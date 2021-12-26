@@ -198,7 +198,7 @@ void OptionsDialog::reload()
             f.wanted = wanted_[i];
             f.size = file.length();
             f.have = 0;
-            f.filename = QString::fromUtf8(std::data(file.path()), std::size(file.path()));
+            f.filename = QString::fromStdString(file.path());
             files_.push_back(f);
 
             ++i;

@@ -560,78 +560,50 @@ std::string_view tr_torrent_metainfo::parseImpl(tr_torrent_metainfo& setme, tr_v
     }
 
     // comment (optional)
+    setme.comment_.clear();
     if (tr_variantDictFindStrView(meta, TR_KEY_comment_utf_8, &sv) || tr_variantDictFindStrView(meta, TR_KEY_comment, &sv))
     {
         setme.comment_ = tr_strvUtf8Clean(sv);
     }
-    else
-    {
-        setme.comment_.clear();
-    }
 
     // created by (optional)
+    setme.creator_.clear();
     if (tr_variantDictFindStrView(meta, TR_KEY_created_by_utf_8, &sv) ||
         tr_variantDictFindStrView(meta, TR_KEY_created_by, &sv))
     {
         setme.creator_ = tr_strvUtf8Clean(sv);
     }
-    else
-    {
-        setme.creator_.clear();
-    }
 
     // creation date (optional)
-    if (tr_variantDictFindInt(meta, TR_KEY_creation_date, &i))
-    {
-        setme.date_created_ = i;
-    }
-    else
-    {
-        setme.date_created_ = 0;
-    }
+    setme.date_created_ = tr_variantDictFindInt(meta, TR_KEY_creation_date, &i) ? i : 0;
 
     // private (optional)
-    if (tr_variantDictFindInt(info_dict, TR_KEY_private, &i) || tr_variantDictFindInt(meta, TR_KEY_private, &i))
-    {
-        setme.is_private_ = i != 0;
-    }
-    else
-    {
-        setme.is_private_ = false;
-    }
+    setme.is_private_ = (tr_variantDictFindInt(info_dict, TR_KEY_private, &i) ||
+                         tr_variantDictFindInt(meta, TR_KEY_private, &i)) &&
+        (i != 0);
 
     // source (optional)
+    setme.source_.clear();
     if (tr_variantDictFindStrView(info_dict, TR_KEY_source, &sv) || tr_variantDictFindStrView(meta, TR_KEY_source, &sv))
     {
         setme.source_ = tr_strvUtf8Clean(sv);
     }
-    else
-    {
-        setme.source_.clear();
-    }
 
     // piece length
-    auto piece_size = uint64_t{};
-    if (tr_variantDictFindInt(info_dict, TR_KEY_piece_length, &i) && (i > 0))
-    {
-        piece_size = i;
-    }
-    else
+    if (!tr_variantDictFindInt(info_dict, TR_KEY_piece_length, &i) && (i <= 0))
     {
         return "'info' dict 'piece length' is missing or has an invalid value";
     }
+    auto const piece_size = i;
 
     // pieces
-    if (tr_variantDictFindStrView(info_dict, TR_KEY_pieces, &sv) && (std::size(sv) % sizeof(tr_sha1_digest_t) == 0))
-    {
-        auto const n = std::size(sv) / sizeof(tr_sha1_digest_t);
-        setme.pieces_.resize(n);
-        std::copy_n(std::data(sv), std::size(sv), reinterpret_cast<char*>(std::data(setme.pieces_)));
-    }
-    else
+    if (!tr_variantDictFindStrView(info_dict, TR_KEY_pieces, &sv) || (std::size(sv) % sizeof(tr_sha1_digest_t) != 0))
     {
         return "'info' dict 'pieces' is missing or has an invalid value";
     }
+    auto const n = std::size(sv) / sizeof(tr_sha1_digest_t);
+    setme.pieces_.resize(n);
+    std::copy_n(std::data(sv), std::size(sv), reinterpret_cast<char*>(std::data(setme.pieces_)));
 
     // files
     auto total_size = uint64_t{ 0 };
@@ -640,7 +612,7 @@ std::string_view tr_torrent_metainfo::parseImpl(tr_torrent_metainfo& setme, tr_v
         return errstr;
     }
 
-    if (std::empty(setme.files_) || total_size == 0)
+    if (std::empty(setme.files_))
     {
         return "no files found"sv;
     }

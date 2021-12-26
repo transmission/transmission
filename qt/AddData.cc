@@ -25,13 +25,12 @@ namespace
 QString getNameFromMetainfo(QByteArray const& benc)
 {
     auto metainfo = tr_torrent_metainfo{};
-    if (metainfo.parseBenc({ benc.constData(), size_t(benc.size()) }))
+    if (!metainfo.parseBenc({ benc.constData(), size_t(benc.size()) }))
     {
-        auto const& mname = metainfo.name();
-        return QString::fromUtf8(std::data(mname), std::size(mname));
+        return {};
     }
 
-    return {};
+    return QString::fromStdString(metainfo.name());
 }
 
 } // namespace
