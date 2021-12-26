@@ -635,8 +635,7 @@ std::string_view tr_torrent_metainfo::parseImpl(tr_torrent_metainfo& setme, tr_v
 
     // files
     auto total_size = uint64_t{ 0 };
-    auto const errstr = parseFiles(setme, info_dict, &total_size);
-    if (!std::empty(errstr))
+    if (auto const errstr = parseFiles(setme, info_dict, &total_size); !std::empty(errstr))
     {
         return errstr;
     }
