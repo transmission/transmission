@@ -159,8 +159,7 @@ void showInfo(tr_torrent_metainfo const& metainfo)
     ***
     **/
 
-    auto const& webseeds = metainfo.webseeds();
-    if (!std::empty(webseeds))
+    if (auto const& webseeds = metainfo.webseeds(); !std::empty(webseeds))
     {
         printf("\nWEBSEEDS\n\n");
 
