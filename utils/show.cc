@@ -221,6 +221,9 @@ CURL* tr_curl_easy_init(struct evbuffer* writebuf)
 
 void doScrape(tr_torrent_metainfo const& metainfo)
 {
+    auto* const buf = evbuffer_new();
+    auto* const curl = tr_curl_easy_init(buf);
+
     for (auto const& tracker : metainfo.announceList())
     {
         if (std::empty(tracker.scrape_str))
@@ -241,80 +244,69 @@ void doScrape(tr_torrent_metainfo const& metainfo)
         printf("%" TR_PRIsv " ... ", TR_PRIsv_ARG(url));
         fflush(stdout);
 
-        auto* const buf = evbuffer_new();
-        auto* const curl = tr_curl_easy_init(buf);
+        // execute the http scrape
         curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
         curl_easy_setopt(curl, CURLOPT_TIMEOUT, TimeoutSecs);
-
         auto const res = curl_easy_perform(curl);
         if (res != CURLE_OK)
         {
             printf("error: %s\n", curl_easy_strerror(res));
+            continue;
         }
-        else
+
+        // check the response code
+        long response;
+        curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &response);
+        if (response != 200 /*HTTP OK*/)
         {
-            long response;
-            curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &response);
+            printf("error: unexpected response %ld \"%s\"\n", response, tr_webGetResponseStr(response));
+            continue;
+        }
 
-            if (response != 200)
+        // print it out
+        tr_variant top;
+        char const* begin = (char const*)evbuffer_pullup(buf, -1);
+        auto sv = std::string_view{ begin, evbuffer_get_length(buf) };
+        if (!tr_variantFromBuf(&top, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, sv))
+        {
+            printf("error parsing scrape response\n");
+            continue;
+        }
+
+        bool matched = false;
+        tr_variant* files = nullptr;
+        if (tr_variantDictFindDict(&top, TR_KEY_files, &files))
+        {
+            size_t child_pos = 0;
+            tr_quark key;
+            tr_variant* val;
+
+            auto hashsv = std::string_view{ reinterpret_cast<char const*>(std::data(metainfo.infoHash())),
+                                            std::size(metainfo.infoHash()) };
+
+            while (tr_variantDictChild(files, child_pos++, &key, &val))
             {
-                printf("error: unexpected response %ld \"%s\"\n", response, tr_webGetResponseStr(response));
-            }
-            else /* HTTP OK */
-            {
-                tr_variant top;
-                tr_variant* files;
-                bool matched = false;
-                char const* begin = (char const*)evbuffer_pullup(buf, -1);
-                auto sv = std::string_view{ begin, evbuffer_get_length(buf) };
-                if (tr_variantFromBuf(&top, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, sv))
+                if (hashsv == tr_quark_get_string_view(key))
                 {
-                    if (tr_variantDictFindDict(&top, TR_KEY_files, &files))
-                    {
-                        size_t child_pos = 0;
-                        tr_quark key;
-                        tr_variant* val;
-
-                        auto hashsv = std::string_view{ reinterpret_cast<char const*>(std::data(metainfo.infoHash())),
-                                                        std::size(metainfo.infoHash()) };
-
-                        while (tr_variantDictChild(files, child_pos, &key, &val))
-                        {
-                            if (hashsv == tr_quark_get_string_view(key))
-                            {
-                                int64_t seeders;
-                                if (!tr_variantDictFindInt(val, TR_KEY_complete, &seeders))
-                                {
-                                    seeders = -1;
-                                }
-
-                                int64_t leechers;
-                                if (!tr_variantDictFindInt(val, TR_KEY_incomplete, &leechers))
-                                {
-                                    leechers = -1;
-                                }
-
-                                printf("%d seeders, %d leechers\n", (int)seeders, (int)leechers);
-                                matched = true;
-                            }
-
-                            ++child_pos;
-                        }
-                    }
-
-                    tr_variantFree(&top);
-                }
-
-                if (!matched)
-                {
-                    printf("no match\n");
+                    auto i = int64_t{};
+                    auto const seeders = tr_variantDictFindInt(val, TR_KEY_complete, &i) ? int(i) : -1;
+                    auto const leechers = tr_variantDictFindInt(val, TR_KEY_incomplete, &i) ? int(i) : -1;
+                    printf("%d seeders, %d leechers\n", (int)seeders, (int)leechers);
+                    matched = true;
                 }
             }
         }
 
-        curl_easy_cleanup(curl);
-        evbuffer_free(buf);
+        tr_variantFree(&top);
+
+        if (!matched)
+        {
+            printf("no match\n");
+        }
     }
+
+    curl_easy_cleanup(curl);
+    evbuffer_free(buf);
 }
 
 } // namespace
