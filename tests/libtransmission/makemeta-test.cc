@@ -81,7 +81,7 @@ protected:
         EXPECT_EQ(comment, metainfo.comment());
         EXPECT_EQ(tr_file_index_t{ 1 }, std::size(metainfo.files()));
         EXPECT_EQ(isPrivate, metainfo.isPrivate());
-        EXPECT_EQ(size_t(trackerCount), metainfo.trackerCount());
+        EXPECT_EQ(size_t(trackerCount), std::size(metainfo.announceList()));
 
         // cleanup
         tr_metaInfoBuilderFree(builder);
@@ -162,7 +162,7 @@ protected:
         EXPECT_EQ(source, metainfo.source());
         EXPECT_EQ(payload_count, std::size(metainfo.files()));
         EXPECT_EQ(is_private, metainfo.isPrivate());
-        EXPECT_EQ(size_t(tracker_count), metainfo.trackerCount());
+        EXPECT_EQ(size_t(tracker_count), std::size(metainfo.announceList()));
 
         // cleanup
         tr_metaInfoBuilderFree(builder);
