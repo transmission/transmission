@@ -1118,47 +1118,7 @@ tr_stat const* tr_torrentStat(tr_torrent* tor)
 static uint64_t countFileBytesCompleted(tr_torrent const* tor, tr_file_index_t index)
 {
     tr_file const& f = tor->file(index);
-    if (f.length == 0)
-    {
-        return 0;
-    }
-
-    auto const [begin, end] = tr_torGetFileBlockSpan(tor, index);
-    auto const n = end - begin;
-
-    if (n == 0)
-    {
-        return 0;
-    }
-
-    if (n == 1)
-    {
-        return tor->hasBlock(begin) ? f.length : 0;
-    }
-
-    auto total = uint64_t{};
-
-    // the first block
-    if (tor->hasBlock(begin))
-    {
-        total += tor->block_size - f.priv.offset % tor->block_size;
-    }
-
-    // the middle blocks
-    if (end - begin > 2)
-    {
-        uint64_t u = tor->completion.blocks().count(begin + 1, end - 1);
-        u *= tor->block_size;
-        total += u;
-    }
-
-    // the last block
-    if (tor->hasBlock(end - 1))
-    {
-        total += f.priv.offset + f.length - (uint64_t)tor->block_size * (end - 1);
-    }
-
-    return total;
+    return tor->completion.countHasBytesInBytes({ f.offset, f.offset + f.length });
 }
 
 tr_file_view tr_torrentFile(tr_torrent const* torrent, tr_file_index_t i)

@@ -46,6 +46,12 @@ struct tr_block_span_t
     tr_block_index_t end;
 };
 
+struct tr_byte_span_t
+{
+    uint64_t begin;
+    uint64_t end;
+};
+
 struct tr_ctor;
 struct tr_error;
 struct tr_file;
