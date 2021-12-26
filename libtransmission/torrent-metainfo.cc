@@ -350,7 +350,7 @@ std::string tr_torrent_metainfo::parsePath(std::string_view root, tr_variant* pa
     }
 
     buf = root;
-    for (int i = 0, n = tr_variantListSize(path); i < n; i++)
+    for (size_t i = 0, n = tr_variantListSize(path); i < n; ++i)
     {
         auto raw = std::string_view{};
         if (!tr_variantGetStrView(tr_variantListChild(path, i), &raw))
