@@ -59,7 +59,7 @@ void tr_ctorInitTorrentWanted(tr_ctor const* ctor, tr_torrent* tor);
 
 bool tr_ctorSaveContents(tr_ctor const* ctor, std::string_view filename, tr_error** error);
 
-bool tr_ctorGetMetainfo(tr_ctor const* ctor, tr_variant const** setme);
+std::string_view tr_ctorGetContents(tr_ctor const* ctor);
 
 tr_session* tr_ctorGetSession(tr_ctor const* ctor);
 
@@ -769,3 +769,6 @@ char* tr_torrentBuildPartial(tr_torrent const*, tr_file_index_t fileNo);
 void tr_torrentGotNewInfoDict(tr_torrent* tor);
 
 tr_peer_id_t const& tr_torrentGetPeerId(tr_torrent* tor);
+
+/** @brief free a metainfo */
+void tr_metainfoFree(tr_info* inf);

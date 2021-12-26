@@ -22,6 +22,7 @@
 #include "transmission.h"
 
 #include "tr-macros.h"
+#include "torrent.h"
 
 struct tr_error;
 struct tr_variant;

@@ -109,10 +109,10 @@ char const* tr_ctorGetSourceFile(tr_ctor const* ctor)
     return ctor->metainfo.parsedTorrentFile().c_str();
 }
 
-bool tr_ctorSaveContents(tr_ctor const* ctor, char const* filename, tr_error** error)
+bool tr_ctorSaveContents(tr_ctor const* ctor, std::string_view filename, tr_error** error)
 {
     TR_ASSERT(ctor != nullptr);
-    TR_ASSERT(filename != nullptr);
+    TR_ASSERT(!std::empty(filename));
 
     if (std::empty(ctor->contents))
     {
@@ -332,7 +332,7 @@ tr_priority_t tr_ctorGetBandwidthPriority(tr_ctor const* ctor)
 ****
 ***/
 
-tr_ctor* tr_ctorNew(tr_session* session)
+tr_ctor* tr_ctorNew(tr_session const* session)
 {
     auto* const ctor = new tr_ctor{ session };
 

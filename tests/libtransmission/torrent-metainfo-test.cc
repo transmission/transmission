@@ -19,11 +19,18 @@
 #include "torrent.h"
 #include "utils.h"
 
-#include "gtest/gtest.h"
+#include "test-fixtures.h"
 
 using namespace std::literals;
 
-TEST(TorrentMetainfo, magnetLink)
+namespace libtransmission
+{
+namespace test
+{
+
+using TorrentMetainfoTest = SessionTest;
+
+TEST_F(TorrentMetainfoTest, magnetLink)
 {
     // background info @ http://wiki.theory.org/BitTorrent_Magnet-URI_Webseeding
     char const constexpr* const MagnetLink =
@@ -47,7 +54,7 @@ TEST(TorrentMetainfo, magnetLink)
     "eed6:lengthi2e4:pathl5:b.txteee4:name3:foo12:piece lengthi32768e6:pieces20:ÞÉ`âMs¡Å;Ëº¬.åÂà7:privatei0eee"
 
 // FIXME: split these into parameterized tests?
-TEST(TorrentMetainfo, bucket)
+TEST_F(TorrentMetainfoTest, bucket)
 {
     struct LocalTest
     {
@@ -81,7 +88,7 @@ TEST(TorrentMetainfo, bucket)
     }
 }
 
-TEST(TorrentMetainfo, sanitize)
+TEST_F(TorrentMetainfoTest, sanitize)
 {
     struct LocalTest
     {
@@ -139,24 +146,24 @@ TEST(TorrentMetainfo, sanitize)
     }
 }
 
-TEST(TorrentMetainfo, AndroidTorrent)
+TEST_F(TorrentMetainfoTest, AndroidTorrent)
 {
     auto const filename = tr_strvJoin(LIBTRANSMISSION_TEST_ASSETS_DIR, "/Android-x86 8.1 r6 iso.torrent"sv);
 
-    auto* ctor = tr_ctorNew(nullptr);
+    auto* ctor = tr_ctorNew(session_);
     tr_error* error = nullptr;
     EXPECT_TRUE(tr_ctorSetMetainfoFromFile(ctor, filename.c_str(), &error));
     EXPECT_EQ(nullptr, error);
     tr_ctorFree(ctor);
 }
 
-TEST(TorrentMetainfo, ctorSaveContents)
+TEST_F(TorrentMetainfoTest, ctorSaveContents)
 {
     auto const src_filename = tr_strvJoin(LIBTRANSMISSION_TEST_ASSETS_DIR, "/Android-x86 8.1 r6 iso.torrent"sv);
     auto const tgt_filename = tr_strvJoin(::testing::TempDir(), "save-contents-test.torrent");
 
     // try saving without passing any metainfo.
-    auto* ctor = tr_ctorNew(nullptr);
+    auto* ctor = tr_ctorNew(session_);
     tr_error* error = nullptr;
     EXPECT_FALSE(tr_ctorSaveContents(ctor, tgt_filename.c_str(), &error));
     EXPECT_NE(nullptr, error);
@@ -167,7 +174,7 @@ TEST(TorrentMetainfo, ctorSaveContents)
     }
 
     // now try saving _with_ metainfo
-    EXPECT_TRUE(tr_ctorSetMetainfoFromFile(ctor, src_filename.c_str()), &error);
+    EXPECT_TRUE(tr_ctorSetMetainfoFromFile(ctor, src_filename.c_str(), &error));
     EXPECT_EQ(nullptr, error);
     EXPECT_TRUE(tr_ctorSaveContents(ctor, tgt_filename.c_str(), &error));
     EXPECT_EQ(nullptr, error);
@@ -185,3 +192,6 @@ TEST(TorrentMetainfo, ctorSaveContents)
     tr_error_clear(&error);
     tr_ctorFree(ctor);
 }
+
+} // namespace test
+} // namespace libtransmission
