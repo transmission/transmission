@@ -7,6 +7,7 @@
  */
 
 #include <algorithm>
+#include <cstdarg>
 #include <cstring> /* strlen() */
 
 #include "transmission.h"
@@ -14,6 +15,8 @@
 #include "file.h"
 #include "tr-assert.h"
 #include "utils.h"
+
+using namespace std::literals;
 
 bool tr_sys_file_read_line(tr_sys_file_t handle, char* buffer, size_t buffer_size, tr_error** error)
 {
@@ -115,7 +118,7 @@ bool tr_sys_file_write_fmt(tr_sys_file_t handle, char const* format, tr_error** 
     }
     else
     {
-        tr_error_set_literal(error, 0, "Unable to format message.");
+        tr_error_set(error, 0, "Unable to format message."sv);
     }
 
     return ret;

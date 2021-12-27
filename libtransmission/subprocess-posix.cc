@@ -24,6 +24,8 @@
 #include "tr-macros.h"
 #include "utils.h"
 
+using namespace std::literals;
+
 static void handle_sigchld(int /*i*/)
 {
     int rc = 0;
@@ -37,21 +39,14 @@ static void handle_sigchld(int /*i*/)
     /* FIXME: Call old handler, if any */
 }
 
-static void set_system_error(tr_error** error, int code, char const* what)
+static void set_system_error(tr_error** error, int code, std::string_view what)
 {
     if (error == nullptr)
     {
         return;
     }
 
-    if (what == nullptr)
-    {
-        tr_error_set_literal(error, code, tr_strerror(code));
-    }
-    else
-    {
-        tr_error_set(error, code, "%s failed: %s", what, tr_strerror(code));
-    }
+    tr_error_set(error, code, tr_strvJoin(what, " failed "sv, tr_strerror(code)));
 }
 
 static bool tr_spawn_async_in_child(

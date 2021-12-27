@@ -538,7 +538,7 @@ std::optional<tr_metainfo_parsed> tr_metainfoParse(tr_session const* session, tr
     char const* bad_tag = tr_metainfoParseImpl(session, &out.info, &out.pieces, &out.info_dict_length, meta_in);
     if (bad_tag != nullptr)
     {
-        tr_error_set(error, TR_ERROR_EINVAL, _("Error parsing metainfo: %s"), bad_tag);
+        tr_error_set(error, TR_ERROR_EINVAL, tr_strvJoin("Error parsing metainfo: "sv, bad_tag));
         tr_metainfoFree(&out.info);
         return {};
     }

@@ -1246,7 +1246,7 @@ bool tr_variantFromBuf(tr_variant* setme, int opts, std::string_view buf, char c
 
     if (err)
     {
-        tr_error_set_literal(error, EILSEQ, "error parsing encoded data");
+        tr_error_set(error, EILSEQ, "error parsing encoded data"sv);
         return false;
     }
 

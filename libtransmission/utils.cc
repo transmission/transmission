@@ -283,7 +283,7 @@ uint8_t* tr_loadFile(char const* path, size_t* size, tr_error** error)
     if (info.type != TR_SYS_PATH_IS_FILE)
     {
         tr_logAddError(err_fmt, path, _("Not a regular file"));
-        tr_error_set_literal(error, TR_ERROR_EISDIR, _("Not a regular file"));
+        tr_error_set(error, TR_ERROR_EISDIR, "Not a regular file"sv);
         return nullptr;
     }
 
@@ -337,7 +337,7 @@ bool tr_loadFile(std::vector<char>& setme, std::string_view path_sv, tr_error** 
     if (info.type != TR_SYS_PATH_IS_FILE)
     {
         tr_logAddError(err_fmt, path_sz, _("Not a regular file"));
-        tr_error_set_literal(error, TR_ERROR_EISDIR, _("Not a regular file"));
+        tr_error_set(error, TR_ERROR_EISDIR, "Not a regular file"sv);
         return false;
     }
 
@@ -1241,7 +1241,7 @@ bool tr_moveFile(char const* oldpath, char const* newpath, tr_error** error)
 
     if (info.type != TR_SYS_PATH_IS_FILE)
     {
-        tr_error_set_literal(error, TR_ERROR_EINVAL, "Old path does not point to a file.");
+        tr_error_set(error, TR_ERROR_EINVAL, "Old path does not point to a file."sv);
         return false;
     }
 
