@@ -177,7 +177,7 @@ void tr_logAddDeep(char const* file, int line, char const* name, char const* fmt
         auto const message = evbuffer_free_to_str(buf);
 
 #ifdef _WIN32
-        OutputDebugStringA(message);
+        OutputDebugStringA(message.c(str());
 #endif
 
         if (fp != TR_BAD_SYS_FILE)
