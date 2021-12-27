@@ -450,11 +450,9 @@ bool Application::Impl::on_rpc_changed_idle(tr_rpc_callback_type type, int torre
                 }
                 else
                 {
-                    char* a = tr_variantToStr(oldval, TR_VARIANT_FMT_BENC, nullptr);
-                    char* b = tr_variantToStr(newval, TR_VARIANT_FMT_BENC, nullptr);
-                    changed = g_strcmp0(a, b) != 0;
-                    tr_free(b);
-                    tr_free(a);
+                    auto const a = tr_variantToStr(oldval, TR_VARIANT_FMT_BENC);
+                    auto const b = tr_variantToStr(newval, TR_VARIANT_FMT_BENC);
+                    changed = a != b;
                 }
 
                 if (changed)

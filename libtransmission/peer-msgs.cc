@@ -682,11 +682,10 @@ static void myDebug(char const* file, int line, tr_peerMsgsImpl const* msgs, cha
         va_end(args);
         evbuffer_add_printf(buf, " (%s:%d)", base, line);
 
-        char* const message = evbuffer_free_to_str(buf, nullptr);
+        auto const message = evbuffer_free_to_str(buf);
         tr_sys_file_write_line(fp, message, nullptr);
 
         tr_free(base);
-        tr_free(message);
     }
 }
 

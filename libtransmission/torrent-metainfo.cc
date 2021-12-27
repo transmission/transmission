@@ -514,12 +514,10 @@ std::string_view tr_torrent_metainfo::parseImpl(tr_torrent_metainfo& setme, tr_v
     {
         // Calculate the hash of the `info` dict.
         // This is the torrent's unique ID and is central to everything.
-        size_t blen = 0;
-        char* const bstr = tr_variantToStr(info_dict, TR_VARIANT_FMT_BENC, &blen);
-        auto const hash = tr_sha1(std::string_view{ bstr, blen });
+        auto const info_dict_benc = tr_variantToStr(info_dict, TR_VARIANT_FMT_BENC);
+        auto const hash = tr_sha1(info_dict_benc);
         if (!hash)
         {
-            tr_free(bstr);
             return "bad info_dict checksum";
         }
         setme.info_hash_ = *hash;
@@ -531,18 +529,15 @@ std::string_view tr_torrent_metainfo::parseImpl(tr_torrent_metainfo& setme, tr_v
         //
         // Calculating this later from scratch is kind of expensive,
         // so do it here since we've already got the bencoded info dict.
-        auto const it = std::search(std::begin(benc), std::end(benc), bstr, bstr + blen);
+        auto const it = std::search(std::begin(benc), std::end(benc), std::begin(info_dict_benc), std::end(info_dict_benc));
         setme.info_dict_offset_ = std::distance(std::begin(benc), it);
-        setme.info_dict_size_ = blen;
+        setme.info_dict_size_ = std::size(info_dict_benc);
 
         // In addition, remember the offset of the pieces dictionary entry.
         // This will be useful when we load piece checksums on demand.
         auto constexpr Key = "6:pieces"sv;
-        auto constexpr* BKey = std::data(Key);
-        auto const pit = std::search(bstr, bstr + blen, BKey, BKey + std::size(Key));
-        setme.pieces_offset_ = setme.info_dict_offset_ + (pit - bstr) + std::size(Key);
-
-        tr_free(bstr);
+        auto const pit = std::search(std::begin(benc), std::end(benc), std::begin(Key), std::end(Key));
+        setme.pieces_offset_ = std::distance(std::begin(benc), pit) + std::size(Key);
     }
     else
     {

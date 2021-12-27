@@ -387,11 +387,8 @@ static char const* tr_metainfoParseImpl(
     }
     else
     {
-        size_t blen = 0;
-        char* bstr = tr_variantToStr(infoDict, TR_VARIANT_FMT_BENC, &blen);
-        auto const hash = tr_sha1(std::string_view{ bstr, blen });
-        tr_free(bstr);
-
+        auto const benc = tr_variantToStr(infoDict, TR_VARIANT_FMT_BENC);
+        auto const hash = tr_sha1(benc);
         if (!hash)
         {
             return "hash";
@@ -402,7 +399,7 @@ static char const* tr_metainfoParseImpl(
 
         if (infoDictLength != nullptr)
         {
-            *infoDictLength = blen;
+            *infoDictLength = std::size(benc);
         }
     }
 

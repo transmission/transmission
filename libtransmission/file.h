@@ -578,13 +578,13 @@ bool tr_sys_file_read_line(tr_sys_file_t handle, char* buffer, size_t buffer_siz
  * should already be in UTF-8 encoding, or whichever else you expect.
  *
  * @param[in]  handle Valid file descriptor.
- * @param[in]  buffer Zero-terminated string to write.
+ * @param[in]  buffer String to write.
  * @param[out] error  Pointer to error object. Optional, pass `nullptr` if you
  *                    are not interested in error details.
  *
  * @return `True` on success, `false` otherwise (with `error` set accordingly).
  */
-bool tr_sys_file_write_line(tr_sys_file_t handle, char const* buffer, struct tr_error** error);
+bool tr_sys_file_write_line(tr_sys_file_t handle, std::string_view buffer, struct tr_error** error);
 
 /**
  * @brief Portability wrapper for `fprintf()`.

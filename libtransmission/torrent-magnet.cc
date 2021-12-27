@@ -28,6 +28,8 @@
 #include "variant.h"
 #include "web-utils.h"
 
+using namespace std::literals;
+
 #define dbgmsg(tor, ...) tr_logAddDeepNamed(tr_torrentName(tor), __VA_ARGS__)
 
 /***
@@ -113,33 +115,34 @@ bool tr_torrentSetMetadataSizeHint(tr_torrent* tor, int64_t size)
 
 static size_t findInfoDictOffset(tr_torrent const* tor)
 {
-    size_t offset = 0;
-
-    /* load the file, and find the info dict's offset inside the file */
-    auto fileLen = size_t{};
-    uint8_t* const fileContents = tr_loadFile(tor->torrentFile(), &fileLen, nullptr);
-    if (fileContents != nullptr)
+    // load the torrent's .torrent file
+    auto benc = std::vector<char>{};
+    if (!tr_loadFile(benc, tor->torrentFile()) || std::empty(benc))
     {
-        auto top = tr_variant{};
-        auto const contents_sv = std::string_view{ reinterpret_cast<char const*>(fileContents), fileLen };
-        if (tr_variantFromBuf(&top, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, contents_sv))
-        {
-            tr_variant* infoDict = nullptr;
-            if (tr_variantDictFindDict(&top, TR_KEY_info, &infoDict))
-            {
-                auto infoLen = size_t{};
-                char* infoContents = tr_variantToStr(infoDict, TR_VARIANT_FMT_BENC, &infoLen);
-                uint8_t const* i = (uint8_t const*)tr_memmem((char*)fileContents, fileLen, infoContents, infoLen);
-                offset = i != nullptr ? i - fileContents : 0;
-                tr_free(infoContents);
-            }
-
-            tr_variantFree(&top);
-        }
-
-        tr_free(fileContents);
+        return {};
     }
 
+    // parse the benc
+    auto top = tr_variant{};
+    auto const benc_sv = std::string_view{ std::data(benc), std::size(benc) };
+    if (!tr_variantFromBuf(&top, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, benc_sv))
+    {
+        return {};
+    }
+
+    auto offset = size_t{};
+    tr_variant* info_dict = nullptr;
+    if (tr_variantDictFindDict(&top, TR_KEY_info, &info_dict))
+    {
+        auto const info_dict_benc = tr_variantToStr(info_dict, TR_VARIANT_FMT_BENC);
+        auto const it = std::search(std::begin(benc), std::end(benc), std::begin(info_dict_benc), std::end(info_dict_benc));
+        if (it != std::end(benc))
+        {
+            offset = std::distance(std::begin(benc), it);
+        }
+    }
+
+    tr_variantFree(&top);
     return offset;
 }
 
@@ -388,31 +391,31 @@ double tr_torrentGetMetadataPercent(tr_torrent const* tor)
 /* TODO: this should be renamed tr_metainfoGetMagnetLink() and moved to metainfo.c for consistency */
 char* tr_torrentInfoGetMagnetLink(tr_info const* inf)
 {
-    evbuffer* const s = evbuffer_new();
+    auto buf = std::string{};
 
-    evbuffer_add_printf(s, "magnet:?xt=urn:btih:%s", inf->hashString);
+    buf += "magnet:?xt=urn:btih:"sv;
+    buf += inf->hashString;
 
     char const* const name = inf->name;
-
     if (!tr_str_is_empty(name))
     {
-        evbuffer_add_printf(s, "%s", "&dn=");
-        tr_http_escape(s, name, true);
+        buf += "&dn="sv;
+        tr_http_escape(buf, name, true);
     }
 
     for (size_t i = 0, n = std::size(*inf->announce_list); i < n; ++i)
     {
-        evbuffer_add_printf(s, "%s", "&tr=");
-        tr_http_escape(s, inf->announce_list->at(i).announce.full, true);
+        buf += "&tr="sv;
+        tr_http_escape(buf, inf->announce_list->at(i).announce.full, true);
     }
 
     for (unsigned int i = 0; i < inf->webseedCount; i++)
     {
-        evbuffer_add_printf(s, "%s", "&ws=");
-        tr_http_escape(s, inf->webseeds[i], true);
+        buf += "&ws="sv;
+        tr_http_escape(buf, inf->webseeds[i], true);
     }
 
-    return evbuffer_free_to_str(s, nullptr);
+    return tr_strvDup(buf);
 }
 
 char* tr_torrentGetMagnetLink(tr_torrent const* tor)
