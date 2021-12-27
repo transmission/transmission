@@ -108,7 +108,7 @@ enum tr_variant_fmt
 
 int tr_variantToFile(tr_variant const* variant, tr_variant_fmt fmt, std::string_view filename);
 
-char* tr_variantToStr(tr_variant const* variant, tr_variant_fmt fmt, size_t* len);
+std::string tr_variantToStr(tr_variant const* variant, tr_variant_fmt fmt);
 
 struct evbuffer* tr_variantToBuf(tr_variant const* variant, tr_variant_fmt fmt);
 

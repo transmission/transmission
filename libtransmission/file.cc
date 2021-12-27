@@ -81,12 +81,11 @@ bool tr_sys_file_read_line(tr_sys_file_t handle, char* buffer, size_t buffer_siz
     return ret;
 }
 
-bool tr_sys_file_write_line(tr_sys_file_t handle, char const* buffer, tr_error** error)
+bool tr_sys_file_write_line(tr_sys_file_t handle, std::string_view buffer, tr_error** error)
 {
     TR_ASSERT(handle != TR_BAD_SYS_FILE);
-    TR_ASSERT(buffer != nullptr);
 
-    bool ret = tr_sys_file_write(handle, buffer, strlen(buffer), nullptr, error);
+    bool ret = tr_sys_file_write(handle, std::data(buffer), std::size(buffer), nullptr, error);
 
     if (ret)
     {

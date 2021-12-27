@@ -857,9 +857,8 @@ static bool init_daemon_data(int argc, char* argv[], struct daemon_data* data, b
 
     if (dumpSettings)
     {
-        char* str = tr_variantToStr(&data->settings, TR_VARIANT_FMT_JSON, nullptr);
-        fprintf(stderr, "%s", str);
-        tr_free(str);
+        auto const str = tr_variantToStr(&data->settings, TR_VARIANT_FMT_JSON);
+        fprintf(stderr, "%s", str.c_str());
         goto EXIT_EARLY;
     }
 

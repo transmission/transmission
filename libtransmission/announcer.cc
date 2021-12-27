@@ -649,9 +649,8 @@ static void dbgmsg_tier_announce_queue(tr_tier const* tier)
             evbuffer_add_printf(buf, "[%d:%s]", i, str);
         }
 
-        char* const message = evbuffer_free_to_str(buf, nullptr);
-        tr_logAddDeep(__FILE__, __LINE__, name, "announce queue is %s", message);
-        tr_free(message);
+        auto const message = evbuffer_free_to_str(buf);
+        tr_logAddDeep(__FILE__, __LINE__, name, "announce queue is %" TR_PRIsv, TR_PRIsv_ARG(message));
     }
 }
 

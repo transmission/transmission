@@ -228,7 +228,7 @@ constexpr bool tr_str_is_empty(char const* value)
     return value == nullptr || *value == '\0';
 }
 
-char* evbuffer_free_to_str(struct evbuffer* buf, size_t* result_len);
+std::string evbuffer_free_to_str(evbuffer* buf);
 
 /**
  * @brief sprintf() a string into a newly-allocated buffer large enough to hold it
