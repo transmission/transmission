@@ -185,7 +185,7 @@ void OptionsDialog::reload()
 
     if (metainfo_)
     {
-        size_t i = 0;
+        int i = 0;
         auto const n_files = std::size(metainfo_->files());
         priorities_.assign(n_files, TR_PRI_NORMAL);
         wanted_.assign(n_files, true);
@@ -198,7 +198,7 @@ void OptionsDialog::reload()
             f.wanted = wanted_[i];
             f.size = file.length();
             f.have = 0;
-            f.filename = QString::fromUtf8(std::data(file.path()), std::size(file.path()));
+            f.filename = QString::fromStdString(file.path());
             files_.push_back(f);
 
             ++i;

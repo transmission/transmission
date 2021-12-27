@@ -50,13 +50,16 @@ auto options = std::array<tr_option, 5>{
       { 0, nullptr, nullptr, nullptr, false, nullptr } }
 };
 
-auto filename_opt = std::string_view{};
-auto magnet_opt = bool{ false };
-auto scrape_opt = bool{ false };
-auto show_version_opt = bool{ false };
-auto unsorted_opt = bool{ false };
+struct app_opts
+{
+    std::string_view filename;
+    bool scrape = false;
+    bool show_magnet = false;
+    bool show_version = false;
+    bool unsorted = false;
+};
 
-int parseCommandLine(int argc, char const* const* argv)
+int parseCommandLine(app_opts& opts, int argc, char const* const* argv)
 {
     int c;
     char const* optarg;
@@ -66,23 +69,23 @@ int parseCommandLine(int argc, char const* const* argv)
         switch (c)
         {
         case 'm':
-            magnet_opt = true;
+            opts.show_magnet = true;
             break;
 
         case 's':
-            scrape_opt = true;
+            opts.scrape = true;
             break;
 
         case 'u':
-            unsorted_opt = true;
+            opts.unsorted = true;
             break;
 
         case 'V':
-            show_version_opt = true;
+            opts.show_version = true;
             break;
 
         case TR_OPT_UNK:
-            filename_opt = optarg;
+            opts.filename = optarg;
             break;
 
         default:
@@ -107,7 +110,7 @@ auto toString(time_t timestamp)
     return std::string{ std::data(buf) };
 }
 
-void showInfo(tr_torrent_metainfo const& metainfo)
+void showInfo(app_opts const& opts, tr_torrent_metainfo const& metainfo)
 {
     auto buf = std::array<char, 128>{};
 
@@ -159,8 +162,7 @@ void showInfo(tr_torrent_metainfo const& metainfo)
     ***
     **/
 
-    auto const& webseeds = metainfo.webseeds();
-    if (!std::empty(webseeds))
+    if (auto const& webseeds = metainfo.webseeds(); !std::empty(webseeds))
     {
         printf("\nWEBSEEDS\n\n");
 
@@ -186,7 +188,7 @@ void showInfo(tr_torrent_metainfo const& metainfo)
         filenames.emplace_back(filename);
     }
 
-    if (!unsorted_opt)
+    if (!opts.unsorted)
     {
         std::sort(std::begin(filenames), std::end(filenames));
     }
@@ -219,6 +221,9 @@ CURL* tr_curl_easy_init(struct evbuffer* writebuf)
 
 void doScrape(tr_torrent_metainfo const& metainfo)
 {
+    auto* const buf = evbuffer_new();
+    auto* const curl = tr_curl_easy_init(buf);
+
     for (auto const& tracker : metainfo.announceList())
     {
         if (std::empty(tracker.scrape_str))
@@ -239,80 +244,69 @@ void doScrape(tr_torrent_metainfo const& metainfo)
         printf("%" TR_PRIsv " ... ", TR_PRIsv_ARG(url));
         fflush(stdout);
 
-        auto* const buf = evbuffer_new();
-        auto* const curl = tr_curl_easy_init(buf);
+        // execute the http scrape
         curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
         curl_easy_setopt(curl, CURLOPT_TIMEOUT, TimeoutSecs);
-
         auto const res = curl_easy_perform(curl);
         if (res != CURLE_OK)
         {
             printf("error: %s\n", curl_easy_strerror(res));
+            continue;
         }
-        else
+
+        // check the response code
+        long response;
+        curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &response);
+        if (response != 200 /*HTTP OK*/)
         {
-            long response;
-            curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &response);
+            printf("error: unexpected response %ld \"%s\"\n", response, tr_webGetResponseStr(response));
+            continue;
+        }
 
-            if (response != 200)
+        // print it out
+        tr_variant top;
+        char const* begin = (char const*)evbuffer_pullup(buf, -1);
+        auto sv = std::string_view{ begin, evbuffer_get_length(buf) };
+        if (!tr_variantFromBuf(&top, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, sv))
+        {
+            printf("error parsing scrape response\n");
+            continue;
+        }
+
+        bool matched = false;
+        tr_variant* files = nullptr;
+        if (tr_variantDictFindDict(&top, TR_KEY_files, &files))
+        {
+            size_t child_pos = 0;
+            tr_quark key;
+            tr_variant* val;
+
+            auto hashsv = std::string_view{ reinterpret_cast<char const*>(std::data(metainfo.infoHash())),
+                                            std::size(metainfo.infoHash()) };
+
+            while (tr_variantDictChild(files, child_pos++, &key, &val))
             {
-                printf("error: unexpected response %ld \"%s\"\n", response, tr_webGetResponseStr(response));
-            }
-            else /* HTTP OK */
-            {
-                tr_variant top;
-                tr_variant* files;
-                bool matched = false;
-                char const* begin = (char const*)evbuffer_pullup(buf, -1);
-                auto sv = std::string_view{ begin, evbuffer_get_length(buf) };
-                if (tr_variantFromBuf(&top, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, sv))
+                if (hashsv == tr_quark_get_string_view(key))
                 {
-                    if (tr_variantDictFindDict(&top, TR_KEY_files, &files))
-                    {
-                        size_t child_pos = 0;
-                        tr_quark key;
-                        tr_variant* val;
-
-                        auto hashsv = std::string_view{ reinterpret_cast<char const*>(std::data(metainfo.infoHash())),
-                                                        std::size(metainfo.infoHash()) };
-
-                        while (tr_variantDictChild(files, child_pos, &key, &val))
-                        {
-                            if (hashsv == tr_quark_get_string_view(key))
-                            {
-                                int64_t seeders;
-                                if (!tr_variantDictFindInt(val, TR_KEY_complete, &seeders))
-                                {
-                                    seeders = -1;
-                                }
-
-                                int64_t leechers;
-                                if (!tr_variantDictFindInt(val, TR_KEY_incomplete, &leechers))
-                                {
-                                    leechers = -1;
-                                }
-
-                                printf("%d seeders, %d leechers\n", (int)seeders, (int)leechers);
-                                matched = true;
-                            }
-
-                            ++child_pos;
-                        }
-                    }
-
-                    tr_variantFree(&top);
-                }
-
-                if (!matched)
-                {
-                    printf("no match\n");
+                    auto i = int64_t{};
+                    auto const seeders = tr_variantDictFindInt(val, TR_KEY_complete, &i) ? int(i) : -1;
+                    auto const leechers = tr_variantDictFindInt(val, TR_KEY_incomplete, &i) ? int(i) : -1;
+                    printf("%d seeders, %d leechers\n", (int)seeders, (int)leechers);
+                    matched = true;
                 }
             }
         }
 
-        curl_easy_cleanup(curl);
-        evbuffer_free(buf);
+        tr_variantFree(&top);
+
+        if (!matched)
+        {
+            printf("no match\n");
+        }
     }
+
+    curl_easy_cleanup(curl);
+    evbuffer_free(buf);
 }
 
 } // namespace
@@ -324,19 +318,20 @@ int tr_main(int argc, char* argv[])
     tr_formatter_size_init(DISK_K, DISK_K_STR, DISK_M_STR, DISK_G_STR, DISK_T_STR);
     tr_formatter_speed_init(SPEED_K, SPEED_K_STR, SPEED_M_STR, SPEED_G_STR, SPEED_T_STR);
 
-    if (parseCommandLine(argc, (char const* const*)argv) != 0)
+    auto opts = app_opts{};
+    if (parseCommandLine(opts, argc, (char const* const*)argv) != 0)
     {
         return EXIT_FAILURE;
     }
 
-    if (show_version_opt)
+    if (opts.show_version)
     {
         fprintf(stderr, "%s %s\n", MyName, LONG_VERSION_STRING);
         return EXIT_SUCCESS;
     }
 
     /* make sure the user specified a filename */
-    if (std::empty(filename_opt))
+    if (std::empty(opts.filename))
     {
         fprintf(stderr, "ERROR: No .torrent file specified.\n");
         tr_getopt_usage(MyName, Usage, std::data(options));
@@ -347,13 +342,13 @@ int tr_main(int argc, char* argv[])
     /* try to parse the .torrent file */
     auto metainfo = tr_torrent_metainfo{};
     tr_error* error = nullptr;
-    auto const parsed = metainfo.parseTorrentFile(filename_opt, nullptr, &error);
+    auto const parsed = metainfo.parseTorrentFile(opts.filename, nullptr, &error);
     if (error != nullptr)
     {
         fprintf(
             stderr,
             "Error parsing .torrent file \"%" TR_PRIsv "\": %s (%d)\n",
-            TR_PRIsv_ARG(filename_opt),
+            TR_PRIsv_ARG(opts.filename),
             error->message,
             error->code);
         tr_error_clear(&error);
@@ -363,24 +358,24 @@ int tr_main(int argc, char* argv[])
         return EXIT_FAILURE;
     }
 
-    if (magnet_opt)
+    if (opts.show_magnet)
     {
         printf("%s", metainfo.magnet().c_str());
     }
     else
     {
         printf("Name: %s\n", metainfo.name().c_str());
-        printf("File: %" TR_PRIsv "\n", TR_PRIsv_ARG(filename_opt));
+        printf("File: %" TR_PRIsv "\n", TR_PRIsv_ARG(opts.filename));
         printf("\n");
         fflush(stdout);
 
-        if (scrape_opt)
+        if (opts.scrape)
         {
             doScrape(metainfo);
         }
         else
         {
-            showInfo(metainfo);
+            showInfo(opts, metainfo);
         }
     }
 
