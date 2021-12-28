@@ -282,22 +282,10 @@ static void printMessage(
         char timestr[64];
         tr_logGetTimeStr(timestr, sizeof(timestr));
 
-        if (name != nullptr)
-        {
-            tr_sys_file_write_fmt(
-                file,
-                "[%s] %s %s (%s:%d)" TR_NATIVE_EOL_STR,
-                nullptr,
-                timestr,
-                name,
-                message,
-                filename,
-                line);
-        }
-        else
-        {
-            tr_sys_file_write_fmt(file, "[%s] %s (%s:%d)" TR_NATIVE_EOL_STR, nullptr, timestr, message, filename, line);
-        }
+        auto const out = name != nullptr ?
+            tr_strvJoin("["sv, timestr, "] "sv, name, " "sv, message, " ("sv, filename, ":"sv, std::to_string(line), ")"sv) :
+            tr_strvJoin("["sv, timestr, "] "sv, message, " ("sv, filename, ":"sv, std::to_string(line), ")"sv);
+        tr_sys_file_write_line(file, out, nullptr);
     }
 
 #ifdef HAVE_SYSLOG
@@ -687,7 +675,8 @@ static int daemon_start(void* varg, [[maybe_unused]] bool foreground)
 
         if (fp != TR_BAD_SYS_FILE)
         {
-            tr_sys_file_write_fmt(fp, "%d", nullptr, (int)getpid());
+            auto const out = std::to_string(getpid());
+            tr_sys_file_write(fp, std::data(out), std::size(out), nullptr, nullptr);
             tr_sys_file_close(fp, nullptr);
             tr_logAddInfo("Saved pidfile \"%s\"", sz_pid_filename.c_str());
             pidfile_created = true;

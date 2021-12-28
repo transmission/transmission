@@ -7,7 +7,6 @@
  */
 
 #include <algorithm>
-#include <cstdarg>
 #include <cstring> /* strlen() */
 
 #include "transmission.h"
