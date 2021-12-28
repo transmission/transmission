@@ -8,7 +8,6 @@
 
 #include <algorithm>
 #include <array>
-#include <cstdarg>
 #include <cstring> /* memmove(), memset(), strlen() */
 #include <random> /* random_device, mt19937, uniform_int_distribution*/
 #include <string>

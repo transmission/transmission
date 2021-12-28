@@ -96,6 +96,8 @@
 #endif
 #endif
 
+using namespace std::literals;
+
 static void set_system_error(tr_error** error, int code)
 {
     if (error == nullptr)
@@ -103,7 +105,7 @@ static void set_system_error(tr_error** error, int code)
         return;
     }
 
-    tr_error_set_literal(error, code, tr_strerror(code));
+    tr_error_set(error, code, tr_strerror(code));
 }
 
 static void set_system_error_if_file_found(tr_error** error, int code)
@@ -175,7 +177,7 @@ static bool create_path_require_dir(char const* path, tr_error** error)
 
     if ((sb.st_mode & S_IFMT) != S_IFDIR)
     {
-        tr_error_set(error, ENOTDIR, _("File \"%s\" is in the way"), path);
+        tr_error_set(error, ENOTDIR, tr_strvJoin("File is in the way: "sv, path));
         return false;
     }
 

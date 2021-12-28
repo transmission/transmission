@@ -7,8 +7,9 @@
  */
 
 #include <algorithm>
-#include <ctype.h> /* isalpha() */
+#include <array>
 #include <cstring>
+#include <ctype.h> /* isalpha() */
 #include <string_view>
 
 #include <shlobj.h> /* SHCreateDirectoryEx() */
@@ -55,12 +56,14 @@ static void set_system_error(tr_error** error, DWORD code)
 
     if (message != nullptr)
     {
-        tr_error_set_literal(error, code, message);
+        tr_error_set(error, code, message);
         tr_free(message);
     }
     else
     {
-        tr_error_set(error, code, "Unknown error: 0x%08lx", code);
+        auto buf = std::array<char, 32>{};
+        tr_snprintf(std::data(buf), std::size(buf), "Unknown error: 0x%08lx", code);
+        tr_error_set(error, code, std::data(buf));
     }
 }
 

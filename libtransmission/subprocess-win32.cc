@@ -30,7 +30,7 @@ enum tr_app_type
     TR_APP_TYPE_BATCH
 };
 
-static void set_system_error(tr_error** error, DWORD code, char const* what)
+static void set_system_error(tr_error** error, DWORD code, std::string_view what)
 {
     if (error == nullptr)
     {
@@ -44,14 +44,7 @@ static void set_system_error(tr_error** error, DWORD code, char const* what)
         message = tr_strdup_printf("Unknown error: 0x%08lx", code);
     }
 
-    if (what == nullptr)
-    {
-        tr_error_set_literal(error, code, message);
-    }
-    else
-    {
-        tr_error_set(error, code, "%s failed: %s", what, message);
-    }
+    tr_error_set(error, code, tr_strvJoin(what, " failed: "sv, message));
 
     tr_free(message);
 }

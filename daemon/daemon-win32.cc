@@ -45,8 +45,10 @@ static HANDLE service_stop_thread = nullptr;
 
 static void set_system_error(tr_error** error, DWORD code, char const* message)
 {
-    char* const system_message = tr_win32_format_message(code);
-    tr_error_set(error, code, "%s (0x%08lx): %s", message, code, system_message);
+    auto* const system_message = tr_win32_format_message(code);
+    auto* const buf = tr_strdup_printf("%s (0x%08lx): %s", message, code, system_message);
+    tr_error_set(error, code, buf);
+    tr_free(buf);
     tr_free(system_message);
 }
 
