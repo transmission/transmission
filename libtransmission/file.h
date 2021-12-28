@@ -586,25 +586,6 @@ bool tr_sys_file_read_line(tr_sys_file_t handle, char* buffer, size_t buffer_siz
  */
 bool tr_sys_file_write_line(tr_sys_file_t handle, std::string_view buffer, struct tr_error** error);
 
-/**
- * @brief Portability wrapper for `fprintf()`.
- *
- * Special care should be taken when writing to one of standard output streams
- * (@ref tr_std_sys_file_t) since no UTF-8 conversion is currently being made.
- *
- * Writing to other streams (files, pipes) also leaves data untouched, so it
- * should already be in UTF-8 encoding, or whichever else you expect.
- *
- * @param[in]  handle Valid file descriptor.
- * @param[in]  format String format to write.
- * @param[out] error  Pointer to error object. Optional, pass `nullptr` if you
- *                    are not interested in error details.
- * @param[in]  ...    Format arguments.
- *
- * @return `True` on success, `false` otherwise (with `error` set accordingly).
- */
-bool tr_sys_file_write_fmt(tr_sys_file_t handle, char const* format, struct tr_error** error, ...) TR_GNUC_PRINTF(2, 4);
-
 /* Directory-related wrappers */
 
 /**

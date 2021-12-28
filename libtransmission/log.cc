@@ -19,6 +19,8 @@
 #include "tr-assert.h"
 #include "utils.h"
 
+using namespace std::literals;
+
 tr_log_level __tr_message_level = TR_LOG_ERROR;
 
 static bool myQueueEnabled = false;
@@ -210,7 +212,8 @@ void tr_logAddMessage(char const* file, int line, tr_log_level level, char const
 
     if (buf_len < 0)
     {
-        goto FINISH;
+        errno = err;
+        return;
     }
 
 #ifdef _WIN32
@@ -269,19 +272,12 @@ void tr_logAddMessage(char const* file, int line, tr_log_level level, char const
 
             tr_logGetTimeStr(timestr, sizeof(timestr));
 
-            if (name != nullptr)
-            {
-                tr_sys_file_write_fmt(fp, "[%s] %s: %s" TR_NATIVE_EOL_STR, nullptr, timestr, name, buf);
-            }
-            else
-            {
-                tr_sys_file_write_fmt(fp, "[%s] %s" TR_NATIVE_EOL_STR, nullptr, timestr, buf);
-            }
-
+            auto const out = name != nullptr ? tr_strvJoin("["sv, timestr, "] "sv, name, ": "sv, buf) :
+                                               tr_strvJoin("["sv, timestr, "] "sv, buf);
+            tr_sys_file_write_line(fp, out, nullptr);
             tr_sys_file_flush(fp, nullptr);
         }
     }
 
-FINISH:
     errno = err;
 }

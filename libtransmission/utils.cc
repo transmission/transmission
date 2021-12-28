@@ -574,17 +574,13 @@ char const* tr_strcasestr(char const* haystack, char const* needle)
 
 char* tr_strdup_printf(char const* fmt, ...)
 {
+    evbuffer* const buf = evbuffer_new();
+
     va_list ap;
     va_start(ap, fmt);
-    char* const ret = tr_strdup_vprintf(fmt, ap);
+    evbuffer_add_vprintf(buf, fmt, ap);
     va_end(ap);
-    return ret;
-}
 
-char* tr_strdup_vprintf(char const* fmt, va_list args)
-{
-    struct evbuffer* buf = evbuffer_new();
-    evbuffer_add_vprintf(buf, fmt, args);
     return evbuffer_free_to_str(buf, nullptr);
 }
 

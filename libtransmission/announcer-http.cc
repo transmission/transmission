@@ -30,6 +30,8 @@
 
 #define dbgmsg(name, ...) tr_logAddDeepNamed(name, __VA_ARGS__)
 
+using namespace std::literals;
+
 /****
 *****
 *****  ANNOUNCE
@@ -210,9 +212,8 @@ static void on_announce_done(
 
     if (response_code != HTTP_OK)
     {
-        char const* fmt = _("Tracker gave HTTP response code %1$ld (%2$s)");
-        char const* response_str = tr_webGetResponseStr(response_code);
-        response->errmsg = tr_strdup_printf(fmt, response_code, response_str);
+        auto const* const response_str = tr_webGetResponseStr(response_code);
+        response->errmsg = tr_strvJoin("Tracker HTTP response "sv, std::to_string(response_code), " ("sv, response_str, ")"sv);
     }
     else
     {

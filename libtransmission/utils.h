@@ -11,7 +11,6 @@
 #include <algorithm>
 #include <cctype>
 #include <cinttypes>
-#include <cstdarg>
 #include <cstddef>
 #include <ctime>
 #include <optional>
@@ -235,7 +234,6 @@ std::string evbuffer_free_to_str(evbuffer* buf);
  * @return a newly-allocated string that can be freed with tr_free()
  */
 char* tr_strdup_printf(char const* fmt, ...) TR_GNUC_MALLOC TR_GNUC_PRINTF(1, 2);
-char* tr_strdup_vprintf(char const* fmt, va_list args) TR_GNUC_MALLOC TR_GNUC_PRINTF(1, 0);
 
 /** @brief Portability wrapper for strlcpy() that uses the system implementation if available */
 size_t tr_strlcpy(void* dst, void const* src, size_t siz);

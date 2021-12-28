@@ -7,7 +7,6 @@
  */
 
 #include <algorithm>
-#include <cstdarg>
 #include <cstring> /* strlen() */
 
 #include "transmission.h"
@@ -93,31 +92,6 @@ bool tr_sys_file_write_line(tr_sys_file_t handle, std::string_view buffer, tr_er
     if (ret)
     {
         ret = tr_sys_file_write(handle, TR_NATIVE_EOL_STR, TR_NATIVE_EOL_STR_SIZE, nullptr, error);
-    }
-
-    return ret;
-}
-
-bool tr_sys_file_write_fmt(tr_sys_file_t handle, char const* format, tr_error** error, ...)
-{
-    TR_ASSERT(handle != TR_BAD_SYS_FILE);
-    TR_ASSERT(format != nullptr);
-
-    bool ret = false;
-    va_list args;
-
-    va_start(args, error);
-    char* const buffer = tr_strdup_vprintf(format, args);
-    va_end(args);
-
-    if (buffer != nullptr)
-    {
-        ret = tr_sys_file_write(handle, buffer, strlen(buffer), nullptr, error);
-        tr_free(buffer);
-    }
-    else
-    {
-        tr_error_set(error, 0, "Unable to format message."sv);
     }
 
     return ret;

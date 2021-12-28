@@ -387,29 +387,6 @@ TEST_F(UtilsTest, truncd)
 #endif
 }
 
-namespace
-{
-
-char* testStrdupPrintfValist(char const* fmt, ...) TR_GNUC_PRINTF(1, 2);
-
-char* testStrdupPrintfValist(char const* fmt, ...)
-{
-    va_list args;
-    va_start(args, fmt);
-    auto* ret = tr_strdup_vprintf(fmt, args);
-    va_end(args);
-    return ret;
-}
-
-} // namespace
-
-TEST_F(UtilsTest, trStrdupVprintf)
-{
-    // NOLINTNEXTLINE(cert-dcl50-cpp)
-    auto s = makeString(testStrdupPrintfValist("\n-%s-%s-%s-\n", "\r", "\t", "\b"));
-    EXPECT_EQ("\n-\r-\t-\b-\n", s);
-}
-
 TEST_F(UtilsTest, trStrdupPrintfFmtS)
 {
     auto s = makeString(tr_strdup_printf("%s", "test"));
