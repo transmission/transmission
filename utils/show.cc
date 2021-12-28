@@ -290,7 +290,7 @@ void doScrape(tr_torrent_metainfo const& metainfo)
                     auto i = int64_t{};
                     auto const seeders = tr_variantDictFindInt(val, TR_KEY_complete, &i) ? int(i) : -1;
                     auto const leechers = tr_variantDictFindInt(val, TR_KEY_incomplete, &i) ? int(i) : -1;
-                    printf("%d seeders, %d leechers\n", (int)seeders, (int)leechers);
+                    printf("%d seeders, %d leechers\n", seeders, leechers);
                     matched = true;
                 }
 
