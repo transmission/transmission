@@ -465,10 +465,8 @@ static void atomSetSeed(tr_swarm* s, struct peer_atom* atom)
 bool tr_peerMgrPeerIsSeed(tr_torrent const* tor, tr_address const* addr)
 {
     bool isSeed = false;
-    tr_swarm const* s = tor->swarm;
-    struct peer_atom const* atom = getExistingAtom(s, addr);
 
-    if (atom != nullptr)
+    if (auto const* atom = getExistingAtom(tor->swarm, addr); atom != nullptr)
     {
         isSeed = atomIsSeed(atom);
     }
