@@ -11,6 +11,8 @@
 
 #include "gtest/gtest.h"
 
+using namespace std::literals;
+
 TEST(Error, errorSet)
 {
     tr_error* err = nullptr;
@@ -18,14 +20,7 @@ TEST(Error, errorSet)
     tr_error_prefix(&err, "error: ");
     EXPECT_EQ(nullptr, err);
 
-    tr_error_set(&err, 1, "error: %s (%d)", "oops", 2);
-    EXPECT_NE(nullptr, err);
-    EXPECT_EQ(1, err->code);
-    EXPECT_STREQ("error: oops (2)", err->message);
-    tr_error_clear(&err);
-    EXPECT_EQ(nullptr, err);
-
-    tr_error_set_literal(&err, 2, "oops");
+    tr_error_set(&err, 2, "oops"sv);
     EXPECT_NE(nullptr, err);
     EXPECT_EQ(2, err->code);
     EXPECT_STREQ("oops", err->message);
@@ -44,7 +39,7 @@ TEST(Error, propagate)
     tr_error* err2 = nullptr;
     auto constexpr Code = int{ 1 };
 
-    tr_error_set_literal(&err, Code, "oops");
+    tr_error_set(&err, Code, "oops"sv);
     EXPECT_NE(nullptr, err);
     EXPECT_EQ(Code, err->code);
     EXPECT_STREQ("oops", err->message);

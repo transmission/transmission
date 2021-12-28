@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include <string_view>
+
 #include "tr-macros.h"
 
 /**
@@ -25,33 +27,11 @@ struct tr_error
 };
 
 /**
- * @brief Create new error object using literal error message.
- *
- * @param[in] code    Error code (platform-specific).
- * @param[in] message Error message.
- *
- * @return Newly allocated error object on success, `nullptr` otherwise.
- */
-tr_error* tr_error_new_literal(int code, char const* message);
-
-/**
  * @brief Free memory used by error object.
  *
  * @param[in] error Error object to be freed.
  */
 void tr_error_free(tr_error* error);
-
-/**
- * @brief Create and set new error object using `printf`-style formatting.
- *
- * If passed pointer to error object is `nullptr`, do nothing.
- *
- * @param[in,out] error          Pointer to error object to be set.
- * @param[in]     code           Error code (platform-specific).
- * @param[in]     message_format Error message format string.
- * @param[in]     ...            Format arguments.
- */
-void tr_error_set(tr_error** error, int code, char const* message_format, ...) TR_GNUC_PRINTF(3, 4);
 
 /**
  * @brief Create and set new error object using literal error message.
@@ -62,7 +42,7 @@ void tr_error_set(tr_error** error, int code, char const* message_format, ...) T
  * @param[in]     code    Error code (platform-specific).
  * @param[in]     message Error message.
  */
-void tr_error_set_literal(tr_error** error, int code, char const* message);
+void tr_error_set(tr_error** error, int code, std::string_view message);
 
 /**
  * @brief Propagate existing error object upwards.

@@ -71,7 +71,7 @@ bool tr_ctorSetMetainfoFromFile(tr_ctor* ctor, char const* filename, tr_error** 
 {
     if (filename == nullptr)
     {
-        tr_error_set_literal(error, EINVAL, "no filename specified");
+        tr_error_set(error, EINVAL, "no filename specified"sv);
         return false;
     }
 
@@ -116,7 +116,7 @@ bool tr_ctorSaveContents(tr_ctor const* ctor, std::string_view filename, tr_erro
 
     if (std::empty(ctor->contents))
     {
-        tr_error_set_literal(error, EINVAL, "torrent ctor has no contents to save");
+        tr_error_set(error, EINVAL, "torrent ctor has no contents to save"sv);
         return false;
     }
 

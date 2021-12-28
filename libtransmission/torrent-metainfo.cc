@@ -637,7 +637,7 @@ bool tr_torrent_metainfo::parseBenc(std::string_view benc, tr_error** error)
     tr_variantFree(&top);
     if (!std::empty(errmsg))
     {
-        tr_error_set(error, TR_ERROR_EINVAL, "Error parsing metainfo: %" TR_PRIsv, TR_PRIsv_ARG(errmsg));
+        tr_error_set(error, TR_ERROR_EINVAL, tr_strvJoin("Error parsing metainfo: ", errmsg));
         return false;
     }
 
