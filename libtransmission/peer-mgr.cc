@@ -326,9 +326,8 @@ static bool peerIsInUse(tr_swarm const* cs, struct peer_atom const* atom)
         getExistingHandshake(&s->manager->incomingHandshakes, &atom->addr) != nullptr;
 }
 
-static void swarmFree(void* vs)
+static void swarmFree(tr_swarm* s)
 {
-    auto* s = static_cast<tr_swarm*>(vs);
     TR_ASSERT(s != nullptr);
     auto const lock = s->manager->unique_lock();
 
@@ -375,7 +374,7 @@ static void ensureMgrTimersExist(struct tr_peerMgr* m);
 
 tr_peerMgr* tr_peerMgrNew(tr_session* session)
 {
-    tr_peerMgr* m = tr_new0(tr_peerMgr, 1);
+    auto* const m = tr_new0(tr_peerMgr, 1);
     m->session = session;
     m->incomingHandshakes = {};
     ensureMgrTimersExist(m);
@@ -466,10 +465,8 @@ static void atomSetSeed(tr_swarm* s, struct peer_atom* atom)
 bool tr_peerMgrPeerIsSeed(tr_torrent const* tor, tr_address const* addr)
 {
     bool isSeed = false;
-    tr_swarm const* s = tor->swarm;
-    struct peer_atom const* atom = getExistingAtom(s, addr);
 
-    if (atom != nullptr)
+    if (auto const* atom = getExistingAtom(tor->swarm, addr); atom != nullptr)
     {
         isSeed = atomIsSeed(atom);
     }
@@ -1116,7 +1113,7 @@ static void close_peer_socket(struct tr_peer_socket const socket, tr_session* se
     }
 }
 
-void tr_peerMgrAddIncoming(tr_peerMgr* manager, tr_address* addr, tr_port port, struct tr_peer_socket const socket)
+void tr_peerMgrAddIncoming(tr_peerMgr* manager, tr_address const* addr, tr_port port, struct tr_peer_socket const socket)
 {
     TR_ASSERT(tr_isSession(manager->session));
     auto const lock = manager->unique_lock();
@@ -1147,7 +1144,7 @@ void tr_peerMgrSetSwarmIsAllSeeds(tr_torrent* tor)
 {
     auto const lock = tor->unique_lock();
 
-    tr_swarm* const swarm = tor->swarm;
+    auto* const swarm = tor->swarm;
     auto atomCount = int{};
     struct peer_atom** atoms = (struct peer_atom**)tr_ptrArrayPeek(&swarm->pool, &atomCount);
     for (int i = 0; i < atomCount; ++i)
@@ -1188,7 +1185,7 @@ tr_pex* tr_peerMgrCompactToPex(
 {
     size_t n = compactLen / 6;
     auto const* walk = static_cast<uint8_t const*>(compact);
-    tr_pex* pex = tr_new0(tr_pex, n);
+    auto* const pex = tr_new0(tr_pex, n);
 
     for (size_t i = 0; i < n; ++i)
     {
@@ -1217,7 +1214,7 @@ tr_pex* tr_peerMgrCompact6ToPex(
 {
     size_t n = compactLen / 18;
     auto const* walk = static_cast<uint8_t const*>(compact);
-    tr_pex* pex = tr_new0(tr_pex, n);
+    auto* const pex = tr_new0(tr_pex, n);
 
     for (size_t i = 0; i < n; ++i)
     {
@@ -1273,9 +1270,7 @@ int tr_pexCompare(void const* va, void const* vb)
     TR_ASSERT(tr_isPex(a));
     TR_ASSERT(tr_isPex(b));
 
-    auto i = int{};
-
-    if ((i = tr_address_compare(&a->addr, &b->addr)) != 0)
+    if (auto const i = tr_address_compare(&a->addr, &b->addr); i != 0)
     {
         return i;
     }
@@ -1360,7 +1355,7 @@ int tr_peerMgrGetPeers(tr_torrent const* tor, tr_pex** setme_pex, uint8_t af, ui
     struct peer_atom** atoms = nullptr;
     if (list_mode == TR_PEERS_CONNECTED) /* connected peers only */
     {
-        tr_peer const** peers = (tr_peer const**)tr_ptrArrayBase(&s->peers);
+        auto const** peers = (tr_peer const**)tr_ptrArrayBase(&s->peers);
         atomCount = tr_ptrArraySize(&s->peers);
         atoms = tr_new(struct peer_atom*, atomCount);
 
@@ -1397,7 +1392,7 @@ int tr_peerMgrGetPeers(tr_torrent const* tor, tr_pex** setme_pex, uint8_t af, ui
     auto count = int{};
     for (int i = 0; i < atomCount && count < n; ++i)
     {
-        struct peer_atom const* atom = atoms[i];
+        auto const* const atom = atoms[i];
 
         if (atom->addr.type == af)
         {
@@ -1516,9 +1511,7 @@ void tr_peerMgrRemoveTorrent(tr_torrent* tor)
 
 void tr_peerUpdateProgress(tr_torrent* tor, tr_peer* peer)
 {
-    auto const* have = &peer->have;
-
-    if (have->hasAll())
+    if (auto const* have = &peer->have; have->hasAll())
     {
         peer->progress = 1.0;
     }
@@ -1556,7 +1549,7 @@ void tr_peerMgrOnTorrentGotMetainfo(tr_torrent* tor)
     /* some peer_msgs' progress fields may not be accurate if we
        didn't have the metadata before now... so refresh them all... */
     int const peerCount = tr_ptrArraySize(&tor->swarm->peers);
-    tr_peer** const peers = (tr_peer**)tr_ptrArrayBase(&tor->swarm->peers);
+    auto** const peers = (tr_peer**)tr_ptrArrayBase(&tor->swarm->peers);
 
     for (int i = 0; i < peerCount; ++i)
     {
@@ -1583,7 +1576,7 @@ void tr_peerMgrTorrentAvailability(tr_torrent const* tor, int8_t* tab, unsigned 
     if (tor->hasMetadata())
     {
         int const peerCount = tr_ptrArraySize(&tor->swarm->peers);
-        tr_peer const** peers = (tr_peer const**)tr_ptrArrayBase(&tor->swarm->peers);
+        auto const** peers = (tr_peer const**)tr_ptrArrayBase(&tor->swarm->peers);
         float const interval = tor->pieceCount() / (float)tabCount;
         auto const isSeed = tor->isSeed();
 
@@ -1991,7 +1984,7 @@ static void rechokeDownloads(tr_swarm* s)
         int const n = tor->pieceCount();
 
         /* build a bitfield of interesting pieces... */
-        bool* const piece_is_interesting = tr_new(bool, n);
+        auto* const piece_is_interesting = tr_new(bool, n);
 
         for (int i = 0; i < n; ++i)
         {
@@ -2111,7 +2104,7 @@ static bool isNew(tr_peerMsgs const* msgs)
 }
 
 /* get a rate for deciding which peers to choke and unchoke. */
-static int getRate(tr_torrent const* tor, struct peer_atom* atom, uint64_t now)
+static int getRate(tr_torrent const* tor, struct peer_atom const* atom, uint64_t now)
 {
     auto Bps = unsigned{};
 
@@ -2536,7 +2529,7 @@ static void enforceSessionPeerLimit(tr_session* session)
         std::begin(session->torrents),
         std::end(session->torrents),
         size_t{},
-        [](size_t sum, tr_torrent* tor) { return sum + tr_ptrArraySize(&tor->swarm->peers); });
+        [](size_t sum, tr_torrent const* tor) { return sum + tr_ptrArraySize(&tor->swarm->peers); });
     size_t const max = tr_sessionGetPeerLimit(session);
     if (n_peers <= max)
     {
@@ -2591,8 +2584,8 @@ static void reconnectPulse(evutil_socket_t /*fd*/, short /*what*/, void* vmgr)
     enforceSessionPeerLimit(mgr->session);
 
     // try to make new peer connections
-    int const MaxConnectionsPerPulse = (int)(MaxConnectionsPerSecond * (ReconnectPeriodMsec / 1000.0));
-    makeNewPeerConnections(mgr, MaxConnectionsPerPulse);
+    auto const max_connections_per_pulse = (int)(MaxConnectionsPerSecond * (ReconnectPeriodMsec / 1000.0));
+    makeNewPeerConnections(mgr, max_connections_per_pulse);
 }
 
 /****

@@ -106,12 +106,7 @@ static void etaToString(char* buf, size_t buflen, int64_t eta)
 
 static char* tr_strltime(char* buf, int seconds, size_t buflen)
 {
-    int days;
-    int hours;
-    int minutes;
-    int total_seconds;
     char b[128];
-    char d[128];
     char h[128];
     char m[128];
     char s[128];
@@ -122,13 +117,12 @@ static char* tr_strltime(char* buf, int seconds, size_t buflen)
         seconds = 0;
     }
 
-    total_seconds = seconds;
-    days = seconds / 86400;
-    hours = (seconds % 86400) / 3600;
-    minutes = (seconds % 3600) / 60;
+    auto const total_seconds = seconds;
+    auto const days = seconds / 86400;
+    auto const hours = (seconds % 86400) / 3600;
+    auto const minutes = (seconds % 3600) / 60;
     seconds = (seconds % 3600) % 60;
 
-    tr_snprintf(d, sizeof(d), "%d %s", days, days == 1 ? "day" : "days");
     tr_snprintf(h, sizeof(h), "%d %s", hours, hours == 1 ? "hour" : "hours");
     tr_snprintf(m, sizeof(m), "%d %s", minutes, minutes == 1 ? "minute" : "minutes");
     tr_snprintf(s, sizeof(s), "%d %s", seconds, seconds == 1 ? "second" : "seconds");
@@ -136,6 +130,9 @@ static char* tr_strltime(char* buf, int seconds, size_t buflen)
 
     if (days != 0)
     {
+        char d[128];
+        tr_snprintf(d, sizeof(d), "%d %s", days, days == 1 ? "day" : "days");
+
         if (days >= 4 || hours == 0)
         {
             tr_strlcpy(b, d, sizeof(b));

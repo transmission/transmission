@@ -35,7 +35,7 @@
 #include <libtransmission/version.h>
 #include <libtransmission/watchdir.h>
 
-using namespace std::literals;
+#include "daemon.h"
 
 #ifdef USE_SYSTEMD
 
@@ -45,15 +45,17 @@ using namespace std::literals;
 
 static void sd_notify(int /*status*/, char const* /*str*/)
 {
+    // no-op
 }
 
 static void sd_notifyf(int /*status*/, char const* /*fmt*/, ...)
 {
+    // no-op
 }
 
 #endif
 
-#include "daemon.h"
+using namespace std::literals;
 
 static char constexpr MyName[] = "transmission-daemon";
 static char constexpr Usage[] = "Transmission " LONG_VERSION_STRING
@@ -65,27 +67,23 @@ static char constexpr Usage[] = "Transmission " LONG_VERSION_STRING
                                 "\n"
                                 "Usage: transmission-daemon [options]";
 
-#define MY_NAME "transmission-daemon"
+static auto constexpr MemK = size_t{ 1024 };
+static char constexpr MemKStr[] = "KiB";
+static char constexpr MemMStr[] = "MiB";
+static char constexpr MemGStr[] = "GiB";
+static char constexpr MemTStr[] = "TiB";
 
-#define MEM_K 1024
-#define MEM_K_STR "KiB"
-#define MEM_M_STR "MiB"
-#define MEM_G_STR "GiB"
-#define MEM_T_STR "TiB"
+static auto constexpr DiskK = size_t{ 1000 };
+static char constexpr DiskKStr[] = "kB";
+static char constexpr DiskMStr[] = "MB";
+static char constexpr DiskGStr[] = "GB";
+static char constexpr DiskTStr[] = "TB";
 
-#define DISK_K 1000
-#define DISK_B_STR "B"
-#define DISK_K_STR "kB"
-#define DISK_M_STR "MB"
-#define DISK_G_STR "GB"
-#define DISK_T_STR "TB"
-
-#define SPEED_K 1000
-#define SPEED_B_STR "B/s"
-#define SPEED_K_STR "kB/s"
-#define SPEED_M_STR "MB/s"
-#define SPEED_G_STR "GB/s"
-#define SPEED_T_STR "TB/s"
+static auto constexpr SpeedK = size_t{ 1000 };
+static char constexpr SpeedKStr[] = "kB/s";
+static char constexpr SpeedMStr[] = "MB/s";
+static char constexpr SpeedGStr[] = "GB/s";
+static char constexpr SpeedTStr[] = "TB/s";
 
 static bool seenHUP = false;
 static char const* logfileName = nullptr;
@@ -272,20 +270,19 @@ static auto onFileAdded(tr_watchdir_t dir, char const* name, void* vsession)
 static void printMessage(
     tr_sys_file_t file,
     [[maybe_unused]] int level,
-    char const* name,
-    char const* message,
-    char const* filename,
+    std::string_view name,
+    std::string_view message,
+    std::string_view filename,
     int line)
 {
+    auto const out = std::empty(name) ? tr_strvJoin(message, " ("sv, filename, ":"sv, std::to_string(line), ")"sv) :
+                                        tr_strvJoin(name, " "sv, message, " ("sv, filename, ":"sv, std::to_string(line), ")"sv);
+
     if (file != TR_BAD_SYS_FILE)
     {
-        char timestr[64];
-        tr_logGetTimeStr(timestr, sizeof(timestr));
-
-        auto const out = name != nullptr ?
-            tr_strvJoin("["sv, timestr, "] "sv, name, " "sv, message, " ("sv, filename, ":"sv, std::to_string(line), ")"sv) :
-            tr_strvJoin("["sv, timestr, "] "sv, message, " ("sv, filename, ":"sv, std::to_string(line), ")"sv);
-        tr_sys_file_write_line(file, out, nullptr);
+        auto timestr = std::array<char, 64>{};
+        tr_logGetTimeStr(std::data(timestr), std::size(timestr));
+        tr_sys_file_write_line(file, tr_strvJoin("["sv, std::data(timestr), "] "sv, out), nullptr);
     }
 
 #ifdef HAVE_SYSLOG
@@ -310,14 +307,7 @@ static void printMessage(
             break;
         }
 
-        if (name != nullptr)
-        {
-            syslog(priority, "%s %s (%s:%d)", name, message, filename, line);
-        }
-        else
-        {
-            syslog(priority, "%s (%s:%d)", message, filename, line);
-        }
+        syslog(priority, "%s", out.c_str());
     }
 
 #endif
@@ -329,7 +319,8 @@ static void pumpLogMessages(tr_sys_file_t file)
 
     for (tr_log_message const* l = list; l != nullptr; l = l->next)
     {
-        printMessage(file, l->level, l->name, l->message, l->file, l->line);
+        auto const name = std::string_view{ l->name != nullptr ? l->name : "" };
+        printMessage(file, l->level, name, l->message, l->file, l->line);
     }
 
     if (file != TR_BAD_SYS_FILE)
@@ -653,9 +644,9 @@ static int daemon_start(void* varg, [[maybe_unused]] bool foreground)
     }
 
     /* start the session */
-    tr_formatter_mem_init(MEM_K, MEM_K_STR, MEM_M_STR, MEM_G_STR, MEM_T_STR);
-    tr_formatter_size_init(DISK_K, DISK_K_STR, DISK_M_STR, DISK_G_STR, DISK_T_STR);
-    tr_formatter_speed_init(SPEED_K, SPEED_K_STR, SPEED_M_STR, SPEED_G_STR, SPEED_T_STR);
+    tr_formatter_mem_init(MemK, MemKStr, MemMStr, MemGStr, MemTStr);
+    tr_formatter_size_init(DiskK, DiskKStr, DiskMStr, DiskGStr, DiskTStr);
+    tr_formatter_speed_init(SpeedK, SpeedKStr, SpeedMStr, SpeedGStr, SpeedTStr);
     session = tr_sessionInit(configDir, true, settings);
     tr_sessionSetRPCCallback(session, on_rpc_callback, nullptr);
     tr_logAddNamedInfo(nullptr, "Using settings from \"%s\"", configDir);
@@ -878,13 +869,9 @@ int tr_main(int argc, char* argv[])
         &daemon_reconfigure,
     };
 
-    tr_error* error = nullptr;
-
-    if (!dtr_daemon(&cb, &data, foreground, &ret, &error))
+    if (tr_error* error = nullptr; !dtr_daemon(&cb, &data, foreground, &ret, &error))
     {
-        char buf[256];
-        tr_snprintf(buf, sizeof(buf), "Failed to daemonize: %s", error->message);
-        printMessage(logfile, TR_LOG_ERROR, MyName, buf, __FILE__, __LINE__);
+        printMessage(logfile, TR_LOG_ERROR, MyName, tr_strvJoin("Failed to daemonize: ", error->message), __FILE__, __LINE__);
         tr_error_free(error);
     }
 

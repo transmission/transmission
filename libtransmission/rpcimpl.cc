@@ -41,11 +41,11 @@
 #include "web.h"
 #include "web-utils.h"
 
-#define RPC_VERSION 17
-#define RPC_VERSION_MIN 14
-#define RPC_VERSION_SEMVER "5.3.0"
+static auto constexpr RpcVersion = int64_t{ 17 };
+static auto constexpr RpcVersionMin = int64_t{ 14 };
+static char constexpr RpcVersionSemver[] = "5.3.0";
 
-#define RECENTLY_ACTIVE_SECONDS 60
+static auto constexpr RecentlyActiveSeconds = time_t{ 60 };
 
 using namespace std::literals;
 
@@ -156,7 +156,7 @@ static auto getTorrents(tr_session* session, tr_variant* args)
     {
         if (sv == "recently-active"sv)
         {
-            time_t const cutoff = tr_time() - RECENTLY_ACTIVE_SECONDS;
+            time_t const cutoff = tr_time() - RecentlyActiveSeconds;
 
             torrents.reserve(std::size(session->torrents));
             std::copy_if(
@@ -878,7 +878,7 @@ static char const* torrentGet(tr_session* session, tr_variant* args_in, tr_varia
     if (tr_variantDictFindStrView(args_in, TR_KEY_ids, &sv) && sv == "recently-active"sv)
     {
         time_t const now = tr_time();
-        int const interval = RECENTLY_ACTIVE_SECONDS;
+        auto const interval = RecentlyActiveSeconds;
 
         auto const& removed = session->removed_torrents;
         tr_variant* removed_out = tr_variantDictAddList(args_out, TR_KEY_removed, std::size(removed));
@@ -902,7 +902,7 @@ static char const* torrentGet(tr_session* session, tr_variant* args_in, tr_varia
         /* make an array of property name quarks */
         size_t keyCount = 0;
         size_t const n = tr_variantListSize(fields);
-        tr_quark* keys = tr_new(tr_quark, n);
+        auto* const keys = tr_new(tr_quark, n);
         for (size_t i = 0; i < n; ++i)
         {
             if (!tr_variantGetStrView(tr_variantListChild(fields, i), &sv))
@@ -2179,15 +2179,15 @@ static void addSessionField(tr_session* s, tr_variant* d, tr_quark key)
         break;
 
     case TR_KEY_rpc_version:
-        tr_variantDictAddInt(d, key, RPC_VERSION);
+        tr_variantDictAddInt(d, key, RpcVersion);
         break;
 
     case TR_KEY_rpc_version_semver:
-        tr_variantDictAddStrView(d, key, RPC_VERSION_SEMVER);
+        tr_variantDictAddStrView(d, key, RpcVersionSemver);
         break;
 
     case TR_KEY_rpc_version_minimum:
-        tr_variantDictAddInt(d, key, RPC_VERSION_MIN);
+        tr_variantDictAddInt(d, key, RpcVersionMin);
         break;
 
     case TR_KEY_seedRatioLimit:
