@@ -326,9 +326,8 @@ static bool peerIsInUse(tr_swarm const* cs, struct peer_atom const* atom)
         getExistingHandshake(&s->manager->incomingHandshakes, &atom->addr) != nullptr;
 }
 
-static void swarmFree(void* vs)
+static void swarmFree(tr_swarm* s)
 {
-    auto* s = static_cast<tr_swarm*>(vs);
     TR_ASSERT(s != nullptr);
     auto const lock = s->manager->unique_lock();
 
