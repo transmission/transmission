@@ -2104,7 +2104,7 @@ static bool isNew(tr_peerMsgs const* msgs)
 }
 
 /* get a rate for deciding which peers to choke and unchoke. */
-static int getRate(tr_torrent const* tor, struct peer_atom* atom, uint64_t now)
+static int getRate(tr_torrent const* tor, struct peer_atom const* atom, uint64_t now)
 {
     auto Bps = unsigned{};
 
