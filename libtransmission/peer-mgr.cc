@@ -1185,7 +1185,7 @@ tr_pex* tr_peerMgrCompactToPex(
 {
     size_t n = compactLen / 6;
     auto const* walk = static_cast<uint8_t const*>(compact);
-    tr_pex* pex = tr_new0(tr_pex, n);
+    auto* const pex = tr_new0(tr_pex, n);
 
     for (size_t i = 0; i < n; ++i)
     {
@@ -1214,7 +1214,7 @@ tr_pex* tr_peerMgrCompact6ToPex(
 {
     size_t n = compactLen / 18;
     auto const* walk = static_cast<uint8_t const*>(compact);
-    tr_pex* pex = tr_new0(tr_pex, n);
+    auto* const pex = tr_new0(tr_pex, n);
 
     for (size_t i = 0; i < n; ++i)
     {
