@@ -35,7 +35,7 @@
 #include <libtransmission/version.h>
 #include <libtransmission/watchdir.h>
 
-using namespace std::literals;
+#include "daemon.h"
 
 #ifdef USE_SYSTEMD
 
@@ -55,7 +55,7 @@ static void sd_notifyf(int /*status*/, char const* /*fmt*/, ...)
 
 #endif
 
-#include "daemon.h"
+using namespace std::literals;
 
 static char constexpr MyName[] = "transmission-daemon";
 static char constexpr Usage[] = "Transmission " LONG_VERSION_STRING
@@ -66,8 +66,6 @@ static char constexpr Usage[] = "Transmission " LONG_VERSION_STRING
                                 "controlled via transmission-qt, transmission-remote, or its web interface.\n"
                                 "\n"
                                 "Usage: transmission-daemon [options]";
-
-#define MY_NAME "transmission-daemon"
 
 static auto constexpr MemK = size_t{ 1024 };
 static char constexpr MemKStr[] = "KiB";
