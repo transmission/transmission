@@ -274,8 +274,7 @@ void doScrape(tr_torrent_metainfo const& metainfo)
         }
 
         bool matched = false;
-        tr_variant* files = nullptr;
-        if (tr_variantDictFindDict(&top, TR_KEY_files, &files))
+        if (tr_variant* files = nullptr; tr_variantDictFindDict(&top, TR_KEY_files, &files))
         {
             size_t child_pos = 0;
             tr_quark key;
@@ -284,16 +283,18 @@ void doScrape(tr_torrent_metainfo const& metainfo)
             auto hashsv = std::string_view{ reinterpret_cast<char const*>(std::data(metainfo.infoHash())),
                                             std::size(metainfo.infoHash()) };
 
-            while (tr_variantDictChild(files, child_pos++, &key, &val))
+            while (tr_variantDictChild(files, child_pos, &key, &val))
             {
                 if (hashsv == tr_quark_get_string_view(key))
                 {
                     auto i = int64_t{};
                     auto const seeders = tr_variantDictFindInt(val, TR_KEY_complete, &i) ? int(i) : -1;
                     auto const leechers = tr_variantDictFindInt(val, TR_KEY_incomplete, &i) ? int(i) : -1;
-                    printf("%d seeders, %d leechers\n", (int)seeders, (int)leechers);
+                    printf("%d seeders, %d leechers\n", seeders, leechers);
                     matched = true;
                 }
+
+                ++child_pos;
             }
         }
 

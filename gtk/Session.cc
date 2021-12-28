@@ -1055,7 +1055,7 @@ int Session::Impl::add_ctor(tr_ctor* ctor, bool do_prompt, bool do_notify)
          * don't want to be nagging users to clean up their watch dirs */
         if (tr_ctorGetSourceFile(ctor) == nullptr || !adding_from_watch_dir_)
         {
-            signal_add_error.emit(static_cast<ErrorCode>(ERR_ADD_TORRENT_DUP), metainfo->name().c_str());
+            signal_add_error.emit(ERR_ADD_TORRENT_DUP, metainfo->name().c_str());
         }
 
         tr_ctorFree(ctor);

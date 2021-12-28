@@ -146,21 +146,15 @@ void OptionsDialog::reload()
     switch (add_.type)
     {
     case AddData::MAGNET:
-        {
-            auto magnet = add_.magnet.toUtf8();
-            ok = metainfo.parseMagnet({ std::data(magnet), size_t(std::size(magnet)) });
-            break;
-        }
+        ok = metainfo.parseMagnet(add_.magnet.toStdString());
+        break;
 
     case AddData::FILENAME:
-        {
-            auto filename = add_.filename.toUtf8();
-            ok = metainfo.parseTorrentFile({ std::data(filename), size_t(std::size(filename)) });
-            break;
-        }
+        ok = metainfo.parseTorrentFile(add_.filename.toStdString());
+        break;
 
     case AddData::METAINFO:
-        ok = metainfo.parseBenc({ std::data(add_.metainfo), size_t(std::size(add_.metainfo)) });
+        ok = metainfo.parseBenc(add_.metainfo.toStdString());
         break;
 
     default:

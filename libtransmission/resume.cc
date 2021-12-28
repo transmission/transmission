@@ -468,7 +468,7 @@ static void rawToBitfield(tr_bitfield& bitfield, uint8_t const* raw, size_t rawl
     }
 }
 
-static void saveProgress(tr_variant* dict, tr_torrent* tor)
+static void saveProgress(tr_variant* dict, tr_torrent const* tor)
 {
     tr_variant* const prog = tr_variantDictAddDict(dict, TR_KEY_progress, 4);
 

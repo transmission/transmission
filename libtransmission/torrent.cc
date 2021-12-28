@@ -2515,8 +2515,7 @@ static void tr_torrentFileCompleted(tr_torrent* tor, tr_file_index_t i)
     char* sub = nullptr;
     if (tr_torrentFindFile2(tor, i, &base, &sub, nullptr))
     {
-        tr_file& file = tor->file(i);
-        if (strcmp(sub, file.name) != 0)
+        if (tr_file& file = tor->file(i); strcmp(sub, file.name) != 0)
         {
             auto const oldpath = tr_strvPath(base, sub);
             auto const newpath = tr_strvPath(base, file.name);
