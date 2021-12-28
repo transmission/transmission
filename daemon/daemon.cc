@@ -270,20 +270,19 @@ static auto onFileAdded(tr_watchdir_t dir, char const* name, void* vsession)
 static void printMessage(
     tr_sys_file_t file,
     [[maybe_unused]] int level,
-    char const* name,
-    char const* message,
-    char const* filename,
+    std::string_view name,
+    std::string_view message,
+    std::string_view filename,
     int line)
 {
+    auto const out = std::empty(name) ? tr_strvJoin(message, " ("sv, filename, ":"sv, std::to_string(line), ")"sv) :
+                                        tr_strvJoin(name, " "sv, message, " ("sv, filename, ":"sv, std::to_string(line), ")"sv);
+
     if (file != TR_BAD_SYS_FILE)
     {
-        char timestr[64];
-        tr_logGetTimeStr(timestr, sizeof(timestr));
-
-        auto const out = name != nullptr ?
-            tr_strvJoin("["sv, timestr, "] "sv, name, " "sv, message, " ("sv, filename, ":"sv, std::to_string(line), ")"sv) :
-            tr_strvJoin("["sv, timestr, "] "sv, message, " ("sv, filename, ":"sv, std::to_string(line), ")"sv);
-        tr_sys_file_write_line(file, out, nullptr);
+        auto timestr = std::array<char, 64>{};
+        tr_logGetTimeStr(std::data(timestr), std::size(timestr));
+        tr_sys_file_write_line(file, tr_strvJoin("["sv, std::data(timestr), "] "sv, out), nullptr);
     }
 
 #ifdef HAVE_SYSLOG
@@ -308,14 +307,7 @@ static void printMessage(
             break;
         }
 
-        if (name != nullptr)
-        {
-            syslog(priority, "%s %s (%s:%d)", name, message, filename, line);
-        }
-        else
-        {
-            syslog(priority, "%s (%s:%d)", message, filename, line);
-        }
+        syslog(priority, "%s", out.c_str());
     }
 
 #endif
@@ -327,7 +319,8 @@ static void pumpLogMessages(tr_sys_file_t file)
 
     for (tr_log_message const* l = list; l != nullptr; l = l->next)
     {
-        printMessage(file, l->level, l->name, l->message, l->file, l->line);
+        auto const name = std::string_view{ l->name != nullptr ? l->name : "" };
+        printMessage(file, l->level, name, l->message, l->file, l->line);
     }
 
     if (file != TR_BAD_SYS_FILE)
@@ -880,9 +873,7 @@ int tr_main(int argc, char* argv[])
 
     if (!dtr_daemon(&cb, &data, foreground, &ret, &error))
     {
-        char buf[256];
-        tr_snprintf(buf, sizeof(buf), "Failed to daemonize: %s", error->message);
-        printMessage(logfile, TR_LOG_ERROR, MyName, buf, __FILE__, __LINE__);
+        printMessage(logfile, TR_LOG_ERROR, MyName, tr_strvJoin("Failed to daemonize: ", error->message), __FILE__, __LINE__);
         tr_error_free(error);
     }
 
