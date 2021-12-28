@@ -283,7 +283,7 @@ void doScrape(tr_torrent_metainfo const& metainfo)
             auto hashsv = std::string_view{ reinterpret_cast<char const*>(std::data(metainfo.infoHash())),
                                             std::size(metainfo.infoHash()) };
 
-            while (tr_variantDictChild(files, child_pos++, &key, &val))
+            while (tr_variantDictChild(files, child_pos, &key, &val))
             {
                 if (hashsv == tr_quark_get_string_view(key))
                 {
@@ -293,6 +293,8 @@ void doScrape(tr_torrent_metainfo const& metainfo)
                     printf("%d seeders, %d leechers\n", (int)seeders, (int)leechers);
                     matched = true;
                 }
+
+                ++child_pos;
             }
         }
 
