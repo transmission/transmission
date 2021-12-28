@@ -274,8 +274,7 @@ void doScrape(tr_torrent_metainfo const& metainfo)
         }
 
         bool matched = false;
-        tr_variant* files = nullptr;
-        if (tr_variantDictFindDict(&top, TR_KEY_files, &files))
+        if (tr_variant* files = nullptr; tr_variantDictFindDict(&top, TR_KEY_files, &files))
         {
             size_t child_pos = 0;
             tr_quark key;
