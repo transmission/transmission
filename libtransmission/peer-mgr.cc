@@ -2584,8 +2584,8 @@ static void reconnectPulse(evutil_socket_t /*fd*/, short /*what*/, void* vmgr)
     enforceSessionPeerLimit(mgr->session);
 
     // try to make new peer connections
-    int const MaxConnectionsPerPulse = (int)(MaxConnectionsPerSecond * (ReconnectPeriodMsec / 1000.0));
-    makeNewPeerConnections(mgr, MaxConnectionsPerPulse);
+    auto const max_connections_per_pulse = (int)(MaxConnectionsPerSecond * (ReconnectPeriodMsec / 1000.0));
+    makeNewPeerConnections(mgr, max_connections_per_pulse);
 }
 
 /****
