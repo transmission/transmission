@@ -39,31 +39,30 @@
 ****
 ***/
 
-#define MEM_K 1024
-#define MEM_K_STR "KiB"
-#define MEM_M_STR "MiB"
-#define MEM_G_STR "GiB"
-#define MEM_T_STR "TiB"
+static auto constexpr MemK = size_t{ 1024 };
+static char constexpr MemKStr[] = "KiB";
+static char constexpr MemMStr[] = "MiB";
+static char constexpr MemGStr[] = "GiB";
+static char constexpr MemTStr[] = "TiB";
 
-#define DISK_K 1000
-#define DISK_B_STR "B"
-#define DISK_K_STR "kB"
-#define DISK_M_STR "MB"
-#define DISK_G_STR "GB"
-#define DISK_T_STR "TB"
+static auto constexpr DiskK = size_t{ 1000 };
+static char constexpr DiskKStr[] = "kB";
+static char constexpr DiskMStr[] = "MB";
+static char constexpr DiskGStr[] = "GB";
+static char constexpr DiskTStr[] = "TB";
 
-#define SPEED_K 1000
-#define SPEED_B_STR "B/s"
+static auto constexpr SpeedK = size_t{ 1000 };
 #define SPEED_K_STR "kB/s"
-#define SPEED_M_STR "MB/s"
-#define SPEED_G_STR "GB/s"
-#define SPEED_T_STR "TB/s"
+static char constexpr SpeedKStr[] = SPEED_K_STR;
+static char constexpr SpeedMStr[] = "MB/s";
+static char constexpr SpeedGStr[] = "GB/s";
+static char constexpr SpeedTStr[] = "TB/s";
 
 /***
 ****
 ***/
 
-#define LINEWIDTH 80
+static auto constexpr LineWidth = size_t{ 80 };
 
 static char constexpr MyConfigName[] = "transmission";
 static char constexpr MyReadableName[] = "transmission-cli";
@@ -239,9 +238,9 @@ int tr_main(int argc, char* argv[])
     tr_variant settings;
     char const* configDir;
 
-    tr_formatter_mem_init(MEM_K, MEM_K_STR, MEM_M_STR, MEM_G_STR, MEM_T_STR);
-    tr_formatter_size_init(DISK_K, DISK_K_STR, DISK_M_STR, DISK_G_STR, DISK_T_STR);
-    tr_formatter_speed_init(SPEED_K, SPEED_K_STR, SPEED_M_STR, SPEED_G_STR, SPEED_T_STR);
+    tr_formatter_mem_init(MemK, MemKStr, MemMStr, MemGStr, MemTStr);
+    tr_formatter_size_init(DiskK, DiskKStr, DiskMStr, DiskGStr, DiskTStr);
+    tr_formatter_speed_init(SpeedK, SpeedKStr, SpeedMStr, SpeedGStr, SpeedTStr);
 
     printf("%s %s\n", MyReadableName, LONG_VERSION_STRING);
 
@@ -349,7 +348,7 @@ int tr_main(int argc, char* argv[])
 
     for (;;)
     {
-        char line[LINEWIDTH];
+        char line[LineWith];
         tr_stat const* st;
         char const* messageName[] = {
             nullptr,
@@ -390,7 +389,7 @@ int tr_main(int argc, char* argv[])
         }
 
         getStatusStr(st, line, sizeof(line));
-        printf("\r%-*s", TR_ARG_TUPLE(LINEWIDTH, line));
+        printf("\r%-*s", TR_ARG_TUPLE(LineWith, line));
 
         if (messageName[st->error])
         {
