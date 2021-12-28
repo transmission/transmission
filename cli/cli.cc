@@ -62,7 +62,7 @@ static char constexpr SpeedTStr[] = "TB/s";
 ****
 ***/
 
-static auto constexpr LineWidth = size_t{ 80 };
+static auto constexpr LineWidth = int{ 80 };
 
 static char constexpr MyConfigName[] = "transmission";
 static char constexpr MyReadableName[] = "transmission-cli";
@@ -348,7 +348,7 @@ int tr_main(int argc, char* argv[])
 
     for (;;)
     {
-        char line[LineWith];
+        char line[LineWidth];
         tr_stat const* st;
         char const* messageName[] = {
             nullptr,
@@ -389,7 +389,7 @@ int tr_main(int argc, char* argv[])
         }
 
         getStatusStr(st, line, sizeof(line));
-        printf("\r%-*s", TR_ARG_TUPLE(LineWith, line));
+        printf("\r%-*s", TR_ARG_TUPLE(LineWidth, line));
 
         if (messageName[st->error])
         {
