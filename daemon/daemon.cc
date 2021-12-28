@@ -45,10 +45,12 @@ using namespace std::literals;
 
 static void sd_notify(int /*status*/, char const* /*str*/)
 {
+    // no-op
 }
 
 static void sd_notifyf(int /*status*/, char const* /*fmt*/, ...)
 {
+    // no-op
 }
 
 #endif
