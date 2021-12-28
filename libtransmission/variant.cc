@@ -1200,20 +1200,18 @@ struct evbuffer* tr_variantToBuf(tr_variant const* v, tr_variant_fmt fmt)
     return buf;
 }
 
-char* tr_variantToStr(tr_variant const* v, tr_variant_fmt fmt, size_t* len)
+std::string tr_variantToStr(tr_variant const* v, tr_variant_fmt fmt)
 {
-    struct evbuffer* buf = tr_variantToBuf(v, fmt);
-    return evbuffer_free_to_str(buf, len);
+    return evbuffer_free_to_str(tr_variantToBuf(v, fmt));
 }
 
 int tr_variantToFile(tr_variant const* v, tr_variant_fmt fmt, std::string_view filename)
 {
     auto error_code = int{ 0 };
-    auto contents_len = size_t{};
-    auto* const contents = tr_variantToStr(v, fmt, &contents_len);
+    auto const contents = tr_variantToStr(v, fmt);
 
     tr_error* error = nullptr;
-    tr_saveFile(filename, { contents, contents_len }, &error);
+    tr_saveFile(filename, { std::data(contents), std::size(contents) }, &error);
     if (error != nullptr)
     {
         tr_logAddError(_("Error saving \"%" TR_PRIsv "\": %s (%d)"), TR_PRIsv_ARG(filename), error->message, error->code);
@@ -1221,7 +1219,6 @@ int tr_variantToFile(tr_variant const* v, tr_variant_fmt fmt, std::string_view f
         tr_error_clear(&error);
     }
 
-    tr_free(contents);
     return error_code;
 }
 

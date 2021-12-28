@@ -250,10 +250,7 @@ bool tr_announce_list::save(std::string_view torrent_file, tr_error** error) con
     }
 
     // save it
-    auto contents_len = size_t{};
-    auto* const contents = tr_variantToStr(&metainfo, TR_VARIANT_FMT_BENC, &contents_len);
+    auto const contents = tr_variantToStr(&metainfo, TR_VARIANT_FMT_BENC);
     tr_variantFree(&metainfo);
-    auto const success = tr_saveFile(torrent_file, { contents, contents_len }, error);
-    tr_free(contents);
-    return success;
+    return tr_saveFile(torrent_file, contents, error);
 }

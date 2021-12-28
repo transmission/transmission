@@ -816,9 +816,9 @@ static size_t parseResponseHeader(void* ptr, size_t size, size_t nmemb, void* /*
     return line_len;
 }
 
-static long getTimeoutSecs(char const* req)
+static long getTimeoutSecs(std::string_view req)
 {
-    if (strstr(req, "\"method\":\"blocklist-update\"") != nullptr)
+    if (req.find("\"method\":\"blocklist-update\""sv) != std::string_view::npos)
     {
         return 300L;
     }
@@ -2193,24 +2193,23 @@ static void tr_curl_easy_cleanup(CURL* curl)
 
 static int flush(char const* rpcurl, tr_variant** benc)
 {
-    CURLcode res;
-    CURL* curl;
     int status = EXIT_SUCCESS;
-    struct evbuffer* buf = evbuffer_new();
-    char* json = tr_variantToStr(*benc, TR_VARIANT_FMT_JSON_LEAN, nullptr);
+    auto const json = tr_variantToStr(*benc, TR_VARIANT_FMT_JSON_LEAN);
     auto const rpcurl_http = tr_strvJoin(UseSSL ? "https://" : "http://", rpcurl);
 
-    curl = tr_curl_easy_init(buf);
+    auto* const buf = evbuffer_new();
+    auto* curl = tr_curl_easy_init(buf);
     curl_easy_setopt(curl, CURLOPT_URL, rpcurl_http.c_str());
-    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, json);
+    curl_easy_setopt(curl, CURLOPT_POSTFIELDS, json.c_str());
     curl_easy_setopt(curl, CURLOPT_TIMEOUT, getTimeoutSecs(json));
 
     if (debug)
     {
-        fprintf(stderr, "posting:\n--------\n%s\n--------\n", json);
+        fprintf(stderr, "posting:\n--------\n%s\n--------\n", json.c_str());
     }
 
-    if ((res = curl_easy_perform(curl)) != CURLE_OK)
+    auto const res = curl_easy_perform(curl);
+    if (res != CURLE_OK)
     {
         tr_logAddNamedError(MyName, " (%s) %s", rpcurl_http.c_str(), curl_easy_strerror(res));
         status |= EXIT_FAILURE;
@@ -2247,7 +2246,6 @@ static int flush(char const* rpcurl, tr_variant** benc)
     }
 
     /* cleanup */
-    tr_free(json);
     evbuffer_free(buf);
 
     if (curl != nullptr)

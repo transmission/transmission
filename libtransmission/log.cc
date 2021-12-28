@@ -175,19 +175,17 @@ void tr_logAddDeep(char const* file, int line, char const* name, char const* fmt
         va_end(args);
         evbuffer_add_printf(buf, " (%s:%d)" TR_NATIVE_EOL_STR, base, line);
 
-        size_t message_len = 0;
-        char* const message = evbuffer_free_to_str(buf, &message_len);
+        auto const message = evbuffer_free_to_str(buf);
 
 #ifdef _WIN32
-        OutputDebugStringA(message);
+        OutputDebugStringA(message.c_str());
 #endif
 
         if (fp != TR_BAD_SYS_FILE)
         {
-            tr_sys_file_write(fp, message, message_len, nullptr, nullptr);
+            tr_sys_file_write(fp, std::data(message), std::size(message), nullptr, nullptr);
         }
 
-        tr_free(message);
         tr_free(base);
     }
 }

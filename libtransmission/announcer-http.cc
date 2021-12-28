@@ -41,7 +41,7 @@ static char const* get_event_string(tr_announce_request const* req)
     return req->partial_seed && (req->event != TR_ANNOUNCE_EVENT_STOPPED) ? "paused" : tr_announce_event_get_string(req->event);
 }
 
-static char* announce_url_new(tr_session const* session, tr_announce_request const* req)
+static std::string announce_url_new(tr_session const* session, tr_announce_request const* req)
 {
     auto const announce_sv = req->announce_url.sv();
 
@@ -115,7 +115,7 @@ static char* announce_url_new(tr_session const* session, tr_announce_request con
         tr_http_escape(buf, ipv6_readable, true);
     }
 
-    return evbuffer_free_to_str(buf, nullptr);
+    return evbuffer_free_to_str(buf);
 }
 
 static tr_pex* listToPex(tr_variant* peerList, size_t* setme_len)
@@ -227,17 +227,12 @@ static void on_announce_done(
             }
             else
             {
-                auto len = size_t{};
-                char* str = tr_variantToStr(&benc, TR_VARIANT_FMT_JSON, &len);
                 fprintf(stderr, "%s", "Announce response:\n< ");
-
-                for (size_t i = 0; i < len; ++i)
+                for (auto const ch : tr_variantToStr(&benc, TR_VARIANT_FMT_JSON))
                 {
-                    fputc(str[i], stderr);
+                    fputc(ch, stderr);
                 }
-
                 fputc('\n', stderr);
-                tr_free(str);
             }
         }
 
@@ -329,10 +324,9 @@ void tr_tracker_http_announce(
     d->response.info_hash = request->info_hash;
     tr_strlcpy(d->log_name, request->log_name, sizeof(d->log_name));
 
-    char* const url = announce_url_new(session, request);
-    dbgmsg(request->log_name, "Sending announce to libcurl: \"%s\"", url);
+    auto const url = announce_url_new(session, request);
+    dbgmsg(request->log_name, "Sending announce to libcurl: \"%" TR_PRIsv "\"", TR_PRIsv_ARG(url));
     tr_webRun(session, url, on_announce_done, d);
-    tr_free(url);
 }
 
 /****
@@ -400,17 +394,12 @@ static void on_scrape_done(
             }
             else
             {
-                auto len = size_t{};
-                char* str = tr_variantToStr(&top, TR_VARIANT_FMT_JSON, &len);
                 fprintf(stderr, "%s", "Scrape response:\n< ");
-
-                for (size_t i = 0; i < len; ++i)
+                for (auto const ch : tr_variantToStr(&top, TR_VARIANT_FMT_JSON))
                 {
-                    fputc(str[i], stderr);
+                    fputc(ch, stderr);
                 }
-
                 fputc('\n', stderr);
-                tr_free(str);
             }
         }
 
@@ -481,7 +470,7 @@ static void on_scrape_done(
     tr_runInEventThread(session, on_scrape_done_eventthread, data);
 }
 
-static char* scrape_url_new(tr_scrape_request const* req)
+static std::string scrape_url_new(tr_scrape_request const* req)
 {
     auto const sv = req->scrape_url.sv();
 
@@ -497,7 +486,7 @@ static char* scrape_url_new(tr_scrape_request const* req)
         delimiter = '&';
     }
 
-    return evbuffer_free_to_str(buf, nullptr);
+    return evbuffer_free_to_str(buf);
 }
 
 void tr_tracker_http_scrape(
@@ -506,8 +495,6 @@ void tr_tracker_http_scrape(
     tr_scrape_response_func response_func,
     void* response_func_user_data)
 {
-    char* url = scrape_url_new(request);
-
     auto* d = new scrape_data{};
     d->response.scrape_url = request->scrape_url;
     d->response_func = response_func;
@@ -524,8 +511,7 @@ void tr_tracker_http_scrape(
 
     tr_strlcpy(d->log_name, request->log_name, sizeof(d->log_name));
 
-    dbgmsg(request->log_name, "Sending scrape to libcurl: \"%s\"", url);
+    auto const url = scrape_url_new(request);
+    dbgmsg(request->log_name, "Sending scrape to libcurl: \"%" TR_PRIsv "\"", TR_PRIsv_ARG(url));
     tr_webRun(session, url, on_scrape_done, d);
-
-    tr_free(url);
 }

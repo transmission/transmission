@@ -85,7 +85,6 @@ TEST_P(JSONTest, testUtf8)
     auto in = "{ \"key\": \"Letöltések\" }"sv;
     tr_variant top;
     auto sv = std::string_view{};
-    char* json;
     tr_quark const key = tr_quark_new("key"sv);
 
     EXPECT_TRUE(tr_variantFromBuf(&top, TR_VARIANT_PARSE_JSON | TR_VARIANT_PARSE_INPLACE, in));
@@ -114,19 +113,17 @@ TEST_P(JSONTest, testUtf8)
     EXPECT_TRUE(tr_variantIsDict(&top));
     EXPECT_TRUE(tr_variantDictFindStrView(&top, key, &sv));
     EXPECT_EQ("Letöltések"sv, sv);
-    json = tr_variantToStr(&top, TR_VARIANT_FMT_JSON, nullptr);
+    auto json = tr_variantToStr(&top, TR_VARIANT_FMT_JSON);
     tr_variantFree(&top);
 
-    EXPECT_NE(nullptr, json);
-    EXPECT_NE(nullptr, strstr(json, "\\u00f6"));
-    EXPECT_NE(nullptr, strstr(json, "\\u00e9"));
+    EXPECT_FALSE(std::empty(json));
+    EXPECT_NE(std::string::npos, json.find("\\u00f6"));
+    EXPECT_NE(std::string::npos, json.find("\\u00e9"));
     EXPECT_TRUE(tr_variantFromBuf(&top, TR_VARIANT_PARSE_JSON | TR_VARIANT_PARSE_INPLACE, json));
     EXPECT_TRUE(tr_variantIsDict(&top));
     EXPECT_TRUE(tr_variantDictFindStrView(&top, key, &sv));
     EXPECT_EQ("Letöltések"sv, sv);
     tr_variantFree(&top);
-
-    tr_free(json);
 }
 
 TEST_P(JSONTest, test1)
