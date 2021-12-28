@@ -1144,7 +1144,7 @@ void tr_peerMgrSetSwarmIsAllSeeds(tr_torrent* tor)
 {
     auto const lock = tor->unique_lock();
 
-    tr_swarm* const swarm = tor->swarm;
+    auto* const swarm = tor->swarm;
     auto atomCount = int{};
     struct peer_atom** atoms = (struct peer_atom**)tr_ptrArrayPeek(&swarm->pool, &atomCount);
     for (int i = 0; i < atomCount; ++i)
@@ -1355,7 +1355,7 @@ int tr_peerMgrGetPeers(tr_torrent const* tor, tr_pex** setme_pex, uint8_t af, ui
     struct peer_atom** atoms = nullptr;
     if (list_mode == TR_PEERS_CONNECTED) /* connected peers only */
     {
-        tr_peer const** peers = (tr_peer const**)tr_ptrArrayBase(&s->peers);
+        auto const** peers = (tr_peer const**)tr_ptrArrayBase(&s->peers);
         atomCount = tr_ptrArraySize(&s->peers);
         atoms = tr_new(struct peer_atom*, atomCount);
 
@@ -1549,7 +1549,7 @@ void tr_peerMgrOnTorrentGotMetainfo(tr_torrent* tor)
     /* some peer_msgs' progress fields may not be accurate if we
        didn't have the metadata before now... so refresh them all... */
     int const peerCount = tr_ptrArraySize(&tor->swarm->peers);
-    tr_peer** const peers = (tr_peer**)tr_ptrArrayBase(&tor->swarm->peers);
+    auto** const peers = (tr_peer**)tr_ptrArrayBase(&tor->swarm->peers);
 
     for (int i = 0; i < peerCount; ++i)
     {
@@ -1576,7 +1576,7 @@ void tr_peerMgrTorrentAvailability(tr_torrent const* tor, int8_t* tab, unsigned 
     if (tor->hasMetadata())
     {
         int const peerCount = tr_ptrArraySize(&tor->swarm->peers);
-        tr_peer const** peers = (tr_peer const**)tr_ptrArrayBase(&tor->swarm->peers);
+        auto const** peers = (tr_peer const**)tr_ptrArrayBase(&tor->swarm->peers);
         float const interval = tor->pieceCount() / (float)tabCount;
         auto const isSeed = tor->isSeed();
 
@@ -1984,7 +1984,7 @@ static void rechokeDownloads(tr_swarm* s)
         int const n = tor->pieceCount();
 
         /* build a bitfield of interesting pieces... */
-        bool* const piece_is_interesting = tr_new(bool, n);
+        auto* const piece_is_interesting = tr_new(bool, n);
 
         for (int i = 0; i < n; ++i)
         {
