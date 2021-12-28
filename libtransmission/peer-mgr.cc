@@ -374,7 +374,7 @@ static void ensureMgrTimersExist(struct tr_peerMgr* m);
 
 tr_peerMgr* tr_peerMgrNew(tr_session* session)
 {
-    tr_peerMgr* m = tr_new0(tr_peerMgr, 1);
+    auto* const m = tr_new0(tr_peerMgr, 1);
     m->session = session;
     m->incomingHandshakes = {};
     ensureMgrTimersExist(m);
