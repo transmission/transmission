@@ -1392,7 +1392,7 @@ int tr_peerMgrGetPeers(tr_torrent const* tor, tr_pex** setme_pex, uint8_t af, ui
     auto count = int{};
     for (int i = 0; i < atomCount && count < n; ++i)
     {
-        struct peer_atom const* atom = atoms[i];
+        auto const* const atom = atoms[i];
 
         if (atom->addr.type == af)
         {
