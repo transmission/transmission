@@ -1270,9 +1270,7 @@ int tr_pexCompare(void const* va, void const* vb)
     TR_ASSERT(tr_isPex(a));
     TR_ASSERT(tr_isPex(b));
 
-    auto i = int{};
-
-    if ((i = tr_address_compare(&a->addr, &b->addr)) != 0)
+    if (auto const i = tr_address_compare(&a->addr, &b->addr); i != 0)
     {
         return i;
     }
