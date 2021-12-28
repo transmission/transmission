@@ -44,7 +44,7 @@ static void set_system_error(tr_error** error, DWORD code, std::string_view what
         message = tr_strdup_printf("Unknown error: 0x%08lx", code);
     }
 
-    tr_error_set(error, code, tr_strvJoin(what, " failed: "sv, message);
+    tr_error_set(error, code, tr_strvJoin(what, " failed: "sv, message));
 
     tr_free(message);
 }
