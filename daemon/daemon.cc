@@ -869,9 +869,7 @@ int tr_main(int argc, char* argv[])
         &daemon_reconfigure,
     };
 
-    tr_error* error = nullptr;
-
-    if (!dtr_daemon(&cb, &data, foreground, &ret, &error))
+    if (tr_error* error = nullptr; !dtr_daemon(&cb, &data, foreground, &ret, &error))
     {
         printMessage(logfile, TR_LOG_ERROR, MyName, tr_strvJoin("Failed to daemonize: ", error->message), __FILE__, __LINE__);
         tr_error_free(error);
