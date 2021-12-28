@@ -1511,9 +1511,7 @@ void tr_peerMgrRemoveTorrent(tr_torrent* tor)
 
 void tr_peerUpdateProgress(tr_torrent* tor, tr_peer* peer)
 {
-    auto const* have = &peer->have;
-
-    if (have->hasAll())
+    if (auto const* have = &peer->have; have->hasAll())
     {
         peer->progress = 1.0;
     }
