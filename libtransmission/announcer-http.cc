@@ -212,12 +212,8 @@ static void on_announce_done(
 
     if (response_code != HTTP_OK)
     {
-        response->errmsg = tr_strvJoin(
-            "Tracker gave HTTP response code "sv,
-            std::to_string(response_code),
-            " ("sv,
-            tr_webGetResponseStr(response_code),
-            ")"sv);
+        auto const* const response_str = tr_webGetResponseStr(response_code);
+        response->errmsg = tr_strvJoin("Tracker HTTP response "sv, std::to_string(response_code), " ("sv, response_str, ")"sv);
     }
     else
     {
