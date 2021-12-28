@@ -2529,7 +2529,7 @@ static void enforceSessionPeerLimit(tr_session* session)
         std::begin(session->torrents),
         std::end(session->torrents),
         size_t{},
-        [](size_t sum, tr_torrent* tor) { return sum + tr_ptrArraySize(&tor->swarm->peers); });
+        [](size_t sum, tr_torrent const* tor) { return sum + tr_ptrArraySize(&tor->swarm->peers); });
     size_t const max = tr_sessionGetPeerLimit(session);
     if (n_peers <= max)
     {
