@@ -195,8 +195,8 @@ struct verify_node
 
 static struct verify_node currentNode;
 // TODO: refactor s.t. this doesn't leak
-static auto& verifyList{ *new std::set<verify_node>{} };
-static tr_thread* verifyThread = nullptr;
+static auto& verify_list{ *new std::set<verify_node>{} };
+static tr_thread* verify_thread = nullptr;
 static bool stopCurrent = false;
 
 static std::mutex verify_mutex_;
@@ -205,27 +205,26 @@ static void verifyThreadFunc(void* /*user_data*/)
 {
     for (;;)
     {
-        bool changed = false;
-
         {
             auto const lock = std::lock_guard(verify_mutex_);
 
             stopCurrent = false;
-            if (std::empty(verifyList))
+            if (std::empty(verify_list))
             {
                 currentNode.torrent = nullptr;
                 break;
             }
 
-            auto const it = std::begin(verifyList);
+            auto const it = std::begin(verify_list);
             currentNode = *it;
-            verifyList.erase(it);
+            verify_list.erase(it);
+            verify_thread = nullptr;
         }
 
         tr_torrent* tor = currentNode.torrent;
         tr_logAddTorInfo(tor, "%s", _("Verifying torrent"));
         tor->setVerifyState(TR_VERIFY_NOW);
-        changed = verifyTorrent(tor, &stopCurrent);
+        auto const changed = verifyTorrent(tor, &stopCurrent);
         tor->setVerifyState(TR_VERIFY_NONE);
         TR_ASSERT(tr_isTorrent(tor));
 
@@ -239,8 +238,6 @@ static void verifyThreadFunc(void* /*user_data*/)
             (*currentNode.callback_func)(tor, stopCurrent, currentNode.callback_data);
         }
     }
-
-    verifyThread = nullptr;
 }
 
 void tr_verifyAdd(tr_torrent* tor, tr_verify_done_func callback_func, void* callback_data)
@@ -256,11 +253,11 @@ void tr_verifyAdd(tr_torrent* tor, tr_verify_done_func callback_func, void* call
 
     auto const lock = std::lock_guard(verify_mutex_);
     tor->setVerifyState(TR_VERIFY_WAIT);
-    verifyList.insert(node);
+    verify_list.insert(node);
 
-    if (verifyThread == nullptr)
+    if (verify_thread == nullptr)
     {
-        verifyThread = tr_threadNew(verifyThreadFunc, nullptr);
+        verify_thread = tr_threadNew(verifyThreadFunc, nullptr);
     }
 }
 
@@ -284,20 +281,20 @@ void tr_verifyRemove(tr_torrent* tor)
     else
     {
         auto const it = std::find_if(
-            std::begin(verifyList),
-            std::end(verifyList),
+            std::begin(verify_list),
+            std::end(verify_list),
             [tor](auto const& task) { return tor == task.torrent; });
 
         tor->setVerifyState(TR_VERIFY_NONE);
 
-        if (it != std::end(verifyList))
+        if (it != std::end(verify_list))
         {
             if (it->callback_func != nullptr)
             {
                 (*it->callback_func)(tor, true, it->callback_data);
             }
 
-            verifyList.erase(it);
+            verify_list.erase(it);
         }
     }
 
@@ -309,5 +306,5 @@ void tr_verifyClose(tr_session* /*session*/)
     auto const lock = std::lock_guard(verify_mutex_);
 
     stopCurrent = true;
-    verifyList.clear();
+    verify_list.clear();
 }
