@@ -213,7 +213,7 @@ static void verifyThreadFunc(void* /*user_data*/)
             {
                 currentNode.torrent = nullptr;
                 verify_thread = nullptr;
-                break;
+                return;
             }
 
             auto const it = std::begin(verify_list);
