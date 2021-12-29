@@ -182,6 +182,12 @@ struct verify_node
             return current_size < that.current_size ? -1 : 1;
         }
 
+        // tertiary compare just to ensure they don't compare equal
+        if (torrent->infoHash() != that.torrent->infoHash())
+        {
+            return torrent->infoHash() < that.torrent->infoHash() ? -1 : 1;
+        }
+
         return 0;
     }
 
