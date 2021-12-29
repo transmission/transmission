@@ -462,12 +462,12 @@ extern uint64_t tr_size_K; /* unused? */
 std::string tr_formatter_speed_KBps(double KBps);
 
 /* format a memory size from bytes into a user-readable string. */
-char* tr_formatter_mem_B(char* buf, size_t bytes, size_t buflen);
+std::string tr_formatter_mem_B(size_t bytes);
 
 /* format a memory size from MB into a user-readable string. */
-static inline char* tr_formatter_mem_MB(char* buf, double MBps, size_t buflen)
+static inline std::string tr_formatter_mem_MB(double MBps)
 {
-    return tr_formatter_mem_B(buf, (size_t)(MBps * tr_mem_K * tr_mem_K), buflen);
+    return tr_formatter_mem_B((size_t)(MBps * tr_mem_K * tr_mem_K));
 }
 
 /* format a file size from bytes into a user-readable string. */

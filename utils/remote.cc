@@ -203,18 +203,9 @@ static char* strlratio(char* buf, int64_t numerator, int64_t denominator, size_t
     return strlratio2(buf, ratio, buflen);
 }
 
-static char* strlmem(char* buf, int64_t bytes, size_t buflen)
+static std::string strlmem(int64_t bytes)
 {
-    if (bytes == 0)
-    {
-        tr_strlcpy(buf, "None", buflen);
-    }
-    else
-    {
-        tr_formatter_mem_B(buf, bytes, buflen);
-    }
-
-    return buf;
+    return bytes == 0 ? "None"s : tr_formatter_mem_B(bytes);
 }
 
 static char* strlsize(char* buf, int64_t bytes, size_t buflen)
@@ -1176,7 +1167,7 @@ static void printDetails(tr_variant* top)
 
             if (tr_variantDictFindInt(t, TR_KEY_pieceSize, &i))
             {
-                printf("  Piece Size: %s\n", strlmem(buf, i, sizeof(buf)));
+                printf("  Piece Size: %s\n", strlmem(i).c_str());
             }
 
             printf("\n");
@@ -1751,7 +1742,6 @@ static void printSession(tr_variant* top)
         int64_t i;
         bool boolVal;
         auto sv = std::string_view{};
-        char buf[128];
 
         printf("VERSION\n");
 
@@ -1821,7 +1811,7 @@ static void printSession(tr_variant* top)
 
         if (tr_variantDictFindInt(args, TR_KEY_cache_size_mb, &i))
         {
-            printf("  Maximum memory cache size: %s\n", tr_formatter_mem_MB(buf, i, sizeof(buf)));
+            printf("  Maximum memory cache size: %s\n", tr_formatter_mem_MB(i).c_str());
         }
 
         printf("\n");
@@ -1857,6 +1847,8 @@ static void printSession(tr_variant* top)
                 tr_variantDictFindReal(args, TR_KEY_seedRatioLimit, &seedRatioLimit) &&
                 tr_variantDictFindBool(args, TR_KEY_seedRatioLimited, &seedRatioLimited))
             {
+                char buf[128];
+
                 printf("LIMITS\n");
                 printf("  Peer limit: %" PRId64 "\n", peerLimit);
 

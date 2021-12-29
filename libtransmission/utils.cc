@@ -1493,9 +1493,10 @@ void tr_formatter_mem_init(size_t kilo, char const* kb, char const* mb, char con
     formatter_init(mem_units, kilo, kb, mb, gb, tb);
 }
 
-char* tr_formatter_mem_B(char* buf, size_t bytes_per_second, size_t buflen)
+std::string tr_formatter_mem_B(size_t bytes_per_second)
 {
-    return formatter_get_size_str(mem_units, buf, bytes_per_second, buflen);
+    auto buf = std::array<char, 64>{};
+    return formatter_get_size_str(mem_units, std::data(buf), bytes_per_second, std::size(buf));
 }
 
 void tr_formatter_get_units(void* vdict)

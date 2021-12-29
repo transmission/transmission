@@ -338,13 +338,10 @@ void MakeDialog::Impl::updatePiecesLabel()
             tr_strlsize(builder_->totalSize),
             builder_->fileCount);
         gstr += "; ";
-
-        char buf[128];
-        tr_formatter_mem_B(buf, builder_->pieceSize, sizeof(buf));
         gstr += gtr_sprintf(
             ngettext("%1$'d Piece @ %2$s", "%1$'d Pieces @ %2$s", builder_->pieceCount),
             builder_->pieceCount,
-            buf);
+            tr_formatter_mem_B(builder_->pieceSize));
     }
 
     gstr += "</i>";

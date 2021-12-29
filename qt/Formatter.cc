@@ -71,9 +71,7 @@ QString Formatter::memToString(int64_t bytes) const
         return tr("None");
     }
 
-    auto buf = std::array<char, 128>{};
-    tr_formatter_mem_B(buf.data(), bytes, buf.size());
-    return QString::fromUtf8(buf.data());
+    return QString::fromStdString(tr_formatter_mem_B(bytes));
 }
 
 QString Formatter::sizeToString(uint64_t bytes) const

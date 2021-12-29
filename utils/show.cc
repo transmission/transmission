@@ -135,7 +135,7 @@ void showInfo(app_opts const& opts, tr_torrent_metainfo const& metainfo)
     }
 
     printf("  Piece Count: %" PRIu64 "\n", metainfo.pieceCount());
-    printf("  Piece Size: %s\n", tr_formatter_mem_B(std::data(buf), metainfo.pieceSize(), std::size(buf)));
+    printf("  Piece Size: %s\n", tr_formatter_mem_B(metainfo.pieceSize()).c_str());
     printf("  Total Size: %s\n", tr_formatter_size_B(std::data(buf), metainfo.totalSize(), std::size(buf)));
     printf("  Privacy: %s\n", metainfo.isPrivate() ? "Private torrent" : "Public torrent");
 

@@ -841,13 +841,11 @@ void DetailsDialog::Impl::refreshInfo(std::vector<tr_torrent*> const& torrents)
         }
         else if (pieceSize >= 0)
         {
-            char piecebuf[128];
-            tr_formatter_mem_B(piecebuf, pieceSize, sizeof(piecebuf));
             str = gtr_sprintf(
                 ngettext("%1$s (%2$'d piece @ %3$s)", "%1$s (%2$'d pieces @ %3$s)", pieces),
                 sizebuf,
                 pieces,
-                piecebuf);
+                tr_formatter_mem_B(pieceSize));
         }
         else
         {
