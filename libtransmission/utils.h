@@ -471,7 +471,7 @@ static inline std::string tr_formatter_mem_MB(double MBps)
 }
 
 /* format a file size from bytes into a user-readable string. */
-char* tr_formatter_size_B(char* buf, uint64_t bytes, size_t buflen);
+std::string tr_formatter_size_B(uint64_t bytes);
 
 void tr_formatter_get_units(void* dict);
 

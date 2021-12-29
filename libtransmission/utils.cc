@@ -1437,9 +1437,10 @@ void tr_formatter_size_init(uint64_t kilo, char const* kb, char const* mb, char 
     formatter_init(size_units, kilo, kb, mb, gb, tb);
 }
 
-char* tr_formatter_size_B(char* buf, uint64_t bytes, size_t buflen)
+std::string tr_formatter_size_B(uint64_t bytes)
 {
-    return formatter_get_size_str(size_units, buf, bytes, buflen);
+    auto buf = std::array<char, 64>{};
+    return formatter_get_size_str(size_units, std::data(buf), bytes, std::size(buf));
 }
 
 static formatter_units speed_units;

@@ -208,22 +208,19 @@ static std::string strlmem(int64_t bytes)
     return bytes == 0 ? "None"s : tr_formatter_mem_B(bytes);
 }
 
-static char* strlsize(char* buf, int64_t bytes, size_t buflen)
+static std::string strlsize(int64_t bytes)
 {
     if (bytes < 0)
     {
-        tr_strlcpy(buf, "Unknown", buflen);
-    }
-    else if (bytes == 0)
-    {
-        tr_strlcpy(buf, "None", buflen);
-    }
-    else
-    {
-        tr_formatter_size_B(buf, bytes, buflen);
+        return "Unknown"s;
     }
 
-    return buf;
+    if (bytes == 0)
+    {
+        return "None"s;
+    }
+
+    return tr_formatter_size_B(bytes);
 }
 
 enum
@@ -936,7 +933,6 @@ static void printDetails(tr_variant* top)
             tr_variant* t = tr_variantListChild(torrents, ti);
             tr_variant* l;
             char buf[512];
-            char buf2[512];
             int64_t i;
             int64_t j;
             int64_t k;
@@ -1015,9 +1011,7 @@ static void printDetails(tr_variant* top)
 
             if (tr_variantDictFindInt(t, TR_KEY_haveUnchecked, &i) && tr_variantDictFindInt(t, TR_KEY_haveValid, &j))
             {
-                strlsize(buf, i + j, sizeof(buf));
-                strlsize(buf2, j, sizeof(buf2));
-                printf("  Have: %s (%s verified)\n", buf, buf2);
+                printf("  Have: %s (%s verified)\n", strlsize(i + j).c_str(), strlsize(j).c_str());
             }
 
             if (tr_variantDictFindInt(t, TR_KEY_sizeWhenDone, &i))
@@ -1036,26 +1030,21 @@ static void printDetails(tr_variant* top)
 
                 if (tr_variantDictFindInt(t, TR_KEY_totalSize, &j))
                 {
-                    strlsize(buf2, i, sizeof(buf2));
-                    strlsize(buf, j, sizeof(buf));
-                    printf("  Total size: %s (%s wanted)\n", buf, buf2);
+                    printf("  Total size: %s (%s wanted)\n", strlsize(j).c_str(), strlsize(i).c_str());
                 }
             }
 
             if (tr_variantDictFindInt(t, TR_KEY_downloadedEver, &i) && tr_variantDictFindInt(t, TR_KEY_uploadedEver, &j))
             {
-                strlsize(buf, i, sizeof(buf));
-                printf("  Downloaded: %s\n", buf);
-                strlsize(buf, j, sizeof(buf));
-                printf("  Uploaded: %s\n", buf);
+                printf("  Downloaded: %s\n", strlsize(i).c_str());
+                printf("  Uploaded: %s\n", strlsize(j).c_str());
                 strlratio(buf, j, i, sizeof(buf));
                 printf("  Ratio: %s\n", buf);
             }
 
             if (tr_variantDictFindInt(t, TR_KEY_corruptEver, &i))
             {
-                strlsize(buf, i, sizeof(buf));
-                printf("  Corrupt DL: %s\n", buf);
+                printf("  Corrupt DL: %s\n", strlsize(i).c_str());
             }
 
             if (tr_variantDictFindStrView(t, TR_KEY_errorString, &sv) && !std::empty(sv) &&
@@ -1285,10 +1274,8 @@ static void printFileList(tr_variant* top)
                         tr_variantGetInt(tr_variantListChild(priorities, j), &priority) &&
                         tr_variantGetBool(tr_variantListChild(wanteds, j), &wanted))
                     {
-                        char sizestr[64];
                         double percent = (double)have / length;
                         char const* pristr;
-                        strlsize(sizestr, length, sizeof(sizestr));
 
                         switch (priority)
                         {
@@ -1311,7 +1298,7 @@ static void printFileList(tr_variant* top)
                             floor(100.0 * percent),
                             pristr,
                             wanted ? "Yes" : "No",
-                            sizestr,
+                            strlsize(length).c_str(),
                             TR_PRIsv_ARG(filename));
                     }
                 }
@@ -1459,7 +1446,6 @@ static void printTorrentList(tr_variant* top)
         int64_t total_size = 0;
         double total_up = 0;
         double total_down = 0;
-        char haveStr[32];
 
         printf(
             "%6s   %-4s  %9s  %-8s  %6s  %6s  %-5s  %-11s  %s\n",
@@ -1509,8 +1495,6 @@ static void printTorrentList(tr_variant* top)
                     tr_strlcpy(doneStr, "n/a", sizeof(doneStr));
                 }
 
-                strlsize(haveStr, sizeWhenDone - leftUntilDone, sizeof(haveStr));
-
                 if (leftUntilDone != 0 || eta != -1)
                 {
                     etaToString(etaStr, sizeof(etaStr), eta);
@@ -1534,7 +1518,7 @@ static void printTorrentList(tr_variant* top)
                     (int)torId,
                     errorMark,
                     doneStr,
-                    haveStr,
+                    strlsize(sizeWhenDone - leftUntilDone).c_str(),
                     etaStr,
                     up / (double)tr_speed_K,
                     down / (double)tr_speed_K,
@@ -1550,7 +1534,7 @@ static void printTorrentList(tr_variant* top)
 
         printf(
             "Sum:           %9s            %6.1f  %6.1f\n",
-            strlsize(haveStr, total_size, sizeof(haveStr)),
+            strlsize(total_size).c_str(),
             total_up / (double)tr_speed_K,
             total_down / (double)tr_speed_K);
     }
@@ -1991,8 +1975,8 @@ static void printSessionStats(tr_variant* top)
             tr_variantDictFindInt(d, TR_KEY_downloadedBytes, &down) && tr_variantDictFindInt(d, TR_KEY_secondsActive, &secs))
         {
             printf("\nCURRENT SESSION\n");
-            printf("  Uploaded:   %s\n", strlsize(buf, up, sizeof(buf)));
-            printf("  Downloaded: %s\n", strlsize(buf, down, sizeof(buf)));
+            printf("  Uploaded:   %s\n", strlsize(up).c_str());
+            printf("  Downloaded: %s\n", strlsize(down).c_str());
             printf("  Ratio:      %s\n", strlratio(buf, up, down, sizeof(buf)));
             printf("  Duration:   %s\n", tr_strltime(buf, secs, sizeof(buf)));
         }
@@ -2003,8 +1987,8 @@ static void printSessionStats(tr_variant* top)
         {
             printf("\nTOTAL\n");
             printf("  Started %lu times\n", (unsigned long)sessions);
-            printf("  Uploaded:   %s\n", strlsize(buf, up, sizeof(buf)));
-            printf("  Downloaded: %s\n", strlsize(buf, down, sizeof(buf)));
+            printf("  Uploaded:   %s\n", strlsize(up).c_str());
+            printf("  Downloaded: %s\n", strlsize(down).c_str());
             printf("  Ratio:      %s\n", strlratio(buf, up, down, sizeof(buf)));
             printf("  Duration:   %s\n", tr_strltime(buf, secs, sizeof(buf)));
         }
