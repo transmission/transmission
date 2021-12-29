@@ -1452,11 +1452,13 @@ void tr_formatter_speed_init(size_t kilo, char const* kb, char const* mb, char c
     formatter_init(speed_units, kilo, kb, mb, gb, tb);
 }
 
-char* tr_formatter_speed_KBps(char* buf, double KBps, size_t buflen)
+std::string tr_formatter_speed_KBps(double KBps)
 {
+    auto buf = std::array<char, 64>{};
+
     if (auto speed = KBps; speed <= 999.95) /* 0.0 KB to 999.9 KB */
     {
-        tr_snprintf(buf, buflen, "%d %s", (int)speed, speed_units[TR_FMT_KB].name);
+        tr_snprintf(std::data(buf), std::size(buf), "%d %s", (int)speed, speed_units[TR_FMT_KB].name);
     }
     else
     {
@@ -1466,19 +1468,19 @@ char* tr_formatter_speed_KBps(char* buf, double KBps, size_t buflen)
 
         if (speed <= 99.995) /* 0.98 MB to 99.99 MB */
         {
-            tr_snprintf(buf, buflen, "%.2f %s", speed, speed_units[TR_FMT_MB].name);
+            tr_snprintf(std::data(buf), std::size(buf), "%.2f %s", speed, speed_units[TR_FMT_MB].name);
         }
         else if (speed <= 999.95) /* 100.0 MB to 999.9 MB */
         {
-            tr_snprintf(buf, buflen, "%.1f %s", speed, speed_units[TR_FMT_MB].name);
+            tr_snprintf(std::data(buf), std::size(buf), "%.1f %s", speed, speed_units[TR_FMT_MB].name);
         }
         else
         {
-            tr_snprintf(buf, buflen, "%.1f %s", speed / K, speed_units[TR_FMT_GB].name);
+            tr_snprintf(std::data(buf), std::size(buf), "%.1f %s", speed / K, speed_units[TR_FMT_GB].name);
         }
     }
 
-    return buf;
+    return std::data(buf);
 }
 
 static formatter_units mem_units;

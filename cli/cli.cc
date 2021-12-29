@@ -162,12 +162,7 @@ static void getStatusStr(tr_stat const* st, char* buf, size_t buflen)
     }
     else if (st->activity == TR_STATUS_DOWNLOAD)
     {
-        char upStr[80];
-        char dnStr[80];
         char ratioStr[80];
-
-        tr_formatter_speed_KBps(upStr, st->pieceUploadSpeed_KBps, sizeof(upStr));
-        tr_formatter_speed_KBps(dnStr, st->pieceDownloadSpeed_KBps, sizeof(dnStr));
         tr_strlratio(ratioStr, st->ratio, sizeof(ratioStr));
 
         tr_snprintf(
@@ -177,17 +172,14 @@ static void getStatusStr(tr_stat const* st, char* buf, size_t buflen)
             tr_truncd(100 * st->percentDone, 1),
             st->peersSendingToUs,
             st->peersConnected,
-            dnStr,
+            tr_formatter_speed_KBps(st->pieceDownloadSpeed_KBps).c_str(),
             st->peersGettingFromUs,
-            upStr,
+            tr_formatter_speed_KBps(st->pieceUploadSpeed_KBps).c_str(),
             ratioStr);
     }
     else if (st->activity == TR_STATUS_SEED)
     {
-        char upStr[80];
         char ratioStr[80];
-
-        tr_formatter_speed_KBps(upStr, st->pieceUploadSpeed_KBps, sizeof(upStr));
         tr_strlratio(ratioStr, st->ratio, sizeof(ratioStr));
 
         tr_snprintf(
@@ -196,7 +188,7 @@ static void getStatusStr(tr_stat const* st, char* buf, size_t buflen)
             "Seeding, uploading to %d of %d peer(s), %s [%s]",
             st->peersGettingFromUs,
             st->peersConnected,
-            upStr,
+            tr_formatter_speed_KBps(st->pieceUploadSpeed_KBps).c_str(),
             ratioStr);
     }
     else

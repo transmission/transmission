@@ -92,51 +92,31 @@ void SystemTrayIcon::Impl::refresh()
 {
     double KBps;
     double limit;
-    char up[64];
     Glib::ustring upLimit;
-    char down[64];
     Glib::ustring downLimit;
-    char const* idle = _("Idle");
+    char const* const idle = _("Idle");
     auto* session = core_->get_session();
 
     /* up */
     KBps = tr_sessionGetRawSpeed_KBps(session, TR_UP);
 
-    if (KBps < 0.001)
-    {
-        g_strlcpy(up, idle, sizeof(up));
-    }
-    else
-    {
-        tr_formatter_speed_KBps(up, KBps, sizeof(up));
-    }
+    auto const up = KBps < 0.001 ? idle : tr_formatter_speed_KBps(KBps);
 
     /* up limit */
     if (tr_sessionGetActiveSpeedLimit_KBps(session, TR_UP, &limit))
     {
-        char buf[64];
-        tr_formatter_speed_KBps(buf, limit, sizeof(buf));
-        upLimit = gtr_sprintf(_(" (Limit: %s)"), buf);
+        upLimit = gtr_sprintf(_(" (Limit: %s)"), tr_formatter_speed_KBps(limit));
     }
 
     /* down */
     KBps = tr_sessionGetRawSpeed_KBps(session, TR_DOWN);
 
-    if (KBps < 0.001)
-    {
-        g_strlcpy(down, idle, sizeof(down));
-    }
-    else
-    {
-        tr_formatter_speed_KBps(down, KBps, sizeof(down));
-    }
+    auto const down = KBps < 0.001 ? idle : tr_formatter_speed_KBps(KBps);
 
     /* down limit */
     if (tr_sessionGetActiveSpeedLimit_KBps(session, TR_DOWN, &limit))
     {
-        char buf[64];
-        tr_formatter_speed_KBps(buf, limit, sizeof(buf));
-        downLimit = gtr_sprintf(_(" (Limit: %s)"), buf);
+        downLimit = gtr_sprintf(_(" (Limit: %s)"), tr_formatter_speed_KBps(limit));
     }
 
     /* %1$s: current upload speed

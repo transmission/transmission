@@ -1251,8 +1251,8 @@ void initPeerRow(Gtk::TreeIter const& iter, std::string const& key, std::string 
 
 void refreshPeerRow(Gtk::TreeIter const& iter, tr_peer_stat const* peer)
 {
-    char up_speed[64] = { '\0' };
-    char down_speed[64] = { '\0' };
+    std::string up_speed;
+    std::string down_speed;
     std::string up_count;
     std::string down_count;
     std::string blocks_to_peer;
@@ -1264,12 +1264,12 @@ void refreshPeerRow(Gtk::TreeIter const& iter, tr_peer_stat const* peer)
 
     if (peer->rateToPeer_KBps > 0.01)
     {
-        tr_formatter_speed_KBps(up_speed, peer->rateToPeer_KBps, sizeof(up_speed));
+        up_speed = tr_formatter_speed_KBps(peer->rateToPeer_KBps);
     }
 
     if (peer->rateToClient_KBps > 0)
     {
-        tr_formatter_speed_KBps(down_speed, peer->rateToClient_KBps, sizeof(down_speed));
+        down_speed = tr_formatter_speed_KBps(peer->rateToClient_KBps);
     }
 
     if (peer->pendingReqsToPeer > 0)
@@ -1448,14 +1448,10 @@ void DetailsDialog::Impl::refreshWebseedList(std::vector<tr_torrent*> const& tor
             auto const iter = store->get_iter(hash.at(key).get_path());
 
             auto const KBps = double(webseed.download_bytes_per_second) / speed_K;
-            auto buf = std::array<char, 128>{};
-            if (webseed.is_downloading)
-            {
-                tr_formatter_speed_KBps(std::data(buf), KBps, std::size(buf));
-            }
+            auto const buf = webseed.is_downloading ? tr_formatter_speed_KBps(KBps) : std::string();
 
             (*iter)[webseed_cols.download_rate_double] = KBps;
-            (*iter)[webseed_cols.download_rate_string] = std::data(buf);
+            (*iter)[webseed_cols.download_rate_string] = buf;
             (*iter)[webseed_cols.was_updated] = true;
         }
     }

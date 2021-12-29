@@ -100,9 +100,7 @@ QString Formatter::sizeToString(int64_t bytes) const
 
 QString Formatter::speedToString(Speed const& speed) const
 {
-    auto buf = std::array<char, 128>{};
-    tr_formatter_speed_KBps(buf.data(), speed.getKBps(), buf.size());
-    return QString::fromUtf8(buf.data());
+    return QString::fromStdString(tr_formatter_speed_KBps(speed.getKBps()));
 }
 
 QString Formatter::uploadSpeedToString(Speed const& upload_speed) const

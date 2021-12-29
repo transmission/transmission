@@ -1014,12 +1014,12 @@ static void printDetails(tr_variant* top)
 
             if (tr_variantDictFindInt(t, TR_KEY_rateDownload, &i))
             {
-                printf("  Download Speed: %s\n", tr_formatter_speed_KBps(buf, i / (double)tr_speed_K, sizeof(buf)));
+                printf("  Download Speed: %s\n", tr_formatter_speed_KBps(i / (double)tr_speed_K).c_str());
             }
 
             if (tr_variantDictFindInt(t, TR_KEY_rateUpload, &i))
             {
-                printf("  Upload Speed: %s\n", tr_formatter_speed_KBps(buf, i / (double)tr_speed_K, sizeof(buf)));
+                printf("  Upload Speed: %s\n", tr_formatter_speed_KBps(i / (double)tr_speed_K).c_str());
             }
 
             if (tr_variantDictFindInt(t, TR_KEY_haveUnchecked, &i) && tr_variantDictFindInt(t, TR_KEY_haveValid, &j))
@@ -1190,7 +1190,7 @@ static void printDetails(tr_variant* top)
 
                 if (boolVal)
                 {
-                    printf("%s\n", tr_formatter_speed_KBps(buf, i, sizeof(buf)));
+                    printf("%s\n", tr_formatter_speed_KBps(i).c_str());
                 }
                 else
                 {
@@ -1204,7 +1204,7 @@ static void printDetails(tr_variant* top)
 
                 if (boolVal)
                 {
-                    printf("%s\n", tr_formatter_speed_KBps(buf, i, sizeof(buf)));
+                    printf("%s\n", tr_formatter_speed_KBps(i).c_str());
                 }
                 else
                 {
@@ -1857,9 +1857,6 @@ static void printSession(tr_variant* top)
                 tr_variantDictFindReal(args, TR_KEY_seedRatioLimit, &seedRatioLimit) &&
                 tr_variantDictFindBool(args, TR_KEY_seedRatioLimited, &seedRatioLimited))
             {
-                char buf2[128];
-                char buf3[128];
-
                 printf("LIMITS\n");
                 printf("  Peer limit: %" PRId64 "\n", peerLimit);
 
@@ -1874,47 +1871,51 @@ static void printSession(tr_variant* top)
 
                 printf("  Default seed ratio limit: %s\n", buf);
 
+                std::string effective_up_limit;
+
                 if (altEnabled)
                 {
-                    tr_formatter_speed_KBps(buf, altUp, sizeof(buf));
+                    effective_up_limit = tr_formatter_speed_KBps(altUp);
                 }
                 else if (upEnabled)
                 {
-                    tr_formatter_speed_KBps(buf, upLimit, sizeof(buf));
+                    effective_up_limit = tr_formatter_speed_KBps(upLimit);
                 }
                 else
                 {
-                    tr_strlcpy(buf, "Unlimited", sizeof(buf));
+                    effective_up_limit = "Unlimited"s;
                 }
 
                 printf(
                     "  Upload speed limit: %s (%s limit: %s; %s turtle limit: %s)\n",
-                    buf,
+                    effective_up_limit.c_str(),
                     upEnabled ? "Enabled" : "Disabled",
-                    tr_formatter_speed_KBps(buf2, upLimit, sizeof(buf2)),
+                    tr_formatter_speed_KBps(upLimit).c_str(),
                     altEnabled ? "Enabled" : "Disabled",
-                    tr_formatter_speed_KBps(buf3, altUp, sizeof(buf3)));
+                    tr_formatter_speed_KBps(altUp).c_str());
+
+                std::string effective_down_limit;
 
                 if (altEnabled)
                 {
-                    tr_formatter_speed_KBps(buf, altDown, sizeof(buf));
+                    effective_down_limit = tr_formatter_speed_KBps(altDown);
                 }
                 else if (downEnabled)
                 {
-                    tr_formatter_speed_KBps(buf, downLimit, sizeof(buf));
+                    effective_down_limit = tr_formatter_speed_KBps(downLimit);
                 }
                 else
                 {
-                    tr_strlcpy(buf, "Unlimited", sizeof(buf));
+                    effective_down_limit = "Unlimited"s;
                 }
 
                 printf(
                     "  Download speed limit: %s (%s limit: %s; %s turtle limit: %s)\n",
-                    buf,
+                    effective_down_limit.c_str(),
                     downEnabled ? "Enabled" : "Disabled",
-                    tr_formatter_speed_KBps(buf2, downLimit, sizeof(buf2)),
+                    tr_formatter_speed_KBps(downLimit).c_str(),
                     altEnabled ? "Enabled" : "Disabled",
-                    tr_formatter_speed_KBps(buf3, altDown, sizeof(buf3)));
+                    tr_formatter_speed_KBps(altDown).c_str());
 
                 if (altTimeEnabled)
                 {

@@ -153,26 +153,18 @@ Glib::ustring getShortTransferString(
 
     if (haveDown)
     {
-        char dnStr[32];
-        char upStr[32];
-        tr_formatter_speed_KBps(dnStr, downloadSpeed_KBps, sizeof(dnStr));
-        tr_formatter_speed_KBps(upStr, uploadSpeed_KBps, sizeof(upStr));
-
         /* down speed, down symbol, up speed, up symbol */
         buf += gtr_sprintf(
             _("%1$s %2$s  %3$s %4$s"),
-            dnStr,
+            tr_formatter_speed_KBps(downloadSpeed_KBps),
             gtr_get_unicode_string(GTR_UNICODE_DOWN),
-            upStr,
+            tr_formatter_speed_KBps(uploadSpeed_KBps),
             gtr_get_unicode_string(GTR_UNICODE_UP));
     }
     else if (haveUp)
     {
-        char upStr[32];
-        tr_formatter_speed_KBps(upStr, uploadSpeed_KBps, sizeof(upStr));
-
         /* up speed, up symbol */
-        buf += gtr_sprintf(_("%1$s  %2$s"), upStr, gtr_get_unicode_string(GTR_UNICODE_UP));
+        buf += gtr_sprintf(_("%1$s  %2$s"), tr_formatter_speed_KBps(uploadSpeed_KBps), gtr_get_unicode_string(GTR_UNICODE_UP));
     }
     else if (st->isStalled)
     {
