@@ -212,13 +212,13 @@ static void verifyThreadFunc(void* /*user_data*/)
             if (std::empty(verify_list))
             {
                 currentNode.torrent = nullptr;
+                verify_thread = nullptr;
                 break;
             }
 
             auto const it = std::begin(verify_list);
             currentNode = *it;
             verify_list.erase(it);
-            verify_thread = nullptr;
         }
 
         tr_torrent* tor = currentNode.torrent;
