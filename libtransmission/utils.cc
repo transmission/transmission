@@ -27,15 +27,9 @@
 #include <exception>
 #include <iterator> // std::back_inserter
 #include <set>
+#include <sstream>
 #include <string>
 #include <vector>
-
-#if defined(__GNUC__) && !__has_include(<charconv>)
-#undef HAVE_CHARCONV
-#else
-#define HAVE_CHARCONV 1
-#include <charconv> // std::from_chars()
-#endif
 
 #ifdef _WIN32
 #include <ws2tcpip.h> /* WSAStartup() */
@@ -1110,45 +1104,34 @@ struct number_range
  */
 static bool parseNumberSection(std::string_view str, number_range& range)
 {
-    auto const error = errno;
-    auto success = bool{};
+    auto constexpr Delimiter = "-"sv;
 
-#if defined(HAVE_CHARCONV)
-    // wants char*, so string_view::iterator don't work. make our own begin/end
-    auto const* const begin_ch = std::data(str);
-    auto const* const end_ch = begin_ch + std::size(str);
-    auto result = std::from_chars(begin_ch, end_ch, range.low);
-    success = result.ec == std::errc{};
-    if (success)
+    auto const first = tr_parseNum<size_t>(str);
+    if (!first)
     {
-        range.high = range.low;
-        if (result.ptr < end_ch && *result.ptr == '-')
-        {
-            result = std::from_chars(result.ptr + 1, end_ch, range.high);
-            success = result.ec == std::errc{};
-        }
+        return false;
     }
-#else
-    try
-    {
-        auto tmp = std::string(str);
-        auto pos = size_t{};
-        range.low = range.high = std::stoi(tmp, &pos);
-        if (pos != std::size(tmp) && tmp[pos] == '-')
-        {
-            tmp.erase(0, pos + 1);
-            range.high = std::stoi(tmp, &pos);
-        }
-        success = true;
-    }
-    catch (std::exception&)
-    {
-        success = false;
-    }
-#endif
 
-    errno = error;
-    return success;
+    range.low = range.high = *first;
+    if (std::empty(str))
+    {
+        return true;
+    }
+
+    if (!tr_strvStartsWith(str, Delimiter))
+    {
+        return false;
+    }
+
+    str.remove_prefix(std::size(Delimiter));
+    auto const second = tr_parseNum<size_t>(str);
+    if (!second)
+    {
+        return false;
+    }
+
+    range.high = *second;
+    return true;
 }
 
 /**
