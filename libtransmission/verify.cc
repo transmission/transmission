@@ -7,10 +7,10 @@
  */
 
 #include <algorithm>
-#include <cstdlib> /* free() */
 #include <ctime>
 #include <mutex>
 #include <set>
+#include <vector>
 
 #include "transmission.h"
 #include "completion.h"
@@ -31,6 +31,8 @@ static auto constexpr MsecToSleepPerSecondDuringVerify = int{ 100 };
 
 static bool verifyTorrent(tr_torrent* tor, bool* stopFlag)
 {
+    auto const begin = tr_time();
+
     tr_sys_file_t fd = TR_BAD_SYS_FILE;
     uint64_t filePos = 0;
     bool changed = false;
@@ -40,11 +42,8 @@ static bool verifyTorrent(tr_torrent* tor, bool* stopFlag)
     tr_file_index_t fileIndex = 0;
     tr_file_index_t prevFileIndex = !fileIndex;
     tr_piece_index_t piece = 0;
-    time_t const begin = tr_time();
-    size_t const buflen = 1024 * 128; // 128 KiB buffer
-    auto* const buffer = static_cast<uint8_t*>(tr_malloc(buflen));
-
-    tr_sha1_ctx_t sha = tr_sha1_init();
+    auto buffer = std::vector<std::byte>(1024 * 256);
+    auto sha = tr_sha1_init();
 
     tr_logAddTorDbg(tor, "%s", "verifying torrent...");
     tor->verify_progress = 0;
@@ -73,16 +72,16 @@ static bool verifyTorrent(tr_torrent* tor, bool* stopFlag)
         uint64_t leftInPiece = tor->pieceSize(piece) - piecePos;
         uint64_t leftInFile = file_length - filePos;
         uint64_t bytesThisPass = std::min(leftInFile, leftInPiece);
-        bytesThisPass = std::min(bytesThisPass, uint64_t{ buflen });
+        bytesThisPass = std::min(bytesThisPass, std::size(buffer));
 
         /* read a bit */
         if (fd != TR_BAD_SYS_FILE)
         {
             auto numRead = uint64_t{};
-            if (tr_sys_file_read_at(fd, buffer, bytesThisPass, filePos, &numRead, nullptr) && numRead > 0)
+            if (tr_sys_file_read_at(fd, std::data(buffer), bytesThisPass, filePos, &numRead, nullptr) && numRead > 0)
             {
                 bytesThisPass = numRead;
-                tr_sha1_update(sha, buffer, bytesThisPass);
+                tr_sha1_update(sha, std::data(buffer), bytesThisPass);
                 tr_sys_file_advise(fd, filePos, bytesThisPass, TR_SYS_FILE_ADVICE_DONT_NEED, nullptr);
             }
         }
@@ -143,7 +142,6 @@ static bool verifyTorrent(tr_torrent* tor, bool* stopFlag)
 
     tor->verify_progress.reset();
     tr_sha1_final(sha);
-    free(buffer);
 
     /* stopwatch */
     time_t const end = tr_time();
