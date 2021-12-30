@@ -1198,36 +1198,37 @@ static char* tr_strtruncd(char* buf, double x, int precision, size_t buflen)
     return buf;
 }
 
-char* tr_strpercent(char* buf, double x, size_t buflen)
+std::string tr_strpercent(double x)
 {
+    auto buf = std::array<char, 64>{};
+
     if (x < 100.0)
     {
-        tr_strtruncd(buf, x, 1, buflen);
+        tr_strtruncd(std::data(buf), x, 1, std::size(buf));
     }
     else
     {
-        tr_strtruncd(buf, x, 0, buflen);
+        tr_strtruncd(std::data(buf), x, 0, std::size(buf));
     }
 
-    return buf;
+    return std::data(buf);
 }
 
-char* tr_strratio(char* buf, size_t buflen, double ratio, char const* infinity)
+std::string tr_strratio(double ratio, char const* infinity)
 {
     if ((int)ratio == TR_RATIO_NA)
     {
-        tr_strlcpy(buf, _("None"), buflen);
-    }
-    else if ((int)ratio == TR_RATIO_INF)
-    {
-        tr_strlcpy(buf, infinity, buflen);
-    }
-    else
-    {
-        tr_strpercent(buf, ratio, buflen);
+        return _("None");
     }
 
-    return buf;
+    if ((int)ratio == TR_RATIO_INF)
+    {
+        auto buf = std::array<char, 64>{};
+        tr_strlcpy(std::data(buf), infinity, std::size(buf));
+        return std::data(buf);
+    }
+
+    return tr_strpercent(ratio);
 }
 
 /***

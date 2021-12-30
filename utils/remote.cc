@@ -173,17 +173,17 @@ static char* tr_strltime(char* buf, int seconds, size_t buflen)
     return buf;
 }
 
-static char* strlpercent(char* buf, double x, size_t buflen)
+static std::string strlpercent(double x)
 {
-    return tr_strpercent(buf, x, buflen);
+    return tr_strpercent(x);
 }
 
-static char* strlratio2(char* buf, double ratio, size_t buflen)
+static std::string strlratio2(double ratio)
 {
-    return tr_strratio(buf, buflen, ratio, "Inf");
+    return tr_strratio(ratio, "Inf");
 }
 
-static char* strlratio(char* buf, int64_t numerator, int64_t denominator, size_t buflen)
+static std::string strlratio(int64_t numerator, int64_t denominator)
 {
     double ratio;
 
@@ -200,7 +200,7 @@ static char* strlratio(char* buf, int64_t numerator, int64_t denominator, size_t
         ratio = TR_RATIO_NA;
     }
 
-    return strlratio2(buf, ratio, buflen);
+    return strlratio2(ratio);
 }
 
 static std::string strlmem(int64_t bytes)
@@ -990,8 +990,7 @@ static void printDetails(tr_variant* top)
 
             if (tr_variantDictFindInt(t, TR_KEY_sizeWhenDone, &i) && tr_variantDictFindInt(t, TR_KEY_leftUntilDone, &j))
             {
-                strlpercent(buf, 100.0 * (i - j) / i, sizeof(buf));
-                printf("  Percent Done: %s%%\n", buf);
+                printf("  Percent Done: %s%%\n", strlpercent(100.0 * (i - j) / i).c_str());
             }
 
             if (tr_variantDictFindInt(t, TR_KEY_eta, &i))
@@ -1024,8 +1023,7 @@ static void printDetails(tr_variant* top)
                 if (tr_variantDictFindInt(t, TR_KEY_desiredAvailable, &j) && tr_variantDictFindInt(t, TR_KEY_leftUntilDone, &k))
                 {
                     j += i - k;
-                    strlpercent(buf, 100.0 * j / i, sizeof(buf));
-                    printf("  Availability: %s%%\n", buf);
+                    printf("  Availability: %s%%\n", strlpercent(100.0 * j / i).c_str());
                 }
 
                 if (tr_variantDictFindInt(t, TR_KEY_totalSize, &j))
@@ -1038,8 +1036,7 @@ static void printDetails(tr_variant* top)
             {
                 printf("  Downloaded: %s\n", strlsize(i).c_str());
                 printf("  Uploaded: %s\n", strlsize(j).c_str());
-                strlratio(buf, j, i, sizeof(buf));
-                printf("  Ratio: %s\n", buf);
+                printf("  Ratio: %s\n", strlratio(j, i).c_str());
             }
 
             if (tr_variantDictFindInt(t, TR_KEY_corruptEver, &i))
@@ -1203,7 +1200,7 @@ static void printDetails(tr_variant* top)
                 case TR_RATIOLIMIT_SINGLE:
                     if (tr_variantDictFindReal(t, TR_KEY_seedRatioLimit, &d))
                     {
-                        printf("  Ratio Limit: %s\n", strlratio2(buf, d, sizeof(buf)));
+                        printf("  Ratio Limit: %s\n", strlratio2(d).c_str());
                     }
 
                     break;
@@ -1481,7 +1478,6 @@ static void printTorrentList(tr_variant* top)
             {
                 char etaStr[16];
                 char statusStr[64];
-                char ratioStr[32];
                 char doneStr[8];
                 int64_t error;
                 char errorMark;
@@ -1522,7 +1518,7 @@ static void printTorrentList(tr_variant* top)
                     etaStr,
                     up / (double)tr_speed_K,
                     down / (double)tr_speed_K,
-                    strlratio2(ratioStr, ratio, sizeof(ratioStr)),
+                    strlratio2(ratio).c_str(),
                     getStatusString(d, statusStr, sizeof(statusStr)),
                     TR_PRIsv_ARG(name));
 
@@ -1831,21 +1827,10 @@ static void printSession(tr_variant* top)
                 tr_variantDictFindReal(args, TR_KEY_seedRatioLimit, &seedRatioLimit) &&
                 tr_variantDictFindBool(args, TR_KEY_seedRatioLimited, &seedRatioLimited))
             {
-                char buf[128];
-
                 printf("LIMITS\n");
                 printf("  Peer limit: %" PRId64 "\n", peerLimit);
 
-                if (seedRatioLimited)
-                {
-                    strlratio2(buf, seedRatioLimit, sizeof(buf));
-                }
-                else
-                {
-                    tr_strlcpy(buf, "Unlimited", sizeof(buf));
-                }
-
-                printf("  Default seed ratio limit: %s\n", buf);
+                printf("  Default seed ratio limit: %s\n", seedRatioLimited ? strlratio2(seedRatioLimit).c_str() : "Unlimited");
 
                 std::string effective_up_limit;
 
@@ -1977,7 +1962,7 @@ static void printSessionStats(tr_variant* top)
             printf("\nCURRENT SESSION\n");
             printf("  Uploaded:   %s\n", strlsize(up).c_str());
             printf("  Downloaded: %s\n", strlsize(down).c_str());
-            printf("  Ratio:      %s\n", strlratio(buf, up, down, sizeof(buf)));
+            printf("  Ratio:      %s\n", strlratio(up, down).c_str());
             printf("  Duration:   %s\n", tr_strltime(buf, secs, sizeof(buf)));
         }
 
@@ -1989,7 +1974,7 @@ static void printSessionStats(tr_variant* top)
             printf("  Started %lu times\n", (unsigned long)sessions);
             printf("  Uploaded:   %s\n", strlsize(up).c_str());
             printf("  Downloaded: %s\n", strlsize(down).c_str());
-            printf("  Ratio:      %s\n", strlratio(buf, up, down, sizeof(buf)));
+            printf("  Ratio:      %s\n", strlratio(up, down).c_str());
             printf("  Duration:   %s\n", tr_strltime(buf, secs, sizeof(buf)));
         }
     }
