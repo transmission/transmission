@@ -129,6 +129,8 @@ void two_major_two_minor_formatter(char* buf, size_t buflen, std::string_view na
 
 bool decodeShad0wClient(char* buf, size_t buflen, std::string_view in)
 {
+    auto const* const buf_in = buf;
+
     // Shad0w with his experimental BitTorrent implementation and BitTornado
     // introduced peer ids that begin with a character which is``T`` in the
     // case of BitTornado followed by up to five ascii characters for version
@@ -199,7 +201,10 @@ bool decodeShad0wClient(char* buf, size_t buflen, std::string_view in)
         std::rbegin(vals),
         std::rend(vals),
         [&buf, &buflen](int num) { std::tie(buf, buflen) = buf_append(buf, buflen, num, '.'); });
-    buf[-1] = '\0'; // remove trailing '.'
+    if (buf > buf_in)
+    {
+        buf[-1] = '\0'; // remove trailing '.'
+    }
     return true;
 }
 
