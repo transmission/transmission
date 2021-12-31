@@ -2180,7 +2180,7 @@ static void deleteLocalData(tr_torrent* tor, tr_fileFunc func)
     ****  Move the local data to a new tmpdir
     ***/
 
-    auto tmpdir = tr_strvPath(top, TR_PATH_DELIMITER_STR, tr_torrentName(tor), "__XXXXXX");
+    auto tmpdir = tr_strvPath(top, tr_torrentName(tor) + "__XXXXXX"s);
     tr_sys_dir_create_temp(std::data(tmpdir), nullptr);
 
     for (tr_file_index_t f = 0, n = tor->fileCount(); f < n; ++f)
