@@ -112,8 +112,6 @@ auto toString(time_t timestamp)
 
 void showInfo(app_opts const& opts, tr_torrent_metainfo const& metainfo)
 {
-    auto buf = std::array<char, 128>{};
-
     /**
     ***  General Info
     **/
@@ -135,8 +133,8 @@ void showInfo(app_opts const& opts, tr_torrent_metainfo const& metainfo)
     }
 
     printf("  Piece Count: %" PRIu64 "\n", metainfo.pieceCount());
-    printf("  Piece Size: %s\n", tr_formatter_mem_B(std::data(buf), metainfo.pieceSize(), std::size(buf)));
-    printf("  Total Size: %s\n", tr_formatter_size_B(std::data(buf), metainfo.totalSize(), std::size(buf)));
+    printf("  Piece Size: %s\n", tr_formatter_mem_B(metainfo.pieceSize()).c_str());
+    printf("  Total Size: %s\n", tr_formatter_size_B(metainfo.totalSize()).c_str());
     printf("  Privacy: %s\n", metainfo.isPrivate() ? "Private torrent" : "Public torrent");
 
     /**
@@ -183,7 +181,7 @@ void showInfo(app_opts const& opts, tr_torrent_metainfo const& metainfo)
     {
         std::string filename = file.path();
         filename += " (";
-        filename += tr_formatter_size_B(std::data(buf), file.length(), std::size(buf));
+        filename += tr_formatter_size_B(file.length());
         filename += ')';
         filenames.emplace_back(filename);
     }

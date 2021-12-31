@@ -203,15 +203,14 @@ int tr_main(int argc, char* argv[])
         tr_metaInfoBuilderSetPieceSize(b, options.piecesize_kib * KiB);
     }
 
-    char buf[128];
     printf(
         b->fileCount > 1 ? " %" PRIu32 " files, %s\n" : " %" PRIu32 " file, %s\n",
         b->fileCount,
-        tr_formatter_size_B(buf, b->totalSize, sizeof(buf)));
+        tr_formatter_size_B(b->totalSize).c_str());
     printf(
         b->pieceCount > 1 ? " %" PRIu32 " pieces, %s each\n" : " %" PRIu32 " piece, %s\n",
         b->pieceCount,
-        tr_formatter_size_B(buf, b->pieceSize, sizeof(buf)));
+        tr_formatter_size_B(b->pieceSize).c_str());
 
     tr_makeMetaInfo(
         b,

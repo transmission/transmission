@@ -248,13 +248,14 @@ static int getMaxBlocks(int64_t max_bytes)
 
 int tr_cacheSetLimit(tr_cache* cache, int64_t max_bytes)
 {
-    char buf[128];
-
     cache->max_bytes = max_bytes;
     cache->max_blocks = getMaxBlocks(max_bytes);
 
-    tr_formatter_mem_B(buf, cache->max_bytes, sizeof(buf));
-    tr_logAddNamedDbg(MY_NAME, "Maximum cache size set to %s (%d blocks)", buf, cache->max_blocks);
+    tr_logAddNamedDbg(
+        MY_NAME,
+        "Maximum cache size set to %s (%d blocks)",
+        tr_formatter_mem_B(cache->max_bytes).c_str(),
+        cache->max_blocks);
 
     return cacheTrim(cache);
 }

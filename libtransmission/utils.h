@@ -422,15 +422,13 @@ std::vector<int> tr_parseNumberRange(std::string_view str);
 double tr_truncd(double x, int decimal_places);
 
 /* return a percent formatted string of either x.xx, xx.x or xxx */
-char* tr_strpercent(char* buf, double x, size_t buflen);
+std::string tr_strpercent(double x);
 
 /**
- * @param buf      the buffer to write the string to
- * @param buflen   buf's size
  * @param ratio    the ratio to convert to a string
  * @param infinity the string represntation of "infinity"
  */
-char* tr_strratio(char* buf, size_t buflen, double ratio, char const* infinity) TR_GNUC_NONNULL(1, 4);
+std::string tr_strratio(double ratio, char const* infinity);
 
 /** @brief Portability wrapper for localtime_r() that uses the system implementation if available */
 struct tm* tr_localtime_r(time_t const* _clock, struct tm* _result);
@@ -501,19 +499,19 @@ extern size_t tr_mem_K;
 extern uint64_t tr_size_K; /* unused? */
 
 /* format a speed from KBps into a user-readable string. */
-char* tr_formatter_speed_KBps(char* buf, double KBps, size_t buflen);
+std::string tr_formatter_speed_KBps(double KBps);
 
 /* format a memory size from bytes into a user-readable string. */
-char* tr_formatter_mem_B(char* buf, size_t bytes, size_t buflen);
+std::string tr_formatter_mem_B(size_t bytes);
 
 /* format a memory size from MB into a user-readable string. */
-static inline char* tr_formatter_mem_MB(char* buf, double MBps, size_t buflen)
+static inline std::string tr_formatter_mem_MB(double MBps)
 {
-    return tr_formatter_mem_B(buf, (size_t)(MBps * tr_mem_K * tr_mem_K), buflen);
+    return tr_formatter_mem_B((size_t)(MBps * tr_mem_K * tr_mem_K));
 }
 
 /* format a file size from bytes into a user-readable string. */
-char* tr_formatter_size_B(char* buf, uint64_t bytes, size_t buflen);
+std::string tr_formatter_size_B(uint64_t bytes);
 
 void tr_formatter_get_units(void* dict);
 

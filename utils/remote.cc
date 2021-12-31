@@ -173,17 +173,17 @@ static char* tr_strltime(char* buf, int seconds, size_t buflen)
     return buf;
 }
 
-static char* strlpercent(char* buf, double x, size_t buflen)
+static std::string strlpercent(double x)
 {
-    return tr_strpercent(buf, x, buflen);
+    return tr_strpercent(x);
 }
 
-static char* strlratio2(char* buf, double ratio, size_t buflen)
+static std::string strlratio2(double ratio)
 {
-    return tr_strratio(buf, buflen, ratio, "Inf");
+    return tr_strratio(ratio, "Inf");
 }
 
-static char* strlratio(char* buf, int64_t numerator, int64_t denominator, size_t buflen)
+static std::string strlratio(int64_t numerator, int64_t denominator)
 {
     double ratio;
 
@@ -200,39 +200,27 @@ static char* strlratio(char* buf, int64_t numerator, int64_t denominator, size_t
         ratio = TR_RATIO_NA;
     }
 
-    return strlratio2(buf, ratio, buflen);
+    return strlratio2(ratio);
 }
 
-static char* strlmem(char* buf, int64_t bytes, size_t buflen)
+static std::string strlmem(int64_t bytes)
 {
-    if (bytes == 0)
-    {
-        tr_strlcpy(buf, "None", buflen);
-    }
-    else
-    {
-        tr_formatter_mem_B(buf, bytes, buflen);
-    }
-
-    return buf;
+    return bytes == 0 ? "None"s : tr_formatter_mem_B(bytes);
 }
 
-static char* strlsize(char* buf, int64_t bytes, size_t buflen)
+static std::string strlsize(int64_t bytes)
 {
     if (bytes < 0)
     {
-        tr_strlcpy(buf, "Unknown", buflen);
-    }
-    else if (bytes == 0)
-    {
-        tr_strlcpy(buf, "None", buflen);
-    }
-    else
-    {
-        tr_formatter_size_B(buf, bytes, buflen);
+        return "Unknown"s;
     }
 
-    return buf;
+    if (bytes == 0)
+    {
+        return "None"s;
+    }
+
+    return tr_formatter_size_B(bytes);
 }
 
 enum
@@ -945,7 +933,6 @@ static void printDetails(tr_variant* top)
             tr_variant* t = tr_variantListChild(torrents, ti);
             tr_variant* l;
             char buf[512];
-            char buf2[512];
             int64_t i;
             int64_t j;
             int64_t k;
@@ -1003,8 +990,7 @@ static void printDetails(tr_variant* top)
 
             if (tr_variantDictFindInt(t, TR_KEY_sizeWhenDone, &i) && tr_variantDictFindInt(t, TR_KEY_leftUntilDone, &j))
             {
-                strlpercent(buf, 100.0 * (i - j) / i, sizeof(buf));
-                printf("  Percent Done: %s%%\n", buf);
+                printf("  Percent Done: %s%%\n", strlpercent(100.0 * (i - j) / i).c_str());
             }
 
             if (tr_variantDictFindInt(t, TR_KEY_eta, &i))
@@ -1014,19 +1000,17 @@ static void printDetails(tr_variant* top)
 
             if (tr_variantDictFindInt(t, TR_KEY_rateDownload, &i))
             {
-                printf("  Download Speed: %s\n", tr_formatter_speed_KBps(buf, i / (double)tr_speed_K, sizeof(buf)));
+                printf("  Download Speed: %s\n", tr_formatter_speed_KBps(i / (double)tr_speed_K).c_str());
             }
 
             if (tr_variantDictFindInt(t, TR_KEY_rateUpload, &i))
             {
-                printf("  Upload Speed: %s\n", tr_formatter_speed_KBps(buf, i / (double)tr_speed_K, sizeof(buf)));
+                printf("  Upload Speed: %s\n", tr_formatter_speed_KBps(i / (double)tr_speed_K).c_str());
             }
 
             if (tr_variantDictFindInt(t, TR_KEY_haveUnchecked, &i) && tr_variantDictFindInt(t, TR_KEY_haveValid, &j))
             {
-                strlsize(buf, i + j, sizeof(buf));
-                strlsize(buf2, j, sizeof(buf2));
-                printf("  Have: %s (%s verified)\n", buf, buf2);
+                printf("  Have: %s (%s verified)\n", strlsize(i + j).c_str(), strlsize(j).c_str());
             }
 
             if (tr_variantDictFindInt(t, TR_KEY_sizeWhenDone, &i))
@@ -1039,32 +1023,25 @@ static void printDetails(tr_variant* top)
                 if (tr_variantDictFindInt(t, TR_KEY_desiredAvailable, &j) && tr_variantDictFindInt(t, TR_KEY_leftUntilDone, &k))
                 {
                     j += i - k;
-                    strlpercent(buf, 100.0 * j / i, sizeof(buf));
-                    printf("  Availability: %s%%\n", buf);
+                    printf("  Availability: %s%%\n", strlpercent(100.0 * j / i).c_str());
                 }
 
                 if (tr_variantDictFindInt(t, TR_KEY_totalSize, &j))
                 {
-                    strlsize(buf2, i, sizeof(buf2));
-                    strlsize(buf, j, sizeof(buf));
-                    printf("  Total size: %s (%s wanted)\n", buf, buf2);
+                    printf("  Total size: %s (%s wanted)\n", strlsize(j).c_str(), strlsize(i).c_str());
                 }
             }
 
             if (tr_variantDictFindInt(t, TR_KEY_downloadedEver, &i) && tr_variantDictFindInt(t, TR_KEY_uploadedEver, &j))
             {
-                strlsize(buf, i, sizeof(buf));
-                printf("  Downloaded: %s\n", buf);
-                strlsize(buf, j, sizeof(buf));
-                printf("  Uploaded: %s\n", buf);
-                strlratio(buf, j, i, sizeof(buf));
-                printf("  Ratio: %s\n", buf);
+                printf("  Downloaded: %s\n", strlsize(i).c_str());
+                printf("  Uploaded: %s\n", strlsize(j).c_str());
+                printf("  Ratio: %s\n", strlratio(j, i).c_str());
             }
 
             if (tr_variantDictFindInt(t, TR_KEY_corruptEver, &i))
             {
-                strlsize(buf, i, sizeof(buf));
-                printf("  Corrupt DL: %s\n", buf);
+                printf("  Corrupt DL: %s\n", strlsize(i).c_str());
             }
 
             if (tr_variantDictFindStrView(t, TR_KEY_errorString, &sv) && !std::empty(sv) &&
@@ -1176,7 +1153,7 @@ static void printDetails(tr_variant* top)
 
             if (tr_variantDictFindInt(t, TR_KEY_pieceSize, &i))
             {
-                printf("  Piece Size: %s\n", strlmem(buf, i, sizeof(buf)));
+                printf("  Piece Size: %s\n", strlmem(i).c_str());
             }
 
             printf("\n");
@@ -1190,7 +1167,7 @@ static void printDetails(tr_variant* top)
 
                 if (boolVal)
                 {
-                    printf("%s\n", tr_formatter_speed_KBps(buf, i, sizeof(buf)));
+                    printf("%s\n", tr_formatter_speed_KBps(i).c_str());
                 }
                 else
                 {
@@ -1204,7 +1181,7 @@ static void printDetails(tr_variant* top)
 
                 if (boolVal)
                 {
-                    printf("%s\n", tr_formatter_speed_KBps(buf, i, sizeof(buf)));
+                    printf("%s\n", tr_formatter_speed_KBps(i).c_str());
                 }
                 else
                 {
@@ -1223,7 +1200,7 @@ static void printDetails(tr_variant* top)
                 case TR_RATIOLIMIT_SINGLE:
                     if (tr_variantDictFindReal(t, TR_KEY_seedRatioLimit, &d))
                     {
-                        printf("  Ratio Limit: %s\n", strlratio2(buf, d, sizeof(buf)));
+                        printf("  Ratio Limit: %s\n", strlratio2(d).c_str());
                     }
 
                     break;
@@ -1294,10 +1271,8 @@ static void printFileList(tr_variant* top)
                         tr_variantGetInt(tr_variantListChild(priorities, j), &priority) &&
                         tr_variantGetBool(tr_variantListChild(wanteds, j), &wanted))
                     {
-                        char sizestr[64];
                         double percent = (double)have / length;
                         char const* pristr;
-                        strlsize(sizestr, length, sizeof(sizestr));
 
                         switch (priority)
                         {
@@ -1320,7 +1295,7 @@ static void printFileList(tr_variant* top)
                             floor(100.0 * percent),
                             pristr,
                             wanted ? "Yes" : "No",
-                            sizestr,
+                            strlsize(length).c_str(),
                             TR_PRIsv_ARG(filename));
                     }
                 }
@@ -1468,7 +1443,6 @@ static void printTorrentList(tr_variant* top)
         int64_t total_size = 0;
         double total_up = 0;
         double total_down = 0;
-        char haveStr[32];
 
         printf(
             "%6s   %-4s  %9s  %-8s  %6s  %6s  %-5s  %-11s  %s\n",
@@ -1504,7 +1478,6 @@ static void printTorrentList(tr_variant* top)
             {
                 char etaStr[16];
                 char statusStr[64];
-                char ratioStr[32];
                 char doneStr[8];
                 int64_t error;
                 char errorMark;
@@ -1517,8 +1490,6 @@ static void printTorrentList(tr_variant* top)
                 {
                     tr_strlcpy(doneStr, "n/a", sizeof(doneStr));
                 }
-
-                strlsize(haveStr, sizeWhenDone - leftUntilDone, sizeof(haveStr));
 
                 if (leftUntilDone != 0 || eta != -1)
                 {
@@ -1543,11 +1514,11 @@ static void printTorrentList(tr_variant* top)
                     (int)torId,
                     errorMark,
                     doneStr,
-                    haveStr,
+                    strlsize(sizeWhenDone - leftUntilDone).c_str(),
                     etaStr,
                     up / (double)tr_speed_K,
                     down / (double)tr_speed_K,
-                    strlratio2(ratioStr, ratio, sizeof(ratioStr)),
+                    strlratio2(ratio).c_str(),
                     getStatusString(d, statusStr, sizeof(statusStr)),
                     TR_PRIsv_ARG(name));
 
@@ -1559,7 +1530,7 @@ static void printTorrentList(tr_variant* top)
 
         printf(
             "Sum:           %9s            %6.1f  %6.1f\n",
-            strlsize(haveStr, total_size, sizeof(haveStr)),
+            strlsize(total_size).c_str(),
             total_up / (double)tr_speed_K,
             total_down / (double)tr_speed_K);
     }
@@ -1751,7 +1722,6 @@ static void printSession(tr_variant* top)
         int64_t i;
         bool boolVal;
         auto sv = std::string_view{};
-        char buf[128];
 
         printf("VERSION\n");
 
@@ -1821,7 +1791,7 @@ static void printSession(tr_variant* top)
 
         if (tr_variantDictFindInt(args, TR_KEY_cache_size_mb, &i))
         {
-            printf("  Maximum memory cache size: %s\n", tr_formatter_mem_MB(buf, i, sizeof(buf)));
+            printf("  Maximum memory cache size: %s\n", tr_formatter_mem_MB(i).c_str());
         }
 
         printf("\n");
@@ -1857,64 +1827,56 @@ static void printSession(tr_variant* top)
                 tr_variantDictFindReal(args, TR_KEY_seedRatioLimit, &seedRatioLimit) &&
                 tr_variantDictFindBool(args, TR_KEY_seedRatioLimited, &seedRatioLimited))
             {
-                char buf2[128];
-                char buf3[128];
-
                 printf("LIMITS\n");
                 printf("  Peer limit: %" PRId64 "\n", peerLimit);
 
-                if (seedRatioLimited)
-                {
-                    strlratio2(buf, seedRatioLimit, sizeof(buf));
-                }
-                else
-                {
-                    tr_strlcpy(buf, "Unlimited", sizeof(buf));
-                }
+                printf("  Default seed ratio limit: %s\n", seedRatioLimited ? strlratio2(seedRatioLimit).c_str() : "Unlimited");
 
-                printf("  Default seed ratio limit: %s\n", buf);
+                std::string effective_up_limit;
 
                 if (altEnabled)
                 {
-                    tr_formatter_speed_KBps(buf, altUp, sizeof(buf));
+                    effective_up_limit = tr_formatter_speed_KBps(altUp);
                 }
                 else if (upEnabled)
                 {
-                    tr_formatter_speed_KBps(buf, upLimit, sizeof(buf));
+                    effective_up_limit = tr_formatter_speed_KBps(upLimit);
                 }
                 else
                 {
-                    tr_strlcpy(buf, "Unlimited", sizeof(buf));
+                    effective_up_limit = "Unlimited"s;
                 }
 
                 printf(
                     "  Upload speed limit: %s (%s limit: %s; %s turtle limit: %s)\n",
-                    buf,
+                    effective_up_limit.c_str(),
                     upEnabled ? "Enabled" : "Disabled",
-                    tr_formatter_speed_KBps(buf2, upLimit, sizeof(buf2)),
+                    tr_formatter_speed_KBps(upLimit).c_str(),
                     altEnabled ? "Enabled" : "Disabled",
-                    tr_formatter_speed_KBps(buf3, altUp, sizeof(buf3)));
+                    tr_formatter_speed_KBps(altUp).c_str());
+
+                std::string effective_down_limit;
 
                 if (altEnabled)
                 {
-                    tr_formatter_speed_KBps(buf, altDown, sizeof(buf));
+                    effective_down_limit = tr_formatter_speed_KBps(altDown);
                 }
                 else if (downEnabled)
                 {
-                    tr_formatter_speed_KBps(buf, downLimit, sizeof(buf));
+                    effective_down_limit = tr_formatter_speed_KBps(downLimit);
                 }
                 else
                 {
-                    tr_strlcpy(buf, "Unlimited", sizeof(buf));
+                    effective_down_limit = "Unlimited"s;
                 }
 
                 printf(
                     "  Download speed limit: %s (%s limit: %s; %s turtle limit: %s)\n",
-                    buf,
+                    effective_down_limit.c_str(),
                     downEnabled ? "Enabled" : "Disabled",
-                    tr_formatter_speed_KBps(buf2, downLimit, sizeof(buf2)),
+                    tr_formatter_speed_KBps(downLimit).c_str(),
                     altEnabled ? "Enabled" : "Disabled",
-                    tr_formatter_speed_KBps(buf3, altDown, sizeof(buf3)));
+                    tr_formatter_speed_KBps(altDown).c_str());
 
                 if (altTimeEnabled)
                 {
@@ -1998,9 +1960,9 @@ static void printSessionStats(tr_variant* top)
             tr_variantDictFindInt(d, TR_KEY_downloadedBytes, &down) && tr_variantDictFindInt(d, TR_KEY_secondsActive, &secs))
         {
             printf("\nCURRENT SESSION\n");
-            printf("  Uploaded:   %s\n", strlsize(buf, up, sizeof(buf)));
-            printf("  Downloaded: %s\n", strlsize(buf, down, sizeof(buf)));
-            printf("  Ratio:      %s\n", strlratio(buf, up, down, sizeof(buf)));
+            printf("  Uploaded:   %s\n", strlsize(up).c_str());
+            printf("  Downloaded: %s\n", strlsize(down).c_str());
+            printf("  Ratio:      %s\n", strlratio(up, down).c_str());
             printf("  Duration:   %s\n", tr_strltime(buf, secs, sizeof(buf)));
         }
 
@@ -2010,9 +1972,9 @@ static void printSessionStats(tr_variant* top)
         {
             printf("\nTOTAL\n");
             printf("  Started %lu times\n", (unsigned long)sessions);
-            printf("  Uploaded:   %s\n", strlsize(buf, up, sizeof(buf)));
-            printf("  Downloaded: %s\n", strlsize(buf, down, sizeof(buf)));
-            printf("  Ratio:      %s\n", strlratio(buf, up, down, sizeof(buf)));
+            printf("  Uploaded:   %s\n", strlsize(up).c_str());
+            printf("  Downloaded: %s\n", strlsize(down).c_str());
+            printf("  Ratio:      %s\n", strlratio(up, down).c_str());
             printf("  Duration:   %s\n", tr_strltime(buf, secs, sizeof(buf)));
         }
     }

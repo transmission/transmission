@@ -200,11 +200,10 @@ bool tr_metaInfoBuilderSetPieceSize(tr_metainfo_builder* b, uint32_t bytes)
 {
     if (!isValidPieceSize(bytes))
     {
-        char wanted[32];
-        char gotten[32];
-        tr_formatter_mem_B(wanted, bytes, sizeof(wanted));
-        tr_formatter_mem_B(gotten, b->pieceSize, sizeof(gotten));
-        tr_logAddError(_("Failed to set piece size to %s, leaving it at %s"), wanted, gotten);
+        tr_logAddError(
+            _("Failed to set piece size to %s, leaving it at %s"),
+            tr_formatter_mem_B(bytes).c_str(),
+            tr_formatter_mem_B(b->pieceSize).c_str());
         return false;
     }
 
