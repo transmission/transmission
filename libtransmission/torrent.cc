@@ -1109,19 +1109,18 @@ tr_file_view tr_torrentFile(tr_torrent const* tor, tr_file_index_t i)
 {
     TR_ASSERT(tr_isTorrent(tor));
 
-    auto const& file = tor->file(i);
-    auto const* const name = file.name;
+    auto const* subpath = tor->fileSubpath(i);
     auto const priority = tor->file_priorities_.filePriority(i);
     auto const wanted = tor->files_wanted_.fileWanted(i);
-    auto const length = file.length;
+    auto const length = tor->fileSize(i);
 
     if (tor->completeness == TR_SEED || length == 0)
     {
-        return { name, length, length, 1.0, priority, wanted };
+        return { subpath, length, length, 1.0, priority, wanted };
     }
 
     auto const have = tor->completion.countHasBytesInSpan(tor->fpm_.byteSpan(i));
-    return { name, have, length, have >= length ? 1.0 : have / double(length), priority, wanted };
+    return { subpath, have, length, have >= length ? 1.0 : have / double(length), priority, wanted };
 }
 
 size_t tr_torrentFileCount(tr_torrent const* torrent)
@@ -2186,7 +2185,7 @@ static void deleteLocalData(tr_torrent* tor, tr_fileFunc func)
     for (tr_file_index_t f = 0, n = tor->fileCount(); f < n; ++f)
     {
         /* try to find the file, looking in the partial and download dirs */
-        auto filename = tr_strvPath(top, tor->file(f).name);
+        auto filename = tr_strvPath(top, tor->fileSubpath(f));
 
         if (!tr_sys_path_exists(filename.c_str(), nullptr))
         {
@@ -2201,7 +2200,7 @@ static void deleteLocalData(tr_torrent* tor, tr_fileFunc func)
         /* if we found the file, move it */
         if (!std::empty(filename))
         {
-            auto target = tr_strvPath(tmpdir, tor->file(f).name);
+            auto target = tr_strvPath(tmpdir, tor->fileSubpath(f));
             tr_moveFile(filename.c_str(), target.c_str(), nullptr);
             files.emplace_back(target);
         }
@@ -2258,7 +2257,7 @@ static void deleteLocalData(tr_torrent* tor, tr_fileFunc func)
     for (tr_file_index_t f = 0, n = tor->fileCount(); f < n; ++f)
     {
         /* get the directory that this file goes in... */
-        auto const filename = tr_strvPath(top, tor->file(f).name);
+        auto const filename = tr_strvPath(top, tor->fileSubpath(f));
         char* dir = tr_sys_path_dirname(filename.c_str(), nullptr);
         if (dir == nullptr)
         {
@@ -2358,7 +2357,7 @@ static void setLocationImpl(void* vdata)
          * if the target directory runs out of space halfway through... */
         for (tr_file_index_t i = 0, n = tor->fileCount(); !err && i < n; ++i)
         {
-            auto const file_length = tor->file(i).length;
+            auto const file_size = tor->fileSize(i);
 
             char const* oldbase = nullptr;
             char* sub = nullptr;
@@ -2393,7 +2392,7 @@ static void setLocationImpl(void* vdata)
 
             if (data->setme_progress != nullptr)
             {
-                bytesHandled += file_length;
+                bytesHandled += file_size;
                 *data->setme_progress = bytesHandled / tor->totalSize();
             }
         }
@@ -2473,9 +2472,8 @@ std::string_view tr_torrent::primaryMimeType() const
     auto size_per_mime_type = std::unordered_map<std::string_view, size_t>{};
     for (tr_file_index_t i = 0, n = this->fileCount(); i < n; ++i)
     {
-        auto const& file = this->file(i);
-        auto const mime_type = tr_get_mime_type_for_filename(file.name);
-        size_per_mime_type[mime_type] += file.length;
+        auto const mime_type = tr_get_mime_type_for_filename(this->fileSubpath(i));
+        size_per_mime_type[mime_type] += this->fileSize(i);
     }
 
     if (std::empty(size_per_mime_type))
@@ -2515,10 +2513,10 @@ static void tr_torrentFileCompleted(tr_torrent* tor, tr_file_index_t i)
     char* sub = nullptr;
     if (tr_torrentFindFile2(tor, i, &base, &sub, nullptr))
     {
-        if (tr_file& file = tor->file(i); strcmp(sub, file.name) != 0)
+        if (char const* file_subpath = tor->fileSubpath(i); strcmp(sub, file_subpath) != 0)
         {
             auto const oldpath = tr_strvPath(base, sub);
-            auto const newpath = tr_strvPath(base, file.name);
+            auto const newpath = tr_strvPath(base, file_subpath);
             tr_error* error = nullptr;
 
             if (!tr_sys_path_rename(oldpath.c_str(), newpath.c_str(), &error))
@@ -2591,20 +2589,20 @@ void tr_torrentGotBlock(tr_torrent* tor, tr_block_index_t block)
 
 std::optional<tr_torrent::tr_found_file_t> tr_torrent::findFile(std::string& filename, tr_file_index_t i) const
 {
-    tr_file const& file = this->file(i);
+    auto const subpath = std::string_view{ this->fileSubpath(i) };
     auto file_info = tr_sys_path_info{};
 
     if (!std::empty(this->downloadDir()))
     {
         auto const base = this->downloadDir().sv();
 
-        tr_buildBuf(filename, base, "/"sv, file.name);
+        tr_buildBuf(filename, base, "/"sv, subpath);
         if (tr_sys_path_get_info(filename.c_str(), 0, &file_info, nullptr))
         {
             return tr_found_file_t{ file_info, filename, base };
         }
 
-        tr_buildBuf(filename, base, "/"sv, file.name, ".part"sv);
+        tr_buildBuf(filename, base, "/"sv, subpath, ".part"sv);
         if (tr_sys_path_get_info(filename.c_str(), 0, &file_info, nullptr))
         {
             return tr_found_file_t{ file_info, filename, base };
@@ -2615,13 +2613,13 @@ std::optional<tr_torrent::tr_found_file_t> tr_torrent::findFile(std::string& fil
     {
         auto const base = this->incompleteDir().sv();
 
-        tr_buildBuf(filename, base, "/"sv, file.name);
+        tr_buildBuf(filename, base, "/"sv, subpath);
         if (tr_sys_path_get_info(filename.c_str(), 0, &file_info, nullptr))
         {
             return tr_found_file_t{ file_info, filename, base };
         }
 
-        tr_buildBuf(filename, base, "/"sv, file.name, ".part"sv);
+        tr_buildBuf(filename, base, "/"sv, subpath, ".part"sv);
         if (tr_sys_path_get_info(filename.c_str(), 0, &file_info, nullptr))
         {
             return tr_found_file_t{ file_info, filename, base };
@@ -2696,7 +2694,7 @@ static void refreshCurrentDir(tr_torrent* tor)
 
 char* tr_torrentBuildPartial(tr_torrent const* tor, tr_file_index_t i)
 {
-    return tr_strvDup(tr_strvJoin(tor->file(i).name, ".part"sv));
+    return tr_strvDup(tr_strvJoin(tor->fileSubpath(i), ".part"sv));
 }
 
 /***
@@ -2870,7 +2868,7 @@ static tr_file_index_t* renameFindAffectedFiles(tr_torrent* tor, char const* old
 
     for (tr_file_index_t i = 0; i < n_files; ++i)
     {
-        char const* name = tor->file(i).name;
+        char const* name = tor->fileSubpath(i);
         size_t const len = strlen(name);
 
         if ((len == oldpath_len || (len > oldpath_len && name[oldpath_len] == '/')) && memcmp(oldpath, name, oldpath_len) == 0)
@@ -2927,21 +2925,21 @@ static int renamePath(tr_torrent* tor, char const* oldpath, char const* newname)
     return err;
 }
 
-static void renameTorrentFileString(tr_torrent* tor, char const* oldpath, char const* newname, tr_file_index_t fileIndex)
+static void renameTorrentFileString(tr_torrent* tor, char const* oldpath, char const* newname, tr_file_index_t file_index)
 {
-    char* name = nullptr;
-    tr_file& file = tor->file(fileIndex);
-    size_t const oldpath_len = strlen(oldpath);
+    auto name = std::string{};
+    auto const subpath = std::string_view{ tor->fileSubpath(file_index) };
+    auto const oldpath_len = strlen(oldpath);
 
     if (strchr(oldpath, TR_PATH_DELIMITER) == nullptr)
     {
-        if (oldpath_len >= strlen(file.name))
+        if (oldpath_len >= std::size(subpath))
         {
-            name = tr_buildPath(newname, nullptr);
+            name = tr_strvPath(newname);
         }
         else
         {
-            name = tr_buildPath(newname, file.name + oldpath_len + 1, nullptr);
+            name = tr_strvPath(newname, subpath.substr(oldpath_len + 1));
         }
     }
     else
@@ -2953,26 +2951,21 @@ static void renameTorrentFileString(tr_torrent* tor, char const* oldpath, char c
             return;
         }
 
-        if (oldpath_len >= strlen(file.name))
+        if (oldpath_len >= std::size(subpath))
         {
-            name = tr_buildPath(tmp, newname, nullptr);
+            name = tr_strvPath(tmp, newname);
         }
         else
         {
-            name = tr_buildPath(tmp, newname, file.name + oldpath_len + 1, nullptr);
+            name = tr_strvPath(tmp, newname, subpath.substr(oldpath_len + 1));
         }
 
         tr_free(tmp);
     }
 
-    if (strcmp(file.name, name) == 0)
+    if (subpath != name)
     {
-        tr_free(name);
-    }
-    else
-    {
-        tr_free(file.name);
-        file.name = name;
+        tor->setFileSubpath(file_index, name);
     }
 }
 
@@ -3137,4 +3130,14 @@ void tr_torrent::setName(std::string_view name)
 
     tr_free(this->info.name);
     this->info.name = tr_strvDup(name);
+}
+
+void tr_torrent::setFileSubpath(tr_file_index_t i, std::string_view subpath)
+{
+    if (fileSubpath(i) != subpath)
+    {
+        auto* old = this->info.files[i].name;
+        this->info.files[i].name = tr_strvDup(subpath);
+        tr_free(old);
+    }
 }

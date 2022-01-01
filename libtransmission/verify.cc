@@ -50,7 +50,7 @@ static bool verifyTorrent(tr_torrent* tor, bool* stopFlag)
 
     while (!*stopFlag && piece < tor->pieceCount())
     {
-        auto const file_length = tor->file(fileIndex).length;
+        auto const file_length = tor->fileSize(fileIndex);
 
         /* if we're starting a new piece... */
         if (piecePos == 0)

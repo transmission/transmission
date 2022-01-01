@@ -317,19 +317,21 @@ public:
         return info.fileCount;
     }
 
-    [[nodiscard]] auto& file(tr_file_index_t i)
+    [[nodiscard]] char const* fileSubpath(tr_file_index_t i) const
     {
         TR_ASSERT(i < this->fileCount());
 
-        return info.files[i];
+        return info.files[i].name ? info.files[i].name : "";
     }
 
-    [[nodiscard]] auto const& file(tr_file_index_t i) const
+    [[nodiscard]] auto fileSize(tr_file_index_t i) const
     {
         TR_ASSERT(i < this->fileCount());
 
-        return info.files[i];
+        return info.files[i].length;
     }
+
+    void setFileSubpath(tr_file_index_t i, std::string_view subpath);
 
     struct tr_found_file_t : public tr_sys_path_info
     {
