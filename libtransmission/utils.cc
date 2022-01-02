@@ -401,51 +401,6 @@ bool tr_saveFile(std::string_view filename_in, std::string_view contents, tr_err
     return true;
 }
 
-char* tr_buildPath(char const* first_element, ...)
-{
-
-    /* pass 1: allocate enough space for the string */
-    va_list vl;
-    va_start(vl, first_element);
-    auto bufLen = size_t{};
-    for (char const* element = first_element; element != nullptr;)
-    {
-        bufLen += strlen(element) + 1;
-        element = va_arg(vl, char const*);
-    }
-    va_end(vl);
-    char* const buf = tr_new(char, bufLen);
-    if (buf == nullptr)
-    {
-        return nullptr;
-    }
-
-    /* pass 2: build the string piece by piece */
-    char* pch = buf;
-    va_start(vl, first_element);
-    for (char const* element = first_element; element != nullptr;)
-    {
-        size_t const elementLen = strlen(element);
-        pch = std::copy_n(element, elementLen, pch);
-        *pch++ = TR_PATH_DELIMITER;
-        element = va_arg(vl, char const*);
-    }
-    va_end(vl);
-
-    // if nonempty, eat the unwanted trailing slash
-    if (pch != buf)
-    {
-        --pch;
-    }
-
-    // zero-terminate the string
-    *pch++ = '\0';
-
-    /* sanity checks & return */
-    TR_ASSERT(pch - buf == (ptrdiff_t)bufLen);
-    return buf;
-}
-
 tr_disk_space tr_dirSpace(std::string_view dir)
 {
     if (std::empty(dir))
