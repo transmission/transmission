@@ -54,7 +54,6 @@ struct tr_byte_span_t
 
 struct tr_ctor;
 struct tr_error;
-struct tr_file;
 struct tr_info;
 struct tr_session;
 struct tr_torrent;

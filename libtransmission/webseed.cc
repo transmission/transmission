@@ -491,14 +491,14 @@ static void web_response_func(
     }
 }
 
-static std::string make_url(tr_webseed* w, char const* name)
+static std::string make_url(tr_webseed* w, std::string_view name)
 {
     struct evbuffer* buf = evbuffer_new();
 
     evbuffer_add(buf, std::data(w->base_url), std::size(w->base_url));
 
     /* if url ends with a '/', add the torrent name */
-    if (*std::rbegin(w->base_url) == '/' && name != nullptr)
+    if (*std::rbegin(w->base_url) == '/' && !std::empty(name))
     {
         tr_http_escape(buf, name, false);
     }
@@ -525,12 +525,11 @@ static void task_request_next_chunk(struct tr_webseed_task* t)
         uint64_t const step_piece_offset = total_offset - uint64_t(piece_size) * step_piece;
 
         auto const [file_index, file_offset] = tor->fileOffset(step_piece, step_piece_offset);
-        auto const& file = tor->file(file_index);
-        uint64_t this_pass = std::min(remain, file.length - file_offset);
+        uint64_t this_pass = std::min(remain, tor->fileSize(file_index) - file_offset);
 
         if (std::empty(urls[file_index]))
         {
-            urls[file_index] = make_url(t->webseed, file.name);
+            urls[file_index] = make_url(t->webseed, tor->fileSubpath(file_index));
         }
 
         char range[64];
