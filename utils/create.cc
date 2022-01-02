@@ -7,11 +7,13 @@
  */
 
 #include <array>
-#include <stdio.h> /* fprintf() */
-#include <stdlib.h> /* strtoul(), EXIT_FAILURE */
-#include <inttypes.h> /* PRIu32 */
+#include <cinttypes>
+#include <cstdio>
+#include <cstdlib>
+#include <string>
 
 #include <libtransmission/transmission.h>
+
 #include <libtransmission/error.h>
 #include <libtransmission/file.h>
 #include <libtransmission/makemeta.h>
@@ -23,12 +25,15 @@
 
 using namespace std::literals;
 
-static char constexpr MyName[] = "transmission-create";
-static char constexpr Usage[] = "Usage: transmission-create [options] <file|directory>";
+namespace
+{
 
-static uint32_t constexpr KiB = 1024;
+char constexpr MyName[] = "transmission-create";
+char constexpr Usage[] = "Usage: transmission-create [options] <file|directory>";
 
-static auto constexpr Options = std::array<tr_option, 8>{
+uint32_t constexpr KiB = 1024;
+
+auto constexpr Options = std::array<tr_option, 8>{
     { { 'p', "private", "Allow this torrent to only be used with the specified tracker(s)", "p", false, nullptr },
       { 'r', "source", "Set the source for private trackers", "r", true, "<source>" },
       { 'o', "outfile", "Save the generated .torrent to this filename", "o", true, "<file>" },
@@ -42,16 +47,16 @@ static auto constexpr Options = std::array<tr_option, 8>{
 struct app_options
 {
     std::vector<tr_tracker_info> trackers;
+    std::string outfile;
+    char const* comment = nullptr;
+    char const* infile = nullptr;
+    char const* source = nullptr;
+    uint32_t piecesize_kib = 0;
     bool is_private = false;
     bool show_version = false;
-    char const* comment = nullptr;
-    char const* outfile = nullptr;
-    char const* infile = nullptr;
-    uint32_t piecesize_kib = 0;
-    char const* source = nullptr;
 };
 
-static int parseCommandLine(app_options& options, int argc, char const* const* argv)
+int parseCommandLine(app_options& options, int argc, char const* const* argv)
 {
     int c;
     char const* optarg;
@@ -110,7 +115,7 @@ static int parseCommandLine(app_options& options, int argc, char const* const* a
     return 0;
 }
 
-static char* tr_getcwd(void)
+char* tr_getcwd(void)
 {
     char* result;
     tr_error* error = nullptr;
@@ -127,9 +132,10 @@ static char* tr_getcwd(void)
     return result;
 }
 
+} // namespace
+
 int tr_main(int argc, char* argv[])
 {
-    char* out2 = nullptr;
     tr_metainfo_builder* b = nullptr;
 
     tr_logSetLevel(TR_LOG_ERROR);
@@ -157,7 +163,7 @@ int tr_main(int argc, char* argv[])
         return EXIT_FAILURE;
     }
 
-    if (options.outfile == nullptr)
+    if (std::empty(options.outfile))
     {
         tr_error* error = nullptr;
         char* base = tr_sys_path_basename(options.infile, &error);
@@ -170,7 +176,7 @@ int tr_main(int argc, char* argv[])
 
         auto const end = tr_strvJoin(base, ".torrent"sv);
         char* cwd = tr_getcwd();
-        options.outfile = out2 = tr_buildPath(cwd, end.c_str(), nullptr);
+        options.outfile = tr_strvDup(tr_strvPath(cwd, end.c_str()));
         tr_free(cwd);
         tr_free(base);
     }
@@ -188,7 +194,7 @@ int tr_main(int argc, char* argv[])
         }
     }
 
-    printf("Creating torrent \"%s\"\n", options.outfile);
+    printf("Creating torrent \"%s\"\n", options.outfile.c_str());
 
     b = tr_metaInfoBuilderCreate(options.infile);
 
@@ -214,7 +220,7 @@ int tr_main(int argc, char* argv[])
 
     tr_makeMetaInfo(
         b,
-        options.outfile,
+        options.outfile.c_str(),
         std::data(options.trackers),
         std::size(options.trackers),
         options.comment,
@@ -264,6 +270,5 @@ int tr_main(int argc, char* argv[])
     putc('\n', stdout);
 
     tr_metaInfoBuilderFree(b);
-    tr_free(out2);
     return EXIT_SUCCESS;
 }

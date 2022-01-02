@@ -7,7 +7,9 @@
  */
 
 #include <algorithm>
+#include <cstdarg>
 #include <cstdlib>
+#include <cstring>
 #include <list>
 #include <string>
 #include <string_view>
@@ -47,6 +49,50 @@
 #include "utils.h"
 
 using namespace std::literals;
+
+static char* tr_buildPath(char const* first_element, ...)
+{
+    // pass 1: allocate enough space for the string
+    va_list vl;
+    va_start(vl, first_element);
+    auto bufLen = size_t{};
+    for (char const* element = first_element; element != nullptr;)
+    {
+        bufLen += strlen(element) + 1;
+        element = va_arg(vl, char const*);
+    }
+    va_end(vl);
+    char* const buf = tr_new(char, bufLen);
+    if (buf == nullptr)
+    {
+        return nullptr;
+    }
+
+    /* pass 2: build the string piece by piece */
+    char* pch = buf;
+    va_start(vl, first_element);
+    for (char const* element = first_element; element != nullptr;)
+    {
+        size_t const elementLen = strlen(element);
+        pch = std::copy_n(element, elementLen, pch);
+        *pch++ = TR_PATH_DELIMITER;
+        element = va_arg(vl, char const*);
+    }
+    va_end(vl);
+
+    // if nonempty, eat the unwanted trailing slash
+    if (pch != buf)
+    {
+        --pch;
+    }
+
+    // zero-terminate the string
+    *pch++ = '\0';
+
+    /* sanity checks & return */
+    TR_ASSERT(pch - buf == (ptrdiff_t)bufLen);
+    return buf;
+}
 
 /***
 ****  THREADS
@@ -219,32 +265,28 @@ static char const* getHomeDir(void)
 #define TORRENT_SUBDIR "torrents"
 #endif
 
-void tr_setConfigDir(tr_session* session, char const* configDir)
+void tr_setConfigDir(tr_session* session, std::string_view config_dir)
 {
-    session->configDir = tr_strdup(configDir);
-
-    char* path = tr_buildPath(configDir, RESUME_SUBDIR, nullptr);
-    tr_sys_dir_create(path, TR_SYS_DIR_CREATE_PARENTS, 0777, nullptr);
-    session->resumeDir = path;
-
-    path = tr_buildPath(configDir, TORRENT_SUBDIR, nullptr);
-    tr_sys_dir_create(path, TR_SYS_DIR_CREATE_PARENTS, 0777, nullptr);
-    session->torrentDir = path;
+    session->config_dir = config_dir;
+    session->resume_dir = tr_strvPath(config_dir, RESUME_SUBDIR);
+    session->torrent_dir = tr_strvPath(config_dir, TORRENT_SUBDIR);
+    tr_sys_dir_create(session->resume_dir.c_str(), TR_SYS_DIR_CREATE_PARENTS, 0777, nullptr);
+    tr_sys_dir_create(session->torrent_dir.c_str(), TR_SYS_DIR_CREATE_PARENTS, 0777, nullptr);
 }
 
 char const* tr_sessionGetConfigDir(tr_session const* session)
 {
-    return session->configDir;
+    return session->config_dir.c_str();
 }
 
 char const* tr_getTorrentDir(tr_session const* session)
 {
-    return session->torrentDir;
+    return session->torrent_dir.c_str();
 }
 
 char const* tr_getResumeDir(tr_session const* session)
 {
-    return session->resumeDir;
+    return session->resume_dir.c_str();
 }
 
 char const* tr_getDefaultConfigDir(char const* appname)

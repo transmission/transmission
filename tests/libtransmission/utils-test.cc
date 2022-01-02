@@ -146,15 +146,6 @@ TEST_F(UtilsTest, trStrvDup)
     tr_free(str);
 }
 
-TEST_F(UtilsTest, trBuildpath)
-{
-    auto out = makeString(tr_buildPath("foo", "bar", nullptr));
-    EXPECT_EQ("foo" TR_PATH_DELIMITER_STR "bar", out);
-
-    out = makeString(tr_buildPath("", "foo", "bar", nullptr));
-    EXPECT_EQ(TR_PATH_DELIMITER_STR "foo" TR_PATH_DELIMITER_STR "bar", out);
-}
-
 TEST_F(UtilsTest, trStrvPath)
 {
     EXPECT_EQ("foo" TR_PATH_DELIMITER_STR "bar", tr_strvPath("foo", "bar"));
