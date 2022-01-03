@@ -472,7 +472,7 @@ void tr_sessionGetSettings(tr_session const* s, tr_variant* d)
     tr_variantDictAddBool(d, TR_KEY_anti_brute_force_enabled, tr_sessionGetAntiBruteForceEnabled(s));
 }
 
-bool tr_sessionLoadSettings(tr_variant* dict, char const* configDir, char const* appName)
+bool tr_sessionLoadSettings(tr_variant* dict, char const* config_dir, char const* appName)
 {
     TR_ASSERT(tr_variantIsDict(dict));
 
@@ -485,14 +485,14 @@ bool tr_sessionLoadSettings(tr_variant* dict, char const* configDir, char const*
     tr_variantFree(&oldDict);
 
     /* if caller didn't specify a config dir, use the default */
-    if (tr_str_is_empty(configDir))
+    if (tr_str_is_empty(config_dir))
     {
-        configDir = tr_getDefaultConfigDir(appName);
+        config_dir = tr_getDefaultConfigDir(appName);
     }
 
     /* file settings override the defaults */
     auto fileSettings = tr_variant{};
-    auto const filename = tr_strvPath(configDir, "settings.json"sv);
+    auto const filename = tr_strvPath(config_dir, "settings.json"sv);
     auto success = bool{};
     if (tr_error* error = nullptr; tr_variantFromFile(&fileSettings, TR_VARIANT_PARSE_JSON, filename.c_str(), &error))
     {
@@ -510,12 +510,12 @@ bool tr_sessionLoadSettings(tr_variant* dict, char const* configDir, char const*
     return success;
 }
 
-void tr_sessionSaveSettings(tr_session* session, char const* configDir, tr_variant const* clientSettings)
+void tr_sessionSaveSettings(tr_session* session, char const* config_dir, tr_variant const* clientSettings)
 {
     TR_ASSERT(tr_variantIsDict(clientSettings));
 
     tr_variant settings;
-    auto const filename = tr_strvPath(configDir, "settings.json"sv);
+    auto const filename = tr_strvPath(config_dir, "settings.json"sv);
 
     tr_variantInitDict(&settings, 0);
 
@@ -588,11 +588,11 @@ struct init_data
     bool done;
     bool messageQueuingEnabled;
     tr_session* session;
-    char const* configDir;
+    char const* config_dir;
     tr_variant* clientSettings;
 };
 
-tr_session* tr_sessionInit(char const* configDir, bool messageQueuingEnabled, tr_variant* clientSettings)
+tr_session* tr_sessionInit(char const* config_dir, bool messageQueuingEnabled, tr_variant* clientSettings)
 {
     TR_ASSERT(tr_variantIsDict(clientSettings));
 
@@ -625,7 +625,7 @@ tr_session* tr_sessionInit(char const* configDir, bool messageQueuingEnabled, tr
     auto data = init_data{};
     data.done = false;
     data.session = session;
-    data.configDir = configDir;
+    data.config_dir = config_dir;
     data.messageQueuingEnabled = messageQueuingEnabled;
     data.clientSettings = clientSettings;
     tr_runInEventThread(session, tr_sessionInitImpl, &data);
@@ -724,7 +724,7 @@ static void tr_sessionInitImpl(void* vdata)
 
     tr_logSetQueueEnabled(data->messageQueuingEnabled);
 
-    tr_setConfigDir(session, data->configDir);
+    tr_setConfigDir(session, data->config_dir);
 
     session->peerMgr = tr_peerMgrNew(session);
 
@@ -735,7 +735,7 @@ static void tr_sessionInitImpl(void* vdata)
     **/
 
     {
-        auto const filename = tr_strvPath(session->configDir, "blocklists"sv);
+        auto const filename = tr_strvPath(session->config_dir, "blocklists"sv);
         tr_sys_dir_create(filename.c_str(), TR_SYS_DIR_CREATE_PARENTS, 0777, nullptr);
         loadBlocklists(session);
     }
@@ -2003,9 +2003,6 @@ void tr_sessionClose(tr_session* session)
     delete session->turtle.minutes;
     tr_session_id_free(session->session_id);
 
-    tr_free(session->configDir);
-    tr_free(session->resumeDir);
-    tr_free(session->torrentDir);
     delete session;
 }
 
@@ -2290,7 +2287,7 @@ static void loadBlocklists(tr_session* session)
     auto const isEnabled = session->useBlocklist();
 
     /* walk the blocklist directory... */
-    auto const dirname = tr_strvPath(session->configDir, "blocklists"sv);
+    auto const dirname = tr_strvPath(session->config_dir, "blocklists"sv);
     auto const odir = tr_sys_dir_open(dirname.c_str(), nullptr);
 
     if (odir == TR_BAD_SYS_DIR)
@@ -2444,7 +2441,7 @@ int tr_blocklistSetContent(tr_session* session, char const* contentFilename)
 
     if (it == std::end(src))
     {
-        auto path = tr_strvJoin(session->configDir, "blocklists"sv, name);
+        auto path = tr_strvJoin(session->config_dir, "blocklists"sv, name);
         b = tr_blocklistFileNew(path.c_str(), session->useBlocklist());
         src.push_back(b);
     }
