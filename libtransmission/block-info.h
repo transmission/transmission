@@ -31,7 +31,28 @@ struct tr_block_info
 
     void initSizes(uint64_t total_size_in, uint64_t piece_size_in);
 
-    constexpr tr_piece_index_t pieceForBlock(tr_block_index_t block) const
+    [[nodiscard]] constexpr auto blockCount() const
+    {
+        return n_blocks;
+    }
+
+    [[nodiscard]] constexpr auto blockSize() const
+    {
+        return block_size;
+    }
+
+    [[nodiscard]] constexpr auto blockSize(tr_block_index_t block) const
+    {
+        // how many bytes are in this block?
+        return block + 1 == n_blocks ? final_block_size : blockSize();
+    }
+
+    [[nodiscard]] constexpr auto pieceCount() const
+    {
+        return n_pieces;
+    }
+
+    [[nodiscard]] constexpr tr_piece_index_t pieceForBlock(tr_block_index_t block) const
     {
         // if not initialized yet, don't divide by zero
         if (n_blocks_in_piece == 0)
@@ -42,19 +63,18 @@ struct tr_block_info
         return block / n_blocks_in_piece;
     }
 
-    constexpr uint32_t pieceSize(tr_piece_index_t piece) const
+    [[nodiscard]] constexpr auto pieceSize() const
+    {
+        return piece_size;
+    }
+
+    [[nodiscard]] constexpr auto pieceSize(tr_piece_index_t piece) const
     {
         // how many bytes are in this piece?
-        return piece + 1 == n_pieces ? final_piece_size : piece_size;
+        return piece + 1 == n_pieces ? final_piece_size : pieceSize();
     }
 
-    constexpr uint32_t blockSize(tr_block_index_t block) const
-    {
-        // how many bytes are in this block?
-        return block + 1 == n_blocks ? final_block_size : block_size;
-    }
-
-    constexpr tr_piece_index_t pieceOf(uint64_t offset) const
+    [[nodiscard]] constexpr tr_piece_index_t pieceOf(uint64_t offset) const
     {
         // if not initialized yet, don't divide by zero
         if (piece_size == 0)
@@ -71,7 +91,7 @@ struct tr_block_info
         return offset / piece_size;
     }
 
-    constexpr tr_block_index_t blockOf(uint64_t offset) const
+    [[nodiscard]] constexpr tr_block_index_t blockOf(uint64_t offset) const
     {
         // if not initialized yet, don't divide by zero
         if (block_size == 0)
@@ -88,7 +108,7 @@ struct tr_block_info
         return offset / block_size;
     }
 
-    constexpr uint64_t offset(tr_piece_index_t piece, uint32_t offset, uint32_t length = 0) const
+    [[nodiscard]] constexpr uint64_t offset(tr_piece_index_t piece, uint32_t offset, uint32_t length = 0) const
     {
         auto ret = piece_size;
         ret *= piece;
@@ -97,12 +117,12 @@ struct tr_block_info
         return ret;
     }
 
-    constexpr tr_block_index_t blockOf(tr_piece_index_t piece, uint32_t offset, uint32_t length = 0) const
+    [[nodiscard]] constexpr auto blockOf(tr_piece_index_t piece, uint32_t offset, uint32_t length = 0) const
     {
         return blockOf(this->offset(piece, offset, length));
     }
 
-    constexpr tr_block_span_t blockSpanForPiece(tr_piece_index_t piece) const
+    [[nodiscard]] constexpr tr_block_span_t blockSpanForPiece(tr_piece_index_t piece) const
     {
         if (block_size == 0)
         {
@@ -112,6 +132,11 @@ struct tr_block_info
         auto const begin = blockOf(offset(piece, 0));
         auto const end = 1 + blockOf(offset(piece, pieceSize(piece) - 1));
         return { begin, end };
+    }
+
+    [[nodiscard]] constexpr auto totalSize() const
+    {
+        return total_size;
     }
 
     static uint32_t bestBlockSize(uint64_t piece_size);

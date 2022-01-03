@@ -110,13 +110,13 @@ struct tr_torrent
     , public tr_completion::torrent_view
 {
 public:
-    tr_torrent(tr_info const& inf)
-        : tr_block_info{ inf.totalSize, inf.pieceSize }
-        , completion{ this, this }
+    explicit tr_torrent(tr_info const& inf)
+        : block_info{ inf.totalSize, inf.pieceSize }
+        , completion{ this, &block_info }
     {
     }
 
-    virtual ~tr_torrent() override = default;
+    ~tr_torrent() override = default;
 
     void setLocation(
         std::string_view location,
@@ -153,6 +153,66 @@ public:
     void setSpeedLimitBps(tr_direction, unsigned int Bps);
 
     unsigned int speedLimitBps(tr_direction) const;
+
+    /// BLOCK INFO
+
+    [[nodiscard]] constexpr auto const& blockInfo() const
+    {
+        return block_info;
+    }
+
+    [[nodiscard]] constexpr auto blockCount() const
+    {
+        return blockInfo().blockCount();
+    }
+    [[nodiscard]] constexpr auto blockOf(uint64_t offset) const
+    {
+        return blockInfo().blockOf(offset);
+    }
+    [[nodiscard]] constexpr auto blockOf(tr_piece_index_t piece, uint32_t offset, uint32_t length = 0) const
+    {
+        return blockInfo().blockOf(piece, offset, length);
+    }
+    [[nodiscard]] constexpr auto blockSize() const
+    {
+        return blockInfo().blockSize();
+    }
+    [[nodiscard]] constexpr auto blockSize(tr_block_index_t block) const
+    {
+        return blockInfo().blockSize(block);
+    }
+    [[nodiscard]] constexpr auto blockSpanForPiece(tr_piece_index_t piece) const
+    {
+        return blockInfo().blockSpanForPiece(piece);
+    }
+    [[nodiscard]] constexpr auto offset(tr_piece_index_t piece, uint32_t offset, uint32_t length = 0) const
+    {
+        return blockInfo().offset(piece, offset, length);
+    }
+    [[nodiscard]] constexpr auto pieceCount() const
+    {
+        return blockInfo().pieceCount();
+    }
+    [[nodiscard]] constexpr auto pieceForBlock(tr_block_index_t block) const
+    {
+        return blockInfo().pieceForBlock(block);
+    }
+    [[nodiscard]] constexpr auto pieceOf(uint64_t offset) const
+    {
+        return blockInfo().pieceOf(offset);
+    }
+    [[nodiscard]] constexpr auto pieceSize() const
+    {
+        return blockInfo().pieceSize();
+    }
+    [[nodiscard]] constexpr auto pieceSize(tr_piece_index_t piece) const
+    {
+        return blockInfo().pieceSize(piece);
+    }
+    [[nodiscard]] constexpr auto totalSize() const
+    {
+        return blockInfo().totalSize();
+    }
 
     /// COMPLETION
 
@@ -352,19 +412,29 @@ public:
 
     /// METAINFO - TRACKERS
 
+    [[nodiscard]] auto const& announceList() const
+    {
+        return *this->info.announce_list;
+    }
+
+    [[nodiscard]] auto& announceList()
+    {
+        return *this->info.announce_list;
+    }
+
     [[nodiscard]] auto trackerCount() const
     {
-        return std::size(*info.announce_list);
+        return std::size(this->announceList());
     }
 
     [[nodiscard]] auto const& tracker(size_t i) const
     {
-        return info.announce_list->at(i);
+        return this->announceList().at(i);
     }
 
     [[nodiscard]] auto tiers() const
     {
-        return info.announce_list->tiers();
+        return this->announceList().tiers();
     }
 
     /// METAINFO - WEBSEEDS
@@ -375,13 +445,6 @@ public:
     }
 
     [[nodiscard]] auto const& webseed(size_t i) const
-    {
-        TR_ASSERT(i < webseedCount());
-
-        return info.webseeds[i];
-    }
-
-    [[nodiscard]] auto& webseed(size_t i)
     {
         TR_ASSERT(i < webseedCount());
 
@@ -407,39 +470,9 @@ public:
         return !this->isPrivate();
     }
 
-    [[nodiscard]] auto pieceCount() const
-    {
-        return this->info.pieceCount;
-    }
-
-    [[nodiscard]] auto pieceSize() const
-    {
-        return this->info.pieceSize;
-    }
-
-    [[nodiscard]] auto pieceSize(tr_piece_index_t i) const
-    {
-        return tr_block_info::pieceSize(i);
-    }
-
-    [[nodiscard]] auto totalSize() const
-    {
-        return this->info.totalSize;
-    }
-
     [[nodiscard]] auto infoHashString() const
     {
         return this->info.hashString;
-    }
-
-    [[nodiscard]] auto const& announceList() const
-    {
-        return *this->info.announce_list;
-    }
-
-    [[nodiscard]] auto& announceList()
-    {
-        return *this->info.announce_list;
     }
 
     [[nodiscard]] auto const& torrentFile() const
@@ -558,6 +591,8 @@ public:
     tr_info info = {};
 
     tr_bitfield checked_pieces_ = tr_bitfield{ 0 };
+
+    tr_block_info block_info;
 
     // TODO(ckerr): make private once some of torrent.cc's `tr_torrentFoo()` methods are member functions
     tr_completion completion;
