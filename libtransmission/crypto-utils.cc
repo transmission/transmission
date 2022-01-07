@@ -137,56 +137,24 @@ bool tr_ssha1_matches(std::string_view ssha1, std::string_view plaintext)
 ****
 ***/
 
-static char* tr_base64_encode(char const* input, size_t input_length, size_t* output_length)
+static size_t base64_alloc_size(std::string_view input)
 {
-    char* ret = nullptr;
-
-    if (input != nullptr)
-    {
-        if (input_length != 0)
-        {
-            size_t ret_length = 4 * ((input_length + 2) / 3);
-            base64_encodestate state;
-
+    size_t ret_length = 4 * ((std::size(input) + 2) / 3);
 #ifdef USE_SYSTEM_B64
-            /* Additional space is needed for newlines if we're using unpatched libb64 */
-            ret_length += ret_length / 72 + 1;
+    // Additional space is needed for newlines if we're using unpatched libb64
+    ret_length += ret_length / 72 + 1;
 #endif
-
-            ret = tr_new(char, ret_length + 8);
-
-            base64_init_encodestate(&state);
-            ret_length = base64_encode_block(static_cast<char const*>(input), input_length, ret, &state);
-            ret_length += base64_encode_blockend(ret + ret_length, &state);
-
-            if (output_length != nullptr)
-            {
-                *output_length = ret_length;
-            }
-
-            ret[ret_length] = '\0';
-
-            return ret;
-        }
-
-        ret = tr_strdup("");
-    }
-
-    if (output_length != nullptr)
-    {
-        *output_length = 0;
-    }
-
-    return ret;
+    return ret_length * 8;
 }
 
 std::string tr_base64_encode_str(std::string_view input)
 {
-    auto len = size_t{};
-    char* const tmp = tr_base64_encode(std::data(input), std::size(input), &len);
-    auto str = std::string{ tmp, len };
-    tr_free(tmp);
-    return str;
+    auto buf = std::vector<char>(base64_alloc_size(input));
+    auto state = base64_encodestate{};
+    base64_init_encodestate(&state);
+    size_t len = base64_encode_block(std::data(input), std::size(input), std::data(buf), &state);
+    len += base64_encode_blockend(std::data(buf) + len, &state);
+    return std::string{ std::data(buf), len };
 }
 
 static char* tr_base64_decode(char const* input, size_t input_length, size_t* output_length)
