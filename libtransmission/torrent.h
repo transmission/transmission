@@ -105,14 +105,12 @@ tr_torrent_activity tr_torrentGetActivity(tr_torrent const* tor);
 struct tr_incomplete_metadata;
 
 /** @brief Torrent object */
-struct tr_torrent
-    : public tr_block_info
-    , public tr_completion::torrent_view
+struct tr_torrent : public tr_completion::torrent_view
 {
 public:
     explicit tr_torrent(tr_info const& inf)
         : block_info{ inf.totalSize, inf.pieceSize }
-        , completion{ this, &block_info }
+        , completion{ this, &this->block_info }
     {
     }
 

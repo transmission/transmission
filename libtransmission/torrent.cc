@@ -562,7 +562,7 @@ static void tr_torrentFireMetadataCompleted(tr_torrent* tor);
 static void torrentInitFromInfoDict(tr_torrent* tor)
 {
     tor->block_info.initSizes(tor->info.totalSize, tor->info.pieceSize);
-    tor->completion = tr_completion{ tor, tor };
+    tor->completion = tr_completion{ tor, &tor->block_info };
     auto const obfuscated = tr_sha1("req2"sv, tor->infoHash());
     if (obfuscated)
     {
@@ -1933,7 +1933,7 @@ void tr_torrentGetBlockLocation(
     uint32_t* length)
 {
     uint64_t pos = block;
-    pos *= tor->block_size;
+    pos *= tor->blockSize();
     *piece = pos / tor->pieceSize();
     uint64_t piece_begin = tor->pieceSize();
     piece_begin *= *piece;
