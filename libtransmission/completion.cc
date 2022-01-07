@@ -56,7 +56,7 @@ uint64_t tr_completion::computeSizeWhenDone() const
     }
 
     // count bytes that we want or that we already have
-    auto size = size_t{ 0 };
+    auto size = uint64_t{ 0 };
     for (tr_piece_index_t piece = 0; piece < block_info_->n_pieces; ++piece)
     {
         if (tor_->pieceIsWanted(piece))
