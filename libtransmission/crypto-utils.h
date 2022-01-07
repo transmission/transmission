@@ -190,12 +190,6 @@ void* tr_base64_encode_str(char const* input, size_t* output_length) TR_GNUC_MAL
 void* tr_base64_decode(void const* input, size_t input_length, size_t* output_length) TR_GNUC_MALLOC;
 
 /**
- * @brief Translate null-terminated string from base64 into raw form.
- * @return a newly-allocated null-terminated string that can be freed with tr_free()
- */
-void* tr_base64_decode_str(char const* input, size_t* output_length) TR_GNUC_MALLOC;
-
-/**
  * @brief Translate a character range from base64 into raw form.
  * @return a new std::string with the decoded contents.
  */

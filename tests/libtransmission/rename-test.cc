@@ -69,12 +69,10 @@ protected:
     tr_torrent* createTorrentFromBase64Metainfo(tr_ctor* ctor, char const* benc_base64)
     {
         // create the torrent ctor
-        size_t benc_len;
-        auto* benc = static_cast<char*>(tr_base64_decode_str(benc_base64, &benc_len));
-        EXPECT_NE(nullptr, benc);
-        EXPECT_LT(size_t(0), benc_len);
+        auto const benc = tr_base64_decode_str(benc_base64);
+        EXPECT_LT(0, std::size(benc));
         tr_error* error = nullptr;
-        EXPECT_TRUE(tr_ctorSetMetainfo(ctor, benc, benc_len, &error));
+        EXPECT_TRUE(tr_ctorSetMetainfo(ctor, std::data(benc), std::size(benc), &error));
         EXPECT_EQ(nullptr, error);
         tr_ctorSetPaused(ctor, TR_FORCE, true);
 
@@ -83,7 +81,6 @@ protected:
         EXPECT_NE(nullptr, tor);
 
         // cleanup
-        tr_free(benc);
         return tor;
     }
 

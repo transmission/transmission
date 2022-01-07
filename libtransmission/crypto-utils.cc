@@ -222,11 +222,6 @@ void* tr_base64_decode(void const* input, size_t input_length, size_t* output_le
     return ret;
 }
 
-void* tr_base64_decode_str(char const* input, size_t* output_length)
-{
-    return tr_base64_decode(input, input == nullptr ? 0 : strlen(input), output_length);
-}
-
 std::string tr_base64_decode_str(std::string_view input)
 {
     auto len = size_t{};
