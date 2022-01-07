@@ -179,9 +179,9 @@ void* tr_base64_encode(void const* input, size_t input_length, size_t* output_le
 
 /**
  * @brief Translate null-terminated string into base64.
- * @return a newly-allocated null-terminated string that can be freed with tr_free()
+ * @return a new std::string with the encoded contents
  */
-void* tr_base64_encode_str(char const* input, size_t* output_length) TR_GNUC_MALLOC;
+std::string tr_base64_encode_str(std::string_view input);
 
 /**
  * @brief Translate a block of bytes from base64 into raw form.

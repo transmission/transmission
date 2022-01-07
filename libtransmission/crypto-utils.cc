@@ -180,9 +180,13 @@ void* tr_base64_encode(void const* input, size_t input_length, size_t* output_le
     return ret;
 }
 
-void* tr_base64_encode_str(char const* input, size_t* output_length)
+std::string tr_base64_encode_str(std::string_view input)
 {
-    return tr_base64_encode(input, input == nullptr ? 0 : strlen(input), output_length);
+    auto len = size_t{};
+    auto* buf = tr_base64_encode(std::data(input), std::size(input), &len);
+    auto str = std::string{ reinterpret_cast<char const*>(buf), len };
+    tr_free(buf);
+    return str;
 }
 
 void* tr_base64_decode(void const* input, size_t input_length, size_t* output_length)

@@ -203,39 +203,15 @@ TEST(Crypto, random)
     }
 }
 
-static bool base64Eq(char const* a, char const* b)
-{
-    for (;; ++a, ++b)
-    {
-        while (*a == '\r' || *a == '\n')
-        {
-            ++a;
-        }
-
-        while (*b == '\r' || *b == '\n')
-        {
-            ++b;
-        }
-
-        if (*a == '\0' || *b == '\0' || *a != *b)
-        {
-            break;
-        }
-    }
-
-    return *a == *b;
-}
-
 TEST(Crypto, base64)
 {
-    auto len = size_t{};
-    auto* out = static_cast<char*>(tr_base64_encode_str("YOYO!", &len));
-    EXPECT_EQ(strlen(out), len);
-    EXPECT_TRUE(base64Eq("WU9ZTyE=", out));
-    EXPECT_EQ("YOYO!", tr_base64_decode_str(std::string_view{ out, len }));
-    tr_free(out);
+    auto raw = std::string_view{ "YOYO!"sv };
+    auto encoded = tr_base64_encode_str(raw);
+    EXPECT_EQ("WU9ZTyE="sv, encoded);
+    EXPECT_EQ(raw, tr_base64_decode_str(encoded));
 
-    out = static_cast<char*>(tr_base64_encode("", 0, &len));
+    size_t len = 0;
+    char* out = static_cast<char*>(tr_base64_encode("", 0, &len));
     EXPECT_EQ(size_t{}, len);
     EXPECT_STREQ("", out);
     tr_free(out);
@@ -271,9 +247,6 @@ TEST(Crypto, base64)
             buf += char(1 + tr_rand_int_weak(255));
         }
 
-        out = static_cast<char*>(tr_base64_encode_str(std::data(buf), &len));
-        EXPECT_EQ(strlen(out), len);
-        EXPECT_EQ(buf, tr_base64_decode_str(out));
-        tr_free(out);
+        EXPECT_EQ(buf, tr_base64_decode_str(tr_base64_encode_str(buf)));
     }
 }

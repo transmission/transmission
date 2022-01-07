@@ -177,11 +177,10 @@ static void handle_upload(struct evhttp_request* req, tr_rpc_server* server)
         {
             for (auto const& p : parts)
             {
-                auto const& body = p.body;
-                auto body_len = std::size(body);
-                if (body_len >= 2 && memcmp(&body[body_len - 2], "\r\n", 2) == 0)
+                auto body = std::string_view{ p.body };
+                if (tr_strvEndsWith(body, "\r\n"sv))
                 {
-                    body_len -= 2;
+                    body.remove_suffix(2);
                 }
 
                 auto top = tr_variant{};
@@ -199,9 +198,7 @@ static void handle_upload(struct evhttp_request* req, tr_rpc_server* server)
                 }
                 else if (tr_variantFromBuf(&test, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, body))
                 {
-                    auto* b64 = static_cast<char*>(tr_base64_encode(body.c_str(), body_len, nullptr));
-                    tr_variantDictAddStr(args, TR_KEY_metainfo, b64);
-                    tr_free(b64);
+                    tr_variantDictAddStrView(args, TR_KEY_metainfo, tr_base64_encode_str(body));
                     have_source = true;
                 }
 
