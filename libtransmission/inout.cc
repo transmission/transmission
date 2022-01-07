@@ -211,7 +211,7 @@ static std::optional<tr_sha1_digest_t> recalculateHash(tr_torrent* tor, tr_piece
     TR_ASSERT(tor != nullptr);
     TR_ASSERT(piece < tor->pieceCount());
 
-    auto bytes_left = size_t{ tor->pieceSize(piece) };
+    auto bytes_left = size_t(tor->pieceSize(piece));
     auto offset = uint32_t{};
     tr_ioPrefetch(tor, piece, offset, bytes_left);
 

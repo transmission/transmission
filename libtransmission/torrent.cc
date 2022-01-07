@@ -579,7 +579,7 @@ static void torrentInitFromInfoDict(tr_torrent* tor)
     tor->file_mtimes_.resize(tor->fileCount());
     tor->file_priorities_.reset(&tor->fpm_);
     tor->files_wanted_.reset(&tor->fpm_);
-    tor->checked_pieces_ = tr_bitfield{ tor->pieceCount() };
+    tor->checked_pieces_ = tr_bitfield{ size_t(tor->pieceCount()) };
 }
 
 void tr_torrentGotNewInfoDict(tr_torrent* tor)
