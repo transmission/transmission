@@ -12,7 +12,6 @@
 #include <cstdlib> /* qsort */
 #include <cstring> /* memcpy, memcmp, strstr */
 #include <ctime>
-#include <iostream>
 #include <iterator>
 #include <vector>
 
@@ -225,7 +224,7 @@ tr_peer::tr_peer(tr_torrent const* tor, peer_atom* atom_in)
     : session{ tor->session }
     , atom{ atom_in }
     , swarm{ tor->swarm }
-    , blame{ tor->n_blocks }
+    , blame{ tor->blockCount() }
     , have{ tor->pieceCount() }
 {
 }
@@ -548,7 +547,7 @@ static void updateEndgame(tr_swarm* s)
 {
     /* we consider ourselves to be in endgame if the number of bytes
        we've got requested is >= the number of bytes left to download */
-    s->endgame = uint64_t(std::size(s->active_requests)) * s->tor->block_size >= s->tor->leftUntilDone();
+    s->endgame = uint64_t(std::size(s->active_requests)) * s->tor->blockSize() >= s->tor->leftUntilDone();
 }
 
 std::vector<tr_block_span_t> tr_peerMgrGetNextRequests(tr_torrent* torrent, tr_peer const* peer, size_t numwant)

@@ -24,6 +24,11 @@ struct tr_info;
 
 struct tr_torrent_metainfo : public tr_magnet_metainfo
 {
+    [[nodiscard]] constexpr auto const& blockInfo() const
+    {
+        return block_info_;
+    }
+
 public:
     tr_torrent_metainfo() = default;
     ~tr_torrent_metainfo() override = default;
@@ -41,30 +46,72 @@ public:
     // load multiple files.
     bool parseTorrentFile(std::string_view benc_filename, std::vector<char>* buffer = nullptr, tr_error** error = nullptr);
 
-    auto const& blockInfo() const
+    /// BLOCK INFO
+
+    [[nodiscard]] constexpr auto blockCount() const
     {
-        return block_info_;
+        return blockInfo().blockCount();
     }
-    auto pieceCount() const
+    [[nodiscard]] constexpr auto blockOf(uint64_t offset) const
     {
-        return block_info_.n_pieces;
+        return blockInfo().blockOf(offset);
     }
-    auto pieceSize() const
+    [[nodiscard]] constexpr auto blockOf(tr_piece_index_t piece, uint32_t offset, uint32_t length = 0) const
     {
-        return block_info_.piece_size;
+        return blockInfo().blockOf(piece, offset, length);
     }
-    auto totalSize() const
+    [[nodiscard]] constexpr auto blockSize() const
     {
-        return block_info_.total_size;
+        return blockInfo().blockSize();
     }
+    [[nodiscard]] constexpr auto blockSize(tr_block_index_t block) const
+    {
+        return blockInfo().blockSize(block);
+    }
+    [[nodiscard]] constexpr auto blockSpanForPiece(tr_piece_index_t piece) const
+    {
+        return blockInfo().blockSpanForPiece(piece);
+    }
+    [[nodiscard]] constexpr auto offset(tr_piece_index_t piece, uint32_t offset, uint32_t length = 0) const
+    {
+        return blockInfo().offset(piece, offset, length);
+    }
+    [[nodiscard]] constexpr auto pieceCount() const
+    {
+        return blockInfo().pieceCount();
+    }
+    [[nodiscard]] constexpr auto pieceForBlock(tr_block_index_t block) const
+    {
+        return blockInfo().pieceForBlock(block);
+    }
+    [[nodiscard]] constexpr auto pieceOf(uint64_t offset) const
+    {
+        return blockInfo().pieceOf(offset);
+    }
+    [[nodiscard]] constexpr auto pieceSize() const
+    {
+        return blockInfo().pieceSize();
+    }
+    [[nodiscard]] constexpr auto pieceSize(tr_piece_index_t piece) const
+    {
+        return blockInfo().pieceSize(piece);
+    }
+    [[nodiscard]] constexpr auto totalSize() const
+    {
+        return blockInfo().totalSize();
+    }
+
     auto const& comment() const
     {
         return comment_;
     }
-
     auto const& creator() const
     {
         return creator_;
+    }
+    [[nodiscard]] auto const& source() const
+    {
+        return source_;
     }
 
     auto const& files() const
@@ -83,11 +130,6 @@ public:
     }
 
     [[nodiscard]] tr_sha1_digest_t const& pieceHash(tr_piece_index_t piece) const;
-
-    [[nodiscard]] auto const& source() const
-    {
-        return source_;
-    }
 
     [[nodiscard]] auto const& dateCreated() const
     {

@@ -218,7 +218,7 @@ static void write_block_func(void* vdata)
     auto* const tor = tr_torrentFindFromId(data->session, data->torrent_id);
     if (tor != nullptr)
     {
-        uint32_t const block_size = tor->block_size;
+        uint32_t const block_size = tor->blockSize();
         uint32_t len = evbuffer_get_length(buf);
         uint32_t const offset_end = data->block_offset + len;
         tr_cache* cache = data->session->cache;
@@ -382,11 +382,11 @@ static void on_idle(tr_webseed* w)
             task->webseed = w;
             task->block = begin;
             task->piece_index = tor->pieceForBlock(begin);
-            task->piece_offset = tor->block_size * begin - tor->pieceSize() * task->piece_index;
-            task->length = (end - 1 - begin) * tor->block_size + tor->blockSize(end - 1);
+            task->piece_offset = tor->blockSize() * begin - tor->pieceSize() * task->piece_index;
+            task->length = (end - 1 - begin) * tor->blockSize() + tor->blockSize(end - 1);
             task->blocks_done = 0;
             task->response_code = 0;
-            task->block_size = tor->block_size;
+            task->block_size = tor->blockSize();
             task->content = evbuffer_new();
             evbuffer_add_cb(task->content, on_content_changed, task);
             w->tasks.insert(task);
@@ -435,7 +435,7 @@ static void web_response_func(
 
         if (!success)
         {
-            tr_block_index_t const blocks_remain = (t->length + tor->block_size - 1) / tor->block_size - t->blocks_done;
+            tr_block_index_t const blocks_remain = (t->length + tor->blockSize() - 1) / tor->blockSize() - t->blocks_done;
 
             if (blocks_remain != 0)
             {
@@ -458,7 +458,7 @@ static void web_response_func(
         }
         else
         {
-            uint32_t const bytes_done = t->blocks_done * tor->block_size;
+            uint32_t const bytes_done = t->blocks_done * tor->blockSize();
             uint32_t const buf_len = evbuffer_get_length(t->content);
 
             if (bytes_done + buf_len < t->length)
@@ -518,7 +518,7 @@ static void task_request_next_chunk(struct tr_webseed_task* t)
         auto& urls = t->webseed->file_urls;
 
         auto const piece_size = tor->pieceSize();
-        uint64_t const remain = t->length - t->blocks_done * tor->block_size - evbuffer_get_length(t->content);
+        uint64_t const remain = t->length - t->blocks_done * tor->blockSize() - evbuffer_get_length(t->content);
 
         auto const total_offset = tor->offset(t->piece_index, t->piece_offset, t->length - remain);
         tr_piece_index_t const step_piece = total_offset / piece_size;
