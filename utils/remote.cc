@@ -549,7 +549,7 @@ static std::string getEncodedMetainfo(char const* filename)
     auto contents = std::vector<char>{};
     if (tr_loadFile(contents, filename))
     {
-        return tr_base64_encode_str({ std::data(contents), std::size(contents) });
+        return tr_base64_encode({ std::data(contents), std::size(contents) });
     }
 
     return {};
@@ -1360,7 +1360,7 @@ static void printPeers(tr_variant* top)
 
 static void printPiecesImpl(std::string_view raw, size_t piece_count)
 {
-    auto const str = tr_base64_decode_str(raw);
+    auto const str = tr_base64_decode(raw);
     printf("  ");
 
     size_t piece = 0;

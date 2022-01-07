@@ -198,7 +198,7 @@ static void handle_upload(struct evhttp_request* req, tr_rpc_server* server)
                 }
                 else if (tr_variantFromBuf(&test, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, body))
                 {
-                    tr_variantDictAddStrView(args, TR_KEY_metainfo, tr_base64_encode_str(body));
+                    tr_variantDictAddStrView(args, TR_KEY_metainfo, tr_base64_encode(body));
                     have_source = true;
                 }
 
@@ -582,7 +582,7 @@ static bool isAuthorized(tr_rpc_server const* server, char const* auth_header)
     }
 
     auth.remove_prefix(std::size(Prefix));
-    auto const decoded_str = tr_base64_decode_str(auth);
+    auto const decoded_str = tr_base64_decode(auth);
     auto decoded = std::string_view{ decoded_str };
     auto const username = tr_strvSep(&decoded, ':');
     auto const password = decoded;

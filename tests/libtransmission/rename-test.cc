@@ -69,7 +69,7 @@ protected:
     tr_torrent* createTorrentFromBase64Metainfo(tr_ctor* ctor, char const* benc_base64)
     {
         // create the torrent ctor
-        auto const benc = tr_base64_decode_str(benc_base64);
+        auto const benc = tr_base64_decode(benc_base64);
         EXPECT_LT(0, std::size(benc));
         tr_error* error = nullptr;
         EXPECT_TRUE(tr_ctorSetMetainfo(ctor, std::data(benc), std::size(benc), &error));

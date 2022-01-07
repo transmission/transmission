@@ -147,7 +147,7 @@ static size_t base64_alloc_size(std::string_view input)
     return ret_length * 8;
 }
 
-std::string tr_base64_encode_str(std::string_view input)
+std::string tr_base64_encode(std::string_view input)
 {
     auto buf = std::vector<char>(base64_alloc_size(input));
     auto state = base64_encodestate{};
@@ -157,7 +157,7 @@ std::string tr_base64_encode_str(std::string_view input)
     return std::string{ std::data(buf), len };
 }
 
-std::string tr_base64_decode_str(std::string_view input)
+std::string tr_base64_decode(std::string_view input)
 {
     auto buf = std::vector<char>(std::size(input) + 8);
     auto state = base64_decodestate{};

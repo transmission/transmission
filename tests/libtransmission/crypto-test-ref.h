@@ -56,10 +56,8 @@
 #define tr_ssha1_matches tr_ssha1_matches_
 #define tr_ssha1_test tr_ssha1_test_
 #define tr_base64_encode tr_base64_encode_
-#define tr_base64_encode_str tr_base64_encode_str_
 #define tr_base64_encode_impl tr_base64_encode_impl_
 #define tr_base64_decode tr_base64_decode_
-#define tr_base64_decode_str tr_base64_decode_str_
 #define tr_base64_decode_impl tr_base64_decode_impl_
 #define tr_sha1_to_string tr_sha1_to_string_
 #define tr_sha1_from_string tr_sha1_from_string_
@@ -116,10 +114,8 @@
 #undef tr_ssha1_matches
 #undef tr_ssha1_test
 #undef tr_base64_encode
-#undef tr_base64_encode_str
 #undef tr_base64_encode_impl
 #undef tr_base64_decode
-#undef tr_base64_decode_str
 #undef tr_base64_decode_impl
 #undef tr_sha1_to_string
 #undef tr_sha1_from_string
@@ -169,10 +165,8 @@
 #define tr_ssha1_matches_ tr_ssha1_matches
 #define tr_ssha1_test_ tr_ssha1_test
 #define tr_base64_encode_ tr_base64_encode
-#define tr_base64_encode_str_ tr_base64_encode_str
 #define tr_base64_encode_impl_ tr_base64_encode_impl
 #define tr_base64_decode_ tr_base64_decode
-#define tr_base64_decode_str_ tr_base64_decode_str
 #define tr_base64_decode_impl_ tr_base64_decode_impl
 #define tr_sha1_to_string_ tr_sha1_to_string
 #define tr_sha1_from_string_ tr_sha1_from_string

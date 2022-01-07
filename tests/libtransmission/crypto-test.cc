@@ -206,12 +206,12 @@ TEST(Crypto, random)
 TEST(Crypto, base64)
 {
     auto raw = std::string_view{ "YOYO!"sv };
-    auto encoded = tr_base64_encode_str(raw);
+    auto encoded = tr_base64_encode(raw);
     EXPECT_EQ("WU9ZTyE="sv, encoded);
-    EXPECT_EQ(raw, tr_base64_decode_str(encoded));
+    EXPECT_EQ(raw, tr_base64_decode(encoded));
 
-    EXPECT_EQ(""sv, tr_base64_encode_str(""sv));
-    EXPECT_EQ(""sv, tr_base64_decode_str(""sv));
+    EXPECT_EQ(""sv, tr_base64_encode(""sv));
+    EXPECT_EQ(""sv, tr_base64_decode(""sv));
 
     static auto constexpr MaxBufSize = size_t{ 1024 };
     for (size_t i = 1; i <= MaxBufSize; ++i)
@@ -221,13 +221,13 @@ TEST(Crypto, base64)
         {
             buf += char(tr_rand_int_weak(256));
         }
-        EXPECT_EQ(buf, tr_base64_decode_str(tr_base64_encode_str(buf)));
+        EXPECT_EQ(buf, tr_base64_decode(tr_base64_encode(buf)));
 
         buf = std::string{};
         for (size_t j = 0; j < i; ++j)
         {
             buf += char(1 + tr_rand_int_weak(255));
         }
-        EXPECT_EQ(buf, tr_base64_decode_str(tr_base64_encode_str(buf)));
+        EXPECT_EQ(buf, tr_base64_decode(tr_base64_encode(buf)));
     }
 }
