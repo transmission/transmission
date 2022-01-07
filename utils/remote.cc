@@ -546,14 +546,12 @@ static bool UseSSL = false;
 
 static char* getEncodedMetainfo(char const* filename)
 {
-    size_t len = 0;
     char* b64 = nullptr;
-    uint8_t* buf = tr_loadFile(filename, &len, nullptr);
 
-    if (buf != nullptr)
+    auto contents = std::vector<char>{};
+    if (tr_loadFile(contents, filename))
     {
-        b64 = static_cast<char*>(tr_base64_encode(buf, len, nullptr));
-        tr_free(buf);
+        b64 = tr_base64_encode(std::data(contents), std::size(contents), nullptr);
     }
 
     return b64;
@@ -1362,19 +1360,18 @@ static void printPeers(tr_variant* top)
     }
 }
 
-static void printPiecesImpl(uint8_t const* raw, size_t raw_len, size_t piece_count)
+static void printPiecesImpl(std::string_view raw, size_t piece_count)
 {
-    size_t len = 0;
-    auto* const str = static_cast<char*>(tr_base64_decode(raw, raw_len, &len));
+    auto const str = tr_base64_decode_str(raw);
     printf("  ");
 
     size_t piece = 0;
     size_t const col_width = 64;
-    for (char const *it = str, *end = it + len; it != end; ++it)
+    for (auto const ch : str)
     {
         for (int bit = 0; piece < piece_count && bit < 8; ++bit, ++piece)
         {
-            printf("%c", (*it & (1 << (7 - bit))) != 0 ? '1' : '0');
+            printf("%c", (ch & (1 << (7 - bit))) != 0 ? '1' : '0');
         }
 
         printf(" ");
@@ -1386,7 +1383,6 @@ static void printPiecesImpl(uint8_t const* raw, size_t raw_len, size_t piece_cou
     }
 
     printf("\n");
-    tr_free(str);
 }
 
 static void printPieces(tr_variant* top)
@@ -1399,15 +1395,14 @@ static void printPieces(tr_variant* top)
         for (int i = 0, n = tr_variantListSize(torrents); i < n; ++i)
         {
             int64_t j;
-            uint8_t const* raw;
-            size_t rawlen;
+            auto raw = std::string_view{};
             tr_variant* torrent = tr_variantListChild(torrents, i);
 
-            if (tr_variantDictFindRaw(torrent, TR_KEY_pieces, &raw, &rawlen) &&
+            if (tr_variantDictFindStrView(torrent, TR_KEY_pieces, &raw) &&
                 tr_variantDictFindInt(torrent, TR_KEY_pieceCount, &j))
             {
                 assert(j >= 0);
-                printPiecesImpl(raw, rawlen, (size_t)j);
+                printPiecesImpl(raw, (size_t)j);
 
                 if (i + 1 < n)
                 {

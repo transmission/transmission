@@ -211,19 +211,19 @@ TEST(Crypto, base64)
     EXPECT_EQ(raw, tr_base64_decode_str(encoded));
 
     size_t len = 0;
-    char* out = static_cast<char*>(tr_base64_encode("", 0, &len));
+    char* out = tr_base64_encode("", 0, &len);
     EXPECT_EQ(size_t{}, len);
     EXPECT_STREQ("", out);
     tr_free(out);
-    out = static_cast<char*>(tr_base64_decode("", 0, &len));
+    out = tr_base64_decode("", 0, &len);
     EXPECT_EQ(0, len);
     EXPECT_STREQ("", out);
     tr_free(out);
 
-    out = static_cast<char*>(tr_base64_encode(nullptr, 0, &len));
+    out = tr_base64_encode(nullptr, 0, &len);
     EXPECT_EQ(0, len);
     EXPECT_EQ(nullptr, out);
-    out = static_cast<char*>(tr_base64_decode(nullptr, 0, &len));
+    out = tr_base64_decode(nullptr, 0, &len);
     EXPECT_EQ(0, len);
     EXPECT_EQ(nullptr, out);
 
@@ -236,7 +236,7 @@ TEST(Crypto, base64)
             buf += char(tr_rand_int_weak(256));
         }
 
-        out = static_cast<char*>(tr_base64_encode(std::data(buf), std::size(buf), &len));
+        out = tr_base64_encode(std::data(buf), std::size(buf), &len);
         EXPECT_EQ(strlen(out), len);
         EXPECT_EQ(buf, tr_base64_decode_str(out));
         tr_free(out);

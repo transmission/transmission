@@ -137,7 +137,7 @@ bool tr_ssha1_matches(std::string_view ssha1, std::string_view plaintext)
 ****
 ***/
 
-void* tr_base64_encode(void const* input, size_t input_length, size_t* output_length)
+char* tr_base64_encode(char const* input, size_t input_length, size_t* output_length)
 {
     char* ret = nullptr;
 
@@ -183,13 +183,13 @@ void* tr_base64_encode(void const* input, size_t input_length, size_t* output_le
 std::string tr_base64_encode_str(std::string_view input)
 {
     auto len = size_t{};
-    auto* buf = tr_base64_encode(std::data(input), std::size(input), &len);
-    auto str = std::string{ reinterpret_cast<char const*>(buf), len };
-    tr_free(buf);
+    char* const tmp = tr_base64_encode(std::data(input), std::size(input), &len);
+    auto str = std::string{ tmp, len };
+    tr_free(tmp);
     return str;
 }
 
-void* tr_base64_decode(void const* input, size_t input_length, size_t* output_length)
+char* tr_base64_decode(char const* input, size_t input_length, size_t* output_length)
 {
     char* ret = nullptr;
 
@@ -229,9 +229,9 @@ void* tr_base64_decode(void const* input, size_t input_length, size_t* output_le
 std::string tr_base64_decode_str(std::string_view input)
 {
     auto len = size_t{};
-    auto* buf = tr_base64_decode(std::data(input), std::size(input), &len);
-    auto str = std::string{ reinterpret_cast<char const*>(buf), len };
-    tr_free(buf);
+    auto* tmp = tr_base64_decode(std::data(input), std::size(input), &len);
+    auto str = std::string{ tmp, len };
+    tr_free(tmp);
     return str;
 }
 

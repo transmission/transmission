@@ -175,7 +175,7 @@ bool tr_ssha1_matches(std::string_view ssha1, std::string_view plain_text);
  * @brief Translate a block of bytes into base64.
  * @return a newly-allocated null-terminated string that can be freed with tr_free()
  */
-void* tr_base64_encode(void const* input, size_t input_length, size_t* output_length) TR_GNUC_MALLOC;
+char* tr_base64_encode(char const* input, size_t input_length, size_t* output_length) TR_GNUC_MALLOC;
 
 /**
  * @brief Translate null-terminated string into base64.
@@ -187,7 +187,7 @@ std::string tr_base64_encode_str(std::string_view input);
  * @brief Translate a block of bytes from base64 into raw form.
  * @return a newly-allocated null-terminated string that can be freed with tr_free()
  */
-void* tr_base64_decode(void const* input, size_t input_length, size_t* output_length) TR_GNUC_MALLOC;
+char* tr_base64_decode(char const* input, size_t input_length, size_t* output_length) TR_GNUC_MALLOC;
 
 /**
  * @brief Translate a character range from base64 into raw form.
