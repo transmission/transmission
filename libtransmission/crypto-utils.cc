@@ -8,8 +8,9 @@
 
 #include <algorithm>
 #include <array>
-#include <cstring> /* memmove(), memset(), strlen() */
-#include <random> /* random_device, mt19937, uniform_int_distribution*/
+#include <cstring> // memmove(), memset()
+#include <iterator>
+#include <random>
 #include <string>
 #include <string_view>
 
@@ -154,7 +155,13 @@ std::string tr_base64_encode(std::string_view input)
     base64_init_encodestate(&state);
     size_t len = base64_encode_block(std::data(input), std::size(input), std::data(buf), &state);
     len += base64_encode_blockend(std::data(buf) + len, &state);
-    return std::string{ std::data(buf), len };
+    auto str = std::string{};
+    std::copy_if(
+        std::data(buf),
+        std::data(buf) + len,
+        std::back_inserter(str),
+        [](auto ch) { return !tr_strvContains("\r\n"sv, ch); });
+    return str;
 }
 
 std::string tr_base64_decode(std::string_view input)
