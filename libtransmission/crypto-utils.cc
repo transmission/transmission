@@ -157,50 +157,13 @@ std::string tr_base64_encode_str(std::string_view input)
     return std::string{ std::data(buf), len };
 }
 
-static char* tr_base64_decode(char const* input, size_t input_length, size_t* output_length)
-{
-    char* ret = nullptr;
-
-    if (input != nullptr)
-    {
-        if (input_length != 0)
-        {
-            size_t ret_length = input_length / 4 * 3;
-            base64_decodestate state;
-
-            ret = tr_new(char, ret_length + 8);
-
-            base64_init_decodestate(&state);
-            ret_length = base64_decode_block(static_cast<char const*>(input), input_length, ret, &state);
-
-            if (output_length != nullptr)
-            {
-                *output_length = ret_length;
-            }
-
-            ret[ret_length] = '\0';
-
-            return ret;
-        }
-
-        ret = tr_strdup("");
-    }
-
-    if (output_length != nullptr)
-    {
-        *output_length = 0;
-    }
-
-    return ret;
-}
-
 std::string tr_base64_decode_str(std::string_view input)
 {
-    auto len = size_t{};
-    auto* tmp = tr_base64_decode(std::data(input), std::size(input), &len);
-    auto str = std::string{ tmp, len };
-    tr_free(tmp);
-    return str;
+    auto buf = std::vector<char>(std::size(input) + 8);
+    auto state = base64_decodestate{};
+    base64_init_decodestate(&state);
+    size_t const len = base64_decode_block(std::data(input), std::size(input), std::data(buf), &state);
+    return std::string{ std::data(buf), len };
 }
 
 /***
