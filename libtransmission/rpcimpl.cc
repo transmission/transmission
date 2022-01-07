@@ -681,9 +681,8 @@ static void initField(
         if (tor->hasMetadata())
         {
             auto const bytes = tor->createPieceBitfield();
-            auto* enc = tr_base64_encode(reinterpret_cast<char const*>(bytes.data()), std::size(bytes), nullptr);
-            tr_variantInitStr(initme, enc != nullptr ? std::string_view{ enc } : ""sv);
-            tr_free(enc);
+            auto const enc = tr_base64_encode_str({ reinterpret_cast<char const*>(std::data(bytes)), std::size(bytes) });
+            tr_variantInitStrView(initme, enc);
         }
         else
         {

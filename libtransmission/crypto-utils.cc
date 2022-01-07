@@ -137,7 +137,7 @@ bool tr_ssha1_matches(std::string_view ssha1, std::string_view plaintext)
 ****
 ***/
 
-char* tr_base64_encode(char const* input, size_t input_length, size_t* output_length)
+static char* tr_base64_encode(char const* input, size_t input_length, size_t* output_length)
 {
     char* ret = nullptr;
 

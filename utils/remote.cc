@@ -544,17 +544,15 @@ static char* netrc = nullptr;
 static char* session_id = nullptr;
 static bool UseSSL = false;
 
-static char* getEncodedMetainfo(char const* filename)
+static std::string getEncodedMetainfo(char const* filename)
 {
-    char* b64 = nullptr;
-
     auto contents = std::vector<char>{};
     if (tr_loadFile(contents, filename))
     {
-        b64 = tr_base64_encode(std::data(contents), std::size(contents), nullptr);
+        return tr_base64_encode_str({ std::data(contents), std::size(contents) });
     }
 
-    return b64;
+    return {};
 }
 
 static void addIdArg(tr_variant* args, char const* id_str, char const* fallback)
@@ -2354,18 +2352,16 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
                 if (tadd != nullptr)
                 {
                     tr_variant* args = tr_variantDictFind(tadd, Arguments);
-                    char* tmp = getEncodedMetainfo(optarg);
+                    std::string const tmp = getEncodedMetainfo(optarg);
 
-                    if (tmp != nullptr)
+                    if (!std::empty(tmp))
                     {
-                        tr_variantDictAddStr(args, TR_KEY_metainfo, tmp);
+                        tr_variantDictAddStrView(args, TR_KEY_metainfo, tmp);
                     }
                     else
                     {
                         tr_variantDictAddStr(args, TR_KEY_filename, optarg);
                     }
-
-                    tr_free(tmp);
                 }
                 else
                 {

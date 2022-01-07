@@ -213,11 +213,6 @@ TEST(Crypto, base64)
     EXPECT_EQ(""sv, tr_base64_encode_str(""sv));
     EXPECT_EQ(""sv, tr_base64_decode_str(""sv));
 
-    size_t len = 0;
-    char* out = tr_base64_encode(nullptr, 0, &len);
-    EXPECT_EQ(0, len);
-    EXPECT_EQ(nullptr, out);
-
     static auto constexpr MaxBufSize = size_t{ 1024 };
     for (size_t i = 1; i <= MaxBufSize; ++i)
     {
@@ -226,18 +221,13 @@ TEST(Crypto, base64)
         {
             buf += char(tr_rand_int_weak(256));
         }
-
-        out = tr_base64_encode(std::data(buf), std::size(buf), &len);
-        EXPECT_EQ(strlen(out), len);
-        EXPECT_EQ(buf, tr_base64_decode_str(out));
-        tr_free(out);
+        EXPECT_EQ(buf, tr_base64_decode_str(tr_base64_encode_str(buf)));
 
         buf = std::string{};
         for (size_t j = 0; j < i; ++j)
         {
             buf += char(1 + tr_rand_int_weak(255));
         }
-
         EXPECT_EQ(buf, tr_base64_decode_str(tr_base64_encode_str(buf)));
     }
 }
