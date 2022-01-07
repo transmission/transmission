@@ -203,11 +203,42 @@ TEST(Crypto, random)
     }
 }
 
+static bool base64Eq(std::string_view a, std::string_view b)
+{
+    auto constexpr IgnoreChars = "\r\n"sv;
+
+    while (!std::empty(a) && !std::empty(b))
+    {
+        if (tr_strvContains(IgnoreChars, a.front()))
+        {
+            a.remove_prefix(1);
+            continue;
+        }
+
+        if (tr_strvContains(IgnoreChars, b.front()))
+        {
+            b.remove_prefix(1);
+            continue;
+        }
+
+        if (a.front() == b.front())
+        {
+            a.remove_prefix(1);
+            b.remove_prefix(1);
+            continue;
+        }
+
+        return false;
+    }
+
+    return std::empty(a) == std::empty(b);
+}
+
 TEST(Crypto, base64)
 {
     auto raw = std::string_view{ "YOYO!"sv };
     auto encoded = tr_base64_encode(raw);
-    EXPECT_EQ("WU9ZTyE="sv, encoded);
+    EXPECT_TRUE(base64Eq("WU9ZTyE="sv, encoded));
     EXPECT_EQ(raw, tr_base64_decode(encoded));
 
     EXPECT_EQ(""sv, tr_base64_encode(""sv));
