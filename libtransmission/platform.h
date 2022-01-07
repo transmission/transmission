@@ -13,6 +13,7 @@
 #endif
 
 #include <string>
+#include <string_view>
 
 /**
  * @addtogroup tr_session Session
@@ -25,7 +26,7 @@
  * @see tr_getTorrentDir()
  * @see tr_getWebClientDir()
  */
-void tr_setConfigDir(tr_session* session, char const* configDir);
+void tr_setConfigDir(tr_session* session, std::string_view config_dir);
 
 /** @brief return the directory where .resume files are stored */
 char const* tr_getResumeDir(tr_session const*);

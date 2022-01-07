@@ -82,10 +82,6 @@ bool tr_loadFile(std::vector<char>& setme, std::string_view filename, tr_error**
 
 bool tr_saveFile(std::string_view filename, std::string_view contents, tr_error** error = nullptr);
 
-/** @brief build a filename from a series of elements using the
-           platform's correct directory separator. */
-char* tr_buildPath(char const* first_element, ...) TR_GNUC_NULL_TERMINATED TR_GNUC_MALLOC;
-
 template<typename... T, typename std::enable_if_t<(std::is_convertible_v<T, std::string_view> && ...), bool> = true>
 std::string& tr_buildBuf(std::string& setme, T... args)
 {

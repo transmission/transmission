@@ -218,7 +218,7 @@ static void dht_bootstrap(void* closure)
 
     if (!bootstrap_done(cl->session, 0))
     {
-        auto const bootstrap_file = tr_strvPath(cl->session->configDir, "dht.bootstrap");
+        auto const bootstrap_file = tr_strvPath(cl->session->config_dir, "dht.bootstrap");
 
         tr_sys_file_t const f = tr_sys_file_open(bootstrap_file.c_str(), TR_SYS_FILE_READ, 0, nullptr);
 
@@ -314,7 +314,7 @@ int tr_dhtInit(tr_session* ss)
         dht_debug = stderr;
     }
 
-    auto const dat_file = tr_strvPath(ss->configDir, "dht.dat"sv);
+    auto const dat_file = tr_strvPath(ss->config_dir, "dht.dat"sv);
     auto benc = tr_variant{};
     auto const ok = tr_variantFromFile(&benc, TR_VARIANT_PARSE_BENC, dat_file);
 
@@ -465,7 +465,7 @@ void tr_dhtUninit(tr_session* ss)
             tr_variantDictAddRaw(&benc, TR_KEY_nodes6, compact6, out6 - compact6);
         }
 
-        auto const dat_file = tr_strvPath(ss->configDir, "dht.dat");
+        auto const dat_file = tr_strvPath(ss->config_dir, "dht.dat");
         tr_variantToFile(&benc, TR_VARIANT_FMT_BENC, dat_file);
         tr_variantFree(&benc);
     }

@@ -321,9 +321,9 @@ public:
     std::map<int, tr_torrent*> torrentsById;
     std::map<tr_sha1_digest_t, tr_torrent*> torrentsByHash;
 
-    char* configDir;
-    char* resumeDir;
-    char* torrentDir;
+    std::string config_dir;
+    std::string resume_dir;
+    std::string torrent_dir;
 
     std::list<tr_blocklistFile*> blocklists;
     struct tr_peerMgr* peerMgr;
