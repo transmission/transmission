@@ -184,12 +184,6 @@ char* tr_base64_encode(char const* input, size_t input_length, size_t* output_le
 std::string tr_base64_encode_str(std::string_view input);
 
 /**
- * @brief Translate a block of bytes from base64 into raw form.
- * @return a newly-allocated null-terminated string that can be freed with tr_free()
- */
-char* tr_base64_decode(char const* input, size_t input_length, size_t* output_length) TR_GNUC_MALLOC;
-
-/**
  * @brief Translate a character range from base64 into raw form.
  * @return a new std::string with the decoded contents.
  */

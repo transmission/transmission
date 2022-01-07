@@ -210,20 +210,11 @@ TEST(Crypto, base64)
     EXPECT_EQ("WU9ZTyE="sv, encoded);
     EXPECT_EQ(raw, tr_base64_decode_str(encoded));
 
-    size_t len = 0;
-    char* out = tr_base64_encode("", 0, &len);
-    EXPECT_EQ(size_t{}, len);
-    EXPECT_STREQ("", out);
-    tr_free(out);
-    out = tr_base64_decode("", 0, &len);
-    EXPECT_EQ(0, len);
-    EXPECT_STREQ("", out);
-    tr_free(out);
+    EXPECT_EQ(""sv, tr_base64_encode_str(""sv));
+    EXPECT_EQ(""sv, tr_base64_decode_str(""sv));
 
-    out = tr_base64_encode(nullptr, 0, &len);
-    EXPECT_EQ(0, len);
-    EXPECT_EQ(nullptr, out);
-    out = tr_base64_decode(nullptr, 0, &len);
+    size_t len = 0;
+    char* out = tr_base64_encode(nullptr, 0, &len);
     EXPECT_EQ(0, len);
     EXPECT_EQ(nullptr, out);
 

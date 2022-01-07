@@ -189,7 +189,7 @@ std::string tr_base64_encode_str(std::string_view input)
     return str;
 }
 
-char* tr_base64_decode(char const* input, size_t input_length, size_t* output_length)
+static char* tr_base64_decode(char const* input, size_t input_length, size_t* output_length)
 {
     char* ret = nullptr;
 
