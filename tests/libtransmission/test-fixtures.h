@@ -16,7 +16,7 @@
 #include <string>
 #include <thread>
 
-#include "crypto-utils.h" // tr_base64_decode_str()
+#include "crypto-utils.h" // tr_base64_decode()
 #include "error.h"
 #include "file.h" // tr_sys_file_*()
 #include "platform.h" // TR_PATH_DELIMITER
@@ -374,16 +374,13 @@ protected:
             "OnByaXZhdGVpMGVlZQ==";
 
         // create the torrent ctor
-        auto metainfo_len = size_t{};
-        auto* const metainfo = tr_base64_decode_str(metainfo_base64, &metainfo_len);
-        EXPECT_NE(nullptr, metainfo);
-        EXPECT_LT(size_t{ 0 }, metainfo_len);
+        auto const metainfo = tr_base64_decode(metainfo_base64);
+        EXPECT_LT(0, std::size(metainfo));
         auto* ctor = tr_ctorNew(session_);
         tr_error* error = nullptr;
-        EXPECT_TRUE(tr_ctorSetMetainfo(ctor, static_cast<char const*>(metainfo), metainfo_len, &error));
+        EXPECT_TRUE(tr_ctorSetMetainfo(ctor, std::data(metainfo), std::size(metainfo), &error));
         EXPECT_EQ(nullptr, error);
         tr_ctorSetPaused(ctor, TR_FORCE, true);
-        tr_free(metainfo);
 
         // create the torrent
         auto* const tor = tr_torrentNew(ctor, nullptr);

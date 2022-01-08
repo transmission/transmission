@@ -8,8 +8,9 @@
 
 #include <algorithm>
 #include <array>
-#include <cstring> /* memmove(), memset(), strlen() */
-#include <random> /* random_device, mt19937, uniform_int_distribution*/
+#include <cstring> // memmove(), memset()
+#include <iterator>
+#include <random>
 #include <string>
 #include <string_view>
 
@@ -137,103 +138,39 @@ bool tr_ssha1_matches(std::string_view ssha1, std::string_view plaintext)
 ****
 ***/
 
-void* tr_base64_encode(void const* input, size_t input_length, size_t* output_length)
+static size_t base64_alloc_size(std::string_view input)
 {
-    char* ret = nullptr;
-
-    if (input != nullptr)
-    {
-        if (input_length != 0)
-        {
-            size_t ret_length = 4 * ((input_length + 2) / 3);
-            base64_encodestate state;
-
+    size_t ret_length = 4 * ((std::size(input) + 2) / 3);
 #ifdef USE_SYSTEM_B64
-            /* Additional space is needed for newlines if we're using unpatched libb64 */
-            ret_length += ret_length / 72 + 1;
+    // Additional space is needed for newlines if we're using unpatched libb64
+    ret_length += ret_length / 72 + 1;
 #endif
-
-            ret = tr_new(char, ret_length + 8);
-
-            base64_init_encodestate(&state);
-            ret_length = base64_encode_block(static_cast<char const*>(input), input_length, ret, &state);
-            ret_length += base64_encode_blockend(ret + ret_length, &state);
-
-            if (output_length != nullptr)
-            {
-                *output_length = ret_length;
-            }
-
-            ret[ret_length] = '\0';
-
-            return ret;
-        }
-
-        ret = tr_strdup("");
-    }
-
-    if (output_length != nullptr)
-    {
-        *output_length = 0;
-    }
-
-    return ret;
+    return ret_length * 8;
 }
 
-void* tr_base64_encode_str(char const* input, size_t* output_length)
+std::string tr_base64_encode(std::string_view input)
 {
-    return tr_base64_encode(input, input == nullptr ? 0 : strlen(input), output_length);
-}
-
-void* tr_base64_decode(void const* input, size_t input_length, size_t* output_length)
-{
-    char* ret = nullptr;
-
-    if (input != nullptr)
-    {
-        if (input_length != 0)
-        {
-            size_t ret_length = input_length / 4 * 3;
-            base64_decodestate state;
-
-            ret = tr_new(char, ret_length + 8);
-
-            base64_init_decodestate(&state);
-            ret_length = base64_decode_block(static_cast<char const*>(input), input_length, ret, &state);
-
-            if (output_length != nullptr)
-            {
-                *output_length = ret_length;
-            }
-
-            ret[ret_length] = '\0';
-
-            return ret;
-        }
-
-        ret = tr_strdup("");
-    }
-
-    if (output_length != nullptr)
-    {
-        *output_length = 0;
-    }
-
-    return ret;
-}
-
-void* tr_base64_decode_str(char const* input, size_t* output_length)
-{
-    return tr_base64_decode(input, input == nullptr ? 0 : strlen(input), output_length);
-}
-
-std::string tr_base64_decode_str(std::string_view input)
-{
-    auto len = size_t{};
-    auto* buf = tr_base64_decode(std::data(input), std::size(input), &len);
-    auto str = std::string{ reinterpret_cast<char const*>(buf), len };
-    tr_free(buf);
+    auto buf = std::vector<char>(base64_alloc_size(input));
+    auto state = base64_encodestate{};
+    base64_init_encodestate(&state);
+    size_t len = base64_encode_block(std::data(input), std::size(input), std::data(buf), &state);
+    len += base64_encode_blockend(std::data(buf) + len, &state);
+    auto str = std::string{};
+    std::copy_if(
+        std::data(buf),
+        std::data(buf) + len,
+        std::back_inserter(str),
+        [](auto ch) { return !tr_strvContains("\r\n"sv, ch); });
     return str;
+}
+
+std::string tr_base64_decode(std::string_view input)
+{
+    auto buf = std::vector<char>(std::size(input) + 8);
+    auto state = base64_decodestate{};
+    base64_init_decodestate(&state);
+    size_t const len = base64_decode_block(std::data(input), std::size(input), std::data(buf), &state);
+    return std::string{ std::data(buf), len };
 }
 
 /***

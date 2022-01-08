@@ -172,34 +172,16 @@ bool tr_ssha1_test(std::string_view text);
 bool tr_ssha1_matches(std::string_view ssha1, std::string_view plain_text);
 
 /**
- * @brief Translate a block of bytes into base64.
- * @return a newly-allocated null-terminated string that can be freed with tr_free()
- */
-void* tr_base64_encode(void const* input, size_t input_length, size_t* output_length) TR_GNUC_MALLOC;
-
-/**
  * @brief Translate null-terminated string into base64.
- * @return a newly-allocated null-terminated string that can be freed with tr_free()
+ * @return a new std::string with the encoded contents
  */
-void* tr_base64_encode_str(char const* input, size_t* output_length) TR_GNUC_MALLOC;
-
-/**
- * @brief Translate a block of bytes from base64 into raw form.
- * @return a newly-allocated null-terminated string that can be freed with tr_free()
- */
-void* tr_base64_decode(void const* input, size_t input_length, size_t* output_length) TR_GNUC_MALLOC;
-
-/**
- * @brief Translate null-terminated string from base64 into raw form.
- * @return a newly-allocated null-terminated string that can be freed with tr_free()
- */
-void* tr_base64_decode_str(char const* input, size_t* output_length) TR_GNUC_MALLOC;
+std::string tr_base64_encode(std::string_view input);
 
 /**
  * @brief Translate a character range from base64 into raw form.
  * @return a new std::string with the decoded contents.
  */
-std::string tr_base64_decode_str(std::string_view input);
+std::string tr_base64_decode(std::string_view input);
 
 /**
  * @brief Generate an ascii hex string for a sha1 digest.

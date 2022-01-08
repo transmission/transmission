@@ -544,19 +544,15 @@ static char* netrc = nullptr;
 static char* session_id = nullptr;
 static bool UseSSL = false;
 
-static char* getEncodedMetainfo(char const* filename)
+static std::string getEncodedMetainfo(char const* filename)
 {
-    size_t len = 0;
-    char* b64 = nullptr;
-    uint8_t* buf = tr_loadFile(filename, &len, nullptr);
-
-    if (buf != nullptr)
+    auto contents = std::vector<char>{};
+    if (tr_loadFile(contents, filename))
     {
-        b64 = static_cast<char*>(tr_base64_encode(buf, len, nullptr));
-        tr_free(buf);
+        return tr_base64_encode({ std::data(contents), std::size(contents) });
     }
 
-    return b64;
+    return {};
 }
 
 static void addIdArg(tr_variant* args, char const* id_str, char const* fallback)
@@ -1362,19 +1358,18 @@ static void printPeers(tr_variant* top)
     }
 }
 
-static void printPiecesImpl(uint8_t const* raw, size_t raw_len, size_t piece_count)
+static void printPiecesImpl(std::string_view raw, size_t piece_count)
 {
-    size_t len = 0;
-    auto* const str = static_cast<char*>(tr_base64_decode(raw, raw_len, &len));
+    auto const str = tr_base64_decode(raw);
     printf("  ");
 
     size_t piece = 0;
     size_t const col_width = 64;
-    for (char const *it = str, *end = it + len; it != end; ++it)
+    for (auto const ch : str)
     {
         for (int bit = 0; piece < piece_count && bit < 8; ++bit, ++piece)
         {
-            printf("%c", (*it & (1 << (7 - bit))) != 0 ? '1' : '0');
+            printf("%c", (ch & (1 << (7 - bit))) != 0 ? '1' : '0');
         }
 
         printf(" ");
@@ -1386,7 +1381,6 @@ static void printPiecesImpl(uint8_t const* raw, size_t raw_len, size_t piece_cou
     }
 
     printf("\n");
-    tr_free(str);
 }
 
 static void printPieces(tr_variant* top)
@@ -1399,15 +1393,14 @@ static void printPieces(tr_variant* top)
         for (int i = 0, n = tr_variantListSize(torrents); i < n; ++i)
         {
             int64_t j;
-            uint8_t const* raw;
-            size_t rawlen;
+            auto raw = std::string_view{};
             tr_variant* torrent = tr_variantListChild(torrents, i);
 
-            if (tr_variantDictFindRaw(torrent, TR_KEY_pieces, &raw, &rawlen) &&
+            if (tr_variantDictFindStrView(torrent, TR_KEY_pieces, &raw) &&
                 tr_variantDictFindInt(torrent, TR_KEY_pieceCount, &j))
             {
                 assert(j >= 0);
-                printPiecesImpl(raw, rawlen, (size_t)j);
+                printPiecesImpl(raw, (size_t)j);
 
                 if (i + 1 < n)
                 {
@@ -2359,18 +2352,16 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
                 if (tadd != nullptr)
                 {
                     tr_variant* args = tr_variantDictFind(tadd, Arguments);
-                    char* tmp = getEncodedMetainfo(optarg);
+                    std::string const tmp = getEncodedMetainfo(optarg);
 
-                    if (tmp != nullptr)
+                    if (!std::empty(tmp))
                     {
-                        tr_variantDictAddStr(args, TR_KEY_metainfo, tmp);
+                        tr_variantDictAddStrView(args, TR_KEY_metainfo, tmp);
                     }
                     else
                     {
                         tr_variantDictAddStr(args, TR_KEY_filename, optarg);
                     }
-
-                    tr_free(tmp);
                 }
                 else
                 {

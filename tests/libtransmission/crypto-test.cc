@@ -203,88 +203,31 @@ TEST(Crypto, random)
     }
 }
 
-static bool base64Eq(char const* a, char const* b)
-{
-    for (;; ++a, ++b)
-    {
-        while (*a == '\r' || *a == '\n')
-        {
-            ++a;
-        }
-
-        while (*b == '\r' || *b == '\n')
-        {
-            ++b;
-        }
-
-        if (*a == '\0' || *b == '\0' || *a != *b)
-        {
-            break;
-        }
-    }
-
-    return *a == *b;
-}
-
 TEST(Crypto, base64)
 {
-    auto len = size_t{};
-    auto* out = static_cast<char*>(tr_base64_encode_str("YOYO!", &len));
-    EXPECT_EQ(strlen(out), len);
-    EXPECT_TRUE(base64Eq("WU9ZTyE=", out));
-    auto* in = static_cast<char*>(tr_base64_decode_str(out, &len));
-    EXPECT_EQ(decltype(len){ 5 }, len);
-    EXPECT_STREQ("YOYO!", in);
-    tr_free(in);
-    tr_free(out);
+    auto raw = std::string_view{ "YOYO!"sv };
+    auto encoded = tr_base64_encode(raw);
+    EXPECT_EQ("WU9ZTyE="sv, encoded);
+    EXPECT_EQ(raw, tr_base64_decode(encoded));
 
-    out = static_cast<char*>(tr_base64_encode("", 0, &len));
-    EXPECT_EQ(size_t{}, len);
-    EXPECT_STREQ("", out);
-    tr_free(out);
-    out = static_cast<char*>(tr_base64_decode("", 0, &len));
-    EXPECT_EQ(0, len);
-    EXPECT_STREQ("", out);
-    tr_free(out);
-
-    out = static_cast<char*>(tr_base64_encode(nullptr, 0, &len));
-    EXPECT_EQ(0, len);
-    EXPECT_EQ(nullptr, out);
-    out = static_cast<char*>(tr_base64_decode(nullptr, 0, &len));
-    EXPECT_EQ(0, len);
-    EXPECT_EQ(nullptr, out);
+    EXPECT_EQ(""sv, tr_base64_encode(""sv));
+    EXPECT_EQ(""sv, tr_base64_decode(""sv));
 
     static auto constexpr MaxBufSize = size_t{ 1024 };
     for (size_t i = 1; i <= MaxBufSize; ++i)
     {
-        auto buf = std::array<char, MaxBufSize + 1>{};
-
+        auto buf = std::string{};
         for (size_t j = 0; j < i; ++j)
         {
-            buf[j] = char(tr_rand_int_weak(256));
+            buf += char(tr_rand_int_weak(256));
         }
+        EXPECT_EQ(buf, tr_base64_decode(tr_base64_encode(buf)));
 
-        out = static_cast<char*>(tr_base64_encode(buf.data(), i, &len));
-        EXPECT_EQ(strlen(out), len);
-        in = static_cast<char*>(tr_base64_decode(out, len, &len));
-        EXPECT_EQ(i, len);
-        EXPECT_EQ(0, memcmp(in, buf.data(), len));
-        tr_free(in);
-        tr_free(out);
-
+        buf = std::string{};
         for (size_t j = 0; j < i; ++j)
         {
-            buf[j] = char(1 + tr_rand_int_weak(255));
+            buf += char(1 + tr_rand_int_weak(255));
         }
-
-        buf[i] = '\0';
-
-        out = static_cast<char*>(tr_base64_encode_str(buf.data(), &len));
-        EXPECT_EQ(strlen(out), len);
-        in = static_cast<char*>(tr_base64_decode_str(out, &len));
-        EXPECT_EQ(i, len);
-        EXPECT_STREQ(buf.data(), in);
-        tr_free(in);
-        tr_free(out);
+        EXPECT_EQ(buf, tr_base64_decode(tr_base64_encode(buf)));
     }
 }

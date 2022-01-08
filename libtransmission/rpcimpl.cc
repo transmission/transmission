@@ -681,9 +681,8 @@ static void initField(
         if (tor->hasMetadata())
         {
             auto const bytes = tor->createPieceBitfield();
-            auto* enc = static_cast<char*>(tr_base64_encode(bytes.data(), std::size(bytes), nullptr));
-            tr_variantInitStr(initme, enc != nullptr ? std::string_view{ enc } : ""sv);
-            tr_free(enc);
+            auto const enc = tr_base64_encode({ reinterpret_cast<char const*>(std::data(bytes)), std::size(bytes) });
+            tr_variantInitStrView(initme, enc);
         }
         else
         {
@@ -1708,7 +1707,7 @@ static char const* torrentAdd(tr_session* session, tr_variant* args_in, tr_varia
     {
         if (std::empty(filename))
         {
-            std::string const metainfo = tr_base64_decode_str(metainfo_base64);
+            auto const metainfo = tr_base64_decode(metainfo_base64);
             tr_ctorSetMetainfo(ctor, std::data(metainfo), std::size(metainfo), nullptr);
         }
         else
