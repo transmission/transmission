@@ -177,11 +177,11 @@ void showInfo(app_opts const& opts, tr_torrent_metainfo const& metainfo)
     printf("\nFILES\n\n");
 
     auto filenames = std::vector<std::string>{};
-    for (auto const& file : metainfo.files())
+    for (tr_file_index_t i = 0, n = metainfo.fileCount(); i < n; ++i)
     {
-        std::string filename = file.path();
+        std::string filename = metainfo.fileSubpath(i);
         filename += " (";
-        filename += tr_formatter_size_B(file.length());
+        filename += tr_formatter_size_B(metainfo.fileSize(i));
         filename += ')';
         filenames.emplace_back(filename);
     }
