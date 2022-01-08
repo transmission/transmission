@@ -100,7 +100,7 @@
 
                 size += metainfo.totalSize();
 
-                auto const n_files = std::size(metainfo.files());
+                auto const n_files = metainfo.fileCount();
                 fileCount += n_files;
                 if (n_files == 1)
                 {
