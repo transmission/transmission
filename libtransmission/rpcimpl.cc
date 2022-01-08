@@ -484,12 +484,7 @@ static void addPeers(tr_torrent const* tor, tr_variant* list)
     tr_torrentPeersFree(peers, peerCount);
 }
 
-static void initField(
-    tr_torrent* const tor,
-    tr_torrent_view const* view,
-    tr_stat const* const st,
-    tr_variant* const initme,
-    tr_quark key)
+static void initField(tr_torrent* const tor, tr_stat const* const st, tr_variant* const initme, tr_quark key)
 {
     char* str = nullptr;
 
@@ -508,7 +503,7 @@ static void initField(
         break;
 
     case TR_KEY_comment:
-        tr_variantInitStr(initme, std::string_view{ view->comment != nullptr ? view->comment : "" });
+        tr_variantInitStr(initme, tor->comment());
         break;
 
     case TR_KEY_corruptEver:
@@ -516,11 +511,11 @@ static void initField(
         break;
 
     case TR_KEY_creator:
-        tr_variantInitStr(initme, std::string_view{ view->creator != nullptr ? view->creator : "" });
+        tr_variantInitStrView(initme, tor->creator());
         break;
 
     case TR_KEY_dateCreated:
-        tr_variantInitInt(initme, view->date_created);
+        tr_variantInitInt(initme, tor->dateCreated());
         break;
 
     case TR_KEY_desiredAvailable:
@@ -692,11 +687,11 @@ static void initField(
         break;
 
     case TR_KEY_pieceCount:
-        tr_variantInitInt(initme, view->n_pieces);
+        tr_variantInitInt(initme, tor->pieceCount());
         break;
 
     case TR_KEY_pieceSize:
-        tr_variantInitInt(initme, view->piece_size);
+        tr_variantInitInt(initme, tor->pieceSize());
         break;
 
     case TR_KEY_primary_mime_type:
@@ -755,7 +750,7 @@ static void initField(
         break;
 
     case TR_KEY_source:
-        tr_variantDictAddStr(initme, key, view->source ? view->source : "");
+        tr_variantInitStrView(initme, tor->source());
         break;
 
     case TR_KEY_startDate:
@@ -792,11 +787,11 @@ static void initField(
         }
 
     case TR_KEY_torrentFile:
-        tr_variantInitStr(initme, view->torrent_filename);
+        tr_variantInitStrView(initme, tor->torrentFile());
         break;
 
     case TR_KEY_totalSize:
-        tr_variantInitInt(initme, view->total_size);
+        tr_variantInitInt(initme, tor->totalSize());
         break;
 
     case TR_KEY_uploadedEver:
@@ -853,14 +848,13 @@ static void addTorrentInfo(tr_torrent* tor, tr_format format, tr_variant* entry,
 
     if (fieldCount > 0)
     {
-        auto const torrent_view = tr_torrentView(tor);
         tr_stat const* const st = tr_torrentStat(tor);
 
         for (size_t i = 0; i < fieldCount; ++i)
         {
             tr_variant* child = format == TR_FORMAT_TABLE ? tr_variantListAdd(entry) : tr_variantDictAdd(entry, fields[i]);
 
-            initField(tor, &torrent_view, st, child, fields[i]);
+            initField(tor, st, child, fields[i]);
         }
     }
 }

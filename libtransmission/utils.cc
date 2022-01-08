@@ -820,13 +820,6 @@ static char* to_utf8(std::string_view sv)
     return strip_non_utf8(sv);
 }
 
-char* tr_utf8clean(std::string_view sv)
-{
-    char* const ret = tr_utf8_validate(sv, nullptr) ? tr_strvDup(sv) : to_utf8(sv);
-    TR_ASSERT(tr_utf8_validate(ret, nullptr));
-    return ret;
-}
-
 std::string tr_strvUtf8Clean(std::string_view sv)
 {
     if (tr_utf8_validate(sv, nullptr))

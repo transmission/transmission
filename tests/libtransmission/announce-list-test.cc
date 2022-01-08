@@ -387,9 +387,9 @@ TEST_F(AnnounceListTest, save)
     tr_variantFree(&metainfo);
 
     // test that non-announce parts of the metainfo are the same
-    EXPECT_STREQ(original->info.name, saved->info.name);
+    EXPECT_EQ(original->info.name(), saved->info.name());
     EXPECT_EQ(original->info.fileCount(), saved->info.fileCount());
-    EXPECT_EQ(original->info.dateCreated, saved->info.dateCreated);
+    EXPECT_EQ(original->info.dateCreated(), saved->info.dateCreated());
     EXPECT_EQ(original->pieces, saved->pieces);
 
     // test that the saved version has the updated announce list

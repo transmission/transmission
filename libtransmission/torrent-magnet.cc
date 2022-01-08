@@ -6,6 +6,7 @@
  *
  */
 
+#include <algorithm>
 #include <climits> /* INT_MAX */
 #include <cstring> /* memcpy(), memset(), memcmp() */
 #include <ctime>
@@ -168,7 +169,7 @@ void* tr_torrentGetMetadataPiece(tr_torrent* tor, int piece, size_t* len)
         return nullptr;
     }
 
-    auto const fd = tr_sys_file_open(tor->torrentFile(), TR_SYS_FILE_READ, 0, nullptr);
+    auto const fd = tr_sys_file_open(tor->torrentFile().c_str(), TR_SYS_FILE_READ, 0, nullptr);
     if (fd == TR_BAD_SYS_FILE)
     {
         return nullptr;
@@ -261,7 +262,7 @@ void tr_torrentSetMetadataPiece(tr_torrent* tor, int piece, void const* data, in
     }
 
     size_t const offset = piece * METADATA_PIECE_SIZE;
-    memcpy(m->metadata + offset, data, len);
+    std::copy_n(reinterpret_cast<char const*>(data), len, m->metadata + offset);
 
     tr_removeElementFromArray(m->piecesNeeded, idx, sizeof(struct metadata_node), m->piecesNeededCount);
     --m->piecesNeededCount;
@@ -288,15 +289,15 @@ void tr_torrentSetMetadataPiece(tr_torrent* tor, int piece, void const* data, in
             {
                 /* yay we have bencoded metainfo... merge it into our .torrent file */
                 tr_variant newMetainfo;
-                char* path = tr_strdup(tor->torrentFile());
+                auto const path = tor->torrentFile();
 
                 if (tr_variantFromFile(&newMetainfo, TR_VARIANT_PARSE_BENC, path, nullptr))
                 {
                     /* remove any old .torrent and .resume files */
-                    tr_sys_path_remove(path, nullptr);
+                    tr_sys_path_remove(path.c_str(), nullptr);
                     tr_torrentRemoveResume(tor);
 
-                    dbgmsg(tor, "Saving completed metadata to \"%s\"", path);
+                    dbgmsg(tor, "Saving completed metadata to \"%s\"", path.c_str());
                     tr_variantMergeDicts(tr_variantDictAddDict(&newMetainfo, TR_KEY_info, 0), &infoDict);
 
                     auto info = tr_metainfoParse(tor->session, &newMetainfo, nullptr);
@@ -322,7 +323,6 @@ void tr_torrentSetMetadataPiece(tr_torrent* tor, int piece, void const* data, in
                 }
 
                 tr_variantFree(&infoDict);
-                tr_free(path);
             }
         }
 
@@ -394,10 +394,10 @@ char* tr_torrentInfoGetMagnetLink(tr_info const* inf)
     auto buf = std::string{};
 
     buf += "magnet:?xt=urn:btih:"sv;
-    buf += inf->hashString;
+    buf += inf->infoHashString();
 
-    char const* const name = inf->name;
-    if (!tr_str_is_empty(name))
+    auto const& name = inf->name();
+    if (!std::empty(name))
     {
         buf += "&dn="sv;
         tr_http_escape(buf, name, true);

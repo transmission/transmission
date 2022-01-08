@@ -21,6 +21,8 @@
 ***/
 
 #include <memory>
+#include <string_view>
+
 #include <stdbool.h> /* bool */
 #include <stddef.h> /* size_t */
 #include <stdint.h> /* uintN_t */
@@ -1502,8 +1504,8 @@ void tr_torrentVerify(tr_torrent* torrent, tr_verify_done_func callback_func_or_
 struct tr_file
 {
     // public
-    std::string subpath; /* Path to the file */
-    uint64_t size; /* Length of the file, in bytes */
+    std::string subpath_; /* Path to the file */
+    uint64_t size_; /* Length of the file, in bytes */
 };
 
 /** @brief information about a torrent that comes from its metainfo file */
@@ -1513,18 +1515,53 @@ struct tr_info
     uint64_t totalSize;
 
     /* The torrent's name. */
-    char* name;
+    std::string name_;
 
     /* Path to torrent Transmission's internal copy of the .torrent file. */
-    char* torrent;
+    std::string torrent_file_;
 
     char** webseeds;
 
-    char* comment;
-    char* creator;
+    std::string comment_;
+    std::string creator_;
 
     /* torrent's source. empty if not set. */
-    char* source;
+    std::string source_;
+
+    auto const& torrentFile() const
+    {
+        return torrent_file_;
+    }
+
+    auto const& name() const
+    {
+        return name_;
+    }
+
+    auto const& creator() const
+    {
+        return creator_;
+    }
+
+    auto const& comment() const
+    {
+        return comment_;
+    }
+
+    auto const& source() const
+    {
+        return source_;
+    }
+
+    auto const& infoHash() const
+    {
+        return hash_;
+    }
+
+    void setName(std::string_view name)
+    {
+        name_ = name;
+    }
 
     // Private.
     // Use tr_torrentFile() and tr_torrentFileCount() instead.
@@ -1537,27 +1574,42 @@ struct tr_info
 
     std::string const& fileSubpath(tr_file_index_t i) const
     {
-        return files[i].subpath;
+        return files[i].subpath_;
+    }
+
+    void setFileSubpath(tr_file_index_t i, std::string_view subpath)
+    {
+        files[i].subpath_ = subpath;
     }
 
     auto fileSize(tr_file_index_t i) const
     {
-        return files[i].size;
+        return files[i].size_;
+    }
+
+    auto const& infoHashString() const
+    {
+        return info_hash_string_;
+    }
+
+    auto dateCreated() const
+    {
+        return date_created_;
     }
 
     // TODO(ckerr) aggregate this directly, rather than  using a shared_ptr, when tr_info is private
     std::shared_ptr<tr_announce_list> announce_list;
 
     /* Torrent info */
-    time_t dateCreated;
+    time_t date_created_;
 
     unsigned int webseedCount;
     uint32_t pieceSize;
     tr_piece_index_t pieceCount;
 
     /* General info */
-    tr_sha1_digest_t hash;
-    char hashString[2 * SHA_DIGEST_LENGTH + 1];
+    tr_sha1_digest_t hash_;
+    std::string info_hash_string_;
 
     /* Flags */
     bool isPrivate;

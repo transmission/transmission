@@ -276,7 +276,8 @@ int tr_lpdInit(tr_session* ss, tr_address* /*tr_addr*/)
      * string handling in tr_lpdSendAnnounce() and tr_lpdConsiderAnnounce().
      * However, the code should work as long as interfaces to the rest of
      * libtransmission are compatible with char* strings. */
-    static_assert(std::is_same_v<char const, std::remove_pointer_t<decltype(std::declval<tr_torrent>().infoHashString())>>);
+    static_assert(
+        std::is_same_v<std::string const&, std::remove_pointer_t<decltype(std::declval<tr_torrent>().infoHashString())>>);
 
     struct ip_mreq mcastReq;
     int const opt_on = 1;
@@ -456,7 +457,7 @@ bool tr_lpdEnabled(tr_session const* ss)
 */
 bool tr_lpdSendAnnounce(tr_torrent const* t)
 {
-    char const fmt[] = //
+    char constexpr fmt[] = //
         "BT-SEARCH * HTTP/%u.%u" CRLF //
         "Host: %s:%u" CRLF //
         "Port: %u" CRLF //
@@ -464,23 +465,17 @@ bool tr_lpdSendAnnounce(tr_torrent const* t)
         "" CRLF //
         "" CRLF;
 
-    char hashString[SIZEOF_HASH_STRING];
-    char query[lpd_maxDatagramLength + 1] = { 0 };
-
     if (t == nullptr)
     {
         return false;
     }
 
-    /* make sure the hash string is normalized, just in case */
-    auto const* const sourceHashString = t->infoHashString();
-    for (size_t i = 0; i < TR_N_ELEMENTS(hashString); ++i)
-    {
-        hashString[i] = toupper(sourceHashString[i]);
-    }
+    /* ensure the hash string is capitalized */
+    auto const hash_string = tr_strupper(t->infoHashString());
 
     /* prepare a zero-terminated announce message */
-    tr_snprintf(query, lpd_maxDatagramLength + 1, fmt, 1, 1, lpd_mcastGroup, lpd_mcastPort, lpd_port, hashString);
+    char query[lpd_maxDatagramLength + 1] = { 0 };
+    tr_snprintf(query, lpd_maxDatagramLength + 1, fmt, 1, 1, lpd_mcastGroup, lpd_mcastPort, lpd_port, hash_string.c_str());
 
     /* actually send the query out using [lpd_socket2] */
     {
@@ -488,7 +483,7 @@ bool tr_lpdSendAnnounce(tr_torrent const* t)
 
         /* destination address info has already been set up in tr_lpdInit(),
          * so we refrain from preparing another sockaddr_in here */
-        int res = sendto(lpd_socket2, query, len, 0, (struct sockaddr const*)&lpd_mcastAddr, sizeof(lpd_mcastAddr));
+        int const res = sendto(lpd_socket2, query, len, 0, (struct sockaddr const*)&lpd_mcastAddr, sizeof(lpd_mcastAddr));
 
         if (res != len)
         {
