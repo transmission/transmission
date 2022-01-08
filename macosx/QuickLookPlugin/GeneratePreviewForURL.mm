@@ -190,7 +190,7 @@ OSStatus GeneratePreviewForURL(void* thisInterface, QLPreviewRequestRef preview,
 
 #warning display size?
 #warning display folders?
-        for (tr_file_inde_t i = 0; i < n_files; ++i)
+        for (tr_file_index_t i = 0; i < n_files; ++i)
         {
             NSString* fullFilePath = [NSString stringWithUTF8String:metainfo.fileSubpath(i).c_str()];
             NSCAssert([fullFilePath hasPrefix:[name stringByAppendingString:@"/"]], @"Expected file path %@ to begin with %@/", fullFilePath, name);
