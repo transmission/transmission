@@ -163,46 +163,46 @@ void* tr_torrentGetMetadataPiece(tr_torrent* tor, int piece, size_t* len)
     TR_ASSERT(piece >= 0);
     TR_ASSERT(len != nullptr);
 
-    char* ret = nullptr;
-
-    if (tor->hasMetadata())
+    if (!tor->hasMetadata())
     {
-        ensureInfoDictOffsetIsCached(tor);
+        return nullptr;
+    }
 
-        auto const info_dict_length = tor->infoDictLength();
-        TR_ASSERT(info_dict_length > 0);
+    auto const fd = tr_sys_file_open(tor->torrentFile(), TR_SYS_FILE_READ, 0, nullptr);
+    if (fd == TR_BAD_SYS_FILE)
+    {
+        return nullptr;
+    }
 
-        auto const fd = tr_sys_file_open(tor->torrentFile(), TR_SYS_FILE_READ, 0, nullptr);
-        if (fd != TR_BAD_SYS_FILE)
+    ensureInfoDictOffsetIsCached(tor);
+
+    auto const info_dict_length = tor->infoDictLength();
+    TR_ASSERT(info_dict_length > 0);
+
+    char* ret = nullptr;
+    if (size_t o = piece * METADATA_PIECE_SIZE; tr_sys_file_seek(fd, tor->infoDictOffset + o, TR_SEEK_SET, nullptr, nullptr))
+    {
+        size_t const l = o + METADATA_PIECE_SIZE <= info_dict_length ? METADATA_PIECE_SIZE : info_dict_length - o;
+
+        if (0 < l && l <= METADATA_PIECE_SIZE)
         {
-            size_t const o = piece * METADATA_PIECE_SIZE;
+            char* buf = tr_new(char, l);
+            auto n = uint64_t{};
 
-            if (tr_sys_file_seek(fd, tor->infoDictOffset + o, TR_SEEK_SET, nullptr, nullptr))
+            if (tr_sys_file_read(fd, buf, l, &n, nullptr) && n == l)
             {
-                size_t const l = o + METADATA_PIECE_SIZE <= info_dict_length ? METADATA_PIECE_SIZE : info_dict_length - o;
-
-                if (0 < l && l <= METADATA_PIECE_SIZE)
-                {
-                    char* buf = tr_new(char, l);
-                    auto n = uint64_t{};
-
-                    if (tr_sys_file_read(fd, buf, l, &n, nullptr) && n == l)
-                    {
-                        *len = l;
-                        ret = buf;
-                        buf = nullptr;
-                    }
-
-                    tr_free(buf);
-                }
+                *len = l;
+                ret = buf;
+                buf = nullptr;
             }
 
-            tr_sys_file_close(fd, nullptr);
+            tr_free(buf);
         }
     }
 
-    TR_ASSERT(ret == nullptr || *len > 0);
+    tr_sys_file_close(fd, nullptr);
 
+    TR_ASSERT(ret == nullptr || *len > 0);
     return ret;
 }
 
