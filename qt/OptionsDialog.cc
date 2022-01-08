@@ -172,30 +172,27 @@ void OptionsDialog::reload()
         metainfo_ = metainfo;
     }
 
-    bool const have_files_to_show = metainfo_ && !std::empty(metainfo_->files());
+    bool const have_files_to_show = metainfo_ && !std::empty(*metainfo_);
 
     ui_.filesView->setVisible(have_files_to_show);
     layout()->setSizeConstraint(have_files_to_show ? QLayout::SetDefaultConstraint : QLayout::SetFixedSize);
 
     if (metainfo_)
     {
-        int i = 0;
-        auto const n_files = std::size(metainfo_->files());
+        auto const n_files = metainfo_->fileCount();
         priorities_.assign(n_files, TR_PRI_NORMAL);
         wanted_.assign(n_files, true);
 
-        for (auto const& file : metainfo_->files())
+        for (tr_file_index_t i = 0; i < n_files; ++i)
         {
             auto f = TorrentFile{};
             f.index = i;
             f.priority = priorities_[i];
             f.wanted = wanted_[i];
-            f.size = file.length();
+            f.size = metainfo_->fileSize(i);
             f.have = 0;
-            f.filename = QString::fromStdString(file.path());
+            f.filename = QString::fromStdString(metainfo_->fileSubpath(i));
             files_.push_back(f);
-
-            ++i;
         }
     }
 

@@ -106,7 +106,7 @@ std::string_view tr_ctorGetContents(tr_ctor const* ctor)
 
 char const* tr_ctorGetSourceFile(tr_ctor const* ctor)
 {
-    return ctor->metainfo.parsedTorrentFile().c_str();
+    return ctor->metainfo.torrentFile().c_str();
 }
 
 bool tr_ctorSaveContents(tr_ctor const* ctor, std::string_view filename, tr_error** error)
@@ -298,7 +298,7 @@ bool tr_ctorGetIncompleteDir(tr_ctor const* ctor, char const** setme)
 
 tr_torrent_metainfo const* tr_ctorGetMetainfo(tr_ctor const* ctor)
 {
-    return std::empty(ctor->metainfo.files()) ? nullptr : &ctor->metainfo;
+    return !std::empty(ctor->metainfo) ? &ctor->metainfo : nullptr;
 }
 
 tr_session* tr_ctorGetSession(tr_ctor const* ctor)

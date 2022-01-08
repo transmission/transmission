@@ -1502,8 +1502,8 @@ void tr_torrentVerify(tr_torrent* torrent, tr_verify_done_func callback_func_or_
 struct tr_file
 {
     // public
-    char* name; /* Path to the file */
-    uint64_t length; /* Length of the file, in bytes */
+    std::string subpath; /* Path to the file */
+    uint64_t size; /* Length of the file, in bytes */
 };
 
 /** @brief information about a torrent that comes from its metainfo file */
@@ -1528,7 +1528,22 @@ struct tr_info
 
     // Private.
     // Use tr_torrentFile() and tr_torrentFileCount() instead.
-    tr_file* files;
+    std::vector<tr_file> files;
+
+    tr_file_index_t fileCount() const
+    {
+        return std::size(files);
+    }
+
+    std::string const& fileSubpath(tr_file_index_t i) const
+    {
+        return files[i].subpath;
+    }
+
+    auto fileSize(tr_file_index_t i) const
+    {
+        return files[i].size;
+    }
 
     // TODO(ckerr) aggregate this directly, rather than  using a shared_ptr, when tr_info is private
     std::shared_ptr<tr_announce_list> announce_list;
@@ -1537,7 +1552,6 @@ struct tr_info
     time_t dateCreated;
 
     unsigned int webseedCount;
-    tr_file_index_t fileCount;
     uint32_t pieceSize;
     tr_piece_index_t pieceCount;
 

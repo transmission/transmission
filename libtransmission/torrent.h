@@ -372,21 +372,17 @@ public:
 
     [[nodiscard]] tr_file_index_t fileCount() const
     {
-        return info.fileCount;
+        return std::size(info.files);
     }
 
-    [[nodiscard]] char const* fileSubpath(tr_file_index_t i) const
+    [[nodiscard]] std::string const& fileSubpath(tr_file_index_t i) const
     {
-        TR_ASSERT(i < this->fileCount());
-
-        return info.files[i].name ? info.files[i].name : "";
+        return info.fileSubpath(i);
     }
 
     [[nodiscard]] auto fileSize(tr_file_index_t i) const
     {
-        TR_ASSERT(i < this->fileCount());
-
-        return info.files[i].length;
+        return info.fileSize(i);
     }
 
     void setFileSubpath(tr_file_index_t i, std::string_view subpath);

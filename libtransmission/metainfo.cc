@@ -110,11 +110,11 @@ bool tr_metainfoAppendSanitizedPathComponent(std::string& out, std::string_view 
     return std::size(out) > original_out_len;
 }
 
-static bool getfile(char** setme, std::string_view root, tr_variant* path, std::string& buf)
+static bool getfile(std::string* setme, std::string_view root, tr_variant* path, std::string& buf)
 {
     bool success = false;
 
-    *setme = nullptr;
+    setme->clear();
 
     if (tr_variantIsList(path))
     {
@@ -148,7 +148,7 @@ static bool getfile(char** setme, std::string_view root, tr_variant* path, std::
 
     if (success)
     {
-        *setme = tr_utf8clean(buf);
+        *setme = tr_strvUtf8Clean(buf);
     }
 
     return success;
@@ -173,10 +173,9 @@ static char const* parseFiles(tr_info* inf, tr_variant* files, tr_variant const*
         errstr = nullptr;
 
         inf->isFolder = true;
-        inf->fileCount = tr_variantListSize(files);
-        inf->files = tr_new0(tr_file, inf->fileCount);
-
-        for (tr_file_index_t i = 0; i < inf->fileCount; i++)
+        tr_file_index_t const n = tr_variantListSize(files);
+        inf->files.resize(n);
+        for (tr_file_index_t i = 0; i < n; ++i)
         {
             auto* const file = tr_variantListChild(files, i);
 
@@ -193,7 +192,7 @@ static char const* parseFiles(tr_info* inf, tr_variant* files, tr_variant const*
                 break;
             }
 
-            if (!getfile(&inf->files[i].name, root_name, path, buf))
+            if (!getfile(&inf->files[i].subpath, root_name, path, buf))
             {
                 errstr = "path";
                 break;
@@ -205,17 +204,16 @@ static char const* parseFiles(tr_info* inf, tr_variant* files, tr_variant const*
                 break;
             }
 
-            inf->files[i].length = len;
+            inf->files[i].size = len;
             inf->totalSize += len;
         }
     }
     else if (tr_variantGetInt(length, &len)) /* single-file mode */
     {
         inf->isFolder = false;
-        inf->fileCount = 1;
-        inf->files = tr_new0(tr_file, 1);
-        inf->files[0].name = tr_strvDup(root_name);
-        inf->files[0].length = len;
+        inf->files.resize(1);
+        inf->files[0].subpath = root_name;
+        inf->files[0].size = len;
         inf->totalSize += len;
     }
     else
@@ -287,7 +285,7 @@ static char* fix_webseed_url(tr_info const* inf, std::string_view url)
         return nullptr;
     }
 
-    if (inf->fileCount > 1 && !std::empty(url) && url.back() != '/')
+    if (inf->fileCount() > 1 && !std::empty(url) && url.back() != '/')
     {
         return tr_strvDup(tr_strvJoin(url, "/"sv));
     }
@@ -500,7 +498,7 @@ static char const* tr_metainfoParseImpl(
             return errstr;
         }
 
-        if (inf->fileCount == 0 || inf->totalSize == 0)
+        if (inf->fileCount() == 0 || inf->totalSize == 0)
         {
             return "files";
         }
@@ -553,17 +551,8 @@ void tr_metainfoFree(tr_info* inf)
         }
     }
 
-    if (inf->files != nullptr)
-    {
-        for (tr_file_index_t ff = 0; ff < inf->fileCount; ff++)
-        {
-            tr_free(inf->files[ff].name);
-        }
-    }
-
     tr_free(inf->comment);
     tr_free(inf->creator);
-    tr_free(inf->files);
     tr_free(inf->name);
     tr_free(inf->source);
     tr_free(inf->torrent);
@@ -571,7 +560,6 @@ void tr_metainfoFree(tr_info* inf)
 
     inf->comment = nullptr;
     inf->creator = nullptr;
-    inf->files = nullptr;
     inf->name = nullptr;
     inf->source = nullptr;
     inf->torrent = nullptr;

@@ -22,6 +22,8 @@
 #include <cstring> // strcmp()
 #include <string>
 
+using namespace std::literals;
+
 namespace libtransmission
 {
 
@@ -262,7 +264,7 @@ TEST_F(RenameTest, multifileTorrent)
         "MjpwaWVjZSBsZW5ndGhpMzI3NjhlNjpwaWVjZXMyMDp27buFkmy8ICfNX4nsJmt0Ckm2Ljc6cHJp"
         "dmF0ZWkwZWVl");
     EXPECT_TRUE(tr_isTorrent(tor));
-    auto* files = tor->info.files;
+    auto& files = tor->info.files;
 
     // sanity check the info
     EXPECT_STREQ("Felidae", tr_torrentName(tor));
@@ -318,8 +320,7 @@ TEST_F(RenameTest, multifileTorrent)
     // (while the branch is renamed: confirm that the .resume file remembers the changes)
     tr_torrentSaveResume(tor);
     // this is a bit dodgy code-wise, but let's make sure the .resume file got the name
-    tr_free(files[1].name);
-    files[1].name = tr_strdup("gabba gabba hey");
+    files[1].subpath = "gabba gabba hey";
     auto const loaded = tr_torrentLoadResume(tor, ~0ULL, ctor, nullptr);
     EXPECT_NE(decltype(loaded){ 0 }, (loaded & TR_FR_FILENAMES));
     EXPECT_EQ(expected_files[0], tr_torrentFile(tor, 0).name);
@@ -461,13 +462,12 @@ TEST_F(RenameTest, partialFile)
     ***/
 
     auto* tor = zeroTorrentInit();
-    auto const& files = tor->info.files;
     EXPECT_EQ(TotalSize, tor->totalSize());
     EXPECT_EQ(PieceSize, tor->pieceSize());
     EXPECT_EQ(PieceCount, tor->pieceCount());
-    EXPECT_STREQ("files-filled-with-zeroes/1048576", files[0].name);
-    EXPECT_STREQ("files-filled-with-zeroes/4096", files[1].name);
-    EXPECT_STREQ("files-filled-with-zeroes/512", files[2].name);
+    EXPECT_EQ("files-filled-with-zeroes/1048576"sv, tor->fileSubpath(0));
+    EXPECT_EQ("files-filled-with-zeroes/4096"sv, tor->fileSubpath(1));
+    EXPECT_EQ("files-filled-with-zeroes/512"sv, tor->fileSubpath(2));
 
     zeroTorrentPopulate(tor, false);
     EXPECT_EQ(Length[0], tr_torrentFile(tor, 0).have + PieceSize);
@@ -483,14 +483,14 @@ TEST_F(RenameTest, partialFile)
 
     EXPECT_EQ(0, torrentRenameAndWait(tor, "files-filled-with-zeroes", "foo"));
     EXPECT_EQ(0, torrentRenameAndWait(tor, "foo/1048576", "bar"));
-    auto strings = std::array<char const*, 3>{};
-    strings[0] = "foo/bar";
-    strings[1] = "foo/4096";
-    strings[2] = "foo/512";
+    auto strings = std::array<std::string_view, 3>{};
+    strings[0] = "foo/bar"sv;
+    strings[1] = "foo/4096"sv;
+    strings[2] = "foo/512"sv;
 
     for (tr_file_index_t i = 0; i < 3; ++i)
     {
-        EXPECT_STREQ(strings[i], files[i].name);
+        EXPECT_EQ(strings[i], tor->fileSubpath(i));
     }
 
     strings[0] = "foo/bar.part";
