@@ -123,7 +123,7 @@ static int readOrWriteBytes(
             if (!tr_sys_file_read_at(fd, buf, buflen, file_offset, nullptr, &error))
             {
                 err = error->code;
-                tr_logAddTorErr(tor, "read failed for \"%s\": %s", tor->fileSubpath(file_index), error->message);
+                tr_logAddTorErr(tor, "read failed for \"%s\": %s", tor->fileSubpath(file_index).c_str(), error->message);
                 tr_error_free(error);
             }
         }
@@ -132,7 +132,7 @@ static int readOrWriteBytes(
             if (!tr_sys_file_write_at(fd, buf, buflen, file_offset, nullptr, &error))
             {
                 err = error->code;
-                tr_logAddTorErr(tor, "write failed for \"%s\": %s", tor->fileSubpath(file_index), error->message);
+                tr_logAddTorErr(tor, "write failed for \"%s\": %s", tor->fileSubpath(file_index).c_str(), error->message);
                 tr_error_free(error);
             }
         }

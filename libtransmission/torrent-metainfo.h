@@ -24,11 +24,6 @@ struct tr_info;
 
 struct tr_torrent_metainfo : public tr_magnet_metainfo
 {
-    [[nodiscard]] constexpr auto const& blockInfo() const
-    {
-        return block_info_;
-    }
-
 public:
     tr_torrent_metainfo() = default;
     ~tr_torrent_metainfo() override = default;
@@ -47,6 +42,11 @@ public:
     bool parseTorrentFile(std::string_view benc_filename, std::vector<char>* buffer = nullptr, tr_error** error = nullptr);
 
     /// BLOCK INFO
+
+    [[nodiscard]] constexpr auto const& blockInfo() const
+    {
+        return block_info_;
+    }
 
     [[nodiscard]] constexpr auto blockCount() const
     {
@@ -114,9 +114,17 @@ public:
         return source_;
     }
 
-    auto const& files() const
+    auto fileCount() const
     {
-        return files_;
+        return std::size(files_);
+    }
+    std::string const& fileSubpath(tr_file_index_t i) const
+    {
+        return files_.at(i).path();
+    }
+    auto fileSize(tr_file_index_t i) const
+    {
+        return files_.at(i).size();
     }
 
     [[nodiscard]] auto const& isPrivate() const
@@ -124,7 +132,7 @@ public:
         return is_private_;
     }
 
-    [[nodiscard]] auto const& parsedTorrentFile() const
+    [[nodiscard]] auto const& torrentFile() const
     {
         return torrent_file_;
     }
@@ -165,20 +173,20 @@ private:
         {
             return path_;
         }
-        uint64_t length() const
+        uint64_t size() const
         {
-            return length_;
+            return size_;
         }
 
-        file_t(std::string_view path, uint64_t length)
+        file_t(std::string_view path, uint64_t size)
             : path_{ path }
-            , length_{ length }
+            , size_{ size }
         {
         }
 
     private:
         std::string path_;
-        uint64_t length_ = 0;
+        uint64_t size_ = 0;
     };
 
     tr_block_info block_info_ = tr_block_info{ 0, 0 };

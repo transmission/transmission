@@ -1109,18 +1109,18 @@ tr_file_view tr_torrentFile(tr_torrent const* tor, tr_file_index_t i)
 {
     TR_ASSERT(tr_isTorrent(tor));
 
-    auto const* subpath = tor->fileSubpath(i);
+    auto const& subpath = tor->fileSubpath(i);
     auto const priority = tor->file_priorities_.filePriority(i);
     auto const wanted = tor->files_wanted_.fileWanted(i);
     auto const length = tor->fileSize(i);
 
     if (tor->completeness == TR_SEED || length == 0)
     {
-        return { subpath, length, length, 1.0, priority, wanted };
+        return { subpath.c_str(), length, length, 1.0, priority, wanted };
     }
 
     auto const have = tor->completion.countHasBytesInSpan(tor->fpm_.byteSpan(i));
-    return { subpath, have, length, have >= length ? 1.0 : have / double(length), priority, wanted };
+    return { subpath.c_str(), have, length, have >= length ? 1.0 : have / double(length), priority, wanted };
 }
 
 size_t tr_torrentFileCount(tr_torrent const* torrent)
@@ -2513,7 +2513,7 @@ static void tr_torrentFileCompleted(tr_torrent* tor, tr_file_index_t i)
     char* sub = nullptr;
     if (tr_torrentFindFile2(tor, i, &base, &sub, nullptr))
     {
-        if (char const* file_subpath = tor->fileSubpath(i); strcmp(sub, file_subpath) != 0)
+        if (auto const& file_subpath = tor->fileSubpath(i); file_subpath != sub)
         {
             auto const oldpath = tr_strvPath(base, sub);
             auto const newpath = tr_strvPath(base, file_subpath);
@@ -2858,26 +2858,21 @@ static bool renameArgsAreValid(char const* oldpath, char const* newname)
         strchr(newname, TR_PATH_DELIMITER) == nullptr;
 }
 
-static tr_file_index_t* renameFindAffectedFiles(tr_torrent* tor, char const* oldpath, size_t* setme_n)
+static auto renameFindAffectedFiles(tr_torrent* tor, std::string_view oldpath)
 {
+    auto indices = std::vector<tr_file_index_t>{};
+    auto oldpath_as_dir = tr_strvJoin(oldpath, "/"sv);
     auto const n_files = tor->fileCount();
-    auto n_affected_files = size_t{};
-    auto* const indices = tr_new0(tr_file_index_t, n_files);
-
-    auto const oldpath_len = strlen(oldpath);
 
     for (tr_file_index_t i = 0; i < n_files; ++i)
     {
-        char const* name = tor->fileSubpath(i);
-        size_t const len = strlen(name);
-
-        if ((len == oldpath_len || (len > oldpath_len && name[oldpath_len] == '/')) && memcmp(oldpath, name, oldpath_len) == 0)
+        auto const& name = tor->fileSubpath(i);
+        if (name == oldpath || tr_strvStartsWith(name, oldpath_as_dir))
         {
-            indices[n_affected_files++] = i;
+            indices.push_back(i);
         }
     }
 
-    *setme_n = n_affected_files;
     return indices;
 }
 
@@ -2999,10 +2994,8 @@ static void torrentRenamePath(void* vdata)
     }
     else
     {
-        auto n = size_t{};
-        tr_file_index_t* const file_indices = renameFindAffectedFiles(tor, oldpath, &n);
-
-        if (n == 0)
+        auto const file_indices = renameFindAffectedFiles(tor, oldpath);
+        if (std::empty(file_indices))
         {
             error = EINVAL;
         }
@@ -3013,13 +3006,13 @@ static void torrentRenamePath(void* vdata)
             if (error == 0)
             {
                 /* update tr_info.files */
-                for (size_t i = 0; i < n; ++i)
+                for (auto const& file_index : file_indices)
                 {
-                    renameTorrentFileString(tor, oldpath, newname, file_indices[i]);
+                    renameTorrentFileString(tor, oldpath, newname, file_index);
                 }
 
                 /* update tr_info.name if user changed the toplevel */
-                if (n == tor->fileCount() && strchr(oldpath, '/') == nullptr)
+                if (std::size(file_indices) == tor->fileCount() && strchr(oldpath, '/') == nullptr)
                 {
                     tor->setName(newname);
                 }
@@ -3028,8 +3021,6 @@ static void torrentRenamePath(void* vdata)
                 tor->setDirty();
             }
         }
-
-        tr_free(file_indices);
     }
 
     /***
@@ -3134,10 +3125,5 @@ void tr_torrent::setName(std::string_view name)
 
 void tr_torrent::setFileSubpath(tr_file_index_t i, std::string_view subpath)
 {
-    if (fileSubpath(i) != subpath)
-    {
-        auto* old = this->info.files[i].name;
-        this->info.files[i].name = tr_strvDup(subpath);
-        tr_free(old);
-    }
+    this->info.files[i].subpath = subpath;
 }
