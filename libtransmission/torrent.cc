@@ -77,7 +77,7 @@ using namespace std::literals;
 
 char const* tr_torrentName(tr_torrent const* tor)
 {
-    return tor != nullptr ? tor->info.name : "";
+    return tor != nullptr ? tor->name().c_str() : "";
 }
 
 uint64_t tr_torrentTotalSize(tr_torrent const* tor)
@@ -727,7 +727,7 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
     tr_sessionAddTorrent(session, tor);
 
     /* if we don't have a local .torrent file already, assume the torrent is new */
-    bool const isNewTorrent = !tr_sys_path_exists(tor->torrentFile(), nullptr);
+    bool const isNewTorrent = !tr_sys_path_exists(tor->torrentFile().c_str(), nullptr);
 
     /* maybe save our own copy of the metainfo */
     if (tr_ctorGetSave(ctor))
@@ -787,7 +787,7 @@ tr_torrent* tr_torrentNew(tr_ctor const* ctor, tr_torrent** setme_duplicate_of)
     }
 
     // is it a duplicate?
-    if (auto* const duplicate_of = session->getTorrent(parsed->info.hash); duplicate_of != nullptr)
+    if (auto* const duplicate_of = session->getTorrent(parsed->info.infoHash()); duplicate_of != nullptr)
     {
         if (setme_duplicate_of != nullptr)
         {
@@ -1158,13 +1158,13 @@ tr_torrent_view tr_torrentView(tr_torrent const* tor)
 
     auto ret = tr_torrent_view{};
     ret.name = tr_torrentName(tor);
-    ret.hash_string = tor->infoHashString();
-    ret.torrent_filename = tor->torrentFile();
-    ret.comment = tor->info.comment;
-    ret.creator = tor->info.creator;
-    ret.source = tor->info.source;
+    ret.hash_string = tor->infoHashString().c_str();
+    ret.torrent_filename = tor->torrentFile().c_str();
+    ret.comment = tor->info.comment().c_str();
+    ret.creator = tor->info.creator().c_str();
+    ret.source = tor->info.source().c_str();
     ret.total_size = tor->totalSize();
-    ret.date_created = tor->info.dateCreated;
+    ret.date_created = tor->dateCreated();
     ret.piece_size = tor->pieceSize();
     ret.n_pieces = tor->pieceCount();
     ret.is_private = tor->isPrivate();
@@ -1983,7 +1983,7 @@ bool tr_torrentReqIsValid(tr_torrent const* tor, tr_piece_index_t index, uint32_
 }
 
 // TODO(ckerr) migrate to fpm?
-tr_block_span_t tr_torGetFileBlockSpan(tr_torrent const* tor, tr_file_index_t const i)
+tr_block_span_t tr_torGetFileBlockSpan(tr_torrent const* tor, tr_file_index_t i)
 {
     auto const [begin_byte, end_byte] = tor->fpm_.byteSpan(i);
 
@@ -3114,16 +3114,10 @@ void tr_torrent::setBlocks(tr_bitfield blocks)
 
 void tr_torrent::setName(std::string_view name)
 {
-    if (name == this->info.name)
-    {
-        return;
-    }
-
-    tr_free(this->info.name);
-    this->info.name = tr_strvDup(name);
+    this->info.setName(name);
 }
 
 void tr_torrent::setFileSubpath(tr_file_index_t i, std::string_view subpath)
 {
-    this->info.files[i].subpath = subpath;
+    this->info.setFileSubpath(i, subpath);
 }

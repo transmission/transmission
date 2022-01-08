@@ -264,7 +264,6 @@ TEST_F(RenameTest, multifileTorrent)
         "MjpwaWVjZSBsZW5ndGhpMzI3NjhlNjpwaWVjZXMyMDp27buFkmy8ICfNX4nsJmt0Ckm2Ljc6cHJp"
         "dmF0ZWkwZWVl");
     EXPECT_TRUE(tr_isTorrent(tor));
-    auto& files = tor->info.files;
 
     // sanity check the info
     EXPECT_STREQ("Felidae", tr_torrentName(tor));
@@ -320,7 +319,7 @@ TEST_F(RenameTest, multifileTorrent)
     // (while the branch is renamed: confirm that the .resume file remembers the changes)
     tr_torrentSaveResume(tor);
     // this is a bit dodgy code-wise, but let's make sure the .resume file got the name
-    files[1].subpath = "gabba gabba hey";
+    tor->setFileSubpath(1, "gabba gabba hey"sv);
     auto const loaded = tr_torrentLoadResume(tor, ~0ULL, ctor, nullptr);
     EXPECT_NE(decltype(loaded){ 0 }, (loaded & TR_FR_FILENAMES));
     EXPECT_EQ(expected_files[0], tr_torrentFile(tor, 0).name);

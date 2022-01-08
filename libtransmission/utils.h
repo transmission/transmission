@@ -300,6 +300,14 @@ std::string tr_strlower(T in)
     return out;
 }
 
+template<typename T>
+std::string tr_strupper(T in)
+{
+    auto out = std::string{ in };
+    std::for_each(std::begin(out), std::end(out), [](char& ch) { ch = std::toupper(ch); });
+    return out;
+}
+
 /***
 ****  std::string_view utils
 ***/

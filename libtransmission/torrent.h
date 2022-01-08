@@ -86,7 +86,7 @@ void tr_torrentGetBlockLocation(
     uint32_t* offset,
     uint32_t* length);
 
-tr_block_span_t tr_torGetFileBlockSpan(tr_torrent const* tor, tr_file_index_t const file);
+tr_block_span_t tr_torGetFileBlockSpan(tr_torrent const* tor, tr_file_index_t file);
 
 void tr_torrentCheckSeedLimit(tr_torrent* tor);
 
@@ -449,9 +449,14 @@ public:
 
     void setName(std::string_view name);
 
+    [[nodiscard]] auto const& name() const
+    {
+        return this->info.name();
+    }
+
     [[nodiscard]] auto const& infoHash() const
     {
-        return this->info.hash;
+        return this->info.infoHash();
     }
 
     [[nodiscard]] auto isPrivate() const
@@ -464,14 +469,34 @@ public:
         return !this->isPrivate();
     }
 
-    [[nodiscard]] auto infoHashString() const
+    [[nodiscard]] auto const& infoHashString() const
     {
-        return this->info.hashString;
+        return this->info.infoHashString();
+    }
+
+    [[nodiscard]] auto dateCreated() const
+    {
+        return this->info.dateCreated();
     }
 
     [[nodiscard]] auto const& torrentFile() const
     {
-        return this->info.torrent;
+        return this->info.torrentFile();
+    }
+
+    [[nodiscard]] auto const& comment() const
+    {
+        return this->info.comment();
+    }
+
+    [[nodiscard]] auto const& creator() const
+    {
+        return this->info.creator();
+    }
+
+    [[nodiscard]] auto const& source() const
+    {
+        return this->info.source();
     }
 
     [[nodiscard]] auto hasMetadata() const

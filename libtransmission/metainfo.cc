@@ -50,7 +50,7 @@ std::string tr_buildTorrentFilename(
 
 static std::string getTorrentFilename(tr_session const* session, tr_info const* inf, enum tr_metainfo_basename_format format)
 {
-    return tr_buildTorrentFilename(tr_getTorrentDir(session), inf->name, inf->hashString, format, ".torrent"sv);
+    return tr_buildTorrentFilename(tr_getTorrentDir(session), inf->name(), inf->infoHashString(), format, ".torrent"sv);
 }
 
 /***
@@ -160,7 +160,7 @@ static char const* parseFiles(tr_info* inf, tr_variant* files, tr_variant const*
     inf->totalSize = 0;
 
     auto root_name = std::string{};
-    if (!tr_metainfoAppendSanitizedPathComponent(root_name, inf->name))
+    if (!tr_metainfoAppendSanitizedPathComponent(root_name, inf->name()))
     {
         return "path";
     }
@@ -192,7 +192,7 @@ static char const* parseFiles(tr_info* inf, tr_variant* files, tr_variant const*
                 break;
             }
 
-            if (!getfile(&inf->files[i].subpath, root_name, path, buf))
+            if (!getfile(&inf->files[i].subpath_, root_name, path, buf))
             {
                 errstr = "path";
                 break;
@@ -204,7 +204,7 @@ static char const* parseFiles(tr_info* inf, tr_variant* files, tr_variant const*
                 break;
             }
 
-            inf->files[i].size = len;
+            inf->files[i].size_ = len;
             inf->totalSize += len;
         }
     }
@@ -212,8 +212,8 @@ static char const* parseFiles(tr_info* inf, tr_variant* files, tr_variant const*
     {
         inf->isFolder = false;
         inf->files.resize(1);
-        inf->files[0].subpath = root_name;
-        inf->files[0].size = len;
+        inf->files[0].subpath_ = root_name;
+        inf->files[0].size_ = len;
         inf->totalSize += len;
     }
     else
@@ -358,25 +358,17 @@ static char const* tr_metainfoParseImpl(
                 return "info_hash";
             }
 
-            if (std::size(sv) != std::size(inf->hash))
+            if (std::size(sv) != std::size(inf->hash_))
             {
                 return "info_hash";
             }
 
-            (void)memcpy(std::data(inf->hash), std::data(sv), std::size(sv));
-            tr_sha1_to_string(inf->hash, inf->hashString);
+            std::copy(std::begin(sv), std::end(sv), reinterpret_cast<char*>(std::data(inf->hash_)));
+            inf->info_hash_string_ = tr_sha1_to_string(inf->hash_);
 
             // maybe get the display name
-            if (tr_variantDictFindStrView(d, TR_KEY_display_name, &sv))
-            {
-                tr_free(inf->name);
-                inf->name = tr_strvDup(sv);
-            }
-
-            if (inf->name == nullptr)
-            {
-                inf->name = tr_strdup(inf->hashString);
-            }
+            tr_variantDictFindStrView(d, TR_KEY_display_name, &sv);
+            inf->setName(!std::empty(sv) ? sv : inf->info_hash_string_);
         }
         else // not a magnet link and has no info dict...
         {
@@ -392,8 +384,8 @@ static char const* tr_metainfoParseImpl(
             return "hash";
         }
 
-        inf->hash = *hash;
-        tr_sha1_to_string(inf->hash, inf->hashString);
+        inf->hash_ = *hash;
+        inf->info_hash_string_ = tr_sha1_to_string(inf->hash_);
 
         if (info_dict_size != nullptr)
         {
@@ -415,8 +407,7 @@ static char const* tr_metainfoParseImpl(
             return "name";
         }
 
-        tr_free(inf->name);
-        inf->name = tr_utf8clean(sv);
+        inf->name_ = tr_strvUtf8Clean(sv);
     }
 
     /* comment */
@@ -425,8 +416,7 @@ static char const* tr_metainfoParseImpl(
         sv = ""sv;
     }
 
-    tr_free(inf->comment);
-    inf->comment = tr_utf8clean(sv);
+    inf->comment_ = tr_strvUtf8Clean(sv);
 
     /* created by */
     if (!tr_variantDictFindStrView(meta, TR_KEY_created_by_utf_8, &sv) &&
@@ -435,13 +425,12 @@ static char const* tr_metainfoParseImpl(
         sv = ""sv;
     }
 
-    tr_free(inf->creator);
-    inf->creator = tr_utf8clean(sv);
+    inf->creator_ = tr_strvUtf8Clean(sv);
 
     /* creation date */
     i = 0;
     (void)!tr_variantDictFindInt(meta, TR_KEY_creation_date, &i);
-    inf->dateCreated = i;
+    inf->date_created_ = i;
 
     /* private */
     if (!tr_variantDictFindInt(infoDict, TR_KEY_private, &i) && !tr_variantDictFindInt(meta, TR_KEY_private, &i))
@@ -457,8 +446,7 @@ static char const* tr_metainfoParseImpl(
         sv = ""sv;
     }
 
-    tr_free(inf->source);
-    inf->source = tr_utf8clean(sv);
+    inf->source_ = tr_strvUtf8Clean(sv);
 
     /* piece length */
     if (!isMagnet)
@@ -520,8 +508,7 @@ static char const* tr_metainfoParseImpl(
     geturllist(inf, meta);
 
     /* filename of Transmission's copy */
-    tr_free(inf->torrent);
-    inf->torrent = session != nullptr ? tr_strvDup(getTorrentFilename(session, inf, TR_METAINFO_BASENAME_HASH)) : nullptr;
+    inf->torrent_file_ = session != nullptr ? getTorrentFilename(session, inf, TR_METAINFO_BASENAME_HASH) : ""sv;
 
     return nullptr;
 }
@@ -551,18 +538,8 @@ void tr_metainfoFree(tr_info* inf)
         }
     }
 
-    tr_free(inf->comment);
-    tr_free(inf->creator);
-    tr_free(inf->name);
-    tr_free(inf->source);
-    tr_free(inf->torrent);
     tr_free(inf->webseeds);
 
-    inf->comment = nullptr;
-    inf->creator = nullptr;
-    inf->name = nullptr;
-    inf->source = nullptr;
-    inf->torrent = nullptr;
     inf->webseeds = nullptr;
 
     inf->announce_list.reset();
@@ -589,7 +566,7 @@ void tr_metainfoMigrateFile(
     if (tr_sys_path_rename(old_filename.c_str(), new_filename.c_str(), nullptr))
     {
         tr_logAddNamedError(
-            info->name,
+            info->name().c_str(),
             "Migrated torrent file from \"%s\" to \"%s\"",
             old_filename.c_str(),
             new_filename.c_str());
