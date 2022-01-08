@@ -164,13 +164,6 @@ std::optional<T> tr_parseNum(std::string_view& sv)
 
 #endif // #if defined(__GNUC__) && !__has_include(<charconv>)
 
-/**
- * @brief make a copy of 'str' whose non-utf8 content has been corrected or stripped
- * @return a newly-allocated string that must be freed with tr_free()
- * @param str the string to make a clean copy of
- */
-char* tr_utf8clean(std::string_view str) TR_GNUC_MALLOC;
-
 bool tr_utf8_validate(std::string_view sv, char const** endptr);
 
 #ifdef _WIN32
