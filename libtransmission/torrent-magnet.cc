@@ -150,10 +150,10 @@ static void ensureInfoDictOffsetIsCached(tr_torrent* tor)
 {
     TR_ASSERT(tor->hasMetadata());
 
-    if (!tor->infoDictOffsetIsCached)
+    if (!tor->info_dict_offset_is_cached)
     {
-        tor->infoDictOffset = findInfoDictOffset(tor);
-        tor->infoDictOffsetIsCached = true;
+        tor->info_dict_offset = findInfoDictOffset(tor);
+        tor->info_dict_offset_is_cached = true;
     }
 }
 
@@ -176,13 +176,13 @@ void* tr_torrentGetMetadataPiece(tr_torrent* tor, int piece, size_t* len)
 
     ensureInfoDictOffsetIsCached(tor);
 
-    auto const info_dict_length = tor->infoDictLength();
-    TR_ASSERT(info_dict_length > 0);
+    auto const info_dict_size = tor->infoDictSize();
+    TR_ASSERT(info_dict_size > 0);
 
     char* ret = nullptr;
-    if (size_t o = piece * METADATA_PIECE_SIZE; tr_sys_file_seek(fd, tor->infoDictOffset + o, TR_SEEK_SET, nullptr, nullptr))
+    if (size_t o = piece * METADATA_PIECE_SIZE; tr_sys_file_seek(fd, tor->infoDictOffset() + o, TR_SEEK_SET, nullptr, nullptr))
     {
-        size_t const l = o + METADATA_PIECE_SIZE <= info_dict_length ? METADATA_PIECE_SIZE : info_dict_length - o;
+        size_t const l = o + METADATA_PIECE_SIZE <= info_dict_size ? METADATA_PIECE_SIZE : info_dict_size - o;
 
         if (0 < l && l <= METADATA_PIECE_SIZE)
         {

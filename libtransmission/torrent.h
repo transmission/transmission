@@ -479,9 +479,14 @@ public:
         return fileCount() > 0;
     }
 
-    [[nodiscard]] auto infoDictLength() const
+    [[nodiscard]] auto infoDictSize() const
     {
-        return this->info_dict_length;
+        return this->info_dict_size;
+    }
+
+    [[nodiscard]] auto infoDictOffset() const
+    {
+        return this->info_dict_offset;
     }
 
     /// METAINFO - CHECKSUMS
@@ -642,13 +647,15 @@ public:
     tr_interned_string current_dir;
 
     /* Length, in bytes, of the "info" dict in the .torrent file. */
-    uint64_t info_dict_length = 0;
+    uint64_t info_dict_size = 0;
 
     /* Offset, in bytes, of the beginning of the "info" dict in the .torrent file.
      *
      * Used by the torrent-magnet code for serving metainfo to peers.
      * This field is lazy-generated and might not be initialized yet. */
-    size_t infoDictOffset = 0;
+    uint64_t info_dict_offset = 0;
+
+    bool info_dict_offset_is_cached = false;
 
     tr_completeness completeness = TR_LEECH;
 
@@ -707,9 +714,6 @@ public:
 
     bool prefetchMagnetMetadata = false;
     bool magnetVerify = false;
-
-    // TODO(ckerr) use std::optional
-    bool infoDictOffsetIsCached = false;
 
     void setDirty()
     {

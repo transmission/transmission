@@ -3074,7 +3074,7 @@ void tr_torrent::swapMetainfo(tr_metainfo_parsed& parsed)
 {
     std::swap(this->info, parsed.info);
     std::swap(this->piece_checksums_, parsed.pieces);
-    std::swap(this->info_dict_length, parsed.info_dict_length);
+    std::swap(this->info_dict_size, parsed.info_dict_size);
 }
 
 void tr_torrentSetFilePriorities(

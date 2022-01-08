@@ -333,7 +333,7 @@ static char const* tr_metainfoParseImpl(
     tr_session const* session,
     tr_info* inf,
     std::vector<tr_sha1_digest_t>* pieces,
-    uint64_t* infoDictLength,
+    uint64_t* info_dict_size,
     tr_variant const* meta_in)
 {
     int64_t i = 0;
@@ -395,9 +395,9 @@ static char const* tr_metainfoParseImpl(
         inf->hash = *hash;
         tr_sha1_to_string(inf->hash, inf->hashString);
 
-        if (infoDictLength != nullptr)
+        if (info_dict_size != nullptr)
         {
-            *infoDictLength = std::size(benc);
+            *info_dict_size = std::size(benc);
         }
     }
 
@@ -530,7 +530,7 @@ std::optional<tr_metainfo_parsed> tr_metainfoParse(tr_session const* session, tr
 {
     auto out = tr_metainfo_parsed{};
 
-    char const* bad_tag = tr_metainfoParseImpl(session, &out.info, &out.pieces, &out.info_dict_length, meta_in);
+    char const* bad_tag = tr_metainfoParseImpl(session, &out.info, &out.pieces, &out.info_dict_size, meta_in);
     if (bad_tag != nullptr)
     {
         tr_error_set(error, TR_ERROR_EINVAL, tr_strvJoin("Error parsing metainfo: "sv, bad_tag));
