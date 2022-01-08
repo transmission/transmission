@@ -37,7 +37,7 @@ enum tr_metainfo_basename_format
 struct tr_metainfo_parsed
 {
     tr_info info = {};
-    uint64_t info_dict_length = 0;
+    uint64_t info_dict_size = 0;
     std::vector<tr_sha1_digest_t> pieces;
     tr_bitfield files_renamed = tr_bitfield{ 0 };
 
@@ -47,7 +47,7 @@ struct tr_metainfo_parsed
     {
         std::swap(this->info, that.info);
         std::swap(this->pieces, that.pieces);
-        std::swap(this->info_dict_length, that.info_dict_length);
+        std::swap(this->info_dict_size, that.info_dict_size);
     }
 
     tr_metainfo_parsed(tr_metainfo_parsed const&) = delete;
