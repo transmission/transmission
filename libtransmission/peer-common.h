@@ -13,9 +13,10 @@
 #endif
 
 #include "transmission.h"
+
 #include "bitfield.h"
 #include "history.h"
-#include "quark.h"
+#include "interned-string.h"
 
 /**
  * @addtogroup peers Peers

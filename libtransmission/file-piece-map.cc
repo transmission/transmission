@@ -59,7 +59,7 @@ void tr_file_piece_map::reset(tr_info const& info)
     {
         file_sizes[i] = info.fileSize(i);
     }
-    reset({ info.totalSize, info.pieceSize }, std::data(file_sizes), std::size(file_sizes));
+    reset({ info.totalSize(), info.pieceSize() }, std::data(file_sizes), std::size(file_sizes));
 }
 
 tr_file_piece_map::piece_span_t tr_file_piece_map::pieceSpan(tr_file_index_t file) const

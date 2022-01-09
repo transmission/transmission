@@ -55,8 +55,8 @@ TEST(MagnetMetainfo, magnetParse)
         EXPECT_EQ(1, it->tier);
         EXPECT_EQ("http://tracker.opentracker.org/announce", it->announce.full);
         EXPECT_EQ("http://tracker.opentracker.org/scrape", it->scrape.full);
-        EXPECT_EQ(1, std::size(mm.webseeds()));
-        EXPECT_EQ("http://server.webseed.org/path/to/file"sv, mm.webseeds().front());
+        EXPECT_EQ(1, mm.webseedCount());
+        EXPECT_EQ("http://server.webseed.org/path/to/file"sv, mm.webseed(0));
         EXPECT_EQ("Display Name"sv, mm.name());
         EXPECT_EQ(ExpectedHash, mm.infoHash());
     }

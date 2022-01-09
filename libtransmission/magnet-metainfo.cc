@@ -239,14 +239,14 @@ void tr_magnet_metainfo::toVariant(tr_variant* top) const
     }
 
     // webseeds
-    n = std::size(this->webseeds());
+    n = this->webseedCount();
     if (n != 0)
     {
         tr_variant* list = tr_variantDictAddList(top, TR_KEY_url_list, n);
 
-        for (auto& url : this->webseeds())
+        for (size_t i = 0; i < n; ++i)
         {
-            tr_variantListAddStr(list, url);
+            tr_variantListAddStr(list, this->webseed(i));
         }
     }
 

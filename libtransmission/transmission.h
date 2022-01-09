@@ -21,7 +21,9 @@
 ***/
 
 #include <memory>
+#include <string>
 #include <string_view>
+#include <vector>
 
 #include <stdbool.h> /* bool */
 #include <stddef.h> /* size_t */
@@ -40,8 +42,6 @@ using tr_tracker_tier_t = uint32_t;
 using tr_tracker_id_t = uint32_t;
 using tr_byte_index_t = uint64_t;
 
-#include "announce-list.h"
-
 struct tr_block_span_t
 {
     tr_block_index_t begin;
@@ -53,6 +53,8 @@ struct tr_byte_span_t
     uint64_t begin;
     uint64_t end;
 };
+
+class tr_announce_list;
 
 struct tr_ctor;
 struct tr_error;
@@ -1511,31 +1513,44 @@ struct tr_file
 /** @brief information about a torrent that comes from its metainfo file */
 struct tr_info
 {
-    /* total size of the torrent, in bytes */
-    uint64_t totalSize;
-
-    /* The torrent's name. */
-    std::string name_;
-
-    /* Path to torrent Transmission's internal copy of the .torrent file. */
-    std::string torrent_file_;
-
-    char** webseeds;
-
-    std::string comment_;
-    std::string creator_;
-
-    /* torrent's source. empty if not set. */
-    std::string source_;
-
-    auto const& torrentFile() const
+    auto totalSize() const
     {
-        return torrent_file_;
+        return total_size_;
+    }
+
+    auto pieceSize() const
+    {
+        return piece_size_;
+    }
+
+    auto pieceCount() const
+    {
+        return piece_count_;
+    }
+
+    auto dateCreated() const
+    {
+        return date_created_;
+    }
+
+    auto const& infoHash() const
+    {
+        return hash_;
+    }
+
+    auto const& infoHashString() const
+    {
+        return info_hash_string_;
     }
 
     auto const& name() const
     {
         return name_;
+    }
+
+    void setName(std::string_view name)
+    {
+        name_ = name;
     }
 
     auto const& creator() const
@@ -1553,23 +1568,19 @@ struct tr_info
         return source_;
     }
 
-    auto const& infoHash() const
+    auto const& torrentFile() const
     {
-        return hash_;
+        return torrent_file_;
     }
-
-    void setName(std::string_view name)
-    {
-        name_ = name;
-    }
-
-    // Private.
-    // Use tr_torrentFile() and tr_torrentFileCount() instead.
-    std::vector<tr_file> files;
 
     tr_file_index_t fileCount() const
     {
         return std::size(files);
+    }
+
+    auto fileSize(tr_file_index_t i) const
+    {
+        return files[i].size_;
     }
 
     std::string const& fileSubpath(tr_file_index_t i) const
@@ -1582,38 +1593,36 @@ struct tr_info
         files[i].subpath_ = subpath;
     }
 
-    auto fileSize(tr_file_index_t i) const
+    auto webseedCount() const
     {
-        return files[i].size_;
+        return std::size(webseeds_);
     }
 
-    auto const& infoHashString() const
+    auto const& webseed(size_t i) const
     {
-        return info_hash_string_;
+        return webseeds_[i];
     }
 
-    auto dateCreated() const
+    auto isPrivate() const
     {
-        return date_created_;
+        return is_private_;
     }
 
-    // TODO(ckerr) aggregate this directly, rather than  using a shared_ptr, when tr_info is private
-    std::shared_ptr<tr_announce_list> announce_list;
-
-    /* Torrent info */
-    time_t date_created_;
-
-    unsigned int webseedCount;
-    uint32_t pieceSize;
-    tr_piece_index_t pieceCount;
-
-    /* General info */
     tr_sha1_digest_t hash_;
+    std::shared_ptr<tr_announce_list> announce_list;
+    std::vector<tr_file> files;
+    std::vector<std::string> webseeds_;
+    std::string comment_;
+    std::string creator_;
     std::string info_hash_string_;
-
-    /* Flags */
-    bool isPrivate;
-    bool isFolder;
+    std::string name_;
+    std::string source_;
+    std::string torrent_file_;
+    uint64_t total_size_ = 0;
+    tr_piece_index_t piece_count_ = 0;
+    time_t date_created_ = 0;
+    uint32_t piece_size_ = 0;
+    bool is_private_ = false;
 };
 
 bool tr_torrentHasMetadata(tr_torrent const* tor);

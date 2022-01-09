@@ -133,7 +133,7 @@ OSStatus GeneratePreviewForURL(void* thisInterface, QLPreviewRequestRef preview,
 
     NSMutableArray* lists = [NSMutableArray array];
 
-    auto const n_webseeds = std::size(metainfo.webseeds());
+    auto const n_webseeds = metainfo.webseedCount();
     if (n_webseeds > 0)
     {
         NSMutableString* listSection = [NSMutableString string];
@@ -145,9 +145,9 @@ OSStatus GeneratePreviewForURL(void* thisInterface, QLPreviewRequestRef preview,
                                        [NSString formattedUInteger:n_webseeds]];
         [listSection appendFormat:@"<tr><th>%@</th></tr>", headerTitleString];
 
-        for (auto const& url : metainfo.webseeds())
+        for (size_t i = 0; i < n_webseeds; ++i)
         {
-            [listSection appendFormat:@"<tr><td>%s<td></tr>", url.c_str()];
+            [listSection appendFormat:@"<tr><td>%s<td></tr>", metainfo.webseed(i).c_str()];
         }
 
         [listSection appendString:@"</table>"];
