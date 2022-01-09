@@ -36,17 +36,6 @@ tr_piece_index_t getBytePiece(tr_torrent_metainfo const& tm, uint64_t byte_offse
 }
 #endif
 
-#if 0
-std::string tr_new_magnet_metainfo::makeFilename(std::string_view dirname, FilenameFormat format, std::string_view suffix) const
-{
-    // `${dirname}/${name}.${info_hash}${suffix}`
-    // `${dirname}/${info_hash}${suffix}`
-    return format == FilenameFormat::NameAndParitalHash ?
-        tr_strvJoin(dirname, "/"sv, this->name, "."sv, this->infoHashString().substr(0, 16), suffix) :
-        tr_strvJoin(dirname, "/"sv, this->infoHashString(), suffix);
-}
-#endif
-
 /// tr_torrent_metainfo
 
 //// C BINDINGS
@@ -194,25 +183,6 @@ void tr_metainfoDestruct(tr_info* inf)
     tr_free(inf->trackers);
 
     memset(inf, '\0', sizeof(tr_info));
-}
-
-void tr_metainfoMigrateFile(
-    tr_session const* session,
-    tr_info const* info,
-    enum tr_metainfo_basename_format old_format,
-    enum tr_metainfo_basename_format new_format)
-{
-    auto const old_filename = getTorrentFilename(session, info, old_format);
-    auto const new_filename = getTorrentFilename(session, info, new_format);
-
-    if (tr_sys_path_rename(old_filename.c_str(), new_filename.c_str(), nullptr))
-    {
-        tr_logAddNamedError(
-            info->name,
-            "Migrated torrent file from \"%s\" to \"%s\"",
-            old_filename.c_str(),
-            new_filename.c_str());
-    }
 }
 #endif
 

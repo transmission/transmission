@@ -538,22 +538,3 @@ void tr_metainfoFree(tr_info* inf)
 
     inf->announce_list.reset();
 }
-
-void tr_metainfoMigrateFile(
-    tr_session const* session,
-    tr_info const* info,
-    tr_magnet_metainfo::BasenameFormat old_format,
-    tr_magnet_metainfo::BasenameFormat new_format)
-{
-    auto const old_filename = getTorrentFilename(session, info, old_format);
-    auto const new_filename = getTorrentFilename(session, info, new_format);
-
-    if (tr_sys_path_rename(old_filename.c_str(), new_filename.c_str(), nullptr))
-    {
-        tr_logAddNamedError(
-            info->name().c_str(),
-            "Migrated torrent file from \"%s\" to \"%s\"",
-            old_filename.c_str(),
-            new_filename.c_str());
-    }
-}

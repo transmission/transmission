@@ -57,11 +57,5 @@ struct tr_metainfo_parsed
 
 std::optional<tr_metainfo_parsed> tr_metainfoParse(tr_session const* session, tr_variant const* variant, tr_error** error);
 
-void tr_metainfoMigrateFile(
-    tr_session const* session,
-    tr_info const* info,
-    tr_magnet_metainfo::BasenameFormat old_format,
-    tr_magnet_metainfo::BasenameFormat new_format);
-
 /** @brief Private function that's exposed here only for unit tests */
 bool tr_metainfoAppendSanitizedPathComponent(std::string& out, std::string_view in);

@@ -632,6 +632,29 @@ static void callScriptIfEnabled(tr_torrent const* tor, TrScript type)
 
 static void refreshCurrentDir(tr_torrent* tor);
 
+static void migrateFile(
+    tr_torrent const* tor,
+    tr_magnet_metainfo::BasenameFormat old_format,
+    tr_magnet_metainfo::BasenameFormat new_format)
+{
+    auto const torrent_dir = tor->session->torrent_dir;
+    auto const& name = tor->name();
+    auto const& hash_string = tor->infoHashString();
+    auto const suffix = "torrent"sv;
+
+    auto const old_filename = tr_magnet_metainfo::makeFilename(torrent_dir, name, hash_string, old_format, suffix);
+    auto const new_filename = tr_magnet_metainfo::makeFilename(torrent_dir, name, hash_string, new_format, suffix);
+
+    if (tr_sys_path_rename(old_filename.c_str(), new_filename.c_str(), nullptr))
+    {
+        tr_logAddNamedError(
+            tor->name().c_str(),
+            "Migrated torrent file from \"%s\" to \"%s\"",
+            old_filename.c_str(),
+            new_filename.c_str());
+    }
+}
+
 static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
 {
     static auto next_unique_id = int{ 1 };
@@ -689,11 +712,7 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
     if (didRenameResumeFileToHashOnlyName)
     {
         /* Rename torrent file as well */
-        tr_metainfoMigrateFile(
-            session,
-            &tor->info,
-            tr_magnet_metainfo::BasenameFormat::NameAndPartialHash,
-            tr_magnet_metainfo::BasenameFormat::Hash);
+        migrateFile(tor, tr_magnet_metainfo::BasenameFormat::NameAndPartialHash, tr_magnet_metainfo::BasenameFormat::Hash);
     }
 
     tor->completeness = tor->completion.status();
