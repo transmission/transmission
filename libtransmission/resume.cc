@@ -17,6 +17,7 @@
 #include "error.h"
 #include "file.h"
 #include "log.h"
+#include "magnet-metainfo.h"
 #include "metainfo.h" /* tr_metainfoGetBasename() */
 #include "peer-mgr.h" /* pex */
 #include "platform.h" /* tr_getResumeDir() */
