@@ -227,6 +227,91 @@ static int getPieceLength(struct tr_incomplete_metadata const* m, int piece)
         METADATA_PIECE_SIZE;
 }
 
+static bool useNewMetainfo(tr_torrent* tor, tr_incomplete_metadata* m)
+{
+    auto const sha1 = tr_sha1(std::string_view{ m->metadata, m->metadata_size });
+    bool const checksum_passed = sha1 && *sha1 == tor->infoHash();
+    if (!checksum_passed)
+    {
+        return false;
+    }
+
+    // checksum passed; now try to parse it as benc
+    auto infoDict = tr_variant{};
+    auto const metadata_sv = std::string_view{ m->metadata, m->metadata_size };
+    auto const metainfoParsed = tr_variantFromBuf(&infoDict, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, metadata_sv);
+    if (!metainfoParsed)
+    {
+        return false;
+    }
+
+    // yay we have bencoded metainfo... merge it into our .torrent file
+    auto success = bool{ false };
+    tr_variant newMetainfo;
+    auto const path = tor->torrentFile();
+
+    if (tr_variantFromFile(&newMetainfo, TR_VARIANT_PARSE_BENC, path, nullptr))
+    {
+        // remove any old .torrent and .resume files
+        tr_sys_path_remove(path.c_str(), nullptr);
+        tr_torrentRemoveResume(tor);
+
+        dbgmsg(tor, "Saving completed metadata to \"%s\"", path.c_str());
+        tr_variantMergeDicts(tr_variantDictAddDict(&newMetainfo, TR_KEY_info, 0), &infoDict);
+
+        auto info = tr_metainfoParse(tor->session, &newMetainfo, nullptr);
+        success = !!info;
+        if (info && tr_block_info::bestBlockSize(info->info.pieceSize()) == 0)
+        {
+            tor->setLocalError(_("Magnet torrent's metadata is not usable"));
+            success = false;
+        }
+
+        if (success)
+        {
+            // tor should keep this metainfo
+            tor->swapMetainfo(*info);
+
+            // save the new .torrent file
+            tr_variantToFile(&newMetainfo, TR_VARIANT_FMT_BENC, tor->torrentFile());
+            tr_torrentGotNewInfoDict(tor);
+            tor->setDirty();
+        }
+
+        tr_variantFree(&newMetainfo);
+    }
+
+    tr_variantFree(&infoDict);
+
+    return success;
+}
+
+static void onHaveAllMetainfo(tr_torrent* tor, tr_incomplete_metadata* m)
+{
+    if (useNewMetainfo(tor, m))
+    {
+        incompleteMetadataFree(tor->incompleteMetadata);
+        tor->incompleteMetadata = nullptr;
+        tor->isStopping = true;
+        tor->magnetVerify = true;
+        tor->startAfterVerify = !tor->prefetchMagnetMetadata;
+        tor->markEdited();
+    }
+    else /* drat. */
+    {
+        int const n = m->pieceCount;
+
+        for (int i = 0; i < n; ++i)
+        {
+            m->piecesNeeded[i].piece = i;
+            m->piecesNeeded[i].requestedAt = 0;
+        }
+
+        m->piecesNeededCount = n;
+        dbgmsg(tor, "metadata error; trying again. %d pieces left", n);
+    }
+}
+
 void tr_torrentSetMetadataPiece(tr_torrent* tor, int piece, void const* data, int len)
 {
     TR_ASSERT(tr_isTorrent(tor));
@@ -236,7 +321,7 @@ void tr_torrentSetMetadataPiece(tr_torrent* tor, int piece, void const* data, in
     dbgmsg(tor, "got metadata piece %d of %d bytes", piece, len);
 
     // are we set up to download metadata?
-    struct tr_incomplete_metadata* const m = tor->incompleteMetadata;
+    tr_incomplete_metadata* const m = tor->incompleteMetadata;
     if (m == nullptr)
     {
         return;
@@ -272,84 +357,8 @@ void tr_torrentSetMetadataPiece(tr_torrent* tor, int piece, void const* data, in
     /* are we done? */
     if (m->piecesNeededCount == 0)
     {
-        bool success = false;
-        bool metainfoParsed = false;
-
-        /* we've got a complete set of metainfo... see if it passes the checksum test */
         dbgmsg(tor, "metainfo piece %d was the last one", piece);
-        auto const sha1 = tr_sha1(std::string_view{ m->metadata, m->metadata_size });
-        bool const checksum_passed = sha1 && *sha1 == tor->infoHash();
-        if (checksum_passed)
-        {
-            /* checksum passed; now try to parse it as benc */
-            auto infoDict = tr_variant{};
-            auto const metadata_sv = std::string_view{ m->metadata, m->metadata_size };
-            metainfoParsed = tr_variantFromBuf(&infoDict, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, metadata_sv);
-            if (metainfoParsed)
-            {
-                /* yay we have bencoded metainfo... merge it into our .torrent file */
-                tr_variant newMetainfo;
-                auto const path = tor->torrentFile();
-
-                if (tr_variantFromFile(&newMetainfo, TR_VARIANT_PARSE_BENC, path, nullptr))
-                {
-                    /* remove any old .torrent and .resume files */
-                    tr_sys_path_remove(path.c_str(), nullptr);
-                    tr_torrentRemoveResume(tor);
-
-                    dbgmsg(tor, "Saving completed metadata to \"%s\"", path.c_str());
-                    tr_variantMergeDicts(tr_variantDictAddDict(&newMetainfo, TR_KEY_info, 0), &infoDict);
-
-                    auto info = tr_metainfoParse(tor->session, &newMetainfo, nullptr);
-                    success = !!info;
-                    if (info && tr_block_info::bestBlockSize(info->info.pieceSize()) == 0)
-                    {
-                        tor->setLocalError(_("Magnet torrent's metadata is not usable"));
-                        success = false;
-                    }
-
-                    if (success)
-                    {
-                        /* tor should keep this metainfo */
-                        tor->swapMetainfo(*info);
-
-                        /* save the new .torrent file */
-                        tr_variantToFile(&newMetainfo, TR_VARIANT_FMT_BENC, tor->torrentFile());
-                        tr_torrentGotNewInfoDict(tor);
-                        tor->setDirty();
-                    }
-
-                    tr_variantFree(&newMetainfo);
-                }
-
-                tr_variantFree(&infoDict);
-            }
-        }
-
-        if (success)
-        {
-            incompleteMetadataFree(tor->incompleteMetadata);
-            tor->incompleteMetadata = nullptr;
-            tor->isStopping = true;
-            tor->magnetVerify = true;
-            tor->startAfterVerify = !tor->prefetchMagnetMetadata;
-            tor->markEdited();
-        }
-        else /* drat. */
-        {
-            int const n = m->pieceCount;
-
-            for (int i = 0; i < n; ++i)
-            {
-                m->piecesNeeded[i].piece = i;
-                m->piecesNeeded[i].requestedAt = 0;
-            }
-
-            m->piecesNeededCount = n;
-            dbgmsg(tor, "metadata error; trying again. %d pieces left", n);
-
-            tr_logAddError("magnet status: checksum passed %d, metainfo parsed %d", (int)checksum_passed, (int)metainfoParsed);
-        }
+        onHaveAllMetainfo(tor, m);
     }
 }
 
