@@ -302,7 +302,7 @@ void tr_torrentSetMetadataPiece(tr_torrent* tor, int piece, void const* data, in
 
                     auto info = tr_metainfoParse(tor->session, &newMetainfo, nullptr);
                     success = !!info;
-                    if (info && tr_block_info::bestBlockSize(info->info.pieceSize) == 0)
+                    if (info && tr_block_info::bestBlockSize(info->info.pieceSize()) == 0)
                     {
                         tor->setLocalError(_("Magnet torrent's metadata is not usable"));
                         success = false;
@@ -409,10 +409,10 @@ char* tr_torrentInfoGetMagnetLink(tr_info const* inf)
         tr_http_escape(buf, inf->announce_list->at(i).announce.full, true);
     }
 
-    for (unsigned int i = 0; i < inf->webseedCount; i++)
+    for (size_t i = 0, n = inf->webseedCount(); i < n; ++i)
     {
         buf += "&ws="sv;
-        tr_http_escape(buf, inf->webseeds[i], true);
+        tr_http_escape(buf, inf->webseed(i), true);
     }
 
     return tr_strvDup(buf);

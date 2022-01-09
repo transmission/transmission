@@ -34,9 +34,15 @@ public:
     {
         return name_;
     }
-    auto const& webseeds() const
+
+    auto webseedCount() const
     {
-        return webseed_urls_;
+        return std::size(webseed_urls_);
+    }
+
+    auto const& webseed(size_t i) const
+    {
+        return webseed_urls_[i];
     }
 
     auto& announceList()

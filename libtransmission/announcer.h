@@ -16,7 +16,7 @@
 
 #include "transmission.h"
 
-#include "quark.h"
+#include "interned-string.h"
 
 struct tr_announcer;
 struct tr_announcer_tiers;

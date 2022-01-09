@@ -561,7 +561,7 @@ static void tr_torrentFireMetadataCompleted(tr_torrent* tor);
 
 static void torrentInitFromInfoDict(tr_torrent* tor)
 {
-    tor->block_info.initSizes(tor->info.totalSize, tor->info.pieceSize);
+    tor->block_info.initSizes(tor->info.totalSize(), tor->info.pieceSize());
     tor->completion = tr_completion{ tor, &tor->block_info };
     auto const obfuscated = tr_sha1("req2"sv, tor->infoHash());
     if (obfuscated)

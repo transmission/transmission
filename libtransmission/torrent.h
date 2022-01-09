@@ -109,7 +109,7 @@ struct tr_torrent : public tr_completion::torrent_view
 {
 public:
     explicit tr_torrent(tr_info const& inf)
-        : block_info{ inf.totalSize, inf.pieceSize }
+        : block_info{ inf.totalSize(), inf.pieceSize() }
         , completion{ this, &this->block_info }
     {
     }
@@ -435,14 +435,12 @@ public:
 
     [[nodiscard]] auto webseedCount() const
     {
-        return info.webseedCount;
+        return info.webseedCount();
     }
 
     [[nodiscard]] auto const& webseed(size_t i) const
     {
-        TR_ASSERT(i < webseedCount());
-
-        return info.webseeds[i];
+        return info.webseed(i);
     }
 
     /// METAINFO - OTHER
@@ -461,7 +459,7 @@ public:
 
     [[nodiscard]] auto isPrivate() const
     {
-        return this->info.isPrivate;
+        return this->info.isPrivate();
     }
 
     [[nodiscard]] auto isPublic() const

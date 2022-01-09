@@ -151,7 +151,7 @@ static bool getfile(std::string* setme, std::string_view root, tr_variant* path,
 static char const* parseFiles(tr_info* inf, tr_variant* files, tr_variant const* length)
 {
     int64_t len = 0;
-    inf->totalSize = 0;
+    inf->total_size_ = 0;
 
     auto root_name = std::string{};
     if (!tr_metainfoAppendSanitizedPathComponent(root_name, inf->name()))
@@ -166,7 +166,6 @@ static char const* parseFiles(tr_info* inf, tr_variant* files, tr_variant const*
         auto buf = std::string{};
         errstr = nullptr;
 
-        inf->isFolder = true;
         tr_file_index_t const n = tr_variantListSize(files);
         inf->files.resize(n);
         for (tr_file_index_t i = 0; i < n; ++i)
@@ -199,16 +198,15 @@ static char const* parseFiles(tr_info* inf, tr_variant* files, tr_variant const*
             }
 
             inf->files[i].size_ = len;
-            inf->totalSize += len;
+            inf->total_size_ += len;
         }
     }
     else if (tr_variantGetInt(length, &len)) /* single-file mode */
     {
-        inf->isFolder = false;
         inf->files.resize(1);
         inf->files[0].subpath_ = root_name;
         inf->files[0].size_ = len;
-        inf->totalSize += len;
+        inf->total_size_ += len;
     }
     else
     {
@@ -289,24 +287,22 @@ static char* fix_webseed_url(tr_info const* inf, std::string_view url)
 
 static void geturllist(tr_info* inf, tr_variant* meta)
 {
-    tr_variant* urls = nullptr;
-    auto url = std::string_view{};
+    inf->webseeds_.clear();
 
+    auto url = std::string_view{};
+    tr_variant* urls = nullptr;
     if (tr_variantDictFindList(meta, TR_KEY_url_list, &urls))
     {
         int const n = tr_variantListSize(urls);
 
-        inf->webseedCount = 0;
-        inf->webseeds = tr_new0(char*, n);
-
-        for (int i = 0; i < n; i++)
+        for (int i = 0; i < n; ++i)
         {
             if (tr_variantGetStrView(tr_variantListChild(urls, i), &url))
             {
                 char* const fixed_url = fix_webseed_url(inf, url);
                 if (fixed_url != nullptr)
                 {
-                    inf->webseeds[inf->webseedCount++] = fixed_url;
+                    inf->webseeds_.emplace_back(fixed_url);
                 }
             }
         }
@@ -316,9 +312,7 @@ static void geturllist(tr_info* inf, tr_variant* meta)
         char* const fixed_url = fix_webseed_url(inf, url);
         if (fixed_url != nullptr)
         {
-            inf->webseedCount = 1;
-            inf->webseeds = tr_new0(char*, 1);
-            inf->webseeds[0] = fixed_url;
+            inf->webseeds_.emplace_back(fixed_url);
         }
     }
 }
@@ -432,7 +426,7 @@ static char const* tr_metainfoParseImpl(
         i = 0;
     }
 
-    inf->isPrivate = i != 0;
+    inf->is_private_ = i != 0;
 
     /* source */
     if (!tr_variantDictFindStrView(infoDict, TR_KEY_source, &sv) && !tr_variantDictFindStrView(meta, TR_KEY_source, &sv))
@@ -450,7 +444,7 @@ static char const* tr_metainfoParseImpl(
             return "piece length";
         }
 
-        inf->pieceSize = i;
+        inf->piece_size_ = i;
     }
 
     /* pieces and files */
@@ -467,7 +461,7 @@ static char const* tr_metainfoParseImpl(
         }
 
         auto const n_pieces = std::size(sv) / std::size(tr_sha1_digest_t{});
-        inf->pieceCount = n_pieces;
+        inf->piece_count_ = n_pieces;
         pieces->resize(n_pieces);
         std::copy_n(std::data(sv), std::size(sv), reinterpret_cast<uint8_t*>(std::data(*pieces)));
 
@@ -480,12 +474,12 @@ static char const* tr_metainfoParseImpl(
             return errstr;
         }
 
-        if (inf->fileCount() == 0 || inf->totalSize == 0)
+        if (inf->fileCount() == 0 || inf->total_size_ == 0)
         {
             return "files";
         }
 
-        if ((uint64_t)inf->pieceCount != (inf->totalSize + inf->pieceSize - 1) / inf->pieceSize)
+        if ((uint64_t)inf->piece_count_ != (inf->total_size_ + inf->piece_size_ - 1) / inf->piece_size_)
         {
             return "files";
         }
@@ -524,17 +518,6 @@ std::optional<tr_metainfo_parsed> tr_metainfoParse(tr_session const* session, tr
 
 void tr_metainfoFree(tr_info* inf)
 {
-    if (inf->webseeds != nullptr)
-    {
-        for (unsigned int i = 0; i < inf->webseedCount; i++)
-        {
-            tr_free(inf->webseeds[i]);
-        }
-    }
-
-    tr_free(inf->webseeds);
-
-    inf->webseeds = nullptr;
-
+    inf->webseeds_.clear();
     inf->announce_list.reset();
 }
