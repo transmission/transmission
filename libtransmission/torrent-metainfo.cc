@@ -28,21 +28,11 @@
 
 using namespace std::literals;
 
-#if 0
-tr_piece_index_t getBytePiece(tr_torrent_metainfo const& tm, uint64_t byte_offset)
-{
-    // handle 0-byte files at the end of a torrent
-    return byte_offset == tm.total_size ? tm.n_pieces - 1 : byte_offset / tm.piece_size;
-}
-#endif
-
-/// tr_torrent_metainfo
-
 //// C BINDINGS
 
+#if 0
 /// Lifecycle
 
-#if 0
 tr_torrent_metainfo* tr_torrentMetainfoNewFromData(char const* data, size_t data_len, struct tr_error** error)
 {
     auto* tm = new tr_torrent_metainfo{};
@@ -54,9 +44,7 @@ tr_torrent_metainfo* tr_torrentMetainfoNewFromData(char const* data, size_t data
 
     return tm;
 }
-#endif
 
-#if 0
 tr_torrent_metainfo* tr_torrentMetainfoNewFromFile(char const* filename, struct tr_error** error)
 {
     auto* tm = new tr_torrent_metainfo{};
@@ -68,27 +56,21 @@ tr_torrent_metainfo* tr_torrentMetainfoNewFromFile(char const* filename, struct 
 
     return tm;
 }
-#endif
 
-#if 0
 void tr_torrentMetainfoFree(tr_torrent_metainfo* tm)
 {
     delete tm;
 }
-#endif
 
 ////  Accessors
 
-#if 0
 char* tr_torrentMetainfoMagnet(struct tr_torrent_metainfo const* tm)
 {
     return tr_strvDup(tm->magnet());
 }
-#endif
 
 /// Info
 
-#if 0
 tr_torrent_metainfo_info* tr_torrentMetainfoGet(tr_torrent_metainfo const* tm, tr_torrent_metainfo_info* setme)
 {
     setme->comment = tm->comment.c_str();
@@ -103,18 +85,14 @@ tr_torrent_metainfo_info* tr_torrentMetainfoGet(tr_torrent_metainfo const* tm, t
     setme->total_size = tm->total_size;
     return setme;
 }
-#endif
 
 /// Files
 
-#if 0
 size_t tr_torrentMetainfoFileCount(tr_torrent_metainfo const* tm)
 {
     return std::size(tm->files);
 }
-#endif
 
-#if 0
 tr_torrent_metainfo_file_info* tr_torrentMetainfoFile(
     tr_torrent_metainfo const* tm,
     size_t n,
@@ -125,18 +103,14 @@ tr_torrent_metainfo_file_info* tr_torrentMetainfoFile(
     setme->size = file.size;
     return setme;
 }
-#endif
 
 /// Trackers
 
-#if 0
 size_t tr_torrentMetainfoTrackerCount(tr_torrent_metainfo const* tm)
 {
     return std::size(tm->trackers);
 }
-#endif
 
-#if 0
 tr_torrent_metainfo_tracker_info* tr_torrentMetainfoTracker(
     tr_torrent_metainfo const* tm,
     size_t n,
@@ -149,40 +123,6 @@ tr_torrent_metainfo_tracker_info* tr_torrentMetainfoTracker(
     setme->scrape_url = tr_quark_get_string(tracker.scrape_url);
     setme->tier = tracker.tier;
     return setme;
-}
-#endif
-
-#if 0
-void tr_metainfoDestruct(tr_info* inf)
-{
-    for (unsigned int i = 0; i < inf->webseedCount; i++)
-    {
-        tr_free(inf->webseeds[i]);
-    }
-
-    for (tr_file_index_t ff = 0; ff < inf->fileCount; ff++)
-    {
-        tr_free(inf->files[ff].name);
-    }
-
-    tr_free(inf->webseeds);
-    tr_free(inf->files);
-    tr_free(inf->comment);
-    tr_free(inf->creator);
-    tr_free(inf->source);
-    tr_free(inf->torrent);
-    tr_free(inf->originalName);
-    tr_free(inf->name);
-
-    for (unsigned int i = 0; i < inf->trackerCount; i++)
-    {
-        tr_free(inf->trackers[i].announce);
-        tr_free(inf->trackers[i].scrape);
-    }
-
-    tr_free(inf->trackers);
-
-    memset(inf, '\0', sizeof(tr_info));
 }
 #endif
 
