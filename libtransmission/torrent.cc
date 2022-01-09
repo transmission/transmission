@@ -632,6 +632,29 @@ static void callScriptIfEnabled(tr_torrent const* tor, TrScript type)
 
 static void refreshCurrentDir(tr_torrent* tor);
 
+static void migrateFile(
+    tr_torrent const* tor,
+    tr_magnet_metainfo::BasenameFormat old_format,
+    tr_magnet_metainfo::BasenameFormat new_format)
+{
+    auto const torrent_dir = tor->session->torrent_dir;
+    auto const& name = tor->name();
+    auto const& hash_string = tor->infoHashString();
+    auto const suffix = "torrent"sv;
+
+    auto const old_filename = tr_magnet_metainfo::makeFilename(torrent_dir, name, hash_string, old_format, suffix);
+    auto const new_filename = tr_magnet_metainfo::makeFilename(torrent_dir, name, hash_string, new_format, suffix);
+
+    if (tr_sys_path_rename(old_filename.c_str(), new_filename.c_str(), nullptr))
+    {
+        tr_logAddNamedError(
+            tor->name().c_str(),
+            "Migrated torrent file from \"%s\" to \"%s\"",
+            old_filename.c_str(),
+            new_filename.c_str());
+    }
+}
+
 static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
 {
     static auto next_unique_id = int{ 1 };
@@ -689,7 +712,7 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
     if (didRenameResumeFileToHashOnlyName)
     {
         /* Rename torrent file as well */
-        tr_metainfoMigrateFile(session, &tor->info, TR_METAINFO_BASENAME_NAME_AND_PARTIAL_HASH, TR_METAINFO_BASENAME_HASH);
+        migrateFile(tor, tr_magnet_metainfo::BasenameFormat::NameAndPartialHash, tr_magnet_metainfo::BasenameFormat::Hash);
     }
 
     tor->completeness = tor->completion.status();
@@ -1160,15 +1183,15 @@ tr_torrent_view tr_torrentView(tr_torrent const* tor)
     ret.name = tr_torrentName(tor);
     ret.hash_string = tor->infoHashString().c_str();
     ret.torrent_filename = tor->torrentFile().c_str();
-    ret.comment = tor->info.comment().c_str();
-    ret.creator = tor->info.creator().c_str();
-    ret.source = tor->info.source().c_str();
+    ret.comment = tor->comment().c_str();
+    ret.creator = tor->creator().c_str();
+    ret.source = tor->source().c_str();
     ret.total_size = tor->totalSize();
     ret.date_created = tor->dateCreated();
     ret.piece_size = tor->pieceSize();
     ret.n_pieces = tor->pieceCount();
     ret.is_private = tor->isPrivate();
-    ret.is_folder = tor->info.isFolder;
+    ret.is_folder = tor->fileCount() > 1;
 
     return ret;
 }
@@ -1550,7 +1573,7 @@ static void closeTorrent(void* vtor)
 
     if (tor->isDeleting)
     {
-        tr_metainfoRemoveSaved(tor->session, &tor->info);
+        tr_sys_path_remove(tor->torrentFile().c_str(), nullptr);
         tr_torrentRemoveResume(tor);
     }
 
