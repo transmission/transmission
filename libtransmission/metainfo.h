@@ -22,7 +22,6 @@
 #include "transmission.h"
 
 #include "bitfield.h"
-#include "magnet-metainfo.h"
 #include "torrent.h"
 #include "tr-macros.h"
 
