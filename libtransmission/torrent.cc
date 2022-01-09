@@ -1183,15 +1183,15 @@ tr_torrent_view tr_torrentView(tr_torrent const* tor)
     ret.name = tr_torrentName(tor);
     ret.hash_string = tor->infoHashString().c_str();
     ret.torrent_filename = tor->torrentFile().c_str();
-    ret.comment = tor->info.comment().c_str();
-    ret.creator = tor->info.creator().c_str();
-    ret.source = tor->info.source().c_str();
+    ret.comment = tor->comment().c_str();
+    ret.creator = tor->creator().c_str();
+    ret.source = tor->source().c_str();
     ret.total_size = tor->totalSize();
     ret.date_created = tor->dateCreated();
     ret.piece_size = tor->pieceSize();
     ret.n_pieces = tor->pieceCount();
     ret.is_private = tor->isPrivate();
-    ret.is_folder = tor->info.isFolder;
+    ret.is_folder = tor->fileCount() > 1;
 
     return ret;
 }
