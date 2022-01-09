@@ -196,20 +196,6 @@ void tr_metainfoDestruct(tr_info* inf)
     memset(inf, '\0', sizeof(tr_info));
 }
 
-static std::string getTorrentFilename(tr_session const* session, tr_info const* inf, enum tr_metainfo_basename_format format)
-{
-    return tr_buildTorrentFilename(tr_getTorrentDir(session), inf, format, ".torrent"sv);
-}
-
-void tr_metainfoRemoveSaved(tr_session const* session, tr_torrent_metainfo const& metainfo)
-{
-    auto filename = getTorrentFilename(session, inf, tr_torrent_metainfo::FilenameFormat::FullHash);
-    tr_sys_path_remove(filename.c_str(), nullptr);
-
-    filename = getTorrentFilename(session, inf, tr_torrent_metainfo::FilenameFormat::NameAndParitalHash);
-    tr_sys_path_remove(filename.c_str(), nullptr);
-}
-
 void tr_metainfoMigrateFile(
     tr_session const* session,
     tr_info const* info,

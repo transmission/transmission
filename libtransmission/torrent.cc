@@ -689,7 +689,11 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
     if (didRenameResumeFileToHashOnlyName)
     {
         /* Rename torrent file as well */
-        tr_metainfoMigrateFile(session, &tor->info, TR_METAINFO_BASENAME_NAME_AND_PARTIAL_HASH, TR_METAINFO_BASENAME_HASH);
+        tr_metainfoMigrateFile(
+            session,
+            &tor->info,
+            tr_magnet_metainfo::BasenameFormat::NameAndPartialHash,
+            tr_magnet_metainfo::BasenameFormat::Hash);
     }
 
     tor->completeness = tor->completion.status();
@@ -1550,7 +1554,7 @@ static void closeTorrent(void* vtor)
 
     if (tor->isDeleting)
     {
-        tr_metainfoRemoveSaved(tor->session, &tor->info);
+        tr_sys_path_remove(tor->torrentFile().c_str(), nullptr);
         tr_torrentRemoveResume(tor);
     }
 

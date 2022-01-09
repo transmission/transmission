@@ -63,6 +63,29 @@ public:
 
     void toVariant(tr_variant* top) const;
 
+    enum class BasenameFormat
+    {
+        Hash,
+        NameAndPartialHash
+    };
+
+    static std::string makeFilename(
+        std::string_view dirname,
+        std::string_view name,
+        std::string_view info_hash_string,
+        BasenameFormat format,
+        std::string_view suffix);
+
+    std::string makeFilename(std::string_view dirname, BasenameFormat format, std::string_view suffix) const
+    {
+        return makeFilename(dirname, name(), infoHashString(), format, suffix);
+    }
+
+    std::string makeTorrentFilename(std::string_view dirname, BasenameFormat format) const
+    {
+        return makeFilename(dirname, format, std::string_view{ ".torrent" });
+    }
+
 protected:
     tr_announce_list announce_list_;
     std::vector<std::string> webseed_urls_;

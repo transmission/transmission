@@ -36,9 +36,9 @@ constexpr int MAX_REMEMBERED_PEERS = 200;
 
 } // unnamed namespace
 
-static std::string getResumeFilename(tr_torrent const* tor, enum tr_metainfo_basename_format format)
+static std::string getResumeFilename(tr_torrent const* tor, tr_magnet_metainfo::BasenameFormat format)
 {
-    return tr_buildTorrentFilename(
+    return tr_magnet_metainfo::makeFilename(
         tr_getResumeDir(tor->session),
         tr_torrentName(tor),
         tor->infoHashString(),
@@ -692,8 +692,8 @@ void tr_torrentSaveResume(tr_torrent* tor)
     saveName(&top, tor);
     saveLabels(&top, tor);
 
-    std::string const filename = getResumeFilename(tor, TR_METAINFO_BASENAME_HASH);
-    int const err = tr_variantToFile(&top, TR_VARIANT_FMT_BENC, filename.c_str());
+    auto const filename = getResumeFilename(tor, tr_magnet_metainfo::BasenameFormat::Hash);
+    auto const err = tr_variantToFile(&top, TR_VARIANT_FMT_BENC, filename.c_str());
     if (err != 0)
     {
         tor->setLocalError(tr_strvJoin("Unable to save resume file: ", tr_strerror(err)));
@@ -719,7 +719,7 @@ static uint64_t loadFromFile(tr_torrent* tor, uint64_t fieldsToLoad, bool* didRe
         *didRenameToHashOnlyName = false;
     }
 
-    std::string const filename = getResumeFilename(tor, TR_METAINFO_BASENAME_HASH);
+    std::string const filename = getResumeFilename(tor, tr_magnet_metainfo::BasenameFormat::Hash);
 
     auto buf = std::vector<char>{};
     if (!tr_loadFile(buf, filename, &error) ||
@@ -733,7 +733,7 @@ static uint64_t loadFromFile(tr_torrent* tor, uint64_t fieldsToLoad, bool* didRe
         tr_logAddTorDbg(tor, "Couldn't read \"%s\": %s", filename.c_str(), error->message);
         tr_error_clear(&error);
 
-        std::string const old_filename = getResumeFilename(tor, TR_METAINFO_BASENAME_NAME_AND_PARTIAL_HASH);
+        std::string const old_filename = getResumeFilename(tor, tr_magnet_metainfo::BasenameFormat::NameAndPartialHash);
 
         if (!tr_variantFromFile(&top, TR_VARIANT_PARSE_BENC, old_filename.c_str(), &error))
         {
@@ -969,9 +969,9 @@ uint64_t tr_torrentLoadResume(tr_torrent* tor, uint64_t fieldsToLoad, tr_ctor co
 
 void tr_torrentRemoveResume(tr_torrent const* tor)
 {
-    std::string filename = getResumeFilename(tor, TR_METAINFO_BASENAME_HASH);
+    std::string filename = getResumeFilename(tor, tr_magnet_metainfo::BasenameFormat::Hash);
     tr_sys_path_remove(filename.c_str(), nullptr);
 
-    filename = getResumeFilename(tor, TR_METAINFO_BASENAME_NAME_AND_PARTIAL_HASH);
+    filename = getResumeFilename(tor, tr_magnet_metainfo::BasenameFormat::NameAndPartialHash);
     tr_sys_path_remove(filename.c_str(), nullptr);
 }

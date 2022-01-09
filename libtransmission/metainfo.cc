@@ -28,6 +28,7 @@
 #include "torrent.h"
 #include "utils.h"
 #include "variant.h"
+#include "magnet-metainfo.h"
 #include "web-utils.h"
 
 using namespace std::literals;
@@ -36,21 +37,14 @@ using namespace std::literals;
 ****
 ***/
 
-std::string tr_buildTorrentFilename(
-    std::string_view dirname,
-    std::string_view name,
-    std::string_view info_hash_string,
-    enum tr_metainfo_basename_format format,
-    std::string_view suffix)
+static std::string getTorrentFilename(tr_session const* session, tr_info const* inf, tr_magnet_metainfo::BasenameFormat format)
 {
-    return format == TR_METAINFO_BASENAME_NAME_AND_PARTIAL_HASH ?
-        tr_strvJoin(dirname, "/"sv, name, "."sv, info_hash_string.substr(0, 16), suffix) :
-        tr_strvJoin(dirname, "/"sv, info_hash_string, suffix);
-}
-
-static std::string getTorrentFilename(tr_session const* session, tr_info const* inf, enum tr_metainfo_basename_format format)
-{
-    return tr_buildTorrentFilename(tr_getTorrentDir(session), inf->name(), inf->infoHashString(), format, ".torrent"sv);
+    return tr_magnet_metainfo::makeFilename(
+        tr_getTorrentDir(session),
+        inf->name(),
+        inf->infoHashString(),
+        format,
+        ".torrent"sv);
 }
 
 /***
@@ -508,7 +502,7 @@ static char const* tr_metainfoParseImpl(
     geturllist(inf, meta);
 
     /* filename of Transmission's copy */
-    inf->torrent_file_ = session != nullptr ? getTorrentFilename(session, inf, TR_METAINFO_BASENAME_HASH) : ""sv;
+    inf->torrent_file_ = session != nullptr ? getTorrentFilename(session, inf, tr_magnet_metainfo::BasenameFormat::Hash) : ""sv;
 
     return nullptr;
 }
@@ -545,20 +539,11 @@ void tr_metainfoFree(tr_info* inf)
     inf->announce_list.reset();
 }
 
-void tr_metainfoRemoveSaved(tr_session const* session, tr_info const* inf)
-{
-    auto filename = getTorrentFilename(session, inf, TR_METAINFO_BASENAME_HASH);
-    tr_sys_path_remove(filename.c_str(), nullptr);
-
-    filename = getTorrentFilename(session, inf, TR_METAINFO_BASENAME_NAME_AND_PARTIAL_HASH);
-    tr_sys_path_remove(filename.c_str(), nullptr);
-}
-
 void tr_metainfoMigrateFile(
     tr_session const* session,
     tr_info const* info,
-    enum tr_metainfo_basename_format old_format,
-    enum tr_metainfo_basename_format new_format)
+    tr_magnet_metainfo::BasenameFormat old_format,
+    tr_magnet_metainfo::BasenameFormat new_format)
 {
     auto const old_filename = getTorrentFilename(session, info, old_format);
     auto const new_filename = getTorrentFilename(session, info, new_format);
