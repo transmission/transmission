@@ -235,6 +235,7 @@ int tr_variantParseBenc(tr_variant& top, int parse_opts, std::string_view benc, 
                 auto const sv = tr_bencParseStr(&benc);
                 if (!sv)
                 {
+                    benc.remove_prefix(1);
                     break;
                 }
 
