@@ -67,6 +67,8 @@ public:
         name_ = name;
     }
 
+    void toVariant(tr_variant* top) const;
+
     enum class BasenameFormat
     {
         Hash,

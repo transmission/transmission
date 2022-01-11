@@ -790,21 +790,16 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
     }
 }
 
-#include <iostream>
-
 tr_torrent* tr_torrentNew(tr_ctor const* ctor, tr_torrent** setme_duplicate_of)
 {
     TR_ASSERT(ctor != nullptr);
     auto* const session = tr_ctorGetSession(ctor);
     TR_ASSERT(tr_isSession(session));
 
-    std::cerr << __FILE__ << ':' << __LINE__ << " tr_torrentNew() " << std::endl;
-
     // is the metainfo valid?
     auto const* metainfo = tr_ctorGetMetainfo(ctor);
     if (metainfo == nullptr)
     {
-        std::cerr << __FILE__ << ':' << __LINE__ << " tr_torrentNew() " << std::endl;
         return nullptr;
     }
 
@@ -816,34 +811,26 @@ tr_torrent* tr_torrentNew(tr_ctor const* ctor, tr_torrent** setme_duplicate_of)
             *setme_duplicate_of = duplicate_of;
         }
 
-        std::cerr << __FILE__ << ':' << __LINE__ << " tr_torrentNew() " << std::endl;
         return nullptr;
     }
 
-    // is it a magnet link?
-    std::cerr << __FILE__ << ':' << __LINE__ << " tr_torrentNew() " << std::endl;
+    // build a variant to parse
     auto top_variant = tr_variant{};
     if (std::empty(*metainfo))
     {
-        std::cerr << __FILE__ << ':' << __LINE__ << " tr_torrentNew() " << std::endl;
-        tr_buildMetainfoExceptInfoDict(*metainfo, &top_variant);
+        metainfo->toVariant(&top_variant);
     }
     else
     {
-        std::cerr << __FILE__ << ':' << __LINE__ << " tr_torrentNew() " << std::endl;
         tr_variantFromBuf(&top_variant, TR_VARIANT_PARSE_BENC, tr_ctorGetContents(ctor), nullptr, nullptr);
     }
-    std::cerr << __FILE__ << ':' << __LINE__ << " tr_torrentNew() " << std::endl;
-    for (auto ch : tr_variantToStr(&top_variant, TR_VARIANT_FMT_JSON))
-        std::cerr << ch;
-    std::cerr << std::endl;
 
+    // parse the metainfo
     tr_error* error = nullptr;
     auto parsed = tr_metainfoParse(session, &top_variant, &error);
     tr_variantFree(&top_variant);
     if (!parsed)
     {
-        std::cerr << __FILE__ << ':' << __LINE__ << " tr_torrentNew() " << error->message << std::endl;
         return nullptr;
     }
 
