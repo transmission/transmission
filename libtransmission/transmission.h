@@ -1608,6 +1608,13 @@ struct tr_info
         return is_private_;
     }
 
+    void setAnnounceList(tr_announce_list const& list);
+
+    tr_announce_list const& announceList() const
+    {
+        return *announce_list;
+    }
+
     tr_sha1_digest_t hash_;
     std::shared_ptr<tr_announce_list> announce_list;
     std::vector<tr_file> files;
