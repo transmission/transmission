@@ -242,9 +242,14 @@ TEST_F(VariantTest, parse)
     benc = "le"sv;
     EXPECT_TRUE(tr_variantFromBuf(&val, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, benc, &end));
     EXPECT_EQ(std::data(benc) + std::size(benc), end);
-
     EXPECT_EQ(benc, tr_variantToStr(&val, TR_VARIANT_FMT_BENC));
     tr_variantFree(&val);
+
+    benc = "d20:"sv;
+    end = nullptr;
+    ok = tr_variantFromBuf(&val, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, benc, &end);
+    EXPECT_FALSE(ok);
+    EXPECT_EQ(nullptr, end);
 }
 
 TEST_F(VariantTest, bencParseAndReencode)
