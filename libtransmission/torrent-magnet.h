@@ -16,6 +16,8 @@
 #include <cstddef> // size_t
 #include <ctime>
 
+#include "transmission.h"
+
 struct tr_torrent;
 
 // defined by BEP #9

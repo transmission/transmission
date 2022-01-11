@@ -797,26 +797,40 @@ tr_torrent* tr_torrentNew(tr_ctor const* ctor, tr_torrent** setme_duplicate_of)
     TR_ASSERT(tr_isSession(session));
 
     // is the metainfo valid?
-    auto top = tr_variant{};
-    if (!tr_variantFromBuf(&top, TR_VARIANT_PARSE_BENC, tr_ctorGetContents(ctor), nullptr, nullptr))
-    {
-        return nullptr;
-    }
-    auto parsed = tr_metainfoParse(session, &top, nullptr);
-    tr_variantFree(&top);
-    if (!parsed)
+    auto const* metainfo = tr_ctorGetMetainfo(ctor);
+    if (metainfo == nullptr)
     {
         return nullptr;
     }
 
     // is it a duplicate?
-    if (auto* const duplicate_of = session->getTorrent(parsed->info.infoHash()); duplicate_of != nullptr)
+    if (auto* const duplicate_of = session->getTorrent(metainfo->infoHash()); duplicate_of != nullptr)
     {
         if (setme_duplicate_of != nullptr)
         {
             *setme_duplicate_of = duplicate_of;
         }
 
+        return nullptr;
+    }
+
+    // build a variant to parse
+    auto top_variant = tr_variant{};
+    if (std::empty(*metainfo))
+    {
+        metainfo->toVariant(&top_variant);
+    }
+    else
+    {
+        tr_variantFromBuf(&top_variant, TR_VARIANT_PARSE_BENC, tr_ctorGetContents(ctor), nullptr, nullptr);
+    }
+
+    // parse the metainfo
+    tr_error* error = nullptr;
+    auto parsed = tr_metainfoParse(session, &top_variant, &error);
+    tr_variantFree(&top_variant);
+    if (!parsed)
+    {
         return nullptr;
     }
 
@@ -3143,4 +3157,9 @@ void tr_torrent::setName(std::string_view name)
 void tr_torrent::setFileSubpath(tr_file_index_t i, std::string_view subpath)
 {
     this->info.setFileSubpath(i, subpath);
+}
+
+void tr_info::setAnnounceList(tr_announce_list const& list)
+{
+    this->announce_list = std::make_shared<tr_announce_list>(list);
 }
