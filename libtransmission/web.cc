@@ -7,6 +7,7 @@
  */
 
 #include <algorithm>
+#include <cstring>
 #include <set>
 #include <string_view>
 

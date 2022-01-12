@@ -8,7 +8,6 @@
 
 #include <algorithm>
 #include <climits> /* INT_MAX */
-#include <cstring> /* memcpy(), memset(), memcmp() */
 #include <ctime>
 #include <string_view>
 

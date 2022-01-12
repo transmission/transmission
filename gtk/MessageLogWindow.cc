@@ -8,7 +8,6 @@
 
 #include <errno.h>
 #include <stdio.h>
-#include <string.h>
 
 #include <glibmm.h>
 #include <glibmm/i18n.h>

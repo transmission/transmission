@@ -7,7 +7,6 @@
  */
 
 #include <cctype>
-#include <cstring>
 #include <memory>
 
 #include <glibmm.h>

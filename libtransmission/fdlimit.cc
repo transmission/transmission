@@ -10,7 +10,6 @@
 #include <array>
 #include <cerrno>
 #include <cinttypes>
-#include <cstring>
 #include <ctime>
 
 #include "transmission.h"

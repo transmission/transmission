@@ -8,8 +8,6 @@
 
 #include "RpcClient.h"
 
-#include <cstring>
-
 #include <QApplication>
 #include <QAuthenticator>
 #include <QHostAddress>

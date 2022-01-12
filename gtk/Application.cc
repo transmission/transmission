@@ -26,7 +26,6 @@
 #include <signal.h>
 #include <sstream>
 #include <stdlib.h> /* exit() */
-#include <string.h>
 #include <thread>
 #include <time.h>
 #include <vector>
