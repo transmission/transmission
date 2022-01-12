@@ -13,6 +13,7 @@
 #include <cstdlib>
 #include <limits>
 #include <optional>
+#include <string>
 #include <string_view>
 
 #include <event2/buffer.h>

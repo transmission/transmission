@@ -7,6 +7,7 @@
  */
 
 #include <ctime>
+#include <string>
 
 #include "transmission.h"
 

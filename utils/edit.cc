@@ -9,6 +9,8 @@
 #include <array>
 #include <stdio.h> /* fprintf() */
 #include <stdlib.h> /* EXIT_FAILURE */
+#include <string>
+#include <string_view>
 #include <vector>
 
 #include <event2/buffer.h>

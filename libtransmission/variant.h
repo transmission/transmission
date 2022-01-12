@@ -8,8 +8,9 @@
 
 #pragma once
 
+#include <cinttypes> // int64_t
 #include <cstddef> // size_t
-#include <inttypes.h> // int64_t
+#include <string>
 #include <string_view>
 
 #include "quark.h"

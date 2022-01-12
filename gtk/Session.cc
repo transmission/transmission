@@ -26,6 +26,7 @@
 #include <functional>
 #include <map>
 #include <memory>
+#include <string>
 
 #include <glibmm/i18n.h>
 

@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <cstring>
 #include <set>
+#include <string>
 #include <string_view>
 
 #ifdef _WIN32

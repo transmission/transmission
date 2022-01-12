@@ -13,6 +13,7 @@
 #include <stddef.h>
 #include <stdio.h> /* sscanf() */
 #include <stdlib.h> /* abort() */
+#include <string>
 #include <string_view>
 #include <unordered_map>
 

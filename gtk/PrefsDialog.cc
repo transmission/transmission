@@ -6,9 +6,10 @@
  *
  */
 
-#include <ctype.h> /* isspace */
-#include <limits.h> /* USHRT_MAX, INT_MAX */
+#include <cctype> /* isspace */
+#include <climits> /* USHRT_MAX, INT_MAX */
 #include <sstream>
+#include <string>
 #include <unistd.h>
 
 #include <glibmm.h>

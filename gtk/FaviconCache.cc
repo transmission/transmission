@@ -8,6 +8,7 @@
 
 #include <array>
 #include <memory>
+#include <string>
 
 #include <glib/gstdio.h> /* g_remove() */
 
