@@ -6,8 +6,8 @@
  *
  */
 
+#include <memory>
 #include <set>
-#include <stdlib.h> /* qsort() */
 #include <unordered_map>
 
 #include <glibmm.h>

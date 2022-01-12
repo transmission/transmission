@@ -8,6 +8,7 @@
 
 #include <algorithm>
 #include <cassert>
+#include <memory>
 
 #include <libtransmission/transmission.h> // priorities
 

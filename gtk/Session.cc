@@ -21,10 +21,11 @@
  *****************************************************************************/
 
 #include <algorithm>
+#include <cmath> /* pow() */
 #include <cstring> // strstr
 #include <functional>
 #include <map>
-#include <math.h> /* pow() */
+#include <memory>
 
 #include <glibmm/i18n.h>
 

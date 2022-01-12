@@ -15,6 +15,7 @@
 #include <ctime>
 #include <iterator> // std::back_inserter
 #include <list>
+#include <memory>
 #include <numeric> // std::acumulate()
 #include <string_view>
 #include <unordered_set>

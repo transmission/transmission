@@ -7,7 +7,8 @@
  */
 
 #include <cctype>
-#include <string.h>
+#include <cstring>
+#include <memory>
 
 #include <glibmm.h>
 #include <glibmm/i18n.h>

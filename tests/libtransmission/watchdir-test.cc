@@ -6,7 +6,12 @@
  *
  */
 
+#include <map>
+#include <memory>
+#include <string>
+
 #include "transmission.h"
+
 #include "file.h"
 #include "net.h"
 #include "utils.h"
@@ -15,9 +20,6 @@
 #include "test-fixtures.h"
 
 #include <event2/event.h>
-
-#include <map>
-#include <string>
 
 /***
 ****

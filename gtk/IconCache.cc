@@ -6,6 +6,7 @@
  */
 
 #include <array>
+#include <memory>
 #include <unordered_map>
 
 #include <glibmm.h>
