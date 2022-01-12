@@ -8,7 +8,6 @@
 
 #pragma once
 
-#include <array>
 #include <bitset>
 #include <ctime> // time_t
 #include <vector>
