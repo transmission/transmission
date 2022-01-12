@@ -9,7 +9,6 @@
 #include <algorithm>
 #include <cerrno>
 #include <cstdarg>
-#include <cstdlib>
 #include <cstring>
 #include <ctime>
 #include <memory> // std::unique_ptr

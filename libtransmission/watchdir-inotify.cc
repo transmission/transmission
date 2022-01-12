@@ -8,7 +8,6 @@
 
 #include <cerrno>
 #include <climits> /* NAME_MAX */
-#include <cstdlib> /* realloc() */
 
 #include <unistd.h> /* close() */
 

@@ -8,7 +8,6 @@
 
 #include <array>
 #include <cstdio>
-#include <cstdlib>
 #include <ctime>
 #include <string_view>
 #include <algorithm>

@@ -8,7 +8,6 @@
 
 #include <cerrno>
 #include <csignal>
-#include <cstdlib>
 #include <map>
 #include <string_view>
 

@@ -21,15 +21,16 @@
  *****************************************************************************/
 
 #include <algorithm>
-#include <locale.h>
+#include <cstdlib> // exit()
+#include <ctime>
 #include <map>
-#include <signal.h>
 #include <sstream>
-#include <stdlib.h> /* exit() */
-#include <thread>
-#include <time.h>
-#include <vector>
 #include <string_view>
+#include <thread>
+#include <vector>
+
+#include <locale.h>
+#include <signal.h>
 
 #include <giomm.h>
 #include <glib/gmessages.h>
