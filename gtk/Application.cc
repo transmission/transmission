@@ -25,7 +25,6 @@
 #include <map>
 #include <signal.h>
 #include <sstream>
-#include <stdio.h>
 #include <stdlib.h> /* exit() */
 #include <string.h>
 #include <thread>

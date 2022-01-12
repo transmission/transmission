@@ -7,7 +7,6 @@
  */
 
 #include <algorithm>
-#include <cstdio>
 #include <sys/types.h>
 
 #include <event2/event.h>

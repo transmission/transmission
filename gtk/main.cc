@@ -20,6 +20,7 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
+#include <cstdio>
 #include <string>
 
 #include <glibmm.h>

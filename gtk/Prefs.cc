@@ -21,7 +21,6 @@
  *****************************************************************************/
 
 #include <errno.h>
-#include <stdio.h>
 #include <stdlib.h> /* strtol() */
 #include <string.h>
 #include <string_view>

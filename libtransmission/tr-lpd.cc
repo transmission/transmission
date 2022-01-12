@@ -24,7 +24,6 @@ THE SOFTWARE.
 #include <cctype> /* toupper() */
 #include <cerrno>
 #include <csignal> /* sig_atomic_t */
-#include <cstdio>
 #include <cstring> /* strlen(), strncpy(), strstr(), memset() */
 #include <type_traits>
 

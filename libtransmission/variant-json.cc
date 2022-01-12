@@ -10,7 +10,6 @@
 #include <cctype>
 #include <cerrno> /* EILSEQ, EINVAL */
 #include <cmath> /* fabs() */
-#include <cstdio>
 #include <cstring>
 #include <deque>
 #include <string_view>
