@@ -7,13 +7,14 @@
  */
 
 #include <array>
-#include <assert.h>
-#include <ctype.h> /* isspace */
-#include <errno.h>
-#include <math.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h> /* strcmp */
+#include <cassert>
+#include <cctype> /* isspace */
+#include <cerrno>
+#include <cmath>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring> /* strcmp */
+#include <string>
 #include <string_view>
 
 #include <event2/buffer.h>

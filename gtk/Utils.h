@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include <ctime>
 #include <functional>
 #include <string>
 

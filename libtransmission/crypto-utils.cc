@@ -8,6 +8,7 @@
 
 #include <algorithm>
 #include <array>
+#include <cctype>
 #include <cstring> // memmove(), memset()
 #include <iterator>
 #include <random>

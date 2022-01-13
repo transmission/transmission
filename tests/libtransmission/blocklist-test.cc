@@ -6,7 +6,6 @@
  *
  */
 
-#include <cstdio>
 #include <cstring> // strlen()
 // #include <unistd.h> // sync()
 

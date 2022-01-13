@@ -6,8 +6,9 @@
  *
  */
 
-#include <limits.h> /* INT_MAX */
+#include <climits> /* INT_MAX */
 #include <cstring> // strchr()
+#include <memory>
 
 #include <glibmm.h>
 #include <glibmm/i18n.h>

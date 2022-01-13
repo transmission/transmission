@@ -7,6 +7,8 @@
  */
 
 #include <algorithm>
+#include <memory>
+#include <string>
 
 #include <glibmm.h>
 #include <glibmm/i18n.h>

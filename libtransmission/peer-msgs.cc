@@ -9,7 +9,6 @@
 #include <algorithm>
 #include <cerrno>
 #include <cstdarg>
-#include <cstdlib>
 #include <cstring>
 #include <ctime>
 #include <memory> // std::unique_ptr
@@ -29,6 +28,7 @@
 #include "peer-mgr.h"
 #include "peer-msgs.h"
 #include "ptrarray.h"
+#include "quark.h"
 #include "session.h"
 #include "torrent-magnet.h"
 #include "torrent.h"

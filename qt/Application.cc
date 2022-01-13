@@ -11,6 +11,7 @@
 #include <algorithm>
 #include <array>
 #include <ctime>
+#include <memory>
 
 #include <QIcon>
 #include <QLibraryInfo>

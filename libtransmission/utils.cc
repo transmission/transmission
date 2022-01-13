@@ -20,7 +20,6 @@
 #include <clocale> /* localeconv() */
 #include <cmath> /* fabs(), floor() */
 #include <cstdint> /* SIZE_MAX */
-#include <cstdio>
 #include <cstdlib> /* getenv() */
 #include <cstring> /* strerror(), memset(), memmem() */
 #include <ctime> /* nanosleep() */
@@ -29,6 +28,7 @@
 #include <set>
 #include <sstream>
 #include <string>
+#include <string_view>
 #include <vector>
 
 #ifdef _WIN32

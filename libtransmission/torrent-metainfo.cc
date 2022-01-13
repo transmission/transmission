@@ -7,6 +7,7 @@
  */
 
 #include <algorithm>
+#include <cctype>
 #include <iterator>
 #include <numeric>
 #include <string>
@@ -20,8 +21,8 @@
 #include "crypto-utils.h"
 #include "error-types.h"
 #include "error.h"
+#include "quark.h"
 #include "torrent-metainfo.h"
-#include "tr-assert.h"
 #include "utils.h"
 #include "variant.h"
 #include "web-utils.h"

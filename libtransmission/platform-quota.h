@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include <cstdint>
+#include <cstdint> // int64_t
 #include <string>
 #include <string_view>
 

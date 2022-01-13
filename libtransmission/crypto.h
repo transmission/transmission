@@ -14,7 +14,6 @@
 #error only libtransmission should #include this header.
 #endif
 
-#include <array>
 #include <cinttypes> // uintX_t
 #include <cstddef>
 #include <optional>

@@ -9,6 +9,7 @@
 #include <cerrno> /* errno, EAFNOSUPPORT */
 #include <cstring> /* memset() */
 #include <ctime>
+#include <string_view>
 #include <vector>
 
 #include <event2/buffer.h>

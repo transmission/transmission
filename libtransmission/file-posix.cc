@@ -20,12 +20,14 @@
 #include <dirent.h>
 #include <fcntl.h> /* O_LARGEFILE, posix_fadvise(), [posix_]fallocate(), fcntl() */
 #include <libgen.h> /* basename(), dirname() */
+#include <string_view>
+#include <unistd.h> /* lseek(), write(), ftruncate(), pread(), pwrite(), pathconf(), etc */
+#include <vector>
+
 #include <sys/file.h> /* flock() */
 #include <sys/mman.h> /* mmap(), munmap() */
 #include <sys/stat.h>
 #include <sys/types.h>
-#include <unistd.h> /* lseek(), write(), ftruncate(), pread(), pwrite(), pathconf(), etc */
-#include <vector>
 
 #ifdef HAVE_XFS_XFS_H
 #include <xfs/xfs.h>

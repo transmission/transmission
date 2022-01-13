@@ -30,7 +30,6 @@
 #include "file.h"
 #include "file-piece-map.h"
 #include "interned-string.h"
-#include "quark.h"
 #include "session.h"
 #include "tr-assert.h"
 #include "tr-macros.h"

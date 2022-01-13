@@ -21,12 +21,15 @@
  *****************************************************************************/
 
 #include <array>
-#include <stdio.h> /* fprintf () */
-#include <stdlib.h> /* atoi () */
-#include <string.h> /* memcmp () */
+#include <cstdio> /* fprintf () */
+#include <cstdlib> /* atoi () */
+#include <cstring> /* memcmp () */
 #include <signal.h>
+#include <string>
+#include <string_view>
 
 #include <libtransmission/transmission.h>
+
 #include <libtransmission/error.h>
 #include <libtransmission/file.h>
 #include <libtransmission/tr-getopt.h>

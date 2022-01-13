@@ -10,7 +10,6 @@
 #include <cctype>
 #include <cerrno> /* EILSEQ, EINVAL */
 #include <cmath> /* fabs() */
-#include <cstdio>
 #include <cstring>
 #include <deque>
 #include <string_view>
@@ -24,6 +23,7 @@
 
 #include "jsonsl.h"
 #include "log.h"
+#include "quark.h"
 #include "tr-assert.h"
 #include "utils.h"
 #include "variant-common.h"

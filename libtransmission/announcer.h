@@ -13,6 +13,8 @@
 #endif
 
 #include <cstddef> // size_t
+#include <ctime>
+#include <string_view>
 
 #include "transmission.h"
 
