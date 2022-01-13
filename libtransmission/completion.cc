@@ -192,7 +192,7 @@ uint64_t tr_completion::countHasBytesInBlocks(tr_block_span_t span) const
 {
     auto const [begin, end] = span;
 
-    auto n = blocks_.count(begin, end);
+    uint64_t n = blocks_.count(begin, end);
     n *= block_info_->block_size;
 
     if (end == block_info_->n_blocks && blocks_.test(end - 1))
