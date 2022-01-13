@@ -6,7 +6,6 @@
  *
  */
 
-#include <cctype> /* isspace */
 #include <climits> /* USHRT_MAX, INT_MAX */
 #include <sstream>
 #include <string>

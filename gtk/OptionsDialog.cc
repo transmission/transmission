@@ -6,7 +6,6 @@
  *
  */
 
-#include <cctype>
 #include <memory>
 
 #include <glibmm.h>
