@@ -15,6 +15,7 @@
 
 #include "announce-list.h"
 #include "metainfo.h"
+#include "quark.h"
 #include "utils.h"
 #include "variant.h"
 

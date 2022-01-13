@@ -31,6 +31,7 @@
 #include "log.h"
 #include "net.h"
 #include "platform.h" /* tr_getWebClientDir() */
+#include "quark.h"
 #include "rpc-server.h"
 #include "rpcimpl.h"
 #include "session-id.h"

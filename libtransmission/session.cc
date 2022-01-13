@@ -2842,3 +2842,9 @@ void tr_sessionRemoveTorrent(tr_session* session, tr_torrent* tor)
     session->torrentsById.erase(tor->uniqueId);
     session->torrentsByHash.erase(tor->infoHash());
 }
+
+tr_torrent* tr_session::getTorrent(std::string_view info_dict_hash_string)
+{
+    auto info_dict_hash = tr_sha1_from_string(std::data(info_dict_hash_string));
+    return this->getTorrent(info_dict_hash);
+}

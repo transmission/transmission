@@ -22,6 +22,7 @@
 
 #include "transmission.h"
 
+#include "quark.h"
 #include "interned-string.h"
 #include "web-utils.h"
 

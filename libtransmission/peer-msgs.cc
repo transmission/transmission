@@ -28,6 +28,7 @@
 #include "peer-mgr.h"
 #include "peer-msgs.h"
 #include "ptrarray.h"
+#include "quark.h"
 #include "session.h"
 #include "torrent-magnet.h"
 #include "torrent.h"

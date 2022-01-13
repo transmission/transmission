@@ -20,6 +20,7 @@
 #include "transmission.h"
 
 #include "tr-assert.h"
+#include "quark.h"
 #include "utils.h" /* tr_snprintf() */
 #include "variant-common.h"
 #include "variant.h"

@@ -29,9 +29,7 @@
 
 #include "transmission.h"
 
-#include "crypto-utils.h"
-#include "net.h"
-#include "tr-macros.h"
+#include "net.h" // tr_socket_t
 
 enum tr_auto_switch_state_t
 {
@@ -125,11 +123,7 @@ public:
         return it == std::end(src) ? nullptr : it->second;
     }
 
-    [[nodiscard]] auto getTorrent(std::string_view info_dict_hash_string)
-    {
-        auto info_dict_hash = tr_sha1_from_string(std::data(info_dict_hash_string));
-        return this->getTorrent(info_dict_hash);
-    }
+    [[nodiscard]] tr_torrent* getTorrent(std::string_view info_dict_hash_string);
 
     [[nodiscard]] auto contains(tr_sha1_digest_t const& info_dict_hash) const
     {

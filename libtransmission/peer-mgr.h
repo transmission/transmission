@@ -23,7 +23,6 @@
 #include "net.h" /* tr_address */
 #include "peer-common.h"
 #include "peer-socket.h"
-#include "quark.h"
 
 /**
  * @addtogroup peers Peers

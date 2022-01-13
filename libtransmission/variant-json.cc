@@ -23,6 +23,7 @@
 
 #include "jsonsl.h"
 #include "log.h"
+#include "quark.h"
 #include "tr-assert.h"
 #include "utils.h"
 #include "variant-common.h"
