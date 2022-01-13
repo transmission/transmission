@@ -21,6 +21,7 @@
 #include <zlib.h>
 
 #include "transmission.h"
+
 #include "completion.h"
 #include "crypto-utils.h"
 #include "error.h"
@@ -28,9 +29,10 @@
 #include "file.h"
 #include "log.h"
 #include "platform-quota.h" /* tr_device_info_get_disk_space() */
+#include "quark.h"
 #include "rpcimpl.h"
-#include "session.h"
 #include "session-id.h"
+#include "session.h"
 #include "stats.h"
 #include "torrent.h"
 #include "tr-assert.h"
@@ -38,8 +40,8 @@
 #include "utils.h"
 #include "variant.h"
 #include "version.h"
-#include "web.h"
 #include "web-utils.h"
+#include "web.h"
 
 static auto constexpr RpcVersion = int64_t{ 17 };
 static auto constexpr RpcVersionMin = int64_t{ 14 };

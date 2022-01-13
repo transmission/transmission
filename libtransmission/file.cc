@@ -7,7 +7,7 @@
  */
 
 #include <algorithm>
-#include <cstring> /* strlen() */
+#include <string_view>
 
 #include "transmission.h"
 #include "error.h"

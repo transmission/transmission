@@ -8,8 +8,10 @@
 
 #include <algorithm>
 #include <array>
-#include <cstring>
+#include <cctype>
 #include <iterator>
+#include <memory>
+#include <string>
 #include <string_view>
 #include <vector>
 

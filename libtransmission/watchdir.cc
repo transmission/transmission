@@ -7,6 +7,7 @@
  */
 
 #include <cstring> /* strcmp() */
+#include <string>
 #include <string_view>
 #include <unordered_set>
 

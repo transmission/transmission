@@ -8,8 +8,6 @@
 
 #pragma once
 
-#include <array>
-
 #include "Torrent.h"
 
 class FilterMode

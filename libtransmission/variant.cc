@@ -20,6 +20,7 @@
 #include <cstdlib> /* strtod() */
 #include <cstring>
 #include <stack>
+#include <string>
 #include <string_view>
 #include <vector>
 
@@ -38,13 +39,15 @@
 #define LIBTRANSMISSION_VARIANT_MODULE
 
 #include "transmission.h"
+
 #include "error.h"
 #include "file.h"
 #include "log.h"
+#include "quark.h"
 #include "tr-assert.h"
 #include "utils.h"
-#include "variant.h"
 #include "variant-common.h"
+#include "variant.h"
 
 /* don't use newlocale/uselocale on old versions of uClibc because they're buggy.
  * https://trac.transmissionbt.com/ticket/6006 */

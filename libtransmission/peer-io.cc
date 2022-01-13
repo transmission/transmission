@@ -10,6 +10,7 @@
 #include <cerrno>
 #include <cstdint>
 #include <cstring>
+#include <string>
 
 #include <event2/event.h>
 #include <event2/buffer.h>

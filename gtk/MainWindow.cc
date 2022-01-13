@@ -20,6 +20,8 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
+#include <string>
+
 #include <glibmm/i18n.h>
 
 #include <libtransmission/transmission.h>

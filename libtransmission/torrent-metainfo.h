@@ -17,7 +17,6 @@
 
 #include "block-info.h"
 #include "magnet-metainfo.h"
-#include "quark.h"
 
 struct tr_error;
 struct tr_info;

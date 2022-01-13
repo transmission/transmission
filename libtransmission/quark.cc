@@ -12,8 +12,8 @@
 #include <vector>
 
 #include "transmission.h"
+
 #include "quark.h"
-#include "tr-assert.h"
 #include "utils.h" // tr_strvDup()
 
 using namespace std::literals;

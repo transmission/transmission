@@ -6,9 +6,9 @@
  *
  */
 
-#include "RpcClient.h"
+#include <string_view>
 
-#include <cstring>
+#include "RpcClient.h"
 
 #include <QApplication>
 #include <QAuthenticator>

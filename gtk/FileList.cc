@@ -6,11 +6,10 @@
  *
  */
 
+#include <climits> /* INT_MAX */
+#include <cstddef>
 #include <cstring> // strchr
-#include <limits.h> /* INT_MAX */
-#include <stddef.h>
-#include <stdio.h>
-#include <string.h>
+#include <string>
 
 #include <glibmm.h>
 #include <glibmm/i18n.h>

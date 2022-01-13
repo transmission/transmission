@@ -9,6 +9,7 @@
 #pragma once
 
 #include <optional>
+#include <string>
 #include <string_view>
 
 #include "tr-macros.h" // tr_sha1_digest_t

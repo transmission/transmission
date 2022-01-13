@@ -13,7 +13,7 @@
 #endif
 
 #include <cinttypes> // uintX_t
-#include <cstdlib> // size_t
+#include <cstddef> // size_t
 #include <vector>
 
 #ifdef _WIN32
@@ -23,7 +23,6 @@
 #include "net.h" /* tr_address */
 #include "peer-common.h"
 #include "peer-socket.h"
-#include "quark.h"
 
 /**
  * @addtogroup peers Peers

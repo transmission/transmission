@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include <ctime>
 #include <memory>
 #include <unordered_set>
 

@@ -14,6 +14,7 @@
 #include <QDir>
 #include <QFile>
 #include <QMap>
+#include <QSet>
 #include <QString>
 #include <QTimer>
 

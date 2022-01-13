@@ -6,6 +6,9 @@
  *
  */
 
+#include <memory>
+#include <string>
+
 #include <glibmm/i18n.h>
 
 #include <libtransmission/utils.h>

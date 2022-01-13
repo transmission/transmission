@@ -12,7 +12,6 @@
 #include <climits> /* INT_MAX */
 #include <cmath>
 #include <csignal> /* signal() */
-#include <cstdlib> /* qsort */
 #include <cstring> /* memcmp */
 #include <ctime>
 #include <map>

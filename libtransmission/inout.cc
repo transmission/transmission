@@ -8,7 +8,7 @@
 
 #include <algorithm>
 #include <cerrno>
-#include <cstdlib> /* bsearch() */
+#include <cstdlib> /* abort() */
 #include <optional>
 #include <vector>
 
