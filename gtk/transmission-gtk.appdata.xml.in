@@ -31,7 +31,7 @@ Copyright 2017 Endless Mobile, Inc.
   <url type="homepage">https://transmissionbt.com/</url>
   <screenshots>
     <screenshot type="default">
-      <image type="source">https://raw.githubusercontent.com/transmission/transmission/master/gtk/screenshots/a.png</image>
+      <image type="source">https://raw.githubusercontent.com/transmission/transmission/main/gtk/screenshots/a.png</image>
     </screenshot>
   </screenshots>
   <update_contact>info_AT_transmissionbt.com</update_contact>
