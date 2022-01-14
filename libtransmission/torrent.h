@@ -104,7 +104,7 @@ struct tr_incomplete_metadata;
 struct tr_torrent : public tr_completion::torrent_view
 {
 public:
-    explicit tr_torrent(tr_torrent_metainfo const& tm)
+    explicit tr_torrent(tr_torrent_metainfo&& tm)
         : metainfo_{ tm }
         , completion{ this, &this->metainfo_.blockInfo() }
     {
@@ -829,3 +829,5 @@ tr_peer_id_t const& tr_torrentGetPeerId(tr_torrent* tor);
 
 /** @brief free a metainfo */
 void tr_metainfoFree(tr_info* inf);
+
+tr_torrent_metainfo&& tr_ctorStealMetainfo(tr_ctor* ctor);

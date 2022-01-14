@@ -919,7 +919,7 @@ enum tr_parse_result
  * @param setme_duplicate_of If the torrent couldn't be created because it's a duplicate,
  *                           this is set to point to the original torrent.
  */
-tr_torrent* tr_torrentNew(tr_ctor const* ctor, tr_torrent** setme_duplicate_of);
+tr_torrent* tr_torrentNew(tr_ctor* ctor, tr_torrent** setme_duplicate_of);
 
 /** @} */
 

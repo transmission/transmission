@@ -769,21 +769,21 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
     }
 }
 
-tr_torrent* tr_torrentNew(tr_ctor const* ctor, tr_torrent** setme_duplicate_of)
+tr_torrent* tr_torrentNew(tr_ctor* ctor, tr_torrent** setme_duplicate_of)
 {
     TR_ASSERT(ctor != nullptr);
     auto* const session = tr_ctorGetSession(ctor);
     TR_ASSERT(tr_isSession(session));
 
     // is the metainfo valid?
-    auto const* metainfo = tr_ctorGetMetainfo(ctor);
-    if (metainfo == nullptr)
+    auto metainfo = tr_ctorStealMetainfo(ctor);
+    if (std::empty(metainfo.infoHashString()))
     {
         return nullptr;
     }
 
     // is it a duplicate?
-    if (auto* const duplicate_of = session->getTorrent(metainfo->infoHash()); duplicate_of != nullptr)
+    if (auto* const duplicate_of = session->getTorrent(metainfo.infoHash()); duplicate_of != nullptr)
     {
         if (setme_duplicate_of != nullptr)
         {
@@ -793,7 +793,7 @@ tr_torrent* tr_torrentNew(tr_ctor const* ctor, tr_torrent** setme_duplicate_of)
         return nullptr;
     }
 
-    auto* const tor = new tr_torrent{ *metainfo };
+    auto* const tor = new tr_torrent{ std::move(metainfo) };
     torrentInit(tor, ctor);
     return tor;
 }
