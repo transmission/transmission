@@ -67,9 +67,9 @@ struct tr_ctor
 ****
 ***/
 
-bool tr_ctorSetMetainfoFromFile(tr_ctor* ctor, char const* filename, tr_error** error)
+bool tr_ctorSetMetainfoFromFile(tr_ctor* ctor, std::string const& filename, tr_error** error)
 {
-    if (filename == nullptr)
+    if (std::empty(filename))
     {
         tr_error_set(error, EINVAL, "no filename specified"sv);
         return false;
@@ -83,6 +83,11 @@ bool tr_ctorSetMetainfoFromFile(tr_ctor* ctor, char const* filename, tr_error** 
     ctor->metainfo.clear();
     auto const contents_sv = std::string_view{ std::data(ctor->contents), std::size(ctor->contents) };
     return ctor->metainfo.parseBenc(contents_sv, error);
+}
+
+bool tr_ctorSetMetainfoFromFile(tr_ctor* ctor, char const* filename, tr_error** error)
+{
+    return tr_ctorSetMetainfoFromFile(ctor, std::string{ filename ? filename : "" }, error);
 }
 
 bool tr_ctorSetMetainfo(tr_ctor* ctor, char const* metainfo, size_t len, tr_error** error)

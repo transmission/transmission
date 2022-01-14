@@ -2042,7 +2042,7 @@ static void sessionLoadTorrents(void* vdata)
             }
 
             tr_buildBuf(path, dirname_sv, "/", name);
-            tr_ctorSetMetainfoFromFile(data->ctor, path.c_str(), nullptr);
+            tr_ctorSetMetainfoFromFile(data->ctor, path, nullptr);
             if (tr_torrent* const tor = tr_torrentNew(data->ctor, nullptr); tor != nullptr)
             {
                 torrents.push_back(tor);
