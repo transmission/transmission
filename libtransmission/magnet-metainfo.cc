@@ -225,18 +225,23 @@ bool tr_magnet_metainfo::migrateFile(
     std::string_view info_hash_string,
     std::string_view suffix)
 {
-    auto old_filename = makeFilename(dirname, name, info_hash_string, BasenameFormat::NameAndPartialHash, suffix);
-    auto new_filename = makeFilename(dirname, name, info_hash_string, BasenameFormat::Hash, suffix);
-    if (tr_sys_path_rename(old_filename.c_str(), new_filename.c_str(), nullptr))
+    auto const old_filename = makeFilename(dirname, name, info_hash_string, BasenameFormat::NameAndPartialHash, suffix);
+    if (!tr_sys_path_exists(old_filename.c_str(), nullptr))
     {
-        auto const name_sz = std::string{ name };
-        tr_logAddNamedError(
-            name_sz.c_str(),
-            "Migrated torrent file from \"%s\" to \"%s\"",
-            old_filename.c_str(),
-            new_filename.c_str());
-        return true;
+        return false;
     }
 
-    return false;
+    auto const new_filename = makeFilename(dirname, name, info_hash_string, BasenameFormat::Hash, suffix);
+    if (!tr_sys_path_rename(old_filename.c_str(), new_filename.c_str(), nullptr))
+    {
+        return false;
+    }
+
+    auto const name_sz = std::string{ name };
+    tr_logAddNamedError(
+        name_sz.c_str(),
+        "Migrated torrent file from \"%s\" to \"%s\"",
+        old_filename.c_str(),
+        new_filename.c_str());
+    return true;
 }
