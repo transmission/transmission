@@ -115,11 +115,6 @@ void base32_to_sha1(uint8_t* out, char const* in, size_t const inlen)
 ****
 ***/
 
-void tr_magnet_metainfo::clear()
-{
-    *this = tr_magnet_metainfo{};
-}
-
 std::string tr_magnet_metainfo::magnet() const
 {
     auto s = std::string{};

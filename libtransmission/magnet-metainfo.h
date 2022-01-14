@@ -24,7 +24,6 @@ class tr_magnet_metainfo
 public:
     bool parseMagnet(std::string_view magnet_link, tr_error** error = nullptr);
     std::string magnet() const;
-    virtual ~tr_magnet_metainfo() = default;
 
     auto const& infoHash() const
     {
@@ -59,8 +58,6 @@ public:
     {
         return info_hash_str_;
     }
-
-    virtual void clear();
 
     void setName(std::string_view name)
     {

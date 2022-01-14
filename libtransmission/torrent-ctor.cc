@@ -80,7 +80,6 @@ bool tr_ctorSetMetainfoFromFile(tr_ctor* ctor, std::string const& filename, tr_e
         return false;
     }
 
-    ctor->metainfo.clear();
     auto const contents_sv = std::string_view{ std::data(ctor->contents), std::size(ctor->contents) };
     return ctor->metainfo.parseBenc(contents_sv, error);
 }
@@ -92,7 +91,6 @@ bool tr_ctorSetMetainfoFromFile(tr_ctor* ctor, char const* filename, tr_error** 
 
 bool tr_ctorSetMetainfo(tr_ctor* ctor, char const* metainfo, size_t len, tr_error** error)
 {
-    ctor->metainfo.clear();
     ctor->contents.assign(metainfo, metainfo + len);
     auto const contents_sv = std::string_view{ std::data(ctor->contents), std::size(ctor->contents) };
     return ctor->metainfo.parseBenc(contents_sv, error);
@@ -100,7 +98,6 @@ bool tr_ctorSetMetainfo(tr_ctor* ctor, char const* metainfo, size_t len, tr_erro
 
 bool tr_ctorSetMetainfoFromMagnetLink(tr_ctor* ctor, char const* magnet_link, tr_error** error)
 {
-    ctor->metainfo.clear();
     return ctor->metainfo.parseMagnet(magnet_link ? magnet_link : "", error);
 }
 

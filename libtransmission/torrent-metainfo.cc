@@ -131,11 +131,6 @@ tr_torrent_metainfo_tracker_info* tr_torrentMetainfoTracker(
 ****
 ***/
 
-void tr_torrent_metainfo::clear()
-{
-    *this = tr_torrent_metainfo{};
-}
-
 /**
  * @brief Ensure that the URLs for multfile torrents end in a slash.
  *

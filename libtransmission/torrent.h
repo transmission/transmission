@@ -105,7 +105,7 @@ struct tr_torrent : public tr_completion::torrent_view
 {
 public:
     explicit tr_torrent(tr_torrent_metainfo&& tm)
-        : metainfo_{ tm }
+        : metainfo_{ std::move(tm) }
         , completion{ this, &this->metainfo_.blockInfo() }
     {
     }

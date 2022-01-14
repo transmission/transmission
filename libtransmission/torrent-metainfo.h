@@ -24,9 +24,6 @@ struct tr_info;
 struct tr_torrent_metainfo : public tr_magnet_metainfo
 {
 public:
-    tr_torrent_metainfo() = default;
-    ~tr_torrent_metainfo() override = default;
-
     [[nodiscard]] auto empty() const
     {
         return std::empty(files_);
@@ -151,8 +148,6 @@ public:
     {
         return date_created_;
     }
-
-    void clear() final;
 
     [[nodiscard]] std::string benc() const;
 
