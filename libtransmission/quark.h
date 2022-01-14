@@ -85,7 +85,6 @@ enum
     TR_KEY_details_window_height,
     TR_KEY_details_window_width,
     TR_KEY_dht_enabled,
-    TR_KEY_display_name,
     TR_KEY_dnd,
     TR_KEY_done_date,
     TR_KEY_doneDate,

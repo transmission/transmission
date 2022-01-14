@@ -248,10 +248,6 @@ static void tr_buildMetainfoExceptInfoDict(tr_torrent_metainfo const& tm, tr_var
             magnet_info,
             TR_KEY_info_hash,
             std::string_view{ reinterpret_cast<char const*>(std::data(tm.infoHash())), std::size(tm.infoHash()) });
-        if (auto const& val = tm.name(); !std::empty(val))
-        {
-            tr_variantDictAddStr(magnet_info, TR_KEY_display_name, val);
-        }
     }
 }
 
