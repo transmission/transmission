@@ -72,9 +72,9 @@ public:
         return makeFilename(torrent_dir, name(), infoHashString(), BasenameFormat::Hash, ".torrent");
     }
 
-    std::string makeResumeFilename(std::string_view torrent_dir) const
+    std::string makeResumeFilename(std::string_view resume_dir) const
     {
-        return makeFilename(torrent_dir, name(), infoHashString(), BasenameFormat::Hash, ".resume");
+        return makeFilename(resume_dir, name(), infoHashString(), BasenameFormat::Hash, ".resume");
     }
 
     bool migrateFile(
