@@ -239,38 +239,39 @@ static bool appendSanitizedComponent(std::string& out, std::string_view in, bool
     return std::size(out) > original_out_len;
 }
 
-std::string tr_torrent_metainfo::parsePath(std::string_view root, tr_variant* path, std::string& buf)
+bool tr_torrent_metainfo::parsePath(std::string_view root, tr_variant* path, std::string& setme)
 {
     if (!tr_variantIsList(path))
     {
-        return {};
+        return false;
     }
 
-    buf = root;
+    setme = root;
     for (size_t i = 0, n = tr_variantListSize(path); i < n; ++i)
     {
         auto raw = std::string_view{};
         if (!tr_variantGetStrView(tr_variantListChild(path, i), &raw))
         {
-            return {};
+            return false;
         }
 
         auto is_component_adjusted = bool{};
-        auto const pos = std::size(buf);
-        if (!appendSanitizedComponent(buf, raw, &is_component_adjusted))
+        auto const pos = std::size(setme);
+        if (!appendSanitizedComponent(setme, raw, &is_component_adjusted))
         {
             continue;
         }
 
-        buf.insert(std::begin(buf) + pos, TR_PATH_DELIMITER);
+        setme.insert(std::begin(setme) + pos, TR_PATH_DELIMITER);
     }
 
-    if (std::size(buf) <= std::size(root))
+    if (std::size(setme) <= std::size(root))
     {
-        return {};
+        return false;
     }
 
-    return tr_strvUtf8Clean(buf);
+    tr_strvUtf8Clean(setme, setme);
+    return true;
 }
 
 std::string_view tr_torrent_metainfo::parseFiles(tr_torrent_metainfo& setme, tr_variant* info_dict, uint64_t* setme_total_size)
@@ -337,13 +338,12 @@ std::string_view tr_torrent_metainfo::parseFiles(tr_torrent_metainfo& setme, tr_
                 return "path";
             }
 
-            auto const path = parsePath(root_name, path_variant, buf);
-            if (std::empty(path))
+            if (!parsePath(root_name, path_variant, buf))
             {
                 return "path";
             }
 
-            setme.files_.emplace_back(path, len);
+            setme.files_.emplace_back(buf, len);
             total_size += len;
         }
     }
@@ -403,6 +403,7 @@ std::string_view tr_torrent_metainfo::parseImpl(tr_torrent_metainfo& setme, tr_v
 {
     int64_t i = 0;
     auto sv = std::string_view{};
+    auto buf = std::string{};
 
     // info_hash: urlencoded 20-byte SHA1 hash of the value of the info key
     // from the Metainfo file. Note that the value will be a bencoded
@@ -445,7 +446,7 @@ std::string_view tr_torrent_metainfo::parseImpl(tr_torrent_metainfo& setme, tr_v
     // name
     if (tr_variantDictFindStrView(info_dict, TR_KEY_name_utf_8, &sv) || tr_variantDictFindStrView(info_dict, TR_KEY_name, &sv))
     {
-        setme.setName(tr_strvUtf8Clean(sv));
+        setme.setName(tr_strvUtf8Clean(sv, buf));
     }
     else
     {
@@ -456,7 +457,7 @@ std::string_view tr_torrent_metainfo::parseImpl(tr_torrent_metainfo& setme, tr_v
     setme.comment_.clear();
     if (tr_variantDictFindStrView(meta, TR_KEY_comment_utf_8, &sv) || tr_variantDictFindStrView(meta, TR_KEY_comment, &sv))
     {
-        setme.comment_ = tr_strvUtf8Clean(sv);
+        setme.comment_ = tr_strvUtf8Clean(sv, buf);
     }
 
     // created by (optional)
@@ -464,7 +465,7 @@ std::string_view tr_torrent_metainfo::parseImpl(tr_torrent_metainfo& setme, tr_v
     if (tr_variantDictFindStrView(meta, TR_KEY_created_by_utf_8, &sv) ||
         tr_variantDictFindStrView(meta, TR_KEY_created_by, &sv))
     {
-        setme.creator_ = tr_strvUtf8Clean(sv);
+        setme.creator_ = tr_strvUtf8Clean(sv, buf);
     }
 
     // creation date (optional)
@@ -479,7 +480,7 @@ std::string_view tr_torrent_metainfo::parseImpl(tr_torrent_metainfo& setme, tr_v
     setme.source_.clear();
     if (tr_variantDictFindStrView(info_dict, TR_KEY_source, &sv) || tr_variantDictFindStrView(meta, TR_KEY_source, &sv))
     {
-        setme.source_ = tr_strvUtf8Clean(sv);
+        setme.source_ = tr_strvUtf8Clean(sv, buf);
     }
 
     // piece length

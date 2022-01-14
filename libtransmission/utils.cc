@@ -817,17 +817,20 @@ static char* to_utf8(std::string_view sv)
     return strip_non_utf8(sv);
 }
 
-std::string tr_strvUtf8Clean(std::string_view sv)
+std::string& tr_strvUtf8Clean(std::string_view cleanme, std::string& setme)
 {
-    if (tr_utf8_validate(sv, nullptr))
+    if (tr_utf8_validate(cleanme, nullptr))
     {
-        return std::string{ sv };
+        setme = cleanme;
+    }
+    else
+    {
+        auto* const tmp = to_utf8(cleanme);
+        setme.assign(tmp ? tmp : "");
+        tr_free(tmp);
     }
 
-    auto* const tmp = to_utf8(sv);
-    auto ret = std::string{ tmp ? tmp : "" };
-    tr_free(tmp);
-    return ret;
+    return setme;
 }
 
 #ifdef _WIN32
