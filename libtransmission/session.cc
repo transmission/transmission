@@ -2036,7 +2036,7 @@ static void sessionLoadTorrents(void* vdata)
         char const* name = nullptr;
         while ((name = tr_sys_dir_read_name(odir, nullptr)) != nullptr)
         {
-            if (!tr_str_has_suffix(name, ".torrent"))
+            if (!tr_strvEndsWith(name, ".torrent"sv))
             {
                 continue;
             }
