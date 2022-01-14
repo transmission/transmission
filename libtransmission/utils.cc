@@ -14,7 +14,7 @@
 
 #include <algorithm> // std::sort
 #include <array> // std::array
-#include <cctype> /* isdigit(), tolower() */
+#include <cctype> /* isdigit() */
 #include <cerrno>
 #include <cfloat> /* DBL_DIG */
 #include <clocale> /* localeconv() */
@@ -1579,16 +1579,7 @@ std::string_view tr_get_mime_type_for_filename(std::string_view filename)
 
     if (auto const pos = filename.rfind('.'); pos != std::string_view::npos)
     {
-        // make a lowercase copy of the file suffix
-        filename.remove_prefix(pos + 1);
-        auto suffix_lc = std::string{};
-        std::transform(
-            std::begin(filename),
-            std::end(filename),
-            std::back_inserter(suffix_lc),
-            [](auto c) { return std::tolower(c); });
-
-        // find it
+        auto const suffix_lc = tr_strlower(filename.substr(pos + 1));
         auto const it = std::lower_bound(std::begin(mime_type_suffixes), std::end(mime_type_suffixes), suffix_lc, compare);
         if (it != std::end(mime_type_suffixes) && suffix_lc == it->suffix)
         {
