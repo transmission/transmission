@@ -32,7 +32,6 @@
 #include "interned-string.h"
 #include "session.h"
 #include "torrent-metainfo.h"
-#include "tr-assert.h"
 #include "tr-macros.h"
 
 class tr_swarm;
@@ -529,47 +528,9 @@ public:
 
     /// METAINFO - CHECKSUMS
 
-    [[nodiscard]] bool ensurePieceIsChecked(tr_piece_index_t piece)
-    {
-        TR_ASSERT(piece < this->pieceCount());
+    [[nodiscard]] bool ensurePieceIsChecked(tr_piece_index_t piece);
 
-        if (checked_pieces_.test(piece))
-        {
-            return true;
-        }
-
-        bool const checked = checkPiece(piece);
-        this->markChanged();
-        this->setDirty();
-
-        checked_pieces_.set(piece, checked);
-        return checked;
-    }
-
-    void initCheckedPieces(tr_bitfield const& checked, time_t const* mtimes /*fileCount()*/)
-    {
-        TR_ASSERT(std::size(checked) == this->pieceCount());
-        checked_pieces_ = checked;
-
-        auto const n = this->fileCount();
-        this->file_mtimes_.resize(n);
-
-        auto filename = std::string{};
-        for (size_t i = 0; i < n; ++i)
-        {
-            auto const found = this->findFile(filename, i);
-            auto const mtime = found ? found->last_modified_at : 0;
-
-            this->file_mtimes_[i] = mtime;
-
-            // if a file has changed, mark its pieces as unchecked
-            if (mtime == 0 || mtime != mtimes[i])
-            {
-                auto const [begin, end] = piecesInFile(i);
-                checked_pieces_.unsetSpan(begin, end);
-            }
-        }
-    }
+    void initCheckedPieces(tr_bitfield const& checked, time_t const* mtimes /*fileCount()*/);
 
     ///
 

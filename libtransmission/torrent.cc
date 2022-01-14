@@ -692,7 +692,6 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
     }
 
     tor->completeness = tor->completion.status();
-    setLocalErrorIfFilesDisappeared(tor);
 
     tr_ctorInitTorrentPriorities(ctor, tor);
     tr_ctorInitTorrentWanted(ctor, tor);
@@ -766,6 +765,10 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
     else if (doStart)
     {
         tr_torrentStart(tor);
+    }
+    else
+    {
+        setLocalErrorIfFilesDisappeared(tor);
     }
 }
 
@@ -3091,4 +3094,46 @@ void tr_torrent::setDateActive(time_t t)
 void tr_torrent::setBlocks(tr_bitfield blocks)
 {
     this->completion.setBlocks(std::move(blocks));
+}
+
+[[nodiscard]] bool tr_torrent::ensurePieceIsChecked(tr_piece_index_t piece)
+{
+    TR_ASSERT(piece < this->pieceCount());
+
+    if (checked_pieces_.test(piece))
+    {
+        return true;
+    }
+
+    bool const checked = checkPiece(piece);
+    this->markChanged();
+    this->setDirty();
+
+    checked_pieces_.set(piece, checked);
+    return checked;
+}
+
+void tr_torrent::initCheckedPieces(tr_bitfield const& checked, time_t const* mtimes /*fileCount()*/)
+{
+    TR_ASSERT(std::size(checked) == this->pieceCount());
+    checked_pieces_ = checked;
+
+    auto const n = this->fileCount();
+    this->file_mtimes_.resize(n);
+
+    auto filename = std::string{};
+    for (size_t i = 0; i < n; ++i)
+    {
+        auto const found = this->findFile(filename, i);
+        auto const mtime = found ? found->last_modified_at : 0;
+
+        this->file_mtimes_[i] = mtime;
+
+        // if a file has changed, mark its pieces as unchecked
+        if (mtime == 0 || mtime != mtimes[i])
+        {
+            auto const [begin, end] = piecesInFile(i);
+            checked_pieces_.unsetSpan(begin, end);
+        }
+    }
 }
