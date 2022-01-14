@@ -123,7 +123,7 @@ enum tr_variant_parse_opts
 bool tr_variantFromFile(
     tr_variant* setme,
     tr_variant_parse_opts opts,
-    std::string_view filename,
+    std::string const& filename,
     struct tr_error** error = nullptr);
 
 bool tr_variantFromBuf(

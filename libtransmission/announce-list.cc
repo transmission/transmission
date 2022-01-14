@@ -210,7 +210,7 @@ bool tr_announce_list::save(std::string_view torrent_file, tr_error** error) con
 {
     // load the .torrent file
     auto metainfo = tr_variant{};
-    if (!tr_variantFromFile(&metainfo, TR_VARIANT_PARSE_BENC, torrent_file, error))
+    if (!tr_variantFromFile(&metainfo, TR_VARIANT_PARSE_BENC, std::string{ torrent_file }, error))
     {
         return false;
     }

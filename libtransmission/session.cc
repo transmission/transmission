@@ -495,7 +495,7 @@ bool tr_sessionLoadSettings(tr_variant* dict, char const* config_dir, char const
     auto fileSettings = tr_variant{};
     auto const filename = tr_strvPath(config_dir, "settings.json"sv);
     auto success = bool{};
-    if (tr_error* error = nullptr; tr_variantFromFile(&fileSettings, TR_VARIANT_PARSE_JSON, filename.c_str(), &error))
+    if (tr_error* error = nullptr; tr_variantFromFile(&fileSettings, TR_VARIANT_PARSE_JSON, filename, &error))
     {
         tr_variantMergeDicts(dict, &fileSettings);
         tr_variantFree(&fileSettings);
@@ -524,7 +524,7 @@ void tr_sessionSaveSettings(tr_session* session, char const* config_dir, tr_vari
     {
         tr_variant fileSettings;
 
-        if (tr_variantFromFile(&fileSettings, TR_VARIANT_PARSE_JSON, filename.c_str(), nullptr))
+        if (tr_variantFromFile(&fileSettings, TR_VARIANT_PARSE_JSON, filename, nullptr))
         {
             tr_variantMergeDicts(&settings, &fileSettings);
             tr_variantFree(&fileSettings);

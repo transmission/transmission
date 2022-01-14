@@ -316,6 +316,7 @@ std::string_view tr_torrent_metainfo::parseFiles(tr_torrent_metainfo& setme, tr_
 
         auto buf = std::string{};
         auto const n_files = size_t{ tr_variantListSize(files_entry) };
+        setme.files_.reserve(n_files);
         for (size_t i = 0; i < n_files; ++i)
         {
             auto* const file_entry = tr_variantListChild(files_entry, i);
@@ -551,8 +552,7 @@ bool tr_torrent_metainfo::parseTorrentFile(std::string_view filename, std::vecto
     }
 
     auto const sz_filename = std::string{ filename };
-    return tr_loadFile(*contents, sz_filename.c_str(), error) &&
-        parseBenc({ std::data(*contents), std::size(*contents) }, error);
+    return tr_loadFile(*contents, sz_filename, error) && parseBenc({ std::data(*contents), std::size(*contents) }, error);
 }
 
 tr_sha1_digest_t const& tr_torrent_metainfo::pieceHash(tr_piece_index_t piece) const

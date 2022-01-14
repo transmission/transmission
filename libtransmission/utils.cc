@@ -312,10 +312,9 @@ uint8_t* tr_loadFile(char const* path, size_t* size, tr_error** error)
     return buf;
 }
 
-bool tr_loadFile(std::vector<char>& setme, std::string_view path_sv, tr_error** error)
+bool tr_loadFile(std::vector<char>& setme, std::string const& path, tr_error** error)
 {
     char const* const err_fmt = _("Couldn't read \"%1$s\": %2$s");
-    auto const path = std::string{ path_sv };
     auto const* const path_sz = path.c_str();
 
     /* try to stat the file */

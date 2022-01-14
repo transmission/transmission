@@ -186,7 +186,6 @@ enum
     TR_KEY_location,
     TR_KEY_lpd_enabled,
     TR_KEY_m,
-    TR_KEY_magnet_info,
     TR_KEY_magnetLink,
     TR_KEY_main_window_height,
     TR_KEY_main_window_is_maximized,

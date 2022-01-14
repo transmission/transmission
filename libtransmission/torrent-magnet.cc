@@ -238,13 +238,6 @@ static void tr_buildMetainfoExceptInfoDict(tr_torrent_metainfo const& tm, tr_var
             tr_variantListAddStr(webseeds_variant, tm.webseed(i));
         }
     }
-
-    if (tm.fileCount() == 0)
-    {
-        // local transmission extensions.
-        // these temporary placeholders are used for magnets until we have the info dict.
-        auto* const magnet_info = tr_variantDictAddDict(top, TR_KEY_magnet_info, 2);
-    }
 }
 
 static bool useNewMetainfo(tr_torrent* tor, tr_incomplete_metadata* m, tr_error** error)

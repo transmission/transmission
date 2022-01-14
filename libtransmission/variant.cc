@@ -1253,7 +1253,7 @@ bool tr_variantFromBuf(tr_variant* setme, int opts, std::string_view buf, char c
     return true;
 }
 
-bool tr_variantFromFile(tr_variant* setme, tr_variant_parse_opts opts, std::string_view filename, tr_error** error)
+bool tr_variantFromFile(tr_variant* setme, tr_variant_parse_opts opts, std::string const& filename, tr_error** error)
 {
     // can't do inplace when this function is allocating & freeing the memory...
     TR_ASSERT((opts & TR_VARIANT_PARSE_INPLACE) == 0);
