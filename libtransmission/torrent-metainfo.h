@@ -121,6 +121,10 @@ public:
     {
         return files_.at(i).path();
     }
+    void setFileSubpath(tr_file_index_t i, std::string_view subpath)
+    {
+        files_.at(i).setSubpath(subpath);
+    }
     auto fileSize(tr_file_index_t i) const
     {
         return files_.at(i).size();
@@ -134,6 +138,11 @@ public:
     [[nodiscard]] auto const& torrentFile() const
     {
         return torrent_file_;
+    }
+
+    void setTorrentFile(std::string_view filename)
+    {
+        torrent_file_ = filename;
     }
 
     [[nodiscard]] tr_sha1_digest_t const& pieceHash(tr_piece_index_t piece) const;
@@ -172,6 +181,12 @@ private:
         {
             return path_;
         }
+
+        void setSubpath(std::string_view subpath)
+        {
+            path_ = subpath;
+        }
+
         uint64_t size() const
         {
             return size_;

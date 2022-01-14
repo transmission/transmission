@@ -16,7 +16,6 @@ add_executable(libtransmission-test
     json-test.cc
     magnet-metainfo-test.cc
     makemeta-test.cc
-    metainfo-test.cc
     move-test.cc
     peer-mgr-active-requests-test.cc
     peer-mgr-wishlist-test.cc

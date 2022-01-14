@@ -2021,8 +2021,6 @@ static void sessionLoadTorrents(void* vdata)
     auto* data = static_cast<struct sessionLoadTorrentsData*>(vdata);
     TR_ASSERT(tr_isSession(data->session));
 
-    tr_ctorSetSave(data->ctor, false); /* since we already have them */
-
     tr_sys_path_info info;
     char const* const dirname = tr_getTorrentDir(data->session);
     tr_sys_dir_t odir = (tr_sys_path_get_info(dirname, 0, &info, nullptr) && info.type == TR_SYS_PATH_IS_DIRECTORY) ?

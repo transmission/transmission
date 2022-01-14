@@ -20,11 +20,6 @@
 ****
 ***/
 
-#include <memory>
-#include <string>
-#include <string_view>
-#include <vector>
-
 #include <stdbool.h> /* bool */
 #include <stddef.h> /* size_t */
 #include <stdint.h> /* uintN_t */
@@ -58,7 +53,6 @@ class tr_announce_list;
 
 struct tr_ctor;
 struct tr_error;
-struct tr_info;
 struct tr_session;
 struct tr_torrent;
 struct tr_torrent_metainfo;
@@ -1173,8 +1167,6 @@ char const* tr_torrentGetDownloadDir(tr_torrent const* torrent);
  */
 char const* tr_torrentGetCurrentDir(tr_torrent const* tor);
 
-char* tr_torrentInfoGetMagnetLink(tr_info const* inf);
-
 /**
  * Returns a newly-allocated string with a magnet link of the torrent.
  * Use tr_free() to free the string when done.
@@ -1498,140 +1490,6 @@ using tr_verify_done_func = void (*)(tr_torrent* torrent, bool aborted, void* us
  */
 void tr_torrentVerify(tr_torrent* torrent, tr_verify_done_func callback_func_or_nullptr, void* callback_data_or_nullptr);
 
-/***********************************************************************
- * tr_info
- **********************************************************************/
-
-/** @brief a part of tr_info that represents a single file of the torrent's content */
-struct tr_file
-{
-    // public
-    std::string subpath_; /* Path to the file */
-    uint64_t size_; /* Length of the file, in bytes */
-};
-
-/** @brief information about a torrent that comes from its metainfo file */
-struct tr_info
-{
-    auto totalSize() const
-    {
-        return total_size_;
-    }
-
-    auto pieceSize() const
-    {
-        return piece_size_;
-    }
-
-    auto pieceCount() const
-    {
-        return piece_count_;
-    }
-
-    auto dateCreated() const
-    {
-        return date_created_;
-    }
-
-    auto const& infoHash() const
-    {
-        return hash_;
-    }
-
-    auto const& infoHashString() const
-    {
-        return info_hash_string_;
-    }
-
-    auto const& name() const
-    {
-        return name_;
-    }
-
-    void setName(std::string_view name)
-    {
-        name_ = name;
-    }
-
-    auto const& creator() const
-    {
-        return creator_;
-    }
-
-    auto const& comment() const
-    {
-        return comment_;
-    }
-
-    auto const& source() const
-    {
-        return source_;
-    }
-
-    auto const& torrentFile() const
-    {
-        return torrent_file_;
-    }
-
-    tr_file_index_t fileCount() const
-    {
-        return std::size(files);
-    }
-
-    auto fileSize(tr_file_index_t i) const
-    {
-        return files[i].size_;
-    }
-
-    std::string const& fileSubpath(tr_file_index_t i) const
-    {
-        return files[i].subpath_;
-    }
-
-    void setFileSubpath(tr_file_index_t i, std::string_view subpath)
-    {
-        files[i].subpath_ = subpath;
-    }
-
-    auto webseedCount() const
-    {
-        return std::size(webseeds_);
-    }
-
-    auto const& webseed(size_t i) const
-    {
-        return webseeds_[i];
-    }
-
-    auto isPrivate() const
-    {
-        return is_private_;
-    }
-
-    void setAnnounceList(tr_announce_list const& list);
-
-    tr_announce_list const& announceList() const
-    {
-        return *announce_list;
-    }
-
-    tr_sha1_digest_t hash_;
-    std::shared_ptr<tr_announce_list> announce_list;
-    std::vector<tr_file> files;
-    std::vector<std::string> webseeds_;
-    std::string comment_;
-    std::string creator_;
-    std::string info_hash_string_;
-    std::string name_;
-    std::string source_;
-    std::string torrent_file_;
-    uint64_t total_size_ = 0;
-    tr_piece_index_t piece_count_ = 0;
-    time_t date_created_ = 0;
-    uint32_t piece_size_ = 0;
-    bool is_private_ = false;
-};
-
 bool tr_torrentHasMetadata(tr_torrent const* tor);
 
 /**
@@ -1820,7 +1678,7 @@ struct tr_stat
     time_t activityDate;
 
     /** The last time during this session that a rarely-changing field
-        changed -- e.g. any tr_info field (trackers, filenames, name)
+        changed -- e.g. any tr_torrent_metainfo field (trackers, filenames, name)
         or download directory. RPC clients can monitor this to know when
         to reload fields that rarely change. */
     time_t editDate;

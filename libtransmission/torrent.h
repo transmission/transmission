@@ -31,6 +31,7 @@
 #include "file-piece-map.h"
 #include "interned-string.h"
 #include "session.h"
+#include "torrent-metainfo.h"
 #include "tr-assert.h"
 #include "tr-macros.h"
 
@@ -47,10 +48,6 @@ struct tr_announcer_tiers;
 **/
 
 void tr_torrentFree(tr_torrent* tor);
-
-void tr_ctorSetSave(tr_ctor* ctor, bool saveMetadataInOurTorrentsDir);
-
-bool tr_ctorGetSave(tr_ctor const* ctor);
 
 void tr_ctorInitTorrentPriorities(tr_ctor const* ctor, tr_torrent* tor);
 
@@ -107,9 +104,9 @@ struct tr_incomplete_metadata;
 struct tr_torrent : public tr_completion::torrent_view
 {
 public:
-    explicit tr_torrent(tr_info const& inf)
-        : block_info{ inf.totalSize(), inf.pieceSize() }
-        , completion{ this, &this->block_info }
+    explicit tr_torrent(tr_torrent_metainfo const& tm)
+        : metainfo_{ tm }
+        , completion{ this, &this->metainfo_.blockInfo() }
     {
     }
 
@@ -129,16 +126,14 @@ public:
 
     tr_sha1_digest_t pieceHash(tr_piece_index_t i) const
     {
-        TR_ASSERT(i < std::size(this->piece_checksums_));
-        return this->piece_checksums_[i];
+        return metainfo_.pieceHash(i);
     }
 
     // these functions should become private when possible,
     // but more refactoring is needed before that can happen
     // because much of tr_torrent's impl is in the non-member C bindings
-    //
-    // private:
-    void swapMetainfo(tr_metainfo_parsed& parsed);
+
+    void setMetainfo(tr_torrent_metainfo const& tm);
 
     auto unique_lock() const
     {
@@ -155,7 +150,7 @@ public:
 
     [[nodiscard]] constexpr auto const& blockInfo() const
     {
-        return block_info;
+        return metainfo_.blockInfo();
     }
 
     [[nodiscard]] constexpr auto blockCount() const
@@ -371,20 +366,23 @@ public:
 
     [[nodiscard]] tr_file_index_t fileCount() const
     {
-        return std::size(info.files);
+        return metainfo_.fileCount();
     }
 
     [[nodiscard]] std::string const& fileSubpath(tr_file_index_t i) const
     {
-        return info.fileSubpath(i);
+        return metainfo_.fileSubpath(i);
     }
 
     [[nodiscard]] auto fileSize(tr_file_index_t i) const
     {
-        return info.fileSize(i);
+        return metainfo_.fileSize(i);
     }
 
-    void setFileSubpath(tr_file_index_t i, std::string_view subpath);
+    void setFileSubpath(tr_file_index_t i, std::string_view subpath)
+    {
+        metainfo_.setFileSubpath(i, subpath);
+    }
 
     struct tr_found_file_t : public tr_sys_path_info
     {
@@ -407,12 +405,12 @@ public:
 
     [[nodiscard]] auto const& announceList() const
     {
-        return *this->info.announce_list;
+        return metainfo_.announceList();
     }
 
     [[nodiscard]] auto& announceList()
     {
-        return *this->info.announce_list;
+        return metainfo_.announceList();
     }
 
     [[nodiscard]] auto trackerCount() const
@@ -434,31 +432,34 @@ public:
 
     [[nodiscard]] auto webseedCount() const
     {
-        return info.webseedCount();
+        return metainfo_.webseedCount();
     }
 
     [[nodiscard]] auto const& webseed(size_t i) const
     {
-        return info.webseed(i);
+        return metainfo_.webseed(i);
     }
 
     /// METAINFO - OTHER
 
-    void setName(std::string_view name);
+    void setName(std::string_view name)
+    {
+        metainfo_.setName(name);
+    }
 
     [[nodiscard]] auto const& name() const
     {
-        return this->info.name();
+        return metainfo_.name();
     }
 
     [[nodiscard]] auto const& infoHash() const
     {
-        return this->info.infoHash();
+        return metainfo_.infoHash();
     }
 
     [[nodiscard]] auto isPrivate() const
     {
-        return this->info.isPrivate();
+        return metainfo_.isPrivate();
     }
 
     [[nodiscard]] auto isPublic() const
@@ -468,32 +469,37 @@ public:
 
     [[nodiscard]] auto const& infoHashString() const
     {
-        return this->info.infoHashString();
+        return metainfo_.infoHashString();
     }
 
     [[nodiscard]] auto dateCreated() const
     {
-        return this->info.dateCreated();
+        return metainfo_.dateCreated();
     }
 
     [[nodiscard]] auto const& torrentFile() const
     {
-        return this->info.torrentFile();
+        return metainfo_.torrentFile();
+    }
+
+    void setTorrentFile(std::string_view filename)
+    {
+        metainfo_.setTorrentFile(filename);
     }
 
     [[nodiscard]] auto const& comment() const
     {
-        return this->info.comment();
+        return metainfo_.comment();
     }
 
     [[nodiscard]] auto const& creator() const
     {
-        return this->info.creator();
+        return metainfo_.creator();
     }
 
     [[nodiscard]] auto const& source() const
     {
-        return this->info.source();
+        return metainfo_.source();
     }
 
     [[nodiscard]] auto hasMetadata() const
@@ -503,12 +509,22 @@ public:
 
     [[nodiscard]] auto infoDictSize() const
     {
-        return this->info_dict_size;
+        return metainfo_.infoDictSize();
     }
 
     [[nodiscard]] auto infoDictOffset() const
     {
-        return this->info_dict_offset;
+        return metainfo_.infoDictOffset();
+    }
+
+    [[nodiscard]] auto makeTorrentFilename() const
+    {
+        return metainfo_.makeTorrentFilename(this->session->torrent_dir);
+    }
+
+    [[nodiscard]] auto makeResumeFilename() const
+    {
+        return metainfo_.makeTorrentFilename(this->session->torrent_dir);
     }
 
     /// METAINFO - CHECKSUMS
@@ -609,11 +625,9 @@ public:
         torrent's content than any other mime-type. */
     std::string_view primaryMimeType() const;
 
-    tr_info info = {};
+    tr_torrent_metainfo metainfo_;
 
     tr_bitfield checked_pieces_ = tr_bitfield{ 0 };
-
-    tr_block_info block_info;
 
     // TODO(ckerr): make private once some of torrent.cc's `tr_torrentFoo()` methods are member functions
     tr_completion completion;
@@ -667,17 +681,6 @@ public:
     // Where the files are now.
     // Will equal either download_dir or incomplete_dir
     tr_interned_string current_dir;
-
-    /* Length, in bytes, of the "info" dict in the .torrent file. */
-    uint64_t info_dict_size = 0;
-
-    /* Offset, in bytes, of the beginning of the "info" dict in the .torrent file.
-     *
-     * Used by the torrent-magnet code for serving metainfo to peers.
-     * This field is lazy-generated and might not be initialized yet. */
-    uint64_t info_dict_offset = 0;
-
-    bool info_dict_offset_is_cached = false;
 
     tr_completeness completeness = TR_LEECH;
 
@@ -765,7 +768,7 @@ public:
 
     static auto constexpr MagicNumber = int{ 95549 };
 
-    tr_file_piece_map fpm_ = tr_file_piece_map{ info };
+    tr_file_piece_map fpm_ = tr_file_piece_map{ metainfo_ };
     tr_file_priorities file_priorities_{ &fpm_ };
     tr_files_wanted files_wanted_{ &fpm_ };
 
@@ -785,8 +788,6 @@ private:
             recheckCompleteness();
         }
     }
-
-    mutable std::vector<tr_sha1_digest_t> piece_checksums_;
 };
 
 /***
@@ -823,10 +824,6 @@ bool tr_torrentFindFile2(tr_torrent const*, tr_file_index_t fileNo, char const**
  * In the current implementation this is done by appending ".part"
  * a la Firefox. */
 char* tr_torrentBuildPartial(tr_torrent const*, tr_file_index_t fileNo);
-
-/* for when the info dict has been fundamentally changed wrt files,
- * piece size, etc. such as in BEP 9 where peers exchange metadata */
-void tr_torrentGotNewInfoDict(tr_torrent* tor);
 
 tr_peer_id_t const& tr_torrentGetPeerId(tr_torrent* tor);
 

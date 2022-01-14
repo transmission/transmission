@@ -14,8 +14,8 @@
 #include "transmission.h"
 
 #include "announce-list.h"
-#include "metainfo.h"
 #include "quark.h"
+#include "torrent-metainfo.h"
 #include "utils.h"
 #include "variant.h"
 
@@ -244,14 +244,15 @@ bool tr_announce_list::save(std::string_view torrent_file, tr_error** error) con
     }
 
     // confirm that it's good by parsing it back again
-    if (!tr_metainfoParse(nullptr, &metainfo, error))
+    auto const contents = tr_variantToStr(&metainfo, TR_VARIANT_FMT_BENC);
+    tr_variantFree(&metainfo);
+
+    auto tm = tr_torrent_metainfo{};
+    if (!tm.parseBenc(contents))
     {
-        tr_variantFree(&metainfo);
         return false;
     }
 
     // save it
-    auto const contents = tr_variantToStr(&metainfo, TR_VARIANT_FMT_BENC);
-    tr_variantFree(&metainfo);
     return tr_saveFile(torrent_file, contents, error);
 }

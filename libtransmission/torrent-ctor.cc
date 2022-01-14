@@ -38,7 +38,6 @@ struct optional_args
 struct tr_ctor
 {
     tr_session const* const session;
-    bool saveInOurTorrentsDir = false;
     std::optional<bool> delete_source;
 
     tr_torrent_metainfo metainfo = {};
@@ -194,16 +193,6 @@ bool tr_ctorGetDeleteSource(tr_ctor const* ctor, bool* setme)
 ****
 ***/
 
-void tr_ctorSetSave(tr_ctor* ctor, bool saveInOurTorrentsDir)
-{
-    ctor->saveInOurTorrentsDir = saveInOurTorrentsDir;
-}
-
-bool tr_ctorGetSave(tr_ctor const* ctor)
-{
-    return ctor != nullptr && ctor->saveInOurTorrentsDir;
-}
-
 void tr_ctorSetPaused(tr_ctor* ctor, tr_ctorMode mode, bool paused)
 {
     TR_ASSERT(ctor != nullptr);
@@ -342,7 +331,6 @@ tr_ctor* tr_ctorNew(tr_session const* session)
     tr_ctorSetPeerLimit(ctor, TR_FALLBACK, session->peerLimitPerTorrent);
     tr_ctorSetDownloadDir(ctor, TR_FALLBACK, tr_sessionGetDownloadDir(session));
 
-    tr_ctorSetSave(ctor, true);
     return ctor;
 }
 
