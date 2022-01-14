@@ -446,7 +446,7 @@ std::string_view tr_torrent_metainfo::parseImpl(tr_torrent_metainfo& setme, tr_v
     // name
     if (tr_variantDictFindStrView(info_dict, TR_KEY_name_utf_8, &sv) || tr_variantDictFindStrView(info_dict, TR_KEY_name, &sv))
     {
-        setme.setName(tr_strvUtf8Clean(sv, buf));
+        tr_strvUtf8Clean(sv, setme.name_);
     }
     else
     {
@@ -457,7 +457,7 @@ std::string_view tr_torrent_metainfo::parseImpl(tr_torrent_metainfo& setme, tr_v
     setme.comment_.clear();
     if (tr_variantDictFindStrView(meta, TR_KEY_comment_utf_8, &sv) || tr_variantDictFindStrView(meta, TR_KEY_comment, &sv))
     {
-        setme.comment_ = tr_strvUtf8Clean(sv, buf);
+        tr_strvUtf8Clean(sv, setme.comment_);
     }
 
     // created by (optional)
@@ -465,7 +465,7 @@ std::string_view tr_torrent_metainfo::parseImpl(tr_torrent_metainfo& setme, tr_v
     if (tr_variantDictFindStrView(meta, TR_KEY_created_by_utf_8, &sv) ||
         tr_variantDictFindStrView(meta, TR_KEY_created_by, &sv))
     {
-        setme.creator_ = tr_strvUtf8Clean(sv, buf);
+        tr_strvUtf8Clean(sv, setme.creator_);
     }
 
     // creation date (optional)
@@ -480,7 +480,7 @@ std::string_view tr_torrent_metainfo::parseImpl(tr_torrent_metainfo& setme, tr_v
     setme.source_.clear();
     if (tr_variantDictFindStrView(info_dict, TR_KEY_source, &sv) || tr_variantDictFindStrView(meta, TR_KEY_source, &sv))
     {
-        setme.source_ = tr_strvUtf8Clean(sv, buf);
+        tr_strvUtf8Clean(sv, setme.source_);
     }
 
     // piece length
