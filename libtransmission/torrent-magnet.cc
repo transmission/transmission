@@ -244,10 +244,6 @@ static void tr_buildMetainfoExceptInfoDict(tr_torrent_metainfo const& tm, tr_var
         // local transmission extensions.
         // these temporary placeholders are used for magnets until we have the info dict.
         auto* const magnet_info = tr_variantDictAddDict(top, TR_KEY_magnet_info, 2);
-        tr_variantDictAddStr(
-            magnet_info,
-            TR_KEY_info_hash,
-            std::string_view{ reinterpret_cast<char const*>(std::data(tm.infoHash())), std::size(tm.infoHash()) });
     }
 }
 
