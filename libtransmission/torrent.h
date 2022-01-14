@@ -524,7 +524,7 @@ public:
 
     [[nodiscard]] auto makeResumeFilename() const
     {
-        return metainfo_.makeTorrentFilename(this->session->torrent_dir);
+        return metainfo_.makeResumeFilename(this->session->torrent_dir);
     }
 
     /// METAINFO - CHECKSUMS
