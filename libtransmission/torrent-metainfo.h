@@ -213,6 +213,11 @@ private:
 
         void setSubpath(std::string_view subpath)
         {
+            if (path_ == subpath)
+            {
+                return;
+            }
+
             path_ = subpath;
         }
 
