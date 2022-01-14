@@ -280,6 +280,7 @@ static bool useNewMetainfo(tr_torrent* tor, tr_incomplete_metadata* m, tr_error*
     }
 
     // tor should keep this metainfo
+    metainfo.setTorrentFile(filename);
     tor->setMetainfo(metainfo);
 
     return true;
