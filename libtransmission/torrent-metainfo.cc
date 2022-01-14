@@ -311,7 +311,6 @@ std::string_view tr_torrent_metainfo::parseFiles(tr_torrent_metainfo& setme, tr_
     // In the multifile case, the name key is the name of a directory.
     else if (tr_variantDictFindList(info_dict, TR_KEY_files, &files_entry))
     {
-
         auto buf = std::string{};
         auto const n_files = size_t{ tr_variantListSize(files_entry) };
         setme.files_.reserve(n_files);
@@ -400,7 +399,6 @@ std::string_view tr_torrent_metainfo::parseImpl(tr_torrent_metainfo& setme, tr_v
 {
     int64_t i = 0;
     auto sv = std::string_view{};
-    auto buf = std::string{};
 
     // info_hash: urlencoded 20-byte SHA1 hash of the value of the info key
     // from the Metainfo file. Note that the value will be a bencoded
