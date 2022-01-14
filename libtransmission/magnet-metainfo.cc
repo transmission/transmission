@@ -211,57 +211,6 @@ bool tr_magnet_metainfo::parseMagnet(std::string_view magnet_link, tr_error** er
     return got_checksum;
 }
 
-void tr_magnet_metainfo::toVariant(tr_variant* top) const
-{
-    tr_variantInitDict(top, 4);
-
-    // announce list
-    auto n = std::size(this->announceList());
-    if (n == 1)
-    {
-        tr_variantDictAddQuark(top, TR_KEY_announce, this->announceList().at(0).announce_str.quark());
-    }
-    else
-    {
-        auto current_tier = tr_tracker_tier_t{};
-        tr_variant* tracker_list = nullptr;
-
-        auto* tier_list = tr_variantDictAddList(top, TR_KEY_announce_list, n);
-        for (auto const& tracker : this->announceList())
-        {
-            if (tracker_list == nullptr || current_tier != tracker.tier)
-            {
-                tracker_list = tr_variantListAddList(tier_list, 1);
-                current_tier = tracker.tier;
-            }
-
-            tr_variantListAddQuark(tracker_list, tracker.announce_str.quark());
-        }
-    }
-
-    // webseeds
-    n = this->webseedCount();
-    if (n != 0)
-    {
-        tr_variant* list = tr_variantDictAddList(top, TR_KEY_url_list, n);
-
-        for (size_t i = 0; i < n; ++i)
-        {
-            tr_variantListAddStr(list, this->webseed(i));
-        }
-    }
-
-    // nonstandard keys
-    auto* const d = tr_variantDictAddDict(top, TR_KEY_magnet_info, 2);
-
-    tr_variantDictAddRaw(d, TR_KEY_info_hash, std::data(this->infoHash()), std::size(this->infoHash()));
-
-    if (!std::empty(this->name()))
-    {
-        tr_variantDictAddStr(d, TR_KEY_display_name, this->name());
-    }
-}
-
 std::string tr_magnet_metainfo::makeFilename(
     std::string_view dirname,
     std::string_view name,

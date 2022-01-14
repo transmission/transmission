@@ -67,8 +67,6 @@ public:
         name_ = name;
     }
 
-    void toVariant(tr_variant* top) const;
-
     std::string makeTorrentFilename(std::string_view torrent_dir) const
     {
         return makeFilename(torrent_dir, name(), infoHashString(), BasenameFormat::Hash, ".torrent");

@@ -793,7 +793,6 @@ tr_torrent* tr_torrentNew(tr_ctor const* ctor, tr_torrent** setme_duplicate_of)
         return nullptr;
     }
 
-    // FIXME(ckerr): is metainfo.toVariant() still used?
     auto* const tor = new tr_torrent{ *metainfo };
     torrentInit(tor, ctor);
     return tor;
