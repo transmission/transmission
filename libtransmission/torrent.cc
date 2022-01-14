@@ -2952,7 +2952,10 @@ static void renameTorrentFileString(tr_torrent* tor, char const* oldpath, char c
         tr_free(tmp);
     }
 
-    tor->setFileSubpath(file_index, name);
+    if (subpath != name)
+    {
+        tor->setFileSubpath(file_index, name);
+    }
 }
 
 struct rename_data
