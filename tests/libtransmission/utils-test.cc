@@ -423,7 +423,7 @@ TEST_F(UtilsTest, saveFile)
     auto filename = tr_strvJoin(::testing::TempDir(), "filename.txt");
     auto contents = "these are the contents"sv;
     tr_error* error = nullptr;
-    EXPECT_TRUE(tr_saveFile(filename.c_str(), contents, &error));
+    EXPECT_TRUE(tr_saveFile(filename, contents, &error));
     EXPECT_EQ(nullptr, error);
 
     // now read the file back in and confirm the contents are the same
@@ -439,7 +439,7 @@ TEST_F(UtilsTest, saveFile)
 
     // try saving a file to a path that doesn't exist
     filename = "/this/path/does/not/exist/foo.txt";
-    EXPECT_FALSE(tr_saveFile(filename.c_str(), contents, &error));
+    EXPECT_FALSE(tr_saveFile(filename, contents, &error));
     ASSERT_NE(nullptr, error);
     EXPECT_NE(0, error->code);
     tr_error_clear(&error);

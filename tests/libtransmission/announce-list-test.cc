@@ -348,7 +348,7 @@ TEST_F(AnnounceListTest, save)
     tr_error* error = nullptr;
     EXPECT_TRUE(tr_loadFile(original_content, OriginalFile, &error));
     EXPECT_EQ(nullptr, error);
-    EXPECT_TRUE(tr_saveFile(test_file.c_str(), { std::data(original_content), std::size(original_content) }, &error));
+    EXPECT_TRUE(tr_saveFile(test_file, { std::data(original_content), std::size(original_content) }, &error));
     EXPECT_EQ(nullptr, error);
 
     // make an announce_list for it
@@ -364,7 +364,7 @@ TEST_F(AnnounceListTest, save)
     tr_error_clear(&error);
 
     // now save to a real .torrent fi le
-    EXPECT_TRUE(announce_list.save(test_file.c_str(), &error));
+    EXPECT_TRUE(announce_list.save(test_file, &error));
     EXPECT_EQ(nullptr, error);
 
     // load the original

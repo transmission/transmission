@@ -1208,7 +1208,7 @@ std::string tr_variantToStr(tr_variant const* v, tr_variant_fmt fmt)
     return evbuffer_free_to_str(tr_variantToBuf(v, fmt));
 }
 
-int tr_variantToFile(tr_variant const* v, tr_variant_fmt fmt, std::string_view filename)
+int tr_variantToFile(tr_variant const* v, tr_variant_fmt fmt, std::string const& filename)
 {
     auto error_code = int{ 0 };
     auto const contents = tr_variantToStr(v, fmt);
