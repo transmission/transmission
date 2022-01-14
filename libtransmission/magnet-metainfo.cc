@@ -231,7 +231,7 @@ bool tr_magnet_metainfo::migrateFile(
     std::string_view suffix)
 {
     auto old_filename = makeFilename(dirname, name, info_hash_string, BasenameFormat::NameAndPartialHash, suffix);
-    auto new_filename = makeFilename(dirname, name, info_hash_string, BasenameFormat::NameAndPartialHash, suffix);
+    auto new_filename = makeFilename(dirname, name, info_hash_string, BasenameFormat::Hash, suffix);
     if (tr_sys_path_rename(old_filename.c_str(), new_filename.c_str(), nullptr))
     {
         auto const name_sz = std::string{ name };
