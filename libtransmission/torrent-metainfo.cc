@@ -21,6 +21,8 @@
 #include "crypto-utils.h"
 #include "error-types.h"
 #include "error.h"
+#include "file.h"
+#include "log.h"
 #include "quark.h"
 #include "torrent-metainfo.h"
 #include "utils.h"
@@ -554,4 +556,44 @@ bool tr_torrent_metainfo::parseTorrentFile(std::string_view filename, std::vecto
 tr_sha1_digest_t const& tr_torrent_metainfo::pieceHash(tr_piece_index_t piece) const
 {
     return this->pieces_[piece];
+}
+
+std::string tr_torrent_metainfo::makeFilename(
+    std::string_view dirname,
+    std::string_view name,
+    std::string_view info_hash_string,
+    BasenameFormat format,
+    std::string_view suffix)
+{
+    // `${dirname}/${name}.${info_hash}${suffix}`
+    // `${dirname}/${info_hash}${suffix}`
+    return format == BasenameFormat::Hash ? tr_strvJoin(dirname, "/"sv, info_hash_string, suffix) :
+                                            tr_strvJoin(dirname, "/"sv, name, "."sv, info_hash_string.substr(0, 16), suffix);
+}
+
+bool tr_torrent_metainfo::migrateFile(
+    std::string_view dirname,
+    std::string_view name,
+    std::string_view info_hash_string,
+    std::string_view suffix)
+{
+    auto const old_filename = makeFilename(dirname, name, info_hash_string, BasenameFormat::NameAndPartialHash, suffix);
+    if (!tr_sys_path_exists(old_filename.c_str(), nullptr))
+    {
+        return false;
+    }
+
+    auto const new_filename = makeFilename(dirname, name, info_hash_string, BasenameFormat::Hash, suffix);
+    if (!tr_sys_path_rename(old_filename.c_str(), new_filename.c_str(), nullptr))
+    {
+        return false;
+    }
+
+    auto const name_sz = std::string{ name };
+    tr_logAddNamedError(
+        name_sz.c_str(),
+        "Migrated torrent file from \"%s\" to \"%s\"",
+        old_filename.c_str(),
+        new_filename.c_str());
+    return true;
 }

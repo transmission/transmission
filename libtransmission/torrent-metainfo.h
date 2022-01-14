@@ -161,6 +161,22 @@ public:
         return info_dict_offset_;
     }
 
+    std::string makeTorrentFilename(std::string_view torrent_dir) const
+    {
+        return makeFilename(torrent_dir, name(), infoHashString(), BasenameFormat::Hash, ".torrent");
+    }
+
+    std::string makeResumeFilename(std::string_view resume_dir) const
+    {
+        return makeFilename(resume_dir, name(), infoHashString(), BasenameFormat::Hash, ".resume");
+    }
+
+    bool migrateFile(
+        std::string_view dirname,
+        std::string_view name,
+        std::string_view info_hash_string,
+        std::string_view suffix);
+
 private:
     static bool parsePath(std::string_view root, tr_variant* path, std::string& setme);
     static std::string fixWebseedUrl(tr_torrent_metainfo const& tm, std::string_view url);
@@ -168,6 +184,24 @@ private:
     static std::string_view parseImpl(tr_torrent_metainfo& setme, tr_variant* meta, std::string_view benc);
     static std::string_view parseAnnounce(tr_torrent_metainfo& setme, tr_variant* meta);
     static void parseWebseeds(tr_torrent_metainfo& setme, tr_variant* meta);
+
+    enum class BasenameFormat
+    {
+        Hash,
+        NameAndPartialHash
+    };
+
+    static std::string makeFilename(
+        std::string_view dirname,
+        std::string_view name,
+        std::string_view info_hash_string,
+        BasenameFormat format,
+        std::string_view suffix);
+
+    std::string makeFilename(std::string_view dirname, BasenameFormat format, std::string_view suffix) const
+    {
+        return makeFilename(dirname, name(), infoHashString(), format, suffix);
+    }
 
     struct file_t
     {

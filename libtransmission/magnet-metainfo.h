@@ -64,41 +64,7 @@ public:
         name_ = name;
     }
 
-    std::string makeTorrentFilename(std::string_view torrent_dir) const
-    {
-        return makeFilename(torrent_dir, name(), infoHashString(), BasenameFormat::Hash, ".torrent");
-    }
-
-    std::string makeResumeFilename(std::string_view resume_dir) const
-    {
-        return makeFilename(resume_dir, name(), infoHashString(), BasenameFormat::Hash, ".resume");
-    }
-
-    bool migrateFile(
-        std::string_view dirname,
-        std::string_view name,
-        std::string_view info_hash_string,
-        std::string_view suffix);
-
 protected:
-    enum class BasenameFormat
-    {
-        Hash,
-        NameAndPartialHash
-    };
-
-    static std::string makeFilename(
-        std::string_view dirname,
-        std::string_view name,
-        std::string_view info_hash_string,
-        BasenameFormat format,
-        std::string_view suffix);
-
-    std::string makeFilename(std::string_view dirname, BasenameFormat format, std::string_view suffix) const
-    {
-        return makeFilename(dirname, name(), infoHashString(), format, suffix);
-    }
-
     tr_announce_list announce_list_;
     std::vector<std::string> webseed_urls_;
     tr_sha1_digest_t info_hash_;

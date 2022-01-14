@@ -16,7 +16,6 @@
 #include "crypto-utils.h"
 #include "error.h"
 #include "error-types.h"
-#include "log.h"
 #include "magnet-metainfo.h"
 #include "tr-assert.h"
 #include "utils.h"
@@ -204,44 +203,4 @@ bool tr_magnet_metainfo::parseMagnet(std::string_view magnet_link, tr_error** er
     info_hash_str_ = tr_sha1_to_string(this->infoHash());
 
     return got_checksum;
-}
-
-std::string tr_magnet_metainfo::makeFilename(
-    std::string_view dirname,
-    std::string_view name,
-    std::string_view info_hash_string,
-    BasenameFormat format,
-    std::string_view suffix)
-{
-    // `${dirname}/${name}.${info_hash}${suffix}`
-    // `${dirname}/${info_hash}${suffix}`
-    return format == BasenameFormat::Hash ? tr_strvJoin(dirname, "/"sv, info_hash_string, suffix) :
-                                            tr_strvJoin(dirname, "/"sv, name, "."sv, info_hash_string.substr(0, 16), suffix);
-}
-
-bool tr_magnet_metainfo::migrateFile(
-    std::string_view dirname,
-    std::string_view name,
-    std::string_view info_hash_string,
-    std::string_view suffix)
-{
-    auto const old_filename = makeFilename(dirname, name, info_hash_string, BasenameFormat::NameAndPartialHash, suffix);
-    if (!tr_sys_path_exists(old_filename.c_str(), nullptr))
-    {
-        return false;
-    }
-
-    auto const new_filename = makeFilename(dirname, name, info_hash_string, BasenameFormat::Hash, suffix);
-    if (!tr_sys_path_rename(old_filename.c_str(), new_filename.c_str(), nullptr))
-    {
-        return false;
-    }
-
-    auto const name_sz = std::string{ name };
-    tr_logAddNamedError(
-        name_sz.c_str(),
-        "Migrated torrent file from \"%s\" to \"%s\"",
-        old_filename.c_str(),
-        new_filename.c_str());
-    return true;
 }
