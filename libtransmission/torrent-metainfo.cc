@@ -312,6 +312,7 @@ std::string_view tr_torrent_metainfo::parseFiles(tr_torrent_metainfo& setme, tr_
     else if (tr_variantDictFindList(info_dict, TR_KEY_files, &files_entry))
     {
         auto buf = std::string{};
+        buf.reserve(1024); // arbitrary
         auto const n_files = size_t{ tr_variantListSize(files_entry) };
         setme.files_.reserve(n_files);
         for (size_t i = 0; i < n_files; ++i)
