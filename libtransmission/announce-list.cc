@@ -14,10 +14,12 @@
 #include "transmission.h"
 
 #include "announce-list.h"
-#include "metainfo.h"
 #include "quark.h"
+#include "torrent-metainfo.h"
 #include "utils.h"
 #include "variant.h"
+
+using namespace std::literals;
 
 size_t tr_announce_list::set(char const* const* announce_urls, tr_tracker_tier_t const* tiers, size_t n)
 {
@@ -87,10 +89,7 @@ bool tr_announce_list::add(tr_tracker_tier_t tier, std::string_view announce_url
     tracker.announce = *tr_urlParseTracker(tracker.announce_str.sv());
     tracker.tier = getTier(tier, *announce);
     tracker.id = nextUniqueId();
-    auto host = std::string{ tracker.announce.host };
-    host += ':';
-    host += tracker.announce.portstr;
-    tracker.host = host;
+    tracker.host = tr_strvJoin(tracker.announce.host, ":"sv, tracker.announce.portstr);
 
     auto const scrape_str = announceToScrape(announce_url_sv);
     if (scrape_str)
@@ -206,11 +205,11 @@ bool tr_announce_list::canAdd(tr_url_parsed_t const& announce)
     return std::none_of(std::begin(trackers_), std::end(trackers_), is_same);
 }
 
-bool tr_announce_list::save(std::string_view torrent_file, tr_error** error) const
+bool tr_announce_list::save(std::string const& torrent_file, tr_error** error) const
 {
     // load the .torrent file
     auto metainfo = tr_variant{};
-    if (!tr_variantFromFile(&metainfo, TR_VARIANT_PARSE_BENC, torrent_file, error))
+    if (!tr_variantFromFile(&metainfo, TR_VARIANT_PARSE_BENC, std::string{ torrent_file }, error))
     {
         return false;
     }
@@ -244,14 +243,15 @@ bool tr_announce_list::save(std::string_view torrent_file, tr_error** error) con
     }
 
     // confirm that it's good by parsing it back again
-    if (!tr_metainfoParse(nullptr, &metainfo, error))
+    auto const contents = tr_variantToStr(&metainfo, TR_VARIANT_FMT_BENC);
+    tr_variantFree(&metainfo);
+
+    auto tm = tr_torrent_metainfo{};
+    if (!tm.parseBenc(contents))
     {
-        tr_variantFree(&metainfo);
         return false;
     }
 
     // save it
-    auto const contents = tr_variantToStr(&metainfo, TR_VARIANT_FMT_BENC);
-    tr_variantFree(&metainfo);
     return tr_saveFile(torrent_file, contents, error);
 }

@@ -38,7 +38,6 @@ struct optional_args
 struct tr_ctor
 {
     tr_session const* const session;
-    bool saveInOurTorrentsDir = false;
     std::optional<bool> delete_source;
 
     tr_torrent_metainfo metainfo = {};
@@ -68,9 +67,9 @@ struct tr_ctor
 ****
 ***/
 
-bool tr_ctorSetMetainfoFromFile(tr_ctor* ctor, char const* filename, tr_error** error)
+bool tr_ctorSetMetainfoFromFile(tr_ctor* ctor, std::string const& filename, tr_error** error)
 {
-    if (filename == nullptr)
+    if (std::empty(filename))
     {
         tr_error_set(error, EINVAL, "no filename specified"sv);
         return false;
@@ -81,14 +80,17 @@ bool tr_ctorSetMetainfoFromFile(tr_ctor* ctor, char const* filename, tr_error** 
         return false;
     }
 
-    ctor->metainfo.clear();
     auto const contents_sv = std::string_view{ std::data(ctor->contents), std::size(ctor->contents) };
     return ctor->metainfo.parseBenc(contents_sv, error);
 }
 
+bool tr_ctorSetMetainfoFromFile(tr_ctor* ctor, char const* filename, tr_error** error)
+{
+    return tr_ctorSetMetainfoFromFile(ctor, std::string{ filename ? filename : "" }, error);
+}
+
 bool tr_ctorSetMetainfo(tr_ctor* ctor, char const* metainfo, size_t len, tr_error** error)
 {
-    ctor->metainfo.clear();
     ctor->contents.assign(metainfo, metainfo + len);
     auto const contents_sv = std::string_view{ std::data(ctor->contents), std::size(ctor->contents) };
     return ctor->metainfo.parseBenc(contents_sv, error);
@@ -96,7 +98,6 @@ bool tr_ctorSetMetainfo(tr_ctor* ctor, char const* metainfo, size_t len, tr_erro
 
 bool tr_ctorSetMetainfoFromMagnetLink(tr_ctor* ctor, char const* magnet_link, tr_error** error)
 {
-    ctor->metainfo.clear();
     return ctor->metainfo.parseMagnet(magnet_link ? magnet_link : "", error);
 }
 
@@ -110,7 +111,7 @@ char const* tr_ctorGetSourceFile(tr_ctor const* ctor)
     return ctor->metainfo.torrentFile().c_str();
 }
 
-bool tr_ctorSaveContents(tr_ctor const* ctor, std::string_view filename, tr_error** error)
+bool tr_ctorSaveContents(tr_ctor const* ctor, std::string const& filename, tr_error** error)
 {
     TR_ASSERT(ctor != nullptr);
     TR_ASSERT(!std::empty(filename));
@@ -193,16 +194,6 @@ bool tr_ctorGetDeleteSource(tr_ctor const* ctor, bool* setme)
 /***
 ****
 ***/
-
-void tr_ctorSetSave(tr_ctor* ctor, bool saveInOurTorrentsDir)
-{
-    ctor->saveInOurTorrentsDir = saveInOurTorrentsDir;
-}
-
-bool tr_ctorGetSave(tr_ctor const* ctor)
-{
-    return ctor != nullptr && ctor->saveInOurTorrentsDir;
-}
 
 void tr_ctorSetPaused(tr_ctor* ctor, tr_ctorMode mode, bool paused)
 {
@@ -297,6 +288,11 @@ bool tr_ctorGetIncompleteDir(tr_ctor const* ctor, char const** setme)
     return true;
 }
 
+tr_torrent_metainfo&& tr_ctorStealMetainfo(tr_ctor* ctor)
+{
+    return std::move(ctor->metainfo);
+}
+
 tr_torrent_metainfo const* tr_ctorGetMetainfo(tr_ctor const* ctor)
 {
     return !std::empty(ctor->metainfo.infoHashString()) ? &ctor->metainfo : nullptr;
@@ -342,7 +338,6 @@ tr_ctor* tr_ctorNew(tr_session const* session)
     tr_ctorSetPeerLimit(ctor, TR_FALLBACK, session->peerLimitPerTorrent);
     tr_ctorSetDownloadDir(ctor, TR_FALLBACK, tr_sessionGetDownloadDir(session));
 
-    tr_ctorSetSave(ctor, true);
     return ctor;
 }
 

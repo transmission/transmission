@@ -495,7 +495,7 @@ bool tr_sessionLoadSettings(tr_variant* dict, char const* config_dir, char const
     auto fileSettings = tr_variant{};
     auto const filename = tr_strvPath(config_dir, "settings.json"sv);
     auto success = bool{};
-    if (tr_error* error = nullptr; tr_variantFromFile(&fileSettings, TR_VARIANT_PARSE_JSON, filename.c_str(), &error))
+    if (tr_error* error = nullptr; tr_variantFromFile(&fileSettings, TR_VARIANT_PARSE_JSON, filename, &error))
     {
         tr_variantMergeDicts(dict, &fileSettings);
         tr_variantFree(&fileSettings);
@@ -524,7 +524,7 @@ void tr_sessionSaveSettings(tr_session* session, char const* config_dir, tr_vari
     {
         tr_variant fileSettings;
 
-        if (tr_variantFromFile(&fileSettings, TR_VARIANT_PARSE_JSON, filename.c_str(), nullptr))
+        if (tr_variantFromFile(&fileSettings, TR_VARIANT_PARSE_JSON, filename, nullptr))
         {
             tr_variantMergeDicts(&settings, &fileSettings);
             tr_variantFree(&fileSettings);
@@ -544,7 +544,7 @@ void tr_sessionSaveSettings(tr_session* session, char const* config_dir, tr_vari
     }
 
     /* save the result */
-    tr_variantToFile(&settings, TR_VARIANT_FMT_JSON, filename.c_str());
+    tr_variantToFile(&settings, TR_VARIANT_FMT_JSON, filename);
 
     /* cleanup */
     tr_variantFree(&settings);
@@ -2021,8 +2021,6 @@ static void sessionLoadTorrents(void* vdata)
     auto* data = static_cast<struct sessionLoadTorrentsData*>(vdata);
     TR_ASSERT(tr_isSession(data->session));
 
-    tr_ctorSetSave(data->ctor, false); /* since we already have them */
-
     tr_sys_path_info info;
     char const* const dirname = tr_getTorrentDir(data->session);
     tr_sys_dir_t odir = (tr_sys_path_get_info(dirname, 0, &info, nullptr) && info.type == TR_SYS_PATH_IS_DIRECTORY) ?
@@ -2038,13 +2036,13 @@ static void sessionLoadTorrents(void* vdata)
         char const* name = nullptr;
         while ((name = tr_sys_dir_read_name(odir, nullptr)) != nullptr)
         {
-            if (!tr_str_has_suffix(name, ".torrent"))
+            if (!tr_strvEndsWith(name, ".torrent"sv))
             {
                 continue;
             }
 
             tr_buildBuf(path, dirname_sv, "/", name);
-            tr_ctorSetMetainfoFromFile(data->ctor, path.c_str(), nullptr);
+            tr_ctorSetMetainfoFromFile(data->ctor, path, nullptr);
             if (tr_torrent* const tor = tr_torrentNew(data->ctor, nullptr); tor != nullptr)
             {
                 torrents.push_back(tor);

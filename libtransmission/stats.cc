@@ -46,12 +46,12 @@ static void loadCumulativeStats(tr_session const* session, tr_session_stats* set
     auto top = tr_variant{};
 
     auto filename = getFilename(session);
-    bool loaded = tr_variantFromFile(&top, TR_VARIANT_PARSE_JSON, filename.c_str(), nullptr);
+    bool loaded = tr_variantFromFile(&top, TR_VARIANT_PARSE_JSON, filename, nullptr);
 
     if (!loaded)
     {
         filename = getOldFilename(session);
-        loaded = tr_variantFromFile(&top, TR_VARIANT_PARSE_BENC, filename.c_str(), nullptr);
+        loaded = tr_variantFromFile(&top, TR_VARIANT_PARSE_BENC, filename, nullptr);
     }
 
     if (loaded)
@@ -103,7 +103,7 @@ static void saveCumulativeStats(tr_session const* session, tr_session_stats cons
         tr_logAddDeep(__FILE__, __LINE__, nullptr, "Saving stats to \"%s\"", filename.c_str());
     }
 
-    tr_variantToFile(&top, TR_VARIANT_FMT_JSON, filename.c_str());
+    tr_variantToFile(&top, TR_VARIANT_FMT_JSON, filename);
 
     tr_variantFree(&top);
 }

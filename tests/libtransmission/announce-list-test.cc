@@ -16,7 +16,7 @@
 
 #include "announce-list.h"
 #include "error.h"
-#include "metainfo.h"
+#include "torrent-metainfo.h"
 #include "utils.h"
 #include "variant.h"
 
@@ -348,7 +348,7 @@ TEST_F(AnnounceListTest, save)
     tr_error* error = nullptr;
     EXPECT_TRUE(tr_loadFile(original_content, OriginalFile, &error));
     EXPECT_EQ(nullptr, error);
-    EXPECT_TRUE(tr_saveFile(test_file.c_str(), { std::data(original_content), std::size(original_content) }, &error));
+    EXPECT_TRUE(tr_saveFile(test_file, { std::data(original_content), std::size(original_content) }, &error));
     EXPECT_EQ(nullptr, error);
 
     // make an announce_list for it
@@ -364,41 +364,29 @@ TEST_F(AnnounceListTest, save)
     tr_error_clear(&error);
 
     // now save to a real .torrent fi le
-    EXPECT_TRUE(announce_list.save(test_file.c_str(), &error));
+    EXPECT_TRUE(announce_list.save(test_file, &error));
     EXPECT_EQ(nullptr, error);
 
     // load the original
-    auto metainfo = tr_variant{};
-    EXPECT_TRUE(tr_variantFromBuf(
-        &metainfo,
-        TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE,
-        { std::data(original_content), std::size(original_content) },
-        nullptr,
-        nullptr));
-    auto original = tr_metainfoParse(nullptr, &metainfo, nullptr);
-    EXPECT_TRUE(original);
-    tr_variantFree(&metainfo);
+    auto original_tm = tr_torrent_metainfo{};
+    EXPECT_TRUE(original_tm.parseBenc({ std::data(original_content), std::size(original_content) }));
 
     // load the scratch that we saved to
-    metainfo = tr_variant{};
-    EXPECT_TRUE(tr_variantFromFile(&metainfo, TR_VARIANT_PARSE_BENC, test_file.c_str(), nullptr));
-    auto saved = tr_metainfoParse(nullptr, &metainfo, nullptr);
-    EXPECT_TRUE(saved);
-    tr_variantFree(&metainfo);
+    auto modified_tm = tr_torrent_metainfo{};
+    EXPECT_TRUE(modified_tm.parseTorrentFile(test_file));
 
     // test that non-announce parts of the metainfo are the same
-    EXPECT_EQ(original->info.name(), saved->info.name());
-    EXPECT_EQ(original->info.fileCount(), saved->info.fileCount());
-    EXPECT_EQ(original->info.dateCreated(), saved->info.dateCreated());
-    EXPECT_EQ(original->pieces, saved->pieces);
+    EXPECT_EQ(original_tm.name(), modified_tm.name());
+    EXPECT_EQ(original_tm.fileCount(), modified_tm.fileCount());
+    EXPECT_EQ(original_tm.dateCreated(), modified_tm.dateCreated());
+    EXPECT_EQ(original_tm.pieceCount(), modified_tm.pieceCount());
 
     // test that the saved version has the updated announce list
-    EXPECT_EQ(std::size(announce_list), std::size(*saved->info.announce_list));
     EXPECT_TRUE(std::equal(
         std::begin(announce_list),
         std::end(announce_list),
-        std::begin(*saved->info.announce_list),
-        std::end(*saved->info.announce_list)));
+        std::begin(modified_tm.announceList()),
+        std::end(modified_tm.announceList())));
 
     // cleanup
     std::remove(test_file.c_str());

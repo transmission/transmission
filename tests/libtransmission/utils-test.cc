@@ -161,22 +161,23 @@ TEST_F(UtilsTest, trStrvPath)
 TEST_F(UtilsTest, trStrvUtf8Clean)
 {
     auto in = "hello world"sv;
-    auto out = tr_strvUtf8Clean(in);
+    auto out = std::string{};
+    tr_strvUtf8Clean(in, out);
     EXPECT_EQ(in, out);
 
     in = "hello world"sv;
-    out = tr_strvUtf8Clean(in.substr(0, 5));
+    tr_strvUtf8Clean(in.substr(0, 5), out);
     EXPECT_EQ("hello"sv, out);
 
     // this version is not utf-8 (but cp866)
     in = "\x92\xE0\xE3\xA4\xAD\xAE \xA1\xEB\xE2\xEC \x81\xAE\xA3\xAE\xAC"sv;
-    out = tr_strvUtf8Clean(in);
+    tr_strvUtf8Clean(in, out);
     EXPECT_TRUE(std::size(out) == 17 || std::size(out) == 33);
     EXPECT_TRUE(tr_utf8_validate(out, nullptr));
 
     // same string, but utf-8 clean
     in = "Трудно быть Богом"sv;
-    out = tr_strvUtf8Clean(in);
+    tr_strvUtf8Clean(in, out);
     EXPECT_NE(nullptr, out.data());
     EXPECT_TRUE(tr_utf8_validate(out, nullptr));
     EXPECT_EQ(in, out);
@@ -187,13 +188,13 @@ TEST_F(UtilsTest, trStrvUtf8Clean)
     // to wait until https://github.com/transmission/transmission/issues/612
     // is resolved before revisiting this.
     in = "\xF4\x00\x81\x82"sv;
-    out = tr_strvUtf8Clean(in);
+    tr_strvUtf8Clean(in, out);
     EXPECT_NE(nullptr, out.data());
     EXPECT_TRUE(out.size() == 1 || out.size() == 2);
     EXPECT_TRUE(tr_utf8_validate(out, nullptr));
 
     in = "\xF4\x33\x81\x82"sv;
-    out = tr_strvUtf8Clean(in);
+    tr_strvUtf8Clean(in, out);
     EXPECT_NE(nullptr, out.data());
     EXPECT_TRUE(out.size() == 4 || out.size() == 7);
     EXPECT_TRUE(tr_utf8_validate(out, nullptr));
@@ -423,12 +424,12 @@ TEST_F(UtilsTest, saveFile)
     auto filename = tr_strvJoin(::testing::TempDir(), "filename.txt");
     auto contents = "these are the contents"sv;
     tr_error* error = nullptr;
-    EXPECT_TRUE(tr_saveFile(filename.c_str(), contents, &error));
+    EXPECT_TRUE(tr_saveFile(filename, contents, &error));
     EXPECT_EQ(nullptr, error);
 
     // now read the file back in and confirm the contents are the same
     auto buf = std::vector<char>{};
-    EXPECT_TRUE(tr_loadFile(buf, filename.c_str(), &error));
+    EXPECT_TRUE(tr_loadFile(buf, filename, &error));
     EXPECT_EQ(nullptr, error);
     auto sv = std::string_view{ std::data(buf), std::size(buf) };
     EXPECT_EQ(contents, sv);
@@ -439,7 +440,7 @@ TEST_F(UtilsTest, saveFile)
 
     // try saving a file to a path that doesn't exist
     filename = "/this/path/does/not/exist/foo.txt";
-    EXPECT_FALSE(tr_saveFile(filename.c_str(), contents, &error));
+    EXPECT_FALSE(tr_saveFile(filename, contents, &error));
     ASSERT_NE(nullptr, error);
     EXPECT_NE(0, error->code);
     tr_error_clear(&error);

@@ -313,8 +313,6 @@
 		BEFC1E450C07861A00B0BB3C /* net.h in Headers */ = {isa = PBXBuildFile; fileRef = BEFC1E0C0C07861A00B0BB3C /* net.h */; };
 		BEFC1E460C07861A00B0BB3C /* net.cc in Sources */ = {isa = PBXBuildFile; fileRef = BEFC1E0D0C07861A00B0BB3C /* net.cc */; };
 		BEFC1E480C07861A00B0BB3C /* natpmp.cc in Sources */ = {isa = PBXBuildFile; fileRef = BEFC1E0F0C07861A00B0BB3C /* natpmp.cc */; };
-		BEFC1E490C07861A00B0BB3C /* metainfo.h in Headers */ = {isa = PBXBuildFile; fileRef = BEFC1E100C07861A00B0BB3C /* metainfo.h */; };
-		BEFC1E4A0C07861A00B0BB3C /* metainfo.cc in Sources */ = {isa = PBXBuildFile; fileRef = BEFC1E110C07861A00B0BB3C /* metainfo.cc */; };
 		BEFC1E4D0C07861A00B0BB3C /* session.h in Headers */ = {isa = PBXBuildFile; fileRef = BEFC1E140C07861A00B0BB3C /* session.h */; };
 		BEFC1E4E0C07861A00B0BB3C /* inout.h in Headers */ = {isa = PBXBuildFile; fileRef = BEFC1E150C07861A00B0BB3C /* inout.h */; };
 		BEFC1E4F0C07861A00B0BB3C /* inout.cc in Sources */ = {isa = PBXBuildFile; fileRef = BEFC1E160C07861A00B0BB3C /* inout.cc */; };
@@ -977,8 +975,6 @@
 		BEFC1E0C0C07861A00B0BB3C /* net.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = net.h; sourceTree = "<group>"; };
 		BEFC1E0D0C07861A00B0BB3C /* net.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = net.cc; sourceTree = "<group>"; };
 		BEFC1E0F0C07861A00B0BB3C /* natpmp.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = natpmp.cc; sourceTree = "<group>"; };
-		BEFC1E100C07861A00B0BB3C /* metainfo.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = metainfo.h; sourceTree = "<group>"; };
-		BEFC1E110C07861A00B0BB3C /* metainfo.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = metainfo.cc; sourceTree = "<group>"; };
 		BEFC1E140C07861A00B0BB3C /* session.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = session.h; sourceTree = "<group>"; };
 		BEFC1E150C07861A00B0BB3C /* inout.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = inout.h; sourceTree = "<group>"; };
 		BEFC1E160C07861A00B0BB3C /* inout.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = inout.cc; sourceTree = "<group>"; };
@@ -1482,8 +1478,6 @@
 				BEFC1E0D0C07861A00B0BB3C /* net.cc */,
 				A2EE726E14DCCC950093C99A /* natpmp_local.h */,
 				BEFC1E0F0C07861A00B0BB3C /* natpmp.cc */,
-				BEFC1E100C07861A00B0BB3C /* metainfo.h */,
-				BEFC1E110C07861A00B0BB3C /* metainfo.cc */,
 				BEFC1E150C07861A00B0BB3C /* inout.h */,
 				BEFC1E160C07861A00B0BB3C /* inout.cc */,
 				BEFC1E190C07861A00B0BB3C /* fdlimit.h */,
@@ -1851,7 +1845,6 @@
 				C1425B371EE9C705001DB85F /* tr-macros.h in Headers */,
 				C1425B381EE9C805001DB85F /* peer-socket.h in Headers */,
 				BEFC1E450C07861A00B0BB3C /* net.h in Headers */,
-				BEFC1E490C07861A00B0BB3C /* metainfo.h in Headers */,
 				BEFC1E4D0C07861A00B0BB3C /* session.h in Headers */,
 				C1FEE5771C3223CC00D62832 /* watchdir-common.h in Headers */,
 				BEFC1E4E0C07861A00B0BB3C /* inout.h in Headers */,
@@ -2448,7 +2441,6 @@
 				C1033E091A3279B800EF44D8 /* crypto-utils.cc in Sources */,
 				BEFC1E480C07861A00B0BB3C /* natpmp.cc in Sources */,
 				C1077A4E183EB29600634C22 /* error.cc in Sources */,
-				BEFC1E4A0C07861A00B0BB3C /* metainfo.cc in Sources */,
 				BEFC1E4F0C07861A00B0BB3C /* inout.cc in Sources */,
 				BEFC1E530C07861A00B0BB3C /* fdlimit.cc in Sources */,
 				C1FEE5781C3223CC00D62832 /* watchdir-generic.cc in Sources */,
