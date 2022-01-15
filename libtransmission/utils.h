@@ -78,9 +78,9 @@ bool tr_wildmat(char const* text, char const* pattern) TR_GNUC_NONNULL(1, 2);
  */
 uint8_t* tr_loadFile(char const* filename, size_t* size, struct tr_error** error) TR_GNUC_MALLOC TR_GNUC_NONNULL(1);
 
-bool tr_loadFile(std::vector<char>& setme, std::string_view filename, tr_error** error = nullptr);
+bool tr_loadFile(std::vector<char>& setme, std::string const& filename, tr_error** error = nullptr);
 
-bool tr_saveFile(std::string_view filename, std::string_view contents, tr_error** error = nullptr);
+bool tr_saveFile(std::string const& filename, std::string_view contents, tr_error** error = nullptr);
 
 template<typename... T, typename std::enable_if_t<(std::is_convertible_v<T, std::string_view> && ...), bool> = true>
 std::string& tr_buildBuf(std::string& setme, T... args)
@@ -382,7 +382,7 @@ std::string_view tr_strvStrip(std::string_view sv);
 
 char* tr_strvDup(std::string_view) TR_GNUC_MALLOC;
 
-std::string tr_strvUtf8Clean(std::string_view sv);
+std::string& tr_strvUtf8Clean(std::string_view cleanme, std::string& setme);
 
 /***
 ****

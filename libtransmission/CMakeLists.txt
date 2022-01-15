@@ -35,7 +35,6 @@ set(PROJECT_FILES
   log.cc
   magnet-metainfo.cc
   makemeta.cc
-  metainfo.cc
   natpmp.cc
   net.cc
   peer-io.cc
@@ -163,7 +162,6 @@ set(${PROJECT_NAME}_PRIVATE_HEADERS
     history.h
     inout.h
     magnet-metainfo.h
-    metainfo.h
     mime-types.h
     natpmp_local.h
     net.h

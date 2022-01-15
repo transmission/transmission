@@ -21,6 +21,8 @@
 #include "crypto-utils.h"
 #include "error-types.h"
 #include "error.h"
+#include "file.h"
+#include "log.h"
 #include "quark.h"
 #include "torrent-metainfo.h"
 #include "utils.h"
@@ -131,11 +133,6 @@ tr_torrent_metainfo_tracker_info* tr_torrentMetainfoTracker(
 ****
 ***/
 
-void tr_torrent_metainfo::clear()
-{
-    *this = tr_torrent_metainfo{};
-}
-
 /**
  * @brief Ensure that the URLs for multfile torrents end in a slash.
  *
@@ -239,38 +236,39 @@ static bool appendSanitizedComponent(std::string& out, std::string_view in, bool
     return std::size(out) > original_out_len;
 }
 
-std::string tr_torrent_metainfo::parsePath(std::string_view root, tr_variant* path, std::string& buf)
+bool tr_torrent_metainfo::parsePath(std::string_view root, tr_variant* path, std::string& setme)
 {
     if (!tr_variantIsList(path))
     {
-        return {};
+        return false;
     }
 
-    buf = root;
+    setme = root;
     for (size_t i = 0, n = tr_variantListSize(path); i < n; ++i)
     {
         auto raw = std::string_view{};
         if (!tr_variantGetStrView(tr_variantListChild(path, i), &raw))
         {
-            return {};
+            return false;
         }
 
         auto is_component_adjusted = bool{};
-        auto const pos = std::size(buf);
-        if (!appendSanitizedComponent(buf, raw, &is_component_adjusted))
+        auto const pos = std::size(setme);
+        if (!appendSanitizedComponent(setme, raw, &is_component_adjusted))
         {
             continue;
         }
 
-        buf.insert(std::begin(buf) + pos, TR_PATH_DELIMITER);
+        setme.insert(std::begin(setme) + pos, TR_PATH_DELIMITER);
     }
 
-    if (std::size(buf) <= std::size(root))
+    if (std::size(setme) <= std::size(root))
     {
-        return {};
+        return false;
     }
 
-    return tr_strvUtf8Clean(buf);
+    tr_strvUtf8Clean(setme, setme);
+    return true;
 }
 
 std::string_view tr_torrent_metainfo::parseFiles(tr_torrent_metainfo& setme, tr_variant* info_dict, uint64_t* setme_total_size)
@@ -313,9 +311,10 @@ std::string_view tr_torrent_metainfo::parseFiles(tr_torrent_metainfo& setme, tr_
     // In the multifile case, the name key is the name of a directory.
     else if (tr_variantDictFindList(info_dict, TR_KEY_files, &files_entry))
     {
-
         auto buf = std::string{};
+        buf.reserve(1024); // arbitrary
         auto const n_files = size_t{ tr_variantListSize(files_entry) };
+        setme.files_.reserve(n_files);
         for (size_t i = 0; i < n_files; ++i)
         {
             auto* const file_entry = tr_variantListChild(files_entry, i);
@@ -336,13 +335,12 @@ std::string_view tr_torrent_metainfo::parseFiles(tr_torrent_metainfo& setme, tr_
                 return "path";
             }
 
-            auto const path = parsePath(root_name, path_variant, buf);
-            if (std::empty(path))
+            if (!parsePath(root_name, path_variant, buf))
             {
                 return "path";
             }
 
-            setme.files_.emplace_back(path, len);
+            setme.files_.emplace_back(buf, len);
             total_size += len;
         }
     }
@@ -444,7 +442,7 @@ std::string_view tr_torrent_metainfo::parseImpl(tr_torrent_metainfo& setme, tr_v
     // name
     if (tr_variantDictFindStrView(info_dict, TR_KEY_name_utf_8, &sv) || tr_variantDictFindStrView(info_dict, TR_KEY_name, &sv))
     {
-        setme.setName(tr_strvUtf8Clean(sv));
+        tr_strvUtf8Clean(sv, setme.name_);
     }
     else
     {
@@ -455,7 +453,7 @@ std::string_view tr_torrent_metainfo::parseImpl(tr_torrent_metainfo& setme, tr_v
     setme.comment_.clear();
     if (tr_variantDictFindStrView(meta, TR_KEY_comment_utf_8, &sv) || tr_variantDictFindStrView(meta, TR_KEY_comment, &sv))
     {
-        setme.comment_ = tr_strvUtf8Clean(sv);
+        tr_strvUtf8Clean(sv, setme.comment_);
     }
 
     // created by (optional)
@@ -463,7 +461,7 @@ std::string_view tr_torrent_metainfo::parseImpl(tr_torrent_metainfo& setme, tr_v
     if (tr_variantDictFindStrView(meta, TR_KEY_created_by_utf_8, &sv) ||
         tr_variantDictFindStrView(meta, TR_KEY_created_by, &sv))
     {
-        setme.creator_ = tr_strvUtf8Clean(sv);
+        tr_strvUtf8Clean(sv, setme.creator_);
     }
 
     // creation date (optional)
@@ -478,7 +476,7 @@ std::string_view tr_torrent_metainfo::parseImpl(tr_torrent_metainfo& setme, tr_v
     setme.source_.clear();
     if (tr_variantDictFindStrView(info_dict, TR_KEY_source, &sv) || tr_variantDictFindStrView(meta, TR_KEY_source, &sv))
     {
-        setme.source_ = tr_strvUtf8Clean(sv);
+        tr_strvUtf8Clean(sv, setme.source_);
     }
 
     // piece length
@@ -551,11 +549,50 @@ bool tr_torrent_metainfo::parseTorrentFile(std::string_view filename, std::vecto
     }
 
     auto const sz_filename = std::string{ filename };
-    return tr_loadFile(*contents, sz_filename.c_str(), error) &&
-        parseBenc({ std::data(*contents), std::size(*contents) }, error);
+    return tr_loadFile(*contents, sz_filename, error) && parseBenc({ std::data(*contents), std::size(*contents) }, error);
 }
 
 tr_sha1_digest_t const& tr_torrent_metainfo::pieceHash(tr_piece_index_t piece) const
 {
     return this->pieces_[piece];
+}
+
+std::string tr_torrent_metainfo::makeFilename(
+    std::string_view dirname,
+    std::string_view name,
+    std::string_view info_hash_string,
+    BasenameFormat format,
+    std::string_view suffix)
+{
+    // `${dirname}/${name}.${info_hash}${suffix}`
+    // `${dirname}/${info_hash}${suffix}`
+    return format == BasenameFormat::Hash ? tr_strvJoin(dirname, "/"sv, info_hash_string, suffix) :
+                                            tr_strvJoin(dirname, "/"sv, name, "."sv, info_hash_string.substr(0, 16), suffix);
+}
+
+bool tr_torrent_metainfo::migrateFile(
+    std::string_view dirname,
+    std::string_view name,
+    std::string_view info_hash_string,
+    std::string_view suffix)
+{
+    auto const old_filename = makeFilename(dirname, name, info_hash_string, BasenameFormat::NameAndPartialHash, suffix);
+    if (!tr_sys_path_exists(old_filename.c_str(), nullptr))
+    {
+        return false;
+    }
+
+    auto const new_filename = makeFilename(dirname, name, info_hash_string, BasenameFormat::Hash, suffix);
+    if (!tr_sys_path_rename(old_filename.c_str(), new_filename.c_str(), nullptr))
+    {
+        return false;
+    }
+
+    auto const name_sz = std::string{ name };
+    tr_logAddNamedError(
+        name_sz.c_str(),
+        "Migrated torrent file from \"%s\" to \"%s\"",
+        old_filename.c_str(),
+        new_filename.c_str());
+    return true;
 }

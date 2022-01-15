@@ -24,7 +24,6 @@ class tr_magnet_metainfo
 public:
     bool parseMagnet(std::string_view magnet_link, tr_error** error = nullptr);
     std::string magnet() const;
-    virtual ~tr_magnet_metainfo() = default;
 
     auto const& infoHash() const
     {
@@ -60,31 +59,9 @@ public:
         return info_hash_str_;
     }
 
-    virtual void clear();
-
     void setName(std::string_view name)
     {
         name_ = name;
-    }
-
-    void toVariant(tr_variant* top) const;
-
-    enum class BasenameFormat
-    {
-        Hash,
-        NameAndPartialHash
-    };
-
-    static std::string makeFilename(
-        std::string_view dirname,
-        std::string_view name,
-        std::string_view info_hash_string,
-        BasenameFormat format,
-        std::string_view suffix);
-
-    std::string makeFilename(std::string_view dirname, BasenameFormat format, std::string_view suffix) const
-    {
-        return makeFilename(dirname, name(), infoHashString(), format, suffix);
     }
 
 protected:
