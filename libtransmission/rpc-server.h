@@ -16,7 +16,7 @@
 #include <string>
 #include <string_view>
 
-#include <virtun-header-libs/sdefl.h>
+#include <vurtun-header-libs/sdefl.h>
 
 #include <event2/buffer.h>
 #include <event2/event.h>

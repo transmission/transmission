@@ -145,7 +145,7 @@ endif()
 find_package(PkgConfig QUIET)
 find_package(Threads)
 find_package(UtfCpp)
-find_package(Virtun)
+find_package(Vurtun)
 
 find_package(CURL ${CURL_MINIMUM} REQUIRED)
 if(TARGET CURL::libcurl)

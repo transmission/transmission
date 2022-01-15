@@ -32,6 +32,6 @@
 	branch = post-3.2.1-transmission
 	path = third-party/utfcpp
 	url = https://github.com/transmission/utfcpp
-[submodule "third-party/virtun-header-libs"]
-	path = third-party/virtun-header-libs
-	url = https://github.com/transmission/virtun-header-libs
+[submodule "third-party/vurtun-header-libs"]
+	path = third-party/vurtun-header-libs
+	url = https://github.com/transmission/vurtun-header-libs
