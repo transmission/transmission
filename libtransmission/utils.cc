@@ -356,14 +356,16 @@ bool tr_loadFile(std::vector<char>& setme, std::string const& path, tr_error** e
     return true;
 }
 
-bool tr_saveFile(std::string filename, std::string_view contents, tr_error** error)
+bool tr_saveFile(std::string const& filename, std::string_view contents, tr_error** error)
 {
     // follow symlinks to find the "real" file, to make sure the temporary
     // we build with tr_sys_file_open_temp() is created on the right partition
     if (char* real_filename = tr_sys_path_resolve(filename.c_str(), nullptr); real_filename != nullptr)
     {
-        filename = real_filename;
-        tr_free(real_filename);
+        if (auto const rfsv = std::string_view{ real_filename }; rfsv != filename)
+        {
+            return tr_saveFile(real_filename, contents, error);
+        }
     }
 
     // Write it to a temp file first.

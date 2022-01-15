@@ -80,7 +80,7 @@ uint8_t* tr_loadFile(char const* filename, size_t* size, struct tr_error** error
 
 bool tr_loadFile(std::vector<char>& setme, std::string const& filename, tr_error** error = nullptr);
 
-bool tr_saveFile(std::string filename, std::string_view contents, tr_error** error = nullptr);
+bool tr_saveFile(std::string const& filename, std::string_view contents, tr_error** error = nullptr);
 
 template<typename... T, typename std::enable_if_t<(std::is_convertible_v<T, std::string_view> && ...), bool> = true>
 std::string& tr_buildBuf(std::string& setme, T... args)
