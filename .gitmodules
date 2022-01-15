@@ -32,3 +32,6 @@
 	branch = post-3.2.1-transmission
 	path = third-party/utfcpp
 	url = https://github.com/transmission/utfcpp
+[submodule "third-party/libdeflate"]
+	path = third-party/libdeflate
+	url = https://github.com/transmission/libdeflate
