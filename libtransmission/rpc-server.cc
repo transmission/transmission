@@ -258,8 +258,6 @@ static char const* mimetype_guess(char const* path)
     return "application/octet-stream";
 }
 
-#include <iostream>
-
 static void add_response(struct evhttp_request* req, tr_rpc_server* server, struct evbuffer* out, struct evbuffer* content)
 {
     char const* key = "Accept-Encoding";
@@ -282,8 +280,6 @@ static void add_response(struct evhttp_request* req, tr_rpc_server* server, stru
         auto const max_compressed_len = content_len * 2;
         evbuffer_reserve_space(out, max_compressed_len, iovec, 1);
         size_t const compressed_len = sdeflate(&server->sdefl, iovec[0].iov_base, content_ptr, content_len, SDEFL_LVL_DEF);
-        std::cerr << __FILE__ << ':' << __LINE__ << " raw[" << content_len << "] compressed[" << compressed_len << ']'
-                  << std::endl;
         if (0 < compressed_len && compressed_len < content_len)
         {
             iovec[0].iov_len -= compressed_len;
