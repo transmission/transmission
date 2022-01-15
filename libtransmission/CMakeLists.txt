@@ -247,6 +247,7 @@ include_directories(
 include_directories(
     SYSTEM
     ${UTFCPP_INCLUDE_DIRS}
+    ${VIRTUN_INCLUDE_DIRS}
     ${ZLIB_INCLUDE_DIRS}
     ${CRYPTO_INCLUDE_DIRS}
     ${CURL_INCLUDE_DIRS}

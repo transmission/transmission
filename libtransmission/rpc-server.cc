@@ -15,8 +15,6 @@
 #include <string_view>
 #include <vector>
 
-#include <zlib.h>
-
 #include <event2/buffer.h>
 #include <event2/event.h>
 #include <event2/http.h>
@@ -42,6 +40,9 @@
 #include "variant.h"
 #include "web-utils.h"
 #include "web.h"
+
+#define SDEFL_IMPLEMENTATION
+#include <virtun/sdefl.h>
 
 using namespace std::literals;
 
@@ -101,9 +102,9 @@ static auto extract_parts_from_multipart(struct evkeyvalq const* headers, struct
     char const* in = (char const*)evbuffer_pullup(body, -1);
     size_t inlen = evbuffer_get_length(body);
 
-    char const* boundary_key = "boundary=";
-    char const* boundary_key_begin = content_type != nullptr ? strstr(content_type, boundary_key) : nullptr;
-    char const* boundary_val = boundary_key_begin != nullptr ? boundary_key_begin + strlen(boundary_key) : "arglebargle";
+    char constexpr BoundaryKey[] = "boundary=";
+    char const* boundary_key_begin = content_type != nullptr ? strstr(content_type, BoundaryKey) : nullptr;
+    char const* boundary_val = boundary_key_begin != nullptr ? boundary_key_begin + strlen(BoundaryKey) : "arglebargle";
     char* boundary = tr_strdup_printf("--%s", boundary_val);
     size_t const boundary_len = strlen(boundary);
 
@@ -257,6 +258,8 @@ static char const* mimetype_guess(char const* path)
     return "application/octet-stream";
 }
 
+#include <iostream>
+
 static void add_response(struct evhttp_request* req, tr_rpc_server* server, struct evbuffer* out, struct evbuffer* content)
 {
     char const* key = "Accept-Encoding";
@@ -270,64 +273,29 @@ static void add_response(struct evhttp_request* req, tr_rpc_server* server, stru
     else
     {
         struct evbuffer_iovec iovec[1];
-        void* content_ptr = evbuffer_pullup(content, -1);
+        auto const* const content_ptr = evbuffer_pullup(content, -1);
         size_t const content_len = evbuffer_get_length(content);
-
-        if (!server->isStreamInitialized)
-        {
-            server->isStreamInitialized = true;
-            server->stream.zalloc = (alloc_func)Z_NULL;
-            server->stream.zfree = (free_func)Z_NULL;
-            server->stream.opaque = (voidpf)Z_NULL;
-
-            /* zlib's manual says: "Add 16 to windowBits to write a simple gzip header
-             * and trailer around the compressed data instead of a zlib wrapper." */
-#ifdef TR_LIGHTWEIGHT
-            int const compressionLevel = Z_DEFAULT_COMPRESSION;
-#else
-            int const compressionLevel = Z_BEST_COMPRESSION;
-#endif
-            // "windowBits can also be greater than 15 for optional gzip encoding.
-            // Add 16 to windowBits to write a simple gzip header and trailer
-            // around the compressed data instead of a zlib wrapper."
-            if (Z_OK != deflateInit2(&server->stream, compressionLevel, Z_DEFLATED, 15 + 16, 8, Z_DEFAULT_STRATEGY))
-            {
-                tr_logAddNamedDbg(MY_NAME, "deflateInit2 failed: %s", server->stream.msg);
-            }
-        }
-
-        server->stream.next_in = static_cast<Bytef*>(content_ptr);
-        server->stream.avail_in = content_len;
 
         /* allocate space for the raw data and call deflate() just once --
          * we won't use the deflated data if it's longer than the raw data,
          * so it's okay to let deflate() run out of output buffer space */
-        evbuffer_reserve_space(out, content_len, iovec, 1);
-        server->stream.next_out = static_cast<Bytef*>(iovec[0].iov_base);
-        server->stream.avail_out = iovec[0].iov_len;
-        auto const state = deflate(&server->stream, Z_FINISH);
-
-        if (state == Z_STREAM_END)
+        auto const max_compressed_len = content_len * 2;
+        evbuffer_reserve_space(out, max_compressed_len, iovec, 1);
+        size_t const compressed_len = sdeflate(&server->sdefl, iovec[0].iov_base, content_ptr, content_len, SDEFL_LVL_DEF);
+        std::cerr << __FILE__ << ':' << __LINE__ << " raw[" << content_len << "] compressed[" << compressed_len << ']'
+                  << std::endl;
+        if (0 < compressed_len && compressed_len < content_len)
         {
-            iovec[0].iov_len -= server->stream.avail_out;
-
-#if 0
-
-            fprintf(stderr, "compressed response is %.2f of original (raw==%zu bytes; compressed==%zu)\n",
-                (double)evbuffer_get_length(out) / content_len, content_len, evbuffer_get_length(out));
-
-#endif
-
+            iovec[0].iov_len -= compressed_len;
             evhttp_add_header(req->output_headers, "Content-Encoding", "gzip");
         }
         else
         {
-            memcpy(iovec[0].iov_base, content_ptr, content_len);
+            std::copy_n(content_ptr, content_len, static_cast<unsigned char*>(iovec[0].iov_base));
             iovec[0].iov_len = content_len;
         }
 
         evbuffer_commit_space(out, iovec, 1);
-        deflateReset(&server->stream);
     }
 }
 
@@ -1233,9 +1201,4 @@ tr_rpc_server::~tr_rpc_server()
     TR_ASSERT(tr_amInEventThread(this->session));
 
     stopServer(this);
-
-    if (this->isStreamInitialized)
-    {
-        deflateEnd(&this->stream);
-    }
 }

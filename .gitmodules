@@ -33,5 +33,5 @@
 	path = third-party/utfcpp
 	url = https://github.com/transmission/utfcpp
 [submodule "third-party/lib"]
-	path = third-party/lib
+	path = third-party/virtun
 	url = https://github.com/vurtun/lib
