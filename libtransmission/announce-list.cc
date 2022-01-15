@@ -19,6 +19,8 @@
 #include "utils.h"
 #include "variant.h"
 
+using namespace std::literals;
+
 size_t tr_announce_list::set(char const* const* announce_urls, tr_tracker_tier_t const* tiers, size_t n)
 {
     trackers_.clear();
@@ -87,10 +89,7 @@ bool tr_announce_list::add(tr_tracker_tier_t tier, std::string_view announce_url
     tracker.announce = *tr_urlParseTracker(tracker.announce_str.sv());
     tracker.tier = getTier(tier, *announce);
     tracker.id = nextUniqueId();
-    auto host = std::string{ tracker.announce.host };
-    host += ':';
-    host += tracker.announce.portstr;
-    tracker.host = host;
+    tracker.host = tr_strvJoin(tracker.announce.host, ":"sv, tracker.announce.portstr);
 
     auto const scrape_str = announceToScrape(announce_url_sv);
     if (scrape_str)
