@@ -301,13 +301,24 @@ std::optional<tr_url_parsed_t> tr_urlParse(std::string_view url)
 {
     url = tr_strvStrip(url);
 
+    auto parsed = tr_url_parsed_t{};
+    parsed.full = url;
+
+    // So many magnet links are malformed, e.g. not escaping text
+    // in the display name, that we're better off handling magnets
+    // as a special case before even scanning for invalid chars.
+    auto constexpr MagnetStart = "magnet:?"sv;
+    if (tr_strvStartsWith(url, MagnetStart))
+    {
+        parsed.scheme = "magnet"sv;
+        parsed.query = url.substr(std::size(MagnetStart));
+        return parsed;
+    }
+
     if (!urlCharsAreValid(url))
     {
         return std::nullopt;
     }
-
-    auto parsed = tr_url_parsed_t{};
-    parsed.full = url;
 
     // scheme
     parsed.scheme = tr_strvSep(&url, ':');
