@@ -442,7 +442,7 @@ void transmission_formatter(char* buf, size_t buflen, std::string_view name, tr_
     }
 }
 
-constexpr void utorrent_formatter(char* buf, size_t buflen, std::string_view name, tr_peer_id_t id)
+void utorrent_formatter(char* buf, size_t buflen, std::string_view name, tr_peer_id_t id)
 {
     if (id[7] == '-')
     {
