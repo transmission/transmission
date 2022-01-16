@@ -97,11 +97,11 @@ public:
         return blockInfo().totalSize();
     }
 
-    auto const& comment() const
+    [[nodiscard]] auto const& comment() const
     {
         return comment_;
     }
-    auto const& creator() const
+    [[nodiscard]] auto const& creator() const
     {
         return creator_;
     }
@@ -110,22 +110,16 @@ public:
         return source_;
     }
 
-    auto fileCount() const
+    [[nodiscard]] auto fileCount() const
     {
         return std::size(files_);
     }
-    std::string const& fileSubpath(tr_file_index_t i) const
-    {
-        return files_.at(i).path();
-    }
-    void setFileSubpath(tr_file_index_t i, std::string_view subpath)
-    {
-        files_.at(i).setSubpath(subpath);
-    }
-    auto fileSize(tr_file_index_t i) const
-    {
-        return files_.at(i).size();
-    }
+
+    [[nodiscard]] std::string const& fileSubpath(tr_file_index_t i) const;
+
+    void setFileSubpath(tr_file_index_t i, std::string_view subpath);
+
+    [[nodiscard]] uint64_t fileSize(tr_file_index_t i) const;
 
     [[nodiscard]] auto const& isPrivate() const
     {
