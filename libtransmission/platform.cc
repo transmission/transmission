@@ -61,7 +61,7 @@ static char* tr_buildPath(char const* first_element, ...)
         element = va_arg(vl, char const*);
     }
     va_end(vl);
-    char* const buf = tr_new(char, bufLen);
+    auto* const buf = tr_new(char, bufLen);
     if (buf == nullptr)
     {
         return nullptr;
