@@ -25,6 +25,7 @@
 #include "log.h"
 #include "quark.h"
 #include "torrent-metainfo.h"
+#include "tr-assert.h"
 #include "utils.h"
 #include "variant.h"
 #include "web-utils.h"
@@ -595,4 +596,25 @@ bool tr_torrent_metainfo::migrateFile(
         old_filename.c_str(),
         new_filename.c_str());
     return true;
+}
+
+std::string const& tr_torrent_metainfo::fileSubpath(tr_file_index_t i) const
+{
+    TR_ASSERT(i < fileCount());
+
+    return files_.at(i).path();
+}
+
+void tr_torrent_metainfo::setFileSubpath(tr_file_index_t i, std::string_view subpath)
+{
+    TR_ASSERT(i < fileCount());
+
+    files_.at(i).setSubpath(subpath);
+}
+
+uint64_t tr_torrent_metainfo::fileSize(tr_file_index_t i) const
+{
+    TR_ASSERT(i < fileCount());
+
+    return files_.at(i).size();
 }
