@@ -259,8 +259,6 @@ static char const* mimetype_guess(char const* path)
     return "application/octet-stream";
 }
 
-#include <iostream>
-
 static void add_response(struct evhttp_request* req, tr_rpc_server* server, struct evbuffer* out, struct evbuffer* content)
 {
     char const* key = "Accept-Encoding";
@@ -273,23 +271,19 @@ static void add_response(struct evhttp_request* req, tr_rpc_server* server, stru
     }
     else
     {
-        struct evbuffer_iovec iovec[1];
         auto const* const content_ptr = evbuffer_pullup(content, -1);
         size_t const content_len = evbuffer_get_length(content);
+        auto const max_compressed_len = libdeflate_deflate_compress_bound(server->compressor.get(), content_len);
 
-        /* allocate space for the raw data and call deflate() just once --
-         * we won't use the deflated data if it's longer than the raw data,
-         * so it's okay to let deflate() run out of output buffer space */
-        auto const compressed_size_max = libdeflate_deflate_compress_bound(server->compressor.get(), content_len);
-        evbuffer_reserve_space(out, compressed_size_max, iovec, 1);
+        struct evbuffer_iovec iovec[1];
+        evbuffer_reserve_space(out, std::max(content_len, max_compressed_len), iovec, 1);
+
         auto const compressed_len = libdeflate_zlib_compress(
             server->compressor.get(),
             content_ptr,
             content_len,
             iovec[0].iov_base,
             iovec[0].iov_len);
-        std::cerr << __FILE__ << ':' << __LINE__ << " raw[" << content_len << "] compressed[" << compressed_len << "] ratio ["
-                  << double(compressed_len) / content_len << ']' << std::endl;
         if (0 < compressed_len && compressed_len < content_len)
         {
             iovec[0].iov_len = compressed_len;
