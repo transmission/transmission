@@ -115,7 +115,7 @@ bool tr_torrentSetMetadataSizeHint(tr_torrent* tor, int64_t size)
     return true;
 }
 
-void* tr_torrentGetMetadataPiece(tr_torrent* tor, int piece, size_t* len)
+void* tr_torrentGetMetadataPiece(tr_torrent const* tor, int piece, size_t* len)
 {
     TR_ASSERT(tr_isTorrent(tor));
     TR_ASSERT(piece >= 0);
