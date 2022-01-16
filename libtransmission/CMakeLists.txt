@@ -245,7 +245,6 @@ include_directories(
 include_directories(
     SYSTEM
     ${UTFCPP_INCLUDE_DIRS}
-    ${ZLIB_INCLUDE_DIRS}
     ${DEFLATE_INCLUDE_DIRS}
     ${CRYPTO_INCLUDE_DIRS}
     ${CURL_INCLUDE_DIRS}
@@ -283,7 +282,6 @@ endforeach()
 
 target_link_libraries(${TR_NAME}
     ${CMAKE_THREAD_LIBS_INIT}
-    ${ZLIB_LIBRARIES}
     ${DEFLATE_LIBRARIES}
     ${CRYPTO_LIBRARIES}
     ${CURL_LIBRARIES}
