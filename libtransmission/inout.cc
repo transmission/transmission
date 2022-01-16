@@ -175,14 +175,15 @@ static int readOrWritePiece(
         err = readOrWriteBytes(tor->session, tor, ioMode, file_index, file_offset, buf, bytes_this_pass);
         buf += bytes_this_pass;
         buflen -= bytes_this_pass;
-        ++file_index;
-        file_offset = 0;
 
         if (err != 0 && ioMode == TR_IO_WRITE && tor->error != TR_STAT_LOCAL_ERROR)
         {
             auto const path = tr_strvPath(tor->downloadDir().sv(), tor->fileSubpath(file_index));
             tor->setLocalError(tr_strvJoin(tr_strerror(err), " ("sv, path, ")"sv));
         }
+
+        ++file_index;
+        file_offset = 0;
     }
 
     return err;
