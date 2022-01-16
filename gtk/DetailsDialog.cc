@@ -1498,7 +1498,7 @@ bool DetailsDialog::Impl::onPeerViewQueryTooltip(int x, int y, bool keyboard_tip
         std::ostringstream gstr;
         gstr << "<b>" << Glib::Markup::escape_text(name) << "</b>\n" << addr << "\n \n";
 
-        for (auto const ch : flagstr)
+        for (char const ch : flagstr)
         {
             char const* s = nullptr;
 
