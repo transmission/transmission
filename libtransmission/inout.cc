@@ -50,9 +50,10 @@ static int readOrWriteBytes(
     void* buf,
     size_t buflen)
 {
+    TR_ASSERT(file_index < tor->fileCount());
+
     int err = 0;
     bool const doWrite = ioMode >= TR_IO_WRITE;
-
     auto const file_size = tor->fileSize(file_index);
     TR_ASSERT(file_size == 0 || file_offset < file_size);
     TR_ASSERT(file_offset + buflen <= file_size);
