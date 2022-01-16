@@ -242,9 +242,9 @@ static void tr_buildMetainfoExceptInfoDict(tr_torrent_metainfo const& tm, tr_var
 
 static bool useNewMetainfo(tr_torrent* tor, tr_incomplete_metadata const* m, tr_error** error)
 {
+    // test the info_dict checksum
     auto const sha1 = tr_sha1(std::string_view{ m->metadata, m->metadata_size });
-    bool const checksum_passed = sha1 && *sha1 == tor->infoHash();
-    if (!checksum_passed)
+    if (bool const checksum_passed = sha1 && *sha1 == tor->infoHash(); !checksum_passed)
     {
         return false;
     }
