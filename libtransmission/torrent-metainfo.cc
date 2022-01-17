@@ -188,7 +188,7 @@ static bool appendSanitizedComponent(std::string& out, std::string_view in, bool
     *setme_is_adjusted = false;
 
     // remove leading spaces
-    auto constexpr leading_test = [](auto ch)
+    auto constexpr leading_test = [](unsigned char ch)
     {
         return isspace(ch);
     };
@@ -196,7 +196,7 @@ static bool appendSanitizedComponent(std::string& out, std::string_view in, bool
     in.remove_prefix(std::distance(std::begin(in), it));
 
     // remove trailing spaces and '.'
-    auto constexpr trailing_test = [](auto ch)
+    auto constexpr trailing_test = [](unsigned char ch)
     {
         return isspace(ch) || ch == '.';
     };
