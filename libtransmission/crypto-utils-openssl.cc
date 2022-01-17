@@ -34,7 +34,7 @@
 ****
 ***/
 
-#define MY_NAME "tr_crypto_utils"
+static char constexpr MY_NAME[] = "tr_crypto_utils";
 
 static void log_openssl_error(char const* file, int line)
 {
