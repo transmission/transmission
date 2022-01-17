@@ -1934,13 +1934,13 @@ static bool deadlineReached(time_t const deadline)
     return time(nullptr) >= deadline;
 }
 
-#define SHUTDOWN_MAX_SECONDS 20
+static auto constexpr ShutdownMaxSeconds = time_t{ 20 };
 
 void tr_sessionClose(tr_session* session)
 {
     TR_ASSERT(tr_isSession(session));
 
-    time_t const deadline = time(nullptr) + SHUTDOWN_MAX_SECONDS;
+    time_t const deadline = time(nullptr) + ShutdownMaxSeconds;
 
     dbgmsg(
         "shutting down transmission session %p... now is %zu, deadline is %zu",
