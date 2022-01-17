@@ -42,7 +42,7 @@ static char* generate_new_session_id_value(void)
     char const pool[] = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
     size_t const pool_size = sizeof(pool) - 1;
 
-    char* buf = tr_new(char, SessionIdSize + 1);
+    auto* buf = tr_new(char, SessionIdSize + 1);
 
     tr_rand_buffer(buf, SessionIdSize);
 
@@ -117,7 +117,7 @@ static void destroy_session_id_lock_file(tr_sys_file_t lock_file, char const* se
 
 tr_session_id_t tr_session_id_new(void)
 {
-    tr_session_id_t const session_id = tr_new0(struct tr_session_id, 1);
+    auto const session_id = tr_new0(struct tr_session_id, 1);
 
     session_id->current_lock_file = TR_BAD_SYS_FILE;
     session_id->previous_lock_file = TR_BAD_SYS_FILE;

@@ -805,7 +805,7 @@ static tr_announce_request* announce_request_new(
     tr_tier const* tier,
     tr_announce_event event)
 {
-    tr_announce_request* req = tr_new0(tr_announce_request, 1);
+    auto* const req = tr_new0(tr_announce_request, 1);
     req->port = tr_sessionGetPublicPeerPort(announcer->session);
     req->announce_url = tier->currentTracker->announce_url;
     req->tracker_id_str = tr_strdup(tier->currentTracker->tracker_id_str);
@@ -1151,7 +1151,7 @@ static void tierAnnounce(tr_announcer* announcer, tr_tier* tier)
     tr_announce_event announce_event = tier_announce_event_pull(tier);
     tr_announce_request* req = announce_request_new(announcer, tor, tier, announce_event);
 
-    struct announce_data* data = tr_new0(struct announce_data, 1);
+    auto* const data = tr_new0(struct announce_data, 1);
     data->session = announcer->session;
     data->tierId = tier->key;
     data->isRunningOnSuccess = tor->isRunning;

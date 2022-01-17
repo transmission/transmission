@@ -263,7 +263,7 @@ void doScrape(tr_torrent_metainfo const& metainfo)
 
         // print it out
         tr_variant top;
-        char const* begin = (char const*)evbuffer_pullup(buf, -1);
+        auto* const begin = (char const*)evbuffer_pullup(buf, -1);
         auto sv = std::string_view{ begin, evbuffer_get_length(buf) };
         if (!tr_variantFromBuf(&top, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, sv))
         {

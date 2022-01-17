@@ -86,7 +86,7 @@ bool tr_torrentSetMetadataSizeHint(tr_torrent* tor, int64_t size)
         return false;
     }
 
-    struct tr_incomplete_metadata* m = tr_new(struct tr_incomplete_metadata, 1);
+    auto* const m = tr_new(struct tr_incomplete_metadata, 1);
 
     if (m == nullptr)
     {
@@ -142,7 +142,7 @@ void* tr_torrentGetMetadataPiece(tr_torrent const* tor, int piece, size_t* len)
 
         if (0 < l && l <= METADATA_PIECE_SIZE)
         {
-            char* buf = tr_new(char, l);
+            auto* buf = tr_new(char, l);
             auto n = uint64_t{};
 
             if (tr_sys_file_read(fd, buf, l, &n, nullptr) && n == l)

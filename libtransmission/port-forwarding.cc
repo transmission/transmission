@@ -161,7 +161,7 @@ static void onTimer(evutil_socket_t /*fd*/, short /*what*/, void* vshared)
 
 tr_shared* tr_sharedInit(tr_session* session)
 {
-    tr_shared* s = tr_new0(tr_shared, 1);
+    auto* const s = tr_new0(tr_shared, 1);
 
     s->session = session;
     s->isEnabled = false;

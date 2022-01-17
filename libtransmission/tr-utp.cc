@@ -103,7 +103,7 @@ static void incoming(void* vsession, struct UTPSocket* s)
 {
     auto* session = static_cast<tr_session*>(vsession);
     struct sockaddr_storage from_storage;
-    struct sockaddr* from = (struct sockaddr*)&from_storage;
+    auto* const from = (struct sockaddr*)&from_storage;
     socklen_t fromlen = sizeof(from_storage);
     tr_address addr;
     tr_port port = 0;

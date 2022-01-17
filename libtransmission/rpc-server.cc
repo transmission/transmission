@@ -98,8 +98,8 @@ static auto extract_parts_from_multipart(struct evkeyvalq const* headers, struct
 {
     auto ret = std::vector<tr_mimepart>{};
 
-    char const* content_type = evhttp_find_header(headers, "Content-Type");
-    char const* in = (char const*)evbuffer_pullup(body, -1);
+    auto const* const content_type = evhttp_find_header(headers, "Content-Type");
+    auto const* in = (char const*)evbuffer_pullup(body, -1);
     size_t inlen = evbuffer_get_length(body);
 
     char const* boundary_key = "boundary=";
@@ -486,7 +486,7 @@ static void handle_rpc(struct evhttp_request* req, tr_rpc_server* server)
 
         if (q != nullptr)
         {
-            struct rpc_response_data* data = tr_new0(struct rpc_response_data, 1);
+            auto* const data = tr_new0(struct rpc_response_data, 1);
             data->req = req;
             data->server = server;
             tr_rpc_request_exec_uri(server->session, q + 1, rpc_response_func, data);

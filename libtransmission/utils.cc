@@ -770,7 +770,7 @@ bool tr_utf8_validate(std::string_view sv, char const** good_end)
 
 static char* strip_non_utf8(std::string_view sv)
 {
-    char* ret = tr_new(char, std::size(sv) + 1);
+    auto* const ret = tr_new(char, std::size(sv) + 1);
     if (ret != nullptr)
     {
         auto const it = utf8::unchecked::replace_invalid(std::data(sv), std::data(sv) + std::size(sv), ret, '?');
@@ -783,7 +783,7 @@ static char* to_utf8(std::string_view sv)
 {
 #ifdef HAVE_ICONV
     size_t const buflen = std::size(sv) * 4 + 10;
-    char* out = tr_new(char, buflen);
+    auto* const out = tr_new(char, buflen);
 
     auto constexpr Encodings = std::array<char const*, 2>{ "CURRENT", "ISO-8859-15" };
     for (auto const* test_encoding : Encodings)

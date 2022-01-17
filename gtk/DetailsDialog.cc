@@ -2204,7 +2204,7 @@ void DetailsDialog::Impl::on_edit_trackers_response(int response, std::shared_pt
 
     if (response == Gtk::RESPONSE_ACCEPT)
     {
-        int const torrent_id = GPOINTER_TO_INT(dialog->get_data(TORRENT_ID_KEY));
+        auto const torrent_id = GPOINTER_TO_INT(dialog->get_data(TORRENT_ID_KEY));
         auto* const text_buffer = static_cast<Gtk::TextBuffer*>(dialog->get_data(TEXT_BUFFER_KEY));
         tr_torrent* const tor = core_->find_torrent(torrent_id);
 
@@ -2359,7 +2359,7 @@ void DetailsDialog::Impl::on_add_tracker_response(int response, std::shared_ptr<
     if (response == Gtk::RESPONSE_ACCEPT)
     {
         auto* e = static_cast<Gtk::Entry*>(dialog->get_data(URL_ENTRY_KEY));
-        int const torrent_id = GPOINTER_TO_INT(dialog->get_data(TORRENT_ID_KEY));
+        auto const torrent_id = GPOINTER_TO_INT(dialog->get_data(TORRENT_ID_KEY));
         auto const url = gtr_str_strip(e->get_text());
 
         if (!url.empty())
