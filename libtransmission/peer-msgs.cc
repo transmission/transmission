@@ -2366,8 +2366,8 @@ static void tellPeerWhatWeHave(tr_peerMsgsImpl* msgs)
 /* some peers give us error messages if we send
    more than this many peers in a single pex message
    http://wiki.theory.org/BitTorrentPeerExchangeConventions */
-#define MAX_PEX_ADDED 50
-#define MAX_PEX_DROPPED 50
+static auto constexpr MaxPexAdded = int{ 50 };
+static auto constexpr MaxPexDropped = int{ 50 };
 
 struct PexDiffs
 {
