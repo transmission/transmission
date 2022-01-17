@@ -1362,7 +1362,7 @@ void DetailsDialog::Impl::refreshPeerList(std::vector<tr_torrent*> const& torren
             {
                 auto const iter = store->append();
                 initPeerRow(iter, key, tr_torrentName(tor), s);
-                hash.emplace(key, Gtk::TreeRowReference(store, store->get_path(iter)));
+                hash.try_emplace(key, Gtk::TreeRowReference(store, store->get_path(iter)));
             }
         }
     }
@@ -1432,7 +1432,7 @@ void DetailsDialog::Impl::refreshWebseedList(std::vector<tr_torrent*> const& tor
                 auto const iter = store->append();
                 (*iter)[webseed_cols.url] = url;
                 (*iter)[webseed_cols.key] = key;
-                hash.emplace(key, Gtk::TreeRowReference(store, store->get_path(iter)));
+                hash.try_emplace(key, Gtk::TreeRowReference(store, store->get_path(iter)));
             }
         }
     }
@@ -2133,7 +2133,7 @@ void DetailsDialog::Impl::refreshTracker(std::vector<tr_torrent*> const& torrent
             (*iter)[tracker_cols.key] = gstr.str();
 
             auto const p = store->get_path(iter);
-            hash.emplace(gstr.str(), Gtk::TreeRowReference(store, p));
+            hash.try_emplace(gstr.str(), Gtk::TreeRowReference(store, p));
             gtr_get_favicon_from_url(
                 session,
                 tracker.announce,
