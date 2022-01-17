@@ -126,7 +126,7 @@ static tr_pex* listToPex(tr_variant* peerList, size_t* setme_len)
 {
     size_t n = 0;
     size_t const len = tr_variantListSize(peerList);
-    tr_pex* pex = tr_new0(tr_pex, len);
+    auto* const pex = tr_new0(tr_pex, len);
 
     for (size_t i = 0; i < len; ++i)
     {

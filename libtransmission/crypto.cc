@@ -20,10 +20,10 @@
 ***
 **/
 
-#define PRIME_LEN 96
-#define DH_PRIVKEY_LEN 20
+static auto constexpr PrimeLen = size_t{ 96 };
+static auto constexpr DhPrivkeyLen = size_t{ 20 };
 
-static uint8_t const dh_P[PRIME_LEN] = {
+static uint8_t constexpr dh_P[PrimeLen] = {
     0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xC9, 0x0F, 0xDA, 0xA2, //
     0x21, 0x68, 0xC2, 0x34, 0xC4, 0xC6, 0x62, 0x8B, 0x80, 0xDC, 0x1C, 0xD1, //
     0x29, 0x02, 0x4E, 0x08, 0x8A, 0x67, 0xCC, 0x74, 0x02, 0x0B, 0xBE, 0xA6, //
@@ -34,7 +34,7 @@ static uint8_t const dh_P[PRIME_LEN] = {
     0xA6, 0x3A, 0x36, 0x21, 0x00, 0x00, 0x00, 0x00, 0x00, 0x09, 0x05, 0x63, //
 };
 
-static uint8_t const dh_G[] = { 2 };
+static uint8_t constexpr dh_G[] = { 2 };
 
 /**
 ***
@@ -46,7 +46,7 @@ static void ensureKeyExists(tr_crypto* crypto)
     {
         size_t public_key_length = 0;
         crypto->dh = tr_dh_new(dh_P, sizeof(dh_P), dh_G, sizeof(dh_G));
-        tr_dh_make_key(crypto->dh, DH_PRIVKEY_LEN, crypto->myPublicKey, &public_key_length);
+        tr_dh_make_key(crypto->dh, DhPrivkeyLen, crypto->myPublicKey, &public_key_length);
 
         TR_ASSERT(public_key_length == KEY_LEN);
     }
