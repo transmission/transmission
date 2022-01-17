@@ -1340,8 +1340,8 @@ namespace
 int gtr_compare_double(double const a, double const b, int decimal_places)
 {
     int ret;
-    int64_t const ia = (int64_t)(a * pow(10, decimal_places));
-    int64_t const ib = (int64_t)(b * pow(10, decimal_places));
+    auto const ia = int64_t(a * pow(10, decimal_places));
+    auto const ib = int64_t(b * pow(10, decimal_places));
 
     if (ia < ib)
     {

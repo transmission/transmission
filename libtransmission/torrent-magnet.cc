@@ -86,7 +86,7 @@ bool tr_torrentSetMetadataSizeHint(tr_torrent* tor, int64_t size)
         return false;
     }
 
-    struct tr_incomplete_metadata* m = tr_new(struct tr_incomplete_metadata, 1);
+    auto* const m = tr_new(struct tr_incomplete_metadata, 1);
 
     if (m == nullptr)
     {
@@ -115,7 +115,7 @@ bool tr_torrentSetMetadataSizeHint(tr_torrent* tor, int64_t size)
     return true;
 }
 
-void* tr_torrentGetMetadataPiece(tr_torrent* tor, int piece, size_t* len)
+void* tr_torrentGetMetadataPiece(tr_torrent const* tor, int piece, size_t* len)
 {
     TR_ASSERT(tr_isTorrent(tor));
     TR_ASSERT(piece >= 0);
@@ -142,7 +142,7 @@ void* tr_torrentGetMetadataPiece(tr_torrent* tor, int piece, size_t* len)
 
         if (0 < l && l <= METADATA_PIECE_SIZE)
         {
-            char* buf = tr_new(char, l);
+            auto* buf = tr_new(char, l);
             auto n = uint64_t{};
 
             if (tr_sys_file_read(fd, buf, l, &n, nullptr) && n == l)
@@ -240,19 +240,23 @@ static void tr_buildMetainfoExceptInfoDict(tr_torrent_metainfo const& tm, tr_var
     }
 }
 
-static bool useNewMetainfo(tr_torrent* tor, tr_incomplete_metadata* m, tr_error** error)
+static bool useNewMetainfo(tr_torrent* tor, tr_incomplete_metadata const* m, tr_error** error)
 {
+    // test the info_dict checksum
     auto const sha1 = tr_sha1(std::string_view{ m->metadata, m->metadata_size });
-    bool const checksum_passed = sha1 && *sha1 == tor->infoHash();
-    if (!checksum_passed)
+    if (bool const checksum_passed = sha1 && *sha1 == tor->infoHash(); !checksum_passed)
     {
         return false;
     }
 
     // checksum passed; now try to parse it as benc
     auto info_dict_v = tr_variant{};
-    auto const info_dict_sv = std::string_view{ m->metadata, m->metadata_size };
-    if (!tr_variantFromBuf(&info_dict_v, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, info_dict_sv, nullptr, error))
+    if (!tr_variantFromBuf(
+            &info_dict_v,
+            TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE,
+            { m->metadata, m->metadata_size },
+            nullptr,
+            error))
     {
         return false;
     }

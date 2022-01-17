@@ -245,9 +245,7 @@ bool tr_announce_list::save(std::string const& torrent_file, tr_error** error) c
     // confirm that it's good by parsing it back again
     auto const contents = tr_variantToStr(&metainfo, TR_VARIANT_FMT_BENC);
     tr_variantFree(&metainfo);
-
-    auto tm = tr_torrent_metainfo{};
-    if (!tm.parseBenc(contents))
+    if (auto tm = tr_torrent_metainfo{}; !tm.parseBenc(contents))
     {
         return false;
     }

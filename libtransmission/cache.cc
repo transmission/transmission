@@ -22,9 +22,9 @@
 #include "trevent.h"
 #include "utils.h"
 
-#define MY_NAME "Cache"
+static char constexpr MyName[] = "Cache";
 
-#define dbgmsg(...) tr_logAddDeepNamed(MY_NAME, __VA_ARGS__)
+#define dbgmsg(...) tr_logAddDeepNamed(MyName, __VA_ARGS__)
 
 /****
 *****
@@ -74,7 +74,7 @@ struct run_info
 static int getBlockRun(tr_cache const* cache, int pos, struct run_info* info)
 {
     int const n = tr_ptrArraySize(&cache->blocks);
-    struct cache_block const* const* blocks = (struct cache_block const* const*)tr_ptrArrayBase(&cache->blocks);
+    auto const* const* blocks = (struct cache_block const* const*)tr_ptrArrayBase(&cache->blocks);
     struct cache_block const* ref = blocks[pos];
     tr_block_index_t block = ref->block;
     int len = 0;
@@ -162,9 +162,9 @@ static int calcRuns(tr_cache const* cache, struct run_info* runs)
 static int flushContiguous(tr_cache* cache, int pos, int n)
 {
     int err = 0;
-    uint8_t* buf = tr_new(uint8_t, n * MAX_BLOCK_SIZE);
-    uint8_t* walk = buf;
-    struct cache_block** blocks = (struct cache_block**)tr_ptrArrayBase(&cache->blocks);
+    auto* const buf = tr_new(uint8_t, n * MAX_BLOCK_SIZE);
+    auto* walk = buf;
+    auto** blocks = (struct cache_block**)tr_ptrArrayBase(&cache->blocks);
 
     struct cache_block* b = blocks[pos];
     tr_torrent* tor = b->tor;
@@ -219,7 +219,7 @@ static int cacheTrim(tr_cache* cache)
         /* Amount of cache that should be removed by the flush. This influences how large
          * runs can grow as well as how often flushes will happen. */
         int const cacheCutoff = 1 + cache->max_blocks / 4;
-        struct run_info* runs = tr_new(struct run_info, tr_ptrArraySize(&cache->blocks));
+        auto* const runs = tr_new(struct run_info, tr_ptrArraySize(&cache->blocks));
         int i = 0;
         int j = 0;
 
@@ -252,7 +252,7 @@ int tr_cacheSetLimit(tr_cache* cache, int64_t max_bytes)
     cache->max_blocks = getMaxBlocks(max_bytes);
 
     tr_logAddNamedDbg(
-        MY_NAME,
+        MyName,
         "Maximum cache size set to %s (%d blocks)",
         tr_formatter_mem_B(cache->max_bytes).c_str(),
         cache->max_blocks);
@@ -267,7 +267,7 @@ int64_t tr_cacheGetLimit(tr_cache const* cache)
 
 tr_cache* tr_cacheNew(int64_t max_bytes)
 {
-    tr_cache* cache = tr_new0(tr_cache, 1);
+    auto* const cache = tr_new0(tr_cache, 1);
     cache->blocks = {};
     cache->max_bytes = max_bytes;
     cache->max_blocks = getMaxBlocks(max_bytes);

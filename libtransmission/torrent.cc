@@ -560,8 +560,7 @@ static void tr_torrentFireMetadataCompleted(tr_torrent* tor);
 static void torrentInitFromInfoDict(tr_torrent* tor)
 {
     tor->completion = tr_completion{ tor, &tor->blockInfo() };
-    auto const obfuscated = tr_sha1("req2"sv, tor->infoHash());
-    if (obfuscated)
+    if (auto const obfuscated = tr_sha1("req2"sv, tor->infoHash()); obfuscated)
     {
         tor->obfuscated_hash = *obfuscated;
     }
@@ -2151,7 +2150,7 @@ static void removeEmptyFoldersAndJunkFiles(char const* folder)
  * 2. If there are nontorrent files, don't delete them...
  * 3. ...unless the other files are "junk", such as .DS_Store
  */
-static void deleteLocalData(tr_torrent* tor, tr_fileFunc func)
+static void deleteLocalData(tr_torrent const* tor, tr_fileFunc func)
 {
     auto files = std::vector<std::string>{};
     auto folders = std::set<std::string>{};
@@ -2852,7 +2851,7 @@ static bool renameArgsAreValid(char const* oldpath, char const* newname)
         strchr(newname, TR_PATH_DELIMITER) == nullptr;
 }
 
-static auto renameFindAffectedFiles(tr_torrent* tor, std::string_view oldpath)
+static auto renameFindAffectedFiles(tr_torrent const* tor, std::string_view oldpath)
 {
     auto indices = std::vector<tr_file_index_t>{};
     auto oldpath_as_dir = tr_strvJoin(oldpath, "/"sv);

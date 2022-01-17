@@ -592,7 +592,7 @@ std::string buildFilename(tr_torrent const* tor, Gtk::TreeModel::iterator const&
         tokens.push_front(child->get_value(file_cols.label));
     }
 
-    tokens.push_front(tr_torrentGetCurrentDir(tor));
+    tokens.emplace_front(tr_torrentGetCurrentDir(tor));
     return Glib::build_filename(tokens);
 }
 

@@ -483,7 +483,7 @@ static void addPeers(tr_torrent const* tor, tr_variant* list)
     tr_torrentPeersFree(peers, peerCount);
 }
 
-static void initField(tr_torrent* const tor, tr_stat const* const st, tr_variant* const initme, tr_quark key)
+static void initField(tr_torrent const* const tor, tr_stat const* const st, tr_variant* const initme, tr_quark key)
 {
     char* str = nullptr;
 
@@ -1135,7 +1135,7 @@ static char const* torrentSet(
 
         if (tr_variantDictFindInt(args_in, TR_KEY_bandwidthPriority, &tmp))
         {
-            tr_priority_t const priority = (tr_priority_t)tmp;
+            auto const priority = tr_priority_t(tmp);
 
             if (tr_isPriority(priority))
             {
@@ -2444,7 +2444,7 @@ void tr_rpc_request_exec_json(
     }
     else
     {
-        struct tr_rpc_idle_data* data = tr_new0(struct tr_rpc_idle_data, 1);
+        auto* const data = tr_new0(struct tr_rpc_idle_data, 1);
         data->session = session;
         data->response = tr_new0(tr_variant, 1);
         tr_variantInitDict(data->response, 3);

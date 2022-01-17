@@ -55,7 +55,7 @@ extern "C"
 namespace
 {
 
-#define MY_NAME "tr_crypto_utils"
+static char constexpr MyName[] = "tr_crypto_utils";
 
 char const* ccrypto_error_to_str(CCCryptorStatus error_code)
 {
@@ -100,7 +100,7 @@ void log_ccrypto_error(CCCryptorStatus error_code, char const* file, int line)
             file,
             line,
             TR_LOG_ERROR,
-            MY_NAME,
+            MyName,
             "CCrypto error (%d): %s",
             error_code,
             ccrypto_error_to_str(error_code));

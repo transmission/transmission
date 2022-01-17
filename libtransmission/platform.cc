@@ -61,7 +61,7 @@ static char* tr_buildPath(char const* first_element, ...)
         element = va_arg(vl, char const*);
     }
     va_end(vl);
-    char* const buf = tr_new(char, bufLen);
+    auto* const buf = tr_new(char, bufLen);
     if (buf == nullptr)
     {
         return nullptr;
@@ -256,19 +256,19 @@ static char const* getHomeDir(void)
     return home;
 }
 
-#if defined(__APPLE__) || defined(_WIN32)
-#define RESUME_SUBDIR "Resume"
-#define TORRENT_SUBDIR "Torrents"
-#else
-#define RESUME_SUBDIR "resume"
-#define TORRENT_SUBDIR "torrents"
-#endif
-
 void tr_setConfigDir(tr_session* session, std::string_view config_dir)
 {
+#if defined(__APPLE__) || defined(_WIN32)
+    auto constexpr ResumeSubdir = "Resume"sv;
+    auto constexpr TorrentSubdir = "Torrents"sv;
+#else
+    auto constexpr ResumeSubdir = "resume"sv;
+    auto constexpr TorrentSubdir = "torrents"sv;
+#endif
+
     session->config_dir = config_dir;
-    session->resume_dir = tr_strvPath(config_dir, RESUME_SUBDIR);
-    session->torrent_dir = tr_strvPath(config_dir, TORRENT_SUBDIR);
+    session->resume_dir = tr_strvPath(config_dir, ResumeSubdir);
+    session->torrent_dir = tr_strvPath(config_dir, TorrentSubdir);
     tr_sys_dir_create(session->resume_dir.c_str(), TR_SYS_DIR_CREATE_PARENTS, 0777, nullptr);
     tr_sys_dir_create(session->torrent_dir.c_str(), TR_SYS_DIR_CREATE_PARENTS, 0777, nullptr);
 }

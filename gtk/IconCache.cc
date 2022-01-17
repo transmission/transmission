@@ -54,7 +54,7 @@ std::unique_ptr<IconCache> icon_cache_new(Gtk::Widget& for_widget, Gtk::IconSize
     auto icons = std::make_unique<IconCache>();
     icons->icon_theme = Gtk::IconTheme::get_for_screen(for_widget.get_screen());
     icons->icon_size = get_size_in_pixels(icon_size);
-    icons->cache.emplace(VoidPixbufKey, create_void_pixbuf(icons->icon_size, icons->icon_size));
+    icons->cache.try_emplace(VoidPixbufKey, create_void_pixbuf(icons->icon_size, icons->icon_size));
     return icons;
 }
 
@@ -152,7 +152,7 @@ Glib::RefPtr<Gdk::Pixbuf> icon_cache_get_mime_type_icon(IconCache& icons, Glib::
 
     if (pixbuf != nullptr)
     {
-        icons.cache.emplace(key, pixbuf);
+        icons.cache.try_emplace(key, pixbuf);
     }
 
     return pixbuf;
