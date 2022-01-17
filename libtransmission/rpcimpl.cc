@@ -15,10 +15,7 @@
 #include <string_view>
 #include <vector>
 
-#ifndef ZLIB_CONST
-#define ZLIB_CONST
-#endif
-#include <zlib.h>
+#include <libdeflate.h>
 
 #include "transmission.h"
 
@@ -486,7 +483,7 @@ static void addPeers(tr_torrent const* tor, tr_variant* list)
     tr_torrentPeersFree(peers, peerCount);
 }
 
-static void initField(tr_torrent* const tor, tr_stat const* const st, tr_variant* const initme, tr_quark key)
+static void initField(tr_torrent const* const tor, tr_stat const* const st, tr_variant* const initme, tr_quark key)
 {
     char* str = nullptr;
 
@@ -1138,7 +1135,7 @@ static char const* torrentSet(
 
         if (tr_variantDictFindInt(args_in, TR_KEY_bandwidthPriority, &tmp))
         {
-            tr_priority_t const priority = (tr_priority_t)tmp;
+            auto const priority = tr_priority_t(tmp);
 
             if (tr_isPriority(priority))
             {
@@ -1390,99 +1387,63 @@ static void gotNewBlocklist(
 
     if (response_code != 200)
     {
+        // we failed to download the blocklist...
         tr_snprintf(
             result,
             sizeof(result),
             "gotNewBlocklist: http error %ld: %s",
             response_code,
             tr_webGetResponseStr(response_code));
+        tr_idle_function_done(data, result);
+        return;
     }
-    else /* successfully fetched the blocklist... */
+
+    // see if we need to decompress the content
+    auto content = std::vector<char>{};
+    content.resize(1024 * 128);
+    for (;;)
     {
-        auto stream = z_stream{};
-        char const* configDir = tr_sessionGetConfigDir(session);
-        size_t const buflen = 1024 * 128; /* 128 KiB buffer */
-        auto* const buf = static_cast<uint8_t*>(tr_malloc(buflen));
-        tr_error* error = nullptr;
-
-        /* this is an odd Magic Number required by zlib to enable gz support.
-           See zlib's inflateInit2() documentation for a full description */
-        int const windowBits = 15 + 32;
-
-        stream.zalloc = (alloc_func)Z_NULL;
-        stream.zfree = (free_func)Z_NULL;
-        stream.opaque = (voidpf)Z_NULL;
-        stream.next_in = reinterpret_cast<Bytef const*>(std::data(response));
-        stream.avail_in = std::size(response);
-        if (inflateInit2(&stream, windowBits) != Z_OK)
+        auto decompressor = std::shared_ptr<libdeflate_decompressor>{ libdeflate_alloc_decompressor(),
+                                                                      libdeflate_free_decompressor };
+        auto actual_size = size_t{};
+        auto const decompress_result = libdeflate_gzip_decompress(
+            decompressor.get(),
+            std::data(response),
+            std::size(response),
+            std::data(content),
+            std::size(content),
+            &actual_size);
+        if (decompress_result == LIBDEFLATE_INSUFFICIENT_SPACE)
         {
-            // If stream init fails, log an error but keep going forward
-            // since the file may be uncompressed anyway.
-            tr_logAddError("inflateInit2 failed: %s", stream.msg ? stream.msg : "unknown");
+            // need a bigger buffer
+            content.resize(content.size() * 2);
+            continue;
         }
-
-        auto filename = tr_strvPath(configDir, "blocklist.tmp.XXXXXX");
-        tr_sys_file_t const fd = tr_sys_file_open_temp(std::data(filename), &error);
-
-        if (fd == TR_BAD_SYS_FILE)
+        if (decompress_result == LIBDEFLATE_BAD_DATA)
         {
-            tr_snprintf(result, sizeof(result), _("Couldn't save file \"%1$s\": %2$s"), filename.c_str(), error->message);
-            tr_error_clear(&error);
+            // couldn't decompress it; maybe we downloaded an uncompressed file
+            content.assign(std::begin(response), std::end(response));
         }
-
-        auto err = int{};
-        for (;;)
-        {
-            stream.next_out = static_cast<Bytef*>(buf);
-            stream.avail_out = buflen;
-            err = inflate(&stream, Z_NO_FLUSH);
-
-            if ((stream.avail_out < buflen) && (!tr_sys_file_write(fd, buf, buflen - stream.avail_out, nullptr, &error)))
-            {
-                tr_snprintf(result, sizeof(result), _("Couldn't save file \"%1$s\": %2$s"), filename.c_str(), error->message);
-                tr_error_clear(&error);
-                break;
-            }
-
-            if (err != Z_OK)
-            {
-                if (err != Z_STREAM_END && err != Z_DATA_ERROR)
-                {
-                    tr_snprintf(result, sizeof(result), _("Error uncompressing blocklist: %s (%d)"), zError(err), err);
-                }
-
-                break;
-            }
-        }
-
-        inflateEnd(&stream);
-
-        if ((err == Z_DATA_ERROR) && // couldn't inflate it... it's probably already uncompressed
-            !tr_sys_file_write(fd, std::data(response), std::size(response), nullptr, &error))
-        {
-            tr_snprintf(result, sizeof(result), _("Couldn't save file \"%1$s\": %2$s"), filename.c_str(), error->message);
-            tr_error_clear(&error);
-        }
-
-        tr_sys_file_close(fd, nullptr);
-
-        if (!tr_str_is_empty(result))
-        {
-            tr_logAddError("%s", result);
-        }
-        else
-        {
-            /* feed it to the session and give the client a response */
-            int const rule_count = tr_blocklistSetContent(session, filename.c_str());
-            tr_variantDictAddInt(data->args_out, TR_KEY_blocklist_size, rule_count);
-            tr_snprintf(result, sizeof(result), "success");
-        }
-
-        tr_sys_path_remove(filename.c_str(), nullptr);
-        tr_free(buf);
+        break;
     }
 
-    tr_idle_function_done(data, result);
+    // tr_blocklistSetContent needs a source file,
+    // so save content into a tmpfile
+    auto const filename = tr_strvJoin(tr_sessionGetConfigDir(session), "blocklist.tmp");
+    tr_error* error = nullptr;
+    if (!tr_saveFile(filename, std::string_view{ std::data(content), std::size(content) }, &error))
+    {
+        tr_snprintf(result, sizeof(result), _("Couldn't save file \"%1$s\": %2$s"), filename.c_str(), error->message);
+        tr_error_clear(&error);
+        tr_idle_function_done(data, result);
+        return;
+    }
+
+    // feed it to the session and give the client a response
+    int const rule_count = tr_blocklistSetContent(session, filename.c_str());
+    tr_variantDictAddInt(data->args_out, TR_KEY_blocklist_size, rule_count);
+    tr_sys_path_remove(filename.c_str(), nullptr);
+    tr_idle_function_done(data, "success");
 }
 
 static char const* blocklistUpdate(
@@ -2483,7 +2444,7 @@ void tr_rpc_request_exec_json(
     }
     else
     {
-        struct tr_rpc_idle_data* data = tr_new0(struct tr_rpc_idle_data, 1);
+        auto* const data = tr_new0(struct tr_rpc_idle_data, 1);
         data->session = session;
         data->response = tr_new0(tr_variant, 1);
         tr_variantInitDict(data->response, 3);

@@ -50,9 +50,10 @@ static int readOrWriteBytes(
     void* buf,
     size_t buflen)
 {
+    TR_ASSERT(file_index < tor->fileCount());
+
     int err = 0;
     bool const doWrite = ioMode >= TR_IO_WRITE;
-
     auto const file_size = tor->fileSize(file_index);
     TR_ASSERT(file_size == 0 || file_offset < file_size);
     TR_ASSERT(file_offset + buflen <= file_size);
@@ -174,14 +175,15 @@ static int readOrWritePiece(
         err = readOrWriteBytes(tor->session, tor, ioMode, file_index, file_offset, buf, bytes_this_pass);
         buf += bytes_this_pass;
         buflen -= bytes_this_pass;
-        ++file_index;
-        file_offset = 0;
 
         if (err != 0 && ioMode == TR_IO_WRITE && tor->error != TR_STAT_LOCAL_ERROR)
         {
             auto const path = tr_strvPath(tor->downloadDir().sv(), tor->fileSubpath(file_index));
             tor->setLocalError(tr_strvJoin(tr_strerror(err), " ("sv, path, ")"sv));
         }
+
+        ++file_index;
+        file_offset = 0;
     }
 
     return err;

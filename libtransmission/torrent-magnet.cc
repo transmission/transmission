@@ -21,7 +21,6 @@
 #include "file.h"
 #include "log.h"
 #include "magnet-metainfo.h"
-#include "metainfo.h"
 #include "resume.h"
 #include "torrent-magnet.h"
 #include "torrent-metainfo.h"
@@ -87,7 +86,7 @@ bool tr_torrentSetMetadataSizeHint(tr_torrent* tor, int64_t size)
         return false;
     }
 
-    struct tr_incomplete_metadata* m = tr_new(struct tr_incomplete_metadata, 1);
+    auto* const m = tr_new(struct tr_incomplete_metadata, 1);
 
     if (m == nullptr)
     {
@@ -116,51 +115,7 @@ bool tr_torrentSetMetadataSizeHint(tr_torrent* tor, int64_t size)
     return true;
 }
 
-static size_t findInfoDictOffset(tr_torrent const* tor)
-{
-    // load the torrent's .torrent file
-    auto benc = std::vector<char>{};
-    if (!tr_loadFile(benc, tor->torrentFile()) || std::empty(benc))
-    {
-        return {};
-    }
-
-    // parse the benc
-    auto top = tr_variant{};
-    auto const benc_sv = std::string_view{ std::data(benc), std::size(benc) };
-    if (!tr_variantFromBuf(&top, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, benc_sv))
-    {
-        return {};
-    }
-
-    auto offset = size_t{};
-    tr_variant* info_dict = nullptr;
-    if (tr_variantDictFindDict(&top, TR_KEY_info, &info_dict))
-    {
-        auto const info_dict_benc = tr_variantToStr(info_dict, TR_VARIANT_FMT_BENC);
-        auto const it = std::search(std::begin(benc), std::end(benc), std::begin(info_dict_benc), std::end(info_dict_benc));
-        if (it != std::end(benc))
-        {
-            offset = std::distance(std::begin(benc), it);
-        }
-    }
-
-    tr_variantFree(&top);
-    return offset;
-}
-
-static void ensureInfoDictOffsetIsCached(tr_torrent* tor)
-{
-    TR_ASSERT(tor->hasMetadata());
-
-    if (!tor->info_dict_offset_is_cached)
-    {
-        tor->info_dict_offset = findInfoDictOffset(tor);
-        tor->info_dict_offset_is_cached = true;
-    }
-}
-
-void* tr_torrentGetMetadataPiece(tr_torrent* tor, int piece, size_t* len)
+void* tr_torrentGetMetadataPiece(tr_torrent const* tor, int piece, size_t* len)
 {
     TR_ASSERT(tr_isTorrent(tor));
     TR_ASSERT(piece >= 0);
@@ -177,8 +132,6 @@ void* tr_torrentGetMetadataPiece(tr_torrent* tor, int piece, size_t* len)
         return nullptr;
     }
 
-    ensureInfoDictOffsetIsCached(tor);
-
     auto const info_dict_size = tor->infoDictSize();
     TR_ASSERT(info_dict_size > 0);
 
@@ -189,7 +142,7 @@ void* tr_torrentGetMetadataPiece(tr_torrent* tor, int piece, size_t* len)
 
         if (0 < l && l <= METADATA_PIECE_SIZE)
         {
-            char* buf = tr_new(char, l);
+            auto* buf = tr_new(char, l);
             auto n = uint64_t{};
 
             if (tr_sys_file_read(fd, buf, l, &n, nullptr) && n == l)
@@ -229,7 +182,7 @@ static int getPieceLength(struct tr_incomplete_metadata const* m, int piece)
         METADATA_PIECE_SIZE;
 }
 
-static void tr_buildMetainfoExceptInfoDict(tr_info const& tm, tr_variant* top)
+static void tr_buildMetainfoExceptInfoDict(tr_torrent_metainfo const& tm, tr_variant* top)
 {
     tr_variantInitDict(top, 6);
 
@@ -285,72 +238,54 @@ static void tr_buildMetainfoExceptInfoDict(tr_info const& tm, tr_variant* top)
             tr_variantListAddStr(webseeds_variant, tm.webseed(i));
         }
     }
-
-    if (tm.fileCount() == 0)
-    {
-        // local transmission extensions.
-        // these temporary placeholders are used for magnets until we have the info dict.
-        auto* const magnet_info = tr_variantDictAddDict(top, TR_KEY_magnet_info, 2);
-        tr_variantDictAddStr(
-            magnet_info,
-            TR_KEY_info_hash,
-            std::string_view{ reinterpret_cast<char const*>(std::data(tm.infoHash())), std::size(tm.infoHash()) });
-        if (auto const& val = tm.name(); !std::empty(val))
-        {
-            tr_variantDictAddStr(magnet_info, TR_KEY_display_name, val);
-        }
-    }
 }
 
-static bool useNewMetainfo(tr_torrent* tor, tr_incomplete_metadata* m, tr_error** error)
+static bool useNewMetainfo(tr_torrent* tor, tr_incomplete_metadata const* m, tr_error** error)
 {
+    // test the info_dict checksum
     auto const sha1 = tr_sha1(std::string_view{ m->metadata, m->metadata_size });
-    bool const checksum_passed = sha1 && *sha1 == tor->infoHash();
-    if (!checksum_passed)
+    if (bool const checksum_passed = sha1 && *sha1 == tor->infoHash(); !checksum_passed)
     {
         return false;
     }
 
     // checksum passed; now try to parse it as benc
     auto info_dict_v = tr_variant{};
-    auto const info_dict_sv = std::string_view{ m->metadata, m->metadata_size };
-    if (!tr_variantFromBuf(&info_dict_v, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, info_dict_sv, nullptr, error))
+    if (!tr_variantFromBuf(
+            &info_dict_v,
+            TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE,
+            { m->metadata, m->metadata_size },
+            nullptr,
+            error))
     {
         return false;
     }
 
     // yay we have an info dict. Let's make a .torrent file
     auto top_v = tr_variant{};
-    tr_buildMetainfoExceptInfoDict(tor->info, &top_v);
+    tr_buildMetainfoExceptInfoDict(tor->metainfo_, &top_v);
     tr_variantMergeDicts(tr_variantDictAddDict(&top_v, TR_KEY_info, 0), &info_dict_v);
     auto const benc = tr_variantToStr(&top_v, TR_VARIANT_FMT_BENC);
-
-    // does this synthetic .torrent file parse?
-    auto parsed = tr_metainfoParse(tor->session, &top_v, error);
     tr_variantFree(&top_v);
     tr_variantFree(&info_dict_v);
-    if (!parsed)
+
+    // does this synthetic .torrent file parse?
+    auto metainfo = tr_torrent_metainfo{};
+    if (!metainfo.parseBenc(benc))
     {
         return false;
     }
 
     // save it
-    auto const& torrent_dir = tor->session->torrent_dir;
-    auto const filename = tr_magnet_metainfo::makeFilename(
-        torrent_dir,
-        tor->name(),
-        tor->infoHashString(),
-        tr_magnet_metainfo::BasenameFormat::Hash,
-        ".torrent"sv);
+    auto const filename = tor->makeTorrentFilename();
     if (!tr_saveFile(filename, benc, error))
     {
         return false;
     }
 
     // tor should keep this metainfo
-    tor->swapMetainfo(*parsed);
-    tr_torrentGotNewInfoDict(tor);
-    tor->setDirty();
+    metainfo.setTorrentFile(filename);
+    tor->setMetainfo(metainfo);
 
     return true;
 }
@@ -469,37 +404,7 @@ double tr_torrentGetMetadataPercent(tr_torrent const* tor)
     return m == nullptr || m->pieceCount == 0 ? 0.0 : (m->pieceCount - m->piecesNeededCount) / (double)m->pieceCount;
 }
 
-/* TODO: this should be renamed tr_metainfoGetMagnetLink() and moved to metainfo.c for consistency */
-char* tr_torrentInfoGetMagnetLink(tr_info const* inf)
-{
-    auto buf = std::string{};
-
-    buf += "magnet:?xt=urn:btih:"sv;
-    buf += inf->infoHashString();
-
-    auto const& name = inf->name();
-    if (!std::empty(name))
-    {
-        buf += "&dn="sv;
-        tr_http_escape(buf, name, true);
-    }
-
-    for (size_t i = 0, n = std::size(*inf->announce_list); i < n; ++i)
-    {
-        buf += "&tr="sv;
-        tr_http_escape(buf, inf->announce_list->at(i).announce.full, true);
-    }
-
-    for (size_t i = 0, n = inf->webseedCount(); i < n; ++i)
-    {
-        buf += "&ws="sv;
-        tr_http_escape(buf, inf->webseed(i), true);
-    }
-
-    return tr_strvDup(buf);
-}
-
 char* tr_torrentGetMagnetLink(tr_torrent const* tor)
 {
-    return tr_torrentInfoGetMagnetLink(&tor->info);
+    return tr_strvDup(tor->metainfo_.magnet());
 }

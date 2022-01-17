@@ -13,6 +13,7 @@
 
 #include "block-info.h"
 #include "file-piece-map.h"
+#include "torrent-metainfo.h"
 #include "tr-assert.h"
 
 void tr_file_piece_map::reset(tr_block_info const& block_info, uint64_t const* file_sizes, size_t n_files)
@@ -51,15 +52,15 @@ void tr_file_piece_map::reset(tr_block_info const& block_info, uint64_t const* f
     }
 }
 
-void tr_file_piece_map::reset(tr_info const& info)
+void tr_file_piece_map::reset(tr_torrent_metainfo const& tm)
 {
-    auto const n = info.fileCount();
+    auto const n = tm.fileCount();
     auto file_sizes = std::vector<uint64_t>(n);
     for (tr_file_index_t i = 0; i < n; ++i)
     {
-        file_sizes[i] = info.fileSize(i);
+        file_sizes[i] = tm.fileSize(i);
     }
-    reset({ info.totalSize(), info.pieceSize() }, std::data(file_sizes), std::size(file_sizes));
+    reset({ tm.totalSize(), tm.pieceSize() }, std::data(file_sizes), std::size(file_sizes));
 }
 
 tr_file_piece_map::piece_span_t tr_file_piece_map::pieceSpan(tr_file_index_t file) const

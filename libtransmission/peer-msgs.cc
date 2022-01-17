@@ -547,7 +547,7 @@ private:
 
     void set_active(tr_direction direction, bool active)
     {
-        // TODO dbgmsg(msgs, "direction [%d] is_active [%d]", (int)direction, (int)is_active);
+        // TODO dbgmsg(msgs, "direction [%d] is_active [%d]", int(direction), int(is_active));
         auto& val = is_active_[direction];
         if (val != active)
         {
@@ -1135,7 +1135,7 @@ static void parseLtepHandshake(tr_peerMsgsImpl* msgs, uint32_t len, struct evbuf
     /* arbitrary limit, should be more than enough */
     if (len <= 4096)
     {
-        dbgmsg(msgs, "here is the handshake: [%*.*s]", TR_ARG_TUPLE((int)len, (int)len, tmp));
+        dbgmsg(msgs, "here is the handshake: [%*.*s]", TR_ARG_TUPLE(int(len), int(len), tmp));
     }
     else
     {
@@ -1166,14 +1166,14 @@ static void parseLtepHandshake(tr_peerMsgsImpl* msgs, uint32_t len, struct evbuf
         {
             msgs->peerSupportsPex = i != 0;
             msgs->ut_pex_id = (uint8_t)i;
-            dbgmsg(msgs, "msgs->ut_pex is %d", (int)msgs->ut_pex_id);
+            dbgmsg(msgs, "msgs->ut_pex is %d", int(msgs->ut_pex_id));
         }
 
         if (tr_variantDictFindInt(sub, TR_KEY_ut_metadata, &i))
         {
             msgs->peerSupportsMetadataXfer = i != 0;
             msgs->ut_metadata_id = (uint8_t)i;
-            dbgmsg(msgs, "msgs->ut_metadata_id is %d", (int)msgs->ut_metadata_id);
+            dbgmsg(msgs, "msgs->ut_metadata_id is %d", int(msgs->ut_metadata_id));
         }
 
         if (tr_variantDictFindInt(sub, TR_KEY_ut_holepunch, &i))
@@ -1201,7 +1201,7 @@ static void parseLtepHandshake(tr_peerMsgsImpl* msgs, uint32_t len, struct evbuf
     {
         pex.port = htons((uint16_t)i);
         msgs->publishClientGotPort(pex.port);
-        dbgmsg(msgs, "peer's port is now %d", (int)i);
+        dbgmsg(msgs, "peer's port is now %d", int(i));
     }
 
     uint8_t const* addr = nullptr;
@@ -1235,7 +1235,7 @@ static void parseUtMetadata(tr_peerMsgsImpl* msgs, uint32_t msglen, struct evbuf
     int64_t msg_type = -1;
     int64_t piece = -1;
     int64_t total_size = 0;
-    char* const tmp = tr_new(char, msglen);
+    auto* const tmp = tr_new(char, msglen);
 
     tr_peerIoReadBytes(msgs->io, inbuf, tmp, msglen);
     char const* const msg_end = (char const*)tmp + msglen;
@@ -1250,7 +1250,7 @@ static void parseUtMetadata(tr_peerMsgsImpl* msgs, uint32_t msglen, struct evbuf
         tr_variantFree(&dict);
     }
 
-    dbgmsg(msgs, "got ut_metadata msg: type %d, piece %d, total_size %d", (int)msg_type, (int)piece, (int)total_size);
+    dbgmsg(msgs, "got ut_metadata msg: type %d, piece %d, total_size %d", int(msg_type), int(piece), int(total_size));
 
     if (msg_type == METADATA_MSG_TYPE_REJECT)
     {
@@ -1391,7 +1391,7 @@ static void parseLtep(tr_peerMsgsImpl* msgs, uint32_t msglen, struct evbuffer* i
     }
     else
     {
-        dbgmsg(msgs, "skipping unknown ltep message (%d)", (int)ltep_msgid);
+        dbgmsg(msgs, "skipping unknown ltep message (%d)", int(ltep_msgid));
         evbuffer_drain(inbuf, msglen);
     }
 }
@@ -1611,7 +1611,7 @@ static ReadState readBtPiece(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, size
         req->index,
         req->offset,
         req->length,
-        (int)(req->length - evbuffer_get_length(block_buffer)));
+        int(req->length - evbuffer_get_length(block_buffer)));
 
     if (evbuffer_get_length(block_buffer) < req->length)
     {
@@ -1643,7 +1643,7 @@ static ReadState readBtMessage(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, si
 
     --msglen; /* id length */
 
-    dbgmsg(msgs, "got BT id %d, len %d, buffer size is %zu", (int)id, (int)msglen, inlen);
+    dbgmsg(msgs, "got BT id %d, len %d, buffer size is %zu", int(id), int(msglen), inlen);
 
     if (inlen < msglen)
     {
@@ -1652,7 +1652,7 @@ static ReadState readBtMessage(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, si
 
     if (!messageLengthIsCorrect(msgs, id, msglen + 1))
     {
-        dbgmsg(msgs, "bad packet - BT message #%d with a length of %d", (int)id, (int)msglen);
+        dbgmsg(msgs, "bad packet - BT message #%d with a length of %d", int(id), int(msglen));
         msgs->publishError(EMSGSIZE);
         return READ_ERR;
     }
@@ -1712,7 +1712,7 @@ static ReadState readBtMessage(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, si
 
     case BtBitfield:
         {
-            uint8_t* tmp = tr_new(uint8_t, msglen);
+            auto* const tmp = tr_new(uint8_t, msglen);
             dbgmsg(msgs, "got a bitfield");
             tr_peerIoReadBytes(msgs->io, inbuf, tmp, msglen);
             msgs->have.setRaw(tmp, msglen);
@@ -1870,7 +1870,7 @@ static ReadState readBtMessage(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, si
         break;
 
     default:
-        dbgmsg(msgs, "peer sent us an UNKNOWN: %d", (int)id);
+        dbgmsg(msgs, "peer sent us an UNKNOWN: %d", int(id));
         tr_peerIoDrain(msgs->io, inbuf, msglen);
         break;
     }
@@ -1982,7 +1982,7 @@ static ReadState canRead(tr_peerIo* io, void* vmsgs, size_t* piece)
 
         default:
 #ifdef TR_ENABLE_ASSERTS
-            TR_ASSERT_MSG(false, "unhandled peer messages state %d", (int)msgs->state);
+            TR_ASSERT_MSG(false, "unhandled peer messages state %d", int(msgs->state));
 #else
             ret = READ_ERR;
             break;
@@ -1990,7 +1990,7 @@ static ReadState canRead(tr_peerIo* io, void* vmsgs, size_t* piece)
         }
     }
 
-    dbgmsg(msgs, "canRead: ret is %d", (int)ret);
+    dbgmsg(msgs, "canRead: ret is %d", int(ret));
 
     return ret;
 }
@@ -2366,8 +2366,8 @@ static void tellPeerWhatWeHave(tr_peerMsgsImpl* msgs)
 /* some peers give us error messages if we send
    more than this many peers in a single pex message
    http://wiki.theory.org/BitTorrentPeerExchangeConventions */
-#define MAX_PEX_ADDED 50
-#define MAX_PEX_DROPPED 50
+static auto constexpr MaxPexAdded = int{ 50 };
+static auto constexpr MaxPexDropped = int{ 50 };
 
 struct PexDiffs
 {
@@ -2384,7 +2384,7 @@ static void pexAddedCb(void const* vpex, void* userData)
     auto* diffs = static_cast<PexDiffs*>(userData);
     auto const* pex = static_cast<tr_pex const*>(vpex);
 
-    if (diffs->addedCount < MAX_PEX_ADDED)
+    if (diffs->addedCount < MaxPexAdded)
     {
         diffs->added[diffs->addedCount++] = *pex;
         diffs->elements[diffs->elementCount++] = *pex;
@@ -2396,7 +2396,7 @@ static constexpr void pexDroppedCb(void const* vpex, void* userData)
     auto* diffs = static_cast<PexDiffs*>(userData);
     auto const* pex = static_cast<tr_pex const*>(vpex);
 
-    if (diffs->droppedCount < MAX_PEX_DROPPED)
+    if (diffs->droppedCount < MaxPexDropped)
     {
         diffs->dropped[diffs->droppedCount++] = *pex;
     }

@@ -24,9 +24,6 @@ struct tr_info;
 struct tr_torrent_metainfo : public tr_magnet_metainfo
 {
 public:
-    tr_torrent_metainfo() = default;
-    ~tr_torrent_metainfo() override = default;
-
     [[nodiscard]] auto empty() const
     {
         return std::empty(files_);
@@ -100,11 +97,11 @@ public:
         return blockInfo().totalSize();
     }
 
-    auto const& comment() const
+    [[nodiscard]] auto const& comment() const
     {
         return comment_;
     }
-    auto const& creator() const
+    [[nodiscard]] auto const& creator() const
     {
         return creator_;
     }
@@ -113,18 +110,16 @@ public:
         return source_;
     }
 
-    auto fileCount() const
+    [[nodiscard]] auto fileCount() const
     {
         return std::size(files_);
     }
-    std::string const& fileSubpath(tr_file_index_t i) const
-    {
-        return files_.at(i).path();
-    }
-    auto fileSize(tr_file_index_t i) const
-    {
-        return files_.at(i).size();
-    }
+
+    [[nodiscard]] std::string const& fileSubpath(tr_file_index_t i) const;
+
+    void setFileSubpath(tr_file_index_t i, std::string_view subpath);
+
+    [[nodiscard]] uint64_t fileSize(tr_file_index_t i) const;
 
     [[nodiscard]] auto const& isPrivate() const
     {
@@ -136,14 +131,17 @@ public:
         return torrent_file_;
     }
 
+    void setTorrentFile(std::string_view filename)
+    {
+        torrent_file_ = filename;
+    }
+
     [[nodiscard]] tr_sha1_digest_t const& pieceHash(tr_piece_index_t piece) const;
 
     [[nodiscard]] auto const& dateCreated() const
     {
         return date_created_;
     }
-
-    void clear() final;
 
     [[nodiscard]] std::string benc() const;
 
@@ -157,13 +155,47 @@ public:
         return info_dict_offset_;
     }
 
+    std::string makeTorrentFilename(std::string_view torrent_dir) const
+    {
+        return makeFilename(torrent_dir, name(), infoHashString(), BasenameFormat::Hash, ".torrent");
+    }
+
+    std::string makeResumeFilename(std::string_view resume_dir) const
+    {
+        return makeFilename(resume_dir, name(), infoHashString(), BasenameFormat::Hash, ".resume");
+    }
+
+    bool migrateFile(
+        std::string_view dirname,
+        std::string_view name,
+        std::string_view info_hash_string,
+        std::string_view suffix);
+
 private:
-    static std::string parsePath(std::string_view root, tr_variant* path, std::string& buf);
+    static bool parsePath(std::string_view root, tr_variant* path, std::string& setme);
     static std::string fixWebseedUrl(tr_torrent_metainfo const& tm, std::string_view url);
     static std::string_view parseFiles(tr_torrent_metainfo& setme, tr_variant* info_dict, uint64_t* setme_total_size);
     static std::string_view parseImpl(tr_torrent_metainfo& setme, tr_variant* meta, std::string_view benc);
     static std::string_view parseAnnounce(tr_torrent_metainfo& setme, tr_variant* meta);
     static void parseWebseeds(tr_torrent_metainfo& setme, tr_variant* meta);
+
+    enum class BasenameFormat
+    {
+        Hash,
+        NameAndPartialHash
+    };
+
+    static std::string makeFilename(
+        std::string_view dirname,
+        std::string_view name,
+        std::string_view info_hash_string,
+        BasenameFormat format,
+        std::string_view suffix);
+
+    std::string makeFilename(std::string_view dirname, BasenameFormat format, std::string_view suffix) const
+    {
+        return makeFilename(dirname, name(), infoHashString(), format, suffix);
+    }
 
     struct file_t
     {
@@ -172,6 +204,12 @@ private:
         {
             return path_;
         }
+
+        void setSubpath(std::string_view subpath)
+        {
+            path_ = subpath;
+        }
+
         uint64_t size() const
         {
             return size_;

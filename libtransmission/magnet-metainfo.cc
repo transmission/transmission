@@ -114,11 +114,6 @@ void base32_to_sha1(uint8_t* out, char const* in, size_t const inlen)
 ****
 ***/
 
-void tr_magnet_metainfo::clear()
-{
-    *this = tr_magnet_metainfo{};
-}
-
 std::string tr_magnet_metainfo::magnet() const
 {
     auto s = std::string{};
@@ -208,68 +203,4 @@ bool tr_magnet_metainfo::parseMagnet(std::string_view magnet_link, tr_error** er
     info_hash_str_ = tr_sha1_to_string(this->infoHash());
 
     return got_checksum;
-}
-
-void tr_magnet_metainfo::toVariant(tr_variant* top) const
-{
-    tr_variantInitDict(top, 4);
-
-    // announce list
-    auto n = std::size(this->announceList());
-    if (n == 1)
-    {
-        tr_variantDictAddQuark(top, TR_KEY_announce, this->announceList().at(0).announce_str.quark());
-    }
-    else
-    {
-        auto current_tier = tr_tracker_tier_t{};
-        tr_variant* tracker_list = nullptr;
-
-        auto* tier_list = tr_variantDictAddList(top, TR_KEY_announce_list, n);
-        for (auto const& tracker : this->announceList())
-        {
-            if (tracker_list == nullptr || current_tier != tracker.tier)
-            {
-                tracker_list = tr_variantListAddList(tier_list, 1);
-                current_tier = tracker.tier;
-            }
-
-            tr_variantListAddQuark(tracker_list, tracker.announce_str.quark());
-        }
-    }
-
-    // webseeds
-    n = this->webseedCount();
-    if (n != 0)
-    {
-        tr_variant* list = tr_variantDictAddList(top, TR_KEY_url_list, n);
-
-        for (size_t i = 0; i < n; ++i)
-        {
-            tr_variantListAddStr(list, this->webseed(i));
-        }
-    }
-
-    // nonstandard keys
-    auto* const d = tr_variantDictAddDict(top, TR_KEY_magnet_info, 2);
-
-    tr_variantDictAddRaw(d, TR_KEY_info_hash, std::data(this->infoHash()), std::size(this->infoHash()));
-
-    if (!std::empty(this->name()))
-    {
-        tr_variantDictAddStr(d, TR_KEY_display_name, this->name());
-    }
-}
-
-std::string tr_magnet_metainfo::makeFilename(
-    std::string_view dirname,
-    std::string_view name,
-    std::string_view info_hash_string,
-    BasenameFormat format,
-    std::string_view suffix)
-{
-    // `${dirname}/${name}.${info_hash}${suffix}`
-    // `${dirname}/${info_hash}${suffix}`
-    return format == BasenameFormat::Hash ? tr_strvJoin(dirname, "/"sv, info_hash_string, suffix) :
-                                            tr_strvJoin(dirname, "/"sv, name, "."sv, info_hash_string.substr(0, 16), suffix);
 }

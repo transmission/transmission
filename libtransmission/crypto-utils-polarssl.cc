@@ -40,7 +40,7 @@
 ****
 ***/
 
-#define MY_NAME "tr_crypto_utils"
+static char constexpr MyName[] = "tr_crypto_utils";
 
 using api_ctr_drbg_context = API(ctr_drbg_context);
 using api_sha1_context = API(sha1_context);
@@ -60,7 +60,7 @@ static void log_polarssl_error(int error_code, char const* file, int line)
         error_strerror(error_code, error_message, sizeof(error_message));
 #endif
 
-        tr_logAddMessage(file, line, TR_LOG_ERROR, MY_NAME, "PolarSSL error: %s", error_message);
+        tr_logAddMessage(file, line, TR_LOG_ERROR, MyName, "PolarSSL error: %s", error_message);
     }
 }
 

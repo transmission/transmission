@@ -14,7 +14,7 @@
 
 #include <algorithm> // std::sort
 #include <array> // std::array
-#include <cctype> /* isdigit(), tolower() */
+#include <cctype> /* isdigit() */
 #include <cerrno>
 #include <cfloat> /* DBL_DIG */
 #include <clocale> /* localeconv() */
@@ -312,10 +312,9 @@ uint8_t* tr_loadFile(char const* path, size_t* size, tr_error** error)
     return buf;
 }
 
-bool tr_loadFile(std::vector<char>& setme, std::string_view path_sv, tr_error** error)
+bool tr_loadFile(std::vector<char>& setme, std::string const& path, tr_error** error)
 {
     char const* const err_fmt = _("Couldn't read \"%1$s\": %2$s");
-    auto const path = std::string{ path_sv };
     auto const* const path_sz = path.c_str();
 
     /* try to stat the file */
@@ -357,16 +356,16 @@ bool tr_loadFile(std::vector<char>& setme, std::string_view path_sv, tr_error** 
     return true;
 }
 
-bool tr_saveFile(std::string_view filename_in, std::string_view contents, tr_error** error)
+bool tr_saveFile(std::string const& filename, std::string_view contents, tr_error** error)
 {
-    auto filename = std::string{ filename_in };
-
     // follow symlinks to find the "real" file, to make sure the temporary
     // we build with tr_sys_file_open_temp() is created on the right partition
     if (char* real_filename = tr_sys_path_resolve(filename.c_str(), nullptr); real_filename != nullptr)
     {
-        filename = real_filename;
-        tr_free(real_filename);
+        if (auto const rfsv = std::string_view{ real_filename }; rfsv != filename)
+        {
+            return tr_saveFile(real_filename, contents, error);
+        }
     }
 
     // Write it to a temp file first.
@@ -771,7 +770,7 @@ bool tr_utf8_validate(std::string_view sv, char const** good_end)
 
 static char* strip_non_utf8(std::string_view sv)
 {
-    char* ret = tr_new(char, std::size(sv) + 1);
+    auto* const ret = tr_new(char, std::size(sv) + 1);
     if (ret != nullptr)
     {
         auto const it = utf8::unchecked::replace_invalid(std::data(sv), std::data(sv) + std::size(sv), ret, '?');
@@ -784,7 +783,7 @@ static char* to_utf8(std::string_view sv)
 {
 #ifdef HAVE_ICONV
     size_t const buflen = std::size(sv) * 4 + 10;
-    char* out = tr_new(char, buflen);
+    auto* const out = tr_new(char, buflen);
 
     auto constexpr Encodings = std::array<char const*, 2>{ "CURRENT", "ISO-8859-15" };
     for (auto const* test_encoding : Encodings)
@@ -820,17 +819,20 @@ static char* to_utf8(std::string_view sv)
     return strip_non_utf8(sv);
 }
 
-std::string tr_strvUtf8Clean(std::string_view sv)
+std::string& tr_strvUtf8Clean(std::string_view cleanme, std::string& setme)
 {
-    if (tr_utf8_validate(sv, nullptr))
+    if (tr_utf8_validate(cleanme, nullptr))
     {
-        return std::string{ sv };
+        setme = cleanme;
+    }
+    else
+    {
+        auto* const tmp = to_utf8(cleanme);
+        setme.assign(tmp ? tmp : "");
+        tr_free(tmp);
     }
 
-    auto* const tmp = to_utf8(sv);
-    auto ret = std::string{ tmp ? tmp : "" };
-    tr_free(tmp);
-    return ret;
+    return setme;
 }
 
 #ifdef _WIN32
@@ -1579,16 +1581,7 @@ std::string_view tr_get_mime_type_for_filename(std::string_view filename)
 
     if (auto const pos = filename.rfind('.'); pos != std::string_view::npos)
     {
-        // make a lowercase copy of the file suffix
-        filename.remove_prefix(pos + 1);
-        auto suffix_lc = std::string{};
-        std::transform(
-            std::begin(filename),
-            std::end(filename),
-            std::back_inserter(suffix_lc),
-            [](auto c) { return std::tolower(c); });
-
-        // find it
+        auto const suffix_lc = tr_strlower(filename.substr(pos + 1));
         auto const it = std::lower_bound(std::begin(mime_type_suffixes), std::end(mime_type_suffixes), suffix_lc, compare);
         if (it != std::end(mime_type_suffixes) && suffix_lc == it->suffix)
         {

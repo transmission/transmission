@@ -55,7 +55,7 @@ struct tr_upnp
 
 tr_upnp* tr_upnpInit(void)
 {
-    tr_upnp* ret = tr_new0(tr_upnp, 1);
+    auto* const ret = tr_new0(tr_upnp, 1);
 
     ret->state = TR_UPNP_DISCOVER;
     ret->port = -1;

@@ -44,7 +44,6 @@
 #include "inout.h" /* tr_ioTestPiece() */
 #include "log.h"
 #include "magnet-metainfo.h"
-#include "metainfo.h"
 #include "peer-common.h" /* MAX_BLOCK_SIZE */
 #include "peer-mgr.h"
 #include "platform.h" /* TR_PATH_DELIMITER_STR */
@@ -560,10 +559,8 @@ static void tr_torrentFireMetadataCompleted(tr_torrent* tor);
 
 static void torrentInitFromInfoDict(tr_torrent* tor)
 {
-    tor->block_info.initSizes(tor->info.totalSize(), tor->info.pieceSize());
-    tor->completion = tr_completion{ tor, &tor->block_info };
-    auto const obfuscated = tr_sha1("req2"sv, tor->infoHash());
-    if (obfuscated)
+    tor->completion = tr_completion{ tor, &tor->blockInfo() };
+    if (auto const obfuscated = tr_sha1("req2"sv, tor->infoHash()); obfuscated)
     {
         tor->obfuscated_hash = *obfuscated;
     }
@@ -574,18 +571,21 @@ static void torrentInitFromInfoDict(tr_torrent* tor)
         tor->obfuscated_hash = tr_sha1_digest_t{};
     }
 
-    tor->fpm_.reset(tor->info);
+    tor->fpm_.reset(tor->metainfo_);
     tor->file_mtimes_.resize(tor->fileCount());
     tor->file_priorities_.reset(&tor->fpm_);
     tor->files_wanted_.reset(&tor->fpm_);
     tor->checked_pieces_ = tr_bitfield{ size_t(tor->pieceCount()) };
 }
 
-void tr_torrentGotNewInfoDict(tr_torrent* tor)
+void tr_torrent::setMetainfo(tr_torrent_metainfo const& tm)
 {
-    torrentInitFromInfoDict(tor);
-    tr_peerMgrOnTorrentGotMetainfo(tor);
-    tr_torrentFireMetadataCompleted(tor);
+    metainfo_ = tm;
+
+    torrentInitFromInfoDict(this);
+    tr_peerMgrOnTorrentGotMetainfo(this);
+    tr_torrentFireMetadataCompleted(this);
+    this->setDirty();
 }
 
 static bool hasAnyLocalData(tr_torrent const* tor)
@@ -630,29 +630,6 @@ static void callScriptIfEnabled(tr_torrent const* tor, TrScript type)
 }
 
 static void refreshCurrentDir(tr_torrent* tor);
-
-static void migrateFile(
-    tr_torrent const* tor,
-    tr_magnet_metainfo::BasenameFormat old_format,
-    tr_magnet_metainfo::BasenameFormat new_format)
-{
-    auto const torrent_dir = tor->session->torrent_dir;
-    auto const& name = tor->name();
-    auto const& hash_string = tor->infoHashString();
-    auto const suffix = "torrent"sv;
-
-    auto const old_filename = tr_magnet_metainfo::makeFilename(torrent_dir, name, hash_string, old_format, suffix);
-    auto const new_filename = tr_magnet_metainfo::makeFilename(torrent_dir, name, hash_string, new_format, suffix);
-
-    if (tr_sys_path_rename(old_filename.c_str(), new_filename.c_str(), nullptr))
-    {
-        tr_logAddNamedError(
-            tor->name().c_str(),
-            "Migrated torrent file from \"%s\" to \"%s\"",
-            old_filename.c_str(),
-            new_filename.c_str());
-    }
-}
 
 static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
 {
@@ -704,18 +681,16 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
     // the same ones that would be saved back again, so don't let them
     // affect the 'is dirty' flag.
     auto const was_dirty = tor->isDirty;
-    bool didRenameResumeFileToHashOnlyName = false;
-    auto const loaded = tr_torrentLoadResume(tor, ~(uint64_t)0, ctor, &didRenameResumeFileToHashOnlyName);
+    bool resume_file_was_migrated = false;
+    auto const loaded = tr_torrentLoadResume(tor, ~(uint64_t)0, ctor, &resume_file_was_migrated);
     tor->isDirty = was_dirty;
 
-    if (didRenameResumeFileToHashOnlyName)
+    if (resume_file_was_migrated)
     {
-        /* Rename torrent file as well */
-        migrateFile(tor, tr_magnet_metainfo::BasenameFormat::NameAndPartialHash, tr_magnet_metainfo::BasenameFormat::Hash);
+        tor->metainfo_.migrateFile(session->torrent_dir, tor->name(), tor->infoHashString(), ".torrent");
     }
 
     tor->completeness = tor->completion.status();
-    setLocalErrorIfFilesDisappeared(tor);
 
     tr_ctorInitTorrentPriorities(ctor, tor);
     tr_ctorInitTorrentWanted(ctor, tor);
@@ -748,14 +723,17 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
 
     tr_sessionAddTorrent(session, tor);
 
-    /* if we don't have a local .torrent file already, assume the torrent is new */
-    bool const isNewTorrent = !tr_sys_path_exists(tor->torrentFile().c_str(), nullptr);
-
-    /* maybe save our own copy of the metainfo */
-    if (tr_ctorGetSave(ctor))
+    // if we don't have a local .torrent file already, assume the torrent is new
+    auto filename = tor->makeTorrentFilename();
+    bool const is_new_torrent = !tr_sys_path_exists(filename.c_str(), nullptr);
+    if (is_new_torrent)
     {
         tr_error* error = nullptr;
-        if (!tr_ctorSaveContents(ctor, tor->torrentFile(), &error))
+        if (tr_ctorSaveContents(ctor, filename, &error))
+        {
+            tor->setTorrentFile(filename);
+        }
+        else
         {
             tor->setLocalError(
                 tr_strvJoin("Unable to save torrent file: ", error->message, " ("sv, std::to_string(error->code), ")"sv));
@@ -765,7 +743,7 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
 
     tor->announcer_tiers = tr_announcerAddTorrent(tor, onTrackerResponse, nullptr);
 
-    if (isNewTorrent)
+    if (is_new_torrent)
     {
         if (tor->hasMetadata())
         {
@@ -787,23 +765,27 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
     {
         tr_torrentStart(tor);
     }
+    else
+    {
+        setLocalErrorIfFilesDisappeared(tor);
+    }
 }
 
-tr_torrent* tr_torrentNew(tr_ctor const* ctor, tr_torrent** setme_duplicate_of)
+tr_torrent* tr_torrentNew(tr_ctor* ctor, tr_torrent** setme_duplicate_of)
 {
     TR_ASSERT(ctor != nullptr);
     auto* const session = tr_ctorGetSession(ctor);
     TR_ASSERT(tr_isSession(session));
 
     // is the metainfo valid?
-    auto const* metainfo = tr_ctorGetMetainfo(ctor);
-    if (metainfo == nullptr)
+    auto metainfo = tr_ctorStealMetainfo(ctor);
+    if (std::empty(metainfo.infoHashString()))
     {
         return nullptr;
     }
 
     // is it a duplicate?
-    if (auto* const duplicate_of = session->getTorrent(metainfo->infoHash()); duplicate_of != nullptr)
+    if (auto* const duplicate_of = session->getTorrent(metainfo.infoHash()); duplicate_of != nullptr)
     {
         if (setme_duplicate_of != nullptr)
         {
@@ -813,29 +795,7 @@ tr_torrent* tr_torrentNew(tr_ctor const* ctor, tr_torrent** setme_duplicate_of)
         return nullptr;
     }
 
-    // build a variant to parse
-    auto top_variant = tr_variant{};
-    if (std::empty(*metainfo))
-    {
-        metainfo->toVariant(&top_variant);
-    }
-    else
-    {
-        tr_variantFromBuf(&top_variant, TR_VARIANT_PARSE_BENC, tr_ctorGetContents(ctor), nullptr, nullptr);
-    }
-
-    // parse the metainfo
-    tr_error* error = nullptr;
-    auto parsed = tr_metainfoParse(session, &top_variant, &error);
-    tr_variantFree(&top_variant);
-    if (!parsed)
-    {
-        return nullptr;
-    }
-
-    // add it
-    auto* const tor = new tr_torrent{ parsed->info };
-    tor->swapMetainfo(*parsed);
+    auto* const tor = new tr_torrent{ std::move(metainfo) };
     torrentInit(tor, ctor);
     return tor;
 }
@@ -1269,7 +1229,6 @@ static void freeTorrent(tr_torrent* tor)
     TR_ASSERT(!tor->isRunning);
 
     tr_session* session = tor->session;
-    tr_info* inf = &tor->info;
 
     tr_peerMgrRemoveTorrent(tor);
 
@@ -1294,8 +1253,6 @@ static void freeTorrent(tr_torrent* tor)
     }
 
     delete tor->bandwidth;
-
-    tr_metainfoFree(inf);
     delete tor;
 }
 
@@ -2061,7 +2018,7 @@ bool tr_torrentSetAnnounceList(tr_torrent* tor, char const* const* announce_urls
         return false;
     }
 
-    std::swap(*tor->info.announce_list, announce_list);
+    tor->metainfo_.announceList() = announce_list;
     tor->markEdited();
 
     /* if we had a tracker-related error on this torrent,
@@ -2193,7 +2150,7 @@ static void removeEmptyFoldersAndJunkFiles(char const* folder)
  * 2. If there are nontorrent files, don't delete them...
  * 3. ...unless the other files are "junk", such as .DS_Store
  */
-static void deleteLocalData(tr_torrent* tor, tr_fileFunc func)
+static void deleteLocalData(tr_torrent const* tor, tr_fileFunc func)
 {
     auto files = std::vector<std::string>{};
     auto folders = std::set<std::string>{};
@@ -2894,7 +2851,7 @@ static bool renameArgsAreValid(char const* oldpath, char const* newname)
         strchr(newname, TR_PATH_DELIMITER) == nullptr;
 }
 
-static auto renameFindAffectedFiles(tr_torrent* tor, std::string_view oldpath)
+static auto renameFindAffectedFiles(tr_torrent const* tor, std::string_view oldpath)
 {
     auto indices = std::vector<tr_file_index_t>{};
     auto oldpath_as_dir = tr_strvJoin(oldpath, "/"sv);
@@ -3106,13 +3063,6 @@ void tr_torrentRenamePath(
     tor->renamePath(oldpath, newname, callback, callback_user_data);
 }
 
-void tr_torrent::swapMetainfo(tr_metainfo_parsed& parsed)
-{
-    std::swap(this->info, parsed.info);
-    std::swap(this->piece_checksums_, parsed.pieces);
-    std::swap(this->info_dict_size, parsed.info_dict_size);
-}
-
 void tr_torrentSetFilePriorities(
     tr_torrent* tor,
     tr_file_index_t const* files,
@@ -3148,17 +3098,44 @@ void tr_torrent::setBlocks(tr_bitfield blocks)
     this->completion.setBlocks(std::move(blocks));
 }
 
-void tr_torrent::setName(std::string_view name)
+[[nodiscard]] bool tr_torrent::ensurePieceIsChecked(tr_piece_index_t piece)
 {
-    this->info.setName(name);
+    TR_ASSERT(piece < this->pieceCount());
+
+    if (checked_pieces_.test(piece))
+    {
+        return true;
+    }
+
+    bool const checked = checkPiece(piece);
+    this->markChanged();
+    this->setDirty();
+
+    checked_pieces_.set(piece, checked);
+    return checked;
 }
 
-void tr_torrent::setFileSubpath(tr_file_index_t i, std::string_view subpath)
+void tr_torrent::initCheckedPieces(tr_bitfield const& checked, time_t const* mtimes /*fileCount()*/)
 {
-    this->info.setFileSubpath(i, subpath);
-}
+    TR_ASSERT(std::size(checked) == this->pieceCount());
+    checked_pieces_ = checked;
 
-void tr_info::setAnnounceList(tr_announce_list const& list)
-{
-    this->announce_list = std::make_shared<tr_announce_list>(list);
+    auto const n = this->fileCount();
+    this->file_mtimes_.resize(n);
+
+    auto filename = std::string{};
+    for (size_t i = 0; i < n; ++i)
+    {
+        auto const found = this->findFile(filename, i);
+        auto const mtime = found ? found->last_modified_at : 0;
+
+        this->file_mtimes_[i] = mtime;
+
+        // if a file has changed, mark its pieces as unchecked
+        if (mtime == 0 || mtime != mtimes[i])
+        {
+            auto const [begin, end] = piecesInFile(i);
+            checked_pieces_.unsetSpan(begin, end);
+        }
+    }
 }

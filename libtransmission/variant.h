@@ -107,7 +107,7 @@ enum tr_variant_fmt
     TR_VARIANT_FMT_JSON_LEAN /* saves bandwidth by omitting all whitespace. */
 };
 
-int tr_variantToFile(tr_variant const* variant, tr_variant_fmt fmt, std::string_view filename);
+int tr_variantToFile(tr_variant const* variant, tr_variant_fmt fmt, std::string const& filename);
 
 std::string tr_variantToStr(tr_variant const* variant, tr_variant_fmt fmt);
 
@@ -123,7 +123,7 @@ enum tr_variant_parse_opts
 bool tr_variantFromFile(
     tr_variant* setme,
     tr_variant_parse_opts opts,
-    std::string_view filename,
+    std::string const& filename,
     struct tr_error** error = nullptr);
 
 bool tr_variantFromBuf(

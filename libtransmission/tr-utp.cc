@@ -38,25 +38,25 @@ THE SOFTWARE.
 
 #ifndef WITH_UTP
 
-#define MY_NAME "UTP"
+static char constexpr MyName[] = "UTP";
 
-#define dbgmsg(...) tr_logAddDeepNamed(MY_NAME, __VA_ARGS__)
+#define dbgmsg(...) tr_logAddDeepNamed(MyName, __VA_ARGS__)
 
 void UTP_Close(struct UTPSocket* socket)
 {
-    tr_logAddNamedError(MY_NAME, "UTP_Close(%p) was called.", socket);
+    tr_logAddNamedError(MyName, "UTP_Close(%p) was called.", socket);
     dbgmsg("UTP_Close(%p) was called.", socket);
 }
 
 void UTP_RBDrained(struct UTPSocket* socket)
 {
-    tr_logAddNamedError(MY_NAME, "UTP_RBDrained(%p) was called.", socket);
+    tr_logAddNamedError(MyName, "UTP_RBDrained(%p) was called.", socket);
     dbgmsg("UTP_RBDrained(%p) was called.", socket);
 }
 
 bool UTP_Write(struct UTPSocket* socket, size_t count)
 {
-    tr_logAddNamedError(MY_NAME, "UTP_RBDrained(%p, %zu) was called.", socket, count);
+    tr_logAddNamedError(MyName, "UTP_RBDrained(%p, %zu) was called.", socket, count);
     dbgmsg("UTP_RBDrained(%p, %zu) was called.", socket, count);
     return false;
 }
@@ -97,14 +97,13 @@ void tr_utpSendTo(
 #else
 
 /* Greg says 50ms works for them. */
-
-#define UTP_INTERVAL_US 50000
+static auto constexpr UtpIntervalUs = int{ 50000 };
 
 static void incoming(void* vsession, struct UTPSocket* s)
 {
     auto* session = static_cast<tr_session*>(vsession);
     struct sockaddr_storage from_storage;
-    struct sockaddr* from = (struct sockaddr*)&from_storage;
+    auto* const from = (struct sockaddr*)&from_storage;
     socklen_t fromlen = sizeof(from_storage);
     tr_address addr;
     tr_port port = 0;
@@ -149,7 +148,7 @@ static void reset_timer(tr_session* ss)
     if (tr_sessionIsUTPEnabled(ss))
     {
         sec = 0;
-        usec = UTP_INTERVAL_US / 2 + tr_rand_int_weak(UTP_INTERVAL_US);
+        usec = UtpIntervalUs / 2 + tr_rand_int_weak(UtpIntervalUs);
     }
     else
     {

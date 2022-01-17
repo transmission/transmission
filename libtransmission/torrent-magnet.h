@@ -23,7 +23,7 @@ struct tr_torrent;
 // defined by BEP #9
 inline constexpr int METADATA_PIECE_SIZE = 1024 * 16;
 
-void* tr_torrentGetMetadataPiece(tr_torrent* tor, int piece, size_t* len);
+void* tr_torrentGetMetadataPiece(tr_torrent const* tor, int piece, size_t* len);
 
 void tr_torrentSetMetadataPiece(tr_torrent* tor, int piece, void const* data, int len);
 

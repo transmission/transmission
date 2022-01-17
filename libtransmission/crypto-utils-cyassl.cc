@@ -50,7 +50,7 @@ struct tr_dh_ctx
 ****
 ***/
 
-#define MY_NAME "tr_crypto_utils"
+static char constexpr MyName[] = "tr_crypto_utils";
 
 static void log_cyassl_error(int error_code, char const* file, int line)
 {
@@ -65,7 +65,7 @@ static void log_cyassl_error(int error_code, char const* file, int line)
         CTaoCryptErrorString(error_code, error_message);
 #endif
 
-        tr_logAddMessage(file, line, TR_LOG_ERROR, MY_NAME, "CyaSSL error: %s", error_message);
+        tr_logAddMessage(file, line, TR_LOG_ERROR, MyName, "CyaSSL error: %s", error_message);
     }
 }
 

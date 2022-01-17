@@ -160,7 +160,7 @@ void notify_callback(Glib::RefPtr<Gio::AsyncResult>& res, TrNotification const& 
 
     auto const id = Glib::VariantBase::cast_dynamic<UInt32VariantType>(result.get_child(0)).get();
 
-    active_notifications.emplace(id, n);
+    active_notifications.try_emplace(id, n);
 }
 
 } // namespace
@@ -207,7 +207,7 @@ void gtr_notify_torrent_completed(Glib::RefPtr<Session> const& core, int torrent
     }
 
     std::map<Glib::ustring, Glib::VariantBase> hints;
-    hints.emplace("category", StringVariantType::create("transfer.complete"));
+    hints.try_emplace("category", StringVariantType::create("transfer.complete"));
 
     proxy->call(
         "Notify",

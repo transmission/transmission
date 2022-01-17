@@ -1037,7 +1037,7 @@ void DetailsDialog::refreshUI()
         for (Peer const& peer : peers)
         {
             QString const key = id_str + QLatin1Char(':') + peer.address;
-            PeerItem* item = static_cast<PeerItem*>(peers_.value(key, nullptr));
+            auto* item = static_cast<PeerItem*>(peers_.value(key, nullptr));
 
             if (item == nullptr) // new peer has connected
             {
