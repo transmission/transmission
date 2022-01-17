@@ -578,24 +578,33 @@ bool tr_torrent_metainfo::migrateFile(
     std::string_view suffix)
 {
     auto const old_filename = makeFilename(dirname, name, info_hash_string, BasenameFormat::NameAndPartialHash, suffix);
-    if (!tr_sys_path_exists(old_filename.c_str(), nullptr))
-    {
-        return false;
-    }
-
+    auto const old_filename_exists = tr_sys_path_exists(old_filename.c_str(), nullptr);
     auto const new_filename = makeFilename(dirname, name, info_hash_string, BasenameFormat::Hash, suffix);
-    if (!tr_sys_path_rename(old_filename.c_str(), new_filename.c_str(), nullptr))
+    auto const new_filename_exists = tr_sys_path_exists(new_filename.c_str(), nullptr);
+
+    if (old_filename_exists && new_filename_exists)
+    {
+        tr_sys_path_remove(old_filename.c_str(), nullptr);
+        return false;
+    }
+
+    if (new_filename_exists)
     {
         return false;
     }
 
-    auto const name_sz = std::string{ name };
-    tr_logAddNamedError(
-        name_sz.c_str(),
-        "Migrated torrent file from \"%s\" to \"%s\"",
-        old_filename.c_str(),
-        new_filename.c_str());
-    return true;
+    if (old_filename_exists && tr_sys_path_rename(old_filename.c_str(), new_filename.c_str(), nullptr))
+    {
+        auto const name_sz = std::string{ name };
+        tr_logAddNamedError(
+            name_sz.c_str(),
+            "Migrated torrent file from \"%s\" to \"%s\"",
+            old_filename.c_str(),
+            new_filename.c_str());
+        return true;
+    }
+
+    return false; // neither file exists
 }
 
 std::string const& tr_torrent_metainfo::fileSubpath(tr_file_index_t i) const
