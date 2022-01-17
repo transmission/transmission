@@ -52,7 +52,8 @@ using namespace std::literals;
  * http://www.webappsec.org/lists/websecurity/archive/2008-04/msg00037.html */
 #define REQUIRE_SESSION_ID
 
-#define MY_NAME "RPC Server"
+static char constexpr MyName[] = "RPC Server";
+
 #define MY_REALM "Transmission"
 
 #define dbgmsg(...) tr_logAddDeepNamed(MY_NAME, __VA_ARGS__)
