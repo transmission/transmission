@@ -32,7 +32,7 @@
 using namespace std::literals;
 
 /* arbitrary value... this is much deeper than our code goes */
-#define MAX_DEPTH 64
+static auto constexpr MaxDepth = int{ 64 };
 
 struct json_wrapper_data
 {
@@ -49,7 +49,7 @@ struct json_wrapper_data
      * e.g. they may all be objects with the same set of keys. So when
      * a container is popped off the stack, remember its size to use as
      * a preallocation heuristic for the next container at that depth. */
-    std::array<size_t, MAX_DEPTH> preallocGuess;
+    std::array<size_t, MaxDepth> preallocGuess;
 };
 
 static tr_variant* get_node(struct jsonsl_st* jsn)
@@ -106,7 +106,7 @@ static void action_callback_PUSH(
         data->stack.push_back(node);
 
         int const depth = std::size(data->stack);
-        size_t const n = depth < MAX_DEPTH ? data->preallocGuess[depth] : 0;
+        size_t const n = depth < MaxDepth ? data->preallocGuess[depth] : 0;
         if (state->type == JSONSL_T_LIST)
         {
             tr_variantInitList(node, n);
@@ -307,7 +307,7 @@ static void action_callback_POP(
         int const depth = std::size(data->stack);
         auto* v = data->stack.back();
         data->stack.pop_back();
-        if (depth < MAX_DEPTH)
+        if (depth < MaxDepth)
         {
             data->preallocGuess[depth] = v->val.l.count;
         }
@@ -346,7 +346,7 @@ int tr_variantParseJson(tr_variant& setme, int parse_opts, std::string_view benc
 
     auto data = json_wrapper_data{};
 
-    jsonsl_t jsn = jsonsl_new(MAX_DEPTH);
+    jsonsl_t jsn = jsonsl_new(MaxDepth);
     jsn->action_callback_PUSH = action_callback_PUSH;
     jsn->action_callback_POP = action_callback_POP;
     jsn->error_callback = error_callback;
