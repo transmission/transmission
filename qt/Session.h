@@ -19,8 +19,8 @@
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/quark.h>
+#include <libtransmission/tr-macros.h>
 
-#include "Macros.h"
 #include "RpcClient.h"
 #include "RpcQueue.h"
 #include "Torrent.h"

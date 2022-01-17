@@ -6,6 +6,9 @@
  *
  */
 
+#include <memory>
+#include <string>
+
 #include <glibmm.h>
 #include <glibmm/i18n.h>
 
@@ -19,10 +22,10 @@
 #include "Session.h"
 #include "Utils.h"
 
-#define FILE_CHOSEN_KEY "file-is-chosen"
-
 namespace
 {
+
+auto const FileChosenKey = Glib::Quark("file-is-chosen");
 
 class MakeProgressDialog : public Gtk::Dialog
 {
@@ -33,6 +36,8 @@ public:
         std::string const& target,
         Glib::RefPtr<Session> const& core);
     ~MakeProgressDialog() override;
+
+    TR_DISABLE_COPY_MOVE(MakeProgressDialog)
 
 private:
     bool onProgressDialogRefresh();
@@ -56,6 +61,8 @@ class MakeDialog::Impl
 {
 public:
     Impl(MakeDialog& dialog, Glib::RefPtr<Session> const& core);
+
+    TR_DISABLE_COPY_MOVE(Impl)
 
 private:
     void onSourceToggled2(Gtk::ToggleButton* tb, Gtk::FileChooserButton* chooser);
@@ -164,7 +171,7 @@ MakeProgressDialog::~MakeProgressDialog()
 void MakeProgressDialog::addTorrent()
 {
     tr_ctor* ctor = tr_ctorNew(core_->get_session());
-    tr_ctorSetMetainfoFromFile(ctor, target_.c_str());
+    tr_ctorSetMetainfoFromFile(ctor, target_.c_str(), nullptr);
     tr_ctorSetDownloadDir(ctor, TR_FORCE, Glib::path_get_dirname(builder_.top).c_str());
     core_->add_ctor(ctor);
 }
@@ -334,13 +341,10 @@ void MakeDialog::Impl::updatePiecesLabel()
             tr_strlsize(builder_->totalSize),
             builder_->fileCount);
         gstr += "; ";
-
-        char buf[128];
-        tr_formatter_mem_B(buf, builder_->pieceSize, sizeof(buf));
         gstr += gtr_sprintf(
             ngettext("%1$'d Piece @ %2$s", "%1$'d Pieces @ %2$s", builder_->pieceCount),
             builder_->pieceCount,
-            buf);
+            tr_formatter_mem_B(builder_->pieceSize));
     }
 
     gstr += "</i>";
@@ -361,7 +365,7 @@ void MakeDialog::Impl::setFilename(std::string const& filename)
 
 void MakeDialog::Impl::onChooserChosen(Gtk::FileChooserButton* chooser)
 {
-    chooser->set_data(FILE_CHOSEN_KEY, GINT_TO_POINTER(true));
+    chooser->set_data(FileChosenKey, GINT_TO_POINTER(true));
     setFilename(chooser->get_filename());
 }
 
@@ -369,7 +373,7 @@ void MakeDialog::Impl::onSourceToggled2(Gtk::ToggleButton* tb, Gtk::FileChooserB
 {
     if (tb->get_active())
     {
-        if (chooser->get_data(FILE_CHOSEN_KEY) != nullptr)
+        if (chooser->get_data(FileChosenKey) != nullptr)
         {
             onChooserChosen(chooser);
         }

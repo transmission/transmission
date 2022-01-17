@@ -9,11 +9,13 @@
 #include <algorithm>
 #include <cerrno>
 #include <cstring> /* memcpy */
+#include <ctime>
 #include <list>
 #include <string>
+#include <string_view>
 #include <vector>
 
-#include <zlib.h>
+#include <libdeflate.h>
 
 #include <event2/buffer.h>
 #include <event2/event.h>
@@ -29,6 +31,7 @@
 #include "log.h"
 #include "net.h"
 #include "platform.h" /* tr_getWebClientDir() */
+#include "quark.h"
 #include "rpc-server.h"
 #include "rpcimpl.h"
 #include "session-id.h"
@@ -49,10 +52,13 @@ using namespace std::literals;
  * http://www.webappsec.org/lists/websecurity/archive/2008-04/msg00037.html */
 #define REQUIRE_SESSION_ID
 
-#define MY_NAME "RPC Server"
+static char constexpr MyName[] = "RPC Server";
+
 #define MY_REALM "Transmission"
 
-#define dbgmsg(...) tr_logAddDeepNamed(MY_NAME, __VA_ARGS__)
+#define dbgmsg(...) tr_logAddDeepNamed(MyName, __VA_ARGS__)
+
+static int constexpr DeflateLevel = 6; // medium / default
 
 /***
 ****
@@ -94,8 +100,8 @@ static auto extract_parts_from_multipart(struct evkeyvalq const* headers, struct
 {
     auto ret = std::vector<tr_mimepart>{};
 
-    char const* content_type = evhttp_find_header(headers, "Content-Type");
-    char const* in = (char const*)evbuffer_pullup(body, -1);
+    auto const* const content_type = evhttp_find_header(headers, "Content-Type");
+    auto const* in = (char const*)evbuffer_pullup(body, -1);
     size_t inlen = evbuffer_get_length(body);
 
     char const* boundary_key = "boundary=";
@@ -175,11 +181,10 @@ static void handle_upload(struct evhttp_request* req, tr_rpc_server* server)
         {
             for (auto const& p : parts)
             {
-                auto const& body = p.body;
-                auto body_len = std::size(body);
-                if (body_len >= 2 && memcmp(&body[body_len - 2], "\r\n", 2) == 0)
+                auto body = std::string_view{ p.body };
+                if (tr_strvEndsWith(body, "\r\n"sv))
                 {
-                    body_len -= 2;
+                    body.remove_suffix(2);
                 }
 
                 auto top = tr_variant{};
@@ -197,9 +202,7 @@ static void handle_upload(struct evhttp_request* req, tr_rpc_server* server)
                 }
                 else if (tr_variantFromBuf(&test, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, body))
                 {
-                    auto* b64 = static_cast<char*>(tr_base64_encode(body.c_str(), body_len, nullptr));
-                    tr_variantDictAddStr(args, TR_KEY_metainfo, b64);
-                    tr_free(b64);
+                    tr_variantDictAddStrView(args, TR_KEY_metainfo, tr_base64_encode(body));
                     have_source = true;
                 }
 
@@ -269,65 +272,31 @@ static void add_response(struct evhttp_request* req, tr_rpc_server* server, stru
     }
     else
     {
-        struct evbuffer_iovec iovec[1];
-        void* content_ptr = evbuffer_pullup(content, -1);
+        auto const* const content_ptr = evbuffer_pullup(content, -1);
         size_t const content_len = evbuffer_get_length(content);
+        auto const max_compressed_len = libdeflate_deflate_compress_bound(server->compressor.get(), content_len);
 
-        if (!server->isStreamInitialized)
+        struct evbuffer_iovec iovec[1];
+        evbuffer_reserve_space(out, std::max(content_len, max_compressed_len), iovec, 1);
+
+        auto const compressed_len = libdeflate_zlib_compress(
+            server->compressor.get(),
+            content_ptr,
+            content_len,
+            iovec[0].iov_base,
+            iovec[0].iov_len);
+        if (0 < compressed_len && compressed_len < content_len)
         {
-            server->isStreamInitialized = true;
-            server->stream.zalloc = (alloc_func)Z_NULL;
-            server->stream.zfree = (free_func)Z_NULL;
-            server->stream.opaque = (voidpf)Z_NULL;
-
-            /* zlib's manual says: "Add 16 to windowBits to write a simple gzip header
-             * and trailer around the compressed data instead of a zlib wrapper." */
-#ifdef TR_LIGHTWEIGHT
-            int const compressionLevel = Z_DEFAULT_COMPRESSION;
-#else
-            int const compressionLevel = Z_BEST_COMPRESSION;
-#endif
-            // "windowBits can also be greater than 15 for optional gzip encoding.
-            // Add 16 to windowBits to write a simple gzip header and trailer
-            // around the compressed data instead of a zlib wrapper."
-            if (Z_OK != deflateInit2(&server->stream, compressionLevel, Z_DEFLATED, 15 + 16, 8, Z_DEFAULT_STRATEGY))
-            {
-                tr_logAddNamedDbg(MY_NAME, "deflateInit2 failed: %s", server->stream.msg);
-            }
-        }
-
-        server->stream.next_in = static_cast<Bytef*>(content_ptr);
-        server->stream.avail_in = content_len;
-
-        /* allocate space for the raw data and call deflate() just once --
-         * we won't use the deflated data if it's longer than the raw data,
-         * so it's okay to let deflate() run out of output buffer space */
-        evbuffer_reserve_space(out, content_len, iovec, 1);
-        server->stream.next_out = static_cast<Bytef*>(iovec[0].iov_base);
-        server->stream.avail_out = iovec[0].iov_len;
-        auto const state = deflate(&server->stream, Z_FINISH);
-
-        if (state == Z_STREAM_END)
-        {
-            iovec[0].iov_len -= server->stream.avail_out;
-
-#if 0
-
-            fprintf(stderr, "compressed response is %.2f of original (raw==%zu bytes; compressed==%zu)\n",
-                (double)evbuffer_get_length(out) / content_len, content_len, evbuffer_get_length(out));
-
-#endif
-
+            iovec[0].iov_len = compressed_len;
             evhttp_add_header(req->output_headers, "Content-Encoding", "gzip");
         }
         else
         {
-            memcpy(iovec[0].iov_base, content_ptr, content_len);
+            std::copy_n(content_ptr, content_len, static_cast<char*>(iovec[0].iov_base));
             iovec[0].iov_len = content_len;
         }
 
         evbuffer_commit_space(out, iovec, 1);
-        deflateReset(&server->stream);
     }
 }
 
@@ -362,9 +331,8 @@ static void serve_file(struct evhttp_request* req, tr_rpc_server* server, char c
 
         if (file == nullptr)
         {
-            char* tmp = tr_strdup_printf("%s (%s)", filename, error->message);
-            send_simple_response(req, HTTP_NOTFOUND, tmp);
-            tr_free(tmp);
+            auto const tmp = tr_strvJoin(filename, " ("sv, error->message, ")"sv);
+            send_simple_response(req, HTTP_NOTFOUND, tmp.c_str());
             tr_error_free(error);
         }
         else
@@ -421,13 +389,11 @@ static void handle_web_client(struct evhttp_request* req, tr_rpc_server* server)
         }
         else
         {
-            char* filename = tr_strdup_printf(
-                "%s%s%s",
+            auto const filename = tr_strvJoin(
                 webClientDir,
                 TR_PATH_DELIMITER_STR,
                 tr_str_is_empty(subpath) ? "index.html" : subpath);
-            serve_file(req, server, filename);
-            tr_free(filename);
+            serve_file(req, server, filename.c_str());
         }
 
         tr_free(subpath);
@@ -488,10 +454,10 @@ static void handle_rpc(struct evhttp_request* req, tr_rpc_server* server)
 
         if (q != nullptr)
         {
-            struct rpc_response_data* data = tr_new0(struct rpc_response_data, 1);
+            auto* const data = tr_new0(struct rpc_response_data, 1);
             data->req = req;
             data->server = server;
-            tr_rpc_request_exec_uri(server->session, q + 1, TR_BAD_SIZE, rpc_response_func, data);
+            tr_rpc_request_exec_uri(server->session, q + 1, rpc_response_func, data);
             return;
         }
     }
@@ -586,7 +552,7 @@ static bool isAuthorized(tr_rpc_server const* server, char const* auth_header)
     }
 
     auth.remove_prefix(std::size(Prefix));
-    auto const decoded_str = tr_base64_decode_str(auth);
+    auto const decoded_str = tr_base64_decode(auth);
     auto decoded = std::string_view{ decoded_str };
     auto const username = tr_strvSep(&decoded, ':');
     auto const password = decoded;
@@ -642,11 +608,11 @@ static void handle_request(struct evhttp_request* req, void* arg)
                 ++server->loginattempts;
             }
 
-            char* unauthuser = tr_strdup_printf(
-                "<p>Unauthorized User. %d unsuccessful login attempts.</p>",
-                server->loginattempts);
-            send_simple_response(req, 401, unauthuser);
-            tr_free(unauthuser);
+            auto const unauthuser = tr_strvJoin(
+                "<p>Unauthorized User. "sv,
+                std::to_string(server->loginattempts),
+                " unsuccessful login attempts.</p>"sv);
+            send_simple_response(req, 401, unauthuser.c_str());
             return;
         }
 
@@ -671,7 +637,7 @@ static void handle_request(struct evhttp_request* req, void* arg)
         }
         else if (!isHostnameAllowed(server, req))
         {
-            char* const tmp = tr_strdup_printf(
+            char const* const tmp =
                 "<p>Transmission received your request, but the hostname was unrecognized.</p>"
                 "<p>To fix this, choose one of the following options:"
                 "<ul>"
@@ -681,15 +647,14 @@ static void handle_request(struct evhttp_request* req, void* arg)
                 "<p>If you're editing settings.json, see the 'rpc-host-whitelist' and 'rpc-host-whitelist-enabled' entries.</p>"
                 "<p>This requirement has been added to help prevent "
                 "<a href=\"https://en.wikipedia.org/wiki/DNS_rebinding\">DNS Rebinding</a> "
-                "attacks.</p>");
+                "attacks.</p>";
             send_simple_response(req, 421, tmp);
-            tr_free(tmp);
         }
 #ifdef REQUIRE_SESSION_ID
         else if (!test_session_id(server, req))
         {
             char const* sessionId = get_current_session_id(server);
-            char* tmp = tr_strdup_printf(
+            auto const tmp = tr_strvJoin(
                 "<p>Your request had an invalid session-id header.</p>"
                 "<p>To fix this, follow these steps:"
                 "<ol><li> When reading a response, get its X-Transmission-Session-Id header and remember it"
@@ -699,13 +664,13 @@ static void handle_request(struct evhttp_request* req, void* arg)
                 "<p>This requirement has been added to help prevent "
                 "<a href=\"https://en.wikipedia.org/wiki/Cross-site_request_forgery\">CSRF</a> "
                 "attacks.</p>"
-                "<p><code>%s: %s</code></p>",
-                TR_RPC_SESSION_ID_HEADER,
-                sessionId);
+                "<p><code>" TR_RPC_SESSION_ID_HEADER,
+                ": "sv,
+                sessionId,
+                "</code></p>");
             evhttp_add_header(req->output_headers, TR_RPC_SESSION_ID_HEADER, sessionId);
             evhttp_add_header(req->output_headers, "Access-Control-Expose-Headers", TR_RPC_SESSION_ID_HEADER);
-            send_simple_response(req, 409, tmp);
-            tr_free(tmp);
+            send_simple_response(req, 409, tmp.c_str());
         }
 #endif
         else if (tr_strvStartsWith(location, "rpc"sv))
@@ -782,12 +747,12 @@ static void startServer(void* vserver)
         {
             int const retry_delay = rpc_server_start_retry(server);
 
-            tr_logAddNamedDbg(MY_NAME, "Unable to bind to %s:%d, retrying in %d seconds", address, port, retry_delay);
+            tr_logAddNamedDbg(MyName, "Unable to bind to %s:%d, retrying in %d seconds", address, port, retry_delay);
             return;
         }
 
         tr_logAddNamedError(
-            MY_NAME,
+            MyName,
             "Unable to bind to %s:%d after %d attempts, giving up",
             address,
             port,
@@ -798,7 +763,7 @@ static void startServer(void* vserver)
         evhttp_set_gencb(httpd, handle_request, server);
         server->httpd = httpd;
 
-        tr_logAddNamedDbg(MY_NAME, "Started listening on %s:%d", address, port);
+        tr_logAddNamedDbg(MyName, "Started listening on %s:%d", address, port);
     }
 
     rpc_server_start_retry_cancel(server);
@@ -823,7 +788,7 @@ static void stopServer(tr_rpc_server* server)
     server->httpd = nullptr;
     evhttp_free(httpd);
 
-    tr_logAddNamedDbg(MY_NAME, "Stopped listening on %s:%d", address, port);
+    tr_logAddNamedDbg(MyName, "Stopped listening on %s:%d", address, port);
 }
 
 static void onEnabledChanged(void* vserver)
@@ -908,13 +873,13 @@ static auto parseWhitelist(std::string_view whitelist)
         if (token.find_first_of("+-"sv) != token.npos)
         {
             tr_logAddNamedInfo(
-                MY_NAME,
+                MyName,
                 "Adding address to whitelist: %" TR_PRIsv " (And it has a '+' or '-'!  Are you using an old ACL by mistake?)",
                 TR_PRIsv_ARG(token));
         }
         else
         {
-            tr_logAddNamedInfo(MY_NAME, "Adding address to whitelist: %" TR_PRIsv, TR_PRIsv_ARG(token));
+            tr_logAddNamedInfo(MyName, "Adding address to whitelist: %" TR_PRIsv, TR_PRIsv_ARG(token));
         }
     }
 
@@ -967,9 +932,9 @@ std::string const& tr_rpcGetUsername(tr_rpc_server const* server)
     return server->username;
 }
 
-static constexpr bool isSalted(std::string_view password)
+static bool isSalted(std::string_view password)
 {
-    return !std::empty(password) && password.front() == '{';
+    return tr_ssha1_test(password);
 }
 
 void tr_rpcSetPassword(tr_rpc_server* server, std::string_view password)
@@ -1031,11 +996,12 @@ void tr_rpcSetAntiBruteForceThreshold(tr_rpc_server* server, int badRequests)
 static void missing_settings_key(tr_quark const q)
 {
     char const* str = tr_quark_get_string(q);
-    tr_logAddNamedError(MY_NAME, _("Couldn't find settings key \"%s\""), str);
+    tr_logAddNamedError(MyName, _("Couldn't find settings key \"%s\""), str);
 }
 
 tr_rpc_server::tr_rpc_server(tr_session* session_in, tr_variant* settings)
-    : session{ session_in }
+    : compressor{ libdeflate_alloc_compressor(DeflateLevel), libdeflate_free_compressor }
+    , session{ session_in }
 {
     auto address = tr_address{};
     auto boolVal = bool{};
@@ -1189,13 +1155,13 @@ tr_rpc_server::tr_rpc_server(tr_session* session_in, tr_variant* settings)
     {
         if (!tr_address_from_string(&address, std::string{ sv }.c_str()))
         {
-            tr_logAddNamedError(MY_NAME, _("%" TR_PRIsv " is not a valid address"), TR_PRIsv_ARG(sv));
+            tr_logAddNamedError(MyName, _("%" TR_PRIsv " is not a valid address"), TR_PRIsv_ARG(sv));
             address = tr_inaddr_any;
         }
         else if (address.type != TR_AF_INET && address.type != TR_AF_INET6)
         {
             tr_logAddNamedError(
-                MY_NAME,
+                MyName,
                 _("%" TR_PRIsv " is not an IPv4 or IPv6 address. RPC listeners must be IPv4 or IPv6"),
                 TR_PRIsv_ARG(sv));
             address = tr_inaddr_any;
@@ -1207,7 +1173,7 @@ tr_rpc_server::tr_rpc_server(tr_session* session_in, tr_variant* settings)
     if (this->isEnabled)
     {
         tr_logAddNamedInfo(
-            MY_NAME,
+            MyName,
             _("Serving RPC and Web requests on %s:%d%s"),
             tr_rpcGetBindAddress(this),
             (int)this->port,
@@ -1216,19 +1182,19 @@ tr_rpc_server::tr_rpc_server(tr_session* session_in, tr_variant* settings)
 
         if (this->isWhitelistEnabled)
         {
-            tr_logAddNamedInfo(MY_NAME, "%s", _("Whitelist enabled"));
+            tr_logAddNamedInfo(MyName, "%s", _("Whitelist enabled"));
         }
 
         if (this->isPasswordEnabled)
         {
-            tr_logAddNamedInfo(MY_NAME, "%s", _("Password required"));
+            tr_logAddNamedInfo(MyName, "%s", _("Password required"));
         }
     }
 
     char const* webClientDir = tr_getWebClientDir(this->session);
     if (!tr_str_is_empty(webClientDir))
     {
-        tr_logAddNamedInfo(MY_NAME, _("Serving RPC and Web requests from directory '%s'"), webClientDir);
+        tr_logAddNamedInfo(MyName, _("Serving RPC and Web requests from directory '%s'"), webClientDir);
     }
 }
 
@@ -1237,9 +1203,4 @@ tr_rpc_server::~tr_rpc_server()
     TR_ASSERT(tr_amInEventThread(this->session));
 
     stopServer(this);
-
-    if (this->isStreamInitialized)
-    {
-        deflateEnd(&this->stream);
-    }
 }

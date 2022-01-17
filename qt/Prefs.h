@@ -16,9 +16,9 @@
 #include <QVariant>
 
 #include <libtransmission/quark.h>
+#include <libtransmission/tr-macros.h>
 
 #include "Filters.h"
-#include "Macros.h"
 
 class QDateTime;
 

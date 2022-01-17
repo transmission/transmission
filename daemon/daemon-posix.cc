@@ -20,6 +20,8 @@
 
 #include "daemon.h"
 
+using namespace std::literals;
+
 /***
 ****
 ***/
@@ -33,9 +35,9 @@ static int signal_pipe[2];
 ****
 ***/
 
-static void set_system_error(tr_error** error, int code, char const* message)
+static void set_system_error(tr_error** error, int code, std::string_view message)
 {
-    tr_error_set(error, code, "%s (%d): %s", message, code, tr_strerror(code));
+    tr_error_set(error, code, tr_strvJoin(message, " ("sv, std::to_string(code), "): "sv, tr_strerror(code)));
 }
 
 /***

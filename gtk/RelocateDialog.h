@@ -13,12 +13,16 @@
 
 #include <gtkmm.h>
 
+#include <libtransmission/tr-macros.h>
+
 class Session;
 
 class RelocateDialog : public Gtk::Dialog
 {
 public:
     ~RelocateDialog() override;
+
+    TR_DISABLE_COPY_MOVE(RelocateDialog)
 
     static std::unique_ptr<RelocateDialog> create(
         Gtk::Window& parent,

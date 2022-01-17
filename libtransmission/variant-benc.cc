@@ -6,12 +6,10 @@
  *
  */
 
-#include <cstdlib>
+#include <array>
 #include <cctype> /* isdigit() */
 #include <deque>
 #include <cerrno>
-#include <cstdlib> /* strtoul() */
-#include <cstring> /* strlen(), memchr() */
 #include <string_view>
 #include <optional>
 
@@ -22,13 +20,14 @@
 #include "transmission.h"
 
 #include "tr-assert.h"
+#include "quark.h"
 #include "utils.h" /* tr_snprintf() */
 #include "variant-common.h"
 #include "variant.h"
 
 using namespace std::literals;
 
-#define MAX_BENC_STR_LENGTH (128 * 1024 * 1024) /* arbitrary */
+auto constexpr MaxBencStrLength = size_t{ 128 * 1024 * 1024 }; // arbitrary
 
 /***
 ****  tr_variantParse()
@@ -47,17 +46,20 @@ using namespace std::literals;
  */
 std::optional<int64_t> tr_bencParseInt(std::string_view* benc)
 {
+    auto constexpr Prefix = "i"sv;
+    auto constexpr Suffix = "e"sv;
+
     // find the beginning delimiter
     auto walk = *benc;
-    if (std::size(walk) < 3 || walk.front() != 'i')
+    if (std::size(walk) < 3 || !tr_strvStartsWith(walk, Prefix))
     {
         return {};
     }
 
     // find the ending delimiter
-    walk.remove_prefix(1);
-    auto const pos = walk.find('e');
-    if (pos == walk.npos)
+    walk.remove_prefix(std::size(Prefix));
+    auto const pos = walk.find(Suffix);
+    if (pos == std::string_view::npos)
     {
         return {};
     }
@@ -68,17 +70,16 @@ std::optional<int64_t> tr_bencParseInt(std::string_view* benc)
         return {};
     }
 
-    errno = 0;
-    char* endptr = nullptr;
-    auto const value = std::strtoll(std::data(walk), &endptr, 10);
-    if (errno != 0 || endptr != std::data(walk) + pos)
+    // parse the string and make sure the next char is `Suffix`
+    auto const value = tr_parseNum<int64_t>(walk);
+    if (!value || !tr_strvStartsWith(walk, Suffix))
     {
         return {};
     }
 
-    walk.remove_prefix(pos + 1);
+    walk.remove_prefix(std::size(Suffix));
     *benc = walk;
-    return value;
+    return *value;
 }
 
 /**
@@ -91,31 +92,28 @@ std::optional<std::string_view> tr_bencParseStr(std::string_view* benc)
 {
     // find the ':' delimiter
     auto const colon_pos = benc->find(':');
-    if (colon_pos == benc->npos)
+    if (colon_pos == std::string_view::npos)
     {
         return {};
     }
 
     // get the string length
-    errno = 0;
-    char* ulend = nullptr;
-    auto const len = strtoul(std::data(*benc), &ulend, 10);
-    if (errno != 0 || ulend != std::data(*benc) + colon_pos || len >= MAX_BENC_STR_LENGTH)
+    auto svtmp = benc->substr(0, colon_pos);
+    auto const len = tr_parseNum<size_t>(svtmp);
+    if (!len || *len >= MaxBencStrLength)
     {
         return {};
     }
 
     // do we have `len` bytes of string data?
-    auto walk = *benc;
-    walk.remove_prefix(colon_pos + 1);
-    if (std::size(walk) < len)
+    svtmp = benc->substr(colon_pos + 1);
+    if (std::size(svtmp) < len)
     {
         return {};
     }
 
-    auto const string = walk.substr(0, len);
-    walk.remove_prefix(len);
-    *benc = walk;
+    auto const string = svtmp.substr(0, *len);
+    *benc = svtmp.substr(*len);
     return string;
 }
 
@@ -186,50 +184,43 @@ int tr_variantParseBenc(tr_variant& top, int parse_opts, std::string_view benc, 
                     break;
                 }
 
-                tr_variant* const v = get_node(stack, key, &top, &err);
-                if (v != nullptr)
+                if (tr_variant* const v = get_node(stack, key, &top, &err); v != nullptr)
                 {
                     tr_variantInitInt(v, *value);
                 }
                 break;
             }
         case 'l': // list
-            {
-                benc.remove_prefix(1);
+            benc.remove_prefix(1);
 
-                tr_variant* const v = get_node(stack, key, &top, &err);
-                if (v != nullptr)
-                {
-                    tr_variantInitList(v, 0);
-                    stack.push_back(v);
-                }
-                break;
+            if (tr_variant* const v = get_node(stack, key, &top, &err); v != nullptr)
+            {
+                tr_variantInitList(v, 0);
+                stack.push_back(v);
             }
+            break;
+
         case 'd': // dict
-            {
-                benc.remove_prefix(1);
+            benc.remove_prefix(1);
 
-                tr_variant* const v = get_node(stack, key, &top, &err);
-                if (v != nullptr)
-                {
-                    tr_variantInitDict(v, 0);
-                    stack.push_back(v);
-                }
-                break;
+            if (tr_variant* const v = get_node(stack, key, &top, &err); v != nullptr)
+            {
+                tr_variantInitDict(v, 0);
+                stack.push_back(v);
             }
+            break;
         case 'e': // end of list or dict
+            benc.remove_prefix(1);
+
+            if (std::empty(stack) || key)
             {
-                benc.remove_prefix(1);
-
-                if (std::empty(stack) || key)
-                {
-                    err = EILSEQ;
-                    break;
-                }
-
-                stack.pop_back();
+                err = EILSEQ;
                 break;
             }
+
+            stack.pop_back();
+            break;
+
         case '0':
         case '1':
         case '2':
@@ -244,6 +235,7 @@ int tr_variantParseBenc(tr_variant& top, int parse_opts, std::string_view benc, 
                 auto const sv = tr_bencParseStr(&benc);
                 if (!sv)
                 {
+                    benc.remove_prefix(1);
                     break;
                 }
 

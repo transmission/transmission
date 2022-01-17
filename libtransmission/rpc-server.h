@@ -13,21 +13,18 @@
 #endif
 
 #include <list>
+#include <memory>
 #include <string>
 #include <string_view>
-
-#include <zlib.h>
-
-#include <event2/buffer.h>
-#include <event2/event.h>
-#include <event2/http.h>
-#include <event2/http_struct.h> /* TODO: eventually remove this */
 
 #include "transmission.h"
 
 #include "net.h"
 
+struct event;
+struct evhttp;
 struct tr_variant;
+struct libdeflate_compressor;
 
 class tr_rpc_server
 {
@@ -40,7 +37,7 @@ public:
     tr_rpc_server& operator=(tr_rpc_server&) = delete;
     tr_rpc_server& operator=(tr_rpc_server&&) = delete;
 
-    z_stream stream = {};
+    std::shared_ptr<libdeflate_compressor> compressor;
 
     std::list<std::string> hostWhitelist;
     std::list<std::string> whitelist;
@@ -65,7 +62,6 @@ public:
     bool isEnabled = false;
     bool isHostWhitelistEnabled = false;
     bool isPasswordEnabled = false;
-    bool isStreamInitialized = false;
     bool isWhitelistEnabled = false;
 };
 

@@ -8,8 +8,7 @@
 
 #include <algorithm>
 #include <cerrno>
-#include <cstdlib> /* bsearch() */
-#include <cstring> /* memcmp() */
+#include <cstdlib> /* abort() */
 #include <optional>
 #include <vector>
 
@@ -26,6 +25,8 @@
 #include "torrent.h"
 #include "tr-assert.h"
 #include "utils.h"
+
+using namespace std::literals;
 
 /****
 *****  Low-level IO functions
@@ -44,21 +45,20 @@ static int readOrWriteBytes(
     tr_session* session,
     tr_torrent* tor,
     int ioMode,
-    tr_file_index_t fileIndex,
-    uint64_t fileOffset,
+    tr_file_index_t file_index,
+    uint64_t file_offset,
     void* buf,
     size_t buflen)
 {
+    TR_ASSERT(file_index < tor->fileCount());
+
     int err = 0;
     bool const doWrite = ioMode >= TR_IO_WRITE;
-    tr_info const* const info = &tor->info;
-    tr_file const* const file = &info->files[fileIndex];
+    auto const file_size = tor->fileSize(file_index);
+    TR_ASSERT(file_size == 0 || file_offset < file_size);
+    TR_ASSERT(file_offset + buflen <= file_size);
 
-    TR_ASSERT(fileIndex < info->fileCount);
-    TR_ASSERT(file->length == 0 || fileOffset < file->length);
-    TR_ASSERT(fileOffset + buflen <= file->length);
-
-    if (file->length == 0)
+    if (file_size == 0)
     {
         return 0;
     }
@@ -67,14 +67,14 @@ static int readOrWriteBytes(
     ****  Find the fd
     ***/
 
-    tr_sys_file_t fd = tr_fdFileGetCached(session, tr_torrentId(tor), fileIndex, doWrite);
+    auto fd = tr_fdFileGetCached(session, tr_torrentId(tor), file_index, doWrite);
 
     if (fd == TR_BAD_SYS_FILE) /* it's not cached, so open/create it now */
     {
         /* see if the file exists... */
         char const* base = nullptr;
         char* subpath = nullptr;
-        if (!tr_torrentFindFile2(tor, fileIndex, &base, &subpath, nullptr))
+        if (!tr_torrentFindFile2(tor, file_index, &base, &subpath, nullptr))
         {
             /* we can't read a file that doesn't exist... */
             if (!doWrite)
@@ -84,18 +84,18 @@ static int readOrWriteBytes(
 
             /* figure out where the file should go, so we can create it */
             base = tr_torrentGetCurrentDir(tor);
-            subpath = tr_sessionIsIncompleteFileNamingEnabled(tor->session) ? tr_torrentBuildPartial(tor, fileIndex) :
-                                                                              tr_strdup(file->name);
+            subpath = tr_sessionIsIncompleteFileNamingEnabled(tor->session) ? tr_torrentBuildPartial(tor, file_index) :
+                                                                              tr_strvDup(tor->fileSubpath(file_index));
         }
 
         if (err == 0)
         {
             /* open (and maybe create) the file */
             auto const filename = tr_strvPath(base, subpath);
-            tr_preallocation_mode const prealloc = (file->dnd || !doWrite) ? TR_PREALLOCATE_NONE :
-                                                                             tor->session->preallocationMode;
+            auto const prealloc = (!doWrite || !tor->fileIsWanted(file_index)) ? TR_PREALLOCATE_NONE :
+                                                                                 tor->session->preallocationMode;
 
-            fd = tr_fdFileCheckout(session, tor->uniqueId, fileIndex, filename.c_str(), doWrite, prealloc, file->length);
+            fd = tr_fdFileCheckout(session, tor->uniqueId, file_index, filename.c_str(), doWrite, prealloc, file_size);
             if (fd == TR_BAD_SYS_FILE)
             {
                 err = errno;
@@ -121,25 +121,25 @@ static int readOrWriteBytes(
 
         if (ioMode == TR_IO_READ)
         {
-            if (!tr_sys_file_read_at(fd, buf, buflen, fileOffset, nullptr, &error))
+            if (!tr_sys_file_read_at(fd, buf, buflen, file_offset, nullptr, &error))
             {
                 err = error->code;
-                tr_logAddTorErr(tor, "read failed for \"%s\": %s", file->name, error->message);
+                tr_logAddTorErr(tor, "read failed for \"%s\": %s", tor->fileSubpath(file_index).c_str(), error->message);
                 tr_error_free(error);
             }
         }
         else if (ioMode == TR_IO_WRITE)
         {
-            if (!tr_sys_file_write_at(fd, buf, buflen, fileOffset, nullptr, &error))
+            if (!tr_sys_file_write_at(fd, buf, buflen, file_offset, nullptr, &error))
             {
                 err = error->code;
-                tr_logAddTorErr(tor, "write failed for \"%s\": %s", file->name, error->message);
+                tr_logAddTorErr(tor, "write failed for \"%s\": %s", tor->fileSubpath(file_index).c_str(), error->message);
                 tr_error_free(error);
             }
         }
         else if (ioMode == TR_IO_PREFETCH)
         {
-            tr_sys_file_advise(fd, fileOffset, buflen, TR_SYS_FILE_ADVICE_WILL_NEED, nullptr);
+            tr_sys_file_advise(fd, file_offset, buflen, TR_SYS_FILE_ADVICE_WILL_NEED, nullptr);
         }
         else
         {
@@ -148,50 +148,6 @@ static int readOrWriteBytes(
     }
 
     return err;
-}
-
-static int compareOffsetToFile(void const* a, void const* b)
-{
-    auto const offset = *static_cast<uint64_t const*>(a);
-    auto const* file = static_cast<tr_file const*>(b);
-
-    if (offset < file->offset)
-    {
-        return -1;
-    }
-
-    if (offset >= file->offset + file->length)
-    {
-        return 1;
-    }
-
-    return 0;
-}
-
-void tr_ioFindFileLocation(
-    tr_torrent const* tor,
-    tr_piece_index_t pieceIndex,
-    uint32_t pieceOffset,
-    tr_file_index_t* fileIndex,
-    uint64_t* fileOffset)
-{
-    TR_ASSERT(tr_isTorrent(tor));
-
-    uint64_t const offset = tr_pieceOffset(tor, pieceIndex, pieceOffset, 0);
-    TR_ASSERT(offset < tor->info.totalSize);
-
-    auto const* file = static_cast<tr_file const*>(
-        bsearch(&offset, tor->info.files, tor->info.fileCount, sizeof(tr_file), compareOffsetToFile));
-    TR_ASSERT(file != nullptr);
-
-    if (file != nullptr)
-    {
-        *fileIndex = file - tor->info.files;
-        *fileOffset = offset - file->offset;
-        TR_ASSERT(*fileIndex < tor->info.fileCount);
-        TR_ASSERT(*fileOffset < file->length);
-        TR_ASSERT(tor->info.files[*fileIndex].offset + *fileOffset == offset);
-    }
 }
 
 /* returns 0 on success, or an errno on failure */
@@ -204,33 +160,30 @@ static int readOrWritePiece(
     size_t buflen)
 {
     int err = 0;
-    tr_info const* info = &tor->info;
 
-    if (pieceIndex >= tor->info.pieceCount)
+    if (pieceIndex >= tor->pieceCount())
     {
         return EINVAL;
     }
 
-    auto fileIndex = tr_file_index_t{};
-    auto fileOffset = uint64_t{};
-    tr_ioFindFileLocation(tor, pieceIndex, pieceOffset, &fileIndex, &fileOffset);
+    auto [file_index, file_offset] = tor->fileOffset(pieceIndex, pieceOffset);
 
     while (buflen != 0 && err == 0)
     {
-        tr_file const* file = &info->files[fileIndex];
-        uint64_t const bytesThisPass = std::min(uint64_t{ buflen }, uint64_t{ file->length - fileOffset });
+        uint64_t const bytes_this_pass = std::min(uint64_t{ buflen }, uint64_t{ tor->fileSize(file_index) - file_offset });
 
-        err = readOrWriteBytes(tor->session, tor, ioMode, fileIndex, fileOffset, buf, bytesThisPass);
-        buf += bytesThisPass;
-        buflen -= bytesThisPass;
-        fileIndex++;
-        fileOffset = 0;
+        err = readOrWriteBytes(tor->session, tor, ioMode, file_index, file_offset, buf, bytes_this_pass);
+        buf += bytes_this_pass;
+        buflen -= bytes_this_pass;
 
         if (err != 0 && ioMode == TR_IO_WRITE && tor->error != TR_STAT_LOCAL_ERROR)
         {
-            auto const path = tr_strvPath(tor->downloadDir, file->name);
-            tr_torrentSetLocalError(tor, "%s (%s)", tr_strerror(err), path.c_str());
+            auto const path = tr_strvPath(tor->downloadDir().sv(), tor->fileSubpath(file_index));
+            tor->setLocalError(tr_strvJoin(tr_strerror(err), " ("sv, path, ")"sv));
         }
+
+        ++file_index;
+        file_offset = 0;
     }
 
     return err;
@@ -258,21 +211,21 @@ int tr_ioWrite(tr_torrent* tor, tr_piece_index_t pieceIndex, uint32_t begin, uin
 static std::optional<tr_sha1_digest_t> recalculateHash(tr_torrent* tor, tr_piece_index_t piece)
 {
     TR_ASSERT(tor != nullptr);
-    TR_ASSERT(piece < tor->info.pieceCount);
+    TR_ASSERT(piece < tor->pieceCount());
 
-    auto bytes_left = size_t{ tr_torPieceCountBytes(tor, piece) };
+    auto bytes_left = size_t(tor->pieceSize(piece));
     auto offset = uint32_t{};
     tr_ioPrefetch(tor, piece, offset, bytes_left);
 
     auto sha = tr_sha1_init();
-    auto buffer = std::vector<uint8_t>(tor->blockSize);
+    auto buffer = std::vector<uint8_t>(tor->blockSize());
     while (bytes_left != 0)
     {
         size_t const len = std::min(bytes_left, std::size(buffer));
-        auto const success = tr_cacheReadBlock(tor->session->cache, tor, piece, offset, len, std::data(buffer)) == 0;
-        if (!success)
+        if (auto const success = tr_cacheReadBlock(tor->session->cache, tor, piece, offset, len, std::data(buffer)) == 0;
+            !success)
         {
-            tr_sha1_final(sha, nullptr);
+            tr_sha1_final(sha);
             return {};
         }
 

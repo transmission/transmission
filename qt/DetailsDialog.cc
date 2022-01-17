@@ -35,6 +35,7 @@
 #include "ColumnResizer.h"
 #include "DetailsDialog.h"
 #include "Formatter.h"
+#include "IconCache.h"
 #include "Prefs.h"
 #include "Session.h"
 #include "SqueezeLabel.h"
@@ -197,18 +198,6 @@ private:
 /***
 ****
 ***/
-
-QIcon DetailsDialog::getStockIcon(QString const& freedesktop_name, int fallback) const
-{
-    QIcon icon = QIcon::fromTheme(freedesktop_name);
-
-    if (icon.isNull())
-    {
-        icon = style()->standardIcon(QStyle::StandardPixmap(fallback), nullptr, this);
-    }
-
-    return icon;
-}
 
 DetailsDialog::DetailsDialog(Session& session, Prefs& prefs, TorrentModel const& model, QWidget* parent)
     : BaseDialog(parent)
@@ -1048,7 +1037,7 @@ void DetailsDialog::refreshUI()
         for (Peer const& peer : peers)
         {
             QString const key = id_str + QLatin1Char(':') + peer.address;
-            PeerItem* item = static_cast<PeerItem*>(peers_.value(key, nullptr));
+            auto* item = static_cast<PeerItem*>(peers_.value(key, nullptr));
 
             if (item == nullptr) // new peer has connected
             {
@@ -1449,9 +1438,10 @@ void DetailsDialog::initTrackerTab()
     ui_.trackersView->setModel(tracker_filter_.get());
     ui_.trackersView->setItemDelegate(tracker_delegate_.get());
 
-    ui_.addTrackerButton->setIcon(getStockIcon(QStringLiteral("list-add"), QStyle::SP_DialogOpenButton));
-    ui_.editTrackerButton->setIcon(getStockIcon(QStringLiteral("document-properties"), QStyle::SP_DesktopIcon));
-    ui_.removeTrackerButton->setIcon(getStockIcon(QStringLiteral("list-remove"), QStyle::SP_TrashIcon));
+    auto& icons = IconCache::get();
+    ui_.addTrackerButton->setIcon(icons.getThemeIcon(QStringLiteral("list-add"), QStyle::SP_DialogOpenButton));
+    ui_.editTrackerButton->setIcon(icons.getThemeIcon(QStringLiteral("document-properties"), QStyle::SP_DesktopIcon));
+    ui_.removeTrackerButton->setIcon(icons.getThemeIcon(QStringLiteral("list-remove"), QStyle::SP_TrashIcon));
 
     ui_.showTrackerScrapesCheck->setChecked(prefs_.getBool(Prefs::SHOW_TRACKER_SCRAPES));
     ui_.showBackupTrackersCheck->setChecked(prefs_.getBool(Prefs::SHOW_BACKUP_TRACKERS));

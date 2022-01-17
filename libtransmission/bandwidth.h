@@ -13,10 +13,11 @@
 #endif
 
 #include <array>
-#include <unordered_set>
+#include <cstddef> // size_t
 #include <vector>
 
 #include "transmission.h"
+
 #include "tr-assert.h"
 
 class tr_peerIo;
@@ -247,7 +248,7 @@ private:
 
     mutable std::array<Band, 2> band_ = {};
     Bandwidth* parent_ = nullptr;
-    std::unordered_set<Bandwidth*> children_;
+    std::vector<Bandwidth*> children_;
     tr_peerIo* peer_ = nullptr;
     tr_priority_t priority_ = 0;
 };

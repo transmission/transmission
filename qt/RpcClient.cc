@@ -6,9 +6,9 @@
  *
  */
 
-#include "RpcClient.h"
+#include <string_view>
 
-#include <cstring>
+#include "RpcClient.h"
 
 #include <QApplication>
 #include <QAuthenticator>
@@ -144,11 +144,7 @@ void RpcClient::sendNetworkRequest(TrVariantPtr json, QFutureInterface<RpcRespon
         request_ = request;
     }
 
-    size_t raw_json_data_length;
-    auto* raw_json_data = tr_variantToStr(json.get(), TR_VARIANT_FMT_JSON_LEAN, &raw_json_data_length);
-    QByteArray json_data(raw_json_data, raw_json_data_length);
-    tr_free(raw_json_data);
-
+    auto const json_data = QByteArray::fromStdString(tr_variantToStr(json.get(), TR_VARIANT_FMT_JSON_LEAN));
     QNetworkReply* reply = networkAccessManager()->post(*request_, json_data);
     reply->setProperty(RequestDataPropertyKey, QVariant::fromValue(json));
     reply->setProperty(RequestFutureinterfacePropertyKey, QVariant::fromValue(promise));

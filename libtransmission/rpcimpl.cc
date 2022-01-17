@@ -8,20 +8,17 @@
 
 #include <algorithm>
 #include <array>
-#include <cctype> /* isdigit */
 #include <cerrno>
-#include <cstdlib> /* strtol */
-#include <cstring> /* strcmp */
+#include <ctime>
 #include <iterator>
+#include <numeric>
 #include <string_view>
 #include <vector>
 
-#ifndef ZLIB_CONST
-#define ZLIB_CONST
-#endif
-#include <zlib.h>
+#include <libdeflate.h>
 
 #include "transmission.h"
+
 #include "completion.h"
 #include "crypto-utils.h"
 #include "error.h"
@@ -29,9 +26,10 @@
 #include "file.h"
 #include "log.h"
 #include "platform-quota.h" /* tr_device_info_get_disk_space() */
+#include "quark.h"
 #include "rpcimpl.h"
-#include "session.h"
 #include "session-id.h"
+#include "session.h"
 #include "stats.h"
 #include "torrent.h"
 #include "tr-assert.h"
@@ -39,14 +37,14 @@
 #include "utils.h"
 #include "variant.h"
 #include "version.h"
-#include "web.h"
 #include "web-utils.h"
+#include "web.h"
 
-#define RPC_VERSION 17
-#define RPC_VERSION_MIN 14
-#define RPC_VERSION_SEMVER "5.3.0"
+static auto constexpr RpcVersion = int64_t{ 17 };
+static auto constexpr RpcVersionMin = int64_t{ 14 };
+static char constexpr RpcVersionSemver[] = "5.3.0";
 
-#define RECENTLY_ACTIVE_SECONDS 60
+static auto constexpr RecentlyActiveSeconds = time_t{ 60 };
 
 using namespace std::literals;
 
@@ -120,9 +118,8 @@ static auto getTorrents(tr_session* session, tr_variant* args)
 
     auto id = int64_t{};
     auto sv = std::string_view{};
-    tr_variant* ids = nullptr;
 
-    if (tr_variantDictFindList(args, TR_KEY_ids, &ids))
+    if (tr_variant* ids = nullptr; tr_variantDictFindList(args, TR_KEY_ids, &ids))
     {
         size_t const n = tr_variantListSize(ids);
         torrents.reserve(n);
@@ -138,7 +135,7 @@ static auto getTorrents(tr_session* session, tr_variant* args)
             }
             else if (tr_variantGetStrView(node, &sv))
             {
-                tor = tr_torrentFindFromHashString(session, sv);
+                tor = session->getTorrent(sv);
             }
 
             if (tor != nullptr)
@@ -149,8 +146,7 @@ static auto getTorrents(tr_session* session, tr_variant* args)
     }
     else if (tr_variantDictFindInt(args, TR_KEY_ids, &id) || tr_variantDictFindInt(args, TR_KEY_id, &id))
     {
-        tr_torrent* const tor = tr_torrentFindFromId(session, id);
-        if (tor != nullptr)
+        if (auto* const tor = tr_torrentFindFromId(session, id); tor != nullptr)
         {
             torrents.push_back(tor);
         }
@@ -159,18 +155,18 @@ static auto getTorrents(tr_session* session, tr_variant* args)
     {
         if (sv == "recently-active"sv)
         {
-            time_t const cutoff = tr_time() - RECENTLY_ACTIVE_SECONDS;
+            time_t const cutoff = tr_time() - RecentlyActiveSeconds;
 
             torrents.reserve(std::size(session->torrents));
             std::copy_if(
                 std::begin(session->torrents),
                 std::end(session->torrents),
                 std::back_inserter(torrents),
-                [&cutoff](tr_torrent* tor) { return tor->anyDate >= cutoff; });
+                [&cutoff](auto const* tor) { return tor->anyDate >= cutoff; });
         }
         else
         {
-            tr_torrent* const tor = tr_torrentFindFromHashString(session, sv);
+            auto* const tor = session->getTorrent(sv);
             if (tor != nullptr)
             {
                 torrents.push_back(tor);
@@ -300,7 +296,7 @@ static char const* torrentStop(
 {
     for (auto* tor : getTorrents(session, args_in))
     {
-        if (tor->isRunning || tr_torrentIsQueued(tor))
+        if (tor->isRunning || tor->isQueued())
         {
             tor->isStopping = true;
             notify(session, TR_RPC_TORRENT_STOPPED, tor);
@@ -382,87 +378,80 @@ static void addLabels(tr_torrent const* tor, tr_variant* list)
 
 static void addFileStats(tr_torrent const* tor, tr_variant* list)
 {
-    auto const* const info = tr_torrentInfo(tor);
-    for (tr_file_index_t i = 0; i < info->fileCount; ++i)
+    for (tr_file_index_t i = 0, n = tor->fileCount(); i < n; ++i)
     {
-        auto const* const file = &info->files[i];
-        tr_variant* const d = tr_variantListAddDict(list, 3);
-        tr_variantDictAddInt(d, TR_KEY_bytesCompleted, tr_torrentFileProgress(tor, i).bytes_completed);
-        tr_variantDictAddInt(d, TR_KEY_priority, file->priority);
-        tr_variantDictAddBool(d, TR_KEY_wanted, !file->dnd);
+        auto const file = tr_torrentFile(tor, i);
+        tr_variant* d = tr_variantListAddDict(list, 3);
+        tr_variantDictAddInt(d, TR_KEY_bytesCompleted, file.have);
+        tr_variantDictAddInt(d, TR_KEY_priority, file.priority);
+        tr_variantDictAddBool(d, TR_KEY_wanted, file.wanted);
     }
 }
 
 static void addFiles(tr_torrent const* tor, tr_variant* list)
 {
-    auto const* const info = tr_torrentInfo(tor);
-    for (tr_file_index_t i = 0; i < info->fileCount; ++i)
+    for (tr_file_index_t i = 0, n = tor->fileCount(); i < n; ++i)
     {
-        tr_file const* file = &info->files[i];
+        auto const file = tr_torrentFile(tor, i);
         tr_variant* d = tr_variantListAddDict(list, 3);
-        tr_variantDictAddInt(d, TR_KEY_bytesCompleted, tr_torrentFileProgress(tor, i).bytes_completed);
-        tr_variantDictAddInt(d, TR_KEY_length, file->length);
-        tr_variantDictAddStr(d, TR_KEY_name, file->name);
+        tr_variantDictAddInt(d, TR_KEY_bytesCompleted, file.have);
+        tr_variantDictAddInt(d, TR_KEY_length, file.length);
+        tr_variantDictAddStr(d, TR_KEY_name, file.name);
     }
 }
 
-static void addWebseeds(tr_info const* info, tr_variant* webseeds)
+static void addWebseeds(tr_torrent const* tor, tr_variant* webseeds)
 {
-    for (unsigned int i = 0; i < info->webseedCount; ++i)
+    for (size_t i = 0, n = tor->webseedCount(); i < n; ++i)
     {
-        tr_variantListAddStr(webseeds, info->webseeds[i]);
+        tr_variantListAddStr(webseeds, tor->webseed(i));
     }
 }
 
-static void addTrackers(tr_info const* info, tr_variant* trackers)
+static void addTrackers(tr_torrent const* tor, tr_variant* trackers)
 {
-    for (unsigned int i = 0; i < info->trackerCount; ++i)
+    for (auto const& tracker : tor->announceList())
     {
-        tr_tracker_info const* t = &info->trackers[i];
         tr_variant* d = tr_variantListAddDict(trackers, 4);
-        tr_variantDictAddStrView(d, TR_KEY_announce, t->announce);
-        tr_variantDictAddInt(d, TR_KEY_id, t->id);
-        tr_variantDictAddStrView(d, TR_KEY_scrape, t->scrape);
-        tr_variantDictAddInt(d, TR_KEY_tier, t->tier);
+        tr_variantDictAddQuark(d, TR_KEY_announce, tracker.announce_str.quark());
+        tr_variantDictAddInt(d, TR_KEY_id, tracker.id);
+        tr_variantDictAddQuark(d, TR_KEY_scrape, tracker.scrape_str.quark());
+        tr_variantDictAddInt(d, TR_KEY_tier, tracker.tier);
     }
 }
 
-static void addTrackerStats(tr_tracker_stat const* st, int n, tr_variant* list)
+static void addTrackerStats(tr_tracker_view const& tracker, tr_variant* list)
 {
-    for (int i = 0; i < n; ++i)
-    {
-        tr_tracker_stat const* s = &st[i];
-        tr_variant* d = tr_variantListAddDict(list, 26);
-        tr_variantDictAddStr(d, TR_KEY_announce, s->announce);
-        tr_variantDictAddInt(d, TR_KEY_announceState, s->announceState);
-        tr_variantDictAddInt(d, TR_KEY_downloadCount, s->downloadCount);
-        tr_variantDictAddBool(d, TR_KEY_hasAnnounced, s->hasAnnounced);
-        tr_variantDictAddBool(d, TR_KEY_hasScraped, s->hasScraped);
-        tr_variantDictAddStr(d, TR_KEY_host, s->host);
-        tr_variantDictAddInt(d, TR_KEY_id, s->id);
-        tr_variantDictAddBool(d, TR_KEY_isBackup, s->isBackup);
-        tr_variantDictAddInt(d, TR_KEY_lastAnnouncePeerCount, s->lastAnnouncePeerCount);
-        tr_variantDictAddStr(d, TR_KEY_lastAnnounceResult, s->lastAnnounceResult);
-        tr_variantDictAddInt(d, TR_KEY_lastAnnounceStartTime, s->lastAnnounceStartTime);
-        tr_variantDictAddBool(d, TR_KEY_lastAnnounceSucceeded, s->lastAnnounceSucceeded);
-        tr_variantDictAddInt(d, TR_KEY_lastAnnounceTime, s->lastAnnounceTime);
-        tr_variantDictAddBool(d, TR_KEY_lastAnnounceTimedOut, s->lastAnnounceTimedOut);
-        tr_variantDictAddStr(d, TR_KEY_lastScrapeResult, s->lastScrapeResult);
-        tr_variantDictAddInt(d, TR_KEY_lastScrapeStartTime, s->lastScrapeStartTime);
-        tr_variantDictAddBool(d, TR_KEY_lastScrapeSucceeded, s->lastScrapeSucceeded);
-        tr_variantDictAddInt(d, TR_KEY_lastScrapeTime, s->lastScrapeTime);
-        tr_variantDictAddBool(d, TR_KEY_lastScrapeTimedOut, s->lastScrapeTimedOut);
-        tr_variantDictAddInt(d, TR_KEY_leecherCount, s->leecherCount);
-        tr_variantDictAddInt(d, TR_KEY_nextAnnounceTime, s->nextAnnounceTime);
-        tr_variantDictAddInt(d, TR_KEY_nextScrapeTime, s->nextScrapeTime);
-        tr_variantDictAddStr(d, TR_KEY_scrape, s->scrape);
-        tr_variantDictAddInt(d, TR_KEY_scrapeState, s->scrapeState);
-        tr_variantDictAddInt(d, TR_KEY_seederCount, s->seederCount);
-        tr_variantDictAddInt(d, TR_KEY_tier, s->tier);
-    }
+    auto* const d = tr_variantListAddDict(list, 26);
+    tr_variantDictAddStr(d, TR_KEY_announce, tracker.announce);
+    tr_variantDictAddInt(d, TR_KEY_announceState, tracker.announceState);
+    tr_variantDictAddInt(d, TR_KEY_downloadCount, tracker.downloadCount);
+    tr_variantDictAddBool(d, TR_KEY_hasAnnounced, tracker.hasAnnounced);
+    tr_variantDictAddBool(d, TR_KEY_hasScraped, tracker.hasScraped);
+    tr_variantDictAddStr(d, TR_KEY_host, tracker.host);
+    tr_variantDictAddInt(d, TR_KEY_id, tracker.id);
+    tr_variantDictAddBool(d, TR_KEY_isBackup, tracker.isBackup);
+    tr_variantDictAddInt(d, TR_KEY_lastAnnouncePeerCount, tracker.lastAnnouncePeerCount);
+    tr_variantDictAddStr(d, TR_KEY_lastAnnounceResult, tracker.lastAnnounceResult);
+    tr_variantDictAddInt(d, TR_KEY_lastAnnounceStartTime, tracker.lastAnnounceStartTime);
+    tr_variantDictAddBool(d, TR_KEY_lastAnnounceSucceeded, tracker.lastAnnounceSucceeded);
+    tr_variantDictAddInt(d, TR_KEY_lastAnnounceTime, tracker.lastAnnounceTime);
+    tr_variantDictAddBool(d, TR_KEY_lastAnnounceTimedOut, tracker.lastAnnounceTimedOut);
+    tr_variantDictAddStr(d, TR_KEY_lastScrapeResult, tracker.lastScrapeResult);
+    tr_variantDictAddInt(d, TR_KEY_lastScrapeStartTime, tracker.lastScrapeStartTime);
+    tr_variantDictAddBool(d, TR_KEY_lastScrapeSucceeded, tracker.lastScrapeSucceeded);
+    tr_variantDictAddInt(d, TR_KEY_lastScrapeTime, tracker.lastScrapeTime);
+    tr_variantDictAddBool(d, TR_KEY_lastScrapeTimedOut, tracker.lastScrapeTimedOut);
+    tr_variantDictAddInt(d, TR_KEY_leecherCount, tracker.leecherCount);
+    tr_variantDictAddInt(d, TR_KEY_nextAnnounceTime, tracker.nextAnnounceTime);
+    tr_variantDictAddInt(d, TR_KEY_nextScrapeTime, tracker.nextScrapeTime);
+    tr_variantDictAddStr(d, TR_KEY_scrape, tracker.scrape);
+    tr_variantDictAddInt(d, TR_KEY_scrapeState, tracker.scrapeState);
+    tr_variantDictAddInt(d, TR_KEY_seederCount, tracker.seederCount);
+    tr_variantDictAddInt(d, TR_KEY_tier, tracker.tier);
 }
 
-static void addPeers(tr_torrent* tor, tr_variant* list)
+static void addPeers(tr_torrent const* tor, tr_variant* list)
 {
     auto peerCount = int{};
     tr_peer_stat* peers = tr_torrentPeers(tor, &peerCount);
@@ -487,19 +476,14 @@ static void addPeers(tr_torrent* tor, tr_variant* list)
         tr_variantDictAddBool(d, TR_KEY_peerIsInterested, peer->peerIsInterested);
         tr_variantDictAddInt(d, TR_KEY_port, peer->port);
         tr_variantDictAddReal(d, TR_KEY_progress, peer->progress);
-        tr_variantDictAddInt(d, TR_KEY_rateToClient, toSpeedBytes(peer->rateToClient_KBps));
-        tr_variantDictAddInt(d, TR_KEY_rateToPeer, toSpeedBytes(peer->rateToPeer_KBps));
+        tr_variantDictAddInt(d, TR_KEY_rateToClient, tr_toSpeedBytes(peer->rateToClient_KBps));
+        tr_variantDictAddInt(d, TR_KEY_rateToPeer, tr_toSpeedBytes(peer->rateToPeer_KBps));
     }
 
     tr_torrentPeersFree(peers, peerCount);
 }
 
-static void initField(
-    tr_torrent* const tor,
-    tr_info const* const inf,
-    tr_stat const* const st,
-    tr_variant* const initme,
-    tr_quark key)
+static void initField(tr_torrent const* const tor, tr_stat const* const st, tr_variant* const initme, tr_quark key)
 {
     char* str = nullptr;
 
@@ -518,7 +502,7 @@ static void initField(
         break;
 
     case TR_KEY_comment:
-        tr_variantInitStr(initme, std::string_view{ inf->comment != nullptr ? inf->comment : "" });
+        tr_variantInitStr(initme, tor->comment());
         break;
 
     case TR_KEY_corruptEver:
@@ -526,11 +510,11 @@ static void initField(
         break;
 
     case TR_KEY_creator:
-        tr_variantInitStr(initme, std::string_view{ inf->creator != nullptr ? inf->creator : "" });
+        tr_variantInitStrView(initme, tor->creator());
         break;
 
     case TR_KEY_dateCreated:
-        tr_variantInitInt(initme, inf->dateCreated);
+        tr_variantInitInt(initme, tor->dateCreated());
         break;
 
     case TR_KEY_desiredAvailable:
@@ -570,21 +554,21 @@ static void initField(
         break;
 
     case TR_KEY_file_count:
-        tr_variantInitInt(initme, inf->fileCount);
+        tr_variantInitInt(initme, tor->fileCount());
         break;
 
     case TR_KEY_files:
-        tr_variantInitList(initme, inf->fileCount);
+        tr_variantInitList(initme, tor->fileCount());
         addFiles(tor, initme);
         break;
 
     case TR_KEY_fileStats:
-        tr_variantInitList(initme, inf->fileCount);
+        tr_variantInitList(initme, tor->fileCount());
         addFileStats(tor, initme);
         break;
 
     case TR_KEY_hashString:
-        tr_variantInitStrView(initme, tor->info.hashString);
+        tr_variantInitStrView(initme, tor->infoHashString());
         break;
 
     case TR_KEY_haveUnchecked:
@@ -612,7 +596,7 @@ static void initField(
         break;
 
     case TR_KEY_isPrivate:
-        tr_variantInitBool(initme, tr_torrentIsPrivate(tor));
+        tr_variantInitBool(initme, tor->isPrivate());
         break;
 
     case TR_KEY_isStalled:
@@ -688,12 +672,11 @@ static void initField(
         break;
 
     case TR_KEY_pieces:
-        if (tr_torrentHasMetadata(tor))
+        if (tor->hasMetadata())
         {
-            auto const bytes = tr_torrentCreatePieceBitfield(tor);
-            auto* enc = static_cast<char*>(tr_base64_encode(bytes.data(), std::size(bytes), nullptr));
-            tr_variantInitStr(initme, enc != nullptr ? std::string_view{ enc } : ""sv);
-            tr_free(enc);
+            auto const bytes = tor->createPieceBitfield();
+            auto const enc = tr_base64_encode({ reinterpret_cast<char const*>(std::data(bytes)), std::size(bytes) });
+            tr_variantInitStrView(initme, enc);
         }
         else
         {
@@ -703,24 +686,26 @@ static void initField(
         break;
 
     case TR_KEY_pieceCount:
-        tr_variantInitInt(initme, inf->pieceCount);
+        tr_variantInitInt(initme, tor->pieceCount());
         break;
 
     case TR_KEY_pieceSize:
-        tr_variantInitInt(initme, inf->pieceSize);
+        tr_variantInitInt(initme, tor->pieceSize());
         break;
 
     case TR_KEY_primary_mime_type:
-        tr_variantInitStrView(initme, tr_torrentPrimaryMimeType(tor));
+        tr_variantInitStrView(initme, tor->primaryMimeType());
         break;
 
     case TR_KEY_priorities:
-        tr_variantInitList(initme, inf->fileCount);
-        for (tr_file_index_t i = 0; i < inf->fileCount; ++i)
         {
-            tr_variantListAddInt(initme, inf->files[i].priority);
+            auto const n = tor->fileCount();
+            tr_variantInitList(initme, n);
+            for (tr_file_index_t i = 0; i < n; ++i)
+            {
+                tr_variantListAddInt(initme, tr_torrentFile(tor, i).priority);
+            }
         }
-
         break;
 
     case TR_KEY_queuePosition:
@@ -732,11 +717,11 @@ static void initField(
         break;
 
     case TR_KEY_rateDownload:
-        tr_variantInitInt(initme, toSpeedBytes(st->pieceDownloadSpeed_KBps));
+        tr_variantInitInt(initme, tr_toSpeedBytes(st->pieceDownloadSpeed_KBps));
         break;
 
     case TR_KEY_rateUpload:
-        tr_variantInitInt(initme, toSpeedBytes(st->pieceUploadSpeed_KBps));
+        tr_variantInitInt(initme, tr_toSpeedBytes(st->pieceUploadSpeed_KBps));
         break;
 
     case TR_KEY_recheckProgress:
@@ -764,7 +749,7 @@ static void initField(
         break;
 
     case TR_KEY_source:
-        tr_variantDictAddStr(initme, key, inf->source);
+        tr_variantInitStrView(initme, tor->source());
         break;
 
     case TR_KEY_startDate:
@@ -784,26 +769,28 @@ static void initField(
         break;
 
     case TR_KEY_trackers:
-        tr_variantInitList(initme, inf->trackerCount);
-        addTrackers(inf, initme);
+        tr_variantInitList(initme, tor->trackerCount());
+        addTrackers(tor, initme);
         break;
 
     case TR_KEY_trackerStats:
         {
-            auto n = int{};
-            tr_tracker_stat* s = tr_torrentTrackers(tor, &n);
+            auto const n = tr_torrentTrackerCount(tor);
             tr_variantInitList(initme, n);
-            addTrackerStats(s, n, initme);
-            tr_torrentTrackersFree(s, n);
+            for (size_t i = 0; i < n; ++i)
+            {
+                auto const& tracker = tr_torrentTracker(tor, i);
+                addTrackerStats(tracker, initme);
+            }
             break;
         }
 
     case TR_KEY_torrentFile:
-        tr_variantInitStr(initme, inf->torrent);
+        tr_variantInitStrView(initme, tor->torrentFile());
         break;
 
     case TR_KEY_totalSize:
-        tr_variantInitInt(initme, inf->totalSize);
+        tr_variantInitInt(initme, tor->totalSize());
         break;
 
     case TR_KEY_uploadedEver:
@@ -823,18 +810,19 @@ static void initField(
         break;
 
     case TR_KEY_wanted:
-        tr_variantInitList(initme, inf->fileCount);
-
-        for (tr_file_index_t i = 0; i < inf->fileCount; ++i)
         {
-            tr_variantListAddInt(initme, inf->files[i].dnd ? 0 : 1);
+            auto const n = tor->fileCount();
+            tr_variantInitList(initme, n);
+            for (tr_file_index_t i = 0; i < n; ++i)
+            {
+                tr_variantListAddInt(initme, tr_torrentFile(tor, i).wanted);
+            }
         }
-
         break;
 
     case TR_KEY_webseeds:
-        tr_variantInitList(initme, inf->webseedCount);
-        addWebseeds(inf, initme);
+        tr_variantInitList(initme, tor->webseedCount());
+        addWebseeds(tor, initme);
         break;
 
     case TR_KEY_webseedsSendingToUs:
@@ -859,14 +847,13 @@ static void addTorrentInfo(tr_torrent* tor, tr_format format, tr_variant* entry,
 
     if (fieldCount > 0)
     {
-        tr_info const* const inf = tr_torrentInfo(tor);
         tr_stat const* const st = tr_torrentStat(tor);
 
         for (size_t i = 0; i < fieldCount; ++i)
         {
             tr_variant* child = format == TR_FORMAT_TABLE ? tr_variantListAdd(entry) : tr_variantDictAdd(entry, fields[i]);
 
-            initField(tor, inf, st, child, fields[i]);
+            initField(tor, st, child, fields[i]);
         }
     }
 }
@@ -883,7 +870,7 @@ static char const* torrentGet(tr_session* session, tr_variant* args_in, tr_varia
     if (tr_variantDictFindStrView(args_in, TR_KEY_ids, &sv) && sv == "recently-active"sv)
     {
         time_t const now = tr_time();
-        int const interval = RECENTLY_ACTIVE_SECONDS;
+        auto const interval = RecentlyActiveSeconds;
 
         auto const& removed = session->removed_torrents;
         tr_variant* removed_out = tr_variantDictAddList(args_out, TR_KEY_removed, std::size(removed));
@@ -907,7 +894,7 @@ static char const* torrentGet(tr_session* session, tr_variant* args_in, tr_varia
         /* make an array of property name quarks */
         size_t keyCount = 0;
         size_t const n = tr_variantListSize(fields);
-        tr_quark* keys = tr_new(tr_quark, n);
+        auto* const keys = tr_new(tr_quark, n);
         for (size_t i = 0; i < n; ++i)
         {
             if (!tr_variantGetStrView(tr_variantListChild(fields, i), &sv))
@@ -980,23 +967,24 @@ static char const* setLabels(tr_torrent* tor, tr_variant* list)
     return nullptr;
 }
 
-static char const* setFilePriorities(tr_torrent* tor, int priority, tr_variant* list)
+static char const* setFilePriorities(tr_torrent* tor, tr_priority_t priority, tr_variant* list)
 {
-    int fileCount = 0;
-    size_t const n = tr_variantListSize(list);
     char const* errmsg = nullptr;
-    tr_file_index_t* files = tr_new0(tr_file_index_t, tor->info.fileCount);
+    auto const n_files = tor->fileCount();
 
-    if (n != 0)
+    auto files = std::vector<tr_file_index_t>{};
+    files.reserve(n_files);
+
+    if (size_t const n = tr_variantListSize(list); n != 0)
     {
         for (size_t i = 0; i < n; ++i)
         {
             auto tmp = int64_t{};
             if (tr_variantGetInt(tr_variantListChild(list, i), &tmp))
             {
-                if (0 <= tmp && tmp < tor->info.fileCount)
+                if (0 <= tmp && tmp < n_files)
                 {
-                    files[fileCount++] = tmp;
+                    files.push_back(tr_file_index_t(tmp));
                 }
                 else
                 {
@@ -1005,41 +993,37 @@ static char const* setFilePriorities(tr_torrent* tor, int priority, tr_variant* 
             }
         }
     }
-    else /* if empty set, apply to all */
+    else // if empty set, apply to all
     {
-        for (tr_file_index_t t = 0; t < tor->info.fileCount; ++t)
-        {
-            files[fileCount++] = t;
-        }
+        files.resize(n_files);
+        std::iota(std::begin(files), std::end(files), 0);
     }
 
-    if (fileCount != 0)
-    {
-        tr_torrentSetFilePriorities(tor, files, fileCount, priority);
-    }
+    tor->setFilePriorities(std::data(files), std::size(files), priority);
 
-    tr_free(files);
     return errmsg;
 }
 
-static char const* setFileDLs(tr_torrent* tor, bool do_download, tr_variant* list)
+static char const* setFileDLs(tr_torrent* tor, bool wanted, tr_variant* list)
 {
     char const* errmsg = nullptr;
 
-    int fileCount = 0;
-    size_t const n = tr_variantListSize(list);
-    tr_file_index_t* files = tr_new0(tr_file_index_t, tor->info.fileCount);
+    auto const n_files = tor->fileCount();
+    size_t const n_items = tr_variantListSize(list);
 
-    if (n != 0) /* if argument list, process them */
+    auto files = std::vector<tr_file_index_t>{};
+    files.reserve(n_files);
+
+    if (n_items != 0) // if argument list, process them
     {
-        for (size_t i = 0; i < n; ++i)
+        for (size_t i = 0; i < n_items; ++i)
         {
             auto tmp = int64_t{};
             if (tr_variantGetInt(tr_variantListChild(list, i), &tmp))
             {
-                if (0 <= tmp && tmp < tor->info.fileCount)
+                if (0 <= tmp && tmp < n_files)
                 {
-                    files[fileCount++] = tmp;
+                    files.push_back(tmp);
                 }
                 else
                 {
@@ -1048,192 +1032,90 @@ static char const* setFileDLs(tr_torrent* tor, bool do_download, tr_variant* lis
             }
         }
     }
-    else /* if empty set, apply to all */
+    else // if empty set, apply to all
     {
-        for (tr_file_index_t t = 0; t < tor->info.fileCount; ++t)
-        {
-            files[fileCount++] = t;
-        }
+        files.resize(n_files);
+        std::iota(std::begin(files), std::end(files), 0);
     }
 
-    if (fileCount != 0)
-    {
-        tr_torrentSetFileDLs(tor, files, fileCount, do_download);
-    }
+    tor->setFilesWanted(std::data(files), std::size(files), wanted);
 
-    tr_free(files);
     return errmsg;
-}
-
-static bool hasAnnounceUrl(tr_tracker_info const* t, int n, std::string_view url)
-{
-    return std::any_of(t, t + n, [&url](auto const& row) { return row.announce == url; });
-}
-
-static int copyTrackers(tr_tracker_info* tgt, tr_tracker_info const* src, int n)
-{
-    int maxTier = -1;
-
-    for (int i = 0; i < n; ++i)
-    {
-        tgt[i].tier = src[i].tier;
-        tgt[i].announce = tr_strdup(src[i].announce);
-        maxTier = std::max(maxTier, src[i].tier);
-    }
-
-    return maxTier;
-}
-
-static void freeTrackers(tr_tracker_info* trackers, int n)
-{
-    for (int i = 0; i < n; ++i)
-    {
-        tr_free(trackers[i].announce);
-    }
-
-    tr_free(trackers);
 }
 
 static char const* addTrackerUrls(tr_torrent* tor, tr_variant* urls)
 {
-    char const* errmsg = nullptr;
+    auto const old_size = tor->trackerCount();
 
-    /* make a working copy of the existing announce list */
-    auto const* const inf = tr_torrentInfo(tor);
-    int n = inf->trackerCount;
-    auto* const trackers = tr_new0(tr_tracker_info, n + tr_variantListSize(urls));
-    int tier = copyTrackers(trackers, inf->trackers, n);
-
-    /* and add the new ones */
-    auto i = int{ 0 };
-    auto changed = bool{ false };
-    tr_variant const* val = nullptr;
-    while ((val = tr_variantListChild(urls, i)) != nullptr)
+    for (size_t i = 0, n = tr_variantListSize(urls); i < n; ++i)
     {
-        auto announce = std::string_view{};
-
-        if (tr_variantGetStrView(val, &announce) && tr_urlIsValidTracker(announce) && !hasAnnounceUrl(trackers, n, announce))
-        {
-            trackers[n].tier = ++tier; /* add a new tier */
-            trackers[n].announce = tr_strvDup(announce);
-            ++n;
-            changed = true;
-        }
-
-        ++i;
-    }
-
-    if (!changed)
-    {
-        errmsg = "invalid argument";
-    }
-    else if (!tr_torrentSetAnnounceList(tor, trackers, n))
-    {
-        errmsg = "error setting announce list";
-    }
-
-    freeTrackers(trackers, n);
-    return errmsg;
-}
-
-static char const* replaceTrackers(tr_torrent* tor, tr_variant* urls)
-{
-    char const* errmsg = nullptr;
-
-    /* make a working copy of the existing announce list */
-    auto const* const inf = tr_torrentInfo(tor);
-    int const n = inf->trackerCount;
-    auto* const trackers = tr_new0(tr_tracker_info, n);
-    copyTrackers(trackers, inf->trackers, n);
-
-    /* make the substitutions... */
-    bool changed = false;
-    for (size_t i = 0, url_count = tr_variantListSize(urls); i + 1 < url_count; i += 2)
-    {
-        auto pos = int64_t{};
-        auto newval = std::string_view{};
-
-        if (tr_variantGetInt(tr_variantListChild(urls, i), &pos) &&
-            tr_variantGetStrView(tr_variantListChild(urls, i + 1), &newval) && tr_urlIsValidTracker(newval) && pos < n &&
-            pos >= 0)
-        {
-            tr_free(trackers[pos].announce);
-            trackers[pos].announce = tr_strvDup(newval);
-            changed = true;
-        }
-    }
-
-    if (!changed)
-    {
-        errmsg = "invalid argument";
-    }
-    else if (!tr_torrentSetAnnounceList(tor, trackers, n))
-    {
-        errmsg = "error setting announce list";
-    }
-
-    freeTrackers(trackers, n);
-    return errmsg;
-}
-
-static char const* removeTrackers(tr_torrent* tor, tr_variant* ids)
-{
-    /* make a working copy of the existing announce list */
-    tr_info const* inf = tr_torrentInfo(tor);
-    int n = inf->trackerCount;
-    int* tids = tr_new0(int, n);
-    tr_tracker_info* trackers = tr_new0(tr_tracker_info, n);
-    copyTrackers(trackers, inf->trackers, n);
-
-    /* remove the ones specified in the urls list */
-    int i = 0;
-    int t = 0;
-    tr_variant const* val = nullptr;
-    while ((val = tr_variantListChild(ids, i)) != nullptr)
-    {
-        auto pos = int64_t{};
-
-        if (tr_variantGetInt(val, &pos) && 0 <= pos && pos < n)
-        {
-            tids[t++] = (int)pos;
-        }
-
-        ++i;
-    }
-
-    /* sort trackerIds and remove from largest to smallest so there is no need to recalculate array indicies */
-    std::sort(tids, tids + t);
-
-    bool changed = false;
-    int dup = -1;
-    while (t-- != 0)
-    {
-        /* check for duplicates */
-        if (tids[t] == dup)
+        auto announce = std::string_view();
+        auto* const val = tr_variantListChild(urls, i);
+        if (val == nullptr || !tr_variantGetStrView(val, &announce))
         {
             continue;
         }
 
-        tr_removeElementFromArray(trackers, tids[t], sizeof(tr_tracker_info), n);
-        --n;
-
-        dup = tids[t];
-        changed = true;
+        tor->announceList().add(tor->announceList().nextTier(), announce);
     }
 
-    char const* errmsg = nullptr;
+    if (tor->trackerCount() == old_size)
+    {
+        return "error setting announce list";
+    }
+
+    tor->announceList().save(tor->torrentFile());
+    return nullptr;
+}
+
+static char const* replaceTrackers(tr_torrent* tor, tr_variant* urls)
+{
+    auto changed = bool{ false };
+
+    for (size_t i = 0, url_count = tr_variantListSize(urls); i + 1 < url_count; i += 2)
+    {
+        auto id = int64_t{};
+        auto newval = std::string_view{};
+
+        if (tr_variantGetInt(tr_variantListChild(urls, i), &id) &&
+            tr_variantGetStrView(tr_variantListChild(urls, i + 1), &newval))
+        {
+            changed |= tor->announceList().replace(id, newval);
+        }
+    }
+
     if (!changed)
     {
-        errmsg = "invalid argument";
-    }
-    else if (!tr_torrentSetAnnounceList(tor, trackers, n))
-    {
-        errmsg = "error setting announce list";
+        return "error setting announce list";
     }
 
-    freeTrackers(trackers, n);
-    tr_free(tids);
-    return errmsg;
+    tor->announceList().save(tor->torrentFile());
+    return nullptr;
+}
+
+static char const* removeTrackers(tr_torrent* tor, tr_variant* ids)
+{
+    auto const old_size = tor->trackerCount();
+
+    for (size_t i = 0, n = tr_variantListSize(ids); i < n; ++i)
+    {
+        auto id = int64_t{};
+        auto* const val = tr_variantListChild(ids, i);
+        if (val == nullptr || !tr_variantGetInt(val, &id))
+        {
+            continue;
+        }
+
+        tor->announceList().remove(id);
+    }
+
+    if (tor->trackerCount() == old_size)
+    {
+        return "error setting announce list";
+    }
+
+    tor->announceList().save(tor->torrentFile());
+    return nullptr;
 }
 
 static char const* torrentSet(
@@ -1253,7 +1135,7 @@ static char const* torrentSet(
 
         if (tr_variantDictFindInt(args_in, TR_KEY_bandwidthPriority, &tmp))
         {
-            tr_priority_t const priority = (tr_priority_t)tmp;
+            auto const priority = tr_priority_t(tmp);
 
             if (tr_isPriority(priority))
             {
@@ -1481,9 +1363,8 @@ static char const* portTest(
     struct tr_rpc_idle_data* idle_data)
 {
     int const port = tr_sessionGetPeerPort(session);
-    char* url = tr_strdup_printf("https://portcheck.transmissionbt.com/%d", port);
+    auto const url = tr_strvJoin("https://portcheck.transmissionbt.com/"sv, std::to_string(port));
     tr_webRun(session, url, portTested, idle_data);
-    tr_free(url);
     return nullptr;
 }
 
@@ -1506,94 +1387,63 @@ static void gotNewBlocklist(
 
     if (response_code != 200)
     {
+        // we failed to download the blocklist...
         tr_snprintf(
             result,
             sizeof(result),
             "gotNewBlocklist: http error %ld: %s",
             response_code,
             tr_webGetResponseStr(response_code));
+        tr_idle_function_done(data, result);
+        return;
     }
-    else /* successfully fetched the blocklist... */
+
+    // see if we need to decompress the content
+    auto content = std::vector<char>{};
+    content.resize(1024 * 128);
+    for (;;)
     {
-        auto stream = z_stream{};
-        char const* configDir = tr_sessionGetConfigDir(session);
-        size_t const buflen = 1024 * 128; /* 128 KiB buffer */
-        auto* const buf = static_cast<uint8_t*>(tr_malloc(buflen));
-        tr_error* error = nullptr;
-
-        /* this is an odd Magic Number required by zlib to enable gz support.
-           See zlib's inflateInit2() documentation for a full description */
-        int const windowBits = 15 + 32;
-
-        stream.zalloc = (alloc_func)Z_NULL;
-        stream.zfree = (free_func)Z_NULL;
-        stream.opaque = (voidpf)Z_NULL;
-        stream.next_in = reinterpret_cast<Bytef const*>(std::data(response));
-        stream.avail_in = std::size(response);
-        inflateInit2(&stream, windowBits);
-
-        auto filename = tr_strvPath(configDir, "blocklist.tmp.XXXXXX");
-        tr_sys_file_t const fd = tr_sys_file_open_temp(std::data(filename), &error);
-
-        if (fd == TR_BAD_SYS_FILE)
+        auto decompressor = std::shared_ptr<libdeflate_decompressor>{ libdeflate_alloc_decompressor(),
+                                                                      libdeflate_free_decompressor };
+        auto actual_size = size_t{};
+        auto const decompress_result = libdeflate_gzip_decompress(
+            decompressor.get(),
+            std::data(response),
+            std::size(response),
+            std::data(content),
+            std::size(content),
+            &actual_size);
+        if (decompress_result == LIBDEFLATE_INSUFFICIENT_SPACE)
         {
-            tr_snprintf(result, sizeof(result), _("Couldn't save file \"%1$s\": %2$s"), filename.c_str(), error->message);
-            tr_error_clear(&error);
+            // need a bigger buffer
+            content.resize(content.size() * 2);
+            continue;
         }
-
-        auto err = int{};
-        for (;;)
+        if (decompress_result == LIBDEFLATE_BAD_DATA)
         {
-            stream.next_out = static_cast<Bytef*>(buf);
-            stream.avail_out = buflen;
-            err = inflate(&stream, Z_NO_FLUSH);
-
-            if ((stream.avail_out < buflen) && (!tr_sys_file_write(fd, buf, buflen - stream.avail_out, nullptr, &error)))
-            {
-                tr_snprintf(result, sizeof(result), _("Couldn't save file \"%1$s\": %2$s"), filename.c_str(), error->message);
-                tr_error_clear(&error);
-                break;
-            }
-
-            if (err != Z_OK)
-            {
-                if (err != Z_STREAM_END && err != Z_DATA_ERROR)
-                {
-                    tr_snprintf(result, sizeof(result), _("Error uncompressing blocklist: %s (%d)"), zError(err), err);
-                }
-
-                break;
-            }
+            // couldn't decompress it; maybe we downloaded an uncompressed file
+            content.assign(std::begin(response), std::end(response));
         }
-
-        inflateEnd(&stream);
-
-        if ((err == Z_DATA_ERROR) && // couldn't inflate it... it's probably already uncompressed
-            !tr_sys_file_write(fd, std::data(response), std::size(response), nullptr, &error))
-        {
-            tr_snprintf(result, sizeof(result), _("Couldn't save file \"%1$s\": %2$s"), filename.c_str(), error->message);
-            tr_error_clear(&error);
-        }
-
-        tr_sys_file_close(fd, nullptr);
-
-        if (!tr_str_is_empty(result))
-        {
-            tr_logAddError("%s", result);
-        }
-        else
-        {
-            /* feed it to the session and give the client a response */
-            int const rule_count = tr_blocklistSetContent(session, filename.c_str());
-            tr_variantDictAddInt(data->args_out, TR_KEY_blocklist_size, rule_count);
-            tr_snprintf(result, sizeof(result), "success");
-        }
-
-        tr_sys_path_remove(filename.c_str(), nullptr);
-        tr_free(buf);
+        break;
     }
 
-    tr_idle_function_done(data, result);
+    // tr_blocklistSetContent needs a source file,
+    // so save content into a tmpfile
+    auto const filename = tr_strvJoin(tr_sessionGetConfigDir(session), "blocklist.tmp");
+    tr_error* error = nullptr;
+    if (!tr_saveFile(filename, std::string_view{ std::data(content), std::size(content) }, &error))
+    {
+        tr_snprintf(result, sizeof(result), _("Couldn't save file \"%1$s\": %2$s"), filename.c_str(), error->message);
+        tr_error_clear(&error);
+        tr_idle_function_done(data, result);
+        return;
+    }
+
+    // feed it to the session and give the client a response
+    int const rule_count = tr_blocklistSetContent(session, filename.c_str());
+    tr_variantDictAddInt(data->args_out, TR_KEY_blocklist_size, rule_count);
+    tr_sys_path_remove(filename.c_str(), nullptr);
+    tr_idle_function_done(data, "success");
 }
 
 static char const* blocklistUpdate(
@@ -1612,21 +1462,20 @@ static char const* blocklistUpdate(
 
 static void addTorrentImpl(struct tr_rpc_idle_data* data, tr_ctor* ctor)
 {
-    auto err = int{};
-    auto duplicate_id = int{};
-    tr_torrent* tor = tr_torrentNew(ctor, &err, &duplicate_id);
+    tr_torrent* duplicate_of = nullptr;
+    tr_torrent* tor = tr_torrentNew(ctor, &duplicate_of);
     tr_ctorFree(ctor);
 
     auto key = tr_quark{};
     char const* result = "invalid or corrupt torrent file";
-    if (err == 0)
+    if (tor != nullptr)
     {
         key = TR_KEY_torrent_added;
         result = nullptr;
     }
-    else if (err == TR_PARSE_DUPLICATE)
+    else if (duplicate_of != nullptr)
     {
-        tor = tr_torrentFindFromId(data->session, duplicate_id);
+        tor = duplicate_of;
         key = TR_KEY_torrent_duplicate;
         result = "duplicate torrent";
     }
@@ -1676,7 +1525,7 @@ static void gotMetadataFromURL(
 
     if (response_code == 200 || response_code == 221) /* http or ftp success.. */
     {
-        tr_ctorSetMetainfo(data->ctor, std::data(response), std::size(response));
+        tr_ctorSetMetainfo(data->ctor, std::data(response), std::size(response), nullptr);
         addTorrentImpl(data->data, data->ctor);
     }
     else
@@ -1815,21 +1664,21 @@ static char const* torrentAdd(tr_session* session, tr_variant* args_in, tr_varia
     {
         if (std::empty(filename))
         {
-            std::string const metainfo = tr_base64_decode_str(metainfo_base64);
-            tr_ctorSetMetainfo(ctor, std::data(metainfo), std::size(metainfo));
+            auto const metainfo = tr_base64_decode(metainfo_base64);
+            tr_ctorSetMetainfo(ctor, std::data(metainfo), std::size(metainfo), nullptr);
         }
         else
         {
             // these two tr_ctorSet*() functions require zero-terminated strings
-            auto const filename_str = std::string{ filename };
+            auto const filename_sz = std::string{ filename };
 
             if (tr_strvStartsWith(filename, "magnet:?"sv))
             {
-                tr_ctorSetMetainfoFromMagnetLink(ctor, filename_str.c_str());
+                tr_ctorSetMetainfoFromMagnetLink(ctor, filename_sz.c_str(), nullptr);
             }
             else
             {
-                tr_ctorSetMetainfoFromFile(ctor, filename_str.c_str());
+                tr_ctorSetMetainfoFromFile(ctor, filename_sz.c_str(), nullptr);
             }
         }
 
@@ -2286,15 +2135,15 @@ static void addSessionField(tr_session* s, tr_variant* d, tr_quark key)
         break;
 
     case TR_KEY_rpc_version:
-        tr_variantDictAddInt(d, key, RPC_VERSION);
+        tr_variantDictAddInt(d, key, RpcVersion);
         break;
 
     case TR_KEY_rpc_version_semver:
-        tr_variantDictAddStrView(d, key, RPC_VERSION_SEMVER);
+        tr_variantDictAddStrView(d, key, RpcVersionSemver);
         break;
 
     case TR_KEY_rpc_version_minimum:
-        tr_variantDictAddInt(d, key, RPC_VERSION_MIN);
+        tr_variantDictAddInt(d, key, RpcVersionMin);
         break;
 
     case TR_KEY_seedRatioLimit:
@@ -2522,7 +2371,7 @@ void tr_rpc_request_exec_json(
     tr_rpc_response_func callback,
     void* callback_user_data)
 {
-    tr_variant* const mutable_request = const_cast<tr_variant*>(request);
+    auto* const mutable_request = const_cast<tr_variant*>(request);
     tr_variant* args_in = tr_variantDictFind(mutable_request, TR_KEY_arguments);
     char const* result = nullptr;
 
@@ -2595,7 +2444,7 @@ void tr_rpc_request_exec_json(
     }
     else
     {
-        struct tr_rpc_idle_data* data = tr_new0(struct tr_rpc_idle_data, 1);
+        auto* const data = tr_new0(struct tr_rpc_idle_data, 1);
         data->session = session;
         data->response = tr_new0(tr_variant, 1);
         tr_variantInitDict(data->response, 3);
@@ -2654,44 +2503,26 @@ void tr_rpc_parse_list_str(tr_variant* setme, std::string_view str)
 
 void tr_rpc_request_exec_uri(
     tr_session* session,
-    void const* request_uri,
-    size_t request_uri_len,
+    std::string_view request_uri,
     tr_rpc_response_func callback,
     void* callback_user_data)
 {
-    char* const request = tr_strndup(request_uri, request_uri_len);
-
     auto top = tr_variant{};
     tr_variantInitDict(&top, 3);
     tr_variant* const args = tr_variantDictAddDict(&top, TR_KEY_arguments, 0);
 
-    char const* pch = strchr(request, '?');
-    if (pch == nullptr)
+    if (auto const parsed = tr_urlParse(request_uri); parsed)
     {
-        pch = request;
-    }
-
-    while (pch != nullptr)
-    {
-        char const* delim = strchr(pch, '=');
-        char const* next = strchr(pch, '&');
-
-        if (delim != nullptr)
+        for (auto const& [key, val] : tr_url_query_view(parsed->query))
         {
-            auto const key = std::string_view{ pch, size_t(delim - pch) };
-            bool isArg = key != "method" && key != "tag";
-            tr_variant* parent = isArg ? args : &top;
-
-            auto const val = std::string_view{ delim + 1, next != nullptr ? (size_t)(next - (delim + 1)) : strlen(delim + 1) };
+            auto is_arg = key != "method"sv && key != "tag"sv;
+            auto* const parent = is_arg ? args : &top;
             tr_rpc_parse_list_str(tr_variantDictAdd(parent, tr_quark_new(key)), val);
         }
-
-        pch = next != nullptr ? next + 1 : nullptr;
     }
 
     tr_rpc_request_exec_json(session, &top, callback, callback_user_data);
 
-    /* cleanup */
+    // cleanup
     tr_variantFree(&top);
-    tr_free(request);
 }

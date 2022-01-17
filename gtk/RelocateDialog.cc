@@ -7,6 +7,8 @@
  */
 
 #include <algorithm>
+#include <memory>
+#include <string>
 
 #include <glibmm.h>
 #include <glibmm/i18n.h>
@@ -31,6 +33,8 @@ class RelocateDialog::Impl
 public:
     Impl(RelocateDialog& dialog, Glib::RefPtr<Session> const& core, std::vector<int> const& torrent_ids);
     ~Impl();
+
+    TR_DISABLE_COPY_MOVE(Impl)
 
 private:
     void onResponse(int response);

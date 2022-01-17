@@ -8,7 +8,8 @@
 
 #pragma once
 
-#include "Macros.h"
+#include <libtransmission/tr-macros.h>
+
 #include "TorrentDelegate.h"
 
 class TorrentDelegateMin : public TorrentDelegate

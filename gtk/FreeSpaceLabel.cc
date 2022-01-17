@@ -6,6 +6,9 @@
  *
  */
 
+#include <memory>
+#include <string>
+
 #include <glibmm/i18n.h>
 
 #include <libtransmission/utils.h>
@@ -19,6 +22,8 @@ class FreeSpaceLabel::Impl
 public:
     Impl(FreeSpaceLabel& label, Glib::RefPtr<Session> const& core, std::string const& dir);
     ~Impl();
+
+    TR_DISABLE_COPY_MOVE(Impl)
 
     void set_dir(std::string const& dir);
 
@@ -39,8 +44,7 @@ FreeSpaceLabel::Impl::~Impl()
 
 bool FreeSpaceLabel::Impl::on_freespace_timer()
 {
-    auto* const session = core_->get_session();
-    if (session == nullptr)
+    if (core_->get_session() == nullptr)
     {
         return false;
     }

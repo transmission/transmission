@@ -12,7 +12,10 @@
 #error only libtransmission should #include this header.
 #endif
 
-#include "tr-macros.h"
+#include <cstdint>
+
+struct tr_ctor;
+struct tr_torrent;
 
 enum
 {

@@ -12,7 +12,9 @@
 #error only libtransmission should #include this header.
 #endif
 
-#include <inttypes.h> /* uint16_t */
+#include <cinttypes> // uintX_t
+#include <cstddef> // size_t
+#include <vector>
 
 #ifdef _WIN32
 #include <winsock2.h> /* struct in_addr */
@@ -21,7 +23,6 @@
 #include "net.h" /* tr_address */
 #include "peer-common.h"
 #include "peer-socket.h"
-#include "quark.h"
 
 /**
  * @addtogroup peers Peers
@@ -79,19 +80,15 @@ void tr_peerMgrSetUtpSupported(tr_torrent* tor, tr_address const* addr);
 
 void tr_peerMgrSetUtpFailed(tr_torrent* tor, tr_address const* addr, bool failed);
 
-void tr_peerMgrGetNextRequests(
-    tr_torrent* torrent,
-    tr_peer* peer,
-    int numwant,
-    tr_block_index_t* setme,
-    int* numgot,
-    bool get_intervals);
+std::vector<tr_block_span_t> tr_peerMgrGetNextRequests(tr_torrent* torrent, tr_peer const* peer, size_t numwant);
 
 bool tr_peerMgrDidPeerRequest(tr_torrent const* torrent, tr_peer const* peer, tr_block_index_t block);
 
-void tr_peerMgrRebuildRequests(tr_torrent* torrent);
+void tr_peerMgrClientSentRequests(tr_torrent* torrent, tr_peer* peer, tr_block_span_t span);
 
-void tr_peerMgrAddIncoming(tr_peerMgr* manager, tr_address* addr, tr_port port, struct tr_peer_socket const socket);
+size_t tr_peerMgrCountActiveRequestsToPeer(tr_torrent const* torrent, tr_peer const* peer);
+
+void tr_peerMgrAddIncoming(tr_peerMgr* manager, tr_address const* addr, tr_port port, struct tr_peer_socket const socket);
 
 tr_pex* tr_peerMgrCompactToPex(
     void const* compact,
@@ -142,7 +139,7 @@ void tr_peerMgrOnBlocklistChanged(tr_peerMgr* manager);
 
 struct tr_peer_stat* tr_peerMgrPeerStats(tr_torrent const* tor, int* setmeCount);
 
-double* tr_peerMgrWebSpeeds_KBps(tr_torrent const* tor);
+tr_webseed_view tr_peerMgrWebseed(tr_torrent const* tor, size_t i);
 
 unsigned int tr_peerGetPieceSpeed_Bps(tr_peer const* peer, uint64_t now, tr_direction direction);
 

@@ -7,8 +7,10 @@
  */
 
 #include <algorithm>
-#include <cstring> /* strlen(), strstr() */
+#include <cstring>
 #include <set>
+#include <string>
+#include <string_view>
 
 #ifdef _WIN32
 #include <windows.h>
@@ -91,8 +93,10 @@ struct tr_web
     bool curl_ssl_verify;
     char* curl_ca_bundle;
     int close_mode;
+
+    std::recursive_mutex web_tasks_mutex;
     struct tr_web_task* tasks;
-    tr_lock* taskLock;
+
     char* cookie_filename;
     std::set<CURL*> paused_easy_handles;
 };
@@ -128,14 +132,13 @@ static size_t writeFunc(void* ptr, size_t size, size_t nmemb, void* vtask)
 static int sockoptfunction(void* vtask, curl_socket_t fd, curlsocktype /*purpose*/)
 {
     auto* task = static_cast<struct tr_web_task*>(vtask);
-    auto const isScrape = tr_strvContains(task->url, "scrape"sv);
-    auto const isAnnounce = tr_strvContains(task->url, "announce"sv);
 
     /* announce and scrape requests have tiny payloads. */
-    if (isScrape || isAnnounce)
+    if (auto const is_scrape = tr_strvContains(task->url, "scrape"sv), is_announce = tr_strvContains(task->url, "announce"sv);
+        is_scrape || is_announce)
     {
-        int const sndbuf = isScrape ? 4096 : 1024;
-        int const rcvbuf = isScrape ? 4096 : 3072;
+        int const sndbuf = is_scrape ? 4096 : 1024;
+        int const rcvbuf = is_scrape ? 4096 : 3072;
         /* ignore the sockopt() return values -- these are suggestions
            rather than hard requirements & it's OK for them to fail */
         (void)setsockopt(fd, SOL_SOCKET, SO_SNDBUF, reinterpret_cast<char const*>(&sndbuf), sizeof(sndbuf));
@@ -207,9 +210,7 @@ static CURLcode ssl_context_func(CURL* /*curl*/, void* ssl_ctx, void* /*user_dat
 
 static long getTimeoutFromURL(struct tr_web_task const* task)
 {
-    tr_session const* const session = task->session;
-
-    if (session == nullptr || session->isClosed)
+    if (auto const* const session = task->session; session == nullptr || session->isClosed)
     {
         return 20L;
     }
@@ -274,23 +275,23 @@ static CURL* createEasy(tr_session* s, struct tr_web* web, struct tr_web_task* t
     tr_address const* addr = tr_sessionGetPublicAddress(s, TR_AF_INET, &is_default_value);
     if (addr != nullptr && !is_default_value)
     {
-        curl_easy_setopt(e, CURLOPT_INTERFACE, tr_address_to_string(addr));
+        (void)curl_easy_setopt(e, CURLOPT_INTERFACE, tr_address_to_string(addr));
     }
 
     addr = tr_sessionGetPublicAddress(s, TR_AF_INET6, &is_default_value);
     if (addr != nullptr && !is_default_value)
     {
-        curl_easy_setopt(e, CURLOPT_INTERFACE, tr_address_to_string(addr));
+        (void)curl_easy_setopt(e, CURLOPT_INTERFACE, tr_address_to_string(addr));
     }
 
     if (!std::empty(task->cookies))
     {
-        curl_easy_setopt(e, CURLOPT_COOKIE, task->cookies.c_str());
+        (void)curl_easy_setopt(e, CURLOPT_COOKIE, task->cookies.c_str());
     }
 
     if (web->cookie_filename != nullptr)
     {
-        curl_easy_setopt(e, CURLOPT_COOKIEFILE, web->cookie_filename);
+        (void)curl_easy_setopt(e, CURLOPT_COOKIEFILE, web->cookie_filename);
     }
 
     if (!std::empty(task->range))
@@ -340,7 +341,7 @@ static struct tr_web_task* tr_webRunImpl(
 {
     struct tr_web_task* task = nullptr;
 
-    if (!session->isClosing)
+    if (!session->isClosing())
     {
         if (session->web == nullptr)
         {
@@ -363,10 +364,9 @@ static struct tr_web_task* tr_webRunImpl(
         task->response = buffer != nullptr ? buffer : evbuffer_new();
         task->freebuf = buffer != nullptr ? nullptr : task->response;
 
-        tr_lockLock(session->web->taskLock);
+        auto const lock = std::unique_lock(session->web->web_tasks_mutex);
         task->next = session->web->tasks;
         session->web->tasks = task;
-        tr_lockUnlock(session->web->taskLock);
     }
 
     return task;
@@ -411,7 +411,6 @@ static void tr_webThreadFunc(void* vsession)
 
     auto* web = new tr_web{};
     web->close_mode = ~0;
-    web->taskLock = tr_lockNew();
     web->tasks = nullptr;
     web->curl_verbose = tr_env_key_exists("TR_CURL_VERBOSE");
     web->curl_ssl_verify = !tr_env_key_exists("TR_CURL_SSL_NO_VERIFY");
@@ -427,7 +426,7 @@ static void tr_webThreadFunc(void* vsession)
         tr_logAddNamedInfo("web", "NB: invalid certs will show up as 'Could not connect to tracker' like many other errors");
     }
 
-    auto const str = tr_strvPath(session->configDir, "cookies.txt");
+    auto const str = tr_strvPath(session->config_dir, "cookies.txt");
     if (tr_sys_path_exists(str.c_str(), nullptr))
     {
         web->cookie_filename = tr_strvDup(str);
@@ -450,20 +449,20 @@ static void tr_webThreadFunc(void* vsession)
         }
 
         /* add tasks from the queue */
-        tr_lockLock(web->taskLock);
-
-        while (web->tasks != nullptr)
         {
-            /* pop the task */
-            struct tr_web_task* task = web->tasks;
-            web->tasks = task->next;
-            task->next = nullptr;
+            auto const lock = std::unique_lock(web->web_tasks_mutex);
 
-            dbgmsg("adding task to curl: [%s]", task->url.c_str());
-            curl_multi_add_handle(multi, createEasy(session, web, task));
+            while (web->tasks != nullptr)
+            {
+                /* pop the task */
+                struct tr_web_task* task = web->tasks;
+                web->tasks = task->next;
+                task->next = nullptr;
+
+                dbgmsg("adding task to curl: [%s]", task->url.c_str());
+                curl_multi_add_handle(multi, createEasy(session, web, task));
+            }
         }
-
-        tr_lockUnlock(web->taskLock);
 
         /* resume any paused curl handles.
            swap paused_easy_handles to prevent oscillation
@@ -559,7 +558,6 @@ static void tr_webThreadFunc(void* vsession)
 
     /* cleanup */
     curl_multi_cleanup(multi);
-    tr_lockFree(web->taskLock);
     tr_free(web->curl_ca_bundle);
     tr_free(web->cookie_filename);
     delete web;

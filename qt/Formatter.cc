@@ -71,9 +71,7 @@ QString Formatter::memToString(int64_t bytes) const
         return tr("None");
     }
 
-    auto buf = std::array<char, 128>{};
-    tr_formatter_mem_B(buf.data(), bytes, buf.size());
-    return QString::fromUtf8(buf.data());
+    return QString::fromStdString(tr_formatter_mem_B(bytes));
 }
 
 QString Formatter::sizeToString(uint64_t bytes) const
@@ -83,9 +81,7 @@ QString Formatter::sizeToString(uint64_t bytes) const
         return tr("None");
     }
 
-    auto buf = std::array<char, 128>{};
-    tr_formatter_size_B(buf.data(), bytes, buf.size());
-    return QString::fromUtf8(buf.data());
+    return QString::fromStdString(tr_formatter_size_B(bytes));
 }
 
 QString Formatter::sizeToString(int64_t bytes) const
@@ -100,9 +96,7 @@ QString Formatter::sizeToString(int64_t bytes) const
 
 QString Formatter::speedToString(Speed const& speed) const
 {
-    auto buf = std::array<char, 128>{};
-    tr_formatter_speed_KBps(buf.data(), speed.getKBps(), buf.size());
-    return QString::fromUtf8(buf.data());
+    return QString::fromStdString(tr_formatter_speed_KBps(speed.getKBps()));
 }
 
 QString Formatter::uploadSpeedToString(Speed const& upload_speed) const
@@ -121,14 +115,12 @@ QString Formatter::downloadSpeedToString(Speed const& download_speed) const
 
 QString Formatter::percentToString(double x) const
 {
-    auto buf = std::array<char, 128>{};
-    return QString::fromUtf8(tr_strpercent(buf.data(), x, buf.size()));
+    return QString::fromStdString(tr_strpercent(x));
 }
 
 QString Formatter::ratioToString(double ratio) const
 {
-    auto buf = std::array<char, 128>{};
-    return QString::fromUtf8(tr_strratio(buf.data(), buf.size(), ratio, "\xE2\x88\x9E"));
+    return QString::fromStdString(tr_strratio(ratio, "\xE2\x88\x9E"));
 }
 
 QString Formatter::timeToString(int seconds) const

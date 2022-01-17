@@ -12,6 +12,8 @@
 
 #include <gtkmm.h>
 
+#include <libtransmission/tr-macros.h>
+
 typedef struct tr_session tr_session;
 
 class FilterBar : public Gtk::Box
@@ -19,6 +21,8 @@ class FilterBar : public Gtk::Box
 public:
     FilterBar(tr_session* session, Glib::RefPtr<Gtk::TreeModel> const& torrent_model);
     ~FilterBar() override;
+
+    TR_DISABLE_COPY_MOVE(FilterBar)
 
     Glib::RefPtr<Gtk::TreeModel> get_filter_model() const;
 

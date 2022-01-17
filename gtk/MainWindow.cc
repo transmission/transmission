@@ -20,7 +20,7 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
-#include <string.h> /* strlen() */
+#include <string>
 
 #include <glibmm/i18n.h>
 
@@ -42,6 +42,8 @@ class MainWindow::Impl
 public:
     Impl(MainWindow& window, Glib::RefPtr<Gio::ActionGroup> const& actions, Glib::RefPtr<Session> const& core);
     ~Impl();
+
+    TR_DISABLE_COPY_MOVE(Impl)
 
     Glib::RefPtr<Gtk::TreeSelection> get_selection() const;
 
@@ -142,7 +144,7 @@ Gtk::TreeView* MainWindow::Impl::makeview(Glib::RefPtr<Gtk::TreeModel> const& mo
 
     selection_ = view->get_selection();
 
-    column_ = new Gtk::TreeViewColumn();
+    column_ = Gtk::make_managed<Gtk::TreeViewColumn>();
     column_->set_title(_("Torrent"));
     column_->set_resizable(true);
     column_->set_sizing(Gtk::TREE_VIEW_COLUMN_FIXED);
@@ -236,10 +238,8 @@ void MainWindow::Impl::syncAltSpeedButton()
     bool const b = gtr_pref_flag_get(TR_KEY_alt_speed_enabled);
     char const* const stock = b ? "alt-speed-on" : "alt-speed-off";
 
-    char u[32];
-    tr_formatter_speed_KBps(u, gtr_pref_int_get(TR_KEY_alt_speed_up), sizeof(u));
-    char d[32];
-    tr_formatter_speed_KBps(d, gtr_pref_int_get(TR_KEY_alt_speed_down), sizeof(d));
+    auto const u = tr_formatter_speed_KBps(gtr_pref_int_get(TR_KEY_alt_speed_up));
+    auto const d = tr_formatter_speed_KBps(gtr_pref_int_get(TR_KEY_alt_speed_down));
 
     auto const str = b ? gtr_sprintf(_("Click to disable Alternative Speed Limits\n (%1$s down, %2$s up)"), d, u) :
                          gtr_sprintf(_("Click to enable Alternative Speed Limits\n (%1$s down, %2$s up)"), d, u);
@@ -303,9 +303,7 @@ Gtk::Menu* MainWindow::Impl::createSpeedMenu(tr_direction dir)
 
     for (auto const speed : speeds_KBps)
     {
-        char buf[128];
-        tr_formatter_speed_KBps(buf, speed, sizeof(buf));
-        auto* w = Gtk::make_managed<Gtk::MenuItem>(buf);
+        auto* w = Gtk::make_managed<Gtk::MenuItem>(tr_formatter_speed_KBps(speed));
         w->signal_activate().connect([this, dir, speed]() { onSpeedSet(dir, speed); });
         m->append(*w);
     }
@@ -387,16 +385,16 @@ Gtk::Menu* MainWindow::Impl::createOptionsMenu()
 
 void MainWindow::Impl::onOptionsClicked(Gtk::Button* button)
 {
-    char buf1[512];
-
-    tr_formatter_speed_KBps(buf1, gtr_pref_int_get(TR_KEY_speed_limit_down), sizeof(buf1));
-    gtr_label_set_text(*static_cast<Gtk::Label*>(speedlimit_on_item_[TR_DOWN]->get_child()), buf1);
+    gtr_label_set_text(
+        *static_cast<Gtk::Label*>(speedlimit_on_item_[TR_DOWN]->get_child()),
+        tr_formatter_speed_KBps(gtr_pref_int_get(TR_KEY_speed_limit_down)));
 
     (gtr_pref_flag_get(TR_KEY_speed_limit_down_enabled) ? speedlimit_on_item_[TR_DOWN] : speedlimit_off_item_[TR_DOWN])
         ->set_active(true);
 
-    tr_formatter_speed_KBps(buf1, gtr_pref_int_get(TR_KEY_speed_limit_up), sizeof(buf1));
-    gtr_label_set_text(*static_cast<Gtk::Label*>(speedlimit_on_item_[TR_UP]->get_child()), buf1);
+    gtr_label_set_text(
+        *static_cast<Gtk::Label*>(speedlimit_on_item_[TR_UP]->get_child()),
+        tr_formatter_speed_KBps(gtr_pref_int_get(TR_KEY_speed_limit_up)));
 
     (gtr_pref_flag_get(TR_KEY_speed_limit_up_enabled) ? speedlimit_on_item_[TR_UP] : speedlimit_off_item_[TR_UP])
         ->set_active(true);
@@ -504,7 +502,7 @@ MainWindow::Impl::Impl(MainWindow& window, Glib::RefPtr<Gio::ActionGroup> const&
 
     /* gear */
     auto* gear_button = Gtk::make_managed<Gtk::Button>();
-    gear_button->add(*Gtk::make_managed<Gtk::Image>("utilities", Gtk::ICON_SIZE_MENU));
+    gear_button->add(*Gtk::make_managed<Gtk::Image>("preferences-other", Gtk::ICON_SIZE_MENU));
     gear_button->set_tooltip_text(_("Options"));
     gear_button->set_relief(Gtk::RELIEF_NONE);
     options_menu_ = createOptionsMenu();
@@ -544,7 +542,7 @@ MainWindow::Impl::Impl(MainWindow& window, Glib::RefPtr<Gio::ActionGroup> const&
     /* ratio selector */
     auto* ratio_button = Gtk::make_managed<Gtk::Button>();
     ratio_button->set_tooltip_text(_("Statistics"));
-    ratio_button->add(*Gtk::make_managed<Gtk::Image>("ratio", Gtk::ICON_SIZE_MENU));
+    ratio_button->add(*Gtk::make_managed<Gtk::Image>("view-statistics", Gtk::ICON_SIZE_MENU));
     ratio_button->set_relief(Gtk::RELIEF_NONE);
     ratio_button->signal_clicked().connect([this, ratio_button]() { onYinYangClicked(ratio_button); });
     status_->add(*ratio_button);
@@ -594,7 +592,7 @@ MainWindow::Impl::Impl(MainWindow& window, Glib::RefPtr<Gio::ActionGroup> const&
 
     tr_sessionSetAltSpeedFunc(
         core_->get_session(),
-        [](tr_session* /*s*/, bool /*isEnabled*/, bool /*byUser*/, void* p)
+        [](tr_session* /*s*/, bool /*isEnabled*/, bool /*byUser*/, gpointer p)
         { Glib::signal_idle().connect_once([p]() { static_cast<Impl*>(p)->onAltSpeedToggledIdle(); }); },
         this);
 
@@ -649,7 +647,6 @@ void MainWindow::Impl::updateSpeeds()
 
     if (session != nullptr)
     {
-        char speed_str[128];
         double upSpeed = 0;
         double downSpeed = 0;
         int upCount = 0;
@@ -664,12 +661,10 @@ void MainWindow::Impl::updateSpeeds()
             downCount += row.get_value(torrent_cols.active_peers_down);
         }
 
-        tr_formatter_speed_KBps(speed_str, downSpeed, sizeof(speed_str));
-        dl_lb_->set_text(gtr_sprintf("%s %s", speed_str, gtr_get_unicode_string(GTR_UNICODE_DOWN)));
+        dl_lb_->set_text(gtr_sprintf("%s %s", tr_formatter_speed_KBps(downSpeed), gtr_get_unicode_string(GTR_UNICODE_DOWN)));
         dl_lb_->set_visible(downCount > 0);
 
-        tr_formatter_speed_KBps(speed_str, upSpeed, sizeof(speed_str));
-        ul_lb_->set_text(gtr_sprintf("%s %s", speed_str, gtr_get_unicode_string(GTR_UNICODE_UP)));
+        ul_lb_->set_text(gtr_sprintf("%s %s", tr_formatter_speed_KBps(upSpeed), gtr_get_unicode_string(GTR_UNICODE_UP)));
         ul_lb_->set_visible(downCount > 0 || upCount > 0);
     }
 }

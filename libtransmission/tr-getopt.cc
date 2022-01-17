@@ -7,8 +7,6 @@
  */
 
 #include <algorithm>
-#include <cctype> /* isspace() */
-#include <cstdio>
 #include <cstdlib> /* exit() */
 #include <cstring>
 #include <string_view>

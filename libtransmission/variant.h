@@ -8,10 +8,11 @@
 
 #pragma once
 
+#include <cinttypes> // int64_t
 #include <cstddef> // size_t
-#include <inttypes.h> // int64_t
+#include <string>
+#include <string_view>
 
-#include "tr-macros.h"
 #include "quark.h"
 
 struct evbuffer;
@@ -106,9 +107,9 @@ enum tr_variant_fmt
     TR_VARIANT_FMT_JSON_LEAN /* saves bandwidth by omitting all whitespace. */
 };
 
-int tr_variantToFile(tr_variant const* variant, tr_variant_fmt fmt, char const* filename);
+int tr_variantToFile(tr_variant const* variant, tr_variant_fmt fmt, std::string const& filename);
 
-char* tr_variantToStr(tr_variant const* variant, tr_variant_fmt fmt, size_t* len);
+std::string tr_variantToStr(tr_variant const* variant, tr_variant_fmt fmt);
 
 struct evbuffer* tr_variantToBuf(tr_variant const* variant, tr_variant_fmt fmt);
 
@@ -119,8 +120,11 @@ enum tr_variant_parse_opts
     TR_VARIANT_PARSE_INPLACE = (1 << 2)
 };
 
-/* TR_VARIANT_FMT_JSON_LEAN and TR_VARIANT_FMT_JSON are equivalent here. */
-bool tr_variantFromFile(tr_variant* setme, tr_variant_parse_opts opts, char const* filename, struct tr_error** error = nullptr);
+bool tr_variantFromFile(
+    tr_variant* setme,
+    tr_variant_parse_opts opts,
+    std::string const& filename,
+    struct tr_error** error = nullptr);
 
 bool tr_variantFromBuf(
     tr_variant* setme,

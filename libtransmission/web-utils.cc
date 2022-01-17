@@ -10,7 +10,10 @@
 #include <array>
 #include <cctype>
 #include <cstddef>
+#include <cstdlib>
+#include <limits>
 #include <optional>
+#include <string>
 #include <string_view>
 
 #include <event2/buffer.h>
@@ -241,24 +244,11 @@ void tr_http_escape_sha1(char* out, uint8_t const* sha1_digest)
 namespace
 {
 
-int parsePort(std::string_view port)
+auto parsePort(std::string_view port_sv)
 {
-    auto tmp = std::array<char, 16>{};
+    auto const port = tr_parseNum<int>(port_sv);
 
-    if (std::size(port) >= std::size(tmp))
-    {
-        return -1;
-    }
-
-    std::copy(std::begin(port), std::end(port), std::begin(tmp));
-    char* end = nullptr;
-    long port_num = strtol(std::data(tmp), &end, 10);
-    if (*end != '\0' || port_num <= 0 || port_num >= 65536)
-    {
-        port_num = -1;
-    }
-
-    return int(port_num);
+    return port && *port >= std::numeric_limits<tr_port>::min() && *port <= std::numeric_limits<tr_port>::max() ? *port : -1;
 }
 
 constexpr std::string_view getPortForScheme(std::string_view scheme)
@@ -311,32 +301,42 @@ std::optional<tr_url_parsed_t> tr_urlParse(std::string_view url)
 {
     url = tr_strvStrip(url);
 
-    if (!urlCharsAreValid(url))
-    {
-        return {};
-    }
-
     auto parsed = tr_url_parsed_t{};
     parsed.full = url;
+
+    // So many magnet links are malformed, e.g. not escaping text
+    // in the display name, that we're better off handling magnets
+    // as a special case before even scanning for invalid chars.
+    auto constexpr MagnetStart = "magnet:?"sv;
+    if (tr_strvStartsWith(url, MagnetStart))
+    {
+        parsed.scheme = "magnet"sv;
+        parsed.query = url.substr(std::size(MagnetStart));
+        return parsed;
+    }
+
+    if (!urlCharsAreValid(url))
+    {
+        return std::nullopt;
+    }
 
     // scheme
     parsed.scheme = tr_strvSep(&url, ':');
     if (std::empty(parsed.scheme))
     {
-        return {};
+        return std::nullopt;
     }
 
     // authority
     // The authority component is preceded by a double slash ("//") and is
     // terminated by the next slash ("/"), question mark ("?"), or number
     // sign ("#") character, or by the end of the URI.
-    auto key = "//"sv;
-    if (tr_strvStartsWith(url, key))
+    if (auto key = "//"sv; tr_strvStartsWith(url, key))
     {
         url.remove_prefix(std::size(key));
         auto pos = url.find_first_of("/?#");
         parsed.authority = url.substr(0, pos);
-        url = pos == url.npos ? ""sv : url.substr(pos);
+        url = pos == std::string_view::npos ? ""sv : url.substr(pos);
 
         auto remain = parsed.authority;
         parsed.host = tr_strvSep(&remain, ':');
@@ -348,7 +348,7 @@ std::optional<tr_url_parsed_t> tr_urlParse(std::string_view url)
     //  number sign ("#") character, or by the end of the URI.
     auto pos = url.find_first_of("?#");
     parsed.path = url.substr(0, pos);
-    url = pos == url.npos ? ""sv : url.substr(pos);
+    url = pos == std::string_view::npos ? ""sv : url.substr(pos);
 
     // query
     if (tr_strvStartsWith(url, '?'))
@@ -356,7 +356,7 @@ std::optional<tr_url_parsed_t> tr_urlParse(std::string_view url)
         url.remove_prefix(1);
         pos = url.find('#');
         parsed.query = url.substr(0, pos);
-        url = pos == url.npos ? ""sv : url.substr(pos);
+        url = pos == std::string_view::npos ? ""sv : url.substr(pos);
     }
 
     // fragment
@@ -371,7 +371,7 @@ std::optional<tr_url_parsed_t> tr_urlParse(std::string_view url)
 std::optional<tr_url_parsed_t> tr_urlParseTracker(std::string_view url)
 {
     auto const parsed = tr_urlParse(url);
-    return parsed && tr_isValidTrackerScheme(parsed->scheme) ? *parsed : std::optional<tr_url_parsed_t>{};
+    return parsed && tr_isValidTrackerScheme(parsed->scheme) ? std::make_optional(*parsed) : std::nullopt;
 }
 
 bool tr_urlIsValidTracker(std::string_view url)
@@ -411,7 +411,7 @@ std::string tr_urlPercentDecode(std::string_view in)
     {
         auto pos = in.find('%');
         out += in.substr(0, pos);
-        if (pos == in.npos)
+        if (pos == std::string_view::npos)
         {
             break;
         }

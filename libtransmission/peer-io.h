@@ -16,13 +16,20 @@
 ***
 **/
 
+#include <cstddef> // size_t
+#include <cstdint> // uintX_t
+#include <ctime>
+#include <optional>
+
 #include <event2/buffer.h>
 
 #include "transmission.h"
+
 #include "bandwidth.h"
 #include "crypto.h"
 #include "net.h" /* tr_address */
 #include "peer-socket.h"
+#include "tr-assert.h"
 #include "utils.h" // tr_time()
 
 class tr_peerIo;
@@ -60,8 +67,15 @@ auto inline constexpr PEER_IO_MAGIC_NUMBER = 206745;
 class tr_peerIo
 {
 public:
-    tr_peerIo(tr_session* session_in, tr_address const& addr_in, tr_port port_in, bool is_seed_in)
-        : addr{ addr_in }
+    tr_peerIo(
+        tr_session* session_in,
+        tr_sha1_digest_t const* torrent_hash,
+        bool is_incoming,
+        tr_address const& addr_in,
+        tr_port port_in,
+        bool is_seed_in)
+        : crypto{ torrent_hash, is_incoming }
+        , addr{ addr_in }
         , session{ session_in }
         , inbuf{ evbuffer_new() }
         , outbuf{ evbuffer_new() }
@@ -76,7 +90,7 @@ public:
         evbuffer_free(inbuf);
     }
 
-    tr_crypto crypto = {};
+    tr_crypto crypto;
 
     tr_address const addr;
 
@@ -136,7 +150,7 @@ tr_peerIo* tr_peerIoNewOutgoing(
     Bandwidth* parent,
     struct tr_address const* addr,
     tr_port port,
-    uint8_t const* torrentHash,
+    tr_sha1_digest_t const& torrent_hash,
     bool isSeed,
     bool utp);
 
@@ -215,17 +229,15 @@ char const* tr_peerIoGetAddrStr(tr_peerIo const* io, char* buf, size_t buflen);
 
 struct tr_address const* tr_peerIoGetAddress(tr_peerIo const* io, tr_port* port);
 
-uint8_t const* tr_peerIoGetTorrentHash(tr_peerIo* io);
+std::optional<tr_sha1_digest_t> tr_peerIoGetTorrentHash(tr_peerIo const* io);
 
-bool tr_peerIoHasTorrentHash(tr_peerIo const* io);
-
-void tr_peerIoSetTorrentHash(tr_peerIo* io, uint8_t const* hash);
+void tr_peerIoSetTorrentHash(tr_peerIo* io, tr_sha1_digest_t const& info_hash);
 
 int tr_peerIoReconnect(tr_peerIo* io);
 
 constexpr bool tr_peerIoIsIncoming(tr_peerIo const* io)
 {
-    return io->crypto.isIncoming;
+    return io->crypto.is_incoming;
 }
 
 // TODO: remove this func; let caller get the current time instead

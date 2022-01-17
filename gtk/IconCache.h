@@ -11,8 +11,8 @@
 
 #include <gtkmm.h>
 
-#define DIRECTORY_MIME_TYPE "folder"
-#define UNKNOWN_MIME_TYPE "unknown"
+extern Glib::ustring const DirectoryMimeType;
+extern Glib::ustring const UnknownMimeType;
 
 Glib::ustring gtr_get_mime_type_from_filename(std::string const& file);
 

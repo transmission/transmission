@@ -6,6 +6,8 @@
  *
  */
 
+#include <mutex>
+
 #if defined(POLARSSL_IS_MBEDTLS)
 #define API_HEADER(x) <mbedtls/x>
 #define API(x) mbedtls_##x
@@ -38,7 +40,7 @@
 ****
 ***/
 
-#define MY_NAME "tr_crypto_utils"
+static char constexpr MyName[] = "tr_crypto_utils";
 
 using api_ctr_drbg_context = API(ctr_drbg_context);
 using api_sha1_context = API(sha1_context);
@@ -58,7 +60,7 @@ static void log_polarssl_error(int error_code, char const* file, int line)
         error_strerror(error_code, error_message, sizeof(error_message));
 #endif
 
-        tr_logAddMessage(file, line, TR_LOG_ERROR, MY_NAME, "PolarSSL error: %s", error_message);
+        tr_logAddMessage(file, line, TR_LOG_ERROR, MyName, "PolarSSL error: %s", error_message);
     }
 }
 
@@ -118,17 +120,7 @@ static api_ctr_drbg_context* get_rng(void)
     return &rng;
 }
 
-static tr_lock* get_rng_lock(void)
-{
-    static tr_lock* lock = nullptr;
-
-    if (lock == nullptr)
-    {
-        lock = tr_lockNew();
-    }
-
-    return lock;
-}
+static std::recursive_mutex rng_mutex_;
 
 /***
 ****
@@ -162,23 +154,20 @@ bool tr_sha1_update(tr_sha1_ctx_t raw_handle, void const* data, size_t data_leng
     return true;
 }
 
-bool tr_sha1_final(tr_sha1_ctx_t raw_handle, uint8_t* hash)
+std::optional<tr_sha1_digest_t> tr_sha1_final(tr_sha1_ctx_t raw_handle)
 {
     auto* handle = static_cast<api_sha1_context*>(raw_handle);
+    TR_ASSERT(handle != nullptr);
 
-    if (hash != nullptr)
-    {
-        TR_ASSERT(handle != nullptr);
-
-        API(sha1_finish)(handle, hash);
-    }
-
+    auto digest = tr_sha1_digest_t{};
+    auto* const digest_as_uchar = reinterpret_cast<unsigned char*>(std::data(digest));
+    API(sha1_finish)(handle, digest_as_uchar);
 #if API_VERSION_NUMBER >= 0x01030800
     API(sha1_free)(handle);
 #endif
 
     tr_free(handle);
-    return true;
+    return digest;
 }
 
 /***
@@ -281,13 +270,13 @@ tr_dh_secret_t tr_dh_agree(tr_dh_ctx_t raw_handle, uint8_t const* other_public_k
 
 bool tr_rand_buffer(void* buffer, size_t length)
 {
+    if (length == 0)
+    {
+        return true;
+    }
+
     TR_ASSERT(buffer != nullptr);
 
-    tr_lock* rng_lock = get_rng_lock();
-
-    tr_lockLock(rng_lock);
-    bool const ret = check_result(API(ctr_drbg_random)(get_rng(), static_cast<unsigned char*>(buffer), length));
-    tr_lockUnlock(rng_lock);
-
-    return ret;
+    auto const lock = std::lock_guard(rng_mutex_);
+    return check_result(API(ctr_drbg_random)(get_rng(), static_cast<unsigned char*>(buffer), length));
 }

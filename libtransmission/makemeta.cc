@@ -8,14 +8,17 @@
 
 #include <algorithm>
 #include <cerrno>
+#include <cstdint>
 #include <cstdlib> /* qsort */
 #include <cstring> /* strcmp, strlen */
+#include <mutex>
+#include <string_view>
 
 #include <event2/util.h> /* evutil_ascii_strcasecmp() */
 
 #include "transmission.h"
 
-#include "crypto-utils.h" /* tr_sha1 */
+#include "crypto-utils.h"
 #include "error.h"
 #include "file.h"
 #include "log.h"
@@ -27,6 +30,8 @@
 #include "variant.h"
 #include "version.h"
 #include "web-utils.h"
+
+using namespace std::literals;
 
 /****
 *****
@@ -50,17 +55,15 @@ static struct FileList* getFiles(char const* dir, char const* base, struct FileL
     tr_sys_path_native_separators(std::data(buf));
 
     tr_sys_path_info info;
-    tr_error* error = nullptr;
-    if (!tr_sys_path_get_info(buf.c_str(), 0, &info, &error))
+    if (tr_error* error = nullptr; !tr_sys_path_get_info(buf.c_str(), 0, &info, &error))
     {
         tr_logAddError(_("Torrent Creator is skipping file \"%s\": %s"), buf.c_str(), error->message);
         tr_error_free(error);
         return list;
     }
 
-    tr_sys_dir_t odir = info.type == TR_SYS_PATH_IS_DIRECTORY ? tr_sys_dir_open(buf.c_str(), nullptr) : TR_BAD_SYS_DIR;
-
-    if (odir != TR_BAD_SYS_DIR)
+    if (tr_sys_dir_t odir = info.type == TR_SYS_PATH_IS_DIRECTORY ? tr_sys_dir_open(buf.c_str(), nullptr) : TR_BAD_SYS_DIR;
+        odir != TR_BAD_SYS_DIR)
     {
         char const* name = nullptr;
         while ((name = tr_sys_dir_read_name(odir, nullptr)) != nullptr)
@@ -75,7 +78,7 @@ static struct FileList* getFiles(char const* dir, char const* base, struct FileL
     }
     else if (info.type == TR_SYS_PATH_IS_FILE && info.size > 0)
     {
-        struct FileList* node = tr_new(struct FileList, 1);
+        auto* const node = tr_new0(FileList, 1);
         node->size = info.size;
         node->filename = tr_strvDup(buf);
         node->next = list;
@@ -124,14 +127,6 @@ static uint32_t bestPieceSize(uint64_t totalSize)
     return 32 * KiB; /* less than 50 meg */
 }
 
-static int builderFileCompare(void const* va, void const* vb)
-{
-    auto const* a = static_cast<tr_metainfo_builder_file const*>(va);
-    auto const* b = static_cast<tr_metainfo_builder_file const*>(vb);
-
-    return evutil_ascii_strcasecmp(a->filename, b->filename);
-}
-
 tr_metainfo_builder* tr_metaInfoBuilderCreate(char const* topFileArg)
 {
     char* const real_top = tr_sys_path_resolve(topFileArg, nullptr);
@@ -142,7 +137,7 @@ tr_metainfo_builder* tr_metaInfoBuilderCreate(char const* topFileArg)
         return nullptr;
     }
 
-    tr_metainfo_builder* ret = tr_new0(tr_metainfo_builder, 1);
+    auto* const ret = tr_new0(tr_metainfo_builder, 1);
 
     ret->top = real_top;
 
@@ -184,7 +179,10 @@ tr_metainfo_builder* tr_metaInfoBuilderCreate(char const* topFileArg)
         tr_free(tmp);
     }
 
-    qsort(ret->files, ret->fileCount, sizeof(tr_metainfo_builder_file), builderFileCompare);
+    std::sort(
+        ret->files,
+        ret->files + ret->fileCount,
+        [](auto const& a, auto const& b) { return evutil_ascii_strcasecmp(a.filename, b.filename) < 0; });
 
     tr_metaInfoBuilderSetPieceSize(ret, bestPieceSize(ret->totalSize));
 
@@ -202,11 +200,10 @@ bool tr_metaInfoBuilderSetPieceSize(tr_metainfo_builder* b, uint32_t bytes)
 {
     if (!isValidPieceSize(bytes))
     {
-        char wanted[32];
-        char gotten[32];
-        tr_formatter_mem_B(wanted, bytes, sizeof(wanted));
-        tr_formatter_mem_B(gotten, b->pieceSize, sizeof(gotten));
-        tr_logAddError(_("Failed to set piece size to %s, leaving it at %s"), wanted, gotten);
+        tr_logAddError(
+            _("Failed to set piece size to %s, leaving it at %s"),
+            tr_formatter_mem_B(bytes).c_str(),
+            tr_formatter_mem_B(b->pieceSize).c_str());
         return false;
     }
 
@@ -250,22 +247,22 @@ void tr_metaInfoBuilderFree(tr_metainfo_builder* builder)
 *****
 ****/
 
-static uint8_t* getHashInfo(tr_metainfo_builder* b)
+static std::vector<std::byte> getHashInfo(tr_metainfo_builder* b)
 {
-    uint32_t fileIndex = 0;
-    uint8_t* ret = tr_new0(uint8_t, SHA_DIGEST_LENGTH * b->pieceCount);
-    uint8_t* walk = ret;
-    uint64_t off = 0;
-    tr_error* error = nullptr;
+    auto ret = std::vector<std::byte>(std::size(tr_sha1_digest_t{}) * b->pieceCount);
 
     if (b->totalSize == 0)
     {
-        return ret;
+        return {};
     }
 
-    auto* const buf = static_cast<uint8_t*>(tr_malloc(b->pieceSize));
     b->pieceIndex = 0;
     uint64_t totalRemain = b->totalSize;
+    uint32_t fileIndex = 0;
+    auto* walk = std::data(ret);
+    auto buf = std::vector<char>(b->pieceSize);
+    uint64_t off = 0;
+    tr_error* error = nullptr;
 
     tr_sys_file_t fd = tr_sys_file_open(b->files[fileIndex].filename, TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0, &error);
     if (fd == TR_BAD_SYS_FILE)
@@ -273,17 +270,15 @@ static uint8_t* getHashInfo(tr_metainfo_builder* b)
         b->my_errno = error->code;
         tr_strlcpy(b->errfile, b->files[fileIndex].filename, sizeof(b->errfile));
         b->result = TR_MAKEMETA_IO_READ;
-        tr_free(buf);
-        tr_free(ret);
         tr_error_free(error);
-        return nullptr;
+        return {};
     }
 
     while (totalRemain != 0)
     {
         TR_ASSERT(b->pieceIndex < b->pieceCount);
 
-        uint8_t* bufptr = buf;
+        auto* bufptr = std::data(buf);
         uint32_t const thisPieceSize = std::min(uint64_t{ b->pieceSize }, totalRemain);
         uint64_t leftInPiece = thisPieceSize;
 
@@ -311,19 +306,25 @@ static uint8_t* getHashInfo(tr_metainfo_builder* b)
                         b->my_errno = error->code;
                         tr_strlcpy(b->errfile, b->files[fileIndex].filename, sizeof(b->errfile));
                         b->result = TR_MAKEMETA_IO_READ;
-                        tr_free(buf);
-                        tr_free(ret);
                         tr_error_free(error);
-                        return nullptr;
+                        return {};
                     }
                 }
             }
         }
 
-        TR_ASSERT(bufptr - buf == (int)thisPieceSize);
+        TR_ASSERT(bufptr - std::data(buf) == (int)thisPieceSize);
         TR_ASSERT(leftInPiece == 0);
-        tr_sha1(walk, buf, (int)thisPieceSize, nullptr);
-        walk += SHA_DIGEST_LENGTH;
+        auto const digest = tr_sha1(buf);
+        if (!digest)
+        {
+            b->my_errno = EIO;
+            tr_snprintf(b->errfile, sizeof(b->errfile), "error hashing piece %" PRIu32, b->pieceIndex);
+            b->result = TR_MAKEMETA_IO_READ;
+            return {};
+        }
+
+        walk = std::copy(std::begin(*digest), std::end(*digest), walk);
 
         if (b->abortFlag)
         {
@@ -335,7 +336,7 @@ static uint8_t* getHashInfo(tr_metainfo_builder* b)
         ++b->pieceIndex;
     }
 
-    TR_ASSERT(b->abortFlag || walk - ret == (int)(SHA_DIGEST_LENGTH * b->pieceCount));
+    TR_ASSERT(b->abortFlag || size_t(walk - std::data(ret)) == std::size(ret));
     TR_ASSERT(b->abortFlag || !totalRemain);
 
     if (fd != TR_BAD_SYS_FILE)
@@ -343,7 +344,6 @@ static uint8_t* getHashInfo(tr_metainfo_builder* b)
         tr_sys_file_close(fd, nullptr);
     }
 
-    tr_free(buf);
     return ret;
 }
 
@@ -399,8 +399,7 @@ static void makeInfoDict(tr_variant* dict, tr_metainfo_builder* builder)
         tr_variantDictAddInt(dict, TR_KEY_length, builder->files[0].size);
     }
 
-    char* const base = tr_sys_path_basename(builder->top, nullptr);
-    if (base != nullptr)
+    if (auto* const base = tr_sys_path_basename(builder->top, nullptr); base != nullptr)
     {
         tr_variantDictAddStr(dict, TR_KEY_name, base);
         tr_free(base);
@@ -408,11 +407,9 @@ static void makeInfoDict(tr_variant* dict, tr_metainfo_builder* builder)
 
     tr_variantDictAddInt(dict, TR_KEY_piece_length, builder->pieceSize);
 
-    uint8_t* const pch = getHashInfo(builder);
-    if (pch != nullptr)
+    if (auto const piece_hashes = getHashInfo(builder); !std::empty(piece_hashes))
     {
-        tr_variantDictAddRaw(dict, TR_KEY_pieces, pch, SHA_DIGEST_LENGTH * builder->pieceCount);
-        tr_free(pch);
+        tr_variantDictAddRaw(dict, TR_KEY_pieces, std::data(piece_hashes), std::size(piece_hashes));
     }
 
     tr_variantDictAddInt(dict, TR_KEY_private, builder->isPrivate ? 1 : 0);
@@ -513,17 +510,7 @@ static tr_metainfo_builder* queue = nullptr;
 
 static tr_thread* workerThread = nullptr;
 
-static tr_lock* getQueueLock(void)
-{
-    static tr_lock* lock = nullptr;
-
-    if (lock == nullptr)
-    {
-        lock = tr_lockNew();
-    }
-
-    return lock;
-}
+static std::recursive_mutex queue_mutex_;
 
 static void makeMetaWorkerFunc(void* /*user_data*/)
 {
@@ -532,8 +519,7 @@ static void makeMetaWorkerFunc(void* /*user_data*/)
         tr_metainfo_builder* builder = nullptr;
 
         /* find the next builder to process */
-        tr_lock* lock = getQueueLock();
-        tr_lockLock(lock);
+        queue_mutex_.lock();
 
         if (queue != nullptr)
         {
@@ -541,7 +527,7 @@ static void makeMetaWorkerFunc(void* /*user_data*/)
             queue = queue->nextBuilder;
         }
 
-        tr_lockUnlock(lock);
+        queue_mutex_.unlock();
 
         /* if no builders, this worker thread is done */
         if (builder == nullptr)
@@ -599,12 +585,12 @@ void tr_makeMetaInfo(
     }
     else
     {
-        builder->outputFile = tr_strdup_printf("%s.torrent", builder->top);
+        builder->outputFile = tr_strvDup(tr_strvJoin(builder->top, ".torrent"sv));
     }
 
     /* enqueue the builder */
-    tr_lock* lock = getQueueLock();
-    tr_lockLock(lock);
+    auto const lock = std::lock_guard(queue_mutex_);
+
     builder->nextBuilder = queue;
     queue = builder;
 
@@ -612,6 +598,4 @@ void tr_makeMetaInfo(
     {
         workerThread = tr_threadNew(makeMetaWorkerFunc, nullptr);
     }
-
-    tr_lockUnlock(lock);
 }

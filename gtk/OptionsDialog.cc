@@ -6,8 +6,7 @@
  *
  */
 
-#include <cctype>
-#include <string.h>
+#include <memory>
 
 #include <glibmm.h>
 #include <glibmm/i18n.h>
@@ -31,13 +30,13 @@
 namespace
 {
 
-#define N_RECENT 4
+auto const MaxRecentDestinations = size_t{ 4 };
 
 std::list<std::string> get_recent_destinations()
 {
     std::list<std::string> list;
 
-    for (int i = 0; i < N_RECENT; ++i)
+    for (size_t i = 0; i < MaxRecentDestinations; ++i)
     {
         auto const key = gtr_sprintf("recent-download-dir-%d", i + 1);
 
@@ -65,8 +64,8 @@ void save_recent_destination(Glib::RefPtr<Session> const& core, std::string cons
     /* add it to the front of the list */
     list.push_front(dir);
 
-    /* save the first N_RECENT directories */
-    list.resize(N_RECENT);
+    /* save the first MaxRecentDestinations directories */
+    list.resize(MaxRecentDestinations);
     int i = 0;
     for (auto const& d : list)
     {
@@ -87,6 +86,8 @@ class OptionsDialog::Impl
 {
 public:
     Impl(OptionsDialog& dialog, Glib::RefPtr<Session> const& core, std::unique_ptr<tr_ctor, void (*)(tr_ctor*)> ctor);
+
+    TR_DISABLE_COPY_MOVE(Impl)
 
 private:
     void sourceChanged(Gtk::FileChooserButton* b);
@@ -186,15 +187,12 @@ void OptionsDialog::Impl::sourceChanged(Gtk::FileChooserButton* b)
     /* maybe instantiate a torrent */
     if (!filename.empty() || tor_ == nullptr)
     {
-        int err = 0;
         bool new_file = false;
-        int duplicate_id = 0;
-        tr_torrent* torrent;
 
         if (!filename.empty() && (filename_.empty() || !tr_sys_path_is_same(filename.c_str(), filename_.c_str(), nullptr)))
         {
             filename_ = filename;
-            tr_ctorSetMetainfoFromFile(ctor_.get(), filename_.c_str());
+            tr_ctorSetMetainfoFromFile(ctor_.get(), filename_.c_str(), nullptr);
             new_file = true;
         }
 
@@ -202,15 +200,15 @@ void OptionsDialog::Impl::sourceChanged(Gtk::FileChooserButton* b)
         tr_ctorSetPaused(ctor_.get(), TR_FORCE, true);
         tr_ctorSetDeleteSource(ctor_.get(), false);
 
-        if (torrent = tr_torrentNew(ctor_.get(), &err, &duplicate_id); torrent != nullptr)
+        tr_torrent* duplicate_of = nullptr;
+        if (tr_torrent* const torrent = tr_torrentNew(ctor_.get(), &duplicate_of); torrent != nullptr)
         {
             removeOldTorrent();
             tor_ = torrent;
         }
         else if (new_file)
         {
-            tr_torrent* tor = duplicate_id != 0 ? core_->find_torrent(duplicate_id) : nullptr;
-            gtr_add_torrent_error_dialog(*b, err, tor, filename_);
+            gtr_add_torrent_error_dialog(*b, duplicate_of, filename_);
         }
 
         updateTorrent();

@@ -12,7 +12,7 @@
 #include <QSet>
 #include <QTimer>
 
-#include "Macros.h"
+#include <libtransmission/tr-macros.h>
 
 class QGridLayout;
 

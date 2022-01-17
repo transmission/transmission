@@ -10,8 +10,6 @@
 
 #include <string_view>
 
-#include "tr-macros.h"
-
 struct event_base;
 
 using tr_watchdir_t = struct tr_watchdir*;

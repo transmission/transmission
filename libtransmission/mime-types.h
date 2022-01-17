@@ -1,5 +1,5 @@
 /*
- * This file Copyright (C) 2021 Mnemosyne LLC
+ * This file Copyright (C) 2022 Mnemosyne LLC
  *
  * It may be used under the GNU GPL versions 2 or 3
  * or any future license endorsed by Mnemosyne LLC.
@@ -16,7 +16,7 @@ struct mime_type_suffix
     std::string_view mime_type;
 };
 
-inline auto constexpr mime_type_suffixes = std::array<mime_type_suffix, 1211>{
+inline auto constexpr mime_type_suffixes = std::array<mime_type_suffix, 1214>{
     { { "123", "application/vnd.lotus-1-2-3" },
       { "1km", "application/vnd.1000minds.decision-model+xml" },
       { "3dml", "text/vnd.in3d.3dml" },
@@ -42,6 +42,7 @@ inline auto constexpr mime_type_suffixes = std::array<mime_type_suffix, 1211>{
       { "aep", "application/vnd.audiograph" },
       { "afm", "application/x-font-type1" },
       { "afp", "application/vnd.ibm.modcap" },
+      { "age", "application/vnd.age" },
       { "ahead", "application/vnd.ahead.space" },
       { "ai", "application/postscript" },
       { "aif", "audio/x-aiff" },
@@ -330,6 +331,7 @@ inline auto constexpr mime_type_suffixes = std::array<mime_type_suffix, 1211>{
       { "gca", "application/x-gca-compressed" },
       { "gdl", "model/vnd.gdl" },
       { "gdoc", "application/vnd.google-apps.document" },
+      { "ged", "text/vnd.familysearch.gedcom" },
       { "geo", "application/vnd.dynageo" },
       { "geojson", "application/geo+json" },
       { "gex", "application/vnd.geometry-explorer" },
@@ -599,6 +601,7 @@ inline auto constexpr mime_type_suffixes = std::array<mime_type_suffix, 1211>{
       { "mpkg", "application/vnd.apple.installer+xml" },
       { "mpm", "application/vnd.blueice.multipass" },
       { "mpn", "application/vnd.mophun.application" },
+      { "mpp", "application/dash-patch+xml" },
       { "mpp", "application/vnd.ms-project" },
       { "mpt", "application/vnd.ms-project" },
       { "mpy", "application/vnd.ibm.minipay" },

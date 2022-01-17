@@ -10,7 +10,7 @@
 
 #include <QComboBox>
 
-#include "Macros.h"
+#include <libtransmission/tr-macros.h>
 
 class FilterBarComboBox : public QComboBox
 {

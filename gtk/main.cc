@@ -20,6 +20,7 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
+#include <cstdio>
 #include <string>
 
 #include <glibmm.h>
@@ -35,11 +36,12 @@
 #include "Prefs.h"
 #include "Utils.h"
 
-#define MY_CONFIG_NAME "transmission"
-#define MY_READABLE_NAME "transmission-gtk"
-
 namespace
 {
+
+auto const* const AppConfigDirName = "transmission";
+auto const* const AppTranslationDomainName = "transmission-gtk";
+auto const* const AppName = "transmission-gtk";
 
 Glib::OptionEntry create_option_entry(Glib::ustring const& long_name, gchar short_name, Glib::ustring const& description)
 {
@@ -56,16 +58,16 @@ int main(int argc, char** argv)
 {
     /* init i18n */
     setlocale(LC_ALL, "");
-    bindtextdomain(MY_READABLE_NAME, TRANSMISSIONLOCALEDIR);
-    bind_textdomain_codeset(MY_READABLE_NAME, "UTF-8");
-    textdomain(MY_READABLE_NAME);
+    bindtextdomain(AppTranslationDomainName, TRANSMISSIONLOCALEDIR);
+    bind_textdomain_codeset(AppTranslationDomainName, "UTF-8");
+    textdomain(AppTranslationDomainName);
 
     /* init glib/gtk */
     Glib::init();
     Glib::set_application_name(_("Transmission"));
 
     /* default settings */
-    std::string config_dir = tr_getDefaultConfigDir(MY_CONFIG_NAME);
+    std::string config_dir;
     bool show_version = false;
     bool start_paused = false;
     bool is_iconified = false;
@@ -100,11 +102,9 @@ int main(int argc, char** argv)
     /* handle the trivial "version" option */
     if (show_version)
     {
-        fprintf(stderr, "%s %s\n", MY_READABLE_NAME, LONG_VERSION_STRING);
+        fprintf(stderr, "%s %s\n", AppName, LONG_VERSION_STRING);
         return 0;
     }
-
-    Gtk::Window::set_default_icon_name(MY_CONFIG_NAME);
 
     /* init the unit formatters */
     tr_formatter_mem_init(mem_K, _(mem_K_str), _(mem_M_str), _(mem_G_str), _(mem_T_str));
@@ -112,6 +112,11 @@ int main(int argc, char** argv)
     tr_formatter_speed_init(speed_K, _(speed_K_str), _(speed_M_str), _(speed_G_str), _(speed_T_str));
 
     /* set up the config dir */
+    if (config_dir.empty())
+    {
+        config_dir = tr_getDefaultConfigDir(AppConfigDirName);
+    }
+
     gtr_pref_init(config_dir);
     g_mkdir_with_parents(config_dir.c_str(), 0755);
 

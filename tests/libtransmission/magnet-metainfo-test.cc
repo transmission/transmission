@@ -46,18 +46,18 @@ TEST(MagnetMetainfo, magnetParse)
         auto mm = tr_magnet_metainfo{};
 
         EXPECT_TRUE(mm.parseMagnet(uri));
-        EXPECT_EQ(2, std::size(mm.trackers));
-        auto it = std::begin(mm.trackers);
-        EXPECT_EQ(0, it->first);
-        EXPECT_EQ("http://tracker.openbittorrent.com/announce"sv, tr_quark_get_string_view(it->second.announce_url));
-        EXPECT_EQ("http://tracker.openbittorrent.com/scrape"sv, tr_quark_get_string_view(it->second.scrape_url));
+        EXPECT_EQ(2, std::size(mm.announceList()));
+        auto it = std::begin(mm.announceList());
+        EXPECT_EQ(0, it->tier);
+        EXPECT_EQ("http://tracker.openbittorrent.com/announce"sv, it->announce.full);
+        EXPECT_EQ("http://tracker.openbittorrent.com/scrape"sv, it->scrape.full);
         ++it;
-        EXPECT_EQ(1, it->first);
-        EXPECT_EQ("http://tracker.opentracker.org/announce", tr_quark_get_string_view(it->second.announce_url));
-        EXPECT_EQ("http://tracker.opentracker.org/scrape", tr_quark_get_string_view(it->second.scrape_url));
-        EXPECT_EQ(1, std::size(mm.webseed_urls));
-        EXPECT_EQ("http://server.webseed.org/path/to/file"sv, mm.webseed_urls.front());
-        EXPECT_EQ("Display Name"sv, mm.name);
-        EXPECT_EQ(ExpectedHash, mm.info_hash);
+        EXPECT_EQ(1, it->tier);
+        EXPECT_EQ("http://tracker.opentracker.org/announce", it->announce.full);
+        EXPECT_EQ("http://tracker.opentracker.org/scrape", it->scrape.full);
+        EXPECT_EQ(1, mm.webseedCount());
+        EXPECT_EQ("http://server.webseed.org/path/to/file"sv, mm.webseed(0));
+        EXPECT_EQ("Display Name"sv, mm.name());
+        EXPECT_EQ(ExpectedHash, mm.infoHash());
     }
 }

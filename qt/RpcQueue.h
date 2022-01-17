@@ -18,7 +18,8 @@
 #include <QPair>
 #include <QQueue>
 
-#include "Macros.h"
+#include <libtransmission/tr-macros.h>
+
 #include "RpcClient.h"
 
 class RpcQueue : public QObject

@@ -8,8 +8,9 @@
 
 #pragma once
 
+#include <libtransmission/tr-macros.h>
+
 #include "BaseDialog.h"
-#include "Macros.h"
 #include "ui_LicenseDialog.h"
 
 class LicenseDialog : public BaseDialog

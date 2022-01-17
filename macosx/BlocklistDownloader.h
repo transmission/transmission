@@ -36,7 +36,6 @@ typedef NS_ENUM(unsigned int, blocklistDownloadState) { //
 
     BlocklistDownloaderViewController* fViewController;
 
-    NSString* fDestination;
     NSUInteger fCurrentSize;
     long long fExpectedSize;
 

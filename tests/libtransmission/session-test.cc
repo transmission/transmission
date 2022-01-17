@@ -16,7 +16,6 @@
 
 #include <algorithm>
 #include <array>
-#include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include <string>
@@ -169,9 +168,10 @@ TEST_F(SessionTest, propertiesApi)
     // rpc password (salted)
 
     {
-        auto const value = "{foo"sv;
-        tr_sessionSetRPCPassword(session, std::string{ value }.c_str());
-        EXPECT_EQ(value, tr_sessionGetRPCPassword(session));
+        auto const plaintext = "foo"sv;
+        auto const salted = tr_ssha1(plaintext);
+        tr_sessionSetRPCPassword(session, salted.c_str());
+        EXPECT_EQ(salted, tr_sessionGetRPCPassword(session));
     }
 
     // blocklist enabled

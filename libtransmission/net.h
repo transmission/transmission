@@ -26,6 +26,7 @@
 #error only libtransmission should #include this header.
 #endif
 
+#include <cstddef> // size_t
 #include <string_view>
 
 #ifdef _WIN32
@@ -36,8 +37,6 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #endif
-
-#include "tr-macros.h"
 
 #ifdef _WIN32
 using tr_socket_t = SOCKET;

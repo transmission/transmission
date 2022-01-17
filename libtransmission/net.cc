@@ -20,10 +20,13 @@
  * DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
 
+#include <algorithm>
 #include <array>
 #include <cerrno>
 #include <climits>
 #include <cstring>
+#include <ctime>
+#include <string_view>
 
 #include <sys/types.h>
 
@@ -39,6 +42,7 @@
 #include <libutp/utp.h>
 
 #include "transmission.h"
+
 #include "fdlimit.h" /* tr_fdSocketClose() */
 #include "log.h"
 #include "net.h"
@@ -216,7 +220,7 @@ bool tr_address_from_sockaddr_storage(tr_address* setme_addr, tr_port* setme_por
 {
     if (from->ss_family == AF_INET)
     {
-        struct sockaddr_in const* sin = (struct sockaddr_in const*)from;
+        auto const* const sin = (struct sockaddr_in const*)from;
         setme_addr->type = TR_AF_INET;
         setme_addr->addr.addr4.s_addr = sin->sin_addr.s_addr;
         *setme_port = sin->sin_port;
@@ -225,7 +229,7 @@ bool tr_address_from_sockaddr_storage(tr_address* setme_addr, tr_port* setme_por
 
     if (from->ss_family == AF_INET6)
     {
-        struct sockaddr_in6 const* sin6 = (struct sockaddr_in6 const*)from;
+        auto const* const sin6 = (struct sockaddr_in6 const*)from;
         setme_addr->type = TR_AF_INET6;
         setme_addr->addr.addr6 = sin6->sin6_addr;
         *setme_port = sin6->sin6_port;
@@ -698,13 +702,13 @@ static bool isMartianAddr(struct tr_address const* a)
     {
     case TR_AF_INET:
         {
-            unsigned char const* address = (unsigned char const*)&a->addr.addr4;
+            auto const* const address = (unsigned char const*)&a->addr.addr4;
             return address[0] == 0 || address[0] == 127 || (address[0] & 0xE0) == 0xE0;
         }
 
     case TR_AF_INET6:
         {
-            unsigned char const* address = (unsigned char const*)&a->addr.addr6;
+            auto const* const address = (unsigned char const*)&a->addr.addr6;
             return address[0] == 0xFF || (memcmp(address, zeroes, 15) == 0 && (address[15] == 0 || address[15] == 1));
         }
 

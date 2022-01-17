@@ -13,6 +13,7 @@
 #endif
 
 #include <string>
+#include <string_view>
 
 /**
  * @addtogroup tr_session Session
@@ -25,7 +26,7 @@
  * @see tr_getTorrentDir()
  * @see tr_getWebClientDir()
  */
-void tr_setConfigDir(tr_session* session, char const* configDir);
+void tr_setConfigDir(tr_session* session, std::string_view config_dir);
 
 /** @brief return the directory where .resume files are stored */
 char const* tr_getResumeDir(tr_session const*);
@@ -54,26 +55,5 @@ tr_thread* tr_threadNew(void (*func)(void*), void* arg);
 /** @brief Return nonzero if this function is being called from `thread'
     @param thread the thread being tested */
 bool tr_amInThread(tr_thread const* thread);
-
-/***
-****
-***/
-
-struct tr_lock;
-
-/** @brief Create a new thread mutex object */
-tr_lock* tr_lockNew(void);
-
-/** @brief Destroy a thread mutex object */
-void tr_lockFree(tr_lock*);
-
-/** @brief Attempt to lock a thread mutex object */
-void tr_lockLock(tr_lock*);
-
-/** @brief Unlock a thread mutex object */
-void tr_lockUnlock(tr_lock*);
-
-/** @brief return nonzero if the specified lock is locked */
-bool tr_lockHave(tr_lock const*);
 
 /* @} */

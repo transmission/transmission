@@ -8,67 +8,66 @@
 
 #pragma once
 
-#ifndef __TRANSMISSION__
-#error only libtransmission should #include this header.
-#endif
-
-#include <map>
 #include <string>
 #include <string_view>
 #include <vector>
 
 #include "transmission.h"
 
-#include "error.h"
-#include "quark.h"
+#include "announce-list.h"
 
+struct tr_error;
 struct tr_variant;
 
-struct tr_magnet_metainfo
+class tr_magnet_metainfo
 {
+public:
     bool parseMagnet(std::string_view magnet_link, tr_error** error = nullptr);
-
     std::string magnet() const;
 
-    void toVariant(tr_variant*) const;
-
-    static bool convertAnnounceToScrape(std::string& setme, std::string_view announce_url);
-
-    std::string_view infoHashString() const
+    auto const& infoHash() const
     {
-        // trim one byte off the end because of zero termination
-        return std::string_view{ std::data(info_hash_chars), std::size(info_hash_chars) - 1 };
+        return info_hash_;
+    }
+    auto const& name() const
+    {
+        return name_;
     }
 
-    struct tracker_t
+    auto webseedCount() const
     {
-        tr_quark announce_url;
-        tr_quark scrape_url;
-        tr_tracker_tier_t tier;
+        return std::size(webseed_urls_);
+    }
 
-        tracker_t(tr_quark announce_in, tr_quark scrape_in, tr_tracker_tier_t tier_in)
-            : announce_url{ announce_in }
-            , scrape_url{ scrape_in }
-            , tier{ tier_in }
-        {
-        }
+    auto const& webseed(size_t i) const
+    {
+        return webseed_urls_[i];
+    }
 
-        bool operator<(tracker_t const& that) const
-        {
-            return announce_url < that.announce_url;
-        }
-    };
+    auto& announceList()
+    {
+        return announce_list_;
+    }
 
-    std::vector<std::string> webseed_urls;
+    auto const& announceList() const
+    {
+        return announce_list_;
+    }
 
-    std::string name;
+    std::string const& infoHashString() const
+    {
+        return info_hash_str_;
+    }
 
-    std::multimap<tr_tracker_tier_t, tracker_t> trackers;
-
-    tr_sha1_digest_string_t info_hash_chars;
-
-    tr_sha1_digest_t info_hash;
+    void setName(std::string_view name)
+    {
+        name_ = name;
+    }
 
 protected:
-    bool addTracker(tr_tracker_tier_t tier, std::string_view announce_url);
+    tr_announce_list announce_list_;
+    std::vector<std::string> webseed_urls_;
+    tr_sha1_digest_t info_hash_;
+    std::string info_hash_str_;
+    std::string name_;
 };

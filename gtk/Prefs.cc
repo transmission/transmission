@@ -21,9 +21,7 @@
  *****************************************************************************/
 
 #include <errno.h>
-#include <stdio.h>
 #include <stdlib.h> /* strtol() */
-#include <string.h>
 #include <string_view>
 
 #include <unistd.h>
@@ -37,8 +35,6 @@
 #include "Prefs.h"
 #include "PrefsDialog.h"
 #include "Utils.h"
-
-#define MY_CONFIG_NAME "transmission"
 
 using namespace std::literals;
 
@@ -133,7 +129,7 @@ static tr_variant* getPrefs()
     {
         tr_variantInitDict(&settings, 0);
         tr_prefs_init_defaults(&settings);
-        tr_sessionLoadSettings(&settings, gl_confdir.c_str(), MY_CONFIG_NAME);
+        tr_sessionLoadSettings(&settings, gl_confdir.c_str(), nullptr);
         ensure_sound_cmd_is_a_list(&settings);
         loaded = true;
     }

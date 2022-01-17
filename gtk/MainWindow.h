@@ -27,12 +27,16 @@
 #include <glibmm.h>
 #include <gtkmm.h>
 
+#include <libtransmission/tr-macros.h>
+
 class Session;
 
 class MainWindow : public Gtk::ApplicationWindow
 {
 public:
     ~MainWindow() override;
+
+    TR_DISABLE_COPY_MOVE(MainWindow)
 
     static std::unique_ptr<MainWindow> create(
         Gtk::Application& app,

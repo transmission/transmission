@@ -17,9 +17,11 @@
 
 #include <algorithm> // std::sort
 #include <cerrno>
-#include <stack>
 #include <cstdlib> /* strtod() */
 #include <cstring>
+#include <stack>
+#include <string>
+#include <string_view>
 #include <vector>
 
 #ifdef _WIN32
@@ -37,13 +39,15 @@
 #define LIBTRANSMISSION_VARIANT_MODULE
 
 #include "transmission.h"
+
 #include "error.h"
 #include "file.h"
 #include "log.h"
+#include "quark.h"
 #include "tr-assert.h"
 #include "utils.h"
-#include "variant.h"
 #include "variant-common.h"
+#include "variant.h"
 
 /* don't use newlocale/uselocale on old versions of uClibc because they're buggy.
  * https://trac.transmissionbt.com/ticket/6006 */
@@ -1020,7 +1024,7 @@ static void tr_variantListCopy(tr_variant* target, tr_variant const* src)
     int i = 0;
     tr_variant const* val = nullptr;
 
-    while ((val = tr_variantListChild((tr_variant*)src, i)) != nullptr)
+    while ((val = tr_variantListChild(const_cast<tr_variant*>(src), i)) != nullptr)
     {
         if (tr_variantIsBool(val))
         {
@@ -1097,12 +1101,12 @@ void tr_variantMergeDicts(tr_variant* target, tr_variant const* source)
     {
         auto key = tr_quark{};
         tr_variant* val = nullptr;
-        if (tr_variantDictChild((tr_variant*)source, i, &key, &val))
+        if (tr_variantDictChild(const_cast<tr_variant*>(source), i, &key, &val))
         {
             tr_variant* t = nullptr;
 
             // if types differ, ensure that target will overwrite source
-            tr_variant* const target_child = tr_variantDictFind(target, key);
+            auto const* const target_child = tr_variantDictFind(target, key);
             if (target_child && !tr_variantIsType(target_child, val->type))
             {
                 tr_variantDictRemove(target, key);
@@ -1199,93 +1203,26 @@ struct evbuffer* tr_variantToBuf(tr_variant const* v, tr_variant_fmt fmt)
     return buf;
 }
 
-char* tr_variantToStr(tr_variant const* v, tr_variant_fmt fmt, size_t* len)
+std::string tr_variantToStr(tr_variant const* v, tr_variant_fmt fmt)
 {
-    struct evbuffer* buf = tr_variantToBuf(v, fmt);
-    return evbuffer_free_to_str(buf, len);
+    return evbuffer_free_to_str(tr_variantToBuf(v, fmt));
 }
 
-static int writeVariantToFd(tr_variant const* v, tr_variant_fmt fmt, tr_sys_file_t fd, tr_error** error)
+int tr_variantToFile(tr_variant const* v, tr_variant_fmt fmt, std::string const& filename)
 {
-    int err = 0;
-    struct evbuffer* buf = tr_variantToBuf(v, fmt);
-    char const* walk = (char const*)evbuffer_pullup(buf, -1);
-    uint64_t nleft = evbuffer_get_length(buf);
+    auto error_code = int{ 0 };
+    auto const contents = tr_variantToStr(v, fmt);
 
-    while (nleft > 0)
-    {
-        uint64_t n = 0;
-
-        tr_error* tmperr = nullptr;
-        if (!tr_sys_file_write(fd, walk, nleft, &n, &tmperr))
-        {
-            err = tmperr->code;
-            tr_error_propagate(error, &tmperr);
-            break;
-        }
-
-        nleft -= n;
-        walk += n;
-    }
-
-    evbuffer_free(buf);
-    return err;
-}
-
-int tr_variantToFile(tr_variant const* v, tr_variant_fmt fmt, char const* filename)
-{
-    /* follow symlinks to find the "real" file, to make sure the temporary
-     * we build with tr_sys_file_open_temp() is created on the right partition */
-    char* real_filename = tr_sys_path_resolve(filename, nullptr);
-    if (real_filename != nullptr)
-    {
-        filename = real_filename;
-    }
-
-    /* if the file already exists, try to move it out of the way & keep it as a backup */
-    char* const tmp = tr_strdup_printf("%s.tmp.XXXXXX", filename);
     tr_error* error = nullptr;
-    tr_sys_file_t const fd = tr_sys_file_open_temp(tmp, &error);
-
-    int err = 0;
-    if (fd != TR_BAD_SYS_FILE)
+    tr_saveFile(filename, { std::data(contents), std::size(contents) }, &error);
+    if (error != nullptr)
     {
-        err = writeVariantToFd(v, fmt, fd, &error);
-        tr_sys_file_close(fd, nullptr);
-
-        if (err)
-        {
-            tr_logAddError(_("Couldn't save temporary file \"%1$s\": %2$s"), tmp, error->message);
-            tr_sys_path_remove(tmp, nullptr);
-            tr_error_free(error);
-        }
-        else
-        {
-            tr_error_clear(&error);
-
-            if (tr_sys_path_rename(tmp, filename, &error))
-            {
-                tr_logAddInfo(_("Saved \"%s\""), filename);
-            }
-            else
-            {
-                err = error->code;
-                tr_logAddError(_("Couldn't save file \"%1$s\": %2$s"), filename, error->message);
-                tr_sys_path_remove(tmp, nullptr);
-                tr_error_free(error);
-            }
-        }
-    }
-    else
-    {
-        err = error->code;
-        tr_logAddError(_("Couldn't save temporary file \"%1$s\": %2$s"), tmp, error->message);
-        tr_error_free(error);
+        tr_logAddError(_("Error saving \"%" TR_PRIsv "\": %s (%d)"), TR_PRIsv_ARG(filename), error->message, error->code);
+        error_code = error->code;
+        tr_error_clear(&error);
     }
 
-    tr_free(tmp);
-    tr_free(real_filename);
-    return err;
+    return error_code;
 }
 
 /***
@@ -1309,14 +1246,14 @@ bool tr_variantFromBuf(tr_variant* setme, int opts, std::string_view buf, char c
 
     if (err)
     {
-        tr_error_set_literal(error, EILSEQ, "error parsing encoded data");
+        tr_error_set(error, EILSEQ, "error parsing encoded data"sv);
         return false;
     }
 
     return true;
 }
 
-bool tr_variantFromFile(tr_variant* setme, tr_variant_parse_opts opts, char const* filename, tr_error** error)
+bool tr_variantFromFile(tr_variant* setme, tr_variant_parse_opts opts, std::string const& filename, tr_error** error)
 {
     // can't do inplace when this function is allocating & freeing the memory...
     TR_ASSERT((opts & TR_VARIANT_PARSE_INPLACE) == 0);
