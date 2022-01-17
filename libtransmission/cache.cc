@@ -22,7 +22,7 @@
 #include "trevent.h"
 #include "utils.h"
 
-#define MY_NAME "Cache"
+static char constexpr MY_NAME[] = "Cache";
 
 #define dbgmsg(...) tr_logAddDeepNamed(MY_NAME, __VA_ARGS__)
 
