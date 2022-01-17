@@ -334,34 +334,33 @@ bool tr_torrentGetSeedRatio(tr_torrent const* tor, double* ratio)
 
 /* returns true if the seed ratio applies --
  * it applies if the torrent's a seed AND it has a seed ratio set */
-static bool tr_torrentGetSeedRatioBytes(tr_torrent const* tor, uint64_t* setmeLeft, uint64_t* setmeGoal)
+static bool tr_torrentGetSeedRatioBytes(tr_torrent const* tor, uint64_t* setme_left, uint64_t* setme_goal)
 {
-    bool seedRatioApplies = false;
+    bool seed_ratio_applies = false;
 
     TR_ASSERT(tr_isTorrent(tor));
 
-    auto seedRatio = double{};
-    if (tr_torrentGetSeedRatio(tor, &seedRatio))
+    auto seed_ratio = double{};
+    if (tr_torrentGetSeedRatio(tor, &seed_ratio))
     {
-        uint64_t const u = tor->uploadedCur + tor->uploadedPrev;
-        uint64_t const d = tor->downloadedCur + tor->downloadedPrev;
-        uint64_t const baseline = d != 0 ? d : tor->completion.sizeWhenDone();
-        uint64_t const goal = baseline * seedRatio;
+        auto const uploaded = tor->uploadedCur + tor->uploadedPrev;
+        auto const baseline = tor->totalSize();
+        auto const goal = baseline * seed_ratio;
 
-        if (setmeLeft != nullptr)
+        if (setme_left != nullptr)
         {
-            *setmeLeft = goal > u ? goal - u : 0;
+            *setme_left = goal > uploaded ? goal - uploaded : 0;
         }
 
-        if (setmeGoal != nullptr)
+        if (setme_goal != nullptr)
         {
-            *setmeGoal = goal;
+            *setme_goal = goal;
         }
 
-        seedRatioApplies = tor->isDone();
+        seed_ratio_applies = tor->isDone();
     }
 
-    return seedRatioApplies;
+    return seed_ratio_applies;
 }
 
 static bool tr_torrentIsSeedRatioDone(tr_torrent const* tor)
@@ -996,7 +995,7 @@ tr_stat const* tr_torrentStat(tr_torrent* tor)
     s->haveUnchecked = tor->hasTotal() - s->haveValid;
     s->desiredAvailable = tr_peerMgrGetDesiredAvailable(tor);
 
-    s->ratio = tr_getRatio(s->uploadedEver, s->downloadedEver != 0 ? s->downloadedEver : s->haveValid);
+    s->ratio = tr_getRatio(s->uploadedEver, tor->totalSize());
 
     auto seedRatioBytesLeft = uint64_t{};
     auto seedRatioBytesGoal = uint64_t{};

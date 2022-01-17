@@ -388,7 +388,7 @@ std::string& tr_strvUtf8Clean(std::string_view cleanme, std::string& setme);
 ****
 ***/
 
-/** @brief return TR_RATIO_NA, TR_RATIO_INF, or a number in [0..1]
+/** @brief return TR_RATIO_NA or a number in [0..1]
     @return TR_RATIO_NA, TR_RATIO_INF, or a number in [0..1] */
 double tr_getRatio(uint64_t numerator, uint64_t denominator);
 
