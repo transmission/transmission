@@ -56,7 +56,7 @@ static char constexpr MyName[] = "RPC Server";
 
 #define MY_REALM "Transmission"
 
-#define dbgmsg(...) tr_logAddDeepNamed(MY_NAME, __VA_ARGS__)
+#define dbgmsg(...) tr_logAddDeepNamed(MyName, __VA_ARGS__)
 
 /***
 ****
@@ -293,7 +293,7 @@ static void add_response(struct evhttp_request* req, tr_rpc_server* server, stru
             // around the compressed data instead of a zlib wrapper."
             if (Z_OK != deflateInit2(&server->stream, compressionLevel, Z_DEFLATED, 15 + 16, 8, Z_DEFAULT_STRATEGY))
             {
-                tr_logAddNamedDbg(MY_NAME, "deflateInit2 failed: %s", server->stream.msg);
+                tr_logAddNamedDbg(MyName, "deflateInit2 failed: %s", server->stream.msg);
             }
         }
 
@@ -779,12 +779,12 @@ static void startServer(void* vserver)
         {
             int const retry_delay = rpc_server_start_retry(server);
 
-            tr_logAddNamedDbg(MY_NAME, "Unable to bind to %s:%d, retrying in %d seconds", address, port, retry_delay);
+            tr_logAddNamedDbg(MyName, "Unable to bind to %s:%d, retrying in %d seconds", address, port, retry_delay);
             return;
         }
 
         tr_logAddNamedError(
-            MY_NAME,
+            MyName,
             "Unable to bind to %s:%d after %d attempts, giving up",
             address,
             port,
@@ -795,7 +795,7 @@ static void startServer(void* vserver)
         evhttp_set_gencb(httpd, handle_request, server);
         server->httpd = httpd;
 
-        tr_logAddNamedDbg(MY_NAME, "Started listening on %s:%d", address, port);
+        tr_logAddNamedDbg(MyName, "Started listening on %s:%d", address, port);
     }
 
     rpc_server_start_retry_cancel(server);
@@ -820,7 +820,7 @@ static void stopServer(tr_rpc_server* server)
     server->httpd = nullptr;
     evhttp_free(httpd);
 
-    tr_logAddNamedDbg(MY_NAME, "Stopped listening on %s:%d", address, port);
+    tr_logAddNamedDbg(MyName, "Stopped listening on %s:%d", address, port);
 }
 
 static void onEnabledChanged(void* vserver)
@@ -905,13 +905,13 @@ static auto parseWhitelist(std::string_view whitelist)
         if (token.find_first_of("+-"sv) != token.npos)
         {
             tr_logAddNamedInfo(
-                MY_NAME,
+                MyName,
                 "Adding address to whitelist: %" TR_PRIsv " (And it has a '+' or '-'!  Are you using an old ACL by mistake?)",
                 TR_PRIsv_ARG(token));
         }
         else
         {
-            tr_logAddNamedInfo(MY_NAME, "Adding address to whitelist: %" TR_PRIsv, TR_PRIsv_ARG(token));
+            tr_logAddNamedInfo(MyName, "Adding address to whitelist: %" TR_PRIsv, TR_PRIsv_ARG(token));
         }
     }
 
@@ -1028,7 +1028,7 @@ void tr_rpcSetAntiBruteForceThreshold(tr_rpc_server* server, int badRequests)
 static void missing_settings_key(tr_quark const q)
 {
     char const* str = tr_quark_get_string(q);
-    tr_logAddNamedError(MY_NAME, _("Couldn't find settings key \"%s\""), str);
+    tr_logAddNamedError(MyName, _("Couldn't find settings key \"%s\""), str);
 }
 
 tr_rpc_server::tr_rpc_server(tr_session* session_in, tr_variant* settings)
@@ -1186,13 +1186,13 @@ tr_rpc_server::tr_rpc_server(tr_session* session_in, tr_variant* settings)
     {
         if (!tr_address_from_string(&address, std::string{ sv }.c_str()))
         {
-            tr_logAddNamedError(MY_NAME, _("%" TR_PRIsv " is not a valid address"), TR_PRIsv_ARG(sv));
+            tr_logAddNamedError(MyName, _("%" TR_PRIsv " is not a valid address"), TR_PRIsv_ARG(sv));
             address = tr_inaddr_any;
         }
         else if (address.type != TR_AF_INET && address.type != TR_AF_INET6)
         {
             tr_logAddNamedError(
-                MY_NAME,
+                MyName,
                 _("%" TR_PRIsv " is not an IPv4 or IPv6 address. RPC listeners must be IPv4 or IPv6"),
                 TR_PRIsv_ARG(sv));
             address = tr_inaddr_any;
@@ -1204,7 +1204,7 @@ tr_rpc_server::tr_rpc_server(tr_session* session_in, tr_variant* settings)
     if (this->isEnabled)
     {
         tr_logAddNamedInfo(
-            MY_NAME,
+            MyName,
             _("Serving RPC and Web requests on %s:%d%s"),
             tr_rpcGetBindAddress(this),
             (int)this->port,
@@ -1213,19 +1213,19 @@ tr_rpc_server::tr_rpc_server(tr_session* session_in, tr_variant* settings)
 
         if (this->isWhitelistEnabled)
         {
-            tr_logAddNamedInfo(MY_NAME, "%s", _("Whitelist enabled"));
+            tr_logAddNamedInfo(MyName, "%s", _("Whitelist enabled"));
         }
 
         if (this->isPasswordEnabled)
         {
-            tr_logAddNamedInfo(MY_NAME, "%s", _("Password required"));
+            tr_logAddNamedInfo(MyName, "%s", _("Password required"));
         }
     }
 
     char const* webClientDir = tr_getWebClientDir(this->session);
     if (!tr_str_is_empty(webClientDir))
     {
-        tr_logAddNamedInfo(MY_NAME, _("Serving RPC and Web requests from directory '%s'"), webClientDir);
+        tr_logAddNamedInfo(MyName, _("Serving RPC and Web requests from directory '%s'"), webClientDir);
     }
 }
 

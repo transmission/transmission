@@ -2384,7 +2384,7 @@ static void pexAddedCb(void const* vpex, void* userData)
     auto* diffs = static_cast<PexDiffs*>(userData);
     auto const* pex = static_cast<tr_pex const*>(vpex);
 
-    if (diffs->addedCount < MAX_PEX_ADDED)
+    if (diffs->addedCount < MaxPexAdded)
     {
         diffs->added[diffs->addedCount++] = *pex;
         diffs->elements[diffs->elementCount++] = *pex;
@@ -2396,7 +2396,7 @@ static constexpr void pexDroppedCb(void const* vpex, void* userData)
     auto* diffs = static_cast<PexDiffs*>(userData);
     auto const* pex = static_cast<tr_pex const*>(vpex);
 
-    if (diffs->droppedCount < MAX_PEX_DROPPED)
+    if (diffs->droppedCount < MaxPexDropped)
     {
         diffs->dropped[diffs->droppedCount++] = *pex;
     }

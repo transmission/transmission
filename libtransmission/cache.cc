@@ -22,9 +22,9 @@
 #include "trevent.h"
 #include "utils.h"
 
-static char constexpr MY_NAME[] = "Cache";
+static char constexpr MyName[] = "Cache";
 
-#define dbgmsg(...) tr_logAddDeepNamed(MY_NAME, __VA_ARGS__)
+#define dbgmsg(...) tr_logAddDeepNamed(MyName, __VA_ARGS__)
 
 /****
 *****
@@ -252,7 +252,7 @@ int tr_cacheSetLimit(tr_cache* cache, int64_t max_bytes)
     cache->max_blocks = getMaxBlocks(max_bytes);
 
     tr_logAddNamedDbg(
-        MY_NAME,
+        MyName,
         "Maximum cache size set to %s (%d blocks)",
         tr_formatter_mem_B(cache->max_bytes).c_str(),
         cache->max_blocks);

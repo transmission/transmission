@@ -38,25 +38,25 @@ THE SOFTWARE.
 
 #ifndef WITH_UTP
 
-#define MY_NAME "UTP"
+static char constexpr MyName[] = "UTP";
 
-#define dbgmsg(...) tr_logAddDeepNamed(MY_NAME, __VA_ARGS__)
+#define dbgmsg(...) tr_logAddDeepNamed(MyName, __VA_ARGS__)
 
 void UTP_Close(struct UTPSocket* socket)
 {
-    tr_logAddNamedError(MY_NAME, "UTP_Close(%p) was called.", socket);
+    tr_logAddNamedError(MyName, "UTP_Close(%p) was called.", socket);
     dbgmsg("UTP_Close(%p) was called.", socket);
 }
 
 void UTP_RBDrained(struct UTPSocket* socket)
 {
-    tr_logAddNamedError(MY_NAME, "UTP_RBDrained(%p) was called.", socket);
+    tr_logAddNamedError(MyName, "UTP_RBDrained(%p) was called.", socket);
     dbgmsg("UTP_RBDrained(%p) was called.", socket);
 }
 
 bool UTP_Write(struct UTPSocket* socket, size_t count)
 {
-    tr_logAddNamedError(MY_NAME, "UTP_RBDrained(%p, %zu) was called.", socket, count);
+    tr_logAddNamedError(MyName, "UTP_RBDrained(%p, %zu) was called.", socket, count);
     dbgmsg("UTP_RBDrained(%p, %zu) was called.", socket, count);
     return false;
 }
