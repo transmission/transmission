@@ -97,8 +97,7 @@ void tr_utpSendTo(
 #else
 
 /* Greg says 50ms works for them. */
-
-#define UTP_INTERVAL_US 50000
+static auto constexpr UtpIntervalUs = int{ 50000 };
 
 static void incoming(void* vsession, struct UTPSocket* s)
 {
@@ -149,7 +148,7 @@ static void reset_timer(tr_session* ss)
     if (tr_sessionIsUTPEnabled(ss))
     {
         sec = 0;
-        usec = UTP_INTERVAL_US / 2 + tr_rand_int_weak(UTP_INTERVAL_US);
+        usec = UtpIntervalUs / 2 + tr_rand_int_weak(UtpIntervalUs);
     }
     else
     {
