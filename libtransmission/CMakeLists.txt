@@ -245,7 +245,7 @@ include_directories(
 include_directories(
     SYSTEM
     ${UTFCPP_INCLUDE_DIRS}
-    ${ZLIB_INCLUDE_DIRS}
+    ${DEFLATE_INCLUDE_DIRS}
     ${CRYPTO_INCLUDE_DIRS}
     ${CURL_INCLUDE_DIRS}
     ${EVENT2_INCLUDE_DIRS}
@@ -274,6 +274,7 @@ foreach(UT ${EVENT2_UPSTREAM_TARGET}
            ${NATPMP_UPSTREAM_TARGET}
            ${MINIUPNPC_UPSTREAM_TARGET}
            ${DHT_UPSTREAM_TARGET}
+           ${DEFLATE_UPSTREAM_TARGET}
            ${UTP_UPSTREAM_TARGET}
            ${B64_UPSTREAM_TARGET})
     add_dependencies(${TR_NAME} ${UT})
@@ -281,7 +282,7 @@ endforeach()
 
 target_link_libraries(${TR_NAME}
     ${CMAKE_THREAD_LIBS_INIT}
-    ${ZLIB_LIBRARIES}
+    ${DEFLATE_LIBRARIES}
     ${CRYPTO_LIBRARIES}
     ${CURL_LIBRARIES}
     ${EVENT2_LIBRARIES}
