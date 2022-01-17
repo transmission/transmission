@@ -114,7 +114,7 @@ static void saveCumulativeStats(tr_session const* session, tr_session_stats cons
 
 void tr_statsInit(tr_session* session)
 {
-    struct tr_stats_handle* stats = tr_new0(struct tr_stats_handle, 1);
+    auto* const stats = tr_new0(struct tr_stats_handle, 1);
 
     loadCumulativeStats(session, &stats->old);
     stats->single.sessionCount = 1;

@@ -98,7 +98,7 @@ Glib::ustring tr_strltime(time_t seconds)
         seconds = 0;
     }
 
-    int const days = (int)(seconds / 86400);
+    auto const days = (int)(seconds / 86400);
     int const hours = (seconds % 86400) / 3600;
     int const minutes = (seconds % 3600) / 60;
     seconds = (seconds % 3600) % 60;

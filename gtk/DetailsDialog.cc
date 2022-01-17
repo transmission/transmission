@@ -1362,7 +1362,7 @@ void DetailsDialog::Impl::refreshPeerList(std::vector<tr_torrent*> const& torren
             {
                 auto const iter = store->append();
                 initPeerRow(iter, key, tr_torrentName(tor), s);
-                hash.emplace(key, Gtk::TreeRowReference(store, store->get_path(iter)));
+                hash.try_emplace(key, Gtk::TreeRowReference(store, store->get_path(iter)));
             }
         }
     }
@@ -1432,7 +1432,7 @@ void DetailsDialog::Impl::refreshWebseedList(std::vector<tr_torrent*> const& tor
                 auto const iter = store->append();
                 (*iter)[webseed_cols.url] = url;
                 (*iter)[webseed_cols.key] = key;
-                hash.emplace(key, Gtk::TreeRowReference(store, store->get_path(iter)));
+                hash.try_emplace(key, Gtk::TreeRowReference(store, store->get_path(iter)));
             }
         }
     }
@@ -2133,7 +2133,7 @@ void DetailsDialog::Impl::refreshTracker(std::vector<tr_torrent*> const& torrent
             (*iter)[tracker_cols.key] = gstr.str();
 
             auto const p = store->get_path(iter);
-            hash.emplace(gstr.str(), Gtk::TreeRowReference(store, p));
+            hash.try_emplace(gstr.str(), Gtk::TreeRowReference(store, p));
             gtr_get_favicon_from_url(
                 session,
                 tracker.announce,
@@ -2204,7 +2204,7 @@ void DetailsDialog::Impl::on_edit_trackers_response(int response, std::shared_pt
 
     if (response == Gtk::RESPONSE_ACCEPT)
     {
-        int const torrent_id = GPOINTER_TO_INT(dialog->get_data(TORRENT_ID_KEY));
+        auto const torrent_id = GPOINTER_TO_INT(dialog->get_data(TORRENT_ID_KEY));
         auto* const text_buffer = static_cast<Gtk::TextBuffer*>(dialog->get_data(TEXT_BUFFER_KEY));
         tr_torrent* const tor = core_->find_torrent(torrent_id);
 
@@ -2359,7 +2359,7 @@ void DetailsDialog::Impl::on_add_tracker_response(int response, std::shared_ptr<
     if (response == Gtk::RESPONSE_ACCEPT)
     {
         auto* e = static_cast<Gtk::Entry*>(dialog->get_data(URL_ENTRY_KEY));
-        int const torrent_id = GPOINTER_TO_INT(dialog->get_data(TORRENT_ID_KEY));
+        auto const torrent_id = GPOINTER_TO_INT(dialog->get_data(TORRENT_ID_KEY));
         auto const url = gtr_str_strip(e->get_text());
 
         if (!url.empty())

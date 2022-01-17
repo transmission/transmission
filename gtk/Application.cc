@@ -246,7 +246,7 @@ void Application::Impl::show_details_dialog_for_selected_torrents()
         auto dialog = DetailsDialog::create(*wind_, core_);
         dialog->set_torrents(ids);
         dialog->signal_hide().connect([this, key]() { details_.erase(key); });
-        dialog_it = details_.emplace(key, std::move(dialog)).first;
+        dialog_it = details_.try_emplace(key, std::move(dialog)).first;
         dialog_it->second->show();
     }
 

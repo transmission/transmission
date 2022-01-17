@@ -245,8 +245,7 @@ static handshake_parse_err_t parseHandshake(tr_handshake* handshake, struct evbu
     /* torrent hash */
     auto hash = tr_sha1_digest_t{};
     tr_peerIoReadBytes(handshake->io, inbuf, std::data(hash), std::size(hash));
-    auto const torrent_hash = tr_peerIoGetTorrentHash(handshake->io);
-    if (!torrent_hash || *torrent_hash != hash)
+    if (auto const torrent_hash = tr_peerIoGetTorrentHash(handshake->io); !torrent_hash || *torrent_hash != hash)
     {
         dbgmsg(handshake, "peer returned the wrong hash. wtf?");
         return HANDSHAKE_BAD_TORRENT;

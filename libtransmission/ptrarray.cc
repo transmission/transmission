@@ -14,7 +14,7 @@
 #include "tr-macros.h"
 #include "utils.h"
 
-#define FLOOR 32
+static auto constexpr Floor = int{ 32 };
 
 int tr_lowerBound(
     void const* key,
@@ -89,7 +89,7 @@ int tr_ptrArrayInsert(tr_ptrArray* t, void* ptr, int pos)
 {
     if (t->n_items >= t->n_alloc)
     {
-        t->n_alloc = std::max(FLOOR, t->n_alloc * 2);
+        t->n_alloc = std::max(Floor, t->n_alloc * 2);
         t->items = tr_renew(void*, t->items, t->n_alloc);
     }
 
