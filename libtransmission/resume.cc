@@ -682,7 +682,7 @@ void tr_torrentSaveResume(tr_torrent* tor)
     saveName(&top, tor);
     saveLabels(&top, tor);
 
-    auto const err = tr_variantToFile(&top, TR_VARIANT_FMT_BENC, tor->resumeFilename());
+    auto const err = tr_variantToFile(&top, TR_VARIANT_FMT_BENC, tor->resumeFile());
     if (err != 0)
     {
         tor->setLocalError(tr_strvJoin("Unable to save resume file: ", tr_strerror(err)));
@@ -702,8 +702,7 @@ static uint64_t loadFromFile(tr_torrent* tor, uint64_t fieldsToLoad, bool* did_m
         *did_migrate_filename = migrated;
     }
 
-    std::string const filename = tor->resumeFilename();
-
+    auto const filename = tor->resumeFile();
     auto buf = std::vector<char>{};
     tr_error* error = nullptr;
     auto top = tr_variant{};
