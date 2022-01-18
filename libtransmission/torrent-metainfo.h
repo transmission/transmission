@@ -155,17 +155,23 @@ public:
         return info_dict_offset_;
     }
 
-    std::string makeTorrentFilename(std::string_view torrent_dir) const
+    std::string torrentFilename(std::string_view torrent_dir) const
     {
         return makeFilename(torrent_dir, name(), infoHashString(), BasenameFormat::Hash, ".torrent");
     }
 
-    std::string makeResumeFilename(std::string_view resume_dir) const
+    std::string resumeFilename(std::string_view resume_dir) const
     {
         return makeFilename(resume_dir, name(), infoHashString(), BasenameFormat::Hash, ".resume");
     }
 
     bool migrateFile(
+        std::string_view dirname,
+        std::string_view name,
+        std::string_view info_hash_string,
+        std::string_view suffix) const;
+
+    void removeFile(
         std::string_view dirname,
         std::string_view name,
         std::string_view info_hash_string,
