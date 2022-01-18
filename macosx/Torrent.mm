@@ -844,7 +844,7 @@ bool trashDataFile(char const* filename, tr_error** error)
 
 - (NSString*)torrentLocation
 {
-    auto* const filename = tr_torrentFilename(tor);
+    auto* const filename = tr_torrentFilename(fHandle);
     NSString* ret = @(filename ? filename : "");
     tr_free(filename);
     return ret;
