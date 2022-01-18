@@ -1150,7 +1150,6 @@ tr_torrent_view tr_torrentView(tr_torrent const* tor)
     auto ret = tr_torrent_view{};
     ret.name = tr_torrentName(tor);
     ret.hash_string = tor->infoHashString().c_str();
-    ret.torrent_filename = tor->torrentFile().c_str();
     ret.comment = tor->comment().c_str();
     ret.creator = tor->creator().c_str();
     ret.source = tor->source().c_str();
@@ -1162,6 +1161,11 @@ tr_torrent_view tr_torrentView(tr_torrent const* tor)
     ret.is_folder = tor->fileCount() > 1;
 
     return ret;
+}
+
+char* tr_torrentFilename(tr_torrent const* tor)
+{
+    return tr_strvDup(tor->torrentFile());
 }
 
 /***

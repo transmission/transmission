@@ -1442,7 +1442,6 @@ struct tr_torrent_view
 {
     char const* name;
     char const* hash_string;
-    char const* torrent_filename;
 
     char const* comment; // optional; may be nullptr
     char const* creator; // optional; may be nullptr
@@ -1460,6 +1459,12 @@ struct tr_torrent_view
 };
 
 struct tr_torrent_view tr_torrentView(tr_torrent const* tor);
+
+/*
+ * Get the filename of Transmission's internal copy of the .torrent file.
+ * This is a duplicate that must be freed with tr_free() when done.
+ */
+char* tr_torrentFilename(tr_torrent const* tor);
 
 /***********************************************************************
  * tr_torrentAvailability
