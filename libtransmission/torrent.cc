@@ -723,16 +723,12 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
     tr_sessionAddTorrent(session, tor);
 
     // if we don't have a local .torrent file already, assume the torrent is new
-    auto filename = tor->torrentFilename();
+    auto const filename = tor->torrentFile();
     bool const is_new_torrent = !tr_sys_path_exists(filename.c_str(), nullptr);
     if (is_new_torrent)
     {
         tr_error* error = nullptr;
-        if (tr_ctorSaveContents(ctor, filename, &error))
-        {
-            tor->setTorrentFile(filename);
-        }
-        else
+        if (!tr_ctorSaveContents(ctor, filename, &error))
         {
             tor->setLocalError(
                 tr_strvJoin("Unable to save torrent file: ", error->message, " ("sv, std::to_string(error->code), ")"sv));
@@ -1154,7 +1150,6 @@ tr_torrent_view tr_torrentView(tr_torrent const* tor)
     auto ret = tr_torrent_view{};
     ret.name = tr_torrentName(tor);
     ret.hash_string = tor->infoHashString().c_str();
-    ret.torrent_filename = tor->torrentFile().c_str();
     ret.comment = tor->comment().c_str();
     ret.creator = tor->creator().c_str();
     ret.source = tor->source().c_str();
@@ -1166,6 +1161,11 @@ tr_torrent_view tr_torrentView(tr_torrent const* tor)
     ret.is_folder = tor->fileCount() > 1;
 
     return ret;
+}
+
+char* tr_torrentFilename(tr_torrent const* tor)
+{
+    return tr_strvDup(tor->torrentFile());
 }
 
 /***

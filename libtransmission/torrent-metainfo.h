@@ -126,16 +126,6 @@ public:
         return is_private_;
     }
 
-    [[nodiscard]] auto const& torrentFile() const
-    {
-        return torrent_file_;
-    }
-
-    void setTorrentFile(std::string_view filename)
-    {
-        torrent_file_ = filename;
-    }
-
     [[nodiscard]] tr_sha1_digest_t const& pieceHash(tr_piece_index_t piece) const;
 
     [[nodiscard]] auto const& dateCreated() const
@@ -155,12 +145,12 @@ public:
         return info_dict_offset_;
     }
 
-    std::string torrentFilename(std::string_view torrent_dir) const
+    std::string torrentFile(std::string_view torrent_dir) const
     {
         return makeFilename(torrent_dir, name(), infoHashString(), BasenameFormat::Hash, ".torrent");
     }
 
-    std::string resumeFilename(std::string_view resume_dir) const
+    std::string resumeFile(std::string_view resume_dir) const
     {
         return makeFilename(resume_dir, name(), infoHashString(), BasenameFormat::Hash, ".resume");
     }
@@ -240,9 +230,6 @@ private:
     std::string comment_;
     std::string creator_;
     std::string source_;
-
-    // empty unless `parseTorrentFile()` was used
-    std::string torrent_file_;
 
     time_t date_created_ = 0;
 
