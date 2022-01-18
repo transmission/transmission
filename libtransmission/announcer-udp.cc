@@ -378,7 +378,7 @@ static void tau_announce_request_fail(
 {
     request->response.did_connect = did_connect;
     request->response.did_timeout = did_timeout;
-    request->response.errmsg = tr_strvDup(errmsg);
+    request->response.errmsg = errmsg;
     tau_announce_request_finished(request);
 }
 
