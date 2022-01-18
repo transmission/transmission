@@ -276,12 +276,6 @@ tr_cache* tr_cacheNew(int64_t max_bytes)
 
 void tr_cacheFree(tr_cache* cache)
 {
-    // FIXME(ckerr): this assertion isn't _always_ going to be true,
-    // e.g. if writing to disk failed due to disk full / permission error etc
-    // then there is still going to be data sitting in the cache on shutdown.
-    // Make this assertion smarter or remove it.
-    TR_ASSERT(tr_ptrArrayEmpty(&cache->blocks));
-
     tr_ptrArrayDestruct(&cache->blocks, nullptr);
     tr_free(cache);
 }
