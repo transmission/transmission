@@ -360,9 +360,12 @@ bool tr_saveFile(std::string const& filename, std::string_view contents, tr_erro
 {
     // follow symlinks to find the "real" file, to make sure the temporary
     // we build with tr_sys_file_open_temp() is created on the right partition
-    if (char* real_filename = tr_sys_path_resolve(filename.c_str(), nullptr); real_filename != nullptr)
+    if (char* const real_filename_c_str = tr_sys_path_resolve(filename.c_str(), nullptr); real_filename_c_str != nullptr)
     {
-        if (auto const rfsv = std::string_view{ real_filename }; rfsv != filename)
+        auto const real_filename = std::string{ real_filename_c_str };
+        tr_free(real_filename_c_str);
+
+        if (real_filename != filename)
         {
             return tr_saveFile(real_filename, contents, error);
         }

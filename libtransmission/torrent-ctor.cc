@@ -80,6 +80,7 @@ bool tr_ctorSetMetainfoFromFile(tr_ctor* ctor, std::string const& filename, tr_e
         return false;
     }
 
+    ctor->torrent_filename = filename;
     auto const contents_sv = std::string_view{ std::data(ctor->contents), std::size(ctor->contents) };
     return ctor->metainfo.parseBenc(contents_sv, error);
 }
@@ -91,6 +92,7 @@ bool tr_ctorSetMetainfoFromFile(tr_ctor* ctor, char const* filename, tr_error** 
 
 bool tr_ctorSetMetainfo(tr_ctor* ctor, char const* metainfo, size_t len, tr_error** error)
 {
+    ctor->torrent_filename.clear();
     ctor->contents.assign(metainfo, metainfo + len);
     auto const contents_sv = std::string_view{ std::data(ctor->contents), std::size(ctor->contents) };
     return ctor->metainfo.parseBenc(contents_sv, error);
@@ -98,6 +100,7 @@ bool tr_ctorSetMetainfo(tr_ctor* ctor, char const* metainfo, size_t len, tr_erro
 
 bool tr_ctorSetMetainfoFromMagnetLink(tr_ctor* ctor, char const* magnet_link, tr_error** error)
 {
+    ctor->torrent_filename.clear();
     return ctor->metainfo.parseMagnet(magnet_link ? magnet_link : "", error);
 }
 
@@ -108,7 +111,7 @@ std::string_view tr_ctorGetContents(tr_ctor const* ctor)
 
 char const* tr_ctorGetSourceFile(tr_ctor const* ctor)
 {
-    return ctor->metainfo.torrentFile().c_str();
+    return ctor->torrent_filename.c_str();
 }
 
 bool tr_ctorSaveContents(tr_ctor const* ctor, std::string const& filename, tr_error** error)
