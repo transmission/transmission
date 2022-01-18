@@ -595,12 +595,12 @@ static void on_tracker_connection_response(struct tau_tracker* tracker, tau_acti
     {
         size_t const buflen = buf != nullptr ? evbuffer_get_length(buf) : 0;
 
-        char* const errmsg = action == TAU_ACTION_ERROR && buflen > 0 ? tr_strndup(evbuffer_pullup(buf, -1), buflen) :
-                                                                        tr_strdup(_("Connection failed"));
+        auto const errmsg = action == TAU_ACTION_ERROR && buflen > 0 ?
+            std::string_view{ reinterpret_cast<char const*>(evbuffer_pullup(buf, -1)), buflen } :
+            std::string_view{ _("Connection failed") };
 
-        dbgmsg(tracker->key, "%s", errmsg);
+        dbgmsg(tracker->key, "%" TR_PRIsv, TR_PRIsv_ARG(errmsg));
         tau_tracker_fail_all(tracker, true, false, errmsg);
-        tr_free(errmsg);
     }
 
     tau_tracker_upkeep(tracker);
