@@ -1092,6 +1092,7 @@ PrefsDialog::PrefsDialog(Gtk::Window& parent, Glib::RefPtr<Session> const& core)
     : Gtk::Dialog(_("Transmission Preferences"), parent)
     , impl_(std::make_unique<Impl>(*this, core))
 {
+    set_modal(true);
 }
 
 PrefsDialog::~PrefsDialog() = default;
