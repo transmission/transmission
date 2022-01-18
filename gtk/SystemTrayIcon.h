@@ -12,6 +12,8 @@
 
 #include <gtkmm.h>
 
+#include <libtransmission/tr-macros.h>
+
 class Session;
 
 class SystemTrayIcon
@@ -19,6 +21,8 @@ class SystemTrayIcon
 public:
     SystemTrayIcon(Gtk::Window& main_window, Glib::RefPtr<Session> const& core);
     ~SystemTrayIcon();
+
+    TR_DISABLE_COPY_MOVE(SystemTrayIcon)
 
     void refresh();
 

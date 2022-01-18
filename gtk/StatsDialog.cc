@@ -6,6 +6,8 @@
  *
  */
 
+#include <memory>
+
 #include <glibmm.h>
 #include <glibmm/i18n.h>
 
@@ -25,6 +27,8 @@ class StatsDialog::Impl
 public:
     Impl(StatsDialog& dialog, Glib::RefPtr<Session> const& core);
     ~Impl();
+
+    TR_DISABLE_COPY_MOVE(Impl)
 
 private:
     bool updateStats();

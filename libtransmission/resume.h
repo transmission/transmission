@@ -12,7 +12,10 @@
 #error only libtransmission should #include this header.
 #endif
 
-#include "tr-macros.h"
+#include <cstdint>
+
+struct tr_ctor;
+struct tr_torrent;
 
 enum
 {
@@ -47,7 +50,3 @@ enum
 uint64_t tr_torrentLoadResume(tr_torrent* tor, uint64_t fieldsToLoad, tr_ctor const* ctor, bool* didRenameToHashOnlyName);
 
 void tr_torrentSaveResume(tr_torrent* tor);
-
-void tr_torrentRemoveResume(tr_torrent const* tor);
-
-int tr_torrentRenameResume(tr_torrent const* tor, char const* newname);

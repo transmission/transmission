@@ -55,7 +55,7 @@ extern "C"
 namespace
 {
 
-#define MY_NAME "tr_crypto_utils"
+static char constexpr MyName[] = "tr_crypto_utils";
 
 char const* ccrypto_error_to_str(CCCryptorStatus error_code)
 {
@@ -100,7 +100,7 @@ void log_ccrypto_error(CCCryptorStatus error_code, char const* file, int line)
             file,
             line,
             TR_LOG_ERROR,
-            MY_NAME,
+            MyName,
             "CCrypto error (%d): %s",
             error_code,
             ccrypto_error_to_str(error_code));
@@ -163,17 +163,17 @@ bool tr_sha1_update(tr_sha1_ctx_t handle, void const* data, size_t data_length)
     return true;
 }
 
-bool tr_sha1_final(tr_sha1_ctx_t handle, uint8_t* hash)
+std::optional<tr_sha1_digest_t> tr_sha1_final(tr_sha1_ctx_t raw_handle)
 {
-    if (hash != nullptr)
-    {
-        TR_ASSERT(handle != nullptr);
+    TR_ASSERT(raw_handle != nullptr);
+    auto* handle = static_cast<CC_SHA1_CTX*>(raw_handle);
 
-        CC_SHA1_Final(hash, static_cast<CC_SHA1_CTX*>(handle));
-    }
+    auto digest = tr_sha1_digest_t{};
+    auto* const digest_as_uchar = reinterpret_cast<unsigned char*>(std::data(digest));
+    CC_SHA1_Final(digest_as_uchar, handle);
 
-    delete static_cast<CC_SHA1_CTX*>(handle);
-    return true;
+    delete handle;
+    return digest;
 }
 
 /***

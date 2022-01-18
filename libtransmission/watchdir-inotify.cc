@@ -8,7 +8,6 @@
 
 #include <cerrno>
 #include <climits> /* NAME_MAX */
-#include <cstdlib> /* realloc() */
 
 #include <unistd.h> /* close() */
 
@@ -72,7 +71,7 @@ static void tr_watchdir_inotify_on_event(struct bufferevent* event, void* contex
 #endif
     struct inotify_event ev;
     size_t name_size = NAME_MAX + 1;
-    char* name = tr_new(char, name_size);
+    auto* name = tr_new(char, name_size);
 
     /* Read the size of the struct excluding name into buf. Guaranteed to have at
        least sizeof(ev) available */
@@ -122,7 +121,7 @@ static void tr_watchdir_inotify_on_event(struct bufferevent* event, void* contex
 
 static void tr_watchdir_inotify_free(tr_watchdir_backend* backend_base)
 {
-    tr_watchdir_inotify* const backend = BACKEND_UPCAST(backend_base);
+    auto* const backend = BACKEND_UPCAST(backend_base);
 
     if (backend == nullptr)
     {

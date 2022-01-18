@@ -11,6 +11,8 @@
 #include <cstdlib>
 #include <cstring>
 #include <cwchar>
+#include <map>
+#include <string_view>
 
 #include <windows.h>
 
@@ -20,13 +22,15 @@
 #include "tr-assert.h"
 #include "utils.h"
 
+using namespace std::literals;
+
 enum tr_app_type
 {
     TR_APP_TYPE_EXE,
     TR_APP_TYPE_BATCH
 };
 
-static void set_system_error(tr_error** error, DWORD code, char const* what)
+static void set_system_error(tr_error** error, DWORD code, std::string_view what)
 {
     if (error == nullptr)
     {
@@ -40,14 +44,7 @@ static void set_system_error(tr_error** error, DWORD code, char const* what)
         message = tr_strdup_printf("Unknown error: 0x%08lx", code);
     }
 
-    if (what == nullptr)
-    {
-        tr_error_set_literal(error, code, message);
-    }
-    else
-    {
-        tr_error_set(error, code, "%s failed: %s", what, message);
-    }
+    tr_error_set(error, code, tr_strvJoin(what, " failed: "sv, message));
 
     tr_free(message);
 }
@@ -128,28 +125,19 @@ static int compare_env_part_names(void const* vlhs, void const* vrhs)
     return ret;
 }
 
-static wchar_t** to_wide_env(char const* const* env)
+static wchar_t** to_wide_env(std::map<std::string_view, std::string_view> const& env)
 {
-    if (env == nullptr || env[0] == nullptr)
+    auto const part_count = std::size(env);
+    wchar_t** const wide_env = tr_new(wchar_t*, part_count + 1);
+
+    int i = 0;
+    for (auto const& [key_sv, val_sv] : env)
     {
-        return nullptr;
+        auto const line = tr_strvJoin(key_sv, "="sv, val_sv);
+        wide_env[i++] = tr_win32_utf8_to_native(std::data(line), std::size(line));
     }
-
-    size_t part_count = 0;
-
-    while (env[part_count] != nullptr)
-    {
-        ++part_count;
-    }
-
-    wchar_t** wide_env = tr_new(wchar_t*, part_count + 1);
-
-    for (size_t i = 0; i < part_count; ++i)
-    {
-        wide_env[i] = tr_win32_utf8_to_native(env[i], -1);
-    }
-
-    wide_env[part_count] = nullptr;
+    wide_env[i] = nullptr;
+    TR_ASSERT(i == part_count);
 
     /* "The sort is case-insensitive, Unicode order, without regard to locale" (c) MSDN */
     qsort(wide_env, part_count, sizeof(wchar_t*), &compare_env_part_names);
@@ -157,7 +145,21 @@ static wchar_t** to_wide_env(char const* const* env)
     return wide_env;
 }
 
-static bool create_env_block(char const* const* env, wchar_t** env_block, tr_error** error)
+static void tr_free_ptrv(void* const* p)
+{
+    if (p == nullptr)
+    {
+        return;
+    }
+
+    while (*p != nullptr)
+    {
+        tr_free(*p);
+        ++p;
+    }
+}
+
+static bool create_env_block(std::map<std::string_view, std::string_view> const& env, wchar_t** env_block, tr_error** error)
 {
     wchar_t** wide_env = to_wide_env(env);
 
@@ -379,7 +381,11 @@ cleanup:
     return ret;
 }
 
-bool tr_spawn_async(char* const* cmd, char* const* env, char const* work_dir, tr_error** error)
+bool tr_spawn_async(
+    char const* const* cmd,
+    std::map<std::string_view, std::string_view> const& env,
+    char const* work_dir,
+    tr_error** error)
 {
     wchar_t* env_block = nullptr;
 

@@ -53,14 +53,14 @@ auto tr_watchdir_generic_interval = timeval{ 10, 0 };
 static void tr_watchdir_generic_on_event(evutil_socket_t /*fd*/, short /*type*/, void* context)
 {
     auto const handle = static_cast<tr_watchdir_t>(context);
-    tr_watchdir_generic* const backend = BACKEND_UPCAST(tr_watchdir_get_backend(handle));
+    auto* const backend = BACKEND_UPCAST(tr_watchdir_get_backend(handle));
 
     tr_watchdir_scan(handle, &backend->dir_entries);
 }
 
 static void tr_watchdir_generic_free(tr_watchdir_backend* backend_base)
 {
-    tr_watchdir_generic* const backend = BACKEND_UPCAST(backend_base);
+    auto* const backend = BACKEND_UPCAST(backend_base);
 
     if (backend == nullptr)
     {

@@ -33,8 +33,8 @@ FilterBarComboBox::FilterBarComboBox(QWidget* parent)
 QSize FilterBarComboBox::minimumSizeHint() const
 {
     QFontMetrics fm(fontMetrics());
-    QSize const text_size = fm.boundingRect(itemText(0)).size();
-    QSize const count_size = fm.boundingRect(itemData(0, CountStringRole).toString()).size();
+    QSize const text_size = fm.size(0, itemText(0));
+    QSize const count_size = fm.size(0, itemData(0, CountStringRole).toString());
     return calculateSize(text_size, count_size);
 }
 
@@ -46,11 +46,11 @@ QSize FilterBarComboBox::sizeHint() const
 
     for (int i = 0, n = count(); i < n; ++i)
     {
-        QSize const text_size = fm.boundingRect(itemText(i)).size();
+        QSize const text_size = fm.size(0, itemText(i));
         max_text_size.setHeight(qMax(max_text_size.height(), text_size.height()));
         max_text_size.setWidth(qMax(max_text_size.width(), text_size.width()));
 
-        QSize const count_size = fm.boundingRect(itemData(i, CountStringRole).toString()).size();
+        QSize const count_size = fm.size(0, itemData(i, CountStringRole).toString());
         max_count_size.setHeight(qMax(max_count_size.height(), count_size.height()));
         max_count_size.setWidth(qMax(max_count_size.width(), count_size.width()));
     }
@@ -116,7 +116,7 @@ void FilterBarComboBox::paintEvent(QPaintEvent* e)
             QRect const text_rect = QStyle::alignedRect(
                 opt.direction,
                 Qt::AlignRight | Qt::AlignVCenter,
-                QSize(opt.fontMetrics.boundingRect(text).width(), rect.height()),
+                QSize(opt.fontMetrics.size(0, text).width(), rect.height()),
                 rect);
             painter.drawText(text_rect, Qt::AlignRight | Qt::AlignVCenter, text);
             Utils::narrowRect(rect, 0, text_rect.width() + hmargin, opt.direction);

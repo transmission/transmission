@@ -11,8 +11,9 @@
 
 #include <libtransmission/transmission.h>
 
-#include <libtransmission/crypto-utils.h> // tr_base64_encode()
+#include <libtransmission/torrent-metainfo.h>
 #include <libtransmission/utils.h>
+#include <libtransmission/error.h>
 
 #include "AddData.h"
 #include "Utils.h"
@@ -20,22 +21,15 @@
 namespace
 {
 
-QString getNameFromMetainfo(QByteArray const& metainfo)
+QString getNameFromMetainfo(QByteArray const& benc)
 {
-    QString name;
-
-    tr_ctor* ctor = tr_ctorNew(nullptr);
-    tr_ctorSetMetainfo(ctor, metainfo.constData(), metainfo.size());
-
-    auto inf = tr_info{};
-    if (tr_torrentParse(ctor, &inf) == TR_PARSE_OK)
+    auto metainfo = tr_torrent_metainfo{};
+    if (!metainfo.parseBenc({ benc.constData(), size_t(benc.size()) }))
     {
-        name = QString::fromUtf8(inf.name); // metainfo is required to be UTF-8
-        tr_metainfoFree(&inf);
+        return {};
     }
 
-    tr_ctorFree(ctor);
-    return name;
+    return QString::fromStdString(metainfo.name());
 }
 
 } // namespace
@@ -69,13 +63,10 @@ int AddData::set(QString const& key)
     }
     else
     {
-        size_t len;
-        void* raw = tr_base64_decode(key.toUtf8().constData(), key.toUtf8().size(), &len);
-
-        if (raw != nullptr)
+        auto raw = QByteArray::fromBase64(key.toUtf8());
+        if (!raw.isEmpty())
         {
-            metainfo.append(static_cast<char const*>(raw), int(len));
-            tr_free(raw);
+            metainfo.append(raw);
             type = METAINFO;
         }
         else
@@ -89,17 +80,7 @@ int AddData::set(QString const& key)
 
 QByteArray AddData::toBase64() const
 {
-    QByteArray ret;
-
-    if (!metainfo.isEmpty())
-    {
-        size_t len;
-        void* b64 = tr_base64_encode(metainfo.constData(), metainfo.size(), &len);
-        ret = QByteArray(static_cast<char const*>(b64), int(len));
-        tr_free(b64);
-    }
-
-    return ret;
+    return metainfo.toBase64();
 }
 
 QString AddData::readableName() const

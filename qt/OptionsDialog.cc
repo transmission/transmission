@@ -14,6 +14,7 @@
 #include <libtransmission/transmission.h>
 #include <libtransmission/utils.h> /* mime64 */
 #include <libtransmission/variant.h>
+#include <libtransmission/torrent-metainfo.h>
 
 #include "AddData.h"
 #include "FileTreeModel.h"
@@ -131,12 +132,7 @@ OptionsDialog::~OptionsDialog()
 
 void OptionsDialog::clearInfo()
 {
-    if (have_info_)
-    {
-        tr_metainfoFree(&info_);
-    }
-
-    have_info_ = false;
+    metainfo_.reset();
     files_.clear();
 }
 
@@ -144,55 +140,59 @@ void OptionsDialog::reload()
 {
     clearInfo();
 
-    tr_ctor* ctor = tr_ctorNew(nullptr);
+    auto metainfo = tr_torrent_metainfo{};
+    auto ok = bool{};
 
     switch (add_.type)
     {
     case AddData::MAGNET:
-        tr_ctorSetMetainfoFromMagnetLink(ctor, add_.magnet.toUtf8().constData());
+        ok = metainfo.parseMagnet(add_.magnet.toStdString());
         break;
 
     case AddData::FILENAME:
-        tr_ctorSetMetainfoFromFile(ctor, add_.filename.toUtf8().constData());
+        ok = metainfo.parseTorrentFile(add_.filename.toStdString());
         break;
 
     case AddData::METAINFO:
-        tr_ctorSetMetainfo(ctor, add_.metainfo.constData(), add_.metainfo.size());
+        ok = metainfo.parseBenc(add_.metainfo.toStdString());
         break;
 
     default:
         break;
     }
 
-    int const err = tr_torrentParse(ctor, &info_);
-    have_info_ = err == 0;
-    tr_ctorFree(ctor);
-
+    metainfo_.reset();
     ui_.filesView->clear();
     files_.clear();
     priorities_.clear();
     wanted_.clear();
 
-    bool const have_files_to_show = have_info_ && info_.fileCount > 0;
+    if (ok)
+    {
+        metainfo_ = metainfo;
+    }
+
+    bool const have_files_to_show = metainfo_ && !std::empty(*metainfo_);
 
     ui_.filesView->setVisible(have_files_to_show);
     layout()->setSizeConstraint(have_files_to_show ? QLayout::SetDefaultConstraint : QLayout::SetFixedSize);
 
-    if (have_info_)
+    if (metainfo_)
     {
-        priorities_.assign(info_.fileCount, TR_PRI_NORMAL);
-        wanted_.assign(info_.fileCount, true);
+        auto const n_files = metainfo_->fileCount();
+        priorities_.assign(n_files, TR_PRI_NORMAL);
+        wanted_.assign(n_files, true);
 
-        for (tr_file_index_t i = 0; i < info_.fileCount; ++i)
+        for (tr_file_index_t i = 0; i < n_files; ++i)
         {
-            TorrentFile file;
-            file.index = i;
-            file.priority = priorities_[i];
-            file.wanted = wanted_[i];
-            file.size = info_.files[i].length;
-            file.have = 0;
-            file.filename = QString::fromUtf8(info_.files[i].name);
-            files_.push_back(file);
+            auto f = TorrentFile{};
+            f.index = i;
+            f.priority = priorities_[i];
+            f.wanted = wanted_[i];
+            f.size = metainfo_->fileSize(i);
+            f.have = 0;
+            f.filename = QString::fromStdString(metainfo_->fileSubpath(i));
+            files_.push_back(f);
         }
     }
 

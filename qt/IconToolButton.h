@@ -10,7 +10,7 @@
 
 #include <QToolButton>
 
-#include "Macros.h"
+#include <libtransmission/tr-macros.h>
 
 class IconToolButton : public QToolButton
 {

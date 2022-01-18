@@ -12,8 +12,11 @@
 #error only libtransmission should #include this header.
 #endif
 
+#include <cstddef> // size_t
+
 #include "transmission.h"
-#include "tr-assert.h"
+
+#include "tr-macros.h"
 
 /**
  * @addtogroup utils Utilities
@@ -44,14 +47,7 @@ void tr_ptrArrayForeach(tr_ptrArray* array, PtrArrayForeachFunc func);
 
 /** @brief Return the nth item in a tr_ptrArray
     @return the nth item in a tr_ptrArray */
-constexpr void* tr_ptrArrayNth(tr_ptrArray* array, int i)
-{
-    TR_ASSERT(array != nullptr);
-    TR_ASSERT(i >= 0);
-    TR_ASSERT(i < array->n_items);
-
-    return array->items[i];
-}
+void* tr_ptrArrayNth(tr_ptrArray* array, int i);
 
 /** @brief Remove the last item from the array and return it
     @return the pointer that's been removed from the array

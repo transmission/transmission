@@ -7,13 +7,15 @@
  */
 
 #include <algorithm>
-#include <cstring> /* strlen() */
+#include <string_view>
 
 #include "transmission.h"
 #include "error.h"
 #include "file.h"
 #include "tr-assert.h"
 #include "utils.h"
+
+using namespace std::literals;
 
 bool tr_sys_file_read_line(tr_sys_file_t handle, char* buffer, size_t buffer_size, tr_error** error)
 {
@@ -81,41 +83,15 @@ bool tr_sys_file_read_line(tr_sys_file_t handle, char* buffer, size_t buffer_siz
     return ret;
 }
 
-bool tr_sys_file_write_line(tr_sys_file_t handle, char const* buffer, tr_error** error)
+bool tr_sys_file_write_line(tr_sys_file_t handle, std::string_view buffer, tr_error** error)
 {
     TR_ASSERT(handle != TR_BAD_SYS_FILE);
-    TR_ASSERT(buffer != nullptr);
 
-    bool ret = tr_sys_file_write(handle, buffer, strlen(buffer), nullptr, error);
+    bool ret = tr_sys_file_write(handle, std::data(buffer), std::size(buffer), nullptr, error);
 
     if (ret)
     {
         ret = tr_sys_file_write(handle, TR_NATIVE_EOL_STR, TR_NATIVE_EOL_STR_SIZE, nullptr, error);
-    }
-
-    return ret;
-}
-
-bool tr_sys_file_write_fmt(tr_sys_file_t handle, char const* format, tr_error** error, ...)
-{
-    TR_ASSERT(handle != TR_BAD_SYS_FILE);
-    TR_ASSERT(format != nullptr);
-
-    bool ret = false;
-    va_list args;
-
-    va_start(args, error);
-    char* const buffer = tr_strdup_vprintf(format, args);
-    va_end(args);
-
-    if (buffer != nullptr)
-    {
-        ret = tr_sys_file_write(handle, buffer, strlen(buffer), nullptr, error);
-        tr_free(buffer);
-    }
-    else
-    {
-        tr_error_set_literal(error, 0, "Unable to format message.");
     }
 
     return ret;

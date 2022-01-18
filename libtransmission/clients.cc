@@ -13,7 +13,6 @@
 #include <cctype> /* isprint() */
 #include <cstdlib> /* strtol() */
 #include <cstring>
-#include <iterator>
 #include <optional>
 #include <string_view>
 #include <tuple>
@@ -93,12 +92,12 @@ auto constexpr charints = std::array<std::string_view, 256>{
       "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x" }
 };
 
-int strint(void const* pch, int span)
+int strint(void const* pch, int span, int base = 0)
 {
     char tmp[64];
     memcpy(tmp, pch, span);
     tmp[span] = '\0';
-    return strtol(tmp, nullptr, 0);
+    return strtol(tmp, nullptr, base);
 }
 
 constexpr std::string_view getMnemonicEnd(uint8_t ch)
@@ -130,6 +129,8 @@ void two_major_two_minor_formatter(char* buf, size_t buflen, std::string_view na
 
 bool decodeShad0wClient(char* buf, size_t buflen, std::string_view in)
 {
+    auto const* const buf_in = buf;
+
     // Shad0w with his experimental BitTorrent implementation and BitTornado
     // introduced peer ids that begin with a character which is``T`` in the
     // case of BitTornado followed by up to five ascii characters for version
@@ -142,7 +143,7 @@ bool decodeShad0wClient(char* buf, size_t buflen, std::string_view in)
     {
         auto constexpr str = std::string_view{ "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz.-" };
         auto const pos = str.find(ch);
-        return pos != std::string_view::npos ? pos : std::optional<int>{};
+        return pos != std::string_view::npos ? std::make_optional(pos) : std::nullopt;
     };
 
     auto peer_id = std::string_view{ std::data(in), 9 };
@@ -200,7 +201,10 @@ bool decodeShad0wClient(char* buf, size_t buflen, std::string_view in)
         std::rbegin(vals),
         std::rend(vals),
         [&buf, &buflen](int num) { std::tie(buf, buflen) = buf_append(buf, buflen, num, '.'); });
-    buf[-1] = '\0'; // remove trailing '.'
+    if (buf > buf_in)
+    {
+        buf[-1] = '\0'; // remove trailing '.'
+    }
     return true;
 }
 
@@ -438,15 +442,35 @@ void transmission_formatter(char* buf, size_t buflen, std::string_view name, tr_
     }
 }
 
-constexpr void utorrent_formatter(char* buf, size_t buflen, std::string_view name, tr_peer_id_t id)
+void utorrent_formatter(char* buf, size_t buflen, std::string_view name, tr_peer_id_t id)
 {
     if (id[7] == '-')
     {
-        buf_append(buf, buflen, name, ' ', id[3], '.', id[4], '.', id[5], getMnemonicEnd(id[6]));
+        buf_append(
+            buf,
+            buflen,
+            name,
+            ' ',
+            strint(&id[3], 1, 16),
+            '.',
+            strint(&id[4], 1, 16),
+            '.',
+            strint(&id[5], 1, 16),
+            getMnemonicEnd(id[6]));
     }
     else // uTorrent replaces the trailing dash with an extra digit for longer version numbers
     {
-        buf_append(buf, buflen, name, ' ', id[3], '.', id[4], '.', id[5], id[6], getMnemonicEnd(id[6]));
+        buf_append(
+            buf,
+            buflen,
+            name,
+            ' ',
+            strint(&id[3], 1, 16),
+            '.',
+            strint(&id[4], 1, 16),
+            '.',
+            strint(&id[5], 2, 10),
+            getMnemonicEnd(id[7]));
     }
 }
 

@@ -12,10 +12,11 @@
 #error only libtransmission should #include this header.
 #endif
 
-#include "tr-macros.h"
+#include <cstdint> // intX_t, uintX_t
 
 struct evbuffer;
 struct tr_cache;
+struct tr_torrent;
 
 /***
 ****

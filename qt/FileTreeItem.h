@@ -17,7 +17,7 @@
 #include <QString>
 #include <QVariant>
 
-#include "Macros.h"
+#include <libtransmission/tr-macros.h>
 
 class FileTreeItem
 {

@@ -14,8 +14,9 @@
 #include <QTimer>
 #include <QWidget>
 
+#include <libtransmission/tr-macros.h>
+
 #include "FaviconCache.h"
-#include "Macros.h"
 #include "Torrent.h"
 #include "Typedefs.h"
 

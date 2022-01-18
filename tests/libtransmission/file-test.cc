@@ -124,7 +124,7 @@ protected:
                 slash_pos = p + strlen(p) - 1;
             }
 
-            auto const path_part = makeString(tr_strndup(path, size_t(slash_pos - path + 1)));
+            auto const path_part = std::string{ path, size_t(slash_pos - path + 1) };
 
             if (!tr_sys_path_get_info(path_part.c_str(), TR_SYS_PATH_NO_FOLLOW, &info, nullptr) ||
                 (info.type != TR_SYS_PATH_IS_FILE && info.type != TR_SYS_PATH_IS_DIRECTORY))
@@ -1320,13 +1320,13 @@ TEST_F(FileTest, fileUtilities)
     EXPECT_EQ(nullptr, err);
     EXPECT_TRUE(tr_sys_file_write_line(fd, "qr", &err));
     EXPECT_EQ(nullptr, err);
-    EXPECT_TRUE(tr_sys_file_write_fmt(fd, "s%cu\r\n", &err, 't'));
+    EXPECT_TRUE(tr_sys_file_write_line(fd, "stu", &err));
     EXPECT_EQ(nullptr, err);
     EXPECT_TRUE(tr_sys_file_write_line(fd, "", &err));
     EXPECT_EQ(nullptr, err);
     EXPECT_TRUE(tr_sys_file_write_line(fd, "", &err));
     EXPECT_EQ(nullptr, err);
-    EXPECT_TRUE(tr_sys_file_write_fmt(fd, "v%sy%d", &err, "wx", 2));
+    EXPECT_TRUE(tr_sys_file_write_line(fd, "vwxy2", &err));
     EXPECT_EQ(nullptr, err);
 
     tr_sys_file_seek(fd, 0, TR_SEEK_SET, nullptr, nullptr);

@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include <ctime>
 #include <memory>
 #include <unordered_set>
 
@@ -16,8 +17,9 @@
 #include <QTimer>
 #include <QTranslator>
 
+#include <libtransmission/tr-macros.h>
+
 #include "FaviconCache.h"
-#include "Macros.h"
 #include "Typedefs.h"
 #include "Utils.h" // std::hash<QString>
 

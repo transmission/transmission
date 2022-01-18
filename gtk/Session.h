@@ -23,6 +23,7 @@
 #pragma once
 
 #include <memory>
+#include <string>
 #include <vector>
 
 #include <giomm.h>
@@ -30,9 +31,8 @@
 #include <gtkmm.h>
 
 #include <libtransmission/transmission.h>
+#include <libtransmission/tr-macros.h>
 #include <libtransmission/variant.h>
-
-#define TR_RESOURCE_PATH "/com/transmissionbt/transmission/"
 
 class Session : public Glib::Object
 {
@@ -46,6 +46,8 @@ public:
 
 public:
     ~Session() override;
+
+    TR_DISABLE_COPY_MOVE(Session)
 
     static Glib::RefPtr<Session> create(tr_session* session);
 
@@ -145,7 +147,7 @@ public:
     sigc::signal<void(bool)>& signal_port_tested();
 
 protected:
-    Session(tr_session* session);
+    explicit Session(tr_session* session);
 
 private:
     class Impl;
@@ -162,7 +164,7 @@ public:
     TorrentModelColumns();
 
     Gtk::TreeModelColumn<Glib::ustring> name_collated;
-    Gtk::TreeModelColumn<void*> torrent;
+    Gtk::TreeModelColumn<gpointer> torrent;
     Gtk::TreeModelColumn<int> torrent_id;
     Gtk::TreeModelColumn<double> speed_up;
     Gtk::TreeModelColumn<double> speed_down;

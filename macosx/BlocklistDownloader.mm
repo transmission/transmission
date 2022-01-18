@@ -28,7 +28,7 @@
 @interface BlocklistDownloader (Private)
 
 - (void)startDownload;
-- (void)decompressBlocklist;
+- (void)decompressFrom:(NSURL*)file to:(NSURL*)destination error:(NSError**)error;
 
 @end
 
@@ -89,27 +89,31 @@ BlocklistDownloader* fBLDownloader = nil;
  totalBytesWritten:(int64_t)totalBytesWritten 
 totalBytesExpectedToWrite:(int64_t)totalBytesExpectedToWrite
 {
-    fState = BLOCKLIST_DL_DOWNLOADING;
+    dispatch_async(dispatch_get_main_queue(), ^{
+        fState = BLOCKLIST_DL_DOWNLOADING;
 
-    fCurrentSize = totalBytesWritten;
-    fExpectedSize = totalBytesExpectedToWrite;
+        fCurrentSize = totalBytesWritten;
+        fExpectedSize = totalBytesExpectedToWrite;
 
-    [fViewController setStatusProgressForCurrentSize:fCurrentSize expectedSize:fExpectedSize];
+        [fViewController setStatusProgressForCurrentSize:fCurrentSize expectedSize:fExpectedSize];
+    });
 }
 
 - (void)URLSession:(NSURLSession *)session 
               task:(NSURLSessionTask *)task 
 didCompleteWithError:(NSError *)error
 {
-    if (error)
-    {
-        [fViewController setFailed:error.localizedDescription];
-    }
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (error)
+        {
+            [fViewController setFailed:error.localizedDescription];
+        }
 
-    [NSUserDefaults.standardUserDefaults setObject:[NSDate date] forKey:@"BlocklistNewLastUpdate"];
-    [BlocklistScheduler.scheduler updateSchedule];
+        [NSUserDefaults.standardUserDefaults setObject:[NSDate date] forKey:@"BlocklistNewLastUpdate"];
+        [BlocklistScheduler.scheduler updateSchedule];
 
-    fBLDownloader = nil;
+        fBLDownloader = nil;
+    });
 }
 
 - (void)URLSession:(NSURLSession *)session 
@@ -118,39 +122,57 @@ didFinishDownloadingToURL:(NSURL *)location
 {
     fState = BLOCKLIST_DL_PROCESSING;
 
-    [fViewController setStatusProcessing];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [fViewController setStatusProcessing];
+    });
 
-    fDestination = [NSTemporaryDirectory() stringByAppendingPathComponent:location.lastPathComponent];
-    [NSFileManager.defaultManager moveItemAtPath:location.path toPath:fDestination error:nil];
+    NSString* filename = downloadTask.response.suggestedFilename;
+    if (filename == nil)
+    {
+        filename = @"transmission-blocklist.tmp";
+    }
 
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        [self decompressBlocklist];
+    NSString* tempFile = [NSTemporaryDirectory() stringByAppendingPathComponent:filename];
+    NSString* blocklistFile = [NSTemporaryDirectory() stringByAppendingPathComponent:@"transmission-blocklist"];
 
-        dispatch_async(dispatch_get_main_queue(), ^{
-            int const count = tr_blocklistSetContent(((Controller*)NSApp.delegate).sessionHandle, fDestination.UTF8String);
+    [NSFileManager.defaultManager moveItemAtPath:location.path toPath:tempFile error:nil];
 
-            //delete downloaded file
-            [NSFileManager.defaultManager removeItemAtPath:fDestination error:nil];
+    if ([@"text/plain" isEqualToString:downloadTask.response.MIMEType])
+    {
+        blocklistFile = tempFile;
+    }
+    else
+    {
+        [self decompressFrom:[NSURL fileURLWithPath:tempFile]
+                          to:[NSURL fileURLWithPath:blocklistFile]
+                       error:nil];
+        [NSFileManager.defaultManager removeItemAtPath:tempFile error:nil];
+    }
 
-            if (count > 0)
-            {
-                [fViewController setFinished];
-            }
-            else
-            {
-                [fViewController setFailed:NSLocalizedString(@"The specified blocklist file did not contain any valid rules.", "blocklist fail message")];
-            }
+    dispatch_async(dispatch_get_main_queue(), ^{
+        const int count = tr_blocklistSetContent(((Controller*)NSApp.delegate).sessionHandle, blocklistFile.UTF8String);
 
-            //update last updated date for schedule
-            NSDate* date = [NSDate date];
-            [NSUserDefaults.standardUserDefaults setObject:date forKey:@"BlocklistNewLastUpdate"];
-            [NSUserDefaults.standardUserDefaults setObject:date forKey:@"BlocklistNewLastUpdateSuccess"];
-            [BlocklistScheduler.scheduler updateSchedule];
+        //delete downloaded file
+        [NSFileManager.defaultManager removeItemAtPath:blocklistFile error:nil];
 
-            [NSNotificationCenter.defaultCenter postNotificationName:@"BlocklistUpdated" object:nil];
+        if (count > 0)
+        {
+            [fViewController setFinished];
+        }
+        else
+        {
+            [fViewController setFailed:NSLocalizedString(@"The specified blocklist file did not contain any valid rules.", "blocklist fail message")];
+        }
 
-            fBLDownloader = nil;
-        });
+        //update last updated date for schedule
+        NSDate* date = [NSDate date];
+        [NSUserDefaults.standardUserDefaults setObject:date forKey:@"BlocklistNewLastUpdate"];
+        [NSUserDefaults.standardUserDefaults setObject:date forKey:@"BlocklistNewLastUpdateSuccess"];
+        [BlocklistScheduler.scheduler updateSchedule];
+
+        [NSNotificationCenter.defaultCenter postNotificationName:@"BlocklistUpdated" object:nil];
+
+        fBLDownloader = nil;
     });
 }
 
@@ -175,85 +197,219 @@ didFinishDownloadingToURL:(NSURL *)location
     }
     else if (![urlString isEqualToString:@""] && [urlString rangeOfString:@"://"].location == NSNotFound)
     {
-        urlString = [@"http://" stringByAppendingString:urlString];
+        urlString = [@"https://" stringByAppendingString:urlString];
     }
 
     NSURLSessionDownloadTask* task = [fSession downloadTaskWithURL:[NSURL URLWithString:urlString]];
     [task resume];
 }
 
-//.gz, .tar.gz, .tgz, and .bgz will be decompressed by NSURLSessionDownloadTask for us.
-// However, we have to do .zip files manually.
-- (void)decompressBlocklist
+- (void)decompressFrom:(NSURL*)file to:(NSURL*)destination error:(NSError**)error
 {
-    if ([fDestination.pathExtension.lowercaseString isEqualToString:@"zip"])
+    if ([self untarFrom:file to:destination])
     {
-        BOOL success = NO;
+        return;
+    }
 
-        NSString* workingDirectory = fDestination.stringByDeletingLastPathComponent;
+    if ([self unzipFrom:file to:destination])
+    {
+        return;
+    }
 
-        //First, perform the actual unzipping
-        NSTask* unzip = [[NSTask alloc] init];
-        unzip.launchPath = @"/usr/bin/unzip";
-        unzip.currentDirectoryPath = workingDirectory;
-        unzip.arguments = @[
-            @"-o", /* overwrite */
-            @"-q", /* quiet! */
-            fDestination, /* source zip file */
-            @"-d",
-            workingDirectory /*destination*/
-        ];
+    if ([self gunzipFrom:file to:destination])
+    {
+        return;
+    }
 
-        @try
+    // If it doesn't look like archive just copy it to destination
+    else
+    {
+        [NSFileManager.defaultManager copyItemAtURL:file toURL:destination error:error];
+    }
+}
+
+- (BOOL)untarFrom:(NSURL*)file to:(NSURL*)destination
+{
+    NSTask* tarList = [[NSTask alloc] init];
+
+    tarList.launchPath = @"/usr/bin/tar";
+    tarList.arguments = @[
+        @"--list",
+        @"--file",
+        file.path
+    ];
+
+    NSPipe* pipe = [[NSPipe alloc] init];
+    tarList.standardOutput = pipe;
+    tarList.standardError = nil;
+
+    NSString* filename;
+
+    @try
+    {
+        [tarList launch];
+        [tarList waitUntilExit];
+
+        if (tarList.terminationStatus != 0)
         {
-            [unzip launch];
-            [unzip waitUntilExit];
-
-            if (unzip.terminationStatus == 0)
-            {
-                success = YES;
-            }
+            return NO;
         }
-        @catch (id exc)
+
+        NSData* data = [pipe.fileHandleForReading readDataToEndOfFile];
+
+        NSString* output = [[NSString alloc] initWithData:data
+                                                 encoding:NSUTF8StringEncoding];
+
+        filename = [output componentsSeparatedByCharactersInSet:NSCharacterSet.newlineCharacterSet].firstObject;
+    }
+    @catch (NSException* exception)
+    {
+        return NO;
+    }
+
+    // It's a directory, skip
+    if ([filename hasSuffix:@"/"])
+    {
+        return NO;
+    }
+
+    NSURL* destinationDir = [destination URLByDeletingLastPathComponent];
+
+    NSTask* untar = [[NSTask alloc] init];
+    untar.launchPath = @"/usr/bin/tar";
+    untar.currentDirectoryPath = destinationDir.path;
+    untar.arguments = @[
+        @"--extract",
+        @"--file",
+        file.path,
+        filename
+    ];
+
+    @try
+    {
+        [untar launch];
+        [untar waitUntilExit];
+
+        if (untar.terminationStatus != 0)
         {
-            success = NO;
-        }
-
-        if (success)
-        {
-            //Now find out what file we actually extracted; don't just assume it matches the zipfile's name
-            NSTask* zipinfo;
-
-            zipinfo = [[NSTask alloc] init];
-            zipinfo.launchPath = @"/usr/bin/zipinfo";
-            zipinfo.arguments = @[
-                @"-1", /* just the filename */
-                fDestination /* source zip file */
-            ];
-            zipinfo.standardOutput = [NSPipe pipe];
-
-            @try
-            {
-                NSFileHandle* zipinfoOutput = [zipinfo.standardOutput fileHandleForReading];
-
-                [zipinfo launch];
-                [zipinfo waitUntilExit];
-
-                NSString* actualFilename = [[NSString alloc] initWithData:[zipinfoOutput readDataToEndOfFile]
-                                                                 encoding:NSUTF8StringEncoding];
-                actualFilename = [actualFilename stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet];
-                NSString* newBlocklistPath = [workingDirectory stringByAppendingPathComponent:actualFilename];
-
-                //Finally, delete the ZIP file; we're done with it, and we'll return the unzipped blocklist
-                [NSFileManager.defaultManager removeItemAtPath:fDestination error:nil];
-
-                fDestination = newBlocklistPath;
-            }
-            @catch (id exc)
-            {
-            }
+            return NO;
         }
     }
+    @catch (NSException* exception)
+    {
+        return NO;
+    }
+
+    NSURL* result = [destinationDir URLByAppendingPathComponent:filename];
+
+    [NSFileManager.defaultManager moveItemAtURL:result toURL:destination error:nil];
+    return YES;
+}
+
+- (BOOL)gunzipFrom:(NSURL*)file to:(NSURL*)destination
+{
+    NSURL* destinationDir = [destination URLByDeletingLastPathComponent];
+
+    NSTask* gunzip = [[NSTask alloc] init];
+    gunzip.launchPath = @"/usr/bin/gunzip";
+    gunzip.currentDirectoryPath = destinationDir.path;
+    gunzip.arguments = @[
+        @"--keep",
+        file.path
+    ];
+
+    @try
+    {
+        [gunzip launch];
+        [gunzip waitUntilExit];
+
+        if (gunzip.terminationStatus != 0)
+        {
+            return NO;
+        }
+    }
+    @catch (NSException *exception)
+    {
+        return NO;
+    }
+
+    NSURL* result = [file URLByDeletingPathExtension];
+
+    [NSFileManager.defaultManager moveItemAtURL:result toURL:destination error:nil];
+    return YES;
+}
+
+- (BOOL)unzipFrom:(NSURL*)file to:(NSURL*)destination
+{
+    NSTask* zipinfo = [[NSTask alloc] init];
+    zipinfo.launchPath = @"/usr/bin/zipinfo";
+    zipinfo.arguments = @[
+        @"-1", /* just the filename */
+        file /* source zip file */
+    ];
+    NSPipe* pipe = [[NSPipe alloc] init];
+    zipinfo.standardOutput = pipe;
+    zipinfo.standardError = nil;
+
+    NSString* filename;
+
+    @try
+    {
+        [zipinfo launch];
+        [zipinfo waitUntilExit];
+
+        if (zipinfo.terminationStatus != 0)
+        {
+            return NO;
+        }
+
+        NSData* data = [pipe.fileHandleForReading readDataToEndOfFile];
+
+        NSString* output = [[NSString alloc] initWithData:data
+                                                 encoding:NSUTF8StringEncoding];
+
+        filename = [output componentsSeparatedByCharactersInSet:NSCharacterSet.newlineCharacterSet].firstObject;
+    }
+    @catch (NSException *exception)
+    {
+        return NO;
+    }
+
+    // It's a directory, skip
+    if ([filename hasSuffix:@"/"])
+    {
+        return NO;
+    }
+
+    NSURL* destinationDir = [destination URLByDeletingLastPathComponent];
+
+    NSTask* unzip = [[NSTask alloc] init];
+    unzip.launchPath = @"/usr/bin/unzip";
+    unzip.currentDirectoryPath = destinationDir.path;
+    unzip.arguments = @[
+        file.path,
+        filename
+    ];
+
+    @try
+    {
+        [unzip launch];
+        [unzip waitUntilExit];
+
+        if (unzip.terminationStatus != 0)
+        {
+            return NO;
+        }
+    }
+    @catch (NSException *exception)
+    {
+        return NO;
+    }
+
+    NSURL* result = [destinationDir URLByAppendingPathComponent:filename];
+
+    [NSFileManager.defaultManager moveItemAtURL:result toURL:destination error:nil];
+    return YES;
 }
 
 @end

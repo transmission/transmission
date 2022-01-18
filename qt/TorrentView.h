@@ -10,7 +10,7 @@
 
 #include <QListView>
 
-#include "Macros.h"
+#include <libtransmission/tr-macros.h>
 
 class TorrentView : public QListView
 {

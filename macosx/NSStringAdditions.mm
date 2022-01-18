@@ -100,29 +100,28 @@
 + (NSString*)stringForRatio:(CGFloat)ratio
 {
     //N/A is different than libtransmission's
+
     if ((int)ratio == TR_RATIO_NA)
     {
         return NSLocalizedString(@"N/A", "No Ratio");
     }
-    else if ((int)ratio == TR_RATIO_INF)
+
+    if ((int)ratio == TR_RATIO_INF)
     {
         return @"\xE2\x88\x9E";
     }
-    else
+
+    if (ratio < 10.0)
     {
-        if (ratio < 10.0)
-        {
-            return [NSString localizedStringWithFormat:@"%.2f", tr_truncd(ratio, 2)];
-        }
-        else if (ratio < 100.0)
-        {
-            return [NSString localizedStringWithFormat:@"%.1f", tr_truncd(ratio, 1)];
-        }
-        else
-        {
-            return [NSString localizedStringWithFormat:@"%.0f", tr_truncd(ratio, 0)];
-        }
+        return [NSString localizedStringWithFormat:@"%.2f", tr_truncd(ratio, 2)];
     }
+
+    if (ratio < 100.0)
+    {
+        return [NSString localizedStringWithFormat:@"%.1f", tr_truncd(ratio, 1)];
+    }
+
+    return [NSString localizedStringWithFormat:@"%.0f", tr_truncd(ratio, 0)];
 }
 
 + (NSString*)percentString:(CGFloat)progress longDecimals:(BOOL)longDecimals

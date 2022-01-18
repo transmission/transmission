@@ -34,7 +34,7 @@
 ****
 ***/
 
-#define MY_NAME "tr_crypto_utils"
+static char constexpr MyName[] = "tr_crypto_utils";
 
 static void log_openssl_error(char const* file, int line)
 {
@@ -62,7 +62,7 @@ static void log_openssl_error(char const* file, int line)
 #endif
 
         ERR_error_string_n(error_code, buf, sizeof(buf));
-        tr_logAddMessage(file, line, TR_LOG_ERROR, MY_NAME, "OpenSSL error: %s", buf);
+        tr_logAddMessage(file, line, TR_LOG_ERROR, MyName, "OpenSSL error: %s", buf);
     }
 }
 
@@ -116,7 +116,7 @@ tr_sha1_ctx_t tr_sha1_init(void)
 
 bool tr_sha1_update(tr_sha1_ctx_t raw_handle, void const* data, size_t data_length)
 {
-    auto* handle = static_cast<EVP_MD_CTX*>(raw_handle);
+    auto* const handle = static_cast<EVP_MD_CTX*>(raw_handle);
 
     TR_ASSERT(handle != nullptr);
 
@@ -130,25 +130,19 @@ bool tr_sha1_update(tr_sha1_ctx_t raw_handle, void const* data, size_t data_leng
     return check_result(EVP_DigestUpdate(handle, data, data_length));
 }
 
-bool tr_sha1_final(tr_sha1_ctx_t raw_handle, uint8_t* hash)
+std::optional<tr_sha1_digest_t> tr_sha1_final(tr_sha1_ctx_t raw_handle)
 {
     auto* handle = static_cast<EVP_MD_CTX*>(raw_handle);
+    TR_ASSERT(handle != nullptr);
 
-    bool ret = true;
-
-    if (hash != nullptr)
-    {
-        TR_ASSERT(handle != nullptr);
-
-        unsigned int hash_length = 0;
-
-        ret = check_result(EVP_DigestFinal_ex(handle, hash, &hash_length));
-
-        TR_ASSERT(!ret || hash_length == SHA_DIGEST_LENGTH);
-    }
+    unsigned int hash_length = 0;
+    auto digest = tr_sha1_digest_t{};
+    auto* const digest_as_uchar = reinterpret_cast<unsigned char*>(std::data(digest));
+    bool const ok = check_result(EVP_DigestFinal_ex(handle, digest_as_uchar, &hash_length));
+    TR_ASSERT(!ok || hash_length == std::size(digest));
 
     EVP_MD_CTX_destroy(handle);
-    return ret;
+    return ok ? std::make_optional(digest) : std::nullopt;
 }
 
 /***

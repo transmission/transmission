@@ -7,6 +7,7 @@
  */
 
 #include <cerrno>
+#include <cstdarg>
 #include <cstdio>
 #include <mutex>
 
@@ -17,6 +18,8 @@
 #include "log.h"
 #include "tr-assert.h"
 #include "utils.h"
+
+using namespace std::literals;
 
 tr_log_level __tr_message_level = TR_LOG_ERROR;
 
@@ -57,9 +60,7 @@ tr_sys_file_t tr_logGetFile(void)
 
     if (!initialized)
     {
-        int const fd = tr_env_get_int("TR_DEBUG_FD", 0);
-
-        switch (fd)
+        switch (tr_env_get_int("TR_DEBUG_FD", 0))
         {
         case 1:
             file = tr_sys_file_get_std(TR_STD_SYS_FILE_OUT, nullptr);
@@ -67,6 +68,10 @@ tr_sys_file_t tr_logGetFile(void)
 
         case 2:
             file = tr_sys_file_get_std(TR_STD_SYS_FILE_ERR, nullptr);
+            break;
+
+        default:
+            file = TR_BAD_SYS_FILE;
             break;
         }
 
@@ -124,7 +129,7 @@ char* tr_logGetTimeStr(char* buf, size_t buflen)
     struct timeval tv;
     tr_gettimeofday(&tv);
     time_t const seconds = tv.tv_sec;
-    int const milliseconds = (int)(tv.tv_usec / 1000);
+    auto const milliseconds = int(tv.tv_usec / 1000);
     char msec_str[8];
     tr_snprintf(msec_str, sizeof msec_str, "%03d", milliseconds);
 
@@ -172,19 +177,17 @@ void tr_logAddDeep(char const* file, int line, char const* name, char const* fmt
         va_end(args);
         evbuffer_add_printf(buf, " (%s:%d)" TR_NATIVE_EOL_STR, base, line);
 
-        size_t message_len = 0;
-        char* const message = evbuffer_free_to_str(buf, &message_len);
+        auto const message = evbuffer_free_to_str(buf);
 
 #ifdef _WIN32
-        OutputDebugStringA(message);
+        OutputDebugStringA(message.c_str());
 #endif
 
         if (fp != TR_BAD_SYS_FILE)
         {
-            tr_sys_file_write(fp, message, message_len, nullptr, nullptr);
+            tr_sys_file_write(fp, std::data(message), std::size(message), nullptr, nullptr);
         }
 
-        tr_free(message);
         tr_free(base);
     }
 }
@@ -209,7 +212,8 @@ void tr_logAddMessage(char const* file, int line, tr_log_level level, char const
 
     if (buf_len < 0)
     {
-        goto FINISH;
+        errno = err;
+        return;
     }
 
 #ifdef _WIN32
@@ -268,19 +272,12 @@ void tr_logAddMessage(char const* file, int line, tr_log_level level, char const
 
             tr_logGetTimeStr(timestr, sizeof(timestr));
 
-            if (name != nullptr)
-            {
-                tr_sys_file_write_fmt(fp, "[%s] %s: %s" TR_NATIVE_EOL_STR, nullptr, timestr, name, buf);
-            }
-            else
-            {
-                tr_sys_file_write_fmt(fp, "[%s] %s" TR_NATIVE_EOL_STR, nullptr, timestr, buf);
-            }
-
+            auto const out = name != nullptr ? tr_strvJoin("["sv, timestr, "] "sv, name, ": "sv, buf) :
+                                               tr_strvJoin("["sv, timestr, "] "sv, buf);
+            tr_sys_file_write_line(fp, out, nullptr);
             tr_sys_file_flush(fp, nullptr);
         }
     }
 
-FINISH:
     errno = err;
 }

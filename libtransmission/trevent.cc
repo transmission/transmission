@@ -265,7 +265,7 @@ static void libeventThreadFunc(void* veh)
     /* shut down the thread */
     event_base_free(base);
     eh->session->events = nullptr;
-    tr_free(eh);
+    delete eh;
     tr_logAddDebug("Closing libevent thread");
 }
 

@@ -8,19 +8,26 @@
 
 #pragma once
 
+#include <optional>
 #include <vector>
 
 #include <QDir>
 #include <QFile>
 #include <QMap>
+#include <QSet>
 #include <QString>
 #include <QTimer>
 
+#include <libtransmission/tr-macros.h>
+
 #include "AddData.h" // AddData
 #include "BaseDialog.h"
-#include "Macros.h"
 #include "Torrent.h" // FileList
 #include "ui_OptionsDialog.h"
+
+#include <libtransmission/transmission.h>
+
+#include <libtransmission/torrent-metainfo.h>
 
 class Prefs;
 class Session;
@@ -65,7 +72,6 @@ private:
     std::vector<int> priorities_;
     Session& session_;
     Ui::OptionsDialog ui_ = {};
-    tr_info info_ = {};
-    bool have_info_ = {};
+    std::optional<tr_torrent_metainfo> metainfo_;
     bool is_local_ = {};
 };

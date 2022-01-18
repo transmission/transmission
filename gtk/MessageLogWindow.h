@@ -12,12 +12,16 @@
 
 #include <gtkmm.h>
 
+#include <libtransmission/tr-macros.h>
+
 class Session;
 
 class MessageLogWindow : public Gtk::Window
 {
 public:
     ~MessageLogWindow() override;
+
+    TR_DISABLE_COPY_MOVE(MessageLogWindow)
 
     static std::unique_ptr<MessageLogWindow> create(Gtk::Window& parent, Glib::RefPtr<Session> const& core);
 

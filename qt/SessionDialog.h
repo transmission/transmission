@@ -10,8 +10,9 @@
 
 #include <QWidgetList>
 
+#include <libtransmission/tr-macros.h>
+
 #include "BaseDialog.h"
-#include "Macros.h"
 #include "ui_SessionDialog.h"
 
 class Prefs;

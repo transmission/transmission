@@ -38,14 +38,4 @@ int tr_ioWrite(struct tr_torrent* tor, tr_piece_index_t pieceIndex, uint32_t off
  */
 bool tr_ioTestPiece(tr_torrent* tor, tr_piece_index_t piece);
 
-/**
- * Converts a piece index + offset into a file index + offset.
- */
-void tr_ioFindFileLocation(
-    tr_torrent const* tor,
-    tr_piece_index_t pieceIndex,
-    uint32_t pieceOffset,
-    tr_file_index_t* fileIndex,
-    uint64_t* fileOffset);
-
 /* @} */

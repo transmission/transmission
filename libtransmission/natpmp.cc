@@ -22,8 +22,8 @@
 #include "port-forwarding.h"
 #include "utils.h"
 
-#define LIFETIME_SECS 3600
-#define COMMAND_WAIT_SECS 8
+static auto constexpr LifetimeSecs = uint32_t{ 3600 };
+static auto constexpr CommandWaitSecs = time_t{ 8 };
 
 static char const* getKey(void)
 {
@@ -110,7 +110,7 @@ static bool canSendCommand(struct tr_natpmp const* nat)
 
 static void setCommandTime(struct tr_natpmp* nat)
 {
-    nat->command_time = tr_time() + COMMAND_WAIT_SECS;
+    nat->command_time = tr_time() + CommandWaitSecs;
 }
 
 tr_port_forwarding tr_natpmpPulse(struct tr_natpmp* nat, tr_port private_port, bool is_enabled, tr_port* public_port)
@@ -199,7 +199,7 @@ tr_port_forwarding tr_natpmpPulse(struct tr_natpmp* nat, tr_port private_port, b
 
     if (nat->state == TR_NATPMP_SEND_MAP && canSendCommand(nat))
     {
-        int const val = sendnewportmappingrequest(&nat->natpmp, NATPMP_PROTOCOL_TCP, private_port, private_port, LIFETIME_SECS);
+        int const val = sendnewportmappingrequest(&nat->natpmp, NATPMP_PROTOCOL_TCP, private_port, private_port, LifetimeSecs);
         logVal("sendnewportmappingrequest", val);
         nat->state = val < 0 ? TR_NATPMP_ERR : TR_NATPMP_RECV_MAP;
         setCommandTime(nat);

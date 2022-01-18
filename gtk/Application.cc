@@ -21,17 +21,17 @@
  *****************************************************************************/
 
 #include <algorithm>
-#include <locale.h>
+#include <cstdlib> // exit()
+#include <ctime>
 #include <map>
-#include <signal.h>
 #include <sstream>
-#include <stdio.h>
-#include <stdlib.h> /* exit() */
-#include <string.h>
-#include <thread>
-#include <time.h>
-#include <vector>
+#include <string>
 #include <string_view>
+#include <thread>
+#include <vector>
+
+#include <locale.h>
+#include <signal.h>
 
 #include <giomm.h>
 #include <glib/gmessages.h>
@@ -59,8 +59,6 @@
 #include "SystemTrayIcon.h"
 #include "Utils.h"
 
-#define MY_CONFIG_NAME "transmission"
-
 using namespace std::literals;
 
 #define SHOW_LICENSE
@@ -68,7 +66,9 @@ using namespace std::literals;
 namespace
 {
 
-char const* LICENSE =
+auto const AppIconName = Glib::ustring("transmission"s);
+
+char const* const LICENSE =
     "Copyright 2005-2020. All code is copyrighted by the respective authors.\n"
     "\n"
     "Transmission can be redistributed and/or modified under the terms of the "
@@ -83,12 +83,14 @@ char const* LICENSE =
     "Some of Transmission's source files have more permissive licenses. "
     "Those files may, of course, be used on their own under their own terms.\n";
 
-}
+} // namespace
 
 class Application::Impl
 {
 public:
     Impl(Application& app, std::string const& config_dir, bool start_paused, bool is_iconified);
+
+    TR_DISABLE_COPY_MOVE(Impl)
 
     void open_files(std::vector<Glib::RefPtr<Gio::File>> const& files);
 
@@ -161,7 +163,11 @@ private:
     bool call_rpc_for_selected_torrents(std::string const& method);
     void remove_selected(bool delete_files);
 
-    static tr_rpc_callback_status on_rpc_changed(tr_session* session, tr_rpc_callback_type type, tr_torrent* tor, void* gdata);
+    static tr_rpc_callback_status on_rpc_changed(
+        tr_session* session,
+        tr_rpc_callback_type type,
+        tr_torrent* tor,
+        gpointer gdata);
 
 private:
     Application& app_;
@@ -240,7 +246,7 @@ void Application::Impl::show_details_dialog_for_selected_torrents()
         auto dialog = DetailsDialog::create(*wind_, core_);
         dialog->set_torrents(ids);
         dialog->signal_hide().connect([this, key]() { details_.erase(key); });
-        dialog_it = details_.emplace(key, std::move(dialog)).first;
+        dialog_it = details_.try_emplace(key, std::move(dialog)).first;
         dialog_it->second->show();
     }
 
@@ -444,11 +450,9 @@ bool Application::Impl::on_rpc_changed_idle(tr_rpc_callback_type type, int torre
                 }
                 else
                 {
-                    char* a = tr_variantToStr(oldval, TR_VARIANT_FMT_BENC, nullptr);
-                    char* b = tr_variantToStr(newval, TR_VARIANT_FMT_BENC, nullptr);
-                    changed = g_strcmp0(a, b) != 0;
-                    tr_free(b);
-                    tr_free(a);
+                    auto const a = tr_variantToStr(oldval, TR_VARIANT_FMT_BENC);
+                    auto const b = tr_variantToStr(newval, TR_VARIANT_FMT_BENC);
+                    changed = a != b;
                 }
 
                 if (changed)
@@ -475,6 +479,9 @@ bool Application::Impl::on_rpc_changed_idle(tr_rpc_callback_type type, int torre
     case TR_RPC_SESSION_QUEUE_POSITIONS_CHANGED:
         /* nothing interesting to do here */
         break;
+
+    default:
+        g_assert_not_reached();
     }
 
     return false;
@@ -484,7 +491,7 @@ tr_rpc_callback_status Application::Impl::on_rpc_changed(
     tr_session* /*session*/,
     tr_rpc_callback_type type,
     tr_torrent* tor,
-    void* gdata)
+    gpointer gdata)
 {
     auto* impl = static_cast<Impl*>(gdata);
     auto const torrent_id = tr_torrentId(tor);
@@ -502,7 +509,7 @@ namespace
 {
 
 sig_atomic_t global_sigcount = 0;
-void* sighandler_cbdata = nullptr;
+gpointer sighandler_cbdata = nullptr;
 
 void signal_handler(int sig)
 {
@@ -534,6 +541,9 @@ void Application::on_startup()
 
 void Application::Impl::on_startup()
 {
+    Gtk::IconTheme::get_default()->add_resource_path(gtr_get_full_resource_path("icons"s));
+    Gtk::Window::set_default_icon_name(AppIconName);
+
     tr_session* session;
 
     ::signal(SIGINT, signal_handler);
@@ -560,7 +570,7 @@ void Application::Impl::on_startup()
     core_ = Session::create(session);
 
     /* init the ui manager */
-    ui_builder_ = Gtk::Builder::create_from_resource(TR_RESOURCE_PATH "transmission-ui.xml");
+    ui_builder_ = Gtk::Builder::create_from_resource(gtr_get_full_resource_path("transmission-ui.xml"s));
     auto const actions = gtr_actions_init(ui_builder_, this);
 
     app_.set_menubar(gtr_action_get_object<Gio::Menu>("main-window-menu"));
@@ -813,13 +823,23 @@ void Application::Impl::on_drag_data_received(
     guint /*info*/,
     guint time_)
 {
-    auto const uris = selection_data.get_uris();
+    if (auto const uris = selection_data.get_uris(); !uris.empty())
+    {
+        auto files = std::vector<Glib::RefPtr<Gio::File>>();
+        files.reserve(uris.size());
+        std::transform(uris.begin(), uris.end(), std::back_inserter(files), &Gio::File::create_for_uri);
 
-    auto files = std::vector<Glib::RefPtr<Gio::File>>();
-    files.reserve(uris.size());
-    std::transform(uris.begin(), uris.end(), std::back_inserter(files), &Gio::File::create_for_uri);
+        open_files(files);
+    }
+    else
+    {
+        auto const text = gtr_str_strip(selection_data.get_text());
 
-    open_files(files);
+        if (!text.empty())
+        {
+            core_->add_from_url(text);
+        }
+    }
 
     drag_context->drag_finish(true, false, time_);
 }
@@ -840,6 +860,7 @@ void Application::Impl::main_window_setup()
     /* register to handle URIs that get dragged onto our main window */
     wind_->drag_dest_set(Gtk::DEST_DEFAULT_ALL, Gdk::ACTION_COPY);
     wind_->drag_dest_add_uri_targets();
+    wind_->drag_dest_add_text_targets(); /* links dragged from browsers are text */
     wind_->signal_drag_data_received().connect(sigc::mem_fun(*this, &Impl::on_drag_data_received));
 }
 
@@ -1272,7 +1293,7 @@ void Application::Impl::show_about_dialog()
     d.set_authors(authors);
     d.set_comments(_("A fast and easy BitTorrent client"));
     d.set_copyright(_("Copyright (c) The Transmission Project"));
-    d.set_logo_icon_name(MY_CONFIG_NAME);
+    d.set_logo_icon_name(AppIconName);
     d.set_name(Glib::get_application_name());
     /* Translators: translate "translator-credits" as your name
        to have it appear in the credits in the "About"
@@ -1391,7 +1412,7 @@ void Application::Impl::copy_magnet_link_to_clipboard(tr_torrent* tor) const
     tr_free(magnet);
 }
 
-void gtr_actions_handler(Glib::ustring const& action_name, void* user_data)
+void gtr_actions_handler(Glib::ustring const& action_name, gpointer user_data)
 {
     static_cast<Application::Impl*>(user_data)->actions_handler(action_name);
 }

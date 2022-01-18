@@ -145,13 +145,13 @@ struct ParserStack
     {
         if (depth == 0)
         {
-            tr_error_set_literal(error, EILSEQ, "Cannot pop empty stack");
+            tr_error_set(error, EILSEQ, "Cannot pop empty stack");
             return {};
         }
 
         if (stack[depth].parent_type == ParentType::Dict && ((stack[depth].n_children_walked % 2) != 0))
         {
-            tr_error_set_literal(error, EILSEQ, "Premature end-of-dict found. Malformed benc?");
+            tr_error_set(error, EILSEQ, "Premature end-of-dict found. Malformed benc?");
             return {};
         }
 
@@ -164,7 +164,7 @@ struct ParserStack
     {
         if (depth + 1 >= std::size(stack))
         {
-            tr_error_set_literal(error, E2BIG, "Max stack depth reached; unable to continue parsing");
+            tr_error_set(error, E2BIG, "Max stack depth reached; unable to continue parsing");
             return false;
         }
 
@@ -204,14 +204,14 @@ bool parse(
                 auto const value = impl::ParseInt(&benc);
                 if (!value)
                 {
-                    tr_error_set_literal(error, err, "Malformed benc? Unable to parse integer");
+                    tr_error_set(error, err, "Malformed benc? Unable to parse integer");
                     break;
                 }
 
                 if (!handler.Int64(*value))
                 {
                     err = ECANCELED;
-                    tr_error_set_literal(error, err, "Handler indicated parser should stop");
+                    tr_error_set(error, err, "Handler indicated parser should stop");
                     break;
                 }
 
@@ -233,7 +233,7 @@ bool parse(
                 if (!ok)
                 {
                     err = ECANCELED;
-                    tr_error_set_literal(error, err, "Handler indicated parser should stop");
+                    tr_error_set(error, err, "Handler indicated parser should stop");
                     break;
                 }
 
@@ -258,7 +258,7 @@ bool parse(
                 if (!ok)
                 {
                     err = ECANCELED;
-                    tr_error_set_literal(error, err, "Handler indicated parser should stop");
+                    tr_error_set(error, err, "Handler indicated parser should stop");
                     break;
                 }
 
@@ -280,7 +280,7 @@ bool parse(
                 if (!sv)
                 {
                     err = EILSEQ;
-                    tr_error_set_literal(error, err, "Malformed benc? Unable to parse string");
+                    tr_error_set(error, err, "Malformed benc? Unable to parse string");
                     break;
                 }
 
@@ -289,7 +289,7 @@ bool parse(
                 if (!ok)
                 {
                     err = ECANCELED;
-                    tr_error_set_literal(error, err, "Handler indicated parser should stop");
+                    tr_error_set(error, err, "Handler indicated parser should stop");
                     break;
                 }
                 stack.tokenWalked();
@@ -316,7 +316,7 @@ bool parse(
     if (stack.depth != 0)
     {
         err = EILSEQ;
-        tr_error_set_literal(error, err, "premature end-of-data reached");
+        tr_error_set(error, err, "premature end-of-data reached");
         errno = err;
         return false;
     }
@@ -324,7 +324,7 @@ bool parse(
     if (stack.stack[0].n_children_walked == 0)
     {
         err = EILSEQ;
-        tr_error_set_literal(error, err, "no data found");
+        tr_error_set(error, err, "no data found");
         errno = err;
         return false;
     }

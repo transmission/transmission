@@ -50,7 +50,7 @@ struct tr_dh_ctx
 ****
 ***/
 
-#define MY_NAME "tr_crypto_utils"
+static char constexpr MyName[] = "tr_crypto_utils";
 
 static void log_cyassl_error(int error_code, char const* file, int line)
 {
@@ -65,7 +65,7 @@ static void log_cyassl_error(int error_code, char const* file, int line)
         CTaoCryptErrorString(error_code, error_message);
 #endif
 
-        tr_logAddMessage(file, line, TR_LOG_ERROR, MY_NAME, "CyaSSL error: %s", error_message);
+        tr_logAddMessage(file, line, TR_LOG_ERROR, MyName, "CyaSSL error: %s", error_message);
     }
 }
 
@@ -139,20 +139,17 @@ bool tr_sha1_update(tr_sha1_ctx_t raw_handle, void const* data, size_t data_leng
     return check_result(API(ShaUpdate)(handle, static_cast<byte const*>(data), data_length));
 }
 
-bool tr_sha1_final(tr_sha1_ctx_t raw_handle, uint8_t* hash)
+std::optional<tr_sha1_digest_t> tr_sha1_final(tr_sha1_ctx_t raw_handle)
 {
     auto* handle = static_cast<Sha*>(raw_handle);
-    bool ret = true;
+    TR_ASSERT(handle != nullptr);
 
-    if (hash != nullptr)
-    {
-        TR_ASSERT(handle != nullptr);
-
-        ret = check_result(API(ShaFinal)(handle, hash));
-    }
-
+    auto digest = tr_sha1_digest_t{};
+    auto* const digest_as_uchar = reinterpret_cast<unsigned char*>(std::data(digest));
+    auto const ok = check_result(API(ShaFinal)(handle, digest_as_uchar));
     tr_free(handle);
-    return ret;
+
+    return ok ? std::make_optional(digest) : std::nullopt;
 }
 
 /***

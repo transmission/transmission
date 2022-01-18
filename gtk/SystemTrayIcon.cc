@@ -26,13 +26,24 @@
 #include "SystemTrayIcon.h"
 #include "Utils.h"
 
-#define ICON_NAME "transmission"
+using namespace std::literals;
+
+namespace
+{
+
+auto const TrayIconName = Glib::ustring("transmission-tray-icon"s);
+auto const AppIconName = Glib::ustring("transmission"s);
+auto const AppName = Glib::ustring("transmission-gtk"s);
+
+} // namespace
 
 class SystemTrayIcon::Impl
 {
 public:
     Impl(Gtk::Window& main_window, Glib::RefPtr<Session> const& core);
     ~Impl();
+
+    TR_DISABLE_COPY_MOVE(Impl)
 
     void refresh();
 
@@ -81,51 +92,31 @@ void SystemTrayIcon::Impl::refresh()
 {
     double KBps;
     double limit;
-    char up[64];
     Glib::ustring upLimit;
-    char down[64];
     Glib::ustring downLimit;
-    char const* idle = _("Idle");
+    char const* const idle = _("Idle");
     auto* session = core_->get_session();
 
     /* up */
     KBps = tr_sessionGetRawSpeed_KBps(session, TR_UP);
 
-    if (KBps < 0.001)
-    {
-        g_strlcpy(up, idle, sizeof(up));
-    }
-    else
-    {
-        tr_formatter_speed_KBps(up, KBps, sizeof(up));
-    }
+    auto const up = KBps < 0.001 ? idle : tr_formatter_speed_KBps(KBps);
 
     /* up limit */
     if (tr_sessionGetActiveSpeedLimit_KBps(session, TR_UP, &limit))
     {
-        char buf[64];
-        tr_formatter_speed_KBps(buf, limit, sizeof(buf));
-        upLimit = gtr_sprintf(_(" (Limit: %s)"), buf);
+        upLimit = gtr_sprintf(_(" (Limit: %s)"), tr_formatter_speed_KBps(limit));
     }
 
     /* down */
     KBps = tr_sessionGetRawSpeed_KBps(session, TR_DOWN);
 
-    if (KBps < 0.001)
-    {
-        g_strlcpy(down, idle, sizeof(down));
-    }
-    else
-    {
-        tr_formatter_speed_KBps(down, KBps, sizeof(down));
-    }
+    auto const down = KBps < 0.001 ? idle : tr_formatter_speed_KBps(KBps);
 
     /* down limit */
     if (tr_sessionGetActiveSpeedLimit_KBps(session, TR_DOWN, &limit))
     {
-        char buf[64];
-        tr_formatter_speed_KBps(buf, limit, sizeof(buf));
-        downLimit = gtr_sprintf(_(" (Limit: %s)"), buf);
+        downLimit = gtr_sprintf(_(" (Limit: %s)"), tr_formatter_speed_KBps(limit));
     }
 
     /* %1$s: current upload speed
@@ -142,24 +133,24 @@ void SystemTrayIcon::Impl::refresh()
 namespace
 {
 
-std::string getIconName()
+Glib::ustring getIconName()
 {
-    std::string icon_name;
+    Glib::ustring icon_name;
 
     auto theme = Gtk::IconTheme::get_default();
 
     // if the tray's icon is a 48x48 file, use it.
     // otherwise, use the fallback builtin icon.
-    if (!theme->has_icon(TRAY_ICON))
+    if (!theme->has_icon(TrayIconName))
     {
-        icon_name = ICON_NAME;
+        icon_name = AppIconName;
     }
     else
     {
-        auto const icon_info = theme->lookup_icon(TRAY_ICON, 48, Gtk::ICON_LOOKUP_USE_BUILTIN);
+        auto const icon_info = theme->lookup_icon(TrayIconName, 48, Gtk::ICON_LOOKUP_USE_BUILTIN);
         bool const icon_is_builtin = icon_info.get_filename().empty();
 
-        icon_name = icon_is_builtin ? ICON_NAME : TRAY_ICON;
+        icon_name = icon_is_builtin ? AppIconName : TrayIconName;
     }
 
     return icon_name;
@@ -188,7 +179,7 @@ SystemTrayIcon::Impl::Impl(Gtk::Window& main_window, Glib::RefPtr<Session> const
 
 #ifdef HAVE_LIBAPPINDICATOR
 
-    indicator_ = app_indicator_new(ICON_NAME, icon_name.c_str(), APP_INDICATOR_CATEGORY_SYSTEM_SERVICES);
+    indicator_ = app_indicator_new(AppName.c_str(), icon_name.c_str(), APP_INDICATOR_CATEGORY_SYSTEM_SERVICES);
     app_indicator_set_status(indicator_, APP_INDICATOR_STATUS_ACTIVE);
     app_indicator_set_menu(indicator_, Glib::unwrap(menu_));
     app_indicator_set_title(indicator_, Glib::get_application_name().c_str());

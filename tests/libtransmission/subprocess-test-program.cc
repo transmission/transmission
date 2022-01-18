@@ -11,7 +11,6 @@
 #include "subprocess.h"
 #include "utils.h"
 
-#include <memory>
 #include <string>
 
 int main(int argc, char** argv)

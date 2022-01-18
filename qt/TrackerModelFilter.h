@@ -10,7 +10,7 @@
 
 #include <QSortFilterProxyModel>
 
-#include "Macros.h"
+#include <libtransmission/tr-macros.h>
 
 class TrackerModelFilter : public QSortFilterProxyModel
 {

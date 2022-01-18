@@ -7,7 +7,6 @@
  */
 
 #include <algorithm>
-#include <cstring> /* memset() */
 #include <vector>
 
 #include "transmission.h"
@@ -120,9 +119,11 @@ void Bandwidth::setParent(Bandwidth* new_parent)
 
     if (new_parent != nullptr)
     {
+#ifdef TR_ENABLE_ASSERTS
         TR_ASSERT(new_parent->parent_ != this);
         auto& children = new_parent->children_;
         TR_ASSERT(std::find(std::begin(children), std::end(children), this) == std::end(children)); // not already there
+#endif
 
         new_parent->children_.push_back(this);
         this->parent_ = new_parent;

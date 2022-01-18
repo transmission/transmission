@@ -7,7 +7,9 @@
  */
 
 #include <cerrno> /* errno, EAFNOSUPPORT */
-#include <cstring> /* memcpy(), memset() */
+#include <cstring> /* memset() */
+#include <ctime>
+#include <string_view>
 #include <vector>
 
 #include <event2/buffer.h>
@@ -29,7 +31,9 @@
 #include "tr-udp.h"
 #include "utils.h"
 
-#define dbgmsg(key, ...) tr_logAddDeepNamed(tr_quark_get_string(key), __VA_ARGS__)
+#define dbgmsg(key, ...) tr_logAddDeepNamed(key.c_str(), __VA_ARGS__)
+
+using namespace std::literals;
 
 /****
 *****
@@ -220,11 +224,15 @@ static void tau_scrape_request_finished(struct tau_scrape_request const* request
     }
 }
 
-static void tau_scrape_request_fail(struct tau_scrape_request* request, bool did_connect, bool did_timeout, char const* errmsg)
+static void tau_scrape_request_fail(
+    struct tau_scrape_request* request,
+    bool did_connect,
+    bool did_timeout,
+    std::string_view errmsg)
 {
     request->response.did_connect = did_connect;
     request->response.did_timeout = did_timeout;
-    request->response.errmsg = errmsg == nullptr ? "" : errmsg;
+    request->response.errmsg = errmsg;
     tau_scrape_request_finished(request);
 }
 
@@ -253,10 +261,10 @@ static void on_scrape_response(struct tau_scrape_request* request, tau_action_t 
     else
     {
         size_t const buflen = evbuffer_get_length(buf);
-        char* const errmsg = action == TAU_ACTION_ERROR && buflen > 0 ? tr_strndup(evbuffer_pullup(buf, -1), buflen) :
-                                                                        tr_strdup(_("Unknown error"));
+        auto const errmsg = action == TAU_ACTION_ERROR && buflen > 0 ?
+            std::string_view{ reinterpret_cast<char const*>(evbuffer_pullup(buf, -1)), buflen } :
+            _("Unknown error");
         tau_scrape_request_fail(request, true, false, errmsg);
-        tr_free(errmsg);
     }
 }
 
@@ -349,8 +357,6 @@ static struct tau_announce_request* tau_announce_request_new(
 static void tau_announce_request_free(struct tau_announce_request* req)
 {
     tr_free(req->response.tracker_id_str);
-    tr_free(req->response.warning);
-    tr_free(req->response.errmsg);
     tr_free(req->response.pex6);
     tr_free(req->response.pex);
     delete req;
@@ -368,11 +374,11 @@ static void tau_announce_request_fail(
     struct tau_announce_request* request,
     bool did_connect,
     bool did_timeout,
-    char const* errmsg)
+    std::string_view errmsg)
 {
     request->response.did_connect = did_connect;
     request->response.did_timeout = did_timeout;
-    request->response.errmsg = tr_strdup(errmsg);
+    request->response.errmsg = errmsg;
     tau_announce_request_finished(request);
 }
 
@@ -399,10 +405,10 @@ static void on_announce_response(struct tau_announce_request* request, tau_actio
     }
     else
     {
-        char* const errmsg = action == TAU_ACTION_ERROR && buflen > 0 ? tr_strndup(evbuffer_pullup(buf, -1), buflen) :
-                                                                        tr_strdup(_("Unknown error"));
+        auto const errmsg = action == TAU_ACTION_ERROR && buflen > 0 ?
+            std::string_view{ reinterpret_cast<char const*>(evbuffer_pullup(buf, -1)), buflen } :
+            _("Unknown error");
         tau_announce_request_fail(request, true, false, errmsg);
-        tr_free(errmsg);
     }
 }
 
@@ -416,8 +422,8 @@ struct tau_tracker
 {
     tr_session* const session;
 
-    tr_quark const key;
-    tr_quark const host;
+    tr_interned_string const key;
+    tr_interned_string const host;
     int const port;
 
     struct evdns_getaddrinfo_request* dns_request = nullptr;
@@ -434,7 +440,7 @@ struct tau_tracker
     tr_ptrArray announces = {};
     tr_ptrArray scrapes = {};
 
-    tau_tracker(tr_session* session_in, tr_quark key_in, tr_quark host_in, int port_in)
+    tau_tracker(tr_session* session_in, tr_interned_string key_in, tr_interned_string host_in, int port_in)
         : session{ session_in }
         , key{ key_in }
         , host{ host_in }
@@ -459,7 +465,7 @@ static void tau_tracker_free(struct tau_tracker* t)
     delete t;
 }
 
-static void tau_tracker_fail_all(struct tau_tracker* tracker, bool did_connect, bool did_timeout, char const* errmsg)
+static void tau_tracker_fail_all(struct tau_tracker* tracker, bool did_connect, bool did_timeout, std::string_view errmsg)
 {
     /* fail all the scrapes */
     tr_ptrArray* reqs = &tracker->scrapes;
@@ -494,10 +500,9 @@ static void tau_tracker_on_dns(int errcode, struct evutil_addrinfo* addr, void* 
 
     if (errcode != 0)
     {
-        char* errmsg = tr_strdup_printf(_("DNS Lookup failed: %s"), evutil_gai_strerror(errcode));
-        dbgmsg(tracker->key, "%s", errmsg);
-        tau_tracker_fail_all(tracker, false, false, errmsg);
-        tr_free(errmsg);
+        auto const errmsg = tr_strvJoin("DNS Lookup failed: "sv, evutil_gai_strerror(errcode));
+        dbgmsg(tracker->key, "%s", errmsg.c_str());
+        tau_tracker_fail_all(tracker, false, false, errmsg.c_str());
     }
     else
     {
@@ -590,12 +595,12 @@ static void on_tracker_connection_response(struct tau_tracker* tracker, tau_acti
     {
         size_t const buflen = buf != nullptr ? evbuffer_get_length(buf) : 0;
 
-        char* const errmsg = action == TAU_ACTION_ERROR && buflen > 0 ? tr_strndup(evbuffer_pullup(buf, -1), buflen) :
-                                                                        tr_strdup(_("Connection failed"));
+        auto const errmsg = action == TAU_ACTION_ERROR && buflen > 0 ?
+            std::string_view{ reinterpret_cast<char const*>(evbuffer_pullup(buf, -1)), buflen } :
+            std::string_view{ _("Connection failed") };
 
-        dbgmsg(tracker->key, "%s", errmsg);
+        dbgmsg(tracker->key, "%" TR_PRIsv, TR_PRIsv_ARG(errmsg));
         tau_tracker_fail_all(tracker, true, false, errmsg);
-        tr_free(errmsg);
     }
 
     tau_tracker_upkeep(tracker);
@@ -620,7 +625,7 @@ static void tau_tracker_timeout_reqs(struct tau_tracker* tracker)
         if (cancel_all || req->created_at + TauRequestTtl < now)
         {
             dbgmsg(tracker->key, "timeout announce req %p", (void*)req);
-            tau_announce_request_fail(req, false, true, nullptr);
+            tau_announce_request_fail(req, false, true, "");
             tau_announce_request_free(req);
             tr_ptrArrayRemove(reqs, i);
             --i;
@@ -637,7 +642,7 @@ static void tau_tracker_timeout_reqs(struct tau_tracker* tracker)
         if (cancel_all || req->created_at + TauRequestTtl < now)
         {
             dbgmsg(tracker->key, "timeout scrape req %p", (void*)req);
-            tau_scrape_request_fail(req, false, true, nullptr);
+            tau_scrape_request_fail(req, false, true, "");
             tau_scrape_request_free(req);
             tr_ptrArrayRemove(reqs, i);
             --i;
@@ -681,7 +686,7 @@ static void tau_tracker_upkeep_ex(struct tau_tracker* tracker, bool timeout_reqs
         dbgmsg(tracker->host, "Trying a new DNS lookup");
         tracker->dns_request = evdns_getaddrinfo(
             tracker->session->evdns_base,
-            tr_quark_get_string(tracker->host),
+            tracker->host.c_str(),
             nullptr,
             &hints,
             tau_tracker_on_dns,
@@ -759,10 +764,10 @@ static struct tr_announcer_udp* announcer_udp_get(tr_session* session)
 
 /* Finds the tau_tracker struct that corresponds to this url.
    If it doesn't exist yet, create one. */
-static tau_tracker* tau_session_get_tracker(tr_announcer_udp* tau, tr_quark announce_url)
+static tau_tracker* tau_session_get_tracker(tr_announcer_udp* tau, tr_interned_string announce_url)
 {
     // build a lookup key for this tracker
-    auto const announce_sv = tr_quark_get_string_view(announce_url);
+    auto const announce_sv = announce_url.sv();
     auto parsed = tr_urlParseTracker(announce_sv);
     TR_ASSERT(parsed);
     if (!parsed)
@@ -783,7 +788,7 @@ static tau_tracker* tau_session_get_tracker(tr_announcer_udp* tau, tr_quark anno
     }
 
     // we don't have it -- build a new one
-    auto* const tracker = new tau_tracker{ tau->session, key, tr_quark_new(parsed->host), parsed->port };
+    auto* const tracker = new tau_tracker{ tau->session, key, tr_interned_string(parsed->host), parsed->port };
     tr_ptrArrayAppend(&tau->trackers, tracker);
     dbgmsg(tracker->key, "New tau_tracker created");
     return tracker;

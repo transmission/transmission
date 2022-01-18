@@ -15,8 +15,9 @@
 #include <QSet>
 #include <QTimer>
 
+#include <libtransmission/tr-macros.h>
+
 #include "BaseDialog.h"
-#include "Macros.h"
 #include "Session.h"
 #include "Typedefs.h"
 
@@ -55,7 +56,6 @@ private:
     void initFilesTab() const;
     void initOptionsTab();
 
-    QIcon getStockIcon(QString const& freedesktop_name, int fallback) const;
     void setEnabled(bool);
 
 private slots:

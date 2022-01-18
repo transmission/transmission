@@ -13,9 +13,11 @@
 #endif
 
 #include <array>
+#include <cstddef> // size_t
 #include <vector>
 
 #include "transmission.h"
+
 #include "tr-assert.h"
 
 class tr_peerIo;

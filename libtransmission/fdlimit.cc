@@ -7,19 +7,22 @@
  */
 
 #include <algorithm>
+#include <array>
 #include <cerrno>
 #include <cinttypes>
-#include <cstring>
+#include <ctime>
 
 #include "transmission.h"
-#include "error.h"
+
 #include "error-types.h"
+#include "error.h"
 #include "fdlimit.h"
 #include "file.h"
 #include "log.h"
 #include "session.h"
 #include "torrent.h" /* tr_isTorrent() */
 #include "tr-assert.h"
+#include "utils.h" // tr_time()
 
 #define dbgmsg(...) tr_logAddDeepNamed(nullptr, __VA_ARGS__)
 
@@ -82,18 +85,17 @@ static bool preallocate_file_full(tr_sys_file_t fd, uint64_t length, tr_error** 
 
     if (!TR_ERROR_IS_ENOSPC(my_error->code))
     {
-        uint8_t buf[4096];
+        auto buf = std::array<uint8_t, 4096>{};
         bool success = true;
 
-        memset(buf, 0, sizeof(buf));
         tr_error_clear(&my_error);
 
         /* fallback: the old-fashioned way */
         while (success && length > 0)
         {
-            uint64_t const thisPass = std::min(length, uint64_t{ sizeof(buf) });
+            uint64_t const thisPass = std::min(length, uint64_t{ std::size(buf) });
             uint64_t bytes_written = 0;
-            success = tr_sys_file_write(fd, buf, thisPass, &bytes_written, &my_error);
+            success = tr_sys_file_write(fd, std::data(buf), thisPass, &bytes_written, &my_error);
             length -= bytes_written;
         }
 
@@ -248,17 +250,15 @@ static int cached_file_open(
     return 0;
 
 FAIL:
+    int const err = error->code;
+    tr_error_free(error);
+
+    if (fd != TR_BAD_SYS_FILE)
     {
-        int const err = error->code;
-        tr_error_free(error);
-
-        if (fd != TR_BAD_SYS_FILE)
-        {
-            tr_sys_file_close(fd, nullptr);
-        }
-
-        return err;
+        tr_sys_file_close(fd, nullptr);
     }
+
+    return err;
 }
 
 /***
@@ -476,9 +476,7 @@ tr_sys_file_t tr_fdFileCheckout(
 
     if (!cached_file_is_open(o))
     {
-        int const err = cached_file_open(o, filename, writable, allocation, file_size);
-
-        if (err != 0)
+        if (int const err = cached_file_open(o, filename, writable, allocation, file_size); err != 0)
         {
             errno = err;
             return TR_BAD_SYS_FILE;

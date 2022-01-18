@@ -29,6 +29,7 @@
 #include <atomic> /* atomic, atomic_fetch_add_explicit, memory_order_relaxed */
 
 #include <libtransmission/transmission.h>
+#include <libtransmission/torrent-metainfo.h>
 #include <libtransmission/utils.h>
 #include <libtransmission/variant.h>
 
@@ -1063,31 +1064,19 @@ static void removeKeRangerRansomware()
 
     for (NSString* torrentPath in filenames)
     {
-        //ensure torrent doesn't already exist
-        tr_ctor* ctor = tr_ctorNew(fLib);
-        tr_ctorSetMetainfoFromFile(ctor, torrentPath.UTF8String);
-
-        tr_info info;
-        tr_parse_result const result = tr_torrentParse(ctor, &info);
-        tr_ctorFree(ctor);
-
-        if (result != TR_PARSE_OK)
+        auto metainfo = tr_torrent_metainfo{};
+        if (!metainfo.parseTorrentFile(torrentPath.UTF8String)) // invalid torrent
         {
-            if (result == TR_PARSE_DUPLICATE)
+            if (type != ADD_AUTO)
             {
-                [self duplicateOpenAlert:@(info.name)];
+                [self invalidOpenAlert:torrentPath.lastPathComponent];
             }
-            else if (result == TR_PARSE_ERR)
-            {
-                if (type != ADD_AUTO)
-                {
-                    [self invalidOpenAlert:torrentPath.lastPathComponent];
-                }
-            }
-            else
-                NSAssert2(NO, @"Unknown error code (%d) when attempting to open \"%@\"", result, torrentPath);
+            continue;
+        }
 
-            tr_metainfoFree(&info);
+        if (tr_torrentFindFromMetainfo(fLib, &metainfo) != nullptr) // dupe torrent
+        {
+            [self duplicateOpenAlert:@(metainfo.name().c_str())];
             continue;
         }
 
@@ -1113,10 +1102,10 @@ static void removeKeRangerRansomware()
         }
 
         //determine to show the options window
+        auto const is_multifile = metainfo.fileCount() > 1;
         BOOL const showWindow = type == ADD_SHOW_OPTIONS ||
-            ([fDefaults boolForKey:@"DownloadAsk"] && (info.isFolder || ![fDefaults boolForKey:@"DownloadAskMulti"]) &&
+            ([fDefaults boolForKey:@"DownloadAsk"] && (is_multifile || ![fDefaults boolForKey:@"DownloadAskMulti"]) &&
              (type != ADD_AUTO || ![fDefaults boolForKey:@"DownloadAskManual"]));
-        tr_metainfoFree(&info);
 
         Torrent* torrent;
         if (!(torrent = [[Torrent alloc] initWithPath:torrentPath location:location
@@ -1213,8 +1202,7 @@ static void removeKeRangerRansomware()
     tr_torrent* duplicateTorrent;
     if ((duplicateTorrent = tr_torrentFindFromMagnetLink(fLib, address.UTF8String)))
     {
-        tr_info const* info = tr_torrentInfo(duplicateTorrent);
-        NSString* name = (info != NULL && info->name != NULL) ? @(info->name) : nil;
+        NSString* name = @(tr_torrentName(duplicateTorrent));
         [self duplicateOpenMagnetAlert:address transferName:name];
         return;
     }
@@ -3330,34 +3318,21 @@ static void removeKeRangerRansomware()
             continue;
         }
 
-        tr_ctor* ctor = tr_ctorNew(fLib);
-        tr_ctorSetMetainfoFromFile(ctor, fullFile.UTF8String);
-
-        switch (tr_torrentParse(ctor, NULL))
+        auto metainfo = tr_torrent_metainfo{};
+        if (!metainfo.parseTorrentFile(fullFile.UTF8String))
         {
-        case TR_PARSE_OK:
-            {
-                [self openFiles:@[ fullFile ] addType:ADD_AUTO forcePath:nil];
-
-                NSString* notificationTitle = NSLocalizedString(@"Torrent File Auto Added", "notification title");
-                NSUserNotification* notification = [[NSUserNotification alloc] init];
-                notification.title = notificationTitle;
-                notification.informativeText = file;
-
-                notification.hasActionButton = NO;
-
-                [NSUserNotificationCenter.defaultUserNotificationCenter deliverNotification:notification];
-                break;
-            }
-        case TR_PARSE_ERR:
-            [fAutoImportedNames removeObject:file];
-            break;
-
-        case TR_PARSE_DUPLICATE: //let's ignore this (but silence a warning)
             break;
         }
 
-        tr_ctorFree(ctor);
+        [self openFiles:@[ fullFile ] addType:ADD_AUTO forcePath:nil];
+
+        NSString* notificationTitle = NSLocalizedString(@"Torrent File Auto Added", "notification title");
+        NSUserNotification* notification = [[NSUserNotification alloc] init];
+        notification.title = notificationTitle;
+        notification.informativeText = file;
+        notification.hasActionButton = NO;
+
+        [NSUserNotificationCenter.defaultUserNotificationCenter deliverNotification:notification];
     }
 }
 
@@ -3651,9 +3626,8 @@ static void removeKeRangerRansomware()
                 [file.pathExtension caseInsensitiveCompare:@"torrent"] == NSOrderedSame)
             {
                 torrent = YES;
-                tr_ctor* ctor = tr_ctorNew(fLib);
-                tr_ctorSetMetainfoFromFile(ctor, file.UTF8String);
-                if (tr_torrentParse(ctor, NULL) == TR_PARSE_OK)
+                auto metainfo = tr_torrent_metainfo{};
+                if (metainfo.parseTorrentFile(file.UTF8String))
                 {
                     if (!fOverlayWindow)
                     {
@@ -3663,7 +3637,6 @@ static void removeKeRangerRansomware()
 
                     return NSDragOperationCopy;
                 }
-                tr_ctorFree(ctor);
             }
         }
 
@@ -3722,13 +3695,11 @@ static void removeKeRangerRansomware()
                 [file.pathExtension caseInsensitiveCompare:@"torrent"] == NSOrderedSame)
             {
                 torrent = YES;
-                tr_ctor* ctor = tr_ctorNew(fLib);
-                tr_ctorSetMetainfoFromFile(ctor, file.UTF8String);
-                if (tr_torrentParse(ctor, NULL) == TR_PARSE_OK)
+                auto metainfo = tr_torrent_metainfo{};
+                if (metainfo.parseTorrentFile(file.UTF8String))
                 {
                     [filesToOpen addObject:file];
                 }
-                tr_ctorFree(ctor);
             }
         }
 

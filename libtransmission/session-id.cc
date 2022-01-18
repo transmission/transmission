@@ -6,8 +6,8 @@
  *
  */
 
-#include <cstring>
 #include <ctime>
+#include <string_view>
 
 #ifndef _WIN32
 #include <sys/stat.h>
@@ -25,8 +25,8 @@
 
 using namespace std::literals;
 
-#define SESSION_ID_SIZE 48
-#define SESSION_ID_DURATION_SEC (60 * 60) /* expire in an hour */
+static auto constexpr SessionIdSize = size_t{ 48 };
+static auto constexpr SessionIdDurationSec = time_t{ 60 * 60 }; /* expire in an hour */
 
 struct tr_session_id
 {
@@ -42,16 +42,16 @@ static char* generate_new_session_id_value(void)
     char const pool[] = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
     size_t const pool_size = sizeof(pool) - 1;
 
-    char* buf = tr_new(char, SESSION_ID_SIZE + 1);
+    auto* buf = tr_new(char, SessionIdSize + 1);
 
-    tr_rand_buffer(buf, SESSION_ID_SIZE);
+    tr_rand_buffer(buf, SessionIdSize);
 
-    for (size_t i = 0; i < SESSION_ID_SIZE; ++i)
+    for (size_t i = 0; i < SessionIdSize; ++i)
     {
         buf[i] = pool[(unsigned char)buf[i] % pool_size];
     }
 
-    buf[SESSION_ID_SIZE] = '\0';
+    buf[SessionIdSize] = '\0';
 
     return buf;
 }
@@ -117,7 +117,7 @@ static void destroy_session_id_lock_file(tr_sys_file_t lock_file, char const* se
 
 tr_session_id_t tr_session_id_new(void)
 {
-    tr_session_id_t const session_id = tr_new0(struct tr_session_id, 1);
+    auto const session_id = tr_new0(struct tr_session_id, 1);
 
     session_id->current_lock_file = TR_BAD_SYS_FILE;
     session_id->previous_lock_file = TR_BAD_SYS_FILE;
@@ -156,7 +156,7 @@ char const* tr_session_id_get_current(tr_session_id_t session_id)
         session_id->previous_lock_file = session_id->current_lock_file;
         session_id->current_lock_file = create_session_id_lock_file(session_id->current_value);
 
-        session_id->expires_at = now + SESSION_ID_DURATION_SEC;
+        session_id->expires_at = now + SessionIdDurationSec;
     }
 
     return session_id->current_value;
