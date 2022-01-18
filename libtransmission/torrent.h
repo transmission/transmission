@@ -476,14 +476,14 @@ public:
         return metainfo_.dateCreated();
     }
 
-    [[nodiscard]] auto const& torrentFile() const
+    [[nodiscard]] auto torrentFile() const
     {
-        return metainfo_.torrentFile();
+        return metainfo_.torrentFile(this->session->torrent_dir);
     }
 
-    void setTorrentFile(std::string_view filename)
+    [[nodiscard]] auto resumeFile() const
     {
-        metainfo_.setTorrentFile(filename);
+        return metainfo_.resumeFile(this->session->resume_dir);
     }
 
     [[nodiscard]] auto const& comment() const
@@ -514,16 +514,6 @@ public:
     [[nodiscard]] auto infoDictOffset() const
     {
         return metainfo_.infoDictOffset();
-    }
-
-    [[nodiscard]] auto makeTorrentFilename() const
-    {
-        return metainfo_.makeTorrentFilename(this->session->torrent_dir);
-    }
-
-    [[nodiscard]] auto makeResumeFilename() const
-    {
-        return metainfo_.makeResumeFilename(this->session->resume_dir);
     }
 
     /// METAINFO - CHECKSUMS

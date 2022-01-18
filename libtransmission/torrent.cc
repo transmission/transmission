@@ -334,34 +334,33 @@ bool tr_torrentGetSeedRatio(tr_torrent const* tor, double* ratio)
 
 /* returns true if the seed ratio applies --
  * it applies if the torrent's a seed AND it has a seed ratio set */
-static bool tr_torrentGetSeedRatioBytes(tr_torrent const* tor, uint64_t* setmeLeft, uint64_t* setmeGoal)
+static bool tr_torrentGetSeedRatioBytes(tr_torrent const* tor, uint64_t* setme_left, uint64_t* setme_goal)
 {
-    bool seedRatioApplies = false;
+    bool seed_ratio_applies = false;
 
     TR_ASSERT(tr_isTorrent(tor));
 
-    auto seedRatio = double{};
-    if (tr_torrentGetSeedRatio(tor, &seedRatio))
+    auto seed_ratio = double{};
+    if (tr_torrentGetSeedRatio(tor, &seed_ratio))
     {
-        uint64_t const u = tor->uploadedCur + tor->uploadedPrev;
-        uint64_t const d = tor->downloadedCur + tor->downloadedPrev;
-        uint64_t const baseline = d != 0 ? d : tor->completion.sizeWhenDone();
-        uint64_t const goal = baseline * seedRatio;
+        auto const uploaded = tor->uploadedCur + tor->uploadedPrev;
+        auto const baseline = tor->totalSize();
+        auto const goal = baseline * seed_ratio;
 
-        if (setmeLeft != nullptr)
+        if (setme_left != nullptr)
         {
-            *setmeLeft = goal > u ? goal - u : 0;
+            *setme_left = goal > uploaded ? goal - uploaded : 0;
         }
 
-        if (setmeGoal != nullptr)
+        if (setme_goal != nullptr)
         {
-            *setmeGoal = goal;
+            *setme_goal = goal;
         }
 
-        seedRatioApplies = tor->isDone();
+        seed_ratio_applies = tor->isDone();
     }
 
-    return seedRatioApplies;
+    return seed_ratio_applies;
 }
 
 static bool tr_torrentIsSeedRatioDone(tr_torrent const* tor)
@@ -724,16 +723,12 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
     tr_sessionAddTorrent(session, tor);
 
     // if we don't have a local .torrent file already, assume the torrent is new
-    auto filename = tor->makeTorrentFilename();
+    auto const filename = tor->torrentFile();
     bool const is_new_torrent = !tr_sys_path_exists(filename.c_str(), nullptr);
     if (is_new_torrent)
     {
         tr_error* error = nullptr;
-        if (tr_ctorSaveContents(ctor, filename, &error))
-        {
-            tor->setTorrentFile(filename);
-        }
-        else
+        if (!tr_ctorSaveContents(ctor, filename, &error))
         {
             tor->setLocalError(
                 tr_strvJoin("Unable to save torrent file: ", error->message, " ("sv, std::to_string(error->code), ")"sv));
@@ -995,7 +990,7 @@ tr_stat const* tr_torrentStat(tr_torrent* tor)
     s->haveUnchecked = tor->hasTotal() - s->haveValid;
     s->desiredAvailable = tr_peerMgrGetDesiredAvailable(tor);
 
-    s->ratio = tr_getRatio(s->uploadedEver, s->downloadedEver != 0 ? s->downloadedEver : s->haveValid);
+    s->ratio = tr_getRatio(s->uploadedEver, tor->totalSize());
 
     auto seedRatioBytesLeft = uint64_t{};
     auto seedRatioBytesGoal = uint64_t{};
@@ -1155,7 +1150,6 @@ tr_torrent_view tr_torrentView(tr_torrent const* tor)
     auto ret = tr_torrent_view{};
     ret.name = tr_torrentName(tor);
     ret.hash_string = tor->infoHashString().c_str();
-    ret.torrent_filename = tor->torrentFile().c_str();
     ret.comment = tor->comment().c_str();
     ret.creator = tor->creator().c_str();
     ret.source = tor->source().c_str();
@@ -1167,6 +1161,11 @@ tr_torrent_view tr_torrentView(tr_torrent const* tor)
     ret.is_folder = tor->fileCount() > 1;
 
     return ret;
+}
+
+char* tr_torrentFilename(tr_torrent const* tor)
+{
+    return tr_strvDup(tor->torrentFile());
 }
 
 /***
@@ -1543,8 +1542,8 @@ static void closeTorrent(void* vtor)
 
     if (tor->isDeleting)
     {
-        tr_sys_path_remove(tor->torrentFile().c_str(), nullptr);
-        tr_torrentRemoveResume(tor);
+        tor->metainfo_.removeFile(tor->session->torrent_dir, tor->name(), tor->infoHashString(), ".torrent"sv);
+        tor->metainfo_.removeFile(tor->session->resume_dir, tor->name(), tor->infoHashString(), ".resume"sv);
     }
 
     tor->isRunning = false;

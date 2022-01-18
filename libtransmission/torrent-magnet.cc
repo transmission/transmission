@@ -277,14 +277,13 @@ static bool useNewMetainfo(tr_torrent* tor, tr_incomplete_metadata const* m, tr_
     }
 
     // save it
-    auto const filename = tor->makeTorrentFilename();
+    auto const filename = tor->torrentFile();
     if (!tr_saveFile(filename, benc, error))
     {
         return false;
     }
 
     // tor should keep this metainfo
-    metainfo.setTorrentFile(filename);
     tor->setMetainfo(metainfo);
 
     return true;
