@@ -262,7 +262,7 @@ OptionsDialog::OptionsDialog(
     Gtk::Window& parent,
     Glib::RefPtr<Session> const& core,
     std::unique_ptr<tr_ctor, void (*)(tr_ctor*)> ctor)
-    : Gtk::Dialog(_("Torrent Options"), parent)
+    : Gtk::Dialog(_("Torrent Options"), parent, true /* modal */)
     , impl_(std::make_unique<Impl>(*this, core, std::move(ctor)))
 {
 }
@@ -438,6 +438,8 @@ std::unique_ptr<TorrentFileChooserDialog> TorrentFileChooserDialog::create(
 TorrentFileChooserDialog::TorrentFileChooserDialog(Gtk::Window& parent, Glib::RefPtr<Session> const& core)
     : Gtk::FileChooserDialog(parent, _("Open a Torrent"), Gtk::FILE_CHOOSER_ACTION_OPEN)
 {
+    set_modal(true);
+
     add_button(_("_Cancel"), Gtk::RESPONSE_CANCEL);
     add_button(_("_Open"), Gtk::RESPONSE_ACCEPT);
 
@@ -496,7 +498,7 @@ std::unique_ptr<TorrentUrlChooserDialog> TorrentUrlChooserDialog::create(Gtk::Wi
 }
 
 TorrentUrlChooserDialog::TorrentUrlChooserDialog(Gtk::Window& parent, Glib::RefPtr<Session> const& core)
-    : Gtk::Dialog(_("Open URL"), parent)
+    : Gtk::Dialog(_("Open URL"), parent, true /* modal  */)
 {
     guint row;
 
