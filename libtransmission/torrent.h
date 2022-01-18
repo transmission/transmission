@@ -516,14 +516,14 @@ public:
         return metainfo_.infoDictOffset();
     }
 
-    [[nodiscard]] auto makeTorrentFilename() const
+    [[nodiscard]] auto torrentFilename() const
     {
-        return metainfo_.makeTorrentFilename(this->session->torrent_dir);
+        return metainfo_.torrentFilename(this->session->torrent_dir);
     }
 
-    [[nodiscard]] auto makeResumeFilename() const
+    [[nodiscard]] auto resumeFilename() const
     {
-        return metainfo_.makeResumeFilename(this->session->resume_dir);
+        return metainfo_.resumeFilename(this->session->resume_dir);
     }
 
     /// METAINFO - CHECKSUMS

@@ -723,7 +723,7 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
     tr_sessionAddTorrent(session, tor);
 
     // if we don't have a local .torrent file already, assume the torrent is new
-    auto filename = tor->makeTorrentFilename();
+    auto filename = tor->torrentFilename();
     bool const is_new_torrent = !tr_sys_path_exists(filename.c_str(), nullptr);
     if (is_new_torrent)
     {
@@ -1542,8 +1542,8 @@ static void closeTorrent(void* vtor)
 
     if (tor->isDeleting)
     {
-        tr_sys_path_remove(tor->torrentFile().c_str(), nullptr);
-        tr_torrentRemoveResume(tor);
+        tor->metainfo_.removeFile(tor->session->torrent_dir, tor->name(), tor->infoHashString(), ".torrent"sv);
+        tor->metainfo_.removeFile(tor->session->resume_dir, tor->name(), tor->infoHashString(), ".resume"sv);
     }
 
     tor->isRunning = false;
