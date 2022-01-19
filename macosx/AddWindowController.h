@@ -4,47 +4,12 @@
 
 #import <Cocoa/Cocoa.h>
 
-#import "Torrent.h"
-
 @class Controller;
-@class FileOutlineController;
 @class Torrent;
 
 @interface AddWindowController : NSWindowController
-{
-    IBOutlet NSImageView* fIconView;
-    IBOutlet NSImageView* fLocationImageView;
-    IBOutlet NSTextField* fNameField;
-    IBOutlet NSTextField* fStatusField;
-    IBOutlet NSTextField* fLocationField;
-    IBOutlet NSButton* fStartCheck;
-    IBOutlet NSButton* fDeleteCheck;
-    IBOutlet NSPopUpButton* fGroupPopUp;
-    IBOutlet NSPopUpButton* fPriorityPopUp;
-    IBOutlet NSProgressIndicator* fVerifyIndicator;
 
-    IBOutlet NSTextField* fFileFilterField;
-    IBOutlet NSButton* fCheckAllButton;
-    IBOutlet NSButton* fUncheckAllButton;
-
-    IBOutlet FileOutlineController* fFileController;
-    IBOutlet NSScrollView* fFileScrollView;
-
-    Controller* fController;
-
-    Torrent* fTorrent;
-    NSString* fDestination;
-    NSString* fTorrentFile;
-    BOOL fLockDestination;
-
-    BOOL fDeleteTorrentEnableInitially;
-    BOOL fCanToggleDelete;
-    NSInteger fGroupValue;
-
-    NSTimer* fTimer;
-
-    TorrentDeterminationType fGroupValueDetermination;
-}
+@property(nonatomic, readonly) Torrent* torrent;
 
 // if canToggleDelete is NO, we will also not delete the file regardless of the delete check's state
 // (this is so it can be disabled and checked for a downloaded torrent, where the file's already deleted)
@@ -55,8 +20,6 @@
                           torrentFile:(NSString*)torrentFile
     deleteTorrentCheckEnableInitially:(BOOL)deleteTorrent
                       canToggleDelete:(BOOL)canToggleDelete;
-
-@property(nonatomic, readonly) Torrent* torrent;
 
 - (void)setDestination:(id)sender;
 

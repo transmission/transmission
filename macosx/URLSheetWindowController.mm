@@ -7,6 +7,11 @@
 
 @interface URLSheetWindowController ()
 
+@property(nonatomic) IBOutlet NSTextField* fLabelField;
+@property(nonatomic) IBOutlet NSTextField* fTextField;
+@property(nonatomic) IBOutlet NSButton* fOpenButton;
+@property(nonatomic) IBOutlet NSButton* fCancelButton;
+
 - (void)updateOpenButtonForURL:(NSString*)string;
 
 @end
@@ -15,37 +20,34 @@
 
 NSString* urlString = nil;
 
-- (instancetype)initWithController:(Controller*)controller
+- (instancetype)init
 {
-    if ((self = [self initWithWindowNibName:@"URLSheetWindow"]))
-    {
-        fController = controller;
-    }
+    self = [self initWithWindowNibName:@"URLSheetWindow"];
     return self;
 }
 
 - (void)awakeFromNib
 {
-    fLabelField.stringValue = NSLocalizedString(@"Internet address of torrent file:", "URL sheet label");
+    self.fLabelField.stringValue = NSLocalizedString(@"Internet address of torrent file:", "URL sheet label");
 
-    if (urlString)
+    if (self.urlString)
     {
-        fTextField.stringValue = urlString;
-        [fTextField selectText:self];
+        self.fTextField.stringValue = self.urlString;
+        [self.fTextField selectText:self];
 
-        [self updateOpenButtonForURL:urlString];
+        [self updateOpenButtonForURL:self.urlString];
     }
 
-    fOpenButton.title = NSLocalizedString(@"Open", "URL sheet button");
-    fCancelButton.title = NSLocalizedString(@"Cancel", "URL sheet button");
+    self.fOpenButton.title = NSLocalizedString(@"Open", "URL sheet button");
+    self.fCancelButton.title = NSLocalizedString(@"Cancel", "URL sheet button");
 
-    [fOpenButton sizeToFit];
-    [fCancelButton sizeToFit];
+    [self.fOpenButton sizeToFit];
+    [self.fCancelButton sizeToFit];
 
     //size the two buttons the same
-    NSRect openFrame = fOpenButton.frame;
+    NSRect openFrame = self.fOpenButton.frame;
     openFrame.size.width += 10.0;
-    NSRect cancelFrame = fCancelButton.frame;
+    NSRect cancelFrame = self.fCancelButton.frame;
     cancelFrame.size.width += 10.0;
 
     if (NSWidth(openFrame) > NSWidth(cancelFrame))
@@ -58,10 +60,10 @@ NSString* urlString = nil;
     }
 
     openFrame.origin.x = NSWidth(self.window.frame) - NSWidth(openFrame) - 20.0 + 6.0; //I don't know why the extra 6.0 is needed
-    fOpenButton.frame = openFrame;
+    self.fOpenButton.frame = openFrame;
 
     cancelFrame.origin.x = NSMinX(openFrame) - NSWidth(cancelFrame);
-    fCancelButton.frame = cancelFrame;
+    self.fCancelButton.frame = cancelFrame;
 }
 
 - (void)openURLEndSheet:(id)sender
@@ -78,13 +80,15 @@ NSString* urlString = nil;
 
 - (NSString*)urlString
 {
-    return fTextField.stringValue;
+    return self.fTextField.stringValue;
 }
 
 - (void)controlTextDidChange:(NSNotification*)notification
 {
-    [self updateOpenButtonForURL:fTextField.stringValue];
+    [self updateOpenButtonForURL:self.fTextField.stringValue];
 }
+
+#pragma mark - Private
 
 - (void)updateOpenButtonForURL:(NSString*)string
 {
@@ -102,7 +106,7 @@ NSString* urlString = nil;
         }
     }
 
-    fOpenButton.enabled = enable;
+    self.fOpenButton.enabled = enable;
 }
 
 @end

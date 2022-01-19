@@ -5,10 +5,6 @@
 #import <Cocoa/Cocoa.h>
 
 @interface FileNameCell : NSActionCell
-{
-    NSMutableDictionary* fTitleAttributes;
-    NSMutableDictionary* fStatusAttributes;
-}
 
 - (NSRect)imageRectForBounds:(NSRect)bounds;
 

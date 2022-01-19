@@ -9,14 +9,6 @@
 @class PrefsController;
 
 @interface BlocklistDownloaderViewController : NSObject
-{
-    PrefsController* fPrefsController;
-
-    IBOutlet NSWindow* fStatusWindow;
-    IBOutlet NSProgressIndicator* fProgressBar;
-    IBOutlet NSTextField* fTextField;
-    IBOutlet NSButton* fButton;
-}
 
 + (void)downloadWithPrefsController:(PrefsController*)prefsController;
 

@@ -10,6 +10,8 @@
 
 @interface GroupsController ()
 
+@property(nonatomic, readonly) NSMutableArray* fGroups;
+
 - (void)saveGroups;
 
 - (NSImage*)imageForGroup:(NSMutableDictionary*)dict;
@@ -38,11 +40,11 @@ GroupsController* fGroupsInstance = nil;
         NSData* data;
         if ((data = [NSUserDefaults.standardUserDefaults dataForKey:@"GroupDicts"]))
         {
-            fGroups = [NSKeyedUnarchiver unarchiveObjectWithData:data];
+            _fGroups = [NSKeyedUnarchiver unarchiveObjectWithData:data];
         }
         else if ((data = [NSUserDefaults.standardUserDefaults dataForKey:@"Groups"])) //handle old groups
         {
-            fGroups = [NSUnarchiver unarchiveObjectWithData:data];
+            _fGroups = [NSUnarchiver unarchiveObjectWithData:data];
             [NSUserDefaults.standardUserDefaults removeObjectForKey:@"Groups"];
             [self saveGroups];
         }
@@ -70,7 +72,7 @@ GroupsController* fGroupsInstance = nil;
             NSMutableDictionary* gray = [NSMutableDictionary
                 dictionaryWithObjectsAndKeys:NSColor.grayColor, @"Color", NSLocalizedString(@"Gray", "Groups -> Name"), @"Name", @6, @"Index", nil];
 
-            fGroups = [[NSMutableArray alloc] initWithObjects:red, orange, yellow, green, blue, purple, gray, nil];
+            _fGroups = [[NSMutableArray alloc] initWithObjects:red, orange, yellow, green, blue, purple, gray, nil];
             [self saveGroups]; //make sure this is saved right away
         }
     }
@@ -80,16 +82,16 @@ GroupsController* fGroupsInstance = nil;
 
 - (NSInteger)numberOfGroups
 {
-    return fGroups.count;
+    return self.fGroups.count;
 }
 
 - (NSInteger)rowValueForIndex:(NSInteger)index
 {
     if (index != -1)
     {
-        for (NSUInteger i = 0; i < fGroups.count; i++)
+        for (NSUInteger i = 0; i < self.fGroups.count; i++)
         {
-            if (index == [fGroups[i][@"Index"] integerValue])
+            if (index == [self.fGroups[i][@"Index"] integerValue])
             {
                 return i;
             }
@@ -100,19 +102,19 @@ GroupsController* fGroupsInstance = nil;
 
 - (NSInteger)indexForRow:(NSInteger)row
 {
-    return [fGroups[row][@"Index"] integerValue];
+    return [self.fGroups[row][@"Index"] integerValue];
 }
 
 - (NSString*)nameForIndex:(NSInteger)index
 {
     NSInteger orderIndex = [self rowValueForIndex:index];
-    return orderIndex != -1 ? fGroups[orderIndex][@"Name"] : nil;
+    return orderIndex != -1 ? self.fGroups[orderIndex][@"Name"] : nil;
 }
 
 - (void)setName:(NSString*)name forIndex:(NSInteger)index
 {
     NSInteger orderIndex = [self rowValueForIndex:index];
-    fGroups[orderIndex][@"Name"] = name;
+    self.fGroups[orderIndex][@"Name"] = name;
     [self saveGroups];
 
     [NSNotificationCenter.defaultCenter postNotificationName:@"UpdateGroups" object:self];
@@ -121,18 +123,18 @@ GroupsController* fGroupsInstance = nil;
 - (NSImage*)imageForIndex:(NSInteger)index
 {
     NSInteger orderIndex = [self rowValueForIndex:index];
-    return orderIndex != -1 ? [self imageForGroup:fGroups[orderIndex]] : [NSImage imageNamed:@"GroupsNoneTemplate"];
+    return orderIndex != -1 ? [self imageForGroup:self.fGroups[orderIndex]] : [NSImage imageNamed:@"GroupsNoneTemplate"];
 }
 
 - (NSColor*)colorForIndex:(NSInteger)index
 {
     NSInteger orderIndex = [self rowValueForIndex:index];
-    return orderIndex != -1 ? fGroups[orderIndex][@"Color"] : nil;
+    return orderIndex != -1 ? self.fGroups[orderIndex][@"Color"] : nil;
 }
 
 - (void)setColor:(NSColor*)color forIndex:(NSInteger)index
 {
-    NSMutableDictionary* dict = fGroups[[self rowValueForIndex:index]];
+    NSMutableDictionary* dict = self.fGroups[[self rowValueForIndex:index]];
     [dict removeObjectForKey:@"Icon"];
 
     dict[@"Color"] = color;
@@ -149,12 +151,12 @@ GroupsController* fGroupsInstance = nil;
     }
 
     NSInteger orderIndex = [self rowValueForIndex:index];
-    return [fGroups[orderIndex][@"UsesCustomDownloadLocation"] boolValue];
+    return [self.fGroups[orderIndex][@"UsesCustomDownloadLocation"] boolValue];
 }
 
 - (void)setUsesCustomDownloadLocation:(BOOL)useCustomLocation forIndex:(NSInteger)index
 {
-    NSMutableDictionary* dict = fGroups[[self rowValueForIndex:index]];
+    NSMutableDictionary* dict = self.fGroups[[self rowValueForIndex:index]];
 
     dict[@"UsesCustomDownloadLocation"] = @(useCustomLocation);
 
@@ -164,12 +166,12 @@ GroupsController* fGroupsInstance = nil;
 - (NSString*)customDownloadLocationForIndex:(NSInteger)index
 {
     NSInteger orderIndex = [self rowValueForIndex:index];
-    return orderIndex != -1 ? fGroups[orderIndex][@"CustomDownloadLocation"] : nil;
+    return orderIndex != -1 ? self.fGroups[orderIndex][@"CustomDownloadLocation"] : nil;
 }
 
 - (void)setCustomDownloadLocation:(NSString*)location forIndex:(NSInteger)index
 {
-    NSMutableDictionary* dict = fGroups[[self rowValueForIndex:index]];
+    NSMutableDictionary* dict = self.fGroups[[self rowValueForIndex:index]];
     dict[@"CustomDownloadLocation"] = location;
 
     [GroupsController.groups saveGroups];
@@ -183,13 +185,13 @@ GroupsController* fGroupsInstance = nil;
         return NO;
     }
 
-    NSNumber* assignRules = fGroups[orderIndex][@"UsesAutoGroupRules"];
+    NSNumber* assignRules = self.fGroups[orderIndex][@"UsesAutoGroupRules"];
     return assignRules && assignRules.boolValue;
 }
 
 - (void)setUsesAutoAssignRules:(BOOL)useAutoAssignRules forIndex:(NSInteger)index
 {
-    NSMutableDictionary* dict = fGroups[[self rowValueForIndex:index]];
+    NSMutableDictionary* dict = self.fGroups[[self rowValueForIndex:index]];
 
     dict[@"UsesAutoGroupRules"] = @(useAutoAssignRules);
 
@@ -204,12 +206,12 @@ GroupsController* fGroupsInstance = nil;
         return nil;
     }
 
-    return fGroups[orderIndex][@"AutoGroupRules"];
+    return self.fGroups[orderIndex][@"AutoGroupRules"];
 }
 
 - (void)setAutoAssignRules:(NSPredicate*)predicate forIndex:(NSInteger)index
 {
-    NSMutableDictionary* dict = fGroups[[self rowValueForIndex:index]];
+    NSMutableDictionary* dict = self.fGroups[[self rowValueForIndex:index]];
 
     if (predicate)
     {
@@ -226,15 +228,15 @@ GroupsController* fGroupsInstance = nil;
 - (void)addNewGroup
 {
     //find the lowest index
-    NSMutableIndexSet* candidates = [NSMutableIndexSet indexSetWithIndexesInRange:NSMakeRange(0, fGroups.count + 1)];
-    for (NSDictionary* dict in fGroups)
+    NSMutableIndexSet* candidates = [NSMutableIndexSet indexSetWithIndexesInRange:NSMakeRange(0, self.fGroups.count + 1)];
+    for (NSDictionary* dict in self.fGroups)
     {
         [candidates removeIndex:[dict[@"Index"] integerValue]];
     }
 
     NSInteger const index = candidates.firstIndex;
 
-    [fGroups addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:@(index),
+    [self.fGroups addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:@(index),
                                                                          @"Index",
                                                                          [NSColor colorWithCalibratedRed:0.0 green:0.65 blue:1.0
                                                                                                    alpha:1.0],
@@ -249,8 +251,8 @@ GroupsController* fGroupsInstance = nil;
 
 - (void)removeGroupWithRowIndex:(NSInteger)row
 {
-    NSInteger index = [fGroups[row][@"Index"] integerValue];
-    [fGroups removeObjectAtIndex:row];
+    NSInteger index = [self.fGroups[row][@"Index"] integerValue];
+    [self.fGroups removeObjectAtIndex:row];
 
     [NSNotificationCenter.defaultCenter postNotificationName:@"GroupValueRemoved" object:self
                                                     userInfo:@{ @"Index" : @(index) }];
@@ -266,7 +268,7 @@ GroupsController* fGroupsInstance = nil;
 
 - (void)moveGroupAtRow:(NSInteger)oldRow toRow:(NSInteger)newRow
 {
-    [fGroups moveObjectAtIndex:oldRow toIndex:newRow];
+    [self.fGroups moveObjectAtIndex:oldRow toIndex:newRow];
 
     [self saveGroups];
     [NSNotificationCenter.defaultCenter postNotificationName:@"UpdateGroups" object:self];
@@ -296,7 +298,7 @@ GroupsController* fGroupsInstance = nil;
 
     [menu addItem:item];
 
-    for (NSMutableDictionary* dict in fGroups)
+    for (NSMutableDictionary* dict in self.fGroups)
     {
         item = [[NSMenuItem alloc] initWithTitle:dict[@"Name"] action:action keyEquivalent:@""];
         item.target = target;
@@ -324,7 +326,7 @@ GroupsController* fGroupsInstance = nil;
 
 - (NSInteger)groupIndexForTorrent:(Torrent*)torrent
 {
-    for (NSDictionary* group in fGroups)
+    for (NSDictionary* group in self.fGroups)
     {
         NSInteger row = [group[@"Index"] integerValue];
         if ([self torrent:torrent doesMatchRulesForGroupAtIndex:row])
@@ -335,11 +337,13 @@ GroupsController* fGroupsInstance = nil;
     return -1;
 }
 
+#pragma mark - Private
+
 - (void)saveGroups
 {
     //don't archive the icon
-    NSMutableArray* groups = [NSMutableArray arrayWithCapacity:fGroups.count];
-    for (NSDictionary* dict in fGroups)
+    NSMutableArray* groups = [NSMutableArray arrayWithCapacity:self.fGroups.count];
+    for (NSDictionary* dict in self.fGroups)
     {
         NSMutableDictionary* tempDict = [dict mutableCopy];
         [tempDict removeObjectForKey:@"Icon"];

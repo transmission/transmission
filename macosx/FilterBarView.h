@@ -5,7 +5,5 @@
 #import <Cocoa/Cocoa.h>
 
 @interface FilterBarView : NSView
-{
-}
 
 @end

@@ -7,18 +7,6 @@
 #include <libtransmission/transmission.h>
 
 @interface GlobalOptionsPopoverViewController : NSViewController
-{
-    tr_session* fHandle;
-    NSUserDefaults* fDefaults;
-
-    IBOutlet NSTextField* fUploadLimitField;
-    IBOutlet NSTextField* fDownloadLimitField;
-
-    IBOutlet NSTextField* fRatioStopField;
-    IBOutlet NSTextField* fIdleStopField;
-
-    NSString* fInitialString;
-}
 
 - (instancetype)initWithHandle:(tr_session*)handle;
 

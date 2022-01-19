@@ -5,9 +5,6 @@
 #import <Cocoa/Cocoa.h>
 
 @interface BlocklistScheduler : NSObject
-{
-    NSTimer* fTimer;
-}
 
 @property(nonatomic, class, readonly) BlocklistScheduler* scheduler;
 

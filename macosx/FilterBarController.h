@@ -4,8 +4,6 @@
 
 #import <Cocoa/Cocoa.h>
 
-@class FilterButton;
-
 #define FILTER_NONE @"None"
 #define FILTER_ACTIVE @"Active"
 #define FILTER_DOWNLOAD @"Download"
@@ -18,17 +16,8 @@
 #define GROUP_FILTER_ALL_TAG -2
 
 @interface FilterBarController : NSViewController
-{
-    IBOutlet FilterButton* fNoFilterButton;
-    IBOutlet FilterButton* fActiveFilterButton;
-    IBOutlet FilterButton* fDownloadFilterButton;
-    IBOutlet FilterButton* fSeedFilterButton;
-    IBOutlet FilterButton* fPauseFilterButton;
 
-    IBOutlet NSSearchField* fSearchField;
-
-    IBOutlet NSPopUpButton* fGroupsButton;
-}
+@property(nonatomic, readonly) NSArray* searchStrings;
 
 - (instancetype)init;
 
@@ -38,8 +27,6 @@
 - (void)setSearchType:(id)sender;
 - (void)setGroupFilter:(id)sender;
 - (void)reset:(BOOL)updateUI;
-
-@property(nonatomic, readonly) NSArray* searchStrings;
 - (void)focusSearchField;
 
 - (void)setCountAll:(NSUInteger)all

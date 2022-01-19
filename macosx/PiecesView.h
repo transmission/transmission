@@ -7,20 +7,8 @@
 @class Torrent;
 
 @interface PiecesView : NSImageView
-{
-    int8_t* fPieces;
 
-    NSColor* fGreenAvailabilityColor;
-    NSColor* fBluePieceColor;
-
-    Torrent* fTorrent;
-    NSInteger fNumPieces;
-    NSInteger fAcross;
-    NSInteger fWidth;
-    NSInteger fExtraBorder;
-}
-
-- (void)setTorrent:(Torrent*)torrent;
+@property(nonatomic) Torrent* torrent;
 
 - (void)clearView;
 - (void)updateView;

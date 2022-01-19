@@ -7,12 +7,6 @@
 #include <libtransmission/transmission.h>
 
 @interface DragOverlayWindow : NSWindow
-{
-    tr_session* fLib;
-
-    NSViewAnimation* fFadeInAnimation;
-    NSViewAnimation* fFadeOutAnimation;
-}
 
 - (instancetype)initWithLib:(tr_session*)lib forWindow:(NSWindow*)window;
 

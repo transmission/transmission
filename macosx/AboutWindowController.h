@@ -5,15 +5,6 @@
 #import <Cocoa/Cocoa.h>
 
 @interface AboutWindowController : NSWindowController
-{
-    IBOutlet NSTextView* fTextView;
-    IBOutlet NSTextView* fLicenseView;
-    IBOutlet NSTextField* fVersionField;
-    IBOutlet NSTextField* fCopyrightField;
-    IBOutlet NSButton* fLicenseButton;
-    IBOutlet NSButton* fLicenseCloseButton;
-    IBOutlet NSPanel* fLicenseSheet;
-}
 
 @property(nonatomic, class, readonly) AboutWindowController* aboutController;
 

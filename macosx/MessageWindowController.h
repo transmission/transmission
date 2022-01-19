@@ -5,23 +5,6 @@
 #import <Cocoa/Cocoa.h>
 
 @interface MessageWindowController : NSWindowController
-{
-    IBOutlet NSTableView* fMessageTable;
-
-    IBOutlet NSPopUpButton* fLevelButton;
-    IBOutlet NSButton* fSaveButton;
-    IBOutlet NSButton* fClearButton;
-    IBOutlet NSSearchField* fFilterField;
-
-    NSMutableArray* fMessages;
-    NSMutableArray* fDisplayedMessages;
-
-    NSDictionary* fAttributes;
-
-    NSTimer* fTimer;
-
-    NSLock* fLock;
-}
 
 - (void)updateLog:(NSTimer*)timer;
 

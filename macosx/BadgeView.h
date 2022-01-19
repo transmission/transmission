@@ -7,14 +7,6 @@
 #include <libtransmission/transmission.h>
 
 @interface BadgeView : NSView
-{
-    tr_session* fLib;
-
-    NSMutableDictionary* fAttributes;
-
-    CGFloat fDownloadRate;
-    CGFloat fUploadRate;
-}
 
 - (instancetype)initWithLib:(tr_session*)lib;
 

@@ -9,6 +9,13 @@
 
 @interface BlocklistDownloaderViewController ()
 
+@property(nonatomic) IBOutlet NSWindow* fStatusWindow;
+@property(nonatomic) IBOutlet NSProgressIndicator* fProgressBar;
+@property(nonatomic) IBOutlet NSTextField* fTextField;
+@property(nonatomic) IBOutlet NSButton* fButton;
+
+@property(nonatomic, readonly) PrefsController* fPrefsController;
+
 - (instancetype)initWithPrefsController:(PrefsController*)prefsController;
 - (void)startDownload;
 
@@ -28,17 +35,17 @@ BlocklistDownloaderViewController* fBLViewController = nil;
 
 - (void)awakeFromNib
 {
-    fButton.title = NSLocalizedString(@"Cancel", "Blocklist -> cancel button");
+    self.fButton.title = NSLocalizedString(@"Cancel", "Blocklist -> cancel button");
 
-    CGFloat const oldWidth = NSWidth(fButton.frame);
-    [fButton sizeToFit];
-    NSRect buttonFrame = fButton.frame;
+    CGFloat const oldWidth = NSWidth(self.fButton.frame);
+    [self.fButton sizeToFit];
+    NSRect buttonFrame = self.fButton.frame;
     buttonFrame.size.width += 12.0; //sizeToFit sizes a bit too small
     buttonFrame.origin.x -= NSWidth(buttonFrame) - oldWidth;
-    fButton.frame = buttonFrame;
+    self.fButton.frame = buttonFrame;
 
-    fProgressBar.usesThreadedAnimation = YES;
-    [fProgressBar startAnimation:self];
+    self.fProgressBar.usesThreadedAnimation = YES;
+    [self.fProgressBar startAnimation:self];
 }
 
 - (void)cancelDownload:(id)sender
@@ -48,8 +55,8 @@ BlocklistDownloaderViewController* fBLViewController = nil;
 
 - (void)setStatusStarting
 {
-    fTextField.stringValue = [NSLocalizedString(@"Connecting to site", "Blocklist -> message") stringByAppendingEllipsis];
-    fProgressBar.indeterminate = YES;
+    self.fTextField.stringValue = [NSLocalizedString(@"Connecting to site", "Blocklist -> message") stringByAppendingEllipsis];
+    self.fProgressBar.indeterminate = YES;
 }
 
 - (void)setStatusProgressForCurrentSize:(NSUInteger)currentSize expectedSize:(long long)expectedSize
@@ -57,42 +64,42 @@ BlocklistDownloaderViewController* fBLViewController = nil;
     NSString* string = NSLocalizedString(@"Downloading blocklist", "Blocklist -> message");
     if (expectedSize != NSURLResponseUnknownLength)
     {
-        fProgressBar.indeterminate = NO;
+        self.fProgressBar.indeterminate = NO;
 
         NSString* substring = [NSString stringForFilePartialSize:currentSize fullSize:expectedSize];
         string = [string stringByAppendingFormat:@" (%@)", substring];
-        fProgressBar.doubleValue = (double)currentSize / expectedSize;
+        self.fProgressBar.doubleValue = (double)currentSize / expectedSize;
     }
     else
     {
         string = [string stringByAppendingFormat:@" (%@)", [NSString stringForFileSize:currentSize]];
     }
 
-    fTextField.stringValue = string;
+    self.fTextField.stringValue = string;
 }
 
 - (void)setStatusProcessing
 {
     //change to indeterminate while processing
-    fProgressBar.indeterminate = YES;
-    [fProgressBar startAnimation:self];
+    self.fProgressBar.indeterminate = YES;
+    [self.fProgressBar startAnimation:self];
 
-    fTextField.stringValue = [NSLocalizedString(@"Processing blocklist", "Blocklist -> message") stringByAppendingEllipsis];
-    fButton.enabled = NO;
+    self.fTextField.stringValue = [NSLocalizedString(@"Processing blocklist", "Blocklist -> message") stringByAppendingEllipsis];
+    self.fButton.enabled = NO;
 }
 
 - (void)setFinished
 {
-    [NSApp endSheet:fStatusWindow];
-    [fStatusWindow orderOut:self];
+    [NSApp endSheet:self.fStatusWindow];
+    [self.fStatusWindow orderOut:self];
 
     fBLViewController = nil;
 }
 
 - (void)setFailed:(NSString*)error
 {
-    [NSApp endSheet:fStatusWindow];
-    [fStatusWindow orderOut:self];
+    [NSApp endSheet:self.fStatusWindow];
+    [self.fStatusWindow orderOut:self];
 
     NSAlert* alert = [[NSAlert alloc] init];
     [alert addButtonWithTitle:NSLocalizedString(@"OK", "Blocklist -> button")];
@@ -101,18 +108,20 @@ BlocklistDownloaderViewController* fBLViewController = nil;
 
     alert.informativeText = error;
 
-    [alert beginSheetModalForWindow:fPrefsController.window completionHandler:^(NSModalResponse returnCode) {
+    [alert beginSheetModalForWindow:self.fPrefsController.window completionHandler:^(NSModalResponse returnCode) {
         [alert.window orderOut:self];
 
         fBLViewController = nil;
     }];
 }
 
+#pragma mark - Private
+
 - (instancetype)initWithPrefsController:(PrefsController*)prefsController
 {
     if ((self = [super init]))
     {
-        fPrefsController = prefsController;
+        _fPrefsController = prefsController;
     }
 
     return self;
@@ -126,7 +135,7 @@ BlocklistDownloaderViewController* fBLViewController = nil;
     BlocklistDownloader* downloader = [BlocklistDownloader downloader];
     [downloader setViewController:self]; //do before showing the sheet to ensure it doesn't slide out with placeholder text
 
-    [fPrefsController.window beginSheet:fStatusWindow completionHandler:nil];
+    [self.fPrefsController.window beginSheet:self.fStatusWindow completionHandler:nil];
 }
 
 @end

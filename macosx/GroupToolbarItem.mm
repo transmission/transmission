@@ -6,18 +6,13 @@
 
 @implementation GroupToolbarItem
 
-- (void)setIdentifiers:(NSArray*)identifiers
-{
-    fIdentifiers = identifiers;
-}
-
 - (void)validate
 {
     NSSegmentedControl* control = (NSSegmentedControl*)self.view;
 
     for (NSInteger i = 0; i < control.segmentCount; i++)
     {
-        [control setEnabled:[self.target validateToolbarItem:[[NSToolbarItem alloc] initWithItemIdentifier:fIdentifiers[i]]]
+        [control setEnabled:[self.target validateToolbarItem:[[NSToolbarItem alloc] initWithItemIdentifier:self.identifiers[i]]]
                  forSegment:i];
     }
 }
@@ -51,7 +46,7 @@
     for (NSInteger i = 0; i < count; i++)
     {
         [menuItem.submenu itemAtIndex:i].enabled = [self.target
-            validateToolbarItem:[[NSToolbarItem alloc] initWithItemIdentifier:fIdentifiers[i]]];
+            validateToolbarItem:[[NSToolbarItem alloc] initWithItemIdentifier:self.identifiers[i]]];
     }
 
     return menuItem;

@@ -4,23 +4,13 @@
 
 #import <Cocoa/Cocoa.h>
 
-@class Controller;
-
 @interface URLSheetWindowController : NSWindowController
-{
-    IBOutlet NSTextField* fLabelField;
-    IBOutlet NSTextField* fTextField;
-    IBOutlet NSButton* fOpenButton;
-    IBOutlet NSButton* fCancelButton;
 
-    Controller* fController;
-}
+@property(nonatomic, readonly) NSString* urlString;
 
-- (instancetype)initWithController:(Controller*)controller;
+- (instancetype)init;
 
 - (void)openURLEndSheet:(id)sender;
 - (void)openURLCancelEndSheet:(id)sender;
-
-@property(nonatomic, readonly) NSString* urlString;
 
 @end

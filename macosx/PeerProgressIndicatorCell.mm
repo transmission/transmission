@@ -5,49 +5,50 @@
 #import "PeerProgressIndicatorCell.h"
 #import "NSStringAdditions.h"
 
+@interface PeerProgressIndicatorCell ()
+
+@property(nonatomic, copy) NSDictionary* fAttributes;
+
+@end
+
 @implementation PeerProgressIndicatorCell
 
 - (id)copyWithZone:(NSZone*)zone
 {
     PeerProgressIndicatorCell* copy = [super copyWithZone:zone];
-    copy->fAttributes = fAttributes;
+    copy->_fAttributes = _fAttributes;
 
     return copy;
-}
-
-- (void)setSeed:(BOOL)seed
-{
-    fSeed = seed;
 }
 
 - (void)drawWithFrame:(NSRect)cellFrame inView:(NSView*)controlView
 {
     if ([NSUserDefaults.standardUserDefaults boolForKey:@"DisplayPeerProgressBarNumber"])
     {
-        if (!fAttributes)
+        if (!self.fAttributes)
         {
             NSMutableParagraphStyle* paragraphStyle = [NSParagraphStyle.defaultParagraphStyle mutableCopy];
             paragraphStyle.alignment = NSTextAlignmentRight;
 
-            fAttributes = @{
+            self.fAttributes = @{
                 NSFontAttributeName : [NSFont systemFontOfSize:11.0],
                 NSForegroundColorAttributeName : NSColor.labelColor,
                 NSParagraphStyleAttributeName : paragraphStyle
             };
         }
 
-        [[NSString percentString:self.floatValue longDecimals:NO] drawInRect:cellFrame withAttributes:fAttributes];
+        [[NSString percentString:self.floatValue longDecimals:NO] drawInRect:cellFrame withAttributes:self.fAttributes];
     }
     else
     {
         //attributes not needed anymore
-        if (fAttributes)
+        if (self.fAttributes)
         {
-            fAttributes = nil;
+            self.fAttributes = nil;
         }
 
         [super drawWithFrame:cellFrame inView:controlView];
-        if (fSeed)
+        if (self.seed)
         {
             NSImage* checkImage = [NSImage imageNamed:@"CompleteCheck"];
 

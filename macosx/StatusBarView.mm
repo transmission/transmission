@@ -36,6 +36,8 @@
     }
 }
 
+#pragma mark - Private
+
 - (void)reload
 {
     self.needsDisplay = YES;

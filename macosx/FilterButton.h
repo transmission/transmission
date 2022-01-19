@@ -5,10 +5,7 @@
 #import <Cocoa/Cocoa.h>
 
 @interface FilterButton : NSButton
-{
-    NSUInteger fCount;
-}
 
-- (void)setCount:(NSUInteger)count;
+@property(nonatomic) NSUInteger count;
 
 @end

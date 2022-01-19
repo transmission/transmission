@@ -9,6 +9,11 @@
 
 @interface BlocklistDownloader ()
 
+@property(nonatomic) NSURLSession* fSession;
+@property(nonatomic) NSUInteger fCurrentSize;
+@property(nonatomic) long long fExpectedSize;
+@property(nonatomic) blocklistDownloadState fState;
+
 - (void)startDownload;
 - (void)decompressFrom:(NSURL*)file to:(NSURL*)destination error:(NSError**)error;
 
@@ -36,19 +41,19 @@ BlocklistDownloader* fBLDownloader = nil;
 
 - (void)setViewController:(BlocklistDownloaderViewController*)viewController
 {
-    fViewController = viewController;
-    if (fViewController)
+    _viewController = viewController;
+    if (_viewController)
     {
-        switch (fState)
+        switch (self.fState)
         {
         case BLOCKLIST_DL_START:
-            [fViewController setStatusStarting];
+            [_viewController setStatusStarting];
             break;
         case BLOCKLIST_DL_DOWNLOADING:
-            [fViewController setStatusProgressForCurrentSize:fCurrentSize expectedSize:fExpectedSize];
+            [_viewController setStatusProgressForCurrentSize:self.fCurrentSize expectedSize:self.fExpectedSize];
             break;
         case BLOCKLIST_DL_PROCESSING:
-            [fViewController setStatusProcessing];
+            [_viewController setStatusProcessing];
             break;
         }
     }
@@ -56,9 +61,9 @@ BlocklistDownloader* fBLDownloader = nil;
 
 - (void)cancelDownload
 {
-    [fViewController setFinished];
+    [_viewController setFinished];
 
-    [fSession invalidateAndCancel];
+    [self.fSession invalidateAndCancel];
 
     [BlocklistScheduler.scheduler updateSchedule];
 
@@ -72,12 +77,12 @@ BlocklistDownloader* fBLDownloader = nil;
 totalBytesExpectedToWrite:(int64_t)totalBytesExpectedToWrite
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        fState = BLOCKLIST_DL_DOWNLOADING;
+        self.fState = BLOCKLIST_DL_DOWNLOADING;
 
-        fCurrentSize = totalBytesWritten;
-        fExpectedSize = totalBytesExpectedToWrite;
+        self.fCurrentSize = totalBytesWritten;
+        self.fExpectedSize = totalBytesExpectedToWrite;
 
-        [fViewController setStatusProgressForCurrentSize:fCurrentSize expectedSize:fExpectedSize];
+        [self.viewController setStatusProgressForCurrentSize:self.fCurrentSize expectedSize:self.fExpectedSize];
     });
 }
 
@@ -88,7 +93,7 @@ didCompleteWithError:(NSError *)error
     dispatch_async(dispatch_get_main_queue(), ^{
         if (error)
         {
-            [fViewController setFailed:error.localizedDescription];
+            [self.viewController setFailed:error.localizedDescription];
         }
 
         [NSUserDefaults.standardUserDefaults setObject:[NSDate date] forKey:@"BlocklistNewLastUpdate"];
@@ -102,10 +107,10 @@ didCompleteWithError:(NSError *)error
       downloadTask:(NSURLSessionDownloadTask *)downloadTask 
 didFinishDownloadingToURL:(NSURL *)location
 {
-    fState = BLOCKLIST_DL_PROCESSING;
+    self.fState = BLOCKLIST_DL_PROCESSING;
 
     dispatch_async(dispatch_get_main_queue(), ^{
-        [fViewController setStatusProcessing];
+        [self.viewController setStatusProcessing];
     });
 
     NSString* filename = downloadTask.response.suggestedFilename;
@@ -139,11 +144,11 @@ didFinishDownloadingToURL:(NSURL *)location
 
         if (count > 0)
         {
-            [fViewController setFinished];
+            [self.viewController setFinished];
         }
         else
         {
-            [fViewController setFailed:NSLocalizedString(@"The specified blocklist file did not contain any valid rules.", "blocklist fail message")];
+            [self.viewController setFailed:NSLocalizedString(@"The specified blocklist file did not contain any valid rules.", "blocklist fail message")];
         }
 
         //update last updated date for schedule
@@ -158,11 +163,13 @@ didFinishDownloadingToURL:(NSURL *)location
     });
 }
 
+#pragma mark - Private
+
 - (void)startDownload
 {
-    fState = BLOCKLIST_DL_START;
+    self.fState = BLOCKLIST_DL_START;
 
-    fSession = [NSURLSession sessionWithConfiguration:NSURLSessionConfiguration.ephemeralSessionConfiguration
+    self.fSession = [NSURLSession sessionWithConfiguration:NSURLSessionConfiguration.ephemeralSessionConfiguration
                                              delegate:self
                                         delegateQueue:nil];
 
@@ -178,7 +185,7 @@ didFinishDownloadingToURL:(NSURL *)location
         urlString = [@"https://" stringByAppendingString:urlString];
     }
 
-    NSURLSessionDownloadTask* task = [fSession downloadTaskWithURL:[NSURL URLWithString:urlString]];
+    NSURLSessionDownloadTask* task = [self.fSession downloadTaskWithURL:[NSURL URLWithString:urlString]];
     [task resume];
 }
 

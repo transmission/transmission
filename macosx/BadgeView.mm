@@ -9,6 +9,13 @@
 
 @interface BadgeView ()
 
+@property(nonatomic, readonly) tr_session* fLib;
+
+@property(nonatomic) NSMutableDictionary* fAttributes;
+
+@property(nonatomic) CGFloat fDownloadRate;
+@property(nonatomic) CGFloat fUploadRate;
+
 - (void)badge:(NSImage*)badge string:(NSString*)string atHeight:(CGFloat)height;
 
 @end
@@ -19,10 +26,10 @@
 {
     if ((self = [super init]))
     {
-        fLib = lib;
+        _fLib = lib;
 
-        fDownloadRate = 0.0;
-        fUploadRate = 0.0;
+        _fDownloadRate = 0.0;
+        _fUploadRate = 0.0;
     }
     return self;
 }
@@ -30,13 +37,13 @@
 - (BOOL)setRatesWithDownload:(CGFloat)downloadRate upload:(CGFloat)uploadRate
 {
     //only needs update if the badges were displayed or are displayed now
-    if (fDownloadRate == downloadRate && fUploadRate == uploadRate)
+    if (self.fDownloadRate == downloadRate && self.fUploadRate == uploadRate)
     {
         return NO;
     }
 
-    fDownloadRate = downloadRate;
-    fUploadRate = uploadRate;
+    self.fDownloadRate = downloadRate;
+    self.fUploadRate = uploadRate;
     return YES;
 }
 
@@ -44,13 +51,14 @@
 {
     [NSApp.applicationIconImage drawInRect:rect fromRect:NSZeroRect operation:NSCompositingOperationSourceOver fraction:1.0];
 
-    BOOL const upload = fUploadRate >= 0.1;
-    BOOL const download = fDownloadRate >= 0.1;
+    BOOL const upload = self.fUploadRate >= 0.1;
+    BOOL const download = self.fDownloadRate >= 0.1;
     CGFloat bottom = 0.0;
     if (upload)
     {
         NSImage* uploadBadge = [NSImage imageNamed:@"UploadBadge"];
-        [self badge:uploadBadge string:[NSString stringForSpeedAbbrev:fUploadRate] atHeight:bottom];
+        [self badge:uploadBadge string:[NSString stringForSpeedAbbrev:self.fUploadRate] atHeight:bottom];
+
         if (download)
         {
             bottom += uploadBadge.size.height + BETWEEN_PADDING; //download rate above upload rate
@@ -58,21 +66,21 @@
     }
     if (download)
     {
-        [self badge:[NSImage imageNamed:@"DownloadBadge"] string:[NSString stringForSpeedAbbrev:fDownloadRate] atHeight:bottom];
+        [self badge:[NSImage imageNamed:@"DownloadBadge"] string:[NSString stringForSpeedAbbrev:self.fDownloadRate] atHeight:bottom];
     }
 }
 
 - (void)badge:(NSImage*)badge string:(NSString*)string atHeight:(CGFloat)height
 {
-    if (!fAttributes)
+    if (!self.fAttributes)
     {
         NSShadow* stringShadow = [[NSShadow alloc] init];
         stringShadow.shadowOffset = NSMakeSize(2.0, -2.0);
         stringShadow.shadowBlurRadius = 4.0;
 
-        fAttributes = [[NSMutableDictionary alloc] initWithCapacity:3];
-        fAttributes[NSForegroundColorAttributeName] = NSColor.whiteColor;
-        fAttributes[NSShadowAttributeName] = stringShadow;
+        self.fAttributes = [[NSMutableDictionary alloc] initWithCapacity:3];
+        self.fAttributes[NSForegroundColorAttributeName] = NSColor.whiteColor;
+        self.fAttributes[NSShadowAttributeName] = stringShadow;
     }
 
     NSRect badgeRect;
@@ -87,8 +95,8 @@
     NSSize stringSize;
     do
     {
-        fAttributes[NSFontAttributeName] = [NSFont boldSystemFontOfSize:fontSize];
-        stringSize = [string sizeWithAttributes:fAttributes];
+        self.fAttributes[NSFontAttributeName] = [NSFont boldSystemFontOfSize:fontSize];
+        stringSize = [string sizeWithAttributes:self.fAttributes];
         fontSize -= 1.0;
     } while (NSWidth(badgeRect) < stringSize.width);
 
@@ -98,7 +106,7 @@
     stringRect.origin.y = NSMidY(badgeRect) - stringSize.height * 0.5 + 1.0; //adjust for shadow
     stringRect.size = stringSize;
 
-    [string drawInRect:stringRect withAttributes:fAttributes];
+    [string drawInRect:stringRect withAttributes:self.fAttributes];
 }
 
 @end

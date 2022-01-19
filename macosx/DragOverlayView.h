@@ -5,12 +5,6 @@
 #import <Cocoa/Cocoa.h>
 
 @interface DragOverlayView : NSView
-{
-    NSImage* fBadge;
-
-    NSDictionary* fMainLineAttributes;
-    NSDictionary* fSubLineAttributes;
-}
 
 - (void)setOverlay:(NSImage*)icon mainLine:(NSString*)mainLine subLine:(NSString*)subLine;
 

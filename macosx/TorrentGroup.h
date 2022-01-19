@@ -5,10 +5,6 @@
 #import <Cocoa/Cocoa.h>
 
 @interface TorrentGroup : NSObject
-{
-    NSInteger fGroup;
-    NSMutableArray* fTorrents;
-}
 
 - (instancetype)initWithGroup:(NSInteger)group;
 
