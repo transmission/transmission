@@ -45,5 +45,8 @@ Be aware that the project was written in C for over a decade before moving to C+
  
 # Questions?
 
-If you have questions or are in doubt, feel free to [file an issue](https://github.com/transmission/transmission/issues/new/choose) or [start a new discussion](https://github.com/transmission/transmission/discussions/new)!
+- Not sure where to start with a feature?
+- Want to know why a piece of code is written in a certain way before changing it?
+- Want to check with the maintainers before writing code?
 
+Feel free to [file an issue](https://github.com/transmission/transmission/issues/new/choose) or [start a new discussion](https://github.com/transmission/transmission/discussions/new)! We're happy to get you unblocked.
