@@ -1212,12 +1212,10 @@ void MainWindow::refreshPref(int key)
         break;
 
     case Prefs::COMPACT_VIEW:
-        {
-            b = prefs_.getBool(key);
-            ui_.action_CompactView->setChecked(b);
-            ui_.listView->setItemDelegate(b ? torrent_delegate_min_ : torrent_delegate_);
-            break;
-        }
+        b = prefs_.getBool(key);
+        ui_.action_CompactView->setChecked(b);
+        ui_.listView->setItemDelegate(b ? torrent_delegate_min_ : torrent_delegate_);
+        break;
 
     case Prefs::MAIN_WINDOW_X:
     case Prefs::MAIN_WINDOW_Y:
@@ -1246,10 +1244,8 @@ void MainWindow::refreshPref(int key)
         }
 
     case Prefs::READ_CLIPBOARD:
-        {
-            b = prefs_.getBool(Prefs::READ_CLIPBOARD);
-            read_from_clipboard_ = b;
-        }
+        read_from_clipboard_ = prefs_.getBool(Prefs::READ_CLIPBOARD);
+        break;
 
     default:
         break;
@@ -1612,11 +1608,11 @@ bool MainWindow::event(QEvent* e)
         return QMainWindow::event(e);
     }
 
-    QClipboard const* clipboard = QGuiApplication::clipboard();
-    if (clipboard->text().trimmed().endsWith(QStringLiteral(".torrent"), Qt::CaseInsensitive) ||
-        clipboard->text().startsWith(QStringLiteral("magnet:"), Qt::CaseInsensitive))
+    QString const text = QGuiApplication::clipboard()->text().trimmed();
+    if (text.endsWith(QStringLiteral(".torrent"), Qt::CaseInsensitive) ||
+        text.startsWith(QStringLiteral("magnet:"), Qt::CaseInsensitive))
     {
-        QStringList list = clipboard->text().trimmed().split(QLatin1Char('\n'));
+        QStringList list = text.split(QLatin1Char('\n'));
 
         for (QString const& entry : list)
         {

@@ -347,6 +347,9 @@
          </item>
          <item row="3" column="0">
           <widget class="QCheckBox" name="detectTorrentFromClipboard">
+           <property name="toolTip">
+            <string>Reads user clipboard content for torrents</string>
+           </property>
            <property name="text">
             <string>Detect new torrents from clipboard</string>
            </property>
