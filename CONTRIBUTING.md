@@ -9,7 +9,7 @@ The following is a set of guidelines for contributing to Transmission. These are
 - Bugfixes
 - Changes that improve Transmission's compliance with [accepted BEPs](https://www.bittorrent.org/beps/bep_0000.html)
 - Changes that improve transfer speeds
-- Changes that improve peer communication, indictly improving transfer speeds
+- Changes that improve peer communication, indirectly improving transfer speeds
 - Changes that measurably reduce CPU load
 - Changes that measurably reduce memory use
 - Changes that improve testing
