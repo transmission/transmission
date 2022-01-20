@@ -107,7 +107,7 @@ static std::string announce_url_new(tr_session const* session, tr_announce_reque
        announce twice. At any rate, we're already computing our IPv6
        address (for the LTEP handshake), so this comes for free. */
 
-    unsigned char const* const ipv6 = tr_globalIPv6();
+    unsigned char const* const ipv6 = tr_globalIPv6(session);
     if (ipv6 != nullptr)
     {
         char ipv6_readable[INET6_ADDRSTRLEN];

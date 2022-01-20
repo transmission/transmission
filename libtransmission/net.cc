@@ -638,12 +638,14 @@ static int tr_globalAddress(int af, void* addr, int* addr_len)
 }
 
 /* Return our global IPv6 address, with caching. */
-unsigned char const* tr_globalIPv6(void)
+unsigned char const* tr_globalIPv6(tr_session const* session)
 {
     static unsigned char ipv6[16];
     static time_t last_time = 0;
     static bool have_ipv6 = false;
     time_t const now = tr_time();
+    bool is_default;
+    tr_address const* ipv6_bindaddr;
 
     /* Re-check every half hour */
     if (last_time < now - 1800)
@@ -654,7 +656,23 @@ unsigned char const* tr_globalIPv6(void)
         last_time = now;
     }
 
-    return have_ipv6 ? ipv6 : nullptr;
+    if (!have_ipv6)
+        return nullptr; /* No IPv6 address at all. */
+
+    /* Return the default address. This is useful for checking
+       for connectivity in general. */
+    if (session == nullptr)
+        return ipv6;
+
+    /* We have some sort of address, now make sure that we return
+       our bound address if non-default. */
+
+    ipv6_bindaddr = tr_sessionGetPublicAddress(session, TR_AF_INET6, &is_default);
+    if (ipv6_bindaddr != nullptr && !is_default)
+        /* Explicitly bound. Return that address. */
+        memcpy(ipv6, ipv6_bindaddr->addr.addr6.s6_addr, 16);
+
+    return ipv6;
 }
 
 /***
