@@ -1,10 +1,7 @@
-//
-//  FileRenameSheetController.m
-//  Transmission
-//
-//  Created by Mitchell Livingston on 1/20/13.
-//  Copyright (c) 2013 The Transmission Project. All rights reserved.
-//
+// This file Copyright © 2013-2022 Transmission authors and contributors.
+// It may be used under the MIT (SPDX: MIT) license.
+// License text can be found in the licenses/ folder.
+// Created by Mitchell Livingston on 1/20/13.
 
 #import "FileRenameSheetController.h"
 #import "FileListNode.h"
@@ -64,7 +61,7 @@ typedef void (^CompletionBlock)(BOOL);
     FileRenameSheetController* renamer = (__bridge_transfer FileRenameSheetController*)(contextInfo);
     NSParameterAssert([renamer isKindOfClass:[FileRenameSheetController class]]);
 
-    renamer.completionHandler(returnCode == NSOKButton);
+    renamer.completionHandler(returnCode == NSModalResponseOK);
 
     [sheet orderOut:self];
 }
@@ -112,7 +109,7 @@ typedef void (^CompletionBlock)(BOOL);
     void (^completionHandler)(BOOL) = ^(BOOL didRename) {
         if (didRename)
         {
-            [NSApp endSheet:self.window returnCode:NSOKButton];
+            [NSApp endSheet:self.window returnCode:NSModalResponseOK];
         }
         else
         {
@@ -133,7 +130,7 @@ typedef void (^CompletionBlock)(BOOL);
 
 - (IBAction)cancelRename:(id)sender
 {
-    [NSApp endSheet:self.window returnCode:NSCancelButton];
+    [NSApp endSheet:self.window returnCode:NSModalResponseCancel];
 }
 
 - (void)controlTextDidChange:(NSNotification*)notification

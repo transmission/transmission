@@ -6,71 +6,78 @@ configure_file(
 )
 
 set(PROJECT_FILES
-  announcer.cc
+  announce-list.cc
   announcer-http.cc
   announcer-udp.cc
+  announcer.cc
   bandwidth.cc
   bitfield.cc
+  block-info.cc
   blocklist.cc
   cache.cc
   clients.cc
   completion.cc
-  crypto.cc
-  crypto-utils.cc
+  crypto-utils-ccrypto.cc
   crypto-utils-cyassl.cc
   crypto-utils-fallback.cc
   crypto-utils-openssl.cc
   crypto-utils-polarssl.cc
+  crypto-utils.cc
+  crypto.cc
   error.cc
   fdlimit.cc
-  file.cc
+  file-piece-map.cc
   file-posix.cc
   file-win32.cc
+  file.cc
   handshake.cc
   inout.cc
   log.cc
-  magnet.cc
+  magnet-metainfo.cc
   makemeta.cc
-  metainfo.cc
   natpmp.cc
   net.cc
   peer-io.cc
+  peer-mgr-active-requests.cc
+  peer-mgr-wishlist.cc
   peer-mgr.cc
   peer-msgs.cc
-  platform.cc
   platform-quota.cc
+  platform.cc
   port-forwarding.cc
   ptrarray.cc
   quark.cc
   resume.cc
-  rpcimpl.cc
   rpc-server.cc
-  session.cc
+  rpcimpl.cc
   session-id.cc
+  session.cc
+  stats.cc
   subprocess-posix.cc
   subprocess-win32.cc
-  stats.cc
-  torrent.cc
   torrent-ctor.cc
   torrent-magnet.cc
-  tr-dht.cc
-  trevent.cc
+  torrent-metainfo.cc
+  torrent.cc
   tr-assert.cc
+  tr-dht.cc
   tr-getopt.cc
   tr-lpd.cc
   tr-udp.cc
   tr-utp.cc
+  trevent.cc
   upnp.cc
   utils.cc
   variant-benc.cc
-  variant.cc
   variant-json.cc
+  variant.cc
   verify.cc
-  watchdir.cc
   watchdir-generic.cc
   watchdir-inotify.cc
   watchdir-kqueue.cc
   watchdir-win32.cc
+  watchdir.cc
+  web-utils.cc
   web.cc
   webseed.cc
 )
@@ -81,7 +88,6 @@ foreach(FILE ${PROJECT_FILES})
 endforeach()
 
 set(THIRD_PARTY_FILES
-  ConvertUTF.c
   jsonsl.c
   wildmat.c
 )
@@ -92,7 +98,7 @@ set(${PROJECT_NAME}_SOURCES
 )
 
 set_source_files_properties(crypto-utils-fallback.cc PROPERTIES HEADER_FILE_ONLY ON)
-foreach(CP cyassl openssl polarssl)
+foreach(CP ccrypto cyassl openssl polarssl)
     if(NOT CP STREQUAL CRYPTO_PKG)
         set_source_files_properties(crypto-utils-${CP}.cc PROPERTIES HEADER_FILE_ONLY ON)
     endif()
@@ -117,8 +123,9 @@ else()
 endif()
 
 set(${PROJECT_NAME}_PUBLIC_HEADERS
-    error.h
+    ${PROJECT_BINARY_DIR}/version.h
     error-types.h
+    error.h
     file.h
     log.h
     makemeta.h
@@ -132,52 +139,56 @@ set(${PROJECT_NAME}_PUBLIC_HEADERS
     utils.h
     variant.h
     watchdir.h
+    web-utils.h
     web.h
-    ${PROJECT_BINARY_DIR}/version.h
 )
 
 set(${PROJECT_NAME}_PRIVATE_HEADERS
+    announce-list.h
     announcer-common.h
     announcer.h
     bandwidth.h
     bitfield.h
+    block-info.h
     blocklist.h
     cache.h
     clients.h
     completion.h
-    ConvertUTF.h
-    crypto.h
     crypto-utils.h
+    crypto.h
     fdlimit.h
+    file-piece-map.h
     handshake.h
     history.h
     inout.h
-    magnet.h
-    metainfo.h
+    magnet-metainfo.h
     mime-types.h
     natpmp_local.h
     net.h
     peer-common.h
     peer-io.h
+    peer-mgr-active-requests.h
+    peer-mgr-wishlist.h
     peer-mgr.h
     peer-msgs.h
     peer-socket.h
-    platform.h
     platform-quota.h
+    platform.h
     port-forwarding.h
     ptrarray.h
     resume.h
     rpc-server.h
     session.h
-    subprocess.h
     stats.h
-    torrent.h
+    subprocess.h
     torrent-magnet.h
+    torrent-metainfo.h
+    torrent.h
     tr-dht.h
-    trevent.h
     tr-lpd.h
     tr-udp.h
     tr-utp.h
+    trevent.h
     upnp.h
     variant-common.h
     verify.h
@@ -233,7 +244,8 @@ include_directories(
 
 include_directories(
     SYSTEM
-    ${ZLIB_INCLUDE_DIRS}
+    ${UTFCPP_INCLUDE_DIRS}
+    ${DEFLATE_INCLUDE_DIRS}
     ${CRYPTO_INCLUDE_DIRS}
     ${CURL_INCLUDE_DIRS}
     ${EVENT2_INCLUDE_DIRS}
@@ -262,6 +274,7 @@ foreach(UT ${EVENT2_UPSTREAM_TARGET}
            ${NATPMP_UPSTREAM_TARGET}
            ${MINIUPNPC_UPSTREAM_TARGET}
            ${DHT_UPSTREAM_TARGET}
+           ${DEFLATE_UPSTREAM_TARGET}
            ${UTP_UPSTREAM_TARGET}
            ${B64_UPSTREAM_TARGET})
     add_dependencies(${TR_NAME} ${UT})
@@ -269,7 +282,7 @@ endforeach()
 
 target_link_libraries(${TR_NAME}
     ${CMAKE_THREAD_LIBS_INIT}
-    ${ZLIB_LIBRARIES}
+    ${DEFLATE_LIBRARIES}
     ${CRYPTO_LIBRARIES}
     ${CURL_LIBRARIES}
     ${EVENT2_LIBRARIES}

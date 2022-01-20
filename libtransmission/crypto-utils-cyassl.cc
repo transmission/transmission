@@ -1,10 +1,9 @@
-/*
- * This file Copyright (C) 2014-2015 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright 2014-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
+
+#include <mutex>
 
 #if defined(CYASSL_IS_WOLFSSL)
 #define API_HEADER(x) <wolfssl/x>
@@ -48,7 +47,7 @@ struct tr_dh_ctx
 ****
 ***/
 
-#define MY_NAME "tr_crypto_utils"
+static char constexpr MyName[] = "tr_crypto_utils";
 
 static void log_cyassl_error(int error_code, char const* file, int line)
 {
@@ -59,11 +58,11 @@ static void log_cyassl_error(int error_code, char const* file, int line)
 #elif API_VERSION_HEX >= 0x03000002
         char const* error_message = CTaoCryptGetErrorString(error_code);
 #else
-        char error_message[CYASSL_MAX_ERROR_SZ];
+        char error_message[CYASSL_MAX_ERROR_SZ] = {};
         CTaoCryptErrorString(error_code, error_message);
 #endif
 
-        tr_logAddMessage(file, line, TR_LOG_ERROR, MY_NAME, "CyaSSL error: %s", error_message);
+        tr_logAddMessage(file, line, TR_LOG_ERROR, MyName, "CyaSSL error: %s", error_message);
     }
 }
 
@@ -103,17 +102,7 @@ static RNG* get_rng(void)
     return &rng;
 }
 
-static tr_lock* get_rng_lock(void)
-{
-    static tr_lock* lock = nullptr;
-
-    if (lock == nullptr)
-    {
-        lock = tr_lockNew();
-    }
-
-    return lock;
-}
+static std::mutex rng_mutex_;
 
 /***
 ****
@@ -147,20 +136,17 @@ bool tr_sha1_update(tr_sha1_ctx_t raw_handle, void const* data, size_t data_leng
     return check_result(API(ShaUpdate)(handle, static_cast<byte const*>(data), data_length));
 }
 
-bool tr_sha1_final(tr_sha1_ctx_t raw_handle, uint8_t* hash)
+std::optional<tr_sha1_digest_t> tr_sha1_final(tr_sha1_ctx_t raw_handle)
 {
     auto* handle = static_cast<Sha*>(raw_handle);
-    bool ret = true;
+    TR_ASSERT(handle != nullptr);
 
-    if (hash != nullptr)
-    {
-        TR_ASSERT(handle != nullptr);
-
-        ret = check_result(API(ShaFinal)(handle, hash));
-    }
-
+    auto digest = tr_sha1_digest_t{};
+    auto* const digest_as_uchar = reinterpret_cast<unsigned char*>(std::data(digest));
+    auto const ok = check_result(API(ShaFinal)(handle, digest_as_uchar));
     tr_free(handle);
-    return ret;
+
+    return ok ? std::make_optional(digest) : std::nullopt;
 }
 
 /***
@@ -205,27 +191,22 @@ void tr_dh_free(tr_dh_ctx_t raw_handle)
     tr_free(handle);
 }
 
-bool tr_dh_make_key(
-    tr_dh_ctx_t raw_handle,
-    [[maybe_unused]] size_t private_key_length,
-    uint8_t* public_key,
-    size_t* public_key_length)
+bool tr_dh_make_key(tr_dh_ctx_t raw_handle, size_t /*private_key_length*/, uint8_t* public_key, size_t* public_key_length)
 {
     TR_ASSERT(raw_handle != nullptr);
     TR_ASSERT(public_key != nullptr);
 
     auto* handle = static_cast<struct tr_dh_ctx*>(raw_handle);
-    word32 my_private_key_length;
-    word32 my_public_key_length;
-    tr_lock* rng_lock = get_rng_lock();
 
     if (handle->private_key == nullptr)
     {
         handle->private_key = static_cast<uint8_t*>(tr_malloc(handle->key_length));
     }
 
-    tr_lockLock(rng_lock);
+    auto const lock = std::lock_guard(rng_mutex_);
 
+    auto my_private_key_length = word32{};
+    auto my_public_key_length = word32{};
     if (!check_result(API(DhGenerateKeyPair)(
             &handle->dh,
             get_rng(),
@@ -234,11 +215,8 @@ bool tr_dh_make_key(
             public_key,
             &my_public_key_length)))
     {
-        tr_lockUnlock(rng_lock);
         return false;
     }
-
-    tr_lockUnlock(rng_lock);
 
     tr_dh_align_key(public_key, my_public_key_length, handle->key_length);
 
@@ -258,11 +236,10 @@ tr_dh_secret_t tr_dh_agree(tr_dh_ctx_t raw_handle, uint8_t const* other_public_k
     TR_ASSERT(other_public_key != nullptr);
 
     auto* handle = static_cast<struct tr_dh_ctx*>(raw_handle);
-    struct tr_dh_secret* ret;
-    word32 my_secret_key_length;
 
-    ret = tr_dh_secret_new(handle->key_length);
+    tr_dh_secret* ret = tr_dh_secret_new(handle->key_length);
 
+    auto my_secret_key_length = word32{};
     if (check_result(API(DhAgree)(
             &handle->dh,
             ret->key,
@@ -289,14 +266,13 @@ tr_dh_secret_t tr_dh_agree(tr_dh_ctx_t raw_handle, uint8_t const* other_public_k
 
 bool tr_rand_buffer(void* buffer, size_t length)
 {
+    if (length == 0)
+    {
+        return true;
+    }
+
     TR_ASSERT(buffer != nullptr);
 
-    bool ret;
-    tr_lock* rng_lock = get_rng_lock();
-
-    tr_lockLock(rng_lock);
-    ret = check_result(API(RNG_GenerateBlock)(get_rng(), static_cast<byte*>(buffer), length));
-    tr_lockUnlock(rng_lock);
-
-    return ret;
+    auto const lock = std::lock_guard(rng_mutex_);
+    return check_result(API(RNG_GenerateBlock)(get_rng(), static_cast<byte*>(buffer), length));
 }

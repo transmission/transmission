@@ -1,10 +1,7 @@
-/*
- * This file Copyright (C) 2009-2016 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2009-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #pragma once
 
@@ -14,12 +11,14 @@
 #include <QMainWindow>
 #include <QNetworkReply>
 #include <QPointer>
+#include <QStringList>
 #include <QSystemTrayIcon>
 #include <QTimer>
 #include <QWidgetList>
 
+#include <libtransmission/tr-macros.h>
+
 #include "Filters.h"
-#include "Macros.h"
 #include "Speed.h"
 #include "TorrentFilter.h"
 #include "Typedefs.h"
@@ -28,7 +27,6 @@
 class QAction;
 class QIcon;
 class QMenu;
-class QStringList;
 
 class AboutDialog;
 class AddData;
@@ -123,7 +121,6 @@ private slots:
     void trayActivated(QSystemTrayIcon::ActivationReason);
 
 private:
-    QIcon getStockIcon(QString const&, int fallback = -1) const;
     QIcon addEmblem(QIcon icon, QStringList const& emblem_names) const;
 
     torrent_ids_t getSelectedTorrents(bool withMetadataOnly = false) const;

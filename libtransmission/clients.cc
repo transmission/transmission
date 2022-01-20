@@ -1,22 +1,20 @@
-/*
- * This file Copyright (C) 2008-2014 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2008-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 /* thanks amc1! */
 
 #include <algorithm>
 #include <array>
-#include <iterator>
+#include <cctype> /* isprint() */
+#include <cstdlib> /* strtol() */
+#include <cstring>
 #include <optional>
 #include <string_view>
-#include <ctype.h> /* isprint() */
-#include <stdlib.h> /* strtol() */
-#include <string.h>
 #include <tuple>
+#include <utility>
+#include <vector>
 
 #include "transmission.h"
 #include "clients.h"
@@ -91,12 +89,12 @@ auto constexpr charints = std::array<std::string_view, 256>{
       "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x" }
 };
 
-int strint(void const* pch, int span)
+int strint(void const* pch, int span, int base = 0)
 {
     char tmp[64];
     memcpy(tmp, pch, span);
     tmp[span] = '\0';
-    return strtol(tmp, nullptr, 0);
+    return strtol(tmp, nullptr, base);
 }
 
 constexpr std::string_view getMnemonicEnd(uint8_t ch)
@@ -120,14 +118,16 @@ constexpr std::string_view getMnemonicEnd(uint8_t ch)
     }
 }
 
-void two_major_two_minor_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
+void two_major_two_minor_formatter(char* buf, size_t buflen, std::string_view name, tr_peer_id_t id)
 {
-    std::tie(buf, buflen) = buf_append(buf, buflen, name, ' ', strint(id + 3, 2), '.');
-    tr_snprintf(buf, buflen, "%02d", strint(id + 5, 2));
+    std::tie(buf, buflen) = buf_append(buf, buflen, name, ' ', strint(&id[3], 2), '.');
+    tr_snprintf(buf, buflen, "%02d", strint(&id[5], 2));
 }
 
-bool decodeShad0wClient(char* buf, size_t buflen, std::string_view peer_id)
+bool decodeShad0wClient(char* buf, size_t buflen, std::string_view in)
 {
+    auto const* const buf_in = buf;
+
     // Shad0w with his experimental BitTorrent implementation and BitTornado
     // introduced peer ids that begin with a character which is``T`` in the
     // case of BitTornado followed by up to five ascii characters for version
@@ -140,8 +140,10 @@ bool decodeShad0wClient(char* buf, size_t buflen, std::string_view peer_id)
     {
         auto constexpr str = std::string_view{ "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz.-" };
         auto const pos = str.find(ch);
-        return pos != std::string_view::npos ? pos : std::optional<int>{};
+        return pos != std::string_view::npos ? std::make_optional(pos) : std::nullopt;
     };
+
+    auto peer_id = std::string_view{ std::data(in), 9 };
 
     if (std::size(peer_id) != 9 || peer_id[6] != '-' || peer_id[7] != '-' || peer_id[8] != '-')
     {
@@ -196,7 +198,10 @@ bool decodeShad0wClient(char* buf, size_t buflen, std::string_view peer_id)
         std::rbegin(vals),
         std::rend(vals),
         [&buf, &buflen](int num) { std::tie(buf, buflen) = buf_append(buf, buflen, num, '.'); });
-    buf[-1] = '\0'; // remove trailing '.'
+    if (buf > buf_in)
+    {
+        buf[-1] = '\0'; // remove trailing '.'
+    }
     return true;
 }
 
@@ -238,31 +243,31 @@ bool decodeBitCometClient(char* buf, size_t buflen, std::string_view peer_id)
     return true;
 }
 
-using format_func = void (*)(char* buf, size_t buflen, std::string_view name, char const* id);
+using format_func = void (*)(char* buf, size_t buflen, std::string_view name, tr_peer_id_t id);
 
-constexpr void three_digit_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
+constexpr void three_digit_formatter(char* buf, size_t buflen, std::string_view name, tr_peer_id_t id)
 {
     buf_append(buf, buflen, name, ' ', charints[id[3]], '.', charints[id[4]], '.', charints[id[5]]);
 }
 
-constexpr void four_digit_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
+constexpr void four_digit_formatter(char* buf, size_t buflen, std::string_view name, tr_peer_id_t id)
 {
     buf_append(buf, buflen, name, ' ', charints[id[3]], '.', charints[id[4]], '.', charints[id[5]], '.', charints[id[6]]);
 }
 
-constexpr void no_version_formatter(char* buf, size_t buflen, std::string_view name, [[maybe_unused]] char const* id)
+constexpr void no_version_formatter(char* buf, size_t buflen, std::string_view name, tr_peer_id_t /*id*/)
 {
     buf_append(buf, buflen, name);
 }
 
 // specific clients
 
-constexpr void amazon_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
+constexpr void amazon_formatter(char* buf, size_t buflen, std::string_view name, tr_peer_id_t id)
 {
     buf_append(buf, buflen, name, ' ', id[3], '.', id[5], '.', id[7]);
 }
 
-constexpr void aria2_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
+constexpr void aria2_formatter(char* buf, size_t buflen, std::string_view name, tr_peer_id_t id)
 {
     if (id[4] == '-' && id[6] == '-' && id[8] == '-')
     {
@@ -278,28 +283,28 @@ constexpr void aria2_formatter(char* buf, size_t buflen, std::string_view name, 
     }
 }
 
-constexpr void bitbuddy_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
+constexpr void bitbuddy_formatter(char* buf, size_t buflen, std::string_view name, tr_peer_id_t id)
 {
     buf_append(buf, buflen, name, ' ', id[3], '.', id[4], id[5], id[6]);
 }
 
-constexpr void bitlord_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
+constexpr void bitlord_formatter(char* buf, size_t buflen, std::string_view name, tr_peer_id_t id)
 {
-    buf_append(buf, buflen, name, ' ', id[3], '.', id[4], '.', id[5], '-', std::string_view(id + 6, 3));
+    buf_append(buf, buflen, name, ' ', id[3], '.', id[4], '.', id[5], '-', std::string_view(&id[6], 3));
 }
 
-constexpr void bitrocket_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
+constexpr void bitrocket_formatter(char* buf, size_t buflen, std::string_view name, tr_peer_id_t id)
 {
     buf_append(buf, buflen, name, ' ', id[3], '.', id[4], ' ', '(', id[5], id[6], ')');
 }
 
-void bittorrent_dna_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
+void bittorrent_dna_formatter(char* buf, size_t buflen, std::string_view name, tr_peer_id_t id)
 {
     std::tie(buf, buflen) = buf_append(buf, buflen, name, ' ');
-    tr_snprintf(buf, buflen, "%d.%d.%d", strint(id + 3, 2), strint(id + 5, 2), strint(id + 7, 2));
+    tr_snprintf(buf, buflen, "%d.%d.%d", strint(&id[3], 2), strint(&id[5], 2), strint(&id[7], 2));
 }
 
-void bits_on_wheels_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
+void bits_on_wheels_formatter(char* buf, size_t buflen, std::string_view name, tr_peer_id_t id)
 {
     // Bits on Wheels uses the pattern -BOWxxx-yyyyyyyyyyyy, where y is random
     // (uppercase letters) and x depends on the version.
@@ -319,32 +324,32 @@ void bits_on_wheels_formatter(char* buf, size_t buflen, std::string_view name, c
     }
 }
 
-constexpr void blizzard_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
+constexpr void blizzard_formatter(char* buf, size_t buflen, std::string_view name, tr_peer_id_t id)
 {
     buf_append(buf, buflen, name, ' ', int(id[3] + 1), int(id[4]));
 }
 
-constexpr void btpd_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
+constexpr void btpd_formatter(char* buf, size_t buflen, std::string_view name, tr_peer_id_t id)
 {
-    buf_append(buf, buflen, name, ' ', std::string_view(id + 5, 3));
+    buf_append(buf, buflen, name, ' ', std::string_view(&id[5], 3));
 }
 
-constexpr void burst_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
+constexpr void burst_formatter(char* buf, size_t buflen, std::string_view name, tr_peer_id_t id)
 {
     buf_append(buf, buflen, name, ' ', id[5], '.', id[7], '.', id[9]);
 }
 
-constexpr void ctorrent_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
+constexpr void ctorrent_formatter(char* buf, size_t buflen, std::string_view name, tr_peer_id_t id)
 {
     buf_append(buf, buflen, name, ' ', charints[id[3]], '.', charints[id[4]], '.', id[5], id[6]);
 }
 
-constexpr void folx_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
+constexpr void folx_formatter(char* buf, size_t buflen, std::string_view name, tr_peer_id_t id)
 {
     buf_append(buf, buflen, name, ' ', charints[id[3]], '.', 'x');
 }
 
-constexpr void ktorrent_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
+constexpr void ktorrent_formatter(char* buf, size_t buflen, std::string_view name, tr_peer_id_t id)
 {
     if (id[5] == 'D')
     {
@@ -360,7 +365,7 @@ constexpr void ktorrent_formatter(char* buf, size_t buflen, std::string_view nam
     }
 }
 
-constexpr void mainline_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
+constexpr void mainline_formatter(char* buf, size_t buflen, std::string_view name, tr_peer_id_t id)
 {
     // Queen Bee uses Bram`s new style:
     // Q1-0-0-- or Q1-10-0- followed by random bytes.
@@ -379,85 +384,99 @@ constexpr void mainline_formatter(char* buf, size_t buflen, std::string_view nam
     }
 }
 
-constexpr void mediaget_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
+constexpr void mediaget_formatter(char* buf, size_t buflen, std::string_view name, tr_peer_id_t id)
 {
     buf_append(buf, buflen, name, ' ', charints[id[3]], '.', charints[id[4]]);
 }
 
-constexpr void mldonkey_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
+constexpr void mldonkey_formatter(char* buf, size_t buflen, std::string_view name, tr_peer_id_t id)
 {
     // MLdonkey use the following peer_id scheme: the first characters are
     // -ML followed by a dotted version then a - followed by randomness.
     // e.g. -ML2.7.2-kgjjfkd
-    buf_append(buf, buflen, name, ' ', std::string_view(id + 3, 5));
+    buf_append(buf, buflen, name, ' ', std::string_view(&id[3], 5));
 }
 
-constexpr void opera_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
+constexpr void opera_formatter(char* buf, size_t buflen, std::string_view name, tr_peer_id_t id)
 {
     // Opera 8 previews and Opera 9.x releases use the following peer_id
     // scheme: The first two characters are OP and the next four digits equal
     // the build number. All following characters are random lowercase
     // hexdecimal digits.
-    buf_append(buf, buflen, name, ' ', std::string_view(id + 2, 4));
+    buf_append(buf, buflen, name, ' ', std::string_view(&id[2], 4));
 }
 
-constexpr void picotorrent_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
+constexpr void picotorrent_formatter(char* buf, size_t buflen, std::string_view name, tr_peer_id_t id)
 {
     buf_append(buf, buflen, name, ' ', charints[id[3]], '.', id[4], id[5], '.', charints[id[6]]);
 }
 
-constexpr void plus_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
+constexpr void plus_formatter(char* buf, size_t buflen, std::string_view name, tr_peer_id_t id)
 {
     buf_append(buf, buflen, name, ' ', id[4], '.', id[5], id[6]);
 }
 
-constexpr void qvod_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
+constexpr void qvod_formatter(char* buf, size_t buflen, std::string_view name, tr_peer_id_t id)
 {
-    four_digit_formatter(buf, buflen, name, id + 1);
+    buf_append(buf, buflen, name, ' ', charints[id[4]], '.', charints[id[5]], '.', charints[id[6]], '.', charints[id[7]]);
 }
 
-void transmission_formatter(char* buf, size_t buflen, std::string_view name, char const* chid)
+void transmission_formatter(char* buf, size_t buflen, std::string_view name, tr_peer_id_t id)
 {
     std::tie(buf, buflen) = buf_append(buf, buflen, name, ' ');
 
-    if (strncmp(chid + 3, "000", 3) == 0) // very old client style: -TR0006- is 0.6
+    if (strncmp(&id[3], "000", 3) == 0) // very old client style: -TR0006- is 0.6
     {
-        tr_snprintf(buf, buflen, "0.%c", chid[6]);
+        tr_snprintf(buf, buflen, "0.%c", id[6]);
     }
-    else if (strncmp(chid + 3, "00", 2) == 0) // previous client style: -TR0072- is 0.72
+    else if (strncmp(&id[3], "00", 2) == 0) // previous client style: -TR0072- is 0.72
     {
-        tr_snprintf(buf, buflen, "0.%02d", strint(chid + 5, 2));
+        tr_snprintf(buf, buflen, "0.%02d", strint(&id[5], 2));
     }
     else // current client style: -TR111Z- is 1.11+ */
     {
-        tr_snprintf(
-            buf,
-            buflen,
-            "%d.%02d%s",
-            strint(chid + 3, 1),
-            strint(chid + 4, 2),
-            (chid[6] == 'Z' || chid[6] == 'X') ? "+" : "");
+        tr_snprintf(buf, buflen, "%d.%02d%s", strint(&id[3], 1), strint(&id[4], 2), (id[6] == 'Z' || id[6] == 'X') ? "+" : "");
     }
 }
 
-constexpr void utorrent_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
+void utorrent_formatter(char* buf, size_t buflen, std::string_view name, tr_peer_id_t id)
 {
     if (id[7] == '-')
     {
-        buf_append(buf, buflen, name, ' ', id[3], '.', id[4], '.', id[5], getMnemonicEnd(id[6]));
+        buf_append(
+            buf,
+            buflen,
+            name,
+            ' ',
+            strint(&id[3], 1, 16),
+            '.',
+            strint(&id[4], 1, 16),
+            '.',
+            strint(&id[5], 1, 16),
+            getMnemonicEnd(id[6]));
     }
     else // uTorrent replaces the trailing dash with an extra digit for longer version numbers
     {
-        buf_append(buf, buflen, name, ' ', id[3], '.', id[4], '.', id[5], id[6], getMnemonicEnd(id[6]));
+        buf_append(
+            buf,
+            buflen,
+            name,
+            ' ',
+            strint(&id[3], 1, 16),
+            '.',
+            strint(&id[4], 1, 16),
+            '.',
+            strint(&id[5], 2, 10),
+            getMnemonicEnd(id[7]));
     }
 }
 
-constexpr void xbt_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
+constexpr void xbt_formatter(char* buf, size_t buflen, std::string_view name, tr_peer_id_t id)
 {
     buf_append(buf, buflen, name, ' ', id[3], '.', id[4], '.', id[5], getMnemonicEnd(id[6]));
 }
 
-constexpr void xfplay_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
+constexpr void xfplay_formatter(char* buf, size_t buflen, std::string_view name, tr_peer_id_t id)
 {
     if (id[6] == '0')
     {
@@ -469,10 +488,10 @@ constexpr void xfplay_formatter(char* buf, size_t buflen, std::string_view name,
     }
 }
 
-void xtorrent_formatter(char* buf, size_t buflen, std::string_view name, char const* id)
+void xtorrent_formatter(char* buf, size_t buflen, std::string_view name, tr_peer_id_t id)
 {
     std::tie(buf, buflen) = buf_append(buf, buflen, name, ' ', charints[id[3]], '.', charints[id[4]], " ("sv);
-    tr_snprintf(buf, buflen, "%d)", strint(id + 5, 2));
+    tr_snprintf(buf, buflen, "%d)", strint(&id[5], 2));
 }
 
 struct Client
@@ -614,26 +633,20 @@ auto constexpr Clients = std::array<Client, 127>{ {
 
 } // namespace
 
-char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
+char* tr_clientForId(char* buf, size_t buflen, tr_peer_id_t peer_id)
 {
     *buf = '\0';
 
-    auto const* const id = static_cast<char const*>(id_in);
-    if (id == nullptr)
-    {
-        return buf;
-    }
-
-    auto const key = std::string_view{ id };
+    auto const key = std::string_view{ std::data(peer_id), std::size(peer_id) };
 
     if (decodeShad0wClient(buf, buflen, key) || decodeBitCometClient(buf, buflen, key))
     {
         return buf;
     }
 
-    if (!*id && strncmp(id + 2, "BS", 2) == 0)
+    if (peer_id[0] == '\0' && peer_id[2] == 'B' && peer_id[3] == 'S')
     {
-        tr_snprintf(buf, buflen, "BitSpirit %d", id[1] == '\0' ? 1 : int(id[1]));
+        tr_snprintf(buf, buflen, "BitSpirit %d", peer_id[1] == '\0' ? 1 : int(peer_id[1]));
         return buf;
     }
 
@@ -654,7 +667,7 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
     auto eq = std::equal_range(std::begin(Clients), std::end(Clients), key, Compare{});
     if (eq.first != std::end(Clients) && eq.first != eq.second)
     {
-        eq.first->formatter(buf, buflen, eq.first->name, id);
+        eq.first->formatter(buf, buflen, eq.first->name, peer_id);
         return buf;
     }
 
@@ -668,7 +681,7 @@ char* tr_clientForId(char* buf, size_t buflen, void const* id_in)
 
         for (size_t i = 0; i < 8; ++i)
         {
-            char const c = id[i];
+            char const c = peer_id[i];
 
             if (isprint((unsigned char)c))
             {

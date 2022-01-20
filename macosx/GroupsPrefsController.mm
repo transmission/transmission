@@ -1,24 +1,6 @@
-/******************************************************************************
- * Copyright (c) 2007-2012 Transmission authors and contributors
- *
- * Permission is hereby granted, free of charge, to any person obtaining a
- * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
- * DEALINGS IN THE SOFTWARE.
- *****************************************************************************/
+// This file Copyright © 2007-2022 Transmission authors and contributors.
+// It may be used under the MIT (SPDX: MIT) license.
+// License text can be found in the licenses/ folder.
 
 #import "GroupsPrefsController.h"
 #import "GroupsController.h"
@@ -222,7 +204,7 @@
 
     [panel beginSheetModalForWindow:fCustomLocationPopUp.window completionHandler:^(NSInteger result) {
         NSInteger const index = [GroupsController.groups indexForRow:fTableView.selectedRow];
-        if (result == NSFileHandlingPanelOKButton)
+        if (result == NSModalResponseOK)
         {
             NSString* path = panel.URLs[0].path;
             [GroupsController.groups setCustomDownloadLocation:path forIndex:index];
@@ -245,7 +227,7 @@
 - (IBAction)toggleUseCustomDownloadLocation:(id)sender
 {
     NSInteger index = [GroupsController.groups indexForRow:fTableView.selectedRow];
-    if (fCustomLocationEnableCheck.state == NSOnState)
+    if (fCustomLocationEnableCheck.state == NSControlStateValueOn)
     {
         if ([GroupsController.groups customDownloadLocationForIndex:index])
         {
@@ -261,7 +243,7 @@
         [GroupsController.groups setUsesCustomDownloadLocation:NO forIndex:index];
     }
 
-    fCustomLocationPopUp.enabled = (fCustomLocationEnableCheck.state == NSOnState);
+    fCustomLocationPopUp.enabled = (fCustomLocationEnableCheck.state == NSControlStateValueOn);
 }
 
 #pragma mark -
@@ -270,7 +252,7 @@
 - (IBAction)toggleUseAutoAssignRules:(id)sender
 {
     NSInteger index = [GroupsController.groups indexForRow:fTableView.selectedRow];
-    if (fAutoAssignRulesEnableCheck.state == NSOnState)
+    if (fAutoAssignRulesEnableCheck.state == NSControlStateValueOn)
     {
         if ([GroupsController.groups autoAssignRulesForIndex:index])
         {
@@ -286,7 +268,7 @@
         [GroupsController.groups setUsesAutoAssignRules:NO forIndex:index];
     }
 
-    fAutoAssignRulesEditButton.enabled = fAutoAssignRulesEnableCheck.state == NSOnState;
+    fAutoAssignRulesEditButton.enabled = fAutoAssignRulesEnableCheck.state == NSControlStateValueOn;
 }
 
 - (IBAction)orderFrontRulesSheet:(id)sender
@@ -334,7 +316,7 @@
     [GroupsController.groups setAutoAssignRules:predicate forIndex:index];
 
     fAutoAssignRulesEnableCheck.state = [GroupsController.groups usesAutoAssignRulesForIndex:index];
-    fAutoAssignRulesEditButton.enabled = fAutoAssignRulesEnableCheck.state == NSOnState;
+    fAutoAssignRulesEditButton.enabled = fAutoAssignRulesEnableCheck.state == NSControlStateValueOn;
 }
 
 - (void)ruleEditorRowsDidChange:(NSNotification*)notification
@@ -370,7 +352,7 @@
 
         fAutoAssignRulesEnableCheck.state = [GroupsController.groups usesAutoAssignRulesForIndex:index];
         fAutoAssignRulesEnableCheck.enabled = YES;
-        fAutoAssignRulesEditButton.enabled = (fAutoAssignRulesEnableCheck.state == NSOnState);
+        fAutoAssignRulesEditButton.enabled = (fAutoAssignRulesEnableCheck.state == NSControlStateValueOn);
     }
     else
     {

@@ -1,30 +1,24 @@
-/*
- * This file Copyright (C) 2013-2014 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2013-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #include <algorithm>
 #include <array>
-#include <cstring> // strlen()
-#include <iterator>
 #include <string_view>
-#include <typeinfo>
 #include <vector>
 
 #include "transmission.h"
+
 #include "quark.h"
-#include "tr-assert.h"
-#include "utils.h" // tr_strndup()
+#include "utils.h" // tr_strvDup()
 
 using namespace std::literals;
 
 namespace
 {
 
-auto constexpr my_static = std::array<std::string_view, 391>{ ""sv,
+auto constexpr my_static = std::array<std::string_view, 389>{ ""sv,
                                                               "activeTorrentCount"sv,
                                                               "activity-date"sv,
                                                               "activityDate"sv,
@@ -86,7 +80,6 @@ auto constexpr my_static = std::array<std::string_view, 391>{ ""sv,
                                                               "details-window-height"sv,
                                                               "details-window-width"sv,
                                                               "dht-enabled"sv,
-                                                              "display-name"sv,
                                                               "dnd"sv,
                                                               "done-date"sv,
                                                               "doneDate"sv,
@@ -156,7 +149,6 @@ auto constexpr my_static = std::array<std::string_view, 391>{ ""sv,
                                                               "incomplete-dir"sv,
                                                               "incomplete-dir-enabled"sv,
                                                               "info"sv,
-                                                              "info_hash"sv,
                                                               "inhibit-desktop-hibernation"sv,
                                                               "interval"sv,
                                                               "ip"sv,
@@ -189,7 +181,6 @@ auto constexpr my_static = std::array<std::string_view, 391>{ ""sv,
                                                               "location"sv,
                                                               "lpd-enabled"sv,
                                                               "m"sv,
-                                                              "magnet-info"sv,
                                                               "magnetLink"sv,
                                                               "main-window-height"sv,
                                                               "main-window-is-maximized"sv,
@@ -345,6 +336,7 @@ auto constexpr my_static = std::array<std::string_view, 391>{ ""sv,
                                                               "sizeWhenDone"sv,
                                                               "sort-mode"sv,
                                                               "sort-reversed"sv,
+                                                              "source"sv,
                                                               "speed"sv,
                                                               "speed-Bps"sv,
                                                               "speed-bytes"sv,
@@ -414,7 +406,7 @@ auto constexpr my_static = std::array<std::string_view, 391>{ ""sv,
                                                               "watch-dir"sv,
                                                               "watch-dir-enabled"sv,
                                                               "webseeds"sv,
-                                                              "webseedsSendingToUs" };
+                                                              "webseedsSendingToUs"sv };
 
 size_t constexpr quarks_are_sorted = ( //
     []() constexpr
@@ -431,24 +423,20 @@ size_t constexpr quarks_are_sorted = ( //
     })();
 
 static_assert(quarks_are_sorted, "Predefined quarks must be sorted by their string value");
+static_assert(std::size(my_static) == TR_N_KEYS);
 
 auto& my_runtime{ *new std::vector<std::string_view>{} };
 
 } // namespace
 
-bool tr_quark_lookup(void const* str, size_t len, tr_quark* setme)
+std::optional<tr_quark> tr_quark_lookup(std::string_view key)
 {
-    auto constexpr n_static = std::size(my_static);
-    static_assert(n_static == TR_N_KEYS);
-
-    /* is it in our static array? */
-    auto const key = std::string_view{ static_cast<char const*>(str), len };
+    // is it in our static array?
     auto constexpr sbegin = std::begin(my_static), send = std::end(my_static);
     auto const sit = std::lower_bound(sbegin, send, key);
     if (sit != send && *sit == key)
     {
-        *setme = std::distance(sbegin, sit);
-        return true;
+        return std::distance(sbegin, sit);
     }
 
     /* was it added during runtime? */
@@ -456,29 +444,32 @@ bool tr_quark_lookup(void const* str, size_t len, tr_quark* setme)
     auto const rit = std::find(rbegin, rend, key);
     if (rit != rend)
     {
-        *setme = TR_N_KEYS + std::distance(rbegin, rit);
-        return true;
+        return TR_N_KEYS + std::distance(rbegin, rit);
     }
 
-    return false;
+    return {};
 }
 
 tr_quark tr_quark_new(std::string_view str)
 {
-    tr_quark ret = TR_KEY_NONE;
-
-    if (!tr_quark_lookup(std::data(str), std::size(str), &ret))
+    if (auto const prior = tr_quark_lookup(str); prior)
     {
-        ret = TR_N_KEYS + std::size(my_runtime);
-        my_runtime.emplace_back(tr_strndup(std::data(str), std::size(str)), std::size(str));
+        return *prior;
     }
 
+    auto const ret = TR_N_KEYS + std::size(my_runtime);
+    my_runtime.emplace_back(tr_strvDup(str), std::size(str));
     return ret;
+}
+
+std::string_view tr_quark_get_string_view(tr_quark q)
+{
+    return q < TR_N_KEYS ? my_static[q] : my_runtime[q - TR_N_KEYS];
 }
 
 char const* tr_quark_get_string(tr_quark q, size_t* len)
 {
-    auto const& tmp = q < TR_N_KEYS ? my_static[q] : my_runtime[q - TR_N_KEYS];
+    auto const tmp = tr_quark_get_string_view(q);
 
     if (len != nullptr)
     {

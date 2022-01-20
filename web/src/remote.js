@@ -1,11 +1,6 @@
-/**
- * @license
- *
- * Copyright © Charles Kerr, Dave Perrett, Malcolm Jarvis and Bruno Bierbaumer
- *
- * This file is licensed under the GPLv2.
- * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
- */
+/* @license This file Copyright © Charles Kerr, Dave Perrett, Malcolm Jarvis and Bruno Bierbaumer
+   It may be used under GPLv2 (SPDX: GPL-2.0).
+   License text can be found in the licenses/ folder. */
 
 import { AlertDialog } from './alert-dialog.js';
 
@@ -203,18 +198,10 @@ export class Remote {
     );
   }
 
-  removeTorrents(torrent_ids, callback, context) {
-    this.sendTorrentActionRequests(
-      'torrent-remove',
-      torrent_ids,
-      callback,
-      context
-    );
-  }
-  removeTorrentsAndData(torrents) {
+  removeTorrents(torrents, trash) {
     const o = {
       arguments: {
-        'delete-local-data': true,
+        'delete-local-data': trash,
         ids: [],
       },
       method: 'torrent-remove',

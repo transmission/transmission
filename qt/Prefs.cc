@@ -1,10 +1,7 @@
-/*
- * This file Copyright (C) 2009-2015 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2009-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #include <array>
 #include <cassert>
@@ -14,7 +11,11 @@
 #include <QDateTime>
 #include <QDir>
 #include <QFile>
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+#include <QStringDecoder>
+#else
 #include <QTextCodec>
+#endif
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/utils.h>
@@ -180,10 +181,20 @@ auto const SortModes = std::array<std::pair<int, std::string_view>, SortMode::NU
 
 bool isValidUtf8(QByteArray const& byteArray)
 {
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+
+    auto decoder = QStringDecoder(QStringConverter::Utf8, QStringConverter::Flag::Stateless);
+    auto const text = QString(decoder.decode(byteArray));
+    return !decoder.hasError() && !text.contains(QChar::ReplacementCharacter);
+
+#else
+
     auto const* const codec = QTextCodec::codecForName("UTF-8");
     auto state = QTextCodec::ConverterState{};
     auto const text = codec->toUnicode(byteArray.constData(), byteArray.size(), &state);
     return state.invalidChars == 0;
+
+#endif
 }
 
 } // namespace
@@ -310,7 +321,11 @@ Prefs::Prefs(QString config_dir)
                 auto const value = getValue<time_t>(b);
                 if (value)
                 {
+#if QT_VERSION >= QT_VERSION_CHECK(5, 8, 0)
+                    values_[i].setValue(QDateTime::fromSecsSinceEpoch(*value));
+#else
                     values_[i].setValue(QDateTime::fromTime_t(*value));
+#endif
                 }
             }
             break;
@@ -391,7 +406,11 @@ Prefs::~Prefs()
             break;
 
         case QVariant::DateTime:
+#if QT_VERSION >= QT_VERSION_CHECK(5, 8, 0)
+            dictAdd(&current_settings, key, int64_t{ val.toDateTime().toSecsSinceEpoch() });
+#else
             dictAdd(&current_settings, key, val.toDateTime().toTime_t());
+#endif
             break;
 
         default:
@@ -404,7 +423,7 @@ Prefs::~Prefs()
     tr_variant file_settings;
     QFile const file(QDir(config_dir_).absoluteFilePath(QStringLiteral("settings.json")));
 
-    if (!tr_variantFromFile(&file_settings, TR_VARIANT_FMT_JSON, file.fileName().toUtf8().constData(), nullptr))
+    if (!tr_variantFromFile(&file_settings, TR_VARIANT_PARSE_JSON, file.fileName().toUtf8().constData(), nullptr))
     {
         tr_variantInitDict(&file_settings, PREFS_COUNT);
     }

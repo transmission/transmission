@@ -1,13 +1,10 @@
-/*
- * This file Copyright (C) 2008-2014 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2008-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #include <algorithm>
-#include <cstring> /* memset() */
+#include <vector>
 
 #include "transmission.h"
 #include "bandwidth.h"
@@ -93,22 +90,39 @@ Bandwidth::Bandwidth(Bandwidth* new_parent)
 ****
 ***/
 
+static void remove_child(std::vector<Bandwidth*>& v, Bandwidth* remove_me)
+{
+    auto it = std::find(std::begin(v), std::end(v), remove_me);
+    if (it == std::end(v))
+    {
+        return;
+    }
+
+    // the list isn't sorted -- so instead of erase()ing `it`,
+    // do the cheaper option of overwriting it with the final item
+    *it = v.back();
+    v.resize(v.size() - 1);
+}
+
 void Bandwidth::setParent(Bandwidth* new_parent)
 {
     TR_ASSERT(this != new_parent);
 
     if (this->parent_ != nullptr)
     {
-        this->parent_->children_.erase(this);
+        remove_child(this->parent_->children_, this);
         this->parent_ = nullptr;
     }
 
     if (new_parent != nullptr)
     {
+#ifdef TR_ENABLE_ASSERTS
         TR_ASSERT(new_parent->parent_ != this);
-        TR_ASSERT(new_parent->children_.find(this) == new_parent->children_.end()); // does not exist
+        auto& children = new_parent->children_;
+        TR_ASSERT(std::find(std::begin(children), std::end(children), this) == std::end(children)); // not already there
+#endif
 
-        new_parent->children_.insert(this);
+        new_parent->children_.push_back(this);
         this->parent_ = new_parent;
     }
 }
@@ -123,8 +137,6 @@ void Bandwidth::allocateBandwidth(
     unsigned int period_msec,
     std::vector<tr_peerIo*>& peer_pool)
 {
-    TR_ASSERT(tr_isDirection(dir));
-
     tr_priority_t const priority = std::max(parent_priority, this->priority_);
 
     /* set the available bandwidth */
@@ -181,10 +193,12 @@ void Bandwidth::phaseOne(std::vector<tr_peerIo*>& peerArray, tr_direction dir)
 
 void Bandwidth::allocate(tr_direction dir, unsigned int period_msec)
 {
-    std::vector<tr_peerIo*> tmp;
-    std::vector<tr_peerIo*> low;
-    std::vector<tr_peerIo*> normal;
-    std::vector<tr_peerIo*> high;
+    TR_ASSERT(tr_isDirection(dir));
+
+    auto high = std::vector<tr_peerIo*>{};
+    auto low = std::vector<tr_peerIo*>{};
+    auto normal = std::vector<tr_peerIo*>{};
+    auto tmp = std::vector<tr_peerIo*>{};
 
     /* allocateBandwidth () is a helper function with two purposes:
      * 1. allocate bandwidth to b and its subtree
@@ -250,18 +264,14 @@ unsigned int Bandwidth::clamp(uint64_t now, tr_direction dir, unsigned int byte_
          * clamp down harder on the bytes available */
         if (byte_count > 0)
         {
-            double current;
-            double desired;
-            double r;
-
             if (now == 0)
             {
                 now = tr_time_msec();
             }
 
-            current = this->getRawSpeedBytesPerSecond(now, TR_DOWN);
-            desired = this->getDesiredSpeedBytesPerSecond(TR_DOWN);
-            r = desired >= 1 ? current / desired : 0;
+            auto const current = this->getRawSpeedBytesPerSecond(now, TR_DOWN);
+            auto const desired = this->getDesiredSpeedBytesPerSecond(TR_DOWN);
+            auto const r = desired >= 1 ? double(current) / desired : 0;
 
             if (r > 1.0)
             {

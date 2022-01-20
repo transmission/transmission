@@ -1,28 +1,13 @@
-/******************************************************************************
- * Copyright (c) 2007-2012 Transmission authors and contributors
- *
- * Permission is hereby granted, free of charge, to any person obtaining a
- * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
- * DEALINGS IN THE SOFTWARE.
- *****************************************************************************/
+// This file Copyright © 2007-2022 Transmission authors and contributors.
+// It may be used under the MIT (SPDX: MIT) license.
+// License text can be found in the licenses/ folder.
 
 #import "DragOverlayWindow.h"
 #import "DragOverlayView.h"
 #import "NSStringAdditions.h"
+
+#include <libtransmission/transmission.h>
+#include <libtransmission/torrent-metainfo.h>
 
 @interface DragOverlayWindow (Private)
 
@@ -34,7 +19,10 @@
 
 - (instancetype)initWithLib:(tr_session*)lib forWindow:(NSWindow*)window
 {
-    if ((self = ([super initWithContentRect:window.frame styleMask:NSBorderlessWindowMask backing:NSBackingStoreBuffered defer:NO])))
+    if ((self = ([super initWithContentRect:window.frame
+                                  styleMask:NSWindowStyleMaskBorderless
+                                    backing:NSBackingStoreBuffered
+                                      defer:NO])))
     {
         fLib = lib;
 
@@ -80,7 +68,6 @@
     NSInteger count = 0;
 
     NSString* name;
-    BOOL folder;
     NSInteger fileCount = 0;
 
     for (NSString* file in files)
@@ -88,24 +75,20 @@
         if ([[NSWorkspace.sharedWorkspace typeOfFile:file error:NULL] isEqualToString:@"org.bittorrent.torrent"] ||
             [file.pathExtension caseInsensitiveCompare:@"torrent"] == NSOrderedSame)
         {
-            tr_ctor* ctor = tr_ctorNew(fLib);
-            tr_ctorSetMetainfoFromFile(ctor, file.UTF8String);
-            tr_info info;
-            if (tr_torrentParse(ctor, &info) == TR_PARSE_OK)
+            auto metainfo = tr_torrent_metainfo{};
+            if (metainfo.parseTorrentFile(file.UTF8String))
             {
-                count++;
-                size += info.totalSize;
-                fileCount += info.fileCount;
+                ++count;
 
-                //only useful when one torrent
-                if (count == 1)
+                size += metainfo.totalSize();
+
+                auto const n_files = metainfo.fileCount();
+                fileCount += n_files;
+                if (n_files == 1)
                 {
-                    name = @(info.name);
-                    folder = info.isFolder;
+                    name = @(metainfo.name().c_str());
                 }
             }
-            tr_metainfoFree(&info);
-            tr_ctorFree(ctor);
         }
     }
 
@@ -116,7 +99,7 @@
 
     //set strings and icon
     NSString* secondString = [NSString stringForFileSize:size];
-    if (count > 1 || folder)
+    if (count > 1)
     {
         NSString* fileString;
         if (fileCount == 1)
@@ -134,7 +117,7 @@
     NSImage* icon;
     if (count == 1)
     {
-        icon = [NSWorkspace.sharedWorkspace iconForFileType:folder ? NSFileTypeForHFSTypeCode(kGenericFolderIcon) : name.pathExtension];
+        icon = [NSWorkspace.sharedWorkspace iconForFileType:name ? name.pathExtension : NSFileTypeForHFSTypeCode(kGenericFolderIcon)];
     }
     else
     {

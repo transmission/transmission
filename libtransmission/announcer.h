@@ -1,10 +1,7 @@
-/*
- * This file Copyright (C) 2010-2014 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2010-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #pragma once
 
@@ -12,10 +9,16 @@
 #error only libtransmission should #include this header.
 #endif
 
+#include <cstddef> // size_t
+#include <ctime>
+#include <string_view>
+
 #include "transmission.h"
 
+#include "interned-string.h"
+
 struct tr_announcer;
-struct tr_torrent_tiers;
+struct tr_announcer_tiers;
 
 /**
  * ***  Tracker Publish / Subscribe
@@ -39,8 +42,8 @@ struct tr_tracker_event
     TrackerEventType messageType;
 
     /* for TR_TRACKER_WARNING and TR_TRACKER_ERROR */
-    char const* text;
-    char const* tracker;
+    std::string_view text;
+    tr_interned_string announce_url;
 
     /* for TR_TRACKER_PEERS */
     struct tr_pex const* pex;
@@ -65,7 +68,7 @@ void tr_announcerClose(tr_session*);
 ***  For torrent customers
 **/
 
-struct tr_torrent_tiers* tr_announcerAddTorrent(tr_torrent* torrent, tr_tracker_callback cb, void* cbdata);
+struct tr_announcer_tiers* tr_announcerAddTorrent(tr_torrent* torrent, tr_tracker_callback cb, void* cbdata);
 
 void tr_announcerResetTorrent(struct tr_announcer*, tr_torrent*);
 
@@ -92,9 +95,9 @@ void tr_announcerAddBytes(tr_torrent*, int up_down_or_corrupt, uint32_t byteCoun
 
 time_t tr_announcerNextManualAnnounce(tr_torrent const*);
 
-tr_tracker_stat* tr_announcerStats(tr_torrent const* torrent, int* setmeTrackerCount);
+tr_tracker_view tr_announcerTracker(tr_torrent const* torrent, size_t i);
 
-void tr_announcerStatsFree(tr_tracker_stat* trackers, int trackerCount);
+size_t tr_announcerTrackerCount(tr_torrent const* tor);
 
 /***
 ****

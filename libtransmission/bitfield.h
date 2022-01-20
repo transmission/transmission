@@ -1,10 +1,7 @@
-/*
- * This file Copyright (C) 2008-2014 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2008-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #pragma once
 
@@ -12,257 +9,111 @@
 #error only libtransmission should #include this header.
 #endif
 
-#include <array>
+#include <cstddef>
 #include <vector>
 
-#include "transmission.h"
-#include "tr-macros.h"
-#include "tr-assert.h"
-#include "span.h"
-
-/// @brief Implementation of the BitTorrent spec's Bitfield array of bits
-struct Bitfield
+/**
+ * @brief Implementation of the BitTorrent spec's Bitfield array of bits.
+ *
+ * This is for tracking the pieces a peer has. Its functionality is like
+ * a bitset or vector<bool> with some added use cases:
+ *
+ * - It needs to be able to read/write the left-to-right bitfield format
+ *   specified in the bittorrent spec. This is what raw() and getRaw()
+ *   are for.
+ *
+ * - "Have all" is a special case where we know the peer has all the
+ *   pieces and don't need to check the bit array. This is useful since
+ *   (a) it's very common (i.e. seeds) and saves memory and work of
+ *   allocating a bit array and doing lookups, and (b) if we have a
+ *   magnet link and haven't gotten the metainfo yet, we may not know
+ *   how many pieces there are -- but we can still know "this peer has
+ *   all of them".
+ *
+ * - "Have none" is another special case that has the same advantages
+ *   and motivations as "Have all".
+ */
+class tr_bitfield
 {
 public:
-    /// @brief State diagram for modes of operation: None -> Normal <==> All
-    /// ALL and NONE: Special cases for when full or empty but we don't know the bitCount.
-    /// This occurs when a magnet link's peers send have all / have none
-    enum struct OperationMode
-    {
-        /// @brief State at the creation
-        Start,
-        /// @brief Normal operation: storage of bytes contains bits to set or clear
-        Normal,
-        /// @brief If bit_count_==0, storage is inactive, consider all bits to be 1
-        All,
-        /// @brief If bit_count_==0, storage is inactive, consider all bits to be 0
-        None,
-    };
+    explicit tr_bitfield(size_t bit_count);
 
-    /***
-    ****  life cycle
-    ***/
-    explicit Bitfield(size_t bit_count);
+    void setHasAll();
+    void setHasNone();
 
-    Bitfield()
-        : Bitfield(0)
+    // set one or more bits
+    void set(size_t bit, bool value = true);
+    void setSpan(size_t begin, size_t end, bool value = true);
+    void unset(size_t bit)
     {
+        set(bit, false);
     }
-
-    /// @brief Builds bits from array of boolean flags
-    Bitfield(bool const* bytes, size_t n);
-
-    ~Bitfield()
+    void unsetSpan(size_t begin, size_t end)
     {
-        setMode(OperationMode::None);
+        setSpan(begin, end, false);
     }
+    void setFromBools(bool const* bytes, size_t n);
 
-    /***
-    ****
-    ***/
+    // "raw" here is in BEP0003 format: "The first byte of the bitfield
+    // corresponds to indices 0 - 7 from high bit to low bit, respectively.
+    // The next one 8-15, etc. Spare bits at the end are set to zero.
+    void setRaw(uint8_t const* bits, size_t byte_count);
+    std::vector<uint8_t> raw() const;
 
-    /// @brief Creates new Bitfield with same count of bits as *this and replaces data from new_bits
-    void setFrom(Span<uint8_t> new_bits, bool bounded)
-    {
-        *this = Bitfield(new_bits, this->bit_count_, bounded);
-    }
-
-    /// @brief Change the state (mode of operation)
-    void setMode(OperationMode new_mode);
-
-    /// @brief Sets one bit
-    void setBit(size_t bit_index);
-
-    /// @brief Sets bit range [begin, end) to 1
-    void setBitRange(size_t begin, size_t end);
-
-    /// @brief Clears one bit
-    void clearBit(size_t bit);
-
-    /// @brief Clears bit range [begin, end) to 0
-    void clearBitRange(size_t begin, size_t end);
-
-    /***
-    ****
-    ***/
-
-    [[nodiscard]] size_t countRange(size_t begin, size_t end) const
-    {
-        if (hasAll())
-        {
-            return end - begin;
-        }
-
-        if (hasNone())
-        {
-            return 0;
-        }
-
-        return countRangeImpl(begin, end);
-    }
-
-    [[nodiscard]] size_t countBits() const;
-
-    /// @brief Returns whether all bits are set, or mode is ALL. Always false for zero sized bitfield.
     [[nodiscard]] constexpr bool hasAll() const
     {
-        return ((bit_count_ != 0) && (true_count_ == bit_count_)) || (mode_ == OperationMode::All);
+        return have_all_hint_ || (bit_count_ > 0 && bit_count_ == true_count_);
     }
 
-    /// @brief Returns whether all bits are clear, or mode is NONE. Always false for zero sized bitfield.
     [[nodiscard]] constexpr bool hasNone() const
     {
-        return ((bit_count_ != 0) && (true_count_ == 0)) || (mode_ == OperationMode::None);
+        return have_none_hint_ || (bit_count_ > 0 && true_count_ == 0);
     }
 
-    [[nodiscard]] bool readBit(size_t n) const;
+    [[nodiscard]] bool test(size_t bit) const
+    {
+        return hasAll() || (!hasNone() && testFlag(bit));
+    }
 
-    /***
-    ****
-    ***/
+    [[nodiscard]] constexpr size_t count() const
+    {
+        return true_count_;
+    }
 
-    [[nodiscard]] std::vector<uint8_t> getRaw() const;
+    [[nodiscard]] size_t count(size_t begin, size_t end) const;
 
-    [[nodiscard]] size_t getBitCount() const
+    [[nodiscard]] constexpr size_t size() const
     {
         return bit_count_;
     }
 
+    [[nodiscard]] constexpr size_t empty() const
+    {
+        return size() == 0;
+    }
+
+    bool isValid() const;
+
 private:
-    /// @brief Copies bits from the readonly view new_bits. Use Bitfield::setFrom to access this constructor
-    /// @param bounded Whether incoming data is constrained by our memory and bit size
-    Bitfield(Span<uint8_t> new_bits, size_t bit_count, bool bounded);
+    std::vector<uint8_t> flags_;
+    [[nodiscard]] size_t countFlags() const;
+    [[nodiscard]] size_t countFlags(size_t begin, size_t end) const;
+    [[nodiscard]] bool testFlag(size_t bit) const;
 
-    /// @brief Contains lookup table for how many set bits are there in 0..255
-    static std::array<int8_t const, 256> true_bits_lookup_;
+    void ensureBitsAlloced(size_t n);
+    [[nodiscard]] bool ensureNthBitAlloced(size_t nth);
+    void freeArray();
 
-    static constexpr size_t getStorageSize(size_t bit_count)
-    {
-        return 1 + ((bit_count + 7) >> 3);
-    }
+    void setTrueCount(size_t n);
+    void rebuildTrueCount();
+    void incrementTrueCount(size_t inc);
+    void decrementTrueCount(size_t dec);
 
-    [[nodiscard]] size_t countArray() const;
-    [[nodiscard]] size_t countRangeImpl(size_t begin, size_t end) const;
-
-    /// @brief Given bit count, sets that many bits in the array, assumes array size is big enough.
-    static void setBitsInArray(std::vector<uint8_t>& array, size_t bit_count);
-
-    void ensureNthBitFits(size_t n);
-
-    inline void setTrueCount(size_t n)
-    {
-        TR_ASSERT(mode_ == OperationMode::Normal);
-        TR_ASSERT(n <= bit_count_);
-
-        true_count_ = n;
-
-        TR_ASSERT(isValid());
-    }
-
-#ifdef TR_ENABLE_ASSERTS
-    [[nodiscard]] bool isValid() const;
-#endif
-
-    /// @brief Set the bit
-    inline void setBitImpl(size_t bit)
-    {
-        TR_ASSERT_MSG(mode_ == OperationMode::Normal, "Can only set bits in Normal operation mode");
-        TR_ASSERT(isValid());
-
-        if (!readBit(bit))
-        {
-            ensureNthBitFits(bit);
-
-            auto const byte_offset = bit >> 3;
-            size_t bit_value = size_t{ 0x80U } >> (bit & 7);
-
-            bits_[byte_offset] |= bit_value;
-            setTrueCount(true_count_ + 1);
-        }
-
-        TR_ASSERT(isValid());
-    }
-
-    /// @brief Clear the bit
-    inline void clearBitImpl(size_t bit)
-    {
-        TR_ASSERT_MSG(mode_ == OperationMode::Normal, "Can only set bits in Normal operation mode");
-        TR_ASSERT(isValid());
-
-        if (readBit(bit))
-        {
-            ensureNthBitFits(bit);
-
-            size_t const byte_mask = size_t{ 0xFF7FU } >> (bit & 7U);
-            bits_[bit >> 3] &= byte_mask;
-
-            TR_ASSERT(true_count_ > 0);
-            setTrueCount(true_count_ - 1);
-        }
-
-        TR_ASSERT(isValid());
-    }
-
-    /// @brief Ensure that the memory is properly deallocated and size becomes zero
-    inline void clearStorage()
-    {
-        bits_ = std::vector<uint8_t>();
-    }
-
-    inline void setBitRangeImpl(size_t begin, size_t end)
-    {
-        size_t start_byte = begin >> 3;
-        size_t start_mask = ~(size_t{ 0xFFU } << (8 - (begin & 7)));
-
-        size_t end_byte = end >> 3;
-        size_t end_mask = size_t{ 0xFFU } << (7 - (end & 7));
-
-        ensureNthBitFits(end);
-
-        if (start_byte == end_byte)
-        {
-            bits_[start_byte] |= start_mask & end_mask;
-        }
-        else
-        {
-            bits_[start_byte] |= start_mask;
-            bits_[end_byte] |= end_mask;
-
-            if (++start_byte < end_byte)
-            {
-                std::fill_n(std::begin(bits_) + start_byte, end_byte - start_byte, 0xFF);
-            }
-        }
-    }
-
-    inline void clearBitRangeImpl(size_t begin, size_t end)
-    {
-        size_t start_byte = begin >> 3;
-        size_t start_mask = size_t{ 0xFFU } << (8 - (begin & 7));
-
-        size_t end_byte = end >> 3;
-        size_t end_mask = ~(size_t{ 0xFFU } << (7 - (end & 7)));
-
-        ensureNthBitFits(end);
-
-        if (start_byte == end_byte)
-        {
-            bits_[start_byte] &= start_mask | end_mask;
-        }
-        else
-        {
-            bits_[start_byte] &= start_mask;
-            bits_[end_byte] &= end_mask;
-
-            if (++start_byte < end_byte)
-            {
-                std::fill_n(std::begin(bits_) + start_byte, end_byte - start_byte, 0);
-            }
-        }
-    }
-
-    std::vector<uint8_t> bits_;
     size_t bit_count_ = 0;
     size_t true_count_ = 0;
-    OperationMode mode_ = OperationMode::Start;
+
+    /* Special cases for when full or empty but we don't know the bitCount.
+       This occurs when a magnet link's peers send have all / have none */
+    bool have_all_hint_ = false;
+    bool have_none_hint_ = false;
 };

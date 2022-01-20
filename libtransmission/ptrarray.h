@@ -1,10 +1,7 @@
-/*
- * This file Copyright (C) 2008-2014 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2008-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #pragma once
 
@@ -12,8 +9,11 @@
 #error only libtransmission should #include this header.
 #endif
 
+#include <cstddef> // size_t
+
 #include "transmission.h"
-#include "tr-assert.h"
+
+#include "tr-macros.h"
 
 /**
  * @addtogroup utils Utilities
@@ -30,6 +30,8 @@ struct tr_ptrArray
     int n_alloc;
 };
 
+using tr_voidptr_compare_func = int (*)(void const* lhs, void const* rhs);
+
 using PtrArrayCompareFunc = tr_voidptr_compare_func;
 
 using PtrArrayForeachFunc = void (*)(void*);
@@ -42,14 +44,7 @@ void tr_ptrArrayForeach(tr_ptrArray* array, PtrArrayForeachFunc func);
 
 /** @brief Return the nth item in a tr_ptrArray
     @return the nth item in a tr_ptrArray */
-constexpr void* tr_ptrArrayNth(tr_ptrArray* array, int i)
-{
-    TR_ASSERT(array != nullptr);
-    TR_ASSERT(i >= 0);
-    TR_ASSERT(i < array->n_items);
-
-    return array->items[i];
-}
+void* tr_ptrArrayNth(tr_ptrArray* array, int i);
 
 /** @brief Remove the last item from the array and return it
     @return the pointer that's been removed from the array
@@ -120,5 +115,14 @@ void tr_ptrArrayRemoveSortedPointer(tr_ptrArray* t, void const* ptr, tr_voidptr_
 /** @brief Find a pointer from an array sorted by the specified sort function
     @return the matching pointer, or nullptr if no match was found */
 void* tr_ptrArrayFindSorted(tr_ptrArray* array, void const* key, tr_voidptr_compare_func compare);
+
+/** @brief similar to bsearch() but returns the index of the lower bound */
+int tr_lowerBound(
+    void const* key,
+    void const* base,
+    size_t nmemb,
+    size_t size,
+    tr_voidptr_compare_func compar,
+    bool* exact_match) TR_GNUC_HOT TR_GNUC_NONNULL(1, 5, 6);
 
 /* @} */

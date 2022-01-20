@@ -1,19 +1,11 @@
-/*
- * This file Copyright (C) 2009-2015 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2009-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #include <set>
 #include <unordered_map>
 #include <unordered_set>
-
-#ifdef _WIN32
-#include <windows.h>
-#include <shellapi.h>
-#endif
 
 #include <QAbstractItemView>
 #include <QApplication>
@@ -30,10 +22,6 @@
 #include <QObject>
 #include <QPixmapCache>
 #include <QStyle>
-
-#ifdef _WIN32
-#include <QtWin>
-#endif
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/utils.h> // tr_formatter

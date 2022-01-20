@@ -1,17 +1,13 @@
-/*
- * This file Copyright (C) 2013-2014 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2012-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #pragma once
 
 #include <cstddef> // size_t
+#include <optional>
 #include <string_view>
-
-#include "tr-macros.h"
 
 /* Quarks — a 2-way association between a string and a unique integer identifier */
 using tr_quark = size_t;
@@ -87,7 +83,6 @@ enum
     TR_KEY_details_window_height,
     TR_KEY_details_window_width,
     TR_KEY_dht_enabled,
-    TR_KEY_display_name,
     TR_KEY_dnd,
     TR_KEY_done_date,
     TR_KEY_doneDate,
@@ -157,7 +152,6 @@ enum
     TR_KEY_incomplete_dir,
     TR_KEY_incomplete_dir_enabled,
     TR_KEY_info,
-    TR_KEY_info_hash,
     TR_KEY_inhibit_desktop_hibernation,
     TR_KEY_interval,
     TR_KEY_ip,
@@ -190,7 +184,6 @@ enum
     TR_KEY_location,
     TR_KEY_lpd_enabled,
     TR_KEY_m,
-    TR_KEY_magnet_info,
     TR_KEY_magnetLink,
     TR_KEY_main_window_height,
     TR_KEY_main_window_is_maximized,
@@ -346,6 +339,7 @@ enum
     TR_KEY_sizeWhenDone,
     TR_KEY_sort_mode,
     TR_KEY_sort_reversed,
+    TR_KEY_source,
     TR_KEY_speed,
     TR_KEY_speed_Bps,
     TR_KEY_speed_bytes,
@@ -424,12 +418,19 @@ enum
  *
  * @return true if the specified string exists as a quark
  */
-bool tr_quark_lookup(void const* str, size_t len, tr_quark* setme);
+std::optional<tr_quark> tr_quark_lookup(std::string_view key);
 
 /**
  * Get the string that corresponds to the specified quark
  */
-char const* tr_quark_get_string(tr_quark quark, size_t* len);
+char const* tr_quark_get_string(tr_quark quark, size_t* len = nullptr);
+
+/**
+ * Get the string view that corresponds to the specified quark.
+ *
+ * Note: this view is guaranteed to be zero-terminated at view[std::size(view)]
+ */
+std::string_view tr_quark_get_string_view(tr_quark quark);
 
 /**
  * Create a new quark for the specified string. If a quark already
