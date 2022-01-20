@@ -1,4 +1,4 @@
-// Copyright (c) 2010 by Juliusz Chroboczek
+// Copyright © 2010 by Juliusz Chroboczek
 // This file is licensed under the MIT (SPDX: MIT) license,
 // A copy of this license can be found in licenses/ .
 

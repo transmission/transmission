@@ -1,4 +1,4 @@
-// This file Copyright (C) 2005-2021 by its respective authors.
+// This file Copyright © 2005-2021 by its respective authors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
@@ -1273,7 +1273,7 @@ void Application::Impl::show_about_dialog()
     Gtk::AboutDialog d;
     d.set_authors(authors);
     d.set_comments(_("A fast and easy BitTorrent client"));
-    d.set_copyright(_("Copyright (c) The Transmission Project"));
+    d.set_copyright(_("Copyright © The Transmission Project"));
     d.set_logo_icon_name(AppIconName);
     d.set_name(Glib::get_application_name());
     /* Translators: translate "translator-credits" as your name

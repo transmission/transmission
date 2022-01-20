@@ -1,4 +1,4 @@
-// Copyright (C) Transmission authors and contributors. This file is
+// Copyright © Transmission authors and contributors. This file is
 // licensed under the MIT (SPDX: MIT) license, A copy is in licenses/
 
 #include <algorithm>
