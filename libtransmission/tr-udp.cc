@@ -130,8 +130,6 @@ void tr_udpSetSocketTOS(tr_session* session)
 // TODO: remove goto, it prevents reducing scope of local variables
 static void rebind_ipv6(tr_session* ss, bool force)
 {
-    bool is_default = false;
-    tr_address const* public_addr = nullptr;
     struct sockaddr_in6 sin6;
     unsigned char const* ipv6 = tr_globalIPv6(ss);
     tr_socket_t s = TR_BAD_SOCKET;
