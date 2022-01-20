@@ -1077,8 +1077,11 @@ Gtk::Widget* DetailsDialog::Impl::info_page_new()
     error_lb_ = Gtk::make_managed<Gtk::Label>();
     error_lb_->set_selectable(true);
     error_lb_->set_ellipsize(Pango::ELLIPSIZE_END);
+    error_lb_->set_line_wrap(true);
+    error_lb_->set_lines(10);
     t->add_row(row, _("Error:"), *error_lb_);
 
+    /* details */
     t->add_section_divider(row);
     t->add_section_title(row, _("Details"));
 
