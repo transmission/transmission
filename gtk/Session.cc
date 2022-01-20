@@ -1,4 +1,4 @@
-// Copyright © Transmission authors and contributors
+// Copyright © Transmission authors and contributors.
 // This file is licensed under the MIT (SPDX: MIT) license,
 // A copy of this license can be found in licenses/ .
 

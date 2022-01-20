@@ -1,5 +1,5 @@
 /*
- * This file copyright Transmission authors and contributors
+ * This file copyright Transmission authors and contributors.
  *
  * or any future license endorsed by Mnemosyne LLC.
  *

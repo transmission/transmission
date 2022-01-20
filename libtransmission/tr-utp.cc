@@ -1,6 +1,6 @@
-// Copyright © 2010 by Juliusz Chroboczek
-// This file is licensed under the MIT (SPDX: MIT) license,
-// A copy of this license can be found in licenses/ .
+// This file Copyright © 2010 Juliusz Chroboczek.
+// It may be used under the MIT (SPDX: MIT) license.
+// License text can be found in the licenses/ folder.
 
 #include <event2/event.h>
 

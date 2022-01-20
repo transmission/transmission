@@ -1,5 +1,5 @@
 /*
- * This file Copyright © Transmission authors and contributors
+ * This file Copyright © Transmission authors and contributors.
  *
  * It may be used under the 3-Clause BSD License, the GNU Public License v2,
  * or v3, or any future license endorsed by Mnemosyne LLC.
