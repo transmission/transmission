@@ -1,10 +1,7 @@
-/*
- * This file Copyright (C) 2010-2017 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright 2010-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #include <cerrno>
 #include <csignal>
@@ -128,7 +125,7 @@ bool tr_spawn_async(
 
     if (!sigchld_handler_set)
     {
-        /* FIXME: "The effects of signal() in a multithreaded process are unspecified." (c) man 2 signal */
+        /* FIXME: "The effects of signal() in a multithreaded process are unspecified." © man 2 signal */
         if (signal(SIGCHLD, &handle_sigchld) == SIG_ERR) // NOLINT(performance-no-int-to-ptr)
         {
             set_system_error(error, errno, "Call to signal()");
