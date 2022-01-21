@@ -3,7 +3,7 @@
 Thanks for reading this and thinking about contributing! :tada:
 
 This page is a list of suggestions and guidelines for contributing. They're not rules, just guidelines. Use your best judgment and feel free to propose changes to this document in a pull request.
- 
+
 # If you've got a change in mind
 
 New people usually start volunteering because they have an itch they want to scratch. If you already know what you want to work on first, please comment in an existing issue, or [file a new issue](https://github.com/transmission/transmission/issues/new/choose) or [start a new discussion](https://github.com/transmission/transmission/discussions/new)! The maintainers will try to get you the information you need.
