@@ -68,8 +68,6 @@ static char const* getNatStateStr(int state)
 
 static void natPulse(tr_shared* s, bool do_check)
 {
-    int oldStatus;
-    int newStatus;
     tr_port received_private_port;
     tr_port const private_peer_port = s->session->private_peer_port;
     bool const is_enabled = s->isEnabled && !s->isShuttingDown;
@@ -94,7 +92,10 @@ static void natPulse(tr_shared* s, bool do_check)
         s->session->public_peer_port = public_peer_port;
         s->session->private_peer_port = received_private_port;
         tr_logAddNamedInfo(
-            getKey(), "public peer port %d (private %d) ", s->session->public_peer_port, s->session->private_peer_port);
+            getKey(),
+            "public peer port %d (private %d) ",
+            s->session->public_peer_port,
+            s->session->private_peer_port);
     }
 
     s->upnpStatus = tr_upnpPulse(s->upnp, private_peer_port, is_enabled, do_check);
@@ -123,8 +124,7 @@ static void set_evtimer_from_status(tr_shared* s)
         /* if we're mapped, everything is fine... check back in 20 minutes
          * to renew the port forwarding if it's expired */
         s->doPortCheck = true;
-        sec = s->natpmp->renew_time - time(NULL);
-
+        sec = (int)(s->natpmp->renew_time - time(NULL));
         break;
 
     case TR_PORT_ERROR:

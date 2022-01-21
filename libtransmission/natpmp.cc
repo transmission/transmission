@@ -27,7 +27,6 @@ static char const* getKey(void)
     return _("Port Forwarding (NAT-PMP)");
 }
 
-
 /**
 ***
 **/
@@ -85,7 +84,12 @@ static void setCommandTime(struct tr_natpmp* nat)
     nat->command_time = tr_time() + CommandWaitSecs;
 }
 
-tr_port_forwarding tr_natpmpPulse(struct tr_natpmp* nat, tr_port private_port, bool is_enabled, tr_port* public_port, tr_port* real_private_port)
+tr_port_forwarding tr_natpmpPulse(
+    struct tr_natpmp* nat,
+    tr_port private_port,
+    bool is_enabled,
+    tr_port* public_port,
+    tr_port* real_private_port)
 {
     if (is_enabled && nat->state == TR_NATPMP_DISCOVER)
     {
