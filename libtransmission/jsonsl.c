@@ -1,6 +1,6 @@
 /* https://github.com/mnunberg/jsonsl */
 
-/* Copyright (C) 2012-2015 Mark Nunberg.
+/* Copyright © 2012-2015 Mark Nunberg.
  *
  * See included LICENSE file for license details.
  */

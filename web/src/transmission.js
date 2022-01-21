@@ -1,11 +1,6 @@
-/**
- * @license
- *
- * Copyright © Charles Kerr, Dave Perrett, Malcolm Jarvis and Bruno Bierbaumer
- *
- * This file is licensed under the GPLv2.
- * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
- */
+/* @license This file Copyright © Charles Kerr, Dave Perrett, Malcolm Jarvis and Bruno Bierbaumer
+   It may be used under GPLv2 (SPDX: GPL-2.0).
+   License text can be found in the licenses/ folder. */
 
 import { AboutDialog } from './about-dialog.js';
 import { ContextMenu } from './context-menu.js';

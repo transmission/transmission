@@ -1,10 +1,7 @@
-/*
- * This file Copyright (C) 2008-2014 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2008-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #include <algorithm>
 #include <sys/types.h>
@@ -94,7 +91,12 @@ static void natPulse(tr_shared* s, bool do_check)
         s->session->public_peer_port = public_peer_port;
     }
 
-    s->upnpStatus = tr_upnpPulse(s->upnp, private_peer_port, is_enabled, do_check);
+    s->upnpStatus = tr_upnpPulse(
+        s->upnp,
+        private_peer_port,
+        is_enabled,
+        do_check,
+        tr_address_to_string(&s->session->bind_ipv4->addr));
 
     auto const new_status = tr_sharedTraversalStatus(s);
 

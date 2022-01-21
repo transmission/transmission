@@ -1,10 +1,7 @@
-/*
- * This file Copyright (C) 2007-2014 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2007-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #include <cerrno>
 
@@ -79,7 +76,7 @@ void tr_upnpClose(tr_upnp* handle)
 ***  Wrappers for miniupnpc functions
 **/
 
-static struct UPNPDev* tr_upnpDiscover(int msec)
+static struct UPNPDev* tr_upnpDiscover(int msec, char const* bindaddr)
 {
     UPNPDev* ret = nullptr;
     auto have_err = bool{};
@@ -88,14 +85,14 @@ static struct UPNPDev* tr_upnpDiscover(int msec)
     int err = UPNPDISCOVER_SUCCESS;
 
 #if (MINIUPNPC_API_VERSION >= 14) /* adds ttl */
-    ret = upnpDiscover(msec, nullptr, nullptr, 0, 0, 2, &err);
+    ret = upnpDiscover(msec, bindaddr, nullptr, 0, 0, 2, &err);
 #else
-    ret = upnpDiscover(msec, nullptr, nullptr, 0, 0, &err);
+    ret = upnpDiscover(msec, bindaddr, nullptr, 0, 0, &err);
 #endif
 
     have_err = err != UPNPDISCOVER_SUCCESS;
 #else
-    ret = upnpDiscover(msec, nullptr, nullptr, 0);
+    ret = upnpDiscover(msec, bindaddr, nullptr, 0);
     have_err = ret == nullptr;
 #endif
 
@@ -221,12 +218,11 @@ enum
     UPNP_IGD_INVALID = 3
 };
 
-tr_port_forwarding tr_upnpPulse(tr_upnp* handle, tr_port port, bool isEnabled, bool doPortCheck)
+tr_port_forwarding tr_upnpPulse(tr_upnp* handle, tr_port port, bool isEnabled, bool doPortCheck, char const* bindaddr)
 {
     if (isEnabled && handle->state == TR_UPNP_DISCOVER)
     {
-        auto* const devlist = tr_upnpDiscover(2000);
-
+        auto* const devlist = tr_upnpDiscover(2000, bindaddr);
         errno = 0;
 
         if (UPNP_GetValidIGD(devlist, &handle->urls, &handle->data, handle->lanaddr, sizeof(handle->lanaddr)) ==

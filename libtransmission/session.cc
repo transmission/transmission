@@ -1,10 +1,7 @@
-/*
- * This file Copyright (C) 2008-2014 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2008-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #include <algorithm> // std::partial_sort(), std::min(), std::max()
 #include <cerrno> /* ENOENT */
@@ -139,13 +136,6 @@ void tr_sessionSetEncryption(tr_session* session, tr_encryption_mode mode)
 /***
 ****
 ***/
-
-struct tr_bindinfo
-{
-    tr_socket_t socket;
-    tr_address addr;
-    struct event* ev;
-};
 
 static void close_bindinfo(struct tr_bindinfo* b)
 {
@@ -1820,8 +1810,6 @@ static void sessionCloseImplStart(tr_session* session)
 {
     session->is_closing_ = true;
 
-    free_incoming_peer_port(session);
-
     if (session->isLPDEnabled)
     {
         tr_lpdUninit(session);
@@ -1838,6 +1826,8 @@ static void sessionCloseImplStart(tr_session* session)
 
     tr_verifyClose(session);
     tr_sharedClose(session);
+
+    free_incoming_peer_port(session);
     session->rpc_server_.reset();
 
     /* Close the torrents. Get the most active ones first so that
