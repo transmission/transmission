@@ -2840,6 +2840,7 @@ void tr_sessionRemoveTorrent(tr_session* session, tr_torrent* tor)
 
 tr_torrent* tr_session::getTorrent(std::string_view info_dict_hash_string)
 {
-    auto info_dict_hash = tr_sha1_from_string(std::data(info_dict_hash_string));
-    return this->getTorrent(info_dict_hash);
+    return std::size(info_dict_hash_string) == TR_SHA1_DIGEST_STRLEN ?
+        this->getTorrent(tr_sha1_from_string(info_dict_hash_string)) :
+        nullptr;
 }
