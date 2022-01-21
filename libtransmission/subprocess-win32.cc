@@ -1,10 +1,7 @@
-/*
- * This file Copyright (C) 2011-2017 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2011-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #include <algorithm>
 #include <climits>
@@ -139,7 +136,7 @@ static wchar_t** to_wide_env(std::map<std::string_view, std::string_view> const&
     wide_env[i] = nullptr;
     TR_ASSERT(i == part_count);
 
-    /* "The sort is case-insensitive, Unicode order, without regard to locale" (c) MSDN */
+    /* "The sort is case-insensitive, Unicode order, without regard to locale" © MSDN */
     qsort(wide_env, part_count, sizeof(wchar_t*), &compare_env_part_names);
 
     return wide_env;

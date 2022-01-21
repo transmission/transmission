@@ -1,25 +1,37 @@
 # Contributing to Transmission
 
-:+1::tada: Thanks for reading this and considering contributing to the project! :tada::+1:
+Thanks for reading this and thinking about contributing! :tada:
 
-The following is a set of guidelines for contributing to Transmission. These are just guidelines, not rules, use your best judgment and feel free to propose changes to this document in a pull request.
+This page is a list of suggestions and guidelines for contributing. They're not rules, just guidelines. Use your best judgment and feel free to propose changes to this document in a pull request.
+ 
+# If you've got a change in mind
 
-# What changes would be welcome?
+New people usually start volunteering because they have an itch they want to scratch. If you already know what you want to work on first, please comment in an existing issue, or [file a new issue](https://github.com/transmission/transmission/issues/new/choose) or [start a new discussion](https://github.com/transmission/transmission/discussions/new)! The maintainers will try to get you the information you need.
 
-- Bugfixes
-- Changes that improve Transmission's compliance with [accepted BEPs](https://www.bittorrent.org/beps/bep_0000.html)
-- Changes that improve transfer speeds
-- Changes that improve peer communication, indirectly improving transfer speeds
-- Changes that measurably reduce CPU load
-- Changes that measurably reduce memory use
-- Changes that improve testing
-- Changes that simplify or shrink the existing codebase
-- Changes that implement an issue that has a [`pr welcome` label](https://github.com/transmission/transmission/issues?q=is%3Aissue+is%3Aopen+label%3A%22pr+welcome%22)
-- Changes that remove deprecated macOS API use in the macOS client
-- Changes that remove deprecated GTK API use in the GTK client
-- Changes that reduce feature disparity between the different Transmission apps
+# If you're looking for ideas
 
-# Guidelines
+If not, there are three labels in the issues tracker that can help:
+
+- [`help wanted`](https://github.com/transmission/transmission/issues?q=is%3Aissue+is%3Aopen+label%3A%22help+wanted%22) indicates that the issue is stuck and needs an outside developer. This is usually because some domain expertese is needed, e.g. for a specific platform or external API.
+- [`good first issue`](https://github.com/transmission/transmission/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22) is a `pr-welcome` issue that is probably on the easier side to code.
+- [`pr welcome`](https://github.com/transmission/transmission/issues?q=is%3Aissue+is%3Aopen+label%3A%22pr+welcome%22) is for features that have been requested and which that the project doesn't have resources to implement, but would consider adding if a good PR was submitted.
+
+The project also welcomes changes that:
+
+- improve Transmission's compliance with [accepted BEPs](https://www.bittorrent.org/beps/bep_0000.html)
+- improve transfer speeds or peer communication
+- reduce the app's footprint in CPU or memory use
+- improve testing
+- simplify / shrink the existing codebase
+- remove deprecated macOS API use in the macOS client
+- remove deprecated GTK API use in the GTK client
+- reduce feature disparity between the different Transmission apps
+
+# Mechanics
+
+## Getting Started
+
+On macOS, Transmission is usually built with Xcode. Everywhere else, it's CMake + the development environment of your choice. If you need to add source files but don't have Xcode, a maintainer can help you to update the Xcode project file. See [README.md](README.md) for information on building Transmission from source.
 
 ## Style
 
@@ -31,7 +43,7 @@ The following is a set of guidelines for contributing to Transmission. These are
 - Fix any warnings in new code before merging
 - Run `./code-style.sh` on your code to ensure the whole codebase has consistent indentation.
 
-Be aware that the project was written in C for over a decade before moving to C++, so the codebase mixes styles. Unfortunately, the legacy code doesn't always meet these guidelines. :eyeroll:
+Note that Transmission existed in C for over a decade and those idioms don't change overnight. "Follow the C++ core guidelines" can be difficult when working with older code, and the maintainers will understand that when reviewing your PRs. :smiley:
 
 ## Considerations
 
@@ -42,11 +54,3 @@ Be aware that the project was written in C for over a decade before moving to C+
 - New features must be reachable via the C API and the RPC/JSON API.
   - The macOS and GTK clients still use the C API. Everything else, including a large number of 3rd party applications, use the RPC/JSON API. New features need to be usable via both of these.
 - KISS. Transmission is a _huge_ codebase so if you're trying to decide between to approaches to implement something, try the simpler one first.
- 
-# Questions?
-
-- Not sure where to start with a feature?
-- Want to know why a piece of code is written in a certain way before changing it?
-- Want to check with the maintainers before writing code?
-
-Feel free to [file an issue](https://github.com/transmission/transmission/issues/new/choose) or [start a new discussion](https://github.com/transmission/transmission/discussions/new)! We're happy to get you unblocked.
