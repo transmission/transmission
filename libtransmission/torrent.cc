@@ -2122,7 +2122,8 @@ static void removeEmptyFoldersAndJunkFiles(char const* folder)
             auto const filename = tr_strvPath(folder, name);
 
             auto info = tr_sys_path_info{};
-            if (tr_sys_path_get_info(filename.c_str(), TR_SYS_PATH_NO_FOLLOW, &info, nullptr) && info.type == TR_SYS_PATH_IS_DIRECTORY)
+            if (tr_sys_path_get_info(filename.c_str(), TR_SYS_PATH_NO_FOLLOW, &info, nullptr) &&
+                info.type == TR_SYS_PATH_IS_DIRECTORY)
             {
                 removeEmptyFoldersAndJunkFiles(filename.c_str());
             }
