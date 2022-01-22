@@ -304,15 +304,15 @@ struct tr_announcer_tiers;
 /** @brief A group of trackers in a single tier, as per the multitracker spec */
 struct tr_tier
 {
-    tr_tier(tr_torrent* tor_in, std::vector<tr_tracker*>&& trackers)
+    tr_tier(tr_torrent* tor_in, std::vector<tr_tracker*>&& trackers_in)
         : tor{ tor_in }
-        , trackers{ std::move(trackers) }
+        , trackers{ std::move(trackers_in) }
         , key{ next_key++ }
     {
         useNextTracker();
     }
 
-    tr_tracker* currentTracker()
+    [[nodiscard]] tr_tracker* currentTracker()
     {
         if (!current_tracker_index_)
         {
@@ -323,7 +323,7 @@ struct tr_tier
         return trackers[*current_tracker_index_];
     }
 
-    tr_tracker const* currentTracker() const
+    [[nodiscard]] tr_tracker const* currentTracker() const
     {
         if (!current_tracker_index_)
         {
@@ -362,7 +362,7 @@ struct tr_tier
         return currentTracker();
     }
 
-    std::optional<size_t> indexOf(tr_interned_string const& announce_url) const
+    [[nodiscard]] std::optional<size_t> indexOf(tr_interned_string const& announce_url) const
     {
         for (size_t i = 0, n = std::size(trackers); i < n; ++i)
         {
@@ -383,7 +383,7 @@ struct tr_tier
         tr_snprintf(buf, buflen, "[%s---%" TR_PRIsv "]", name, TR_PRIsv_ARG(key_sv));
     }
 
-    bool canManualAnnounce() const
+    [[nodiscard]] bool canManualAnnounce() const
     {
         return this->manualAnnounceAllowedAt <= tr_time();
     }
@@ -1439,7 +1439,7 @@ static constexpr bool tierNeedsToAnnounce(tr_tier const* tier, time_t const now)
         !std::empty(tier->announce_events);
 }
 
-static constexpr bool tierNeedsToScrape(tr_tier const* tier, time_t const now)
+static bool tierNeedsToScrape(tr_tier const* tier, time_t const now)
 {
     auto const* const tracker = tier->currentTracker();
 
