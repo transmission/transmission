@@ -60,6 +60,7 @@ set(PROJECT_FILES
   torrent-metainfo.cc
   torrent.cc
   tr-assert.cc
+  tr-assert.mm
   tr-dht.cc
   tr-getopt.cc
   tr-lpd.cc
@@ -120,6 +121,12 @@ if(WIN32)
     set_source_files_properties(file-posix.cc subprocess-posix.cc PROPERTIES HEADER_FILE_ONLY ON)
 else()
     set_source_files_properties(file-win32.cc subprocess-win32.cc watchdir-win32.cc PROPERTIES HEADER_FILE_ONLY ON)
+endif()
+
+if(APPLE)
+    set_source_files_properties(tr-assert.cc PROPERTIES HEADER_FILE_ONLY ON)
+else()
+    set_source_files_properties(tr-assert.mm PROPERTIES HEADER_FILE_ONLY ON)
 endif()
 
 set(${PROJECT_NAME}_PUBLIC_HEADERS
@@ -303,6 +310,10 @@ endif()
 
 if(WIN32)
     target_link_libraries(${TR_NAME} crypt32 shlwapi)
+endif()
+
+if(APPLE)
+    target_link_libraries(${TR_NAME} "-framework Foundation")
 endif()
 
 if(INSTALL_LIB)
