@@ -346,6 +346,13 @@ struct tr_tier
         return !isScraping && scrapeAt != 0 && scrapeAt <= now && tracker != nullptr && tracker->scrape_info != nullptr;
     }
 
+    [[nodiscard]] auto countDownloaders() const
+    {
+        auto const* const tracker = currentTracker();
+
+        return tracker == nullptr ? 0 : tracker->downloader_count + tracker->leecher_count;
+    }
+
     tr_tracker* useNextTracker()
     {
         // move our index to the next tracker in the tier
@@ -1434,13 +1441,6 @@ static void flushCloseMessages(tr_announcer* announcer)
     stops.clear();
 }
 
-static constexpr int countDownloaders(tr_tier const* tier)
-{
-    auto const* const tracker = tier->currentTracker();
-
-    return tracker == nullptr ? 0 : tracker->downloader_count + tracker->leecher_count;
-}
-
 static int compareAnnounceTiers(tr_tier const* a, tr_tier const* b)
 {
     /* prefer higher-priority events */
@@ -1450,7 +1450,7 @@ static int compareAnnounceTiers(tr_tier const* a, tr_tier const* b)
     }
 
     /* prefer swarms where we might upload */
-    if (auto const leechers_a = countDownloaders(a), leechers_b = countDownloaders(b); leechers_a != leechers_b)
+    if (auto const leechers_a = a->countDownloaders(), leechers_b = b->countDownloaders(); leechers_a != leechers_b)
     {
         return leechers_a > leechers_b ? -1 : 1;
     }
