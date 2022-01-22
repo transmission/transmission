@@ -37,7 +37,7 @@ struct tr_magnet_info;
 struct tr_metainfo_parsed;
 struct tr_session;
 struct tr_torrent;
-struct tr_announcer_tiers;
+struct tr_torrent_announcer;
 
 /**
 ***  Package-visible ctor API
@@ -582,7 +582,7 @@ public:
 
     tr_session* session = nullptr;
 
-    tr_announcer_tiers* announcer_tiers = nullptr;
+    tr_torrent_announcer* torrent_announcer = nullptr;
 
     // Changed to non-owning pointer temporarily till tr_torrent becomes C++-constructible and destructible
     // TODO: change tr_bandwidth* to owning pointer to the bandwidth, or remove * and own the value

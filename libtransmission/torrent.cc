@@ -733,7 +733,7 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
         tr_error_clear(&error);
     }
 
-    tor->announcer_tiers = tr_announcerAddTorrent(tor, onTrackerResponse, nullptr);
+    tor->torrent_announcer = tr_announcerAddTorrent(tor, onTrackerResponse, nullptr);
 
     if (is_new_torrent)
     {

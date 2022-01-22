@@ -18,7 +18,7 @@
 #include "interned-string.h"
 
 struct tr_announcer;
-struct tr_announcer_tiers;
+struct tr_torrent_announcer;
 
 /**
  * ***  Tracker Publish / Subscribe
@@ -68,7 +68,7 @@ void tr_announcerClose(tr_session*);
 ***  For torrent customers
 **/
 
-struct tr_announcer_tiers* tr_announcerAddTorrent(tr_torrent* torrent, tr_tracker_callback cb, void* cbdata);
+struct tr_torrent_announcer* tr_announcerAddTorrent(tr_torrent* torrent, tr_tracker_callback cb, void* cbdata);
 
 void tr_announcerResetTorrent(struct tr_announcer*, tr_torrent*);
 
