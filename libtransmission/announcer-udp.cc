@@ -353,7 +353,6 @@ static struct tau_announce_request* tau_announce_request_new(
 
 static void tau_announce_request_free(struct tau_announce_request* req)
 {
-    tr_free(req->response.tracker_id_str);
     tr_free(req->response.pex6);
     tr_free(req->response.pex);
     delete req;
@@ -740,9 +739,9 @@ static void tau_tracker_upkeep(struct tau_tracker* tracker)
 struct tr_announcer_udp
 {
     /* tau_tracker */
-    tr_ptrArray trackers;
+    tr_ptrArray trackers = {};
 
-    tr_session* session;
+    tr_session* session = nullptr;
 };
 
 static struct tr_announcer_udp* announcer_udp_get(tr_session* session)
@@ -752,7 +751,7 @@ static struct tr_announcer_udp* announcer_udp_get(tr_session* session)
         return session->announcer_udp;
     }
 
-    auto* const tau = tr_new0(tr_announcer_udp, 1);
+    auto* const tau = new tr_announcer_udp{};
     tau->trackers = {};
     tau->session = session;
     session->announcer_udp = tau;
@@ -835,7 +834,7 @@ void tr_tracker_udp_close(tr_session* session)
     {
         session->announcer_udp = nullptr;
         tr_ptrArrayDestruct(&tau->trackers, (PtrArrayForeachFunc)tau_tracker_free);
-        tr_free(tau);
+        delete tau;
     }
 }
 

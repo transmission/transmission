@@ -92,10 +92,9 @@ static std::string announce_url_new(tr_session const* session, tr_announce_reque
         evbuffer_add_printf(buf, "&event=%s", str);
     }
 
-    str = req->tracker_id_str;
-    if (!tr_str_is_empty(str))
+    if (!std::empty(req->tracker_id))
     {
-        evbuffer_add_printf(buf, "&trackerid=%s", str);
+        evbuffer_add_printf(buf, "&trackerid=%" TR_PRIsv, TR_PRIsv_ARG(req->tracker_id));
     }
 
     /* There are two incompatible techniques for announcing an IPv6 address.
@@ -190,8 +189,7 @@ static void on_announce_done_eventthread(void* vdata)
 
     tr_free(data->response.pex6);
     tr_free(data->response.pex);
-    tr_free(data->response.tracker_id_str);
-    tr_free(data);
+    delete data;
 }
 
 static void on_announce_done(
@@ -264,7 +262,7 @@ static void on_announce_done(
 
             if (tr_variantDictFindStrView(&benc, TR_KEY_tracker_id, &sv))
             {
-                response->tracker_id_str = tr_strvDup(sv);
+                response->tracker_id = sv;
             }
 
             if (tr_variantDictFindInt(&benc, TR_KEY_complete, &i))
@@ -315,7 +313,7 @@ void tr_tracker_http_announce(
     tr_announce_response_func response_func,
     void* response_func_user_data)
 {
-    auto* const d = tr_new0(announce_data, 1);
+    auto* const d = new announce_data{};
     d->response.seeders = -1;
     d->response.leechers = -1;
     d->response.downloads = -1;
