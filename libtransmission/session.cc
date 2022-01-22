@@ -1240,7 +1240,7 @@ void tr_sessionSetPeerPort(tr_session* session, tr_port port)
 
 tr_port tr_sessionGetPeerPort(tr_session const* session)
 {
-    return tr_isSession(session) ? session->private_peer_port : 0;
+    return tr_isSession(session) ? session->public_peer_port : 0;
 }
 
 tr_port tr_sessionSetPeerPortRandom(tr_session* session)
@@ -2833,6 +2833,7 @@ void tr_sessionRemoveTorrent(tr_session* session, tr_torrent* tor)
 
 tr_torrent* tr_session::getTorrent(std::string_view info_dict_hash_string)
 {
-    auto info_dict_hash = tr_sha1_from_string(std::data(info_dict_hash_string));
-    return this->getTorrent(info_dict_hash);
+    return std::size(info_dict_hash_string) == TR_SHA1_DIGEST_STRLEN ?
+        this->getTorrent(tr_sha1_from_string(info_dict_hash_string)) :
+        nullptr;
 }
