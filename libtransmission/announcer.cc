@@ -627,7 +627,7 @@ static void publishPeerCounts(tr_tier* tier, int seeders, int leechers)
     }
 }
 
-static void publishPeersPex(tr_tier* tier, int seeders, int leechers, tr_pex const* pex, int n)
+static void publishPeersPex(tr_tier* tier, int seeders, int leechers, std::vector<tr_pex> const& pex)
 {
     if (tier->tor->torrent_announcer->callback != nullptr)
     {
@@ -636,8 +636,12 @@ static void publishPeersPex(tr_tier* tier, int seeders, int leechers, tr_pex con
         e.seeders = seeders;
         e.leechers = leechers;
         e.pex = pex;
-        e.pexCount = n;
-        dbgmsg(tier, "tracker knows of %d seeders and %d leechers and gave a list of %d peers.", seeders, leechers, n);
+        dbgmsg(
+            tier,
+            "tracker knows of %d seeders and %d leechers and gave a list of %zu peers.",
+            seeders,
+            leechers,
+            std::size(pex));
 
         (*tier->tor->torrent_announcer->callback)(tier->tor, &e, nullptr);
     }
@@ -948,8 +952,8 @@ static void on_announce_done(tr_announce_response const* response, void* vdata)
             response->interval,
             response->min_interval,
             (!std::empty(response->tracker_id) ? response->tracker_id.c_str() : "none"),
-            response->pex_count,
-            response->pex6_count,
+            std::size(response->pex),
+            std::size(response->pex6),
             (!std::empty(response->errmsg) ? response->errmsg.c_str() : "none"),
             (!std::empty(response->warning) ? response->warning.c_str() : "none"));
 
@@ -1039,14 +1043,14 @@ static void on_announce_done(tr_announce_response const* response, void* vdata)
                 tier->announceIntervalSec = response->interval;
             }
 
-            if (response->pex_count > 0)
+            if (!std::empty(response->pex))
             {
-                publishPeersPex(tier, seeders, leechers, response->pex, response->pex_count);
+                publishPeersPex(tier, seeders, leechers, response->pex);
             }
 
-            if (response->pex6_count > 0)
+            if (!std::empty(response->pex6))
             {
-                publishPeersPex(tier, seeders, leechers, response->pex6, response->pex6_count);
+                publishPeersPex(tier, seeders, leechers, response->pex6);
             }
 
             publishPeerCounts(tier, seeders, leechers);
@@ -1072,7 +1076,7 @@ static void on_announce_done(tr_announce_response const* response, void* vdata)
             }
 
             tier->lastAnnounceSucceeded = true;
-            tier->lastAnnouncePeerCount = response->pex_count + response->pex6_count;
+            tier->lastAnnouncePeerCount = std::size(response->pex) + std::size(response->pex6);
 
             if (isStopped)
             {

@@ -118,11 +118,11 @@ static std::string announce_url_new(tr_session const* session, tr_announce_reque
     return evbuffer_free_to_str(buf);
 }
 
-static tr_pex* listToPex(tr_variant* peerList, size_t* setme_len)
+static auto listToPex(tr_variant* peerList)
 {
     size_t n = 0;
     size_t const len = tr_variantListSize(peerList);
-    auto* const pex = tr_new0(tr_pex, len);
+    auto pex = std::vector<tr_pex>(len);
 
     for (size_t i = 0; i < len; ++i)
     {
@@ -166,7 +166,7 @@ static tr_pex* listToPex(tr_variant* peerList, size_t* setme_len)
         ++n;
     }
 
-    *setme_len = n;
+    pex.resize(n);
     return pex;
 }
 
@@ -187,8 +187,6 @@ static void on_announce_done_eventthread(void* vdata)
         data->response_func(&data->response, data->response_func_user_data);
     }
 
-    tr_free(data->response.pex6);
-    tr_free(data->response.pex);
     delete data;
 }
 
@@ -283,18 +281,18 @@ static void on_announce_done(
             if (tr_variantDictFindStrView(&benc, TR_KEY_peers6, &sv))
             {
                 dbgmsg(data->log_name, "got a peers6 length of %zu", std::size(sv));
-                response->pex6 = tr_peerMgrCompact6ToPex(std::data(sv), std::size(sv), nullptr, 0, &response->pex6_count);
+                response->pex6 = tr_peerMgrCompact6ToPex(std::data(sv), std::size(sv), nullptr, 0);
             }
 
             if (tr_variantDictFindStrView(&benc, TR_KEY_peers, &sv))
             {
                 dbgmsg(data->log_name, "got a compact peers length of %zu", std::size(sv));
-                response->pex = tr_peerMgrCompactToPex(std::data(sv), std::size(sv), nullptr, 0, &response->pex_count);
+                response->pex = tr_peerMgrCompactToPex(std::data(sv), std::size(sv), nullptr, 0);
             }
             else if (tr_variantDictFindList(&benc, TR_KEY_peers, &tmp))
             {
-                response->pex = listToPex(tmp, &response->pex_count);
-                dbgmsg(data->log_name, "got a peers list with %zu entries", response->pex_count);
+                response->pex = listToPex(tmp);
+                dbgmsg(data->log_name, "got a peers list with %zu entries", std::size(response->pex));
             }
         }
 

@@ -12,6 +12,7 @@
 #include <cstddef> // size_t
 #include <ctime>
 #include <string_view>
+#include <vector>
 
 #include "transmission.h"
 
@@ -46,8 +47,7 @@ struct tr_tracker_event
     tr_interned_string announce_url;
 
     /* for TR_TRACKER_PEERS */
-    struct tr_pex const* pex;
-    size_t pexCount;
+    std::vector<tr_pex> pex;
 
     /* for TR_TRACKER_PEERS and TR_TRACKER_COUNTS */
     int leechers;

@@ -12,6 +12,7 @@
 #include <array>
 #include <cstddef> // size_t
 #include <string>
+#include <vector>
 
 #include "transmission.h"
 
@@ -65,7 +66,7 @@ struct tr_scrape_response_row
     /* the number of active downloaders in the swarm.
      * this is a BEP 21 extension that some trackers won't support.
      * http://www.bittorrent.org/beps/bep_0021.html#tracker-scrapes  */
-    int downloaders;
+    int downloaders = 0;
 };
 
 struct tr_scrape_response
@@ -198,17 +199,11 @@ struct tr_announce_response
     /* how many times this torrent has been downloaded */
     int downloads = -1;
 
-    /* number of items in the 'pex' field */
-    size_t pex_count = 0;
-
     /* IPv4 peers that we acquired from the tracker */
-    struct tr_pex* pex = nullptr;
-
-    /* number of items in the 'pex6' field */
-    size_t pex6_count = 0;
+    std::vector<tr_pex> pex;
 
     /* IPv6 peers that we acquired from the tracker */
-    struct tr_pex* pex6 = nullptr;
+    std::vector<tr_pex> pex6;
 
     /* human-readable error string on failure, or nullptr */
     std::string errmsg;
