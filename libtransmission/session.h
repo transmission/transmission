@@ -103,12 +103,12 @@ struct tr_turtle_info
 struct tr_session
 {
 public:
-    auto unique_lock() const
+    [[nodiscard]] auto unique_lock() const
     {
         return std::unique_lock(session_mutex_);
     }
 
-    bool isClosing() const
+    [[nodiscard]] bool isClosing() const
     {
         return is_closing_;
     }

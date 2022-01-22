@@ -131,7 +131,7 @@ public:
 
     void setMetainfo(tr_torrent_metainfo const& tm);
 
-    auto unique_lock() const
+    [[nodiscard]] auto unique_lock() const
     {
         return session->unique_lock();
     }
@@ -140,7 +140,7 @@ public:
 
     void setSpeedLimitBps(tr_direction, unsigned int Bps);
 
-    unsigned int speedLimitBps(tr_direction) const;
+    [[nodiscard]] unsigned int speedLimitBps(tr_direction) const;
 
     /// BLOCK INFO
 

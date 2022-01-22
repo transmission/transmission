@@ -187,7 +187,7 @@ struct tr_announcer
     std::map<tr_interned_string, tr_scrape_info> scrape_info;
 
     tr_session* const session;
-    struct event* const upkeep_timer;
+    event* const upkeep_timer;
     int const key;
     time_t tau_upkeep_at = 0;
 };
@@ -235,7 +235,7 @@ void tr_announcerClose(tr_session* session)
 struct tr_tracker
 {
     explicit tr_tracker(tr_announcer* announcer, tr_announce_list::tracker_info const& info)
-        : key{ info.host }
+        : host{ info.host }
         , announce_url{ info.announce_str }
         , scrape_info{ std::empty(info.scrape_str) ? nullptr : tr_announcerGetScrapeInfo(announcer, info.scrape_str) }
         , id{ info.id }
@@ -269,7 +269,7 @@ struct tr_tracker
         }
     }
 
-    tr_interned_string const key;
+    tr_interned_string const host;
     tr_interned_string const announce_url;
     tr_scrape_info* const scrape_info;
 
@@ -302,7 +302,7 @@ struct tr_tier
 {
     tr_tier(tr_announcer* announcer, tr_torrent* tor_in, std::vector<tr_announce_list::tracker_info const*> const& infos)
         : tor{ tor_in }
-        , key{ next_key++ }
+        , id{ next_key++ }
     {
         trackers.reserve(std::size(infos));
         for (auto const* info : infos)
@@ -396,10 +396,10 @@ struct tr_tier
 
     void buildLogName(char* buf, size_t buflen) const
     {
-        auto const* const name = tr_torrentName(tor);
+        auto const* const torrent_name = tr_torrentName(tor);
         auto const* const current_tracker = currentTracker();
-        auto const key_sv = current_tracker == nullptr ? "?"sv : current_tracker->key.sv();
-        tr_snprintf(buf, buflen, "[%s---%" TR_PRIsv "]", name, TR_PRIsv_ARG(key_sv));
+        auto const host_sv = current_tracker == nullptr ? "?"sv : current_tracker->host.sv();
+        tr_snprintf(buf, buflen, "[%s---%" TR_PRIsv "]", torrent_name, TR_PRIsv_ARG(host_sv));
     }
 
     [[nodiscard]] bool canManualAnnounce() const
@@ -430,13 +430,9 @@ struct tr_tier
     bool lastAnnounceTimedOut = false;
 
     std::deque<tr_announce_event> announce_events;
-    //tr_announce_event* announce_events = nullptr;
     int announce_event_priority = 0;
-    //int announce_event_count = 0;
-    //int announce_event_alloc = 0;
 
-    /* unique lookup key */
-    int const key;
+    int const id;
 
     int scrapeIntervalSec = DefaultScrapeIntervalSec;
     int announceIntervalSec = DefaultAnnounceIntervalSec;
@@ -505,11 +501,11 @@ struct tr_torrent_announcer
         }
     }
 
-    tr_tier* getTier(int tierId)
+    tr_tier* getTier(int tier_id)
     {
         for (auto& tier : tiers)
         {
-            if (tier.key == tierId)
+            if (tier.id == tier_id)
             {
                 return &tier;
             }
@@ -570,13 +566,12 @@ static tr_tier* getTier(tr_announcer* announcer, tr_sha1_digest_t const& info_ha
     }
 
     auto* const tor = announcer->session->getTorrent(info_hash);
-    if (tor == nullptr)
+    if (tor == nullptr || tor->torrent_announcer == nullptr)
     {
         return nullptr;
     }
 
-    auto* const ta = tor->torrent_announcer;
-    return ta == nullptr ? nullptr : ta->getTier(tier_id);
+    return tor->torrent_announcer->getTier(tier_id);
 }
 
 /***
@@ -837,7 +832,7 @@ static tr_announce_request* announce_request_new(
     tr_tier const* tier,
     tr_announce_event event)
 {
-    auto* const req = new tr_announce_request{};
+    auto* const req = new tr_announce_request();
     req->port = tr_sessionGetPublicPeerPort(announcer->session);
     req->announce_url = tier->currentTracker()->announce_url;
     req->tracker_id = tier->currentTracker()->tracker_id;
@@ -887,13 +882,13 @@ void tr_announcerRemoveTorrent(tr_announcer* announcer, tr_torrent* tor)
 
 struct announce_data
 {
-    int tierId = 0;
-    time_t timeSent = 0;
+    int const tier_id;
+    time_t const time_sent;
     tr_announce_event event = {};
     tr_session* session = nullptr;
 
     /** If the request succeeds, the value for tier's "isRunning" flag */
-    bool isRunningOnSuccess = false;
+    bool is_running_on_success = false;
 };
 
 static void on_announce_error(tr_tier* tier, char const* err, tr_announce_event e)
@@ -913,9 +908,9 @@ static void on_announce_error(tr_tier* tier, char const* err, tr_announce_event 
 
     /* schedule a reannounce */
     int const interval = current_tracker->getRetryInterval();
-    auto const* const key_cstr = current_tracker->key.c_str();
-    dbgmsg(tier, "Tracker '%s' announce error: %s (Retrying in %d seconds)", key_cstr, err, interval);
-    tr_logAddTorInfo(tier->tor, "Tracker '%s' announce error: %s (Retrying in %d seconds)", key_cstr, err, interval);
+    auto const* const host_cstr = current_tracker->host.c_str();
+    dbgmsg(tier, "Tracker '%s' announce error: %s (Retrying in %d seconds)", host_cstr, err, interval);
+    tr_logAddTorInfo(tier->tor, "Tracker '%s' announce error: %s (Retrying in %d seconds)", host_cstr, err, interval);
     tier_announce_event_push(tier, e, tr_time() + interval);
 }
 
@@ -924,7 +919,7 @@ static void on_announce_done(tr_announce_response const* response, void* vdata)
     auto* const data = static_cast<announce_data*>(vdata);
 
     tr_announcer* announcer = data->session->announcer;
-    tr_tier* tier = getTier(announcer, response->info_hash, data->tierId);
+    tr_tier* tier = getTier(announcer, response->info_hash, data->tier_id);
     time_t const now = tr_time();
     tr_announce_event const event = data->event;
 
@@ -1056,7 +1051,7 @@ static void on_announce_done(tr_announce_response const* response, void* vdata)
 
             publishPeerCounts(tier, seeders, leechers);
 
-            tier->isRunning = data->isRunningOnSuccess;
+            tier->isRunning = data->is_running_on_success;
 
             /* if the tracker included scrape fields in its announce response,
                then a separate scrape isn't needed */
@@ -1149,12 +1144,7 @@ static void tierAnnounce(tr_announcer* announcer, tr_tier* tier)
     tr_announce_event announce_event = tier_announce_event_pull(tier);
     tr_announce_request* req = announce_request_new(announcer, tor, tier, announce_event);
 
-    auto* const data = new announce_data();
-    data->session = announcer->session;
-    data->tierId = tier->key;
-    data->isRunningOnSuccess = tor->isRunning;
-    data->timeSent = now;
-    data->event = announce_event;
+    auto* const data = new announce_data{ tier->id, now, announce_event, announcer->session, tor->isRunning };
 
     tier->isAnnouncing = true;
     tier->lastAnnounceStartTime = now;
@@ -1178,15 +1168,10 @@ static constexpr bool multiscrape_too_big(std::string_view errmsg)
         "Request-URI Too Long",
     };
 
-    for (auto const& tle : TooLongErrors)
-    {
-        if (tr_strvContains(errmsg, tle))
-        {
-            return true;
-        }
-    }
-
-    return false;
+    return std::any_of(
+        std::begin(TooLongErrors),
+        std::end(TooLongErrors),
+        [&errmsg](auto const& substr) { return tr_strvContains(errmsg, substr); });
 }
 
 static void on_scrape_error(tr_session const* session, tr_tier* tier, char const* errmsg)
@@ -1206,9 +1191,9 @@ static void on_scrape_error(tr_session const* session, tr_tier* tier, char const
 
     // schedule a rescrape
     auto const interval = current_tracker->getRetryInterval();
-    auto const* const key_cstr = current_tracker->key.c_str();
-    dbgmsg(tier, "Tracker '%s' scrape error: %s (Retrying in %zu seconds)", key_cstr, errmsg, (size_t)interval);
-    tr_logAddTorInfo(tier->tor, "Tracker '%s' error: %s (Retrying in %zu seconds)", key_cstr, errmsg, (size_t)interval);
+    auto const* const host_cstr = current_tracker->host.c_str();
+    dbgmsg(tier, "Tracker '%s' scrape error: %s (Retrying in %zu seconds)", host_cstr, errmsg, (size_t)interval);
+    tr_logAddTorInfo(tier->tor, "Tracker '%s' error: %s (Retrying in %zu seconds)", host_cstr, errmsg, (size_t)interval);
     tier->lastScrapeSucceeded = false;
     tier->scrapeAt = get_next_scrape_time(session, tier, interval);
 }
@@ -1221,7 +1206,7 @@ static void checkMultiscrapeMax(tr_announcer* announcer, tr_scrape_response cons
     }
 
     auto const& url = response->scrape_url;
-    struct tr_scrape_info* const scrape_info = tr_announcerGetScrapeInfo(announcer, url);
+    auto* const scrape_info = tr_announcerGetScrapeInfo(announcer, url);
     if (scrape_info == nullptr)
     {
         return;
@@ -1566,7 +1551,7 @@ static tr_tracker_view trackerView(tr_torrent const& tor, int tier_index, tr_tie
     auto const now = tr_time();
     auto view = tr_tracker_view{};
 
-    view.host = tracker.key.c_str();
+    view.host = tracker.host.c_str();
     view.announce = tracker.announce_url.c_str();
     view.scrape = tracker.scrape_info == nullptr ? "" : tracker.scrape_info->scrape_url.c_str();
 
