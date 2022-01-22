@@ -38,8 +38,6 @@
 
 using namespace std::literals;
 
-struct tr_tier;
-
 #define dbgmsg(tier, ...) \
     do \
     { \
