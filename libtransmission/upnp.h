@@ -20,6 +20,6 @@ tr_upnp* tr_upnpInit(void);
 
 void tr_upnpClose(tr_upnp*);
 
-tr_port_forwarding tr_upnpPulse(tr_upnp*, tr_port port, bool isEnabled, bool doPortCheck);
+tr_port_forwarding tr_upnpPulse(tr_upnp*, tr_port port, bool isEnabled, bool doPortCheck, char const*);
 
 /* @} */
