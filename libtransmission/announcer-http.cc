@@ -46,8 +46,8 @@ static std::string announce_url_new(tr_session const* session, tr_announce_reque
 {
     auto const announce_sv = req->announce_url.sv();
 
-    char escaped_info_hash[SHA_DIGEST_LENGTH * 3 + 1];
-    tr_http_escape_sha1(escaped_info_hash, req->info_hash);
+    auto escaped_info_hash = std::array<char, SHA_DIGEST_LENGTH * 3 + 1>{};
+    tr_http_escape_sha1(std::data(escaped_info_hash), req->info_hash);
 
     auto* const buf = evbuffer_new();
     evbuffer_expand(buf, 1024);
@@ -67,7 +67,7 @@ static std::string announce_url_new(tr_session const* session, tr_announce_reque
         "&supportcrypto=1",
         TR_PRIsv_ARG(announce_sv),
         announce_sv.find('?') == announce_sv.npos ? '?' : '&',
-        escaped_info_hash,
+        std::data(escaped_info_hash),
         TR_PRIsv_ARG(req->peer_id),
         req->port,
         req->up,
