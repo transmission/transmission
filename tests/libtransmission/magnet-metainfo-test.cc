@@ -1,10 +1,7 @@
-/*
- * This file Copyright (C) 2010-2014 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright (C) 2010-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #include "transmission.h"
 #include "magnet-metainfo.h"
@@ -33,6 +30,27 @@ TEST(MagnetMetainfo, magnetParse)
         "&tr=http%3A%2F%2Ftracker.opentracker.org%2Fannounce"
         "&ws=http%3A%2F%2Fserver.webseed.org%2Fpath%2Fto%2Ffile"sv;
 
+    auto constexpr UriHexWithEmptyValue =
+        "magnet:?xt=urn:btih:"
+        "d2354010a3ca4ade5b7427bb093a62a3899ff381"
+        "&empty"
+        "&dn=Display%20Name"
+        "&tr=http%3A%2F%2Ftracker.openbittorrent.com%2Fannounce"
+        "&tr=http%3A%2F%2Ftracker.opentracker.org%2Fannounce"
+        "&ws=http%3A%2F%2Fserver.webseed.org%2Fpath%2Fto%2Ffile"sv;
+
+    auto constexpr UriHexWithJunkValues =
+        "magnet:?xt=urn:btih:"
+        "d2354010a3ca4ade5b7427bb093a62a3899ff381"
+        "&empty"
+        "&empty_again"
+        "&dn=Display%20Name"
+        "&tr=http%3A%2F%2Ftracker.openbittorrent.com%2Fannounce"
+        "&empty_again"
+        "&="
+        "&ws=http%3A%2F%2Fserver.webseed.org%2Fpath%2Fto%2Ffile"
+        "&tr=http%3A%2F%2Ftracker.opentracker.org%2Fannounce"sv;
+
     auto constexpr UriBase32 =
         "magnet:?xt=urn:btih:"
         "2I2UAEFDZJFN4W3UE65QSOTCUOEZ744B"
@@ -41,7 +59,7 @@ TEST(MagnetMetainfo, magnetParse)
         "&ws=http%3A%2F%2Fserver.webseed.org%2Fpath%2Fto%2Ffile"
         "&tr=http%3A%2F%2Ftracker.opentracker.org%2Fannounce"sv;
 
-    for (auto const& uri : { UriHex, UriBase32 })
+    for (auto const& uri : { UriHex, UriHexWithEmptyValue, UriHexWithJunkValues, UriBase32 })
     {
         auto mm = tr_magnet_metainfo{};
 

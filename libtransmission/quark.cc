@@ -1,10 +1,7 @@
-/*
- * This file Copyright (C) 2013-2014 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2013-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #include <algorithm>
 #include <array>
@@ -21,7 +18,7 @@ using namespace std::literals;
 namespace
 {
 
-auto constexpr my_static = std::array<std::string_view, 389>{ ""sv,
+auto constexpr my_static = std::array<std::string_view, 390>{ ""sv,
                                                               "activeTorrentCount"sv,
                                                               "activity-date"sv,
                                                               "activityDate"sv,
@@ -274,6 +271,7 @@ auto constexpr my_static = std::array<std::string_view, 389>{ ""sv,
                                                               "ratio-limit"sv,
                                                               "ratio-limit-enabled"sv,
                                                               "ratio-mode"sv,
+                                                              "read-clipboard"sv,
                                                               "recent-download-dir-1"sv,
                                                               "recent-download-dir-2"sv,
                                                               "recent-download-dir-3"sv,

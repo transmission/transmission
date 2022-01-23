@@ -1,10 +1,7 @@
-/*
- * This file Copyright (C) 2010-2014 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2010-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #pragma once
 
@@ -15,13 +12,14 @@
 #include <cstddef> // size_t
 #include <ctime>
 #include <string_view>
+#include <vector>
 
 #include "transmission.h"
 
 #include "interned-string.h"
 
 struct tr_announcer;
-struct tr_announcer_tiers;
+struct tr_torrent_announcer;
 
 /**
  * ***  Tracker Publish / Subscribe
@@ -49,8 +47,7 @@ struct tr_tracker_event
     tr_interned_string announce_url;
 
     /* for TR_TRACKER_PEERS */
-    struct tr_pex const* pex;
-    size_t pexCount;
+    std::vector<tr_pex> pex;
 
     /* for TR_TRACKER_PEERS and TR_TRACKER_COUNTS */
     int leechers;
@@ -71,7 +68,7 @@ void tr_announcerClose(tr_session*);
 ***  For torrent customers
 **/
 
-struct tr_announcer_tiers* tr_announcerAddTorrent(tr_torrent* torrent, tr_tracker_callback cb, void* cbdata);
+struct tr_torrent_announcer* tr_announcerAddTorrent(tr_torrent* torrent, tr_tracker_callback cb, void* cbdata);
 
 void tr_announcerResetTorrent(struct tr_announcer*, tr_torrent*);
 

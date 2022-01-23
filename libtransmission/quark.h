@@ -1,9 +1,7 @@
-/*
- * This file Copyright (C) Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- */
+// This file Copyright © 2012-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #pragma once
 
@@ -276,6 +274,7 @@ enum
     TR_KEY_ratio_limit,
     TR_KEY_ratio_limit_enabled,
     TR_KEY_ratio_mode,
+    TR_KEY_read_clipboard,
     TR_KEY_recent_download_dir_1,
     TR_KEY_recent_download_dir_2,
     TR_KEY_recent_download_dir_3,

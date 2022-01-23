@@ -1,10 +1,7 @@
-/*
- * This file Copyright (C) 2010-2014 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2010-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #include <climits> /* USHRT_MAX */
 #include <cstdio> /* fprintf() */
@@ -49,8 +46,8 @@ static std::string announce_url_new(tr_session const* session, tr_announce_reque
 {
     auto const announce_sv = req->announce_url.sv();
 
-    char escaped_info_hash[SHA_DIGEST_LENGTH * 3 + 1];
-    tr_http_escape_sha1(escaped_info_hash, req->info_hash);
+    auto escaped_info_hash = std::array<char, SHA_DIGEST_LENGTH * 3 + 1>{};
+    tr_http_escape_sha1(std::data(escaped_info_hash), req->info_hash);
 
     auto* const buf = evbuffer_new();
     evbuffer_expand(buf, 1024);
@@ -70,7 +67,7 @@ static std::string announce_url_new(tr_session const* session, tr_announce_reque
         "&supportcrypto=1",
         TR_PRIsv_ARG(announce_sv),
         announce_sv.find('?') == announce_sv.npos ? '?' : '&',
-        escaped_info_hash,
+        std::data(escaped_info_hash),
         TR_PRIsv_ARG(req->peer_id),
         req->port,
         req->up,
@@ -95,10 +92,9 @@ static std::string announce_url_new(tr_session const* session, tr_announce_reque
         evbuffer_add_printf(buf, "&event=%s", str);
     }
 
-    str = req->tracker_id_str;
-    if (!tr_str_is_empty(str))
+    if (!std::empty(req->tracker_id))
     {
-        evbuffer_add_printf(buf, "&trackerid=%s", str);
+        evbuffer_add_printf(buf, "&trackerid=%" TR_PRIsv, TR_PRIsv_ARG(req->tracker_id));
     }
 
     /* There are two incompatible techniques for announcing an IPv6 address.
@@ -110,7 +106,7 @@ static std::string announce_url_new(tr_session const* session, tr_announce_reque
        announce twice. At any rate, we're already computing our IPv6
        address (for the LTEP handshake), so this comes for free. */
 
-    unsigned char const* const ipv6 = tr_globalIPv6();
+    unsigned char const* const ipv6 = tr_globalIPv6(session);
     if (ipv6 != nullptr)
     {
         char ipv6_readable[INET6_ADDRSTRLEN];
@@ -122,11 +118,11 @@ static std::string announce_url_new(tr_session const* session, tr_announce_reque
     return evbuffer_free_to_str(buf);
 }
 
-static tr_pex* listToPex(tr_variant* peerList, size_t* setme_len)
+static auto listToPex(tr_variant* peerList)
 {
     size_t n = 0;
     size_t const len = tr_variantListSize(peerList);
-    auto* const pex = tr_new0(tr_pex, len);
+    auto pex = std::vector<tr_pex>(len);
 
     for (size_t i = 0; i < len; ++i)
     {
@@ -170,7 +166,7 @@ static tr_pex* listToPex(tr_variant* peerList, size_t* setme_len)
         ++n;
     }
 
-    *setme_len = n;
+    pex.resize(n);
     return pex;
 }
 
@@ -191,10 +187,7 @@ static void on_announce_done_eventthread(void* vdata)
         data->response_func(&data->response, data->response_func_user_data);
     }
 
-    tr_free(data->response.pex6);
-    tr_free(data->response.pex);
-    tr_free(data->response.tracker_id_str);
-    tr_free(data);
+    delete data;
 }
 
 static void on_announce_done(
@@ -267,7 +260,7 @@ static void on_announce_done(
 
             if (tr_variantDictFindStrView(&benc, TR_KEY_tracker_id, &sv))
             {
-                response->tracker_id_str = tr_strvDup(sv);
+                response->tracker_id = sv;
             }
 
             if (tr_variantDictFindInt(&benc, TR_KEY_complete, &i))
@@ -288,18 +281,18 @@ static void on_announce_done(
             if (tr_variantDictFindStrView(&benc, TR_KEY_peers6, &sv))
             {
                 dbgmsg(data->log_name, "got a peers6 length of %zu", std::size(sv));
-                response->pex6 = tr_peerMgrCompact6ToPex(std::data(sv), std::size(sv), nullptr, 0, &response->pex6_count);
+                response->pex6 = tr_peerMgrCompact6ToPex(std::data(sv), std::size(sv), nullptr, 0);
             }
 
             if (tr_variantDictFindStrView(&benc, TR_KEY_peers, &sv))
             {
                 dbgmsg(data->log_name, "got a compact peers length of %zu", std::size(sv));
-                response->pex = tr_peerMgrCompactToPex(std::data(sv), std::size(sv), nullptr, 0, &response->pex_count);
+                response->pex = tr_peerMgrCompactToPex(std::data(sv), std::size(sv), nullptr, 0);
             }
             else if (tr_variantDictFindList(&benc, TR_KEY_peers, &tmp))
             {
-                response->pex = listToPex(tmp, &response->pex_count);
-                dbgmsg(data->log_name, "got a peers list with %zu entries", response->pex_count);
+                response->pex = listToPex(tmp);
+                dbgmsg(data->log_name, "got a peers list with %zu entries", std::size(response->pex));
             }
         }
 
@@ -318,7 +311,7 @@ void tr_tracker_http_announce(
     tr_announce_response_func response_func,
     void* response_func_user_data)
 {
-    auto* const d = tr_new0(announce_data, 1);
+    auto* const d = new announce_data{};
     d->response.seeders = -1;
     d->response.leechers = -1;
     d->response.downloads = -1;

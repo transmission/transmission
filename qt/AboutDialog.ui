@@ -50,7 +50,7 @@
    <item>
     <widget class="QLabel" name="copyrightsLabel">
      <property name="text">
-      <string>Copyright (c) The Transmission Project</string>
+      <string>Copyright © The Transmission Project</string>
      </property>
      <property name="alignment">
       <set>Qt::AlignCenter</set>

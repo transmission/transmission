@@ -1,10 +1,7 @@
-/*
- * This file Copyright (C) 2009-2021 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2009-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #pragma once
 
@@ -40,7 +37,7 @@ struct tr_magnet_info;
 struct tr_metainfo_parsed;
 struct tr_session;
 struct tr_torrent;
-struct tr_announcer_tiers;
+struct tr_torrent_announcer;
 
 /**
 ***  Package-visible ctor API
@@ -134,7 +131,7 @@ public:
 
     void setMetainfo(tr_torrent_metainfo const& tm);
 
-    auto unique_lock() const
+    [[nodiscard]] auto unique_lock() const
     {
         return session->unique_lock();
     }
@@ -143,7 +140,7 @@ public:
 
     void setSpeedLimitBps(tr_direction, unsigned int Bps);
 
-    unsigned int speedLimitBps(tr_direction) const;
+    [[nodiscard]] unsigned int speedLimitBps(tr_direction) const;
 
     /// BLOCK INFO
 
@@ -585,7 +582,7 @@ public:
 
     tr_session* session = nullptr;
 
-    tr_announcer_tiers* announcer_tiers = nullptr;
+    tr_torrent_announcer* torrent_announcer = nullptr;
 
     // Changed to non-owning pointer temporarily till tr_torrent becomes C++-constructible and destructible
     // TODO: change tr_bandwidth* to owning pointer to the bandwidth, or remove * and own the value
