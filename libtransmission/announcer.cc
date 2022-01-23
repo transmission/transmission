@@ -590,8 +590,7 @@ static void publishMessage(tr_tier* tier, std::string_view msg, TrackerEventType
         event.messageType = type;
         event.text = msg;
 
-        auto* const current_tracker = tier->currentTracker();
-        if (current_tracker != nullptr)
+        if (auto const* const current_tracker = tier->currentTracker(); current_tracker != nullptr)
         {
             event.announce_url = current_tracker->announce_url;
         }
