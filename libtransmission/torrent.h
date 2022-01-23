@@ -151,55 +151,55 @@ public:
 
     [[nodiscard]] constexpr auto blockCount() const
     {
-        return blockInfo().blockCount();
+        return metainfo_.blockCount();
     }
     [[nodiscard]] constexpr auto blockOf(uint64_t offset) const
     {
-        return blockInfo().blockOf(offset);
+        return metainfo_.blockOf(offset);
     }
     [[nodiscard]] constexpr auto blockOf(tr_piece_index_t piece, uint32_t offset, uint32_t length = 0) const
     {
-        return blockInfo().blockOf(piece, offset, length);
+        return metainfo_.blockOf(piece, offset, length);
     }
     [[nodiscard]] constexpr auto blockSize() const
     {
-        return blockInfo().blockSize();
+        return metainfo_.blockSize();
     }
     [[nodiscard]] constexpr auto blockSize(tr_block_index_t block) const
     {
-        return blockInfo().blockSize(block);
+        return metainfo_.blockSize(block);
     }
     [[nodiscard]] constexpr auto blockSpanForPiece(tr_piece_index_t piece) const
     {
-        return blockInfo().blockSpanForPiece(piece);
+        return metainfo_.blockSpanForPiece(piece);
     }
     [[nodiscard]] constexpr auto offset(tr_piece_index_t piece, uint32_t offset, uint32_t length = 0) const
     {
-        return blockInfo().offset(piece, offset, length);
+        return metainfo_.offset(piece, offset, length);
     }
     [[nodiscard]] constexpr auto pieceCount() const
     {
-        return blockInfo().pieceCount();
+        return metainfo_.pieceCount();
     }
     [[nodiscard]] constexpr auto pieceForBlock(tr_block_index_t block) const
     {
-        return blockInfo().pieceForBlock(block);
+        return metainfo_.pieceForBlock(block);
     }
     [[nodiscard]] constexpr auto pieceOf(uint64_t offset) const
     {
-        return blockInfo().pieceOf(offset);
+        return metainfo_.pieceOf(offset);
     }
     [[nodiscard]] constexpr auto pieceSize() const
     {
-        return blockInfo().pieceSize();
+        return metainfo_.pieceSize();
     }
     [[nodiscard]] constexpr auto pieceSize(tr_piece_index_t piece) const
     {
-        return blockInfo().pieceSize(piece);
+        return metainfo_.pieceSize(piece);
     }
     [[nodiscard]] constexpr auto totalSize() const
     {
-        return blockInfo().totalSize();
+        return metainfo_.totalSize();
     }
 
     /// COMPLETION
