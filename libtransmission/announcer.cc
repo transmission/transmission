@@ -1162,7 +1162,7 @@ static void tierAnnounce(tr_announcer* announcer, tr_tier* tier)
 ****
 ***/
 
-static constexpr bool multiscrape_too_big(std::string_view errmsg)
+static bool multiscrape_too_big(std::string_view errmsg)
 {
     /* Found a tracker that returns some bespoke string for this case?
        Add your patch here and open a PR */
