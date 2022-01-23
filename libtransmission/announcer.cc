@@ -1403,7 +1403,7 @@ static void multiscrape(tr_announcer* announcer, std::vector<tr_tier*> const& ti
         /* otherwise, if there's room for another request, build a new one */
         if (!found && request_count < MaxScrapesPerUpkeep)
         {
-            auto* const req = &requests[request_count++];
+            auto* const req = &requests[request_count];
             req->scrape_url = scrape_info->scrape_url;
             tier->buildLogName(req->log_name, sizeof(req->log_name));
 
@@ -1411,6 +1411,8 @@ static void multiscrape(tr_announcer* announcer, std::vector<tr_tier*> const& ti
             ++req->info_hash_count;
             tier->isScraping = true;
             tier->lastScrapeStartTime = now;
+
+            ++request_count;
         }
     }
 
