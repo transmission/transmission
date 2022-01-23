@@ -155,6 +155,54 @@ static auto constexpr TauRequestTtl = int{ 60 };
 
 struct tau_scrape_request
 {
+    void requestFinished()
+    {
+        if (callback != nullptr)
+        {
+            callback(&response, user_data);
+        }
+    }
+
+    void fail(bool did_connect, bool did_timeout, std::string_view errmsg)
+    {
+        response.did_connect = did_connect;
+        response.did_timeout = did_timeout;
+        response.errmsg = errmsg;
+        requestFinished();
+    }
+
+    void onResponse(tau_action_t action, evbuffer* buf)
+    {
+        response.did_connect = true;
+        response.did_timeout = false;
+
+        if (action == TAU_ACTION_SCRAPE)
+        {
+            for (int i = 0; i < response.row_count; ++i)
+            {
+                if (evbuffer_get_length(buf) < sizeof(uint32_t) * 3)
+                {
+                    break;
+                }
+
+                auto& row = response.rows[i];
+                row.seeders = evbuffer_read_ntoh_32(buf);
+                row.downloads = evbuffer_read_ntoh_32(buf);
+                row.leechers = evbuffer_read_ntoh_32(buf);
+            }
+
+            requestFinished();
+        }
+        else
+        {
+            size_t const buflen = evbuffer_get_length(buf);
+            auto const errmsg = action == TAU_ACTION_ERROR && buflen > 0 ?
+                std::string_view{ reinterpret_cast<char const*>(evbuffer_pullup(buf, -1)), buflen } :
+                _("Unknown error");
+            fail(true, false, errmsg);
+        }
+    }
+
     std::vector<uint8_t> payload;
 
     time_t sent_at;
@@ -209,58 +257,6 @@ static tau_scrape_request make_tau_scrape_request(
     return req;
 }
 
-static void tau_scrape_request_finished(struct tau_scrape_request const* request)
-{
-    if (request->callback != nullptr)
-    {
-        request->callback(&request->response, request->user_data);
-    }
-}
-
-static void tau_scrape_request_fail(
-    struct tau_scrape_request* request,
-    bool did_connect,
-    bool did_timeout,
-    std::string_view errmsg)
-{
-    request->response.did_connect = did_connect;
-    request->response.did_timeout = did_timeout;
-    request->response.errmsg = errmsg;
-    tau_scrape_request_finished(request);
-}
-
-static void on_scrape_response(struct tau_scrape_request* request, tau_action_t action, struct evbuffer* buf)
-{
-    request->response.did_connect = true;
-    request->response.did_timeout = false;
-
-    if (action == TAU_ACTION_SCRAPE)
-    {
-        for (int i = 0; i < request->response.row_count; ++i)
-        {
-            if (evbuffer_get_length(buf) < sizeof(uint32_t) * 3)
-            {
-                break;
-            }
-
-            struct tr_scrape_response_row& row = request->response.rows[i];
-            row.seeders = evbuffer_read_ntoh_32(buf);
-            row.downloads = evbuffer_read_ntoh_32(buf);
-            row.leechers = evbuffer_read_ntoh_32(buf);
-        }
-
-        tau_scrape_request_finished(request);
-    }
-    else
-    {
-        size_t const buflen = evbuffer_get_length(buf);
-        auto const errmsg = action == TAU_ACTION_ERROR && buflen > 0 ?
-            std::string_view{ reinterpret_cast<char const*>(evbuffer_pullup(buf, -1)), buflen } :
-            _("Unknown error");
-        tau_scrape_request_fail(request, true, false, errmsg);
-    }
-}
-
 /****
 *****
 *****  ANNOUNCE
@@ -269,6 +265,46 @@ static void on_scrape_response(struct tau_scrape_request* request, tau_action_t 
 
 struct tau_announce_request
 {
+    void requestFinished()
+    {
+        if (this->callback != nullptr)
+        {
+            this->callback(&this->response, this->user_data);
+        }
+    }
+
+    void fail(bool did_connect, bool did_timeout, std::string_view errmsg)
+    {
+        this->response.did_connect = did_connect;
+        this->response.did_timeout = did_timeout;
+        this->response.errmsg = errmsg;
+        this->requestFinished();
+    }
+
+    void onResponse(tau_action_t action, struct evbuffer* buf)
+    {
+        size_t const buflen = evbuffer_get_length(buf);
+
+        this->response.did_connect = true;
+        this->response.did_timeout = false;
+
+        if (action == TAU_ACTION_ANNOUNCE && buflen >= 3 * sizeof(uint32_t))
+        {
+            response.interval = evbuffer_read_ntoh_32(buf);
+            response.leechers = evbuffer_read_ntoh_32(buf);
+            response.seeders = evbuffer_read_ntoh_32(buf);
+            response.pex = tr_peerMgrCompactToPex(evbuffer_pullup(buf, -1), evbuffer_get_length(buf), nullptr, 0);
+            requestFinished();
+        }
+        else
+        {
+            auto const errmsg = action == TAU_ACTION_ERROR && buflen > 0 ?
+                std::string_view{ reinterpret_cast<char const*>(evbuffer_pullup(buf, -1)), buflen } :
+                _("Unknown error");
+            fail(true, false, errmsg);
+        }
+    }
+
     std::vector<uint8_t> payload;
 
     time_t created_at = 0;
@@ -348,51 +384,6 @@ static tau_announce_request make_tau_announce_request(
     return req;
 }
 
-static void tau_announce_request_finished(struct tau_announce_request const* request)
-{
-    if (request->callback != nullptr)
-    {
-        request->callback(&request->response, request->user_data);
-    }
-}
-
-static void tau_announce_request_fail(
-    struct tau_announce_request* request,
-    bool did_connect,
-    bool did_timeout,
-    std::string_view errmsg)
-{
-    request->response.did_connect = did_connect;
-    request->response.did_timeout = did_timeout;
-    request->response.errmsg = errmsg;
-    tau_announce_request_finished(request);
-}
-
-static void on_announce_response(struct tau_announce_request* request, tau_action_t action, struct evbuffer* buf)
-{
-    size_t const buflen = evbuffer_get_length(buf);
-
-    request->response.did_connect = true;
-    request->response.did_timeout = false;
-
-    if (action == TAU_ACTION_ANNOUNCE && buflen >= 3 * sizeof(uint32_t))
-    {
-        tr_announce_response* resp = &request->response;
-        resp->interval = evbuffer_read_ntoh_32(buf);
-        resp->leechers = evbuffer_read_ntoh_32(buf);
-        resp->seeders = evbuffer_read_ntoh_32(buf);
-        resp->pex = tr_peerMgrCompactToPex(evbuffer_pullup(buf, -1), evbuffer_get_length(buf), nullptr, 0);
-        tau_announce_request_finished(request);
-    }
-    else
-    {
-        auto const errmsg = action == TAU_ACTION_ERROR && buflen > 0 ?
-            std::string_view{ reinterpret_cast<char const*>(evbuffer_pullup(buf, -1)), buflen } :
-            _("Unknown error");
-        tau_announce_request_fail(request, true, false, errmsg);
-    }
-}
-
 /****
 *****
 *****  TRACKERS
@@ -418,12 +409,12 @@ struct tau_tracker
     {
         for (auto& req : this->scrapes)
         {
-            tau_scrape_request_fail(&req, did_connect, did_timeout, errmsg);
+            req.fail(did_connect, did_timeout, errmsg);
         }
 
         for (auto& req : this->announces)
         {
-            tau_announce_request_fail(&req, did_connect, did_timeout, errmsg);
+            req.fail(did_connect, did_timeout, errmsg);
         }
 
         this->scrapes.clear();
@@ -579,7 +570,7 @@ static void tau_tracker_timeout_reqs(struct tau_tracker* tracker)
             if (cancel_all || req.created_at + TauRequestTtl < now)
             {
                 dbgmsg(tracker->key, "timeout announce req %p", (void*)&req);
-                tau_announce_request_fail(&req, false, true, "");
+                req.fail(false, true, "");
                 it = reqs.erase(it);
             }
             else
@@ -597,7 +588,7 @@ static void tau_tracker_timeout_reqs(struct tau_tracker* tracker)
             if (cancel_all || req.created_at + TauRequestTtl < now)
             {
                 dbgmsg(tracker->key, "timeout scrape req %p", &req);
-                tau_scrape_request_fail(&req, false, true, "");
+                req.fail(false, true, "");
                 it = reqs.erase(it);
             }
             else
@@ -855,7 +846,7 @@ bool tau_handle_message(tr_session* session, uint8_t const* msg, size_t msglen)
                 dbgmsg(tracker.key, "%" PRIu32 " is an announce request!", transaction_id);
                 auto req = *it;
                 it = reqs.erase(it);
-                on_announce_response(&req, action_id, buf);
+                req.onResponse(action_id, buf);
                 evbuffer_free(buf);
                 return true;
             }
@@ -873,7 +864,7 @@ bool tau_handle_message(tr_session* session, uint8_t const* msg, size_t msglen)
                 dbgmsg(tracker.key, "%" PRIu32 " is a scrape request!", transaction_id);
                 auto req = *it;
                 it = reqs.erase(it);
-                on_scrape_response(&req, action_id, buf);
+                req.onResponse(action_id, buf);
                 evbuffer_free(buf);
                 return true;
             }
