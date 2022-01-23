@@ -81,6 +81,7 @@ Checks: >
   bugprone-use-after-move,
   bugprone-virtual-near-miss,
   cppcoreguidelines-init-variables,
+  cppcoreguidelines-prefer-member-initializer,
   misc-static-assert,
   modernize-avoid-bind,
   modernize-concat-nested-namespaces,
