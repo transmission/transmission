@@ -425,9 +425,9 @@ std::vector<TorrentModel::span_t> TorrentModel::getSpans(torrent_ids_t const& id
 
 void TorrentModel::rowsEmitChanged(torrent_ids_t const& ids)
 {
-    for (auto const& span : getSpans(ids))
+    for (auto const& [first, last] : getSpans(ids))
     {
-        emit dataChanged(index(span.first), index(span.second));
+        emit dataChanged(index(first), index(last));
     }
 }
 
