@@ -1359,9 +1359,8 @@ tr_torrent* Application::Impl::get_first_selected_torrent() const
 {
     tr_torrent* tor = nullptr;
     Glib::RefPtr<Gtk::TreeModel> m;
-    auto const l = sel_->get_selected_rows(m);
 
-    if (!l.empty())
+    if (auto const l = sel_->get_selected_rows(m); !l.empty())
     {
         if (auto iter = m->get_iter(l.front()); iter)
         {
