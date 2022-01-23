@@ -1,14 +1,12 @@
-/*
- * This file Copyright (C) 2010-2017 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright 2010-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #include <cerrno>
 #include <csignal>
-#include <cstdlib>
+#include <map>
+#include <string_view>
 
 #include <fcntl.h>
 #include <sys/types.h>
@@ -21,6 +19,8 @@
 #include "tr-assert.h"
 #include "tr-macros.h"
 #include "utils.h"
+
+using namespace std::literals;
 
 static void handle_sigchld(int /*i*/)
 {
@@ -35,33 +35,33 @@ static void handle_sigchld(int /*i*/)
     /* FIXME: Call old handler, if any */
 }
 
-static void set_system_error(tr_error** error, int code, char const* what)
+static void set_system_error(tr_error** error, int code, std::string_view what)
 {
     if (error == nullptr)
     {
         return;
     }
 
-    if (what == nullptr)
-    {
-        tr_error_set_literal(error, code, tr_strerror(code));
-    }
-    else
-    {
-        tr_error_set(error, code, "%s failed: %s", what, tr_strerror(code));
-    }
+    tr_error_set(error, code, tr_strvJoin(what, " failed "sv, tr_strerror(code)));
 }
 
-static bool tr_spawn_async_in_child(char* const* cmd, char* const* env, char const* work_dir, int pipe_fd)
+static bool tr_spawn_async_in_child(
+    char const* const* cmd,
+    std::map<std::string_view, std::string_view> const& env,
+    char const* work_dir,
+    int pipe_fd)
 {
-    if (env != nullptr)
+    auto key_sz = std::string{};
+    auto val_sz = std::string{};
+
+    for (auto const& [key_sv, val_sv] : env)
     {
-        for (size_t i = 0; env[i] != nullptr; ++i)
+        key_sz = key_sv;
+        val_sz = val_sv;
+
+        if (setenv(key_sz.c_str(), val_sz.c_str(), 1) != 0)
         {
-            if (putenv(env[i]) != 0)
-            {
-                goto FAIL;
-            }
+            goto FAIL;
         }
     }
 
@@ -70,7 +70,7 @@ static bool tr_spawn_async_in_child(char* const* cmd, char* const* env, char con
         goto FAIL;
     }
 
-    if (execvp(cmd[0], cmd) == -1)
+    if (execvp(cmd[0], const_cast<char* const*>(cmd)) == -1)
     {
         goto FAIL;
     }
@@ -115,13 +115,17 @@ static bool tr_spawn_async_in_parent(int pipe_fd, tr_error** error)
     return true;
 }
 
-bool tr_spawn_async(char* const* cmd, char* const* env, char const* work_dir, tr_error** error)
+bool tr_spawn_async(
+    char const* const* cmd,
+    std::map<std::string_view, std::string_view> const& env,
+    char const* work_dir,
+    tr_error** error)
 {
     static bool sigchld_handler_set = false;
 
     if (!sigchld_handler_set)
     {
-        /* FIXME: "The effects of signal() in a multithreaded process are unspecified." (c) man 2 signal */
+        /* FIXME: "The effects of signal() in a multithreaded process are unspecified." © man 2 signal */
         if (signal(SIGCHLD, &handle_sigchld) == SIG_ERR) // NOLINT(performance-no-int-to-ptr)
         {
             set_system_error(error, errno, "Call to signal()");

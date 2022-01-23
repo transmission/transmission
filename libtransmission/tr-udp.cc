@@ -1,25 +1,6 @@
-/*
-Copyright (c) 2010 by Juliusz Chroboczek
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
-
-*/
+// This file Copyright © 2010 Juliusz Chroboczek.
+// It may be used under the MIT (SPDX: MIT) license.
+// License text can be found in the licenses/ folder.
 
 #include <cstring> /* memcmp(), memcpy(), memset() */
 #include <cstdlib> /* malloc(), free() */
@@ -126,19 +107,21 @@ void tr_udpSetSocketBuffers(tr_session* session)
 
 void tr_udpSetSocketTOS(tr_session* session)
 {
-    if (session->peerSocketTOS == 0)
+    auto const tos = session->peerSocketTos();
+
+    if (tos)
     {
         return;
     }
 
     if (session->udp_socket != TR_BAD_SOCKET)
     {
-        tr_netSetTOS(session->udp_socket, session->peerSocketTOS, TR_AF_INET);
+        tr_netSetTOS(session->udp_socket, tos, TR_AF_INET);
     }
 
     if (session->udp6_socket != TR_BAD_SOCKET)
     {
-        tr_netSetTOS(session->udp6_socket, session->peerSocketTOS, TR_AF_INET6);
+        tr_netSetTOS(session->udp6_socket, tos, TR_AF_INET6);
     }
 }
 
@@ -147,10 +130,8 @@ void tr_udpSetSocketTOS(tr_session* session)
 // TODO: remove goto, it prevents reducing scope of local variables
 static void rebind_ipv6(tr_session* ss, bool force)
 {
-    bool is_default = false;
-    tr_address const* public_addr = nullptr;
     struct sockaddr_in6 sin6;
-    unsigned char const* ipv6 = tr_globalIPv6();
+    unsigned char const* ipv6 = tr_globalIPv6(ss);
     tr_socket_t s = TR_BAD_SOCKET;
     int rc = -1;
     int one = 1;
@@ -195,12 +176,6 @@ static void rebind_ipv6(tr_session* ss, bool force)
     }
 
     sin6.sin6_port = htons(ss->udp_port);
-    public_addr = tr_sessionGetPublicAddress(ss, TR_AF_INET6, &is_default);
-
-    if (public_addr != nullptr && !is_default)
-    {
-        sin6.sin6_addr = public_addr->addr.addr6;
-    }
 
     rc = bind(s, (struct sockaddr*)&sin6, sizeof(sin6));
 
@@ -360,7 +335,7 @@ void tr_udpInit(tr_session* ss)
 
     // IPV6
 
-    if (tr_globalIPv6() != nullptr)
+    if (tr_globalIPv6(nullptr) != nullptr)
     {
         rebind_ipv6(ss, true);
     }

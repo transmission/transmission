@@ -1,10 +1,7 @@
-/*
- * This file Copyright (C) 2008-2014 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2008-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #pragma once
 
@@ -13,10 +10,7 @@
 #endif
 
 #include <cstddef>
-#include <cstdint>
 #include <vector>
-
-#include "tr-assert.h"
 
 /**
  * @brief Implementation of the BitTorrent spec's Bitfield array of bits.
@@ -49,21 +43,21 @@ public:
 
     // set one or more bits
     void set(size_t bit, bool value = true);
-    void setRange(size_t begin, size_t end, bool value = true);
+    void setSpan(size_t begin, size_t end, bool value = true);
     void unset(size_t bit)
     {
         set(bit, false);
     }
-    void unsetRange(size_t begin, size_t end)
+    void unsetSpan(size_t begin, size_t end)
     {
-        setRange(begin, end, false);
+        setSpan(begin, end, false);
     }
     void setFromBools(bool const* bytes, size_t n);
 
     // "raw" here is in BEP0003 format: "The first byte of the bitfield
     // corresponds to indices 0 - 7 from high bit to low bit, respectively.
     // The next one 8-15, etc. Spare bits at the end are set to zero.
-    void setRaw(uint8_t const* bits, size_t byte_count, bool bounded);
+    void setRaw(uint8_t const* bits, size_t byte_count);
     std::vector<uint8_t> raw() const;
 
     [[nodiscard]] constexpr bool hasAll() const
@@ -93,9 +87,12 @@ public:
         return bit_count_;
     }
 
-#ifdef TR_ENABLE_ASSERTS
-    bool assertValid() const;
-#endif
+    [[nodiscard]] constexpr size_t empty() const
+    {
+        return size() == 0;
+    }
+
+    bool isValid() const;
 
 private:
     std::vector<uint8_t> flags_;

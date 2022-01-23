@@ -1,14 +1,13 @@
-/*
- * This file Copyright (C) 2010-2014 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2010-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #include <climits> /* USHRT_MAX */
 #include <cstdio> /* fprintf() */
 #include <cstring> /* strchr(), memcmp(), memcpy() */
+#include <string>
+#include <string_view>
 
 #include <event2/buffer.h>
 #include <event2/http.h> /* for HTTP_OK */
@@ -20,13 +19,17 @@
 #include "log.h"
 #include "net.h" /* tr_globalIPv6() */
 #include "peer-mgr.h" /* pex */
+#include "quark.h"
 #include "torrent.h"
 #include "trevent.h" /* tr_runInEventThread() */
 #include "utils.h"
 #include "variant.h"
-#include "web.h" /* tr_http_escape() */
+#include "web.h"
+#include "web-utils.h"
 
 #define dbgmsg(name, ...) tr_logAddDeepNamed(name, __VA_ARGS__)
+
+using namespace std::literals;
 
 /****
 *****
@@ -39,21 +42,21 @@ static char const* get_event_string(tr_announce_request const* req)
     return req->partial_seed && (req->event != TR_ANNOUNCE_EVENT_STOPPED) ? "paused" : tr_announce_event_get_string(req->event);
 }
 
-static char* announce_url_new(tr_session const* session, tr_announce_request const* req)
+static std::string announce_url_new(tr_session const* session, tr_announce_request const* req)
 {
-    evbuffer* const buf = evbuffer_new();
-    char escaped_info_hash[SHA_DIGEST_LENGTH * 3 + 1];
+    auto const announce_sv = req->announce_url.sv();
 
-    tr_http_escape_sha1(escaped_info_hash, req->info_hash);
+    auto escaped_info_hash = std::array<char, SHA_DIGEST_LENGTH * 3 + 1>{};
+    tr_http_escape_sha1(std::data(escaped_info_hash), req->info_hash);
 
+    auto* const buf = evbuffer_new();
     evbuffer_expand(buf, 1024);
-
     evbuffer_add_printf(
         buf,
-        "%s"
+        "%" TR_PRIsv
         "%c"
         "info_hash=%s"
-        "&peer_id=%*.*s"
+        "&peer_id=%" TR_PRIsv
         "&port=%d"
         "&uploaded=%" PRIu64 //
         "&downloaded=%" PRIu64 //
@@ -62,10 +65,10 @@ static char* announce_url_new(tr_session const* session, tr_announce_request con
         "&key=%x"
         "&compact=1"
         "&supportcrypto=1",
-        req->url,
-        strchr(req->url, '?') != nullptr ? '&' : '?',
-        escaped_info_hash,
-        TR_ARG_TUPLE(int(std::size(req->peer_id)), int(std::size(req->peer_id)), std::data(req->peer_id)),
+        TR_PRIsv_ARG(announce_sv),
+        announce_sv.find('?') == announce_sv.npos ? '?' : '&',
+        std::data(escaped_info_hash),
+        TR_PRIsv_ARG(req->peer_id),
         req->port,
         req->up,
         req->down,
@@ -89,10 +92,9 @@ static char* announce_url_new(tr_session const* session, tr_announce_request con
         evbuffer_add_printf(buf, "&event=%s", str);
     }
 
-    str = req->tracker_id_str;
-    if (!tr_str_is_empty(str))
+    if (!std::empty(req->tracker_id))
     {
-        evbuffer_add_printf(buf, "&trackerid=%s", str);
+        evbuffer_add_printf(buf, "&trackerid=%" TR_PRIsv, TR_PRIsv_ARG(req->tracker_id));
     }
 
     /* There are two incompatible techniques for announcing an IPv6 address.
@@ -104,7 +106,7 @@ static char* announce_url_new(tr_session const* session, tr_announce_request con
        announce twice. At any rate, we're already computing our IPv6
        address (for the LTEP handshake), so this comes for free. */
 
-    unsigned char const* const ipv6 = tr_globalIPv6();
+    unsigned char const* const ipv6 = tr_globalIPv6(session);
     if (ipv6 != nullptr)
     {
         char ipv6_readable[INET6_ADDRSTRLEN];
@@ -113,14 +115,14 @@ static char* announce_url_new(tr_session const* session, tr_announce_request con
         tr_http_escape(buf, ipv6_readable, true);
     }
 
-    return evbuffer_free_to_str(buf, nullptr);
+    return evbuffer_free_to_str(buf);
 }
 
-static tr_pex* listToPex(tr_variant* peerList, size_t* setme_len)
+static auto listToPex(tr_variant* peerList)
 {
     size_t n = 0;
     size_t const len = tr_variantListSize(peerList);
-    tr_pex* pex = tr_new0(tr_pex, len);
+    auto pex = std::vector<tr_pex>(len);
 
     for (size_t i = 0; i < len; ++i)
     {
@@ -131,8 +133,8 @@ static tr_pex* listToPex(tr_variant* peerList, size_t* setme_len)
             continue;
         }
 
-        char const* ip = nullptr;
-        if (!tr_variantDictFindStr(peer, TR_KEY_ip, &ip, nullptr))
+        auto ip = std::string_view{};
+        if (!tr_variantDictFindStrView(peer, TR_KEY_ip, &ip))
         {
             continue;
         }
@@ -164,7 +166,7 @@ static tr_pex* listToPex(tr_variant* peerList, size_t* setme_len)
         ++n;
     }
 
-    *setme_len = n;
+    pex.resize(n);
     return pex;
 }
 
@@ -185,12 +187,7 @@ static void on_announce_done_eventthread(void* vdata)
         data->response_func(&data->response, data->response_func_user_data);
     }
 
-    tr_free(data->response.pex6);
-    tr_free(data->response.pex);
-    tr_free(data->response.tracker_id_str);
-    tr_free(data->response.warning);
-    tr_free(data->response.errmsg);
-    tr_free(data);
+    delete data;
 }
 
 static void on_announce_done(
@@ -198,8 +195,7 @@ static void on_announce_done(
     bool did_connect,
     bool did_timeout,
     long response_code,
-    void const* msg,
-    size_t msglen,
+    std::string_view msg,
     void* vdata)
 {
     auto* data = static_cast<struct announce_data*>(vdata);
@@ -211,14 +207,13 @@ static void on_announce_done(
 
     if (response_code != HTTP_OK)
     {
-        char const* fmt = _("Tracker gave HTTP response code %1$ld (%2$s)");
-        char const* response_str = tr_webGetResponseStr(response_code);
-        response->errmsg = tr_strdup_printf(fmt, response_code, response_str);
+        auto const* const response_str = tr_webGetResponseStr(response_code);
+        response->errmsg = tr_strvJoin("Tracker HTTP response "sv, std::to_string(response_code), " ("sv, response_str, ")"sv);
     }
     else
     {
         tr_variant benc;
-        bool const variant_loaded = tr_variantFromBenc(&benc, msg, msglen) == 0;
+        auto const variant_loaded = tr_variantFromBuf(&benc, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, msg);
 
         if (tr_env_key_exists("TR_CURL_VERBOSE"))
         {
@@ -228,36 +223,29 @@ static void on_announce_done(
             }
             else
             {
-                auto len = size_t{};
-                char* str = tr_variantToStr(&benc, TR_VARIANT_FMT_JSON, &len);
                 fprintf(stderr, "%s", "Announce response:\n< ");
-
-                for (size_t i = 0; i < len; ++i)
+                for (auto const ch : tr_variantToStr(&benc, TR_VARIANT_FMT_JSON))
                 {
-                    fputc(str[i], stderr);
+                    fputc(ch, stderr);
                 }
-
                 fputc('\n', stderr);
-                tr_free(str);
             }
         }
 
         if (variant_loaded && tr_variantIsDict(&benc))
         {
             auto i = int64_t{};
-            auto len = size_t{};
+            auto sv = std::string_view{};
             tr_variant* tmp = nullptr;
-            char const* str = nullptr;
-            uint8_t const* raw = nullptr;
 
-            if (tr_variantDictFindStr(&benc, TR_KEY_failure_reason, &str, &len))
+            if (tr_variantDictFindStrView(&benc, TR_KEY_failure_reason, &sv))
             {
-                response->errmsg = tr_strndup(str, len);
+                response->errmsg = sv;
             }
 
-            if (tr_variantDictFindStr(&benc, TR_KEY_warning_message, &str, &len))
+            if (tr_variantDictFindStrView(&benc, TR_KEY_warning_message, &sv))
             {
-                response->warning = tr_strndup(str, len);
+                response->warning = sv;
             }
 
             if (tr_variantDictFindInt(&benc, TR_KEY_interval, &i))
@@ -270,9 +258,9 @@ static void on_announce_done(
                 response->min_interval = i;
             }
 
-            if (tr_variantDictFindStr(&benc, TR_KEY_tracker_id, &str, &len))
+            if (tr_variantDictFindStrView(&benc, TR_KEY_tracker_id, &sv))
             {
-                response->tracker_id_str = tr_strndup(str, len);
+                response->tracker_id = sv;
             }
 
             if (tr_variantDictFindInt(&benc, TR_KEY_complete, &i))
@@ -290,21 +278,21 @@ static void on_announce_done(
                 response->downloads = i;
             }
 
-            if (tr_variantDictFindRaw(&benc, TR_KEY_peers6, &raw, &len))
+            if (tr_variantDictFindStrView(&benc, TR_KEY_peers6, &sv))
             {
-                dbgmsg(data->log_name, "got a peers6 length of %zu", len);
-                response->pex6 = tr_peerMgrCompact6ToPex(raw, len, nullptr, 0, &response->pex6_count);
+                dbgmsg(data->log_name, "got a peers6 length of %zu", std::size(sv));
+                response->pex6 = tr_peerMgrCompact6ToPex(std::data(sv), std::size(sv), nullptr, 0);
             }
 
-            if (tr_variantDictFindRaw(&benc, TR_KEY_peers, &raw, &len))
+            if (tr_variantDictFindStrView(&benc, TR_KEY_peers, &sv))
             {
-                dbgmsg(data->log_name, "got a compact peers length of %zu", len);
-                response->pex = tr_peerMgrCompactToPex(raw, len, nullptr, 0, &response->pex_count);
+                dbgmsg(data->log_name, "got a compact peers length of %zu", std::size(sv));
+                response->pex = tr_peerMgrCompactToPex(std::data(sv), std::size(sv), nullptr, 0);
             }
             else if (tr_variantDictFindList(&benc, TR_KEY_peers, &tmp))
             {
-                response->pex = listToPex(tmp, &response->pex_count);
-                dbgmsg(data->log_name, "got a peers list with %zu entries", response->pex_count);
+                response->pex = listToPex(tmp);
+                dbgmsg(data->log_name, "got a peers list with %zu entries", std::size(response->pex));
             }
         }
 
@@ -323,21 +311,18 @@ void tr_tracker_http_announce(
     tr_announce_response_func response_func,
     void* response_func_user_data)
 {
-    char* const url = announce_url_new(session, request);
-
-    auto* const d = tr_new0(announce_data, 1);
+    auto* const d = new announce_data{};
     d->response.seeders = -1;
     d->response.leechers = -1;
     d->response.downloads = -1;
     d->response_func = response_func;
     d->response_func_user_data = response_func_user_data;
-    memcpy(d->response.info_hash, request->info_hash, SHA_DIGEST_LENGTH);
+    d->response.info_hash = request->info_hash;
     tr_strlcpy(d->log_name, request->log_name, sizeof(d->log_name));
 
-    dbgmsg(request->log_name, "Sending announce to libcurl: \"%s\"", url);
+    auto const url = announce_url_new(session, request);
+    dbgmsg(request->log_name, "Sending announce to libcurl: \"%" TR_PRIsv "\"", TR_PRIsv_ARG(url));
     tr_webRun(session, url, on_announce_done, d);
-
-    tr_free(url);
 }
 
 /****
@@ -371,8 +356,7 @@ static void on_scrape_done(
     bool did_connect,
     bool did_timeout,
     long response_code,
-    void const* msg,
-    size_t msglen,
+    std::string_view msg,
     void* vdata)
 {
     auto* data = static_cast<struct scrape_data*>(vdata);
@@ -380,7 +364,9 @@ static void on_scrape_done(
     tr_scrape_response* response = &data->response;
     response->did_connect = did_connect;
     response->did_timeout = did_timeout;
-    dbgmsg(data->log_name, "Got scrape response for \"%s\"", response->url.c_str());
+
+    auto const scrape_url_sv = response->scrape_url.sv();
+    dbgmsg(data->log_name, "Got scrape response for \"%" TR_PRIsv "\"", TR_PRIsv_ARG(scrape_url_sv));
 
     if (response_code != HTTP_OK)
     {
@@ -393,7 +379,8 @@ static void on_scrape_done(
     else
     {
         auto top = tr_variant{};
-        auto const variant_loaded = tr_variantFromBenc(&top, msg, msglen) == 0;
+
+        auto const variant_loaded = tr_variantFromBuf(&top, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, msg);
 
         if (tr_env_key_exists("TR_CURL_VERBOSE"))
         {
@@ -403,27 +390,20 @@ static void on_scrape_done(
             }
             else
             {
-                auto len = size_t{};
-                char* str = tr_variantToStr(&top, TR_VARIANT_FMT_JSON, &len);
                 fprintf(stderr, "%s", "Scrape response:\n< ");
-
-                for (size_t i = 0; i < len; ++i)
+                for (auto const ch : tr_variantToStr(&top, TR_VARIANT_FMT_JSON))
                 {
-                    fputc(str[i], stderr);
+                    fputc(ch, stderr);
                 }
-
                 fputc('\n', stderr);
-                tr_free(str);
             }
         }
 
         if (variant_loaded)
         {
-            auto len = size_t{};
-            char const* str = nullptr;
-            if (tr_variantDictFindStr(&top, TR_KEY_failure_reason, &str, &len))
+            if (auto sv = std::string_view{}; tr_variantDictFindStrView(&top, TR_KEY_failure_reason, &sv))
             {
-                response->errmsg = std::string{ str, len };
+                response->errmsg = sv;
             }
 
             tr_variant* flags = nullptr;
@@ -447,7 +427,11 @@ static void on_scrape_done(
                     {
                         struct tr_scrape_response_row* row = &response->rows[j];
 
-                        if (memcmp(tr_quark_get_string(key, nullptr), row->info_hash, SHA_DIGEST_LENGTH) == 0)
+                        // TODO(ckerr): ugh, interning info dict hashes is awful
+                        auto const& hash = row->info_hash;
+                        auto const key_sv = tr_quark_get_string_view(key);
+                        if (std::size(hash) == std::size(key_sv) &&
+                            memcmp(std::data(hash), std::data(key_sv), std::size(hash)) == 0)
                         {
                             if (tr_variantDictFindInt(val, TR_KEY_complete, &intVal))
                             {
@@ -482,13 +466,14 @@ static void on_scrape_done(
     tr_runInEventThread(session, on_scrape_done_eventthread, data);
 }
 
-static char* scrape_url_new(tr_scrape_request const* req)
+static std::string scrape_url_new(tr_scrape_request const* req)
 {
-    struct evbuffer* const buf = evbuffer_new();
+    auto const sv = req->scrape_url.sv();
 
-    evbuffer_add_printf(buf, "%s", req->url);
-    char delimiter = strchr(req->url, '?') != nullptr ? '&' : '?';
+    auto* const buf = evbuffer_new();
+    evbuffer_add(buf, std::data(sv), std::size(sv));
 
+    char delimiter = sv.find('?') == std::string_view::npos ? '?' : '&';
     for (int i = 0; i < req->info_hash_count; ++i)
     {
         char str[SHA_DIGEST_LENGTH * 3 + 1];
@@ -497,7 +482,7 @@ static char* scrape_url_new(tr_scrape_request const* req)
         delimiter = '&';
     }
 
-    return evbuffer_free_to_str(buf, nullptr);
+    return evbuffer_free_to_str(buf);
 }
 
 void tr_tracker_http_scrape(
@@ -506,17 +491,15 @@ void tr_tracker_http_scrape(
     tr_scrape_response_func response_func,
     void* response_func_user_data)
 {
-    char* url = scrape_url_new(request);
-
     auto* d = new scrape_data{};
-    d->response.url = request->url;
+    d->response.scrape_url = request->scrape_url;
     d->response_func = response_func;
     d->response_func_user_data = response_func_user_data;
     d->response.row_count = request->info_hash_count;
 
     for (int i = 0; i < d->response.row_count; ++i)
     {
-        memcpy(d->response.rows[i].info_hash, request->info_hash[i], SHA_DIGEST_LENGTH);
+        d->response.rows[i].info_hash = request->info_hash[i];
         d->response.rows[i].seeders = -1;
         d->response.rows[i].leechers = -1;
         d->response.rows[i].downloads = -1;
@@ -524,8 +507,7 @@ void tr_tracker_http_scrape(
 
     tr_strlcpy(d->log_name, request->log_name, sizeof(d->log_name));
 
-    dbgmsg(request->log_name, "Sending scrape to libcurl: \"%s\"", url);
+    auto const url = scrape_url_new(request);
+    dbgmsg(request->log_name, "Sending scrape to libcurl: \"%" TR_PRIsv "\"", TR_PRIsv_ARG(url));
     tr_webRun(session, url, on_scrape_done, d);
-
-    tr_free(url);
 }

@@ -3,7 +3,7 @@
 //  Sparkle
 //
 //  Created by C.W. Betts on 10/13/14.
-//  Copyright (c) 2014 Sparkle Project. All rights reserved.
+//  Copyright © 2014 Sparkle Project. All rights reserved.
 //
 
 #ifndef SUERRORS_H

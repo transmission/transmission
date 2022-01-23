@@ -1,10 +1,7 @@
-/*
- * This file Copyright (C) 2009-2015 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2009-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #include <QApplication>
 #include <QFont>
@@ -17,6 +14,7 @@
 #include <QStyleOptionProgressBar>
 
 #include "Formatter.h"
+#include "IconCache.h"
 #include "Torrent.h"
 #include "TorrentDelegate.h"
 #include "TorrentModel.h"
@@ -437,12 +435,7 @@ QIcon& TorrentDelegate::getWarningEmblem() const
 
     if (icon.isNull())
     {
-        icon = QIcon::fromTheme(QStringLiteral("emblem-important"));
-    }
-
-    if (icon.isNull())
-    {
-        icon = QApplication::style()->standardIcon(QStyle::SP_MessageBoxWarning);
+        icon = IconCache::get().getThemeIcon(QStringLiteral("emblem-important"), QStyle::SP_MessageBoxWarning);
     }
 
     return icon;
@@ -552,7 +545,7 @@ void TorrentDelegate::drawTorrent(QPainter* painter, QStyleOptionViewItem const&
         cr = QPalette::Text;
     }
 
-    QStyle::State progress_bar_state(option.state);
+    QStyle::State progress_bar_state(option.state | QStyle::State_Horizontal);
 
     if (is_paused)
     {

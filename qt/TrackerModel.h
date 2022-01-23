@@ -1,17 +1,16 @@
-/*
- * This file Copyright (C) 2010-2015 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2010-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #pragma once
 
-#include <QAbstractListModel>
-#include <QVector>
+#include <vector>
 
-#include "Macros.h"
+#include <QAbstractListModel>
+
+#include <libtransmission/tr-macros.h>
+
 #include "Torrent.h"
 #include "Typedefs.h"
 
@@ -46,7 +45,7 @@ public:
     QVariant data(QModelIndex const& index, int role = Qt::DisplayRole) const override;
 
 private:
-    using rows_t = QVector<TrackerInfo>;
+    using rows_t = std::vector<TrackerInfo>;
 
     rows_t rows_;
 };

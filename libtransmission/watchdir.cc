@@ -1,12 +1,12 @@
-/*
- * This file Copyright (C) 2015-2016 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2015-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #include <cstring> /* strcmp() */
+#include <string>
+#include <string_view>
+#include <unordered_set>
 
 #include <event2/event.h>
 #include <event2/util.h>
@@ -54,23 +54,22 @@ struct tr_watchdir
 
 static bool is_regular_file(char const* dir, char const* name)
 {
-    char* const path = tr_buildPath(dir, name, nullptr);
+    auto const path = tr_strvPath(dir, name);
     auto path_info = tr_sys_path_info{};
     tr_error* error = nullptr;
 
-    bool const ret = tr_sys_path_get_info(path, 0, &path_info, &error) && (path_info.type == TR_SYS_PATH_IS_FILE);
+    bool const ret = tr_sys_path_get_info(path.c_str(), 0, &path_info, &error) && (path_info.type == TR_SYS_PATH_IS_FILE);
 
     if (error != nullptr)
     {
         if (!TR_ERROR_IS_ENOENT(error->code))
         {
-            log_error("Failed to get type of \"%s\" (%d): %s", path, error->code, error->message);
+            log_error("Failed to get type of \"%s\" (%d): %s", path.c_str(), error->code, error->message);
         }
 
         tr_error_free(error);
     }
 
-    tr_free(path);
     return ret;
 }
 
@@ -217,14 +216,14 @@ static void tr_watchdir_retry_restart(tr_watchdir_retry* retry)
 ***/
 
 tr_watchdir_t tr_watchdir_new(
-    char const* path,
+    std::string_view path,
     tr_watchdir_cb callback,
     void* callback_user_data,
     struct event_base* event_base,
     bool force_generic)
 {
     auto* handle = tr_new0(struct tr_watchdir, 1);
-    handle->path = tr_strdup(path);
+    handle->path = tr_strvDup(path);
     handle->callback = callback;
     handle->callback_user_data = callback_user_data;
     handle->event_base = event_base;

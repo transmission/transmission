@@ -1,33 +1,17 @@
-/******************************************************************************
- * Copyright (c) 2005-2019 Transmission authors and contributors
- *
- * Permission is hereby granted, free of charge, to any person obtaining a
- * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
- * DEALINGS IN THE SOFTWARE.
- *****************************************************************************/
+// This file Copyright © 2005-2022 Transmission authors and contributors.
+// It may be used under the MIT (SPDX: MIT) license.
+// License text can be found in the licenses/ folder.
 
 #import <IOKit/IOMessage.h>
 #import <IOKit/pwr_mgt/IOPMLib.h>
 #import <Carbon/Carbon.h>
-#import <libkern/OSAtomic.h>
 
 #import <Sparkle/Sparkle.h>
 
+#include <atomic> /* atomic, atomic_fetch_add_explicit, memory_order_relaxed */
+
 #include <libtransmission/transmission.h>
+#include <libtransmission/torrent-metainfo.h>
 #include <libtransmission/utils.h>
 #include <libtransmission/variant.h>
 
@@ -982,7 +966,7 @@ static void removeKeRangerRansomware()
         NSString* message = [NSString
             stringWithFormat:NSLocalizedString(@"It appears that the file \"%@\" from %@ is not a torrent file.", "Download not a torrent -> message"),
                              suggestedName,
-                             [download.request.URL.absoluteString stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
+                             [download.request.URL.absoluteString stringByRemovingPercentEncoding]];
 
         NSAlert* alert = [[NSAlert alloc] init];
         [alert addButtonWithTitle:NSLocalizedString(@"OK", "Download not a torrent -> button")];
@@ -1007,7 +991,7 @@ static void removeKeRangerRansomware()
 {
     NSString* message = [NSString
         stringWithFormat:NSLocalizedString(@"The torrent could not be downloaded from %@: %@.", "Torrent download failed -> message"),
-                         [download.request.URL.absoluteString stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding],
+                         [download.request.URL.absoluteString stringByRemovingPercentEncoding],
                          error.localizedDescription];
 
     NSAlert* alert = [[NSAlert alloc] init];
@@ -1062,31 +1046,19 @@ static void removeKeRangerRansomware()
 
     for (NSString* torrentPath in filenames)
     {
-        //ensure torrent doesn't already exist
-        tr_ctor* ctor = tr_ctorNew(fLib);
-        tr_ctorSetMetainfoFromFile(ctor, torrentPath.UTF8String);
-
-        tr_info info;
-        tr_parse_result const result = tr_torrentParse(ctor, &info);
-        tr_ctorFree(ctor);
-
-        if (result != TR_PARSE_OK)
+        auto metainfo = tr_torrent_metainfo{};
+        if (!metainfo.parseTorrentFile(torrentPath.UTF8String)) // invalid torrent
         {
-            if (result == TR_PARSE_DUPLICATE)
+            if (type != ADD_AUTO)
             {
-                [self duplicateOpenAlert:@(info.name)];
+                [self invalidOpenAlert:torrentPath.lastPathComponent];
             }
-            else if (result == TR_PARSE_ERR)
-            {
-                if (type != ADD_AUTO)
-                {
-                    [self invalidOpenAlert:torrentPath.lastPathComponent];
-                }
-            }
-            else
-                NSAssert2(NO, @"Unknown error code (%d) when attempting to open \"%@\"", result, torrentPath);
+            continue;
+        }
 
-            tr_metainfoFree(&info);
+        if (tr_torrentFindFromMetainfo(fLib, &metainfo) != nullptr) // dupe torrent
+        {
+            [self duplicateOpenAlert:@(metainfo.name().c_str())];
             continue;
         }
 
@@ -1112,10 +1084,10 @@ static void removeKeRangerRansomware()
         }
 
         //determine to show the options window
+        auto const is_multifile = metainfo.fileCount() > 1;
         BOOL const showWindow = type == ADD_SHOW_OPTIONS ||
-            ([fDefaults boolForKey:@"DownloadAsk"] && (info.isFolder || ![fDefaults boolForKey:@"DownloadAskMulti"]) &&
+            ([fDefaults boolForKey:@"DownloadAsk"] && (is_multifile || ![fDefaults boolForKey:@"DownloadAskMulti"]) &&
              (type != ADD_AUTO || ![fDefaults boolForKey:@"DownloadAskManual"]));
-        tr_metainfoFree(&info);
 
         Torrent* torrent;
         if (!(torrent = [[Torrent alloc] initWithPath:torrentPath location:location
@@ -1212,8 +1184,7 @@ static void removeKeRangerRansomware()
     tr_torrent* duplicateTorrent;
     if ((duplicateTorrent = tr_torrentFindFromMagnetLink(fLib, address.UTF8String)))
     {
-        tr_info const* info = tr_torrentInfo(duplicateTorrent);
-        NSString* name = (info != NULL && info->name != NULL) ? @(info->name) : nil;
+        NSString* name = @(tr_torrentName(duplicateTorrent));
         [self duplicateOpenMagnetAlert:address transferName:name];
         return;
     }
@@ -2673,7 +2644,6 @@ static void removeKeRangerRansomware()
 
 - (void)applyFilter
 {
-    __block int32_t active = 0, downloading = 0, seeding = 0, paused = 0;
     NSString* filterType = [fDefaults stringForKey:@"Filter"];
     BOOL filterActive = NO, filterDownload = NO, filterSeed = NO, filterPause = NO, filterStatus = YES;
     if ([filterType isEqualToString:FILTER_ACTIVE])
@@ -2707,6 +2677,12 @@ static void removeKeRangerRansomware()
     }
     BOOL const filterTracker = searchStrings && [[fDefaults stringForKey:@"FilterSearchType"] isEqualToString:FILTER_TYPE_TRACKER];
 
+    std::atomic<int32_t> active{0}, downloading{0}, seeding{0}, paused{0};
+    // Pointers to be captured by Obj-C Block as const*
+    auto* activeRef = &active;
+    auto* downloadingRef = &downloading;
+    auto* seedingRef = &seeding;
+    auto* pausedRef = &paused;
     //filter & get counts of each type
     NSIndexSet* indexesOfNonFilteredTorrents = [fTorrents
         indexesOfObjectsWithOptions:NSEnumerationConcurrent passingTest:^BOOL(Torrent* torrent, NSUInteger idx, BOOL* stop) {
@@ -2716,12 +2692,12 @@ static void removeKeRangerRansomware()
                 BOOL const isActive = !torrent.stalled;
                 if (isActive)
                 {
-                    OSAtomicIncrement32(&active);
+                    std::atomic_fetch_add_explicit(activeRef, 1, std::memory_order_relaxed);
                 }
 
                 if (torrent.seeding)
                 {
-                    OSAtomicIncrement32(&seeding);
+                    std::atomic_fetch_add_explicit(seedingRef, 1, std::memory_order_relaxed);
                     if (filterStatus && !((filterActive && isActive) || filterSeed))
                     {
                         return NO;
@@ -2729,7 +2705,7 @@ static void removeKeRangerRansomware()
                 }
                 else
                 {
-                    OSAtomicIncrement32(&downloading);
+                    std::atomic_fetch_add_explicit(downloadingRef, 1, std::memory_order_relaxed);
                     if (filterStatus && !((filterActive && isActive) || filterDownload))
                     {
                         return NO;
@@ -2738,7 +2714,7 @@ static void removeKeRangerRansomware()
             }
             else
             {
-                OSAtomicIncrement32(&paused);
+                std::atomic_fetch_add_explicit(pausedRef, 1, std::memory_order_relaxed);
                 if (filterStatus && !filterPause)
                 {
                     return NO;
@@ -2804,7 +2780,11 @@ static void removeKeRangerRansomware()
     //set button tooltips
     if (fFilterBar)
     {
-        [fFilterBar setCountAll:fTorrents.count active:active downloading:downloading seeding:seeding paused:paused];
+        [fFilterBar setCountAll:fTorrents.count
+                         active:active.load()
+                    downloading:downloading.load()
+                        seeding:seeding.load()
+                         paused:paused.load()];
     }
 
     //if either the previous or current lists are blank, set its value to the other
@@ -3320,34 +3300,21 @@ static void removeKeRangerRansomware()
             continue;
         }
 
-        tr_ctor* ctor = tr_ctorNew(fLib);
-        tr_ctorSetMetainfoFromFile(ctor, fullFile.UTF8String);
-
-        switch (tr_torrentParse(ctor, NULL))
+        auto metainfo = tr_torrent_metainfo{};
+        if (!metainfo.parseTorrentFile(fullFile.UTF8String))
         {
-        case TR_PARSE_OK:
-            {
-                [self openFiles:@[ fullFile ] addType:ADD_AUTO forcePath:nil];
-
-                NSString* notificationTitle = NSLocalizedString(@"Torrent File Auto Added", "notification title");
-                NSUserNotification* notification = [[NSUserNotification alloc] init];
-                notification.title = notificationTitle;
-                notification.informativeText = file;
-
-                notification.hasActionButton = NO;
-
-                [NSUserNotificationCenter.defaultUserNotificationCenter deliverNotification:notification];
-                break;
-            }
-        case TR_PARSE_ERR:
-            [fAutoImportedNames removeObject:file];
-            break;
-
-        case TR_PARSE_DUPLICATE: //let's ignore this (but silence a warning)
             break;
         }
 
-        tr_ctorFree(ctor);
+        [self openFiles:@[ fullFile ] addType:ADD_AUTO forcePath:nil];
+
+        NSString* notificationTitle = NSLocalizedString(@"Torrent File Auto Added", "notification title");
+        NSUserNotification* notification = [[NSUserNotification alloc] init];
+        notification.title = notificationTitle;
+        notification.informativeText = file;
+        notification.hasActionButton = NO;
+
+        [NSUserNotificationCenter.defaultUserNotificationCenter deliverNotification:notification];
     }
 }
 
@@ -3641,9 +3608,8 @@ static void removeKeRangerRansomware()
                 [file.pathExtension caseInsensitiveCompare:@"torrent"] == NSOrderedSame)
             {
                 torrent = YES;
-                tr_ctor* ctor = tr_ctorNew(fLib);
-                tr_ctorSetMetainfoFromFile(ctor, file.UTF8String);
-                if (tr_torrentParse(ctor, NULL) == TR_PARSE_OK)
+                auto metainfo = tr_torrent_metainfo{};
+                if (metainfo.parseTorrentFile(file.UTF8String))
                 {
                     if (!fOverlayWindow)
                     {
@@ -3653,7 +3619,6 @@ static void removeKeRangerRansomware()
 
                     return NSDragOperationCopy;
                 }
-                tr_ctorFree(ctor);
             }
         }
 
@@ -3712,13 +3677,11 @@ static void removeKeRangerRansomware()
                 [file.pathExtension caseInsensitiveCompare:@"torrent"] == NSOrderedSame)
             {
                 torrent = YES;
-                tr_ctor* ctor = tr_ctorNew(fLib);
-                tr_ctorSetMetainfoFromFile(ctor, file.UTF8String);
-                if (tr_torrentParse(ctor, NULL) == TR_PARSE_OK)
+                auto metainfo = tr_torrent_metainfo{};
+                if (metainfo.parseTorrentFile(file.UTF8String))
                 {
                     [filesToOpen addObject:file];
                 }
-                tr_ctorFree(ctor);
             }
         }
 

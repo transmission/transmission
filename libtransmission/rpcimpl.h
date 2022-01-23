@@ -1,22 +1,20 @@
-/*
- * This file Copyright (C) 2008-2014 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2008-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #pragma once
 
+#include <cstddef> // size_t
 #include <string_view>
 
 #include "transmission.h"
-#include "tr-macros.h"
-#include "variant.h"
 
 /***
 ****  RPC processing
 ***/
+
+struct tr_variant;
 
 using tr_rpc_response_func = void (*)(tr_session* session, tr_variant* response, void* user_data);
 
@@ -30,8 +28,7 @@ void tr_rpc_request_exec_json(
 /* see the RPC spec's "Request URI Notation" section */
 void tr_rpc_request_exec_uri(
     tr_session* session,
-    void const* request_uri,
-    size_t request_uri_len,
+    std::string_view request_uri,
     tr_rpc_response_func callback,
     void* callback_user_data);
 

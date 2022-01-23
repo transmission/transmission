@@ -1,10 +1,7 @@
-/*
- * This file Copyright (C) 2008-2014 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2008-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #if defined(HAVE_USELOCALE) && (!defined(_XOPEN_SOURCE) || _XOPEN_SOURCE < 700)
 #undef _XOPEN_SOURCE
@@ -17,9 +14,11 @@
 
 #include <algorithm> // std::sort
 #include <cerrno>
-#include <stack>
 #include <cstdlib> /* strtod() */
 #include <cstring>
+#include <stack>
+#include <string>
+#include <string_view>
 #include <vector>
 
 #ifdef _WIN32
@@ -37,13 +36,15 @@
 #define LIBTRANSMISSION_VARIANT_MODULE
 
 #include "transmission.h"
+
 #include "error.h"
 #include "file.h"
 #include "log.h"
+#include "quark.h"
 #include "tr-assert.h"
-#include "utils.h" /* tr_new(), tr_free() */
-#include "variant.h"
+#include "utils.h"
 #include "variant-common.h"
+#include "variant.h"
 
 /* don't use newlocale/uselocale on old versions of uClibc because they're buggy.
  * https://trac.transmissionbt.com/ticket/6006 */
@@ -54,6 +55,8 @@
 /**
 ***
 **/
+
+using namespace std::literals;
 
 struct locale_context
 {
@@ -158,6 +161,7 @@ static constexpr char const* tr_variant_string_get_string(struct tr_variant_stri
 
     case TR_STRING_TYPE_HEAP:
     case TR_STRING_TYPE_QUARK:
+    case TR_STRING_TYPE_VIEW:
         return str->str.str;
 
     default:
@@ -171,6 +175,15 @@ static void tr_variant_string_set_quark(struct tr_variant_string* str, tr_quark 
 
     str->type = TR_STRING_TYPE_QUARK;
     str->str.str = tr_quark_get_string(quark, &str->len);
+}
+
+static void tr_variant_string_set_string_view(struct tr_variant_string* str, std::string_view in)
+{
+    tr_variant_string_clear(str);
+
+    str->type = TR_STRING_TYPE_VIEW;
+    str->len = std::size(in);
+    str->str.str = std::data(in);
 }
 
 static void tr_variant_string_set_string(struct tr_variant_string* str, std::string_view in)
@@ -301,21 +314,17 @@ bool tr_variantGetInt(tr_variant const* v, int64_t* setme)
     return success;
 }
 
-bool tr_variantGetStr(tr_variant const* v, char const** setme, size_t* len)
+bool tr_variantGetStrView(tr_variant const* v, std::string_view* setme)
 {
-    bool const success = tr_variantIsString(v);
-
-    if (success)
+    if (!tr_variantIsString(v))
     {
-        *setme = getStr(v);
+        return false;
     }
 
-    if (len != nullptr)
-    {
-        *len = success ? v->val.s.len : 0;
-    }
-
-    return success;
+    char const* const str = tr_variant_string_get_string(&v->val.s);
+    size_t const len = v->val.s.len;
+    *setme = std::string_view{ str, len };
+    return true;
 }
 
 bool tr_variantGetRaw(tr_variant const* v, uint8_t const** setme_raw, size_t* setme_len)
@@ -333,28 +342,35 @@ bool tr_variantGetRaw(tr_variant const* v, uint8_t const** setme_raw, size_t* se
 
 bool tr_variantGetBool(tr_variant const* v, bool* setme)
 {
-    bool success = false;
-
     if (tr_variantIsBool(v))
     {
         *setme = v->val.b;
-        success = true;
+        return true;
     }
 
-    if ((!success) && tr_variantIsInt(v) && (v->val.i == 0 || v->val.i == 1))
+    if (tr_variantIsInt(v) && (v->val.i == 0 || v->val.i == 1))
     {
         *setme = v->val.i != 0;
-        success = true;
+        return true;
     }
 
-    char const* str = nullptr;
-    if ((!success) && tr_variantGetStr(v, &str, nullptr) && (strcmp(str, "true") == 0 || strcmp(str, "false") == 0))
+    auto sv = std::string_view{};
+    if (tr_variantGetStrView(v, &sv))
     {
-        *setme = strcmp(str, "true") == 0;
-        success = true;
+        if (sv == "true"sv)
+        {
+            *setme = true;
+            return true;
+        }
+
+        if (sv == "false"sv)
+        {
+            *setme = false;
+            return true;
+        }
     }
 
-    return success;
+    return false;
 }
 
 bool tr_variantGetReal(tr_variant const* v, double* setme)
@@ -410,10 +426,10 @@ bool tr_variantDictFindReal(tr_variant* dict, tr_quark const key, double* setme)
     return tr_variantGetReal(child, setme);
 }
 
-bool tr_variantDictFindStr(tr_variant* dict, tr_quark const key, char const** setme, size_t* len)
+bool tr_variantDictFindStrView(tr_variant* dict, tr_quark const key, std::string_view* setme)
 {
     tr_variant const* const child = tr_variantDictFind(dict, key);
-    return tr_variantGetStr(child, setme, len);
+    return tr_variantGetStrView(child, setme);
 }
 
 bool tr_variantDictFindList(tr_variant* dict, tr_quark const key, tr_variant** setme)
@@ -452,6 +468,12 @@ void tr_variantInitStr(tr_variant* v, std::string_view str)
 {
     tr_variantInit(v, TR_VARIANT_TYPE_STR);
     tr_variant_string_set_string(&v->val.s, str);
+}
+
+void tr_variantInitStrView(tr_variant* v, std::string_view str)
+{
+    tr_variantInit(v, TR_VARIANT_TYPE_STR);
+    tr_variant_string_set_string_view(&v->val.s, str);
 }
 
 void tr_variantInitBool(tr_variant* v, bool value)
@@ -561,6 +583,13 @@ tr_variant* tr_variantListAddStr(tr_variant* list, std::string_view str)
     return child;
 }
 
+tr_variant* tr_variantListAddStrView(tr_variant* list, std::string_view str)
+{
+    tr_variant* child = tr_variantListAdd(list);
+    tr_variantInitStrView(child, str);
+    return child;
+}
+
 tr_variant* tr_variantListAddQuark(tr_variant* list, tr_quark const val)
 {
     tr_variant* child = tr_variantListAdd(list);
@@ -662,6 +691,13 @@ tr_variant* tr_variantDictAddStr(tr_variant* dict, tr_quark const key, std::stri
     return child;
 }
 
+tr_variant* tr_variantDictAddStrView(tr_variant* dict, tr_quark const key, std::string_view str)
+{
+    tr_variant* child = dictFindOrAdd(dict, key, TR_VARIANT_TYPE_STR);
+    tr_variantInitStrView(child, str);
+    return child;
+}
+
 tr_variant* tr_variantDictAddRaw(tr_variant* dict, tr_quark const key, void const* src, size_t len)
 {
     tr_variant* child = dictFindOrAdd(dict, key, TR_VARIANT_TYPE_STR);
@@ -723,13 +759,9 @@ bool tr_variantDictRemove(tr_variant* dict, tr_quark const key)
 class WalkNode
 {
 public:
-    WalkNode(tr_variant const* v_in, bool sort_dicts)
-        : v{ *v_in }
+    explicit WalkNode(tr_variant const* v_in)
     {
-        if (sort_dicts && tr_variantIsDict(v_in))
-        {
-            sortByKey();
-        }
+        assign(v_in);
     }
 
     tr_variant const* nextChild()
@@ -750,35 +782,50 @@ public:
 
     bool is_visited = false;
 
-    // Shallow bitwise copy of the variant passed to the constructor
-    tr_variant const v = {};
+    // shallow bitwise copy of the variant passed to the constructor
+    tr_variant v = {};
 
-private:
-    void sortByKey()
+protected:
+    friend class VariantWalker;
+
+    void assign(tr_variant const* v_in)
     {
-        auto const n = v.val.l.count;
+        is_visited = false;
+        v = *v_in;
+        child_index = 0;
+        sorted.clear();
+    }
 
-        struct ByKey
-        {
-            char const* key;
-            size_t idx;
-        };
+    struct ByKey
+    {
+        std::string_view key;
+        size_t idx;
+    };
 
-        auto const* children = v.val.l.vals;
-        auto tmp = std::vector<ByKey>(n);
-        for (size_t i = 0; i < n; ++i)
+    void sort(std::vector<ByKey>& sortbuf)
+    {
+        if (!tr_variantIsDict(&v))
         {
-            tmp[i] = { tr_quark_get_string(children[i].key, nullptr), i };
+            return;
         }
 
-        std::sort(std::begin(tmp), std::end(tmp), [](ByKey const& a, ByKey const& b) { return strcmp(a.key, b.key) < 0; });
+        auto const n = v.val.l.count;
+        auto const* children = v.val.l.vals;
+
+        sortbuf.resize(n);
+        for (size_t i = 0; i < n; ++i)
+        {
+            sortbuf[i] = { tr_quark_get_string(children[i].key), i };
+        }
+
+        std::sort(std::begin(sortbuf), std::end(sortbuf), [](ByKey const& a, ByKey const& b) { return a.key < b.key; });
 
         //  keep the sorted indices
 
         sorted.resize(n);
         for (size_t i = 0; i < n; ++i)
         {
-            sorted[i] = tmp[i].idx;
+            sorted[i] = sortbuf[i].idx;
         }
     }
 
@@ -790,6 +837,54 @@ private:
     std::vector<size_t> sorted;
 };
 
+class VariantWalker
+{
+public:
+    void emplace(tr_variant const* v_in, bool sort_dicts)
+    {
+        if (size == std::size(stack))
+        {
+            stack.emplace_back(v_in);
+        }
+        else
+        {
+            stack[size].assign(v_in);
+        }
+
+        ++size;
+
+        if (sort_dicts)
+        {
+            top().sort(sortbuf);
+        }
+    }
+
+    void pop()
+    {
+        TR_ASSERT(size > 0);
+        if (size > 0)
+        {
+            --size;
+        }
+    }
+
+    bool empty() const
+    {
+        return size == 0;
+    }
+
+    WalkNode& top()
+    {
+        TR_ASSERT(size > 0);
+        return stack[size - 1];
+    }
+
+private:
+    size_t size = 0;
+    std::vector<WalkNode> stack;
+    std::vector<WalkNode::ByKey> sortbuf;
+};
+
 /**
  * This function's previous recursive implementation was
  * easier to read, but was vulnerable to a smash-stacking
@@ -797,7 +892,7 @@ private:
  */
 void tr_variantWalk(tr_variant const* v_in, struct VariantWalkFuncs const* walkFuncs, void* user_data, bool sort_dicts)
 {
-    auto stack = std::stack<WalkNode>{};
+    auto stack = VariantWalker{};
     stack.emplace(v_in, sort_dicts);
 
     while (!stack.empty())
@@ -926,7 +1021,7 @@ static void tr_variantListCopy(tr_variant* target, tr_variant const* src)
     int i = 0;
     tr_variant const* val = nullptr;
 
-    while ((val = tr_variantListChild((tr_variant*)src, i)) != nullptr)
+    while ((val = tr_variantListChild(const_cast<tr_variant*>(src), i)) != nullptr)
     {
         if (tr_variantIsBool(val))
         {
@@ -948,10 +1043,9 @@ static void tr_variantListCopy(tr_variant* target, tr_variant const* src)
         }
         else if (tr_variantIsString(val))
         {
-            size_t len = 0;
-            char const* str = nullptr;
-            (void)tr_variantGetStr(val, &str, &len);
-            tr_variantListAddRaw(target, str, len);
+            auto sv = std::string_view{};
+            (void)tr_variantGetStrView(val, &sv);
+            tr_variantListAddRaw(target, std::data(sv), std::size(sv));
         }
         else if (tr_variantIsDict(val))
         {
@@ -1004,12 +1098,12 @@ void tr_variantMergeDicts(tr_variant* target, tr_variant const* source)
     {
         auto key = tr_quark{};
         tr_variant* val = nullptr;
-        if (tr_variantDictChild((tr_variant*)source, i, &key, &val))
+        if (tr_variantDictChild(const_cast<tr_variant*>(source), i, &key, &val))
         {
             tr_variant* t = nullptr;
 
             // if types differ, ensure that target will overwrite source
-            tr_variant* const target_child = tr_variantDictFind(target, key);
+            auto const* const target_child = tr_variantDictFind(target, key);
             if (target_child && !tr_variantIsType(target_child, val->type))
             {
                 tr_variantDictRemove(target, key);
@@ -1035,10 +1129,9 @@ void tr_variantMergeDicts(tr_variant* target, tr_variant const* source)
             }
             else if (tr_variantIsString(val))
             {
-                size_t len = 0;
-                char const* str = nullptr;
-                (void)tr_variantGetStr(val, &str, &len);
-                tr_variantDictAddRaw(target, key, str, len);
+                auto sv = std::string_view{};
+                (void)tr_variantGetStrView(val, &sv);
+                tr_variantDictAddRaw(target, key, std::data(sv), std::size(sv));
             }
             else if (tr_variantIsDict(val) && tr_variantDictFindDict(target, key, &t))
             {
@@ -1067,7 +1160,7 @@ void tr_variantMergeDicts(tr_variant* target, tr_variant const* source)
             }
             else
             {
-                tr_logAddDebug("tr_variantMergeDicts skipping \"%s\"", tr_quark_get_string(key, nullptr));
+                tr_logAddDebug("tr_variantMergeDicts skipping \"%s\"", tr_quark_get_string(key));
             }
         }
     }
@@ -1107,148 +1200,67 @@ struct evbuffer* tr_variantToBuf(tr_variant const* v, tr_variant_fmt fmt)
     return buf;
 }
 
-char* tr_variantToStr(tr_variant const* v, tr_variant_fmt fmt, size_t* len)
+std::string tr_variantToStr(tr_variant const* v, tr_variant_fmt fmt)
 {
-    struct evbuffer* buf = tr_variantToBuf(v, fmt);
-    return evbuffer_free_to_str(buf, len);
+    return evbuffer_free_to_str(tr_variantToBuf(v, fmt));
 }
 
-static int writeVariantToFd(tr_variant const* v, tr_variant_fmt fmt, tr_sys_file_t fd, tr_error** error)
+int tr_variantToFile(tr_variant const* v, tr_variant_fmt fmt, std::string const& filename)
 {
-    int err = 0;
-    struct evbuffer* buf = tr_variantToBuf(v, fmt);
-    char const* walk = (char const*)evbuffer_pullup(buf, -1);
-    uint64_t nleft = evbuffer_get_length(buf);
+    auto error_code = int{ 0 };
+    auto const contents = tr_variantToStr(v, fmt);
 
-    while (nleft > 0)
-    {
-        uint64_t n = 0;
-
-        tr_error* tmperr = nullptr;
-        if (!tr_sys_file_write(fd, walk, nleft, &n, &tmperr))
-        {
-            err = tmperr->code;
-            tr_error_propagate(error, &tmperr);
-            break;
-        }
-
-        nleft -= n;
-        walk += n;
-    }
-
-    evbuffer_free(buf);
-    return err;
-}
-
-int tr_variantToFile(tr_variant const* v, tr_variant_fmt fmt, char const* filename)
-{
-    /* follow symlinks to find the "real" file, to make sure the temporary
-     * we build with tr_sys_file_open_temp() is created on the right partition */
-    char* real_filename = tr_sys_path_resolve(filename, nullptr);
-    if (real_filename != nullptr)
-    {
-        filename = real_filename;
-    }
-
-    /* if the file already exists, try to move it out of the way & keep it as a backup */
-    char* const tmp = tr_strdup_printf("%s.tmp.XXXXXX", filename);
     tr_error* error = nullptr;
-    tr_sys_file_t const fd = tr_sys_file_open_temp(tmp, &error);
-
-    int err = 0;
-    if (fd != TR_BAD_SYS_FILE)
+    tr_saveFile(filename, { std::data(contents), std::size(contents) }, &error);
+    if (error != nullptr)
     {
-        err = writeVariantToFd(v, fmt, fd, &error);
-        tr_sys_file_close(fd, nullptr);
-
-        if (err)
-        {
-            tr_logAddError(_("Couldn't save temporary file \"%1$s\": %2$s"), tmp, error->message);
-            tr_sys_path_remove(tmp, nullptr);
-            tr_error_free(error);
-        }
-        else
-        {
-            tr_error_clear(&error);
-
-            if (tr_sys_path_rename(tmp, filename, &error))
-            {
-                tr_logAddInfo(_("Saved \"%s\""), filename);
-            }
-            else
-            {
-                err = error->code;
-                tr_logAddError(_("Couldn't save file \"%1$s\": %2$s"), filename, error->message);
-                tr_sys_path_remove(tmp, nullptr);
-                tr_error_free(error);
-            }
-        }
-    }
-    else
-    {
-        err = error->code;
-        tr_logAddError(_("Couldn't save temporary file \"%1$s\": %2$s"), tmp, error->message);
-        tr_error_free(error);
+        tr_logAddError(_("Error saving \"%" TR_PRIsv "\": %s (%d)"), TR_PRIsv_ARG(filename), error->message, error->code);
+        error_code = error->code;
+        tr_error_clear(&error);
     }
 
-    tr_free(tmp);
-    tr_free(real_filename);
-    return err;
+    return error_code;
 }
 
 /***
 ****
 ***/
 
-bool tr_variantFromFile(tr_variant* setme, tr_variant_fmt fmt, char const* filename, tr_error** error)
+bool tr_variantFromBuf(tr_variant* setme, int opts, std::string_view buf, char const** setme_end, tr_error** error)
 {
-    bool ret = false;
+    // supported formats: benc, json
+    TR_ASSERT((opts & (TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_JSON)) != 0);
 
-    auto buflen = size_t{};
-    uint8_t* const buf = tr_loadFile(filename, &buflen, error);
-    if (buf != nullptr)
-    {
-        if (tr_variantFromBuf(setme, fmt, buf, buflen, filename, nullptr) == 0)
-        {
-            ret = true;
-        }
-        else
-        {
-            tr_error_set_literal(error, 0, _("Unable to parse file content"));
-        }
-
-        tr_free(buf);
-    }
-
-    return ret;
-}
-
-int tr_variantFromBuf(
-    tr_variant* setme,
-    tr_variant_fmt fmt,
-    void const* buf,
-    size_t buflen,
-    char const* optional_source,
-    char const** setme_end)
-{
-    /* parse with LC_NUMERIC="C" to ensure a "." decimal separator */
-    struct locale_context locale_ctx;
+    // parse with LC_NUMERIC="C" to ensure a "." decimal separator
+    auto locale_ctx = locale_context{};
     use_numeric_locale(&locale_ctx, "C");
 
-    auto err = int{};
-    switch (fmt)
-    {
-    case TR_VARIANT_FMT_JSON:
-    case TR_VARIANT_FMT_JSON_LEAN:
-        err = tr_jsonParse(optional_source, buf, buflen, setme, setme_end);
-        break;
-
-    default /* TR_VARIANT_FMT_BENC */:
-        err = tr_variantParseBenc(buf, (char const*)buf + buflen, setme, setme_end);
-        break;
-    }
+    auto err = (opts & TR_VARIANT_PARSE_BENC) ? tr_variantParseBenc(*setme, opts, buf, setme_end) :
+                                                tr_variantParseJson(*setme, opts, buf, setme_end);
 
     /* restore the previous locale */
     restore_locale(&locale_ctx);
-    return err;
+
+    if (err)
+    {
+        tr_error_set(error, EILSEQ, "error parsing encoded data"sv);
+        return false;
+    }
+
+    return true;
+}
+
+bool tr_variantFromFile(tr_variant* setme, tr_variant_parse_opts opts, std::string const& filename, tr_error** error)
+{
+    // can't do inplace when this function is allocating & freeing the memory...
+    TR_ASSERT((opts & TR_VARIANT_PARSE_INPLACE) == 0);
+
+    auto buf = std::vector<char>{};
+    if (!tr_loadFile(buf, filename, error))
+    {
+        return false;
+    }
+
+    auto sv = std::string_view{ std::data(buf), std::size(buf) };
+    return tr_variantFromBuf(setme, opts, sv, nullptr, error);
 }

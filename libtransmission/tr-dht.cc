@@ -1,26 +1,6 @@
-/*
- * Copyright (c) 2009-2010 by Juliusz Chroboczek
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- *
- *
- */
+// This file Copyright © 2009-2010 Juliusz Chroboczek.
+// It may be used under the MIT (SPDX: MIT) license.
+// License text can be found in the licenses/ folder.
 
 #include <algorithm>
 #include <cerrno>
@@ -28,6 +8,8 @@
 #include <cstdio>
 #include <cstdlib> /* atoi() */
 #include <cstring> /* memcpy(), memset(), memchr(), strlen() */
+#include <ctime>
+#include <string_view>
 
 #ifdef _WIN32
 #include <inttypes.h>
@@ -42,25 +24,26 @@
 #include <netinet/in.h> /* sockaddr_in */
 #endif
 
-/* third party */
 #include <event2/event.h>
 #include <dht/dht.h>
 
-/* libT */
 #include "transmission.h"
+
 #include "crypto-utils.h"
 #include "file.h"
 #include "log.h"
 #include "net.h"
-#include "peer-mgr.h" /* tr_peerMgrCompactToPex() */
-#include "platform.h" /* tr_threadNew() */
+#include "peer-mgr.h"
+#include "platform.h"
 #include "session.h"
-#include "torrent.h" /* tr_torrentFindFromHash() */
+#include "torrent.h"
 #include "tr-assert.h"
 #include "tr-dht.h"
-#include "trevent.h" /* tr_runInEventThread() */
+#include "trevent.h"
 #include "utils.h"
 #include "variant.h"
+
+using namespace std::literals;
 
 static struct event* dht_timer = nullptr;
 static unsigned char myid[20];
@@ -215,14 +198,9 @@ static void dht_bootstrap(void* closure)
 
     if (!bootstrap_done(cl->session, 0))
     {
-        tr_sys_file_t f = TR_BAD_SYS_FILE;
+        auto const bootstrap_file = tr_strvPath(cl->session->config_dir, "dht.bootstrap");
 
-        char* const bootstrap_file = tr_buildPath(cl->session->configDir, "dht.bootstrap", nullptr);
-
-        if (bootstrap_file != nullptr)
-        {
-            f = tr_sys_file_open(bootstrap_file, TR_SYS_FILE_READ, 0, nullptr);
-        }
+        tr_sys_file_t const f = tr_sys_file_open(bootstrap_file.c_str(), TR_SYS_FILE_READ, 0, nullptr);
 
         if (f != TR_BAD_SYS_FILE)
         {
@@ -262,8 +240,6 @@ static void dht_bootstrap(void* closure)
 
             tr_sys_file_close(f, nullptr);
         }
-
-        tr_free(bootstrap_file);
     }
 
     if (!bootstrap_done(cl->session, 0))
@@ -318,26 +294,25 @@ int tr_dhtInit(tr_session* ss)
         dht_debug = stderr;
     }
 
-    char* const dat_file = tr_buildPath(ss->configDir, "dht.dat", nullptr);
+    auto const dat_file = tr_strvPath(ss->config_dir, "dht.dat"sv);
     auto benc = tr_variant{};
-    int rc = tr_variantFromFile(&benc, TR_VARIANT_FMT_BENC, dat_file, nullptr) ? 0 : -1;
-    tr_free(dat_file);
+    auto const ok = tr_variantFromFile(&benc, TR_VARIANT_PARSE_BENC, dat_file);
 
     bool have_id = false;
     uint8_t* nodes = nullptr;
     uint8_t* nodes6 = nullptr;
     size_t len = 0;
     size_t len6 = 0;
-    if (rc == 0)
+    if (ok)
     {
-        uint8_t const* raw = nullptr;
-        have_id = tr_variantDictFindRaw(&benc, TR_KEY_id, &raw, &len);
-
-        if (have_id && len == 20)
+        auto sv = std::string_view{};
+        have_id = tr_variantDictFindStrView(&benc, TR_KEY_id, &sv);
+        if (have_id && std::size(sv) == 20)
         {
-            memcpy(myid, raw, len);
+            std::copy(std::begin(sv), std::end(sv), myid);
         }
 
+        uint8_t const* raw = nullptr;
         if (ss->udp_socket != TR_BAD_SOCKET && tr_variantDictFindRaw(&benc, TR_KEY_nodes, &raw, &len) && len % 6 == 0)
         {
             nodes = static_cast<uint8_t*>(tr_memdup(raw, len));
@@ -371,9 +346,7 @@ int tr_dhtInit(tr_session* ss)
         tr_rand_buffer(myid, 20);
     }
 
-    rc = dht_init(ss->udp_socket, ss->udp6_socket, myid, nullptr);
-
-    if (rc < 0)
+    if (int rc = dht_init(ss->udp_socket, ss->udp6_socket, myid, nullptr); rc < 0)
     {
         tr_free(nodes6);
         tr_free(nodes);
@@ -472,10 +445,9 @@ void tr_dhtUninit(tr_session* ss)
             tr_variantDictAddRaw(&benc, TR_KEY_nodes6, compact6, out6 - compact6);
         }
 
-        char* const dat_file = tr_buildPath(ss->configDir, "dht.dat", nullptr);
+        auto const dat_file = tr_strvPath(ss->config_dir, "dht.dat");
         tr_variantToFile(&benc, TR_VARIANT_FMT_BENC, dat_file);
         tr_variantFree(&benc);
-        tr_free(dat_file);
     }
 
     dht_uninit();
@@ -628,12 +600,14 @@ char const* tr_dhtPrintableStatus(int status)
 
 static void callback(void* /*ignore*/, int event, unsigned char const* info_hash, void const* data, size_t data_len)
 {
+    auto hash = tr_sha1_digest_t{};
+    std::copy_n(reinterpret_cast<std::byte const*>(info_hash), std::size(hash), std::data(hash));
+    auto const lock = session_->unique_lock();
+    tr_torrent* const tor = session_->getTorrent(hash);
+
     if (event == DHT_EVENT_VALUES || event == DHT_EVENT_VALUES6)
     {
-        tr_sessionLock(session_);
-
-        tr_torrent* const tor = tr_torrentFindFromHash(session_, info_hash);
-        if (tor != nullptr && tr_torrentAllowsDHT(tor))
+        if (tor != nullptr && tor->allowsDht())
         {
             size_t n = 0;
             tr_pex* const pex = event == DHT_EVENT_VALUES ? tr_peerMgrCompactToPex(data, data_len, nullptr, 0, &n) :
@@ -644,13 +618,9 @@ static void callback(void* /*ignore*/, int event, unsigned char const* info_hash
             tr_free(pex);
             tr_logAddTorDbg(tor, "Learned %d %s peers from DHT", (int)n, event == DHT_EVENT_VALUES6 ? "IPv6" : "IPv4");
         }
-
-        tr_sessionUnlock(session_);
     }
     else if (event == DHT_EVENT_SEARCH_DONE || event == DHT_EVENT_SEARCH_DONE6)
     {
-        tr_torrent* tor = tr_torrentFindFromHash(session_, info_hash);
-
         if (tor != nullptr)
         {
             if (event == DHT_EVENT_SEARCH_DONE)
@@ -676,7 +646,7 @@ enum class AnnounceResult
 
 static AnnounceResult tr_dhtAnnounce(tr_torrent* tor, int af, bool announce)
 {
-    if (!tr_torrentAllowsDHT(tor))
+    if (!tor->allowsDht())
     {
         return AnnounceResult::INVALID;
     }
@@ -700,7 +670,8 @@ static AnnounceResult tr_dhtAnnounce(tr_torrent* tor, int af, bool announce)
         return AnnounceResult::FAILED;
     }
 
-    int const rc = dht_search(tor->info.hash, announce ? tr_sessionGetPeerPort(session_) : 0, af, callback, nullptr);
+    auto const* dht_hash = reinterpret_cast<unsigned char const*>(std::data(tor->infoHash()));
+    int const rc = dht_search(dht_hash, announce ? tr_sessionGetPeerPort(session_) : 0, af, callback, nullptr);
     if (rc < 0)
     {
         tr_logAddTorErr(
@@ -738,7 +709,7 @@ void tr_dhtUpkeep(tr_session* session)
 
     for (auto* tor : session->torrents)
     {
-        if (!tor->isRunning || !tr_torrentAllowsDHT(tor))
+        if (!tor->isRunning || !tor->allowsDht())
         {
             continue;
         }
@@ -815,10 +786,17 @@ int dht_blacklisted(sockaddr const* /*sa*/, int /*salen*/)
 
 void dht_hash(void* hash_return, int hash_size, void const* v1, int len1, void const* v2, int len2, void const* v3, int len3)
 {
-    unsigned char sha1[SHA_DIGEST_LENGTH];
-    tr_sha1(sha1, v1, len1, v2, len2, v3, len3, nullptr);
-    memset(hash_return, 0, hash_size);
-    memcpy(hash_return, sha1, std::min(hash_size, SHA_DIGEST_LENGTH));
+    auto* setme = reinterpret_cast<std::byte*>(hash_return);
+    std::fill_n(static_cast<char*>(hash_return), hash_size, '\0');
+
+    auto const sv1 = std::string_view{ static_cast<char const*>(v1), size_t(len1) };
+    auto const sv2 = std::string_view{ static_cast<char const*>(v2), size_t(len2) };
+    auto const sv3 = std::string_view{ static_cast<char const*>(v3), size_t(len3) };
+    auto const digest = tr_sha1(sv1, sv2, sv3);
+    if (digest)
+    {
+        std::copy_n(std::data(*digest), std::min(size_t(hash_size), std::size(*digest)), setme);
+    }
 }
 
 int dht_random_bytes(void* buf, size_t size)
