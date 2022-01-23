@@ -342,10 +342,10 @@ std::optional<int> TorrentModel::getRow(int id) const
 {
     std::optional<int> row;
 
-    auto const it = std::equal_range(torrents_.begin(), torrents_.end(), id, TorrentIdLessThan());
-    if (it.first != it.second)
+    auto const [begin, end] = std::equal_range(torrents_.begin(), torrents_.end(), id, TorrentIdLessThan());
+    if (begin != end)
     {
-        row = std::distance(torrents_.begin(), it.first);
+        row = std::distance(torrents_.begin(), begin);
         assert(torrents_[*row]->id() == id);
     }
 
