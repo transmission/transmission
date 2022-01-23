@@ -68,7 +68,6 @@ static char const* getNatStateStr(int state)
 
 static void natPulse(tr_shared* s, bool do_check)
 {
-    tr_port received_private_port;
     tr_port const private_peer_port = s->session->private_peer_port;
     bool const is_enabled = s->isEnabled && !s->isShuttingDown;
 
@@ -85,6 +84,7 @@ static void natPulse(tr_shared* s, bool do_check)
     auto const old_status = tr_sharedTraversalStatus(s);
 
     auto public_peer_port = tr_port{};
+    auto received_private_port = tr_port{};
     s->natpmpStatus = tr_natpmpPulse(s->natpmp, private_peer_port, is_enabled, &public_peer_port, &received_private_port);
 
     if (s->natpmpStatus == TR_PORT_MAPPED)
