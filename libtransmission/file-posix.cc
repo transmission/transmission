@@ -708,7 +708,7 @@ bool tr_sys_file_seek(tr_sys_file_t handle, int64_t offset, tr_seek_origin_t ori
     bool ret = false;
 
     off_t const my_new_offset = lseek(handle, offset, origin);
-    static_assert(sizeof(*new_offset) >= sizeof(my_new_offset), "");
+    static_assert(sizeof(*new_offset) >= sizeof(my_new_offset));
 
     if (my_new_offset != -1)
     {
@@ -735,7 +735,7 @@ bool tr_sys_file_read(tr_sys_file_t handle, void* buffer, uint64_t size, uint64_
     bool ret = false;
 
     ssize_t const my_bytes_read = read(handle, buffer, size);
-    static_assert(sizeof(*bytes_read) >= sizeof(my_bytes_read), "");
+    static_assert(sizeof(*bytes_read) >= sizeof(my_bytes_read));
 
     if (my_bytes_read != -1)
     {
@@ -779,7 +779,7 @@ bool tr_sys_file_read_at(
 
 #endif
 
-    static_assert(sizeof(*bytes_read) >= sizeof(my_bytes_read), "");
+    static_assert(sizeof(*bytes_read) >= sizeof(my_bytes_read));
 
     if (my_bytes_read != -1)
     {
@@ -806,7 +806,7 @@ bool tr_sys_file_write(tr_sys_file_t handle, void const* buffer, uint64_t size, 
     bool ret = false;
 
     ssize_t const my_bytes_written = write(handle, buffer, size);
-    static_assert(sizeof(*bytes_written) >= sizeof(my_bytes_written), "");
+    static_assert(sizeof(*bytes_written) >= sizeof(my_bytes_written));
 
     if (my_bytes_written != -1)
     {
@@ -850,7 +850,7 @@ bool tr_sys_file_write_at(
 
 #endif
 
-    static_assert(sizeof(*bytes_written) >= sizeof(my_bytes_written), "");
+    static_assert(sizeof(*bytes_written) >= sizeof(my_bytes_written));
 
     if (my_bytes_written != -1)
     {
