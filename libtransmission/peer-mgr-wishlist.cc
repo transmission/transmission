@@ -36,7 +36,7 @@ struct Candidate
     {
     }
 
-    int compare(Candidate const& that) const // <=>
+    [[nodiscard]] int compare(Candidate const& that) const // <=>
     {
         // prefer pieces closer to completion
         if (n_blocks_missing != that.n_blocks_missing)

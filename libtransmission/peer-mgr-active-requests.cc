@@ -32,7 +32,7 @@ struct peer_at
     {
     }
 
-    int compare(peer_at const& that) const // <=>
+    [[nodiscard]] int compare(peer_at const& that) const // <=>
     {
         if (peer != that.peer)
         {
