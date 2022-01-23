@@ -421,11 +421,11 @@ Gtk::ComboBox* gtr_combo_box_new_enum(std::vector<std::pair<Glib::ustring, int>>
 {
     auto store = Gtk::ListStore::create(enum_combo_cols);
 
-    for (auto const& item : items)
+    for (auto const& [label, value] : items)
     {
         auto const iter = store->append();
-        (*iter)[enum_combo_cols.value] = item.second;
-        (*iter)[enum_combo_cols.label] = item.first;
+        (*iter)[enum_combo_cols.value] = value;
+        (*iter)[enum_combo_cols.label] = label;
     }
 
     auto w = Gtk::make_managed<Gtk::ComboBox>(static_cast<Glib::RefPtr<Gtk::TreeModel> const&>(store));
