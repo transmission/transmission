@@ -51,6 +51,13 @@ struct tr_blocklistFile;
 struct tr_cache;
 struct tr_fdInfo;
 
+struct tr_bindinfo
+{
+    int socket;
+    tr_address addr;
+    struct event* ev;
+};
+
 struct tr_turtle_info
 {
     /* TR_UP and TR_DOWN speed limits */
@@ -96,12 +103,12 @@ struct tr_turtle_info
 struct tr_session
 {
 public:
-    auto unique_lock() const
+    [[nodiscard]] auto unique_lock() const
     {
         return std::unique_lock(session_mutex_);
     }
 
-    bool isClosing() const
+    [[nodiscard]] bool isClosing() const
     {
         return is_closing_;
     }

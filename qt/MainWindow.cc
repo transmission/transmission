@@ -314,7 +314,7 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
     connect(&filter_model_, &TorrentFilter::rowsRemoved, this, refresh_header_soon);
     connect(ui_.listView, &TorrentView::headerDoubleClicked, filter_bar, &FilterBar::clear);
 
-    static std::array<int, 16> constexpr InitKeys = {
+    static std::array<int, 17> constexpr InitKeys = {
         Prefs::ALT_SPEED_LIMIT_ENABLED, //
         Prefs::COMPACT_VIEW, //
         Prefs::DSPEED, //
@@ -323,6 +323,7 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
         Prefs::MAIN_WINDOW_X, //
         Prefs::RATIO, //
         Prefs::RATIO_ENABLED, //
+        Prefs::READ_CLIPBOARD, //
         Prefs::SHOW_TRAY_ICON, //
         Prefs::SORT_MODE, //
         Prefs::SORT_REVERSED, //
@@ -1208,12 +1209,10 @@ void MainWindow::refreshPref(int key)
         break;
 
     case Prefs::COMPACT_VIEW:
-        {
-            b = prefs_.getBool(key);
-            ui_.action_CompactView->setChecked(b);
-            ui_.listView->setItemDelegate(b ? torrent_delegate_min_ : torrent_delegate_);
-            break;
-        }
+        b = prefs_.getBool(key);
+        ui_.action_CompactView->setChecked(b);
+        ui_.listView->setItemDelegate(b ? torrent_delegate_min_ : torrent_delegate_);
+        break;
 
     case Prefs::MAIN_WINDOW_X:
     case Prefs::MAIN_WINDOW_Y:
@@ -1240,6 +1239,10 @@ void MainWindow::refreshPref(int key)
             ui_.altSpeedButton->setToolTip(fmt.arg(Formatter::get().speedToString(d)).arg(Formatter::get().speedToString(u)));
             break;
         }
+
+    case Prefs::READ_CLIPBOARD:
+        auto_add_clipboard_links = prefs_.getBool(Prefs::READ_CLIPBOARD);
+        break;
 
     default:
         break;
@@ -1593,6 +1596,42 @@ void MainWindow::dropEvent(QDropEvent* event)
             trApp->addTorrent(AddData(key));
         }
     }
+}
+
+bool MainWindow::event(QEvent* e)
+{
+    if (e->type() != QEvent::WindowActivate || !auto_add_clipboard_links)
+    {
+        return QMainWindow::event(e);
+    }
+
+    QString const text = QGuiApplication::clipboard()->text().trimmed();
+    if (text.endsWith(QStringLiteral(".torrent"), Qt::CaseInsensitive) ||
+        text.startsWith(QStringLiteral("magnet:"), Qt::CaseInsensitive))
+    {
+        for (QString const& entry : text.split(QLatin1Char('\n')))
+        {
+            QString key = entry.trimmed();
+
+            if (key.isEmpty())
+            {
+                continue;
+            }
+
+            if (QUrl const url(key); url.isLocalFile())
+            {
+                key = url.toLocalFile();
+            }
+
+            if (!clipboard_processed_keys_.contains(key))
+            {
+                clipboard_processed_keys_.append(key);
+                trApp->addTorrent(AddData(key));
+            }
+        }
+    }
+
+    return QMainWindow::event(e);
 }
 
 /***

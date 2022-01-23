@@ -12,13 +12,14 @@
 #include <cstddef> // size_t
 #include <ctime>
 #include <string_view>
+#include <vector>
 
 #include "transmission.h"
 
 #include "interned-string.h"
 
 struct tr_announcer;
-struct tr_announcer_tiers;
+struct tr_torrent_announcer;
 
 /**
  * ***  Tracker Publish / Subscribe
@@ -46,8 +47,7 @@ struct tr_tracker_event
     tr_interned_string announce_url;
 
     /* for TR_TRACKER_PEERS */
-    struct tr_pex const* pex;
-    size_t pexCount;
+    std::vector<tr_pex> pex;
 
     /* for TR_TRACKER_PEERS and TR_TRACKER_COUNTS */
     int leechers;
@@ -68,7 +68,7 @@ void tr_announcerClose(tr_session*);
 ***  For torrent customers
 **/
 
-struct tr_announcer_tiers* tr_announcerAddTorrent(tr_torrent* torrent, tr_tracker_callback cb, void* cbdata);
+struct tr_torrent_announcer* tr_announcerAddTorrent(tr_torrent* torrent, tr_tracker_callback cb, void* cbdata);
 
 void tr_announcerResetTorrent(struct tr_announcer*, tr_torrent*);
 

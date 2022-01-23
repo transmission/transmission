@@ -508,8 +508,8 @@ static void onTrackerResponse(tr_torrent* tor, tr_tracker_event const* event, vo
     switch (event->messageType)
     {
     case TR_TRACKER_PEERS:
-        tr_logAddTorDbg(tor, "Got %zu peers from tracker", event->pexCount);
-        tr_peerMgrAddPex(tor, TR_PEER_FROM_TRACKER, event->pex, event->pexCount);
+        tr_logAddTorDbg(tor, "Got %zu peers from tracker", size_t(std::size(event->pex)));
+        tr_peerMgrAddPex(tor, TR_PEER_FROM_TRACKER, std::data(event->pex), std::size(event->pex));
         break;
 
     case TR_TRACKER_COUNTS:
@@ -733,7 +733,7 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
         tr_error_clear(&error);
     }
 
-    tor->announcer_tiers = tr_announcerAddTorrent(tor, onTrackerResponse, nullptr);
+    tor->torrent_announcer = tr_announcerAddTorrent(tor, onTrackerResponse, nullptr);
 
     if (is_new_torrent)
     {
@@ -2122,7 +2122,8 @@ static void removeEmptyFoldersAndJunkFiles(char const* folder)
             auto const filename = tr_strvPath(folder, name);
 
             auto info = tr_sys_path_info{};
-            if (tr_sys_path_get_info(filename.c_str(), 0, &info, nullptr) && info.type == TR_SYS_PATH_IS_DIRECTORY)
+            if (tr_sys_path_get_info(filename.c_str(), TR_SYS_PATH_NO_FOLLOW, &info, nullptr) &&
+                info.type == TR_SYS_PATH_IS_DIRECTORY)
             {
                 removeEmptyFoldersAndJunkFiles(filename.c_str());
             }
