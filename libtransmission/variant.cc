@@ -869,7 +869,7 @@ public:
         }
     }
 
-    bool empty() const
+    [[nodiscard]] bool empty() const
     {
         return size == 0;
     }

@@ -500,7 +500,7 @@ extern "C"
 /* User-level routine. returns whether or not 'text' and 'p' matched */
 bool tr_wildmat(char const* text, char const* p)
 {
-    return (p[0] == '*' && p[1] == '\0') || (DoMatch(text, p) == true);
+    return (p[0] == '*' && p[1] == '\0') || (DoMatch(text, p) != 0);
 }
 
 char const* tr_strcasestr(char const* haystack, char const* needle)
