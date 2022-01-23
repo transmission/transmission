@@ -1045,20 +1045,15 @@ void Application::Impl::on_prefs_changed(tr_quark const key)
         break;
 
     case TR_KEY_show_notification_area_icon:
+        if (bool const show = gtr_pref_flag_get(key); show && icon_ == nullptr)
         {
-            bool const show = gtr_pref_flag_get(key);
-
-            if (show && icon_ == nullptr)
-            {
-                icon_ = std::make_unique<SystemTrayIcon>(*wind_, core_);
-            }
-            else if (!show && icon_ != nullptr)
-            {
-                icon_.reset();
-            }
-
-            break;
+            icon_ = std::make_unique<SystemTrayIcon>(*wind_, core_);
         }
+        else if (!show && icon_ != nullptr)
+        {
+            icon_.reset();
+        }
+        break;
 
     case TR_KEY_speed_limit_down_enabled:
         tr_sessionLimitSpeed(tr, TR_DOWN, gtr_pref_flag_get(key));
