@@ -129,7 +129,7 @@ static void set_evtimer_from_status(tr_shared* s)
         /* if we're mapped, everything is fine... check back at renew_time
          * to renew the port forwarding if it's expired */
         s->doPortCheck = true;
-        sec = int(s->natpmp->renew_time - tr_time());
+        sec = std::max(0, int(s->natpmp->renew_time - tr_time()));
         break;
 
     case TR_PORT_ERROR:
