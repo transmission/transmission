@@ -2513,7 +2513,7 @@ static void closeBadPeers(tr_swarm* s, time_t const now_sec)
 
 struct ComparePeerByActivity
 {
-    int compare(tr_peer const* a, tr_peer const* b) const // <=>
+    static int compare(tr_peer const* a, tr_peer const* b) // <=>
     {
         if (a->doPurge != b->doPurge)
         {

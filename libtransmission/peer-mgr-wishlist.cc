@@ -129,7 +129,7 @@ std::vector<tr_block_span_t> makeSpans(tr_block_index_t const* sorted_blocks, si
 
 } // namespace
 
-std::vector<tr_block_span_t> Wishlist::next(Wishlist::PeerInfo const& peer_info, size_t n_wanted_blocks) const
+std::vector<tr_block_span_t> Wishlist::next(Wishlist::PeerInfo const& peer_info, size_t n_wanted_blocks)
 {
     size_t n_blocks = 0;
     auto spans = std::vector<tr_block_span_t>{};

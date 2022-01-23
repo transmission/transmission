@@ -96,7 +96,7 @@ namespace
 
 struct StopsCompare
 {
-    int compare(tr_announce_request const* a, tr_announce_request const* b) const // <=>
+    static int compare(tr_announce_request const* a, tr_announce_request const* b) // <=>
     {
         // primary key: volume of data transferred
         auto const ax = a->up + a->down;

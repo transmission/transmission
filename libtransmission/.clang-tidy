@@ -18,7 +18,6 @@ Checks: >
   -modernize-use-bool-literals,
   -modernize-use-nodiscard,
   -readability-braces-around-statements,
-  -readability-convert-member-functions-to-static,
   -readability-function-cognitive-complexity,
   -readability-implicit-bool-conversion,
   -readability-inconsistent-declaration-parameter-name,
@@ -112,6 +111,7 @@ Checks: >
   readability-avoid-const-params-in-decls,
   readability-const-return-type,
   readability-container-size-empty,
+  readability-convert-member-functions-to-static,
   readability-delete-null-pointer,
   readability-else-after-return,
   readability-function-size,
@@ -131,4 +131,4 @@ Checks: >
   readability-simplify-subscript-expr,
   readability-string-compare,
   readability-suspicious-call-argument,
-  readability-uniqueptr-delete-release
+  readability-uniqueptr-delete-release,
