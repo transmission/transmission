@@ -1573,7 +1573,7 @@ void tr_peerUpdateProgress(tr_torrent* tor, tr_peer* peer)
 
     peer->progress = std::clamp(peer->progress, 0.0F, 1.0F);
 
-    if (peer->atom != nullptr && peer->progress >= 1.0f)
+    if (peer->atom != nullptr && peer->progress >= 1.0F)
     {
         atomSetSeed(tor->swarm, peer->atom);
     }

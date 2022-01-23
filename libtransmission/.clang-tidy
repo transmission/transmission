@@ -29,7 +29,6 @@ Checks: >
   -readability-simplify-boolean-expr,
   -readability-static-accessed-through-instance,
   -readability-static-definition-in-anonymous-namespace,
-  -readability-uppercase-literal-suffix,
   bugprone-argument-comment,
   bugprone-assert-side-effect,
   bugprone-bad-signal-to-kill-thread,
@@ -133,3 +132,4 @@ Checks: >
   readability-string-compare,
   readability-suspicious-call-argument,
   readability-uniqueptr-delete-release,
+  readability-uppercase-literal-suffix,
