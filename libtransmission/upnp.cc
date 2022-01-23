@@ -37,13 +37,21 @@ enum tr_upnp_state
 
 struct tr_upnp
 {
-    bool hasDiscovered;
-    struct UPNPUrls urls;
-    struct IGDdatas data;
-    int port;
-    char lanaddr[16];
-    bool isMapped;
-    tr_upnp_state state;
+    ~tr_upnp()
+    {
+        TR_ASSERT(!isMapped);
+        TR_ASSERT(state == TR_UPNP_IDLE || state == TR_UPNP_ERR || state == TR_UPNP_DISCOVER);
+
+        FreeUPNPUrls(&urls);
+    }
+
+    bool hasDiscovered = false;
+    struct UPNPUrls urls = {};
+    struct IGDdatas data = {};
+    int port = -1;
+    char lanaddr[16] = {};
+    bool isMapped = false;
+    tr_upnp_state state = TR_UPNP_DISCOVER;
 };
 
 /**
@@ -52,24 +60,12 @@ struct tr_upnp
 
 tr_upnp* tr_upnpInit(void)
 {
-    auto* const ret = tr_new0(tr_upnp, 1);
-
-    ret->state = TR_UPNP_DISCOVER;
-    ret->port = -1;
-    return ret;
+    return new tr_upnp();
 }
 
 void tr_upnpClose(tr_upnp* handle)
 {
-    TR_ASSERT(!handle->isMapped);
-    TR_ASSERT(handle->state == TR_UPNP_IDLE || handle->state == TR_UPNP_ERR || handle->state == TR_UPNP_DISCOVER);
-
-    if (handle->hasDiscovered)
-    {
-        FreeUPNPUrls(&handle->urls);
-    }
-
-    tr_free(handle);
+    delete handle;
 }
 
 /**
@@ -225,6 +221,7 @@ tr_port_forwarding tr_upnpPulse(tr_upnp* handle, tr_port port, bool isEnabled, b
         auto* const devlist = tr_upnpDiscover(2000, bindaddr);
         errno = 0;
 
+        FreeUPNPUrls(&handle->urls);
         if (UPNP_GetValidIGD(devlist, &handle->urls, &handle->data, handle->lanaddr, sizeof(handle->lanaddr)) ==
             UPNP_IGD_VALID_CONNECTED)
         {
