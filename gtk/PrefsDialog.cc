@@ -1,14 +1,11 @@
-/*
- * This file Copyright (C) 2007-2021 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2007-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
-#include <ctype.h> /* isspace */
-#include <limits.h> /* USHRT_MAX, INT_MAX */
+#include <climits> /* USHRT_MAX, INT_MAX */
 #include <sstream>
+#include <string>
 #include <unistd.h>
 
 #include <glibmm.h>
@@ -17,6 +14,7 @@
 #include <libtransmission/transmission.h>
 #include <libtransmission/utils.h>
 #include <libtransmission/version.h>
+#include <libtransmission/web-utils.h>
 
 #include "FreeSpaceLabel.h"
 #include "HigWorkarea.h"
@@ -34,6 +32,8 @@ class PrefsDialog::Impl
 public:
     Impl(PrefsDialog& dialog, Glib::RefPtr<Session> const& core);
     ~Impl();
+
+    TR_DISABLE_COPY_MOVE(Impl)
 
 private:
     Gtk::Widget* speedPage();
@@ -91,12 +91,12 @@ Gtk::CheckButton* new_check_button(Glib::ustring const& mnemonic, tr_quark const
     return w;
 }
 
-#define IDLE_DATA "idle-data"
+auto const IdleDataKey = Glib::Quark("idle-data");
 
 bool spun_cb_idle(Gtk::SpinButton* spin, tr_quark const key, Glib::RefPtr<Session> const& core, bool isDouble)
 {
     bool keep_waiting = true;
-    auto* last_change = static_cast<Glib::Timer*>(spin->get_data(IDLE_DATA));
+    auto* last_change = static_cast<Glib::Timer*>(spin->get_data(IdleDataKey));
 
     /* has the user stopped making changes? */
     if (last_change->elapsed() > 0.33)
@@ -114,7 +114,7 @@ bool spun_cb_idle(Gtk::SpinButton* spin, tr_quark const key, Glib::RefPtr<Sessio
         }
 
         /* cleanup */
-        spin->set_data(IDLE_DATA, nullptr);
+        spin->set_data(IdleDataKey, nullptr);
         keep_waiting = false;
         spin->unreference();
     }
@@ -126,12 +126,12 @@ void spun_cb(Gtk::SpinButton* w, tr_quark const key, Glib::RefPtr<Session> const
 {
     /* user may be spinning through many values, so let's hold off
        for a moment to keep from flooding the core with changes */
-    auto* last_change = static_cast<Glib::Timer*>(w->get_data(IDLE_DATA));
+    auto* last_change = static_cast<Glib::Timer*>(w->get_data(IdleDataKey));
 
     if (last_change == nullptr)
     {
         last_change = new Glib::Timer();
-        w->set_data(IDLE_DATA, last_change, [](void* p) { delete static_cast<Glib::Timer*>(p); });
+        w->set_data(IdleDataKey, last_change, [](gpointer p) { delete static_cast<Glib::Timer*>(p); });
         w->reference();
         Glib::signal_timeout().connect_seconds([w, key, core, isDouble]() { return spun_cb_idle(w, key, core, isDouble); }, 1);
     }
@@ -362,7 +362,10 @@ namespace
 
 struct blocklist_data
 {
+    blocklist_data() = default;
     ~blocklist_data();
+
+    TR_DISABLE_COPY_MOVE(blocklist_data)
 
     sigc::connection updateBlocklistTag;
     Gtk::Button* updateBlocklistButton = nullptr;
@@ -429,8 +432,7 @@ void onBlocklistUpdate(Gtk::Button* w, std::shared_ptr<blocklist_data> const& da
 void on_blocklist_url_changed(Gtk::Editable* e, Gtk::Button* button)
 {
     auto const url = e->get_chars(0, -1);
-    bool const is_url_valid = tr_urlParse(url.c_str(), TR_BAD_SIZE, nullptr, nullptr, nullptr, nullptr);
-    button->set_sensitive(is_url_valid);
+    button->set_sensitive(tr_urlIsValid(url.c_str()));
 }
 
 void onIntComboChanged(Gtk::ComboBox* combo_box, tr_quark const key, Glib::RefPtr<Session> const& core)
@@ -918,7 +920,10 @@ namespace
 
 struct network_page_data
 {
+    network_page_data() = default;
     ~network_page_data();
+
+    TR_DISABLE_COPY_MOVE(network_page_data)
 
     Glib::RefPtr<Session> core;
     Gtk::Label* portLabel = nullptr;
@@ -1084,6 +1089,7 @@ PrefsDialog::PrefsDialog(Gtk::Window& parent, Glib::RefPtr<Session> const& core)
     : Gtk::Dialog(_("Transmission Preferences"), parent)
     , impl_(std::make_unique<Impl>(*this, core))
 {
+    set_modal(true);
 }
 
 PrefsDialog::~PrefsDialog() = default;
@@ -1094,7 +1100,7 @@ PrefsDialog::Impl::Impl(PrefsDialog& dialog, Glib::RefPtr<Session> const& core)
 {
     static tr_quark const prefs_quarks[] = { TR_KEY_peer_port, TR_KEY_download_dir };
 
-    core_prefs_tag_ = core_->signal_prefs_changed().connect(sigc::mem_fun(this, &Impl::on_core_prefs_changed));
+    core_prefs_tag_ = core_->signal_prefs_changed().connect(sigc::mem_fun(*this, &Impl::on_core_prefs_changed));
 
     dialog_.add_button(_("_Help"), Gtk::RESPONSE_HELP);
     dialog_.add_button(_("_Close"), Gtk::RESPONSE_CLOSE);
@@ -1118,6 +1124,6 @@ PrefsDialog::Impl::Impl(PrefsDialog& dialog, Glib::RefPtr<Session> const& core)
         on_core_prefs_changed(key);
     }
 
-    dialog_.signal_response().connect(sigc::mem_fun(this, &Impl::response_cb));
+    dialog_.signal_response().connect(sigc::mem_fun(*this, &Impl::response_cb));
     gtr_dialog_set_content(dialog_, *n);
 }

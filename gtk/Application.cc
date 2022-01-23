@@ -1,39 +1,23 @@
-/******************************************************************************
- * Copyright (c) Transmission authors and contributors
- *
- * Permission is hereby granted, free of charge, to any person obtaining a
- * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
- * DEALINGS IN THE SOFTWARE.
- *****************************************************************************/
+// This file Copyright © 2005-2021 Transmission authors and contributors.
+// It may be used under the MIT (SPDX: MIT) license.
+// License text can be found in the licenses/ folder.
 
 #include <algorithm>
-#include <locale.h>
+#include <cstdlib> // exit()
+#include <ctime>
 #include <map>
-#include <signal.h>
 #include <sstream>
-#include <stdio.h>
-#include <stdlib.h> /* exit() */
-#include <string.h>
-#include <time.h>
-#include <vector>
+#include <string>
 #include <string_view>
+#include <thread>
+#include <vector>
+
+#include <locale.h>
+#include <signal.h>
 
 #include <giomm.h>
 #include <glib/gmessages.h>
+#include <glibmm/i18n.h>
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/rpcimpl.h>
@@ -57,8 +41,6 @@
 #include "SystemTrayIcon.h"
 #include "Utils.h"
 
-#define MY_CONFIG_NAME "transmission"
-
 using namespace std::literals;
 
 #define SHOW_LICENSE
@@ -66,11 +48,12 @@ using namespace std::literals;
 namespace
 {
 
-char const* LICENSE =
+auto const AppIconName = Glib::ustring("transmission"s);
+
+char const* const LICENSE =
     "Copyright 2005-2020. All code is copyrighted by the respective authors.\n"
     "\n"
     "Transmission can be redistributed and/or modified under the terms of the "
-    "GNU GPL versions 2 or 3 or by any future license endorsed by Mnemosyne LLC.\n"
     "\n"
     "In addition, linking to and/or using OpenSSL is allowed.\n"
     "\n"
@@ -81,12 +64,14 @@ char const* LICENSE =
     "Some of Transmission's source files have more permissive licenses. "
     "Those files may, of course, be used on their own under their own terms.\n";
 
-}
+} // namespace
 
 class Application::Impl
 {
 public:
     Impl(Application& app, std::string const& config_dir, bool start_paused, bool is_iconified);
+
+    TR_DISABLE_COPY_MOVE(Impl)
 
     void open_files(std::vector<Glib::RefPtr<Gio::File>> const& files);
 
@@ -149,8 +134,6 @@ private:
     void on_add_torrent(tr_ctor* ctor);
     void on_prefs_changed(tr_quark key);
 
-    void on_message_window_closed();
-
     std::vector<int> get_selected_torrent_ids() const;
     tr_torrent* get_first_selected_torrent() const;
     counts_data get_selected_torrent_counts() const;
@@ -161,7 +144,11 @@ private:
     bool call_rpc_for_selected_torrents(std::string const& method);
     void remove_selected(bool delete_files);
 
-    static tr_rpc_callback_status on_rpc_changed(tr_session* session, tr_rpc_callback_type type, tr_torrent* tor, void* gdata);
+    static tr_rpc_callback_status on_rpc_changed(
+        tr_session* session,
+        tr_rpc_callback_type type,
+        tr_torrent* tor,
+        gpointer gdata);
 
 private:
     Application& app_;
@@ -171,7 +158,7 @@ private:
     bool is_iconified_ = false;
     bool is_closing_ = false;
 
-    Glib::RefPtr<Gtk::UIManager> ui_manager_;
+    Glib::RefPtr<Gtk::Builder> ui_builder_;
 
     unsigned int activation_count_ = 0;
     sigc::connection timer_;
@@ -240,7 +227,7 @@ void Application::Impl::show_details_dialog_for_selected_torrents()
         auto dialog = DetailsDialog::create(*wind_, core_);
         dialog->set_torrents(ids);
         dialog->signal_hide().connect([this, key]() { details_.erase(key); });
-        dialog_it = details_.emplace(key, std::move(dialog)).first;
+        dialog_it = details_.try_emplace(key, std::move(dialog)).first;
         dialog_it->second->show();
     }
 
@@ -328,7 +315,7 @@ void Application::Impl::refresh_actions_soon()
 {
     if (!is_closing_ && !refresh_actions_tag_.connected())
     {
-        refresh_actions_tag_ = Glib::signal_idle().connect(sigc::mem_fun(this, &Impl::refresh_actions));
+        refresh_actions_tag_ = Glib::signal_idle().connect(sigc::mem_fun(*this, &Impl::refresh_actions));
     }
 }
 
@@ -444,11 +431,9 @@ bool Application::Impl::on_rpc_changed_idle(tr_rpc_callback_type type, int torre
                 }
                 else
                 {
-                    char* a = tr_variantToStr(oldval, TR_VARIANT_FMT_BENC, nullptr);
-                    char* b = tr_variantToStr(newval, TR_VARIANT_FMT_BENC, nullptr);
-                    changed = g_strcmp0(a, b) != 0;
-                    tr_free(b);
-                    tr_free(a);
+                    auto const a = tr_variantToStr(oldval, TR_VARIANT_FMT_BENC);
+                    auto const b = tr_variantToStr(newval, TR_VARIANT_FMT_BENC);
+                    changed = a != b;
                 }
 
                 if (changed)
@@ -475,6 +460,9 @@ bool Application::Impl::on_rpc_changed_idle(tr_rpc_callback_type type, int torre
     case TR_RPC_SESSION_QUEUE_POSITIONS_CHANGED:
         /* nothing interesting to do here */
         break;
+
+    default:
+        g_assert_not_reached();
     }
 
     return false;
@@ -484,7 +472,7 @@ tr_rpc_callback_status Application::Impl::on_rpc_changed(
     tr_session* /*session*/,
     tr_rpc_callback_type type,
     tr_torrent* tor,
-    void* gdata)
+    gpointer gdata)
 {
     auto* impl = static_cast<Impl*>(gdata);
     auto const torrent_id = tr_torrentId(tor);
@@ -502,7 +490,7 @@ namespace
 {
 
 sig_atomic_t global_sigcount = 0;
-void* sighandler_cbdata = nullptr;
+gpointer sighandler_cbdata = nullptr;
 
 void signal_handler(int sig)
 {
@@ -534,6 +522,9 @@ void Application::on_startup()
 
 void Application::Impl::on_startup()
 {
+    Gtk::IconTheme::get_default()->add_resource_path(gtr_get_full_resource_path("icons"s));
+    Gtk::Window::set_default_icon_name(AppIconName);
+
     tr_session* session;
 
     ::signal(SIGINT, signal_handler);
@@ -560,14 +551,14 @@ void Application::Impl::on_startup()
     core_ = Session::create(session);
 
     /* init the ui manager */
-    ui_manager_ = Gtk::UIManager::create();
-    gtr_actions_init(ui_manager_, this);
-    ui_manager_->add_ui_from_resource(TR_RESOURCE_PATH "transmission-ui.xml");
-    ui_manager_->ensure_update();
+    ui_builder_ = Gtk::Builder::create_from_resource(gtr_get_full_resource_path("transmission-ui.xml"s));
+    auto const actions = gtr_actions_init(ui_builder_, this);
+
+    app_.set_menubar(gtr_action_get_object<Gio::Menu>("main-window-menu"));
 
     /* create main window now to be a parent to any error dialogs */
-    wind_ = MainWindow::create(app_, ui_manager_, core_);
-    wind_->signal_size_allocate().connect(sigc::mem_fun(this, &Impl::on_main_window_size_allocated));
+    wind_ = MainWindow::create(app_, actions, core_);
+    wind_->signal_size_allocate().connect(sigc::mem_fun(*this, &Impl::on_main_window_size_allocated));
     app_.hold();
     app_setup();
     tr_sessionSetRPCCallback(session, &Impl::on_rpc_changed, this);
@@ -674,10 +665,10 @@ void Application::Impl::app_setup()
     gtr_actions_set_core(core_);
 
     /* set up core handlers */
-    core_->signal_busy().connect(sigc::mem_fun(this, &Impl::on_core_busy));
-    core_->signal_add_error().connect(sigc::mem_fun(this, &Impl::on_core_error));
-    core_->signal_add_prompt().connect(sigc::mem_fun(this, &Impl::on_add_torrent));
-    core_->signal_prefs_changed().connect(sigc::mem_fun(this, &Impl::on_prefs_changed));
+    core_->signal_busy().connect(sigc::mem_fun(*this, &Impl::on_core_busy));
+    core_->signal_add_error().connect(sigc::mem_fun(*this, &Impl::on_core_error));
+    core_->signal_add_prompt().connect(sigc::mem_fun(*this, &Impl::on_add_torrent));
+    core_->signal_prefs_changed().connect(sigc::mem_fun(*this, &Impl::on_prefs_changed));
 
     /* add torrents from command-line and saved state */
     core_->load(start_paused_);
@@ -691,7 +682,7 @@ void Application::Impl::app_setup()
 
     /* start model update timer */
     timer_ = Glib::signal_timeout().connect_seconds(
-        sigc::mem_fun(this, &Impl::update_model_loop),
+        sigc::mem_fun(*this, &Impl::update_model_loop),
         MAIN_WINDOW_REFRESH_INTERVAL_SECONDS);
     update_model_once();
 
@@ -699,6 +690,7 @@ void Application::Impl::app_setup()
     if (!is_iconified_)
     {
         wind_->show();
+        gtr_action_set_toggled("toggle-main-window", true);
     }
     else
     {
@@ -742,6 +734,8 @@ void Application::Impl::placeWindowFromPrefs()
 
 void Application::Impl::presentMainWindow()
 {
+    gtr_action_set_toggled("toggle-main-window", true);
+
     if (is_iconified_)
     {
         is_iconified_ = false;
@@ -761,6 +755,8 @@ void Application::Impl::presentMainWindow()
 
 void Application::Impl::hideMainWindow()
 {
+    gtr_action_set_toggled("toggle-main-window", false);
+
     wind_->set_skip_taskbar_hint(true);
     gtr_widget_set_visible(*wind_, false);
     is_iconified_ = true;
@@ -808,13 +804,23 @@ void Application::Impl::on_drag_data_received(
     guint /*info*/,
     guint time_)
 {
-    auto const uris = selection_data.get_uris();
+    if (auto const uris = selection_data.get_uris(); !uris.empty())
+    {
+        auto files = std::vector<Glib::RefPtr<Gio::File>>();
+        files.reserve(uris.size());
+        std::transform(uris.begin(), uris.end(), std::back_inserter(files), &Gio::File::create_for_uri);
 
-    auto files = std::vector<Glib::RefPtr<Gio::File>>();
-    files.reserve(uris.size());
-    std::transform(uris.begin(), uris.end(), std::back_inserter(files), &Gio::File::create_for_uri);
+        open_files(files);
+    }
+    else
+    {
+        auto const text = gtr_str_strip(selection_data.get_text());
 
-    open_files(files);
+        if (!text.empty())
+        {
+            core_->add_from_url(text);
+        }
+    }
 
     drag_context->drag_finish(true, false, time_);
 }
@@ -825,17 +831,18 @@ void Application::Impl::main_window_setup()
     // cbdata->wind = wind;
     sel_ = wind_->get_selection();
 
-    sel_->signal_changed().connect(sigc::mem_fun(this, &Impl::refresh_actions_soon));
+    sel_->signal_changed().connect(sigc::mem_fun(*this, &Impl::refresh_actions_soon));
     refresh_actions_soon();
     auto const model = core_->get_model();
-    model->signal_row_changed().connect(sigc::mem_fun(this, &Impl::rowChangedCB));
-    wind_->signal_delete_event().connect(sigc::mem_fun(this, &Impl::winclose));
+    model->signal_row_changed().connect(sigc::mem_fun(*this, &Impl::rowChangedCB));
+    wind_->signal_delete_event().connect(sigc::mem_fun(*this, &Impl::winclose));
     refresh_actions();
 
     /* register to handle URIs that get dragged onto our main window */
     wind_->drag_dest_set(Gtk::DEST_DEFAULT_ALL, Gdk::ACTION_COPY);
     wind_->drag_dest_add_uri_targets();
-    wind_->signal_drag_data_received().connect(sigc::mem_fun(this, &Impl::on_drag_data_received));
+    wind_->drag_dest_add_text_targets(); /* links dragged from browsers are text */
+    wind_->signal_drag_data_received().connect(sigc::mem_fun(*this, &Impl::on_drag_data_received));
 }
 
 bool Application::Impl::on_session_closed()
@@ -916,12 +923,13 @@ void Application::Impl::on_app_exit()
     /* since tr_sessionClose () is a blocking function,
      * delegate its call to another thread here... when it's done,
      * punt the GUI teardown back to the GTK+ thread */
-    Glib::Thread::create(
+    std::thread(
         [this, session = core_->close()]()
         {
             tr_sessionClose(session);
-            Glib::signal_idle().connect(sigc::mem_fun(this, &Impl::on_session_closed));
-        });
+            Glib::signal_idle().connect(sigc::mem_fun(*this, &Impl::on_session_closed));
+        })
+        .detach();
 }
 
 void Application::Impl::show_torrent_errors(Glib::ustring const& primary, std::vector<std::string>& files)
@@ -996,7 +1004,7 @@ void Application::Impl::on_add_torrent(tr_ctor* ctor)
         OptionsDialog::create(*wind_, core_, std::unique_ptr<tr_ctor, decltype(&tr_ctorFree)>(ctor, &tr_ctorFree)));
 
     w->signal_hide().connect([w]() mutable { w.reset(); });
-    w->signal_focus_in_event().connect(sigc::mem_fun(this, &Impl::on_main_window_focus_in));
+    w->signal_focus_in_event().connect(sigc::mem_fun(*this, &Impl::on_main_window_focus_in));
 
     if (wind_ != nullptr)
     {
@@ -1042,7 +1050,7 @@ void Application::Impl::on_prefs_changed(tr_quark const key)
 
             if (show && icon_ == nullptr)
             {
-                icon_ = std::make_unique<SystemTrayIcon>(core_);
+                icon_ = std::make_unique<SystemTrayIcon>(*wind_, core_);
             }
             else if (!show && icon_ != nullptr)
             {
@@ -1237,7 +1245,7 @@ void Application::Impl::update_model_soon()
 {
     if (!update_model_soon_tag_.connected())
     {
-        update_model_soon_tag_ = Glib::signal_idle().connect(sigc::mem_fun(this, &Impl::update_model_once));
+        update_model_soon_tag_ = Glib::signal_idle().connect(sigc::mem_fun(*this, &Impl::update_model_once));
     }
 }
 
@@ -1265,8 +1273,8 @@ void Application::Impl::show_about_dialog()
     Gtk::AboutDialog d;
     d.set_authors(authors);
     d.set_comments(_("A fast and easy BitTorrent client"));
-    d.set_copyright(_("Copyright (c) The Transmission Project"));
-    d.set_logo_icon_name(MY_CONFIG_NAME);
+    d.set_copyright(_("Copyright © The Transmission Project"));
+    d.set_logo_icon_name(AppIconName);
     d.set_name(Glib::get_application_name());
     /* Translators: translate "translator-credits" as your name
        to have it appear in the credits in the "About"
@@ -1292,7 +1300,7 @@ bool Application::Impl::call_rpc_for_selected_torrents(std::string const& method
     auto* session = core_->get_session();
 
     tr_variantInitDict(&top, 2);
-    tr_variantDictAddStr(&top, TR_KEY_method, method);
+    tr_variantDictAddStrView(&top, TR_KEY_method, method);
     args = tr_variantDictAddDict(&top, TR_KEY_arguments, 1);
     ids = tr_variantDictAddList(args, TR_KEY_ids, 0);
     sel_->selected_foreach(
@@ -1310,11 +1318,6 @@ bool Application::Impl::call_rpc_for_selected_torrents(std::string const& method
 
     tr_variantFree(&top);
     return invoked;
-}
-
-void Application::Impl::on_message_window_closed()
-{
-    gtr_action_set_toggled("toggle-message-log", false);
 }
 
 void Application::Impl::remove_selected(bool delete_files)
@@ -1336,7 +1339,7 @@ void Application::Impl::start_all_torrents()
     tr_variant request;
 
     tr_variantInitDict(&request, 1);
-    tr_variantDictAddStr(&request, TR_KEY_method, "torrent-start"sv);
+    tr_variantDictAddStrView(&request, TR_KEY_method, "torrent-start"sv);
     tr_rpc_request_exec_json(session, &request, nullptr, nullptr);
     tr_variantFree(&request);
 }
@@ -1347,7 +1350,7 @@ void Application::Impl::pause_all_torrents()
     tr_variant request;
 
     tr_variantInitDict(&request, 1);
-    tr_variantDictAddStr(&request, TR_KEY_method, "torrent-stop"sv);
+    tr_variantDictAddStrView(&request, TR_KEY_method, "torrent-stop"sv);
     tr_rpc_request_exec_json(session, &request, nullptr, nullptr);
     tr_variantFree(&request);
 }
@@ -1390,7 +1393,7 @@ void Application::Impl::copy_magnet_link_to_clipboard(tr_torrent* tor) const
     tr_free(magnet);
 }
 
-void gtr_actions_handler(Glib::ustring const& action_name, void* user_data)
+void gtr_actions_handler(Glib::ustring const& action_name, gpointer user_data)
 {
     static_cast<Application::Impl*>(user_data)->actions_handler(action_name);
 }
@@ -1405,7 +1408,7 @@ void Application::Impl::actions_handler(Glib::ustring const& action_name)
         w->signal_hide().connect([w]() mutable { w.reset(); });
         w->show();
     }
-    else if (action_name == "open-torrent-menu" || action_name == "open-torrent-toolbar")
+    else if (action_name == "open-torrent")
     {
         auto w = std::shared_ptr<TorrentFileChooserDialog>(TorrentFileChooserDialog::create(*wind_, core_));
         w->signal_hide().connect([w]() mutable { w.reset(); });
@@ -1506,12 +1509,12 @@ void Application::Impl::actions_handler(Glib::ustring const& action_name)
         if (msgwin_ == nullptr)
         {
             msgwin_ = MessageLogWindow::create(*wind_, core_);
-            msgwin_->signal_hide().connect(sigc::mem_fun(this, &Impl::on_message_window_closed));
+            msgwin_->signal_hide().connect([this]() { msgwin_.reset(); });
+            msgwin_->show();
         }
         else
         {
-            gtr_action_set_toggled("toggle-message-log", false);
-            msgwin_.reset();
+            msgwin_->hide();
         }
     }
     else if (action_name == "show-about-dialog")

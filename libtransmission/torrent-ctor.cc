@@ -1,23 +1,24 @@
-/*
- * This file Copyright (C) 2009-2014 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2009-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
-#include <cerrno> /* EINVAL */
+#include <cerrno> // EINVAL
 #include <optional>
 #include <string>
+#include <string_view>
 #include <vector>
 
 #include "transmission.h"
-#include "file.h"
-#include "magnet.h"
+
+#include "error.h"
+#include "error-types.h"
+#include "magnet-metainfo.h"
 #include "session.h"
-#include "torrent.h" /* tr_ctorGetSave() */
+#include "torrent-metainfo.h"
+#include "torrent.h"
 #include "tr-assert.h"
-#include "utils.h" /* tr_new0 */
+#include "utils.h"
 #include "variant.h"
 
 using namespace std::literals;
@@ -34,23 +35,24 @@ struct optional_args
 struct tr_ctor
 {
     tr_session const* const session;
-    bool saveInOurTorrentsDir = false;
     std::optional<bool> delete_source;
 
+    tr_torrent_metainfo metainfo = {};
+
     tr_priority_t priority = TR_PRI_NORMAL;
-    bool isSet_metainfo = false;
-    tr_variant metainfo = {};
-    std::string source_file;
 
     struct optional_args optional_args[2];
 
     std::string incomplete_dir;
+    std::string torrent_filename;
 
-    std::vector<tr_file_index_t> want;
-    std::vector<tr_file_index_t> not_want;
+    std::vector<tr_file_index_t> wanted;
+    std::vector<tr_file_index_t> unwanted;
     std::vector<tr_file_index_t> low;
     std::vector<tr_file_index_t> normal;
     std::vector<tr_file_index_t> high;
+
+    std::vector<char> contents;
 
     explicit tr_ctor(tr_session const* session_in)
         : session{ session_in }
@@ -62,104 +64,65 @@ struct tr_ctor
 ****
 ***/
 
-static void setSourceFile(tr_ctor* ctor, char const* source_file)
+bool tr_ctorSetMetainfoFromFile(tr_ctor* ctor, std::string const& filename, tr_error** error)
 {
-    ctor->source_file.assign(source_file ? source_file : "");
-}
-
-static void clearMetainfo(tr_ctor* ctor)
-{
-    if (ctor->isSet_metainfo)
+    if (std::empty(filename))
     {
-        ctor->isSet_metainfo = false;
-        tr_variantFree(&ctor->metainfo);
+        tr_error_set(error, EINVAL, "no filename specified"sv);
+        return false;
     }
 
-    setSourceFile(ctor, nullptr);
+    if (!tr_loadFile(ctor->contents, filename, error))
+    {
+        return false;
+    }
+
+    ctor->torrent_filename = filename;
+    auto const contents_sv = std::string_view{ std::data(ctor->contents), std::size(ctor->contents) };
+    return ctor->metainfo.parseBenc(contents_sv, error);
 }
 
-int tr_ctorSetMetainfo(tr_ctor* ctor, void const* metainfo, size_t len)
+bool tr_ctorSetMetainfoFromFile(tr_ctor* ctor, char const* filename, tr_error** error)
 {
-    clearMetainfo(ctor);
-    auto const err = tr_variantFromBenc(&ctor->metainfo, metainfo, len);
-    ctor->isSet_metainfo = err == 0;
-    return err;
+    return tr_ctorSetMetainfoFromFile(ctor, std::string{ filename ? filename : "" }, error);
+}
+
+bool tr_ctorSetMetainfo(tr_ctor* ctor, char const* metainfo, size_t len, tr_error** error)
+{
+    ctor->torrent_filename.clear();
+    ctor->contents.assign(metainfo, metainfo + len);
+    auto const contents_sv = std::string_view{ std::data(ctor->contents), std::size(ctor->contents) };
+    return ctor->metainfo.parseBenc(contents_sv, error);
+}
+
+bool tr_ctorSetMetainfoFromMagnetLink(tr_ctor* ctor, char const* magnet_link, tr_error** error)
+{
+    ctor->torrent_filename.clear();
+    return ctor->metainfo.parseMagnet(magnet_link ? magnet_link : "", error);
+}
+
+std::string_view tr_ctorGetContents(tr_ctor const* ctor)
+{
+    return std::string_view{ std::data(ctor->contents), std::size(ctor->contents) };
 }
 
 char const* tr_ctorGetSourceFile(tr_ctor const* ctor)
 {
-    return ctor->source_file.c_str();
+    return ctor->torrent_filename.c_str();
 }
 
-int tr_ctorSetMetainfoFromMagnetLink(tr_ctor* ctor, char const* magnet_link)
+bool tr_ctorSaveContents(tr_ctor const* ctor, std::string const& filename, tr_error** error)
 {
-    tr_magnet_info* magnet_info = tr_magnetParse(magnet_link);
-    if (magnet_info == nullptr)
+    TR_ASSERT(ctor != nullptr);
+    TR_ASSERT(!std::empty(filename));
+
+    if (std::empty(ctor->contents))
     {
-        return -1;
+        tr_error_set(error, EINVAL, "torrent ctor has no contents to save"sv);
+        return false;
     }
 
-    auto tmp = tr_variant{};
-    auto len = size_t{};
-    tr_magnetCreateMetainfo(magnet_info, &tmp);
-    char* const str = tr_variantToStr(&tmp, TR_VARIANT_FMT_BENC, &len);
-    auto const err = tr_ctorSetMetainfo(ctor, (uint8_t const*)str, len);
-
-    tr_free(str);
-    tr_variantFree(&tmp);
-    tr_magnetFree(magnet_info);
-
-    return err;
-}
-
-int tr_ctorSetMetainfoFromFile(tr_ctor* ctor, char const* filename)
-{
-    auto len = size_t{};
-    auto* const metainfo = tr_loadFile(filename, &len, nullptr);
-
-    auto err = int{};
-    if (metainfo != nullptr && len != 0)
-    {
-        err = tr_ctorSetMetainfo(ctor, metainfo, len);
-    }
-    else
-    {
-        clearMetainfo(ctor);
-        err = 1;
-    }
-
-    setSourceFile(ctor, filename);
-
-    /* if no `name' field was set, then set it from the filename */
-    if (ctor->isSet_metainfo)
-    {
-        tr_variant* info = nullptr;
-
-        if (tr_variantDictFindDict(&ctor->metainfo, TR_KEY_info, &info))
-        {
-            auto name = std::string_view{};
-
-            if (!tr_variantDictFindStrView(info, TR_KEY_name_utf_8, &name) &&
-                !tr_variantDictFindStrView(info, TR_KEY_name, &name))
-            {
-                name = ""sv;
-            }
-
-            if (std::empty(name))
-            {
-                char* base = tr_sys_path_basename(filename, nullptr);
-
-                if (base != nullptr)
-                {
-                    tr_variantDictAddStr(info, TR_KEY_name, base);
-                    tr_free(base);
-                }
-            }
-        }
-    }
-
-    tr_free(metainfo);
-    return err;
+    return tr_saveFile(filename, { std::data(ctor->contents), std::size(ctor->contents) }, error);
 }
 
 /***
@@ -186,32 +149,21 @@ void tr_ctorSetFilePriorities(tr_ctor* ctor, tr_file_index_t const* files, tr_fi
 
 void tr_ctorInitTorrentPriorities(tr_ctor const* ctor, tr_torrent* tor)
 {
-    for (auto file_index : ctor->low)
-    {
-        tr_torrentInitFilePriority(tor, file_index, TR_PRI_LOW);
-    }
-
-    for (auto file_index : ctor->normal)
-    {
-        tr_torrentInitFilePriority(tor, file_index, TR_PRI_NORMAL);
-    }
-
-    for (auto file_index : ctor->high)
-    {
-        tr_torrentInitFilePriority(tor, file_index, TR_PRI_HIGH);
-    }
+    tor->setFilePriorities(std::data(ctor->low), std::size(ctor->low), TR_PRI_LOW);
+    tor->setFilePriorities(std::data(ctor->normal), std::size(ctor->normal), TR_PRI_NORMAL);
+    tor->setFilePriorities(std::data(ctor->high), std::size(ctor->high), TR_PRI_HIGH);
 }
 
 void tr_ctorSetFilesWanted(tr_ctor* ctor, tr_file_index_t const* files, tr_file_index_t fileCount, bool wanted)
 {
-    auto& indices = wanted ? ctor->want : ctor->not_want;
+    auto& indices = wanted ? ctor->wanted : ctor->unwanted;
     indices.assign(files, files + fileCount);
 }
 
 void tr_ctorInitTorrentWanted(tr_ctor const* ctor, tr_torrent* tor)
 {
-    tr_torrentInitFileDLs(tor, std::data(ctor->not_want), std::size(ctor->not_want), false);
-    tr_torrentInitFileDLs(tor, std::data(ctor->want), std::size(ctor->want), true);
+    tor->initFilesWanted(std::data(ctor->unwanted), std::size(ctor->unwanted), false);
+    tor->initFilesWanted(std::data(ctor->wanted), std::size(ctor->wanted), true);
 }
 
 /***
@@ -242,16 +194,6 @@ bool tr_ctorGetDeleteSource(tr_ctor const* ctor, bool* setme)
 /***
 ****
 ***/
-
-void tr_ctorSetSave(tr_ctor* ctor, bool saveInOurTorrentsDir)
-{
-    ctor->saveInOurTorrentsDir = saveInOurTorrentsDir;
-}
-
-bool tr_ctorGetSave(tr_ctor const* ctor)
-{
-    return ctor != nullptr && ctor->saveInOurTorrentsDir;
-}
 
 void tr_ctorSetPaused(tr_ctor* ctor, tr_ctorMode mode, bool paused)
 {
@@ -346,19 +288,14 @@ bool tr_ctorGetIncompleteDir(tr_ctor const* ctor, char const** setme)
     return true;
 }
 
-bool tr_ctorGetMetainfo(tr_ctor const* ctor, tr_variant const** setme)
+tr_torrent_metainfo&& tr_ctorStealMetainfo(tr_ctor* ctor)
 {
-    if (!ctor->isSet_metainfo)
-    {
-        return false;
-    }
+    return std::move(ctor->metainfo);
+}
 
-    if (setme != nullptr)
-    {
-        *setme = &ctor->metainfo;
-    }
-
-    return true;
+tr_torrent_metainfo const* tr_ctorGetMetainfo(tr_ctor const* ctor)
+{
+    return !std::empty(ctor->metainfo.infoHashString()) ? &ctor->metainfo : nullptr;
 }
 
 tr_session* tr_ctorGetSession(tr_ctor const* ctor)
@@ -396,20 +333,15 @@ tr_ctor* tr_ctorNew(tr_session const* session)
 {
     auto* const ctor = new tr_ctor{ session };
 
-    if (session != nullptr)
-    {
-        tr_ctorSetDeleteSource(ctor, tr_sessionGetDeleteSource(session));
-        tr_ctorSetPaused(ctor, TR_FALLBACK, tr_sessionGetPaused(session));
-        tr_ctorSetPeerLimit(ctor, TR_FALLBACK, session->peerLimitPerTorrent);
-        tr_ctorSetDownloadDir(ctor, TR_FALLBACK, tr_sessionGetDownloadDir(session));
-    }
+    tr_ctorSetDeleteSource(ctor, tr_sessionGetDeleteSource(session));
+    tr_ctorSetPaused(ctor, TR_FALLBACK, tr_sessionGetPaused(session));
+    tr_ctorSetPeerLimit(ctor, TR_FALLBACK, session->peerLimitPerTorrent);
+    tr_ctorSetDownloadDir(ctor, TR_FALLBACK, tr_sessionGetDownloadDir(session));
 
-    tr_ctorSetSave(ctor, true);
     return ctor;
 }
 
 void tr_ctorFree(tr_ctor* ctor)
 {
-    clearMetainfo(ctor);
     delete ctor;
 }

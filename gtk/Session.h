@@ -1,28 +1,11 @@
-/******************************************************************************
- * Copyright (c) Transmission authors and contributors
- *
- * Permission is hereby granted, free of charge, to any person obtaining a
- * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
- * DEALINGS IN THE SOFTWARE.
- *****************************************************************************/
+// Copyright © Transmission authors and contributors.
+// This file is licensed under the MIT (SPDX: MIT) license,
+// A copy of this license can be found in licenses/ .
 
 #pragma once
 
 #include <memory>
+#include <string>
 #include <vector>
 
 #include <giomm.h>
@@ -30,9 +13,8 @@
 #include <gtkmm.h>
 
 #include <libtransmission/transmission.h>
+#include <libtransmission/tr-macros.h>
 #include <libtransmission/variant.h>
-
-#define TR_RESOURCE_PATH "/com/transmissionbt/transmission/"
 
 class Session : public Glib::Object
 {
@@ -46,6 +28,8 @@ public:
 
 public:
     ~Session() override;
+
+    TR_DISABLE_COPY_MOVE(Session)
 
     static Glib::RefPtr<Session> create(tr_session* session);
 
@@ -112,6 +96,11 @@ public:
     void update();
 
     /**
+     * Attempts to start a torrent immediately.
+     */
+    void start_now(int id);
+
+    /**
     ***  Set a preference value, save the prefs file, and emit the "prefs-changed" signal
     **/
 
@@ -140,7 +129,7 @@ public:
     sigc::signal<void(bool)>& signal_port_tested();
 
 protected:
-    Session(tr_session* session);
+    explicit Session(tr_session* session);
 
 private:
     class Impl;
@@ -157,7 +146,7 @@ public:
     TorrentModelColumns();
 
     Gtk::TreeModelColumn<Glib::ustring> name_collated;
-    Gtk::TreeModelColumn<void*> torrent;
+    Gtk::TreeModelColumn<gpointer> torrent;
     Gtk::TreeModelColumn<int> torrent_id;
     Gtk::TreeModelColumn<double> speed_up;
     Gtk::TreeModelColumn<double> speed_down;

@@ -1,19 +1,24 @@
 add_executable(libtransmission-test
+    announce-list-test.cc
     bitfield-test.cc
+    block-info-test.cc
     blocklist-test.cc
     clients-test.cc
+    completion-test.cc
     copy-test.cc
     crypto-test-ref.h
     crypto-test.cc
     error-test.cc
+    file-piece-map-test.cc
     file-test.cc
     getopt-test.cc
     history-test.cc
     json-test.cc
-    magnet-test.cc
+    magnet-metainfo-test.cc
     makemeta-test.cc
-    metainfo-test.cc
     move-test.cc
+    peer-mgr-active-requests-test.cc
+    peer-mgr-wishlist-test.cc
     peer-msgs-test.cc
     quark-test.cc
     rename-test.cc
@@ -22,9 +27,11 @@ add_executable(libtransmission-test
     subprocess-test-script.cmd
     subprocess-test.cc
     test-fixtures.h
+    torrent-metainfo-test.cc
     utils-test.cc
     variant-test.cc
-    watchdir-test.cc)
+    watchdir-test.cc
+    web-utils-test.cc)
 
 target_compile_definitions(libtransmission-test
     PRIVATE

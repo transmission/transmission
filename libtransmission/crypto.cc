@@ -1,10 +1,7 @@
-/*
- * This file Copyright (C) 2007-2014 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2007-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #include <cstring> /* memcpy(), memmove(), memset() */
 
@@ -20,10 +17,10 @@
 ***
 **/
 
-#define PRIME_LEN 96
-#define DH_PRIVKEY_LEN 20
+static auto constexpr PrimeLen = size_t{ 96 };
+static auto constexpr DhPrivkeyLen = size_t{ 20 };
 
-static uint8_t const dh_P[PRIME_LEN] = {
+static uint8_t constexpr dh_P[PrimeLen] = {
     0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xC9, 0x0F, 0xDA, 0xA2, //
     0x21, 0x68, 0xC2, 0x34, 0xC4, 0xC6, 0x62, 0x8B, 0x80, 0xDC, 0x1C, 0xD1, //
     0x29, 0x02, 0x4E, 0x08, 0x8A, 0x67, 0xCC, 0x74, 0x02, 0x0B, 0xBE, 0xA6, //
@@ -34,7 +31,7 @@ static uint8_t const dh_P[PRIME_LEN] = {
     0xA6, 0x3A, 0x36, 0x21, 0x00, 0x00, 0x00, 0x00, 0x00, 0x09, 0x05, 0x63, //
 };
 
-static uint8_t const dh_G[] = { 2 };
+static uint8_t constexpr dh_G[] = { 2 };
 
 /**
 ***
@@ -46,26 +43,27 @@ static void ensureKeyExists(tr_crypto* crypto)
     {
         size_t public_key_length = 0;
         crypto->dh = tr_dh_new(dh_P, sizeof(dh_P), dh_G, sizeof(dh_G));
-        tr_dh_make_key(crypto->dh, DH_PRIVKEY_LEN, crypto->myPublicKey, &public_key_length);
+        tr_dh_make_key(crypto->dh, DhPrivkeyLen, crypto->myPublicKey, &public_key_length);
 
         TR_ASSERT(public_key_length == KEY_LEN);
     }
 }
 
-void tr_cryptoConstruct(tr_crypto* crypto, uint8_t const* torrentHash, bool isIncoming)
+tr_crypto::tr_crypto(tr_sha1_digest_t const* torrent_hash_in, bool is_incoming_in)
+    : is_incoming{ is_incoming_in }
 {
-    memset(crypto, 0, sizeof(tr_crypto));
-
-    crypto->isIncoming = isIncoming;
-    tr_cryptoSetTorrentHash(crypto, torrentHash);
+    if (torrent_hash_in != nullptr)
+    {
+        this->torrent_hash = *torrent_hash_in;
+    }
 }
 
-void tr_cryptoDestruct(tr_crypto* crypto)
+tr_crypto::~tr_crypto()
 {
-    tr_dh_secret_free(crypto->mySecret);
-    tr_dh_free(crypto->dh);
-    tr_free(crypto->enc_key);
-    tr_free(crypto->dec_key);
+    tr_dh_secret_free(this->mySecret);
+    tr_dh_free(this->dh);
+    tr_free(this->enc_key);
+    tr_free(this->dec_key);
 }
 
 /**
@@ -81,7 +79,7 @@ bool tr_cryptoComputeSecret(tr_crypto* crypto, uint8_t const* peerPublicKey)
 
 uint8_t const* tr_cryptoGetMyPublicKey(tr_crypto const* crypto, int* setme_len)
 {
-    ensureKeyExists((tr_crypto*)crypto);
+    ensureKeyExists(const_cast<tr_crypto*>(crypto));
     *setme_len = KEY_LEN;
     return crypto->myPublicKey;
 }
@@ -92,18 +90,17 @@ uint8_t const* tr_cryptoGetMyPublicKey(tr_crypto const* crypto, int* setme_len)
 
 static void init_rc4(tr_crypto const* crypto, struct arc4_context** setme, char const* key)
 {
-    TR_ASSERT(crypto->torrentHashIsSet);
+    TR_ASSERT(crypto->torrent_hash);
 
     if (*setme == nullptr)
     {
         *setme = tr_new0(struct arc4_context, 1);
     }
 
-    uint8_t buf[SHA_DIGEST_LENGTH];
-
-    if (tr_cryptoSecretKeySha1(crypto, key, 4, crypto->torrentHash, SHA_DIGEST_LENGTH, buf))
+    auto const buf = tr_cryptoSecretKeySha1(crypto, key, 4, std::data(*crypto->torrent_hash), std::size(*crypto->torrent_hash));
+    if (buf)
     {
-        arc4_init(*setme, buf, SHA_DIGEST_LENGTH);
+        arc4_init(*setme, std::data(*buf), std::size(*buf));
         arc4_discard(*setme, 1024);
     }
 }
@@ -125,7 +122,7 @@ static void crypt_rc4(struct arc4_context* key, size_t buf_len, void const* buf_
 
 void tr_cryptoDecryptInit(tr_crypto* crypto)
 {
-    init_rc4(crypto, &crypto->dec_key, crypto->isIncoming ? "keyA" : "keyB"); // lgtm[cpp/weak-cryptographic-algorithm]
+    init_rc4(crypto, &crypto->dec_key, crypto->is_incoming ? "keyA" : "keyB"); // lgtm[cpp/weak-cryptographic-algorithm]
 }
 
 void tr_cryptoDecrypt(tr_crypto* crypto, size_t buf_len, void const* buf_in, void* buf_out)
@@ -135,7 +132,7 @@ void tr_cryptoDecrypt(tr_crypto* crypto, size_t buf_len, void const* buf_in, voi
 
 void tr_cryptoEncryptInit(tr_crypto* crypto)
 {
-    init_rc4(crypto, &crypto->enc_key, crypto->isIncoming ? "keyB" : "keyA"); // lgtm[cpp/weak-cryptographic-algorithm]
+    init_rc4(crypto, &crypto->enc_key, crypto->is_incoming ? "keyB" : "keyA"); // lgtm[cpp/weak-cryptographic-algorithm]
 }
 
 void tr_cryptoEncrypt(tr_crypto* crypto, size_t buf_len, void const* buf_in, void* buf_out)
@@ -143,57 +140,31 @@ void tr_cryptoEncrypt(tr_crypto* crypto, size_t buf_len, void const* buf_in, voi
     crypt_rc4(crypto->enc_key, buf_len, buf_in, buf_out); // lgtm[cpp/weak-cryptographic-algorithm]
 }
 
-bool tr_cryptoSecretKeySha1(
+std::optional<tr_sha1_digest_t> tr_cryptoSecretKeySha1(
     tr_crypto const* crypto,
     void const* prepend_data,
     size_t prepend_data_size,
     void const* append_data,
-    size_t append_data_size,
-    uint8_t* hash)
+    size_t append_data_size)
 {
     TR_ASSERT(crypto != nullptr);
     TR_ASSERT(crypto->mySecret != nullptr);
 
-    return tr_dh_secret_derive(crypto->mySecret, prepend_data, prepend_data_size, append_data, append_data_size, hash);
+    return tr_dh_secret_derive(crypto->mySecret, prepend_data, prepend_data_size, append_data, append_data_size);
 }
 
 /**
 ***
 **/
 
-void tr_cryptoSetTorrentHash(tr_crypto* crypto, uint8_t const* hash)
+void tr_cryptoSetTorrentHash(tr_crypto* crypto, tr_sha1_digest_t const& hash)
 {
-    crypto->torrentHashIsSet = hash != nullptr;
-
-    if (hash != nullptr)
-    {
-        memcpy(crypto->torrentHash, hash, SHA_DIGEST_LENGTH);
-    }
-    else
-    {
-        memset(crypto->torrentHash, 0, SHA_DIGEST_LENGTH);
-    }
+    crypto->torrent_hash = hash;
 }
 
-uint8_t const* tr_cryptoGetTorrentHash(tr_crypto const* crypto)
+std::optional<tr_sha1_digest_t> tr_cryptoGetTorrentHash(tr_crypto const* crypto)
 {
     TR_ASSERT(crypto != nullptr);
 
-    return crypto->torrentHashIsSet ? crypto->torrentHash : nullptr;
-}
-
-bool tr_cryptoHasTorrentHash(tr_crypto const* crypto)
-{
-    TR_ASSERT(crypto != nullptr);
-
-    return crypto->torrentHashIsSet;
-}
-
-///
-
-std::optional<tr_sha1_digest_t> tr_sha1_final(tr_sha1_ctx_t handle)
-{
-    auto digest = tr_sha1_digest_t{};
-    auto const success = tr_sha1_final(handle, reinterpret_cast<uint8_t*>(std::data(digest)));
-    return success ? digest : std::optional<tr_sha1_digest_t>{};
+    return crypto->torrent_hash;
 }

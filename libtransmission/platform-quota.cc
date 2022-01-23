@@ -1,14 +1,12 @@
-/*
- * This file Copyright (C) 2013-2014 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2013-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #include <cerrno>
-#include <cstdlib>
 #include <cstring>
+#include <string>
+#include <string_view>
 
 #include <event2/util.h> /* evutil_ascii_strcasecmp() */
 
@@ -76,7 +74,7 @@
 
 #ifndef _WIN32
 
-static char const* getdev(char const* path)
+static char const* getdev(std::string_view path)
 {
 #ifdef HAVE_GETMNTENT
 
@@ -91,7 +89,7 @@ static char const* getdev(char const* path)
     struct mnttab mnt;
     while (getmntent(fp, &mnt) != -1)
     {
-        if (tr_strcmp0(path, mnt.mnt_mountp) == 0)
+        if (mnt.mnt_mountp != nullptr && path == mnt.mnt_mountp)
         {
             break;
         }
@@ -111,7 +109,7 @@ static char const* getdev(char const* path)
     struct mntent const* mnt = nullptr;
     while ((mnt = getmntent(fp)) != nullptr)
     {
-        if (tr_strcmp0(path, mnt->mnt_dir) == 0)
+        if (mnt->mnt_dir != nullptr && path == mnt->mnt_dir)
         {
             break;
         }
@@ -133,7 +131,7 @@ static char const* getdev(char const* path)
 
     for (int i = 0; i < n; i++)
     {
-        if (tr_strcmp0(path, mnt[i].f_mntonname) == 0)
+        if (mnt[i].f_mntonname != nullptr && path == mnt[i].f_mntonname)
         {
             return mnt[i].f_mntfromname;
         }
@@ -212,34 +210,23 @@ static char const* getfstype(char const* device)
 #endif
 }
 
-static char const* getblkdev(char const* path)
+static std::string getblkdev(std::string_view path)
 {
-    char const* device = nullptr;
-
-    char* const dir = tr_strdup(path);
-
     for (;;)
     {
-        device = getdev(dir);
-
-        if (device != nullptr)
+        if (auto const* const device = getdev(path); device != nullptr)
         {
-            break;
+            return device;
         }
 
-        char* c = strrchr(dir, '/');
-        if (c != nullptr)
+        auto const pos = path.rfind('/');
+        if (pos == path.npos)
         {
-            *c = '\0';
+            return {};
         }
-        else
-        {
-            break;
-        }
+
+        path = path.substr(0, pos);
     }
-
-    tr_free(dir);
-    return device;
 }
 
 #if defined(__NetBSD__) && __NetBSD_Version__ >= 600000000
@@ -385,7 +372,7 @@ static struct tr_disk_space getquota(char const* device)
 
 #ifdef HAVE_XQM
 
-static struct tr_disk_space getxfsquota(char* device)
+static struct tr_disk_space getxfsquota(char const* device)
 {
     struct tr_disk_space disk_space = { -1, -1 };
     struct fs_disk_quota dq;
@@ -424,21 +411,21 @@ static struct tr_disk_space getxfsquota(char* device)
 
 #endif /* _WIN32 */
 
-static struct tr_disk_space tr_getQuotaSpace([[maybe_unused]] tr_device_info const* info)
+static tr_disk_space getQuotaSpace([[maybe_unused]] tr_device_info const& info)
 {
     struct tr_disk_space ret = { -1, -1 };
 
 #ifndef _WIN32
 
-    if (info->fstype != nullptr && evutil_ascii_strcasecmp(info->fstype, "xfs") == 0)
+    if (evutil_ascii_strcasecmp(info.fstype.c_str(), "xfs") == 0)
     {
 #ifdef HAVE_XQM
-        ret = getxfsquota(info->device);
+        ret = getxfsquota(info.device.c_str());
 #endif
     }
     else
     {
-        ret = getquota(info->device);
+        ret = getquota(info.device.c_str());
     }
 
 #endif /* _WIN32 */
@@ -446,7 +433,7 @@ static struct tr_disk_space tr_getQuotaSpace([[maybe_unused]] tr_device_info con
     return ret;
 }
 
-static struct tr_disk_space tr_getDiskSpace(char const* path)
+static struct tr_disk_space getDiskSpace(char const* path)
 {
 #ifdef _WIN32
 
@@ -485,53 +472,32 @@ static struct tr_disk_space tr_getDiskSpace(char const* path)
 #endif
 }
 
-struct tr_device_info* tr_device_info_create(char const* path)
+tr_device_info tr_device_info_create(std::string_view path)
 {
-    auto* const info = tr_new0(struct tr_device_info, 1);
-    info->path = tr_strdup(path);
-
+    auto out = tr_device_info{};
+    out.path = path;
 #ifndef _WIN32
-    info->device = tr_strdup(getblkdev(path));
-    info->fstype = tr_strdup(getfstype(path));
+    out.device = getblkdev(out.path);
+    auto const* const fstype = getfstype(out.path.c_str());
+    out.fstype = fstype ? fstype : "";
 #endif
-
-    return info;
+    return out;
 }
 
-void tr_device_info_free(struct tr_device_info* info)
+tr_disk_space tr_device_info_get_disk_space(struct tr_device_info const& info)
 {
-    if (info != nullptr)
-    {
-        tr_free(info->fstype);
-        tr_free(info->device);
-        tr_free(info->path);
-        tr_free(info);
-    }
-}
-
-struct tr_disk_space tr_device_info_get_disk_space(struct tr_device_info const* info)
-{
-    struct tr_disk_space space;
-
-    if (info == nullptr || info->path == nullptr)
+    if (std::empty(info.path))
     {
         errno = EINVAL;
-        space.free = -1;
-        space.total = -1;
+        return { -1, -1 };
     }
-    else
-    {
-        space = tr_getQuotaSpace(info);
 
-        if (space.free < 0 || space.total < 0)
-        {
-            space = tr_getDiskSpace(info->path);
-        }
+    auto space = getQuotaSpace(info);
+
+    if (space.free < 0 || space.total < 0)
+    {
+        space = getDiskSpace(info.path.c_str());
     }
 
     return space;
 }
-
-/***
-****
-***/

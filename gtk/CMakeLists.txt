@@ -144,12 +144,17 @@ add_definitions(
     -DG_DISABLE_DEPRECATED
     -DGDK_PIXBUF_DISABLE_DEPRECATED
     -DGDK_DISABLE_DEPRECATED
-    # FIXME: migrate from GtkUIManager to GtkBuilder in 2.90
-    # -DGTK_DISABLE_DEPRECATED
+    -DGTK_DISABLE_DEPRECATED
     -DPANGO_DISABLE_DEPRECATED
     # FIXME: these break libnotify's headers
     # -DG_DISABLE_SINGLE_INCLUDES
     # -DGTK_DISABLE_SINGLE_INCLUDES
+    -DGDKMM_DISABLE_DEPRECATED
+    -DGIOMM_DISABLE_DEPRECATED
+    -DGLIBMM_DISABLE_DEPRECATED
+    -DGTKMM_DISABLE_DEPRECATED
+    -DPANGOMM_DISABLE_DEPRECATED
+    -DSIGCXX_DISABLE_DEPRECATED
     ${GTK_CFLAGS_OTHER}
 )
 
@@ -176,8 +181,7 @@ target_link_libraries(${TR_NAME}-gtk
 )
 
 if(NOT MSVC)
-    # https://github.com/transmission/transmission/issues/1381 patches welcome
-    target_compile_options(${TR_NAME}-gtk PRIVATE -Wno-deprecated-declarations)
+    target_compile_options(${TR_NAME}-gtk PRIVATE -Wno-exit-time-destructors)
 endif()
 
 if(MSVC)

@@ -1,12 +1,11 @@
-/*
- * This file Copyright (C) 2009-2021 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2009-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #include <algorithm>
+#include <memory>
+#include <string>
 
 #include <glibmm.h>
 #include <glibmm/i18n.h>
@@ -31,6 +30,8 @@ class RelocateDialog::Impl
 public:
     Impl(RelocateDialog& dialog, Glib::RefPtr<Session> const& core, std::vector<int> const& torrent_ids);
     ~Impl();
+
+    TR_DISABLE_COPY_MOVE(Impl)
 
 private:
     void onResponse(int response);
@@ -124,7 +125,7 @@ void RelocateDialog::Impl::onResponse(int response)
 
         /* start the move and periodically check its status */
         done_ = TR_LOC_DONE;
-        timer_ = Glib::signal_timeout().connect_seconds(sigc::mem_fun(this, &Impl::onTimer), 1);
+        timer_ = Glib::signal_timeout().connect_seconds(sigc::mem_fun(*this, &Impl::onTimer), 1);
         onTimer();
     }
     else
@@ -159,7 +160,7 @@ RelocateDialog::Impl::Impl(RelocateDialog& dialog, Glib::RefPtr<Session> const& 
     dialog_.add_button(_("_Cancel"), Gtk::RESPONSE_CANCEL);
     dialog_.add_button(_("_Apply"), Gtk::RESPONSE_APPLY);
     dialog_.set_default_response(Gtk::RESPONSE_CANCEL);
-    dialog_.signal_response().connect(sigc::mem_fun(this, &Impl::onResponse));
+    dialog_.signal_response().connect(sigc::mem_fun(*this, &Impl::onResponse));
 
     row = 0;
     auto* t = Gtk::make_managed<HigWorkarea>();

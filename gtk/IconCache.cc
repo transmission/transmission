@@ -6,6 +6,7 @@
  */
 
 #include <array>
+#include <memory>
 #include <unordered_map>
 
 #include <glibmm.h>
@@ -14,10 +15,15 @@
 #include "IconCache.h"
 #include "Utils.h"
 
-#define VOID_PIXBUF_KEY "void-pixbuf"
+using namespace std::literals;
+
+Glib::ustring const DirectoryMimeType = "folder"s;
+Glib::ustring const UnknownMimeType = "unknown"s;
 
 namespace
 {
+
+auto const VoidPixbufKey = "void-pixbuf"s;
 
 struct IconCache
 {
@@ -48,7 +54,7 @@ std::unique_ptr<IconCache> icon_cache_new(Gtk::Widget& for_widget, Gtk::IconSize
     auto icons = std::make_unique<IconCache>();
     icons->icon_theme = Gtk::IconTheme::get_for_screen(for_widget.get_screen());
     icons->icon_size = get_size_in_pixels(icon_size);
-    icons->cache.emplace(VOID_PIXBUF_KEY, create_void_pixbuf(icons->icon_size, icons->icon_size));
+    icons->cache.try_emplace(VoidPixbufKey, create_void_pixbuf(icons->icon_size, icons->icon_size));
     return icons;
 }
 
@@ -80,7 +86,7 @@ Glib::RefPtr<Gdk::Pixbuf> get_themed_icon_pixbuf(Gio::ThemedIcon& icon, int size
 
     auto icon_info = icon_theme.choose_icon(icon_names, size);
 
-    if (icon_info == nullptr)
+    if (!bool{ icon_info })
     {
         icon_info = icon_theme.lookup_icon("text-x-generic", size, Gtk::ICON_LOOKUP_USE_BUILTIN);
     }
@@ -134,7 +140,7 @@ Glib::RefPtr<Gdk::Pixbuf> icon_cache_get_mime_type_icon(IconCache& icons, Glib::
     auto key = _icon_cache_get_icon_key(icon);
     if (key.empty())
     {
-        key = VOID_PIXBUF_KEY;
+        key = VoidPixbufKey;
     }
 
     if (auto pixbuf_it = icons.cache.find(key); pixbuf_it != icons.cache.end())
@@ -146,7 +152,7 @@ Glib::RefPtr<Gdk::Pixbuf> icon_cache_get_mime_type_icon(IconCache& icons, Glib::
 
     if (pixbuf != nullptr)
     {
-        icons.cache.emplace(key, pixbuf);
+        icons.cache.try_emplace(key, pixbuf);
     }
 
     return pixbuf;

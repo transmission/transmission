@@ -1,28 +1,14 @@
-/******************************************************************************
- * Copyright (c) Transmission authors and contributors
- *
- * Permission is hereby granted, free of charge, to any person obtaining a
- * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
- * DEALINGS IN THE SOFTWARE.
- *****************************************************************************/
+// This file Copyright © 2010 Transmission authors and contributors.
+// It may be used under the MIT (SPDX: MIT) license.
+// License text can be found in the licenses/ folder.
 
+#include <algorithm>
+#include <array>
 #include <cerrno>
 #include <climits>
 #include <cstring>
+#include <ctime>
+#include <string_view>
 
 #include <sys/types.h>
 
@@ -38,6 +24,7 @@
 #include <libutp/utp.h>
 
 #include "transmission.h"
+
 #include "fdlimit.h" /* tr_fdSocketClose() */
 #include "log.h"
 #include "net.h"
@@ -108,20 +95,35 @@ char const* tr_address_to_string(tr_address const* addr)
 
 bool tr_address_from_string(tr_address* dst, char const* src)
 {
-    bool success = false;
-
     if (evutil_inet_pton(AF_INET, src, &dst->addr) == 1)
     {
         dst->type = TR_AF_INET;
-        success = true;
-    }
-    else if (evutil_inet_pton(AF_INET6, src, &dst->addr) == 1)
-    {
-        dst->type = TR_AF_INET6;
-        success = true;
+        return true;
     }
 
-    return success;
+    if (evutil_inet_pton(AF_INET6, src, &dst->addr) == 1)
+    {
+        dst->type = TR_AF_INET6;
+        return true;
+    }
+
+    return false;
+}
+
+bool tr_address_from_string(tr_address* dst, std::string_view src)
+{
+    // inet_pton() requires zero-terminated strings,
+    // so make a zero-terminated copy here on the stack.
+    auto buf = std::array<char, 64>{};
+    if (std::size(src) >= std::size(buf))
+    {
+        // shouldn't ever be that large; malformed address
+        return false;
+    }
+
+    *std::copy(std::begin(src), std::end(src), std::begin(buf)) = '\0';
+
+    return tr_address_from_string(dst, std::data(buf));
 }
 
 /*
@@ -200,7 +202,7 @@ bool tr_address_from_sockaddr_storage(tr_address* setme_addr, tr_port* setme_por
 {
     if (from->ss_family == AF_INET)
     {
-        struct sockaddr_in const* sin = (struct sockaddr_in const*)from;
+        auto const* const sin = (struct sockaddr_in const*)from;
         setme_addr->type = TR_AF_INET;
         setme_addr->addr.addr4.s_addr = sin->sin_addr.s_addr;
         *setme_port = sin->sin_port;
@@ -209,7 +211,7 @@ bool tr_address_from_sockaddr_storage(tr_address* setme_addr, tr_port* setme_por
 
     if (from->ss_family == AF_INET6)
     {
-        struct sockaddr_in6 const* sin6 = (struct sockaddr_in6 const*)from;
+        auto const* const sin6 = (struct sockaddr_in6 const*)from;
         setme_addr->type = TR_AF_INET6;
         setme_addr->addr.addr6 = sin6->sin6_addr;
         *setme_port = sin6->sin6_port;
@@ -636,7 +638,7 @@ static int tr_globalAddress(int af, void* addr, int* addr_len)
 }
 
 /* Return our global IPv6 address, with caching. */
-unsigned char const* tr_globalIPv6(void)
+unsigned char const* tr_globalIPv6(tr_session const* session)
 {
     static unsigned char ipv6[16];
     static time_t last_time = 0;
@@ -652,7 +654,24 @@ unsigned char const* tr_globalIPv6(void)
         last_time = now;
     }
 
-    return have_ipv6 ? ipv6 : nullptr;
+    if (!have_ipv6)
+        return nullptr; /* No IPv6 address at all. */
+
+    /* Return the default address. This is useful for checking
+       for connectivity in general. */
+    if (session == nullptr)
+        return ipv6;
+
+    /* We have some sort of address, now make sure that we return
+       our bound address if non-default. */
+
+    bool is_default = false;
+    auto const* ipv6_bindaddr = tr_sessionGetPublicAddress(session, TR_AF_INET6, &is_default);
+    if (ipv6_bindaddr != nullptr && !is_default)
+        /* Explicitly bound. Return that address. */
+        memcpy(ipv6, ipv6_bindaddr->addr.addr6.s6_addr, 16);
+
+    return ipv6;
 }
 
 /***
@@ -682,13 +701,13 @@ static bool isMartianAddr(struct tr_address const* a)
     {
     case TR_AF_INET:
         {
-            unsigned char const* address = (unsigned char const*)&a->addr.addr4;
+            auto const* const address = (unsigned char const*)&a->addr.addr4;
             return address[0] == 0 || address[0] == 127 || (address[0] & 0xE0) == 0xE0;
         }
 
     case TR_AF_INET6:
         {
-            unsigned char const* address = (unsigned char const*)&a->addr.addr6;
+            auto const* const address = (unsigned char const*)&a->addr.addr6;
             return address[0] == 0xFF || (memcmp(address, zeroes, 15) == 0 && (address[15] == 0 || address[15] == 1));
         }
 

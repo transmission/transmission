@@ -1,31 +1,17 @@
-/******************************************************************************
- * Copyright (c) Transmission authors and contributors
- *
- * Permission is hereby granted, free of charge, to any person obtaining a
- * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
- * DEALINGS IN THE SOFTWARE.
- *****************************************************************************/
+// This file Copyright © Transmission authors and contributors.
+// It may be used under the MIT (SPDX: MIT) license.
+// License text can be found in the licenses/ folder.
 
-#include <stdio.h> /* fprintf () */
-#include <stdlib.h> /* atoi () */
-#include <string.h> /* memcmp () */
+#include <array>
+#include <cstdio> /* fprintf () */
+#include <cstdlib> /* atoi () */
+#include <cstring> /* memcmp () */
 #include <signal.h>
+#include <string>
+#include <string_view>
 
 #include <libtransmission/transmission.h>
+
 #include <libtransmission/error.h>
 #include <libtransmission/file.h>
 #include <libtransmission/tr-getopt.h>
@@ -38,33 +24,37 @@
 ****
 ***/
 
-#define MEM_K 1024
-#define MEM_K_STR "KiB"
-#define MEM_M_STR "MiB"
-#define MEM_G_STR "GiB"
-#define MEM_T_STR "TiB"
+static auto constexpr MemK = size_t{ 1024 };
+static char constexpr MemKStr[] = "KiB";
+static char constexpr MemMStr[] = "MiB";
+static char constexpr MemGStr[] = "GiB";
+static char constexpr MemTStr[] = "TiB";
 
-#define DISK_K 1000
-#define DISK_B_STR "B"
-#define DISK_K_STR "kB"
-#define DISK_M_STR "MB"
-#define DISK_G_STR "GB"
-#define DISK_T_STR "TB"
+static auto constexpr DiskK = size_t{ 1000 };
+static char constexpr DiskKStr[] = "kB";
+static char constexpr DiskMStr[] = "MB";
+static char constexpr DiskGStr[] = "GB";
+static char constexpr DiskTStr[] = "TB";
 
-#define SPEED_K 1000
-#define SPEED_B_STR "B/s"
+static auto constexpr SpeedK = size_t{ 1000 };
 #define SPEED_K_STR "kB/s"
-#define SPEED_M_STR "MB/s"
-#define SPEED_G_STR "GB/s"
-#define SPEED_T_STR "TB/s"
+static char constexpr SpeedKStr[] = SPEED_K_STR;
+static char constexpr SpeedMStr[] = "MB/s";
+static char constexpr SpeedGStr[] = "GB/s";
+static char constexpr SpeedTStr[] = "TB/s";
 
 /***
 ****
 ***/
 
-#define LINEWIDTH 80
-#define MY_CONFIG_NAME "transmission"
-#define MY_READABLE_NAME "transmission-cli"
+static auto constexpr LineWidth = int{ 80 };
+
+static char constexpr MyConfigName[] = "transmission";
+static char constexpr MyReadableName[] = "transmission-cli";
+static char constexpr Usage
+    [] = "A fast and easy BitTorrent client\n"
+         "\n"
+         "Usage: transmission-cli [options] <file|url|magnet>";
 
 static bool showVersion = false;
 static bool verify = false;
@@ -73,37 +63,27 @@ static sig_atomic_t manualUpdate = false;
 
 static char const* torrentPath = nullptr;
 
-static struct tr_option const options[] = {
-    { 'b', "blocklist", "Enable peer blocklists", "b", false, nullptr },
-    { 'B', "no-blocklist", "Disable peer blocklists", "B", false, nullptr },
-    { 'd', "downlimit", "Set max download speed in " SPEED_K_STR, "d", true, "<speed>" },
-    { 'D', "no-downlimit", "Don't limit the download speed", "D", false, nullptr },
-    { 910, "encryption-required", "Encrypt all peer connections", "er", false, nullptr },
-    { 911, "encryption-preferred", "Prefer encrypted peer connections", "ep", false, nullptr },
-    { 912, "encryption-tolerated", "Prefer unencrypted peer connections", "et", false, nullptr },
-    { 'f', "finish", "Run a script when the torrent finishes", "f", true, "<script>" },
-    { 'g', "config-dir", "Where to find configuration files", "g", true, "<path>" },
-    { 'm', "portmap", "Enable portmapping via NAT-PMP or UPnP", "m", false, nullptr },
-    { 'M', "no-portmap", "Disable portmapping", "M", false, nullptr },
-    { 'p', "port", "Port for incoming peers (Default: " TR_DEFAULT_PEER_PORT_STR ")", "p", true, "<port>" },
-    { 't', "tos", "Peer socket TOS (0 to 255, default=" TR_DEFAULT_PEER_SOCKET_TOS_STR ")", "t", true, "<tos>" },
-    { 'u', "uplimit", "Set max upload speed in " SPEED_K_STR, "u", true, "<speed>" },
-    { 'U', "no-uplimit", "Don't limit the upload speed", "U", false, nullptr },
-    { 'v', "verify", "Verify the specified torrent", "v", false, nullptr },
-    { 'V', "version", "Show version number and exit", "V", false, nullptr },
-    { 'w', "download-dir", "Where to save downloaded data", "w", true, "<path>" },
-    { 0, nullptr, nullptr, nullptr, false, nullptr }
+static auto constexpr Options = std::array<tr_option, 19>{
+    { { 'b', "blocklist", "Enable peer blocklists", "b", false, nullptr },
+      { 'B', "no-blocklist", "Disable peer blocklists", "B", false, nullptr },
+      { 'd', "downlimit", "Set max download speed in " SPEED_K_STR, "d", true, "<speed>" },
+      { 'D', "no-downlimit", "Don't limit the download speed", "D", false, nullptr },
+      { 910, "encryption-required", "Encrypt all peer connections", "er", false, nullptr },
+      { 911, "encryption-preferred", "Prefer encrypted peer connections", "ep", false, nullptr },
+      { 912, "encryption-tolerated", "Prefer unencrypted peer connections", "et", false, nullptr },
+      { 'f', "finish", "Run a script when the torrent finishes", "f", true, "<script>" },
+      { 'g', "config-dir", "Where to find configuration files", "g", true, "<path>" },
+      { 'm', "portmap", "Enable portmapping via NAT-PMP or UPnP", "m", false, nullptr },
+      { 'M', "no-portmap", "Disable portmapping", "M", false, nullptr },
+      { 'p', "port", "Port for incoming peers (Default: " TR_DEFAULT_PEER_PORT_STR ")", "p", true, "<port>" },
+      { 't', "tos", "Peer socket TOS (0 to 255, default=" TR_DEFAULT_PEER_SOCKET_TOS_STR ")", "t", true, "<tos>" },
+      { 'u', "uplimit", "Set max upload speed in " SPEED_K_STR, "u", true, "<speed>" },
+      { 'U', "no-uplimit", "Don't limit the upload speed", "U", false, nullptr },
+      { 'v', "verify", "Verify the specified torrent", "v", false, nullptr },
+      { 'V', "version", "Show version number and exit", "V", false, nullptr },
+      { 'w', "download-dir", "Where to save downloaded data", "w", true, "<path>" },
+      { 0, nullptr, nullptr, nullptr, false, nullptr } }
 };
-
-static char const* getUsage(void)
-{
-    // clang-format off
-    return
-        "A fast and easy BitTorrent client\n"
-        "\n"
-        "Usage: " MY_READABLE_NAME " [options] <file|url|magnet>";
-    // clang-format on
-}
 
 static int parseCommandLine(tr_variant*, int argc, char const** argv);
 
@@ -142,12 +122,11 @@ static void onTorrentFileDownloaded(
     bool /*did_connect*/,
     bool /*did_timeout*/,
     long /*response_code*/,
-    void const* response,
-    size_t response_byte_count,
+    std::string_view response,
     void* vctor)
 {
     auto* ctor = static_cast<tr_ctor*>(vctor);
-    tr_ctorSetMetainfo(ctor, response, response_byte_count);
+    tr_ctorSetMetainfo(ctor, std::data(response), std::size(response), nullptr);
     waitingOnWeb = false;
 }
 
@@ -168,12 +147,7 @@ static void getStatusStr(tr_stat const* st, char* buf, size_t buflen)
     }
     else if (st->activity == TR_STATUS_DOWNLOAD)
     {
-        char upStr[80];
-        char dnStr[80];
         char ratioStr[80];
-
-        tr_formatter_speed_KBps(upStr, st->pieceUploadSpeed_KBps, sizeof(upStr));
-        tr_formatter_speed_KBps(dnStr, st->pieceDownloadSpeed_KBps, sizeof(dnStr));
         tr_strlratio(ratioStr, st->ratio, sizeof(ratioStr));
 
         tr_snprintf(
@@ -183,17 +157,14 @@ static void getStatusStr(tr_stat const* st, char* buf, size_t buflen)
             tr_truncd(100 * st->percentDone, 1),
             st->peersSendingToUs,
             st->peersConnected,
-            dnStr,
+            tr_formatter_speed_KBps(st->pieceDownloadSpeed_KBps).c_str(),
             st->peersGettingFromUs,
-            upStr,
+            tr_formatter_speed_KBps(st->pieceUploadSpeed_KBps).c_str(),
             ratioStr);
     }
     else if (st->activity == TR_STATUS_SEED)
     {
-        char upStr[80];
         char ratioStr[80];
-
-        tr_formatter_speed_KBps(upStr, st->pieceUploadSpeed_KBps, sizeof(upStr));
         tr_strlratio(ratioStr, st->ratio, sizeof(ratioStr));
 
         tr_snprintf(
@@ -202,7 +173,7 @@ static void getStatusStr(tr_stat const* st, char* buf, size_t buflen)
             "Seeding, uploading to %d of %d peer(s), %s [%s]",
             st->peersGettingFromUs,
             st->peersConnected,
-            upStr,
+            tr_formatter_speed_KBps(st->pieceUploadSpeed_KBps).c_str(),
             ratioStr);
     }
     else
@@ -215,14 +186,14 @@ static char const* getConfigDir(int argc, char const** argv)
 {
     int c;
     char const* configDir = nullptr;
-    char const* optarg;
+    char const* my_optarg;
     int const ind = tr_optind;
 
-    while ((c = tr_getopt(getUsage(), argc, argv, options, &optarg)) != TR_OPT_DONE)
+    while ((c = tr_getopt(Usage, argc, argv, std::data(Options), &my_optarg)) != TR_OPT_DONE)
     {
         if (c == 'g')
         {
-            configDir = optarg;
+            configDir = my_optarg;
             break;
         }
     }
@@ -231,7 +202,7 @@ static char const* getConfigDir(int argc, char const** argv)
 
     if (configDir == nullptr)
     {
-        configDir = tr_getDefaultConfigDir(MY_CONFIG_NAME);
+        configDir = tr_getDefaultConfigDir(MyConfigName);
     }
 
     return configDir;
@@ -241,30 +212,26 @@ int tr_main(int argc, char* argv[])
 {
     tr_session* h;
     tr_ctor* ctor;
-    tr_torrent* tor = nullptr;
     tr_variant settings;
     char const* configDir;
-    uint8_t* fileContents;
-    size_t fileLength;
-    char const* str;
 
-    tr_formatter_mem_init(MEM_K, MEM_K_STR, MEM_M_STR, MEM_G_STR, MEM_T_STR);
-    tr_formatter_size_init(DISK_K, DISK_K_STR, DISK_M_STR, DISK_G_STR, DISK_T_STR);
-    tr_formatter_speed_init(SPEED_K, SPEED_K_STR, SPEED_M_STR, SPEED_G_STR, SPEED_T_STR);
+    tr_formatter_mem_init(MemK, MemKStr, MemMStr, MemGStr, MemTStr);
+    tr_formatter_size_init(DiskK, DiskKStr, DiskMStr, DiskGStr, DiskTStr);
+    tr_formatter_speed_init(SpeedK, SpeedKStr, SpeedMStr, SpeedGStr, SpeedTStr);
 
-    printf("%s %s\n", MY_READABLE_NAME, LONG_VERSION_STRING);
+    printf("%s %s\n", MyReadableName, LONG_VERSION_STRING);
 
     /* user needs to pass in at least one argument */
     if (argc < 2)
     {
-        tr_getopt_usage(MY_READABLE_NAME, getUsage(), options);
+        tr_getopt_usage(MyReadableName, Usage, std::data(Options));
         return EXIT_FAILURE;
     }
 
     /* load the defaults from config file + libtransmission defaults */
     tr_variantInitDict(&settings, 0);
     configDir = getConfigDir(argc, (char const**)argv);
-    tr_sessionLoadSettings(&settings, configDir, MY_CONFIG_NAME);
+    tr_sessionLoadSettings(&settings, configDir, MyConfigName);
 
     /* the command line overrides defaults */
     if (parseCommandLine(&settings, argc, (char const**)argv) != 0)
@@ -284,15 +251,21 @@ int tr_main(int argc, char* argv[])
         return EXIT_FAILURE;
     }
 
-    if (tr_variantDictFindStr(&settings, TR_KEY_download_dir, &str, nullptr) && !tr_sys_path_exists(str, nullptr))
+    if (auto sv = std::string_view{}; tr_variantDictFindStrView(&settings, TR_KEY_download_dir, &sv))
     {
-        tr_error* error = nullptr;
+        // tr_sys_path_exists and tr_sys_dir_create need zero-terminated strs
+        auto const sz_download_dir = std::string{ sv };
 
-        if (!tr_sys_dir_create(str, TR_SYS_DIR_CREATE_PARENTS, 0700, &error))
+        if (!tr_sys_path_exists(sz_download_dir.c_str(), nullptr))
         {
-            fprintf(stderr, "Unable to create download directory \"%s\": %s\n", str, error->message);
-            tr_error_free(error);
-            return EXIT_FAILURE;
+            tr_error* error = nullptr;
+
+            if (!tr_sys_dir_create(sz_download_dir.c_str(), TR_SYS_DIR_CREATE_PARENTS, 0700, &error))
+            {
+                fprintf(stderr, "Unable to create download directory \"%s\": %s\n", sz_download_dir.c_str(), error->message);
+                tr_error_free(error);
+                return EXIT_FAILURE;
+            }
         }
     }
 
@@ -300,16 +273,15 @@ int tr_main(int argc, char* argv[])
 
     ctor = tr_ctorNew(h);
 
-    fileContents = tr_loadFile(torrentPath, &fileLength, nullptr);
     tr_ctorSetPaused(ctor, TR_FORCE, false);
 
-    if (fileContents != nullptr)
+    if (tr_sys_path_exists(torrentPath, nullptr))
     {
-        tr_ctorSetMetainfo(ctor, fileContents, fileLength);
+        tr_ctorSetMetainfoFromFile(ctor, torrentPath, nullptr);
     }
     else if (memcmp(torrentPath, "magnet:?", 8) == 0)
     {
-        tr_ctorSetMetainfoFromMagnetLink(ctor, torrentPath);
+        tr_ctorSetMetainfoFromMagnetLink(ctor, torrentPath, nullptr);
     }
     else if (memcmp(torrentPath, "http", 4) == 0)
     {
@@ -330,11 +302,8 @@ int tr_main(int argc, char* argv[])
         return EXIT_FAILURE;
     }
 
-    tr_free(fileContents);
-
-    tor = tr_torrentNew(ctor, nullptr, nullptr);
+    tr_torrent* tor = tr_torrentNew(ctor, nullptr);
     tr_ctorFree(ctor);
-
     if (tor == nullptr)
     {
         fprintf(stderr, "Failed opening torrent file `%s'\n", torrentPath);
@@ -356,7 +325,7 @@ int tr_main(int argc, char* argv[])
 
     for (;;)
     {
-        char line[LINEWIDTH];
+        char line[LineWidth];
         tr_stat const* st;
         char const* messageName[] = {
             nullptr,
@@ -397,7 +366,7 @@ int tr_main(int argc, char* argv[])
         }
 
         getStatusStr(st, line, sizeof(line));
-        printf("\r%-*s", TR_ARG_TUPLE(LINEWIDTH, line));
+        printf("\r%-*s", TR_ARG_TUPLE(LineWidth, line));
 
         if (messageName[st->error])
         {
@@ -421,9 +390,9 @@ int tr_main(int argc, char* argv[])
 static int parseCommandLine(tr_variant* d, int argc, char const** argv)
 {
     int c;
-    char const* optarg;
+    char const* my_optarg;
 
-    while ((c = tr_getopt(getUsage(), argc, argv, options, &optarg)) != TR_OPT_DONE)
+    while ((c = tr_getopt(Usage, argc, argv, std::data(Options), &my_optarg)) != TR_OPT_DONE)
     {
         switch (c)
         {
@@ -436,7 +405,7 @@ static int parseCommandLine(tr_variant* d, int argc, char const** argv)
             break;
 
         case 'd':
-            tr_variantDictAddInt(d, TR_KEY_speed_limit_down, atoi(optarg));
+            tr_variantDictAddInt(d, TR_KEY_speed_limit_down, atoi(my_optarg));
             tr_variantDictAddBool(d, TR_KEY_speed_limit_down_enabled, true);
             break;
 
@@ -445,7 +414,7 @@ static int parseCommandLine(tr_variant* d, int argc, char const** argv)
             break;
 
         case 'f':
-            tr_variantDictAddStr(d, TR_KEY_script_torrent_done_filename, optarg);
+            tr_variantDictAddStr(d, TR_KEY_script_torrent_done_filename, my_optarg);
             tr_variantDictAddBool(d, TR_KEY_script_torrent_done_enabled, true);
             break;
 
@@ -461,15 +430,15 @@ static int parseCommandLine(tr_variant* d, int argc, char const** argv)
             break;
 
         case 'p':
-            tr_variantDictAddInt(d, TR_KEY_peer_port, atoi(optarg));
+            tr_variantDictAddInt(d, TR_KEY_peer_port, atoi(my_optarg));
             break;
 
         case 't':
-            tr_variantDictAddInt(d, TR_KEY_peer_socket_tos, atoi(optarg));
+            tr_variantDictAddInt(d, TR_KEY_peer_socket_tos, atoi(my_optarg));
             break;
 
         case 'u':
-            tr_variantDictAddInt(d, TR_KEY_speed_limit_up, atoi(optarg));
+            tr_variantDictAddInt(d, TR_KEY_speed_limit_up, atoi(my_optarg));
             tr_variantDictAddBool(d, TR_KEY_speed_limit_up_enabled, true);
             break;
 
@@ -486,7 +455,7 @@ static int parseCommandLine(tr_variant* d, int argc, char const** argv)
             break;
 
         case 'w':
-            tr_variantDictAddStr(d, TR_KEY_download_dir, optarg);
+            tr_variantDictAddStr(d, TR_KEY_download_dir, my_optarg);
             break;
 
         case 910:
@@ -504,7 +473,7 @@ static int parseCommandLine(tr_variant* d, int argc, char const** argv)
         case TR_OPT_UNK:
             if (torrentPath == nullptr)
             {
-                torrentPath = optarg;
+                torrentPath = my_optarg;
             }
 
             break;

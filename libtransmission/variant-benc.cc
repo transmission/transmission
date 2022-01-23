@@ -1,16 +1,12 @@
-/*
- * This file Copyright (C) 2008-2014 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2008-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
+#include <array>
 #include <cctype> /* isdigit() */
 #include <deque>
 #include <cerrno>
-#include <cstdlib> /* strtoul() */
-#include <cstring> /* strlen(), memchr() */
 #include <string_view>
 #include <optional>
 
@@ -19,11 +15,16 @@
 #define LIBTRANSMISSION_VARIANT_MODULE
 
 #include "transmission.h"
-#include "utils.h" /* tr_snprintf() */
-#include "variant.h"
-#include "variant-common.h"
 
-#define MAX_BENC_STR_LENGTH (128 * 1024 * 1024) /* arbitrary */
+#include "tr-assert.h"
+#include "quark.h"
+#include "utils.h" /* tr_snprintf() */
+#include "variant-common.h"
+#include "variant.h"
+
+using namespace std::literals;
+
+auto constexpr MaxBencStrLength = size_t{ 128 * 1024 * 1024 }; // arbitrary
 
 /***
 ****  tr_variantParse()
@@ -35,50 +36,47 @@
  * You can have negative numbers such as i-3e. You cannot prefix the
  * number with a zero such as i04e. However, i0e is valid.
  * Example: i3e represents the integer "3"
- * NOTE: The maximum number of bit of this integer is unspecified,
+ *
+ * The maximum number of bit of this integer is unspecified,
  * but to handle it as a signed 64bit integer is mandatory to handle
  * "large files" aka .torrent for more that 4Gbyte
  */
-int tr_bencParseInt(void const* vbuf, void const* vbufend, uint8_t const** setme_end, int64_t* setme_val)
+std::optional<int64_t> tr_bencParseInt(std::string_view* benc)
 {
-    uint8_t const* const buf = (uint8_t const*)vbuf;
-    uint8_t const* const bufend = (uint8_t const*)vbufend;
+    auto constexpr Prefix = "i"sv;
+    auto constexpr Suffix = "e"sv;
 
-    if (buf >= bufend)
+    // find the beginning delimiter
+    auto walk = *benc;
+    if (std::size(walk) < 3 || !tr_strvStartsWith(walk, Prefix))
     {
-        return EILSEQ;
+        return {};
     }
 
-    if (*buf != 'i')
+    // find the ending delimiter
+    walk.remove_prefix(std::size(Prefix));
+    auto const pos = walk.find(Suffix);
+    if (pos == std::string_view::npos)
     {
-        return EILSEQ;
+        return {};
     }
 
-    void const* begin = buf + 1;
-    void const* end = memchr(begin, 'e', (bufend - buf) - 1);
-
-    if (end == nullptr)
+    // leading zeroes are not allowed
+    if ((walk[0] == '0' && isdigit(walk[1])) || (walk[0] == '-' && walk[1] == '0' && isdigit(walk[2])))
     {
-        return EILSEQ;
+        return {};
     }
 
-    errno = 0;
-    char* endptr = nullptr;
-    int64_t val = evutil_strtoll(static_cast<char const*>(begin), &endptr, 10);
-
-    if (errno != 0 || endptr != end) /* incomplete parse */
+    // parse the string and make sure the next char is `Suffix`
+    auto const value = tr_parseNum<int64_t>(walk);
+    if (!value || !tr_strvStartsWith(walk, Suffix))
     {
-        return EILSEQ;
+        return {};
     }
 
-    if (val != 0 && *(char const*)begin == '0') /* no leading zeroes! */
-    {
-        return EILSEQ;
-    }
-
-    *setme_end = (uint8_t const*)end + 1;
-    *setme_val = val;
-    return 0;
+    walk.remove_prefix(std::size(Suffix));
+    *benc = walk;
+    return *value;
 }
 
 /**
@@ -87,46 +85,33 @@ int tr_bencParseInt(void const* vbuf, void const* vbufend, uint8_t const** setme
  * Note that there is no constant beginning delimiter, and no ending delimiter.
  * Example: 4:spam represents the string "spam"
  */
-int tr_bencParseStr(
-    void const* vbuf,
-    void const* vbufend,
-    uint8_t const** setme_end,
-    uint8_t const** setme_str,
-    size_t* setme_strlen)
+std::optional<std::string_view> tr_bencParseStr(std::string_view* benc)
 {
-    uint8_t const* const buf = (uint8_t const*)vbuf;
-    uint8_t const* const bufend = (uint8_t const*)vbufend;
-
-    if ((buf < bufend) && isdigit(*buf))
+    // find the ':' delimiter
+    auto const colon_pos = benc->find(':');
+    if (colon_pos == std::string_view::npos)
     {
-        void const* end = memchr(buf, ':', bufend - buf);
-
-        if (end != nullptr)
-        {
-            errno = 0;
-            char* ulend = nullptr;
-            size_t len = strtoul((char const*)buf, &ulend, 10);
-
-            if (errno == 0 && ulend == end && len <= MAX_BENC_STR_LENGTH)
-            {
-                uint8_t const* strbegin = (uint8_t const*)end + 1;
-                uint8_t const* strend = strbegin + len;
-
-                if (strbegin <= strend && strend <= bufend)
-                {
-                    *setme_end = (uint8_t const*)end + 1 + len;
-                    *setme_str = (uint8_t const*)end + 1;
-                    *setme_strlen = len;
-                    return 0;
-                }
-            }
-        }
+        return {};
     }
 
-    *setme_end = nullptr;
-    *setme_str = nullptr;
-    *setme_strlen = 0;
-    return EILSEQ;
+    // get the string length
+    auto svtmp = benc->substr(0, colon_pos);
+    auto const len = tr_parseNum<size_t>(svtmp);
+    if (!len || *len >= MaxBencStrLength)
+    {
+        return {};
+    }
+
+    // do we have `len` bytes of string data?
+    svtmp = benc->substr(colon_pos + 1);
+    if (std::size(svtmp) < len)
+    {
+        return {};
+    }
+
+    auto const string = svtmp.substr(0, *len);
+    *benc = svtmp.substr(*len);
+    return string;
 }
 
 static tr_variant* get_node(std::deque<tr_variant*>& stack, std::optional<tr_quark>& dict_key, tr_variant* top, int* err)
@@ -164,24 +149,19 @@ static tr_variant* get_node(std::deque<tr_variant*>& stack, std::optional<tr_qua
  * easier to read, but was vulnerable to a smash-stacking
  * attack via maliciously-crafted bencoded data. (#667)
  */
-int tr_variantParseBenc(void const* buf_in, void const* bufend_in, tr_variant* top, char const** setme_end)
+int tr_variantParseBenc(tr_variant& top, int parse_opts, std::string_view benc, char const** setme_end)
 {
-    int err = 0;
-    auto const* buf = static_cast<uint8_t const*>(buf_in);
-    auto const* const bufend = static_cast<uint8_t const*>(bufend_in);
+    TR_ASSERT((parse_opts & TR_VARIANT_PARSE_BENC) != 0);
+
     auto stack = std::deque<tr_variant*>{};
     auto key = std::optional<tr_quark>{};
 
-    if ((buf_in == nullptr) || (bufend_in == nullptr) || (top == nullptr))
-    {
-        return EINVAL;
-    }
+    tr_variantInit(&top, 0);
 
-    tr_variantInit(top, 0);
-
-    while (buf != bufend)
+    int err = 0;
+    for (;;)
     {
-        if (buf > bufend) /* no more text to parse... */
+        if (std::empty(benc))
         {
             err = EILSEQ;
         }
@@ -191,48 +171,43 @@ int tr_variantParseBenc(void const* buf_in, void const* bufend_in, tr_variant* t
             break;
         }
 
-        if (*buf == 'i') /* int */
+        switch (benc.front())
         {
-            uint8_t const* end = nullptr;
-            auto val = int64_t{};
-            if ((err = tr_bencParseInt(buf, bufend, &end, &val)) != 0)
+        case 'i': // int
             {
+                auto const value = tr_bencParseInt(&benc);
+                if (!value)
+                {
+                    break;
+                }
+
+                if (tr_variant* const v = get_node(stack, key, &top, &err); v != nullptr)
+                {
+                    tr_variantInitInt(v, *value);
+                }
                 break;
             }
+        case 'l': // list
+            benc.remove_prefix(1);
 
-            buf = end;
-
-            tr_variant* const v = get_node(stack, key, top, &err);
-            if (v != nullptr)
-            {
-                tr_variantInitInt(v, val);
-            }
-        }
-        else if (*buf == 'l') /* list */
-        {
-            ++buf;
-
-            tr_variant* const v = get_node(stack, key, top, &err);
-            if (v != nullptr)
+            if (tr_variant* const v = get_node(stack, key, &top, &err); v != nullptr)
             {
                 tr_variantInitList(v, 0);
                 stack.push_back(v);
             }
-        }
-        else if (*buf == 'd') /* dict */
-        {
-            ++buf;
+            break;
 
-            tr_variant* const v = get_node(stack, key, top, &err);
-            if (v != nullptr)
+        case 'd': // dict
+            benc.remove_prefix(1);
+
+            if (tr_variant* const v = get_node(stack, key, &top, &err); v != nullptr)
             {
                 tr_variantInitDict(v, 0);
                 stack.push_back(v);
             }
-        }
-        else if (*buf == 'e') /* end of list or dict */
-        {
-            ++buf;
+            break;
+        case 'e': // end of list or dict
+            benc.remove_prefix(1);
 
             if (std::empty(stack) || key)
             {
@@ -241,40 +216,50 @@ int tr_variantParseBenc(void const* buf_in, void const* bufend_in, tr_variant* t
             }
 
             stack.pop_back();
-            if (std::empty(stack))
-            {
-                break;
-            }
-        }
-        else if (isdigit(*buf)) /* string? */
-        {
-            uint8_t const* end = nullptr;
-            uint8_t const* str = nullptr;
-            auto str_len = size_t{};
-            if ((err = tr_bencParseStr(buf, bufend, &end, &str, &str_len)) != 0)
-            {
-                break;
-            }
+            break;
 
-            buf = end;
-            auto const sv = std::string_view{ reinterpret_cast<char const*>(str), str_len };
-
-            if (!key && !std::empty(stack) && tr_variantIsDict(stack.back()))
+        case '0':
+        case '1':
+        case '2':
+        case '3':
+        case '4':
+        case '5':
+        case '6':
+        case '7':
+        case '8':
+        case '9': // string?
             {
-                key = tr_quark_new(sv);
-            }
-            else
-            {
-                tr_variant* const v = get_node(stack, key, top, &err);
-                if (v != nullptr)
+                auto const sv = tr_bencParseStr(&benc);
+                if (!sv)
                 {
-                    tr_variantInitStr(v, sv);
+                    benc.remove_prefix(1);
+                    break;
                 }
+
+                if (!key && !std::empty(stack) && tr_variantIsDict(stack.back()))
+                {
+                    key = tr_quark_new(*sv);
+                }
+                else
+                {
+                    tr_variant* const v = get_node(stack, key, &top, &err);
+                    if (v != nullptr)
+                    {
+                        if ((parse_opts & TR_VARIANT_PARSE_INPLACE) != 0)
+                        {
+                            tr_variantInitStrView(v, *sv);
+                        }
+                        else
+                        {
+                            tr_variantInitStr(v, *sv);
+                        }
+                    }
+                }
+                break;
             }
-        }
-        else /* invalid bencoded text... march past it */
-        {
-            ++buf;
+        default: // invalid bencoded text... march past it
+            benc.remove_prefix(1);
+            break;
         }
 
         if (std::empty(stack))
@@ -283,7 +268,7 @@ int tr_variantParseBenc(void const* buf_in, void const* bufend_in, tr_variant* t
         }
     }
 
-    if (err == 0 && (top->type == 0 || !std::empty(stack)))
+    if (err == 0 && (top.type == 0 || !std::empty(stack)))
     {
         err = EILSEQ;
     }
@@ -292,13 +277,13 @@ int tr_variantParseBenc(void const* buf_in, void const* bufend_in, tr_variant* t
     {
         if (setme_end != nullptr)
         {
-            *setme_end = (char const*)buf;
+            *setme_end = std::data(benc);
         }
     }
-    else if (top->type != 0)
+    else if (top.type != 0)
     {
-        tr_variantFree(top);
-        tr_variantInit(top, 0);
+        tr_variantFree(&top);
+        tr_variantInit(&top, 0);
     }
 
     return err;
@@ -329,12 +314,12 @@ static void saveBoolFunc(tr_variant const* val, void* vevbuf)
 
 static void saveRealFunc(tr_variant const* val, void* vevbuf)
 {
-    char buf[128];
-    int const len = tr_snprintf(buf, sizeof(buf), "%f", val->val.d);
+    auto buf = std::array<char, 64>{};
+    int const len = tr_snprintf(std::data(buf), std::size(buf), "%f", val->val.d);
 
-    auto* evbuf = static_cast<struct evbuffer*>(vevbuf);
+    auto* evbuf = static_cast<evbuffer*>(vevbuf);
     evbuffer_add_printf(evbuf, "%d:", len);
-    evbuffer_add(evbuf, buf, len);
+    evbuffer_add(evbuf, std::data(buf), len);
 }
 
 static void saveStringFunc(tr_variant const* v, void* vevbuf)

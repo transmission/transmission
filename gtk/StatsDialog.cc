@@ -1,10 +1,9 @@
-/*
- * This file Copyright (C) 2007-2021 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2007-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
+
+#include <memory>
 
 #include <glibmm.h>
 #include <glibmm/i18n.h>
@@ -25,6 +24,8 @@ class StatsDialog::Impl
 public:
     Impl(StatsDialog& dialog, Glib::RefPtr<Session> const& core);
     ~Impl();
+
+    TR_DISABLE_COPY_MOVE(Impl)
 
 private:
     bool updateStats();
@@ -181,8 +182,8 @@ StatsDialog::Impl::Impl(StatsDialog& dialog, Glib::RefPtr<Session> const& core)
     gtr_dialog_set_content(dialog_, *t);
 
     updateStats();
-    dialog_.signal_response().connect(sigc::mem_fun(this, &Impl::dialogResponse));
+    dialog_.signal_response().connect(sigc::mem_fun(*this, &Impl::dialogResponse));
     update_stats_tag_ = Glib::signal_timeout().connect_seconds(
-        sigc::mem_fun(this, &Impl::updateStats),
+        sigc::mem_fun(*this, &Impl::updateStats),
         SECONDARY_WINDOW_REFRESH_INTERVAL_SECONDS);
 }

@@ -73,8 +73,6 @@ set(${PROJECT_NAME}_SOURCES
     InfoGeneralViewController.mm
     InfoOptionsViewController.mm
     InfoPeersViewController.mm
-    InfoTabButtonBack.mm
-    InfoTabButtonCell.mm
     InfoTextField.mm
     InfoTrackersViewController.mm
     InfoWindowController.mm
@@ -145,8 +143,6 @@ set(${PROJECT_NAME}_HEADERS
     InfoGeneralViewController.h
     InfoOptionsViewController.h
     InfoPeersViewController.h
-    InfoTabButtonBack.h
-    InfoTabButtonCell.h
     InfoTextField.h
     InfoTrackersViewController.h
     InfoViewController.h

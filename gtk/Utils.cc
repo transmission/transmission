@@ -1,17 +1,13 @@
-/*
- * This file Copyright (C) 2008-2021 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2008-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #include <array>
 #include <ctype.h> /* isxdigit() */
 #include <errno.h>
 #include <limits.h> /* INT_MAX */
 #include <stdarg.h>
-#include <string.h> /* strchr(), strrchr(), strlen(), strstr() */
 
 #include <giomm.h> /* g_file_trash() */
 #include <glibmm/i18n.h>
@@ -19,7 +15,7 @@
 #include <libtransmission/transmission.h> /* TR_RATIO_NA, TR_RATIO_INF */
 #include <libtransmission/error.h>
 #include <libtransmission/utils.h> /* tr_strratio() */
-#include <libtransmission/web.h> /* tr_webResponseStr() */
+#include <libtransmission/web-utils.h>
 #include <libtransmission/version.h> /* SHORT_VERSION_STRING */
 
 #include "HigWorkarea.h"
@@ -28,27 +24,29 @@
 #include "Session.h"
 #include "Utils.h"
 
+using namespace std::literals;
+
 /***
 ****  UNITS
 ***/
 
 int const mem_K = 1024;
-char const* mem_K_str = N_("KiB");
-char const* mem_M_str = N_("MiB");
-char const* mem_G_str = N_("GiB");
-char const* mem_T_str = N_("TiB");
+char const* const mem_K_str = N_("KiB");
+char const* const mem_M_str = N_("MiB");
+char const* const mem_G_str = N_("GiB");
+char const* const mem_T_str = N_("TiB");
 
 int const disk_K = 1000;
-char const* disk_K_str = N_("kB");
-char const* disk_M_str = N_("MB");
-char const* disk_G_str = N_("GB");
-char const* disk_T_str = N_("TB");
+char const* const disk_K_str = N_("kB");
+char const* const disk_M_str = N_("MB");
+char const* const disk_G_str = N_("GB");
+char const* const disk_T_str = N_("TB");
 
 int const speed_K = 1000;
-char const* speed_K_str = N_("kB/s");
-char const* speed_M_str = N_("MB/s");
-char const* speed_G_str = N_("GB/s");
-char const* speed_T_str = N_("TB/s");
+char const* const speed_K_str = N_("kB/s");
+char const* const speed_M_str = N_("MB/s");
+char const* const speed_G_str = N_("GB/s");
+char const* const speed_T_str = N_("TB/s");
 
 /***
 ****
@@ -77,25 +75,17 @@ Glib::ustring gtr_get_unicode_string(int i)
 
 Glib::ustring tr_strlratio(double ratio)
 {
-    std::array<char, 64> buf = {};
-    return tr_strratio(buf.data(), buf.size(), ratio, gtr_get_unicode_string(GTR_UNICODE_INF).c_str());
+    return tr_strratio(ratio, gtr_get_unicode_string(GTR_UNICODE_INF).c_str());
 }
 
 Glib::ustring tr_strlpercent(double x)
 {
-    std::array<char, 64> buf = {};
-    return tr_strpercent(buf.data(), x, buf.size());
+    return tr_strpercent(x);
 }
 
 Glib::ustring tr_strlsize(guint64 bytes)
 {
-    if (bytes == 0)
-    {
-        return Q_("None");
-    }
-
-    std::array<char, 64> buf = {};
-    return tr_formatter_size_B(buf.data(), bytes, buf.size());
+    return bytes == 0 ? Q_("None") : tr_formatter_size_B(bytes);
 }
 
 Glib::ustring tr_strltime(time_t seconds)
@@ -105,7 +95,7 @@ Glib::ustring tr_strltime(time_t seconds)
         seconds = 0;
     }
 
-    int const days = (int)(seconds / 86400);
+    auto const days = (int)(seconds / 86400);
     int const hours = (seconds % 86400) / 3600;
     int const minutes = (seconds % 3600) / 60;
     seconds = (seconds % 3600) % 60;
@@ -218,16 +208,12 @@ Gtk::Window* getWindow(Gtk::Widget* w)
 
 } // namespace
 
-void gtr_add_torrent_error_dialog(Gtk::Widget& child, int err, tr_torrent* duplicate_torrent, std::string const& filename)
+void gtr_add_torrent_error_dialog(Gtk::Widget& child, tr_torrent* duplicate_torrent, std::string const& filename)
 {
     Glib::ustring secondary;
     auto* win = getWindow(&child);
 
-    if (err == TR_PARSE_ERR)
-    {
-        secondary = gtr_sprintf(_("The torrent file \"%s\" contains invalid data."), filename);
-    }
-    else if (err == TR_PARSE_DUPLICATE)
+    if (duplicate_torrent != nullptr)
     {
         secondary = gtr_sprintf(
             _("The torrent file \"%s\" is already in use by \"%s.\""),
@@ -236,12 +222,17 @@ void gtr_add_torrent_error_dialog(Gtk::Widget& child, int err, tr_torrent* dupli
     }
     else
     {
-        secondary = gtr_sprintf(_("The torrent file \"%s\" encountered an unknown error."), filename);
+        secondary = gtr_sprintf(_("Unable to add torrent file \"%s\"."), filename);
     }
 
-    auto* w = new Gtk::MessageDialog(*win, _("Error opening torrent"), false, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_CLOSE);
+    auto w = std::make_shared<Gtk::MessageDialog>(
+        *win,
+        _("Error opening torrent"),
+        false,
+        Gtk::MESSAGE_ERROR,
+        Gtk::BUTTONS_CLOSE);
     w->set_secondary_text(secondary);
-    w->signal_response().connect([w](int /*response*/) { delete w; });
+    w->signal_response().connect([w](int /*response*/) mutable { w.reset(); });
     w->show_all();
 }
 
@@ -309,7 +300,7 @@ bool gtr_file_trash_or_remove(std::string const& filename, tr_error** error)
         catch (Glib::Error const& e)
         {
             g_message("Unable to trash file \"%s\": %s", filename.c_str(), e.what().c_str());
-            tr_error_set_literal(error, e.code(), e.what().c_str());
+            tr_error_set(error, e.code(), e.what().raw());
         }
     }
 
@@ -323,7 +314,7 @@ bool gtr_file_trash_or_remove(std::string const& filename, tr_error** error)
         {
             g_message("Unable to delete file \"%s\": %s", filename.c_str(), e.what().c_str());
             tr_error_clear(error);
-            tr_error_set_literal(error, e.code(), e.what().c_str());
+            tr_error_set(error, e.code(), e.what().raw());
             result = false;
         }
     }
@@ -470,7 +461,7 @@ Gtk::ComboBox* gtr_priority_combo_new()
 ****
 ***/
 
-#define GTR_CHILD_HIDDEN "gtr-child-hidden"
+auto const ChildHiddenKey = Glib::Quark("gtr-child-hidden");
 
 void gtr_widget_set_visible(Gtk::Widget& w, bool b)
 {
@@ -489,14 +480,14 @@ void gtr_widget_set_visible(Gtk::Widget& w, bool b)
                 continue;
             }
 
-            if (b && l->get_data(GTR_CHILD_HIDDEN) != nullptr)
+            if (b && l->get_data(ChildHiddenKey) != nullptr)
             {
-                l->steal_data(GTR_CHILD_HIDDEN);
+                l->steal_data(ChildHiddenKey);
                 gtr_widget_set_visible(*l, true);
             }
             else if (!b)
             {
-                l->set_data(GTR_CHILD_HIDDEN, GINT_TO_POINTER(1));
+                l->set_data(ChildHiddenKey, GINT_TO_POINTER(1));
                 gtr_widget_set_visible(*l, false);
             }
         }
@@ -524,7 +515,12 @@ void gtr_unrecognized_url_dialog(Gtk::Widget& parent, Glib::ustring const& url)
 
     Glib::ustring gstr;
 
-    auto* w = new Gtk::MessageDialog(*window, _("Unrecognized URL"), false, Gtk::MESSAGE_ERROR, Gtk::BUTTONS_CLOSE);
+    auto w = std::make_shared<Gtk::MessageDialog>(
+        *window,
+        _("Unrecognized URL"),
+        false,
+        Gtk::MESSAGE_ERROR,
+        Gtk::BUTTONS_CLOSE);
 
     gstr += gtr_sprintf(_("Transmission doesn't know how to use \"%s\""), url);
 
@@ -538,7 +534,7 @@ void gtr_unrecognized_url_dialog(Gtk::Widget& parent, Glib::ustring const& url)
     }
 
     w->set_secondary_text(gstr);
-    w->signal_response().connect([w](int /*response*/) { delete w; });
+    w->signal_response().connect([w](int /*response*/) mutable { w.reset(); });
     w->show();
 }
 
@@ -573,4 +569,10 @@ void gtr_label_set_text(Gtk::Label& lb, Glib::ustring const& newstr)
     {
         lb.set_text(newstr);
     }
+}
+
+std::string gtr_get_full_resource_path(std::string const& rel_path)
+{
+    static auto const BasePath = "/com/transmissionbt/transmission/"s;
+    return BasePath + rel_path;
 }

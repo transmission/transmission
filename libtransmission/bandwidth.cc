@@ -1,13 +1,10 @@
-/*
- * This file Copyright (C) 2008-2014 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2008-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #include <algorithm>
-#include <cstring> /* memset() */
+#include <vector>
 
 #include "transmission.h"
 #include "bandwidth.h"
@@ -93,22 +90,39 @@ Bandwidth::Bandwidth(Bandwidth* new_parent)
 ****
 ***/
 
+static void remove_child(std::vector<Bandwidth*>& v, Bandwidth* remove_me)
+{
+    auto it = std::find(std::begin(v), std::end(v), remove_me);
+    if (it == std::end(v))
+    {
+        return;
+    }
+
+    // the list isn't sorted -- so instead of erase()ing `it`,
+    // do the cheaper option of overwriting it with the final item
+    *it = v.back();
+    v.resize(v.size() - 1);
+}
+
 void Bandwidth::setParent(Bandwidth* new_parent)
 {
     TR_ASSERT(this != new_parent);
 
     if (this->parent_ != nullptr)
     {
-        this->parent_->children_.erase(this);
+        remove_child(this->parent_->children_, this);
         this->parent_ = nullptr;
     }
 
     if (new_parent != nullptr)
     {
+#ifdef TR_ENABLE_ASSERTS
         TR_ASSERT(new_parent->parent_ != this);
-        TR_ASSERT(new_parent->children_.find(this) == new_parent->children_.end()); // does not exist
+        auto& children = new_parent->children_;
+        TR_ASSERT(std::find(std::begin(children), std::end(children), this) == std::end(children)); // not already there
+#endif
 
-        new_parent->children_.insert(this);
+        new_parent->children_.push_back(this);
         this->parent_ = new_parent;
     }
 }

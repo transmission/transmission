@@ -1,15 +1,12 @@
-/*
- * This file Copyright (C) 2009-2021 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2009-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
-#include <limits.h> /* INT_MAX */
-#include <stddef.h>
-#include <stdio.h>
-#include <string.h>
+#include <climits> /* INT_MAX */
+#include <cstddef>
+#include <cstring> // strchr
+#include <string>
 
 #include <glibmm.h>
 #include <glibmm/i18n.h>
@@ -24,10 +21,10 @@
 #include "Session.h"
 #include "Utils.h"
 
-#define TR_COLUMN_ID_KEY "tr-model-column-id-key"
-
 namespace
 {
+
+auto const ColumnIdKey = Glib::Quark("tr-model-column-id-key");
 
 enum
 {
@@ -75,6 +72,8 @@ class FileList::Impl
 public:
     Impl(FileList& widget, Glib::RefPtr<Session> const& core, int torrent_id);
     ~Impl();
+
+    TR_DISABLE_COPY_MOVE(Impl)
 
     void set_torrent(int torrent_id);
 
@@ -151,12 +150,12 @@ bool refreshFilesForeach(
     if (is_file)
     {
         auto const* tor = refresh_data.tor;
-        auto const* inf = tr_torrentInfo(tor);
-        int const enabled = inf->files[index].dnd ? 0 : 1;
-        int const priority = inf->files[index].priority;
-        auto const progress = tr_torrentFileProgress(tor, index);
-        uint64_t const have = progress.bytes_completed;
-        int const prog = std::clamp(int(100 * progress.progress), 0, 100);
+        auto const file = tr_torrentFile(tor, index);
+        int const enabled = file.wanted;
+        int const priority = file.priority;
+        auto const progress = file.progress;
+        uint64_t const have = file.have;
+        int const prog = std::clamp(int(100 * progress), 0, 100);
 
         if (priority != old_priority || enabled != old_enabled || have != old_have || prog != old_prog)
         {
@@ -423,11 +422,11 @@ void buildTree(FileRowNode& node, build_data& build)
     auto& child_data = node.data();
     bool const isLeaf = node.child_count() == 0;
 
-    auto const mime_type = isLeaf ? gtr_get_mime_type_from_filename(child_data.name) : DIRECTORY_MIME_TYPE;
+    auto const mime_type = isLeaf ? gtr_get_mime_type_from_filename(child_data.name) : DirectoryMimeType;
     auto const icon = gtr_get_mime_type_icon(mime_type, Gtk::ICON_SIZE_MENU, *build.w);
-    auto const* inf = tr_torrentInfo(build.tor);
-    int const priority = isLeaf ? inf->files[child_data.index].priority : 0;
-    bool const enabled = isLeaf ? !inf->files[child_data.index].dnd : true;
+    auto const file = isLeaf ? tr_torrentFile(build.tor, child_data.index) : tr_file_view{};
+    int const priority = isLeaf ? file.priority : 0;
+    bool const enabled = isLeaf ? file.wanted : true;
     auto name_esc = Glib::Markup::escape_text(child_data.name);
 
     auto const child_iter = build.store->append(build.iter->children());
@@ -490,13 +489,12 @@ void FileList::Impl::set_torrent(int torrentId)
         root_data.index = -1;
         root_data.length = 0;
 
-        auto const* inf = tr_torrentInfo(tor);
-        for (tr_file_index_t i = 0; i < inf->fileCount; ++i)
+        for (tr_file_index_t i = 0, n_files = tr_torrentFileCount(tor); i < n_files; ++i)
         {
             auto* parent = &root;
-            auto const* const file = &inf->files[i];
+            auto const file = tr_torrentFile(tor, i);
 
-            for (char const *last = file->name, *next = strchr(last, '/'); last != nullptr;
+            for (char const *last = file.name, *next = strchr(last, '/'); last != nullptr;
                  last = next != nullptr ? next + 1 : nullptr, next = last != nullptr ? strchr(last, '/') : nullptr)
             {
                 bool const isLeaf = next == nullptr;
@@ -509,7 +507,7 @@ void FileList::Impl::set_torrent(int torrentId)
                     auto& row = node->data();
                     row.name = std::move(name);
                     row.index = isLeaf ? (int)i : -1;
-                    row.length = isLeaf ? file->length : 0;
+                    row.length = isLeaf ? file.length : 0;
                     parent->append(*node);
                 }
 
@@ -591,7 +589,7 @@ std::string buildFilename(tr_torrent const* tor, Gtk::TreeModel::iterator const&
         tokens.push_front(child->get_value(file_cols.label));
     }
 
-    tokens.push_front(tr_torrentGetCurrentDir(tor));
+    tokens.emplace_front(tr_torrentGetCurrentDir(tor));
     return Glib::build_filename(tokens);
 }
 
@@ -638,7 +636,7 @@ bool FileList::Impl::onViewPathToggled(Gtk::TreeViewColumn* col, Gtk::TreeModel:
 
     bool handled = false;
 
-    auto const cid = GPOINTER_TO_INT(col->get_data(TR_COLUMN_ID_KEY));
+    auto const cid = GPOINTER_TO_INT(col->get_data(ColumnIdKey));
     auto* tor = core_->find_torrent(torrent_id_);
 
     if (tor != nullptr && (cid == file_cols.priority.index() || cid == file_cols.enabled.index()))
@@ -726,7 +724,7 @@ struct rename_data
 {
     Glib::ustring newname;
     Glib::ustring path_string;
-    void* impl;
+    gpointer impl;
 };
 
 bool FileList::Impl::on_rename_done_idle(Glib::ustring const& path_string, Glib::ustring const& newname, int error)
@@ -736,7 +734,7 @@ bool FileList::Impl::on_rename_done_idle(Glib::ustring const& path_string, Glib:
         if (auto const iter = store_->get_iter(path_string); iter)
         {
             bool const isLeaf = iter->children().empty();
-            auto const mime_type = isLeaf ? gtr_get_mime_type_from_filename(newname) : DIRECTORY_MIME_TYPE;
+            auto const mime_type = isLeaf ? gtr_get_mime_type_from_filename(newname) : DirectoryMimeType;
             auto const icon = gtr_get_mime_type_icon(mime_type, Gtk::ICON_SIZE_MENU, *view_);
 
             (*iter)[file_cols.label] = newname;
@@ -796,7 +794,7 @@ void FileList::Impl::cell_edited_callback(Glib::ustring const& path_string, Glib
     }
 
     /* do the renaming */
-    auto* rename_data = new struct rename_data();
+    auto rename_data = std::make_unique<struct rename_data>();
     rename_data->newname = newname;
     rename_data->impl = this;
     rename_data->path_string = path_string;
@@ -805,14 +803,14 @@ void FileList::Impl::cell_edited_callback(Glib::ustring const& path_string, Glib
         oldpath.c_str(),
         newname.c_str(),
         static_cast<tr_torrent_rename_done_func>(
-            [](tr_torrent* /*tor*/, char const* /*oldpath*/, char const* /*newname*/, int error, void* data)
+            [](tr_torrent* /*tor*/, char const* /*oldpath*/, char const* /*newname*/, int error, gpointer data)
             {
                 Glib::signal_idle().connect(
                     [rdata = std::shared_ptr<struct rename_data>(static_cast<struct rename_data*>(data)), error]() {
                         return static_cast<Impl*>(rdata->impl)->on_rename_done_idle(rdata->path_string, rdata->newname, error);
                     });
             }),
-        rename_data);
+        rename_data.release());
 }
 
 FileList::FileList(Glib::RefPtr<Session> const& core, int torrent_id)
@@ -828,8 +826,8 @@ FileList::Impl::Impl(FileList& widget, Glib::RefPtr<Session> const& core, int to
     /* create the view */
     view_ = Gtk::make_managed<Gtk::TreeView>();
     view_->set_border_width(GUI_PAD_BIG);
-    view_->signal_button_press_event().connect(sigc::mem_fun(this, &Impl::onViewButtonPressed), false);
-    view_->signal_row_activated().connect(sigc::mem_fun(this, &Impl::onRowActivated));
+    view_->signal_button_press_event().connect(sigc::mem_fun(*this, &Impl::onViewButtonPressed), false);
+    view_->signal_row_activated().connect(sigc::mem_fun(*this, &Impl::onRowActivated));
     view_->signal_button_release_event().connect([this](GdkEventButton* event)
                                                  { return on_tree_view_button_released(view_, event); });
 
@@ -856,7 +854,7 @@ FileList::Impl::Impl(FileList& widget, Glib::RefPtr<Session> const& core, int to
         text_rend->property_editable() = true;
         text_rend->property_ellipsize() = Pango::ELLIPSIZE_END;
         text_rend->property_font_desc() = pango_font_description;
-        text_rend->signal_edited().connect(sigc::mem_fun(this, &Impl::cell_edited_callback));
+        text_rend->signal_edited().connect(sigc::mem_fun(*this, &Impl::cell_edited_callback));
         col->pack_start(*text_rend, true);
         col->add_attribute(text_rend->property_text(), file_cols.label);
         col->set_sort_column(file_cols.label);
@@ -903,7 +901,7 @@ FileList::Impl::Impl(FileList& widget, Glib::RefPtr<Session> const& core, int to
         width += 30; /* room for the sort indicator */
         auto* rend = Gtk::make_managed<Gtk::CellRendererToggle>();
         auto* col = Gtk::make_managed<Gtk::TreeViewColumn>(title, *rend);
-        col->set_data(TR_COLUMN_ID_KEY, GINT_TO_POINTER(file_cols.enabled.index()));
+        col->set_data(ColumnIdKey, GINT_TO_POINTER(file_cols.enabled.index()));
         col->set_fixed_width(width);
         col->set_sizing(Gtk::TREE_VIEW_COLUMN_FIXED);
         col->set_cell_data_func(*rend, sigc::ptr_fun(&renderDownload));
@@ -922,7 +920,7 @@ FileList::Impl::Impl(FileList& widget, Glib::RefPtr<Session> const& core, int to
         rend->property_xalign() = 0.5F;
         rend->property_yalign() = 0.5F;
         auto* col = Gtk::make_managed<Gtk::TreeViewColumn>(title, *rend);
-        col->set_data(TR_COLUMN_ID_KEY, GINT_TO_POINTER(file_cols.priority.index()));
+        col->set_data(ColumnIdKey, GINT_TO_POINTER(file_cols.priority.index()));
         col->set_fixed_width(width);
         col->set_sizing(Gtk::TREE_VIEW_COLUMN_FIXED);
         col->set_sort_column(file_cols.priority);

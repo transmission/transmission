@@ -1,10 +1,7 @@
-/*
- * This file Copyright (C) 2008-2014 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2008-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #pragma once
 
@@ -15,21 +12,21 @@
 #define TR_NAME "Transmission"
 
 #include <array>
-#include <cstring> // memcmp()
+#include <cstddef> // size_t
+#include <cstdint> // uintX_t
+#include <ctime>
 #include <list>
 #include <map>
+#include <memory>
+#include <mutex>
 #include <string>
 #include <string_view>
 #include <unordered_set>
 #include <vector>
 
-#include <event2/util.h> // evutil_ascii_strcasecmp()
+#include "transmission.h"
 
-#include "bandwidth.h"
-#include "bitfield.h"
-#include "net.h"
-#include "tr-macros.h"
-#include "utils.h"
+#include "net.h" // tr_socket_t
 
 enum tr_auto_switch_state_t
 {
@@ -43,6 +40,9 @@ tr_peer_id_t tr_peerIdInit();
 struct event_base;
 struct evdns_base;
 
+class tr_bitfield;
+class tr_rpc_server;
+struct Bandwidth;
 struct tr_address;
 struct tr_announcer;
 struct tr_announcer_udp;
@@ -50,7 +50,13 @@ struct tr_bindsockets;
 struct tr_blocklistFile;
 struct tr_cache;
 struct tr_fdInfo;
-struct tr_device_info;
+
+struct tr_bindinfo
+{
+    int socket;
+    tr_address addr;
+    struct event* ev;
+};
 
 struct tr_turtle_info
 {
@@ -93,61 +99,163 @@ struct tr_turtle_info
     tr_auto_switch_state_t autoTurtleState;
 };
 
-struct CompareHash
-{
-    bool operator()(uint8_t const* const a, uint8_t const* const b) const
-    {
-        return std::memcmp(a, b, SHA_DIGEST_LENGTH) < 0;
-    }
-};
-
-struct CaseInsensitiveStringCompare // case-insensitive string compare
-{
-    int compare(std::string_view a, std::string_view b) const // <=>
-    {
-        auto const alen = std::size(a);
-        auto const blen = std::size(b);
-
-        auto i = evutil_ascii_strncasecmp(std::data(a), std::data(b), std::min(alen, blen));
-        if (i != 0)
-        {
-            return i;
-        }
-
-        if (alen != blen)
-        {
-            return alen < blen ? -1 : 1;
-        }
-
-        return 0;
-    }
-
-    bool operator()(std::string_view a, std::string_view b) const // less than
-    {
-        return compare(a, b) < 0;
-    }
-};
-
 /** @brief handle to an active libtransmission session */
 struct tr_session
 {
+public:
+    [[nodiscard]] auto unique_lock() const
+    {
+        return std::unique_lock(session_mutex_);
+    }
+
+    [[nodiscard]] bool isClosing() const
+    {
+        return is_closing_;
+    }
+
+    [[nodiscard]] auto const* getTorrent(tr_sha1_digest_t const& info_dict_hash) const
+    {
+        auto& src = this->torrentsByHash;
+        auto it = src.find(info_dict_hash);
+        return it == std::end(src) ? nullptr : it->second;
+    }
+
+    [[nodiscard]] auto* getTorrent(tr_sha1_digest_t const& info_dict_hash)
+    {
+        auto& src = this->torrentsByHash;
+        auto it = src.find(info_dict_hash);
+        return it == std::end(src) ? nullptr : it->second;
+    }
+
+    [[nodiscard]] tr_torrent* getTorrent(std::string_view info_dict_hash_string);
+
+    [[nodiscard]] auto contains(tr_sha1_digest_t const& info_dict_hash) const
+    {
+        return getTorrent(info_dict_hash) != nullptr;
+    }
+
+    // download dir
+
+    std::string const& downloadDir() const
+    {
+        return download_dir_;
+    }
+
+    void setDownloadDir(std::string_view dir)
+    {
+        download_dir_ = dir;
+    }
+
+    // incomplete dir
+
+    std::string const& incompleteDir() const
+    {
+        return incomplete_dir_;
+    }
+
+    void setIncompleteDir(std::string_view dir)
+    {
+        incomplete_dir_ = dir;
+    }
+
+    bool useIncompleteDir() const
+    {
+        return incomplete_dir_enabled_;
+    }
+
+    void useIncompleteDir(bool enabled)
+    {
+        incomplete_dir_enabled_ = enabled;
+    }
+
+    // scripts
+
+    void useScript(TrScript i, bool enabled)
+    {
+        scripts_enabled_[i] = enabled;
+    }
+
+    bool useScript(TrScript i) const
+    {
+        return scripts_enabled_[i];
+    }
+
+    void setScript(TrScript i, std::string_view path)
+    {
+        scripts_[i] = path;
+    }
+
+    std::string const& script(TrScript i) const
+    {
+        return scripts_[i];
+    }
+
+    // blocklist
+
+    bool useBlocklist() const
+    {
+        return blocklist_enabled_;
+    }
+
+    void useBlocklist(bool enabled);
+
+    std::string const& blocklistUrl() const
+    {
+        return blocklist_url_;
+    }
+
+    void setBlocklistUrl(std::string_view url)
+    {
+        blocklist_url_ = url;
+    }
+
+    // RPC
+
+    void setRpcWhitelist(std::string_view whitelist) const;
+
+    std::string const& rpcWhitelist() const;
+
+    void useRpcWhitelist(bool enabled) const;
+
+    bool useRpcWhitelist() const;
+
+    // peer networking
+
+    std::string const& peerCongestionAlgorithm() const
+    {
+        return peer_congestion_algorithm_;
+    }
+
+    void setPeerCongestionAlgorithm(std::string_view algorithm)
+    {
+        peer_congestion_algorithm_ = algorithm;
+    }
+
+    int peerSocketTos() const
+    {
+        return peer_socket_tos_;
+    }
+
+    void setPeerSocketTos(int tos)
+    {
+        peer_socket_tos_ = tos;
+    }
+
+public:
     bool isPortRandom;
     bool isPexEnabled;
     bool isDHTEnabled;
     bool isUTPEnabled;
     bool isLPDEnabled;
-    bool isBlocklistEnabled;
     bool isPrefetchEnabled;
-    bool isClosing;
+    bool is_closing_ = false;
     bool isClosed;
-    bool isIncompleteFileNamingEnabled;
     bool isRatioLimited;
     bool isIdleLimited;
-    bool isIncompleteDirEnabled;
+    bool isIncompleteFileNamingEnabled;
     bool pauseAddedTorrent;
     bool deleteSourceTorrent;
     bool scrapePausedTorrents;
-    std::array<bool, TR_SCRIPT_N_TYPES> scripts_enabled;
 
     uint8_t peer_id_ttl_hours;
 
@@ -207,24 +315,13 @@ struct tr_session
     tr_port randomPortLow;
     tr_port randomPortHigh;
 
-    int peerSocketTOS;
-    char* peer_congestion_algorithm;
-
     std::unordered_set<tr_torrent*> torrents;
     std::map<int, tr_torrent*> torrentsById;
-    std::map<uint8_t const*, tr_torrent*, CompareHash> torrentsByHash;
-    std::map<std::string_view, tr_torrent*, CaseInsensitiveStringCompare> torrentsByHashString;
+    std::map<tr_sha1_digest_t, tr_torrent*> torrentsByHash;
 
-    std::array<std::string, TR_SCRIPT_N_TYPES> scripts;
-
-    char* configDir;
-    char* resumeDir;
-    char* torrentDir;
-    char* incompleteDir;
-
-    char* blocklist_url;
-
-    struct tr_device_info* downloadDir;
+    std::string config_dir;
+    std::string resume_dir;
+    std::string torrent_dir;
 
     std::list<tr_blocklistFile*> blocklists;
     struct tr_peerMgr* peerMgr;
@@ -232,12 +329,10 @@ struct tr_session
 
     struct tr_cache* cache;
 
-    struct tr_lock* lock;
-
     struct tr_web* web;
 
     struct tr_session_id* session_id;
-    struct tr_rpc_server* rpcServer;
+
     tr_rpc_func rpc_func;
     void* rpc_func_user_data;
 
@@ -260,6 +355,23 @@ struct tr_session
 
     struct tr_bindinfo* bind_ipv4;
     struct tr_bindinfo* bind_ipv6;
+
+    std::unique_ptr<tr_rpc_server> rpc_server_;
+
+private:
+    static std::recursive_mutex session_mutex_;
+
+    std::array<std::string, TR_SCRIPT_N_TYPES> scripts_;
+    std::string blocklist_url_;
+    std::string download_dir_;
+    std::string incomplete_dir_;
+    std::string peer_congestion_algorithm_;
+
+    int peer_socket_tos_ = 0;
+
+    std::array<bool, TR_SCRIPT_N_TYPES> scripts_enabled_;
+    bool blocklist_enabled_ = false;
+    bool incomplete_dir_enabled_ = false;
 };
 
 constexpr tr_port tr_sessionGetPublicPeerPort(tr_session const* session)
@@ -272,12 +384,6 @@ bool tr_sessionAllowsDHT(tr_session const* session);
 bool tr_sessionAllowsLPD(tr_session const* session);
 
 bool tr_sessionIsAddressBlocked(tr_session const* session, struct tr_address const* addr);
-
-void tr_sessionLock(tr_session*);
-
-void tr_sessionUnlock(tr_session*);
-
-bool tr_sessionIsLocked(tr_session const*);
 
 struct tr_address const* tr_sessionGetPublicAddress(tr_session const* session, int tr_af_type, bool* is_default_value);
 
@@ -315,31 +421,6 @@ constexpr bool tr_isPriority(tr_priority_t p)
 /***
 ****
 ***/
-
-static inline unsigned int toSpeedBytes(unsigned int KBps)
-{
-    return KBps * tr_speed_K;
-}
-
-static inline double toSpeedKBps(unsigned int Bps)
-{
-    return Bps / (double)tr_speed_K;
-}
-
-static inline uint64_t toMemBytes(unsigned int MB)
-{
-    uint64_t B = (uint64_t)tr_mem_K * tr_mem_K;
-    B *= MB;
-    return B;
-}
-
-static inline int toMemMB(uint64_t B)
-{
-    return (int)(B / (tr_mem_K * tr_mem_K));
-}
-
-/**
-**/
 
 unsigned int tr_sessionGetSpeedLimit_Bps(tr_session const*, tr_direction);
 unsigned int tr_sessionGetPieceSpeed_Bps(tr_session const*, tr_direction);

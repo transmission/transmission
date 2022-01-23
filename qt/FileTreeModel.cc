@@ -1,13 +1,11 @@
-/*
- * This file Copyright (C) 2009-2015 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2009-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #include <algorithm>
 #include <cassert>
+#include <memory>
 
 #include <libtransmission/transmission.h> // priorities
 
@@ -91,17 +89,15 @@ public:
 } // namespace
 
 FileTreeModel::FileTreeModel(QObject* parent, bool is_editable)
-    : QAbstractItemModel(parent)
-    , root_item_(new FileTreeItem)
-    , is_editable_(is_editable)
+    : QAbstractItemModel{ parent }
+    , root_item_{ std::make_unique<FileTreeItem>() }
+    , is_editable_{ is_editable }
 {
 }
 
 FileTreeModel::~FileTreeModel()
 {
     clear();
-
-    delete root_item_;
 }
 
 void FileTreeModel::setEditable(bool is_editable)
@@ -233,7 +229,7 @@ QModelIndex FileTreeModel::index(int row, int column, QModelIndex const& parent)
 
         if (!parent.isValid())
         {
-            parent_item = root_item_;
+            parent_item = root_item_.get();
         }
         else
         {
@@ -270,7 +266,7 @@ QModelIndex FileTreeModel::parent(QModelIndex const& child, int column) const
 
 int FileTreeModel::rowCount(QModelIndex const& parent) const
 {
-    FileTreeItem const* parent_item = parent.isValid() ? itemFromIndex(parent) : root_item_;
+    FileTreeItem const* parent_item = parent.isValid() ? itemFromIndex(parent) : root_item_.get();
 
     return parent_item->childCount();
 }
@@ -284,7 +280,7 @@ int FileTreeModel::columnCount(QModelIndex const& parent) const
 
 QModelIndex FileTreeModel::indexOf(FileTreeItem* item, int column) const
 {
-    if (item == nullptr || item == root_item_)
+    if (item == nullptr || item == root_item_.get())
     {
         return QModelIndex();
     }
@@ -320,6 +316,7 @@ void FileTreeModel::clear()
 {
     beginResetModel();
     clearSubtree(QModelIndex());
+    root_item_ = std::make_unique<FileTreeItem>();
     endResetModel();
 
     assert(index_cache_.isEmpty());
@@ -366,7 +363,7 @@ void FileTreeModel::addFile(
             item = item->parent();
         }
 
-        assert(item == root_item_);
+        assert(item == root_item_.get());
 
         if (index_with_changed_parents.isValid())
         {
@@ -377,7 +374,7 @@ void FileTreeModel::addFile(
     {
         bool added = false;
 
-        item = root_item_;
+        item = root_item_.get();
         BackwardPathIterator filename_it(filename);
 
         while (filename_it.hasNext())
@@ -409,7 +406,7 @@ void FileTreeModel::addFile(
             item = child;
         }
 
-        if (item != root_item_)
+        if (item != root_item_.get())
         {
             assert(item->fileIndex() == file_index);
             assert(item->totalSize() == total_size);

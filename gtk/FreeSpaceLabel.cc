@@ -1,12 +1,14 @@
-/*
- * This file Copyright (C) 2008-2021 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2008-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
+
+#include <memory>
+#include <string>
 
 #include <glibmm/i18n.h>
+
+#include <libtransmission/utils.h>
 
 #include "FreeSpaceLabel.h"
 #include "Session.h"
@@ -17,6 +19,8 @@ class FreeSpaceLabel::Impl
 public:
     Impl(FreeSpaceLabel& label, Glib::RefPtr<Session> const& core, std::string const& dir);
     ~Impl();
+
+    TR_DISABLE_COPY_MOVE(Impl)
 
     void set_dir(std::string const& dir);
 
@@ -37,13 +41,12 @@ FreeSpaceLabel::Impl::~Impl()
 
 bool FreeSpaceLabel::Impl::on_freespace_timer()
 {
-    auto* const session = core_->get_session();
-    if (session == nullptr)
+    if (core_->get_session() == nullptr)
     {
         return false;
     }
 
-    auto const bytes = tr_sessionGetDirFreeSpace(session, dir_.c_str());
+    auto const bytes = tr_dirSpace(dir_).free;
     auto const text = bytes < 0 ? _("Error") : gtr_sprintf(_("%s free"), tr_strlsize(bytes));
     auto const markup = gtr_sprintf("<i>%s</i>", text);
     label_.set_markup(markup);
@@ -64,7 +67,7 @@ FreeSpaceLabel::Impl::Impl(FreeSpaceLabel& label, Glib::RefPtr<Session> const& c
     , core_(core)
     , dir_(dir)
 {
-    timer_id_ = Glib::signal_timeout().connect_seconds(sigc::mem_fun(this, &Impl::on_freespace_timer), 3);
+    timer_id_ = Glib::signal_timeout().connect_seconds(sigc::mem_fun(*this, &Impl::on_freespace_timer), 3);
     on_freespace_timer();
 }
 

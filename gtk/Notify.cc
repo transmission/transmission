@@ -1,10 +1,7 @@
-/*
- * This file Copyright (C) 2008-2021 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2008-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #include <map>
 
@@ -17,9 +14,7 @@
 #include "Session.h"
 #include "Utils.h"
 
-#define NOTIFICATIONS_DBUS_NAME "org.freedesktop.Notifications"
-#define NOTIFICATIONS_DBUS_CORE_OBJECT "/org/freedesktop/Notifications"
-#define NOTIFICATIONS_DBUS_CORE_INTERFACE "org.freedesktop.Notifications"
+using namespace std::literals;
 
 using StringVariantType = Glib::Variant<Glib::ustring>;
 using StringListVariantType = Glib::Variant<std::vector<Glib::ustring>>;
@@ -27,6 +22,10 @@ using UInt32VariantType = Glib::Variant<guint32>;
 
 namespace
 {
+
+auto const NotificationsDbusName = Glib::ustring("org.freedesktop.Notifications"s);
+auto const NotificationsDbusCoreObject = Glib::ustring("/org/freedesktop/Notifications"s);
+auto const NotificationsDbusCoreInterface = Glib::ustring("org.freedesktop.Notifications"s);
 
 struct TrNotification
 {
@@ -105,10 +104,13 @@ void g_signal_callback(
         }
         else if (action == "file")
         {
-            auto const* inf = tr_torrentInfo(tor);
             char const* dir = tr_torrentGetDownloadDir(tor);
-            auto const path = Glib::build_filename(dir, inf->files[0].name);
+            auto const path = Glib::build_filename(dir, tr_torrentFile(tor, 0).name);
             gtr_open_file(path);
+        }
+        else if (action == "start-now")
+        {
+            n.core->start_now(n.torrent_id);
         }
     }
 }
@@ -119,7 +121,7 @@ void dbus_proxy_ready_callback(Glib::RefPtr<Gio::AsyncResult>& res)
 
     if (proxy == nullptr)
     {
-        g_warning("Failed to create proxy for %s", NOTIFICATIONS_DBUS_NAME);
+        g_warning("Failed to create proxy for %s", NotificationsDbusName.c_str());
         return;
     }
 
@@ -133,9 +135,9 @@ void gtr_notify_init()
 {
     Gio::DBus::Proxy::create_for_bus(
         Gio::DBus::BUS_TYPE_SESSION,
-        NOTIFICATIONS_DBUS_NAME,
-        NOTIFICATIONS_DBUS_CORE_OBJECT,
-        NOTIFICATIONS_DBUS_CORE_INTERFACE,
+        NotificationsDbusName,
+        NotificationsDbusCoreObject,
+        NotificationsDbusCoreInterface,
         &dbus_proxy_ready_callback,
         {},
         Gio::DBus::PROXY_FLAGS_DO_NOT_LOAD_PROPERTIES);
@@ -155,7 +157,7 @@ void notify_callback(Glib::RefPtr<Gio::AsyncResult>& res, TrNotification const& 
 
     auto const id = Glib::VariantBase::cast_dynamic<UInt32VariantType>(result.get_child(0)).get();
 
-    active_notifications.emplace(id, n);
+    active_notifications.try_emplace(id, n);
 }
 
 } // namespace
@@ -189,22 +191,20 @@ void gtr_notify_torrent_completed(Glib::RefPtr<Session> const& core, int torrent
     std::vector<Glib::ustring> actions;
     if (server_supports_actions)
     {
-        auto const* inf = tr_torrentInfo(tor);
-
-        if (inf->fileCount == 1)
+        if (tr_torrentFileCount(tor) == 1)
         {
-            actions.push_back("file");
-            actions.push_back(_("Open File"));
+            actions.emplace_back("file");
+            actions.emplace_back(_("Open File"));
         }
         else
         {
-            actions.push_back("folder");
-            actions.push_back(_("Open Folder"));
+            actions.emplace_back("folder");
+            actions.emplace_back(_("Open Folder"));
         }
     }
 
     std::map<Glib::ustring, Glib::VariantBase> hints;
-    hints.emplace("category", StringVariantType::create("transfer.complete"));
+    hints.try_emplace("category", StringVariantType::create("transfer.complete"));
 
     proxy->call(
         "Notify",
@@ -220,7 +220,7 @@ void gtr_notify_torrent_completed(Glib::RefPtr<Session> const& core, int torrent
             -1));
 }
 
-void gtr_notify_torrent_added(Glib::ustring const& name)
+void gtr_notify_torrent_added(Glib::RefPtr<Session> const& core, int torrent_id)
 {
     g_return_if_fail(proxy != nullptr);
 
@@ -229,16 +229,27 @@ void gtr_notify_torrent_added(Glib::ustring const& name)
         return;
     }
 
+    auto const* const tor = core->find_torrent(torrent_id);
+
+    std::vector<Glib::ustring> actions;
+    if (server_supports_actions)
+    {
+        actions.emplace_back("start-now");
+        actions.emplace_back(_("Start Now"));
+    }
+
+    auto const n = TrNotification{ core, torrent_id };
+
     proxy->call(
         "Notify",
-        [](auto& res) { notify_callback(res, {}); },
+        [n](auto& res) { notify_callback(res, n); },
         make_variant_tuple(
             Glib::ustring("Transmission"),
             0u,
             Glib::ustring("transmission"),
             Glib::ustring(_("Torrent Added")),
-            name,
-            std::vector<Glib::ustring>(),
+            Glib::ustring(tr_torrentName(tor)),
+            actions,
             std::map<Glib::ustring, Glib::VariantBase>(),
             -1));
 }

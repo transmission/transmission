@@ -1,11 +1,9 @@
-/*
- * This file Copyright (C) 2008-2014 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2008-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
+#include <array>
 #include <errno.h>
 #include <stdio.h> /* printf */
 #include <stdlib.h> /* atoi */
@@ -34,7 +32,7 @@
 #include <libtransmission/version.h>
 #include <libtransmission/watchdir.h>
 
-using namespace std::literals;
+#include "daemon.h"
 
 #ifdef USE_SYSTEMD
 
@@ -44,37 +42,45 @@ using namespace std::literals;
 
 static void sd_notify(int /*status*/, char const* /*str*/)
 {
+    // no-op
 }
 
 static void sd_notifyf(int /*status*/, char const* /*fmt*/, ...)
 {
+    // no-op
 }
 
 #endif
 
-#include "daemon.h"
+using namespace std::literals;
 
-#define MY_NAME "transmission-daemon"
+static char constexpr MyName[] = "transmission-daemon";
+static char constexpr Usage[] = "Transmission " LONG_VERSION_STRING
+                                "  https://transmissionbt.com/\n"
+                                "A fast and easy BitTorrent client\n"
+                                "\n"
+                                "transmission-daemon is a headless Transmission session that can be\n"
+                                "controlled via transmission-qt, transmission-remote, or its web interface.\n"
+                                "\n"
+                                "Usage: transmission-daemon [options]";
 
-#define MEM_K 1024
-#define MEM_K_STR "KiB"
-#define MEM_M_STR "MiB"
-#define MEM_G_STR "GiB"
-#define MEM_T_STR "TiB"
+static auto constexpr MemK = size_t{ 1024 };
+static char constexpr MemKStr[] = "KiB";
+static char constexpr MemMStr[] = "MiB";
+static char constexpr MemGStr[] = "GiB";
+static char constexpr MemTStr[] = "TiB";
 
-#define DISK_K 1000
-#define DISK_B_STR "B"
-#define DISK_K_STR "kB"
-#define DISK_M_STR "MB"
-#define DISK_G_STR "GB"
-#define DISK_T_STR "TB"
+static auto constexpr DiskK = size_t{ 1000 };
+static char constexpr DiskKStr[] = "kB";
+static char constexpr DiskMStr[] = "MB";
+static char constexpr DiskGStr[] = "GB";
+static char constexpr DiskTStr[] = "TB";
 
-#define SPEED_K 1000
-#define SPEED_B_STR "B/s"
-#define SPEED_K_STR "kB/s"
-#define SPEED_M_STR "MB/s"
-#define SPEED_G_STR "GB/s"
-#define SPEED_T_STR "TB/s"
+static auto constexpr SpeedK = size_t{ 1000 };
+static char constexpr SpeedKStr[] = "kB/s";
+static char constexpr SpeedMStr[] = "MB/s";
+static char constexpr SpeedGStr[] = "GB/s";
+static char constexpr SpeedTStr[] = "TB/s";
 
 static bool seenHUP = false;
 static char const* logfileName = nullptr;
@@ -88,85 +94,70 @@ static struct event_base* ev_base = nullptr;
 ****  Config File
 ***/
 
-static char const* getUsage(void)
-{
-    // clang-format off
-    return
-        "Transmission " LONG_VERSION_STRING "  https://transmissionbt.com/\n"
-        "A fast and easy BitTorrent client\n"
-        "\n"
-        MY_NAME " is a headless Transmission session\n"
-        "that can be controlled via transmission-remote\n"
-        "or the web interface.\n"
-        "\n"
-        "Usage: " MY_NAME " [options]";
-    // clang-format on
-}
-
-static struct tr_option const options[] = {
-    { 'a', "allowed", "Allowed IP addresses. (Default: " TR_DEFAULT_RPC_WHITELIST ")", "a", true, "<list>" },
-    { 'b', "blocklist", "Enable peer blocklists", "b", false, nullptr },
-    { 'B', "no-blocklist", "Disable peer blocklists", "B", false, nullptr },
-    { 'c', "watch-dir", "Where to watch for new .torrent files", "c", true, "<directory>" },
-    { 'C', "no-watch-dir", "Disable the watch-dir", "C", false, nullptr },
-    { 941, "incomplete-dir", "Where to store new torrents until they're complete", nullptr, true, "<directory>" },
-    { 942, "no-incomplete-dir", "Don't store incomplete torrents in a different location", nullptr, false, nullptr },
-    { 'd', "dump-settings", "Dump the settings and exit", "d", false, nullptr },
-    { 'e', "logfile", "Dump the log messages to this filename", "e", true, "<filename>" },
-    { 'f', "foreground", "Run in the foreground instead of daemonizing", "f", false, nullptr },
-    { 'g', "config-dir", "Where to look for configuration files", "g", true, "<path>" },
-    { 'p', "port", "RPC port (Default: " TR_DEFAULT_RPC_PORT_STR ")", "p", true, "<port>" },
-    { 't', "auth", "Require authentication", "t", false, nullptr },
-    { 'T', "no-auth", "Don't require authentication", "T", false, nullptr },
-    { 'u', "username", "Set username for authentication", "u", true, "<username>" },
-    { 'v', "password", "Set password for authentication", "v", true, "<password>" },
-    { 'V', "version", "Show version number and exit", "V", false, nullptr },
-    { 810, "log-error", "Show error messages", nullptr, false, nullptr },
-    { 811, "log-info", "Show error and info messages", nullptr, false, nullptr },
-    { 812, "log-debug", "Show error, info, and debug messages", nullptr, false, nullptr },
-    { 'w', "download-dir", "Where to save downloaded data", "w", true, "<path>" },
-    { 800, "paused", "Pause all torrents on startup", nullptr, false, nullptr },
-    { 'o', "dht", "Enable distributed hash tables (DHT)", "o", false, nullptr },
-    { 'O', "no-dht", "Disable distributed hash tables (DHT)", "O", false, nullptr },
-    { 'y', "lpd", "Enable local peer discovery (LPD)", "y", false, nullptr },
-    { 'Y', "no-lpd", "Disable local peer discovery (LPD)", "Y", false, nullptr },
-    { 830, "utp", "Enable uTP for peer connections", nullptr, false, nullptr },
-    { 831, "no-utp", "Disable uTP for peer connections", nullptr, false, nullptr },
-    { 'P', "peerport", "Port for incoming peers (Default: " TR_DEFAULT_PEER_PORT_STR ")", "P", true, "<port>" },
-    { 'm', "portmap", "Enable portmapping via NAT-PMP or UPnP", "m", false, nullptr },
-    { 'M', "no-portmap", "Disable portmapping", "M", false, nullptr },
-    { 'L',
-      "peerlimit-global",
-      "Maximum overall number of peers (Default: " TR_DEFAULT_PEER_LIMIT_GLOBAL_STR ")",
-      "L",
-      true,
-      "<limit>" },
-    { 'l',
-      "peerlimit-torrent",
-      "Maximum number of peers per torrent (Default: " TR_DEFAULT_PEER_LIMIT_TORRENT_STR ")",
-      "l",
-      true,
-      "<limit>" },
-    { 910, "encryption-required", "Encrypt all peer connections", "er", false, nullptr },
-    { 911, "encryption-preferred", "Prefer encrypted peer connections", "ep", false, nullptr },
-    { 912, "encryption-tolerated", "Prefer unencrypted peer connections", "et", false, nullptr },
-    { 'i', "bind-address-ipv4", "Where to listen for peer connections", "i", true, "<ipv4 addr>" },
-    { 'I', "bind-address-ipv6", "Where to listen for peer connections", "I", true, "<ipv6 addr>" },
-    { 'r', "rpc-bind-address", "Where to listen for RPC connections", "r", true, "<ip addr>" },
-    { 953,
-      "global-seedratio",
-      "All torrents, unless overridden by a per-torrent setting, should seed until a specific ratio",
-      "gsr",
-      true,
-      "ratio" },
-    { 954,
-      "no-global-seedratio",
-      "All torrents, unless overridden by a per-torrent setting, should seed regardless of ratio",
-      "GSR",
-      false,
-      nullptr },
-    { 'x', "pid-file", "Enable PID file", "x", true, "<pid-file>" },
-    { 0, nullptr, nullptr, nullptr, false, nullptr }
+static auto constexpr Options = std::array<tr_option, 43>{
+    { { 'a', "allowed", "Allowed IP addresses. (Default: " TR_DEFAULT_RPC_WHITELIST ")", "a", true, "<list>" },
+      { 'b', "blocklist", "Enable peer blocklists", "b", false, nullptr },
+      { 'B', "no-blocklist", "Disable peer blocklists", "B", false, nullptr },
+      { 'c', "watch-dir", "Where to watch for new .torrent files", "c", true, "<directory>" },
+      { 'C', "no-watch-dir", "Disable the watch-dir", "C", false, nullptr },
+      { 941, "incomplete-dir", "Where to store new torrents until they're complete", nullptr, true, "<directory>" },
+      { 942, "no-incomplete-dir", "Don't store incomplete torrents in a different location", nullptr, false, nullptr },
+      { 'd', "dump-settings", "Dump the settings and exit", "d", false, nullptr },
+      { 'e', "logfile", "Dump the log messages to this filename", "e", true, "<filename>" },
+      { 'f', "foreground", "Run in the foreground instead of daemonizing", "f", false, nullptr },
+      { 'g', "config-dir", "Where to look for configuration files", "g", true, "<path>" },
+      { 'p', "port", "RPC port (Default: " TR_DEFAULT_RPC_PORT_STR ")", "p", true, "<port>" },
+      { 't', "auth", "Require authentication", "t", false, nullptr },
+      { 'T', "no-auth", "Don't require authentication", "T", false, nullptr },
+      { 'u', "username", "Set username for authentication", "u", true, "<username>" },
+      { 'v', "password", "Set password for authentication", "v", true, "<password>" },
+      { 'V', "version", "Show version number and exit", "V", false, nullptr },
+      { 810, "log-error", "Show error messages", nullptr, false, nullptr },
+      { 811, "log-info", "Show error and info messages", nullptr, false, nullptr },
+      { 812, "log-debug", "Show error, info, and debug messages", nullptr, false, nullptr },
+      { 'w', "download-dir", "Where to save downloaded data", "w", true, "<path>" },
+      { 800, "paused", "Pause all torrents on startup", nullptr, false, nullptr },
+      { 'o', "dht", "Enable distributed hash tables (DHT)", "o", false, nullptr },
+      { 'O', "no-dht", "Disable distributed hash tables (DHT)", "O", false, nullptr },
+      { 'y', "lpd", "Enable local peer discovery (LPD)", "y", false, nullptr },
+      { 'Y', "no-lpd", "Disable local peer discovery (LPD)", "Y", false, nullptr },
+      { 830, "utp", "Enable uTP for peer connections", nullptr, false, nullptr },
+      { 831, "no-utp", "Disable uTP for peer connections", nullptr, false, nullptr },
+      { 'P', "peerport", "Port for incoming peers (Default: " TR_DEFAULT_PEER_PORT_STR ")", "P", true, "<port>" },
+      { 'm', "portmap", "Enable portmapping via NAT-PMP or UPnP", "m", false, nullptr },
+      { 'M', "no-portmap", "Disable portmapping", "M", false, nullptr },
+      { 'L',
+        "peerlimit-global",
+        "Maximum overall number of peers (Default: " TR_DEFAULT_PEER_LIMIT_GLOBAL_STR ")",
+        "L",
+        true,
+        "<limit>" },
+      { 'l',
+        "peerlimit-torrent",
+        "Maximum number of peers per torrent (Default: " TR_DEFAULT_PEER_LIMIT_TORRENT_STR ")",
+        "l",
+        true,
+        "<limit>" },
+      { 910, "encryption-required", "Encrypt all peer connections", "er", false, nullptr },
+      { 911, "encryption-preferred", "Prefer encrypted peer connections", "ep", false, nullptr },
+      { 912, "encryption-tolerated", "Prefer unencrypted peer connections", "et", false, nullptr },
+      { 'i', "bind-address-ipv4", "Where to listen for peer connections", "i", true, "<ipv4 addr>" },
+      { 'I', "bind-address-ipv6", "Where to listen for peer connections", "I", true, "<ipv6 addr>" },
+      { 'r', "rpc-bind-address", "Where to listen for RPC connections", "r", true, "<ip addr>" },
+      { 953,
+        "global-seedratio",
+        "All torrents, unless overridden by a per-torrent setting, should seed until a specific ratio",
+        "gsr",
+        true,
+        "ratio" },
+      { 954,
+        "no-global-seedratio",
+        "All torrents, unless overridden by a per-torrent setting, should seed regardless of ratio",
+        "GSR",
+        false,
+        nullptr },
+      { 'x', "pid-file", "Enable PID file", "x", true, "<pid-file>" },
+      { 0, nullptr, nullptr, nullptr, false, nullptr } }
 };
 
 static bool reopen_log_file(char const* filename)
@@ -203,7 +194,7 @@ static char const* getConfigDir(int argc, char const* const* argv)
     char const* optstr;
     int const ind = tr_optind;
 
-    while ((c = tr_getopt(getUsage(), argc, argv, options, &optstr)) != TR_OPT_DONE)
+    while ((c = tr_getopt(Usage, argc, argv, std::data(Options), &optstr)) != TR_OPT_DONE)
     {
         if (c == 'g')
         {
@@ -216,13 +207,13 @@ static char const* getConfigDir(int argc, char const* const* argv)
 
     if (configDir == nullptr)
     {
-        configDir = tr_getDefaultConfigDir(MY_NAME);
+        configDir = tr_getDefaultConfigDir(MyName);
     }
 
     return configDir;
 }
 
-static tr_watchdir_status onFileAdded(tr_watchdir_t dir, char const* name, void* vsession)
+static auto onFileAdded(tr_watchdir_t dir, char const* name, void* vsession)
 {
     auto const* session = static_cast<tr_session const*>(vsession);
 
@@ -231,85 +222,64 @@ static tr_watchdir_status onFileAdded(tr_watchdir_t dir, char const* name, void*
         return TR_WATCHDIR_IGNORE;
     }
 
-    char* filename = tr_buildPath(tr_watchdir_get_path(dir), name, nullptr);
+    auto filename = tr_strvPath(tr_watchdir_get_path(dir), name);
     tr_ctor* ctor = tr_ctorNew(session);
-    int err = tr_ctorSetMetainfoFromFile(ctor, filename);
-
-    if (err == 0)
+    if (!tr_ctorSetMetainfoFromFile(ctor, filename.c_str(), nullptr))
     {
-        tr_torrentNew(ctor, &err, nullptr);
+        tr_ctorFree(ctor);
+        return TR_WATCHDIR_RETRY;
+    }
 
-        if (err == TR_PARSE_ERR)
-        {
-            tr_logAddError("Error parsing .torrent file \"%s\"", name);
-        }
-        else
-        {
-            bool trash = false;
-            bool const test = tr_ctorGetDeleteSource(ctor, &trash);
-
-            tr_logAddInfo("Parsing .torrent file successful \"%s\"", name);
-
-            if (test && trash)
-            {
-                tr_error* error = nullptr;
-
-                tr_logAddInfo("Deleting input .torrent file \"%s\"", name);
-
-                if (!tr_sys_path_remove(filename, &error))
-                {
-                    tr_logAddError("Error deleting .torrent file: %s", error->message);
-                    tr_error_free(error);
-                }
-            }
-            else
-            {
-                char* new_filename = tr_strdup_printf("%s.added", filename);
-                tr_sys_path_rename(filename, new_filename, nullptr);
-                tr_free(new_filename);
-            }
-        }
+    if (tr_torrentNew(ctor, nullptr) == nullptr)
+    {
+        tr_logAddError("Unable to add .torrent file \"%s\"", name);
     }
     else
     {
-        err = TR_PARSE_ERR;
+        bool trash = false;
+        bool const test = tr_ctorGetDeleteSource(ctor, &trash);
+
+        tr_logAddInfo("Parsing .torrent file successful \"%s\"", name);
+
+        if (test && trash)
+        {
+            tr_error* error = nullptr;
+
+            tr_logAddInfo("Deleting input .torrent file \"%s\"", name);
+
+            if (!tr_sys_path_remove(filename.c_str(), &error))
+            {
+                tr_logAddError("Error deleting .torrent file: %s", error->message);
+                tr_error_free(error);
+            }
+        }
+        else
+        {
+            auto const new_filename = filename + ".added";
+            tr_sys_path_rename(filename.c_str(), new_filename.c_str(), nullptr);
+        }
     }
 
     tr_ctorFree(ctor);
-    tr_free(filename);
-
-    return err == TR_PARSE_ERR ? TR_WATCHDIR_RETRY : TR_WATCHDIR_ACCEPT;
+    return TR_WATCHDIR_ACCEPT;
 }
 
 static void printMessage(
     tr_sys_file_t file,
     [[maybe_unused]] int level,
-    char const* name,
-    char const* message,
-    char const* filename,
+    std::string_view name,
+    std::string_view message,
+    std::string_view filename,
     int line)
 {
+    auto const out = std::empty(name) ? tr_strvJoin(message, " ("sv, filename, ":"sv, std::to_string(line), ")"sv) :
+                                        tr_strvJoin(name, " "sv, message, " ("sv, filename, ":"sv, std::to_string(line), ")"sv);
+
     if (file != TR_BAD_SYS_FILE)
     {
-        char timestr[64];
-        tr_logGetTimeStr(timestr, sizeof(timestr));
-
-        if (name != nullptr)
-        {
-            tr_sys_file_write_fmt(
-                file,
-                "[%s] %s %s (%s:%d)" TR_NATIVE_EOL_STR,
-                nullptr,
-                timestr,
-                name,
-                message,
-                filename,
-                line);
-        }
-        else
-        {
-            tr_sys_file_write_fmt(file, "[%s] %s (%s:%d)" TR_NATIVE_EOL_STR, nullptr, timestr, message, filename, line);
-        }
+        auto timestr = std::array<char, 64>{};
+        tr_logGetTimeStr(std::data(timestr), std::size(timestr));
+        tr_sys_file_write_line(file, tr_strvJoin("["sv, std::data(timestr), "] "sv, out), nullptr);
     }
 
 #ifdef HAVE_SYSLOG
@@ -334,14 +304,7 @@ static void printMessage(
             break;
         }
 
-        if (name != nullptr)
-        {
-            syslog(priority, "%s %s (%s:%d)", name, message, filename, line);
-        }
-        else
-        {
-            syslog(priority, "%s (%s:%d)", message, filename, line);
-        }
+        syslog(priority, "%s", out.c_str());
     }
 
 #endif
@@ -353,7 +316,8 @@ static void pumpLogMessages(tr_sys_file_t file)
 
     for (tr_log_message const* l = list; l != nullptr; l = l->next)
     {
-        printMessage(file, l->level, l->name, l->message, l->file, l->line);
+        auto const name = std::string_view{ l->name != nullptr ? l->name : "" };
+        printMessage(file, l->level, name, l->message, l->file, l->line);
     }
 
     if (file != TR_BAD_SYS_FILE)
@@ -417,7 +381,7 @@ static bool parse_args(
 
     tr_optind = 1;
 
-    while ((c = tr_getopt(getUsage(), argc, argv, options, &optstr)) != TR_OPT_DONE)
+    while ((c = tr_getopt(Usage, argc, argv, std::data(Options), &optstr)) != TR_OPT_DONE)
     {
         switch (c)
         {
@@ -472,7 +436,7 @@ static bool parse_args(
             break;
 
         case 'V': /* version */
-            fprintf(stderr, "%s %s\n", MY_NAME, LONG_VERSION_STRING);
+            fprintf(stderr, "%s %s\n", MyName, LONG_VERSION_STRING);
             *exit_code = 0;
             return false;
 
@@ -598,7 +562,7 @@ static bool parse_args(
             break;
 
         default:
-            tr_getopt_usage(MY_NAME, getUsage(), options);
+            tr_getopt_usage(MyName, Usage, std::data(Options));
             *exit_code = 0;
             return false;
         }
@@ -636,7 +600,7 @@ static void daemon_reconfigure(void* /*arg*/)
         tr_logAddInfo("Reloading settings from \"%s\"", configDir);
         tr_variantInitDict(&settings, 0);
         tr_variantDictAddBool(&settings, TR_KEY_rpc_enabled, true);
-        tr_sessionLoadSettings(&settings, configDir, MY_NAME);
+        tr_sessionLoadSettings(&settings, configDir, MyName);
         tr_sessionSet(mySession, &settings);
         tr_variantFree(&settings);
         tr_sessionReloadBlocklists(mySession);
@@ -651,7 +615,6 @@ static void daemon_stop(void* /*arg*/)
 static int daemon_start(void* varg, [[maybe_unused]] bool foreground)
 {
     bool boolVal;
-    char const* pid_filename;
     bool pidfile_created = false;
     tr_session* session = nullptr;
     struct event* status_ev = nullptr;
@@ -673,47 +636,49 @@ static int daemon_start(void* varg, [[maybe_unused]] bool foreground)
     {
         char buf[256];
         tr_snprintf(buf, sizeof(buf), "Failed to init daemon event state: %s", tr_strerror(errno));
-        printMessage(logfile, TR_LOG_ERROR, MY_NAME, buf, __FILE__, __LINE__);
+        printMessage(logfile, TR_LOG_ERROR, MyName, buf, __FILE__, __LINE__);
         return 1;
     }
 
     /* start the session */
-    tr_formatter_mem_init(MEM_K, MEM_K_STR, MEM_M_STR, MEM_G_STR, MEM_T_STR);
-    tr_formatter_size_init(DISK_K, DISK_K_STR, DISK_M_STR, DISK_G_STR, DISK_T_STR);
-    tr_formatter_speed_init(SPEED_K, SPEED_K_STR, SPEED_M_STR, SPEED_G_STR, SPEED_T_STR);
+    tr_formatter_mem_init(MemK, MemKStr, MemMStr, MemGStr, MemTStr);
+    tr_formatter_size_init(DiskK, DiskKStr, DiskMStr, DiskGStr, DiskTStr);
+    tr_formatter_speed_init(SpeedK, SpeedKStr, SpeedMStr, SpeedGStr, SpeedTStr);
     session = tr_sessionInit(configDir, true, settings);
     tr_sessionSetRPCCallback(session, on_rpc_callback, nullptr);
     tr_logAddNamedInfo(nullptr, "Using settings from \"%s\"", configDir);
     tr_sessionSaveSettings(session, configDir, settings);
 
-    pid_filename = nullptr;
-    (void)tr_variantDictFindStr(settings, key_pidfile, &pid_filename, nullptr);
-    if (!tr_str_is_empty(pid_filename))
+    auto sv = std::string_view{};
+    (void)tr_variantDictFindStrView(settings, key_pidfile, &sv);
+    auto const sz_pid_filename = std::string{ sv };
+    if (!std::empty(sz_pid_filename))
     {
         tr_error* error = nullptr;
         tr_sys_file_t fp = tr_sys_file_open(
-            pid_filename,
+            sz_pid_filename.c_str(),
             TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_TRUNCATE,
             0666,
             &error);
 
         if (fp != TR_BAD_SYS_FILE)
         {
-            tr_sys_file_write_fmt(fp, "%d", nullptr, (int)getpid());
+            auto const out = std::to_string(getpid());
+            tr_sys_file_write(fp, std::data(out), std::size(out), nullptr, nullptr);
             tr_sys_file_close(fp, nullptr);
-            tr_logAddInfo("Saved pidfile \"%s\"", pid_filename);
+            tr_logAddInfo("Saved pidfile \"%s\"", sz_pid_filename.c_str());
             pidfile_created = true;
         }
         else
         {
-            tr_logAddError("Unable to save pidfile \"%s\": %s", pid_filename, error->message);
+            tr_logAddError("Unable to save pidfile \"%s\": %s", sz_pid_filename.c_str(), error->message);
             tr_error_free(error);
         }
     }
 
     if (tr_variantDictFindBool(settings, TR_KEY_rpc_authentication_required, &boolVal) && boolVal)
     {
-        tr_logAddNamedInfo(MY_NAME, "requiring authentication");
+        tr_logAddNamedInfo(MyName, "requiring authentication");
     }
 
     mySession = session;
@@ -727,19 +692,17 @@ static int daemon_start(void* varg, [[maybe_unused]] bool foreground)
     /* maybe add a watchdir */
     if (tr_variantDictFindBool(settings, TR_KEY_watch_dir_enabled, &boolVal) && boolVal)
     {
-        char const* dir;
-        bool force_generic;
+        auto force_generic = bool{ false };
+        (void)tr_variantDictFindBool(settings, key_watch_dir_force_generic, &force_generic);
 
-        if (!tr_variantDictFindBool(settings, key_watch_dir_force_generic, &force_generic))
+        auto dir = std::string_view{};
+        (void)tr_variantDictFindStrView(settings, TR_KEY_watch_dir, &dir);
+        if (!std::empty(dir))
         {
-            force_generic = false;
-        }
+            tr_logAddInfo("Watching \"%" TR_PRIsv "\" for new .torrent files", TR_PRIsv_ARG(dir));
 
-        if (tr_variantDictFindStr(settings, TR_KEY_watch_dir, &dir, nullptr) && !tr_str_is_empty(dir))
-        {
-            tr_logAddInfo("Watching \"%s\" for new .torrent files", dir);
-
-            if ((watchdir = tr_watchdir_new(dir, &onFileAdded, mySession, ev_base, force_generic)) == nullptr)
+            watchdir = tr_watchdir_new(dir, &onFileAdded, mySession, ev_base, force_generic);
+            if (watchdir == nullptr)
             {
                 goto CLEANUP;
             }
@@ -765,7 +728,7 @@ static int daemon_start(void* varg, [[maybe_unused]] bool foreground)
 
     if (!foreground)
     {
-        openlog(MY_NAME, LOG_CONS | LOG_PID, LOG_DAEMON);
+        openlog(MyName, LOG_CONS | LOG_PID, LOG_DAEMON);
     }
 
 #endif
@@ -830,7 +793,7 @@ CLEANUP:
     /* cleanup */
     if (pidfile_created)
     {
-        tr_sys_path_remove(pid_filename, nullptr);
+        tr_sys_path_remove(sz_pid_filename.c_str(), nullptr);
     }
 
     sd_notify(0, "STATUS=\n");
@@ -845,7 +808,7 @@ static bool init_daemon_data(int argc, char* argv[], struct daemon_data* data, b
     /* load settings from defaults + config file */
     tr_variantInitDict(&data->settings, 0);
     tr_variantDictAddBool(&data->settings, TR_KEY_rpc_enabled, true);
-    bool const loaded = tr_sessionLoadSettings(&data->settings, data->configDir, MY_NAME);
+    bool const loaded = tr_sessionLoadSettings(&data->settings, data->configDir, MyName);
 
     bool dumpSettings;
 
@@ -864,16 +827,15 @@ static bool init_daemon_data(int argc, char* argv[], struct daemon_data* data, b
 
     if (!loaded)
     {
-        printMessage(logfile, TR_LOG_ERROR, MY_NAME, "Error loading config file -- exiting.", __FILE__, __LINE__);
+        printMessage(logfile, TR_LOG_ERROR, MyName, "Error loading config file -- exiting.", __FILE__, __LINE__);
         *ret = 1;
         goto EXIT_EARLY;
     }
 
     if (dumpSettings)
     {
-        char* str = tr_variantToStr(&data->settings, TR_VARIANT_FMT_JSON, nullptr);
-        fprintf(stderr, "%s", str);
-        tr_free(str);
+        auto const str = tr_variantToStr(&data->settings, TR_VARIANT_FMT_JSON);
+        fprintf(stderr, "%s", str.c_str());
         goto EXIT_EARLY;
     }
 
@@ -904,13 +866,9 @@ int tr_main(int argc, char* argv[])
         &daemon_reconfigure,
     };
 
-    tr_error* error = nullptr;
-
-    if (!dtr_daemon(&cb, &data, foreground, &ret, &error))
+    if (tr_error* error = nullptr; !dtr_daemon(&cb, &data, foreground, &ret, &error))
     {
-        char buf[256];
-        tr_snprintf(buf, sizeof(buf), "Failed to daemonize: %s", error->message);
-        printMessage(logfile, TR_LOG_ERROR, MY_NAME, buf, __FILE__, __LINE__);
+        printMessage(logfile, TR_LOG_ERROR, MyName, tr_strvJoin("Failed to daemonize: ", error->message), __FILE__, __LINE__);
         tr_error_free(error);
     }
 

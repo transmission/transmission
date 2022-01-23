@@ -36,11 +36,19 @@ function global:Build-Transmission([string] $PrefixDir, [string] $Arch, [string]
         Copy-Item -Path (Join-Path $DepsPrefixDir bin "${x}.pdb") -Destination $DebugSymbolsDir
     }
 
-    foreach ($x in @('Core', 'DBus', 'Gui', 'Network', 'Widgets', 'WinExtras')) {
+    foreach ($x in @('Core', 'DBus', 'Gui', 'Network', 'Svg', 'Widgets', 'WinExtras')) {
         if ($DepsPrefixDir -ne $PrefixDir) {
             Copy-Item -Path (Join-Path $DepsPrefixDir bin "Qt5${x}.dll") -Destination (Join-Path $PrefixDir bin)
         }
         Copy-Item -Path (Join-Path $DepsPrefixDir bin "Qt5${x}.pdb") -Destination $DebugSymbolsDir
+    }
+
+    foreach ($x in @('gif', 'ico', 'jpeg', 'svg')) {
+        if ($DepsPrefixDir -ne $PrefixDir) {
+            New-Item -Path (Join-Path $PrefixDir plugins imageformats) -ItemType Directory -ErrorAction Ignore | Out-Null
+            Copy-Item -Path (Join-Path $DepsPrefixDir plugins imageformats "q${x}.dll") -Destination (Join-Path $PrefixDir plugins imageformats)
+        }
+        Copy-Item -Path (Join-Path $DepsPrefixDir plugins imageformats "q${x}.pdb") -Destination $DebugSymbolsDir
     }
 
     if ($DepsPrefixDir -ne $PrefixDir) {

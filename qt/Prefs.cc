@@ -1,10 +1,7 @@
-/*
- * This file Copyright (C) 2009-2015 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2009-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #include <array>
 #include <cassert>
@@ -100,6 +97,7 @@ std::array<Prefs::PrefItem, Prefs::PREFS_COUNT> const Prefs::Items{
     { COMPLETE_SOUND_COMMAND, TR_KEY_torrent_complete_sound_command, QVariant::StringList },
     { COMPLETE_SOUND_ENABLED, TR_KEY_torrent_complete_sound_enabled, QVariant::Bool },
     { USER_HAS_GIVEN_INFORMED_CONSENT, TR_KEY_user_has_given_informed_consent, QVariant::Bool },
+    { READ_CLIPBOARD, TR_KEY_read_clipboard, QVariant::Bool },
 
     /* libtransmission settings */
     { ALT_SPEED_LIMIT_UP, TR_KEY_alt_speed_up, QVariant::Int },
@@ -426,7 +424,7 @@ Prefs::~Prefs()
     tr_variant file_settings;
     QFile const file(QDir(config_dir_).absoluteFilePath(QStringLiteral("settings.json")));
 
-    if (!tr_variantFromFile(&file_settings, TR_VARIANT_FMT_JSON, file.fileName().toUtf8().constData(), nullptr))
+    if (!tr_variantFromFile(&file_settings, TR_VARIANT_PARSE_JSON, file.fileName().toUtf8().constData(), nullptr))
     {
         tr_variantInitDict(&file_settings, PREFS_COUNT);
     }
@@ -493,6 +491,7 @@ void Prefs::initDefaults(tr_variant* d) const
     dictAdd(d, TR_KEY_sort_mode, SortMode);
     dictAdd(d, TR_KEY_statusbar_stats, StatsMode);
     dictAdd(d, TR_KEY_watch_dir, download_dir);
+    dictAdd(d, TR_KEY_read_clipboard, false);
 }
 
 /***

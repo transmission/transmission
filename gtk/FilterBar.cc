@@ -1,13 +1,11 @@
-/*
- * This file Copyright (C) 2012-2021 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2012-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
+#include <memory>
 #include <set>
-#include <stdlib.h> /* qsort() */
+#include <string>
 #include <unordered_map>
 
 #include <glibmm.h>
@@ -15,6 +13,7 @@
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/utils.h>
+#include <libtransmission/web-utils.h>
 
 #include "FaviconCache.h" /* gtr_get_favicon() */
 #include "FilterBar.h"
@@ -27,7 +26,6 @@ namespace
 
 auto const DIRTY_KEY = Glib::Quark("tr-filter-dirty-key");
 auto const SESSION_KEY = Glib::Quark("tr-session-key");
-auto const TEXT_KEY = Glib::Quark("tr-filter-text-key");
 auto const TORRENT_MODEL_KEY = Glib::Quark("tr-filter-torrent-model-key");
 
 } // namespace
@@ -37,6 +35,8 @@ class FilterBar::Impl
 public:
     Impl(FilterBar& widget, tr_session* session, Glib::RefPtr<Gtk::TreeModel> const& torrent_model);
     ~Impl();
+
+    TR_DISABLE_COPY_MOVE(Impl)
 
     Glib::RefPtr<Gtk::TreeModel> get_filter_model() const;
 
@@ -71,6 +71,8 @@ private:
     sigc::connection torrent_model_row_changed_tag_;
     sigc::connection torrent_model_row_inserted_tag_;
     sigc::connection torrent_model_row_deleted_cb_tag_;
+
+    Glib::ustring filter_text_;
 };
 
 /***
@@ -173,17 +175,16 @@ bool tracker_filter_model_update(Glib::RefPtr<Gtk::TreeStore> const& tracker_mod
     for (auto const& row : tmodel->children())
     {
         auto const* tor = static_cast<tr_torrent const*>(row.get_value(torrent_cols.torrent));
-        auto const* const inf = tr_torrentInfo(tor);
 
         std::set<std::string const*> keys;
 
-        for (unsigned int i = 0; i < inf->trackerCount; ++i)
+        for (size_t i = 0, n = tr_torrentTrackerCount(tor); i < n; ++i)
         {
-            auto const* const key = &*strings.insert(gtr_get_host_from_url(inf->trackers[i].announce)).first;
+            auto const* const key = &*strings.insert(gtr_get_host_from_url(tr_torrentTracker(tor, i).announce)).first;
 
             if (auto const count = hosts_hash.find(key); count == hosts_hash.end())
             {
-                hosts_hash.emplace(key, 1);
+                hosts_hash.emplace(key, 0);
                 hosts.push_back(key);
             }
 
@@ -383,21 +384,20 @@ namespace
 
 bool test_tracker(tr_torrent const* tor, int active_tracker_type, Glib::ustring const& host)
 {
-    bool matches = true;
-
-    if (active_tracker_type == TRACKER_FILTER_TYPE_HOST)
+    if (active_tracker_type != TRACKER_FILTER_TYPE_HOST)
     {
-        auto const* const inf = tr_torrentInfo(tor);
+        return true;
+    }
 
-        matches = false;
-
-        for (unsigned int i = 0; !matches && i < inf->trackerCount; ++i)
+    for (size_t i = 0, n = tr_torrentTrackerCount(tor); i < n; ++i)
+    {
+        if (gtr_get_host_from_url(tr_torrentTracker(tor, i).announce) == host)
         {
-            matches = gtr_get_host_from_url(inf->trackers[i].announce) == host;
+            return true;
         }
     }
 
-    return matches;
+    return false;
 }
 
 /***
@@ -519,7 +519,7 @@ Glib::RefPtr<Gtk::ListStore> activity_filter_model_new(Glib::RefPtr<Gtk::TreeMod
         Glib::ustring icon_name;
     } const types[] = {
         { ACTIVITY_FILTER_ALL, nullptr, N_("All"), {} },
-        { ACTIVITY_FILTER_SEPARATOR, nullptr, "", {} },
+        { ACTIVITY_FILTER_SEPARATOR, nullptr, nullptr, {} },
         { ACTIVITY_FILTER_ACTIVE, nullptr, N_("Active"), "system-run" },
         { ACTIVITY_FILTER_DOWNLOADING, "Verb", NC_("Verb", "Downloading"), "network-receive" },
         { ACTIVITY_FILTER_SEEDING, "Verb", NC_("Verb", "Seeding"), "network-transmit" },
@@ -533,8 +533,9 @@ Glib::RefPtr<Gtk::ListStore> activity_filter_model_new(Glib::RefPtr<Gtk::TreeMod
 
     for (auto const& type : types)
     {
-        auto const name = Glib::ustring(
-            type.context != nullptr ? g_dpgettext2(nullptr, type.context, type.name) : _(type.name));
+        auto const name = type.name != nullptr ?
+            Glib::ustring(type.context != nullptr ? g_dpgettext2(nullptr, type.context, type.name) : _(type.name)) :
+            Glib::ustring();
         auto const iter = store->append();
         iter->set_value(activity_filter_cols.name, name);
         iter->set_value(activity_filter_cols.type, type.type);
@@ -611,25 +612,23 @@ Gtk::ComboBox* FilterBar::Impl::activity_combo_box_new(Glib::RefPtr<Gtk::TreeMod
 namespace
 {
 
-bool testText(tr_torrent const* tor, Glib::ustring const* key)
+bool testText(tr_torrent const* tor, Glib::ustring const& key)
 {
     bool ret = false;
 
-    if (key == nullptr || key->empty())
+    if (key.empty())
     {
         ret = true;
     }
     else
     {
-        tr_info const* inf = tr_torrentInfo(tor);
-
         /* test the torrent name... */
-        ret = Glib::ustring(tr_torrentName(tor)).casefold().find(*key) != Glib::ustring::npos;
+        ret = Glib::ustring(tr_torrentName(tor)).casefold().find(key) != Glib::ustring::npos;
 
         /* test the files... */
-        for (tr_file_index_t i = 0; i < inf->fileCount && !ret; ++i)
+        for (tr_file_index_t i = 0, n = tr_torrentFileCount(tor); i < n && !ret; ++i)
         {
-            ret = Glib::ustring(inf->files[i].name).casefold().find(*key) != Glib::ustring::npos;
+            ret = Glib::ustring(tr_torrentFile(tor, i).name).casefold().find(key) != Glib::ustring::npos;
         }
     }
 
@@ -640,10 +639,7 @@ bool testText(tr_torrent const* tor, Glib::ustring const* key)
 
 void FilterBar::Impl::filter_entry_changed()
 {
-    filter_model_->set_data(
-        TEXT_KEY,
-        new Glib::ustring(gtr_str_strip(entry_->get_text().casefold())),
-        [](void* p) { delete static_cast<Glib::ustring*>(p); });
+    filter_text_ = gtr_str_strip(entry_->get_text().casefold());
     filter_model_->refilter();
 }
 
@@ -656,10 +652,9 @@ void FilterBar::Impl::filter_entry_changed()
 bool FilterBar::Impl::is_row_visible(Gtk::TreeModel::const_iterator const& iter)
 {
     auto* tor = static_cast<tr_torrent*>(iter->get_value(torrent_cols.torrent));
-    auto const* text = static_cast<Glib::ustring const*>(filter_model_->get_data(TEXT_KEY));
 
     return tor != nullptr && test_tracker(tor, active_tracker_type_, active_tracker_host_) &&
-        test_torrent_activity(tor, active_activity_type_) && testText(tor, text);
+        test_torrent_activity(tor, active_activity_type_) && testText(tor, filter_text_);
 }
 
 void FilterBar::Impl::selection_changed_cb()
@@ -736,7 +731,7 @@ void FilterBar::Impl::update_count_label_idle()
     if (!pending)
     {
         show_lb_->set_data(DIRTY_KEY, GINT_TO_POINTER(1));
-        Glib::signal_idle().connect(sigc::mem_fun(this, &Impl::update_count_label));
+        Glib::signal_idle().connect(sigc::mem_fun(*this, &Impl::update_count_label));
     }
 }
 
@@ -764,10 +759,10 @@ FilterBar::Impl::Impl(FilterBar& widget, tr_session* session, Glib::RefPtr<Gtk::
     tracker_->property_width_request() = 170;
     static_cast<Gtk::TreeStore*>(gtr_get_ptr(tracker_->get_model()))->set_data(SESSION_KEY, session);
 
-    filter_model_->set_visible_func(sigc::mem_fun(this, &Impl::is_row_visible));
+    filter_model_->set_visible_func(sigc::mem_fun(*this, &Impl::is_row_visible));
 
-    tracker_->signal_changed().connect(sigc::mem_fun(this, &Impl::selection_changed_cb));
-    activity_->signal_changed().connect(sigc::mem_fun(this, &Impl::selection_changed_cb));
+    tracker_->signal_changed().connect(sigc::mem_fun(*this, &Impl::selection_changed_cb));
+    activity_->signal_changed().connect(sigc::mem_fun(*this, &Impl::selection_changed_cb));
 
     /* add the activity combobox */
     show_lb_->set_mnemonic_widget(*activity_);
@@ -785,7 +780,7 @@ FilterBar::Impl::Impl(FilterBar& widget, tr_session* session, Glib::RefPtr<Gtk::
     entry_->signal_icon_release().connect([this](auto /*icon_position*/, auto const* /*event*/) { entry_->set_text({}); });
     widget_.pack_start(*entry_, true, true, 0);
 
-    entry_->signal_changed().connect(sigc::mem_fun(this, &Impl::filter_entry_changed));
+    entry_->signal_changed().connect(sigc::mem_fun(*this, &Impl::filter_entry_changed));
     selection_changed_cb();
 
     update_count_label();

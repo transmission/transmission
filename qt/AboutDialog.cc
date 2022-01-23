@@ -1,10 +1,7 @@
-/*
- * This file Copyright (C) 2009-2015 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2009-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #include <QApplication>
 #include <QIcon>
@@ -37,9 +34,9 @@ AboutDialog::AboutDialog(Session& session, QWidget* parent)
         QString title = QStringLiteral(
             "<div style='font-size:x-large; font-weight: bold; text-align: center'>Transmission</div>");
         title += QStringLiteral("<div style='text-align: center'>%1: %2</div>")
-                     .arg(tr("This GUI"))
+                     .arg(tr("Client"))
                      .arg(QStringLiteral(LONG_VERSION_STRING));
-        title += QStringLiteral("<div style='text-align: center'>%1: %2</div>").arg(tr("Remote")).arg(session.sessionVersion());
+        title += QStringLiteral("<div style='text-align: center'>%1: %2</div>").arg(tr("Server")).arg(session.sessionVersion());
         ui_.titleLabel->setText(title);
     }
 

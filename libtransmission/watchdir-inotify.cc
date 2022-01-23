@@ -1,14 +1,10 @@
-/*
- * This file Copyright (C) 2015-2016 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2015-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #include <cerrno>
 #include <climits> /* NAME_MAX */
-#include <cstdlib> /* realloc() */
 
 #include <unistd.h> /* close() */
 
@@ -72,7 +68,7 @@ static void tr_watchdir_inotify_on_event(struct bufferevent* event, void* contex
 #endif
     struct inotify_event ev;
     size_t name_size = NAME_MAX + 1;
-    char* name = tr_new(char, name_size);
+    auto* name = tr_new(char, name_size);
 
     /* Read the size of the struct excluding name into buf. Guaranteed to have at
        least sizeof(ev) available */
@@ -122,7 +118,7 @@ static void tr_watchdir_inotify_on_event(struct bufferevent* event, void* contex
 
 static void tr_watchdir_inotify_free(tr_watchdir_backend* backend_base)
 {
-    tr_watchdir_inotify* const backend = BACKEND_UPCAST(backend_base);
+    auto* const backend = BACKEND_UPCAST(backend_base);
 
     if (backend == nullptr)
     {

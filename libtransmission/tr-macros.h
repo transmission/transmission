@@ -1,10 +1,7 @@
-/*
- * This file Copyright (C) 2017 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2017-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #pragma once
 
@@ -64,6 +61,18 @@
 #define TR_UNLIKELY(x) (x)
 #endif
 
+#define TR_DISABLE_COPY(Class) \
+    Class(Class const&) = delete; \
+    Class& operator=(Class const&) = delete;
+
+#define TR_DISABLE_MOVE(Class) \
+    Class(Class&&) = delete; \
+    Class& operator=(Class&&) = delete;
+
+#define TR_DISABLE_COPY_MOVE(Class) \
+    TR_DISABLE_COPY(Class) \
+    TR_DISABLE_MOVE(Class)
+
 /***
 ****
 ***/
@@ -110,14 +119,15 @@
 ****
 ***/
 
+#define TR_PATH_DELIMITER '/'
+#define TR_PATH_DELIMITER_STR "/"
+
 /* Only use this macro to suppress false-positive alignment warnings */
 #define TR_DISCARD_ALIGN(ptr, type) ((type)(void*)(ptr))
 
 #define TR_INET6_ADDRSTRLEN 46
 
 #define TR_ADDRSTRLEN 64
-
-#define TR_BAD_SIZE ((size_t)-1)
 
 // Mostly to enforce better formatting
 #define TR_ARG_TUPLE(...) __VA_ARGS__
@@ -137,4 +147,6 @@ using tr_peer_id_t = std::array<char, PEER_ID_LEN>;
 // TODO #1: all arrays of SHA_DIGEST_LENGTH should be replaced with tr_sha1_digest_t
 // TODO #2: tr_peer_id_t, tr_sha1_digest_t should be moved into a new 'types.h' header
 auto inline constexpr TR_SHA1_DIGEST_LEN = size_t{ 20 };
+auto inline constexpr TR_SHA1_DIGEST_STRLEN = size_t{ 40 };
 using tr_sha1_digest_t = std::array<std::byte, TR_SHA1_DIGEST_LEN>;
+using tr_sha1_digest_string_t = std::array<char, TR_SHA1_DIGEST_STRLEN + 1>; // +1 for '\0'

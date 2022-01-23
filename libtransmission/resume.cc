@@ -1,28 +1,27 @@
-/*
- * This file Copyright (C) 2008-2014 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2008-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #include <algorithm>
 #include <cstring>
+#include <ctime>
 #include <string_view>
+#include <vector>
 
 #include "transmission.h"
-#include "completion.h"
+
 #include "error.h"
 #include "file.h"
 #include "log.h"
-#include "metainfo.h" /* tr_metainfoGetBasename() */
+#include "magnet-metainfo.h"
 #include "peer-mgr.h" /* pex */
 #include "platform.h" /* tr_getResumeDir() */
 #include "resume.h"
 #include "session.h"
 #include "torrent.h"
 #include "tr-assert.h"
-#include "utils.h" /* tr_buildPath */
+#include "utils.h"
 #include "variant.h"
 
 using namespace std::literals;
@@ -33,14 +32,6 @@ namespace
 constexpr int MAX_REMEMBERED_PEERS = 200;
 
 } // unnamed namespace
-
-static char* getResumeFilename(tr_torrent const* tor, enum tr_metainfo_basename_format format)
-{
-    char* base = tr_metainfoGetBasename(tr_torrentInfo(tor), format);
-    char* filename = tr_strdup_printf("%s" TR_PATH_DELIMITER_STR "%s.resume", tr_getResumeDir(tor->session), base);
-    tr_free(base);
-    return filename;
-}
 
 /***
 ****
@@ -142,14 +133,12 @@ static uint64_t loadLabels(tr_variant* dict, tr_torrent* tor)
 
 static void saveDND(tr_variant* dict, tr_torrent const* tor)
 {
-    tr_info const* const inf = tr_torrentInfo(tor);
-    tr_file_index_t const n = inf->fileCount;
-
+    auto const n = tor->fileCount();
     tr_variant* const list = tr_variantDictAddList(dict, TR_KEY_dnd, n);
 
     for (tr_file_index_t i = 0; i < n; ++i)
     {
-        tr_variantListAddBool(list, inf->files[i].dnd);
+        tr_variantListAddBool(list, !tr_torrentFile(tor, i).wanted);
     }
 }
 
@@ -157,42 +146,31 @@ static uint64_t loadDND(tr_variant* dict, tr_torrent* tor)
 {
     uint64_t ret = 0;
     tr_variant* list = nullptr;
-    tr_file_index_t const n = tor->info.fileCount;
+    auto const n = tor->fileCount();
 
     if (tr_variantDictFindList(dict, TR_KEY_dnd, &list) && tr_variantListSize(list) == n)
     {
-        tr_file_index_t* dl = tr_new(tr_file_index_t, n);
-        tr_file_index_t* dnd = tr_new(tr_file_index_t, n);
-        tr_file_index_t dlCount = 0;
-        tr_file_index_t dndCount = 0;
+        auto wanted = std::vector<tr_file_index_t>{};
+        auto unwanted = std::vector<tr_file_index_t>{};
+        wanted.reserve(n);
+        unwanted.reserve(n);
 
         for (tr_file_index_t i = 0; i < n; ++i)
         {
             auto tmp = false;
             if (tr_variantGetBool(tr_variantListChild(list, i), &tmp) && tmp)
             {
-                dnd[dndCount++] = i;
+                unwanted.push_back(i);
             }
             else
             {
-                dl[dlCount++] = i;
+                wanted.push_back(i);
             }
         }
 
-        if (dndCount != 0)
-        {
-            tr_torrentInitFileDLs(tor, dnd, dndCount, false);
-            tr_logAddTorDbg(tor, "Resume file found %d files listed as dnd", dndCount);
-        }
+        tor->initFilesWanted(std::data(unwanted), std::size(unwanted), false);
+        tor->initFilesWanted(std::data(wanted), std::size(wanted), true);
 
-        if (dlCount != 0)
-        {
-            tr_torrentInitFileDLs(tor, dl, dlCount, true);
-            tr_logAddTorDbg(tor, "Resume file found %d files marked for download", dlCount);
-        }
-
-        tr_free(dnd);
-        tr_free(dl);
         ret = TR_FR_DND;
     }
     else
@@ -215,13 +193,12 @@ static uint64_t loadDND(tr_variant* dict, tr_torrent* tor)
 
 static void saveFilePriorities(tr_variant* dict, tr_torrent const* tor)
 {
-    tr_info const* const inf = tr_torrentInfo(tor);
-    tr_file_index_t const n = inf->fileCount;
+    auto const n = tor->fileCount();
 
     tr_variant* const list = tr_variantDictAddList(dict, TR_KEY_priority, n);
     for (tr_file_index_t i = 0; i < n; ++i)
     {
-        tr_variantListAddInt(list, inf->files[i].priority);
+        tr_variantListAddInt(list, tr_torrentFile(tor, i).priority);
     }
 }
 
@@ -229,7 +206,7 @@ static uint64_t loadFilePriorities(tr_variant* dict, tr_torrent* tor)
 {
     auto ret = uint64_t{};
 
-    tr_file_index_t const n = tor->info.fileCount;
+    auto const n = tor->fileCount();
     tr_variant* list = nullptr;
     if (tr_variantDictFindList(dict, TR_KEY_priority, &list) && tr_variantListSize(list) == n)
     {
@@ -238,7 +215,7 @@ static uint64_t loadFilePriorities(tr_variant* dict, tr_torrent* tor)
             auto priority = int64_t{};
             if (tr_variantGetInt(tr_variantListChild(list, i), &priority))
             {
-                tr_torrentInitFilePriority(tor, i, priority);
+                tor->setFilePriority(i, tr_priority_t(priority));
             }
         }
 
@@ -255,7 +232,7 @@ static uint64_t loadFilePriorities(tr_variant* dict, tr_torrent* tor)
 static void saveSingleSpeedLimit(tr_variant* d, tr_torrent* tor, tr_direction dir)
 {
     tr_variantDictReserve(d, 3);
-    tr_variantDictAddInt(d, TR_KEY_speed_Bps, tr_torrentGetSpeedLimit_Bps(tor, dir));
+    tr_variantDictAddInt(d, TR_KEY_speed_Bps, tor->speedLimitBps(dir));
     tr_variantDictAddBool(d, TR_KEY_use_global_speed_limit, tr_torrentUsesSessionLimits(tor));
     tr_variantDictAddBool(d, TR_KEY_use_speed_limit, tr_torrentUsesSpeedLimit(tor, dir));
 }
@@ -287,11 +264,11 @@ static void loadSingleSpeedLimit(tr_variant* d, tr_direction dir, tr_torrent* to
 
     if (tr_variantDictFindInt(d, TR_KEY_speed_Bps, &i))
     {
-        tr_torrentSetSpeedLimit_Bps(tor, dir, i);
+        tor->setSpeedLimitBps(dir, i);
     }
     else if (tr_variantDictFindInt(d, TR_KEY_speed, &i))
     {
-        tr_torrentSetSpeedLimit_Bps(tor, dir, i * 1024);
+        tor->setSpeedLimitBps(dir, i * 1024);
     }
 
     if (tr_variantDictFindBool(d, TR_KEY_use_speed_limit, &boolVal))
@@ -381,7 +358,7 @@ static uint64_t loadIdleLimits(tr_variant* dict, tr_torrent* tor)
 
 static void saveName(tr_variant* dict, tr_torrent const* tor)
 {
-    tr_variantDictAddStr(dict, TR_KEY_name, tr_torrentName(tor));
+    tr_variantDictAddStrView(dict, TR_KEY_name, tr_torrentName(tor));
 }
 
 static uint64_t loadName(tr_variant* dict, tr_torrent* tor)
@@ -392,11 +369,13 @@ static uint64_t loadName(tr_variant* dict, tr_torrent* tor)
         return 0;
     }
 
-    if (name != tr_torrentName(tor))
+    name = tr_strvStrip(name);
+    if (std::empty(name))
     {
-        tr_free(tor->info.name);
-        tor->info.name = tr_strvdup(name);
+        return 0;
     }
+
+    tor->setName(name);
 
     return TR_FR_NAME;
 }
@@ -407,24 +386,11 @@ static uint64_t loadName(tr_variant* dict, tr_torrent* tor)
 
 static void saveFilenames(tr_variant* dict, tr_torrent const* tor)
 {
-    tr_file_index_t const n = tor->info.fileCount;
-    tr_file const* files = tor->info.files;
-
-    bool any_renamed = false;
-
-    for (tr_file_index_t i = 0; !any_renamed && i < n; ++i)
+    auto const n = tor->fileCount();
+    tr_variant* const list = tr_variantDictAddList(dict, TR_KEY_files, n);
+    for (tr_file_index_t i = 0; i < n; ++i)
     {
-        any_renamed = files[i].is_renamed;
-    }
-
-    if (any_renamed)
-    {
-        tr_variant* list = tr_variantDictAddList(dict, TR_KEY_files, n);
-
-        for (tr_file_index_t i = 0; i < n; ++i)
-        {
-            tr_variantListAddStr(list, files[i].is_renamed ? files[i].name : "");
-        }
+        tr_variantListAddStrView(list, tor->fileSubpath(i));
     }
 }
 
@@ -436,16 +402,14 @@ static uint64_t loadFilenames(tr_variant* dict, tr_torrent* tor)
         return 0;
     }
 
-    size_t const n = tr_variantListSize(list);
-    tr_file* files = tor->info.files;
-    for (size_t i = 0; i < tor->info.fileCount && i < n; ++i)
+    auto const n_files = tor->fileCount();
+    auto const n_list = tr_variantListSize(list);
+    for (size_t i = 0; i < n_files && i < n_list; ++i)
     {
         auto sv = std::string_view{};
         if (tr_variantGetStrView(tr_variantListChild(list, i), &sv) && !std::empty(sv))
         {
-            tr_free(files[i].name);
-            files[i].name = tr_strvdup(sv);
-            files[i].is_renamed = true;
+            tor->setFileSubpath(i, sv);
         }
     }
 
@@ -456,19 +420,19 @@ static uint64_t loadFilenames(tr_variant* dict, tr_torrent* tor)
 ****
 ***/
 
-static void bitfieldToRaw(tr_bitfield const* b, tr_variant* benc)
+static void bitfieldToRaw(tr_bitfield const& b, tr_variant* benc)
 {
-    if (b->hasNone() || std::size(*b) == 0)
+    if (b.hasNone() || std::empty(b))
     {
         tr_variantInitStr(benc, "none"sv);
     }
-    else if (b->hasAll())
+    else if (b.hasAll())
     {
-        tr_variantInitStr(benc, "all"sv);
+        tr_variantInitStrView(benc, "all"sv);
     }
     else
     {
-        auto const raw = b->raw();
+        auto const raw = b.raw();
         tr_variantInitRaw(benc, raw.data(), std::size(raw));
     }
 }
@@ -489,31 +453,30 @@ static void rawToBitfield(tr_bitfield& bitfield, uint8_t const* raw, size_t rawl
     }
 }
 
-static void saveProgress(tr_variant* dict, tr_torrent* tor)
+static void saveProgress(tr_variant* dict, tr_torrent const* tor)
 {
-    tr_info const* inf = tr_torrentInfo(tor);
-
     tr_variant* const prog = tr_variantDictAddDict(dict, TR_KEY_progress, 4);
 
     // add the mtimes
-    size_t const n = inf->fileCount;
+    auto const& mtimes = tor->file_mtimes_;
+    auto const n = std::size(mtimes);
     tr_variant* const l = tr_variantDictAddList(prog, TR_KEY_mtimes, n);
-    for (auto const *file = inf->files, *end = file + inf->fileCount; file != end; ++file)
+    for (auto const& mtime : mtimes)
     {
-        tr_variantListAddInt(l, file->mtime);
+        tr_variantListAddInt(l, mtime);
     }
 
     // add the 'checked pieces' bitfield
-    bitfieldToRaw(&tor->checked_pieces_, tr_variantDictAdd(prog, TR_KEY_pieces));
+    bitfieldToRaw(tor->checked_pieces_, tr_variantDictAdd(prog, TR_KEY_pieces));
 
     /* add the progress */
     if (tor->completeness == TR_SEED)
     {
-        tr_variantDictAddStr(prog, TR_KEY_have, "all"sv);
+        tr_variantDictAddStrView(prog, TR_KEY_have, "all"sv);
     }
 
     /* add the blocks bitfield */
-    bitfieldToRaw(tor->completion.blockBitfield, tr_variantDictAdd(prog, TR_KEY_blocks));
+    bitfieldToRaw(tor->blocks(), tr_variantDictAdd(prog, TR_KEY_blocks));
 }
 
 /*
@@ -539,16 +502,15 @@ static void saveProgress(tr_variant* dict, tr_torrent* tor)
 static uint64_t loadProgress(tr_variant* dict, tr_torrent* tor)
 {
     auto ret = uint64_t{};
-    tr_info const* inf = tr_torrentInfo(tor);
 
-    tr_variant* prog = nullptr;
-    if (tr_variantDictFindDict(dict, TR_KEY_progress, &prog))
+    if (tr_variant* prog = nullptr; tr_variantDictFindDict(dict, TR_KEY_progress, &prog))
     {
         /// CHECKED PIECES
 
-        auto checked = tr_bitfield(inf->pieceCount);
+        auto checked = tr_bitfield(tor->pieceCount());
         auto mtimes = std::vector<time_t>{};
-        mtimes.reserve(inf->fileCount);
+        auto const n_files = tor->fileCount();
+        mtimes.reserve(n_files);
 
         // try to load mtimes
         tr_variant* l = nullptr;
@@ -573,10 +535,9 @@ static uint64_t loadProgress(tr_variant* dict, tr_torrent* tor)
         // maybe it's a .resume file from [2.20 - 3.00] with the per-piece mtimes
         if (tr_variantDictFindList(prog, TR_KEY_time_checked, &l))
         {
-            for (tr_file_index_t fi = 0; fi < inf->fileCount; ++fi)
+            for (tr_file_index_t fi = 0; fi < n_files; ++fi)
             {
                 tr_variant* const b = tr_variantListChild(l, fi);
-                tr_file* const f = &inf->files[fi];
                 auto time_checked = time_t{};
 
                 if (tr_variantIsInt(b))
@@ -591,8 +552,8 @@ static uint64_t loadProgress(tr_variant* dict, tr_torrent* tor)
                     tr_variantGetInt(tr_variantListChild(b, 0), &offset);
 
                     time_checked = tr_time();
-                    size_t const pieces = f->lastPiece + 1 - f->firstPiece;
-                    for (size_t i = 0; i < pieces; ++i)
+                    auto const [begin, end] = tor->piecesInFile(fi);
+                    for (size_t i = 0, n = end - begin; i < n; ++i)
                     {
                         int64_t piece_time = 0;
                         tr_variantGetInt(tr_variantListChild(b, i + 1), &piece_time);
@@ -604,20 +565,20 @@ static uint64_t loadProgress(tr_variant* dict, tr_torrent* tor)
             }
         }
 
-        if (std::size(mtimes) != tor->info.fileCount)
+        if (std::size(mtimes) != n_files)
         {
-            tr_logAddTorErr(tor, "got %zu mtimes; expected %zu", std::size(mtimes), size_t(tor->info.fileCount));
+            tr_logAddTorErr(tor, "got %zu mtimes; expected %zu", std::size(mtimes), size_t(n_files));
             // if resizing grows the vector, we'll get 0 mtimes for the
             // new items which is exactly what we want since the pieces
             // in an unknown state should be treated as untested
-            mtimes.resize(tor->info.fileCount);
+            mtimes.resize(n_files);
         }
 
         tor->initCheckedPieces(checked, std::data(mtimes));
 
         /// COMPLETION
 
-        auto blocks = tr_bitfield{ tor->blockCount };
+        auto blocks = tr_bitfield{ tor->blockCount() };
         char const* err = nullptr;
         auto sv = std::string_view{};
         tr_variant const* const b = tr_variantDictFind(prog, TR_KEY_blocks);
@@ -661,7 +622,7 @@ static uint64_t loadProgress(tr_variant* dict, tr_torrent* tor)
         }
         else
         {
-            tr_cpBlockInit(&tor->completion, blocks);
+            tor->setBlocks(blocks);
         }
 
         ret = TR_FR_PROGRESS;
@@ -690,21 +651,21 @@ void tr_torrentSaveResume(tr_torrent* tor)
     tr_variantDictAddInt(&top, TR_KEY_added_date, tor->addedDate);
     tr_variantDictAddInt(&top, TR_KEY_corrupt, tor->corruptPrev + tor->corruptCur);
     tr_variantDictAddInt(&top, TR_KEY_done_date, tor->doneDate);
-    tr_variantDictAddStr(&top, TR_KEY_destination, tor->downloadDir);
+    tr_variantDictAddQuark(&top, TR_KEY_destination, tor->downloadDir().quark());
 
-    if (tor->incompleteDir != nullptr)
+    if (!std::empty(tor->incompleteDir()))
     {
-        tr_variantDictAddStr(&top, TR_KEY_incomplete_dir, tor->incompleteDir);
+        tr_variantDictAddQuark(&top, TR_KEY_incomplete_dir, tor->incompleteDir().quark());
     }
 
     tr_variantDictAddInt(&top, TR_KEY_downloaded, tor->downloadedPrev + tor->downloadedCur);
     tr_variantDictAddInt(&top, TR_KEY_uploaded, tor->uploadedPrev + tor->uploadedCur);
     tr_variantDictAddInt(&top, TR_KEY_max_peers, tor->maxConnectedPeers);
     tr_variantDictAddInt(&top, TR_KEY_bandwidth_priority, tr_torrentGetPriority(tor));
-    tr_variantDictAddBool(&top, TR_KEY_paused, !tor->isRunning && !tor->isQueued);
+    tr_variantDictAddBool(&top, TR_KEY_paused, !tor->isRunning && !tor->isQueued());
     savePeers(&top, tor);
 
-    if (tr_torrentHasMetadata(tor))
+    if (tor->hasMetadata())
     {
         saveFilePriorities(&top, tor);
         saveDND(&top, tor);
@@ -718,67 +679,49 @@ void tr_torrentSaveResume(tr_torrent* tor)
     saveName(&top, tor);
     saveLabels(&top, tor);
 
-    char* const filename = getResumeFilename(tor, TR_METAINFO_BASENAME_HASH);
-    int const err = tr_variantToFile(&top, TR_VARIANT_FMT_BENC, filename);
+    auto const err = tr_variantToFile(&top, TR_VARIANT_FMT_BENC, tor->resumeFile());
     if (err != 0)
     {
-        tr_torrentSetLocalError(tor, "Unable to save resume file: %s", tr_strerror(err));
+        tor->setLocalError(tr_strvJoin("Unable to save resume file: ", tr_strerror(err)));
     }
-    tr_free(filename);
 
     tr_variantFree(&top);
 }
 
-static uint64_t loadFromFile(tr_torrent* tor, uint64_t fieldsToLoad, bool* didRenameToHashOnlyName)
+static uint64_t loadFromFile(tr_torrent* tor, uint64_t fieldsToLoad, bool* did_migrate_filename)
 {
     TR_ASSERT(tr_isTorrent(tor));
-
-    auto boolVal = false;
     auto const wasDirty = tor->isDirty;
-    auto fieldsLoaded = uint64_t{};
-    auto i = int64_t{};
-    auto top = tr_variant{};
-    auto sv = std::string_view{};
+
+    auto const migrated = tor->metainfo_.migrateFile(tor->session->resume_dir, tor->name(), tor->infoHashString(), ".resume"sv);
+    if (did_migrate_filename != nullptr)
+    {
+        *did_migrate_filename = migrated;
+    }
+
+    auto const filename = tor->resumeFile();
+    auto buf = std::vector<char>{};
     tr_error* error = nullptr;
-
-    if (didRenameToHashOnlyName != nullptr)
+    auto top = tr_variant{};
+    if (!tr_loadFile(buf, filename, &error) ||
+        !tr_variantFromBuf(
+            &top,
+            TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE,
+            { std::data(buf), std::size(buf) },
+            nullptr,
+            &error))
     {
-        *didRenameToHashOnlyName = false;
-    }
-
-    char* const filename = getResumeFilename(tor, TR_METAINFO_BASENAME_HASH);
-
-    if (!tr_variantFromFile(&top, TR_VARIANT_FMT_BENC, filename, &error))
-    {
-        tr_logAddTorDbg(tor, "Couldn't read \"%s\": %s", filename, error->message);
+        tr_logAddTorDbg(tor, "Couldn't read \"%s\": %s", filename.c_str(), error->message);
         tr_error_clear(&error);
-
-        char* old_filename = getResumeFilename(tor, TR_METAINFO_BASENAME_NAME_AND_PARTIAL_HASH);
-
-        if (!tr_variantFromFile(&top, TR_VARIANT_FMT_BENC, old_filename, &error))
-        {
-            tr_logAddTorDbg(tor, "Couldn't read \"%s\" either: %s", old_filename, error->message);
-            tr_error_free(error);
-
-            tr_free(old_filename);
-            tr_free(filename);
-            return fieldsLoaded;
-        }
-
-        if (tr_sys_path_rename(old_filename, filename, nullptr))
-        {
-            tr_logAddTorDbg(tor, "Migrated resume file from \"%s\" to \"%s\"", old_filename, filename);
-
-            if (didRenameToHashOnlyName != nullptr)
-            {
-                *didRenameToHashOnlyName = true;
-            }
-        }
-
-        tr_free(old_filename);
+        return 0;
     }
 
-    tr_logAddTorDbg(tor, "Read resume file \"%s\"", filename);
+    tr_logAddTorDbg(tor, "Read resume file \"%s\"", filename.c_str());
+
+    auto fieldsLoaded = uint64_t{};
+    auto boolVal = false;
+    auto i = int64_t{};
+    auto sv = std::string_view{};
 
     if ((fieldsToLoad & TR_FR_CORRUPT) != 0 && tr_variantDictFindInt(&top, TR_KEY_corrupt, &i))
     {
@@ -789,13 +732,11 @@ static uint64_t loadFromFile(tr_torrent* tor, uint64_t fieldsToLoad, bool* didRe
     if ((fieldsToLoad & (TR_FR_PROGRESS | TR_FR_DOWNLOAD_DIR)) != 0 &&
         tr_variantDictFindStrView(&top, TR_KEY_destination, &sv) && !std::empty(sv))
     {
-        bool const is_current_dir = tor->currentDir == tor->downloadDir;
-        tr_free(tor->downloadDir);
-        tor->downloadDir = tr_strvdup(sv);
-
+        bool const is_current_dir = tor->current_dir == tor->download_dir;
+        tor->download_dir = sv;
         if (is_current_dir)
         {
-            tor->currentDir = tor->downloadDir;
+            tor->current_dir = sv;
         }
 
         fieldsLoaded |= TR_FR_DOWNLOAD_DIR;
@@ -804,13 +745,11 @@ static uint64_t loadFromFile(tr_torrent* tor, uint64_t fieldsToLoad, bool* didRe
     if ((fieldsToLoad & (TR_FR_PROGRESS | TR_FR_INCOMPLETE_DIR)) != 0 &&
         tr_variantDictFindStrView(&top, TR_KEY_incomplete_dir, &sv) && !std::empty(sv))
     {
-        bool const is_current_dir = tor->currentDir == tor->incompleteDir;
-        tr_free(tor->incompleteDir);
-        tor->incompleteDir = tr_strvdup(sv);
-
+        bool const is_current_dir = tor->current_dir == tor->incomplete_dir;
+        tor->incomplete_dir = sv;
         if (is_current_dir)
         {
-            tor->currentDir = tor->incompleteDir;
+            tor->current_dir = sv;
         }
 
         fieldsLoaded |= TR_FR_INCOMPLETE_DIR;
@@ -854,7 +793,7 @@ static uint64_t loadFromFile(tr_torrent* tor, uint64_t fieldsToLoad, bool* didRe
 
     if ((fieldsToLoad & TR_FR_ACTIVITY_DATE) != 0 && tr_variantDictFindInt(&top, TR_KEY_activity_date, &i))
     {
-        tr_torrentSetDateActive(tor, i);
+        tor->setDateActive(i);
         fieldsLoaded |= TR_FR_ACTIVITY_DATE;
     }
 
@@ -890,7 +829,7 @@ static uint64_t loadFromFile(tr_torrent* tor, uint64_t fieldsToLoad, bool* didRe
     // Only load file priorities if we are actually downloading.
     // If we're a seed or partial seed, loading it is a waste of time.
     // NB: this is why loadProgress() comes before loadFilePriorities()
-    if ((tr_cpLeftUntilDone(&tor->completion) != 0) && (fieldsToLoad & TR_FR_FILE_PRIORITIES) != 0)
+    if (!tor->isDone() && (fieldsToLoad & TR_FR_FILE_PRIORITIES) != 0)
     {
         fieldsLoaded |= loadFilePriorities(&top, tor);
     }
@@ -936,7 +875,6 @@ static uint64_t loadFromFile(tr_torrent* tor, uint64_t fieldsToLoad, bool* didRe
     tor->isDirty = wasDirty;
 
     tr_variantFree(&top);
-    tr_free(filename);
     return fieldsLoaded;
 }
 
@@ -965,8 +903,7 @@ static uint64_t setFromCtor(tr_torrent* tor, uint64_t fields, tr_ctor const* cto
         if (tr_ctorGetDownloadDir(ctor, mode, &path) && !tr_str_is_empty(path))
         {
             ret |= TR_FR_DOWNLOAD_DIR;
-            tr_free(tor->downloadDir);
-            tor->downloadDir = tr_strdup(path);
+            tor->download_dir = path;
         }
     }
 
@@ -996,15 +933,4 @@ uint64_t tr_torrentLoadResume(tr_torrent* tor, uint64_t fieldsToLoad, tr_ctor co
     ret |= useFallbackFields(tor, fieldsToLoad, ctor);
 
     return ret;
-}
-
-void tr_torrentRemoveResume(tr_torrent const* tor)
-{
-    char* filename = getResumeFilename(tor, TR_METAINFO_BASENAME_HASH);
-    tr_sys_path_remove(filename, nullptr);
-    tr_free(filename);
-
-    filename = getResumeFilename(tor, TR_METAINFO_BASENAME_NAME_AND_PARTIAL_HASH);
-    tr_sys_path_remove(filename, nullptr);
-    tr_free(filename);
 }

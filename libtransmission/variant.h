@@ -1,17 +1,15 @@
-/*
- * This file Copyright (C) 2008-2014 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2008-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #pragma once
 
+#include <cinttypes> // int64_t
 #include <cstddef> // size_t
-#include <inttypes.h> // int64_t
+#include <string>
+#include <string_view>
 
-#include "tr-macros.h"
 #include "quark.h"
 
 struct evbuffer;
@@ -34,7 +32,8 @@ enum tr_string_type
 {
     TR_STRING_TYPE_QUARK,
     TR_STRING_TYPE_HEAP,
-    TR_STRING_TYPE_BUF
+    TR_STRING_TYPE_BUF,
+    TR_STRING_TYPE_VIEW
 };
 
 /* these are PRIVATE IMPLEMENTATION details that should not be touched.
@@ -105,53 +104,31 @@ enum tr_variant_fmt
     TR_VARIANT_FMT_JSON_LEAN /* saves bandwidth by omitting all whitespace. */
 };
 
-int tr_variantToFile(tr_variant const* variant, tr_variant_fmt fmt, char const* filename);
+int tr_variantToFile(tr_variant const* variant, tr_variant_fmt fmt, std::string const& filename);
 
-char* tr_variantToStr(tr_variant const* variant, tr_variant_fmt fmt, size_t* len);
+std::string tr_variantToStr(tr_variant const* variant, tr_variant_fmt fmt);
 
 struct evbuffer* tr_variantToBuf(tr_variant const* variant, tr_variant_fmt fmt);
 
-/* TR_VARIANT_FMT_JSON_LEAN and TR_VARIANT_FMT_JSON are equivalent here. */
-bool tr_variantFromFile(tr_variant* setme, tr_variant_fmt fmt, char const* filename, struct tr_error** error);
+enum tr_variant_parse_opts
+{
+    TR_VARIANT_PARSE_BENC = (1 << 0),
+    TR_VARIANT_PARSE_JSON = (1 << 1),
+    TR_VARIANT_PARSE_INPLACE = (1 << 2)
+};
 
-/* TR_VARIANT_FMT_JSON_LEAN and TR_VARIANT_FMT_JSON are equivalent here. */
-int tr_variantFromBuf(
+bool tr_variantFromFile(
     tr_variant* setme,
-    tr_variant_fmt fmt,
-    void const* buf,
-    size_t buflen,
-    char const* optional_source,
-    char const** setme_end);
+    tr_variant_parse_opts opts,
+    std::string const& filename,
+    struct tr_error** error = nullptr);
 
-static inline int tr_variantFromBenc(tr_variant* setme, void const* buf, size_t buflen)
-{
-    return tr_variantFromBuf(setme, TR_VARIANT_FMT_BENC, buf, buflen, nullptr, nullptr);
-}
-
-static inline int tr_variantFromBencFull(
+bool tr_variantFromBuf(
     tr_variant* setme,
-    void const* buf,
-    size_t buflen,
-    char const* source,
-    char const** setme_end)
-{
-    return tr_variantFromBuf(setme, TR_VARIANT_FMT_BENC, buf, buflen, source, setme_end);
-}
-
-static inline int tr_variantFromJsonFull(
-    tr_variant* setme,
-    void const* buf,
-    size_t buflen,
-    char const* source,
-    char const** setme_end)
-{
-    return tr_variantFromBuf(setme, TR_VARIANT_FMT_JSON, buf, buflen, source, setme_end);
-}
-
-static inline int tr_variantFromJson(tr_variant* setme, void const* buf, size_t buflen)
-{
-    return tr_variantFromBuf(setme, TR_VARIANT_FMT_JSON, buf, buflen, nullptr, nullptr);
-}
+    int variant_parse_opts,
+    std::string_view buf,
+    char const** setme_end = nullptr,
+    tr_error** error = nullptr);
 
 constexpr bool tr_variantIsType(tr_variant const* b, int type)
 {
@@ -167,10 +144,10 @@ constexpr bool tr_variantIsString(tr_variant const* b)
     return b != nullptr && b->type == TR_VARIANT_TYPE_STR;
 }
 
-bool tr_variantGetStr(tr_variant const* variant, char const** setme_str, size_t* setme_len);
 bool tr_variantGetStrView(tr_variant const* variant, std::string_view* setme);
 
 void tr_variantInitStr(tr_variant* initme, std::string_view);
+void tr_variantInitStrView(tr_variant* initme, std::string_view);
 void tr_variantInitQuark(tr_variant* initme, tr_quark const quark);
 void tr_variantInitRaw(tr_variant* initme, void const* raw, size_t raw_len);
 
@@ -229,6 +206,7 @@ tr_variant* tr_variantListAddBool(tr_variant* list, bool addme);
 tr_variant* tr_variantListAddInt(tr_variant* list, int64_t addme);
 tr_variant* tr_variantListAddReal(tr_variant* list, double addme);
 tr_variant* tr_variantListAddStr(tr_variant* list, std::string_view);
+tr_variant* tr_variantListAddStrView(tr_variant* list, std::string_view);
 tr_variant* tr_variantListAddQuark(tr_variant* list, tr_quark const addme);
 tr_variant* tr_variantListAddRaw(tr_variant* list, void const* addme_value, size_t addme_len);
 tr_variant* tr_variantListAddList(tr_variant* list, size_t reserve_count);
@@ -256,6 +234,7 @@ tr_variant* tr_variantDictAddReal(tr_variant* dict, tr_quark const key, double v
 tr_variant* tr_variantDictAddInt(tr_variant* dict, tr_quark const key, int64_t value);
 tr_variant* tr_variantDictAddBool(tr_variant* dict, tr_quark const key, bool value);
 tr_variant* tr_variantDictAddStr(tr_variant* dict, tr_quark const key, std::string_view);
+tr_variant* tr_variantDictAddStrView(tr_variant* dict, tr_quark const key, std::string_view);
 tr_variant* tr_variantDictAddQuark(tr_variant* dict, tr_quark const key, tr_quark const val);
 tr_variant* tr_variantDictAddList(tr_variant* dict, tr_quark const key, size_t reserve_count);
 tr_variant* tr_variantDictAddDict(tr_variant* dict, tr_quark const key, size_t reserve_count);
@@ -269,7 +248,6 @@ bool tr_variantDictFindDict(tr_variant* dict, tr_quark const key, tr_variant** s
 bool tr_variantDictFindInt(tr_variant* dict, tr_quark const key, int64_t* setme);
 bool tr_variantDictFindReal(tr_variant* dict, tr_quark const key, double* setme);
 bool tr_variantDictFindBool(tr_variant* dict, tr_quark const key, bool* setme);
-bool tr_variantDictFindStr(tr_variant* dict, tr_quark const key, char const** setme, size_t* len);
 bool tr_variantDictFindStrView(tr_variant* dict, tr_quark const key, std::string_view* setme);
 bool tr_variantDictFindRaw(tr_variant* dict, tr_quark const key, uint8_t const** setme_raw, size_t* setme_len);
 

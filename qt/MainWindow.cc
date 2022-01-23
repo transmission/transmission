@@ -1,14 +1,12 @@
-/*
- * This file Copyright (C) 2009-2016 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2009-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #include <array>
 #include <cassert>
 #include <functional>
+#include <memory>
 #include <utility>
 
 #include <QCheckBox>
@@ -30,6 +28,7 @@
 #include "FilterBar.h"
 #include "Filters.h"
 #include "Formatter.h"
+#include "IconCache.h"
 #include "MainWindow.h"
 #include "MakeDialog.h"
 #include "OptionsDialog.h"
@@ -78,18 +77,6 @@ public:
     }
 };
 
-QIcon MainWindow::getStockIcon(QString const& name, int fallback) const
-{
-    QIcon icon = QIcon::fromTheme(name);
-
-    if (icon.isNull() && fallback >= 0)
-    {
-        icon = style()->standardIcon(QStyle::StandardPixmap(fallback), nullptr, this);
-    }
-
-    return icon;
-}
-
 QIcon MainWindow::addEmblem(QIcon base_icon, QStringList const& emblem_names) const
 {
     if (base_icon.isNull())
@@ -97,11 +84,12 @@ QIcon MainWindow::addEmblem(QIcon base_icon, QStringList const& emblem_names) co
         return base_icon;
     }
 
+    auto& icons = IconCache::get();
     QIcon emblem_icon;
 
     for (QString const& emblem_name : emblem_names)
     {
-        emblem_icon = QIcon::fromTheme(emblem_name);
+        emblem_icon = icons.getThemeIcon(emblem_name);
 
         if (!emblem_icon.isNull())
         {
@@ -156,38 +144,43 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
     ui_.listView->setStyle(lvp_style_.get());
     ui_.listView->setAttribute(Qt::WA_MacShowFocusRect, false);
 
+    auto& icons = IconCache::get();
+
     // icons
-    QIcon const icon_play = getStockIcon(QStringLiteral("media-playback-start"), QStyle::SP_MediaPlay);
-    QIcon const icon_pause = getStockIcon(QStringLiteral("media-playback-pause"), QStyle::SP_MediaPause);
-    QIcon const icon_open = getStockIcon(QStringLiteral("document-open"), QStyle::SP_DialogOpenButton);
+    QIcon const icon_play = icons.getThemeIcon(QStringLiteral("media-playback-start"), QStyle::SP_MediaPlay);
+    QIcon const icon_pause = icons.getThemeIcon(QStringLiteral("media-playback-pause"), QStyle::SP_MediaPause);
+    QIcon const icon_open = icons.getThemeIcon(QStringLiteral("document-open"), QStyle::SP_DialogOpenButton);
     ui_.action_OpenFile->setIcon(icon_open);
     ui_.action_AddURL->setIcon(
         addEmblem(icon_open, QStringList() << QStringLiteral("emblem-web") << QStringLiteral("applications-internet")));
-    ui_.action_New->setIcon(getStockIcon(QStringLiteral("document-new"), QStyle::SP_DesktopIcon));
-    ui_.action_Properties->setIcon(getStockIcon(QStringLiteral("document-properties"), QStyle::SP_DesktopIcon));
-    ui_.action_OpenFolder->setIcon(getStockIcon(QStringLiteral("folder-open"), QStyle::SP_DirOpenIcon));
+    ui_.action_New->setIcon(icons.getThemeIcon(QStringLiteral("document-new"), QStyle::SP_DesktopIcon));
+    ui_.action_Properties->setIcon(icons.getThemeIcon(QStringLiteral("document-properties"), QStyle::SP_DesktopIcon));
+    ui_.action_OpenFolder->setIcon(icons.getThemeIcon(QStringLiteral("folder-open"), QStyle::SP_DirOpenIcon));
     ui_.action_Start->setIcon(icon_play);
     ui_.action_StartNow->setIcon(icon_play);
-    ui_.action_Announce->setIcon(getStockIcon(QStringLiteral("network-transmit-receive")));
+    ui_.action_Announce->setIcon(icons.getThemeIcon(QStringLiteral("network-transmit-receive")));
     ui_.action_Pause->setIcon(icon_pause);
-    ui_.action_Remove->setIcon(getStockIcon(QStringLiteral("list-remove"), QStyle::SP_TrashIcon));
-    ui_.action_Delete->setIcon(getStockIcon(QStringLiteral("edit-delete"), QStyle::SP_TrashIcon));
+    ui_.action_Remove->setIcon(icons.getThemeIcon(QStringLiteral("list-remove"), QStyle::SP_TrashIcon));
+    ui_.action_Delete->setIcon(icons.getThemeIcon(QStringLiteral("edit-delete"), QStyle::SP_TrashIcon));
     ui_.action_StartAll->setIcon(icon_play);
     ui_.action_PauseAll->setIcon(icon_pause);
-    ui_.action_Quit->setIcon(getStockIcon(QStringLiteral("application-exit")));
-    ui_.action_SelectAll->setIcon(getStockIcon(QStringLiteral("edit-select-all")));
-    ui_.action_ReverseSortOrder->setIcon(getStockIcon(QStringLiteral("view-sort-ascending"), QStyle::SP_ArrowDown));
-    ui_.action_Preferences->setIcon(getStockIcon(QStringLiteral("preferences-system")));
-    ui_.action_Contents->setIcon(getStockIcon(QStringLiteral("help-contents"), QStyle::SP_DialogHelpButton));
-    ui_.action_About->setIcon(getStockIcon(QStringLiteral("help-about")));
-    ui_.action_QueueMoveTop->setIcon(getStockIcon(QStringLiteral("go-top")));
-    ui_.action_QueueMoveUp->setIcon(getStockIcon(QStringLiteral("go-up"), QStyle::SP_ArrowUp));
-    ui_.action_QueueMoveDown->setIcon(getStockIcon(QStringLiteral("go-down"), QStyle::SP_ArrowDown));
-    ui_.action_QueueMoveBottom->setIcon(getStockIcon(QStringLiteral("go-bottom")));
+    ui_.action_Quit->setIcon(icons.getThemeIcon(QStringLiteral("application-exit")));
+    ui_.action_SelectAll->setIcon(icons.getThemeIcon(QStringLiteral("edit-select-all")));
+    ui_.action_ReverseSortOrder->setIcon(icons.getThemeIcon(QStringLiteral("view-sort-ascending"), QStyle::SP_ArrowDown));
+    ui_.action_Preferences->setIcon(icons.getThemeIcon(QStringLiteral("preferences-system")));
+    ui_.action_Contents->setIcon(icons.getThemeIcon(QStringLiteral("help-contents"), QStyle::SP_DialogHelpButton));
+    ui_.action_About->setIcon(icons.getThemeIcon(QStringLiteral("help-about")));
+    ui_.action_QueueMoveTop->setIcon(icons.getThemeIcon(QStringLiteral("go-top")));
+    ui_.action_QueueMoveUp->setIcon(icons.getThemeIcon(QStringLiteral("go-up"), QStyle::SP_ArrowUp));
+    ui_.action_QueueMoveDown->setIcon(icons.getThemeIcon(QStringLiteral("go-down"), QStyle::SP_ArrowDown));
+    ui_.action_QueueMoveBottom->setIcon(icons.getThemeIcon(QStringLiteral("go-bottom")));
 
-    auto make_network_pixmap = [this](QString name, QSize size = { 16, 16 })
+    ui_.optionsButton->setIcon(icons.getThemeIcon(QStringLiteral("preferences-other")));
+    ui_.statsModeButton->setIcon(icons.getThemeIcon(QStringLiteral("view-statistics")));
+
+    auto make_network_pixmap = [&icons](QString name, QSize size = { 16, 16 })
     {
-        return getStockIcon(name, QStyle::SP_DriveNetIcon).pixmap(size);
+        return icons.getThemeIcon(name, QStyle::SP_DriveNetIcon).pixmap(size);
     };
     pixmap_network_error_ = make_network_pixmap(QStringLiteral("network-error"));
     pixmap_network_idle_ = make_network_pixmap(QStringLiteral("network-idle"));
@@ -321,7 +314,7 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
     connect(&filter_model_, &TorrentFilter::rowsRemoved, this, refresh_header_soon);
     connect(ui_.listView, &TorrentView::headerDoubleClicked, filter_bar, &FilterBar::clear);
 
-    static std::array<int, 16> constexpr InitKeys = {
+    static std::array<int, 17> constexpr InitKeys = {
         Prefs::ALT_SPEED_LIMIT_ENABLED, //
         Prefs::COMPACT_VIEW, //
         Prefs::DSPEED, //
@@ -330,6 +323,7 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
         Prefs::MAIN_WINDOW_X, //
         Prefs::RATIO, //
         Prefs::RATIO_ENABLED, //
+        Prefs::READ_CLIPBOARD, //
         Prefs::SHOW_TRAY_ICON, //
         Prefs::SORT_MODE, //
         Prefs::SORT_REVERSED, //
@@ -402,7 +396,7 @@ void MainWindow::initStatusBar()
     ui_.optionsButton->setMenu(createOptionsMenu());
 
     int const minimum_speed_width = ui_.downloadSpeedLabel->fontMetrics()
-                                        .boundingRect(Formatter::get().uploadSpeedToString(Speed::fromKBps(999.99)))
+                                        .size(0, Formatter::get().uploadSpeedToString(Speed::fromKBps(999.99)))
                                         .width();
     ui_.downloadSpeedLabel->setMinimumWidth(minimum_speed_width);
     ui_.uploadSpeedLabel->setMinimumWidth(minimum_speed_width);
@@ -1215,12 +1209,10 @@ void MainWindow::refreshPref(int key)
         break;
 
     case Prefs::COMPACT_VIEW:
-        {
-            b = prefs_.getBool(key);
-            ui_.action_CompactView->setChecked(b);
-            ui_.listView->setItemDelegate(b ? torrent_delegate_min_ : torrent_delegate_);
-            break;
-        }
+        b = prefs_.getBool(key);
+        ui_.action_CompactView->setChecked(b);
+        ui_.listView->setItemDelegate(b ? torrent_delegate_min_ : torrent_delegate_);
+        break;
 
     case Prefs::MAIN_WINDOW_X:
     case Prefs::MAIN_WINDOW_Y:
@@ -1247,6 +1239,10 @@ void MainWindow::refreshPref(int key)
             ui_.altSpeedButton->setToolTip(fmt.arg(Formatter::get().speedToString(d)).arg(Formatter::get().speedToString(u)));
             break;
         }
+
+    case Prefs::READ_CLIPBOARD:
+        auto_add_clipboard_links = prefs_.getBool(Prefs::READ_CLIPBOARD);
+        break;
 
     default:
         break;
@@ -1600,6 +1596,42 @@ void MainWindow::dropEvent(QDropEvent* event)
             trApp->addTorrent(AddData(key));
         }
     }
+}
+
+bool MainWindow::event(QEvent* e)
+{
+    if (e->type() != QEvent::WindowActivate || !auto_add_clipboard_links)
+    {
+        return QMainWindow::event(e);
+    }
+
+    QString const text = QGuiApplication::clipboard()->text().trimmed();
+    if (text.endsWith(QStringLiteral(".torrent"), Qt::CaseInsensitive) ||
+        text.startsWith(QStringLiteral("magnet:"), Qt::CaseInsensitive))
+    {
+        for (QString const& entry : text.split(QLatin1Char('\n')))
+        {
+            QString key = entry.trimmed();
+
+            if (key.isEmpty())
+            {
+                continue;
+            }
+
+            if (QUrl const url(key); url.isLocalFile())
+            {
+                key = url.toLocalFile();
+            }
+
+            if (!clipboard_processed_keys_.contains(key))
+            {
+                clipboard_processed_keys_.append(key);
+                trApp->addTorrent(AddData(key));
+            }
+        }
+    }
+
+    return QMainWindow::event(e);
 }
 
 /***

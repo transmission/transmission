@@ -16,6 +16,7 @@ function global:Build-Qt([string] $PrefixDir, [string] $Arch, [string] $DepsPref
     $UnpackFlags = @(
         (Join-Path $ArchiveBase qtactiveqt '*')
         (Join-Path $ArchiveBase qtbase '*')
+        (Join-Path $ArchiveBase qtsvg '*')
         (Join-Path $ArchiveBase qttools '*')
         (Join-Path $ArchiveBase qttranslations '*')
         (Join-Path $ArchiveBase qtwinextras '*')

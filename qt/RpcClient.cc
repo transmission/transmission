@@ -1,14 +1,11 @@
-/*
- * This file Copyright (C) 2014-2016 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2014-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
+
+#include <string_view>
 
 #include "RpcClient.h"
-
-#include <cstring>
 
 #include <QApplication>
 #include <QAuthenticator>
@@ -144,11 +141,7 @@ void RpcClient::sendNetworkRequest(TrVariantPtr json, QFutureInterface<RpcRespon
         request_ = request;
     }
 
-    size_t raw_json_data_length;
-    auto* raw_json_data = tr_variantToStr(json.get(), TR_VARIANT_FMT_JSON_LEAN, &raw_json_data_length);
-    QByteArray json_data(raw_json_data, raw_json_data_length);
-    tr_free(raw_json_data);
-
+    auto const json_data = QByteArray::fromStdString(tr_variantToStr(json.get(), TR_VARIANT_FMT_JSON_LEAN));
     QNetworkReply* reply = networkAccessManager()->post(*request_, json_data);
     reply->setProperty(RequestDataPropertyKey, QVariant::fromValue(json));
     reply->setProperty(RequestFutureinterfacePropertyKey, QVariant::fromValue(promise));
@@ -272,12 +265,12 @@ void RpcClient::networkRequestFinished(QNetworkReply* reply)
     }
     else
     {
-        RpcResponse result;
-
         QByteArray const json_data = reply->readAll().trimmed();
-        TrVariantPtr json = createVariant();
+        auto const json_sv = std::string_view{ std::data(json_data), size_t(std::size(json_data)) };
 
-        if (tr_variantFromJson(json.get(), json_data.constData(), json_data.size()) == 0)
+        TrVariantPtr json = createVariant();
+        RpcResponse result;
+        if (tr_variantFromBuf(json.get(), TR_VARIANT_PARSE_JSON, json_sv))
         {
             result = parseResponseData(*json);
         }

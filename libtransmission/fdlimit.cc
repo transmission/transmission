@@ -1,25 +1,25 @@
-/*
- * This file Copyright (C) 2005-2014 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2005-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #include <algorithm>
+#include <array>
 #include <cerrno>
 #include <cinttypes>
-#include <cstring>
+#include <ctime>
 
 #include "transmission.h"
-#include "error.h"
+
 #include "error-types.h"
+#include "error.h"
 #include "fdlimit.h"
 #include "file.h"
 #include "log.h"
 #include "session.h"
 #include "torrent.h" /* tr_isTorrent() */
 #include "tr-assert.h"
+#include "utils.h" // tr_time()
 
 #define dbgmsg(...) tr_logAddDeepNamed(nullptr, __VA_ARGS__)
 
@@ -82,18 +82,17 @@ static bool preallocate_file_full(tr_sys_file_t fd, uint64_t length, tr_error** 
 
     if (!TR_ERROR_IS_ENOSPC(my_error->code))
     {
-        uint8_t buf[4096];
+        auto buf = std::array<uint8_t, 4096>{};
         bool success = true;
 
-        memset(buf, 0, sizeof(buf));
         tr_error_clear(&my_error);
 
         /* fallback: the old-fashioned way */
         while (success && length > 0)
         {
-            uint64_t const thisPass = std::min(length, uint64_t{ sizeof(buf) });
+            uint64_t const thisPass = std::min(length, uint64_t{ std::size(buf) });
             uint64_t bytes_written = 0;
-            success = tr_sys_file_write(fd, buf, thisPass, &bytes_written, &my_error);
+            success = tr_sys_file_write(fd, std::data(buf), thisPass, &bytes_written, &my_error);
             length -= bytes_written;
         }
 
@@ -248,17 +247,15 @@ static int cached_file_open(
     return 0;
 
 FAIL:
+    int const err = error->code;
+    tr_error_free(error);
+
+    if (fd != TR_BAD_SYS_FILE)
     {
-        int const err = error->code;
-        tr_error_free(error);
-
-        if (fd != TR_BAD_SYS_FILE)
-        {
-            tr_sys_file_close(fd, nullptr);
-        }
-
-        return err;
+        tr_sys_file_close(fd, nullptr);
     }
+
+    return err;
 }
 
 /***
@@ -447,7 +444,7 @@ tr_sys_file_t tr_fdFileGetCached(tr_session* s, int torrent_id, tr_file_index_t 
 
 void tr_fdTorrentClose(tr_session* session, int torrent_id)
 {
-    TR_ASSERT(tr_sessionIsLocked(session));
+    auto const lock = session->unique_lock();
 
     fileset_close_torrent(get_fileset(session), torrent_id);
 }
@@ -476,9 +473,7 @@ tr_sys_file_t tr_fdFileCheckout(
 
     if (!cached_file_is_open(o))
     {
-        int const err = cached_file_open(o, filename, writable, allocation, file_size);
-
-        if (err != 0)
+        if (int const err = cached_file_open(o, filename, writable, allocation, file_size); err != 0)
         {
             errno = err;
             return TR_BAD_SYS_FILE;

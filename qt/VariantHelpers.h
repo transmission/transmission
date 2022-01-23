@@ -1,13 +1,11 @@
-/*
- * This file Copyright (C) 2020 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2020-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #pragma once
 
+#include <ctime>
 #include <optional>
 #include <string_view>
 #include <vector>
@@ -77,11 +75,10 @@ template<typename T, typename std::enable_if<std::is_same_v<T, QString>>::type* 
 auto getValue(tr_variant const* variant)
 {
     std::optional<T> ret;
-    char const* str;
-    size_t len;
-    if (tr_variantGetStr(variant, &str, &len))
+
+    if (auto sv = std::string_view{}; tr_variantGetStrView(variant, &sv))
     {
-        ret = QString::fromUtf8(str, len);
+        ret = QString::fromUtf8(std::data(sv), std::size(sv));
     }
 
     return ret;
@@ -91,11 +88,10 @@ template<typename T, typename std::enable_if<std::is_same_v<T, std::string_view>
 auto getValue(tr_variant const* variant)
 {
     std::optional<T> ret;
-    char const* str;
-    size_t len;
-    if (tr_variantGetStr(variant, &str, &len))
+
+    if (auto sv = std::string_view{}; tr_variantGetStrView(variant, &sv))
     {
-        ret = std::string_view(str, len);
+        ret = std::string_view(std::data(sv), std::size(sv));
     }
 
     return ret;
@@ -183,8 +179,8 @@ template<typename T>
 auto dictFind(tr_variant* dict, tr_quark key)
 {
     std::optional<T> ret;
-    auto const* child = tr_variantDictFind(dict, key);
-    if (child != nullptr)
+
+    if (auto const* child = tr_variantDictFind(dict, key); child != nullptr)
     {
         ret = getValue<T>(child);
     }

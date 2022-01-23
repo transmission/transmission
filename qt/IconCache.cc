@@ -1,10 +1,7 @@
-/*
- * This file Copyright (C) 2009-2015 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2009-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #include "IconCache.h"
 
@@ -13,6 +10,7 @@
 #include <shellapi.h>
 #endif
 
+#include <QApplication>
 #include <QFile>
 #include <QFileIconProvider>
 #include <QFileInfo>
@@ -86,11 +84,11 @@ QIcon IconCache::getMimeTypeIcon(QString const& mime_type_name, bool multifile) 
     {
         QMimeDatabase mime_db;
         auto const type = mime_db.mimeTypeForName(mime_type_name);
-        icon = QIcon::fromTheme(type.iconName());
+        icon = getThemeIcon(type.iconName());
 
         if (icon.isNull())
         {
-            icon = QIcon::fromTheme(type.genericIconName());
+            icon = getThemeIcon(type.genericIconName());
         }
 
         if (icon.isNull())
@@ -123,6 +121,11 @@ QIcon IconCache::getMimeTypeIcon(QString const& mime_type_name, bool multifile) 
     }
 
     return icon;
+}
+
+QIcon IconCache::getThemeIcon(QString const& name, std::optional<QStyle::StandardPixmap> const& fallback) const
+{
+    return getThemeIcon(name, name + QStringLiteral("-symbolic"), fallback);
 }
 
 /***
@@ -197,12 +200,12 @@ QIcon IconCache::getMimeIcon(QString const& filename) const
         auto const type = mime_db.mimeTypeForFile(filename, QMimeDatabase::MatchExtension);
         if (icon.isNull())
         {
-            icon = QIcon::fromTheme(type.iconName());
+            icon = getThemeIcon(type.iconName());
         }
 
         if (icon.isNull())
         {
-            icon = QIcon::fromTheme(type.genericIconName());
+            icon = getThemeIcon(type.genericIconName());
         }
 
         if (icon.isNull())
@@ -215,3 +218,25 @@ QIcon IconCache::getMimeIcon(QString const& filename) const
 }
 
 #endif
+
+QIcon IconCache::getThemeIcon(
+    QString const& name,
+    QString const& fallbackName,
+    std::optional<QStyle::StandardPixmap> const& fallbackPixmap) const
+{
+    auto const rtl_suffix = qApp->layoutDirection() == Qt::RightToLeft ? QStringLiteral("-rtl") : QString();
+
+    auto icon = QIcon::fromTheme(name + rtl_suffix);
+
+    if (icon.isNull())
+    {
+        icon = QIcon::fromTheme(fallbackName + rtl_suffix);
+    }
+
+    if (icon.isNull() && fallbackPixmap.has_value())
+    {
+        icon = qApp->style()->standardIcon(*fallbackPixmap, nullptr);
+    }
+
+    return icon;
+}

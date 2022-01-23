@@ -1,29 +1,24 @@
-/*
- * This file Copyright (C) 2013-2014 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2013-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #include <algorithm>
 #include <array>
-#include <cstring> // strlen()
-#include <iterator>
 #include <string_view>
 #include <vector>
 
 #include "transmission.h"
+
 #include "quark.h"
-#include "tr-assert.h"
-#include "utils.h" // tr_strndup()
+#include "utils.h" // tr_strvDup()
 
 using namespace std::literals;
 
 namespace
 {
 
-auto constexpr my_static = std::array<std::string_view, 392>{ ""sv,
+auto constexpr my_static = std::array<std::string_view, 390>{ ""sv,
                                                               "activeTorrentCount"sv,
                                                               "activity-date"sv,
                                                               "activityDate"sv,
@@ -85,7 +80,6 @@ auto constexpr my_static = std::array<std::string_view, 392>{ ""sv,
                                                               "details-window-height"sv,
                                                               "details-window-width"sv,
                                                               "dht-enabled"sv,
-                                                              "display-name"sv,
                                                               "dnd"sv,
                                                               "done-date"sv,
                                                               "doneDate"sv,
@@ -155,7 +149,6 @@ auto constexpr my_static = std::array<std::string_view, 392>{ ""sv,
                                                               "incomplete-dir"sv,
                                                               "incomplete-dir-enabled"sv,
                                                               "info"sv,
-                                                              "info_hash"sv,
                                                               "inhibit-desktop-hibernation"sv,
                                                               "interval"sv,
                                                               "ip"sv,
@@ -188,7 +181,6 @@ auto constexpr my_static = std::array<std::string_view, 392>{ ""sv,
                                                               "location"sv,
                                                               "lpd-enabled"sv,
                                                               "m"sv,
-                                                              "magnet-info"sv,
                                                               "magnetLink"sv,
                                                               "main-window-height"sv,
                                                               "main-window-is-maximized"sv,
@@ -279,6 +271,7 @@ auto constexpr my_static = std::array<std::string_view, 392>{ ""sv,
                                                               "ratio-limit"sv,
                                                               "ratio-limit-enabled"sv,
                                                               "ratio-mode"sv,
+                                                              "read-clipboard"sv,
                                                               "recent-download-dir-1"sv,
                                                               "recent-download-dir-2"sv,
                                                               "recent-download-dir-3"sv,
@@ -460,14 +453,13 @@ std::optional<tr_quark> tr_quark_lookup(std::string_view key)
 
 tr_quark tr_quark_new(std::string_view str)
 {
-    auto const prior = tr_quark_lookup(str);
-    if (prior)
+    if (auto const prior = tr_quark_lookup(str); prior)
     {
         return *prior;
     }
 
     auto const ret = TR_N_KEYS + std::size(my_runtime);
-    my_runtime.emplace_back(tr_strndup(std::data(str), std::size(str)), std::size(str));
+    my_runtime.emplace_back(tr_strvDup(str), std::size(str));
     return ret;
 }
 

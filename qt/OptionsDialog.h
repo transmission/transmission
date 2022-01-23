@@ -1,27 +1,30 @@
-/*
- * This file Copyright (C) 2009-2015 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2009-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #pragma once
 
+#include <optional>
 #include <vector>
 
-#include <QCryptographicHash>
 #include <QDir>
 #include <QFile>
 #include <QMap>
+#include <QSet>
 #include <QString>
 #include <QTimer>
 
+#include <libtransmission/tr-macros.h>
+
 #include "AddData.h" // AddData
 #include "BaseDialog.h"
-#include "Macros.h"
 #include "Torrent.h" // FileList
 #include "ui_OptionsDialog.h"
+
+#include <libtransmission/transmission.h>
+
+#include <libtransmission/torrent-metainfo.h>
 
 class Prefs;
 class Session;
@@ -44,8 +47,6 @@ private slots:
     void onAccepted();
     void onPriorityChanged(QSet<int> const& file_indices, int);
     void onWantedChanged(QSet<int> const& file_indices, bool);
-    void onVerify();
-    void onTimeout();
 
     void onSourceChanged();
     void onDestinationChanged();
@@ -58,29 +59,16 @@ private:
     void reload();
     void updateWidgetsLocality();
     void clearInfo();
-    void clearVerify();
 
     AddData add_;
     FileList files_;
-    QCryptographicHash verify_hash_ = QCryptographicHash(QCryptographicHash::Sha1);
 
     QDir local_destination_;
-    QFile verify_file_;
-    QPushButton* verify_button_ = {};
     QTimer edit_timer_;
-    QTimer verify_timer_;
-    std::vector<bool> verify_flags_;
     std::vector<bool> wanted_;
     std::vector<int> priorities_;
     Session& session_;
     Ui::OptionsDialog ui_ = {};
-    mybins_t verify_bins_;
-    tr_info info_ = {};
-    uint64_t verify_file_pos_ = {};
-    uint32_t verify_piece_index_ = {};
-    uint32_t verify_piece_pos_ = {};
-    int verify_file_index_ = {};
-    char verify_buf_[2048 * 4] = {};
-    bool have_info_ = {};
+    std::optional<tr_torrent_metainfo> metainfo_;
     bool is_local_ = {};
 };

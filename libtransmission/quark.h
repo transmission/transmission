@@ -1,18 +1,13 @@
-/*
- * This file Copyright (C) 2013-2014 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2012-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #pragma once
 
 #include <cstddef> // size_t
 #include <optional>
 #include <string_view>
-
-#include "tr-macros.h"
 
 /* Quarks — a 2-way association between a string and a unique integer identifier */
 using tr_quark = size_t;
@@ -88,7 +83,6 @@ enum
     TR_KEY_details_window_height,
     TR_KEY_details_window_width,
     TR_KEY_dht_enabled,
-    TR_KEY_display_name,
     TR_KEY_dnd,
     TR_KEY_done_date,
     TR_KEY_doneDate,
@@ -158,7 +152,6 @@ enum
     TR_KEY_incomplete_dir,
     TR_KEY_incomplete_dir_enabled,
     TR_KEY_info,
-    TR_KEY_info_hash,
     TR_KEY_inhibit_desktop_hibernation,
     TR_KEY_interval,
     TR_KEY_ip,
@@ -191,7 +184,6 @@ enum
     TR_KEY_location,
     TR_KEY_lpd_enabled,
     TR_KEY_m,
-    TR_KEY_magnet_info,
     TR_KEY_magnetLink,
     TR_KEY_main_window_height,
     TR_KEY_main_window_is_maximized,
@@ -282,6 +274,7 @@ enum
     TR_KEY_ratio_limit,
     TR_KEY_ratio_limit_enabled,
     TR_KEY_ratio_mode,
+    TR_KEY_read_clipboard,
     TR_KEY_recent_download_dir_1,
     TR_KEY_recent_download_dir_2,
     TR_KEY_recent_download_dir_3,
