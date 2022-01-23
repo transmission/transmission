@@ -433,7 +433,8 @@ auto& my_runtime{ *new std::vector<std::string_view>{} };
 std::optional<tr_quark> tr_quark_lookup(std::string_view key)
 {
     // is it in our static array?
-    auto constexpr sbegin = std::begin(my_static), send = std::end(my_static);
+    auto constexpr sbegin = std::begin(my_static);
+    auto constexpr send = std::end(my_static);
     auto const sit = std::lower_bound(sbegin, send, key);
     if (sit != send && *sit == key)
     {
@@ -441,7 +442,8 @@ std::optional<tr_quark> tr_quark_lookup(std::string_view key)
     }
 
     /* was it added during runtime? */
-    auto const rbegin = std::begin(my_runtime), rend = std::end(my_runtime);
+    auto const rbegin = std::begin(my_runtime);
+    auto const rend = std::end(my_runtime);
     auto const rit = std::find(rbegin, rend, key);
     if (rit != rend)
     {
