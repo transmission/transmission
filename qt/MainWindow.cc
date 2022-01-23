@@ -262,10 +262,10 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
     // NOLINTNEXTLINE(clang-analyzer-cplusplus.NewDeleteLeaks)
     auto* action_group = new QActionGroup(this);
 
-    for (auto const& mode : sort_modes)
+    for (auto const& [action, mode] : sort_modes)
     {
-        mode.first->setProperty(SortModeKey, mode.second);
-        action_group->addAction(mode.first);
+        action->setProperty(SortModeKey, mode);
+        action_group->addAction(action);
     }
 
     connect(action_group, &QActionGroup::triggered, this, &MainWindow::onSortModeChanged);
