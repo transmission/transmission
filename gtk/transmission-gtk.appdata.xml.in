@@ -35,4 +35,7 @@ Copyright 2017 Endless Mobile, Inc.
     </screenshot>
   </screenshots>
   <update_contact>info_AT_transmissionbt.com</update_contact>
+  <content_rating type="oars-1.1">
+    <content_attribute id="social-info">mild</content_attribute>
+  </content_rating>
 </component>
