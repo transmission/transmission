@@ -462,10 +462,10 @@ void TorrentModel::rowsRemove(torrents_t const& torrents)
     auto const& spans = getSpans(getIds(torrents.begin(), torrents.end()));
     for (auto it = spans.rbegin(), end = spans.rend(); it != end; ++it)
     {
-        auto const& span = *it;
+        auto const& [first, last] = *it;
 
-        beginRemoveRows(QModelIndex(), span.first, span.second);
-        torrents_.erase(torrents_.begin() + span.first, torrents_.begin() + span.second + 1);
+        beginRemoveRows(QModelIndex(), first, last);
+        torrents_.erase(torrents_.begin() + first, torrents_.begin() + last + 1);
         endRemoveRows();
     }
 
