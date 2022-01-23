@@ -1605,8 +1605,8 @@ bool MainWindow::event(QEvent* e)
         return QMainWindow::event(e);
     }
 
-    QString const text = QGuiApplication::clipboard()->text().trimmed();
-    if (text.endsWith(QStringLiteral(".torrent"), Qt::CaseInsensitive) ||
+    if (auto const text = QGuiApplication::clipboard()->text().trimmed();
+        text.endsWith(QStringLiteral(".torrent"), Qt::CaseInsensitive) ||
         text.startsWith(QStringLiteral("magnet:"), Qt::CaseInsensitive))
     {
         for (QString const& entry : text.split(QLatin1Char('\n')))
