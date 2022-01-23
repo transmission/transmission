@@ -36,5 +36,5 @@ public:
     };
 
     // get a list of the next blocks that we should request from a peer
-    std::vector<tr_block_span_t> next(PeerInfo const& peer_info, size_t n_wanted_blocks) const;
+    static std::vector<tr_block_span_t> next(PeerInfo const& peer_info, size_t n_wanted_blocks);
 };

@@ -96,7 +96,7 @@ namespace
 
 struct StopsCompare
 {
-    int compare(tr_announce_request const* a, tr_announce_request const* b) const // <=>
+    static int compare(tr_announce_request const* a, tr_announce_request const* b) // <=>
     {
         // primary key: volume of data transferred
         auto const ax = a->up + a->down;
@@ -242,7 +242,7 @@ struct tr_tracker
     {
     }
 
-    int getRetryInterval() const
+    [[nodiscard]] int getRetryInterval() const
     {
         switch (consecutive_failures)
         {
@@ -529,12 +529,15 @@ struct tr_torrent_announcer
         return nullptr;
     }
 
-    bool canManualAnnounce() const
+    [[nodiscard]] bool canManualAnnounce() const
     {
         return std::any_of(std::begin(tiers), std::end(tiers), [](auto const& tier) { return tier.canManualAnnounce(); });
     }
 
-    bool findTracker(tr_interned_string const& announce_url, tr_tier const** setme_tier, tr_tracker const** setme_tracker) const
+    [[nodiscard]] bool findTracker(
+        tr_interned_string const& announce_url,
+        tr_tier const** setme_tier,
+        tr_tracker const** setme_tracker) const
     {
         for (auto const& tier : tiers)
         {

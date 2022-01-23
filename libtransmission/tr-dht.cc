@@ -162,7 +162,7 @@ static void dht_bootstrap(void* closure)
             memcpy(&addr.addr.addr4, &cl->nodes[i * 6], 4);
             memcpy(&port, &cl->nodes[i * 6 + 4], 2);
             port = ntohs(port);
-            tr_dhtAddNode(cl->session, &addr, port, 1);
+            tr_dhtAddNode(cl->session, &addr, port, true);
         }
 
         if (i < num6 && !bootstrap_done(cl->session, AF_INET6))
@@ -175,7 +175,7 @@ static void dht_bootstrap(void* closure)
             memcpy(&addr.addr.addr6, &cl->nodes6[i * 18], 16);
             memcpy(&port, &cl->nodes6[i * 18 + 16], 2);
             port = ntohs(port);
-            tr_dhtAddNode(cl->session, &addr, port, 1);
+            tr_dhtAddNode(cl->session, &addr, port, true);
         }
 
         /* Our DHT code is able to take up to 9 nodes in a row without
