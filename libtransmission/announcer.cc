@@ -863,7 +863,7 @@ void tr_announcerRemoveTorrent(tr_announcer* announcer, tr_torrent* tor)
         return;
     }
 
-    for (auto& tier : ta->tiers)
+    for (auto const& tier : ta->tiers)
     {
         if (tier.isRunning)
         {
