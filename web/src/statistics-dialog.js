@@ -1,11 +1,7 @@
-/**
- * @license
- *
- * This file Copyright (C) 2020 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- */
+/* @license This file Copyright (C) 2020-2022 Mnemosyne LLC.
+   It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+   or any future license endorsed by Mnemosyne LLC.
+   License text can be found in the licenses/ folder. */
 
 import { Formatter } from './formatter.js';
 import {
@@ -72,14 +68,14 @@ export class StatisticsDialog extends EventTarget {
 
   static _create() {
     const elements = createDialogContainer('statistics-dialog');
-    const { workarea } = elements;
-    elements.confirm.remove();
-    elements.dismiss.textContent = 'Close';
+    const { confirm, dismiss, heading, root, workarea } = elements;
+    confirm.remove();
+    dismiss.textContent = 'Close';
     delete elements.confirm;
 
     const heading_text = 'Statistics';
-    elements.root.setAttribute('aria-label', heading_text);
-    elements.heading.textContent = heading_text;
+    root.setAttribute('aria-label', heading_text);
+    heading.textContent = heading_text;
 
     const labels = ['Uploaded:', 'Downloaded:', 'Ratio:', 'Running time:'];
     let section = createInfoSection('Current session', labels);

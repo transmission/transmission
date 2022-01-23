@@ -1,12 +1,8 @@
-/*
- * This file Copyright (C) 2013-2014 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright (C) 2013-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
-#include <cstdio>
 #include <cstring> // strlen()
 // #include <unistd.h> // sync()
 
@@ -66,8 +62,7 @@ protected:
     bool addressIsBlocked(char const* address_str)
     {
         struct tr_address addr = {};
-        tr_address_from_string(&addr, address_str);
-        return tr_sessionIsAddressBlocked(session_, &addr);
+        return !tr_address_from_string(&addr, address_str) || tr_sessionIsAddressBlocked(session_, &addr);
     }
 };
 
@@ -76,7 +71,7 @@ TEST_F(BlocklistTest, parsing)
     EXPECT_EQ(0, tr_blocklistGetRuleCount(session_));
 
     // init the blocklist
-    auto const path = makeString(tr_buildPath(tr_sessionGetConfigDir(session_), "blocklists", "level1", nullptr));
+    auto const path = tr_strvPath(tr_sessionGetConfigDir(session_), "blocklists", "level1");
     createFileWithContents(path, Contents1);
     tr_sessionReloadBlocklists(session_);
     EXPECT_TRUE(tr_blocklistExists(session_));
@@ -112,7 +107,7 @@ TEST_F(BlocklistTest, parsing)
 TEST_F(BlocklistTest, updating)
 {
     // init the session
-    char* path = tr_buildPath(tr_sessionGetConfigDir(session_), "blocklists", "level1", nullptr);
+    auto const path = tr_strvPath(tr_sessionGetConfigDir(session_), "blocklists", "level1");
 
     // no blocklist to start with...
     EXPECT_EQ(0, tr_blocklistGetRuleCount(session_));
@@ -138,7 +133,6 @@ TEST_F(BlocklistTest, updating)
     EXPECT_EQ(5, tr_blocklistGetRuleCount(session_));
 
     // cleanup
-    tr_free(path);
 }
 
 } // namespace test

@@ -1,10 +1,7 @@
-/*
- * This file Copyright (C) 2009-2016 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2009-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #pragma once
 
@@ -14,12 +11,14 @@
 #include <QMainWindow>
 #include <QNetworkReply>
 #include <QPointer>
+#include <QStringList>
 #include <QSystemTrayIcon>
 #include <QTimer>
 #include <QWidgetList>
 
+#include <libtransmission/tr-macros.h>
+
 #include "Filters.h"
-#include "Macros.h"
 #include "Speed.h"
 #include "TorrentFilter.h"
 #include "Typedefs.h"
@@ -28,7 +27,6 @@
 class QAction;
 class QIcon;
 class QMenu;
-class QStringList;
 
 class AboutDialog;
 class AddData;
@@ -45,7 +43,7 @@ class TorrentModel;
 
 extern "C"
 {
-struct tr_variant;
+    struct tr_variant;
 }
 
 class MainWindow : public QMainWindow
@@ -90,24 +88,7 @@ protected:
     void contextMenuEvent(QContextMenuEvent*) override;
     void dragEnterEvent(QDragEnterEvent*) override;
     void dropEvent(QDropEvent*) override;
-
-private:
-    QIcon getStockIcon(QString const&, int fallback = -1);
-    QIcon addEmblem(QIcon icon, QStringList const& emblem_names);
-
-    torrent_ids_t getSelectedTorrents(bool withMetadataOnly = false) const;
-    void updateNetworkIcon();
-
-    QMenu* createOptionsMenu();
-    QMenu* createStatsModeMenu();
-    void initStatusBar();
-
-    void clearSelection();
-    void addTorrent(AddData const& add_me, bool show_options);
-
-    // QWidget
-    void hideEvent(QHideEvent* event) override;
-    void showEvent(QShowEvent* event) override;
+    bool event(QEvent*) override;
 
 private slots:
     void addTorrents(QStringList const& filenames);
@@ -120,12 +101,12 @@ private slots:
     void onSessionSourceChanged();
     void onSetPrefs();
     void onSetPrefs(bool);
-    void onSortModeChanged(QAction* action);
-    void onStatsModeChanged(QAction* action);
+    void onSortModeChanged(QAction const* action);
+    void onStatsModeChanged(QAction const* action);
     void openAbout();
-    void openDonate();
+    void openDonate() const;
     void openFolder();
-    void openHelp();
+    void openHelp() const;
     void openPreferences();
     void openProperties();
     void openStats();
@@ -141,6 +122,22 @@ private slots:
     void trayActivated(QSystemTrayIcon::ActivationReason);
 
 private:
+    QIcon addEmblem(QIcon icon, QStringList const& emblem_names) const;
+
+    torrent_ids_t getSelectedTorrents(bool withMetadataOnly = false) const;
+    void updateNetworkIcon();
+
+    QMenu* createOptionsMenu();
+    QMenu* createStatsModeMenu();
+    void initStatusBar();
+
+    void clearSelection();
+    void addTorrent(AddData const& add_me, bool show_options);
+
+    // QWidget
+    void hideEvent(QHideEvent* event) override;
+    void showEvent(QShowEvent* event) override;
+
     Session& session_;
     Prefs& prefs_;
     TorrentModel& model_;
@@ -179,13 +176,14 @@ private:
     QWidget* filter_bar_ = {};
     QAction* alt_speed_action_ = {};
     QString error_message_;
+    bool auto_add_clipboard_links = {};
+    QStringList clipboard_processed_keys_ = {};
 
-    QString const total_ratio_stats_mode_name_;
-    QString const total_transfer_stats_mode_name_;
-    QString const session_ratio_stats_mode_name_;
-    QString const session_transfer_stats_mode_name_;
-
-    QString const show_options_checkbox_name_;
+    QString const total_ratio_stats_mode_name_ = QStringLiteral("total-ratio");
+    QString const total_transfer_stats_mode_name_ = QStringLiteral("total-transfer");
+    QString const session_ratio_stats_mode_name_ = QStringLiteral("session-ratio");
+    QString const session_transfer_stats_mode_name_ = QStringLiteral("session-transfer");
+    QString const show_options_checkbox_name_ = QStringLiteral("show-options-checkbox");
 
     struct TransferStats
     {

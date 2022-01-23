@@ -1,11 +1,9 @@
-/*
- * This file Copyright (C) 2009-2015 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2009-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
+#include <array>
 #include <cassert>
 #include <cstdlib>
 #include <string_view>
@@ -13,6 +11,11 @@
 #include <QDateTime>
 #include <QDir>
 #include <QFile>
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+#include <QStringDecoder>
+#else
+#include <QTextCodec>
+#endif
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/utils.h>
@@ -20,7 +23,6 @@
 
 #include "CustomVariantType.h"
 #include "Prefs.h"
-#include "Utils.h"
 #include "VariantHelpers.h"
 
 using ::trqt::variant_helpers::dictAdd;
@@ -30,8 +32,32 @@ using ::trqt::variant_helpers::getValue;
 ****
 ***/
 
-std::array<Prefs::PrefItem, Prefs::PREFS_COUNT> const Prefs::Items
+namespace
 {
+
+void ensureSoundCommandIsAList(tr_variant* dict)
+{
+    tr_quark key = TR_KEY_torrent_complete_sound_command;
+    tr_variant* list = nullptr;
+    if (tr_variantDictFindList(dict, key, &list))
+    {
+        return;
+    }
+
+    tr_variantDictRemove(dict, key);
+    dictAdd(
+        dict,
+        key,
+        std::array<std::string_view, 5>{
+            "canberra-gtk-play",
+            TR_ARG_TUPLE("-i", "complete-download"),
+            TR_ARG_TUPLE("-d", "transmission torrent downloaded"),
+        });
+}
+
+} // namespace
+
+std::array<Prefs::PrefItem, Prefs::PREFS_COUNT> const Prefs::Items{
     /* gui settings */
     PrefItem{ OPTIONS_PROMPT, TR_KEY_show_options_window, QVariant::Bool },
     { OPEN_DIALOG_FOLDER, TR_KEY_open_dialog_dir, QVariant::String },
@@ -68,9 +94,10 @@ std::array<Prefs::PrefItem, Prefs::PREFS_COUNT> const Prefs::Items
     { SESSION_REMOTE_AUTH, TR_KEY_remote_session_requres_authentication, QVariant::Bool },
     { SESSION_REMOTE_USERNAME, TR_KEY_remote_session_username, QVariant::String },
     { SESSION_REMOTE_PASSWORD, TR_KEY_remote_session_password, QVariant::String },
-    { COMPLETE_SOUND_COMMAND, TR_KEY_torrent_complete_sound_command, QVariant::String },
+    { COMPLETE_SOUND_COMMAND, TR_KEY_torrent_complete_sound_command, QVariant::StringList },
     { COMPLETE_SOUND_ENABLED, TR_KEY_torrent_complete_sound_enabled, QVariant::Bool },
     { USER_HAS_GIVEN_INFORMED_CONSENT, TR_KEY_user_has_given_informed_consent, QVariant::Bool },
+    { READ_CLIPBOARD, TR_KEY_read_clipboard, QVariant::Bool },
 
     /* libtransmission settings */
     { ALT_SPEED_LIMIT_UP, TR_KEY_alt_speed_up, QVariant::Int },
@@ -123,14 +150,13 @@ std::array<Prefs::PrefItem, Prefs::PREFS_COUNT> const Prefs::Items
     { RPC_WHITELIST, TR_KEY_rpc_whitelist, QVariant::String },
     { USPEED_ENABLED, TR_KEY_speed_limit_up_enabled, QVariant::Bool },
     { USPEED, TR_KEY_speed_limit_up, QVariant::Int },
-    { UPLOAD_SLOTS_PER_TORRENT, TR_KEY_upload_slots_per_torrent, QVariant::Int }
+    { UPLOAD_SLOTS_PER_TORRENT, TR_KEY_upload_slots_per_torrent, QVariant::Int },
 };
 
 namespace
 {
 
-auto const FilterModes = std::array<std::pair<int, std::string_view>, FilterMode::NUM_MODES>
-{{
+auto const FilterModes = std::array<std::pair<int, std::string_view>, FilterMode::NUM_MODES>{ {
     { FilterMode::SHOW_ALL, "show-all" },
     { FilterMode::SHOW_ACTIVE, "show-active" },
     { FilterMode::SHOW_DOWNLOADING, "show-downloading" },
@@ -138,11 +164,10 @@ auto const FilterModes = std::array<std::pair<int, std::string_view>, FilterMode
     { FilterMode::SHOW_PAUSED, "show-paused" },
     { FilterMode::SHOW_FINISHED, "show-finished" },
     { FilterMode::SHOW_VERIFYING, "show-verifying" },
-    { FilterMode::SHOW_ERROR, "show-error" }
-}};
+    { FilterMode::SHOW_ERROR, "show-error" },
+} };
 
-auto const SortModes = std::array<std::pair<int, std::string_view>, SortMode::NUM_MODES>
-{{
+auto const SortModes = std::array<std::pair<int, std::string_view>, SortMode::NUM_MODES>{ {
     { SortMode::SORT_BY_NAME, "sort-by-name" },
     { SortMode::SORT_BY_ACTIVITY, "sort-by-activity" },
     { SortMode::SORT_BY_AGE, "sort-by-age" },
@@ -152,8 +177,26 @@ auto const SortModes = std::array<std::pair<int, std::string_view>, SortMode::NU
     { SortMode::SORT_BY_RATIO, "sort-by-ratio" },
     { SortMode::SORT_BY_SIZE, "sort-by-size" },
     { SortMode::SORT_BY_STATE, "sort-by-state" },
-    { SortMode::SORT_BY_ID, "sort-by-id" }
-}};
+    { SortMode::SORT_BY_ID, "sort-by-id" },
+} };
+
+bool isValidUtf8(QByteArray const& byteArray)
+{
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+
+    auto decoder = QStringDecoder(QStringConverter::Utf8, QStringConverter::Flag::Stateless);
+    auto const text = QString(decoder.decode(byteArray));
+    return !decoder.hasError() && !text.contains(QChar::ReplacementCharacter);
+
+#else
+
+    auto const* const codec = QTextCodec::codecForName("UTF-8");
+    auto state = QTextCodec::ConverterState{};
+    auto const text = codec->toUnicode(byteArray.constData(), byteArray.size(), &state);
+    return state.invalidChars == 0;
+
+#endif
+}
 
 } // namespace
 
@@ -161,8 +204,8 @@ auto const SortModes = std::array<std::pair<int, std::string_view>, SortMode::NU
 ****
 ***/
 
-Prefs::Prefs(QString config_dir) :
-    config_dir_(std::move(config_dir))
+Prefs::Prefs(QString config_dir)
+    : config_dir_(std::move(config_dir))
 {
     static_assert(sizeof(Items) / sizeof(Items[0]) == PREFS_COUNT);
 
@@ -182,10 +225,11 @@ Prefs::Prefs(QString config_dir) :
     tr_variantInitDict(&top, 0);
     initDefaults(&top);
     tr_sessionLoadSettings(&top, config_dir_.toUtf8().constData(), nullptr);
+    ensureSoundCommandIsAList(&top);
 
     for (int i = 0; i < PREFS_COUNT; ++i)
     {
-        tr_variant* b(tr_variantDictFind(&top, Items[i].key));
+        tr_variant const* b = tr_variantDictFind(&top, Items[i].key);
 
         switch (Items[i].type)
         {
@@ -204,7 +248,10 @@ Prefs::Prefs(QString config_dir) :
                 auto const value = getValue<std::string_view>(b);
                 if (value)
                 {
-                    auto const test = [&value](auto const& item) { return item.second == *value; };
+                    auto const test = [&value](auto const& item)
+                    {
+                        return item.second == *value;
+                    };
                     // NOLINTNEXTLINE(readability-qualified-auto)
                     auto const it = std::find_if(std::cbegin(SortModes), std::cend(SortModes), test);
                     auto const& pair = it == std::end(SortModes) ? SortModes.front() : *it;
@@ -218,7 +265,10 @@ Prefs::Prefs(QString config_dir) :
                 auto const value = getValue<std::string_view>(b);
                 if (value)
                 {
-                    auto const test = [&value](auto const& item) { return item.second == *value; };
+                    auto const test = [&value](auto const& item)
+                    {
+                        return item.second == *value;
+                    };
                     // NOLINTNEXTLINE(readability-qualified-auto)
                     auto const it = std::find_if(std::cbegin(FilterModes), std::cend(FilterModes), test);
                     auto const& pair = it == std::end(FilterModes) ? FilterModes.front() : *it;
@@ -230,6 +280,16 @@ Prefs::Prefs(QString config_dir) :
         case QVariant::String:
             {
                 auto const value = getValue<QString>(b);
+                if (value)
+                {
+                    values_[i].setValue(*value);
+                }
+            }
+            break;
+
+        case QVariant::StringList:
+            {
+                auto const value = getValue<QStringList>(b);
                 if (value)
                 {
                     values_[i].setValue(*value);
@@ -262,7 +322,11 @@ Prefs::Prefs(QString config_dir) :
                 auto const value = getValue<time_t>(b);
                 if (value)
                 {
+#if QT_VERSION >= QT_VERSION_CHECK(5, 8, 0)
+                    values_[i].setValue(QDateTime::fromSecsSinceEpoch(*value));
+#else
                     values_[i].setValue(QDateTime::fromTime_t(*value));
+#endif
                 }
             }
             break;
@@ -301,7 +365,10 @@ Prefs::~Prefs()
         case CustomVariantType::SortModeType:
             {
                 auto const mode = val.value<SortMode>().mode();
-                auto const test = [&mode](auto const& item) { return item.first == mode; };
+                auto const test = [&mode](auto const& item)
+                {
+                    return item.first == mode;
+                };
                 // NOLINTNEXTLINE(readability-qualified-auto)
                 auto const it = std::find_if(std::cbegin(SortModes), std::cend(SortModes), test);
                 auto const& pair = it == std::end(SortModes) ? SortModes.front() : *it;
@@ -312,7 +379,10 @@ Prefs::~Prefs()
         case CustomVariantType::FilterModeType:
             {
                 auto const mode = val.value<FilterMode>().mode();
-                auto const test = [&mode](auto const& item) { return item.first == mode; };
+                auto const test = [&mode](auto const& item)
+                {
+                    return item.first == mode;
+                };
                 // NOLINTNEXTLINE(readability-qualified-auto)
                 auto const it = std::find_if(std::cbegin(FilterModes), std::cend(FilterModes), test);
                 auto const& pair = it == std::end(FilterModes) ? FilterModes.front() : *it;
@@ -324,6 +394,10 @@ Prefs::~Prefs()
             dictAdd(&current_settings, key, val.toString());
             break;
 
+        case QVariant::StringList:
+            dictAdd(&current_settings, key, val.toStringList());
+            break;
+
         case QVariant::Bool:
             dictAdd(&current_settings, key, val.toBool());
             break;
@@ -333,7 +407,11 @@ Prefs::~Prefs()
             break;
 
         case QVariant::DateTime:
+#if QT_VERSION >= QT_VERSION_CHECK(5, 8, 0)
+            dictAdd(&current_settings, key, int64_t{ val.toDateTime().toSecsSinceEpoch() });
+#else
             dictAdd(&current_settings, key, val.toDateTime().toTime_t());
+#endif
             break;
 
         default:
@@ -346,7 +424,7 @@ Prefs::~Prefs()
     tr_variant file_settings;
     QFile const file(QDir(config_dir_).absoluteFilePath(QStringLiteral("settings.json")));
 
-    if (!tr_variantFromFile(&file_settings, TR_VARIANT_FMT_JSON, file.fileName().toUtf8().constData(), nullptr))
+    if (!tr_variantFromFile(&file_settings, TR_VARIANT_PARSE_JSON, file.fileName().toUtf8().constData(), nullptr))
     {
         tr_variantInitDict(&file_settings, PREFS_COUNT);
     }
@@ -363,19 +441,17 @@ Prefs::~Prefs()
  * This is where we initialize the preferences file with the default values.
  * If you add a new preferences key, you /must/ add a default value here.
  */
-void Prefs::initDefaults(tr_variant* d)
+void Prefs::initDefaults(tr_variant* d) const
 {
-    auto constexpr FilterMode = std::string_view { "all" };
-    auto constexpr SessionHost = std::string_view { "localhost" };
-    auto constexpr SessionPassword = std::string_view { "" };
-    auto constexpr SessionUsername = std::string_view { "" };
-    auto constexpr SortMode = std::string_view { "sort-by-name" };
-    auto constexpr SoundCommand =
-        std::string_view { "canberra-gtk-play -i complete-download -d 'transmission torrent downloaded'" };
-    auto constexpr StatsMode = std::string_view { "total-ratio" };
-    auto constexpr WindowLayout = std::string_view { "menu,toolbar,filter,list,statusbar" };
+    auto constexpr FilterMode = std::string_view{ "all" };
+    auto constexpr SessionHost = std::string_view{ "localhost" };
+    auto constexpr SessionPassword = std::string_view{};
+    auto constexpr SessionUsername = std::string_view{};
+    auto constexpr SortMode = std::string_view{ "sort-by-name" };
+    auto constexpr StatsMode = std::string_view{ "total-ratio" };
+    auto constexpr WindowLayout = std::string_view{ "menu,toolbar,filter,list,statusbar" };
 
-    auto const download_dir = std::string_view { tr_getDefaultDownloadDir() };
+    auto const download_dir = std::string_view{ tr_getDefaultDownloadDir() };
 
     tr_variantDictReserve(d, 38);
     dictAdd(d, TR_KEY_blocklist_updates_enabled, true);
@@ -396,7 +472,6 @@ void Prefs::initDefaults(tr_variant* d)
     dictAdd(d, TR_KEY_sort_reversed, false);
     dictAdd(d, TR_KEY_torrent_added_notification_enabled, true);
     dictAdd(d, TR_KEY_torrent_complete_notification_enabled, true);
-    dictAdd(d, TR_KEY_torrent_complete_sound_command, SoundCommand);
     dictAdd(d, TR_KEY_torrent_complete_sound_enabled, true);
     dictAdd(d, TR_KEY_user_has_given_informed_consent, false);
     dictAdd(d, TR_KEY_watch_dir_enabled, false);
@@ -416,6 +491,7 @@ void Prefs::initDefaults(tr_variant* d)
     dictAdd(d, TR_KEY_sort_mode, SortMode);
     dictAdd(d, TR_KEY_statusbar_stats, StatsMode);
     dictAdd(d, TR_KEY_watch_dir, download_dir);
+    dictAdd(d, TR_KEY_read_clipboard, false);
 }
 
 /***
@@ -433,7 +509,7 @@ QString Prefs::getString(int key) const
     assert(Items[key].type == QVariant::String);
     QByteArray const b = values_[key].toByteArray();
 
-    if (Utils::isValidUtf8(b.constData()))
+    if (isValidUtf8(b.constData()))
     {
         values_[key].setValue(QString::fromUtf8(b.constData()));
     }

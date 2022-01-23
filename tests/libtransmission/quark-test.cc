@@ -1,10 +1,7 @@
-/*
- * This file Copyright (C) 2013-2014 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright (C) 2013-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #include "transmission.h"
 #include "quark.h"
@@ -13,6 +10,7 @@
 
 #include <cstring>
 #include <string>
+#include <string_view>
 
 class QuarkTest : public ::testing::Test
 {
@@ -32,26 +30,17 @@ TEST_F(QuarkTest, allPredefinedKeysCanBeLookedUp)
     for (int i = 0; i < TR_N_KEYS; i++)
     {
         auto const str = quarkGetString(i);
-
-        tr_quark q;
-        EXPECT_TRUE(tr_quark_lookup(str.data(), str.size(), &q));
-        EXPECT_EQ(i, q);
+        auto const q = tr_quark_lookup(str);
+        EXPECT_TRUE(q);
+        EXPECT_EQ(i, *q);
     }
 }
 
-TEST_F(QuarkTest, allPredefinedKeysAreSorted)
+TEST_F(QuarkTest, newQuarkByStringView)
 {
-    for (int i = 0; i + 1 < TR_N_KEYS; i++)
-    {
-        auto const str1 = quarkGetString(i);
-        auto const str2 = quarkGetString(i + 1);
-        EXPECT_LT(str1, str2);
-    }
-}
-
-TEST_F(QuarkTest, newEmptyQuarkReturnsNone)
-{
-    auto const q = tr_quark_new(nullptr, TR_BAD_SIZE);
-    EXPECT_EQ(TR_KEY_NONE, q);
-    EXPECT_EQ(std::string{ "" }, quarkGetString(q));
+    auto constexpr UniqueString = std::string_view{ "this string is not a predefined quark" };
+    auto const q = tr_quark_new(UniqueString);
+    auto len = size_t{};
+    EXPECT_EQ(UniqueString, tr_quark_get_string(q, &len));
+    EXPECT_EQ(std::size(UniqueString), len);
 }

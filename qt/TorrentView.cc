@@ -1,10 +1,7 @@
-/*
- * This file Copyright (C) 2015 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2015-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #include <QApplication>
 #include <QStyleOptionHeader>
@@ -15,11 +12,10 @@
 class TorrentView::HeaderWidget : public QWidget
 {
 public:
-    explicit HeaderWidget(TorrentView* parent) :
-        QWidget(parent),
-        text_()
+    explicit HeaderWidget(TorrentView* parent)
+        : QWidget(parent)
     {
-        setFont(qApp->font("QMiniFont"));
+        setFont(QApplication::font("QMiniFont"));
     }
 
     void setText(QString const& text)
@@ -64,9 +60,9 @@ private:
     QString text_;
 };
 
-TorrentView::TorrentView(QWidget* parent) :
-    QListView(parent),
-    header_widget_(new HeaderWidget(this))
+TorrentView::TorrentView(QWidget* parent)
+    : QListView(parent)
+    , header_widget_(new HeaderWidget(this))
 {
 }
 

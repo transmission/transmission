@@ -1,10 +1,7 @@
-/*
- * This file Copyright (C) 2008-2014 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2008-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #pragma once
 
@@ -12,8 +9,10 @@
 #error only libtransmission should #include this header.
 #endif
 
-typedef struct tr_webseed tr_webseed;
+#include <string_view>
 
 #include "peer-common.h"
 
-tr_webseed* tr_webseedNew(struct tr_torrent* torrent, char const* url, tr_peer_callback callback, void* callback_data);
+tr_peer* tr_webseedNew(struct tr_torrent* torrent, std::string_view, tr_peer_callback callback, void* callback_data);
+
+tr_webseed_view tr_webseedView(tr_peer const* peer);

@@ -1,10 +1,7 @@
-/*
- * This file Copyright (C) 2009-2014 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2009-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #pragma once
 
@@ -12,120 +9,147 @@
 #error only libtransmission should #include this header.
 #endif
 
+#include <algorithm>
+#include <cstdint>
+#include <cstddef> // size_t
+#include <optional>
+#include <vector>
+
 #include "transmission.h"
+
+#include "block-info.h"
 #include "bitfield.h"
-#include "utils.h" /* tr_getRatio() */
-
-typedef struct tr_completion
-{
-    tr_torrent* tor;
-
-    tr_bitfield blockBitfield;
-
-    /* number of bytes we'll have when done downloading. [0..info.totalSize]
-       DON'T access this directly; it's a lazy field.
-       use tr_cpSizeWhenDone() instead! */
-    uint64_t sizeWhenDoneLazy;
-
-    /* whether or not sizeWhenDone needs to be recalculated */
-    bool sizeWhenDoneIsDirty;
-
-    /* number of bytes we'll have when done downloading. [0..info.totalSize]
-       DON'T access this directly; it's a lazy field.
-       use tr_cpHaveValid() instead! */
-    uint64_t haveValidLazy;
-
-    /* whether or not haveValidLazy needs to be recalculated */
-    bool haveValidIsDirty;
-
-    /* number of bytes we want or have now. [0..sizeWhenDone] */
-    uint64_t sizeNow;
-}
-tr_completion;
 
 /**
-*** Life Cycle
-**/
-
-void tr_cpConstruct(tr_completion*, tr_torrent*);
-
-void tr_cpBlockInit(tr_completion* cp, tr_bitfield const* blocks);
-
-static inline void tr_cpDestruct(tr_completion* cp)
+ * @brief knows which blocks and pieces we have
+ */
+struct tr_completion
 {
-    tr_bitfieldDestruct(&cp->blockBitfield);
-}
+    struct torrent_view
+    {
+        virtual bool pieceIsWanted(tr_piece_index_t piece) const = 0;
 
-/**
-*** General
-**/
+        virtual ~torrent_view() = default;
+    };
 
-double tr_cpPercentComplete(tr_completion const* cp);
+    explicit tr_completion(torrent_view const* tor, tr_block_info const* block_info)
+        : tor_{ tor }
+        , block_info_{ block_info }
+        , blocks_{ block_info_->n_blocks }
+    {
+        blocks_.setHasNone();
+    }
 
-double tr_cpPercentDone(tr_completion const* cp);
+    [[nodiscard]] constexpr tr_bitfield const& blocks() const
+    {
+        return blocks_;
+    }
 
-tr_completeness tr_cpGetStatus(tr_completion const*);
+    [[nodiscard]] constexpr bool hasAll() const
+    {
+        return hasMetainfo() && blocks_.hasAll();
+    }
 
-uint64_t tr_cpHaveValid(tr_completion const*);
+    [[nodiscard]] bool hasBlock(tr_block_index_t block) const
+    {
+        return blocks_.test(block);
+    }
 
-uint64_t tr_cpSizeWhenDone(tr_completion const*);
+    [[nodiscard]] bool hasBlocks(tr_block_span_t span) const
+    {
+        return blocks_.count(span.begin, span.end) == span.end - span.begin;
+    }
 
-uint64_t tr_cpLeftUntilDone(tr_completion const*);
+    [[nodiscard]] constexpr bool hasNone() const
+    {
+        return !hasMetainfo() || blocks_.hasNone();
+    }
 
-void tr_cpGetAmountDone(tr_completion const* completion, float* tab, int tabCount);
+    [[nodiscard]] bool hasPiece(tr_piece_index_t piece) const
+    {
+        return block_info_->piece_size != 0 && countMissingBlocksInPiece(piece) == 0;
+    }
 
-static inline uint64_t tr_cpHaveTotal(tr_completion const* cp)
-{
-    return cp->sizeNow;
-}
+    [[nodiscard]] constexpr uint64_t hasTotal() const
+    {
+        return size_now_;
+    }
 
-static inline bool tr_cpHasAll(tr_completion const* cp)
-{
-    return tr_torrentHasMetadata(cp->tor) && tr_bitfieldHasAll(&cp->blockBitfield);
-}
+    [[nodiscard]] uint64_t hasValid() const;
 
-static inline bool tr_cpHasNone(tr_completion const* cp)
-{
-    return !tr_torrentHasMetadata(cp->tor) || tr_bitfieldHasNone(&cp->blockBitfield);
-}
+    [[nodiscard]] uint64_t leftUntilDone() const;
 
-/**
-***  Pieces
-**/
+    [[nodiscard]] constexpr double percentComplete() const
+    {
+        auto const denom = block_info_->total_size;
+        return denom ? std::clamp(double(size_now_) / denom, 0.0, 1.0) : 0.0;
+    }
 
-void tr_cpPieceAdd(tr_completion* cp, tr_piece_index_t i);
+    [[nodiscard]] double percentDone() const
+    {
+        auto const denom = sizeWhenDone();
+        return denom ? std::clamp(double(size_now_) / denom, 0.0, 1.0) : 0.0;
+    }
 
-void tr_cpPieceRem(tr_completion* cp, tr_piece_index_t i);
+    [[nodiscard]] uint64_t sizeWhenDone() const;
 
-size_t tr_cpMissingBlocksInPiece(tr_completion const*, tr_piece_index_t);
+    [[nodiscard]] tr_completeness status() const;
 
-size_t tr_cpMissingBytesInPiece(tr_completion const*, tr_piece_index_t);
+    [[nodiscard]] std::vector<uint8_t> createPieceBitfield() const;
 
-static inline bool tr_cpPieceIsComplete(tr_completion const* cp, tr_piece_index_t i)
-{
-    return tr_cpMissingBlocksInPiece(cp, i) == 0;
-}
+    [[nodiscard]] size_t countMissingBlocksInPiece(tr_piece_index_t) const;
+    [[nodiscard]] size_t countMissingBytesInPiece(tr_piece_index_t) const;
 
-/**
-***  Blocks
-**/
+    void amountDone(float* tab, size_t n_tabs) const;
 
-void tr_cpBlockAdd(tr_completion* cp, tr_block_index_t i);
+    void addBlock(tr_block_index_t i);
+    void addPiece(tr_piece_index_t i);
+    void removePiece(tr_piece_index_t i);
 
-static inline bool tr_cpBlockIsComplete(tr_completion const* cp, tr_block_index_t i)
-{
-    return tr_bitfieldHas(&cp->blockBitfield, i);
-}
+    void setHasPiece(tr_piece_index_t i, bool has)
+    {
+        if (has)
+        {
+            addPiece(i);
+        }
+        else
+        {
+            removePiece(i);
+        }
+    }
 
-/***
-****  Misc
-***/
+    void setBlocks(tr_bitfield blocks);
 
-bool tr_cpFileIsComplete(tr_completion const* cp, tr_file_index_t);
+    void invalidateSizeWhenDone()
+    {
+        size_when_done_.reset();
+    }
 
-void* tr_cpCreatePieceBitfield(tr_completion const* cp, size_t* byte_count);
+    [[nodiscard]] uint64_t countHasBytesInSpan(tr_byte_span_t) const;
 
-static inline void tr_cpInvalidateDND(tr_completion* cp)
-{
-    cp->sizeWhenDoneIsDirty = true;
-}
+private:
+    [[nodiscard]] constexpr bool hasMetainfo() const
+    {
+        return !std::empty(blocks_);
+    }
+
+    [[nodiscard]] uint64_t computeHasValid() const;
+    [[nodiscard]] uint64_t computeSizeWhenDone() const;
+    [[nodiscard]] uint64_t countHasBytesInBlocks(tr_block_span_t) const;
+
+    torrent_view const* tor_;
+    tr_block_info const* block_info_;
+
+    tr_bitfield blocks_{ 0 };
+
+    // Number of bytes we'll have when done downloading. [0..totalSize]
+    // Mutable because lazy-calculated
+    mutable std::optional<uint64_t> size_when_done_;
+
+    // Number of verified bytes we have right now. [0..totalSize]
+    // Mutable because lazy-calculated
+    mutable std::optional<uint64_t> has_valid_;
+
+    // Number of bytes we have now. [0..sizeWhenDone]
+    uint64_t size_now_ = 0;
+};

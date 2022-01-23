@@ -1,34 +1,13 @@
-/**
- * @license
- *
- * This file Copyright (C) 2020 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- */
+/* @license This file Copyright (C) 2020-2022 Mnemosyne LLC.
+   It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+   or any future license endorsed by Mnemosyne LLC.
+   License text can be found in the licenses/ folder. */
 
 import isEqual from 'lodash.isequal';
 
-export class Utils {
-  /**
-   * Checks to see if the content actually changed before poking the DOM.
-   */
-  static setInnerHTML(e, html) {
-    if (!e) {
-      return;
-    }
-
-    /* innerHTML is listed as a string, but the browser seems to change it.
-     * For example, "&infin;" gets changed to "∞" somewhere down the line.
-     * So, let's use an arbitrary  different field to test our state... */
-    if (e.currentHTML !== html) {
-      e.currentHTML = html;
-      e.innerHTML = html;
-    }
-  }
-
+export const Utils = {
   /** Given a numerator and denominator, return a ratio string */
-  static ratio(numerator, denominator) {
+  ratio(numerator, denominator) {
     let result = Math.floor((100 * numerator) / denominator) / 100;
 
     // check for special cases
@@ -42,8 +21,25 @@ export class Utils {
     }
 
     return result;
-  }
-}
+  },
+
+  /**
+   * Checks to see if the content actually changed before poking the DOM.
+   */
+  setInnerHTML(e, html) {
+    if (!e) {
+      return;
+    }
+
+    /* innerHTML is listed as a string, but the browser seems to change it.
+     * For example, "&infin;" gets changed to "∞" somewhere down the line.
+     * So, let's use an arbitrary  different field to test our state... */
+    if (e.currentHTML !== html) {
+      e.currentHTML = html;
+      e.innerHTML = html;
+    }
+  },
+};
 
 export function createTabsContainer(id, tabs, callback) {
   const root = document.createElement('div');

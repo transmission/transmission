@@ -1,19 +1,16 @@
-/*
- * This file Copyright (C) 2013-2014 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2012-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #pragma once
 
-#include "tr-macros.h"
-
-TR_BEGIN_DECLS
+#include <cstddef> // size_t
+#include <optional>
+#include <string_view>
 
 /* Quarks — a 2-way association between a string and a unique integer identifier */
-typedef size_t tr_quark;
+using tr_quark = size_t;
 
 /*
  * Predefined Quarks.
@@ -45,6 +42,8 @@ enum
     TR_KEY_announce, /* metainfo */
     TR_KEY_announce_list, /* metainfo */
     TR_KEY_announceState, /* rpc */
+    TR_KEY_anti_brute_force_enabled, /* rpc */
+    TR_KEY_anti_brute_force_threshold, /* rpc */
     TR_KEY_arguments, /* rpc */
     TR_KEY_bandwidth_priority,
     TR_KEY_bandwidthPriority,
@@ -84,7 +83,6 @@ enum
     TR_KEY_details_window_height,
     TR_KEY_details_window_width,
     TR_KEY_dht_enabled,
-    TR_KEY_display_name,
     TR_KEY_dnd,
     TR_KEY_done_date,
     TR_KEY_doneDate,
@@ -154,7 +152,6 @@ enum
     TR_KEY_incomplete_dir,
     TR_KEY_incomplete_dir_enabled,
     TR_KEY_info,
-    TR_KEY_info_hash,
     TR_KEY_inhibit_desktop_hibernation,
     TR_KEY_interval,
     TR_KEY_ip,
@@ -187,7 +184,6 @@ enum
     TR_KEY_location,
     TR_KEY_lpd_enabled,
     TR_KEY_m,
-    TR_KEY_magnet_info,
     TR_KEY_magnetLink,
     TR_KEY_main_window_height,
     TR_KEY_main_window_is_maximized,
@@ -278,6 +274,7 @@ enum
     TR_KEY_ratio_limit,
     TR_KEY_ratio_limit_enabled,
     TR_KEY_ratio_mode,
+    TR_KEY_read_clipboard,
     TR_KEY_recent_download_dir_1,
     TR_KEY_recent_download_dir_2,
     TR_KEY_recent_download_dir_3,
@@ -304,11 +301,14 @@ enum
     TR_KEY_rpc_username,
     TR_KEY_rpc_version,
     TR_KEY_rpc_version_minimum,
+    TR_KEY_rpc_version_semver,
     TR_KEY_rpc_whitelist,
     TR_KEY_rpc_whitelist_enabled,
     TR_KEY_scrape,
     TR_KEY_scrape_paused_torrents_enabled,
     TR_KEY_scrapeState,
+    TR_KEY_script_torrent_added_enabled,
+    TR_KEY_script_torrent_added_filename,
     TR_KEY_script_torrent_done_enabled,
     TR_KEY_script_torrent_done_filename,
     TR_KEY_seconds_active,
@@ -340,6 +340,7 @@ enum
     TR_KEY_sizeWhenDone,
     TR_KEY_sort_mode,
     TR_KEY_sort_reversed,
+    TR_KEY_source,
     TR_KEY_speed,
     TR_KEY_speed_Bps,
     TR_KEY_speed_bytes,
@@ -418,22 +419,23 @@ enum
  *
  * @return true if the specified string exists as a quark
  */
-bool tr_quark_lookup(void const* str, size_t len, tr_quark* setme);
+std::optional<tr_quark> tr_quark_lookup(std::string_view key);
 
 /**
  * Get the string that corresponds to the specified quark
  */
-char const* tr_quark_get_string(tr_quark quark, size_t* len);
+char const* tr_quark_get_string(tr_quark quark, size_t* len = nullptr);
+
+/**
+ * Get the string view that corresponds to the specified quark.
+ *
+ * Note: this view is guaranteed to be zero-terminated at view[std::size(view)]
+ */
+std::string_view tr_quark_get_string_view(tr_quark quark);
 
 /**
  * Create a new quark for the specified string. If a quark already
  * exists for that string, it is returned so that no duplicates are
  * created.
  */
-tr_quark tr_quark_new(void const* str, size_t len);
-
-/***
-****
-***/
-
-TR_END_DECLS
+tr_quark tr_quark_new(std::string_view);

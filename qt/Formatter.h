@@ -1,10 +1,7 @@
-/*
- * This file Copyright (C) 2012-2015 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2012-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #pragma once
 
@@ -49,6 +46,7 @@ public:
 
     QString memToString(int64_t bytes) const;
     QString sizeToString(int64_t bytes) const;
+    QString sizeToString(uint64_t bytes) const;
     QString speedToString(Speed const& speed) const;
     QString percentToString(double x) const;
     QString ratioToString(double ratio) const;

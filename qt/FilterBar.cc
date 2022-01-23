@@ -1,10 +1,7 @@
-/*
- * This file Copyright (C) 2012-2015 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2012-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #include "FilterBar.h"
 
@@ -22,6 +19,7 @@
 #include "FilterBarComboBox.h"
 #include "FilterBarComboBoxDelegate.h"
 #include "Filters.h"
+#include "IconCache.h"
 #include "Prefs.h"
 #include "Torrent.h"
 #include "TorrentFilter.h"
@@ -51,33 +49,35 @@ FilterBarComboBox* FilterBar::createActivityCombo()
     model->appendRow(row);
 
     model->appendRow(new QStandardItem); // separator
-    delegate->setSeparator(model, model->index(1, 0));
+    FilterBarComboBoxDelegate::setSeparator(model, model->index(1, 0));
 
-    row = new QStandardItem(QIcon::fromTheme(QStringLiteral("system-run")), tr("Active"));
+    auto& icons = IconCache::get();
+
+    row = new QStandardItem(icons.getThemeIcon(QStringLiteral("system-run")), tr("Active"));
     row->setData(FilterMode::SHOW_ACTIVE, ACTIVITY_ROLE);
     model->appendRow(row);
 
-    row = new QStandardItem(QIcon::fromTheme(QStringLiteral("go-down")), tr("Downloading"));
+    row = new QStandardItem(icons.getThemeIcon(QStringLiteral("go-down")), tr("Downloading"));
     row->setData(FilterMode::SHOW_DOWNLOADING, ACTIVITY_ROLE);
     model->appendRow(row);
 
-    row = new QStandardItem(QIcon::fromTheme(QStringLiteral("go-up")), tr("Seeding"));
+    row = new QStandardItem(icons.getThemeIcon(QStringLiteral("go-up")), tr("Seeding"));
     row->setData(FilterMode::SHOW_SEEDING, ACTIVITY_ROLE);
     model->appendRow(row);
 
-    row = new QStandardItem(QIcon::fromTheme(QStringLiteral("media-playback-pause")), tr("Paused"));
+    row = new QStandardItem(icons.getThemeIcon(QStringLiteral("media-playback-pause")), tr("Paused"));
     row->setData(FilterMode::SHOW_PAUSED, ACTIVITY_ROLE);
     model->appendRow(row);
 
-    row = new QStandardItem(QIcon::fromTheme(QStringLiteral("dialog-ok")), tr("Finished"));
+    row = new QStandardItem(icons.getThemeIcon(QStringLiteral("dialog-ok")), tr("Finished"));
     row->setData(FilterMode::SHOW_FINISHED, ACTIVITY_ROLE);
     model->appendRow(row);
 
-    row = new QStandardItem(QIcon::fromTheme(QStringLiteral("view-refresh")), tr("Verifying"));
+    row = new QStandardItem(icons.getThemeIcon(QStringLiteral("view-refresh")), tr("Verifying"));
     row->setData(FilterMode::SHOW_VERIFYING, ACTIVITY_ROLE);
     model->appendRow(row);
 
-    row = new QStandardItem(QIcon::fromTheme(QStringLiteral("process-stop")), tr("Error"));
+    row = new QStandardItem(icons.getThemeIcon(QStringLiteral("process-stop")), tr("Error"));
     row->setData(FilterMode::SHOW_ERROR, ACTIVITY_ROLE);
     model->appendRow(row);
 
@@ -92,14 +92,14 @@ FilterBarComboBox* FilterBar::createActivityCombo()
 namespace
 {
 
-QString getCountString(int n)
+QString getCountString(size_t n)
 {
     return QStringLiteral("%L1").arg(n);
 }
 
 Torrent::fields_t constexpr TrackerFields = {
-    (uint64_t(1) << Torrent::TRACKER_STATS)
-    };
+    uint64_t(1) << Torrent::TRACKER_STATS,
+};
 
 auto constexpr ActivityFields = FilterMode::TorrentFields;
 
@@ -109,7 +109,9 @@ void FilterBar::refreshTrackers()
 {
     enum
     {
-        ROW_TOTALS = 0, ROW_SEPARATOR, ROW_FIRST_TRACKER
+        ROW_TOTALS = 0,
+        ROW_SEPARATOR,
+        ROW_FIRST_TRACKER
     };
 
     auto torrents_per_tracker = std::unordered_map<FaviconCache::Key, int>{};
@@ -128,20 +130,20 @@ void FilterBar::refreshTrackers()
     item->setData(getCountString(num_trackers), FilterBarComboBox::CountStringRole);
 
     auto update_tracker_item = [](QStandardItem* i, auto const& it)
-        {
-            auto const& key = it->first;
-            auto const& display_name = FaviconCache::getDisplayName(key);
-            auto const& count = it->second;
-            auto const icon = qApp->faviconCache().find(key);
+    {
+        auto const& key = it->first;
+        auto const& display_name = FaviconCache::getDisplayName(key);
+        auto const& count = it->second;
+        auto const icon = trApp->faviconCache().find(key);
 
-            i->setData(display_name, Qt::DisplayRole);
-            i->setData(display_name, TRACKER_ROLE);
-            i->setData(getCountString(count), FilterBarComboBox::CountStringRole);
-            i->setData(icon, Qt::DecorationRole);
-            i->setData(int(count), FilterBarComboBox::CountRole);
+        i->setData(display_name, Qt::DisplayRole);
+        i->setData(display_name, TRACKER_ROLE);
+        i->setData(getCountString(static_cast<size_t>(count)), FilterBarComboBox::CountStringRole);
+        i->setData(icon, Qt::DecorationRole);
+        i->setData(int(count), FilterBarComboBox::CountRole);
 
-            return i;
-        };
+        return i;
+    };
 
     auto new_trackers = std::map<FaviconCache::Key, int>(torrents_per_tracker.begin(), torrents_per_tracker.end());
     auto old_it = tracker_counts_.cbegin();
@@ -192,11 +194,11 @@ FilterBarComboBox* FilterBar::createTrackerCombo(QStandardItemModel* model)
     row->setData(QString(), TRACKER_ROLE);
     int const count = torrents_.rowCount();
     row->setData(count, FilterBarComboBox::CountRole);
-    row->setData(getCountString(count), FilterBarComboBox::CountStringRole);
+    row->setData(getCountString(static_cast<size_t>(count)), FilterBarComboBox::CountStringRole);
     model->appendRow(row);
 
     model->appendRow(new QStandardItem); // separator
-    delegate->setSeparator(model, model->index(1, 0));
+    FilterBarComboBoxDelegate::setSeparator(model, model->index(1, 0));
 
     c->setModel(model);
     return c;
@@ -206,13 +208,12 @@ FilterBarComboBox* FilterBar::createTrackerCombo(QStandardItemModel* model)
 ****
 ***/
 
-FilterBar::FilterBar(Prefs& prefs, TorrentModel const& torrents, TorrentFilter const& filter, QWidget* parent) :
-    QWidget(parent),
-    prefs_(prefs),
-    torrents_(torrents),
-    filter_(filter),
-    recount_timer_(new QTimer(this)),
-    is_bootstrapping_(true)
+FilterBar::FilterBar(Prefs& prefs, TorrentModel const& torrents, TorrentFilter const& filter, QWidget* parent)
+    : QWidget(parent)
+    , prefs_(prefs)
+    , torrents_(torrents)
+    , filter_(filter)
+    , is_bootstrapping_(true)
 {
     auto* h = new QHBoxLayout(this);
     h->setContentsMargins(3, 3, 3, 3);
@@ -234,18 +235,18 @@ FilterBar::FilterBar(Prefs& prefs, TorrentModel const& torrents, TorrentFilter c
     line_edit_->setPlaceholderText(tr("Search..."));
     line_edit_->setMaximumWidth(250);
     h->addWidget(line_edit_, 1);
-    connect(line_edit_, SIGNAL(textChanged(QString)), this, SLOT(onTextChanged(QString)));
+    connect(line_edit_, &QLineEdit::textChanged, this, &FilterBar::onTextChanged);
 
     // listen for changes from the other players
-    connect(&prefs_, SIGNAL(changed(int)), this, SLOT(refreshPref(int)));
-    connect(activity_combo_, SIGNAL(currentIndexChanged(int)), this, SLOT(onActivityIndexChanged(int)));
-    connect(tracker_combo_, SIGNAL(currentIndexChanged(int)), this, SLOT(onTrackerIndexChanged(int)));
+    connect(&prefs_, &Prefs::changed, this, &FilterBar::refreshPref);
+    connect(activity_combo_, qOverload<int>(&QComboBox::currentIndexChanged), this, &FilterBar::onActivityIndexChanged);
+    connect(tracker_combo_, qOverload<int>(&QComboBox::currentIndexChanged), this, &FilterBar::onTrackerIndexChanged);
     connect(&torrents_, &TorrentModel::modelReset, this, &FilterBar::recountAllSoon);
     connect(&torrents_, &TorrentModel::rowsInserted, this, &FilterBar::recountAllSoon);
     connect(&torrents_, &TorrentModel::rowsRemoved, this, &FilterBar::recountAllSoon);
     connect(&torrents_, &TorrentModel::torrentsChanged, this, &FilterBar::onTorrentsChanged);
-    connect(recount_timer_, SIGNAL(timeout()), this, SLOT(recount()));
-    connect(&qApp->faviconCache(), &FaviconCache::pixmapReady, this, &FilterBar::recountTrackersSoon);
+    connect(&recount_timer_, &QTimer::timeout, this, &FilterBar::recount);
+    connect(&trApp->faviconCache(), &FaviconCache::pixmapReady, this, &FilterBar::recountTrackersSoon);
 
     recountAllSoon();
     is_bootstrapping_ = false;
@@ -344,7 +345,7 @@ void FilterBar::onActivityIndexChanged(int i)
 {
     if (!is_bootstrapping_)
     {
-        FilterMode const mode = activity_combo_->itemData(i, ACTIVITY_ROLE).toInt();
+        auto const mode = FilterMode(activity_combo_->itemData(i, ACTIVITY_ROLE).toInt());
         prefs_.set(Prefs::FILTER_MODE, mode);
     }
 }
@@ -357,10 +358,10 @@ void FilterBar::recountSoon(Pending const& pending)
 {
     pending_ |= pending;
 
-    if (!recount_timer_->isActive())
+    if (!recount_timer_.isActive())
     {
-        recount_timer_->setSingleShot(true);
-        recount_timer_->start(800);
+        recount_timer_.setSingleShot(true);
+        recount_timer_.start(800);
     }
 }
 
@@ -381,7 +382,7 @@ void FilterBar::recount()
             auto const mode = index.data(ACTIVITY_ROLE).toInt();
             auto const count = torrents_per_mode[mode];
             model->setData(index, count, FilterBarComboBox::CountRole);
-            model->setData(index, getCountString(count), FilterBarComboBox::CountStringRole);
+            model->setData(index, getCountString(static_cast<size_t>(count)), FilterBarComboBox::CountStringRole);
         }
     }
 

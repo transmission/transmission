@@ -1,10 +1,7 @@
-/*
- * This file Copyright (C) 2017 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2017-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #pragma once
 
@@ -13,10 +10,6 @@
 #endif
 
 #include "net.h"
-#include "tr-assert.h"
-#include "tr-macros.h"
-
-TR_BEGIN_DECLS
 
 enum tr_peer_socket_type
 {
@@ -37,8 +30,6 @@ struct tr_peer_socket
     union tr_peer_socket_handle handle;
 };
 
-#define TR_PEER_SOCKET_INIT ((struct tr_peer_socket){ .type = TR_PEER_SOCKET_TYPE_NONE })
-
 struct tr_peer_socket tr_peer_socket_tcp_create(tr_socket_t const handle);
 
 struct tr_peer_socket tr_peer_socket_utp_create(struct UTPSocket* const handle);
@@ -49,5 +40,3 @@ struct tr_address;
 struct tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const* addr, tr_port port, bool clientIsSeed);
 
 struct tr_peer_socket tr_netOpenPeerUTPSocket(tr_session* session, tr_address const* addr, tr_port port, bool clientIsSeed);
-
-TR_END_DECLS

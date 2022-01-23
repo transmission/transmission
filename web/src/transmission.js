@@ -1,11 +1,6 @@
-/**
- * @license
- *
- * Copyright © Charles Kerr, Dave Perrett, Malcolm Jarvis and Bruno Bierbaumer
- *
- * This file is licensed under the GPLv2.
- * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
- */
+/* @license This file Copyright © Charles Kerr, Dave Perrett, Malcolm Jarvis and Bruno Bierbaumer
+   It may be used under GPLv2 (SPDX: GPL-2.0).
+   License text can be found in the licenses/ folder. */
 
 import { AboutDialog } from './about-dialog.js';
 import { ContextMenu } from './context-menu.js';
@@ -141,7 +136,9 @@ export class Transmission extends EventTarget {
           this.setCurrentPopup(new MoveDialog(this, this.remote));
           break;
         case 'show-overflow-menu':
-          {
+          if (this.popup instanceof OverflowMenu) {
+            this.setCurrentPopup(null);
+          } else {
             this.setCurrentPopup(
               new OverflowMenu(
                 this,
@@ -254,9 +251,9 @@ export class Transmission extends EventTarget {
     this.prefs.addEventListener('change', ({ key, value }) =>
       this._onPrefChanged(key, value)
     );
-    this.prefs
-      .entries()
-      .forEach(([key, value]) => this._onPrefChanged(key, value));
+    for (const [key, value] of this.prefs.entries()) {
+      this._onPrefChanged(key, value);
+    }
   }
 
   loadDaemonPrefs() {
@@ -417,9 +414,9 @@ export class Transmission extends EventTarget {
   _dispatchSelectionChanged() {
     const nonselected = [];
     const selected = [];
-    this._rows.forEach((r) =>
-      (r.isSelected() ? selected : nonselected).push(r.getTorrent())
-    );
+    for (const r of this._rows) {
+      (r.isSelected() ? selected : nonselected).push(r.getTorrent());
+    }
 
     const event = new Event('torrent-selection-changed');
     event.nonselected = nonselected;
@@ -453,7 +450,7 @@ export class Transmission extends EventTarget {
 
   // Process key events
   _keyDown(event_) {
-    const { keyCode } = event_;
+    const { ctrlKey, keyCode, metaKey, shiftKey, target } = event_;
 
     // look for a shortcut
     const aria_keys = Transmission._createKeyShortcutFromKeyboardEvent(event_);
@@ -472,19 +469,14 @@ export class Transmission extends EventTarget {
     }
 
     const any_popup_active = document.querySelector('.popup:not(.hidden)');
-    const is_input_focused = event_.target.matches('input');
+    const is_input_focused = target.matches('input');
     const rows = this._rows;
 
     // Some shortcuts can only be used if the following conditions are met:
     // 1. when no input fields are focused
     // 2. when no other dialogs are visible
     // 3. when the meta or ctrl key isn't pressed (i.e. opening dev tools shouldn't trigger the info panel)
-    if (
-      !is_input_focused &&
-      !any_popup_active &&
-      !event_.metaKey &&
-      !event_.ctrlKey
-    ) {
+    if (!is_input_focused && !any_popup_active && !metaKey && !ctrlKey) {
       const shift_key = keyCode === 16; // shift key pressed
       const up_key = keyCode === 38; // up key pressed
       const dn_key = keyCode === 40; // down key pressed
@@ -518,7 +510,7 @@ export class Transmission extends EventTarget {
             this._deselectRow(rows[last]);
           }
         } else {
-          if (event_.shiftKey) {
+          if (shiftKey) {
             this._selectRange(r);
           } else {
             this._setSelectedRow(r);
@@ -580,12 +572,13 @@ export class Transmission extends EventTarget {
     const type = event_.data.Transfer.types
       .filter((t) => ['text/uri-list', 'text/plain'].contains(t))
       .pop();
-    event_.dataTransfer
+    for (const uri of event_.dataTransfer
       .getData(type)
       .split('\n')
       .map((string) => string.trim())
-      .filter((string) => Transmission._isValidURL(string))
-      .forEach((uri) => this.remote.addTorrentByUrl(uri, paused));
+      .filter((string) => Transmission._isValidURL(string))) {
+      this.remote.addTorrentByUrl(uri, paused);
+    }
 
     event_.preventDefault();
     return false;
@@ -630,9 +623,9 @@ export class Transmission extends EventTarget {
       const keys = table.shift();
       const o = {};
       for (const row of table) {
-        keys.forEach((key, index) => {
+        for (const [index, key] of keys.entries()) {
           o[key] = row[index];
-        });
+        }
         const { id } = o;
         let t = this._torrents[id];
         if (t) {
@@ -654,10 +647,11 @@ export class Transmission extends EventTarget {
 
       if (needinfo.length > 0) {
         // whee, new torrents! get their initial information.
-        const more_fields = ['id'].concat(
-          Torrent.Fields.Metadata,
-          Torrent.Fields.Stats
-        );
+        const more_fields = [
+          'id',
+          ...Torrent.Fields.Metadata,
+          ...Torrent.Fields.Stats,
+        ];
         this.updateTorrents(needinfo, more_fields);
         this.refilterSoon();
       }
@@ -689,12 +683,12 @@ TODO: fix this when notifications get fixed
 */
 
   refreshTorrents() {
-    const fields = ['id'].concat(Torrent.Fields.Stats);
+    const fields = ['id', ...Torrent.Fields.Stats];
     this.updateTorrents('recently-active', fields);
   }
 
   _initializeTorrents() {
-    const fields = ['id'].concat(Torrent.Fields.Metadata, Torrent.Fields.Stats);
+    const fields = ['id', ...Torrent.Fields.Metadata, ...Torrent.Fields.Stats];
     this.updateTorrents(null, fields);
   }
 
@@ -908,7 +902,9 @@ TODO: fix this when notifications get fixed
       this.prefs.sort_mode,
       this.prefs.sort_direction
     );
-    torrents.forEach((tor, index) => (rows[index] = id2row[tor.getId()]));
+    for (const [index, tor] of torrents.entries()) {
+      rows[index] = id2row[tor.getId()];
+    }
   }
 
   _refilter(rebuildEverything) {
@@ -1034,13 +1030,11 @@ TODO: fix this when notifications get fixed
     this.dirtyTorrents.clear();
 
     // set the odd/even property
-    rows
-      .map((row) => row.getElement())
-      .forEach((e, index) => {
-        const even = index % 2 === 0;
-        e.classList.toggle('even', even);
-        e.classList.toggle('odd', !even);
-      });
+    for (const [index, e] of rows.map((row) => row.getElement()).entries()) {
+      const even = index % 2 === 0;
+      e.classList.toggle('even', even);
+      e.classList.toggle('odd', !even);
+    }
 
     this._updateStatusbar();
     if (

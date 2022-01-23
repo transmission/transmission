@@ -1,11 +1,7 @@
-/**
- * @license
- *
- * This file Copyright (C) 2020 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- */
+/* @license This file Copyright (C) 2020-2022 Mnemosyne LLC.
+   It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+   or any future license endorsed by Mnemosyne LLC.
+   License text can be found in the licenses/ folder. */
 
 import { createDialogContainer } from './utils.js';
 
@@ -38,13 +34,9 @@ export class RemoveDialog extends EventTarget {
   }
 
   _onConfirm() {
-    const { torrents } = this.options;
+    const { remote, torrents, trash } = this.options;
     if (torrents.length > 0) {
-      if (this.options.trash) {
-        this.options.remote.removeTorrentsAndData(torrents);
-      } else {
-        this.options.remote.removeTorrents(torrents);
-      }
+      remote.removeTorrents(torrents, trash);
     }
 
     this.close();
@@ -64,13 +56,13 @@ export class RemoveDialog extends EventTarget {
   static _createMessage(options) {
     let heading = null;
     let message = null;
-    const { torrents } = options;
+    const { torrents, trash } = options;
     const [torrent] = torrents;
-    if (options.trash && torrents.length === 1) {
+    if (trash && torrents.length === 1) {
       heading = `Remove ${torrent.getName()} and delete data?`;
       message =
         'All data downloaded for this torrent will be deleted. Are you sure you want to remove it?';
-    } else if (options.trash) {
+    } else if (trash) {
       heading = `Remove ${torrents.length} transfers and delete data?`;
       message =
         'All data downloaded for these torrents will be deleted. Are you sure you want to remove them?';

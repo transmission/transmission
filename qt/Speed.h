@@ -1,10 +1,7 @@
-/*
- * This file Copyright (C) 2009-2015 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2009-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #pragma once
 
@@ -37,38 +34,37 @@ public:
         bytes_per_second_ = Bps;
     }
 
-    Speed& operator +=(Speed const& that)
+    Speed& operator+=(Speed const& that)
     {
         bytes_per_second_ += that.bytes_per_second_;
         return *this;
     }
 
-    [[nodiscard]] Speed operator +(Speed const& that) const
+    [[nodiscard]] Speed operator+(Speed const& that) const
     {
         return Speed{ getBps() + that.getBps() };
     }
 
-    [[nodiscard]] bool operator <(Speed const& that) const
+    [[nodiscard]] bool operator<(Speed const& that) const
     {
         return getBps() < that.getBps();
     }
 
-    [[nodiscard]] bool operator ==(Speed const& that) const
+    [[nodiscard]] bool operator==(Speed const& that) const
     {
         return getBps() == that.getBps();
     }
 
-    [[nodiscard]] bool operator !=(Speed const& that) const
+    [[nodiscard]] bool operator!=(Speed const& that) const
     {
         return getBps() != that.getBps();
     }
 
 private:
-    explicit Speed(int bytes_per_second) :
-        bytes_per_second_{bytes_per_second}
+    explicit Speed(int bytes_per_second)
+        : bytes_per_second_{ bytes_per_second }
     {
     }
 
-private:
     int bytes_per_second_ = {};
 };

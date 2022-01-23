@@ -1,10 +1,7 @@
-/*
- * This file Copyright (C) 2009-2015 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2009-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #include <QApplication>
 #include <QPainter>
@@ -41,7 +38,7 @@ void FileTreeDelegate::paint(QPainter* painter, QStyleOptionViewItem const& opti
         return;
     }
 
-    QStyle* style(qApp->style());
+    QStyle const* style = QApplication::style();
 
     painter->save();
     QItemDelegate::drawBackground(painter, option, index);
@@ -49,12 +46,12 @@ void FileTreeDelegate::paint(QPainter* painter, QStyleOptionViewItem const& opti
     if (column == FileTreeModel::COL_PROGRESS)
     {
         QStyleOptionProgressBar p;
-        p.state = option.state | QStyle::State_Small;
-        p.direction = qApp->layoutDirection();
+        p.state = option.state | QStyle::State_Horizontal | QStyle::State_Small;
+        p.direction = QApplication::layoutDirection();
         p.rect = option.rect;
         p.rect.setSize(QSize(option.rect.width() - 4, option.rect.height() - 8));
         p.rect.moveCenter(option.rect.center());
-        p.fontMetrics = qApp->fontMetrics();
+        p.fontMetrics = QApplication::fontMetrics();
         p.minimum = 0;
         p.maximum = 100;
         p.textAlignment = Qt::AlignCenter;

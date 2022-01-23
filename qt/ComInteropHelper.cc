@@ -1,10 +1,7 @@
-/*
- * This file Copyright (C) 2015 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2015-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #include <windows.h>
 #include <objbase.h>
@@ -19,7 +16,7 @@
 // NOLINTNEXTLINE(cppcoreguidelines-special-member-functions)
 QAXFACTORY_BEGIN("{1e405fc2-1a3a-468b-8bd6-bfbb58770390}", "{792d1aac-53cc-4dc9-bc29-e5295fdb93a9}")
 QAXCLASS(InteropObject)
-QAXFACTORY_END()
+QAXFACTORY_END() // NOLINT
 
 // These are ActiveQt internals; declaring here as I don't like their WinMain much...
 extern HANDLE qAxInstance; // NOLINT
@@ -27,8 +24,8 @@ extern bool qAxOutProcServer; // NOLINT
 extern wchar_t qAxModuleFilename[MAX_PATH]; // NOLINT
 extern QString qAxInit(); // NOLINT
 
-ComInteropHelper::ComInteropHelper() :
-    client_(new QAxObject(QStringLiteral("Transmission.QtClient")))
+ComInteropHelper::ComInteropHelper()
+    : client_(new QAxObject(QStringLiteral("Transmission.QtClient")))
 {
 }
 
@@ -37,7 +34,7 @@ bool ComInteropHelper::isConnected() const
     return !client_->isNull();
 }
 
-QVariant ComInteropHelper::addMetainfo(QString const& metainfo)
+QVariant ComInteropHelper::addMetainfo(QString const& metainfo) const
 {
     return client_->dynamicCall("AddMetainfo(QString)", metainfo);
 }

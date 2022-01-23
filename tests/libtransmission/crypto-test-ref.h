@@ -1,10 +1,7 @@
-/*
- * This file Copyright (C) 2015 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright (C) 2015-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #ifndef TR_CRYPTO_TEST_REF_H
 #define TR_CRYPTO_TEST_REF_H
@@ -16,7 +13,6 @@
 #define KEY_LEN KEY_LEN_
 
 #define tr_sha1_ctx_t tr_sha1_ctx_t_
-#define tr_rc4_ctx_t tr_rc4_ctx_t_
 #define tr_dh_ctx_t tr_dh_ctx_t_
 #define tr_dh_secret_t tr_dh_secret_t_
 #define tr_ssl_ctx_t tr_ssl_ctx_t_
@@ -39,10 +35,6 @@
 #define tr_sha1_init tr_sha1_init_
 #define tr_sha1_update tr_sha1_update_
 #define tr_sha1_final tr_sha1_final_
-#define tr_rc4_new tr_rc4_new_
-#define tr_rc4_free tr_rc4_free_
-#define tr_rc4_set_key tr_rc4_set_key_
-#define tr_rc4_process tr_rc4_process_
 #define tr_dh_new tr_dh_new_
 #define tr_dh_free tr_dh_free_
 #define tr_dh_make_key tr_dh_make_key_
@@ -59,28 +51,26 @@
 #define tr_rand_buffer tr_rand_buffer_
 #define tr_ssha1 tr_ssha1_
 #define tr_ssha1_matches tr_ssha1_matches_
+#define tr_ssha1_test tr_ssha1_test_
 #define tr_base64_encode tr_base64_encode_
-#define tr_base64_encode_str tr_base64_encode_str_
 #define tr_base64_encode_impl tr_base64_encode_impl_
 #define tr_base64_decode tr_base64_decode_
-#define tr_base64_decode_str tr_base64_decode_str_
 #define tr_base64_decode_impl tr_base64_decode_impl_
-#define tr_sha1_to_hex tr_sha1_to_hex_
-#define tr_hex_to_sha1 tr_hex_to_sha1_
+#define tr_sha1_to_string tr_sha1_to_string_
+#define tr_sha1_from_string tr_sha1_from_string_
 
 #undef TR_ENCRYPTION_H
 #undef TR_CRYPTO_UTILS_H
 
 #include "crypto.h"
 #include "crypto-utils.h"
-#include "crypto.c"
-#include "crypto-utils.c"
-#include "crypto-utils-openssl.c"
+#include "crypto.cc"
+#include "crypto-utils.cc"
+#include "crypto-utils-openssl.cc"
 
 #undef KEY_LEN_
 
 #undef tr_sha1_ctx_t
-#undef tr_rc4_ctx_t
 #undef tr_dh_ctx_t
 #undef tr_dh_secret_t
 #undef tr_ssl_ctx_t
@@ -103,10 +93,6 @@
 #undef tr_sha1_init
 #undef tr_sha1_update
 #undef tr_sha1_final
-#undef tr_rc4_new
-#undef tr_rc4_free
-#undef tr_rc4_set_key
-#undef tr_rc4_process
 #undef tr_dh_new
 #undef tr_dh_free
 #undef tr_dh_make_key
@@ -123,21 +109,19 @@
 #undef tr_rand_buffer
 #undef tr_ssha1
 #undef tr_ssha1_matches
+#undef tr_ssha1_test
 #undef tr_base64_encode
-#undef tr_base64_encode_str
 #undef tr_base64_encode_impl
 #undef tr_base64_decode
-#undef tr_base64_decode_str
 #undef tr_base64_decode_impl
-#undef tr_sha1_to_hex
-#undef tr_hex_to_sha1
+#undef tr_sha1_to_string
+#undef tr_sha1_from_string
 
 #else /* CRYPTO_REFERENCE_CHECK */
 
 #define KEY_LEN_ KEY_LEN
 
 #define tr_sha1_ctx_t_ tr_sha1_ctx_t
-#define tr_rc4_ctx_t_ tr_rc4_ctx_t
 #define tr_dh_ctx_t_ tr_dh_ctx_t
 #define tr_dh_secret_t_ tr_dh_secret_t
 #define tr_ssl_ctx_t_ tr_ssl_ctx_t
@@ -160,10 +144,6 @@
 #define tr_sha1_init_ tr_sha1_init
 #define tr_sha1_update_ tr_sha1_update
 #define tr_sha1_final_ tr_sha1_final
-#define tr_rc4_new_ tr_rc4_new
-#define tr_rc4_free_ tr_rc4_free
-#define tr_rc4_set_key_ tr_rc4_set_key
-#define tr_rc4_process_ tr_rc4_process
 #define tr_dh_new_ tr_dh_new
 #define tr_dh_free_ tr_dh_free
 #define tr_dh_make_key_ tr_dh_make_key
@@ -180,14 +160,13 @@
 #define tr_rand_buffer_ tr_rand_buffer
 #define tr_ssha1_ tr_ssha1
 #define tr_ssha1_matches_ tr_ssha1_matches
+#define tr_ssha1_test_ tr_ssha1_test
 #define tr_base64_encode_ tr_base64_encode
-#define tr_base64_encode_str_ tr_base64_encode_str
 #define tr_base64_encode_impl_ tr_base64_encode_impl
 #define tr_base64_decode_ tr_base64_decode
-#define tr_base64_decode_str_ tr_base64_decode_str
 #define tr_base64_decode_impl_ tr_base64_decode_impl
-#define tr_sha1_to_hex_ tr_sha1_to_hex
-#define tr_hex_to_sha1_ tr_hex_to_sha1
+#define tr_sha1_to_string_ tr_sha1_to_string
+#define tr_sha1_from_string_ tr_sha1_from_string
 
 #endif /* CRYPTO_REFERENCE_CHECK */
 

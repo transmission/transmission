@@ -1,18 +1,27 @@
-/**
- * @license
- *
- * This file Copyright (C) 2020 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- */
+/* @license This file Copyright (C) 2020-2022 Mnemosyne LLC.
+   It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+   or any future license endorsed by Mnemosyne LLC.
+   License text can be found in the licenses/ folder. */
 
 import { Formatter } from './formatter.js';
 import { Torrent } from './torrent.js';
 import { setTextContent } from './utils.js';
 
-class TorrentRendererHelper {
-  static getProgressInfo(controller, t) {
+const TorrentRendererHelper = {
+  formatDL: (t) => {
+    return `▼${Formatter.speedBps(t.getDownloadSpeed())}`;
+  },
+  formatETA: (t) => {
+    const eta = t.getETA();
+    if (eta < 0 || eta >= 999 * 60 * 60) {
+      return '';
+    }
+    return `ETA: ${Formatter.timeInterval(eta)}`;
+  },
+  formatUL: (t) => {
+    return `▲${Formatter.speedBps(t.getUploadSpeed())}`;
+  },
+  getProgressInfo: (controller, t) => {
     const status = t.getStatus();
     const classList = ['torrent-progress-bar'];
     let percent = null;
@@ -46,29 +55,14 @@ class TorrentRendererHelper {
       classList,
       percent,
     };
-  }
+  },
 
-  static renderProgressbar(controller, t, progressbar) {
+  renderProgressbar: (controller, t, progressbar) => {
     const info = TorrentRendererHelper.getProgressInfo(controller, t);
     progressbar.className = info.classList.join(' ');
     progressbar.style['background-size'] = `${info.percent}% 100%, 100% 100%`;
-  }
-
-  static formatUL(t) {
-    return `▲${Formatter.speedBps(t.getUploadSpeed())}`;
-  }
-  static formatDL(t) {
-    return `▼${Formatter.speedBps(t.getDownloadSpeed())}`;
-  }
-
-  static formatETA(t) {
-    const eta = t.getETA();
-    if (eta < 0 || eta >= 999 * 60 * 60) {
-      return '';
-    }
-    return `ETA: ${Formatter.timeInterval(eta)}`;
-  }
-}
+  },
+};
 
 ///
 

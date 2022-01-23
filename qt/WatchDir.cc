@@ -1,18 +1,17 @@
-/*
- * This file Copyright (C) 2009-2015 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2009-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
-#include <iostream>
+#include <memory>
 
 #include <QDir>
 #include <QFileSystemWatcher>
 #include <QTimer>
 
 #include <libtransmission/transmission.h>
+
+#include <libtransmission/torrent-metainfo.h>
 
 #include "Prefs.h"
 #include "TorrentModel.h"
@@ -22,8 +21,8 @@
 ****
 ***/
 
-WatchDir::WatchDir(TorrentModel const& model) :
-    model_(model)
+WatchDir::WatchDir(TorrentModel const& model)
+    : model_(model)
 {
 }
 
@@ -33,35 +32,18 @@ WatchDir::WatchDir(TorrentModel const& model) :
 
 int WatchDir::metainfoTest(QString const& filename) const
 {
-    int ret;
-    tr_info inf;
-    tr_ctor* ctor = tr_ctorNew(nullptr);
-
-    // parse
-    tr_ctorSetMetainfoFromFile(ctor, filename.toUtf8().constData());
-    int const err = tr_torrentParse(ctor, &inf);
-
-    if (err != 0)
+    auto metainfo = tr_torrent_metainfo();
+    if (!metainfo.parseTorrentFile(filename.toUtf8().constData()))
     {
-        ret = ERROR;
-    }
-    else if (model_.hasTorrent(TorrentHash(inf.hashString)))
-    {
-        ret = DUPLICATE;
-    }
-    else
-    {
-        ret = OK;
+        return ERROR;
     }
 
-    // cleanup
-    if (err == 0)
+    if (model_.hasTorrent(TorrentHash{ metainfo.infoHash() }))
     {
-        tr_metainfoFree(&inf);
+        return DUPLICATE;
     }
 
-    tr_ctorFree(ctor);
-    return ret;
+    return OK;
 }
 
 void WatchDir::onTimeout()
@@ -87,8 +69,9 @@ void WatchDir::setPath(QString const& path, bool is_enabled)
     if (is_enabled)
     {
         watcher_ = std::make_unique<QFileSystemWatcher>(QStringList{ path });
-        connect(watcher_.get(), SIGNAL(directoryChanged(QString)), this, SLOT(watcherActivated(QString)));
-        QTimer::singleShot(0, this, SLOT(rescanAllWatchedDirectories())); // trigger the watchdir for .torrent files in there already
+        connect(watcher_.get(), &QFileSystemWatcher::directoryChanged, this, &WatchDir::watcherActivated);
+        // trigger the watchdir for .torrent files in there already
+        QTimer::singleShot(0, this, SLOT(rescanAllWatchedDirectories()));
     }
 }
 
@@ -105,7 +88,7 @@ void WatchDir::watcherActivated(QString const& path)
     }
 
     // try to add any new files which end in .torrent
-    QSet<QString> const new_files(files - watch_dir_files_);
+    auto const new_files = files - watch_dir_files_;
     auto const torrent_suffix = QStringLiteral(".torrent");
 
     for (QString const& name : new_files)
@@ -129,7 +112,7 @@ void WatchDir::watcherActivated(QString const& path)
                     auto* t = new QTimer(this);
                     t->setObjectName(dir.absoluteFilePath(name));
                     t->setSingleShot(true);
-                    connect(t, SIGNAL(timeout()), this, SLOT(onTimeout()));
+                    connect(t, &QTimer::timeout, this, &WatchDir::onTimeout);
                     t->start(5000);
                 }
             }

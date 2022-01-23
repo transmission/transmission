@@ -1,24 +1,6 @@
-/******************************************************************************
- * Copyright (c) 2005-2019 Transmission authors and contributors
- *
- * Permission is hereby granted, free of charge, to any person obtaining a
- * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
- * DEALINGS IN THE SOFTWARE.
- *****************************************************************************/
+// This file Copyright © 2005-2022 Transmission authors and contributors.
+// It may be used under the MIT (SPDX: MIT) license.
+// License text can be found in the licenses/ folder.
 
 #import <Cocoa/Cocoa.h>
 
@@ -30,66 +12,74 @@
 
 #define GROUP_SEPARATOR_HEIGHT 18.0
 
-@interface TorrentTableView : NSOutlineView <NSOutlineViewDelegate, NSAnimationDelegate, NSPopoverDelegate>
+@interface TorrentTableView : NSOutlineView<NSOutlineViewDelegate, NSAnimationDelegate, NSPopoverDelegate>
 {
-    IBOutlet Controller * fController;
+    IBOutlet Controller* fController;
 
-    TorrentCell * fTorrentCell;
+    TorrentCell* fTorrentCell;
 
-    NSUserDefaults * fDefaults;
+    NSUserDefaults* fDefaults;
 
-    NSMutableIndexSet * fCollapsedGroups;
+    NSMutableIndexSet* fCollapsedGroups;
 
-    IBOutlet NSMenu * fContextRow, * fContextNoRow;
+    IBOutlet NSMenu* fContextRow;
+    IBOutlet NSMenu* fContextNoRow;
 
-    NSInteger fMouseRow, fMouseControlRow, fMouseRevealRow, fMouseActionRow;
-    NSArray * fSelectedValues;
+    NSInteger fMouseRow;
+    NSInteger fMouseControlRow;
+    NSInteger fMouseRevealRow;
+    NSInteger fMouseActionRow;
+    NSArray* fSelectedValues;
 
-    IBOutlet NSMenu * fActionMenu, * fUploadMenu, * fDownloadMenu, * fRatioMenu, * fPriorityMenu;
-    IBOutlet NSMenuItem * fGlobalLimitItem;
-    Torrent * fMenuTorrent;
+    IBOutlet NSMenu* fActionMenu;
+    IBOutlet NSMenu* fUploadMenu;
+    IBOutlet NSMenu* fDownloadMenu;
+    IBOutlet NSMenu* fRatioMenu;
+    IBOutlet NSMenu* fPriorityMenu;
+    IBOutlet NSMenuItem* fGlobalLimitItem;
+    Torrent* fMenuTorrent;
 
     CGFloat fPiecesBarPercent;
-    NSAnimation * fPiecesBarAnimation;
+    NSAnimation* fPiecesBarAnimation;
 
     BOOL fActionPopoverShown;
 }
 
-- (BOOL) isGroupCollapsed: (NSInteger) value;
-- (void) removeCollapsedGroup: (NSInteger) value;
-- (void) removeAllCollapsedGroups;
-- (void) saveCollapsedGroups;
+- (BOOL)isGroupCollapsed:(NSInteger)value;
+- (void)removeCollapsedGroup:(NSInteger)value;
+- (void)removeAllCollapsedGroups;
+- (void)saveCollapsedGroups;
 
-- (void) removeTrackingAreas;
-- (void) setRowHover: (NSInteger) row;
-- (void) setControlButtonHover: (NSInteger) row;
-- (void) setRevealButtonHover: (NSInteger) row;
-- (void) setActionButtonHover: (NSInteger) row;
+- (void)removeTrackingAreas;
+- (void)setRowHover:(NSInteger)row;
+- (void)setControlButtonHover:(NSInteger)row;
+- (void)setRevealButtonHover:(NSInteger)row;
+- (void)setActionButtonHover:(NSInteger)row;
 
-- (void) selectValues: (NSArray *) values;
-- (NSArray *) selectedValues;
-- (NSArray *) selectedTorrents;
+- (void)selectValues:(NSArray*)values;
+@property(nonatomic, readonly) NSArray* selectedValues;
+@property(nonatomic, readonly) NSArray* selectedTorrents;
 
-- (NSRect) iconRectForRow: (NSInteger) row;
+- (NSRect)iconRectForRow:(NSInteger)row;
 
-- (void) paste: (id) sender;
+- (void)paste:(id)sender;
 
-- (void) toggleControlForTorrent: (Torrent *) torrent;
+- (void)toggleControlForTorrent:(Torrent*)torrent;
 
-- (void) displayTorrentActionPopoverForEvent: (NSEvent *) event;
+- (void)displayTorrentActionPopoverForEvent:(NSEvent*)event;
 
-- (void) setQuickLimitMode: (id) sender;
-- (void) setQuickLimit: (id) sender;
-- (void) setGlobalLimit: (id) sender;
+- (void)setQuickLimitMode:(id)sender;
+- (void)setQuickLimit:(id)sender;
+- (void)setGlobalLimit:(id)sender;
 
-- (void) setQuickRatioMode: (id) sender;
-- (void) setQuickRatio: (id) sender;
+- (void)setQuickRatioMode:(id)sender;
+- (void)setQuickRatio:(id)sender;
 
-- (void) setPriority: (id) sender;
+- (void)setPriority:(id)sender;
 
-- (void) togglePiecesBar;
-- (CGFloat) piecesBarPercent;
+- (void)togglePiecesBar;
+@property(nonatomic, readonly) CGFloat piecesBarPercent;
 
-- (void) selectAndScrollToRow: (NSInteger) row;
+- (void)selectAndScrollToRow:(NSInteger)row;
 
 @end

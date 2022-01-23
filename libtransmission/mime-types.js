@@ -1,12 +1,10 @@
 #!/usr/bin/env node
 
 const copyright =
-`/*
- * This file Copyright (C) ${new Date().getFullYear()} Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- */`;
+`// This file Copyright © 2021-${new Date().getFullYear()} Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.`;
 
 const fs = require('fs');
 const https = require('https');
@@ -34,39 +32,32 @@ https.get(url, (res) => {
         }
       }
 
-      const max_suffix_len = suffixes
-        .reduce((acc, [suffix]) => Math.max(acc, suffix.length), 0);
-
       const mime_type_lines = suffixes
-        .map(([suffix, mime_type]) => `    { "${suffix}", "${mime_type}" }`)
+        .map(([suffix, mime_type]) => `      { "${suffix}", "${mime_type}" }`)
         .sort()
         .join(',\n');
-      fs.writeFileSync('mime-types.c', `${copyright}
-
-#include "mime-types.h"
-
-struct mime_type_suffix const mime_type_suffixes[MIME_TYPE_SUFFIX_COUNT] =
-{
-${mime_type_lines}
-};
-`);
       fs.writeFileSync('mime-types.h', `${copyright}
 
 #pragma once
 
-#define MIME_TYPE_SUFFIX_MAXLEN ${max_suffix_len}
-#define MIME_TYPE_SUFFIX_COUNT ${suffixes.length}
+#include <array>
+#include <string_view>
 
 struct mime_type_suffix
 {
-    char const* suffix;
-    char const* mime_type;
+    std::string_view suffix;
+    std::string_view mime_type;
 };
 
-extern struct mime_type_suffix const mime_type_suffixes[MIME_TYPE_SUFFIX_COUNT];
+inline auto constexpr mime_type_suffixes = std::array<mime_type_suffix, ${suffixes.length}>
+{{
+${mime_type_lines}
+}};
+
 `);
     } catch (e) {
       console.error(e.message);
     }
   });
 });
+

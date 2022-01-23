@@ -1,10 +1,7 @@
-/*
- * This file Copyright (C) 2009-2015 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2009-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #pragma once
 
@@ -12,7 +9,7 @@
 
 #include <QStyledItemDelegate>
 
-#include "Macros.h"
+#include <libtransmission/tr-macros.h>
 
 class QStyle;
 class QStyleOptionProgressBar;
@@ -45,12 +42,12 @@ protected:
     static QString shortStatusString(Torrent const& tor);
     static QString shortTransferString(Torrent const& tor);
 
-    QColor const blue_back;
-    QColor const blue_brush;
-    QColor const green_back;
-    QColor const green_brush;
-    QColor const silver_back;
-    QColor const silver_brush;
+    QColor const BlueBack{ "lightgrey" };
+    QColor const BlueBrush{ "steelblue" };
+    QColor const GreenBack{ "darkseagreen" };
+    QColor const GreenBrush{ "forestgreen" };
+    QColor const SilverBack{ "grey" };
+    QColor const SilverBrush{ "silver" };
 
     mutable QStyleOptionProgressBar progress_bar_style_ = {};
 

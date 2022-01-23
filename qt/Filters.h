@@ -1,14 +1,9 @@
-/*
- * This file Copyright (C) 2010-2015 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2010-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #pragma once
-
-#include <array>
 
 #include "Torrent.h"
 
@@ -28,9 +23,8 @@ public:
         NUM_MODES
     };
 
-public:
-    FilterMode(int mode = SHOW_ALL) :
-        mode_(mode)
+    explicit FilterMode(int mode = SHOW_ALL)
+        : mode_(mode)
     {
     }
 
@@ -41,16 +35,19 @@ public:
 
     /* The Torrent properties that can affect this filter.
        When one of these changes, it's time to refilter. */
-    static Torrent::fields_t constexpr TorrentFields = {
-        (uint64_t(1) << Torrent::ERROR) |
-                (uint64_t(1) << Torrent::IS_FINISHED) |
-                (uint64_t(1) << Torrent::PEERS_GETTING_FROM_US) |
-                (uint64_t(1) << Torrent::PEERS_SENDING_TO_US) |
-                (uint64_t(1) << Torrent::STATUS)
-        };
+    static Torrent::fields_t constexpr TorrentFields = //
+        (uint64_t(1) << Torrent::ERROR) | //
+        (uint64_t(1) << Torrent::IS_FINISHED) | //
+        (uint64_t(1) << Torrent::PEERS_GETTING_FROM_US) | //
+        (uint64_t(1) << Torrent::PEERS_SENDING_TO_US) | //
+        (uint64_t(1) << Torrent::STATUS);
 
     static bool test(Torrent const& tor, int mode);
-    bool test(Torrent const& tor) const { return test(tor, mode()); }
+
+    bool test(Torrent const& tor) const
+    {
+        return test(tor, mode());
+    }
 
 private:
     int mode_;
@@ -76,9 +73,8 @@ public:
         NUM_MODES
     };
 
-public:
-    SortMode(int mode = SORT_BY_ID) :
-        mode_(mode)
+    explicit SortMode(int mode = SORT_BY_ID)
+        : mode_(mode)
     {
     }
 

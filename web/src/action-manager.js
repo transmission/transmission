@@ -1,11 +1,7 @@
-/**
- * @license
- *
- * This file Copyright (C) 2020 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- */
+/* @license This file Copyright (C) 2020-2022 Mnemosyne LLC.
+   It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+   or any future license endorsed by Mnemosyne LLC.
+   License text can be found in the licenses/ folder. */
 
 export class ActionManager extends EventTarget {
   constructor() {
@@ -137,11 +133,12 @@ export class ActionManager extends EventTarget {
   }
 
   static _recount(selected, nonselected) {
-    const test = (tor) => tor.isStopped();
     const total = selected.length + nonselected.length;
-    const selected_paused = selected.filter(test).length;
+    const selected_paused = selected.filter((tor) => tor.isStopped()).length;
     const selected_active = selected.length - selected_paused;
-    const nonselected_paused = nonselected.filter(test).length;
+    const nonselected_paused = nonselected.filter((tor) =>
+      tor.isStopped()
+    ).length;
     const nonselected_active = nonselected.length - nonselected_paused;
     const paused = selected_paused + nonselected_paused;
     const active = selected_active + nonselected_active;

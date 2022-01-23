@@ -1,19 +1,11 @@
-/*
- * This file Copyright (C) 2009-2015 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2009-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #include <set>
 #include <unordered_map>
 #include <unordered_set>
-
-#ifdef _WIN32
-#include <windows.h>
-#include <shellapi.h>
-#endif
 
 #include <QAbstractItemView>
 #include <QApplication>
@@ -30,10 +22,6 @@
 #include <QObject>
 #include <QPixmapCache>
 #include <QStyle>
-
-#ifdef _WIN32
-#include <QtWin>
-#endif
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/utils.h> // tr_formatter
@@ -71,57 +59,6 @@ QIcon Utils::getIconFromIndex(QModelIndex const& index)
     }
 }
 
-bool Utils::isValidUtf8(char const* s)
-{
-    int n; // number of bytes in a UTF-8 sequence
-
-    for (char const* c = s; *c != '\0'; c += n)
-    {
-        if ((*c & 0x80) == 0x00)
-        {
-            n = 1; // ASCII
-        }
-        else if ((*c & 0xc0) == 0x80)
-        { // NOLINT(bugprone-branch-clone)
-            return false; // not valid
-        }
-        else if ((*c & 0xe0) == 0xc0)
-        {
-            n = 2;
-        }
-        else if ((*c & 0xf0) == 0xe0)
-        {
-            n = 3;
-        }
-        else if ((*c & 0xf8) == 0xf0)
-        {
-            n = 4;
-        }
-        else if ((*c & 0xfc) == 0xf8)
-        {
-            n = 5;
-        }
-        else if ((*c & 0xfe) == 0xfc)
-        {
-            n = 6;
-        }
-        else
-        {
-            return false;
-        }
-
-        for (int m = 1; m < n; m++)
-        {
-            if ((c[m] & 0xc0) != 0x80)
-            {
-                return false;
-            }
-        }
-    }
-
-    return true;
-}
-
 QString Utils::removeTrailingDirSeparator(QString const& path)
 {
     int i = path.size();
@@ -134,7 +71,7 @@ QString Utils::removeTrailingDirSeparator(QString const& path)
     return path.left(i);
 }
 
-int Utils::measureViewItem(QAbstractItemView* view, QString const& text)
+int Utils::measureViewItem(QAbstractItemView const* view, QString const& text)
 {
     QStyleOptionViewItem option;
     option.initFrom(view);
@@ -143,11 +80,12 @@ int Utils::measureViewItem(QAbstractItemView* view, QString const& text)
     option.textElideMode = Qt::ElideNone;
     option.font = view->font();
 
-    return view->style()->sizeFromContents(QStyle::CT_ItemViewItem, &option, QSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX), view).
-        width();
+    return view->style()
+        ->sizeFromContents(QStyle::CT_ItemViewItem, &option, QSize(QWIDGETSIZE_MAX, QWIDGETSIZE_MAX), view)
+        .width();
 }
 
-int Utils::measureHeaderItem(QHeaderView* view, QString const& text)
+int Utils::measureHeaderItem(QHeaderView const* view, QString const& text)
 {
     QStyleOptionHeader option;
     option.initFrom(view);

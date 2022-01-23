@@ -1,10 +1,7 @@
-/*
- * This file Copyright (C) 2009-2015 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2009-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #pragma once
 
@@ -30,7 +27,7 @@ namespace std
 template<>
 struct hash<QString>
 {
-    std::size_t operator ()(QString const& s) const
+    std::size_t operator()(QString const& s) const
     {
         return qHash(s);
     }
@@ -45,9 +42,6 @@ class Utils
 public:
     static QIcon getIconFromIndex(QModelIndex const& index);
 
-    // Test if string is UTF-8 or not
-    static bool isValidUtf8(char const* s);
-
     static QString removeTrailingDirSeparator(QString const& path);
 
     static void narrowRect(QRect& rect, int dx1, int dx2, Qt::LayoutDirection direction)
@@ -60,8 +54,8 @@ public:
         rect.adjust(dx1, 0, -dx2, 0);
     }
 
-    static int measureViewItem(QAbstractItemView* view, QString const& text);
-    static int measureHeaderItem(QHeaderView* view, QString const& text);
+    static int measureViewItem(QAbstractItemView const* view, QString const& text);
+    static int measureHeaderItem(QHeaderView const* view, QString const& text);
 
     static QColor getFadedColor(QColor const& color);
 
@@ -110,8 +104,7 @@ public:
 
     static bool isUriWithSupportedScheme(QString const& s)
     {
-        return s.startsWith(QStringLiteral("ftp://")) ||
-            s.startsWith(QStringLiteral("http://")) ||
+        return s.startsWith(QStringLiteral("ftp://")) || s.startsWith(QStringLiteral("http://")) ||
             s.startsWith(QStringLiteral("https://"));
     }
 };

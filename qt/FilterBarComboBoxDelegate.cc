@@ -1,10 +1,7 @@
-/*
- * This file Copyright (C) 2012-2015 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2012-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #include <QAbstractItemView>
 #include <QComboBox>
@@ -26,9 +23,9 @@ int getHSpacing(QWidget const* w)
 
 } // namespace
 
-FilterBarComboBoxDelegate::FilterBarComboBoxDelegate(QObject* parent, QComboBox* combo) :
-    QItemDelegate(parent),
-    combo_(combo)
+FilterBarComboBoxDelegate::FilterBarComboBoxDelegate(QObject* parent, QComboBox* combo)
+    : QItemDelegate(parent)
+    , combo_(combo)
 {
 }
 
@@ -69,9 +66,11 @@ void FilterBarComboBoxDelegate::paint(QPainter* painter, QStyleOptionViewItem co
     {
         QStyleOptionViewItem disabled_option = option;
         QPalette::ColorRole const disabled_color_role = (disabled_option.state & QStyle::State_Selected) != 0 ?
-            QPalette::HighlightedText : QPalette::Text;
-        disabled_option.palette.setColor(disabled_color_role, Utils::getFadedColor(disabled_option.palette.color(
-            disabled_color_role)));
+            QPalette::HighlightedText :
+            QPalette::Text;
+        disabled_option.palette.setColor(
+            disabled_color_role,
+            Utils::getFadedColor(disabled_option.palette.color(disabled_color_role)));
 
         QRect bounding_box = option.rect;
 
@@ -80,7 +79,10 @@ void FilterBarComboBoxDelegate::paint(QPainter* painter, QStyleOptionViewItem co
 
         QRect decoration_rect = rect(option, index, Qt::DecorationRole);
         decoration_rect.setSize(combo_->iconSize());
-        decoration_rect = QStyle::alignedRect(option.direction, Qt::AlignLeft | Qt::AlignVCenter, decoration_rect.size(),
+        decoration_rect = QStyle::alignedRect(
+            option.direction,
+            Qt::AlignLeft | Qt::AlignVCenter,
+            decoration_rect.size(),
             bounding_box);
         Utils::narrowRect(bounding_box, decoration_rect.width() + hmargin, 0, option.direction);
 

@@ -1,10 +1,7 @@
-/*
- * This file Copyright (C) 2009-2016 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2009-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #pragma once
 
@@ -19,8 +16,8 @@
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/quark.h>
+#include <libtransmission/tr-macros.h>
 
-#include "Macros.h"
 #include "RpcClient.h"
 #include "RpcQueue.h"
 #include "Torrent.h"
@@ -31,7 +28,7 @@ class Prefs;
 
 extern "C"
 {
-struct tr_variant;
+    struct tr_variant;
 }
 
 class Session : public QObject
@@ -120,7 +117,7 @@ public:
 
 public slots:
     void addTorrent(AddData const& addme);
-    void launchWebInterface();
+    void launchWebInterface() const;
     void queueMoveBottom(torrent_ids_t const& torrentIds = {});
     void queueMoveDown(torrent_ids_t const& torrentIds = {});
     void queueMoveTop(torrent_ids_t const& torrentIds = {});
@@ -144,6 +141,9 @@ signals:
     void networkResponse(QNetworkReply::NetworkError code, QString const& message);
     void httpAuthenticationRequired();
 
+private slots:
+    void onDuplicatesTimer();
+
 private:
     void start();
 
@@ -159,9 +159,8 @@ private:
 
     static void updateStats(tr_variant* d, tr_session_stats* stats);
 
-    void addOptionalIds(tr_variant* args, torrent_ids_t const& ids);
+    void addOptionalIds(tr_variant* args, torrent_ids_t const& ids) const;
 
-private:
     QString const config_dir_;
     Prefs& prefs_;
 
@@ -180,7 +179,4 @@ private:
 
     std::map<QString, QString> duplicates_;
     QTimer duplicates_timer_;
-
-private slots:
-    void onDuplicatesTimer();
 };

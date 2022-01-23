@@ -1,17 +1,15 @@
-/*
- * This file Copyright (C) 2009-2015 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2009-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #pragma once
 
 #include <QSet>
 #include <QTreeView>
 
-#include "Macros.h"
+#include <libtransmission/tr-macros.h>
+
 #include "Torrent.h" // FileList
 
 class QAction;
@@ -68,7 +66,6 @@ private:
 
     static Qt::CheckState getCumulativeCheckState(QModelIndexList const& indices);
 
-private:
     FileTreeModel* model_ = {};
     QSortFilterProxyModel* proxy_ = {};
     FileTreeDelegate* delegate_ = {};

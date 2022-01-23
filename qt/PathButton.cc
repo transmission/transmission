@@ -1,10 +1,7 @@
-/*
- * This file Copyright (C) 2014-2015 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2014-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #include <QApplication>
 #include <QDir>
@@ -18,9 +15,8 @@
 #include "PathButton.h"
 #include "Utils.h"
 
-PathButton::PathButton(QWidget* parent) :
-    QToolButton(parent),
-    mode_(DirectoryMode)
+PathButton::PathButton(QWidget* parent)
+    : QToolButton(parent)
 {
     setSizePolicy(QSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed));
     setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
@@ -28,7 +24,7 @@ PathButton::PathButton(QWidget* parent) :
 
     updateAppearance();
 
-    connect(this, SIGNAL(clicked()), this, SLOT(onClicked()));
+    connect(this, &QAbstractButton::clicked, this, &PathButton::onClicked);
 }
 
 void PathButton::setMode(Mode mode)
@@ -84,7 +80,7 @@ void PathButton::paintEvent(QPaintEvent* /*event*/)
     QStyleOptionToolButton option;
     initStyleOption(&option);
 
-    QSize const fake_content_size(qMax(100, qApp->globalStrut().width()), qMax(100, qApp->globalStrut().height()));
+    QSize const fake_content_size(100, 100);
     QSize const fake_size_hint = style()->sizeFromContents(QStyle::CT_ToolButton, &option, fake_content_size, this);
 
     int text_width = width() - (fake_size_hint.width() - fake_content_size.width()) - iconSize().width() - 6;
@@ -101,7 +97,7 @@ void PathButton::paintEvent(QPaintEvent* /*event*/)
     painter.drawComplexControl(QStyle::CC_ToolButton, option);
 }
 
-void PathButton::onClicked()
+void PathButton::onClicked() const
 {
     auto* dialog = new QFileDialog(window(), effectiveTitle());
     dialog->setFileMode(isDirMode() ? QFileDialog::Directory : QFileDialog::ExistingFile);
@@ -131,7 +127,7 @@ void PathButton::onClicked()
         }
     }
 
-    connect(dialog, SIGNAL(fileSelected(QString)), this, SLOT(onFileSelected(QString)));
+    connect(dialog, &QFileDialog::fileSelected, this, &PathButton::onFileSelected);
 
     dialog->setAttribute(Qt::WA_DeleteOnClose);
     dialog->open();
@@ -156,7 +152,7 @@ void PathButton::updateAppearance()
 
     if (!path_.isEmpty() && path_info.exists())
     {
-        icon = icon_provider.icon(path_);
+        icon = icon_provider.icon(QFileInfo(path_));
     }
 
     if (icon.isNull())

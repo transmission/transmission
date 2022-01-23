@@ -1,10 +1,7 @@
-/*
- * This file Copyright (C) 2009-2015 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2009-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #include <algorithm>
 #include <cassert>
@@ -28,10 +25,9 @@
 
 using ::trqt::variant_helpers::change;
 
-Torrent::Torrent(Prefs const& prefs, int id) :
-    id_(id),
-    icon_(IconCache::get().fileIcon()),
-    prefs_(prefs)
+Torrent::Torrent(Prefs const& prefs, int id)
+    : id_(id)
+    , prefs_(prefs)
 {
 }
 
@@ -187,10 +183,11 @@ Torrent::fields_t Torrent::update(tr_quark const* keys, tr_variant const* const*
 
         switch (key)
         {
-#define HANDLE_KEY(key, field, bit) case TR_KEY_ ## key: \
-    field_changed = change(field ## _, child); \
-    changed.set(bit, field_changed); \
-    break;
+#define HANDLE_KEY(key, field, bit) \
+    case TR_KEY_##key: \
+        field_changed = change(field##_, child); \
+        changed.set(bit, field_changed); \
+        break;
 
             HANDLE_KEY(activityDate, activity_date, ACTIVITY_DATE)
             HANDLE_KEY(addedDate, added_date, ADDED_DATE)
@@ -247,14 +244,15 @@ Torrent::fields_t Torrent::update(tr_quark const* keys, tr_variant const* const*
             HANDLE_KEY(webseedsSendingToUs, webseeds_sending_to_us, WEBSEEDS_SENDING_TO_US)
 #undef HANDLE_KEY
 
-#define HANDLE_KEY(key, field, bit) case TR_KEY_ ## key: \
-    field_changed = change(field ## _, child); \
-    if (field_changed) \
-    { \
-        field ## _ = qApp->intern(field ## _); \
-    } \
-    changed.set(bit, field_changed); \
-    break;
+#define HANDLE_KEY(key, field, bit) \
+    case TR_KEY_##key: \
+        field_changed = change(field##_, child); \
+        if (field_changed) \
+        { \
+            field##_ = trApp->intern(field##_); \
+        } \
+        changed.set(bit, field_changed); \
+        break;
 
             HANDLE_KEY(comment, comment, COMMENT)
             HANDLE_KEY(creator, creator, CREATOR)
@@ -279,7 +277,7 @@ Torrent::fields_t Torrent::update(tr_quark const* keys, tr_variant const* const*
 
             case TR_KEY_files:
                 {
-                    for (int i = 0; i < files_.size(); ++i)
+                    for (size_t i = 0; i < files_.size(); ++i)
                     {
                         files_[i].index = i;
                     }
@@ -371,5 +369,5 @@ QString Torrent::getError() const
 
 QPixmap TrackerStat::getFavicon() const
 {
-    return qApp->faviconCache().find(favicon_key);
+    return trApp->faviconCache().find(favicon_key);
 }

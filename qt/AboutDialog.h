@@ -1,20 +1,19 @@
-/*
- * This file Copyright (C) 2010-2015 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2010-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #pragma once
 
 #include <QPointer>
 
+#include <libtransmission/tr-macros.h>
+
 #include "BaseDialog.h"
-#include "Macros.h"
 #include "ui_AboutDialog.h"
 
 class LicenseDialog;
+class Session;
 
 class AboutDialog : public BaseDialog
 {
@@ -22,7 +21,7 @@ class AboutDialog : public BaseDialog
     TR_DISABLE_COPY_MOVE(AboutDialog)
 
 public:
-    AboutDialog(QWidget* parent = nullptr);
+    explicit AboutDialog(Session& session, QWidget* parent = nullptr);
 
 private slots:
     void showCredits();

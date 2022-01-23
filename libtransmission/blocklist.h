@@ -1,10 +1,7 @@
-/*
- * This file Copyright (C) 2008-2014 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2008-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #pragma once
 
@@ -12,13 +9,8 @@
 #error only libtransmission should #include this header.
 #endif
 
-#include "tr-macros.h"
-
-TR_BEGIN_DECLS
-
 struct tr_address;
-
-typedef struct tr_blocklistFile tr_blocklistFile;
+struct tr_blocklistFile;
 
 tr_blocklistFile* tr_blocklistFileNew(char const* filename, bool isEnabled);
 
@@ -37,5 +29,3 @@ void tr_blocklistFileSetEnabled(tr_blocklistFile* b, bool isEnabled);
 bool tr_blocklistFileHasAddress(tr_blocklistFile* b, struct tr_address const* addr);
 
 int tr_blocklistFileSetContent(tr_blocklistFile* b, char const* filename);
-
-TR_END_DECLS

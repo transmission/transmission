@@ -1,10 +1,7 @@
-/*
- * This file Copyright (C) 2007-2014 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2007-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #pragma once
 
@@ -12,7 +9,9 @@
 #error only libtransmission should #include this header.
 #endif
 
-#include <inttypes.h> /* uint16_t */
+#include <cinttypes> // uintX_t
+#include <cstddef> // size_t
+#include <vector>
 
 #ifdef _WIN32
 #include <winsock2.h> /* struct in_addr */
@@ -21,17 +20,20 @@
 #include "net.h" /* tr_address */
 #include "peer-common.h"
 #include "peer-socket.h"
-#include "quark.h"
 
 /**
  * @addtogroup peers Peers
  * @{
  */
 
+class tr_peerIo;
+class tr_peerMsgs;
+class tr_swarm;
 struct UTPSocket;
+struct peer_atom;
+struct tr_peerMgr;
 struct tr_peer_stat;
 struct tr_torrent;
-typedef struct tr_peerMgr tr_peerMgr;
 
 /* added_f's bitwise-or'ed flags */
 enum
@@ -49,20 +51,14 @@ enum
     ADDED_F_CONNECTABLE = 16
 };
 
-typedef struct tr_pex
+struct tr_pex
 {
     tr_address addr;
     tr_port port; /* this field is in network byte order */
     uint8_t flags;
-}
-tr_pex;
+};
 
-struct peer_atom;
-struct tr_peerIo;
-struct tr_peerMsgs;
-struct tr_swarm;
-
-static inline bool tr_isPex(tr_pex const* pex)
+constexpr bool tr_isPex(tr_pex const* pex)
 {
     return pex && tr_address_is_valid(&pex->addr);
 }
@@ -81,25 +77,37 @@ void tr_peerMgrSetUtpSupported(tr_torrent* tor, tr_address const* addr);
 
 void tr_peerMgrSetUtpFailed(tr_torrent* tor, tr_address const* addr, bool failed);
 
-void tr_peerMgrGetNextRequests(tr_torrent* torrent, tr_peer* peer, int numwant, tr_block_index_t* setme, int* numgot,
-    bool get_intervals);
+std::vector<tr_block_span_t> tr_peerMgrGetNextRequests(tr_torrent* torrent, tr_peer const* peer, size_t numwant);
 
 bool tr_peerMgrDidPeerRequest(tr_torrent const* torrent, tr_peer const* peer, tr_block_index_t block);
 
-void tr_peerMgrRebuildRequests(tr_torrent* torrent);
+void tr_peerMgrClientSentRequests(tr_torrent* torrent, tr_peer* peer, tr_block_span_t span);
 
-void tr_peerMgrAddIncoming(tr_peerMgr* manager, tr_address* addr, tr_port port, struct tr_peer_socket const socket);
+size_t tr_peerMgrCountActiveRequestsToPeer(tr_torrent const* torrent, tr_peer const* peer);
 
-tr_pex* tr_peerMgrCompactToPex(void const* compact, size_t compactLen, uint8_t const* added_f, size_t added_f_len,
+void tr_peerMgrAddIncoming(tr_peerMgr* manager, tr_address const* addr, tr_port port, struct tr_peer_socket const socket);
+
+tr_pex* tr_peerMgrCompactToPex(
+    void const* compact,
+    size_t compactLen,
+    uint8_t const* added_f,
+    size_t added_f_len,
     size_t* setme_pex_count);
 
-tr_pex* tr_peerMgrCompact6ToPex(void const* compact, size_t compactLen, uint8_t const* added_f, size_t added_f_len,
+tr_pex* tr_peerMgrCompact6ToPex(
+    void const* compact,
+    size_t compactLen,
+    uint8_t const* added_f,
+    size_t added_f_len,
     size_t* pexCount);
 
-/**
- * @param seedProbability [0..100] for likelihood that the peer is a seed; -1 for unknown
- */
-void tr_peerMgrAddPex(tr_torrent* tor, uint8_t from, tr_pex const* pex, int8_t seedProbability);
+std::vector<tr_pex> tr_peerMgrCompactToPex(void const* compact, size_t compactLen, uint8_t const* added_f, size_t added_f_len);
+
+std::vector<tr_pex> tr_peerMgrCompact6ToPex(void const* compact, size_t compactLen, uint8_t const* added_f, size_t added_f_len);
+
+size_t tr_peerMgrAddPex(tr_torrent* tor, uint8_t from, tr_pex const* pex, size_t n_pex);
+
+void tr_peerMgrSetSwarmIsAllSeeds(tr_torrent* tor);
 
 enum
 {
@@ -107,7 +115,12 @@ enum
     TR_PEERS_INTERESTING
 };
 
-int tr_peerMgrGetPeers(tr_torrent* tor, tr_pex** setme_pex, uint8_t address_type, uint8_t peer_list_mode, int max_peer_count);
+int tr_peerMgrGetPeers(
+    tr_torrent const* tor,
+    tr_pex** setme_pex,
+    uint8_t address_type,
+    uint8_t peer_list_mode,
+    int max_peer_count);
 
 void tr_peerMgrStartTorrent(tr_torrent* tor);
 
@@ -127,7 +140,7 @@ void tr_peerMgrOnBlocklistChanged(tr_peerMgr* manager);
 
 struct tr_peer_stat* tr_peerMgrPeerStats(tr_torrent const* tor, int* setmeCount);
 
-double* tr_peerMgrWebSpeeds_KBps(tr_torrent const* tor);
+tr_webseed_view tr_peerMgrWebseed(tr_torrent const* tor, size_t i);
 
 unsigned int tr_peerGetPieceSpeed_Bps(tr_peer const* peer, uint64_t now, tr_direction direction);
 

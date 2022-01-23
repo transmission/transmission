@@ -1,16 +1,13 @@
-/*
- * This file Copyright (C) 2009-2015 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2009-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #pragma once
 
-#include <array>
 #include <bitset>
 #include <ctime> // time_t
+#include <vector>
 
 #include <QIcon>
 #include <QMetaType>
@@ -18,11 +15,13 @@
 #include <QString>
 
 #include <libtransmission/transmission.h>
+
 #include <libtransmission/crypto-utils.h>
 #include <libtransmission/quark.h>
+#include <libtransmission/tr-macros.h>
 
 #include "FaviconCache.h"
-#include "Macros.h"
+#include "IconCache.h"
 #include "Speed.h"
 
 #ifdef ERROR
@@ -35,7 +34,7 @@ class Prefs;
 
 extern "C"
 {
-struct tr_variant;
+    struct tr_variant;
 }
 
 struct Peer
@@ -57,7 +56,7 @@ struct Peer
     double progress;
 };
 
-using PeerList = QVector<Peer>;
+using PeerList = std::vector<Peer>;
 
 struct TrackerStat
 {
@@ -90,7 +89,7 @@ struct TrackerStat
     QString last_scrape_result;
 };
 
-using TrackerStatsList = QVector<TrackerStat>;
+using TrackerStatsList = std::vector<TrackerStat>;
 
 struct TorrentFile
 {
@@ -102,46 +101,51 @@ struct TorrentFile
     uint64_t have = 0;
 };
 
-using FileList = QVector<TorrentFile>;
+using FileList = std::vector<TorrentFile>;
 
 class TorrentHash
 {
 private:
-    std::array<uint8_t, SHA_DIGEST_LENGTH> data_ = {};
+    tr_sha1_digest_t data_ = {};
 
 public:
-    TorrentHash() {}
-
-    TorrentHash(char const* str)
+    TorrentHash()
     {
-        tr_hex_to_sha1(data_.data(), str);
     }
 
-    TorrentHash(QString const& str)
+    explicit TorrentHash(tr_sha1_digest_t const& data)
+        : data_{ data }
     {
-        tr_hex_to_sha1(data_.data(), str.toUtf8().constData());
     }
 
-    bool operator ==(TorrentHash const& that) const
+    explicit TorrentHash(char const* str)
+    {
+        data_ = tr_sha1_from_string(str != nullptr ? str : "");
+    }
+
+    explicit TorrentHash(QString const& str)
+    {
+        data_ = tr_sha1_from_string(str.toStdString());
+    }
+
+    bool operator==(TorrentHash const& that) const
     {
         return data_ == that.data_;
     }
 
-    bool operator !=(TorrentHash const& that) const
+    bool operator!=(TorrentHash const& that) const
     {
         return data_ != that.data_;
     }
 
-    bool operator <(TorrentHash const& that) const
+    bool operator<(TorrentHash const& that) const
     {
         return data_ < that.data_;
     }
 
     QString toString() const
     {
-        char str[SHA_DIGEST_LENGTH * 2 + 1];
-        tr_sha1_to_hex(str, data_.data());
-        return QString::fromUtf8(str, SHA_DIGEST_LENGTH * 2);
+        return QString::fromStdString(tr_sha1_to_string(data_));
     }
 };
 
@@ -284,7 +288,7 @@ public:
     {
         auto const l = leftUntilDone();
         auto const s = sizeWhenDone();
-        return s ? double(s - l) / s : 0.0;
+        return s ? static_cast<double>(s - l) / static_cast<double>(s) : 0.0;
     }
 
     double metadataPercentDone() const
@@ -666,7 +670,7 @@ private:
     QString name_;
 
     // mutable because it's a lazy lookup
-    mutable QIcon icon_;
+    mutable QIcon icon_ = IconCache::get().fileIcon();
 
     PeerList peers_;
     FileList files_;

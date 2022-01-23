@@ -1,20 +1,18 @@
-/*
- * This file Copyright (C) 2009-2015 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2009-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #pragma once
 
 #include <cstdint> // uint64_t
+#include <memory>
 
 #include <QAbstractItemModel>
 #include <QMap>
 #include <QSet>
 
-#include "Macros.h"
+#include <libtransmission/tr-macros.h>
 
 class FileTreeItem;
 
@@ -43,14 +41,19 @@ public:
         CompleteRole
     };
 
-public:
     FileTreeModel(QObject* parent = nullptr, bool is_editable = true);
     ~FileTreeModel() override;
 
     void setEditable(bool editable);
 
     void clear();
-    void addFile(int index, QString const& filename, bool wanted, int priority, uint64_t size, uint64_t have,
+    void addFile(
+        int index,
+        QString const& filename,
+        bool wanted,
+        int priority,
+        uint64_t size,
+        uint64_t have,
         bool torrent_changed);
 
     bool openFile(QModelIndex const& index);
@@ -82,15 +85,17 @@ signals:
 private:
     void clearSubtree(QModelIndex const&);
     QModelIndex indexOf(FileTreeItem*, int column) const;
-    void emitParentsChanged(QModelIndex const&, int first_column, int last_column,
+    void emitParentsChanged(
+        QModelIndex const&,
+        int first_column,
+        int last_column,
         QSet<QModelIndex>* visited_parent_indices = nullptr);
     void emitSubtreeChanged(QModelIndex const&, int first_column, int last_column);
     FileTreeItem* findItemForFileIndex(int file_index) const;
     FileTreeItem* itemFromIndex(QModelIndex const&) const;
     QModelIndexList getOrphanIndices(QModelIndexList const& indices) const;
 
-private:
     QMap<int, FileTreeItem*> index_cache_;
-    FileTreeItem* root_item_ = {};
+    std::unique_ptr<FileTreeItem> root_item_;
     bool is_editable_ = {};
 };

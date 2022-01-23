@@ -1,20 +1,20 @@
-/*
- * This file Copyright (C) 2009-2015 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2009-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #pragma once
+
+#include <memory>
 
 #include <QString>
 #include <QMap>
 #include <QSet>
 #include <QTimer>
 
+#include <libtransmission/tr-macros.h>
+
 #include "BaseDialog.h"
-#include "Macros.h"
 #include "Session.h"
 #include "Typedefs.h"
 
@@ -37,7 +37,6 @@ class DetailsDialog : public BaseDialog
 
 public:
     DetailsDialog(Session&, Prefs&, TorrentModel const&, QWidget* parent = nullptr);
-    ~DetailsDialog() override;
 
     void setIds(torrent_ids_t const& ids);
 
@@ -51,10 +50,9 @@ private:
     void initPeersTab();
     void initTrackerTab();
     void initInfoTab();
-    void initFilesTab();
+    void initFilesTab() const;
     void initOptionsTab();
 
-    QIcon getStockIcon(QString const& freedesktop_name, int fallback);
     void setEnabled(bool);
 
 private slots:
@@ -78,7 +76,7 @@ private slots:
     void onFilePriorityChanged(QSet<int> const& file_indices, int);
     void onFileWantedChanged(QSet<int> const& file_indices, bool);
     void onPathEdited(QString const& old_path, QString const& new_name);
-    void onOpenRequested(QString const& path);
+    void onOpenRequested(QString const& path) const;
 
     // Options tab
     void onBandwidthPriorityChanged(int);
@@ -96,7 +94,10 @@ private:
        until we know the server has processed the request. This keeps
        the UI from appearing to undo the change if we receive a refresh
        that was already in-flight _before_ the property was edited. */
-    bool canEdit() const { return std::empty(pending_changes_tags_); }
+    bool canEdit() const
+    {
+        return std::empty(pending_changes_tags_);
+    }
     std::unordered_set<Session::Tag> pending_changes_tags_;
     QMetaObject::Connection pending_changes_connection_;
 
@@ -127,12 +128,12 @@ private:
     QTimer model_timer_;
     QTimer ui_debounce_timer_;
 
-    TrackerModel* tracker_model_ = {};
-    TrackerModelFilter* tracker_filter_ = {};
-    TrackerDelegate* tracker_delegate_ = {};
+    std::shared_ptr<TrackerModel> tracker_model_;
+    std::shared_ptr<TrackerModelFilter> tracker_filter_;
+    std::shared_ptr<TrackerDelegate> tracker_delegate_;
 
     QMap<QString, QTreeWidgetItem*> peers_;
 
-    QIcon const icon_encrypted_;
-    QIcon const icon_unencrypted_;
+    QIcon const icon_encrypted_ = QIcon(QStringLiteral(":/icons/encrypted.png"));
+    QIcon const icon_unencrypted_ = {};
 };

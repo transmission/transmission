@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2009 Nokia Corporation and/or its subsidiary(-ies).
+** Copyright © 2009 Nokia Corporation and/or its subsidiary(-ies).
 ** Contact: Qt Software Information (qt-info@nokia.com)
 **
 ** This file is part of the demonstration applications of the Qt Toolkit.
@@ -45,13 +45,13 @@
 
 #include "SqueezeLabel.h"
 
-SqueezeLabel::SqueezeLabel(QString const& text, QWidget* parent) :
-    QLabel(text, parent)
+SqueezeLabel::SqueezeLabel(QString const& text, QWidget* parent)
+    : QLabel(text, parent)
 {
 }
 
-SqueezeLabel::SqueezeLabel(QWidget* parent) :
-    QLabel(parent)
+SqueezeLabel::SqueezeLabel(QWidget* parent)
+    : QLabel(parent)
 {
 }
 

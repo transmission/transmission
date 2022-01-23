@@ -1,10 +1,7 @@
-/*
- * This file Copyright (C) 2009-2015 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2009-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #include <algorithm>
 #include <optional>
@@ -16,8 +13,8 @@
 #include "TorrentModel.h"
 #include "Utils.h"
 
-TorrentFilter::TorrentFilter(Prefs const& prefs) :
-    prefs_(prefs)
+TorrentFilter::TorrentFilter(Prefs const& prefs)
+    : prefs_(prefs)
 {
     connect(&prefs_, &Prefs::changed, this, &TorrentFilter::onPrefChanged);
     connect(&refilter_timer_, &QTimer::timeout, this, &TorrentFilter::refilter);
@@ -142,7 +139,8 @@ bool TorrentFilter::lessThan(QModelIndex const& left, QModelIndex const& right) 
 
         if (val == 0)
         {
-            val = compare(a->peersWeAreUploadingTo() + a->webseedsWeAreDownloadingFrom(),
+            val = compare(
+                a->peersWeAreUploadingTo() + a->webseedsWeAreDownloadingFrom(),
                 b->peersWeAreUploadingTo() + b->webseedsWeAreDownloadingFrom());
         }
 
@@ -253,7 +251,8 @@ bool TorrentFilter::filterAcceptsRow(int source_row, QModelIndex const& source_p
     if (accepts)
     {
         auto const text = prefs_.getString(Prefs::FILTER_TEXT);
-        accepts = text.isEmpty() || tor.name().contains(text, Qt::CaseInsensitive);
+        accepts = text.isEmpty() || tor.name().contains(text, Qt::CaseInsensitive) ||
+            tor.hash().toString().contains(text, Qt::CaseInsensitive);
     }
 
     return accepts;

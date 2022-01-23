@@ -1,13 +1,11 @@
-/*
- * This file Copyright (C) 2009-2015 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2009-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #include <algorithm>
 #include <cassert>
+#include <memory>
 
 #include <libtransmission/transmission.h> // priorities
 
@@ -20,9 +18,9 @@ namespace
 class PathIteratorBase
 {
 protected:
-    PathIteratorBase(QString const& path, int slash_index) :
-        path_(path),
-        slash_index_(slash_index)
+    PathIteratorBase(QString const& path, int slash_index)
+        : path_(path)
+        , slash_index_(slash_index)
     {
         token_.reserve(path.size() / 2);
     }
@@ -39,8 +37,8 @@ QChar const PathIteratorBase::SlashChar = QLatin1Char('/');
 class ForwardPathIterator : public PathIteratorBase
 {
 public:
-    explicit ForwardPathIterator(QString const& path) :
-        PathIteratorBase(path, path.size() - 1)
+    explicit ForwardPathIterator(QString const& path)
+        : PathIteratorBase(path, path.size() - 1)
     {
     }
 
@@ -53,7 +51,7 @@ public:
     {
         int new_slash_index = path_.lastIndexOf(SlashChar, slash_index_);
         token_.truncate(0);
-        token_ += path_.midRef(new_slash_index + 1, slash_index_ - new_slash_index);
+        token_.append(&path_.data()[new_slash_index + 1], slash_index_ - new_slash_index);
         slash_index_ = new_slash_index - 1;
         return token_;
     }
@@ -62,8 +60,8 @@ public:
 class BackwardPathIterator : public PathIteratorBase
 {
 public:
-    explicit BackwardPathIterator(QString const& path) :
-        PathIteratorBase(path, 0)
+    explicit BackwardPathIterator(QString const& path)
+        : PathIteratorBase(path, 0)
     {
     }
 
@@ -82,7 +80,7 @@ public:
         }
 
         token_.truncate(0);
-        token_ += path_.midRef(slash_index_, new_slash_index - slash_index_);
+        token_.append(&path_.data()[slash_index_], new_slash_index - slash_index_);
         slash_index_ = new_slash_index + 1;
         return token_;
     }
@@ -90,18 +88,16 @@ public:
 
 } // namespace
 
-FileTreeModel::FileTreeModel(QObject* parent, bool is_editable) :
-    QAbstractItemModel(parent),
-    root_item_(new FileTreeItem),
-    is_editable_(is_editable)
+FileTreeModel::FileTreeModel(QObject* parent, bool is_editable)
+    : QAbstractItemModel{ parent }
+    , root_item_{ std::make_unique<FileTreeItem>() }
+    , is_editable_{ is_editable }
 {
 }
 
 FileTreeModel::~FileTreeModel()
 {
     clear();
-
-    delete root_item_;
 }
 
 void FileTreeModel::setEditable(bool is_editable)
@@ -171,7 +167,7 @@ Qt::ItemFlags FileTreeModel::flags(QModelIndex const& index) const
 
     if (index.column() == COL_WANTED)
     {
-        i |= Qt::ItemIsUserCheckable | Qt::ItemIsTristate;
+        i |= Qt::ItemIsUserCheckable | Qt::ItemIsAutoTristate;
     }
 
     return Qt::ItemFlags(i);
@@ -181,7 +177,7 @@ bool FileTreeModel::setData(QModelIndex const& index, QVariant const& newname, i
 {
     if (role == Qt::EditRole)
     {
-        FileTreeItem* item = itemFromIndex(index);
+        FileTreeItem const* item = itemFromIndex(index);
 
         emit pathEdited(item->path(), newname.toString());
     }
@@ -233,7 +229,7 @@ QModelIndex FileTreeModel::index(int row, int column, QModelIndex const& parent)
 
         if (!parent.isValid())
         {
-            parent_item = root_item_;
+            parent_item = root_item_.get();
         }
         else
         {
@@ -270,9 +266,7 @@ QModelIndex FileTreeModel::parent(QModelIndex const& child, int column) const
 
 int FileTreeModel::rowCount(QModelIndex const& parent) const
 {
-    FileTreeItem* parent_item = parent.isValid() ?
-        itemFromIndex(parent) :
-        root_item_;
+    FileTreeItem const* parent_item = parent.isValid() ? itemFromIndex(parent) : root_item_.get();
 
     return parent_item->childCount();
 }
@@ -286,7 +280,7 @@ int FileTreeModel::columnCount(QModelIndex const& parent) const
 
 QModelIndex FileTreeModel::indexOf(FileTreeItem* item, int column) const
 {
-    if (item == nullptr || item == root_item_)
+    if (item == nullptr || item == root_item_.get())
     {
         return QModelIndex();
     }
@@ -322,6 +316,7 @@ void FileTreeModel::clear()
 {
     beginResetModel();
     clearSubtree(QModelIndex());
+    root_item_ = std::make_unique<FileTreeItem>();
     endResetModel();
 
     assert(index_cache_.isEmpty());
@@ -332,8 +327,14 @@ FileTreeItem* FileTreeModel::findItemForFileIndex(int file_index) const
     return index_cache_.value(file_index, nullptr);
 }
 
-void FileTreeModel::addFile(int file_index, QString const& filename, bool wanted, int priority, uint64_t total_size,
-    uint64_t have, bool update_fields)
+void FileTreeModel::addFile(
+    int file_index,
+    QString const& filename,
+    bool wanted,
+    int priority,
+    uint64_t total_size,
+    uint64_t have,
+    bool update_fields)
 {
     FileTreeItem* item;
 
@@ -362,7 +363,7 @@ void FileTreeModel::addFile(int file_index, QString const& filename, bool wanted
             item = item->parent();
         }
 
-        assert(item == root_item_);
+        assert(item == root_item_.get());
 
         if (index_with_changed_parents.isValid())
         {
@@ -373,7 +374,7 @@ void FileTreeModel::addFile(int file_index, QString const& filename, bool wanted
     {
         bool added = false;
 
-        item = root_item_;
+        item = root_item_.get();
         BackwardPathIterator filename_it(filename);
 
         while (filename_it.hasNext())
@@ -405,7 +406,7 @@ void FileTreeModel::addFile(int file_index, QString const& filename, bool wanted
             item = child;
         }
 
-        if (item != root_item_)
+        if (item != root_item_.get())
         {
             assert(item->fileIndex() == file_index);
             assert(item->totalSize() == total_size);
@@ -422,7 +423,10 @@ void FileTreeModel::addFile(int file_index, QString const& filename, bool wanted
     }
 }
 
-void FileTreeModel::emitParentsChanged(QModelIndex const& index, int first_column, int last_column,
+void FileTreeModel::emitParentsChanged(
+    QModelIndex const& index,
+    int first_column,
+    int last_column,
     QSet<QModelIndex>* visited_parent_indices)
 {
     assert(first_column <= last_column);
@@ -602,7 +606,7 @@ bool FileTreeModel::openFile(QModelIndex const& index)
         return false;
     }
 
-    FileTreeItem* const item = itemFromIndex(index);
+    FileTreeItem const* const item = itemFromIndex(index);
 
     if (item->fileIndex() < 0 || !item->isComplete())
     {

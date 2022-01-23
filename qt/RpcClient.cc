@@ -1,17 +1,14 @@
-/*
- * This file Copyright (C) 2014-2016 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2014-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
+
+#include <string_view>
 
 #include "RpcClient.h"
 
-#include <cstring>
-#include <iostream>
-
 #include <QApplication>
+#include <QAuthenticator>
 #include <QHostAddress>
 #include <QNetworkAccessManager>
 #include <QNetworkReply>
@@ -31,8 +28,8 @@ using ::trqt::variant_helpers::variantInit;
 namespace
 {
 
-char const constexpr* const RequestDataPropertyKey { "requestData" };
-char const constexpr* const RequestFutureinterfacePropertyKey { "requestReplyFutureInterface" };
+char const constexpr* const RequestDataPropertyKey{ "requestData" };
+char const constexpr* const RequestFutureinterfacePropertyKey{ "requestReplyFutureInterface" };
 
 bool const Verbose = tr_env_key_exists("TR_RPC_VERBOSE");
 
@@ -49,8 +46,8 @@ TrVariantPtr createVariant()
 
 } // namespace
 
-RpcClient::RpcClient(QObject* parent) :
-    QObject(parent)
+RpcClient::RpcClient(QObject* parent)
+    : QObject(parent)
 {
     qRegisterMetaType<TrVariantPtr>("TrVariantPtr");
 }
@@ -132,8 +129,9 @@ void RpcClient::sendNetworkRequest(TrVariantPtr json, QFutureInterface<RpcRespon
     {
         QNetworkRequest request;
         request.setUrl(url_);
-        request.setRawHeader("User-Agent", (qApp->applicationName() + QLatin1Char('/') + QString::fromUtf8(
-            LONG_VERSION_STRING)).toUtf8());
+        request.setRawHeader(
+            "User-Agent",
+            (QApplication::applicationName() + QLatin1Char('/') + QString::fromUtf8(LONG_VERSION_STRING)).toUtf8());
         request.setRawHeader("Content-Type", "application/json; charset=UTF-8");
         if (!session_id_.isEmpty())
         {
@@ -143,28 +141,26 @@ void RpcClient::sendNetworkRequest(TrVariantPtr json, QFutureInterface<RpcRespon
         request_ = request;
     }
 
-    size_t raw_json_data_length;
-    auto* raw_json_data = tr_variantToStr(json.get(), TR_VARIANT_FMT_JSON_LEAN, &raw_json_data_length);
-    QByteArray json_data(raw_json_data, raw_json_data_length);
-    tr_free(raw_json_data);
-
+    auto const json_data = QByteArray::fromStdString(tr_variantToStr(json.get(), TR_VARIANT_FMT_JSON_LEAN));
     QNetworkReply* reply = networkAccessManager()->post(*request_, json_data);
     reply->setProperty(RequestDataPropertyKey, QVariant::fromValue(json));
     reply->setProperty(RequestFutureinterfacePropertyKey, QVariant::fromValue(promise));
 
-    connect(reply, SIGNAL(downloadProgress(qint64, qint64)), this, SIGNAL(dataReadProgress()));
-    connect(reply, SIGNAL(uploadProgress(qint64, qint64)), this, SIGNAL(dataSendProgress()));
+    connect(reply, &QNetworkReply::downloadProgress, this, &RpcClient::dataReadProgress);
+    connect(reply, &QNetworkReply::uploadProgress, this, &RpcClient::dataSendProgress);
 
     if (Verbose)
     {
-        std::cerr << "sending " << "POST " << qPrintable(url_.path()) << std::endl;
+        qInfo() << "sending"
+                << "POST" << qPrintable(url_.path());
 
         for (QByteArray const& b : request_->rawHeaderList())
         {
-            std::cerr << b.constData() << ": " << request_->rawHeader(b).constData() << std::endl;
+            qInfo() << b.constData() << ": " << request_->rawHeader(b).constData();
         }
 
-        std::cerr << "Body:\n" << json_data.constData() << std::endl;
+        qInfo() << "Body:";
+        qInfo() << json_data.constData();
     }
 }
 
@@ -203,10 +199,9 @@ QNetworkAccessManager* RpcClient::networkAccessManager()
     {
         nam_ = new QNetworkAccessManager();
 
-        connect(nam_, SIGNAL(finished(QNetworkReply*)), this, SLOT(networkRequestFinished(QNetworkReply*)));
+        connect(nam_, &QNetworkAccessManager::finished, this, &RpcClient::networkRequestFinished);
 
-        connect(nam_, SIGNAL(authenticationRequired(QNetworkReply*, QAuthenticator*)), this,
-            SIGNAL(httpAuthenticationRequired()));
+        connect(nam_, &QNetworkAccessManager::authenticationRequired, this, &RpcClient::httpAuthenticationRequired);
     }
 
     return nam_;
@@ -231,19 +226,19 @@ void RpcClient::networkRequestFinished(QNetworkReply* reply)
 {
     reply->deleteLater();
 
-    auto promise = reply->property(RequestFutureinterfacePropertyKey).
-        value<QFutureInterface<RpcResponse>>();
+    auto promise = reply->property(RequestFutureinterfacePropertyKey).value<QFutureInterface<RpcResponse>>();
 
     if (Verbose)
     {
-        std::cerr << "http response header: " << std::endl;
+        qInfo() << "http response header:";
 
         for (QByteArray const& b : reply->rawHeaderList())
         {
-            std::cerr << b.constData() << ": " << reply->rawHeader(b).constData() << std::endl;
+            qInfo() << b.constData() << ": " << reply->rawHeader(b).constData();
         }
 
-        std::cerr << "json:\n" << reply->peek(reply->bytesAvailable()).constData() << std::endl;
+        qInfo() << "json:";
+        qInfo() << reply->peek(reply->bytesAvailable()).constData();
     }
 
     if (reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt() == 409 &&
@@ -270,12 +265,12 @@ void RpcClient::networkRequestFinished(QNetworkReply* reply)
     }
     else
     {
-        RpcResponse result;
-
         QByteArray const json_data = reply->readAll().trimmed();
-        TrVariantPtr json = createVariant();
+        auto const json_sv = std::string_view{ std::data(json_data), size_t(std::size(json_data)) };
 
-        if (tr_variantFromJson(json.get(), json_data.constData(), json_data.size()) == 0)
+        TrVariantPtr json = createVariant();
+        RpcResponse result;
+        if (tr_variantFromBuf(json.get(), TR_VARIANT_PARSE_JSON, json_sv))
         {
             result = parseResponseData(*json);
         }
@@ -296,13 +291,13 @@ void RpcClient::localRequestFinished(TrVariantPtr response)
     promise.reportFinished(&result);
 }
 
-int64_t RpcClient::parseResponseTag(tr_variant& json)
+int64_t RpcClient::parseResponseTag(tr_variant& json) const
 {
     auto const tag = dictFind<int>(&json, TR_KEY_tag);
     return tag ? *tag : -1;
 }
 
-RpcResponse RpcClient::parseResponseData(tr_variant& json)
+RpcResponse RpcClient::parseResponseData(tr_variant& json) const
 {
     RpcResponse ret;
 

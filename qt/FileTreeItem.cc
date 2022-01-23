@@ -1,14 +1,11 @@
-/*
- * This file Copyright (C) 2009-2015 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2009-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #include <algorithm>
-#include <array>
 #include <cassert>
+#include <set>
 
 #include <QApplication>
 #include <QStyle>
@@ -22,7 +19,7 @@
 
 QHash<QString, int> const& FileTreeItem::getMyChildRows()
 {
-    size_t const n = childCount();
+    int const n = childCount();
 
     // ensure that all the rows are hashed
     while (first_unhashed_row_ < n)
@@ -50,7 +47,7 @@ FileTreeItem::~FileTreeItem()
 
 void FileTreeItem::appendChild(FileTreeItem* child)
 {
-    size_t const n = childCount();
+    int const n = childCount();
     child->parent_ = this;
     children_.append(child);
     first_unhashed_row_ = n;
@@ -114,7 +111,7 @@ QVariant FileTreeItem::data(int column, int role) const
     case Qt::TextAlignmentRole:
         if (column == FileTreeModel::COL_SIZE)
         {
-            value = Qt::AlignRight + Qt::AlignVCenter;
+            value = static_cast<int>(Qt::AlignRight | Qt::AlignVCenter);
         }
 
         break;
@@ -167,14 +164,12 @@ QVariant FileTreeItem::data(int column, int role) const
         {
             if (file_index_ < 0)
             {
-                value = qApp->style()->standardIcon(QStyle::SP_DirOpenIcon);
+                value = QApplication::style()->standardIcon(QStyle::SP_DirOpenIcon);
             }
             else
             {
-                auto& icon_cache = IconCache::get();
-                value = childCount() > 0 ?
-                    icon_cache.folderIcon() :
-                    icon_cache.guessMimeIcon(name(), icon_cache.fileIcon());
+                auto const& icon_cache = IconCache::get();
+                value = childCount() > 0 ? icon_cache.folderIcon() : icon_cache.guessMimeIcon(name(), icon_cache.fileIcon());
             }
         }
 
@@ -234,8 +229,7 @@ uint64_t FileTreeItem::size() const
 
 std::pair<int, int> FileTreeItem::update(QString const& name, bool wanted, int priority, uint64_t have_size, bool update_fields)
 {
-    int changed_count = 0;
-    std::array<int, FileTreeModel::NUM_COLUMNS> changed_columns = {};
+    auto changed_columns = std::set<int>{};
 
     if (name_ != name)
     {
@@ -245,7 +239,7 @@ std::pair<int, int> FileTreeItem::update(QString const& name, bool wanted, int p
         }
 
         name_ = name;
-        changed_columns[changed_count++] = FileTreeModel::COL_NAME;
+        changed_columns.insert(FileTreeModel::COL_NAME);
     }
 
     if (fileIndex() != -1)
@@ -253,7 +247,7 @@ std::pair<int, int> FileTreeItem::update(QString const& name, bool wanted, int p
         if (have_size_ != have_size)
         {
             have_size_ = have_size;
-            changed_columns[changed_count++] = FileTreeModel::COL_PROGRESS;
+            changed_columns.insert(FileTreeModel::COL_PROGRESS);
         }
 
         if (update_fields)
@@ -261,24 +255,23 @@ std::pair<int, int> FileTreeItem::update(QString const& name, bool wanted, int p
             if (is_wanted_ != wanted)
             {
                 is_wanted_ = wanted;
-                changed_columns[changed_count++] = FileTreeModel::COL_WANTED;
+                changed_columns.insert(FileTreeModel::COL_WANTED);
             }
 
             if (priority_ != priority)
             {
                 priority_ = priority;
-                changed_columns[changed_count++] = FileTreeModel::COL_PRIORITY;
+                changed_columns.insert(FileTreeModel::COL_PRIORITY);
             }
         }
     }
 
     std::pair<int, int> changed(-1, -1);
 
-    if (changed_count > 0)
+    if (!changed_columns.empty())
     {
-        std::sort(changed_columns.begin(), changed_columns.end());
-        changed.first = changed_columns.front();
-        changed.second = changed_columns.back();
+        changed.first = *std::cbegin(changed_columns);
+        changed.second = *std::crbegin(changed_columns);
     }
 
     return changed;

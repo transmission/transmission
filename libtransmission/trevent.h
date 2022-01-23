@@ -1,10 +1,7 @@
-/*
- * This file Copyright (C) 2007-2014 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2007-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #pragma once
 
@@ -14,14 +11,10 @@
 
 #include "tr-macros.h"
 
-TR_BEGIN_DECLS
-
 void tr_eventInit(tr_session*);
 
 void tr_eventClose(tr_session*);
 
 bool tr_amInEventThread(tr_session const*);
 
-void tr_runInEventThread(tr_session*, void (* func)(void*), void* user_data);
-
-TR_END_DECLS
+void tr_runInEventThread(tr_session*, void (*func)(void*), void* user_data);

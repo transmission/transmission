@@ -1,11 +1,7 @@
-/**
- * @license
- *
- * This file Copyright (C) 2020 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- */
+/* @license This file Copyright (C) 2020-2022 Mnemosyne LLC.
+   It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+   or any future license endorsed by Mnemosyne LLC.
+   License text can be found in the licenses/ folder. */
 
 const plural_rules = new Intl.PluralRules();
 const current_locale = plural_rules.resolvedOptions().locale;
@@ -30,15 +26,21 @@ const fmt_MBps = new Intl.NumberFormat(current_locale, {
   unit: 'megabyte-per-second',
 });
 
-export class Formatter {
-  static countString(msgid, msgid_plural, n) {
+export const Formatter = {
+  /** Round a string of a number to a specified number of decimal places */
+  _toTruncFixed(number, places) {
+    const returnValue = Math.floor(number * 10 ** places) / 10 ** places;
+    return returnValue.toFixed(places);
+  },
+
+  countString(msgid, msgid_plural, n) {
     return `${this.number(n)} ${this.ngettext(msgid, msgid_plural, n)}`;
-  }
+  },
 
   // Formats the a memory size into a human-readable string
   // @param {Number} bytes the filesize in bytes
   // @return {String} human-readable string
-  static mem(bytes) {
+  mem(bytes) {
     if (bytes < 0) {
       return 'Unknown';
     }
@@ -55,22 +57,26 @@ export class Formatter {
     }
 
     return 'E2BIG';
-  }
+  },
 
-  static ngettext(msgid, msgid_plural, n) {
+  ngettext(msgid, msgid_plural, n) {
     return plural_rules.select(n) === 'one' ? msgid : msgid_plural;
-  }
+  },
+
+  number(number) {
+    return number_format.format(number);
+  },
 
   // format a percentage to a string
-  static percentString(x) {
+  percentString(x) {
     const decimal_places = x < 100 ? 1 : 0;
     return this._toTruncFixed(x, decimal_places);
-  }
+  },
 
   /*
    *   Format a ratio to a string
    */
-  static ratioString(x) {
+  ratioString(x) {
     if (x === -1) {
       return 'None';
     }
@@ -78,32 +84,32 @@ export class Formatter {
       return '&infin;';
     }
     return this.percentString(x);
-  }
+  },
 
   /**
    * Formats the a disk capacity or file size into a human-readable string
    * @param {Number} bytes the filesize in bytes
    * @return {String} human-readable string
    */
-  static size(bytes) {
+  size(bytes) {
     return this.mem(bytes);
-  }
+  },
 
-  static speed(KBps) {
+  speed(KBps) {
     return KBps < 999.95 ? fmt_kBps.format(KBps) : fmt_MBps.format(KBps / 1000);
-  }
+  },
 
-  static speedBps(Bps) {
+  speedBps(Bps) {
     return this.speed(this.toKBps(Bps));
-  }
+  },
 
-  static timeInterval(seconds) {
-    const days = Math.floor(seconds / 86400);
+  timeInterval(seconds) {
+    const days = Math.floor(seconds / 86_400);
     if (days) {
       return this.countString('day', 'days', days);
     }
 
-    const hours = Math.floor((seconds % 86400) / 3600);
+    const hours = Math.floor((seconds % 86_400) / 3600);
     if (hours) {
       return this.countString('hour', 'hours', hours);
     }
@@ -115,9 +121,9 @@ export class Formatter {
 
     seconds = Math.floor(seconds % 60);
     return this.countString('second', 'seconds', seconds);
-  }
+  },
 
-  static timestamp(seconds) {
+  timestamp(seconds) {
     if (!seconds) {
       return 'N/A';
     }
@@ -168,19 +174,9 @@ export class Formatter {
     time = [hours, minutes, seconds].join(':');
 
     return [date, time, period].join(' ');
-  }
+  },
 
-  static toKBps(Bps) {
+  toKBps(Bps) {
     return Math.floor(Bps / kilo);
-  }
-
-  static number(number) {
-    return number_format.format(number);
-  }
-
-  /** Round a string of a number to a specified number of decimal places */
-  static _toTruncFixed(number, places) {
-    const returnValue = Math.floor(number * 10 ** places) / 10 ** places;
-    return returnValue.toFixed(places);
-  }
-}
+  },
+};

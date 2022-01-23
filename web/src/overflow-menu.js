@@ -1,11 +1,7 @@
-/**
- * @license
- *
- * This file Copyright (C) 2020 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- */
+/* @license This file Copyright (C) 2020-2022 Mnemosyne LLC.
+   It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+   or any future license endorsed by Mnemosyne LLC.
+   License text can be found in the licenses/ folder. */
 
 import { Formatter } from './formatter.js';
 import { Prefs } from './prefs.js';
@@ -318,7 +314,7 @@ export class OverflowMenu extends EventTarget {
     select.addEventListener('change', (event_) => {
       const { value } = event_.target;
       console.log(event_);
-      if (event_.target.value === unlimited) {
+      if (value === unlimited) {
         this.remote.savePrefs({ [RPC._UpSpeedLimited]: false });
       } else {
         this.remote.savePrefs({
@@ -361,7 +357,7 @@ export class OverflowMenu extends EventTarget {
     select.addEventListener('change', (event_) => {
       const { value } = event_.target;
       console.log(event_);
-      if (event_.target.value === unlimited) {
+      if (value === unlimited) {
         this.remote.savePrefs({ [RPC._DownSpeedLimited]: false });
       } else {
         this.remote.savePrefs({
@@ -460,7 +456,8 @@ export class OverflowMenu extends EventTarget {
     e.textContent = 'Source Code';
     options.append(e);
 
-    Object.values(actions).forEach(this._updateElement.bind(this));
+    this._updateElement = this._updateElement.bind(this);
+
     return { actions, elements, root };
   }
 }

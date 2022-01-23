@@ -2,11 +2,11 @@ version: '{build}'
 
 environment:
   AWS_ACCESS_KEY_ID:
-    secure: JH2KJ09654cSwhYup2MKb80kK60+nezvUmFzBay7tUI=
+    secure: WQRc7y9bDiWiLpjm9lXdw9Q7n4extWau3W1ztQdqMgU=
   AWS_SECRET_ACCESS_KEY:
-    secure: fum5aRKLhJvxh3UQhiQVt2acV4eke8GiGdMhHIW/uuQC7wztj4T9tJWp5IO1U7m4
+    secure: pP+D6ZtfXLDcEnl8pk/n3KApaV1fdGns4VkSyebs0zHzCutlvWj7ee16PalCcnBY
   AWS_S3_BUCKET_NAME:
-    secure: Bf3x1Iruxg+l3tp+an+g9kWhBexLLw/69gEt9bEu7Zk=
+    secure: Bf3x1Iruxg+l3tp+an+g9oE36EHxvyWrE8GTJzZh4Ss=
 
   matrix:
   - APPVEYOR_BUILD_WORKER_IMAGE: Visual Studio 2019
@@ -26,7 +26,7 @@ for:
   - pwsh: |
       $Version = git describe --tags --abbrev=10 --always
       if ($Version -ne $Env:APPVEYOR_REPO_BRANCH) {
-          $version += "-${Env:APPVEYOR_REPO_BRANCH}"
+          $Version += "-${Env:APPVEYOR_REPO_BRANCH}"
       }
 
       $BuildIndex = 0
@@ -41,7 +41,6 @@ for:
       choco install ActivePerl
       choco install nasm
       choco install jom
-      choco install imagemagick.tool --version 7.0.10.29
       choco install wixtoolset --version 3.11.2
 
       Remove-Item -Path (Join-Path $Env:SystemDrive OpenSSL-Win32) -Recurse
@@ -63,7 +62,8 @@ for:
       try {
           & (Join-Path $Env:APPVEYOR_BUILD_FOLDER release windows main.ps1) `
               -Mode Build `
-              -BuildArch $env:TR_ARCH
+              -BuildArch $env:TR_ARCH `
+              -PackDebugSyms:$($Env:APPVEYOR_REPO_BRANCH -eq "main" -or $Env:APPVEYOR_REPO_TAG -eq "true")
       } catch {
           Write-Error ("{1}{0}{2}{0}{3}" -f [Environment]::NewLine, $_.ToString(), $_.InvocationInfo.PositionMessage, $_.ScriptStackTrace) -ErrorAction Continue
           exit 1
@@ -84,7 +84,7 @@ for:
 
   artifacts:
   - path: '*.msi'
-  - path: '*-pdb.zip'
+  - path: '*-pdb.7z'
 
   deploy:
   - provider: Webhook

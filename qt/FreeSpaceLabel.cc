@@ -1,10 +1,7 @@
-/*
- * This file Copyright (C) 2013-2016 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2013-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #include <QDir>
 
@@ -27,14 +24,14 @@ int const IntervalMSec = 15000;
 
 } // namespace
 
-FreeSpaceLabel::FreeSpaceLabel(QWidget* parent) :
-    QLabel(parent),
-    timer_(this)
+FreeSpaceLabel::FreeSpaceLabel(QWidget* parent)
+    : QLabel(parent)
+    , timer_(this)
 {
     timer_.setSingleShot(true);
     timer_.setInterval(IntervalMSec);
 
-    connect(&timer_, SIGNAL(timeout()), this, SLOT(onTimer()));
+    connect(&timer_, &QTimer::timeout, this, &FreeSpaceLabel::onTimer);
 }
 
 void FreeSpaceLabel::setSession(Session& session)
@@ -71,14 +68,12 @@ void FreeSpaceLabel::onTimer()
     tr_variantInitDict(&args, 1);
     dictAdd(&args, TR_KEY_path, path_);
 
-    auto* q = new RpcQueue();
+    auto* q = new RpcQueue(this);
 
-    q->add([this, &args]()
-        {
-            return session_->exec("free-space", &args);
-        });
+    q->add([this, &args]() { return session_->exec("free-space", &args); });
 
-    q->add([this](RpcResponse const& r)
+    q->add(
+        [this](RpcResponse const& r)
         {
             // update the label
             auto const bytes = dictFind<int64_t>(r.args.get(), TR_KEY_size_bytes);

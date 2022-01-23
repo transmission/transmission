@@ -1,11 +1,7 @@
-/**
- * @license
- *
- * This file Copyright (C) 2020 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- */
+/* @license This file Copyright (C) 2020-2022 Mnemosyne LLC.
+   It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+   or any future license endorsed by Mnemosyne LLC.
+   License text can be found in the licenses/ folder. */
 
 import { AlertDialog } from './alert-dialog.js';
 import { Formatter } from './formatter.js';
@@ -53,8 +49,8 @@ export class OpenDialog extends EventTarget {
   }
 
   _onConfirm() {
-    const { remote } = this;
-    const { file_input, folder_input, start_input, url_input } = this.elements;
+    const { controller, elements, remote } = this;
+    const { file_input, folder_input, start_input, url_input } = elements;
     const paused = !start_input.checked;
     const destination = folder_input.value.trim();
 
@@ -79,7 +75,7 @@ export class OpenDialog extends EventTarget {
         remote.sendRequest(o, (response) => {
           if (response.result !== 'success') {
             alert(`Error adding "${file.name}": ${response.result}`);
-            this.controller.setCurrentPopup(
+            controller.setCurrentPopup(
               new AlertDialog({
                 heading: `Error adding "${file.name}"`,
                 message: response.result,
@@ -93,7 +89,7 @@ export class OpenDialog extends EventTarget {
 
     let url = url_input.value.trim();
     if (url.length > 0) {
-      if (url.match(/^[\da-f]{40}$/i)) {
+      if (/^[\da-f]{40}$/i.test(url)) {
         url = `magnet:?xt=urn:btih:${url}`;
       }
       const o = {
@@ -107,7 +103,7 @@ export class OpenDialog extends EventTarget {
       console.log(o);
       remote.sendRequest(o, (payload, response) => {
         if (response.result !== 'success') {
-          this.controller.setCurrentPopup(
+          controller.setCurrentPopup(
             new AlertDialog({
               heading: `Error adding "${url}"`,
               message: response.result,

@@ -1,11 +1,7 @@
-/**
- * @license
- *
- * This file Copyright (C) 2020 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- */
+/* @license This file Copyright (C) 2020-2022 Mnemosyne LLC.
+   It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+   or any future license endorsed by Mnemosyne LLC.
+   License text can be found in the licenses/ folder. */
 
 import { Formatter } from './formatter.js';
 import { Prefs } from './prefs.js';
@@ -122,6 +118,12 @@ export class Torrent extends EventTarget {
         case 'trackers': // ...so only save 'trackers' if we don't have it already
           if (!(key in this.fields)) {
             changed |= this.setField(this.fields, key, value);
+          }
+          break;
+        case 'name':
+          if (this.setField(this.fields, key, data[key])) {
+            this.fields.collatedName = '';
+            changed = true;
           }
           break;
         default:

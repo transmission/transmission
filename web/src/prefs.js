@@ -1,11 +1,7 @@
-/**
- * @license
- *
- * This file Copyright (C) 2020 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- */
+/* @license This file Copyright (C) 2020-2022 Mnemosyne LLC.
+   It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+   or any future license endorsed by Mnemosyne LLC.
+   License text can be found in the licenses/ folder. */
 
 import { debounce } from './utils.js';
 
@@ -66,7 +62,8 @@ export class Prefs extends EventTarget {
   static _setCookie(key, value) {
     const date = new Date();
     date.setFullYear(date.getFullYear() + 1);
-    document.cookie = `${key}=${value}; SameSite=Strict; expires=${date.toGMTString()}; path=/`;
+    // eslint-disable-next-line unicorn/no-document-cookie
+    document.cookie = `${key}=${value}; SameSite=Strict; expires=${date.toGMTString()}`;
   }
 
   static _getCookie(key, fallback) {
@@ -80,7 +77,7 @@ export class Prefs extends EventTarget {
     if (value === 'false') {
       return false;
     }
-    if (value.match(/^\d+$/)) {
+    if (/^\d+$/.test(value)) {
       return Number.parseInt(value, 10);
     }
     return value;

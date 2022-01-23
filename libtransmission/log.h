@@ -1,10 +1,7 @@
-/*
- * This file Copyright (C) 2010-2014 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2010-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #pragma once
 
@@ -12,9 +9,6 @@
 
 #include "file.h" /* tr_sys_file_t */
 #include "tr-macros.h"
-#include "utils.h" /* TR_GNUC_PRINTF, TR_GNUC_NONNULL */
-
-TR_BEGIN_DECLS
 
 #define TR_LOG_MAX_QUEUE_LENGTH 10000
 
@@ -25,7 +19,7 @@ static inline bool tr_logLevelIsActive(tr_log_level level)
     return tr_logGetLevel() >= level;
 }
 
-void tr_logAddMessage(char const* file, int line, tr_log_level level, char const* torrent, char const* fmt, ...) \
+void tr_logAddMessage(char const* file, int line, tr_log_level level, char const* torrent, char const* fmt, ...)
     TR_GNUC_PRINTF(5, 6);
 
 #define tr_logAddNamed(level, name, ...) \
@@ -35,8 +29,7 @@ void tr_logAddMessage(char const* file, int line, tr_log_level level, char const
         { \
             tr_logAddMessage(__FILE__, __LINE__, level, name, __VA_ARGS__); \
         } \
-    } \
-    while (0)
+    } while (0)
 
 #define tr_logAddNamedError(name, ...) tr_logAddNamed(TR_LOG_ERROR, name, __VA_ARGS__)
 #define tr_logAddNamedInfo(name, ...) tr_logAddNamed(TR_LOG_INFO, name, __VA_ARGS__)
@@ -48,7 +41,7 @@ void tr_logAddMessage(char const* file, int line, tr_log_level level, char const
 #define tr_logAddTorInfo(tor, ...) tr_logAddTor(TR_LOG_INFO, tor, __VA_ARGS__)
 #define tr_logAddTorDbg(tor, ...) tr_logAddTor(TR_LOG_DEBUG, tor, __VA_ARGS__)
 
-#define tr_logAdd(level, ...) tr_logAddNamed(level, NULL, __VA_ARGS__)
+#define tr_logAdd(level, ...) tr_logAddNamed(level, nullptr, __VA_ARGS__)
 
 #define tr_logAddError(...) tr_logAdd(TR_LOG_ERROR, __VA_ARGS__)
 #define tr_logAddInfo(...) tr_logAdd(TR_LOG_INFO, __VA_ARGS__)
@@ -56,10 +49,10 @@ void tr_logAddMessage(char const* file, int line, tr_log_level level, char const
 
 tr_sys_file_t tr_logGetFile(void);
 
-/** @brief return true if deep logging has been enabled by the user; false otherwise */
+/** @brief return true if deep logging has been enabled by the user, false otherwise */
 bool tr_logGetDeepEnabled(void);
 
-void tr_logAddDeep(char const* file, int line, char const* name, char const* fmt, ...) TR_GNUC_PRINTF(4, 5) \
+void tr_logAddDeep(char const* file, int line, char const* name, char const* fmt, ...) TR_GNUC_PRINTF(4, 5)
     TR_GNUC_NONNULL(1, 4);
 
 #define tr_logAddDeepNamed(name, ...) \
@@ -69,12 +62,9 @@ void tr_logAddDeep(char const* file, int line, char const* name, char const* fmt
         { \
             tr_logAddDeep(__FILE__, __LINE__, name, __VA_ARGS__); \
         } \
-    } \
-    while (0)
+    } while (0)
 
 /** @brief set the buffer with the current time formatted for deep logging. */
 char* tr_logGetTimeStr(char* buf, size_t buflen) TR_GNUC_NONNULL(1);
 
 /** @} */
-
-TR_END_DECLS

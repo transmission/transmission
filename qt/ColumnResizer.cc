@@ -1,21 +1,17 @@
-/*
- * This file Copyright (C) 2015 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2015-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #include <QEvent>
 #include <QGridLayout>
-#include <QTimer>
 
 #include "ColumnResizer.h"
 
 namespace
 {
 
-int itemColumnSpan(QGridLayout* layout, QLayoutItem const* item)
+int itemColumnSpan(QGridLayout const* layout, QLayoutItem const* item)
 {
     for (int i = 0, count = layout->count(); i < count; ++i)
     {
@@ -37,12 +33,11 @@ int itemColumnSpan(QGridLayout* layout, QLayoutItem const* item)
 
 } // namespace
 
-ColumnResizer::ColumnResizer(QObject* parent) :
-    QObject(parent),
-    timer_(new QTimer(this))
+ColumnResizer::ColumnResizer(QObject* parent)
+    : QObject(parent)
 {
-    timer_->setSingleShot(true);
-    connect(timer_, SIGNAL(timeout()), SLOT(update()));
+    timer_.setSingleShot(true);
+    connect(&timer_, &QTimer::timeout, this, &ColumnResizer::update);
 }
 
 void ColumnResizer::addLayout(QGridLayout* layout)
@@ -61,15 +56,15 @@ bool ColumnResizer::eventFilter(QObject* object, QEvent* event)
     return QObject::eventFilter(object, event);
 }
 
-void ColumnResizer::update()
+void ColumnResizer::update() const
 {
     int max_width = 0;
 
-    for (QGridLayout* const layout : layouts_)
+    for (QGridLayout const* const layout : layouts_)
     {
         for (int i = 0, count = layout->rowCount(); i < count; ++i)
         {
-            QLayoutItem* item = layout->itemAtPosition(i, 0);
+            QLayoutItem const* const item = layout->itemAtPosition(i, 0);
 
             if (item == nullptr || itemColumnSpan(layout, item) > 1)
             {
@@ -88,5 +83,5 @@ void ColumnResizer::update()
 
 void ColumnResizer::scheduleUpdate()
 {
-    timer_->start(0);
+    timer_.start(0);
 }

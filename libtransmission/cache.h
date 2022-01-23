@@ -1,10 +1,7 @@
-/*
- * This file Copyright (C) 2010-2014 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2010-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #pragma once
 
@@ -12,13 +9,11 @@
 #error only libtransmission should #include this header.
 #endif
 
-#include "tr-macros.h"
-
-TR_BEGIN_DECLS
+#include <cstdint> // intX_t, uintX_t
 
 struct evbuffer;
-
-typedef struct tr_cache tr_cache;
+struct tr_cache;
+struct tr_torrent;
 
 /***
 ****
@@ -36,10 +31,20 @@ int tr_cacheSetLimit(tr_cache* cache, int64_t max_bytes);
 
 int64_t tr_cacheGetLimit(tr_cache const*);
 
-int tr_cacheWriteBlock(tr_cache* cache, tr_torrent* torrent, tr_piece_index_t piece, uint32_t offset, uint32_t len,
+int tr_cacheWriteBlock(
+    tr_cache* cache,
+    tr_torrent* torrent,
+    tr_piece_index_t piece,
+    uint32_t offset,
+    uint32_t len,
     struct evbuffer* writeme);
 
-int tr_cacheReadBlock(tr_cache* cache, tr_torrent* torrent, tr_piece_index_t piece, uint32_t offset, uint32_t len,
+int tr_cacheReadBlock(
+    tr_cache* cache,
+    tr_torrent* torrent,
+    tr_piece_index_t piece,
+    uint32_t offset,
+    uint32_t len,
     uint8_t* setme);
 
 int tr_cachePrefetchBlock(tr_cache* cache, tr_torrent* torrent, tr_piece_index_t piece, uint32_t offset, uint32_t len);
@@ -53,5 +58,3 @@ int tr_cacheFlushDone(tr_cache* cache);
 int tr_cacheFlushTorrent(tr_cache* cache, tr_torrent* torrent);
 
 int tr_cacheFlushFile(tr_cache* cache, tr_torrent* torrent, tr_file_index_t file);
-
-TR_END_DECLS

@@ -1,10 +1,7 @@
-/*
- * This file Copyright (C) 2010-2014 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2010-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #pragma once
 
@@ -12,217 +9,227 @@
 #error only the libtransmission announcer module should #include this header.
 #endif
 
-#include "transmission.h" /* SHA_DIGEST_LENGTH */
-#include "session.h" /* PEER_ID_LEN */
+#include <array>
+#include <cstddef> // size_t
+#include <string>
+#include <vector>
+
+#include "transmission.h"
+
+#include "interned-string.h"
+#include "web-utils.h"
 
 /***
 ****  SCRAPE
 ***/
 
-enum
-{
-    /* pick a number small enough for common tracker software:
-     *  - ocelot has no upper bound
-     *  - opentracker has an upper bound of 64
-     *  - udp protocol has an upper bound of 74
-     *  - xbtt has no upper bound
-     *
-     * This is only an upper bound: if the tracker complains about
-     * length, announcer will incrementally lower the batch size.
-     */
-    TR_MULTISCRAPE_MAX = 100
-};
+/* pick a number small enough for common tracker software:
+ *  - ocelot has no upper bound
+ *  - opentracker has an upper bound of 64
+ *  - udp protocol has an upper bound of 74
+ *  - xbtt has no upper bound
+ *
+ * This is only an upper bound: if the tracker complains about
+ * length, announcer will incrementally lower the batch size.
+ */
+auto inline constexpr TR_MULTISCRAPE_MAX = 60;
 
-typedef struct
+struct tr_scrape_request
 {
     /* the scrape URL */
-    char* url;
+    tr_interned_string scrape_url;
 
     /* the name to use when deep logging is enabled */
     char log_name[128];
 
     /* info hashes of the torrents to scrape */
-    uint8_t info_hash[TR_MULTISCRAPE_MAX][SHA_DIGEST_LENGTH];
+    std::array<tr_sha1_digest_t, TR_MULTISCRAPE_MAX> info_hash;
 
     /* how many hashes to use in the info_hash field */
-    int info_hash_count;
-}
-tr_scrape_request;
+    int info_hash_count = 0;
+};
 
 struct tr_scrape_response_row
 {
     /* the torrent's info_hash */
-    uint8_t info_hash[SHA_DIGEST_LENGTH];
+    tr_sha1_digest_t info_hash;
 
     /* how many peers are seeding this torrent */
-    int seeders;
+    int seeders = 0;
 
     /* how many peers are downloading this torrent */
-    int leechers;
+    int leechers = 0;
 
     /* how many times this torrent has been downloaded */
-    int downloads;
+    int downloads = 0;
 
     /* the number of active downloaders in the swarm.
      * this is a BEP 21 extension that some trackers won't support.
      * http://www.bittorrent.org/beps/bep_0021.html#tracker-scrapes  */
-    int downloaders;
+    int downloaders = 0;
 };
 
-typedef struct
+struct tr_scrape_response
 {
     /* whether or not we managed to connect to the tracker */
-    bool did_connect;
+    bool did_connect = false;
 
     /* whether or not the scrape timed out */
-    bool did_timeout;
+    bool did_timeout = false;
 
     /* how many info hashes are in the 'rows' field */
     int row_count;
 
     /* the individual torrents' scrape results */
-    struct tr_scrape_response_row rows[TR_MULTISCRAPE_MAX];
+    std::array<tr_scrape_response_row, TR_MULTISCRAPE_MAX> rows;
 
     /* the raw scrape url */
-    char* url;
+    tr_interned_string scrape_url;
 
-    /* human-readable error string on failure, or NULL */
-    char* errmsg;
+    /* human-readable error string on failure, or nullptr */
+    std::string errmsg;
 
     /* minimum interval (in seconds) allowed between scrapes.
      * this is an unofficial extension that some trackers won't support. */
     int min_request_interval;
-}
-tr_scrape_response;
+};
 
-typedef void (* tr_scrape_response_func)(tr_scrape_response const* response, void* user_data);
+using tr_scrape_response_func = void (*)(tr_scrape_response const* response, void* user_data);
 
-void tr_tracker_http_scrape(tr_session* session, tr_scrape_request const* req, tr_scrape_response_func response_func,
+void tr_tracker_http_scrape(
+    tr_session* session,
+    tr_scrape_request const* req,
+    tr_scrape_response_func response_func,
     void* user_data);
 
-void tr_tracker_udp_scrape(tr_session* session, tr_scrape_request const* req, tr_scrape_response_func response_func,
+void tr_tracker_udp_scrape(
+    tr_session* session,
+    tr_scrape_request const* req,
+    tr_scrape_response_func response_func,
     void* user_data);
 
 /***
 ****  ANNOUNCE
 ***/
 
-typedef enum
+enum tr_announce_event
 {
+    /* Note: the ordering of this enum's values is important to
+     * announcer.c's tr_tier.announce_event_priority. If changing
+     * the enum, ensure announcer.c is compatible with the change. */
     TR_ANNOUNCE_EVENT_NONE,
-    TR_ANNOUNCE_EVENT_COMPLETED,
     TR_ANNOUNCE_EVENT_STARTED,
-    TR_ANNOUNCE_EVENT_STOPPED
-}
-tr_announce_event;
+    TR_ANNOUNCE_EVENT_COMPLETED,
+    TR_ANNOUNCE_EVENT_STOPPED,
+};
 
 char const* tr_announce_event_get_string(tr_announce_event);
 
-typedef struct
+struct tr_announce_request
 {
-    tr_announce_event event;
-    bool partial_seed;
+    tr_announce_event event = {};
+    bool partial_seed = false;
 
     /* the port we listen for incoming peers on */
-    int port;
+    int port = 0;
 
     /* per-session key */
-    int key;
+    int key = 0;
 
     /* the number of peers we'd like to get back in the response */
-    int numwant;
+    int numwant = 0;
 
     /* the number of bytes we uploaded since the last 'started' event */
-    uint64_t up;
+    uint64_t up = 0;
 
     /* the number of good bytes we downloaded since the last 'started' event */
-    uint64_t down;
+    uint64_t down = 0;
 
     /* the number of bad bytes we downloaded since the last 'started' event */
-    uint64_t corrupt;
+    uint64_t corrupt = 0;
 
     /* the total size of the torrent minus the number of bytes completed */
-    uint64_t leftUntilComplete;
+    uint64_t leftUntilComplete = 0;
 
     /* the tracker's announce URL */
-    char* url;
+    tr_interned_string announce_url;
 
     /* key generated by and returned from an http tracker.
      * see tr_announce_response.tracker_id_str */
-    char* tracker_id_str;
+    std::string tracker_id;
 
     /* the torrent's peer id.
      * this changes when a torrent is stopped -> restarted. */
-    char peer_id[PEER_ID_LEN];
+    tr_peer_id_t peer_id;
 
     /* the torrent's info_hash */
-    uint8_t info_hash[SHA_DIGEST_LENGTH];
+    tr_sha1_digest_t info_hash;
 
     /* the name to use when deep logging is enabled */
     char log_name[128];
-}
-tr_announce_request;
+};
 
 struct tr_pex;
 
-typedef struct
+struct tr_announce_response
 {
     /* the torrent's info hash */
-    uint8_t info_hash[SHA_DIGEST_LENGTH];
+    tr_sha1_digest_t info_hash = {};
 
     /* whether or not we managed to connect to the tracker */
-    bool did_connect;
+    bool did_connect = false;
 
     /* whether or not the scrape timed out */
-    bool did_timeout;
+    bool did_timeout = false;
 
     /* preferred interval between announces.
      * transmission treats this as the interval for periodic announces */
-    int interval;
+    int interval = 0;
 
     /* minimum interval between announces. (optional)
      * transmission treats this as the min interval for manual announces */
-    int min_interval;
+    int min_interval = 0;
 
     /* how many peers are seeding this torrent */
-    int seeders;
+    int seeders = -1;
 
     /* how many peers are downloading this torrent */
-    int leechers;
+    int leechers = -1;
 
     /* how many times this torrent has been downloaded */
-    int downloads;
-
-    /* number of items in the 'pex' field */
-    size_t pex_count;
+    int downloads = -1;
 
     /* IPv4 peers that we acquired from the tracker */
-    struct tr_pex* pex;
-
-    /* number of items in the 'pex6' field */
-    size_t pex6_count;
+    std::vector<tr_pex> pex;
 
     /* IPv6 peers that we acquired from the tracker */
-    struct tr_pex* pex6;
+    std::vector<tr_pex> pex6;
 
-    /* human-readable error string on failure, or NULL */
-    char* errmsg;
+    /* human-readable error string on failure, or nullptr */
+    std::string errmsg;
 
-    /* human-readable warning string or NULL */
-    char* warning;
+    /* human-readable warning string or nullptr */
+    std::string warning;
 
     /* key generated by and returned from an http tracker.
      * if this is provided, subsequent http announces must include this. */
-    char* tracker_id_str;
-}
-tr_announce_response;
+    std::string tracker_id;
+};
 
-typedef void (* tr_announce_response_func)(tr_announce_response const* response, void* userdata);
+using tr_announce_response_func = void (*)(tr_announce_response const* response, void* userdata);
 
-void tr_tracker_http_announce(tr_session* session, tr_announce_request const* req, tr_announce_response_func response_func,
+void tr_tracker_http_announce(
+    tr_session* session,
+    tr_announce_request const* req,
+    tr_announce_response_func response_func,
     void* user_data);
 
-void tr_tracker_udp_announce(tr_session* session, tr_announce_request const* req, tr_announce_response_func response_func,
+void tr_tracker_udp_announce(
+    tr_session* session,
+    tr_announce_request const* req,
+    tr_announce_response_func response_func,
     void* user_data);
 
 void tr_tracker_udp_start_shutdown(tr_session* session);
+
+tr_interned_string tr_announcerGetKey(tr_url_parsed_t const& parsed);

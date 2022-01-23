@@ -1,10 +1,7 @@
-/*
- * This file Copyright (C) 2020 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2020-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #include "VariantHelpers.h"
 
@@ -56,8 +53,10 @@ bool change(Peer& setme, tr_variant const* value)
     {
         switch (key)
         {
-#define HANDLE_KEY(key, field) case TR_KEY_ ## key: \
-    changed = change(setme.field, child) || changed; break;
+#define HANDLE_KEY(key, field) \
+    case TR_KEY_##key: \
+        changed = change(setme.field, child) || changed; \
+        break;
 
             HANDLE_KEY(address, address)
             HANDLE_KEY(clientIsChoked, client_is_choked)
@@ -94,15 +93,19 @@ bool change(TorrentFile& setme, tr_variant const* value)
     {
         switch (key)
         {
-#define HANDLE_KEY(key) case TR_KEY_ ## key: \
-    changed = change(setme.key, child) || changed; break;
+#define HANDLE_KEY(key) \
+    case TR_KEY_##key: \
+        changed = change(setme.key, child) || changed; \
+        break;
 
             HANDLE_KEY(have)
             HANDLE_KEY(priority)
             HANDLE_KEY(wanted)
 #undef HANDLE_KEY
-#define HANDLE_KEY(key, field) case TR_KEY_ ## key: \
-    changed = change(setme.field, child) || changed; break;
+#define HANDLE_KEY(key, field) \
+    case TR_KEY_##key: \
+        changed = change(setme.field, child) || changed; \
+        break;
 
             HANDLE_KEY(bytesCompleted, have)
             HANDLE_KEY(length, size)
@@ -129,8 +132,10 @@ bool change(TrackerStat& setme, tr_variant const* value)
 
         switch (key)
         {
-#define HANDLE_KEY(key, field) case TR_KEY_ ## key: \
-    field_changed = change(setme.field, child); break;
+#define HANDLE_KEY(key, field) \
+    case TR_KEY_##key: \
+        field_changed = change(setme.field, child); \
+        break;
             HANDLE_KEY(announce, announce)
             HANDLE_KEY(announceState, announce_state)
             HANDLE_KEY(downloadCount, download_count)
@@ -165,8 +170,8 @@ bool change(TrackerStat& setme, tr_variant const* value)
         {
             if (key == TR_KEY_announce)
             {
-                setme.announce = qApp->intern(setme.announce);
-                setme.favicon_key = qApp->faviconCache().add(setme.announce);
+                setme.announce = trApp->intern(setme.announce);
+                setme.favicon_key = trApp->faviconCache().add(setme.announce);
             }
 
             changed = true;
@@ -215,7 +220,7 @@ void variantInit(tr_variant* init_me, QString const& value)
 
 void variantInit(tr_variant* init_me, std::string_view value)
 {
-    tr_variantInitStr(init_me, std::data(value), std::size(value));
+    tr_variantInitStr(init_me, value);
 }
 
 } // namespace trqt::variant_helpers

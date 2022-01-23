@@ -1,11 +1,7 @@
-/**
- * @license
- *
- * This file Copyright (C) 2020 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- */
+/* @license This file Copyright (C) 2020-2022 Mnemosyne LLC.
+   It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+   or any future license endorsed by Mnemosyne LLC.
+   License text can be found in the licenses/ folder. */
 
 import { Formatter } from './formatter.js';
 import {
@@ -231,6 +227,21 @@ export class PrefsDialog extends EventTarget {
     root.append(cal.root);
     const suffix_check = cal.check;
 
+    cal = PrefsDialog._createCheckAndLabel(
+      'download-queue-div',
+      'Download queue size:'
+    );
+    cal.check.dataset.key = 'download-queue-enabled';
+    root.append(cal.root);
+    const download_queue_check = cal.check;
+
+    input = document.createElement('input');
+    input.type = 'number';
+    input.dataset.key = 'download-queue-size';
+    root.append(input);
+    PrefsDialog._enableIfChecked(input, cal.check);
+    const download_queue_input = input;
+
     label = document.createElement('div');
     label.textContent = 'Seeding';
     label.classList.add('section-label');
@@ -269,6 +280,8 @@ export class PrefsDialog extends EventTarget {
     return {
       autostart_check,
       download_dir,
+      download_queue_check,
+      download_queue_input,
       root,
       stop_idle_check,
       stop_idle_input,

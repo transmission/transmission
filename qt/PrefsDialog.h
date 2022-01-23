@@ -1,17 +1,15 @@
-/*
- * This file Copyright (C) 2009-2015 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2009-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #pragma once
 
 #include <QMap>
 
+#include <libtransmission/tr-macros.h>
+
 #include "BaseDialog.h"
-#include "Macros.h"
 #include "Prefs.h"
 #include "ui_PrefsDialog.h"
 
@@ -29,25 +27,6 @@ class PrefsDialog : public BaseDialog
 
 public:
     PrefsDialog(Session&, Prefs&, QWidget* parent = nullptr);
-
-private:
-    using key2widget_t = QMap<int, QWidget*>;
-
-private:
-    bool updateWidgetValue(QWidget* widget, int pref_key);
-    void linkWidgetToPref(QWidget* widget, int pref_key);
-    void updateBlocklistLabel();
-    void updateDownloadingWidgetsLocality();
-
-    void setPref(int key, QVariant const& v);
-
-    void initDownloadingTab();
-    void initSeedingTab();
-    void initSpeedTab();
-    void initPrivacyTab();
-    void initNetworkTab();
-    void initDesktopTab();
-    void initRemoteTab();
 
 private slots:
     void checkBoxToggled(bool checked);
@@ -70,6 +49,23 @@ private slots:
     void onBlocklistUpdated(int n);
 
 private:
+    using key2widget_t = QMap<int, QWidget*>;
+
+    bool updateWidgetValue(QWidget* widget, int pref_key) const;
+    void linkWidgetToPref(QWidget* widget, int pref_key);
+    void updateBlocklistLabel();
+    void updateDownloadingWidgetsLocality();
+
+    void setPref(int key, QVariant const& v);
+
+    void initDownloadingTab();
+    void initSeedingTab();
+    void initSpeedTab();
+    void initPrivacyTab();
+    void initNetworkTab();
+    void initDesktopTab();
+    void initRemoteTab();
+
     Session& session_;
     Prefs& prefs_;
 

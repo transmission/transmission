@@ -1,10 +1,7 @@
-/*
- * This file Copyright (C) 2012-2015 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2012-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/utils.h> // tr_formatter
@@ -22,29 +19,32 @@ Formatter& Formatter::get()
     return singleton;
 }
 
-Formatter::Formatter() :
-    UnitStrings{{
-        { tr("B/s"), tr("kB/s"), tr("MB/s"), tr("GB/s"), tr("TB/s") }, // SPEED
-        { tr("B"), tr("kB"), tr("MB"), tr("GB"), tr("TB") }, // SIZE
-        { tr("B"), tr("KiB"), tr("MiB"), tr("GiB"), tr("TiB") } // MEM
-    }}
+Formatter::Formatter()
+    : UnitStrings{ {
+          { tr("B/s"), tr("kB/s"), tr("MB/s"), tr("GB/s"), tr("TB/s") }, // SPEED
+          { tr("B"), tr("kB"), tr("MB"), tr("GB"), tr("TB") }, // SIZE
+          { tr("B"), tr("KiB"), tr("MiB"), tr("GiB"), tr("TiB") } // MEM
+      } }
 {
     auto const& speed = UnitStrings[SPEED];
-    tr_formatter_speed_init(SpeedBase,
+    tr_formatter_speed_init(
+        SpeedBase,
         speed[KB].toUtf8().constData(),
         speed[MB].toUtf8().constData(),
         speed[GB].toUtf8().constData(),
         speed[TB].toUtf8().constData());
 
     auto const& size = UnitStrings[SIZE];
-    tr_formatter_size_init(SizeBase,
+    tr_formatter_size_init(
+        SizeBase,
         size[KB].toUtf8().constData(),
         size[MB].toUtf8().constData(),
         size[GB].toUtf8().constData(),
         size[TB].toUtf8().constData());
 
     auto const& mem = UnitStrings[MEM];
-    tr_formatter_mem_init(MemBase,
+    tr_formatter_mem_init(
+        MemBase,
         mem[KB].toUtf8().constData(),
         mem[MB].toUtf8().constData(),
         mem[GB].toUtf8().constData(),
@@ -68,9 +68,17 @@ QString Formatter::memToString(int64_t bytes) const
         return tr("None");
     }
 
-    auto buf = std::array<char, 128>{};
-    tr_formatter_mem_B(buf.data(), bytes, buf.size());
-    return QString::fromUtf8(buf.data());
+    return QString::fromStdString(tr_formatter_mem_B(bytes));
+}
+
+QString Formatter::sizeToString(uint64_t bytes) const
+{
+    if (bytes == 0)
+    {
+        return tr("None");
+    }
+
+    return QString::fromStdString(tr_formatter_size_B(bytes));
 }
 
 QString Formatter::sizeToString(int64_t bytes) const
@@ -80,21 +88,12 @@ QString Formatter::sizeToString(int64_t bytes) const
         return tr("Unknown");
     }
 
-    if (bytes == 0)
-    {
-        return tr("None");
-    }
-
-    auto buf = std::array<char, 128>{};
-    tr_formatter_size_B(buf.data(), bytes, buf.size());
-    return QString::fromUtf8(buf.data());
+    return Formatter::sizeToString(static_cast<uint64_t>(bytes));
 }
 
 QString Formatter::speedToString(Speed const& speed) const
 {
-    auto buf = std::array<char, 128>{};
-    tr_formatter_speed_KBps(buf.data(), speed.getKBps(), buf.size());
-    return QString::fromUtf8(buf.data());
+    return QString::fromStdString(tr_formatter_speed_KBps(speed.getKBps()));
 }
 
 QString Formatter::uploadSpeedToString(Speed const& upload_speed) const
@@ -113,14 +112,12 @@ QString Formatter::downloadSpeedToString(Speed const& download_speed) const
 
 QString Formatter::percentToString(double x) const
 {
-    auto buf = std::array<char, 128>{};
-    return QString::fromUtf8(tr_strpercent(buf.data(), x, buf.size()));
+    return QString::fromStdString(tr_strpercent(x));
 }
 
 QString Formatter::ratioToString(double ratio) const
 {
-    auto buf = std::array<char, 128>{};
-    return QString::fromUtf8(tr_strratio(buf.data(), buf.size(), ratio, "\xE2\x88\x9E"));
+    return QString::fromStdString(tr_strratio(ratio, "\xE2\x88\x9E"));
 }
 
 QString Formatter::timeToString(int seconds) const

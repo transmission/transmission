@@ -1,10 +1,7 @@
-/*
- * This file Copyright (C) 2009-2015 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2009-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #pragma once
 
@@ -12,10 +9,13 @@
 #include <unordered_set>
 #endif
 
+#include <optional>
 #include <unordered_map>
 
+#include <QFileIconProvider>
 #include <QIcon>
 #include <QString>
+#include <QStyle>
 
 #include "Utils.h" // std::hash<QString>()
 
@@ -30,17 +30,27 @@ class IconCache
 public:
     static IconCache& get();
 
-    QIcon folderIcon() const { return folder_icon_; }
-    QIcon fileIcon() const { return file_icon_; }
+    QIcon folderIcon() const
+    {
+        return folder_icon_;
+    }
+
+    QIcon fileIcon() const
+    {
+        return file_icon_;
+    }
+
     QIcon guessMimeIcon(QString const& filename, QIcon fallback = {}) const;
     QIcon getMimeTypeIcon(QString const& mime_type, bool multifile) const;
 
+    QIcon getThemeIcon(QString const& name, std::optional<QStyle::StandardPixmap> const& fallback = {}) const;
+
 protected:
-    IconCache();
+    IconCache() = default;
 
 private:
-    QIcon const folder_icon_;
-    QIcon const file_icon_;
+    QIcon const folder_icon_ = QFileIconProvider().icon(QFileIconProvider::Folder);
+    QIcon const file_icon_ = QFileIconProvider().icon(QFileIconProvider::File);
 
     mutable std::unordered_map<QString, QIcon> name_to_icon_;
     mutable std::unordered_map<QString, QIcon> name_to_emblem_icon_;
@@ -52,4 +62,9 @@ private:
     mutable std::unordered_map<QString, QIcon> ext_to_icon_;
     QIcon getMimeIcon(QString const& filename) const;
 #endif
+
+    QIcon getThemeIcon(
+        QString const& name,
+        QString const& fallbackName,
+        std::optional<QStyle::StandardPixmap> const& fallbackPixmap) const;
 };

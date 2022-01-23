@@ -1,10 +1,7 @@
-/*
- * This file Copyright (C) 2014-2016 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2014-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #pragma once
 
@@ -23,9 +20,8 @@
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/quark.h>
+#include <libtransmission/tr-macros.h>
 #include <libtransmission/variant.h>
-
-#include "Macros.h"
 
 class QByteArray;
 class QNetworkAccessManager;
@@ -35,8 +31,8 @@ Q_DECLARE_METATYPE(TrVariantPtr)
 
 extern "C"
 {
-struct evbuffer;
-struct tr_session;
+    struct evbuffer;
+    struct tr_session;
 }
 
 struct RpcResponse
@@ -58,7 +54,7 @@ class RpcClient : public QObject
     TR_DISABLE_COPY_MOVE(RpcClient)
 
 public:
-    RpcClient(QObject* parent = nullptr);
+    explicit RpcClient(QObject* parent = nullptr);
 
     void stop();
     void start(tr_session* session);
@@ -87,8 +83,8 @@ private:
 
     void sendNetworkRequest(TrVariantPtr json, QFutureInterface<RpcResponse> const& promise);
     void sendLocalRequest(TrVariantPtr json, QFutureInterface<RpcResponse> const& promise, int64_t tag);
-    int64_t parseResponseTag(tr_variant& response);
-    RpcResponse parseResponseData(tr_variant& response);
+    int64_t parseResponseTag(tr_variant& response) const;
+    RpcResponse parseResponseData(tr_variant& response) const;
 
     static void localSessionCallback(tr_session* s, tr_variant* response, void* vself) noexcept;
 
