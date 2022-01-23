@@ -156,8 +156,7 @@ void showInfo(app_opts const& opts, tr_torrent_metainfo const& metainfo)
     ***
     **/
 
-    auto const n_webseeds = metainfo.webseedCount();
-    if (n_webseeds > 0)
+    if (auto const n_webseeds = metainfo.webseedCount(); n_webseeds > 0)
     {
         printf("\nWEBSEEDS\n\n");
 
