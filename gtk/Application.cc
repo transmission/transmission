@@ -423,9 +423,8 @@ bool Application::Impl::on_rpc_changed_idle(tr_rpc_callback_type type, int torre
             for (int i = 0; tr_variantDictChild(&tmp, i, &key, &newval); ++i)
             {
                 bool changed;
-                tr_variant const* oldval = tr_variantDictFind(oldvals, key);
 
-                if (oldval == nullptr)
+                if (tr_variant const* oldval = tr_variantDictFind(oldvals, key); oldval == nullptr)
                 {
                     changed = true;
                 }
