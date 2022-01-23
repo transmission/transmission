@@ -97,6 +97,7 @@ std::array<Prefs::PrefItem, Prefs::PREFS_COUNT> const Prefs::Items{
     { COMPLETE_SOUND_COMMAND, TR_KEY_torrent_complete_sound_command, QVariant::StringList },
     { COMPLETE_SOUND_ENABLED, TR_KEY_torrent_complete_sound_enabled, QVariant::Bool },
     { USER_HAS_GIVEN_INFORMED_CONSENT, TR_KEY_user_has_given_informed_consent, QVariant::Bool },
+    { READ_CLIPBOARD, TR_KEY_read_clipboard, QVariant::Bool },
 
     /* libtransmission settings */
     { ALT_SPEED_LIMIT_UP, TR_KEY_alt_speed_up, QVariant::Int },
@@ -490,6 +491,7 @@ void Prefs::initDefaults(tr_variant* d) const
     dictAdd(d, TR_KEY_sort_mode, SortMode);
     dictAdd(d, TR_KEY_statusbar_stats, StatsMode);
     dictAdd(d, TR_KEY_watch_dir, download_dir);
+    dictAdd(d, TR_KEY_read_clipboard, false);
 }
 
 /***
