@@ -1244,7 +1244,7 @@ void MainWindow::refreshPref(int key)
         }
 
     case Prefs::READ_CLIPBOARD:
-        read_from_clipboard_ = prefs_.getBool(Prefs::READ_CLIPBOARD);
+        auto_add_clipboard_links = prefs_.getBool(Prefs::READ_CLIPBOARD);
         break;
 
     default:
@@ -1603,7 +1603,7 @@ void MainWindow::dropEvent(QDropEvent* event)
 
 bool MainWindow::event(QEvent* e)
 {
-    if (e->type() != QEvent::WindowActivate || !read_from_clipboard_)
+    if (e->type() != QEvent::WindowActivate || !auto_add_clipboard_links)
     {
         return QMainWindow::event(e);
     }
@@ -1612,26 +1612,24 @@ bool MainWindow::event(QEvent* e)
     if (text.endsWith(QStringLiteral(".torrent"), Qt::CaseInsensitive) ||
         text.startsWith(QStringLiteral("magnet:"), Qt::CaseInsensitive))
     {
-        QStringList list = text.split(QLatin1Char('\n'));
-
-        for (QString const& entry : list)
+        for (QString const& entry : text.split(QLatin1Char('\n')))
         {
             QString key = entry.trimmed();
 
-            if (!key.isEmpty())
+            if (key.isEmpty())
             {
-                if (QUrl const url(key); url.isLocalFile())
-                {
-                    key = url.toLocalFile();
-                }
+                continue;
+            }
 
-                static QStringList processed;
+            if (QUrl const url(key); url.isLocalFile())
+            {
+                key = url.toLocalFile();
+            }
 
-                if (!processed.contains(key))
-                {
-                    processed.append(key);
-                    trApp->addTorrent(AddData(key));
-                }
+            if (!clipboard_processed_keys_.contains(key))
+            {
+                clipboard_processed_keys_.append(key);
+                trApp->addTorrent(AddData(key));
             }
         }
     }
