@@ -274,6 +274,7 @@
                     </textFieldCell>
                 </textField>
             </subviews>
+            <point key="canvasLocation" x="138" y="459"/>
         </customView>
         <customView id="41" userLabel="Transfers">
             <rect key="frame" x="0.0" y="0.0" width="542" height="393"/>
@@ -1099,7 +1100,7 @@
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" heightSizable="YES"/>
                     <clipView key="contentView" id="fRP-Wa-RJL">
                         <rect key="frame" x="1" y="1" width="141" height="169"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <tableView focusRingType="none" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" columnReordering="NO" columnResizing="NO" multipleSelection="NO" emptySelection="NO" autosaveColumns="NO" rowHeight="18" id="1774">
                                 <rect key="frame" x="0.0" y="0.0" width="141" height="169"/>
@@ -1871,9 +1872,9 @@ los límites globales de ancho de banda</string>
             <autoresizingMask key="autoresizingMask"/>
             <subviews>
                 <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1717">
-                    <rect key="frame" x="83" y="343" width="149" height="25"/>
+                    <rect key="frame" x="76" y="340" width="180" height="32"/>
                     <autoresizingMask key="autoresizingMask"/>
-                    <buttonCell key="cell" type="roundTextured" title="Ejecutar interfaz web" bezelStyle="texturedRounded" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="1718">
+                    <buttonCell key="cell" type="push" title="Ejecutar interfaz web" bezelStyle="rounded" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="1718">
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                         <font key="font" metaFont="system"/>
                     </buttonCell>

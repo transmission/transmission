@@ -1,12 +1,10 @@
-/*
- * This file Copyright (C) 2010-2014 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright 2010-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
-#include <stdlib.h> /* qsort() */
+#include <cstdlib> /* qsort() */
+#include <ctime>
 
 #include <event2/buffer.h>
 
@@ -21,9 +19,9 @@
 #include "trevent.h"
 #include "utils.h"
 
-#define MY_NAME "Cache"
+static char constexpr MyName[] = "Cache";
 
-#define dbgmsg(...) tr_logAddDeepNamed(MY_NAME, __VA_ARGS__)
+#define dbgmsg(...) tr_logAddDeepNamed(MyName, __VA_ARGS__)
 
 /****
 *****
@@ -73,7 +71,7 @@ struct run_info
 static int getBlockRun(tr_cache const* cache, int pos, struct run_info* info)
 {
     int const n = tr_ptrArraySize(&cache->blocks);
-    struct cache_block const* const* blocks = (struct cache_block const* const*)tr_ptrArrayBase(&cache->blocks);
+    auto const* const* blocks = (struct cache_block const* const*)tr_ptrArrayBase(&cache->blocks);
     struct cache_block const* ref = blocks[pos];
     tr_block_index_t block = ref->block;
     int len = 0;
@@ -100,7 +98,7 @@ static int getBlockRun(tr_cache const* cache, int pos, struct run_info* info)
     {
         struct cache_block const* b = blocks[pos + len - 1];
         info->last_block_time = b->time;
-        info->is_piece_done = tr_torrentPieceIsComplete(b->tor, b->piece);
+        info->is_piece_done = b->tor->hasPiece(b->piece);
         info->is_multi_piece = b->piece != blocks[pos]->piece;
         info->len = len;
         info->pos = pos;
@@ -128,6 +126,7 @@ enum
  *   - Stale runs, runs sitting in cache for a long time or runs not growing, get priority.
  *     Returns number of runs.
  */
+// TODO: return std::vector
 static int calcRuns(tr_cache const* cache, struct run_info* runs)
 {
     int const n = tr_ptrArraySize(&cache->blocks);
@@ -160,9 +159,9 @@ static int calcRuns(tr_cache const* cache, struct run_info* runs)
 static int flushContiguous(tr_cache* cache, int pos, int n)
 {
     int err = 0;
-    uint8_t* buf = tr_new(uint8_t, n * MAX_BLOCK_SIZE);
-    uint8_t* walk = buf;
-    struct cache_block** blocks = (struct cache_block**)tr_ptrArrayBase(&cache->blocks);
+    auto* const buf = tr_new(uint8_t, n * MAX_BLOCK_SIZE);
+    auto* walk = buf;
+    auto** blocks = (struct cache_block**)tr_ptrArrayBase(&cache->blocks);
 
     struct cache_block* b = blocks[pos];
     tr_torrent* tor = b->tor;
@@ -217,7 +216,7 @@ static int cacheTrim(tr_cache* cache)
         /* Amount of cache that should be removed by the flush. This influences how large
          * runs can grow as well as how often flushes will happen. */
         int const cacheCutoff = 1 + cache->max_blocks / 4;
-        struct run_info* runs = tr_new(struct run_info, tr_ptrArraySize(&cache->blocks));
+        auto* const runs = tr_new(struct run_info, tr_ptrArraySize(&cache->blocks));
         int i = 0;
         int j = 0;
 
@@ -246,13 +245,14 @@ static int getMaxBlocks(int64_t max_bytes)
 
 int tr_cacheSetLimit(tr_cache* cache, int64_t max_bytes)
 {
-    char buf[128];
-
     cache->max_bytes = max_bytes;
     cache->max_blocks = getMaxBlocks(max_bytes);
 
-    tr_formatter_mem_B(buf, cache->max_bytes, sizeof(buf));
-    tr_logAddNamedDbg(MY_NAME, "Maximum cache size set to %s (%d blocks)", buf, cache->max_blocks);
+    tr_logAddNamedDbg(
+        MyName,
+        "Maximum cache size set to %s (%d blocks)",
+        tr_formatter_mem_B(cache->max_bytes).c_str(),
+        cache->max_blocks);
 
     return cacheTrim(cache);
 }
@@ -264,7 +264,7 @@ int64_t tr_cacheGetLimit(tr_cache const* cache)
 
 tr_cache* tr_cacheNew(int64_t max_bytes)
 {
-    tr_cache* cache = tr_new0(tr_cache, 1);
+    auto* const cache = tr_new0(tr_cache, 1);
     cache->blocks = {};
     cache->max_bytes = max_bytes;
     cache->max_blocks = getMaxBlocks(max_bytes);
@@ -273,8 +273,6 @@ tr_cache* tr_cacheNew(int64_t max_bytes)
 
 void tr_cacheFree(tr_cache* cache)
 {
-    TR_ASSERT(tr_ptrArrayEmpty(&cache->blocks));
-
     tr_ptrArrayDestruct(&cache->blocks, nullptr);
     tr_free(cache);
 }
@@ -308,7 +306,7 @@ static struct cache_block* findBlock(tr_cache* cache, tr_torrent* torrent, tr_pi
 {
     struct cache_block key;
     key.tor = torrent;
-    key.block = _tr_block(torrent, piece, offset);
+    key.block = torrent->blockOf(piece, offset);
     return static_cast<struct cache_block*>(tr_ptrArrayFindSorted(&cache->blocks, &key, cache_block_compare));
 }
 
@@ -331,7 +329,7 @@ int tr_cacheWriteBlock(
         cb->piece = piece;
         cb->offset = offset;
         cb->length = length;
-        cb->block = _tr_block(torrent, piece, offset);
+        cb->block = torrent->blockOf(piece, offset);
         cb->evbuf = evbuffer_new();
         tr_ptrArrayInsertSorted(&cache->blocks, cb, cache_block_compare);
     }
@@ -403,13 +401,9 @@ int tr_cacheFlushDone(tr_cache* cache)
 
     if (tr_ptrArraySize(&cache->blocks) > 0)
     {
-        int i;
-        int n;
-        struct run_info* runs;
-
-        runs = tr_new(struct run_info, tr_ptrArraySize(&cache->blocks));
-        i = 0;
-        n = calcRuns(cache, runs);
+        auto* const runs = tr_new(struct run_info, tr_ptrArraySize(&cache->blocks));
+        int i = 0;
+        int const n = calcRuns(cache, runs);
 
         while (i < n && (runs[i].is_piece_done || runs[i].is_multi_piece))
         {
@@ -425,16 +419,13 @@ int tr_cacheFlushDone(tr_cache* cache)
 
 int tr_cacheFlushFile(tr_cache* cache, tr_torrent* torrent, tr_file_index_t i)
 {
-    int pos;
-    int err = 0;
-    tr_block_index_t first;
-    tr_block_index_t last;
+    auto const [begin, end] = tr_torGetFileBlockSpan(torrent, i);
 
-    tr_torGetFileBlockRange(torrent, i, &first, &last);
-    pos = findBlockPos(cache, torrent, first);
-    dbgmsg("flushing file %d from cache to disk: blocks [%zu...%zu]", (int)i, (size_t)first, (size_t)last);
+    int pos = findBlockPos(cache, torrent, begin);
+    dbgmsg("flushing file %d from cache to disk: blocks [%zu...%zu)", (int)i, (size_t)begin, (size_t)end);
 
     /* flush out all the blocks in that file */
+    int err = 0;
     while (err == 0 && pos < tr_ptrArraySize(&cache->blocks))
     {
         auto const* b = static_cast<struct cache_block const*>(tr_ptrArrayNth(&cache->blocks, pos));
@@ -444,7 +435,7 @@ int tr_cacheFlushFile(tr_cache* cache, tr_torrent* torrent, tr_file_index_t i)
             break;
         }
 
-        if (b->block < first || b->block > last)
+        if (b->block < begin || b->block >= end)
         {
             break;
         }

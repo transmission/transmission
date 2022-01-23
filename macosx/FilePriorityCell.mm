@@ -1,24 +1,6 @@
-/******************************************************************************
- * Copyright (c) 2007-2012 Transmission authors and contributors
- *
- * Permission is hereby granted, free of charge, to any person obtaining a
- * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
- * DEALINGS IN THE SOFTWARE.
- *****************************************************************************/
+// This file Copyright © 2007-2022 Transmission authors and contributors.
+// It may be used under the MIT (SPDX: MIT) license.
+// License text can be found in the licenses/ folder.
 
 #import "FilePriorityCell.h"
 #import "FileOutlineView.h"
@@ -35,7 +17,7 @@
     if ((self = [super init]))
     {
         self.trackingMode = NSSegmentSwitchTrackingSelectAny;
-        self.controlSize = NSMiniControlSize;
+        self.controlSize = NSControlSizeMini;
         self.segmentCount = 3;
 
         for (NSInteger i = 0; i < self.segmentCount; i++)
@@ -131,7 +113,7 @@
 
         if (count == 0)
         {
-            //if ([self backgroundStyle] != NSBackgroundStyleDark)
+            //if ([self backgroundStyle] != NSBackgroundStyleEmphasized)
             {
                 NSImage* image = [[NSImage imageNamed:@"PriorityNormalTemplate"] imageWithColor:NSColor.lightGrayColor];
                 [images addObject:image];
@@ -140,7 +122,7 @@
         }
         else
         {
-            NSColor* priorityColor = self.backgroundStyle == NSBackgroundStyleDark ? NSColor.whiteColor : NSColor.darkGrayColor;
+            NSColor* priorityColor = self.backgroundStyle == NSBackgroundStyleEmphasized ? NSColor.whiteColor : NSColor.darkGrayColor;
 
             totalWidth = 0.0;
             if ([priorities containsObject:@(TR_PRI_LOW)])
@@ -179,7 +161,7 @@
                 imageSize.width,
                 imageSize.height);
 
-            [image drawInRect:imageRect fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:1.0 respectFlipped:YES
+            [image drawInRect:imageRect fromRect:NSZeroRect operation:NSCompositingOperationSourceOver fraction:1.0 respectFlipped:YES
                          hints:nil];
 
             currentWidth += imageSize.width - IMAGE_OVERLAP;

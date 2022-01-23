@@ -1,10 +1,7 @@
-/*
- * This file Copyright (C) 2016 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2016-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #pragma once
 
@@ -18,7 +15,8 @@
 #include <QPair>
 #include <QQueue>
 
-#include "Macros.h"
+#include <libtransmission/tr-macros.h>
+
 #include "RpcClient.h"
 
 class RpcQueue : public QObject
@@ -94,7 +92,7 @@ private:
         };
     }
 
-    // closure without return value ("auxiliary"), takes response and returns nothing -- internally we reuse the last future
+    // closure without return value ("auxiliary"), takes response and returns nothing
     template<
         typename Func,
         typename std::enable_if<std::is_same_v<typename std::invoke_result_t<Func, RpcResponse const&>, void>>::type* = nullptr>
@@ -103,7 +101,7 @@ private:
         return [func](RpcResponseFuture const& r)
         {
             func(r.result());
-            return r;
+            return createFinishedFuture();
         };
     }
 
@@ -111,10 +109,10 @@ private:
     template<typename Func, typename std::enable_if<std::is_same_v<typename std::invoke_result_t<Func>, void>>::type* = nullptr>
     QueuedFunction normalizeFunc(Func const& func) const
     {
-        return [func](RpcResponseFuture const& r)
+        return [func](RpcResponseFuture const&)
         {
             func();
-            return r;
+            return createFinishedFuture();
         };
     }
 
@@ -138,6 +136,14 @@ private:
         {
             func();
         };
+    }
+
+    static RpcResponseFuture createFinishedFuture()
+    {
+        QFutureInterface<RpcResponse> promise;
+        promise.reportStarted();
+        promise.reportFinished();
+        return promise.future();
     }
 
     Tag const tag_;

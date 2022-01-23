@@ -1,23 +1,22 @@
-/*
- * This file Copyright (C) 2007-2014 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2007-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #include <algorithm>
 #include <cerrno>
 #include <cstdarg>
-#include <cstdlib>
 #include <cstring>
+#include <ctime>
 #include <memory> // std::unique_ptr
+#include <optional>
 
 #include <event2/buffer.h>
 #include <event2/bufferevent.h>
 #include <event2/event.h>
 
 #include "transmission.h"
+
 #include "cache.h"
 #include "completion.h"
 #include "file.h"
@@ -25,9 +24,11 @@
 #include "peer-io.h"
 #include "peer-mgr.h"
 #include "peer-msgs.h"
+#include "ptrarray.h"
+#include "quark.h"
 #include "session.h"
-#include "torrent.h"
 #include "torrent-magnet.h"
+#include "torrent.h"
 #include "tr-assert.h"
 #include "tr-dht.h"
 #include "utils.h"
@@ -42,60 +43,84 @@
 ***
 **/
 
-enum
+// these values are hardcoded by various BEPs as noted
+enum BitTorrentMessages
 {
-    BT_CHOKE = 0,
-    BT_UNCHOKE = 1,
-    BT_INTERESTED = 2,
-    BT_NOT_INTERESTED = 3,
-    BT_HAVE = 4,
-    BT_BITFIELD = 5,
-    BT_REQUEST = 6,
-    BT_PIECE = 7,
-    BT_CANCEL = 8,
-    BT_PORT = 9,
-    /* */
-    BT_FEXT_SUGGEST = 13,
-    BT_FEXT_HAVE_ALL = 14,
-    BT_FEXT_HAVE_NONE = 15,
-    BT_FEXT_REJECT = 16,
-    BT_FEXT_ALLOWED_FAST = 17,
-    /* */
-    BT_LTEP = 20,
-    /* */
+    // http://bittorrent.org/beps/bep_0003.html#peer-messages
+    BtChoke = 0,
+    BtUnchoke = 1,
+    BtInterested = 2,
+    BtNotInterested = 3,
+    BtHave = 4,
+    BtBitfield = 5,
+    BtRequest = 6,
+    BtPiece = 7,
+    BtCancel = 8,
+    BtPort = 9,
+
+    // https://www.bittorrent.org/beps/bep_0006.html
+    BtFextSuggest = 13,
+    BtFextHaveAll = 14,
+    BtFextHaveNone = 15,
+    BtFextReject = 16,
+    BtFextAllowedFast = 17,
+
+    // http://bittorrent.org/beps/bep_0010.html
+    // see also LtepMessageIds below
+    BtLtep = 20
+};
+
+enum LtepMessages
+{
     LTEP_HANDSHAKE = 0,
-    /* */
+};
+
+// http://bittorrent.org/beps/bep_0010.html
+// Client-defined extension message IDs that we tell peers about
+// in the LTEP handshake and will respond to when sent in an LTEP
+// message.
+enum LtepMessageIds
+{
+    // we support peer exchange (bep 11)
     UT_PEX_ID = 1,
+
+    // we support sending metadata files (bep 9)
+    // see also MetadataMsgType below
     UT_METADATA_ID = 3,
-    /* */
-    MIN_CHOKE_PERIOD_SEC = 10,
-    /* idle seconds before we send a keepalive */
-    KEEPALIVE_INTERVAL_SECS = 100,
-    /* */
-    PEX_INTERVAL_SECS = 90, /* sec between sendPex() calls */
-    /* */
-    REQQ = 512,
-    /* */
-    METADATA_REQQ = 64,
-    /* */
-    MAGIC_NUMBER = 21549,
-    /* used in lowering the outMessages queue period */
-    IMMEDIATE_PRIORITY_INTERVAL_SECS = 0,
-    HIGH_PRIORITY_INTERVAL_SECS = 2,
-    LOW_PRIORITY_INTERVAL_SECS = 10,
-    /* number of pieces we'll allow in our fast set */
-    MAX_FAST_SET_SIZE = 3,
-    /* how many blocks to keep prefetched per peer */
-    PREFETCH_SIZE = 18,
-    /* when we're making requests from another peer,
-       batch them together to send enough requests to
-       meet our bandwidth goals for the next N seconds */
-    REQUEST_BUF_SECS = 10,
-    /* defined in BEP #9 */
+};
+
+// http://bittorrent.org/beps/bep_0009.html
+enum MetadataMsgType
+{
     METADATA_MSG_TYPE_REQUEST = 0,
     METADATA_MSG_TYPE_DATA = 1,
     METADATA_MSG_TYPE_REJECT = 2
 };
+
+// seconds between sendPex() calls
+static auto constexpr PexIntervalSecs = int{ 90 };
+
+static auto constexpr MinChokePeriodSec = int{ 10 };
+
+// idle seconds before we send a keepalive
+static auto constexpr KeepaliveIntervalSecs = int{ 100 };
+
+static auto constexpr MetadataReqQ = int{ 64 };
+
+static auto constexpr ReqQ = int{ 512 };
+
+// used in lowering the outMessages queue period
+static auto constexpr ImmediatePriorityIntervalSecs = int{ 0 };
+static auto constexpr HighPriorityIntervalSecs = int{ 2 };
+static auto constexpr LowPriorityIntervalSecs = int{ 10 };
+
+// how many blocks to keep prefetched per peer
+static auto constexpr PrefetchSize = int{ 18 };
+
+// when we're making requests from another peer,
+// batch them together to send enough requests to
+// meet our bandwidth goals for the next N seconds
+static auto constexpr RequestBufSecs = int{ 10 };
 
 namespace
 {
@@ -106,10 +131,10 @@ constexpr int MAX_PEX_PEER_COUNT = 50;
 
 enum
 {
-    AWAITING_BT_LENGTH,
-    AWAITING_BT_ID,
-    AWAITING_BT_MESSAGE,
-    AWAITING_BT_PIECE
+    AwaitingBtLength,
+    AwaitingBtId,
+    AwaitingBtMessage,
+    AwaitingBtPiece
 };
 
 enum encryption_preference_t
@@ -198,19 +223,17 @@ class tr_peerMsgsImpl : public tr_peerMsgs
 public:
     tr_peerMsgsImpl(tr_torrent* torrent_in, peer_atom* atom_in, tr_peerIo* io_in, tr_peer_callback callback, void* callbackData)
         : tr_peerMsgs{ torrent_in, atom_in }
-        , outMessagesBatchPeriod{ LOW_PRIORITY_INTERVAL_SECS }
-        , state{ AWAITING_BT_LENGTH }
+        , outMessagesBatchPeriod{ LowPriorityIntervalSecs }
         , torrent{ torrent_in }
         , outMessages{ evbuffer_new() }
-        , outMessagesBatchedAt{ 0 }
         , io{ io_in }
         , callback_{ callback }
         , callbackData_{ callbackData }
     {
-        if (tr_torrentAllowsPex(torrent))
+        if (torrent->allowsPex())
         {
             pex_timer.reset(evtimer_new(torrent->session->event_base, pexPulse, this));
-            tr_timerAdd(pex_timer.get(), PEX_INTERVAL_SECS, 0);
+            tr_timerAdd(pex_timer.get(), PexIntervalSecs, 0);
         }
 
         if (tr_peerIoSupportsUTP(io))
@@ -232,7 +255,7 @@ public:
             /* Only send PORT over IPv6 when the IPv6 DHT is running (BEP-32). */
             struct tr_address const* addr = tr_peerIoGetAddress(io, nullptr);
 
-            if (addr->type == TR_AF_INET || tr_globalIPv6() != nullptr)
+            if (addr->type == TR_AF_INET || tr_globalIPv6(nullptr) != nullptr)
             {
                 protocolSendPort(this, tr_dhtPort(torrent->session));
             }
@@ -332,7 +355,7 @@ public:
 
     bool is_reading_block(tr_block_index_t block) const override
     {
-        return state == AWAITING_BT_PIECE && block == _tr_block(torrent, incoming.blockReq.index, incoming.blockReq.offset);
+        return state == AwaitingBtPiece && block == torrent->blockOf(incoming.blockReq.index, incoming.blockReq.offset);
     }
 
     void cancel_block_request(tr_block_index_t block) override
@@ -343,7 +366,7 @@ public:
     void set_choke(bool peer_is_choked) override
     {
         time_t const now = tr_time();
-        time_t const fibrillationTime = now - MIN_CHOKE_PERIOD_SEC;
+        time_t const fibrillationTime = now - MinChokePeriodSec;
 
         if (chokeChangedAt > fibrillationTime)
         {
@@ -483,7 +506,7 @@ public:
         publish(e);
     }
 
-    void publishClientGotBitfield(Bitfield* bitfield)
+    void publishClientGotBitfield(tr_bitfield* bitfield)
     {
         auto e = tr_peer_event{};
         e.eventType = TR_PEER_CLIENT_GOT_BITFIELD;
@@ -509,19 +532,19 @@ private:
 
         // TR_PEER_TO_CLIENT
 
-        if (!tr_torrentHasMetadata(torrent))
+        if (!torrent->hasMetadata())
         {
             return true;
         }
 
         auto const active = is_client_interested() && !is_client_choked();
-        TR_ASSERT(!active || !tr_torrentIsSeed(torrent));
+        TR_ASSERT(!active || !torrent->isDone());
         return active;
     }
 
     void set_active(tr_direction direction, bool active)
     {
-        // TODO dbgmsg(msgs, "direction [%d] is_active [%d]", (int)direction, (int)is_active);
+        // TODO dbgmsg(msgs, "direction [%d] is_active [%d]", int(direction), int(is_active));
         auto& val = is_active_[direction];
         if (val != active)
         {
@@ -557,7 +580,7 @@ public:
     bool clientSentLtepHandshake = false;
     bool peerSentLtepHandshake = false;
 
-    int desiredRequestCount = 0;
+    size_t desired_request_count = 0;
 
     int prefetchCount = 0;
 
@@ -566,7 +589,7 @@ public:
      * very quickly; others aren't as urgent. */
     int8_t outMessagesBatchPeriod;
 
-    uint8_t state = AWAITING_BT_LENGTH;
+    uint8_t state = AwaitingBtLength;
     uint8_t ut_pex_id = 0;
     uint8_t ut_metadata_id = 0;
     uint16_t pexCount = 0;
@@ -578,6 +601,8 @@ public:
 
     size_t metadata_size_hint = 0;
 #if 0
+    /* number of pieces we'll allow in our fast set */
+    static auto constexpr MAX_FAST_SET_SIZE = int{ 3 };
     size_t fastsetSize;
     tr_piece_index_t fastset[MAX_FAST_SET_SIZE];
 #endif
@@ -586,9 +611,9 @@ public:
 
     evbuffer* const outMessages; /* all the non-piece messages */
 
-    struct peer_request peerAskedFor[REQQ] = {};
+    struct peer_request peerAskedFor[ReqQ] = {};
 
-    int peerAskedForMetadata[METADATA_REQQ] = {};
+    int peerAskedForMetadata[MetadataReqQ] = {};
     int peerAskedForMetadataCount = 0;
 
     tr_pex* pex = nullptr;
@@ -604,9 +629,8 @@ public:
     struct tr_incoming incoming = {};
 
     /* if the peer supports the Extension Protocol in BEP 10 and
-       supplied a reqq argument, it's stored here. Otherwise, the
-       value is zero and should be ignored. */
-    int64_t reqq = 0;
+       supplied a reqq argument, it's stored here. */
+    std::optional<size_t> reqq;
 
     UniqueTimer pex_timer;
 
@@ -641,7 +665,6 @@ static void myDebug(char const* file, int line, tr_peerMsgsImpl const* msgs, cha
         char addrstr[TR_ADDRSTRLEN];
         struct evbuffer* buf = evbuffer_new();
         char* base = tr_sys_path_basename(file, nullptr);
-        char* message;
 
         evbuffer_add_printf(
             buf,
@@ -649,17 +672,16 @@ static void myDebug(char const* file, int line, tr_peerMsgsImpl const* msgs, cha
             tr_logGetTimeStr(timestr, sizeof(timestr)),
             tr_torrentName(msgs->torrent),
             tr_peerIoGetAddrStr(msgs->io, addrstr, sizeof(addrstr)),
-            tr_quark_get_string(msgs->client, nullptr));
+            msgs->client.c_str());
         va_start(args, fmt);
         evbuffer_add_vprintf(buf, fmt, args);
         va_end(args);
         evbuffer_add_printf(buf, " (%s:%d)", base, line);
 
-        message = evbuffer_free_to_str(buf, nullptr);
+        auto const message = evbuffer_free_to_str(buf);
         tr_sys_file_write_line(fp, message, nullptr);
 
         tr_free(base);
-        tr_free(message);
     }
 }
 
@@ -697,7 +719,7 @@ static void protocolSendReject(tr_peerMsgsImpl* msgs, struct peer_request const*
     struct evbuffer* out = msgs->outMessages;
 
     evbuffer_add_uint32(out, sizeof(uint8_t) + 3 * sizeof(uint32_t));
-    evbuffer_add_uint8(out, BT_FEXT_REJECT);
+    evbuffer_add_uint8(out, BtFextReject);
     evbuffer_add_uint32(out, req->index);
     evbuffer_add_uint32(out, req->offset);
     evbuffer_add_uint32(out, req->length);
@@ -711,14 +733,14 @@ static void protocolSendRequest(tr_peerMsgsImpl* msgs, struct peer_request const
     struct evbuffer* out = msgs->outMessages;
 
     evbuffer_add_uint32(out, sizeof(uint8_t) + 3 * sizeof(uint32_t));
-    evbuffer_add_uint8(out, BT_REQUEST);
+    evbuffer_add_uint8(out, BtRequest);
     evbuffer_add_uint32(out, req.index);
     evbuffer_add_uint32(out, req.offset);
     evbuffer_add_uint32(out, req.length);
 
     dbgmsg(msgs, "requesting %u:%u->%u...", req.index, req.offset, req.length);
     dbgOutMessageLen(msgs);
-    pokeBatchPeriod(msgs, IMMEDIATE_PRIORITY_INTERVAL_SECS);
+    pokeBatchPeriod(msgs, ImmediatePriorityIntervalSecs);
 }
 
 static void protocolSendCancel(tr_peerMsgsImpl* msgs, peer_request const& req)
@@ -726,14 +748,14 @@ static void protocolSendCancel(tr_peerMsgsImpl* msgs, peer_request const& req)
     struct evbuffer* out = msgs->outMessages;
 
     evbuffer_add_uint32(out, sizeof(uint8_t) + 3 * sizeof(uint32_t));
-    evbuffer_add_uint8(out, BT_CANCEL);
+    evbuffer_add_uint8(out, BtCancel);
     evbuffer_add_uint32(out, req.index);
     evbuffer_add_uint32(out, req.offset);
     evbuffer_add_uint32(out, req.length);
 
     dbgmsg(msgs, "cancelling %u:%u->%u...", req.index, req.offset, req.length);
     dbgOutMessageLen(msgs);
-    pokeBatchPeriod(msgs, IMMEDIATE_PRIORITY_INTERVAL_SECS);
+    pokeBatchPeriod(msgs, ImmediatePriorityIntervalSecs);
 }
 
 static void protocolSendPort(tr_peerMsgsImpl* msgs, uint16_t port)
@@ -742,7 +764,7 @@ static void protocolSendPort(tr_peerMsgsImpl* msgs, uint16_t port)
 
     dbgmsg(msgs, "sending Port %u", port);
     evbuffer_add_uint32(out, 3);
-    evbuffer_add_uint8(out, BT_PORT);
+    evbuffer_add_uint8(out, BtPort);
     evbuffer_add_uint16(out, port);
 }
 
@@ -751,12 +773,12 @@ static void protocolSendHave(tr_peerMsgsImpl* msgs, tr_piece_index_t index)
     struct evbuffer* out = msgs->outMessages;
 
     evbuffer_add_uint32(out, sizeof(uint8_t) + sizeof(uint32_t));
-    evbuffer_add_uint8(out, BT_HAVE);
+    evbuffer_add_uint8(out, BtHave);
     evbuffer_add_uint32(out, index);
 
     dbgmsg(msgs, "sending Have %u", index);
     dbgOutMessageLen(msgs);
-    pokeBatchPeriod(msgs, LOW_PRIORITY_INTERVAL_SECS);
+    pokeBatchPeriod(msgs, LowPriorityIntervalSecs);
 }
 
 #if 0
@@ -769,7 +791,7 @@ static void protocolSendAllowedFast(tr_peerMsgs* msgs, uint32_t pieceIndex)
     struct evbuffer* out = msgs->outMessages;
 
     evbuffer_add_uint32(io, out, sizeof(uint8_t) + sizeof(uint32_t));
-    evbuffer_add_uint8(io, out, BT_FEXT_ALLOWED_FAST);
+    evbuffer_add_uint8(io, out, BtFextAllowedFast);
     evbuffer_add_uint32(io, out, pieceIndex);
 
     dbgmsg(msgs, "sending Allowed Fast %u...", pieceIndex);
@@ -783,11 +805,11 @@ static void protocolSendChoke(tr_peerMsgsImpl* msgs, bool choke)
     struct evbuffer* out = msgs->outMessages;
 
     evbuffer_add_uint32(out, sizeof(uint8_t));
-    evbuffer_add_uint8(out, choke ? BT_CHOKE : BT_UNCHOKE);
+    evbuffer_add_uint8(out, choke ? BtChoke : BtUnchoke);
 
     dbgmsg(msgs, "sending %s...", choke ? "Choke" : "Unchoke");
     dbgOutMessageLen(msgs);
-    pokeBatchPeriod(msgs, IMMEDIATE_PRIORITY_INTERVAL_SECS);
+    pokeBatchPeriod(msgs, ImmediatePriorityIntervalSecs);
 }
 
 static void protocolSendHaveAll(tr_peerMsgsImpl* msgs)
@@ -797,11 +819,11 @@ static void protocolSendHaveAll(tr_peerMsgsImpl* msgs)
     struct evbuffer* out = msgs->outMessages;
 
     evbuffer_add_uint32(out, sizeof(uint8_t));
-    evbuffer_add_uint8(out, BT_FEXT_HAVE_ALL);
+    evbuffer_add_uint8(out, BtFextHaveAll);
 
     dbgmsg(msgs, "sending HAVE_ALL...");
     dbgOutMessageLen(msgs);
-    pokeBatchPeriod(msgs, IMMEDIATE_PRIORITY_INTERVAL_SECS);
+    pokeBatchPeriod(msgs, ImmediatePriorityIntervalSecs);
 }
 
 static void protocolSendHaveNone(tr_peerMsgsImpl* msgs)
@@ -811,11 +833,11 @@ static void protocolSendHaveNone(tr_peerMsgsImpl* msgs)
     struct evbuffer* out = msgs->outMessages;
 
     evbuffer_add_uint32(out, sizeof(uint8_t));
-    evbuffer_add_uint8(out, BT_FEXT_HAVE_NONE);
+    evbuffer_add_uint8(out, BtFextHaveNone);
 
     dbgmsg(msgs, "sending HAVE_NONE...");
     dbgOutMessageLen(msgs);
-    pokeBatchPeriod(msgs, IMMEDIATE_PRIORITY_INTERVAL_SECS);
+    pokeBatchPeriod(msgs, ImmediatePriorityIntervalSecs);
 }
 
 /**
@@ -878,7 +900,7 @@ size_t tr_generateAllowedSet(tr_piece_index_t* setmePieces, size_t desiredSetSiz
     return setSize;
 }
 
-static void updateFastSet([[maybe_unused]] tr_peerMsgs* msgs)
+static void updateFastSet(tr_peerMsgs*)
 {
     bool const fext = tr_peerIoSupportsFEXT(msgs->io);
     bool const peerIsNeedy = msgs->peer->progress < 0.10;
@@ -914,9 +936,9 @@ static void sendInterest(tr_peerMsgsImpl* msgs, bool b)
 
     dbgmsg(msgs, "Sending %s", b ? "Interested" : "Not Interested");
     evbuffer_add_uint32(out, sizeof(uint8_t));
-    evbuffer_add_uint8(out, b ? BT_INTERESTED : BT_NOT_INTERESTED);
+    evbuffer_add_uint8(out, b ? BtInterested : BtNotInterested);
 
-    pokeBatchPeriod(msgs, HIGH_PRIORITY_INTERVAL_SECS);
+    pokeBatchPeriod(msgs, HighPriorityIntervalSecs);
     dbgOutMessageLen(msgs);
 }
 
@@ -984,11 +1006,8 @@ static bool requestIsValid(tr_peerMsgsImpl const* msgs, struct peer_request cons
 
 static void sendLtepHandshake(tr_peerMsgsImpl* msgs)
 {
-    tr_variant val;
-    bool allow_pex;
-    struct evbuffer* payload;
-    struct evbuffer* out = msgs->outMessages;
-    unsigned char const* ipv6 = tr_globalIPv6();
+    evbuffer* const out = msgs->outMessages;
+    unsigned char const* ipv6 = tr_globalIPv6(msgs->io->session);
     static tr_quark version_quark = 0;
 
     if (msgs->clientSentLtepHandshake)
@@ -998,17 +1017,18 @@ static void sendLtepHandshake(tr_peerMsgsImpl* msgs)
 
     if (version_quark == 0)
     {
-        version_quark = tr_quark_new(TR_NAME " " USERAGENT_PREFIX, TR_BAD_SIZE);
+        version_quark = tr_quark_new(TR_NAME " " USERAGENT_PREFIX);
     }
 
     dbgmsg(msgs, "sending an ltep handshake");
     msgs->clientSentLtepHandshake = true;
 
     /* decide if we want to advertise metadata xfer support (BEP 9) */
-    bool const allow_metadata_xfer = !tr_torrentIsPrivate(msgs->torrent);
+    bool const allow_metadata_xfer = msgs->torrent->isPublic();
 
     /* decide if we want to advertise pex support */
-    if (!tr_torrentAllowsPex(msgs->torrent))
+    auto allow_pex = bool{};
+    if (!msgs->torrent->allowsPex())
     {
         allow_pex = false;
     }
@@ -1021,6 +1041,7 @@ static void sendLtepHandshake(tr_peerMsgsImpl* msgs)
         allow_pex = true;
     }
 
+    auto val = tr_variant{};
     tr_variantInitDict(&val, 8);
     tr_variantDictAddBool(&val, TR_KEY_e, msgs->session->encryptionMode != TR_CLEAR_PREFERRED);
 
@@ -1029,15 +1050,41 @@ static void sendLtepHandshake(tr_peerMsgsImpl* msgs)
         tr_variantDictAddRaw(&val, TR_KEY_ipv6, ipv6, 16);
     }
 
-    if (allow_metadata_xfer && tr_torrentHasMetadata(msgs->torrent) && msgs->torrent->infoDictLength > 0)
+    // http://bittorrent.org/beps/bep_0009.html
+    // It also adds "metadata_size" to the handshake message (not the
+    // "m" dictionary) specifying an integer value of the number of
+    // bytes of the metadata.
+    auto const info_dict_size = msgs->torrent->infoDictSize();
+    if (allow_metadata_xfer && msgs->torrent->hasMetadata() && info_dict_size > 0)
     {
-        tr_variantDictAddInt(&val, TR_KEY_metadata_size, msgs->torrent->infoDictLength);
+        tr_variantDictAddInt(&val, TR_KEY_metadata_size, info_dict_size);
     }
 
+    // http://bittorrent.org/beps/bep_0010.html
+    // Local TCP listen port. Allows each side to learn about the TCP
+    // port number of the other side. Note that there is no need for the
+    // receiving side of the connection to send this extension message,
+    // since its port number is already known.
     tr_variantDictAddInt(&val, TR_KEY_p, tr_sessionGetPublicPeerPort(msgs->session));
-    tr_variantDictAddInt(&val, TR_KEY_reqq, REQQ);
-    tr_variantDictAddBool(&val, TR_KEY_upload_only, tr_torrentIsSeed(msgs->torrent));
+
+    // http://bittorrent.org/beps/bep_0010.html
+    // An integer, the number of outstanding request messages this
+    // client supports without dropping any. The default in in
+    // libtorrent is 250.
+    tr_variantDictAddInt(&val, TR_KEY_reqq, ReqQ);
+
+    // http://bittorrent.org/beps/bep_0010.html
+    // Client name and version (as a utf-8 string). This is a much more
+    // reliable way of identifying the client than relying on the
+    // peer id encoding.
     tr_variantDictAddQuark(&val, TR_KEY_v, version_quark);
+
+    // http://bittorrent.org/beps/bep_0021.html
+    // A peer that is a partial seed SHOULD include an extra header in
+    // the extension handshake 'upload_only'. Setting the value of this
+    // key to 1 indicates that this peer is not interested in downloading
+    // anything.
+    tr_variantDictAddBool(&val, TR_KEY_upload_only, msgs->torrent->isDone());
 
     if (allow_metadata_xfer || allow_pex)
     {
@@ -1054,13 +1101,13 @@ static void sendLtepHandshake(tr_peerMsgsImpl* msgs)
         }
     }
 
-    payload = tr_variantToBuf(&val, TR_VARIANT_FMT_BENC);
+    auto* const payload = tr_variantToBuf(&val, TR_VARIANT_FMT_BENC);
 
     evbuffer_add_uint32(out, 2 * sizeof(uint8_t) + evbuffer_get_length(payload));
-    evbuffer_add_uint8(out, BT_LTEP);
+    evbuffer_add_uint8(out, BtLtep);
     evbuffer_add_uint8(out, LTEP_HANDSHAKE);
     evbuffer_add_buffer(out, payload);
-    pokeBatchPeriod(msgs, IMMEDIATE_PRIORITY_INTERVAL_SECS);
+    pokeBatchPeriod(msgs, ImmediatePriorityIntervalSecs);
     dbgOutMessageLen(msgs);
 
     /* cleanup */
@@ -1070,20 +1117,12 @@ static void sendLtepHandshake(tr_peerMsgsImpl* msgs)
 
 static void parseLtepHandshake(tr_peerMsgsImpl* msgs, uint32_t len, struct evbuffer* inbuf)
 {
-    int64_t i;
-    tr_variant val;
-    tr_variant* sub;
-    uint8_t* tmp = tr_new(uint8_t, len);
-    uint8_t const* addr;
-    size_t addr_len;
-    tr_pex pex;
-
-    memset(&pex, 0, sizeof(tr_pex));
-
+    auto* const tmp = tr_new(char, len);
     tr_peerIoReadBytes(msgs->io, inbuf, tmp, len);
     msgs->peerSentLtepHandshake = true;
 
-    if (tr_variantFromBenc(&val, tmp, len) != 0 || !tr_variantIsDict(&val))
+    auto val = tr_variant{};
+    if (!tr_variantFromBuf(&val, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, { tmp, len }) || !tr_variantIsDict(&val))
     {
         dbgmsg(msgs, "GET  extended-handshake, couldn't get dictionary");
         tr_free(tmp);
@@ -1093,7 +1132,7 @@ static void parseLtepHandshake(tr_peerMsgsImpl* msgs, uint32_t len, struct evbuf
     /* arbitrary limit, should be more than enough */
     if (len <= 4096)
     {
-        dbgmsg(msgs, "here is the handshake: [%*.*s]", TR_ARG_TUPLE((int)len, (int)len, tmp));
+        dbgmsg(msgs, "here is the handshake: [%*.*s]", TR_ARG_TUPLE(int(len), int(len), tmp));
     }
     else
     {
@@ -1101,6 +1140,8 @@ static void parseLtepHandshake(tr_peerMsgsImpl* msgs, uint32_t len, struct evbuf
     }
 
     /* does the peer prefer encrypted connections? */
+    auto i = int64_t{};
+    auto pex = tr_pex{};
     if (tr_variantDictFindInt(&val, TR_KEY_e, &i))
     {
         msgs->encryption_preference = i != 0 ? ENCRYPTION_PREFERENCE_YES : ENCRYPTION_PREFERENCE_NO;
@@ -1115,20 +1156,21 @@ static void parseLtepHandshake(tr_peerMsgsImpl* msgs, uint32_t len, struct evbuf
     msgs->peerSupportsPex = false;
     msgs->peerSupportsMetadataXfer = false;
 
+    tr_variant* sub = nullptr;
     if (tr_variantDictFindDict(&val, TR_KEY_m, &sub))
     {
         if (tr_variantDictFindInt(sub, TR_KEY_ut_pex, &i))
         {
             msgs->peerSupportsPex = i != 0;
             msgs->ut_pex_id = (uint8_t)i;
-            dbgmsg(msgs, "msgs->ut_pex is %d", (int)msgs->ut_pex_id);
+            dbgmsg(msgs, "msgs->ut_pex is %d", int(msgs->ut_pex_id));
         }
 
         if (tr_variantDictFindInt(sub, TR_KEY_ut_metadata, &i))
         {
             msgs->peerSupportsMetadataXfer = i != 0;
             msgs->ut_metadata_id = (uint8_t)i;
-            dbgmsg(msgs, "msgs->ut_metadata_id is %d", (int)msgs->ut_metadata_id);
+            dbgmsg(msgs, "msgs->ut_metadata_id is %d", int(msgs->ut_metadata_id));
         }
 
         if (tr_variantDictFindInt(sub, TR_KEY_ut_holepunch, &i))
@@ -1156,9 +1198,11 @@ static void parseLtepHandshake(tr_peerMsgsImpl* msgs, uint32_t len, struct evbuf
     {
         pex.port = htons((uint16_t)i);
         msgs->publishClientGotPort(pex.port);
-        dbgmsg(msgs, "peer's port is now %d", (int)i);
+        dbgmsg(msgs, "peer's port is now %d", int(i));
     }
 
+    uint8_t const* addr = nullptr;
+    auto addr_len = size_t{};
     if (tr_peerIoIsIncoming(msgs->io) && tr_variantDictFindRaw(&val, TR_KEY_ipv4, &addr, &addr_len) && addr_len == 4)
     {
         pex.addr.type = TR_AF_INET;
@@ -1188,14 +1232,14 @@ static void parseUtMetadata(tr_peerMsgsImpl* msgs, uint32_t msglen, struct evbuf
     int64_t msg_type = -1;
     int64_t piece = -1;
     int64_t total_size = 0;
-    uint8_t* const tmp = tr_new(uint8_t, msglen);
+    auto* const tmp = tr_new(char, msglen);
 
     tr_peerIoReadBytes(msgs->io, inbuf, tmp, msglen);
     char const* const msg_end = (char const*)tmp + msglen;
 
-    tr_variant dict;
-    char const* benc_end;
-    if (tr_variantFromBencFull(&dict, tmp, msglen, nullptr, &benc_end) == 0)
+    auto dict = tr_variant{};
+    char const* benc_end = nullptr;
+    if (tr_variantFromBuf(&dict, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, { tmp, msglen }, &benc_end))
     {
         (void)tr_variantDictFindInt(&dict, TR_KEY_msg_type, &msg_type);
         (void)tr_variantDictFindInt(&dict, TR_KEY_piece, &piece);
@@ -1203,15 +1247,15 @@ static void parseUtMetadata(tr_peerMsgsImpl* msgs, uint32_t msglen, struct evbuf
         tr_variantFree(&dict);
     }
 
-    dbgmsg(msgs, "got ut_metadata msg: type %d, piece %d, total_size %d", (int)msg_type, (int)piece, (int)total_size);
+    dbgmsg(msgs, "got ut_metadata msg: type %d, piece %d, total_size %d", int(msg_type), int(piece), int(total_size));
 
     if (msg_type == METADATA_MSG_TYPE_REJECT)
     {
         /* NOOP */
     }
 
-    if (msg_type == METADATA_MSG_TYPE_DATA && !tr_torrentHasMetadata(msgs->torrent) &&
-        msg_end - benc_end <= METADATA_PIECE_SIZE && piece * METADATA_PIECE_SIZE + (msg_end - benc_end) <= total_size)
+    if (msg_type == METADATA_MSG_TYPE_DATA && !msgs->torrent->hasMetadata() && msg_end - benc_end <= METADATA_PIECE_SIZE &&
+        piece * METADATA_PIECE_SIZE + (msg_end - benc_end) <= total_size)
     {
         int const pieceLen = msg_end - benc_end;
         tr_torrentSetMetadataPiece(msgs->torrent, piece, benc_end, pieceLen);
@@ -1219,29 +1263,28 @@ static void parseUtMetadata(tr_peerMsgsImpl* msgs, uint32_t msglen, struct evbuf
 
     if (msg_type == METADATA_MSG_TYPE_REQUEST)
     {
-        if (piece >= 0 && tr_torrentHasMetadata(msgs->torrent) && !tr_torrentIsPrivate(msgs->torrent) &&
-            msgs->peerAskedForMetadataCount < METADATA_REQQ)
+        if (piece >= 0 && msgs->torrent->hasMetadata() && msgs->torrent->isPublic() &&
+            msgs->peerAskedForMetadataCount < MetadataReqQ)
         {
             msgs->peerAskedForMetadata[msgs->peerAskedForMetadataCount++] = piece;
         }
         else
         {
-            tr_variant v;
-            struct evbuffer* payload;
-            struct evbuffer* out = msgs->outMessages;
+            evbuffer* const out = msgs->outMessages;
 
             /* build the rejection message */
+            auto v = tr_variant{};
             tr_variantInitDict(&v, 2);
             tr_variantDictAddInt(&v, TR_KEY_msg_type, METADATA_MSG_TYPE_REJECT);
             tr_variantDictAddInt(&v, TR_KEY_piece, piece);
-            payload = tr_variantToBuf(&v, TR_VARIANT_FMT_BENC);
+            evbuffer* const payload = tr_variantToBuf(&v, TR_VARIANT_FMT_BENC);
 
             /* write it out as a LTEP message to our outMessages buffer */
             evbuffer_add_uint32(out, 2 * sizeof(uint8_t) + evbuffer_get_length(payload));
-            evbuffer_add_uint8(out, BT_LTEP);
+            evbuffer_add_uint8(out, BtLtep);
             evbuffer_add_uint8(out, msgs->ut_metadata_id);
             evbuffer_add_buffer(out, payload);
-            pokeBatchPeriod(msgs, HIGH_PRIORITY_INTERVAL_SECS);
+            pokeBatchPeriod(msgs, HighPriorityIntervalSecs);
             dbgOutMessageLen(msgs);
 
             /* cleanup */
@@ -1256,68 +1299,58 @@ static void parseUtMetadata(tr_peerMsgsImpl* msgs, uint32_t msglen, struct evbuf
 static void parseUtPex(tr_peerMsgsImpl* msgs, uint32_t msglen, struct evbuffer* inbuf)
 {
     tr_torrent* tor = msgs->torrent;
-    if (!tr_torrentAllowsPex(tor))
+    if (!tor->allowsPex())
     {
         return;
     }
 
-    uint8_t* tmp = tr_new(uint8_t, msglen);
+    auto* tmp = tr_new(char, msglen);
     tr_peerIoReadBytes(msgs->io, inbuf, tmp, msglen);
 
     tr_variant val;
-    bool const loaded = tr_variantFromBenc(&val, tmp, msglen) == 0;
+
+    if (tr_variantFromBuf(&val, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, { tmp, msglen }))
+    {
+        uint8_t const* added = nullptr;
+        auto added_len = size_t{};
+        if (tr_variantDictFindRaw(&val, TR_KEY_added, &added, &added_len))
+        {
+            uint8_t const* added_f = nullptr;
+            auto added_f_len = size_t{};
+            if (!tr_variantDictFindRaw(&val, TR_KEY_added_f, &added_f, &added_f_len))
+            {
+                added_f_len = 0;
+                added_f = nullptr;
+            }
+
+            auto n = size_t{};
+            tr_pex* const pex = tr_peerMgrCompactToPex(added, added_len, added_f, added_f_len, &n);
+            n = std::min(n, size_t{ MAX_PEX_PEER_COUNT });
+            tr_peerMgrAddPex(tor, TR_PEER_FROM_PEX, pex, n);
+            tr_free(pex);
+        }
+
+        if (tr_variantDictFindRaw(&val, TR_KEY_added6, &added, &added_len))
+        {
+            uint8_t const* added_f = nullptr;
+            auto added_f_len = size_t{};
+            if (!tr_variantDictFindRaw(&val, TR_KEY_added6_f, &added_f, &added_f_len))
+            {
+                added_f_len = 0;
+                added_f = nullptr;
+            }
+
+            auto n = size_t{};
+            tr_pex* const pex = tr_peerMgrCompact6ToPex(added, added_len, added_f, added_f_len, &n);
+            n = std::min(n, size_t{ MAX_PEX_PEER_COUNT });
+            tr_peerMgrAddPex(tor, TR_PEER_FROM_PEX, pex, n);
+            tr_free(pex);
+        }
+
+        tr_variantFree(&val);
+    }
 
     tr_free(tmp);
-
-    if (!loaded)
-    {
-        return;
-    }
-
-    uint8_t const* added;
-    size_t added_len;
-
-    if (tr_variantDictFindRaw(&val, TR_KEY_added, &added, &added_len))
-    {
-        tr_pex* pex;
-        size_t n;
-        size_t added_f_len;
-        uint8_t const* added_f;
-
-        if (!tr_variantDictFindRaw(&val, TR_KEY_added_f, &added_f, &added_f_len))
-        {
-            added_f_len = 0;
-            added_f = nullptr;
-        }
-
-        pex = tr_peerMgrCompactToPex(added, added_len, added_f, added_f_len, &n);
-        n = std::min(n, size_t{ MAX_PEX_PEER_COUNT });
-        tr_peerMgrAddPex(tor, TR_PEER_FROM_PEX, pex, n);
-
-        tr_free(pex);
-    }
-
-    if (tr_variantDictFindRaw(&val, TR_KEY_added6, &added, &added_len))
-    {
-        tr_pex* pex;
-        size_t n;
-        size_t added_f_len;
-        uint8_t const* added_f;
-
-        if (!tr_variantDictFindRaw(&val, TR_KEY_added6_f, &added_f, &added_f_len))
-        {
-            added_f_len = 0;
-            added_f = nullptr;
-        }
-
-        pex = tr_peerMgrCompact6ToPex(added, added_len, added_f, added_f_len, &n);
-        n = std::min(n, size_t{ MAX_PEX_PEER_COUNT });
-        tr_peerMgrAddPex(tor, TR_PEER_FROM_PEX, pex, n);
-
-        tr_free(pex);
-    }
-
-    tr_variantFree(&val);
 }
 
 static void sendPex(tr_peerMsgsImpl* msgs);
@@ -1326,8 +1359,7 @@ static void parseLtep(tr_peerMsgsImpl* msgs, uint32_t msglen, struct evbuffer* i
 {
     TR_ASSERT(msglen > 0);
 
-    uint8_t ltep_msgid;
-
+    auto ltep_msgid = uint8_t{};
     tr_peerIoReadUint8(msgs->io, inbuf, &ltep_msgid);
     msglen--;
 
@@ -1356,22 +1388,20 @@ static void parseLtep(tr_peerMsgsImpl* msgs, uint32_t msglen, struct evbuffer* i
     }
     else
     {
-        dbgmsg(msgs, "skipping unknown ltep message (%d)", (int)ltep_msgid);
+        dbgmsg(msgs, "skipping unknown ltep message (%d)", int(ltep_msgid));
         evbuffer_drain(inbuf, msglen);
     }
 }
 
 static ReadState readBtLength(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, size_t inlen)
 {
-    uint32_t len;
-
+    auto len = uint32_t{};
     if (inlen < sizeof(len))
     {
         return READ_LATER;
     }
 
     tr_peerIoReadUint32(msgs->io, inbuf, &len);
-
     if (len == 0) /* peer sent us a keepalive message */
     {
         dbgmsg(msgs, "got KeepAlive");
@@ -1379,7 +1409,7 @@ static ReadState readBtLength(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, siz
     else
     {
         msgs->incoming.length = len;
-        msgs->state = AWAITING_BT_ID;
+        msgs->state = AwaitingBtId;
     }
 
     return READ_NOW;
@@ -1389,31 +1419,29 @@ static ReadState readBtMessage(tr_peerMsgsImpl*, struct evbuffer*, size_t);
 
 static ReadState readBtId(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, size_t inlen)
 {
-    uint8_t id;
-
     if (inlen < sizeof(uint8_t))
     {
         return READ_LATER;
     }
 
+    auto id = uint8_t{};
     tr_peerIoReadUint8(msgs->io, inbuf, &id);
     msgs->incoming.id = id;
     dbgmsg(msgs, "msgs->incoming.id is now %d; msgs->incoming.length is %zu", id, (size_t)msgs->incoming.length);
 
-    if (id == BT_PIECE)
+    if (id == BtPiece)
     {
-        msgs->state = AWAITING_BT_PIECE;
+        msgs->state = AwaitingBtPiece;
         return READ_NOW;
     }
-    else if (msgs->incoming.length != 1)
+
+    if (msgs->incoming.length != 1)
     {
-        msgs->state = AWAITING_BT_MESSAGE;
+        msgs->state = AwaitingBtMessage;
         return READ_NOW;
     }
-    else
-    {
-        return readBtMessage(msgs, inbuf, inlen - 1);
-    }
+
+    return readBtMessage(msgs, inbuf, inlen - 1);
 }
 
 static void updatePeerProgress(tr_peerMsgsImpl* msgs)
@@ -1430,7 +1458,7 @@ static void prefetchPieces(tr_peerMsgsImpl* msgs)
         return;
     }
 
-    for (int i = msgs->prefetchCount; i < msgs->pendingReqsToClient && i < PREFETCH_SIZE; ++i)
+    for (int i = msgs->prefetchCount; i < msgs->pendingReqsToClient && i < PrefetchSize; ++i)
     {
         struct peer_request const* req = msgs->peerAskedFor + i;
 
@@ -1446,7 +1474,7 @@ static void peerMadeRequest(tr_peerMsgsImpl* msgs, struct peer_request const* re
 {
     bool const fext = tr_peerIoSupportsFEXT(msgs->io);
     bool const reqIsValid = requestIsValid(msgs, req);
-    bool const clientHasPiece = reqIsValid && tr_torrentPieceIsComplete(msgs->torrent, req->index);
+    bool const clientHasPiece = reqIsValid && msgs->torrent->hasPiece(req->index);
     bool const peerIsChoked = msgs->peer_is_choked_;
 
     bool allow = false;
@@ -1463,7 +1491,7 @@ static void peerMadeRequest(tr_peerMsgsImpl* msgs, struct peer_request const* re
     {
         dbgmsg(msgs, "rejecting request from choked peer");
     }
-    else if (msgs->pendingReqsToClient + 1 >= REQQ)
+    else if (msgs->pendingReqsToClient + 1 >= ReqQ)
     {
         dbgmsg(msgs, "rejecting request ... reqq is full");
     }
@@ -1487,23 +1515,23 @@ static bool messageLengthIsCorrect(tr_peerMsgsImpl const* msg, uint8_t id, uint3
 {
     switch (id)
     {
-    case BT_CHOKE:
-    case BT_UNCHOKE:
-    case BT_INTERESTED:
-    case BT_NOT_INTERESTED:
-    case BT_FEXT_HAVE_ALL:
-    case BT_FEXT_HAVE_NONE:
+    case BtChoke:
+    case BtUnchoke:
+    case BtInterested:
+    case BtNotInterested:
+    case BtFextHaveAll:
+    case BtFextHaveNone:
         return len == 1;
 
-    case BT_HAVE:
-    case BT_FEXT_SUGGEST:
-    case BT_FEXT_ALLOWED_FAST:
+    case BtHave:
+    case BtFextSuggest:
+    case BtFextAllowedFast:
         return len == 5;
 
-    case BT_BITFIELD:
-        if (tr_torrentHasMetadata(msg->torrent))
+    case BtBitfield:
+        if (msg->torrent->hasMetadata())
         {
-            return len == (msg->torrent->info.pieceCount >> 3) + ((msg->torrent->info.pieceCount & 7) != 0 ? 1 : 0) + 1U;
+            return len == (msg->torrent->pieceCount() >> 3) + ((msg->torrent->pieceCount() & 7) != 0 ? 1 : 0) + 1U;
         }
 
         /* we don't know the piece count yet,
@@ -1515,18 +1543,18 @@ static bool messageLengthIsCorrect(tr_peerMsgsImpl const* msg, uint8_t id, uint3
 
         return true;
 
-    case BT_REQUEST:
-    case BT_CANCEL:
-    case BT_FEXT_REJECT:
+    case BtRequest:
+    case BtCancel:
+    case BtFextReject:
         return len == 13;
 
-    case BT_PIECE:
+    case BtPiece:
         return len > 9 && len <= 16393;
 
-    case BT_PORT:
+    case BtPort:
         return len == 3;
 
-    case BT_LTEP:
+    case BtLtep:
         return len >= 2;
 
     default:
@@ -1557,51 +1585,44 @@ static ReadState readBtPiece(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, size
         dbgmsg(msgs, "got incoming block header %u:%u->%u", req->index, req->offset, req->length);
         return READ_NOW;
     }
-    else
+
+    if (msgs->incoming.block == nullptr)
     {
-        int err;
-        size_t n;
-        size_t nLeft;
-        struct evbuffer* block_buffer;
-
-        if (msgs->incoming.block == nullptr)
-        {
-            msgs->incoming.block = evbuffer_new();
-        }
-
-        block_buffer = msgs->incoming.block;
-
-        /* read in another chunk of data */
-        nLeft = req->length - evbuffer_get_length(block_buffer);
-        n = std::min(nLeft, inlen);
-
-        tr_peerIoReadBytesToBuf(msgs->io, inbuf, block_buffer, n);
-
-        msgs->publishClientGotPieceData(n);
-        *setme_piece_bytes_read += n;
-        dbgmsg(
-            msgs,
-            "got %zu bytes for block %u:%u->%u ... %d remain",
-            n,
-            req->index,
-            req->offset,
-            req->length,
-            (int)(req->length - evbuffer_get_length(block_buffer)));
-
-        if (evbuffer_get_length(block_buffer) < req->length)
-        {
-            return READ_LATER;
-        }
-
-        /* pass the block along... */
-        err = clientGotBlock(msgs, block_buffer, req);
-        evbuffer_drain(block_buffer, evbuffer_get_length(block_buffer));
-
-        /* cleanup */
-        req->length = 0;
-        msgs->state = AWAITING_BT_LENGTH;
-        return err != 0 ? READ_ERR : READ_NOW;
+        msgs->incoming.block = evbuffer_new();
     }
+
+    struct evbuffer* const block_buffer = msgs->incoming.block;
+
+    /* read in another chunk of data */
+    size_t const nLeft = req->length - evbuffer_get_length(block_buffer);
+    size_t const n = std::min(nLeft, inlen);
+
+    tr_peerIoReadBytesToBuf(msgs->io, inbuf, block_buffer, n);
+
+    msgs->publishClientGotPieceData(n);
+    *setme_piece_bytes_read += n;
+    dbgmsg(
+        msgs,
+        "got %zu bytes for block %u:%u->%u ... %d remain",
+        n,
+        req->index,
+        req->offset,
+        req->length,
+        int(req->length - evbuffer_get_length(block_buffer)));
+
+    if (evbuffer_get_length(block_buffer) < req->length)
+    {
+        return READ_LATER;
+    }
+
+    /* pass the block along... */
+    int const err = clientGotBlock(msgs, block_buffer, req);
+    evbuffer_drain(block_buffer, evbuffer_get_length(block_buffer));
+
+    /* cleanup */
+    req->length = 0;
+    msgs->state = AwaitingBtLength;
+    return err != 0 ? READ_ERR : READ_NOW;
 }
 
 static ReadState readBtMessage(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, size_t inlen)
@@ -1612,14 +1633,14 @@ static ReadState readBtMessage(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, si
 #endif
     bool const fext = tr_peerIoSupportsFEXT(msgs->io);
 
-    uint32_t ui32;
-    uint32_t msglen = msgs->incoming.length;
+    auto ui32 = uint32_t{};
+    auto msglen = uint32_t{ msgs->incoming.length };
 
     TR_ASSERT(msglen > 0);
 
     --msglen; /* id length */
 
-    dbgmsg(msgs, "got BT id %d, len %d, buffer size is %zu", (int)id, (int)msglen, inlen);
+    dbgmsg(msgs, "got BT id %d, len %d, buffer size is %zu", int(id), int(msglen), inlen);
 
     if (inlen < msglen)
     {
@@ -1628,14 +1649,14 @@ static ReadState readBtMessage(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, si
 
     if (!messageLengthIsCorrect(msgs, id, msglen + 1))
     {
-        dbgmsg(msgs, "bad packet - BT message #%d with a length of %d", (int)id, (int)msglen);
+        dbgmsg(msgs, "bad packet - BT message #%d with a length of %d", int(id), int(msglen));
         msgs->publishError(EMSGSIZE);
         return READ_ERR;
     }
 
     switch (id)
     {
-    case BT_CHOKE:
+    case BtChoke:
         dbgmsg(msgs, "got Choke");
         msgs->client_is_choked_ = true;
 
@@ -1647,58 +1668,58 @@ static ReadState readBtMessage(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, si
         msgs->update_active(TR_PEER_TO_CLIENT);
         break;
 
-    case BT_UNCHOKE:
+    case BtUnchoke:
         dbgmsg(msgs, "got Unchoke");
         msgs->client_is_choked_ = false;
         msgs->update_active(TR_PEER_TO_CLIENT);
         updateDesiredRequestCount(msgs);
         break;
 
-    case BT_INTERESTED:
+    case BtInterested:
         dbgmsg(msgs, "got Interested");
         msgs->peer_is_interested_ = true;
         msgs->update_active(TR_CLIENT_TO_PEER);
         break;
 
-    case BT_NOT_INTERESTED:
+    case BtNotInterested:
         dbgmsg(msgs, "got Not Interested");
         msgs->peer_is_interested_ = false;
         msgs->update_active(TR_CLIENT_TO_PEER);
         break;
 
-    case BT_HAVE:
+    case BtHave:
         tr_peerIoReadUint32(msgs->io, inbuf, &ui32);
         dbgmsg(msgs, "got Have: %u", ui32);
 
-        if (tr_torrentHasMetadata(msgs->torrent) && ui32 >= msgs->torrent->info.pieceCount)
+        if (msgs->torrent->hasMetadata() && ui32 >= msgs->torrent->pieceCount())
         {
             msgs->publishError(ERANGE);
             return READ_ERR;
         }
 
         /* a peer can send the same HAVE message twice... */
-        if (!msgs->have.readBit(ui32))
+        if (!msgs->have.test(ui32))
         {
-            msgs->have.setBit(ui32);
+            msgs->have.set(ui32);
             msgs->publishClientGotHave(ui32);
         }
 
         updatePeerProgress(msgs);
         break;
 
-    case BT_BITFIELD:
+    case BtBitfield:
         {
-            uint8_t* tmp = tr_new(uint8_t, msglen);
+            auto* const tmp = tr_new(uint8_t, msglen);
             dbgmsg(msgs, "got a bitfield");
             tr_peerIoReadBytes(msgs->io, inbuf, tmp, msglen);
-            msgs->have.setRaw(tmp, msglen, tr_torrentHasMetadata(msgs->torrent));
+            msgs->have.setRaw(tmp, msglen);
             msgs->publishClientGotBitfield(&msgs->have);
             updatePeerProgress(msgs);
             tr_free(tmp);
             break;
         }
 
-    case BT_REQUEST:
+    case BtRequest:
         {
             struct peer_request r;
             tr_peerIoReadUint32(msgs->io, inbuf, &r.index);
@@ -1709,7 +1730,7 @@ static ReadState readBtMessage(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, si
             break;
         }
 
-    case BT_CANCEL:
+    case BtCancel:
         {
             struct peer_request r;
             tr_peerIoReadUint32(msgs->io, inbuf, &r.index);
@@ -1726,6 +1747,11 @@ static ReadState readBtMessage(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, si
                 {
                     tr_removeElementFromArray(msgs->peerAskedFor, i, sizeof(struct peer_request), msgs->pendingReqsToClient);
                     --msgs->pendingReqsToClient;
+                    if (fext)
+                    {
+                        protocolSendReject(msgs, &r);
+                    }
+
                     break;
                 }
             }
@@ -1733,12 +1759,12 @@ static ReadState readBtMessage(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, si
             break;
         }
 
-    case BT_PIECE:
+    case BtPiece:
         TR_ASSERT(false); /* handled elsewhere! */
         break;
 
-    case BT_PORT:
-        dbgmsg(msgs, "Got a BT_PORT");
+    case BtPort:
+        dbgmsg(msgs, "Got a BtPort");
         tr_peerIoReadUint16(msgs->io, inbuf, &msgs->dht_port);
 
         if (msgs->dht_port > 0)
@@ -1748,8 +1774,8 @@ static ReadState readBtMessage(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, si
 
         break;
 
-    case BT_FEXT_SUGGEST:
-        dbgmsg(msgs, "Got a BT_FEXT_SUGGEST");
+    case BtFextSuggest:
+        dbgmsg(msgs, "Got a BtFextSuggest");
         tr_peerIoReadUint32(msgs->io, inbuf, &ui32);
 
         if (fext)
@@ -1764,8 +1790,8 @@ static ReadState readBtMessage(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, si
 
         break;
 
-    case BT_FEXT_ALLOWED_FAST:
-        dbgmsg(msgs, "Got a BT_FEXT_ALLOWED_FAST");
+    case BtFextAllowedFast:
+        dbgmsg(msgs, "Got a BtFextAllowedFast");
         tr_peerIoReadUint32(msgs->io, inbuf, &ui32);
 
         if (fext)
@@ -1780,13 +1806,12 @@ static ReadState readBtMessage(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, si
 
         break;
 
-    case BT_FEXT_HAVE_ALL:
-        dbgmsg(msgs, "Got a BT_FEXT_HAVE_ALL");
+    case BtFextHaveAll:
+        dbgmsg(msgs, "Got a BtFextHaveAll");
 
         if (fext)
         {
             msgs->have.setHasAll();
-            TR_ASSERT(msgs->have.hasAll());
             msgs->publishClientGotHaveAll();
             updatePeerProgress(msgs);
         }
@@ -1798,8 +1823,8 @@ static ReadState readBtMessage(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, si
 
         break;
 
-    case BT_FEXT_HAVE_NONE:
-        dbgmsg(msgs, "Got a BT_FEXT_HAVE_NONE");
+    case BtFextHaveNone:
+        dbgmsg(msgs, "Got a BtFextHaveNone");
 
         if (fext)
         {
@@ -1815,10 +1840,10 @@ static ReadState readBtMessage(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, si
 
         break;
 
-    case BT_FEXT_REJECT:
+    case BtFextReject:
         {
             struct peer_request r;
-            dbgmsg(msgs, "Got a BT_FEXT_REJECT");
+            dbgmsg(msgs, "Got a BtFextReject");
             tr_peerIoReadUint32(msgs->io, inbuf, &r.index);
             tr_peerIoReadUint32(msgs->io, inbuf, &r.offset);
             tr_peerIoReadUint32(msgs->io, inbuf, &r.length);
@@ -1836,13 +1861,13 @@ static ReadState readBtMessage(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, si
             break;
         }
 
-    case BT_LTEP:
-        dbgmsg(msgs, "Got a BT_LTEP");
+    case BtLtep:
+        dbgmsg(msgs, "Got a BtLtep");
         parseLtep(msgs, msglen, inbuf);
         break;
 
     default:
-        dbgmsg(msgs, "peer sent us an UNKNOWN: %d", (int)id);
+        dbgmsg(msgs, "peer sent us an UNKNOWN: %d", int(id));
         tr_peerIoDrain(msgs->io, inbuf, msglen);
         break;
     }
@@ -1850,7 +1875,7 @@ static ReadState readBtMessage(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, si
     TR_ASSERT(msglen + 1 == msgs->incoming.length);
     TR_ASSERT(evbuffer_get_length(inbuf) == startBufLen - msglen);
 
-    msgs->state = AWAITING_BT_LENGTH;
+    msgs->state = AwaitingBtLength;
     return READ_NOW;
 }
 
@@ -1860,9 +1885,8 @@ static int clientGotBlock(tr_peerMsgsImpl* msgs, struct evbuffer* data, struct p
     TR_ASSERT(msgs != nullptr);
     TR_ASSERT(req != nullptr);
 
-    int err;
     tr_torrent* tor = msgs->torrent;
-    tr_block_index_t const block = _tr_block(tor, req->index, req->offset);
+    tr_block_index_t const block = tor->blockOf(req->index, req->offset);
 
     if (!requestIsValid(msgs, req))
     {
@@ -1870,9 +1894,9 @@ static int clientGotBlock(tr_peerMsgsImpl* msgs, struct evbuffer* data, struct p
         return EBADMSG;
     }
 
-    if (req->length != tr_torBlockCountBytes(msgs->torrent, block))
+    if (req->length != msgs->torrent->blockSize(block))
     {
-        dbgmsg(msgs, "wrong block size -- expected %u, got %d", tr_torBlockCountBytes(msgs->torrent, block), req->length);
+        dbgmsg(msgs, "wrong block size -- expected %u, got %d", msgs->torrent->blockSize(block), req->length);
         return EMSGSIZE;
     }
 
@@ -1884,7 +1908,7 @@ static int clientGotBlock(tr_peerMsgsImpl* msgs, struct evbuffer* data, struct p
         return 0;
     }
 
-    if (tr_torrentPieceIsComplete(msgs->torrent, req->index))
+    if (msgs->torrent->hasPiece(req->index))
     {
         dbgmsg(msgs, "we did ask for this message, but the piece is already complete...");
         return 0;
@@ -1894,12 +1918,13 @@ static int clientGotBlock(tr_peerMsgsImpl* msgs, struct evbuffer* data, struct p
     ***  Save the block
     **/
 
-    if ((err = tr_cacheWriteBlock(msgs->session->cache, tor, req->index, req->offset, req->length, data)) != 0)
+    int const err = tr_cacheWriteBlock(msgs->session->cache, tor, req->index, req->offset, req->length, data);
+    if (err != 0)
     {
         return err;
     }
 
-    msgs->blame.setBit(req->index);
+    msgs->blame.set(req->index);
     msgs->publishGotBlock(req);
     return 0;
 }
@@ -1921,18 +1946,18 @@ static void didWrite(tr_peerIo* io, size_t bytesWritten, bool wasPieceData, void
 
 static ReadState canRead(tr_peerIo* io, void* vmsgs, size_t* piece)
 {
-    ReadState ret;
     auto* msgs = static_cast<tr_peerMsgsImpl*>(vmsgs);
     struct evbuffer* in = tr_peerIoGetReadBuffer(io);
     size_t const inlen = evbuffer_get_length(in);
 
     dbgmsg(msgs, "canRead: inlen is %zu, msgs->state is %d", inlen, msgs->state);
 
+    auto ret = ReadState{};
     if (inlen == 0)
     {
         ret = READ_LATER;
     }
-    else if (msgs->state == AWAITING_BT_PIECE)
+    else if (msgs->state == AwaitingBtPiece)
     {
         ret = readBtPiece(msgs, in, inlen, piece);
     }
@@ -1940,21 +1965,21 @@ static ReadState canRead(tr_peerIo* io, void* vmsgs, size_t* piece)
     {
         switch (msgs->state)
         {
-        case AWAITING_BT_LENGTH:
+        case AwaitingBtLength:
             ret = readBtLength(msgs, in, inlen);
             break;
 
-        case AWAITING_BT_ID:
+        case AwaitingBtId:
             ret = readBtId(msgs, in, inlen);
             break;
 
-        case AWAITING_BT_MESSAGE:
+        case AwaitingBtMessage:
             ret = readBtMessage(msgs, in, inlen);
             break;
 
         default:
 #ifdef TR_ENABLE_ASSERTS
-            TR_ASSERT_MSG(false, "unhandled peer messages state %d", (int)msgs->state);
+            TR_ASSERT_MSG(false, "unhandled peer messages state %d", int(msgs->state));
 #else
             ret = READ_ERR;
             break;
@@ -1962,7 +1987,7 @@ static ReadState canRead(tr_peerIo* io, void* vmsgs, size_t* piece)
         }
     }
 
-    dbgmsg(msgs, "canRead: ret is %d", (int)ret);
+    dbgmsg(msgs, "canRead: ret is %d", int(ret));
 
     return ret;
 }
@@ -1976,29 +2001,23 @@ static void updateDesiredRequestCount(tr_peerMsgsImpl* msgs)
     tr_torrent const* const torrent = msgs->torrent;
 
     /* there are lots of reasons we might not want to request any blocks... */
-    if (tr_torrentIsSeed(torrent) || !tr_torrentHasMetadata(torrent) || msgs->client_is_choked_ || !msgs->client_is_interested_)
+    if (torrent->isDone() || !torrent->hasMetadata() || msgs->client_is_choked_ || !msgs->client_is_interested_)
     {
-        msgs->desiredRequestCount = 0;
+        msgs->desired_request_count = 0;
     }
     else
     {
-        int estimatedBlocksInPeriod;
-        unsigned int rate_Bps;
-        unsigned int irate_Bps;
-        int const floor = 4;
-        int const seconds = REQUEST_BUF_SECS;
-        uint64_t const now = tr_time_msec();
-
         /* Get the rate limit we should use.
-         * FIXME: this needs to consider all the other peers as well... */
-        rate_Bps = tr_peerGetPieceSpeed_Bps(msgs, now, TR_PEER_TO_CLIENT);
-
+         * TODO: this needs to consider all the other peers as well... */
+        uint64_t const now = tr_time_msec();
+        auto rate_Bps = tr_peerGetPieceSpeed_Bps(msgs, now, TR_PEER_TO_CLIENT);
         if (tr_torrentUsesSpeedLimit(torrent, TR_PEER_TO_CLIENT))
         {
-            rate_Bps = std::min(rate_Bps, tr_torrentGetSpeedLimit_Bps(torrent, TR_PEER_TO_CLIENT));
+            rate_Bps = std::min(rate_Bps, torrent->speedLimitBps(TR_PEER_TO_CLIENT));
         }
 
         /* honor the session limits, if enabled */
+        auto irate_Bps = unsigned{};
         if (tr_torrentUsesSessionLimits(torrent) &&
             tr_sessionGetActiveSpeedLimit_Bps(torrent->session, TR_PEER_TO_CLIENT, &irate_Bps))
         {
@@ -2007,41 +2026,36 @@ static void updateDesiredRequestCount(tr_peerMsgsImpl* msgs)
 
         /* use this desired rate to figure out how
          * many requests we should send to this peer */
-        estimatedBlocksInPeriod = (rate_Bps * seconds) / torrent->blockSize;
-        msgs->desiredRequestCount = std::max(floor, estimatedBlocksInPeriod);
-
-        /* honor the peer's maximum request count, if specified */
-        if ((msgs->reqq > 0) && (msgs->desiredRequestCount > msgs->reqq))
-        {
-            msgs->desiredRequestCount = msgs->reqq;
-        }
+        size_t constexpr Floor = 32;
+        size_t constexpr Seconds = RequestBufSecs;
+        size_t const estimated_blocks_in_period = (rate_Bps * Seconds) / torrent->blockSize();
+        size_t const ceil = msgs->reqq ? *msgs->reqq : 250;
+        msgs->desired_request_count = std::clamp(estimated_blocks_in_period, Floor, ceil);
     }
 }
 
 static void updateMetadataRequests(tr_peerMsgsImpl* msgs, time_t now)
 {
-    int piece;
-
+    auto piece = int{};
     if (msgs->peerSupportsMetadataXfer && tr_torrentGetNextMetadataRequest(msgs->torrent, now, &piece))
     {
-        tr_variant tmp;
-        struct evbuffer* payload;
-        struct evbuffer* out = msgs->outMessages;
+        evbuffer* const out = msgs->outMessages;
 
         /* build the data message */
+        auto tmp = tr_variant{};
         tr_variantInitDict(&tmp, 3);
         tr_variantDictAddInt(&tmp, TR_KEY_msg_type, METADATA_MSG_TYPE_REQUEST);
         tr_variantDictAddInt(&tmp, TR_KEY_piece, piece);
-        payload = tr_variantToBuf(&tmp, TR_VARIANT_FMT_BENC);
+        auto* const payload = tr_variantToBuf(&tmp, TR_VARIANT_FMT_BENC);
 
         dbgmsg(msgs, "requesting metadata piece #%d", piece);
 
         /* write it out as a LTEP message to our outMessages buffer */
         evbuffer_add_uint32(out, 2 * sizeof(uint8_t) + evbuffer_get_length(payload));
-        evbuffer_add_uint8(out, BT_LTEP);
+        evbuffer_add_uint8(out, BtLtep);
         evbuffer_add_uint8(out, msgs->ut_metadata_id);
         evbuffer_add_buffer(out, payload);
-        pokeBatchPeriod(msgs, HIGH_PRIORITY_INTERVAL_SECS);
+        pokeBatchPeriod(msgs, HighPriorityIntervalSecs);
         dbgOutMessageLen(msgs);
 
         /* cleanup */
@@ -2052,31 +2066,39 @@ static void updateMetadataRequests(tr_peerMsgsImpl* msgs, time_t now)
 
 static void updateBlockRequests(tr_peerMsgsImpl* msgs)
 {
-    if (tr_torrentIsPieceTransferAllowed(msgs->torrent, TR_PEER_TO_CLIENT) && msgs->desiredRequestCount > 0 &&
-        msgs->pendingReqsToPeer <= msgs->desiredRequestCount * 0.66)
+    if (!msgs->torrent->clientCanDownload())
     {
-        TR_ASSERT(msgs->is_client_interested());
-        TR_ASSERT(!msgs->is_client_choked());
+        return;
+    }
 
-        int n;
-        tr_block_index_t* blocks;
-        int const numwant = msgs->desiredRequestCount - msgs->pendingReqsToPeer;
+    auto const n_active = tr_peerMgrCountActiveRequestsToPeer(msgs->torrent, msgs);
+    if (n_active >= msgs->desired_request_count)
+    {
+        return;
+    }
 
-        blocks = tr_new(tr_block_index_t, numwant);
-        tr_peerMgrGetNextRequests(msgs->torrent, msgs, numwant, blocks, &n, false);
+    auto const n_wanted = msgs->desired_request_count - n_active;
+    if (n_wanted == 0)
+    {
+        return;
+    }
 
-        for (int i = 0; i < n; ++i)
+    TR_ASSERT(msgs->is_client_interested());
+    TR_ASSERT(!msgs->is_client_choked());
+
+    for (auto const span : tr_peerMgrGetNextRequests(msgs->torrent, msgs, n_wanted))
+    {
+        for (tr_block_index_t block = span.begin; block < span.end; ++block)
         {
-            protocolSendRequest(msgs, blockToReq(msgs->torrent, blocks[i]));
+            protocolSendRequest(msgs, blockToReq(msgs->torrent, block));
         }
 
-        tr_free(blocks);
+        tr_peerMgrClientSentRequests(msgs->torrent, msgs, span);
     }
 }
 
 static size_t fillOutputBuffer(tr_peerMsgsImpl* msgs, time_t now)
 {
-    int piece;
     size_t bytesWritten = 0;
     struct peer_request req;
     bool const haveMessages = evbuffer_get_length(msgs->outMessages) != 0;
@@ -2099,7 +2121,7 @@ static size_t fillOutputBuffer(tr_peerMsgsImpl* msgs, time_t now)
         tr_peerIoWriteBuf(msgs->io, msgs->outMessages, false);
         msgs->clientSentAnythingAt = now;
         msgs->outMessagesBatchedAt = 0;
-        msgs->outMessagesBatchPeriod = LOW_PRIORITY_INTERVAL_SECS;
+        msgs->outMessagesBatchPeriod = LowPriorityIntervalSecs;
         bytesWritten += len;
     }
 
@@ -2107,33 +2129,33 @@ static size_t fillOutputBuffer(tr_peerMsgsImpl* msgs, time_t now)
     ***  Metadata Pieces
     **/
 
+    auto piece = int{};
     if (tr_peerIoGetWriteBufferSpace(msgs->io, now) >= METADATA_PIECE_SIZE && popNextMetadataRequest(msgs, &piece))
     {
-        size_t dataLen;
-        bool ok = false;
+        auto ok = bool{ false };
 
+        auto dataLen = size_t{};
         auto* data = static_cast<char*>(tr_torrentGetMetadataPiece(msgs->torrent, piece, &dataLen));
 
         if (data != nullptr)
         {
-            tr_variant tmp;
-            struct evbuffer* payload;
-            struct evbuffer* out = msgs->outMessages;
+            evbuffer* const out = msgs->outMessages;
 
             /* build the data message */
+            auto tmp = tr_variant{};
             tr_variantInitDict(&tmp, 3);
             tr_variantDictAddInt(&tmp, TR_KEY_msg_type, METADATA_MSG_TYPE_DATA);
             tr_variantDictAddInt(&tmp, TR_KEY_piece, piece);
-            tr_variantDictAddInt(&tmp, TR_KEY_total_size, msgs->torrent->infoDictLength);
-            payload = tr_variantToBuf(&tmp, TR_VARIANT_FMT_BENC);
+            tr_variantDictAddInt(&tmp, TR_KEY_total_size, msgs->torrent->infoDictSize());
+            evbuffer* const payload = tr_variantToBuf(&tmp, TR_VARIANT_FMT_BENC);
 
             /* write it out as a LTEP message to our outMessages buffer */
             evbuffer_add_uint32(out, 2 * sizeof(uint8_t) + evbuffer_get_length(payload) + dataLen);
-            evbuffer_add_uint8(out, BT_LTEP);
+            evbuffer_add_uint8(out, BtLtep);
             evbuffer_add_uint8(out, msgs->ut_metadata_id);
             evbuffer_add_buffer(out, payload);
             evbuffer_add(out, data, dataLen);
-            pokeBatchPeriod(msgs, HIGH_PRIORITY_INTERVAL_SECS);
+            pokeBatchPeriod(msgs, HighPriorityIntervalSecs);
             dbgOutMessageLen(msgs);
 
             evbuffer_free(payload);
@@ -2145,22 +2167,21 @@ static size_t fillOutputBuffer(tr_peerMsgsImpl* msgs, time_t now)
 
         if (!ok) /* send a rejection message */
         {
-            tr_variant tmp;
-            struct evbuffer* payload;
-            struct evbuffer* out = msgs->outMessages;
+            evbuffer* const out = msgs->outMessages;
 
             /* build the rejection message */
+            auto tmp = tr_variant{};
             tr_variantInitDict(&tmp, 2);
             tr_variantDictAddInt(&tmp, TR_KEY_msg_type, METADATA_MSG_TYPE_REJECT);
             tr_variantDictAddInt(&tmp, TR_KEY_piece, piece);
-            payload = tr_variantToBuf(&tmp, TR_VARIANT_FMT_BENC);
+            evbuffer* const payload = tr_variantToBuf(&tmp, TR_VARIANT_FMT_BENC);
 
             /* write it out as a LTEP message to our outMessages buffer */
             evbuffer_add_uint32(out, 2 * sizeof(uint8_t) + evbuffer_get_length(payload));
-            evbuffer_add_uint8(out, BT_LTEP);
+            evbuffer_add_uint8(out, BtLtep);
             evbuffer_add_uint8(out, msgs->ut_metadata_id);
             evbuffer_add_buffer(out, payload);
-            pokeBatchPeriod(msgs, HIGH_PRIORITY_INTERVAL_SECS);
+            pokeBatchPeriod(msgs, HighPriorityIntervalSecs);
             dbgOutMessageLen(msgs);
 
             evbuffer_free(payload);
@@ -2172,47 +2193,45 @@ static size_t fillOutputBuffer(tr_peerMsgsImpl* msgs, time_t now)
     ***  Data Blocks
     **/
 
-    if (tr_peerIoGetWriteBufferSpace(msgs->io, now) >= msgs->torrent->blockSize && popNextRequest(msgs, &req))
+    if (tr_peerIoGetWriteBufferSpace(msgs->io, now) >= msgs->torrent->blockSize() && popNextRequest(msgs, &req))
     {
         --msgs->prefetchCount;
 
-        if (requestIsValid(msgs, &req) && tr_torrentPieceIsComplete(msgs->torrent, req.index))
+        if (requestIsValid(msgs, &req) && msgs->torrent->hasPiece(req.index))
         {
-            bool err;
             uint32_t const msglen = 4 + 1 + 4 + 4 + req.length;
-            struct evbuffer* out;
             struct evbuffer_iovec iovec[1];
 
-            out = evbuffer_new();
+            auto* const out = evbuffer_new();
             evbuffer_expand(out, msglen);
 
             evbuffer_add_uint32(out, sizeof(uint8_t) + 2 * sizeof(uint32_t) + req.length);
-            evbuffer_add_uint8(out, BT_PIECE);
+            evbuffer_add_uint8(out, BtPiece);
             evbuffer_add_uint32(out, req.index);
             evbuffer_add_uint32(out, req.offset);
 
             evbuffer_reserve_space(out, req.length, iovec, 1);
-            err = tr_cacheReadBlock(
-                      msgs->session->cache,
-                      msgs->torrent,
-                      req.index,
-                      req.offset,
-                      req.length,
-                      static_cast<uint8_t*>(iovec[0].iov_base)) != 0;
+            bool err = tr_cacheReadBlock(
+                           msgs->session->cache,
+                           msgs->torrent,
+                           req.index,
+                           req.offset,
+                           req.length,
+                           static_cast<uint8_t*>(iovec[0].iov_base)) != 0;
             iovec[0].iov_len = req.length;
             evbuffer_commit_space(out, iovec, 1);
 
             /* check the piece if it needs checking... */
-            if (!err && tr_torrentPieceNeedsCheck(msgs->torrent, req.index))
+            if (!err)
             {
-                err = !tr_torrentCheckPiece(msgs->torrent, req.index);
-
+                err = !msgs->torrent->ensurePieceIsChecked(req.index);
                 if (err)
                 {
-                    tr_torrentSetLocalError(
-                        msgs->torrent,
-                        _("Please Verify Local Data! Piece #%zu is corrupt."),
-                        (size_t)req.index);
+                    auto const errmsg = tr_strvJoin(
+                        "Please Verify Local Data! Piece #",
+                        std::to_string(req.index),
+                        " is corrupt.");
+                    msgs->torrent->setLocalError(errmsg);
                 }
             }
 
@@ -2257,11 +2276,11 @@ static size_t fillOutputBuffer(tr_peerMsgsImpl* msgs, time_t now)
     ***  Keepalive
     **/
 
-    if (msgs != nullptr && msgs->clientSentAnythingAt != 0 && now - msgs->clientSentAnythingAt > KEEPALIVE_INTERVAL_SECS)
+    if (msgs != nullptr && msgs->clientSentAnythingAt != 0 && now - msgs->clientSentAnythingAt > KeepaliveIntervalSecs)
     {
         dbgmsg(msgs, "sending a keepalive message");
         evbuffer_add_uint32(msgs->outMessages, 0);
-        pokeBatchPeriod(msgs, IMMEDIATE_PRIORITY_INTERVAL_SECS);
+        pokeBatchPeriod(msgs, ImmediatePriorityIntervalSecs);
     }
 
     return bytesWritten;
@@ -2288,7 +2307,7 @@ static void peerPulse(void* vmsgs)
     }
 }
 
-static void gotError([[maybe_unused]] tr_peerIo* io, short what, void* vmsgs)
+static void gotError(tr_peerIo* /*io*/, short what, void* vmsgs)
 {
     auto* msgs = static_cast<tr_peerMsgsImpl*>(vmsgs);
 
@@ -2307,35 +2326,31 @@ static void gotError([[maybe_unused]] tr_peerIo* io, short what, void* vmsgs)
 
 static void sendBitfield(tr_peerMsgsImpl* msgs)
 {
-    TR_ASSERT(tr_torrentHasMetadata(msgs->torrent));
+    TR_ASSERT(msgs->torrent->hasMetadata());
 
-    void* bytes;
-    size_t byte_count = 0;
     struct evbuffer* out = msgs->outMessages;
 
-    bytes = tr_torrentCreatePieceBitfield(msgs->torrent, &byte_count);
-    evbuffer_add_uint32(out, sizeof(uint8_t) + byte_count);
-    evbuffer_add_uint8(out, BT_BITFIELD);
-    evbuffer_add(out, bytes, byte_count);
+    auto bytes = msgs->torrent->createPieceBitfield();
+    evbuffer_add_uint32(out, sizeof(uint8_t) + bytes.size());
+    evbuffer_add_uint8(out, BtBitfield);
+    evbuffer_add(out, bytes.data(), std::size(bytes));
     dbgmsg(msgs, "sending bitfield... outMessage size is now %zu", evbuffer_get_length(out));
-    pokeBatchPeriod(msgs, IMMEDIATE_PRIORITY_INTERVAL_SECS);
-
-    tr_free(bytes);
+    pokeBatchPeriod(msgs, ImmediatePriorityIntervalSecs);
 }
 
 static void tellPeerWhatWeHave(tr_peerMsgsImpl* msgs)
 {
     bool const fext = tr_peerIoSupportsFEXT(msgs->io);
 
-    if (fext && tr_torrentHasAll(msgs->torrent))
+    if (fext && msgs->torrent->hasAll())
     {
         protocolSendHaveAll(msgs);
     }
-    else if (fext && tr_torrentHasNone(msgs->torrent))
+    else if (fext && msgs->torrent->hasNone())
     {
         protocolSendHaveNone(msgs);
     }
-    else if (!tr_torrentHasNone(msgs->torrent))
+    else if (!msgs->torrent->hasNone())
     {
         sendBitfield(msgs);
     }
@@ -2348,8 +2363,8 @@ static void tellPeerWhatWeHave(tr_peerMsgsImpl* msgs)
 /* some peers give us error messages if we send
    more than this many peers in a single pex message
    http://wiki.theory.org/BitTorrentPeerExchangeConventions */
-#define MAX_PEX_ADDED 50
-#define MAX_PEX_DROPPED 50
+static auto constexpr MaxPexAdded = int{ 50 };
+static auto constexpr MaxPexDropped = int{ 50 };
 
 struct PexDiffs
 {
@@ -2366,7 +2381,7 @@ static void pexAddedCb(void const* vpex, void* userData)
     auto* diffs = static_cast<PexDiffs*>(userData);
     auto const* pex = static_cast<tr_pex const*>(vpex);
 
-    if (diffs->addedCount < MAX_PEX_ADDED)
+    if (diffs->addedCount < MaxPexAdded)
     {
         diffs->added[diffs->addedCount++] = *pex;
         diffs->elements[diffs->elementCount++] = *pex;
@@ -2378,7 +2393,7 @@ static constexpr void pexDroppedCb(void const* vpex, void* userData)
     auto* diffs = static_cast<PexDiffs*>(userData);
     auto const* pex = static_cast<tr_pex const*>(vpex);
 
-    if (diffs->droppedCount < MAX_PEX_DROPPED)
+    if (diffs->droppedCount < MaxPexDropped)
     {
         diffs->dropped[diffs->droppedCount++] = *pex;
     }
@@ -2462,7 +2477,7 @@ static void tr_set_compare(
 
 static void sendPex(tr_peerMsgsImpl* msgs)
 {
-    if (msgs->peerSupportsPex && tr_torrentAllowsPex(msgs->torrent))
+    if (msgs->peerSupportsPex && msgs->torrent->allowsPex())
     {
         PexDiffs diffs;
         PexDiffs diffs6;
@@ -2525,11 +2540,9 @@ static void sendPex(tr_peerMsgsImpl* msgs)
         }
         else
         {
-            tr_variant val;
-            uint8_t* tmp;
-            uint8_t* walk;
-            struct evbuffer* payload;
-            struct evbuffer* out = msgs->outMessages;
+            uint8_t* tmp = nullptr;
+            uint8_t* walk = nullptr;
+            evbuffer* const out = msgs->outMessages;
 
             /* update peer */
             tr_free(msgs->pex);
@@ -2540,6 +2553,7 @@ static void sendPex(tr_peerMsgsImpl* msgs)
             msgs->pexCount6 = diffs6.elementCount;
 
             /* build the pex payload */
+            auto val = tr_variant{};
             tr_variantInitDict(&val, 3); /* ipv6 support: left as 3: speed vs. likelihood? */
 
             if (diffs.addedCount > 0)
@@ -2641,12 +2655,12 @@ static void sendPex(tr_peerMsgsImpl* msgs)
             }
 
             /* write the pex message */
-            payload = tr_variantToBuf(&val, TR_VARIANT_FMT_BENC);
+            auto* const payload = tr_variantToBuf(&val, TR_VARIANT_FMT_BENC);
             evbuffer_add_uint32(out, 2 * sizeof(uint8_t) + evbuffer_get_length(payload));
-            evbuffer_add_uint8(out, BT_LTEP);
+            evbuffer_add_uint8(out, BtLtep);
             evbuffer_add_uint8(out, msgs->ut_pex_id);
             evbuffer_add_buffer(out, payload);
-            pokeBatchPeriod(msgs, HIGH_PRIORITY_INTERVAL_SECS);
+            pokeBatchPeriod(msgs, HighPriorityIntervalSecs);
             dbgmsg(msgs, "sending a pex message; outMessage size is now %zu", evbuffer_get_length(out));
             dbgOutMessageLen(msgs);
 
@@ -2664,12 +2678,12 @@ static void sendPex(tr_peerMsgsImpl* msgs)
     }
 }
 
-static void pexPulse([[maybe_unused]] evutil_socket_t fd, [[maybe_unused]] short what, void* vmsgs)
+static void pexPulse(evutil_socket_t /*fd*/, short /*what*/, void* vmsgs)
 {
     auto* msgs = static_cast<tr_peerMsgsImpl*>(vmsgs);
 
     sendPex(msgs);
 
     TR_ASSERT(msgs->pex_timer);
-    tr_timerAdd(msgs->pex_timer.get(), PEX_INTERVAL_SECS, 0);
+    tr_timerAdd(msgs->pex_timer.get(), PexIntervalSecs, 0);
 }

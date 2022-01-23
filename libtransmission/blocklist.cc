@@ -1,15 +1,12 @@
-/*
- * This file Copyright (C) 2008-2014 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2008-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
-#include <errno.h>
-#include <stdio.h>
-#include <stdlib.h> /* bsearch(), qsort() */
-#include <string.h>
+#include <cerrno>
+#include <cstdio>
+#include <cstdlib> /* bsearch(), qsort() */
+#include <cstring>
 
 #include "transmission.h"
 #include "blocklist.h"
@@ -55,29 +52,24 @@ static void blocklistClose(tr_blocklistFile* b)
 
 static void blocklistLoad(tr_blocklistFile* b)
 {
-    tr_sys_file_t fd;
-    uint64_t byteCount;
-    tr_sys_path_info info;
-    char* base;
     tr_error* error = nullptr;
     char const* err_fmt = _("Couldn't read \"%1$s\": %2$s");
 
     blocklistClose(b);
 
+    auto info = tr_sys_path_info{};
     if (!tr_sys_path_get_info(b->filename, 0, &info, nullptr))
     {
         return;
     }
 
-    byteCount = info.size;
-
+    auto const byteCount = info.size;
     if (byteCount == 0)
     {
         return;
     }
 
-    fd = tr_sys_file_open(b->filename, TR_SYS_FILE_READ, 0, &error);
-
+    auto const fd = tr_sys_file_open(b->filename, TR_SYS_FILE_READ, 0, &error);
     if (fd == TR_BAD_SYS_FILE)
     {
         tr_logAddError(err_fmt, b->filename, error->message);
@@ -86,7 +78,6 @@ static void blocklistLoad(tr_blocklistFile* b)
     }
 
     b->rules = static_cast<struct tr_ipv4_range*>(tr_sys_file_map_for_reading(fd, 0, byteCount, &error));
-
     if (b->rules == nullptr)
     {
         tr_logAddError(err_fmt, b->filename, error->message);
@@ -99,7 +90,7 @@ static void blocklistLoad(tr_blocklistFile* b)
     b->byteCount = byteCount;
     b->ruleCount = byteCount / sizeof(struct tr_ipv4_range);
 
-    base = tr_sys_path_basename(b->filename, nullptr);
+    char* const base = tr_sys_path_basename(b->filename, nullptr);
     tr_logAddInfo(_("Blocklist \"%s\" contains %zu entries"), base, b->ruleCount);
     tr_free(base);
 }
@@ -142,9 +133,7 @@ static void blocklistDelete(tr_blocklistFile* b)
 
 tr_blocklistFile* tr_blocklistFileNew(char const* filename, bool isEnabled)
 {
-    tr_blocklistFile* b;
-
-    b = tr_new0(tr_blocklistFile, 1);
+    auto* const b = tr_new0(tr_blocklistFile, 1);
     b->fd = TR_BAD_SYS_FILE;
     b->filename = tr_strdup(filename);
     b->isEnabled = isEnabled;
@@ -192,8 +181,6 @@ bool tr_blocklistFileHasAddress(tr_blocklistFile* b, tr_address const* addr)
 {
     TR_ASSERT(tr_address_is_valid(addr));
 
-    uint32_t needle;
-
     if (!b->isEnabled || addr->type == TR_AF_INET6)
     {
         return false;
@@ -206,7 +193,7 @@ bool tr_blocklistFileHasAddress(tr_blocklistFile* b, tr_address const* addr)
         return false;
     }
 
-    needle = ntohl(addr->addr.addr4.s_addr);
+    auto const needle = ntohl(addr->addr.addr4.s_addr);
 
     auto const* range = static_cast<struct tr_ipv4_range const*>(
         bsearch(&needle, b->rules, b->ruleCount, sizeof(struct tr_ipv4_range), compareAddressToRange));
@@ -271,7 +258,7 @@ static bool parseLine1(char const* line, struct tr_ipv4_range* range)
  */
 static bool parseLine2(char const* line, struct tr_ipv4_range* range)
 {
-    int unk;
+    int unk = 0;
     int a[4];
     int b[4];
     char str[32];
@@ -315,8 +302,8 @@ static bool parseLine2(char const* line, struct tr_ipv4_range* range)
 static bool parseLine3(char const* line, struct tr_ipv4_range* range)
 {
     unsigned int ip[4];
-    unsigned int pflen;
-    uint32_t ip_u;
+    unsigned int pflen = 0;
+    uint32_t ip_u = 0;
     uint32_t mask = 0xffffffff;
 
     if (sscanf(line, "%u.%u.%u.%u/%u", TR_ARG_TUPLE(&ip[0], &ip[1], &ip[2], &ip[3]), &pflen) != 5)
@@ -360,11 +347,10 @@ static int compareAddressRangesByFirstAddress(void const* va, void const* vb)
 
 int tr_blocklistFileSetContent(tr_blocklistFile* b, char const* filename)
 {
-    tr_sys_file_t in;
-    tr_sys_file_t out;
     int inCount = 0;
     char line[2048];
     char const* err_fmt = _("Couldn't read \"%1$s\": %2$s");
+    // TODO: should be a vector
     struct tr_ipv4_range* ranges = nullptr;
     size_t ranges_alloc = 0;
     size_t ranges_count = 0;
@@ -376,8 +362,7 @@ int tr_blocklistFileSetContent(tr_blocklistFile* b, char const* filename)
         return 0;
     }
 
-    in = tr_sys_file_open(filename, TR_SYS_FILE_READ, 0, &error);
-
+    auto const in = tr_sys_file_open(filename, TR_SYS_FILE_READ, 0, &error);
     if (in == TR_BAD_SYS_FILE)
     {
         tr_logAddError(err_fmt, filename, error->message);
@@ -387,8 +372,7 @@ int tr_blocklistFileSetContent(tr_blocklistFile* b, char const* filename)
 
     blocklistClose(b);
 
-    out = tr_sys_file_open(b->filename, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_TRUNCATE, 0666, &error);
-
+    auto const out = tr_sys_file_open(b->filename, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_TRUNCATE, 0666, &error);
     if (out == TR_BAD_SYS_FILE)
     {
         tr_logAddError(err_fmt, b->filename, error->message);

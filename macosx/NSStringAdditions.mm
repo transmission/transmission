@@ -1,24 +1,6 @@
-/******************************************************************************
- * Copyright (c) 2005-2019 Transmission authors and contributors
- *
- * Permission is hereby granted, free of charge, to any person obtaining a
- * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
- * DEALINGS IN THE SOFTWARE.
- *****************************************************************************/
+// This file Copyright © 2005-2022 Transmission authors and contributors.
+// It may be used under the MIT (SPDX: MIT) license.
+// License text can be found in the licenses/ folder.
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/utils.h>
@@ -100,29 +82,28 @@
 + (NSString*)stringForRatio:(CGFloat)ratio
 {
     //N/A is different than libtransmission's
+
     if ((int)ratio == TR_RATIO_NA)
     {
         return NSLocalizedString(@"N/A", "No Ratio");
     }
-    else if ((int)ratio == TR_RATIO_INF)
+
+    if ((int)ratio == TR_RATIO_INF)
     {
         return @"\xE2\x88\x9E";
     }
-    else
+
+    if (ratio < 10.0)
     {
-        if (ratio < 10.0)
-        {
-            return [NSString localizedStringWithFormat:@"%.2f", tr_truncd(ratio, 2)];
-        }
-        else if (ratio < 100.0)
-        {
-            return [NSString localizedStringWithFormat:@"%.1f", tr_truncd(ratio, 1)];
-        }
-        else
-        {
-            return [NSString localizedStringWithFormat:@"%.0f", tr_truncd(ratio, 0)];
-        }
+        return [NSString localizedStringWithFormat:@"%.2f", tr_truncd(ratio, 2)];
     }
+
+    if (ratio < 100.0)
+    {
+        return [NSString localizedStringWithFormat:@"%.1f", tr_truncd(ratio, 1)];
+    }
+
+    return [NSString localizedStringWithFormat:@"%.0f", tr_truncd(ratio, 0)];
 }
 
 + (NSString*)percentString:(CGFloat)progress longDecimals:(BOOL)longDecimals

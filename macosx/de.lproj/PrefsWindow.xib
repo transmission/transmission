@@ -1104,7 +1104,7 @@
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" heightSizable="YES"/>
                     <clipView key="contentView" id="IOr-J0-Ikz">
                         <rect key="frame" x="1" y="1" width="158" height="197"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <tableView focusRingType="none" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" columnReordering="NO" columnResizing="NO" multipleSelection="NO" emptySelection="NO" autosaveColumns="NO" rowHeight="18" id="1774">
                                 <rect key="frame" x="0.0" y="0.0" width="158" height="197"/>
@@ -1874,18 +1874,6 @@
             <rect key="frame" x="0.0" y="0.0" width="555" height="460"/>
             <autoresizingMask key="autoresizingMask"/>
             <subviews>
-                <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1717">
-                    <rect key="frame" x="97" y="356" width="162" height="25"/>
-                    <autoresizingMask key="autoresizingMask"/>
-                    <buttonCell key="cell" type="roundTextured" title="Im Web-Browser öffnen" bezelStyle="texturedRounded" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="1718">
-                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
-                        <font key="font" metaFont="system"/>
-                    </buttonCell>
-                    <connections>
-                        <action selector="linkWebUI:" target="-2" id="1720"/>
-                        <binding destination="365" name="enabled" keyPath="values.RPC" id="1719"/>
-                    </connections>
-                </button>
                 <button horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1660">
                     <rect key="frame" x="513" y="16" width="25" height="25"/>
                     <autoresizingMask key="autoresizingMask"/>
@@ -2166,6 +2154,18 @@
                         <binding destination="365" name="enabled" keyPath="values.RPC" id="1695"/>
                     </connections>
                 </textField>
+                <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1717">
+                    <rect key="frame" x="91" y="354" width="180" height="32"/>
+                    <autoresizingMask key="autoresizingMask"/>
+                    <buttonCell key="cell" type="push" title="Im Web-Browser öffnen" bezelStyle="rounded" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="1718">
+                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                        <font key="font" metaFont="system"/>
+                    </buttonCell>
+                    <connections>
+                        <action selector="linkWebUI:" target="-2" id="1720"/>
+                        <binding destination="365" name="enabled" keyPath="values.RPC" id="1719"/>
+                    </connections>
+                </button>
             </subviews>
             <point key="canvasLocation" x="139" y="-280"/>
         </customView>

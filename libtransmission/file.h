@@ -1,15 +1,14 @@
-/*
- * This file Copyright (C) 2013-2017 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright 2013-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #pragma once
 
-#include <inttypes.h>
-#include <time.h>
+#include <cstddef> // size_t
+#include <cinttypes> // uintX_t
+#include <ctime>
+#include <string_view>
 
 #ifdef _WIN32
 #include <windows.h>
@@ -181,7 +180,7 @@ bool tr_sys_path_exists(char const* path, struct tr_error** error);
  *
  * @return `True` if path is relative, `false` otherwise
  */
-bool tr_sys_path_is_relative(char const* path);
+bool tr_sys_path_is_relative(std::string_view path);
 
 /**
  * @brief Test to see if the two filenames point to the same file.
@@ -224,7 +223,7 @@ char* tr_sys_path_resolve(char const* path, struct tr_error** error);
  *         it when no longer needed), `nullptr` otherwise (with `error` set
  *         accordingly).
  */
-char* tr_sys_path_basename(char const* path, struct tr_error** error);
+char* tr_sys_path_basename(std::string_view path, struct tr_error** error);
 
 /**
  * @brief Portability wrapper for `dirname()`.
@@ -238,7 +237,7 @@ char* tr_sys_path_basename(char const* path, struct tr_error** error);
  *         when no longer needed), `nullptr` otherwise (with `error` set
  *         accordingly).
  */
-char* tr_sys_path_dirname(char const* path, struct tr_error** error);
+char* tr_sys_path_dirname(std::string_view path, struct tr_error** error);
 
 /**
  * @brief Portability wrapper for `rename()`.
@@ -576,32 +575,13 @@ bool tr_sys_file_read_line(tr_sys_file_t handle, char* buffer, size_t buffer_siz
  * should already be in UTF-8 encoding, or whichever else you expect.
  *
  * @param[in]  handle Valid file descriptor.
- * @param[in]  buffer Zero-terminated string to write.
+ * @param[in]  buffer String to write.
  * @param[out] error  Pointer to error object. Optional, pass `nullptr` if you
  *                    are not interested in error details.
  *
  * @return `True` on success, `false` otherwise (with `error` set accordingly).
  */
-bool tr_sys_file_write_line(tr_sys_file_t handle, char const* buffer, struct tr_error** error);
-
-/**
- * @brief Portability wrapper for `fprintf()`.
- *
- * Special care should be taken when writing to one of standard output streams
- * (@ref tr_std_sys_file_t) since no UTF-8 conversion is currently being made.
- *
- * Writing to other streams (files, pipes) also leaves data untouched, so it
- * should already be in UTF-8 encoding, or whichever else you expect.
- *
- * @param[in]  handle Valid file descriptor.
- * @param[in]  format String format to write.
- * @param[out] error  Pointer to error object. Optional, pass `nullptr` if you
- *                    are not interested in error details.
- * @param[in]  ...    Format arguments.
- *
- * @return `True` on success, `false` otherwise (with `error` set accordingly).
- */
-bool tr_sys_file_write_fmt(tr_sys_file_t handle, char const* format, struct tr_error** error, ...) TR_GNUC_PRINTF(2, 4);
+bool tr_sys_file_write_line(tr_sys_file_t handle, std::string_view buffer, struct tr_error** error);
 
 /* Directory-related wrappers */
 

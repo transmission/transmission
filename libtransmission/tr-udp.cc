@@ -1,28 +1,9 @@
-/*
-Copyright (c) 2010 by Juliusz Chroboczek
+// This file Copyright © 2010 Juliusz Chroboczek.
+// It may be used under the MIT (SPDX: MIT) license.
+// License text can be found in the licenses/ folder.
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
-
-*/
-
-#include <string.h> /* memcmp(), memcpy(), memset() */
-#include <stdlib.h> /* malloc(), free() */
+#include <cstring> /* memcmp(), memcpy(), memset() */
+#include <cstdlib> /* malloc(), free() */
 
 #ifdef _WIN32
 #include <io.h> /* dup2() */
@@ -32,7 +13,7 @@ THE SOFTWARE.
 
 #include <event2/event.h>
 
-#include <stdint.h>
+#include <cstdint>
 #include <libutp/utp.h>
 
 #include "transmission.h"
@@ -53,16 +34,14 @@ THE SOFTWARE.
 
 static void set_socket_buffers(tr_socket_t fd, bool large)
 {
-    int size;
-    int rbuf;
-    int sbuf;
-    int rc;
+    int rbuf = 0;
+    int sbuf = 0;
     socklen_t rbuf_len = sizeof(rbuf);
     socklen_t sbuf_len = sizeof(sbuf);
     char err_buf[512];
 
-    size = large ? RECV_BUFFER_SIZE : SMALL_BUFFER_SIZE;
-    rc = setsockopt(fd, SOL_SOCKET, SO_RCVBUF, reinterpret_cast<char const*>(&size), sizeof(size));
+    int size = large ? RECV_BUFFER_SIZE : SMALL_BUFFER_SIZE;
+    int rc = setsockopt(fd, SOL_SOCKET, SO_RCVBUF, reinterpret_cast<char const*>(&size), sizeof(size));
 
     if (rc < 0)
     {
@@ -126,17 +105,35 @@ void tr_udpSetSocketBuffers(tr_session* session)
     }
 }
 
+void tr_udpSetSocketTOS(tr_session* session)
+{
+    auto const tos = session->peerSocketTos();
+
+    if (tos)
+    {
+        return;
+    }
+
+    if (session->udp_socket != TR_BAD_SOCKET)
+    {
+        tr_netSetTOS(session->udp_socket, tos, TR_AF_INET);
+    }
+
+    if (session->udp6_socket != TR_BAD_SOCKET)
+    {
+        tr_netSetTOS(session->udp6_socket, tos, TR_AF_INET6);
+    }
+}
+
 /* BEP-32 has a rather nice explanation of why we need to bind to one
    IPv6 address, if I may say so myself. */
-
+// TODO: remove goto, it prevents reducing scope of local variables
 static void rebind_ipv6(tr_session* ss, bool force)
 {
-    bool is_default;
-    struct tr_address const* public_addr;
     struct sockaddr_in6 sin6;
-    unsigned char const* ipv6 = tr_globalIPv6();
+    unsigned char const* ipv6 = tr_globalIPv6(ss);
     tr_socket_t s = TR_BAD_SOCKET;
-    int rc;
+    int rc = -1;
     int one = 1;
 
     /* We currently have no way to enable or disable IPv6 after initialisation.
@@ -179,12 +176,6 @@ static void rebind_ipv6(tr_session* ss, bool force)
     }
 
     sin6.sin6_port = htons(ss->udp_port);
-    public_addr = tr_sessionGetPublicAddress(ss, TR_AF_INET6, &is_default);
-
-    if (public_addr != nullptr && !is_default)
-    {
-        sin6.sin6_addr = public_addr->addr.addr6;
-    }
 
     rc = bind(s, (struct sockaddr*)&sin6, sizeof(sin6));
 
@@ -244,14 +235,12 @@ static void event_callback(evutil_socket_t s, [[maybe_unused]] short type, void*
     TR_ASSERT(tr_isSession(static_cast<tr_session*>(vsession)));
     TR_ASSERT(type == EV_READ);
 
-    int rc;
-    socklen_t fromlen;
     unsigned char buf[4096];
     struct sockaddr_storage from;
     auto* session = static_cast<tr_session*>(vsession);
 
-    fromlen = sizeof(from);
-    rc = recvfrom(s, reinterpret_cast<char*>(buf), 4096 - 1, 0, (struct sockaddr*)&from, &fromlen);
+    socklen_t fromlen = sizeof(from);
+    int rc = recvfrom(s, reinterpret_cast<char*>(buf), 4096 - 1, 0, (struct sockaddr*)&from, &fromlen);
 
     /* Since most packets we receive here are ÂµTP, make quick inline
        checks for the other protocols.  The logic is as follows:
@@ -299,11 +288,6 @@ void tr_udpInit(tr_session* ss)
     TR_ASSERT(ss->udp_socket == TR_BAD_SOCKET);
     TR_ASSERT(ss->udp6_socket == TR_BAD_SOCKET);
 
-    bool is_default;
-    struct tr_address const* public_addr;
-    struct sockaddr_in sin;
-    int rc;
-
     ss->udp_port = tr_sessionGetPeerPort(ss);
 
     if (ss->udp_port <= 0)
@@ -316,38 +300,42 @@ void tr_udpInit(tr_session* ss)
     if (ss->udp_socket == TR_BAD_SOCKET)
     {
         tr_logAddNamedError("UDP", "Couldn't create IPv4 socket");
-        goto IPV6;
     }
-
-    memset(&sin, 0, sizeof(sin));
-    sin.sin_family = AF_INET;
-    public_addr = tr_sessionGetPublicAddress(ss, TR_AF_INET, &is_default);
-
-    if (public_addr != nullptr && !is_default)
+    else
     {
-        memcpy(&sin.sin_addr, &public_addr->addr.addr4, sizeof(struct in_addr));
+        auto is_default = bool{};
+        tr_address const* public_addr = tr_sessionGetPublicAddress(ss, TR_AF_INET, &is_default);
+
+        auto sin = sockaddr_in{};
+        sin.sin_family = AF_INET;
+        if (public_addr != nullptr && !is_default)
+        {
+            memcpy(&sin.sin_addr, &public_addr->addr.addr4, sizeof(struct in_addr));
+        }
+
+        sin.sin_port = htons(ss->udp_port);
+        int const rc = bind(ss->udp_socket, (struct sockaddr*)&sin, sizeof(sin));
+
+        if (rc == -1)
+        {
+            tr_logAddNamedError("UDP", "Couldn't bind IPv4 socket");
+            tr_netCloseSocket(ss->udp_socket);
+            ss->udp_socket = TR_BAD_SOCKET;
+        }
+        else
+        {
+            ss->udp_event = event_new(ss->event_base, ss->udp_socket, EV_READ | EV_PERSIST, event_callback, ss);
+
+            if (ss->udp_event == nullptr)
+            {
+                tr_logAddNamedError("UDP", "Couldn't allocate IPv4 event");
+            }
+        }
     }
 
-    sin.sin_port = htons(ss->udp_port);
-    rc = bind(ss->udp_socket, (struct sockaddr*)&sin, sizeof(sin));
+    // IPV6
 
-    if (rc == -1)
-    {
-        tr_logAddNamedError("UDP", "Couldn't bind IPv4 socket");
-        tr_netCloseSocket(ss->udp_socket);
-        ss->udp_socket = TR_BAD_SOCKET;
-        goto IPV6;
-    }
-
-    ss->udp_event = event_new(ss->event_base, ss->udp_socket, EV_READ | EV_PERSIST, event_callback, ss);
-
-    if (ss->udp_event == nullptr)
-    {
-        tr_logAddNamedError("UDP", "Couldn't allocate IPv4 event");
-    }
-
-IPV6:
-    if (tr_globalIPv6() != nullptr)
+    if (tr_globalIPv6(nullptr) != nullptr)
     {
         rebind_ipv6(ss, true);
     }
@@ -363,6 +351,8 @@ IPV6:
     }
 
     tr_udpSetSocketBuffers(ss);
+
+    tr_udpSetSocketTOS(ss);
 
     if (ss->isDHTEnabled)
     {

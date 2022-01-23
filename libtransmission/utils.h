@@ -1,20 +1,22 @@
-/*
- * This file Copyright (C) 2009-2017 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2009-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #pragma once
 
-#include <inttypes.h>
-#include <stdarg.h>
-#include <stddef.h> /* size_t */
+#include <algorithm>
+#include <cctype>
+#include <cinttypes>
+#include <cstddef>
+#include <ctime>
+#include <optional>
+#include <string>
 #include <string_view>
-#include <time.h> /* time_t */
+#include <type_traits>
 #include <vector>
 
+#include "platform-quota.h"
 #include "tr-macros.h"
 
 /***
@@ -24,7 +26,6 @@
 struct evbuffer;
 struct event;
 struct timeval;
-
 struct tr_error;
 
 /**
@@ -60,7 +61,7 @@ char const* tr_strip_positional_args(char const* fmt);
 
 #define TR_N_ELEMENTS(ary) (sizeof(ary) / sizeof(*(ary)))
 
-char const* tr_get_mime_type_for_filename(std::string_view filename);
+std::string_view tr_get_mime_type_for_filename(std::string_view filename);
 
 /**
  * @brief Rich Salz's classic implementation of shell-style pattern matching for ?, \, [], and * characters.
@@ -74,15 +75,28 @@ bool tr_wildmat(char const* text, char const* pattern) TR_GNUC_NONNULL(1, 2);
  */
 uint8_t* tr_loadFile(char const* filename, size_t* size, struct tr_error** error) TR_GNUC_MALLOC TR_GNUC_NONNULL(1);
 
-/** @brief build a filename from a series of elements using the
-           platform's correct directory separator. */
-char* tr_buildPath(char const* first_element, ...) TR_GNUC_NULL_TERMINATED TR_GNUC_MALLOC;
+bool tr_loadFile(std::vector<char>& setme, std::string const& filename, tr_error** error = nullptr);
+
+bool tr_saveFile(std::string const& filename, std::string_view contents, tr_error** error = nullptr);
+
+template<typename... T, typename std::enable_if_t<(std::is_convertible_v<T, std::string_view> && ...), bool> = true>
+std::string& tr_buildBuf(std::string& setme, T... args)
+{
+    setme.clear();
+    auto const n = (std::size(std::string_view{ args }) + ...);
+    if (setme.capacity() < n)
+    {
+        setme.reserve(n);
+    }
+    ((setme += args), ...);
+    return setme;
+}
 
 /**
- * @brief Get available disk space (in bytes) for the specified folder.
- * @return zero or positive integer on success, -1 in case of error.
+ * @brief Get disk capacity and free disk space (in bytes) for the specified folder.
+ * @return struct with free and total as zero or positive integer on success, -1 in case of error.
  */
-int64_t tr_getDirFreeSpace(char const* path);
+tr_disk_space tr_dirSpace(std::string_view path);
 
 /**
  * @brief Convenience wrapper around timer_add() to have a timer wake up in a number of seconds and microseconds
@@ -105,13 +119,49 @@ uint64_t tr_time_msec(void);
 /** @brief sleep the specified number of milliseconds */
 void tr_wait_msec(long int delay_milliseconds);
 
-/**
- * @brief make a copy of 'str' whose non-utf8 content has been corrected or stripped
- * @return a newly-allocated string that must be freed with tr_free()
- * @param str the string to make a clean copy of
- * @param len the length of the string to copy. If -1, the entire string is used.
- */
-char* tr_utf8clean(char const* str, size_t len) TR_GNUC_MALLOC;
+#if defined(__GNUC__) && !__has_include(<charconv>)
+
+#include <sstream>
+
+template<typename T>
+std::optional<T> tr_parseNum(std::string_view& sv)
+{
+    auto val = T{};
+    auto const str = std::string(std::data(sv), std::min(std::size(sv), size_t{ 64 }));
+    auto sstream = std::stringstream{ str };
+    auto const oldpos = sstream.tellg();
+    sstream >> val;
+    auto const newpos = sstream.tellg();
+    if ((newpos == oldpos) || (sstream.fail() && !sstream.eof()))
+    {
+        return std::nullopt;
+    }
+    sv.remove_prefix(sstream.eof() ? std::size(sv) : newpos - oldpos);
+    return val;
+}
+
+#else // #if defined(__GNUC__) && !__has_include(<charconv>)
+
+#include <charconv> // std::from_chars()
+
+template<typename T>
+std::optional<T> tr_parseNum(std::string_view& sv)
+{
+    auto val = T{};
+    auto const* const begin_ch = std::data(sv);
+    auto const* const end_ch = begin_ch + std::size(sv);
+    auto const result = std::from_chars(begin_ch, end_ch, val);
+    if (result.ec != std::errc{})
+    {
+        return std::nullopt;
+    }
+    sv.remove_prefix(result.ptr - std::data(sv));
+    return val;
+}
+
+#endif // #if defined(__GNUC__) && !__has_include(<charconv>)
+
+bool tr_utf8_validate(std::string_view sv, char const** endptr);
 
 #ifdef _WIN32
 
@@ -165,9 +215,6 @@ void* tr_realloc(void* p, size_t size);
 /** @brief Portability wrapper around free() in which `nullptr' is a safe argument */
 void tr_free(void* p);
 
-/** @brief Free pointers in a nullptr-terminated array (the array itself is not freed) */
-void tr_free_ptrv(void* const* p);
-
 /**
  * @brief make a newly-allocated copy of a chunk of memory
  * @param src the memory to copy
@@ -176,11 +223,12 @@ void tr_free_ptrv(void* const* p);
  */
 void* tr_memdup(void const* src, size_t byteCount);
 
-#define tr_new(struct_type, n_structs) ((struct_type*)tr_malloc(sizeof(struct_type) * (size_t)(n_structs)))
+#define tr_new(struct_type, n_structs) (static_cast<struct_type*>(tr_malloc(sizeof(struct_type) * (size_t)(n_structs))))
 
-#define tr_new0(struct_type, n_structs) ((struct_type*)tr_malloc0(sizeof(struct_type) * (size_t)(n_structs)))
+#define tr_new0(struct_type, n_structs) (static_cast<struct_type*>(tr_malloc0(sizeof(struct_type) * (size_t)(n_structs))))
 
-#define tr_renew(struct_type, mem, n_structs) ((struct_type*)tr_realloc((mem), sizeof(struct_type) * (size_t)(n_structs)))
+#define tr_renew(struct_type, mem, n_structs) \
+    (static_cast<struct_type*>(tr_realloc((mem), sizeof(struct_type) * (size_t)(n_structs))))
 
 /**
  * @brief make a newly-allocated copy of a substring
@@ -207,23 +255,13 @@ constexpr bool tr_str_is_empty(char const* value)
     return value == nullptr || *value == '\0';
 }
 
-char* evbuffer_free_to_str(struct evbuffer* buf, size_t* result_len);
-
-/** @brief similar to bsearch() but returns the index of the lower bound */
-int tr_lowerBound(
-    void const* key,
-    void const* base,
-    size_t nmemb,
-    size_t size,
-    tr_voidptr_compare_func compar,
-    bool* exact_match) TR_GNUC_HOT TR_GNUC_NONNULL(1, 5, 6);
+std::string evbuffer_free_to_str(evbuffer* buf);
 
 /**
  * @brief sprintf() a string into a newly-allocated buffer large enough to hold it
  * @return a newly-allocated string that can be freed with tr_free()
  */
 char* tr_strdup_printf(char const* fmt, ...) TR_GNUC_MALLOC TR_GNUC_PRINTF(1, 2);
-char* tr_strdup_vprintf(char const* fmt, va_list args) TR_GNUC_MALLOC TR_GNUC_PRINTF(1, 0);
 
 /** @brief Portability wrapper for strlcpy() that uses the system implementation if available */
 size_t tr_strlcpy(void* dst, void const* src, size_t siz);
@@ -235,10 +273,6 @@ int tr_snprintf(void* buf, size_t buflen, char const* fmt, ...) TR_GNUC_PRINTF(3
     @param errnum the error number to describe */
 char const* tr_strerror(int errnum);
 
-/** @brief strips leading and trailing whitspace from a string
-    @return the stripped string */
-char* tr_strstrip(char* str);
-
 /** @brief Returns true if the string ends with the specified case-insensitive suffix */
 bool tr_str_has_suffix(char const* str, char const* suffix);
 
@@ -248,29 +282,108 @@ char const* tr_memmem(char const* haystack, size_t haystack_len, char const* nee
 /** @brief Portability wrapper for strcasestr() that uses the system implementation if available */
 char const* tr_strcasestr(char const* haystack, char const* needle);
 
-/** @brief Portability wrapper for strsep() that uses the system implementation if available */
-char* tr_strsep(char** str, char const* delim);
+template<typename T>
+std::string tr_strlower(T in)
+{
+    auto out = std::string{ in };
+    std::for_each(std::begin(out), std::end(out), [](char& ch) { ch = std::tolower(ch); });
+    return out;
+}
+
+template<typename T>
+std::string tr_strupper(T in)
+{
+    auto out = std::string{ in };
+    std::for_each(std::begin(out), std::end(out), [](char& ch) { ch = std::toupper(ch); });
+    return out;
+}
+
+/***
+****  std::string_view utils
+***/
+
+template<typename... T, typename std::enable_if_t<(std::is_convertible_v<T, std::string_view> && ...), bool> = true>
+std::string tr_strvPath(T... args)
+{
+    auto setme = std::string{};
+    auto const n_args = sizeof...(args);
+    auto const n = n_args + (std::size(std::string_view{ args }) + ...);
+    if (setme.capacity() < n)
+    {
+        setme.reserve(n);
+    }
+
+    auto const foo = [&setme](std::string_view a)
+    {
+        setme += a;
+        setme += TR_PATH_DELIMITER;
+    };
+    (foo(args), ...);
+    setme.resize(setme.size() - 1);
+    return setme;
+}
+
+template<typename... T, typename std::enable_if_t<(std::is_convertible_v<T, std::string_view> && ...), bool> = true>
+std::string tr_strvJoin(T... args)
+{
+    auto setme = std::string{};
+    auto const n = (std::size(std::string_view{ args }) + ...);
+    if (setme.capacity() < n)
+    {
+        setme.reserve(n);
+    }
+    ((setme += args), ...);
+    return setme;
+}
+
+template<typename T>
+constexpr bool tr_strvContains(std::string_view sv, T key) // c++23
+{
+    return sv.find(key) != sv.npos;
+}
+
+constexpr bool tr_strvStartsWith(std::string_view sv, char key) // c++20
+{
+    return !std::empty(sv) && sv.front() == key;
+}
+
+constexpr bool tr_strvStartsWith(std::string_view sv, std::string_view key) // c++20
+{
+    return std::size(key) <= std::size(sv) && sv.substr(0, std::size(key)) == key;
+}
+
+constexpr bool tr_strvEndsWith(std::string_view sv, std::string_view key) // c++20
+{
+    return std::size(key) <= std::size(sv) && sv.substr(std::size(sv) - std::size(key)) == key;
+}
+
+constexpr bool tr_strvEndsWith(std::string_view sv, char key) // c++20
+{
+    return !std::empty(sv) && sv.back() == key;
+}
+
+constexpr std::string_view tr_strvSep(std::string_view* sv, char delim)
+{
+    auto pos = sv->find(delim);
+    auto const ret = sv->substr(0, pos);
+    sv->remove_prefix(pos != sv->npos ? pos + 1 : std::size(*sv));
+    return ret;
+}
+
+constexpr bool tr_strvSep(std::string_view* sv, std::string_view* token, char delim)
+{
+    return !std::empty((*token = tr_strvSep(sv, delim)));
+}
+
+std::string_view tr_strvStrip(std::string_view sv);
+
+char* tr_strvDup(std::string_view) TR_GNUC_MALLOC;
+
+std::string& tr_strvUtf8Clean(std::string_view cleanme, std::string& setme);
 
 /***
 ****
 ***/
-
-void tr_binary_to_hex(void const* input, void* output, size_t byte_length) TR_GNUC_NONNULL(1, 2);
-void tr_hex_to_binary(void const* input, void* output, size_t byte_length) TR_GNUC_NONNULL(1, 2);
-
-/** @brief convenience function to determine if an address is an IP address (IPv4 or IPv6) */
-bool tr_addressIsIP(char const* address);
-
-/** @brief return true if the url is a http or https or UDP url that Transmission understands */
-bool tr_urlIsValidTracker(char const* url);
-
-/** @brief return true if the url is a [ http, https, ftp, sftp ] url that Transmission understands */
-bool tr_urlIsValid(char const* url, size_t url_len);
-
-/** @brief parse a URL into its component parts
-    @return True on success or false if an error occurred */
-bool tr_urlParse(char const* url, size_t url_len, char** setme_scheme, char** setme_host, int* setme_port, char** setme_path)
-    TR_GNUC_NONNULL(1);
 
 /** @brief return TR_RATIO_NA, TR_RATIO_INF, or a number in [0..1]
     @return TR_RATIO_NA, TR_RATIO_INF, or a number in [0..1] */
@@ -284,7 +397,7 @@ double tr_getRatio(uint64_t numerator, uint64_t denominator);
  *
  * For example, "5-8" will return [ 5, 6, 7, 8 ] and setmeCount will be 4.
  */
-std::vector<int> tr_parseNumberRange(char const* str, size_t str_len) TR_GNUC_NONNULL(1);
+std::vector<int> tr_parseNumberRange(std::string_view str);
 
 /**
  * @brief truncate a double value at a given number of decimal places.
@@ -303,15 +416,13 @@ std::vector<int> tr_parseNumberRange(char const* str, size_t str_len) TR_GNUC_NO
 double tr_truncd(double x, int decimal_places);
 
 /* return a percent formatted string of either x.xx, xx.x or xxx */
-char* tr_strpercent(char* buf, double x, size_t buflen);
+std::string tr_strpercent(double x);
 
 /**
- * @param buf      the buffer to write the string to
- * @param buflen   buf's size
  * @param ratio    the ratio to convert to a string
  * @param infinity the string represntation of "infinity"
  */
-char* tr_strratio(char* buf, size_t buflen, double ratio, char const* infinity) TR_GNUC_NONNULL(1, 4);
+std::string tr_strratio(double ratio, char const* infinity);
 
 /** @brief Portability wrapper for localtime_r() that uses the system implementation if available */
 struct tm* tr_localtime_r(time_t const* _clock, struct tm* _result);
@@ -371,7 +482,7 @@ uint64_t tr_ntohll(uint64_t);
 
 /* example: tr_formatter_size_init(1024, _("KiB"), _("MiB"), _("GiB"), _("TiB")); */
 
-void tr_formatter_size_init(size_t kilo, char const* kb, char const* mb, char const* gb, char const* tb);
+void tr_formatter_size_init(uint64_t kilo, char const* kb, char const* mb, char const* gb, char const* tb);
 
 void tr_formatter_speed_init(size_t kilo, char const* kb, char const* mb, char const* gb, char const* tb);
 
@@ -379,24 +490,46 @@ void tr_formatter_mem_init(size_t kilo, char const* kb, char const* mb, char con
 
 extern size_t tr_speed_K;
 extern size_t tr_mem_K;
-extern size_t tr_size_K;
+extern uint64_t tr_size_K; /* unused? */
 
 /* format a speed from KBps into a user-readable string. */
-char* tr_formatter_speed_KBps(char* buf, double KBps, size_t buflen);
+std::string tr_formatter_speed_KBps(double KBps);
 
 /* format a memory size from bytes into a user-readable string. */
-char* tr_formatter_mem_B(char* buf, size_t bytes, size_t buflen);
+std::string tr_formatter_mem_B(size_t bytes);
 
 /* format a memory size from MB into a user-readable string. */
-static inline char* tr_formatter_mem_MB(char* buf, double MBps, size_t buflen)
+static inline std::string tr_formatter_mem_MB(double MBps)
 {
-    return tr_formatter_mem_B(buf, (size_t)(MBps * tr_mem_K * tr_mem_K), buflen);
+    return tr_formatter_mem_B((size_t)(MBps * tr_mem_K * tr_mem_K));
 }
 
 /* format a file size from bytes into a user-readable string. */
-char* tr_formatter_size_B(char* buf, size_t bytes, size_t buflen);
+std::string tr_formatter_size_B(uint64_t bytes);
 
 void tr_formatter_get_units(void* dict);
+
+static inline unsigned int tr_toSpeedBytes(unsigned int KBps)
+{
+    return KBps * tr_speed_K;
+}
+
+static inline auto tr_toSpeedKBps(unsigned int Bps)
+{
+    return Bps / double(tr_speed_K);
+}
+
+static inline auto tr_toMemBytes(unsigned int MB)
+{
+    auto B = uint64_t(tr_mem_K) * tr_mem_K;
+    B *= MB;
+    return B;
+}
+
+static inline auto tr_toMemMB(uint64_t B)
+{
+    return int(B / (tr_mem_K * tr_mem_K));
+}
 
 /***
 ****

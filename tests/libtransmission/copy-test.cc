@@ -1,10 +1,12 @@
 /*
- * This file copyright Transmission authors and contributors
+ * This file copyright Transmission authors and contributors.
  *
- * It may be used under the GNU GPL versions 2 or 3
  * or any future license endorsed by Mnemosyne LLC.
  *
  */
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #include <algorithm>
 
@@ -25,7 +27,7 @@ class CopyTest : public SandboxedTest
 protected:
     void testImpl(char const* filename1, char const* filename2, size_t const file_length)
     {
-        auto const path1 = tr_buildPath(sandboxDir().data(), filename1, nullptr);
+        auto const path1 = tr_strvPath(sandboxDir(), filename1);
 
         /* Create a file. */
         char* file_content = static_cast<char*>(tr_malloc(file_length));
@@ -33,22 +35,19 @@ protected:
         createFileWithContents(path1, file_content, file_length);
         tr_free(file_content);
 
-        auto const path2 = tr_buildPath(sandboxDir().data(), filename2, nullptr);
+        auto const path2 = tr_strvPath(sandboxDir(), filename2);
 
         tr_error* err = nullptr;
         /* Copy it. */
-        EXPECT_TRUE(tr_sys_path_copy(path1, path2, &err));
+        EXPECT_TRUE(tr_sys_path_copy(path1.c_str(), path2.c_str(), &err));
         EXPECT_EQ(nullptr, err);
         tr_error_clear(&err);
 
-        EXPECT_TRUE(filesAreIdentical(path1, path2));
+        EXPECT_TRUE(filesAreIdentical(path1.c_str(), path2.c_str()));
 
         /* Dispose of those files that we created. */
-        tr_sys_path_remove(path1, nullptr);
-        tr_free(path1);
-
-        tr_sys_path_remove(path2, nullptr);
-        tr_free(path2);
+        tr_sys_path_remove(path1.c_str(), nullptr);
+        tr_sys_path_remove(path2.c_str(), nullptr);
     }
 
 private:

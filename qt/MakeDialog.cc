@@ -1,12 +1,11 @@
-/*
- * This file Copyright (C) 2009-2015 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2009-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #include "MakeDialog.h"
+
+#include <vector>
 
 #include <QDir>
 #include <QFileInfo>
@@ -144,7 +143,7 @@ void MakeDialog::makeTorrent()
 
     // get the tiers
     int tier = 0;
-    QVector<tr_tracker_info> trackers;
+    std::vector<tr_tracker_info> trackers;
 
     for (QString const& line : ui_.trackersEdit->toPlainText().split(QLatin1Char('\n')))
     {
@@ -159,7 +158,7 @@ void MakeDialog::makeTorrent()
             auto tmp = tr_tracker_info{};
             tmp.announce = tr_strdup(announce_url.toUtf8().constData());
             tmp.tier = tier;
-            trackers.append(tmp);
+            trackers.push_back(tmp);
         }
     }
 
@@ -176,14 +175,23 @@ void MakeDialog::makeTorrent()
         comment = ui_.commentEdit->text();
     }
 
+    // source
+    QString source;
+
+    if (ui_.sourceCheck->isChecked())
+    {
+        source = ui_.sourceEdit->text();
+    }
+
     // start making the torrent
     tr_makeMetaInfo(
         builder_.get(),
         target.toUtf8().constData(),
-        trackers.isEmpty() ? nullptr : trackers.data(),
+        trackers.empty() ? nullptr : trackers.data(),
         trackers.size(),
         comment.isEmpty() ? nullptr : comment.toUtf8().constData(),
-        ui_.privateCheck->isChecked());
+        ui_.privateCheck->isChecked(),
+        source.isNull() ? nullptr : source.toUtf8().constData());
 
     // pop up the dialog
     auto* dialog = new MakeProgressDialog(session_, *builder_, this);

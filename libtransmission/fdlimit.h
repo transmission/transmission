@@ -1,10 +1,7 @@
-/*
- * This file Copyright (C) 2005-2014 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2005-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #pragma once
 
@@ -50,8 +47,6 @@ tr_sys_file_t tr_fdFileCheckout(
     uint64_t preallocation_file_size);
 
 tr_sys_file_t tr_fdFileGetCached(tr_session* session, int torrent_id, tr_file_index_t file_num, bool doWrite);
-
-bool tr_fdFileGetCachedMTime(tr_session* session, int torrent_id, tr_file_index_t file_num, time_t* mtime);
 
 /**
  * Closes a file that's being held by our file repository.

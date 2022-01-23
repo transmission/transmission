@@ -68,53 +68,57 @@ if(ENABLE_NLS)
 endif()
 
 set(${PROJECT_NAME}_SOURCES
-    actions.cc
-    conf.cc
-    details.cc
-    dialogs.cc
-    favicon.cc
-    file-list.cc
-    filter.cc
-    hig.cc
-    icons.cc
+    Actions.cc
+    Application.cc
+    DetailsDialog.cc
+    Dialogs.cc
+    FaviconCache.cc
+    FileList.cc
+    FilterBar.cc
+    FreeSpaceLabel.cc
+    HigWorkarea.cc
+    IconCache.cc
     main.cc
-    makemeta-ui.cc
-    msgwin.cc
-    notify.cc
-    open-dialog.cc
-    relocate.cc
-    stats.cc
-    torrent-cell-renderer.cc
-    tr-core.cc
-    tr-icon.cc
-    tr-prefs.cc
-    tr-window.cc
-    util.cc
+    MainWindow.cc
+    MakeDialog.cc
+    MessageLogWindow.cc
+    Notify.cc
+    OptionsDialog.cc
+    Prefs.cc
+    PrefsDialog.cc
+    RelocateDialog.cc
+    Session.cc
+    StatsDialog.cc
+    SystemTrayIcon.cc
+    TorrentCellRenderer.cc
+    Utils.cc
     ${CMAKE_CURRENT_BINARY_DIR}/transmission-resources.c
 )
 
 set(${PROJECT_NAME}_HEADERS
-    actions.h
-    conf.h
-    details.h
-    dialogs.h
-    favicon.h
-    file-list.h
-    filter.h
-    hig.h
-    icons.h
-    makemeta-ui.h
-    msgwin.h
-    notify.h
-    open-dialog.h
-    relocate.h
-    stats.h
-    torrent-cell-renderer.h
-    tr-core.h
-    tr-icon.h
-    tr-prefs.h
-    tr-window.h
-    util.h
+    Actions.h
+    Application.h
+    DetailsDialog.h
+    Dialogs.h
+    FaviconCache.h
+    FileList.h
+    FilterBar.h
+    FreeSpaceLabel.h
+    HigWorkarea.h
+    IconCache.h
+    MainWindow.h
+    MakeDialog.h
+    MessageLogWindow.h
+    Notify.h
+    OptionsDialog.h
+    Prefs.h
+    PrefsDialog.h
+    RelocateDialog.h
+    Session.h
+    StatsDialog.h
+    SystemTrayIcon.h
+    TorrentCellRenderer.h
+    Utils.h
     ${CMAKE_CURRENT_BINARY_DIR}/transmission-resources.h
 )
 
@@ -140,12 +144,17 @@ add_definitions(
     -DG_DISABLE_DEPRECATED
     -DGDK_PIXBUF_DISABLE_DEPRECATED
     -DGDK_DISABLE_DEPRECATED
-    # FIXME: migrate from GtkUIManager to GtkBuilder in 2.90
-    # -DGTK_DISABLE_DEPRECATED
+    -DGTK_DISABLE_DEPRECATED
     -DPANGO_DISABLE_DEPRECATED
     # FIXME: these break libnotify's headers
     # -DG_DISABLE_SINGLE_INCLUDES
     # -DGTK_DISABLE_SINGLE_INCLUDES
+    -DGDKMM_DISABLE_DEPRECATED
+    -DGIOMM_DISABLE_DEPRECATED
+    -DGLIBMM_DISABLE_DEPRECATED
+    -DGTKMM_DISABLE_DEPRECATED
+    -DPANGOMM_DISABLE_DEPRECATED
+    -DSIGCXX_DISABLE_DEPRECATED
     ${GTK_CFLAGS_OTHER}
 )
 
@@ -172,8 +181,7 @@ target_link_libraries(${TR_NAME}-gtk
 )
 
 if(NOT MSVC)
-    # https://github.com/transmission/transmission/issues/1381 patches welcome
-    target_compile_options(${TR_NAME}-gtk PRIVATE -Wno-deprecated-declarations)
+    target_compile_options(${TR_NAME}-gtk PRIVATE -Wno-exit-time-destructors)
 endif()
 
 if(MSVC)

@@ -57,11 +57,10 @@
         <window title="Настройки" allowsToolTipsWhenApplicationIsInactive="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" tabbingMode="disallowed" id="23" userLabel="Preferences" customClass="PrefsWindow">
             <windowStyleMask key="styleMask" titled="YES" closable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
-            <rect key="contentRect" x="108" y="632" width="555" height="107"/>
+            <rect key="contentRect" x="108" y="632" width="565" height="107"/>
             <rect key="screenRect" x="0.0" y="0.0" width="1440" height="875"/>
-            <value key="maxSize" type="size" width="555" height="107"/>
             <view key="contentView" id="24">
-                <rect key="frame" x="0.0" y="0.0" width="555" height="107"/>
+                <rect key="frame" x="0.0" y="0.0" width="565" height="107"/>
                 <autoresizingMask key="autoresizingMask"/>
             </view>
             <connections>
@@ -70,7 +69,7 @@
             <point key="canvasLocation" x="-550" y="-1439"/>
         </window>
         <customView id="28" userLabel="General">
-            <rect key="frame" x="0.0" y="0.0" width="555" height="371"/>
+            <rect key="frame" x="0.0" y="0.0" width="565" height="371"/>
             <autoresizingMask key="autoresizingMask"/>
             <subviews>
                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="652">
@@ -278,17 +277,17 @@
             <point key="canvasLocation" x="-550.5" y="456.5"/>
         </customView>
         <customView id="41" userLabel="Transfers">
-            <rect key="frame" x="0.0" y="0.0" width="555" height="393"/>
+            <rect key="frame" x="0.0" y="0.0" width="565" height="393"/>
             <autoresizingMask key="autoresizingMask"/>
             <subviews>
                 <tabView fixedFrame="YES" initialItem="253" translatesAutoresizingMaskIntoConstraints="NO" id="252">
-                    <rect key="frame" x="13" y="10" width="529" height="379"/>
+                    <rect key="frame" x="13" y="10" width="539" height="379"/>
                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                     <font key="font" metaFont="system"/>
                     <tabViewItems>
                         <tabViewItem label="Основные" identifier="" id="253">
                             <view key="view" id="255">
-                                <rect key="frame" x="10" y="33" width="509" height="333"/>
+                                <rect key="frame" x="10" y="33" width="519" height="333"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <subviews>
                                     <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="51">
@@ -981,7 +980,7 @@
             <point key="canvasLocation" x="-550.5" y="-647.5"/>
         </customView>
         <customView id="1760" userLabel="Groups">
-            <rect key="frame" x="0.0" y="0.0" width="555" height="240"/>
+            <rect key="frame" x="0.0" y="0.0" width="565" height="240"/>
             <autoresizingMask key="autoresizingMask"/>
             <subviews>
                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1834">
@@ -1156,7 +1155,7 @@
             <point key="canvasLocation" x="-550" y="1094"/>
         </customView>
         <customView id="153" userLabel="Bandwidth">
-            <rect key="frame" x="0.0" y="0.0" width="555" height="227"/>
+            <rect key="frame" x="0.0" y="0.0" width="565" height="227"/>
             <autoresizingMask key="autoresizingMask"/>
             <subviews>
                 <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1907">
@@ -1250,7 +1249,7 @@
                     </connections>
                 </button>
                 <imageView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="228">
-                    <rect key="frame" x="17" y="117" width="18" height="18"/>
+                    <rect key="frame" x="17" y="118" width="18" height="18"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <imageCell key="cell" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyUpOrDown" image="TurtleTemplate" id="1279"/>
                 </imageView>
@@ -1463,7 +1462,7 @@
             <point key="canvasLocation" x="-550" y="814"/>
         </customView>
         <customView id="1361" userLabel="Peers">
-            <rect key="frame" x="0.0" y="0.0" width="555" height="366"/>
+            <rect key="frame" x="0.0" y="0.0" width="565" height="366"/>
             <autoresizingMask key="autoresizingMask"/>
             <subviews>
                 <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1741">
@@ -1480,7 +1479,7 @@
                     </connections>
                 </button>
                 <button horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1473">
-                    <rect key="frame" x="517" y="12" width="21" height="23"/>
+                    <rect key="frame" x="527" y="12" width="21" height="23"/>
                     <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
                     <buttonCell key="cell" type="help" bezelStyle="helpButton" alignment="center" borderStyle="border" inset="2" id="1474">
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -1714,7 +1713,7 @@
                     </connections>
                 </button>
                 <textField verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1985">
-                    <rect key="frame" x="191" y="100" width="340" height="22"/>
+                    <rect key="frame" x="191" y="100" width="350" height="22"/>
                     <autoresizingMask key="autoresizingMask" widthSizable="YES"/>
                     <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="1986">
                         <font key="font" metaFont="system"/>
@@ -1735,7 +1734,7 @@
             <point key="canvasLocation" x="-550.5" y="37"/>
         </customView>
         <customView id="66" userLabel="Network">
-            <rect key="frame" x="0.0" y="0.0" width="555" height="220"/>
+            <rect key="frame" x="0.0" y="0.0" width="565" height="220"/>
             <autoresizingMask key="autoresizingMask"/>
             <subviews>
                 <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1891">
@@ -1768,7 +1767,7 @@
                     </textFieldCell>
                 </textField>
                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="357">
-                    <rect key="frame" x="234" y="143" width="304" height="17"/>
+                    <rect key="frame" x="234" y="143" width="314" height="17"/>
                     <autoresizingMask key="autoresizingMask" widthSizable="YES"/>
                     <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Проверяю статус порта…" id="1250">
                         <font key="font" metaFont="system"/>
@@ -1858,7 +1857,7 @@
                     </textFieldCell>
                 </textField>
                 <button horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="326">
-                    <rect key="frame" x="517" y="12" width="21" height="23"/>
+                    <rect key="frame" x="527" y="12" width="21" height="23"/>
                     <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
                     <buttonCell key="cell" type="help" bezelStyle="helpButton" alignment="center" borderStyle="border" inset="2" id="1246">
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -1884,13 +1883,13 @@
             <point key="canvasLocation" x="-550" y="-297"/>
         </customView>
         <customView id="1481" userLabel="Remote">
-            <rect key="frame" x="0.0" y="0.0" width="555" height="439"/>
+            <rect key="frame" x="0.0" y="0.0" width="565" height="439"/>
             <autoresizingMask key="autoresizingMask"/>
             <subviews>
                 <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1717">
-                    <rect key="frame" x="83" y="343" width="185" height="25"/>
+                    <rect key="frame" x="76" y="340" width="180" height="32"/>
                     <autoresizingMask key="autoresizingMask"/>
-                    <buttonCell key="cell" type="roundTextured" title="Открыть веб-интерфейс" bezelStyle="texturedRounded" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="1718">
+                    <buttonCell key="cell" type="push" title="Открыть веб-интерфейс" bezelStyle="rounded" alignment="center" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="1718">
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                         <font key="font" metaFont="system"/>
                     </buttonCell>
@@ -1900,7 +1899,7 @@
                     </connections>
                 </button>
                 <button horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1660">
-                    <rect key="frame" x="513" y="12" width="25" height="25"/>
+                    <rect key="frame" x="523" y="12" width="25" height="25"/>
                     <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
                     <buttonCell key="cell" type="help" bezelStyle="helpButton" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="1661">
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -2093,7 +2092,7 @@
                 <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1483">
                     <rect key="frame" x="62" y="403" width="252" height="18"/>
                     <autoresizingMask key="autoresizingMask"/>
-                    <buttonCell key="cell" type="check" title="Включить удаленное управление" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1502">
+                    <buttonCell key="cell" type="check" title="Включить удалённый доступ" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1502">
                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                         <font key="font" metaFont="system"/>
                     </buttonCell>
