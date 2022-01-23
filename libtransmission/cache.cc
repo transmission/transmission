@@ -110,8 +110,8 @@ static int getBlockRun(tr_cache const* cache, int pos, struct run_info* info)
 /* higher rank comes before lower rank */
 static int compareRuns(void const* va, void const* vb)
 {
-    auto* a = static_cast<struct run_info const*>(va);
-    auto* b = static_cast<struct run_info const*>(vb);
+    auto const* const a = static_cast<struct run_info const*>(va);
+    auto const* const b = static_cast<struct run_info const*>(vb);
     return b->rank - a->rank;
 }
 
