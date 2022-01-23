@@ -168,7 +168,6 @@ struct tr_announcer
     explicit tr_announcer(tr_session* session_in)
         : session{ session_in }
         , upkeep_timer{ evtimer_new(session_in->event_base, onUpkeepTimer, this) }
-        , key{ tr_rand_int(INT_MAX) }
     {
         scheduleNextUpdate();
     }
@@ -188,7 +187,7 @@ struct tr_announcer
 
     tr_session* const session;
     event* const upkeep_timer;
-    int const key;
+    int const key = tr_rand_int(INT_MAX);
     time_t tau_upkeep_at = 0;
 };
 
