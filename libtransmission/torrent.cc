@@ -508,8 +508,8 @@ static void onTrackerResponse(tr_torrent* tor, tr_tracker_event const* event, vo
     switch (event->messageType)
     {
     case TR_TRACKER_PEERS:
-        tr_logAddTorDbg(tor, "Got %zu peers from tracker", event->pexCount);
-        tr_peerMgrAddPex(tor, TR_PEER_FROM_TRACKER, event->pex, event->pexCount);
+        tr_logAddTorDbg(tor, "Got %zu peers from tracker", size_t(std::size(event->pex)));
+        tr_peerMgrAddPex(tor, TR_PEER_FROM_TRACKER, std::data(event->pex), std::size(event->pex));
         break;
 
     case TR_TRACKER_COUNTS:
@@ -733,7 +733,7 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
         tr_error_clear(&error);
     }
 
-    tor->announcer_tiers = tr_announcerAddTorrent(tor, onTrackerResponse, nullptr);
+    tor->torrent_announcer = tr_announcerAddTorrent(tor, onTrackerResponse, nullptr);
 
     if (is_new_torrent)
     {

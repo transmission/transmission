@@ -101,6 +101,10 @@ tr_pex* tr_peerMgrCompact6ToPex(
     size_t added_f_len,
     size_t* pexCount);
 
+std::vector<tr_pex> tr_peerMgrCompactToPex(void const* compact, size_t compactLen, uint8_t const* added_f, size_t added_f_len);
+
+std::vector<tr_pex> tr_peerMgrCompact6ToPex(void const* compact, size_t compactLen, uint8_t const* added_f, size_t added_f_len);
+
 size_t tr_peerMgrAddPex(tr_torrent* tor, uint8_t from, tr_pex const* pex, size_t n_pex);
 
 void tr_peerMgrSetSwarmIsAllSeeds(tr_torrent* tor);
