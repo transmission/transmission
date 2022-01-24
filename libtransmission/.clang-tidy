@@ -79,6 +79,7 @@ Checks: >
   cppcoreguidelines-init-variables,
   cppcoreguidelines-prefer-member-initializer,
   cppcoreguidelines-virtual-class-destructor,
+  misc-misleading-identifier,
   misc-static-assert,
   modernize-avoid-bind,
   modernize-concat-nested-namespaces,
