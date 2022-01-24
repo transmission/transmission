@@ -13,6 +13,7 @@
 		0A89346B736DBCF81F3A4852 /* torrent-metainfo.h in Headers */ = {isa = PBXBuildFile; fileRef = 0A89346B736DBCF81F3A4853 /* torrent-metainfo.h */; };
 		1BB44E07B1B52E28291B4E32 /* file-piece-map.cc in Sources */ = {isa = PBXBuildFile; fileRef = 1BB44E07B1B52E28291B4E30 /* file-piece-map.cc */; };
 		1BB44E07B1B52E28291B4E33 /* file-piece-map.h in Headers */ = {isa = PBXBuildFile; fileRef = 1BB44E07B1B52E28291B4E31 /* file-piece-map.h */; };
+		2856E0656A49F2665D69E760 /* benc.h in Headers */ = {isa = PBXBuildFile; fileRef = 2856E0656A49F2665D69E761 /* benc.h */; };
 		35F373030C2DA89000DAA8F2 /* FilePriorityCell.mm in Sources */ = {isa = PBXBuildFile; fileRef = 35F373010C2DA88F00DAA8F2 /* FilePriorityCell.mm */; };
 		3C7A11970D0B2EE300B5701F /* getgateway.c in Sources */ = {isa = PBXBuildFile; fileRef = 3C7A11910D0B2EE300B5701F /* getgateway.c */; };
 		3C7A11980D0B2EE300B5701F /* getgateway.h in Headers */ = {isa = PBXBuildFile; fileRef = 3C7A11920D0B2EE300B5701F /* getgateway.h */; };
@@ -400,7 +401,6 @@
 		C3CEBBFB2794A0D200683BE0 /* compiler_msc.h in Headers */ = {isa = PBXBuildFile; fileRef = C3CEBBF82794A0D200683BE0 /* compiler_msc.h */; };
 		C3CEBBFC2794A12200683BE0 /* libdeflate.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C3CEBBA927949CA000683BE0 /* libdeflate.a */; };
 		CAB35C64252F6F5E00552A55 /* mime-types.h in Headers */ = {isa = PBXBuildFile; fileRef = CAB35C62252F6F5E00552A55 /* mime-types.h */; };
-		2856E0656A49F2665D69E760 /* benc.h in Headers */ = {isa = PBXBuildFile; fileRef = 2856E0656A49F2665D69E761 /* benc.h */; };
 		E138A9780C04D88F00C5426C /* ProgressGradients.mm in Sources */ = {isa = PBXBuildFile; fileRef = E138A9760C04D88F00C5426C /* ProgressGradients.mm */; };
 		E23B55A5FC3B557F7746D510 /* interned-string.h in Headers */ = {isa = PBXBuildFile; fileRef = E23B55A5FC3B557F7746D511 /* interned-string.h */; settings = {ATTRIBUTES = (Project, ); }; };
 		E71A5565279C2DD600EBFA1E /* tr-assert.mm in Sources */ = {isa = PBXBuildFile; fileRef = E71A5564279C2DD600EBFA1E /* tr-assert.mm */; };
@@ -547,6 +547,7 @@
 		13E42FB307B3F0F600E4EEF1 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
 		1BB44E07B1B52E28291B4E30 /* file-piece-map.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "file-piece-map.cc"; sourceTree = "<group>"; };
 		1BB44E07B1B52E28291B4E31 /* file-piece-map.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "file-piece-map.h"; sourceTree = "<group>"; };
+		2856E0656A49F2665D69E761 /* benc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = benc.h; sourceTree = "<group>"; };
 		29B97316FDCFA39411CA2CEA /* main.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = main.mm; sourceTree = "<group>"; };
 		29B97324FDCFA39411CA2CEA /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
 		29B97325FDCFA39411CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -1112,10 +1113,10 @@
 		C3CEBBF72794A0D200683BE0 /* compiler_gcc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = compiler_gcc.h; path = common/compiler_gcc.h; sourceTree = "<group>"; };
 		C3CEBBF82794A0D200683BE0 /* compiler_msc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = compiler_msc.h; path = common/compiler_msc.h; sourceTree = "<group>"; };
 		CAB35C62252F6F5E00552A55 /* mime-types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "mime-types.h"; sourceTree = "<group>"; };
-		2856E0656A49F2665D69E761 /* benc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "benc.h"; sourceTree = "<group>"; };
 		E138A9750C04D88F00C5426C /* ProgressGradients.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ProgressGradients.h; sourceTree = "<group>"; };
 		E138A9760C04D88F00C5426C /* ProgressGradients.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ProgressGradients.mm; sourceTree = "<group>"; };
 		E23B55A5FC3B557F7746D511 /* interned-string.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "interned-string.h"; sourceTree = SOURCE_ROOT; };
+		E7087D82279F1B1700AA245E /* Transmission.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Transmission.entitlements; sourceTree = "<group>"; };
 		E71A5564279C2DD600EBFA1E /* tr-assert.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = "tr-assert.mm"; sourceTree = "<group>"; };
 		ED8A163B2735A8AA000D61F9 /* peer-mgr-active-requests.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "peer-mgr-active-requests.h"; sourceTree = "<group>"; };
 		ED8A163C2735A8AA000D61F9 /* peer-mgr-active-requests.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = "peer-mgr-active-requests.cc"; sourceTree = "<group>"; };
@@ -1383,6 +1384,7 @@
 		29B97314FDCFA39411CA2CEA /* Transmission */ = {
 			isa = PBXGroup;
 			children = (
+				E7087D82279F1B1700AA245E /* Transmission.entitlements */,
 				A22CEF9E21CDC44400C5C1BA /* Transmission.entitlements */,
 				4DDBB70A09E16B3200284745 /* GUI */,
 				A2F35BC315C5A0A100EBF632 /* QuickLookPlugin */,
@@ -3303,6 +3305,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CODE_SIGN_ENTITLEMENTS = Transmission.entitlements;
 				ENABLE_HARDENED_RUNTIME = YES;
 				FRAMEWORK_SEARCH_PATHS = macosx;
 				GCC_PREFIX_HEADER = macosx/Transmission_Prefix.pch;
@@ -3514,6 +3517,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CODE_SIGN_ENTITLEMENTS = Transmission.entitlements;
 				ENABLE_HARDENED_RUNTIME = YES;
 				FRAMEWORK_SEARCH_PATHS = macosx;
 				GCC_PREFIX_HEADER = macosx/Transmission_Prefix.pch;
@@ -3679,6 +3683,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CODE_SIGN_ENTITLEMENTS = Transmission.entitlements;
 				ENABLE_HARDENED_RUNTIME = YES;
 				FRAMEWORK_SEARCH_PATHS = macosx;
 				GCC_PREFIX_HEADER = macosx/Transmission_Prefix.pch;
