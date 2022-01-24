@@ -180,7 +180,6 @@ public:
     bool endgame = false;
 
     ActiveRequests active_requests;
-    Wishlist wishlist;
 
     int interestedCount = 0;
     int maxPeers = 0;
@@ -609,7 +608,7 @@ std::vector<tr_block_span_t> tr_peerMgrGetNextRequests(tr_torrent* torrent, tr_p
 
     auto* const swarm = torrent->swarm;
     updateEndgame(swarm);
-    return swarm->wishlist.next(PeerInfoImpl(torrent, peer), numwant);
+    return Wishlist::next(PeerInfoImpl(torrent, peer), numwant);
 }
 
 /****
