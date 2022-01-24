@@ -1328,7 +1328,7 @@ static char* formatter_get_size_str(formatter_units const& u, char* buf, uint64_
 
     if (bytes < u[1].value)
     {
-        unit = &u[0];
+        unit = std::data(u);
     }
     else if (bytes < u[2].value)
     {
