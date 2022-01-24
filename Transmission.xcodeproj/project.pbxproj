@@ -400,6 +400,7 @@
 		C3CEBBFB2794A0D200683BE0 /* compiler_msc.h in Headers */ = {isa = PBXBuildFile; fileRef = C3CEBBF82794A0D200683BE0 /* compiler_msc.h */; };
 		C3CEBBFC2794A12200683BE0 /* libdeflate.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C3CEBBA927949CA000683BE0 /* libdeflate.a */; };
 		CAB35C64252F6F5E00552A55 /* mime-types.h in Headers */ = {isa = PBXBuildFile; fileRef = CAB35C62252F6F5E00552A55 /* mime-types.h */; };
+		2856E0656A49F2665D69E760 /* benc.h in Headers */ = {isa = PBXBuildFile; fileRef = 2856E0656A49F2665D69E761 /* benc.h */; };
 		E138A9780C04D88F00C5426C /* ProgressGradients.mm in Sources */ = {isa = PBXBuildFile; fileRef = E138A9760C04D88F00C5426C /* ProgressGradients.mm */; };
 		E23B55A5FC3B557F7746D510 /* interned-string.h in Headers */ = {isa = PBXBuildFile; fileRef = E23B55A5FC3B557F7746D511 /* interned-string.h */; settings = {ATTRIBUTES = (Project, ); }; };
 		E71A5565279C2DD600EBFA1E /* tr-assert.mm in Sources */ = {isa = PBXBuildFile; fileRef = E71A5564279C2DD600EBFA1E /* tr-assert.mm */; };
@@ -1111,6 +1112,7 @@
 		C3CEBBF72794A0D200683BE0 /* compiler_gcc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = compiler_gcc.h; path = common/compiler_gcc.h; sourceTree = "<group>"; };
 		C3CEBBF82794A0D200683BE0 /* compiler_msc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = compiler_msc.h; path = common/compiler_msc.h; sourceTree = "<group>"; };
 		CAB35C62252F6F5E00552A55 /* mime-types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "mime-types.h"; sourceTree = "<group>"; };
+		2856E0656A49F2665D69E761 /* benc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "benc.h"; sourceTree = "<group>"; };
 		E138A9750C04D88F00C5426C /* ProgressGradients.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ProgressGradients.h; sourceTree = "<group>"; };
 		E138A9760C04D88F00C5426C /* ProgressGradients.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ProgressGradients.mm; sourceTree = "<group>"; };
 		E23B55A5FC3B557F7746D511 /* interned-string.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "interned-string.h"; sourceTree = SOURCE_ROOT; };
@@ -1481,6 +1483,7 @@
 				C17740D3273A002C00E455D2 /* web-utils.cc */,
 				C17740D4273A002C00E455D2 /* web-utils.h */,
 				CAB35C62252F6F5E00552A55 /* mime-types.h */,
+				2856E0656A49F2665D69E761 /* benc.h */,
 				C1077A4A183EB29600634C22 /* error.cc */,
 				C1077A4B183EB29600634C22 /* error.h */,
 				C1077A4C183EB29600634C22 /* file-posix.cc */,
@@ -2060,6 +2063,7 @@
 				A220EC5C118C8A060022B4BE /* tr-lpd.h in Headers */,
 				A23547E311CD0B090046EAE6 /* cache.h in Headers */,
 				CAB35C64252F6F5E00552A55 /* mime-types.h in Headers */,
+				2856E0656A49F2665D69E760 /* benc.h in Headers */,
 				A284214512DA663E00FBDDBB /* tr-udp.h in Headers */,
 				C1077A4F183EB29600634C22 /* error.h in Headers */,
 				A2679295130E00A000CB7464 /* tr-utp.h in Headers */,

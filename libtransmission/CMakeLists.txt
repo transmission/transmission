@@ -155,6 +155,7 @@ set(${PROJECT_NAME}_PRIVATE_HEADERS
     announcer-common.h
     announcer.h
     bandwidth.h
+    benc.h
     bitfield.h
     block-info.h
     blocklist.h
