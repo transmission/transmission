@@ -21,6 +21,5 @@
 - (void)addCompletedTorrent:(Torrent*)torrent;
 - (void)removeTorrent:(Torrent*)torrent;
 - (void)clearCompleted;
-- (void)setQuitting;
 
 @end

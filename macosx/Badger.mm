@@ -69,11 +69,4 @@
     }
 }
 
-- (void)setQuitting
-{
-    [self clearCompleted];
-    [(BadgeView*)NSApp.dockTile.contentView setQuitting];
-    [NSApp.dockTile display];
-}
-
 @end
