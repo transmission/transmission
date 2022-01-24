@@ -2802,7 +2802,9 @@ int tr_sessionCountQueueFreeSlots(tr_session* session, tr_direction dir)
         {
             auto const idle_secs = int(difftime(now, std::max(tor->startDate, tor->activityDate)));
             if (idle_secs >= stalled_if_idle_for_n_seconds)
+            {
                 continue;
+            }
         }
 
         ++active_count;
