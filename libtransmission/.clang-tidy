@@ -26,7 +26,6 @@ Checks: >
   -readability-qualified-auto,
   -readability-redundant-access-specifiers,
   -readability-static-accessed-through-instance,
-  -readability-static-definition-in-anonymous-namespace,
   cppcoreguidelines-init-variables,
   cppcoreguidelines-prefer-member-initializer,
   cppcoreguidelines-virtual-class-destructor,
