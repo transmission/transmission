@@ -50,7 +50,7 @@ protected:
         return test_dir;
     }
 
-    bool createSymlink(char const* dst_path, char const* src_path, [[maybe_unused]] bool dst_is_dir)
+    static bool createSymlink(char const* dst_path, char const* src_path, [[maybe_unused]] bool dst_is_dir)
     {
 #ifndef _WIN32
 
@@ -70,7 +70,7 @@ protected:
 #endif
     }
 
-    bool createHardlink(char const* dst_path, char const* src_path)
+    static bool createHardlink(char const* dst_path, char const* src_path)
     {
 #ifndef _WIN32
 
@@ -91,12 +91,12 @@ protected:
 #endif
     }
 
-    void clearPathInfo(tr_sys_path_info* info)
+    static void clearPathInfo(tr_sys_path_info* info)
     {
         *info = {};
     }
 
-    bool pathContainsNoSymlinks(char const* path)
+    static bool pathContainsNoSymlinks(char const* path)
     {
         char const* p = path;
 
@@ -135,7 +135,7 @@ protected:
         return true;
     }
 
-    bool validatePermissions([[maybe_unused]] char const* path, [[maybe_unused]] unsigned int permissions)
+    static bool validatePermissions([[maybe_unused]] char const* path, [[maybe_unused]] unsigned int permissions)
     {
 #ifndef _WIN32
 
@@ -156,7 +156,7 @@ protected:
         char const* output;
     };
 
-    void testPathXname(XnameTestData const* data, size_t data_size, char* (*func)(std::string_view, tr_error**))
+    static void testPathXname(XnameTestData const* data, size_t data_size, char* (*func)(std::string_view, tr_error**))
     {
         for (size_t i = 0; i < data_size; ++i)
         {
