@@ -31,6 +31,8 @@ std::optional<std::string_view> ParseString(std::string_view* benc);
 
 struct Handler
 {
+    virtual ~Handler() = default;
+
     virtual bool Int64(int64_t) = 0;
     virtual bool String(std::string_view) = 0;
 
@@ -197,24 +199,21 @@ bool parse(
         switch (benc.front())
         {
         case 'i': // int
+            if (auto const value = impl::ParseInt(&benc); !value)
             {
-                auto const value = impl::ParseInt(&benc);
-                if (!value)
-                {
-                    tr_error_set(error, err, "Malformed benc? Unable to parse integer");
-                    break;
-                }
-
-                if (!handler.Int64(*value))
-                {
-                    err = ECANCELED;
-                    tr_error_set(error, err, "Handler indicated parser should stop");
-                    break;
-                }
-
-                stack.tokenWalked();
-                break;
+                tr_error_set(error, err, "Malformed benc? Unable to parse integer");
             }
+            else if (!handler.Int64(*value))
+            {
+                err = ECANCELED;
+                tr_error_set(error, err, "Handler indicated parser should stop");
+            }
+            else
+            {
+                stack.tokenWalked();
+            }
+            break;
+
         case 'l': // list
         case 'd': // dict
             {
@@ -238,29 +237,25 @@ bool parse(
                 break;
             }
         case 'e': // end of list or dict
+            benc.remove_prefix(1);
+
+            if (auto const parent_type = stack.pop(error); !parent_type)
             {
-                benc.remove_prefix(1);
-
-                auto const parent_type = stack.pop(error);
-                if (!parent_type)
-                {
-                    err = EILSEQ;
-                    break;
-                }
-
+                err = EILSEQ;
+            }
+            else
+            {
                 stack.tokenWalked();
 
-                bool ok = *parent_type == ParserStack<MaxDepth>::ParentType::Array ? handler.EndArray() : handler.EndDict();
-
-                if (!ok)
+                if (auto const ok = *parent_type == ParserStack<MaxDepth>::ParentType::Array ? handler.EndArray() :
+                                                                                               handler.EndDict();
+                    !ok)
                 {
                     err = ECANCELED;
                     tr_error_set(error, err, "Handler indicated parser should stop");
-                    break;
                 }
-
-                break;
             }
+            break;
 
         case '0':
         case '1':
@@ -272,26 +267,21 @@ bool parse(
         case '7':
         case '8':
         case '9': // string
+            if (auto const sv = impl::ParseString(&benc); !sv)
             {
-                auto const sv = impl::ParseString(&benc);
-                if (!sv)
-                {
-                    err = EILSEQ;
-                    tr_error_set(error, err, "Malformed benc? Unable to parse string");
-                    break;
-                }
-
-                bool const ok = stack.expectingDictKey() ? handler.Key(*sv) : handler.String(*sv);
-
-                if (!ok)
-                {
-                    err = ECANCELED;
-                    tr_error_set(error, err, "Handler indicated parser should stop");
-                    break;
-                }
-                stack.tokenWalked();
-                break;
+                err = EILSEQ;
+                tr_error_set(error, err, "Malformed benc? Unable to parse string");
             }
+            else if (bool const ok = stack.expectingDictKey() ? handler.Key(*sv) : handler.String(*sv); !ok)
+            {
+                err = ECANCELED;
+                tr_error_set(error, err, "Handler indicated parser should stop");
+            }
+            else
+            {
+                stack.tokenWalked();
+            }
+            break;
 
         default: // invalid bencoded text... march past it
             benc.remove_prefix(1);
