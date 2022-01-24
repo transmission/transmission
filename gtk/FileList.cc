@@ -556,9 +556,8 @@ void renderDownload(Gtk::CellRenderer* renderer, Gtk::TreeModel::iterator const&
 void renderPriority(Gtk::CellRenderer* renderer, Gtk::TreeModel::iterator const& iter)
 {
     Glib::ustring text;
-    auto const priority = iter->get_value(file_cols.priority);
 
-    switch (priority)
+    switch (auto const priority = iter->get_value(file_cols.priority); priority)
     {
     case TR_PRI_HIGH:
         text = _("High");

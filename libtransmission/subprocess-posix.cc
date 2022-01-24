@@ -87,7 +87,7 @@ static bool tr_spawn_async_in_parent(int pipe_fd, tr_error** error)
     int child_errno = 0;
     ssize_t count = 0;
 
-    static_assert(sizeof(child_errno) == sizeof(errno), "");
+    static_assert(sizeof(child_errno) == sizeof(errno));
 
     do
     {

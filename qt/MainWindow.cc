@@ -262,10 +262,10 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
     // NOLINTNEXTLINE(clang-analyzer-cplusplus.NewDeleteLeaks)
     auto* action_group = new QActionGroup(this);
 
-    for (auto const& mode : sort_modes)
+    for (auto const& [action, mode] : sort_modes)
     {
-        mode.first->setProperty(SortModeKey, mode.second);
-        action_group->addAction(mode.first);
+        action->setProperty(SortModeKey, mode);
+        action_group->addAction(action);
     }
 
     connect(action_group, &QActionGroup::triggered, this, &MainWindow::onSortModeChanged);
@@ -1605,8 +1605,8 @@ bool MainWindow::event(QEvent* e)
         return QMainWindow::event(e);
     }
 
-    QString const text = QGuiApplication::clipboard()->text().trimmed();
-    if (text.endsWith(QStringLiteral(".torrent"), Qt::CaseInsensitive) ||
+    if (auto const text = QGuiApplication::clipboard()->text().trimmed();
+        text.endsWith(QStringLiteral(".torrent"), Qt::CaseInsensitive) ||
         text.startsWith(QStringLiteral("magnet:"), Qt::CaseInsensitive))
     {
         for (QString const& entry : text.split(QLatin1Char('\n')))

@@ -152,13 +152,13 @@ public:
         return makeFilename(resume_dir, name(), infoHashString(), BasenameFormat::Hash, ".resume");
     }
 
-    bool migrateFile(
+    static bool migrateFile(
         std::string_view dirname,
         std::string_view name,
         std::string_view info_hash_string,
-        std::string_view suffix) const;
+        std::string_view suffix);
 
-    void removeFile(
+    static void removeFile(
         std::string_view dirname,
         std::string_view name,
         std::string_view info_hash_string,

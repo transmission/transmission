@@ -588,9 +588,7 @@ void MainWindow::Impl::updateStats()
     auto const* const session = core_->get_session();
 
     /* update the stats */
-    auto const pch = gtr_pref_string_get(TR_KEY_statusbar_stats);
-
-    if (pch == "session-ratio")
+    if (auto const pch = gtr_pref_string_get(TR_KEY_statusbar_stats); pch == "session-ratio")
     {
         tr_sessionGetStats(session, &stats);
         buf = gtr_sprintf(_("Ratio: %s"), tr_strlratio(stats.ratio));

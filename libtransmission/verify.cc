@@ -163,7 +163,7 @@ struct verify_node
     void* callback_data;
     uint64_t current_size;
 
-    int compare(verify_node const& that) const
+    [[nodiscard]] int compare(verify_node const& that) const
     {
         // higher priority comes before lower priority
         auto const pa = tr_torrentGetPriority(torrent);

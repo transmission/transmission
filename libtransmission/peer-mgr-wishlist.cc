@@ -36,7 +36,7 @@ struct Candidate
     {
     }
 
-    int compare(Candidate const& that) const // <=>
+    [[nodiscard]] int compare(Candidate const& that) const // <=>
     {
         // prefer pieces closer to completion
         if (n_blocks_missing != that.n_blocks_missing)
@@ -129,7 +129,7 @@ std::vector<tr_block_span_t> makeSpans(tr_block_index_t const* sorted_blocks, si
 
 } // namespace
 
-std::vector<tr_block_span_t> Wishlist::next(Wishlist::PeerInfo const& peer_info, size_t n_wanted_blocks) const
+std::vector<tr_block_span_t> Wishlist::next(Wishlist::PeerInfo const& peer_info, size_t n_wanted_blocks)
 {
     size_t n_blocks = 0;
     auto spans = std::vector<tr_block_span_t>{};
