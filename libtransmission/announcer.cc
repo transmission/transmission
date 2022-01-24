@@ -168,7 +168,6 @@ struct tr_announcer
     explicit tr_announcer(tr_session* session_in)
         : session{ session_in }
         , upkeep_timer{ evtimer_new(session_in->event_base, onUpkeepTimer, this) }
-        , key{ tr_rand_int(INT_MAX) }
     {
         scheduleNextUpdate();
     }
@@ -188,7 +187,7 @@ struct tr_announcer
 
     tr_session* const session;
     event* const upkeep_timer;
-    int const key;
+    int const key = tr_rand_int(INT_MAX);
     time_t tau_upkeep_at = 0;
 };
 
@@ -591,8 +590,7 @@ static void publishMessage(tr_tier* tier, std::string_view msg, TrackerEventType
         event.messageType = type;
         event.text = msg;
 
-        auto* const current_tracker = tier->currentTracker();
-        if (current_tracker != nullptr)
+        if (auto const* const current_tracker = tier->currentTracker(); current_tracker != nullptr)
         {
             event.announce_url = current_tracker->announce_url;
         }
@@ -865,7 +863,7 @@ void tr_announcerRemoveTorrent(tr_announcer* announcer, tr_torrent* tor)
         return;
     }
 
-    for (auto& tier : ta->tiers)
+    for (auto const& tier : ta->tiers)
     {
         if (tier.isRunning)
         {
@@ -1405,7 +1403,7 @@ static void multiscrape(tr_announcer* announcer, std::vector<tr_tier*> const& ti
         /* otherwise, if there's room for another request, build a new one */
         if (!found && request_count < MaxScrapesPerUpkeep)
         {
-            auto* const req = &requests[request_count++];
+            auto* const req = &requests[request_count];
             req->scrape_url = scrape_info->scrape_url;
             tier->buildLogName(req->log_name, sizeof(req->log_name));
 
@@ -1413,6 +1411,8 @@ static void multiscrape(tr_announcer* announcer, std::vector<tr_tier*> const& ti
             ++req->info_hash_count;
             tier->isScraping = true;
             tier->lastScrapeStartTime = now;
+
+            ++request_count;
         }
     }
 

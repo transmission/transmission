@@ -298,7 +298,7 @@ uint8_t* tr_loadFile(char const* path, size_t* size, tr_error** error)
     {
         tr_logAddError(err_fmt, path, my_error->message);
         tr_sys_file_close(fd, nullptr);
-        free(buf);
+        tr_free(buf);
         tr_error_propagate(error, &my_error);
         return nullptr;
     }

@@ -390,11 +390,10 @@ void MakeDialog::Impl::on_drag_data_received(
     guint time_)
 {
     bool success = false;
-    auto const uris = selection_data.get_uris();
 
-    if (!uris.empty())
+    if (auto const uris = selection_data.get_uris(); !uris.empty())
     {
-        auto const uri = uris.front();
+        auto const& uri = uris.front();
         auto const filename = Glib::filename_from_uri(uri);
 
         if (Glib::file_test(filename, Glib::FILE_TEST_IS_DIR))
