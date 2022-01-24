@@ -1713,7 +1713,8 @@ uint64_t tr_peerMgrGetDesiredAvailable(tr_torrent const* tor)
 
     for (size_t i = 0; i < n_peers; ++i)
     {
-        auto* peer = peers[i];
+        auto const* const peer = peers[i];
+
         for (size_t j = 0; j < n_pieces; ++j)
         {
             if (peer->have.test(j))

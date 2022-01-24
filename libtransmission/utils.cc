@@ -669,7 +669,7 @@ size_t tr_strlcpy(void* vdst, void const* vsrc, size_t siz)
 #else
 
     auto* d = dst;
-    auto* s = src;
+    auto const* s = src;
     size_t n = siz;
 
     /* Copy as many bytes as will fit */
