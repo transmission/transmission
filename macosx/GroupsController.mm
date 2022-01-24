@@ -8,7 +8,7 @@
 #define ICON_WIDTH 16.0
 #define ICON_WIDTH_SMALL 12.0
 
-@interface GroupsController (Private)
+@interface GroupsController ()
 
 - (void)saveGroups;
 
@@ -334,10 +334,6 @@ GroupsController* fGroupsInstance = nil;
     }
     return -1;
 }
-
-@end
-
-@implementation GroupsController (Private)
 
 - (void)saveGroups
 {

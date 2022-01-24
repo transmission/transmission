@@ -9,7 +9,7 @@
 #include <libtransmission/transmission.h>
 #include <libtransmission/torrent-metainfo.h>
 
-@interface DragOverlayWindow (Private)
+@interface DragOverlayWindow ()
 
 - (void)resizeWindow;
 
@@ -170,10 +170,6 @@
         [fFadeOutAnimation startAnimation];
     }
 }
-
-@end
-
-@implementation DragOverlayWindow (Private)
 
 - (void)resizeWindow
 {

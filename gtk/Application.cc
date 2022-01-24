@@ -423,9 +423,8 @@ bool Application::Impl::on_rpc_changed_idle(tr_rpc_callback_type type, int torre
             for (int i = 0; tr_variantDictChild(&tmp, i, &key, &newval); ++i)
             {
                 bool changed;
-                tr_variant const* oldval = tr_variantDictFind(oldvals, key);
 
-                if (oldval == nullptr)
+                if (tr_variant const* oldval = tr_variantDictFind(oldvals, key); oldval == nullptr)
                 {
                     changed = true;
                 }
@@ -1045,20 +1044,15 @@ void Application::Impl::on_prefs_changed(tr_quark const key)
         break;
 
     case TR_KEY_show_notification_area_icon:
+        if (bool const show = gtr_pref_flag_get(key); show && icon_ == nullptr)
         {
-            bool const show = gtr_pref_flag_get(key);
-
-            if (show && icon_ == nullptr)
-            {
-                icon_ = std::make_unique<SystemTrayIcon>(*wind_, core_);
-            }
-            else if (!show && icon_ != nullptr)
-            {
-                icon_.reset();
-            }
-
-            break;
+            icon_ = std::make_unique<SystemTrayIcon>(*wind_, core_);
         }
+        else if (!show && icon_ != nullptr)
+        {
+            icon_.reset();
+        }
+        break;
 
     case TR_KEY_speed_limit_down_enabled:
         tr_sessionLimitSpeed(tr, TR_DOWN, gtr_pref_flag_get(key));
@@ -1359,9 +1353,8 @@ tr_torrent* Application::Impl::get_first_selected_torrent() const
 {
     tr_torrent* tor = nullptr;
     Glib::RefPtr<Gtk::TreeModel> m;
-    auto const l = sel_->get_selected_rows(m);
 
-    if (!l.empty())
+    if (auto const l = sel_->get_selected_rows(m); !l.empty())
     {
         if (auto iter = m->get_iter(l.front()); iter)
         {

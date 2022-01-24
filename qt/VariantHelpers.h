@@ -28,7 +28,7 @@ namespace trqt
 namespace variant_helpers
 {
 
-template<typename T, typename std::enable_if<std::is_same_v<T, bool>>::type* = nullptr>
+template<typename T, typename std::enable_if_t<std::is_same_v<T, bool>>* = nullptr>
 auto getValue(tr_variant const* variant)
 {
     std::optional<T> ret;
@@ -43,9 +43,9 @@ auto getValue(tr_variant const* variant)
 
 template<
     typename T,
-    typename std::enable_if<
-        std::is_same_v<T, int64_t> || std::is_same_v<T, uint64_t> || std::is_same_v<T, int> ||
-        std::is_same_v<T, time_t>>::type* = nullptr>
+    typename std::enable_if_t<
+        std::is_same_v<T, int64_t> || std::is_same_v<T, uint64_t> || std::is_same_v<T, int> || std::is_same_v<T, time_t>>* =
+        nullptr>
 auto getValue(tr_variant const* variant)
 {
     std::optional<T> ret;
@@ -58,7 +58,7 @@ auto getValue(tr_variant const* variant)
     return ret;
 }
 
-template<typename T, typename std::enable_if<std::is_same_v<T, double>>::type* = nullptr>
+template<typename T, typename std::enable_if_t<std::is_same_v<T, double>>* = nullptr>
 auto getValue(tr_variant const* variant)
 {
     std::optional<T> ret;
@@ -71,7 +71,7 @@ auto getValue(tr_variant const* variant)
     return ret;
 }
 
-template<typename T, typename std::enable_if<std::is_same_v<T, QString>>::type* = nullptr>
+template<typename T, typename std::enable_if_t<std::is_same_v<T, QString>>* = nullptr>
 auto getValue(tr_variant const* variant)
 {
     std::optional<T> ret;
@@ -84,7 +84,7 @@ auto getValue(tr_variant const* variant)
     return ret;
 }
 
-template<typename T, typename std::enable_if<std::is_same_v<T, std::string_view>>::type* = nullptr>
+template<typename T, typename std::enable_if_t<std::is_same_v<T, std::string_view>>* = nullptr>
 auto getValue(tr_variant const* variant)
 {
     std::optional<T> ret;
@@ -100,8 +100,8 @@ auto getValue(tr_variant const* variant)
 template<
     typename C,
     typename T = typename C::value_type,
-    typename std::enable_if<
-        std::is_same_v<C, QStringList> || std::is_same_v<C, QList<T>> || std::is_same_v<C, std::vector<T>>>::type* = nullptr>
+    typename std::enable_if_t<
+        std::is_same_v<C, QStringList> || std::is_same_v<C, QList<T>> || std::is_same_v<C, std::vector<T>>>* = nullptr>
 auto getValue(tr_variant const* variant)
 {
     std::optional<C> ret;

@@ -829,6 +829,7 @@ protected:
         }
     }
 
+private:
     // When walking `v`'s children, this is the index of the next child
     size_t child_index = 0;
 
@@ -868,7 +869,7 @@ public:
         }
     }
 
-    bool empty() const
+    [[nodiscard]] bool empty() const
     {
         return size == 0;
     }

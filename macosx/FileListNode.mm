@@ -4,7 +4,7 @@
 
 #import "FileListNode.h"
 
-@interface FileListNode (Private)
+@interface FileListNode ()
 
 - (instancetype)initWithFolder:(BOOL)isFolder name:(NSString*)name path:(NSString*)path torrent:(Torrent*)torrent;
 
@@ -136,10 +136,6 @@
 
     return NO;
 }
-
-@end
-
-@implementation FileListNode (Private)
 
 - (instancetype)initWithFolder:(BOOL)isFolder name:(NSString*)name path:(NSString*)path torrent:(Torrent*)torrent
 {

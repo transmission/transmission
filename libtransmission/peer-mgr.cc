@@ -189,7 +189,7 @@ public:
 
 struct tr_peerMgr
 {
-    auto unique_lock() const
+    [[nodiscard]] auto unique_lock() const
     {
         return session->unique_lock();
     }
@@ -549,7 +549,7 @@ static void updateEndgame(tr_swarm* s)
 
 std::vector<tr_block_span_t> tr_peerMgrGetNextRequests(tr_torrent* torrent, tr_peer const* peer, size_t numwant)
 {
-    class PeerInfoImpl : public Wishlist::PeerInfo
+    class PeerInfoImpl final : public Wishlist::PeerInfo
     {
     public:
         PeerInfoImpl(tr_torrent const* torrent_in, tr_peer const* peer_in)
@@ -559,44 +559,44 @@ std::vector<tr_block_span_t> tr_peerMgrGetNextRequests(tr_torrent* torrent, tr_p
         {
         }
 
-        ~PeerInfoImpl() override = default;
+        ~PeerInfoImpl() final = default;
 
-        bool clientCanRequestBlock(tr_block_index_t block) const override
+        [[nodiscard]] bool clientCanRequestBlock(tr_block_index_t block) const final
         {
             return !torrent_->hasBlock(block) && !swarm_->active_requests.has(block, peer_);
         }
 
-        bool clientCanRequestPiece(tr_piece_index_t piece) const override
+        [[nodiscard]] bool clientCanRequestPiece(tr_piece_index_t piece) const final
         {
             return torrent_->pieceIsWanted(piece) && peer_->have.test(piece);
         }
 
-        bool isEndgame() const override
+        [[nodiscard]] bool isEndgame() const final
         {
             return swarm_->endgame;
         }
 
-        size_t countActiveRequests(tr_block_index_t block) const override
+        [[nodiscard]] size_t countActiveRequests(tr_block_index_t block) const final
         {
             return swarm_->active_requests.count(block);
         }
 
-        size_t countMissingBlocks(tr_piece_index_t piece) const override
+        [[nodiscard]] size_t countMissingBlocks(tr_piece_index_t piece) const final
         {
             return torrent_->countMissingBlocksInPiece(piece);
         }
 
-        tr_block_span_t blockSpan(tr_piece_index_t piece) const override
+        [[nodiscard]] tr_block_span_t blockSpan(tr_piece_index_t piece) const final
         {
             return torrent_->blockSpanForPiece(piece);
         }
 
-        tr_piece_index_t countAllPieces() const override
+        [[nodiscard]] tr_piece_index_t countAllPieces() const final
         {
             return torrent_->pieceCount();
         }
 
-        tr_priority_t priority(tr_piece_index_t piece) const override
+        [[nodiscard]] tr_priority_t priority(tr_piece_index_t piece) const final
         {
             return torrent_->piecePriority(piece);
         }
@@ -1573,7 +1573,7 @@ void tr_peerUpdateProgress(tr_torrent* tor, tr_peer* peer)
 
     peer->progress = std::clamp(peer->progress, 0.0F, 1.0F);
 
-    if (peer->atom != nullptr && peer->progress >= 1.0f)
+    if (peer->atom != nullptr && peer->progress >= 1.0F)
     {
         atomSetSeed(tor->swarm, peer->atom);
     }
@@ -2513,7 +2513,7 @@ static void closeBadPeers(tr_swarm* s, time_t const now_sec)
 
 struct ComparePeerByActivity
 {
-    int compare(tr_peer const* a, tr_peer const* b) const // <=>
+    static int compare(tr_peer const* a, tr_peer const* b) // <=>
     {
         if (a->doPurge != b->doPurge)
         {

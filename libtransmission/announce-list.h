@@ -111,7 +111,7 @@ private:
     tr_tracker_tier_t getTier(tr_tracker_tier_t tier, tr_url_parsed_t const& announce) const;
 
     bool canAdd(tr_url_parsed_t const& announce);
-    tr_tracker_id_t nextUniqueId();
+    static tr_tracker_id_t nextUniqueId();
     trackers_t::iterator find(std::string_view announce);
     trackers_t::iterator find(tr_tracker_id_t id);
 
