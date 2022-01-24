@@ -611,7 +611,7 @@ bool tr_str_has_suffix(char const* str, char const* suffix)
 *****
 ****/
 
-uint64_t tr_time_msec(void)
+uint64_t tr_time_msec()
 {
     struct timeval tv;
 
@@ -1555,7 +1555,7 @@ char* tr_env_get_string(char const* key, char const* default_value)
 ****
 ***/
 
-void tr_net_init(void)
+void tr_net_init()
 {
     static bool initialized = false;
 

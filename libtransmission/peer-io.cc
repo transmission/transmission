@@ -93,7 +93,7 @@ struct tr_datatype
 
 static struct tr_datatype* datatype_pool = nullptr;
 
-static struct tr_datatype* datatype_new(void)
+static struct tr_datatype* datatype_new()
 {
     tr_datatype* ret = nullptr;
 

@@ -32,7 +32,7 @@ static int myQueueLength = 0;
 #ifndef _WIN32
 
 /* make null versions of these win32 functions */
-static inline bool IsDebuggerPresent(void)
+static inline bool IsDebuggerPresent()
 {
     return false;
 }
@@ -43,7 +43,7 @@ static inline bool IsDebuggerPresent(void)
 ****
 ***/
 
-tr_log_level tr_logGetLevel(void)
+tr_log_level tr_logGetLevel()
 {
     return __tr_message_level;
 }
@@ -54,7 +54,7 @@ tr_log_level tr_logGetLevel(void)
 
 static std::recursive_mutex message_mutex_;
 
-tr_sys_file_t tr_logGetFile(void)
+tr_sys_file_t tr_logGetFile()
 {
     static bool initialized = false;
     static tr_sys_file_t file = TR_BAD_SYS_FILE;
@@ -92,12 +92,12 @@ void tr_logSetQueueEnabled(bool isEnabled)
     myQueueEnabled = isEnabled;
 }
 
-bool tr_logGetQueueEnabled(void)
+bool tr_logGetQueueEnabled()
 {
     return myQueueEnabled;
 }
 
-tr_log_message* tr_logGetQueue(void)
+tr_log_message* tr_logGetQueue()
 {
     auto const lock = std::lock_guard(message_mutex_);
 
@@ -143,7 +143,7 @@ char* tr_logGetTimeStr(char* buf, size_t buflen)
     return buf;
 }
 
-bool tr_logGetDeepEnabled(void)
+bool tr_logGetDeepEnabled()
 {
     static int8_t deepLoggingIsActive = -1;
 
