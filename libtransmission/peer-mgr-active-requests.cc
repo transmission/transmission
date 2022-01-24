@@ -223,7 +223,7 @@ std::vector<std::pair<tr_block_index_t, tr_peer*>> ActiveRequests::sentBefore(ti
 
     for (auto& [block, peers_at] : impl_->blocks_)
     {
-        for (auto& sent : peers_at)
+        for (auto const& sent : peers_at)
         {
             if (sent.when < when)
             {

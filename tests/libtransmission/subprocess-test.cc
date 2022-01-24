@@ -65,7 +65,7 @@ protected:
 
     std::string self_path_;
 
-    void waitForFileToExist(std::string const& path)
+    static void waitForFileToExist(std::string const& path)
     {
         auto const test = [path]()
         {
@@ -193,8 +193,8 @@ TEST_P(SubprocessTest, SpawnAsyncEnv)
         { test_env_key5, test_env_value5 },
     };
 
-    setenv("FOO", "bar", true); // inherited
-    setenv("ZOO", "tar", true); // overridden
+    setenv("FOO", "bar", 1 /*true*/); // inherited
+    setenv("ZOO", "tar", 1 /*true*/); // overridden
 
     tr_error* error = nullptr;
     bool const ret = tr_spawn_async(std::data(args), env, nullptr, &error);

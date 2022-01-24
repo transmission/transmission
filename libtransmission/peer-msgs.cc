@@ -2434,8 +2434,8 @@ static void tr_set_compare(
     tr_set_func in_both_cb,
     void* userData)
 {
-    auto* a = static_cast<uint8_t const*>(va);
-    auto* b = static_cast<uint8_t const*>(vb);
+    auto const* a = static_cast<uint8_t const*>(va);
+    auto const* b = static_cast<uint8_t const*>(vb);
     uint8_t const* aend = a + elementSize * aCount;
     uint8_t const* bend = b + elementSize * bCount;
 

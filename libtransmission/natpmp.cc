@@ -22,7 +22,7 @@
 static auto constexpr LifetimeSecs = uint32_t{ 3600 };
 static auto constexpr CommandWaitSecs = time_t{ 8 };
 
-static char const* getKey(void)
+static char const* getKey()
 {
     return _("Port Forwarding (NAT-PMP)");
 }
@@ -55,7 +55,7 @@ static void logVal(char const* func, int ret)
     }
 }
 
-struct tr_natpmp* tr_natpmpInit(void)
+struct tr_natpmp* tr_natpmpInit()
 {
     auto* const nat = tr_new0(struct tr_natpmp, 1);
     nat->state = TR_NATPMP_DISCOVER;

@@ -336,7 +336,7 @@ TEST_F(CompletionTest, createPieceBitfield)
     EXPECT_TRUE(tr_rand_buffer(std::data(buf), std::size(buf)));
     for (uint64_t i = 0; i < block_info.n_pieces; ++i)
     {
-        if (buf[i] % 2)
+        if ((buf[i] % 2) != 0)
         {
             completion.addPiece(i);
         }

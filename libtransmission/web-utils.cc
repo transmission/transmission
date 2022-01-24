@@ -173,7 +173,7 @@ void tr_http_escape(struct evbuffer* out, std::string_view str, bool escape_rese
     auto constexpr ReservedChars = std::string_view{ "!*'();:@&=+$,/?%#[]" };
     auto constexpr UnescapedChars = std::string_view{ "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_.~" };
 
-    for (auto& ch : str)
+    for (auto const& ch : str)
     {
         if (tr_strvContains(UnescapedChars, ch) || (tr_strvContains(ReservedChars, ch) && !escape_reserved))
         {
@@ -191,7 +191,7 @@ void tr_http_escape(std::string& appendme, std::string_view str, bool escape_res
     auto constexpr ReservedChars = std::string_view{ "!*'();:@&=+$,/?%#[]" };
     auto constexpr UnescapedChars = std::string_view{ "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_.~" };
 
-    for (auto& ch : str)
+    for (auto const& ch : str)
     {
         if (tr_strvContains(UnescapedChars, ch) || (!escape_reserved && tr_strvContains(ReservedChars, ch)))
         {
