@@ -98,7 +98,7 @@ static bool check_openssl_pointer(void const* pointer, char const* file, int lin
 ****
 ***/
 
-tr_sha1_ctx_t tr_sha1_init(void)
+tr_sha1_ctx_t tr_sha1_init()
 {
     EVP_MD_CTX* handle = EVP_MD_CTX_create();
 

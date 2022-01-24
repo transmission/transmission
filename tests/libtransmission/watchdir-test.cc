@@ -89,7 +89,7 @@ protected:
         return path;
     }
 
-    std::string createDir(std::string const& parent_dir, std::string const& name)
+    static std::string createDir(std::string const& parent_dir, std::string const& name)
     {
         auto path = parent_dir;
         path += TR_PATH_DELIMITER;
