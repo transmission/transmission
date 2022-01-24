@@ -47,7 +47,6 @@ Checks: >
   -hicpp-special-member-functions,
   -hicpp-vararg,
   misc-*,
-  -misc-no-recursion,
   -misc-non-private-member-variables-in-classes,
   modernize-*,
   -modernize-concat-nested-namespaces,
