@@ -7,7 +7,7 @@
 #import "BlocklistScheduler.h"
 #import "Controller.h"
 
-@interface BlocklistDownloader (Private)
+@interface BlocklistDownloader ()
 
 - (void)startDownload;
 - (void)decompressFrom:(NSURL*)file to:(NSURL*)destination error:(NSError**)error;
@@ -157,10 +157,6 @@ didFinishDownloadingToURL:(NSURL *)location
         fBLDownloader = nil;
     });
 }
-
-@end
-
-@implementation BlocklistDownloader (Private)
 
 - (void)startDownload
 {

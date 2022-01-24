@@ -25,7 +25,7 @@
 
 #define TOGGLE_PROGRESS_SECONDS 0.175
 
-@interface TorrentTableView (Private)
+@interface TorrentTableView ()
 
 - (BOOL)pointInGroupStatusRect:(NSPoint)point;
 
@@ -959,10 +959,6 @@
 
     [[self.superview animator] setBoundsOrigin:scrollOrigin];
 }
-
-@end
-
-@implementation TorrentTableView (Private)
 
 - (BOOL)pointInGroupStatusRect:(NSPoint)point
 {

@@ -7,7 +7,7 @@
 #define CHECKER_URL(port) [NSString stringWithFormat:@"https://portcheck.transmissionbt.com/%ld", port]
 #define CHECK_FIRE 3.0
 
-@interface PortChecker (Private)
+@interface PortChecker ()
 
 - (void)startProbe:(NSTimer*)timer;
 
@@ -98,10 +98,6 @@
         [self callBackWithStatus:PORT_STATUS_ERROR];
     }
 }
-
-@end
-
-@implementation PortChecker (Private)
 
 - (void)startProbe:(NSTimer*)timer
 {
