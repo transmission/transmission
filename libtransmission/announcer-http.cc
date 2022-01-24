@@ -86,8 +86,7 @@ static std::string announce_url_new(tr_session const* session, tr_announce_reque
         evbuffer_add_printf(buf, "&corrupt=%" PRIu64, req->corrupt);
     }
 
-    char const* str = get_event_string(req);
-    if (!tr_str_is_empty(str))
+    if (char const* str = get_event_string(req); !tr_str_is_empty(str))
     {
         evbuffer_add_printf(buf, "&event=%s", str);
     }
