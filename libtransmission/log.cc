@@ -22,7 +22,6 @@
 
 using namespace std::literals;
 
-
 tr_log_level __tr_message_level = TR_LOG_ERROR;
 
 static bool myQueueEnabled = false;
@@ -237,17 +236,18 @@ void tr_logAddMessage(char const* file, int line, tr_log_level level, char const
 
     int prio;
 
-    switch (level) {
-      case TR_LOG_ERROR:
+    switch (level)
+    {
+    case TR_LOG_ERROR:
         prio = ANDROID_LOG_ERROR;
         break;
-      case TR_LOG_INFO:
+    case TR_LOG_INFO:
         prio = ANDROID_LOG_INFO;
         break;
-      case TR_LOG_DEBUG:
+    case TR_LOG_DEBUG:
         prio = ANDROID_LOG_DEBUG;
         break;
-      default:
+    default:
         prio = ANDROID_LOG_VERBOSE;
     }
 
