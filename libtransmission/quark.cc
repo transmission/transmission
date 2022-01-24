@@ -409,21 +409,20 @@ auto constexpr my_static = std::array<std::string_view, 390>{ ""sv,
                                                               "webseeds"sv,
                                                               "webseedsSendingToUs"sv };
 
-size_t constexpr quarks_are_sorted = ( //
-    []() constexpr
+bool constexpr quarks_are_sorted()
+{
+    for (size_t i = 1; i < std::size(my_static); ++i)
     {
-        for (size_t i = 1; i < std::size(my_static); ++i)
+        if (my_static[i - 1] >= my_static[i])
         {
-            if (my_static[i - 1] >= my_static[i])
-            {
-                return false;
-            }
+            return false;
         }
+    }
 
-        return true;
-    })();
+    return true;
+}
 
-static_assert(quarks_are_sorted, "Predefined quarks must be sorted by their string value");
+static_assert(quarks_are_sorted(), "Predefined quarks must be sorted by their string value");
 static_assert(std::size(my_static) == TR_N_KEYS);
 
 auto& my_runtime{ *new std::vector<std::string_view>{} };
