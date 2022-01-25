@@ -683,7 +683,7 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
 
     if (resume_file_was_migrated)
     {
-        tor->metainfo_.migrateFile(session->torrent_dir, tor->name(), tor->infoHashString(), ".torrent");
+        tr_torrent_metainfo::migrateFile(session->torrent_dir, tor->name(), tor->infoHashString(), ".torrent"sv);
     }
 
     tor->completeness = tor->completion.status();
@@ -1539,8 +1539,8 @@ static void closeTorrent(void* vtor)
 
     if (tor->isDeleting)
     {
-        tor->metainfo_.removeFile(tor->session->torrent_dir, tor->name(), tor->infoHashString(), ".torrent"sv);
-        tor->metainfo_.removeFile(tor->session->resume_dir, tor->name(), tor->infoHashString(), ".resume"sv);
+        tr_torrent_metainfo::removeFile(tor->session->torrent_dir, tor->name(), tor->infoHashString(), ".torrent"sv);
+        tr_torrent_metainfo::removeFile(tor->session->resume_dir, tor->name(), tor->infoHashString(), ".resume"sv);
     }
 
     tor->isRunning = false;
@@ -2078,23 +2078,8 @@ uint64_t tr_torrentGetBytesLeftToAllocate(tr_torrent const* tor)
 *****  Removing the torrent's local data
 ****/
 
-static constexpr bool isJunkFile(std::string_view base)
+static bool isJunkFile(std::string_view base)
 {
-    auto constexpr Files = std::array<std::string_view, 3>{
-        ".DS_Store"sv,
-        "Thumbs.db"sv,
-        "desktop.ini"sv,
-    };
-
-    // TODO(C++20): std::any_of is constexpr in C++20
-    for (auto const& file : Files)
-    {
-        if (file == base)
-        {
-            return true;
-        }
-    }
-
 #ifdef __APPLE__
     // check for resource forks. <http://support.apple.com/kb/TA20578>
     if (tr_strvStartsWith(base, "._"sv))
@@ -2103,7 +2088,13 @@ static constexpr bool isJunkFile(std::string_view base)
     }
 #endif
 
-    return false;
+    auto constexpr Files = std::array<std::string_view, 3>{
+        ".DS_Store"sv,
+        "Thumbs.db"sv,
+        "desktop.ini"sv,
+    };
+
+    return std::find(std::begin(Files), std::end(Files), base) != std::end(Files);
 }
 
 static void removeEmptyFoldersAndJunkFiles(char const* folder)

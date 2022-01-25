@@ -21,7 +21,7 @@
 #include "upnp.h"
 #include "utils.h"
 
-static char const* getKey(void)
+static char const* getKey()
 {
     return _("Port Forwarding (UPnP)");
 }
@@ -58,7 +58,7 @@ struct tr_upnp
 ***
 **/
 
-tr_upnp* tr_upnpInit(void)
+tr_upnp* tr_upnpInit()
 {
     return new tr_upnp();
 }

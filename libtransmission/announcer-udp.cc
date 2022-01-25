@@ -104,7 +104,7 @@ static auto constexpr TauConnectionTtlSecs = int{ 60 };
 
 using tau_transaction_t = uint32_t;
 
-static tau_transaction_t tau_transaction_new(void)
+static tau_transaction_t tau_transaction_new()
 {
     auto tmp = tau_transaction_t{};
     tr_rand_buffer(&tmp, sizeof(tau_transaction_t));

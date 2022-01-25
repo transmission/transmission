@@ -51,7 +51,7 @@ protected:
     }
 
 private:
-    uint64_t fillBufferFromFd(tr_sys_file_t fd, uint64_t bytes_remaining, char* buf, size_t buf_len)
+    static uint64_t fillBufferFromFd(tr_sys_file_t fd, uint64_t bytes_remaining, char* buf, size_t buf_len)
     {
         memset(buf, 0, buf_len);
 
@@ -72,7 +72,7 @@ private:
         return bytes_remaining;
     }
 
-    bool filesAreIdentical(char const* fn1, char const* fn2)
+    static bool filesAreIdentical(char const* fn1, char const* fn2)
     {
         bool identical = true;
 

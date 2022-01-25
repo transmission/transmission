@@ -27,7 +27,7 @@ using namespace std::literals;
 class VariantTest : public ::testing::Test
 {
 protected:
-    std::string stripWhitespace(std::string const& in)
+    static std::string stripWhitespace(std::string const& in)
     {
         auto s = in;
         s.erase(s.begin(), std::find_if_not(s.begin(), s.end(), ::isspace));
@@ -447,7 +447,7 @@ TEST_F(VariantTest, boolAndIntRecast)
     tr_variantInitDict(&top, 10);
     tr_variantDictAddBool(&top, key1, false);
     tr_variantDictAddBool(&top, key2, 0); // NOLINT modernize-use-bool-literals
-    tr_variantDictAddInt(&top, key3, true);
+    tr_variantDictAddInt(&top, key3, true); // NOLINT readability-implicit-bool-conversion
     tr_variantDictAddInt(&top, key4, 1);
 
     // confirm we can read both bools and ints as bools

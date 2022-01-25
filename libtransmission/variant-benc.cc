@@ -138,6 +138,8 @@ struct MyHandler : public transmission::benc::Handler
     {
     }
 
+    ~MyHandler() override = default;
+
     bool Int64(int64_t value) final
     {
         if (tr_variant* variant = get_node(); variant != nullptr)

@@ -29,12 +29,12 @@ auto const Options = std::array<tr_option, 8>{
 class GetoptTest : public ::testing::Test
 {
 protected:
-    void runTest( //
+    static void runTest( //
         int argc,
         char const* const* argv,
         int expected_n,
         int const* expected_c,
-        char const* const* expected_args) const
+        char const* const* expected_args)
     {
         auto n = int{};
         tr_optind = 1;

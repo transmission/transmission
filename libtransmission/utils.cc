@@ -611,7 +611,7 @@ bool tr_str_has_suffix(char const* str, char const* suffix)
 *****
 ****/
 
-uint64_t tr_time_msec(void)
+uint64_t tr_time_msec()
 {
     struct timeval tv;
 
@@ -669,7 +669,7 @@ size_t tr_strlcpy(void* vdst, void const* vsrc, size_t siz)
 #else
 
     auto* d = dst;
-    auto* s = src;
+    auto const* s = src;
     size_t n = siz;
 
     /* Copy as many bytes as will fit */
@@ -1135,7 +1135,11 @@ std::string tr_strpercent(double x)
 {
     auto buf = std::array<char, 64>{};
 
-    if (x < 100.0)
+    if (x < 5.0)
+    {
+        tr_strtruncd(std::data(buf), x, 2, std::size(buf));
+    }
+    else if (x < 100.0)
     {
         tr_strtruncd(std::data(buf), x, 1, std::size(buf));
     }
@@ -1555,7 +1559,7 @@ char* tr_env_get_string(char const* key, char const* default_value)
 ****
 ***/
 
-void tr_net_init(void)
+void tr_net_init()
 {
     static bool initialized = false;
 
