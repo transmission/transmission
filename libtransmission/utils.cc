@@ -1135,7 +1135,11 @@ std::string tr_strpercent(double x)
 {
     auto buf = std::array<char, 64>{};
 
-    if (x < 100.0)
+    if (x < 5.0)
+    {
+        tr_strtruncd(std::data(buf), x, 2, std::size(buf));
+    }
+    else if (x < 100.0)
     {
         tr_strtruncd(std::data(buf), x, 1, std::size(buf));
     }
