@@ -882,8 +882,6 @@ static void removeKeRangerRansomware()
         }
     }
 
-    [fBadger setQuitting];
-
     //remove all torrent downloads
     if (fPendingTorrentDownloads)
     {
