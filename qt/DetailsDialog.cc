@@ -196,6 +196,8 @@ private:
 ****
 ***/
 
+int DetailsDialog::prev_tab_index_ = 0;
+
 DetailsDialog::DetailsDialog(Session& session, Prefs& prefs, TorrentModel const& model, QWidget* parent)
     : BaseDialog(parent)
     , session_(session)
@@ -212,6 +214,7 @@ DetailsDialog::DetailsDialog(Session& session, Prefs& prefs, TorrentModel const&
 
     adjustSize();
     ui_.commentBrowser->setMaximumHeight(QWIDGETSIZE_MAX);
+    ui_.tabs->setCurrentIndex(prev_tab_index_);
 
     static std::array<int, 2> constexpr InitKeys = {
         Prefs::SHOW_TRACKER_SCRAPES,
@@ -236,6 +239,11 @@ DetailsDialog::DetailsDialog(Session& session, Prefs& prefs, TorrentModel const&
     // set up the debounce timer
     connect(&ui_debounce_timer_, &QTimer::timeout, this, &DetailsDialog::refreshUI);
     ui_debounce_timer_.setSingleShot(true);
+}
+
+DetailsDialog::~DetailsDialog()
+{
+    prev_tab_index_ = ui_.tabs->currentIndex();
 }
 
 void DetailsDialog::setIds(torrent_ids_t const& ids)

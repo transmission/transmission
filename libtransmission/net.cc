@@ -643,10 +643,9 @@ unsigned char const* tr_globalIPv6(tr_session const* session)
     static unsigned char ipv6[16];
     static time_t last_time = 0;
     static bool have_ipv6 = false;
-    time_t const now = tr_time();
 
     /* Re-check every half hour */
-    if (last_time < now - 1800)
+    if (auto const now = tr_time(); last_time < now - 1800)
     {
         int addrlen = 16;
         int const rc = tr_globalAddress(AF_INET6, ipv6, &addrlen);

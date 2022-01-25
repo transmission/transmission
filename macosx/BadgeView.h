@@ -14,12 +14,10 @@
 
     CGFloat fDownloadRate;
     CGFloat fUploadRate;
-    BOOL fQuitting;
 }
 
 - (instancetype)initWithLib:(tr_session*)lib;
 
 - (BOOL)setRatesWithDownload:(CGFloat)downloadRate upload:(CGFloat)uploadRate;
-- (void)setQuitting;
 
 @end
