@@ -22,8 +22,8 @@ using namespace std::literals;
 
 TEST_F(AnnouncerTest, parseHttpAnnounceResponseNoPeers)
 {
+    // clang-format off
     auto constexpr NoPeers =
-        // clang-format off
         "d"
             "8:complete" "i3e"
             "10:downloaded" "i2e"
@@ -49,8 +49,8 @@ TEST_F(AnnouncerTest, parseHttpAnnounceResponseNoPeers)
 
 TEST_F(AnnouncerTest, parseHttpAnnounceResponsePexCompact)
 {
+    // clang-format off
     auto constexpr IPv4Peers =
-        // clang-format off
         "d"
             "8:complete" "i3e"
             "10:downloaded" "i2e"
@@ -82,8 +82,8 @@ TEST_F(AnnouncerTest, parseHttpAnnounceResponsePexCompact)
 
 TEST_F(AnnouncerTest, parseHttpAnnounceResponsePexList)
 {
+    // clang-format off
     auto constexpr IPv4Peers =
-        // clang-format off
         "d"
             "8:complete" "i3e"
             "10:downloaded" "i2e"
@@ -121,8 +121,19 @@ TEST_F(AnnouncerTest, parseHttpAnnounceResponsePexList)
 
 TEST_F(AnnouncerTest, parseHttpAnnounceResponseFailureReason)
 {
+    // clang-format off
     auto constexpr NoPeers =
-        "d8:completei3e14:failure reason6:foobar10:downloadedi2e10:incompletei0e8:intervali1803e12:min intervali1800e5:peers0:e"sv;
+        "d"
+            "8:complete" "i3e"
+            "14:failure reason" "6:foobar"
+            "10:downloaded" "i2e"
+            "10:incomplete" "i0e"
+            "8:interval" "i1803e"
+            "12:min interval" "i1800e"
+            "5:peers" "0:"
+        "e"sv;
+    // clang-format on
+
     auto response = tr_announce_response{};
     tr_announcerParseHttpAnnounceResponse(response, NoPeers);
     EXPECT_EQ(1803, response.interval);

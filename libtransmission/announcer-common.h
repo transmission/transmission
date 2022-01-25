@@ -20,8 +20,6 @@
 #include "interned-string.h"
 #include "web-utils.h"
 
-struct tr_error;
-
 /***
 ****  SCRAPE
 ***/

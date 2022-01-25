@@ -127,55 +127,46 @@ static auto listToPex(tr_variant* peerList)
     size_t n = 0;
     size_t const len = tr_variantListSize(peerList);
     auto pex = std::vector<tr_pex>(len);
-    std::cerr << __FILE__ << ':' << __LINE__ << "found peers list" << std::endl;
-    std::cerr << __FILE__ << ':' << __LINE__ << ' ' << tr_variantToStr(peerList, TR_VARIANT_FMT_JSON) << std::endl;
-    std::cerr << __FILE__ << ':' << __LINE__ << ' ' << tr_variantToStr(peerList, TR_VARIANT_FMT_BENC) << std::endl;
 
     for (size_t i = 0; i < len; ++i)
     {
-        std::cerr << __FILE__ << ':' << __LINE__ << " child " << i << std::endl;
         tr_variant* const peer = tr_variantListChild(peerList, i);
+
         if (peer == nullptr)
         {
             continue;
         }
 
-        std::cerr << __FILE__ << ':' << __LINE__ << " looking for ip " << std::endl;
         auto ip = std::string_view{};
         if (!tr_variantDictFindStrView(peer, TR_KEY_ip, &ip))
         {
             continue;
         }
 
-        std::cerr << __FILE__ << ':' << __LINE__ << " parsing " << ip << " as address " << std::endl;
         auto addr = tr_address{};
         if (!tr_address_from_string(&addr, ip))
         {
             continue;
         }
 
-        std::cerr << __FILE__ << ':' << __LINE__ << " looking for port" << std::endl;
         auto port = int64_t{};
         if (!tr_variantDictFindInt(peer, TR_KEY_port, &port))
         {
             continue;
         }
 
-        std::cerr << __FILE__ << ':' << __LINE__ << " is port valid" << std::endl;
         if (port < 0 || port > USHRT_MAX)
+        {
+            continue;
+        }
+
+        if (!tr_address_is_valid_for_peers(&addr, port))
         {
             continue;
         }
 
         pex[n].addr = addr;
         pex[n].port = htons((uint16_t)port);
-        std::cerr << pex[n].to_string() << std::endl;
-
-        if (!tr_address_is_valid_for_peers(&addr, port))
-        {
-            std::cerr << "OOPS not valid" << std::endl;
-            continue;
-        }
         ++n;
     }
 
@@ -234,19 +225,8 @@ void tr_announcerParseHttpAnnounceResponse(tr_announce_response& response, std::
 {
     maybeLogMessage("Announce response:", TR_DOWN, msg);
 
-    tr_variant benc;
-    tr_error* error = nullptr;
-    auto const variant_loaded = tr_variantFromBuf(
-        &benc,
-        TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE,
-        msg,
-        nullptr,
-        &error);
-    if (error != nullptr)
-    {
-        std::cerr << __FILE__ << ':' << __LINE__ << " [" << error->message << " (" << error->code << ")]" << std::endl;
-    }
-    std::cerr << "variant loaded: " << variant_loaded << std::endl;
+    auto benc = tr_variant{};
+    auto const variant_loaded = tr_variantFromBuf(&benc, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, msg);
 
     if (variant_loaded && tr_variantIsDict(&benc))
     {
