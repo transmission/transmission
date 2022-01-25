@@ -37,6 +37,7 @@ class DetailsDialog : public BaseDialog
 
 public:
     DetailsDialog(Session&, Prefs&, TorrentModel const&, QWidget* parent = nullptr);
+    ~DetailsDialog() override;
 
     void setIds(torrent_ids_t const& ids);
 
@@ -136,4 +137,6 @@ private:
 
     QIcon const icon_encrypted_ = QIcon(QStringLiteral(":/icons/encrypted.png"));
     QIcon const icon_unencrypted_ = {};
+
+    static int prev_tab_index_;
 };
