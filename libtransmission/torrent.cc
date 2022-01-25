@@ -683,7 +683,7 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
 
     if (resume_file_was_migrated)
     {
-        tor->metainfo_.migrateFile(session->torrent_dir, tor->name(), tor->infoHashString(), ".torrent");
+        tr_torrent_metainfo::migrateFile(session->torrent_dir, tor->name(), tor->infoHashString(), ".torrent"sv);
     }
 
     tor->completeness = tor->completion.status();
@@ -1539,8 +1539,8 @@ static void closeTorrent(void* vtor)
 
     if (tor->isDeleting)
     {
-        tor->metainfo_.removeFile(tor->session->torrent_dir, tor->name(), tor->infoHashString(), ".torrent"sv);
-        tor->metainfo_.removeFile(tor->session->resume_dir, tor->name(), tor->infoHashString(), ".resume"sv);
+        tr_torrent_metainfo::removeFile(tor->session->torrent_dir, tor->name(), tor->infoHashString(), ".torrent"sv);
+        tr_torrent_metainfo::removeFile(tor->session->resume_dir, tor->name(), tor->infoHashString(), ".resume"sv);
     }
 
     tor->isRunning = false;
