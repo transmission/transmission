@@ -203,8 +203,8 @@ static void maybeLogMessage(std::string_view description, tr_direction direction
         return;
     }
 
-    out << description << std::endl;
-    out << "[raw]"sv << (direction == TR_DOWN ? "<< "sv : ">> "sv);
+    auto const direction_sv = direction == TR_DOWN ? "<< "sv : ">> "sv;
+    out << description << std::endl << "[raw]"sv << direction_sv;
     for (unsigned char ch : message)
     {
         if (isprint(ch))
@@ -217,8 +217,7 @@ static void maybeLogMessage(std::string_view description, tr_direction direction
                 << std::setfill(' ');
         }
     }
-    out << std::endl;
-    out << "[b64]"sv << (direction == TR_DOWN ? "<< "sv : ">> "sv) << tr_base64_encode(message) << std::endl;
+    out << std::endl << "[b64]"sv << direction_sv << tr_base64_encode(message) << std::endl;
 }
 
 void tr_announcerParseHttpAnnounceResponse(tr_announce_response& response, std::string_view msg)

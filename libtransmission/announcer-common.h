@@ -16,8 +16,8 @@
 
 #include "transmission.h"
 
-#include "peer-mgr.h" // tr_pex
 #include "interned-string.h"
+#include "peer-mgr.h" // tr_pex
 #include "web-utils.h"
 
 /***
