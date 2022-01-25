@@ -276,7 +276,7 @@ static void add_response(struct evhttp_request* req, tr_rpc_server* server, stru
         struct evbuffer_iovec iovec[1];
         evbuffer_reserve_space(out, std::max(content_len, max_compressed_len), iovec, 1);
 
-        auto const compressed_len = libdeflate_zlib_compress(
+        auto const compressed_len = libdeflate_gzip_compress(
             server->compressor.get(),
             content_ptr,
             content_len,
