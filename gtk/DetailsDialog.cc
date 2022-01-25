@@ -156,7 +156,12 @@ private:
     Glib::Quark const TORRENT_ID_KEY = Glib::Quark("tr-torrent-id-key");
     Glib::Quark const TEXT_BUFFER_KEY = Glib::Quark("tr-text-buffer-key");
     Glib::Quark const URL_ENTRY_KEY = Glib::Quark("tr-url-entry-key");
+
+    static guint last_page_;
+    sigc::connection last_page_tag_;
 };
+
+guint DetailsDialog::Impl::last_page_ = 0;
 
 std::vector<tr_torrent*> DetailsDialog::Impl::getTorrents() const
 {
@@ -2572,6 +2577,7 @@ void DetailsDialog::Impl::on_details_window_size_allocated(Gtk::Allocation& /*al
 DetailsDialog::Impl::~Impl()
 {
     periodic_refresh_tag_.disconnect();
+    last_page_tag_.disconnect();
 }
 
 std::unique_ptr<DetailsDialog> DetailsDialog::create(Gtk::Window& parent, Glib::RefPtr<Session> const& core)
@@ -2623,6 +2629,9 @@ DetailsDialog::Impl::Impl(DetailsDialog& dialog, Glib::RefPtr<Session> const& co
     periodic_refresh_tag_ = Glib::signal_timeout().connect_seconds(
         [this]() { return refresh(), true; },
         SECONDARY_WINDOW_REFRESH_INTERVAL_SECONDS);
+
+    n->set_current_page(last_page_);
+    last_page_tag_ = n->signal_switch_page().connect([](Widget*, guint page) { DetailsDialog::Impl::last_page_ = page; });
 }
 
 void DetailsDialog::set_torrents(std::vector<int> const& ids)
