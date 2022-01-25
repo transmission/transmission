@@ -180,7 +180,6 @@ public:
     bool endgame = false;
 
     ActiveRequests active_requests;
-    Wishlist wishlist;
 
     int interestedCount = 0;
     int maxPeers = 0;
@@ -559,44 +558,44 @@ std::vector<tr_block_span_t> tr_peerMgrGetNextRequests(tr_torrent* torrent, tr_p
         {
         }
 
-        ~PeerInfoImpl() final = default;
+        ~PeerInfoImpl() override = default;
 
-        [[nodiscard]] bool clientCanRequestBlock(tr_block_index_t block) const final
+        [[nodiscard]] bool clientCanRequestBlock(tr_block_index_t block) const override
         {
             return !torrent_->hasBlock(block) && !swarm_->active_requests.has(block, peer_);
         }
 
-        [[nodiscard]] bool clientCanRequestPiece(tr_piece_index_t piece) const final
+        [[nodiscard]] bool clientCanRequestPiece(tr_piece_index_t piece) const override
         {
             return torrent_->pieceIsWanted(piece) && peer_->have.test(piece);
         }
 
-        [[nodiscard]] bool isEndgame() const final
+        [[nodiscard]] bool isEndgame() const override
         {
             return swarm_->endgame;
         }
 
-        [[nodiscard]] size_t countActiveRequests(tr_block_index_t block) const final
+        [[nodiscard]] size_t countActiveRequests(tr_block_index_t block) const override
         {
             return swarm_->active_requests.count(block);
         }
 
-        [[nodiscard]] size_t countMissingBlocks(tr_piece_index_t piece) const final
+        [[nodiscard]] size_t countMissingBlocks(tr_piece_index_t piece) const override
         {
             return torrent_->countMissingBlocksInPiece(piece);
         }
 
-        [[nodiscard]] tr_block_span_t blockSpan(tr_piece_index_t piece) const final
+        [[nodiscard]] tr_block_span_t blockSpan(tr_piece_index_t piece) const override
         {
             return torrent_->blockSpanForPiece(piece);
         }
 
-        [[nodiscard]] tr_piece_index_t countAllPieces() const final
+        [[nodiscard]] tr_piece_index_t countAllPieces() const override
         {
             return torrent_->pieceCount();
         }
 
-        [[nodiscard]] tr_priority_t priority(tr_piece_index_t piece) const final
+        [[nodiscard]] tr_priority_t priority(tr_piece_index_t piece) const override
         {
             return torrent_->piecePriority(piece);
         }
@@ -609,7 +608,7 @@ std::vector<tr_block_span_t> tr_peerMgrGetNextRequests(tr_torrent* torrent, tr_p
 
     auto* const swarm = torrent->swarm;
     updateEndgame(swarm);
-    return swarm->wishlist.next(PeerInfoImpl(torrent, peer), numwant);
+    return Wishlist::next(PeerInfoImpl(torrent, peer), numwant);
 }
 
 /****

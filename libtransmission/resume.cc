@@ -693,7 +693,11 @@ static uint64_t loadFromFile(tr_torrent* tor, uint64_t fieldsToLoad, bool* did_m
     TR_ASSERT(tr_isTorrent(tor));
     auto const wasDirty = tor->isDirty;
 
-    auto const migrated = tor->metainfo_.migrateFile(tor->session->resume_dir, tor->name(), tor->infoHashString(), ".resume"sv);
+    auto const migrated = tr_torrent_metainfo::migrateFile(
+        tor->session->resume_dir,
+        tor->name(),
+        tor->infoHashString(),
+        ".resume"sv);
     if (did_migrate_filename != nullptr)
     {
         *did_migrate_filename = migrated;

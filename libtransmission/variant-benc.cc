@@ -138,7 +138,7 @@ struct MyHandler : public transmission::benc::Handler
     {
     }
 
-    virtual ~MyHandler() = default;
+    ~MyHandler() override = default;
 
     bool Int64(int64_t value) final
     {
