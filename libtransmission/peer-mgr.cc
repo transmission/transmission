@@ -1210,8 +1210,10 @@ std::vector<tr_pex> tr_peerMgrCompactToPex(void const* compact, size_t compactLe
     for (size_t i = 0; i < n; ++i)
     {
         pex[i].addr.type = TR_AF_INET;
-        walk = std::copy_n(walk, 4, reinterpret_cast<std::byte*>(&pex[i].addr.addr));
-        walk = std::copy_n(walk, 2, reinterpret_cast<std::byte*>(&pex[i].port));
+        std::copy_n(walk, 4, reinterpret_cast<std::byte*>(&pex[i].addr.addr));
+        walk += 4;
+        std::copy_n(walk, 2, reinterpret_cast<std::byte*>(&pex[i].port));
+        walk += 2;
 
         if (added_f != nullptr && n == added_f_len)
         {
@@ -1260,8 +1262,10 @@ std::vector<tr_pex> tr_peerMgrCompact6ToPex(void const* compact, size_t compactL
     for (size_t i = 0; i < n; ++i)
     {
         pex[i].addr.type = TR_AF_INET6;
-        walk = std::copy_n(walk, 16, reinterpret_cast<std::byte*>(&pex[i].addr.addr.addr6.s6_addr));
-        walk = std::copy_n(walk, 2, reinterpret_cast<std::byte*>(&pex[i].port));
+        std::copy_n(walk, 16, reinterpret_cast<std::byte*>(&pex[i].addr.addr.addr6.s6_addr));
+        walk += 16;
+        std::copy_n(walk, 2, reinterpret_cast<std::byte*>(&pex[i].port));
+        walk += 2;
 
         if (added_f != nullptr && n == added_f_len)
         {
