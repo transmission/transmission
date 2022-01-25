@@ -26,7 +26,7 @@
 
 static auto constexpr MsecToSleepPerSecondDuringVerify = int{ 100 };
 
-static bool verifyTorrent(tr_torrent* tor, bool* stopFlag)
+static bool verifyTorrent(tr_torrent* tor, bool const* stopFlag)
 {
     auto const begin = tr_time();
 

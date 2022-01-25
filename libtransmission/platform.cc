@@ -100,7 +100,7 @@ using tr_thread_id = DWORD;
 using tr_thread_id = pthread_t;
 #endif
 
-static tr_thread_id tr_getCurrentThread(void)
+static tr_thread_id tr_getCurrentThread()
 {
 #ifdef _WIN32
     return GetCurrentThreadId();
@@ -216,7 +216,7 @@ static char* win32_get_known_folder(REFKNOWNFOLDERID folder_id)
 
 #endif
 
-static char const* getHomeDir(void)
+static char const* getHomeDir()
 {
     static char const* home = nullptr;
 
@@ -381,7 +381,7 @@ static std::string getXdgEntryFromUserDirs(std::string_view key)
     return val;
 }
 
-char const* tr_getDefaultDownloadDir(void)
+char const* tr_getDefaultDownloadDir()
 {
     static char const* user_dir = nullptr;
 

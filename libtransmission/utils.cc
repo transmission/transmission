@@ -611,7 +611,7 @@ bool tr_str_has_suffix(char const* str, char const* suffix)
 *****
 ****/
 
-uint64_t tr_time_msec(void)
+uint64_t tr_time_msec()
 {
     struct timeval tv;
 
@@ -669,7 +669,7 @@ size_t tr_strlcpy(void* vdst, void const* vsrc, size_t siz)
 #else
 
     auto* d = dst;
-    auto* s = src;
+    auto const* s = src;
     size_t n = siz;
 
     /* Copy as many bytes as will fit */
@@ -1555,7 +1555,7 @@ char* tr_env_get_string(char const* key, char const* default_value)
 ****
 ***/
 
-void tr_net_init(void)
+void tr_net_init()
 {
     static bool initialized = false;
 

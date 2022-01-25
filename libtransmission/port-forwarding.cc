@@ -20,7 +20,7 @@
 #include "upnp.h"
 #include "utils.h"
 
-static char const* getKey(void)
+static char const* getKey()
 {
     return _("Port Forwarding");
 }
