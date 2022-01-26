@@ -14,7 +14,6 @@ endif()
 
 find_path(EVENT2_INCLUDE_DIR NAMES event2/event.h HINTS ${_EVENT2_INCLUDEDIR})
 find_library(EVENT2_LIBRARY NAMES event-2.1 event-2.0 event HINTS ${_EVENT2_LIBDIR})
-find_library(EVENT2_THREAD_LIBRARY NAMES event_pthreads-2.1 event_pthreads-2.0 event_pthreads HINTS ${_EVENT2_LIBDIR})
 
 if(EVENT2_INCLUDE_DIR)
     if(_EVENT2_VERSION)
@@ -28,7 +27,7 @@ if(EVENT2_INCLUDE_DIR)
 endif()
 
 set(EVENT2_INCLUDE_DIRS ${EVENT2_INCLUDE_DIR})
-set(EVENT2_LIBRARIES ${EVENT2_LIBRARY} ${EVENT2_THREAD_LIBRARY})
+set(EVENT2_LIBRARIES ${EVENT2_LIBRARY})
 
 include(FindPackageHandleStandardArgs)
 

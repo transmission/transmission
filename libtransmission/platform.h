@@ -49,6 +49,8 @@ struct tr_thread;
 /** @brief Instantiate a new process thread */
 tr_thread* tr_threadNew(void (*func)(void*), void* arg);
 
+unsigned long tr_threadCurrentId();
+
 /** @brief Return nonzero if this function is being called from `thread'
     @param thread the thread being tested */
 bool tr_amInThread(tr_thread const* thread);
