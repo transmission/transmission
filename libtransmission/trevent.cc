@@ -38,21 +38,22 @@ namespace impl
 {
 struct std_lock
 {
-    std::mutex mutex;
-    std::unique_lock<std::mutex> lock = std::unique_lock<std::mutex>(mutex);
+    // libevent2/thread.h says recursion support is mandatory
+    std::recursive_mutex mutex;
+    std::unique_lock<std::recursive_mutex> lock = std::unique_lock<std::recursive_mutex>(mutex);
 };
 
-void* std_lock_alloc(unsigned /*locktype*/)
+void* lock_alloc(unsigned /*locktype*/)
 {
     return new std_lock{};
 }
 
-void std_lock_free(void* lock_, unsigned /*locktype*/)
+void lock_free(void* lock_, unsigned /*locktype*/)
 {
     delete static_cast<std_lock*>(lock_);
 }
 
-int std_lock_lock(unsigned mode, void* lock_)
+int lock_lock(unsigned mode, void* lock_)
 {
     try
     {
@@ -71,7 +72,7 @@ int std_lock_lock(unsigned mode, void* lock_)
     }
 }
 
-int std_lock_unlock(unsigned /*mode*/, void* lock_)
+int lock_unlock(unsigned /*mode*/, void* lock_)
 {
     try
     {
@@ -85,19 +86,19 @@ int std_lock_unlock(unsigned /*mode*/, void* lock_)
     }
 }
 
-void* std_cond_alloc(unsigned /*condflags*/)
+void* cond_alloc(unsigned /*condflags*/)
 {
-    return new std::condition_variable();
+    return new std::condition_variable_any();
 }
 
-void std_cond_free(void* cond_)
+void cond_free(void* cond_)
 {
-    delete static_cast<std::condition_variable*>(cond_);
+    delete static_cast<std::condition_variable_any*>(cond_);
 }
 
-int std_cond_signal(void* cond_, int broadcast)
+int cond_signal(void* cond_, int broadcast)
 {
-    auto* cond = static_cast<std::condition_variable*>(cond_);
+    auto* cond = static_cast<std::condition_variable_any*>(cond_);
     if (broadcast)
     {
         cond->notify_all();
@@ -109,9 +110,9 @@ int std_cond_signal(void* cond_, int broadcast)
     return 0;
 }
 
-int std_cond_wait(void* cond_, void* lock_, struct timeval const* tv)
+int cond_wait(void* cond_, void* lock_, struct timeval const* tv)
 {
-    auto* cond = static_cast<std::condition_variable*>(cond_);
+    auto* cond = static_cast<std::condition_variable_any*>(cond_);
     auto* lock = static_cast<std_lock*>(lock_);
     if (tv == nullptr)
     {
@@ -133,21 +134,16 @@ unsigned long std_get_thread_id()
 
 void tr_evthread_init()
 {
-    auto constexpr cbs = evthread_lock_callbacks{
-        1 /* EVTHREAD_LOCK_API_VERSION */,
-        EVTHREAD_LOCKTYPE_RECURSIVE,
-        impl::std_lock_alloc,
-        impl::std_lock_free,
-        impl::std_lock_lock,
-        impl::std_lock_unlock,
-    };
-    evthread_set_lock_callbacks(&cbs);
+    evthread_lock_callbacks constexpr lock_cbs{ EVTHREAD_LOCK_API_VERSION, EVTHREAD_LOCKTYPE_RECURSIVE,
+                                                impl::lock_alloc,          impl::lock_free,
+                                                impl::lock_lock,           impl::lock_unlock };
+    evthread_set_lock_callbacks(&lock_cbs);
 
-    auto constexpr cond_cbs = evthread_condition_callbacks{ 1 /* EVTHREAD_CONDITION_API_VERSION */,
-                                                            impl::std_cond_alloc,
-                                                            impl::std_cond_free,
-                                                            impl::std_cond_signal,
-                                                            impl::std_cond_wait };
+    evthread_condition_callbacks constexpr cond_cbs{ EVTHREAD_CONDITION_API_VERSION,
+                                                     impl::cond_alloc,
+                                                     impl::cond_free,
+                                                     impl::cond_signal,
+                                                     impl::cond_wait };
     evthread_set_condition_callbacks(&cond_cbs);
 
     evthread_set_id_callback(impl::std_get_thread_id);
