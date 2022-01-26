@@ -6,6 +6,7 @@
 #include <condition_variable>
 #include <list>
 #include <mutex>
+#include <shared_mutex>
 
 #include <csignal>
 
@@ -31,58 +32,38 @@
 ****
 ***/
 
+#include <iostream>
+
 namespace
 {
 namespace impl
 {
-struct std_lock
-{
-    // libevent2/thread.h says recursion support is mandatory
-    std::recursive_mutex mutex;
-    std::unique_lock<std::recursive_mutex> lock = std::unique_lock<std::recursive_mutex>(mutex, std::defer_lock);
-};
-
 void* lock_alloc(unsigned /*locktype*/)
 {
-    return new std_lock{};
+    return new std::recursive_mutex{};
 }
 
 void lock_free(void* lock_, unsigned /*locktype*/)
 {
-    delete static_cast<std_lock*>(lock_);
+    delete static_cast<std::recursive_mutex*>(lock_);
 }
 
 int lock_lock(unsigned mode, void* lock_)
 {
-    try
+    auto* lock = static_cast<std::recursive_mutex*>(lock_);
+    if (mode & EVTHREAD_TRY)
     {
-        auto* lock = static_cast<std_lock*>(lock_);
-        if (mode & EVTHREAD_TRY)
-        {
-            auto const success = lock->lock.try_lock();
-            return success ? 0 : -1;
-        }
-        lock->lock.lock();
-        return 0;
+        auto const success = lock->try_lock();
+        return success ? 0 : -1;
     }
-    catch (std::system_error const& /*e*/)
-    {
-        return -1;
-    }
+    lock->lock();
+    return 0;
 }
 
 int lock_unlock(unsigned /*mode*/, void* lock_)
 {
-    try
-    {
-        auto* lock = static_cast<std_lock*>(lock_);
-        lock->lock.unlock();
-        return 0;
-    }
-    catch (std::system_error const& /*e*/)
-    {
-        return -1;
-    }
+    static_cast<std::recursive_mutex*>(lock_)->unlock();
+    return 0;
 }
 
 void* cond_alloc(unsigned /*condflags*/)
@@ -112,15 +93,15 @@ int cond_signal(void* cond_, int broadcast)
 int cond_wait(void* cond_, void* lock_, struct timeval const* tv)
 {
     auto* cond = static_cast<std::condition_variable_any*>(cond_);
-    auto* lock = static_cast<std_lock*>(lock_);
+    auto* lock = static_cast<std::recursive_mutex*>(lock_);
     if (tv == nullptr)
     {
-        cond->wait(lock->lock);
+        cond->wait(*lock);
         return 0;
     }
 
     auto const duration = std::chrono::seconds(tv->tv_sec) + std::chrono::microseconds(tv->tv_usec);
-    auto const success = cond->wait_for(lock->lock, duration);
+    auto const success = cond->wait_for(*lock, duration);
     return success == std::cv_status::timeout ? 1 : 0;
 }
 
@@ -128,6 +109,8 @@ int cond_wait(void* cond_, void* lock_, struct timeval const* tv)
 
 void tr_evthread_init()
 {
+    // evthread_enable_lock_debugging();
+
     evthread_lock_callbacks constexpr lock_cbs{ EVTHREAD_LOCK_API_VERSION, EVTHREAD_LOCKTYPE_RECURSIVE,
                                                 impl::lock_alloc,          impl::lock_free,
                                                 impl::lock_lock,           impl::lock_unlock };
