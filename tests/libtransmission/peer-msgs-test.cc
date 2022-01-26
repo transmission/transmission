@@ -1,10 +1,7 @@
-/*
- * This file Copyright (C) 2013-2014 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright (C) 2013-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #include "transmission.h"
 #include "peer-msgs.h"
@@ -16,7 +13,7 @@ TEST(PeerMsgs, placeholder)
 {
 #if 0
 
-    uint8_t infohash[SHA_DIGEST_LENGTH];
+    auto infohash = tr_sha1_digest_t{};
     struct tr_address addr;
     tr_piece_index_t pieceCount = 1313;
     size_t numwant;
@@ -24,7 +21,7 @@ TEST(PeerMsgs, placeholder)
     tr_piece_index_t pieces[] = { 1059, 431, 808, 1217, 287, 376, 1188, 353, 508 };
     tr_piece_index_t buf[16];
 
-    memset(infohash, 0xaa, SHA_DIGEST_LENGTH);
+    memset(std::data(infohash), 0xaa, std::size(infohash));
 
     tr_address_from_string(&addr, "80.4.4.200");
 

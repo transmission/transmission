@@ -1,12 +1,9 @@
-/*
- * This file Copyright (C) 2007-2014 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2007-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
-#include <errno.h>
+#include <cerrno>
 
 #ifdef SYSTEM_MINIUPNP
 #include <miniupnpc/miniupnpc.h>
@@ -24,7 +21,7 @@
 #include "upnp.h"
 #include "utils.h"
 
-static char const* getKey(void)
+static char const* getKey()
 {
     return _("Port Forwarding (UPnP)");
 }
@@ -40,62 +37,58 @@ enum tr_upnp_state
 
 struct tr_upnp
 {
-    bool hasDiscovered;
-    struct UPNPUrls urls;
-    struct IGDdatas data;
-    int port;
-    char lanaddr[16];
-    bool isMapped;
-    tr_upnp_state state;
+    ~tr_upnp()
+    {
+        TR_ASSERT(!isMapped);
+        TR_ASSERT(state == TR_UPNP_IDLE || state == TR_UPNP_ERR || state == TR_UPNP_DISCOVER);
+
+        FreeUPNPUrls(&urls);
+    }
+
+    bool hasDiscovered = false;
+    struct UPNPUrls urls = {};
+    struct IGDdatas data = {};
+    int port = -1;
+    char lanaddr[16] = {};
+    bool isMapped = false;
+    tr_upnp_state state = TR_UPNP_DISCOVER;
 };
 
 /**
 ***
 **/
 
-tr_upnp* tr_upnpInit(void)
+tr_upnp* tr_upnpInit()
 {
-    tr_upnp* ret = tr_new0(tr_upnp, 1);
-
-    ret->state = TR_UPNP_DISCOVER;
-    ret->port = -1;
-    return ret;
+    return new tr_upnp();
 }
 
 void tr_upnpClose(tr_upnp* handle)
 {
-    TR_ASSERT(!handle->isMapped);
-    TR_ASSERT(handle->state == TR_UPNP_IDLE || handle->state == TR_UPNP_ERR || handle->state == TR_UPNP_DISCOVER);
-
-    if (handle->hasDiscovered)
-    {
-        FreeUPNPUrls(&handle->urls);
-    }
-
-    tr_free(handle);
+    delete handle;
 }
 
 /**
 ***  Wrappers for miniupnpc functions
 **/
 
-static struct UPNPDev* tr_upnpDiscover(int msec)
+static struct UPNPDev* tr_upnpDiscover(int msec, char const* bindaddr)
 {
-    struct UPNPDev* ret;
-    bool have_err;
+    UPNPDev* ret = nullptr;
+    auto have_err = bool{};
 
 #if (MINIUPNPC_API_VERSION >= 8) /* adds ipv6 and error args */
     int err = UPNPDISCOVER_SUCCESS;
 
 #if (MINIUPNPC_API_VERSION >= 14) /* adds ttl */
-    ret = upnpDiscover(msec, nullptr, nullptr, 0, 0, 2, &err);
+    ret = upnpDiscover(msec, bindaddr, nullptr, 0, 0, 2, &err);
 #else
-    ret = upnpDiscover(msec, nullptr, nullptr, 0, 0, &err);
+    ret = upnpDiscover(msec, bindaddr, nullptr, 0, 0, &err);
 #endif
 
     have_err = err != UPNPDISCOVER_SUCCESS;
 #else
-    ret = upnpDiscover(msec, nullptr, nullptr, 0);
+    ret = upnpDiscover(msec, bindaddr, nullptr, 0);
     have_err = ret == nullptr;
 #endif
 
@@ -109,7 +102,6 @@ static struct UPNPDev* tr_upnpDiscover(int msec)
 
 static int tr_upnpGetSpecificPortMappingEntry(tr_upnp* handle, char const* proto)
 {
-    int err;
     char intClient[16];
     char intPort[16];
     char portStr[16];
@@ -120,7 +112,7 @@ static int tr_upnpGetSpecificPortMappingEntry(tr_upnp* handle, char const* proto
     tr_snprintf(portStr, sizeof(portStr), "%d", handle->port);
 
 #if (MINIUPNPC_API_VERSION >= 10) /* adds remoteHost arg */
-    err = UPNP_GetSpecificPortMappingEntry(
+    int const err = UPNP_GetSpecificPortMappingEntry(
         handle->urls.controlURL,
         handle->data.first.servicetype,
         portStr,
@@ -132,7 +124,7 @@ static int tr_upnpGetSpecificPortMappingEntry(tr_upnp* handle, char const* proto
         nullptr /*enabled*/,
         nullptr /*duration*/);
 #elif (MINIUPNPC_API_VERSION >= 8) /* adds desc, enabled and leaseDuration args */
-    err = UPNP_GetSpecificPortMappingEntry(
+    int const err = UPNP_GetSpecificPortMappingEntry(
         handle->urls.controlURL,
         handle->data.first.servicetype,
         portStr,
@@ -143,7 +135,7 @@ static int tr_upnpGetSpecificPortMappingEntry(tr_upnp* handle, char const* proto
         nullptr /*enabled*/,
         nullptr /*duration*/);
 #else
-    err = UPNP_GetSpecificPortMappingEntry(
+    int const err = UPNP_GetSpecificPortMappingEntry(
         handle->urls.controlURL,
         handle->data.first.servicetype,
         portStr,
@@ -157,7 +149,6 @@ static int tr_upnpGetSpecificPortMappingEntry(tr_upnp* handle, char const* proto
 
 static int tr_upnpAddPortMapping(tr_upnp const* handle, char const* proto, tr_port port, char const* desc)
 {
-    int err;
     int const old_errno = errno;
     char portStr[16];
     errno = 0;
@@ -165,7 +156,7 @@ static int tr_upnpAddPortMapping(tr_upnp const* handle, char const* proto, tr_po
     tr_snprintf(portStr, sizeof(portStr), "%d", (int)port);
 
 #if (MINIUPNPC_API_VERSION >= 8)
-    err = UPNP_AddPortMapping(
+    int err = UPNP_AddPortMapping(
         handle->urls.controlURL,
         handle->data.first.servicetype,
         portStr,
@@ -176,7 +167,7 @@ static int tr_upnpAddPortMapping(tr_upnp const* handle, char const* proto, tr_po
         nullptr,
         nullptr);
 #else
-    err = UPNP_AddPortMapping(
+    int err = UPNP_AddPortMapping(
         handle->urls.controlURL,
         handle->data.first.servicetype,
         portStr,
@@ -223,18 +214,14 @@ enum
     UPNP_IGD_INVALID = 3
 };
 
-tr_port_forwarding tr_upnpPulse(tr_upnp* handle, tr_port port, bool isEnabled, bool doPortCheck)
+tr_port_forwarding tr_upnpPulse(tr_upnp* handle, tr_port port, bool isEnabled, bool doPortCheck, char const* bindaddr)
 {
-    tr_port_forwarding ret;
-
     if (isEnabled && handle->state == TR_UPNP_DISCOVER)
     {
-        struct UPNPDev* devlist;
-
-        devlist = tr_upnpDiscover(2000);
-
+        auto* const devlist = tr_upnpDiscover(2000, bindaddr);
         errno = 0;
 
+        FreeUPNPUrls(&handle->urls);
         if (UPNP_GetValidIGD(devlist, &handle->urls, &handle->data, handle->lanaddr, sizeof(handle->lanaddr)) ==
             UPNP_IGD_VALID_CONNECTED)
         {
@@ -331,25 +318,18 @@ tr_port_forwarding tr_upnpPulse(tr_upnp* handle, tr_port port, bool isEnabled, b
     switch (handle->state)
     {
     case TR_UPNP_DISCOVER:
-        ret = TR_PORT_UNMAPPED;
-        break;
+        return TR_PORT_UNMAPPED;
 
     case TR_UPNP_MAP:
-        ret = TR_PORT_MAPPING;
-        break;
+        return TR_PORT_MAPPING;
 
     case TR_UPNP_UNMAP:
-        ret = TR_PORT_UNMAPPING;
-        break;
+        return TR_PORT_UNMAPPING;
 
     case TR_UPNP_IDLE:
-        ret = handle->isMapped ? TR_PORT_MAPPED : TR_PORT_UNMAPPED;
-        break;
+        return handle->isMapped ? TR_PORT_MAPPED : TR_PORT_UNMAPPED;
 
     default:
-        ret = TR_PORT_ERROR;
-        break;
+        return TR_PORT_ERROR;
     }
-
-    return ret;
 }

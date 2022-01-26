@@ -1,12 +1,9 @@
-/*
- * This file Copyright (C) 2015-2016 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2015-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
-#include <errno.h>
+#include <cerrno>
 #include <string>
 #include <unordered_set>
 
@@ -50,17 +47,17 @@ auto tr_watchdir_generic_interval = timeval{ 10, 0 };
 ****
 ***/
 
-static void tr_watchdir_generic_on_event([[maybe_unused]] evutil_socket_t fd, [[maybe_unused]] short type, void* context)
+static void tr_watchdir_generic_on_event(evutil_socket_t /*fd*/, short /*type*/, void* context)
 {
     auto const handle = static_cast<tr_watchdir_t>(context);
-    tr_watchdir_generic* const backend = BACKEND_UPCAST(tr_watchdir_get_backend(handle));
+    auto* const backend = BACKEND_UPCAST(tr_watchdir_get_backend(handle));
 
     tr_watchdir_scan(handle, &backend->dir_entries);
 }
 
 static void tr_watchdir_generic_free(tr_watchdir_backend* backend_base)
 {
-    tr_watchdir_generic* const backend = BACKEND_UPCAST(backend_base);
+    auto* const backend = BACKEND_UPCAST(backend_base);
 
     if (backend == nullptr)
     {

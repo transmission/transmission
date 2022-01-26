@@ -1,22 +1,21 @@
-/*
- * This file Copyright (C) 2013-2014 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright (C) 2013-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
+
+#include <string>
+#include <utility>
 
 #include <event2/buffer.h>
 
 #include "transmission.h"
+
 #include "cache.h" // tr_cacheWriteBlock()
 #include "file.h" // tr_sys_path_*()
+#include "utils.h"
 #include "variant.h"
 
 #include "test-fixtures.h"
-
-#include <string>
-#include <utility>
 
 namespace libtransmission
 {
@@ -50,13 +49,9 @@ TEST_P(IncompleteDirTest, incompleteDir)
     // the test zero_torrent will be missing its first piece.
     auto* tor = zeroTorrentInit();
     zeroTorrentPopulate(tor, false);
-    EXPECT_EQ(
-        makeString(tr_strdup_printf("%s/%s.part", incomplete_dir, tor->info.files[0].name)),
-        makeString(tr_torrentFindFile(tor, 0)));
-    EXPECT_EQ(
-        makeString(tr_buildPath(incomplete_dir, tor->info.files[1].name, nullptr)),
-        makeString(tr_torrentFindFile(tor, 1)));
-    EXPECT_EQ(tor->info.pieceSize, tr_torrentStat(tor)->leftUntilDone);
+    EXPECT_EQ(tr_strvJoin(incomplete_dir, "/", tr_torrentFile(tor, 0).name, ".part"), makeString(tr_torrentFindFile(tor, 0)));
+    EXPECT_EQ(tr_strvPath(incomplete_dir, tr_torrentFile(tor, 1).name), makeString(tr_torrentFindFile(tor, 1)));
+    EXPECT_EQ(tor->pieceSize(), tr_torrentStat(tor)->leftUntilDone);
 
     // auto constexpr completeness_unset = tr_completeness { -1 };
     // auto completeness = completeness_unset;
@@ -82,30 +77,28 @@ TEST_P(IncompleteDirTest, incompleteDir)
     auto const test_incomplete_dir_threadfunc = [](void* vdata) noexcept
     {
         auto* data = static_cast<TestIncompleteDirData*>(vdata);
-        tr_cacheWriteBlock(data->session->cache, data->tor, 0, data->offset, data->tor->blockSize, data->buf);
+        tr_cacheWriteBlock(data->session->cache, data->tor, 0, data->offset, data->tor->blockSize(), data->buf);
         tr_torrentGotBlock(data->tor, data->block);
         data->done = true;
     };
 
     // now finish writing it
     {
-        char* zero_block = tr_new0(char, tor->blockSize);
+        char* zero_block = tr_new0(char, tor->blockSize());
 
         struct TestIncompleteDirData data = {};
         data.session = session_;
         data.tor = tor;
         data.buf = evbuffer_new();
 
-        tr_block_index_t first;
-        tr_block_index_t last;
-        tr_torGetPieceBlockRange(tor, data.pieceIndex, &first, &last);
+        auto const [begin, end] = tor->blockSpanForPiece(data.pieceIndex);
 
-        for (tr_block_index_t block_index = first; block_index <= last; ++block_index)
+        for (tr_block_index_t block_index = begin; block_index < end; ++block_index)
         {
-            evbuffer_add(data.buf, zero_block, tor->blockSize);
+            evbuffer_add(data.buf, zero_block, tor->blockSize());
             data.block = block_index;
             data.done = false;
-            data.offset = data.block * tor->blockSize;
+            data.offset = data.block * tor->blockSize();
             tr_runInEventThread(session_, test_incomplete_dir_threadfunc, &data);
 
             auto const test = [&data]()
@@ -129,11 +122,10 @@ TEST_P(IncompleteDirTest, incompleteDir)
     EXPECT_TRUE(waitFor(test, 300));
     EXPECT_EQ(TR_SEED, completeness);
 
-    for (tr_file_index_t file_index = 0; file_index < tor->info.fileCount; ++file_index)
+    auto const n = tr_torrentFileCount(tor);
+    for (tr_file_index_t i = 0; i < n; ++i)
     {
-        EXPECT_EQ(
-            makeString(tr_buildPath(download_dir, tor->info.files[file_index].name, nullptr)),
-            makeString(tr_torrentFindFile(tor, file_index)));
+        EXPECT_EQ(tr_strvPath(download_dir, tr_torrentFile(tor, i).name), makeString(tr_torrentFindFile(tor, i)));
     }
 
     // cleanup
@@ -159,7 +151,7 @@ using MoveTest = SessionTest;
 
 TEST_F(MoveTest, setLocation)
 {
-    auto const target_dir = makeString(tr_buildPath(tr_sessionGetConfigDir(session_), "target", nullptr));
+    auto const target_dir = tr_strvPath(tr_sessionGetConfigDir(session_), "target");
     tr_sys_dir_create(target_dir.data(), TR_SYS_DIR_CREATE_PARENTS, 0777, nullptr);
 
     // init a torrent.
@@ -184,11 +176,10 @@ TEST_F(MoveTest, setLocation)
 
     // confirm the files really got moved
     sync();
-    for (tr_file_index_t file_index = 0; file_index < tor->info.fileCount; ++file_index)
+    auto const n = tr_torrentFileCount(tor);
+    for (tr_file_index_t i = 0; i < n; ++i)
     {
-        EXPECT_EQ(
-            makeString(tr_buildPath(target_dir.data(), tor->info.files[file_index].name, nullptr)),
-            makeString(tr_torrentFindFile(tor, file_index)));
+        EXPECT_EQ(tr_strvPath(target_dir.data(), tr_torrentFile(tor, i).name), makeString(tr_torrentFindFile(tor, i)));
     }
 
     // cleanup

@@ -1,30 +1,15 @@
-/******************************************************************************
- * Copyright (c) Transmission authors and contributors
- *
- * Permission is hereby granted, free of charge, to any person obtaining a
- * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
- * DEALINGS IN THE SOFTWARE.
- *****************************************************************************/
+// Copyright © Transmission authors and contributors.
+// This file is licensed under the MIT (SPDX: MIT) license,
+// A copy of this license can be found in licenses/ .
 
 #pragma once
 
 #ifndef __TRANSMISSION__
 #error only libtransmission should #include this header.
 #endif
+
+#include <cstddef> // size_t
+#include <string_view>
 
 #ifdef _WIN32
 #include <inttypes.h>
@@ -34,8 +19,6 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #endif
-
-#include "tr-macros.h"
 
 #ifdef _WIN32
 using tr_socket_t = SOCKET;
@@ -104,6 +87,8 @@ char const* tr_address_and_port_to_string(char* buf, size_t buflen, tr_address c
 
 bool tr_address_from_string(tr_address* setme, char const* string);
 
+bool tr_address_from_string(tr_address* dst, std::string_view src);
+
 bool tr_address_from_sockaddr_storage(tr_address* setme, tr_port* port, struct sockaddr_storage const* src);
 
 int tr_address_compare(tr_address const* a, tr_address const* b);
@@ -150,4 +135,4 @@ bool tr_net_hasIPv6(tr_port);
  */
 char* tr_net_strerror(char* buf, size_t buflen, int err);
 
-unsigned char const* tr_globalIPv6(void);
+unsigned char const* tr_globalIPv6(tr_session const* session);

@@ -1,10 +1,7 @@
-/*
- * This file Copyright (C) 2016 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2016-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #include <cassert>
 
@@ -70,25 +67,9 @@ void RpcQueue::runNext(RpcResponseFuture const& response)
 {
     assert(!queue_.isEmpty());
 
-    RpcResponseFuture const old_future = future_watcher_.future();
-
-    for (;;)
-    {
-        auto next = queue_.dequeue();
-        next_error_handler_ = next.second;
-        future_watcher_.setFuture((next.first)(response));
-
-        if (old_future != future_watcher_.future())
-        {
-            break;
-        }
-
-        if (queue_.isEmpty())
-        {
-            deleteLater();
-            break;
-        }
-    }
+    auto next = queue_.dequeue();
+    next_error_handler_ = next.second;
+    future_watcher_.setFuture((next.first)(response));
 }
 
 void RpcQueue::run()

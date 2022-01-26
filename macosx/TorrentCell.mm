@@ -1,24 +1,6 @@
-/******************************************************************************
- * Copyright (c) 2006-2012 Transmission authors and contributors
- *
- * Permission is hereby granted, free of charge, to any person obtaining a
- * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
- * DEALINGS IN THE SOFTWARE.
- *****************************************************************************/
+// This file Copyright © 2006-2022 Transmission authors and contributors.
+// It may be used under the MIT (SPDX: MIT) license.
+// License text can be found in the licenses/ folder.
 
 #import "TorrentCell.h"
 #import "GroupsController.h"
@@ -61,7 +43,7 @@
 
 #define MAX_PIECES (18 * 18)
 
-@interface TorrentCell (Private)
+@interface TorrentCell ()
 
 - (void)drawBar:(NSRect)barRect;
 - (void)drawRegularBar:(NSRect)barRect;
@@ -162,7 +144,7 @@
 
     [(TorrentTableView*)controlView removeTrackingAreas];
 
-    while (event.type != NSLeftMouseUp)
+    while (event.type != NSEventTypeLeftMouseUp)
     {
         point = [controlView convertPoint:event.locationInWindow fromView:nil];
 
@@ -186,12 +168,14 @@
         }
 
         //send events to where necessary
-        if (event.type == NSMouseEntered || event.type == NSMouseExited)
+        if (event.type == NSEventTypeMouseEntered || event.type == NSEventTypeMouseExited)
         {
             [NSApp sendEvent:event];
         }
-        event = [controlView.window
-            nextEventMatchingMask:(NSLeftMouseUpMask | NSLeftMouseDraggedMask | NSMouseEnteredMask | NSMouseExitedMask)];
+        event = [controlView.window nextEventMatchingMask:(NSEventMaskLeftMouseUp |
+                                                           NSEventMaskLeftMouseDragged |
+                                                           NSEventMaskMouseEntered |
+                                                           NSEventMaskMouseExited)];
     }
 
     fTracking = NO;
@@ -359,7 +343,7 @@
     if (!minimal || !(!fTracking && fHoverAction)) //don't show in minimal mode when hovered over
     {
         NSImage* icon = (minimal && error) ? [NSImage imageNamed:NSImageNameCaution] : torrent.icon;
-        [icon drawInRect:iconRect fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:1.0 respectFlipped:YES hints:nil];
+        [icon drawInRect:iconRect fromRect:NSZeroRect operation:NSCompositingOperationSourceOver fraction:1.0 respectFlipped:YES hints:nil];
     }
 
     //error badge
@@ -367,13 +351,13 @@
     {
         NSImage* errorImage = [NSImage imageNamed:NSImageNameCaution];
         NSRect const errorRect = NSMakeRect(NSMaxX(iconRect) - ERROR_IMAGE_SIZE, NSMaxY(iconRect) - ERROR_IMAGE_SIZE, ERROR_IMAGE_SIZE, ERROR_IMAGE_SIZE);
-        [errorImage drawInRect:errorRect fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:1.0 respectFlipped:YES
+        [errorImage drawInRect:errorRect fromRect:NSZeroRect operation:NSCompositingOperationSourceOver fraction:1.0 respectFlipped:YES
                          hints:nil];
     }
 
     //text color
     NSColor *titleColor, *statusColor;
-    if (self.backgroundStyle == NSBackgroundStyleDark)
+    if (self.backgroundStyle == NSBackgroundStyleEmphasized)
     {
         titleColor = statusColor = NSColor.whiteColor;
     }
@@ -434,7 +418,7 @@
         }
         else
         {
-            if (NSApp.currentEvent.modifierFlags & NSAlternateKeyMask)
+            if (NSApp.currentEvent.modifierFlags & NSEventModifierFlagOption)
             {
                 controlImage = [NSImage imageNamed:[@"ResumeNoWait" stringByAppendingString:controlImageSuffix]];
             }
@@ -449,7 +433,7 @@
         }
 
         NSRect const controlRect = [self controlButtonRectForBounds:cellFrame];
-        [controlImage drawInRect:controlRect fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:1.0 respectFlipped:YES
+        [controlImage drawInRect:controlRect fromRect:NSZeroRect operation:NSCompositingOperationSourceOver fraction:1.0 respectFlipped:YES
                            hints:nil];
         minimalTitleRightBound = MIN(minimalTitleRightBound, NSMinX(controlRect));
 
@@ -469,7 +453,7 @@
         }
 
         NSImage* revealImage = [NSImage imageNamed:revealImageString];
-        [revealImage drawInRect:[self revealButtonRectForBounds:cellFrame] fromRect:NSZeroRect operation:NSCompositeSourceOver
+        [revealImage drawInRect:[self revealButtonRectForBounds:cellFrame] fromRect:NSZeroRect operation:NSCompositingOperationSourceOver
                        fraction:1.0
                  respectFlipped:YES
                           hints:nil];
@@ -495,7 +479,7 @@
         {
             NSImage* actionImage = [NSImage imageNamed:actionImageString];
             [actionImage drawInRect:[self actionButtonRectForBounds:cellFrame] fromRect:NSZeroRect
-                          operation:NSCompositeSourceOver
+                          operation:NSCompositingOperationSourceOver
                            fraction:1.0
                      respectFlipped:YES
                               hints:nil];
@@ -516,11 +500,12 @@
             PRIORITY_ICON_WIDTH,
             PRIORITY_ICON_HEIGHT);
 
-        NSColor* priorityColor = self.backgroundStyle == NSBackgroundStyleDark ? NSColor.whiteColor : NSColor.labelColor;
+        NSColor* priorityColor = self.backgroundStyle == NSBackgroundStyleEmphasized ? NSColor.whiteColor
+                                                                                     : NSColor.labelColor;
 
         NSImage* priorityImage = [[NSImage imageNamed:(torrent.priority == TR_PRI_HIGH ? @"PriorityHighTemplate" : @"PriorityLowTemplate")]
             imageWithColor:priorityColor];
-        [priorityImage drawInRect:priorityRect fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:1.0
+        [priorityImage drawInRect:priorityRect fromRect:NSZeroRect operation:NSCompositingOperationSourceOver fraction:1.0
                    respectFlipped:YES
                             hints:nil];
     }
@@ -577,10 +562,6 @@
     NSAttributedString* titleString = self.attributedTitle;
     [titleString drawInRect:cellFrame];
 }
-
-@end
-
-@implementation TorrentCell (Private)
 
 - (void)drawBar:(NSRect)barRect
 {
@@ -697,7 +678,7 @@
     if (torrent.magnet)
     {
         [[NSColor colorWithCalibratedWhite:1.0 alpha:[fDefaults boolForKey:@"SmallView"] ? 0.25 : 1.0] set];
-        NSRectFillUsingOperation(barRect, NSCompositeSourceOver);
+        NSRectFillUsingOperation(barRect, NSCompositingOperationSourceOver);
         return;
     }
 
@@ -746,7 +727,7 @@
     torrent.previousFinishedPieces = finishedIndexes.count > 0 ? finishedIndexes : nil; //don't bother saving if none are complete
 
     //actually draw image
-    [bitmap drawInRect:barRect fromRect:NSZeroRect operation:NSCompositeSourceOver
+    [bitmap drawInRect:barRect fromRect:NSZeroRect operation:NSCompositingOperationSourceOver
               fraction:([fDefaults boolForKey:@"SmallView"] ? 0.25 : 1.0)respectFlipped:YES
                  hints:nil];
 }
@@ -911,7 +892,7 @@
             return NSLocalizedString(@"Pause the transfer", "Torrent Table -> tooltip");
         else
         {
-            if (NSApp.currentEvent.modifierFlags & NSAlternateKeyMask)
+            if (NSApp.currentEvent.modifierFlags & NSEventModifierFlagOption)
             {
                 return NSLocalizedString(@"Resume the transfer right away", "Torrent cell -> button info");
             }

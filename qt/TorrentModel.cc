@@ -1,13 +1,11 @@
-/*
- * This file Copyright (C) 2009-2015 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2009-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #include <algorithm>
 #include <cassert>
+#include <string_view>
 #include <utility>
 
 #include <libtransmission/transmission.h>
@@ -92,7 +90,7 @@ int TorrentModel::rowCount(QModelIndex const& parent) const
 
 QVariant TorrentModel::data(QModelIndex const& index, int role) const
 {
-    Torrent const* t = torrents_.value(index.row(), nullptr);
+    auto const* const t = (index.isValid() && index.row() < rowCount()) ? torrents_.at(index.row()) : nullptr;
 
     if (t != nullptr)
     {
@@ -176,13 +174,12 @@ void TorrentModel::updateTorrents(tr_variant* torrents, bool is_complete_list)
     {
         // In 'table' format, the first entry in 'torrents' is an array of keys.
         // All the other entries are an array of the values for one torrent.
-        char const* str;
-        size_t len;
+        auto sv = std::string_view{};
         size_t i = 0;
         keys.reserve(tr_variantListSize(first_child));
-        while (tr_variantGetStr(tr_variantListChild(first_child, i++), &str, &len))
+        while (tr_variantGetStrView(tr_variantListChild(first_child, i++), &sv))
         {
-            keys.push_back(tr_quark_new(str, len));
+            keys.push_back(tr_quark_new(sv));
         }
     }
     else if (first_child != nullptr)
@@ -345,10 +342,10 @@ std::optional<int> TorrentModel::getRow(int id) const
 {
     std::optional<int> row;
 
-    auto const it = std::equal_range(torrents_.begin(), torrents_.end(), id, TorrentIdLessThan());
-    if (it.first != it.second)
+    auto const [begin, end] = std::equal_range(torrents_.begin(), torrents_.end(), id, TorrentIdLessThan());
+    if (begin != end)
     {
-        row = std::distance(torrents_.begin(), it.first);
+        row = std::distance(torrents_.begin(), begin);
         assert(torrents_[*row]->id() == id);
     }
 
@@ -428,9 +425,9 @@ std::vector<TorrentModel::span_t> TorrentModel::getSpans(torrent_ids_t const& id
 
 void TorrentModel::rowsEmitChanged(torrent_ids_t const& ids)
 {
-    for (auto const& span : getSpans(ids))
+    for (auto const& [first, last] : getSpans(ids))
     {
-        emit dataChanged(index(span.first), index(span.second));
+        emit dataChanged(index(first), index(last));
     }
 }
 
@@ -449,7 +446,7 @@ void TorrentModel::rowsAdd(torrents_t const& torrents)
     {
         for (auto const& tor : torrents)
         {
-            auto* const it = std::lower_bound(torrents_.begin(), torrents_.end(), tor, compare);
+            auto const it = std::lower_bound(torrents_.begin(), torrents_.end(), tor, compare);
             auto const row = static_cast<int>(std::distance(torrents_.begin(), it));
 
             beginInsertRows(QModelIndex(), row, row);
@@ -465,11 +462,10 @@ void TorrentModel::rowsRemove(torrents_t const& torrents)
     auto const& spans = getSpans(getIds(torrents.begin(), torrents.end()));
     for (auto it = spans.rbegin(), end = spans.rend(); it != end; ++it)
     {
-        auto const& span = *it;
+        auto const& [first, last] = *it;
 
-        beginRemoveRows(QModelIndex(), span.first, span.second);
-        auto const n = span.second + 1 - span.first;
-        torrents_.remove(span.first, n);
+        beginRemoveRows(QModelIndex(), first, last);
+        torrents_.erase(torrents_.begin() + first, torrents_.begin() + last + 1);
         endRemoveRows();
     }
 

@@ -73,8 +73,6 @@ set(${PROJECT_NAME}_SOURCES
     InfoGeneralViewController.mm
     InfoOptionsViewController.mm
     InfoPeersViewController.mm
-    InfoTabButtonBack.mm
-    InfoTabButtonCell.mm
     InfoTextField.mm
     InfoTrackersViewController.mm
     InfoWindowController.mm
@@ -145,8 +143,6 @@ set(${PROJECT_NAME}_HEADERS
     InfoGeneralViewController.h
     InfoOptionsViewController.h
     InfoPeersViewController.h
-    InfoTabButtonBack.h
-    InfoTabButtonCell.h
     InfoTextField.h
     InfoTrackersViewController.h
     InfoViewController.h
@@ -200,7 +196,7 @@ set(APPICONSET_DIR "${PROJECT_SOURCE_DIR}/Images/Images.xcassets/AppIcon.appicon
 set(APPICON_FILE "${PROJECT_BINARY_DIR}/Transmission.icns")
 add_custom_command(
     OUTPUT "${APPICON_FILE}"
-    COMMAND "${CMAKE_COMMAND}" -E rm -f
+    COMMAND "${CMAKE_COMMAND}" -E rm -rf
         "${PROJECT_BINARY_DIR}/Transmission.iconset"
     COMMAND "${CMAKE_COMMAND}" -E copy_directory
         "${APPICONSET_DIR}"

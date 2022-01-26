@@ -1,10 +1,7 @@
-/*
- * This file Copyright (C) 2008-2014 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2008-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #pragma once
 
@@ -13,11 +10,12 @@
 #endif
 
 #include <array>
-#include <unordered_set>
+#include <cstddef> // size_t
+#include <vector>
 
 #include "transmission.h"
+
 #include "tr-assert.h"
-#include "utils.h" /* tr_new(), tr_free() */
 
 class tr_peerIo;
 
@@ -247,7 +245,7 @@ private:
 
     mutable std::array<Band, 2> band_ = {};
     Bandwidth* parent_ = nullptr;
-    std::unordered_set<Bandwidth*> children_;
+    std::vector<Bandwidth*> children_;
     tr_peerIo* peer_ = nullptr;
     tr_priority_t priority_ = 0;
 };

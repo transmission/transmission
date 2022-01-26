@@ -1,10 +1,7 @@
-/*
- * This file Copyright (C) 2015 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2015-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #include <assert.h>
 #include <errno.h>
@@ -20,6 +17,8 @@
 
 #include "daemon.h"
 
+using namespace std::literals;
+
 /***
 ****
 ***/
@@ -33,9 +32,9 @@ static int signal_pipe[2];
 ****
 ***/
 
-static void set_system_error(tr_error** error, int code, char const* message)
+static void set_system_error(tr_error** error, int code, std::string_view message)
 {
-    tr_error_set(error, code, "%s (%d): %s", message, code, tr_strerror(code));
+    tr_error_set(error, code, tr_strvJoin(message, " ("sv, std::to_string(code), "): "sv, tr_strerror(code)));
 }
 
 /***
@@ -72,7 +71,7 @@ static void send_signal_to_pipe(int sig)
     errno = old_errno;
 }
 
-static void* signal_handler_thread_main([[maybe_unused]] void* arg)
+static void* signal_handler_thread_main(void* /*arg*/)
 {
     int sig;
 

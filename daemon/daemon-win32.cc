@@ -1,10 +1,7 @@
-/*
- * This file Copyright (C) 2015 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2015-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #include <process.h> /* _beginthreadex() */
 
@@ -45,8 +42,10 @@ static HANDLE service_stop_thread = nullptr;
 
 static void set_system_error(tr_error** error, DWORD code, char const* message)
 {
-    char* const system_message = tr_win32_format_message(code);
-    tr_error_set(error, code, "%s (0x%08lx): %s", message, code, system_message);
+    auto* const system_message = tr_win32_format_message(code);
+    auto* const buf = tr_strdup_printf("%s (0x%08lx): %s", message, code, system_message);
+    tr_error_set(error, code, buf);
+    tr_free(buf);
     tr_free(system_message);
 }
 
@@ -72,7 +71,7 @@ static void do_log_system_error(char const* file, int line, tr_log_level level, 
 ****
 ***/
 
-static BOOL WINAPI handle_console_ctrl([[maybe_unused]] DWORD control_type)
+static BOOL WINAPI handle_console_ctrl(DWORD /*control_type*/)
 {
     callbacks->on_stop(callback_arg);
     return TRUE;
@@ -145,11 +144,7 @@ static void stop_service(void)
     }
 }
 
-static DWORD WINAPI handle_service_ctrl(
-    DWORD control_code,
-    [[maybe_unused]] DWORD event_type,
-    [[maybe_unused]] LPVOID event_data,
-    [[maybe_unused]] LPVOID context)
+static DWORD WINAPI handle_service_ctrl(DWORD control_code, DWORD /*event_type*/, LPVOID /*event_data*/, LPVOID /*context*/)
 {
     switch (control_code)
     {
@@ -171,12 +166,12 @@ static DWORD WINAPI handle_service_ctrl(
     return ERROR_CALL_NOT_IMPLEMENTED;
 }
 
-static unsigned int __stdcall service_thread_main([[maybe_unused]] void* context)
+static unsigned int __stdcall service_thread_main(void* /*context*/)
 {
     return callbacks->on_start(callback_arg, false);
 }
 
-static VOID WINAPI service_main([[maybe_unused]] DWORD argc, [[maybe_unused]] LPWSTR* argv)
+static VOID WINAPI service_main(DWORD /*argc*/, LPWSTR* /*argv*/)
 {
     status_handle = RegisterServiceCtrlHandlerExW(service_name, &handle_service_ctrl, nullptr);
 

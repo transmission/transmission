@@ -1,10 +1,7 @@
-/*
- * This file Copyright (C) 2009-2016 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2009-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #include "Session.h"
 
@@ -581,7 +578,7 @@ std::vector<std::string_view> const& Session::getKeyNames(TorrentProperties prop
         };
 
         // changing fields needed by the details dialog
-        static auto constexpr DetailStatKeys = std::array<tr_quark, 17>{
+        static auto constexpr DetailStatKeys = std::array<tr_quark, 18>{
             TR_KEY_activityDate, //
             TR_KEY_bandwidthPriority, //
             TR_KEY_corruptEver, //
@@ -590,6 +587,7 @@ std::vector<std::string_view> const& Session::getKeyNames(TorrentProperties prop
             TR_KEY_downloadLimit, //
             TR_KEY_downloadLimited, //
             TR_KEY_fileStats, //
+            TR_KEY_haveUnchecked, //
             TR_KEY_honorsSessionLimits, //
             TR_KEY_peer_limit, //
             TR_KEY_peers, //
@@ -1117,9 +1115,9 @@ void Session::onDuplicatesTimer()
     duplicates.swap(duplicates_);
 
     QStringList lines;
-    for (auto it : duplicates)
+    for (auto [dupe, original] : duplicates)
     {
-        lines.push_back(tr("%1 (copy of %2)").arg(it.first).arg(it.second.left(7)));
+        lines.push_back(tr("%1 (copy of %2)").arg(dupe).arg(original.left(7)));
     }
 
     if (!lines.empty())

@@ -1,6 +1,6 @@
 #!/usr/bin/env pwsh
 
-function global:Build-Transmission([string] $PrefixDir, [string] $Arch, [string] $DepsPrefixDir, [string] $SourceDir, [string] $ArtifactsDir) {
+function global:Build-Transmission([string] $PrefixDir, [string] $Arch, [string] $DepsPrefixDir, [string] $SourceDir, [string] $ArtifactsDir, [boolean] $PackDebugSyms) {
     $BuildDir = Join-Path $SourceDir .build
 
     $env:PATH = @(
@@ -36,11 +36,19 @@ function global:Build-Transmission([string] $PrefixDir, [string] $Arch, [string]
         Copy-Item -Path (Join-Path $DepsPrefixDir bin "${x}.pdb") -Destination $DebugSymbolsDir
     }
 
-    foreach ($x in @('Core', 'DBus', 'Gui', 'Network', 'Widgets', 'WinExtras')) {
+    foreach ($x in @('Core', 'DBus', 'Gui', 'Network', 'Svg', 'Widgets', 'WinExtras')) {
         if ($DepsPrefixDir -ne $PrefixDir) {
             Copy-Item -Path (Join-Path $DepsPrefixDir bin "Qt5${x}.dll") -Destination (Join-Path $PrefixDir bin)
         }
         Copy-Item -Path (Join-Path $DepsPrefixDir bin "Qt5${x}.pdb") -Destination $DebugSymbolsDir
+    }
+
+    foreach ($x in @('gif', 'ico', 'jpeg', 'svg')) {
+        if ($DepsPrefixDir -ne $PrefixDir) {
+            New-Item -Path (Join-Path $PrefixDir plugins imageformats) -ItemType Directory -ErrorAction Ignore | Out-Null
+            Copy-Item -Path (Join-Path $DepsPrefixDir plugins imageformats "q${x}.dll") -Destination (Join-Path $PrefixDir plugins imageformats)
+        }
+        Copy-Item -Path (Join-Path $DepsPrefixDir plugins imageformats "q${x}.pdb") -Destination $DebugSymbolsDir
     }
 
     if ($DepsPrefixDir -ne $PrefixDir) {
@@ -64,7 +72,10 @@ function global:Build-Transmission([string] $PrefixDir, [string] $Arch, [string]
     New-Item -Path $ArtifactsDir -ItemType Directory -ErrorAction Ignore | Out-Null
     $MsiPackage = (Get-ChildItem (Join-Path $BuildDir dist msi 'transmission-*.msi'))[0]
     Move-Item -Path $MsiPackage.FullName -Destination $ArtifactsDir
-    Invoke-NativeCommand cmake -E chdir $DebugSymbolsDir 7z a -y (Join-Path $ArtifactsDir "$($MsiPackage.BaseName)-pdb.7z")
+
+    if ($PackDebugSyms) {
+        Invoke-NativeCommand cmake -E chdir $DebugSymbolsDir 7z a -y (Join-Path $ArtifactsDir "$($MsiPackage.BaseName)-pdb.7z")
+    }
 }
 
 function global:Test-Transmission([string] $DepsPrefixDir, [string] $SourceDir) {

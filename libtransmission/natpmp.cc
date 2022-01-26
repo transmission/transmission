@@ -1,14 +1,11 @@
-/*
- * This file Copyright (C) 2007-2014 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2007-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
-#include <errno.h>
-#include <time.h>
-#include <inttypes.h>
+#include <cerrno>
+#include <ctime>
+#include <cinttypes>
 
 #include <event2/util.h> /* evutil_inet_ntop() */
 
@@ -22,39 +19,13 @@
 #include "port-forwarding.h"
 #include "utils.h"
 
-#define LIFETIME_SECS 3600
-#define COMMAND_WAIT_SECS 8
+static auto constexpr LifetimeSecs = uint32_t{ 3600 };
+static auto constexpr CommandWaitSecs = time_t{ 8 };
 
-static char const* getKey(void)
+static char const* getKey()
 {
     return _("Port Forwarding (NAT-PMP)");
 }
-
-enum tr_natpmp_state
-{
-    TR_NATPMP_IDLE,
-    TR_NATPMP_ERR,
-    TR_NATPMP_DISCOVER,
-    TR_NATPMP_RECV_PUB,
-    TR_NATPMP_SEND_MAP,
-    TR_NATPMP_RECV_MAP,
-    TR_NATPMP_SEND_UNMAP,
-    TR_NATPMP_RECV_UNMAP
-};
-
-struct tr_natpmp
-{
-    bool has_discovered;
-    bool is_mapped;
-
-    tr_port public_port;
-    tr_port private_port;
-
-    time_t renew_time;
-    time_t command_time;
-    tr_natpmp_state state;
-    natpmp_t natpmp;
-};
 
 /**
 ***
@@ -84,11 +55,9 @@ static void logVal(char const* func, int ret)
     }
 }
 
-struct tr_natpmp* tr_natpmpInit(void)
+struct tr_natpmp* tr_natpmpInit()
 {
-    struct tr_natpmp* nat;
-
-    nat = tr_new0(struct tr_natpmp, 1);
+    auto* const nat = tr_new0(struct tr_natpmp, 1);
     nat->state = TR_NATPMP_DISCOVER;
     nat->public_port = 0;
     nat->private_port = 0;
@@ -112,13 +81,16 @@ static bool canSendCommand(struct tr_natpmp const* nat)
 
 static void setCommandTime(struct tr_natpmp* nat)
 {
-    nat->command_time = tr_time() + COMMAND_WAIT_SECS;
+    nat->command_time = tr_time() + CommandWaitSecs;
 }
 
-tr_port_forwarding tr_natpmpPulse(struct tr_natpmp* nat, tr_port private_port, bool is_enabled, tr_port* public_port)
+tr_port_forwarding tr_natpmpPulse(
+    struct tr_natpmp* nat,
+    tr_port private_port,
+    bool is_enabled,
+    tr_port* public_port,
+    tr_port* real_private_port)
 {
-    tr_port_forwarding ret;
-
     if (is_enabled && nat->state == TR_NATPMP_DISCOVER)
     {
         int val = initnatpmp(&nat->natpmp, 0, 0);
@@ -203,7 +175,7 @@ tr_port_forwarding tr_natpmpPulse(struct tr_natpmp* nat, tr_port private_port, b
 
     if (nat->state == TR_NATPMP_SEND_MAP && canSendCommand(nat))
     {
-        int const val = sendnewportmappingrequest(&nat->natpmp, NATPMP_PROTOCOL_TCP, private_port, private_port, LIFETIME_SECS);
+        int const val = sendnewportmappingrequest(&nat->natpmp, NATPMP_PROTOCOL_TCP, private_port, private_port, LifetimeSecs);
         logVal("sendnewportmappingrequest", val);
         nat->state = val < 0 ? TR_NATPMP_ERR : TR_NATPMP_RECV_MAP;
         setCommandTime(nat);
@@ -234,27 +206,22 @@ tr_port_forwarding tr_natpmpPulse(struct tr_natpmp* nat, tr_port private_port, b
     {
     case TR_NATPMP_IDLE:
         *public_port = nat->public_port;
+        *real_private_port = nat->private_port;
         return nat->is_mapped ? TR_PORT_MAPPED : TR_PORT_UNMAPPED;
 
     case TR_NATPMP_DISCOVER:
-        ret = TR_PORT_UNMAPPED;
-        break;
+        return TR_PORT_UNMAPPED;
 
     case TR_NATPMP_RECV_PUB:
     case TR_NATPMP_SEND_MAP:
     case TR_NATPMP_RECV_MAP:
-        ret = TR_PORT_MAPPING;
-        break;
+        return TR_PORT_MAPPING;
 
     case TR_NATPMP_SEND_UNMAP:
     case TR_NATPMP_RECV_UNMAP:
-        ret = TR_PORT_UNMAPPING;
-        break;
+        return TR_PORT_UNMAPPING;
 
     default:
-        ret = TR_PORT_ERROR;
-        break;
+        return TR_PORT_ERROR;
     }
-
-    return ret;
 }

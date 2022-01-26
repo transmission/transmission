@@ -1,13 +1,9 @@
-/*
- * This file Copyright (C) 2008-2014 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2008-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #include <algorithm>
-#include <cstdio>
 #include <sys/types.h>
 
 #include <event2/event.h>
@@ -24,7 +20,7 @@
 #include "upnp.h"
 #include "utils.h"
 
-static char const* getKey(void)
+static char const* getKey()
 {
     return _("Port Forwarding");
 }
@@ -72,9 +68,6 @@ static char const* getNatStateStr(int state)
 
 static void natPulse(tr_shared* s, bool do_check)
 {
-    int oldStatus;
-    int newStatus;
-    tr_port public_peer_port;
     tr_port const private_peer_port = s->session->private_peer_port;
     bool const is_enabled = s->isEnabled && !s->isShuttingDown;
 
@@ -88,26 +81,39 @@ static void natPulse(tr_shared* s, bool do_check)
         s->upnp = tr_upnpInit();
     }
 
-    oldStatus = tr_sharedTraversalStatus(s);
+    auto const old_status = tr_sharedTraversalStatus(s);
 
-    s->natpmpStatus = tr_natpmpPulse(s->natpmp, private_peer_port, is_enabled, &public_peer_port);
+    auto public_peer_port = tr_port{};
+    auto received_private_port = tr_port{};
+    s->natpmpStatus = tr_natpmpPulse(s->natpmp, private_peer_port, is_enabled, &public_peer_port, &received_private_port);
 
     if (s->natpmpStatus == TR_PORT_MAPPED)
     {
         s->session->public_peer_port = public_peer_port;
+        s->session->private_peer_port = received_private_port;
+        tr_logAddNamedInfo(
+            getKey(),
+            "public peer port %d (private %d) ",
+            s->session->public_peer_port,
+            s->session->private_peer_port);
     }
 
-    s->upnpStatus = tr_upnpPulse(s->upnp, private_peer_port, is_enabled, do_check);
+    s->upnpStatus = tr_upnpPulse(
+        s->upnp,
+        private_peer_port,
+        is_enabled,
+        do_check,
+        tr_address_to_string(&s->session->bind_ipv4->addr));
 
-    newStatus = tr_sharedTraversalStatus(s);
+    auto const new_status = tr_sharedTraversalStatus(s);
 
-    if (newStatus != oldStatus)
+    if (new_status != old_status)
     {
         tr_logAddNamedInfo(
             getKey(),
             _("State changed from \"%1$s\" to \"%2$s\""),
-            getNatStateStr(oldStatus),
-            getNatStateStr(newStatus));
+            getNatStateStr(old_status),
+            getNatStateStr(new_status));
     }
 }
 
@@ -120,10 +126,10 @@ static void set_evtimer_from_status(tr_shared* s)
     switch (tr_sharedTraversalStatus(s))
     {
     case TR_PORT_MAPPED:
-        /* if we're mapped, everything is fine... check back in 20 minutes
+        /* if we're mapped, everything is fine... check back at renew_time
          * to renew the port forwarding if it's expired */
         s->doPortCheck = true;
-        sec = 60 * 20;
+        sec = std::max(0, int(s->natpmp->renew_time - tr_time()));
         break;
 
     case TR_PORT_ERROR:
@@ -143,7 +149,7 @@ static void set_evtimer_from_status(tr_shared* s)
     }
 }
 
-static void onTimer([[maybe_unused]] evutil_socket_t fd, [[maybe_unused]] short what, void* vshared)
+static void onTimer(evutil_socket_t /*fd*/, short /*what*/, void* vshared)
 {
     auto* s = static_cast<tr_shared*>(vshared);
 
@@ -164,7 +170,7 @@ static void onTimer([[maybe_unused]] evutil_socket_t fd, [[maybe_unused]] short 
 
 tr_shared* tr_sharedInit(tr_session* session)
 {
-    tr_shared* s = tr_new0(tr_shared, 1);
+    auto* const s = tr_new0(tr_shared, 1);
 
     s->session = session;
     s->isEnabled = false;

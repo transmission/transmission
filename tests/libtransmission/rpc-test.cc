@@ -1,10 +1,7 @@
-/*
- * This file Copyright (C) 2013-2014 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright (C) 2013-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #include "transmission.h"
 #include "rpcimpl.h"
@@ -16,7 +13,10 @@
 #include <algorithm>
 #include <array>
 #include <set>
+#include <string_view>
 #include <vector>
+
+using namespace std::literals;
 
 namespace libtransmission
 {
@@ -28,24 +28,17 @@ using RpcTest = SessionTest;
 
 TEST_F(RpcTest, list)
 {
-    size_t len;
     int64_t i;
-    char const* str;
+    auto sv = std::string_view{};
     tr_variant top;
 
-    tr_rpc_parse_list_str(&top, "12", TR_BAD_SIZE);
+    tr_rpc_parse_list_str(&top, "12"sv);
     EXPECT_TRUE(tr_variantIsInt(&top));
     EXPECT_TRUE(tr_variantGetInt(&top, &i));
     EXPECT_EQ(12, i);
     tr_variantFree(&top);
 
-    tr_rpc_parse_list_str(&top, "12", 1);
-    EXPECT_TRUE(tr_variantIsInt(&top));
-    EXPECT_TRUE(tr_variantGetInt(&top, &i));
-    EXPECT_EQ(1, i);
-    tr_variantFree(&top);
-
-    tr_rpc_parse_list_str(&top, "6,7", TR_BAD_SIZE);
+    tr_rpc_parse_list_str(&top, "6,7"sv);
     EXPECT_TRUE(tr_variantIsList(&top));
     EXPECT_EQ(2, tr_variantListSize(&top));
     EXPECT_TRUE(tr_variantGetInt(tr_variantListChild(&top, 0), &i));
@@ -54,14 +47,13 @@ TEST_F(RpcTest, list)
     EXPECT_EQ(7, i);
     tr_variantFree(&top);
 
-    tr_rpc_parse_list_str(&top, "asdf", TR_BAD_SIZE);
+    tr_rpc_parse_list_str(&top, "asdf"sv);
     EXPECT_TRUE(tr_variantIsString(&top));
-    EXPECT_TRUE(tr_variantGetStr(&top, &str, &len));
-    EXPECT_EQ(4, len);
-    EXPECT_STREQ("asdf", str);
+    EXPECT_TRUE(tr_variantGetStrView(&top, &sv));
+    EXPECT_EQ("asdf"sv, sv);
     tr_variantFree(&top);
 
-    tr_rpc_parse_list_str(&top, "1,3-5", TR_BAD_SIZE);
+    tr_rpc_parse_list_str(&top, "1,3-5"sv);
     EXPECT_TRUE(tr_variantIsList(&top));
     EXPECT_EQ(4, tr_variantListSize(&top));
     EXPECT_TRUE(tr_variantGetInt(tr_variantListChild(&top, 0), &i));
@@ -92,7 +84,7 @@ TEST_F(RpcTest, sessionGet)
 
     tr_variant request;
     tr_variantInitDict(&request, 1);
-    tr_variantDictAddStr(&request, TR_KEY_method, "session-get");
+    tr_variantDictAddStrView(&request, TR_KEY_method, "session-get");
     tr_variant response;
     tr_rpc_request_exec_json(session_, &request, rpc_response_func, &response);
     tr_variantFree(&request);

@@ -1,12 +1,13 @@
-/*
- * This file Copyright (C) 2013-2017 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2013-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
+#include <algorithm>
+#include <array>
+#include <cstring>
 #include <ctype.h> /* isalpha() */
+#include <string_view>
 
 #include <shlobj.h> /* SHCreateDirectoryEx() */
 #include <winioctl.h> /* FSCTL_SET_SPARSE */
@@ -17,6 +18,8 @@
 #include "file.h"
 #include "tr-assert.h"
 #include "utils.h"
+
+using namespace std::literals;
 
 #ifndef MAXSIZE_T
 #define MAXSIZE_T ((SIZE_T) ~((SIZE_T)0))
@@ -50,12 +53,14 @@ static void set_system_error(tr_error** error, DWORD code)
 
     if (message != nullptr)
     {
-        tr_error_set_literal(error, code, message);
+        tr_error_set(error, code, message);
         tr_free(message);
     }
     else
     {
-        tr_error_set(error, code, "Unknown error: 0x%08lx", code);
+        auto buf = std::array<char, 32>{};
+        tr_snprintf(std::data(buf), std::size(buf), "Unknown error: 0x%08lx", code);
+        tr_error_set(error, code, std::data(buf));
     }
 }
 
@@ -116,12 +121,12 @@ static constexpr bool is_slash(char c)
     return c == '\\' || c == '/';
 }
 
-static constexpr bool is_unc_path(char const* path)
+static constexpr bool is_unc_path(std::string_view path)
 {
-    return is_slash(path[0]) && path[1] == path[0];
+    return std::size(path) >= 2 && is_slash(path[0]) && path[1] == path[0];
 }
 
-static bool is_valid_path(char const* path)
+static bool is_valid_path(std::string_view path)
 {
     if (is_unc_path(path))
     {
@@ -132,24 +137,29 @@ static bool is_valid_path(char const* path)
     }
     else
     {
-        char const* colon_pos = strchr(path, ':');
+        auto pos = path.find(':');
 
-        if (colon_pos != nullptr)
+        if (pos != path.npos)
         {
-            if (colon_pos != path + 1 || !isalpha(path[0]))
+            if (pos != 1 || !isalpha(path[0]))
             {
                 return false;
             }
 
-            path += 2;
+            path.remove_prefix(2);
         }
     }
 
-    return strpbrk(path, "<>:\"|?*") == nullptr;
+    return path.find_first_of("<>:\"|?*"sv) == path.npos;
 }
 
-static wchar_t* path_to_native_path_ex(char const* path, int extra_chars_after, int* real_result_size)
+static wchar_t* path_to_native_path_ex(char const* path, int extra_chars_after, int* setme_real_result_size)
 {
+    if (path == nullptr)
+    {
+        return nullptr;
+    }
+
     /* Extending maximum path length limit up to ~32K. See "Naming Files, Paths, and Namespaces"
        (https://msdn.microsoft.com/en-us/library/windows/desktop/aa365247.aspx) for more info */
 
@@ -163,12 +173,15 @@ static wchar_t* path_to_native_path_ex(char const* path, int extra_chars_after, 
 
     /* TODO (?): TR_ASSERT(!is_relative); */
 
-    wchar_t* const wide_path = tr_win32_utf8_to_native_ex(path, -1, extra_chars_before, extra_chars_after, real_result_size);
+    int real_result_size = 0;
+    wchar_t* const wide_path = tr_win32_utf8_to_native_ex(path, -1, extra_chars_before, extra_chars_after, &real_result_size);
 
     if (wide_path == nullptr)
     {
         return nullptr;
     }
+
+    real_result_size += extra_chars_before;
 
     /* Relative paths cannot be used with "\\?\" prefixes. This also means that relative paths are
        limited to ~260 chars... but we should rarely work with relative paths in the first place */
@@ -194,9 +207,24 @@ static wchar_t* path_to_native_path_ex(char const* path, int extra_chars_after, 
         *p++ = L'\\';
     }
 
-    if (real_result_size != nullptr)
+    /* Squash multiple consecutive path separators into one to avoid ERROR_INVALID_NAME */
+    wchar_t* first_conseq_sep = wide_path + extra_chars_before;
+
+    while ((first_conseq_sep = std::wcsstr(first_conseq_sep, L"\\\\")) != nullptr)
     {
-        *real_result_size += extra_chars_before;
+        wchar_t const* last_conseq_sep = first_conseq_sep + 1;
+        while (*(last_conseq_sep + 1) == L'\\')
+        {
+            ++last_conseq_sep;
+        }
+
+        std::copy_n(last_conseq_sep, real_result_size - (last_conseq_sep - wide_path) + 1, first_conseq_sep);
+        real_result_size -= last_conseq_sep - first_conseq_sep;
+    }
+
+    if (setme_real_result_size != nullptr)
+    {
+        *setme_real_result_size = real_result_size;
     }
 
     return wide_path;
@@ -260,7 +288,7 @@ static tr_sys_file_t open_file(char const* path, DWORD access, DWORD disposition
     return ret;
 }
 
-static bool create_dir(char const* path, int flags, [[maybe_unused]] int permissions, bool okay_if_exists, tr_error** error)
+static bool create_dir(char const* path, int flags, int /*permissions*/, bool okay_if_exists, tr_error** error)
 {
     TR_ASSERT(path != nullptr);
 
@@ -458,18 +486,22 @@ bool tr_sys_path_get_info(char const* path, int flags, tr_sys_path_info* info, t
     return ret;
 }
 
-bool tr_sys_path_is_relative(char const* path)
+bool tr_sys_path_is_relative(std::string_view path)
 {
-    TR_ASSERT(path != nullptr);
-
     /* UNC path: `\\...`. */
     if (is_unc_path(path))
     {
         return false;
     }
 
-    /* Local path: `X:` or `X:\...`. */
-    if (isalpha(path[0]) && path[1] == ':' && (path[2] == '\0' || is_slash(path[2])))
+    /* Local path: `X:` */
+    if (std::size(path) == 2 && isalpha(path[0]) && path[1] == ':')
+    {
+        return false;
+    }
+
+    /* Local path: `X:\...`. */
+    if (std::size(path) > 2 && isalpha(path[0]) && path[1] == ':' && is_slash(path[2]))
     {
         return false;
     }
@@ -614,9 +646,9 @@ cleanup:
     return ret;
 }
 
-char* tr_sys_path_basename(char const* path, tr_error** error)
+char* tr_sys_path_basename(std::string_view path, tr_error** error)
 {
-    if (tr_str_is_empty(path))
+    if (std::empty(path))
     {
         return tr_strdup(".");
     }
@@ -627,21 +659,22 @@ char* tr_sys_path_basename(char const* path, tr_error** error)
         return nullptr;
     }
 
-    char const* end = path + strlen(path);
+    char const* const begin = std::data(path);
+    char const* end = begin + std::size(path);
 
-    while (end > path && is_slash(*(end - 1)))
+    while (end > begin && is_slash(*(end - 1)))
     {
         --end;
     }
 
-    if (end == path)
+    if (end == begin)
     {
         return tr_strdup("/");
     }
 
     char const* name = end;
 
-    while (name > path && *(name - 1) != ':' && !is_slash(*(name - 1)))
+    while (name > begin && *(name - 1) != ':' && !is_slash(*(name - 1)))
     {
         --name;
     }
@@ -654,9 +687,9 @@ char* tr_sys_path_basename(char const* path, tr_error** error)
     return tr_strndup(name, end - name);
 }
 
-char* tr_sys_path_dirname(char const* path, tr_error** error)
+char* tr_sys_path_dirname(std::string_view path, tr_error** error)
 {
-    if (tr_str_is_empty(path))
+    if (std::empty(path))
     {
         return tr_strdup(".");
     }
@@ -671,44 +704,45 @@ char* tr_sys_path_dirname(char const* path, tr_error** error)
 
     if (is_unc && path[2] == '\0')
     {
-        return tr_strdup(path);
+        return tr_strvDup(path);
     }
 
-    char const* end = path + strlen(path);
+    char const* const begin = std::data(path);
+    char const* end = begin + std::size(path);
 
-    while (end > path && is_slash(*(end - 1)))
+    while (end > begin && is_slash(*(end - 1)))
     {
         --end;
     }
 
-    if (end == path)
+    if (end == begin)
     {
         return tr_strdup("/");
     }
 
     char const* name = end;
 
-    while (name > path && *(name - 1) != ':' && !is_slash(*(name - 1)))
+    while (name > begin && *(name - 1) != ':' && !is_slash(*(name - 1)))
     {
         --name;
     }
 
-    while (name > path && is_slash(*(name - 1)))
+    while (name > begin && is_slash(*(name - 1)))
     {
         --name;
     }
 
-    if (name == path)
+    if (name == begin)
     {
         return tr_strdup(is_unc ? "\\\\" : ".");
     }
 
-    if (name > path && *(name - 1) == ':' && *name != '\0' && !is_slash(*name))
+    if (name > begin && *(name - 1) == ':' && *name != '\0' && !is_slash(*name))
     {
-        return tr_strdup_printf("%c:.", path[0]);
+        return tr_strdup_printf("%c:.", begin[0]);
     }
 
-    return tr_strndup(path, name - path);
+    return tr_strndup(begin, name - begin);
 }
 
 bool tr_sys_path_rename(char const* src_path, char const* dst_path, tr_error** error)
@@ -875,7 +909,7 @@ tr_sys_file_t tr_sys_file_get_std(tr_std_sys_file_t std_file, tr_error** error)
     return ret;
 }
 
-tr_sys_file_t tr_sys_file_open(char const* path, int flags, [[maybe_unused]] int permissions, tr_error** error)
+tr_sys_file_t tr_sys_file_open(char const* path, int flags, int /*permissions*/, tr_error** error)
 {
     TR_ASSERT(path != nullptr);
     TR_ASSERT((flags & (TR_SYS_FILE_READ | TR_SYS_FILE_WRITE)) != 0);
@@ -998,9 +1032,9 @@ bool tr_sys_file_get_info(tr_sys_file_t handle, tr_sys_path_info* info, tr_error
 
 bool tr_sys_file_seek(tr_sys_file_t handle, int64_t offset, tr_seek_origin_t origin, uint64_t* new_offset, tr_error** error)
 {
-    TR_STATIC_ASSERT(TR_SEEK_SET == FILE_BEGIN, "values should match");
-    TR_STATIC_ASSERT(TR_SEEK_CUR == FILE_CURRENT, "values should match");
-    TR_STATIC_ASSERT(TR_SEEK_END == FILE_END, "values should match");
+    static_assert(TR_SEEK_SET == FILE_BEGIN, "values should match");
+    static_assert(TR_SEEK_CUR == FILE_CURRENT, "values should match");
+    static_assert(TR_SEEK_END == FILE_END, "values should match");
 
     TR_ASSERT(handle != TR_BAD_SYS_FILE);
     TR_ASSERT(origin == TR_SEEK_SET || origin == TR_SEEK_CUR || origin == TR_SEEK_END);
@@ -1209,10 +1243,10 @@ bool tr_sys_file_truncate(tr_sys_file_t handle, uint64_t size, tr_error** error)
 
 bool tr_sys_file_advise(
     [[maybe_unused]] tr_sys_file_t handle,
-    [[maybe_unused]] uint64_t offset,
+    uint64_t /*offset*/,
     [[maybe_unused]] uint64_t size,
     [[maybe_unused]] tr_sys_file_advice_t advice,
-    [[maybe_unused]] tr_error** error)
+    tr_error** /*error*/)
 {
     TR_ASSERT(handle != TR_BAD_SYS_FILE);
     TR_ASSERT(size > 0);
@@ -1251,7 +1285,7 @@ void* tr_sys_file_map_for_reading(tr_sys_file_t handle, uint64_t offset, uint64_
     if (size > MAXSIZE_T)
     {
         set_system_error(error, ERROR_INVALID_PARAMETER);
-        return false;
+        return nullptr;
     }
 
     void* ret = nullptr;
@@ -1387,7 +1421,7 @@ tr_sys_dir_t tr_sys_dir_open(char const* path, tr_error** error)
 {
 #ifndef __clang__
     /* Clang gives "static_assert expression is not an integral constant expression" error */
-    TR_STATIC_ASSERT(TR_BAD_SYS_DIR == nullptr, "values should match");
+    static_assert(TR_BAD_SYS_DIR == nullptr, "values should match");
 #endif
 
     TR_ASSERT(path != nullptr);

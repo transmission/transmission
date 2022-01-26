@@ -1,22 +1,22 @@
-/*
- * This file Copyright (C) 2009-2015 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2009-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #pragma once
 
+#include <ctime>
 #include <memory>
 #include <unordered_set>
 
 #include <QApplication>
+#include <QRegularExpression>
 #include <QTimer>
 #include <QTranslator>
 
+#include <libtransmission/tr-macros.h>
+
 #include "FaviconCache.h"
-#include "Macros.h"
 #include "Typedefs.h"
 #include "Utils.h" // std::hash<QString>
 
@@ -27,6 +27,7 @@ class Torrent;
 class TorrentModel;
 class MainWindow;
 class WatchDir;
+class Torrent;
 
 class Application : public QApplication
 {
@@ -37,7 +38,7 @@ public:
     Application(int& argc, char** argv);
 
     void raise() const;
-    bool notifyApp(QString const& title, QString const& body) const;
+    bool notifyApp(QString const& title, QString const& body, QStringList const& actions = {}) const;
 
     QString const& intern(QString const& in)
     {
@@ -60,12 +61,16 @@ private slots:
     void refreshPref(int key) const;
     void refreshTorrents();
     void saveGeometry() const;
+#ifdef QT_DBUS_LIB
+    void onNotificationActionInvoked(quint32 notification_id, QString action_key);
+#endif
 
 private:
     void maybeUpdateBlocklist() const;
     void loadTranslations();
     QStringList getNames(torrent_ids_t const& ids) const;
     void quitLater() const;
+    void notifyTorrentAdded(Torrent const*) const;
 
     std::unique_ptr<Prefs> prefs_;
     std::unique_ptr<Session> session_;
@@ -84,6 +89,13 @@ private:
     QString const display_name_ = QStringLiteral("transmission-qt");
 
     std::unordered_set<QString> interned_strings_;
+
+#ifdef QT_DBUS_LIB
+    QString const fdo_notifications_service_name_ = QStringLiteral("org.freedesktop.Notifications");
+    QString const fdo_notifications_path_ = QStringLiteral("/org/freedesktop/Notifications");
+    QString const fdo_notifications_interface_name_ = QStringLiteral("org.freedesktop.Notifications");
+    QRegularExpression const start_now_regex_;
+#endif
 };
 
 #define trApp static_cast<Application*>(Application::instance())

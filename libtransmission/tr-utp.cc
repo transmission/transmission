@@ -1,29 +1,10 @@
-/*
-Copyright (c) 2010 by Juliusz Chroboczek
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
-
-*/
+// This file Copyright © 2010 Juliusz Chroboczek.
+// It may be used under the MIT (SPDX: MIT) license.
+// License text can be found in the licenses/ folder.
 
 #include <event2/event.h>
 
-#include <stdint.h>
+#include <cstdint>
 #include <libutp/utp.h>
 
 #include "transmission.h"
@@ -33,82 +14,80 @@ THE SOFTWARE.
 #include "crypto-utils.h" /* tr_rand_int_weak() */
 #include "peer-mgr.h"
 #include "peer-socket.h"
-#include "tr-assert.h"
 #include "tr-utp.h"
 #include "utils.h"
 
 #ifndef WITH_UTP
 
-#define MY_NAME "UTP"
+static char constexpr MyName[] = "UTP";
 
-#define dbgmsg(...) tr_logAddDeepNamed(MY_NAME, __VA_ARGS__)
+#define dbgmsg(...) tr_logAddDeepNamed(MyName, __VA_ARGS__)
 
 void UTP_Close(struct UTPSocket* socket)
 {
-    tr_logAddNamedError(MY_NAME, "UTP_Close(%p) was called.", socket);
+    tr_logAddNamedError(MyName, "UTP_Close(%p) was called.", socket);
     dbgmsg("UTP_Close(%p) was called.", socket);
 }
 
 void UTP_RBDrained(struct UTPSocket* socket)
 {
-    tr_logAddNamedError(MY_NAME, "UTP_RBDrained(%p) was called.", socket);
+    tr_logAddNamedError(MyName, "UTP_RBDrained(%p) was called.", socket);
     dbgmsg("UTP_RBDrained(%p) was called.", socket);
 }
 
 bool UTP_Write(struct UTPSocket* socket, size_t count)
 {
-    tr_logAddNamedError(MY_NAME, "UTP_RBDrained(%p, %zu) was called.", socket, count);
+    tr_logAddNamedError(MyName, "UTP_RBDrained(%p, %zu) was called.", socket, count);
     dbgmsg("UTP_RBDrained(%p, %zu) was called.", socket, count);
     return false;
 }
 
 int tr_utpPacket(
-    [[maybe_unused]] unsigned char const* buf,
-    [[maybe_unused]] size_t buflen,
-    [[maybe_unused]] struct sockaddr const* from,
-    [[maybe_unused]] socklen_t fromlen,
-    [[maybe_unused]] tr_session* ss)
+    unsigned char const* /*buf*/,
+    size_t /*buflen*/,
+    sockaddr const* /*from*/,
+    socklen_t /*fromlen*/,
+    tr_session* /*ss*/)
 {
     return -1;
 }
 
 struct UTPSocket* UTP_Create(
-    [[maybe_unused]] SendToProc* send_to_proc,
-    [[maybe_unused]] void* send_to_userdata,
-    [[maybe_unused]] struct sockaddr const* addr,
-    [[maybe_unused]] socklen_t addrlen)
+    SendToProc* /*send_to_proc*/,
+    void* /*send_to_userdata*/,
+    sockaddr const* /*addr*/,
+    socklen_t /*addrlen*/)
 {
     errno = ENOSYS;
     return nullptr;
 }
 
-void tr_utpClose([[maybe_unused]] tr_session* ss)
+void tr_utpClose(tr_session* /*ss*/)
 {
 }
 
 void tr_utpSendTo(
-    [[maybe_unused]] void* closure,
-    [[maybe_unused]] unsigned char const* buf,
-    [[maybe_unused]] size_t buflen,
-    [[maybe_unused]] struct sockaddr const* to,
-    [[maybe_unused]] socklen_t tolen)
+    void* /*closure*/,
+    unsigned char const* /*buf*/,
+    size_t /*buflen*/,
+    struct sockaddr const* /*to*/,
+    socklen_t /*tolen*/)
 {
 }
 
 #else
 
 /* Greg says 50ms works for them. */
-
-#define UTP_INTERVAL_US 50000
+static auto constexpr UtpIntervalUs = int{ 50000 };
 
 static void incoming(void* vsession, struct UTPSocket* s)
 {
     auto* session = static_cast<tr_session*>(vsession);
     struct sockaddr_storage from_storage;
-    struct sockaddr* from = (struct sockaddr*)&from_storage;
+    auto* const from = (struct sockaddr*)&from_storage;
     socklen_t fromlen = sizeof(from_storage);
     tr_address addr;
-    tr_port port;
+    tr_port port = 0;
 
     if (!tr_sessionIsUTPEnabled(session))
     {
@@ -134,23 +113,23 @@ void tr_utpSendTo(void* closure, unsigned char const* buf, size_t buflen, struct
 
     if (to->sa_family == AF_INET && ss->udp_socket != TR_BAD_SOCKET)
     {
-        sendto(ss->udp_socket, reinterpret_cast<char const*>(buf), buflen, 0, to, tolen);
+        (void)sendto(ss->udp_socket, reinterpret_cast<char const*>(buf), buflen, 0, to, tolen);
     }
     else if (to->sa_family == AF_INET6 && ss->udp6_socket != TR_BAD_SOCKET)
     {
-        sendto(ss->udp6_socket, reinterpret_cast<char const*>(buf), buflen, 0, to, tolen);
+        (void)sendto(ss->udp6_socket, reinterpret_cast<char const*>(buf), buflen, 0, to, tolen);
     }
 }
 
 static void reset_timer(tr_session* ss)
 {
-    int sec;
-    int usec;
+    int sec = 0;
+    int usec = 0;
 
     if (tr_sessionIsUTPEnabled(ss))
     {
         sec = 0;
-        usec = UTP_INTERVAL_US / 2 + tr_rand_int_weak(UTP_INTERVAL_US);
+        usec = UtpIntervalUs / 2 + tr_rand_int_weak(UtpIntervalUs);
     }
     else
     {
@@ -166,7 +145,7 @@ static void reset_timer(tr_session* ss)
     tr_timerAdd(ss->utp_timer, sec, usec);
 }
 
-static void timer_callback([[maybe_unused]] evutil_socket_t s, [[maybe_unused]] short type, void* vsession)
+static void timer_callback(evutil_socket_t /*s*/, short /*type*/, void* vsession)
 {
     auto* session = static_cast<tr_session*>(vsession);
     UTP_CheckTimeouts();

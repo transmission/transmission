@@ -1,10 +1,7 @@
-/*
- * This file Copyright (C) 2012-2015 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2012-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #include <array>
 
@@ -15,6 +12,43 @@
 #include <QStandardPaths>
 
 #include "FaviconCache.h"
+
+/***
+****
+***/
+
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+Q_NETWORK_EXPORT bool qIsEffectiveTLD(QStringView domain);
+#endif
+
+namespace
+{
+
+QString getTopLevelDomain(QUrl const& url)
+{
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+
+    auto const host = url.host();
+    auto const dot = QChar(QLatin1Char('.'));
+
+    for (auto dot_pos = host.indexOf(dot); dot_pos != -1; dot_pos = host.indexOf(dot, dot_pos + 1))
+    {
+        if (qIsEffectiveTLD(QStringView(&host.data()[dot_pos + 1], host.size() - dot_pos - 1)))
+        {
+            return host.mid(dot_pos);
+        }
+    }
+
+    return {};
+
+#else
+
+    return url.topLevelDomain();
+
+#endif
+}
+
+} // namespace
 
 /***
 ****
@@ -107,7 +141,10 @@ void FaviconCache::ensureCacheDirHasBeenScanned()
 QString FaviconCache::getDisplayName(Key const& key)
 {
     auto name = key;
-    name[0] = name.at(0).toTitleCase();
+    if (!name.isEmpty())
+    {
+        name.front() = name.front().toTitleCase();
+    }
     return name;
 }
 
@@ -116,7 +153,7 @@ FaviconCache::Key FaviconCache::getKey(QUrl const& url)
     auto host = url.host();
 
     // remove tld
-    auto const suffix = url.topLevelDomain();
+    auto const suffix = getTopLevelDomain(url);
     host.truncate(host.size() - suffix.size());
 
     // remove subdomain
