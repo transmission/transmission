@@ -6,6 +6,7 @@
 #include <condition_variable>
 #include <list>
 #include <mutex>
+#include <thread>
 
 #include <csignal>
 
@@ -15,6 +16,7 @@
 
 #include <event2/dns.h>
 #include <event2/event.h>
+#include <event2/thread.h>
 
 #include "transmission.h"
 
@@ -25,6 +27,133 @@
 #include "tr-assert.h"
 #include "trevent.h"
 #include "utils.h"
+
+/***
+****
+***/
+
+namespace
+{
+namespace impl
+{
+struct std_lock
+{
+    std::mutex mutex;
+    std::unique_lock<std::mutex> lock = std::unique_lock<std::mutex>(mutex);
+};
+
+void* std_lock_alloc(unsigned /*locktype*/)
+{
+    return new std_lock{};
+}
+
+void std_lock_free(void* lock_, unsigned /*locktype*/)
+{
+    delete static_cast<std_lock*>(lock_);
+}
+
+int std_lock_lock(unsigned mode, void* lock_)
+{
+    try
+    {
+        auto* lock = static_cast<std_lock*>(lock_);
+        if (mode & EVTHREAD_TRY)
+        {
+            auto const success = lock->lock.try_lock();
+            return success ? 0 : -1;
+        }
+        lock->lock.lock();
+        return 0;
+    }
+    catch (std::system_error const& /*e*/)
+    {
+        return -1;
+    }
+}
+
+int std_lock_unlock(unsigned /*mode*/, void* lock_)
+{
+    try
+    {
+        auto* lock = static_cast<std_lock*>(lock_);
+        lock->lock.unlock();
+        return 0;
+    }
+    catch (std::system_error const& /*e*/)
+    {
+        return -1;
+    }
+}
+
+void* std_cond_alloc(unsigned /*condflags*/)
+{
+    return new std::condition_variable();
+}
+
+void std_cond_free(void* cond_)
+{
+    delete static_cast<std::condition_variable*>(cond_);
+}
+
+int std_cond_signal(void* cond_, int broadcast)
+{
+    auto* cond = static_cast<std::condition_variable*>(cond_);
+    if (broadcast)
+    {
+        cond->notify_all();
+    }
+    else
+    {
+        cond->notify_one();
+    }
+    return 0;
+}
+
+int std_cond_wait(void* cond_, void* lock_, struct timeval const* tv)
+{
+    auto* cond = static_cast<std::condition_variable*>(cond_);
+    auto* lock = static_cast<std_lock*>(lock_);
+    if (tv == nullptr)
+    {
+        cond->wait(lock->lock);
+        return 0;
+    }
+
+    auto duration = std::chrono::seconds(tv->tv_sec) + std::chrono::microseconds(tv->tv_usec);
+    auto const success = cond->wait_for(lock->lock, duration);
+    return success == std::cv_status::timeout ? 1 : 0;
+}
+
+unsigned long std_get_thread_id()
+{
+    return std::hash<std::thread::id>{}(std::this_thread::get_id());
+}
+
+} // namespace impl
+
+void tr_evthread_init()
+{
+    auto constexpr cbs = evthread_lock_callbacks{
+        1 /* EVTHREAD_LOCK_API_VERSION */,
+        EVTHREAD_LOCKTYPE_RECURSIVE,
+        impl::std_lock_alloc,
+        impl::std_lock_free,
+        impl::std_lock_lock,
+        impl::std_lock_unlock,
+    };
+    evthread_set_lock_callbacks(&cbs);
+
+    auto constexpr cond_cbs = evthread_condition_callbacks{ 1 /* EVTHREAD_CONDITION_API_VERSION */,
+                                                            impl::std_cond_alloc,
+                                                            impl::std_cond_free,
+                                                            impl::std_cond_signal,
+                                                            impl::std_cond_wait };
+    evthread_set_condition_callbacks(&cond_cbs);
+
+    evthread_set_id_callback(impl::std_get_thread_id);
+}
+
+} // namespace
 
 /***
 ****
@@ -54,15 +183,34 @@ struct tr_event_handle
     };
 
     using work_queue_t = std::list<callback>;
-    std::condition_variable work_queue_cv;
     work_queue_t work_queue;
     std::mutex work_queue_mutex;
-    bool work_queue_die = false;
+    event* work_queue_event = nullptr;
 
-    struct event_base* base = nullptr;
+    event_base* base = nullptr;
     tr_session* session = nullptr;
     tr_thread* thread = nullptr;
 };
+
+static void onWorkAvailable(evutil_socket_t /*fd*/, short /*flags*/, void* vsession)
+{
+    // invariant
+    auto* const session = static_cast<tr_session*>(vsession);
+    TR_ASSERT(tr_amInEventThread(session));
+
+    // steal the work queue
+    auto* events = session->events;
+    auto work_queue_lock = std::unique_lock(events->work_queue_mutex);
+    auto work_queue = tr_event_handle::work_queue_t{};
+    std::swap(work_queue, events->work_queue);
+    work_queue_lock.unlock();
+
+    // process the work queue
+    for (auto const& work : work_queue)
+    {
+        work.invoke();
+    }
+}
 
 static void libeventThreadFunc(void* vevents)
 {
@@ -73,33 +221,24 @@ static void libeventThreadFunc(void* vevents)
     signal(SIGPIPE, SIG_IGN);
 #endif
 
+    tr_evthread_init();
+
     // create the libevent base
     auto* const base = event_base_new();
 
     // initialize the session struct's event fields
     events->base = base;
+    events->work_queue_event = evuser_new(base, onWorkAvailable, events->session);
     events->session->event_base = base;
     events->session->evdns_base = evdns_base_new(base, true);
     events->session->events = events;
 
-    while (!events->work_queue_die)
-    {
-        auto work_queue_lock = std::unique_lock(events->work_queue_mutex);
-        auto callback = tr_event_handle::callback{};
-        events->work_queue_cv.wait(work_queue_lock);
-
-        auto work_queue = tr_event_handle::work_queue_t{};
-        std::swap(work_queue, events->work_queue);
-        work_queue_lock.unlock();
-
-        for (auto const& work : work_queue)
-        {
-            work.invoke();
-        }
-    }
+    event_base_dispatch(base);
 
     // shut down the thread
     event_base_free(base);
+    events->session->event_base = nullptr;
+    events->session->evdns_base = nullptr;
     events->session->events = nullptr;
     delete events;
     tr_logAddDebug("Closing libevent thread");
@@ -130,8 +269,7 @@ void tr_eventClose(tr_session* session)
         return;
     }
 
-    events->work_queue_die = true;
-    events->work_queue_cv.notify_one();
+    event_base_loopexit(events->base, nullptr);
 
     if (tr_logGetDeepEnabled())
     {
@@ -167,8 +305,8 @@ void tr_runInEventThread(tr_session* session, void (*func)(void*), void* user_da
     }
     else
     {
-        auto const lock = std::unique_lock(events->work_queue_mutex);
+        auto const lock = std::scoped_lock(events->work_queue_mutex);
         events->work_queue.emplace_back(func, user_data);
-        events->work_queue_cv.notify_one();
+        event_active(events->work_queue_event, 0, {});
     }
 }
