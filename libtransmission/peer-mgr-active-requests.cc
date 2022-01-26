@@ -1,10 +1,7 @@
-/*
- * This file Copyright (C) 2021 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2021-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #include <algorithm>
 #include <ctime>
@@ -35,7 +32,7 @@ struct peer_at
     {
     }
 
-    int compare(peer_at const& that) const // <=>
+    [[nodiscard]] int compare(peer_at const& that) const // <=>
     {
         if (peer != that.peer)
         {
@@ -226,7 +223,7 @@ std::vector<std::pair<tr_block_index_t, tr_peer*>> ActiveRequests::sentBefore(ti
 
     for (auto& [block, peers_at] : impl_->blocks_)
     {
-        for (auto& sent : peers_at)
+        for (auto const& sent : peers_at)
         {
             if (sent.when < when)
             {

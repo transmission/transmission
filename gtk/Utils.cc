@@ -1,10 +1,7 @@
-/*
- * This file Copyright (C) 2008-2021 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2008-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #include <array>
 #include <ctype.h> /* isxdigit() */
@@ -424,11 +421,11 @@ Gtk::ComboBox* gtr_combo_box_new_enum(std::vector<std::pair<Glib::ustring, int>>
 {
     auto store = Gtk::ListStore::create(enum_combo_cols);
 
-    for (auto const& item : items)
+    for (auto const& [label, value] : items)
     {
         auto const iter = store->append();
-        (*iter)[enum_combo_cols.value] = item.second;
-        (*iter)[enum_combo_cols.label] = item.first;
+        (*iter)[enum_combo_cols.value] = value;
+        (*iter)[enum_combo_cols.label] = label;
     }
 
     auto w = Gtk::make_managed<Gtk::ComboBox>(static_cast<Glib::RefPtr<Gtk::TreeModel> const&>(store));

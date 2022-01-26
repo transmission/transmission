@@ -1,24 +1,6 @@
-/******************************************************************************
- * Copyright (c) Transmission authors and contributors
- *
- * Permission is hereby granted, free of charge, to any person obtaining a
- * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
- * DEALINGS IN THE SOFTWARE.
- *****************************************************************************/
+// This file Copyright © 2010 Transmission authors and contributors.
+// It may be used under the MIT (SPDX: MIT) license.
+// License text can be found in the licenses/ folder.
 
 #include <algorithm>
 #include <array>
@@ -656,15 +638,14 @@ static int tr_globalAddress(int af, void* addr, int* addr_len)
 }
 
 /* Return our global IPv6 address, with caching. */
-unsigned char const* tr_globalIPv6(void)
+unsigned char const* tr_globalIPv6(tr_session const* session)
 {
     static unsigned char ipv6[16];
     static time_t last_time = 0;
     static bool have_ipv6 = false;
-    time_t const now = tr_time();
 
     /* Re-check every half hour */
-    if (last_time < now - 1800)
+    if (auto const now = tr_time(); last_time < now - 1800)
     {
         int addrlen = 16;
         int const rc = tr_globalAddress(AF_INET6, ipv6, &addrlen);
@@ -672,7 +653,30 @@ unsigned char const* tr_globalIPv6(void)
         last_time = now;
     }
 
-    return have_ipv6 ? ipv6 : nullptr;
+    if (!have_ipv6)
+    {
+        return nullptr; /* No IPv6 address at all. */
+    }
+
+    /* Return the default address. This is useful for checking
+       for connectivity in general. */
+    if (session == nullptr)
+    {
+        return ipv6;
+    }
+
+    /* We have some sort of address, now make sure that we return
+       our bound address if non-default. */
+
+    bool is_default = false;
+    auto const* ipv6_bindaddr = tr_sessionGetPublicAddress(session, TR_AF_INET6, &is_default);
+    if (ipv6_bindaddr != nullptr && !is_default)
+    {
+        /* Explicitly bound. Return that address. */
+        memcpy(ipv6, ipv6_bindaddr->addr.addr6.s6_addr, 16);
+    }
+
+    return ipv6;
 }
 
 /***

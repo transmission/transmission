@@ -1,10 +1,7 @@
-/*
- * This file Copyright (C) 2008-2014 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2008-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #include <algorithm> // std::partial_sort(), std::min(), std::max()
 #include <cerrno> /* ENOENT */
@@ -139,13 +136,6 @@ void tr_sessionSetEncryption(tr_session* session, tr_encryption_mode mode)
 /***
 ****
 ***/
-
-struct tr_bindinfo
-{
-    tr_socket_t socket;
-    tr_address addr;
-    struct event* ev;
-};
 
 static void close_bindinfo(struct tr_bindinfo* b)
 {
@@ -1250,7 +1240,7 @@ void tr_sessionSetPeerPort(tr_session* session, tr_port port)
 
 tr_port tr_sessionGetPeerPort(tr_session const* session)
 {
-    return tr_isSession(session) ? session->private_peer_port : 0;
+    return tr_isSession(session) ? session->public_peer_port : 0;
 }
 
 tr_port tr_sessionSetPeerPortRandom(tr_session* session)
@@ -1820,8 +1810,6 @@ static void sessionCloseImplStart(tr_session* session)
 {
     session->is_closing_ = true;
 
-    free_incoming_peer_port(session);
-
     if (session->isLPDEnabled)
     {
         tr_lpdUninit(session);
@@ -1838,6 +1826,8 @@ static void sessionCloseImplStart(tr_session* session)
 
     tr_verifyClose(session);
     tr_sharedClose(session);
+
+    free_incoming_peer_port(session);
     session->rpc_server_.reset();
 
     /* Close the torrents. Get the most active ones first so that
@@ -2456,7 +2446,7 @@ int tr_blocklistSetContent(tr_session* session, char const* contentFilename)
 
 bool tr_sessionIsAddressBlocked(tr_session const* session, tr_address const* addr)
 {
-    auto& src = session->blocklists;
+    auto const& src = session->blocklists;
     return std::any_of(
         std::begin(src),
         std::end(src),
@@ -2812,7 +2802,9 @@ int tr_sessionCountQueueFreeSlots(tr_session* session, tr_direction dir)
         {
             auto const idle_secs = int(difftime(now, std::max(tor->startDate, tor->activityDate)));
             if (idle_secs >= stalled_if_idle_for_n_seconds)
+            {
                 continue;
+            }
         }
 
         ++active_count;
@@ -2843,6 +2835,7 @@ void tr_sessionRemoveTorrent(tr_session* session, tr_torrent* tor)
 
 tr_torrent* tr_session::getTorrent(std::string_view info_dict_hash_string)
 {
-    auto info_dict_hash = tr_sha1_from_string(std::data(info_dict_hash_string));
-    return this->getTorrent(info_dict_hash);
+    return std::size(info_dict_hash_string) == TR_SHA1_DIGEST_STRLEN ?
+        this->getTorrent(tr_sha1_from_string(info_dict_hash_string)) :
+        nullptr;
 }

@@ -10,6 +10,7 @@
           <attribute name="action">win.open-torrent</attribute>
           <attribute name="icon">document-open</attribute>
           <attribute name="label" translatable="yes">_Open</attribute>
+          <attribute name="accel">&lt;control&gt;O</attribute>
           <attribute name="tooltip" translatable="yes">Open a torrent</attribute>
         </item>
         <item>

@@ -1,10 +1,7 @@
-/*
- * This file Copyright (C) Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright (C) 2021-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #include <algorithm>
 #include <type_traits>
@@ -76,7 +73,6 @@ protected:
 TEST_F(PeerMgrWishlistTest, doesNotRequestPiecesThatCannotBeRequested)
 {
     auto peer_info = MockPeerInfo{};
-    auto wishlist = Wishlist{};
 
     // setup: three pieces, all missing
     peer_info.piece_count_ = 3;
@@ -95,7 +91,7 @@ TEST_F(PeerMgrWishlistTest, doesNotRequestPiecesThatCannotBeRequested)
     }
 
     // we should only get the first piece back
-    auto spans = wishlist.next(peer_info, 1000);
+    auto spans = Wishlist::next(peer_info, 1000);
     ASSERT_EQ(1, std::size(spans));
     EXPECT_EQ(peer_info.block_span_[0].begin, spans[0].begin);
     EXPECT_EQ(peer_info.block_span_[0].end, spans[0].end);
@@ -104,7 +100,6 @@ TEST_F(PeerMgrWishlistTest, doesNotRequestPiecesThatCannotBeRequested)
 TEST_F(PeerMgrWishlistTest, doesNotRequestBlocksThatCannotBeRequested)
 {
     auto peer_info = MockPeerInfo{};
-    auto wishlist = Wishlist{};
 
     // setup: three pieces, all missing
     peer_info.piece_count_ = 3;
@@ -129,7 +124,7 @@ TEST_F(PeerMgrWishlistTest, doesNotRequestBlocksThatCannotBeRequested)
 
     // even if we ask wishlist for more blocks than exist,
     // it should omit blocks 1-10 from the return set
-    auto spans = wishlist.next(peer_info, 1000);
+    auto spans = Wishlist::next(peer_info, 1000);
     auto requested = tr_bitfield(250);
     for (auto const& span : spans)
     {
@@ -143,7 +138,6 @@ TEST_F(PeerMgrWishlistTest, doesNotRequestBlocksThatCannotBeRequested)
 TEST_F(PeerMgrWishlistTest, doesNotRequestTooManyBlocks)
 {
     auto peer_info = MockPeerInfo{};
-    auto wishlist = Wishlist{};
 
     // setup: three pieces, all missing
     peer_info.piece_count_ = 3;
@@ -167,7 +161,7 @@ TEST_F(PeerMgrWishlistTest, doesNotRequestTooManyBlocks)
     // but we only ask for 10 blocks,
     // so that's how many we should get back
     auto const n_wanted = 10;
-    auto const spans = wishlist.next(peer_info, n_wanted);
+    auto const spans = Wishlist::next(peer_info, n_wanted);
     auto n_got = size_t{};
     for (auto const& span : spans)
     {
@@ -179,7 +173,6 @@ TEST_F(PeerMgrWishlistTest, doesNotRequestTooManyBlocks)
 TEST_F(PeerMgrWishlistTest, prefersHighPriorityPieces)
 {
     auto peer_info = MockPeerInfo{};
-    auto wishlist = Wishlist{};
 
     // setup: three pieces, all missing
     peer_info.piece_count_ = 3;
@@ -212,7 +205,7 @@ TEST_F(PeerMgrWishlistTest, prefersHighPriorityPieces)
     for (int run = 0; run < num_runs; ++run)
     {
         auto const n_wanted = 10;
-        auto spans = wishlist.next(peer_info, n_wanted);
+        auto spans = Wishlist::next(peer_info, n_wanted);
         auto n_got = size_t{};
         for (auto const& span : spans)
         {
@@ -230,7 +223,6 @@ TEST_F(PeerMgrWishlistTest, prefersHighPriorityPieces)
 TEST_F(PeerMgrWishlistTest, onlyRequestsDupesDuringEndgame)
 {
     auto peer_info = MockPeerInfo{};
-    auto wishlist = Wishlist{};
 
     // setup: three pieces, all missing
     peer_info.piece_count_ = 3;
@@ -259,7 +251,7 @@ TEST_F(PeerMgrWishlistTest, onlyRequestsDupesDuringEndgame)
 
     // even if we ask wishlist to list more blocks than exist,
     // those first 150 should be omitted from the return list
-    auto spans = wishlist.next(peer_info, 1000);
+    auto spans = Wishlist::next(peer_info, 1000);
     auto requested = tr_bitfield(300);
     for (auto const& span : spans)
     {
@@ -272,7 +264,7 @@ TEST_F(PeerMgrWishlistTest, onlyRequestsDupesDuringEndgame)
     // BUT during endgame it's OK to request dupes,
     // so then we _should_ see the first 150 in the list
     peer_info.is_endgame_ = true;
-    spans = wishlist.next(peer_info, 1000);
+    spans = Wishlist::next(peer_info, 1000);
     requested = tr_bitfield(300);
     for (auto const& span : spans)
     {
@@ -286,7 +278,6 @@ TEST_F(PeerMgrWishlistTest, onlyRequestsDupesDuringEndgame)
 TEST_F(PeerMgrWishlistTest, prefersNearlyCompletePieces)
 {
     auto peer_info = MockPeerInfo{};
-    auto wishlist = Wishlist{};
 
     // setup: three pieces, same size
     peer_info.piece_count_ = 3;
@@ -323,7 +314,7 @@ TEST_F(PeerMgrWishlistTest, prefersNearlyCompletePieces)
     auto const num_runs = 1000;
     for (int run = 0; run < num_runs; ++run)
     {
-        auto const ranges = wishlist.next(peer_info, 10);
+        auto const ranges = Wishlist::next(peer_info, 10);
         auto requested = tr_bitfield(300);
         for (auto const& range : ranges)
         {
@@ -339,7 +330,7 @@ TEST_F(PeerMgrWishlistTest, prefersNearlyCompletePieces)
     // those blocks should be next in line.
     for (int run = 0; run < num_runs; ++run)
     {
-        auto const ranges = wishlist.next(peer_info, 20);
+        auto const ranges = Wishlist::next(peer_info, 20);
         auto requested = tr_bitfield(300);
         for (auto const& range : ranges)
         {

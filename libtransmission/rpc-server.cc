@@ -1,10 +1,7 @@
-/*
- * This file Copyright (C) 2008-2014 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2008-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #include <algorithm>
 #include <cerrno>
@@ -279,7 +276,7 @@ static void add_response(struct evhttp_request* req, tr_rpc_server* server, stru
         struct evbuffer_iovec iovec[1];
         evbuffer_reserve_space(out, std::max(content_len, max_compressed_len), iovec, 1);
 
-        auto const compressed_len = libdeflate_zlib_compress(
+        auto const compressed_len = libdeflate_gzip_compress(
             server->compressor.get(),
             content_ptr,
             content_len,

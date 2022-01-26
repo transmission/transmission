@@ -1,10 +1,7 @@
-/*
- * This file Copyright (C) 2007-2014 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2007-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #include <algorithm>
 #include <ctime>
@@ -29,7 +26,7 @@
 
 static auto constexpr MsecToSleepPerSecondDuringVerify = int{ 100 };
 
-static bool verifyTorrent(tr_torrent* tor, bool* stopFlag)
+static bool verifyTorrent(tr_torrent* tor, bool const* stopFlag)
 {
     auto const begin = tr_time();
 
@@ -166,7 +163,7 @@ struct verify_node
     void* callback_data;
     uint64_t current_size;
 
-    int compare(verify_node const& that) const
+    [[nodiscard]] int compare(verify_node const& that) const
     {
         // higher priority comes before lower priority
         auto const pa = tr_torrentGetPriority(torrent);

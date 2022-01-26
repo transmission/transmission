@@ -1,26 +1,6 @@
-/*
- * Copyright (c) 2009-2010 by Juliusz Chroboczek
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- *
- *
- */
+// This file Copyright © 2009-2010 Juliusz Chroboczek.
+// It may be used under the MIT (SPDX: MIT) license.
+// License text can be found in the licenses/ folder.
 
 #include <algorithm>
 #include <cerrno>
@@ -182,7 +162,7 @@ static void dht_bootstrap(void* closure)
             memcpy(&addr.addr.addr4, &cl->nodes[i * 6], 4);
             memcpy(&port, &cl->nodes[i * 6 + 4], 2);
             port = ntohs(port);
-            tr_dhtAddNode(cl->session, &addr, port, 1);
+            tr_dhtAddNode(cl->session, &addr, port, true);
         }
 
         if (i < num6 && !bootstrap_done(cl->session, AF_INET6))
@@ -195,7 +175,7 @@ static void dht_bootstrap(void* closure)
             memcpy(&addr.addr.addr6, &cl->nodes6[i * 18], 16);
             memcpy(&port, &cl->nodes6[i * 18 + 16], 2);
             port = ntohs(port);
-            tr_dhtAddNode(cl->session, &addr, port, 1);
+            tr_dhtAddNode(cl->session, &addr, port, true);
         }
 
         /* Our DHT code is able to take up to 9 nodes in a row without

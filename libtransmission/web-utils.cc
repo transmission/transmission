@@ -1,10 +1,7 @@
-/*
- * This file Copyright (C) Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2021-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #include <algorithm>
 #include <array>
@@ -176,7 +173,7 @@ void tr_http_escape(struct evbuffer* out, std::string_view str, bool escape_rese
     auto constexpr ReservedChars = std::string_view{ "!*'();:@&=+$,/?%#[]" };
     auto constexpr UnescapedChars = std::string_view{ "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_.~" };
 
-    for (auto& ch : str)
+    for (auto const& ch : str)
     {
         if (tr_strvContains(UnescapedChars, ch) || (tr_strvContains(ReservedChars, ch) && !escape_reserved))
         {
@@ -194,7 +191,7 @@ void tr_http_escape(std::string& appendme, std::string_view str, bool escape_res
     auto constexpr ReservedChars = std::string_view{ "!*'();:@&=+$,/?%#[]" };
     auto constexpr UnescapedChars = std::string_view{ "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_.~" };
 
-    for (auto& ch : str)
+    for (auto const& ch : str)
     {
         if (tr_strvContains(UnescapedChars, ch) || (!escape_reserved && tr_strvContains(ReservedChars, ch)))
         {

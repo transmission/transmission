@@ -1,10 +1,7 @@
-/*
- * This file Copyright (C) 2010-2021 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2010-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #include <memory>
 
@@ -262,7 +259,7 @@ OptionsDialog::OptionsDialog(
     Gtk::Window& parent,
     Glib::RefPtr<Session> const& core,
     std::unique_ptr<tr_ctor, void (*)(tr_ctor*)> ctor)
-    : Gtk::Dialog(_("Torrent Options"), parent)
+    : Gtk::Dialog(_("Torrent Options"), parent, true /* modal */)
     , impl_(std::make_unique<Impl>(*this, core, std::move(ctor)))
 {
 }
@@ -438,6 +435,8 @@ std::unique_ptr<TorrentFileChooserDialog> TorrentFileChooserDialog::create(
 TorrentFileChooserDialog::TorrentFileChooserDialog(Gtk::Window& parent, Glib::RefPtr<Session> const& core)
     : Gtk::FileChooserDialog(parent, _("Open a Torrent"), Gtk::FILE_CHOOSER_ACTION_OPEN)
 {
+    set_modal(true);
+
     add_button(_("_Cancel"), Gtk::RESPONSE_CANCEL);
     add_button(_("_Open"), Gtk::RESPONSE_ACCEPT);
 
@@ -496,7 +495,7 @@ std::unique_ptr<TorrentUrlChooserDialog> TorrentUrlChooserDialog::create(Gtk::Wi
 }
 
 TorrentUrlChooserDialog::TorrentUrlChooserDialog(Gtk::Window& parent, Glib::RefPtr<Session> const& core)
-    : Gtk::Dialog(_("Open URL"), parent)
+    : Gtk::Dialog(_("Open URL"), parent, true /* modal  */)
 {
     guint row;
 

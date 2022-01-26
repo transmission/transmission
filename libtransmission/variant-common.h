@@ -1,10 +1,7 @@
-/*
- * This file Copyright (C) 2008-2014 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2008-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #pragma once
 
@@ -46,6 +43,6 @@ std::optional<int64_t> tr_bencParseInt(std::string_view* benc_inout);
 /** @brief Private function that's exposed here only for unit tests */
 std::optional<std::string_view> tr_bencParseStr(std::string_view* benc_inout);
 
-int tr_variantParseBenc(tr_variant& setme, int opts, std::string_view benc, char const** setme_end);
+bool tr_variantParseBenc(tr_variant& top, int parse_opts, std::string_view benc, char const** setme_end, tr_error** error);
 
 int tr_variantParseJson(tr_variant& setme, int opts, std::string_view benc, char const** setme_end);

@@ -1,10 +1,7 @@
-/*
- * This file Copyright (C) 2013-2017 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2013-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #undef _GNU_SOURCE
 #define _GNU_SOURCE
@@ -711,7 +708,7 @@ bool tr_sys_file_seek(tr_sys_file_t handle, int64_t offset, tr_seek_origin_t ori
     bool ret = false;
 
     off_t const my_new_offset = lseek(handle, offset, origin);
-    static_assert(sizeof(*new_offset) >= sizeof(my_new_offset), "");
+    static_assert(sizeof(*new_offset) >= sizeof(my_new_offset));
 
     if (my_new_offset != -1)
     {
@@ -738,7 +735,7 @@ bool tr_sys_file_read(tr_sys_file_t handle, void* buffer, uint64_t size, uint64_
     bool ret = false;
 
     ssize_t const my_bytes_read = read(handle, buffer, size);
-    static_assert(sizeof(*bytes_read) >= sizeof(my_bytes_read), "");
+    static_assert(sizeof(*bytes_read) >= sizeof(my_bytes_read));
 
     if (my_bytes_read != -1)
     {
@@ -782,7 +779,7 @@ bool tr_sys_file_read_at(
 
 #endif
 
-    static_assert(sizeof(*bytes_read) >= sizeof(my_bytes_read), "");
+    static_assert(sizeof(*bytes_read) >= sizeof(my_bytes_read));
 
     if (my_bytes_read != -1)
     {
@@ -809,7 +806,7 @@ bool tr_sys_file_write(tr_sys_file_t handle, void const* buffer, uint64_t size, 
     bool ret = false;
 
     ssize_t const my_bytes_written = write(handle, buffer, size);
-    static_assert(sizeof(*bytes_written) >= sizeof(my_bytes_written), "");
+    static_assert(sizeof(*bytes_written) >= sizeof(my_bytes_written));
 
     if (my_bytes_written != -1)
     {
@@ -853,7 +850,7 @@ bool tr_sys_file_write_at(
 
 #endif
 
-    static_assert(sizeof(*bytes_written) >= sizeof(my_bytes_written), "");
+    static_assert(sizeof(*bytes_written) >= sizeof(my_bytes_written));
 
     if (my_bytes_written != -1)
     {

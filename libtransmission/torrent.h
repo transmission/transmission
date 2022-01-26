@@ -1,10 +1,7 @@
-/*
- * This file Copyright (C) 2009-2021 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2009-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #pragma once
 
@@ -40,7 +37,7 @@ struct tr_magnet_info;
 struct tr_metainfo_parsed;
 struct tr_session;
 struct tr_torrent;
-struct tr_announcer_tiers;
+struct tr_torrent_announcer;
 
 /**
 ***  Package-visible ctor API
@@ -134,7 +131,7 @@ public:
 
     void setMetainfo(tr_torrent_metainfo const& tm);
 
-    auto unique_lock() const
+    [[nodiscard]] auto unique_lock() const
     {
         return session->unique_lock();
     }
@@ -143,7 +140,7 @@ public:
 
     void setSpeedLimitBps(tr_direction, unsigned int Bps);
 
-    unsigned int speedLimitBps(tr_direction) const;
+    [[nodiscard]] unsigned int speedLimitBps(tr_direction) const;
 
     /// BLOCK INFO
 
@@ -154,55 +151,55 @@ public:
 
     [[nodiscard]] constexpr auto blockCount() const
     {
-        return blockInfo().blockCount();
+        return metainfo_.blockCount();
     }
     [[nodiscard]] constexpr auto blockOf(uint64_t offset) const
     {
-        return blockInfo().blockOf(offset);
+        return metainfo_.blockOf(offset);
     }
     [[nodiscard]] constexpr auto blockOf(tr_piece_index_t piece, uint32_t offset, uint32_t length = 0) const
     {
-        return blockInfo().blockOf(piece, offset, length);
+        return metainfo_.blockOf(piece, offset, length);
     }
     [[nodiscard]] constexpr auto blockSize() const
     {
-        return blockInfo().blockSize();
+        return metainfo_.blockSize();
     }
     [[nodiscard]] constexpr auto blockSize(tr_block_index_t block) const
     {
-        return blockInfo().blockSize(block);
+        return metainfo_.blockSize(block);
     }
     [[nodiscard]] constexpr auto blockSpanForPiece(tr_piece_index_t piece) const
     {
-        return blockInfo().blockSpanForPiece(piece);
+        return metainfo_.blockSpanForPiece(piece);
     }
     [[nodiscard]] constexpr auto offset(tr_piece_index_t piece, uint32_t offset, uint32_t length = 0) const
     {
-        return blockInfo().offset(piece, offset, length);
+        return metainfo_.offset(piece, offset, length);
     }
     [[nodiscard]] constexpr auto pieceCount() const
     {
-        return blockInfo().pieceCount();
+        return metainfo_.pieceCount();
     }
     [[nodiscard]] constexpr auto pieceForBlock(tr_block_index_t block) const
     {
-        return blockInfo().pieceForBlock(block);
+        return metainfo_.pieceForBlock(block);
     }
     [[nodiscard]] constexpr auto pieceOf(uint64_t offset) const
     {
-        return blockInfo().pieceOf(offset);
+        return metainfo_.pieceOf(offset);
     }
     [[nodiscard]] constexpr auto pieceSize() const
     {
-        return blockInfo().pieceSize();
+        return metainfo_.pieceSize();
     }
     [[nodiscard]] constexpr auto pieceSize(tr_piece_index_t piece) const
     {
-        return blockInfo().pieceSize(piece);
+        return metainfo_.pieceSize(piece);
     }
     [[nodiscard]] constexpr auto totalSize() const
     {
-        return blockInfo().totalSize();
+        return metainfo_.totalSize();
     }
 
     /// COMPLETION
@@ -585,7 +582,7 @@ public:
 
     tr_session* session = nullptr;
 
-    tr_announcer_tiers* announcer_tiers = nullptr;
+    tr_torrent_announcer* torrent_announcer = nullptr;
 
     // Changed to non-owning pointer temporarily till tr_torrent becomes C++-constructible and destructible
     // TODO: change tr_bandwidth* to owning pointer to the bandwidth, or remove * and own the value

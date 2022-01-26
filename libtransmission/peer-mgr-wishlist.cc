@@ -1,10 +1,7 @@
-/*
- * This file Copyright (C) 2021 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2021-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #include <algorithm>
 #include <cstddef>
@@ -39,7 +36,7 @@ struct Candidate
     {
     }
 
-    int compare(Candidate const& that) const // <=>
+    [[nodiscard]] int compare(Candidate const& that) const // <=>
     {
         // prefer pieces closer to completion
         if (n_blocks_missing != that.n_blocks_missing)
@@ -132,7 +129,7 @@ std::vector<tr_block_span_t> makeSpans(tr_block_index_t const* sorted_blocks, si
 
 } // namespace
 
-std::vector<tr_block_span_t> Wishlist::next(Wishlist::PeerInfo const& peer_info, size_t n_wanted_blocks) const
+std::vector<tr_block_span_t> Wishlist::next(Wishlist::PeerInfo const& peer_info, size_t n_wanted_blocks)
 {
     size_t n_blocks = 0;
     auto spans = std::vector<tr_block_span_t>{};

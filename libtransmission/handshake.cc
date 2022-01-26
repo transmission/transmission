@@ -1,10 +1,7 @@
-/*
- * This file Copyright (C) 2007-2014 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2017-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #include <algorithm>
 #include <cerrno>
@@ -29,11 +26,11 @@
 using namespace std::literals;
 
 /* enable LibTransmission extension protocol */
-#define ENABLE_LTEP * /
+#define ENABLE_LTEP
 /* fast extensions */
-#define ENABLE_FAST * /
+#define ENABLE_FAST
 /* DHT */
-#define ENABLE_DHT * /
+#define ENABLE_DHT
 
 /***
 ****

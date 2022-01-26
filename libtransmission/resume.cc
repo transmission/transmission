@@ -1,10 +1,7 @@
-/*
- * This file Copyright (C) 2008-2014 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2008-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #include <algorithm>
 #include <cstring>
@@ -696,7 +693,11 @@ static uint64_t loadFromFile(tr_torrent* tor, uint64_t fieldsToLoad, bool* did_m
     TR_ASSERT(tr_isTorrent(tor));
     auto const wasDirty = tor->isDirty;
 
-    auto const migrated = tor->metainfo_.migrateFile(tor->session->resume_dir, tor->name(), tor->infoHashString(), ".resume"sv);
+    auto const migrated = tr_torrent_metainfo::migrateFile(
+        tor->session->resume_dir,
+        tor->name(),
+        tor->infoHashString(),
+        ".resume"sv);
     if (did_migrate_filename != nullptr)
     {
         *did_migrate_filename = migrated;

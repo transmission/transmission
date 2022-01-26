@@ -1,10 +1,7 @@
-/*
- * This file Copyright (C) 2005-2014 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2005-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #pragma once
 
@@ -155,13 +152,13 @@ public:
         return makeFilename(resume_dir, name(), infoHashString(), BasenameFormat::Hash, ".resume");
     }
 
-    bool migrateFile(
+    static bool migrateFile(
         std::string_view dirname,
         std::string_view name,
         std::string_view info_hash_string,
-        std::string_view suffix) const;
+        std::string_view suffix);
 
-    void removeFile(
+    static void removeFile(
         std::string_view dirname,
         std::string_view name,
         std::string_view info_hash_string,

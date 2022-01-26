@@ -1,10 +1,7 @@
-/*
- * This file Copyright (C) 2013-2014 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright (C) 2013-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #include <string_view>
 
@@ -444,4 +441,26 @@ TEST_F(UtilsTest, saveFile)
     ASSERT_NE(nullptr, error);
     EXPECT_NE(0, error->code);
     tr_error_clear(&error);
+}
+
+TEST_F(UtilsTest, ratioToString)
+{
+    // Testpairs contain ratio as a double and a string
+    std::vector<std::pair<double, std::string>> const tests{
+        { 0.0, "0.00" },        { 0.01, "0.01" },  { 0.1, "0.10" },    { 1.0, "1.00" },        { 1.015, "1.01" },
+        { 4.99, "4.99" },       { 4.996, "4.99" }, { 5.0, "5.0" },     { 5.09999, "5.0" },     { 5.1, "5.1" },
+        { 99.99, "99.9" },      { 100.0, "100" },  { 4000.4, "4000" }, { 600000.0, "600000" }, { 900000000.0, "900000000" },
+        { TR_RATIO_INF, "inf" }
+    };
+    char const nullchar = '\0';
+
+    ASSERT_EQ(tr_strratio(TR_RATIO_NA, "Ratio is NaN"), "None");
+    ASSERT_EQ(tr_strratio(TR_RATIO_INF, "A bit longer text for infinity"), "A bit longer text for infinity");
+    // Inf contains only null character
+    ASSERT_EQ(tr_strratio(TR_RATIO_INF, &nullchar), "");
+
+    for (auto& test : tests)
+    {
+        ASSERT_EQ(tr_strratio(test.first, "inf"), test.second);
+    }
 }

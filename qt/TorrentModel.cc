@@ -1,10 +1,7 @@
-/*
- * This file Copyright (C) 2009-2015 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2009-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #include <algorithm>
 #include <cassert>
@@ -345,10 +342,10 @@ std::optional<int> TorrentModel::getRow(int id) const
 {
     std::optional<int> row;
 
-    auto const it = std::equal_range(torrents_.begin(), torrents_.end(), id, TorrentIdLessThan());
-    if (it.first != it.second)
+    auto const [begin, end] = std::equal_range(torrents_.begin(), torrents_.end(), id, TorrentIdLessThan());
+    if (begin != end)
     {
-        row = std::distance(torrents_.begin(), it.first);
+        row = std::distance(torrents_.begin(), begin);
         assert(torrents_[*row]->id() == id);
     }
 
@@ -428,9 +425,9 @@ std::vector<TorrentModel::span_t> TorrentModel::getSpans(torrent_ids_t const& id
 
 void TorrentModel::rowsEmitChanged(torrent_ids_t const& ids)
 {
-    for (auto const& span : getSpans(ids))
+    for (auto const& [first, last] : getSpans(ids))
     {
-        emit dataChanged(index(span.first), index(span.second));
+        emit dataChanged(index(first), index(last));
     }
 }
 
@@ -465,10 +462,10 @@ void TorrentModel::rowsRemove(torrents_t const& torrents)
     auto const& spans = getSpans(getIds(torrents.begin(), torrents.end()));
     for (auto it = spans.rbegin(), end = spans.rend(); it != end; ++it)
     {
-        auto const& span = *it;
+        auto const& [first, last] = *it;
 
-        beginRemoveRows(QModelIndex(), span.first, span.second);
-        torrents_.erase(torrents_.begin() + span.first, torrents_.begin() + span.second + 1);
+        beginRemoveRows(QModelIndex(), first, last);
+        torrents_.erase(torrents_.begin() + first, torrents_.begin() + last + 1);
         endRemoveRows();
     }
 

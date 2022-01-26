@@ -1,24 +1,6 @@
-/******************************************************************************
- * Copyright (c) Transmission authors and contributors
- *
- * Permission is hereby granted, free of charge, to any person obtaining a
- * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
- * DEALINGS IN THE SOFTWARE.
- *****************************************************************************/
+// This file Copyright © 2005-2021 Transmission authors and contributors.
+// It may be used under the MIT (SPDX: MIT) license.
+// License text can be found in the licenses/ folder.
 
 #include <algorithm>
 #include <cstdlib> // exit()
@@ -72,7 +54,6 @@ char const* const LICENSE =
     "Copyright 2005-2020. All code is copyrighted by the respective authors.\n"
     "\n"
     "Transmission can be redistributed and/or modified under the terms of the "
-    "GNU GPL versions 2 or 3 or by any future license endorsed by Mnemosyne LLC.\n"
     "\n"
     "In addition, linking to and/or using OpenSSL is allowed.\n"
     "\n"
@@ -442,9 +423,8 @@ bool Application::Impl::on_rpc_changed_idle(tr_rpc_callback_type type, int torre
             for (int i = 0; tr_variantDictChild(&tmp, i, &key, &newval); ++i)
             {
                 bool changed;
-                tr_variant const* oldval = tr_variantDictFind(oldvals, key);
 
-                if (oldval == nullptr)
+                if (tr_variant const* oldval = tr_variantDictFind(oldvals, key); oldval == nullptr)
                 {
                     changed = true;
                 }
@@ -1064,20 +1044,15 @@ void Application::Impl::on_prefs_changed(tr_quark const key)
         break;
 
     case TR_KEY_show_notification_area_icon:
+        if (bool const show = gtr_pref_flag_get(key); show && icon_ == nullptr)
         {
-            bool const show = gtr_pref_flag_get(key);
-
-            if (show && icon_ == nullptr)
-            {
-                icon_ = std::make_unique<SystemTrayIcon>(*wind_, core_);
-            }
-            else if (!show && icon_ != nullptr)
-            {
-                icon_.reset();
-            }
-
-            break;
+            icon_ = std::make_unique<SystemTrayIcon>(*wind_, core_);
         }
+        else if (!show && icon_ != nullptr)
+        {
+            icon_.reset();
+        }
+        break;
 
     case TR_KEY_speed_limit_down_enabled:
         tr_sessionLimitSpeed(tr, TR_DOWN, gtr_pref_flag_get(key));
@@ -1292,7 +1267,7 @@ void Application::Impl::show_about_dialog()
     Gtk::AboutDialog d;
     d.set_authors(authors);
     d.set_comments(_("A fast and easy BitTorrent client"));
-    d.set_copyright(_("Copyright (c) The Transmission Project"));
+    d.set_copyright(_("Copyright © The Transmission Project"));
     d.set_logo_icon_name(AppIconName);
     d.set_name(Glib::get_application_name());
     /* Translators: translate "translator-credits" as your name
@@ -1378,9 +1353,8 @@ tr_torrent* Application::Impl::get_first_selected_torrent() const
 {
     tr_torrent* tor = nullptr;
     Glib::RefPtr<Gtk::TreeModel> m;
-    auto const l = sel_->get_selected_rows(m);
 
-    if (!l.empty())
+    if (auto const l = sel_->get_selected_rows(m); !l.empty())
     {
         if (auto iter = m->get_iter(l.front()); iter)
         {

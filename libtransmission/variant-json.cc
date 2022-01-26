@@ -1,10 +1,7 @@
-/*
- * This file Copyright (C) 2008-2014 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2008-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #include <array>
 #include <cctype>
@@ -574,7 +571,7 @@ static void jsonStringFunc(tr_variant const* val, void* vdata)
             break;
 
         default:
-            if (isprint(sv.front()))
+            if (isprint((unsigned char)sv.front()))
             {
                 *outwalk++ = sv.front();
             }
@@ -582,9 +579,9 @@ static void jsonStringFunc(tr_variant const* val, void* vdata)
             {
                 try
                 {
-                    auto* begin8 = std::data(sv);
-                    auto* end8 = begin8 + std::size(sv);
-                    auto* walk8 = begin8;
+                    auto const* const begin8 = std::data(sv);
+                    auto const* const end8 = begin8 + std::size(sv);
+                    auto const* walk8 = begin8;
                     auto const uch32 = utf8::next(walk8, end8);
                     outwalk += tr_snprintf(outwalk, outend - outwalk, "\\u%04x", uch32);
                     sv.remove_prefix(walk8 - begin8 - 1);

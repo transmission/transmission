@@ -1,10 +1,7 @@
-/*
- * This file Copyright (C) 2013-2014 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright (C) 2013-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #include "transmission.h"
 
@@ -70,7 +67,7 @@ protected:
         sync();
     }
 
-    tr_torrent* createTorrentFromBase64Metainfo(tr_ctor* ctor, char const* benc_base64)
+    static tr_torrent* createTorrentFromBase64Metainfo(tr_ctor* ctor, char const* benc_base64)
     {
         // create the torrent ctor
         auto const benc = tr_base64_decode(benc_base64);
@@ -88,7 +85,7 @@ protected:
         return tor;
     }
 
-    bool testFileExistsAndConsistsOfThisString(tr_torrent const* tor, tr_file_index_t file_index, std::string const& str)
+    static bool testFileExistsAndConsistsOfThisString(tr_torrent const* tor, tr_file_index_t file_index, std::string const& str)
     {
         auto const str_len = str.size();
         auto success = false;
@@ -110,7 +107,7 @@ protected:
         return success;
     }
 
-    void expectHaveNone(tr_torrent* tor, uint64_t total_size)
+    static void expectHaveNone(tr_torrent* tor, uint64_t total_size)
     {
         auto const* tst = tr_torrentStat(tor);
         EXPECT_EQ(TR_STATUS_STOPPED, tst->activity);
@@ -121,7 +118,7 @@ protected:
         EXPECT_EQ(0, tst->haveValid);
     }
 
-    int torrentRenameAndWait(tr_torrent* tor, char const* oldpath, char const* newname)
+    static int torrentRenameAndWait(tr_torrent* tor, char const* oldpath, char const* newname)
     {
         auto const on_rename_done =
             [](tr_torrent* /*tor*/, char const* /*oldpath*/, char const* /*newname*/, int error, void* user_data) noexcept

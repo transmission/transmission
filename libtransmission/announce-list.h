@@ -1,10 +1,7 @@
-/*
- * This file Copyright (C) Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2021-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #pragma once
 
@@ -114,7 +111,7 @@ private:
     tr_tracker_tier_t getTier(tr_tracker_tier_t tier, tr_url_parsed_t const& announce) const;
 
     bool canAdd(tr_url_parsed_t const& announce);
-    tr_tracker_id_t nextUniqueId();
+    static tr_tracker_id_t nextUniqueId();
     trackers_t::iterator find(std::string_view announce);
     trackers_t::iterator find(tr_tracker_id_t id);
 

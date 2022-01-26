@@ -1,10 +1,7 @@
-/*
- * This file Copyright (C) 2009-2017 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2009-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #include <algorithm> /* EINVAL */
 #include <array>
@@ -511,8 +508,8 @@ static void onTrackerResponse(tr_torrent* tor, tr_tracker_event const* event, vo
     switch (event->messageType)
     {
     case TR_TRACKER_PEERS:
-        tr_logAddTorDbg(tor, "Got %zu peers from tracker", event->pexCount);
-        tr_peerMgrAddPex(tor, TR_PEER_FROM_TRACKER, event->pex, event->pexCount);
+        tr_logAddTorDbg(tor, "Got %zu peers from tracker", size_t(std::size(event->pex)));
+        tr_peerMgrAddPex(tor, TR_PEER_FROM_TRACKER, std::data(event->pex), std::size(event->pex));
         break;
 
     case TR_TRACKER_COUNTS:
@@ -686,7 +683,7 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
 
     if (resume_file_was_migrated)
     {
-        tor->metainfo_.migrateFile(session->torrent_dir, tor->name(), tor->infoHashString(), ".torrent");
+        tr_torrent_metainfo::migrateFile(session->torrent_dir, tor->name(), tor->infoHashString(), ".torrent"sv);
     }
 
     tor->completeness = tor->completion.status();
@@ -736,7 +733,7 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
         tr_error_clear(&error);
     }
 
-    tor->announcer_tiers = tr_announcerAddTorrent(tor, onTrackerResponse, nullptr);
+    tor->torrent_announcer = tr_announcerAddTorrent(tor, onTrackerResponse, nullptr);
 
     if (is_new_torrent)
     {
@@ -1542,8 +1539,8 @@ static void closeTorrent(void* vtor)
 
     if (tor->isDeleting)
     {
-        tor->metainfo_.removeFile(tor->session->torrent_dir, tor->name(), tor->infoHashString(), ".torrent"sv);
-        tor->metainfo_.removeFile(tor->session->resume_dir, tor->name(), tor->infoHashString(), ".resume"sv);
+        tr_torrent_metainfo::removeFile(tor->session->torrent_dir, tor->name(), tor->infoHashString(), ".torrent"sv);
+        tr_torrent_metainfo::removeFile(tor->session->resume_dir, tor->name(), tor->infoHashString(), ".resume"sv);
     }
 
     tor->isRunning = false;
@@ -2081,23 +2078,8 @@ uint64_t tr_torrentGetBytesLeftToAllocate(tr_torrent const* tor)
 *****  Removing the torrent's local data
 ****/
 
-static constexpr bool isJunkFile(std::string_view base)
+static bool isJunkFile(std::string_view base)
 {
-    auto constexpr Files = std::array<std::string_view, 3>{
-        ".DS_Store"sv,
-        "Thumbs.db"sv,
-        "desktop.ini"sv,
-    };
-
-    // TODO(C++20): std::any_of is constexpr in C++20
-    for (auto const& file : Files)
-    {
-        if (file == base)
-        {
-            return true;
-        }
-    }
-
 #ifdef __APPLE__
     // check for resource forks. <http://support.apple.com/kb/TA20578>
     if (tr_strvStartsWith(base, "._"sv))
@@ -2106,7 +2088,13 @@ static constexpr bool isJunkFile(std::string_view base)
     }
 #endif
 
-    return false;
+    auto constexpr Files = std::array<std::string_view, 3>{
+        ".DS_Store"sv,
+        "Thumbs.db"sv,
+        "desktop.ini"sv,
+    };
+
+    return std::find(std::begin(Files), std::end(Files), base) != std::end(Files);
 }
 
 static void removeEmptyFoldersAndJunkFiles(char const* folder)
@@ -2125,7 +2113,8 @@ static void removeEmptyFoldersAndJunkFiles(char const* folder)
             auto const filename = tr_strvPath(folder, name);
 
             auto info = tr_sys_path_info{};
-            if (tr_sys_path_get_info(filename.c_str(), 0, &info, nullptr) && info.type == TR_SYS_PATH_IS_DIRECTORY)
+            if (tr_sys_path_get_info(filename.c_str(), TR_SYS_PATH_NO_FOLLOW, &info, nullptr) &&
+                info.type == TR_SYS_PATH_IS_DIRECTORY)
             {
                 removeEmptyFoldersAndJunkFiles(filename.c_str());
             }

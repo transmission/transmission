@@ -1,10 +1,7 @@
-/*
- * This file Copyright (C) 2010-2014 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright 2010-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #include <cstdlib> /* qsort() */
 #include <ctime>
@@ -113,8 +110,8 @@ static int getBlockRun(tr_cache const* cache, int pos, struct run_info* info)
 /* higher rank comes before lower rank */
 static int compareRuns(void const* va, void const* vb)
 {
-    auto* a = static_cast<struct run_info const*>(va);
-    auto* b = static_cast<struct run_info const*>(vb);
+    auto const* const a = static_cast<struct run_info const*>(va);
+    auto const* const b = static_cast<struct run_info const*>(vb);
     return b->rank - a->rank;
 }
 
@@ -276,12 +273,6 @@ tr_cache* tr_cacheNew(int64_t max_bytes)
 
 void tr_cacheFree(tr_cache* cache)
 {
-    // FIXME(ckerr): this assertion isn't _always_ going to be true,
-    // e.g. if writing to disk failed due to disk full / permission error etc
-    // then there is still going to be data sitting in the cache on shutdown.
-    // Make this assertion smarter or remove it.
-    TR_ASSERT(tr_ptrArrayEmpty(&cache->blocks));
-
     tr_ptrArrayDestruct(&cache->blocks, nullptr);
     tr_free(cache);
 }

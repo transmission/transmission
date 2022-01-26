@@ -1,10 +1,7 @@
-/*
- * This file Copyright (C) 2007-2014 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2007-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #include <algorithm>
 #include <cctype>
@@ -575,7 +572,7 @@ bool tr_torrent_metainfo::migrateFile(
     std::string_view dirname,
     std::string_view name,
     std::string_view info_hash_string,
-    std::string_view suffix) const
+    std::string_view suffix)
 {
     auto const old_filename = makeFilename(dirname, name, info_hash_string, BasenameFormat::NameAndPartialHash, suffix);
     auto const old_filename_exists = tr_sys_path_exists(old_filename.c_str(), nullptr);

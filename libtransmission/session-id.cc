@@ -1,10 +1,7 @@
-/*
- * This file Copyright (C) 2016 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2016-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #include <ctime>
 #include <string_view>
@@ -37,7 +34,7 @@ struct tr_session_id
     time_t expires_at;
 };
 
-static char* generate_new_session_id_value(void)
+static char* generate_new_session_id_value()
 {
     char const pool[] = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
     size_t const pool_size = sizeof(pool) - 1;
@@ -115,7 +112,7 @@ static void destroy_session_id_lock_file(tr_sys_file_t lock_file, char const* se
     }
 }
 
-tr_session_id_t tr_session_id_new(void)
+tr_session_id_t tr_session_id_new()
 {
     auto const session_id = tr_new0(struct tr_session_id, 1);
 

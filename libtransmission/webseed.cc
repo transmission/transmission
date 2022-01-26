@@ -1,10 +1,7 @@
-/*
- * This file Copyright (C) 2008-2014 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2008-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #include <algorithm>
 #include <set>
@@ -68,6 +65,7 @@ public:
         , callback{ callback_in }
         , callback_data{ callback_data_in }
         , bandwidth(tor->bandwidth)
+        , timer(evtimer_new(session->event_base, webseed_timer_func, this))
     {
         // init parent bits
         have.setHasAll();
@@ -75,7 +73,6 @@ public:
 
         file_urls.resize(tor->fileCount());
 
-        timer = evtimer_new(session->event_base, webseed_timer_func, this);
         tr_timerAddMsec(timer, TR_IDLE_TIMER_MSEC);
     }
 
@@ -114,7 +111,7 @@ public:
 
     Bandwidth bandwidth;
     std::set<tr_webseed_task*> tasks;
-    struct event* timer = nullptr;
+    struct event* const timer;
     int consecutive_failures = 0;
     int retry_tickcount = 0;
     int retry_challenge = 0;

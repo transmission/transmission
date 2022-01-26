@@ -1,14 +1,13 @@
-/*
- * This file Copyright (C) 2010-2014 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2010-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #include <climits> /* USHRT_MAX */
 #include <cstdio> /* fprintf() */
 #include <cstring> /* strchr(), memcmp(), memcpy() */
+#include <iostream>
+#include <iomanip>
 #include <string>
 #include <string_view>
 
@@ -18,7 +17,10 @@
 #define LIBTRANSMISSION_ANNOUNCER_MODULE
 
 #include "transmission.h"
+
 #include "announcer-common.h"
+#include "crypto-utils.h"
+#include "error.h"
 #include "log.h"
 #include "net.h" /* tr_globalIPv6() */
 #include "peer-mgr.h" /* pex */
@@ -27,8 +29,8 @@
 #include "trevent.h" /* tr_runInEventThread() */
 #include "utils.h"
 #include "variant.h"
-#include "web.h"
 #include "web-utils.h"
+#include "web.h"
 
 #define dbgmsg(name, ...) tr_logAddDeepNamed(name, __VA_ARGS__)
 
@@ -49,8 +51,8 @@ static std::string announce_url_new(tr_session const* session, tr_announce_reque
 {
     auto const announce_sv = req->announce_url.sv();
 
-    char escaped_info_hash[SHA_DIGEST_LENGTH * 3 + 1];
-    tr_http_escape_sha1(escaped_info_hash, req->info_hash);
+    auto escaped_info_hash = std::array<char, SHA_DIGEST_LENGTH * 3 + 1>{};
+    tr_http_escape_sha1(std::data(escaped_info_hash), req->info_hash);
 
     auto* const buf = evbuffer_new();
     evbuffer_expand(buf, 1024);
@@ -70,7 +72,7 @@ static std::string announce_url_new(tr_session const* session, tr_announce_reque
         "&supportcrypto=1",
         TR_PRIsv_ARG(announce_sv),
         announce_sv.find('?') == announce_sv.npos ? '?' : '&',
-        escaped_info_hash,
+        std::data(escaped_info_hash),
         TR_PRIsv_ARG(req->peer_id),
         req->port,
         req->up,
@@ -89,16 +91,14 @@ static std::string announce_url_new(tr_session const* session, tr_announce_reque
         evbuffer_add_printf(buf, "&corrupt=%" PRIu64, req->corrupt);
     }
 
-    char const* str = get_event_string(req);
-    if (!tr_str_is_empty(str))
+    if (char const* str = get_event_string(req); !tr_str_is_empty(str))
     {
         evbuffer_add_printf(buf, "&event=%s", str);
     }
 
-    str = req->tracker_id_str;
-    if (!tr_str_is_empty(str))
+    if (!std::empty(req->tracker_id))
     {
-        evbuffer_add_printf(buf, "&trackerid=%s", str);
+        evbuffer_add_printf(buf, "&trackerid=%" TR_PRIsv, TR_PRIsv_ARG(req->tracker_id));
     }
 
     /* There are two incompatible techniques for announcing an IPv6 address.
@@ -110,7 +110,7 @@ static std::string announce_url_new(tr_session const* session, tr_announce_reque
        announce twice. At any rate, we're already computing our IPv6
        address (for the LTEP handshake), so this comes for free. */
 
-    unsigned char const* const ipv6 = tr_globalIPv6();
+    unsigned char const* const ipv6 = tr_globalIPv6(session);
     if (ipv6 != nullptr)
     {
         char ipv6_readable[INET6_ADDRSTRLEN];
@@ -122,11 +122,11 @@ static std::string announce_url_new(tr_session const* session, tr_announce_reque
     return evbuffer_free_to_str(buf);
 }
 
-static tr_pex* listToPex(tr_variant* peerList, size_t* setme_len)
+static auto listToPex(tr_variant* peerList)
 {
     size_t n = 0;
     size_t const len = tr_variantListSize(peerList);
-    auto* const pex = tr_new0(tr_pex, len);
+    auto pex = std::vector<tr_pex>(len);
 
     for (size_t i = 0; i < len; ++i)
     {
@@ -170,7 +170,7 @@ static tr_pex* listToPex(tr_variant* peerList, size_t* setme_len)
         ++n;
     }
 
-    *setme_len = n;
+    pex.resize(n);
     return pex;
 }
 
@@ -191,10 +191,107 @@ static void on_announce_done_eventthread(void* vdata)
         data->response_func(&data->response, data->response_func_user_data);
     }
 
-    tr_free(data->response.pex6);
-    tr_free(data->response.pex);
-    tr_free(data->response.tracker_id_str);
-    tr_free(data);
+    delete data;
+}
+
+static void maybeLogMessage(std::string_view description, tr_direction direction, std::string_view message)
+{
+    auto& out = std::cerr;
+    static bool const verbose = tr_env_key_exists("TR_CURL_VERBOSE");
+    if (!verbose)
+    {
+        return;
+    }
+
+    auto const direction_sv = direction == TR_DOWN ? "<< "sv : ">> "sv;
+    out << description << std::endl << "[raw]"sv << direction_sv;
+    for (unsigned char ch : message)
+    {
+        if (isprint(ch))
+        {
+            out << ch;
+        }
+        else
+        {
+            out << "\\x"sv << std::hex << std::setw(2) << std::setfill('0') << unsigned(ch) << std::dec << std::setw(1)
+                << std::setfill(' ');
+        }
+    }
+    out << std::endl << "[b64]"sv << direction_sv << tr_base64_encode(message) << std::endl;
+}
+
+void tr_announcerParseHttpAnnounceResponse(tr_announce_response& response, std::string_view msg)
+{
+    maybeLogMessage("Announce response:", TR_DOWN, msg);
+
+    auto benc = tr_variant{};
+    auto const variant_loaded = tr_variantFromBuf(&benc, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, msg);
+
+    if (variant_loaded && tr_variantIsDict(&benc))
+    {
+        auto i = int64_t{};
+        auto sv = std::string_view{};
+        tr_variant* tmp = nullptr;
+
+        if (tr_variantDictFindStrView(&benc, TR_KEY_failure_reason, &sv))
+        {
+            response.errmsg = sv;
+        }
+
+        if (tr_variantDictFindStrView(&benc, TR_KEY_warning_message, &sv))
+        {
+            response.warning = sv;
+        }
+
+        if (tr_variantDictFindInt(&benc, TR_KEY_interval, &i))
+        {
+            response.interval = i;
+        }
+
+        if (tr_variantDictFindInt(&benc, TR_KEY_min_interval, &i))
+        {
+            response.min_interval = i;
+        }
+
+        if (tr_variantDictFindStrView(&benc, TR_KEY_tracker_id, &sv))
+        {
+            response.tracker_id = sv;
+        }
+
+        if (tr_variantDictFindInt(&benc, TR_KEY_complete, &i))
+        {
+            response.seeders = i;
+        }
+
+        if (tr_variantDictFindInt(&benc, TR_KEY_incomplete, &i))
+        {
+            response.leechers = i;
+        }
+
+        if (tr_variantDictFindInt(&benc, TR_KEY_downloaded, &i))
+        {
+            response.downloads = i;
+        }
+
+        if (tr_variantDictFindStrView(&benc, TR_KEY_peers6, &sv))
+        {
+            response.pex6 = tr_peerMgrCompact6ToPex(std::data(sv), std::size(sv), nullptr, 0);
+        }
+
+        if (tr_variantDictFindStrView(&benc, TR_KEY_peers, &sv))
+        {
+            response.pex = tr_peerMgrCompactToPex(std::data(sv), std::size(sv), nullptr, 0);
+        }
+        else if (tr_variantDictFindList(&benc, TR_KEY_peers, &tmp))
+        {
+            response.pex = listToPex(tmp);
+        }
+    }
+
+    if (variant_loaded)
+    {
+        tr_variantFree(&benc);
+    }
 }
 
 static void on_announce_done(
@@ -219,94 +316,17 @@ static void on_announce_done(
     }
     else
     {
-        tr_variant benc;
-        auto const variant_loaded = tr_variantFromBuf(&benc, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, msg);
+        tr_announcerParseHttpAnnounceResponse(*response, msg);
+    }
 
-        if (tr_env_key_exists("TR_CURL_VERBOSE"))
-        {
-            if (!variant_loaded)
-            {
-                fprintf(stderr, "%s", "Announce response was not in benc format\n");
-            }
-            else
-            {
-                fprintf(stderr, "%s", "Announce response:\n< ");
-                for (auto const ch : tr_variantToStr(&benc, TR_VARIANT_FMT_JSON))
-                {
-                    fputc(ch, stderr);
-                }
-                fputc('\n', stderr);
-            }
-        }
+    if (!std::empty(response->pex6))
+    {
+        dbgmsg(data->log_name, "got a peers6 length of %zu", std::size(response->pex6));
+    }
 
-        if (variant_loaded && tr_variantIsDict(&benc))
-        {
-            auto i = int64_t{};
-            auto sv = std::string_view{};
-            tr_variant* tmp = nullptr;
-
-            if (tr_variantDictFindStrView(&benc, TR_KEY_failure_reason, &sv))
-            {
-                response->errmsg = sv;
-            }
-
-            if (tr_variantDictFindStrView(&benc, TR_KEY_warning_message, &sv))
-            {
-                response->warning = sv;
-            }
-
-            if (tr_variantDictFindInt(&benc, TR_KEY_interval, &i))
-            {
-                response->interval = i;
-            }
-
-            if (tr_variantDictFindInt(&benc, TR_KEY_min_interval, &i))
-            {
-                response->min_interval = i;
-            }
-
-            if (tr_variantDictFindStrView(&benc, TR_KEY_tracker_id, &sv))
-            {
-                response->tracker_id_str = tr_strvDup(sv);
-            }
-
-            if (tr_variantDictFindInt(&benc, TR_KEY_complete, &i))
-            {
-                response->seeders = i;
-            }
-
-            if (tr_variantDictFindInt(&benc, TR_KEY_incomplete, &i))
-            {
-                response->leechers = i;
-            }
-
-            if (tr_variantDictFindInt(&benc, TR_KEY_downloaded, &i))
-            {
-                response->downloads = i;
-            }
-
-            if (tr_variantDictFindStrView(&benc, TR_KEY_peers6, &sv))
-            {
-                dbgmsg(data->log_name, "got a peers6 length of %zu", std::size(sv));
-                response->pex6 = tr_peerMgrCompact6ToPex(std::data(sv), std::size(sv), nullptr, 0, &response->pex6_count);
-            }
-
-            if (tr_variantDictFindStrView(&benc, TR_KEY_peers, &sv))
-            {
-                dbgmsg(data->log_name, "got a compact peers length of %zu", std::size(sv));
-                response->pex = tr_peerMgrCompactToPex(std::data(sv), std::size(sv), nullptr, 0, &response->pex_count);
-            }
-            else if (tr_variantDictFindList(&benc, TR_KEY_peers, &tmp))
-            {
-                response->pex = listToPex(tmp, &response->pex_count);
-                dbgmsg(data->log_name, "got a peers list with %zu entries", response->pex_count);
-            }
-        }
-
-        if (variant_loaded)
-        {
-            tr_variantFree(&benc);
-        }
+    if (!std::empty(response->pex))
+    {
+        dbgmsg(data->log_name, "got a peers length of %zu", std::size(response->pex));
     }
 
     tr_runInEventThread(session, on_announce_done_eventthread, data);
@@ -318,10 +338,7 @@ void tr_tracker_http_announce(
     tr_announce_response_func response_func,
     void* response_func_user_data)
 {
-    auto* const d = tr_new0(announce_data, 1);
-    d->response.seeders = -1;
-    d->response.leechers = -1;
-    d->response.downloads = -1;
+    auto* const d = new announce_data();
     d->response_func = response_func;
     d->response_func_user_data = response_func_user_data;
     d->response.info_hash = request->info_hash;
@@ -498,7 +515,7 @@ void tr_tracker_http_scrape(
     tr_scrape_response_func response_func,
     void* response_func_user_data)
 {
-    auto* d = new scrape_data{};
+    auto* d = new scrape_data();
     d->response.scrape_url = request->scrape_url;
     d->response_func = response_func;
     d->response_func_user_data = response_func_user_data;

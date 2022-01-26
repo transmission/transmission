@@ -1,10 +1,7 @@
-/*
- * This file Copyright (C) 2007-2021 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2007-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #include <algorithm>
 #include <array>
@@ -159,7 +156,12 @@ private:
     Glib::Quark const TORRENT_ID_KEY = Glib::Quark("tr-torrent-id-key");
     Glib::Quark const TEXT_BUFFER_KEY = Glib::Quark("tr-text-buffer-key");
     Glib::Quark const URL_ENTRY_KEY = Glib::Quark("tr-url-entry-key");
+
+    static guint last_page_;
+    sigc::connection last_page_tag_;
 };
+
+guint DetailsDialog::Impl::last_page_ = 0;
 
 std::vector<tr_torrent*> DetailsDialog::Impl::getTorrents() const
 {
@@ -1080,8 +1082,11 @@ Gtk::Widget* DetailsDialog::Impl::info_page_new()
     error_lb_ = Gtk::make_managed<Gtk::Label>();
     error_lb_->set_selectable(true);
     error_lb_->set_ellipsize(Pango::ELLIPSIZE_END);
+    error_lb_->set_line_wrap(true);
+    error_lb_->set_lines(10);
     t->add_row(row, _("Error:"), *error_lb_);
 
+    /* details */
     t->add_section_divider(row);
     t->add_section_title(row, _("Details"));
 
@@ -2572,6 +2577,7 @@ void DetailsDialog::Impl::on_details_window_size_allocated(Gtk::Allocation& /*al
 DetailsDialog::Impl::~Impl()
 {
     periodic_refresh_tag_.disconnect();
+    last_page_tag_.disconnect();
 }
 
 std::unique_ptr<DetailsDialog> DetailsDialog::create(Gtk::Window& parent, Glib::RefPtr<Session> const& core)
@@ -2623,6 +2629,9 @@ DetailsDialog::Impl::Impl(DetailsDialog& dialog, Glib::RefPtr<Session> const& co
     periodic_refresh_tag_ = Glib::signal_timeout().connect_seconds(
         [this]() { return refresh(), true; },
         SECONDARY_WINDOW_REFRESH_INTERVAL_SECONDS);
+
+    n->set_current_page(last_page_);
+    last_page_tag_ = n->signal_switch_page().connect([](Widget*, guint page) { DetailsDialog::Impl::last_page_ = page; });
 }
 
 void DetailsDialog::set_torrents(std::vector<int> const& ids)
