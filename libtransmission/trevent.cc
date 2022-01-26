@@ -295,8 +295,10 @@ void tr_runInEventThread(tr_session* session, void (*func)(void*), void* user_da
     }
     else
     {
-        auto const lock = std::scoped_lock(events->work_queue_mutex);
+        auto lock = std::unique_lock(events->work_queue_mutex);
         events->work_queue.emplace_back(func, user_data);
+        lock.unlock();
+
         event_active(events->work_queue_event, 0, {});
     }
 }
