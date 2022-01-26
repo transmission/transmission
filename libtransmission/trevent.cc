@@ -224,7 +224,7 @@ static void libeventThreadFunc(void* vevents)
 
     // initialize the session struct's event fields
     events->base = base;
-    events->work_queue_event = evuser_new(base, onWorkAvailable, events->session);
+    events->work_queue_event = event_new(base, -1, 0, onWorkAvailable, events->session);
     events->session->event_base = base;
     events->session->evdns_base = evdns_base_new(base, true);
     events->session->events = events;
