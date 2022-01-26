@@ -31,124 +31,6 @@
 ****
 ***/
 
-namespace
-{
-namespace impl
-{
-struct std_lock
-{
-    // libevent2/thread.h says recursion support is mandatory
-    std::recursive_mutex mutex;
-    std::unique_lock<std::recursive_mutex> lock = std::unique_lock<std::recursive_mutex>(mutex, std::defer_lock);
-};
-
-void* lock_alloc(unsigned /*locktype*/)
-{
-    return new std_lock{};
-}
-
-void lock_free(void* lock_, unsigned /*locktype*/)
-{
-    delete static_cast<std_lock*>(lock_);
-}
-
-int lock_lock(unsigned mode, void* lock_)
-{
-    try
-    {
-        auto* lock = static_cast<std_lock*>(lock_);
-        if (mode & EVTHREAD_TRY)
-        {
-            auto const success = lock->lock.try_lock();
-            return success ? 0 : -1;
-        }
-        lock->lock.lock();
-        return 0;
-    }
-    catch (std::system_error const& /*e*/)
-    {
-        return -1;
-    }
-}
-
-int lock_unlock(unsigned /*mode*/, void* lock_)
-{
-    try
-    {
-        auto* lock = static_cast<std_lock*>(lock_);
-        lock->lock.unlock();
-        return 0;
-    }
-    catch (std::system_error const& /*e*/)
-    {
-        return -1;
-    }
-}
-
-void* cond_alloc(unsigned /*condflags*/)
-{
-    return new std::condition_variable_any();
-}
-
-void cond_free(void* cond_)
-{
-    delete static_cast<std::condition_variable_any*>(cond_);
-}
-
-int cond_signal(void* cond_, int broadcast)
-{
-    auto* cond = static_cast<std::condition_variable_any*>(cond_);
-    if (broadcast)
-    {
-        cond->notify_all();
-    }
-    else
-    {
-        cond->notify_one();
-    }
-    return 0;
-}
-
-int cond_wait(void* cond_, void* lock_, struct timeval const* tv)
-{
-    auto* cond = static_cast<std::condition_variable_any*>(cond_);
-    auto* lock = static_cast<std_lock*>(lock_);
-    if (tv == nullptr)
-    {
-        cond->wait(lock->lock);
-        return 0;
-    }
-
-    auto const duration = std::chrono::seconds(tv->tv_sec) + std::chrono::microseconds(tv->tv_usec);
-    auto const success = cond->wait_for(lock->lock, duration);
-    return success == std::cv_status::timeout ? 1 : 0;
-}
-
-} // namespace impl
-
-void tr_evthread_init()
-{
-    evthread_lock_callbacks constexpr lock_cbs{ EVTHREAD_LOCK_API_VERSION, EVTHREAD_LOCKTYPE_RECURSIVE,
-                                                impl::lock_alloc,          impl::lock_free,
-                                                impl::lock_lock,           impl::lock_unlock };
-    evthread_set_lock_callbacks(&lock_cbs);
-
-    evthread_condition_callbacks constexpr cond_cbs{ EVTHREAD_CONDITION_API_VERSION,
-                                                     impl::cond_alloc,
-                                                     impl::cond_free,
-                                                     impl::cond_signal,
-                                                     impl::cond_wait };
-    evthread_set_condition_callbacks(&cond_cbs);
-
-    evthread_set_id_callback(tr_threadCurrentId);
-}
-
-} // namespace
-
-/***
-****
-***/
-
 struct tr_event_handle
 {
     // would it be more expensive to use std::function here?
@@ -206,12 +88,12 @@ static void libeventThreadFunc(void* vevents)
 {
     auto* const events = static_cast<tr_event_handle*>(vevents);
 
-#ifndef _WIN32
-    /* Don't exit when writing on a broken socket */
-    signal(SIGPIPE, SIG_IGN);
+#ifdef _WIN32
+    evthread_use_windows_threads();
+#else
+    signal(SIGPIPE, SIG_IGN); // don't exit when writing on a broken socket
+    evthread_use_pthreads();
 #endif
-
-    tr_evthread_init();
 
     // create the libevent base
     auto* const base = event_base_new();
