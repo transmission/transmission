@@ -156,8 +156,7 @@ void showInfo(app_opts const& opts, tr_torrent_metainfo const& metainfo)
     ***
     **/
 
-    auto const n_webseeds = metainfo.webseedCount();
-    if (n_webseeds > 0)
+    if (auto const n_webseeds = metainfo.webseedCount(); n_webseeds > 0)
     {
         printf("\nWEBSEEDS\n\n");
 
@@ -242,8 +241,7 @@ void doScrape(tr_torrent_metainfo const& metainfo)
         // execute the http scrape
         curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
         curl_easy_setopt(curl, CURLOPT_TIMEOUT, TimeoutSecs);
-        auto const res = curl_easy_perform(curl);
-        if (res != CURLE_OK)
+        if (auto const res = curl_easy_perform(curl); res != CURLE_OK)
         {
             printf("error: %s\n", curl_easy_strerror(res));
             continue;

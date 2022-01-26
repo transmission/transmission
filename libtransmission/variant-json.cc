@@ -579,9 +579,9 @@ static void jsonStringFunc(tr_variant const* val, void* vdata)
             {
                 try
                 {
-                    auto* begin8 = std::data(sv);
-                    auto* end8 = begin8 + std::size(sv);
-                    auto* walk8 = begin8;
+                    auto const* const begin8 = std::data(sv);
+                    auto const* const end8 = begin8 + std::size(sv);
+                    auto const* walk8 = begin8;
                     auto const uch32 = utf8::next(walk8, end8);
                     outwalk += tr_snprintf(outwalk, outend - outwalk, "\\u%04x", uch32);
                     sv.remove_prefix(walk8 - begin8 - 1);

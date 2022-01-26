@@ -16,6 +16,10 @@
 #include "tr-assert.h"
 #include "utils.h"
 
+#ifdef __ANDROID__
+#include <android/log.h>
+#endif
+
 using namespace std::literals;
 
 tr_log_level __tr_message_level = TR_LOG_ERROR;
@@ -28,7 +32,7 @@ static int myQueueLength = 0;
 #ifndef _WIN32
 
 /* make null versions of these win32 functions */
-static inline bool IsDebuggerPresent(void)
+static inline bool IsDebuggerPresent()
 {
     return false;
 }
@@ -39,7 +43,7 @@ static inline bool IsDebuggerPresent(void)
 ****
 ***/
 
-tr_log_level tr_logGetLevel(void)
+tr_log_level tr_logGetLevel()
 {
     return __tr_message_level;
 }
@@ -50,7 +54,7 @@ tr_log_level tr_logGetLevel(void)
 
 static std::recursive_mutex message_mutex_;
 
-tr_sys_file_t tr_logGetFile(void)
+tr_sys_file_t tr_logGetFile()
 {
     static bool initialized = false;
     static tr_sys_file_t file = TR_BAD_SYS_FILE;
@@ -88,12 +92,12 @@ void tr_logSetQueueEnabled(bool isEnabled)
     myQueueEnabled = isEnabled;
 }
 
-bool tr_logGetQueueEnabled(void)
+bool tr_logGetQueueEnabled()
 {
     return myQueueEnabled;
 }
 
-tr_log_message* tr_logGetQueue(void)
+tr_log_message* tr_logGetQueue()
 {
     auto const lock = std::lock_guard(message_mutex_);
 
@@ -139,7 +143,7 @@ char* tr_logGetTimeStr(char* buf, size_t buflen)
     return buf;
 }
 
-bool tr_logGetDeepEnabled(void)
+bool tr_logGetDeepEnabled()
 {
     static int8_t deepLoggingIsActive = -1;
 
@@ -228,7 +232,32 @@ void tr_logAddMessage(char const* file, int line, tr_log_level level, char const
         OutputDebugStringA(buf);
     }
 
+#elif defined(__ANDROID__)
+
+    int prio;
+
+    switch (level)
+    {
+    case TR_LOG_ERROR:
+        prio = ANDROID_LOG_ERROR;
+        break;
+    case TR_LOG_INFO:
+        prio = ANDROID_LOG_INFO;
+        break;
+    case TR_LOG_DEBUG:
+        prio = ANDROID_LOG_DEBUG;
+        break;
+    default:
+        prio = ANDROID_LOG_VERBOSE;
+    }
+
+#ifdef NDEBUG
+    __android_log_print(prio, "transmission", "%s", buf);
+#else
+    __android_log_print(prio, "transmission", "[%s:%d] %s", file, line, buf);
 #endif
+
+#else
 
     if (!tr_str_is_empty(buf))
     {
@@ -275,6 +304,7 @@ void tr_logAddMessage(char const* file, int line, tr_log_level level, char const
             tr_sys_file_flush(fp, nullptr);
         }
     }
+#endif
 
     errno = err;
 }

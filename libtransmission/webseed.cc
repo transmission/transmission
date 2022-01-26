@@ -65,6 +65,7 @@ public:
         , callback{ callback_in }
         , callback_data{ callback_data_in }
         , bandwidth(tor->bandwidth)
+        , timer(evtimer_new(session->event_base, webseed_timer_func, this))
     {
         // init parent bits
         have.setHasAll();
@@ -72,7 +73,6 @@ public:
 
         file_urls.resize(tor->fileCount());
 
-        timer = evtimer_new(session->event_base, webseed_timer_func, this);
         tr_timerAddMsec(timer, TR_IDLE_TIMER_MSEC);
     }
 
@@ -111,7 +111,7 @@ public:
 
     Bandwidth bandwidth;
     std::set<tr_webseed_task*> tasks;
-    struct event* timer = nullptr;
+    struct event* const timer;
     int consecutive_failures = 0;
     int retry_tickcount = 0;
     int retry_challenge = 0;

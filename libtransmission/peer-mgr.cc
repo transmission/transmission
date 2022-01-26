@@ -180,7 +180,6 @@ public:
     bool endgame = false;
 
     ActiveRequests active_requests;
-    Wishlist wishlist;
 
     int interestedCount = 0;
     int maxPeers = 0;
@@ -189,7 +188,7 @@ public:
 
 struct tr_peerMgr
 {
-    auto unique_lock() const
+    [[nodiscard]] auto unique_lock() const
     {
         return session->unique_lock();
     }
@@ -549,7 +548,7 @@ static void updateEndgame(tr_swarm* s)
 
 std::vector<tr_block_span_t> tr_peerMgrGetNextRequests(tr_torrent* torrent, tr_peer const* peer, size_t numwant)
 {
-    class PeerInfoImpl : public Wishlist::PeerInfo
+    class PeerInfoImpl final : public Wishlist::PeerInfo
     {
     public:
         PeerInfoImpl(tr_torrent const* torrent_in, tr_peer const* peer_in)
@@ -561,42 +560,42 @@ std::vector<tr_block_span_t> tr_peerMgrGetNextRequests(tr_torrent* torrent, tr_p
 
         ~PeerInfoImpl() override = default;
 
-        bool clientCanRequestBlock(tr_block_index_t block) const override
+        [[nodiscard]] bool clientCanRequestBlock(tr_block_index_t block) const override
         {
             return !torrent_->hasBlock(block) && !swarm_->active_requests.has(block, peer_);
         }
 
-        bool clientCanRequestPiece(tr_piece_index_t piece) const override
+        [[nodiscard]] bool clientCanRequestPiece(tr_piece_index_t piece) const override
         {
             return torrent_->pieceIsWanted(piece) && peer_->have.test(piece);
         }
 
-        bool isEndgame() const override
+        [[nodiscard]] bool isEndgame() const override
         {
             return swarm_->endgame;
         }
 
-        size_t countActiveRequests(tr_block_index_t block) const override
+        [[nodiscard]] size_t countActiveRequests(tr_block_index_t block) const override
         {
             return swarm_->active_requests.count(block);
         }
 
-        size_t countMissingBlocks(tr_piece_index_t piece) const override
+        [[nodiscard]] size_t countMissingBlocks(tr_piece_index_t piece) const override
         {
             return torrent_->countMissingBlocksInPiece(piece);
         }
 
-        tr_block_span_t blockSpan(tr_piece_index_t piece) const override
+        [[nodiscard]] tr_block_span_t blockSpan(tr_piece_index_t piece) const override
         {
             return torrent_->blockSpanForPiece(piece);
         }
 
-        tr_piece_index_t countAllPieces() const override
+        [[nodiscard]] tr_piece_index_t countAllPieces() const override
         {
             return torrent_->pieceCount();
         }
 
-        tr_priority_t priority(tr_piece_index_t piece) const override
+        [[nodiscard]] tr_priority_t priority(tr_piece_index_t piece) const override
         {
             return torrent_->piecePriority(piece);
         }
@@ -609,7 +608,7 @@ std::vector<tr_block_span_t> tr_peerMgrGetNextRequests(tr_torrent* torrent, tr_p
 
     auto* const swarm = torrent->swarm;
     updateEndgame(swarm);
-    return swarm->wishlist.next(PeerInfoImpl(torrent, peer), numwant);
+    return Wishlist::next(PeerInfoImpl(torrent, peer), numwant);
 }
 
 /****
@@ -1210,8 +1209,10 @@ std::vector<tr_pex> tr_peerMgrCompactToPex(void const* compact, size_t compactLe
     for (size_t i = 0; i < n; ++i)
     {
         pex[i].addr.type = TR_AF_INET;
-        walk = std::copy_n(walk, 4, reinterpret_cast<std::byte*>(&pex[i].addr.addr));
-        walk = std::copy_n(walk, 2, reinterpret_cast<std::byte*>(&pex[i].port));
+        std::copy_n(walk, 4, reinterpret_cast<std::byte*>(&pex[i].addr.addr));
+        walk += 4;
+        std::copy_n(walk, 2, reinterpret_cast<std::byte*>(&pex[i].port));
+        walk += 2;
 
         if (added_f != nullptr && n == added_f_len)
         {
@@ -1260,8 +1261,10 @@ std::vector<tr_pex> tr_peerMgrCompact6ToPex(void const* compact, size_t compactL
     for (size_t i = 0; i < n; ++i)
     {
         pex[i].addr.type = TR_AF_INET6;
-        walk = std::copy_n(walk, 16, reinterpret_cast<std::byte*>(&pex[i].addr.addr.addr6.s6_addr));
-        walk = std::copy_n(walk, 2, reinterpret_cast<std::byte*>(&pex[i].port));
+        std::copy_n(walk, 16, reinterpret_cast<std::byte*>(&pex[i].addr.addr.addr6.s6_addr));
+        walk += 16;
+        std::copy_n(walk, 2, reinterpret_cast<std::byte*>(&pex[i].port));
+        walk += 2;
 
         if (added_f != nullptr && n == added_f_len)
         {
@@ -1573,7 +1576,7 @@ void tr_peerUpdateProgress(tr_torrent* tor, tr_peer* peer)
 
     peer->progress = std::clamp(peer->progress, 0.0F, 1.0F);
 
-    if (peer->atom != nullptr && peer->progress >= 1.0f)
+    if (peer->atom != nullptr && peer->progress >= 1.0F)
     {
         atomSetSeed(tor->swarm, peer->atom);
     }
@@ -1713,7 +1716,8 @@ uint64_t tr_peerMgrGetDesiredAvailable(tr_torrent const* tor)
 
     for (size_t i = 0; i < n_peers; ++i)
     {
-        auto* peer = peers[i];
+        auto const* const peer = peers[i];
+
         for (size_t j = 0; j < n_pieces; ++j)
         {
             if (peer->have.test(j))
@@ -2513,7 +2517,7 @@ static void closeBadPeers(tr_swarm* s, time_t const now_sec)
 
 struct ComparePeerByActivity
 {
-    int compare(tr_peer const* a, tr_peer const* b) const // <=>
+    static int compare(tr_peer const* a, tr_peer const* b) // <=>
     {
         if (a->doPurge != b->doPurge)
         {

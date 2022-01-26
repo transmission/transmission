@@ -298,42 +298,42 @@ public:
         return Bps > 0;
     }
 
-    bool is_peer_choked() const override
+    [[nodiscard]] bool is_peer_choked() const override
     {
         return peer_is_choked_;
     }
 
-    bool is_peer_interested() const override
+    [[nodiscard]] bool is_peer_interested() const override
     {
         return peer_is_interested_;
     }
 
-    bool is_client_choked() const override
+    [[nodiscard]] bool is_client_choked() const override
     {
         return client_is_choked_;
     }
 
-    bool is_client_interested() const override
+    [[nodiscard]] bool is_client_interested() const override
     {
         return client_is_interested_;
     }
 
-    bool is_utp_connection() const override
+    [[nodiscard]] bool is_utp_connection() const override
     {
         return io->socket.type == TR_PEER_SOCKET_TYPE_UTP;
     }
 
-    bool is_encrypted() const override
+    [[nodiscard]] bool is_encrypted() const override
     {
         return tr_peerIoIsEncrypted(io);
     }
 
-    bool is_incoming_connection() const override
+    [[nodiscard]] bool is_incoming_connection() const override
     {
         return tr_peerIoIsIncoming(io);
     }
 
-    bool is_active(tr_direction direction) const override
+    [[nodiscard]] bool is_active(tr_direction direction) const override
     {
         TR_ASSERT(tr_isDirection(direction));
         auto const active = is_active_[direction];
@@ -348,12 +348,12 @@ public:
         set_active(direction, calculate_active(direction));
     }
 
-    time_t get_connection_age() const override
+    [[nodiscard]] time_t get_connection_age() const override
     {
         return tr_peerIoGetAge(io);
     }
 
-    bool is_reading_block(tr_block_index_t block) const override
+    [[nodiscard]] bool is_reading_block(tr_block_index_t block) const override
     {
         return state == AwaitingBtPiece && block == torrent->blockOf(incoming.blockReq.index, incoming.blockReq.offset);
     }
@@ -523,7 +523,7 @@ public:
     }
 
 private:
-    bool calculate_active(tr_direction direction) const
+    [[nodiscard]] bool calculate_active(tr_direction direction) const
     {
         if (direction == TR_CLIENT_TO_PEER)
         {
@@ -2434,8 +2434,8 @@ static void tr_set_compare(
     tr_set_func in_both_cb,
     void* userData)
 {
-    auto* a = static_cast<uint8_t const*>(va);
-    auto* b = static_cast<uint8_t const*>(vb);
+    auto const* a = static_cast<uint8_t const*>(va);
+    auto const* b = static_cast<uint8_t const*>(vb);
     uint8_t const* aend = a + elementSize * aCount;
     uint8_t const* bend = b + elementSize * bCount;
 

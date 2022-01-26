@@ -2446,7 +2446,7 @@ int tr_blocklistSetContent(tr_session* session, char const* contentFilename)
 
 bool tr_sessionIsAddressBlocked(tr_session const* session, tr_address const* addr)
 {
-    auto& src = session->blocklists;
+    auto const& src = session->blocklists;
     return std::any_of(
         std::begin(src),
         std::end(src),
@@ -2802,7 +2802,9 @@ int tr_sessionCountQueueFreeSlots(tr_session* session, tr_direction dir)
         {
             auto const idle_secs = int(difftime(now, std::max(tor->startDate, tor->activityDate)));
             if (idle_secs >= stalled_if_idle_for_n_seconds)
+            {
                 continue;
+            }
         }
 
         ++active_count;

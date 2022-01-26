@@ -7,9 +7,9 @@
 
 #define BETWEEN_PADDING 2.0
 
-@interface BadgeView (Private)
+@interface BadgeView ()
 
-- (void)badge:(NSImage*)badge string:(NSString*)string atHeight:(CGFloat)height adjustForQuit:(BOOL)quit;
+- (void)badge:(NSImage*)badge string:(NSString*)string atHeight:(CGFloat)height;
 
 @end
 
@@ -23,7 +23,6 @@
 
         fDownloadRate = 0.0;
         fUploadRate = 0.0;
-        fQuitting = NO;
     }
     return self;
 }
@@ -41,23 +40,9 @@
     return YES;
 }
 
-- (void)setQuitting
-{
-    fQuitting = YES;
-}
-
 - (void)drawRect:(NSRect)rect
 {
     [NSApp.applicationIconImage drawInRect:rect fromRect:NSZeroRect operation:NSCompositingOperationSourceOver fraction:1.0];
-
-    if (fQuitting)
-    {
-        NSImage* quitBadge = [NSImage imageNamed:@"QuitBadge"];
-        [self badge:quitBadge string:NSLocalizedString(@"Quitting", "Dock Badger -> quit")
-                 atHeight:(NSHeight(rect) - quitBadge.size.height) * 0.5
-            adjustForQuit:YES];
-        return;
-    }
 
     BOOL const upload = fUploadRate >= 0.1;
     BOOL const download = fDownloadRate >= 0.1;
@@ -65,7 +50,7 @@
     if (upload)
     {
         NSImage* uploadBadge = [NSImage imageNamed:@"UploadBadge"];
-        [self badge:uploadBadge string:[NSString stringForSpeedAbbrev:fUploadRate] atHeight:bottom adjustForQuit:NO];
+        [self badge:uploadBadge string:[NSString stringForSpeedAbbrev:fUploadRate] atHeight:bottom];
         if (download)
         {
             bottom += uploadBadge.size.height + BETWEEN_PADDING; //download rate above upload rate
@@ -73,16 +58,11 @@
     }
     if (download)
     {
-        [self badge:[NSImage imageNamed:@"DownloadBadge"] string:[NSString stringForSpeedAbbrev:fDownloadRate] atHeight:bottom
-            adjustForQuit:NO];
+        [self badge:[NSImage imageNamed:@"DownloadBadge"] string:[NSString stringForSpeedAbbrev:fDownloadRate] atHeight:bottom];
     }
 }
 
-@end
-
-@implementation BadgeView (Private)
-
-- (void)badge:(NSImage*)badge string:(NSString*)string atHeight:(CGFloat)height adjustForQuit:(BOOL)quit
+- (void)badge:(NSImage*)badge string:(NSString*)string atHeight:(CGFloat)height
 {
     if (!fAttributes)
     {
@@ -115,7 +95,7 @@
     //string is in center of image
     NSRect stringRect;
     stringRect.origin.x = NSMidX(badgeRect) - stringSize.width * 0.5;
-    stringRect.origin.y = NSMidY(badgeRect) - stringSize.height * 0.5 + (quit ? 2.0 : 1.0); //adjust for shadow, extra for quit
+    stringRect.origin.y = NSMidY(badgeRect) - stringSize.height * 0.5 + 1.0; //adjust for shadow
     stringRect.size = stringSize;
 
     [string drawInRect:stringRect withAttributes:fAttributes];

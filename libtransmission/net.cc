@@ -643,10 +643,9 @@ unsigned char const* tr_globalIPv6(tr_session const* session)
     static unsigned char ipv6[16];
     static time_t last_time = 0;
     static bool have_ipv6 = false;
-    time_t const now = tr_time();
 
     /* Re-check every half hour */
-    if (last_time < now - 1800)
+    if (auto const now = tr_time(); last_time < now - 1800)
     {
         int addrlen = 16;
         int const rc = tr_globalAddress(AF_INET6, ipv6, &addrlen);
@@ -655,12 +654,16 @@ unsigned char const* tr_globalIPv6(tr_session const* session)
     }
 
     if (!have_ipv6)
+    {
         return nullptr; /* No IPv6 address at all. */
+    }
 
     /* Return the default address. This is useful for checking
        for connectivity in general. */
     if (session == nullptr)
+    {
         return ipv6;
+    }
 
     /* We have some sort of address, now make sure that we return
        our bound address if non-default. */
@@ -668,8 +671,10 @@ unsigned char const* tr_globalIPv6(tr_session const* session)
     bool is_default = false;
     auto const* ipv6_bindaddr = tr_sessionGetPublicAddress(session, TR_AF_INET6, &is_default);
     if (ipv6_bindaddr != nullptr && !is_default)
+    {
         /* Explicitly bound. Return that address. */
         memcpy(ipv6, ipv6_bindaddr->addr.addr6.s6_addr, 16);
+    }
 
     return ipv6;
 }

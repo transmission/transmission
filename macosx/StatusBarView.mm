@@ -5,7 +5,7 @@
 #import "StatusBarView.h"
 #import "NSApplicationAdditions.h"
 
-@interface StatusBarView (Private)
+@interface StatusBarView ()
 
 - (void)reload;
 
@@ -35,10 +35,6 @@
         NSRectFill(lineBorderRect);
     }
 }
-
-@end
-
-@implementation StatusBarView (Private)
 
 - (void)reload
 {

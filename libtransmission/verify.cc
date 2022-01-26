@@ -26,7 +26,7 @@
 
 static auto constexpr MsecToSleepPerSecondDuringVerify = int{ 100 };
 
-static bool verifyTorrent(tr_torrent* tor, bool* stopFlag)
+static bool verifyTorrent(tr_torrent* tor, bool const* stopFlag)
 {
     auto const begin = tr_time();
 
@@ -163,7 +163,7 @@ struct verify_node
     void* callback_data;
     uint64_t current_size;
 
-    int compare(verify_node const& that) const
+    [[nodiscard]] int compare(verify_node const& that) const
     {
         // higher priority comes before lower priority
         auto const pa = tr_torrentGetPriority(torrent);

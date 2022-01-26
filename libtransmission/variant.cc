@@ -829,6 +829,7 @@ protected:
         }
     }
 
+private:
     // When walking `v`'s children, this is the index of the next child
     size_t child_index = 0;
 
@@ -868,7 +869,7 @@ public:
         }
     }
 
-    bool empty() const
+    [[nodiscard]] bool empty() const
     {
         return size == 0;
     }
@@ -1235,19 +1236,26 @@ bool tr_variantFromBuf(tr_variant* setme, int opts, std::string_view buf, char c
     auto locale_ctx = locale_context{};
     use_numeric_locale(&locale_ctx, "C");
 
-    auto err = (opts & TR_VARIANT_PARSE_BENC) ? tr_variantParseBenc(*setme, opts, buf, setme_end) :
-                                                tr_variantParseJson(*setme, opts, buf, setme_end);
+    auto success = bool{};
+    if (opts & TR_VARIANT_PARSE_BENC)
+    {
+        success = tr_variantParseBenc(*setme, opts, buf, setme_end, error);
+    }
+    else
+    {
+        // TODO: tr_variantParseJson() should take a tr_error* same as ParseBenc
+        auto err = tr_variantParseJson(*setme, opts, buf, setme_end);
+        if (err)
+        {
+            tr_error_set(error, EILSEQ, "error parsing encoded data"sv);
+        }
+        success = err == 0;
+    }
 
     /* restore the previous locale */
     restore_locale(&locale_ctx);
 
-    if (err)
-    {
-        tr_error_set(error, EILSEQ, "error parsing encoded data"sv);
-        return false;
-    }
-
-    return true;
+    return success;
 }
 
 bool tr_variantFromFile(tr_variant* setme, tr_variant_parse_opts opts, std::string const& filename, tr_error** error)
@@ -1261,6 +1269,6 @@ bool tr_variantFromFile(tr_variant* setme, tr_variant_parse_opts opts, std::stri
         return false;
     }
 
-    auto sv = std::string_view{ std::data(buf), std::size(buf) };
+    auto const sv = std::string_view{ std::data(buf), std::size(buf) };
     return tr_variantFromBuf(setme, opts, sv, nullptr, error);
 }

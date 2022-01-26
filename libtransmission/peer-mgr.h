@@ -9,8 +9,10 @@
 #error only libtransmission should #include this header.
 #endif
 
+#include <array>
 #include <cinttypes> // uintX_t
 #include <cstddef> // size_t
+#include <string>
 #include <vector>
 
 #ifdef _WIN32
@@ -56,6 +58,18 @@ struct tr_pex
     tr_address addr;
     tr_port port; /* this field is in network byte order */
     uint8_t flags;
+
+    std::string_view to_string(char* buf, size_t buflen) const
+    {
+        tr_address_and_port_to_string(buf, buflen, &addr, port);
+        return buf;
+    }
+
+    [[nodiscard]] std::string to_string() const
+    {
+        auto buf = std::array<char, 64>{};
+        return std::string{ to_string(std::data(buf), std::size(buf)) };
+    }
 };
 
 constexpr bool tr_isPex(tr_pex const* pex)

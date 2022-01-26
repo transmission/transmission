@@ -298,7 +298,7 @@ uint8_t* tr_loadFile(char const* path, size_t* size, tr_error** error)
     {
         tr_logAddError(err_fmt, path, my_error->message);
         tr_sys_file_close(fd, nullptr);
-        free(buf);
+        tr_free(buf);
         tr_error_propagate(error, &my_error);
         return nullptr;
     }
@@ -500,7 +500,7 @@ extern "C"
 /* User-level routine. returns whether or not 'text' and 'p' matched */
 bool tr_wildmat(char const* text, char const* p)
 {
-    return (p[0] == '*' && p[1] == '\0') || (DoMatch(text, p) == true);
+    return (p[0] == '*' && p[1] == '\0') || (DoMatch(text, p) != 0);
 }
 
 char const* tr_strcasestr(char const* haystack, char const* needle)
@@ -611,7 +611,7 @@ bool tr_str_has_suffix(char const* str, char const* suffix)
 *****
 ****/
 
-uint64_t tr_time_msec(void)
+uint64_t tr_time_msec()
 {
     struct timeval tv;
 
@@ -669,7 +669,7 @@ size_t tr_strlcpy(void* vdst, void const* vsrc, size_t siz)
 #else
 
     auto* d = dst;
-    auto* s = src;
+    auto const* s = src;
     size_t n = siz;
 
     /* Copy as many bytes as will fit */
@@ -1135,7 +1135,11 @@ std::string tr_strpercent(double x)
 {
     auto buf = std::array<char, 64>{};
 
-    if (x < 100.0)
+    if (x < 5.0)
+    {
+        tr_strtruncd(std::data(buf), x, 2, std::size(buf));
+    }
+    else if (x < 100.0)
     {
         tr_strtruncd(std::data(buf), x, 1, std::size(buf));
     }
@@ -1328,7 +1332,7 @@ static char* formatter_get_size_str(formatter_units const& u, char* buf, uint64_
 
     if (bytes < u[1].value)
     {
-        unit = &u[0];
+        unit = std::data(u);
     }
     else if (bytes < u[2].value)
     {
@@ -1555,7 +1559,7 @@ char* tr_env_get_string(char const* key, char const* default_value)
 ****
 ***/
 
-void tr_net_init(void)
+void tr_net_init()
 {
     static bool initialized = false;
 

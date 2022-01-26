@@ -34,7 +34,7 @@ struct tr_session_id
     time_t expires_at;
 };
 
-static char* generate_new_session_id_value(void)
+static char* generate_new_session_id_value()
 {
     char const pool[] = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
     size_t const pool_size = sizeof(pool) - 1;
@@ -112,7 +112,7 @@ static void destroy_session_id_lock_file(tr_sys_file_t lock_file, char const* se
     }
 }
 
-tr_session_id_t tr_session_id_new(void)
+tr_session_id_t tr_session_id_new()
 {
     auto const session_id = tr_new0(struct tr_session_id, 1);
 
