@@ -6,7 +6,6 @@
 #include <condition_variable>
 #include <list>
 #include <mutex>
-#include <thread>
 
 #include <csignal>
 
@@ -125,11 +124,6 @@ int cond_wait(void* cond_, void* lock_, struct timeval const* tv)
     return success == std::cv_status::timeout ? 1 : 0;
 }
 
-unsigned long std_get_thread_id()
-{
-    return std::hash<std::thread::id>{}(std::this_thread::get_id());
-}
-
 } // namespace impl
 
 void tr_evthread_init()
@@ -146,7 +140,7 @@ void tr_evthread_init()
                                                      impl::cond_wait };
     evthread_set_condition_callbacks(&cond_cbs);
 
-    evthread_set_id_callback(impl::std_get_thread_id);
+    evthread_set_id_callback(tr_threadCurrentId);
 }
 
 } // namespace
