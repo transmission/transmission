@@ -220,7 +220,7 @@ export class PrefsDialog extends EventTarget {
       'Use temporary folder:'
     );
     cal.check.title =
-      'Separate folder to temporary store downloads in progress.';
+      'Separate folder to temporarily store downloads until they are complete.';
     cal.check.dataset.key = 'incomplete-dir-enabled';
     cal.label.title = cal.check.title;
     root.append(cal.root);
