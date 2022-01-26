@@ -39,7 +39,7 @@ struct std_lock
 {
     // libevent2/thread.h says recursion support is mandatory
     std::recursive_mutex mutex;
-    std::unique_lock<std::recursive_mutex> lock = std::unique_lock<std::recursive_mutex>(mutex);
+    std::unique_lock<std::recursive_mutex> lock = std::unique_lock<std::recursive_mutex>(mutex, std::defer_lock);
 };
 
 void* lock_alloc(unsigned /*locktype*/)
@@ -119,7 +119,7 @@ int cond_wait(void* cond_, void* lock_, struct timeval const* tv)
         return 0;
     }
 
-    auto duration = std::chrono::seconds(tv->tv_sec) + std::chrono::microseconds(tv->tv_usec);
+    auto const duration = std::chrono::seconds(tv->tv_sec) + std::chrono::microseconds(tv->tv_usec);
     auto const success = cond->wait_for(lock->lock, duration);
     return success == std::cv_status::timeout ? 1 : 0;
 }
