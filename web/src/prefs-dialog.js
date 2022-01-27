@@ -229,10 +229,7 @@ export class PrefsDialog extends EventTarget {
     PrefsDialog._enableIfChecked(input, cal.check);
     const incomplete_dir_input = input;
 
-    cal = PrefsDialog._createCheckAndLabel(
-      'autostart-div',
-      'Start when added'
-    );
+    cal = PrefsDialog._createCheckAndLabel('autostart-div', 'Start when added');
     cal.check.dataset.key = 'start-added-torrents';
     root.append(cal.root);
     const autostart_check = cal.check;
