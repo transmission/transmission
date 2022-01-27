@@ -424,6 +424,7 @@
    "cookies"            | string      pointer to a string of one or more cookies.
    "download-dir"       | string      path to download the torrent to
    "filename"           | string      filename or URL of the .torrent file
+   "labels"             | array       array of string labels
    "metainfo"           | string      base64-encoded .torrent content
    "paused"             | boolean     if true, don't start the torrent
    "peer-limit"         | number      maximum number of peers
@@ -857,6 +858,7 @@
        |       |      | torrent-get          | new arg "primary-mime-type"
        |       |      | free-space           | new return arg "total-capacity"
        |       |      |                      | undocumented "/upload" endpoint removed
+       |       |      | torrent-add          | new arg "labels"
 
 
 5.1.  Upcoming Breakage

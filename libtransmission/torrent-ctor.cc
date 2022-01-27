@@ -41,6 +41,8 @@ struct tr_ctor
 
     tr_priority_t priority = TR_PRI_NORMAL;
 
+    tr_labels_t labels = {};
+
     struct optional_args optional_args[2];
 
     std::string incomplete_dir;
@@ -323,6 +325,31 @@ void tr_ctorSetBandwidthPriority(tr_ctor* ctor, tr_priority_t priority)
 tr_priority_t tr_ctorGetBandwidthPriority(tr_ctor const* ctor)
 {
     return ctor->priority;
+}
+
+/***
+****
+***/
+
+void tr_ctorSetLabels(tr_ctor* ctor, char const** labels, size_t len)
+{
+    auto labels_set = tr_labels_t{};
+    for (size_t i = 0; i < len; i++)
+    {
+        labels_set.emplace(labels[i]);
+    }
+
+    tr_ctorSetLabels(ctor, std::move(labels_set));
+}
+
+void tr_ctorSetLabels(tr_ctor* ctor, tr_labels_t&& labels)
+{
+    ctor->labels = std::move(labels);
+}
+
+tr_labels_t tr_ctorGetLabels(tr_ctor const* ctor)
+{
+    return ctor->labels;
 }
 
 /***
