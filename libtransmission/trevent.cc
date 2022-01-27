@@ -206,7 +206,8 @@ static void libeventThreadFunc(void* vevents)
     events->session->evdns_base = evdns_base_new(base, true);
     events->session->events = events;
 
-    event_base_dispatch(base);
+    // loop until `tr_eventClose()` kills the loop
+    event_base_loop(base, EVLOOP_NO_EXIT_ON_EMPTY);
 
     // shut down the thread
     event_base_free(base);
