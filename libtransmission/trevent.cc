@@ -19,12 +19,11 @@
 #include <event2/event.h>
 
 #include "transmission.h"
+
 #include "log.h"
 #include "net.h"
-#include "session.h"
-
-#include "transmission.h"
 #include "platform.h"
+#include "session.h"
 #include "tr-assert.h"
 #include "trevent.h"
 #include "utils.h"
