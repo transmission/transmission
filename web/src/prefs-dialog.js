@@ -212,9 +212,24 @@ export class PrefsDialog extends EventTarget {
     const download_dir = input;
 
     let cal = PrefsDialog._createCheckAndLabel(
-      'autostart-div',
-      'Start when added'
+      'incomplete-dir-div',
+      'Use temporary folder:'
     );
+    cal.check.title =
+      'Separate folder to temporarily store downloads until they are complete.';
+    cal.check.dataset.key = 'incomplete-dir-enabled';
+    cal.label.title = cal.check.title;
+    root.append(cal.root);
+    const incomplete_dir_check = cal.check;
+
+    input = document.createElement('input');
+    input.type = 'text';
+    input.dataset.key = 'incomplete-dir';
+    root.append(input);
+    PrefsDialog._enableIfChecked(input, cal.check);
+    const incomplete_dir_input = input;
+
+    cal = PrefsDialog._createCheckAndLabel('autostart-div', 'Start when added');
     cal.check.dataset.key = 'start-added-torrents';
     root.append(cal.root);
     const autostart_check = cal.check;
@@ -282,6 +297,8 @@ export class PrefsDialog extends EventTarget {
       download_dir,
       download_queue_check,
       download_queue_input,
+      incomplete_dir_check,
+      incomplete_dir_input,
       root,
       stop_idle_check,
       stop_idle_input,
