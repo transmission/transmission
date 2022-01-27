@@ -194,7 +194,7 @@ static void on_announce_done_eventthread(void* vdata)
     delete data;
 }
 
-static void maybeLogMessage(std::string_view description, tr_direction direction, std::string_view message)
+static void verboseLog(std::string_view description, tr_direction direction, std::string_view message)
 {
     auto& out = std::cerr;
     static bool const verbose = tr_env_key_exists("TR_CURL_VERBOSE");
@@ -222,12 +222,16 @@ static void maybeLogMessage(std::string_view description, tr_direction direction
 
 void tr_announcerParseHttpAnnounceResponse(tr_announce_response& response, std::string_view msg)
 {
-    maybeLogMessage("Announce response:", TR_DOWN, msg);
+    verboseLog("Announce response:", TR_DOWN, msg);
 
     auto benc = tr_variant{};
     auto const variant_loaded = tr_variantFromBuf(&benc, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, msg);
+    if (!variant_loaded)
+    {
+        return;
+    }
 
-    if (variant_loaded && tr_variantIsDict(&benc))
+    if (tr_variantIsDict(&benc))
     {
         auto i = int64_t{};
         auto sv = std::string_view{};
@@ -288,10 +292,7 @@ void tr_announcerParseHttpAnnounceResponse(tr_announce_response& response, std::
         }
     }
 
-    if (variant_loaded)
-    {
-        tr_variantFree(&benc);
-    }
+    tr_variantFree(&benc);
 }
 
 static void on_announce_done(
@@ -375,6 +376,77 @@ static void on_scrape_done_eventthread(void* vdata)
     delete data;
 }
 
+void tr_announcerParseHttpScrapeResponse(tr_scrape_response& response, std::string_view msg)
+{
+    verboseLog("Scrape response:", TR_DOWN, msg);
+
+    auto top = tr_variant{};
+    auto const variant_loaded = tr_variantFromBuf(&top, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, msg);
+    if (!variant_loaded)
+    {
+        return;
+    }
+
+    if (auto sv = std::string_view{}; tr_variantDictFindStrView(&top, TR_KEY_failure_reason, &sv))
+    {
+        response.errmsg = sv;
+    }
+
+    tr_variant* flags = nullptr;
+    auto intVal = int64_t{};
+    if (tr_variantDictFindDict(&top, TR_KEY_flags, &flags) &&
+        tr_variantDictFindInt(flags, TR_KEY_min_request_interval, &intVal))
+    {
+        response.min_request_interval = intVal;
+    }
+
+    tr_variant* files = nullptr;
+    if (tr_variantDictFindDict(&top, TR_KEY_files, &files))
+    {
+        auto key = tr_quark{};
+        tr_variant* val = nullptr;
+
+        for (int i = 0; tr_variantDictChild(files, i, &key, &val); ++i)
+        {
+            /* populate the corresponding row in our response array */
+            for (int j = 0; j < response.row_count; ++j)
+            {
+                struct tr_scrape_response_row* row = &response.rows[j];
+
+                // TODO(ckerr): ugh, interning info dict hashes is awful
+                auto const& hash = row->info_hash;
+                auto const key_sv = tr_quark_get_string_view(key);
+                if (std::size(hash) == std::size(key_sv) && memcmp(std::data(hash), std::data(key_sv), std::size(hash)) == 0)
+                {
+                    if (tr_variantDictFindInt(val, TR_KEY_complete, &intVal))
+                    {
+                        row->seeders = intVal;
+                    }
+
+                    if (tr_variantDictFindInt(val, TR_KEY_incomplete, &intVal))
+                    {
+                        row->leechers = intVal;
+                    }
+
+                    if (tr_variantDictFindInt(val, TR_KEY_downloaded, &intVal))
+                    {
+                        row->downloads = intVal;
+                    }
+
+                    if (tr_variantDictFindInt(val, TR_KEY_downloaders, &intVal))
+                    {
+                        row->downloaders = intVal;
+                    }
+
+                    break;
+                }
+            }
+        }
+    }
+
+    tr_variantFree(&top);
+}
+
 static void on_scrape_done(
     tr_session* session,
     bool did_connect,
@@ -385,11 +457,11 @@ static void on_scrape_done(
 {
     auto* data = static_cast<struct scrape_data*>(vdata);
 
-    tr_scrape_response* response = &data->response;
-    response->did_connect = did_connect;
-    response->did_timeout = did_timeout;
+    tr_scrape_response& response = data->response;
+    response.did_connect = did_connect;
+    response.did_timeout = did_timeout;
 
-    auto const scrape_url_sv = response->scrape_url.sv();
+    auto const scrape_url_sv = response.scrape_url.sv();
     dbgmsg(data->log_name, "Got scrape response for \"%" TR_PRIsv "\"", TR_PRIsv_ARG(scrape_url_sv));
 
     if (response_code != HTTP_OK)
@@ -398,93 +470,11 @@ static void on_scrape_done(
         char const* response_str = tr_webGetResponseStr(response_code);
         char buf[512];
         tr_snprintf(buf, sizeof(buf), fmt, response_code, response_str);
-        response->errmsg = buf;
+        response.errmsg = buf;
     }
     else
     {
-        auto top = tr_variant{};
-
-        auto const variant_loaded = tr_variantFromBuf(&top, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, msg);
-
-        if (tr_env_key_exists("TR_CURL_VERBOSE"))
-        {
-            if (!variant_loaded)
-            {
-                fprintf(stderr, "%s", "Scrape response was not in benc format\n");
-            }
-            else
-            {
-                fprintf(stderr, "%s", "Scrape response:\n< ");
-                for (auto const ch : tr_variantToStr(&top, TR_VARIANT_FMT_JSON))
-                {
-                    fputc(ch, stderr);
-                }
-                fputc('\n', stderr);
-            }
-        }
-
-        if (variant_loaded)
-        {
-            if (auto sv = std::string_view{}; tr_variantDictFindStrView(&top, TR_KEY_failure_reason, &sv))
-            {
-                response->errmsg = sv;
-            }
-
-            tr_variant* flags = nullptr;
-            auto intVal = int64_t{};
-            if (tr_variantDictFindDict(&top, TR_KEY_flags, &flags) &&
-                tr_variantDictFindInt(flags, TR_KEY_min_request_interval, &intVal))
-            {
-                response->min_request_interval = intVal;
-            }
-
-            tr_variant* files = nullptr;
-            if (tr_variantDictFindDict(&top, TR_KEY_files, &files))
-            {
-                auto key = tr_quark{};
-                tr_variant* val = nullptr;
-
-                for (int i = 0; tr_variantDictChild(files, i, &key, &val); ++i)
-                {
-                    /* populate the corresponding row in our response array */
-                    for (int j = 0; j < response->row_count; ++j)
-                    {
-                        struct tr_scrape_response_row* row = &response->rows[j];
-
-                        // TODO(ckerr): ugh, interning info dict hashes is awful
-                        auto const& hash = row->info_hash;
-                        auto const key_sv = tr_quark_get_string_view(key);
-                        if (std::size(hash) == std::size(key_sv) &&
-                            memcmp(std::data(hash), std::data(key_sv), std::size(hash)) == 0)
-                        {
-                            if (tr_variantDictFindInt(val, TR_KEY_complete, &intVal))
-                            {
-                                row->seeders = intVal;
-                            }
-
-                            if (tr_variantDictFindInt(val, TR_KEY_incomplete, &intVal))
-                            {
-                                row->leechers = intVal;
-                            }
-
-                            if (tr_variantDictFindInt(val, TR_KEY_downloaded, &intVal))
-                            {
-                                row->downloads = intVal;
-                            }
-
-                            if (tr_variantDictFindInt(val, TR_KEY_downloaders, &intVal))
-                            {
-                                row->downloaders = intVal;
-                            }
-
-                            break;
-                        }
-                    }
-                }
-            }
-
-            tr_variantFree(&top);
-        }
+        tr_announcerParseHttpScrapeResponse(response, msg);
     }
 
     tr_runInEventThread(session, on_scrape_done_eventthread, data);

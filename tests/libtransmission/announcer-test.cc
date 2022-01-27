@@ -3,6 +3,7 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include <algorithm>
 #include <array>
 #include <string_view>
 
@@ -145,4 +146,157 @@ TEST_F(AnnouncerTest, parseHttpAnnounceResponseFailureReason)
     EXPECT_EQ(0, std::size(response.pex6));
     EXPECT_EQ("foobar"sv, response.errmsg);
     EXPECT_EQ(""sv, response.warning);
+}
+
+TEST_F(AnnouncerTest, parseHttpScrapeResponseMulti)
+{
+    // clang-format off
+    auto constexpr ResponseBenc =
+        "d"
+            "5:files"
+            "d"
+                "20:aaaaaaaaaaaaaaaaaaaa"
+                "d"
+                    "8:complete" "i1e"
+                    "10:incomplete" "i2e"
+                    "10:downloaded" "i3e"
+                "e"
+
+                "20:bbbbbbbbbbbbbbbbbbbb"
+                "d"
+                    "8:complete" "i4e"
+                    "10:incomplete" "i5e"
+                    "10:downloaded" "i6e"
+                "e"
+
+                "20:cccccccccccccccccccc"
+                "d"
+                    "8:complete" "i7e"
+                    "10:incomplete" "i8e"
+                    "10:downloaded" "i9e"
+                "e"
+            "e"
+        "e"sv;
+    // clang-format on
+
+    auto response = tr_scrape_response{};
+    std::fill_n(std::data(response.rows[0].info_hash), std::size(response.rows[0].info_hash), std::byte{ 'a' });
+    std::fill_n(std::data(response.rows[1].info_hash), std::size(response.rows[1].info_hash), std::byte{ 'b' });
+    std::fill_n(std::data(response.rows[2].info_hash), std::size(response.rows[2].info_hash), std::byte{ 'c' });
+    response.row_count = 3;
+    tr_announcerParseHttpScrapeResponse(response, ResponseBenc);
+
+    EXPECT_EQ(1, response.rows[0].seeders);
+    EXPECT_EQ(2, response.rows[0].leechers);
+    EXPECT_EQ(3, response.rows[0].downloads);
+
+    EXPECT_EQ(4, response.rows[1].seeders);
+    EXPECT_EQ(5, response.rows[1].leechers);
+    EXPECT_EQ(6, response.rows[1].downloads);
+
+    EXPECT_EQ(7, response.rows[2].seeders);
+    EXPECT_EQ(8, response.rows[2].leechers);
+    EXPECT_EQ(9, response.rows[2].downloads);
+}
+
+TEST_F(AnnouncerTest, parseHttpScrapeResponseMultiWithExcess)
+{
+    // clang-format off
+    auto constexpr ResponseBenc =
+        "d"
+            "5:files"
+            "d"
+                "20:aaaaaaaaaaaaaaaaaaaa"
+                "d"
+                    "8:complete" "i1e"
+                    "10:incomplete" "i2e"
+                    "10:downloaded" "i3e"
+                "e"
+
+                "20:bbbbbbbbbbbbbbbbbbbb"
+                "d"
+                    "8:complete" "i4e"
+                    "10:incomplete" "i5e"
+                    "10:downloaded" "i6e"
+                "e"
+
+                "20:cccccccccccccccccccc"
+                "d"
+                    "8:complete" "i7e"
+                    "10:incomplete" "i8e"
+                    "10:downloaded" "i9e"
+                "e"
+
+                "20:dddddddddddddddddddd"
+                "d"
+                    "8:complete" "i7e"
+                    "10:incomplete" "i8e"
+                    "10:downloaded" "i9e"
+                "e"
+            "e"
+        "e"sv;
+    // clang-format on
+
+    auto response = tr_scrape_response{};
+    std::fill_n(std::data(response.rows[0].info_hash), std::size(response.rows[0].info_hash), std::byte{ 'a' });
+    std::fill_n(std::data(response.rows[1].info_hash), std::size(response.rows[1].info_hash), std::byte{ 'b' });
+    std::fill_n(std::data(response.rows[2].info_hash), std::size(response.rows[2].info_hash), std::byte{ 'c' });
+    response.row_count = 3;
+    tr_announcerParseHttpScrapeResponse(response, ResponseBenc);
+
+    EXPECT_EQ(1, response.rows[0].seeders);
+    EXPECT_EQ(2, response.rows[0].leechers);
+    EXPECT_EQ(3, response.rows[0].downloads);
+
+    EXPECT_EQ(4, response.rows[1].seeders);
+    EXPECT_EQ(5, response.rows[1].leechers);
+    EXPECT_EQ(6, response.rows[1].downloads);
+
+    EXPECT_EQ(7, response.rows[2].seeders);
+    EXPECT_EQ(8, response.rows[2].leechers);
+    EXPECT_EQ(9, response.rows[2].downloads);
+}
+
+TEST_F(AnnouncerTest, parseHttpScrapeResponseMultiWithMissing)
+{
+    // clang-format off
+    auto constexpr ResponseBenc =
+        "d"
+            "5:files"
+            "d"
+                "20:aaaaaaaaaaaaaaaaaaaa"
+                "d"
+                    "8:complete" "i1e"
+                    "10:incomplete" "i2e"
+                    "10:downloaded" "i3e"
+                "e"
+
+                "20:cccccccccccccccccccc"
+                "d"
+                    "8:complete" "i7e"
+                    "10:incomplete" "i8e"
+                    "10:downloaded" "i9e"
+                "e"
+            "e"
+        "e"sv;
+    // clang-format on
+
+    auto response = tr_scrape_response{};
+    std::fill_n(std::data(response.rows[0].info_hash), std::size(response.rows[0].info_hash), std::byte{ 'a' });
+    std::fill_n(std::data(response.rows[1].info_hash), std::size(response.rows[1].info_hash), std::byte{ 'b' });
+    std::fill_n(std::data(response.rows[2].info_hash), std::size(response.rows[2].info_hash), std::byte{ 'c' });
+    response.row_count = 3;
+    tr_announcerParseHttpScrapeResponse(response, ResponseBenc);
+
+    EXPECT_EQ(1, response.rows[0].seeders);
+    EXPECT_EQ(2, response.rows[0].leechers);
+    EXPECT_EQ(3, response.rows[0].downloads);
+
+    EXPECT_EQ(0, response.rows[1].seeders);
+    EXPECT_EQ(0, response.rows[1].leechers);
+    EXPECT_EQ(0, response.rows[1].downloads);
+
+    EXPECT_EQ(7, response.rows[2].seeders);
+    EXPECT_EQ(8, response.rows[2].leechers);
+    EXPECT_EQ(9, response.rows[2].downloads);
 }
