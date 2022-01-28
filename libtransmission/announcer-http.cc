@@ -439,10 +439,8 @@ void tr_announcerParseHttpScrapeResponse(tr_scrape_response& response, std::stri
             }
             else
             {
-                tr_error_set(
-                    context.error,
-                    EINVAL,
-                    tr_strvJoin("unexpected int: key["sv, key, "] value["sv, std::to_string(value), "]"sv));
+                auto const errmsg = tr_strvJoin("unexpected int: key["sv, key, "] value["sv, std::to_string(value), "]"sv);
+                tr_error_set(context.error, EINVAL, errmsg);
             }
 
             return true;
