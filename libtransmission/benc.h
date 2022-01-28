@@ -269,7 +269,6 @@ bool parse(
                 if (!handler.Int64(*value, context))
                 {
                     err = ECANCELED;
-                    // tr_error_set(error, err, "Handler indicated parser should stop");
                 }
                 else
                 {
@@ -294,7 +293,6 @@ bool parse(
                 if (!ok)
                 {
                     err = ECANCELED;
-                    // tr_error_set(error, err, "Handler indicated parser should stop");
                     break;
                 }
 
@@ -318,7 +316,6 @@ bool parse(
                     !ok)
                 {
                     err = ECANCELED;
-                    // tr_error_set(error, err, "Handler indicated parser should stop");
                 }
             }
             break;
@@ -344,7 +341,6 @@ bool parse(
                 if (bool const ok = stack.expectingDictKey() ? handler.Key(*sv, context) : handler.String(*sv, context); !ok)
                 {
                     err = ECANCELED;
-                    // tr_error_set(error, err, "Handler indicated parser should stop");
                 }
                 else
                 {
