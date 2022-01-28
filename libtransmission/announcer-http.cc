@@ -211,7 +211,6 @@ void tr_announcerParseHttpAnnounceResponse(tr_announce_response& response, std::
 
         bool Int64(int64_t value) override
         {
-            BasicHandler::Int64(value);
             auto const key = currentKey();
 
             if (key == "interval")
@@ -244,7 +243,6 @@ void tr_announcerParseHttpAnnounceResponse(tr_announce_response& response, std::
 
         bool String(std::string_view value) override
         {
-            BasicHandler::String(value);
             auto const key = currentKey();
 
             if (key == "failure reason"sv)
@@ -406,8 +404,6 @@ void tr_announcerParseHttpScrapeResponse(tr_scrape_response& response, std::stri
 
         bool Int64(int64_t value) override
         {
-            BasicHandler::Int64(value);
-
             if (row_ && currentKey() == "complete"sv)
             {
                 response_.rows[*row_].seeders = value;
@@ -426,8 +422,6 @@ void tr_announcerParseHttpScrapeResponse(tr_scrape_response& response, std::stri
 
         bool String(std::string_view value) override
         {
-            BasicHandler::String(value);
-
             if (depth() == 1 && currentKey() == "failure reason"sv)
             {
                 response_.errmsg = value;
