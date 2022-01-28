@@ -233,4 +233,6 @@ void tr_tracker_udp_start_shutdown(tr_session* session);
 
 void tr_announcerParseHttpAnnounceResponse(tr_announce_response& response, std::string_view msg);
 
+void tr_announcerParseHttpScrapeResponse(tr_scrape_response& response, std::string_view msg);
+
 tr_interned_string tr_announcerGetKey(tr_url_parsed_t const& parsed);

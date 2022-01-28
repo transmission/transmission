@@ -31,63 +31,120 @@ std::optional<std::string_view> ParseString(std::string_view* benc);
 
 struct Handler
 {
+    class Context
+    {
+    public:
+        Context(char const* stream_begin_in, tr_error** error_in)
+            : error{ error_in }
+            , stream_begin_{ stream_begin_in }
+        {
+        }
+        [[nodiscard]] std::pair<long, long> tokenSpan() const
+        {
+            return std::make_pair(token_begin_ - stream_begin_, token_end_ - stream_begin_);
+        }
+        [[nodiscard]] auto raw() const
+        {
+            return std::string_view{ token_begin_, size_t(token_end_ - token_begin_) };
+        }
+        void setTokenSpan(char const* a, size_t len)
+        {
+            token_begin_ = a;
+            token_end_ = token_begin_ + len;
+        }
+        tr_error** error = nullptr;
+
+    private:
+        char const* token_begin_ = nullptr;
+        char const* token_end_ = nullptr;
+        char const* const stream_begin_;
+    };
+
     virtual ~Handler() = default;
 
-    virtual bool Int64(int64_t) = 0;
-    virtual bool String(std::string_view) = 0;
+    virtual bool Int64(int64_t, Context const& context) = 0;
+    virtual bool String(std::string_view, Context const& context) = 0;
 
-    virtual bool StartDict() = 0;
-    virtual bool Key(std::string_view) = 0;
-    virtual bool EndDict() = 0;
+    virtual bool StartDict(Context const& context) = 0;
+    virtual bool Key(std::string_view, Context const& context) = 0;
+    virtual bool EndDict(Context const& context) = 0;
 
-    virtual bool StartArray() = 0;
-    virtual bool EndArray() = 0;
+    virtual bool StartArray(Context const& context) = 0;
+    virtual bool EndArray(Context const& context) = 0;
 };
 
 template<std::size_t MaxDepth>
 struct BasicHandler : public Handler
 {
-    bool Int64(int64_t) override
+    bool Int64(int64_t /*value*/, Context const& /*context*/) override
     {
         return true;
     }
 
-    bool String(std::string_view) override
+    bool String(std::string_view /*value*/, Context const& /*context*/) override
     {
         return true;
     }
 
-    bool StartDict() override
+    bool StartDict(Context const& /*context*/) override
     {
-        keys.emplace_back();
+        push();
         return true;
     }
 
-    bool Key(std::string_view key) override
+    bool Key(std::string_view key, Context const& /*context*/) override
     {
-        keys.back() = key;
+        keys_[depth_] = key;
         return true;
     }
 
-    bool EndDict() override
+    bool EndDict(Context const& /*context*/) override
     {
-        keys.resize(keys.size() - 1);
+        pop();
         return true;
     }
 
-    bool StartArray() override
+    bool StartArray(Context const& /*context*/) override
     {
-        keys.emplace_back();
+        push();
         return true;
     }
 
-    bool EndArray() override
+    bool EndArray(Context const& /*context*/) override
     {
-        keys.resize(keys.size() - 1);
+        pop();
         return true;
     }
 
-    std::array<std::string_view, MaxDepth> keys;
+    auto key(size_t i) const
+    {
+        return keys_[i];
+    }
+
+    auto depth() const
+    {
+        return depth_;
+    }
+
+    auto currentKey() const
+    {
+        return key(depth());
+    }
+
+private:
+    void push()
+    {
+        ++depth_;
+        keys_[depth_] = {};
+    }
+
+    void pop()
+    {
+        --depth_;
+    }
+
+    size_t depth_ = 0;
+    std::array<std::string_view, MaxDepth> keys_;
 };
 
 template<std::size_t MaxDepth>
@@ -125,7 +182,7 @@ struct ParserStack
         return stack[depth];
     }
 
-    bool expectingDictKey() const
+    [[nodiscard]] bool expectingDictKey() const
     {
         return depth > 0 && stack[depth].parent_type == ParentType::Dict && (stack[depth].n_children_walked % 2) == 0;
     }
@@ -182,6 +239,7 @@ bool parse(
     tr_error** error = nullptr)
 {
     stack.clear();
+    auto context = Handler::Context(std::data(benc), error);
 
     int err = 0;
     for (;;)
@@ -196,6 +254,7 @@ bool parse(
             break;
         }
 
+        auto const* const front = std::data(benc);
         switch (benc.front())
         {
         case 'i': // int
@@ -203,14 +262,18 @@ bool parse(
             {
                 tr_error_set(error, err, "Malformed benc? Unable to parse integer");
             }
-            else if (!handler.Int64(*value))
-            {
-                err = ECANCELED;
-                tr_error_set(error, err, "Handler indicated parser should stop");
-            }
             else
             {
-                stack.tokenWalked();
+                context.setTokenSpan(front, std::data(benc) - front);
+
+                if (!handler.Int64(*value, context))
+                {
+                    err = ECANCELED;
+                }
+                else
+                {
+                    stack.tokenWalked();
+                }
             }
             break;
 
@@ -225,11 +288,11 @@ bool parse(
                     break;
                 }
 
-                ok = benc.front() == 'l' ? handler.StartArray() : handler.StartDict();
+                context.setTokenSpan(front, 1);
+                ok = benc.front() == 'l' ? handler.StartArray(context) : handler.StartDict(context);
                 if (!ok)
                 {
                     err = ECANCELED;
-                    tr_error_set(error, err, "Handler indicated parser should stop");
                     break;
                 }
 
@@ -246,13 +309,13 @@ bool parse(
             else
             {
                 stack.tokenWalked();
+                context.setTokenSpan(front, 1);
 
-                if (auto const ok = *parent_type == ParserStack<MaxDepth>::ParentType::Array ? handler.EndArray() :
-                                                                                               handler.EndDict();
+                if (auto const ok = *parent_type == ParserStack<MaxDepth>::ParentType::Array ? handler.EndArray(context) :
+                                                                                               handler.EndDict(context);
                     !ok)
                 {
                     err = ECANCELED;
-                    tr_error_set(error, err, "Handler indicated parser should stop");
                 }
             }
             break;
@@ -272,14 +335,17 @@ bool parse(
                 err = EILSEQ;
                 tr_error_set(error, err, "Malformed benc? Unable to parse string");
             }
-            else if (bool const ok = stack.expectingDictKey() ? handler.Key(*sv) : handler.String(*sv); !ok)
-            {
-                err = ECANCELED;
-                tr_error_set(error, err, "Handler indicated parser should stop");
-            }
             else
             {
-                stack.tokenWalked();
+                context.setTokenSpan(front, std::data(benc) - front);
+                if (bool const ok = stack.expectingDictKey() ? handler.Key(*sv, context) : handler.String(*sv, context); !ok)
+                {
+                    err = ECANCELED;
+                }
+                else
+                {
+                    stack.tokenWalked();
+                }
             }
             break;
 
