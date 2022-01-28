@@ -187,18 +187,18 @@ void tr_announcerParseHttpAnnounceResponse(tr_announce_response& response, std::
         {
         }
 
-        bool StartDict() override
+        bool StartDict(Context const& context) override
         {
-            BasicHandler::StartDict();
+            BasicHandler::StartDict(context);
 
             pex_ = {};
 
             return true;
         }
 
-        bool EndDict() override
+        bool EndDict(Context const& context) override
         {
-            BasicHandler::EndDict();
+            BasicHandler::EndDict(context);
 
             if (tr_address_is_valid_for_peers(&pex_.addr, pex_.port))
             {
@@ -209,7 +209,7 @@ void tr_announcerParseHttpAnnounceResponse(tr_announce_response& response, std::
             return true;
         }
 
-        bool Int64(int64_t value) override
+        bool Int64(int64_t value, Context const& context) override
         {
             auto const key = currentKey();
 
@@ -237,11 +237,16 @@ void tr_announcerParseHttpAnnounceResponse(tr_announce_response& response, std::
             {
                 pex_.port = htons(uint16_t(value));
             }
+            else
+            {
+                auto const msg = tr_strvJoin("unexpected int: key["sv, key, "] value["sv, std::to_string(value), "]"sv);
+                tr_error_set(context.error, EINVAL, msg);
+            }
 
             return true;
         }
 
-        bool String(std::string_view value) override
+        bool String(std::string_view value, Context const& context) override
         {
             auto const key = currentKey();
 
@@ -269,6 +274,14 @@ void tr_announcerParseHttpAnnounceResponse(tr_announce_response& response, std::
             {
                 tr_address_from_string(&pex_.addr, value);
             }
+            else if (key == "peer id")
+            {
+                // unused
+            }
+            else
+            {
+                tr_error_set(context.error, EINVAL, tr_strvJoin("unexpected str: key["sv, key, "] value["sv, value, "]"sv));
+            }
 
             return true;
         }
@@ -276,7 +289,13 @@ void tr_announcerParseHttpAnnounceResponse(tr_announce_response& response, std::
 
     auto stack = transmission::benc::ParserStack<MaxBencDepth>{};
     auto handler = AnnounceHandler{ response };
-    transmission::benc::parse(benc, stack, handler);
+    tr_error* error = nullptr;
+    transmission::benc::parse(benc, stack, handler, nullptr, &error);
+    if (error != nullptr)
+    {
+        tr_logAddError("%s", error->message);
+        tr_error_clear(&error);
+    }
 }
 
 static void on_announce_done(
@@ -376,9 +395,9 @@ void tr_announcerParseHttpScrapeResponse(tr_scrape_response& response, std::stri
         {
         }
 
-        bool Key(std::string_view value) override
+        bool Key(std::string_view value, Context const& context) override
         {
-            BasicHandler::Key(value);
+            BasicHandler::Key(value, context);
 
             auto needle = tr_sha1_digest_t{};
             if (depth() == 2 && key(1) == "files"sv && std::size(value) == std::size(needle))
@@ -402,29 +421,44 @@ void tr_announcerParseHttpScrapeResponse(tr_scrape_response& response, std::stri
             return true;
         }
 
-        bool Int64(int64_t value) override
+        bool Int64(int64_t value, Context const& context) override
         {
-            if (row_ && currentKey() == "complete"sv)
+            auto const key = currentKey();
+
+            if (row_ && key == "complete"sv)
             {
                 response_.rows[*row_].seeders = value;
             }
-            else if (row_ && currentKey() == "downloaded"sv)
+            else if (row_ && key == "downloaded"sv)
             {
                 response_.rows[*row_].downloads = value;
             }
-            else if (row_ && currentKey() == "incomplete"sv)
+            else if (row_ && key == "incomplete"sv)
             {
                 response_.rows[*row_].leechers = value;
+            }
+            else
+            {
+                tr_error_set(
+                    context.error,
+                    EINVAL,
+                    tr_strvJoin("unexpected int: key["sv, key, "] value["sv, std::to_string(value), "]"sv));
             }
 
             return true;
         }
 
-        bool String(std::string_view value) override
+        bool String(std::string_view value, Context const& context) override
         {
-            if (depth() == 1 && currentKey() == "failure reason"sv)
+            auto const key = currentKey();
+
+            if (depth() == 1 && key == "failure reason"sv)
             {
                 response_.errmsg = value;
+            }
+            else
+            {
+                tr_error_set(context.error, EINVAL, tr_strvJoin("unexpected string: key["sv, key, "] value["sv, value, "]"sv));
             }
 
             return true;
@@ -437,7 +471,7 @@ void tr_announcerParseHttpScrapeResponse(tr_scrape_response& response, std::stri
     transmission::benc::parse(benc, stack, handler, nullptr, &error);
     if (error != nullptr)
     {
-        std::cerr << error->message << std::endl;
+        tr_logAddError("%s", error->message);
         tr_error_clear(&error);
     }
 }

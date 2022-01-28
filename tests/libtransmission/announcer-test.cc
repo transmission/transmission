@@ -199,7 +199,7 @@ TEST_F(AnnouncerTest, parseHttpScrapeResponseMulti)
     EXPECT_EQ(9, response.rows[2].downloads);
 }
 
-TEST_F(AnnouncerTest, parseHttpScrapeResponseMultiWithExcess)
+TEST_F(AnnouncerTest, parseHttpScrapeResponseMultiWithUnexpected)
 {
     // clang-format off
     auto constexpr ResponseBenc =

@@ -140,7 +140,7 @@ struct MyHandler : public transmission::benc::Handler
 
     ~MyHandler() override = default;
 
-    bool Int64(int64_t value) final
+    bool Int64(int64_t value, Context const& /*context*/) final
     {
         if (tr_variant* variant = get_node(); variant != nullptr)
         {
@@ -150,7 +150,7 @@ struct MyHandler : public transmission::benc::Handler
         return true;
     }
 
-    bool String(std::string_view sv) final
+    bool String(std::string_view sv, Context const& /*context*/) final
     {
         if (tr_variant* variant = get_node(); variant != nullptr)
         {
@@ -167,7 +167,7 @@ struct MyHandler : public transmission::benc::Handler
         return true;
     }
 
-    bool StartDict() final
+    bool StartDict(Context const& /*context*/) final
     {
         if (tr_variant* variant = get_node(); variant != nullptr)
         {
@@ -178,21 +178,21 @@ struct MyHandler : public transmission::benc::Handler
         return true;
     }
 
-    bool Key(std::string_view sv) final
+    bool Key(std::string_view sv, Context const& /*context*/) final
     {
         key_ = tr_quark_new(sv);
 
         return true;
     }
 
-    bool EndDict() final
+    bool EndDict(Context const& /*context*/) final
     {
         stack_.pop_back();
 
         return true;
     }
 
-    bool StartArray() final
+    bool StartArray(Context const& /*context*/) final
     {
         if (tr_variant* variant = get_node(); variant != nullptr)
         {
@@ -203,7 +203,7 @@ struct MyHandler : public transmission::benc::Handler
         return true;
     }
 
-    bool EndArray() final
+    bool EndArray(Context const& /*context*/) final
     {
         stack_.pop_back();
 
