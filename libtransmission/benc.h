@@ -59,35 +59,63 @@ struct BasicHandler : public Handler
 
     bool StartDict() override
     {
-        keys.emplace_back();
+        push();
         return true;
     }
 
     bool Key(std::string_view key) override
     {
-        keys.back() = key;
+        keys_[depth_] = key;
         return true;
     }
 
     bool EndDict() override
     {
-        keys.resize(keys.size() - 1);
+        pop();
         return true;
     }
 
     bool StartArray() override
     {
-        keys.emplace_back();
+        push();
         return true;
     }
 
     bool EndArray() override
     {
-        keys.resize(keys.size() - 1);
+        pop();
         return true;
     }
 
-    std::array<std::string_view, MaxDepth> keys;
+    auto key(size_t i) const
+    {
+        return keys_[i];
+    }
+
+    auto depth() const
+    {
+        return depth_;
+    }
+
+    auto currentKey() const
+    {
+        return key(depth());
+    }
+
+private:
+    void push()
+    {
+        ++depth_;
+        keys_[depth_] = {};
+    }
+
+    void pop()
+    {
+        --depth_;
+    }
+
+    size_t depth_ = 0;
+    std::array<std::string_view, MaxDepth> keys_;
 };
 
 template<std::size_t MaxDepth>
@@ -125,7 +153,7 @@ struct ParserStack
         return stack[depth];
     }
 
-    bool expectingDictKey() const
+    [[nodiscard]] bool expectingDictKey() const
     {
         return depth > 0 && stack[depth].parent_type == ParentType::Dict && (stack[depth].n_children_walked % 2) == 0;
     }
