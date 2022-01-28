@@ -235,7 +235,7 @@ char const* tr_strip_positional_args(char const* str)
 
 void tr_timerAdd(struct event* timer, int seconds, int microseconds)
 {
-    struct timeval tv;
+    auto tv = timeval{};
     tv.tv_sec = seconds;
     tv.tv_usec = microseconds;
 
