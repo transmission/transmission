@@ -170,111 +170,111 @@ static void verboseLog(std::string_view description, tr_direction direction, std
 
 static auto constexpr MaxBencDepth = 8;
 
-struct AnnounceHandler final : public transmission::benc::BasicHandler<MaxBencDepth>
-{
-    using BasicHandler = transmission::benc::BasicHandler<MaxBencDepth>;
-
-    tr_announce_response& response_;
-    std::optional<size_t> row_;
-    tr_pex pex_ = {};
-
-    explicit AnnounceHandler(tr_announce_response& response)
-        : response_{ response }
-    {
-    }
-
-    bool StartDict() override
-    {
-        BasicHandler::StartDict();
-
-        pex_ = {};
-
-        return true;
-    }
-
-    bool EndDict() override
-    {
-        BasicHandler::EndDict();
-
-        if (tr_address_is_valid_for_peers(&pex_.addr, pex_.port))
-        {
-            response_.pex.push_back(pex_);
-            pex_ = {};
-        }
-
-        return true;
-    }
-
-    bool Int64(int64_t value) override
-    {
-        BasicHandler::Int64(value);
-        auto const key = currentKey();
-
-        if (key == "interval")
-        {
-            response_.interval = value;
-        }
-        else if (key == "min interval"sv)
-        {
-            response_.min_interval = value;
-        }
-        else if (key == "complete"sv)
-        {
-            response_.seeders = value;
-        }
-        else if (key == "incomplete"sv)
-        {
-            response_.leechers = value;
-        }
-        else if (key == "downloaded"sv)
-        {
-            response_.downloads = value;
-        }
-        else if (key == "port"sv)
-        {
-            pex_.port = htons(uint16_t(value));
-        }
-
-        return true;
-    }
-
-    bool String(std::string_view value) override
-    {
-        BasicHandler::String(value);
-        auto const key = currentKey();
-
-        if (key == "failure reason"sv)
-        {
-            response_.errmsg = value;
-        }
-        else if (key == "warning message"sv)
-        {
-            response_.warning = value;
-        }
-        else if (key == "tracker id"sv)
-        {
-            response_.tracker_id = value;
-        }
-        else if (key == "peers"sv)
-        {
-            response_.pex = tr_peerMgrCompactToPex(std::data(value), std::size(value), nullptr, 0);
-        }
-        else if (key == "peers6"sv)
-        {
-            response_.pex6 = tr_peerMgrCompact6ToPex(std::data(value), std::size(value), nullptr, 0);
-        }
-        else if (key == "ip")
-        {
-            tr_address_from_string(&pex_.addr, value);
-        }
-
-        return true;
-    }
-};
-
 void tr_announcerParseHttpAnnounceResponse(tr_announce_response& response, std::string_view benc)
 {
     verboseLog("Announce response:", TR_DOWN, benc);
+
+    struct AnnounceHandler final : public transmission::benc::BasicHandler<MaxBencDepth>
+    {
+        using BasicHandler = transmission::benc::BasicHandler<MaxBencDepth>;
+
+        tr_announce_response& response_;
+        std::optional<size_t> row_;
+        tr_pex pex_ = {};
+
+        explicit AnnounceHandler(tr_announce_response& response)
+            : response_{ response }
+        {
+        }
+
+        bool StartDict() override
+        {
+            BasicHandler::StartDict();
+
+            pex_ = {};
+
+            return true;
+        }
+
+        bool EndDict() override
+        {
+            BasicHandler::EndDict();
+
+            if (tr_address_is_valid_for_peers(&pex_.addr, pex_.port))
+            {
+                response_.pex.push_back(pex_);
+                pex_ = {};
+            }
+
+            return true;
+        }
+
+        bool Int64(int64_t value) override
+        {
+            BasicHandler::Int64(value);
+            auto const key = currentKey();
+
+            if (key == "interval")
+            {
+                response_.interval = value;
+            }
+            else if (key == "min interval"sv)
+            {
+                response_.min_interval = value;
+            }
+            else if (key == "complete"sv)
+            {
+                response_.seeders = value;
+            }
+            else if (key == "incomplete"sv)
+            {
+                response_.leechers = value;
+            }
+            else if (key == "downloaded"sv)
+            {
+                response_.downloads = value;
+            }
+            else if (key == "port"sv)
+            {
+                pex_.port = htons(uint16_t(value));
+            }
+
+            return true;
+        }
+
+        bool String(std::string_view value) override
+        {
+            BasicHandler::String(value);
+            auto const key = currentKey();
+
+            if (key == "failure reason"sv)
+            {
+                response_.errmsg = value;
+            }
+            else if (key == "warning message"sv)
+            {
+                response_.warning = value;
+            }
+            else if (key == "tracker id"sv)
+            {
+                response_.tracker_id = value;
+            }
+            else if (key == "peers"sv)
+            {
+                response_.pex = tr_peerMgrCompactToPex(std::data(value), std::size(value), nullptr, 0);
+            }
+            else if (key == "peers6"sv)
+            {
+                response_.pex6 = tr_peerMgrCompact6ToPex(std::data(value), std::size(value), nullptr, 0);
+            }
+            else if (key == "ip")
+            {
+                tr_address_from_string(&pex_.addr, value);
+            }
+
+            return true;
+        }
+    };
 
     auto stack = transmission::benc::ParserStack<MaxBencDepth>{};
     auto handler = AnnounceHandler{ response };
@@ -362,80 +362,80 @@ static void on_scrape_done_eventthread(void* vdata)
     delete data;
 }
 
-struct ScrapeHandler final : public transmission::benc::BasicHandler<MaxBencDepth>
-{
-    using BasicHandler = transmission::benc::BasicHandler<MaxBencDepth>;
-
-    tr_scrape_response& response_;
-    std::optional<size_t> row_;
-
-    explicit ScrapeHandler(tr_scrape_response& response)
-        : response_{ response }
-    {
-    }
-
-    bool Key(std::string_view value) override
-    {
-        BasicHandler::Key(value);
-
-        auto needle = tr_sha1_digest_t{};
-        if (depth() == 2 && key(1) == "files"sv && std::size(value) == std::size(needle))
-        {
-            std::copy_n(reinterpret_cast<std::byte const*>(std::data(value)), std::size(value), std::data(needle));
-            auto const it = std::find_if(
-                std::begin(response_.rows),
-                std::end(response_.rows),
-                [needle](auto const& row) { return row.info_hash == needle; });
-
-            if (it == std::end(response_.rows))
-            {
-                row_.reset();
-            }
-            else
-            {
-                row_ = std::distance(std::begin(response_.rows), it);
-            }
-        }
-
-        return true;
-    }
-
-    bool Int64(int64_t value) override
-    {
-        BasicHandler::Int64(value);
-
-        if (row_ && currentKey() == "complete"sv)
-        {
-            response_.rows[*row_].seeders = value;
-        }
-        else if (row_ && currentKey() == "downloaded"sv)
-        {
-            response_.rows[*row_].downloads = value;
-        }
-        else if (row_ && currentKey() == "incomplete"sv)
-        {
-            response_.rows[*row_].leechers = value;
-        }
-
-        return true;
-    }
-
-    bool String(std::string_view value) override
-    {
-        BasicHandler::String(value);
-
-        if (depth() == 1 && currentKey() == "failure reason"sv)
-        {
-            response_.errmsg = value;
-        }
-
-        return true;
-    }
-};
-
 void tr_announcerParseHttpScrapeResponse(tr_scrape_response& response, std::string_view benc)
 {
     verboseLog("Scrape response:", TR_DOWN, benc);
+
+    struct ScrapeHandler final : public transmission::benc::BasicHandler<MaxBencDepth>
+    {
+        using BasicHandler = transmission::benc::BasicHandler<MaxBencDepth>;
+
+        tr_scrape_response& response_;
+        std::optional<size_t> row_;
+
+        explicit ScrapeHandler(tr_scrape_response& response)
+            : response_{ response }
+        {
+        }
+
+        bool Key(std::string_view value) override
+        {
+            BasicHandler::Key(value);
+
+            auto needle = tr_sha1_digest_t{};
+            if (depth() == 2 && key(1) == "files"sv && std::size(value) == std::size(needle))
+            {
+                std::copy_n(reinterpret_cast<std::byte const*>(std::data(value)), std::size(value), std::data(needle));
+                auto const it = std::find_if(
+                    std::begin(response_.rows),
+                    std::end(response_.rows),
+                    [needle](auto const& row) { return row.info_hash == needle; });
+
+                if (it == std::end(response_.rows))
+                {
+                    row_.reset();
+                }
+                else
+                {
+                    row_ = std::distance(std::begin(response_.rows), it);
+                }
+            }
+
+            return true;
+        }
+
+        bool Int64(int64_t value) override
+        {
+            BasicHandler::Int64(value);
+
+            if (row_ && currentKey() == "complete"sv)
+            {
+                response_.rows[*row_].seeders = value;
+            }
+            else if (row_ && currentKey() == "downloaded"sv)
+            {
+                response_.rows[*row_].downloads = value;
+            }
+            else if (row_ && currentKey() == "incomplete"sv)
+            {
+                response_.rows[*row_].leechers = value;
+            }
+
+            return true;
+        }
+
+        bool String(std::string_view value) override
+        {
+            BasicHandler::String(value);
+
+            if (depth() == 1 && currentKey() == "failure reason"sv)
+            {
+                response_.errmsg = value;
+            }
+
+            return true;
+        }
+    };
 
     auto stack = transmission::benc::ParserStack<MaxBencDepth>{};
     auto handler = ScrapeHandler{ response };
