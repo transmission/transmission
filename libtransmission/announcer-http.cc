@@ -237,7 +237,7 @@ void tr_announcerParseHttpAnnounceResponse(tr_announce_response& response, std::
             {
                 pex_.port = htons(uint16_t(value));
             }
-            else
+            else if (!tr_error_is_set(context.error))
             {
                 auto const msg = tr_strvJoin("unexpected int: key["sv, key, "] value["sv, std::to_string(value), "]"sv);
                 tr_error_set(context.error, EINVAL, msg);
@@ -278,7 +278,7 @@ void tr_announcerParseHttpAnnounceResponse(tr_announce_response& response, std::
             {
                 // unused
             }
-            else
+            else if (!tr_error_is_set(context.error))
             {
                 tr_error_set(context.error, EINVAL, tr_strvJoin("unexpected str: key["sv, key, "] value["sv, value, "]"sv));
             }
@@ -437,7 +437,7 @@ void tr_announcerParseHttpScrapeResponse(tr_scrape_response& response, std::stri
             {
                 response_.rows[*row_].leechers = value;
             }
-            else
+            else if (!tr_error_is_set(context.error))
             {
                 auto const errmsg = tr_strvJoin("unexpected int: key["sv, key, "] value["sv, std::to_string(value), "]"sv);
                 tr_error_set(context.error, EINVAL, errmsg);
@@ -454,7 +454,7 @@ void tr_announcerParseHttpScrapeResponse(tr_scrape_response& response, std::stri
             {
                 response_.errmsg = value;
             }
-            else
+            else if (!tr_error_is_set(context.error))
             {
                 tr_error_set(context.error, EINVAL, tr_strvJoin("unexpected string: key["sv, key, "] value["sv, value, "]"sv));
             }
