@@ -109,6 +109,11 @@ static tr_thread_id tr_getCurrentThread()
 #endif
 }
 
+unsigned long tr_threadCurrentId()
+{
+    return (unsigned long)tr_getCurrentThread();
+}
+
 static bool tr_areThreadsEqual(tr_thread_id a, tr_thread_id b)
 {
 #ifdef _WIN32
