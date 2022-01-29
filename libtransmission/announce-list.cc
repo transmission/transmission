@@ -24,7 +24,7 @@ size_t tr_announce_list::set(char const* const* announce_urls, tr_tracker_tier_t
 
     for (size_t i = 0; i < n; ++i)
     {
-        add(tiers[i], announce_urls[i]);
+        add(announce_urls[i], tiers[i]);
     }
 
     return size();
@@ -70,10 +70,10 @@ bool tr_announce_list::replace(tr_tracker_id_t id, std::string_view announce_url
 
     auto const tier = it->tier;
     trackers_.erase(it);
-    return add(tier, announce_url_sv);
+    return add(announce_url_sv, tier);
 }
 
-bool tr_announce_list::add(tr_tracker_tier_t tier, std::string_view announce_url_sv)
+bool tr_announce_list::add(std::string_view announce_url_sv, tr_tracker_tier_t tier)
 {
     auto const announce = tr_urlParseTracker(announce_url_sv);
     if (!announce || !canAdd(*announce))

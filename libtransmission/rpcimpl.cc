@@ -1053,7 +1053,7 @@ static char const* addTrackerUrls(tr_torrent* tor, tr_variant* urls)
             continue;
         }
 
-        tor->announceList().add(tor->announceList().nextTier(), announce);
+        tor->announceList().add(announce);
     }
 
     if (tor->trackerCount() == old_size)

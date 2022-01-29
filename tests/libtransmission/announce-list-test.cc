@@ -28,7 +28,7 @@ TEST_F(AnnounceListTest, canAdd)
     auto constexpr Announce = "https://example.org/announce"sv;
 
     auto announce_list = tr_announce_list{};
-    EXPECT_EQ(1, announce_list.add(Tier, Announce));
+    EXPECT_EQ(1, announce_list.add(Announce, Tier));
     auto const tracker = announce_list.at(0);
     EXPECT_EQ(Announce, tracker.announce.full);
     EXPECT_EQ("https://example.org/scrape"sv, tracker.scrape.full);
@@ -46,9 +46,9 @@ TEST_F(AnnounceListTest, groupsSiblingsIntoSameTier)
     auto constexpr Announce3 = "udp://example.org:999/announce"sv;
 
     auto announce_list = tr_announce_list{};
-    EXPECT_TRUE(announce_list.add(Tier1, Announce1));
-    EXPECT_TRUE(announce_list.add(Tier2, Announce2));
-    EXPECT_TRUE(announce_list.add(Tier3, Announce3));
+    EXPECT_TRUE(announce_list.add(Announce1, Tier1));
+    EXPECT_TRUE(announce_list.add(Announce2, Tier2));
+    EXPECT_TRUE(announce_list.add(Announce3, Tier3));
 
     EXPECT_EQ(3, std::size(announce_list));
     EXPECT_EQ(Tier1, announce_list.at(0).tier);
@@ -68,7 +68,7 @@ TEST_F(AnnounceListTest, canAddWithoutScrape)
     auto constexpr Announce = "https://example.org/foo"sv;
 
     auto announce_list = tr_announce_list{};
-    EXPECT_TRUE(announce_list.add(Tier, Announce));
+    EXPECT_TRUE(announce_list.add(Announce, Tier));
     auto const tracker = announce_list.at(0);
     EXPECT_EQ(Announce, tracker.announce.full);
     EXPECT_TRUE(std::empty(tracker.scrape_str));
@@ -81,7 +81,7 @@ TEST_F(AnnounceListTest, canAddUdp)
     auto constexpr Announce = "udp://example.org/"sv;
 
     auto announce_list = tr_announce_list{};
-    EXPECT_TRUE(announce_list.add(Tier, Announce));
+    EXPECT_TRUE(announce_list.add(Announce, Tier));
     auto const tracker = announce_list.at(0);
     EXPECT_EQ(Announce, tracker.announce.full);
     EXPECT_EQ("udp://example.org/"sv, tracker.scrape.full);
@@ -94,13 +94,13 @@ TEST_F(AnnounceListTest, canNotAddDuplicateAnnounce)
     auto constexpr Announce = "https://example.org/announce"sv;
 
     auto announce_list = tr_announce_list{};
-    EXPECT_TRUE(announce_list.add(Tier, Announce));
+    EXPECT_TRUE(announce_list.add(Announce, Tier));
     EXPECT_EQ(1, announce_list.size());
-    EXPECT_FALSE(announce_list.add(Tier, Announce));
+    EXPECT_FALSE(announce_list.add(Announce, Tier));
     EXPECT_EQ(1, announce_list.size());
 
     auto constexpr Announce2 = "https://example.org:443/announce"sv;
-    EXPECT_FALSE(announce_list.add(Tier, Announce2));
+    EXPECT_FALSE(announce_list.add(Announce2, Tier));
     EXPECT_EQ(1, announce_list.size());
 }
 
@@ -110,7 +110,7 @@ TEST_F(AnnounceListTest, canNotAddInvalidUrl)
     auto constexpr Announce = "telnet://example.org/announce"sv;
 
     auto announce_list = tr_announce_list{};
-    EXPECT_FALSE(announce_list.add(Tier, Announce));
+    EXPECT_FALSE(announce_list.add(Announce, Tier));
     EXPECT_EQ(0, announce_list.size());
 }
 
@@ -212,7 +212,7 @@ TEST_F(AnnounceListTest, canRemoveById)
     auto constexpr Tier = tr_tracker_tier_t{ 1 };
 
     auto announce_list = tr_announce_list{};
-    announce_list.add(Tier, Announce);
+    announce_list.add(Announce, Tier);
     EXPECT_EQ(1, std::size(announce_list));
     auto const id = announce_list.at(0).id;
 
@@ -226,7 +226,7 @@ TEST_F(AnnounceListTest, canNotRemoveByInvalidId)
     auto constexpr Tier = tr_tracker_tier_t{ 1 };
 
     auto announce_list = tr_announce_list{};
-    announce_list.add(Tier, Announce);
+    announce_list.add(Announce, Tier);
     EXPECT_EQ(1, std::size(announce_list));
     auto const id = announce_list.at(0).id;
 
@@ -241,7 +241,7 @@ TEST_F(AnnounceListTest, canRemoveByAnnounce)
     auto constexpr Tier = tr_tracker_tier_t{ 1 };
 
     auto announce_list = tr_announce_list{};
-    announce_list.add(Tier, Announce);
+    announce_list.add(Announce, Tier);
     EXPECT_EQ(1, std::size(announce_list));
 
     EXPECT_TRUE(announce_list.remove(Announce));
@@ -254,7 +254,7 @@ TEST_F(AnnounceListTest, canNotRemoveByInvalidAnnounce)
     auto constexpr Tier = tr_tracker_tier_t{ 1 };
 
     auto announce_list = tr_announce_list{};
-    announce_list.add(Tier, Announce);
+    announce_list.add(Announce, Tier);
     EXPECT_EQ(1, std::size(announce_list));
 
     EXPECT_FALSE(announce_list.remove("https://www.not-example.com/announce"sv));
@@ -268,7 +268,7 @@ TEST_F(AnnounceListTest, canReplace)
     auto constexpr Announce2 = "https://www.example.com/2/announce"sv;
 
     auto announce_list = tr_announce_list{};
-    EXPECT_TRUE(announce_list.add(Tier, Announce1));
+    EXPECT_TRUE(announce_list.add(Announce1, Tier));
     EXPECT_TRUE(announce_list.replace(announce_list.at(0).id, Announce2));
     EXPECT_EQ(Announce2, announce_list.at(0).announce.full);
 }
@@ -280,7 +280,7 @@ TEST_F(AnnounceListTest, canNotReplaceInvalidId)
     auto constexpr Announce2 = "https://www.example.com/2/announce"sv;
 
     auto announce_list = tr_announce_list{};
-    EXPECT_TRUE(announce_list.add(Tier, Announce1));
+    EXPECT_TRUE(announce_list.add(Announce1, Tier));
     EXPECT_FALSE(announce_list.replace(announce_list.at(0).id + 1, Announce2));
     EXPECT_EQ(Announce1, announce_list.at(0).announce.full);
 }
@@ -292,7 +292,7 @@ TEST_F(AnnounceListTest, canNotReplaceWithInvalidAnnounce)
     auto constexpr Announce2 = "telnet://www.example.com/2/announce"sv;
 
     auto announce_list = tr_announce_list{};
-    EXPECT_TRUE(announce_list.add(Tier, Announce1));
+    EXPECT_TRUE(announce_list.add(Announce1, Tier));
     EXPECT_FALSE(announce_list.replace(announce_list.at(0).id, Announce2));
     EXPECT_EQ(Announce1, announce_list.at(0).announce.full);
 }
@@ -303,7 +303,7 @@ TEST_F(AnnounceListTest, canNotReplaceWithDuplicate)
     auto constexpr Announce = "https://www.example.com/announce"sv;
 
     auto announce_list = tr_announce_list{};
-    EXPECT_TRUE(announce_list.add(Tier, Announce));
+    EXPECT_TRUE(announce_list.add(Announce, Tier));
     EXPECT_FALSE(announce_list.replace(announce_list.at(0).id, Announce));
     EXPECT_EQ(Announce, announce_list.at(0).announce.full);
 }
@@ -350,9 +350,9 @@ TEST_F(AnnounceListTest, save)
 
     // make an announce_list for it
     auto announce_list = tr_announce_list();
-    EXPECT_TRUE(announce_list.add(Tiers[0], Urls[0]));
-    EXPECT_TRUE(announce_list.add(Tiers[1], Urls[1]));
-    EXPECT_TRUE(announce_list.add(Tiers[2], Urls[2]));
+    EXPECT_TRUE(announce_list.add(Urls[0], Tiers[0]));
+    EXPECT_TRUE(announce_list.add(Urls[1], Tiers[1]));
+    EXPECT_TRUE(announce_list.add(Urls[2], Tiers[2]));
 
     // try saving to a nonexistent .torrent file
     EXPECT_FALSE(announce_list.save("/this/path/does/not/exist", &error));
