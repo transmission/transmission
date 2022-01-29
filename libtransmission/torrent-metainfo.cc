@@ -380,7 +380,7 @@ std::string_view tr_torrent_metainfo::parseAnnounce(tr_torrent_metainfo& setme, 
                     continue;
                 }
 
-                setme.announce_list_.add(i, url);
+                setme.announce_list_.add(url, i);
             }
         }
     }
@@ -388,7 +388,7 @@ std::string_view tr_torrent_metainfo::parseAnnounce(tr_torrent_metainfo& setme, 
     // single 'announce' url
     if (std::empty(setme.announce_list_) && tr_variantDictFindStrView(meta, TR_KEY_announce, &url))
     {
-        setme.announce_list_.add(0, url);
+        setme.announce_list_.add(url, 0);
     }
 
     return {};

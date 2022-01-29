@@ -142,6 +142,11 @@ public:
         return info_dict_offset_;
     }
 
+    [[nodiscard]] auto piecesOffset() const
+    {
+        return pieces_offset_;
+    }
+
     std::string torrentFile(std::string_view torrent_dir) const
     {
         return makeFilename(torrent_dir, name(), infoHashString(), BasenameFormat::Hash, ".torrent");
