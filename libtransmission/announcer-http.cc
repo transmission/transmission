@@ -211,9 +211,7 @@ void tr_announcerParseHttpAnnounceResponse(tr_announce_response& response, std::
 
         bool Int64(int64_t value, Context const& context) override
         {
-            auto const key = currentKey();
-
-            if (key == "interval")
+            if (auto const key = currentKey(); key == "interval")
             {
                 response_.interval = value;
             }
@@ -248,9 +246,7 @@ void tr_announcerParseHttpAnnounceResponse(tr_announce_response& response, std::
 
         bool String(std::string_view value, Context const& context) override
         {
-            auto const key = currentKey();
-
-            if (key == "failure reason"sv)
+            if (auto const key = currentKey(); key == "failure reason"sv)
             {
                 response_.errmsg = value;
             }
@@ -399,8 +395,7 @@ void tr_announcerParseHttpScrapeResponse(tr_scrape_response& response, std::stri
         {
             BasicHandler::Key(value, context);
 
-            auto needle = tr_sha1_digest_t{};
-            if (depth() == 2 && key(1) == "files"sv && std::size(value) == std::size(needle))
+            if (auto needle = tr_sha1_digest_t{}; depth() == 2 && key(1) == "files"sv && std::size(value) == std::size(needle))
             {
                 std::copy_n(reinterpret_cast<std::byte const*>(std::data(value)), std::size(value), std::data(needle));
                 auto const it = std::find_if(
