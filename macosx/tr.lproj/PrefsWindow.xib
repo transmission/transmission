@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="19162" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="19529" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19162"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19529"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -274,6 +274,7 @@
                     </textFieldCell>
                 </textField>
             </subviews>
+            <point key="canvasLocation" x="139" y="459"/>
         </customView>
         <customView id="41" userLabel="Transfers">
             <rect key="frame" x="0.0" y="0.0" width="542" height="393"/>
@@ -567,9 +568,9 @@
                         <tabViewItem label="Yönet" identifier="" id="254">
                             <view key="view" id="256">
                                 <rect key="frame" x="10" y="33" width="496" height="333"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxY="YES"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <subviews>
-                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="257">
+                                    <textField verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="257">
                                         <rect key="frame" x="164" y="175" width="35" height="22"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="1229">
@@ -590,7 +591,7 @@
                                             <outlet property="nextKeyView" destination="604" id="1638"/>
                                         </connections>
                                     </textField>
-                                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="262">
+                                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="262">
                                         <rect key="frame" x="36" y="177" width="48" height="17"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="Sıralar:" id="1230">
@@ -599,7 +600,7 @@
                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                         </textFieldCell>
                                     </textField>
-                                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="263" customClass="ColorTextField">
+                                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="263" customClass="ColorTextField">
                                         <rect key="frame" x="206" y="177" width="158" height="17"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="etkin aktarıma izin ver" id="1231">
@@ -611,7 +612,7 @@
                                             <binding destination="365" name="enabled" keyPath="values.Queue" id="1697"/>
                                         </connections>
                                     </textField>
-                                    <button translatesAutoresizingMaskIntoConstraints="NO" id="264">
+                                    <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="264">
                                         <rect key="frame" x="91" y="302" width="204" height="18"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                         <buttonCell key="cell" type="check" title="Şu oranda beslemeyi durdur:" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1232">
@@ -623,7 +624,7 @@
                                             <binding destination="365" name="value" keyPath="values.RatioCheck" id="430"/>
                                         </connections>
                                     </button>
-                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="265">
+                                    <textField verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="265">
                                         <rect key="frame" x="299" y="301" width="50" height="22"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="1233">
@@ -644,7 +645,7 @@
                                             <outlet property="nextKeyView" destination="257" id="1637"/>
                                         </connections>
                                     </textField>
-                                    <button translatesAutoresizingMaskIntoConstraints="NO" id="1958">
+                                    <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1958">
                                         <rect key="frame" x="91" y="258" width="270" height="18"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                         <buttonCell key="cell" type="check" title="Beslemeyi şu kadar boş kalınca durdur:" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1962">
@@ -656,7 +657,7 @@
                                             <binding destination="365" name="value" keyPath="values.IdleLimitCheck" id="1982"/>
                                         </connections>
                                     </button>
-                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1959">
+                                    <textField verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1959">
                                         <rect key="frame" x="369" y="257" width="41" height="22"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="1960">
@@ -675,7 +676,7 @@
                                             <outlet property="nextKeyView" destination="257" id="1963"/>
                                         </connections>
                                     </textField>
-                                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="267">
+                                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="267">
                                         <rect key="frame" x="32" y="303" width="56" height="17"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="Limitler:" id="1234">
@@ -684,7 +685,7 @@
                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                         </textFieldCell>
                                     </textField>
-                                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="268">
+                                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="268">
                                         <rect key="frame" x="109" y="282" width="362" height="15"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                         <textFieldCell key="cell" controlSize="small" sendsActionOnEndEditing="YES" title="Karşıya yüklemeler ve indirmelerin birbirlerine bölümü oranı verir" id="1235">
@@ -693,7 +694,7 @@
                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                         </textFieldCell>
                                     </textField>
-                                    <button translatesAutoresizingMaskIntoConstraints="NO" id="337">
+                                    <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="337">
                                         <rect key="frame" x="91" y="176" width="64" height="18"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                         <buttonCell key="cell" type="check" title="En çok" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1236">
@@ -705,7 +706,7 @@
                                             <binding destination="365" name="value" keyPath="values.Queue" id="405"/>
                                         </connections>
                                     </button>
-                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="604">
+                                    <textField verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="604">
                                         <rect key="frame" x="164" y="149" width="35" height="22"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="1238">
@@ -726,7 +727,7 @@
                                             <outlet property="nextKeyView" destination="636" id="1639"/>
                                         </connections>
                                     </textField>
-                                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="606" customClass="ColorTextField">
+                                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="606" customClass="ColorTextField">
                                         <rect key="frame" x="206" y="152" width="127" height="16"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="beslemeye izin ver" id="1239">
@@ -738,7 +739,7 @@
                                             <binding destination="365" name="enabled" keyPath="values.QueueSeed" id="1698"/>
                                         </connections>
                                     </textField>
-                                    <button translatesAutoresizingMaskIntoConstraints="NO" id="607">
+                                    <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="607">
                                         <rect key="frame" x="91" y="150" width="64" height="18"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                         <buttonCell key="cell" type="check" title="En çok" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1240">
@@ -750,7 +751,7 @@
                                             <binding destination="365" name="value" keyPath="values.QueueSeed" id="608"/>
                                         </connections>
                                     </button>
-                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="636">
+                                    <textField verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="636">
                                         <rect key="frame" x="361" y="123" width="41" height="22"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="1241">
@@ -771,7 +772,7 @@
                                             <outlet property="nextKeyView" destination="1298" id="1640"/>
                                         </connections>
                                     </textField>
-                                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="638" customClass="ColorTextField">
+                                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="638" customClass="ColorTextField">
                                         <rect key="frame" x="409" y="125" width="24" height="17"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="dk." id="1242">
@@ -783,7 +784,7 @@
                                             <binding destination="365" name="enabled" keyPath="values.CheckStalled" id="1699"/>
                                         </connections>
                                     </textField>
-                                    <button translatesAutoresizingMaskIntoConstraints="NO" id="639">
+                                    <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="639">
                                         <rect key="frame" x="91" y="124" width="265" height="18"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                         <buttonCell key="cell" type="check" title="Şu kadar boşta kalırsa aktarımı beklet:" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1243">
@@ -795,7 +796,7 @@
                                             <binding destination="365" name="value" keyPath="values.CheckStalled" id="640"/>
                                         </connections>
                                     </button>
-                                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1297">
+                                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1297">
                                         <rect key="frame" x="33" y="85" width="51" height="17"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="Ses çal:" id="1310">
@@ -804,7 +805,7 @@
                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                         </textFieldCell>
                                     </textField>
-                                    <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="1298">
+                                    <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1298">
                                         <rect key="frame" x="234" y="79" width="130" height="26"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                         <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" id="1307">
@@ -824,7 +825,7 @@
                                             <outlet property="nextKeyView" destination="1300" id="1641"/>
                                         </connections>
                                     </popUpButton>
-                                    <button translatesAutoresizingMaskIntoConstraints="NO" id="1299">
+                                    <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1299">
                                         <rect key="frame" x="91" y="59" width="143" height="18"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                         <buttonCell key="cell" type="check" title="Besleme bittiğinde:" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1306">
@@ -835,7 +836,7 @@
                                             <binding destination="365" name="value" keyPath="values.PlaySeedingSound" id="1346"/>
                                         </connections>
                                     </button>
-                                    <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="1300">
+                                    <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1300">
                                         <rect key="frame" x="234" y="54" width="130" height="26"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                         <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" id="1303">
@@ -854,7 +855,7 @@
                                             <binding destination="365" name="selectedValue" keyPath="values.SeedingSound" previousBinding="1332" id="1333"/>
                                         </connections>
                                     </popUpButton>
-                                    <button translatesAutoresizingMaskIntoConstraints="NO" id="1301">
+                                    <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1301">
                                         <rect key="frame" x="91" y="84" width="140" height="18"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                         <buttonCell key="cell" type="check" title="İndirme bittiğinde:" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1302">
@@ -865,7 +866,7 @@
                                             <binding destination="365" name="value" keyPath="values.PlayDownloadSound" id="1322"/>
                                         </connections>
                                     </button>
-                                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1969" customClass="ColorTextField">
+                                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1969" customClass="ColorTextField">
                                         <rect key="frame" x="419" y="259" width="24" height="17"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="dk." id="1970">
@@ -877,7 +878,7 @@
                                             <binding destination="365" name="enabled" keyPath="values.IdleLimitCheck" id="1984"/>
                                         </connections>
                                     </textField>
-                                    <button translatesAutoresizingMaskIntoConstraints="NO" id="2043">
+                                    <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2043">
                                         <rect key="frame" x="91" y="19" width="186" height="18"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                         <buttonCell key="cell" type="check" title="İndirme bittiğinde çalıştır:" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="2044">
@@ -889,7 +890,7 @@
                                             <binding destination="365" name="value" keyPath="values.DoneScriptEnabled" id="2058"/>
                                         </connections>
                                     </button>
-                                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2046">
+                                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2046">
                                         <rect key="frame" x="28" y="20" width="56" height="17"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="left" title="Betikler:" id="2047">
@@ -898,7 +899,7 @@
                                             <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                         </textFieldCell>
                                     </textField>
-                                    <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2048">
+                                    <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2048">
                                         <rect key="frame" x="281" y="14" width="168" height="26"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                         <popUpButtonCell key="cell" type="push" title="Diğer..." bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" arrowPosition="arrowAtCenter" preferredEdge="maxY" selectedItem="2053" id="2049">
@@ -935,7 +936,7 @@
                                             <binding destination="365" name="enabled" keyPath="values.DoneScriptEnabled" id="2061"/>
                                         </connections>
                                     </popUpButton>
-                                    <button horizontalHuggingPriority="750" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="2068">
+                                    <button horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2068">
                                         <rect key="frame" x="459" y="14" width="25" height="25"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                         <buttonCell key="cell" type="help" bezelStyle="helpButton" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="2069">
@@ -946,7 +947,7 @@
                                             <action selector="helpForScript:" target="-2" id="2070"/>
                                         </connections>
                                     </button>
-                                    <button translatesAutoresizingMaskIntoConstraints="NO" id="2118">
+                                    <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2118">
                                         <rect key="frame" x="91" y="235" width="305" height="18"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                         <buttonCell key="cell" type="check" title="Besleme bitince aktarım dizelgesinden kaldır" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="2119">
@@ -958,7 +959,7 @@
                                             <binding destination="365" name="value" keyPath="values.RemoveWhenFinishSeeding" id="2125"/>
                                         </connections>
                                     </button>
-                                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2122">
+                                    <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2122">
                                         <rect key="frame" x="109" y="217" width="153" height="14"/>
                                         <autoresizingMask key="autoresizingMask" flexibleMinY="YES"/>
                                         <textFieldCell key="cell" controlSize="small" sendsActionOnEndEditing="YES" title="Yeni eklenen aktarımlar için" id="2123">
@@ -1100,7 +1101,7 @@
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" heightSizable="YES"/>
                     <clipView key="contentView" id="D6N-I2-fEN">
                         <rect key="frame" x="1" y="1" width="141" height="169"/>
-                        <autoresizingMask key="autoresizingMask"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <tableView focusRingType="none" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" columnReordering="NO" columnResizing="NO" multipleSelection="NO" emptySelection="NO" autosaveColumns="NO" rowHeight="18" id="1774">
                                 <rect key="frame" x="0.0" y="0.0" width="141" height="169"/>
@@ -1716,6 +1717,7 @@
             <connections>
                 <outlet property="nextKeyView" destination="1429" id="1636"/>
             </connections>
+            <point key="canvasLocation" x="-530" y="-206"/>
         </customView>
         <customView id="66" userLabel="Network">
             <rect key="frame" x="0.0" y="0.0" width="542" height="220"/>
@@ -1744,7 +1746,7 @@
                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2081">
                     <rect key="frame" x="35" y="143" width="124" height="17"/>
                     <autoresizingMask key="autoresizingMask"/>
-                    <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Kişi dinleme portu:" id="2082">
+                    <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Kişi dinleme kapısı:" id="2082">
                         <font key="font" metaFont="system"/>
                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -1753,16 +1755,16 @@
                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="357">
                     <rect key="frame" x="234" y="143" width="291" height="17"/>
                     <autoresizingMask key="autoresizingMask" widthSizable="YES"/>
-                    <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Port açık" id="1250">
+                    <textFieldCell key="cell" sendsActionOnEndEditing="YES" title="Kapı açık" id="1250">
                         <font key="font" metaFont="system"/>
                         <color key="textColor" name="disabledControlTextColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
                 <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="336">
-                    <rect key="frame" x="180" y="77" width="238" height="14"/>
+                    <rect key="frame" x="180" y="77" width="284" height="14"/>
                     <autoresizingMask key="autoresizingMask"/>
-                    <textFieldCell key="cell" controlSize="small" sendsActionOnEndEditing="YES" title="NAT traversal uses either NAT-PMP or UPnP" id="1248">
+                    <textFieldCell key="cell" controlSize="small" sendsActionOnEndEditing="YES" title="NAT uçtan uca dolaşımı NAT-PMP veya UPnP kullanır" id="1248">
                         <font key="font" metaFont="smallSystem"/>
                         <color key="textColor" name="disabledControlTextColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
@@ -1790,7 +1792,7 @@
                 <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1889">
                     <rect key="frame" x="162" y="117" width="238" height="18"/>
                     <autoresizingMask key="autoresizingMask"/>
-                    <buttonCell key="cell" type="check" title="Başlangıçta portları rastgele dağıt:" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1890">
+                    <buttonCell key="cell" type="check" title="Başlangıçta kapıları rastgele dağıt:" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1890">
                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                         <font key="font" metaFont="system"/>
                     </buttonCell>
@@ -1802,7 +1804,7 @@
                 <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="332">
                     <rect key="frame" x="162" y="93" width="171" height="18"/>
                     <autoresizingMask key="autoresizingMask"/>
-                    <buttonCell key="cell" type="check" title="Portu otomatik ata" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1247">
+                    <buttonCell key="cell" type="check" title="Kapıyı otomatik ata" bezelStyle="regularSquare" imagePosition="left" alignment="left" inset="2" id="1247">
                         <behavior key="behavior" changeContents="YES" doesNotDimImage="YES" lightByContents="YES"/>
                         <font key="font" metaFont="system"/>
                     </buttonCell>
@@ -1864,6 +1866,7 @@
                     </connections>
                 </button>
             </subviews>
+            <point key="canvasLocation" x="-557" y="-564"/>
         </customView>
         <customView id="1481" userLabel="Remote">
             <rect key="frame" x="0.0" y="0.0" width="542" height="439"/>
@@ -1951,17 +1954,17 @@
                     <rect key="frame" x="103" y="94" width="308" height="78"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <clipView key="contentView" id="sre-eV-u9A">
-                        <rect key="frame" x="1" y="1" width="306" height="76"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <rect key="frame" x="1" y="1" width="291" height="76"/>
+                        <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" columnReordering="NO" columnResizing="NO" autosaveColumns="NO" typeSelect="NO" id="1521">
-                                <rect key="frame" x="0.0" y="0.0" width="306" height="76"/>
+                                <rect key="frame" x="0.0" y="0.0" width="291" height="76"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <size key="intercellSpacing" width="3" height="2"/>
                                 <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
                                 <tableColumns>
-                                    <tableColumn identifier="IP" width="265" minWidth="40" maxWidth="1000" id="1523">
+                                    <tableColumn identifier="IP" width="279" minWidth="40" maxWidth="1000" id="1523">
                                         <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="IP Address">
                                             <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                             <color key="backgroundColor" white="0.33333299" alpha="1" colorSpace="calibratedWhite"/>
@@ -1995,7 +1998,7 @@
                         <autoresizingMask key="autoresizingMask"/>
                     </scroller>
                     <scroller key="verticalScroller" wantsLayer="YES" verticalHuggingPriority="750" horizontal="NO" id="1519">
-                        <rect key="frame" x="291" y="1" width="16" height="76"/>
+                        <rect key="frame" x="292" y="1" width="15" height="76"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </scroller>
                 </scrollView>

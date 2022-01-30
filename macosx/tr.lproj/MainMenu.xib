@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="19162" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="19529" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19162"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19529"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -184,7 +184,7 @@
                                     <action selector="showAboutWindow:" target="206" id="1927"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="Güncellemeleri Kontrol Et" tag="1234" id="975">
+                            <menuItem title="Güncellemeleri Denetle" tag="1234" id="975">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
                                     <action selector="checkForUpdates:" target="1812" id="1814"/>
@@ -364,8 +364,8 @@
                         </items>
                     </menu>
                 </menuItem>
-                <menuItem title="Görünüm" id="301">
-                    <menu key="submenu" title="Görünüm" id="302">
+                <menuItem title="Görüntü" id="301">
+                    <menu key="submenu" title="Görüntü" id="302">
                         <items>
                             <menuItem title="Küçük Görünüm" keyEquivalent="t" id="1578">
                                 <connections>
@@ -378,7 +378,7 @@
                                     <action selector="togglePiecesBar:" target="206" id="2186"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="Uygunluk" id="2279">
+                            <menuItem title="Kullanılabilirlik" id="2279">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
                                     <action selector="toggleAvailabilityBar:" target="206" id="2280"/>
@@ -606,7 +606,7 @@ CA
                                     <action selector="performMiniaturize:" target="-1" id="1691"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="Büyült/Küçült" id="1688">
+                            <menuItem title="Büyüt/Küçült" id="1688">
                                 <connections>
                                     <action selector="performZoom:" target="-1" id="1690"/>
                                 </connections>
@@ -679,12 +679,12 @@ CA
                             <menuItem isSeparatorItem="YES" id="1559">
                                 <modifierMask key="keyEquivalentModifierMask" command="YES"/>
                             </menuItem>
-                            <menuItem title="Transmission Anabeti" id="1558">
+                            <menuItem title="Transmission Web Sitesi" id="1558">
                                 <connections>
                                     <action selector="linkHomepage:" target="206" id="1560"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="Yazışmalıklar" id="418">
+                            <menuItem title="Forumlar" id="418">
                                 <connections>
                                     <action selector="linkForums:" target="206" id="421"/>
                                 </connections>
@@ -698,6 +698,7 @@ CA
                     </menu>
                 </menuItem>
             </items>
+            <point key="canvasLocation" x="139" y="355"/>
         </menu>
         <customObject id="206" userLabel="Controller" customClass="Controller">
             <connections>
@@ -823,6 +824,7 @@ CA
                     </connections>
                 </menuItem>
             </items>
+            <point key="canvasLocation" x="139" y="629"/>
         </menu>
         <menu title="Menu" id="589" userLabel="ContextNoRowMenu">
             <items>
