@@ -466,23 +466,6 @@ bool tr_wildmat(char const* text, char const* p)
     return (p[0] == '*' && p[1] == '\0') || (DoMatch(text, p) != 0);
 }
 
-char const* tr_strcasestr(char const* haystack, char const* needle)
-{
-#ifdef HAVE_STRCASESTR
-
-    return strcasestr(haystack, needle);
-
-#elif defined(_WIN32)
-
-    return StrStrIA(haystack, needle);
-
-#else
-
-#error please open a PR to implement tr_strcasestr() for your platform
-
-#endif
-}
-
 char* tr_strdup_printf(char const* fmt, ...)
 {
     evbuffer* const buf = evbuffer_new();

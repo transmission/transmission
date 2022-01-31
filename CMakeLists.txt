@@ -568,9 +568,7 @@ set(NEEDED_FUNCTIONS
     pwrite
     sendfile64
     statvfs
-    strcasestr
     strlcpy
-    strsep
     syslog
     uselocale)
 
