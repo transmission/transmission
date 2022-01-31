@@ -6,10 +6,11 @@
 #include <algorithm>
 #include <cerrno>
 #include <cstdint>
-#include <cstdlib> /* qsort */
 #include <cstring> /* strcmp, strlen */
 #include <mutex>
+#include <optional>
 #include <string_view>
+#include <thread>
 
 #include <event2/util.h> /* evutil_ascii_strcasecmp() */
 
@@ -20,7 +21,6 @@
 #include "file.h"
 #include "log.h"
 #include "makemeta.h"
-#include "platform.h" /* threads, locks */
 #include "session.h"
 #include "tr-assert.h"
 #include "utils.h" /* buildpath */
@@ -505,11 +505,11 @@ static void tr_realMakeMetaInfo(tr_metainfo_builder* builder)
 
 static tr_metainfo_builder* queue = nullptr;
 
-static tr_thread* workerThread = nullptr;
+static std::optional<std::thread::id> worker_thread_id;
 
 static std::recursive_mutex queue_mutex_;
 
-static void makeMetaWorkerFunc(void* /*user_data*/)
+static void makeMetaWorkerFunc()
 {
     for (;;)
     {
@@ -535,7 +535,7 @@ static void makeMetaWorkerFunc(void* /*user_data*/)
         tr_realMakeMetaInfo(builder);
     }
 
-    workerThread = nullptr;
+    worker_thread_id.reset();
 }
 
 void tr_makeMetaInfo(
@@ -591,8 +591,10 @@ void tr_makeMetaInfo(
     builder->nextBuilder = queue;
     queue = builder;
 
-    if (workerThread == nullptr)
+    if (!worker_thread_id)
     {
-        workerThread = tr_threadNew(makeMetaWorkerFunc, nullptr);
+        auto thread = std::thread(makeMetaWorkerFunc);
+        worker_thread_id = thread.get_id();
+        thread.detach();
     }
 }

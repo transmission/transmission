@@ -55,7 +55,6 @@
 #include "error.h"
 #include "file.h"
 #include "log.h"
-#include "platform.h"
 #include "tr-assert.h"
 #include "utils.h"
 
