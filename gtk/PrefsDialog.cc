@@ -6,7 +6,6 @@
 #include <climits> /* USHRT_MAX, INT_MAX */
 #include <sstream>
 #include <string>
-#include <unistd.h>
 
 #include <glibmm.h>
 #include <glibmm/i18n.h>

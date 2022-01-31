@@ -7,17 +7,14 @@
 #include <array> // std::array
 #include <cctype> /* isdigit() */
 #include <cerrno>
-#include <cfloat> /* DBL_DIG */
-#include <clocale> /* localeconv() */
-#include <cmath> /* fabs(), floor() */
-#include <cstdint> /* SIZE_MAX */
-#include <cstdlib> /* getenv() */
-#include <cstring> /* strerror(), memset(), memmem() */
-#include <ctime> /* nanosleep() */
-#include <exception>
+#include <cfloat> // DBL_DIG
+#include <clocale> // localeconv()
+#include <cstdint> // SIZE_MAX
+#include <cstdlib> // getenv()
+#include <cstring> /* strerror() */
+#include <ctime> // nanosleep()
 #include <iterator> // std::back_inserter
 #include <set>
-#include <sstream>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -26,9 +23,6 @@
 #include <ws2tcpip.h> /* WSAStartup() */
 #include <windows.h> /* Sleep(), GetSystemTimeAsFileTime(), GetEnvironmentVariable() */
 #include <shellapi.h> /* CommandLineToArgv() */
-#include <shlwapi.h> /* StrStrIA() */
-#else
-#include <unistd.h> /* getpagesize() */
 #endif
 
 #ifdef HAVE_ICONV
@@ -40,8 +34,9 @@
 #include <event2/event.h>
 
 #include "transmission.h"
-#include "error.h"
+
 #include "error-types.h"
+#include "error.h"
 #include "file.h"
 #include "log.h"
 #include "mime-types.h"
@@ -279,7 +274,7 @@ uint8_t* tr_loadFile(char const* path, size_t* size, tr_error** error)
     }
 
     /* Load the torrent file into our buffer */
-    tr_sys_file_t const fd = tr_sys_file_open(path, TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0, &my_error);
+    auto const fd = tr_sys_file_open(path, TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0, &my_error);
     if (fd == TR_BAD_SYS_FILE)
     {
         tr_logAddError(err_fmt, path, my_error->message);
@@ -326,7 +321,7 @@ bool tr_loadFile(std::vector<char>& setme, std::string const& path, tr_error** e
     }
 
     /* Load the torrent file into our buffer */
-    tr_sys_file_t const fd = tr_sys_file_open(path_sz, TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0, &my_error);
+    auto const fd = tr_sys_file_open(path_sz, TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0, &my_error);
     if (fd == TR_BAD_SYS_FILE)
     {
         tr_logAddError(err_fmt, path_sz, my_error->message);

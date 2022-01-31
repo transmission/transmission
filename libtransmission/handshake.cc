@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <cerrno>
 #include <cstring>
+#include <string_view>
 
 #include <event2/buffer.h>
 #include <event2/event.h>

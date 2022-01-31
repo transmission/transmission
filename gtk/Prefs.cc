@@ -6,8 +6,6 @@
 #include <stdlib.h> /* strtol() */
 #include <string_view>
 
-#include <unistd.h>
-
 #include <glibmm.h>
 #include <glibmm/i18n.h>
 
