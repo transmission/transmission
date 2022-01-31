@@ -2354,7 +2354,7 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
 
                     if (!std::empty(tmp))
                     {
-                        tr_variantDictAddStrView(args, TR_KEY_metainfo, tmp);
+                        tr_variantDictAddStr(args, TR_KEY_metainfo, tmp);
                     }
                     else
                     {
