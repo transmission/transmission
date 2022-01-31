@@ -264,16 +264,6 @@ TEST_F(UtilsTest, trStrlower)
     EXPECT_EQ("hello"sv, tr_strlower("hello"sv));
 }
 
-TEST_F(UtilsTest, trMemmem)
-{
-    auto const haystack = std::string{ "abcabcabcabc" };
-    auto const needle = std::string{ "cab" };
-
-    EXPECT_EQ(haystack, tr_memmem(haystack.data(), haystack.size(), haystack.data(), haystack.size()));
-    EXPECT_EQ(haystack.substr(2), tr_memmem(haystack.data(), haystack.size(), needle.data(), needle.size()));
-    EXPECT_EQ(nullptr, tr_memmem(needle.data(), needle.size(), haystack.data(), haystack.size()));
-}
-
 TEST_F(UtilsTest, array)
 {
     auto array = std::array<size_t, 10>{ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };

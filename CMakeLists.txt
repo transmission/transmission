@@ -560,7 +560,6 @@ set(NEEDED_FUNCTIONS
     htonll
     localtime_r
     localtime_s
-    memmem
     mkdtemp
     ntohll
     posix_fadvise

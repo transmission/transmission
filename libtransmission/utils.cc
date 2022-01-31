@@ -3,12 +3,6 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#ifdef HAVE_MEMMEM
-#ifndef _GNU_SOURCE
-#define _GNU_SOURCE /* glibc's string.h needs this to pick up memmem */
-#endif
-#endif
-
 #include <algorithm> // std::sort
 #include <array> // std::array
 #include <cctype> /* isdigit() */
@@ -459,37 +453,6 @@ char* tr_strndup(void const* vin, size_t len)
 char* tr_strdup(void const* in)
 {
     return in == nullptr ? nullptr : tr_strvDup(static_cast<char const*>(in));
-}
-
-char const* tr_memmem(char const* haystack, size_t haystacklen, char const* needle, size_t needlelen)
-{
-#ifdef HAVE_MEMMEM
-
-    return static_cast<char const*>(memmem(haystack, haystacklen, needle, needlelen));
-
-#else
-
-    if (needlelen == 0)
-    {
-        return haystack;
-    }
-
-    if (needlelen > haystacklen || haystack == nullptr || needle == nullptr)
-    {
-        return nullptr;
-    }
-
-    for (size_t i = 0; i <= haystacklen - needlelen; ++i)
-    {
-        if (memcmp(haystack + i, needle, needlelen) == 0)
-        {
-            return haystack + i;
-        }
-    }
-
-    return nullptr;
-
-#endif
 }
 
 extern "C"
