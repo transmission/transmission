@@ -7,6 +7,7 @@
 #include <list>
 #include <mutex>
 #include <shared_mutex>
+#include <thread>
 
 #include <csignal>
 
@@ -22,7 +23,6 @@
 
 #include "log.h"
 #include "net.h"
-#include "platform.h"
 #include "session.h"
 #include "tr-assert.h"
 #include "trevent.h"
@@ -105,6 +105,11 @@ int cond_wait(void* cond_, void* lock_, struct timeval const* tv)
     return success == std::cv_status::timeout ? 1 : 0;
 }
 
+unsigned long thread_current_id()
+{
+    return std::hash<std::thread::id>()(std::this_thread::get_id());
+}
+
 } // namespace impl
 
 void tr_evthread_init()
@@ -123,7 +128,7 @@ void tr_evthread_init()
                                                      impl::cond_wait };
     evthread_set_condition_callbacks(&cond_cbs);
 
-    evthread_set_id_callback(tr_threadCurrentId);
+    evthread_set_id_callback(impl::thread_current_id);
 }
 
 } // namespace
@@ -162,7 +167,7 @@ struct tr_event_handle
 
     event_base* base = nullptr;
     tr_session* session = nullptr;
-    tr_thread* thread = nullptr;
+    std::thread::id thread_id;
 };
 
 static void onWorkAvailable(evutil_socket_t /*fd*/, short /*flags*/, void* vsession)
@@ -185,10 +190,8 @@ static void onWorkAvailable(evutil_socket_t /*fd*/, short /*flags*/, void* vsess
     }
 }
 
-static void libeventThreadFunc(void* vevents)
+static void libeventThreadFunc(tr_event_handle* events)
 {
-    auto* const events = static_cast<tr_event_handle*>(vevents);
-
 #ifndef _WIN32
     /* Don't exit when writing on a broken socket */
     signal(SIGPIPE, SIG_IGN);
@@ -224,7 +227,10 @@ void tr_eventInit(tr_session* session)
 
     auto* const events = new tr_event_handle();
     events->session = session;
-    events->thread = tr_threadNew(libeventThreadFunc, events);
+
+    auto thread = std::thread(libeventThreadFunc, events);
+    events->thread_id = thread.get_id();
+    thread.detach();
 
     // wait until the libevent thread is running
     while (session->events == nullptr)
@@ -260,7 +266,7 @@ bool tr_amInEventThread(tr_session const* session)
     TR_ASSERT(tr_isSession(session));
     TR_ASSERT(session->events != nullptr);
 
-    return tr_amInThread(session->events->thread);
+    return std::this_thread::get_id() == session->events->thread_id;
 }
 
 /**
@@ -273,7 +279,7 @@ void tr_runInEventThread(tr_session* session, void (*func)(void*), void* user_da
     auto* events = session->events;
     TR_ASSERT(events != nullptr);
 
-    if (tr_amInThread(events->thread))
+    if (tr_amInEventThread(session))
     {
         (*func)(user_data);
     }

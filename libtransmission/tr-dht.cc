@@ -10,6 +10,7 @@
 #include <cstring> /* memcpy(), memset(), memchr(), strlen() */
 #include <ctime>
 #include <string_view>
+#include <thread>
 
 #ifdef _WIN32
 #include <inttypes.h>
@@ -34,7 +35,6 @@
 #include "log.h"
 #include "net.h"
 #include "peer-mgr.h"
-#include "platform.h"
 #include "session.h"
 #include "torrent.h"
 #include "tr-assert.h"
@@ -364,7 +364,7 @@ int tr_dhtInit(tr_session* ss)
     cl->nodes6 = nodes6;
     cl->len = len;
     cl->len6 = len6;
-    tr_threadNew(dht_bootstrap, cl);
+    std::thread(dht_bootstrap, cl).detach();
 
     dht_timer = evtimer_new(session_->event_base, timer_callback, session_);
     tr_timerAdd(dht_timer, 0, tr_rand_int_weak(1000000));

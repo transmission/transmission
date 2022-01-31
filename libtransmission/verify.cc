@@ -6,7 +6,9 @@
 #include <algorithm>
 #include <ctime>
 #include <mutex>
+#include <optional>
 #include <set>
+#include <thread>
 #include <vector>
 
 #include "transmission.h"
@@ -14,7 +16,6 @@
 #include "crypto-utils.h"
 #include "file.h"
 #include "log.h"
-#include "platform.h"
 #include "torrent.h"
 #include "tr-assert.h"
 #include "utils.h" /* tr_malloc(), tr_free() */
@@ -197,12 +198,12 @@ struct verify_node
 static struct verify_node currentNode;
 // TODO: refactor s.t. this doesn't leak
 static auto& verify_list{ *new std::set<verify_node>{} };
-static tr_thread* verify_thread = nullptr;
+static std::optional<std::thread::id> verify_thread_id;
 static bool stopCurrent = false;
 
 static std::mutex verify_mutex_;
 
-static void verifyThreadFunc(void* /*user_data*/)
+static void verifyThreadFunc()
 {
     for (;;)
     {
@@ -213,7 +214,7 @@ static void verifyThreadFunc(void* /*user_data*/)
             if (std::empty(verify_list))
             {
                 currentNode.torrent = nullptr;
-                verify_thread = nullptr;
+                verify_thread_id.reset();
                 return;
             }
 
@@ -256,9 +257,11 @@ void tr_verifyAdd(tr_torrent* tor, tr_verify_done_func callback_func, void* call
     tor->setVerifyState(TR_VERIFY_WAIT);
     verify_list.insert(node);
 
-    if (verify_thread == nullptr)
+    if (!verify_thread_id)
     {
-        verify_thread = tr_threadNew(verifyThreadFunc, nullptr);
+        auto thread = std::thread(verifyThreadFunc);
+        verify_thread_id = thread.get_id();
+        thread.detach();
     }
 }
 
