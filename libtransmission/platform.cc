@@ -10,6 +10,7 @@
 #include <string>
 #include <string_view>
 #include <thread>
+#include <vector>
 
 #ifdef __HAIKU__
 #include <limits.h> /* PATH_MAX */

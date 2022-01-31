@@ -13,6 +13,7 @@
 #include <cinttypes> // uintX_t
 #include <cstddef> // size_t
 #include <string>
+#include <string_view>
 #include <vector>
 
 #ifdef _WIN32

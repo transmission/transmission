@@ -5,19 +5,16 @@
 
 #pragma once
 
-#include <algorithm>
 #include <array>
-#include <cctype>
 #include <cerrno>
-#include <cstddef>
-#include <cstdint>
+#include <cstddef> // size_t
+#include <cstdint> // int64_t
 #include <cstdlib>
 #include <optional>
-#include <string>
 #include <string_view>
+#include <utility> // make_pair
 
 #include "error.h"
-#include "utils.h"
 
 namespace transmission::benc
 {
@@ -263,10 +260,7 @@ bool parse(
         case 'i': // int
             if (auto const value = impl::ParseInt(&benc); !value)
             {
-                auto const errmsg = tr_strvJoin(
-                    std::string_view{ "Malformed benc? Unable to parse integer at pos " },
-                    std::to_string(std::data(benc) - stream_begin));
-                tr_error_set(error, err, errmsg);
+                tr_error_set(error, err, "Malformed benc? Unable to parse integer");
                 err = EILSEQ;
             }
             else
