@@ -13,12 +13,11 @@
 using BencTest = ::testing::Test;
 using namespace std::literals;
 
-TEST_F(BencTest, CanParse)
+TEST_F(BencTest, MalformedBenc)
 {
-    // clang-format off
-    auto constexpr Benc = "d14:failure reason119:The tracker was unable to process your request. It may be down, overloaded, under attack or it just does not like you.12:min intervali1800e8:intervali1800e5:peers0:ee\n"sv;
-    // clang-format on
-
+    // malformed benc seen in the wild. "119" length is incorrect.
+    auto constexpr Benc =
+        "d14:failure reason119:The tracker was unable to process your request. It may be down, overloaded, under attack or it just does not like you.12:min intervali1800e8:intervali1800e5:peers0:ee\n"sv;
     auto constexpr MaxBencDepth = 8;
     using TestHandler = transmission::benc::BasicHandler<MaxBencDepth>;
 
