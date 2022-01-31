@@ -856,6 +856,7 @@
        |       |      | torrent-get          | new arg "file-count"
        |       |      | torrent-get          | new arg "primary-mime-type"
        |       |      | free-space           | new return arg "total-capacity"
+       |       |      |                      | undocumented "/upload" endpoint removed
 
 
 5.1.  Upcoming Breakage
