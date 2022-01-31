@@ -27,7 +27,6 @@
 #include "transmission.h"
 #include "crypto-utils.h"
 #include "log.h"
-#include "platform.h"
 #include "tr-assert.h"
 #include "utils.h"
 

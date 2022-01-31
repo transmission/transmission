@@ -16,7 +16,6 @@
 #include "log.h"
 #include "magnet-metainfo.h"
 #include "peer-mgr.h" /* pex */
-#include "platform.h" /* tr_getResumeDir() */
 #include "resume.h"
 #include "session.h"
 #include "torrent.h"
