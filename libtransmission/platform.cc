@@ -11,13 +11,6 @@
 #include <string_view>
 #include <thread>
 
-#ifndef _XOPEN_SOURCE
-#define _XOPEN_SOURCE 600 /* needed for recursive locks. */
-#endif
-#ifndef __USE_UNIX98
-#define __USE_UNIX98 /* some older Linuxes need it spelt out for them */
-#endif
-
 #ifdef __HAIKU__
 #include <limits.h> /* PATH_MAX */
 #endif
@@ -28,16 +21,18 @@
 #include <shlobj.h> /* SHGetKnownFolderPath(), FOLDERID_... */
 #else
 #include <unistd.h> /* getuid() */
+#endif
+
 #ifdef BUILD_MAC_CLIENT
 #include <CoreFoundation/CoreFoundation.h>
 #endif
+
 #ifdef __HAIKU__
 #include <FindDirectory.h>
 #endif
-#include <pthread.h>
-#endif
 
 #include "transmission.h"
+
 #include "file.h"
 #include "log.h"
 #include "platform.h"
