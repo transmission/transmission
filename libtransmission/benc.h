@@ -13,9 +13,11 @@
 #include <cstdint>
 #include <cstdlib>
 #include <optional>
+#include <string>
 #include <string_view>
 
 #include "error.h"
+#include "utils.h"
 
 namespace transmission::benc
 {
@@ -239,7 +241,8 @@ bool parse(
     tr_error** error = nullptr)
 {
     stack.clear();
-    auto context = Handler::Context(std::data(benc), error);
+    auto const* const stream_begin = std::data(benc);
+    auto context = Handler::Context(stream_begin, error);
 
     int err = 0;
     for (;;)
@@ -260,7 +263,11 @@ bool parse(
         case 'i': // int
             if (auto const value = impl::ParseInt(&benc); !value)
             {
-                tr_error_set(error, err, "Malformed benc? Unable to parse integer");
+                auto const errmsg = tr_strvJoin(
+                    std::string_view{ "Malformed benc? Unable to parse integer at pos " },
+                    std::to_string(std::data(benc) - stream_begin));
+                tr_error_set(error, err, errmsg);
+                err = EILSEQ;
             }
             else
             {
