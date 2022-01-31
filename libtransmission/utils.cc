@@ -8,6 +8,7 @@
 #include <cctype> /* isdigit() */
 #include <cerrno>
 #include <cfloat> /* DBL_DIG */
+#include <chrono>
 #include <clocale> /* localeconv() */
 #include <cmath> /* fabs(), floor() */
 #include <cstdint> /* SIZE_MAX */
@@ -23,12 +24,10 @@
 #include <vector>
 
 #ifdef _WIN32
-#include <ws2tcpip.h> /* WSAStartup() */
-#include <windows.h> /* Sleep(), GetSystemTimeAsFileTime(), GetEnvironmentVariable() */
 #include <shellapi.h> /* CommandLineToArgv() */
 #include <shlwapi.h> /* StrStrIA() */
-#else
-#include <unistd.h> /* getpagesize() */
+#include <windows.h> /* Sleep(), GetEnvironmentVariable() */
+#include <ws2tcpip.h> /* WSAStartup() */
 #endif
 
 #ifdef HAVE_ICONV
@@ -107,40 +106,14 @@ struct tm* tr_localtime_r(time_t const* timep, struct tm* result)
 #endif
 }
 
-int tr_gettimeofday(struct timeval* tv)
+struct timeval tr_gettimeofday()
 {
-#ifdef _WIN32
-
-#define DELTA_EPOCH_IN_MICROSECS 11644473600000000ULL
-
-    FILETIME ft;
-    uint64_t tmp = 0;
-
-    if (tv == nullptr)
-    {
-        errno = EINVAL;
-        return -1;
-    }
-
-    GetSystemTimeAsFileTime(&ft);
-    tmp |= ft.dwHighDateTime;
-    tmp <<= 32;
-    tmp |= ft.dwLowDateTime;
-    tmp /= 10; /* to microseconds */
-    tmp -= DELTA_EPOCH_IN_MICROSECS;
-
-    tv->tv_sec = tmp / 1000000UL;
-    tv->tv_usec = tmp % 1000000UL;
-
-    return 0;
-
-#undef DELTA_EPOCH_IN_MICROSECS
-
-#else
-
-    return gettimeofday(tv, nullptr);
-
-#endif
+    auto const d = std::chrono::system_clock::now().time_since_epoch();
+    auto const s = std::chrono::duration_cast<std::chrono::seconds>(d);
+    auto ret = timeval{};
+    ret.tv_sec = s.count();
+    ret.tv_usec = std::chrono::duration_cast<std::chrono::microseconds>(d - s).count();
+    return ret;
 }
 
 /***
@@ -559,10 +532,8 @@ bool tr_str_has_suffix(char const* str, char const* suffix)
 
 uint64_t tr_time_msec()
 {
-    struct timeval tv;
-
-    tr_gettimeofday(&tv);
-    return (uint64_t)tv.tv_sec * 1000 + (tv.tv_usec / 1000);
+    auto const tv = tr_gettimeofday();
+    return uint64_t(tv.tv_sec) * 1000 + (tv.tv_usec / 1000);
 }
 
 void tr_wait_msec(long int msec)

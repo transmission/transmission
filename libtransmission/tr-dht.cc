@@ -815,8 +815,8 @@ int dht_sendto(int sockfd, void const* buf, int len, int flags, struct sockaddr 
 extern "C" int dht_gettimeofday(struct timeval* tv, struct timezone* tz)
 {
     TR_ASSERT(tz == nullptr);
-
-    return tr_gettimeofday(tv);
+    *tv = tr_gettimeofday();
+    return 0;
 }
 
 #endif

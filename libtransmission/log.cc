@@ -127,8 +127,7 @@ void tr_logFreeQueue(tr_log_message* list)
 
 char* tr_logGetTimeStr(char* buf, size_t buflen)
 {
-    struct timeval tv;
-    tr_gettimeofday(&tv);
+    auto const tv = tr_gettimeofday();
     time_t const seconds = tv.tv_sec;
     auto const milliseconds = int(tv.tv_usec / 1000);
     char msec_str[8];

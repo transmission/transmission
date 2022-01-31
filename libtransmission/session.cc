@@ -676,8 +676,7 @@ static void onNowTimer(evutil_socket_t /*fd*/, short /*what*/, void* vsession)
     **/
 
     /* schedule the next timer for right after the next second begins */
-    struct timeval tv;
-    tr_gettimeofday(&tv);
+    auto const tv = tr_gettimeofday();
     int constexpr Min = 100;
     int constexpr Max = 999999;
     int const usec = std::clamp(int(1000000 - tv.tv_usec), Min, Max);
