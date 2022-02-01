@@ -707,7 +707,7 @@ static void pokeBatchPeriod(tr_peerMsgsImpl* msgs, int interval)
     }
 }
 
-static void dbgOutMessageLen(tr_peerMsgsImpl* msgs)
+static void dbgOutMessageLen(tr_peerMsgsImpl const* msgs)
 {
     dbgmsg(msgs, "outMessage size is now %zu", evbuffer_get_length(msgs->outMessages));
 }

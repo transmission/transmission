@@ -668,7 +668,7 @@ static void refillUpkeep(evutil_socket_t /*fd*/, short /*what*/, void* vmgr)
     tr_timerAddMsec(mgr->refillUpkeepTimer, RefillUpkeepPeriodMsec);
 }
 
-static void addStrike(tr_swarm* s, tr_peer* peer)
+static void addStrike(tr_swarm const* s, tr_peer* peer)
 {
     tordbg(s, "increasing peer %s strike count to %d", tr_atomAddrStr(peer->atom), peer->strikes + 1);
 
@@ -681,7 +681,11 @@ static void addStrike(tr_swarm* s, tr_peer* peer)
     }
 }
 
-static void peerSuggestedPiece(tr_swarm* /*s*/, tr_peer* /*peer*/, tr_piece_index_t /*pieceIndex*/, int /*isFastAllowed*/)
+static void peerSuggestedPiece(
+    tr_swarm const* /*s*/,
+    tr_peer const* /*peer*/,
+    tr_piece_index_t /*pieceIndex*/,
+    int /*isFastAllowed*/)
 {
 #if 0
 
@@ -1884,7 +1888,7 @@ void tr_peerMgrClearInterest(tr_torrent* tor)
 }
 
 /* does this peer have any pieces that we want? */
-static bool isPeerInteresting(tr_torrent* const tor, bool const* const piece_is_interesting, tr_peer const* const peer)
+static bool isPeerInteresting(tr_torrent const* const tor, bool const* const piece_is_interesting, tr_peer const* const peer)
 {
     /* these cases should have already been handled by the calling code... */
     TR_ASSERT(!tor->isDone());
@@ -2998,7 +3002,7 @@ static bool swarmIsAllSeeds(tr_swarm* swarm)
 }
 
 /** @return an array of all the atoms we might want to connect to */
-static std::vector<peer_candidate> getPeerCandidates(tr_session* session, size_t max)
+static std::vector<peer_candidate> getPeerCandidates(tr_session const* session, size_t max)
 {
     time_t const now = tr_time();
     uint64_t const now_msec = tr_time_msec();

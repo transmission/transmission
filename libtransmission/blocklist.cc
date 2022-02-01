@@ -165,7 +165,7 @@ int tr_blocklistFileGetRuleCount(tr_blocklistFile const* b)
     return b->ruleCount;
 }
 
-bool tr_blocklistFileIsEnabled(tr_blocklistFile* b)
+bool tr_blocklistFileIsEnabled(tr_blocklistFile const* b)
 {
     return b->isEnabled;
 }

@@ -118,7 +118,7 @@ tr_peer_id_t tr_peerIdInit()
 ****
 ***/
 
-tr_encryption_mode tr_sessionGetEncryption(tr_session* session)
+tr_encryption_mode tr_sessionGetEncryption(tr_session const* session)
 {
     TR_ASSERT(session != nullptr);
 
