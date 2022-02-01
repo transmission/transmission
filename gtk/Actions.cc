@@ -26,7 +26,7 @@ namespace
 
 Session* myCore = nullptr;
 
-void action_cb(Gio::SimpleAction& action, gpointer user_data)
+void action_cb(Gio::SimpleAction const& action, gpointer user_data)
 {
     gtr_actions_handler(action.get_name(), user_data);
 }

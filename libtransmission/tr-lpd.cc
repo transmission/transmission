@@ -138,10 +138,9 @@ static char const* lpd_extractHeader(char const* s, struct lpd_protocolVersion* 
 
     int major = -1;
     int minor = -1;
-    size_t len = strlen(s);
 
     /* something might be rotten with this chunk of data */
-    if (len == 0 || len > lpd_maxDatagramLength)
+    if (auto len = strlen(s); len == 0 || len > lpd_maxDatagramLength)
     {
         return nullptr;
     }

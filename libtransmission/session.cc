@@ -118,7 +118,7 @@ tr_peer_id_t tr_peerIdInit()
 ****
 ***/
 
-tr_encryption_mode tr_sessionGetEncryption(tr_session* session)
+tr_encryption_mode tr_sessionGetEncryption(tr_session const* session)
 {
     TR_ASSERT(session != nullptr);
 
@@ -600,8 +600,7 @@ tr_session* tr_sessionInit(char const* config_dir, bool messageQueuingEnabled, t
     session->removed_torrents.clear();
 
     /* nice to start logging at the very beginning */
-    auto i = int64_t{};
-    if (tr_variantDictFindInt(clientSettings, TR_KEY_message_level, &i))
+    if (auto i = int64_t{}; tr_variantDictFindInt(clientSettings, TR_KEY_message_level, &i))
     {
         tr_logSetLevel(tr_log_level(i));
     }
@@ -2307,9 +2306,8 @@ static void loadBlocklists(tr_session* session)
             if (!tr_sys_path_get_info(binname.c_str(), 0, &binname_info, nullptr)) /* create it */
             {
                 tr_blocklistFile* b = tr_blocklistFileNew(binname.c_str(), isEnabled);
-                int const n = tr_blocklistFileSetContent(b, path.c_str());
 
-                if (n > 0)
+                if (int const n = tr_blocklistFileSetContent(b, path.c_str()); n > 0)
                 {
                     load = binname;
                 }

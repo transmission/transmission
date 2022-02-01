@@ -84,8 +84,7 @@ QString collateAddress(QString const& address)
 {
     QString collated;
 
-    QHostAddress ip_address;
-    if (ip_address.setAddress(address))
+    if (QHostAddress ip_address; ip_address.setAddress(address))
     {
         if (ip_address.protocol() == QAbstractSocket::IPv4Protocol)
         {

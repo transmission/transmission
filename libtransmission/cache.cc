@@ -356,9 +356,8 @@ int tr_cacheReadBlock(
     uint8_t* setme)
 {
     int err = 0;
-    struct cache_block* cb = findBlock(cache, torrent, piece, offset);
 
-    if (cb != nullptr)
+    if (auto* cb = findBlock(cache, torrent, piece, offset); cb != nullptr)
     {
         evbuffer_copyout(cb->evbuf, setme, len);
     }
@@ -373,9 +372,8 @@ int tr_cacheReadBlock(
 int tr_cachePrefetchBlock(tr_cache* cache, tr_torrent* torrent, tr_piece_index_t piece, uint32_t offset, uint32_t len)
 {
     int err = 0;
-    struct cache_block const* const cb = findBlock(cache, torrent, piece, offset);
 
-    if (cb == nullptr)
+    if (auto const* const cb = findBlock(cache, torrent, piece, offset); cb == nullptr)
     {
         err = tr_ioPrefetch(torrent, piece, offset, len);
     }
@@ -454,9 +452,7 @@ int tr_cacheFlushTorrent(tr_cache* cache, tr_torrent* torrent)
     /* flush out all the blocks in that torrent */
     while (err == 0 && pos < tr_ptrArraySize(&cache->blocks))
     {
-        auto const* b = static_cast<struct cache_block const*>(tr_ptrArrayNth(&cache->blocks, pos));
-
-        if (b->tor != torrent)
+        if (auto const* b = static_cast<struct cache_block const*>(tr_ptrArrayNth(&cache->blocks, pos)); b->tor != torrent)
         {
             break;
         }

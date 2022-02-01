@@ -3,6 +3,7 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include <array>
 #include <climits> /* USHRT_MAX, INT_MAX */
 #include <sstream>
 #include <string>
@@ -1097,7 +1098,7 @@ PrefsDialog::Impl::Impl(PrefsDialog& dialog, Glib::RefPtr<Session> const& core)
     : dialog_(dialog)
     , core_(core)
 {
-    static tr_quark const prefs_quarks[] = { TR_KEY_peer_port, TR_KEY_download_dir };
+    auto constexpr PrefsQuarks = std::array<tr_quark, 2>{ TR_KEY_peer_port, TR_KEY_download_dir };
 
     core_prefs_tag_ = core_->signal_prefs_changed().connect(sigc::mem_fun(*this, &Impl::on_core_prefs_changed));
 
@@ -1118,7 +1119,7 @@ PrefsDialog::Impl::Impl(PrefsDialog& dialog, Glib::RefPtr<Session> const& core)
     n->append_page(*remotePage(), _("Remote"));
 
     /* init from prefs keys */
-    for (auto const key : prefs_quarks)
+    for (auto const key : PrefsQuarks)
     {
         on_core_prefs_changed(key);
     }

@@ -301,9 +301,7 @@ bool getSelectedFilesForeach(
     Glib::RefPtr<Gtk::TreeSelection> const& sel,
     std::vector<tr_file_index_t>& indexBuf)
 {
-    bool const is_file = iter->children().empty();
-
-    if (is_file)
+    if (bool const is_file = iter->children().empty(); is_file)
     {
         /* active means: if it's selected or any ancestor is selected */
         bool is_active = sel->is_selected(iter);
@@ -345,9 +343,7 @@ bool getSubtreeForeach(
     Gtk::TreeModel::Path const& subtree_path,
     std::vector<tr_file_index_t>& indexBuf)
 {
-    bool const is_file = iter->children().empty();
-
-    if (is_file)
+    if (bool const is_file = iter->children().empty(); is_file)
     {
         if (path == subtree_path || path.is_descendant(subtree_path))
         {
@@ -479,8 +475,7 @@ void FileList::Impl::set_torrent(int torrentId)
     torrent_id_ = torrentId;
 
     /* populate the model */
-    auto* const tor = torrent_id_ > 0 ? core_->find_torrent(torrent_id_) : nullptr;
-    if (tor != nullptr)
+    if (auto* const tor = torrent_id_ > 0 ? core_->find_torrent(torrent_id_) : nullptr; tor != nullptr)
     {
         // build a GNode tree of the files
         FileRowNode root;
@@ -690,9 +685,7 @@ bool FileList::Impl::getAndSelectEventPath(GdkEventButton const* event, Gtk::Tre
 
     if (view_->get_path_at_pos(event->x, event->y, path, col, cell_x, cell_y))
     {
-        auto const sel = view_->get_selection();
-
-        if (!sel->is_selected(path))
+        if (auto const sel = view_->get_selection(); !sel->is_selected(path))
         {
             sel->unselect_all();
             sel->select(path);

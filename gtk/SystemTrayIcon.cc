@@ -134,11 +134,9 @@ Glib::ustring getIconName()
 {
     Glib::ustring icon_name;
 
-    auto theme = Gtk::IconTheme::get_default();
-
     // if the tray's icon is a 48x48 file, use it.
     // otherwise, use the fallback builtin icon.
-    if (!theme->has_icon(TrayIconName))
+    if (auto theme = Gtk::IconTheme::get_default(); !theme->has_icon(TrayIconName))
     {
         icon_name = AppIconName;
     }

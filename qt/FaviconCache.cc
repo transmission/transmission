@@ -108,8 +108,7 @@ void FaviconCache::ensureCacheDirHasBeenScanned()
 
     // remember which hosts we've asked for a favicon so that we
     // don't re-ask them every time we start a new session
-    auto skip_file = QFile(getScrapedFile());
-    if (skip_file.open(QIODevice::ReadOnly | QIODevice::Text))
+    if (auto skip_file = QFile(getScrapedFile()); skip_file.open(QIODevice::ReadOnly | QIODevice::Text))
     {
         while (!skip_file.atEnd())
         {
@@ -183,8 +182,7 @@ FaviconCache::Key FaviconCache::add(QString const& url_str)
     ensureCacheDirHasBeenScanned();
 
     // find or add this url's key
-    auto k_it = keys_.find(url_str);
-    if (k_it != keys_.end())
+    if (auto k_it = keys_.find(url_str); k_it != keys_.end())
     {
         return k_it->second;
     }

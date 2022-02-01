@@ -274,8 +274,7 @@ static bool useNewMetainfo(tr_torrent* tor, tr_incomplete_metadata const* m, tr_
     }
 
     // save it
-    auto const filename = tor->torrentFile();
-    if (!tr_saveFile(filename, benc, error))
+    if (auto const filename = tor->torrentFile(); !tr_saveFile(filename, benc, error))
     {
         return false;
     }
@@ -370,9 +369,9 @@ bool tr_torrentGetNextMetadataRequest(tr_torrent* tor, time_t now, int* setme_pi
     TR_ASSERT(tr_isTorrent(tor));
 
     bool have_request = false;
-    struct tr_incomplete_metadata* m = tor->incompleteMetadata;
 
-    if (m != nullptr && m->piecesNeededCount > 0 && m->piecesNeeded[0].requestedAt + MinRepeatIntervalSecs < now)
+    if (auto* m = tor->incompleteMetadata;
+        m != nullptr && m->piecesNeededCount > 0 && m->piecesNeeded[0].requestedAt + MinRepeatIntervalSecs < now)
     {
         int const piece = m->piecesNeeded[0].piece;
         tr_removeElementFromArray(m->piecesNeeded, 0, sizeof(struct metadata_node), m->piecesNeededCount);

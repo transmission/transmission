@@ -707,7 +707,7 @@ static void pokeBatchPeriod(tr_peerMsgsImpl* msgs, int interval)
     }
 }
 
-static void dbgOutMessageLen(tr_peerMsgsImpl* msgs)
+static void dbgOutMessageLen(tr_peerMsgsImpl const* msgs)
 {
     dbgmsg(msgs, "outMessage size is now %zu", evbuffer_get_length(msgs->outMessages));
 }
@@ -1156,8 +1156,7 @@ static void parseLtepHandshake(tr_peerMsgsImpl* msgs, uint32_t len, struct evbuf
     msgs->peerSupportsPex = false;
     msgs->peerSupportsMetadataXfer = false;
 
-    tr_variant* sub = nullptr;
-    if (tr_variantDictFindDict(&val, TR_KEY_m, &sub))
+    if (tr_variant* sub = nullptr; tr_variantDictFindDict(&val, TR_KEY_m, &sub))
     {
         if (tr_variantDictFindInt(sub, TR_KEY_ut_pex, &i))
         {
@@ -1914,8 +1913,7 @@ static int clientGotBlock(tr_peerMsgsImpl* msgs, struct evbuffer* data, struct p
     ***  Save the block
     **/
 
-    int const err = tr_cacheWriteBlock(msgs->session->cache, tor, req->index, req->offset, req->length, data);
-    if (err != 0)
+    if (int const err = tr_cacheWriteBlock(msgs->session->cache, tor, req->index, req->offset, req->length, data); err != 0)
     {
         return err;
     }

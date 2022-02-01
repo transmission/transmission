@@ -175,9 +175,7 @@ Application::Application(int& argc, char** argv)
 
     // try to delegate the work to an existing copy of Transmission
     // before starting ourselves...
-    InteropHelper interop_client;
-
-    if (interop_client.isConnected())
+    if (InteropHelper interop_client; interop_client.isConnected())
     {
         bool delegated = false;
 
@@ -605,9 +603,7 @@ void Application::raise() const
 bool Application::notifyApp(QString const& title, QString const& body, QStringList const& actions) const
 {
 #ifdef QT_DBUS_LIB
-    QDBusConnection bus = QDBusConnection::sessionBus();
-
-    if (bus.isConnected())
+    if (auto bus = QDBusConnection::sessionBus(); bus.isConnected())
     {
         QDBusMessage m = QDBusMessage::createMethodCall(
             fdo_notifications_service_name_,
@@ -633,7 +629,6 @@ bool Application::notifyApp(QString const& title, QString const& body, QStringLi
             return true;
         }
     }
-
 #endif
 
     window_->trayIcon().showMessage(title, body);

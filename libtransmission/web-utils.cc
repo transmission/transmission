@@ -304,8 +304,7 @@ std::optional<tr_url_parsed_t> tr_urlParse(std::string_view url)
     // So many magnet links are malformed, e.g. not escaping text
     // in the display name, that we're better off handling magnets
     // as a special case before even scanning for invalid chars.
-    auto constexpr MagnetStart = "magnet:?"sv;
-    if (tr_strvStartsWith(url, MagnetStart))
+    if (auto constexpr MagnetStart = "magnet:?"sv; tr_strvStartsWith(url, MagnetStart))
     {
         parsed.scheme = "magnet"sv;
         parsed.query = url.substr(std::size(MagnetStart));
