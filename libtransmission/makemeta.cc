@@ -318,7 +318,7 @@ static std::vector<std::byte> getHashInfo(tr_metainfo_builder* b)
             b->my_errno = EIO;
             tr_snprintf(b->errfile, sizeof(b->errfile), "error hashing piece %" PRIu32, b->pieceIndex);
             b->result = TR_MAKEMETA_IO_READ;
-            return {};
+            break;
         }
 
         walk = std::copy(std::begin(*digest), std::end(*digest), walk);
