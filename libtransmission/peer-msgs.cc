@@ -125,7 +125,7 @@ static auto constexpr RequestBufSecs = int{ 10 };
 namespace
 {
 
-constexpr int MAX_PEX_PEER_COUNT = 50;
+auto constexpr MaxPexPeerCount = size_t{ 50 };
 
 } // unnamed namespace
 
@@ -1323,11 +1323,9 @@ static void parseUtPex(tr_peerMsgsImpl* msgs, uint32_t msglen, struct evbuffer* 
                 added_f = nullptr;
             }
 
-            auto n = size_t{};
-            tr_pex* const pex = tr_peerMgrCompactToPex(added, added_len, added_f, added_f_len, &n);
-            n = std::min(n, size_t{ MAX_PEX_PEER_COUNT });
-            tr_peerMgrAddPex(tor, TR_PEER_FROM_PEX, pex, n);
-            tr_free(pex);
+            auto pex = tr_peerMgrCompactToPex(added, added_len, added_f, added_f_len);
+            pex.resize(std::min(MaxPexPeerCount, std::size(pex)));
+            tr_peerMgrAddPex(tor, TR_PEER_FROM_PEX, std::data(pex), std::size(pex));
         }
 
         if (tr_variantDictFindRaw(&val, TR_KEY_added6, &added, &added_len))
@@ -1340,11 +1338,9 @@ static void parseUtPex(tr_peerMsgsImpl* msgs, uint32_t msglen, struct evbuffer* 
                 added_f = nullptr;
             }
 
-            auto n = size_t{};
-            tr_pex* const pex = tr_peerMgrCompact6ToPex(added, added_len, added_f, added_f_len, &n);
-            n = std::min(n, size_t{ MAX_PEX_PEER_COUNT });
-            tr_peerMgrAddPex(tor, TR_PEER_FROM_PEX, pex, n);
-            tr_free(pex);
+            auto pex = tr_peerMgrCompact6ToPex(added, added_len, added_f, added_f_len);
+            pex.resize(std::min(MaxPexPeerCount, std::size(pex)));
+            tr_peerMgrAddPex(tor, TR_PEER_FROM_PEX, std::data(pex), std::size(pex));
         }
 
         tr_variantFree(&val);
@@ -2483,8 +2479,8 @@ static void sendPex(tr_peerMsgsImpl* msgs)
         PexDiffs diffs6;
         tr_pex* newPex = nullptr;
         tr_pex* newPex6 = nullptr;
-        int const newCount = tr_peerMgrGetPeers(msgs->torrent, &newPex, TR_AF_INET, TR_PEERS_CONNECTED, MAX_PEX_PEER_COUNT);
-        int const newCount6 = tr_peerMgrGetPeers(msgs->torrent, &newPex6, TR_AF_INET6, TR_PEERS_CONNECTED, MAX_PEX_PEER_COUNT);
+        int const newCount = tr_peerMgrGetPeers(msgs->torrent, &newPex, TR_AF_INET, TR_PEERS_CONNECTED, MaxPexPeerCount);
+        int const newCount6 = tr_peerMgrGetPeers(msgs->torrent, &newPex6, TR_AF_INET6, TR_PEERS_CONNECTED, MaxPexPeerCount);
 
         /* build the diffs */
         diffs.added = tr_new(tr_pex, newCount);

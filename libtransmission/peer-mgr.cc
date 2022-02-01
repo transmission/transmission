@@ -7,9 +7,8 @@
 #include <cerrno> /* error codes ERANGE, ... */
 #include <climits> /* INT_MAX */
 #include <cstdlib> /* qsort */
-#include <cstring> /* memcpy, memcmp, strstr */
-#include <ctime>
-#include <iterator>
+#include <ctime> // time_t
+#include <iterator> // std::back_inserter
 #include <vector>
 
 #include <event2/event.h>
@@ -20,6 +19,7 @@
 #define LIBTRANSMISSION_PEER_MODULE
 
 #include "transmission.h"
+
 #include "announcer.h"
 #include "bandwidth.h"
 #include "blocklist.h"
@@ -31,9 +31,9 @@
 #include "log.h"
 #include "net.h"
 #include "peer-io.h"
-#include "peer-mgr.h"
 #include "peer-mgr-active-requests.h"
 #include "peer-mgr-wishlist.h"
+#include "peer-mgr.h"
 #include "peer-msgs.h"
 #include "ptrarray.h"
 #include "session.h"
@@ -1175,35 +1175,6 @@ size_t tr_peerMgrAddPex(tr_torrent* tor, uint8_t from, tr_pex const* pex, size_t
     return n_used;
 }
 
-tr_pex* tr_peerMgrCompactToPex(
-    void const* compact,
-    size_t compactLen,
-    uint8_t const* added_f,
-    size_t added_f_len,
-    size_t* pexCount)
-{
-    size_t n = compactLen / 6;
-    auto const* walk = static_cast<uint8_t const*>(compact);
-    auto* const pex = tr_new0(tr_pex, n);
-
-    for (size_t i = 0; i < n; ++i)
-    {
-        pex[i].addr.type = TR_AF_INET;
-        memcpy(&pex[i].addr.addr, walk, 4);
-        walk += 4;
-        memcpy(&pex[i].port, walk, 2);
-        walk += 2;
-
-        if (added_f != nullptr && n == added_f_len)
-        {
-            pex[i].flags = added_f[i];
-        }
-    }
-
-    *pexCount = n;
-    return pex;
-}
-
 std::vector<tr_pex> tr_peerMgrCompactToPex(void const* compact, size_t compactLen, uint8_t const* added_f, size_t added_f_len)
 {
     size_t n = compactLen / 6;
@@ -1224,35 +1195,6 @@ std::vector<tr_pex> tr_peerMgrCompactToPex(void const* compact, size_t compactLe
         }
     }
 
-    return pex;
-}
-
-tr_pex* tr_peerMgrCompact6ToPex(
-    void const* compact,
-    size_t compactLen,
-    uint8_t const* added_f,
-    size_t added_f_len,
-    size_t* pexCount)
-{
-    size_t n = compactLen / 18;
-    auto const* walk = static_cast<uint8_t const*>(compact);
-    auto* const pex = tr_new0(tr_pex, n);
-
-    for (size_t i = 0; i < n; ++i)
-    {
-        pex[i].addr.type = TR_AF_INET6;
-        memcpy(&pex[i].addr.addr.addr6.s6_addr, walk, 16);
-        walk += 16;
-        memcpy(&pex[i].port, walk, 2);
-        walk += 2;
-
-        if (added_f != nullptr && n == added_f_len)
-        {
-            pex[i].flags = added_f[i];
-        }
-    }
-
-    *pexCount = n;
     return pex;
 }
 
@@ -1616,7 +1558,7 @@ void tr_peerMgrTorrentAvailability(tr_torrent const* tor, int8_t* tab, unsigned 
     TR_ASSERT(tab != nullptr);
     TR_ASSERT(tabCount > 0);
 
-    memset(tab, 0, tabCount);
+    std::fill_n(tab, tabCount, int8_t{});
 
     if (tor->hasMetadata())
     {
