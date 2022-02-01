@@ -1322,7 +1322,8 @@ static void on_scrape_done(tr_scrape_response const* response, void* vsession)
                 tier->scheduleNextScrape();
                 tr_logAddTorDbg(tier->tor, "Scrape successful. Rescraping in %d seconds.", tier->scrapeIntervalSec);
 
-                if (auto* const tracker = tier->currentTracker(); tracker != nullptr)
+                tr_tracker* const tracker = tier->currentTracker();
+                if (tracker != nullptr)
                 {
                     if (row.seeders >= 0)
                     {

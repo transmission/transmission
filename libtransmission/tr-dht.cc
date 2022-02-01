@@ -104,8 +104,8 @@ static void bootstrap_from_name(char const* name, tr_port port, int af)
     tr_snprintf(pp, sizeof(pp), "%d", (int)port);
 
     addrinfo* info = nullptr;
-
-    if (int const rc = getaddrinfo(name, pp, &hints, &info); rc != 0)
+    int const rc = getaddrinfo(name, pp, &hints, &info);
+    if (rc != 0)
     {
         tr_logAddNamedError("DHT", "%s:%s: %s", name, pp, gai_strerror(rc));
         return;
@@ -527,7 +527,7 @@ int tr_dhtStatus(tr_session* session, int af, int* nodes_return)
     return closure.status;
 }
 
-tr_port tr_dhtPort(tr_session const* ss)
+tr_port tr_dhtPort(tr_session* ss)
 {
     return tr_dhtEnabled(ss) ? ss->udp_port : 0;
 }
@@ -738,8 +738,9 @@ void tr_dhtCallback(unsigned char* buf, int buflen, struct sockaddr* from, sockl
     }
 
     time_t tosleep = 0;
+    int rc = dht_periodic(buf, buflen, from, fromlen, &tosleep, callback, nullptr);
 
-    if (int rc = dht_periodic(buf, buflen, from, fromlen, &tosleep, callback, nullptr); rc < 0)
+    if (rc < 0)
     {
         if (errno == EINTR)
         {

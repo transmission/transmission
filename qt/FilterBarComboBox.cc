@@ -83,7 +83,9 @@ void FilterBarComboBox::paintEvent(QPaintEvent* e)
     painter.drawComplexControl(QStyle::CC_ComboBox, opt);
 
     // draw the icon and text
-    if (auto const model_index = model()->index(currentIndex(), 0, rootModelIndex()); model_index.isValid())
+    QModelIndex const model_index = model()->index(currentIndex(), 0, rootModelIndex());
+
+    if (model_index.isValid())
     {
         QStyle* s = style();
         int const hmargin = getHSpacing(this);

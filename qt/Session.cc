@@ -199,21 +199,26 @@ void Session::updatePref(int key)
             break;
 
         case Prefs::ENCRYPTION:
-            switch (int const i = prefs_.variant(key).toInt(); i)
             {
-            case 0:
-                sessionSet(prefs_.getKey(key), QStringLiteral("tolerated"));
-                break;
+                int const i = prefs_.variant(key).toInt();
 
-            case 1:
-                sessionSet(prefs_.getKey(key), QStringLiteral("preferred"));
-                break;
+                switch (i)
+                {
+                case 0:
+                    sessionSet(prefs_.getKey(key), QStringLiteral("tolerated"));
+                    break;
 
-            case 2:
-                sessionSet(prefs_.getKey(key), QStringLiteral("required"));
+                case 1:
+                    sessionSet(prefs_.getKey(key), QStringLiteral("preferred"));
+                    break;
+
+                case 2:
+                    sessionSet(prefs_.getKey(key), QStringLiteral("required"));
+                    break;
+                }
+
                 break;
             }
-            break;
 
         case Prefs::RPC_AUTH_REQUIRED:
             if (session_ != nullptr)
@@ -902,46 +907,68 @@ void Session::updateInfo(tr_variant* d)
         switch (prefs_.type(i))
         {
         case QVariant::Int:
-            if (auto const value = getValue<int>(b); value)
             {
-                prefs_.set(i, *value);
+                auto const value = getValue<int>(b);
+
+                if (value)
+                {
+                    prefs_.set(i, *value);
+                }
+
+                break;
             }
-            break;
 
         case QVariant::Double:
-            if (auto const value = getValue<double>(b); value)
             {
-                prefs_.set(i, *value);
+                auto const value = getValue<double>(b);
+
+                if (value)
+                {
+                    prefs_.set(i, *value);
+                }
+
+                break;
             }
-            break;
 
         case QVariant::Bool:
-            if (auto const value = getValue<bool>(b); value)
             {
-                prefs_.set(i, *value);
+                auto const value = getValue<bool>(b);
+
+                if (value)
+                {
+                    prefs_.set(i, *value);
+                }
+
+                break;
             }
-            break;
 
         case CustomVariantType::FilterModeType:
         case CustomVariantType::SortModeType:
         case QVariant::String:
-            if (auto const value = getValue<QString>(b); value)
             {
-                prefs_.set(i, *value);
+                auto const value = getValue<QString>(b);
+
+                if (value)
+                {
+                    prefs_.set(i, *value);
+                }
+
+                break;
             }
-            break;
 
         default:
             break;
         }
     }
 
-    if (auto const b = dictFind<bool>(d, TR_KEY_seedRatioLimited); b)
+    auto const b = dictFind<bool>(d, TR_KEY_seedRatioLimited);
+    if (b)
     {
         prefs_.set(Prefs::RATIO_ENABLED, *b);
     }
 
-    if (auto const x = dictFind<double>(d, TR_KEY_seedRatioLimit); x)
+    auto const x = dictFind<double>(d, TR_KEY_seedRatioLimit);
+    if (x)
     {
         prefs_.set(Prefs::RATIO, *x);
     }

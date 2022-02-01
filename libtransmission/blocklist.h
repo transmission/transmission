@@ -22,7 +22,7 @@ int tr_blocklistFileGetRuleCount(tr_blocklistFile const* b);
 
 void tr_blocklistFileFree(tr_blocklistFile* b);
 
-bool tr_blocklistFileIsEnabled(tr_blocklistFile const* b);
+bool tr_blocklistFileIsEnabled(tr_blocklistFile* b);
 
 void tr_blocklistFileSetEnabled(tr_blocklistFile* b, bool isEnabled);
 

@@ -145,7 +145,7 @@ private:
     void on_pref_changed(tr_quark key);
 
     void on_torrent_completeness_changed(tr_torrent* tor, tr_completeness completeness, bool was_running);
-    void on_torrent_metadata_changed(tr_torrent const* tor);
+    void on_torrent_metadata_changed(tr_torrent* tor);
 
 private:
     Session& core_;
@@ -896,7 +896,7 @@ Gtk::TreeModel::iterator find_row_from_torrent_id(Glib::RefPtr<Gtk::TreeModel> c
 
 /* this is called in the libtransmission thread, *NOT* the GTK+ thread,
    so delegate to the GTK+ thread before changing our list store... */
-void Session::Impl::on_torrent_metadata_changed(tr_torrent const* tor)
+void Session::Impl::on_torrent_metadata_changed(tr_torrent* tor)
 {
     Glib::signal_idle().connect(
         [this, core = get_core_ptr(), torrent_id = tr_torrentId(tor)]()
@@ -925,7 +925,7 @@ void Session::Impl::on_torrent_metadata_changed(tr_torrent const* tor)
 namespace
 {
 
-unsigned int build_torrent_trackers_hash(tr_torrent const* tor)
+unsigned int build_torrent_trackers_hash(tr_torrent* tor)
 {
     auto hash = uint64_t{};
 
@@ -1135,8 +1135,9 @@ void Session::Impl::add_file_async_callback(
 bool Session::Impl::add_file(Glib::RefPtr<Gio::File> const& file, bool do_start, bool do_prompt, bool do_notify)
 {
     bool handled = false;
+    auto const* const session = get_session();
 
-    if (auto const* const session = get_session(); session != nullptr)
+    if (session != nullptr)
     {
         tr_ctor* ctor;
         bool tried = false;

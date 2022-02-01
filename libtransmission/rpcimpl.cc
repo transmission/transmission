@@ -1305,7 +1305,8 @@ static char const* torrentRenamePath(
     auto newname = std::string_view{};
     (void)tr_variantDictFindStrView(args_in, TR_KEY_name, &newname);
 
-    if (auto const torrents = getTorrents(session, args_in); std::size(torrents) == 1)
+    auto const torrents = getTorrents(session, args_in);
+    if (std::size(torrents) == 1)
     {
         torrents[0]->renamePath(oldpath, newname, torrentRenamePathDone, idle_data);
     }
@@ -2404,7 +2405,8 @@ void tr_rpc_request_exec_json(
         tr_variantDictAddDict(&response, TR_KEY_arguments, 0);
         tr_variantDictAddStr(&response, TR_KEY_result, result);
 
-        if (auto tag = int64_t{}; tr_variantDictFindInt(mutable_request, TR_KEY_tag, &tag))
+        auto tag = int64_t{};
+        if (tr_variantDictFindInt(mutable_request, TR_KEY_tag, &tag))
         {
             tr_variantDictAddInt(&response, TR_KEY_tag, tag);
         }
@@ -2427,7 +2429,8 @@ void tr_rpc_request_exec_json(
 
         tr_variantDictAddStr(&response, TR_KEY_result, result);
 
-        if (auto tag = int64_t{}; tr_variantDictFindInt(mutable_request, TR_KEY_tag, &tag))
+        auto tag = int64_t{};
+        if (tr_variantDictFindInt(mutable_request, TR_KEY_tag, &tag))
         {
             tr_variantDictAddInt(&response, TR_KEY_tag, tag);
         }
@@ -2443,7 +2446,8 @@ void tr_rpc_request_exec_json(
         data->response = tr_new0(tr_variant, 1);
         tr_variantInitDict(data->response, 3);
 
-        if (auto tag = int64_t{}; tr_variantDictFindInt(mutable_request, TR_KEY_tag, &tag))
+        auto tag = int64_t{};
+        if (tr_variantDictFindInt(mutable_request, TR_KEY_tag, &tag))
         {
             tr_variantDictAddInt(data->response, TR_KEY_tag, tag);
         }
