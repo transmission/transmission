@@ -80,7 +80,7 @@ std::string _icon_cache_get_icon_key(Glib::RefPtr<Gio::Icon> const& icon)
     return key;
 }
 
-Glib::RefPtr<Gdk::Pixbuf> get_themed_icon_pixbuf(Gio::ThemedIcon const& icon, int size, Gtk::IconTheme& icon_theme)
+Glib::RefPtr<Gdk::Pixbuf> get_themed_icon_pixbuf(Gio::ThemedIcon& icon, int size, Gtk::IconTheme& icon_theme)
 {
     auto const icon_names = icon.get_names();
 

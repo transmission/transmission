@@ -39,7 +39,8 @@ void DBusInteropHelper::registerObject(QObject* parent)
         return;
     }
 
-    if (auto const service_name = QStringLiteral("com.transmissionbt.Transmission"); !bus.registerService(service_name))
+    auto const service_name = QStringLiteral("com.transmissionbt.Transmission");
+    if (!bus.registerService(service_name))
     {
         qWarning() << "couldn't register" << qPrintable(service_name);
     }

@@ -57,7 +57,9 @@ FileTreeItem* FileTreeItem::child(QString const& filename)
 {
     FileTreeItem* item(nullptr);
 
-    if (int const row = getMyChildRows().value(filename, -1); row != -1)
+    int const row = getMyChildRows().value(filename, -1);
+
+    if (row != -1)
     {
         item = child(row);
         assert(filename == item->name());

@@ -22,7 +22,9 @@ bool InteropObject::PresentWindow() const
 // NOLINTNEXTLINE(readability-identifier-naming)
 bool InteropObject::AddMetainfo(QString const& metainfo) const
 {
-    if (AddData addme(metainfo); addme.type != addme.NONE)
+    AddData addme(metainfo);
+
+    if (addme.type != addme.NONE)
     {
         trApp->addTorrent(addme);
     }

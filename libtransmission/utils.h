@@ -83,7 +83,8 @@ template<typename... T, typename std::enable_if_t<(std::is_convertible_v<T, std:
 std::string& tr_buildBuf(std::string& setme, T... args)
 {
     setme.clear();
-    if (auto const n = (std::size(std::string_view{ args }) + ...); setme.capacity() < n)
+    auto const n = (std::size(std::string_view{ args }) + ...);
+    if (setme.capacity() < n)
     {
         setme.reserve(n);
     }
@@ -300,8 +301,8 @@ std::string tr_strvPath(T... args)
 {
     auto setme = std::string{};
     auto const n_args = sizeof...(args);
-
-    if (auto const n = n_args + (std::size(std::string_view{ args }) + ...); setme.capacity() < n)
+    auto const n = n_args + (std::size(std::string_view{ args }) + ...);
+    if (setme.capacity() < n)
     {
         setme.reserve(n);
     }
@@ -320,12 +321,11 @@ template<typename... T, typename std::enable_if_t<(std::is_convertible_v<T, std:
 std::string tr_strvJoin(T... args)
 {
     auto setme = std::string{};
-
-    if (auto const n = (std::size(std::string_view{ args }) + ...); setme.capacity() < n)
+    auto const n = (std::size(std::string_view{ args }) + ...);
+    if (setme.capacity() < n)
     {
         setme.reserve(n);
     }
-
     ((setme += args), ...);
     return setme;
 }

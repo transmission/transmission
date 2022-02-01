@@ -173,7 +173,9 @@ void FileTreeView::mouseDoubleClickEvent(QMouseEvent* event)
 
 void FileTreeView::contextMenuEvent(QContextMenuEvent* event)
 {
-    if (auto const root_index = model_->index(0, 0); !root_index.isValid())
+    QModelIndex const root_index = model_->index(0, 0);
+
+    if (!root_index.isValid())
     {
         return;
     }

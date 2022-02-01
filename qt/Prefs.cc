@@ -38,8 +38,8 @@ namespace
 void ensureSoundCommandIsAList(tr_variant* dict)
 {
     tr_quark key = TR_KEY_torrent_complete_sound_command;
-
-    if (tr_variant* list = nullptr; tr_variantDictFindList(dict, key, &list))
+    tr_variant* list = nullptr;
+    if (tr_variantDictFindList(dict, key, &list))
     {
         return;
     }
@@ -507,8 +507,9 @@ bool Prefs::getBool(int key) const
 QString Prefs::getString(int key) const
 {
     assert(Items[key].type == QVariant::String);
+    QByteArray const b = values_[key].toByteArray();
 
-    if (auto const b = values_[key].toByteArray(); isValidUtf8(b.constData()))
+    if (isValidUtf8(b.constData()))
     {
         values_[key].setValue(QString::fromUtf8(b.constData()));
     }

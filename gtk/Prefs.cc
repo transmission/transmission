@@ -174,7 +174,8 @@ std::vector<std::string> gtr_pref_strv_get(tr_quark const key)
 {
     std::vector<std::string> ret;
 
-    if (tr_variant* list = nullptr; tr_variantDictFindList(getPrefs(), key, &list))
+    tr_variant* list = nullptr;
+    if (tr_variantDictFindList(getPrefs(), key, &list))
     {
         size_t const n = tr_variantListSize(list);
         ret.reserve(n);

@@ -228,7 +228,7 @@ static uint64_t loadFilePriorities(tr_variant* dict, tr_torrent* tor)
 ****
 ***/
 
-static void saveSingleSpeedLimit(tr_variant* d, tr_torrent const* tor, tr_direction dir)
+static void saveSingleSpeedLimit(tr_variant* d, tr_torrent* tor, tr_direction dir)
 {
     tr_variantDictReserve(d, 3);
     tr_variantDictAddInt(d, TR_KEY_speed_Bps, tor->speedLimitBps(dir));
@@ -236,20 +236,20 @@ static void saveSingleSpeedLimit(tr_variant* d, tr_torrent const* tor, tr_direct
     tr_variantDictAddBool(d, TR_KEY_use_speed_limit, tr_torrentUsesSpeedLimit(tor, dir));
 }
 
-static void saveSpeedLimits(tr_variant* dict, tr_torrent const* tor)
+static void saveSpeedLimits(tr_variant* dict, tr_torrent* tor)
 {
     saveSingleSpeedLimit(tr_variantDictAddDict(dict, TR_KEY_speed_limit_down, 0), tor, TR_DOWN);
     saveSingleSpeedLimit(tr_variantDictAddDict(dict, TR_KEY_speed_limit_up, 0), tor, TR_UP);
 }
 
-static void saveRatioLimits(tr_variant* dict, tr_torrent const* tor)
+static void saveRatioLimits(tr_variant* dict, tr_torrent* tor)
 {
     tr_variant* d = tr_variantDictAddDict(dict, TR_KEY_ratio_limit, 2);
     tr_variantDictAddReal(d, TR_KEY_ratio_limit, tr_torrentGetRatioLimit(tor));
     tr_variantDictAddInt(d, TR_KEY_ratio_mode, tr_torrentGetRatioMode(tor));
 }
 
-static void saveIdleLimits(tr_variant* dict, tr_torrent const* tor)
+static void saveIdleLimits(tr_variant* dict, tr_torrent* tor)
 {
     tr_variant* d = tr_variantDictAddDict(dict, TR_KEY_idle_limit, 2);
     tr_variantDictAddInt(d, TR_KEY_idle_limit, tr_torrentGetIdleLimit(tor));
@@ -305,14 +305,17 @@ static uint64_t loadRatioLimits(tr_variant* dict, tr_torrent* tor)
 {
     auto ret = uint64_t{};
 
-    if (tr_variant* d = nullptr; tr_variantDictFindDict(dict, TR_KEY_ratio_limit, &d))
+    tr_variant* d = nullptr;
+    if (tr_variantDictFindDict(dict, TR_KEY_ratio_limit, &d))
     {
-        if (auto dratio = double{}; tr_variantDictFindReal(d, TR_KEY_ratio_limit, &dratio))
+        auto dratio = double{};
+        if (tr_variantDictFindReal(d, TR_KEY_ratio_limit, &dratio))
         {
             tr_torrentSetRatioLimit(tor, dratio);
         }
 
-        if (auto i = int64_t{}; tr_variantDictFindInt(d, TR_KEY_ratio_mode, &i))
+        auto i = int64_t{};
+        if (tr_variantDictFindInt(d, TR_KEY_ratio_mode, &i))
         {
             tr_torrentSetRatioMode(tor, tr_ratiolimit(i));
         }
@@ -327,14 +330,17 @@ static uint64_t loadIdleLimits(tr_variant* dict, tr_torrent* tor)
 {
     auto ret = uint64_t{};
 
-    if (tr_variant* d = nullptr; tr_variantDictFindDict(dict, TR_KEY_idle_limit, &d))
+    tr_variant* d = nullptr;
+    if (tr_variantDictFindDict(dict, TR_KEY_idle_limit, &d))
     {
-        if (auto imin = int64_t{}; tr_variantDictFindInt(d, TR_KEY_idle_limit, &imin))
+        auto imin = int64_t{};
+        if (tr_variantDictFindInt(d, TR_KEY_idle_limit, &imin))
         {
             tr_torrentSetIdleLimit(tor, imin);
         }
 
-        if (auto i = int64_t{}; tr_variantDictFindInt(d, TR_KEY_idle_mode, &i))
+        auto i = int64_t{};
+        if (tr_variantDictFindInt(d, TR_KEY_idle_mode, &i))
         {
             tr_torrentSetIdleMode(tor, tr_idlelimit(i));
         }
@@ -574,7 +580,8 @@ static uint64_t loadProgress(tr_variant* dict, tr_torrent* tor)
         auto blocks = tr_bitfield{ tor->blockCount() };
         char const* err = nullptr;
         auto sv = std::string_view{};
-        if (auto const* const b = tr_variantDictFind(prog, TR_KEY_blocks); b != nullptr)
+        tr_variant const* const b = tr_variantDictFind(prog, TR_KEY_blocks);
+        if (b != nullptr)
         {
             uint8_t const* buf = nullptr;
             auto buflen = size_t{};
@@ -671,7 +678,8 @@ void tr_torrentSaveResume(tr_torrent* tor)
     saveName(&top, tor);
     saveLabels(&top, tor);
 
-    if (auto const err = tr_variantToFile(&top, TR_VARIANT_FMT_BENC, tor->resumeFile()); err != 0)
+    auto const err = tr_variantToFile(&top, TR_VARIANT_FMT_BENC, tor->resumeFile());
+    if (err != 0)
     {
         tor->setLocalError(tr_strvJoin("Unable to save resume file: ", tr_strerror(err)));
     }
