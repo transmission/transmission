@@ -436,8 +436,7 @@ std::optional<tr_quark> tr_quark_lookup(std::string_view key)
     /* was it added during runtime? */
     auto const rbegin = std::begin(my_runtime);
     auto const rend = std::end(my_runtime);
-    auto const rit = std::find(rbegin, rend, key);
-    if (rit != rend)
+    if (auto const rit = std::find(rbegin, rend, key); rit != rend)
     {
         return TR_N_KEYS + std::distance(rbegin, rit);
     }

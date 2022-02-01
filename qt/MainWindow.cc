@@ -658,9 +658,8 @@ void MainWindow::openFolder()
     }
 
     QString const first_file = files.at(0).filename;
-    int slash_index = first_file.indexOf(QLatin1Char('/'));
 
-    if (slash_index > -1)
+    if (int slash_index = first_file.indexOf(QLatin1Char('/')); slash_index > -1)
     {
         path = path + QLatin1Char('/') + first_file.left(slash_index);
     }

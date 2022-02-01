@@ -1135,9 +1135,8 @@ void Session::Impl::add_file_async_callback(
 bool Session::Impl::add_file(Glib::RefPtr<Gio::File> const& file, bool do_start, bool do_prompt, bool do_notify)
 {
     bool handled = false;
-    auto const* const session = get_session();
 
-    if (session != nullptr)
+    if (auto const* const session = get_session(); session != nullptr)
     {
         tr_ctor* ctor;
         bool tried = false;

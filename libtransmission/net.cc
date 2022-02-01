@@ -598,9 +598,7 @@ static int tr_globalAddress(int af, void* addr, int* addr_len)
         return -1;
     }
 
-    int const rc = get_source_address(sa, salen, (struct sockaddr*)&ss, &sslen);
-
-    if (rc < 0)
+    if (int const rc = get_source_address(sa, salen, (struct sockaddr*)&ss, &sslen); rc < 0)
     {
         return -1;
     }

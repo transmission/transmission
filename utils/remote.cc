@@ -544,8 +544,7 @@ static bool UseSSL = false;
 
 static std::string getEncodedMetainfo(char const* filename)
 {
-    auto contents = std::vector<char>{};
-    if (tr_loadFile(contents, filename))
+    if (auto contents = std::vector<char>{}; tr_loadFile(contents, filename))
     {
         return tr_base64_encode({ std::data(contents), std::size(contents) });
     }
@@ -2158,8 +2157,7 @@ static int flush(char const* rpcurl, tr_variant** benc)
         fprintf(stderr, "posting:\n--------\n%s\n--------\n", json.c_str());
     }
 
-    auto const res = curl_easy_perform(curl);
-    if (res != CURLE_OK)
+    if (auto const res = curl_easy_perform(curl); res != CURLE_OK)
     {
         tr_logAddNamedError(MyName, " (%s) %s", rpcurl_http.c_str(), curl_easy_strerror(res));
         status |= EXIT_FAILURE;

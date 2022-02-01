@@ -336,8 +336,7 @@ static bool tr_torrentGetSeedRatioBytes(tr_torrent const* tor, uint64_t* setme_l
 
     TR_ASSERT(tr_isTorrent(tor));
 
-    auto seed_ratio = double{};
-    if (tr_torrentGetSeedRatio(tor, &seed_ratio))
+    if (auto seed_ratio = double{}; tr_torrentGetSeedRatio(tor, &seed_ratio))
     {
         auto const uploaded = tor->uploadedCur + tor->uploadedPrev;
         auto const baseline = tor->totalSize();
@@ -2340,8 +2339,8 @@ static void setLocationImpl(void* vdata)
             auto const file_size = tor->fileSize(i);
 
             char const* oldbase = nullptr;
-            char* sub = nullptr;
-            if (tr_torrentFindFile2(tor, i, &oldbase, &sub, nullptr))
+
+            if (char* sub = nullptr; tr_torrentFindFile2(tor, i, &oldbase, &sub, nullptr))
             {
                 auto const oldpath = tr_strvPath(oldbase, sub);
                 auto const newpath = tr_strvPath(location, sub);

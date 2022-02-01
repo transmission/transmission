@@ -769,8 +769,7 @@ static ReadState readPadA(tr_handshake* handshake, struct evbuffer* inbuf)
         return READ_NOW;
     }
 
-    size_t const len = evbuffer_get_length(inbuf);
-    if (len > SHA_DIGEST_LENGTH)
+    if (size_t const len = evbuffer_get_length(inbuf); len > SHA_DIGEST_LENGTH)
     {
         evbuffer_drain(inbuf, len - SHA_DIGEST_LENGTH);
     }

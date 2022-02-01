@@ -213,8 +213,7 @@ static void write_block_func(void* vdata)
     struct tr_webseed* const w = data->webseed;
     struct evbuffer* const buf = data->content;
 
-    auto* const tor = tr_torrentFindFromId(data->session, data->torrent_id);
-    if (tor != nullptr)
+    if (auto* const tor = tr_torrentFindFromId(data->session, data->torrent_id); tor != nullptr)
     {
         uint32_t const block_size = tor->blockSize();
         uint32_t len = evbuffer_get_length(buf);

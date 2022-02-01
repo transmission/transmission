@@ -62,8 +62,7 @@ static void getopts_usage_line(tr_option const* opt, int longWidth, int shortWid
 
     auto const strip_leading_whitespace = [](std::string_view text)
     {
-        auto pos = text.find_first_not_of(' ');
-        if (pos != std::string_view::npos)
+        if (auto pos = text.find_first_not_of(' '); pos != std::string_view::npos)
         {
             text.remove_prefix(pos);
         }

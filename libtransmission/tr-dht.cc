@@ -104,8 +104,8 @@ static void bootstrap_from_name(char const* name, tr_port port, int af)
     tr_snprintf(pp, sizeof(pp), "%d", (int)port);
 
     addrinfo* info = nullptr;
-    int const rc = getaddrinfo(name, pp, &hints, &info);
-    if (rc != 0)
+
+    if (int const rc = getaddrinfo(name, pp, &hints, &info); rc != 0)
     {
         tr_logAddNamedError("DHT", "%s:%s: %s", name, pp, gai_strerror(rc));
         return;
@@ -738,9 +738,8 @@ void tr_dhtCallback(unsigned char* buf, int buflen, struct sockaddr* from, sockl
     }
 
     time_t tosleep = 0;
-    int rc = dht_periodic(buf, buflen, from, fromlen, &tosleep, callback, nullptr);
 
-    if (rc < 0)
+    if (int rc = dht_periodic(buf, buflen, from, fromlen, &tosleep, callback, nullptr); rc < 0)
     {
         if (errno == EINTR)
         {

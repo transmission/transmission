@@ -112,9 +112,7 @@ void PathButton::onClicked() const
         dialog->setNameFilter(name_filter_);
     }
 
-    QFileInfo const path_info(path_);
-
-    if (!path_.isEmpty() && path_info.exists())
+    if (QFileInfo const path_info(path_); !path_.isEmpty() && path_info.exists())
     {
         if (path_info.isDir())
         {

@@ -301,16 +301,13 @@ RpcResponse RpcClient::parseResponseData(tr_variant& json) const
 {
     RpcResponse ret;
 
-    auto const result = dictFind<QString>(&json, TR_KEY_result);
-    if (result)
+    if (auto const result = dictFind<QString>(&json, TR_KEY_result); result)
     {
         ret.result = *result;
         ret.success = *result == QStringLiteral("success");
     }
 
-    tr_variant* args;
-
-    if (tr_variantDictFindDict(&json, TR_KEY_arguments, &args))
+    if (tr_variant * args; tr_variantDictFindDict(&json, TR_KEY_arguments, &args))
     {
         ret.args = createVariant();
         *ret.args = *args;
