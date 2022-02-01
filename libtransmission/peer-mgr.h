@@ -102,20 +102,6 @@ size_t tr_peerMgrCountActiveRequestsToPeer(tr_torrent const* torrent, tr_peer co
 
 void tr_peerMgrAddIncoming(tr_peerMgr* manager, tr_address const* addr, tr_port port, struct tr_peer_socket const socket);
 
-tr_pex* tr_peerMgrCompactToPex(
-    void const* compact,
-    size_t compactLen,
-    uint8_t const* added_f,
-    size_t added_f_len,
-    size_t* setme_pex_count);
-
-tr_pex* tr_peerMgrCompact6ToPex(
-    void const* compact,
-    size_t compactLen,
-    uint8_t const* added_f,
-    size_t added_f_len,
-    size_t* pexCount);
-
 std::vector<tr_pex> tr_peerMgrCompactToPex(void const* compact, size_t compactLen, uint8_t const* added_f, size_t added_f_len);
 
 std::vector<tr_pex> tr_peerMgrCompact6ToPex(void const* compact, size_t compactLen, uint8_t const* added_f, size_t added_f_len);
