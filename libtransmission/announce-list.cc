@@ -88,8 +88,7 @@ bool tr_announce_list::add(std::string_view announce_url_sv, tr_tracker_tier_t t
     tracker.id = nextUniqueId();
     tracker.host = tr_strvJoin(tracker.announce.host, ":"sv, tracker.announce.portstr);
 
-    auto const scrape_str = announceToScrape(announce_url_sv);
-    if (scrape_str)
+    if (auto const scrape_str = announceToScrape(announce_url_sv); scrape_str)
     {
         tracker.scrape_str = *scrape_str;
         tracker.scrape = *tr_urlParseTracker(tracker.scrape_str.sv());
@@ -127,11 +126,11 @@ std::optional<std::string> tr_announce_list::announceToScrape(std::string_view a
 
 tr_quark tr_announce_list::announceToScrape(tr_quark announce)
 {
-    auto const scrape_str = announceToScrape(tr_quark_get_string_view(announce));
-    if (scrape_str)
+    if (auto const scrape_str = announceToScrape(tr_quark_get_string_view(announce)); scrape_str)
     {
         return tr_quark_new(*scrape_str);
     }
+
     return TR_KEY_NONE;
 }
 
