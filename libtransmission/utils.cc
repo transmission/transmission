@@ -1196,17 +1196,11 @@ uint64_t tr_ntohll(uint64_t x)
 
 struct formatter_unit
 {
-    char* name;
+    std::array<char, 16> name;
     uint64_t value;
 };
 
 using formatter_units = std::array<formatter_unit, 4>;
-/*
-struct formatter_units
-{
-    struct formatter_unit units[4];
-};
-*/
 
 enum
 {
@@ -1225,19 +1219,19 @@ static void formatter_init(
     char const* tb)
 {
     uint64_t value = kilo;
-    units[TR_FMT_KB].name = tr_strdup(kb);
+    tr_strlcpy(std::data(units[TR_FMT_KB].name), kb, std::size(units[TR_FMT_KB].name));
     units[TR_FMT_KB].value = value;
 
     value *= kilo;
-    units[TR_FMT_MB].name = tr_strdup(mb);
+    tr_strlcpy(std::data(units[TR_FMT_MB].name), mb, std::size(units[TR_FMT_MB].name));
     units[TR_FMT_MB].value = value;
 
     value *= kilo;
-    units[TR_FMT_GB].name = tr_strdup(gb);
+    tr_strlcpy(std::data(units[TR_FMT_GB].name), gb, std::size(units[TR_FMT_GB].name));
     units[TR_FMT_GB].value = value;
 
     value *= kilo;
-    units[TR_FMT_TB].name = tr_strdup(tb);
+    tr_strlcpy(std::data(units[TR_FMT_TB].name), tb, std::size(units[TR_FMT_TB].name));
     units[TR_FMT_TB].value = value;
 }
 
