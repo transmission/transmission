@@ -8,6 +8,7 @@
 #include <climits> /* INT_MAX */
 #include <cstdlib> /* qsort */
 #include <ctime> // time_t
+#include <iterator> // std::back_inserter
 #include <vector>
 
 #include <event2/event.h>
