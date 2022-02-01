@@ -609,14 +609,10 @@ static void callback(void* /*ignore*/, int event, unsigned char const* info_hash
     {
         if (tor != nullptr && tor->allowsDht())
         {
-            size_t n = 0;
-            tr_pex* const pex = event == DHT_EVENT_VALUES ? tr_peerMgrCompactToPex(data, data_len, nullptr, 0, &n) :
-                                                            tr_peerMgrCompact6ToPex(data, data_len, nullptr, 0, &n);
-
-            tr_peerMgrAddPex(tor, TR_PEER_FROM_DHT, pex, n);
-
-            tr_free(pex);
-            tr_logAddTorDbg(tor, "Learned %d %s peers from DHT", (int)n, event == DHT_EVENT_VALUES6 ? "IPv6" : "IPv4");
+            auto const pex = event == DHT_EVENT_VALUES ? tr_peerMgrCompactToPex(data, data_len, nullptr, 0) :
+                                                         tr_peerMgrCompact6ToPex(data, data_len, nullptr, 0);
+            tr_peerMgrAddPex(tor, TR_PEER_FROM_DHT, std::data(pex), std::size(pex));
+            tr_logAddTorDbg(tor, "Learned %zu %s peers from DHT", std::size(pex), event == DHT_EVENT_VALUES6 ? "IPv6" : "IPv4");
         }
     }
     else if (event == DHT_EVENT_SEARCH_DONE || event == DHT_EVENT_SEARCH_DONE6)
