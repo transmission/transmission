@@ -21,9 +21,9 @@
 #include <vector>
 
 #ifdef _WIN32
-#include <shellapi.h> /* CommandLineToArgv() */
-#include <shlwapi.h> /* StrStrIA() */
 #include <windows.h> /* Sleep(), GetEnvironmentVariable() */
+
+#include <shellapi.h> /* CommandLineToArgv() */
 #include <ws2tcpip.h> /* WSAStartup() */
 #endif
 
