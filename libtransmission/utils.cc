@@ -1256,8 +1256,8 @@ static char* formatter_get_size_str(formatter_units const& u, char* buf, uint64_
         unit = &u[3];
     }
 
-    double value = (double)bytes / unit->value;
-    char const* units = unit->name;
+    double value = double(bytes) / unit->value;
+    auto const* const units = std::data(unit->name);
 
     auto precision = int{};
     if (unit->value == 1)
@@ -1306,7 +1306,7 @@ std::string tr_formatter_speed_KBps(double KBps)
 
     if (auto speed = KBps; speed <= 999.95) /* 0.0 KB to 999.9 KB */
     {
-        tr_snprintf(std::data(buf), std::size(buf), "%d %s", (int)speed, speed_units[TR_FMT_KB].name);
+        tr_snprintf(std::data(buf), std::size(buf), "%d %s", int(speed), std::data(speed_units[TR_FMT_KB].name));
     }
     else
     {
@@ -1316,15 +1316,15 @@ std::string tr_formatter_speed_KBps(double KBps)
 
         if (speed <= 99.995) /* 0.98 MB to 99.99 MB */
         {
-            tr_snprintf(std::data(buf), std::size(buf), "%.2f %s", speed, speed_units[TR_FMT_MB].name);
+            tr_snprintf(std::data(buf), std::size(buf), "%.2f %s", speed, std::data(speed_units[TR_FMT_MB].name));
         }
         else if (speed <= 999.95) /* 100.0 MB to 999.9 MB */
         {
-            tr_snprintf(std::data(buf), std::size(buf), "%.1f %s", speed, speed_units[TR_FMT_MB].name);
+            tr_snprintf(std::data(buf), std::size(buf), "%.1f %s", speed, std::data(speed_units[TR_FMT_MB].name));
         }
         else
         {
-            tr_snprintf(std::data(buf), std::size(buf), "%.1f %s", speed / K, speed_units[TR_FMT_GB].name);
+            tr_snprintf(std::data(buf), std::size(buf), "%.1f %s", speed / K, std::data(speed_units[TR_FMT_GB].name));
         }
     }
 
@@ -1357,21 +1357,21 @@ void tr_formatter_get_units(void* vdict)
     tr_variant* l = tr_variantDictAddList(dict, TR_KEY_memory_units, std::size(mem_units));
     for (auto const& unit : mem_units)
     {
-        tr_variantListAddStr(l, unit.name);
+        tr_variantListAddStr(l, std::data(unit.name));
     }
 
     tr_variantDictAddInt(dict, TR_KEY_size_bytes, size_units[TR_FMT_KB].value);
     l = tr_variantDictAddList(dict, TR_KEY_size_units, std::size(size_units));
     for (auto const& unit : size_units)
     {
-        tr_variantListAddStr(l, unit.name);
+        tr_variantListAddStr(l, std::data(unit.name));
     }
 
     tr_variantDictAddInt(dict, TR_KEY_speed_bytes, speed_units[TR_FMT_KB].value);
     l = tr_variantDictAddList(dict, TR_KEY_speed_units, std::size(speed_units));
     for (auto const& unit : speed_units)
     {
-        tr_variantListAddStr(l, unit.name);
+        tr_variantListAddStr(l, std::data(unit.name));
     }
 }
 
