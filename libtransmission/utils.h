@@ -425,7 +425,7 @@ struct tm* tr_localtime_r(time_t const* _clock, struct tm* _result);
 struct tm* tr_gmtime_r(time_t const* _clock, struct tm* _result);
 
 /** @brief Portability wrapper for gettimeofday(), with tz argument dropped */
-int tr_gettimeofday(struct timeval* tv);
+struct timeval tr_gettimeofday();
 
 /**
  * @brief move a file
