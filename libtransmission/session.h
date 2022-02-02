@@ -231,14 +231,14 @@ public:
         peer_congestion_algorithm_ = algorithm;
     }
 
-    int peerSocketTos() const
+    int peerSocketDSCP() const
     {
-        return peer_socket_tos_;
+        return peer_socket_dscp_;
     }
 
-    void setPeerSocketTos(int tos)
+    void setPeerSocketDSCP(int dscp)
     {
-        peer_socket_tos_ = tos;
+        peer_socket_dscp_ = dscp;
     }
 
 public:
@@ -367,7 +367,7 @@ private:
     std::string incomplete_dir_;
     std::string peer_congestion_algorithm_;
 
-    int peer_socket_tos_ = 0;
+    int peer_socket_dscp_ = DSCPvalues.at(TR_DEFAULT_PEER_SOCKET_DSCP_STR);
 
     std::array<bool, TR_SCRIPT_N_TYPES> scripts_enabled_;
     bool blocklist_enabled_ = false;

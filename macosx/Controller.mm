@@ -407,9 +407,9 @@ static void removeKeRangerRansomware()
         }
 
         //hidden pref
-        if ([fDefaults objectForKey:@"PeerSocketTOS"])
+        if ([fDefaults objectForKey:@"PeerSocketDSCP"])
         {
-            tr_variantDictAddStr(&settings, TR_KEY_peer_socket_tos, [fDefaults stringForKey:@"PeerSocketTOS"].UTF8String);
+            tr_variantDictAddStr(&settings, TR_KEY_peer_socket_dscp, [fDefaults stringForKey:@"PeerSocketDSCP"].UTF8String);
         }
 
         tr_variantDictAddBool(&settings, TR_KEY_pex_enabled, [fDefaults boolForKey:@"PEXGlobal"]);

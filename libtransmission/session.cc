@@ -250,60 +250,24 @@ tr_address const* tr_sessionGetPublicAddress(tr_session const* session, int tr_a
 ****
 ***/
 
-static int parseTos(std::string_view tos_in)
+static int parseDSCP(std::string_view dscp_in)
 {
-    auto tos = tr_strlower(tr_strvStrip(tos_in));
+    auto dscp = tr_strlower(tr_strvStrip(dscp_in));
+    auto it = DSCPvalues.find(dscp);
 
-    if (tos == ""sv || tos == "default"sv)
-    {
-        return 0;
-    }
+    if (it != DSCPvalues.end())
+        return it->second;
 
-    if (tos == "lowcost"sv || tos == "mincost"sv)
-    {
-        return TR_IPTOS_LOWCOST;
-    }
-
-    if (tos == "throughput"sv)
-    {
-        return TR_IPTOS_THRUPUT;
-    }
-
-    if (tos == "reliability"sv)
-    {
-        return TR_IPTOS_RELIABLE;
-    }
-
-    if (tos == "lowdelay"sv)
-    {
-        return TR_IPTOS_LOWDELAY;
-    }
-
-    return std::stoi(tos);
+    return std::min(std::stoi(dscp), 0xFF);
 }
 
-static std::string format_tos(int value)
+static std::string format_dscp(int value)
 {
-    switch (value)
-    {
-    case 0:
-        return "default";
+    for (auto it = DSCPvalues.begin(); it != DSCPvalues.end(); ++it)
+        if (it->second == value)
+            return it->first;
 
-    case TR_IPTOS_LOWCOST:
-        return "lowcost";
-
-    case TR_IPTOS_THRUPUT:
-        return "throughput";
-
-    case TR_IPTOS_RELIABLE:
-        return "reliability";
-
-    case TR_IPTOS_LOWDELAY:
-        return "lowdelay";
-
-    default:
-        return std::to_string(value);
-    }
+    return std::to_string(value);
 }
 
 #ifdef TR_LIGHTWEIGHT
@@ -340,7 +304,7 @@ void tr_sessionGetDefaultSettings(tr_variant* d)
     tr_variantDictAddBool(d, TR_KEY_peer_port_random_on_start, false);
     tr_variantDictAddInt(d, TR_KEY_peer_port_random_low, 49152);
     tr_variantDictAddInt(d, TR_KEY_peer_port_random_high, 65535);
-    tr_variantDictAddStrView(d, TR_KEY_peer_socket_tos, TR_DEFAULT_PEER_SOCKET_TOS_STR);
+    tr_variantDictAddStrView(d, TR_KEY_peer_socket_dscp, TR_DEFAULT_PEER_SOCKET_DSCP_STR);
     tr_variantDictAddBool(d, TR_KEY_pex_enabled, true);
     tr_variantDictAddBool(d, TR_KEY_port_forwarding_enabled, true);
     tr_variantDictAddInt(d, TR_KEY_preallocation, TR_PREALLOCATE_SPARSE);
@@ -416,7 +380,7 @@ void tr_sessionGetSettings(tr_session const* s, tr_variant* d)
     tr_variantDictAddBool(d, TR_KEY_peer_port_random_on_start, s->isPortRandom);
     tr_variantDictAddInt(d, TR_KEY_peer_port_random_low, s->randomPortLow);
     tr_variantDictAddInt(d, TR_KEY_peer_port_random_high, s->randomPortHigh);
-    tr_variantDictAddStr(d, TR_KEY_peer_socket_tos, format_tos(s->peerSocketTos()));
+    tr_variantDictAddStr(d, TR_KEY_peer_socket_dscp, format_dscp(s->peerSocketDSCP()));
     tr_variantDictAddStr(d, TR_KEY_peer_congestion_algorithm, s->peerCongestionAlgorithm());
     tr_variantDictAddBool(d, TR_KEY_pex_enabled, s->isPexEnabled);
     tr_variantDictAddBool(d, TR_KEY_port_forwarding_enabled, tr_sessionIsPortForwardingEnabled(s));
@@ -828,9 +792,9 @@ static void sessionSetImpl(void* vdata)
         tr_sessionSetEncryption(session, tr_encryption_mode(i));
     }
 
-    if (tr_variantDictFindStrView(settings, TR_KEY_peer_socket_tos, &sv))
+    if (tr_variantDictFindStrView(settings, TR_KEY_peer_socket_dscp, &sv))
     {
-        session->setPeerSocketTos(parseTos(sv));
+        session->setPeerSocketDSCP(parseDSCP(sv));
     }
 
     sv = ""sv;
@@ -2154,7 +2118,7 @@ static void toggle_utp(void* vsession)
 
     tr_udpSetSocketBuffers(session);
 
-    tr_udpSetSocketTOS(session);
+    tr_udpSetSocketDSCP(session);
 
     /* But don't call tr_utpClose -- see reset_timer in tr-utp.c for an
        explanation. */
