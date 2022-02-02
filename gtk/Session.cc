@@ -901,10 +901,8 @@ void Session::Impl::on_torrent_metadata_changed(tr_torrent* tor)
     Glib::signal_idle().connect(
         [this, core = get_core_ptr(), torrent_id = tr_torrentId(tor)]()
         {
-            auto const* const tor2 = tr_torrentFindFromId(session_, torrent_id);
-
             /* update the torrent's collated name */
-            if (tor2 != nullptr)
+            if (auto const* const tor2 = tr_torrentFindFromId(session_, torrent_id); tor2 != nullptr)
             {
                 if (auto const iter = find_row_from_torrent_id(raw_model_, torrent_id); iter)
                 {
@@ -1135,9 +1133,8 @@ void Session::Impl::add_file_async_callback(
 bool Session::Impl::add_file(Glib::RefPtr<Gio::File> const& file, bool do_start, bool do_prompt, bool do_notify)
 {
     bool handled = false;
-    auto const* const session = get_session();
 
-    if (session != nullptr)
+    if (auto const* const session = get_session(); session != nullptr)
     {
         tr_ctor* ctor;
         bool tried = false;

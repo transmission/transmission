@@ -110,8 +110,7 @@ static std::string announce_url_new(tr_session const* session, tr_announce_reque
        announce twice. At any rate, we're already computing our IPv6
        address (for the LTEP handshake), so this comes for free. */
 
-    unsigned char const* const ipv6 = tr_globalIPv6(session);
-    if (ipv6 != nullptr)
+    if (auto const* const ipv6 = tr_globalIPv6(session); ipv6 != nullptr)
     {
         auto ipv6_readable = std::array<char, INET6_ADDRSTRLEN>{};
         evutil_inet_ntop(AF_INET6, ipv6, std::data(ipv6_readable), std::size(ipv6_readable));
@@ -418,9 +417,7 @@ void tr_announcerParseHttpScrapeResponse(tr_scrape_response& response, std::stri
 
         bool Int64(int64_t value, Context const& context) override
         {
-            auto const key = currentKey();
-
-            if (row_ && key == "complete"sv)
+            if (auto const key = currentKey(); row_ && key == "complete"sv)
             {
                 response_.rows[*row_].seeders = value;
             }
@@ -443,9 +440,7 @@ void tr_announcerParseHttpScrapeResponse(tr_scrape_response& response, std::stri
 
         bool String(std::string_view value, Context const& context) override
         {
-            auto const key = currentKey();
-
-            if (depth() == 1 && key == "failure reason"sv)
+            if (auto const key = currentKey(); depth() == 1 && key == "failure reason"sv)
             {
                 response_.errmsg = value;
             }

@@ -272,9 +272,7 @@ bool on_tree_view_button_pressed(
  * clear all the selections. */
 bool on_tree_view_button_released(Gtk::TreeView* view, GdkEventButton* event)
 {
-    Gtk::TreeModel::Path path;
-
-    if (!view->get_path_at_pos((int)event->x, (int)event->y, path))
+    if (Gtk::TreeModel::Path path; !view->get_path_at_pos((int)event->x, (int)event->y, path))
     {
         view->get_selection()->unselect_all();
     }
