@@ -658,9 +658,8 @@ void MainWindow::openFolder()
     }
 
     QString const first_file = files.at(0).filename;
-    int slash_index = first_file.indexOf(QLatin1Char('/'));
 
-    if (slash_index > -1)
+    if (int const slash_index = first_file.indexOf(QLatin1Char('/')); slash_index > -1)
     {
         path = path + QLatin1Char('/') + first_file.left(slash_index);
     }
@@ -775,9 +774,8 @@ void MainWindow::onRefreshTimer()
 void MainWindow::refreshTitle()
 {
     QString title(QStringLiteral("Transmission"));
-    QUrl const url(session_.getRemoteUrl());
 
-    if (!url.isEmpty())
+    if (auto const url = QUrl(session_.getRemoteUrl()); !url.isEmpty())
     {
         //: Second (optional) part of main window title "Transmission - host:port" (added when connected to remote session)
         //: notice that leading space (before the dash) is included here
@@ -1271,9 +1269,7 @@ void MainWindow::openTorrent()
     d->setFileMode(QFileDialog::ExistingFiles);
     d->setAttribute(Qt::WA_DeleteOnClose);
 
-    auto* const l = qobject_cast<QGridLayout*>(d->layout());
-
-    if (l != nullptr)
+    if (auto* const l = qobject_cast<QGridLayout*>(d->layout()); l != nullptr)
     {
         auto* b = new QCheckBox(tr("Show &options dialog"));
         b->setChecked(prefs_.getBool(Prefs::OPTIONS_PROMPT));
@@ -1307,9 +1303,7 @@ void MainWindow::addTorrents(QStringList const& filenames)
 {
     bool show_options = prefs_.getBool(Prefs::OPTIONS_PROMPT);
 
-    auto const* const file_dialog = qobject_cast<QFileDialog const*>(sender());
-
-    if (file_dialog != nullptr)
+    if (auto const* const file_dialog = qobject_cast<QFileDialog const*>(sender()); file_dialog != nullptr)
     {
         auto const* const b = file_dialog->findChild<QCheckBox const*>(show_options_checkbox_name_);
 
@@ -1586,9 +1580,7 @@ void MainWindow::dropEvent(QDropEvent* event)
 
         if (!key.isEmpty())
         {
-            QUrl const url(key);
-
-            if (url.isLocalFile())
+            if (auto const url = QUrl(key); url.isLocalFile())
             {
                 key = url.toLocalFile();
             }

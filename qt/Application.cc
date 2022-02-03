@@ -605,9 +605,7 @@ void Application::raise() const
 bool Application::notifyApp(QString const& title, QString const& body, QStringList const& actions) const
 {
 #ifdef QT_DBUS_LIB
-    QDBusConnection bus = QDBusConnection::sessionBus();
-
-    if (bus.isConnected())
+    if (auto bus = QDBusConnection::sessionBus(); bus.isConnected())
     {
         QDBusMessage m = QDBusMessage::createMethodCall(
             fdo_notifications_service_name_,

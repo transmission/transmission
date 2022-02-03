@@ -32,8 +32,8 @@ template<typename T, typename std::enable_if_t<std::is_same_v<T, bool>>* = nullp
 auto getValue(tr_variant const* variant)
 {
     std::optional<T> ret;
-    auto value = T{};
-    if (tr_variantGetBool(variant, &value))
+
+    if (auto value = T{}; tr_variantGetBool(variant, &value))
     {
         ret = value;
     }
@@ -49,8 +49,8 @@ template<
 auto getValue(tr_variant const* variant)
 {
     std::optional<T> ret;
-    auto value = int64_t{};
-    if (tr_variantGetInt(variant, &value))
+
+    if (auto value = int64_t{}; tr_variantGetInt(variant, &value))
     {
         ret = value;
     }
@@ -62,8 +62,8 @@ template<typename T, typename std::enable_if_t<std::is_same_v<T, double>>* = nul
 auto getValue(tr_variant const* variant)
 {
     std::optional<T> ret;
-    auto value = T{};
-    if (tr_variantGetReal(variant, &value))
+
+    if (auto value = T{}; tr_variantGetReal(variant, &value))
     {
         ret = value;
     }
