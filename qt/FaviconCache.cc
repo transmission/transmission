@@ -108,8 +108,7 @@ void FaviconCache::ensureCacheDirHasBeenScanned()
 
     // remember which hosts we've asked for a favicon so that we
     // don't re-ask them every time we start a new session
-    auto skip_file = QFile(getScrapedFile());
-    if (skip_file.open(QIODevice::ReadOnly | QIODevice::Text))
+    if (auto skip_file = QFile(getScrapedFile()); skip_file.open(QIODevice::ReadOnly | QIODevice::Text))
     {
         while (!skip_file.atEnd())
         {
@@ -123,8 +122,7 @@ void FaviconCache::ensureCacheDirHasBeenScanned()
     // load the cached favicons
     auto cache_dir = QDir(getCacheDir());
     cache_dir.mkpath(cache_dir.absolutePath());
-    QStringList const files = cache_dir.entryList(QDir::Files | QDir::Readable);
-    for (auto const& file : files)
+    for (auto const& file : cache_dir.entryList(QDir::Files | QDir::Readable))
     {
         QPixmap pixmap(cache_dir.absoluteFilePath(file));
         if (!pixmap.isNull())
@@ -183,8 +181,7 @@ FaviconCache::Key FaviconCache::add(QString const& url_str)
     ensureCacheDirHasBeenScanned();
 
     // find or add this url's key
-    auto k_it = keys_.find(url_str);
-    if (k_it != keys_.end())
+    if (auto k_it = keys_.find(url_str); k_it != keys_.end())
     {
         return k_it->second;
     }

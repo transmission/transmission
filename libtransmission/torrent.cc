@@ -662,6 +662,8 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
     tor->error = TR_STAT_OK;
     tor->finishedSeedingByIdle = false;
 
+    tor->labels = tr_ctorGetLabels(ctor);
+
     tr_peerMgrAddTorrent(session->peerMgr, tor);
 
     TR_ASSERT(tor->downloadedCur == 0);

@@ -216,9 +216,7 @@ void MakeDialog::onSourceChanged()
 {
     builder_.reset();
 
-    QString const filename = getSource();
-
-    if (!filename.isEmpty())
+    if (auto const filename = getSource(); !filename.isEmpty())
     {
         builder_.reset(tr_metaInfoBuilderCreate(filename.toUtf8().constData()));
     }
