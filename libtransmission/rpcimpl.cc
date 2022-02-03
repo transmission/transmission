@@ -933,10 +933,8 @@ static char const* torrentGet(tr_session* session, tr_variant* args_in, tr_varia
 ****
 ***/
 
-static char const* setLabels(tr_torrent* tor, tr_variant* list)
+static char const* makeLabels(tr_labels_t* labels, tr_variant* list)
 {
-    auto labels = tr_labels_t{};
-
     size_t const n = tr_variantListSize(list);
     for (size_t i = 0; i < n; ++i)
     {
@@ -957,10 +955,23 @@ static char const* setLabels(tr_torrent* tor, tr_variant* list)
             return "labels cannot contain comma (,) character";
         }
 
-        labels.emplace(label);
+        labels->emplace(label);
+    }
+
+    return nullptr;
+}
+
+static char const* setLabels(tr_torrent* tor, tr_variant* list)
+{
+    auto labels = tr_labels_t{};
+
+    if (auto const* errmsg = makeLabels(&labels, list); errmsg != nullptr)
+    {
+        return errmsg;
     }
 
     tr_torrentSetLabels(tor, std::move(labels));
+
     return nullptr;
 }
 
@@ -1646,6 +1657,17 @@ static char const* torrentAdd(tr_session* session, tr_variant* args_in, tr_varia
     {
         auto const files = fileListFromList(l);
         tr_ctorSetFilePriorities(ctor, std::data(files), std::size(files), TR_PRI_HIGH);
+    }
+
+    if (tr_variantDictFindList(args_in, TR_KEY_labels, &l))
+    {
+        auto labels = tr_labels_t{};
+        if (auto const* errmsg = makeLabels(&labels, l); errmsg != nullptr)
+        {
+            return errmsg;
+        }
+
+        tr_ctorSetLabels(ctor, std::move(labels));
     }
 
     dbgmsg("torrentAdd: filename is \"%" TR_PRIsv "\"", TR_PRIsv_ARG(filename));
