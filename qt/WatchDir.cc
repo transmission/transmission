@@ -49,9 +49,8 @@ int WatchDir::metainfoTest(QString const& filename) const
 void WatchDir::onTimeout()
 {
     auto* t = qobject_cast<QTimer*>(sender());
-    QString const filename = t->objectName();
 
-    if (metainfoTest(filename) == OK)
+    if (auto const filename = t->objectName(); metainfoTest(filename) == OK)
     {
         emit torrentFileAdded(filename);
     }
