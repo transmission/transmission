@@ -236,6 +236,7 @@ struct tr_tracker
     explicit tr_tracker(tr_announcer* announcer, tr_announce_list::tracker_info const& info)
         : host{ info.host }
         , announce_url{ info.announce_str }
+        , sitename{ info.announce.sitename }
         , scrape_info{ std::empty(info.scrape_str) ? nullptr : tr_announcerGetScrapeInfo(announcer, info.scrape_str) }
         , id{ info.id }
     {
@@ -270,6 +271,7 @@ struct tr_tracker
 
     tr_interned_string const host;
     tr_interned_string const announce_url;
+    std::string_view const sitename;
     tr_scrape_info* const scrape_info;
 
     std::string tracker_id;
@@ -1575,6 +1577,7 @@ static tr_tracker_view trackerView(tr_torrent const& tor, int tier_index, tr_tie
     view.host = tracker.host.c_str();
     view.announce = tracker.announce_url.c_str();
     view.scrape = tracker.scrape_info == nullptr ? "" : tracker.scrape_info->scrape_url.c_str();
+    tr_strlcpy(view.sitename, std::string(tracker.sitename).c_str(), sizeof(view.sitename));
 
     view.id = tracker.id;
     view.tier = tier_index;

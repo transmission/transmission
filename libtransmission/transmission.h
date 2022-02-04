@@ -1369,7 +1369,12 @@ struct tr_tracker_view
 {
     char const* announce; // full announce URL
     char const* scrape; // full scrape URL
-    char const* host; // human-readable tracker name. (`${host}:${port}`)
+    char const* host; // uniquely-identifying tracker name (`${host}:${port}`)
+
+    // The tracker's name.
+    // This is the first private subdomain before the announce URL's public suffix.
+    // For example "www.example.co.uk" -> "example"
+    char sitename[128];
 
     char lastAnnounceResult[128]; // if hasAnnounced, the human-readable result of latest announce
     char lastScrapeResult[128]; // if hasScraped, the human-readable result of the latest scrape

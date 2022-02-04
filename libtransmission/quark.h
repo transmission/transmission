@@ -330,6 +330,7 @@ enum
     TR_KEY_show_statusbar,
     TR_KEY_show_toolbar,
     TR_KEY_show_tracker_scrapes,
+    TR_KEY_sitename,
     TR_KEY_size_bytes,
     TR_KEY_size_units,
     TR_KEY_sizeWhenDone,
