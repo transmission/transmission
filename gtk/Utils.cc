@@ -123,37 +123,6 @@ Glib::ustring tr_strltime(time_t seconds)
     }
 }
 
-/* pattern-matching text; ie, legaltorrents.com */
-Glib::ustring gtr_get_host_from_url(Glib::ustring const& url)
-{
-    Glib::ustring host;
-
-    if (auto const pch = url.find("://"); pch != Glib::ustring::npos)
-    {
-        auto const hostend = url.find_first_of(":/", pch + 3);
-        host = url.substr(pch + 3, hostend == Glib::ustring::npos ? hostend : (hostend - pch - 3));
-    }
-
-    if (tr_addressIsIP(host.c_str()))
-    {
-        return url;
-    }
-    else
-    {
-        auto const first_dot = host.find('.');
-        auto const last_dot = host.rfind('.');
-
-        if (first_dot != Glib::ustring::npos && last_dot != Glib::ustring::npos && first_dot != last_dot)
-        {
-            return host.substr(first_dot + 1);
-        }
-        else
-        {
-            return host;
-        }
-    }
-}
-
 namespace
 {
 
