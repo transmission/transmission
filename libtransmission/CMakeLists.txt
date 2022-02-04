@@ -257,6 +257,7 @@ include_directories(
     ${CRYPTO_INCLUDE_DIRS}
     ${CURL_INCLUDE_DIRS}
     ${EVENT2_INCLUDE_DIRS}
+    ${PSL_INCLUDE_DIRS}
     ${NATPMP_INCLUDE_DIRS}
     ${MINIUPNPC_INCLUDE_DIRS}
     ${DHT_INCLUDE_DIRS}
@@ -284,6 +285,7 @@ foreach(UT ${EVENT2_UPSTREAM_TARGET}
            ${DHT_UPSTREAM_TARGET}
            ${DEFLATE_UPSTREAM_TARGET}
            ${UTP_UPSTREAM_TARGET}
+           ${PSL_UPSTREAM_TARGET}
            ${B64_UPSTREAM_TARGET})
     add_dependencies(${TR_NAME} ${UT})
 endforeach()
@@ -294,6 +296,7 @@ target_link_libraries(${TR_NAME}
     ${CRYPTO_LIBRARIES}
     ${CURL_LIBRARIES}
     ${EVENT2_LIBRARIES}
+    ${PSL_LIBRARIES}
     ${NATPMP_LIBRARIES}
     ${MINIUPNPC_LIBRARIES}
     ${DHT_LIBRARIES}
