@@ -865,22 +865,29 @@ TODO: fix this when notifications get fixed
     setTextContent(document.querySelector('#filter-count'), string);
   }
 
+  static _displayName(hostname) {
+    let name = hostname;
+    if (name.length > 0) {
+      name = name.charAt(0).toUpperCase() + name.slice(1);
+    }
+    return name;
+  }
+
   _updateFilterSelect() {
-    const trackers = this._getTrackers();
-    const names = Object.keys(trackers).sort();
+    const trackers = this._getTrackerCounts();
+    const sitenames = Object.keys(trackers).sort();
 
     // build the new html
     let string = '';
     string += !this.filterTracker
       ? '<option value="all" selected="selected">All</option>'
       : '<option value="all">All</option>';
-    for (const name of names) {
-      const o = trackers[name];
-      string += `<option value="${o.domain}"`;
-      if (trackers[name].domain === this.filterTracker) {
+    for (const sitename of sitenames) {
+      string += `<option value="${sitename}"`;
+      if (sitename === this.filterTracker) {
         string += ' selected="selected"';
       }
-      string += `>${name}</option>`;
+      string += `>${Transmission._displayName(sitename)}</option>`;
     }
 
     if (!this.filterTrackersStr || this.filterTrackersStr !== string) {
@@ -1045,36 +1052,25 @@ TODO: fix this when notifications get fixed
     }
   }
 
-  setFilterTracker(domain) {
+  setFilterTracker(sitename) {
     const e = document.querySelector('#filter-tracker');
-    e.value = domain ? Transmission._getReadableDomain(domain) : 'all';
+    e.value = sitename ? Transmission._getReadableDomain(sitename) : 'all';
 
-    this.filterTracker = domain;
+    this.filterTracker = sitename;
     this.refilterAllSoon();
   }
 
-  _getTrackers() {
-    const returnValue = {};
+  _getTrackerCounts() {
+    const counts = {};
 
     for (const torrent of this._getAllTorrents()) {
-      const names = new Set();
-
       for (const tracker of torrent.getTrackers()) {
-        const { domain, name } = tracker;
-
-        if (!returnValue[name]) {
-          returnValue[name] = { count: 0, domain };
-        }
-
-        names.add(name);
-      }
-
-      for (const name of names.values()) {
-        ++returnValue[name].count;
+        const { sitename } = tracker;
+        counts[sitename] = (counts[sitename] || 0) + 1;
       }
     }
 
-    return returnValue;
+    return counts;
   }
 
   ///
