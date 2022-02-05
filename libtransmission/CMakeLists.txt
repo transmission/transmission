@@ -268,10 +268,6 @@ if(ICONV_FOUND)
     include_directories(SYSTEM ${ICONV_INCLUDE_DIRS})
 endif()
 
-if(ENABLE_UTP)
-    include_directories(SYSTEM ${TP_TOP}/libutp)
-endif()
-
 add_library(${TR_NAME} STATIC
     ${${PROJECT_NAME}_SOURCES}
     ${${PROJECT_NAME}_PUBLIC_HEADERS}
