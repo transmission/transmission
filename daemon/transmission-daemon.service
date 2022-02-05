@@ -8,6 +8,7 @@ Type=notify
 ExecStart=/usr/bin/transmission-daemon -f --log-error
 ExecReload=/bin/kill -s HUP $MAINPID
 NoNewPrivileges=true
+MemoryDenyWriteExecute=true
 
 [Install]
 WantedBy=multi-user.target
