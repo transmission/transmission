@@ -16,6 +16,7 @@
 
 #ifndef _WIN32
 #include <sys/un.h>
+#include <sys/stat.h>
 #include <unistd.h>
 #endif
 
@@ -657,7 +658,7 @@ static bool tr_rpc_address_from_string(tr_rpc_address* dst, std::string_view src
     return false;
 }
 
-static bool bindUnixSocket(struct event_base* base, struct evhttp* httpd, char const* path)
+static bool bindUnixSocket(struct event_base* base, struct evhttp* httpd, char const* path, int socket_mode)
 {
 #ifdef _WIN32
     tr_logAddNamedError(
@@ -678,6 +679,11 @@ static bool bindUnixSocket(struct event_base* base, struct evhttp* httpd, char c
     if (lev == nullptr)
     {
         return false;
+    }
+
+    if (chmod(addr.sun_path, (mode_t)socket_mode) != 0)
+    {
+        tr_logAddNamedError(MyName, _("Could not set RPC socket mode to %o, defaulting to 755"), socket_mode);
     }
 
     return evhttp_bind_listener(httpd, lev) != nullptr;
@@ -736,8 +742,9 @@ static void startServer(void* vserver)
 
     tr_port const port = server->port;
 
-    bool const success = server->bindAddress->type == TR_RPC_AF_UNIX ? bindUnixSocket(base, httpd, address) :
-                                                                       (evhttp_bind_socket(httpd, address, port) != -1);
+    bool const success = server->bindAddress->type == TR_RPC_AF_UNIX ?
+        bindUnixSocket(base, httpd, address, server->rpc_socket_mode) :
+        (evhttp_bind_socket(httpd, address, port) != -1);
 
     auto const addr_port_str = tr_rpc_address_with_port(server);
 
@@ -920,6 +927,16 @@ bool tr_rpcGetWhitelistEnabled(tr_rpc_server const* server)
 static void tr_rpcSetHostWhitelistEnabled(tr_rpc_server* server, bool isEnabled)
 {
     server->isHostWhitelistEnabled = isEnabled;
+}
+
+int tr_rpcGetRPCSocketMode(tr_rpc_server const* server)
+{
+    return server->rpc_socket_mode;
+}
+
+static void tr_rpcSetRPCSocketMode(tr_rpc_server* server, int socket_mode)
+{
+    server->rpc_socket_mode = socket_mode;
 }
 
 /****
@@ -1148,6 +1165,17 @@ tr_rpc_server::tr_rpc_server(tr_session* session_in, tr_variant* settings)
     else
     {
         tr_rpcSetAntiBruteForceThreshold(this, i);
+    }
+
+    key = TR_KEY_rpc_socket_mode;
+
+    if (!tr_variantDictFindInt(settings, key, &i))
+    {
+        missing_settings_key(key);
+    }
+    else
+    {
+        tr_rpcSetRPCSocketMode(this, i);
     }
 
     key = TR_KEY_rpc_bind_address;
