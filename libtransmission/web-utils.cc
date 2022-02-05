@@ -15,6 +15,7 @@
 
 #include <event2/buffer.h>
 
+#define PSL_STATIC
 #include <libpsl.h>
 
 #include "transmission.h"
