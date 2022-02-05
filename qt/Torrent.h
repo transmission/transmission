@@ -87,6 +87,7 @@ struct TrackerStat
     QString announce;
     QString last_announce_result;
     QString last_scrape_result;
+    QString sitename;
 };
 
 using TrackerStatsList = std::vector<TrackerStat>;

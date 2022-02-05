@@ -11,44 +11,11 @@
 #include <QNetworkRequest>
 #include <QStandardPaths>
 
+#include <libtransmission/transmission.h>
+
+#include <libtransmission/web-utils.h> // tr_urlParse()
+
 #include "FaviconCache.h"
-
-/***
-****
-***/
-
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
-Q_NETWORK_EXPORT bool qIsEffectiveTLD(QStringView domain);
-#endif
-
-namespace
-{
-
-QString getTopLevelDomain(QUrl const& url)
-{
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
-
-    auto const host = url.host();
-    auto const dot = QChar(QLatin1Char('.'));
-
-    for (auto dot_pos = host.indexOf(dot); dot_pos != -1; dot_pos = host.indexOf(dot, dot_pos + 1))
-    {
-        if (qIsEffectiveTLD(QStringView(&host.data()[dot_pos + 1], host.size() - dot_pos - 1)))
-        {
-            return host.mid(dot_pos);
-        }
-    }
-
-    return {};
-
-#else
-
-    return url.topLevelDomain();
-
-#endif
-}
-
-} // namespace
 
 /***
 ****
@@ -148,15 +115,9 @@ QString FaviconCache::getDisplayName(Key const& key)
 
 FaviconCache::Key FaviconCache::getKey(QUrl const& url)
 {
-    auto host = url.host();
-
-    // remove tld
-    auto const suffix = getTopLevelDomain(url);
-    host.truncate(host.size() - suffix.size());
-
-    // remove subdomain
-    auto const pos = host.indexOf(QLatin1Char('.'));
-    return pos < 0 ? host : host.remove(0, pos + 1);
+    auto const url_stdstr = url.toString().toStdString();
+    auto const sitename = tr_urlParse(url_stdstr)->sitename;
+    return QString::fromUtf8(std::data(sitename), std::size(sitename));
 }
 
 FaviconCache::Key FaviconCache::getKey(QString const& displayName)
@@ -247,10 +208,9 @@ FaviconCache::Key FaviconCache::add(QString const& url_str)
 void FaviconCache::onRequestFinished(QNetworkReply* reply)
 {
     auto const key = getKey(reply->url());
+    auto const content = reply->readAll();
 
-    QPixmap pixmap;
-
-    QByteArray const content = reply->readAll();
+    auto pixmap = QPixmap{};
 
     if (reply->error() == QNetworkReply::NoError)
     {

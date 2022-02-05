@@ -159,6 +159,7 @@ bool change(TrackerStat& setme, tr_variant const* value)
             HANDLE_KEY(nextScrapeTime, next_scrape_time)
             HANDLE_KEY(scrapeState, scrape_state)
             HANDLE_KEY(seederCount, seeder_count)
+            HANDLE_KEY(sitename, sitename)
             HANDLE_KEY(tier, tier)
 
 #undef HANDLE_KEY
