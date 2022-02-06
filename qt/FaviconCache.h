@@ -28,31 +28,25 @@ class FaviconCache : public QObject
 public:
     FaviconCache();
 
-    using Key = QString;
-    using Keys = std::vector<Key>;
+    // This will emit a signal when (if) the icon becomes ready.
+    void add(QString const& sitename, QString const& url);
 
     // returns a cached pixmap, or a nullptr pixmap if there's no match in the cache
-    QPixmap find(Key const& key);
+    QPixmap find(QString const& sitename);
 
-    static Key getKey(QString const& display_name);
-
-    // This will emit a signal when (if) the icon becomes ready.
-    Key add(QString const& url);
-
-    static QString getDisplayName(Key const& key);
+    static QString getDisplayName(QString const& sitename);
     static QSize getIconSize();
 
 signals:
-    void pixmapReady(Key const& key);
+    void pixmapReady(QString const& sitename);
 
 private slots:
     void onRequestFinished(QNetworkReply* reply);
 
 private:
-    static Key getKey(QUrl const& url);
+    // static Key getKey(QUrl const& url);
     void ensureCacheDirHasBeenScanned();
 
     QNetworkAccessManager* nam_ = {};
-    std::unordered_map<Key, QPixmap> pixmaps_;
-    std::unordered_map<QString, Key> keys_;
+    std::unordered_map<QString /*sitename*/, QPixmap> pixmaps_;
 };

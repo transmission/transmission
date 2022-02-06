@@ -62,9 +62,9 @@ bool Torrent::getSeedRatio(double& setmeRatio) const
     return is_limited;
 }
 
-bool Torrent::includesTracker(FaviconCache::Key const& key) const
+bool Torrent::includesTracker(QString const& sitename) const
 {
-    return std::binary_search(std::begin(tracker_keys_), std::end(tracker_keys_), key);
+    return std::binary_search(std::begin(sitenames_), std::end(sitenames_), sitename);
 }
 
 int Torrent::compareSeedRatio(Torrent const& that) const
@@ -281,19 +281,17 @@ Torrent::fields_t Torrent::update(tr_quark const* keys, tr_variant const* const*
                     {
                         files_[i].index = i;
                     }
-
                     break;
                 }
 
             case TR_KEY_trackers:
                 {
-                    std::set<FaviconCache::Key> tmp;
+                    auto tmp = std::set<QString>{};
                     for (auto const& ts : tracker_stats_)
                     {
-                        tmp.insert(ts.favicon_key);
+                        tmp.insert(ts.sitename);
                     }
-
-                    tracker_keys_ = FaviconCache::Keys(std::begin(tmp), std::end(tmp));
+                    sitenames_ = std::vector<QString>{ std::begin(tmp), std::end(tmp) };
                     break;
                 }
             }
@@ -369,5 +367,5 @@ QString Torrent::getError() const
 
 QPixmap TrackerStat::getFavicon() const
 {
-    return trApp->faviconCache().find(favicon_key);
+    return trApp->faviconCache().find(sitename);
 }

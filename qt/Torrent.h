@@ -83,7 +83,6 @@ struct TrackerStat
     int scrape_state;
     int seeder_count;
     int tier;
-    FaviconCache::Key favicon_key;
     QString announce;
     QString last_announce_result;
     QString last_scrape_result;
@@ -406,11 +405,11 @@ public:
         return recheck_progress_;
     }
 
-    bool includesTracker(FaviconCache::Key const& key) const;
+    bool includesTracker(QString const& sitename) const;
 
-    FaviconCache::Keys const& trackerKeys() const
+    std::vector<QString> const& sitenames() const
     {
-        return tracker_keys_;
+        return sitenames_;
     }
 
     Speed uploadLimit() const
@@ -676,7 +675,7 @@ private:
     PeerList peers_;
     FileList files_;
 
-    FaviconCache::Keys tracker_keys_;
+    std::vector<QString> sitenames_;
     TrackerStatsList tracker_stats_;
 
     Speed upload_speed_;

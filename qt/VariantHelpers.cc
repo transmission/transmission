@@ -122,6 +122,7 @@ bool change(TorrentFile& setme, tr_variant const* value)
 bool change(TrackerStat& setme, tr_variant const* value)
 {
     bool changed = false;
+    bool site_changed = false;
 
     size_t pos = 0;
     tr_quark key;
@@ -169,14 +170,16 @@ bool change(TrackerStat& setme, tr_variant const* value)
 
         if (field_changed)
         {
-            if (key == TR_KEY_announce)
-            {
-                setme.announce = trApp->intern(setme.announce);
-                setme.favicon_key = trApp->faviconCache().add(setme.announce);
-            }
-
-            changed = true;
+            site_changed |= key == TR_KEY_announce || key == TR_KEY_sitename;
         }
+
+        changed = true;
+    }
+
+    if (site_changed && !setme.sitename.isEmpty() && !setme.announce.isEmpty())
+    {
+        setme.announce = trApp->intern(setme.announce);
+        trApp->faviconCache().add(setme.sitename, setme.announce);
     }
 
     return changed;
