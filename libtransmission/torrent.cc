@@ -1216,7 +1216,7 @@ static void tr_torrentResetTransferStats(tr_torrent* tor)
 ***/
 
 #ifdef TR_ENABLE_ASSERTS
-static bool queueIsSequenced(tr_session*);
+static bool queueIsSequenced(tr_session* /*session*/);
 #endif
 
 static void freeTorrent(tr_torrent* tor)
@@ -1570,7 +1570,7 @@ struct remove_data
     tr_fileFunc deleteFunc;
 };
 
-static void tr_torrentDeleteLocalData(tr_torrent*, tr_fileFunc);
+static void tr_torrentDeleteLocalData(tr_torrent* /*tor*/, tr_fileFunc /*func*/);
 
 static void removeTorrent(void* vdata)
 {

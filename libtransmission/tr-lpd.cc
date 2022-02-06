@@ -46,7 +46,7 @@ static auto constexpr SIZEOF_HASH_STRING = TR_SHA1_DIGEST_STRLEN;
 *
 */
 
-static void event_callback(evutil_socket_t, short, void*);
+static void event_callback(evutil_socket_t, short /*type*/, void* /*unused*/);
 
 static auto constexpr UpkeepIntervalSecs = int{ 5 };
 
@@ -239,7 +239,7 @@ static bool lpd_extractParam(char const* const str, char const* const name, int 
 /**
 * @} */
 
-static void on_upkeep_timer(evutil_socket_t, short, void*);
+static void on_upkeep_timer(evutil_socket_t, short /*unused*/, void* /*unused*/);
 
 /**
 * @brief Initializes Local Peer Discovery for this node

@@ -339,7 +339,7 @@ static void swarmFree(tr_swarm* s)
     delete s;
 }
 
-static void peerCallbackFunc(tr_peer*, tr_peer_event const*, void*);
+static void peerCallbackFunc(tr_peer* /*peer*/, tr_peer_event const* /*e*/, void* /*vs*/);
 
 static void rebuildWebseedArray(tr_swarm* s, tr_torrent* tor)
 {
@@ -1399,10 +1399,10 @@ int tr_peerMgrGetPeers(tr_torrent const* tor, tr_pex** setme_pex, uint8_t af, ui
     return count;
 }
 
-static void atomPulse(evutil_socket_t, short, void*);
-static void bandwidthPulse(evutil_socket_t, short, void*);
-static void rechokePulse(evutil_socket_t, short, void*);
-static void reconnectPulse(evutil_socket_t, short, void*);
+static void atomPulse(evutil_socket_t, short /*unused*/, void* /*vmgr*/);
+static void bandwidthPulse(evutil_socket_t, short /*unused*/, void* /*vmgr*/);
+static void rechokePulse(evutil_socket_t, short /*unused*/, void* /*vmgr*/);
+static void reconnectPulse(evutil_socket_t, short /*unused*/, void* /*vmgr*/);
 
 static struct event* createTimer(tr_session* session, int msec, event_callback_fn callback, void* cbdata)
 {
@@ -1450,7 +1450,7 @@ void tr_peerMgrStartTorrent(tr_torrent* tor)
     tr_timerAddMsec(s->manager->rechokeTimer, 100);
 }
 
-static void removeAllPeers(tr_swarm*);
+static void removeAllPeers(tr_swarm* /*swarm*/);
 
 static void stopSwarm(tr_swarm* swarm)
 {

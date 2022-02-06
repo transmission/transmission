@@ -450,7 +450,7 @@ struct tau_tracker
     }
 };
 
-static void tau_tracker_upkeep(struct tau_tracker*);
+static void tau_tracker_upkeep(struct tau_tracker* /*tracker*/);
 
 static void tau_tracker_on_dns(int errcode, struct evutil_addrinfo* addr, void* vtracker)
 {

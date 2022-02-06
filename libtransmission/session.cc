@@ -572,7 +572,7 @@ static void onSaveTimer(evutil_socket_t /*fd*/, short /*what*/, void* vsession)
 ****
 ***/
 
-static void tr_sessionInitImpl(void*);
+static void tr_sessionInitImpl(void* /*vdata*/);
 
 struct init_data
 {
@@ -757,7 +757,7 @@ static void tr_sessionInitImpl(void* vdata)
     data->done = true;
 }
 
-static void turtleBootstrap(tr_session*, struct tr_turtle_info*);
+static void turtleBootstrap(tr_session* /*session*/, struct tr_turtle_info* /*turtle*/);
 static void setPeerPort(tr_session* session, tr_port port);
 
 static void sessionSetImpl(void* vdata)
@@ -1801,7 +1801,7 @@ std::vector<tr_torrent*> tr_sessionGetTorrents(tr_session* session)
     return torrents;
 }
 
-static void closeBlocklists(tr_session*);
+static void closeBlocklists(tr_session* /*session*/);
 
 static void sessionCloseImplWaitForIdleUdp(evutil_socket_t fd, short what, void* vsession);
 

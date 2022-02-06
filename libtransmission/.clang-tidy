@@ -43,7 +43,6 @@ Checks: >
   -readability-implicit-bool-conversion,
   -readability-inconsistent-declaration-parameter-name,
   -readability-magic-numbers,
-  -readability-named-parameter,
   -readability-qualified-auto,
   -readability-redundant-access-specifiers,
   -readability-static-accessed-through-instance,
