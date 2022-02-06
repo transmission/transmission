@@ -5,7 +5,7 @@
 
 #if defined(HAVE_USELOCALE) && (!defined(_XOPEN_SOURCE) || _XOPEN_SOURCE < 700)
 #undef _XOPEN_SOURCE
-#define _XOPEN_SOURCE 700
+#define XOPEN_SOURCE 700 // NOLINT
 #endif
 
 #if defined(HAVE_USELOCALE) && !defined(_GNU_SOURCE)
