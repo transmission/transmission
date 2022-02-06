@@ -26,6 +26,7 @@ Checks: >
   clang-analyzer-valist.*,
   cppcoreguidelines-init-variables,
   cppcoreguidelines-prefer-member-initializer,
+  cppcoreguidelines-slicing,
   cppcoreguidelines-virtual-class-destructor,
   misc-*,
   -misc-misplaced-const,
