@@ -115,6 +115,7 @@ export class Inspector extends EventTarget {
       ['hash', 'Hash:'],
       ['privacy', 'Privacy:'],
       ['origin', 'Origin:'],
+      ['magnetLink', 'Magnet:'],
       ['comment', 'Comment:'],
     ];
     for (const [name, text] of rows) {
@@ -528,6 +529,23 @@ export class Inspector extends EventTarget {
       string = torrents.every((t) => get(t) === first) ? first : mixed;
     }
     setTextContent(e.info.location, string);
+
+    // magnetLink
+    if (torrents.length === 0) {
+      string = none;
+    } else {
+      const get = (t) => t.getMagnetLink();
+      const first = get(torrents[0]);
+      string = torrents.every((t) => get(t) === first) ? first : mixed;
+    }
+    if (none !== string) {
+      Utils.setInnerHTML(
+        e.info.magnetLink,
+        `<a class="inspector-info-magnet" href="${string}"><button></button></a>`
+      );
+    } else {
+      setTextContent(e.info.magnetLink, string);
+    }
   }
 
   ///  PEERS PAGE
