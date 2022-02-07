@@ -39,7 +39,7 @@ void destroyVariant(tr_variant* json)
 
 TrVariantPtr createVariant()
 {
-    return TrVariantPtr(tr_new0(tr_variant, 1), &destroyVariant);
+    return { tr_new0(tr_variant, 1), &destroyVariant };
 }
 
 } // namespace

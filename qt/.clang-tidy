@@ -45,7 +45,6 @@ Checks: >
   -misc-no-recursion,
   -misc-non-private-member-variables-in-classes,
   modernize-*,
-  -modernize-return-braced-init-list,
   -modernize-use-trailing-return-type, # keep
   performance-*,
   readability-*,

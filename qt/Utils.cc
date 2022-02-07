@@ -52,10 +52,10 @@ QIcon Utils::getIconFromIndex(QModelIndex const& index)
         return qvariant_cast<QIcon>(variant);
 
     case QVariant::Pixmap:
-        return QIcon(qvariant_cast<QPixmap>(variant));
+        return qvariant_cast<QPixmap>(variant);
 
     default:
-        return QIcon();
+        return {};
     }
 }
 

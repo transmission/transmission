@@ -152,7 +152,7 @@ QSize TorrentDelegate::margin(QStyle const& style) const
 {
     Q_UNUSED(style)
 
-    return QSize(4, 4);
+    return { 4, 4 };
 }
 
 QString TorrentDelegate::progressString(Torrent const& tor)
@@ -426,7 +426,7 @@ QSize TorrentDelegate::sizeHint(QStyleOptionViewItem const& option, QModelIndex 
         height_hint_ = sizeHint(option, *tor).height();
     }
 
-    return QSize(option.rect.width(), *height_hint_);
+    return { option.rect.width(), *height_hint_ };
 }
 
 QIcon& TorrentDelegate::getWarningEmblem() const

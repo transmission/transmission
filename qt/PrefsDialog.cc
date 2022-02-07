@@ -152,7 +152,7 @@ QString qtDayName(int day)
 
     default:
         assert(false && "Invalid day of week");
-        return QString();
+        return {};
     }
 }
 

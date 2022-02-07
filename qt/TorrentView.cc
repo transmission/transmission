@@ -32,7 +32,7 @@ public:
 
         QRect const label_rect = style()->subElementRect(QStyle::SE_HeaderLabel, &option, this);
 
-        return QSize(100, fontMetrics().height() + (option.rect.height() - label_rect.height()));
+        return { 100, fontMetrics().height() + (option.rect.height() - label_rect.height()) };
     }
 
 protected:

@@ -170,7 +170,7 @@ Qt::ItemFlags FileTreeModel::flags(QModelIndex const& index) const
         i |= Qt::ItemIsUserCheckable | Qt::ItemIsAutoTristate;
     }
 
-    return Qt::ItemFlags(i);
+    return { i };
 }
 
 bool FileTreeModel::setData(QModelIndex const& index, QVariant const& newname, int role)
@@ -282,7 +282,7 @@ QModelIndex FileTreeModel::indexOf(FileTreeItem* item, int column) const
 {
     if (item == nullptr || item == root_item_.get())
     {
-        return QModelIndex();
+        return {};
     }
 
     return createIndex(item->row(), column, item);
