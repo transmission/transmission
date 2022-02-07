@@ -6,13 +6,10 @@
 #pragma once
 
 #include <unordered_map>
-#include <vector>
 
 #include <QObject>
 #include <QPixmap>
 #include <QString>
-
-#include <libtransmission/tr-macros.h>
 
 #include "Utils.h" // std::hash<QString>
 
@@ -23,7 +20,6 @@ class QUrl;
 class FaviconCache : public QObject
 {
     Q_OBJECT
-    TR_DISABLE_COPY_MOVE(FaviconCache)
 
 public:
     FaviconCache();
@@ -44,7 +40,6 @@ private slots:
     void onRequestFinished(QNetworkReply* reply);
 
 private:
-    // static Key getKey(QUrl const& url);
     void ensureCacheDirHasBeenScanned();
 
     QNetworkAccessManager* nam_ = {};
