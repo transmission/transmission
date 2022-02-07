@@ -53,7 +53,7 @@ protected:
 
     void mouseDoubleClickEvent(QMouseEvent* /*event*/) override
     {
-        emit static_cast<TorrentView*>(parent())->headerDoubleClicked();
+        emit dynamic_cast<TorrentView*>(parent())->headerDoubleClicked();
     }
 
 private:

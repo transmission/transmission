@@ -30,7 +30,6 @@ Checks: >
   -cppcoreguidelines-pro-bounds-pointer-arithmetic,
   -cppcoreguidelines-pro-type-const-cast,
   -cppcoreguidelines-pro-type-cstyle-cast,
-  -cppcoreguidelines-pro-type-static-cast-downcast,
   -cppcoreguidelines-pro-type-vararg,
   google-readability-*,
   -google-readability-casting,
