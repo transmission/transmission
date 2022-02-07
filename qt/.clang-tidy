@@ -8,7 +8,6 @@ Checks: >
   -bugprone-implicit-widening-of-multiplication-result,
   -bugprone-narrowing-conversions,
   cert-*,
-  -cert-err58-cpp,
   clang-analyzer-optin*,
   -clang-diagnostic-c++98*,
   -clang-diagnostic-double-promotion,

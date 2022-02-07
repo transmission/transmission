@@ -31,8 +31,6 @@ namespace
 char const constexpr* const RequestDataPropertyKey{ "requestData" };
 char const constexpr* const RequestFutureinterfacePropertyKey{ "requestReplyFutureInterface" };
 
-bool const Verbose = tr_env_key_exists("TR_RPC_VERBOSE");
-
 void destroyVariant(tr_variant* json)
 {
     tr_variantFree(json);
@@ -149,7 +147,7 @@ void RpcClient::sendNetworkRequest(TrVariantPtr json, QFutureInterface<RpcRespon
     connect(reply, &QNetworkReply::downloadProgress, this, &RpcClient::dataReadProgress);
     connect(reply, &QNetworkReply::uploadProgress, this, &RpcClient::dataSendProgress);
 
-    if (Verbose)
+    if (verbose_)
     {
         qInfo() << "sending"
                 << "POST" << qPrintable(url_.path());
@@ -228,7 +226,7 @@ void RpcClient::networkRequestFinished(QNetworkReply* reply)
 
     auto promise = reply->property(RequestFutureinterfacePropertyKey).value<QFutureInterface<RpcResponse>>();
 
-    if (Verbose)
+    if (verbose_)
     {
         qInfo() << "http response header:";
 
