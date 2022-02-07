@@ -14,7 +14,6 @@ Checks: >
   -clang-diagnostic-double-promotion,
   -clang-diagnostic-exit-time-destructors,
   -clang-diagnostic-global-constructors,
-  -clang-diagnostic-nonportable-system-include-path,
   -clang-diagnostic-old-style-cast,
   -clang-diagnostic-shorten-64-to-32,
   -clang-diagnostic-sign-compare,
