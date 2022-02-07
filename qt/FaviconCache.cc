@@ -163,17 +163,23 @@ void FaviconCache::add(QString const& sitename, QString const& url_str)
     };
 
     // scrape tracker.domain.com
-    auto const url = QUrl(url_str);
-    auto const host = url.host();
+    auto const host = QUrl(url_str).host();
     scrape(host);
 
     if (auto const idx = host.indexOf(sitename); idx != -1)
     {
         // scrape domain.com
-        auto const root_url = sitename + QStringLiteral(".") + host.mid(idx + std::size(sitename) + 1);
-        scrape(root_url);
+        auto const root = host.mid(idx);
+        if (root != host)
+        {
+            scrape(root);
+        }
+
         // scrape www.domain.com
-        scrape(QStringLiteral("www.") + root_url);
+        if (auto const www = QStringLiteral("www.") + root; www != host)
+        {
+            scrape(www);
+        }
     }
 }
 
