@@ -8,7 +8,6 @@ Checks: >
   -bugprone-incorrect-roundings,
   -bugprone-narrowing-conversions,
   -bugprone-signed-char-misuse,
-  -bugprone-sizeof-expression,
   -bugprone-suspicious-include,
   cert-*,
   -cert-dcl50-cpp,

@@ -2042,7 +2042,7 @@ static void sessionLoadTorrents(void* vdata)
     }
 
     int const n = std::size(torrents);
-    data->torrents = tr_new(tr_torrent*, n);
+    data->torrents = tr_new(tr_torrent*, n); // NOLINT(bugprone-sizeof-expression)
     std::copy(std::begin(torrents), std::end(torrents), data->torrents);
 
     if (n != 0)
