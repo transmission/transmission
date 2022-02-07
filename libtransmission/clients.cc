@@ -235,8 +235,8 @@ bool decodeBitCometClient(char* buf, size_t buflen, std::string_view peer_id)
 
     bool const is_bitlord = std::string_view(std::data(peer_id) + 6, 4) == "LORD"sv;
     auto const name = is_bitlord ? "BitLord"sv : "BitComet"sv;
-    int const major = peer_id[4];
-    int const minor = peer_id[5];
+    int const major = uint8_t(peer_id[4]);
+    int const minor = uint8_t(peer_id[5]);
 
     std::tie(buf, buflen) = buf_append(buf, buflen, name, ' ', mod, major, '.');
     tr_snprintf(buf, buflen, "%02d", minor);
