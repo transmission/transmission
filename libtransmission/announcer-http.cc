@@ -160,7 +160,7 @@ static void verboseLog(std::string_view description, tr_direction direction, std
         }
         else
         {
-            out << "\\x"sv << std::hex << std::setw(2) << std::setfill('0') << unsigned(ch) << std::dec << std::setw(1)
+            out << R"(\x)" << std::hex << std::setw(2) << std::setfill('0') << unsigned(ch) << std::dec << std::setw(1)
                 << std::setfill(' ');
         }
     }
