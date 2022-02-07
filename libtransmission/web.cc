@@ -490,7 +490,7 @@ static void tr_webThreadFunc(void* vsession)
 
             auto numfds = int{};
             curl_multi_wait(multi, nullptr, 0, msec, &numfds);
-            if (!numfds)
+            if (numfds == 0)
             {
                 repeats++;
                 if (repeats > 1)

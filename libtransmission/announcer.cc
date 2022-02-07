@@ -761,7 +761,7 @@ static void tier_announce_event_push(tr_tier* tier, tr_announce_event e, time_t 
          * dump everything leading up to it except "completed" */
         if (e == TR_ANNOUNCE_EVENT_STOPPED)
         {
-            bool has_completed = std::count(std::begin(events), std::end(events), TR_ANNOUNCE_EVENT_COMPLETED);
+            bool has_completed = std::count(std::begin(events), std::end(events), TR_ANNOUNCE_EVENT_COMPLETED) != 0;
             events.clear();
             if (has_completed)
             {
@@ -885,7 +885,7 @@ void tr_announcerRemoveTorrent(tr_announcer* announcer, tr_torrent* tor)
             auto const e = TR_ANNOUNCE_EVENT_STOPPED;
             auto* req = announce_request_new(announcer, tor, &tier, e);
 
-            if (announcer->stops.count(req))
+            if (announcer->stops.count(req) != 0U)
             {
                 delete req;
             }
@@ -1593,8 +1593,8 @@ static tr_tracker_view trackerView(tr_torrent const& tor, int tier_index, tr_tie
     }
     else
     {
-        view.hasScraped = tier.lastScrapeTime;
-        if (view.hasScraped != 0)
+        view.hasScraped = tier.lastScrapeTime != 0;
+        if (view.hasScraped)
         {
             view.lastScrapeTime = tier.lastScrapeTime;
             view.lastScrapeSucceeded = tier.lastScrapeSucceeded;
@@ -1622,8 +1622,8 @@ static tr_tracker_view trackerView(tr_torrent const& tor, int tier_index, tr_tie
 
         view.lastAnnounceStartTime = tier.lastAnnounceStartTime;
 
-        view.hasAnnounced = tier.lastAnnounceTime;
-        if (view.hasAnnounced != 0)
+        view.hasAnnounced = tier.lastAnnounceTime != 0;
+        if (view.hasAnnounced)
         {
             view.lastAnnounceTime = tier.lastAnnounceTime;
             view.lastAnnounceSucceeded = tier.lastAnnounceSucceeded;

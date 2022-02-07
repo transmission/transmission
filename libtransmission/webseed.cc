@@ -309,7 +309,7 @@ static void on_content_changed(struct evbuffer* buf, struct evbuffer_cb_info con
                     session,
                     connection_succeeded,
                     new connection_succeeded_data{ w,
-                                                   real_url ? real_url : "",
+                                                   real_url != nullptr ? real_url : "",
                                                    task->piece_index,
                                                    task->piece_offset + task->blocks_done * task->block_size + len - 1 });
             }

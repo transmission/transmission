@@ -154,7 +154,7 @@ static void verboseLog(std::string_view description, tr_direction direction, std
     out << description << std::endl << "[raw]"sv << direction_sv;
     for (unsigned char ch : message)
     {
-        if (isprint(ch))
+        if (isprint(ch) != 0)
         {
             out << ch;
         }

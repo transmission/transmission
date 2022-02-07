@@ -111,7 +111,7 @@ tr_torrent* tr_torrentFindFromMetainfo(tr_session* session, tr_torrent_metainfo 
 tr_torrent* tr_torrentFindFromMagnetLink(tr_session* session, char const* magnet_link)
 {
     auto mm = tr_magnet_metainfo{};
-    return mm.parseMagnet(magnet_link ? magnet_link : "") ? session->getTorrent(mm.infoHash()) : nullptr;
+    return mm.parseMagnet(magnet_link != nullptr ? magnet_link : "") ? session->getTorrent(mm.infoHash()) : nullptr;
 }
 
 tr_torrent* tr_torrentFindFromObfuscatedHash(tr_session* session, tr_sha1_digest_t const& obfuscated_hash)
@@ -2010,7 +2010,7 @@ bool tr_torrentSetAnnounceList(tr_torrent* tor, char const* const* announce_urls
     auto const lock = tor->unique_lock();
 
     auto announce_list = tr_announce_list();
-    if (!announce_list.set(announce_urls, tiers, n) || !announce_list.save(tor->torrentFile()))
+    if ((announce_list.set(announce_urls, tiers, n) == 0U) || !announce_list.save(tor->torrentFile()))
     {
         return false;
     }
@@ -2443,7 +2443,7 @@ void tr_torrentSetLocation(
     TR_ASSERT(tr_isTorrent(tor));
     TR_ASSERT(!tr_str_is_empty(location));
 
-    return tor->setLocation(location ? location : "", move_from_old_location, setme_progress, setme_state);
+    return tor->setLocation(location != nullptr ? location : "", move_from_old_location, setme_progress, setme_state);
 }
 
 std::string_view tr_torrent::primaryMimeType() const

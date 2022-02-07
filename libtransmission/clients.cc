@@ -683,7 +683,7 @@ char* tr_clientForId(char* buf, size_t buflen, tr_peer_id_t peer_id)
         {
             char const c = peer_id[i];
 
-            if (isprint((unsigned char)c))
+            if (isprint((unsigned char)c) != 0)
             {
                 *walk++ = c;
             }

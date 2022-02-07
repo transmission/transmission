@@ -812,7 +812,7 @@ static void initField(tr_torrent const* const tor, tr_stat const* const st, tr_v
             tr_variantInitList(initme, n);
             for (tr_file_index_t i = 0; i < n; ++i)
             {
-                tr_variantListAddInt(initme, tr_torrentFile(tor, i).wanted);
+                tr_variantListAddInt(initme, static_cast<int64_t>(tr_torrentFile(tor, i).wanted));
             }
         }
         break;

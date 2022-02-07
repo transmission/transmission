@@ -682,7 +682,7 @@ static void addStrike(tr_swarm* s, tr_peer* peer)
     }
 }
 
-static void peerSuggestedPiece(tr_swarm* /*s*/, tr_peer* /*peer*/, tr_piece_index_t /*pieceIndex*/, int /*isFastAllowed*/)
+static void peerSuggestedPiece(tr_swarm* /*s*/, tr_peer* /*peer*/, tr_piece_index_t /*pieceIndex*/, bool /*isFastAllowed*/)
 {
 #if 0
 
