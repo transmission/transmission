@@ -150,7 +150,7 @@ static int sockoptfunction(void* vtask, curl_socket_t fd, curlsocktype /*purpose
 
 static CURLcode ssl_context_func(CURL* /*curl*/, void* ssl_ctx, void* /*user_data*/)
 {
-    tr_x509_store_t const cert_store = tr_ssl_get_x509_store(ssl_ctx);
+    auto const cert_store = tr_ssl_get_x509_store(ssl_ctx);
     if (cert_store == nullptr)
     {
         return CURLE_OK;
@@ -490,7 +490,7 @@ static void tr_webThreadFunc(void* vsession)
 
             auto numfds = int{};
             curl_multi_wait(multi, nullptr, 0, msec, &numfds);
-            if (!numfds)
+            if (numfds == 0)
             {
                 repeats++;
                 if (repeats > 1)

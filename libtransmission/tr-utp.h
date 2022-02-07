@@ -10,7 +10,7 @@
 
 #include <cstddef> // size_t
 
-int tr_utpPacket(unsigned char const* buf, size_t buflen, struct sockaddr const* from, socklen_t fromlen, tr_session* ss);
+bool tr_utpPacket(unsigned char const* buf, size_t buflen, struct sockaddr const* from, socklen_t fromlen, tr_session* ss);
 
 void tr_utpClose(tr_session*);
 

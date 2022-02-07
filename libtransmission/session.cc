@@ -572,7 +572,7 @@ static void onSaveTimer(evutil_socket_t /*fd*/, short /*what*/, void* vsession)
 ****
 ***/
 
-static void tr_sessionInitImpl(void*);
+static void tr_sessionInitImpl(void* /*vdata*/);
 
 struct init_data
 {
@@ -757,7 +757,7 @@ static void tr_sessionInitImpl(void* vdata)
     data->done = true;
 }
 
-static void turtleBootstrap(tr_session*, struct tr_turtle_info*);
+static void turtleBootstrap(tr_session* /*session*/, struct tr_turtle_info* /*turtle*/);
 static void setPeerPort(tr_session* session, tr_port port);
 
 static void sessionSetImpl(void* vdata)
@@ -1142,7 +1142,7 @@ void tr_sessionSetDownloadDir(tr_session* session, char const* dir)
 {
     TR_ASSERT(tr_isSession(session));
 
-    session->setDownloadDir(dir ? dir : "");
+    session->setDownloadDir(dir != nullptr ? dir : "");
 }
 
 char const* tr_sessionGetDownloadDir(tr_session const* session)
@@ -1178,7 +1178,7 @@ void tr_sessionSetIncompleteDir(tr_session* session, char const* dir)
 {
     TR_ASSERT(tr_isSession(session));
 
-    session->setIncompleteDir(dir ? dir : "");
+    session->setIncompleteDir(dir != nullptr ? dir : "");
 }
 
 char const* tr_sessionGetIncompleteDir(tr_session const* session)
@@ -1801,7 +1801,7 @@ std::vector<tr_torrent*> tr_sessionGetTorrents(tr_session* session)
     return torrents;
 }
 
-static void closeBlocklists(tr_session*);
+static void closeBlocklists(tr_session* /*session*/);
 
 static void sessionCloseImplWaitForIdleUdp(evutil_socket_t fd, short what, void* vsession);
 
@@ -2042,7 +2042,7 @@ static void sessionLoadTorrents(void* vdata)
     }
 
     int const n = std::size(torrents);
-    data->torrents = tr_new(tr_torrent*, n);
+    data->torrents = tr_new(tr_torrent*, n); // NOLINT(bugprone-sizeof-expression)
     std::copy(std::begin(torrents), std::end(torrents), data->torrents);
 
     if (n != 0)
@@ -2454,7 +2454,7 @@ bool tr_sessionIsAddressBlocked(tr_session const* session, tr_address const* add
 
 void tr_blocklistSetURL(tr_session* session, char const* url)
 {
-    session->setBlocklistUrl(url ? url : "");
+    session->setBlocklistUrl(url != nullptr ? url : "");
 }
 
 char const* tr_blocklistGetURL(tr_session const* session)
@@ -2518,7 +2518,7 @@ void tr_sessionSetRPCUrl(tr_session* session, char const* url)
 {
     TR_ASSERT(tr_isSession(session));
 
-    tr_rpcSetUrl(session->rpc_server_.get(), url ? url : "");
+    tr_rpcSetUrl(session->rpc_server_.get(), url != nullptr ? url : "");
 }
 
 char const* tr_sessionGetRPCUrl(tr_session const* session)
@@ -2540,7 +2540,7 @@ void tr_sessionSetRPCWhitelist(tr_session* session, char const* whitelist)
 {
     TR_ASSERT(tr_isSession(session));
 
-    session->setRpcWhitelist(whitelist ? whitelist : "");
+    session->setRpcWhitelist(whitelist != nullptr ? whitelist : "");
 }
 
 char const* tr_sessionGetRPCWhitelist(tr_session const* session)
@@ -2568,7 +2568,7 @@ void tr_sessionSetRPCPassword(tr_session* session, char const* password)
 {
     TR_ASSERT(tr_isSession(session));
 
-    tr_rpcSetPassword(session->rpc_server_.get(), password ? password : "");
+    tr_rpcSetPassword(session->rpc_server_.get(), password != nullptr ? password : "");
 }
 
 char const* tr_sessionGetRPCPassword(tr_session const* session)
@@ -2582,7 +2582,7 @@ void tr_sessionSetRPCUsername(tr_session* session, char const* username)
 {
     TR_ASSERT(tr_isSession(session));
 
-    tr_rpcSetUsername(session->rpc_server_.get(), username ? username : "");
+    tr_rpcSetUsername(session->rpc_server_.get(), username != nullptr ? username : "");
 }
 
 char const* tr_sessionGetRPCUsername(tr_session const* session)
@@ -2638,7 +2638,7 @@ void tr_sessionSetScript(tr_session* session, TrScript type, char const* script)
     TR_ASSERT(tr_isSession(session));
     TR_ASSERT(type < TR_SCRIPT_N_TYPES);
 
-    session->setScript(type, script ? script : "");
+    session->setScript(type, script != nullptr ? script : "");
 }
 
 char const* tr_sessionGetScript(tr_session const* session, TrScript type)

@@ -144,7 +144,7 @@ static void tr_watchdir_on_retry_timer(evutil_socket_t /*fd*/, short /*type*/, v
     TR_ASSERT(context != nullptr);
 
     auto* const retry = static_cast<tr_watchdir_retry*>(context);
-    tr_watchdir_t const handle = retry->handle;
+    auto const handle = retry->handle;
 
     if (tr_watchdir_process_impl(handle, retry->name) == TR_WATCHDIR_RETRY)
     {
@@ -325,7 +325,7 @@ void tr_watchdir_scan(tr_watchdir_t handle, std::unordered_set<std::string>* dir
     auto new_dir_entries = std::unordered_set<std::string>{};
     tr_error* error = nullptr;
 
-    tr_sys_dir_t const dir = tr_sys_dir_open(handle->path, &error);
+    auto const dir = tr_sys_dir_open(handle->path, &error);
     if (dir == TR_BAD_SYS_DIR)
     {
         log_error("Failed to open directory \"%s\" (%d): %s", handle->path, error->code, error->message);

@@ -78,7 +78,7 @@ static bool tr_spawn_async_in_child(
     return true;
 
 FAIL:
-    (void)!write(pipe_fd, &errno, sizeof(errno));
+    (void)write(pipe_fd, &errno, sizeof(errno));
     return false;
 }
 

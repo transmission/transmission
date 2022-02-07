@@ -25,7 +25,7 @@
 #include "utils.h"
 
 #define TR_CRYPTO_DH_SECRET_FALLBACK
-#include "crypto-utils-fallback.cc"
+#include "crypto-utils-fallback.cc" // NOLINT(bugprone-suspicious-include)
 
 /***
 ****
