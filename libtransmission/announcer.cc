@@ -1577,7 +1577,10 @@ static tr_tracker_view trackerView(tr_torrent const& tor, int tier_index, tr_tie
     view.host = tracker.host.c_str();
     view.announce = tracker.announce_url.c_str();
     view.scrape = tracker.scrape_info == nullptr ? "" : tracker.scrape_info->scrape_url.c_str();
-    tr_strlcpy(view.sitename, std::string(tracker.sitename).c_str(), sizeof(view.sitename));
+    *std::copy_n(
+        std::begin(tracker.sitename),
+        std::min(std::size(tracker.sitename), sizeof(view.sitename) - 1),
+        view.sitename) = '\0';
 
     view.id = tracker.id;
     view.tier = tier_index;
