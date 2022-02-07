@@ -253,7 +253,7 @@ static std::string getXdgEntryFromUserDirs(std::string_view key)
     }
 
     // search for key="val" and extract val
-    auto const search = tr_strvJoin(key, "=\""sv);
+    auto const search = tr_strvJoin(key, R"(=")");
     auto begin = std::search(std::begin(content), std::end(content), std::begin(search), std::end(search));
     if (begin == std::end(content))
     {

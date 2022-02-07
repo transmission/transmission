@@ -196,7 +196,7 @@ static bool appendSanitizedComponent(std::string& out, std::string_view in, bool
     // remove trailing spaces and '.'
     auto constexpr trailing_test = [](unsigned char ch)
     {
-        return isspace(ch) || ch == '.';
+        return (isspace(ch) != 0) || ch == '.';
     };
     auto const rit = std::find_if_not(std::rbegin(in), std::rend(in), trailing_test);
     in.remove_suffix(std::distance(std::rbegin(in), rit));

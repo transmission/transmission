@@ -164,15 +164,15 @@ char const* tr_strip_positional_args(char const* str)
     char const* in = str;
     size_t pos = 0;
 
-    for (; str && *str && pos + 1 < std::size(buf); ++str)
+    for (; (str != nullptr) && (*str != 0) && pos + 1 < std::size(buf); ++str)
     {
         buf[pos++] = *str;
 
-        if (*str == '%' && isdigit(str[1]))
+        if (*str == '%' && (isdigit(str[1]) != 0))
         {
             char const* tmp = str + 1;
 
-            while (isdigit(*tmp))
+            while (isdigit(*tmp) != 0)
             {
                 ++tmp;
             }
@@ -191,7 +191,7 @@ char const* tr_strip_positional_args(char const* str)
 
     buf[pos] = '\0';
 
-    return in && !strcmp(buf.data(), in) ? in : buf.data();
+    return (in != nullptr) && (strcmp(buf.data(), in) == 0) ? in : buf.data();
 }
 
 /**
@@ -743,7 +743,7 @@ std::string& tr_strvUtf8Clean(std::string_view cleanme, std::string& setme)
     else
     {
         auto* const tmp = to_utf8(cleanme);
-        setme.assign(tmp ? tmp : "");
+        setme.assign(tmp != nullptr ? tmp : "");
         tr_free(tmp);
     }
 

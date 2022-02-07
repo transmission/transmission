@@ -51,7 +51,7 @@ void lock_free(void* lock_, unsigned /*locktype*/)
 int lock_lock(unsigned mode, void* lock_)
 {
     auto* lock = static_cast<std::recursive_mutex*>(lock_);
-    if (mode & EVTHREAD_TRY)
+    if ((mode & EVTHREAD_TRY) != 0U)
     {
         auto const success = lock->try_lock();
         return success ? 0 : -1;
@@ -79,7 +79,7 @@ void cond_free(void* cond_)
 int cond_signal(void* cond_, int broadcast)
 {
     auto* cond = static_cast<std::condition_variable_any*>(cond_);
-    if (broadcast)
+    if (broadcast != 0)
     {
         cond->notify_all();
     }
@@ -206,7 +206,7 @@ static void libeventThreadFunc(tr_event_handle* events)
     events->base = base;
     events->work_queue_event = event_new(base, -1, 0, onWorkAvailable, events->session);
     events->session->event_base = base;
-    events->session->evdns_base = evdns_base_new(base, true);
+    events->session->evdns_base = evdns_base_new(base, EVDNS_BASE_INITIALIZE_NAMESERVERS);
     events->session->events = events;
 
     // loop until `tr_eventClose()` kills the loop

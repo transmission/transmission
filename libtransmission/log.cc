@@ -22,8 +22,7 @@
 
 using namespace std::literals;
 
-tr_log_level __tr_message_level = TR_LOG_ERROR;
-
+static tr_log_level tr_message_level = TR_LOG_ERROR;
 static bool myQueueEnabled = false;
 static tr_log_message* myQueue = nullptr;
 static tr_log_message** myQueueTail = &myQueue;
@@ -45,7 +44,7 @@ static inline bool IsDebuggerPresent()
 
 tr_log_level tr_logGetLevel()
 {
-    return __tr_message_level;
+    return tr_message_level;
 }
 
 /***
@@ -84,7 +83,7 @@ tr_sys_file_t tr_logGetFile()
 
 void tr_logSetLevel(tr_log_level level)
 {
-    __tr_message_level = level;
+    tr_message_level = level;
 }
 
 void tr_logSetQueueEnabled(bool isEnabled)

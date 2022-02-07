@@ -109,7 +109,7 @@ void tr_udpSetSocketTOS(tr_session* session)
 {
     auto const tos = session->peerSocketTos();
 
-    if (tos)
+    if (tos != 0)
     {
         return;
     }
@@ -261,9 +261,7 @@ static void event_callback(evutil_socket_t s, [[maybe_unused]] short type, void*
         }
         else if (rc >= 8 && buf[0] == 0 && buf[1] == 0 && buf[2] == 0 && buf[3] <= 3)
         {
-            rc = tau_handle_message(session, buf, rc);
-
-            if (rc == 0)
+            if (!tau_handle_message(session, buf, rc))
             {
                 tr_logAddNamedDbg("UDP", "Couldn't parse UDP tracker packet.");
             }
@@ -272,9 +270,7 @@ static void event_callback(evutil_socket_t s, [[maybe_unused]] short type, void*
         {
             if (tr_sessionIsUTPEnabled(session))
             {
-                rc = tr_utpPacket(buf, rc, (struct sockaddr*)&from, fromlen, session);
-
-                if (rc == 0)
+                if (!tr_utpPacket(buf, rc, (struct sockaddr*)&from, fromlen, session))
                 {
                     tr_logAddNamedDbg("UDP", "Unexpected UDP packet");
                 }

@@ -5,7 +5,7 @@
 
 #if defined(HAVE_USELOCALE) && (!defined(_XOPEN_SOURCE) || _XOPEN_SOURCE < 700)
 #undef _XOPEN_SOURCE
-#define _XOPEN_SOURCE 700
+#define XOPEN_SOURCE 700 // NOLINT
 #endif
 
 #if defined(HAVE_USELOCALE) && !defined(_GNU_SOURCE)
@@ -479,7 +479,7 @@ void tr_variantInitStrView(tr_variant* v, std::string_view str)
 void tr_variantInitBool(tr_variant* v, bool value)
 {
     tr_variantInit(v, TR_VARIANT_TYPE_BOOL);
-    v->val.b = value != 0;
+    v->val.b = value;
 }
 
 void tr_variantInitReal(tr_variant* v, double value)
@@ -1105,7 +1105,7 @@ void tr_variantMergeDicts(tr_variant* target, tr_variant const* source)
 
             // if types differ, ensure that target will overwrite source
             auto const* const target_child = tr_variantDictFind(target, key);
-            if (target_child && !tr_variantIsType(target_child, val->type))
+            if ((target_child != nullptr) && !tr_variantIsType(target_child, val->type))
             {
                 tr_variantDictRemove(target, key);
             }
@@ -1237,7 +1237,7 @@ bool tr_variantFromBuf(tr_variant* setme, int opts, std::string_view buf, char c
     use_numeric_locale(&locale_ctx, "C");
 
     auto success = bool{};
-    if (opts & TR_VARIANT_PARSE_BENC)
+    if ((opts & TR_VARIANT_PARSE_BENC) != 0)
     {
         success = tr_variantParseBenc(*setme, opts, buf, setme_end, error);
     }
@@ -1245,7 +1245,7 @@ bool tr_variantFromBuf(tr_variant* setme, int opts, std::string_view buf, char c
     {
         // TODO: tr_variantParseJson() should take a tr_error* same as ParseBenc
         auto err = tr_variantParseJson(*setme, opts, buf, setme_end);
-        if (err)
+        if (err != 0)
         {
             tr_error_set(error, EILSEQ, "error parsing encoded data"sv);
         }
