@@ -1371,10 +1371,11 @@ struct tr_tracker_view
     char const* scrape; // full scrape URL
     char const* host; // uniquely-identifying tracker name (`${host}:${port}`)
 
-    // The tracker site's name. Uses the first private subdomain before the
-    // public suffix (see https://publicsuffix.org/) in the announce URL's host,
-    // e.g. "example" for "https://www.example.co.uk/announce/"
-    char sitename[256];
+    // The tracker site's name. Uses the first label before the public suffix
+    // (https://publicsuffix.org/) in the announce URL's host.
+    // e.g. "https://www.example.co.uk/announce/"'s sitename is "example"
+    // RFC 1034 says labels must be less than 64 chars
+    char sitename[64];
 
     char lastAnnounceResult[128]; // if hasAnnounced, the human-readable result of latest announce
     char lastScrapeResult[128]; // if hasScraped, the human-readable result of the latest scrape
