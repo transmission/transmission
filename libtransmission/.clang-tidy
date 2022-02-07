@@ -35,4 +35,3 @@ Checks: >
   -readability-magic-numbers,
   -readability-qualified-auto,
   -readability-redundant-access-specifiers,
-  -readability-static-accessed-through-instance,

@@ -71,7 +71,7 @@ static std::string announce_url_new(tr_session const* session, tr_announce_reque
         "&compact=1"
         "&supportcrypto=1",
         TR_PRIsv_ARG(announce_sv),
-        announce_sv.find('?') == announce_sv.npos ? '?' : '&',
+        announce_sv.find('?') == std::string_view::npos ? '?' : '&',
         std::data(escaped_info_hash),
         TR_PRIsv_ARG(req->peer_id),
         req->port,

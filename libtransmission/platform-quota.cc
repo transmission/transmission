@@ -220,7 +220,7 @@ static std::string getblkdev(std::string_view path)
         }
 
         auto const pos = path.rfind('/');
-        if (pos == path.npos)
+        if (pos == std::string_view::npos)
         {
             return {};
         }
