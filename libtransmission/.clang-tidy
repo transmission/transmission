@@ -5,7 +5,6 @@ Checks: >
   -bugprone-branch-clone,
   -bugprone-easily-swappable-parameters,
   -bugprone-implicit-widening-of-multiplication-result,
-  -bugprone-incorrect-roundings,
   -bugprone-narrowing-conversions,
   -bugprone-signed-char-misuse,
   -bugprone-suspicious-include,

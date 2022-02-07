@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <cerrno> /* error codes ERANGE, ... */
 #include <climits> /* INT_MAX */
+#include <cmath>
 #include <cstdlib> /* qsort */
 #include <ctime> // time_t
 #include <iterator> // std::back_inserter
@@ -2297,7 +2298,7 @@ static bool shouldPeerBeClosed(tr_swarm const* s, tr_peer const* peer, int peerC
     /* disconnect if it's been too long since piece data has been transferred.
      * this is on a sliding scale based on number of available peers... */
     {
-        auto const relaxStrictnessIfFewerThanN = int(getMaxPeerCount(tor) * 0.9 + 0.5);
+        auto const relaxStrictnessIfFewerThanN = std::lround(getMaxPeerCount(tor) * 0.9);
         /* if we have >= relaxIfFewerThan, strictness is 100%.
          * if we have zero connections, strictness is 0% */
         float const strictness = peerCount >= relaxStrictnessIfFewerThanN ? 1.0 :
