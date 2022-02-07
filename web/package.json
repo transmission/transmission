@@ -4,7 +4,7 @@
   "repository": "https://github.com/transmission/transmission",
   "license": "MIT",
   "scripts": {
-    "dev": "WEBPACK_MODE=development webpack-dev-server -d --config webpack.config.js",
+    "dev": "WEBPACK_MODE=development webpack serve --config webpack.config.js",
     "build": "webpack --config webpack.config.js",
     "css": "sass --no-source-map style/",
     "css:map": "sass style/",
