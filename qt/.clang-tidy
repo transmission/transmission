@@ -19,7 +19,6 @@ Checks: >
   -clang-diagnostic-sign-compare,
   -clang-diagnostic-sign-conversion,
   -clang-diagnostic-switch-enum,
-  -clang-diagnostic-undefined-reinterpret-cast,
   cppcoreguidelines-*,
   -cppcoreguidelines-avoid-magic-numbers,
   -cppcoreguidelines-init-variables,
