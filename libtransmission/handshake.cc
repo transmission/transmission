@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <cerrno>
 #include <cstring>
+#include <string_view>
 
 #include <event2/buffer.h>
 #include <event2/event.h>
@@ -768,8 +769,7 @@ static ReadState readPadA(tr_handshake* handshake, struct evbuffer* inbuf)
         return READ_NOW;
     }
 
-    size_t const len = evbuffer_get_length(inbuf);
-    if (len > SHA_DIGEST_LENGTH)
+    if (size_t const len = evbuffer_get_length(inbuf); len > SHA_DIGEST_LENGTH)
     {
         evbuffer_drain(inbuf, len - SHA_DIGEST_LENGTH);
     }

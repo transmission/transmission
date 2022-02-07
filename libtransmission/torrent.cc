@@ -43,7 +43,6 @@
 #include "magnet-metainfo.h"
 #include "peer-common.h" /* MAX_BLOCK_SIZE */
 #include "peer-mgr.h"
-#include "platform.h" /* TR_PATH_DELIMITER_STR */
 #include "resume.h"
 #include "session.h"
 #include "subprocess.h"
@@ -662,6 +661,8 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
     tor->bandwidth->setPriority(tr_ctorGetBandwidthPriority(ctor));
     tor->error = TR_STAT_OK;
     tor->finishedSeedingByIdle = false;
+
+    tor->labels = tr_ctorGetLabels(ctor);
 
     tr_peerMgrAddTorrent(session->peerMgr, tor);
 

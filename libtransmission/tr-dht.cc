@@ -10,6 +10,7 @@
 #include <cstring> /* memcpy(), memset(), memchr(), strlen() */
 #include <ctime>
 #include <string_view>
+#include <thread>
 
 #ifdef _WIN32
 #include <inttypes.h>
@@ -34,7 +35,6 @@
 #include "log.h"
 #include "net.h"
 #include "peer-mgr.h"
-#include "platform.h"
 #include "session.h"
 #include "torrent.h"
 #include "tr-assert.h"
@@ -364,7 +364,7 @@ int tr_dhtInit(tr_session* ss)
     cl->nodes6 = nodes6;
     cl->len = len;
     cl->len6 = len6;
-    tr_threadNew(dht_bootstrap, cl);
+    std::thread(dht_bootstrap, cl).detach();
 
     dht_timer = evtimer_new(session_->event_base, timer_callback, session_);
     tr_timerAdd(dht_timer, 0, tr_rand_int_weak(1000000));
@@ -609,14 +609,10 @@ static void callback(void* /*ignore*/, int event, unsigned char const* info_hash
     {
         if (tor != nullptr && tor->allowsDht())
         {
-            size_t n = 0;
-            tr_pex* const pex = event == DHT_EVENT_VALUES ? tr_peerMgrCompactToPex(data, data_len, nullptr, 0, &n) :
-                                                            tr_peerMgrCompact6ToPex(data, data_len, nullptr, 0, &n);
-
-            tr_peerMgrAddPex(tor, TR_PEER_FROM_DHT, pex, n);
-
-            tr_free(pex);
-            tr_logAddTorDbg(tor, "Learned %d %s peers from DHT", (int)n, event == DHT_EVENT_VALUES6 ? "IPv6" : "IPv4");
+            auto const pex = event == DHT_EVENT_VALUES ? tr_peerMgrCompactToPex(data, data_len, nullptr, 0) :
+                                                         tr_peerMgrCompact6ToPex(data, data_len, nullptr, 0);
+            tr_peerMgrAddPex(tor, TR_PEER_FROM_DHT, std::data(pex), std::size(pex));
+            tr_logAddTorDbg(tor, "Learned %zu %s peers from DHT", std::size(pex), event == DHT_EVENT_VALUES6 ? "IPv6" : "IPv4");
         }
     }
     else if (event == DHT_EVENT_SEARCH_DONE || event == DHT_EVENT_SEARCH_DONE6)
@@ -815,8 +811,8 @@ int dht_sendto(int sockfd, void const* buf, int len, int flags, struct sockaddr 
 extern "C" int dht_gettimeofday(struct timeval* tv, struct timezone* tz)
 {
     TR_ASSERT(tz == nullptr);
-
-    return tr_gettimeofday(tv);
+    *tv = tr_gettimeofday();
+    return 0;
 }
 
 #endif

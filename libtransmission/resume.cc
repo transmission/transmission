@@ -16,7 +16,6 @@
 #include "log.h"
 #include "magnet-metainfo.h"
 #include "peer-mgr.h" /* pex */
-#include "platform.h" /* tr_getResumeDir() */
 #include "resume.h"
 #include "session.h"
 #include "torrent.h"
@@ -306,17 +305,14 @@ static uint64_t loadRatioLimits(tr_variant* dict, tr_torrent* tor)
 {
     auto ret = uint64_t{};
 
-    tr_variant* d = nullptr;
-    if (tr_variantDictFindDict(dict, TR_KEY_ratio_limit, &d))
+    if (tr_variant* d = nullptr; tr_variantDictFindDict(dict, TR_KEY_ratio_limit, &d))
     {
-        auto dratio = double{};
-        if (tr_variantDictFindReal(d, TR_KEY_ratio_limit, &dratio))
+        if (auto dratio = double{}; tr_variantDictFindReal(d, TR_KEY_ratio_limit, &dratio))
         {
             tr_torrentSetRatioLimit(tor, dratio);
         }
 
-        auto i = int64_t{};
-        if (tr_variantDictFindInt(d, TR_KEY_ratio_mode, &i))
+        if (auto i = int64_t{}; tr_variantDictFindInt(d, TR_KEY_ratio_mode, &i))
         {
             tr_torrentSetRatioMode(tor, tr_ratiolimit(i));
         }
@@ -331,17 +327,14 @@ static uint64_t loadIdleLimits(tr_variant* dict, tr_torrent* tor)
 {
     auto ret = uint64_t{};
 
-    tr_variant* d = nullptr;
-    if (tr_variantDictFindDict(dict, TR_KEY_idle_limit, &d))
+    if (tr_variant* d = nullptr; tr_variantDictFindDict(dict, TR_KEY_idle_limit, &d))
     {
-        auto imin = int64_t{};
-        if (tr_variantDictFindInt(d, TR_KEY_idle_limit, &imin))
+        if (auto imin = int64_t{}; tr_variantDictFindInt(d, TR_KEY_idle_limit, &imin))
         {
             tr_torrentSetIdleLimit(tor, imin);
         }
 
-        auto i = int64_t{};
-        if (tr_variantDictFindInt(d, TR_KEY_idle_mode, &i))
+        if (auto i = int64_t{}; tr_variantDictFindInt(d, TR_KEY_idle_mode, &i))
         {
             tr_torrentSetIdleMode(tor, tr_idlelimit(i));
         }
@@ -679,8 +672,7 @@ void tr_torrentSaveResume(tr_torrent* tor)
     saveName(&top, tor);
     saveLabels(&top, tor);
 
-    auto const err = tr_variantToFile(&top, TR_VARIANT_FMT_BENC, tor->resumeFile());
-    if (err != 0)
+    if (auto const err = tr_variantToFile(&top, TR_VARIANT_FMT_BENC, tor->resumeFile()); err != 0)
     {
         tor->setLocalError(tr_strvJoin("Unable to save resume file: ", tr_strerror(err)));
     }

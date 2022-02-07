@@ -8,6 +8,7 @@
 #include <set>
 #include <string>
 #include <string_view>
+#include <thread>
 
 #ifdef _WIN32
 #include <windows.h>
@@ -24,7 +25,6 @@
 #include "log.h"
 #include "net.h" /* tr_address */
 #include "torrent.h"
-#include "platform.h" /* mutex */
 #include "session.h"
 #include "tr-assert.h"
 #include "tr-macros.h"
@@ -342,8 +342,7 @@ static struct tr_web_task* tr_webRunImpl(
     {
         if (session->web == nullptr)
         {
-            tr_threadNew(tr_webThreadFunc, session);
-
+            std::thread(tr_webThreadFunc, session).detach();
             while (session->web == nullptr)
             {
                 tr_wait_msec(20);

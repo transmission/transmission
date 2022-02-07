@@ -5,15 +5,14 @@
 
 #pragma once
 
-#include <algorithm>
 #include <array>
-#include <cctype>
 #include <cerrno>
-#include <cstddef>
-#include <cstdint>
+#include <cstddef> // size_t
+#include <cstdint> // int64_t
 #include <cstdlib>
 #include <optional>
 #include <string_view>
+#include <utility> // make_pair
 
 #include "error.h"
 
@@ -239,7 +238,8 @@ bool parse(
     tr_error** error = nullptr)
 {
     stack.clear();
-    auto context = Handler::Context(std::data(benc), error);
+    auto const* const stream_begin = std::data(benc);
+    auto context = Handler::Context(stream_begin, error);
 
     int err = 0;
     for (;;)
@@ -261,6 +261,7 @@ bool parse(
             if (auto const value = impl::ParseInt(&benc); !value)
             {
                 tr_error_set(error, err, "Malformed benc? Unable to parse integer");
+                err = EILSEQ;
             }
             else
             {

@@ -3,38 +3,28 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#ifdef HAVE_MEMMEM
-#ifndef _GNU_SOURCE
-#define _GNU_SOURCE /* glibc's string.h needs this to pick up memmem */
-#endif
-#endif
-
 #include <algorithm> // std::sort
 #include <array> // std::array
 #include <cctype> /* isdigit() */
 #include <cerrno>
-#include <cfloat> /* DBL_DIG */
-#include <clocale> /* localeconv() */
-#include <cmath> /* fabs(), floor() */
-#include <cstdint> /* SIZE_MAX */
-#include <cstdlib> /* getenv() */
-#include <cstring> /* strerror(), memset(), memmem() */
-#include <ctime> /* nanosleep() */
-#include <exception>
+#include <cfloat> // DBL_DIG
+#include <chrono>
+#include <clocale> // localeconv()
+#include <cstdint> // SIZE_MAX
+#include <cstdlib> // getenv()
+#include <cstring> /* strerror() */
+#include <ctime> // nanosleep()
 #include <iterator> // std::back_inserter
 #include <set>
-#include <sstream>
 #include <string>
 #include <string_view>
 #include <vector>
 
 #ifdef _WIN32
-#include <ws2tcpip.h> /* WSAStartup() */
-#include <windows.h> /* Sleep(), GetSystemTimeAsFileTime(), GetEnvironmentVariable() */
+#include <windows.h> /* Sleep(), GetEnvironmentVariable() */
+
 #include <shellapi.h> /* CommandLineToArgv() */
-#include <shlwapi.h> /* StrStrIA() */
-#else
-#include <unistd.h> /* getpagesize() */
+#include <ws2tcpip.h> /* WSAStartup() */
 #endif
 
 #ifdef HAVE_ICONV
@@ -46,8 +36,9 @@
 #include <event2/event.h>
 
 #include "transmission.h"
-#include "error.h"
+
 #include "error-types.h"
+#include "error.h"
 #include "file.h"
 #include "log.h"
 #include "mime-types.h"
@@ -113,40 +104,14 @@ struct tm* tr_localtime_r(time_t const* timep, struct tm* result)
 #endif
 }
 
-int tr_gettimeofday(struct timeval* tv)
+struct timeval tr_gettimeofday()
 {
-#ifdef _WIN32
-
-#define DELTA_EPOCH_IN_MICROSECS 11644473600000000ULL
-
-    FILETIME ft;
-    uint64_t tmp = 0;
-
-    if (tv == nullptr)
-    {
-        errno = EINVAL;
-        return -1;
-    }
-
-    GetSystemTimeAsFileTime(&ft);
-    tmp |= ft.dwHighDateTime;
-    tmp <<= 32;
-    tmp |= ft.dwLowDateTime;
-    tmp /= 10; /* to microseconds */
-    tmp -= DELTA_EPOCH_IN_MICROSECS;
-
-    tv->tv_sec = tmp / 1000000UL;
-    tv->tv_usec = tmp % 1000000UL;
-
-    return 0;
-
-#undef DELTA_EPOCH_IN_MICROSECS
-
-#else
-
-    return gettimeofday(tv, nullptr);
-
-#endif
+    auto const d = std::chrono::system_clock::now().time_since_epoch();
+    auto const s = std::chrono::duration_cast<std::chrono::seconds>(d);
+    auto ret = timeval{};
+    ret.tv_sec = s.count();
+    ret.tv_usec = std::chrono::duration_cast<std::chrono::microseconds>(d - s).count();
+    return ret;
 }
 
 /***
@@ -285,7 +250,7 @@ uint8_t* tr_loadFile(char const* path, size_t* size, tr_error** error)
     }
 
     /* Load the torrent file into our buffer */
-    tr_sys_file_t const fd = tr_sys_file_open(path, TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0, &my_error);
+    auto const fd = tr_sys_file_open(path, TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0, &my_error);
     if (fd == TR_BAD_SYS_FILE)
     {
         tr_logAddError(err_fmt, path, my_error->message);
@@ -332,7 +297,7 @@ bool tr_loadFile(std::vector<char>& setme, std::string const& path, tr_error** e
     }
 
     /* Load the torrent file into our buffer */
-    tr_sys_file_t const fd = tr_sys_file_open(path_sz, TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0, &my_error);
+    auto const fd = tr_sys_file_open(path_sz, TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0, &my_error);
     if (fd == TR_BAD_SYS_FILE)
     {
         tr_logAddError(err_fmt, path_sz, my_error->message);
@@ -461,37 +426,6 @@ char* tr_strdup(void const* in)
     return in == nullptr ? nullptr : tr_strvDup(static_cast<char const*>(in));
 }
 
-char const* tr_memmem(char const* haystack, size_t haystacklen, char const* needle, size_t needlelen)
-{
-#ifdef HAVE_MEMMEM
-
-    return static_cast<char const*>(memmem(haystack, haystacklen, needle, needlelen));
-
-#else
-
-    if (needlelen == 0)
-    {
-        return haystack;
-    }
-
-    if (needlelen > haystacklen || haystack == nullptr || needle == nullptr)
-    {
-        return nullptr;
-    }
-
-    for (size_t i = 0; i <= haystacklen - needlelen; ++i)
-    {
-        if (memcmp(haystack + i, needle, needlelen) == 0)
-        {
-            return haystack + i;
-        }
-    }
-
-    return nullptr;
-
-#endif
-}
-
 extern "C"
 {
     int DoMatch(char const* text, char const* p);
@@ -501,23 +435,6 @@ extern "C"
 bool tr_wildmat(char const* text, char const* p)
 {
     return (p[0] == '*' && p[1] == '\0') || (DoMatch(text, p) != 0);
-}
-
-char const* tr_strcasestr(char const* haystack, char const* needle)
-{
-#ifdef HAVE_STRCASESTR
-
-    return strcasestr(haystack, needle);
-
-#elif defined(_WIN32)
-
-    return StrStrIA(haystack, needle);
-
-#else
-
-#error please open a PR to implement tr_strcasestr() for your platform
-
-#endif
 }
 
 char* tr_strdup_printf(char const* fmt, ...)
@@ -613,10 +530,8 @@ bool tr_str_has_suffix(char const* str, char const* suffix)
 
 uint64_t tr_time_msec()
 {
-    struct timeval tv;
-
-    tr_gettimeofday(&tv);
-    return (uint64_t)tv.tv_sec * 1000 + (tv.tv_usec / 1000);
+    auto const tv = tr_gettimeofday();
+    return uint64_t(tv.tv_sec) * 1000 + (tv.tv_usec / 1000);
 }
 
 void tr_wait_msec(long int msec)
@@ -1281,17 +1196,11 @@ uint64_t tr_ntohll(uint64_t x)
 
 struct formatter_unit
 {
-    char* name;
+    std::array<char, 16> name;
     uint64_t value;
 };
 
 using formatter_units = std::array<formatter_unit, 4>;
-/*
-struct formatter_units
-{
-    struct formatter_unit units[4];
-};
-*/
 
 enum
 {
@@ -1310,19 +1219,19 @@ static void formatter_init(
     char const* tb)
 {
     uint64_t value = kilo;
-    units[TR_FMT_KB].name = tr_strdup(kb);
+    tr_strlcpy(std::data(units[TR_FMT_KB].name), kb, std::size(units[TR_FMT_KB].name));
     units[TR_FMT_KB].value = value;
 
     value *= kilo;
-    units[TR_FMT_MB].name = tr_strdup(mb);
+    tr_strlcpy(std::data(units[TR_FMT_MB].name), mb, std::size(units[TR_FMT_MB].name));
     units[TR_FMT_MB].value = value;
 
     value *= kilo;
-    units[TR_FMT_GB].name = tr_strdup(gb);
+    tr_strlcpy(std::data(units[TR_FMT_GB].name), gb, std::size(units[TR_FMT_GB].name));
     units[TR_FMT_GB].value = value;
 
     value *= kilo;
-    units[TR_FMT_TB].name = tr_strdup(tb);
+    tr_strlcpy(std::data(units[TR_FMT_TB].name), tb, std::size(units[TR_FMT_TB].name));
     units[TR_FMT_TB].value = value;
 }
 
@@ -1347,8 +1256,8 @@ static char* formatter_get_size_str(formatter_units const& u, char* buf, uint64_
         unit = &u[3];
     }
 
-    double value = (double)bytes / unit->value;
-    char const* units = unit->name;
+    double value = double(bytes) / unit->value;
+    auto const* const units = std::data(unit->name);
 
     auto precision = int{};
     if (unit->value == 1)
@@ -1397,7 +1306,7 @@ std::string tr_formatter_speed_KBps(double KBps)
 
     if (auto speed = KBps; speed <= 999.95) /* 0.0 KB to 999.9 KB */
     {
-        tr_snprintf(std::data(buf), std::size(buf), "%d %s", (int)speed, speed_units[TR_FMT_KB].name);
+        tr_snprintf(std::data(buf), std::size(buf), "%d %s", int(speed), std::data(speed_units[TR_FMT_KB].name));
     }
     else
     {
@@ -1407,15 +1316,15 @@ std::string tr_formatter_speed_KBps(double KBps)
 
         if (speed <= 99.995) /* 0.98 MB to 99.99 MB */
         {
-            tr_snprintf(std::data(buf), std::size(buf), "%.2f %s", speed, speed_units[TR_FMT_MB].name);
+            tr_snprintf(std::data(buf), std::size(buf), "%.2f %s", speed, std::data(speed_units[TR_FMT_MB].name));
         }
         else if (speed <= 999.95) /* 100.0 MB to 999.9 MB */
         {
-            tr_snprintf(std::data(buf), std::size(buf), "%.1f %s", speed, speed_units[TR_FMT_MB].name);
+            tr_snprintf(std::data(buf), std::size(buf), "%.1f %s", speed, std::data(speed_units[TR_FMT_MB].name));
         }
         else
         {
-            tr_snprintf(std::data(buf), std::size(buf), "%.1f %s", speed / K, speed_units[TR_FMT_GB].name);
+            tr_snprintf(std::data(buf), std::size(buf), "%.1f %s", speed / K, std::data(speed_units[TR_FMT_GB].name));
         }
     }
 
@@ -1448,21 +1357,21 @@ void tr_formatter_get_units(void* vdict)
     tr_variant* l = tr_variantDictAddList(dict, TR_KEY_memory_units, std::size(mem_units));
     for (auto const& unit : mem_units)
     {
-        tr_variantListAddStr(l, unit.name);
+        tr_variantListAddStr(l, std::data(unit.name));
     }
 
     tr_variantDictAddInt(dict, TR_KEY_size_bytes, size_units[TR_FMT_KB].value);
     l = tr_variantDictAddList(dict, TR_KEY_size_units, std::size(size_units));
     for (auto const& unit : size_units)
     {
-        tr_variantListAddStr(l, unit.name);
+        tr_variantListAddStr(l, std::data(unit.name));
     }
 
     tr_variantDictAddInt(dict, TR_KEY_speed_bytes, speed_units[TR_FMT_KB].value);
     l = tr_variantDictAddList(dict, TR_KEY_speed_units, std::size(speed_units));
     for (auto const& unit : speed_units)
     {
-        tr_variantListAddStr(l, unit.name);
+        tr_variantListAddStr(l, std::data(unit.name));
     }
 }
 

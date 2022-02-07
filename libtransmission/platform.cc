@@ -9,13 +9,8 @@
 #include <list>
 #include <string>
 #include <string_view>
-
-#ifndef _XOPEN_SOURCE
-#define _XOPEN_SOURCE 600 /* needed for recursive locks. */
-#endif
-#ifndef __USE_UNIX98
-#define __USE_UNIX98 /* some older Linuxes need it spelt out for them */
-#endif
+#include <thread>
+#include <vector>
 
 #ifdef __HAIKU__
 #include <limits.h> /* PATH_MAX */
@@ -27,16 +22,18 @@
 #include <shlobj.h> /* SHGetKnownFolderPath(), FOLDERID_... */
 #else
 #include <unistd.h> /* getuid() */
+#endif
+
 #ifdef BUILD_MAC_CLIENT
 #include <CoreFoundation/CoreFoundation.h>
 #endif
+
 #ifdef __HAIKU__
 #include <FindDirectory.h>
 #endif
-#include <pthread.h>
-#endif
 
 #include "transmission.h"
+
 #include "file.h"
 #include "log.h"
 #include "platform.h"
@@ -88,106 +85,6 @@ static char* tr_buildPath(char const* first_element, ...)
     /* sanity checks & return */
     TR_ASSERT(pch - buf == (ptrdiff_t)bufLen);
     return buf;
-}
-
-/***
-****  THREADS
-***/
-
-#ifdef _WIN32
-using tr_thread_id = DWORD;
-#else
-using tr_thread_id = pthread_t;
-#endif
-
-static tr_thread_id tr_getCurrentThread()
-{
-#ifdef _WIN32
-    return GetCurrentThreadId();
-#else
-    return pthread_self();
-#endif
-}
-
-unsigned long tr_threadCurrentId()
-{
-    return (unsigned long)tr_getCurrentThread();
-}
-
-static bool tr_areThreadsEqual(tr_thread_id a, tr_thread_id b)
-{
-#ifdef _WIN32
-    return a == b;
-#else
-    return pthread_equal(a, b) != 0;
-#endif
-}
-
-/** @brief portability wrapper around OS-dependent threads */
-struct tr_thread
-{
-    void (*func)(void*);
-    void* arg;
-    tr_thread_id thread;
-
-#ifdef _WIN32
-    HANDLE thread_handle;
-#endif
-};
-
-bool tr_amInThread(tr_thread const* t)
-{
-    return tr_areThreadsEqual(tr_getCurrentThread(), t->thread);
-}
-
-#ifdef _WIN32
-#define ThreadFuncReturnType unsigned WINAPI
-#else
-#define ThreadFuncReturnType void*
-#endif
-
-static ThreadFuncReturnType ThreadFunc(void* _t)
-{
-#ifndef _WIN32
-    pthread_detach(pthread_self());
-#endif
-
-    auto* t = static_cast<tr_thread*>(_t);
-
-    t->func(t->arg);
-
-    tr_free(t);
-
-#ifdef _WIN32
-    _endthreadex(0);
-    return 0;
-#else
-    return nullptr;
-#endif
-}
-
-tr_thread* tr_threadNew(void (*func)(void*), void* arg)
-{
-    auto* t = static_cast<tr_thread*>(tr_new0(tr_thread, 1));
-
-    t->func = func;
-    t->arg = arg;
-
-#ifdef _WIN32
-
-    {
-        unsigned int id;
-        t->thread_handle = (HANDLE)_beginthreadex(nullptr, 0, &ThreadFunc, t, 0, &id);
-        t->thread = (DWORD)id;
-    }
-
-#else
-
-    pthread_create(&t->thread, nullptr, (void* (*)(void*))ThreadFunc, t);
-
-#endif
-
-    return t;
 }
 
 /***
@@ -283,11 +180,6 @@ char const* tr_sessionGetConfigDir(tr_session const* session)
 char const* tr_getTorrentDir(tr_session const* session)
 {
     return session->torrent_dir.c_str();
-}
-
-char const* tr_getResumeDir(tr_session const* session)
-{
-    return session->resume_dir.c_str();
 }
 
 char const* tr_getDefaultConfigDir(char const* appname)

@@ -454,7 +454,6 @@ static int getOptMode(int val)
     case 993: /* no-trash-torrent */
         return MODE_SESSION_SET;
 
-    case 'L': /* labels */
     case 712: /* tracker-remove */
     case 950: /* seedratio */
     case 951: /* seedratio-default */
@@ -468,6 +467,7 @@ static int getOptMode(int val)
 
     case 'g': /* get */
     case 'G': /* no-get */
+    case 'L': /* labels */
     case 700: /* torrent priority-high */
     case 701: /* torrent priority-normal */
     case 702: /* torrent priority-low */
@@ -2354,7 +2354,7 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
 
                     if (!std::empty(tmp))
                     {
-                        tr_variantDictAddStrView(args, TR_KEY_metainfo, tmp);
+                        tr_variantDictAddStr(args, TR_KEY_metainfo, tmp);
                     }
                     else
                     {
@@ -2691,10 +2691,6 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
 
             switch (c)
             {
-            case 'L':
-                addLabels(args, optarg ? optarg : "");
-                break;
-
             case 712:
                 {
                     tr_variant* list;
@@ -2753,6 +2749,10 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
 
             case 'G':
                 addFiles(args, TR_KEY_files_unwanted, optarg);
+                break;
+
+            case 'L':
+                addLabels(args, optarg ? optarg : "");
                 break;
 
             case 900:

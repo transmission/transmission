@@ -376,9 +376,7 @@ bool MessageLogWindow::Impl::onRefresh()
 
     if (!isPaused_)
     {
-        auto* msgs = tr_logGetQueue();
-
-        if (msgs != nullptr)
+        if (auto* msgs = tr_logGetQueue(); msgs != nullptr)
         {
             /* add the new messages and append them to the end of
              * our persistent list */
