@@ -1480,7 +1480,7 @@ void MainWindow::updateNetworkIcon()
     {
         tip = tr("%1 is responding").arg(url);
     }
-    else if (seconds_since_last_read < 60 * 2)
+    else if (seconds_since_last_read < 120)
     {
         tip = tr("%1 last responded %2 ago").arg(url).arg(Formatter::get().timeToString(seconds_since_last_read));
     }

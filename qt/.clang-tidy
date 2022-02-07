@@ -5,7 +5,6 @@ Checks: >
   bugprone-*,
   -bugprone-branch-clone,
   -bugprone-easily-swappable-parameters,
-  -bugprone-implicit-widening-of-multiplication-result,
   -bugprone-narrowing-conversions,
   cert-*,
   clang-analyzer-optin*,
