@@ -7,7 +7,6 @@ Checks: >
   -bugprone-implicit-widening-of-multiplication-result,
   -bugprone-incorrect-roundings,
   -bugprone-narrowing-conversions,
-  -bugprone-not-null-terminated-result,
   -bugprone-signed-char-misuse,
   -bugprone-sizeof-expression,
   -bugprone-suspicious-include,
