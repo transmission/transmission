@@ -17,7 +17,6 @@ Checks: >
   -clang-diagnostic-shorten-64-to-32,
   -clang-diagnostic-sign-compare,
   -clang-diagnostic-sign-conversion,
-  -clang-diagnostic-switch-enum,
   cppcoreguidelines-*,
   -cppcoreguidelines-avoid-magic-numbers,
   -cppcoreguidelines-init-variables,
