@@ -71,7 +71,7 @@ static std::string announce_url_new(tr_session const* session, tr_announce_reque
         "&compact=1"
         "&supportcrypto=1",
         TR_PRIsv_ARG(announce_sv),
-        announce_sv.find('?') == announce_sv.npos ? '?' : '&',
+        announce_sv.find('?') == std::string_view::npos ? '?' : '&',
         std::data(escaped_info_hash),
         TR_PRIsv_ARG(req->peer_id),
         req->port,
@@ -154,13 +154,13 @@ static void verboseLog(std::string_view description, tr_direction direction, std
     out << description << std::endl << "[raw]"sv << direction_sv;
     for (unsigned char ch : message)
     {
-        if (isprint(ch))
+        if (isprint(ch) != 0)
         {
             out << ch;
         }
         else
         {
-            out << "\\x"sv << std::hex << std::setw(2) << std::setfill('0') << unsigned(ch) << std::dec << std::setw(1)
+            out << R"(\x)" << std::hex << std::setw(2) << std::setfill('0') << unsigned(ch) << std::dec << std::setw(1)
                 << std::setfill(' ');
         }
     }

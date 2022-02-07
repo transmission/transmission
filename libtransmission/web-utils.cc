@@ -414,7 +414,7 @@ std::string tr_urlPercentDecode(std::string_view in)
         }
 
         in.remove_prefix(pos);
-        if (std::size(in) >= 3 && in[0] == '%' && std::isxdigit(in[1]) && std::isxdigit(in[2]))
+        if (std::size(in) >= 3 && in[0] == '%' && (std::isxdigit(in[1]) != 0) && (std::isxdigit(in[2]) != 0))
         {
             auto hexstr = std::array<char, 3>{ in[1], in[2], '\0' };
             auto const hex = strtoul(std::data(hexstr), nullptr, 16);

@@ -86,7 +86,7 @@ bool tr_ctorSetMetainfoFromFile(tr_ctor* ctor, std::string const& filename, tr_e
 
 bool tr_ctorSetMetainfoFromFile(tr_ctor* ctor, char const* filename, tr_error** error)
 {
-    return tr_ctorSetMetainfoFromFile(ctor, std::string{ filename ? filename : "" }, error);
+    return tr_ctorSetMetainfoFromFile(ctor, std::string{ filename != nullptr ? filename : "" }, error);
 }
 
 bool tr_ctorSetMetainfo(tr_ctor* ctor, char const* metainfo, size_t len, tr_error** error)
@@ -100,7 +100,7 @@ bool tr_ctorSetMetainfo(tr_ctor* ctor, char const* metainfo, size_t len, tr_erro
 bool tr_ctorSetMetainfoFromMagnetLink(tr_ctor* ctor, char const* magnet_link, tr_error** error)
 {
     ctor->torrent_filename.clear();
-    return ctor->metainfo.parseMagnet(magnet_link ? magnet_link : "", error);
+    return ctor->metainfo.parseMagnet(magnet_link != nullptr ? magnet_link : "", error);
 }
 
 std::string_view tr_ctorGetContents(tr_ctor const* ctor)
@@ -218,12 +218,12 @@ void tr_ctorSetDownloadDir(tr_ctor* ctor, tr_ctorMode mode, char const* director
     TR_ASSERT(ctor != nullptr);
     TR_ASSERT(mode == TR_FALLBACK || mode == TR_FORCE);
 
-    ctor->optional_args[mode].download_dir.assign(directory ? directory : "");
+    ctor->optional_args[mode].download_dir.assign(directory != nullptr ? directory : "");
 }
 
 void tr_ctorSetIncompleteDir(tr_ctor* ctor, char const* directory)
 {
-    ctor->incomplete_dir.assign(directory ? directory : "");
+    ctor->incomplete_dir.assign(directory != nullptr ? directory : "");
 }
 
 bool tr_ctorGetPeerLimit(tr_ctor const* ctor, tr_ctorMode mode, uint16_t* setme)

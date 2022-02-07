@@ -571,7 +571,7 @@ static void jsonStringFunc(tr_variant const* val, void* vdata)
             break;
 
         default:
-            if (isprint((unsigned char)sv.front()))
+            if (isprint((unsigned char)sv.front()) != 0)
             {
                 *outwalk++ = sv.front();
             }
