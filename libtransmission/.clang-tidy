@@ -23,7 +23,6 @@ Checks: >
   cppcoreguidelines-slicing,
   cppcoreguidelines-virtual-class-destructor,
   misc-*,
-  -misc-misplaced-const,
   -misc-no-recursion,
   -misc-non-private-member-variables-in-classes,
   modernize-*,
