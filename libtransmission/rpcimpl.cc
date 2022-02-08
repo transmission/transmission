@@ -10,6 +10,7 @@
 #include <iterator>
 #include <numeric>
 #include <string_view>
+#include <utility>
 #include <vector>
 
 #include <libdeflate.h>
@@ -933,8 +934,9 @@ static char const* torrentGet(tr_session* session, tr_variant* args_in, tr_varia
 ****
 ***/
 
-static char const* makeLabels(tr_labels_t* labels, tr_variant* list)
+static std::pair<tr_labels_t, char const* /*errmsg*/> makeLabels(tr_variant* list)
 {
+    auto labels = tr_labels_t{};
     size_t const n = tr_variantListSize(list);
     for (size_t i = 0; i < n; ++i)
     {
@@ -947,31 +949,30 @@ static char const* makeLabels(tr_labels_t* labels, tr_variant* list)
         label = tr_strvStrip(label);
         if (std::empty(label))
         {
-            return "labels cannot be empty";
+            return { {}, "labels cannot be empty" };
         }
 
         if (tr_strvContains(label, ','))
         {
-            return "labels cannot contain comma (,) character";
+            return { {}, "labels cannot contain comma (,) character" };
         }
 
-        labels->emplace(label);
+        labels.emplace(label);
     }
 
-    return nullptr;
+    return { labels, nullptr };
 }
 
 static char const* setLabels(tr_torrent* tor, tr_variant* list)
 {
-    auto labels = tr_labels_t{};
+    auto [labels, errmsg] = makeLabels(list);
 
-    if (auto const* errmsg = makeLabels(&labels, list); errmsg != nullptr)
+    if (errmsg != nullptr)
     {
         return errmsg;
     }
 
     tr_torrentSetLabels(tor, std::move(labels));
-
     return nullptr;
 }
 
@@ -1660,9 +1661,11 @@ static char const* torrentAdd(tr_session* session, tr_variant* args_in, tr_varia
 
     if (tr_variantDictFindList(args_in, TR_KEY_labels, &l))
     {
-        auto labels = tr_labels_t{};
-        if (auto const* errmsg = makeLabels(&labels, l); errmsg != nullptr)
+        auto [labels, errmsg] = makeLabels(l);
+
+        if (errmsg != nullptr)
         {
+            tr_ctorFree(ctor);
             return errmsg;
         }
 
