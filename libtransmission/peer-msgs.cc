@@ -139,12 +139,12 @@ auto constexpr MaxPexPeerCount = size_t{ 50 };
 
 } // unnamed namespace
 
-enum
+enum class AwaitingBt
 {
-    AwaitingBtLength,
-    AwaitingBtId,
-    AwaitingBtMessage,
-    AwaitingBtPiece
+    Length,
+    Id,
+    Message,
+    Piece
 };
 
 enum encryption_preference_t
@@ -365,7 +365,7 @@ public:
 
     [[nodiscard]] bool is_reading_block(tr_block_index_t block) const override
     {
-        return state == AwaitingBtPiece && block == torrent->blockOf(incoming.blockReq.index, incoming.blockReq.offset);
+        return state == AwaitingBt::Piece && block == torrent->blockOf(incoming.blockReq.index, incoming.blockReq.offset);
     }
 
     void cancel_block_request(tr_block_index_t block) override
@@ -599,7 +599,7 @@ public:
      * very quickly; others aren't as urgent. */
     int8_t outMessagesBatchPeriod;
 
-    uint8_t state = AwaitingBtLength;
+    AwaitingBt state = AwaitingBt::Length;
     uint8_t ut_pex_id = 0;
     uint8_t ut_metadata_id = 0;
     uint16_t pexCount = 0;
@@ -1412,7 +1412,7 @@ static ReadState readBtLength(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, siz
     else
     {
         msgs->incoming.length = len;
-        msgs->state = AwaitingBtId;
+        msgs->state = AwaitingBt::Id;
     }
 
     return READ_NOW;
@@ -1434,13 +1434,13 @@ static ReadState readBtId(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, size_t 
 
     if (id == BtPeerMsgs::Piece)
     {
-        msgs->state = AwaitingBtPiece;
+        msgs->state = AwaitingBt::Piece;
         return READ_NOW;
     }
 
     if (msgs->incoming.length != 1)
     {
-        msgs->state = AwaitingBtMessage;
+        msgs->state = AwaitingBt::Message;
         return READ_NOW;
     }
 
@@ -1624,7 +1624,7 @@ static ReadState readBtPiece(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, size
 
     /* cleanup */
     req->length = 0;
-    msgs->state = AwaitingBtLength;
+    msgs->state = AwaitingBt::Length;
     return err != 0 ? READ_ERR : READ_NOW;
 }
 
@@ -1878,7 +1878,7 @@ static ReadState readBtMessage(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, si
     TR_ASSERT(msglen + 1 == msgs->incoming.length);
     TR_ASSERT(evbuffer_get_length(inbuf) == startBufLen - msglen);
 
-    msgs->state = AwaitingBtLength;
+    msgs->state = AwaitingBt::Length;
     return READ_NOW;
 }
 
@@ -1959,7 +1959,7 @@ static ReadState canRead(tr_peerIo* io, void* vmsgs, size_t* piece)
     {
         ret = READ_LATER;
     }
-    else if (msgs->state == AwaitingBtPiece)
+    else if (msgs->state == AwaitingBt::Piece)
     {
         ret = readBtPiece(msgs, in, inlen, piece);
     }
@@ -1967,15 +1967,15 @@ static ReadState canRead(tr_peerIo* io, void* vmsgs, size_t* piece)
     {
         switch (msgs->state)
         {
-        case AwaitingBtLength:
+        case AwaitingBt::Length:
             ret = readBtLength(msgs, in, inlen);
             break;
 
-        case AwaitingBtId:
+        case AwaitingBt::Id:
             ret = readBtId(msgs, in, inlen);
             break;
 
-        case AwaitingBtMessage:
+        case AwaitingBt::Message:
             ret = readBtMessage(msgs, in, inlen);
             break;
 
