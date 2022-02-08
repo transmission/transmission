@@ -332,14 +332,14 @@ void FileTreeModel::addFile(
 
         while (filename_it.hasNext())
         {
-            QString const& token = filename_it.next();
-            std::pair<int, int> const changed = item->update(token, wanted, priority, have, update_fields);
+            auto const& token = filename_it.next();
+            auto const& [first_col, last_col] = item->update(token, wanted, priority, have, update_fields);
 
-            if (changed.first >= 0)
+            if (first_col >= 0)
             {
-                emit dataChanged(indexOf(item, changed.first), indexOf(item, changed.second));
+                emit dataChanged(indexOf(item, first_col), indexOf(item, last_col));
 
-                if (!index_with_changed_parents.isValid() && changed.first <= COL_PRIORITY && changed.second >= COL_SIZE)
+                if (!index_with_changed_parents.isValid() && first_col <= COL_PRIORITY && last_col >= COL_SIZE)
                 {
                     index_with_changed_parents = indexOf(item, 0);
                 }
@@ -398,11 +398,11 @@ void FileTreeModel::addFile(
 
             index_cache_[file_index] = item;
 
-            std::pair<int, int> const changed = item->update(item->name(), wanted, priority, have, added || update_fields);
+            auto const [first_col, last_col] = item->update(item->name(), wanted, priority, have, added || update_fields);
 
-            if (changed.first >= 0)
+            if (first_col >= 0)
             {
-                emit dataChanged(indexOf(item, changed.first), indexOf(item, changed.second));
+                emit dataChanged(indexOf(item, first_col), indexOf(item, last_col));
             }
         }
     }

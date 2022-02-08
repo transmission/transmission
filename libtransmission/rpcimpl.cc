@@ -1316,8 +1316,7 @@ static char const* torrentRenamePath(
     auto newname = std::string_view{};
     (void)tr_variantDictFindStrView(args_in, TR_KEY_name, &newname);
 
-    auto const torrents = getTorrents(session, args_in);
-    if (std::size(torrents) == 1)
+    if (auto const torrents = getTorrents(session, args_in); std::size(torrents) == 1)
     {
         torrents[0]->renamePath(oldpath, newname, torrentRenamePathDone, idle_data);
     }
@@ -2265,8 +2264,7 @@ static void addSessionField(tr_session* s, tr_variant* d, tr_quark key)
 
 static char const* sessionGet(tr_session* s, tr_variant* args_in, tr_variant* args_out, tr_rpc_idle_data* /*idle_data*/)
 {
-    tr_variant* fields = nullptr;
-    if (tr_variantDictFindList(args_in, TR_KEY_fields, &fields))
+    if (tr_variant* fields = nullptr; tr_variantDictFindList(args_in, TR_KEY_fields, &fields))
     {
         size_t const field_count = tr_variantListSize(fields);
 
@@ -2427,8 +2425,7 @@ void tr_rpc_request_exec_json(
         tr_variantDictAddDict(&response, TR_KEY_arguments, 0);
         tr_variantDictAddStr(&response, TR_KEY_result, result);
 
-        auto tag = int64_t{};
-        if (tr_variantDictFindInt(mutable_request, TR_KEY_tag, &tag))
+        if (auto tag = int64_t{}; tr_variantDictFindInt(mutable_request, TR_KEY_tag, &tag))
         {
             tr_variantDictAddInt(&response, TR_KEY_tag, tag);
         }
@@ -2451,8 +2448,7 @@ void tr_rpc_request_exec_json(
 
         tr_variantDictAddStr(&response, TR_KEY_result, result);
 
-        auto tag = int64_t{};
-        if (tr_variantDictFindInt(mutable_request, TR_KEY_tag, &tag))
+        if (auto tag = int64_t{}; tr_variantDictFindInt(mutable_request, TR_KEY_tag, &tag))
         {
             tr_variantDictAddInt(&response, TR_KEY_tag, tag);
         }
@@ -2468,8 +2464,7 @@ void tr_rpc_request_exec_json(
         data->response = tr_new0(tr_variant, 1);
         tr_variantInitDict(data->response, 3);
 
-        auto tag = int64_t{};
-        if (tr_variantDictFindInt(mutable_request, TR_KEY_tag, &tag))
+        if (auto tag = int64_t{}; tr_variantDictFindInt(mutable_request, TR_KEY_tag, &tag))
         {
             tr_variantDictAddInt(data->response, TR_KEY_tag, tag);
         }

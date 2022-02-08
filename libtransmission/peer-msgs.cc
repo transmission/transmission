@@ -2127,11 +2127,10 @@ static size_t fillOutputBuffer(tr_peerMsgsImpl* msgs, time_t now)
         auto ok = bool{ false };
 
         auto dataLen = size_t{};
-        auto* data = static_cast<char*>(tr_torrentGetMetadataPiece(msgs->torrent, piece, &dataLen));
 
-        if (data != nullptr)
+        if (auto* data = static_cast<char*>(tr_torrentGetMetadataPiece(msgs->torrent, piece, &dataLen)); data != nullptr)
         {
-            evbuffer* const out = msgs->outMessages;
+            auto* const out = msgs->outMessages;
 
             /* build the data message */
             auto tmp = tr_variant{};

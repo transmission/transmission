@@ -237,8 +237,7 @@ static void handle_web_client(struct evhttp_request* req, tr_rpc_server* server)
     {
         // TODO: string_view
         char* const subpath = tr_strdup(req->uri + std::size(server->url) + 4);
-        char* pch = strchr(subpath, '?');
-        if (pch != nullptr)
+        if (char* pch = strchr(subpath, '?'); pch != nullptr)
         {
             *pch = '\0';
         }
