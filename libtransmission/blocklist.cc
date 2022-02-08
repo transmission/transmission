@@ -337,9 +337,14 @@ static int compareAddressRangesByFirstAddress(void const* va, void const* vb)
     auto const* a = static_cast<struct tr_ipv4_range const*>(va);
     auto const* b = static_cast<struct tr_ipv4_range const*>(vb);
 
-    if (a->begin != b->begin)
+    if (a->begin < b->begin)
     {
-        return a->begin < b->begin ? -1 : 1;
+        return -1;
+    }
+
+    if (a->begin > b->begin)
+    {
+        return 1;
     }
 
     return 0;

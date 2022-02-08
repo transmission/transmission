@@ -269,8 +269,7 @@ static std::string getXdgEntryFromUserDirs(std::string_view key)
 
     // if val contains "$HOME", replace that with getHomeDir()
     auto constexpr Home = "$HOME"sv;
-    auto const it = std::search(std::begin(val), std::end(val), std::begin(Home), std::end(Home));
-    if (it != std::end(val))
+    if (auto const it = std::search(std::begin(val), std::end(val), std::begin(Home), std::end(Home)); it != std::end(val))
     {
         val.replace(it, it + std::size(Home), std::string_view{ getHomeDir() });
     }
@@ -284,8 +283,7 @@ char const* tr_getDefaultDownloadDir()
 
     if (user_dir == nullptr)
     {
-        auto const xdg_user_dir = getXdgEntryFromUserDirs("XDG_DOWNLOAD_DIR"sv);
-        if (!std::empty(xdg_user_dir))
+        if (auto const xdg_user_dir = getXdgEntryFromUserDirs("XDG_DOWNLOAD_DIR"sv); !std::empty(xdg_user_dir))
         {
             user_dir = tr_strvDup(xdg_user_dir);
         }
