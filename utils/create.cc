@@ -243,23 +243,23 @@ int tr_main(int argc, char* argv[])
 
     switch (b->result)
     {
-    case TR_MAKEMETA_OK:
+    case TrMakemetaResult::OK:
         printf("done!");
         break;
 
-    case TR_MAKEMETA_URL:
+    case TrMakemetaResult::ERR_URL:
         printf("bad announce URL: \"%s\"", b->errfile);
         break;
 
-    case TR_MAKEMETA_IO_READ:
+    case TrMakemetaResult::ERR_IO_READ:
         printf("error reading \"%s\": %s", b->errfile, tr_strerror(b->my_errno));
         break;
 
-    case TR_MAKEMETA_IO_WRITE:
+    case TrMakemetaResult::ERR_IO_WRITE:
         printf("error writing \"%s\": %s", b->errfile, tr_strerror(b->my_errno));
         break;
 
-    case TR_MAKEMETA_CANCELLED:
+    case TrMakemetaResult::CANCELLED:
         printf("cancelled");
         break;
     }

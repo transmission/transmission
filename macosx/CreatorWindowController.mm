@@ -587,7 +587,7 @@ NSMutableSet* creatorWindowControllerSet = nil;
         NSAlert* alert;
         switch (fInfo->result)
         {
-        case TR_MAKEMETA_OK:
+        case TrMakemetaResult::OK:
             if (fOpenWhenCreated)
             {
                 NSDictionary* dict = @{ @"File" : fLocation.path, @"Path" : fPath.URLByDeletingLastPathComponent.path };
@@ -597,7 +597,7 @@ NSMutableSet* creatorWindowControllerSet = nil;
             [self.window close];
             break;
 
-        case TR_MAKEMETA_CANCELLED:
+        case TrMakemetaResult::CANCELLED:
             [self.window close];
             break;
 
@@ -608,14 +608,14 @@ NSMutableSet* creatorWindowControllerSet = nil;
                                                            fLocation.lastPathComponent];
             alert.alertStyle = NSAlertStyleWarning;
 
-            if (fInfo->result == TR_MAKEMETA_IO_READ)
+            if (fInfo->result == TrMakemetaResult::ERR_IO_READ)
             {
                 alert.informativeText = [NSString
                     stringWithFormat:NSLocalizedString(@"Could not read \"%s\": %s.", "Create torrent -> failed -> warning"),
                                      fInfo->errfile,
                                      strerror(fInfo->my_errno)];
             }
-            else if (fInfo->result == TR_MAKEMETA_IO_WRITE)
+            else if (fInfo->result == TrMakemetaResult::ERR_IO_WRITE)
             {
                 alert.informativeText = [NSString
                     stringWithFormat:NSLocalizedString(@"Could not write \"%s\": %s.", "Create torrent -> failed -> warning"),
