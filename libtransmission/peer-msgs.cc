@@ -147,11 +147,11 @@ enum class AwaitingBt
     Piece
 };
 
-enum encryption_preference_t
+enum class EncryptionPreference
 {
-    ENCRYPTION_PREFERENCE_UNKNOWN,
-    ENCRYPTION_PREFERENCE_YES,
-    ENCRYPTION_PREFERENCE_NO
+    Unknown,
+    Yes,
+    No
 };
 
 /**
@@ -607,7 +607,7 @@ public:
 
     tr_port dht_port = 0;
 
-    encryption_preference_t encryption_preference = ENCRYPTION_PREFERENCE_UNKNOWN;
+    EncryptionPreference encryption_preference = EncryptionPreference::Unknown;
 
     size_t metadata_size_hint = 0;
 #if 0
@@ -1154,9 +1154,9 @@ static void parseLtepHandshake(tr_peerMsgsImpl* msgs, uint32_t len, struct evbuf
     auto pex = tr_pex{};
     if (tr_variantDictFindInt(&val, TR_KEY_e, &i))
     {
-        msgs->encryption_preference = i != 0 ? ENCRYPTION_PREFERENCE_YES : ENCRYPTION_PREFERENCE_NO;
+        msgs->encryption_preference = i != 0 ? EncryptionPreference::Yes : EncryptionPreference::No;
 
-        if (i != 0)
+        if (msgs->encryption_preference == EncryptionPreference::Yes)
         {
             pex.flags |= ADDED_F_ENCRYPTION_FLAG;
         }
