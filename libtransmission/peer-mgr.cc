@@ -2402,12 +2402,11 @@ static void closePeer(tr_peer* peer)
 {
     TR_ASSERT(peer != nullptr);
     auto* const s = peer->swarm;
-    peer_atom* const atom = peer->atom;
 
     /* if we transferred piece data, then they might be good peers,
        so reset their `numFails' weight to zero. otherwise we connected
        to them fruitlessly, so mark it as another fail */
-    if (atom->piece_data_time != 0)
+    if (auto* const atom = peer->atom; atom->piece_data_time != 0)
     {
         tordbg(s, "resetting atom %s numFails to 0", tr_atomAddrStr(atom));
         atom->numFails = 0;

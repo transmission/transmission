@@ -450,8 +450,7 @@ static void jsonChildFunc(struct jsonWalk* data)
         case TR_VARIANT_TYPE_LIST:
             {
                 ++pstate.childIndex;
-                bool const is_last = pstate.childIndex == pstate.childCount;
-                if (!is_last)
+                if (bool const is_last = pstate.childIndex == pstate.childCount; !is_last)
                 {
                     evbuffer_add(data->out, ",", 1);
                     jsonIndent(data);

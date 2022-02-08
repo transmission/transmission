@@ -354,8 +354,7 @@ bool tr_variantGetBool(tr_variant const* v, bool* setme)
         return true;
     }
 
-    auto sv = std::string_view{};
-    if (tr_variantGetStrView(v, &sv))
+    if (auto sv = std::string_view{}; tr_variantGetStrView(v, &sv))
     {
         if (sv == "true"sv)
         {
@@ -731,9 +730,8 @@ tr_variant* tr_variantDictSteal(tr_variant* dict, tr_quark const key, tr_variant
 bool tr_variantDictRemove(tr_variant* dict, tr_quark const key)
 {
     bool removed = false;
-    int const i = dictIndexOf(dict, key);
 
-    if (i >= 0)
+    if (int const i = dictIndexOf(dict, key); i >= 0)
     {
         int const last = (int)dict->val.l.count - 1;
 

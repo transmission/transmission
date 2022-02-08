@@ -107,8 +107,7 @@ static void bootstrap_from_name(char const* name, tr_port port, int af)
     tr_snprintf(pp, sizeof(pp), "%d", (int)port);
 
     addrinfo* info = nullptr;
-    int const rc = getaddrinfo(name, pp, &hints, &info);
-    if (rc != 0)
+    if (int const rc = getaddrinfo(name, pp, &hints, &info); rc != 0)
     {
         tr_logAddNamedError("DHT", "%s:%s: %s", name, pp, gai_strerror(rc));
         return;

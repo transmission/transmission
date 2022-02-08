@@ -95,10 +95,9 @@ auto const IdleDataKey = Glib::Quark("idle-data");
 bool spun_cb_idle(Gtk::SpinButton* spin, tr_quark const key, Glib::RefPtr<Session> const& core, bool isDouble)
 {
     bool keep_waiting = true;
-    auto* last_change = static_cast<Glib::Timer*>(spin->get_data(IdleDataKey));
 
     /* has the user stopped making changes? */
-    if (last_change->elapsed() > 0.33)
+    if (auto* last_change = static_cast<Glib::Timer*>(spin->get_data(IdleDataKey)); last_change->elapsed() > 0.33)
     {
         /* update the core */
         if (isDouble)

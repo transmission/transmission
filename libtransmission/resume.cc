@@ -573,9 +573,7 @@ static uint64_t loadProgress(tr_variant* dict, tr_torrent* tor)
 
         auto blocks = tr_bitfield{ tor->blockCount() };
         char const* err = nullptr;
-        auto sv = std::string_view{};
-        tr_variant const* const b = tr_variantDictFind(prog, TR_KEY_blocks);
-        if (b != nullptr)
+        if (tr_variant const* const b = tr_variantDictFind(prog, TR_KEY_blocks); b != nullptr)
         {
             uint8_t const* buf = nullptr;
             auto buflen = size_t{};
@@ -589,7 +587,7 @@ static uint64_t loadProgress(tr_variant* dict, tr_torrent* tor)
                 rawToBitfield(blocks, buf, buflen);
             }
         }
-        else if (tr_variantDictFindStrView(prog, TR_KEY_have, &sv))
+        else if (auto sv = std::string_view{}; tr_variantDictFindStrView(prog, TR_KEY_have, &sv))
         {
             if (sv == "all"sv)
             {
