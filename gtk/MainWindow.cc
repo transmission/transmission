@@ -641,10 +641,10 @@ void MainWindow::Impl::updateSpeeds()
             downCount += row.get_value(torrent_cols.active_peers_down);
         }
 
-        dl_lb_->set_text(gtr_sprintf("%s %s", tr_formatter_speed_KBps(downSpeed), gtr_get_unicode_string(GTR_UNICODE_DOWN)));
+        dl_lb_->set_text(gtr_sprintf("%s %s", tr_formatter_speed_KBps(downSpeed), gtr_get_unicode_string(GtrUnicode::Down)));
         dl_lb_->set_visible(downCount > 0);
 
-        ul_lb_->set_text(gtr_sprintf("%s %s", tr_formatter_speed_KBps(upSpeed), gtr_get_unicode_string(GTR_UNICODE_UP)));
+        ul_lb_->set_text(gtr_sprintf("%s %s", tr_formatter_speed_KBps(upSpeed), gtr_get_unicode_string(GtrUnicode::Up)));
         ul_lb_->set_visible(downCount > 0 || upCount > 0);
     }
 }

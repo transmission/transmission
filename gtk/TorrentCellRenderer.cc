@@ -151,15 +151,15 @@ Glib::ustring getShortTransferString(
         return gtr_sprintf(
             _("%1$s %2$s  %3$s %4$s"),
             tr_formatter_speed_KBps(downloadSpeed_KBps),
-            gtr_get_unicode_string(GTR_UNICODE_DOWN),
+            gtr_get_unicode_string(GtrUnicode::Down),
             tr_formatter_speed_KBps(uploadSpeed_KBps),
-            gtr_get_unicode_string(GTR_UNICODE_UP));
+            gtr_get_unicode_string(GtrUnicode::Up));
     }
 
     if (bool const haveUp = haveMeta && st->peersGettingFromUs > 0; haveUp)
     {
         /* up speed, up symbol */
-        return gtr_sprintf(_("%1$s  %2$s"), tr_formatter_speed_KBps(uploadSpeed_KBps), gtr_get_unicode_string(GTR_UNICODE_UP));
+        return gtr_sprintf(_("%1$s  %2$s"), tr_formatter_speed_KBps(uploadSpeed_KBps), gtr_get_unicode_string(GtrUnicode::Up));
     }
 
     if (st->isStalled)
