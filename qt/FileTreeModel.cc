@@ -170,7 +170,7 @@ Qt::ItemFlags FileTreeModel::flags(QModelIndex const& index) const
         i |= Qt::ItemIsUserCheckable | Qt::ItemIsAutoTristate;
     }
 
-    return Qt::ItemFlags(i);
+    return { i };
 }
 
 bool FileTreeModel::setData(QModelIndex const& index, QVariant const& newname, int role)
@@ -221,30 +221,17 @@ QVariant FileTreeModel::headerData(int column, Qt::Orientation orientation, int 
 
 QModelIndex FileTreeModel::index(int row, int column, QModelIndex const& parent) const
 {
-    QModelIndex i;
-
     if (hasIndex(row, column, parent))
     {
-        FileTreeItem* parent_item;
+        auto* const parent_item = parent.isValid() ? itemFromIndex(parent) : root_item_.get();
 
-        if (!parent.isValid())
+        if (auto* const child_item = parent_item->child(row); child_item != nullptr)
         {
-            parent_item = root_item_.get();
-        }
-        else
-        {
-            parent_item = itemFromIndex(parent);
-        }
-
-        FileTreeItem* child_item = parent_item->child(row);
-
-        if (child_item != nullptr)
-        {
-            i = createIndex(row, column, child_item);
+            return createIndex(row, column, child_item);
         }
     }
 
-    return i;
+    return {};
 }
 
 QModelIndex FileTreeModel::parent(QModelIndex const& child) const
@@ -282,7 +269,7 @@ QModelIndex FileTreeModel::indexOf(FileTreeItem* item, int column) const
 {
     if (item == nullptr || item == root_item_.get())
     {
-        return QModelIndex();
+        return {};
     }
 
     return createIndex(item->row(), column, item);
@@ -336,9 +323,7 @@ void FileTreeModel::addFile(
     uint64_t have,
     bool update_fields)
 {
-    FileTreeItem* item;
-
-    item = findItemForFileIndex(file_index);
+    auto* item = findItemForFileIndex(file_index);
 
     if (item != nullptr) // this file is already in the tree, we've added this
     {

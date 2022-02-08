@@ -118,9 +118,9 @@ Application::Application(int& argc, char** argv)
 #endif
 
     // parse the command-line arguments
-    int c;
+    int c = 0;
     bool minimized = false;
-    char const* optarg;
+    char const* optarg = nullptr;
     QString host;
     QString port;
     QString username;

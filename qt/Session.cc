@@ -119,8 +119,7 @@ void Session::copyMagnetLinkToClipboard(int torrent_id)
     q->add(
         [](RpcResponse const& r)
         {
-            tr_variant* torrents;
-
+            tr_variant* torrents = nullptr;
             if (!tr_variantDictFindList(r.args.get(), TR_KEY_torrents, &torrents))
             {
                 return;
@@ -354,10 +353,8 @@ void Session::start()
 
         rpc_.start(session_);
 
-        tr_ctor* ctor = tr_ctorNew(session_);
-        int torrent_count;
-        tr_torrent** torrents = tr_sessionLoadTorrents(session_, ctor, &torrent_count);
-        tr_free(torrents);
+        auto* const ctor = tr_ctorNew(session_);
+        tr_free(tr_sessionLoadTorrents(session_, ctor, nullptr));
         tr_ctorFree(ctor);
     }
 
@@ -667,7 +664,7 @@ void Session::refreshTorrents(torrent_ids_t const& ids, TorrentProperties props)
     q->add(
         [this, all_torrents](RpcResponse const& r)
         {
-            tr_variant* torrents;
+            tr_variant* torrents = nullptr;
 
             if (tr_variantDictFindList(r.args.get(), TR_KEY_torrents, &torrents))
             {
@@ -846,18 +843,16 @@ void Session::updateStats(tr_variant* d, tr_session_stats* stats)
     stats->ratio = static_cast<float>(tr_getRatio(stats->uploadedBytes, stats->downloadedBytes));
 }
 
-void Session::updateStats(tr_variant* d)
+void Session::updateStats(tr_variant* dict)
 {
-    tr_variant* c;
-
-    if (tr_variantDictFindDict(d, TR_KEY_current_stats, &c))
+    if (tr_variant* var = nullptr; tr_variantDictFindDict(dict, TR_KEY_current_stats, &var))
     {
-        updateStats(c, &stats_);
+        updateStats(var, &stats_);
     }
 
-    if (tr_variantDictFindDict(d, TR_KEY_cumulative_stats, &c))
+    if (tr_variant* var = nullptr; tr_variantDictFindDict(dict, TR_KEY_cumulative_stats, &var))
     {
-        updateStats(c, &cumulative_stats_);
+        updateStats(var, &cumulative_stats_);
     }
 
     emit statsUpdated();
@@ -1042,10 +1037,9 @@ void Session::addTorrent(AddData const& add_me, tr_variant* args, bool trash_ori
     q->add(
         [this, add_me](RpcResponse const& r)
         {
-            tr_variant* dup;
             bool session_has_torrent = false;
 
-            if (tr_variantDictFindDict(r.args.get(), TR_KEY_torrent_added, &dup))
+            if (tr_variant* dup = nullptr; tr_variantDictFindDict(r.args.get(), TR_KEY_torrent_added, &dup))
             {
                 session_has_torrent = true;
             }

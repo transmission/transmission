@@ -106,7 +106,7 @@ QSize FilterBarComboBoxDelegate::sizeHint(QStyleOptionViewItem const& option, QM
     if (isSeparator(index))
     {
         int const pm = combo_->style()->pixelMetric(QStyle::PM_DefaultFrameWidth, nullptr, combo_);
-        return QSize(pm, pm + 10);
+        return { pm, pm + 10 };
     }
 
     QStyle* s = combo_->style();

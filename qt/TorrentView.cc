@@ -32,7 +32,7 @@ public:
 
         QRect const label_rect = style()->subElementRect(QStyle::SE_HeaderLabel, &option, this);
 
-        return QSize(100, fontMetrics().height() + (option.rect.height() - label_rect.height()));
+        return { 100, fontMetrics().height() + (option.rect.height() - label_rect.height()) };
     }
 
 protected:
@@ -53,7 +53,7 @@ protected:
 
     void mouseDoubleClickEvent(QMouseEvent* /*event*/) override
     {
-        emit static_cast<TorrentView*>(parent())->headerDoubleClicked();
+        emit dynamic_cast<TorrentView*>(parent())->headerDoubleClicked();
     }
 
 private:

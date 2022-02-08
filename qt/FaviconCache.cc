@@ -113,7 +113,7 @@ QString FaviconCache::getDisplayName(QString const& sitename)
 
 QSize FaviconCache::getIconSize()
 {
-    return QSize(16, 16);
+    return { 16, 16 };
 }
 
 QPixmap FaviconCache::find(QString const& sitename)
