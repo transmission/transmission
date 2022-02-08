@@ -56,8 +56,7 @@ bool tr_announce_list::remove(tr_tracker_id_t id)
 
 bool tr_announce_list::replace(tr_tracker_id_t id, std::string_view announce_url_sv)
 {
-    auto const announce = tr_urlParseTracker(announce_url_sv);
-    if (!announce || !canAdd(*announce))
+    if (auto const announce = tr_urlParseTracker(announce_url_sv); !announce || !canAdd(*announce))
     {
         return false;
     }

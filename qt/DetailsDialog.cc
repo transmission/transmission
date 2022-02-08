@@ -82,10 +82,9 @@ int measureViewItem(QTreeWidget const* view, int column, QString const& text)
 
 QString collateAddress(QString const& address)
 {
-    QString collated;
+    auto collated = QString{};
 
-    QHostAddress ip_address;
-    if (ip_address.setAddress(address))
+    if (auto ip_address = QHostAddress{}; ip_address.setAddress(address))
     {
         if (ip_address.protocol() == QAbstractSocket::IPv4Protocol)
         {

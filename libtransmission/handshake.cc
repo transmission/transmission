@@ -257,8 +257,7 @@ static handshake_parse_err_t parseHandshake(tr_handshake* handshake, struct evbu
     /* peer id */
     dbgmsg(handshake, "peer-id is [%" TR_PRIsv "]", TR_PRIsv_ARG(peer_id));
 
-    auto* const tor = handshake->session->getTorrent(hash);
-    if (peer_id == tr_torrentGetPeerId(tor))
+    if (auto* const tor = handshake->session->getTorrent(hash); peer_id == tr_torrentGetPeerId(tor))
     {
         dbgmsg(handshake, "streuth!  we've connected to ourselves.");
         return HANDSHAKE_PEER_IS_SELF;
@@ -855,9 +854,8 @@ static ReadState readCryptoProvide(tr_handshake* handshake, struct evbuffer* inb
 static ReadState readPadC(tr_handshake* handshake, struct evbuffer* inbuf)
 {
     uint16_t ia_len = 0;
-    size_t const needlen = handshake->pad_c_len + sizeof(uint16_t);
 
-    if (evbuffer_get_length(inbuf) < needlen)
+    if (auto const needlen = handshake->pad_c_len + sizeof(uint16_t); evbuffer_get_length(inbuf) < needlen)
     {
         return READ_LATER;
     }

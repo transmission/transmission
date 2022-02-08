@@ -59,8 +59,7 @@ std::optional<int64_t> ParseInt(std::string_view* benc)
 
     // find the ending delimiter
     walk.remove_prefix(std::size(Prefix));
-    auto const pos = walk.find(Suffix);
-    if (pos == std::string_view::npos)
+    if (auto const pos = walk.find(Suffix); pos == std::string_view::npos)
     {
         return {};
     }
