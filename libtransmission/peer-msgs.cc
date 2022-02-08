@@ -73,10 +73,13 @@ auto constexpr Ltep = uint8_t{ 20 };
 
 } // namespace BtPeerMsgs
 
-enum LtepMessages
+namespace LtepMessages
 {
-    LTEP_HANDSHAKE = 0,
-};
+
+// http://bittorrent.org/beps/bep_0010.html
+auto constexpr Handshake = uint8_t{ 0 };
+
+} // namespace LtepMessages
 
 // http://bittorrent.org/beps/bep_0010.html
 // Client-defined extension message IDs that we tell peers about
@@ -85,20 +88,24 @@ enum LtepMessages
 enum LtepMessageIds
 {
     // we support peer exchange (bep 11)
+    // https://www.bittorrent.org/beps/bep_0011.html
     UT_PEX_ID = 1,
 
     // we support sending metadata files (bep 9)
+    // https://www.bittorrent.org/beps/bep_0009.html
     // see also MetadataMsgType below
     UT_METADATA_ID = 3,
 };
 
 // http://bittorrent.org/beps/bep_0009.html
-enum MetadataMsgType
+namespace MetadataMsgType
 {
-    METADATA_MSG_TYPE_REQUEST = 0,
-    METADATA_MSG_TYPE_DATA = 1,
-    METADATA_MSG_TYPE_REJECT = 2
-};
+
+auto constexpr Request = int{ 0 };
+auto constexpr Data = int{ 1 };
+auto constexpr Reject = int{ 2 };
+
+} // namespace MetadataMsgType
 
 // seconds between sendPex() calls
 static auto constexpr PexIntervalSecs = int{ 90 };
@@ -1108,7 +1115,7 @@ static void sendLtepHandshake(tr_peerMsgsImpl* msgs)
 
     evbuffer_add_uint32(out, 2 * sizeof(uint8_t) + evbuffer_get_length(payload));
     evbuffer_add_uint8(out, BtPeerMsgs::Ltep);
-    evbuffer_add_uint8(out, LTEP_HANDSHAKE);
+    evbuffer_add_uint8(out, LtepMessages::Handshake);
     evbuffer_add_buffer(out, payload);
     pokeBatchPeriod(msgs, ImmediatePriorityIntervalSecs);
     dbgOutMessageLen(msgs);
@@ -1251,19 +1258,19 @@ static void parseUtMetadata(tr_peerMsgsImpl* msgs, uint32_t msglen, struct evbuf
 
     dbgmsg(msgs, "got ut_metadata msg: type %d, piece %d, total_size %d", int(msg_type), int(piece), int(total_size));
 
-    if (msg_type == METADATA_MSG_TYPE_REJECT)
+    if (msg_type == MetadataMsgType::Reject)
     {
         /* NOOP */
     }
 
-    if (msg_type == METADATA_MSG_TYPE_DATA && !msgs->torrent->hasMetadata() && msg_end - benc_end <= METADATA_PIECE_SIZE &&
+    if (msg_type == MetadataMsgType::Data && !msgs->torrent->hasMetadata() && msg_end - benc_end <= METADATA_PIECE_SIZE &&
         piece * METADATA_PIECE_SIZE + (msg_end - benc_end) <= total_size)
     {
         int const pieceLen = msg_end - benc_end;
         tr_torrentSetMetadataPiece(msgs->torrent, piece, benc_end, pieceLen);
     }
 
-    if (msg_type == METADATA_MSG_TYPE_REQUEST)
+    if (msg_type == MetadataMsgType::Request)
     {
         if (piece >= 0 && msgs->torrent->hasMetadata() && msgs->torrent->isPublic() &&
             msgs->peerAskedForMetadataCount < MetadataReqQ)
@@ -1277,7 +1284,7 @@ static void parseUtMetadata(tr_peerMsgsImpl* msgs, uint32_t msglen, struct evbuf
             /* build the rejection message */
             auto v = tr_variant{};
             tr_variantInitDict(&v, 2);
-            tr_variantDictAddInt(&v, TR_KEY_msg_type, METADATA_MSG_TYPE_REJECT);
+            tr_variantDictAddInt(&v, TR_KEY_msg_type, MetadataMsgType::Reject);
             tr_variantDictAddInt(&v, TR_KEY_piece, piece);
             evbuffer* const payload = tr_variantToBuf(&v, TR_VARIANT_FMT_BENC);
 
@@ -1359,7 +1366,7 @@ static void parseLtep(tr_peerMsgsImpl* msgs, uint32_t msglen, struct evbuffer* i
     tr_peerIoReadUint8(msgs->io, inbuf, &ltep_msgid);
     msglen--;
 
-    if (ltep_msgid == LTEP_HANDSHAKE)
+    if (ltep_msgid == LtepMessages::Handshake)
     {
         dbgmsg(msgs, "got ltep handshake");
         parseLtepHandshake(msgs, msglen, inbuf);
@@ -2039,7 +2046,7 @@ static void updateMetadataRequests(tr_peerMsgsImpl* msgs, time_t now)
         /* build the data message */
         auto tmp = tr_variant{};
         tr_variantInitDict(&tmp, 3);
-        tr_variantDictAddInt(&tmp, TR_KEY_msg_type, METADATA_MSG_TYPE_REQUEST);
+        tr_variantDictAddInt(&tmp, TR_KEY_msg_type, MetadataMsgType::Request);
         tr_variantDictAddInt(&tmp, TR_KEY_piece, piece);
         auto* const payload = tr_variantToBuf(&tmp, TR_VARIANT_FMT_BENC);
 
@@ -2138,7 +2145,7 @@ static size_t fillOutputBuffer(tr_peerMsgsImpl* msgs, time_t now)
             /* build the data message */
             auto tmp = tr_variant{};
             tr_variantInitDict(&tmp, 3);
-            tr_variantDictAddInt(&tmp, TR_KEY_msg_type, METADATA_MSG_TYPE_DATA);
+            tr_variantDictAddInt(&tmp, TR_KEY_msg_type, MetadataMsgType::Data);
             tr_variantDictAddInt(&tmp, TR_KEY_piece, piece);
             tr_variantDictAddInt(&tmp, TR_KEY_total_size, msgs->torrent->infoDictSize());
             evbuffer* const payload = tr_variantToBuf(&tmp, TR_VARIANT_FMT_BENC);
@@ -2166,7 +2173,7 @@ static size_t fillOutputBuffer(tr_peerMsgsImpl* msgs, time_t now)
             /* build the rejection message */
             auto tmp = tr_variant{};
             tr_variantInitDict(&tmp, 2);
-            tr_variantDictAddInt(&tmp, TR_KEY_msg_type, METADATA_MSG_TYPE_REJECT);
+            tr_variantDictAddInt(&tmp, TR_KEY_msg_type, MetadataMsgType::Reject);
             tr_variantDictAddInt(&tmp, TR_KEY_piece, piece);
             evbuffer* const payload = tr_variantToBuf(&tmp, TR_VARIANT_FMT_BENC);
 
