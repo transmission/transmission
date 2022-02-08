@@ -44,11 +44,11 @@ bool change(TorrentHash& setme, tr_variant const* value)
 
 bool change(Peer& setme, tr_variant const* value)
 {
-    bool changed = false;
+    auto changed = bool{ false };
 
-    size_t pos = 0;
-    tr_quark key;
-    tr_variant* child;
+    auto pos = size_t{ 0 };
+    auto key = tr_quark{};
+    tr_variant* child = nullptr;
     while (tr_variantDictChild(const_cast<tr_variant*>(value), pos++, &key, &child))
     {
         switch (key)
@@ -84,11 +84,11 @@ bool change(Peer& setme, tr_variant const* value)
 
 bool change(TorrentFile& setme, tr_variant const* value)
 {
-    bool changed = false;
+    auto changed = bool{ false };
 
-    size_t pos = 0;
-    tr_quark key;
-    tr_variant* child;
+    auto pos = size_t{ 0 };
+    auto key = tr_quark{};
+    tr_variant* child = nullptr;
     while (tr_variantDictChild(const_cast<tr_variant*>(value), pos++, &key, &child))
     {
         switch (key)
@@ -121,11 +121,11 @@ bool change(TorrentFile& setme, tr_variant const* value)
 
 bool change(TrackerStat& setme, tr_variant const* value)
 {
-    bool changed = false;
+    auto changed = bool{ false };
 
-    size_t pos = 0;
-    tr_quark key;
-    tr_variant* child;
+    auto pos = size_t{ 0 };
+    auto key = tr_quark{};
+    tr_variant* child = nullptr;
     while (tr_variantDictChild(const_cast<tr_variant*>(value), pos++, &key, &child))
     {
         bool field_changed = false;

@@ -156,7 +156,7 @@ std::array<Prefs::PrefItem, Prefs::PREFS_COUNT> const Prefs::Items{
 namespace
 {
 
-auto const FilterModes = std::array<std::pair<int, std::string_view>, FilterMode::NUM_MODES>{ {
+auto constexpr FilterModes = std::array<std::pair<int, std::string_view>, FilterMode::NUM_MODES>{ {
     { FilterMode::SHOW_ALL, "show-all" },
     { FilterMode::SHOW_ACTIVE, "show-active" },
     { FilterMode::SHOW_DOWNLOADING, "show-downloading" },
@@ -167,7 +167,7 @@ auto const FilterModes = std::array<std::pair<int, std::string_view>, FilterMode
     { FilterMode::SHOW_ERROR, "show-error" },
 } };
 
-auto const SortModes = std::array<std::pair<int, std::string_view>, SortMode::NUM_MODES>{ {
+auto constexpr SortModes = std::array<std::pair<int, std::string_view>, SortMode::NUM_MODES>{ {
     { SortMode::SORT_BY_NAME, "sort-by-name" },
     { SortMode::SORT_BY_ACTIVITY, "sort-by-activity" },
     { SortMode::SORT_BY_AGE, "sort-by-age" },

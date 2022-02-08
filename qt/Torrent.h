@@ -7,6 +7,7 @@
 
 #include <bitset>
 #include <ctime> // time_t
+#include <optional>
 #include <vector>
 
 #include <QIcon>
@@ -219,7 +220,7 @@ public:
         return is_private_;
     }
 
-    bool getSeedRatio(double& setmeRatio) const;
+    std::optional<double> getSeedRatioLimit() const;
 
     uint64_t haveVerified() const
     {

@@ -166,7 +166,7 @@ FaviconCache::Key FaviconCache::getKey(QString const& displayName)
 
 QSize FaviconCache::getIconSize()
 {
-    return QSize(16, 16);
+    return { 16, 16 };
 }
 
 QPixmap FaviconCache::find(Key const& key)

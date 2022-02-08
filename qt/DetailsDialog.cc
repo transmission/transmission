@@ -899,15 +899,11 @@ void DetailsDialog::refreshUI()
 
     if (canEdit() && !torrents.empty())
     {
-        int i;
-        bool uniform;
-        bool baseline_flag;
-        int baseline_int;
         Torrent const& baseline = *torrents.front();
 
         // mySessionLimitCheck
-        uniform = true;
-        baseline_flag = baseline.honorsSessionLimits();
+        bool uniform = true;
+        bool baseline_flag = baseline.honorsSessionLimits();
 
         for (Torrent const* const tor : torrents)
         {
@@ -952,7 +948,7 @@ void DetailsDialog::refreshUI()
 
         // myBandwidthPriorityCombo
         uniform = true;
-        baseline_int = baseline.getBandwidthPriority();
+        int baseline_int = baseline.getBandwidthPriority();
 
         for (Torrent const* const tor : torrents)
         {
@@ -963,14 +959,7 @@ void DetailsDialog::refreshUI()
             }
         }
 
-        if (uniform)
-        {
-            i = ui_.bandwidthPriorityCombo->findData(baseline_int);
-        }
-        else
-        {
-            i = -1;
-        }
+        int i = uniform ? ui_.bandwidthPriorityCombo->findData(baseline_int) : -1;
 
         setIfIdle(ui_.bandwidthPriorityCombo, i);
 
@@ -1042,7 +1031,7 @@ void DetailsDialog::refreshUI()
         for (Peer const& peer : peers)
         {
             QString const key = id_str + QLatin1Char(':') + peer.address;
-            auto* item = static_cast<PeerItem*>(peers_.value(key, nullptr));
+            auto* item = dynamic_cast<PeerItem*>(peers_.value(key, nullptr));
 
             if (item == nullptr) // new peer has connected
             {
@@ -1494,26 +1483,27 @@ void DetailsDialog::initFilesTab() const
     connect(ui_.filesView, &FileTreeView::wantedChanged, this, &DetailsDialog::onFileWantedChanged);
 }
 
-void DetailsDialog::onFilePriorityChanged(QSet<int> const& indices, int priority)
+static constexpr tr_quark priorityKey(int priority)
 {
-    tr_quark key;
-
     switch (priority)
     {
     case TR_PRI_LOW:
-        key = TR_KEY_priority_low;
+        return TR_KEY_priority_low;
         break;
 
     case TR_PRI_HIGH:
-        key = TR_KEY_priority_high;
+        return TR_KEY_priority_high;
         break;
 
     default:
-        key = TR_KEY_priority_normal;
+        return TR_KEY_priority_normal;
         break;
     }
+}
 
-    torrentSet(key, indices.values());
+void DetailsDialog::onFilePriorityChanged(QSet<int> const& indices, int priority)
+{
+    torrentSet(priorityKey(priority), indices.values());
 }
 
 void DetailsDialog::onFileWantedChanged(QSet<int> const& indices, bool wanted)
