@@ -20,7 +20,7 @@ const TorrentRendererHelper = {
   },
   formatLabels: (t) => {
     if (t.getLabels().length > 0) {
-      return `🏷: ${t.getLabels().join(', ')}`;
+      return `🏷 ${t.getLabels().join(', ')}`;
     }
     return '';
   },
