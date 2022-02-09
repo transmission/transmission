@@ -32,7 +32,7 @@
 .Op Fl h
 .Op Fl m | M
 .Op Fl p Ar port
-.Op Fl t Ar tos
+.Op Fl -dscp Ar dscp
 .Op Fl u Ar number | Fl U
 .Op Fl v
 .Op Fl w Ar directory
@@ -74,17 +74,39 @@ Enable portmapping via NAT-PMP or UPnP
 Disable portmapping
 .It Fl p -port Ar port
 Set the port to listen for incoming peers. (Default: 51413)
-.It Fl t -tos Ar tos
-Set the peer socket TOS for local router-based traffic shaping.
-Valid values are
+.It Fl -dscp Ar dscp
+.nf
+Set the peer socket DSCP for local router-based traffic shaping. (Default: le)
+Valid values are:
+.fi
 .Pp
-.Dq default ,
-.Dq lowcost ,
-.Dq throughput ,
-.Dq reliability ,
-.Dq lowdelay ,
+.Dq af11 ,
+.Dq af12 ,
+.Dq af13 ,
+.Dq af21 ,
+.Dq af22 ,
+.Dq af23 ,
+.Dq af31 ,
+.Dq af32 ,
+.Dq af33 ,
+.Dq af41 ,
+.Dq af42 ,
+.Dq af43 ,
+.Dq cs0 ,
+.Dq cs1 ,
+.Dq cs2 ,
+.Dq cs3 ,
+.Dq cs4 ,
+.Dq cs5 ,
+.Dq cs6 ,
+.Dq cs7 ,
+.Dq ef ,
+.Dq le
 .Pp
-a decimal value 0-255 or a hexidecimal value 0x00-0xff)
+a decimal value 0-255 or a hexadecimal value 0x00-0xff
+.Pp
+.Dq none
+(Use operating system default)
 .It Fl u -uplimit Ar number
 Set the maximum upload speed in KB/s
 .It Fl U -no-uplimit

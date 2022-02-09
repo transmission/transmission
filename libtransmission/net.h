@@ -9,15 +9,22 @@
 #endif
 
 #include <cstddef> // size_t
+#include <climits>
+#include <map>
 #include <string_view>
+
+#include "utils.h"
 
 #ifdef _WIN32
 #include <inttypes.h>
 #include <ws2tcpip.h>
 #else
 #include <errno.h>
+#include <sys/types.h>
 #include <sys/socket.h>
+#include <netinet/tcp.h>
 #include <netinet/in.h>
+#include <netinet/ip.h>
 #endif
 
 #ifdef _WIN32
@@ -104,13 +111,70 @@ constexpr bool tr_address_is_valid(tr_address const* a)
  * Sockets
  **********************************************************************/
 
-/* https://en.wikipedia.org/wiki/Differentiated_services#Class_Selector */
-enum
-{
-    TR_IPTOS_LOWCOST = 0x38, /* AF13: low prio, high drop */
-    TR_IPTOS_LOWDELAY = 0x70, /* AF32: high prio, mid drop */
-    TR_IPTOS_THRUPUT = 0x20, /* CS1: low prio, undef drop */
-    TR_IPTOS_RELIABLE = 0x28 /* AF11: low prio, low drop */
+/*
+ * Definitions for DiffServ Codepoints as per RFCs 2474, 3246, 4594 & 8622.
+ * Not all are guaranteed to be defined in <netinet/ip.h> so we keep a copy of the DSCP values.
+ */
+#ifndef IPTOS_DSCP_AF11
+#define IPTOS_DSCP_AF11  0x28
+#define IPTOS_DSCP_AF12  0x30
+#define IPTOS_DSCP_AF13  0x38
+#define IPTOS_DSCP_AF21  0x48
+#define IPTOS_DSCP_AF22  0x50
+#define IPTOS_DSCP_AF23  0x58
+#define IPTOS_DSCP_AF31  0x68
+#define IPTOS_DSCP_AF32  0x70
+#define IPTOS_DSCP_AF33  0x78
+#define IPTOS_DSCP_AF41  0x88
+#define IPTOS_DSCP_AF42  0x90
+#define IPTOS_DSCP_AF43  0x98
+#define IPTOS_DSCP_EF  0xb8
+#endif
+
+#ifndef IPTOS_DSCP_CS0
+#define IPTOS_DSCP_CS0  0x00
+#define IPTOS_DSCP_CS1  0x20
+#define IPTOS_DSCP_CS2  0x40
+#define IPTOS_DSCP_CS3  0x60
+#define IPTOS_DSCP_CS4  0x80
+#define IPTOS_DSCP_CS5  0xa0
+#define IPTOS_DSCP_CS6  0xc0
+#define IPTOS_DSCP_CS7  0xe0
+#endif
+
+#ifndef IPTOS_DSCP_EF
+#define IPTOS_DSCP_EF  0xb8
+#endif
+
+#ifndef IPTOS_DSCP_LE
+#define IPTOS_DSCP_LE  0x04
+#endif
+
+const std::map<const std::string, int> DSCPvalues {
+    { "none", INT_MAX },    // CS0 has value 0 but we want 'none' to mean OS default
+    { "",     INT_MAX },    // an alias to 'none'
+    { "af11", IPTOS_DSCP_AF11 },
+    { "af12", IPTOS_DSCP_AF12 },
+    { "af13", IPTOS_DSCP_AF13 },
+    { "af21", IPTOS_DSCP_AF21 },
+    { "af22", IPTOS_DSCP_AF22 },
+    { "af23", IPTOS_DSCP_AF23 },
+    { "af31", IPTOS_DSCP_AF31 },
+    { "af32", IPTOS_DSCP_AF32 },
+    { "af33", IPTOS_DSCP_AF33 },
+    { "af41", IPTOS_DSCP_AF41 },
+    { "af42", IPTOS_DSCP_AF42 },
+    { "af43", IPTOS_DSCP_AF43 },
+    { "cs0",  IPTOS_DSCP_CS0 },
+    { "cs1",  IPTOS_DSCP_CS1 },
+    { "cs2",  IPTOS_DSCP_CS2 },
+    { "cs3",  IPTOS_DSCP_CS3 },
+    { "cs4",  IPTOS_DSCP_CS4 },
+    { "cs5",  IPTOS_DSCP_CS5 },
+    { "cs6",  IPTOS_DSCP_CS6 },
+    { "cs7",  IPTOS_DSCP_CS7 },
+    { "ef",   IPTOS_DSCP_EF },
+    { "le",   IPTOS_DSCP_LE }
 };
 
 struct tr_session;
@@ -119,7 +183,7 @@ tr_socket_t tr_netBindTCP(tr_address const* addr, tr_port port, bool suppressMsg
 
 tr_socket_t tr_netAccept(tr_session* session, tr_socket_t bound, tr_address* setme_addr, tr_port* setme_port);
 
-void tr_netSetTOS(tr_socket_t s, int tos, tr_address_type type);
+void tr_netSetDSCP(tr_socket_t s, int dscp, tr_address_type type);
 
 void tr_netSetCongestionControl(tr_socket_t s, char const* algorithm);
 

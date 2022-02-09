@@ -105,23 +105,23 @@ void tr_udpSetSocketBuffers(tr_session* session)
     }
 }
 
-void tr_udpSetSocketTOS(tr_session* session)
+void tr_udpSetSocketDSCP(tr_session* session)
 {
-    auto const tos = session->peerSocketTos();
+    auto const dscp = session->peerSocketDSCP();
 
-    if (tos != 0)
+    if (dscp != DSCPvalues.at("none"))
     {
         return;
     }
 
     if (session->udp_socket != TR_BAD_SOCKET)
     {
-        tr_netSetTOS(session->udp_socket, tos, TR_AF_INET);
+        tr_netSetDSCP(session->udp_socket, dscp, TR_AF_INET);
     }
 
     if (session->udp6_socket != TR_BAD_SOCKET)
     {
-        tr_netSetTOS(session->udp6_socket, tos, TR_AF_INET6);
+        tr_netSetDSCP(session->udp6_socket, dscp, TR_AF_INET6);
     }
 }
 
@@ -348,7 +348,7 @@ void tr_udpInit(tr_session* ss)
 
     tr_udpSetSocketBuffers(ss);
 
-    tr_udpSetSocketTOS(ss);
+    tr_udpSetSocketDSCP(ss);
 
     if (ss->isDHTEnabled)
     {

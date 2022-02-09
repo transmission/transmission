@@ -149,35 +149,35 @@ int tr_address_compare(tr_address const* a, tr_address const* b)
  * TCP sockets
  **********************************************************************/
 
-void tr_netSetTOS([[maybe_unused]] tr_socket_t s, [[maybe_unused]] int tos, tr_address_type type)
+void tr_netSetDSCP([[maybe_unused]] tr_socket_t s, [[maybe_unused]] int dscp, tr_address_type type)
 {
     if (type == TR_AF_INET)
     {
-#if defined(IP_TOS) && !defined(_WIN32)
+#if !defined(_WIN32)
 
-        if (setsockopt(s, IPPROTO_IP, IP_TOS, (void const*)&tos, sizeof(tos)) == -1)
+        if (setsockopt(s, IPPROTO_IP, IP_TOS, (void const*)&dscp, sizeof(dscp)) == -1)
         {
             char err_buf[512];
             tr_net_strerror(err_buf, sizeof(err_buf), sockerrno);
-            tr_logAddNamedInfo("Net", "Can't set TOS '%d': %s", tos, err_buf);
+            tr_logAddNamedInfo("Net", "Can't set DSCP '%d': %s", dscp, err_buf);
         }
 #endif
     }
     else if (type == TR_AF_INET6)
     {
-#if defined(IPV6_TCLASS) && !defined(_WIN32)
-        if (setsockopt(s, IPPROTO_IPV6, IPV6_TCLASS, (void const*)&tos, sizeof(tos)) == -1)
+#if !defined(_WIN32)
+        if (setsockopt(s, IPPROTO_IPV6, IPV6_TCLASS, (void const*)&dscp, sizeof(dscp)) == -1)
         {
             char err_buf[512];
             tr_net_strerror(err_buf, sizeof(err_buf), sockerrno);
-            tr_logAddNamedInfo("Net", "Can't set IPv6 QoS '%d': %s", tos, err_buf);
+            tr_logAddNamedInfo("Net", "Can't set IPv6 QoS '%d': %s", dscp, err_buf);
         }
 #endif
     }
     else
     {
         /* program should never reach here! */
-        tr_logAddNamedInfo("Net", "Something goes wrong while setting TOS/Traffic-Class");
+        tr_logAddNamedInfo("Net", "Something goes wrong while setting DSCP/Traffic-Class");
     }
 }
 
