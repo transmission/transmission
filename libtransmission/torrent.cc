@@ -1372,6 +1372,7 @@ void tr_torrentStartNow(tr_torrent* tor)
 static void onVerifyDoneThreadFunc(void* vtor)
 {
     auto* const tor = static_cast<tr_torrent*>(vtor);
+    TR_ASSERT(tr_amInEventThread(tor->session));
 
     if (tor->isDeleting)
     {
@@ -1400,6 +1401,7 @@ static void onVerifyDone(tr_torrent* tor, bool aborted, void* /*unused*/)
 static void verifyTorrent(void* vtor)
 {
     auto* tor = static_cast<tr_torrent*>(vtor);
+    TR_ASSERT(tr_amInEventThread(tor->session));
     auto const lock = tor->unique_lock();
 
     if (tor->isDeleting)
@@ -1417,14 +1419,13 @@ static void verifyTorrent(void* vtor)
         tr_torrentStop(tor);
     }
 
-    tor->startAfterVerify = startAfter;
-
     if (setLocalErrorIfFilesDisappeared(tor))
     {
         tor->startAfterVerify = false;
     }
     else
     {
+        tor->startAfterVerify = startAfter;
         tr_verifyAdd(tor, onVerifyDone, nullptr);
     }
 }
@@ -1449,6 +1450,7 @@ static void stopTorrent(void* vtor)
 {
     auto* tor = static_cast<tr_torrent*>(vtor);
     TR_ASSERT(tr_isTorrent(tor));
+    TR_ASSERT(tr_amInEventThread(tor->session));
     auto const lock = tor->unique_lock();
 
     tr_logAddTorInfo(tor, "%s", "Pausing");
@@ -1480,25 +1482,25 @@ static void stopTorrent(void* vtor)
 
 void tr_torrentStop(tr_torrent* tor)
 {
-    TR_ASSERT(tr_isTorrent(tor));
-
-    if (tr_isTorrent(tor))
+    if (!tr_isTorrent(tor))
     {
-        auto const lock = tor->unique_lock();
-
-        tor->isRunning = false;
-        tor->isStopping = false;
-        tor->prefetchMagnetMetadata = false;
-        tor->setDirty();
-        tr_runInEventThread(tor->session, stopTorrent, tor);
+        return;
     }
+
+    auto const lock = tor->unique_lock();
+
+    tor->isRunning = false;
+    tor->isStopping = false;
+    tor->prefetchMagnetMetadata = false;
+    tor->setDirty();
+    tr_runInEventThread(tor->session, stopTorrent, tor);
 }
 
 static void closeTorrent(void* vtor)
 {
-    auto* tor = static_cast<tr_torrent*>(vtor);
-
+    auto* const tor = static_cast<tr_torrent*>(vtor);
     TR_ASSERT(tr_isTorrent(tor));
+    TR_ASSERT(tr_amInEventThread(tor->session));
 
     tor->session->removed_torrents.emplace_back(tor->uniqueId, tr_time());
 

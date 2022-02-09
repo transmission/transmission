@@ -436,7 +436,7 @@ protected:
         EXPECT_NE(nullptr, tor->session);
         EXPECT_FALSE(tr_amInEventThread(tor->session));
         tr_torrentVerify(tor);
-        EXPECT_TRUE(waitFor([tor]() { return tor->verifyState != TR_VERIFY_NONE; }, 2000));
+        tr_wait_msec(100);
         EXPECT_TRUE(waitFor([tor]() { return tor->verifyState == TR_VERIFY_NONE; }, 4000));
     }
 
