@@ -12,9 +12,9 @@ replace_if_differs() {
 
 echo "creating libtransmission/version.h"
 
-user_agent_prefix=$(grep m4_define configure.ac | sed "s/[][)(]/,/g" | grep user_agent_prefix | cut -d , -f 6)
+user_agent_prefix=$(grep 'set[(]TR_USER_AGENT_PREFIX' CMakeLists.txt | cut -d \" -f 2)
 
-peer_id_prefix=$(grep m4_define configure.ac | sed "s/[][)(]/,/g" | grep peer_id_prefix | cut -d , -f 6)
+peer_id_prefix=$(grep 'set[(]TR_PEER_ID_PREFIX' CMakeLists.txt | cut -d \" -f 2)
 
 major_version=$(echo "${user_agent_prefix}" | awk -F . '{print $1}')
 minor_version=$(echo "${user_agent_prefix}" | awk -F . '{print $2 + 0}')
@@ -26,7 +26,7 @@ if [ -n "$JENKINS_URL" ] && [ -n "$GIT_COMMIT" ]; then
   vcs_revision=$GIT_COMMIT
 elif [ -n "$TEAMCITY_PROJECT_NAME" ] && [ -n "$BUILD_VCS_NUMBER" ]; then
   vcs_revision=$BUILD_VCS_NUMBER
-elif [ -d ".git" ] && type git > /dev/null 2>&1; then
+elif [ -e ".git" ] && type git > /dev/null 2>&1; then
   vcs_revision=$(git rev-list --max-count=1 HEAD)
 elif [ -f "$vcs_revision_file" ]; then
   vcs_revision=$(cat "$vcs_revision_file")

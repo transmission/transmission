@@ -10,12 +10,13 @@ $global:QtDeps = @(
 
 function global:Build-Qt([string] $PrefixDir, [string] $Arch, [string] $DepsPrefixDir) {
     $Filename = "qt-everywhere-src-${QtVersion}.zip" # tar.xz has some names truncated (e.g. .../double-conversion.h -> .../double-conv)
-    $Url = "http://download.qt.io/archive/qt/$($QtVersion -replace '\.\d+$', '')/${QtVersion}/single/${Filename}"
+    $Url = "http://qt.mirror.constant.com/archive/qt/$($QtVersion -replace '\.\d+$', '')/${QtVersion}/single/${Filename}"
 
     $ArchiveBase = "qt-everywhere-src-${QtVersion}"
     $UnpackFlags = @(
         (Join-Path $ArchiveBase qtactiveqt '*')
         (Join-Path $ArchiveBase qtbase '*')
+        (Join-Path $ArchiveBase qtsvg '*')
         (Join-Path $ArchiveBase qttools '*')
         (Join-Path $ArchiveBase qttranslations '*')
         (Join-Path $ArchiveBase qtwinextras '*')

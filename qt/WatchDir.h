@@ -1,32 +1,39 @@
-/*
- * This file Copyright (C) 2009-2015 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2009-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #pragma once
 
+#include <memory>
+
 #include <QObject>
+#include <QFileSystemWatcher>
 #include <QSet>
 #include <QString>
 
-class QFileSystemWatcher;
+#include <libtransmission/tr-macros.h>
 
 class TorrentModel;
 
 class WatchDir : public QObject
 {
     Q_OBJECT
+    TR_DISABLE_COPY_MOVE(WatchDir)
 
 public:
-    WatchDir(TorrentModel const&);
+    explicit WatchDir(TorrentModel const&);
 
-    void setPath(QString const& path, bool isEnabled);
+    void setPath(QString const& path, bool is_enabled);
 
 signals:
     void torrentFileAdded(QString const& filename);
+
+private slots:
+    void watcherActivated(QString const& path);
+    void onTimeout();
+
+    void rescanAllWatchedDirectories();
 
 private:
     enum
@@ -36,18 +43,10 @@ private:
         ERROR
     };
 
-private:
     int metainfoTest(QString const& filename) const;
 
-private slots:
-    void watcherActivated(QString const& path);
-    void onTimeout();
+    TorrentModel const& model_;
 
-    void rescanAllWatchedDirectories();
-
-private:
-    TorrentModel const& myModel;
-
-    QSet<QString> myWatchDirFiles;
-    QFileSystemWatcher* myWatcher;
+    QSet<QString> watch_dir_files_;
+    std::unique_ptr<QFileSystemWatcher> watcher_;
 };

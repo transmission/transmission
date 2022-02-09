@@ -31,8 +31,11 @@ Copyright 2017 Endless Mobile, Inc.
   <url type="homepage">https://transmissionbt.com/</url>
   <screenshots>
     <screenshot type="default">
-      <image type="source">https://raw.githubusercontent.com/transmission/transmission/master/gtk/screenshots/a.png</image>
+      <image type="source">https://raw.githubusercontent.com/transmission/transmission/main/gtk/screenshots/a.png</image>
     </screenshot>
   </screenshots>
   <update_contact>info_AT_transmissionbt.com</update_contact>
+  <content_rating type="oars-1.1">
+    <content_attribute id="social-info">mild</content_attribute>
+  </content_rating>
 </component>

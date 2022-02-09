@@ -1,16 +1,13 @@
-/*
- * This file Copyright (C) 2013-2014 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2013-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #pragma once
 
-#ifndef __TRANSMISSION__
-#error only libtransmission should #include this header.
-#endif
+#include <cstdint> // int64_t
+#include <string>
+#include <string_view>
 
 /**
  * @addtogroup tr_session Session
@@ -19,17 +16,22 @@
 
 struct tr_device_info
 {
-    char* path;
-    char* device;
-    char* fstype;
+    std::string path;
+    std::string device;
+    std::string fstype;
 };
 
-struct tr_device_info* tr_device_info_create(char const* path);
+struct tr_disk_space
+{
+    int64_t free;
+    int64_t total;
+};
 
-/** If the disk quota is enabled and readable, this returns how much is available in the quota.
-    Otherwise, it returns how much is available on the disk, or -1 on error. */
-int64_t tr_device_info_get_free_space(struct tr_device_info const* info);
+tr_device_info tr_device_info_create(std::string_view path);
 
-void tr_device_info_free(struct tr_device_info* info);
+/** Values represents the total space on disk.
+    If the disk quota (free space) is enabled and readable, this returns how much is available in the quota.
+    Otherwise, it returns how much is available on the disk, or { -1, -1 } on error. */
+tr_disk_space tr_device_info_get_disk_space(tr_device_info const& info);
 
 /** @} */

@@ -1,10 +1,7 @@
-/*
- * This file Copyright (C) 2009-2015 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2009-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #include <QApplication>
 #include <QIcon>
@@ -16,37 +13,53 @@
 
 #include "AboutDialog.h"
 #include "LicenseDialog.h"
+#include "Session.h"
 #include "Utils.h"
 
-AboutDialog::AboutDialog(QWidget* parent) :
-    BaseDialog(parent),
-    myLicenseDialog()
+AboutDialog::AboutDialog(Session& session, QWidget* parent)
+    : BaseDialog(parent)
 {
-    ui.setupUi(this);
+    ui_.setupUi(this);
 
-    ui.iconLabel->setPixmap(qApp->windowIcon().pixmap(48));
-    ui.titleLabel->setText(tr("<b style='font-size:x-large'>Transmission %1</b>").arg(QString::fromUtf8(LONG_VERSION_STRING)));
+    ui_.iconLabel->setPixmap(QApplication::windowIcon().pixmap(48));
 
-    QPushButton* b;
+    if (session.isServer())
+    {
+        auto const title = QStringLiteral("<b style='font-size:x-large'>Transmission %1</b>")
+                               .arg(QStringLiteral(LONG_VERSION_STRING));
+        ui_.titleLabel->setText(title);
+    }
+    else
+    {
+        QString title = QStringLiteral(
+            "<div style='font-size:x-large; font-weight: bold; text-align: center'>Transmission</div>");
+        title += QStringLiteral("<div style='text-align: center'>%1: %2</div>")
+                     .arg(tr("Client"))
+                     .arg(QStringLiteral(LONG_VERSION_STRING));
+        title += QStringLiteral("<div style='text-align: center'>%1: %2</div>").arg(tr("Server")).arg(session.sessionVersion());
+        ui_.titleLabel->setText(title);
+    }
 
-    b = ui.dialogButtons->addButton(tr("C&redits"), QDialogButtonBox::ActionRole);
-    connect(b, SIGNAL(clicked()), this, SLOT(showCredits()));
+    QPushButton const* b = ui_.dialogButtons->addButton(tr("C&redits"), QDialogButtonBox::ActionRole);
+    connect(b, &QAbstractButton::clicked, this, &AboutDialog::showCredits);
 
-    b = ui.dialogButtons->addButton(tr("&License"), QDialogButtonBox::ActionRole);
-    connect(b, SIGNAL(clicked()), this, SLOT(showLicense()));
+    b = ui_.dialogButtons->addButton(tr("&License"), QDialogButtonBox::ActionRole);
+    connect(b, &QAbstractButton::clicked, this, &AboutDialog::showLicense);
 
-    ui.dialogButtons->button(QDialogButtonBox::Close)->setDefault(true);
+    ui_.dialogButtons->button(QDialogButtonBox::Close)->setDefault(true);
 }
 
 void AboutDialog::showCredits()
 {
-    QMessageBox::about(this, tr("Credits"), QString::fromUtf8(
-        "Charles Kerr (Backend; Daemon; GTK+; Qt)\n"
-        "Mitchell Livingston (OS X)\n"
-        "Mike Gelfand\n"));
+    QMessageBox::about(
+        this,
+        tr("Credits"),
+        QString::fromUtf8("Charles Kerr (Backend; Daemon; GTK+; Qt)\n"
+                          "Mitchell Livingston (OS X)\n"
+                          "Mike Gelfand\n"));
 }
 
 void AboutDialog::showLicense()
 {
-    Utils::openDialog(myLicenseDialog, this);
+    Utils::openDialog(license_dialog_, this);
 }

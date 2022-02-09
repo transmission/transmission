@@ -88,6 +88,15 @@ macro(tr_add_external_auto_library ID DIRNAME LIBNAME)
         set(${ID}_INCLUDE_DIRS ${${ID}_INCLUDE_DIR})
         set(${ID}_LIBRARIES ${${ID}_LIBRARY})
 
+        set(${ID}_EXT_PROJ_CMAKE_ARGS)
+        if(APPLE)
+            string(REPLACE ";" "$<SEMICOLON>" ${ID}_CMAKE_OSX_ARCHITECTURES "${CMAKE_OSX_ARCHITECTURES}")
+            list(APPEND ${ID}_EXT_PROJ_CMAKE_ARGS
+                "-DCMAKE_OSX_ARCHITECTURES:STRING=${${ID}_CMAKE_OSX_ARCHITECTURES}"
+                "-DCMAKE_OSX_DEPLOYMENT_TARGET:STRING=${CMAKE_OSX_DEPLOYMENT_TARGET}"
+                "-DCMAKE_OSX_SYSROOT:PATH=${CMAKE_OSX_SYSROOT}")
+        endif()
+
         ExternalProject_Add(
             ${${ID}_UPSTREAM_TARGET}
             URL "${CMAKE_SOURCE_DIR}/third-party/${DIRNAME}"
@@ -101,6 +110,7 @@ macro(tr_add_external_auto_library ID DIRNAME LIBNAME)
                 "-DCMAKE_CXX_FLAGS:STRING=${CMAKE_CXX_FLAGS}"
                 "-DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}"
                 "-DCMAKE_INSTALL_PREFIX:PATH=<INSTALL_DIR>"
+                ${${ID}_EXT_PROJ_CMAKE_ARGS}
             BUILD_BYPRODUCTS "${${ID}_LIBRARY}"
         )
 
@@ -186,13 +196,27 @@ function(tr_fixup_bundle_item BUNDLE_DIR BUNDLE_ITEMS DEP_DIRS)
 endfunction()
 
 macro(tr_qt_wrap_ui)
-    qt5_wrap_ui(${ARGN})
+    if(Qt_VERSION_MAJOR EQUAL 6)
+        qt6_wrap_ui(${ARGN})
+    else()
+        qt5_wrap_ui(${ARGN})
+    endif()
 endmacro()
 
 macro(tr_qt_add_resources)
-    qt5_add_resources(${ARGN})
+    if(Qt_VERSION_MAJOR EQUAL 6)
+        qt6_add_resources(${ARGN})
+    else()
+        qt5_add_resources(${ARGN})
+    endif()
 endmacro()
 
 macro(tr_qt_add_translation)
-    qt5_add_translation(${ARGN} OPTIONS -silent)
+    if(Qt_VERSION_MAJOR EQUAL 6)
+        qt6_add_translation(${ARGN} OPTIONS -silent)
+    elseif(Qt_VERSION GREATER_EQUAL 5.11)
+        qt5_add_translation(${ARGN} OPTIONS -silent)
+    else()
+        qt5_add_translation(${ARGN})
+    endif()
 endmacro()

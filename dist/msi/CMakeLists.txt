@@ -22,7 +22,7 @@ if(NOT TR_THIRD_PARTY_DIR)
 endif()
 
 if(NOT TR_QT_DIR)
-    set(TR_QT_DIR "$<TARGET_FILE_DIR:Qt5::Core>/..")
+    set(TR_QT_DIR "$<TARGET_FILE_DIR:Qt${Qt_VERSION_MAJOR}::Core>/..")
 endif()
 
 find_msvc_crt_msm(TR_MSVC_CRT_MSM_FILE)
@@ -53,7 +53,7 @@ png2ico(Transmission.ico
     "${ICONS_DIR}/192x192/transmission-qt.png"
     "${ICONS_DIR}/256x256/transmission-qt.png")
 
-set(WEBSRCDIR "${CMAKE_INSTALL_PREFIX}/share/transmission/web")
+set(WEBSRCDIR "${CMAKE_INSTALL_PREFIX}/share/transmission/public_html")
 set(TRQMSRCDIR "${CMAKE_INSTALL_PREFIX}/share/transmission/translations")
 set(QTQMSRCDIR "${TR_QT_DIR}/translations")
 
@@ -82,6 +82,7 @@ wix_candle(${PROJECT_NAME}_OBJS
         "SrcDir=${CMAKE_INSTALL_PREFIX}"
         "ThirdPartyDir=${TR_THIRD_PARTY_DIR}"
         "QtDir=${TR_QT_DIR}"
+        "QtMajorVer=${Qt_VERSION_MAJOR}"
         "LicenseFile=${CMAKE_CURRENT_SOURCE_DIR}/GPLv2.rtf"
         "WebSrcDir=${WEBSRCDIR}"
         "TrQmSrcDir=${TRQMSRCDIR}"

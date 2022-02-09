@@ -1,58 +1,52 @@
-/*
- * This file Copyright (C) 2009-2015 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2009-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #pragma once
 
-#include <QCryptographicHash>
+#include <optional>
+#include <vector>
+
 #include <QDir>
 #include <QFile>
 #include <QMap>
+#include <QSet>
 #include <QString>
 #include <QTimer>
-#include <QVector>
+
+#include <libtransmission/tr-macros.h>
 
 #include "AddData.h" // AddData
 #include "BaseDialog.h"
 #include "Torrent.h" // FileList
-
 #include "ui_OptionsDialog.h"
+
+#include <libtransmission/transmission.h>
+
+#include <libtransmission/torrent-metainfo.h>
 
 class Prefs;
 class Session;
 
 extern "C"
 {
-struct tr_variant;
+    struct tr_variant;
 }
 
 class OptionsDialog : public BaseDialog
 {
     Q_OBJECT
+    TR_DISABLE_COPY_MOVE(OptionsDialog)
 
 public:
-    OptionsDialog(Session& session, Prefs const& prefs, AddData const& addme, QWidget* parent = nullptr);
-    virtual ~OptionsDialog();
-
-private:
-    typedef QMap<uint32_t, int32_t> mybins_t;
-
-private:
-    void reload();
-    void updateWidgetsLocality();
-    void clearInfo();
-    void clearVerify();
+    OptionsDialog(Session& session, Prefs const& prefs, AddData addme, QWidget* parent = nullptr);
+    ~OptionsDialog() override;
 
 private slots:
     void onAccepted();
-    void onPriorityChanged(QSet<int> const& fileIndices, int);
-    void onWantedChanged(QSet<int> const& fileIndices, bool);
-    void onVerify();
-    void onTimeout();
+    void onPriorityChanged(QSet<int> const& file_indices, int);
+    void onWantedChanged(QSet<int> const& file_indices, bool);
 
     void onSourceChanged();
     void onDestinationChanged();
@@ -60,29 +54,21 @@ private slots:
     void onSessionUpdated();
 
 private:
-    Session& mySession;
-    AddData myAdd;
+    using mybins_t = QMap<uint32_t, int32_t>;
 
-    Ui::OptionsDialog ui;
+    void reload();
+    void updateWidgetsLocality();
+    void clearInfo();
 
-    bool myIsLocal;
-    QDir myLocalDestination;
-    bool myHaveInfo;
-    tr_info myInfo;
-    QPushButton* myVerifyButton;
-    QVector<int> myPriorities;
-    QVector<bool> myWanted;
-    FileList myFiles;
+    AddData add_;
+    FileList files_;
 
-    QTimer myVerifyTimer;
-    char myVerifyBuf[2048 * 4];
-    QFile myVerifyFile;
-    uint64_t myVerifyFilePos;
-    int myVerifyFileIndex;
-    uint32_t myVerifyPieceIndex;
-    uint32_t myVerifyPiecePos;
-    QVector<bool> myVerifyFlags;
-    QCryptographicHash myVerifyHash;
-    mybins_t myVerifyBins;
-    QTimer myEditTimer;
+    QDir local_destination_;
+    QTimer edit_timer_;
+    std::vector<bool> wanted_;
+    std::vector<int> priorities_;
+    Session& session_;
+    Ui::OptionsDialog ui_ = {};
+    std::optional<tr_torrent_metainfo> metainfo_;
+    bool is_local_ = {};
 };

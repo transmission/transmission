@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2009 Nokia Corporation and/or its subsidiary(-ies).
+** Copyright © 2009 Nokia Corporation and/or its subsidiary(-ies).
 ** Contact: Qt Software Information (qt-info@nokia.com)
 **
 ** This file is part of the demonstration applications of the Qt Toolkit.
@@ -43,15 +43,18 @@
 
 #include <QLabel>
 
+#include <libtransmission/tr-macros.h>
+
 class SqueezeLabel : public QLabel
 {
     Q_OBJECT
+    TR_DISABLE_COPY_MOVE(SqueezeLabel)
 
 public:
-    SqueezeLabel(QWidget* parent = nullptr);
-    SqueezeLabel(QString const& text, QWidget* parent = nullptr);
+    explicit SqueezeLabel(QWidget* parent = nullptr);
+    explicit SqueezeLabel(QString const& text, QWidget* parent = nullptr);
 
 protected:
     // QWidget
-    void paintEvent(QPaintEvent* paintEvent) override;
+    void paintEvent(QPaintEvent* paint_event) override;
 };

@@ -1,12 +1,11 @@
-/*
- * This file Copyright (C) 2009-2015 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2009-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #pragma once
+
+#include <array>
 
 #include <QObject>
 #include <QSet>
@@ -14,6 +13,7 @@
 #include <QVariant>
 
 #include <libtransmission/quark.h>
+#include <libtransmission/tr-macros.h>
 
 #include "Filters.h"
 
@@ -21,12 +21,13 @@ class QDateTime;
 
 extern "C"
 {
-struct tr_variant;
+    struct tr_variant;
 }
 
 class Prefs : public QObject
 {
     Q_OBJECT
+    TR_DISABLE_COPY_MOVE(Prefs)
 
 public:
     enum
@@ -70,6 +71,7 @@ public:
         COMPLETE_SOUND_COMMAND,
         COMPLETE_SOUND_ENABLED,
         USER_HAS_GIVEN_INFORMED_CONSENT,
+        READ_CLIPBOARD,
         /* core prefs */
         FIRST_CORE_PREF,
         ALT_SPEED_LIMIT_UP = FIRST_CORE_PREF,
@@ -128,9 +130,8 @@ public:
         PREFS_COUNT
     };
 
-public:
-    Prefs(QString const& configDir);
-    virtual ~Prefs();
+    explicit Prefs(QString config_dir);
+    ~Prefs() override;
 
     bool isCore(int key) const
     {
@@ -142,24 +143,19 @@ public:
         return !isCore(key);
     }
 
-    char const* keyStr(int i) const
-    {
-        return tr_quark_get_string(myItems[i].key, nullptr);
-    }
-
     tr_quark getKey(int i) const
     {
-        return myItems[i].key;
+        return Items[i].key;
     }
 
     int type(int i) const
     {
-        return myItems[i].type;
+        return Items[i].type;
     }
 
     QVariant const& variant(int i) const
     {
-        return myValues[i];
+        return values_[i];
     }
 
     int getInt(int key) const;
@@ -171,13 +167,13 @@ public:
     template<typename T>
     T get(int key) const
     {
-        return myValues[key].value<T>();
+        return values_[key].value<T>();
     }
 
     template<typename T>
     void set(int key, T const& value)
     {
-        QVariant& v(myValues[key]);
+        QVariant& v(values_[key]);
         QVariant const tmp = QVariant::fromValue(value);
 
         if (v.isNull() || v != tmp)
@@ -200,17 +196,14 @@ private:
         int type;
     };
 
-private:
-    void initDefaults(tr_variant*);
+    void initDefaults(tr_variant*) const;
 
-    // Intentionally not implemented
-    void set(int key, char const* value);
+    void set(int key, char const* value) = delete;
 
-private:
-    QString const myConfigDir;
+    QString const config_dir_;
 
-    QSet<int> myTemporaryPrefs;
-    QVariant mutable myValues[PREFS_COUNT];
+    QSet<int> temporary_prefs_;
+    std::array<QVariant, PREFS_COUNT> mutable values_;
 
-    static PrefItem myItems[];
+    static std::array<PrefItem, PREFS_COUNT> const Items;
 };

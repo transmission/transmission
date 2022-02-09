@@ -1,19 +1,11 @@
-/*
- * This file Copyright (C) 2016 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright 2016-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #pragma once
 
-#ifdef __cplusplus
-extern "C"
-{
-#endif
-
-typedef struct tr_session_id* tr_session_id_t;
+using tr_session_id_t = struct tr_session_id*;
 
 /**
  * Create new session identifier object.
@@ -51,7 +43,3 @@ char const* tr_session_id_get_current(tr_session_id_t session_id);
  * @return `True` if session is valid and local, `false` otherwise.
  */
 bool tr_session_id_is_local(char const* session_id);
-
-#ifdef __cplusplus
-}
-#endif

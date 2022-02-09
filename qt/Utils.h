@@ -1,15 +1,14 @@
-/*
- * This file Copyright (C) 2009-2015 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2009-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #pragma once
 
 #include <cctype> // isxdigit()
+#include <functional>
 
+#include <QHash>
 #include <QPointer>
 #include <QRect>
 #include <QString>
@@ -20,16 +19,28 @@ class QHeaderView;
 class QIcon;
 class QModelIndex;
 
+#if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
+
+namespace std
+{
+
+template<>
+struct hash<QString>
+{
+    std::size_t operator()(QString const& s) const
+    {
+        return qHash(s);
+    }
+};
+
+} // namespace std
+
+#endif
+
 class Utils
 {
 public:
-    static QIcon getFileIcon();
-    static QIcon getFolderIcon();
-    static QIcon guessMimeIcon(QString const& filename);
     static QIcon getIconFromIndex(QModelIndex const& index);
-
-    // Test if string is UTF-8 or not
-    static bool isValidUtf8(char const* s);
 
     static QString removeTrailingDirSeparator(QString const& path);
 
@@ -43,8 +54,8 @@ public:
         rect.adjust(dx1, 0, -dx2, 0);
     }
 
-    static int measureViewItem(QAbstractItemView* view, QString const& text);
-    static int measureHeaderItem(QHeaderView* view, QString const& text);
+    static int measureViewItem(QAbstractItemView const* view, QString const& text);
+    static int measureHeaderItem(QHeaderView const* view, QString const& text);
 
     static QColor getFadedColor(QColor const& color);
 
@@ -70,7 +81,7 @@ public:
 
     static bool isMagnetLink(QString const& s)
     {
-        return s.startsWith(QString::fromUtf8("magnet:?"));
+        return s.startsWith(QStringLiteral("magnet:?"));
     }
 
     static bool isHexHashcode(QString const& s)
@@ -93,26 +104,7 @@ public:
 
     static bool isUriWithSupportedScheme(QString const& s)
     {
-        return s.startsWith(QStringLiteral("ftp://")) ||
-            s.startsWith(QStringLiteral("http://")) ||
+        return s.startsWith(QStringLiteral("ftp://")) || s.startsWith(QStringLiteral("http://")) ||
             s.startsWith(QStringLiteral("https://"));
     }
 };
-
-#if QT_VERSION < QT_VERSION_CHECK(5, 14, 0)
-
-namespace std
-{
-
-template<>
-struct hash<QString>
-{
-    std::size_t operator ()(QString const& s) const
-    {
-        return qHash(s);
-    }
-};
-
-} // namespace std
-
-#endif

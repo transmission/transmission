@@ -1,29 +1,26 @@
-/*
- * This file Copyright (C) 2012-2014 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2012-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #pragma once
 
-#define MEM_K 1024
-#define MEM_K_STR "KiB"
-#define MEM_M_STR "MiB"
-#define MEM_G_STR "GiB"
-#define MEM_T_STR "TiB"
+#include <cstddef>
 
-#define DISK_K 1000
-#define DISK_B_STR "B"
-#define DISK_K_STR "kB"
-#define DISK_M_STR "MB"
-#define DISK_G_STR "GB"
-#define DISK_T_STR "TB"
+static auto constexpr MemK = size_t{ 1024 };
+static char constexpr MemKStr[] = "KiB";
+static char constexpr MemMStr[] = "MiB";
+static char constexpr MemGStr[] = "GiB";
+static char constexpr MemTStr[] = "TiB";
 
-#define SPEED_K 1000
-#define SPEED_B_STR "B/s"
-#define SPEED_K_STR "kB/s"
-#define SPEED_M_STR "MB/s"
-#define SPEED_G_STR "GB/s"
-#define SPEED_T_STR "TB/s"
+static auto constexpr DiskK = size_t{ 1000 };
+static char constexpr DiskKStr[] = "kB";
+static char constexpr DiskMStr[] = "MB";
+static char constexpr DiskGStr[] = "GB";
+static char constexpr DiskTStr[] = "TB";
+
+static auto constexpr SpeedK = size_t{ 1000 };
+static char constexpr SpeedKStr[] = "kB/s";
+static char constexpr SpeedMStr[] = "MB/s";
+static char constexpr SpeedGStr[] = "GB/s";
+static char constexpr SpeedTStr[] = "TB/s";

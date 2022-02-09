@@ -1,15 +1,15 @@
-/*
- * This file Copyright (C) 2010-2015 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2010-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #pragma once
 
+#include <vector>
+
 #include <QAbstractListModel>
-#include <QVector>
+
+#include <libtransmission/tr-macros.h>
 
 #include "Torrent.h"
 #include "Typedefs.h"
@@ -19,7 +19,7 @@ class TorrentModel;
 struct TrackerInfo
 {
     TrackerStat st;
-    int torrentId;
+    int torrent_id = {};
 };
 
 Q_DECLARE_METATYPE(TrackerInfo)
@@ -27,6 +27,7 @@ Q_DECLARE_METATYPE(TrackerInfo)
 class TrackerModel : public QAbstractListModel
 {
     Q_OBJECT
+    TR_DISABLE_COPY_MOVE(TrackerModel)
 
 public:
     enum Role
@@ -34,19 +35,17 @@ public:
         TrackerRole = Qt::UserRole
     };
 
-public:
     TrackerModel() = default;
 
     void refresh(TorrentModel const&, torrent_ids_t const& ids);
-    int find(int torrentId, QString const& url) const;
+    int find(int torrent_id, QString const& url) const;
 
     // QAbstractItemModel
     int rowCount(QModelIndex const& parent = QModelIndex()) const override;
     QVariant data(QModelIndex const& index, int role = Qt::DisplayRole) const override;
 
 private:
-    typedef QVector<TrackerInfo> rows_t;
+    using rows_t = std::vector<TrackerInfo>;
 
-private:
-    rows_t myRows;
+    rows_t rows_;
 };

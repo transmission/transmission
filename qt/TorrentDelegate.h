@@ -1,16 +1,15 @@
-/*
- * This file Copyright (C) 2009-2015 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2009-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #pragma once
 
 #include <optional>
 
 #include <QStyledItemDelegate>
+
+#include <libtransmission/tr-macros.h>
 
 class QStyle;
 class QStyleOptionProgressBar;
@@ -20,10 +19,10 @@ class Torrent;
 class TorrentDelegate : public QStyledItemDelegate
 {
     Q_OBJECT
+    TR_DISABLE_COPY_MOVE(TorrentDelegate)
 
 public:
     explicit TorrentDelegate(QObject* parent = nullptr);
-    virtual ~TorrentDelegate();
 
     // QAbstractItemDelegate
     QSize sizeHint(QStyleOptionViewItem const& option, QModelIndex const& index) const override;
@@ -43,18 +42,17 @@ protected:
     static QString shortStatusString(Torrent const& tor);
     static QString shortTransferString(Torrent const& tor);
 
-protected:
-    QStyleOptionProgressBar* myProgressBarStyle;
+    QColor const BlueBack{ "lightgrey" };
+    QColor const BlueBrush{ "steelblue" };
+    QColor const GreenBack{ "darkseagreen" };
+    QColor const GreenBrush{ "forestgreen" };
+    QColor const SilverBack{ "grey" };
+    QColor const SilverBrush{ "silver" };
 
-    static QColor blueBrush;
-    static QColor greenBrush;
-    static QColor silverBrush;
-    static QColor blueBack;
-    static QColor greenBack;
-    static QColor silverBack;
+    mutable QStyleOptionProgressBar progress_bar_style_ = {};
 
 private:
-    mutable std::optional<int> myHeightHint;
-    mutable QFont myHeightFont;
-    mutable QIcon myWarningEmblem;
+    mutable std::optional<int> height_hint_;
+    mutable QFont height_font_;
+    mutable QIcon warning_emblem_;
 };

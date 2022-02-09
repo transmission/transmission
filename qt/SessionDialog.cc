@@ -1,10 +1,7 @@
-/*
- * This file Copyright (C) 2009-2015 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2009-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #include "Prefs.h"
 #include "Session.h"
@@ -16,29 +13,29 @@
 
 void SessionDialog::accept()
 {
-    myPrefs.set(Prefs::SESSION_IS_REMOTE, ui.remoteSessionRadio->isChecked());
-    myPrefs.set(Prefs::SESSION_REMOTE_HOST, ui.hostEdit->text());
-    myPrefs.set(Prefs::SESSION_REMOTE_PORT, ui.portSpin->value());
-    myPrefs.set(Prefs::SESSION_REMOTE_AUTH, ui.authCheck->isChecked());
-    myPrefs.set(Prefs::SESSION_REMOTE_USERNAME, ui.usernameEdit->text());
-    myPrefs.set(Prefs::SESSION_REMOTE_PASSWORD, ui.passwordEdit->text());
-    mySession.restart();
+    prefs_.set(Prefs::SESSION_IS_REMOTE, ui_.remoteSessionRadio->isChecked());
+    prefs_.set(Prefs::SESSION_REMOTE_HOST, ui_.hostEdit->text());
+    prefs_.set(Prefs::SESSION_REMOTE_PORT, ui_.portSpin->value());
+    prefs_.set(Prefs::SESSION_REMOTE_AUTH, ui_.authCheck->isChecked());
+    prefs_.set(Prefs::SESSION_REMOTE_USERNAME, ui_.usernameEdit->text());
+    prefs_.set(Prefs::SESSION_REMOTE_PASSWORD, ui_.passwordEdit->text());
+    session_.restart();
     BaseDialog::accept();
 }
 
-void SessionDialog::resensitize()
+void SessionDialog::resensitize() const
 {
-    bool const isRemote = ui.remoteSessionRadio->isChecked();
-    bool const useAuth = ui.authCheck->isChecked();
+    bool const is_remote = ui_.remoteSessionRadio->isChecked();
+    bool const use_auth = ui_.authCheck->isChecked();
 
-    for (QWidget* const w : myRemoteWidgets)
+    for (QWidget* const w : remote_widgets_)
     {
-        w->setEnabled(isRemote);
+        w->setEnabled(is_remote);
     }
 
-    for (QWidget* const w : myAuthWidgets)
+    for (QWidget* const w : auth_widgets_)
     {
-        w->setEnabled(isRemote && useAuth);
+        w->setEnabled(is_remote && use_auth);
     }
 }
 
@@ -46,34 +43,34 @@ void SessionDialog::resensitize()
 ****
 ***/
 
-SessionDialog::SessionDialog(Session& session, Prefs& prefs, QWidget* parent) :
-    BaseDialog(parent),
-    mySession(session),
-    myPrefs(prefs)
+SessionDialog::SessionDialog(Session& session, Prefs& prefs, QWidget* parent)
+    : BaseDialog(parent)
+    , session_(session)
+    , prefs_(prefs)
 {
-    ui.setupUi(this);
+    ui_.setupUi(this);
 
-    ui.localSessionRadio->setChecked(!prefs.get<bool>(Prefs::SESSION_IS_REMOTE));
-    connect(ui.localSessionRadio, SIGNAL(toggled(bool)), this, SLOT(resensitize()));
+    ui_.localSessionRadio->setChecked(!prefs.get<bool>(Prefs::SESSION_IS_REMOTE));
+    connect(ui_.localSessionRadio, &QAbstractButton::toggled, this, &SessionDialog::resensitize);
 
-    ui.remoteSessionRadio->setChecked(prefs.get<bool>(Prefs::SESSION_IS_REMOTE));
-    connect(ui.remoteSessionRadio, SIGNAL(toggled(bool)), this, SLOT(resensitize()));
+    ui_.remoteSessionRadio->setChecked(prefs.get<bool>(Prefs::SESSION_IS_REMOTE));
+    connect(ui_.remoteSessionRadio, &QAbstractButton::toggled, this, &SessionDialog::resensitize);
 
-    ui.hostEdit->setText(prefs.get<QString>(Prefs::SESSION_REMOTE_HOST));
-    myRemoteWidgets << ui.hostLabel << ui.hostEdit;
+    ui_.hostEdit->setText(prefs.get<QString>(Prefs::SESSION_REMOTE_HOST));
+    remote_widgets_ << ui_.hostLabel << ui_.hostEdit;
 
-    ui.portSpin->setValue(prefs.get<int>(Prefs::SESSION_REMOTE_PORT));
-    myRemoteWidgets << ui.portLabel << ui.portSpin;
+    ui_.portSpin->setValue(prefs.get<int>(Prefs::SESSION_REMOTE_PORT));
+    remote_widgets_ << ui_.portLabel << ui_.portSpin;
 
-    ui.authCheck->setChecked(prefs.get<bool>(Prefs::SESSION_REMOTE_AUTH));
-    connect(ui.authCheck, SIGNAL(toggled(bool)), this, SLOT(resensitize()));
-    myRemoteWidgets << ui.authCheck;
+    ui_.authCheck->setChecked(prefs.get<bool>(Prefs::SESSION_REMOTE_AUTH));
+    connect(ui_.authCheck, &QAbstractButton::toggled, this, &SessionDialog::resensitize);
+    remote_widgets_ << ui_.authCheck;
 
-    ui.usernameEdit->setText(prefs.get<QString>(Prefs::SESSION_REMOTE_USERNAME));
-    myAuthWidgets << ui.usernameLabel << ui.usernameEdit;
+    ui_.usernameEdit->setText(prefs.get<QString>(Prefs::SESSION_REMOTE_USERNAME));
+    auth_widgets_ << ui_.usernameLabel << ui_.usernameEdit;
 
-    ui.passwordEdit->setText(prefs.get<QString>(Prefs::SESSION_REMOTE_PASSWORD));
-    myAuthWidgets << ui.passwordLabel << ui.passwordEdit;
+    ui_.passwordEdit->setText(prefs.get<QString>(Prefs::SESSION_REMOTE_PASSWORD));
+    auth_widgets_ << ui_.passwordLabel << ui_.passwordEdit;
 
     resensitize();
 }

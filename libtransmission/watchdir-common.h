@@ -1,26 +1,23 @@
-/*
- * This file Copyright (C) 2015-2016 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2015-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #pragma once
 
-#ifndef __LIBTRANSMISSION_WATCHDIR_MODULE__
+#ifndef LIBTRANSMISSION_WATCHDIR_MODULE
 #error only the libtransmission watchdir module should #include this header.
 #endif
 
-struct tr_ptrArray;
+#include <string>
+#include <unordered_set>
 
-typedef struct tr_watchdir_backend
+struct tr_watchdir_backend
 {
-    void (* free_func)(struct tr_watchdir_backend*);
-}
-tr_watchdir_backend;
+    void (*free_func)(struct tr_watchdir_backend*);
+};
 
-#define BACKEND_DOWNCAST(b) ((tr_watchdir_backend*)(b))
+#define BACKEND_DOWNCAST(b) (reinterpret_cast<tr_watchdir_backend*>(b))
 
 /* ... */
 
@@ -32,7 +29,7 @@ struct event_base* tr_watchdir_get_event_base(tr_watchdir_t handle);
 
 void tr_watchdir_process(tr_watchdir_t handle, char const* name);
 
-void tr_watchdir_scan(tr_watchdir_t handle, struct tr_ptrArray* dir_entries);
+void tr_watchdir_scan(tr_watchdir_t handle, std::unordered_set<std::string>* dir_entries);
 
 /* ... */
 

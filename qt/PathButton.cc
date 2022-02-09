@@ -1,10 +1,7 @@
-/*
- * This file Copyright (C) 2014-2015 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2014-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #include <QApplication>
 #include <QDir>
@@ -18,12 +15,8 @@
 #include "PathButton.h"
 #include "Utils.h"
 
-PathButton::PathButton(QWidget* parent) :
-    QToolButton(parent),
-    myMode(DirectoryMode),
-    myTitle(),
-    myNameFilter(),
-    myPath()
+PathButton::PathButton(QWidget* parent)
+    : QToolButton(parent)
 {
     setSizePolicy(QSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed));
     setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
@@ -31,54 +24,54 @@ PathButton::PathButton(QWidget* parent) :
 
     updateAppearance();
 
-    connect(this, SIGNAL(clicked()), this, SLOT(onClicked()));
+    connect(this, &QAbstractButton::clicked, this, &PathButton::onClicked);
 }
 
 void PathButton::setMode(Mode mode)
 {
-    if (myMode == mode)
+    if (mode_ == mode)
     {
         return;
     }
 
-    myMode = mode;
+    mode_ = mode;
 
     updateAppearance();
 }
 
 void PathButton::setTitle(QString const& title)
 {
-    myTitle = title;
+    title_ = title;
 }
 
-void PathButton::setNameFilter(QString const& nameFilter)
+void PathButton::setNameFilter(QString const& name_filter)
 {
-    myNameFilter = nameFilter;
+    name_filter_ = name_filter;
 }
 
 void PathButton::setPath(QString const& path)
 {
-    if (myPath == path)
+    if (path_ == path)
     {
         return;
     }
 
-    myPath = QDir::toNativeSeparators(Utils::removeTrailingDirSeparator(path));
+    path_ = QDir::toNativeSeparators(Utils::removeTrailingDirSeparator(path));
 
     updateAppearance();
 
-    emit pathChanged(myPath);
+    emit pathChanged(path_);
 }
 
 QString const& PathButton::path() const
 {
-    return myPath;
+    return path_;
 }
 
 QSize PathButton::sizeHint() const
 {
     QSize const sh(QToolButton::sizeHint());
-    return QSize(qMin(sh.width(), 150), sh.height());
+    return { qMin(sh.width(), 150), sh.height() };
 }
 
 void PathButton::paintEvent(QPaintEvent* /*event*/)
@@ -87,26 +80,26 @@ void PathButton::paintEvent(QPaintEvent* /*event*/)
     QStyleOptionToolButton option;
     initStyleOption(&option);
 
-    QSize const fakeContentSize(qMax(100, qApp->globalStrut().width()), qMax(100, qApp->globalStrut().height()));
-    QSize const fakeSizeHint = style()->sizeFromContents(QStyle::CT_ToolButton, &option, fakeContentSize, this);
+    QSize const fake_content_size(100, 100);
+    QSize const fake_size_hint = style()->sizeFromContents(QStyle::CT_ToolButton, &option, fake_content_size, this);
 
-    int textWidth = width() - (fakeSizeHint.width() - fakeContentSize.width()) - iconSize().width() - 6;
+    int text_width = width() - (fake_size_hint.width() - fake_content_size.width()) - iconSize().width() - 6;
 
     if (popupMode() == MenuButtonPopup)
     {
-        textWidth -= style()->pixelMetric(QStyle::PM_MenuButtonIndicator, &option, this);
+        text_width -= style()->pixelMetric(QStyle::PM_MenuButtonIndicator, &option, this);
     }
 
-    QFileInfo const pathInfo(myPath);
-    option.text = myPath.isEmpty() ? tr("(None)") : (pathInfo.fileName().isEmpty() ? myPath : pathInfo.fileName());
-    option.text = fontMetrics().elidedText(option.text, Qt::ElideMiddle, textWidth);
+    QFileInfo const path_info(path_);
+    option.text = path_.isEmpty() ? tr("(None)") : (path_info.fileName().isEmpty() ? path_ : path_info.fileName());
+    option.text = fontMetrics().elidedText(option.text, Qt::ElideMiddle, text_width);
 
     painter.drawComplexControl(QStyle::CC_ToolButton, option);
 }
 
-void PathButton::onClicked()
+void PathButton::onClicked() const
 {
-    QFileDialog* dialog = new QFileDialog(window(), effectiveTitle());
+    auto* dialog = new QFileDialog(window(), effectiveTitle());
     dialog->setFileMode(isDirMode() ? QFileDialog::Directory : QFileDialog::ExistingFile);
 
     if (isDirMode())
@@ -114,27 +107,25 @@ void PathButton::onClicked()
         dialog->setOption(QFileDialog::ShowDirsOnly);
     }
 
-    if (!myNameFilter.isEmpty())
+    if (!name_filter_.isEmpty())
     {
-        dialog->setNameFilter(myNameFilter);
+        dialog->setNameFilter(name_filter_);
     }
 
-    QFileInfo const pathInfo(myPath);
-
-    if (!myPath.isEmpty() && pathInfo.exists())
+    if (auto const path_info = QFileInfo(path_); !path_.isEmpty() && path_info.exists())
     {
-        if (pathInfo.isDir())
+        if (path_info.isDir())
         {
-            dialog->setDirectory(pathInfo.absoluteFilePath());
+            dialog->setDirectory(path_info.absoluteFilePath());
         }
         else
         {
-            dialog->setDirectory(pathInfo.absolutePath());
-            dialog->selectFile(pathInfo.fileName());
+            dialog->setDirectory(path_info.absolutePath());
+            dialog->selectFile(path_info.fileName());
         }
     }
 
-    connect(dialog, SIGNAL(fileSelected(QString)), this, SLOT(onFileSelected(QString)));
+    connect(dialog, &QFileDialog::fileSelected, this, &PathButton::onFileSelected);
 
     dialog->setAttribute(Qt::WA_DeleteOnClose);
     dialog->open();
@@ -150,40 +141,40 @@ void PathButton::onFileSelected(QString const& path)
 
 void PathButton::updateAppearance()
 {
-    QFileInfo const pathInfo(myPath);
+    QFileInfo const path_info(path_);
 
-    int const iconSize(style()->pixelMetric(QStyle::PM_SmallIconSize));
-    QFileIconProvider const iconProvider;
+    int const icon_size(style()->pixelMetric(QStyle::PM_SmallIconSize));
+    QFileIconProvider const icon_provider;
 
     QIcon icon;
 
-    if (!myPath.isEmpty() && pathInfo.exists())
+    if (!path_.isEmpty() && path_info.exists())
     {
-        icon = iconProvider.icon(myPath);
+        icon = icon_provider.icon(QFileInfo(path_));
     }
 
     if (icon.isNull())
     {
-        icon = iconProvider.icon(isDirMode() ? QFileIconProvider::Folder : QFileIconProvider::File);
+        icon = icon_provider.icon(isDirMode() ? QFileIconProvider::Folder : QFileIconProvider::File);
     }
 
-    setIconSize(QSize(iconSize, iconSize));
+    setIconSize(QSize(icon_size, icon_size));
     setIcon(icon);
-    setToolTip(myPath == text() ? QString() : myPath);
+    setToolTip(path_ == text() ? QString() : path_);
 
     update();
 }
 
 bool PathButton::isDirMode() const
 {
-    return myMode == DirectoryMode;
+    return mode_ == DirectoryMode;
 }
 
 QString PathButton::effectiveTitle() const
 {
-    if (!myTitle.isEmpty())
+    if (!title_.isEmpty())
     {
-        return myTitle;
+        return title_;
     }
 
     return isDirMode() ? tr("Select Folder") : tr("Select File");

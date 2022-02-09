@@ -1,24 +1,6 @@
-/******************************************************************************
- * Copyright (c) 2008-2012 Transmission authors and contributors
- *
- * Permission is hereby granted, free of charge, to any person obtaining a
- * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
- * DEALINGS IN THE SOFTWARE.
- *****************************************************************************/
+// This file Copyright © 2008-2022 Transmission authors and contributors.
+// It may be used under the MIT (SPDX: MIT) license.
+// License text can be found in the licenses/ folder.
 
 #import <Cocoa/Cocoa.h>
 
@@ -28,23 +10,23 @@
 
 @interface BlocklistDownloaderViewController : NSObject
 {
-    PrefsController * fPrefsController;
+    PrefsController* fPrefsController;
 
-    IBOutlet NSWindow * fStatusWindow;
-    IBOutlet NSProgressIndicator * fProgressBar;
-    IBOutlet NSTextField * fTextField;
-    IBOutlet NSButton * fButton;
+    IBOutlet NSWindow* fStatusWindow;
+    IBOutlet NSProgressIndicator* fProgressBar;
+    IBOutlet NSTextField* fTextField;
+    IBOutlet NSButton* fButton;
 }
 
-+ (void) downloadWithPrefsController: (PrefsController *) prefsController;
++ (void)downloadWithPrefsController:(PrefsController*)prefsController;
 
-- (void) cancelDownload: (id) sender;
+- (void)cancelDownload:(id)sender;
 
-- (void) setStatusStarting;
-- (void) setStatusProgressForCurrentSize: (NSUInteger) currentSize expectedSize: (long long) expectedSize;
-- (void) setStatusProcessing;
+- (void)setStatusStarting;
+- (void)setStatusProgressForCurrentSize:(NSUInteger)currentSize expectedSize:(long long)expectedSize;
+- (void)setStatusProcessing;
 
-- (void) setFinished;
-- (void) setFailed: (NSString *) error;
+- (void)setFinished;
+- (void)setFailed:(NSString*)error;
 
 @end

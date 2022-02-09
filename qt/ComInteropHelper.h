@@ -1,16 +1,14 @@
-/*
- * This file Copyright (C) 2015 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2015-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #pragma once
 
 #include <memory>
 
-class QAxObject;
+#include <QAxObject>
+
 class QObject;
 class QString;
 class QVariant;
@@ -19,15 +17,14 @@ class ComInteropHelper
 {
 public:
     ComInteropHelper();
-    ~ComInteropHelper();
 
     bool isConnected() const;
 
-    QVariant addMetainfo(QString const& metainfo);
+    QVariant addMetainfo(QString const& metainfo) const;
 
     static void initialize();
     static void registerObject(QObject* parent);
 
 private:
-    std::unique_ptr<QAxObject> m_client;
+    std::unique_ptr<QAxObject> client_;
 };

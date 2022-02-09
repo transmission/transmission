@@ -1,15 +1,14 @@
-/*
- * This file Copyright (C) 2009-2015 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2009-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #pragma once
 
 #include <QSet>
 #include <QTreeView>
+
+#include <libtransmission/tr-macros.h>
 
 #include "Torrent.h" // FileList
 
@@ -23,19 +22,20 @@ class FileTreeModel;
 class FileTreeView : public QTreeView
 {
     Q_OBJECT
+    TR_DISABLE_COPY_MOVE(FileTreeView)
 
 public:
     FileTreeView(QWidget* parent = nullptr, bool editable = true);
 
     void clear();
-    void update(FileList const& files, bool updateProperties = true);
+    void update(FileList const& files, bool update_properties = true);
 
     void setEditable(bool editable);
 
 signals:
-    void priorityChanged(QSet<int> const& fileIndices, int priority);
-    void wantedChanged(QSet<int> const& fileIndices, bool wanted);
-    void pathEdited(QString const& oldpath, QString const& newname);
+    void priorityChanged(QSet<int> const& file_indices, int priority);
+    void wantedChanged(QSet<int> const& file_indices, bool wanted);
+    void pathEdited(QString const& old_path, QString const& new_name);
     void openRequested(QString const& path);
 
 protected:
@@ -66,19 +66,18 @@ private:
 
     static Qt::CheckState getCumulativeCheckState(QModelIndexList const& indices);
 
-private:
-    FileTreeModel* myModel;
-    QSortFilterProxyModel* myProxy;
-    FileTreeDelegate* myDelegate;
+    FileTreeModel* model_ = {};
+    QSortFilterProxyModel* proxy_ = {};
+    FileTreeDelegate* delegate_ = {};
 
-    QMenu* myContextMenu = nullptr;
-    QMenu* myPriorityMenu = nullptr;
-    QAction* myCheckSelectedAction = nullptr;
-    QAction* myUncheckSelectedAction = nullptr;
-    QAction* myOnlyCheckSelectedAction = nullptr;
-    QAction* myHighPriorityAction = nullptr;
-    QAction* myNormalPriorityAction = nullptr;
-    QAction* myLowPriorityAction = nullptr;
-    QAction* myOpenAction = nullptr;
-    QAction* myRenameAction = nullptr;
+    QMenu* context_menu_ = {};
+    QMenu* priority_menu_ = {};
+    QAction* check_selected_action_ = {};
+    QAction* uncheck_selected_action_ = {};
+    QAction* only_check_selected_action_ = {};
+    QAction* high_priority_action_ = {};
+    QAction* normal_priority_action_ = {};
+    QAction* low_priority_action_ = {};
+    QAction* open_action_ = {};
+    QAction* rename_action_ = {};
 };

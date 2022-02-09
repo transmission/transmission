@@ -1,17 +1,15 @@
-/*
- * This file Copyright (C) 2010-2015 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2010-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #pragma once
 
 #include <QWidgetList>
 
-#include "BaseDialog.h"
+#include <libtransmission/tr-macros.h>
 
+#include "BaseDialog.h"
 #include "ui_SessionDialog.h"
 
 class Prefs;
@@ -20,6 +18,7 @@ class Session;
 class SessionDialog : public BaseDialog
 {
     Q_OBJECT
+    TR_DISABLE_COPY_MOVE(SessionDialog)
 
 public:
     SessionDialog(Session& session, Prefs& prefs, QWidget* parent = nullptr);
@@ -29,14 +28,14 @@ public slots:
     void accept() override;
 
 private slots:
-    void resensitize();
+    void resensitize() const;
 
 private:
-    Session& mySession;
-    Prefs& myPrefs;
+    Session& session_;
+    Prefs& prefs_;
 
-    Ui::SessionDialog ui;
+    Ui::SessionDialog ui_ = {};
 
-    QWidgetList myRemoteWidgets;
-    QWidgetList myAuthWidgets;
+    QWidgetList remote_widgets_;
+    QWidgetList auth_widgets_;
 };

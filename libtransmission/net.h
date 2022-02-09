@@ -1,30 +1,15 @@
-/******************************************************************************
- * Copyright (c) Transmission authors and contributors
- *
- * Permission is hereby granted, free of charge, to any person obtaining a
- * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
- * DEALINGS IN THE SOFTWARE.
- *****************************************************************************/
+// Copyright © Transmission authors and contributors.
+// This file is licensed under the MIT (SPDX: MIT) license,
+// A copy of this license can be found in licenses/ .
 
 #pragma once
 
 #ifndef __TRANSMISSION__
 #error only libtransmission should #include this header.
 #endif
+
+#include <cstddef> // size_t
+#include <string_view>
 
 #ifdef _WIN32
 #include <inttypes.h>
@@ -36,7 +21,7 @@
 #endif
 
 #ifdef _WIN32
-typedef SOCKET tr_socket_t;
+using tr_socket_t = SOCKET;
 #define TR_BAD_SOCKET INVALID_SOCKET
 
 #undef EADDRINUSE
@@ -61,7 +46,7 @@ typedef SOCKET tr_socket_t;
 #define sockerrno WSAGetLastError()
 #else
 /** @brief Platform-specific socket descriptor type. */
-typedef int tr_socket_t;
+using tr_socket_t = int;
 /** @brief Platform-specific invalid socket descriptor constant. */
 #define TR_BAD_SOCKET (-1)
 
@@ -74,25 +59,22 @@ typedef int tr_socket_t;
 *****
 ****/
 
-typedef enum tr_address_type
+enum tr_address_type
 {
     TR_AF_INET,
     TR_AF_INET6,
     NUM_TR_AF_INET_TYPES
-}
-tr_address_type;
+};
 
-typedef struct tr_address
+struct tr_address
 {
     tr_address_type type;
     union
     {
         struct in6_addr addr6;
         struct in_addr addr4;
-    }
-    addr;
-}
-tr_address;
+    } addr;
+};
 
 extern tr_address const tr_inaddr_any;
 extern tr_address const tr_in6addr_any;
@@ -101,7 +83,11 @@ char const* tr_address_to_string(tr_address const* addr);
 
 char const* tr_address_to_string_with_buf(tr_address const* addr, char* buf, size_t buflen);
 
+char const* tr_address_and_port_to_string(char* buf, size_t buflen, tr_address const* addr, tr_port port);
+
 bool tr_address_from_string(tr_address* setme, char const* string);
+
+bool tr_address_from_string(tr_address* dst, std::string_view src);
 
 bool tr_address_from_sockaddr_storage(tr_address* setme, tr_port* port, struct sockaddr_storage const* src);
 
@@ -109,9 +95,9 @@ int tr_address_compare(tr_address const* a, tr_address const* b);
 
 bool tr_address_is_valid_for_peers(tr_address const* addr, tr_port port);
 
-static inline bool tr_address_is_valid(tr_address const* a)
+constexpr bool tr_address_is_valid(tr_address const* a)
 {
-    return a != NULL && (a->type == TR_AF_INET || a->type == TR_AF_INET6);
+    return a != nullptr && (a->type == TR_AF_INET || a->type == TR_AF_INET6);
 }
 
 /***********************************************************************
@@ -128,10 +114,6 @@ enum
 };
 
 struct tr_session;
-
-struct tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const* addr, tr_port port, bool clientIsSeed);
-
-struct tr_peer_socket tr_netOpenPeerUTPSocket(tr_session* session, tr_address const* addr, tr_port port, bool clientIsSeed);
 
 tr_socket_t tr_netBindTCP(tr_address const* addr, tr_port port, bool suppressMsgs);
 
@@ -153,4 +135,4 @@ bool tr_net_hasIPv6(tr_port);
  */
 char* tr_net_strerror(char* buf, size_t buflen, int err);
 
-unsigned char const* tr_globalIPv6(void);
+unsigned char const* tr_globalIPv6(tr_session const* session);

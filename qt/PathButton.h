@@ -1,18 +1,18 @@
-/*
- * This file Copyright (C) 2014-2015 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2014-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #pragma once
 
 #include <QToolButton>
 
+#include <libtransmission/tr-macros.h>
+
 class PathButton : public QToolButton
 {
     Q_OBJECT
+    TR_DISABLE_COPY_MOVE(PathButton)
 
 public:
     enum Mode
@@ -21,12 +21,11 @@ public:
         FileMode
     };
 
-public:
-    PathButton(QWidget* parent = nullptr);
+    explicit PathButton(QWidget* parent = nullptr);
 
     void setMode(Mode mode);
     void setTitle(QString const& title);
-    void setNameFilter(QString const& nameFilter);
+    void setNameFilter(QString const& name_filter);
 
     void setPath(QString const& path);
     QString const& path() const;
@@ -41,19 +40,18 @@ protected:
     // QWidget
     void paintEvent(QPaintEvent* event) override;
 
+private slots:
+    void onClicked() const;
+    void onFileSelected(QString const& path);
+
 private:
     void updateAppearance();
 
     bool isDirMode() const;
     QString effectiveTitle() const;
 
-private slots:
-    void onClicked();
-    void onFileSelected(QString const& path);
-
-private:
-    Mode myMode;
-    QString myTitle;
-    QString myNameFilter;
-    QString myPath;
+    QString name_filter_;
+    QString path_;
+    QString title_;
+    Mode mode_ = DirectoryMode;
 };

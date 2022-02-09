@@ -1,29 +1,25 @@
-/*
- * This file Copyright (C) 2010-2015 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2010-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #include "TrackerModel.h"
 #include "TrackerModelFilter.h"
 
-TrackerModelFilter::TrackerModelFilter(QObject* parent) :
-    QSortFilterProxyModel(parent),
-    myShowBackups(false)
+TrackerModelFilter::TrackerModelFilter(QObject* parent)
+    : QSortFilterProxyModel(parent)
 {
 }
 
 void TrackerModelFilter::setShowBackupTrackers(bool b)
 {
-    myShowBackups = b;
+    show_backups_ = b;
     invalidateFilter();
 }
 
-bool TrackerModelFilter::filterAcceptsRow(int sourceRow, QModelIndex const& sourceParent) const
+bool TrackerModelFilter::filterAcceptsRow(int source_row, QModelIndex const& source_parent) const
 {
-    QModelIndex index = sourceModel()->index(sourceRow, 0, sourceParent);
-    TrackerInfo const trackerInfo = index.data(TrackerModel::TrackerRole).value<TrackerInfo>();
-    return myShowBackups || !trackerInfo.st.isBackup;
+    QModelIndex index = sourceModel()->index(source_row, 0, source_parent);
+    auto const tracker_info = index.data(TrackerModel::TrackerRole).value<TrackerInfo>();
+    return show_backups_ || !tracker_info.st.is_backup;
 }

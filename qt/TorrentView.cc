@@ -1,10 +1,7 @@
-/*
- * This file Copyright (C) 2015 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2015-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #include <QApplication>
 #include <QStyleOptionHeader>
@@ -15,33 +12,32 @@
 class TorrentView::HeaderWidget : public QWidget
 {
 public:
-    HeaderWidget(TorrentView* parent) :
-        QWidget(parent),
-        myText()
+    explicit HeaderWidget(TorrentView* parent)
+        : QWidget(parent)
     {
-        setFont(qApp->font("QMiniFont"));
+        setFont(QApplication::font("QMiniFont"));
     }
 
     void setText(QString const& text)
     {
-        myText = text;
+        text_ = text;
         update();
     }
 
     // QWidget
-    virtual QSize sizeHint() const
+    [[nodiscard]] QSize sizeHint() const override
     {
         QStyleOptionHeader option;
         option.rect = QRect(0, 0, 100, 100);
 
-        QRect const labelRect = style()->subElementRect(QStyle::SE_HeaderLabel, &option, this);
+        QRect const label_rect = style()->subElementRect(QStyle::SE_HeaderLabel, &option, this);
 
-        return QSize(100, fontMetrics().height() + (option.rect.height() - labelRect.height()));
+        return { 100, fontMetrics().height() + (option.rect.height() - label_rect.height()) };
     }
 
 protected:
     // QWidget
-    virtual void paintEvent(QPaintEvent* /*event*/)
+    void paintEvent(QPaintEvent* /*event*/) override
     {
         QStyleOptionHeader option;
         option.initFrom(this);
@@ -52,44 +48,44 @@ protected:
         painter.drawControl(QStyle::CE_HeaderSection, option);
 
         option.rect = style()->subElementRect(QStyle::SE_HeaderLabel, &option, this);
-        painter.drawItemText(option.rect, Qt::AlignCenter, option.palette, true, myText, QPalette::ButtonText);
+        painter.drawItemText(option.rect, Qt::AlignCenter, option.palette, true, text_, QPalette::ButtonText);
     }
 
-    virtual void mouseDoubleClickEvent(QMouseEvent* /*event*/)
+    void mouseDoubleClickEvent(QMouseEvent* /*event*/) override
     {
-        emit static_cast<TorrentView*>(parent())->headerDoubleClicked();
+        emit dynamic_cast<TorrentView*>(parent())->headerDoubleClicked();
     }
 
 private:
-    QString myText;
+    QString text_;
 };
 
-TorrentView::TorrentView(QWidget* parent) :
-    QListView(parent),
-    myHeaderWidget(new HeaderWidget(this))
+TorrentView::TorrentView(QWidget* parent)
+    : QListView(parent)
+    , header_widget_(new HeaderWidget(this))
 {
 }
 
 void TorrentView::setHeaderText(QString const& text)
 {
-    bool const headerVisible = !text.isEmpty();
+    bool const header_visible = !text.isEmpty();
 
-    myHeaderWidget->setText(text);
-    myHeaderWidget->setVisible(headerVisible);
+    header_widget_->setText(text);
+    header_widget_->setVisible(header_visible);
 
-    if (headerVisible)
+    if (header_visible)
     {
         adjustHeaderPosition();
     }
 
-    setViewportMargins(0, headerVisible ? myHeaderWidget->height() : 0, 0, 0);
+    setViewportMargins(0, header_visible ? header_widget_->height() : 0, 0, 0);
 }
 
 void TorrentView::resizeEvent(QResizeEvent* event)
 {
     QListView::resizeEvent(event);
 
-    if (myHeaderWidget->isVisible())
+    if (header_widget_->isVisible())
     {
         adjustHeaderPosition();
     }
@@ -97,8 +93,8 @@ void TorrentView::resizeEvent(QResizeEvent* event)
 
 void TorrentView::adjustHeaderPosition()
 {
-    QRect headerWidgetRect = contentsRect();
-    headerWidgetRect.setWidth(viewport()->width());
-    headerWidgetRect.setHeight(myHeaderWidget->sizeHint().height());
-    myHeaderWidget->setGeometry(headerWidgetRect);
+    QRect header_widget_rect = contentsRect();
+    header_widget_rect.setWidth(viewport()->width());
+    header_widget_rect.setHeight(header_widget_->sizeHint().height());
+    header_widget_->setGeometry(header_widget_rect);
 }

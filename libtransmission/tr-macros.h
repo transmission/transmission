@@ -1,12 +1,13 @@
-/*
- * This file Copyright (C) 2017 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2017-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #pragma once
+
+#include <array>
+#include <cstddef>
+#include <cstdint>
 
 /***
 ****
@@ -35,32 +36,17 @@
 #endif
 
 #ifdef __GNUC__
-#define TR_GNUC_CHECK_VERSION(major, minor) \
-    (__GNUC__ > (major) || \
-    (__GNUC__ == (major) && __GNUC_MINOR__ >= (minor)))
+#define TR_GNUC_CHECK_VERSION(major, minor) (__GNUC__ > (major) || (__GNUC__ == (major) && __GNUC_MINOR__ >= (minor)))
 #else
 #define TR_GNUC_CHECK_VERSION(major, minor) 0
 #endif
 
 #ifdef __UCLIBC__
 #define TR_UCLIBC_CHECK_VERSION(major, minor, micro) \
-    (__UCLIBC_MAJOR__ > (major) || \
-    (__UCLIBC_MAJOR__ == (major) && __UCLIBC_MINOR__ > (minor)) || \
-    (__UCLIBC_MAJOR__ == (major) && __UCLIBC_MINOR__ == (minor) && __UCLIBC_SUBLEVEL__ >= (micro)))
+    (__UCLIBC_MAJOR__ > (major) || (__UCLIBC_MAJOR__ == (major) && __UCLIBC_MINOR__ > (minor)) || \
+     (__UCLIBC_MAJOR__ == (major) && __UCLIBC_MINOR__ == (minor) && __UCLIBC_SUBLEVEL__ >= (micro)))
 #else
 #define TR_UCLIBC_CHECK_VERSION(major, minor, micro) 0
-#endif
-
-/***
-****
-***/
-
-#ifndef UNUSED
-#if __has_attribute(__unused__) || TR_GNUC_CHECK_VERSION(2, 7)
-#define UNUSED __attribute__((__unused__))
-#else
-#define UNUSED
-#endif
 #endif
 
 /***
@@ -75,17 +61,21 @@
 #define TR_UNLIKELY(x) (x)
 #endif
 
+#define TR_DISABLE_COPY(Class) \
+    Class(Class const&) = delete; \
+    Class& operator=(Class const&) = delete;
+
+#define TR_DISABLE_MOVE(Class) \
+    Class(Class&&) = delete; \
+    Class& operator=(Class&&) = delete;
+
+#define TR_DISABLE_COPY_MOVE(Class) \
+    TR_DISABLE_COPY(Class) \
+    TR_DISABLE_MOVE(Class)
+
 /***
 ****
 ***/
-
-#if __has_attribute(__noreturn__) || TR_GNUC_CHECK_VERSION(2, 5)
-#define TR_NORETURN __attribute__((__noreturn__))
-#elif defined(_MSC_VER)
-#define TR_NORETURN __declspec(noreturn)
-#else
-#define TR_NORETURN
-#endif
 
 #if __has_attribute(__deprecated__) || TR_GNUC_CHECK_VERSION(3, 1)
 #define TR_DEPRECATED __attribute__((__deprecated__))
@@ -125,51 +115,38 @@
 #define TR_GNUC_MALLOC
 #endif
 
-#if __has_attribute(__fallthrough__) || TR_GNUC_CHECK_VERSION(7, 0)
-#define TR_GNUC_FALLTHROUGH __attribute__((__fallthrough__))
-#else
-#define TR_GNUC_FALLTHROUGH
-#endif
-
 /***
 ****
 ***/
 
-/**
- * @def TR_STATIC_ASSERT
- * @brief This helper allows to perform static checks at compile time
- */
-#if defined(static_assert)
-#define TR_STATIC_ASSERT static_assert
-#elif __has_feature(c_static_assert) || __has_extension(c_static_assert)
-#define TR_STATIC_ASSERT _Static_assert
-#else
-#define TR_STATIC_ASSERT(x, msg) \
-    { \
-        typedef char __tr_static_check__ [(x) ? 1 : -1] UNUSED; \
-    }
-#endif
-
-/* Sometimes the system defines MAX/MIN, sometimes not.
-   In the latter case, define those here since we will use them */
-
-#ifndef MAX
-#define MAX(a, b) ((a) > (b) ? (a) : (b))
-#endif
-
-#ifndef MIN
-#define MIN(a, b) ((a) > (b) ? (b) : (a))
-#endif
-
-/***
-****
-***/
+#define TR_PATH_DELIMITER '/'
+#define TR_PATH_DELIMITER_STR "/"
 
 /* Only use this macro to suppress false-positive alignment warnings */
 #define TR_DISCARD_ALIGN(ptr, type) ((type)(void*)(ptr))
 
-#define SHA_DIGEST_LENGTH 20
-
 #define TR_INET6_ADDRSTRLEN 46
 
-#define TR_BAD_SIZE ((size_t)-1)
+#define TR_ADDRSTRLEN 64
+
+// Mostly to enforce better formatting
+#define TR_ARG_TUPLE(...) __VA_ARGS__
+
+#define TR_PRIsv "*.*s"
+#define TR_PRIsv_ARG(sv) TR_ARG_TUPLE(int(std::size(sv)), int(std::size(sv)), std::data(sv))
+
+// https://www.bittorrent.org/beps/bep_0003.html
+// A string of length 20 which this downloader uses as its id. Each
+// downloader generates its own id at random at the start of a new
+// download. This value will also almost certainly have to be escaped.
+auto inline constexpr PEER_ID_LEN = size_t{ 20 };
+using tr_peer_id_t = std::array<char, PEER_ID_LEN>;
+
+#define SHA_DIGEST_LENGTH 20
+
+// TODO #1: all arrays of SHA_DIGEST_LENGTH should be replaced with tr_sha1_digest_t
+// TODO #2: tr_peer_id_t, tr_sha1_digest_t should be moved into a new 'types.h' header
+auto inline constexpr TR_SHA1_DIGEST_LEN = size_t{ 20 };
+auto inline constexpr TR_SHA1_DIGEST_STRLEN = size_t{ 40 };
+using tr_sha1_digest_t = std::array<std::byte, TR_SHA1_DIGEST_LEN>;
+using tr_sha1_digest_string_t = std::array<char, TR_SHA1_DIGEST_STRLEN + 1>; // +1 for '\0'

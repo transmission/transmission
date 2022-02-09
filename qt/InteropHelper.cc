@@ -1,10 +1,7 @@
-/*
- * This file Copyright (C) 2015 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2015-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #include <QVariant>
 
@@ -12,33 +9,29 @@
 
 bool InteropHelper::isConnected() const
 {
+    bool is_connected = false;
+
 #ifdef ENABLE_DBUS_INTEROP
 
-    if (myDbusClient.isConnected())
-    {
-        return true;
-    }
+    is_connected |= dbus_client_.isConnected();
 
 #endif
 
 #ifdef ENABLE_COM_INTEROP
 
-    if (myComClient.isConnected())
-    {
-        return true;
-    }
+    is_connected |= com_client_.isConnected();
 
 #endif
 
-    return false;
+    return is_connected;
 }
 
-bool InteropHelper::addMetainfo(QString const& metainfo)
+bool InteropHelper::addMetainfo(QString const& metainfo) const
 {
 #ifdef ENABLE_DBUS_INTEROP
 
     {
-        QVariant const response = myDbusClient.addMetainfo(metainfo);
+        QVariant const response = dbus_client_.addMetainfo(metainfo);
 
         if (response.isValid() && response.toBool())
         {
@@ -51,7 +44,7 @@ bool InteropHelper::addMetainfo(QString const& metainfo)
 #ifdef ENABLE_COM_INTEROP
 
     {
-        QVariant const response = myComClient.addMetainfo(metainfo);
+        QVariant const response = com_client_.addMetainfo(metainfo);
 
         if (response.isValid() && response.toBool())
         {

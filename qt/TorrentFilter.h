@@ -1,15 +1,18 @@
-/*
- * This file Copyright (C) 2009-2015 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2009-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #pragma once
 
+#include <array>
+
 #include <QSortFilterProxyModel>
 #include <QTimer>
+
+#include <libtransmission/tr-macros.h>
+
+#include "Filters.h"
 
 class QString;
 
@@ -20,6 +23,7 @@ class Torrent;
 class TorrentFilter : public QSortFilterProxyModel
 {
     Q_OBJECT
+    TR_DISABLE_COPY_MOVE(TorrentFilter)
 
 public:
     enum TextMode
@@ -29,26 +33,19 @@ public:
         FILTER_BY_TRACKER
     };
 
-public:
-    TorrentFilter(Prefs const& prefs);
-    virtual ~TorrentFilter();
-
-    void countTorrentsPerMode(int* setmeCounts) const;
+    explicit TorrentFilter(Prefs const& prefs);
+    [[nodiscard]] std::array<int, FilterMode::NUM_MODES> countTorrentsPerMode() const;
 
 protected:
     // QSortFilterProxyModel
     bool filterAcceptsRow(int, QModelIndex const&) const override;
     bool lessThan(QModelIndex const&, QModelIndex const&) const override;
 
-private:
-    bool activityFilterAcceptsTorrent(Torrent const* tor, FilterMode const& mode) const;
-    bool trackerFilterAcceptsTorrent(Torrent const* tor, QString const& tracker) const;
-
 private slots:
     void onPrefChanged(int key);
     void refilter();
 
 private:
-    QTimer myRefilterTimer;
-    Prefs const& myPrefs;
+    QTimer refilter_timer_;
+    Prefs const& prefs_;
 };
