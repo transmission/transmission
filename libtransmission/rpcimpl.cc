@@ -10,6 +10,7 @@
 #include <iterator>
 #include <numeric>
 #include <string_view>
+#include <utility>
 #include <vector>
 
 #include <libdeflate.h>
@@ -51,10 +52,10 @@ using namespace std::literals;
 #define dbgmsg(...) tr_logAddDeepNamed("RPC", __VA_ARGS__)
 #endif
 
-enum tr_format
+enum class TrFormat
 {
-    TR_FORMAT_OBJECT = 0,
-    TR_FORMAT_TABLE
+    Object,
+    Table
 };
 
 /***
@@ -831,9 +832,9 @@ static void initField(tr_torrent const* const tor, tr_stat const* const st, tr_v
     }
 }
 
-static void addTorrentInfo(tr_torrent* tor, tr_format format, tr_variant* entry, tr_quark const* fields, size_t fieldCount)
+static void addTorrentInfo(tr_torrent* tor, TrFormat format, tr_variant* entry, tr_quark const* fields, size_t fieldCount)
 {
-    if (format == TR_FORMAT_TABLE)
+    if (format == TrFormat::Table)
     {
         tr_variantInitList(entry, fieldCount);
     }
@@ -848,7 +849,7 @@ static void addTorrentInfo(tr_torrent* tor, tr_format format, tr_variant* entry,
 
         for (size_t i = 0; i < fieldCount; ++i)
         {
-            tr_variant* child = format == TR_FORMAT_TABLE ? tr_variantListAdd(entry) : tr_variantDictAdd(entry, fields[i]);
+            tr_variant* child = format == TrFormat::Table ? tr_variantListAdd(entry) : tr_variantDictAdd(entry, fields[i]);
 
             initField(tor, st, child, fields[i]);
         }
@@ -861,8 +862,8 @@ static char const* torrentGet(tr_session* session, tr_variant* args_in, tr_varia
     tr_variant* const list = tr_variantDictAddList(args_out, TR_KEY_torrents, std::size(torrents) + 1);
 
     auto sv = std::string_view{};
-    tr_format const format = tr_variantDictFindStrView(args_in, TR_KEY_format, &sv) && sv == "table"sv ? TR_FORMAT_TABLE :
-                                                                                                         TR_FORMAT_OBJECT;
+    auto const format = tr_variantDictFindStrView(args_in, TR_KEY_format, &sv) && sv == "table"sv ? TrFormat::Table :
+                                                                                                    TrFormat::Object;
 
     if (tr_variantDictFindStrView(args_in, TR_KEY_ids, &sv) && sv == "recently-active"sv)
     {
@@ -908,7 +909,7 @@ static char const* torrentGet(tr_session* session, tr_variant* args_in, tr_varia
             keys[keyCount++] = *key;
         }
 
-        if (format == TR_FORMAT_TABLE)
+        if (format == TrFormat::Table)
         {
             /* first entry is an array of property names */
             tr_variant* names = tr_variantListAddList(list, keyCount);
@@ -933,8 +934,9 @@ static char const* torrentGet(tr_session* session, tr_variant* args_in, tr_varia
 ****
 ***/
 
-static char const* makeLabels(tr_labels_t* labels, tr_variant* list)
+static std::pair<tr_labels_t, char const* /*errmsg*/> makeLabels(tr_variant* list)
 {
+    auto labels = tr_labels_t{};
     size_t const n = tr_variantListSize(list);
     for (size_t i = 0; i < n; ++i)
     {
@@ -947,31 +949,30 @@ static char const* makeLabels(tr_labels_t* labels, tr_variant* list)
         label = tr_strvStrip(label);
         if (std::empty(label))
         {
-            return "labels cannot be empty";
+            return { {}, "labels cannot be empty" };
         }
 
         if (tr_strvContains(label, ','))
         {
-            return "labels cannot contain comma (,) character";
+            return { {}, "labels cannot contain comma (,) character" };
         }
 
-        labels->emplace(label);
+        labels.emplace(label);
     }
 
-    return nullptr;
+    return { labels, nullptr };
 }
 
 static char const* setLabels(tr_torrent* tor, tr_variant* list)
 {
-    auto labels = tr_labels_t{};
+    auto [labels, errmsg] = makeLabels(list);
 
-    if (auto const* errmsg = makeLabels(&labels, list); errmsg != nullptr)
+    if (errmsg != nullptr)
     {
         return errmsg;
     }
 
     tr_torrentSetLabels(tor, std::move(labels));
-
     return nullptr;
 }
 
@@ -1316,8 +1317,7 @@ static char const* torrentRenamePath(
     auto newname = std::string_view{};
     (void)tr_variantDictFindStrView(args_in, TR_KEY_name, &newname);
 
-    auto const torrents = getTorrents(session, args_in);
-    if (std::size(torrents) == 1)
+    if (auto const torrents = getTorrents(session, args_in); std::size(torrents) == 1)
     {
         torrents[0]->renamePath(oldpath, newname, torrentRenamePathDone, idle_data);
     }
@@ -1496,7 +1496,7 @@ static void addTorrentImpl(struct tr_rpc_idle_data* data, tr_ctor* ctor)
             TR_KEY_hashString,
         };
 
-        addTorrentInfo(tor, TR_FORMAT_OBJECT, tr_variantDictAdd(data->args_out, key), fields, TR_N_ELEMENTS(fields));
+        addTorrentInfo(tor, TrFormat::Object, tr_variantDictAdd(data->args_out, key), fields, TR_N_ELEMENTS(fields));
 
         if (result == nullptr)
         {
@@ -1661,9 +1661,11 @@ static char const* torrentAdd(tr_session* session, tr_variant* args_in, tr_varia
 
     if (tr_variantDictFindList(args_in, TR_KEY_labels, &l))
     {
-        auto labels = tr_labels_t{};
-        if (auto const* errmsg = makeLabels(&labels, l); errmsg != nullptr)
+        auto [labels, errmsg] = makeLabels(l);
+
+        if (errmsg != nullptr)
         {
+            tr_ctorFree(ctor);
             return errmsg;
         }
 
@@ -2265,8 +2267,7 @@ static void addSessionField(tr_session* s, tr_variant* d, tr_quark key)
 
 static char const* sessionGet(tr_session* s, tr_variant* args_in, tr_variant* args_out, tr_rpc_idle_data* /*idle_data*/)
 {
-    tr_variant* fields = nullptr;
-    if (tr_variantDictFindList(args_in, TR_KEY_fields, &fields))
+    if (tr_variant* fields = nullptr; tr_variantDictFindList(args_in, TR_KEY_fields, &fields))
     {
         size_t const field_count = tr_variantListSize(fields);
 
@@ -2427,8 +2428,7 @@ void tr_rpc_request_exec_json(
         tr_variantDictAddDict(&response, TR_KEY_arguments, 0);
         tr_variantDictAddStr(&response, TR_KEY_result, result);
 
-        auto tag = int64_t{};
-        if (tr_variantDictFindInt(mutable_request, TR_KEY_tag, &tag))
+        if (auto tag = int64_t{}; tr_variantDictFindInt(mutable_request, TR_KEY_tag, &tag))
         {
             tr_variantDictAddInt(&response, TR_KEY_tag, tag);
         }
@@ -2451,8 +2451,7 @@ void tr_rpc_request_exec_json(
 
         tr_variantDictAddStr(&response, TR_KEY_result, result);
 
-        auto tag = int64_t{};
-        if (tr_variantDictFindInt(mutable_request, TR_KEY_tag, &tag))
+        if (auto tag = int64_t{}; tr_variantDictFindInt(mutable_request, TR_KEY_tag, &tag))
         {
             tr_variantDictAddInt(&response, TR_KEY_tag, tag);
         }
@@ -2468,8 +2467,7 @@ void tr_rpc_request_exec_json(
         data->response = tr_new0(tr_variant, 1);
         tr_variantInitDict(data->response, 3);
 
-        auto tag = int64_t{};
-        if (tr_variantDictFindInt(mutable_request, TR_KEY_tag, &tag))
+        if (auto tag = int64_t{}; tr_variantDictFindInt(mutable_request, TR_KEY_tag, &tag))
         {
             tr_variantDictAddInt(data->response, TR_KEY_tag, tag);
         }

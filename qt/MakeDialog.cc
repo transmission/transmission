@@ -91,31 +91,31 @@ void MakeProgressDialog::onProgress()
     ui_.progressBar->setValue(static_cast<int>((100.0 * b.pieceIndex) / denom));
 
     // progress label
-    QString const top = QString::fromUtf8(b.top);
-    QString const base(QFileInfo(top).completeBaseName());
+    auto const top = QString::fromUtf8(b.top);
+    auto const base = QFileInfo(top).completeBaseName();
     QString str;
 
     if (!b.isDone)
     {
         str = tr("Creating \"%1\"").arg(base);
     }
-    else if (b.result == TR_MAKEMETA_OK)
+    else if (b.result == TrMakemetaResult::OK)
     {
         str = tr("Created \"%1\"!").arg(base);
     }
-    else if (b.result == TR_MAKEMETA_URL)
-    {
-        str = tr("Error: invalid announce URL \"%1\"").arg(QString::fromUtf8(b.errfile));
-    }
-    else if (b.result == TR_MAKEMETA_CANCELLED)
+    else if (b.result == TrMakemetaResult::CANCELLED)
     {
         str = tr("Cancelled");
     }
-    else if (b.result == TR_MAKEMETA_IO_READ)
+    else if (b.result == TrMakemetaResult::ERR_URL)
+    {
+        str = tr("Error: invalid announce URL \"%1\"").arg(QString::fromUtf8(b.errfile));
+    }
+    else if (b.result == TrMakemetaResult::ERR_IO_READ)
     {
         str = tr("Error reading \"%1\": %2").arg(QString::fromUtf8(b.errfile)).arg(QString::fromUtf8(tr_strerror(b.my_errno)));
     }
-    else if (b.result == TR_MAKEMETA_IO_WRITE)
+    else if (b.result == TrMakemetaResult::ERR_IO_WRITE)
     {
         str = tr("Error writing \"%1\": %2").arg(QString::fromUtf8(b.errfile)).arg(QString::fromUtf8(tr_strerror(b.my_errno)));
     }
@@ -125,7 +125,7 @@ void MakeProgressDialog::onProgress()
     // buttons
     ui_.dialogButtons->button(QDialogButtonBox::Abort)->setEnabled(!b.isDone);
     ui_.dialogButtons->button(QDialogButtonBox::Ok)->setEnabled(b.isDone);
-    ui_.dialogButtons->button(QDialogButtonBox::Open)->setEnabled(b.isDone && b.result == TR_MAKEMETA_OK);
+    ui_.dialogButtons->button(QDialogButtonBox::Open)->setEnabled(b.isDone && b.result == TrMakemetaResult::OK);
 }
 
 #include "MakeDialog.moc"

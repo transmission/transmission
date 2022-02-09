@@ -143,33 +143,31 @@ Glib::ustring getShortTransferString(
     double uploadSpeed_KBps,
     double downloadSpeed_KBps)
 {
-    Glib::ustring buf;
-
     bool const haveMeta = tr_torrentHasMetadata(tor);
-    bool const haveUp = haveMeta && st->peersGettingFromUs > 0;
-    bool const haveDown = haveMeta && (st->peersSendingToUs > 0 || st->webseedsSendingToUs > 0);
 
-    if (haveDown)
+    if (bool const haveDown = haveMeta && (st->peersSendingToUs > 0 || st->webseedsSendingToUs > 0); haveDown)
     {
         /* down speed, down symbol, up speed, up symbol */
-        buf += gtr_sprintf(
+        return gtr_sprintf(
             _("%1$s %2$s  %3$s %4$s"),
             tr_formatter_speed_KBps(downloadSpeed_KBps),
-            gtr_get_unicode_string(GTR_UNICODE_DOWN),
+            gtr_get_unicode_string(GtrUnicode::Down),
             tr_formatter_speed_KBps(uploadSpeed_KBps),
-            gtr_get_unicode_string(GTR_UNICODE_UP));
-    }
-    else if (haveUp)
-    {
-        /* up speed, up symbol */
-        buf += gtr_sprintf(_("%1$s  %2$s"), tr_formatter_speed_KBps(uploadSpeed_KBps), gtr_get_unicode_string(GTR_UNICODE_UP));
-    }
-    else if (st->isStalled)
-    {
-        buf += _("Stalled");
+            gtr_get_unicode_string(GtrUnicode::Up));
     }
 
-    return buf;
+    if (bool const haveUp = haveMeta && st->peersGettingFromUs > 0; haveUp)
+    {
+        /* up speed, up symbol */
+        return gtr_sprintf(_("%1$s  %2$s"), tr_formatter_speed_KBps(uploadSpeed_KBps), gtr_get_unicode_string(GtrUnicode::Up));
+    }
+
+    if (st->isStalled)
+    {
+        return _("Stalled");
+    }
+
+    return {};
 }
 
 Glib::ustring getShortStatusString(tr_torrent const* tor, tr_stat const* st, double uploadSpeed_KBps, double downloadSpeed_KBps)

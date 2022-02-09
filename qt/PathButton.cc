@@ -71,7 +71,7 @@ QString const& PathButton::path() const
 QSize PathButton::sizeHint() const
 {
     QSize const sh(QToolButton::sizeHint());
-    return QSize(qMin(sh.width(), 150), sh.height());
+    return { qMin(sh.width(), 150), sh.height() };
 }
 
 void PathButton::paintEvent(QPaintEvent* /*event*/)

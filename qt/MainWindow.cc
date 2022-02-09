@@ -1118,19 +1118,16 @@ void MainWindow::trayActivated(QSystemTrayIcon::ActivationReason reason)
 
 void MainWindow::refreshPref(int key)
 {
-    bool b;
-    int i;
-    QString str;
-    QActionGroup const* action_group;
+    auto b = bool{};
+    auto i = int{};
+    auto str = QString{};
 
     switch (key)
     {
     case Prefs::STATUSBAR_STATS:
         str = prefs_.getString(key);
-        action_group = ui_.action_TotalRatio->actionGroup();
-        assert(action_group != nullptr);
 
-        for (QAction* action : action_group->actions())
+        for (auto* action : ui_.action_TotalRatio->actionGroup()->actions())
         {
             action->setChecked(str == action->property(StatsModeKey).toString());
         }
@@ -1144,10 +1141,8 @@ void MainWindow::refreshPref(int key)
 
     case Prefs::SORT_MODE:
         i = prefs_.get<SortMode>(key).mode();
-        action_group = ui_.action_SortByActivity->actionGroup();
-        assert(action_group != nullptr);
 
-        for (QAction* action : action_group->actions())
+        for (auto* action : ui_.action_SortByActivity->actionGroup()->actions())
         {
             action->setChecked(i == action->property(SortModeKey).toInt());
         }
@@ -1260,8 +1255,7 @@ void MainWindow::newTorrent()
 
 void MainWindow::openTorrent()
 {
-    QFileDialog* d;
-    d = new QFileDialog(
+    auto* const d = new QFileDialog(
         this,
         tr("Open Torrent"),
         prefs_.getString(Prefs::OPEN_DIALOG_FOLDER),
@@ -1342,7 +1336,6 @@ void MainWindow::removeTorrents(bool const delete_files)
     QString secondary_text;
     int incomplete = 0;
     int connected = 0;
-    int count;
 
     for (QModelIndex const& index : ui_.listView->selectionModel()->selectedRows())
     {
@@ -1365,7 +1358,7 @@ void MainWindow::removeTorrents(bool const delete_files)
         return;
     }
 
-    count = ids.size();
+    int const count = ids.size();
 
     if (!delete_files)
     {
@@ -1487,7 +1480,7 @@ void MainWindow::updateNetworkIcon()
     {
         tip = tr("%1 is responding").arg(url);
     }
-    else if (seconds_since_last_read < 60 * 2)
+    else if (seconds_since_last_read < 120)
     {
         tip = tr("%1 last responded %2 ago").arg(url).arg(Formatter::get().timeToString(seconds_since_last_read));
     }
