@@ -42,6 +42,7 @@ $image-chevron-dn: 'images/chevron-down.svg';
 $image-chevron-up: 'images/chevron-up.svg';
 $image-lock-fill: 'images/lock-fill.svg';
 $image-network: 'images/router.svg';
+$image-magnet: 'images/magnet.svg';
 $image-overflow: 'images/three-dots-vertical.svg';
 $image-pause-circle-active: 'images/pause-circle-active.svg';
 $image-pause-circle-idle: 'images/pause-circle-idle.svg';
@@ -949,6 +950,20 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
     // this section is not copied
     overflow-x: hidden;
     text-overflow: ellipsis;
+  }
+}
+
+.inspector-info-magnet {
+  button {
+    background-color: transparent;
+    background-image: url($image-magnet);
+    background-position: top;
+    background-repeat: no-repeat;
+    border: 0;
+    cursor: pointer;
+    height: 1rem;
+    vertical-align: middle;
+    width: 1rem;
   }
 }
 

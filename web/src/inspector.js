@@ -115,6 +115,7 @@ export class Inspector extends EventTarget {
       ['hash', 'Hash:'],
       ['privacy', 'Privacy:'],
       ['origin', 'Origin:'],
+      ['magnetLink', 'Magnet:'],
       ['comment', 'Comment:'],
       ['labels', 'Labels:'],
     ];
@@ -533,6 +534,19 @@ export class Inspector extends EventTarget {
       string = torrents.every((t) => get(t) === first) ? first : mixed;
     }
     setTextContent(e.info.location, string);
+
+    // magnetLink
+    if (torrents.length === 0) {
+      setTextContent(e.info.magnetLink, none);
+    } else if (torrents.length > 1) {
+      setTextContent(e.info.magnetLink, mixed);
+    } else {
+      const link = torrents[0].getMagnetLink();
+      Utils.setInnerHTML(
+        e.info.magnetLink,
+        `<a class="inspector-info-magnet" href="${link}"><button></button></a>`
+      );
+    }
   }
 
   ///  PEERS PAGE
