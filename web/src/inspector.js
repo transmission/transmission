@@ -532,20 +532,16 @@ export class Inspector extends EventTarget {
 
     // magnetLink
     if (torrents.length === 0) {
-      string = none;
+      setTextContent(e.info.magnetLink, none);
+    } else if (torrents.length > 1) {
+      setTextContent(e.info.magnetLink, mixed);
     } else {
-      const get = (t) => t.getMagnetLink();
-      const first = get(torrents[0]);
-      string = torrents.every((t) => get(t) === first) ? first : mixed;
-    }
-    if (none !== string) {
+      const link = torrents[0].getMagnetLink();
       Utils.setInnerHTML(
         e.info.magnetLink,
-        `<a class="inspector-info-magnet" href="${string}"><button></button></a>`
+        `<a class="inspector-info-magnet" href="${link}"><button></button></a>`
       );
-    } else {
-      setTextContent(e.info.magnetLink, string);
-    }
+  }
   }
 
   ///  PEERS PAGE
