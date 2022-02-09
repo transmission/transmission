@@ -541,7 +541,7 @@ export class Inspector extends EventTarget {
         e.info.magnetLink,
         `<a class="inspector-info-magnet" href="${link}"><button></button></a>`
       );
-  }
+    }
   }
 
   ///  PEERS PAGE
