@@ -354,7 +354,7 @@ static char const* torrentVerify(
 {
     for (auto* tor : getTorrents(session, args_in))
     {
-        tr_torrentVerify(tor, nullptr, nullptr);
+        tr_torrentVerify(tor);
         notify(session, TR_RPC_TORRENT_CHANGED, tor);
     }
 

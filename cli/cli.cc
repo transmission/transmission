@@ -320,7 +320,7 @@ int tr_main(int argc, char* argv[])
     if (verify)
     {
         verify = false;
-        tr_torrentVerify(tor, nullptr, nullptr);
+        tr_torrentVerify(tor);
     }
 
     for (;;)

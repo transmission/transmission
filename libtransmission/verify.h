@@ -9,10 +9,15 @@
 #error only libtransmission should #include this header.
 #endif
 
+struct tr_session;
+struct tr_torrent;
+
 /**
  * @addtogroup file_io File IO
  * @{
  */
+
+using tr_verify_done_func = void (*)(tr_torrent*, bool aborted, void* user_data);
 
 void tr_verifyAdd(tr_torrent* tor, tr_verify_done_func callback_func, void* callback_user_data);
 
