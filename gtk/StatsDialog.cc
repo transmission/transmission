@@ -14,10 +14,7 @@
 #include "StatsDialog.h"
 #include "Utils.h"
 
-enum
-{
-    TR_RESPONSE_RESET = 1
-};
+static auto constexpr TR_RESPONSE_RESET = int{ 1 };
 
 class StatsDialog::Impl
 {

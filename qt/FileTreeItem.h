@@ -22,12 +22,9 @@ class FileTreeItem
     TR_DISABLE_COPY_MOVE(FileTreeItem)
 
 public:
-    enum
-    {
-        LOW = (1 << 0),
-        NORMAL = (1 << 1),
-        HIGH = (1 << 2)
-    };
+    static auto constexpr Low = int{ 1 << 0 };
+    static auto constexpr Normal = int{ 1 << 1 };
+    static auto constexpr High = int{ 1 << 2 };
 
     FileTreeItem(QString const& name = QString(), int file_index = -1, uint64_t size = 0)
         : name_(name)

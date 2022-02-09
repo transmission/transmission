@@ -52,10 +52,10 @@ using namespace std::literals;
 #define dbgmsg(...) tr_logAddDeepNamed("RPC", __VA_ARGS__)
 #endif
 
-enum tr_format
+enum class TrFormat
 {
-    TR_FORMAT_OBJECT = 0,
-    TR_FORMAT_TABLE
+    Object,
+    Table
 };
 
 /***
@@ -832,9 +832,9 @@ static void initField(tr_torrent const* const tor, tr_stat const* const st, tr_v
     }
 }
 
-static void addTorrentInfo(tr_torrent* tor, tr_format format, tr_variant* entry, tr_quark const* fields, size_t fieldCount)
+static void addTorrentInfo(tr_torrent* tor, TrFormat format, tr_variant* entry, tr_quark const* fields, size_t fieldCount)
 {
-    if (format == TR_FORMAT_TABLE)
+    if (format == TrFormat::Table)
     {
         tr_variantInitList(entry, fieldCount);
     }
@@ -849,7 +849,7 @@ static void addTorrentInfo(tr_torrent* tor, tr_format format, tr_variant* entry,
 
         for (size_t i = 0; i < fieldCount; ++i)
         {
-            tr_variant* child = format == TR_FORMAT_TABLE ? tr_variantListAdd(entry) : tr_variantDictAdd(entry, fields[i]);
+            tr_variant* child = format == TrFormat::Table ? tr_variantListAdd(entry) : tr_variantDictAdd(entry, fields[i]);
 
             initField(tor, st, child, fields[i]);
         }
@@ -862,8 +862,8 @@ static char const* torrentGet(tr_session* session, tr_variant* args_in, tr_varia
     tr_variant* const list = tr_variantDictAddList(args_out, TR_KEY_torrents, std::size(torrents) + 1);
 
     auto sv = std::string_view{};
-    tr_format const format = tr_variantDictFindStrView(args_in, TR_KEY_format, &sv) && sv == "table"sv ? TR_FORMAT_TABLE :
-                                                                                                         TR_FORMAT_OBJECT;
+    auto const format = tr_variantDictFindStrView(args_in, TR_KEY_format, &sv) && sv == "table"sv ? TrFormat::Table :
+                                                                                                    TrFormat::Object;
 
     if (tr_variantDictFindStrView(args_in, TR_KEY_ids, &sv) && sv == "recently-active"sv)
     {
@@ -909,7 +909,7 @@ static char const* torrentGet(tr_session* session, tr_variant* args_in, tr_varia
             keys[keyCount++] = *key;
         }
 
-        if (format == TR_FORMAT_TABLE)
+        if (format == TrFormat::Table)
         {
             /* first entry is an array of property names */
             tr_variant* names = tr_variantListAddList(list, keyCount);
@@ -1496,7 +1496,7 @@ static void addTorrentImpl(struct tr_rpc_idle_data* data, tr_ctor* ctor)
             TR_KEY_hashString,
         };
 
-        addTorrentInfo(tor, TR_FORMAT_OBJECT, tr_variantDictAdd(data->args_out, key), fields, TR_N_ELEMENTS(fields));
+        addTorrentInfo(tor, TrFormat::Object, tr_variantDictAdd(data->args_out, key), fields, TR_N_ELEMENTS(fields));
 
         if (result == nullptr)
         {

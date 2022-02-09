@@ -30,8 +30,5 @@ private:
     std::unique_ptr<Impl> const impl_;
 };
 
-enum
-{
-    MAIN_WINDOW_REFRESH_INTERVAL_SECONDS = 2,
-    SECONDARY_WINDOW_REFRESH_INTERVAL_SECONDS = 2
-};
+auto inline constexpr MAIN_WINDOW_REFRESH_INTERVAL_SECONDS = int{ 2 };
+auto inline constexpr SECONDARY_WINDOW_REFRESH_INTERVAL_SECONDS = int{ 2 };

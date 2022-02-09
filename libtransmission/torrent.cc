@@ -672,13 +672,13 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
     tor->addedDate = now; // this is a default that will be overwritten by the resume file
     tor->anyDate = now;
 
-    // tr_torrentLoadResume() calls a lot of tr_torrentSetFoo() methods
+    // tr_resume::load() calls a lot of tr_torrentSetFoo() methods
     // that set things as dirty, but... these settings being loaded are
     // the same ones that would be saved back again, so don't let them
     // affect the 'is dirty' flag.
     auto const was_dirty = tor->isDirty;
     bool resume_file_was_migrated = false;
-    auto const loaded = tr_torrentLoadResume(tor, ~(uint64_t)0, ctor, &resume_file_was_migrated);
+    auto const loaded = tr_resume::load(tor, tr_resume::All, ctor, &resume_file_was_migrated);
     tor->isDirty = was_dirty;
 
     if (resume_file_was_migrated)
@@ -696,7 +696,7 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
     bool const doStart = tor->isRunning;
     tor->isRunning = false;
 
-    if ((loaded & TR_FR_SPEEDLIMIT) == 0)
+    if ((loaded & tr_resume::Speedlimit) == 0)
     {
         tr_torrentUseSpeedLimit(tor, TR_UP, false);
         tor->setSpeedLimitBps(TR_UP, tr_sessionGetSpeedLimit_Bps(tor->session, TR_UP));
@@ -705,13 +705,13 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
         tr_torrentUseSessionLimits(tor, true);
     }
 
-    if ((loaded & TR_FR_RATIOLIMIT) == 0)
+    if ((loaded & tr_resume::Ratiolimit) == 0)
     {
         tr_torrentSetRatioMode(tor, TR_RATIOLIMIT_GLOBAL);
         tr_torrentSetRatioLimit(tor, tr_sessionGetRatioLimit(tor->session));
     }
 
-    if ((loaded & TR_FR_IDLELIMIT) == 0)
+    if ((loaded & tr_resume::Idlelimit) == 0)
     {
         tr_torrentSetIdleMode(tor, TR_IDLELIMIT_GLOBAL);
         tr_torrentSetIdleLimit(tor, tr_sessionGetIdleLimit(tor->session));
@@ -1471,7 +1471,7 @@ void tr_torrentSave(tr_torrent* tor)
     if (tor->isDirty)
     {
         tor->isDirty = false;
-        tr_torrentSaveResume(tor);
+        tr_resume::save(tor);
     }
 }
 
