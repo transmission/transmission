@@ -266,7 +266,7 @@ static std::vector<std::byte> getHashInfo(tr_metainfo_builder* b)
     {
         b->my_errno = error->code;
         tr_strlcpy(b->errfile, b->files[fileIndex].filename, sizeof(b->errfile));
-        b->result = TR_MAKEMETA_IO_READ;
+        b->result = TrMakemetaResult::ERR_IO_READ;
         tr_error_free(error);
         return {};
     }
@@ -302,7 +302,7 @@ static std::vector<std::byte> getHashInfo(tr_metainfo_builder* b)
                     {
                         b->my_errno = error->code;
                         tr_strlcpy(b->errfile, b->files[fileIndex].filename, sizeof(b->errfile));
-                        b->result = TR_MAKEMETA_IO_READ;
+                        b->result = TrMakemetaResult::ERR_IO_READ;
                         tr_error_free(error);
                         return {};
                     }
@@ -317,7 +317,7 @@ static std::vector<std::byte> getHashInfo(tr_metainfo_builder* b)
         {
             b->my_errno = EIO;
             tr_snprintf(b->errfile, sizeof(b->errfile), "error hashing piece %" PRIu32, b->pieceIndex);
-            b->result = TR_MAKEMETA_IO_READ;
+            b->result = TrMakemetaResult::ERR_IO_READ;
             break;
         }
 
@@ -325,7 +325,7 @@ static std::vector<std::byte> getHashInfo(tr_metainfo_builder* b)
 
         if (b->abortFlag)
         {
-            b->result = TR_MAKEMETA_CANCELLED;
+            b->result = TrMakemetaResult::CANCELLED;
             break;
         }
 
@@ -421,12 +421,12 @@ static void tr_realMakeMetaInfo(tr_metainfo_builder* builder)
     tr_variant top;
 
     /* allow an empty set, but if URLs *are* listed, verify them. #814, #971 */
-    for (int i = 0; i < builder->trackerCount && builder->result == TR_MAKEMETA_OK; ++i)
+    for (int i = 0; i < builder->trackerCount && builder->result == TrMakemetaResult::OK; ++i)
     {
         if (!tr_urlIsValidTracker(builder->trackers[i].announce))
         {
             tr_strlcpy(builder->errfile, builder->trackers[i].announce, sizeof(builder->errfile));
-            builder->result = TR_MAKEMETA_URL;
+            builder->result = TrMakemetaResult::ERR_URL;
         }
     }
 
@@ -436,11 +436,11 @@ static void tr_realMakeMetaInfo(tr_metainfo_builder* builder)
     {
         builder->errfile[0] = '\0';
         builder->my_errno = ENOENT;
-        builder->result = TR_MAKEMETA_IO_READ;
+        builder->result = TrMakemetaResult::ERR_IO_READ;
         builder->isDone = true;
     }
 
-    if (builder->result == TR_MAKEMETA_OK && builder->trackerCount != 0)
+    if (builder->result == TrMakemetaResult::OK && builder->trackerCount != 0)
     {
         int prevTier = -1;
         tr_variant* tier = nullptr;
@@ -464,7 +464,7 @@ static void tr_realMakeMetaInfo(tr_metainfo_builder* builder)
         tr_variantDictAddStr(&top, TR_KEY_announce, builder->trackers[0].announce);
     }
 
-    if (builder->result == TR_MAKEMETA_OK && !builder->abortFlag)
+    if (builder->result == TrMakemetaResult::OK && !builder->abortFlag)
     {
         if (!tr_str_is_empty(builder->comment))
         {
@@ -478,12 +478,12 @@ static void tr_realMakeMetaInfo(tr_metainfo_builder* builder)
     }
 
     /* save the file */
-    if ((builder->result == TR_MAKEMETA_OK) && (!builder->abortFlag) &&
+    if ((builder->result == TrMakemetaResult::OK) && (!builder->abortFlag) &&
         (tr_variantToFile(&top, TR_VARIANT_FMT_BENC, builder->outputFile) != 0))
     {
         builder->my_errno = errno;
         tr_strlcpy(builder->errfile, builder->outputFile, sizeof(builder->errfile));
-        builder->result = TR_MAKEMETA_IO_WRITE;
+        builder->result = TrMakemetaResult::ERR_IO_WRITE;
     }
 
     /* cleanup */
@@ -491,7 +491,7 @@ static void tr_realMakeMetaInfo(tr_metainfo_builder* builder)
 
     if (builder->abortFlag)
     {
-        builder->result = TR_MAKEMETA_CANCELLED;
+        builder->result = TrMakemetaResult::CANCELLED;
     }
 
     builder->isDone = true;
@@ -560,7 +560,7 @@ void tr_makeMetaInfo(
 
     /* initialize the builder variables */
     builder->abortFlag = false;
-    builder->result = TR_MAKEMETA_OK;
+    builder->result = TrMakemetaResult::OK;
     builder->isDone = false;
     builder->pieceIndex = 0;
     builder->trackerCount = trackerCount;

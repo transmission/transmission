@@ -139,7 +139,6 @@ protected:
 
 TEST_F(RenameTest, singleFilenameTorrent)
 {
-    uint64_t loaded;
     static auto constexpr TotalSize = size_t{ 14 };
 
     // this is a single-file torrent whose file is hello-world.txt, holding the string "hello, world!"
@@ -207,11 +206,11 @@ TEST_F(RenameTest, singleFilenameTorrent)
     EXPECT_TRUE(testFileExistsAndConsistsOfThisString(tor, 0, "hello, world!\n")); // confirm the contents are right
 
     // (while it's renamed: confirm that the .resume file remembers the changes)
-    tr_torrentSaveResume(tor);
+    tr_resume::save(tor);
     sync();
-    loaded = tr_torrentLoadResume(tor, ~0ULL, ctor, nullptr);
+    auto const loaded = tr_resume::load(tor, tr_resume::All, ctor, nullptr);
     EXPECT_STREQ("foobar", tr_torrentName(tor));
-    EXPECT_NE(decltype(loaded){ 0 }, (loaded & TR_FR_NAME));
+    EXPECT_NE(decltype(loaded){ 0 }, (loaded & tr_resume::Name));
 
     /***
     ****  ...and rename it back again
@@ -318,11 +317,11 @@ TEST_F(RenameTest, multifileTorrent)
     EXPECT_TRUE(testFileExistsAndConsistsOfThisString(tor, 2, expected_contents[2]));
 
     // (while the branch is renamed: confirm that the .resume file remembers the changes)
-    tr_torrentSaveResume(tor);
+    tr_resume::save(tor);
     // this is a bit dodgy code-wise, but let's make sure the .resume file got the name
     tor->setFileSubpath(1, "gabba gabba hey"sv);
-    auto const loaded = tr_torrentLoadResume(tor, ~0ULL, ctor, nullptr);
-    EXPECT_NE(decltype(loaded){ 0 }, (loaded & TR_FR_FILENAMES));
+    auto const loaded = tr_resume::load(tor, tr_resume::All, ctor, nullptr);
+    EXPECT_NE(decltype(loaded){ 0 }, (loaded & tr_resume::Filenames));
     EXPECT_EQ(expected_files[0], tr_torrentFile(tor, 0).name);
     EXPECT_STREQ("Felidae/Felinae/Felis/placeholder/Kyphi", tr_torrentFile(tor, 1).name);
     EXPECT_STREQ("Felidae/Felinae/Felis/placeholder/Saffron", tr_torrentFile(tor, 2).name);
