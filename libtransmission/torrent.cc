@@ -750,7 +750,7 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
         else
         {
             tor->startAfterVerify = doStart;
-            tr_torrentVerify(tor, nullptr, nullptr);
+            tr_torrentVerify(tor);
         }
     }
     else if (doStart)
@@ -1369,99 +1369,70 @@ void tr_torrentStartNow(tr_torrent* tor)
     }
 }
 
-struct verify_data
+static void onVerifyDoneThreadFunc(void* vtor)
 {
-    bool aborted;
-    tr_torrent* tor;
-    tr_verify_done_func callback_func;
-    void* callback_data;
-};
-
-static void onVerifyDoneThreadFunc(void* vdata)
-{
-    auto* data = static_cast<struct verify_data*>(vdata);
-
-    if (auto* const tor = data->tor; !tor->isDeleting)
-    {
-        if (!data->aborted)
-        {
-            tor->recheckCompleteness();
-        }
-
-        if (data->callback_func != nullptr)
-        {
-            (*data->callback_func)(tor, data->aborted, data->callback_data);
-        }
-
-        if (!data->aborted && tor->startAfterVerify)
-        {
-            tor->startAfterVerify = false;
-            torrentStart(tor, false);
-        }
-    }
-
-    tr_free(data);
-}
-
-static void onVerifyDone(tr_torrent* tor, bool aborted, void* vdata)
-{
-    auto* data = static_cast<struct verify_data*>(vdata);
-
-    TR_ASSERT(data->tor == tor);
+    auto* const tor = static_cast<tr_torrent*>(vtor);
+    TR_ASSERT(tr_amInEventThread(tor->session));
 
     if (tor->isDeleting)
     {
-        tr_free(data);
         return;
     }
 
-    data->aborted = aborted;
-    tr_runInEventThread(tor->session, onVerifyDoneThreadFunc, data);
+    tor->recheckCompleteness();
+
+    if (tor->startAfterVerify)
+    {
+        tor->startAfterVerify = false;
+        torrentStart(tor, false);
+    }
 }
 
-static void verifyTorrent(void* vdata)
+static void onVerifyDone(tr_torrent* tor, bool aborted, void* /*unused*/)
 {
-    auto* data = static_cast<struct verify_data*>(vdata);
-    tr_torrent* tor = data->tor;
+    if (aborted || tor->isDeleting)
+    {
+        return;
+    }
+
+    tr_runInEventThread(tor->session, onVerifyDoneThreadFunc, tor);
+}
+
+static void verifyTorrent(void* vtor)
+{
+    auto* tor = static_cast<tr_torrent*>(vtor);
+    TR_ASSERT(tr_amInEventThread(tor->session));
     auto const lock = tor->unique_lock();
 
     if (tor->isDeleting)
     {
-        tr_free(data);
+        return;
+    }
+
+    /* if the torrent's already being verified, stop it */
+    tr_verifyRemove(tor);
+
+    bool const startAfter = (tor->isRunning || tor->startAfterVerify) && !tor->isStopping;
+
+    if (tor->isRunning)
+    {
+        tr_torrentStop(tor);
+    }
+
+    if (setLocalErrorIfFilesDisappeared(tor))
+    {
+        tor->startAfterVerify = false;
     }
     else
     {
-        /* if the torrent's already being verified, stop it */
-        tr_verifyRemove(tor);
-
-        bool const startAfter = (tor->isRunning || tor->startAfterVerify) && !tor->isStopping;
-
-        if (tor->isRunning)
-        {
-            tr_torrentStop(tor);
-        }
-
         tor->startAfterVerify = startAfter;
-
-        if (setLocalErrorIfFilesDisappeared(tor))
-        {
-            tor->startAfterVerify = false;
-        }
-        else
-        {
-            tr_verifyAdd(tor, onVerifyDone, data);
-        }
+        tr_verifyAdd(tor, onVerifyDone, nullptr);
     }
 }
 
-void tr_torrentVerify(tr_torrent* tor, tr_verify_done_func callback_func, void* callback_data)
+void tr_torrentVerify(tr_torrent* tor)
 {
-    auto* const data = tr_new(struct verify_data, 1);
-    data->tor = tor;
-    data->aborted = false;
-    data->callback_func = callback_func;
-    data->callback_data = callback_data;
-    tr_runInEventThread(tor->session, verifyTorrent, data);
+    tr_runInEventThread(tor->session, verifyTorrent, tor);
 }
 
 void tr_torrentSave(tr_torrent* tor)
@@ -1479,6 +1450,7 @@ static void stopTorrent(void* vtor)
 {
     auto* tor = static_cast<tr_torrent*>(vtor);
     TR_ASSERT(tr_isTorrent(tor));
+    TR_ASSERT(tr_amInEventThread(tor->session));
     auto const lock = tor->unique_lock();
 
     tr_logAddTorInfo(tor, "%s", "Pausing");
@@ -1502,7 +1474,7 @@ static void stopTorrent(void* vtor)
         tor->magnetVerify = false;
         tr_logAddTorInfo(tor, "%s", "Magnet Verify");
         refreshCurrentDir(tor);
-        tr_torrentVerify(tor, nullptr, nullptr);
+        tr_torrentVerify(tor);
 
         callScriptIfEnabled(tor, TR_SCRIPT_ON_TORRENT_ADDED);
     }
@@ -1510,25 +1482,25 @@ static void stopTorrent(void* vtor)
 
 void tr_torrentStop(tr_torrent* tor)
 {
-    TR_ASSERT(tr_isTorrent(tor));
-
-    if (tr_isTorrent(tor))
+    if (!tr_isTorrent(tor))
     {
-        auto const lock = tor->unique_lock();
-
-        tor->isRunning = false;
-        tor->isStopping = false;
-        tor->prefetchMagnetMetadata = false;
-        tor->setDirty();
-        tr_runInEventThread(tor->session, stopTorrent, tor);
+        return;
     }
+
+    auto const lock = tor->unique_lock();
+
+    tor->isRunning = false;
+    tor->isStopping = false;
+    tor->prefetchMagnetMetadata = false;
+    tor->setDirty();
+    tr_runInEventThread(tor->session, stopTorrent, tor);
 }
 
 static void closeTorrent(void* vtor)
 {
-    auto* tor = static_cast<tr_torrent*>(vtor);
-
+    auto* const tor = static_cast<tr_torrent*>(vtor);
     TR_ASSERT(tr_isTorrent(tor));
+    TR_ASSERT(tr_amInEventThread(tor->session));
 
     tor->session->removed_torrents.emplace_back(tor->uniqueId, tr_time());
 

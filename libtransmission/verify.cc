@@ -59,7 +59,7 @@ static bool verifyTorrent(tr_torrent* tor, bool const* stopFlag)
         /* if we're starting a new file... */
         if (filePos == 0 && fd == TR_BAD_SYS_FILE && fileIndex != prevFileIndex)
         {
-            char* filename = tr_torrentFindFile(tor, fileIndex);
+            char* const filename = tr_torrentFindFile(tor, fileIndex);
             fd = filename == nullptr ? TR_BAD_SYS_FILE :
                                        tr_sys_file_open(filename, TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0, nullptr);
             tr_free(filename);
