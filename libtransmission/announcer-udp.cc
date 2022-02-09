@@ -629,7 +629,7 @@ static void tau_tracker_upkeep_ex(struct tau_tracker* tracker, bool timeout_reqs
         dbgmsg(tracker->host, "Trying a new DNS lookup");
         tracker->dns_request = evdns_getaddrinfo(
             tracker->session->evdns_base,
-            tracker->host.c_str(),
+            tr_strlower(tracker->host.sv()).c_str(),
             nullptr,
             &hints,
             tau_tracker_on_dns,
