@@ -68,10 +68,12 @@ export class RemoveDialog extends EventTarget {
         'All data downloaded for these torrents will be deleted. Are you sure you want to remove them?';
     } else if (torrents.length === 1) {
       heading = `Remove ${torrent.getName()}?`;
-      message = 'This torrent has not finished downloading.';
+      message =
+        'Once removed, continuing the transfer will require the torrent file. Are you sure you want to remove it?';
     } else {
       heading = `Remove ${torrents.length} transfers?`;
-      message = 'These torrents have not finished downloading.';
+      message =
+        'Once removed, continuing the transfers will require the torrent files. Are you sure you want to remove them?';
     }
     return { heading, message };
   }
