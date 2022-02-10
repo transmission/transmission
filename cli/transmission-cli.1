@@ -32,7 +32,7 @@
 .Op Fl h
 .Op Fl m | M
 .Op Fl p Ar port
-.Op Fl -dscp Ar dscp
+.Op Fl -tos Ar tos
 .Op Fl u Ar number | Fl U
 .Op Fl v
 .Op Fl w Ar directory
@@ -77,8 +77,8 @@ Set the port to listen for incoming peers. (Default: 51413)
 .It Fl -tos Ar tos
 .nf
 Use a ToS or DSCP name to set the peer socket service type for
-local router-based traffic shaping. Valid values are a numeric
-value, or any of these DSCP strings:
+local router-based traffic shaping. Valid values are a decimal
+value 0-255, or any of these DSCP strings:
 .fi
 .Pp
 .Dq af11 ,
@@ -111,7 +111,6 @@ These ToS keys are deprecated and will be removed in the future:
 .Dq reliability ,
 .Dq throughput
 .Pp
-or a decimal value 0-255
 .It Fl u -uplimit Ar number
 Set the maximum upload speed in KB/s
 .It Fl U -no-uplimit
