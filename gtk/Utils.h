@@ -35,15 +35,15 @@ extern char const* const speed_M_str;
 extern char const* const speed_G_str;
 extern char const* const speed_T_str;
 
-enum
+enum class GtrUnicode
 {
-    GTR_UNICODE_UP,
-    GTR_UNICODE_DOWN,
-    GTR_UNICODE_INF,
-    GTR_UNICODE_BULLET
+    Up,
+    Down,
+    Inf,
+    Bullet
 };
 
-Glib::ustring gtr_get_unicode_string(int);
+Glib::ustring gtr_get_unicode_string(GtrUnicode);
 
 /* return a percent formatted string of either x.xx, xx.x or xxx */
 Glib::ustring tr_strlpercent(double x);

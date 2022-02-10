@@ -52,20 +52,20 @@ char const* const speed_T_str = N_("TB/s");
 ****
 ***/
 
-Glib::ustring gtr_get_unicode_string(int i)
+Glib::ustring gtr_get_unicode_string(GtrUnicode uni)
 {
-    switch (i)
+    switch (uni)
     {
-    case GTR_UNICODE_UP:
+    case GtrUnicode::Up:
         return "\xE2\x96\xB4";
 
-    case GTR_UNICODE_DOWN:
+    case GtrUnicode::Down:
         return "\xE2\x96\xBE";
 
-    case GTR_UNICODE_INF:
+    case GtrUnicode::Inf:
         return "\xE2\x88\x9E";
 
-    case GTR_UNICODE_BULLET:
+    case GtrUnicode::Bullet:
         return "\xE2\x88\x99";
 
     default:
@@ -75,7 +75,7 @@ Glib::ustring gtr_get_unicode_string(int i)
 
 Glib::ustring tr_strlratio(double ratio)
 {
-    return tr_strratio(ratio, gtr_get_unicode_string(GTR_UNICODE_INF).c_str());
+    return tr_strratio(ratio, gtr_get_unicode_string(GtrUnicode::Inf).c_str());
 }
 
 Glib::ustring tr_strlpercent(double x)

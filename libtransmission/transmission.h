@@ -1489,24 +1489,9 @@ void tr_torrentAvailability(tr_torrent const* torrent, int8_t* tab, int size);
 void tr_torrentAmountFinished(tr_torrent const* torrent, float* tab, int size);
 
 /**
- * Callback function invoked when a torrent finishes being verified.
- *
- * @param torrent the torrent that was verified
- * @param aborted true if the verify ended prematurely for some reason,
- *                such as tr_torrentStop() or tr_torrentSetLocation()
- *                being called during verification.
- * @param user_data the user-defined pointer from tr_torrentVerify()
- */
-using tr_verify_done_func = void (*)(tr_torrent* torrent, bool aborted, void* user_data);
-
-/**
  * Queue a torrent for verification.
- *
- * If callback_func is non-nullptr, it will be called from the libtransmission
- * thread after the torrent's completness state is updated after the
- * file verification pass.
  */
-void tr_torrentVerify(tr_torrent* torrent, tr_verify_done_func callback_func_or_nullptr, void* callback_data_or_nullptr);
+void tr_torrentVerify(tr_torrent* torrent);
 
 bool tr_torrentHasMetadata(tr_torrent const* tor);
 

@@ -281,13 +281,13 @@ QString FileTreeItem::priorityString() const
 
     switch (i)
     {
-    case LOW:
+    case Low:
         return tr("Low");
 
-    case HIGH:
+    case High:
         return tr("High");
 
-    case NORMAL:
+    case Normal:
         return tr("Normal");
 
     default:
@@ -304,15 +304,15 @@ int FileTreeItem::priority() const
         switch (priority_)
         {
         case TR_PRI_LOW:
-            i |= LOW;
+            i |= Low;
             break;
 
         case TR_PRI_HIGH:
-            i |= HIGH;
+            i |= High;
             break;
 
         default:
-            i |= NORMAL;
+            i |= Normal;
             break;
         }
     }

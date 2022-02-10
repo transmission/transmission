@@ -42,6 +42,7 @@ $image-chevron-dn: 'images/chevron-down.svg';
 $image-chevron-up: 'images/chevron-up.svg';
 $image-lock-fill: 'images/lock-fill.svg';
 $image-network: 'images/router.svg';
+$image-magnet: 'images/magnet.svg';
 $image-overflow: 'images/three-dots-vertical.svg';
 $image-pause-circle-active: 'images/pause-circle-active.svg';
 $image-pause-circle-idle: 'images/pause-circle-idle.svg';
@@ -505,7 +506,7 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
     background-position: center center;
     background-repeat: no-repeat;
     background-size: $pauseresume-size;
-    margin-left: math.floor($pauseresume-size-number / 2) * 1px;
+    margin-left: math.floor(math.div($pauseresume-size-number, 2)) * 1px;
     width: $pauseresume-size;
 
     &[data-action='pause'] {
@@ -934,6 +935,20 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
   }
 }
 
+.inspector-info-magnet {
+  button {
+    background-color: transparent;
+    background-image: url($image-magnet);
+    background-position: top;
+    background-repeat: no-repeat;
+    border: 0;
+    cursor: pointer;
+    height: 1rem;
+    vertical-align: middle;
+    width: 1rem;
+  }
+}
+
 #inspector .tabs-button,
 #prefs-dialog .tabs-button {
   background-size: 20px 20px, 40px 30px;
@@ -1144,7 +1159,7 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
 .file-priority-radiobox {
   $size-number: 20;
   $size: $size-number * 1px;
-  $halfsize: math.floor($size-number / 2) * 1px;
+  $halfsize: math.floor(math.div($size-number, 2)) * 1px;
 
   grid-area: priority;
 
@@ -1372,7 +1387,7 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
 /// DIALOGS
 
 $dialog-padding-number: 20;
-$dialog-logo-padding-number: $dialog-padding-number * 2 / 3;
+$dialog-logo-padding-number: math.div($dialog-padding-number * 2, 3);
 $logo-size: 64px;
 
 @include for-phone-only {

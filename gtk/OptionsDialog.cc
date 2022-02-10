@@ -166,7 +166,7 @@ void OptionsDialog::Impl::updateTorrent()
         tr_torrentSetDownloadDir(tor_, downloadDir_.c_str());
         file_list_->set_sensitive(tr_torrentHasMetadata(tor_));
         file_list_->set_torrent(tr_torrentId(tor_));
-        tr_torrentVerify(tor_, nullptr, nullptr);
+        tr_torrentVerify(tor_);
     }
 }
 

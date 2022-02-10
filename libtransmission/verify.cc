@@ -38,7 +38,7 @@ static bool verifyTorrent(tr_torrent* tor, bool const* stopFlag)
     time_t lastSleptAt = 0;
     uint32_t piecePos = 0;
     tr_file_index_t fileIndex = 0;
-    tr_file_index_t prevFileIndex = ~0;
+    tr_file_index_t prevFileIndex = ~fileIndex;
     tr_piece_index_t piece = 0;
     auto buffer = std::vector<std::byte>(1024 * 256);
     auto sha = tr_sha1_init();
@@ -59,7 +59,7 @@ static bool verifyTorrent(tr_torrent* tor, bool const* stopFlag)
         /* if we're starting a new file... */
         if (filePos == 0 && fd == TR_BAD_SYS_FILE && fileIndex != prevFileIndex)
         {
-            char* filename = tr_torrentFindFile(tor, fileIndex);
+            char* const filename = tr_torrentFindFile(tor, fileIndex);
             fd = filename == nullptr ? TR_BAD_SYS_FILE :
                                        tr_sys_file_open(filename, TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0, nullptr);
             tr_free(filename);

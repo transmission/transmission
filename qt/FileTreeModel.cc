@@ -491,11 +491,11 @@ void FileTreeModel::twiddlePriority(QModelIndexList const& indices)
         int priority = item->priority();
 
         // ... -> normal -> high -> low -> normal -> ...; mixed -> normal
-        if (priority == FileTreeItem::NORMAL)
+        if (priority == FileTreeItem::Normal)
         {
             priority = TR_PRI_HIGH;
         }
-        else if (priority == FileTreeItem::HIGH)
+        else if (priority == FileTreeItem::High)
         {
             priority = TR_PRI_LOW;
         }

@@ -195,7 +195,13 @@ void tr_logAddDeep(char const* file, int line, char const* name, char const* fmt
 ****
 ***/
 
-void tr_logAddMessage(char const* file, int line, tr_log_level level, char const* name, char const* fmt, ...)
+void tr_logAddMessage(
+    [[maybe_unused]] char const* file,
+    [[maybe_unused]] int line,
+    [[maybe_unused]] tr_log_level level,
+    [[maybe_unused]] char const* name,
+    char const* fmt,
+    ...)
 {
     int const err = errno; /* message logging shouldn't affect errno */
     char buf[1024];

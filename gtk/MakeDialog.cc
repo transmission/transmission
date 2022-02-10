@@ -111,23 +111,23 @@ bool MakeProgressDialog::onProgressDialogRefresh()
     {
         str = gtr_sprintf(_("Creating \"%s\""), base);
     }
-    else if (builder_.result == TR_MAKEMETA_OK)
+    else if (builder_.result == TrMakemetaResult::OK)
     {
         str = gtr_sprintf(_("Created \"%s\"!"), base);
     }
-    else if (builder_.result == TR_MAKEMETA_URL)
-    {
-        str = gtr_sprintf(_("Error: invalid announce URL \"%s\""), builder_.errfile);
-    }
-    else if (builder_.result == TR_MAKEMETA_CANCELLED)
+    else if (builder_.result == TrMakemetaResult::CANCELLED)
     {
         str = _("Cancelled");
     }
-    else if (builder_.result == TR_MAKEMETA_IO_READ)
+    else if (builder_.result == TrMakemetaResult::ERR_URL)
+    {
+        str = gtr_sprintf(_("Error: invalid announce URL \"%s\""), builder_.errfile);
+    }
+    else if (builder_.result == TrMakemetaResult::ERR_IO_READ)
     {
         str = gtr_sprintf(_("Error reading \"%s\": %s"), builder_.errfile, Glib::strerror(builder_.my_errno));
     }
-    else if (builder_.result == TR_MAKEMETA_IO_WRITE)
+    else if (builder_.result == TrMakemetaResult::ERR_IO_WRITE)
     {
         str = gtr_sprintf(_("Error writing \"%s\": %s"), builder_.errfile, Glib::strerror(builder_.my_errno));
     }
@@ -155,7 +155,7 @@ bool MakeProgressDialog::onProgressDialogRefresh()
     /* buttons */
     set_response_sensitive(Gtk::RESPONSE_CANCEL, !builder_.isDone);
     set_response_sensitive(Gtk::RESPONSE_CLOSE, builder_.isDone);
-    set_response_sensitive(Gtk::RESPONSE_ACCEPT, builder_.isDone && !builder_.result);
+    set_response_sensitive(Gtk::RESPONSE_ACCEPT, builder_.isDone && builder_.result == TrMakemetaResult::OK);
 
     return true;
 }
@@ -241,7 +241,7 @@ void MakeDialog::Impl::makeProgressDialog(std::string const& target)
         {
             progress_dialog_.reset();
 
-            if (!builder_->result)
+            if (builder_->result == TrMakemetaResult::OK)
             {
                 dialog_.hide();
             }

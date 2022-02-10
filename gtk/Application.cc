@@ -933,7 +933,7 @@ void Application::Impl::on_app_exit()
 void Application::Impl::show_torrent_errors(Glib::ustring const& primary, std::vector<std::string>& files)
 {
     std::ostringstream s;
-    auto const leader = files.size() > 1 ? gtr_get_unicode_string(GTR_UNICODE_BULLET) : "";
+    auto const leader = files.size() > 1 ? gtr_get_unicode_string(GtrUnicode::Bullet) : "";
 
     for (auto const& f : files)
     {
