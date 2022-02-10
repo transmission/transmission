@@ -14,6 +14,7 @@ import { PrefsDialog } from './prefs-dialog.js';
 import { Remote, RPC } from './remote.js';
 import { RemoveDialog } from './remove-dialog.js';
 import { RenameDialog } from './rename-dialog.js';
+import { LabelsDialog } from './labels-dialog.js';
 import { ShortcutsDialog } from './shortcuts-dialog.js';
 import { StatisticsDialog } from './statistics-dialog.js';
 import { Torrent } from './torrent.js';
@@ -169,6 +170,9 @@ export class Transmission extends EventTarget {
           break;
         case 'show-rename-dialog':
           this.setCurrentPopup(new RenameDialog(this, this.remote));
+          break;
+        case 'show-labels-dialog':
+          this.setCurrentPopup(new LabelsDialog(this, this.remote));
           break;
         case 'start-all-torrents':
           this._startTorrents(this._getAllTorrents());
@@ -909,10 +913,20 @@ TODO: fix this when notifications get fixed
 
   _refilter(rebuildEverything) {
     const { sort_mode, sort_direction, filter_mode } = this.prefs;
-    const filter_text = this.filterText;
     const filter_tracker = this.filterTracker;
     const renderer = this.torrentRenderer;
     const list = this.elements.torrent_list;
+
+    let filter_text = null;
+    let labels = null;
+    const m = /^labels:([\w,]*)(.*)$/.exec(this.filterText);
+    if (m) {
+      filter_text = m[2].trim();
+      labels = m[1].split(',');
+    } else {
+      filter_text = this.filterText;
+      labels = [];
+    }
 
     const countRows = () => [...list.children].length;
     const countSelectedRows = () =>
@@ -958,7 +972,7 @@ TODO: fix this when notifications get fixed
     for (const row of dirty_rows) {
       const id = row.getTorrentId();
       const t = this._torrents[id];
-      if (t && t.test(filter_mode, filter_text, filter_tracker)) {
+      if (t && t.test(filter_mode, filter_tracker, filter_text, labels)) {
         temporary.push(row);
       }
       this.dirtyTorrents.delete(id);
@@ -969,7 +983,7 @@ TODO: fix this when notifications get fixed
     // but don't already have a row
     for (const id of this.dirtyTorrents.values()) {
       const t = this._torrents[id];
-      if (t && t.test(filter_mode, filter_text, filter_tracker)) {
+      if (t && t.test(filter_mode, filter_tracker, filter_text, labels)) {
         const row = new TorrentRow(renderer, this, t);
         const e = row.getElement();
         e.row = row;
