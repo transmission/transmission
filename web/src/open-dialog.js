@@ -71,7 +71,6 @@ export class OpenDialog extends EventTarget {
           },
           method: 'torrent-add',
         };
-        console.log(o);
         remote.sendRequest(o, (response) => {
           if (response.result !== 'success') {
             alert(`Error adding "${file.name}": ${response.result}`);
@@ -100,13 +99,12 @@ export class OpenDialog extends EventTarget {
         },
         method: 'torrent-add',
       };
-      console.log(o);
-      remote.sendRequest(o, (payload, response) => {
-        if (response.result !== 'success') {
+      remote.sendRequest(o, (payload) => {
+        if (payload.result !== 'success') {
           controller.setCurrentPopup(
             new AlertDialog({
               heading: `Error adding "${url}"`,
-              message: response.result,
+              message: payload.result,
             })
           );
         }
@@ -149,6 +147,11 @@ export class OpenDialog extends EventTarget {
     input.id = input_id;
     workarea.append(input);
     elements.url_input = input;
+    input.addEventListener('keyup', ({ key }) => {
+      if (key === 'Enter') {
+        confirm.click();
+      }
+    });
 
     input_id = makeUUID();
     label = document.createElement('label');
