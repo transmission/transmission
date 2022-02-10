@@ -510,7 +510,7 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
     background-position: center center;
     background-repeat: no-repeat;
     background-size: $pauseresume-size;
-    margin-left: math.floor($pauseresume-size-number / 2) * 1px;
+    margin-left: math.floor(math.div($pauseresume-size-number, 2)) * 1px;
     width: $pauseresume-size;
 
     &[data-action='pause'] {
@@ -1177,7 +1177,7 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
 .file-priority-radiobox {
   $size-number: 20;
   $size: $size-number * 1px;
-  $halfsize: math.floor($size-number / 2) * 1px;
+  $halfsize: math.floor(math.div($size-number, 2)) * 1px;
 
   grid-area: priority;
 
@@ -1405,7 +1405,7 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
 /// DIALOGS
 
 $dialog-padding-number: 20;
-$dialog-logo-padding-number: $dialog-padding-number * 2 / 3;
+$dialog-logo-padding-number: math.div($dialog-padding-number * 2, 3);
 $logo-size: 64px;
 
 @include for-phone-only {
