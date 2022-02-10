@@ -105,24 +105,10 @@ void tr_udpSetSocketBuffers(tr_session* session)
     }
 }
 
-void tr_udpSetSocketDSCP(tr_session* session)
+void tr_udpSetSocketTOS(tr_session* session)
 {
-    auto const dscp = session->peerSocketDSCP();
-
-    if (dscp != DSCPvalues.at("none"))
-    {
-        return;
-    }
-
-    if (session->udp_socket != TR_BAD_SOCKET)
-    {
-        tr_netSetDSCP(session->udp_socket, dscp, TR_AF_INET);
-    }
-
-    if (session->udp6_socket != TR_BAD_SOCKET)
-    {
-        tr_netSetDSCP(session->udp6_socket, dscp, TR_AF_INET6);
-    }
+    session->setSocketTOS(session->udp_socket, TR_AF_INET);
+    session->setSocketTOS(session->udp6_socket, TR_AF_INET6);
 }
 
 /* BEP-32 has a rather nice explanation of why we need to bind to one
@@ -348,7 +334,7 @@ void tr_udpInit(tr_session* ss)
 
     tr_udpSetSocketBuffers(ss);
 
-    tr_udpSetSocketDSCP(ss);
+    tr_udpSetSocketTOS(ss);
 
     if (ss->isDHTEnabled)
     {

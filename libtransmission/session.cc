@@ -250,26 +250,6 @@ tr_address const* tr_sessionGetPublicAddress(tr_session const* session, int tr_a
 ****
 ***/
 
-static int parseDSCP(std::string_view dscp_in)
-{
-    auto dscp = tr_strlower(tr_strvStrip(dscp_in));
-    auto it = DSCPvalues.find(dscp);
-
-    if (it != DSCPvalues.end())
-        return it->second;
-
-    return std::min(std::stoi(dscp), 0xFF);
-}
-
-static std::string format_dscp(int value)
-{
-    for (auto it = DSCPvalues.begin(); it != DSCPvalues.end(); ++it)
-        if (it->second == value)
-            return it->first;
-
-    return std::to_string(value);
-}
-
 #ifdef TR_LIGHTWEIGHT
 #define TR_DEFAULT_ENCRYPTION TR_CLEAR_PREFERRED
 #else
@@ -304,7 +284,7 @@ void tr_sessionGetDefaultSettings(tr_variant* d)
     tr_variantDictAddBool(d, TR_KEY_peer_port_random_on_start, false);
     tr_variantDictAddInt(d, TR_KEY_peer_port_random_low, 49152);
     tr_variantDictAddInt(d, TR_KEY_peer_port_random_high, 65535);
-    tr_variantDictAddStrView(d, TR_KEY_peer_socket_dscp, TR_DEFAULT_PEER_SOCKET_DSCP_STR);
+    tr_variantDictAddStrView(d, TR_KEY_peer_socket_tos, TR_DEFAULT_PEER_SOCKET_TOS_STR);
     tr_variantDictAddBool(d, TR_KEY_pex_enabled, true);
     tr_variantDictAddBool(d, TR_KEY_port_forwarding_enabled, true);
     tr_variantDictAddInt(d, TR_KEY_preallocation, TR_PREALLOCATE_SPARSE);
@@ -380,7 +360,7 @@ void tr_sessionGetSettings(tr_session const* s, tr_variant* d)
     tr_variantDictAddBool(d, TR_KEY_peer_port_random_on_start, s->isPortRandom);
     tr_variantDictAddInt(d, TR_KEY_peer_port_random_low, s->randomPortLow);
     tr_variantDictAddInt(d, TR_KEY_peer_port_random_high, s->randomPortHigh);
-    tr_variantDictAddStr(d, TR_KEY_peer_socket_dscp, format_dscp(s->peerSocketDSCP()));
+    tr_variantDictAddStr(d, TR_KEY_peer_socket_tos, tr_netTosToName(s->peer_socket_tos_));
     tr_variantDictAddStr(d, TR_KEY_peer_congestion_algorithm, s->peerCongestionAlgorithm());
     tr_variantDictAddBool(d, TR_KEY_pex_enabled, s->isPexEnabled);
     tr_variantDictAddBool(d, TR_KEY_port_forwarding_enabled, tr_sessionIsPortForwardingEnabled(s));
@@ -791,9 +771,16 @@ static void sessionSetImpl(void* vdata)
         tr_sessionSetEncryption(session, tr_encryption_mode(i));
     }
 
-    if (tr_variantDictFindStrView(settings, TR_KEY_peer_socket_dscp, &sv))
+    if (tr_variantDictFindInt(settings, TR_KEY_peer_socket_tos, &i))
     {
-        session->setPeerSocketDSCP(parseDSCP(sv));
+        session->peer_socket_tos_ = i;
+    }
+    else if (tr_variantDictFindStrView(settings, TR_KEY_peer_socket_tos, &sv))
+    {
+        if (auto ip_tos = tr_netTosFromName(sv); ip_tos)
+        {
+            session->peer_socket_tos_ = *ip_tos;
+        }
     }
 
     sv = ""sv;
@@ -2117,7 +2104,7 @@ static void toggle_utp(void* vsession)
 
     tr_udpSetSocketBuffers(session);
 
-    tr_udpSetSocketDSCP(session);
+    tr_udpSetSocketTOS(session);
 
     /* But don't call tr_utpClose -- see reset_timer in tr-utp.c for an
        explanation. */

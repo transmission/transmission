@@ -223,7 +223,7 @@ enum
     TR_KEY_peer_port_random_high,
     TR_KEY_peer_port_random_low,
     TR_KEY_peer_port_random_on_start,
-    TR_KEY_peer_socket_dscp,
+    TR_KEY_peer_socket_tos,
     TR_KEY_peerIsChoked,
     TR_KEY_peerIsInterested,
     TR_KEY_peers,

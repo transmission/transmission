@@ -74,9 +74,9 @@ Enable portmapping via NAT-PMP or UPnP
 Disable portmapping
 .It Fl p -port Ar port
 Set the port to listen for incoming peers. (Default: 51413)
-.It Fl -dscp Ar dscp
+.It Fl -tos Ar tos
 .nf
-Set the peer socket DSCP for local router-based traffic shaping. (Default: le)
+Use a ToS or DSCP name to set the peer socket service type for local router-based traffic shaping. (Default: le)
 Valid values are:
 .fi
 .Pp
@@ -101,12 +101,14 @@ Valid values are:
 .Dq cs6 ,
 .Dq cs7 ,
 .Dq ef ,
-.Dq le
+.Dq le ,
+.Dq default ,
+.Dq lowcost ,
+.Dq throughput ,
+.Dq reliability ,
+.Dq lowdelay ,
 .Pp
-a decimal value 0-255 or a hexadecimal value 0x00-0xff
-.Pp
-.Dq none
-(Use operating system default)
+or a decimal value 0-255
 .It Fl u -uplimit Ar number
 Set the maximum upload speed in KB/s
 .It Fl U -no-uplimit

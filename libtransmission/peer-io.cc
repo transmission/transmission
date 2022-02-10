@@ -624,7 +624,7 @@ static tr_peerIo* tr_peerIoNew(
 
     if (socket.type == TR_PEER_SOCKET_TYPE_TCP)
     {
-        tr_netSetDSCP(socket.handle.tcp, session->peerSocketDSCP(), addr->type);
+        session->setSocketTOS(socket.handle.tcp, addr->type);
         maybeSetCongestionAlgorithm(socket.handle.tcp, session->peerCongestionAlgorithm());
     }
 
@@ -979,10 +979,7 @@ int tr_peerIoReconnect(tr_peerIo* io)
     io->event_write = event_new(session->event_base, io->socket.handle.tcp, EV_WRITE, event_write_cb, io);
 
     event_enable(io, pendingEvents);
-    if (session->peerSocketDSCP() != DSCPvalues.at("none"))
-    {
-        tr_netSetDSCP(io->socket.handle.tcp, session->peerSocketDSCP(), io->addr.type);
-    }
+    io->session->setSocketTOS(io->socket.handle.tcp, io->addr.type);
     maybeSetCongestionAlgorithm(io->socket.handle.tcp, session->peerCongestionAlgorithm());
 
     return 0;

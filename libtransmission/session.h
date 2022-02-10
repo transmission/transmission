@@ -231,14 +231,9 @@ public:
         peer_congestion_algorithm_ = algorithm;
     }
 
-    int peerSocketDSCP() const
+    void setSocketTOS(tr_socket_t sock, tr_address_type type)
     {
-        return peer_socket_dscp_;
-    }
-
-    void setPeerSocketDSCP(int dscp)
-    {
-        peer_socket_dscp_ = dscp;
+        tr_netSetTOS(sock, peer_socket_tos_, type);
     }
 
 public:
@@ -358,6 +353,11 @@ public:
 
     std::unique_ptr<tr_rpc_server> rpc_server_;
 
+    // One of <netinet/ip.h>'s IPTOS_ values.
+    // See tr_netTos*() in libtransmission/net.h for more info
+    // Only session.cc should use this.
+    int peer_socket_tos_ = 0;
+
 private:
     static std::recursive_mutex session_mutex_;
 
@@ -366,8 +366,6 @@ private:
     std::string download_dir_;
     std::string incomplete_dir_;
     std::string peer_congestion_algorithm_;
-
-    int peer_socket_dscp_ = DSCPvalues.at(TR_DEFAULT_PEER_SOCKET_DSCP_STR);
 
     std::array<bool, TR_SCRIPT_N_TYPES> scripts_enabled_;
     bool blocklist_enabled_ = false;
