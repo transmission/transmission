@@ -356,7 +356,7 @@ public:
     // One of <netinet/ip.h>'s IPTOS_ values.
     // See tr_netTos*() in libtransmission/net.h for more info
     // Only session.cc should use this.
-    int peer_socket_tos_ = 0;
+    int peer_socket_tos_ = *tr_netTosFromName(TR_DEFAULT_PEER_SOCKET_TOS_STR);
 
 private:
     static std::recursive_mutex session_mutex_;
