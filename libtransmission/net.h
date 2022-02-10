@@ -9,6 +9,8 @@
 #endif
 
 #include <cstddef> // size_t
+#include <optional>
+#include <string>
 #include <string_view>
 
 #ifdef _WIN32
@@ -104,22 +106,11 @@ constexpr bool tr_address_is_valid(tr_address const* a)
  * Sockets
  **********************************************************************/
 
-/* https://en.wikipedia.org/wiki/Differentiated_services#Class_Selector */
-enum
-{
-    TR_IPTOS_LOWCOST = 0x38, /* AF13: low prio, high drop */
-    TR_IPTOS_LOWDELAY = 0x70, /* AF32: high prio, mid drop */
-    TR_IPTOS_THRUPUT = 0x20, /* CS1: low prio, undef drop */
-    TR_IPTOS_RELIABLE = 0x28 /* AF11: low prio, low drop */
-};
-
 struct tr_session;
 
 tr_socket_t tr_netBindTCP(tr_address const* addr, tr_port port, bool suppressMsgs);
 
 tr_socket_t tr_netAccept(tr_session* session, tr_socket_t bound, tr_address* setme_addr, tr_port* setme_port);
-
-void tr_netSetTOS(tr_socket_t s, int tos, tr_address_type type);
 
 void tr_netSetCongestionControl(tr_socket_t s, char const* algorithm);
 
@@ -128,6 +119,17 @@ void tr_netClose(tr_session* session, tr_socket_t s);
 void tr_netCloseSocket(tr_socket_t fd);
 
 bool tr_net_hasIPv6(tr_port);
+
+/// TOS / DSCP
+
+// get a string of one of <netinet/ip.h>'s IPTOS_ values, e.g. "cs0"
+std::string tr_netTosToName(int tos);
+
+// get the number that corresponds to the specified IPTOS_ name, e.g. "cs0" returns 0x00
+std::optional<int> tr_netTosFromName(std::string_view name);
+
+// set the IPTOS_ value for the specified socket
+void tr_netSetTOS(tr_socket_t sock, int tos, tr_address_type type);
 
 /**
  * @brief get a human-representable string representing the network error.
