@@ -203,6 +203,9 @@ export class Torrent extends EventTarget {
   getId() {
     return this.fields.id;
   }
+  getLabels() {
+    return this.fields.labels.sort();
+  }
   getLastActivity() {
     return this.fields.activityDate;
   }
@@ -419,17 +422,34 @@ export class Torrent extends EventTarget {
   }
 
   /**
-   * @param filter one of Prefs.Filter*
+   * @param state one of Prefs.Filter*
+   * @param tracker tracker name
    * @param search substring to look for, or null
+   * @param labels array of labels. Empty array matches all.
    * @return true if it passes the test, false if it fails
    */
-  test(state, search, tracker) {
+  test(state, tracker, search, labels) {
     // flter by state...
     let pass = this.testState(state);
 
     // maybe filter by text...
-    if (pass && search && search.length > 0) {
+    if (pass && search) {
       pass = this.getCollatedName().includes(search.toLowerCase());
+    }
+
+    // maybe filter by labels...
+    if (pass) {
+      for (const l of labels) {
+        let m = false;
+        for (let j = 0; j < this.getLabels().length; j++) {
+          if (l === this.getLabels()[j]) {
+            m = true;
+            break;
+          }
+        }
+
+        pass = pass && m;
+      }
     }
 
     // maybe filter by tracker...
@@ -627,6 +647,7 @@ Torrent.Fields.Stats = [
   'eta',
   'isFinished',
   'isStalled',
+  'labels',
   'leftUntilDone',
   'metadataPercentComplete',
   'peersConnected',
