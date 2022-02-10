@@ -45,10 +45,6 @@ export class ActionManager extends EventTarget {
         shortcut: 'Alt+I',
         text: 'Torrent Inspector',
       },
-      'show-labels-dialog': {
-        enabled: false,
-        text: 'Edit Labels…',
-      },
       'show-move-dialog': {
         enabled: false,
         shortcut: 'Alt+L',
@@ -189,10 +185,9 @@ export class ActionManager extends EventTarget {
       'move-down',
       'move-top',
       'move-up',
-      'remove-selected-torrents',
       'show-inspector',
-      'show-labels-dialog',
       'show-move-dialog',
+      'remove-selected-torrents',
       'trash-selected-torrents',
       'verify-selected-torrents',
     ]);

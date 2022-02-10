@@ -103,14 +103,6 @@ export class Remote {
     this.sendRequest(o, callback, context);
   }
 
-  setLabels(torrentIds, labels, callback) {
-    const args = {
-      ids: torrentIds,
-      labels,
-    };
-    this.sendRequest({ arguments: args, method: 'torrent-set' }, callback);
-  }
-
   loadDaemonStats(callback, context) {
     const o = {
       method: 'session-stats',

@@ -117,7 +117,6 @@ export class Inspector extends EventTarget {
       ['origin', 'Origin:'],
       ['magnetLink', 'Magnet:'],
       ['comment', 'Comment:'],
-      ['labels', 'Labels:'],
     ];
     for (const [name, text] of rows) {
       elements[name] = append_row(text);
@@ -490,10 +489,6 @@ export class Inspector extends EventTarget {
     } else {
       setTextContent(e.info.comment, string);
     }
-
-    // labels
-    string = torrents.length === 0 ? none : torrents[0].getLabels().join(', ');
-    setTextContent(e.info.labels, string);
 
     // origin
     if (torrents.length === 0) {
