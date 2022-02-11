@@ -450,11 +450,11 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
       display: grid;
       grid-column-gap: 12px;
       grid-template-areas:
-        'icon name'
-        'icon peers'
-        'icon progressbar'
-        'icon progress-text';
-      grid-template-columns: $icon-size 1fr;
+        'icon name labels'
+        'icon peers peers'
+        'icon progressbar progressbar'
+        'icon progress-text progress-text';
+      grid-template-columns: $icon-size auto 1fr;
       padding: 2px 12px;
 
       .icon {
@@ -466,6 +466,10 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
 
       .torrent-name {
         grid-area: name;
+      }
+
+      .torrent-labels {
+        grid-area: labels;
       }
 
       .torrent-peer-details {
@@ -539,13 +543,27 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
     white-space: nowrap;
 
     &.compact {
-      flex: 1;
       font-size: 1em;
       font-weight: normal;
     }
 
     &:not(.paused) {
       color: var(--color-fg-name);
+    }
+  }
+
+  .torrent-labels {
+    font-size: x-small;
+    font-weight: normal;
+    margin-bottom: 2px;
+    margin-top: 2px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    &.compact {
+      flex: 1;
+      font-size: x-small;
     }
   }
 

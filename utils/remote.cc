@@ -958,13 +958,15 @@ static void printDetails(tr_variant* top)
 
             if (tr_variantDictFindList(t, TR_KEY_labels, &l))
             {
+                printf("  Labels: ");
+
                 size_t child_pos = 0;
                 tr_variant const* child;
                 while ((child = tr_variantListChild(l, child_pos++)))
                 {
                     if (tr_variantGetStrView(child, &sv))
                     {
-                        printf(i == 0 ? "%" TR_PRIsv : ", %" TR_PRIsv, TR_PRIsv_ARG(sv));
+                        printf(child_pos == 1 ? "%" TR_PRIsv : ", %" TR_PRIsv, TR_PRIsv_ARG(sv));
                     }
                 }
 

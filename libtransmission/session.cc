@@ -250,62 +250,6 @@ tr_address const* tr_sessionGetPublicAddress(tr_session const* session, int tr_a
 ****
 ***/
 
-static int parseTos(std::string_view tos_in)
-{
-    auto tos = tr_strlower(tr_strvStrip(tos_in));
-
-    if (tos == ""sv || tos == "default"sv)
-    {
-        return 0;
-    }
-
-    if (tos == "lowcost"sv || tos == "mincost"sv)
-    {
-        return TR_IPTOS_LOWCOST;
-    }
-
-    if (tos == "throughput"sv)
-    {
-        return TR_IPTOS_THRUPUT;
-    }
-
-    if (tos == "reliability"sv)
-    {
-        return TR_IPTOS_RELIABLE;
-    }
-
-    if (tos == "lowdelay"sv)
-    {
-        return TR_IPTOS_LOWDELAY;
-    }
-
-    return std::stoi(tos);
-}
-
-static std::string format_tos(int value)
-{
-    switch (value)
-    {
-    case 0:
-        return "default";
-
-    case TR_IPTOS_LOWCOST:
-        return "lowcost";
-
-    case TR_IPTOS_THRUPUT:
-        return "throughput";
-
-    case TR_IPTOS_RELIABLE:
-        return "reliability";
-
-    case TR_IPTOS_LOWDELAY:
-        return "lowdelay";
-
-    default:
-        return std::to_string(value);
-    }
-}
-
 #ifdef TR_LIGHTWEIGHT
 #define TR_DEFAULT_ENCRYPTION TR_CLEAR_PREFERRED
 #else
@@ -416,7 +360,7 @@ void tr_sessionGetSettings(tr_session const* s, tr_variant* d)
     tr_variantDictAddBool(d, TR_KEY_peer_port_random_on_start, s->isPortRandom);
     tr_variantDictAddInt(d, TR_KEY_peer_port_random_low, s->randomPortLow);
     tr_variantDictAddInt(d, TR_KEY_peer_port_random_high, s->randomPortHigh);
-    tr_variantDictAddStr(d, TR_KEY_peer_socket_tos, format_tos(s->peerSocketTos()));
+    tr_variantDictAddStr(d, TR_KEY_peer_socket_tos, tr_netTosToName(s->peer_socket_tos_));
     tr_variantDictAddStr(d, TR_KEY_peer_congestion_algorithm, s->peerCongestionAlgorithm());
     tr_variantDictAddBool(d, TR_KEY_pex_enabled, s->isPexEnabled);
     tr_variantDictAddBool(d, TR_KEY_port_forwarding_enabled, tr_sessionIsPortForwardingEnabled(s));
@@ -827,9 +771,16 @@ static void sessionSetImpl(void* vdata)
         tr_sessionSetEncryption(session, tr_encryption_mode(i));
     }
 
-    if (tr_variantDictFindStrView(settings, TR_KEY_peer_socket_tos, &sv))
+    if (tr_variantDictFindInt(settings, TR_KEY_peer_socket_tos, &i))
     {
-        session->setPeerSocketTos(parseTos(sv));
+        session->peer_socket_tos_ = i;
+    }
+    else if (tr_variantDictFindStrView(settings, TR_KEY_peer_socket_tos, &sv))
+    {
+        if (auto ip_tos = tr_netTosFromName(sv); ip_tos)
+        {
+            session->peer_socket_tos_ = *ip_tos;
+        }
     }
 
     sv = ""sv;
