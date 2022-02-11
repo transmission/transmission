@@ -926,7 +926,7 @@ void DetailsDialog::Impl::refreshInfo(std::vector<tr_torrent*> const& torrents)
 
         if (f != 0)
         {
-            str = gtr_sprintf(_("%1$s (+%2$s corrupt)"), dbuf, fbuf);
+            str = gtr_sprintf(_("%1$s (+%2$s discarded after failed checksum)"), dbuf, fbuf);
         }
         else
         {
