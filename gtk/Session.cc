@@ -1128,69 +1128,47 @@ void Session::Impl::add_file_async_callback(
 
 bool Session::Impl::add_file(Glib::RefPtr<Gio::File> const& file, bool do_start, bool do_prompt, bool do_notify)
 {
-    bool handled = false;
-
-    if (auto const* const session = get_session(); session != nullptr)
+    auto const* const session = get_session();
+    if (session == nullptr)
     {
-        tr_ctor* ctor;
-        bool tried = false;
-        bool loaded = false;
+        return false;
+    }
 
-        ctor = tr_ctorNew(session);
-        core_apply_defaults(ctor);
-        tr_ctorSetPaused(ctor, TR_FORCE, !do_start);
+    bool handled = false;
+    auto* ctor = tr_ctorNew(session);
+    core_apply_defaults(ctor);
+    tr_ctorSetPaused(ctor, TR_FORCE, !do_start);
 
-        /* local files... */
-        if (!tried)
-        {
-            auto const str = file->get_path();
+    bool loaded = false;
+    if (auto const path = file->get_path(); !std::empty(path))
+    {
+        // try to treat it as a file...
+        loaded = tr_ctorSetMetainfoFromFile(ctor, path.c_str(), nullptr);
+    }
 
-            if ((tried = !str.empty() && Glib::file_test(str, Glib::FILE_TEST_EXISTS)))
-            {
-                loaded = tr_ctorSetMetainfoFromFile(ctor, str.c_str(), nullptr);
-            }
-        }
+    if (!loaded)
+    {
+        // try to treat it as a magnet link...
+        loaded = tr_ctorSetMetainfoFromMagnetLink(ctor, file->get_uri().c_str(), nullptr);
+    }
 
-        /* magnet links... */
-        if (!tried && file->has_uri_scheme("magnet"))
-        {
-            /* GFile mangles the original string with /// so we have to un-mangle */
-            auto const str = file->get_parse_name();
-            auto const magnet = gtr_sprintf("magnet:%s", str.substr(str.find('?')));
-            tried = true;
-            loaded = tr_ctorSetMetainfoFromMagnetLink(ctor, magnet.c_str(), nullptr);
-        }
-
-        /* hashcodes that we can turn into magnet links... */
-        if (!tried)
-        {
-            auto const str = file->get_basename();
-
-            if (gtr_is_hex_hashcode(str))
-            {
-                auto const magnet = gtr_sprintf("magnet:?xt=urn:btih:%s", str);
-                loaded = tr_ctorSetMetainfoFromMagnetLink(ctor, magnet.c_str(), nullptr);
-            }
-        }
-
-        /* if we were able to load the metainfo, add the torrent */
-        if (loaded)
-        {
-            handled = true;
-            add_ctor(ctor, do_prompt, do_notify);
-        }
-        else if (file->has_uri_scheme("http") || file->has_uri_scheme("https") || file->has_uri_scheme("ftp"))
-        {
-            handled = true;
-            inc_busy();
-            file->load_contents_async([this, file, ctor, do_prompt, do_notify](auto& result)
-                                      { add_file_async_callback(file, result, ctor, do_prompt, do_notify); });
-        }
-        else
-        {
-            tr_ctorFree(ctor);
-            g_message(_("Skipping unknown torrent \"%s\""), file->get_parse_name().c_str());
-        }
+    // if we could make sense of it, add it
+    if (loaded)
+    {
+        handled = true;
+        add_ctor(ctor, do_prompt, do_notify);
+    }
+    else if (tr_urlIsValid(file->get_uri().raw()))
+    {
+        handled = true;
+        inc_busy();
+        file->load_contents_async([this, file, ctor, do_prompt, do_notify](auto& result)
+                                  { add_file_async_callback(file, result, ctor, do_prompt, do_notify); });
+    }
+    else
+    {
+        tr_ctorFree(ctor);
+        g_message(_("Skipping unknown torrent \"%s\""), file->get_parse_name().c_str());
     }
 
     return handled;
@@ -1203,15 +1181,13 @@ bool Session::add_from_url(Glib::ustring const& uri)
 
 bool Session::Impl::add_from_url(Glib::ustring const& uri)
 {
-    bool handled;
-    bool const do_start = gtr_pref_flag_get(TR_KEY_start_added_torrents);
-    bool const do_prompt = gtr_pref_flag_get(TR_KEY_show_options_window);
-    bool const do_notify = false;
-
     auto const file = Gio::File::create_for_uri(uri);
-    handled = add_file(file, do_start, do_prompt, do_notify);
-    torrents_added();
+    auto const do_start = gtr_pref_flag_get(TR_KEY_start_added_torrents);
+    auto const do_prompt = gtr_pref_flag_get(TR_KEY_show_options_window);
+    auto const do_notify = false;
 
+    auto const handled = add_file(file, do_start, do_prompt, do_notify);
+    torrents_added();
     return handled;
 }
 

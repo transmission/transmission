@@ -194,7 +194,7 @@ std::string tr_sha1_to_string(tr_sha1_digest_t const&);
 /**
  * @brief Generate a sha1 digest from a hex string.
  */
-tr_sha1_digest_t tr_sha1_from_string(std::string_view hex);
+std::optional<tr_sha1_digest_t> tr_sha1_from_string(std::string_view hex);
 
 /** @} */
 

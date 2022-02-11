@@ -461,31 +461,29 @@ TorrentFileChooserDialog::TorrentFileChooserDialog(Gtk::Window& parent, Glib::Re
 
 void TorrentUrlChooserDialog::onOpenURLResponse(int response, Glib::RefPtr<Session> const& core)
 {
-    bool handled = false;
 
-    if (response == Gtk::RESPONSE_ACCEPT)
-    {
-        auto* e = static_cast<Gtk::Entry*>(get_data("url-entry"));
-        auto const url = gtr_str_strip(e->get_text());
-
-        if (!url.empty())
-        {
-            handled = core->add_from_url(url);
-
-            if (!handled)
-            {
-                gtr_unrecognized_url_dialog(*this, url);
-            }
-        }
-    }
-    else if (response == Gtk::RESPONSE_CANCEL)
-    {
-        handled = true;
-    }
-
-    if (handled)
+    if (response == Gtk::RESPONSE_CANCEL)
     {
         hide();
+    }
+    else if (response == Gtk::RESPONSE_ACCEPT)
+    {
+        auto* const e = static_cast<Gtk::Entry*>(get_data("url-entry"));
+        auto const url = gtr_str_strip(e->get_text());
+
+        if (url.empty())
+        {
+            return;
+        }
+
+        if (core->add_from_url(url))
+        {
+            hide();
+        }
+        else
+        {
+            gtr_unrecognized_url_dialog(*this, url);
+        }
     }
 }
 
