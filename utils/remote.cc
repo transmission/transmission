@@ -1030,14 +1030,19 @@ static void printDetails(tr_variant* top)
 
             if (tr_variantDictFindInt(t, TR_KEY_downloadedEver, &i) && tr_variantDictFindInt(t, TR_KEY_uploadedEver, &j))
             {
-                printf("  Downloaded: %s\n", strlsize(i).c_str());
+                if (auto corrupt = int64_t{}; tr_variantDictFindInt(t, TR_KEY_corruptEver, &corrupt) && corrupt != 0)
+                {
+                    printf(
+                        "  Downloaded: %s (+%s discarded after failed checksum)\n",
+                        strlsize(i).c_str(),
+                        strlsize(corrupt).c_str());
+                }
+                else
+                {
+                    printf("  Downloaded: %s\n", strlsize(i).c_str());
+                }
                 printf("  Uploaded: %s\n", strlsize(j).c_str());
                 printf("  Ratio: %s\n", strlratio(j, i).c_str());
-            }
-
-            if (tr_variantDictFindInt(t, TR_KEY_corruptEver, &i))
-            {
-                printf("  Corrupt DL: %s\n", strlsize(i).c_str());
             }
 
             if (tr_variantDictFindStrView(t, TR_KEY_errorString, &sv) && !std::empty(sv) &&
