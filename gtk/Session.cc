@@ -1158,7 +1158,7 @@ bool Session::Impl::add_file(Glib::RefPtr<Gio::File> const& file, bool do_start,
         handled = true;
         add_ctor(ctor, do_prompt, do_notify);
     }
-    else if (tr_urlIsValid(file->get_uri().raw()))
+    else if (tr_urlIsValid(file->get_uri()))
     {
         handled = true;
         inc_busy();
