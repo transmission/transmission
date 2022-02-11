@@ -1,17 +1,17 @@
-/*
- * This file Copyright (C) 2007-2014 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2007-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
+
+#include <ctime>
+#include <string>
 
 #include "transmission.h"
-#include "session.h"
+
 #include "log.h"
-#include "platform.h" /* tr_sessionGetConfigDir() */
+#include "session.h"
 #include "stats.h"
-#include "utils.h" /* tr_buildPath */
+#include "utils.h"
 #include "variant.h"
 
 /***
@@ -27,29 +27,27 @@ struct tr_stats_handle
     bool isDirty;
 };
 
-static char* getOldFilename(tr_session const* session)
+static std::string getOldFilename(tr_session const* session)
 {
-    return tr_buildPath(tr_sessionGetConfigDir(session), "stats.benc", nullptr);
+    return tr_strvPath(tr_sessionGetConfigDir(session), "stats.benc");
 }
 
-static char* getFilename(tr_session const* session)
+static std::string getFilename(tr_session const* session)
 {
-    return tr_buildPath(tr_sessionGetConfigDir(session), "stats.json", nullptr);
+    return tr_strvPath(tr_sessionGetConfigDir(session), "stats.json");
 }
 
 static void loadCumulativeStats(tr_session const* session, tr_session_stats* setme)
 {
     auto top = tr_variant{};
 
-    char* filename = getFilename(session);
-    bool loaded = tr_variantFromFile(&top, TR_VARIANT_FMT_JSON, filename, nullptr);
-    tr_free(filename);
+    auto filename = getFilename(session);
+    bool loaded = tr_variantFromFile(&top, TR_VARIANT_PARSE_JSON, filename, nullptr);
 
     if (!loaded)
     {
         filename = getOldFilename(session);
-        loaded = tr_variantFromFile(&top, TR_VARIANT_FMT_BENC, filename, nullptr);
-        tr_free(filename);
+        loaded = tr_variantFromFile(&top, TR_VARIANT_PARSE_BENC, filename, nullptr);
     }
 
     if (loaded)
@@ -95,15 +93,14 @@ static void saveCumulativeStats(tr_session const* session, tr_session_stats cons
     tr_variantDictAddInt(&top, TR_KEY_session_count, s->sessionCount);
     tr_variantDictAddInt(&top, TR_KEY_uploaded_bytes, s->uploadedBytes);
 
-    char* const filename = getFilename(session);
+    auto const filename = getFilename(session);
     if (tr_logGetDeepEnabled())
     {
-        tr_logAddDeep(__FILE__, __LINE__, nullptr, "Saving stats to \"%s\"", filename);
+        tr_logAddDeep(__FILE__, __LINE__, nullptr, "Saving stats to \"%s\"", filename.c_str());
     }
 
     tr_variantToFile(&top, TR_VARIANT_FMT_JSON, filename);
 
-    tr_free(filename);
     tr_variantFree(&top);
 }
 
@@ -113,7 +110,7 @@ static void saveCumulativeStats(tr_session const* session, tr_session_stats cons
 
 void tr_statsInit(tr_session* session)
 {
-    struct tr_stats_handle* stats = tr_new0(struct tr_stats_handle, 1);
+    auto* const stats = tr_new0(struct tr_stats_handle, 1);
 
     loadCumulativeStats(session, &stats->old);
     stats->single.sessionCount = 1;

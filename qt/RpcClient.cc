@@ -1,14 +1,11 @@
-/*
- * This file Copyright (C) 2014-2016 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2014-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
+
+#include <string_view>
 
 #include "RpcClient.h"
-
-#include <cstring>
 
 #include <QApplication>
 #include <QAuthenticator>
@@ -34,8 +31,6 @@ namespace
 char const constexpr* const RequestDataPropertyKey{ "requestData" };
 char const constexpr* const RequestFutureinterfacePropertyKey{ "requestReplyFutureInterface" };
 
-bool const Verbose = tr_env_key_exists("TR_RPC_VERBOSE");
-
 void destroyVariant(tr_variant* json)
 {
     tr_variantFree(json);
@@ -44,7 +39,7 @@ void destroyVariant(tr_variant* json)
 
 TrVariantPtr createVariant()
 {
-    return TrVariantPtr(tr_new0(tr_variant, 1), &destroyVariant);
+    return { tr_new0(tr_variant, 1), &destroyVariant };
 }
 
 } // namespace
@@ -144,11 +139,7 @@ void RpcClient::sendNetworkRequest(TrVariantPtr json, QFutureInterface<RpcRespon
         request_ = request;
     }
 
-    size_t raw_json_data_length;
-    auto* raw_json_data = tr_variantToStr(json.get(), TR_VARIANT_FMT_JSON_LEAN, &raw_json_data_length);
-    QByteArray json_data(raw_json_data, raw_json_data_length);
-    tr_free(raw_json_data);
-
+    auto const json_data = QByteArray::fromStdString(tr_variantToStr(json.get(), TR_VARIANT_FMT_JSON_LEAN));
     QNetworkReply* reply = networkAccessManager()->post(*request_, json_data);
     reply->setProperty(RequestDataPropertyKey, QVariant::fromValue(json));
     reply->setProperty(RequestFutureinterfacePropertyKey, QVariant::fromValue(promise));
@@ -156,7 +147,7 @@ void RpcClient::sendNetworkRequest(TrVariantPtr json, QFutureInterface<RpcRespon
     connect(reply, &QNetworkReply::downloadProgress, this, &RpcClient::dataReadProgress);
     connect(reply, &QNetworkReply::uploadProgress, this, &RpcClient::dataSendProgress);
 
-    if (Verbose)
+    if (verbose_)
     {
         qInfo() << "sending"
                 << "POST" << qPrintable(url_.path());
@@ -235,7 +226,7 @@ void RpcClient::networkRequestFinished(QNetworkReply* reply)
 
     auto promise = reply->property(RequestFutureinterfacePropertyKey).value<QFutureInterface<RpcResponse>>();
 
-    if (Verbose)
+    if (verbose_)
     {
         qInfo() << "http response header:";
 
@@ -272,12 +263,12 @@ void RpcClient::networkRequestFinished(QNetworkReply* reply)
     }
     else
     {
-        RpcResponse result;
-
         QByteArray const json_data = reply->readAll().trimmed();
-        TrVariantPtr json = createVariant();
+        auto const json_sv = std::string_view{ std::data(json_data), size_t(std::size(json_data)) };
 
-        if (tr_variantFromJson(json.get(), json_data.constData(), json_data.size()) == 0)
+        TrVariantPtr json = createVariant();
+        RpcResponse result;
+        if (tr_variantFromBuf(json.get(), TR_VARIANT_PARSE_JSON, json_sv))
         {
             result = parseResponseData(*json);
         }
@@ -308,16 +299,13 @@ RpcResponse RpcClient::parseResponseData(tr_variant& json) const
 {
     RpcResponse ret;
 
-    auto const result = dictFind<QString>(&json, TR_KEY_result);
-    if (result)
+    if (auto const result = dictFind<QString>(&json, TR_KEY_result); result)
     {
         ret.result = *result;
         ret.success = *result == QStringLiteral("success");
     }
 
-    tr_variant* args;
-
-    if (tr_variantDictFindDict(&json, TR_KEY_arguments, &args))
+    if (tr_variant* args = nullptr; tr_variantDictFindDict(&json, TR_KEY_arguments, &args))
     {
         ret.args = createVariant();
         *ret.args = *args;

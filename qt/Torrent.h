@@ -1,16 +1,14 @@
-/*
- * This file Copyright (C) 2009-2015 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2009-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #pragma once
 
-#include <array>
 #include <bitset>
 #include <ctime> // time_t
+#include <optional>
+#include <vector>
 
 #include <QIcon>
 #include <QMetaType>
@@ -18,12 +16,13 @@
 #include <QString>
 
 #include <libtransmission/transmission.h>
+
 #include <libtransmission/crypto-utils.h>
 #include <libtransmission/quark.h>
+#include <libtransmission/tr-macros.h>
 
 #include "FaviconCache.h"
 #include "IconCache.h"
-#include "Macros.h"
 #include "Speed.h"
 
 #ifdef ERROR
@@ -58,7 +57,7 @@ struct Peer
     double progress;
 };
 
-using PeerList = QVector<Peer>;
+using PeerList = std::vector<Peer>;
 
 struct TrackerStat
 {
@@ -91,7 +90,7 @@ struct TrackerStat
     QString last_scrape_result;
 };
 
-using TrackerStatsList = QVector<TrackerStat>;
+using TrackerStatsList = std::vector<TrackerStat>;
 
 struct TorrentFile
 {
@@ -103,26 +102,31 @@ struct TorrentFile
     uint64_t have = 0;
 };
 
-using FileList = QVector<TorrentFile>;
+using FileList = std::vector<TorrentFile>;
 
 class TorrentHash
 {
 private:
-    std::array<uint8_t, SHA_DIGEST_LENGTH> data_ = {};
+    tr_sha1_digest_t data_ = {};
 
 public:
     TorrentHash()
     {
     }
 
+    explicit TorrentHash(tr_sha1_digest_t const& data)
+        : data_{ data }
+    {
+    }
+
     explicit TorrentHash(char const* str)
     {
-        tr_hex_to_sha1(data_.data(), str);
+        data_ = tr_sha1_from_string(str != nullptr ? str : "");
     }
 
     explicit TorrentHash(QString const& str)
     {
-        tr_hex_to_sha1(data_.data(), str.toUtf8().constData());
+        data_ = tr_sha1_from_string(str.toStdString());
     }
 
     bool operator==(TorrentHash const& that) const
@@ -142,9 +146,7 @@ public:
 
     QString toString() const
     {
-        char str[SHA_DIGEST_LENGTH * 2 + 1];
-        tr_sha1_to_hex(str, data_.data());
-        return QString::fromUtf8(str, SHA_DIGEST_LENGTH * 2);
+        return QString::fromStdString(tr_sha1_to_string(data_));
     }
 };
 
@@ -218,7 +220,7 @@ public:
         return is_private_;
     }
 
-    bool getSeedRatio(double& setmeRatio) const;
+    std::optional<double> getSeedRatioLimit() const;
 
     uint64_t haveVerified() const
     {

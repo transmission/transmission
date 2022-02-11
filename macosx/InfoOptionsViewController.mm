@@ -1,24 +1,6 @@
-/******************************************************************************
- * Copyright (c) 2010-2012 Transmission authors and contributors
- *
- * Permission is hereby granted, free of charge, to any person obtaining a
- * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
- * DEALINGS IN THE SOFTWARE.
- *****************************************************************************/
+// This file Copyright © 2010-2022 Transmission authors and contributors.
+// It may be used under the MIT (SPDX: MIT) license.
+// License text can be found in the licenses/ folder.
 
 #import "InfoOptionsViewController.h"
 #import "NSStringAdditions.h"
@@ -98,19 +80,21 @@
     NSEnumerator* enumerator = [fTorrents objectEnumerator];
     Torrent* torrent = [enumerator nextObject]; //first torrent
 
-    NSInteger uploadUseSpeedLimit = [torrent usesSpeedLimit:YES] ? NSOnState : NSOffState;
+    NSInteger uploadUseSpeedLimit = [torrent usesSpeedLimit:YES] ? NSControlStateValueOn : NSControlStateValueOff;
     NSInteger uploadSpeedLimit = [torrent speedLimit:YES];
-    NSInteger downloadUseSpeedLimit = [torrent usesSpeedLimit:NO] ? NSOnState : NSOffState;
+    NSInteger downloadUseSpeedLimit = [torrent usesSpeedLimit:NO] ? NSControlStateValueOn : NSControlStateValueOff;
     NSInteger downloadSpeedLimit = [torrent speedLimit:NO];
-    NSInteger globalUseSpeedLimit = torrent.usesGlobalSpeedLimit ? NSOnState : NSOffState;
+    NSInteger globalUseSpeedLimit = torrent.usesGlobalSpeedLimit ? NSControlStateValueOn : NSControlStateValueOff;
 
     while ((torrent = [enumerator nextObject]) &&
-           (uploadUseSpeedLimit != NSMixedState || uploadSpeedLimit != INVALID || downloadUseSpeedLimit != NSMixedState ||
-            downloadSpeedLimit != INVALID || globalUseSpeedLimit != NSMixedState))
+           (uploadUseSpeedLimit != NSControlStateValueMixed || uploadSpeedLimit != INVALID ||
+            downloadUseSpeedLimit != NSControlStateValueMixed || downloadSpeedLimit != INVALID ||
+            globalUseSpeedLimit != NSControlStateValueMixed))
     {
-        if (uploadUseSpeedLimit != NSMixedState && uploadUseSpeedLimit != ([torrent usesSpeedLimit:YES] ? NSOnState : NSOffState))
+        if (uploadUseSpeedLimit != NSControlStateValueMixed &&
+            uploadUseSpeedLimit != ([torrent usesSpeedLimit:YES] ? NSControlStateValueOn : NSControlStateValueOff))
         {
-            uploadUseSpeedLimit = NSMixedState;
+            uploadUseSpeedLimit = NSControlStateValueMixed;
         }
 
         if (uploadSpeedLimit != INVALID && uploadSpeedLimit != [torrent speedLimit:YES])
@@ -118,9 +102,10 @@
             uploadSpeedLimit = INVALID;
         }
 
-        if (downloadUseSpeedLimit != NSMixedState && downloadUseSpeedLimit != ([torrent usesSpeedLimit:NO] ? NSOnState : NSOffState))
+        if (downloadUseSpeedLimit != NSControlStateValueMixed &&
+            downloadUseSpeedLimit != ([torrent usesSpeedLimit:NO] ? NSControlStateValueOn : NSControlStateValueOff))
         {
-            downloadUseSpeedLimit = NSMixedState;
+            downloadUseSpeedLimit = NSControlStateValueMixed;
         }
 
         if (downloadSpeedLimit != INVALID && downloadSpeedLimit != [torrent speedLimit:NO])
@@ -128,9 +113,10 @@
             downloadSpeedLimit = INVALID;
         }
 
-        if (globalUseSpeedLimit != NSMixedState && globalUseSpeedLimit != (torrent.usesGlobalSpeedLimit ? NSOnState : NSOffState))
+        if (globalUseSpeedLimit != NSControlStateValueMixed &&
+            globalUseSpeedLimit != (torrent.usesGlobalSpeedLimit ? NSControlStateValueOn : NSControlStateValueOff))
         {
-            globalUseSpeedLimit = NSMixedState;
+            globalUseSpeedLimit = NSControlStateValueMixed;
         }
     }
 
@@ -138,8 +124,8 @@
     fUploadLimitCheck.state = uploadUseSpeedLimit;
     fUploadLimitCheck.enabled = YES;
 
-    fUploadLimitLabel.enabled = uploadUseSpeedLimit == NSOnState;
-    fUploadLimitField.enabled = uploadUseSpeedLimit == NSOnState;
+    fUploadLimitLabel.enabled = uploadUseSpeedLimit == NSControlStateValueOn;
+    fUploadLimitField.enabled = uploadUseSpeedLimit == NSControlStateValueOn;
     if (uploadSpeedLimit != INVALID)
     {
         fUploadLimitField.intValue = uploadSpeedLimit;
@@ -153,8 +139,8 @@
     fDownloadLimitCheck.state = downloadUseSpeedLimit;
     fDownloadLimitCheck.enabled = YES;
 
-    fDownloadLimitLabel.enabled = downloadUseSpeedLimit == NSOnState;
-    fDownloadLimitField.enabled = downloadUseSpeedLimit == NSOnState;
+    fDownloadLimitLabel.enabled = downloadUseSpeedLimit == NSControlStateValueOn;
+    fDownloadLimitField.enabled = downloadUseSpeedLimit == NSControlStateValueOn;
     if (downloadSpeedLimit != INVALID)
     {
         fDownloadLimitField.intValue = downloadSpeedLimit;
@@ -174,7 +160,8 @@
 
     NSInteger checkRatio = torrent.ratioSetting;
     NSInteger checkIdle = torrent.idleSetting;
-    NSInteger removeWhenFinishSeeding = torrent.removeWhenFinishSeeding ? NSOnState : NSOffState;
+    NSInteger removeWhenFinishSeeding = torrent.removeWhenFinishSeeding ? NSControlStateValueOn
+                                                                        : NSControlStateValueOff;
     CGFloat ratioLimit = torrent.ratioLimit;
     NSUInteger idleLimit = torrent.idleLimitMinutes;
 
@@ -201,9 +188,11 @@
             idleLimit = INVALID;
         }
 
-        if (removeWhenFinishSeeding != NSMixedState && removeWhenFinishSeeding != (torrent.removeWhenFinishSeeding ? NSOnState : NSOffState))
+        if (removeWhenFinishSeeding != NSControlStateValueMixed &&
+            removeWhenFinishSeeding != (torrent.removeWhenFinishSeeding ? NSControlStateValueOn
+                                                                        : NSControlStateValueOff))
         {
-            removeWhenFinishSeeding = NSMixedState;
+            removeWhenFinishSeeding = NSControlStateValueMixed;
         }
     }
 
@@ -343,11 +332,11 @@
 {
     BOOL const upload = sender == fUploadLimitCheck;
 
-    if (((NSButton*)sender).state == NSMixedState)
+    if (((NSButton*)sender).state == NSControlStateValueMixed)
     {
-        [sender setState:NSOnState];
+        [sender setState:NSControlStateValueOn];
     }
-    BOOL const limit = ((NSButton*)sender).state == NSOnState;
+    BOOL const limit = ((NSButton*)sender).state == NSControlStateValueOn;
 
     for (Torrent* torrent in fTorrents)
     {
@@ -370,11 +359,11 @@
 
 - (void)setUseGlobalSpeedLimit:(id)sender
 {
-    if (((NSButton*)sender).state == NSMixedState)
+    if (((NSButton*)sender).state == NSControlStateValueMixed)
     {
-        [sender setState:NSOnState];
+        [sender setState:NSControlStateValueOn];
     }
-    BOOL const limit = ((NSButton*)sender).state == NSOnState;
+    BOOL const limit = ((NSButton*)sender).state == NSControlStateValueOn;
 
     for (Torrent* torrent in fTorrents)
     {
@@ -500,11 +489,11 @@
 
 - (IBAction)setRemoveWhenSeedingCompletes:(id)sender
 {
-    if (((NSButton*)sender).state == NSMixedState)
+    if (((NSButton*)sender).state == NSControlStateValueMixed)
     {
-        [sender setState:NSOnState];
+        [sender setState:NSControlStateValueOn];
     }
-    BOOL const enable = ((NSButton*)sender).state == NSOnState;
+    BOOL const enable = ((NSButton*)sender).state == NSControlStateValueOn;
 
     for (Torrent* torrent in fTorrents)
     {
@@ -582,19 +571,19 @@
     if (fTorrents.count == 0)
     {
         fUploadLimitCheck.enabled = NO;
-        fUploadLimitCheck.state = NSOffState;
+        fUploadLimitCheck.state = NSControlStateValueOff;
         fUploadLimitField.enabled = NO;
         fUploadLimitLabel.enabled = NO;
         fUploadLimitField.stringValue = @"";
 
         fDownloadLimitCheck.enabled = NO;
-        fDownloadLimitCheck.state = NSOffState;
+        fDownloadLimitCheck.state = NSControlStateValueOff;
         fDownloadLimitField.enabled = NO;
         fDownloadLimitLabel.enabled = NO;
         fDownloadLimitField.stringValue = @"";
 
         fGlobalLimitCheck.enabled = NO;
-        fGlobalLimitCheck.state = NSOffState;
+        fGlobalLimitCheck.state = NSControlStateValueOff;
 
         fPriorityPopUp.enabled = NO;
         [fPriorityPopUp selectItemAtIndex:-1];
@@ -613,7 +602,7 @@
         fIdleLimitGlobalLabel.hidden = YES;
 
         fRemoveSeedingCompleteCheck.enabled = NO;
-        fRemoveSeedingCompleteCheck.state = NSOffState;
+        fRemoveSeedingCompleteCheck.state = NSControlStateValueOff;
 
         fPeersConnectField.enabled = NO;
         fPeersConnectField.stringValue = @"";

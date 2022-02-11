@@ -1,11 +1,7 @@
-/**
- * @license
- *
- * This file Copyright (C) 2020 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- */
+/* @license This file Copyright (C) 2020-2022 Mnemosyne LLC.
+   It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
+   or any future license endorsed by Mnemosyne LLC.
+   License text can be found in the licenses/ folder. */
 
 export class ActionManager extends EventTarget {
   constructor() {
@@ -48,6 +44,10 @@ export class ActionManager extends EventTarget {
         enabled: true,
         shortcut: 'Alt+I',
         text: 'Torrent Inspector',
+      },
+      'show-labels-dialog': {
+        enabled: false,
+        text: 'Edit Labels…',
       },
       'show-move-dialog': {
         enabled: false,
@@ -189,9 +189,10 @@ export class ActionManager extends EventTarget {
       'move-down',
       'move-top',
       'move-up',
-      'show-inspector',
-      'show-move-dialog',
       'remove-selected-torrents',
+      'show-inspector',
+      'show-labels-dialog',
+      'show-move-dialog',
       'trash-selected-torrents',
       'verify-selected-torrents',
     ]);

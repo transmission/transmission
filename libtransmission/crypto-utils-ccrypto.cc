@@ -1,10 +1,7 @@
-/*
- * This file Copyright (C) 2021 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2021-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #include <memory>
 #include <type_traits>
@@ -23,7 +20,7 @@
 
 #define TR_CRYPTO_DH_SECRET_FALLBACK
 #define TR_CRYPTO_X509_FALLBACK
-#include "crypto-utils-fallback.cc"
+#include "crypto-utils-fallback.cc" // NOLINT(bugprone-suspicious-include)
 
 /***
 ****
@@ -55,7 +52,7 @@ extern "C"
 namespace
 {
 
-#define MY_NAME "tr_crypto_utils"
+static char constexpr MyName[] = "tr_crypto_utils";
 
 char const* ccrypto_error_to_str(CCCryptorStatus error_code)
 {
@@ -100,7 +97,7 @@ void log_ccrypto_error(CCCryptorStatus error_code, char const* file, int line)
             file,
             line,
             TR_LOG_ERROR,
-            MY_NAME,
+            MyName,
             "CCrypto error (%d): %s",
             error_code,
             ccrypto_error_to_str(error_code));
@@ -163,17 +160,17 @@ bool tr_sha1_update(tr_sha1_ctx_t handle, void const* data, size_t data_length)
     return true;
 }
 
-bool tr_sha1_final(tr_sha1_ctx_t handle, uint8_t* hash)
+std::optional<tr_sha1_digest_t> tr_sha1_final(tr_sha1_ctx_t raw_handle)
 {
-    if (hash != nullptr)
-    {
-        TR_ASSERT(handle != nullptr);
+    TR_ASSERT(raw_handle != nullptr);
+    auto* handle = static_cast<CC_SHA1_CTX*>(raw_handle);
 
-        CC_SHA1_Final(hash, static_cast<CC_SHA1_CTX*>(handle));
-    }
+    auto digest = tr_sha1_digest_t{};
+    auto* const digest_as_uchar = reinterpret_cast<unsigned char*>(std::data(digest));
+    CC_SHA1_Final(digest_as_uchar, handle);
 
-    delete static_cast<CC_SHA1_CTX*>(handle);
-    return true;
+    delete handle;
+    return digest;
 }
 
 /***
@@ -215,7 +212,7 @@ tr_dh_ctx_t tr_dh_new(
     TR_ASSERT(generator_num != nullptr);
 
     auto handle = std::make_unique<tr_dh_ctx>();
-    CCStatus status;
+    auto status = CCStatus{};
 
     handle->p = CCBigNumPtr(CCBigNumFromData(&status, prime_num, prime_num_length));
     if (!check_pointer(handle->p.get(), &status))
@@ -243,7 +240,7 @@ bool tr_dh_make_key(tr_dh_ctx_t raw_handle, size_t private_key_length, uint8_t* 
     TR_ASSERT(public_key != nullptr);
 
     auto& handle = *static_cast<tr_dh_ctx*>(raw_handle);
-    CCStatus status;
+    auto status = CCStatus{};
 
     handle.private_key = CCBigNumPtr(CCBigNumCreateRandom(&status, private_key_length * 8, private_key_length * 8, 0));
     if (!check_pointer(handle.private_key.get(), &status))
@@ -286,7 +283,7 @@ tr_dh_secret_t tr_dh_agree(tr_dh_ctx_t raw_handle, uint8_t const* other_public_k
     TR_ASSERT(other_public_key != nullptr);
 
     auto const& handle = *static_cast<tr_dh_ctx*>(raw_handle);
-    CCStatus status;
+    auto status = CCStatus{};
 
     auto const other_key = CCBigNumPtr(CCBigNumFromData(&status, other_public_key, other_public_key_length));
     if (!check_pointer(other_key.get(), &status))
@@ -326,6 +323,11 @@ tr_dh_secret_t tr_dh_agree(tr_dh_ctx_t raw_handle, uint8_t const* other_public_k
 
 bool tr_rand_buffer(void* buffer, size_t length)
 {
+    if (length == 0)
+    {
+        return true;
+    }
+
     TR_ASSERT(buffer != nullptr);
 
     return check_result(CCRandomGenerateBytes(buffer, length));

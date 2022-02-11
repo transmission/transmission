@@ -1,14 +1,10 @@
-/*
- * This file Copyright (C) 2007-2014 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2007-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #pragma once
 
-#include "tr-macros.h"
 #include "transmission.h"
 
 struct tr_metainfo_builder_file
@@ -17,13 +13,21 @@ struct tr_metainfo_builder_file
     uint64_t size;
 };
 
-enum tr_metainfo_builder_err
+enum class TrMakemetaResult
 {
-    TR_MAKEMETA_OK,
-    TR_MAKEMETA_URL,
-    TR_MAKEMETA_CANCELLED,
-    TR_MAKEMETA_IO_READ, /* see builder.errfile, builder.my_errno */
-    TR_MAKEMETA_IO_WRITE /* see builder.errfile, builder.my_errno */
+    OK,
+    CANCELLED,
+    ERR_URL, // invalid announce URL
+    ERR_IO_READ, // see builder.errfile, builder.my_errno
+    ERR_IO_WRITE // see builder.errfile, builder.my_errno
+};
+
+struct tr_tracker_info
+{
+    int tier;
+    char* announce;
+    char* scrape;
+    uint32_t id; /* unique identifier used to match to a tr_tracker_stat */
 };
 
 struct tr_metainfo_builder
@@ -64,7 +68,7 @@ struct tr_metainfo_builder
     uint32_t pieceIndex;
     bool abortFlag;
     bool isDone;
-    tr_metainfo_builder_err result;
+    TrMakemetaResult result;
 
     /* file in use when result was set to _IO_READ or _IO_WRITE,
      * or the URL in use when the result was set to _URL */

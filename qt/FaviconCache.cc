@@ -1,10 +1,7 @@
-/*
- * This file Copyright (C) 2012-2015 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2012-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #include <array>
 
@@ -15,6 +12,43 @@
 #include <QStandardPaths>
 
 #include "FaviconCache.h"
+
+/***
+****
+***/
+
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+Q_NETWORK_EXPORT bool qIsEffectiveTLD(QStringView domain);
+#endif
+
+namespace
+{
+
+QString getTopLevelDomain(QUrl const& url)
+{
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+
+    auto const host = url.host();
+    auto const dot = QChar(QLatin1Char('.'));
+
+    for (auto dot_pos = host.indexOf(dot); dot_pos != -1; dot_pos = host.indexOf(dot, dot_pos + 1))
+    {
+        if (qIsEffectiveTLD(QStringView(&host.data()[dot_pos + 1], host.size() - dot_pos - 1)))
+        {
+            return host.mid(dot_pos);
+        }
+    }
+
+    return {};
+
+#else
+
+    return url.topLevelDomain();
+
+#endif
+}
+
+} // namespace
 
 /***
 ****
@@ -74,8 +108,7 @@ void FaviconCache::ensureCacheDirHasBeenScanned()
 
     // remember which hosts we've asked for a favicon so that we
     // don't re-ask them every time we start a new session
-    auto skip_file = QFile(getScrapedFile());
-    if (skip_file.open(QIODevice::ReadOnly | QIODevice::Text))
+    if (auto skip_file = QFile(getScrapedFile()); skip_file.open(QIODevice::ReadOnly | QIODevice::Text))
     {
         while (!skip_file.atEnd())
         {
@@ -89,8 +122,7 @@ void FaviconCache::ensureCacheDirHasBeenScanned()
     // load the cached favicons
     auto cache_dir = QDir(getCacheDir());
     cache_dir.mkpath(cache_dir.absolutePath());
-    QStringList const files = cache_dir.entryList(QDir::Files | QDir::Readable);
-    for (auto const& file : files)
+    for (auto const& file : cache_dir.entryList(QDir::Files | QDir::Readable))
     {
         QPixmap pixmap(cache_dir.absoluteFilePath(file));
         if (!pixmap.isNull())
@@ -107,7 +139,10 @@ void FaviconCache::ensureCacheDirHasBeenScanned()
 QString FaviconCache::getDisplayName(Key const& key)
 {
     auto name = key;
-    name[0] = name.at(0).toTitleCase();
+    if (!name.isEmpty())
+    {
+        name.front() = name.front().toTitleCase();
+    }
     return name;
 }
 
@@ -116,7 +151,7 @@ FaviconCache::Key FaviconCache::getKey(QUrl const& url)
     auto host = url.host();
 
     // remove tld
-    auto const suffix = url.topLevelDomain();
+    auto const suffix = getTopLevelDomain(url);
     host.truncate(host.size() - suffix.size());
 
     // remove subdomain
@@ -131,7 +166,7 @@ FaviconCache::Key FaviconCache::getKey(QString const& displayName)
 
 QSize FaviconCache::getIconSize()
 {
-    return QSize(16, 16);
+    return { 16, 16 };
 }
 
 QPixmap FaviconCache::find(Key const& key)
@@ -146,8 +181,7 @@ FaviconCache::Key FaviconCache::add(QString const& url_str)
     ensureCacheDirHasBeenScanned();
 
     // find or add this url's key
-    auto k_it = keys_.find(url_str);
-    if (k_it != keys_.end())
+    if (auto k_it = keys_.find(url_str); k_it != keys_.end())
     {
         return k_it->second;
     }

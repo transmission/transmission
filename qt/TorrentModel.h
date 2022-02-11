@@ -1,10 +1,7 @@
-/*
- * This file Copyright (C) 2010-2015 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2010-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #pragma once
 
@@ -12,9 +9,9 @@
 #include <vector>
 
 #include <QAbstractListModel>
-#include <QVector>
 
-#include "Macros.h"
+#include <libtransmission/tr-macros.h>
+
 #include "Torrent.h"
 #include "Typedefs.h"
 
@@ -46,7 +43,7 @@ public:
     Torrent* getTorrentFromId(int id);
     Torrent const* getTorrentFromId(int id) const;
 
-    using torrents_t = QVector<Torrent*>;
+    using torrents_t = std::vector<Torrent*>;
 
     torrents_t const& torrents() const
     {

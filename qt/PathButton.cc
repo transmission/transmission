@@ -1,10 +1,7 @@
-/*
- * This file Copyright (C) 2014-2015 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2014-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #include <QApplication>
 #include <QDir>
@@ -74,7 +71,7 @@ QString const& PathButton::path() const
 QSize PathButton::sizeHint() const
 {
     QSize const sh(QToolButton::sizeHint());
-    return QSize(qMin(sh.width(), 150), sh.height());
+    return { qMin(sh.width(), 150), sh.height() };
 }
 
 void PathButton::paintEvent(QPaintEvent* /*event*/)
@@ -83,8 +80,7 @@ void PathButton::paintEvent(QPaintEvent* /*event*/)
     QStyleOptionToolButton option;
     initStyleOption(&option);
 
-    auto const& strut = QApplication::globalStrut();
-    QSize const fake_content_size(qMax(100, strut.width()), qMax(100, strut.height()));
+    QSize const fake_content_size(100, 100);
     QSize const fake_size_hint = style()->sizeFromContents(QStyle::CT_ToolButton, &option, fake_content_size, this);
 
     int text_width = width() - (fake_size_hint.width() - fake_content_size.width()) - iconSize().width() - 6;
@@ -116,9 +112,7 @@ void PathButton::onClicked() const
         dialog->setNameFilter(name_filter_);
     }
 
-    QFileInfo const path_info(path_);
-
-    if (!path_.isEmpty() && path_info.exists())
+    if (auto const path_info = QFileInfo(path_); !path_.isEmpty() && path_info.exists())
     {
         if (path_info.isDir())
         {
@@ -156,7 +150,7 @@ void PathButton::updateAppearance()
 
     if (!path_.isEmpty() && path_info.exists())
     {
-        icon = icon_provider.icon(path_);
+        icon = icon_provider.icon(QFileInfo(path_));
     }
 
     if (icon.isNull())

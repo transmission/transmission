@@ -1,10 +1,7 @@
-/*
- * This file Copyright (C) 2013-2016 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2013-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #include <QDir>
 
@@ -79,8 +76,7 @@ void FreeSpaceLabel::onTimer()
         [this](RpcResponse const& r)
         {
             // update the label
-            auto const bytes = dictFind<int64_t>(r.args.get(), TR_KEY_size_bytes);
-            if (bytes && *bytes > 1)
+            if (auto const bytes = dictFind<int64_t>(r.args.get(), TR_KEY_size_bytes); bytes && *bytes > 1)
             {
                 setText(tr("%1 free").arg(Formatter::get().sizeToString(*bytes)));
             }

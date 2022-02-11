@@ -1,23 +1,16 @@
-/*
- * This file Copyright (C) 2009-2014 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2009-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
-#include <cstdlib>
+#include <algorithm>
+#include <cstdarg>
 #include <cstring>
 #include <list>
-#include <map>
 #include <string>
-
-#ifndef _XOPEN_SOURCE
-#define _XOPEN_SOURCE 600 /* needed for recursive locks. */
-#endif
-#ifndef __USE_UNIX98
-#define __USE_UNIX98 /* some older Linuxes need it spelt out for them */
-#endif
+#include <string_view>
+#include <thread>
+#include <vector>
 
 #ifdef __HAIKU__
 #include <limits.h> /* PATH_MAX */
@@ -29,16 +22,18 @@
 #include <shlobj.h> /* SHGetKnownFolderPath(), FOLDERID_... */
 #else
 #include <unistd.h> /* getuid() */
+#endif
+
 #ifdef BUILD_MAC_CLIENT
 #include <CoreFoundation/CoreFoundation.h>
 #endif
+
 #ifdef __HAIKU__
 #include <FindDirectory.h>
 #endif
-#include <pthread.h>
-#endif
 
 #include "transmission.h"
+
 #include "file.h"
 #include "log.h"
 #include "platform.h"
@@ -46,182 +41,50 @@
 #include "tr-assert.h"
 #include "utils.h"
 
-/***
-****  THREADS
-***/
+using namespace std::literals;
 
-#ifdef _WIN32
-using tr_thread_id = DWORD;
-#else
-using tr_thread_id = pthread_t;
-#endif
-
-static tr_thread_id tr_getCurrentThread(void)
+static char* tr_buildPath(char const* first_element, ...)
 {
-#ifdef _WIN32
-    return GetCurrentThreadId();
-#else
-    return pthread_self();
-#endif
-}
-
-static bool tr_areThreadsEqual(tr_thread_id a, tr_thread_id b)
-{
-#ifdef _WIN32
-    return a == b;
-#else
-    return pthread_equal(a, b) != 0;
-#endif
-}
-
-/** @brief portability wrapper around OS-dependent threads */
-struct tr_thread
-{
-    void (*func)(void*);
-    void* arg;
-    tr_thread_id thread;
-
-#ifdef _WIN32
-    HANDLE thread_handle;
-#endif
-};
-
-bool tr_amInThread(tr_thread const* t)
-{
-    return tr_areThreadsEqual(tr_getCurrentThread(), t->thread);
-}
-
-#ifdef _WIN32
-#define ThreadFuncReturnType unsigned WINAPI
-#else
-#define ThreadFuncReturnType void*
-#endif
-
-static ThreadFuncReturnType ThreadFunc(void* _t)
-{
-#ifndef _WIN32
-    pthread_detach(pthread_self());
-#endif
-
-    auto* t = static_cast<tr_thread*>(_t);
-
-    t->func(t->arg);
-
-    tr_free(t);
-
-#ifdef _WIN32
-    _endthreadex(0);
-    return 0;
-#else
-    return nullptr;
-#endif
-}
-
-tr_thread* tr_threadNew(void (*func)(void*), void* arg)
-{
-    auto* t = static_cast<tr_thread*>(tr_new0(tr_thread, 1));
-
-    t->func = func;
-    t->arg = arg;
-
-#ifdef _WIN32
-
+    // pass 1: allocate enough space for the string
+    va_list vl;
+    va_start(vl, first_element);
+    auto bufLen = size_t{};
+    for (char const* element = first_element; element != nullptr;)
     {
-        unsigned int id;
-        t->thread_handle = (HANDLE)_beginthreadex(nullptr, 0, &ThreadFunc, t, 0, &id);
-        t->thread = (DWORD)id;
+        bufLen += strlen(element) + 1;
+        element = va_arg(vl, char const*);
+    }
+    va_end(vl);
+    auto* const buf = tr_new(char, bufLen);
+    if (buf == nullptr)
+    {
+        return nullptr;
     }
 
-#else
+    /* pass 2: build the string piece by piece */
+    char* pch = buf;
+    va_start(vl, first_element);
+    for (char const* element = first_element; element != nullptr;)
+    {
+        size_t const elementLen = strlen(element);
+        pch = std::copy_n(element, elementLen, pch);
+        *pch++ = TR_PATH_DELIMITER;
+        element = va_arg(vl, char const*);
+    }
+    va_end(vl);
 
-    pthread_create(&t->thread, nullptr, (void* (*)(void*))ThreadFunc, t);
+    // if nonempty, eat the unwanted trailing slash
+    if (pch != buf)
+    {
+        --pch;
+    }
 
-#endif
+    // zero-terminate the string
+    *pch++ = '\0';
 
-    return t;
-}
-
-/***
-****  LOCKS
-***/
-
-/** @brief portability wrapper around OS-dependent thread mutexes */
-struct tr_lock
-{
-    int depth;
-#ifdef _WIN32
-    CRITICAL_SECTION lock;
-    DWORD lockThread;
-#else
-    pthread_mutex_t lock;
-    pthread_t lockThread;
-#endif
-};
-
-tr_lock* tr_lockNew(void)
-{
-    tr_lock* l = tr_new0(tr_lock, 1);
-
-#ifdef _WIN32
-
-    InitializeCriticalSection(&l->lock); /* supports recursion */
-
-#else
-
-    pthread_mutexattr_t attr;
-    pthread_mutexattr_init(&attr);
-    pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
-    pthread_mutex_init(&l->lock, &attr);
-
-#endif
-
-    return l;
-}
-
-void tr_lockFree(tr_lock* l)
-{
-#ifdef _WIN32
-    DeleteCriticalSection(&l->lock);
-#else
-    pthread_mutex_destroy(&l->lock);
-#endif
-
-    tr_free(l);
-}
-
-void tr_lockLock(tr_lock* l)
-{
-#ifdef _WIN32
-    EnterCriticalSection(&l->lock);
-#else
-    pthread_mutex_lock(&l->lock);
-#endif
-
-    TR_ASSERT(l->depth >= 0);
-    TR_ASSERT(l->depth == 0 || tr_areThreadsEqual(l->lockThread, tr_getCurrentThread()));
-
-    l->lockThread = tr_getCurrentThread();
-    ++l->depth;
-}
-
-bool tr_lockHave(tr_lock const* l)
-{
-    return l->depth > 0 && tr_areThreadsEqual(l->lockThread, tr_getCurrentThread());
-}
-
-void tr_lockUnlock(tr_lock* l)
-{
-    TR_ASSERT(l->depth > 0);
-    TR_ASSERT(tr_areThreadsEqual(l->lockThread, tr_getCurrentThread()));
-
-    --l->depth;
-    TR_ASSERT(l->depth >= 0);
-
-#ifdef _WIN32
-    LeaveCriticalSection(&l->lock);
-#else
-    pthread_mutex_unlock(&l->lock);
-#endif
+    /* sanity checks & return */
+    TR_ASSERT(pch - buf == (ptrdiff_t)bufLen);
+    return buf;
 }
 
 /***
@@ -255,7 +118,7 @@ static char* win32_get_known_folder(REFKNOWNFOLDERID folder_id)
 
 #endif
 
-static char const* getHomeDir(void)
+static char const* getHomeDir()
 {
     static char const* home = nullptr;
 
@@ -292,40 +155,31 @@ static char const* getHomeDir(void)
     return home;
 }
 
+void tr_setConfigDir(tr_session* session, std::string_view config_dir)
+{
 #if defined(__APPLE__) || defined(_WIN32)
-#define RESUME_SUBDIR "Resume"
-#define TORRENT_SUBDIR "Torrents"
+    auto constexpr ResumeSubdir = "Resume"sv;
+    auto constexpr TorrentSubdir = "Torrents"sv;
 #else
-#define RESUME_SUBDIR "resume"
-#define TORRENT_SUBDIR "torrents"
+    auto constexpr ResumeSubdir = "resume"sv;
+    auto constexpr TorrentSubdir = "torrents"sv;
 #endif
 
-void tr_setConfigDir(tr_session* session, char const* configDir)
-{
-    session->configDir = tr_strdup(configDir);
-
-    char* path = tr_buildPath(configDir, RESUME_SUBDIR, nullptr);
-    tr_sys_dir_create(path, TR_SYS_DIR_CREATE_PARENTS, 0777, nullptr);
-    session->resumeDir = path;
-
-    path = tr_buildPath(configDir, TORRENT_SUBDIR, nullptr);
-    tr_sys_dir_create(path, TR_SYS_DIR_CREATE_PARENTS, 0777, nullptr);
-    session->torrentDir = path;
+    session->config_dir = config_dir;
+    session->resume_dir = tr_strvPath(config_dir, ResumeSubdir);
+    session->torrent_dir = tr_strvPath(config_dir, TorrentSubdir);
+    tr_sys_dir_create(session->resume_dir.c_str(), TR_SYS_DIR_CREATE_PARENTS, 0777, nullptr);
+    tr_sys_dir_create(session->torrent_dir.c_str(), TR_SYS_DIR_CREATE_PARENTS, 0777, nullptr);
 }
 
 char const* tr_sessionGetConfigDir(tr_session const* session)
 {
-    return session->configDir;
+    return session->config_dir.c_str();
 }
 
 char const* tr_getTorrentDir(tr_session const* session)
 {
-    return session->torrentDir;
-}
-
-char const* tr_getResumeDir(tr_session const* session)
-{
-    return session->resumeDir;
+    return session->torrent_dir.c_str();
 }
 
 char const* tr_getDefaultConfigDir(char const* appname)
@@ -380,62 +234,65 @@ char const* tr_getDefaultConfigDir(char const* appname)
     return s;
 }
 
-char const* tr_getDefaultDownloadDir(void)
+static std::string getUserDirsFilename()
+{
+    char* const config_home = tr_env_get_string("XDG_CONFIG_HOME", nullptr);
+    auto config_file = !tr_str_is_empty(config_home) ? tr_strvPath(config_home, "user-dirs.dirs") :
+                                                       tr_strvPath(getHomeDir(), ".config", "user-dirs.dirs");
+
+    tr_free(config_home);
+    return config_file;
+}
+
+static std::string getXdgEntryFromUserDirs(std::string_view key)
+{
+    auto content = std::vector<char>{};
+    if (!tr_loadFile(content, getUserDirsFilename()) && std::empty(content))
+    {
+        return {};
+    }
+
+    // search for key="val" and extract val
+    auto const search = tr_strvJoin(key, R"(=")");
+    auto begin = std::search(std::begin(content), std::end(content), std::begin(search), std::end(search));
+    if (begin == std::end(content))
+    {
+        return {};
+    }
+    std::advance(begin, std::size(search));
+    auto const end = std::find(begin, std::end(content), '"');
+    if (end == std::end(content))
+    {
+        return {};
+    }
+    auto val = std::string{ begin, end };
+
+    // if val contains "$HOME", replace that with getHomeDir()
+    auto constexpr Home = "$HOME"sv;
+    if (auto const it = std::search(std::begin(val), std::end(val), std::begin(Home), std::end(Home)); it != std::end(val))
+    {
+        val.replace(it, it + std::size(Home), std::string_view{ getHomeDir() });
+    }
+
+    return val;
+}
+
+char const* tr_getDefaultDownloadDir()
 {
     static char const* user_dir = nullptr;
 
     if (user_dir == nullptr)
     {
-        /* figure out where to look for user-dirs.dirs */
-        char* const config_home = tr_env_get_string("XDG_CONFIG_HOME", nullptr);
-
-        char* const config_file = !tr_str_is_empty(config_home) ?
-            tr_buildPath(config_home, "user-dirs.dirs", nullptr) :
-            tr_buildPath(getHomeDir(), ".config", "user-dirs.dirs", nullptr);
-
-        tr_free(config_home);
-
-        /* read in user-dirs.dirs and look for the download dir entry */
-        size_t content_len = 0;
-        char* const content = (char*)tr_loadFile(config_file, &content_len, nullptr);
-
-        if (content != nullptr && content_len > 0)
+        if (auto const xdg_user_dir = getXdgEntryFromUserDirs("XDG_DOWNLOAD_DIR"sv); !std::empty(xdg_user_dir))
         {
-            char const* key = "XDG_DOWNLOAD_DIR=\"";
-            char* line = strstr(content, key);
-
-            if (line != nullptr)
-            {
-                char* value = line + strlen(key);
-                char* end = strchr(value, '"');
-
-                if (end != nullptr)
-                {
-                    *end = '\0';
-
-                    if (strncmp(value, "$HOME/", 6) == 0)
-                    {
-                        user_dir = tr_buildPath(getHomeDir(), value + 6, nullptr);
-                    }
-                    else if (strcmp(value, "$HOME") == 0)
-                    {
-                        user_dir = tr_strdup(getHomeDir());
-                    }
-                    else
-                    {
-                        user_dir = tr_strdup(value);
-                    }
-                }
-            }
+            user_dir = tr_strvDup(xdg_user_dir);
         }
 
 #ifdef _WIN32
-
         if (user_dir == nullptr)
         {
             user_dir = win32_get_known_folder(FOLDERID_Downloads);
         }
-
 #endif
 
         if (user_dir == nullptr)
@@ -446,9 +303,6 @@ char const* tr_getDefaultDownloadDir(void)
             user_dir = tr_buildPath(getHomeDir(), "Downloads", nullptr);
 #endif
         }
-
-        tr_free(content);
-        tr_free(config_file);
     }
 
     return user_dir;
@@ -458,12 +312,11 @@ char const* tr_getDefaultDownloadDir(void)
 ****
 ***/
 
-static bool isWebClientDir(char const* path)
+static bool isWebClientDir(std::string_view path)
 {
-    char* tmp = tr_buildPath(path, "index.html", nullptr);
-    bool const ret = tr_sys_path_exists(tmp, nullptr);
-    tr_logAddInfo(_("Searching for web interface file \"%s\""), tmp);
-    tr_free(tmp);
+    auto tmp = tr_strvPath(path, "index.html");
+    bool const ret = tr_sys_path_exists(tmp.c_str(), nullptr);
+    tr_logAddInfo(_("Searching for web interface file \"%s\""), tmp.c_str());
 
     return ret;
 }
@@ -545,11 +398,9 @@ char const* tr_getWebClientDir([[maybe_unused]] tr_session const* session)
             if (s == nullptr) /* check calling module place */
             {
                 wchar_t wide_module_path[MAX_PATH];
-                char* module_path;
-                char* dir;
                 GetModuleFileNameW(nullptr, wide_module_path, TR_N_ELEMENTS(wide_module_path));
-                module_path = tr_win32_native_to_utf8(wide_module_path, -1);
-                dir = tr_sys_path_dirname(module_path, nullptr);
+                char* module_path = tr_win32_native_to_utf8(wide_module_path, -1);
+                char* dir = tr_sys_path_dirname(module_path, nullptr);
                 tr_free(module_path);
 
                 if (dir != nullptr)
@@ -580,59 +431,39 @@ char const* tr_getWebClientDir([[maybe_unused]] tr_session const* session)
             }
             else
             {
-                char* dhome = tr_buildPath(getHomeDir(), ".local", "share", nullptr);
-                candidates.emplace_back(dhome);
-                tr_free(dhome);
+                candidates.emplace_back(tr_strvPath(getHomeDir(), ".local"sv, "share"sv));
             }
             tr_free(tmp);
 
             /* XDG_DATA_DIRS are the backup directories */
             {
                 char const* const pkg = PACKAGE_DATA_DIR;
-                char* xdg = tr_env_get_string("XDG_DATA_DIRS", nullptr);
-                char const* fallback = "/usr/local/share:/usr/share";
-                char* buf = tr_strdup_printf("%s:%s:%s", pkg, xdg != nullptr ? xdg : "", fallback);
+                auto* xdg = tr_env_get_string("XDG_DATA_DIRS", "");
+                auto const buf = tr_strvJoin(pkg, ":", xdg, ":/usr/local/share:/usr/share");
                 tr_free(xdg);
-                tmp = buf;
 
-                while (!tr_str_is_empty(tmp))
+                auto sv = std::string_view{ buf };
+                auto token = std::string_view{};
+                while (tr_strvSep(&sv, &token, ':'))
                 {
-                    char const* end = strchr(tmp, ':');
-
-                    if (end != nullptr)
+                    token = tr_strvStrip(token);
+                    if (!std::empty(token))
                     {
-                        if (end - tmp > 1)
-                        {
-                            candidates.emplace_back(tmp, (size_t)(end - tmp));
-                        }
-
-                        tmp = (char*)end + 1;
-                    }
-                    else if (!tr_str_is_empty(tmp))
-                    {
-                        candidates.emplace_back(tmp);
-                        break;
+                        candidates.emplace_back(token);
                     }
                 }
-
-                tr_free(buf);
             }
 
             /* walk through the candidates & look for a match */
             for (auto const& dir : candidates)
             {
-                char* path = tr_buildPath(dir.c_str(), "transmission", "public_html", nullptr);
-                bool const found = isWebClientDir(path);
-
-                if (found)
+                auto const path = tr_strvPath(dir, "transmission"sv, "public_html"sv);
+                if (isWebClientDir(path))
                 {
-                    s = path;
+                    s = tr_strvDup(path);
                     break;
                 }
-
-                tr_free(path);
             }
-
 #endif
         }
     }
@@ -640,18 +471,18 @@ char const* tr_getWebClientDir([[maybe_unused]] tr_session const* session)
     return s;
 }
 
-char* tr_getSessionIdDir(void)
+std::string tr_getSessionIdDir()
 {
 #ifndef _WIN32
 
-    return tr_strdup("/tmp");
+    return std::string{ "/tmp"sv };
 
 #else
 
     char* program_data_dir = win32_get_known_folder_ex(FOLDERID_ProgramData, KF_FLAG_CREATE);
-    char* result = tr_buildPath(program_data_dir, "Transmission", nullptr);
+    auto const result = tr_strvPath(program_data_dir, "Transmission");
     tr_free(program_data_dir);
-    tr_sys_dir_create(result, 0, 0, nullptr);
+    tr_sys_dir_create(result.c_str(), 0, 0, nullptr);
     return result;
 
 #endif

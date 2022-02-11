@@ -1,10 +1,7 @@
-/*
- * This file Copyright (C) 2009-2016 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2009-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #include "Session.h"
 
@@ -122,8 +119,7 @@ void Session::copyMagnetLinkToClipboard(int torrent_id)
     q->add(
         [](RpcResponse const& r)
         {
-            tr_variant* torrents;
-
+            tr_variant* torrents = nullptr;
             if (!tr_variantDictFindList(r.args.get(), TR_KEY_torrents, &torrents))
             {
                 return;
@@ -202,26 +198,22 @@ void Session::updatePref(int key)
             break;
 
         case Prefs::ENCRYPTION:
+            switch (int const i = prefs_.variant(key).toInt(); i)
             {
-                int const i = prefs_.variant(key).toInt();
+            case 0:
+                sessionSet(prefs_.getKey(key), QStringLiteral("tolerated"));
+                break;
 
-                switch (i)
-                {
-                case 0:
-                    sessionSet(prefs_.getKey(key), QStringLiteral("tolerated"));
-                    break;
+            case 1:
+                sessionSet(prefs_.getKey(key), QStringLiteral("preferred"));
+                break;
 
-                case 1:
-                    sessionSet(prefs_.getKey(key), QStringLiteral("preferred"));
-                    break;
-
-                case 2:
-                    sessionSet(prefs_.getKey(key), QStringLiteral("required"));
-                    break;
-                }
-
+            case 2:
+                sessionSet(prefs_.getKey(key), QStringLiteral("required"));
                 break;
             }
+
+            break;
 
         case Prefs::RPC_AUTH_REQUIRED:
             if (session_ != nullptr)
@@ -361,10 +353,8 @@ void Session::start()
 
         rpc_.start(session_);
 
-        tr_ctor* ctor = tr_ctorNew(session_);
-        int torrent_count;
-        tr_torrent** torrents = tr_sessionLoadTorrents(session_, ctor, &torrent_count);
-        tr_free(torrents);
+        auto* const ctor = tr_ctorNew(session_);
+        tr_free(tr_sessionLoadTorrents(session_, ctor, nullptr));
         tr_ctorFree(ctor);
     }
 
@@ -674,7 +664,7 @@ void Session::refreshTorrents(torrent_ids_t const& ids, TorrentProperties props)
     q->add(
         [this, all_torrents](RpcResponse const& r)
         {
-            tr_variant* torrents;
+            tr_variant* torrents = nullptr;
 
             if (tr_variantDictFindList(r.args.get(), TR_KEY_torrents, &torrents))
             {
@@ -799,8 +789,7 @@ void Session::updateBlocklist()
     q->add(
         [this](RpcResponse const& r)
         {
-            auto const size = dictFind<int>(r.args.get(), TR_KEY_blocklist_size);
-            if (size)
+            if (auto const size = dictFind<int>(r.args.get(), TR_KEY_blocklist_size); size)
             {
                 setBlocklistSize(*size);
             }
@@ -854,18 +843,16 @@ void Session::updateStats(tr_variant* d, tr_session_stats* stats)
     stats->ratio = static_cast<float>(tr_getRatio(stats->uploadedBytes, stats->downloadedBytes));
 }
 
-void Session::updateStats(tr_variant* d)
+void Session::updateStats(tr_variant* dict)
 {
-    tr_variant* c;
-
-    if (tr_variantDictFindDict(d, TR_KEY_current_stats, &c))
+    if (tr_variant* var = nullptr; tr_variantDictFindDict(dict, TR_KEY_current_stats, &var))
     {
-        updateStats(c, &stats_);
+        updateStats(var, &stats_);
     }
 
-    if (tr_variantDictFindDict(d, TR_KEY_cumulative_stats, &c))
+    if (tr_variant* var = nullptr; tr_variantDictFindDict(dict, TR_KEY_cumulative_stats, &var))
     {
-        updateStats(c, &cumulative_stats_);
+        updateStats(var, &cumulative_stats_);
     }
 
     emit statsUpdated();
@@ -886,9 +873,7 @@ void Session::updateInfo(tr_variant* d)
 
         if (i == Prefs::ENCRYPTION)
         {
-            auto const str = getValue<QString>(b);
-
-            if (str)
+            if (auto const str = getValue<QString>(b); str)
             {
                 if (*str == QStringLiteral("required"))
                 {
@@ -910,68 +895,50 @@ void Session::updateInfo(tr_variant* d)
         switch (prefs_.type(i))
         {
         case QVariant::Int:
+            if (auto const value = getValue<int>(b); value)
             {
-                auto const value = getValue<int>(b);
-
-                if (value)
-                {
-                    prefs_.set(i, *value);
-                }
-
-                break;
+                prefs_.set(i, *value);
             }
+
+            break;
 
         case QVariant::Double:
+            if (auto const value = getValue<double>(b); value)
             {
-                auto const value = getValue<double>(b);
-
-                if (value)
-                {
-                    prefs_.set(i, *value);
-                }
-
-                break;
+                prefs_.set(i, *value);
             }
+
+            break;
 
         case QVariant::Bool:
+            if (auto const value = getValue<bool>(b); value)
             {
-                auto const value = getValue<bool>(b);
-
-                if (value)
-                {
-                    prefs_.set(i, *value);
-                }
-
-                break;
+                prefs_.set(i, *value);
             }
+
+            break;
 
         case CustomVariantType::FilterModeType:
         case CustomVariantType::SortModeType:
         case QVariant::String:
+            if (auto const value = getValue<QString>(b); value)
             {
-                auto const value = getValue<QString>(b);
-
-                if (value)
-                {
-                    prefs_.set(i, *value);
-                }
-
-                break;
+                prefs_.set(i, *value);
             }
+
+            break;
 
         default:
             break;
         }
     }
 
-    auto const b = dictFind<bool>(d, TR_KEY_seedRatioLimited);
-    if (b)
+    if (auto const b = dictFind<bool>(d, TR_KEY_seedRatioLimited); b)
     {
         prefs_.set(Prefs::RATIO_ENABLED, *b);
     }
 
-    auto const x = dictFind<double>(d, TR_KEY_seedRatioLimit);
-    if (x)
+    if (auto const x = dictFind<double>(d, TR_KEY_seedRatioLimit); x)
     {
         prefs_.set(Prefs::RATIO, *x);
     }
@@ -988,20 +955,17 @@ void Session::updateInfo(tr_variant* d)
         prefs_.set(Prefs::RPC_WHITELIST, QString::fromUtf8(tr_sessionGetRPCWhitelist(session_)));
     }
 
-    auto const size = dictFind<int>(d, TR_KEY_blocklist_size);
-    if (size && *size != blocklistSize())
+    if (auto const size = dictFind<int>(d, TR_KEY_blocklist_size); size && *size != blocklistSize())
     {
         setBlocklistSize(*size);
     }
 
-    auto str = dictFind<QString>(d, TR_KEY_version);
-    if (str)
+    if (auto const str = dictFind<QString>(d, TR_KEY_version); str)
     {
         session_version_ = *str;
     }
 
-    str = dictFind<QString>(d, TR_KEY_session_id);
-    if (str)
+    if (auto const str = dictFind<QString>(d, TR_KEY_session_id); str)
     {
         session_id_ = *str;
         is_definitely_local_session_ = tr_session_id_is_local(session_id_.toUtf8().constData());
@@ -1073,10 +1037,9 @@ void Session::addTorrent(AddData const& add_me, tr_variant* args, bool trash_ori
     q->add(
         [this, add_me](RpcResponse const& r)
         {
-            tr_variant* dup;
             bool session_has_torrent = false;
 
-            if (tr_variantDictFindDict(r.args.get(), TR_KEY_torrent_added, &dup))
+            if (tr_variant* dup = nullptr; tr_variantDictFindDict(r.args.get(), TR_KEY_torrent_added, &dup))
             {
                 session_has_torrent = true;
             }
@@ -1118,9 +1081,9 @@ void Session::onDuplicatesTimer()
     duplicates.swap(duplicates_);
 
     QStringList lines;
-    for (auto it : duplicates)
+    for (auto [dupe, original] : duplicates)
     {
-        lines.push_back(tr("%1 (copy of %2)").arg(it.first).arg(it.second.left(7)));
+        lines.push_back(tr("%1 (copy of %2)").arg(dupe).arg(original.left(7)));
     }
 
     if (!lines.empty())

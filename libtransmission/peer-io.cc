@@ -1,15 +1,13 @@
-/*
- * This file Copyright (C) 2007-2014 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2007-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #include <algorithm>
 #include <cerrno>
 #include <cstdint>
 #include <cstring>
+#include <string>
 
 #include <event2/event.h>
 #include <event2/buffer.h>
@@ -95,7 +93,7 @@ struct tr_datatype
 
 static struct tr_datatype* datatype_pool = nullptr;
 
-static struct tr_datatype* datatype_new(void)
+static struct tr_datatype* datatype_new()
 {
     tr_datatype* ret = nullptr;
 
@@ -195,12 +193,12 @@ static void canReadWrapper(tr_peerIo* io)
 
     tr_peerIoRef(io);
 
-    tr_session* const session = io->session;
+    tr_session const* const session = io->session;
 
     /* try to consume the input buffer */
     if (io->canRead != nullptr)
     {
-        tr_sessionLock(session);
+        auto const lock = session->unique_lock();
 
         auto const now = tr_time_msec();
         auto done = bool{ false };
@@ -254,8 +252,6 @@ static void canReadWrapper(tr_peerIo* io)
 
             TR_ASSERT(tr_isPeerIo(io));
         }
-
-        tr_sessionUnlock(session);
     }
 
     tr_peerIoUnref(io);
@@ -427,11 +423,11 @@ FAIL:
 ***
 **/
 
-static void maybeSetCongestionAlgorithm(tr_socket_t socket, char const* algorithm)
+static void maybeSetCongestionAlgorithm(tr_socket_t socket, std::string const& algorithm)
 {
-    if (!tr_str_is_empty(algorithm))
+    if (!std::empty(algorithm))
     {
-        tr_netSetCongestionControl(socket, algorithm);
+        tr_netSetCongestionControl(socket, algorithm.c_str());
     }
 }
 
@@ -571,14 +567,14 @@ static auto utp_function_table = UTPFunctionTable{
 
 static void dummy_read(void* /*closure*/, unsigned char const* /*buf*/, size_t /*buflen*/)
 {
-    /* This cannot happen, as far as I'm aware. */
+    // This cannot happen, as far as I'm aware. */
     tr_logAddNamedError("UTP", "On_read called on closed socket");
 }
 
 static void dummy_write(void* /*closure*/, unsigned char* buf, size_t buflen)
 {
     /* This can very well happen if we've shut down a peer connection that
-       had unflushed buffers.  Complain and send zeroes. */
+       had unflushed buffers.Complain and send zeroes.*/
     tr_logAddNamedDbg("UTP", "On_write called on closed socket");
     memset(buf, 0, buflen);
 }
@@ -611,8 +607,8 @@ static tr_peerIo* tr_peerIoNew(
     Bandwidth* parent,
     tr_address const* addr,
     tr_port port,
-    uint8_t const* torrentHash,
-    bool isIncoming,
+    tr_sha1_digest_t const* torrent_hash,
+    bool is_incoming,
     bool isSeed,
     struct tr_peer_socket const socket)
 {
@@ -628,12 +624,11 @@ static tr_peerIo* tr_peerIoNew(
 
     if (socket.type == TR_PEER_SOCKET_TYPE_TCP)
     {
-        tr_netSetTOS(socket.handle.tcp, session->peerSocketTOS, addr->type);
-        maybeSetCongestionAlgorithm(socket.handle.tcp, session->peer_congestion_algorithm);
+        session->setSocketTOS(socket.handle.tcp, addr->type);
+        maybeSetCongestionAlgorithm(socket.handle.tcp, session->peerCongestionAlgorithm());
     }
 
-    auto* io = new tr_peerIo{ session, *addr, port, isSeed };
-    tr_cryptoConstruct(&io->crypto, torrentHash, isIncoming);
+    auto* io = new tr_peerIo{ session, torrent_hash, is_incoming, *addr, port, isSeed };
     io->socket = socket;
     io->bandwidth = new Bandwidth(parent);
     io->bandwidth->setPeer(io);
@@ -655,7 +650,7 @@ static tr_peerIo* tr_peerIoNew(
         dbgmsg(io, "%s", "calling UTP_SetCallbacks &utp_function_table");
         UTP_SetCallbacks(socket.handle.utp, &utp_function_table, io);
 
-        if (!isIncoming)
+        if (!is_incoming)
         {
             dbgmsg(io, "%s", "calling UTP_Connect");
             UTP_Connect(socket.handle.utp);
@@ -690,13 +685,12 @@ tr_peerIo* tr_peerIoNewOutgoing(
     Bandwidth* parent,
     tr_address const* addr,
     tr_port port,
-    uint8_t const* torrentHash,
+    tr_sha1_digest_t const& torrent_hash,
     bool isSeed,
     bool utp)
 {
     TR_ASSERT(session != nullptr);
     TR_ASSERT(tr_address_is_valid(addr));
-    TR_ASSERT(torrentHash != nullptr);
 
     auto socket = tr_peer_socket{};
 
@@ -719,7 +713,7 @@ tr_peerIo* tr_peerIoNewOutgoing(
         return nullptr;
     }
 
-    return tr_peerIoNew(session, parent, addr, port, torrentHash, false, isSeed, socket);
+    return tr_peerIoNew(session, parent, addr, port, &torrent_hash, false, isSeed, socket);
 }
 
 /***
@@ -878,7 +872,6 @@ static void io_dtor(void* vio)
     event_disable(io, EV_READ | EV_WRITE);
     delete io->bandwidth;
     io_close_socket(io);
-    tr_cryptoDestruct(&io->crypto);
 
     while (io->outbuf_datatypes != nullptr)
     {
@@ -986,8 +979,8 @@ int tr_peerIoReconnect(tr_peerIo* io)
     io->event_write = event_new(session->event_base, io->socket.handle.tcp, EV_WRITE, event_write_cb, io);
 
     event_enable(io, pendingEvents);
-    tr_netSetTOS(io->socket.handle.tcp, session->peerSocketTOS, io->addr.type);
-    maybeSetCongestionAlgorithm(io->socket.handle.tcp, session->peer_congestion_algorithm);
+    io->session->setSocketTOS(io->socket.handle.tcp, io->addr.type);
+    maybeSetCongestionAlgorithm(io->socket.handle.tcp, session->peerCongestionAlgorithm());
 
     return 0;
 }
@@ -996,25 +989,18 @@ int tr_peerIoReconnect(tr_peerIo* io)
 ***
 **/
 
-void tr_peerIoSetTorrentHash(tr_peerIo* io, uint8_t const* hash)
+void tr_peerIoSetTorrentHash(tr_peerIo* io, tr_sha1_digest_t const& info_hash)
 {
     TR_ASSERT(tr_isPeerIo(io));
 
-    tr_cryptoSetTorrentHash(&io->crypto, hash);
+    tr_cryptoSetTorrentHash(&io->crypto, info_hash);
 }
 
-uint8_t const* tr_peerIoGetTorrentHash(tr_peerIo* io)
+std::optional<tr_sha1_digest_t> tr_peerIoGetTorrentHash(tr_peerIo const* io)
 {
     TR_ASSERT(tr_isPeerIo(io));
 
     return tr_cryptoGetTorrentHash(&io->crypto);
-}
-
-bool tr_peerIoHasTorrentHash(tr_peerIo const* io)
-{
-    TR_ASSERT(tr_isPeerIo(io));
-
-    return tr_cryptoHasTorrentHash(&io->crypto);
 }
 
 /**

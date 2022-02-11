@@ -1,36 +1,20 @@
-/*
- * This file Copyright (C) 2013-2014 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2013-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
+
+#include <string_view>
 
 #include "transmission.h"
+
 #include "error.h"
 #include "tr-assert.h"
+#include "tr-macros.h"
 #include "utils.h"
 
-tr_error* tr_error_new_literal(int code, char const* message)
+bool tr_error_is_set(tr_error const* const* error)
 {
-    TR_ASSERT(message != nullptr);
-
-    tr_error* error = tr_new(tr_error, 1);
-    error->code = code;
-    error->message = tr_strdup(message);
-
-    return error;
-}
-
-tr_error* tr_error_new_valist(int code, char const* message_format, va_list args)
-{
-    TR_ASSERT(message_format != nullptr);
-
-    tr_error* error = tr_new(tr_error, 1);
-    error->code = code;
-    error->message = tr_strdup_vprintf(message_format, args);
-
-    return error;
+    return (error != nullptr) && (*error != nullptr);
 }
 
 void tr_error_free(tr_error* error)
@@ -41,39 +25,18 @@ void tr_error_free(tr_error* error)
     }
 
     tr_free(error->message);
-    tr_free(error);
+    delete error;
 }
 
-void tr_error_set(tr_error** error, int code, char const* message_format, ...)
+void tr_error_set(tr_error** error, int code, std::string_view message)
 {
-    TR_ASSERT(message_format != nullptr);
-
     if (error == nullptr)
     {
         return;
     }
 
     TR_ASSERT(*error == nullptr);
-
-    va_list args;
-
-    va_start(args, message_format);
-    *error = tr_error_new_valist(code, message_format, args);
-    va_end(args);
-}
-
-void tr_error_set_literal(tr_error** error, int code, char const* message)
-{
-    TR_ASSERT(message != nullptr);
-
-    if (error == nullptr)
-    {
-        return;
-    }
-
-    TR_ASSERT(*error == nullptr);
-
-    *error = tr_error_new_literal(code, message);
+    *error = new tr_error{ code, tr_strvDup(message) };
 }
 
 void tr_error_propagate(tr_error** new_error, tr_error** old_error)
@@ -106,53 +69,17 @@ void tr_error_clear(tr_error** error)
     *error = nullptr;
 }
 
-static void error_prefix_valist(tr_error** error, char const* prefix_format, va_list args) TR_GNUC_PRINTF(2, 0);
-
-static void error_prefix_valist(tr_error** error, char const* prefix_format, va_list args)
+void tr_error_prefix(tr_error** error, char const* prefix)
 {
-    TR_ASSERT(error != nullptr);
-    TR_ASSERT(*error != nullptr);
-    TR_ASSERT(prefix_format != nullptr);
-
-    char* prefix = tr_strdup_vprintf(prefix_format, args);
-
-    char* new_message = tr_strdup_printf("%s%s", prefix, (*error)->message);
-    tr_free((*error)->message);
-    (*error)->message = new_message;
-
-    tr_free(prefix);
-}
-
-void tr_error_prefix(tr_error** error, char const* prefix_format, ...)
-{
-    TR_ASSERT(prefix_format != nullptr);
+    TR_ASSERT(prefix != nullptr);
 
     if (error == nullptr || *error == nullptr)
     {
         return;
     }
 
-    va_list args;
-
-    va_start(args, prefix_format);
-    error_prefix_valist(error, prefix_format, args);
-    va_end(args);
-}
-
-void tr_error_propagate_prefixed(tr_error** new_error, tr_error** old_error, char const* prefix_format, ...)
-{
-    TR_ASSERT(prefix_format != nullptr);
-
-    tr_error_propagate(new_error, old_error);
-
-    if (new_error == nullptr)
-    {
-        return;
-    }
-
-    va_list args;
-
-    va_start(args, prefix_format);
-    error_prefix_valist(new_error, prefix_format, args);
-    va_end(args);
+    auto* err = *error;
+    auto* const new_message = tr_strvDup(tr_strvJoin(prefix, err->message));
+    tr_free(err->message);
+    err->message = new_message;
 }

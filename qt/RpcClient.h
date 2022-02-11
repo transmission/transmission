@@ -1,10 +1,7 @@
-/*
- * This file Copyright (C) 2014-2016 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2014-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #pragma once
 
@@ -22,12 +19,11 @@
 #include <QUrl>
 
 #include <libtransmission/transmission.h>
+
 #include <libtransmission/quark.h>
+#include <libtransmission/utils.h>
 #include <libtransmission/variant.h>
 
-#include "Macros.h"
-
-class QByteArray;
 class QNetworkAccessManager;
 
 using TrVariantPtr = std::shared_ptr<tr_variant>;
@@ -100,4 +96,5 @@ private:
     QNetworkAccessManager* nam_ = {};
     QHash<int64_t, QFutureInterface<RpcResponse>> local_requests_;
     int64_t next_tag_ = {};
+    bool const verbose_ = tr_env_key_exists("TR_RPC_VERBOSE");
 };

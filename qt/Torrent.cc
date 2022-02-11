@@ -1,10 +1,7 @@
-/*
- * This file Copyright (C) 2009-2015 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2009-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #include <algorithm>
 #include <cassert>
@@ -38,31 +35,21 @@ Torrent::Torrent(Prefs const& prefs, int id)
 ****
 ***/
 
-bool Torrent::getSeedRatio(double& setmeRatio) const
+std::optional<double> Torrent::getSeedRatioLimit() const
 {
-    bool is_limited;
+    auto const mode = seedRatioMode();
 
-    switch (seedRatioMode())
+    if (mode == TR_RATIOLIMIT_SINGLE)
     {
-    case TR_RATIOLIMIT_SINGLE:
-        is_limited = true;
-        setmeRatio = seedRatioLimit();
-        break;
-
-    case TR_RATIOLIMIT_GLOBAL:
-        if ((is_limited = prefs_.getBool(Prefs::RATIO_ENABLED)))
-        {
-            setmeRatio = prefs_.getDouble(Prefs::RATIO);
-        }
-
-        break;
-
-    default: // TR_RATIOLIMIT_UNLIMITED:
-        is_limited = false;
-        break;
+        return seedRatioLimit();
     }
 
-    return is_limited;
+    if (mode == TR_RATIOLIMIT_GLOBAL && prefs_.getBool(Prefs::RATIO_ENABLED))
+    {
+        return prefs_.getDouble(Prefs::RATIO);
+    }
+
+    return {};
 }
 
 bool Torrent::includesTracker(FaviconCache::Key const& key) const
@@ -72,27 +59,25 @@ bool Torrent::includesTracker(FaviconCache::Key const& key) const
 
 int Torrent::compareSeedRatio(Torrent const& that) const
 {
-    double a;
-    double b;
-    bool const has_a = getSeedRatio(a);
-    bool const has_b = that.getSeedRatio(b);
+    auto const a = getSeedRatioLimit();
+    auto const b = that.getSeedRatioLimit();
 
-    if (!has_a && !has_b)
+    if (!a && !b)
     {
         return 0;
     }
 
-    if (!has_a || !has_b)
+    if (!a || !b)
     {
-        return has_a ? -1 : 1;
+        return a ? -1 : 1;
     }
 
-    if (a < b)
+    if (*a < *b)
     {
         return -1;
     }
 
-    if (a > b)
+    if (*a > *b)
     {
         return 1;
     }
@@ -280,7 +265,7 @@ Torrent::fields_t Torrent::update(tr_quark const* keys, tr_variant const* const*
 
             case TR_KEY_files:
                 {
-                    for (int i = 0; i < files_.size(); ++i)
+                    for (size_t i = 0; i < files_.size(); ++i)
                     {
                         files_[i].index = i;
                     }

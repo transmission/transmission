@@ -1,10 +1,7 @@
-/*
- * This file Copyright (C) 2015 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2015-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #include <process.h> /* _beginthreadex() */
 
@@ -45,8 +42,10 @@ static HANDLE service_stop_thread = nullptr;
 
 static void set_system_error(tr_error** error, DWORD code, char const* message)
 {
-    char* const system_message = tr_win32_format_message(code);
-    tr_error_set(error, code, "%s (0x%08lx): %s", message, code, system_message);
+    auto* const system_message = tr_win32_format_message(code);
+    auto* const buf = tr_strdup_printf("%s (0x%08lx): %s", message, code, system_message);
+    tr_error_set(error, code, buf);
+    tr_free(buf);
     tr_free(system_message);
 }
 

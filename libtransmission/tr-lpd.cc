@@ -1,31 +1,12 @@
-/*
-Copyright (c) 2010 by Johannes Lieder
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in
-all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-THE SOFTWARE.
-*/
+// This file Copyright © 2010 Johannes Lieder.
+// It may be used under the MIT (SPDX: MIT) license.
+// License text can be found in the licenses/ folder.
 
 #include <algorithm>
-#include <cctype> /* toupper() */
 #include <cerrno>
 #include <csignal> /* sig_atomic_t */
-#include <cstdio>
 #include <cstring> /* strlen(), strncpy(), strstr(), memset() */
+#include <type_traits>
 
 #ifdef _WIN32
 #include <inttypes.h>
@@ -43,8 +24,8 @@ using in_port_t = uint16_t; /* all missing */
 #include <event2/event.h>
 #include <event2/util.h>
 
-/* libT */
 #include "transmission.h"
+
 #include "log.h"
 #include "net.h"
 #include "peer-mgr.h" /* tr_peerMgrAddPex() */
@@ -53,9 +34,8 @@ using in_port_t = uint16_t; /* all missing */
 #include "tr-assert.h"
 #include "tr-lpd.h"
 #include "utils.h"
-#include "version.h"
 
-#define SIZEOF_HASH_STRING (sizeof(((struct tr_info*)0)->hashString))
+static auto constexpr SIZEOF_HASH_STRING = TR_SHA1_DIGEST_STRLEN;
 
 /**
 * @brief Local Peer Discovery
@@ -66,7 +46,7 @@ using in_port_t = uint16_t; /* all missing */
 *
 */
 
-static void event_callback(evutil_socket_t, short, void*);
+static void event_callback(evutil_socket_t, short /*type*/, void* /*unused*/);
 
 static auto constexpr UpkeepIntervalSecs = int{ 5 };
 
@@ -259,7 +239,7 @@ static bool lpd_extractParam(char const* const str, char const* const name, int 
 /**
 * @} */
 
-static void on_upkeep_timer(evutil_socket_t, short, void*);
+static void on_upkeep_timer(evutil_socket_t, short /*unused*/, void* /*unused*/);
 
 /**
 * @brief Initializes Local Peer Discovery for this node
@@ -276,7 +256,8 @@ int tr_lpdInit(tr_session* ss, tr_address* /*tr_addr*/)
      * string handling in tr_lpdSendAnnounce() and tr_lpdConsiderAnnounce().
      * However, the code should work as long as interfaces to the rest of
      * libtransmission are compatible with char* strings. */
-    static_assert(sizeof(((struct tr_info*)nullptr)->hashString[0]) == sizeof(char), "");
+    static_assert(
+        std::is_same_v<std::string const&, std::remove_pointer_t<decltype(std::declval<tr_torrent>().infoHashString())>>);
 
     struct ip_mreq mcastReq;
     int const opt_on = 1;
@@ -456,7 +437,7 @@ bool tr_lpdEnabled(tr_session const* ss)
 */
 bool tr_lpdSendAnnounce(tr_torrent const* t)
 {
-    char const fmt[] = //
+    char constexpr fmt[] = //
         "BT-SEARCH * HTTP/%u.%u" CRLF //
         "Host: %s:%u" CRLF //
         "Port: %u" CRLF //
@@ -464,22 +445,17 @@ bool tr_lpdSendAnnounce(tr_torrent const* t)
         "" CRLF //
         "" CRLF;
 
-    char hashString[SIZEOF_HASH_STRING];
-    char query[lpd_maxDatagramLength + 1] = { 0 };
-
     if (t == nullptr)
     {
         return false;
     }
 
-    /* make sure the hash string is normalized, just in case */
-    for (size_t i = 0; i < TR_N_ELEMENTS(hashString); ++i)
-    {
-        hashString[i] = toupper(t->info.hashString[i]);
-    }
+    /* ensure the hash string is capitalized */
+    auto const hash_string = tr_strupper(t->infoHashString());
 
     /* prepare a zero-terminated announce message */
-    tr_snprintf(query, lpd_maxDatagramLength + 1, fmt, 1, 1, lpd_mcastGroup, lpd_mcastPort, lpd_port, hashString);
+    char query[lpd_maxDatagramLength + 1] = { 0 };
+    tr_snprintf(query, lpd_maxDatagramLength + 1, fmt, 1, 1, lpd_mcastGroup, lpd_mcastPort, lpd_port, hash_string.c_str());
 
     /* actually send the query out using [lpd_socket2] */
     {
@@ -487,7 +463,7 @@ bool tr_lpdSendAnnounce(tr_torrent const* t)
 
         /* destination address info has already been set up in tr_lpdInit(),
          * so we refrain from preparing another sockaddr_in here */
-        int res = sendto(lpd_socket2, query, len, 0, (struct sockaddr const*)&lpd_mcastAddr, sizeof(lpd_mcastAddr));
+        int const res = sendto(lpd_socket2, query, len, 0, (struct sockaddr const*)&lpd_mcastAddr, sizeof(lpd_mcastAddr));
 
         if (res != len)
         {
@@ -557,9 +533,9 @@ static int tr_lpdConsiderAnnounce(tr_pex* peer, char const* const msg)
             return res;
         }
 
-        tor = tr_torrentFindFromHashString(session, hashString);
+        tor = session->getTorrent(hashString);
 
-        if (tr_isTorrent(tor) && tr_torrentAllowsLPD(tor))
+        if (tr_isTorrent(tor) && tor->allowsLpd())
         {
             /* we found a suitable peer, add it to the torrent */
             tr_peerMgrAddPex(tor, TR_PEER_FROM_LPD, peer, 1);
@@ -604,7 +580,7 @@ static int tr_lpdAnnounceMore(time_t const now, int const interval)
         {
             int announcePrio = 0;
 
-            if (!tr_torrentAllowsLPD(tor))
+            if (!tor->allowsLpd())
             {
                 continue;
             }

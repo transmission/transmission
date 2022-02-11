@@ -1,33 +1,15 @@
-/******************************************************************************
- * Copyright (c) 2007-2012 Transmission authors and contributors
- *
- * Permission is hereby granted, free of charge, to any person obtaining a
- * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
- * DEALINGS IN THE SOFTWARE.
- *****************************************************************************/
+// This file Copyright © 2007-2022 Transmission authors and contributors.
+// It may be used under the MIT (SPDX: MIT) license.
+// License text can be found in the licenses/ folder.
 
 #import "BadgeView.h"
 #import "NSStringAdditions.h"
 
 #define BETWEEN_PADDING 2.0
 
-@interface BadgeView (Private)
+@interface BadgeView ()
 
-- (void)badge:(NSImage*)badge string:(NSString*)string atHeight:(CGFloat)height adjustForQuit:(BOOL)quit;
+- (void)badge:(NSImage*)badge string:(NSString*)string atHeight:(CGFloat)height;
 
 @end
 
@@ -41,7 +23,6 @@
 
         fDownloadRate = 0.0;
         fUploadRate = 0.0;
-        fQuitting = NO;
     }
     return self;
 }
@@ -59,23 +40,9 @@
     return YES;
 }
 
-- (void)setQuitting
-{
-    fQuitting = YES;
-}
-
 - (void)drawRect:(NSRect)rect
 {
-    [NSApp.applicationIconImage drawInRect:rect fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:1.0];
-
-    if (fQuitting)
-    {
-        NSImage* quitBadge = [NSImage imageNamed:@"QuitBadge"];
-        [self badge:quitBadge string:NSLocalizedString(@"Quitting", "Dock Badger -> quit")
-                 atHeight:(NSHeight(rect) - quitBadge.size.height) * 0.5
-            adjustForQuit:YES];
-        return;
-    }
+    [NSApp.applicationIconImage drawInRect:rect fromRect:NSZeroRect operation:NSCompositingOperationSourceOver fraction:1.0];
 
     BOOL const upload = fUploadRate >= 0.1;
     BOOL const download = fDownloadRate >= 0.1;
@@ -83,7 +50,7 @@
     if (upload)
     {
         NSImage* uploadBadge = [NSImage imageNamed:@"UploadBadge"];
-        [self badge:uploadBadge string:[NSString stringForSpeedAbbrev:fUploadRate] atHeight:bottom adjustForQuit:NO];
+        [self badge:uploadBadge string:[NSString stringForSpeedAbbrev:fUploadRate] atHeight:bottom];
         if (download)
         {
             bottom += uploadBadge.size.height + BETWEEN_PADDING; //download rate above upload rate
@@ -91,16 +58,11 @@
     }
     if (download)
     {
-        [self badge:[NSImage imageNamed:@"DownloadBadge"] string:[NSString stringForSpeedAbbrev:fDownloadRate] atHeight:bottom
-            adjustForQuit:NO];
+        [self badge:[NSImage imageNamed:@"DownloadBadge"] string:[NSString stringForSpeedAbbrev:fDownloadRate] atHeight:bottom];
     }
 }
 
-@end
-
-@implementation BadgeView (Private)
-
-- (void)badge:(NSImage*)badge string:(NSString*)string atHeight:(CGFloat)height adjustForQuit:(BOOL)quit
+- (void)badge:(NSImage*)badge string:(NSString*)string atHeight:(CGFloat)height
 {
     if (!fAttributes)
     {
@@ -118,7 +80,7 @@
     badgeRect.origin.x = 0.0;
     badgeRect.origin.y = height;
 
-    [badge drawInRect:badgeRect fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:1.0];
+    [badge drawInRect:badgeRect fromRect:NSZeroRect operation:NSCompositingOperationSourceOver fraction:1.0];
 
     //make sure text fits on the badge
     CGFloat fontSize = 26.0;
@@ -133,7 +95,7 @@
     //string is in center of image
     NSRect stringRect;
     stringRect.origin.x = NSMidX(badgeRect) - stringSize.width * 0.5;
-    stringRect.origin.y = NSMidY(badgeRect) - stringSize.height * 0.5 + (quit ? 2.0 : 1.0); //adjust for shadow, extra for quit
+    stringRect.origin.y = NSMidY(badgeRect) - stringSize.height * 0.5 + 1.0; //adjust for shadow
     stringRect.size = stringSize;
 
     [string drawInRect:stringRect withAttributes:fAttributes];

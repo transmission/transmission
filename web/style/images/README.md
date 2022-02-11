@@ -25,6 +25,7 @@ license: MIT
 * files.svg
 * gear-fill.svg
 * lock-fill.svg
+* magnet.svg
 * search.svg
 * three-dots-vertical.svg
 

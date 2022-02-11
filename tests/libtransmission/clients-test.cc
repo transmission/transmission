@@ -1,10 +1,7 @@
-/*
- * This file Copyright (C) 2013-2014 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright (C) 2013-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #include <array>
 #include <string_view>
@@ -25,7 +22,7 @@ TEST(Client, clientForId)
         std::string_view expected_client;
     };
 
-    auto constexpr Tests = std::array<LocalTest, 37>{
+    auto constexpr Tests = std::array<LocalTest, 38>{
         { { "-AZ8421-"sv, "Azureus / Vuze 8.4.2.1"sv },
           { "-BC0241-"sv, "BitComet 2.41"sv }, // two major, two minor
           { "-BI2300-"sv, "BiglyBT 2.3.0.0"sv },
@@ -50,6 +47,7 @@ TEST(Client, clientForId)
           { "-TR0072-"sv, "Transmission 0.72"sv },
           { "-TR111Z-"sv, "Transmission 1.11+"sv },
           { "-UT341\0-"sv, "\xc2\xb5Torrent 3.4.1"sv },
+          { "-UT7a5\0-"sv, "\xc2\xb5Torrent 7.10.5"sv },
           { "-UW110Q-"sv, "\xc2\xb5Torrent Web 1.1.0"sv },
           { "-UW1110Q"sv, "\xc2\xb5Torrent Web 1.1.10"sv }, // wider version
           { "-WS1000-"sv, "HTTP Seed"sv },
@@ -73,6 +71,6 @@ TEST(Client, clientForId)
 
         auto buf = std::array<char, 128>{};
         tr_clientForId(buf.data(), buf.size(), peer_id);
-        EXPECT_EQ(test.expected_client, buf.data());
+        EXPECT_EQ(test.expected_client, std::string_view{ buf.data() });
     }
 }

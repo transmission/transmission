@@ -1,10 +1,7 @@
-/*
- * This file Copyright (C) 2007-2014 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2007-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #ifdef __APPLE__
 /* OpenSSL "deprecated" as of OS X 10.7, but we still use it */
@@ -28,13 +25,13 @@
 #include "utils.h"
 
 #define TR_CRYPTO_DH_SECRET_FALLBACK
-#include "crypto-utils-fallback.cc"
+#include "crypto-utils-fallback.cc" // NOLINT(bugprone-suspicious-include)
 
 /***
 ****
 ***/
 
-#define MY_NAME "tr_crypto_utils"
+static char constexpr MyName[] = "tr_crypto_utils";
 
 static void log_openssl_error(char const* file, int line)
 {
@@ -62,7 +59,7 @@ static void log_openssl_error(char const* file, int line)
 #endif
 
         ERR_error_string_n(error_code, buf, sizeof(buf));
-        tr_logAddMessage(file, line, TR_LOG_ERROR, MY_NAME, "OpenSSL error: %s", buf);
+        tr_logAddMessage(file, line, TR_LOG_ERROR, MyName, "OpenSSL error: %s", buf);
     }
 }
 
@@ -101,7 +98,7 @@ static bool check_openssl_pointer(void const* pointer, char const* file, int lin
 ****
 ***/
 
-tr_sha1_ctx_t tr_sha1_init(void)
+tr_sha1_ctx_t tr_sha1_init()
 {
     EVP_MD_CTX* handle = EVP_MD_CTX_create();
 
@@ -116,7 +113,7 @@ tr_sha1_ctx_t tr_sha1_init(void)
 
 bool tr_sha1_update(tr_sha1_ctx_t raw_handle, void const* data, size_t data_length)
 {
-    auto* handle = static_cast<EVP_MD_CTX*>(raw_handle);
+    auto* const handle = static_cast<EVP_MD_CTX*>(raw_handle);
 
     TR_ASSERT(handle != nullptr);
 
@@ -130,25 +127,19 @@ bool tr_sha1_update(tr_sha1_ctx_t raw_handle, void const* data, size_t data_leng
     return check_result(EVP_DigestUpdate(handle, data, data_length));
 }
 
-bool tr_sha1_final(tr_sha1_ctx_t raw_handle, uint8_t* hash)
+std::optional<tr_sha1_digest_t> tr_sha1_final(tr_sha1_ctx_t raw_handle)
 {
     auto* handle = static_cast<EVP_MD_CTX*>(raw_handle);
+    TR_ASSERT(handle != nullptr);
 
-    bool ret = true;
-
-    if (hash != nullptr)
-    {
-        TR_ASSERT(handle != nullptr);
-
-        unsigned int hash_length;
-
-        ret = check_result(EVP_DigestFinal_ex(handle, hash, &hash_length));
-
-        TR_ASSERT(!ret || hash_length == SHA_DIGEST_LENGTH);
-    }
+    unsigned int hash_length = 0;
+    auto digest = tr_sha1_digest_t{};
+    auto* const digest_as_uchar = reinterpret_cast<unsigned char*>(std::data(digest));
+    bool const ok = check_result(EVP_DigestFinal_ex(handle, digest_as_uchar, &hash_length));
+    TR_ASSERT(!ok || hash_length == std::size(digest));
 
     EVP_MD_CTX_destroy(handle);
-    return ret;
+    return ok ? std::make_optional(digest) : std::nullopt;
 }
 
 /***
@@ -258,11 +249,9 @@ tr_dh_ctx_t tr_dh_new(
     TR_ASSERT(generator_num != nullptr);
 
     DH* handle = DH_new();
-    BIGNUM* p;
-    BIGNUM* g;
 
-    p = BN_bin2bn(prime_num, prime_num_length, nullptr);
-    g = BN_bin2bn(generator_num, generator_num_length, nullptr);
+    BIGNUM* const p = BN_bin2bn(prime_num, prime_num_length, nullptr);
+    BIGNUM* const g = BN_bin2bn(generator_num, generator_num_length, nullptr);
 
     if (!check_pointer(p) || !check_pointer(g) || DH_set0_pqg(handle, p, nullptr, g) == 0)
     {
@@ -293,9 +282,6 @@ bool tr_dh_make_key(tr_dh_ctx_t raw_handle, size_t private_key_length, uint8_t* 
     TR_ASSERT(public_key != nullptr);
 
     auto* handle = static_cast<DH*>(raw_handle);
-    int dh_size;
-    int my_public_key_length;
-    BIGNUM const* my_public_key;
 
     DH_set_length(handle, private_key_length * 8);
 
@@ -304,10 +290,11 @@ bool tr_dh_make_key(tr_dh_ctx_t raw_handle, size_t private_key_length, uint8_t* 
         return false;
     }
 
+    BIGNUM const* my_public_key = nullptr;
     DH_get0_key(handle, &my_public_key, nullptr);
 
-    my_public_key_length = BN_bn2bin(my_public_key, public_key);
-    dh_size = DH_size(handle);
+    int const my_public_key_length = BN_bn2bin(my_public_key, public_key);
+    int const dh_size = DH_size(handle);
 
     tr_dh_align_key(public_key, my_public_key_length, dh_size);
 
@@ -326,20 +313,15 @@ tr_dh_secret_t tr_dh_agree(tr_dh_ctx_t raw_handle, uint8_t const* other_public_k
     TR_ASSERT(handle != nullptr);
     TR_ASSERT(other_public_key != nullptr);
 
-    struct tr_dh_secret* ret;
-    int dh_size;
-    int secret_key_length;
-    BIGNUM* other_key;
-
-    if (!check_pointer(other_key = BN_bin2bn(other_public_key, other_public_key_length, nullptr)))
+    BIGNUM* const other_key = BN_bin2bn(other_public_key, other_public_key_length, nullptr);
+    if (!check_pointer(other_key))
     {
         return nullptr;
     }
 
-    dh_size = DH_size(handle);
-    ret = tr_dh_secret_new(dh_size);
-
-    secret_key_length = DH_compute_key(ret->key, other_key, handle);
+    int const dh_size = DH_size(handle);
+    tr_dh_secret* ret = tr_dh_secret_new(dh_size);
+    int const secret_key_length = DH_compute_key(ret->key, other_key, handle);
 
     if (check_result_neq(secret_key_length, -1))
     {
@@ -407,6 +389,11 @@ void tr_x509_cert_free(tr_x509_cert_t handle)
 
 bool tr_rand_buffer(void* buffer, size_t length)
 {
+    if (length == 0)
+    {
+        return true;
+    }
+
     TR_ASSERT(buffer != nullptr);
 
     return check_result(RAND_bytes(static_cast<unsigned char*>(buffer), (int)length));

@@ -1,10 +1,7 @@
-/*
- * This file Copyright (C) 2009-2015 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2009-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #pragma once
 
@@ -17,7 +14,7 @@
 #include <QString>
 #include <QVariant>
 
-#include "Macros.h"
+#include <libtransmission/tr-macros.h>
 
 class FileTreeItem
 {
@@ -25,12 +22,9 @@ class FileTreeItem
     TR_DISABLE_COPY_MOVE(FileTreeItem)
 
 public:
-    enum
-    {
-        LOW = (1 << 0),
-        NORMAL = (1 << 1),
-        HIGH = (1 << 2)
-    };
+    static auto constexpr Low = int{ 1 << 0 };
+    static auto constexpr Normal = int{ 1 << 1 };
+    static auto constexpr High = int{ 1 << 2 };
 
     FileTreeItem(QString const& name = QString(), int file_index = -1, uint64_t size = 0)
         : name_(name)

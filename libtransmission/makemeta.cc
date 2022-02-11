@@ -1,30 +1,34 @@
-/*
- * This file Copyright (C) 2010-2014 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2010-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #include <algorithm>
 #include <cerrno>
-#include <cstdlib> /* qsort */
+#include <cstdint>
 #include <cstring> /* strcmp, strlen */
+#include <mutex>
+#include <optional>
+#include <string_view>
+#include <thread>
 
 #include <event2/util.h> /* evutil_ascii_strcasecmp() */
 
 #include "transmission.h"
-#include "crypto-utils.h" /* tr_sha1 */
+
+#include "crypto-utils.h"
 #include "error.h"
 #include "file.h"
 #include "log.h"
-#include "session.h"
 #include "makemeta.h"
-#include "platform.h" /* threads, locks */
+#include "session.h"
 #include "tr-assert.h"
 #include "utils.h" /* buildpath */
 #include "variant.h"
 #include "version.h"
+#include "web-utils.h"
+
+using namespace std::literals;
 
 /****
 *****
@@ -44,29 +48,26 @@ static struct FileList* getFiles(char const* dir, char const* base, struct FileL
         return nullptr;
     }
 
-    char* buf = tr_buildPath(dir, base, nullptr);
-    (void)tr_sys_path_native_separators(buf);
+    auto buf = tr_strvPath(dir, base);
+    tr_sys_path_native_separators(std::data(buf));
 
     tr_sys_path_info info;
-    tr_error* error = nullptr;
-    if (!tr_sys_path_get_info(buf, 0, &info, &error))
+    if (tr_error* error = nullptr; !tr_sys_path_get_info(buf.c_str(), 0, &info, &error))
     {
-        tr_logAddError(_("Torrent Creator is skipping file \"%s\": %s"), buf, error->message);
-        tr_free(buf);
+        tr_logAddError(_("Torrent Creator is skipping file \"%s\": %s"), buf.c_str(), error->message);
         tr_error_free(error);
         return list;
     }
 
-    tr_sys_dir_t odir = info.type == TR_SYS_PATH_IS_DIRECTORY ? tr_sys_dir_open(buf, nullptr) : TR_BAD_SYS_DIR;
-
-    if (odir != TR_BAD_SYS_DIR)
+    if (tr_sys_dir_t odir = info.type == TR_SYS_PATH_IS_DIRECTORY ? tr_sys_dir_open(buf.c_str(), nullptr) : TR_BAD_SYS_DIR;
+        odir != TR_BAD_SYS_DIR)
     {
         char const* name = nullptr;
         while ((name = tr_sys_dir_read_name(odir, nullptr)) != nullptr)
         {
             if (name[0] != '.') /* skip dotfiles */
             {
-                list = getFiles(buf, name, list);
+                list = getFiles(buf.c_str(), name, list);
             }
         }
 
@@ -74,14 +75,13 @@ static struct FileList* getFiles(char const* dir, char const* base, struct FileL
     }
     else if (info.type == TR_SYS_PATH_IS_FILE && info.size > 0)
     {
-        struct FileList* node = tr_new(struct FileList, 1);
+        auto* const node = tr_new0(FileList, 1);
         node->size = info.size;
-        node->filename = tr_strdup(buf);
+        node->filename = tr_strvDup(buf);
         node->next = list;
         list = node;
     }
 
-    tr_free(buf);
     return list;
 }
 
@@ -124,14 +124,6 @@ static uint32_t bestPieceSize(uint64_t totalSize)
     return 32 * KiB; /* less than 50 meg */
 }
 
-static int builderFileCompare(void const* va, void const* vb)
-{
-    auto const* a = static_cast<tr_metainfo_builder_file const*>(va);
-    auto const* b = static_cast<tr_metainfo_builder_file const*>(vb);
-
-    return evutil_ascii_strcasecmp(a->filename, b->filename);
-}
-
 tr_metainfo_builder* tr_metaInfoBuilderCreate(char const* topFileArg)
 {
     char* const real_top = tr_sys_path_resolve(topFileArg, nullptr);
@@ -142,7 +134,7 @@ tr_metainfo_builder* tr_metaInfoBuilderCreate(char const* topFileArg)
         return nullptr;
     }
 
-    tr_metainfo_builder* ret = tr_new0(tr_metainfo_builder, 1);
+    auto* const ret = tr_new0(tr_metainfo_builder, 1);
 
     ret->top = real_top;
 
@@ -184,7 +176,10 @@ tr_metainfo_builder* tr_metaInfoBuilderCreate(char const* topFileArg)
         tr_free(tmp);
     }
 
-    qsort(ret->files, ret->fileCount, sizeof(tr_metainfo_builder_file), builderFileCompare);
+    std::sort(
+        ret->files,
+        ret->files + ret->fileCount,
+        [](auto const& a, auto const& b) { return evutil_ascii_strcasecmp(a.filename, b.filename) < 0; });
 
     tr_metaInfoBuilderSetPieceSize(ret, bestPieceSize(ret->totalSize));
 
@@ -202,11 +197,10 @@ bool tr_metaInfoBuilderSetPieceSize(tr_metainfo_builder* b, uint32_t bytes)
 {
     if (!isValidPieceSize(bytes))
     {
-        char wanted[32];
-        char gotten[32];
-        tr_formatter_mem_B(wanted, bytes, sizeof(wanted));
-        tr_formatter_mem_B(gotten, b->pieceSize, sizeof(gotten));
-        tr_logAddError(_("Failed to set piece size to %s, leaving it at %s"), wanted, gotten);
+        tr_logAddError(
+            _("Failed to set piece size to %s, leaving it at %s"),
+            tr_formatter_mem_B(bytes).c_str(),
+            tr_formatter_mem_B(b->pieceSize).c_str());
         return false;
     }
 
@@ -250,40 +244,38 @@ void tr_metaInfoBuilderFree(tr_metainfo_builder* builder)
 *****
 ****/
 
-static uint8_t* getHashInfo(tr_metainfo_builder* b)
+static std::vector<std::byte> getHashInfo(tr_metainfo_builder* b)
 {
-    uint32_t fileIndex = 0;
-    uint8_t* ret = tr_new0(uint8_t, SHA_DIGEST_LENGTH * b->pieceCount);
-    uint8_t* walk = ret;
-    uint64_t off = 0;
-    tr_error* error = nullptr;
+    auto ret = std::vector<std::byte>(std::size(tr_sha1_digest_t{}) * b->pieceCount);
 
     if (b->totalSize == 0)
     {
-        return ret;
+        return {};
     }
 
-    auto* const buf = static_cast<uint8_t*>(tr_malloc(b->pieceSize));
     b->pieceIndex = 0;
     uint64_t totalRemain = b->totalSize;
+    uint32_t fileIndex = 0;
+    auto* walk = std::data(ret);
+    auto buf = std::vector<char>(b->pieceSize);
+    uint64_t off = 0;
+    tr_error* error = nullptr;
 
     tr_sys_file_t fd = tr_sys_file_open(b->files[fileIndex].filename, TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0, &error);
     if (fd == TR_BAD_SYS_FILE)
     {
         b->my_errno = error->code;
         tr_strlcpy(b->errfile, b->files[fileIndex].filename, sizeof(b->errfile));
-        b->result = TR_MAKEMETA_IO_READ;
-        tr_free(buf);
-        tr_free(ret);
+        b->result = TrMakemetaResult::ERR_IO_READ;
         tr_error_free(error);
-        return nullptr;
+        return {};
     }
 
     while (totalRemain != 0)
     {
         TR_ASSERT(b->pieceIndex < b->pieceCount);
 
-        uint8_t* bufptr = buf;
+        auto* bufptr = std::data(buf);
         uint32_t const thisPieceSize = std::min(uint64_t{ b->pieceSize }, totalRemain);
         uint64_t leftInPiece = thisPieceSize;
 
@@ -310,24 +302,30 @@ static uint8_t* getHashInfo(tr_metainfo_builder* b)
                     {
                         b->my_errno = error->code;
                         tr_strlcpy(b->errfile, b->files[fileIndex].filename, sizeof(b->errfile));
-                        b->result = TR_MAKEMETA_IO_READ;
-                        tr_free(buf);
-                        tr_free(ret);
+                        b->result = TrMakemetaResult::ERR_IO_READ;
                         tr_error_free(error);
-                        return nullptr;
+                        return {};
                     }
                 }
             }
         }
 
-        TR_ASSERT(bufptr - buf == (int)thisPieceSize);
+        TR_ASSERT(bufptr - std::data(buf) == (int)thisPieceSize);
         TR_ASSERT(leftInPiece == 0);
-        tr_sha1(walk, buf, (int)thisPieceSize, nullptr);
-        walk += SHA_DIGEST_LENGTH;
+        auto const digest = tr_sha1(buf);
+        if (!digest)
+        {
+            b->my_errno = EIO;
+            tr_snprintf(b->errfile, sizeof(b->errfile), "error hashing piece %" PRIu32, b->pieceIndex);
+            b->result = TrMakemetaResult::ERR_IO_READ;
+            break;
+        }
+
+        walk = std::copy(std::begin(*digest), std::end(*digest), walk);
 
         if (b->abortFlag)
         {
-            b->result = TR_MAKEMETA_CANCELLED;
+            b->result = TrMakemetaResult::CANCELLED;
             break;
         }
 
@@ -335,7 +333,7 @@ static uint8_t* getHashInfo(tr_metainfo_builder* b)
         ++b->pieceIndex;
     }
 
-    TR_ASSERT(b->abortFlag || walk - ret == (int)(SHA_DIGEST_LENGTH * b->pieceCount));
+    TR_ASSERT(b->abortFlag || size_t(walk - std::data(ret)) == std::size(ret));
     TR_ASSERT(b->abortFlag || !totalRemain);
 
     if (fd != TR_BAD_SYS_FILE)
@@ -343,7 +341,6 @@ static uint8_t* getHashInfo(tr_metainfo_builder* b)
         tr_sys_file_close(fd, nullptr);
     }
 
-    tr_free(buf);
     return ret;
 }
 
@@ -366,21 +363,15 @@ static void getFileInfo(
     /* build the path list */
     tr_variantInitList(uninitialized_path, 0);
 
-    if (strlen(file->filename) > offset)
+    auto filename = std::string_view{ file->filename };
+    if (std::size(filename) > offset)
     {
-        char* filename = tr_strdup(file->filename + offset);
-        char* walk = filename;
-        char const* token = nullptr;
-
-        while ((token = tr_strsep(&walk, TR_PATH_DELIMITER_STR)) != nullptr)
+        filename.remove_prefix(offset);
+        auto token = std::string_view{};
+        while (tr_strvSep(&filename, &token, TR_PATH_DELIMITER))
         {
-            if (!tr_str_is_empty(token))
-            {
-                tr_variantListAddStr(uninitialized_path, token);
-            }
+            tr_variantListAddStr(uninitialized_path, token);
         }
-
-        tr_free(filename);
     }
 }
 
@@ -405,8 +396,7 @@ static void makeInfoDict(tr_variant* dict, tr_metainfo_builder* builder)
         tr_variantDictAddInt(dict, TR_KEY_length, builder->files[0].size);
     }
 
-    char* const base = tr_sys_path_basename(builder->top, nullptr);
-    if (base != nullptr)
+    if (auto* const base = tr_sys_path_basename(builder->top, nullptr); base != nullptr)
     {
         tr_variantDictAddStr(dict, TR_KEY_name, base);
         tr_free(base);
@@ -414,11 +404,9 @@ static void makeInfoDict(tr_variant* dict, tr_metainfo_builder* builder)
 
     tr_variantDictAddInt(dict, TR_KEY_piece_length, builder->pieceSize);
 
-    uint8_t* const pch = getHashInfo(builder);
-    if (pch != nullptr)
+    if (auto const piece_hashes = getHashInfo(builder); !std::empty(piece_hashes))
     {
-        tr_variantDictAddRaw(dict, TR_KEY_pieces, pch, SHA_DIGEST_LENGTH * builder->pieceCount);
-        tr_free(pch);
+        tr_variantDictAddRaw(dict, TR_KEY_pieces, std::data(piece_hashes), std::size(piece_hashes));
     }
 
     tr_variantDictAddInt(dict, TR_KEY_private, builder->isPrivate ? 1 : 0);
@@ -433,12 +421,12 @@ static void tr_realMakeMetaInfo(tr_metainfo_builder* builder)
     tr_variant top;
 
     /* allow an empty set, but if URLs *are* listed, verify them. #814, #971 */
-    for (int i = 0; i < builder->trackerCount && builder->result == TR_MAKEMETA_OK; ++i)
+    for (int i = 0; i < builder->trackerCount && builder->result == TrMakemetaResult::OK; ++i)
     {
         if (!tr_urlIsValidTracker(builder->trackers[i].announce))
         {
             tr_strlcpy(builder->errfile, builder->trackers[i].announce, sizeof(builder->errfile));
-            builder->result = TR_MAKEMETA_URL;
+            builder->result = TrMakemetaResult::ERR_URL;
         }
     }
 
@@ -448,11 +436,11 @@ static void tr_realMakeMetaInfo(tr_metainfo_builder* builder)
     {
         builder->errfile[0] = '\0';
         builder->my_errno = ENOENT;
-        builder->result = TR_MAKEMETA_IO_READ;
+        builder->result = TrMakemetaResult::ERR_IO_READ;
         builder->isDone = true;
     }
 
-    if (builder->result == TR_MAKEMETA_OK && builder->trackerCount != 0)
+    if (builder->result == TrMakemetaResult::OK && builder->trackerCount != 0)
     {
         int prevTier = -1;
         tr_variant* tier = nullptr;
@@ -476,26 +464,26 @@ static void tr_realMakeMetaInfo(tr_metainfo_builder* builder)
         tr_variantDictAddStr(&top, TR_KEY_announce, builder->trackers[0].announce);
     }
 
-    if (builder->result == TR_MAKEMETA_OK && !builder->abortFlag)
+    if (builder->result == TrMakemetaResult::OK && !builder->abortFlag)
     {
         if (!tr_str_is_empty(builder->comment))
         {
             tr_variantDictAddStr(&top, TR_KEY_comment, builder->comment);
         }
 
-        tr_variantDictAddStr(&top, TR_KEY_created_by, TR_NAME "/" LONG_VERSION_STRING);
+        tr_variantDictAddStrView(&top, TR_KEY_created_by, TR_NAME "/" LONG_VERSION_STRING);
         tr_variantDictAddInt(&top, TR_KEY_creation_date, time(nullptr));
-        tr_variantDictAddStr(&top, TR_KEY_encoding, "UTF-8");
+        tr_variantDictAddStrView(&top, TR_KEY_encoding, "UTF-8");
         makeInfoDict(tr_variantDictAddDict(&top, TR_KEY_info, 666), builder);
     }
 
     /* save the file */
-    if ((builder->result == TR_MAKEMETA_OK) && (!builder->abortFlag) &&
+    if ((builder->result == TrMakemetaResult::OK) && (!builder->abortFlag) &&
         (tr_variantToFile(&top, TR_VARIANT_FMT_BENC, builder->outputFile) != 0))
     {
         builder->my_errno = errno;
         tr_strlcpy(builder->errfile, builder->outputFile, sizeof(builder->errfile));
-        builder->result = TR_MAKEMETA_IO_WRITE;
+        builder->result = TrMakemetaResult::ERR_IO_WRITE;
     }
 
     /* cleanup */
@@ -503,7 +491,7 @@ static void tr_realMakeMetaInfo(tr_metainfo_builder* builder)
 
     if (builder->abortFlag)
     {
-        builder->result = TR_MAKEMETA_CANCELLED;
+        builder->result = TrMakemetaResult::CANCELLED;
     }
 
     builder->isDone = true;
@@ -517,29 +505,18 @@ static void tr_realMakeMetaInfo(tr_metainfo_builder* builder)
 
 static tr_metainfo_builder* queue = nullptr;
 
-static tr_thread* workerThread = nullptr;
+static std::optional<std::thread::id> worker_thread_id;
 
-static tr_lock* getQueueLock(void)
-{
-    static tr_lock* lock = nullptr;
+static std::recursive_mutex queue_mutex_;
 
-    if (lock == nullptr)
-    {
-        lock = tr_lockNew();
-    }
-
-    return lock;
-}
-
-static void makeMetaWorkerFunc(void* /*user_data*/)
+static void makeMetaWorkerFunc()
 {
     for (;;)
     {
         tr_metainfo_builder* builder = nullptr;
 
         /* find the next builder to process */
-        tr_lock* lock = getQueueLock();
-        tr_lockLock(lock);
+        queue_mutex_.lock();
 
         if (queue != nullptr)
         {
@@ -547,7 +524,7 @@ static void makeMetaWorkerFunc(void* /*user_data*/)
             queue = queue->nextBuilder;
         }
 
-        tr_lockUnlock(lock);
+        queue_mutex_.unlock();
 
         /* if no builders, this worker thread is done */
         if (builder == nullptr)
@@ -558,7 +535,7 @@ static void makeMetaWorkerFunc(void* /*user_data*/)
         tr_realMakeMetaInfo(builder);
     }
 
-    workerThread = nullptr;
+    worker_thread_id.reset();
 }
 
 void tr_makeMetaInfo(
@@ -583,7 +560,7 @@ void tr_makeMetaInfo(
 
     /* initialize the builder variables */
     builder->abortFlag = false;
-    builder->result = TR_MAKEMETA_OK;
+    builder->result = TrMakemetaResult::OK;
     builder->isDone = false;
     builder->pieceIndex = 0;
     builder->trackerCount = trackerCount;
@@ -605,19 +582,19 @@ void tr_makeMetaInfo(
     }
     else
     {
-        builder->outputFile = tr_strdup_printf("%s.torrent", builder->top);
+        builder->outputFile = tr_strvDup(tr_strvJoin(builder->top, ".torrent"sv));
     }
 
     /* enqueue the builder */
-    tr_lock* lock = getQueueLock();
-    tr_lockLock(lock);
+    auto const lock = std::lock_guard(queue_mutex_);
+
     builder->nextBuilder = queue;
     queue = builder;
 
-    if (workerThread == nullptr)
+    if (!worker_thread_id)
     {
-        workerThread = tr_threadNew(makeMetaWorkerFunc, nullptr);
+        auto thread = std::thread(makeMetaWorkerFunc);
+        worker_thread_id = thread.get_id();
+        thread.detach();
     }
-
-    tr_lockUnlock(lock);
 }

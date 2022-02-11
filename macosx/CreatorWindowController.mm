@@ -1,27 +1,10 @@
-/******************************************************************************
- * Copyright (c) 2007-2012 Transmission authors and contributors
- *
- * Permission is hereby granted, free of charge, to any person obtaining a
- * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
- * DEALINGS IN THE SOFTWARE.
- *****************************************************************************/
+// This file Copyright © 2007-2022 Transmission authors and contributors.
+// It may be used under the MIT (SPDX: MIT) license.
+// License text can be found in the licenses/ folder.
 
 #include <libtransmission/transmission.h>
-#include <libtransmission/utils.h> // tr_urlIsValidTracker()
+#include <libtransmission/utils.h>
+#include <libtransmission/web-utils.h> // tr_urlIsValidTracker()
 
 #import "CreatorWindowController.h"
 #import "Controller.h"
@@ -31,7 +14,7 @@
 #define TRACKER_ADD_TAG 0
 #define TRACKER_REMOVE_TAG 1
 
-@interface CreatorWindowController (Private)
+@interface CreatorWindowController ()
 
 + (NSURL*)chooseFile;
 
@@ -88,7 +71,7 @@ NSMutableSet* creatorWindowControllerSet = nil;
             alert.informativeText = NSLocalizedString(
                 @"There must be at least one file in a folder to create a torrent file.",
                 "Create torrent -> no files -> warning");
-            alert.alertStyle = NSWarningAlertStyle;
+            alert.alertStyle = NSAlertStyleWarning;
 
             [alert runModal];
 
@@ -100,7 +83,7 @@ NSMutableSet* creatorWindowControllerSet = nil;
             [alert addButtonWithTitle:NSLocalizedString(@"OK", "Create torrent -> zero size -> button")];
             alert.messageText = NSLocalizedString(@"The total file size is zero bytes.", "Create torrent -> zero size -> title");
             alert.informativeText = NSLocalizedString(@"A torrent file cannot be created for files with no size.", "Create torrent -> zero size -> warning");
-            alert.alertStyle = NSWarningAlertStyle;
+            alert.alertStyle = NSAlertStyleWarning;
 
             [alert runModal];
 
@@ -203,7 +186,7 @@ NSMutableSet* creatorWindowControllerSet = nil;
     //set previously saved values
     if ([fDefaults objectForKey:@"CreatorPrivate"])
     {
-        fPrivateCheck.state = [fDefaults boolForKey:@"CreatorPrivate"] ? NSOnState : NSOffState;
+        fPrivateCheck.state = [fDefaults boolForKey:@"CreatorPrivate"] ? NSControlStateValueOn : NSControlStateValueOff;
     }
 
     if ([fDefaults objectForKey:@"CreatorSource"])
@@ -211,7 +194,7 @@ NSMutableSet* creatorWindowControllerSet = nil;
         fSource.stringValue = [fDefaults stringForKey:@"CreatorSource"];
     }
 
-    fOpenCheck.state = [fDefaults boolForKey:@"CreatorOpen"] ? NSOnState : NSOffState;
+    fOpenCheck.state = [fDefaults boolForKey:@"CreatorOpen"] ? NSControlStateValueOn : NSControlStateValueOff;
 }
 
 - (void)dealloc
@@ -278,7 +261,7 @@ NSMutableSet* creatorWindowControllerSet = nil;
     panel.nameFieldStringValue = fLocation.lastPathComponent;
 
     [panel beginSheetModalForWindow:self.window completionHandler:^(NSInteger result) {
-        if (result == NSFileHandlingPanelOKButton)
+        if (result == NSModalResponseOK)
         {
             fLocation = panel.URL;
             [self updateLocationField];
@@ -294,7 +277,7 @@ NSMutableSet* creatorWindowControllerSet = nil;
         [self.window endEditingFor:fTrackerTable];
     }
 
-    BOOL const isPrivate = fPrivateCheck.state == NSOnState;
+    BOOL const isPrivate = fPrivateCheck.state == NSControlStateValueOn;
     if (fTrackers.count == 0 && [fDefaults boolForKey:isPrivate ? @"WarningCreatorPrivateBlankAddress" : @"WarningCreatorBlankAddress"])
     {
         NSAlert* alert = [[NSAlert alloc] init];
@@ -317,10 +300,10 @@ NSMutableSet* creatorWindowControllerSet = nil;
         alert.showsSuppressionButton = YES;
 
         [alert beginSheetModalForWindow:self.window completionHandler:^(NSModalResponse returnCode) {
-            if (alert.suppressionButton.state == NSOnState)
+            if (alert.suppressionButton.state == NSControlStateValueOn)
             {
                 [NSUserDefaults.standardUserDefaults setBool:NO forKey:@"WarningCreatorBlankAddress"]; //set regardless of private/public
-                if (fPrivateCheck.state == NSOnState)
+                if (fPrivateCheck.state == NSControlStateValueOn)
                 {
                     [NSUserDefaults.standardUserDefaults setBool:NO forKey:@"WarningCreatorPrivateBlankAddress"];
                 }
@@ -495,10 +478,6 @@ NSMutableSet* creatorWindowControllerSet = nil;
     }
 }
 
-@end
-
-@implementation CreatorWindowController (Private)
-
 - (void)updateLocationField
 {
     NSString* pathString = fLocation.path;
@@ -536,7 +515,7 @@ NSMutableSet* creatorWindowControllerSet = nil;
                                                                 "Create this directory or choose a different one to create the torrent file.",
                                                                "Create torrent -> directory doesn't exist warning -> warning"),
                                                            fLocation.URLByDeletingLastPathComponent.path];
-        alert.alertStyle = NSWarningAlertStyle;
+        alert.alertStyle = NSAlertStyleWarning;
 
         [alert beginSheetModalForWindow:self.window completionHandler:nil];
         return;
@@ -559,7 +538,7 @@ NSMutableSet* creatorWindowControllerSet = nil;
                                                                "Create torrent -> file already exists warning -> warning"),
                                                            pathComponents[count - 1],
                                                            pathComponents[count - 2]];
-        alert.alertStyle = NSWarningAlertStyle;
+        alert.alertStyle = NSAlertStyleWarning;
 
         [alert beginSheetModalForWindow:self.window completionHandler:nil];
         return;
@@ -576,10 +555,10 @@ NSMutableSet* creatorWindowControllerSet = nil;
 
     //store values
     [fDefaults setObject:fTrackers forKey:@"CreatorTrackers"];
-    [fDefaults setBool:fPrivateCheck.state == NSOnState forKey:@"CreatorPrivate"];
+    [fDefaults setBool:fPrivateCheck.state == NSControlStateValueOn forKey:@"CreatorPrivate"];
     [fDefaults setObject: [fSource stringValue] forKey: @"CreatorSource"];
-    [fDefaults setBool:fOpenCheck.state == NSOnState forKey:@"CreatorOpen"];
-    fOpenWhenCreated = fOpenCheck.state == NSOnState; //need this since the check box might not exist, and value in prefs might have changed from another creator window
+    [fDefaults setBool:fOpenCheck.state == NSControlStateValueOn forKey:@"CreatorOpen"];
+    fOpenWhenCreated = fOpenCheck.state == NSControlStateValueOn; //need this since the check box might not exist, and value in prefs might have changed from another creator window
     [fDefaults setURL:fLocation.URLByDeletingLastPathComponent forKey:@"CreatorLocationURL"];
 
     self.window.restorable = NO;
@@ -591,7 +570,7 @@ NSMutableSet* creatorWindowControllerSet = nil;
         trackerInfo,
         fTrackers.count,
         fCommentView.string.UTF8String,
-        fPrivateCheck.state == NSOnState,
+        fPrivateCheck.state == NSControlStateValueOn,
         fSource.stringValue.UTF8String);
     tr_free(trackerInfo);
 
@@ -608,7 +587,7 @@ NSMutableSet* creatorWindowControllerSet = nil;
         NSAlert* alert;
         switch (fInfo->result)
         {
-        case TR_MAKEMETA_OK:
+        case TrMakemetaResult::OK:
             if (fOpenWhenCreated)
             {
                 NSDictionary* dict = @{ @"File" : fLocation.path, @"Path" : fPath.URLByDeletingLastPathComponent.path };
@@ -618,7 +597,7 @@ NSMutableSet* creatorWindowControllerSet = nil;
             [self.window close];
             break;
 
-        case TR_MAKEMETA_CANCELLED:
+        case TrMakemetaResult::CANCELLED:
             [self.window close];
             break;
 
@@ -627,16 +606,16 @@ NSMutableSet* creatorWindowControllerSet = nil;
             [alert addButtonWithTitle:NSLocalizedString(@"OK", "Create torrent -> failed -> button")];
             alert.messageText = [NSString stringWithFormat:NSLocalizedString(@"Creation of \"%@\" failed.", "Create torrent -> failed -> title"),
                                                            fLocation.lastPathComponent];
-            alert.alertStyle = NSWarningAlertStyle;
+            alert.alertStyle = NSAlertStyleWarning;
 
-            if (fInfo->result == TR_MAKEMETA_IO_READ)
+            if (fInfo->result == TrMakemetaResult::ERR_IO_READ)
             {
                 alert.informativeText = [NSString
                     stringWithFormat:NSLocalizedString(@"Could not read \"%s\": %s.", "Create torrent -> failed -> warning"),
                                      fInfo->errfile,
                                      strerror(fInfo->my_errno)];
             }
-            else if (fInfo->result == TR_MAKEMETA_IO_WRITE)
+            else if (fInfo->result == TrMakemetaResult::ERR_IO_WRITE)
             {
                 alert.informativeText = [NSString
                     stringWithFormat:NSLocalizedString(@"Could not write \"%s\": %s.", "Create torrent -> failed -> warning"),

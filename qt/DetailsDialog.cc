@@ -1,10 +1,7 @@
-/*
- * This file Copyright (C) 2009-2015 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2009-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #include <algorithm>
 #include <cassert>
@@ -24,7 +21,7 @@
 #include <QMap>
 #include <QMessageBox>
 #include <QResizeEvent>
-#include <QRegExp>
+#include <QRegularExpression>
 #include <QStringList>
 #include <QStyle>
 #include <QTreeWidgetItem>
@@ -35,6 +32,7 @@
 #include "ColumnResizer.h"
 #include "DetailsDialog.h"
 #include "Formatter.h"
+#include "IconCache.h"
 #include "Prefs.h"
 #include "Session.h"
 #include "SqueezeLabel.h"
@@ -84,10 +82,9 @@ int measureViewItem(QTreeWidget const* view, int column, QString const& text)
 
 QString collateAddress(QString const& address)
 {
-    QString collated;
+    auto collated = QString{};
 
-    QHostAddress ip_address;
-    if (ip_address.setAddress(address))
+    if (auto ip_address = QHostAddress{}; ip_address.setAddress(address))
     {
         if (ip_address.protocol() == QAbstractSocket::IPv4Protocol)
         {
@@ -198,17 +195,7 @@ private:
 ****
 ***/
 
-QIcon DetailsDialog::getStockIcon(QString const& freedesktop_name, int fallback) const
-{
-    QIcon icon = QIcon::fromTheme(freedesktop_name);
-
-    if (icon.isNull())
-    {
-        icon = style()->standardIcon(QStyle::StandardPixmap(fallback), nullptr, this);
-    }
-
-    return icon;
-}
+int DetailsDialog::prev_tab_index_ = 0;
 
 DetailsDialog::DetailsDialog(Session& session, Prefs& prefs, TorrentModel const& model, QWidget* parent)
     : BaseDialog(parent)
@@ -226,6 +213,7 @@ DetailsDialog::DetailsDialog(Session& session, Prefs& prefs, TorrentModel const&
 
     adjustSize();
     ui_.commentBrowser->setMaximumHeight(QWIDGETSIZE_MAX);
+    ui_.tabs->setCurrentIndex(prev_tab_index_);
 
     static std::array<int, 2> constexpr InitKeys = {
         Prefs::SHOW_TRACKER_SCRAPES,
@@ -250,6 +238,11 @@ DetailsDialog::DetailsDialog(Session& session, Prefs& prefs, TorrentModel const&
     // set up the debounce timer
     connect(&ui_debounce_timer_, &QTimer::timeout, this, &DetailsDialog::refreshUI);
     ui_debounce_timer_.setSingleShot(true);
+}
+
+DetailsDialog::~DetailsDialog()
+{
+    prev_tab_index_ = ui_.tabs->currentIndex();
 }
 
 void DetailsDialog::setIds(torrent_ids_t const& ids)
@@ -563,7 +556,7 @@ void DetailsDialog::refreshUI()
 
         if (f != 0)
         {
-            string = tr("%1 (%2 corrupt)").arg(dstr).arg(fstr);
+            string = tr("%1 (+%2 discarded after failed checksum)").arg(dstr).arg(fstr);
         }
         else
         {
@@ -905,15 +898,11 @@ void DetailsDialog::refreshUI()
 
     if (canEdit() && !torrents.empty())
     {
-        int i;
-        bool uniform;
-        bool baseline_flag;
-        int baseline_int;
         Torrent const& baseline = *torrents.front();
 
         // mySessionLimitCheck
-        uniform = true;
-        baseline_flag = baseline.honorsSessionLimits();
+        bool uniform = true;
+        bool baseline_flag = baseline.honorsSessionLimits();
 
         for (Torrent const* const tor : torrents)
         {
@@ -958,7 +947,7 @@ void DetailsDialog::refreshUI()
 
         // myBandwidthPriorityCombo
         uniform = true;
-        baseline_int = baseline.getBandwidthPriority();
+        int baseline_int = baseline.getBandwidthPriority();
 
         for (Torrent const* const tor : torrents)
         {
@@ -969,14 +958,7 @@ void DetailsDialog::refreshUI()
             }
         }
 
-        if (uniform)
-        {
-            i = ui_.bandwidthPriorityCombo->findData(baseline_int);
-        }
-        else
-        {
-            i = -1;
-        }
+        int i = uniform ? ui_.bandwidthPriorityCombo->findData(baseline_int) : -1;
 
         setIfIdle(ui_.bandwidthPriorityCombo, i);
 
@@ -1048,7 +1030,7 @@ void DetailsDialog::refreshUI()
         for (Peer const& peer : peers)
         {
             QString const key = id_str + QLatin1Char(':') + peer.address;
-            PeerItem* item = static_cast<PeerItem*>(peers_.value(key, nullptr));
+            auto* item = dynamic_cast<PeerItem*>(peers_.value(key, nullptr));
 
             if (item == nullptr) // new peer has connected
             {
@@ -1294,7 +1276,7 @@ void DetailsDialog::onAddTrackerClicked()
         QSet<QString> urls;
         torrent_ids_t ids;
 
-        for (auto const& line : text.split(QRegExp(QStringLiteral("[\r\n]+"))))
+        for (auto const& line : text.split(QRegularExpression(QStringLiteral("[\r\n]+"))))
         {
             QString const url = line.trimmed();
             if (!line.isEmpty() && QUrl(url).isValid())
@@ -1449,9 +1431,10 @@ void DetailsDialog::initTrackerTab()
     ui_.trackersView->setModel(tracker_filter_.get());
     ui_.trackersView->setItemDelegate(tracker_delegate_.get());
 
-    ui_.addTrackerButton->setIcon(getStockIcon(QStringLiteral("list-add"), QStyle::SP_DialogOpenButton));
-    ui_.editTrackerButton->setIcon(getStockIcon(QStringLiteral("document-properties"), QStyle::SP_DesktopIcon));
-    ui_.removeTrackerButton->setIcon(getStockIcon(QStringLiteral("list-remove"), QStyle::SP_TrashIcon));
+    auto& icons = IconCache::get();
+    ui_.addTrackerButton->setIcon(icons.getThemeIcon(QStringLiteral("list-add"), QStyle::SP_DialogOpenButton));
+    ui_.editTrackerButton->setIcon(icons.getThemeIcon(QStringLiteral("document-properties"), QStyle::SP_DesktopIcon));
+    ui_.removeTrackerButton->setIcon(icons.getThemeIcon(QStringLiteral("list-remove"), QStyle::SP_TrashIcon));
 
     ui_.showTrackerScrapesCheck->setChecked(prefs_.getBool(Prefs::SHOW_TRACKER_SCRAPES));
     ui_.showBackupTrackersCheck->setChecked(prefs_.getBool(Prefs::SHOW_BACKUP_TRACKERS));
@@ -1499,26 +1482,27 @@ void DetailsDialog::initFilesTab() const
     connect(ui_.filesView, &FileTreeView::wantedChanged, this, &DetailsDialog::onFileWantedChanged);
 }
 
-void DetailsDialog::onFilePriorityChanged(QSet<int> const& indices, int priority)
+static constexpr tr_quark priorityKey(int priority)
 {
-    tr_quark key;
-
     switch (priority)
     {
     case TR_PRI_LOW:
-        key = TR_KEY_priority_low;
+        return TR_KEY_priority_low;
         break;
 
     case TR_PRI_HIGH:
-        key = TR_KEY_priority_high;
+        return TR_KEY_priority_high;
         break;
 
     default:
-        key = TR_KEY_priority_normal;
+        return TR_KEY_priority_normal;
         break;
     }
+}
 
-    torrentSet(key, indices.values());
+void DetailsDialog::onFilePriorityChanged(QSet<int> const& indices, int priority)
+{
+    torrentSet(priorityKey(priority), indices.values());
 }
 
 void DetailsDialog::onFileWantedChanged(QSet<int> const& indices, bool wanted)

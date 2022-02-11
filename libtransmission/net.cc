@@ -1,28 +1,15 @@
-/******************************************************************************
- * Copyright (c) Transmission authors and contributors
- *
- * Permission is hereby granted, free of charge, to any person obtaining a
- * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
- * DEALINGS IN THE SOFTWARE.
- *****************************************************************************/
+// This file Copyright © 2010-2022 Transmission authors and contributors.
+// It may be used under the MIT (SPDX: MIT) license.
+// License text can be found in the licenses/ folder.
 
+#include <algorithm>
+#include <array>
 #include <cerrno>
 #include <climits>
 #include <cstring>
+#include <ctime>
+#include <string_view>
+#include <utility> // std::pair
 
 #include <sys/types.h>
 
@@ -38,6 +25,7 @@
 #include <libutp/utp.h>
 
 #include "transmission.h"
+
 #include "fdlimit.h" /* tr_fdSocketClose() */
 #include "log.h"
 #include "net.h"
@@ -108,20 +96,35 @@ char const* tr_address_to_string(tr_address const* addr)
 
 bool tr_address_from_string(tr_address* dst, char const* src)
 {
-    bool success = false;
-
     if (evutil_inet_pton(AF_INET, src, &dst->addr) == 1)
     {
         dst->type = TR_AF_INET;
-        success = true;
-    }
-    else if (evutil_inet_pton(AF_INET6, src, &dst->addr) == 1)
-    {
-        dst->type = TR_AF_INET6;
-        success = true;
+        return true;
     }
 
-    return success;
+    if (evutil_inet_pton(AF_INET6, src, &dst->addr) == 1)
+    {
+        dst->type = TR_AF_INET6;
+        return true;
+    }
+
+    return false;
+}
+
+bool tr_address_from_string(tr_address* dst, std::string_view src)
+{
+    // inet_pton() requires zero-terminated strings,
+    // so make a zero-terminated copy here on the stack.
+    auto buf = std::array<char, 64>{};
+    if (std::size(src) >= std::size(buf))
+    {
+        // shouldn't ever be that large; malformed address
+        return false;
+    }
+
+    *std::copy(std::begin(src), std::end(src), std::begin(buf)) = '\0';
+
+    return tr_address_from_string(dst, std::data(buf));
 }
 
 /*
@@ -147,8 +150,70 @@ int tr_address_compare(tr_address const* a, tr_address const* b)
  * TCP sockets
  **********************************************************************/
 
+// RFCs 2474, 3246, 4594 & 8622
+// Service class names are defined in RFC 4594, RFC 5865, and RFC 8622.
+// Not all platforms have these IPTOS_ definitions, so hardcode them here
+static auto constexpr IpTosNames = std::array<std::pair<int, std::string_view>, 28>{ {
+    { 0x00, "cs0" }, // IPTOS_CLASS_CS0
+    { 0x04, "le" },
+    { 0x20, "cs1" }, // IPTOS_CLASS_CS1
+    { 0x28, "af11" }, // IPTOS_DSCP_AF11
+    { 0x30, "af12" }, // IPTOS_DSCP_AF12
+    { 0x38, "af13" }, // IPTOS_DSCP_AF13
+    { 0x40, "cs2" }, // IPTOS_CLASS_CS2
+    { 0x48, "af21" }, // IPTOS_DSCP_AF21
+    { 0x50, "af22" }, // IPTOS_DSCP_AF22
+    { 0x58, "af23" }, // IPTOS_DSCP_AF23
+    { 0x60, "cs3" }, // IPTOS_CLASS_CS3
+    { 0x68, "af31" }, // IPTOS_DSCP_AF31
+    { 0x70, "af32" }, // IPTOS_DSCP_AF32
+    { 0x78, "af33" }, // IPTOS_DSCP_AF33
+    { 0x80, "cs4" }, // IPTOS_CLASS_CS4
+    { 0x88, "af41" }, // IPTOS_DSCP_AF41
+    { 0x90, "af42" }, // IPTOS_DSCP_AF42
+    { 0x98, "af43" }, // IPTOS_DSCP_AF43
+    { 0xa0, "cs5" }, // IPTOS_CLASS_CS5
+    { 0xb8, "ef" }, // IPTOS_DSCP_EF
+    { 0xc0, "cs6" }, // IPTOS_CLASS_CS6
+    { 0xe0, "cs7" }, // IPTOS_CLASS_CS7
+
+    // <netinet/ip.h> lists these TOS names as deprecated,
+    // but keep them defined here for backward compatibility
+    { 0x00, "routine" }, // IPTOS_PREC_ROUTINE
+    { 0x02, "lowcost" }, // IPTOS_LOWCOST
+    { 0x02, "mincost" }, // IPTOS_MINCOST
+    { 0x04, "reliable" }, // IPTOS_RELIABILITY
+    { 0x08, "throughput" }, // IPTOS_THROUGHPUT
+    { 0x10, "lowdelay" }, // IPTOS_LOWDELAY
+} };
+
+std::string tr_netTosToName(int tos)
+{
+    auto const test = [tos](auto const& pair)
+    {
+        return pair.first == tos;
+    };
+    auto const it = std::find_if(std::begin(IpTosNames), std::end(IpTosNames), test);
+    return it == std::end(IpTosNames) ? std::to_string(tos) : std::string{ it->second };
+}
+
+std::optional<int> tr_netTosFromName(std::string_view name)
+{
+    auto const test = [&name](auto const& pair)
+    {
+        return pair.second == name;
+    };
+    auto const it = std::find_if(std::begin(IpTosNames), std::end(IpTosNames), test);
+    return it != std::end(IpTosNames) ? it->first : tr_parseNum<int>(name);
+}
+
 void tr_netSetTOS([[maybe_unused]] tr_socket_t s, [[maybe_unused]] int tos, tr_address_type type)
 {
+    if (s == TR_BAD_SOCKET)
+    {
+        return;
+    }
+
     if (type == TR_AF_INET)
     {
 #if defined(IP_TOS) && !defined(_WIN32)
@@ -200,7 +265,7 @@ bool tr_address_from_sockaddr_storage(tr_address* setme_addr, tr_port* setme_por
 {
     if (from->ss_family == AF_INET)
     {
-        struct sockaddr_in const* sin = (struct sockaddr_in const*)from;
+        auto const* const sin = (struct sockaddr_in const*)from;
         setme_addr->type = TR_AF_INET;
         setme_addr->addr.addr4.s_addr = sin->sin_addr.s_addr;
         *setme_port = sin->sin_port;
@@ -209,7 +274,7 @@ bool tr_address_from_sockaddr_storage(tr_address* setme_addr, tr_port* setme_por
 
     if (from->ss_family == AF_INET6)
     {
-        struct sockaddr_in6 const* sin6 = (struct sockaddr_in6 const*)from;
+        auto const* const sin6 = (struct sockaddr_in6 const*)from;
         setme_addr->type = TR_AF_INET6;
         setme_addr->addr.addr6 = sin6->sin6_addr;
         *setme_port = sin6->sin6_port;
@@ -596,9 +661,7 @@ static int tr_globalAddress(int af, void* addr, int* addr_len)
         return -1;
     }
 
-    int const rc = get_source_address(sa, salen, (struct sockaddr*)&ss, &sslen);
-
-    if (rc < 0)
+    if (int const rc = get_source_address(sa, salen, (struct sockaddr*)&ss, &sslen); rc < 0)
     {
         return -1;
     }
@@ -636,15 +699,14 @@ static int tr_globalAddress(int af, void* addr, int* addr_len)
 }
 
 /* Return our global IPv6 address, with caching. */
-unsigned char const* tr_globalIPv6(void)
+unsigned char const* tr_globalIPv6(tr_session const* session)
 {
     static unsigned char ipv6[16];
     static time_t last_time = 0;
     static bool have_ipv6 = false;
-    time_t const now = tr_time();
 
     /* Re-check every half hour */
-    if (last_time < now - 1800)
+    if (auto const now = tr_time(); last_time < now - 1800)
     {
         int addrlen = 16;
         int const rc = tr_globalAddress(AF_INET6, ipv6, &addrlen);
@@ -652,7 +714,30 @@ unsigned char const* tr_globalIPv6(void)
         last_time = now;
     }
 
-    return have_ipv6 ? ipv6 : nullptr;
+    if (!have_ipv6)
+    {
+        return nullptr; /* No IPv6 address at all. */
+    }
+
+    /* Return the default address. This is useful for checking
+       for connectivity in general. */
+    if (session == nullptr)
+    {
+        return ipv6;
+    }
+
+    /* We have some sort of address, now make sure that we return
+       our bound address if non-default. */
+
+    bool is_default = false;
+    auto const* ipv6_bindaddr = tr_sessionGetPublicAddress(session, TR_AF_INET6, &is_default);
+    if (ipv6_bindaddr != nullptr && !is_default)
+    {
+        /* Explicitly bound. Return that address. */
+        memcpy(ipv6, ipv6_bindaddr->addr.addr6.s6_addr, 16);
+    }
+
+    return ipv6;
 }
 
 /***
@@ -682,13 +767,13 @@ static bool isMartianAddr(struct tr_address const* a)
     {
     case TR_AF_INET:
         {
-            unsigned char const* address = (unsigned char const*)&a->addr.addr4;
+            auto const* const address = (unsigned char const*)&a->addr.addr4;
             return address[0] == 0 || address[0] == 127 || (address[0] & 0xE0) == 0xE0;
         }
 
     case TR_AF_INET6:
         {
-            unsigned char const* address = (unsigned char const*)&a->addr.addr6;
+            auto const* const address = (unsigned char const*)&a->addr.addr6;
             return address[0] == 0xFF || (memcmp(address, zeroes, 15) == 0 && (address[15] == 0 || address[15] == 1));
         }
 

@@ -1,11 +1,7 @@
-/**
- * @license
- *
- * This file Copyright (C) 2020 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- */
+/* @license This file Copyright (C) 2020-2022 Mnemosyne LLC.
+   It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
+   or any future license endorsed by Mnemosyne LLC.
+   License text can be found in the licenses/ folder. */
 
 import { FileRow } from './file-row.js';
 import { Formatter } from './formatter.js';
@@ -119,7 +115,9 @@ export class Inspector extends EventTarget {
       ['hash', 'Hash:'],
       ['privacy', 'Privacy:'],
       ['origin', 'Origin:'],
+      ['magnetLink', 'Magnet:'],
       ['comment', 'Comment:'],
+      ['labels', 'Labels:'],
     ];
     for (const [name, text] of rows) {
       elements[name] = append_row(text);
@@ -342,7 +340,9 @@ export class Inspector extends EventTarget {
         (accumulator, t) => accumulator + t.getFailedEver(),
         0
       );
-      string = f ? `${fmt.size(d)} (${fmt.size(f)} corrupt)` : fmt.size(d);
+      string = f
+        ? `${fmt.size(d)} (+${fmt.size(f)} discarded after failed checksum)`
+        : fmt.size(d);
     }
     setTextContent(e.info.downloaded, string);
 
@@ -493,6 +493,10 @@ export class Inspector extends EventTarget {
       setTextContent(e.info.comment, string);
     }
 
+    // labels
+    string = torrents.length === 0 ? none : torrents[0].getLabels().join(', ');
+    setTextContent(e.info.labels, string);
+
     // origin
     if (torrents.length === 0) {
       string = none;
@@ -532,6 +536,19 @@ export class Inspector extends EventTarget {
       string = torrents.every((t) => get(t) === first) ? first : mixed;
     }
     setTextContent(e.info.location, string);
+
+    // magnetLink
+    if (torrents.length === 0) {
+      setTextContent(e.info.magnetLink, none);
+    } else if (torrents.length > 1) {
+      setTextContent(e.info.magnetLink, mixed);
+    } else {
+      const link = torrents[0].getMagnetLink();
+      Utils.setInnerHTML(
+        e.info.magnetLink,
+        `<a class="inspector-info-magnet" href="${link}"><button></button></a>`
+      );
+    }
   }
 
   ///  PEERS PAGE

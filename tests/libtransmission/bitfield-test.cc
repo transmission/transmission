@@ -1,12 +1,12 @@
-/*
- * This file Copyright (C) 2010-2014 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright (C) 2010-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
+#include <algorithm>
 #include <array>
+#include <limits>
+#include <vector>
 
 #include "transmission.h"
 #include "crypto-utils.h"
@@ -15,7 +15,7 @@
 
 #include "gtest/gtest.h"
 
-TEST(Bitfield, countRange)
+TEST(Bitfield, count)
 {
     auto constexpr IterCount = int{ 10000 };
 
@@ -59,6 +59,18 @@ TEST(Bitfield, countRange)
         auto const count2 = bf.count(begin, end);
         EXPECT_EQ(count1, count2);
     }
+
+    auto bf = tr_bitfield{ 0 };
+    EXPECT_EQ(0, bf.count(0, 0));
+    EXPECT_EQ(0, bf.count(0, 1));
+
+    bf = tr_bitfield{ 100 };
+    EXPECT_EQ(0, bf.count(0, 0));
+    EXPECT_EQ(0, bf.count(0, 100));
+    bf.setHasAll();
+    EXPECT_EQ(0, bf.count(0, 0));
+    EXPECT_EQ(1, bf.count(0, 1));
+    EXPECT_EQ(100, bf.count(0, 100));
 }
 
 TEST(Bitfield, ctorFromFlagArray)
@@ -96,10 +108,10 @@ TEST(Bitfield, setRaw)
     auto constexpr TestByte = uint8_t{ 10 };
     auto constexpr TestByteTrueBits = 2;
 
-    auto const raw = std::vector<uint8_t>(100, TestByte);
+    auto raw = std::vector<uint8_t>(100, TestByte);
 
     auto bf = tr_bitfield(std::size(raw) * 8);
-    bf.setRaw(std::data(raw), std::size(raw), true);
+    bf.setRaw(std::data(raw), std::size(raw));
     EXPECT_EQ(TestByteTrueBits * std::size(raw), bf.count());
 
     // The first byte of the bitfield corresponds to indices 0 - 7
@@ -115,6 +127,24 @@ TEST(Bitfield, setRaw)
     }
     EXPECT_EQ(TestByte, test);
     EXPECT_EQ(raw, bf.raw());
+
+    // check that has-all bitfield gets all-true
+    bf = tr_bitfield(std::size(raw) * 8);
+    bf.setHasAll();
+    raw = bf.raw();
+    EXPECT_EQ(std::size(bf) / 8, std::size(raw));
+    EXPECT_EQ(std::numeric_limits<unsigned char>::max(), raw[0]);
+
+    // check that the spare bits t the end are zero
+    bf = tr_bitfield{ 1 };
+    uint8_t by = ~uint8_t{};
+    bf.setRaw(&by, 1);
+    EXPECT_TRUE(bf.hasAll());
+    EXPECT_FALSE(bf.hasNone());
+    EXPECT_EQ(1, bf.count());
+    raw = bf.raw();
+    EXPECT_EQ(1, std::size(raw));
+    EXPECT_EQ(1 << 7, raw[0]);
 }
 
 TEST(Bitfield, bitfields)
@@ -136,8 +166,8 @@ TEST(Bitfield, bitfields)
         EXPECT_EQ(field.test(i), (i % 7 == 0));
     }
 
-    /* test tr_bitfield::setRange */
-    field.setRange(0, bitcount);
+    /* test tr_bitfield::setSpan */
+    field.setSpan(0, bitcount);
 
     for (unsigned int i = 0; i < bitcount; i++)
     {
@@ -159,8 +189,8 @@ TEST(Bitfield, bitfields)
     }
 
     /* test tr_bitfield::clearBitRange in the middle of a boundary */
-    field.setRange(0, 64);
-    field.unsetRange(4, 21);
+    field.setSpan(0, 64);
+    field.unsetSpan(4, 21);
 
     for (unsigned int i = 0; i < 64; i++)
     {
@@ -168,8 +198,8 @@ TEST(Bitfield, bitfields)
     }
 
     /* test tr_bitfield::clearBitRange on the boundaries */
-    field.setRange(0, 64);
-    field.unsetRange(8, 24);
+    field.setSpan(0, 64);
+    field.unsetSpan(8, 24);
 
     for (unsigned int i = 0; i < 64; i++)
     {
@@ -177,40 +207,66 @@ TEST(Bitfield, bitfields)
     }
 
     /* test tr_bitfield::clearBitRange when begin & end is on the same word */
-    field.setRange(0, 64);
-    field.unsetRange(4, 5);
+    field.setSpan(0, 64);
+    field.unsetSpan(4, 5);
 
     for (unsigned int i = 0; i < 64; i++)
     {
         EXPECT_EQ(field.test(i), (i < 4 || i >= 5));
     }
 
-    /* test tr_bitfield::setRange */
-    field.unsetRange(0, 64);
-    field.setRange(4, 21);
+    /* test tr_bitfield::setSpan */
+    field.unsetSpan(0, 64);
+    field.setSpan(4, 21);
 
     for (unsigned int i = 0; i < 64; i++)
     {
         EXPECT_EQ(field.test(i), (4 <= i && i < 21));
     }
 
-    /* test tr_bitfield::setRange on the boundaries */
-    field.unsetRange(0, 64);
-    field.setRange(8, 24);
+    /* test tr_bitfield::setSpan on the boundaries */
+    field.unsetSpan(0, 64);
+    field.setSpan(8, 24);
 
     for (unsigned int i = 0; i < 64; i++)
     {
         EXPECT_EQ(field.test(i), (8 <= i && i < 24));
     }
 
-    /* test tr_bitfield::setRange when begin & end is on the same word */
-    field.unsetRange(0, 64);
-    field.setRange(4, 5);
+    /* test tr_bitfield::setSpan when begin & end is on the same word */
+    field.unsetSpan(0, 64);
+    field.setSpan(4, 5);
 
     for (unsigned int i = 0; i < 64; i++)
     {
         EXPECT_EQ(field.test(i), (4 <= i && i < 5));
     }
+
+    /* test tr_bitfield::setSpan when end runs beyond the end of the bitfield */
+    field.setHasNone();
+    field.setSpan(100, 1000);
+    EXPECT_FALSE(field.hasNone());
+    EXPECT_FALSE(field.hasAll());
+    EXPECT_EQ(std::size(field) - 100, field.count());
+
+    /* test tr_bitfield::unsetSpan when it changes nothing */
+    field.setHasNone();
+    field.unsetSpan(0, 100);
+    EXPECT_TRUE(field.hasNone());
+    EXPECT_FALSE(field.hasAll());
+    EXPECT_EQ(0, field.count());
+
+    /* test tr_bitfield::setSpan when it changes nothing */
+    field.setHasAll();
+    field.setSpan(0, 100);
+    EXPECT_FALSE(field.hasNone());
+    EXPECT_TRUE(field.hasAll());
+    EXPECT_EQ(std::size(field), field.count());
+
+    /* test tr_bitfield::setSpan with an invalid span doesn't crash */
+    field.setHasAll();
+    field.setSpan(0, 0);
+    EXPECT_TRUE(field.hasAll());
 }
 
 TEST(Bitfield, hasAllNone)

@@ -1,10 +1,7 @@
-/*
- * This file Copyright (C) 2017 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright (C) 2017-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #include "transmission.h"
 #include "error.h"
@@ -68,7 +65,7 @@ protected:
 
     std::string self_path_;
 
-    void waitForFileToExist(std::string const& path)
+    static void waitForFileToExist(std::string const& path)
     {
         auto const test = [path]()
         {
@@ -87,14 +84,10 @@ TEST_P(SubprocessTest, SpawnAsyncMissingExec)
 {
     auto const missing_exe_path = std::string{ TR_IF_WIN32("C:\\", "/") "tr-missing-test-exe" TR_IF_WIN32(".exe", "") };
 
-    auto args = std::array<char*, 2>{
-        //  FIXME(ckerr): remove tr_strdup()s after https://github.com/transmission/transmission/issues/1384
-        tr_strdup(missing_exe_path.data()),
-        nullptr
-    };
+    auto args = std::array<char const*, 2>{ missing_exe_path.data(), nullptr };
 
     tr_error* error = nullptr;
-    auto const ret = tr_spawn_async(args.data(), nullptr, nullptr, &error);
+    auto const ret = tr_spawn_async(std::data(args), {}, nullptr, &error);
     EXPECT_FALSE(ret);
     EXPECT_NE(nullptr, error);
     EXPECT_NE(0, error->code);
@@ -113,20 +106,17 @@ TEST_P(SubprocessTest, SpawnAsyncArgs)
     auto const test_arg3 = std::string{};
     auto const test_arg4 = std::string{ "\"arg3'^! $PATH %PATH% \\" };
 
-    auto args = std::array<char*, 8>{
-        //  FIXME(ckerr): remove tr_strdup()s after https://github.com/transmission/transmission/issues/1384
-        tr_strdup(self_path_.c_str()),
-        tr_strdup(result_path.data()),
-        tr_strdup(arg_dump_args_.data()),
-        tr_strdup(test_arg1.data()),
-        tr_strdup(test_arg2.data()),
-        tr_strdup(test_arg3.data()),
-        tr_strdup(allow_batch_metachars ? test_arg4.data() : nullptr),
-        nullptr
-    };
+    auto const args = std::array<char const*, 8>{ self_path_.c_str(),
+                                                  result_path.data(),
+                                                  arg_dump_args_.data(),
+                                                  test_arg1.data(),
+                                                  test_arg2.data(),
+                                                  test_arg3.data(),
+                                                  allow_batch_metachars ? test_arg4.data() : nullptr,
+                                                  nullptr };
 
     tr_error* error = nullptr;
-    bool const ret = tr_spawn_async(args.data(), nullptr, nullptr, &error);
+    bool const ret = tr_spawn_async(std::data(args), {}, nullptr, &error);
     EXPECT_TRUE(ret) << args[0] << ' ' << args[1];
     EXPECT_EQ(nullptr, error) << error->code << ", " << error->message;
 
@@ -139,24 +129,29 @@ TEST_P(SubprocessTest, SpawnAsyncArgs)
 
     buffer[0] = '\0';
     EXPECT_TRUE(tr_sys_file_read_line(fd, buffer.data(), buffer.size(), nullptr));
+    buffer.back() = '\0';
     EXPECT_EQ(test_arg1, buffer.data());
 
     buffer[0] = '\0';
     EXPECT_TRUE(tr_sys_file_read_line(fd, buffer.data(), buffer.size(), nullptr));
+    buffer.back() = '\0';
     EXPECT_EQ(test_arg2, buffer.data());
 
     buffer[0] = '\0';
     EXPECT_TRUE(tr_sys_file_read_line(fd, buffer.data(), buffer.size(), nullptr));
+    buffer.back() = '\0';
     EXPECT_EQ(test_arg3, buffer.data());
 
     if (allow_batch_metachars)
     {
         buffer[0] = '\0';
         EXPECT_TRUE(tr_sys_file_read_line(fd, buffer.data(), buffer.size(), nullptr));
+        buffer.back() = '\0';
         EXPECT_EQ(test_arg4, buffer.data());
     }
 
     EXPECT_FALSE(tr_sys_file_read_line(fd, buffer.data(), buffer.size(), nullptr));
+    buffer.back() = '\0';
 
     tr_sys_file_close(fd, nullptr);
 }
@@ -178,34 +173,31 @@ TEST_P(SubprocessTest, SpawnAsyncEnv)
     auto const test_env_value4 = std::string{ "bar" };
     auto const test_env_value5 = std::string{ "jar" };
 
-    auto args = std::array<char*, 10>{
-        //  FIXME(ckerr): remove tr_strdup()s after https://github.com/transmission/transmission/issues/1384
-        tr_strdup(self_path_.c_str()), //
-        tr_strdup(result_path.data()), //
-        tr_strdup(arg_dump_env_.data()), //
-        tr_strdup(test_env_key1.data()), //
-        tr_strdup(test_env_key2.data()), //
-        tr_strdup(test_env_key3.data()), //
-        tr_strdup(test_env_key4.data()), //
-        tr_strdup(test_env_key5.data()), //
-        tr_strdup(test_env_key6.data()), //
+    auto args = std::array<char const*, 10>{
+        self_path_.c_str(), //
+        result_path.data(), //
+        arg_dump_env_.data(), //
+        test_env_key1.data(), //
+        test_env_key2.data(), //
+        test_env_key3.data(), //
+        test_env_key4.data(), //
+        test_env_key5.data(), //
+        test_env_key6.data(), //
         nullptr, //
     };
 
-    auto env = std::array<char*, 5>{
-        //  FIXME(ckerr): remove tr_strdup()s after https://github.com/transmission/transmission/issues/1384
-        tr_strdup_printf("%s=%s", test_env_key1.data(), test_env_value1.data()),
-        tr_strdup_printf("%s=%s", test_env_key2.data(), test_env_value2.data()),
-        tr_strdup_printf("%s=%s", test_env_key3.data(), test_env_value3.data()),
-        tr_strdup_printf("%s=%s", test_env_key5.data(), test_env_value5.data()),
-        nullptr,
+    auto const env = std::map<std::string_view, std::string_view>{
+        { test_env_key1, test_env_value1 },
+        { test_env_key2, test_env_value2 },
+        { test_env_key3, test_env_value3 },
+        { test_env_key5, test_env_value5 },
     };
 
-    setenv("FOO", "bar", true); // inherited
-    setenv("ZOO", "tar", true); // overridden
+    setenv("FOO", "bar", 1 /*true*/); // inherited
+    setenv("ZOO", "tar", 1 /*true*/); // overridden
 
     tr_error* error = nullptr;
-    bool const ret = tr_spawn_async(args.data(), env.data(), nullptr, &error);
+    bool const ret = tr_spawn_async(std::data(args), env, nullptr, &error);
     EXPECT_TRUE(ret);
     EXPECT_EQ(nullptr, error);
 
@@ -243,11 +235,6 @@ TEST_P(SubprocessTest, SpawnAsyncEnv)
     EXPECT_FALSE(tr_sys_file_read_line(fd, buffer.data(), buffer.size(), nullptr));
 
     tr_sys_file_close(fd, nullptr);
-
-    for (auto& env_item : env)
-    {
-        tr_free(env_item);
-    }
 }
 
 TEST_P(SubprocessTest, SpawnAsyncCwdExplicit)
@@ -255,16 +242,10 @@ TEST_P(SubprocessTest, SpawnAsyncCwdExplicit)
     auto const test_dir = sandbox_.path();
     auto const result_path = buildSandboxPath("result.txt");
 
-    auto args = std::array<char*, 4>{
-        //  FIXME(ckerr): remove tr_strdup()s after https://github.com/transmission/transmission/issues/1384
-        tr_strdup(self_path_.c_str()),
-        tr_strdup(result_path.data()),
-        tr_strdup(arg_dump_cwd_.data()),
-        nullptr
-    };
+    auto const args = std::array<char const*, 4>{ self_path_.c_str(), result_path.data(), arg_dump_cwd_.data(), nullptr };
 
     tr_error* error = nullptr;
-    bool const ret = tr_spawn_async(args.data(), nullptr, test_dir.c_str(), &error);
+    bool const ret = tr_spawn_async(std::data(args), {}, test_dir.c_str(), &error);
     EXPECT_TRUE(ret);
     EXPECT_EQ(nullptr, error);
 
@@ -289,16 +270,10 @@ TEST_P(SubprocessTest, SpawnAsyncCwdInherit)
     auto const result_path = buildSandboxPath("result.txt");
     auto const expected_cwd = nativeCwd();
 
-    auto args = std::array<char*, 4>{
-        //  FIXME(ckerr): remove tr_strdup()s after https://github.com/transmission/transmission/issues/1384
-        tr_strdup(self_path_.c_str()),
-        tr_strdup(result_path.data()),
-        tr_strdup(arg_dump_cwd_.data()),
-        nullptr
-    };
+    auto const args = std::array<char const*, 4>{ self_path_.c_str(), result_path.data(), arg_dump_cwd_.data(), nullptr };
 
     tr_error* error = nullptr;
-    auto const ret = tr_spawn_async(args.data(), nullptr, nullptr, &error);
+    auto const ret = tr_spawn_async(std::data(args), {}, nullptr, &error);
     EXPECT_TRUE(ret);
     EXPECT_EQ(nullptr, error);
 
@@ -318,16 +293,10 @@ TEST_P(SubprocessTest, SpawnAsyncCwdMissing)
 {
     auto const result_path = buildSandboxPath("result.txt");
 
-    auto args = std::array<char*, 4>{
-        //  FIXME(ckerr): remove tr_strdup()s after https://github.com/transmission/transmission/issues/1384
-        tr_strdup(self_path_.c_str()),
-        tr_strdup(result_path.data()),
-        tr_strdup(arg_dump_cwd_.data()),
-        nullptr
-    };
+    auto const args = std::array<char const*, 4>{ self_path_.c_str(), result_path.data(), arg_dump_cwd_.data(), nullptr };
 
     tr_error* error = nullptr;
-    auto const ret = tr_spawn_async(args.data(), nullptr, TR_IF_WIN32("C:\\", "/") "tr-missing-test-work-dir", &error);
+    auto const ret = tr_spawn_async(std::data(args), {}, TR_IF_WIN32("C:\\", "/") "tr-missing-test-work-dir", &error);
     EXPECT_FALSE(ret);
     EXPECT_NE(nullptr, error);
     EXPECT_NE(0, error->code);

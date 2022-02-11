@@ -1,10 +1,7 @@
-/*
- * This file Copyright (C) 2008-2014 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2008-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #pragma once
 
@@ -13,9 +10,10 @@
 #endif
 
 #include "transmission.h"
+
 #include "bitfield.h"
 #include "history.h"
-#include "quark.h"
+#include "interned-string.h"
 
 /**
  * @addtogroup peers Peers
@@ -90,9 +88,6 @@ public:
     /* how many requests the peer has made that we haven't responded to yet */
     int pendingReqsToClient = 0;
 
-    /* how many requests we've made and are currently awaiting a response for */
-    int pendingReqsToPeer = 0;
-
     tr_session* const session;
 
     /* Hook to private peer-mgr information */
@@ -108,7 +103,7 @@ public:
 
     /* the client name.
        For BitTorrent peers, this is the app name derived from the `v' string in LTEP's handshake dictionary */
-    tr_quark client = TR_KEY_NONE;
+    tr_interned_string client;
 
     tr_recentHistory blocksSentToClient;
     tr_recentHistory blocksSentToPeer;

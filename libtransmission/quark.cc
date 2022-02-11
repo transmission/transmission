@@ -1,29 +1,25 @@
-/*
- * This file Copyright (C) 2013-2014 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2013-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #include <algorithm>
 #include <array>
-#include <cstring> // strlen()
-#include <iterator>
 #include <string_view>
 #include <vector>
 
 #include "transmission.h"
+
 #include "quark.h"
-#include "tr-assert.h"
-#include "utils.h" // tr_strndup()
+#include "utils.h" // tr_strvDup()
 
 using namespace std::literals;
 
 namespace
 {
 
-auto constexpr my_static = std::array<std::string_view, 394>{ ""sv,
+
+auto constexpr my_static = std::array<std::string_view, 385>{ ""sv,
                                                               "activeTorrentCount"sv,
                                                               "activity-date"sv,
                                                               "activityDate"sv,
@@ -85,7 +81,6 @@ auto constexpr my_static = std::array<std::string_view, 394>{ ""sv,
                                                               "details-window-height"sv,
                                                               "details-window-width"sv,
                                                               "dht-enabled"sv,
-                                                              "display-name"sv,
                                                               "dnd"sv,
                                                               "done-date"sv,
                                                               "doneDate"sv,
@@ -114,7 +109,6 @@ auto constexpr my_static = std::array<std::string_view, 394>{ ""sv,
                                                               "errorString"sv,
                                                               "eta"sv,
                                                               "etaIdle"sv,
-                                                              "failure reason"sv,
                                                               "fields"sv,
                                                               "file-count"sv,
                                                               "fileStats"sv,
@@ -155,10 +149,7 @@ auto constexpr my_static = std::array<std::string_view, 394>{ ""sv,
                                                               "incomplete-dir"sv,
                                                               "incomplete-dir-enabled"sv,
                                                               "info"sv,
-                                                              "info_hash"sv,
                                                               "inhibit-desktop-hibernation"sv,
-                                                              "interval"sv,
-                                                              "ip"sv,
                                                               "ipv4"sv,
                                                               "ipv6"sv,
                                                               "isBackup"sv,
@@ -188,7 +179,6 @@ auto constexpr my_static = std::array<std::string_view, 394>{ ""sv,
                                                               "location"sv,
                                                               "lpd-enabled"sv,
                                                               "m"sv,
-                                                              "magnet-info"sv,
                                                               "magnetLink"sv,
                                                               "main-window-height"sv,
                                                               "main-window-is-maximized"sv,
@@ -206,7 +196,6 @@ auto constexpr my_static = std::array<std::string_view, 394>{ ""sv,
                                                               "metadata_size"sv,
                                                               "metainfo"sv,
                                                               "method"sv,
-                                                              "min interval"sv,
                                                               "min_request_interval"sv,
                                                               "move"sv,
                                                               "msg_type"sv,
@@ -238,7 +227,6 @@ auto constexpr my_static = std::array<std::string_view, 394>{ ""sv,
                                                               "peers"sv,
                                                               "peers2"sv,
                                                               "peers2-6"sv,
-                                                              "peers6"sv,
                                                               "peersConnected"sv,
                                                               "peersFrom"sv,
                                                               "peersGettingFromUs"sv,
@@ -279,6 +267,7 @@ auto constexpr my_static = std::array<std::string_view, 394>{ ""sv,
                                                               "ratio-limit"sv,
                                                               "ratio-limit-enabled"sv,
                                                               "ratio-mode"sv,
+                                                              "read-clipboard"sv,
                                                               "recent-download-dir-1"sv,
                                                               "recent-download-dir-2"sv,
                                                               "recent-download-dir-3"sv,
@@ -379,7 +368,6 @@ auto constexpr my_static = std::array<std::string_view, 394>{ ""sv,
                                                               "torrents"sv,
                                                               "totalSize"sv,
                                                               "total_size"sv,
-                                                              "tracker id"sv,
                                                               "trackerAdd"sv,
                                                               "trackerRemove"sv,
                                                               "trackerReplace"sv,
@@ -412,75 +400,74 @@ auto constexpr my_static = std::array<std::string_view, 394>{ ""sv,
                                                               "v"sv,
                                                               "version"sv,
                                                               "wanted"sv,
-                                                              "warning message"sv,
                                                               "watch-dir"sv,
                                                               "watch-dir-enabled"sv,
                                                               "webseeds"sv,
                                                               "webseedsSendingToUs"sv };
 
-size_t constexpr quarks_are_sorted = ( //
-    []() constexpr
+bool constexpr quarks_are_sorted()
+{
+    for (size_t i = 1; i < std::size(my_static); ++i)
     {
-        for (size_t i = 1; i < std::size(my_static); ++i)
+        if (my_static[i - 1] >= my_static[i])
         {
-            if (my_static[i - 1] >= my_static[i])
-            {
-                return false;
-            }
+            return false;
         }
+    }
 
-        return true;
-    })();
+    return true;
+}
 
-static_assert(quarks_are_sorted, "Predefined quarks must be sorted by their string value");
+static_assert(quarks_are_sorted(), "Predefined quarks must be sorted by their string value");
+static_assert(std::size(my_static) == TR_N_KEYS);
 
 auto& my_runtime{ *new std::vector<std::string_view>{} };
 
 } // namespace
 
-bool tr_quark_lookup(void const* str, size_t len, tr_quark* setme)
+std::optional<tr_quark> tr_quark_lookup(std::string_view key)
 {
-    auto constexpr n_static = std::size(my_static);
-    static_assert(n_static == TR_N_KEYS);
-
-    /* is it in our static array? */
-    auto const key = std::string_view{ static_cast<char const*>(str), len };
-    auto constexpr sbegin = std::begin(my_static), send = std::end(my_static);
+    // is it in our static array?
+    auto constexpr sbegin = std::begin(my_static);
+    auto constexpr send = std::end(my_static);
     auto const sit = std::lower_bound(sbegin, send, key);
     if (sit != send && *sit == key)
     {
-        *setme = std::distance(sbegin, sit);
-        return true;
+        return std::distance(sbegin, sit);
     }
 
     /* was it added during runtime? */
-    auto const rbegin = std::begin(my_runtime), rend = std::end(my_runtime);
+    auto const rbegin = std::begin(my_runtime);
+    auto const rend = std::end(my_runtime);
     auto const rit = std::find(rbegin, rend, key);
     if (rit != rend)
     {
-        *setme = TR_N_KEYS + std::distance(rbegin, rit);
-        return true;
+        return TR_N_KEYS + std::distance(rbegin, rit);
     }
 
-    return false;
+    return {};
 }
 
 tr_quark tr_quark_new(std::string_view str)
 {
-    tr_quark ret = TR_KEY_NONE;
-
-    if (!tr_quark_lookup(std::data(str), std::size(str), &ret))
+    if (auto const prior = tr_quark_lookup(str); prior)
     {
-        ret = TR_N_KEYS + std::size(my_runtime);
-        my_runtime.emplace_back(tr_strndup(std::data(str), std::size(str)), std::size(str));
+        return *prior;
     }
 
+    auto const ret = TR_N_KEYS + std::size(my_runtime);
+    my_runtime.emplace_back(tr_strvDup(str), std::size(str));
     return ret;
+}
+
+std::string_view tr_quark_get_string_view(tr_quark q)
+{
+    return q < TR_N_KEYS ? my_static[q] : my_runtime[q - TR_N_KEYS];
 }
 
 char const* tr_quark_get_string(tr_quark q, size_t* len)
 {
-    auto const& tmp = q < TR_N_KEYS ? my_static[q] : my_runtime[q - TR_N_KEYS];
+    auto const tmp = tr_quark_get_string_view(q);
 
     if (len != nullptr)
     {

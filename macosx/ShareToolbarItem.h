@@ -1,10 +1,7 @@
-//
-//  ShareButtonToolbarItem.h
-//  Transmission
-//
-//  Created by Mitchell Livingston on 1/8/14.
-//  Copyright (c) 2014 The Transmission Project. All rights reserved.
-//
+// This file Copyright © 2008-2022 Transmission authors and contributors.
+// It may be used under the MIT (SPDX: MIT) license.
+// License text can be found in the licenses/ folder.
+// Created by Mitchell Livingston on 1/8/14.
 
 #import "ButtonToolbarItem.h"
 

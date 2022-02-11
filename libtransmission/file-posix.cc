@@ -1,13 +1,10 @@
-/*
- * This file Copyright (C) 2013-2017 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2013-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #undef _GNU_SOURCE
-#define _GNU_SOURCE
+#define _GNU_SOURCE // NOLINT
 
 #include <algorithm>
 #include <array>
@@ -17,6 +14,9 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <string_view>
+#include <vector>
+
 #include <dirent.h>
 #include <fcntl.h> /* O_LARGEFILE, posix_fadvise(), [posix_]fallocate(), fcntl() */
 #include <libgen.h> /* basename(), dirname() */
@@ -25,7 +25,6 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <unistd.h> /* lseek(), write(), ftruncate(), pread(), pwrite(), pathconf(), etc */
-#include <vector>
 
 #ifdef HAVE_XFS_XFS_H
 #include <xfs/xfs.h>
@@ -56,7 +55,6 @@
 #include "error.h"
 #include "file.h"
 #include "log.h"
-#include "platform.h"
 #include "tr-assert.h"
 #include "utils.h"
 
@@ -96,6 +94,8 @@
 #endif
 #endif
 
+using namespace std::literals;
+
 static void set_system_error(tr_error** error, int code)
 {
     if (error == nullptr)
@@ -103,7 +103,7 @@ static void set_system_error(tr_error** error, int code)
         return;
     }
 
-    tr_error_set_literal(error, code, tr_strerror(code));
+    tr_error_set(error, code, tr_strerror(code));
 }
 
 static void set_system_error_if_file_found(tr_error** error, int code)
@@ -175,7 +175,7 @@ static bool create_path_require_dir(char const* path, tr_error** error)
 
     if ((sb.st_mode & S_IFMT) != S_IFDIR)
     {
-        tr_error_set(error, ENOTDIR, _("File \"%s\" is in the way"), path);
+        tr_error_set(error, ENOTDIR, tr_strvJoin("File is in the way: "sv, path));
         return false;
     }
 
@@ -185,7 +185,7 @@ static bool create_path_require_dir(char const* path, tr_error** error)
 static bool create_path(char const* path_in, int permissions, tr_error** error)
 {
     /* make a temporary copy of path */
-    char* path = tr_strdup(path_in);
+    char* const path = tr_strdup(path_in);
 
     /* walk past the root */
     char* p = path;
@@ -202,7 +202,7 @@ static bool create_path(char const* path_in, int permissions, tr_error** error)
         --path_end;
     }
 
-    char* pp;
+    char* pp = nullptr;
     bool ret = false;
     tr_error* my_error = nullptr;
 
@@ -297,7 +297,7 @@ bool tr_sys_path_get_info(char const* path, int flags, tr_sys_path_info* info, t
     TR_ASSERT(path != nullptr);
     TR_ASSERT(info != nullptr);
 
-    bool ret;
+    bool ret = false;
     struct stat sb;
 
     if ((flags & TR_SYS_PATH_NO_FOLLOW) == 0)
@@ -321,11 +321,9 @@ bool tr_sys_path_get_info(char const* path, int flags, tr_sys_path_info* info, t
     return ret;
 }
 
-bool tr_sys_path_is_relative(char const* path)
+bool tr_sys_path_is_relative(std::string_view path)
 {
-    TR_ASSERT(path != nullptr);
-
-    return path[0] != '/';
+    return std::empty(path) || path.front() != '/';
 }
 
 bool tr_sys_path_is_same(char const* path1, char const* path2, tr_error** error)
@@ -380,15 +378,10 @@ char* tr_sys_path_resolve(char const* path, tr_error** error)
     return ret;
 }
 
-char* tr_sys_path_basename(char const* path, tr_error** error)
+char* tr_sys_path_basename(std::string_view path, tr_error** error)
 {
-    TR_ASSERT(path != nullptr);
-
-    char* ret = nullptr;
-    char* tmp;
-
-    tmp = tr_strdup(path);
-    ret = basename(tmp);
+    char* const tmp = tr_strvDup(path);
+    char* ret = basename(tmp);
 
     if (ret != nullptr)
     {
@@ -404,11 +397,9 @@ char* tr_sys_path_basename(char const* path, tr_error** error)
     return ret;
 }
 
-char* tr_sys_path_dirname(char const* path, tr_error** error)
+char* tr_sys_path_dirname(std::string_view path, tr_error** error)
 {
-    TR_ASSERT(path != nullptr);
-
-    char* tmp = tr_strdup(path);
+    char* const tmp = tr_strvDup(path);
     char* ret = dirname(tmp);
 
     if (ret != nullptr)
@@ -430,7 +421,7 @@ bool tr_sys_path_rename(char const* src_path, char const* dst_path, tr_error** e
     TR_ASSERT(src_path != nullptr);
     TR_ASSERT(dst_path != nullptr);
 
-    bool ret = rename(src_path, dst_path) != -1;
+    bool const ret = rename(src_path, dst_path) != -1;
 
     if (!ret)
     {
@@ -563,7 +554,7 @@ bool tr_sys_path_remove(char const* path, tr_error** error)
 {
     TR_ASSERT(path != nullptr);
 
-    bool ret = remove(path) != -1;
+    bool const ret = remove(path) != -1;
 
     if (!ret)
     {
@@ -637,7 +628,7 @@ tr_sys_file_t tr_sys_file_open(char const* path, int flags, int permissions, tr_
         }
     }
 
-    tr_sys_file_t ret = open(path, native_flags, permissions);
+    tr_sys_file_t const ret = open(path, native_flags, permissions);
 
     if (ret != TR_BAD_SYS_FILE)
     {
@@ -658,7 +649,7 @@ tr_sys_file_t tr_sys_file_open_temp(char* path_template, tr_error** error)
 {
     TR_ASSERT(path_template != nullptr);
 
-    tr_sys_file_t ret = mkstemp(path_template);
+    tr_sys_file_t const ret = mkstemp(path_template);
 
     if (ret == TR_BAD_SYS_FILE)
     {
@@ -674,7 +665,7 @@ bool tr_sys_file_close(tr_sys_file_t handle, tr_error** error)
 {
     TR_ASSERT(handle != TR_BAD_SYS_FILE);
 
-    bool ret = close(handle) != -1;
+    bool const ret = close(handle) != -1;
 
     if (!ret)
     {
@@ -690,7 +681,7 @@ bool tr_sys_file_get_info(tr_sys_file_t handle, tr_sys_path_info* info, tr_error
     TR_ASSERT(info != nullptr);
 
     struct stat sb;
-    bool ret = fstat(handle, &sb) != -1;
+    bool const ret = fstat(handle, &sb) != -1;
 
     if (ret)
     {
@@ -714,11 +705,9 @@ bool tr_sys_file_seek(tr_sys_file_t handle, int64_t offset, tr_seek_origin_t ori
     TR_ASSERT(origin == TR_SEEK_SET || origin == TR_SEEK_CUR || origin == TR_SEEK_END);
 
     bool ret = false;
-    off_t my_new_offset;
 
-    static_assert(sizeof(*new_offset) >= sizeof(my_new_offset), "");
-
-    my_new_offset = lseek(handle, offset, origin);
+    off_t const my_new_offset = lseek(handle, offset, origin);
+    static_assert(sizeof(*new_offset) >= sizeof(my_new_offset));
 
     if (my_new_offset != -1)
     {
@@ -743,11 +732,9 @@ bool tr_sys_file_read(tr_sys_file_t handle, void* buffer, uint64_t size, uint64_
     TR_ASSERT(buffer != nullptr || size == 0);
 
     bool ret = false;
-    ssize_t my_bytes_read;
 
-    static_assert(sizeof(*bytes_read) >= sizeof(my_bytes_read), "");
-
-    my_bytes_read = read(handle, buffer, size);
+    ssize_t const my_bytes_read = read(handle, buffer, size);
+    static_assert(sizeof(*bytes_read) >= sizeof(my_bytes_read));
 
     if (my_bytes_read != -1)
     {
@@ -780,26 +767,18 @@ bool tr_sys_file_read_at(
     TR_ASSERT(offset < UINT64_MAX / 2);
 
     bool ret = false;
-    ssize_t my_bytes_read;
-
-    static_assert(sizeof(*bytes_read) >= sizeof(my_bytes_read), "");
 
 #ifdef HAVE_PREAD
 
-    my_bytes_read = pread(handle, buffer, size, offset);
+    ssize_t const my_bytes_read = pread(handle, buffer, size, offset);
 
 #else
 
-    if (lseek(handle, offset, SEEK_SET) != -1)
-    {
-        my_bytes_read = read(handle, buffer, size);
-    }
-    else
-    {
-        my_bytes_read = -1;
-    }
+    ssize_t const my_bytes_read = lseek(handle, offset, SEEK_SET) == -1 ? -1 : read(handle, buffer, size);
 
 #endif
+
+    static_assert(sizeof(*bytes_read) >= sizeof(my_bytes_read));
 
     if (my_bytes_read != -1)
     {
@@ -824,11 +803,9 @@ bool tr_sys_file_write(tr_sys_file_t handle, void const* buffer, uint64_t size, 
     TR_ASSERT(buffer != nullptr || size == 0);
 
     bool ret = false;
-    ssize_t my_bytes_written;
 
-    static_assert(sizeof(*bytes_written) >= sizeof(my_bytes_written), "");
-
-    my_bytes_written = write(handle, buffer, size);
+    ssize_t const my_bytes_written = write(handle, buffer, size);
+    static_assert(sizeof(*bytes_written) >= sizeof(my_bytes_written));
 
     if (my_bytes_written != -1)
     {
@@ -861,26 +838,18 @@ bool tr_sys_file_write_at(
     TR_ASSERT(offset < UINT64_MAX / 2);
 
     bool ret = false;
-    ssize_t my_bytes_written;
-
-    static_assert(sizeof(*bytes_written) >= sizeof(my_bytes_written), "");
 
 #ifdef HAVE_PWRITE
 
-    my_bytes_written = pwrite(handle, buffer, size, offset);
+    ssize_t const my_bytes_written = pwrite(handle, buffer, size, offset);
 
 #else
 
-    if (lseek(handle, offset, SEEK_SET) != -1)
-    {
-        my_bytes_written = write(handle, buffer, size);
-    }
-    else
-    {
-        my_bytes_written = -1;
-    }
+    ssize_t const my_bytes_written = lseek(handle, offset, SEEK_SET) == -1 ? -1 : write(handle, buffer, size);
 
 #endif
+
+    static_assert(sizeof(*bytes_written) >= sizeof(my_bytes_written));
 
     if (my_bytes_written != -1)
     {
@@ -948,9 +917,7 @@ bool tr_sys_file_advise(
 
     TR_ASSERT(native_advice != POSIX_FADV_NORMAL);
 
-    int const code = posix_fadvise(handle, offset, size, native_advice);
-
-    if (code != 0)
+    if (int const code = posix_fadvise(handle, offset, size, native_advice); code != 0)
     {
         set_system_error(error, code);
         ret = false;
@@ -1083,8 +1050,7 @@ bool tr_sys_file_preallocate(tr_sys_file_t handle, uint64_t size, int flags, tr_
     {
         errno = 0;
 
-        auto const success = approach(handle, size);
-        if (success)
+        if (auto const success = approach(handle, size); success)
         {
             return success;
         }
@@ -1137,7 +1103,7 @@ bool tr_sys_file_lock([[maybe_unused]] tr_sys_file_t handle, [[maybe_unused]] in
     TR_ASSERT(
         !!(operation & TR_SYS_FILE_LOCK_SH) + !!(operation & TR_SYS_FILE_LOCK_EX) + !!(operation & TR_SYS_FILE_LOCK_UN) == 1);
 
-    bool ret;
+    bool ret = false;
 
 #if defined(F_OFD_SETLK)
 
@@ -1216,9 +1182,7 @@ bool tr_sys_file_lock([[maybe_unused]] tr_sys_file_t handle, [[maybe_unused]] in
 
 char* tr_sys_dir_get_current(tr_error** error)
 {
-    char* ret;
-
-    ret = getcwd(nullptr, 0);
+    char* ret = getcwd(nullptr, 0);
 
     if (ret == nullptr && (errno == EINVAL || errno == ERANGE))
     {
@@ -1258,7 +1222,7 @@ bool tr_sys_dir_create(char const* path, int flags, int permissions, tr_error** 
 {
     TR_ASSERT(path != nullptr);
 
-    bool ret;
+    bool ret = false;
     tr_error* my_error = nullptr;
 
     if ((flags & TR_SYS_DIR_CREATE_PARENTS) != 0)
@@ -1308,15 +1272,13 @@ bool tr_sys_dir_create_temp(char* path_template, tr_error** error)
 {
     TR_ASSERT(path_template != nullptr);
 
-    bool ret;
-
 #ifdef HAVE_MKDTEMP
 
-    ret = mkdtemp(path_template) != nullptr;
+    bool const ret = mkdtemp(path_template) != nullptr;
 
 #else
 
-    ret = mktemp(path_template) != nullptr && mkdir(path_template, 0700) != -1;
+    bool const ret = mktemp(path_template) != nullptr && mkdir(path_template, 0700) != -1;
 
 #endif
 
@@ -1350,9 +1312,8 @@ char const* tr_sys_dir_read_name(tr_sys_dir_t handle, tr_error** error)
     char const* ret = nullptr;
 
     errno = 0;
-    struct dirent const* const entry = readdir((DIR*)handle);
 
-    if (entry != nullptr)
+    if (auto const* const entry = readdir((DIR*)handle); entry != nullptr)
     {
         ret = entry->d_name;
     }

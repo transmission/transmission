@@ -1,11 +1,6 @@
-/**
- * @license
- *
- * Copyright © Charles Kerr, Dave Perrett, Malcolm Jarvis and Bruno Bierbaumer
- *
- * This file is licensed under the GPLv2.
- * http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
- */
+/* @license This file Copyright © Charles Kerr, Dave Perrett, Malcolm Jarvis and Bruno Bierbaumer
+   It may be used under GPLv2 (SPDX: GPL-2.0-only).
+   License text can be found in the licenses/ folder. */
 
 import { AlertDialog } from './alert-dialog.js';
 
@@ -106,6 +101,14 @@ export class Remote {
       method: 'torrent-rename-path',
     };
     this.sendRequest(o, callback, context);
+  }
+
+  setLabels(torrentIds, labels, callback) {
+    const args = {
+      ids: torrentIds,
+      labels,
+    };
+    this.sendRequest({ arguments: args, method: 'torrent-set' }, callback);
   }
 
   loadDaemonStats(callback, context) {

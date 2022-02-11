@@ -1,24 +1,6 @@
-/******************************************************************************
- * Copyright (c) 2005-2019 Transmission authors and contributors
- *
- * Permission is hereby granted, free of charge, to any person obtaining a
- * copy of this software and associated documentation files (the "Software"),
- * to deal in the Software without restriction, including without limitation
- * the rights to use, copy, modify, merge, publish, distribute, sublicense,
- * and/or sell copies of the Software, and to permit persons to whom the
- * Software is furnished to do so, subject to the following conditions:
- *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
- * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
- * DEALINGS IN THE SOFTWARE.
- *****************************************************************************/
+// This file Copyright © 2005-2022 Transmission authors and contributors.
+// It may be used under the MIT (SPDX: MIT) license.
+// License text can be found in the licenses/ folder.
 
 #import "TorrentTableView.h"
 #import "Controller.h"
@@ -43,7 +25,7 @@
 
 #define TOGGLE_PROGRESS_SECONDS 0.175
 
-@interface TorrentTableView (Private)
+@interface TorrentTableView ()
 
 - (BOOL)pointInGroupStatusRect:(NSPoint)point;
 
@@ -593,7 +575,9 @@
 {
     unichar const firstChar = [event.charactersIgnoringModifiers characterAtIndex:0];
 
-    if (firstChar == 'f' && event.modifierFlags & NSAlternateKeyMask && event.modifierFlags & NSCommandKeyMask)
+    if (firstChar == 'f' &&
+        event.modifierFlags & NSEventModifierFlagOption &&
+        event.modifierFlags & NSEventModifierFlagCommand)
     {
         [fController focusFilterField];
     }
@@ -688,7 +672,7 @@
     }
     else
     {
-        if (NSEvent.modifierFlags & NSAlternateKeyMask)
+        if (NSEvent.modifierFlags & NSEventModifierFlagOption)
         {
             [fController resumeTorrentsNoWait:@[ torrent ]];
         }
@@ -776,12 +760,12 @@
         BOOL const limit = [fMenuTorrent usesSpeedLimit:upload];
 
         item = [menu itemWithTag:ACTION_MENU_LIMIT_TAG];
-        item.state = limit ? NSOnState : NSOffState;
+        item.state = limit ? NSControlStateValueOn : NSControlStateValueOff;
         item.title = [NSString stringWithFormat:NSLocalizedString(@"Limit (%d KB/s)", "torrent action menu -> upload/download limit"),
                                                 [fMenuTorrent speedLimit:upload]];
 
         item = [menu itemWithTag:ACTION_MENU_UNLIMITED_TAG];
-        item.state = !limit ? NSOnState : NSOffState;
+        item.state = !limit ? NSControlStateValueOn : NSControlStateValueOff;
     }
     else if (menu == fRatioMenu)
     {
@@ -804,28 +788,28 @@
         tr_ratiolimit const mode = fMenuTorrent.ratioSetting;
 
         item = [menu itemWithTag:ACTION_MENU_LIMIT_TAG];
-        item.state = mode == TR_RATIOLIMIT_SINGLE ? NSOnState : NSOffState;
+        item.state = mode == TR_RATIOLIMIT_SINGLE ? NSControlStateValueOn : NSControlStateValueOff;
         item.title = [NSString localizedStringWithFormat:NSLocalizedString(@"Stop at Ratio (%.2f)", "torrent action menu -> ratio stop"),
                                                          fMenuTorrent.ratioLimit];
 
         item = [menu itemWithTag:ACTION_MENU_UNLIMITED_TAG];
-        item.state = mode == TR_RATIOLIMIT_UNLIMITED ? NSOnState : NSOffState;
+        item.state = mode == TR_RATIOLIMIT_UNLIMITED ? NSControlStateValueOn : NSControlStateValueOff;
 
         item = [menu itemWithTag:ACTION_MENU_GLOBAL_TAG];
-        item.state = mode == TR_RATIOLIMIT_GLOBAL ? NSOnState : NSOffState;
+        item.state = mode == TR_RATIOLIMIT_GLOBAL ? NSControlStateValueOn : NSControlStateValueOff;
     }
     else if (menu == fPriorityMenu)
     {
         tr_priority_t const priority = fMenuTorrent.priority;
 
         NSMenuItem* item = [menu itemWithTag:ACTION_MENU_PRIORITY_HIGH_TAG];
-        item.state = priority == TR_PRI_HIGH ? NSOnState : NSOffState;
+        item.state = priority == TR_PRI_HIGH ? NSControlStateValueOn : NSControlStateValueOff;
 
         item = [menu itemWithTag:ACTION_MENU_PRIORITY_NORMAL_TAG];
-        item.state = priority == TR_PRI_NORMAL ? NSOnState : NSOffState;
+        item.state = priority == TR_PRI_NORMAL ? NSControlStateValueOn : NSControlStateValueOff;
 
         item = [menu itemWithTag:ACTION_MENU_PRIORITY_LOW_TAG];
-        item.state = priority == TR_PRI_LOW ? NSOnState : NSOffState;
+        item.state = priority == TR_PRI_LOW ? NSControlStateValueOn : NSControlStateValueOff;
     }
 }
 
@@ -849,7 +833,7 @@
 
 - (void)setGlobalLimit:(id)sender
 {
-    fMenuTorrent.usesGlobalSpeedLimit = ((NSButton*)sender).state != NSOnState;
+    fMenuTorrent.usesGlobalSpeedLimit = ((NSButton*)sender).state != NSControlStateValueOn;
 
     [NSNotificationCenter.defaultCenter postNotificationName:@"UpdateOptions" object:nil];
 }
@@ -975,10 +959,6 @@
 
     [[self.superview animator] setBoundsOrigin:scrollOrigin];
 }
-
-@end
-
-@implementation TorrentTableView (Private)
 
 - (BOOL)pointInGroupStatusRect:(NSPoint)point
 {

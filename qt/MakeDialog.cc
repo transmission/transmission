@@ -1,12 +1,11 @@
-/*
- * This file Copyright (C) 2009-2015 Mnemosyne LLC
- *
- * It may be used under the GNU GPL versions 2 or 3
- * or any future license endorsed by Mnemosyne LLC.
- *
- */
+// This file Copyright © 2009-2022 Mnemosyne LLC.
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
+// or any future license endorsed by Mnemosyne LLC.
+// License text can be found in the licenses/ folder.
 
 #include "MakeDialog.h"
+
+#include <vector>
 
 #include <QDir>
 #include <QFileInfo>
@@ -92,31 +91,31 @@ void MakeProgressDialog::onProgress()
     ui_.progressBar->setValue(static_cast<int>((100.0 * b.pieceIndex) / denom));
 
     // progress label
-    QString const top = QString::fromUtf8(b.top);
-    QString const base(QFileInfo(top).completeBaseName());
+    auto const top = QString::fromUtf8(b.top);
+    auto const base = QFileInfo(top).completeBaseName();
     QString str;
 
     if (!b.isDone)
     {
         str = tr("Creating \"%1\"").arg(base);
     }
-    else if (b.result == TR_MAKEMETA_OK)
+    else if (b.result == TrMakemetaResult::OK)
     {
         str = tr("Created \"%1\"!").arg(base);
     }
-    else if (b.result == TR_MAKEMETA_URL)
-    {
-        str = tr("Error: invalid announce URL \"%1\"").arg(QString::fromUtf8(b.errfile));
-    }
-    else if (b.result == TR_MAKEMETA_CANCELLED)
+    else if (b.result == TrMakemetaResult::CANCELLED)
     {
         str = tr("Cancelled");
     }
-    else if (b.result == TR_MAKEMETA_IO_READ)
+    else if (b.result == TrMakemetaResult::ERR_URL)
+    {
+        str = tr("Error: invalid announce URL \"%1\"").arg(QString::fromUtf8(b.errfile));
+    }
+    else if (b.result == TrMakemetaResult::ERR_IO_READ)
     {
         str = tr("Error reading \"%1\": %2").arg(QString::fromUtf8(b.errfile)).arg(QString::fromUtf8(tr_strerror(b.my_errno)));
     }
-    else if (b.result == TR_MAKEMETA_IO_WRITE)
+    else if (b.result == TrMakemetaResult::ERR_IO_WRITE)
     {
         str = tr("Error writing \"%1\": %2").arg(QString::fromUtf8(b.errfile)).arg(QString::fromUtf8(tr_strerror(b.my_errno)));
     }
@@ -126,7 +125,7 @@ void MakeProgressDialog::onProgress()
     // buttons
     ui_.dialogButtons->button(QDialogButtonBox::Abort)->setEnabled(!b.isDone);
     ui_.dialogButtons->button(QDialogButtonBox::Ok)->setEnabled(b.isDone);
-    ui_.dialogButtons->button(QDialogButtonBox::Open)->setEnabled(b.isDone && b.result == TR_MAKEMETA_OK);
+    ui_.dialogButtons->button(QDialogButtonBox::Open)->setEnabled(b.isDone && b.result == TrMakemetaResult::OK);
 }
 
 #include "MakeDialog.moc"
@@ -144,7 +143,7 @@ void MakeDialog::makeTorrent()
 
     // get the tiers
     int tier = 0;
-    QVector<tr_tracker_info> trackers;
+    std::vector<tr_tracker_info> trackers;
 
     for (QString const& line : ui_.trackersEdit->toPlainText().split(QLatin1Char('\n')))
     {
@@ -159,7 +158,7 @@ void MakeDialog::makeTorrent()
             auto tmp = tr_tracker_info{};
             tmp.announce = tr_strdup(announce_url.toUtf8().constData());
             tmp.tier = tier;
-            trackers.append(tmp);
+            trackers.push_back(tmp);
         }
     }
 
@@ -188,7 +187,7 @@ void MakeDialog::makeTorrent()
     tr_makeMetaInfo(
         builder_.get(),
         target.toUtf8().constData(),
-        trackers.isEmpty() ? nullptr : trackers.data(),
+        trackers.empty() ? nullptr : trackers.data(),
         trackers.size(),
         comment.isEmpty() ? nullptr : comment.toUtf8().constData(),
         ui_.privateCheck->isChecked(),
@@ -217,9 +216,7 @@ void MakeDialog::onSourceChanged()
 {
     builder_.reset();
 
-    QString const filename = getSource();
-
-    if (!filename.isEmpty())
+    if (auto const filename = getSource(); !filename.isEmpty())
     {
         builder_.reset(tr_metaInfoBuilderCreate(filename.toUtf8().constData()));
     }
