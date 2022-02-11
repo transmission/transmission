@@ -556,7 +556,7 @@ void DetailsDialog::refreshUI()
 
         if (f != 0)
         {
-            string = tr("%1 (%2 corrupt)").arg(dstr).arg(fstr);
+            string = tr("%1 (+%2 discarded after failed checksum)").arg(dstr).arg(fstr);
         }
         else
         {
