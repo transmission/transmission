@@ -516,9 +516,10 @@ void gtr_unrecognized_url_dialog(Gtk::Widget& parent, Glib::ustring const& url)
     auto w = std::make_shared<Gtk::MessageDialog>(
         *window,
         _("Unrecognized URL"),
-        false,
+        false /*use markup*/,
         Gtk::MESSAGE_ERROR,
-        Gtk::BUTTONS_CLOSE);
+        Gtk::BUTTONS_CLOSE,
+        true /*modal*/);
 
     gstr += gtr_sprintf(_("Transmission doesn't know how to use \"%s\""), url);
 

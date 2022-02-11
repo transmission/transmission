@@ -126,7 +126,7 @@ char const* tr_getDefaultDownloadDir(void);
 #define TR_DEFAULT_RPC_PORT 9091
 #define TR_DEFAULT_RPC_URL_STR "/transmission/"
 #define TR_DEFAULT_PEER_PORT_STR "51413"
-#define TR_DEFAULT_PEER_SOCKET_TOS_STR "default"
+#define TR_DEFAULT_PEER_SOCKET_TOS_STR "le"
 #define TR_DEFAULT_PEER_LIMIT_GLOBAL_STR "200"
 #define TR_DEFAULT_PEER_LIMIT_TORRENT_STR "50"
 #define TR_DEFAULT_PEER_LIMIT_TORRENT 50
