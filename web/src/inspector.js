@@ -340,7 +340,9 @@ export class Inspector extends EventTarget {
         (accumulator, t) => accumulator + t.getFailedEver(),
         0
       );
-      string = f ? `${fmt.size(d)} (${fmt.size(f)} corrupt)` : fmt.size(d);
+      string = f
+        ? `${fmt.size(d)} (+${fmt.size(f)} discarded after failed checksum)`
+        : fmt.size(d);
     }
     setTextContent(e.info.downloaded, string);
 
