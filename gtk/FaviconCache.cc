@@ -11,6 +11,7 @@
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/web.h> /* tr_webRun() */
+#include <libtransmission/web-utils.h>
 
 #include "FaviconCache.h"
 #include "Utils.h" /* gtr_get_host_from_url() */
@@ -144,5 +145,6 @@ void gtr_get_favicon_from_url(
     Glib::ustring const& url,
     std::function<void(Glib::RefPtr<Gdk::Pixbuf> const&)> const& pixbuf_ready_func)
 {
-    gtr_get_favicon(session, gtr_get_host_from_url(url), pixbuf_ready_func);
+    auto const host = std::string{ tr_urlParse(url.c_str())->host };
+    gtr_get_favicon(session, host, pixbuf_ready_func);
 }

@@ -410,23 +410,25 @@ static void addTrackers(tr_torrent const* tor, tr_variant* trackers)
 {
     for (auto const& tracker : tor->announceList())
     {
-        tr_variant* d = tr_variantListAddDict(trackers, 4);
+        auto* const d = tr_variantListAddDict(trackers, 5);
         tr_variantDictAddQuark(d, TR_KEY_announce, tracker.announce_str.quark());
         tr_variantDictAddInt(d, TR_KEY_id, tracker.id);
         tr_variantDictAddQuark(d, TR_KEY_scrape, tracker.scrape_str.quark());
+        tr_variantDictAddStrView(d, TR_KEY_sitename, tracker.announce.sitename);
         tr_variantDictAddInt(d, TR_KEY_tier, tracker.tier);
     }
 }
 
 static void addTrackerStats(tr_tracker_view const& tracker, tr_variant* list)
 {
-    auto* const d = tr_variantListAddDict(list, 26);
+    auto* const d = tr_variantListAddDict(list, 27);
     tr_variantDictAddStr(d, TR_KEY_announce, tracker.announce);
     tr_variantDictAddInt(d, TR_KEY_announceState, tracker.announceState);
     tr_variantDictAddInt(d, TR_KEY_downloadCount, tracker.downloadCount);
     tr_variantDictAddBool(d, TR_KEY_hasAnnounced, tracker.hasAnnounced);
     tr_variantDictAddBool(d, TR_KEY_hasScraped, tracker.hasScraped);
     tr_variantDictAddStr(d, TR_KEY_host, tracker.host);
+    tr_variantDictAddStr(d, TR_KEY_sitename, tracker.sitename);
     tr_variantDictAddInt(d, TR_KEY_id, tracker.id);
     tr_variantDictAddBool(d, TR_KEY_isBackup, tracker.isBackup);
     tr_variantDictAddInt(d, TR_KEY_lastAnnouncePeerCount, tracker.lastAnnouncePeerCount);
