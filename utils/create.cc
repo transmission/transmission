@@ -38,7 +38,7 @@ auto constexpr Options = std::array<tr_option, 9>{
       { 's', "piecesize", "Set the piece size in KiB, overriding the preferred default", "s", true, "<KiB>" },
       { 'c', "comment", "Add a comment", "c", true, "<comment>" },
       { 't', "tracker", "Add a tracker's announce URL", "t", true, "<url>" },
-      { 'u', "url", "Add a webseed URL", "u", true, "<url>" },
+      { 'w', "webseed", "Add a webseed URL", "w", true, "<url>" },
       { 'V', "version", "Show version number and exit", "V", false, nullptr },
       { 0, nullptr, nullptr, nullptr, false, nullptr } }
 };
@@ -85,7 +85,7 @@ int parseCommandLine(app_options& options, int argc, char const* const* argv)
             options.trackers.push_back(tr_tracker_info{ 0, const_cast<char*>(optarg) });
             break;
 
-        case 'u':
+        case 'w':
             options.webseeds.push_back(optarg);
             break;
 
