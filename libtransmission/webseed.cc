@@ -7,7 +7,6 @@
 #include <set>
 #include <string>
 #include <string_view>
-#include <vector>
 
 #include <event2/buffer.h>
 #include <event2/event.h>
@@ -23,6 +22,8 @@
 #include "web-utils.h"
 #include "web.h"
 #include "webseed.h"
+
+using namespace std::literals;
 
 namespace
 {
@@ -71,8 +72,6 @@ public:
         have.setHasAll();
         tr_peerUpdateProgress(tor, this);
 
-        file_urls.resize(tor->fileCount());
-
         tr_timerAddMsec(timer, TR_IDLE_TIMER_MSEC);
     }
 
@@ -117,7 +116,6 @@ public:
     int retry_challenge = 0;
     int idle_connections = 0;
     int active_transfers = 0;
-    std::vector<std::string> file_urls;
 };
 
 } // namespace
@@ -243,43 +241,6 @@ static void write_block_func(void* vdata)
 ****
 ***/
 
-struct connection_succeeded_data
-{
-    tr_webseed* webseed = nullptr;
-    std::string real_url;
-    tr_piece_index_t piece_index = 0;
-    uint32_t piece_offset = 0;
-};
-
-static void connection_succeeded(void* vdata)
-{
-    auto* data = static_cast<struct connection_succeeded_data*>(vdata);
-    struct tr_webseed* w = data->webseed;
-
-    if (++w->active_transfers >= w->retry_challenge && w->retry_challenge != 0)
-    {
-        /* the server seems to be accepting more connections now */
-        w->consecutive_failures = w->retry_tickcount = w->retry_challenge = 0;
-    }
-
-    if (!std::empty(data->real_url))
-    {
-        tr_torrent const* const tor = tr_torrentFindFromId(w->session, w->torrent_id);
-
-        if (tor != nullptr)
-        {
-            auto const file_index = tor->fileOffset(data->piece_index, data->piece_offset).index;
-            w->file_urls[file_index].assign(data->real_url);
-        }
-    }
-
-    delete data;
-}
-
-/***
-****
-***/
-
 static void on_content_changed(struct evbuffer* buf, struct evbuffer_cb_info const* info, void* vtask)
 {
     size_t const n_added = info->n_added;
@@ -301,17 +262,11 @@ static void on_content_changed(struct evbuffer* buf, struct evbuffer_cb_info con
 
             if (task->response_code == 206)
             {
-                auto const* real_url = tr_webGetTaskRealUrl(task->web_task);
-
-                /* processing this uses a tr_torrent pointer,
-                   so push the work to the libevent thread... */
-                tr_runInEventThread(
-                    session,
-                    connection_succeeded,
-                    new connection_succeeded_data{ w,
-                                                   real_url != nullptr ? real_url : "",
-                                                   task->piece_index,
-                                                   task->piece_offset + task->blocks_done * task->block_size + len - 1 });
+                if (++w->active_transfers >= w->retry_challenge && w->retry_challenge != 0)
+                {
+                    /* the server seems to be accepting more connections now */
+                    w->consecutive_failures = w->retry_tickcount = w->retry_challenge = 0;
+                }
             }
         }
 
@@ -491,18 +446,13 @@ static void web_response_func(
 
 static std::string make_url(tr_webseed* w, std::string_view name)
 {
-    struct evbuffer* buf = evbuffer_new();
+    auto url = w->base_url;
 
-    evbuffer_add(buf, std::data(w->base_url), std::size(w->base_url));
-
-    /* if url ends with a '/', add the torrent name */
-    if (*std::rbegin(w->base_url) == '/' && !std::empty(name))
+    if (tr_strvEndsWith(url, "/"sv) && !std::empty(name))
     {
-        tr_http_escape(buf, name, false);
+        tr_http_escape(url, name, false);
     }
 
-    auto url = std::string{ (char const*)evbuffer_pullup(buf, -1), evbuffer_get_length(buf) };
-    evbuffer_free(buf);
     return url;
 }
 
@@ -513,8 +463,6 @@ static void task_request_next_chunk(struct tr_webseed_task* t)
 
     if (tor != nullptr)
     {
-        auto& urls = t->webseed->file_urls;
-
         auto const piece_size = tor->pieceSize();
         uint64_t const remain = t->length - t->blocks_done * tor->blockSize() - evbuffer_get_length(t->content);
 
@@ -525,15 +473,12 @@ static void task_request_next_chunk(struct tr_webseed_task* t)
         auto const [file_index, file_offset] = tor->fileOffset(step_piece, step_piece_offset);
         uint64_t this_pass = std::min(remain, tor->fileSize(file_index) - file_offset);
 
-        if (std::empty(urls[file_index]))
-        {
-            urls[file_index] = make_url(t->webseed, tor->fileSubpath(file_index));
-        }
+        auto const url = make_url(t->webseed, tor->fileSubpath(file_index));
 
         char range[64];
         tr_snprintf(range, sizeof(range), "%" PRIu64 "-%" PRIu64, file_offset, file_offset + this_pass - 1);
 
-        t->web_task = tr_webRunWebseed(tor, urls[file_index].c_str(), range, web_response_func, t, t->content);
+        t->web_task = tr_webRunWebseed(tor, url.c_str(), range, web_response_func, t, t->content);
     }
 }
 
