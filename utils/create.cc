@@ -7,6 +7,7 @@
 #include <cinttypes>
 #include <cstdio>
 #include <cstdlib>
+#include <iostream>
 #include <string>
 
 #include <libtransmission/transmission.h>
@@ -30,13 +31,14 @@ char constexpr Usage[] = "Usage: transmission-create [options] <file|directory>"
 
 uint32_t constexpr KiB = 1024;
 
-auto constexpr Options = std::array<tr_option, 8>{
+auto constexpr Options = std::array<tr_option, 9>{
     { { 'p', "private", "Allow this torrent to only be used with the specified tracker(s)", "p", false, nullptr },
       { 'r', "source", "Set the source for private trackers", "r", true, "<source>" },
       { 'o', "outfile", "Save the generated .torrent to this filename", "o", true, "<file>" },
       { 's', "piecesize", "Set the piece size in KiB, overriding the preferred default", "s", true, "<KiB>" },
       { 'c', "comment", "Add a comment", "c", true, "<comment>" },
       { 't', "tracker", "Add a tracker's announce URL", "t", true, "<url>" },
+      { 'u', "url", "Add a webseed URL", "u", true, "<url>" },
       { 'V', "version", "Show version number and exit", "V", false, nullptr },
       { 0, nullptr, nullptr, nullptr, false, nullptr } }
 };
@@ -44,6 +46,7 @@ auto constexpr Options = std::array<tr_option, 8>{
 struct app_options
 {
     std::vector<tr_tracker_info> trackers;
+    std::vector<char const*> webseeds;
     std::string outfile;
     char const* comment = nullptr;
     char const* infile = nullptr;
@@ -79,7 +82,11 @@ int parseCommandLine(app_options& options, int argc, char const* const* argv)
             break;
 
         case 't':
-            options.trackers.push_back(tr_tracker_info{ 0, const_cast<char*>(optarg), nullptr, 0 });
+            options.trackers.push_back(tr_tracker_info{ 0, const_cast<char*>(optarg) });
+            break;
+
+        case 'u':
+            options.webseeds.push_back(optarg);
             break;
 
         case 's':
@@ -220,6 +227,8 @@ int tr_main(int argc, char* argv[])
         options.outfile.c_str(),
         std::data(options.trackers),
         std::size(options.trackers),
+        std::data(options.webseeds),
+        std::size(options.webseeds),
         options.comment,
         options.is_private,
         options.source);
