@@ -569,6 +569,8 @@ NSMutableSet* creatorWindowControllerSet = nil;
         fLocation.path.UTF8String,
         trackerInfo,
         fTrackers.count,
+        nullptr,
+        0,
         fCommentView.string.UTF8String,
         fPrivateCheck.state == NSControlStateValueOn,
         fSource.stringValue.UTF8String);

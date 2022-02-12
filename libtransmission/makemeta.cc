@@ -234,6 +234,11 @@ void tr_metaInfoBuilderFree(tr_metainfo_builder* builder)
             tr_free(builder->trackers[i].announce);
         }
 
+        for (int i = 0; i < builder->webseedCount; ++i)
+        {
+            tr_free(builder->webseeds[i]);
+        }
+
         tr_free(builder->trackers);
         tr_free(builder->outputFile);
         tr_free(builder);
@@ -420,12 +425,20 @@ static void tr_realMakeMetaInfo(tr_metainfo_builder* builder)
 {
     tr_variant top;
 
-    /* allow an empty set, but if URLs *are* listed, verify them. #814, #971 */
     for (int i = 0; i < builder->trackerCount && builder->result == TrMakemetaResult::OK; ++i)
     {
         if (!tr_urlIsValidTracker(builder->trackers[i].announce))
         {
             tr_strlcpy(builder->errfile, builder->trackers[i].announce, sizeof(builder->errfile));
+            builder->result = TrMakemetaResult::ERR_URL;
+        }
+    }
+
+    for (int i = 0; i < builder->webseedCount && builder->result == TrMakemetaResult::OK; ++i)
+    {
+        if (!tr_urlIsValid(builder->webseeds[i]))
+        {
+            tr_strlcpy(builder->errfile, builder->webseeds[i], sizeof(builder->errfile));
             builder->result = TrMakemetaResult::ERR_URL;
         }
     }
@@ -462,6 +475,16 @@ static void tr_realMakeMetaInfo(tr_metainfo_builder* builder)
         }
 
         tr_variantDictAddStr(&top, TR_KEY_announce, builder->trackers[0].announce);
+    }
+
+    if (builder->result == TrMakemetaResult::OK && builder->webseedCount > 0)
+    {
+        tr_variant* url_list = tr_variantDictAddList(&top, TR_KEY_url_list, builder->webseedCount);
+
+        for (int i = 0; i < builder->webseedCount; ++i)
+        {
+            tr_variantListAddStr(url_list, builder->webseeds[i]);
+        }
     }
 
     if (builder->result == TrMakemetaResult::OK && !builder->abortFlag)
@@ -543,6 +566,8 @@ void tr_makeMetaInfo(
     char const* outputFile,
     tr_tracker_info const* trackers,
     int trackerCount,
+    char const** webseeds,
+    int webseedCount,
     char const* comment,
     bool isPrivate,
     char const* source)
@@ -570,6 +595,13 @@ void tr_makeMetaInfo(
     {
         builder->trackers[i].tier = trackers[i].tier;
         builder->trackers[i].announce = tr_strdup(trackers[i].announce);
+    }
+
+    builder->webseedCount = webseedCount;
+    builder->webseeds = tr_new0(char*, webseedCount);
+    for (int i = 0; i < webseedCount; ++i)
+    {
+        builder->webseeds[i] = tr_strdup(webseeds[i]);
     }
 
     builder->comment = tr_strdup(comment);
