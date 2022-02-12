@@ -48,13 +48,88 @@ struct tr_webseed_task
 
 auto constexpr TR_IDLE_TIMER_MSEC = 2000;
 
-auto constexpr FAILURE_RETRY_INTERVAL = 150;
-
-auto constexpr MAX_CONSECUTIVE_FAILURES = 5;
-
-auto constexpr MAX_WEBSEED_CONNECTIONS = 4;
-
 void webseed_timer_func(evutil_socket_t fd, short what, void* vw);
+
+/**
+ * Manages how many web tasks should be running at a time.
+ *
+ * - When all is well, allow multiple tasks running in parallel.
+ * - If we get an error, throttle down to only one at a time
+ *   until we get piece data.
+ * - If we have too many errors in a row, put the peer in timeout
+ *   and don't allow _any_ connections for awhile.
+ */
+class ConnectionLimiter
+{
+public:
+    void taskStarted()
+    {
+        ++n_tasks;
+    }
+
+    void taskFinished(bool success)
+    {
+        if (!success)
+        {
+            taskFailed();
+        }
+
+        TR_ASSERT(n_tasks > 0);
+        --n_tasks;
+    }
+
+    void gotData()
+    {
+        TR_ASSERT(n_tasks > 0);
+        n_consecutive_failures = 0;
+        paused_until = 0;
+    }
+
+    [[nodiscard]] size_t slotsAvailable() const
+    {
+        if (isPaused())
+        {
+            return 0;
+        }
+
+        auto const max = maxConnections();
+        if (n_tasks >= max)
+        {
+            return 0;
+        }
+
+        return max - n_tasks;
+    }
+
+private:
+    [[nodiscard]] bool isPaused() const
+    {
+        return paused_until > tr_time();
+    }
+
+    [[nodiscard]] size_t maxConnections() const
+    {
+        return n_consecutive_failures > 0 ? 1 : MaxConnections;
+    }
+
+    void taskFailed()
+    {
+        TR_ASSERT(n_tasks > 0);
+
+        if (++n_consecutive_failures >= MaxConsecutiveFailures)
+        {
+            paused_until = tr_time() + TimeoutIntervalSecs;
+        }
+    }
+
+    static time_t constexpr TimeoutIntervalSecs = 120;
+    static size_t constexpr MaxConnections = 4;
+    static size_t constexpr MaxConsecutiveFailures = MaxConnections;
+
+    size_t n_tasks = 0;
+    size_t n_consecutive_failures = 0;
+    time_t paused_until = 0;
+};
 
 struct tr_webseed : public tr_peer
 {
@@ -109,13 +184,9 @@ public:
     void* const callback_data;
 
     Bandwidth bandwidth;
+    ConnectionLimiter connection_limiter;
     std::set<tr_webseed_task*> tasks;
-    struct event* const timer;
-    int consecutive_failures = 0;
-    int retry_tickcount = 0;
-    int retry_challenge = 0;
-    int idle_connections = 0;
-    int active_transfers = 0;
+    event* const timer;
 };
 
 } // namespace
@@ -250,7 +321,7 @@ static void on_content_changed(struct evbuffer* buf, struct evbuffer_cb_info con
 
     if (!task->dead && n_added > 0)
     {
-        struct tr_webseed* w = task->webseed;
+        auto* const w = task->webseed;
 
         w->bandwidth.notifyBandwidthConsumed(TR_DOWN, n_added, true, tr_time_msec());
         fire_client_got_piece_data(w, n_added);
@@ -262,11 +333,7 @@ static void on_content_changed(struct evbuffer* buf, struct evbuffer_cb_info con
 
             if (task->response_code == 206)
             {
-                if (++w->active_transfers >= w->retry_challenge && w->retry_challenge != 0)
-                {
-                    /* the server seems to be accepting more connections now */
-                    w->consecutive_failures = w->retry_tickcount = w->retry_challenge = 0;
-                }
+                task->webseed->connection_limiter.gotData();
             }
         }
 
@@ -301,59 +368,33 @@ static void task_request_next_chunk(struct tr_webseed_task* task);
 
 static void on_idle(tr_webseed* w)
 {
-    auto want = int{};
-    int const running_tasks = std::size(w->tasks);
-    tr_torrent* tor = tr_torrentFindFromId(w->session, w->torrent_id);
-
-    if (w->consecutive_failures >= MAX_CONSECUTIVE_FAILURES)
+    auto* const tor = tr_torrentFindFromId(w->session, w->torrent_id);
+    if (tor == nullptr || !tor->isRunning || tor->isDone() || w->connection_limiter.slotsAvailable() < 1)
     {
-        want = w->idle_connections;
-
-        if (w->retry_tickcount >= FAILURE_RETRY_INTERVAL)
-        {
-            /* some time has passed since our connection attempts failed. try again */
-            ++want;
-            /* if this challenge is fulfilled we will reset consecutive_failures */
-            w->retry_challenge = running_tasks + want;
-        }
-    }
-    else
-    {
-        want = MAX_WEBSEED_CONNECTIONS - running_tasks;
-        w->retry_challenge = running_tasks + w->idle_connections + 1;
+        return;
     }
 
-    if (tor != nullptr && tor->isRunning && !tor->isDone() && want > 0)
+    for (auto const span : tr_peerMgrGetNextRequests(tor, w, 1))
     {
-        auto n_tasks = size_t{};
+        w->connection_limiter.taskStarted();
 
-        for (auto const span : tr_peerMgrGetNextRequests(tor, w, want))
-        {
-            auto const [begin, end] = span;
-            auto* const task = tr_new0(tr_webseed_task, 1);
-            task->session = tor->session;
-            task->webseed = w;
-            task->block = begin;
-            task->piece_index = tor->pieceForBlock(begin);
-            task->piece_offset = tor->blockSize() * begin - tor->pieceSize() * task->piece_index;
-            task->length = (end - 1 - begin) * tor->blockSize() + tor->blockSize(end - 1);
-            task->blocks_done = 0;
-            task->response_code = 0;
-            task->block_size = tor->blockSize();
-            task->content = evbuffer_new();
-            evbuffer_add_cb(task->content, on_content_changed, task);
-            w->tasks.insert(task);
-            task_request_next_chunk(task);
+        auto const [begin, end] = span;
+        auto* const task = tr_new0(tr_webseed_task, 1);
+        task->session = tor->session;
+        task->webseed = w;
+        task->block = begin;
+        task->piece_index = tor->pieceForBlock(begin);
+        task->piece_offset = tor->blockSize() * begin - tor->pieceSize() * task->piece_index;
+        task->length = (end - 1 - begin) * tor->blockSize() + tor->blockSize(end - 1);
+        task->blocks_done = 0;
+        task->response_code = 0;
+        task->block_size = tor->blockSize();
+        task->content = evbuffer_new();
+        evbuffer_add_cb(task->content, on_content_changed, task);
+        w->tasks.insert(task);
+        task_request_next_chunk(task);
 
-            --w->idle_connections;
-            ++n_tasks;
-            tr_peerMgrClientSentRequests(tor, w, span);
-        }
-
-        if (w->retry_tickcount >= FAILURE_RETRY_INTERVAL && n_tasks > 0)
-        {
-            w->retry_tickcount = 0;
-        }
+        tr_peerMgrClientSentRequests(tor, w, span);
     }
 }
 
@@ -367,6 +408,9 @@ static void web_response_func(
 {
     auto* t = static_cast<struct tr_webseed_task*>(vtask);
     bool const success = response_code == 206;
+    tr_webseed* w = t->webseed;
+
+    w->connection_limiter.taskFinished(success);
 
     if (t->dead)
     {
@@ -375,17 +419,10 @@ static void web_response_func(
         return;
     }
 
-    tr_webseed* w = t->webseed;
     tr_torrent* tor = tr_torrentFindFromId(session, w->torrent_id);
 
     if (tor != nullptr)
     {
-        /* active_transfers was only increased if the connection was successful */
-        if (t->response_code == 206)
-        {
-            --w->active_transfers;
-        }
-
         if (!success)
         {
             tr_block_index_t const blocks_remain = (t->length + tor->blockSize() - 1) / tor->blockSize() - t->blocks_done;
@@ -393,16 +430,6 @@ static void web_response_func(
             if (blocks_remain != 0)
             {
                 fire_client_got_rejs(tor, w, t->block + t->blocks_done, blocks_remain);
-            }
-
-            if (t->blocks_done != 0)
-            {
-                ++w->idle_connections;
-            }
-            else if (++w->consecutive_failures >= MAX_CONSECUTIVE_FAILURES && w->retry_tickcount == 0)
-            {
-                /* now wait a while until retrying to establish a connection */
-                ++w->retry_tickcount;
             }
 
             w->tasks.erase(t);
@@ -431,8 +458,6 @@ static void web_response_func(
 
                     fire_client_got_blocks(tor, t->webseed, t->block + t->blocks_done, 1);
                 }
-
-                ++w->idle_connections;
 
                 w->tasks.erase(t);
                 evbuffer_free(t->content);
@@ -492,14 +517,7 @@ namespace
 void webseed_timer_func(evutil_socket_t /*fd*/, short /*what*/, void* vw)
 {
     auto* w = static_cast<tr_webseed*>(vw);
-
-    if (w->retry_tickcount != 0)
-    {
-        ++w->retry_tickcount;
-    }
-
     on_idle(w);
-
     tr_timerAddMsec(w->timer, TR_IDLE_TIMER_MSEC);
 }
 
