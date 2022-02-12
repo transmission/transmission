@@ -61,9 +61,6 @@ Glib::ustring tr_strltime(time_t secs);
 ****
 ***/
 
-/* http://www.legaltorrents.com/some/announce/url --> legaltorrents.com */
-Glib::ustring gtr_get_host_from_url(Glib::ustring const& url);
-
 bool gtr_is_magnet_link(Glib::ustring const& str);
 
 bool gtr_is_hex_hashcode(std::string const& str);

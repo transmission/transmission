@@ -352,41 +352,43 @@ The 'source' column here corresponds to the data structure there.
 
 | Key | Value Type | transmission.h source
 |:--|:--|:--
-| `announce` | string | tr_tracker_info
-| `id` | number | tr_tracker_info
-| `scrape` | string | tr_tracker_info
-| `tier` | number | tr_tracker_info
+| `announce` | string | tr_tracker_view
+| `id` | number | tr_tracker_view
+| `scrape` | string | tr_tracker_view
+| `sitename` | string | tr_tracker_view
+| `tier` | number | tr_tracker_view
 
 `trackerStats`: array of objects, each containing:
 
 | Key | Value Type | transmission.h source
 |:--|:--|:--
-| `announce`                | string     | tr_tracker_stat
-| `announceState`           | number     | tr_tracker_stat
-| `downloadCount`           | number     | tr_tracker_stat
-| `hasAnnounced`            | boolean    | tr_tracker_stat
-| `hasScraped`              | boolean    | tr_tracker_stat
-| `host`                    | string     | tr_tracker_stat
-| `id`                      | number     | tr_tracker_stat
-| `isBackup`                | boolean    | tr_tracker_stat
-| `lastAnnouncePeerCount`   | number     | tr_tracker_stat
-| `lastAnnounceResult`      | string     | tr_tracker_stat
-| `lastAnnounceStartTime`   | number     | tr_tracker_stat
-| `lastAnnounceSucceeded`   | boolean    | tr_tracker_stat
-| `lastAnnounceTime`        | number     | tr_tracker_stat
-| `lastAnnounceTimedOut`    | boolean    | tr_tracker_stat
-| `lastScrapeResult`        | string     | tr_tracker_stat
-| `lastScrapeStartTime`     | number     | tr_tracker_stat
-| `lastScrapeSucceeded`     | boolean    | tr_tracker_stat
-| `lastScrapeTime`          | number     | tr_tracker_stat
-| `lastScrapeTimedOut`      | boolean    | tr_tracker_stat
-| `leecherCount`            | number     | tr_tracker_stat
-| `nextAnnounceTime`        | number     | tr_tracker_stat
-| `nextScrapeTime`          | number     | tr_tracker_stat
-| `scrape`                  | string     | tr_tracker_stat
-| `scrapeState`             | number     | tr_tracker_stat
-| `seederCount`             | number     | tr_tracker_stat
-| `tier`                    | number     | tr_tracker_stat
+| `announceState`           | number     | tr_tracker_view
+| `announce`                | string     | tr_tracker_view
+| `downloadCount`           | number     | tr_tracker_view
+| `hasAnnounced`            | boolean    | tr_tracker_view
+| `hasScraped`              | boolean    | tr_tracker_view
+| `host`                    | string     | tr_tracker_view
+| `id`                      | number     | tr_tracker_view
+| `isBackup`                | boolean    | tr_tracker_view
+| `lastAnnouncePeerCount`   | number     | tr_tracker_view
+| `lastAnnounceResult`      | string     | tr_tracker_view
+| `lastAnnounceStartTime`   | number     | tr_tracker_view
+| `lastAnnounceSucceeded`   | boolean    | tr_tracker_view
+| `lastAnnounceTime`        | number     | tr_tracker_view
+| `lastAnnounceTimedOut`    | boolean    | tr_tracker_view
+| `lastScrapeResult`        | string     | tr_tracker_view
+| `lastScrapeStartTime`     | number     | tr_tracker_view
+| `lastScrapeSucceeded`     | boolean    | tr_tracker_view
+| `lastScrapeTime`          | number     | tr_tracker_view
+| `lastScrapeTimedOut`      | boolean    | tr_tracker_view
+| `leecherCount`            | number     | tr_tracker_view
+| `nextAnnounceTime`        | number     | tr_tracker_view
+| `nextScrapeTime`          | number     | tr_tracker_view
+| `scrapeState`             | number     | tr_tracker_view
+| `scrape`                  | string     | tr_tracker_view
+| `seederCount`             | number     | tr_tracker_view
+| `sitename`                | string     | tr_tracker_view
+| `tier`                    | number     | tr_tracker_view
 
 
 `wanted`: An array of `tr_torrentFileCount()` booleans true if the corresponding file is to be downloaded. (Source: `tr_file_view`)
@@ -936,6 +938,8 @@ Transmission 4.0.0 (`rpc-version-semver` 5.3.0, `rpc-version`: 17)
 | `session-get` | new arg `script-torrent-added-filename`
 | `torrent-add` | new arg `labels`
 | `torrent-get` | new arg `file-count`
+| `torrent-get` | new arg `tracker.sitename`
+| `torrent-get` | new arg `trackerStats.sitename`
 | `torrent-get` | new arg `primary-mime-type`
 
 
