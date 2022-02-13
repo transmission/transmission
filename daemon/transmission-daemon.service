@@ -9,6 +9,8 @@ ExecStart=/usr/bin/transmission-daemon -f --log-error
 ExecReload=/bin/kill -s HUP $MAINPID
 NoNewPrivileges=true
 MemoryDenyWriteExecute=true
+ProtectSystem=true
+PrivateTmp=true
 
 [Install]
 WantedBy=multi-user.target
