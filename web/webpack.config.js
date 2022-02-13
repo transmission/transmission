@@ -24,9 +24,9 @@ const config = {
   module: {
     rules: [
       {
-        test: /\.js$/,
-        include: /src/,
         exclude: /(node_modules)/,
+        include: /src/,
+        test: /\.js$/,
         use: 'babel-loader',
       },
 
@@ -41,8 +41,8 @@ const config = {
       },
 
       {
-        test: /\.(sa|sc|c)ss$/,
         include: [/(src)/, /(node_modules)/],
+        test: /\.(sa|sc|c)ss$/,
         use: [
           isProduction ? MiniCssExtractPlugin.loader : 'style-loader',
           {
@@ -63,8 +63,8 @@ const config = {
       },
 
       {
-        include: /src/,
         exclude: /(node_modules)/,
+        include: /src/,
         test: /\.html$/i,
         use: 'html-loader',
       },
@@ -83,9 +83,9 @@ const config = {
     splitChunks: {
       cacheGroups: {
         vendor: {
-          test: /[\\/]node_modules[\\/]/,
-          name: 'vendors',
           chunks: 'all',
+          name: 'vendors',
+          test: /[\\/]node_modules[\\/]/,
         },
       },
     },

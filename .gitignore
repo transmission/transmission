@@ -21,4 +21,7 @@ macosx/en.lproj/*~.nib
 node_modules/
 po/*.mo
 third-party/miniupnp/miniupnpcstrings.h
-web/public_html/
+/web/public_html/*
+/web/.yarn/cache/
+/web/.yarn/unplugged/
+/web/.yarn/install-state.gz
