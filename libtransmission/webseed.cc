@@ -43,7 +43,7 @@ public:
         , session{ tor->session }
         , block{ span.begin }
         , piece_index{ tor->pieceForBlock(this->block) }
-        , piece_offset{ static_cast<uint32_t>(tor->blockSize() * this->block - tor->pieceSize() * this->piece_index) }
+        , piece_offset{ static_cast<uint32_t>(int64_t{tor->blockSize()}* this->block - tor->pieceSize() * this->piece_index) }
         , block_size{ tor->blockSize() }
         , length{ (span.end - 1 - span.begin) * tor->blockSize() + tor->blockSize(span.end - 1) }
     {
