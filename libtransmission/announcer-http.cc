@@ -345,7 +345,7 @@ void tr_tracker_http_announce(
 
     auto const url = announce_url_new(session, request);
     dbgmsg(request->log_name, "Sending announce to libcurl: \"%" TR_PRIsv "\"", TR_PRIsv_ARG(url));
-    tr_webRun(session, url, on_announce_done, d);
+    tr_webRun(session, { url, on_announce_done, d });
 }
 
 /****
@@ -540,5 +540,5 @@ void tr_tracker_http_scrape(
 
     auto const url = scrape_url_new(request);
     dbgmsg(request->log_name, "Sending scrape to libcurl: \"%" TR_PRIsv "\"", TR_PRIsv_ARG(url));
-    tr_webRun(session, url, on_scrape_done, d);
+    tr_webRun(session, { url, on_scrape_done, d });
 }

@@ -1376,9 +1376,9 @@ static char const* portTest(
     tr_variant* /*args_out*/,
     struct tr_rpc_idle_data* idle_data)
 {
-    int const port = tr_sessionGetPeerPort(session);
+    auto const port = tr_sessionGetPeerPort(session);
     auto const url = tr_strvJoin("https://portcheck.transmissionbt.com/"sv, std::to_string(port));
-    tr_webRun(session, url, portTested, idle_data);
+    tr_webRun(session, { url, portTested, idle_data });
     return nullptr;
 }
 
@@ -1466,7 +1466,7 @@ static char const* blocklistUpdate(
     tr_variant* /*args_out*/,
     struct tr_rpc_idle_data* idle_data)
 {
-    tr_webRun(session, session->blocklistUrl().c_str(), gotNewBlocklist, idle_data);
+    tr_webRun(session, { session->blocklistUrl(), gotNewBlocklist, idle_data });
     return nullptr;
 }
 
@@ -1685,7 +1685,10 @@ static char const* torrentAdd(tr_session* session, tr_variant* args_in, tr_varia
         auto* const d = tr_new0(struct add_torrent_idle_data, 1);
         d->data = idle_data;
         d->ctor = ctor;
-        tr_webRunWithCookies(session, filename, cookies, gotMetadataFromURL, d);
+
+        auto options = tr_web_options{ filename, gotMetadataFromURL, d };
+        options.cookies = cookies;
+        tr_webRun(session, std::move(options));
     }
     else
     {
