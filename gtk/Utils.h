@@ -61,14 +61,6 @@ Glib::ustring tr_strltime(time_t secs);
 ****
 ***/
 
-bool gtr_is_magnet_link(Glib::ustring const& str);
-
-bool gtr_is_hex_hashcode(std::string const& str);
-
-/***
-****
-***/
-
 void gtr_open_uri(Glib::ustring const& uri);
 
 void gtr_open_file(std::string const& path);

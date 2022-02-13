@@ -272,6 +272,8 @@ export class PrefsDialog extends EventTarget {
 
     input = document.createElement('input');
     input.type = 'number';
+    input.min = '0.1';
+    input.step = 'any';
     input.dataset.key = 'seedRatioLimit';
     root.append(input);
     PrefsDialog._enableIfChecked(input, cal.check);
@@ -287,6 +289,8 @@ export class PrefsDialog extends EventTarget {
 
     input = document.createElement('input');
     input.type = 'number';
+    input.min = '0.1';
+    input.step = 'any';
     input.dataset.key = 'idle-seeding-limit';
     root.append(input);
     PrefsDialog._enableIfChecked(input, cal.check);

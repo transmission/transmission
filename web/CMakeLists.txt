@@ -8,7 +8,9 @@ set(TRWEB_SRCS
   src/file-row.js
   src/formatter.js
   src/inspector.js
-  src/main.js
+  src/index.js
+  src/index.html
+  src/labels-dialog.js
   src/move-dialog.js
   src/notifications.js
   src/open-dialog.js
@@ -24,55 +26,59 @@ set(TRWEB_SRCS
   src/torrent-row.js
   src/transmission.js
   src/utils.js
-  style/transmission-app.scss
+  src/assets/css/index.scss
+  src/assets/css/mixins.scss
+  src/assets/css/variables.scss
 )
 
-set(TRWEB_IMGS
-  style/images/analytics.svg
-  style/images/application-x-executable.png
-  style/images/audio-x-generic.png
-  style/images/blue-turtle.png
-  style/images/checkered-flag.svg
-  style/images/chevron-down.svg
-  style/images/chevron-up.svg
-  style/images/diagram-3-fill.svg
-  style/images/files.svg
-  style/images/folder.png
-  style/images/font-x-generic.png
-  style/images/gear-fill.svg
-  style/images/horizontal-rule.svg
-  style/images/image-x-generic.png
-  style/images/lock-fill.svg
-  style/images/logo.png
-  style/images/package-x-generic.png
-  style/images/pause-circle-active.svg
-  style/images/pause-circle-idle.svg
-  style/images/play-circle-active.svg
-  style/images/play-circle-idle.svg
-  style/images/router.svg
-  style/images/search.svg
-  style/images/team.svg
-  style/images/text-x-generic.png
-  style/images/three-dots-vertical.svg
-  style/images/toolbar-close.png
-  style/images/toolbar-folder.png
-  style/images/toolbar-info.png
-  style/images/toolbar-pause.png
-  style/images/toolbar-start.png
-  style/images/turtle.png
-  style/images/up-and-down-arrows.svg
-  style/images/video-x-generic.png
+set(TRWEB_ASSETS
+  src/assets/img/analytics.svg
+  src/assets/img/application-x-executable.png
+  src/assets/img/audio-x-generic.png
+  src/assets/img/blue-turtle.png
+  src/assets/img/checkered-flag.svg
+  src/assets/img/chevron-down.svg
+  src/assets/img/chevron-up.svg
+  src/assets/img/diagram-3-fill.svg
+  src/assets/img/favicon.ico
+  src/assets/img/files.svg
+  src/assets/img/folder.png
+  src/assets/img/font-x-generic.png
+  src/assets/img/gear-fill.svg
+  src/assets/img/horizontal-rule.svg
+  src/assets/img/image-x-generic.png
+  src/assets/img/lock-fill.svg
+  src/assets/img/logo.png
+  src/assets/img/magnet.svg
+  src/assets/img/package-x-generic.png
+  src/assets/img/pause-circle-active.svg
+  src/assets/img/pause-circle-idle.svg
+  src/assets/img/play-circle-active.svg
+  src/assets/img/play-circle-idle.svg
+  src/assets/img/router.svg
+  src/assets/img/search.svg
+  src/assets/img/team.svg
+  src/assets/img/text-x-generic.png
+  src/assets/img/three-dots-vertical.svg
+  src/assets/img/toolbar-close.png
+  src/assets/img/toolbar-folder.png
+  src/assets/img/toolbar-info.png
+  src/assets/img/toolbar-pause.png
+  src/assets/img/toolbar-start.png
+  src/assets/img/turtle.png
+  src/assets/img/up-and-down-arrows.svg
+  src/assets/img/video-x-generic.png
 )
 
 add_custom_target(
   trweb ALL
-  COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/package.json" "${CMAKE_CURRENT_BINARY_DIR}/package.json"
-  COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/yarn.lock" "${CMAKE_CURRENT_BINARY_DIR}/yarn.lock"
-  COMMAND yarn install
+  COMMENT "Building Web"
+  COMMAND yarn install WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
   COMMAND yarn webpack --config "${CMAKE_CURRENT_SOURCE_DIR}/webpack.config.js" --context "${CMAKE_CURRENT_SOURCE_DIR}"
+  COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/public_html" "${CMAKE_CURRENT_BINARY_DIR}/public_html"
   BYPRODUCTS
-    public_html/transmission-app.js
-    public_html/transmission-app.js.LICENSE.txt
-  DEPENDS ${TRWEB_IMGS}
+    public_html/favicon.ico
+    public_html/index.html
+  DEPENDS ${TRWEB_ASSETS}
   SOURCES ${TRWEB_SRCS}
 )

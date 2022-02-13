@@ -633,6 +633,10 @@ static void initField(tr_torrent const* const tor, tr_stat const* const st, tr_v
         tr_variantInitStrView(initme, tr_torrentName(tor));
         break;
 
+    case TR_KEY_percentComplete:
+        tr_variantInitReal(initme, st->percentComplete);
+        break;
+
     case TR_KEY_percentDone:
         tr_variantInitReal(initme, st->percentDone);
         break;
@@ -1695,13 +1699,9 @@ static char const* torrentAdd(tr_session* session, tr_variant* args_in, tr_varia
             // these two tr_ctorSet*() functions require zero-terminated strings
             auto const filename_sz = std::string{ filename };
 
-            if (tr_strvStartsWith(filename, "magnet:?"sv))
+            if (!tr_ctorSetMetainfoFromFile(ctor, filename_sz.c_str(), nullptr))
             {
                 tr_ctorSetMetainfoFromMagnetLink(ctor, filename_sz.c_str(), nullptr);
-            }
-            else
-            {
-                tr_ctorSetMetainfoFromFile(ctor, filename_sz.c_str(), nullptr);
             }
         }
 
