@@ -1,5 +1,5 @@
 // This file Copyright © 2008-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -85,143 +85,6 @@ static void send_simple_response(struct evhttp_request* req, int code, char cons
     evhttp_send_reply(req, code, code_text, body);
 
     evbuffer_free(body);
-}
-
-struct tr_mimepart
-{
-    std::string headers;
-    std::string body;
-};
-
-static auto extract_parts_from_multipart(struct evkeyvalq const* headers, struct evbuffer* body)
-{
-    auto ret = std::vector<tr_mimepart>{};
-
-    auto const* const content_type = evhttp_find_header(headers, "Content-Type");
-    auto const* in = (char const*)evbuffer_pullup(body, -1);
-    size_t inlen = evbuffer_get_length(body);
-
-    char const* boundary_key = "boundary=";
-    char const* boundary_key_begin = content_type != nullptr ? strstr(content_type, boundary_key) : nullptr;
-    char const* boundary_val = boundary_key_begin != nullptr ? boundary_key_begin + strlen(boundary_key) : "arglebargle";
-    char* boundary = tr_strdup_printf("--%s", boundary_val);
-    size_t const boundary_len = strlen(boundary);
-
-    char const* delim = tr_memmem(in, inlen, boundary, boundary_len);
-
-    while (delim != nullptr)
-    {
-        char const* part = delim + boundary_len;
-
-        inlen -= part - in;
-        in = part;
-
-        delim = tr_memmem(in, inlen, boundary, boundary_len);
-        size_t part_len = delim != nullptr ? (size_t)(delim - part) : inlen;
-
-        if (part_len != 0)
-        {
-            char const* rnrn = tr_memmem(part, part_len, "\r\n\r\n", 4);
-
-            if (rnrn != nullptr)
-            {
-                auto tmp = tr_mimepart{};
-                tmp.headers.assign(part, rnrn - part);
-                tmp.body.assign(rnrn + 4, (part + part_len) - (rnrn + 4));
-                ret.push_back(tmp);
-            }
-        }
-    }
-
-    tr_free(boundary);
-
-    return ret;
-}
-
-static void handle_upload(struct evhttp_request* req, tr_rpc_server* server)
-{
-    if (req->type != EVHTTP_REQ_POST)
-    {
-        send_simple_response(req, 405, nullptr);
-    }
-    else
-    {
-        bool hasSessionId = false;
-
-        char const* query = strchr(req->uri, '?');
-        bool const paused = query != nullptr && strstr(query + 1, "paused=true") != nullptr;
-
-        auto const parts = extract_parts_from_multipart(req->input_headers, req->input_buffer);
-
-        /* first look for the session id */
-        for (auto const& p : parts)
-        {
-            if (tr_strcasestr(p.headers.c_str(), TR_RPC_SESSION_ID_HEADER) != nullptr)
-            {
-                char const* ours = get_current_session_id(server);
-                size_t const ourlen = strlen(ours);
-                hasSessionId = ourlen <= std::size(p.body) && memcmp(p.body.c_str(), ours, ourlen) == 0;
-                break;
-            }
-        }
-
-        if (!hasSessionId)
-        {
-            int code = 409;
-            char const* codetext = tr_webGetResponseStr(code);
-            struct evbuffer* body = evbuffer_new();
-            evbuffer_add_printf(body, "%s", "{ \"success\": false, \"msg\": \"Bad Session-Id\" }");
-            evhttp_send_reply(req, code, codetext, body);
-            evbuffer_free(body);
-        }
-        else
-        {
-            for (auto const& p : parts)
-            {
-                auto body = std::string_view{ p.body };
-                if (tr_strvEndsWith(body, "\r\n"sv))
-                {
-                    body.remove_suffix(2);
-                }
-
-                auto top = tr_variant{};
-                tr_variantInitDict(&top, 2);
-                tr_variantDictAddStrView(&top, TR_KEY_method, "torrent-add");
-                auto* const args = tr_variantDictAddDict(&top, TR_KEY_arguments, 2);
-                tr_variantDictAddBool(args, TR_KEY_paused, paused);
-
-                auto test = tr_variant{};
-                auto have_source = bool{ false };
-                if (tr_urlIsValid(body))
-                {
-                    tr_variantDictAddStrView(args, TR_KEY_filename, body);
-                    have_source = true;
-                }
-                else if (tr_variantFromBuf(&test, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, body))
-                {
-                    tr_variantDictAddStrView(args, TR_KEY_metainfo, tr_base64_encode(body));
-                    have_source = true;
-                }
-
-                if (have_source)
-                {
-                    tr_rpc_request_exec_json(server->session, &top, nullptr, nullptr);
-                }
-
-                tr_variantFree(&top);
-            }
-        }
-
-        /* send "success" response */
-        {
-            int code = HTTP_OK;
-            char const* codetext = tr_webGetResponseStr(code);
-            struct evbuffer* body = evbuffer_new();
-            evbuffer_add_printf(body, "%s", "{ \"success\": true, \"msg\": \"Torrent Added\" }");
-            evhttp_send_reply(req, code, codetext, body);
-            evbuffer_free(body);
-        }
-    }
 }
 
 /***
@@ -374,8 +237,7 @@ static void handle_web_client(struct evhttp_request* req, tr_rpc_server* server)
     {
         // TODO: string_view
         char* const subpath = tr_strdup(req->uri + std::size(server->url) + 4);
-        char* pch = strchr(subpath, '?');
-        if (pch != nullptr)
+        if (char* pch = strchr(subpath, '?'); pch != nullptr)
         {
             *pch = '\0';
         }
@@ -628,10 +490,6 @@ static void handle_request(struct evhttp_request* req, void* arg)
         {
             handle_web_client(req, server);
         }
-        else if (tr_strvStartsWith(location, "upload"sv))
-        {
-            handle_upload(req, server);
-        }
         else if (!isHostnameAllowed(server, req))
         {
             char const* const tmp =
@@ -865,9 +723,9 @@ static auto parseWhitelist(std::string_view whitelist)
         auto const pos = whitelist.find_first_of(" ,;"sv);
         auto const token = tr_strvStrip(whitelist.substr(0, pos));
         list.emplace_back(token);
-        whitelist = pos == whitelist.npos ? ""sv : whitelist.substr(pos + 1);
+        whitelist = pos == std::string_view::npos ? ""sv : whitelist.substr(pos + 1);
 
-        if (token.find_first_of("+-"sv) != token.npos)
+        if (token.find_first_of("+-"sv) != std::string_view::npos)
         {
             tr_logAddNamedInfo(
                 MyName,

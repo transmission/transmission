@@ -1,5 +1,5 @@
 /* @license This file Copyright © Charles Kerr, Dave Perrett, Malcolm Jarvis and Bruno Bierbaumer
-   It may be used under GPLv2 (SPDX: GPL-2.0).
+   It may be used under GPLv2 (SPDX: GPL-2.0-only).
    License text can be found in the licenses/ folder. */
 
 import { AboutDialog } from './about-dialog.js';
@@ -14,6 +14,7 @@ import { PrefsDialog } from './prefs-dialog.js';
 import { Remote, RPC } from './remote.js';
 import { RemoveDialog } from './remove-dialog.js';
 import { RenameDialog } from './rename-dialog.js';
+import { LabelsDialog } from './labels-dialog.js';
 import { ShortcutsDialog } from './shortcuts-dialog.js';
 import { StatisticsDialog } from './statistics-dialog.js';
 import { Torrent } from './torrent.js';
@@ -169,6 +170,9 @@ export class Transmission extends EventTarget {
           break;
         case 'show-rename-dialog':
           this.setCurrentPopup(new RenameDialog(this, this.remote));
+          break;
+        case 'show-labels-dialog':
+          this.setCurrentPopup(new LabelsDialog(this, this.remote));
           break;
         case 'start-all-torrents':
           this._startTorrents(this._getAllTorrents());
@@ -865,22 +869,29 @@ TODO: fix this when notifications get fixed
     setTextContent(document.querySelector('#filter-count'), string);
   }
 
+  static _displayName(hostname) {
+    let name = hostname;
+    if (name.length > 0) {
+      name = name.charAt(0).toUpperCase() + name.slice(1);
+    }
+    return name;
+  }
+
   _updateFilterSelect() {
-    const trackers = this._getTrackers();
-    const names = Object.keys(trackers).sort();
+    const trackers = this._getTrackerCounts();
+    const sitenames = Object.keys(trackers).sort();
 
     // build the new html
     let string = '';
     string += !this.filterTracker
       ? '<option value="all" selected="selected">All</option>'
       : '<option value="all">All</option>';
-    for (const name of names) {
-      const o = trackers[name];
-      string += `<option value="${o.domain}"`;
-      if (trackers[name].domain === this.filterTracker) {
+    for (const sitename of sitenames) {
+      string += `<option value="${sitename}"`;
+      if (sitename === this.filterTracker) {
         string += ' selected="selected"';
       }
-      string += `>${name}</option>`;
+      string += `>${Transmission._displayName(sitename)}</option>`;
     }
 
     if (!this.filterTrackersStr || this.filterTrackersStr !== string) {
@@ -909,10 +920,20 @@ TODO: fix this when notifications get fixed
 
   _refilter(rebuildEverything) {
     const { sort_mode, sort_direction, filter_mode } = this.prefs;
-    const filter_text = this.filterText;
     const filter_tracker = this.filterTracker;
     const renderer = this.torrentRenderer;
     const list = this.elements.torrent_list;
+
+    let filter_text = null;
+    let labels = null;
+    const m = /^labels:([\w,]*)(.*)$/.exec(this.filterText);
+    if (m) {
+      filter_text = m[2].trim();
+      labels = m[1].split(',');
+    } else {
+      filter_text = this.filterText;
+      labels = [];
+    }
 
     const countRows = () => [...list.children].length;
     const countSelectedRows = () =>
@@ -958,7 +979,7 @@ TODO: fix this when notifications get fixed
     for (const row of dirty_rows) {
       const id = row.getTorrentId();
       const t = this._torrents[id];
-      if (t && t.test(filter_mode, filter_text, filter_tracker)) {
+      if (t && t.test(filter_mode, filter_tracker, filter_text, labels)) {
         temporary.push(row);
       }
       this.dirtyTorrents.delete(id);
@@ -969,7 +990,7 @@ TODO: fix this when notifications get fixed
     // but don't already have a row
     for (const id of this.dirtyTorrents.values()) {
       const t = this._torrents[id];
-      if (t && t.test(filter_mode, filter_text, filter_tracker)) {
+      if (t && t.test(filter_mode, filter_tracker, filter_text, labels)) {
         const row = new TorrentRow(renderer, this, t);
         const e = row.getElement();
         e.row = row;
@@ -1045,36 +1066,25 @@ TODO: fix this when notifications get fixed
     }
   }
 
-  setFilterTracker(domain) {
+  setFilterTracker(sitename) {
     const e = document.querySelector('#filter-tracker');
-    e.value = domain ? Transmission._getReadableDomain(domain) : 'all';
+    e.value = sitename ? Transmission._getReadableDomain(sitename) : 'all';
 
-    this.filterTracker = domain;
+    this.filterTracker = sitename;
     this.refilterAllSoon();
   }
 
-  _getTrackers() {
-    const returnValue = {};
+  _getTrackerCounts() {
+    const counts = {};
 
     for (const torrent of this._getAllTorrents()) {
-      const names = new Set();
-
       for (const tracker of torrent.getTrackers()) {
-        const { domain, name } = tracker;
-
-        if (!returnValue[name]) {
-          returnValue[name] = { count: 0, domain };
-        }
-
-        names.add(name);
-      }
-
-      for (const name of names.values()) {
-        ++returnValue[name].count;
+        const { sitename } = tracker;
+        counts[sitename] = (counts[sitename] || 0) + 1;
       }
     }
 
-    return returnValue;
+    return counts;
   }
 
   ///

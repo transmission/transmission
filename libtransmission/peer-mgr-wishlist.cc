@@ -1,5 +1,5 @@
 // This file Copyright © 2021-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -131,11 +131,13 @@ std::vector<tr_block_span_t> makeSpans(tr_block_index_t const* sorted_blocks, si
 
 std::vector<tr_block_span_t> Wishlist::next(Wishlist::PeerInfo const& peer_info, size_t n_wanted_blocks)
 {
+    if (n_wanted_blocks == 0)
+    {
+        return {};
+    }
+
     size_t n_blocks = 0;
     auto spans = std::vector<tr_block_span_t>{};
-
-    // sanity clause
-    TR_ASSERT(n_wanted_blocks > 0);
 
     // We usually won't need all the candidates until endgame, so don't
     // waste cycles sorting all of them here. partial sort is enough.

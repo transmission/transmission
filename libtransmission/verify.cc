@@ -1,12 +1,14 @@
 // This file Copyright © 2007-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
 #include <algorithm>
 #include <ctime>
 #include <mutex>
+#include <optional>
 #include <set>
+#include <thread>
 #include <vector>
 
 #include "transmission.h"
@@ -14,7 +16,6 @@
 #include "crypto-utils.h"
 #include "file.h"
 #include "log.h"
-#include "platform.h"
 #include "torrent.h"
 #include "tr-assert.h"
 #include "utils.h" /* tr_malloc(), tr_free() */
@@ -37,7 +38,7 @@ static bool verifyTorrent(tr_torrent* tor, bool const* stopFlag)
     time_t lastSleptAt = 0;
     uint32_t piecePos = 0;
     tr_file_index_t fileIndex = 0;
-    tr_file_index_t prevFileIndex = !fileIndex;
+    tr_file_index_t prevFileIndex = ~fileIndex;
     tr_piece_index_t piece = 0;
     auto buffer = std::vector<std::byte>(1024 * 256);
     auto sha = tr_sha1_init();
@@ -58,7 +59,7 @@ static bool verifyTorrent(tr_torrent* tor, bool const* stopFlag)
         /* if we're starting a new file... */
         if (filePos == 0 && fd == TR_BAD_SYS_FILE && fileIndex != prevFileIndex)
         {
-            char* filename = tr_torrentFindFile(tor, fileIndex);
+            char* const filename = tr_torrentFindFile(tor, fileIndex);
             fd = filename == nullptr ? TR_BAD_SYS_FILE :
                                        tr_sys_file_open(filename, TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0, nullptr);
             tr_free(filename);
@@ -101,6 +102,7 @@ static bool verifyTorrent(tr_torrent* tor, bool const* stopFlag)
                 changed |= hasPiece != hadPiece;
             }
 
+            tor->checked_pieces_.set(piece, true);
             tor->markChanged();
 
             /* sleeping even just a few msec per second goes a long
@@ -197,12 +199,12 @@ struct verify_node
 static struct verify_node currentNode;
 // TODO: refactor s.t. this doesn't leak
 static auto& verify_list{ *new std::set<verify_node>{} };
-static tr_thread* verify_thread = nullptr;
+static std::optional<std::thread::id> verify_thread_id;
 static bool stopCurrent = false;
 
 static std::mutex verify_mutex_;
 
-static void verifyThreadFunc(void* /*user_data*/)
+static void verifyThreadFunc()
 {
     for (;;)
     {
@@ -213,7 +215,7 @@ static void verifyThreadFunc(void* /*user_data*/)
             if (std::empty(verify_list))
             {
                 currentNode.torrent = nullptr;
-                verify_thread = nullptr;
+                verify_thread_id.reset();
                 return;
             }
 
@@ -256,9 +258,11 @@ void tr_verifyAdd(tr_torrent* tor, tr_verify_done_func callback_func, void* call
     tor->setVerifyState(TR_VERIFY_WAIT);
     verify_list.insert(node);
 
-    if (verify_thread == nullptr)
+    if (!verify_thread_id)
     {
-        verify_thread = tr_threadNew(verifyThreadFunc, nullptr);
+        auto thread = std::thread(verifyThreadFunc);
+        verify_thread_id = thread.get_id();
+        thread.detach();
     }
 }
 

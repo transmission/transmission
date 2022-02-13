@@ -1,11 +1,12 @@
 // This file Copyright © 2017-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
 #include <algorithm>
 #include <cerrno>
 #include <cstring>
+#include <string_view>
 
 #include <event2/buffer.h>
 #include <event2/event.h>
@@ -256,8 +257,7 @@ static handshake_parse_err_t parseHandshake(tr_handshake* handshake, struct evbu
     /* peer id */
     dbgmsg(handshake, "peer-id is [%" TR_PRIsv "]", TR_PRIsv_ARG(peer_id));
 
-    auto* const tor = handshake->session->getTorrent(hash);
-    if (peer_id == tr_torrentGetPeerId(tor))
+    if (auto* const tor = handshake->session->getTorrent(hash); peer_id == tr_torrentGetPeerId(tor))
     {
         dbgmsg(handshake, "streuth!  we've connected to ourselves.");
         return HANDSHAKE_PEER_IS_SELF;
@@ -768,8 +768,7 @@ static ReadState readPadA(tr_handshake* handshake, struct evbuffer* inbuf)
         return READ_NOW;
     }
 
-    size_t const len = evbuffer_get_length(inbuf);
-    if (len > SHA_DIGEST_LENGTH)
+    if (size_t const len = evbuffer_get_length(inbuf); len > SHA_DIGEST_LENGTH)
     {
         evbuffer_drain(inbuf, len - SHA_DIGEST_LENGTH);
     }
@@ -855,9 +854,8 @@ static ReadState readCryptoProvide(tr_handshake* handshake, struct evbuffer* inb
 static ReadState readPadC(tr_handshake* handshake, struct evbuffer* inbuf)
 {
     uint16_t ia_len = 0;
-    size_t const needlen = handshake->pad_c_len + sizeof(uint16_t);
 
-    if (evbuffer_get_length(inbuf) < needlen)
+    if (auto const needlen = handshake->pad_c_len + sizeof(uint16_t); evbuffer_get_length(inbuf) < needlen)
     {
         return READ_LATER;
     }

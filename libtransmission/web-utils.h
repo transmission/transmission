@@ -24,15 +24,18 @@ bool tr_urlIsValid(std::string_view url);
 
 struct tr_url_parsed_t
 {
-    std::string_view scheme;
-    std::string_view authority;
-    std::string_view host;
-    std::string_view path;
-    std::string_view portstr;
-    std::string_view query;
-    std::string_view fragment;
-    std::string_view full;
-    int port = -1;
+    // http://example.com:80/over/there?name=ferret#nose
+
+    std::string_view scheme; // "http"
+    std::string_view authority; // "example.com:80"
+    std::string_view host; // "example.com"
+    std::string_view sitename; // "example"
+    std::string_view portstr; // "80"
+    std::string_view path; // /"over/there"
+    std::string_view query; // "name=ferret"
+    std::string_view fragment; // "nose"
+    std::string_view full; // "http://example.com:80/over/there?name=ferret#nose"
+    int port = -1; // 80
 };
 
 std::optional<tr_url_parsed_t> tr_urlParse(std::string_view url);

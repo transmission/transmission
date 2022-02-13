@@ -5,12 +5,6 @@
 
 #pragma once
 
-#if 0 // TODO(ckerr): re-enable this after tr_info is made private
-#ifndef __TRANSMISSION__
-#error only libtransmission should #include this header.
-#endif
-#endif
-
 #include <cstddef>
 #include <optional>
 #include <set>
@@ -92,7 +86,12 @@ public:
     std::set<tr_tracker_tier_t> tiers() const;
     tr_tracker_tier_t nextTier() const;
 
-    bool add(tr_tracker_tier_t tier, std::string_view announce_url_sv);
+    bool add(std::string_view announce_url_sv)
+    {
+        return add(announce_url_sv, this->nextTier());
+    }
+
+    bool add(std::string_view announce_url_sv, tr_tracker_tier_t tier);
     bool remove(std::string_view announce_url);
     bool remove(tr_tracker_id_t id);
     bool replace(tr_tracker_id_t id, std::string_view announce_url_sv);

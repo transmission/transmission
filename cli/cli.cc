@@ -18,6 +18,7 @@
 #include <libtransmission/utils.h> /* tr_wait_msec */
 #include <libtransmission/variant.h>
 #include <libtransmission/version.h>
+#include <libtransmission/web-utils.h>
 #include <libtransmission/web.h> /* tr_webRun */
 
 /***
@@ -76,7 +77,13 @@ static auto constexpr Options = std::array<tr_option, 19>{
       { 'm', "portmap", "Enable portmapping via NAT-PMP or UPnP", "m", false, nullptr },
       { 'M', "no-portmap", "Disable portmapping", "M", false, nullptr },
       { 'p', "port", "Port for incoming peers (Default: " TR_DEFAULT_PEER_PORT_STR ")", "p", true, "<port>" },
-      { 't', "tos", "Peer socket TOS (0 to 255, default=" TR_DEFAULT_PEER_SOCKET_TOS_STR ")", "t", true, "<tos>" },
+      { 't',
+        "tos",
+        "Peer socket DSCP / ToS setting (number, or a DSCP string, e.g. 'af11' or 'cs0', default=" TR_DEFAULT_PEER_SOCKET_TOS_STR
+        ")",
+        "t",
+        true,
+        "<dscp-or-tos>" },
       { 'u', "uplimit", "Set max upload speed in " SPEED_K_STR, "u", true, "<speed>" },
       { 'U', "no-uplimit", "Don't limit the upload speed", "U", false, nullptr },
       { 'v', "verify", "Verify the specified torrent", "v", false, nullptr },
@@ -210,8 +217,6 @@ static char const* getConfigDir(int argc, char const** argv)
 
 int tr_main(int argc, char* argv[])
 {
-    tr_session* h;
-    tr_ctor* ctor;
     tr_variant settings;
     char const* configDir;
 
@@ -269,25 +274,20 @@ int tr_main(int argc, char* argv[])
         }
     }
 
-    h = tr_sessionInit(configDir, false, &settings);
-
-    ctor = tr_ctorNew(h);
+    auto* const h = tr_sessionInit(configDir, false, &settings);
+    auto* const ctor = tr_ctorNew(h);
 
     tr_ctorSetPaused(ctor, TR_FORCE, false);
 
-    if (tr_sys_path_exists(torrentPath, nullptr))
+    if (tr_ctorSetMetainfoFromFile(ctor, torrentPath, nullptr) || tr_ctorSetMetainfoFromMagnetLink(ctor, torrentPath, nullptr))
     {
-        tr_ctorSetMetainfoFromFile(ctor, torrentPath, nullptr);
+        // all good
     }
-    else if (memcmp(torrentPath, "magnet:?", 8) == 0)
+    else if (tr_urlIsValid(torrentPath))
     {
-        tr_ctorSetMetainfoFromMagnetLink(ctor, torrentPath, nullptr);
-    }
-    else if (memcmp(torrentPath, "http", 4) == 0)
-    {
+        // fetch it
         tr_webRun(h, torrentPath, onTorrentFileDownloaded, ctor);
         waitingOnWeb = true;
-
         while (waitingOnWeb)
         {
             tr_wait_msec(1000);
@@ -320,7 +320,7 @@ int tr_main(int argc, char* argv[])
     if (verify)
     {
         verify = false;
-        tr_torrentVerify(tor, nullptr, nullptr);
+        tr_torrentVerify(tor);
     }
 
     for (;;)
@@ -434,7 +434,7 @@ static int parseCommandLine(tr_variant* d, int argc, char const** argv)
             break;
 
         case 't':
-            tr_variantDictAddInt(d, TR_KEY_peer_socket_tos, atoi(my_optarg));
+            tr_variantDictAddStr(d, TR_KEY_peer_socket_tos, my_optarg);
             break;
 
         case 'u':

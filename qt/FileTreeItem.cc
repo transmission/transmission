@@ -1,5 +1,5 @@
 // This file Copyright © 2009-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -57,9 +57,7 @@ FileTreeItem* FileTreeItem::child(QString const& filename)
 {
     FileTreeItem* item(nullptr);
 
-    int const row = getMyChildRows().value(filename, -1);
-
-    if (row != -1)
+    if (int const row = getMyChildRows().value(filename, -1); row != -1)
     {
         item = child(row);
         assert(filename == item->name());
@@ -283,13 +281,13 @@ QString FileTreeItem::priorityString() const
 
     switch (i)
     {
-    case LOW:
+    case Low:
         return tr("Low");
 
-    case HIGH:
+    case High:
         return tr("High");
 
-    case NORMAL:
+    case Normal:
         return tr("Normal");
 
     default:
@@ -306,15 +304,15 @@ int FileTreeItem::priority() const
         switch (priority_)
         {
         case TR_PRI_LOW:
-            i |= LOW;
+            i |= Low;
             break;
 
         case TR_PRI_HIGH:
-            i |= HIGH;
+            i |= High;
             break;
 
         default:
-            i |= NORMAL;
+            i |= Normal;
             break;
         }
     }

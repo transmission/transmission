@@ -1,5 +1,5 @@
 // This file Copyright © 2014-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -31,8 +31,6 @@ namespace
 char const constexpr* const RequestDataPropertyKey{ "requestData" };
 char const constexpr* const RequestFutureinterfacePropertyKey{ "requestReplyFutureInterface" };
 
-bool const Verbose = tr_env_key_exists("TR_RPC_VERBOSE");
-
 void destroyVariant(tr_variant* json)
 {
     tr_variantFree(json);
@@ -41,7 +39,7 @@ void destroyVariant(tr_variant* json)
 
 TrVariantPtr createVariant()
 {
-    return TrVariantPtr(tr_new0(tr_variant, 1), &destroyVariant);
+    return { tr_new0(tr_variant, 1), &destroyVariant };
 }
 
 } // namespace
@@ -149,7 +147,7 @@ void RpcClient::sendNetworkRequest(TrVariantPtr json, QFutureInterface<RpcRespon
     connect(reply, &QNetworkReply::downloadProgress, this, &RpcClient::dataReadProgress);
     connect(reply, &QNetworkReply::uploadProgress, this, &RpcClient::dataSendProgress);
 
-    if (Verbose)
+    if (verbose_)
     {
         qInfo() << "sending"
                 << "POST" << qPrintable(url_.path());
@@ -228,7 +226,7 @@ void RpcClient::networkRequestFinished(QNetworkReply* reply)
 
     auto promise = reply->property(RequestFutureinterfacePropertyKey).value<QFutureInterface<RpcResponse>>();
 
-    if (Verbose)
+    if (verbose_)
     {
         qInfo() << "http response header:";
 
@@ -301,16 +299,13 @@ RpcResponse RpcClient::parseResponseData(tr_variant& json) const
 {
     RpcResponse ret;
 
-    auto const result = dictFind<QString>(&json, TR_KEY_result);
-    if (result)
+    if (auto const result = dictFind<QString>(&json, TR_KEY_result); result)
     {
         ret.result = *result;
         ret.success = *result == QStringLiteral("success");
     }
 
-    tr_variant* args;
-
-    if (tr_variantDictFindDict(&json, TR_KEY_arguments, &args))
+    if (tr_variant* args = nullptr; tr_variantDictFindDict(&json, TR_KEY_arguments, &args))
     {
         ret.args = createVariant();
         *ret.args = *args;

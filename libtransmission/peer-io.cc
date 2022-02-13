@@ -1,5 +1,5 @@
 // This file Copyright © 2007-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -624,7 +624,7 @@ static tr_peerIo* tr_peerIoNew(
 
     if (socket.type == TR_PEER_SOCKET_TYPE_TCP)
     {
-        tr_netSetTOS(socket.handle.tcp, session->peerSocketTos(), addr->type);
+        session->setSocketTOS(socket.handle.tcp, addr->type);
         maybeSetCongestionAlgorithm(socket.handle.tcp, session->peerCongestionAlgorithm());
     }
 
@@ -979,7 +979,7 @@ int tr_peerIoReconnect(tr_peerIo* io)
     io->event_write = event_new(session->event_base, io->socket.handle.tcp, EV_WRITE, event_write_cb, io);
 
     event_enable(io, pendingEvents);
-    tr_netSetTOS(io->socket.handle.tcp, session->peerSocketTos(), io->addr.type);
+    io->session->setSocketTOS(io->socket.handle.tcp, io->addr.type);
     maybeSetCongestionAlgorithm(io->socket.handle.tcp, session->peerCongestionAlgorithm());
 
     return 0;

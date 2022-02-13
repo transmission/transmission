@@ -1,5 +1,5 @@
 // This file Copyright © 2009-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -152,7 +152,7 @@ QSize TorrentDelegate::margin(QStyle const& style) const
 {
     Q_UNUSED(style)
 
-    return QSize(4, 4);
+    return { 4, 4 };
 }
 
 QString TorrentDelegate::progressString(Torrent const& tor)
@@ -162,8 +162,7 @@ QString TorrentDelegate::progressString(Torrent const& tor)
     bool const is_seed(tor.isSeed());
     uint64_t const have_total(tor.haveTotal());
     QString str;
-    double seed_ratio;
-    bool const has_seed_ratio(tor.getSeedRatio(seed_ratio));
+    auto const seed_ratio_limit = tor.getSeedRatioLimit();
 
     if (is_magnet) // magnet link with no metadata
     {
@@ -185,7 +184,7 @@ QString TorrentDelegate::progressString(Torrent const& tor)
     }
     else if (!is_seed) // partial seed
     {
-        if (has_seed_ratio)
+        if (seed_ratio_limit)
         {
             //: First part of torrent progress string,
             //: %1 is how much we've got,
@@ -200,7 +199,7 @@ QString TorrentDelegate::progressString(Torrent const& tor)
                       .arg(Formatter::get().percentToString(tor.percentComplete() * 100.0))
                       .arg(Formatter::get().sizeToString(tor.uploadedEver()))
                       .arg(Formatter::get().ratioToString(tor.ratio()))
-                      .arg(Formatter::get().ratioToString(seed_ratio));
+                      .arg(Formatter::get().ratioToString(*seed_ratio_limit));
         }
         else
         {
@@ -220,7 +219,7 @@ QString TorrentDelegate::progressString(Torrent const& tor)
     }
     else // seeding
     {
-        if (has_seed_ratio)
+        if (seed_ratio_limit)
         {
             //: First part of torrent progress string,
             //: %1 is the torrent's total size,
@@ -231,7 +230,7 @@ QString TorrentDelegate::progressString(Torrent const& tor)
                       .arg(Formatter::get().sizeToString(have_total))
                       .arg(Formatter::get().sizeToString(tor.uploadedEver()))
                       .arg(Formatter::get().ratioToString(tor.ratio()))
-                      .arg(Formatter::get().ratioToString(seed_ratio));
+                      .arg(Formatter::get().ratioToString(*seed_ratio_limit));
         }
         else // seeding w/o a ratio
         {
@@ -247,7 +246,7 @@ QString TorrentDelegate::progressString(Torrent const& tor)
     }
 
     // add time when downloading
-    if ((has_seed_ratio && tor.isSeeding()) || tor.isDownloading())
+    if ((seed_ratio_limit && tor.isSeeding()) || tor.isDownloading())
     {
         if (tor.hasETA())
         {
@@ -426,7 +425,7 @@ QSize TorrentDelegate::sizeHint(QStyleOptionViewItem const& option, QModelIndex 
         height_hint_ = sizeHint(option, *tor).height();
     }
 
-    return QSize(option.rect.width(), *height_hint_);
+    return { option.rect.width(), *height_hint_ };
 }
 
 QIcon& TorrentDelegate::getWarningEmblem() const
@@ -452,11 +451,11 @@ void TorrentDelegate::paint(QPainter* painter, QStyleOptionViewItem const& optio
 
 void TorrentDelegate::setProgressBarPercentDone(QStyleOptionViewItem const& option, Torrent const& tor) const
 {
-    double seed_ratio_limit;
+    auto const seed_ratio_limit = tor.getSeedRatioLimit();
 
-    if (tor.isSeeding() && tor.getSeedRatio(seed_ratio_limit))
+    if (tor.isSeeding() && seed_ratio_limit)
     {
-        auto const seed_rate_ratio = tor.ratio() / seed_ratio_limit;
+        auto const seed_rate_ratio = tor.ratio() / *seed_ratio_limit;
         auto const scaled_progress = static_cast<int>(
             seed_rate_ratio * (progress_bar_style_.maximum - progress_bar_style_.minimum));
         progress_bar_style_.progress = progress_bar_style_.minimum + scaled_progress;
@@ -496,54 +495,36 @@ void TorrentDelegate::drawTorrent(QPainter* painter, QStyleOptionViewItem const&
         painter->fillRect(option.rect, option.palette.brush(cg, QPalette::Highlight));
     }
 
-    QIcon::Mode im;
+    auto icon_mode = QIcon::Mode{};
 
     if (is_paused || !is_item_enabled)
     {
-        im = QIcon::Disabled;
+        icon_mode = QIcon::Disabled;
     }
     else if (is_item_selected)
     {
-        im = QIcon::Selected;
+        icon_mode = QIcon::Selected;
     }
     else
     {
-        im = QIcon::Normal;
+        icon_mode = QIcon::Normal;
     }
 
-    QIcon::State qs;
+    auto const icon_state = is_paused ? QIcon::Off : QIcon::On;
 
-    if (is_paused)
-    {
-        qs = QIcon::Off;
-    }
-    else
-    {
-        qs = QIcon::On;
-    }
-
-    QPalette::ColorGroup cg = QPalette::Normal;
+    auto color_group = QPalette::Normal;
 
     if (is_paused || !is_item_enabled)
     {
-        cg = QPalette::Disabled;
+        color_group = QPalette::Disabled;
     }
 
-    if (cg == QPalette::Normal && !is_item_active)
+    if (color_group == QPalette::Normal && !is_item_active)
     {
-        cg = QPalette::Inactive;
+        color_group = QPalette::Inactive;
     }
 
-    QPalette::ColorRole cr;
-
-    if (is_item_selected)
-    {
-        cr = QPalette::HighlightedText;
-    }
-    else
-    {
-        cr = QPalette::Text;
-    }
+    auto const color_role = is_item_selected ? QPalette::HighlightedText : QPalette::Text;
 
     QStyle::State progress_bar_state(option.state | QStyle::State_Horizontal);
 
@@ -577,14 +558,14 @@ void TorrentDelegate::drawTorrent(QPainter* painter, QStyleOptionViewItem const&
     }
     else
     {
-        painter->setPen(option.palette.color(cg, cr));
+        painter->setPen(option.palette.color(color_group, color_role));
     }
 
-    tor.getMimeTypeIcon().paint(painter, layout.icon_rect, Qt::AlignCenter, im, qs);
+    tor.getMimeTypeIcon().paint(painter, layout.icon_rect, Qt::AlignCenter, icon_mode, icon_state);
 
     if (!emblem_icon.isNull())
     {
-        emblem_icon.paint(painter, layout.emblem_rect, Qt::AlignCenter, emblem_im, qs);
+        emblem_icon.paint(painter, layout.emblem_rect, Qt::AlignCenter, emblem_im, icon_state);
     }
 
     painter->setFont(layout.name_font);

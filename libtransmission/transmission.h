@@ -126,7 +126,7 @@ char const* tr_getDefaultDownloadDir(void);
 #define TR_DEFAULT_RPC_PORT 9091
 #define TR_DEFAULT_RPC_URL_STR "/transmission/"
 #define TR_DEFAULT_PEER_PORT_STR "51413"
-#define TR_DEFAULT_PEER_SOCKET_TOS_STR "default"
+#define TR_DEFAULT_PEER_SOCKET_TOS_STR "le"
 #define TR_DEFAULT_PEER_LIMIT_GLOBAL_STR "200"
 #define TR_DEFAULT_PEER_LIMIT_TORRENT_STR "50"
 #define TR_DEFAULT_PEER_LIMIT_TORRENT 50
@@ -314,7 +314,7 @@ bool tr_sessionIsIncompleteFileNamingEnabled(tr_session const* session);
  * @brief Set whether or not RPC calls are allowed in this session.
  *
  * @details If true, libtransmission will open a server socket to listen
- * for incoming http RPC requests as described in docs/rpc-spec.txt.
+ * for incoming http RPC requests as described in extras/rpc-spec.md.
  *
  * This is intially set by tr_sessionInit() and can be
  * queried by tr_sessionIsRPCEnabled().
@@ -889,6 +889,10 @@ void tr_ctorSetFilePriorities(tr_ctor* ctor, tr_file_index_t const* files, tr_fi
 /** @brief Set the download flag for files in a torrent */
 void tr_ctorSetFilesWanted(tr_ctor* ctor, tr_file_index_t const* fileIndices, tr_file_index_t fileCount, bool wanted);
 
+/** @brief Set labels for this torrent, the length of the labels array
+    must be the same size as len. */
+void tr_ctorSetLabels(tr_ctor* ctor, char const** labels, size_t len);
+
 /** @brief Get this peer constructor's peer limit */
 bool tr_ctorGetPeerLimit(tr_ctor const* ctor, tr_ctorMode mode, uint16_t* setmeCount);
 
@@ -1365,7 +1369,13 @@ struct tr_tracker_view
 {
     char const* announce; // full announce URL
     char const* scrape; // full scrape URL
-    char const* host; // human-readable tracker name. (`${host}:${port}`)
+    char const* host; // uniquely-identifying tracker name (`${host}:${port}`)
+
+    // The tracker site's name. Uses the first label before the public suffix
+    // (https://publicsuffix.org/) in the announce URL's host.
+    // e.g. "https://www.example.co.uk/announce/"'s sitename is "example"
+    // RFC 1034 says labels must be less than 64 chars
+    char sitename[64];
 
     char lastAnnounceResult[128]; // if hasAnnounced, the human-readable result of latest announce
     char lastScrapeResult[128]; // if hasScraped, the human-readable result of the latest scrape
@@ -1479,24 +1489,9 @@ void tr_torrentAvailability(tr_torrent const* torrent, int8_t* tab, int size);
 void tr_torrentAmountFinished(tr_torrent const* torrent, float* tab, int size);
 
 /**
- * Callback function invoked when a torrent finishes being verified.
- *
- * @param torrent the torrent that was verified
- * @param aborted true if the verify ended prematurely for some reason,
- *                such as tr_torrentStop() or tr_torrentSetLocation()
- *                being called during verification.
- * @param user_data the user-defined pointer from tr_torrentVerify()
- */
-using tr_verify_done_func = void (*)(tr_torrent* torrent, bool aborted, void* user_data);
-
-/**
  * Queue a torrent for verification.
- *
- * If callback_func is non-nullptr, it will be called from the libtransmission
- * thread after the torrent's completness state is updated after the
- * file verification pass.
  */
-void tr_torrentVerify(tr_torrent* torrent, tr_verify_done_func callback_func_or_nullptr, void* callback_data_or_nullptr);
+void tr_torrentVerify(tr_torrent* torrent);
 
 bool tr_torrentHasMetadata(tr_torrent const* tor);
 

@@ -101,10 +101,10 @@ void gtr_confirm_remove(
     auto d = std::make_shared<Gtk::MessageDialog>(
         parent,
         gtr_sprintf("<big><b>%s</b></big>", primary_text),
-        true,
+        true /*use_markup*/,
         Gtk::MESSAGE_QUESTION,
         Gtk::BUTTONS_NONE,
-        false);
+        true /*modal*/);
 
     if (!secondary_text.empty())
     {

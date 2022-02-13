@@ -1,5 +1,5 @@
 // This file Copyright © 2013-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -220,7 +220,7 @@ static std::string getblkdev(std::string_view path)
         }
 
         auto const pos = path.rfind('/');
-        if (pos == path.npos)
+        if (pos == std::string_view::npos)
         {
             return {};
         }
@@ -459,7 +459,7 @@ static struct tr_disk_space getDiskSpace(char const* path)
 #elif defined(HAVE_STATVFS)
 
     struct statvfs buf;
-    return statvfs(path, &buf) ?
+    return statvfs(path, &buf) != 0 ?
         (struct tr_disk_space){ -1, -1 } :
         (struct tr_disk_space){ (int64_t)buf.f_bavail * (int64_t)buf.f_frsize, (int64_t)buf.f_blocks * (int64_t)buf.f_frsize };
 
@@ -479,7 +479,7 @@ tr_device_info tr_device_info_create(std::string_view path)
 #ifndef _WIN32
     out.device = getblkdev(out.path);
     auto const* const fstype = getfstype(out.path.c_str());
-    out.fstype = fstype ? fstype : "";
+    out.fstype = fstype != nullptr ? fstype : "";
 #endif
     return out;
 }

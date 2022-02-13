@@ -1,5 +1,5 @@
 // This file Copyright © 2009-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -40,6 +40,8 @@ struct tr_ctor
     tr_torrent_metainfo metainfo = {};
 
     tr_priority_t priority = TR_PRI_NORMAL;
+
+    tr_labels_t labels = {};
 
     struct optional_args optional_args[2];
 
@@ -84,7 +86,7 @@ bool tr_ctorSetMetainfoFromFile(tr_ctor* ctor, std::string const& filename, tr_e
 
 bool tr_ctorSetMetainfoFromFile(tr_ctor* ctor, char const* filename, tr_error** error)
 {
-    return tr_ctorSetMetainfoFromFile(ctor, std::string{ filename ? filename : "" }, error);
+    return tr_ctorSetMetainfoFromFile(ctor, std::string{ filename != nullptr ? filename : "" }, error);
 }
 
 bool tr_ctorSetMetainfo(tr_ctor* ctor, char const* metainfo, size_t len, tr_error** error)
@@ -98,7 +100,7 @@ bool tr_ctorSetMetainfo(tr_ctor* ctor, char const* metainfo, size_t len, tr_erro
 bool tr_ctorSetMetainfoFromMagnetLink(tr_ctor* ctor, char const* magnet_link, tr_error** error)
 {
     ctor->torrent_filename.clear();
-    return ctor->metainfo.parseMagnet(magnet_link ? magnet_link : "", error);
+    return ctor->metainfo.parseMagnet(magnet_link != nullptr ? magnet_link : "", error);
 }
 
 std::string_view tr_ctorGetContents(tr_ctor const* ctor)
@@ -216,12 +218,12 @@ void tr_ctorSetDownloadDir(tr_ctor* ctor, tr_ctorMode mode, char const* director
     TR_ASSERT(ctor != nullptr);
     TR_ASSERT(mode == TR_FALLBACK || mode == TR_FORCE);
 
-    ctor->optional_args[mode].download_dir.assign(directory ? directory : "");
+    ctor->optional_args[mode].download_dir.assign(directory != nullptr ? directory : "");
 }
 
 void tr_ctorSetIncompleteDir(tr_ctor* ctor, char const* directory)
 {
-    ctor->incomplete_dir.assign(directory ? directory : "");
+    ctor->incomplete_dir.assign(directory != nullptr ? directory : "");
 }
 
 bool tr_ctorGetPeerLimit(tr_ctor const* ctor, tr_ctorMode mode, uint16_t* setme)
@@ -323,6 +325,31 @@ void tr_ctorSetBandwidthPriority(tr_ctor* ctor, tr_priority_t priority)
 tr_priority_t tr_ctorGetBandwidthPriority(tr_ctor const* ctor)
 {
     return ctor->priority;
+}
+
+/***
+****
+***/
+
+void tr_ctorSetLabels(tr_ctor* ctor, char const** labels, size_t len)
+{
+    auto labels_set = tr_labels_t{};
+    for (size_t i = 0; i < len; i++)
+    {
+        labels_set.emplace(labels[i]);
+    }
+
+    tr_ctorSetLabels(ctor, std::move(labels_set));
+}
+
+void tr_ctorSetLabels(tr_ctor* ctor, tr_labels_t&& labels)
+{
+    ctor->labels = std::move(labels);
+}
+
+tr_labels_t tr_ctorGetLabels(tr_ctor const* ctor)
+{
+    return ctor->labels;
 }
 
 /***

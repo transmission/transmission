@@ -1,5 +1,5 @@
 // This file Copyright © 2007-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -14,10 +14,7 @@
 #include "StatsDialog.h"
 #include "Utils.h"
 
-enum
-{
-    TR_RESPONSE_RESET = 1
-};
+static auto constexpr TR_RESPONSE_RESET = int{ 1 };
 
 class StatsDialog::Impl
 {

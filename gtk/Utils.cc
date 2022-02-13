@@ -1,5 +1,5 @@
 // This file Copyright © 2008-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -13,10 +13,12 @@
 #include <glibmm/i18n.h>
 
 #include <libtransmission/transmission.h> /* TR_RATIO_NA, TR_RATIO_INF */
+
 #include <libtransmission/error.h>
+#include <libtransmission/torrent-metainfo.h>
 #include <libtransmission/utils.h> /* tr_strratio() */
-#include <libtransmission/web-utils.h>
 #include <libtransmission/version.h> /* SHORT_VERSION_STRING */
+#include <libtransmission/web-utils.h>
 
 #include "HigWorkarea.h"
 #include "Prefs.h"
@@ -52,20 +54,20 @@ char const* const speed_T_str = N_("TB/s");
 ****
 ***/
 
-Glib::ustring gtr_get_unicode_string(int i)
+Glib::ustring gtr_get_unicode_string(GtrUnicode uni)
 {
-    switch (i)
+    switch (uni)
     {
-    case GTR_UNICODE_UP:
+    case GtrUnicode::Up:
         return "\xE2\x96\xB4";
 
-    case GTR_UNICODE_DOWN:
+    case GtrUnicode::Down:
         return "\xE2\x96\xBE";
 
-    case GTR_UNICODE_INF:
+    case GtrUnicode::Inf:
         return "\xE2\x88\x9E";
 
-    case GTR_UNICODE_BULLET:
+    case GtrUnicode::Bullet:
         return "\xE2\x88\x99";
 
     default:
@@ -75,7 +77,7 @@ Glib::ustring gtr_get_unicode_string(int i)
 
 Glib::ustring tr_strlratio(double ratio)
 {
-    return tr_strratio(ratio, gtr_get_unicode_string(GTR_UNICODE_INF).c_str());
+    return tr_strratio(ratio, gtr_get_unicode_string(GtrUnicode::Inf).c_str());
 }
 
 Glib::ustring tr_strlpercent(double x)
@@ -121,71 +123,6 @@ Glib::ustring tr_strltime(time_t seconds)
     {
         return s;
     }
-}
-
-/* pattern-matching text; ie, legaltorrents.com */
-Glib::ustring gtr_get_host_from_url(Glib::ustring const& url)
-{
-    Glib::ustring host;
-
-    if (auto const pch = url.find("://"); pch != Glib::ustring::npos)
-    {
-        auto const hostend = url.find_first_of(":/", pch + 3);
-        host = url.substr(pch + 3, hostend == Glib::ustring::npos ? hostend : (hostend - pch - 3));
-    }
-
-    if (tr_addressIsIP(host.c_str()))
-    {
-        return url;
-    }
-    else
-    {
-        auto const first_dot = host.find('.');
-        auto const last_dot = host.rfind('.');
-
-        if (first_dot != Glib::ustring::npos && last_dot != Glib::ustring::npos && first_dot != last_dot)
-        {
-            return host.substr(first_dot + 1);
-        }
-        else
-        {
-            return host;
-        }
-    }
-}
-
-namespace
-{
-
-bool gtr_is_supported_url(Glib::ustring const& str)
-{
-    return !str.empty() &&
-        (Glib::str_has_prefix(str, "ftp://") || Glib::str_has_prefix(str, "http://") || Glib::str_has_prefix(str, "https://"));
-}
-
-} // namespace
-
-bool gtr_is_magnet_link(Glib::ustring const& str)
-{
-    return !str.empty() && Glib::str_has_prefix(str, "magnet:?");
-}
-
-bool gtr_is_hex_hashcode(std::string const& str)
-{
-    if (str.size() != 40)
-    {
-        return false;
-    }
-
-    for (int i = 0; i < 40; ++i)
-    {
-        if (!isxdigit(str[i]))
-        {
-            return false;
-        }
-    }
-
-    return true;
 }
 
 namespace
@@ -272,9 +209,7 @@ bool on_tree_view_button_pressed(
  * clear all the selections. */
 bool on_tree_view_button_released(Gtk::TreeView* view, GdkEventButton* event)
 {
-    Gtk::TreeModel::Path path;
-
-    if (!view->get_path_at_pos((int)event->x, (int)event->y, path))
+    if (Gtk::TreeModel::Path path; !view->get_path_at_pos((int)event->x, (int)event->y, path))
     {
         view->get_selection()->unselect_all();
     }
@@ -509,8 +444,6 @@ void gtr_dialog_set_content(Gtk::Dialog& dialog, Gtk::Widget& content)
 
 void gtr_unrecognized_url_dialog(Gtk::Widget& parent, Glib::ustring const& url)
 {
-    char const* xt = "xt=urn:btih";
-
     auto* window = getWindow(&parent);
 
     Glib::ustring gstr;
@@ -518,19 +451,17 @@ void gtr_unrecognized_url_dialog(Gtk::Widget& parent, Glib::ustring const& url)
     auto w = std::make_shared<Gtk::MessageDialog>(
         *window,
         _("Unrecognized URL"),
-        false,
+        false /*use markup*/,
         Gtk::MESSAGE_ERROR,
-        Gtk::BUTTONS_CLOSE);
+        Gtk::BUTTONS_CLOSE,
+        true /*modal*/);
 
     gstr += gtr_sprintf(_("Transmission doesn't know how to use \"%s\""), url);
 
-    if (gtr_is_magnet_link(url) && url.find(xt) == Glib::ustring::npos)
+    if (tr_magnet_metainfo{}.parseMagnet(url.raw()))
     {
         gstr += "\n \n";
-        gstr += gtr_sprintf(
-            _("This magnet link appears to be intended for something other than BitTorrent. "
-              "BitTorrent magnet links have a section containing \"%s\"."),
-            xt);
+        gstr += _("This magnet link appears to be intended for something other than BitTorrent.");
     }
 
     w->set_secondary_text(gstr);
@@ -542,19 +473,16 @@ void gtr_unrecognized_url_dialog(Gtk::Widget& parent, Glib::ustring const& url)
 ****
 ***/
 
-void gtr_paste_clipboard_url_into_entry(Gtk::Entry& e)
+void gtr_paste_clipboard_url_into_entry(Gtk::Entry& entry)
 {
-    Glib::ustring const text[] = {
-        gtr_str_strip(Gtk::Clipboard::get(GDK_SELECTION_PRIMARY)->wait_for_text()),
-        gtr_str_strip(Gtk::Clipboard::get(GDK_SELECTION_CLIPBOARD)->wait_for_text()),
-    };
-
-    for (auto const& s : text)
+    for (auto const& str : { Gtk::Clipboard::get(GDK_SELECTION_PRIMARY)->wait_for_text(),
+                             Gtk::Clipboard::get(GDK_SELECTION_CLIPBOARD)->wait_for_text() })
     {
-        if (!s.empty() && (gtr_is_supported_url(s) || gtr_is_magnet_link(s) || gtr_is_hex_hashcode(s)))
+        auto const sv = tr_strvStrip(str.raw());
+        if (!sv.empty() && (tr_urlIsValid(sv) || tr_magnet_metainfo{}.parseMagnet(sv)))
         {
-            e.set_text(s);
-            break;
+            entry.set_text(str);
+            return;
         }
     }
 }

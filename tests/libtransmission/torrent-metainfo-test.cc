@@ -149,6 +149,11 @@ TEST_F(TorrentMetainfoTest, AndroidTorrent)
     tr_error* error = nullptr;
     EXPECT_TRUE(tr_ctorSetMetainfoFromFile(ctor, filename.c_str(), &error));
     EXPECT_EQ(nullptr, error);
+    auto const* const metainfo = tr_ctorGetMetainfo(ctor);
+    EXPECT_NE(nullptr, metainfo);
+    EXPECT_EQ(336, metainfo->infoDictOffset());
+    EXPECT_EQ(26583, metainfo->infoDictSize());
+    EXPECT_EQ(592, metainfo->piecesOffset());
     tr_ctorFree(ctor);
 }
 

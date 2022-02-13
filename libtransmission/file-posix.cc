@@ -1,10 +1,10 @@
 // This file Copyright © 2013-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
 #undef _GNU_SOURCE
-#define _GNU_SOURCE
+#define _GNU_SOURCE // NOLINT
 
 #include <algorithm>
 #include <array>
@@ -14,17 +14,17 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <string_view>
+#include <vector>
+
 #include <dirent.h>
 #include <fcntl.h> /* O_LARGEFILE, posix_fadvise(), [posix_]fallocate(), fcntl() */
 #include <libgen.h> /* basename(), dirname() */
-#include <string_view>
-#include <unistd.h> /* lseek(), write(), ftruncate(), pread(), pwrite(), pathconf(), etc */
-#include <vector>
-
 #include <sys/file.h> /* flock() */
 #include <sys/mman.h> /* mmap(), munmap() */
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <unistd.h> /* lseek(), write(), ftruncate(), pread(), pwrite(), pathconf(), etc */
 
 #ifdef HAVE_XFS_XFS_H
 #include <xfs/xfs.h>
@@ -55,7 +55,6 @@
 #include "error.h"
 #include "file.h"
 #include "log.h"
-#include "platform.h"
 #include "tr-assert.h"
 #include "utils.h"
 
@@ -918,9 +917,7 @@ bool tr_sys_file_advise(
 
     TR_ASSERT(native_advice != POSIX_FADV_NORMAL);
 
-    int const code = posix_fadvise(handle, offset, size, native_advice);
-
-    if (code != 0)
+    if (int const code = posix_fadvise(handle, offset, size, native_advice); code != 0)
     {
         set_system_error(error, code);
         ret = false;
@@ -1053,8 +1050,7 @@ bool tr_sys_file_preallocate(tr_sys_file_t handle, uint64_t size, int flags, tr_
     {
         errno = 0;
 
-        auto const success = approach(handle, size);
-        if (success)
+        if (auto const success = approach(handle, size); success)
         {
             return success;
         }
@@ -1316,9 +1312,8 @@ char const* tr_sys_dir_read_name(tr_sys_dir_t handle, tr_error** error)
     char const* ret = nullptr;
 
     errno = 0;
-    struct dirent const* const entry = readdir((DIR*)handle);
 
-    if (entry != nullptr)
+    if (auto const* const entry = readdir((DIR*)handle); entry != nullptr)
     {
         ret = entry->d_name;
     }

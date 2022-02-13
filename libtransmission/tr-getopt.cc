@@ -1,5 +1,5 @@
 // This file Copyright © 2008-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -62,11 +62,11 @@ static void getopts_usage_line(tr_option const* opt, int longWidth, int shortWid
 
     auto const strip_leading_whitespace = [](std::string_view text)
     {
-        auto pos = text.find_first_not_of(' ');
-        if (pos != std::string_view::npos)
+        if (auto pos = text.find_first_not_of(' '); pos != std::string_view::npos)
         {
             text.remove_prefix(pos);
         }
+
         return text;
     };
 

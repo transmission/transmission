@@ -1,5 +1,5 @@
 // This file Copyright © 2009-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -38,8 +38,8 @@ namespace
 void ensureSoundCommandIsAList(tr_variant* dict)
 {
     tr_quark key = TR_KEY_torrent_complete_sound_command;
-    tr_variant* list = nullptr;
-    if (tr_variantDictFindList(dict, key, &list))
+
+    if (tr_variant* list = nullptr; tr_variantDictFindList(dict, key, &list))
     {
         return;
     }
@@ -129,7 +129,7 @@ std::array<Prefs::PrefItem, Prefs::PREFS_COUNT> const Prefs::Items{
     { QUEUE_STALLED_MINUTES, TR_KEY_queue_stalled_minutes, QVariant::Int },
     { SCRIPT_TORRENT_DONE_ENABLED, TR_KEY_script_torrent_done_enabled, QVariant::Bool },
     { SCRIPT_TORRENT_DONE_FILENAME, TR_KEY_script_torrent_done_filename, QVariant::String },
-    { SOCKET_TOS, TR_KEY_peer_socket_tos, QVariant::Int },
+    { SOCKET_TOS, TR_KEY_peer_socket_tos, QVariant::String },
     { START, TR_KEY_start_added_torrents, QVariant::Bool },
     { TRASH_ORIGINAL, TR_KEY_trash_original_torrent_files, QVariant::Bool },
     { PEX_ENABLED, TR_KEY_pex_enabled, QVariant::Bool },
@@ -156,7 +156,7 @@ std::array<Prefs::PrefItem, Prefs::PREFS_COUNT> const Prefs::Items{
 namespace
 {
 
-auto const FilterModes = std::array<std::pair<int, std::string_view>, FilterMode::NUM_MODES>{ {
+auto constexpr FilterModes = std::array<std::pair<int, std::string_view>, FilterMode::NUM_MODES>{ {
     { FilterMode::SHOW_ALL, "show-all" },
     { FilterMode::SHOW_ACTIVE, "show-active" },
     { FilterMode::SHOW_DOWNLOADING, "show-downloading" },
@@ -167,7 +167,7 @@ auto const FilterModes = std::array<std::pair<int, std::string_view>, FilterMode
     { FilterMode::SHOW_ERROR, "show-error" },
 } };
 
-auto const SortModes = std::array<std::pair<int, std::string_view>, SortMode::NUM_MODES>{ {
+auto constexpr SortModes = std::array<std::pair<int, std::string_view>, SortMode::NUM_MODES>{ {
     { SortMode::SORT_BY_NAME, "sort-by-name" },
     { SortMode::SORT_BY_ACTIVITY, "sort-by-activity" },
     { SortMode::SORT_BY_AGE, "sort-by-age" },
@@ -507,9 +507,8 @@ bool Prefs::getBool(int key) const
 QString Prefs::getString(int key) const
 {
     assert(Items[key].type == QVariant::String);
-    QByteArray const b = values_[key].toByteArray();
 
-    if (isValidUtf8(b.constData()))
+    if (auto const b = values_[key].toByteArray(); isValidUtf8(b.constData()))
     {
         values_[key].setValue(QString::fromUtf8(b.constData()));
     }

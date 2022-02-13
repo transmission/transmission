@@ -1,5 +1,5 @@
 // This file Copyright © 2009-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -35,61 +35,49 @@ Torrent::Torrent(Prefs const& prefs, int id)
 ****
 ***/
 
-bool Torrent::getSeedRatio(double& setmeRatio) const
+std::optional<double> Torrent::getSeedRatioLimit() const
 {
-    bool is_limited;
+    auto const mode = seedRatioMode();
 
-    switch (seedRatioMode())
+    if (mode == TR_RATIOLIMIT_SINGLE)
     {
-    case TR_RATIOLIMIT_SINGLE:
-        is_limited = true;
-        setmeRatio = seedRatioLimit();
-        break;
-
-    case TR_RATIOLIMIT_GLOBAL:
-        if ((is_limited = prefs_.getBool(Prefs::RATIO_ENABLED)))
-        {
-            setmeRatio = prefs_.getDouble(Prefs::RATIO);
-        }
-
-        break;
-
-    default: // TR_RATIOLIMIT_UNLIMITED:
-        is_limited = false;
-        break;
+        return seedRatioLimit();
     }
 
-    return is_limited;
+    if (mode == TR_RATIOLIMIT_GLOBAL && prefs_.getBool(Prefs::RATIO_ENABLED))
+    {
+        return prefs_.getDouble(Prefs::RATIO);
+    }
+
+    return {};
 }
 
-bool Torrent::includesTracker(FaviconCache::Key const& key) const
+bool Torrent::includesTracker(QString const& sitename) const
 {
-    return std::binary_search(std::begin(tracker_keys_), std::end(tracker_keys_), key);
+    return std::binary_search(std::begin(sitenames_), std::end(sitenames_), sitename);
 }
 
 int Torrent::compareSeedRatio(Torrent const& that) const
 {
-    double a;
-    double b;
-    bool const has_a = getSeedRatio(a);
-    bool const has_b = that.getSeedRatio(b);
+    auto const a = getSeedRatioLimit();
+    auto const b = that.getSeedRatioLimit();
 
-    if (!has_a && !has_b)
+    if (!a && !b)
     {
         return 0;
     }
 
-    if (!has_a || !has_b)
+    if (!a || !b)
     {
-        return has_a ? -1 : 1;
+        return a ? -1 : 1;
     }
 
-    if (a < b)
+    if (*a < *b)
     {
         return -1;
     }
 
-    if (a > b)
+    if (*a > *b)
     {
         return 1;
     }
@@ -281,19 +269,17 @@ Torrent::fields_t Torrent::update(tr_quark const* keys, tr_variant const* const*
                     {
                         files_[i].index = i;
                     }
-
                     break;
                 }
 
             case TR_KEY_trackers:
                 {
-                    std::set<FaviconCache::Key> tmp;
+                    auto tmp = std::set<QString>{};
                     for (auto const& ts : tracker_stats_)
                     {
-                        tmp.insert(ts.favicon_key);
+                        tmp.insert(ts.sitename);
                     }
-
-                    tracker_keys_ = FaviconCache::Keys(std::begin(tmp), std::end(tmp));
+                    sitenames_ = std::vector<QString>{ std::begin(tmp), std::end(tmp) };
                     break;
                 }
             }
@@ -369,5 +355,5 @@ QString Torrent::getError() const
 
 QPixmap TrackerStat::getFavicon() const
 {
-    return trApp->faviconCache().find(favicon_key);
+    return trApp->faviconCache().find(sitename);
 }

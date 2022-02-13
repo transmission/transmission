@@ -13,6 +13,7 @@
 		0A89346B736DBCF81F3A4852 /* torrent-metainfo.h in Headers */ = {isa = PBXBuildFile; fileRef = 0A89346B736DBCF81F3A4853 /* torrent-metainfo.h */; };
 		1BB44E07B1B52E28291B4E32 /* file-piece-map.cc in Sources */ = {isa = PBXBuildFile; fileRef = 1BB44E07B1B52E28291B4E30 /* file-piece-map.cc */; };
 		1BB44E07B1B52E28291B4E33 /* file-piece-map.h in Headers */ = {isa = PBXBuildFile; fileRef = 1BB44E07B1B52E28291B4E31 /* file-piece-map.h */; };
+		2856E0656A49F2665D69E760 /* benc.h in Headers */ = {isa = PBXBuildFile; fileRef = 2856E0656A49F2665D69E761 /* benc.h */; };
 		35F373030C2DA89000DAA8F2 /* FilePriorityCell.mm in Sources */ = {isa = PBXBuildFile; fileRef = 35F373010C2DA88F00DAA8F2 /* FilePriorityCell.mm */; };
 		3C7A11970D0B2EE300B5701F /* getgateway.c in Sources */ = {isa = PBXBuildFile; fileRef = 3C7A11910D0B2EE300B5701F /* getgateway.c */; };
 		3C7A11980D0B2EE300B5701F /* getgateway.h in Headers */ = {isa = PBXBuildFile; fileRef = 3C7A11920D0B2EE300B5701F /* getgateway.h */; };
@@ -399,8 +400,11 @@
 		C3CEBBFA2794A0D200683BE0 /* compiler_gcc.h in Headers */ = {isa = PBXBuildFile; fileRef = C3CEBBF72794A0D200683BE0 /* compiler_gcc.h */; };
 		C3CEBBFB2794A0D200683BE0 /* compiler_msc.h in Headers */ = {isa = PBXBuildFile; fileRef = C3CEBBF82794A0D200683BE0 /* compiler_msc.h */; };
 		C3CEBBFC2794A12200683BE0 /* libdeflate.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C3CEBBA927949CA000683BE0 /* libdeflate.a */; };
+		C3D9062627B7E3E200EF2386 /* lookup_string_in_fixed_set.c in Sources */ = {isa = PBXBuildFile; fileRef = C3D9061727B7E1DE00EF2386 /* lookup_string_in_fixed_set.c */; };
+		C3D9062727B7E3E800EF2386 /* psl.c in Sources */ = {isa = PBXBuildFile; fileRef = C3D9061827B7E1DE00EF2386 /* psl.c */; };
+		C3D9062A27B7EAC600EF2386 /* libpsl.h in Headers */ = {isa = PBXBuildFile; fileRef = C3D9061B27B7E31100EF2386 /* libpsl.h */; };
+		C3D9062F27B7F7E200EF2386 /* libpsl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C3D9062127B7E3C900EF2386 /* libpsl.a */; };
 		CAB35C64252F6F5E00552A55 /* mime-types.h in Headers */ = {isa = PBXBuildFile; fileRef = CAB35C62252F6F5E00552A55 /* mime-types.h */; };
-		2856E0656A49F2665D69E760 /* benc.h in Headers */ = {isa = PBXBuildFile; fileRef = 2856E0656A49F2665D69E761 /* benc.h */; };
 		E138A9780C04D88F00C5426C /* ProgressGradients.mm in Sources */ = {isa = PBXBuildFile; fileRef = E138A9760C04D88F00C5426C /* ProgressGradients.mm */; };
 		E23B55A5FC3B557F7746D510 /* interned-string.h in Headers */ = {isa = PBXBuildFile; fileRef = E23B55A5FC3B557F7746D511 /* interned-string.h */; settings = {ATTRIBUTES = (Project, ); }; };
 		E71A5565279C2DD600EBFA1E /* tr-assert.mm in Sources */ = {isa = PBXBuildFile; fileRef = E71A5564279C2DD600EBFA1E /* tr-assert.mm */; };
@@ -512,6 +516,13 @@
 			remoteGlobalIDString = C3CEBB9F27949CA000683BE0;
 			remoteInfo = deflate;
 		};
+		C3D9062D27B7F7CE00EF2386 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 29B97313FDCFA39411CA2CEA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = C3D9062027B7E3C900EF2386;
+			remoteInfo = psl;
+		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -547,6 +558,7 @@
 		13E42FB307B3F0F600E4EEF1 /* CoreData.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreData.framework; path = System/Library/Frameworks/CoreData.framework; sourceTree = SDKROOT; };
 		1BB44E07B1B52E28291B4E30 /* file-piece-map.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "file-piece-map.cc"; sourceTree = "<group>"; };
 		1BB44E07B1B52E28291B4E31 /* file-piece-map.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "file-piece-map.h"; sourceTree = "<group>"; };
+		2856E0656A49F2665D69E761 /* benc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = benc.h; sourceTree = "<group>"; };
 		29B97316FDCFA39411CA2CEA /* main.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = main.mm; sourceTree = "<group>"; };
 		29B97324FDCFA39411CA2CEA /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
 		29B97325FDCFA39411CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -1111,8 +1123,11 @@
 		C3CEBBF62794A0D200683BE0 /* common_defs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = common_defs.h; path = common/common_defs.h; sourceTree = "<group>"; };
 		C3CEBBF72794A0D200683BE0 /* compiler_gcc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = compiler_gcc.h; path = common/compiler_gcc.h; sourceTree = "<group>"; };
 		C3CEBBF82794A0D200683BE0 /* compiler_msc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = compiler_msc.h; path = common/compiler_msc.h; sourceTree = "<group>"; };
+		C3D9061727B7E1DE00EF2386 /* lookup_string_in_fixed_set.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = lookup_string_in_fixed_set.c; path = src/lookup_string_in_fixed_set.c; sourceTree = "<group>"; };
+		C3D9061827B7E1DE00EF2386 /* psl.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = psl.c; path = src/psl.c; sourceTree = "<group>"; };
+		C3D9061B27B7E31100EF2386 /* libpsl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = libpsl.h; path = include/libpsl.h; sourceTree = "<group>"; };
+		C3D9062127B7E3C900EF2386 /* libpsl.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libpsl.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		CAB35C62252F6F5E00552A55 /* mime-types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "mime-types.h"; sourceTree = "<group>"; };
-		2856E0656A49F2665D69E761 /* benc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "benc.h"; sourceTree = "<group>"; };
 		E138A9750C04D88F00C5426C /* ProgressGradients.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ProgressGradients.h; sourceTree = "<group>"; };
 		E138A9760C04D88F00C5426C /* ProgressGradients.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ProgressGradients.mm; sourceTree = "<group>"; };
 		E23B55A5FC3B557F7746D511 /* interned-string.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "interned-string.h"; sourceTree = SOURCE_ROOT; };
@@ -1209,6 +1224,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C3D9062F27B7F7E200EF2386 /* libpsl.a in Frameworks */,
 				C3CEBBFC2794A12200683BE0 /* libdeflate.a in Frameworks */,
 				C1A7517526ED048C0038B90A /* libarc4.a in Frameworks */,
 				C1639A741A55F4E000E42033 /* libb64.a in Frameworks */,
@@ -1259,6 +1275,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		C3CEBBA427949CA000683BE0 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		C3D9061F27B7E3C900EF2386 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -1376,6 +1399,7 @@
 				C1639A6F1A55F4D600E42033 /* libb64.a */,
 				C1A7516426ED03140038B90A /* libarc4.a */,
 				C3CEBBA927949CA000683BE0 /* libdeflate.a */,
+				C3D9062127B7E3C900EF2386 /* libpsl.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1397,6 +1421,7 @@
 				BE75C3570C72A0D600DBEFE0 /* libevent */,
 				BE1183410CE15DF00002D0F3 /* libminiupnp */,
 				3C7A11880D0B2E6700B5701F /* libnatpmp */,
+				C3D9061627B7E12F00EF2386 /* libpsl */,
 				C1639A751A55F52800E42033 /* b64 */,
 				4DDBB71509E16B3F00284745 /* Libraries */,
 				A2F35BBA15C5A0A100EBF632 /* Frameworks */,
@@ -1931,6 +1956,17 @@
 			name = common;
 			sourceTree = "<group>";
 		};
+		C3D9061627B7E12F00EF2386 /* libpsl */ = {
+			isa = PBXGroup;
+			children = (
+				C3D9061B27B7E31100EF2386 /* libpsl.h */,
+				C3D9061727B7E1DE00EF2386 /* lookup_string_in_fixed_set.c */,
+				C3D9061827B7E1DE00EF2386 /* psl.c */,
+			);
+			name = libpsl;
+			path = "third-party/libpsl";
+			sourceTree = "<group>";
+		};
 		E1B6FBF80C0D719B0015FE4D /* Info Window */ = {
 			isa = PBXGroup;
 			children = (
@@ -2186,6 +2222,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		C3D9061D27B7E3C900EF2386 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C3D9062A27B7EAC600EF2386 /* libpsl.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
@@ -2226,6 +2270,7 @@
 				A22CFCC70FC24F990009BD3E /* PBXTargetDependency */,
 				A2E384E4130DFB51001F501B /* PBXTargetDependency */,
 				C165AB8D1A55FAA900D37711 /* PBXTargetDependency */,
+				C3D9062E27B7F7CE00EF2386 /* PBXTargetDependency */,
 			);
 			name = libtransmission;
 			productName = transmission;
@@ -2447,6 +2492,24 @@
 			productReference = C3CEBBA927949CA000683BE0 /* libdeflate.a */;
 			productType = "com.apple.product-type.library.static";
 		};
+		C3D9062027B7E3C900EF2386 /* psl */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = C3D9062227B7E3C900EF2386 /* Build configuration list for PBXNativeTarget "psl" */;
+			buildPhases = (
+				C3D9062C27B7F4FE00EF2386 /* ShellScript */,
+				C3D9061D27B7E3C900EF2386 /* Headers */,
+				C3D9061E27B7E3C900EF2386 /* Sources */,
+				C3D9061F27B7E3C900EF2386 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = psl;
+			productName = libpsl;
+			productReference = C3D9062127B7E3C900EF2386 /* libpsl.a */;
+			productType = "com.apple.product-type.library.static";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -2465,6 +2528,9 @@
 					};
 					C1639A6E1A55F4D600E42033 = {
 						CreatedOnToolsVersion = 6.1.1;
+					};
+					C3D9062027B7E3C900EF2386 = {
+						CreatedOnToolsVersion = 13.0;
 					};
 				};
 			};
@@ -2503,6 +2569,7 @@
 				C1639A6E1A55F4D600E42033 /* b64 */,
 				C1A7516326ED03140038B90A /* arc4 */,
 				C3CEBB9F27949CA000683BE0 /* deflate */,
+				C3D9062027B7E3C900EF2386 /* psl */,
 			);
 		};
 /* End PBXProject section */
@@ -2571,7 +2638,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "sh update-version-h.sh";
+			shellScript = "sh update-version-h.sh\n";
 		};
 		A2305097100C0293003FDB0C /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -2643,6 +2710,25 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "cd third-party/dht && rm -f dht && ln -s . dht\n";
+		};
+		C3D9062C27B7F4FE00EF2386 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"third-party/libpsl/include/libpsl.h.in",
+			);
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"third-party/libpsl/include/libpsl.h",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "sed 's|@LIBPSL_[A-Z_]*@|0|' < third-party/libpsl/include/libpsl.h.in > third-party/libpsl/include/libpsl.h\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -2944,6 +3030,15 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		C3D9061E27B7E3C900EF2386 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				C3D9062627B7E3E200EF2386 /* lookup_string_in_fixed_set.c in Sources */,
+				C3D9062727B7E3E800EF2386 /* psl.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -3016,6 +3111,11 @@
 			isa = PBXTargetDependency;
 			target = C3CEBB9F27949CA000683BE0 /* deflate */;
 			targetProxy = C33E46A12794B3CC0090F2AA /* PBXContainerItemProxy */;
+		};
+		C3D9062E27B7F7CE00EF2386 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = C3D9062027B7E3C900EF2386 /* psl */;
+			targetProxy = C3D9062D27B7F7CE00EF2386 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -3277,17 +3377,15 @@
 					"third-party/libutp",
 					"third-party/utfcpp/source",
 					"third-party/libdeflate",
+					"third-party/libpsl/include",
 				);
 				OTHER_CFLAGS = (
 					"$(inherited)",
 					"-DWITH_UTP",
 					"-D__TRANSMISSION__",
 					"-DHAVE_STRLCPY",
-					"-DHAVE_STRLCAT",
 					"-DHAVE_ASPRINTF",
 					"-DHAVE_LIBGEN",
-					"-DHAVE_STRCASECMP",
-					"-DHAVE_STRCASESTR",
 					"-DHAVE_ZLIB",
 					"-DHAVE_ICONV",
 				);
@@ -3472,17 +3570,15 @@
 					"third-party/libutp",
 					"third-party/utfcpp/source",
 					"third-party/libdeflate",
+					"third-party/libpsl/include",
 				);
 				OTHER_CFLAGS = (
 					"$(inherited)",
 					"-DWITH_UTP",
 					"-D__TRANSMISSION__",
 					"-DHAVE_STRLCPY",
-					"-DHAVE_STRLCAT",
 					"-DHAVE_ASPRINTF",
 					"-DHAVE_LIBGEN",
-					"-DHAVE_STRCASECMP",
-					"-DHAVE_STRCASESTR",
 					"-DHAVE_ZLIB",
 					"-DHAVE_ICONV",
 				);
@@ -3724,17 +3820,15 @@
 					"third-party/libutp",
 					"third-party/utfcpp/source",
 					"third-party/libdeflate",
+					"third-party/libpsl/include",
 				);
 				OTHER_CFLAGS = (
 					"$(inherited)",
 					"-DWITH_UTP",
 					"-D__TRANSMISSION__",
 					"-DHAVE_STRLCPY",
-					"-DHAVE_STRLCAT",
 					"-DHAVE_ASPRINTF",
 					"-DHAVE_LIBGEN",
-					"-DHAVE_STRCASECMP",
-					"-DHAVE_STRCASESTR",
 					"-DHAVE_ZLIB",
 					"-DHAVE_ICONV",
 				);
@@ -4021,6 +4115,33 @@
 			};
 			name = Release;
 		};
+		C3D9062327B7E3C900EF2386 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_PREPROCESSOR_DEFINITIONS_NOT_USED_IN_PRECOMPS = "PACKAGE_VERSION=\"\\\"0\\\"\"";
+				HEADER_SEARCH_PATHS = "third-party/libpsl/include";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		C3D9062427B7E3C900EF2386 /* Release - Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_PREPROCESSOR_DEFINITIONS_NOT_USED_IN_PRECOMPS = "PACKAGE_VERSION=\"\\\"0\\\"\"";
+				HEADER_SEARCH_PATHS = "third-party/libpsl/include";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = "Release - Debug";
+		};
+		C3D9062527B7E3C900EF2386 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_PREPROCESSOR_DEFINITIONS_NOT_USED_IN_PRECOMPS = "PACKAGE_VERSION=\"\\\"0\\\"\"";
+				HEADER_SEARCH_PATHS = "third-party/libpsl/include";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -4170,6 +4291,16 @@
 				C3CEBBA627949CA000683BE0 /* Debug */,
 				C3CEBBA727949CA000683BE0 /* Release - Debug */,
 				C3CEBBA827949CA000683BE0 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		C3D9062227B7E3C900EF2386 /* Build configuration list for PBXNativeTarget "psl" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C3D9062327B7E3C900EF2386 /* Debug */,
+				C3D9062427B7E3C900EF2386 /* Release - Debug */,
+				C3D9062527B7E3C900EF2386 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;

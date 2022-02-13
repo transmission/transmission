@@ -1,5 +1,5 @@
 // This file Copyright © 2010-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -22,8 +22,7 @@
 
 using namespace std::literals;
 
-tr_log_level __tr_message_level = TR_LOG_ERROR;
-
+static tr_log_level tr_message_level = TR_LOG_ERROR;
 static bool myQueueEnabled = false;
 static tr_log_message* myQueue = nullptr;
 static tr_log_message** myQueueTail = &myQueue;
@@ -45,7 +44,7 @@ static inline bool IsDebuggerPresent()
 
 tr_log_level tr_logGetLevel()
 {
-    return __tr_message_level;
+    return tr_message_level;
 }
 
 /***
@@ -84,7 +83,7 @@ tr_sys_file_t tr_logGetFile()
 
 void tr_logSetLevel(tr_log_level level)
 {
-    __tr_message_level = level;
+    tr_message_level = level;
 }
 
 void tr_logSetQueueEnabled(bool isEnabled)
@@ -127,8 +126,7 @@ void tr_logFreeQueue(tr_log_message* list)
 
 char* tr_logGetTimeStr(char* buf, size_t buflen)
 {
-    struct timeval tv;
-    tr_gettimeofday(&tv);
+    auto const tv = tr_gettimeofday();
     time_t const seconds = tv.tv_sec;
     auto const milliseconds = int(tv.tv_usec / 1000);
     char msec_str[8];
@@ -197,7 +195,13 @@ void tr_logAddDeep(char const* file, int line, char const* name, char const* fmt
 ****
 ***/
 
-void tr_logAddMessage(char const* file, int line, tr_log_level level, char const* name, char const* fmt, ...)
+void tr_logAddMessage(
+    [[maybe_unused]] char const* file,
+    [[maybe_unused]] int line,
+    [[maybe_unused]] tr_log_level level,
+    [[maybe_unused]] char const* name,
+    char const* fmt,
+    ...)
 {
     int const err = errno; /* message logging shouldn't affect errno */
     char buf[1024];

@@ -34,6 +34,8 @@ protected:
         tr_torrent_metainfo& metainfo,
         tr_tracker_info const* trackers,
         int const trackerCount,
+        char const** webseeds,
+        int const webseedCount,
         void const* payload,
         size_t const payloadSize,
         char const* comment,
@@ -56,7 +58,16 @@ protected:
 
         // have tr_makeMetaInfo() build the .torrent file
         auto const torrent_file = tr_strvJoin(input_file, ".torrent");
-        tr_makeMetaInfo(builder, torrent_file.c_str(), trackers, trackerCount, comment, isPrivate, std::string(source).c_str());
+        tr_makeMetaInfo(
+            builder,
+            torrent_file.c_str(),
+            trackers,
+            trackerCount,
+            webseeds,
+            webseedCount,
+            comment,
+            isPrivate,
+            std::string(source).c_str());
         EXPECT_EQ(isPrivate, builder->isPrivate);
         EXPECT_EQ(torrent_file, builder->outputFile);
         EXPECT_STREQ(comment, builder->comment);
@@ -76,9 +87,12 @@ protected:
         EXPECT_EQ(payloadSize, metainfo.totalSize());
         EXPECT_EQ(makeString(tr_sys_path_basename(input_file.data(), nullptr)), metainfo.name());
         EXPECT_EQ(comment, metainfo.comment());
-        EXPECT_EQ(tr_file_index_t{ 1 }, metainfo.fileCount());
         EXPECT_EQ(isPrivate, metainfo.isPrivate());
         EXPECT_EQ(size_t(trackerCount), std::size(metainfo.announceList()));
+        EXPECT_EQ(size_t(webseedCount), metainfo.webseedCount());
+        EXPECT_EQ(tr_file_index_t{ 1 }, metainfo.fileCount());
+        EXPECT_EQ(makeString(tr_sys_path_basename(input_file.data(), nullptr)), metainfo.fileSubpath(0));
+        EXPECT_EQ(payloadSize, metainfo.fileSize(0));
 
         // cleanup
         tr_metaInfoBuilderFree(builder);
@@ -87,6 +101,8 @@ protected:
     void testSingleDirectoryImpl(
         tr_tracker_info const* trackers,
         int const tracker_count,
+        char const** webseeds,
+        int const webseed_count,
         void const** payloads,
         size_t const* payload_sizes,
         size_t const payload_count,
@@ -133,7 +149,16 @@ protected:
 
         // build the .torrent file
         auto torrent_file = tr_strvJoin(top, ".torrent"sv);
-        tr_makeMetaInfo(builder, torrent_file.c_str(), trackers, tracker_count, comment, is_private, source);
+        tr_makeMetaInfo(
+            builder,
+            torrent_file.c_str(),
+            trackers,
+            tracker_count,
+            webseeds,
+            webseed_count,
+            comment,
+            is_private,
+            source);
         EXPECT_EQ(is_private, builder->isPrivate);
         EXPECT_EQ(torrent_file, builder->outputFile);
         EXPECT_STREQ(comment, builder->comment);
@@ -168,6 +193,8 @@ protected:
     void testSingleDirectoryRandomPayloadImpl(
         tr_tracker_info const* trackers,
         int const tracker_count,
+        char const** webseeds,
+        int const webseed_count,
         size_t const max_file_count,
         size_t const max_file_size,
         char const* comment,
@@ -191,6 +218,8 @@ protected:
         testSingleDirectoryImpl(
             trackers,
             tracker_count,
+            webseeds,
+            webseed_count,
             const_cast<void const**>(payloads),
             payload_sizes,
             payload_count,
@@ -227,6 +256,32 @@ TEST_F(MakemetaTest, singleFile)
         metainfo,
         trackers.data(),
         tracker_count,
+        nullptr,
+        0,
+        payload.data(),
+        payload.size(),
+        comment,
+        is_private,
+        "TESTME"sv);
+}
+
+TEST_F(MakemetaTest, webseed)
+{
+    auto trackers = std::vector<tr_tracker_info>{};
+    auto webseeds = std::vector<char const*>{};
+
+    webseeds.emplace_back("https://www.example.com/linux.iso");
+
+    auto const payload = std::string{ "Hello, World!\n" };
+    char const* const comment = "This is the comment";
+    bool const is_private = false;
+    auto metainfo = tr_torrent_metainfo{};
+    testSingleFileImpl(
+        metainfo,
+        std::data(trackers),
+        std::size(trackers),
+        std::data(webseeds),
+        std::size(webseeds),
         payload.data(),
         payload.size(),
         comment,
@@ -253,6 +308,8 @@ TEST_F(MakemetaTest, singleFileDifferentSourceFlags)
         metainfo_foobar,
         trackers.data(),
         tracker_count,
+        nullptr,
+        0,
         payload.data(),
         payload.size(),
         comment,
@@ -264,6 +321,8 @@ TEST_F(MakemetaTest, singleFileDifferentSourceFlags)
         metainfo_testme,
         trackers.data(),
         tracker_count,
+        nullptr,
+        0,
         payload.data(),
         payload.size(),
         comment,
@@ -295,6 +354,8 @@ TEST_F(MakemetaTest, singleDirectoryRandomPayload)
         testSingleDirectoryRandomPayloadImpl(
             trackers.data(),
             tracker_count,
+            nullptr,
+            0,
             DefaultMaxFileCount,
             DefaultMaxFileSize,
             comment,

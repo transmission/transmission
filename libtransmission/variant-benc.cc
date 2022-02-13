@@ -1,5 +1,5 @@
 // This file Copyright © 2008-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -59,14 +59,13 @@ std::optional<int64_t> ParseInt(std::string_view* benc)
 
     // find the ending delimiter
     walk.remove_prefix(std::size(Prefix));
-    auto const pos = walk.find(Suffix);
-    if (pos == std::string_view::npos)
+    if (auto const pos = walk.find(Suffix); pos == std::string_view::npos)
     {
         return {};
     }
 
     // leading zeroes are not allowed
-    if ((walk[0] == '0' && isdigit(walk[1])) || (walk[0] == '-' && walk[1] == '0' && isdigit(walk[2])))
+    if ((walk[0] == '0' && (isdigit(walk[1]) != 0)) || (walk[0] == '-' && walk[1] == '0' && (isdigit(walk[2]) != 0)))
     {
         return {};
     }
@@ -140,7 +139,7 @@ struct MyHandler : public transmission::benc::Handler
 
     ~MyHandler() override = default;
 
-    bool Int64(int64_t value) final
+    bool Int64(int64_t value, Context const& /*context*/) final
     {
         if (tr_variant* variant = get_node(); variant != nullptr)
         {
@@ -150,7 +149,7 @@ struct MyHandler : public transmission::benc::Handler
         return true;
     }
 
-    bool String(std::string_view sv) final
+    bool String(std::string_view sv, Context const& /*context*/) final
     {
         if (tr_variant* variant = get_node(); variant != nullptr)
         {
@@ -167,7 +166,7 @@ struct MyHandler : public transmission::benc::Handler
         return true;
     }
 
-    bool StartDict() final
+    bool StartDict(Context const& /*context*/) final
     {
         if (tr_variant* variant = get_node(); variant != nullptr)
         {
@@ -178,21 +177,21 @@ struct MyHandler : public transmission::benc::Handler
         return true;
     }
 
-    bool Key(std::string_view sv) final
+    bool Key(std::string_view sv, Context const& /*context*/) final
     {
         key_ = tr_quark_new(sv);
 
         return true;
     }
 
-    bool EndDict() final
+    bool EndDict(Context const& /*context*/) final
     {
         stack_.pop_back();
 
         return true;
     }
 
-    bool StartArray() final
+    bool StartArray(Context const& /*context*/) final
     {
         if (tr_variant* variant = get_node(); variant != nullptr)
         {
@@ -203,7 +202,7 @@ struct MyHandler : public transmission::benc::Handler
         return true;
     }
 
-    bool EndArray() final
+    bool EndArray(Context const& /*context*/) final
     {
         stack_.pop_back();
 

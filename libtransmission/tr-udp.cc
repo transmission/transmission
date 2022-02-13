@@ -107,22 +107,8 @@ void tr_udpSetSocketBuffers(tr_session* session)
 
 void tr_udpSetSocketTOS(tr_session* session)
 {
-    auto const tos = session->peerSocketTos();
-
-    if (tos)
-    {
-        return;
-    }
-
-    if (session->udp_socket != TR_BAD_SOCKET)
-    {
-        tr_netSetTOS(session->udp_socket, tos, TR_AF_INET);
-    }
-
-    if (session->udp6_socket != TR_BAD_SOCKET)
-    {
-        tr_netSetTOS(session->udp6_socket, tos, TR_AF_INET6);
-    }
+    session->setSocketTOS(session->udp_socket, TR_AF_INET);
+    session->setSocketTOS(session->udp6_socket, TR_AF_INET6);
 }
 
 /* BEP-32 has a rather nice explanation of why we need to bind to one
@@ -261,9 +247,7 @@ static void event_callback(evutil_socket_t s, [[maybe_unused]] short type, void*
         }
         else if (rc >= 8 && buf[0] == 0 && buf[1] == 0 && buf[2] == 0 && buf[3] <= 3)
         {
-            rc = tau_handle_message(session, buf, rc);
-
-            if (rc == 0)
+            if (!tau_handle_message(session, buf, rc))
             {
                 tr_logAddNamedDbg("UDP", "Couldn't parse UDP tracker packet.");
             }
@@ -272,9 +256,7 @@ static void event_callback(evutil_socket_t s, [[maybe_unused]] short type, void*
         {
             if (tr_sessionIsUTPEnabled(session))
             {
-                rc = tr_utpPacket(buf, rc, (struct sockaddr*)&from, fromlen, session);
-
-                if (rc == 0)
+                if (!tr_utpPacket(buf, rc, (struct sockaddr*)&from, fromlen, session))
                 {
                     tr_logAddNamedDbg("UDP", "Unexpected UDP packet");
                 }

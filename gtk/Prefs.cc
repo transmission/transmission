@@ -6,8 +6,6 @@
 #include <stdlib.h> /* strtol() */
 #include <string_view>
 
-#include <unistd.h>
-
 #include <glibmm.h>
 #include <glibmm/i18n.h>
 
@@ -176,8 +174,7 @@ std::vector<std::string> gtr_pref_strv_get(tr_quark const key)
 {
     std::vector<std::string> ret;
 
-    tr_variant* list = nullptr;
-    if (tr_variantDictFindList(getPrefs(), key, &list))
+    if (tr_variant* list = nullptr; tr_variantDictFindList(getPrefs(), key, &list))
     {
         size_t const n = tr_variantListSize(list);
         ret.reserve(n);

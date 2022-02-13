@@ -1,5 +1,5 @@
 // This file Copyright © 2012-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -140,9 +140,8 @@ void* tr_torrentGetMetadataPiece(tr_torrent const* tor, int piece, size_t* len)
         if (0 < l && l <= METADATA_PIECE_SIZE)
         {
             auto* buf = tr_new(char, l);
-            auto n = uint64_t{};
 
-            if (tr_sys_file_read(fd, buf, l, &n, nullptr) && n == l)
+            if (auto n = uint64_t{}; tr_sys_file_read(fd, buf, l, &n, nullptr) && n == l)
             {
                 *len = l;
                 ret = buf;
@@ -274,8 +273,7 @@ static bool useNewMetainfo(tr_torrent* tor, tr_incomplete_metadata const* m, tr_
     }
 
     // save it
-    auto const filename = tor->torrentFile();
-    if (!tr_saveFile(filename, benc, error))
+    if (auto const filename = tor->torrentFile(); !tr_saveFile(filename, benc, error))
     {
         return false;
     }

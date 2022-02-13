@@ -9,7 +9,11 @@
 #include <cstdlib> /* atoi() */
 #include <cstring> /* memcpy(), memset(), memchr(), strlen() */
 #include <ctime>
+#include <fstream>
+#include <sstream>
+#include <string>
 #include <string_view>
+#include <thread>
 
 #ifdef _WIN32
 #include <inttypes.h>
@@ -34,7 +38,6 @@
 #include "log.h"
 #include "net.h"
 #include "peer-mgr.h"
-#include "platform.h"
 #include "session.h"
 #include "torrent.h"
 #include "tr-assert.h"
@@ -104,8 +107,7 @@ static void bootstrap_from_name(char const* name, tr_port port, int af)
     tr_snprintf(pp, sizeof(pp), "%d", (int)port);
 
     addrinfo* info = nullptr;
-    int const rc = getaddrinfo(name, pp, &hints, &info);
-    if (rc != 0)
+    if (int const rc = getaddrinfo(name, pp, &hints, &info); rc != 0)
     {
         tr_logAddNamedError("DHT", "%s:%s: %s", name, pp, gai_strerror(rc));
         return;
@@ -127,6 +129,42 @@ static void bootstrap_from_name(char const* name, tr_port port, int af)
     }
 
     freeaddrinfo(info);
+}
+
+static void dht_boostrap_from_file(tr_session* session)
+{
+    if (bootstrap_done(session, 0))
+    {
+        return;
+    }
+
+    // check for a manual bootstrap file.
+    auto const bootstrap_file = tr_strvPath(session->config_dir, "dht.bootstrap");
+    auto in = std::ifstream{ bootstrap_file };
+    if (!in.is_open())
+    {
+        return;
+    }
+
+    // format is each line has address, a space char, and port number
+    tr_logAddNamedInfo("DHT", "Attempting manual bootstrap");
+    auto line = std::string{};
+    while (!bootstrap_done(session, 0) && std::getline(in, line))
+    {
+        auto line_stream = std::istringstream{ line };
+        auto addrstr = std::string{};
+        auto port = tr_port{};
+        line_stream >> addrstr >> port;
+
+        if (line_stream.bad() || std::empty(addrstr) || port <= 0)
+        {
+            tr_logAddNamedError("DHT", "Couldn't parse line: \"%s\"", line.c_str());
+        }
+        else
+        {
+            bootstrap_from_name(addrstr.c_str(), port, bootstrap_af(session_));
+        }
+    }
 }
 
 static void dht_bootstrap(void* closure)
@@ -198,48 +236,7 @@ static void dht_bootstrap(void* closure)
 
     if (!bootstrap_done(cl->session, 0))
     {
-        auto const bootstrap_file = tr_strvPath(cl->session->config_dir, "dht.bootstrap");
-
-        tr_sys_file_t const f = tr_sys_file_open(bootstrap_file.c_str(), TR_SYS_FILE_READ, 0, nullptr);
-
-        if (f != TR_BAD_SYS_FILE)
-        {
-            tr_logAddNamedInfo("DHT", "Attempting manual bootstrap");
-
-            for (;;)
-            {
-                char buf[201];
-                if (!tr_sys_file_read_line(f, buf, 200, nullptr))
-                {
-                    break;
-                }
-
-                auto* p = static_cast<char*>(memchr(buf, ' ', strlen(buf)));
-                int port = 0;
-
-                if (p != nullptr)
-                {
-                    port = atoi(p + 1);
-                }
-
-                if (p == nullptr || port <= 0 || port >= 0x10000)
-                {
-                    tr_logAddNamedError("DHT", "Couldn't parse %s", buf);
-                    continue;
-                }
-
-                *p = '\0';
-
-                bootstrap_from_name(buf, port, bootstrap_af(session_));
-
-                if (bootstrap_done(cl->session, 0))
-                {
-                    break;
-                }
-            }
-
-            tr_sys_file_close(f, nullptr);
-        }
+        dht_boostrap_from_file(cl->session);
     }
 
     if (!bootstrap_done(cl->session, 0))
@@ -364,7 +361,7 @@ int tr_dhtInit(tr_session* ss)
     cl->nodes6 = nodes6;
     cl->len = len;
     cl->len6 = len6;
-    tr_threadNew(dht_bootstrap, cl);
+    std::thread(dht_bootstrap, cl).detach();
 
     dht_timer = evtimer_new(session_->event_base, timer_callback, session_);
     tr_timerAdd(dht_timer, 0, tr_rand_int_weak(1000000));
@@ -609,14 +606,10 @@ static void callback(void* /*ignore*/, int event, unsigned char const* info_hash
     {
         if (tor != nullptr && tor->allowsDht())
         {
-            size_t n = 0;
-            tr_pex* const pex = event == DHT_EVENT_VALUES ? tr_peerMgrCompactToPex(data, data_len, nullptr, 0, &n) :
-                                                            tr_peerMgrCompact6ToPex(data, data_len, nullptr, 0, &n);
-
-            tr_peerMgrAddPex(tor, TR_PEER_FROM_DHT, pex, n);
-
-            tr_free(pex);
-            tr_logAddTorDbg(tor, "Learned %d %s peers from DHT", (int)n, event == DHT_EVENT_VALUES6 ? "IPv6" : "IPv4");
+            auto const pex = event == DHT_EVENT_VALUES ? tr_peerMgrCompactToPex(data, data_len, nullptr, 0) :
+                                                         tr_peerMgrCompact6ToPex(data, data_len, nullptr, 0);
+            tr_peerMgrAddPex(tor, TR_PEER_FROM_DHT, std::data(pex), std::size(pex));
+            tr_logAddTorDbg(tor, "Learned %zu %s peers from DHT", std::size(pex), event == DHT_EVENT_VALUES6 ? "IPv6" : "IPv4");
         }
     }
     else if (event == DHT_EVENT_SEARCH_DONE || event == DHT_EVENT_SEARCH_DONE6)
@@ -815,8 +808,8 @@ int dht_sendto(int sockfd, void const* buf, int len, int flags, struct sockaddr 
 extern "C" int dht_gettimeofday(struct timeval* tv, struct timezone* tz)
 {
     TR_ASSERT(tz == nullptr);
-
-    return tr_gettimeofday(tv);
+    *tv = tr_gettimeofday();
+    return 0;
 }
 
 #endif

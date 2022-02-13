@@ -1,5 +1,5 @@
 // This file Copyright © 2008-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -450,8 +450,7 @@ static void jsonChildFunc(struct jsonWalk* data)
         case TR_VARIANT_TYPE_LIST:
             {
                 ++pstate.childIndex;
-                bool const is_last = pstate.childIndex == pstate.childCount;
-                if (!is_last)
+                if (bool const is_last = pstate.childIndex == pstate.childCount; !is_last)
                 {
                     evbuffer_add(data->out, ",", 1);
                     jsonIndent(data);
@@ -571,7 +570,7 @@ static void jsonStringFunc(tr_variant const* val, void* vdata)
             break;
 
         default:
-            if (isprint((unsigned char)sv.front()))
+            if (isprint((unsigned char)sv.front()) != 0)
             {
                 *outwalk++ = sv.front();
             }

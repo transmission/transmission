@@ -1,5 +1,5 @@
 // This file Copyright © 2009-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -49,9 +49,8 @@ int WatchDir::metainfoTest(QString const& filename) const
 void WatchDir::onTimeout()
 {
     auto* t = qobject_cast<QTimer*>(sender());
-    QString const filename = t->objectName();
 
-    if (metainfoTest(filename) == OK)
+    if (auto const filename = t->objectName(); metainfoTest(filename) == OK)
     {
         emit torrentFileAdded(filename);
     }

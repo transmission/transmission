@@ -1,5 +1,5 @@
 // This file Copyright © 2012-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -11,6 +11,7 @@
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/web.h> /* tr_webRun() */
+#include <libtransmission/web-utils.h>
 
 #include "FaviconCache.h"
 #include "Utils.h" /* gtr_get_host_from_url() */
@@ -144,5 +145,6 @@ void gtr_get_favicon_from_url(
     Glib::ustring const& url,
     std::function<void(Glib::RefPtr<Gdk::Pixbuf> const&)> const& pixbuf_ready_func)
 {
-    gtr_get_favicon(session, gtr_get_host_from_url(url), pixbuf_ready_func);
+    auto const host = std::string{ tr_urlParse(url.c_str())->host };
+    gtr_get_favicon(session, host, pixbuf_ready_func);
 }

@@ -435,19 +435,15 @@ protected:
     {
         EXPECT_NE(nullptr, tor->session);
         EXPECT_FALSE(tr_amInEventThread(tor->session));
-
-        auto constexpr onVerifyDone = [](tr_torrent*, bool, void* done) noexcept
-        {
-            *static_cast<bool*>(done) = true;
-        };
-
-        bool done = false;
-        tr_torrentVerify(tor, onVerifyDone, &done);
-        auto test = [&done]()
-        {
-            return done;
-        };
-        EXPECT_TRUE(waitFor(test, 2000));
+        tr_torrentVerify(tor);
+        tr_wait_msec(100);
+        EXPECT_TRUE(waitFor(
+            [tor]()
+            {
+                auto const activity = tr_torrentGetActivity(tor);
+                return activity != TR_STATUS_CHECK && activity != TR_STATUS_CHECK_WAIT && tor->checked_pieces_.hasAll();
+            },
+            4000));
     }
 
     tr_session* session_ = nullptr;

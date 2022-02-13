@@ -1,9 +1,10 @@
 // This file Copyright © 2007-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
 #include <algorithm>
+#include <array>
 #include <cctype>
 #include <iterator>
 #include <numeric>
@@ -195,7 +196,7 @@ static bool appendSanitizedComponent(std::string& out, std::string_view in, bool
     // remove trailing spaces and '.'
     auto constexpr trailing_test = [](unsigned char ch)
     {
-        return isspace(ch) || ch == '.';
+        return (isspace(ch) != 0) || ch == '.';
     };
     auto const rit = std::find_if_not(std::rbegin(in), std::rend(in), trailing_test);
     in.remove_suffix(std::distance(std::rbegin(in), rit));
@@ -380,7 +381,7 @@ std::string_view tr_torrent_metainfo::parseAnnounce(tr_torrent_metainfo& setme, 
                     continue;
                 }
 
-                setme.announce_list_.add(i, url);
+                setme.announce_list_.add(url, i);
             }
         }
     }
@@ -388,7 +389,7 @@ std::string_view tr_torrent_metainfo::parseAnnounce(tr_torrent_metainfo& setme, 
     // single 'announce' url
     if (std::empty(setme.announce_list_) && tr_variantDictFindStrView(meta, TR_KEY_announce, &url))
     {
-        setme.announce_list_.add(0, url);
+        setme.announce_list_.add(url, 0);
     }
 
     return {};

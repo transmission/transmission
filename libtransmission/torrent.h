@@ -39,6 +39,8 @@ struct tr_session;
 struct tr_torrent;
 struct tr_torrent_announcer;
 
+using tr_labels_t = std::unordered_set<std::string>;
+
 /**
 ***  Package-visible ctor API
 **/
@@ -57,11 +59,11 @@ tr_session* tr_ctorGetSession(tr_ctor const* ctor);
 
 bool tr_ctorGetIncompleteDir(tr_ctor const* ctor, char const** setmeIncompleteDir);
 
+tr_labels_t tr_ctorGetLabels(tr_ctor const* ctor);
+
 /**
 ***
 **/
-
-using tr_labels_t = std::unordered_set<std::string>;
 
 void tr_torrentSetLabels(tr_torrent* tor, tr_labels_t&& labels);
 
@@ -781,3 +783,4 @@ void tr_metainfoFree(tr_info* inf);
 tr_torrent_metainfo&& tr_ctorStealMetainfo(tr_ctor* ctor);
 
 bool tr_ctorSetMetainfoFromFile(tr_ctor* ctor, std::string const& filename, tr_error** error);
+void tr_ctorSetLabels(tr_ctor* ctor, tr_labels_t&& labels);

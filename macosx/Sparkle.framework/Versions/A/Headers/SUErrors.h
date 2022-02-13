@@ -3,7 +3,7 @@
 //  Sparkle
 //
 //  Created by C.W. Betts on 10/13/14.
-//  Copyright © 2014 Sparkle Project. All rights reserved.
+//  Copyright (c) 2014 Sparkle Project. All rights reserved.
 //
 
 #ifndef SUERRORS_H
@@ -30,6 +30,7 @@ typedef NS_ENUM(OSStatus, SUError) {
     SUAppcastError = 1002,
     SURunningFromDiskImageError = 1003,
     SURunningTranslocated = 1004,
+    SUWebKitTerminationError = 1005,
 
     // Download phase errors.
     SUTemporaryDirectoryError = 2000,

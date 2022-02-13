@@ -1,5 +1,5 @@
 // This file Copyright © 2010-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -450,7 +450,7 @@ struct tau_tracker
     }
 };
 
-static void tau_tracker_upkeep(struct tau_tracker*);
+static void tau_tracker_upkeep(struct tau_tracker* /*tracker*/);
 
 static void tau_tracker_on_dns(int errcode, struct evutil_addrinfo* addr, void* vtracker)
 {
@@ -629,7 +629,7 @@ static void tau_tracker_upkeep_ex(struct tau_tracker* tracker, bool timeout_reqs
         dbgmsg(tracker->host, "Trying a new DNS lookup");
         tracker->dns_request = evdns_getaddrinfo(
             tracker->session->evdns_base,
-            tracker->host.c_str(),
+            tr_strlower(tracker->host.sv()).c_str(),
             nullptr,
             &hints,
             tau_tracker_on_dns,

@@ -1,5 +1,5 @@
 // This file Copyright © 2009-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -658,9 +658,8 @@ void MainWindow::openFolder()
     }
 
     QString const first_file = files.at(0).filename;
-    int slash_index = first_file.indexOf(QLatin1Char('/'));
 
-    if (slash_index > -1)
+    if (int const slash_index = first_file.indexOf(QLatin1Char('/')); slash_index > -1)
     {
         path = path + QLatin1Char('/') + first_file.left(slash_index);
     }
@@ -775,9 +774,8 @@ void MainWindow::onRefreshTimer()
 void MainWindow::refreshTitle()
 {
     QString title(QStringLiteral("Transmission"));
-    QUrl const url(session_.getRemoteUrl());
 
-    if (!url.isEmpty())
+    if (auto const url = QUrl(session_.getRemoteUrl()); !url.isEmpty())
     {
         //: Second (optional) part of main window title "Transmission - host:port" (added when connected to remote session)
         //: notice that leading space (before the dash) is included here
@@ -1120,19 +1118,16 @@ void MainWindow::trayActivated(QSystemTrayIcon::ActivationReason reason)
 
 void MainWindow::refreshPref(int key)
 {
-    bool b;
-    int i;
-    QString str;
-    QActionGroup const* action_group;
+    auto b = bool{};
+    auto i = int{};
+    auto str = QString{};
 
     switch (key)
     {
     case Prefs::STATUSBAR_STATS:
         str = prefs_.getString(key);
-        action_group = ui_.action_TotalRatio->actionGroup();
-        assert(action_group != nullptr);
 
-        for (QAction* action : action_group->actions())
+        for (auto* action : ui_.action_TotalRatio->actionGroup()->actions())
         {
             action->setChecked(str == action->property(StatsModeKey).toString());
         }
@@ -1146,10 +1141,8 @@ void MainWindow::refreshPref(int key)
 
     case Prefs::SORT_MODE:
         i = prefs_.get<SortMode>(key).mode();
-        action_group = ui_.action_SortByActivity->actionGroup();
-        assert(action_group != nullptr);
 
-        for (QAction* action : action_group->actions())
+        for (auto* action : ui_.action_SortByActivity->actionGroup()->actions())
         {
             action->setChecked(i == action->property(SortModeKey).toInt());
         }
@@ -1262,8 +1255,7 @@ void MainWindow::newTorrent()
 
 void MainWindow::openTorrent()
 {
-    QFileDialog* d;
-    d = new QFileDialog(
+    auto* const d = new QFileDialog(
         this,
         tr("Open Torrent"),
         prefs_.getString(Prefs::OPEN_DIALOG_FOLDER),
@@ -1271,9 +1263,7 @@ void MainWindow::openTorrent()
     d->setFileMode(QFileDialog::ExistingFiles);
     d->setAttribute(Qt::WA_DeleteOnClose);
 
-    auto* const l = qobject_cast<QGridLayout*>(d->layout());
-
-    if (l != nullptr)
+    if (auto* const l = qobject_cast<QGridLayout*>(d->layout()); l != nullptr)
     {
         auto* b = new QCheckBox(tr("Show &options dialog"));
         b->setChecked(prefs_.getBool(Prefs::OPTIONS_PROMPT));
@@ -1307,9 +1297,7 @@ void MainWindow::addTorrents(QStringList const& filenames)
 {
     bool show_options = prefs_.getBool(Prefs::OPTIONS_PROMPT);
 
-    auto const* const file_dialog = qobject_cast<QFileDialog const*>(sender());
-
-    if (file_dialog != nullptr)
+    if (auto const* const file_dialog = qobject_cast<QFileDialog const*>(sender()); file_dialog != nullptr)
     {
         auto const* const b = file_dialog->findChild<QCheckBox const*>(show_options_checkbox_name_);
 
@@ -1348,7 +1336,6 @@ void MainWindow::removeTorrents(bool const delete_files)
     QString secondary_text;
     int incomplete = 0;
     int connected = 0;
-    int count;
 
     for (QModelIndex const& index : ui_.listView->selectionModel()->selectedRows())
     {
@@ -1371,7 +1358,7 @@ void MainWindow::removeTorrents(bool const delete_files)
         return;
     }
 
-    count = ids.size();
+    int const count = ids.size();
 
     if (!delete_files)
     {
@@ -1493,7 +1480,7 @@ void MainWindow::updateNetworkIcon()
     {
         tip = tr("%1 is responding").arg(url);
     }
-    else if (seconds_since_last_read < 60 * 2)
+    else if (seconds_since_last_read < 120)
     {
         tip = tr("%1 last responded %2 ago").arg(url).arg(Formatter::get().timeToString(seconds_since_last_read));
     }
@@ -1558,7 +1545,7 @@ void MainWindow::dragEnterEvent(QDragEnterEvent* event)
 
     if (mime->hasFormat(QStringLiteral("application/x-bittorrent")) || mime->hasUrls() ||
         mime->text().trimmed().endsWith(QStringLiteral(".torrent"), Qt::CaseInsensitive) ||
-        mime->text().startsWith(QStringLiteral("magnet:"), Qt::CaseInsensitive))
+        tr_magnet_metainfo{}.parseMagnet(mime->text().toStdString()))
     {
         event->acceptProposedAction();
     }
@@ -1586,9 +1573,7 @@ void MainWindow::dropEvent(QDropEvent* event)
 
         if (!key.isEmpty())
         {
-            QUrl const url(key);
-
-            if (url.isLocalFile())
+            if (auto const url = QUrl(key); url.isLocalFile())
             {
                 key = url.toLocalFile();
             }
@@ -1606,19 +1591,17 @@ bool MainWindow::event(QEvent* e)
     }
 
     if (auto const text = QGuiApplication::clipboard()->text().trimmed();
-        text.endsWith(QStringLiteral(".torrent"), Qt::CaseInsensitive) ||
-        text.startsWith(QStringLiteral("magnet:"), Qt::CaseInsensitive))
+        text.endsWith(QStringLiteral(".torrent"), Qt::CaseInsensitive) || tr_magnet_metainfo{}.parseMagnet(text.toStdString()))
     {
-        for (QString const& entry : text.split(QLatin1Char('\n')))
+        for (auto const& entry : text.split(QLatin1Char('\n')))
         {
-            QString key = entry.trimmed();
-
+            auto key = entry.trimmed();
             if (key.isEmpty())
             {
                 continue;
             }
 
-            if (QUrl const url(key); url.isLocalFile())
+            if (auto const url = QUrl{ key }; url.isLocalFile())
             {
                 key = url.toLocalFile();
             }

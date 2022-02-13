@@ -415,7 +415,7 @@ bool trashDataFile(char const* filename, tr_error** error)
 
 - (void)resetCache
 {
-    tr_torrentVerify(fHandle, NULL, NULL);
+    tr_torrentVerify(fHandle);
     [self update];
 }
 

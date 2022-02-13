@@ -1,12 +1,11 @@
 // This file Copyright © 2007-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
 #include <climits> /* USHRT_MAX, INT_MAX */
 #include <sstream>
 #include <string>
-#include <unistd.h>
 
 #include <glibmm.h>
 #include <glibmm/i18n.h>
@@ -96,10 +95,9 @@ auto const IdleDataKey = Glib::Quark("idle-data");
 bool spun_cb_idle(Gtk::SpinButton* spin, tr_quark const key, Glib::RefPtr<Session> const& core, bool isDouble)
 {
     bool keep_waiting = true;
-    auto* last_change = static_cast<Glib::Timer*>(spin->get_data(IdleDataKey));
 
     /* has the user stopped making changes? */
-    if (last_change->elapsed() > 0.33)
+    if (auto* last_change = static_cast<Glib::Timer*>(spin->get_data(IdleDataKey)); last_change->elapsed() > 0.33)
     {
         /* update the core */
         if (isDouble)

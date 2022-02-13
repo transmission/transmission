@@ -42,14 +42,14 @@ bool UTP_Write(struct UTPSocket* socket, size_t count)
     return false;
 }
 
-int tr_utpPacket(
+bool tr_utpPacket(
     unsigned char const* /*buf*/,
     size_t /*buflen*/,
     sockaddr const* /*from*/,
     socklen_t /*fromlen*/,
     tr_session* /*ss*/)
 {
-    return -1;
+    return false;
 }
 
 struct UTPSocket* UTP_Create(
@@ -152,7 +152,7 @@ static void timer_callback(evutil_socket_t /*s*/, short /*type*/, void* vsession
     reset_timer(session);
 }
 
-int tr_utpPacket(unsigned char const* buf, size_t buflen, struct sockaddr const* from, socklen_t fromlen, tr_session* ss)
+bool tr_utpPacket(unsigned char const* buf, size_t buflen, struct sockaddr const* from, socklen_t fromlen, tr_session* ss)
 {
     if (!ss->isClosed && ss->utp_timer == nullptr)
     {
@@ -160,7 +160,7 @@ int tr_utpPacket(unsigned char const* buf, size_t buflen, struct sockaddr const*
 
         if (ss->utp_timer == nullptr)
         {
-            return -1;
+            return false;
         }
 
         reset_timer(ss);

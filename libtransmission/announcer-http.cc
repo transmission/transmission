@@ -1,5 +1,5 @@
 // This file Copyright © 2010-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -19,6 +19,7 @@
 #include "transmission.h"
 
 #include "announcer-common.h"
+#include "benc.h"
 #include "crypto-utils.h"
 #include "error.h"
 #include "log.h"
@@ -28,7 +29,6 @@
 #include "torrent.h"
 #include "trevent.h" /* tr_runInEventThread() */
 #include "utils.h"
-#include "variant.h"
 #include "web-utils.h"
 #include "web.h"
 
@@ -71,7 +71,7 @@ static std::string announce_url_new(tr_session const* session, tr_announce_reque
         "&compact=1"
         "&supportcrypto=1",
         TR_PRIsv_ARG(announce_sv),
-        announce_sv.find('?') == announce_sv.npos ? '?' : '&',
+        announce_sv.find('?') == std::string_view::npos ? '?' : '&',
         std::data(escaped_info_hash),
         TR_PRIsv_ARG(req->peer_id),
         req->port,
@@ -110,68 +110,15 @@ static std::string announce_url_new(tr_session const* session, tr_announce_reque
        announce twice. At any rate, we're already computing our IPv6
        address (for the LTEP handshake), so this comes for free. */
 
-    unsigned char const* const ipv6 = tr_globalIPv6(session);
-    if (ipv6 != nullptr)
+    if (auto const* const ipv6 = tr_globalIPv6(session); ipv6 != nullptr)
     {
-        char ipv6_readable[INET6_ADDRSTRLEN];
-        evutil_inet_ntop(AF_INET6, ipv6, ipv6_readable, INET6_ADDRSTRLEN);
+        auto ipv6_readable = std::array<char, INET6_ADDRSTRLEN>{};
+        evutil_inet_ntop(AF_INET6, ipv6, std::data(ipv6_readable), std::size(ipv6_readable));
         evbuffer_add_printf(buf, "&ipv6=");
-        tr_http_escape(buf, ipv6_readable, true);
+        tr_http_escape(buf, std::data(ipv6_readable), true);
     }
 
     return evbuffer_free_to_str(buf);
-}
-
-static auto listToPex(tr_variant* peerList)
-{
-    size_t n = 0;
-    size_t const len = tr_variantListSize(peerList);
-    auto pex = std::vector<tr_pex>(len);
-
-    for (size_t i = 0; i < len; ++i)
-    {
-        tr_variant* const peer = tr_variantListChild(peerList, i);
-
-        if (peer == nullptr)
-        {
-            continue;
-        }
-
-        auto ip = std::string_view{};
-        if (!tr_variantDictFindStrView(peer, TR_KEY_ip, &ip))
-        {
-            continue;
-        }
-
-        auto addr = tr_address{};
-        if (!tr_address_from_string(&addr, ip))
-        {
-            continue;
-        }
-
-        auto port = int64_t{};
-        if (!tr_variantDictFindInt(peer, TR_KEY_port, &port))
-        {
-            continue;
-        }
-
-        if (port < 0 || port > USHRT_MAX)
-        {
-            continue;
-        }
-
-        if (!tr_address_is_valid_for_peers(&addr, port))
-        {
-            continue;
-        }
-
-        pex[n].addr = addr;
-        pex[n].port = htons((uint16_t)port);
-        ++n;
-    }
-
-    pex.resize(n);
-    return pex;
 }
 
 struct announce_data
@@ -194,7 +141,7 @@ static void on_announce_done_eventthread(void* vdata)
     delete data;
 }
 
-static void maybeLogMessage(std::string_view description, tr_direction direction, std::string_view message)
+static void verboseLog(std::string_view description, tr_direction direction, std::string_view message)
 {
     auto& out = std::cerr;
     static bool const verbose = tr_env_key_exists("TR_CURL_VERBOSE");
@@ -207,90 +154,142 @@ static void maybeLogMessage(std::string_view description, tr_direction direction
     out << description << std::endl << "[raw]"sv << direction_sv;
     for (unsigned char ch : message)
     {
-        if (isprint(ch))
+        if (isprint(ch) != 0)
         {
             out << ch;
         }
         else
         {
-            out << "\\x"sv << std::hex << std::setw(2) << std::setfill('0') << unsigned(ch) << std::dec << std::setw(1)
+            out << R"(\x)" << std::hex << std::setw(2) << std::setfill('0') << unsigned(ch) << std::dec << std::setw(1)
                 << std::setfill(' ');
         }
     }
     out << std::endl << "[b64]"sv << direction_sv << tr_base64_encode(message) << std::endl;
 }
 
-void tr_announcerParseHttpAnnounceResponse(tr_announce_response& response, std::string_view msg)
+static auto constexpr MaxBencDepth = 8;
+
+void tr_announcerParseHttpAnnounceResponse(tr_announce_response& response, std::string_view benc)
 {
-    maybeLogMessage("Announce response:", TR_DOWN, msg);
+    verboseLog("Announce response:", TR_DOWN, benc);
 
-    auto benc = tr_variant{};
-    auto const variant_loaded = tr_variantFromBuf(&benc, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, msg);
-
-    if (variant_loaded && tr_variantIsDict(&benc))
+    struct AnnounceHandler final : public transmission::benc::BasicHandler<MaxBencDepth>
     {
-        auto i = int64_t{};
-        auto sv = std::string_view{};
-        tr_variant* tmp = nullptr;
+        using BasicHandler = transmission::benc::BasicHandler<MaxBencDepth>;
 
-        if (tr_variantDictFindStrView(&benc, TR_KEY_failure_reason, &sv))
+        tr_announce_response& response_;
+        std::optional<size_t> row_;
+        tr_pex pex_ = {};
+
+        explicit AnnounceHandler(tr_announce_response& response)
+            : response_{ response }
         {
-            response.errmsg = sv;
         }
 
-        if (tr_variantDictFindStrView(&benc, TR_KEY_warning_message, &sv))
+        bool StartDict(Context const& context) override
         {
-            response.warning = sv;
+            BasicHandler::StartDict(context);
+
+            pex_ = {};
+
+            return true;
         }
 
-        if (tr_variantDictFindInt(&benc, TR_KEY_interval, &i))
+        bool EndDict(Context const& context) override
         {
-            response.interval = i;
+            BasicHandler::EndDict(context);
+
+            if (tr_address_is_valid_for_peers(&pex_.addr, pex_.port))
+            {
+                response_.pex.push_back(pex_);
+                pex_ = {};
+            }
+
+            return true;
         }
 
-        if (tr_variantDictFindInt(&benc, TR_KEY_min_interval, &i))
+        bool Int64(int64_t value, Context const& context) override
         {
-            response.min_interval = i;
+            if (auto const key = currentKey(); key == "interval")
+            {
+                response_.interval = value;
+            }
+            else if (key == "min interval"sv)
+            {
+                response_.min_interval = value;
+            }
+            else if (key == "complete"sv)
+            {
+                response_.seeders = value;
+            }
+            else if (key == "incomplete"sv)
+            {
+                response_.leechers = value;
+            }
+            else if (key == "downloaded"sv)
+            {
+                response_.downloads = value;
+            }
+            else if (key == "port"sv)
+            {
+                pex_.port = htons(uint16_t(value));
+            }
+            else if (!tr_error_is_set(context.error))
+            {
+                auto const msg = tr_strvJoin("unexpected int: key["sv, key, "] value["sv, std::to_string(value), "]"sv);
+                tr_error_set(context.error, EINVAL, msg);
+            }
+
+            return true;
         }
 
-        if (tr_variantDictFindStrView(&benc, TR_KEY_tracker_id, &sv))
+        bool String(std::string_view value, Context const& context) override
         {
-            response.tracker_id = sv;
-        }
+            if (auto const key = currentKey(); key == "failure reason"sv)
+            {
+                response_.errmsg = value;
+            }
+            else if (key == "warning message"sv)
+            {
+                response_.warning = value;
+            }
+            else if (key == "tracker id"sv)
+            {
+                response_.tracker_id = value;
+            }
+            else if (key == "peers"sv)
+            {
+                response_.pex = tr_peerMgrCompactToPex(std::data(value), std::size(value), nullptr, 0);
+            }
+            else if (key == "peers6"sv)
+            {
+                response_.pex6 = tr_peerMgrCompact6ToPex(std::data(value), std::size(value), nullptr, 0);
+            }
+            else if (key == "ip")
+            {
+                tr_address_from_string(&pex_.addr, value);
+            }
+            else if (key == "peer id")
+            {
+                // unused
+            }
+            else if (!tr_error_is_set(context.error))
+            {
+                tr_error_set(context.error, EINVAL, tr_strvJoin("unexpected str: key["sv, key, "] value["sv, value, "]"sv));
+            }
 
-        if (tr_variantDictFindInt(&benc, TR_KEY_complete, &i))
-        {
-            response.seeders = i;
+            return true;
         }
+    };
 
-        if (tr_variantDictFindInt(&benc, TR_KEY_incomplete, &i))
-        {
-            response.leechers = i;
-        }
-
-        if (tr_variantDictFindInt(&benc, TR_KEY_downloaded, &i))
-        {
-            response.downloads = i;
-        }
-
-        if (tr_variantDictFindStrView(&benc, TR_KEY_peers6, &sv))
-        {
-            response.pex6 = tr_peerMgrCompact6ToPex(std::data(sv), std::size(sv), nullptr, 0);
-        }
-
-        if (tr_variantDictFindStrView(&benc, TR_KEY_peers, &sv))
-        {
-            response.pex = tr_peerMgrCompactToPex(std::data(sv), std::size(sv), nullptr, 0);
-        }
-        else if (tr_variantDictFindList(&benc, TR_KEY_peers, &tmp))
-        {
-            response.pex = listToPex(tmp);
-        }
-    }
-
-    if (variant_loaded)
+    auto stack = transmission::benc::ParserStack<MaxBencDepth>{};
+    auto handler = AnnounceHandler{ response };
+    tr_error* error = nullptr;
+    transmission::benc::parse(benc, stack, handler, nullptr, &error);
+    if (error != nullptr)
     {
-        tr_variantFree(&benc);
+        tr_logAddError("%s", error->message);
+        tr_error_clear(&error);
     }
 }
 
@@ -375,6 +374,96 @@ static void on_scrape_done_eventthread(void* vdata)
     delete data;
 }
 
+void tr_announcerParseHttpScrapeResponse(tr_scrape_response& response, std::string_view benc)
+{
+    verboseLog("Scrape response:", TR_DOWN, benc);
+
+    struct ScrapeHandler final : public transmission::benc::BasicHandler<MaxBencDepth>
+    {
+        using BasicHandler = transmission::benc::BasicHandler<MaxBencDepth>;
+
+        tr_scrape_response& response_;
+        std::optional<size_t> row_;
+
+        explicit ScrapeHandler(tr_scrape_response& response)
+            : response_{ response }
+        {
+        }
+
+        bool Key(std::string_view value, Context const& context) override
+        {
+            BasicHandler::Key(value, context);
+
+            if (auto needle = tr_sha1_digest_t{}; depth() == 2 && key(1) == "files"sv && std::size(value) == std::size(needle))
+            {
+                std::copy_n(reinterpret_cast<std::byte const*>(std::data(value)), std::size(value), std::data(needle));
+                auto const it = std::find_if(
+                    std::begin(response_.rows),
+                    std::end(response_.rows),
+                    [needle](auto const& row) { return row.info_hash == needle; });
+
+                if (it == std::end(response_.rows))
+                {
+                    row_.reset();
+                }
+                else
+                {
+                    row_ = std::distance(std::begin(response_.rows), it);
+                }
+            }
+
+            return true;
+        }
+
+        bool Int64(int64_t value, Context const& context) override
+        {
+            if (auto const key = currentKey(); row_ && key == "complete"sv)
+            {
+                response_.rows[*row_].seeders = value;
+            }
+            else if (row_ && key == "downloaded"sv)
+            {
+                response_.rows[*row_].downloads = value;
+            }
+            else if (row_ && key == "incomplete"sv)
+            {
+                response_.rows[*row_].leechers = value;
+            }
+            else if (!tr_error_is_set(context.error))
+            {
+                auto const errmsg = tr_strvJoin("unexpected int: key["sv, key, "] value["sv, std::to_string(value), "]"sv);
+                tr_error_set(context.error, EINVAL, errmsg);
+            }
+
+            return true;
+        }
+
+        bool String(std::string_view value, Context const& context) override
+        {
+            if (auto const key = currentKey(); depth() == 1 && key == "failure reason"sv)
+            {
+                response_.errmsg = value;
+            }
+            else if (!tr_error_is_set(context.error))
+            {
+                tr_error_set(context.error, EINVAL, tr_strvJoin("unexpected string: key["sv, key, "] value["sv, value, "]"sv));
+            }
+
+            return true;
+        }
+    };
+
+    auto stack = transmission::benc::ParserStack<MaxBencDepth>{};
+    auto handler = ScrapeHandler{ response };
+    tr_error* error = nullptr;
+    transmission::benc::parse(benc, stack, handler, nullptr, &error);
+    if (error != nullptr)
+    {
+        tr_logAddError("%s", error->message);
+        tr_error_clear(&error);
+    }
+}
+
 static void on_scrape_done(
     tr_session* session,
     bool did_connect,
@@ -385,11 +474,11 @@ static void on_scrape_done(
 {
     auto* data = static_cast<struct scrape_data*>(vdata);
 
-    tr_scrape_response* response = &data->response;
-    response->did_connect = did_connect;
-    response->did_timeout = did_timeout;
+    tr_scrape_response& response = data->response;
+    response.did_connect = did_connect;
+    response.did_timeout = did_timeout;
 
-    auto const scrape_url_sv = response->scrape_url.sv();
+    auto const scrape_url_sv = response.scrape_url.sv();
     dbgmsg(data->log_name, "Got scrape response for \"%" TR_PRIsv "\"", TR_PRIsv_ARG(scrape_url_sv));
 
     if (response_code != HTTP_OK)
@@ -398,93 +487,11 @@ static void on_scrape_done(
         char const* response_str = tr_webGetResponseStr(response_code);
         char buf[512];
         tr_snprintf(buf, sizeof(buf), fmt, response_code, response_str);
-        response->errmsg = buf;
+        response.errmsg = buf;
     }
     else
     {
-        auto top = tr_variant{};
-
-        auto const variant_loaded = tr_variantFromBuf(&top, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, msg);
-
-        if (tr_env_key_exists("TR_CURL_VERBOSE"))
-        {
-            if (!variant_loaded)
-            {
-                fprintf(stderr, "%s", "Scrape response was not in benc format\n");
-            }
-            else
-            {
-                fprintf(stderr, "%s", "Scrape response:\n< ");
-                for (auto const ch : tr_variantToStr(&top, TR_VARIANT_FMT_JSON))
-                {
-                    fputc(ch, stderr);
-                }
-                fputc('\n', stderr);
-            }
-        }
-
-        if (variant_loaded)
-        {
-            if (auto sv = std::string_view{}; tr_variantDictFindStrView(&top, TR_KEY_failure_reason, &sv))
-            {
-                response->errmsg = sv;
-            }
-
-            tr_variant* flags = nullptr;
-            auto intVal = int64_t{};
-            if (tr_variantDictFindDict(&top, TR_KEY_flags, &flags) &&
-                tr_variantDictFindInt(flags, TR_KEY_min_request_interval, &intVal))
-            {
-                response->min_request_interval = intVal;
-            }
-
-            tr_variant* files = nullptr;
-            if (tr_variantDictFindDict(&top, TR_KEY_files, &files))
-            {
-                auto key = tr_quark{};
-                tr_variant* val = nullptr;
-
-                for (int i = 0; tr_variantDictChild(files, i, &key, &val); ++i)
-                {
-                    /* populate the corresponding row in our response array */
-                    for (int j = 0; j < response->row_count; ++j)
-                    {
-                        struct tr_scrape_response_row* row = &response->rows[j];
-
-                        // TODO(ckerr): ugh, interning info dict hashes is awful
-                        auto const& hash = row->info_hash;
-                        auto const key_sv = tr_quark_get_string_view(key);
-                        if (std::size(hash) == std::size(key_sv) &&
-                            memcmp(std::data(hash), std::data(key_sv), std::size(hash)) == 0)
-                        {
-                            if (tr_variantDictFindInt(val, TR_KEY_complete, &intVal))
-                            {
-                                row->seeders = intVal;
-                            }
-
-                            if (tr_variantDictFindInt(val, TR_KEY_incomplete, &intVal))
-                            {
-                                row->leechers = intVal;
-                            }
-
-                            if (tr_variantDictFindInt(val, TR_KEY_downloaded, &intVal))
-                            {
-                                row->downloads = intVal;
-                            }
-
-                            if (tr_variantDictFindInt(val, TR_KEY_downloaders, &intVal))
-                            {
-                                row->downloaders = intVal;
-                            }
-
-                            break;
-                        }
-                    }
-                }
-            }
-
-            tr_variantFree(&top);
-        }
+        tr_announcerParseHttpScrapeResponse(response, msg);
     }
 
     tr_runInEventThread(session, on_scrape_done_eventthread, data);

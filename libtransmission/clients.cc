@@ -1,5 +1,5 @@
 // This file Copyright © 2008-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -235,8 +235,8 @@ bool decodeBitCometClient(char* buf, size_t buflen, std::string_view peer_id)
 
     bool const is_bitlord = std::string_view(std::data(peer_id) + 6, 4) == "LORD"sv;
     auto const name = is_bitlord ? "BitLord"sv : "BitComet"sv;
-    int const major = peer_id[4];
-    int const minor = peer_id[5];
+    int const major = uint8_t(peer_id[4]);
+    int const minor = uint8_t(peer_id[5]);
 
     std::tie(buf, buflen) = buf_append(buf, buflen, name, ' ', mod, major, '.');
     tr_snprintf(buf, buflen, "%02d", minor);
@@ -683,7 +683,7 @@ char* tr_clientForId(char* buf, size_t buflen, tr_peer_id_t peer_id)
         {
             char const c = peer_id[i];
 
-            if (isprint((unsigned char)c))
+            if (isprint((unsigned char)c) != 0)
             {
                 *walk++ = c;
             }

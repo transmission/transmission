@@ -1,5 +1,5 @@
 // This file Copyright © 2010-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -166,7 +166,7 @@ void OptionsDialog::Impl::updateTorrent()
         tr_torrentSetDownloadDir(tor_, downloadDir_.c_str());
         file_list_->set_sensitive(tr_torrentHasMetadata(tor_));
         file_list_->set_torrent(tr_torrentId(tor_));
-        tr_torrentVerify(tor_, nullptr, nullptr);
+        tr_torrentVerify(tor_);
     }
 }
 
@@ -461,31 +461,29 @@ TorrentFileChooserDialog::TorrentFileChooserDialog(Gtk::Window& parent, Glib::Re
 
 void TorrentUrlChooserDialog::onOpenURLResponse(int response, Glib::RefPtr<Session> const& core)
 {
-    bool handled = false;
 
-    if (response == Gtk::RESPONSE_ACCEPT)
-    {
-        auto* e = static_cast<Gtk::Entry*>(get_data("url-entry"));
-        auto const url = gtr_str_strip(e->get_text());
-
-        if (!url.empty())
-        {
-            handled = core->add_from_url(url);
-
-            if (!handled)
-            {
-                gtr_unrecognized_url_dialog(*this, url);
-            }
-        }
-    }
-    else if (response == Gtk::RESPONSE_CANCEL)
-    {
-        handled = true;
-    }
-
-    if (handled)
+    if (response == Gtk::RESPONSE_CANCEL)
     {
         hide();
+    }
+    else if (response == Gtk::RESPONSE_ACCEPT)
+    {
+        auto* const e = static_cast<Gtk::Entry*>(get_data("url-entry"));
+        auto const url = gtr_str_strip(e->get_text());
+
+        if (url.empty())
+        {
+            return;
+        }
+
+        if (core->add_from_url(url))
+        {
+            hide();
+        }
+        else
+        {
+            gtr_unrecognized_url_dialog(*this, url);
+        }
     }
 }
 

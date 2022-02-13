@@ -1,5 +1,5 @@
 // This file Copyright © 2009-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -301,9 +301,7 @@ bool getSelectedFilesForeach(
     Glib::RefPtr<Gtk::TreeSelection> const& sel,
     std::vector<tr_file_index_t>& indexBuf)
 {
-    bool const is_file = iter->children().empty();
-
-    if (is_file)
+    if (bool const is_file = iter->children().empty(); is_file)
     {
         /* active means: if it's selected or any ancestor is selected */
         bool is_active = sel->is_selected(iter);
@@ -345,9 +343,7 @@ bool getSubtreeForeach(
     Gtk::TreeModel::Path const& subtree_path,
     std::vector<tr_file_index_t>& indexBuf)
 {
-    bool const is_file = iter->children().empty();
-
-    if (is_file)
+    if (bool const is_file = iter->children().empty(); is_file)
     {
         if (path == subtree_path || path.is_descendant(subtree_path))
         {
@@ -479,52 +475,51 @@ void FileList::Impl::set_torrent(int torrentId)
     torrent_id_ = torrentId;
 
     /* populate the model */
-    auto* const tor = torrent_id_ > 0 ? core_->find_torrent(torrent_id_) : nullptr;
-    if (tor != nullptr)
-    {
-        // build a GNode tree of the files
-        FileRowNode root;
-        auto& root_data = root.data();
-        root_data.name = tr_torrentName(tor);
-        root_data.index = -1;
-        root_data.length = 0;
-
-        for (tr_file_index_t i = 0, n_files = tr_torrentFileCount(tor); i < n_files; ++i)
-        {
-            auto* parent = &root;
-            auto const file = tr_torrentFile(tor, i);
-
-            for (char const *last = file.name, *next = strchr(last, '/'); last != nullptr;
-                 last = next != nullptr ? next + 1 : nullptr, next = last != nullptr ? strchr(last, '/') : nullptr)
-            {
-                bool const isLeaf = next == nullptr;
-                auto name = Glib::ustring(isLeaf ? last : std::string(last, next - last));
-                auto* node = find_child(parent, name);
-
-                if (node == nullptr)
-                {
-                    node = new FileRowNode();
-                    auto& row = node->data();
-                    row.name = std::move(name);
-                    row.index = isLeaf ? (int)i : -1;
-                    row.length = isLeaf ? file.length : 0;
-                    parent->append(*node);
-                }
-
-                parent = node;
-            }
-        }
-
-        // now, add them to the model
-        struct build_data build;
-        build.w = &widget_;
-        build.tor = tor;
-        build.store = store_;
-        root.foreach ([&build](auto& child_node) { buildTree(child_node, build); }, FileRowNode::TRAVERSE_ALL);
-    }
-
     if (torrent_id_ > 0)
     {
+        if (auto* const tor = core_->find_torrent(torrent_id_); tor != nullptr)
+        {
+            // build a GNode tree of the files
+            FileRowNode root;
+            auto& root_data = root.data();
+            root_data.name = tr_torrentName(tor);
+            root_data.index = -1;
+            root_data.length = 0;
+
+            for (tr_file_index_t i = 0, n_files = tr_torrentFileCount(tor); i < n_files; ++i)
+            {
+                auto* parent = &root;
+                auto const file = tr_torrentFile(tor, i);
+
+                for (char const *last = file.name, *next = strchr(last, '/'); last != nullptr;
+                     last = next != nullptr ? next + 1 : nullptr, next = last != nullptr ? strchr(last, '/') : nullptr)
+                {
+                    bool const isLeaf = next == nullptr;
+                    auto name = Glib::ustring(isLeaf ? last : std::string(last, next - last));
+                    auto* node = find_child(parent, name);
+
+                    if (node == nullptr)
+                    {
+                        node = new FileRowNode();
+                        auto& row = node->data();
+                        row.name = std::move(name);
+                        row.index = isLeaf ? (int)i : -1;
+                        row.length = isLeaf ? file.length : 0;
+                        parent->append(*node);
+                    }
+
+                    parent = node;
+                }
+            }
+
+            // now, add them to the model
+            struct build_data build;
+            build.w = &widget_;
+            build.tor = tor;
+            build.store = store_;
+            root.foreach ([&build](auto& child_node) { buildTree(child_node, build); }, FileRowNode::TRAVERSE_ALL);
+        }
+
         refresh();
         timeout_tag_ = Glib::signal_timeout().connect_seconds(
             [this]() { return refresh(), true; },
@@ -597,9 +592,8 @@ std::string buildFilename(tr_torrent const* tor, Gtk::TreeModel::iterator const&
 void FileList::Impl::onRowActivated(Gtk::TreeModel::Path const& path, Gtk::TreeViewColumn* /*col*/)
 {
     bool handled = false;
-    auto const* tor = core_->find_torrent(torrent_id_);
 
-    if (tor != nullptr)
+    if (auto const* tor = core_->find_torrent(torrent_id_); tor != nullptr)
     {
         if (auto const iter = store_->get_iter(path); iter)
         {
@@ -690,9 +684,7 @@ bool FileList::Impl::getAndSelectEventPath(GdkEventButton const* event, Gtk::Tre
 
     if (view_->get_path_at_pos(event->x, event->y, path, col, cell_x, cell_y))
     {
-        auto const sel = view_->get_selection();
-
-        if (!sel->is_selected(path))
+        if (auto const sel = view_->get_selection(); !sel->is_selected(path))
         {
             sel->unselect_all();
             sel->select(path);

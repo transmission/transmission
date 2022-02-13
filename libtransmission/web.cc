@@ -1,5 +1,5 @@
 // This file Copyright © 2008-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -8,6 +8,7 @@
 #include <set>
 #include <string>
 #include <string_view>
+#include <thread>
 
 #ifdef _WIN32
 #include <windows.h>
@@ -24,7 +25,6 @@
 #include "log.h"
 #include "net.h" /* tr_address */
 #include "torrent.h"
-#include "platform.h" /* mutex */
 #include "session.h"
 #include "tr-assert.h"
 #include "tr-macros.h"
@@ -150,7 +150,7 @@ static int sockoptfunction(void* vtask, curl_socket_t fd, curlsocktype /*purpose
 
 static CURLcode ssl_context_func(CURL* /*curl*/, void* ssl_ctx, void* /*user_data*/)
 {
-    tr_x509_store_t const cert_store = tr_ssl_get_x509_store(ssl_ctx);
+    auto const cert_store = tr_ssl_get_x509_store(ssl_ctx);
     if (cert_store == nullptr)
     {
         return CURLE_OK;
@@ -342,8 +342,7 @@ static struct tr_web_task* tr_webRunImpl(
     {
         if (session->web == nullptr)
         {
-            tr_threadNew(tr_webThreadFunc, session);
-
+            std::thread(tr_webThreadFunc, session).detach();
             while (session->web == nullptr)
             {
                 tr_wait_msec(20);
@@ -491,7 +490,7 @@ static void tr_webThreadFunc(void* vsession)
 
             auto numfds = int{};
             curl_multi_wait(multi, nullptr, 0, msec, &numfds);
-            if (!numfds)
+            if (numfds == 0)
             {
                 repeats++;
                 if (repeats > 1)
@@ -582,11 +581,4 @@ long tr_webGetTaskResponseCode(struct tr_web_task* task)
     long code = 0;
     curl_easy_getinfo(task->curl_easy, CURLINFO_RESPONSE_CODE, &code);
     return code;
-}
-
-char const* tr_webGetTaskRealUrl(struct tr_web_task* task)
-{
-    char* url = nullptr;
-    curl_easy_getinfo(task->curl_easy, CURLINFO_EFFECTIVE_URL, &url);
-    return url;
 }

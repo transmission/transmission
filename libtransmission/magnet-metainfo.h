@@ -20,6 +20,7 @@ class tr_magnet_metainfo
 {
 public:
     bool parseMagnet(std::string_view magnet_link, tr_error** error = nullptr);
+
     std::string magnet() const;
 
     auto const& infoHash() const

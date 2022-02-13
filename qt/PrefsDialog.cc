@@ -1,5 +1,5 @@
 // This file Copyright © 2009-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -152,7 +152,7 @@ QString qtDayName(int day)
 
     default:
         assert(false && "Invalid day of week");
-        return QString();
+        return {};
     }
 }
 
@@ -206,36 +206,31 @@ void PrefsDialog::linkWidgetToPref(QWidget* widget, int pref_key)
     updateWidgetValue(widget, pref_key);
     widgets_.insert(pref_key, widget);
 
-    auto const* check_box = qobject_cast<QCheckBox*>(widget);
-    if (check_box != nullptr)
+    if (auto const* check_box = qobject_cast<QCheckBox*>(widget); check_box != nullptr)
     {
         connect(check_box, &QAbstractButton::toggled, this, &PrefsDialog::checkBoxToggled);
         return;
     }
 
-    auto const* time_edit = qobject_cast<QTimeEdit*>(widget);
-    if (time_edit != nullptr)
+    if (auto const* time_edit = qobject_cast<QTimeEdit*>(widget); time_edit != nullptr)
     {
         connect(time_edit, &QAbstractSpinBox::editingFinished, this, &PrefsDialog::timeEditingFinished);
         return;
     }
 
-    auto const* line_edit = qobject_cast<QLineEdit*>(widget);
-    if (line_edit != nullptr)
+    if (auto const* line_edit = qobject_cast<QLineEdit*>(widget); line_edit != nullptr)
     {
         connect(line_edit, &QLineEdit::editingFinished, this, &PrefsDialog::lineEditingFinished);
         return;
     }
 
-    auto const* path_button = qobject_cast<PathButton*>(widget);
-    if (path_button != nullptr)
+    if (auto const* path_button = qobject_cast<PathButton*>(widget); path_button != nullptr)
     {
         connect(path_button, &PathButton::pathChanged, this, &PrefsDialog::pathChanged);
         return;
     }
 
-    auto const* spin_box = qobject_cast<QAbstractSpinBox*>(widget);
-    if (spin_box != nullptr)
+    if (auto const* spin_box = qobject_cast<QAbstractSpinBox*>(widget); spin_box != nullptr)
     {
         connect(spin_box, &QAbstractSpinBox::editingFinished, this, &PrefsDialog::spinBoxEditingFinished);
     }
@@ -681,9 +676,7 @@ void PrefsDialog::setPref(int key, QVariant const& v)
 
 void PrefsDialog::sessionUpdated()
 {
-    bool const is_local = session_.isLocal();
-
-    if (is_local_ != is_local)
+    if (bool const is_local = session_.isLocal(); is_local_ != is_local)
     {
         is_local_ = is_local;
         updateDownloadingWidgetsLocality();

@@ -1,5 +1,5 @@
 // This file Copyright © 2007-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -134,11 +134,9 @@ Glib::ustring getIconName()
 {
     Glib::ustring icon_name;
 
-    auto theme = Gtk::IconTheme::get_default();
-
     // if the tray's icon is a 48x48 file, use it.
     // otherwise, use the fallback builtin icon.
-    if (!theme->has_icon(TrayIconName))
+    if (auto theme = Gtk::IconTheme::get_default(); !theme->has_icon(TrayIconName))
     {
         icon_name = AppIconName;
     }

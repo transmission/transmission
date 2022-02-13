@@ -1,5 +1,5 @@
 // This file Copyright © 2007-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -46,10 +46,10 @@ void tr_block_info::initSizes(uint64_t total_size_in, uint64_t piece_size_in)
     n_pieces = (total_size + piece_size - 1) / piece_size;
 
     auto remainder = total_size % piece_size;
-    final_piece_size = remainder ? remainder : piece_size;
+    final_piece_size = remainder != 0U ? remainder : piece_size;
 
     remainder = total_size % block_size;
-    final_block_size = remainder ? remainder : block_size;
+    final_block_size = remainder != 0U ? remainder : block_size;
 
     if (block_size != 0)
     {

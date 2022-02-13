@@ -1,5 +1,5 @@
 // This file Copyright © 2010-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -236,6 +236,7 @@ struct tr_tracker
     explicit tr_tracker(tr_announcer* announcer, tr_announce_list::tracker_info const& info)
         : host{ info.host }
         , announce_url{ info.announce_str }
+        , sitename{ info.announce.sitename }
         , scrape_info{ std::empty(info.scrape_str) ? nullptr : tr_announcerGetScrapeInfo(announcer, info.scrape_str) }
         , id{ info.id }
     {
@@ -270,6 +271,7 @@ struct tr_tracker
 
     tr_interned_string const host;
     tr_interned_string const announce_url;
+    std::string_view const sitename;
     tr_scrape_info* const scrape_info;
 
     std::string tracker_id;
@@ -309,6 +311,7 @@ struct tr_tier
             trackers.emplace_back(announcer, *info);
         }
         useNextTracker();
+        scrapeSoon();
     }
 
     [[nodiscard]] tr_tracker* currentTracker()
@@ -406,6 +409,21 @@ struct tr_tier
         return this->manualAnnounceAllowedAt <= tr_time();
     }
 
+    void scheduleNextScrape()
+    {
+        scheduleNextScrape(this->scrapeIntervalSec);
+    }
+
+    void scrapeSoon()
+    {
+        scheduleNextScrape(0);
+    }
+
+    void scheduleNextScrape(int interval)
+    {
+        this->scrapeAt = getNextScrapeTime(tor->session, this, interval);
+    }
+
     tr_torrent* const tor;
 
     /* number of up/down/corrupt bytes since the last time we sent an
@@ -447,31 +465,30 @@ struct tr_tier
     std::string last_scrape_str;
 
 private:
+    [[nodiscard]] static time_t getNextScrapeTime(tr_session const* session, tr_tier const* tier, int interval)
+    {
+        // Maybe don't scrape paused torrents
+        if (!tier->isRunning && !session->scrapePausedTorrents)
+        {
+            return 0;
+        }
+
+        /* Add the interval, and then increment to the nearest 10th second.
+         * The latter step is to increase the odds of several torrents coming
+         * due at the same time to improve multiscrape. */
+        auto ret = tr_time() + interval;
+        while (ret % 10 != 0)
+        {
+            ++ret;
+        }
+
+        return ret;
+    }
+
     static int next_key;
 };
 
 int tr_tier::next_key = 0;
-
-static time_t get_next_scrape_time(tr_session const* session, tr_tier const* tier, int interval)
-{
-    /* Maybe don't scrape paused torrents */
-    if (!tier->isRunning && !session->scrapePausedTorrents)
-    {
-        return 0;
-    }
-
-    /* Add the interval, and then increment to the nearest 10th second.
-     * The latter step is to increase the odds of several torrents coming
-     * due at the same time to improve multiscrape. */
-    time_t const now = tr_time();
-    time_t ret = now + interval;
-    while (ret % 10 != 0)
-    {
-        ++ret;
-    }
-
-    return ret;
-}
 
 /***
 ****
@@ -746,7 +763,7 @@ static void tier_announce_event_push(tr_tier* tier, tr_announce_event e, time_t 
          * dump everything leading up to it except "completed" */
         if (e == TR_ANNOUNCE_EVENT_STOPPED)
         {
-            bool has_completed = std::count(std::begin(events), std::end(events), TR_ANNOUNCE_EVENT_COMPLETED);
+            bool has_completed = std::count(std::begin(events), std::end(events), TR_ANNOUNCE_EVENT_COMPLETED) != 0;
             events.clear();
             if (has_completed)
             {
@@ -870,7 +887,7 @@ void tr_announcerRemoveTorrent(tr_announcer* announcer, tr_torrent* tor)
             auto const e = TR_ANNOUNCE_EVENT_STOPPED;
             auto* req = announce_request_new(announcer, tor, &tier, e);
 
-            if (announcer->stops.count(req))
+            if (announcer->stops.count(req) != 0U)
             {
                 delete req;
             }
@@ -1067,13 +1084,13 @@ static void on_announce_done(tr_announce_response const* response, void* vdata)
                     "Announce response contained scrape info; "
                     "rescheduling next scrape to %d seconds from now.",
                     tier->scrapeIntervalSec);
-                tier->scrapeAt = get_next_scrape_time(announcer->session, tier, tier->scrapeIntervalSec);
+                tier->scheduleNextScrape();
                 tier->lastScrapeTime = now;
                 tier->lastScrapeSucceeded = true;
             }
             else if (tier->lastScrapeTime + tier->scrapeIntervalSec <= now)
             {
-                tier->scrapeAt = get_next_scrape_time(announcer->session, tier, 0);
+                tier->scrapeSoon();
             }
 
             tier->lastAnnounceSucceeded = true;
@@ -1179,7 +1196,7 @@ static bool multiscrape_too_big(std::string_view errmsg)
         [&errmsg](auto const& substr) { return tr_strvContains(errmsg, substr); });
 }
 
-static void on_scrape_error(tr_session const* session, tr_tier* tier, char const* errmsg)
+static void on_scrape_error(tr_session const* /*session*/, tr_tier* tier, char const* errmsg)
 {
     // increment the error count
     auto* current_tracker = tier->currentTracker();
@@ -1200,7 +1217,7 @@ static void on_scrape_error(tr_session const* session, tr_tier* tier, char const
     dbgmsg(tier, "Tracker '%s' scrape error: %s (Retrying in %zu seconds)", host_cstr, errmsg, (size_t)interval);
     tr_logAddTorInfo(tier->tor, "Tracker '%s' error: %s (Retrying in %zu seconds)", host_cstr, errmsg, (size_t)interval);
     tier->lastScrapeSucceeded = false;
-    tier->scrapeAt = get_next_scrape_time(session, tier, interval);
+    tier->scheduleNextScrape(interval);
 }
 
 static void checkMultiscrapeMax(tr_announcer* announcer, tr_scrape_response const* response)
@@ -1304,11 +1321,10 @@ static void on_scrape_done(tr_scrape_response const* response, void* vsession)
             {
                 tier->lastScrapeSucceeded = true;
                 tier->scrapeIntervalSec = std::max(int{ DefaultScrapeIntervalSec }, response->min_request_interval);
-                tier->scrapeAt = get_next_scrape_time(session, tier, tier->scrapeIntervalSec);
+                tier->scheduleNextScrape();
                 tr_logAddTorDbg(tier->tor, "Scrape successful. Rescraping in %d seconds.", tier->scrapeIntervalSec);
 
-                tr_tracker* const tracker = tier->currentTracker();
-                if (tracker != nullptr)
+                if (tr_tracker* const tracker = tier->currentTracker(); tracker != nullptr)
                 {
                     if (row.seeders >= 0)
                     {
@@ -1561,6 +1577,10 @@ static tr_tracker_view trackerView(tr_torrent const& tor, int tier_index, tr_tie
     view.host = tracker.host.c_str();
     view.announce = tracker.announce_url.c_str();
     view.scrape = tracker.scrape_info == nullptr ? "" : tracker.scrape_info->scrape_url.c_str();
+    *std::copy_n(
+        std::begin(tracker.sitename),
+        std::min(std::size(tracker.sitename), sizeof(view.sitename) - 1),
+        view.sitename) = '\0';
 
     view.id = tracker.id;
     view.tier = tier_index;
@@ -1579,8 +1599,8 @@ static tr_tracker_view trackerView(tr_torrent const& tor, int tier_index, tr_tie
     }
     else
     {
-        view.hasScraped = tier.lastScrapeTime;
-        if (view.hasScraped != 0)
+        view.hasScraped = tier.lastScrapeTime != 0;
+        if (view.hasScraped)
         {
             view.lastScrapeTime = tier.lastScrapeTime;
             view.lastScrapeSucceeded = tier.lastScrapeSucceeded;
@@ -1608,8 +1628,8 @@ static tr_tracker_view trackerView(tr_torrent const& tor, int tier_index, tr_tie
 
         view.lastAnnounceStartTime = tier.lastAnnounceStartTime;
 
-        view.hasAnnounced = tier.lastAnnounceTime;
-        if (view.hasAnnounced != 0)
+        view.hasAnnounced = tier.lastAnnounceTime != 0;
+        if (view.hasAnnounced)
         {
             view.lastAnnounceTime = tier.lastAnnounceTime;
             view.lastAnnounceSucceeded = tier.lastAnnounceSucceeded;

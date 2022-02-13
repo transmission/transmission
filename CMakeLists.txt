@@ -41,6 +41,7 @@ tr_auto_option(USE_SYSTEM_MINIUPNPC "Use system miniupnpc library" AUTO)
 tr_auto_option(USE_SYSTEM_NATPMP    "Use system natpmp library" AUTO)
 tr_auto_option(USE_SYSTEM_UTP       "Use system utp library" AUTO)
 tr_auto_option(USE_SYSTEM_B64       "Use system b64 library" AUTO)
+tr_auto_option(USE_SYSTEM_PSL       "Use system psl library" AUTO)
 tr_auto_option(USE_QT_VERSION       "Use specific Qt version" AUTO 5 6)
 tr_list_option(WITH_CRYPTO          "Use specified crypto library" AUTO openssl cyassl polarssl ccrypto)
 tr_auto_option(WITH_INOTIFY         "Enable inotify support (on systems that support it)" AUTO)
@@ -109,10 +110,11 @@ string(SUBSTRING "${TR_VCS_REVISION}" 0 10 TR_VCS_REVISION)
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
+set(PSL_MINIMUM             0.21.1)
 set(CURL_MINIMUM            7.28.0)
 set(CYASSL_MINIMUM          3.0)
 set(DEFLATE_MINIMUM         1.9)
-set(EVENT2_MINIMUM          2.0.10)
+set(EVENT2_MINIMUM          2.1.0)
 set(GIO_MINIMUM             2.26.0)
 set(GLIB_MINIMUM            2.50.1)
 set(GTK_MINIMUM             3.24.0)
@@ -354,6 +356,8 @@ endif()
 
 tr_add_external_auto_library(DHT dht dht)
 
+tr_add_external_auto_library(PSL libpsl psl)
+
 if(ENABLE_UTP)
     tr_add_external_auto_library(UTP libutp utp)
 
@@ -560,7 +564,6 @@ set(NEEDED_FUNCTIONS
     htonll
     localtime_r
     localtime_s
-    memmem
     mkdtemp
     ntohll
     posix_fadvise
@@ -569,9 +572,7 @@ set(NEEDED_FUNCTIONS
     pwrite
     sendfile64
     statvfs
-    strcasestr
     strlcpy
-    strsep
     syslog
     uselocale)
 
@@ -677,7 +678,7 @@ if(ENABLE_DAEMON OR ENABLE_GTK OR ENABLE_QT)
 endif()
 
 if(INSTALL_DOC)
-    install(FILES AUTHORS COPYING NEWS.md README.md extras/rpc-spec.txt extras/send-email-when-torrent-done.sh DESTINATION ${CMAKE_INSTALL_DOCDIR})
+    install(FILES AUTHORS COPYING NEWS.md README.md extras/rpc-spec.md extras/send-email-when-torrent-done.sh DESTINATION ${CMAKE_INSTALL_DOCDIR})
 endif()
 
 if(MSVC AND ENABLE_DAEMON AND ENABLE_QT AND ENABLE_UTILS AND WITH_CRYPTO STREQUAL "openssl")

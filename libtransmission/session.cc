@@ -1,5 +1,5 @@
 // This file Copyright © 2008-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -250,62 +250,6 @@ tr_address const* tr_sessionGetPublicAddress(tr_session const* session, int tr_a
 ****
 ***/
 
-static int parseTos(std::string_view tos_in)
-{
-    auto tos = tr_strlower(tr_strvStrip(tos_in));
-
-    if (tos == ""sv || tos == "default"sv)
-    {
-        return 0;
-    }
-
-    if (tos == "lowcost"sv || tos == "mincost"sv)
-    {
-        return TR_IPTOS_LOWCOST;
-    }
-
-    if (tos == "throughput"sv)
-    {
-        return TR_IPTOS_THRUPUT;
-    }
-
-    if (tos == "reliability"sv)
-    {
-        return TR_IPTOS_RELIABLE;
-    }
-
-    if (tos == "lowdelay"sv)
-    {
-        return TR_IPTOS_LOWDELAY;
-    }
-
-    return std::stoi(tos);
-}
-
-static std::string format_tos(int value)
-{
-    switch (value)
-    {
-    case 0:
-        return "default";
-
-    case TR_IPTOS_LOWCOST:
-        return "lowcost";
-
-    case TR_IPTOS_THRUPUT:
-        return "throughput";
-
-    case TR_IPTOS_RELIABLE:
-        return "reliability";
-
-    case TR_IPTOS_LOWDELAY:
-        return "lowdelay";
-
-    default:
-        return std::to_string(value);
-    }
-}
-
 #ifdef TR_LIGHTWEIGHT
 #define TR_DEFAULT_ENCRYPTION TR_CLEAR_PREFERRED
 #else
@@ -416,7 +360,7 @@ void tr_sessionGetSettings(tr_session const* s, tr_variant* d)
     tr_variantDictAddBool(d, TR_KEY_peer_port_random_on_start, s->isPortRandom);
     tr_variantDictAddInt(d, TR_KEY_peer_port_random_low, s->randomPortLow);
     tr_variantDictAddInt(d, TR_KEY_peer_port_random_high, s->randomPortHigh);
-    tr_variantDictAddStr(d, TR_KEY_peer_socket_tos, format_tos(s->peerSocketTos()));
+    tr_variantDictAddStr(d, TR_KEY_peer_socket_tos, tr_netTosToName(s->peer_socket_tos_));
     tr_variantDictAddStr(d, TR_KEY_peer_congestion_algorithm, s->peerCongestionAlgorithm());
     tr_variantDictAddBool(d, TR_KEY_pex_enabled, s->isPexEnabled);
     tr_variantDictAddBool(d, TR_KEY_port_forwarding_enabled, tr_sessionIsPortForwardingEnabled(s));
@@ -572,7 +516,7 @@ static void onSaveTimer(evutil_socket_t /*fd*/, short /*what*/, void* vsession)
 ****
 ***/
 
-static void tr_sessionInitImpl(void*);
+static void tr_sessionInitImpl(void* /*vdata*/);
 
 struct init_data
 {
@@ -600,8 +544,7 @@ tr_session* tr_sessionInit(char const* config_dir, bool messageQueuingEnabled, t
     session->removed_torrents.clear();
 
     /* nice to start logging at the very beginning */
-    auto i = int64_t{};
-    if (tr_variantDictFindInt(clientSettings, TR_KEY_message_level, &i))
+    if (auto i = int64_t{}; tr_variantDictFindInt(clientSettings, TR_KEY_message_level, &i))
     {
         tr_logSetLevel(tr_log_level(i));
     }
@@ -676,8 +619,7 @@ static void onNowTimer(evutil_socket_t /*fd*/, short /*what*/, void* vsession)
     **/
 
     /* schedule the next timer for right after the next second begins */
-    struct timeval tv;
-    tr_gettimeofday(&tv);
+    auto const tv = tr_gettimeofday();
     int constexpr Min = 100;
     int constexpr Max = 999999;
     int const usec = std::clamp(int(1000000 - tv.tv_usec), Min, Max);
@@ -758,7 +700,7 @@ static void tr_sessionInitImpl(void* vdata)
     data->done = true;
 }
 
-static void turtleBootstrap(tr_session*, struct tr_turtle_info*);
+static void turtleBootstrap(tr_session* /*session*/, struct tr_turtle_info* /*turtle*/);
 static void setPeerPort(tr_session* session, tr_port port);
 
 static void sessionSetImpl(void* vdata)
@@ -829,9 +771,16 @@ static void sessionSetImpl(void* vdata)
         tr_sessionSetEncryption(session, tr_encryption_mode(i));
     }
 
-    if (tr_variantDictFindStrView(settings, TR_KEY_peer_socket_tos, &sv))
+    if (tr_variantDictFindInt(settings, TR_KEY_peer_socket_tos, &i))
     {
-        session->setPeerSocketTos(parseTos(sv));
+        session->peer_socket_tos_ = i;
+    }
+    else if (tr_variantDictFindStrView(settings, TR_KEY_peer_socket_tos, &sv))
+    {
+        if (auto ip_tos = tr_netTosFromName(sv); ip_tos)
+        {
+            session->peer_socket_tos_ = *ip_tos;
+        }
     }
 
     sv = ""sv;
@@ -1143,7 +1092,7 @@ void tr_sessionSetDownloadDir(tr_session* session, char const* dir)
 {
     TR_ASSERT(tr_isSession(session));
 
-    session->setDownloadDir(dir ? dir : "");
+    session->setDownloadDir(dir != nullptr ? dir : "");
 }
 
 char const* tr_sessionGetDownloadDir(tr_session const* session)
@@ -1179,7 +1128,7 @@ void tr_sessionSetIncompleteDir(tr_session* session, char const* dir)
 {
     TR_ASSERT(tr_isSession(session));
 
-    session->setIncompleteDir(dir ? dir : "");
+    session->setIncompleteDir(dir != nullptr ? dir : "");
 }
 
 char const* tr_sessionGetIncompleteDir(tr_session const* session)
@@ -1802,7 +1751,7 @@ std::vector<tr_torrent*> tr_sessionGetTorrents(tr_session* session)
     return torrents;
 }
 
-static void closeBlocklists(tr_session*);
+static void closeBlocklists(tr_session* /*session*/);
 
 static void sessionCloseImplWaitForIdleUdp(evutil_socket_t fd, short what, void* vsession);
 
@@ -2043,7 +1992,7 @@ static void sessionLoadTorrents(void* vdata)
     }
 
     int const n = std::size(torrents);
-    data->torrents = tr_new(tr_torrent*, n);
+    data->torrents = tr_new(tr_torrent*, n); // NOLINT(bugprone-sizeof-expression)
     std::copy(std::begin(torrents), std::end(torrents), data->torrents);
 
     if (n != 0)
@@ -2308,9 +2257,8 @@ static void loadBlocklists(tr_session* session)
             if (!tr_sys_path_get_info(binname.c_str(), 0, &binname_info, nullptr)) /* create it */
             {
                 tr_blocklistFile* b = tr_blocklistFileNew(binname.c_str(), isEnabled);
-                int const n = tr_blocklistFileSetContent(b, path.c_str());
 
-                if (n > 0)
+                if (auto const n = tr_blocklistFileSetContent(b, path.c_str()); n > 0)
                 {
                     load = binname;
                 }
@@ -2455,7 +2403,7 @@ bool tr_sessionIsAddressBlocked(tr_session const* session, tr_address const* add
 
 void tr_blocklistSetURL(tr_session* session, char const* url)
 {
-    session->setBlocklistUrl(url ? url : "");
+    session->setBlocklistUrl(url != nullptr ? url : "");
 }
 
 char const* tr_blocklistGetURL(tr_session const* session)
@@ -2519,7 +2467,7 @@ void tr_sessionSetRPCUrl(tr_session* session, char const* url)
 {
     TR_ASSERT(tr_isSession(session));
 
-    tr_rpcSetUrl(session->rpc_server_.get(), url ? url : "");
+    tr_rpcSetUrl(session->rpc_server_.get(), url != nullptr ? url : "");
 }
 
 char const* tr_sessionGetRPCUrl(tr_session const* session)
@@ -2541,7 +2489,7 @@ void tr_sessionSetRPCWhitelist(tr_session* session, char const* whitelist)
 {
     TR_ASSERT(tr_isSession(session));
 
-    session->setRpcWhitelist(whitelist ? whitelist : "");
+    session->setRpcWhitelist(whitelist != nullptr ? whitelist : "");
 }
 
 char const* tr_sessionGetRPCWhitelist(tr_session const* session)
@@ -2569,7 +2517,7 @@ void tr_sessionSetRPCPassword(tr_session* session, char const* password)
 {
     TR_ASSERT(tr_isSession(session));
 
-    tr_rpcSetPassword(session->rpc_server_.get(), password ? password : "");
+    tr_rpcSetPassword(session->rpc_server_.get(), password != nullptr ? password : "");
 }
 
 char const* tr_sessionGetRPCPassword(tr_session const* session)
@@ -2583,7 +2531,7 @@ void tr_sessionSetRPCUsername(tr_session* session, char const* username)
 {
     TR_ASSERT(tr_isSession(session));
 
-    tr_rpcSetUsername(session->rpc_server_.get(), username ? username : "");
+    tr_rpcSetUsername(session->rpc_server_.get(), username != nullptr ? username : "");
 }
 
 char const* tr_sessionGetRPCUsername(tr_session const* session)
@@ -2639,7 +2587,7 @@ void tr_sessionSetScript(tr_session* session, TrScript type, char const* script)
     TR_ASSERT(tr_isSession(session));
     TR_ASSERT(type < TR_SCRIPT_N_TYPES);
 
-    session->setScript(type, script ? script : "");
+    session->setScript(type, script != nullptr ? script : "");
 }
 
 char const* tr_sessionGetScript(tr_session const* session, TrScript type)
@@ -2835,7 +2783,6 @@ void tr_sessionRemoveTorrent(tr_session* session, tr_torrent* tor)
 
 tr_torrent* tr_session::getTorrent(std::string_view info_dict_hash_string)
 {
-    return std::size(info_dict_hash_string) == TR_SHA1_DIGEST_STRLEN ?
-        this->getTorrent(tr_sha1_from_string(info_dict_hash_string)) :
-        nullptr;
+    auto const info_hash = tr_sha1_from_string(info_dict_hash_string);
+    return info_hash ? this->getTorrent(*info_hash) : nullptr;
 }

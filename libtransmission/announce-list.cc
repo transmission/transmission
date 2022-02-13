@@ -1,5 +1,5 @@
 // This file Copyright 2021-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -24,7 +24,7 @@ size_t tr_announce_list::set(char const* const* announce_urls, tr_tracker_tier_t
 
     for (size_t i = 0; i < n; ++i)
     {
-        add(tiers[i], announce_urls[i]);
+        add(announce_urls[i], tiers[i]);
     }
 
     return size();
@@ -56,8 +56,7 @@ bool tr_announce_list::remove(tr_tracker_id_t id)
 
 bool tr_announce_list::replace(tr_tracker_id_t id, std::string_view announce_url_sv)
 {
-    auto const announce = tr_urlParseTracker(announce_url_sv);
-    if (!announce || !canAdd(*announce))
+    if (auto const announce = tr_urlParseTracker(announce_url_sv); !announce || !canAdd(*announce))
     {
         return false;
     }
@@ -70,10 +69,10 @@ bool tr_announce_list::replace(tr_tracker_id_t id, std::string_view announce_url
 
     auto const tier = it->tier;
     trackers_.erase(it);
-    return add(tier, announce_url_sv);
+    return add(announce_url_sv, tier);
 }
 
-bool tr_announce_list::add(tr_tracker_tier_t tier, std::string_view announce_url_sv)
+bool tr_announce_list::add(std::string_view announce_url_sv, tr_tracker_tier_t tier)
 {
     auto const announce = tr_urlParseTracker(announce_url_sv);
     if (!announce || !canAdd(*announce))
@@ -88,8 +87,7 @@ bool tr_announce_list::add(tr_tracker_tier_t tier, std::string_view announce_url
     tracker.id = nextUniqueId();
     tracker.host = tr_strvJoin(tracker.announce.host, ":"sv, tracker.announce.portstr);
 
-    auto const scrape_str = announceToScrape(announce_url_sv);
-    if (scrape_str)
+    if (auto const scrape_str = announceToScrape(announce_url_sv); scrape_str)
     {
         tracker.scrape_str = *scrape_str;
         tracker.scrape = *tr_urlParseTracker(tracker.scrape_str.sv());
@@ -127,11 +125,11 @@ std::optional<std::string> tr_announce_list::announceToScrape(std::string_view a
 
 tr_quark tr_announce_list::announceToScrape(tr_quark announce)
 {
-    auto const scrape_str = announceToScrape(tr_quark_get_string_view(announce));
-    if (scrape_str)
+    if (auto const scrape_str = announceToScrape(tr_quark_get_string_view(announce)); scrape_str)
     {
         return tr_quark_new(*scrape_str);
     }
+
     return TR_KEY_NONE;
 }
 
