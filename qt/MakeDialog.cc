@@ -189,6 +189,8 @@ void MakeDialog::makeTorrent()
         target.toUtf8().constData(),
         trackers.empty() ? nullptr : trackers.data(),
         trackers.size(),
+        nullptr,
+        0,
         comment.isEmpty() ? nullptr : comment.toUtf8().constData(),
         ui_.privateCheck->isChecked(),
         source.isNull() ? nullptr : source.toUtf8().constData());

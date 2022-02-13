@@ -48,5 +48,3 @@ struct tr_web_task* tr_webRunWebseed(
     struct evbuffer* buffer);
 
 long tr_webGetTaskResponseCode(struct tr_web_task* task);
-
-char const* tr_webGetTaskRealUrl(struct tr_web_task* task);

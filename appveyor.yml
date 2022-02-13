@@ -38,6 +38,7 @@ for:
 
       git submodule update --init --recursive
 
+      choco install python3 --pre
       choco install ActivePerl
       choco install nasm
       choco install jom

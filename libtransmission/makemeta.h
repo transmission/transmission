@@ -26,8 +26,6 @@ struct tr_tracker_info
 {
     int tier;
     char* announce;
-    char* scrape;
-    uint32_t id; /* unique identifier used to match to a tr_tracker_stat */
 };
 
 struct tr_metainfo_builder
@@ -53,6 +51,10 @@ struct tr_metainfo_builder
 
     tr_tracker_info* trackers;
     int trackerCount;
+
+    char** webseeds;
+    int webseedCount;
+
     char* comment;
     char* outputFile;
     bool isPrivate;
@@ -116,9 +118,11 @@ void tr_metaInfoBuilderFree(tr_metainfo_builder*);
  */
 void tr_makeMetaInfo(
     tr_metainfo_builder* builder,
-    char const* outputFile,
+    char const* output_file,
     tr_tracker_info const* trackers,
-    int trackerCount,
+    int n_trackers,
+    char const** webseeds,
+    int n_webseeds,
     char const* comment,
-    bool isPrivate,
+    bool is_private,
     char const* source);

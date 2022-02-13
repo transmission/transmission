@@ -437,7 +437,13 @@ protected:
         EXPECT_FALSE(tr_amInEventThread(tor->session));
         tr_torrentVerify(tor);
         tr_wait_msec(100);
-        EXPECT_TRUE(waitFor([tor]() { return tor->verifyState == TR_VERIFY_NONE; }, 4000));
+        EXPECT_TRUE(waitFor(
+            [tor]()
+            {
+                auto const activity = tr_torrentGetActivity(tor);
+                return activity != TR_STATUS_CHECK && activity != TR_STATUS_CHECK_WAIT && tor->checked_pieces_.hasAll();
+            },
+            4000));
     }
 
     tr_session* session_ = nullptr;

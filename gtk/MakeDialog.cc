@@ -284,7 +284,7 @@ void MakeDialog::Impl::onResponse(int response)
                 else
                 {
                     announce_urls.push_front(str);
-                    trackers.push_back(tr_tracker_info{ tier, announce_urls.front().data(), nullptr, 0 });
+                    trackers.push_back(tr_tracker_info{ tier, announce_urls.front().data() });
                 }
             }
 
@@ -295,6 +295,8 @@ void MakeDialog::Impl::onResponse(int response)
                 target.c_str(),
                 trackers.data(),
                 trackers.size(),
+                nullptr,
+                0,
                 useComment ? comment.c_str() : nullptr,
                 isPrivate,
                 useSource ? source.c_str() : nullptr);
