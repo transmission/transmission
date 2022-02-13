@@ -633,6 +633,10 @@ static void initField(tr_torrent const* const tor, tr_stat const* const st, tr_v
         tr_variantInitStrView(initme, tr_torrentName(tor));
         break;
 
+    case TR_KEY_percentComplete:
+        tr_variantInitReal(initme, st->percentComplete);
+        break;
+
     case TR_KEY_percentDone:
         tr_variantInitReal(initme, st->percentDone);
         break;
