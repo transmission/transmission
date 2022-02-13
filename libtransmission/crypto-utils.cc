@@ -223,9 +223,17 @@ static void tr_hex_to_binary(char const* input, void* voutput, size_t byte_lengt
     }
 }
 
-tr_sha1_digest_t tr_sha1_from_string(std::string_view hex)
+std::optional<tr_sha1_digest_t> tr_sha1_from_string(std::string_view hex)
 {
-    TR_ASSERT(std::size(hex) == TR_SHA1_DIGEST_STRLEN);
+    if (std::size(hex) != TR_SHA1_DIGEST_STRLEN)
+    {
+        return {};
+    }
+
+    if (!std::all_of(std::begin(hex), std::end(hex), [](unsigned char ch) { return isxdigit(ch); }))
+    {
+        return {};
+    }
 
     auto digest = tr_sha1_digest_t{};
     tr_hex_to_binary(std::data(hex), std::data(digest), std::size(digest));
