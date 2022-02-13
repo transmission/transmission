@@ -74,37 +74,4 @@ public:
             dialog->activateWindow();
         }
     }
-
-    ///
-    /// URLs
-    ///
-
-    static bool isMagnetLink(QString const& s)
-    {
-        return s.startsWith(QStringLiteral("magnet:?"));
-    }
-
-    static bool isHexHashcode(QString const& s)
-    {
-        if (s.length() != 40)
-        {
-            return false;
-        }
-
-        for (auto const& ch : s)
-        {
-            if (!isxdigit(ch.unicode()))
-            {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    static bool isUriWithSupportedScheme(QString const& s)
-    {
-        return s.startsWith(QStringLiteral("ftp://")) || s.startsWith(QStringLiteral("http://")) ||
-            s.startsWith(QStringLiteral("https://"));
-    }
 };

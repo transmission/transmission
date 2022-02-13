@@ -121,12 +121,18 @@ public:
 
     explicit TorrentHash(char const* str)
     {
-        data_ = tr_sha1_from_string(str != nullptr ? str : "");
+        if (auto const hash = tr_sha1_from_string(str != nullptr ? str : ""); hash)
+        {
+            data_ = *hash;
+        }
     }
 
     explicit TorrentHash(QString const& str)
     {
-        data_ = tr_sha1_from_string(str.toStdString());
+        if (auto const hash = tr_sha1_from_string(str.toStdString()); hash)
+        {
+            data_ = *hash;
+        }
     }
 
     bool operator==(TorrentHash const& that) const

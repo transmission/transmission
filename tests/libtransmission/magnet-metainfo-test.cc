@@ -78,4 +78,14 @@ TEST(MagnetMetainfo, magnetParse)
         EXPECT_EQ("Display Name"sv, mm.name());
         EXPECT_EQ(ExpectedHash, mm.infoHash());
     }
+
+    for (auto const& uri : { "2I2UAEFDZJFN4W3UE65QSOTCUOEZ744B"sv, "d2354010a3ca4ade5b7427bb093a62a3899ff381"sv })
+    {
+        auto mm = tr_magnet_metainfo{};
+
+        EXPECT_TRUE(mm.parseMagnet(uri));
+        EXPECT_EQ(0, std::size(mm.announceList()));
+        EXPECT_EQ(0, mm.webseedCount());
+        EXPECT_EQ(ExpectedHash, mm.infoHash());
+    }
 }
