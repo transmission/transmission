@@ -3,7 +3,7 @@
    or any future license endorsed by Mnemosyne LLC.
    License text can be found in the licenses/ folder. */
 
-import isEqual from 'lodash.isequal';
+import isEqual from 'lodash/isEqual';
 
 export const Utils = {
   /** Given a numerator and denominator, return a ratio string */

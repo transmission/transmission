@@ -904,10 +904,11 @@ TODO: fix this when notifications get fixed
 
   sortRows(rows) {
     const torrents = rows.map((row) => row.getTorrent());
-    const id2row = rows.reduce((accumulator, row) => {
-      accumulator[row.getTorrent().getId()] = row;
-      return accumulator;
-    }, {});
+    const id2row = {};
+    for (const _row of rows) {
+      const _torrentId = _row.getTorrent().getId();
+      id2row[_torrentId] = _row;
+    }
     Torrent.sortTorrents(
       torrents,
       this.prefs.sort_mode,

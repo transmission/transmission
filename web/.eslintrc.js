@@ -9,11 +9,12 @@ module.exports = {
     "plugin:sonarjs/recommended",
     "plugin:unicorn/recommended"
   ],
-  "parser": "@babel/eslint-parser",
   "parserOptions": {
+    parser: 'babel-eslint',
     "sourceType": "module"
   },
   "plugins": [
+    'import',
     "sonarjs",
     "unicorn"
   ],
@@ -32,6 +33,11 @@ module.exports = {
     "grouped-accessor-pairs": "error",
     "guard-for-in": "error",
     "init-declarations": "error",
+    'linebreak-style': [
+      0,
+      'unix',
+    ],
+    'max-len': 'off',
     "no-array-constructor": "error",
     "no-caller": "error",
     "no-confusing-arrow": "error",
@@ -79,8 +85,10 @@ module.exports = {
     "no-template-curly-in-string": "error",
     "no-this-before-super": "error",
     "no-throw-literal": "error",
+    'no-trailing-spaces': 'off',
     "no-undef-init": "error",
     "no-undefined": "error",
+    'no-underscore-dangle': 'off',
     "no-unmodified-loop-condition": "error",
     "no-unreachable-loop": "error",
     "no-unused-expressions": "error",
@@ -99,7 +107,9 @@ module.exports = {
     "no-var": "error",
     "no-void": "error",
     "no-with": "error",
+    'object-curly-newline': 'warn',
     "object-shorthand": "error",
+    'padded-blocks': 'off',
     "prefer-arrow-callback": "error",
     "prefer-const": "error",
     "prefer-destructuring": "error",

@@ -1,0 +1,51 @@
+// Color palette recycled from GitHub Primer.
+// Please use those values if you need to add colors.
+// https://primer.style/css/support/color-system
+$blue-100: #dbedff;
+$blue-200: #c8e1ff;
+$blue-300: #79b8ff;
+$blue-700: #044289;
+$green-100: #dcffe4;
+$green-200: #bef5cb;
+$green-300: #85e89d;
+$green-500: #28a745;
+$green-700: #176f2c;
+$grey-100: #f6f8fa;
+$grey-200: #e1e4e8;
+$grey-300: #d1d5da;
+$grey-400: #959da5;
+$grey-500: #6a737d;
+$grey-800: #2f363d;
+$pink-300: #f692ce;
+$pink-700: #b93a86;
+$purple-000: #f5f0ff;
+$purple-100: #e6dcfd;
+$red-500: #d73a49;
+$white: #fff;
+$yellow-200: #fff5b1;
+$yellow-300: #ffea7f;
+$yellow-700: #dbab09;
+
+// Z-INDEX ENUM
+// $z-index-progressbar: 1;
+$z-index-popup: 2;
+
+// SVG ICONS -- see ../img/README.md for sources and license details
+// Are you a designer? New icon PRs welcomed!
+$image-analytics: '../img/analytics.svg';
+$image-baseline: '../img/horizontal-rule.svg';
+$image-files: '../img/files.svg';
+$image-chevron-dn: '../img/chevron-down.svg';
+$image-chevron-up: '../img/chevron-up.svg';
+$image-lock-fill: '../img/lock-fill.svg';
+$image-network: '../img/router.svg';
+$image-magnet: '../img/magnet.svg';
+$image-overflow: '../img/three-dots-vertical.svg';
+$image-pause-circle-active: '../img/pause-circle-active.svg';
+$image-pause-circle-idle: '../img/pause-circle-idle.svg';
+$image-peers: '../img/team.svg';
+$image-play-circle-active: '../img/play-circle-active.svg';
+$image-play-circle-idle: '../img/play-circle-idle.svg';
+$image-speed: '../img/checkered-flag.svg';
+$image-tiers: '../img/diagram-3-fill.svg';
+$image-upload-download: '../img/up-and-down-arrows.svg';
