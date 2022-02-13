@@ -248,7 +248,8 @@ The 'source' column here corresponds to the data structure there.
 | `peersFrom` | object (see below)| n/a
 | `peersGettingFromUs` | number| tr_stat
 | `peersSendingToUs` | number| tr_stat
-| `percentDone` | double| tr_stat
+| `percentComplete` | double | tr_stat
+| `percentDone` | double | tr_stat
 | `pieces` | string (see below)| tr_torrent
 | `pieceCount`| number| tr_torrent_view
 | `pieceSize`| number| tr_torrent_view
@@ -938,9 +939,10 @@ Transmission 4.0.0 (`rpc-version-semver` 5.3.0, `rpc-version`: 17)
 | `session-get` | new arg `script-torrent-added-filename`
 | `torrent-add` | new arg `labels`
 | `torrent-get` | new arg `file-count`
+| `torrent-get` | new arg `percentComplete`
+| `torrent-get` | new arg `primary-mime-type`
 | `torrent-get` | new arg `tracker.sitename`
 | `torrent-get` | new arg `trackerStats.sitename`
-| `torrent-get` | new arg `primary-mime-type`
 
 
 ### 5.1. Upcoming Breakage
