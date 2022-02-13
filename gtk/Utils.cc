@@ -13,10 +13,12 @@
 #include <glibmm/i18n.h>
 
 #include <libtransmission/transmission.h> /* TR_RATIO_NA, TR_RATIO_INF */
+
 #include <libtransmission/error.h>
+#include <libtransmission/torrent-metainfo.h>
 #include <libtransmission/utils.h> /* tr_strratio() */
-#include <libtransmission/web-utils.h>
 #include <libtransmission/version.h> /* SHORT_VERSION_STRING */
+#include <libtransmission/web-utils.h>
 
 #include "HigWorkarea.h"
 #include "Prefs.h"
@@ -121,40 +123,6 @@ Glib::ustring tr_strltime(time_t seconds)
     {
         return s;
     }
-}
-
-namespace
-{
-
-bool gtr_is_supported_url(Glib::ustring const& str)
-{
-    return !str.empty() &&
-        (Glib::str_has_prefix(str, "ftp://") || Glib::str_has_prefix(str, "http://") || Glib::str_has_prefix(str, "https://"));
-}
-
-} // namespace
-
-bool gtr_is_magnet_link(Glib::ustring const& str)
-{
-    return !str.empty() && Glib::str_has_prefix(str, "magnet:?");
-}
-
-bool gtr_is_hex_hashcode(std::string const& str)
-{
-    if (str.size() != 40)
-    {
-        return false;
-    }
-
-    for (int i = 0; i < 40; ++i)
-    {
-        if (!isxdigit(str[i]))
-        {
-            return false;
-        }
-    }
-
-    return true;
 }
 
 namespace
@@ -476,8 +444,6 @@ void gtr_dialog_set_content(Gtk::Dialog& dialog, Gtk::Widget& content)
 
 void gtr_unrecognized_url_dialog(Gtk::Widget& parent, Glib::ustring const& url)
 {
-    char const* xt = "xt=urn:btih";
-
     auto* window = getWindow(&parent);
 
     Glib::ustring gstr;
@@ -492,13 +458,10 @@ void gtr_unrecognized_url_dialog(Gtk::Widget& parent, Glib::ustring const& url)
 
     gstr += gtr_sprintf(_("Transmission doesn't know how to use \"%s\""), url);
 
-    if (gtr_is_magnet_link(url) && url.find(xt) == Glib::ustring::npos)
+    if (tr_magnet_metainfo{}.parseMagnet(url.raw()))
     {
         gstr += "\n \n";
-        gstr += gtr_sprintf(
-            _("This magnet link appears to be intended for something other than BitTorrent. "
-              "BitTorrent magnet links have a section containing \"%s\"."),
-            xt);
+        gstr += _("This magnet link appears to be intended for something other than BitTorrent.");
     }
 
     w->set_secondary_text(gstr);
@@ -510,19 +473,16 @@ void gtr_unrecognized_url_dialog(Gtk::Widget& parent, Glib::ustring const& url)
 ****
 ***/
 
-void gtr_paste_clipboard_url_into_entry(Gtk::Entry& e)
+void gtr_paste_clipboard_url_into_entry(Gtk::Entry& entry)
 {
-    Glib::ustring const text[] = {
-        gtr_str_strip(Gtk::Clipboard::get(GDK_SELECTION_PRIMARY)->wait_for_text()),
-        gtr_str_strip(Gtk::Clipboard::get(GDK_SELECTION_CLIPBOARD)->wait_for_text()),
-    };
-
-    for (auto const& s : text)
+    for (auto const& str : { Gtk::Clipboard::get(GDK_SELECTION_PRIMARY)->wait_for_text(),
+                             Gtk::Clipboard::get(GDK_SELECTION_CLIPBOARD)->wait_for_text() })
     {
-        if (!s.empty() && (gtr_is_supported_url(s) || gtr_is_magnet_link(s) || gtr_is_hex_hashcode(s)))
+        auto const sv = tr_strvStrip(str.raw());
+        if (!sv.empty() && (tr_urlIsValid(sv) || tr_magnet_metainfo{}.parseMagnet(sv)))
         {
-            e.set_text(s);
-            break;
+            entry.set_text(str);
+            return;
         }
     }
 }
