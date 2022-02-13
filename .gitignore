@@ -22,6 +22,7 @@ node_modules/
 po/*.mo
 third-party/miniupnp/miniupnpcstrings.h
 /web/public_html/*
+/web/.pnp.*
 /web/.yarn/cache/
 /web/.yarn/unplugged/
 /web/.yarn/install-state.gz
