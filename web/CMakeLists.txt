@@ -6,22 +6,6 @@ file(GLOB_RECURSE TRWEB_ASSETS
   ${CMAKE_CURRENT_SOURCE_DIR}/src/assets/img/favicon.ico
 )
 
-file(GLOB_RECURSE TRWEB_BYPRODUCTS
-  ${CMAKE_CURRENT_BINARY_DIR}/public_html/assets/css/main.*.css
-  ${CMAKE_CURRENT_BINARY_DIR}/public_html/assets/img/*.png
-  ${CMAKE_CURRENT_BINARY_DIR}/public_html/assets/img/*.svg
-  ${CMAKE_CURRENT_BINARY_DIR}/public_html/js/main.*.js
-  ${CMAKE_CURRENT_BINARY_DIR}/public_html/js/main.*.js.LICENSE.txt
-  ${CMAKE_CURRENT_BINARY_DIR}/public_html/js/main.*.js.map
-  ${CMAKE_CURRENT_BINARY_DIR}/public_html/js/runtime.*.js
-  ${CMAKE_CURRENT_BINARY_DIR}/public_html/js/runtime.*.js.map
-  ${CMAKE_CURRENT_BINARY_DIR}/public_html/js/vendors.*.js
-  ${CMAKE_CURRENT_BINARY_DIR}/public_html/js/vendors.*.js.map
-  ${CMAKE_CURRENT_BINARY_DIR}/public_html/*.ico
-  ${CMAKE_CURRENT_BINARY_DIR}/public_html/favicon.ico
-  ${CMAKE_CURRENT_BINARY_DIR}/public_html/index.html
-)
-
 file(GLOB_RECURSE TRWEB_TMP_BUILD
   ${CMAKE_CURRENT_SOURCE_DIR}/public_html/assets/**/*
   ${CMAKE_CURRENT_SOURCE_DIR}/public_html/js/*
@@ -42,6 +26,7 @@ add_custom_target(
   COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/public_html" "${CMAKE_CURRENT_BINARY_DIR}/public_html"
   COMMAND ${CMAKE_COMMAND} -E remove -f ${TRWEB_TMP_BUILD}
   BYPRODUCTS
+    public_html/d9466499ee75557f5395.ico
     public_html/favicon.ico
     public_html/index.html
     public_html/assets/
