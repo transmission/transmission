@@ -1694,18 +1694,17 @@ static void torrentCallScript(tr_torrent const* tor, char const* script)
     auto torrent_dir = std::string{ tor->currentDir().sv() };
     tr_sys_path_native_separators(std::data(torrent_dir));
 
-    auto const cmd = std::array<char const*, 2>{
-        script,
-        nullptr,
-    };
+    auto const cmd = std::array<char const*, 2>{ script, nullptr };
 
     auto const id_str = std::to_string(tr_torrentId(tor));
     auto const labels_str = buildLabelsString(tor);
     auto const trackers_str = buildTrackersString(tor);
+    auto const bytes_downloaded_str = std::to_string(tor->downloadedCur + tor->downloadedPrev);
 
     auto const env = std::map<std::string_view, std::string_view>{
         { "TR_APP_VERSION"sv, SHORT_VERSION_STRING },
         { "TR_TIME_LOCALTIME"sv, ctime_str },
+        { "TR_TORRENT_BYTES_DOWNLOADED"sv, bytes_downloaded_str },
         { "TR_TORRENT_DIR"sv, torrent_dir.c_str() },
         { "TR_TORRENT_HASH"sv, tor->infoHashString() },
         { "TR_TORRENT_ID"sv, id_str },
