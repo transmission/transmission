@@ -129,6 +129,8 @@ std::array<Prefs::PrefItem, Prefs::PREFS_COUNT> const Prefs::Items{
     { QUEUE_STALLED_MINUTES, TR_KEY_queue_stalled_minutes, QVariant::Int },
     { SCRIPT_TORRENT_DONE_ENABLED, TR_KEY_script_torrent_done_enabled, QVariant::Bool },
     { SCRIPT_TORRENT_DONE_FILENAME, TR_KEY_script_torrent_done_filename, QVariant::String },
+    { SCRIPT_TORRENT_DONE_SEEDING_ENABLED, TR_KEY_script_torrent_done_seeding_enabled, QVariant::Bool },
+    { SCRIPT_TORRENT_DONE_SEEDING_FILENAME, TR_KEY_script_torrent_done_seeding_filename, QVariant::String },
     { SOCKET_TOS, TR_KEY_peer_socket_tos, QVariant::String },
     { START, TR_KEY_start_added_torrents, QVariant::Bool },
     { TRASH_ORIGINAL, TR_KEY_trash_original_torrent_files, QVariant::Bool },

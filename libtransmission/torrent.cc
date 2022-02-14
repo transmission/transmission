@@ -448,6 +448,18 @@ static bool tr_torrentIsSeedIdleLimitDone(tr_torrent const* tor)
         difftime(tr_time(), std::max(tor->startDate, tor->activityDate)) >= idleMinutes * 60U;
 }
 
+static void torrentCallScript(tr_torrent const* tor, char const* script);
+
+static void callScriptIfEnabled(tr_torrent const* tor, TrScript type)
+{
+    auto const* session = tor->session;
+
+    if (tr_sessionIsScriptEnabled(session, type))
+    {
+        torrentCallScript(tor, tr_sessionGetScript(session, type));
+    }
+}
+
 /***
 ****
 ***/
@@ -474,7 +486,7 @@ void tr_torrentCheckSeedLimit(tr_torrent* tor)
             (*tor->ratio_limit_hit_func)(tor, tor->ratio_limit_hit_func_user_data);
         }
     }
-    /* if we're seeding and reach our inactiviy limit, stop the torrent */
+    /* if we're seeding and reach our inactivity limit, stop the torrent */
     else if (tr_torrentIsSeedIdleLimitDone(tor))
     {
         tr_logAddTorInfo(tor, "%s", "Seeding idle limit reached; pausing torrent");
@@ -487,6 +499,11 @@ void tr_torrentCheckSeedLimit(tr_torrent* tor)
         {
             (*tor->idle_limit_hit_func)(tor, tor->idle_limit_hit_func_user_data);
         }
+    }
+
+    if (tor->isStopping)
+    {
+        callScriptIfEnabled(tor, TR_SCRIPT_ON_TORRENT_DONE_SEEDING);
     }
 }
 
@@ -611,16 +628,47 @@ static bool setLocalErrorIfFilesDisappeared(tr_torrent* tor)
     return disappeared;
 }
 
-static void torrentCallScript(tr_torrent const* tor, char const* script);
-
-static void callScriptIfEnabled(tr_torrent const* tor, TrScript type)
+/**
+ * Sniff out newly-added seeds so that they can skip the verify step
+ */
+static bool isNewTorrentASeed(tr_torrent* tor)
 {
-    auto const* session = tor->session;
-
-    if (tr_sessionIsScriptEnabled(session, type))
+    if (!tor->hasMetadata())
     {
-        torrentCallScript(tor, tr_sessionGetScript(session, type));
+        return false;
     }
+
+    auto filename_buf = std::string{};
+    for (tr_file_index_t i = 0, n = tor->fileCount(); i < n; ++i)
+    {
+        // it's not a new seed if a file is missing
+        auto const found = tor->findFile(filename_buf, i);
+        if (!found)
+        {
+            return false;
+        }
+
+        // it's not a new seed if a file is partial
+        if (tr_strvEndsWith(found->filename, ".part"sv))
+        {
+            return false;
+        }
+
+        // it's not a new seed if a file size is wrong
+        if (found->size != tor->fileSize(i))
+        {
+            return false;
+        }
+
+        // it's not a new seed if it was modified after it was added
+        if (found->last_modified_at >= tor->addedDate)
+        {
+            return false;
+        }
+    }
+
+    // check the first piece
+    return tor->ensurePieceIsChecked(0);
 }
 
 static void refreshCurrentDir(tr_torrent* tor);
@@ -746,6 +794,11 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
         {
             tor->prefetchMagnetMetadata = true;
             tr_torrentStartNow(tor);
+        }
+        else if (isNewTorrentASeed(tor))
+        {
+            tor->completion.setHasAll();
+            tor->recheckCompleteness();
         }
         else
         {

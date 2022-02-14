@@ -226,9 +226,9 @@ int tr_main(int argc, char* argv[])
         b,
         options.outfile.c_str(),
         std::data(options.trackers),
-        std::size(options.trackers),
+        static_cast<int>(std::size(options.trackers)),
         std::data(options.webseeds),
-        std::size(options.webseeds),
+        static_cast<int>(std::size(options.webseeds)),
         options.comment,
         options.is_private,
         options.source);

@@ -11,8 +11,10 @@
 #include <deque>
 #include <string_view>
 
+#define UTF_CPP_CPLUSPLUS 201703L
 #include <utf8.h>
-#include <event2/buffer.h> /* evbuffer_add() */
+
+#include <event2/buffer.h>
 
 #define LIBTRANSMISSION_VARIANT_MODULE
 

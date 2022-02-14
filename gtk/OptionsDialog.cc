@@ -468,7 +468,7 @@ void TorrentUrlChooserDialog::onOpenURLResponse(int response, Glib::RefPtr<Sessi
     }
     else if (response == Gtk::RESPONSE_ACCEPT)
     {
-        auto* const e = static_cast<Gtk::Entry*>(get_data("url-entry"));
+        auto const* const e = static_cast<Gtk::Entry*>(get_data("url-entry"));
         auto const url = gtr_str_strip(e->get_text());
 
         if (url.empty())

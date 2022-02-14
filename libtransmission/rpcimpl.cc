@@ -1376,9 +1376,9 @@ static char const* portTest(
     tr_variant* /*args_out*/,
     struct tr_rpc_idle_data* idle_data)
 {
-    int const port = tr_sessionGetPeerPort(session);
+    auto const port = tr_sessionGetPeerPort(session);
     auto const url = tr_strvJoin("https://portcheck.transmissionbt.com/"sv, std::to_string(port));
-    tr_webRun(session, url, portTested, idle_data);
+    tr_webRun(session, { url, portTested, idle_data });
     return nullptr;
 }
 
@@ -1466,7 +1466,7 @@ static char const* blocklistUpdate(
     tr_variant* /*args_out*/,
     struct tr_rpc_idle_data* idle_data)
 {
-    tr_webRun(session, session->blocklistUrl().c_str(), gotNewBlocklist, idle_data);
+    tr_webRun(session, { session->blocklistUrl(), gotNewBlocklist, idle_data });
     return nullptr;
 }
 
@@ -1685,7 +1685,10 @@ static char const* torrentAdd(tr_session* session, tr_variant* args_in, tr_varia
         auto* const d = tr_new0(struct add_torrent_idle_data, 1);
         d->data = idle_data;
         d->ctor = ctor;
-        tr_webRunWithCookies(session, filename, cookies, gotMetadataFromURL, d);
+
+        auto options = tr_web_options{ filename, gotMetadataFromURL, d };
+        options.cookies = cookies;
+        tr_webRun(session, std::move(options));
     }
     else
     {
@@ -1909,24 +1912,17 @@ static char const* sessionSet(
         tr_sessionSetQueueSize(session, TR_UP, (int)i);
     }
 
-    if (tr_variantDictFindStrView(args_in, TR_KEY_script_torrent_added_filename, &sv))
+    for (auto const& [enabled_key, script_key, script] : tr_session::Scripts)
     {
-        session->setScript(TR_SCRIPT_ON_TORRENT_ADDED, sv);
-    }
+        if (auto enabled = bool{}; tr_variantDictFindBool(args_in, enabled_key, &enabled))
+        {
+            session->useScript(script, enabled);
+        }
 
-    if (tr_variantDictFindBool(args_in, TR_KEY_script_torrent_added_enabled, &boolVal))
-    {
-        session->useScript(TR_SCRIPT_ON_TORRENT_ADDED, boolVal);
-    }
-
-    if (tr_variantDictFindStrView(args_in, TR_KEY_script_torrent_done_filename, &sv))
-    {
-        session->setScript(TR_SCRIPT_ON_TORRENT_DONE, sv);
-    }
-
-    if (tr_variantDictFindBool(args_in, TR_KEY_script_torrent_done_enabled, &boolVal))
-    {
-        session->useScript(TR_SCRIPT_ON_TORRENT_DONE, boolVal);
+        if (auto file = std::string_view{}; tr_variantDictFindStrView(args_in, script_key, &file))
+        {
+            session->setScript(script, file);
+        }
     }
 
     if (tr_variantDictFindBool(args_in, TR_KEY_trash_original_torrent_files, &boolVal))
@@ -2231,6 +2227,14 @@ static void addSessionField(tr_session* s, tr_variant* d, tr_quark key)
 
     case TR_KEY_script_torrent_done_enabled:
         tr_variantDictAddBool(d, key, tr_sessionIsScriptEnabled(s, TR_SCRIPT_ON_TORRENT_DONE));
+        break;
+
+    case TR_KEY_script_torrent_done_seeding_filename:
+        tr_variantDictAddStr(d, key, tr_sessionGetScript(s, TR_SCRIPT_ON_TORRENT_DONE_SEEDING));
+        break;
+
+    case TR_KEY_script_torrent_done_seeding_enabled:
+        tr_variantDictAddBool(d, key, tr_sessionIsScriptEnabled(s, TR_SCRIPT_ON_TORRENT_DONE_SEEDING));
         break;
 
     case TR_KEY_queue_stalled_enabled:

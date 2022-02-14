@@ -12,7 +12,7 @@ Copyright 2017 Endless Mobile, Inc.
   <summary>Download and share files over BitTorrent</summary>
 
   <description>
-    <!-- Translators: these are the application description paragraphs in the AppData file. -->
+    <!-- Translators: these are the application description paragraphs in the MetaInfo file. -->
     <p>
       BitTorrent is a peer-to-peer file-sharing protocol that is commonly used to
       distribute large amounts of data between multiple users.
