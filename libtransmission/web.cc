@@ -302,7 +302,7 @@ static CURL* createEasy(tr_session* s, struct tr_web* web, struct tr_web_task* t
 
     if (web->curl_proxy_ssl_verify)
     {
-        if (web->curl_ca_bundle != NULL)
+        if (web->curl_ca_bundle != nullptr)
         {
             curl_easy_setopt(e, CURLOPT_PROXY_CAINFO, web->curl_ca_bundle);
         }
