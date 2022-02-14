@@ -628,6 +628,49 @@ static bool setLocalErrorIfFilesDisappeared(tr_torrent* tor)
     return disappeared;
 }
 
+/**
+ * Sniff out newly-added seeds so that they can skip the verify step
+ */
+static bool isNewTorrentASeed(tr_torrent* tor)
+{
+    if (!tor->hasMetadata())
+    {
+        return false;
+    }
+
+    auto filename_buf = std::string{};
+    for (tr_file_index_t i = 0, n = tor->fileCount(); i < n; ++i)
+    {
+        // it's not a new seed if a file is missing
+        auto const found = tor->findFile(filename_buf, i);
+        if (!found)
+        {
+            return false;
+        }
+
+        // it's not a new seed if a file is partial
+        if (tr_strvEndsWith(found->filename, ".part"sv))
+        {
+            return false;
+        }
+
+        // it's not a new seed if a file size is wrong
+        if (found->size != tor->fileSize(i))
+        {
+            return false;
+        }
+
+        // it's not a new seed if it was modified after it was added
+        if (found->last_modified_at >= tor->addedDate)
+        {
+            return false;
+        }
+    }
+
+    // check the first piece
+    return tor->ensurePieceIsChecked(0);
+}
+
 static void refreshCurrentDir(tr_torrent* tor);
 
 static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
@@ -751,6 +794,11 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
         {
             tor->prefetchMagnetMetadata = true;
             tr_torrentStartNow(tor);
+        }
+        else if (isNewTorrentASeed(tor))
+        {
+            tor->completion.setHasAll();
+            tor->recheckCompleteness();
         }
         else
         {

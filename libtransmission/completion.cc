@@ -167,6 +167,16 @@ void tr_completion::setBlocks(tr_bitfield blocks)
     has_valid_.reset();
 }
 
+void tr_completion::setHasAll()
+{
+    auto const total_size = block_info_->totalSize();
+
+    blocks_.setHasAll();
+    size_now_ = total_size;
+    size_when_done_ = total_size;
+    has_valid_ = total_size;
+}
+
 void tr_completion::addPiece(tr_piece_index_t piece)
 {
     auto const [begin, end] = block_info_->blockSpanForPiece(piece);
