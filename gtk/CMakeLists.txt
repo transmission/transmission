@@ -18,7 +18,7 @@ if(NOT GLIB_COMPILE_RESOURCES_EXECUTABLE)
     message(SEND_ERROR "Unable to find glib-compile-resources executable")
 endif()
 
-find_program(APPSTREAM appstreamcli REQUIRED)
+find_program(APPSTREAM appstreamcli)
 
 add_custom_command(
     OUTPUT
