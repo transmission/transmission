@@ -551,10 +551,12 @@ Response arguments: `path`, `name`, and `id`, holding the torrent ID integer
 | `rpc-version-minimum` | number | the minimum RPC API version supported
 | `rpc-version-semver` | number | the current RPC API version in a semver-compatible string
 | `rpc-version` | number | the current RPC API version
-| `script-torrent-added-enabled` | boolean | whether or not to call the `done` script
+| `script-torrent-added-enabled` | boolean | whether or not to call the `added` script
 | `script-torrent-added-filename` | string | filename of the script to run
 | `script-torrent-done-enabled` | boolean | whether or not to call the `done` script
 | `script-torrent-done-filename` | string | filename of the script to run
+| `script-torrent-done-seeding-enabled` | boolean | whether or not to call the `seeding-done` script
+| `script-torrent-done-seeding-filename` | string | filename of the script to run
 | `seed-queue-enabled` | boolean | if true, limit how many torrents can be uploaded at once
 | `seed-queue-size` | number | max number of torrents to uploaded at once (see seed-queue-enabled)
 | `seedRatioLimit` | double | the default seed ratio for torrents to use
@@ -937,6 +939,8 @@ Transmission 4.0.0 (`rpc-version-semver` 5.3.0, `rpc-version`: 17)
 | `session-get` | new arg `rpc-version-semver`
 | `session-get` | new arg `script-torrent-added-enabled`
 | `session-get` | new arg `script-torrent-added-filename`
+| `session-get` | new arg `script-torrent-done-seeding-enabled`
+| `session-get` | new arg `script-torrent-done-seeding-filename`
 | `torrent-add` | new arg `labels`
 | `torrent-get` | new arg `file-count`
 | `torrent-get` | new arg `percentComplete`

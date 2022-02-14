@@ -21,12 +21,14 @@
 #include <mutex>
 #include <string>
 #include <string_view>
+#include <tuple>
 #include <unordered_set>
 #include <vector>
 
 #include "transmission.h"
 
 #include "net.h" // tr_socket_t
+#include "quark.h"
 
 enum tr_auto_switch_state_t
 {
@@ -237,6 +239,14 @@ public:
     }
 
 public:
+    static constexpr std::array<std::tuple<tr_quark, tr_quark, TrScript>, 3> Scripts{
+        { { TR_KEY_script_torrent_added_enabled, TR_KEY_script_torrent_added_filename, TR_SCRIPT_ON_TORRENT_ADDED },
+          { TR_KEY_script_torrent_done_enabled, TR_KEY_script_torrent_done_filename, TR_SCRIPT_ON_TORRENT_DONE },
+          { TR_KEY_script_torrent_done_seeding_enabled,
+            TR_KEY_script_torrent_done_seeding_filename,
+            TR_SCRIPT_ON_TORRENT_DONE_SEEDING } }
+    };
+
     bool isPortRandom;
     bool isPexEnabled;
     bool isDHTEnabled;
