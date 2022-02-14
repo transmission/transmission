@@ -13,7 +13,6 @@
 #include "transmission.h"
 
 struct evbuffer;
-struct tr_web_task;
 
 enum tr_web_close_mode
 {
@@ -50,6 +49,4 @@ public:
     evbuffer* buffer = nullptr;
 };
 
-struct tr_web_task* tr_webRun(tr_session* session, tr_web_options&& options);
-
-long tr_webGetTaskResponseCode(struct tr_web_task* task);
+void tr_webRun(tr_session* session, tr_web_options&& options);
