@@ -274,7 +274,7 @@ Gtk::Widget* PrefsDialog::Impl::downloadingPage()
     }
 
     {
-        auto* l = new_check_button(_("Call scrip_t when torrent is completed:"), TR_KEY_script_torrent_done_enabled, core_);
+        auto* l = new_check_button(_("Call scrip_t when done downloading:"), TR_KEY_script_torrent_done_enabled, core_);
         auto* w = new_file_chooser_button(TR_KEY_script_torrent_done_filename, core_);
         w->set_sensitive(gtr_pref_flag_get(TR_KEY_script_torrent_done_enabled));
         l->signal_toggled().connect([l, w]() { target_cb(l, w); });
