@@ -366,11 +366,11 @@ static void task_finish_func(void* vtask)
 
 static void tr_webThreadFunc(void* vsession);
 
-tr_web_task* tr_webRun(tr_session* session, tr_web_options&& options)
+void tr_webRun(tr_session* session, tr_web_options&& options)
 {
     if (session->isClosing())
     {
-        return {};
+        return;
     }
 
     if (session->web == nullptr)
@@ -386,8 +386,6 @@ tr_web_task* tr_webRun(tr_session* session, tr_web_options&& options)
     auto* const task = new tr_web_task{ session, std::move(options) };
     task->next = session->web->tasks;
     session->web->tasks = task;
-
-    return task;
 }
 
 static void tr_webThreadFunc(void* vsession)
@@ -564,11 +562,4 @@ void tr_webClose(tr_session* session, tr_web_close_mode close_mode)
             }
         }
     }
-}
-
-long tr_webGetTaskResponseCode(tr_web_task* task)
-{
-    long code = 0;
-    curl_easy_getinfo(task->curl_easy, CURLINFO_RESPONSE_CODE, &code);
-    return code;
 }
