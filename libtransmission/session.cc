@@ -24,7 +24,6 @@
 #include <sys/stat.h> /* umask() */
 #endif
 
-#include <event2/dns.h> /* evdns_base_free() */
 #include <event2/event.h>
 
 #include <libutp/utp.h>
@@ -1837,8 +1836,6 @@ static void sessionCloseImplFinish(tr_session* session)
     session->saveTimer = nullptr;
 
     /* we had to wait until UDP trackers were closed before closing these: */
-    evdns_base_free(session->evdns_base, 0);
-    session->evdns_base = nullptr;
     tr_tracker_udp_close(session);
     tr_udpUninit(session);
 
