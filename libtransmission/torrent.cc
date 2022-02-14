@@ -638,12 +638,6 @@ static bool isNewTorrentASeed(tr_torrent* tor)
         return false;
     }
 
-    auto const piece_count = tor->pieceCount();
-    if (piece_count == 0)
-    {
-        return false;
-    }
-
     auto filename_buf = std::string{};
     for (tr_file_index_t i = 0, n = tor->fileCount(); i < n; ++i)
     {
@@ -673,16 +667,8 @@ static bool isNewTorrentASeed(tr_torrent* tor)
         }
     }
 
-    // check first and last piece
-    for (auto const piece : { 0UL, piece_count - 1 })
-    {
-        if (!tor->ensurePieceIsChecked(piece))
-        {
-            return false;
-        }
-    }
-
-    return true;
+    // check the first piece
+    return tor->ensurePieceIsChecked(0);
 }
 
 static void refreshCurrentDir(tr_torrent* tor);
