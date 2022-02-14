@@ -18,6 +18,8 @@ if(NOT GLIB_COMPILE_RESOURCES_EXECUTABLE)
     message(SEND_ERROR "Unable to find glib-compile-resources executable")
 endif()
 
+find_program(APPSTREAM appstreamcli REQUIRED)
+
 add_custom_command(
     OUTPUT
         ${CMAKE_CURRENT_BINARY_DIR}/transmission-resources.c
@@ -45,6 +47,7 @@ add_custom_command(
         icons/utilities.png
         transmission.gresource.xml
         transmission-ui.xml
+        ${APPSTREAM}
     WORKING_DIRECTORY
         ${CMAKE_CURRENT_SOURCE_DIR}
 )
