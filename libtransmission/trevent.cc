@@ -201,18 +201,23 @@ static void libeventThreadFunc(tr_event_handle* events)
 
     // create the libevent base
     auto* const base = event_base_new();
+    auto* const dns_base = evdns_base_new(base, EVDNS_BASE_INITIALIZE_NAMESERVERS);
 
     // initialize the session struct's event fields
     events->base = base;
     events->work_queue_event = event_new(base, -1, 0, onWorkAvailable, events->session);
     events->session->event_base = base;
-    events->session->evdns_base = evdns_base_new(base, EVDNS_BASE_INITIALIZE_NAMESERVERS);
+    events->session->evdns_base = dns_base;
     events->session->events = events;
 
     // loop until `tr_eventClose()` kills the loop
     event_base_loop(base, EVLOOP_NO_EXIT_ON_EMPTY);
 
     // shut down the thread
+    if (dns_base != nullptr)
+    {
+        evdns_base_free(dns_base, 0);
+    }
     event_base_free(base);
     events->session->event_base = nullptr;
     events->session->evdns_base = nullptr;
