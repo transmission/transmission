@@ -6,12 +6,13 @@
 #pragma once
 
 #include <cstdint>
+#include <optional>
+#include <string>
 #include <string_view>
 
 #include "transmission.h"
 
 struct evbuffer;
-struct tr_address;
 struct tr_web_task;
 
 enum tr_web_close_mode
@@ -30,21 +31,25 @@ using tr_web_done_func = void (*)(
     std::string_view response,
     void* user_data);
 
-struct tr_web_task* tr_webRun(tr_session* session, std::string_view url, tr_web_done_func done_func, void* done_func_user_data);
+class tr_web_options
+{
+public:
+    tr_web_options(std::string_view url_in, tr_web_done_func done_func_in, void* done_func_user_data_in)
+        : url{ url_in }
+        , done_func{ done_func_in }
+        , done_func_user_data{ done_func_user_data_in }
+    {
+    }
 
-struct tr_web_task* tr_webRunWithCookies(
-    tr_session* session,
-    std::string_view url,
-    std::string_view cookies,
-    tr_web_done_func done_func,
-    void* done_func_user_data);
+    std::string url;
+    std::optional<int> torrent_id;
+    tr_web_done_func done_func = nullptr;
+    void* done_func_user_data = nullptr;
+    std::string range;
+    std::string cookies;
+    evbuffer* buffer = nullptr;
+};
 
-struct tr_web_task* tr_webRunWebseed(
-    tr_torrent* tor,
-    std::string_view url,
-    std::string_view range,
-    tr_web_done_func done_func,
-    void* done_func_user_data,
-    struct evbuffer* buffer);
+struct tr_web_task* tr_webRun(tr_session* session, tr_web_options&& options);
 
 long tr_webGetTaskResponseCode(struct tr_web_task* task);
