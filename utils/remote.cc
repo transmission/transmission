@@ -241,7 +241,7 @@ enum
 ****
 ***/
 
-static auto constexpr Options = std::array<tr_option, 87>{
+static auto constexpr Options = std::array<tr_option, 89>{
     { { 'a', "add", "Add torrent files by filename or URL", "a", false, nullptr },
       { 970, "alt-speed", "Use the alternate Limits", "as", false, nullptr },
       { 971, "no-alt-speed", "Don't use the alternate Limits", "AS", false, nullptr },
@@ -308,8 +308,10 @@ static auto constexpr Options = std::array<tr_option, 87>{
       { 'r', "remove", "Remove the current torrent(s)", "r", false, nullptr },
       { 930, "peers", "Set the maximum number of peers for the current torrent(s) or globally", "pr", true, "<max>" },
       { 840, "remove-and-delete", "Remove the current torrent(s) and delete local data", "rad", false, nullptr },
-      { 800, "torrent-done-script", "Specify a script to run when a torrent finishes", nullptr, true, "<file>" },
-      { 801, "no-torrent-done-script", "Don't run a script when torrents finish", nullptr, false, nullptr },
+      { 800, "torrent-done-script", "A script to run when a torrent finishes downloading", nullptr, true, "<file>" },
+      { 801, "no-torrent-done-script", "Don't run the done-downloading script", nullptr, false, nullptr },
+      { 802, "torrent-done-seeding-script", "A script to run when a torrent finishes seeding", nullptr, true, "<file>" },
+      { 803, "no-torrent-done-seeding-script", "Don't run the done-seeding script", nullptr, false, nullptr },
       { 950, "seedratio", "Let the current torrent(s) seed until a specific ratio", "sr", true, "ratio" },
       { 951, "seedratio-default", "Let the current torrent(s) use the global seedratio settings", "srd", false, nullptr },
       { 952, "no-seedratio", "Let the current torrent(s) seed regardless of ratio", "SR", false, nullptr },
@@ -432,6 +434,8 @@ static int getOptMode(int val)
     case 'Y': /* no-lpd */
     case 800: /* torrent-done-script */
     case 801: /* no-torrent-done-script */
+    case 802: /* torrent-done-seeding-script */
+    case 803: /* no-torrent-done-seeding-script */
     case 830: /* utp */
     case 831: /* no-utp */
     case 970: /* alt-speed */
@@ -2466,6 +2470,15 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
 
             case 801:
                 tr_variantDictAddBool(args, TR_KEY_script_torrent_done_enabled, false);
+                break;
+
+            case 802:
+                tr_variantDictAddStr(args, TR_KEY_script_torrent_done_seeding_filename, optarg);
+                tr_variantDictAddBool(args, TR_KEY_script_torrent_done_seeding_enabled, true);
+                break;
+
+            case 803:
+                tr_variantDictAddBool(args, TR_KEY_script_torrent_done_seeding_enabled, false);
                 break;
 
             case 970:

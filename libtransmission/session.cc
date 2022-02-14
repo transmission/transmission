@@ -15,6 +15,7 @@
 #include <memory>
 #include <numeric> // std::acumulate()
 #include <string_view>
+#include <tuple>
 #include <unordered_set>
 #include <vector>
 
@@ -260,7 +261,7 @@ void tr_sessionGetDefaultSettings(tr_variant* d)
 {
     TR_ASSERT(tr_variantIsDict(d));
 
-    tr_variantDictReserve(d, 69);
+    tr_variantDictReserve(d, 71);
     tr_variantDictAddBool(d, TR_KEY_blocklist_enabled, false);
     tr_variantDictAddStrView(d, TR_KEY_blocklist_url, "http://www.example.com/blocklist"sv);
     tr_variantDictAddInt(d, TR_KEY_cache_size_mb, DefaultCacheSizeMB);
@@ -311,6 +312,8 @@ void tr_sessionGetDefaultSettings(tr_variant* d)
     tr_variantDictAddBool(d, TR_KEY_script_torrent_added_enabled, false);
     tr_variantDictAddStrView(d, TR_KEY_script_torrent_done_filename, "");
     tr_variantDictAddBool(d, TR_KEY_script_torrent_done_enabled, false);
+    tr_variantDictAddStrView(d, TR_KEY_script_torrent_done_seeding_filename, "");
+    tr_variantDictAddBool(d, TR_KEY_script_torrent_done_seeding_enabled, false);
     tr_variantDictAddInt(d, TR_KEY_seed_queue_size, 10);
     tr_variantDictAddBool(d, TR_KEY_seed_queue_enabled, false);
     tr_variantDictAddBool(d, TR_KEY_alt_speed_enabled, false);
@@ -336,7 +339,7 @@ void tr_sessionGetSettings(tr_session const* s, tr_variant* d)
 {
     TR_ASSERT(tr_variantIsDict(d));
 
-    tr_variantDictReserve(d, 68);
+    tr_variantDictReserve(d, 70);
     tr_variantDictAddBool(d, TR_KEY_blocklist_enabled, s->useBlocklist());
     tr_variantDictAddStr(d, TR_KEY_blocklist_url, s->blocklistUrl());
     tr_variantDictAddInt(d, TR_KEY_cache_size_mb, tr_sessionGetCacheLimit_MB(s));
@@ -382,10 +385,6 @@ void tr_sessionGetSettings(tr_session const* s, tr_variant* d)
     tr_variantDictAddStr(d, TR_KEY_rpc_whitelist, tr_sessionGetRPCWhitelist(s));
     tr_variantDictAddBool(d, TR_KEY_rpc_whitelist_enabled, tr_sessionGetRPCWhitelistEnabled(s));
     tr_variantDictAddBool(d, TR_KEY_scrape_paused_torrents_enabled, s->scrapePausedTorrents);
-    tr_variantDictAddBool(d, TR_KEY_script_torrent_added_enabled, tr_sessionIsScriptEnabled(s, TR_SCRIPT_ON_TORRENT_ADDED));
-    tr_variantDictAddStr(d, TR_KEY_script_torrent_added_filename, tr_sessionGetScript(s, TR_SCRIPT_ON_TORRENT_ADDED));
-    tr_variantDictAddBool(d, TR_KEY_script_torrent_done_enabled, tr_sessionIsScriptEnabled(s, TR_SCRIPT_ON_TORRENT_DONE));
-    tr_variantDictAddStr(d, TR_KEY_script_torrent_done_filename, tr_sessionGetScript(s, TR_SCRIPT_ON_TORRENT_DONE));
     tr_variantDictAddInt(d, TR_KEY_seed_queue_size, tr_sessionGetQueueSize(s, TR_UP));
     tr_variantDictAddBool(d, TR_KEY_seed_queue_enabled, tr_sessionGetQueueEnabled(s, TR_UP));
     tr_variantDictAddBool(d, TR_KEY_alt_speed_enabled, tr_sessionUsesAltSpeed(s));
@@ -405,6 +404,11 @@ void tr_sessionGetSettings(tr_session const* s, tr_variant* d)
     tr_variantDictAddBool(d, TR_KEY_trash_original_torrent_files, tr_sessionGetDeleteSource(s));
     tr_variantDictAddInt(d, TR_KEY_anti_brute_force_threshold, tr_sessionGetAntiBruteForceThreshold(s));
     tr_variantDictAddBool(d, TR_KEY_anti_brute_force_enabled, tr_sessionGetAntiBruteForceEnabled(s));
+    for (auto const& [enabled_key, script_key, script] : tr_session::Scripts)
+    {
+        tr_variantDictAddBool(d, enabled_key, tr_sessionIsScriptEnabled(s, script));
+        tr_variantDictAddStr(d, script_key, tr_sessionGetScript(s, script));
+    }
 }
 
 bool tr_sessionLoadSettings(tr_variant* dict, char const* config_dir, char const* appName)
@@ -1022,28 +1026,17 @@ static void sessionSetImpl(void* vdata)
 
     turtleBootstrap(session, turtle);
 
-    /**
-    ***  Scripts
-    **/
-
-    if (tr_variantDictFindBool(settings, TR_KEY_script_torrent_added_enabled, &boolVal))
+    for (auto const& [enabled_key, script_key, script] : tr_session::Scripts)
     {
-        session->useScript(TR_SCRIPT_ON_TORRENT_ADDED, boolVal);
-    }
+        if (auto enabled = bool{}; tr_variantDictFindBool(settings, enabled_key, &enabled))
+        {
+            session->useScript(script, enabled);
+        }
 
-    if (tr_variantDictFindStrView(settings, TR_KEY_script_torrent_added_filename, &sv))
-    {
-        session->setScript(TR_SCRIPT_ON_TORRENT_ADDED, sv);
-    }
-
-    if (tr_variantDictFindBool(settings, TR_KEY_script_torrent_done_enabled, &boolVal))
-    {
-        session->useScript(TR_SCRIPT_ON_TORRENT_DONE, boolVal);
-    }
-
-    if (tr_variantDictFindStrView(settings, TR_KEY_script_torrent_done_filename, &sv))
-    {
-        session->setScript(TR_SCRIPT_ON_TORRENT_DONE, sv);
+        if (auto file = std::string_view{}; tr_variantDictFindStrView(settings, script_key, &file))
+        {
+            session->setScript(script, file);
+        }
     }
 
     if (tr_variantDictFindBool(settings, TR_KEY_scrape_paused_torrents_enabled, &boolVal))

@@ -518,13 +518,19 @@ void PrefsDialog::onIdleLimitChanged()
 
 void PrefsDialog::initSeedingTab()
 {
+    ui_.doneSeedingScriptButton->setTitle(tr("Select \"Torrent Done Seeding\" Script"));
+
     linkWidgetToPref(ui_.ratioLimitCheck, Prefs::RATIO_ENABLED);
     linkWidgetToPref(ui_.ratioLimitSpin, Prefs::RATIO);
     linkWidgetToPref(ui_.idleLimitCheck, Prefs::IDLE_LIMIT_ENABLED);
     linkWidgetToPref(ui_.idleLimitSpin, Prefs::IDLE_LIMIT);
+    linkWidgetToPref(ui_.doneSeedingScriptCheck, Prefs::SCRIPT_TORRENT_DONE_SEEDING_ENABLED);
+    linkWidgetToPref(ui_.doneSeedingScriptButton, Prefs::SCRIPT_TORRENT_DONE_SEEDING_FILENAME);
+    linkWidgetToPref(ui_.doneSeedingScriptEdit, Prefs::SCRIPT_TORRENT_DONE_SEEDING_FILENAME);
 
     connect(ui_.idleLimitSpin, qOverload<int>(&QSpinBox::valueChanged), this, &PrefsDialog::onIdleLimitChanged);
 
+    updateSeedingWidgetsLocality();
     onIdleLimitChanged();
 }
 
@@ -544,12 +550,13 @@ void PrefsDialog::initDownloadingTab()
     ui_.watchDirButton->setMode(PathButton::DirectoryMode);
     ui_.downloadDirButton->setMode(PathButton::DirectoryMode);
     ui_.incompleteDirButton->setMode(PathButton::DirectoryMode);
-    ui_.completionScriptButton->setMode(PathButton::FileMode);
+    ui_.doneDownloadingScriptButton->setMode(PathButton::FileMode);
+    ui_.doneSeedingScriptButton->setMode(PathButton::FileMode);
 
     ui_.watchDirButton->setTitle(tr("Select Watch Directory"));
     ui_.downloadDirButton->setTitle(tr("Select Destination"));
     ui_.incompleteDirButton->setTitle(tr("Select Incomplete Directory"));
-    ui_.completionScriptButton->setTitle(tr("Select \"Torrent Done\" Script"));
+    ui_.doneDownloadingScriptButton->setTitle(tr("Select \"Torrent Done Downloading\" Script"));
 
     ui_.watchDirStack->setMinimumWidth(200);
 
@@ -572,9 +579,9 @@ void PrefsDialog::initDownloadingTab()
     linkWidgetToPref(ui_.incompleteDirCheck, Prefs::INCOMPLETE_DIR_ENABLED);
     linkWidgetToPref(ui_.incompleteDirButton, Prefs::INCOMPLETE_DIR);
     linkWidgetToPref(ui_.incompleteDirEdit, Prefs::INCOMPLETE_DIR);
-    linkWidgetToPref(ui_.completionScriptCheck, Prefs::SCRIPT_TORRENT_DONE_ENABLED);
-    linkWidgetToPref(ui_.completionScriptButton, Prefs::SCRIPT_TORRENT_DONE_FILENAME);
-    linkWidgetToPref(ui_.completionScriptEdit, Prefs::SCRIPT_TORRENT_DONE_FILENAME);
+    linkWidgetToPref(ui_.doneDownloadingScriptCheck, Prefs::SCRIPT_TORRENT_DONE_ENABLED);
+    linkWidgetToPref(ui_.doneDownloadingScriptButton, Prefs::SCRIPT_TORRENT_DONE_FILENAME);
+    linkWidgetToPref(ui_.doneDownloadingScriptEdit, Prefs::SCRIPT_TORRENT_DONE_FILENAME);
 
     auto* cr = new ColumnResizer(this);
     cr->addLayout(ui_.addingSectionLayout);
@@ -598,15 +605,22 @@ void PrefsDialog::updateDownloadingWidgetsLocality()
     ui_.downloadDirStack->setCurrentWidget(is_local_ ? static_cast<QWidget*>(ui_.downloadDirButton) : ui_.downloadDirEdit);
     ui_.incompleteDirStack->setCurrentWidget(
         is_local_ ? static_cast<QWidget*>(ui_.incompleteDirButton) : ui_.incompleteDirEdit);
-    ui_.completionScriptStack->setCurrentWidget(
-        is_local_ ? static_cast<QWidget*>(ui_.completionScriptButton) : ui_.completionScriptEdit);
+    ui_.doneDownloadingScriptStack->setCurrentWidget(
+        is_local_ ? static_cast<QWidget*>(ui_.doneDownloadingScriptButton) : ui_.doneDownloadingScriptEdit);
 
     ui_.watchDirStack->setFixedHeight(ui_.watchDirStack->currentWidget()->sizeHint().height());
     ui_.downloadDirStack->setFixedHeight(ui_.downloadDirStack->currentWidget()->sizeHint().height());
     ui_.incompleteDirStack->setFixedHeight(ui_.incompleteDirStack->currentWidget()->sizeHint().height());
-    ui_.completionScriptStack->setFixedHeight(ui_.completionScriptStack->currentWidget()->sizeHint().height());
+    ui_.doneDownloadingScriptStack->setFixedHeight(ui_.doneDownloadingScriptStack->currentWidget()->sizeHint().height());
 
     ui_.downloadDirLabel->setBuddy(ui_.downloadDirStack->currentWidget());
+}
+
+void PrefsDialog::updateSeedingWidgetsLocality()
+{
+    ui_.doneSeedingScriptStack->setCurrentWidget(
+        is_local_ ? static_cast<QWidget*>(ui_.doneSeedingScriptButton) : ui_.doneSeedingScriptEdit);
+    ui_.doneSeedingScriptStack->setFixedHeight(ui_.doneSeedingScriptStack->currentWidget()->sizeHint().height());
 }
 
 /***
@@ -680,6 +694,7 @@ void PrefsDialog::sessionUpdated()
     {
         is_local_ = is_local;
         updateDownloadingWidgetsLocality();
+        updateSeedingWidgetsLocality();
     }
 
     updateBlocklistLabel();
