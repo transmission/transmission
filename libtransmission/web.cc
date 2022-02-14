@@ -116,6 +116,8 @@ struct tr_web
 {
     bool const curl_verbose = tr_env_key_exists("TR_CURL_VERBOSE");
     bool const curl_ssl_verify = !tr_env_key_exists("TR_CURL_SSL_NO_VERIFY");
+    bool const curl_proxy_ssl_verify = !tr_env_key_exists("TR_CURL_PROXY_SSL_NO_VERIFY");
+
     char* curl_ca_bundle;
     int close_mode = ~0;
 
@@ -296,6 +298,19 @@ static CURL* createEasy(tr_session* s, struct tr_web* web, struct tr_web_task* t
     {
         curl_easy_setopt(e, CURLOPT_SSL_VERIFYHOST, 0L);
         curl_easy_setopt(e, CURLOPT_SSL_VERIFYPEER, 0L);
+    }
+
+    if (web->curl_proxy_ssl_verify)
+    {
+        if (web->curl_ca_bundle != NULL)
+        {
+            curl_easy_setopt(e, CURLOPT_PROXY_CAINFO, web->curl_ca_bundle);
+        }
+    }
+    else
+    {
+        curl_easy_setopt(e, CURLOPT_PROXY_SSL_VERIFYHOST, 0L);
+        curl_easy_setopt(e, CURLOPT_PROXY_SSL_VERIFYPEER, 0L);
     }
 
     curl_easy_setopt(e, CURLOPT_TIMEOUT, task->timeout_secs);
