@@ -118,6 +118,8 @@ struct tr_completion
         }
     }
 
+    void setHasAll();
+
     void setBlocks(tr_bitfield blocks);
 
     void invalidateSizeWhenDone()
