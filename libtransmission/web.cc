@@ -49,36 +49,64 @@ static auto constexpr ThreadfuncMaxSleepMsec = int{ 200 };
 
 struct tr_web_task
 {
-    std::string cookies;
-    std::string range;
-    std::string url;
+private:
+    std::shared_ptr<evbuffer> const privbuf{ evbuffer_new(), evbuffer_free };
+    tr_web_options const options;
+
+public:
+    tr_web_task(tr_session* session_in, tr_web_options&& options_in)
+        : options{ std::move(options_in) }
+        , session{ session_in }
+    {
+    }
+
+    [[nodiscard]] auto* response() const
+    {
+        return options.buffer != nullptr ? options.buffer : privbuf.get();
+    }
+
+    [[nodiscard]] auto const& torrent_id() const
+    {
+        return options.torrent_id;
+    }
+
+    [[nodiscard]] auto const& url() const
+    {
+        return options.url;
+    }
+
+    [[nodiscard]] auto const& range() const
+    {
+        return options.range;
+    }
+
+    [[nodiscard]] auto const& cookies() const
+    {
+        return options.cookies;
+    }
+
+    void done() const
+    {
+        if (options.done_func == nullptr)
+        {
+            return;
+        }
+
+        auto const sv = std::string_view{ reinterpret_cast<char const*>(evbuffer_pullup(response(), -1)),
+                                          evbuffer_get_length(response()) };
+        options.done_func(session, did_connect, did_timeout, response_code, sv, options.done_func_user_data);
+    }
+
+    tr_session* const session;
 
     CURL* curl_easy = nullptr;
-    evbuffer* freebuf = nullptr;
-    evbuffer* response = nullptr;
-    tr_session* session = nullptr;
-    tr_web_done_func done_func = nullptr;
     tr_web_task* next = nullptr;
-    void* done_func_user_data = nullptr;
 
-    long code = 0;
+    long response_code = 0;
     long timeout_secs = 0;
-
-    int torrentId = 0;
-
     bool did_connect = false;
     bool did_timeout = false;
 };
-
-static void task_free(struct tr_web_task* task)
-{
-    if (task->freebuf != nullptr)
-    {
-        evbuffer_free(task->freebuf);
-    }
-
-    delete task;
-}
 
 /***
 ****
@@ -86,15 +114,15 @@ static void task_free(struct tr_web_task* task)
 
 struct tr_web
 {
-    bool curl_verbose;
-    bool curl_ssl_verify;
+    bool const curl_verbose = tr_env_key_exists("TR_CURL_VERBOSE");
+    bool const curl_ssl_verify = !tr_env_key_exists("TR_CURL_SSL_NO_VERIFY");
     char* curl_ca_bundle;
-    int close_mode;
+    int close_mode = ~0;
 
     std::recursive_mutex web_tasks_mutex;
-    struct tr_web_task* tasks;
+    tr_web_task* tasks = nullptr;
 
-    char* cookie_filename;
+    std::string cookie_filename;
     std::set<CURL*> paused_easy_handles;
 };
 
@@ -108,9 +136,9 @@ static size_t writeFunc(void* ptr, size_t size, size_t nmemb, void* vtask)
     auto* task = static_cast<struct tr_web_task*>(vtask);
 
     /* webseed downloads should be speed limited */
-    if (task->torrentId != -1)
+    if (auto const& torrent_id = task->torrent_id(); torrent_id)
     {
-        tr_torrent const* const tor = tr_torrentFindFromId(task->session, task->torrentId);
+        tr_torrent const* const tor = tr_torrentFindFromId(task->session, *torrent_id);
 
         if (tor != nullptr && tor->bandwidth->clamp(TR_DOWN, nmemb) == 0)
         {
@@ -119,7 +147,7 @@ static size_t writeFunc(void* ptr, size_t size, size_t nmemb, void* vtask)
         }
     }
 
-    evbuffer_add(task->response, ptr, byteCount);
+    evbuffer_add(task->response(), ptr, byteCount);
     dbgmsg("wrote %zu bytes to task %p's buffer", byteCount, (void*)task);
     return byteCount;
 }
@@ -130,14 +158,23 @@ static int sockoptfunction(void* vtask, curl_socket_t fd, curlsocktype /*purpose
 {
     auto* task = static_cast<struct tr_web_task*>(vtask);
 
-    /* announce and scrape requests have tiny payloads. */
-    if (auto const is_scrape = tr_strvContains(task->url, "scrape"sv), is_announce = tr_strvContains(task->url, "announce"sv);
-        is_scrape || is_announce)
+    // Announce and scrape requests have tiny payloads.
+    // Ignore the sockopt() return values -- these are suggestions
+    // rather than hard requirements & it's OK for them to fail
+
+    auto const& url = task->url();
+
+    if (tr_strvContains(url, "scrape"sv))
     {
-        int const sndbuf = is_scrape ? 4096 : 1024;
-        int const rcvbuf = is_scrape ? 4096 : 3072;
-        /* ignore the sockopt() return values -- these are suggestions
-           rather than hard requirements & it's OK for them to fail */
+        int const sndbuf = 4096;
+        int const rcvbuf = 4096;
+        (void)setsockopt(fd, SOL_SOCKET, SO_SNDBUF, reinterpret_cast<char const*>(&sndbuf), sizeof(sndbuf));
+        (void)setsockopt(fd, SOL_SOCKET, SO_RCVBUF, reinterpret_cast<char const*>(&rcvbuf), sizeof(rcvbuf));
+    }
+    else if (tr_strvContains(url, "announce"sv))
+    {
+        int const sndbuf = 1024;
+        int const rcvbuf = 3072;
         (void)setsockopt(fd, SOL_SOCKET, SO_SNDBUF, reinterpret_cast<char const*>(&sndbuf), sizeof(sndbuf));
         (void)setsockopt(fd, SOL_SOCKET, SO_RCVBUF, reinterpret_cast<char const*>(&rcvbuf), sizeof(rcvbuf));
     }
@@ -212,12 +249,12 @@ static long getTimeoutFromURL(struct tr_web_task const* task)
         return 20L;
     }
 
-    if (tr_strvContains(task->url, "scrape"sv))
+    if (tr_strvContains(task->url(), "scrape"sv))
     {
         return 30L;
     }
 
-    if (tr_strvContains(task->url, "announce"sv))
+    if (tr_strvContains(task->url(), "announce"sv))
     {
         return 90L;
     }
@@ -262,7 +299,7 @@ static CURL* createEasy(tr_session* s, struct tr_web* web, struct tr_web_task* t
     }
 
     curl_easy_setopt(e, CURLOPT_TIMEOUT, task->timeout_secs);
-    curl_easy_setopt(e, CURLOPT_URL, task->url.c_str());
+    curl_easy_setopt(e, CURLOPT_URL, task->url().c_str());
     curl_easy_setopt(e, CURLOPT_USERAGENT, TR_NAME "/" SHORT_VERSION_STRING);
     curl_easy_setopt(e, CURLOPT_VERBOSE, (long)(web->curl_verbose ? 1 : 0));
     curl_easy_setopt(e, CURLOPT_WRITEDATA, task);
@@ -281,19 +318,19 @@ static CURL* createEasy(tr_session* s, struct tr_web* web, struct tr_web_task* t
         (void)curl_easy_setopt(e, CURLOPT_INTERFACE, tr_address_to_string(addr));
     }
 
-    if (!std::empty(task->cookies))
+    if (auto const& cookies = task->cookies(); !std::empty(cookies))
     {
-        (void)curl_easy_setopt(e, CURLOPT_COOKIE, task->cookies.c_str());
+        (void)curl_easy_setopt(e, CURLOPT_COOKIE, cookies.c_str());
     }
 
-    if (web->cookie_filename != nullptr)
+    if (auto const& filename = web->cookie_filename; !std::empty(filename))
     {
-        (void)curl_easy_setopt(e, CURLOPT_COOKIEFILE, web->cookie_filename);
+        (void)curl_easy_setopt(e, CURLOPT_COOKIEFILE, filename.c_str());
     }
 
-    if (!std::empty(task->range))
+    if (auto const& range = task->range(); !std::empty(range))
     {
-        curl_easy_setopt(e, CURLOPT_RANGE, task->range.c_str());
+        curl_easy_setopt(e, CURLOPT_RANGE, range.c_str());
         /* don't bother asking the server to compress webseed fragments */
         curl_easy_setopt(e, CURLOPT_ENCODING, "identity");
     }
@@ -301,23 +338,11 @@ static CURL* createEasy(tr_session* s, struct tr_web* web, struct tr_web_task* t
     return e;
 }
 
-/***
-****
-***/
-
 static void task_finish_func(void* vtask)
 {
-    auto* task = static_cast<struct tr_web_task*>(vtask);
-    dbgmsg("finished web task %p; got %ld", (void*)task, task->code);
-
-    if (task->done_func != nullptr)
-    {
-        auto const sv = std::string_view{ reinterpret_cast<char const*>(evbuffer_pullup(task->response, -1)),
-                                          evbuffer_get_length(task->response) };
-        (*task->done_func)(task->session, task->did_connect, task->did_timeout, task->code, sv, task->done_func_user_data);
-    }
-
-    task_free(task);
+    auto* task = static_cast<tr_web_task*>(vtask);
+    task->done();
+    delete task;
 }
 
 /****
@@ -326,72 +351,28 @@ static void task_finish_func(void* vtask)
 
 static void tr_webThreadFunc(void* vsession);
 
-static struct tr_web_task* tr_webRunImpl(
-    tr_session* session,
-    int torrentId,
-    std::string_view url,
-    std::string_view range,
-    std::string_view cookies,
-    tr_web_done_func done_func,
-    void* done_func_user_data,
-    struct evbuffer* buffer)
+tr_web_task* tr_webRun(tr_session* session, tr_web_options&& options)
 {
-    struct tr_web_task* task = nullptr;
-
-    if (!session->isClosing())
+    if (session->isClosing())
     {
-        if (session->web == nullptr)
-        {
-            std::thread(tr_webThreadFunc, session).detach();
-            while (session->web == nullptr)
-            {
-                tr_wait_msec(20);
-            }
-        }
-
-        task = new tr_web_task{};
-        task->session = session;
-        task->torrentId = torrentId;
-        task->url = url;
-        task->range = range;
-        task->cookies = cookies;
-        task->done_func = done_func;
-        task->done_func_user_data = done_func_user_data;
-        task->response = buffer != nullptr ? buffer : evbuffer_new();
-        task->freebuf = buffer != nullptr ? nullptr : task->response;
-
-        auto const lock = std::unique_lock(session->web->web_tasks_mutex);
-        task->next = session->web->tasks;
-        session->web->tasks = task;
+        return {};
     }
 
+    if (session->web == nullptr)
+    {
+        std::thread(tr_webThreadFunc, session).detach();
+        while (session->web == nullptr)
+        {
+            tr_wait_msec(20);
+        }
+    }
+
+    auto const lock = std::unique_lock(session->web->web_tasks_mutex);
+    auto* const task = new tr_web_task{ session, std::move(options) };
+    task->next = session->web->tasks;
+    session->web->tasks = task;
+
     return task;
-}
-
-struct tr_web_task* tr_webRunWithCookies(
-    tr_session* session,
-    std::string_view url,
-    std::string_view cookies,
-    tr_web_done_func done_func,
-    void* done_func_user_data)
-{
-    return tr_webRunImpl(session, -1, url, {}, cookies, done_func, done_func_user_data, nullptr);
-}
-
-struct tr_web_task* tr_webRun(tr_session* session, std::string_view url, tr_web_done_func done_func, void* done_func_user_data)
-{
-    return tr_webRunWithCookies(session, url, {}, done_func, done_func_user_data);
-}
-
-struct tr_web_task* tr_webRunWebseed(
-    tr_torrent* tor,
-    std::string_view url,
-    std::string_view range,
-    tr_web_done_func done_func,
-    void* done_func_user_data,
-    struct evbuffer* buffer)
-{
-    return tr_webRunImpl(tor->session, tr_torrentId(tor), url, range, {}, done_func, done_func_user_data, buffer);
 }
 
 static void tr_webThreadFunc(void* vsession)
@@ -405,11 +386,7 @@ static void tr_webThreadFunc(void* vsession)
         curl_global_init(0);
     }
 
-    auto* web = new tr_web{};
-    web->close_mode = ~0;
-    web->tasks = nullptr;
-    web->curl_verbose = tr_env_key_exists("TR_CURL_VERBOSE");
-    web->curl_ssl_verify = !tr_env_key_exists("TR_CURL_SSL_NO_VERIFY");
+    auto* const web = new tr_web{};
     web->curl_ca_bundle = tr_env_get_string("CURL_CA_BUNDLE", nullptr);
 
     if (web->curl_ssl_verify)
@@ -425,7 +402,7 @@ static void tr_webThreadFunc(void* vsession)
     auto const str = tr_strvPath(session->config_dir, "cookies.txt");
     if (tr_sys_path_exists(str.c_str(), nullptr))
     {
-        web->cookie_filename = tr_strvDup(str);
+        web->cookie_filename = str;
     }
 
     auto* const multi = curl_multi_init();
@@ -451,11 +428,11 @@ static void tr_webThreadFunc(void* vsession)
             while (web->tasks != nullptr)
             {
                 /* pop the task */
-                struct tr_web_task* task = web->tasks;
+                auto* const task = web->tasks;
                 web->tasks = task->next;
                 task->next = nullptr;
 
-                dbgmsg("adding task to curl: [%s]", task->url.c_str());
+                dbgmsg("adding task to curl: [%s]", task->url().c_str());
                 curl_multi_add_handle(multi, createEasy(session, web, task));
             }
         }
@@ -470,7 +447,6 @@ static void tr_webThreadFunc(void* vsession)
         /* maybe wait a little while before calling curl_multi_perform() */
         auto msec = long{};
         curl_multi_timeout(multi, &msec);
-
         if (msec < 0)
         {
             msec = ThreadfuncMaxSleepMsec;
@@ -521,19 +497,19 @@ static void tr_webThreadFunc(void* vsession)
         {
             if (msg->msg == CURLMSG_DONE && msg->easy_handle != nullptr)
             {
-                CURL* const e = msg->easy_handle;
+                auto* const e = msg->easy_handle;
 
-                struct tr_web_task* task = nullptr;
+                tr_web_task* task = nullptr;
                 curl_easy_getinfo(e, CURLINFO_PRIVATE, (void*)&task);
                 TR_ASSERT(e == task->curl_easy);
 
                 auto req_bytes_sent = long{};
                 auto total_time = double{};
-                curl_easy_getinfo(e, CURLINFO_RESPONSE_CODE, &task->code);
+                curl_easy_getinfo(e, CURLINFO_RESPONSE_CODE, &task->response_code);
                 curl_easy_getinfo(e, CURLINFO_REQUEST_SIZE, &req_bytes_sent);
                 curl_easy_getinfo(e, CURLINFO_TOTAL_TIME, &total_time);
-                task->did_connect = task->code > 0 || req_bytes_sent > 0;
-                task->did_timeout = task->code == 0 && total_time >= task->timeout_secs;
+                task->did_connect = task->response_code > 0 || req_bytes_sent > 0;
+                task->did_timeout = task->response_code == 0 && total_time >= task->timeout_secs;
                 curl_multi_remove_handle(multi, e);
                 web->paused_easy_handles.erase(e);
                 curl_easy_cleanup(e);
@@ -546,16 +522,15 @@ static void tr_webThreadFunc(void* vsession)
      * This is rare, but can happen on shutdown with unresponsive trackers. */
     while (web->tasks != nullptr)
     {
-        struct tr_web_task* task = web->tasks;
+        auto* const task = web->tasks;
         web->tasks = task->next;
-        dbgmsg("Discarding task \"%s\"", task->url.c_str());
-        task_free(task);
+        dbgmsg("Discarding task \"%s\"", task->url().c_str());
+        delete task;
     }
 
     /* cleanup */
     curl_multi_cleanup(multi);
     tr_free(web->curl_ca_bundle);
-    tr_free(web->cookie_filename);
     delete web;
     session->web = nullptr;
 }
@@ -576,7 +551,7 @@ void tr_webClose(tr_session* session, tr_web_close_mode close_mode)
     }
 }
 
-long tr_webGetTaskResponseCode(struct tr_web_task* task)
+long tr_webGetTaskResponseCode(tr_web_task* task)
 {
     long code = 0;
     curl_easy_getinfo(task->curl_easy, CURLINFO_RESPONSE_CODE, &code);
