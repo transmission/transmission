@@ -582,10 +582,3 @@ long tr_webGetTaskResponseCode(struct tr_web_task* task)
     curl_easy_getinfo(task->curl_easy, CURLINFO_RESPONSE_CODE, &code);
     return code;
 }
-
-char const* tr_webGetTaskRealUrl(struct tr_web_task* task)
-{
-    char* url = nullptr;
-    curl_easy_getinfo(task->curl_easy, CURLINFO_EFFECTIVE_URL, &url);
-    return url;
-}

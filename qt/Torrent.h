@@ -84,10 +84,10 @@ struct TrackerStat
     int scrape_state;
     int seeder_count;
     int tier;
-    FaviconCache::Key favicon_key;
     QString announce;
     QString last_announce_result;
     QString last_scrape_result;
+    QString sitename;
 };
 
 using TrackerStatsList = std::vector<TrackerStat>;
@@ -121,12 +121,18 @@ public:
 
     explicit TorrentHash(char const* str)
     {
-        data_ = tr_sha1_from_string(str != nullptr ? str : "");
+        if (auto const hash = tr_sha1_from_string(str != nullptr ? str : ""); hash)
+        {
+            data_ = *hash;
+        }
     }
 
     explicit TorrentHash(QString const& str)
     {
-        data_ = tr_sha1_from_string(str.toStdString());
+        if (auto const hash = tr_sha1_from_string(str.toStdString()); hash)
+        {
+            data_ = *hash;
+        }
     }
 
     bool operator==(TorrentHash const& that) const
@@ -406,11 +412,11 @@ public:
         return recheck_progress_;
     }
 
-    bool includesTracker(FaviconCache::Key const& key) const;
+    bool includesTracker(QString const& sitename) const;
 
-    FaviconCache::Keys const& trackerKeys() const
+    std::vector<QString> const& sitenames() const
     {
-        return tracker_keys_;
+        return sitenames_;
     }
 
     Speed uploadLimit() const
@@ -676,7 +682,7 @@ private:
     PeerList peers_;
     FileList files_;
 
-    FaviconCache::Keys tracker_keys_;
+    std::vector<QString> sitenames_;
     TrackerStatsList tracker_stats_;
 
     Speed upload_speed_;

@@ -5,6 +5,7 @@
 
 #include <array>
 #include <cstring>
+#include <cctype> // isxdigit()
 #include <string>
 #include <string_view>
 
@@ -21,10 +22,13 @@
 
 using namespace std::literals;
 
-/* this base32 code converted from code by Robert Kaye and Gordon Mohr
- * and is public domain. see http://bitzi.com/publicdomain for more info */
 namespace
 {
+
+auto constexpr Base32HashStrLen = size_t{ 32 };
+
+/* this base32 code converted from code by Robert Kaye and Gordon Mohr
+ * and is public domain. see http://bitzi.com/publicdomain for more info */
 namespace bitzi
 {
 
@@ -43,8 +47,6 @@ auto constexpr Base32Lookup = std::array<int, 80>{
 
 void base32_to_sha1(uint8_t* out, char const* in, size_t const inlen)
 {
-    TR_ASSERT(inlen == 32);
-
     size_t const outlen = 20;
 
     memset(out, 0, 20);
@@ -105,6 +107,43 @@ void base32_to_sha1(uint8_t* out, char const* in, size_t const inlen)
 }
 
 } // namespace bitzi
+
+std::optional<tr_sha1_digest_t> parseBase32Hash(std::string_view sv)
+{
+    if (std::size(sv) != Base32HashStrLen)
+    {
+        return {};
+    }
+
+    if (!std::all_of(std::begin(sv), std::end(sv), [](unsigned char ch) { return bitzi::Base32Lookup[ch] - '0' != 0xFF; }))
+    {
+        return {};
+    }
+
+    auto digest = tr_sha1_digest_t{};
+    bitzi::base32_to_sha1(reinterpret_cast<uint8_t*>(std::data(digest)), std::data(sv), std::size(sv));
+    return digest;
+}
+
+std::optional<tr_sha1_digest_t> parseHash(std::string_view sv)
+{
+    // http://bittorrent.org/beps/bep_0009.html
+    // Is the info-hash hex encoded, for a total of 40 characters.
+    // For compatability with existing links in the wild, clients
+    // should also support the 32 character base32 encoded info-hash.
+
+    if (auto const hash = tr_sha1_from_string(sv); hash)
+    {
+        return hash;
+    }
+    if (auto const hash = parseBase32Hash(sv); hash)
+    {
+        return hash;
+    }
+
+    return {};
+}
+
 } // namespace
 
 /***
@@ -141,6 +180,13 @@ std::string tr_magnet_metainfo::magnet() const
 
 bool tr_magnet_metainfo::parseMagnet(std::string_view magnet_link, tr_error** error)
 {
+    magnet_link = tr_strvStrip(magnet_link);
+
+    if (auto const hash = parseHash(magnet_link); hash)
+    {
+        return parseMagnet(tr_strvJoin("magnet:?xt=urn:btih:", tr_sha1_to_string(*hash)));
+    }
+
     auto const parsed = tr_urlParse(magnet_link);
     if (!parsed || parsed->scheme != "magnet"sv)
     {
@@ -148,7 +194,7 @@ bool tr_magnet_metainfo::parseMagnet(std::string_view magnet_link, tr_error** er
         return false;
     }
 
-    bool got_checksum = false;
+    bool got_hash = false;
     for (auto const& [key, value] : tr_url_query_view{ parsed->query })
     {
         if (key == "dn"sv)
@@ -174,24 +220,10 @@ bool tr_magnet_metainfo::parseMagnet(std::string_view magnet_link, tr_error** er
             auto constexpr ValPrefix = "urn:btih:"sv;
             if (tr_strvStartsWith(value, ValPrefix))
             {
-                auto const hash = value.substr(std::size(ValPrefix));
-                switch (std::size(hash))
+                if (auto const hash = parseHash(value.substr(std::size(ValPrefix))); hash)
                 {
-                case TR_SHA1_DIGEST_STRLEN:
-                    this->info_hash_ = tr_sha1_from_string(hash);
-                    got_checksum = true;
-                    break;
-
-                case 32:
-                    bitzi::base32_to_sha1(
-                        reinterpret_cast<uint8_t*>(std::data(this->info_hash_)),
-                        std::data(hash),
-                        std::size(hash));
-                    got_checksum = true;
-                    break;
-
-                default:
-                    break;
+                    this->info_hash_ = *hash;
+                    got_hash = true;
                 }
             }
         }
@@ -199,5 +231,10 @@ bool tr_magnet_metainfo::parseMagnet(std::string_view magnet_link, tr_error** er
 
     info_hash_str_ = tr_sha1_to_string(this->infoHash());
 
-    return got_checksum;
+    if (std::empty(name()))
+    {
+        this->setName(info_hash_str_);
+    }
+
+    return got_hash;
 }

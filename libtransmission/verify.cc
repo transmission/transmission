@@ -102,6 +102,7 @@ static bool verifyTorrent(tr_torrent* tor, bool const* stopFlag)
                 changed |= hasPiece != hadPiece;
             }
 
+            tor->checked_pieces_.set(piece, true);
             tor->markChanged();
 
             /* sleeping even just a few msec per second goes a long
