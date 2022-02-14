@@ -349,7 +349,7 @@ void on_content_changed(evbuffer* buf, evbuffer_cb_info const* info, void* vtask
 {
     size_t const n_added = info->n_added;
     auto* const task = static_cast<tr_webseed_task*>(vtask);
-    auto const* const session = task->session;
+    auto* const session = task->session;
     auto const lock = session->unique_lock();
 
     if (!task->dead && n_added > 0)
