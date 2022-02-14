@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>601</width>
-    <height>547</height>
+    <height>597</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -497,9 +497,9 @@
           </widget>
          </item>
          <item row="2" column="0">
-          <widget class="QCheckBox" name="completionScriptCheck">
+          <widget class="QCheckBox" name="doneDownloadingScriptCheck">
            <property name="text">
-            <string>Call scrip&amp;t when torrent is completed:</string>
+            <string>Call scrip&amp;t when downloading is completed:</string>
            </property>
            <property name="checked">
             <bool>true</bool>
@@ -507,15 +507,15 @@
           </widget>
          </item>
          <item row="2" column="1">
-          <widget class="QStackedWidget" name="completionScriptStack">
+          <widget class="QStackedWidget" name="doneDownloadingScriptStack">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
-           <widget class="PathButton" name="completionScriptButton"/>
-           <widget class="QLineEdit" name="completionScriptEdit"/>
+           <widget class="PathButton" name="doneDownloadingScriptButton"/>
+           <widget class="QLineEdit" name="doneDownloadingScriptEdit"/>
           </widget>
          </item>
         </layout>
@@ -599,6 +599,28 @@
            <property name="singleStep">
             <number>5</number>
            </property>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QCheckBox" name="doneSeedingScriptCheck">
+           <property name="text">
+            <string>Call scrip&amp;t when seeding is completed:</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QStackedWidget" name="doneSeedingScriptStack">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <widget class="PathButton" name="doneSeedingScriptButton"/>
+           <widget class="QLineEdit" name="doneSeedingScriptEdit"/>
           </widget>
          </item>
         </layout>
@@ -1366,9 +1388,9 @@
    </hints>
   </connection>
   <connection>
-   <sender>completionScriptCheck</sender>
+   <sender>doneDownloadingScriptCheck</sender>
    <signal>toggled(bool)</signal>
-   <receiver>completionScriptStack</receiver>
+   <receiver>doneDownloadingScriptStack</receiver>
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
@@ -1378,6 +1400,22 @@
     <hint type="destinationlabel">
      <x>395</x>
      <y>447</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>doneSeedingScriptCheck</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>doneSeedingScriptStack</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>69</x>
+     <y>69</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>69</x>
+     <y>69</y>
     </hint>
    </hints>
   </connection>

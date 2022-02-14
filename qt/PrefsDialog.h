@@ -55,6 +55,7 @@ private:
     void linkWidgetToPref(QWidget* widget, int pref_key);
     void updateBlocklistLabel();
     void updateDownloadingWidgetsLocality();
+    void updateSeedingWidgetsLocality();
 
     void setPref(int key, QVariant const& v);
 

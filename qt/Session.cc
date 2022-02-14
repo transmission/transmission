@@ -175,6 +175,8 @@ void Session::updatePref(int key)
         case Prefs::RENAME_PARTIAL_FILES:
         case Prefs::SCRIPT_TORRENT_DONE_ENABLED:
         case Prefs::SCRIPT_TORRENT_DONE_FILENAME:
+        case Prefs::SCRIPT_TORRENT_DONE_SEEDING_ENABLED:
+        case Prefs::SCRIPT_TORRENT_DONE_SEEDING_FILENAME:
         case Prefs::START:
         case Prefs::TRASH_ORIGINAL:
         case Prefs::USPEED:
