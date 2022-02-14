@@ -233,7 +233,7 @@ public:
         peer_congestion_algorithm_ = algorithm;
     }
 
-    void setSocketTOS(tr_socket_t sock, tr_address_type type)
+    void setSocketTOS(tr_socket_t sock, tr_address_type type) const
     {
         tr_netSetTOS(sock, peer_socket_tos_, type);
     }

@@ -315,21 +315,19 @@ std::string_view getSiteName(std::string_view host)
     }
 
     // is it a registered name?
-    char* lower = nullptr;
-    if (PSL_SUCCESS == psl_str_to_utf8lower(szhost.c_str(), nullptr, nullptr, &lower))
+    if (char* lower = nullptr; psl_str_to_utf8lower(szhost.c_str(), nullptr, nullptr, &lower) == PSL_SUCCESS)
     {
         // www.example.com -> example.com
-        char const* const top = psl_registrable_domain(psl_builtin(), lower);
-        if (top != nullptr)
+        if (char const* const top = psl_registrable_domain(psl_builtin(), lower); top != nullptr)
         {
             host.remove_prefix(top - lower);
         }
+
         psl_free_string(lower);
     }
 
     // example.com -> example
-    auto const dot_pos = host.find('.');
-    if (dot_pos != std::string_view::npos)
+    if (auto const dot_pos = host.find('.'); dot_pos != std::string_view::npos)
     {
         host = host.substr(0, dot_pos);
     }

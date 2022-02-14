@@ -215,16 +215,12 @@ bool tr_magnet_metainfo::parseMagnet(std::string_view magnet_link, tr_error** er
                 this->webseed_urls_.emplace_back(url_sv);
             }
         }
-        else if (key == "xt"sv)
+        else if (auto constexpr ValPrefix = "urn:btih:"sv; key == "xt"sv && tr_strvStartsWith(value, ValPrefix))
         {
-            auto constexpr ValPrefix = "urn:btih:"sv;
-            if (tr_strvStartsWith(value, ValPrefix))
+            if (auto const hash = parseHash(value.substr(std::size(ValPrefix))); hash)
             {
-                if (auto const hash = parseHash(value.substr(std::size(ValPrefix))); hash)
-                {
-                    this->info_hash_ = *hash;
-                    got_hash = true;
-                }
+                this->info_hash_ = *hash;
+                got_hash = true;
             }
         }
     }
