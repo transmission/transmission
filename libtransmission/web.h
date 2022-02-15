@@ -40,10 +40,10 @@ public:
     static std::unique_ptr<tr_web> create(Controller const& controller, tr_session* session);
     ~tr_web();
 
-    using tr_web_done_func = void (*)(
+    using done_func = void (*)(
         tr_session* session,
-        bool did_connect_flag,
-        bool timeout_flag,
+        bool did_connect,
+        bool did_timeout,
         long response_code,
         std::string_view response,
         void* user_data);
@@ -51,7 +51,7 @@ public:
     class RunOptions
     {
     public:
-        RunOptions(std::string_view url_in, tr_web_done_func done_func_in, void* done_func_user_data_in)
+        RunOptions(std::string_view url_in, done_func done_func_in, void* done_func_user_data_in)
             : url{ url_in }
             , done_func{ done_func_in }
             , done_func_user_data{ done_func_user_data_in }
@@ -66,7 +66,7 @@ public:
         std::optional<int> speed_limit_tag;
         std::optional<int> sndbuf;
         std::optional<int> rcvbuf;
-        tr_web_done_func done_func = nullptr;
+        done_func done_func = nullptr;
         void* done_func_user_data = nullptr;
         evbuffer* buffer = nullptr;
         int timeout_secs = DefaultTimeoutSecs;
