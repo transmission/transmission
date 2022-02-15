@@ -137,7 +137,7 @@ struct tr_web
     bool const curl_ssl_verify = !tr_env_key_exists("TR_CURL_SSL_NO_VERIFY");
     bool const curl_proxy_ssl_verify = !tr_env_key_exists("TR_CURL_PROXY_SSL_NO_VERIFY");
 
-    char* curl_ca_bundle;
+    std::string curl_ca_bundle;
     int close_mode = ~0;
 
     std::recursive_mutex web_tasks_mutex;
@@ -275,9 +275,9 @@ static void initEasy(tr_session* s, struct tr_web* web, struct tr_web_task* task
         curl_easy_setopt(e, CURLOPT_SSL_VERIFYHOST, 0L);
         curl_easy_setopt(e, CURLOPT_SSL_VERIFYPEER, 0L);
     }
-    else if (web->curl_ca_bundle != nullptr)
+    else if (!std::empty(web->curl_ca_bundle))
     {
-        curl_easy_setopt(e, CURLOPT_CAINFO, web->curl_ca_bundle);
+        curl_easy_setopt(e, CURLOPT_CAINFO, web->curl_ca_bundle.c_str());
     }
     else
     {
@@ -289,9 +289,9 @@ static void initEasy(tr_session* s, struct tr_web* web, struct tr_web_task* task
         curl_easy_setopt(e, CURLOPT_PROXY_SSL_VERIFYHOST, 0L);
         curl_easy_setopt(e, CURLOPT_PROXY_SSL_VERIFYPEER, 0L);
     }
-    else if (web->curl_ca_bundle != nullptr)
+    else if (!std::empty(web->curl_ca_bundle))
     {
-        curl_easy_setopt(e, CURLOPT_PROXY_CAINFO, web->curl_ca_bundle);
+        curl_easy_setopt(e, CURLOPT_PROXY_CAINFO, web->curl_ca_bundle.c_str());
     }
 
     curl_easy_setopt(e, CURLOPT_TIMEOUT, task->timeoutSecs());
@@ -379,14 +379,19 @@ static void tr_webThreadFunc(void* vsession)
     }
 
     auto* const web = new tr_web{};
-    web->curl_ca_bundle = tr_env_get_string("CURL_CA_BUNDLE", nullptr);
+
+    if (auto* ca_bundle = tr_env_get_string("CURL_CA_BUNDLE", nullptr); ca_bundle != nullptr)
+    {
+        web->curl_ca_bundle = ca_bundle;
+        tr_free(ca_bundle);
+    }
 
     if (web->curl_ssl_verify)
     {
         tr_logAddNamedInfo(
             "web",
             "will verify tracker certs using envvar CURL_CA_BUNDLE: %s",
-            web->curl_ca_bundle == nullptr ? "none" : web->curl_ca_bundle);
+            std::empty(web->curl_ca_bundle) ? "none" : web->curl_ca_bundle.c_str());
         tr_logAddNamedInfo("web", "NB: this only works if you built against libcurl with openssl or gnutls, NOT nss");
         tr_logAddNamedInfo("web", "NB: invalid certs will show up as 'Could not connect to tracker' like many other errors");
     }
@@ -397,7 +402,7 @@ static void tr_webThreadFunc(void* vsession)
         web->cookie_filename = str;
     }
 
-    auto* const multi = curl_multi_init();
+    auto const multi = std::shared_ptr<CURLM>(curl_multi_init(), curl_multi_cleanup);
     session->web = web;
 
     auto repeats = uint32_t{};
@@ -426,7 +431,7 @@ static void tr_webThreadFunc(void* vsession)
 
                 dbgmsg("adding task to curl: [%s]", task->url().c_str());
                 initEasy(session, web, task);
-                curl_multi_add_handle(multi, task->easy());
+                curl_multi_add_handle(multi.get(), task->easy());
             }
         }
 
@@ -439,7 +444,7 @@ static void tr_webThreadFunc(void* vsession)
 
         /* maybe wait a little while before calling curl_multi_perform() */
         auto msec = long{};
-        curl_multi_timeout(multi, &msec);
+        curl_multi_timeout(multi.get(), &msec);
         if (msec < 0)
         {
             msec = ThreadfuncMaxSleepMsec;
@@ -458,7 +463,7 @@ static void tr_webThreadFunc(void* vsession)
             }
 
             auto numfds = int{};
-            curl_multi_wait(multi, nullptr, 0, msec, &numfds);
+            curl_multi_wait(multi.get(), nullptr, 0, msec, &numfds);
             if (numfds == 0)
             {
                 repeats++;
@@ -481,12 +486,12 @@ static void tr_webThreadFunc(void* vsession)
         auto unused = int{};
         do
         {
-            mcode = curl_multi_perform(multi, &unused);
+            mcode = curl_multi_perform(multi.get(), &unused);
         } while (mcode == CURLM_CALL_MULTI_PERFORM);
 
         /* pump completed tasks from the multi */
         CURLMsg* msg = nullptr;
-        while ((msg = curl_multi_info_read(multi, &unused)) != nullptr)
+        while ((msg = curl_multi_info_read(multi.get(), &unused)) != nullptr)
         {
             if (msg->msg == CURLMSG_DONE && msg->easy_handle != nullptr)
             {
@@ -503,7 +508,7 @@ static void tr_webThreadFunc(void* vsession)
                 curl_easy_getinfo(e, CURLINFO_TOTAL_TIME, &total_time);
                 task->did_connect = task->response_code > 0 || req_bytes_sent > 0;
                 task->did_timeout = task->response_code == 0 && total_time >= task->timeoutSecs();
-                curl_multi_remove_handle(multi, e);
+                curl_multi_remove_handle(multi.get(), e);
                 web->paused_easy_handles.erase(e);
                 tr_runInEventThread(task->session, task_finish_func, task);
             }
@@ -521,8 +526,6 @@ static void tr_webThreadFunc(void* vsession)
     }
 
     /* cleanup */
-    curl_multi_cleanup(multi);
-    tr_free(web->curl_ca_bundle);
     delete web;
     session->web = nullptr;
 }
