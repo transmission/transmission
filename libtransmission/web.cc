@@ -113,7 +113,7 @@ public:
 
         auto const sv = std::string_view{ reinterpret_cast<char const*>(evbuffer_pullup(response(), -1)),
                                           evbuffer_get_length(response()) };
-        options.done_func(session, did_connect, did_timeout, response_code, sv, options.done_func_user_data);
+        options.done_func(response_code, sv, did_connect, did_timeout, options.done_func_user_data);
     }
 
     tr_session* const session;

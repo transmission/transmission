@@ -1341,11 +1341,10 @@ static char const* torrentRenamePath(
 ***/
 
 static void portTested(
-    tr_session* /*session*/,
-    bool /*did_connect*/,
-    bool /*did_timeout*/,
     long response_code,
     std::string_view response,
+    bool /*did_connect*/,
+    bool /*did_timeout*/,
     void* user_data)
 {
     char result[1024];
@@ -1387,15 +1386,15 @@ static char const* portTest(
 ***/
 
 static void gotNewBlocklist(
-    tr_session* session,
-    bool /*did_connect*/,
-    bool /*did_timeout*/,
     long response_code,
     std::string_view response,
+    bool /*did_connect*/,
+    bool /*did_timeout*/,
     void* user_data)
 {
     char result[1024];
     auto* data = static_cast<struct tr_rpc_idle_data*>(user_data);
+    auto* const session = data->session;
 
     *result = '\0';
 
@@ -1522,11 +1521,10 @@ struct add_torrent_idle_data
 };
 
 static void gotMetadataFromURL(
-    tr_session* /*session*/,
-    bool /*did_connect*/,
-    bool /*did_timeout*/,
     long response_code,
     std::string_view response,
+    bool /*did_connect*/,
+    bool /*did_timeout*/,
     void* user_data)
 {
     auto* data = static_cast<struct add_torrent_idle_data*>(user_data);

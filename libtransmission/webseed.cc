@@ -406,16 +406,17 @@ void on_idle(tr_webseed* w)
 }
 
 void web_response_func(
-    tr_session* session,
-    bool /*did_connect*/,
-    bool /*did_timeout*/,
     long response_code,
     std::string_view /*response*/,
+    bool /*did_connect*/,
+    bool /*did_timeout*/,
     void* vtask)
 {
-    auto* const t = static_cast<tr_webseed_task*>(vtask);
     bool const success = response_code == 206;
-    tr_webseed* w = t->webseed;
+
+    auto* const t = static_cast<tr_webseed_task*>(vtask);
+    auto* const session = t->session;
+    auto* const w = t->webseed;
 
     w->connection_limiter.taskFinished(success);
 

@@ -281,13 +281,7 @@ struct announce_data
     char log_name[128];
 };
 
-static void on_announce_done(
-    tr_session* /*session*/,
-    bool did_connect,
-    bool did_timeout,
-    long response_code,
-    std::string_view msg,
-    void* vdata)
+static void on_announce_done(long response_code, std::string_view msg, bool did_connect, bool did_timeout, void* vdata)
 {
     auto* data = static_cast<struct announce_data*>(vdata);
 
@@ -450,13 +444,7 @@ struct scrape_data
     char log_name[128];
 };
 
-static void on_scrape_done(
-    tr_session* /*session*/,
-    bool did_connect,
-    bool did_timeout,
-    long response_code,
-    std::string_view msg,
-    void* vdata)
+static void on_scrape_done(long response_code, std::string_view msg, bool did_connect, bool did_timeout, void* vdata)
 {
     auto* data = static_cast<struct scrape_data*>(vdata);
 

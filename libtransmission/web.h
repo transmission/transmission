@@ -40,13 +40,8 @@ public:
     static std::unique_ptr<tr_web> create(Controller const& controller, tr_session* session);
     ~tr_web();
 
-    using done_func = void (*)(
-        tr_session* session,
-        bool did_connect,
-        bool did_timeout,
-        long response_code,
-        std::string_view response,
-        void* user_data);
+    using done_func =
+        void (*)(long response_code, std::string_view response, bool did_connect, bool did_timeout, void* user_data);
 
     class RunOptions
     {
