@@ -154,7 +154,7 @@ struct tr_web
 static size_t writeFunc(void* ptr, size_t size, size_t nmemb, void* vtask)
 {
     size_t const byteCount = size * nmemb;
-    auto* task = static_cast<struct tr_web_task*>(vtask);
+    auto* task = static_cast<tr_web_task*>(vtask);
 
     /* webseed downloads should be speed limited */
     if (auto const& torrent_id = task->torrent_id(); torrent_id)
@@ -254,7 +254,7 @@ static CURLcode ssl_context_func(CURL* /*curl*/, void* ssl_ctx, void* /*user_dat
     return CURLE_OK;
 }
 
-static void initEasy(tr_session* s, struct tr_web* web, struct tr_web_task* task)
+static void initEasy(tr_session* s, tr_web* web, tr_web_task* task)
 {
     auto* const e = task->easy();
 
