@@ -693,6 +693,8 @@ static void tr_sessionInitImpl(void* vdata)
 
     tr_udpInit(session);
 
+    session->web = tr_web::create(session);
+
     if (session->isLPDEnabled)
     {
         tr_lpdInit(session, &session->bind_ipv4->addr);
@@ -1799,7 +1801,7 @@ static void sessionCloseImplStart(tr_session* session)
 
     /* and this goes *after* announcer close so that
        it won't be idle until the announce events are sent... */
-    tr_webClose(session, TR_WEB_CLOSE_WHEN_IDLE);
+    session->web->closeSoon();
 
     tr_cacheFree(session->cache);
     session->cache = nullptr;
@@ -1890,7 +1892,7 @@ void tr_sessionClose(tr_session* session)
      * so we need to keep the transmission thread alive
      * for a bit while they tell the router & tracker
      * that we're closing now */
-    while ((session->shared != nullptr || session->web != nullptr || session->announcer != nullptr ||
+    while ((session->shared != nullptr || !session->web->isClosed() || session->announcer != nullptr ||
             session->announcer_udp != nullptr) &&
            !deadlineReached(deadline))
     {
@@ -1903,7 +1905,7 @@ void tr_sessionClose(tr_session* session)
         tr_wait_msec(50);
     }
 
-    tr_webClose(session, TR_WEB_CLOSE_NOW);
+    session->web.reset();
 
     /* close the libtransmission thread */
     tr_eventClose(session);

@@ -44,6 +44,7 @@ struct evdns_base;
 
 class tr_bitfield;
 class tr_rpc_server;
+class tr_web;
 struct Bandwidth;
 struct tr_address;
 struct tr_announcer;
@@ -334,7 +335,7 @@ public:
 
     struct tr_cache* cache;
 
-    struct tr_web* web;
+    std::unique_ptr<tr_web> web;
 
     struct tr_session_id* session_id;
 

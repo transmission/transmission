@@ -5,53 +5,60 @@
 
 #pragma once
 
-#include <cstdint>
 #include <optional>
+#include <memory>
 #include <string>
 #include <string_view>
 
-#include "transmission.h"
-
 struct evbuffer;
+struct tr_session;
 
-enum tr_web_close_mode
-{
-    TR_WEB_CLOSE_WHEN_IDLE,
-    TR_WEB_CLOSE_NOW
-};
-
-void tr_webClose(tr_session* session, tr_web_close_mode close_mode);
-
-using tr_web_done_func = void (*)(
-    tr_session* session,
-    bool did_connect_flag,
-    bool timeout_flag,
-    long response_code,
-    std::string_view response,
-    void* user_data);
-
-class tr_web_options
+class tr_web
 {
 public:
-    tr_web_options(std::string_view url_in, tr_web_done_func done_func_in, void* done_func_user_data_in)
-        : url{ url_in }
-        , done_func{ done_func_in }
-        , done_func_user_data{ done_func_user_data_in }
+    static std::unique_ptr<tr_web> create(tr_session* session);
+    ~tr_web();
+
+    using tr_web_done_func = void (*)(
+        tr_session* session,
+        bool did_connect_flag,
+        bool timeout_flag,
+        long response_code,
+        std::string_view response,
+        void* user_data);
+
+    class RunOptions
     {
-    }
+    public:
+        RunOptions(std::string_view url_in, tr_web_done_func done_func_in, void* done_func_user_data_in)
+            : url{ url_in }
+            , done_func{ done_func_in }
+            , done_func_user_data{ done_func_user_data_in }
+        {
+        }
 
-    static constexpr int DefaultTimeoutSecs = 120;
+        static constexpr int DefaultTimeoutSecs = 120;
 
-    std::string url;
-    std::string range;
-    std::string cookies;
-    std::optional<int> torrent_id;
-    std::optional<int> sndbuf;
-    std::optional<int> rcvbuf;
-    tr_web_done_func done_func = nullptr;
-    void* done_func_user_data = nullptr;
-    evbuffer* buffer = nullptr;
-    int timeout_secs = DefaultTimeoutSecs;
+        std::string url;
+        std::string range;
+        std::string cookies;
+        std::optional<int> torrent_id;
+        std::optional<int> sndbuf;
+        std::optional<int> rcvbuf;
+        tr_web_done_func done_func = nullptr;
+        void* done_func_user_data = nullptr;
+        evbuffer* buffer = nullptr;
+        int timeout_secs = DefaultTimeoutSecs;
+    };
+
+    void run(RunOptions&& options);
+    void closeSoon();
+    [[nodiscard]] bool isClosed() const;
+
+private:
+    class Impl;
+    std::unique_ptr<Impl> const impl_;
+    explicit tr_web(tr_session* session);
 };
 
-void tr_webRun(tr_session* session, tr_web_options&& options);
+void tr_sessionFetch(tr_session* session, tr_web::RunOptions&& options);

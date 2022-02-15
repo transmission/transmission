@@ -511,11 +511,11 @@ void task_request_next_chunk(tr_webseed_task* t)
     uint64_t this_pass = std::min(remain, tor->fileSize(file_index) - file_offset);
 
     auto const url = make_url(t->webseed, tor->fileSubpath(file_index));
-    auto options = tr_web_options{ url, web_response_func, t };
+    auto options = tr_web::RunOptions{ url, web_response_func, t };
     options.range = tr_strvJoin(std::to_string(file_offset), "-"sv, std::to_string(file_offset + this_pass - 1));
     options.torrent_id = tor->uniqueId;
     options.buffer = t->content();
-    tr_webRun(tor->session, std::move(options));
+    tor->session->web->run(std::move(options));
 }
 
 } // namespace

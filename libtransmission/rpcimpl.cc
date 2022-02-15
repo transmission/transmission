@@ -1378,7 +1378,7 @@ static char const* portTest(
 {
     auto const port = tr_sessionGetPeerPort(session);
     auto const url = tr_strvJoin("https://portcheck.transmissionbt.com/"sv, std::to_string(port));
-    tr_webRun(session, { url, portTested, idle_data });
+    session->web->run({ url, portTested, idle_data });
     return nullptr;
 }
 
@@ -1466,7 +1466,7 @@ static char const* blocklistUpdate(
     tr_variant* /*args_out*/,
     struct tr_rpc_idle_data* idle_data)
 {
-    tr_webRun(session, { session->blocklistUrl(), gotNewBlocklist, idle_data });
+    session->web->run({ session->blocklistUrl(), gotNewBlocklist, idle_data });
     return nullptr;
 }
 
@@ -1686,9 +1686,9 @@ static char const* torrentAdd(tr_session* session, tr_variant* args_in, tr_varia
         d->data = idle_data;
         d->ctor = ctor;
 
-        auto options = tr_web_options{ filename, gotMetadataFromURL, d };
+        auto options = tr_web::RunOptions{ filename, gotMetadataFromURL, d };
         options.cookies = cookies;
-        tr_webRun(session, std::move(options));
+        session->web->run(std::move(options));
     }
     else
     {

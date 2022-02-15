@@ -19,7 +19,7 @@
 #include <libtransmission/variant.h>
 #include <libtransmission/version.h>
 #include <libtransmission/web-utils.h>
-#include <libtransmission/web.h> /* tr_webRun */
+#include <libtransmission/web.h> // tr_sessionFetch()
 
 /***
 ****
@@ -286,7 +286,7 @@ int tr_main(int argc, char* argv[])
     else if (tr_urlIsValid(torrentPath))
     {
         // fetch it
-        tr_webRun(h, { torrentPath, onTorrentFileDownloaded, ctor });
+        tr_sessionFetch(h, { torrentPath, onTorrentFileDownloaded, ctor });
         waitingOnWeb = true;
         while (waitingOnWeb)
         {
