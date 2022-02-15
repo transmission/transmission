@@ -40,13 +40,18 @@ public:
     {
     }
 
+    static constexpr int DefaultTimeoutSecs = 120;
+
     std::string url;
-    std::optional<int> torrent_id;
-    tr_web_done_func done_func = nullptr;
-    void* done_func_user_data = nullptr;
     std::string range;
     std::string cookies;
+    std::optional<int> torrent_id;
+    std::optional<int> sndbuf;
+    std::optional<int> rcvbuf;
+    tr_web_done_func done_func = nullptr;
+    void* done_func_user_data = nullptr;
     evbuffer* buffer = nullptr;
+    int timeout_secs = DefaultTimeoutSecs;
 };
 
 void tr_webRun(tr_session* session, tr_web_options&& options);

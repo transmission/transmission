@@ -85,6 +85,21 @@ public:
         return options.cookies;
     }
 
+    [[nodiscard]] auto const& sndbuf() const
+    {
+        return options.sndbuf;
+    }
+
+    [[nodiscard]] auto const& rcvbuf() const
+    {
+        return options.rcvbuf;
+    }
+
+    [[nodiscard]] auto const& timeoutSecs() const
+    {
+        return options.timeout_secs;
+    }
+
     void done() const
     {
         if (options.done_func == nullptr)
@@ -103,7 +118,6 @@ public:
     tr_web_task* next = nullptr;
 
     long response_code = 0;
-    long timeout_secs = 0;
     bool did_connect = false;
     bool did_timeout = false;
 };
@@ -158,30 +172,21 @@ static size_t writeFunc(void* ptr, size_t size, size_t nmemb, void* vtask)
 
 static int sockoptfunction(void* vtask, curl_socket_t fd, curlsocktype /*purpose*/)
 {
-    auto* task = static_cast<struct tr_web_task*>(vtask);
+    auto const* const task = static_cast<tr_web_task const*>(vtask);
 
-    // Announce and scrape requests have tiny payloads.
     // Ignore the sockopt() return values -- these are suggestions
     // rather than hard requirements & it's OK for them to fail
 
-    auto const& url = task->url();
-
-    if (tr_strvContains(url, "scrape"sv))
+    if (auto const& buf = task->sndbuf(); buf)
     {
-        int const sndbuf = 4096;
-        int const rcvbuf = 4096;
-        (void)setsockopt(fd, SOL_SOCKET, SO_SNDBUF, reinterpret_cast<char const*>(&sndbuf), sizeof(sndbuf));
-        (void)setsockopt(fd, SOL_SOCKET, SO_RCVBUF, reinterpret_cast<char const*>(&rcvbuf), sizeof(rcvbuf));
+        (void)setsockopt(fd, SOL_SOCKET, SO_SNDBUF, &*buf, sizeof(*buf));
     }
-    else if (tr_strvContains(url, "announce"sv))
+    if (auto const& buf = task->rcvbuf(); buf)
     {
-        int const sndbuf = 1024;
-        int const rcvbuf = 3072;
-        (void)setsockopt(fd, SOL_SOCKET, SO_SNDBUF, reinterpret_cast<char const*>(&sndbuf), sizeof(sndbuf));
-        (void)setsockopt(fd, SOL_SOCKET, SO_RCVBUF, reinterpret_cast<char const*>(&rcvbuf), sizeof(rcvbuf));
+        (void)setsockopt(fd, SOL_SOCKET, SO_RCVBUF, &*buf, sizeof(&*buf));
     }
 
-    /* return nonzero if this function encountered an error */
+    // return nonzero if this function encountered an error
     return 0;
 }
 
@@ -244,32 +249,11 @@ static CURLcode ssl_context_func(CURL* /*curl*/, void* ssl_ctx, void* /*user_dat
     return CURLE_OK;
 }
 
-static long getTimeoutFromURL(struct tr_web_task const* task)
-{
-    if (auto const* const session = task->session; session == nullptr || session->isClosed)
-    {
-        return 20L;
-    }
-
-    if (tr_strvContains(task->url(), "scrape"sv))
-    {
-        return 30L;
-    }
-
-    if (tr_strvContains(task->url(), "announce"sv))
-    {
-        return 90L;
-    }
-
-    return 240L;
-}
-
 static CURL* createEasy(tr_session* s, struct tr_web* web, struct tr_web_task* task)
 {
     CURL* const e = curl_easy_init();
 
     task->curl_easy = e;
-    task->timeout_secs = getTimeoutFromURL(task);
 
     curl_easy_setopt(e, CURLOPT_AUTOREFERER, 1L);
     curl_easy_setopt(e, CURLOPT_ENCODING, "");
@@ -313,7 +297,7 @@ static CURL* createEasy(tr_session* s, struct tr_web* web, struct tr_web_task* t
         curl_easy_setopt(e, CURLOPT_PROXY_SSL_VERIFYPEER, 0L);
     }
 
-    curl_easy_setopt(e, CURLOPT_TIMEOUT, task->timeout_secs);
+    curl_easy_setopt(e, CURLOPT_TIMEOUT, task->timeoutSecs());
     curl_easy_setopt(e, CURLOPT_URL, task->url().c_str());
     curl_easy_setopt(e, CURLOPT_USERAGENT, TR_NAME "/" SHORT_VERSION_STRING);
     curl_easy_setopt(e, CURLOPT_VERBOSE, (long)(web->curl_verbose ? 1 : 0));
@@ -522,7 +506,7 @@ static void tr_webThreadFunc(void* vsession)
                 curl_easy_getinfo(e, CURLINFO_REQUEST_SIZE, &req_bytes_sent);
                 curl_easy_getinfo(e, CURLINFO_TOTAL_TIME, &total_time);
                 task->did_connect = task->response_code > 0 || req_bytes_sent > 0;
-                task->did_timeout = task->response_code == 0 && total_time >= task->timeout_secs;
+                task->did_timeout = task->response_code == 0 && total_time >= task->timeoutSecs();
                 curl_multi_remove_handle(multi, e);
                 web->paused_easy_handles.erase(e);
                 curl_easy_cleanup(e);

@@ -345,7 +345,12 @@ void tr_tracker_http_announce(
 
     auto const url = announce_url_new(session, request);
     dbgmsg(request->log_name, "Sending announce to libcurl: \"%" TR_PRIsv "\"", TR_PRIsv_ARG(url));
-    tr_webRun(session, { url, on_announce_done, d });
+
+    auto options = tr_web_options{ url, on_announce_done, d };
+    options.timeout_secs = 90L;
+    options.sndbuf = 1024;
+    options.rcvbuf = 3072;
+    tr_webRun(session, std::move(options));
 }
 
 /****
@@ -540,5 +545,10 @@ void tr_tracker_http_scrape(
 
     auto const url = scrape_url_new(request);
     dbgmsg(request->log_name, "Sending scrape to libcurl: \"%" TR_PRIsv "\"", TR_PRIsv_ARG(url));
-    tr_webRun(session, { url, on_scrape_done, d });
+
+    auto options = tr_web_options{ url, on_scrape_done, d };
+    options.timeout_secs = 30L;
+    options.sndbuf = 4096;
+    options.rcvbuf = 4096;
+    tr_webRun(session, std::move(options));
 }
