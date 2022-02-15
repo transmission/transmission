@@ -267,34 +267,28 @@ static CURL* createEasy(tr_session* s, struct tr_web* web, struct tr_web_task* t
     curl_easy_setopt(e, CURLOPT_SOCKOPTDATA, task);
 #endif
 
-    if (web->curl_ssl_verify)
-    {
-        if (web->curl_ca_bundle != nullptr)
-        {
-            curl_easy_setopt(e, CURLOPT_CAINFO, web->curl_ca_bundle);
-        }
-        else
-        {
-            curl_easy_setopt(e, CURLOPT_SSL_CTX_FUNCTION, ssl_context_func);
-        }
-    }
-    else
+    if (!web->curl_ssl_verify)
     {
         curl_easy_setopt(e, CURLOPT_SSL_VERIFYHOST, 0L);
         curl_easy_setopt(e, CURLOPT_SSL_VERIFYPEER, 0L);
     }
-
-    if (web->curl_proxy_ssl_verify)
+    else if (web->curl_ca_bundle != nullptr)
     {
-        if (web->curl_ca_bundle != nullptr)
-        {
-            curl_easy_setopt(e, CURLOPT_PROXY_CAINFO, web->curl_ca_bundle);
-        }
+        curl_easy_setopt(e, CURLOPT_CAINFO, web->curl_ca_bundle);
     }
     else
     {
+        curl_easy_setopt(e, CURLOPT_SSL_CTX_FUNCTION, ssl_context_func);
+    }
+
+    if (!web->curl_proxy_ssl_verify)
+    {
         curl_easy_setopt(e, CURLOPT_PROXY_SSL_VERIFYHOST, 0L);
         curl_easy_setopt(e, CURLOPT_PROXY_SSL_VERIFYPEER, 0L);
+    }
+    else if (web->curl_ca_bundle != nullptr)
+    {
+        curl_easy_setopt(e, CURLOPT_PROXY_CAINFO, web->curl_ca_bundle);
     }
 
     curl_easy_setopt(e, CURLOPT_TIMEOUT, task->timeoutSecs());
