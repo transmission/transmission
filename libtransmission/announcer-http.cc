@@ -121,26 +121,6 @@ static std::string announce_url_new(tr_session const* session, tr_announce_reque
     return evbuffer_free_to_str(buf);
 }
 
-struct announce_data
-{
-    tr_announce_response response;
-    tr_announce_response_func response_func;
-    void* response_func_user_data;
-    char log_name[128];
-};
-
-static void on_announce_done_eventthread(void* vdata)
-{
-    auto* data = static_cast<struct announce_data*>(vdata);
-
-    if (data->response_func != nullptr)
-    {
-        data->response_func(&data->response, data->response_func_user_data);
-    }
-
-    delete data;
-}
-
 static void verboseLog(std::string_view description, tr_direction direction, std::string_view message)
 {
     auto& out = std::cerr;
@@ -293,8 +273,16 @@ void tr_announcerParseHttpAnnounceResponse(tr_announce_response& response, std::
     }
 }
 
+struct announce_data
+{
+    tr_announce_response response;
+    tr_announce_response_func response_func;
+    void* response_func_user_data;
+    char log_name[128];
+};
+
 static void on_announce_done(
-    tr_session* session,
+    tr_session* /*session*/,
     bool did_connect,
     bool did_timeout,
     long response_code,
@@ -328,7 +316,12 @@ static void on_announce_done(
         dbgmsg(data->log_name, "got a peers length of %zu", std::size(response->pex));
     }
 
-    tr_runInEventThread(session, on_announce_done_eventthread, data);
+    if (data->response_func != nullptr)
+    {
+        data->response_func(&data->response, data->response_func_user_data);
+    }
+
+    delete data;
 }
 
 void tr_tracker_http_announce(
@@ -358,26 +351,6 @@ void tr_tracker_http_announce(
 *****  SCRAPE
 *****
 ****/
-
-struct scrape_data
-{
-    tr_scrape_response response;
-    tr_scrape_response_func response_func;
-    void* response_func_user_data;
-    char log_name[128];
-};
-
-static void on_scrape_done_eventthread(void* vdata)
-{
-    auto* data = static_cast<struct scrape_data*>(vdata);
-
-    if (data->response_func != nullptr)
-    {
-        data->response_func(&data->response, data->response_func_user_data);
-    }
-
-    delete data;
-}
 
 void tr_announcerParseHttpScrapeResponse(tr_scrape_response& response, std::string_view benc)
 {
@@ -469,8 +442,16 @@ void tr_announcerParseHttpScrapeResponse(tr_scrape_response& response, std::stri
     }
 }
 
+struct scrape_data
+{
+    tr_scrape_response response;
+    tr_scrape_response_func response_func;
+    void* response_func_user_data;
+    char log_name[128];
+};
+
 static void on_scrape_done(
-    tr_session* session,
+    tr_session* /*session*/,
     bool did_connect,
     bool did_timeout,
     long response_code,
@@ -499,7 +480,12 @@ static void on_scrape_done(
         tr_announcerParseHttpScrapeResponse(response, msg);
     }
 
-    tr_runInEventThread(session, on_scrape_done_eventthread, data);
+    if (data->response_func != nullptr)
+    {
+        data->response_func(&data->response, data->response_func_user_data);
+    }
+
+    delete data;
 }
 
 static std::string scrape_url_new(tr_scrape_request const* req)
