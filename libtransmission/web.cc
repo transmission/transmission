@@ -4,9 +4,8 @@
 // License text can be found in the licenses/ folder.
 
 #include <algorithm>
-#include <cstring>
+#include <memory>
 #include <mutex>
-#include <set>
 #include <string>
 #include <string_view>
 #include <thread>
@@ -20,22 +19,14 @@
 
 #include <event2/buffer.h>
 
-#include "transmission.h"
 #include "crypto-utils.h"
-#include "file.h"
 #include "log.h"
-#include "torrent.h"
-#include "session.h"
-#include "tr-assert.h"
-#include "tr-macros.h"
-#include "trevent.h" /* tr_runInEventThread() */
 #include "utils.h"
-#include "version.h" /* User-Agent */
 #include "web.h"
 
 using namespace std::literals;
 
-#if LIBCURL_VERSION_NUM >= 0x070F06 /* CURLOPT_SOCKOPT* was added in 7.15.6 */
+#if LIBCURL_VERSION_NUM >= 0x070F06 // CURLOPT_SOCKOPT* was added in 7.15.6
 #define USE_LIBCURL_SOCKOPT
 #endif
 
@@ -45,7 +36,7 @@ using namespace std::literals;
 ****
 ***/
 
-struct tr_web_task
+class tr_web_task
 {
 private:
     std::shared_ptr<evbuffer> const privbuf{ evbuffer_new(), evbuffer_free };
@@ -53,10 +44,11 @@ private:
     tr_web::RunOptions const options;
 
 public:
-    tr_web_task(tr_session* session_in, tr_web::RunOptions&& options_in)
+    tr_web_task(tr_web::Controller const& controller_in, tr_web::RunOptions&& options_in)
         : options{ std::move(options_in) }
-        , session{ session_in }
+        , controller{ controller_in }
     {
+        response.user_data = options.done_func_user_data;
     }
 
     [[nodiscard]] auto* easy() const
@@ -64,7 +56,7 @@ public:
         return easy_handle.get();
     }
 
-    [[nodiscard]] auto* response() const
+    [[nodiscard]] auto* body() const
     {
         return options.buffer != nullptr ? options.buffer : privbuf.get();
     }
@@ -104,25 +96,20 @@ public:
         return options.timeout_secs;
     }
 
-    void done() const
+    void done()
     {
         if (options.done_func == nullptr)
         {
             return;
         }
 
-        auto const sv = std::string_view{ reinterpret_cast<char const*>(evbuffer_pullup(response(), -1)),
-                                          evbuffer_get_length(response()) };
-        options.done_func(response_code, sv, did_connect, did_timeout, options.done_func_user_data);
+        response.body.assign(reinterpret_cast<char const*>(evbuffer_pullup(body(), -1)), evbuffer_get_length(body()));
+        options.done_func(std::move(this->response));
     }
 
-    tr_session* const session;
-
+    tr_web::Controller const& controller;
+    tr_web::Response response;
     tr_web_task* next = nullptr;
-
-    long response_code = 0;
-    bool did_connect = false;
-    bool did_timeout = false;
 };
 
 /***
@@ -216,10 +203,11 @@ static CURLcode ssl_context_func(CURL* /*curl*/, void* ssl_ctx, void* /*user_dat
 
 class tr_web::Impl
 {
+    friend class tr_web_task;
+
 public:
-    Impl(Controller const& controller_in, tr_session* session_in)
+    Impl(Controller const& controller_in)
         : controller{ controller_in }
-        , session{ session_in }
     {
         std::call_once(curl_init_flag, curlInit);
 
@@ -237,9 +225,14 @@ public:
             tr_logAddNamedInfo("web", "NB: Invalid certs will appear as 'Could not connect to tracker' like many other errors");
         }
 
-        if (auto const file = controller.cookieFile(); file)
+        if (auto const& file = controller.cookieFile(); file)
         {
-            cookie_file = *file;
+            this->cookie_file = *file;
+        }
+
+        if (auto const& ua = controller.userAgent(); ua)
+        {
+            this->user_agent = *ua;
         }
 
         curl_thread = std::make_unique<std::thread>(tr_webThreadFunc, this);
@@ -269,7 +262,7 @@ public:
         }
 
         auto const lock = std::unique_lock(web_tasks_mutex);
-        auto* const task = new tr_web_task{ session, std::move(options) };
+        auto* const task = new tr_web_task{ controller, std::move(options) };
         task->next = tasks;
         tasks = task;
     }
@@ -282,7 +275,6 @@ private:
     bool const curl_proxy_ssl_verify = !tr_env_key_exists("TR_CURL_PROXY_SSL_NO_VERIFY");
 
     Controller const& controller;
-    tr_session* const session;
 
     std::string curl_ca_bundle;
 
@@ -290,6 +282,7 @@ private:
     tr_web_task* tasks = nullptr;
 
     std::string cookie_file;
+    std::string user_agent;
 
     std::unique_ptr<std::thread> curl_thread;
 
@@ -307,7 +300,7 @@ private:
         size_t const byteCount = size * nmemb;
         auto* task = static_cast<tr_web_task*>(vtask);
 
-        evbuffer_add(task->response(), ptr, byteCount);
+        evbuffer_add(task->body(), ptr, byteCount);
         dbgmsg("wrote %zu bytes to task %p's buffer", byteCount, (void*)task);
         return byteCount;
     }
@@ -352,20 +345,24 @@ private:
             curl_easy_setopt(e, CURLOPT_PROXY_CAINFO, impl->curl_ca_bundle.c_str());
         }
 
-        curl_easy_setopt(e, CURLOPT_TIMEOUT, task->timeoutSecs());
-        curl_easy_setopt(e, CURLOPT_URL, task->url().c_str());
-        curl_easy_setopt(e, CURLOPT_USERAGENT, TR_NAME "/" SHORT_VERSION_STRING);
-        curl_easy_setopt(e, CURLOPT_VERBOSE, (long)(impl->curl_verbose ? 1 : 0));
-        curl_easy_setopt(e, CURLOPT_WRITEDATA, task);
-        curl_easy_setopt(e, CURLOPT_WRITEFUNCTION, onDataReceived);
+        if (auto const& ua = impl->user_agent; !std::empty(ua))
+        {
+            curl_easy_setopt(e, CURLOPT_USERAGENT, ua.c_str());
+        }
 
         if (auto const& tag = task->speedLimitTag(); tag)
         {
-            if (auto const limit = controller.desiredSpeedBytesPerSecond(*tag); limit)
+            if (auto const limit = task->controller.desiredSpeedBytesPerSecond(*tag); limit)
             {
-                (void)curl_easy_setopt(e, CURLOPT_MAX_RECV_SPEED_LARGE, *limit);
+                (void)curl_easy_setopt(task->easy(), CURLOPT_MAX_RECV_SPEED_LARGE, *limit);
             }
         }
+
+        curl_easy_setopt(e, CURLOPT_TIMEOUT, task->timeoutSecs());
+        curl_easy_setopt(e, CURLOPT_URL, task->url().c_str());
+        curl_easy_setopt(e, CURLOPT_VERBOSE, impl->curl_verbose ? 1L : 0L);
+        curl_easy_setopt(e, CURLOPT_WRITEDATA, task);
+        curl_easy_setopt(e, CURLOPT_WRITEFUNCTION, onDataReceived);
 
         if (auto const addrstr = controller.publicAddress(); addrstr)
         {
@@ -388,13 +385,6 @@ private:
             /* don't bother asking the server to compress webseed fragments */
             curl_easy_setopt(e, CURLOPT_ENCODING, "identity");
         }
-    }
-
-    static void task_finish_func(void* vtask)
-    {
-        auto* task = static_cast<tr_web_task*>(vtask);
-        task->done();
-        delete task;
     }
 
     long getWaitMsec(CURLM* const multi) const
@@ -492,17 +482,17 @@ private:
 
                     tr_web_task* task = nullptr;
                     curl_easy_getinfo(e, CURLINFO_PRIVATE, (void*)&task);
-                    TR_ASSERT(e == task->curl_easy);
 
                     auto req_bytes_sent = long{};
                     auto total_time = double{};
-                    curl_easy_getinfo(e, CURLINFO_RESPONSE_CODE, &task->response_code);
                     curl_easy_getinfo(e, CURLINFO_REQUEST_SIZE, &req_bytes_sent);
                     curl_easy_getinfo(e, CURLINFO_TOTAL_TIME, &total_time);
-                    task->did_connect = task->response_code > 0 || req_bytes_sent > 0;
-                    task->did_timeout = task->response_code == 0 && total_time >= task->timeoutSecs();
+                    curl_easy_getinfo(e, CURLINFO_RESPONSE_CODE, &task->response.status);
+                    task->response.did_connect = task->response.status > 0 || req_bytes_sent > 0;
+                    task->response.did_timeout = task->response.status == 0 && total_time >= task->timeoutSecs();
                     curl_multi_remove_handle(multi.get(), e);
-                    tr_runInEventThread(task->session, task_finish_func, task);
+                    task->done();
+                    delete task;
                 }
             }
         }
@@ -538,16 +528,16 @@ private:
 
 std::once_flag tr_web::Impl::curl_init_flag;
 
-tr_web::tr_web(Controller const& controller, tr_session* session)
-    : impl_{ std::make_unique<Impl>(controller, session) }
+tr_web::tr_web(Controller const& controller)
+    : impl_{ std::make_unique<Impl>(controller) }
 {
 }
 
 tr_web::~tr_web() = default;
 
-std::unique_ptr<tr_web> tr_web::create(Controller const& controller, tr_session* session)
+std::unique_ptr<tr_web> tr_web::create(Controller const& controller)
 {
-    return std::unique_ptr<tr_web>(new tr_web(controller, session));
+    return std::unique_ptr<tr_web>(new tr_web(controller));
 }
 
 void tr_web::run(RunOptions&& options)
@@ -563,9 +553,4 @@ bool tr_web::isClosed() const
 void tr_web::closeSoon()
 {
     impl_->closeSoon();
-}
-
-void tr_sessionFetch(tr_session* session, tr_web::RunOptions&& options)
-{
-    session->web->run(std::move(options));
 }

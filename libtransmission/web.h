@@ -11,11 +11,21 @@
 #include <string_view>
 
 struct evbuffer;
-struct tr_session;
 
 class tr_web
 {
 public:
+    struct Response
+    {
+        long status;
+        std::string body;
+        bool did_connect;
+        bool did_timeout;
+        void* user_data;
+    };
+
+    using done_func = void (*)(Response&& response);
+
     class Controller
     {
     public:
@@ -31,17 +41,24 @@ public:
             return std::nullopt;
         }
 
+        [[nodiscard]] virtual std::optional<std::string> userAgent() const
+        {
+            return std::nullopt;
+        }
+
         [[nodiscard]] virtual std::optional<long> desiredSpeedBytesPerSecond([[maybe_unused]] int speed_limit_tag) const
         {
             return std::nullopt;
         }
+
+        virtual void run(done_func func, Response&& response) const
+        {
+            func(std::move(response));
+        }
     };
 
-    static std::unique_ptr<tr_web> create(Controller const& controller, tr_session* session);
+    static std::unique_ptr<tr_web> create(Controller const& controller);
     ~tr_web();
-
-    using done_func =
-        void (*)(long response_code, std::string_view response, bool did_connect, bool did_timeout, void* user_data);
 
     class RunOptions
     {
@@ -74,7 +91,7 @@ public:
 private:
     class Impl;
     std::unique_ptr<Impl> const impl_;
-    explicit tr_web(Controller const& controller, tr_session* session);
+    explicit tr_web(Controller const& controller);
 };
 
-void tr_sessionFetch(tr_session* session, tr_web::RunOptions&& options);
+void tr_sessionFetch(struct tr_session* session, tr_web::RunOptions&& options);

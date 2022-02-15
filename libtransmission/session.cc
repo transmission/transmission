@@ -124,6 +124,11 @@ std::optional<std::string> tr_session::WebController::cookieFile() const
     return tr_sys_path_exists(str.c_str(), nullptr) ? std::optional<std::string>{ str } : std::nullopt;
 }
 
+std::optional<std::string> tr_session::WebController::userAgent() const
+{
+    return tr_strvJoin(TR_NAME, "/"sv, SHORT_VERSION_STRING);
+}
+
 std::optional<std::string> tr_session::WebController::publicAddress() const
 {
     for (auto const type : { TR_AF_INET, TR_AF_INET6 })
@@ -154,6 +159,25 @@ std::optional<long> tr_session::WebController::desiredSpeedBytesPerSecond(int sp
     }
 
     return static_cast<long>(tor->bandwidth->getDesiredSpeedBytesPerSecond(TR_DOWN));
+}
+
+void tr_session::WebController::run(tr_web::done_func func, tr_web::Response&& response) const
+{
+    using wrapper_t = std::pair<tr_web::done_func, tr_web::Response>;
+
+    auto constexpr callback = [](void* vwrapped)
+    {
+        auto* const wrapped = static_cast<wrapper_t*>(vwrapped);
+        wrapped->first(std::move(wrapped->second));
+        delete wrapped;
+    };
+
+    tr_runInEventThread(session_, callback, new wrapper_t{ func, std::move(response) });
+}
+
+void tr_sessionFetch(tr_session* session, tr_web::RunOptions&& options)
+{
+    session->web->run(std::move(options));
 }
 
 /***
@@ -735,7 +759,7 @@ static void tr_sessionInitImpl(void* vdata)
 
     tr_udpInit(session);
 
-    session->web = tr_web::create(session->web_controller, session);
+    session->web = tr_web::create(session->web_controller);
 
     if (session->isLPDEnabled)
     {

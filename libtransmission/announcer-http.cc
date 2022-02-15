@@ -281,8 +281,9 @@ struct announce_data
     char log_name[128];
 };
 
-static void on_announce_done(long response_code, std::string_view msg, bool did_connect, bool did_timeout, void* vdata)
+static void onAnnounceDone(tr_web::Response&& web_response)
 {
+    auto const& [status, body, did_connect, did_timeout, vdata] = web_response;
     auto* data = static_cast<struct announce_data*>(vdata);
 
     tr_announce_response* const response = &data->response;
@@ -290,14 +291,14 @@ static void on_announce_done(long response_code, std::string_view msg, bool did_
     response->did_timeout = did_timeout;
     dbgmsg(data->log_name, "Got announce response");
 
-    if (response_code != HTTP_OK)
+    if (status != HTTP_OK)
     {
-        auto const* const response_str = tr_webGetResponseStr(response_code);
-        response->errmsg = tr_strvJoin("Tracker HTTP response "sv, std::to_string(response_code), " ("sv, response_str, ")"sv);
+        auto const* const response_str = tr_webGetResponseStr(status);
+        response->errmsg = tr_strvJoin("Tracker HTTP response "sv, std::to_string(status), " ("sv, response_str, ")"sv);
     }
     else
     {
-        tr_announcerParseHttpAnnounceResponse(*response, msg);
+        tr_announcerParseHttpAnnounceResponse(*response, body);
     }
 
     if (!std::empty(response->pex6))
@@ -333,7 +334,7 @@ void tr_tracker_http_announce(
     auto const url = announce_url_new(session, request);
     dbgmsg(request->log_name, "Sending announce to libcurl: \"%" TR_PRIsv "\"", TR_PRIsv_ARG(url));
 
-    auto options = tr_web::RunOptions{ url, on_announce_done, d };
+    auto options = tr_web::RunOptions{ url, onAnnounceDone, d };
     options.timeout_secs = 90L;
     options.sndbuf = 1024;
     options.rcvbuf = 3072;
@@ -444,9 +445,10 @@ struct scrape_data
     char log_name[128];
 };
 
-static void on_scrape_done(long response_code, std::string_view msg, bool did_connect, bool did_timeout, void* vdata)
+static void onScrapeDone(tr_web::Response&& web_response)
 {
-    auto* data = static_cast<struct scrape_data*>(vdata);
+    auto const& [status, body, did_connect, did_timeout, vdata] = web_response;
+    auto* const data = static_cast<struct scrape_data*>(vdata);
 
     tr_scrape_response& response = data->response;
     response.did_connect = did_connect;
@@ -455,17 +457,14 @@ static void on_scrape_done(long response_code, std::string_view msg, bool did_co
     auto const scrape_url_sv = response.scrape_url.sv();
     dbgmsg(data->log_name, "Got scrape response for \"%" TR_PRIsv "\"", TR_PRIsv_ARG(scrape_url_sv));
 
-    if (response_code != HTTP_OK)
+    if (status != HTTP_OK)
     {
-        char const* fmt = _("Tracker gave HTTP response code %1$ld (%2$s)");
-        char const* response_str = tr_webGetResponseStr(response_code);
-        char buf[512];
-        tr_snprintf(buf, sizeof(buf), fmt, response_code, response_str);
-        response.errmsg = buf;
+        auto const* const response_str = tr_webGetResponseStr(status);
+        response.errmsg = tr_strvJoin("Tracker HTTP response "sv, std::to_string(status), " ("sv, response_str, ")"sv);
     }
     else
     {
-        tr_announcerParseHttpScrapeResponse(response, msg);
+        tr_announcerParseHttpScrapeResponse(response, body);
     }
 
     if (data->response_func != nullptr)
@@ -520,7 +519,7 @@ void tr_tracker_http_scrape(
     auto const url = scrape_url_new(request);
     dbgmsg(request->log_name, "Sending scrape to libcurl: \"%" TR_PRIsv "\"", TR_PRIsv_ARG(url));
 
-    auto options = tr_web::RunOptions{ url, on_scrape_done, d };
+    auto options = tr_web::RunOptions{ url, onScrapeDone, d };
     options.timeout_secs = 30L;
     options.sndbuf = 4096;
     options.rcvbuf = 4096;

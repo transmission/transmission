@@ -346,10 +346,12 @@ public:
         ~WebController() override = default;
         [[nodiscard]] std::optional<std::string> cookieFile() const override;
         [[nodiscard]] std::optional<std::string> publicAddress() const override;
+        [[nodiscard]] std::optional<std::string> userAgent() const override;
         [[nodiscard]] std::optional<long> desiredSpeedBytesPerSecond(int speed_limit_tag) const override;
+        void run(tr_web::done_func func, tr_web::Response&& response) const override;
 
     private:
-        tr_session const* const session_;
+        tr_session* const session_;
     };
 
     WebController web_controller{ this };
