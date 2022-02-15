@@ -513,7 +513,7 @@ void task_request_next_chunk(tr_webseed_task* t)
     auto const url = make_url(t->webseed, tor->fileSubpath(file_index));
     auto options = tr_web::RunOptions{ url, web_response_func, t };
     options.range = tr_strvJoin(std::to_string(file_offset), "-"sv, std::to_string(file_offset + this_pass - 1));
-    options.torrent_id = tor->uniqueId;
+    options.speed_limit_tag = tor->uniqueId;
     options.buffer = t->content();
     tor->session->web->run(std::move(options));
 }

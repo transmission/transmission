@@ -118,6 +118,48 @@ tr_peer_id_t tr_peerIdInit()
 ****
 ***/
 
+std::optional<std::string> tr_session::WebController::cookieFile() const
+{
+    auto const str = tr_strvPath(session_->config_dir, "cookies.txt");
+    return tr_sys_path_exists(str.c_str(), nullptr) ? std::optional<std::string>{ str } : std::nullopt;
+}
+
+std::optional<std::string> tr_session::WebController::publicAddress() const
+{
+    for (auto const type : { TR_AF_INET, TR_AF_INET6 })
+    {
+        auto is_default_value = bool{};
+        tr_address const* addr = tr_sessionGetPublicAddress(session_, type, &is_default_value);
+        if (addr != nullptr && !is_default_value)
+        {
+            return tr_address_to_string(addr);
+        }
+    }
+
+    return std::nullopt;
+}
+
+std::optional<long> tr_session::WebController::desiredSpeedBytesPerSecond(int speed_limit_tag) const
+{
+    auto const it = session_->torrentsById.find(speed_limit_tag);
+    if (it == std::end(session_->torrentsById))
+    {
+        return {};
+    }
+
+    auto const* const tor = it->second;
+    if (!tor->bandwidth->isLimited(TR_DOWN))
+    {
+        return {};
+    }
+
+    return static_cast<long>(tor->bandwidth->getDesiredSpeedBytesPerSecond(TR_DOWN));
+}
+
+/***
+****
+***/
+
 tr_encryption_mode tr_sessionGetEncryption(tr_session* session)
 {
     TR_ASSERT(session != nullptr);
@@ -693,7 +735,7 @@ static void tr_sessionInitImpl(void* vdata)
 
     tr_udpInit(session);
 
-    session->web = tr_web::create(session);
+    session->web = tr_web::create(session->web_controller, session);
 
     if (session->isLPDEnabled)
     {

@@ -16,7 +16,28 @@ struct tr_session;
 class tr_web
 {
 public:
-    static std::unique_ptr<tr_web> create(tr_session* session);
+    class Controller
+    {
+    public:
+        virtual ~Controller() = default;
+
+        [[nodiscard]] virtual std::optional<std::string> cookieFile() const
+        {
+            return std::nullopt;
+        }
+
+        [[nodiscard]] virtual std::optional<std::string> publicAddress() const
+        {
+            return std::nullopt;
+        }
+
+        [[nodiscard]] virtual std::optional<long> desiredSpeedBytesPerSecond([[maybe_unused]] int speed_limit_tag) const
+        {
+            return std::nullopt;
+        }
+    };
+
+    static std::unique_ptr<tr_web> create(Controller const& controller, tr_session* session);
     ~tr_web();
 
     using tr_web_done_func = void (*)(
@@ -42,7 +63,7 @@ public:
         std::string url;
         std::string range;
         std::string cookies;
-        std::optional<int> torrent_id;
+        std::optional<int> speed_limit_tag;
         std::optional<int> sndbuf;
         std::optional<int> rcvbuf;
         tr_web_done_func done_func = nullptr;
@@ -58,7 +79,7 @@ public:
 private:
     class Impl;
     std::unique_ptr<Impl> const impl_;
-    explicit tr_web(tr_session* session);
+    explicit tr_web(Controller const& controller, tr_session* session);
 };
 
 void tr_sessionFetch(tr_session* session, tr_web::RunOptions&& options);
