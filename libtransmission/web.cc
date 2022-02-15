@@ -51,6 +51,7 @@ struct tr_web_task
 {
 private:
     std::shared_ptr<evbuffer> const privbuf{ evbuffer_new(), evbuffer_free };
+    std::shared_ptr<CURL> const easy_handle{ curl_easy_init(), curl_easy_cleanup };
     tr_web_options const options;
 
 public:
@@ -58,6 +59,11 @@ public:
         : options{ std::move(options_in) }
         , session{ session_in }
     {
+    }
+
+    [[nodiscard]] auto* easy() const
+    {
+        return easy_handle.get();
     }
 
     [[nodiscard]] auto* response() const
@@ -114,7 +120,6 @@ public:
 
     tr_session* const session;
 
-    CURL* curl_easy = nullptr;
     tr_web_task* next = nullptr;
 
     long response_code = 0;
@@ -158,7 +163,7 @@ static size_t writeFunc(void* ptr, size_t size, size_t nmemb, void* vtask)
 
         if (tor != nullptr && tor->bandwidth->clamp(TR_DOWN, nmemb) == 0)
         {
-            task->session->web->paused_easy_handles.insert(task->curl_easy);
+            task->session->web->paused_easy_handles.insert(task->easy());
             return CURL_WRITEFUNC_PAUSE;
         }
     }
@@ -249,11 +254,9 @@ static CURLcode ssl_context_func(CURL* /*curl*/, void* ssl_ctx, void* /*user_dat
     return CURLE_OK;
 }
 
-static CURL* createEasy(tr_session* s, struct tr_web* web, struct tr_web_task* task)
+static void initEasy(tr_session* s, struct tr_web* web, struct tr_web_task* task)
 {
-    CURL* const e = curl_easy_init();
-
-    task->curl_easy = e;
+    auto* const e = task->easy();
 
     curl_easy_setopt(e, CURLOPT_AUTOREFERER, 1L);
     curl_easy_setopt(e, CURLOPT_ENCODING, "");
@@ -327,8 +330,6 @@ static CURL* createEasy(tr_session* s, struct tr_web* web, struct tr_web_task* t
         /* don't bother asking the server to compress webseed fragments */
         curl_easy_setopt(e, CURLOPT_ENCODING, "identity");
     }
-
-    return e;
 }
 
 static void task_finish_func(void* vtask)
@@ -424,7 +425,8 @@ static void tr_webThreadFunc(void* vsession)
                 task->next = nullptr;
 
                 dbgmsg("adding task to curl: [%s]", task->url().c_str());
-                curl_multi_add_handle(multi, createEasy(session, web, task));
+                initEasy(session, web, task);
+                curl_multi_add_handle(multi, task->easy());
             }
         }
 
@@ -503,7 +505,6 @@ static void tr_webThreadFunc(void* vsession)
                 task->did_timeout = task->response_code == 0 && total_time >= task->timeoutSecs();
                 curl_multi_remove_handle(multi, e);
                 web->paused_easy_handles.erase(e);
-                curl_easy_cleanup(e);
                 tr_runInEventThread(task->session, task_finish_func, task);
             }
         }
