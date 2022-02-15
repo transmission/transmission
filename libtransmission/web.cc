@@ -131,7 +131,7 @@ public:
 
 #ifdef USE_LIBCURL_SOCKOPT
 
-static int sockoptfunction(void* vtask, curl_socket_t fd, curlsocktype /*purpose*/)
+static int onSocketCreated(void* vtask, curl_socket_t fd, curlsocktype /*purpose*/)
 {
     auto const* const task = static_cast<tr_web_task const*>(vtask);
 
@@ -302,7 +302,7 @@ private:
 
     RunMode run_mode = RunMode::Run;
 
-    static size_t writeFunc(void* ptr, size_t size, size_t nmemb, void* vtask)
+    static size_t onDataReceived(void* ptr, size_t size, size_t nmemb, void* vtask)
     {
         size_t const byteCount = size * nmemb;
         auto* task = static_cast<tr_web_task*>(vtask);
@@ -324,7 +324,7 @@ private:
         curl_easy_setopt(e, CURLOPT_PRIVATE, task);
 
 #ifdef USE_LIBCURL_SOCKOPT
-        curl_easy_setopt(e, CURLOPT_SOCKOPTFUNCTION, sockoptfunction);
+        curl_easy_setopt(e, CURLOPT_SOCKOPTFUNCTION, onSocketCreated);
         curl_easy_setopt(e, CURLOPT_SOCKOPTDATA, task);
 #endif
 
@@ -357,7 +357,7 @@ private:
         curl_easy_setopt(e, CURLOPT_USERAGENT, TR_NAME "/" SHORT_VERSION_STRING);
         curl_easy_setopt(e, CURLOPT_VERBOSE, (long)(impl->curl_verbose ? 1 : 0));
         curl_easy_setopt(e, CURLOPT_WRITEDATA, task);
-        curl_easy_setopt(e, CURLOPT_WRITEFUNCTION, writeFunc);
+        curl_easy_setopt(e, CURLOPT_WRITEFUNCTION, onDataReceived);
 
         if (auto const& tag = task->speedLimitTag(); tag)
         {
