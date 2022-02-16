@@ -798,6 +798,7 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
         else if (isNewTorrentASeed(tor))
         {
             tor->completion.setHasAll();
+            tor->doneDate = tor->addedDate;
             tor->recheckCompleteness();
         }
         else
