@@ -29,6 +29,7 @@
 
 #include "net.h" // tr_socket_t
 #include "quark.h"
+#include "web.h"
 
 enum tr_auto_switch_state_t
 {
@@ -44,6 +45,7 @@ struct evdns_base;
 
 class tr_bitfield;
 class tr_rpc_server;
+class tr_web;
 struct Bandwidth;
 struct tr_address;
 struct tr_announcer;
@@ -334,7 +336,29 @@ public:
 
     struct tr_cache* cache;
 
-    struct tr_web* web;
+    class WebController final : public tr_web::Controller
+    {
+    public:
+        explicit WebController(tr_session* session)
+            : session_{ session }
+        {
+        }
+        ~WebController() override = default;
+
+        [[nodiscard]] std::optional<std::string> cookieFile() const override;
+        [[nodiscard]] std::optional<std::string> publicAddress() const override;
+        [[nodiscard]] std::optional<std::string> userAgent() const override;
+        [[nodiscard]] unsigned int clamp(int bandwidth_tag, unsigned int byte_count) const override;
+        void notifyBandwidthConsumed(int torrent_id, size_t byte_count) override;
+        // runs the tr_web::fetch response callback in the libtransmission thread
+        void run(tr_web::FetchDoneFunc func, tr_web::FetchResponse&& response) const override;
+
+    private:
+        tr_session* const session_;
+    };
+
+    WebController web_controller{ this };
+    std::unique_ptr<tr_web> web;
 
     struct tr_session_id* session_id;
 

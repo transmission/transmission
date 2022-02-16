@@ -118,6 +118,74 @@ tr_peer_id_t tr_peerIdInit()
 ****
 ***/
 
+std::optional<std::string> tr_session::WebController::cookieFile() const
+{
+    auto const str = tr_strvPath(session_->config_dir, "cookies.txt");
+    return tr_sys_path_exists(str.c_str(), nullptr) ? std::optional<std::string>{ str } : std::nullopt;
+}
+
+std::optional<std::string> tr_session::WebController::userAgent() const
+{
+    return tr_strvJoin(TR_NAME, "/"sv, SHORT_VERSION_STRING);
+}
+
+std::optional<std::string> tr_session::WebController::publicAddress() const
+{
+    for (auto const type : { TR_AF_INET, TR_AF_INET6 })
+    {
+        auto is_default_value = bool{};
+        tr_address const* addr = tr_sessionGetPublicAddress(session_, type, &is_default_value);
+        if (addr != nullptr && !is_default_value)
+        {
+            return tr_address_to_string(addr);
+        }
+    }
+
+    return std::nullopt;
+}
+
+unsigned int tr_session::WebController::clamp(int torrent_id, unsigned int byte_count) const
+{
+    auto const lock = session_->unique_lock();
+    auto const it = session_->torrentsById.find(torrent_id);
+    return it == std::end(session_->torrentsById) ? 0U : it->second->bandwidth->clamp(TR_DOWN, byte_count);
+}
+
+void tr_session::WebController::notifyBandwidthConsumed(int torrent_id, size_t byte_count)
+{
+    auto const lock = session_->unique_lock();
+    auto const it = session_->torrentsById.find(torrent_id);
+    if (it != std::end(session_->torrentsById))
+    {
+        it->second->bandwidth->notifyBandwidthConsumed(TR_DOWN, byte_count, true, tr_time_msec());
+    }
+}
+
+void tr_session::WebController::run(tr_web::FetchDoneFunc func, tr_web::FetchResponse&& response) const
+{
+    // marshall the `func` call into the libtransmission thread
+
+    using wrapper_t = std::pair<tr_web::FetchDoneFunc, tr_web::FetchResponse>;
+
+    auto constexpr callback = [](void* vwrapped)
+    {
+        auto* const wrapped = static_cast<wrapper_t*>(vwrapped);
+        wrapped->first(std::move(wrapped->second));
+        delete wrapped;
+    };
+
+    tr_runInEventThread(session_, callback, new wrapper_t{ func, std::move(response) });
+}
+
+void tr_sessionFetch(tr_session* session, tr_web::FetchOptions&& options)
+{
+    session->web->fetch(std::move(options));
+}
+
+/***
+****
+***/
+
 tr_encryption_mode tr_sessionGetEncryption(tr_session* session)
 {
     TR_ASSERT(session != nullptr);
@@ -692,6 +760,8 @@ static void tr_sessionInitImpl(void* vdata)
     tr_sessionSet(session, &settings);
 
     tr_udpInit(session);
+
+    session->web = tr_web::create(session->web_controller);
 
     if (session->isLPDEnabled)
     {
@@ -1799,7 +1869,7 @@ static void sessionCloseImplStart(tr_session* session)
 
     /* and this goes *after* announcer close so that
        it won't be idle until the announce events are sent... */
-    tr_webClose(session, TR_WEB_CLOSE_WHEN_IDLE);
+    session->web->closeSoon();
 
     tr_cacheFree(session->cache);
     session->cache = nullptr;
@@ -1890,7 +1960,7 @@ void tr_sessionClose(tr_session* session)
      * so we need to keep the transmission thread alive
      * for a bit while they tell the router & tracker
      * that we're closing now */
-    while ((session->shared != nullptr || session->web != nullptr || session->announcer != nullptr ||
+    while ((session->shared != nullptr || !session->web->isClosed() || session->announcer != nullptr ||
             session->announcer_udp != nullptr) &&
            !deadlineReached(deadline))
     {
@@ -1903,7 +1973,7 @@ void tr_sessionClose(tr_session* session)
         tr_wait_msec(50);
     }
 
-    tr_webClose(session, TR_WEB_CLOSE_NOW);
+    session->web.reset();
 
     /* close the libtransmission thread */
     tr_eventClose(session);
