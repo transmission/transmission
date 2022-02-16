@@ -231,7 +231,7 @@ private:
             }
 
             response.body.assign(reinterpret_cast<char const*>(evbuffer_pullup(body(), -1)), evbuffer_get_length(body()));
-            options.done_func(std::move(this->response));
+            impl.controller.run(options.done_func, std::move(this->response));
         }
 
         tr_web::Impl& impl;

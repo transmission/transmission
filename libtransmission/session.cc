@@ -163,6 +163,8 @@ void tr_session::WebController::notifyBandwidthConsumed(int torrent_id, size_t b
 
 void tr_session::WebController::run(tr_web::done_func func, tr_web::Response&& response) const
 {
+    // marshall the `func` call into the libtransmission thread
+
     using wrapper_t = std::pair<tr_web::done_func, tr_web::Response>;
 
     auto constexpr callback = [](void* vwrapped)
