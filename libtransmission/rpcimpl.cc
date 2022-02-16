@@ -1340,7 +1340,7 @@ static char const* torrentRenamePath(
 ****
 ***/
 
-static void portTested(tr_web::Response&& web_response)
+static void portTested(tr_web::FetchResponse&& web_response)
 {
     auto const& [status, body, did_connect, did_tmieout, user_data] = web_response;
     char result[1024];
@@ -1368,7 +1368,7 @@ static char const* portTest(
 {
     auto const port = tr_sessionGetPeerPort(session);
     auto const url = tr_strvJoin("https://portcheck.transmissionbt.com/"sv, std::to_string(port));
-    session->web->run({ url, portTested, idle_data });
+    session->web->fetch({ url, portTested, idle_data });
     return nullptr;
 }
 
@@ -1376,9 +1376,9 @@ static char const* portTest(
 ****
 ***/
 
-static void gotNewBlocklist(tr_web::Response&& response)
+static void gotNewBlocklist(tr_web::FetchResponse&& web_response)
 {
-    auto const& [status, body, did_connect, did_timeout, user_data] = response;
+    auto const& [status, body, did_connect, did_timeout, user_data] = web_response;
     auto* data = static_cast<struct tr_rpc_idle_data*>(user_data);
     auto* const session = data->session;
 
@@ -1446,7 +1446,7 @@ static char const* blocklistUpdate(
     tr_variant* /*args_out*/,
     struct tr_rpc_idle_data* idle_data)
 {
-    session->web->run({ session->blocklistUrl(), gotNewBlocklist, idle_data });
+    session->web->fetch({ session->blocklistUrl(), gotNewBlocklist, idle_data });
     return nullptr;
 }
 
@@ -1501,7 +1501,7 @@ struct add_torrent_idle_data
     tr_ctor* ctor;
 };
 
-static void gotMetadataFromURL(tr_web::Response&& web_response)
+static void gotMetadataFromURL(tr_web::FetchResponse&& web_response)
 {
     auto const& [status, body, did_connect, did_timeout, user_data] = web_response;
     auto* data = static_cast<struct add_torrent_idle_data*>(user_data);
@@ -1656,9 +1656,9 @@ static char const* torrentAdd(tr_session* session, tr_variant* args_in, tr_varia
         d->data = idle_data;
         d->ctor = ctor;
 
-        auto options = tr_web::RunOptions{ filename, gotMetadataFromURL, d };
+        auto options = tr_web::FetchOptions{ filename, gotMetadataFromURL, d };
         options.cookies = cookies;
-        session->web->run(std::move(options));
+        session->web->fetch(std::move(options));
     }
     else
     {

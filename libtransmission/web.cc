@@ -150,7 +150,7 @@ public:
         return is_closed_;
     }
 
-    void run(RunOptions&& options)
+    void fetch(FetchOptions&& options)
     {
         if (run_mode != RunMode::Run)
         {
@@ -169,10 +169,10 @@ private:
     private:
         std::shared_ptr<evbuffer> const privbuf{ evbuffer_new(), evbuffer_free };
         std::shared_ptr<CURL> const easy_handle{ curl_easy_init(), curl_easy_cleanup };
-        tr_web::RunOptions const options;
+        tr_web::FetchOptions const options;
 
     public:
-        Task(tr_web::Impl& impl_in, tr_web::RunOptions&& options_in)
+        Task(tr_web::Impl& impl_in, tr_web::FetchOptions&& options_in)
             : options{ std::move(options_in) }
             , impl{ impl_in }
         {
@@ -236,7 +236,7 @@ private:
         }
 
         tr_web::Impl& impl;
-        tr_web::Response response;
+        tr_web::FetchResponse response;
         Task* next = nullptr;
     };
 
@@ -387,9 +387,9 @@ private:
 
         if (auto const& range = task->range(); range)
         {
-            curl_easy_setopt(e, CURLOPT_RANGE, range->c_str());
             /* don't bother asking the server to compress webseed fragments */
             curl_easy_setopt(e, CURLOPT_ENCODING, "identity");
+            curl_easy_setopt(e, CURLOPT_RANGE, range->c_str());
         }
     }
 
@@ -419,9 +419,11 @@ private:
         }
     }
 
+    // the thread started by Impl.curl_thread runs this function
     static void tr_webThreadFunc(void* vimpl)
     {
         auto* impl = static_cast<tr_web::Impl*>(vimpl);
+        TR_ASSERT(std::this_thread::get_id() == impl->curl_thread->get_id());
 
         auto const multi = std::shared_ptr<CURLM>(curl_multi_init(), curl_multi_cleanup);
 
@@ -558,9 +560,9 @@ std::unique_ptr<tr_web> tr_web::create(Controller& controller)
     return std::unique_ptr<tr_web>(new tr_web(controller));
 }
 
-void tr_web::run(RunOptions&& options)
+void tr_web::fetch(FetchOptions&& options)
 {
-    impl_->run(std::move(options));
+    impl_->fetch(std::move(options));
 }
 
 bool tr_web::isClosed() const

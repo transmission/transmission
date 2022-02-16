@@ -161,11 +161,11 @@ void tr_session::WebController::notifyBandwidthConsumed(int torrent_id, size_t b
     }
 }
 
-void tr_session::WebController::run(tr_web::done_func func, tr_web::Response&& response) const
+void tr_session::WebController::run(tr_web::FetchDoneFunc func, tr_web::FetchResponse&& response) const
 {
     // marshall the `func` call into the libtransmission thread
 
-    using wrapper_t = std::pair<tr_web::done_func, tr_web::Response>;
+    using wrapper_t = std::pair<tr_web::FetchDoneFunc, tr_web::FetchResponse>;
 
     auto constexpr callback = [](void* vwrapped)
     {
@@ -177,9 +177,9 @@ void tr_session::WebController::run(tr_web::done_func func, tr_web::Response&& r
     tr_runInEventThread(session_, callback, new wrapper_t{ func, std::move(response) });
 }
 
-void tr_sessionFetch(tr_session* session, tr_web::RunOptions&& options)
+void tr_sessionFetch(tr_session* session, tr_web::FetchOptions&& options)
 {
-    session->web->run(std::move(options));
+    session->web->fetch(std::move(options));
 }
 
 /***

@@ -15,21 +15,84 @@ struct evbuffer;
 class tr_web
 {
 public:
-    struct Response
+    // The response struct passed to the user's FetchDoneFunc callback
+    // when a fetch() finishes.
+    struct FetchResponse
     {
-        long status;
+        long status; // http server response, e.g. 200
         std::string body;
         bool did_connect;
         bool did_timeout;
         void* user_data;
     };
 
-    using done_func = void (*)(Response&& response);
+    using FetchDoneFunc = void (*)(FetchResponse&& response);
+
+    class FetchOptions
+    {
+    public:
+        FetchOptions(std::string_view url_in, FetchDoneFunc done_func_in, void* done_func_user_data_in)
+            : url{ url_in }
+            , done_func{ done_func_in }
+            , done_func_user_data{ done_func_user_data_in }
+        {
+        }
+
+        // the URL to fetch
+        std::string url;
+
+        // Callback to invoke with a FetchResponse when done
+        FetchDoneFunc done_func = nullptr;
+        void* done_func_user_data = nullptr;
+
+        // If you need to set multiple cookies, set them all using a single
+        // option concatenated like this: "name1=content1; name2=content2;"
+        std::optional<std::string> cookies;
+
+        // https://developer.mozilla.org/en-US/docs/Web/HTTP/Range_requests
+        std::optional<std::string> range;
+
+        // Tag used by tr_web::Controller to limit some transfers' bandwidth
+        std::optional<int> speed_limit_tag;
+
+        // Optionaly set the underlying sockets' send/receive buffers' size.
+        // Can be useful for scrapes / announces where the payload is known
+        // to be small.
+        std::optional<int> sndbuf;
+        std::optional<int> rcvbuf;
+
+        // Maximum time to wait before timeout
+        int timeout_secs = DefaultTimeoutSecs;
+
+        // If provided, this buffer will be used to hold the response body.
+        // Provided for webseeds, which need to set low-level callbacks on
+        // the buffer itself.
+        evbuffer* buffer = nullptr;
+
+        static constexpr int DefaultTimeoutSecs = 120;
+    };
+
+    void fetch(FetchOptions&& options);
+
+    // Notify tr_web that it's going to be destroyed sooon.
+    // New fetch() tasks will be rejected, but already-running tasks
+    // are left alone so that they can finish.
+    void closeSoon();
+
+    // True when tr_web is ready to be destroyed.
+    // Will never be true until after closeSoon() is called.
+    [[nodiscard]] bool isClosed() const;
+
+    // closeSoon() *should* be called first, but OK to destroy tr_web before
+    // isClosed() is true, e.g. there could be a hung fetch task that hasn't
+    // timmed out yet. Deleting the tr_web object will force-terminate any
+    // pending tasks.
+    ~tr_web();
 
     /**
      * Mediates between tr_web and its clients.
      *
-     * NB: Note that tr_web calls all these methods in its own thread.
+     * NB: Note that tr_web calls all these methods in the web thread.
      */
     class Controller
     {
@@ -59,48 +122,20 @@ public:
         {
         }
 
-        // return the number of bytes that should be allowed. See Bandwidth::clamp()
+        // Return the number of bytes that should be allowed. See Bandwidth::clamp()
         [[nodiscard]] virtual unsigned int clamp([[maybe_unused]] int bandwidth_tag, unsigned int byte_count) const
         {
             return byte_count;
         }
 
-        virtual void run(done_func func, Response&& response) const
+        // Invoke the user-provided fetch callback
+        virtual void run(FetchDoneFunc func, FetchResponse&& response) const
         {
             func(std::move(response));
         }
     };
 
     static std::unique_ptr<tr_web> create(Controller& controller);
-    ~tr_web();
-
-    class RunOptions
-    {
-    public:
-        RunOptions(std::string_view url_in, done_func done_func_in, void* done_func_user_data_in)
-            : url{ url_in }
-            , done_func{ done_func_in }
-            , done_func_user_data{ done_func_user_data_in }
-        {
-        }
-
-        static constexpr int DefaultTimeoutSecs = 120;
-
-        std::string url;
-        std::optional<std::string> cookies;
-        std::optional<std::string> range;
-        std::optional<int> speed_limit_tag;
-        std::optional<int> sndbuf;
-        std::optional<int> rcvbuf;
-        done_func done_func = nullptr;
-        void* done_func_user_data = nullptr;
-        evbuffer* buffer = nullptr;
-        int timeout_secs = DefaultTimeoutSecs;
-    };
-
-    void run(RunOptions&& options);
-    void closeSoon();
-    [[nodiscard]] bool isClosed() const;
 
 private:
     class Impl;
@@ -108,4 +143,4 @@ private:
     explicit tr_web(Controller& controller);
 };
 
-void tr_sessionFetch(struct tr_session* session, tr_web::RunOptions&& options);
+void tr_sessionFetch(struct tr_session* session, tr_web::FetchOptions&& options);

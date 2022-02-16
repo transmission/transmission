@@ -405,7 +405,7 @@ void on_idle(tr_webseed* w)
     }
 }
 
-void onWebResponse(tr_web::Response&& web_response)
+void onWebResponse(tr_web::FetchResponse&& web_response)
 {
     auto const& [status, body, did_connect, did_timeout, vtask] = web_response;
     bool const success = status == 206;
@@ -508,11 +508,11 @@ void task_request_next_chunk(tr_webseed_task* t)
     uint64_t this_pass = std::min(remain, tor->fileSize(file_index) - file_offset);
 
     auto const url = make_url(t->webseed, tor->fileSubpath(file_index));
-    auto options = tr_web::RunOptions{ url, onWebResponse, t };
+    auto options = tr_web::FetchOptions{ url, onWebResponse, t };
     options.range = tr_strvJoin(std::to_string(file_offset), "-"sv, std::to_string(file_offset + this_pass - 1));
     options.speed_limit_tag = tor->uniqueId;
     options.buffer = t->content();
-    tor->session->web->run(std::move(options));
+    tor->session->web->fetch(std::move(options));
 }
 
 } // namespace

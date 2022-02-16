@@ -281,7 +281,7 @@ struct announce_data
     char log_name[128];
 };
 
-static void onAnnounceDone(tr_web::Response&& web_response)
+static void onAnnounceDone(tr_web::FetchResponse&& web_response)
 {
     auto const& [status, body, did_connect, did_timeout, vdata] = web_response;
     auto* data = static_cast<struct announce_data*>(vdata);
@@ -334,11 +334,11 @@ void tr_tracker_http_announce(
     auto const url = announce_url_new(session, request);
     dbgmsg(request->log_name, "Sending announce to libcurl: \"%" TR_PRIsv "\"", TR_PRIsv_ARG(url));
 
-    auto options = tr_web::RunOptions{ url, onAnnounceDone, d };
+    auto options = tr_web::FetchOptions{ url, onAnnounceDone, d };
     options.timeout_secs = 90L;
     options.sndbuf = 1024;
     options.rcvbuf = 3072;
-    session->web->run(std::move(options));
+    session->web->fetch(std::move(options));
 }
 
 /****
@@ -445,7 +445,7 @@ struct scrape_data
     char log_name[128];
 };
 
-static void onScrapeDone(tr_web::Response&& web_response)
+static void onScrapeDone(tr_web::FetchResponse&& web_response)
 {
     auto const& [status, body, did_connect, did_timeout, vdata] = web_response;
     auto* const data = static_cast<struct scrape_data*>(vdata);
@@ -519,9 +519,9 @@ void tr_tracker_http_scrape(
     auto const url = scrape_url_new(request);
     dbgmsg(request->log_name, "Sending scrape to libcurl: \"%" TR_PRIsv "\"", TR_PRIsv_ARG(url));
 
-    auto options = tr_web::RunOptions{ url, onScrapeDone, d };
+    auto options = tr_web::FetchOptions{ url, onScrapeDone, d };
     options.timeout_secs = 30L;
     options.sndbuf = 4096;
     options.rcvbuf = 4096;
-    session->web->run(std::move(options));
+    session->web->fetch(std::move(options));
 }
