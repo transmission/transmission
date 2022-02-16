@@ -66,8 +66,6 @@ public:
 
     bool dead = false;
     tr_block_index_t blocks_done = 0;
-    tr_web_task* web_task = nullptr;
-    long response_code = 0;
 };
 
 /**
@@ -360,14 +358,9 @@ void on_content_changed(evbuffer* buf, evbuffer_cb_info const* info, void* vtask
         fire_client_got_piece_data(w, n_added);
         uint32_t const len = evbuffer_get_length(buf);
 
-        if (task->response_code == 0)
-        {
-            task->response_code = tr_webGetTaskResponseCode(task->web_task);
+        task->webseed->connection_limiter.gotData();
 
-            task->webseed->connection_limiter.gotData();
-        }
-
-        if (task->response_code == 206 && len >= task->block_size)
+        if (len >= task->block_size)
         {
             /* once we've got at least one full block, save it */
 
@@ -457,7 +450,6 @@ void web_response_func(
             {
                 /* request finished successfully but there's still data missing. that
                    means we've reached the end of a file and need to request the next one */
-                t->response_code = 0;
                 task_request_next_chunk(t);
             }
             else
@@ -523,7 +515,7 @@ void task_request_next_chunk(tr_webseed_task* t)
     options.range = tr_strvJoin(std::to_string(file_offset), "-"sv, std::to_string(file_offset + this_pass - 1));
     options.torrent_id = tor->uniqueId;
     options.buffer = t->content();
-    t->web_task = tr_webRun(tor->session, std::move(options));
+    tr_webRun(tor->session, std::move(options));
 }
 
 } // namespace
