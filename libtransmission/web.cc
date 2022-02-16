@@ -240,6 +240,7 @@ private:
     };
 
     static auto constexpr ThreadfuncMaxSleepMsec = long{ 200 };
+    static auto constexpr DnsCacheTimeoutSecs = long{ 60 * 60 };
 
     bool const curl_verbose = tr_env_key_exists("TR_CURL_VERBOSE");
     bool const curl_ssl_verify = !tr_env_key_exists("TR_CURL_SSL_NO_VERIFY");
@@ -312,10 +313,12 @@ private:
     }
 #endif
 
-    static void initEasy(Controller& controller, tr_web::Impl* impl, Task* task)
+    static void initEasy(tr_web::Impl* impl, Task* task)
     {
         auto* const e = task->easy();
 
+        curl_easy_setopt(e, CURLOPT_SHARE, impl->shared());
+        curl_easy_setopt(e, CURLOPT_DNS_CACHE_TIMEOUT, impl->DnsCacheTimeoutSecs);
         curl_easy_setopt(e, CURLOPT_AUTOREFERER, 1L);
         curl_easy_setopt(e, CURLOPT_ENCODING, "");
         curl_easy_setopt(e, CURLOPT_FOLLOWLOCATION, 1L);
@@ -363,7 +366,7 @@ private:
         curl_easy_setopt(e, CURLOPT_WRITEDATA, task);
         curl_easy_setopt(e, CURLOPT_WRITEFUNCTION, onDataReceived);
 
-        if (auto const addrstr = controller.publicAddress(); addrstr)
+        if (auto const addrstr = impl->controller.publicAddress(); addrstr)
         {
             (void)curl_easy_setopt(e, CURLOPT_INTERFACE, addrstr->c_str());
         }
@@ -417,7 +420,7 @@ private:
                     task->next = nullptr;
 
                     dbgmsg("adding task to curl: [%s]", task->url().c_str());
-                    initEasy(impl->controller, impl, task);
+                    initEasy(impl, task);
                     curl_multi_add_handle(multi.get(), task->easy());
                 }
             }
@@ -500,6 +503,13 @@ private:
     }
 
 private:
+    std::shared_ptr<CURLSH> const curlsh_{ curl_share_init(), curl_share_cleanup };
+
+    CURLSH* shared()
+    {
+        return curlsh_.get();
+    }
+
     static std::once_flag curl_init_flag;
 
     bool is_closed_ = false;
