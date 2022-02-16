@@ -22,6 +22,7 @@
 
 #include "crypto-utils.h"
 #include "log.h"
+#include "tr-assert.h"
 #include "utils.h"
 #include "web.h"
 
@@ -239,7 +240,7 @@ private:
         Task* next = nullptr;
     };
 
-    static auto constexpr ThreadfuncMaxSleepMsec = long{ 200 };
+    static auto constexpr BandwidthPauseMsec = long{ 500 };
     static auto constexpr DnsCacheTimeoutSecs = long{ 60 * 60 };
 
     bool const curl_verbose = tr_env_key_exists("TR_CURL_VERBOSE");
@@ -267,26 +268,27 @@ private:
 
     RunMode run_mode = RunMode::Run;
 
-    static size_t onDataReceived(void* ptr, size_t size, size_t nmemb, void* vtask)
+    static size_t onDataReceived(void* data, size_t size, size_t nmemb, void* vtask)
     {
         size_t const bytes_used = size * nmemb;
         auto* task = static_cast<Task*>(vtask);
+        TR_ASSERT(std::this_thread::get_id() == task->impl.curl_thread->get_id());
 
-        // Pause the handle for a moment if we exceed our speed limit.
-        // Note: do this _before_ evbuffer_add() because curl will save
-        // `ptr` and re-send us to it when we unpause
         if (auto const& tag = task->speedLimitTag(); tag)
         {
-            task->impl.controller.notifyBandwidthConsumed(*tag, bytes_used);
-
-            if (task->impl.controller.clamp(*tag, 1) == 0)
+            // If this is more bandwidth than is allocated for this tag,
+            // then pause the torrent for a tick. curl will deliver `data`
+            // again when the transfer is unpaused.
+            if (task->impl.controller.clamp(*tag, bytes_used) < bytes_used)
             {
-                task->impl.paused_easy_handles.emplace(tr_time(), task->easy());
+                task->impl.paused_easy_handles.emplace(tr_time_msec(), task->easy());
                 return CURL_WRITEFUNC_PAUSE;
             }
+
+            task->impl.controller.notifyBandwidthConsumed(*tag, bytes_used);
         }
 
-        evbuffer_add(task->body(), ptr, bytes_used);
+        evbuffer_add(task->body(), data, bytes_used);
         dbgmsg("wrote %zu bytes to task %p's buffer", bytes_used, (void*)task);
         return bytes_used;
     }
@@ -295,6 +297,7 @@ private:
     static int onSocketCreated(void* vtask, curl_socket_t fd, curlsocktype /*purpose*/)
     {
         auto const* const task = static_cast<Task const*>(vtask);
+        TR_ASSERT(std::this_thread::get_id() == task->impl.curl_thread->get_id());
 
         // Ignore the sockopt() return values -- these are suggestions
         // rather than hard requirements & it's OK for them to fail
@@ -315,10 +318,11 @@ private:
 
     static void initEasy(tr_web::Impl* impl, Task* task)
     {
+        TR_ASSERT(std::this_thread::get_id() == impl->curl_thread->get_id());
         auto* const e = task->easy();
 
         curl_easy_setopt(e, CURLOPT_SHARE, impl->shared());
-        curl_easy_setopt(e, CURLOPT_DNS_CACHE_TIMEOUT, impl->DnsCacheTimeoutSecs);
+        curl_easy_setopt(e, CURLOPT_DNS_CACHE_TIMEOUT, DnsCacheTimeoutSecs);
         curl_easy_setopt(e, CURLOPT_AUTOREFERER, 1L);
         curl_easy_setopt(e, CURLOPT_ENCODING, "");
         curl_easy_setopt(e, CURLOPT_FOLLOWLOCATION, 1L);
@@ -389,6 +393,32 @@ private:
         }
     }
 
+    void resumePausedTasks()
+    {
+        TR_ASSERT(std::this_thread::get_id() == curl_thread->get_id());
+
+        auto& paused = paused_easy_handles;
+        if (std::empty(paused))
+        {
+            return;
+        }
+
+        auto const now = tr_time_msec();
+
+        for (auto it = std::begin(paused); it != std::end(paused);)
+        {
+            if (it->first + BandwidthPauseMsec < now)
+            {
+                curl_easy_pause(it->second, CURLPAUSE_CONT);
+                it = paused.erase(it);
+            }
+            else
+            {
+                ++it;
+            }
+        }
+    }
+
     static void tr_webThreadFunc(void* vimpl)
     {
         auto* impl = static_cast<tr_web::Impl*>(vimpl);
@@ -425,31 +455,18 @@ private:
                 }
             }
 
-            // resume any paused tasks
-            auto& paused = impl->paused_easy_handles;
-            auto const now = tr_time();
-            for (auto it = std::begin(paused); it != std::end(paused);)
-            {
-                if (it->first < now)
-                {
-                    curl_easy_pause(it->second, CURLPAUSE_CONT);
-                    it = paused.erase(it);
-                }
-                else
-                {
-                    ++it;
-                }
-            }
+            impl->resumePausedTasks();
 
-            /* 'numfds' being zero means either a timeout or no file descriptors to
-                wait for. Try timeout on first occurrence, then assume no file
-                descriptors and no file descriptors to wait for means wait for 100
-                milliseconds. */
+            // Adapted from https://curl.se/libcurl/c/curl_multi_wait.html docs.
+            // 'numfds' being zero means either a timeout or no file descriptors to
+            // wait for. Try timeout on first occurrence, then assume no file
+            // descriptors and no file descriptors to wait for means wait for 100
+            // milliseconds.
             auto numfds = int{};
             curl_multi_wait(multi.get(), nullptr, 0, 1000, &numfds);
             if (numfds == 0)
             {
-                repeats++;
+                ++repeats;
                 if (repeats > 1U)
                 {
                     tr_wait_msec(100);
@@ -514,7 +531,7 @@ private:
 
     bool is_closed_ = false;
 
-    std::multimap<time_t, CURL*> paused_easy_handles;
+    std::multimap<uint64_t /*tr_time_msec()*/, CURL*> paused_easy_handles;
 
     static void curlInit()
     {
