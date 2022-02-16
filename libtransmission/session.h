@@ -347,7 +347,8 @@ public:
         [[nodiscard]] std::optional<std::string> cookieFile() const override;
         [[nodiscard]] std::optional<std::string> publicAddress() const override;
         [[nodiscard]] std::optional<std::string> userAgent() const override;
-        [[nodiscard]] std::optional<long> desiredSpeedBytesPerSecond(int speed_limit_tag) const override;
+        [[nodiscard]] unsigned int clamp(int bandwidth_tag, unsigned int byte_count) const override;
+        void notifyBandwidthConsumed(int torrent_id, size_t byte_count) override;
         void run(tr_web::done_func func, tr_web::Response&& response) const override;
 
     private:

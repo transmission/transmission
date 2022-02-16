@@ -5,6 +5,7 @@
 
 #include <algorithm>
 #include <memory>
+#include <map>
 #include <mutex>
 #include <string>
 #include <string_view>
@@ -35,110 +36,6 @@ using namespace std::literals;
 /***
 ****
 ***/
-
-class tr_web_task
-{
-private:
-    std::shared_ptr<evbuffer> const privbuf{ evbuffer_new(), evbuffer_free };
-    std::shared_ptr<CURL> const easy_handle{ curl_easy_init(), curl_easy_cleanup };
-    tr_web::RunOptions const options;
-
-public:
-    tr_web_task(tr_web::Controller const& controller_in, tr_web::RunOptions&& options_in)
-        : options{ std::move(options_in) }
-        , controller{ controller_in }
-    {
-        response.user_data = options.done_func_user_data;
-    }
-
-    [[nodiscard]] auto* easy() const
-    {
-        return easy_handle.get();
-    }
-
-    [[nodiscard]] auto* body() const
-    {
-        return options.buffer != nullptr ? options.buffer : privbuf.get();
-    }
-
-    [[nodiscard]] auto const& speedLimitTag() const
-    {
-        return options.speed_limit_tag;
-    }
-
-    [[nodiscard]] auto const& url() const
-    {
-        return options.url;
-    }
-
-    [[nodiscard]] auto const& range() const
-    {
-        return options.range;
-    }
-
-    [[nodiscard]] auto const& cookies() const
-    {
-        return options.cookies;
-    }
-
-    [[nodiscard]] auto const& sndbuf() const
-    {
-        return options.sndbuf;
-    }
-
-    [[nodiscard]] auto const& rcvbuf() const
-    {
-        return options.rcvbuf;
-    }
-
-    [[nodiscard]] auto const& timeoutSecs() const
-    {
-        return options.timeout_secs;
-    }
-
-    void done()
-    {
-        if (options.done_func == nullptr)
-        {
-            return;
-        }
-
-        response.body.assign(reinterpret_cast<char const*>(evbuffer_pullup(body(), -1)), evbuffer_get_length(body()));
-        options.done_func(std::move(this->response));
-    }
-
-    tr_web::Controller const& controller;
-    tr_web::Response response;
-    tr_web_task* next = nullptr;
-};
-
-/***
-****
-***/
-
-#ifdef USE_LIBCURL_SOCKOPT
-
-static int onSocketCreated(void* vtask, curl_socket_t fd, curlsocktype /*purpose*/)
-{
-    auto const* const task = static_cast<tr_web_task const*>(vtask);
-
-    // Ignore the sockopt() return values -- these are suggestions
-    // rather than hard requirements & it's OK for them to fail
-
-    if (auto const& buf = task->sndbuf(); buf)
-    {
-        (void)setsockopt(fd, SOL_SOCKET, SO_SNDBUF, reinterpret_cast<char const*>(&*buf), sizeof(*buf));
-    }
-    if (auto const& buf = task->rcvbuf(); buf)
-    {
-        (void)setsockopt(fd, SOL_SOCKET, SO_RCVBUF, reinterpret_cast<char const*>(&*buf), sizeof(*buf));
-    }
-
-    // return nonzero if this function encountered an error
-    return 0;
-}
-
-#endif
 
 static CURLcode ssl_context_func(CURL* /*curl*/, void* ssl_ctx, void* /*user_data*/)
 {
@@ -203,10 +100,8 @@ static CURLcode ssl_context_func(CURL* /*curl*/, void* ssl_ctx, void* /*user_dat
 
 class tr_web::Impl
 {
-    friend class tr_web_task;
-
 public:
-    Impl(Controller const& controller_in)
+    Impl(Controller& controller_in)
         : controller{ controller_in }
     {
         std::call_once(curl_init_flag, curlInit);
@@ -262,24 +157,100 @@ public:
         }
 
         auto const lock = std::unique_lock(web_tasks_mutex);
-        auto* const task = new tr_web_task{ controller, std::move(options) };
+        auto* const task = new Task{ *this, std::move(options) };
         task->next = tasks;
         tasks = task;
     }
 
 private:
+    class Task
+    {
+    private:
+        std::shared_ptr<evbuffer> const privbuf{ evbuffer_new(), evbuffer_free };
+        std::shared_ptr<CURL> const easy_handle{ curl_easy_init(), curl_easy_cleanup };
+        tr_web::RunOptions const options;
+
+    public:
+        Task(tr_web::Impl& impl_in, tr_web::RunOptions&& options_in)
+            : options{ std::move(options_in) }
+            , impl{ impl_in }
+        {
+            response.user_data = options.done_func_user_data;
+        }
+
+        [[nodiscard]] auto* easy() const
+        {
+            return easy_handle.get();
+        }
+
+        [[nodiscard]] auto* body() const
+        {
+            return options.buffer != nullptr ? options.buffer : privbuf.get();
+        }
+
+        [[nodiscard]] auto const& speedLimitTag() const
+        {
+            return options.speed_limit_tag;
+        }
+
+        [[nodiscard]] auto const& url() const
+        {
+            return options.url;
+        }
+
+        [[nodiscard]] auto const& range() const
+        {
+            return options.range;
+        }
+
+        [[nodiscard]] auto const& cookies() const
+        {
+            return options.cookies;
+        }
+
+        [[nodiscard]] auto const& sndbuf() const
+        {
+            return options.sndbuf;
+        }
+
+        [[nodiscard]] auto const& rcvbuf() const
+        {
+            return options.rcvbuf;
+        }
+
+        [[nodiscard]] auto const& timeoutSecs() const
+        {
+            return options.timeout_secs;
+        }
+
+        void done()
+        {
+            if (options.done_func == nullptr)
+            {
+                return;
+            }
+
+            response.body.assign(reinterpret_cast<char const*>(evbuffer_pullup(body(), -1)), evbuffer_get_length(body()));
+            options.done_func(std::move(this->response));
+        }
+
+        tr_web::Impl& impl;
+        tr_web::Response response;
+        Task* next = nullptr;
+    };
+
     static auto constexpr ThreadfuncMaxSleepMsec = long{ 200 };
 
     bool const curl_verbose = tr_env_key_exists("TR_CURL_VERBOSE");
     bool const curl_ssl_verify = !tr_env_key_exists("TR_CURL_SSL_NO_VERIFY");
     bool const curl_proxy_ssl_verify = !tr_env_key_exists("TR_CURL_PROXY_SSL_NO_VERIFY");
 
-    Controller const& controller;
+    Controller& controller;
 
     std::string curl_ca_bundle;
 
     std::recursive_mutex web_tasks_mutex;
-    tr_web_task* tasks = nullptr;
+    Task* tasks = nullptr;
 
     std::string cookie_file;
     std::string user_agent;
@@ -297,15 +268,51 @@ private:
 
     static size_t onDataReceived(void* ptr, size_t size, size_t nmemb, void* vtask)
     {
-        size_t const byteCount = size * nmemb;
-        auto* task = static_cast<tr_web_task*>(vtask);
+        size_t const bytes_used = size * nmemb;
+        auto* task = static_cast<Task*>(vtask);
 
-        evbuffer_add(task->body(), ptr, byteCount);
-        dbgmsg("wrote %zu bytes to task %p's buffer", byteCount, (void*)task);
-        return byteCount;
+        // Pause the handle for a moment if we exceed our speed limit.
+        // Note: do this _before_ evbuffer_add() because curl will save
+        // `ptr` and re-send us to it when we unpause
+        if (auto const& tag = task->speedLimitTag(); tag)
+        {
+            task->impl.controller.notifyBandwidthConsumed(*tag, bytes_used);
+
+            if (task->impl.controller.clamp(*tag, 1) == 0)
+            {
+                task->impl.paused_easy_handles.emplace(tr_time(), task->easy());
+                return CURL_WRITEFUNC_PAUSE;
+            }
+        }
+
+        evbuffer_add(task->body(), ptr, bytes_used);
+        dbgmsg("wrote %zu bytes to task %p's buffer", bytes_used, (void*)task);
+        return bytes_used;
     }
 
-    static void initEasy(Controller const& controller, tr_web::Impl* impl, tr_web_task* task)
+#ifdef USE_LIBCURL_SOCKOPT
+    static int onSocketCreated(void* vtask, curl_socket_t fd, curlsocktype /*purpose*/)
+    {
+        auto const* const task = static_cast<Task const*>(vtask);
+
+        // Ignore the sockopt() return values -- these are suggestions
+        // rather than hard requirements & it's OK for them to fail
+
+        if (auto const& buf = task->sndbuf(); buf)
+        {
+            (void)setsockopt(fd, SOL_SOCKET, SO_SNDBUF, reinterpret_cast<char const*>(&*buf), sizeof(*buf));
+        }
+        if (auto const& buf = task->rcvbuf(); buf)
+        {
+            (void)setsockopt(fd, SOL_SOCKET, SO_RCVBUF, reinterpret_cast<char const*>(&*buf), sizeof(*buf));
+        }
+
+        // return nonzero if this function encountered an error
+        return 0;
+    }
+#endif
+
+    static void initEasy(Controller& controller, tr_web::Impl* impl, Task* task)
     {
         auto* const e = task->easy();
 
@@ -350,14 +357,6 @@ private:
             curl_easy_setopt(e, CURLOPT_USERAGENT, ua.c_str());
         }
 
-        if (auto const& tag = task->speedLimitTag(); tag)
-        {
-            if (auto const limit = task->controller.desiredSpeedBytesPerSecond(*tag); limit)
-            {
-                (void)curl_easy_setopt(task->easy(), CURLOPT_MAX_RECV_SPEED_LARGE, *limit);
-            }
-        }
-
         curl_easy_setopt(e, CURLOPT_TIMEOUT, task->timeoutSecs());
         curl_easy_setopt(e, CURLOPT_URL, task->url().c_str());
         curl_easy_setopt(e, CURLOPT_VERBOSE, impl->curl_verbose ? 1L : 0L);
@@ -387,32 +386,13 @@ private:
         }
     }
 
-    long getWaitMsec(CURLM* const multi) const
-    {
-        // If the msec returned by curl_multi_timeout is 0, proceed immediately
-        // without waiting for anything. If it returns -1, there's no timeout set.
-        auto msec = long{};
-        curl_multi_timeout(multi, &msec);
-        if (msec < 0)
-        {
-            msec = ThreadfuncMaxSleepMsec;
-        }
-
-        if (run_mode != RunMode::Run)
-        {
-            msec = std::min(msec, 50L); // on shutdown, shorten the wait time
-        }
-
-        return std::clamp(msec, 0L, ThreadfuncMaxSleepMsec);
-    }
-
     static void tr_webThreadFunc(void* vimpl)
     {
         auto* impl = static_cast<tr_web::Impl*>(vimpl);
 
         auto const multi = std::shared_ptr<CURLM>(curl_multi_init(), curl_multi_cleanup);
 
-        auto repeats = uint32_t{};
+        auto repeats = unsigned{};
         for (;;)
         {
             if (impl->run_mode == RunMode::CloseNow)
@@ -442,35 +422,44 @@ private:
                 }
             }
 
-            // Maybe wait a moment before calling multi_perform
-            if (auto const msec = impl->getWaitMsec(multi.get()); msec > 0)
+            // resume any paused tasks
+            auto& paused = impl->paused_easy_handles;
+            auto const now = tr_time();
+            for (auto it = std::begin(paused); it != std::end(paused);)
             {
-                auto numfds = int{};
-                curl_multi_wait(multi.get(), nullptr, 0, msec, &numfds);
-                if (numfds == 0)
+                if (it->first < now)
                 {
-                    ++repeats;
-                    if (repeats > 1)
-                    {
-                        /* curl_multi_wait() returns immediately if there are
-                         * no fds to wait for, so we need an explicit wait here
-                         * to emulate select() behavior */
-                        tr_wait_msec(std::min(msec, ThreadfuncMaxSleepMsec / 2L));
-                    }
+                    curl_easy_pause(it->second, CURLPAUSE_CONT);
+                    it = paused.erase(it);
                 }
                 else
                 {
-                    repeats = 0;
+                    ++it;
                 }
             }
 
-            /* call curl_multi_perform() */
-            auto mcode = CURLMcode{};
-            auto unused = int{};
-            do
+            /* 'numfds' being zero means either a timeout or no file descriptors to
+                wait for. Try timeout on first occurrence, then assume no file
+                descriptors and no file descriptors to wait for means wait for 100
+                milliseconds. */
+            auto numfds = int{};
+            curl_multi_wait(multi.get(), nullptr, 0, 1000, &numfds);
+            if (numfds == 0)
             {
-                mcode = curl_multi_perform(multi.get(), &unused);
-            } while (mcode == CURLM_CALL_MULTI_PERFORM && impl->run_mode != RunMode::CloseNow);
+                repeats++;
+                if (repeats > 1U)
+                {
+                    tr_wait_msec(100);
+                }
+            }
+            else
+            {
+                repeats = 0;
+            }
+
+            /* call curl_multi_perform() */
+            auto unused = int{};
+            curl_multi_perform(multi.get(), &unused);
 
             /* pump completed tasks from the multi */
             CURLMsg* msg = nullptr;
@@ -480,7 +469,7 @@ private:
                 {
                     auto* const e = msg->easy_handle;
 
-                    tr_web_task* task = nullptr;
+                    Task* task = nullptr;
                     curl_easy_getinfo(e, CURLINFO_PRIVATE, (void*)&task);
 
                     auto req_bytes_sent = long{};
@@ -515,6 +504,8 @@ private:
 
     bool is_closed_ = false;
 
+    std::multimap<time_t, CURL*> paused_easy_handles;
+
     static void curlInit()
     {
         // try to enable ssl for https support;
@@ -528,14 +519,14 @@ private:
 
 std::once_flag tr_web::Impl::curl_init_flag;
 
-tr_web::tr_web(Controller const& controller)
+tr_web::tr_web(Controller& controller)
     : impl_{ std::make_unique<Impl>(controller) }
 {
 }
 
 tr_web::~tr_web() = default;
 
-std::unique_ptr<tr_web> tr_web::create(Controller const& controller)
+std::unique_ptr<tr_web> tr_web::create(Controller& controller)
 {
     return std::unique_ptr<tr_web>(new tr_web(controller));
 }

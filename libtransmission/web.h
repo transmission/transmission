@@ -26,29 +26,43 @@ public:
 
     using done_func = void (*)(Response&& response);
 
+    /**
+     * Mediates between tr_web and its clients.
+     *
+     * NB: Note that tr_web calls all these methods in its own thread.
+     */
     class Controller
     {
     public:
         virtual ~Controller() = default;
 
+        // Return the location of the cookie file, or nullopt to not use one
         [[nodiscard]] virtual std::optional<std::string> cookieFile() const
         {
             return std::nullopt;
         }
 
+        // Return the preferred user public address string, or nullopt to not use one
         [[nodiscard]] virtual std::optional<std::string> publicAddress() const
         {
             return std::nullopt;
         }
 
+        // Return the preferred user aagent, or nullopt to not use one
         [[nodiscard]] virtual std::optional<std::string> userAgent() const
         {
             return std::nullopt;
         }
 
-        [[nodiscard]] virtual std::optional<long> desiredSpeedBytesPerSecond([[maybe_unused]] int speed_limit_tag) const
+        // Notify the system that `byte_count` of download bandwidth was used
+        virtual void notifyBandwidthConsumed([[maybe_unused]] int bandwidth_tag, [[maybe_unused]] size_t byte_count)
         {
-            return std::nullopt;
+        }
+
+        // return the number of bytes that should be allowed. See Bandwidth::clamp()
+        [[nodiscard]] virtual unsigned int clamp([[maybe_unused]] int bandwidth_tag, unsigned int byte_count) const
+        {
+            return byte_count;
         }
 
         virtual void run(done_func func, Response&& response) const
@@ -57,7 +71,7 @@ public:
         }
     };
 
-    static std::unique_ptr<tr_web> create(Controller const& controller);
+    static std::unique_ptr<tr_web> create(Controller& controller);
     ~tr_web();
 
     class RunOptions
@@ -91,7 +105,7 @@ public:
 private:
     class Impl;
     std::unique_ptr<Impl> const impl_;
-    explicit tr_web(Controller const& controller);
+    explicit tr_web(Controller& controller);
 };
 
 void tr_sessionFetch(struct tr_session* session, tr_web::RunOptions&& options);

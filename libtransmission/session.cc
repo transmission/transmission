@@ -144,21 +144,21 @@ std::optional<std::string> tr_session::WebController::publicAddress() const
     return std::nullopt;
 }
 
-std::optional<long> tr_session::WebController::desiredSpeedBytesPerSecond(int speed_limit_tag) const
+unsigned int tr_session::WebController::clamp(int torrent_id, unsigned int byte_count) const
 {
-    auto const it = session_->torrentsById.find(speed_limit_tag);
-    if (it == std::end(session_->torrentsById))
-    {
-        return {};
-    }
+    auto const lock = session_->unique_lock();
+    auto const it = session_->torrentsById.find(torrent_id);
+    return it == std::end(session_->torrentsById) ? 0U : it->second->bandwidth->clamp(TR_DOWN, byte_count);
+}
 
-    auto const* const tor = it->second;
-    if (!tor->bandwidth->isLimited(TR_DOWN))
+void tr_session::WebController::notifyBandwidthConsumed(int torrent_id, size_t byte_count)
+{
+    auto const lock = session_->unique_lock();
+    auto const it = session_->torrentsById.find(torrent_id);
+    if (it != std::end(session_->torrentsById))
     {
-        return {};
+        it->second->bandwidth->notifyBandwidthConsumed(TR_DOWN, byte_count, true, tr_time_msec());
     }
-
-    return static_cast<long>(tor->bandwidth->getDesiredSpeedBytesPerSecond(TR_DOWN));
 }
 
 void tr_session::WebController::run(tr_web::done_func func, tr_web::Response&& response) const
