@@ -127,11 +127,11 @@ static int onSocketCreated(void* vtask, curl_socket_t fd, curlsocktype /*purpose
 
     if (auto const& buf = task->sndbuf(); buf)
     {
-        (void)setsockopt(fd, SOL_SOCKET, SO_SNDBUF, &*buf, sizeof(*buf));
+        (void)setsockopt(fd, SOL_SOCKET, SO_SNDBUF, reinterpret_cast<char const*>(&*buf), sizeof(*buf));
     }
     if (auto const& buf = task->rcvbuf(); buf)
     {
-        (void)setsockopt(fd, SOL_SOCKET, SO_RCVBUF, &*buf, sizeof(&*buf));
+        (void)setsockopt(fd, SOL_SOCKET, SO_RCVBUF, reinterpret_cast<char const*>(&*buf), sizeof(*buf));
     }
 
     // return nonzero if this function encountered an error
