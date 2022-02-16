@@ -87,8 +87,8 @@ public:
         static constexpr int DefaultTimeoutSecs = 120;
 
         std::string url;
-        std::string range;
-        std::string cookies;
+        std::optional<std::string> cookies;
+        std::optional<std::string> range;
         std::optional<int> speed_limit_tag;
         std::optional<int> sndbuf;
         std::optional<int> rcvbuf;

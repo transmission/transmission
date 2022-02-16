@@ -371,9 +371,9 @@ private:
             (void)curl_easy_setopt(e, CURLOPT_INTERFACE, addrstr->c_str());
         }
 
-        if (auto const& cookies = task->cookies(); !std::empty(cookies))
+        if (auto const& cookies = task->cookies(); cookies)
         {
-            (void)curl_easy_setopt(e, CURLOPT_COOKIE, cookies.c_str());
+            (void)curl_easy_setopt(e, CURLOPT_COOKIE, cookies->c_str());
         }
 
         if (auto const& file = impl->cookie_file; !std::empty(file))
@@ -381,9 +381,9 @@ private:
             (void)curl_easy_setopt(e, CURLOPT_COOKIEFILE, file.c_str());
         }
 
-        if (auto const& range = task->range(); !std::empty(range))
+        if (auto const& range = task->range(); range)
         {
-            curl_easy_setopt(e, CURLOPT_RANGE, range.c_str());
+            curl_easy_setopt(e, CURLOPT_RANGE, range->c_str());
             /* don't bother asking the server to compress webseed fragments */
             curl_easy_setopt(e, CURLOPT_ENCODING, "identity");
         }
