@@ -23,9 +23,9 @@ find_program(YARN yarn)
 add_custom_target(
   trweb ALL
   COMMENT "Building Web"
-  COMMAND cd corepack enable
-  COMMAND cd "${CMAKE_CURRENT_SOURCE_DIR}" && yarn install
-  COMMAND cd "${CMAKE_CURRENT_SOURCE_DIR}" && yarn build
+  COMMAND corepack enable
+  COMMAND yarn install WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+  COMMAND yarn webpack --config "${CMAKE_CURRENT_SOURCE_DIR}/webpack.config.js" --context "${CMAKE_CURRENT_SOURCE_DIR}"
   COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/public_html" "${CMAKE_CURRENT_BINARY_DIR}/public_html"
   COMMAND ${CMAKE_COMMAND} -E remove -f ${TRWEB_TMP_BUILD}
   BYPRODUCTS
