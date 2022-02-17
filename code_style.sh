@@ -61,12 +61,11 @@ fi
 
 # format JS
 cd "${root}/web" || exit 1
-yarn_args='--silent --no-progress --non-interactive'
 yarn_lint_args="$([ -n "$fix" ] && echo 'lint:fix' || echo 'lint')"
-if ! yarn $yarn_args install; then
+if ! yarn install; then
   [ -n "$fix" ] || echo 'JS code could not be checked -- "yarn install" failed'
   exitcode=1
-elif ! yarn $yarn_args $yarn_lint_args; then
+elif ! yarn $yarn_lint_args; then
   [ -n "$fix" ] || echo 'JS code needs formatting'
   exitcode=1
 fi

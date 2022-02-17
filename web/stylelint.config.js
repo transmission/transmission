@@ -1,12 +1,9 @@
 
 module.exports = {
   "extends": [
+    "@primer/stylelint-config",
     "stylelint-config-sass-guidelines",
     "stylelint-config-prettier"
-  ],
-  "plugins":  [
-    "stylelint-config-primer/plugins/no-undefined-vars",
-    "stylelint-config-primer/plugins/no-unused-vars"
   ],
   "rules": {
     "block-no-empty": true,
