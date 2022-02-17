@@ -415,11 +415,8 @@ private:
     }
 
     // the thread started by Impl.curl_thread runs this function
-    static void curlThreadFunc(void* vimpl)
+    static void curlThreadFunc(Impl* impl)
     {
-        auto* impl = static_cast<tr_web::Impl*>(vimpl);
-        TR_ASSERT(std::this_thread::get_id() == impl->curl_thread->get_id());
-
         auto const multi = std::shared_ptr<CURLM>(curl_multi_init(), curl_multi_cleanup);
 
         auto running_tasks = int{ 0 };
