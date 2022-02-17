@@ -11,7 +11,6 @@ import { debounce } from './utils.js';
 
 import './assets/css/index.scss';
 
-
 function main() {
   const action_manager = new ActionManager();
   const prefs = new Prefs();
@@ -22,7 +21,7 @@ function main() {
     transmission.elements.torrent_list.scrollTo(0, 1)
   );
   window.addEventListener('load', scroll_soon);
-  window.addEventListener('orientationchange',  scroll_soon);
+  window.addEventListener('orientationchange', scroll_soon);
 }
 
 document.addEventListener('DOMContentLoaded', main);
