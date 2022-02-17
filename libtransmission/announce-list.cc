@@ -248,3 +248,41 @@ bool tr_announce_list::save(std::string const& torrent_file, tr_error** error) c
     // save it
     return tr_saveFile(torrent_file, contents, error);
 }
+
+bool tr_announce_list::parse(std::string_view text)
+{
+    auto scratch = tr_announce_list{};
+
+    auto current_tier = tr_tracker_tier_t{ 0 };
+    auto current_tier_size = size_t{ 0 };
+    auto line = std::string_view{};
+    while (tr_strvSep(&text, &line, '\n'))
+    {
+        if (tr_strvEndsWith(line, '\r'))
+        {
+            line = line.substr(0, std::size(line) - 1);
+        }
+
+        line = tr_strvStrip(line);
+
+        if (std::empty(line))
+        {
+            if (current_tier_size > 0)
+            {
+                ++current_tier;
+                current_tier_size = 0;
+            }
+        }
+        else if (scratch.add(line, current_tier))
+        {
+            ++current_tier_size;
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    *this = scratch;
+    return true;
+}

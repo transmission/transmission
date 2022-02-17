@@ -101,6 +101,13 @@ public:
         return trackers_.clear();
     }
 
+    /**
+     * Populate the announce list from a text string.
+     * - One announce URL per line
+     * - Blank line denotes a new tier
+     */
+    bool parse(std::string_view text);
+
     bool save(std::string const& torrent_file, tr_error** error = nullptr) const;
 
     static std::optional<std::string> announceToScrape(std::string_view announce);
