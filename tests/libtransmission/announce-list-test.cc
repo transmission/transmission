@@ -418,6 +418,7 @@ TEST_F(AnnounceListTest, parseThreeTier)
     EXPECT_EQ(1, announce_list.at(1).tier);
     EXPECT_EQ("https://www.example.com/c/announce", announce_list.at(2).announce.full);
     EXPECT_EQ(2, announce_list.at(2).tier);
+    EXPECT_EQ(tr_strvJoin(Text, "\n"sv), announce_list.toString());
 }
 
 TEST_F(AnnounceListTest, parseThreeTierWithTrailingLf)
@@ -439,6 +440,7 @@ TEST_F(AnnounceListTest, parseThreeTierWithTrailingLf)
     EXPECT_EQ(1, announce_list.at(1).tier);
     EXPECT_EQ("https://www.example.com/c/announce", announce_list.at(2).announce.full);
     EXPECT_EQ(2, announce_list.at(2).tier);
+    EXPECT_EQ(Text, announce_list.toString());
 }
 
 TEST_F(AnnounceListTest, parseThreeTierWithExcessLf)
@@ -469,6 +471,14 @@ TEST_F(AnnounceListTest, parseThreeTierWithExcessLf)
     EXPECT_EQ(1, announce_list.at(1).tier);
     EXPECT_EQ("https://www.example.com/c/announce", announce_list.at(2).announce.full);
     EXPECT_EQ(2, announce_list.at(2).tier);
+
+    auto constexpr ExpectedText =
+        "https://www.example.com/a/announce\n"
+        "\n"
+        "https://www.example.com/b/announce\n"
+        "\n"
+        "https://www.example.com/c/announce\n"sv;
+    EXPECT_EQ(ExpectedText, announce_list.toString());
 }
 
 TEST_F(AnnounceListTest, parseThreeTierWithWhitespace)
@@ -494,6 +504,14 @@ TEST_F(AnnounceListTest, parseThreeTierWithWhitespace)
     EXPECT_EQ(1, announce_list.at(1).tier);
     EXPECT_EQ("https://www.example.com/c/announce", announce_list.at(2).announce.full);
     EXPECT_EQ(2, announce_list.at(2).tier);
+
+    auto constexpr ExpectedText =
+        "https://www.example.com/a/announce\n"
+        "\n"
+        "https://www.example.com/b/announce\n"
+        "\n"
+        "https://www.example.com/c/announce\n"sv;
+    EXPECT_EQ(ExpectedText, announce_list.toString());
 }
 
 TEST_F(AnnounceListTest, parseThreeTierCrLf)
@@ -515,6 +533,14 @@ TEST_F(AnnounceListTest, parseThreeTierCrLf)
     EXPECT_EQ(1, announce_list.at(1).tier);
     EXPECT_EQ("https://www.example.com/c/announce", announce_list.at(2).announce.full);
     EXPECT_EQ(2, announce_list.at(2).tier);
+
+    auto constexpr ExpectedText =
+        "https://www.example.com/a/announce\n"
+        "\n"
+        "https://www.example.com/b/announce\n"
+        "\n"
+        "https://www.example.com/c/announce\n"sv;
+    EXPECT_EQ(ExpectedText, announce_list.toString());
 }
 
 TEST_F(AnnounceListTest, parseMultiTrackerInTier)
@@ -557,6 +583,8 @@ TEST_F(AnnounceListTest, parseMultiTrackerInTier)
     EXPECT_EQ(2, announce_list.at(7).tier);
     EXPECT_EQ("https://www.example.com/i/announce", announce_list.at(8).announce.full);
     EXPECT_EQ(2, announce_list.at(8).tier);
+
+    EXPECT_EQ(Text, announce_list.toString());
 }
 
 TEST_F(AnnounceListTest, parseInvalidUrl)

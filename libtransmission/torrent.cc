@@ -2028,13 +2028,13 @@ bool tr_torrent::checkPiece(tr_piece_index_t piece)
 ****
 ***/
 
-bool tr_torrentSetAnnounceList(tr_torrent* tor, char const* const* announce_urls, tr_tracker_tier_t const* tiers, size_t n)
+bool tr_torrentSetAnnounceList(tr_torrent* tor, char const* text)
 {
     TR_ASSERT(tr_isTorrent(tor));
     auto const lock = tor->unique_lock();
 
     auto announce_list = tr_announce_list();
-    if ((announce_list.set(announce_urls, tiers, n) == 0U) || !announce_list.save(tor->torrentFile()))
+    if (!announce_list.parse(text) || !announce_list.save(tor->torrentFile()))
     {
         return false;
     }

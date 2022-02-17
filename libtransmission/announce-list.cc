@@ -286,3 +286,24 @@ bool tr_announce_list::parse(std::string_view text)
     *this = scratch;
     return true;
 }
+
+std::string tr_announce_list::toString() const
+{
+    auto text = std::string{};
+    auto current_tier = std::optional<tr_tracker_tier_t>{};
+
+    for (auto const& tracker : *this)
+    {
+        if (current_tier && *current_tier != tracker.tier)
+        {
+            text += '\n';
+        }
+
+        text += tracker.announce.full;
+        text += '\n';
+
+        current_tier = tracker.tier;
+    }
+
+    return text;
+}

@@ -1192,11 +1192,9 @@ char* tr_torrentGetMagnetLink(tr_torrent const* tor);
  * and the metainfo file in tr_sessionGetConfigDir()'s torrent subdirectory.
  *
  * @param torrent The torrent whose tracker list is to be modified
- * @param urls Array of n announce url strings
- * @param tiers Array of n tier numbers for grouping 'urls' into tiers
- * @param n the number of urls/tiers
+ * @param text Tracker announce URLs. One URL per line; blank line for a new tier
  */
-bool tr_torrentSetAnnounceList(tr_torrent* torrent, char const* const* announce_urls, tr_tracker_tier_t const* tiers, size_t n);
+bool tr_torrentSetAnnounceList(tr_torrent* torrent, char const* text);
 
 /**
 ***
