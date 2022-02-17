@@ -1189,7 +1189,7 @@ char* tr_torrentGetMagnetLink(tr_torrent const* tor);
  * Returns a newly-allocated string listing its tracker's announce URLs.
  * One URL per line, with a blank line between tiers
  */
-char* tr_torrentGetTrackers(tr_torrent const* tor);
+char* tr_torrentGetTrackerList(tr_torrent const* tor);
 
 /**
  * Sets a torrent's tracker list from a list of announce URLs with one
@@ -1198,7 +1198,7 @@ char* tr_torrentGetTrackers(tr_torrent const* tor);
  * This updates both the `torrent' object's tracker list
  * and the metainfo file in tr_sessionGetConfigDir()'s torrent subdirectory.
  */
-bool tr_torrentSetTrackers(tr_torrent* tor, char const* text);
+bool tr_torrentSetTrackerList(tr_torrent* tor, char const* text);
 
 /**
 ***

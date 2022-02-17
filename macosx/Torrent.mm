@@ -746,9 +746,9 @@ bool trashDataFile(char const* filename, tr_error** error)
         new_tracker = [@"http://" stringByAppendingString:new_tracker];
     }
 
-    char* old_list = tr_torrentGetTrackers(fHandle);
+    char* old_list = tr_torrentGetTrackerList(fHandle);
     auto new_list = tr_strvJoin(old_list, "\n\n"sv, new_tracker.UTF8String);
-    BOOL const success = tr_torrentSetTrackers(fHandle, new_list.c_str());
+    BOOL const success = tr_torrentSetTrackerList(fHandle, new_list.c_str());
     tr_free(old_list);
 
     return success;
@@ -779,7 +779,7 @@ bool trashDataFile(char const* filename, tr_error** error)
         current_tier = tracker.tier;
     }
 
-    BOOL const success = tr_torrentSetTrackers(fHandle, new_list.c_str());
+    BOOL const success = tr_torrentSetTrackerList(fHandle, new_list.c_str());
     NSAssert(success, @"Removing tracker addresses failed");
 }
 

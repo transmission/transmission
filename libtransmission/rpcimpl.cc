@@ -1258,6 +1258,14 @@ static char const* torrentSet(
             errmsg = replaceTrackers(tor, tmp_variant);
         }
 
+        if (std::string_view txt; errmsg == nullptr && tr_variantDictFindStrView(args_in, TR_KEY_trackerList, &txt))
+        {
+            if (!tor->setTrackers(txt))
+            {
+                errmsg = "Invalid announce list";
+            }
+        }
+
         notify(session, TR_RPC_TORRENT_CHANGED, tor);
     }
 

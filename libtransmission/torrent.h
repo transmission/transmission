@@ -426,6 +426,8 @@ public:
         return this->announceList().tiers();
     }
 
+    bool setTrackers(std::string_view text);
+
     /// METAINFO - WEBSEEDS
 
     [[nodiscard]] auto webseedCount() const

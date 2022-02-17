@@ -373,6 +373,7 @@ enum
     TR_KEY_totalSize,
     TR_KEY_total_size,
     TR_KEY_trackerAdd,
+    TR_KEY_trackerList,
     TR_KEY_trackerRemove,
     TR_KEY_trackerReplace,
     TR_KEY_trackerStats,
