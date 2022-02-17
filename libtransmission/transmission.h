@@ -1186,15 +1186,19 @@ char* tr_torrentGetMagnetLink(tr_torrent const* tor);
 **/
 
 /**
- * @brief Modify a torrent's tracker list.
+ * Returns a newly-allocated string listing its tracker's announce URLs.
+ * One URL per line, with a blank line between tiers
+ */
+char* tr_torrentGetTrackers(tr_torrent const* tor);
+
+/**
+ * Sets a torrent's tracker list from a list of announce URLs with one
+ * URL per line and a blank line between tiers.
  *
  * This updates both the `torrent' object's tracker list
  * and the metainfo file in tr_sessionGetConfigDir()'s torrent subdirectory.
- *
- * @param torrent The torrent whose tracker list is to be modified
- * @param text Tracker announce URLs. One URL per line; blank line for a new tier
  */
-bool tr_torrentSetAnnounceList(tr_torrent* torrent, char const* text);
+bool tr_torrentSetTrackers(tr_torrent* tor, char const* text);
 
 /**
 ***
@@ -1597,8 +1601,8 @@ struct tr_stat
         This ONLY counts piece data. */
     float pieceDownloadSpeed_KBps;
 
-#define TR_ETA_NOT_AVAIL -1
-#define TR_ETA_UNKNOWN -2
+#define TR_ETA_NOT_AVAIL (-1)
+#define TR_ETA_UNKNOWN (-2)
     /** If downloading, estimated number of seconds left until the torrent is done.
         If seeding, estimated number of seconds left until seed ratio is reached. */
     int eta;

@@ -2211,39 +2211,10 @@ void DetailsDialog::Impl::on_edit_trackers_response(int response, std::shared_pt
     {
         auto const torrent_id = GPOINTER_TO_INT(dialog->get_data(TORRENT_ID_KEY));
         auto* const text_buffer = static_cast<Gtk::TextBuffer*>(dialog->get_data(TEXT_BUFFER_KEY));
-        tr_torrent* const tor = core_->find_torrent(torrent_id);
 
-        if (tor != nullptr)
+        if (auto* const tor = core_->find_torrent(torrent_id); tor != nullptr)
         {
-            /* build the array of trackers */
-            auto const tracker_text = text_buffer->get_text(false);
-            std::istringstream tracker_strings(tracker_text);
-
-            auto announce_url_strings = std::vector<std::string>{};
-            auto announce_urls = std::vector<char const*>{};
-            auto tiers = std::vector<tr_tracker_tier_t>{};
-            auto tier = tr_tracker_tier_t{ 0 };
-
-            std::string str;
-            while (std::getline(tracker_strings, str))
-            {
-                if (str.empty())
-                {
-                    ++tier;
-                }
-                else
-                {
-                    announce_url_strings.push_back(str);
-                    tiers.push_back(tier);
-                }
-            }
-
-            std::transform(
-                std::begin(announce_url_strings),
-                std::end(announce_url_strings),
-                std::back_inserter(announce_urls),
-                [](auto const& url) { return url.c_str(); });
-            if (tr_torrentSetAnnounceList(tor, std::data(announce_urls), std::data(tiers), std::size(announce_urls)))
+            if (tr_torrentSetTrackers(tor, text_buffer->get_text(false).c_str()))
             {
                 refresh();
             }

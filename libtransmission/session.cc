@@ -28,7 +28,6 @@
 
 #include <libutp/utp.h>
 
-// #define TR_SHOW_DEPRECATED
 #include "transmission.h"
 
 #include "announcer.h"
