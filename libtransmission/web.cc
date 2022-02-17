@@ -4,8 +4,9 @@
 // License text can be found in the licenses/ folder.
 
 #include <algorithm>
-#include <memory>
+#include <list>
 #include <map>
+#include <memory>
 #include <mutex>
 #include <string>
 #include <string_view>
@@ -102,7 +103,7 @@ static CURLcode ssl_context_func(CURL* /*curl*/, void* ssl_ctx, void* /*user_dat
 class tr_web::Impl
 {
 public:
-    Impl(Controller& controller_in)
+    explicit Impl(Controller& controller_in)
         : controller{ controller_in }
     {
         std::call_once(curl_init_flag, curlInit);
@@ -131,7 +132,7 @@ public:
             this->user_agent = *ua;
         }
 
-        curl_thread = std::make_unique<std::thread>(tr_webThreadFunc, this);
+        curl_thread = std::make_unique<std::thread>(curlThreadFunc, this);
     }
 
     ~Impl()
@@ -157,10 +158,8 @@ public:
             return;
         }
 
-        auto const lock = std::unique_lock(web_tasks_mutex);
-        auto* const task = new Task{ *this, std::move(options) };
-        task->next = tasks;
-        tasks = task;
+        auto const lock = std::unique_lock(queued_tasks_mutex);
+        queued_tasks.emplace_back(new Task{ *this, std::move(options) });
     }
 
 private:
@@ -169,7 +168,7 @@ private:
     private:
         std::shared_ptr<evbuffer> const privbuf{ evbuffer_new(), evbuffer_free };
         std::shared_ptr<CURL> const easy_handle{ curl_easy_init(), curl_easy_cleanup };
-        tr_web::FetchOptions const options;
+        tr_web::FetchOptions options;
 
     public:
         Task(tr_web::Impl& impl_in, tr_web::FetchOptions&& options_in)
@@ -232,12 +231,11 @@ private:
             }
 
             response.body.assign(reinterpret_cast<char const*>(evbuffer_pullup(body(), -1)), evbuffer_get_length(body()));
-            impl.controller.run(options.done_func, std::move(this->response));
+            impl.controller.run(std::move(options.done_func), std::move(this->response));
         }
 
         tr_web::Impl& impl;
         tr_web::FetchResponse response;
-        Task* next = nullptr;
     };
 
     static auto constexpr BandwidthPauseMsec = long{ 500 };
@@ -250,9 +248,6 @@ private:
     Controller& controller;
 
     std::string curl_ca_bundle;
-
-    std::recursive_mutex web_tasks_mutex;
-    Task* tasks = nullptr;
 
     std::string cookie_file;
     std::string user_agent;
@@ -321,54 +316,54 @@ private:
         TR_ASSERT(std::this_thread::get_id() == impl->curl_thread->get_id());
         auto* const e = task->easy();
 
-        curl_easy_setopt(e, CURLOPT_SHARE, impl->shared());
-        curl_easy_setopt(e, CURLOPT_DNS_CACHE_TIMEOUT, DnsCacheTimeoutSecs);
-        curl_easy_setopt(e, CURLOPT_AUTOREFERER, 1L);
-        curl_easy_setopt(e, CURLOPT_ENCODING, "");
-        curl_easy_setopt(e, CURLOPT_FOLLOWLOCATION, 1L);
-        curl_easy_setopt(e, CURLOPT_MAXREDIRS, -1L);
-        curl_easy_setopt(e, CURLOPT_NOSIGNAL, 1L);
-        curl_easy_setopt(e, CURLOPT_PRIVATE, task);
+        (void)curl_easy_setopt(e, CURLOPT_SHARE, impl->shared());
+        (void)curl_easy_setopt(e, CURLOPT_DNS_CACHE_TIMEOUT, DnsCacheTimeoutSecs);
+        (void)curl_easy_setopt(e, CURLOPT_AUTOREFERER, 1L);
+        (void)curl_easy_setopt(e, CURLOPT_ENCODING, "");
+        (void)curl_easy_setopt(e, CURLOPT_FOLLOWLOCATION, 1L);
+        (void)curl_easy_setopt(e, CURLOPT_MAXREDIRS, -1L);
+        (void)curl_easy_setopt(e, CURLOPT_NOSIGNAL, 1L);
+        (void)curl_easy_setopt(e, CURLOPT_PRIVATE, task);
 
 #ifdef USE_LIBCURL_SOCKOPT
-        curl_easy_setopt(e, CURLOPT_SOCKOPTFUNCTION, onSocketCreated);
-        curl_easy_setopt(e, CURLOPT_SOCKOPTDATA, task);
+        (void)curl_easy_setopt(e, CURLOPT_SOCKOPTFUNCTION, onSocketCreated);
+        (void)curl_easy_setopt(e, CURLOPT_SOCKOPTDATA, task);
 #endif
 
         if (!impl->curl_ssl_verify)
         {
-            curl_easy_setopt(e, CURLOPT_SSL_VERIFYHOST, 0L);
-            curl_easy_setopt(e, CURLOPT_SSL_VERIFYPEER, 0L);
+            (void)curl_easy_setopt(e, CURLOPT_SSL_VERIFYHOST, 0L);
+            (void)curl_easy_setopt(e, CURLOPT_SSL_VERIFYPEER, 0L);
         }
         else if (!std::empty(impl->curl_ca_bundle))
         {
-            curl_easy_setopt(e, CURLOPT_CAINFO, impl->curl_ca_bundle.c_str());
+            (void)curl_easy_setopt(e, CURLOPT_CAINFO, impl->curl_ca_bundle.c_str());
         }
         else
         {
-            curl_easy_setopt(e, CURLOPT_SSL_CTX_FUNCTION, ssl_context_func);
+            (void)curl_easy_setopt(e, CURLOPT_SSL_CTX_FUNCTION, ssl_context_func);
         }
 
         if (!impl->curl_proxy_ssl_verify)
         {
-            curl_easy_setopt(e, CURLOPT_PROXY_SSL_VERIFYHOST, 0L);
-            curl_easy_setopt(e, CURLOPT_PROXY_SSL_VERIFYPEER, 0L);
+            (void)curl_easy_setopt(e, CURLOPT_PROXY_SSL_VERIFYHOST, 0L);
+            (void)curl_easy_setopt(e, CURLOPT_PROXY_SSL_VERIFYPEER, 0L);
         }
         else if (!std::empty(impl->curl_ca_bundle))
         {
-            curl_easy_setopt(e, CURLOPT_PROXY_CAINFO, impl->curl_ca_bundle.c_str());
+            (void)curl_easy_setopt(e, CURLOPT_PROXY_CAINFO, impl->curl_ca_bundle.c_str());
         }
 
         if (auto const& ua = impl->user_agent; !std::empty(ua))
         {
-            curl_easy_setopt(e, CURLOPT_USERAGENT, ua.c_str());
+            (void)curl_easy_setopt(e, CURLOPT_USERAGENT, ua.c_str());
         }
 
-        curl_easy_setopt(e, CURLOPT_TIMEOUT, task->timeoutSecs());
-        curl_easy_setopt(e, CURLOPT_URL, task->url().c_str());
-        curl_easy_setopt(e, CURLOPT_VERBOSE, impl->curl_verbose ? 1L : 0L);
-        curl_easy_setopt(e, CURLOPT_WRITEDATA, task);
-        curl_easy_setopt(e, CURLOPT_WRITEFUNCTION, onDataReceived);
+        (void)curl_easy_setopt(e, CURLOPT_TIMEOUT, task->timeoutSecs());
+        (void)curl_easy_setopt(e, CURLOPT_URL, task->url().c_str());
+        (void)curl_easy_setopt(e, CURLOPT_VERBOSE, impl->curl_verbose ? 1L : 0L);
+        (void)curl_easy_setopt(e, CURLOPT_WRITEDATA, task);
+        (void)curl_easy_setopt(e, CURLOPT_WRITEFUNCTION, onDataReceived);
 
         if (auto const addrstr = impl->controller.publicAddress(); addrstr)
         {
@@ -388,8 +383,8 @@ private:
         if (auto const& range = task->range(); range)
         {
             /* don't bother asking the server to compress webseed fragments */
-            curl_easy_setopt(e, CURLOPT_ENCODING, "identity");
-            curl_easy_setopt(e, CURLOPT_RANGE, range->c_str());
+            (void)curl_easy_setopt(e, CURLOPT_ENCODING, "identity");
+            (void)curl_easy_setopt(e, CURLOPT_RANGE, range->c_str());
         }
     }
 
@@ -420,13 +415,11 @@ private:
     }
 
     // the thread started by Impl.curl_thread runs this function
-    static void tr_webThreadFunc(void* vimpl)
+    static void curlThreadFunc(Impl* impl)
     {
-        auto* impl = static_cast<tr_web::Impl*>(vimpl);
-        TR_ASSERT(std::this_thread::get_id() == impl->curl_thread->get_id());
-
         auto const multi = std::shared_ptr<CURLM>(curl_multi_init(), curl_multi_cleanup);
 
+        auto running_tasks = int{ 0 };
         auto repeats = unsigned{};
         for (;;)
         {
@@ -435,26 +428,21 @@ private:
                 break;
             }
 
-            if (impl->run_mode == RunMode::CloseSoon && impl->tasks == nullptr)
+            if (impl->run_mode == RunMode::CloseSoon && std::empty(impl->queued_tasks) && running_tasks == 0)
             {
                 break;
             }
 
-            /* add tasks from the queue */
+            // add queued tasks
             {
-                auto const lock = std::unique_lock(impl->web_tasks_mutex);
-
-                while (impl->tasks != nullptr)
+                auto const lock = std::unique_lock(impl->queued_tasks_mutex);
+                for (auto* task : impl->queued_tasks)
                 {
-                    /* pop the task */
-                    auto* const task = impl->tasks;
-                    impl->tasks = task->next;
-                    task->next = nullptr;
-
                     dbgmsg("adding task to curl: [%s]", task->url().c_str());
                     initEasy(impl, task);
                     curl_multi_add_handle(multi.get(), task->easy());
                 }
+                impl->queued_tasks.clear();
             }
 
             impl->resumePausedTasks();
@@ -479,12 +467,12 @@ private:
                 repeats = 0;
             }
 
-            /* call curl_multi_perform() */
-            auto unused = int{};
-            curl_multi_perform(multi.get(), &unused);
+            // nonblocking update of the tasks
+            curl_multi_perform(multi.get(), &running_tasks);
 
-            /* pump completed tasks from the multi */
+            // process any tasks that just finished
             CURLMsg* msg = nullptr;
+            auto unused = int{};
             while ((msg = curl_multi_info_read(multi.get(), &unused)) != nullptr)
             {
                 if (msg->msg == CURLMSG_DONE && msg->easy_handle != nullptr)
@@ -508,21 +496,18 @@ private:
             }
         }
 
-        /* Discard any remaining tasks.
-         * This is rare, but can happen on shutdown with unresponsive trackers. */
-        while (impl->tasks != nullptr)
-        {
-            auto* const task = impl->tasks;
-            impl->tasks = task->next;
-            dbgmsg("Discarding task \"%s\"", task->url().c_str());
-            delete task;
-        }
+        // Discard any queued tasks.
+        // This shouldn't happen, but do it just in case
+        std::for_each(std::begin(impl->queued_tasks), std::end(impl->queued_tasks), [](auto* task) { delete task; });
 
         impl->is_closed_ = true;
     }
 
 private:
     std::shared_ptr<CURLSH> const curlsh_{ curl_share_init(), curl_share_cleanup };
+
+    std::recursive_mutex queued_tasks_mutex;
+    std::list<Task*> queued_tasks;
 
     CURLSH* shared()
     {

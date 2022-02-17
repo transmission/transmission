@@ -73,7 +73,7 @@ Glib::RefPtr<Gdk::Pixbuf> favicon_load_from_cache(std::string const& host)
     }
 }
 
-void favicon_web_done_cb(tr_web::FetchResponse&& response);
+void favicon_web_done_cb(tr_web::FetchResponse const& response);
 
 bool favicon_web_done_idle_cb(std::unique_ptr<favicon_data> fav)
 {
@@ -102,7 +102,7 @@ bool favicon_web_done_idle_cb(std::unique_ptr<favicon_data> fav)
     return false;
 }
 
-void favicon_web_done_cb(tr_web::FetchResponse&& response)
+void favicon_web_done_cb(tr_web::FetchResponse const& response)
 {
     auto* const fav = static_cast<favicon_data*>(response.user_data);
     fav->contents = response.body;
