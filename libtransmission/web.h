@@ -27,6 +27,7 @@ public:
         void* user_data;
     };
 
+    // Callback to invoke when fetch() is done
     using FetchDoneFunc = std::function<void(FetchResponse const&)>;
 
     class FetchOptions
@@ -57,8 +58,8 @@ public:
         std::optional<int> speed_limit_tag;
 
         // Optionaly set the underlying sockets' send/receive buffers' size.
-        // Can be useful for scrapes / announces where the payload is known
-        // to be small.
+        // Can be used to conserve resources for scrapes and announces, where
+        // the payload is known to be small.
         std::optional<int> sndbuf;
         std::optional<int> rcvbuf;
 
@@ -84,16 +85,16 @@ public:
     // Will never be true until after closeSoon() is called.
     [[nodiscard]] bool isClosed() const;
 
-    // closeSoon() *should* be called first, but OK to destroy tr_web before
-    // isClosed() is true, e.g. there could be a hung fetch task that hasn't
-    // timmed out yet. Deleting the tr_web object will force-terminate any
-    // pending tasks.
+    // If you want to give running tasks a chance to finish, call closeSoon()
+    // before destroying the tr_web object. Deleting the object will cancel
+    // all of its tasks.
     ~tr_web();
 
     /**
      * Mediates between tr_web and its clients.
      *
-     * NB: Note that tr_web calls all these methods in the web thread.
+     * NB: Note that tr_web calls all these methods from its own thread.
+     * Overridden methods should take care to be threadsafe.
      */
     class Controller
     {
@@ -136,6 +137,8 @@ public:
         }
     };
 
+    // Note that tr_web does no management of the `controller` reference.
+    // The caller must ensure `controller` is valid for tr_web's lifespan.
     static std::unique_ptr<tr_web> create(Controller& controller);
 
 private:
