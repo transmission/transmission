@@ -436,6 +436,15 @@ Session::Tag Session::torrentSet(torrent_ids_t const& ids, tr_quark const key, b
     return torrentSetImpl(&args);
 }
 
+Session::Tag Session::torrentSet(torrent_ids_t const& ids, tr_quark const key, QString const& value)
+{
+    tr_variant args;
+    tr_variantInitDict(&args, 2);
+    addOptionalIds(&args, ids);
+    dictAdd(&args, key, value);
+    return torrentSetImpl(&args);
+}
+
 Session::Tag Session::torrentSet(torrent_ids_t const& ids, tr_quark const key, QStringList const& value)
 {
     tr_variant args;
@@ -561,7 +570,7 @@ std::vector<std::string_view> const& Session::getKeyNames(TorrentProperties prop
         };
 
         // unchanging fields needed by the details dialog
-        static auto constexpr DetailInfoKeys = std::array<tr_quark, 8>{
+        static auto constexpr DetailInfoKeys = std::array<tr_quark, 9>{
             TR_KEY_comment, //
             TR_KEY_creator, //
             TR_KEY_dateCreated, //
@@ -569,6 +578,7 @@ std::vector<std::string_view> const& Session::getKeyNames(TorrentProperties prop
             TR_KEY_isPrivate, //
             TR_KEY_pieceCount, //
             TR_KEY_pieceSize, //
+            TR_KEY_trackerList, //
             TR_KEY_trackers, //
         };
 

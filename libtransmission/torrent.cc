@@ -2028,7 +2028,7 @@ bool tr_torrent::checkPiece(tr_piece_index_t piece)
 ****
 ***/
 
-bool tr_torrent::setTrackers(std::string_view text)
+bool tr_torrent::setTrackerList(std::string_view text)
 {
     auto const lock = this->unique_lock();
 
@@ -2065,12 +2065,12 @@ bool tr_torrent::setTrackers(std::string_view text)
 
 bool tr_torrentSetTrackerList(tr_torrent* tor, char const* text)
 {
-    return text != nullptr && tor->setTrackers(text);
+    return text != nullptr && tor->setTrackerList(text);
 }
 
 char* tr_torrentGetTrackerList(tr_torrent const* tor)
 {
-    return tr_strvDup(tor->announceList().toString());
+    return tr_strvDup(tor->trackerList());
 }
 
 /**

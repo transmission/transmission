@@ -777,6 +777,10 @@ static void initField(tr_torrent const* const tor, tr_stat const* const st, tr_v
         addTrackers(tor, initme);
         break;
 
+    case TR_KEY_trackerList:
+        tr_variantInitStr(initme, tor->trackerList());
+        break;
+
     case TR_KEY_trackerStats:
         {
             auto const n = tr_torrentTrackerCount(tor);
@@ -1260,9 +1264,9 @@ static char const* torrentSet(
 
         if (std::string_view txt; errmsg == nullptr && tr_variantDictFindStrView(args_in, TR_KEY_trackerList, &txt))
         {
-            if (!tor->setTrackers(txt))
+            if (!tor->setTrackerList(txt))
             {
-                errmsg = "Invalid announce list";
+                errmsg = "Invalid tracker list";
             }
         }
 

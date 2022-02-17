@@ -426,7 +426,12 @@ public:
         return this->announceList().tiers();
     }
 
-    bool setTrackers(std::string_view text);
+    [[nodiscard]] auto trackerList() const
+    {
+        return this->announceList().toString();
+    }
+
+    bool setTrackerList(std::string_view text);
 
     /// METAINFO - WEBSEEDS
 
