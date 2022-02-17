@@ -18,8 +18,6 @@ file(GLOB_RECURSE TRWEB_SRCS
   ${CMAKE_CURRENT_SOURCE_DIR}/src/assets/css/*.scss
 )
 
-find_program(YARN yarn)
-
 add_custom_target(
   trweb ALL
   COMMENT "Building Web"
@@ -34,6 +32,6 @@ add_custom_target(
     public_html/index.html
     public_html/assets/
     public_html/js/
-  DEPENDS ${TRWEB_ASSETS} ${YARN}
+  DEPENDS ${TRWEB_ASSETS}
   SOURCES ${TRWEB_SRCS}
 )
