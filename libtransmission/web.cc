@@ -102,7 +102,7 @@ static CURLcode ssl_context_func(CURL* /*curl*/, void* ssl_ctx, void* /*user_dat
 class tr_web::Impl
 {
 public:
-    Impl(Controller& controller_in)
+    explicit Impl(Controller& controller_in)
         : controller{ controller_in }
     {
         std::call_once(curl_init_flag, curlInit);
@@ -169,7 +169,7 @@ private:
     private:
         std::shared_ptr<evbuffer> const privbuf{ evbuffer_new(), evbuffer_free };
         std::shared_ptr<CURL> const easy_handle{ curl_easy_init(), curl_easy_cleanup };
-        tr_web::FetchOptions const options;
+        tr_web::FetchOptions options;
 
     public:
         Task(tr_web::Impl& impl_in, tr_web::FetchOptions&& options_in)
@@ -232,7 +232,7 @@ private:
             }
 
             response.body.assign(reinterpret_cast<char const*>(evbuffer_pullup(body(), -1)), evbuffer_get_length(body()));
-            impl.controller.run(options.done_func, std::move(this->response));
+            impl.controller.run(std::move(options.done_func), std::move(this->response));
         }
 
         tr_web::Impl& impl;

@@ -5,8 +5,9 @@
 
 #pragma once
 
-#include <optional>
+#include <functional>
 #include <memory>
+#include <optional>
 #include <string>
 #include <string_view>
 
@@ -26,14 +27,14 @@ public:
         void* user_data;
     };
 
-    using FetchDoneFunc = void (*)(FetchResponse&& response);
+    using FetchDoneFunc = std::function<void(FetchResponse const&)>;
 
     class FetchOptions
     {
     public:
-        FetchOptions(std::string_view url_in, FetchDoneFunc done_func_in, void* done_func_user_data_in)
+        FetchOptions(std::string_view url_in, FetchDoneFunc&& done_func_in, void* done_func_user_data_in)
             : url{ url_in }
-            , done_func{ done_func_in }
+            , done_func{ std::move(done_func_in) }
             , done_func_user_data{ done_func_user_data_in }
         {
         }
@@ -129,9 +130,9 @@ public:
         }
 
         // Invoke the user-provided fetch callback
-        virtual void run(FetchDoneFunc func, FetchResponse&& response) const
+        virtual void run(FetchDoneFunc&& func, FetchResponse&& response) const
         {
-            func(std::move(response));
+            func(response);
         }
     };
 

@@ -281,7 +281,7 @@ struct announce_data
     char log_name[128];
 };
 
-static void onAnnounceDone(tr_web::FetchResponse&& web_response)
+static void onAnnounceDone(tr_web::FetchResponse const& web_response)
 {
     auto const& [status, body, did_connect, did_timeout, vdata] = web_response;
     auto* data = static_cast<struct announce_data*>(vdata);
@@ -445,7 +445,7 @@ struct scrape_data
     char log_name[128];
 };
 
-static void onScrapeDone(tr_web::FetchResponse&& web_response)
+static void onScrapeDone(tr_web::FetchResponse const& web_response)
 {
     auto const& [status, body, did_connect, did_timeout, vdata] = web_response;
     auto* const data = static_cast<struct scrape_data*>(vdata);
