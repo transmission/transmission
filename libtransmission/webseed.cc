@@ -405,17 +405,14 @@ void on_idle(tr_webseed* w)
     }
 }
 
-void web_response_func(
-    tr_session* session,
-    bool /*did_connect*/,
-    bool /*did_timeout*/,
-    long response_code,
-    std::string_view /*response*/,
-    void* vtask)
+void onWebResponse(tr_web::FetchResponse&& web_response)
 {
+    auto const& [status, body, did_connect, did_timeout, vtask] = web_response;
+    bool const success = status == 206;
+
     auto* const t = static_cast<tr_webseed_task*>(vtask);
-    bool const success = response_code == 206;
-    tr_webseed* w = t->webseed;
+    auto* const session = t->session;
+    auto* const w = t->webseed;
 
     w->connection_limiter.taskFinished(success);
 
@@ -511,11 +508,11 @@ void task_request_next_chunk(tr_webseed_task* t)
     uint64_t this_pass = std::min(remain, tor->fileSize(file_index) - file_offset);
 
     auto const url = make_url(t->webseed, tor->fileSubpath(file_index));
-    auto options = tr_web_options{ url, web_response_func, t };
+    auto options = tr_web::FetchOptions{ url, onWebResponse, t };
     options.range = tr_strvJoin(std::to_string(file_offset), "-"sv, std::to_string(file_offset + this_pass - 1));
-    options.torrent_id = tor->uniqueId;
+    options.speed_limit_tag = tor->uniqueId;
     options.buffer = t->content();
-    tr_webRun(tor->session, std::move(options));
+    tor->session->web->fetch(std::move(options));
 }
 
 } // namespace
