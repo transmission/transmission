@@ -26,9 +26,9 @@ if (NODE)
       COMMENT "Building Web"
       COMMAND node --version
       COMMAND npm config set package-lock false
-      COMMAND npm install corepack
+      COMMAND npm install --no-save corepack
       COMMAND npx corepack enable
-      COMMAND rm yarn.lock
+      COMMAND npx set version stable
       COMMAND npx yarn install WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
       COMMAND npx yarn webpack --config "${CMAKE_CURRENT_SOURCE_DIR}/webpack.config.js" --context "${CMAKE_CURRENT_SOURCE_DIR}"
       COMMAND ${CMAKE_COMMAND} -E copy_directory "${CMAKE_CURRENT_SOURCE_DIR}/public_html" "${CMAKE_CURRENT_BINARY_DIR}/public_html"
