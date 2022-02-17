@@ -25,6 +25,7 @@ if (NODE)
       trweb ALL
       COMMENT "Building Web"
       COMMAND node --version
+      COMMAND npm config set package-lock false
       COMMAND npm install corepack
       COMMAND npx corepack enable
       COMMAND npx yarn install WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
