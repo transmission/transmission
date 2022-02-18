@@ -1947,7 +1947,7 @@ static ReadState canRead(tr_peerIo* io, void* vmsgs, size_t* piece)
     struct evbuffer* in = tr_peerIoGetReadBuffer(io);
     size_t const inlen = evbuffer_get_length(in);
 
-    dbgmsg(msgs, "canRead: inlen is %zu, msgs->state is %d", inlen, msgs->state);
+    dbgmsg(msgs, "canRead: inlen is %zu, msgs->state is %d", inlen, int(msgs->state));
 
     auto ret = ReadState{};
     if (inlen == 0)

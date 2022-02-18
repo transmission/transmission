@@ -97,13 +97,13 @@ struct tr_block_info
     };
 
     // Location of the first byte in `block`.
-    [[nodiscard]] Location blockLoc(tr_block_index_t block) const
+    [[nodiscard]] Location constexpr blockLoc(tr_block_index_t block) const
     {
         return byteLoc(uint64_t{ block } * blockSize());
     }
 
     // Location of the last byte in `block`.
-    [[nodiscard]] Location blockLastLoc(tr_block_index_t block) const
+    [[nodiscard]] Location constexpr blockLastLoc(tr_block_index_t block) const
     {
         if (!isInitialized())
         {
@@ -114,13 +114,13 @@ struct tr_block_info
     }
 
     // Location of the first byte (+ optional offset and length) in `piece`
-    [[nodiscard]] Location pieceLoc(tr_piece_index_t piece, uint32_t offset = 0, uint32_t length = 0) const
+    [[nodiscard]] Location constexpr pieceLoc(tr_piece_index_t piece, uint32_t offset = 0, uint32_t length = 0) const
     {
         return byteLoc(uint64_t{ piece } * pieceSize() + offset + length);
     }
 
     // Location of the last byte in `piece`.
-    [[nodiscard]] Location pieceLastLoc(tr_piece_index_t piece) const
+    [[nodiscard]] Location constexpr pieceLastLoc(tr_piece_index_t piece) const
     {
         if (!isInitialized())
         {
@@ -131,7 +131,7 @@ struct tr_block_info
     }
 
     // Location of the torrent's nth byte
-    [[nodiscard]] Location byteLoc(uint64_t byte) const
+    [[nodiscard]] Location constexpr byteLoc(uint64_t byte) const
     {
         if (!isInitialized())
         {
