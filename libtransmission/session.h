@@ -351,7 +351,7 @@ public:
         [[nodiscard]] unsigned int clamp(int bandwidth_tag, unsigned int byte_count) const override;
         void notifyBandwidthConsumed(int torrent_id, size_t byte_count) override;
         // runs the tr_web::fetch response callback in the libtransmission thread
-        void run(tr_web::FetchDoneFunc func, tr_web::FetchResponse&& response) const override;
+        void run(tr_web::FetchDoneFunc&& func, tr_web::FetchResponse&& response) const override;
 
     private:
         tr_session* const session_;

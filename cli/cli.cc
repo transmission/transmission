@@ -124,7 +124,7 @@ static char* tr_strlratio(char* buf, double ratio, size_t buflen)
 
 static bool waitingOnWeb;
 
-static void onTorrentFileDownloaded(tr_web::FetchResponse&& response)
+static void onTorrentFileDownloaded(tr_web::FetchResponse const& response)
 {
     auto* ctor = static_cast<tr_ctor*>(response.user_data);
     tr_ctorSetMetainfo(ctor, std::data(response.body), std::size(response.body), nullptr);
