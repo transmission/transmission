@@ -32,12 +32,12 @@ struct tr_block_info
 
         // tr_file_index_t file = 0;
         // uint32_t file_offset = 0;
-        bool operator== (Location const& that) const
+        bool operator==(Location const& that) const
         {
             return this->byte == that.byte;
         }
 
-        bool operator< (Location const& that) const
+        bool operator<(Location const& that) const
         {
             return this->byte < that.byte;
         }
@@ -165,28 +165,11 @@ struct tr_block_info
         return total_size;
     }
 
-    [[nodiscard]] Location constexpr blockLoc(tr_block_index_t block) const
-    {
-        // if not initialized yet, don't divide by zero
-        if (n_blocks_in_piece == 0)
-        {
-            return {};
-        }
+    [[nodiscard]] Location blockLoc(tr_block_index_t block) const;
 
-        auto loc = Location{};
-        loc.byte = block;
-        loc.byte *= blockSize();
+    [[nodiscard]] Location pieceLoc(tr_piece_index_t piece) const;
 
-        loc.block = block;
-        loc.block_offset = 0;
-
-        loc.piece = pieceOf(loc.byte);
-        loc.piece_offset = loc.byte - (uint64_t{loc.piece} * pieceSize());
-
-        // FIXME: file
-
-        return loc;
-    }
+    [[nodiscard]] Location byteLoc(uint64_t byte) const;
 
     static uint32_t bestBlockSize(uint64_t piece_size);
 };

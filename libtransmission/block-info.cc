@@ -81,3 +81,68 @@ void tr_block_info::initSizes(uint64_t total_size_in, uint64_t piece_size_in)
     TR_ASSERT(t == n_blocks);
 #endif
 }
+
+tr_block_info::Location tr_block_info::blockLoc(tr_block_index_t block) const
+{
+    if (n_blocks_in_piece == 0) // if not initialized yet
+    {
+        return {};
+    }
+
+    auto loc = Location{};
+    loc.byte = block;
+    loc.byte *= blockSize();
+
+    loc.block = block;
+    loc.block_offset = 0;
+
+    loc.piece = pieceOf(loc.byte);
+    loc.piece_offset = loc.byte - (uint64_t{ loc.piece } * pieceSize());
+
+    // FIXME: file
+
+    return loc;
+}
+
+tr_block_info::Location tr_block_info::pieceLoc(tr_piece_index_t piece) const
+{
+    if (n_blocks_in_piece == 0) // if not initialized yet
+    {
+        return {};
+    }
+
+    auto loc = Location{};
+    loc.byte = piece;
+    loc.byte *= pieceSize();
+
+    loc.block = blockOf(loc.byte);
+    loc.block_offset = loc.byte - (uint64_t{ loc.block } * blockSize());
+
+    loc.piece = piece;
+    loc.piece_offset = 0;
+
+    // FIXME: file
+
+    return loc;
+}
+
+tr_block_info::Location tr_block_info::byteLoc(uint64_t byte) const
+{
+    if (n_blocks_in_piece == 0) // if not initialized yet
+    {
+        return {};
+    }
+
+    auto loc = Location{};
+    loc.byte = byte;
+
+    loc.block = blockOf(loc.byte);
+    loc.block_offset = loc.byte - (uint64_t{ loc.block } * blockSize());
+
+    loc.piece = pieceOf(loc.byte);
+    loc.piece_offset = loc.byte - (uint64_t{ loc.piece } * pieceSize());
+
+    // FIXME: file
+
+    return loc;
+}
