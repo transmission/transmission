@@ -201,6 +201,11 @@ public:
 
     QString getError() const;
 
+    QString trackerList() const
+    {
+        return tracker_list_;
+    }
+
     TorrentHash const& hash() const
     {
         return hash_;
@@ -606,6 +611,7 @@ public:
         STATUS,
         TOTAL_SIZE,
         TRACKER_STATS,
+        TRACKER_LIST,
         UPLOADED_EVER,
         UPLOAD_LIMIT,
         UPLOAD_LIMITED,
@@ -669,12 +675,13 @@ private:
     double recheck_progress_ = {};
     double seed_ratio_limit_ = {};
 
-    QString primary_mime_type_;
     QString comment_;
     QString creator_;
     QString download_dir_;
     QString error_string_;
     QString name_;
+    QString primary_mime_type_;
+    QString tracker_list_;
 
     // mutable because it's a lazy lookup
     mutable QIcon icon_ = IconCache::get().fileIcon();

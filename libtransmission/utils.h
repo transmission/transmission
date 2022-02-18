@@ -114,7 +114,7 @@ void tr_timerAdd(struct event* timer, int seconds, int microseconds) TR_GNUC_NON
 void tr_timerAddMsec(struct event* timer, int milliseconds) TR_GNUC_NONNULL(1);
 
 /** @brief return the current date in milliseconds */
-uint64_t tr_time_msec(void);
+uint64_t tr_time_msec();
 
 /** @brief sleep the specified number of milliseconds */
 void tr_wait_msec(long int delay_milliseconds);
@@ -360,13 +360,19 @@ constexpr std::string_view tr_strvSep(std::string_view* sv, char delim)
 {
     auto pos = sv->find(delim);
     auto const ret = sv->substr(0, pos);
-    sv->remove_prefix(pos != sv->npos ? pos + 1 : std::size(*sv));
+    sv->remove_prefix(pos != std::string_view::npos ? pos + 1 : std::size(*sv));
     return ret;
 }
 
 constexpr bool tr_strvSep(std::string_view* sv, std::string_view* token, char delim)
 {
-    return !std::empty((*token = tr_strvSep(sv, delim)));
+    if (std::empty(*sv))
+    {
+        return false;
+    }
+
+    *token = tr_strvSep(sv, delim);
+    return true;
 }
 
 std::string_view tr_strvStrip(std::string_view sv);
@@ -453,7 +459,7 @@ extern time_t __tr_current_time;
  * to always be accurate. However, it is *much* faster when 100% accuracy
  * isn't needed
  */
-static inline time_t tr_time(void)
+static inline time_t tr_time()
 {
     return __tr_current_time;
 }
@@ -542,4 +548,4 @@ char* tr_env_get_string(char const* key, char const* default_value);
 ****
 ***/
 
-void tr_net_init(void);
+void tr_net_init();
