@@ -111,11 +111,6 @@ struct tr_block_info
         return ret;
     }
 
-    [[nodiscard]] constexpr auto blockOf(tr_piece_index_t piece, uint32_t offset, uint32_t length = 0) const
-    {
-        return blockOf(this->offset(piece, offset, length));
-    }
-
     [[nodiscard]] constexpr tr_block_span_t blockSpanForPiece(tr_piece_index_t piece) const
     {
         if (!isInitialized())
@@ -158,29 +153,19 @@ struct tr_block_info
         }
     };
 
-    // location of the first byte in `block`
+    // Location of the first byte in `block`.
     [[nodiscard]] Location blockLoc(tr_block_index_t block) const;
 
-    // location of the last byte in `block`
+    // Location of the last byte in `block`.
     [[nodiscard]] Location blockLastLoc(tr_block_index_t block) const;
 
-    // location of the first byte in `piece`
-    [[nodiscard]] Location pieceLoc(tr_piece_index_t piece) const;
+    // Location of the first byte (+ optional offset and length) in `piece`
+    [[nodiscard]] Location pieceLoc(tr_piece_index_t piece, uint32_t offset = 0, uint32_t length = 0) const;
 
-    // location of the first byte in `piece`
+    // Location of the last byte in `piece`.
     [[nodiscard]] Location pieceLastLoc(tr_piece_index_t piece) const;
 
     [[nodiscard]] Location byteLoc(uint64_t byte) const;
-
-    // location of a [piece, offset, length] request
-    [[nodiscard]] Location polLoc(tr_piece_index_t piece, uint32_t offset, uint32_t length = 0) const
-    {
-        auto byte = uint64_t{ piece };
-        byte *= pieceSize();
-        byte += offset;
-        byte += length;
-        return byteLoc(byte);
-    }
 
     struct Span
     {
@@ -191,7 +176,7 @@ struct tr_block_info
     [[nodiscard]] static uint32_t bestBlockSize(uint64_t piece_size);
 
 private:
-    bool constexpr isInitialized() const
+    [[nodiscard]] bool constexpr isInitialized() const
     {
         return n_blocks_in_piece != 0;
     }

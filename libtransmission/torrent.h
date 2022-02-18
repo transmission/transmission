@@ -159,9 +159,9 @@ public:
     {
         return metainfo_.blockOf(offset);
     }
-    [[nodiscard]] constexpr auto blockOf(tr_piece_index_t piece, uint32_t offset, uint32_t length = 0) const
+    [[nodiscard]] auto pieceLoc(tr_piece_index_t piece, uint32_t offset, uint32_t length = 0) const
     {
-        return metainfo_.blockOf(piece, offset, length);
+        return blockInfo().pieceLoc(piece, offset, length);
     }
     [[nodiscard]] constexpr auto blockSize() const
     {

@@ -816,7 +816,7 @@ static void peerCallbackFunc(tr_peer* peer, tr_peer_event const* e, void* vs)
         break;
 
     case TR_PEER_CLIENT_GOT_REJ:
-        s->active_requests.remove(s->tor->blockOf(e->pieceIndex, e->offset), peer);
+        s->active_requests.remove(s->tor->pieceLoc(e->pieceIndex, e->offset).block, peer);
         break;
 
     case TR_PEER_CLIENT_GOT_CHOKE:
@@ -841,12 +841,11 @@ static void peerCallbackFunc(tr_peer* peer, tr_peer_event const* e, void* vs)
 
     case TR_PEER_CLIENT_GOT_BLOCK:
         {
-            tr_torrent* tor = s->tor;
-            tr_piece_index_t const p = e->pieceIndex;
-            tr_block_index_t const block = tor->blockOf(p, e->offset);
-            cancelAllRequestsForBlock(s, block, peer);
+            auto* const tor = s->tor;
+            auto const loc = tor->pieceLoc(e->pieceIndex, e->offset);
+            cancelAllRequestsForBlock(s, loc.block, peer);
             peer->blocksSentToClient.add(tr_time(), 1);
-            tr_torrentGotBlock(tor, block);
+            tr_torrentGotBlock(tor, loc.block);
             break;
         }
 

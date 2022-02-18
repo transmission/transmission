@@ -117,7 +117,7 @@ tr_block_info::Location tr_block_info::blockLastLoc(tr_block_index_t block) cons
     return byteLoc(byte);
 }
 
-tr_block_info::Location tr_block_info::pieceLoc(tr_piece_index_t piece) const
+tr_block_info::Location tr_block_info::pieceLoc(tr_piece_index_t piece, uint32_t offset, uint32_t length) const
 {
     if (!isInitialized())
     {
@@ -127,12 +127,14 @@ tr_block_info::Location tr_block_info::pieceLoc(tr_piece_index_t piece) const
     auto loc = Location{};
     loc.byte = piece;
     loc.byte *= pieceSize();
+    loc.byte += offset;
+    loc.byte += length;
 
     loc.block = blockOf(loc.byte);
-    loc.block_offset = loc.byte - (uint64_t{ loc.block } * blockSize());
+    loc.block_offset = static_cast<uint32_t>(loc.byte - (uint64_t{ loc.block } * blockSize()));
 
-    loc.piece = piece;
-    loc.piece_offset = 0;
+    loc.piece = pieceOf(loc.byte);
+    loc.piece_offset = static_cast<uint32_t>(loc.byte - (uint64_t{ loc.piece } * pieceSize()));
 
     // FIXME: file
 

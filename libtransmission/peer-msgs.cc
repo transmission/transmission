@@ -363,11 +363,6 @@ public:
         return tr_peerIoGetAge(io);
     }
 
-    [[nodiscard]] bool is_reading_block(tr_block_index_t block) const override
-    {
-        return state == AwaitingBt::Piece && block == torrent->blockOf(incoming.blockReq.index, incoming.blockReq.offset);
-    }
-
     void cancel_block_request(tr_block_index_t block) override
     {
         protocolSendCancel(this, blockToReq(torrent, block));
@@ -1888,8 +1883,8 @@ static int clientGotBlock(tr_peerMsgsImpl* msgs, struct evbuffer* data, struct p
     TR_ASSERT(msgs != nullptr);
     TR_ASSERT(req != nullptr);
 
-    tr_torrent* tor = msgs->torrent;
-    tr_block_index_t const block = tor->blockOf(req->index, req->offset);
+    tr_torrent* const tor = msgs->torrent;
+    auto const block = tor->pieceLoc(req->index, req->offset).block;
 
     if (!requestIsValid(msgs, req))
     {

@@ -31,6 +31,7 @@ struct cache_block
 {
     tr_torrent* tor;
 
+    // TODO: use tr_block_info::Location
     tr_piece_index_t piece;
     uint32_t offset;
     uint32_t length;
@@ -304,9 +305,9 @@ static int cache_block_compare(void const* va, void const* vb)
 
 static struct cache_block* findBlock(tr_cache* cache, tr_torrent* torrent, tr_piece_index_t piece, uint32_t offset)
 {
-    struct cache_block key;
+    auto key = cache_block{};
     key.tor = torrent;
-    key.block = torrent->blockOf(piece, offset);
+    key.block = torrent->pieceLoc(piece, offset).block;
     return static_cast<struct cache_block*>(tr_ptrArrayFindSorted(&cache->blocks, &key, cache_block_compare));
 }
 
@@ -329,7 +330,7 @@ int tr_cacheWriteBlock(
         cb->piece = piece;
         cb->offset = offset;
         cb->length = length;
-        cb->block = torrent->blockOf(piece, offset);
+        cb->block = torrent->pieceLoc(piece, offset).block;
         cb->evbuf = evbuffer_new();
         tr_ptrArrayInsertSorted(&cache->blocks, cb, cache_block_compare);
     }

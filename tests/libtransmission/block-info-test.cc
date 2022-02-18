@@ -244,6 +244,27 @@ TEST_F(BlockInfoTest, pieceLoc)
         EXPECT_EQ(i, loc.piece);
         EXPECT_EQ(0, loc.piece_offset);
     }
+
+    loc = info.pieceLoc(0, PieceSize - 1);
+    EXPECT_EQ(PieceSize - 1, loc.byte);
+    EXPECT_EQ(ExpectedBlocksPerPiece - 1, loc.block);
+    EXPECT_EQ(ExpectedBlockSize - 1, loc.block_offset);
+    EXPECT_EQ(0, loc.piece);
+    EXPECT_EQ(PieceSize - 1, loc.piece_offset);
+
+    loc = info.pieceLoc(0, PieceSize);
+    EXPECT_EQ(PieceSize, loc.byte);
+    EXPECT_EQ(ExpectedBlocksPerPiece, loc.block);
+    EXPECT_EQ(0, loc.block_offset);
+    EXPECT_EQ(1, loc.piece);
+    EXPECT_EQ(0, loc.piece_offset);
+
+    loc = info.pieceLoc(0, PieceSize + 1);
+    EXPECT_EQ(PieceSize + 1, loc.byte);
+    EXPECT_EQ(ExpectedBlocksPerPiece, loc.block);
+    EXPECT_EQ(1, loc.block_offset);
+    EXPECT_EQ(1, loc.piece);
+    EXPECT_EQ(1, loc.piece_offset);
 }
 
 TEST_F(BlockInfoTest, pieceLastLoc)
