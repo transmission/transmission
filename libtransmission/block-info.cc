@@ -155,3 +155,10 @@ tr_block_info::Location tr_block_info::polLoc(tr_piece_index_t piece, uint32_t o
     byte += length;
     return byteLoc(byte);
 }
+
+tr_block_info::Span tr_block_info::blockSpan(tr_block_index_t block) const
+{
+    auto const begin = blockLoc(block);
+    auto const end = byteLoc(begin.byte + blockSize(block));
+    return { begin, end };
+}
