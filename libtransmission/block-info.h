@@ -141,10 +141,18 @@ struct tr_block_info
         auto loc = Location{};
         loc.byte = byte;
 
-        loc.block = blockOf(loc.byte);
-        loc.block_offset = static_cast<uint32_t>(loc.byte - (uint64_t{ loc.block } * blockSize()));
+        if (byte == totalSize()) // handle 0-byte files at the end of a torrent
+        {
+            loc.block = n_blocks - 1;
+            loc.piece = n_pieces - 1;
+        }
+        else
+        {
+            loc.block = byte / block_size;
+            loc.piece = byte / piece_size;
+        }
 
-        loc.piece = pieceOf(loc.byte);
+        loc.block_offset = static_cast<uint32_t>(loc.byte - (uint64_t{ loc.block } * blockSize()));
         loc.piece_offset = static_cast<uint32_t>(loc.byte - (uint64_t{ loc.piece } * pieceSize()));
 
         return loc;
@@ -156,37 +164,5 @@ private:
     [[nodiscard]] bool constexpr isInitialized() const
     {
         return n_blocks_in_piece != 0;
-    }
-
-    [[nodiscard]] constexpr tr_block_index_t blockOf(uint64_t offset) const
-    {
-        if (!isInitialized())
-        {
-            return {};
-        }
-
-        // handle 0-byte files at the end of a torrent
-        if (offset == total_size)
-        {
-            return n_blocks - 1;
-        }
-
-        return offset / block_size;
-    }
-
-    [[nodiscard]] constexpr tr_piece_index_t pieceOf(uint64_t offset) const
-    {
-        if (!isInitialized())
-        {
-            return {};
-        }
-
-        // handle 0-byte files at the end of a torrent
-        if (offset == total_size)
-        {
-            return n_pieces - 1;
-        }
-
-        return offset / piece_size;
     }
 };
