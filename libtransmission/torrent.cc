@@ -2028,40 +2028,49 @@ bool tr_torrent::checkPiece(tr_piece_index_t piece)
 ****
 ***/
 
-bool tr_torrentSetAnnounceList(tr_torrent* tor, char const* const* announce_urls, tr_tracker_tier_t const* tiers, size_t n)
+bool tr_torrent::setTrackerList(std::string_view text)
 {
-    TR_ASSERT(tr_isTorrent(tor));
-    auto const lock = tor->unique_lock();
+    auto const lock = this->unique_lock();
 
     auto announce_list = tr_announce_list();
-    if ((announce_list.set(announce_urls, tiers, n) == 0U) || !announce_list.save(tor->torrentFile()))
+    if (!announce_list.parse(text) || !announce_list.save(this->torrentFile()))
     {
         return false;
     }
 
-    tor->metainfo_.announceList() = announce_list;
-    tor->markEdited();
+    this->metainfo_.announceList() = announce_list;
+    this->markEdited();
 
     /* if we had a tracker-related error on this torrent,
      * and that tracker's been removed,
      * then clear the error */
-    if (tor->error == TR_STAT_TRACKER_WARNING || tor->error == TR_STAT_TRACKER_ERROR)
+    if (this->error == TR_STAT_TRACKER_WARNING || this->error == TR_STAT_TRACKER_ERROR)
     {
-        auto const error_url = tor->error_announce_url;
+        auto const error_url = this->error_announce_url;
 
         if (std::any_of(
-                std::begin(tor->announceList()),
-                std::end(tor->announceList()),
+                std::begin(this->announceList()),
+                std::end(this->announceList()),
                 [error_url](auto const& tracker) { return tracker.announce_str == error_url; }))
         {
-            tr_torrentClearError(tor);
+            tr_torrentClearError(this);
         }
     }
 
     /* tell the announcer to reload this torrent's tracker list */
-    tr_announcerResetTorrent(tor->session->announcer, tor);
+    tr_announcerResetTorrent(this->session->announcer, this);
 
     return true;
+}
+
+bool tr_torrentSetTrackerList(tr_torrent* tor, char const* text)
+{
+    return text != nullptr && tor->setTrackerList(text);
+}
+
+char* tr_torrentGetTrackerList(tr_torrent const* tor)
+{
+    return tr_strvDup(tor->trackerList());
 }
 
 /**
