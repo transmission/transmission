@@ -171,5 +171,7 @@ struct tr_block_info
 
     [[nodiscard]] Location byteLoc(uint64_t byte) const;
 
+    [[nodiscard]] Location polLoc(tr_piece_index_t piece, uint32_t offset, uint32_t length = 0) const;
+
     static uint32_t bestBlockSize(uint64_t piece_size);
 };

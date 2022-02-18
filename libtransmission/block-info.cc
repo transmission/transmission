@@ -146,3 +146,12 @@ tr_block_info::Location tr_block_info::byteLoc(uint64_t byte) const
 
     return loc;
 }
+
+tr_block_info::Location tr_block_info::polLoc(tr_piece_index_t piece, uint32_t offset, uint32_t length) const
+{
+    auto byte = uint64_t{ piece };
+    byte *= pieceSize();
+    byte += offset;
+    byte += length;
+    return byteLoc(byte);
+}
