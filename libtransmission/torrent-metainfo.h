@@ -48,6 +48,10 @@ public:
     {
         return blockInfo().byteLoc(byte);
     }
+    [[nodiscard]] auto blockLoc(tr_block_index_t block) const
+    {
+        return blockInfo().blockLoc(block);
+    }
     [[nodiscard]] auto pieceLoc(tr_piece_index_t piece, uint32_t offset, uint32_t length = 0) const
     {
         return blockInfo().pieceLoc(piece, offset, length);
@@ -67,10 +71,6 @@ public:
     [[nodiscard]] constexpr auto pieceCount() const
     {
         return blockInfo().pieceCount();
-    }
-    [[nodiscard]] constexpr auto pieceForBlock(tr_block_index_t block) const
-    {
-        return blockInfo().pieceForBlock(block);
     }
     [[nodiscard]] constexpr auto pieceSize() const
     {

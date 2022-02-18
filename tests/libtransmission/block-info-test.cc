@@ -65,23 +65,6 @@ TEST_F(BlockInfoTest, handlesOddSize)
     EXPECT_EQ(TotalSize, info.total_size);
 }
 
-TEST_F(BlockInfoTest, pieceForBlock)
-{
-    auto info = tr_block_info{};
-
-    uint64_t constexpr ExpectedBlockSize = 1024 * 16;
-    uint64_t constexpr ExpectedBlocksPerPiece = 4;
-    uint64_t constexpr PieceSize = ExpectedBlockSize * ExpectedBlocksPerPiece;
-    uint64_t constexpr PieceCount = 4;
-    uint64_t constexpr TotalSize = PieceSize * PieceCount;
-    info.initSizes(TotalSize, PieceSize);
-
-    for (uint64_t i = 0; i < info.n_blocks; ++i)
-    {
-        EXPECT_EQ((i * ExpectedBlockSize) / PieceSize, info.pieceForBlock(i));
-    }
-}
-
 TEST_F(BlockInfoTest, pieceSize)
 {
     auto info = tr_block_info{};

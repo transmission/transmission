@@ -54,16 +54,6 @@ struct tr_block_info
         return piece_size;
     }
 
-    [[nodiscard]] constexpr tr_piece_index_t pieceForBlock(tr_block_index_t block) const
-    {
-        if (!isInitialized())
-        {
-            return {};
-        }
-
-        return block / n_blocks_in_piece;
-    }
-
     [[nodiscard]] constexpr auto pieceSize(tr_piece_index_t piece) const
     {
         // how many bytes are in this piece?

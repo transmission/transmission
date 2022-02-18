@@ -2563,21 +2563,21 @@ void tr_torrentGotBlock(tr_torrent* tor, tr_block_index_t block)
         tor->completion.addBlock(block);
         tor->setDirty();
 
-        tr_piece_index_t const p = tor->pieceForBlock(block);
+        auto const piece = tor->blockLoc(block).piece;
 
-        if (tor->hasPiece(p))
+        if (tor->hasPiece(piece))
         {
-            if (tor->checkPiece(p))
+            if (tor->checkPiece(piece))
             {
-                tr_torrentPieceCompleted(tor, p);
+                tr_torrentPieceCompleted(tor, piece);
             }
             else
             {
-                uint32_t const n = tor->pieceSize(p);
-                tr_logAddTorErr(tor, _("Piece %" PRIu32 ", which was just downloaded, failed its checksum test"), p);
+                uint32_t const n = tor->pieceSize(piece);
+                tr_logAddTorErr(tor, _("Piece %" PRIu32 ", which was just downloaded, failed its checksum test"), piece);
                 tor->corruptCur += n;
                 tor->downloadedCur -= std::min(tor->downloadedCur, uint64_t{ n });
-                tr_peerMgrGotBadPiece(tor, p);
+                tr_peerMgrGotBadPiece(tor, piece);
             }
         }
     }

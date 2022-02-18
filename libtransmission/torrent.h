@@ -159,6 +159,10 @@ public:
     {
         return metainfo_.byteLoc(byte);
     }
+    [[nodiscard]] auto blockLoc(tr_block_index_t block) const
+    {
+        return metainfo_.blockLoc(block);
+    }
     [[nodiscard]] auto pieceLoc(tr_piece_index_t piece, uint32_t offset, uint32_t length = 0) const
     {
         return metainfo_.pieceLoc(piece, offset, length);
@@ -178,10 +182,6 @@ public:
     [[nodiscard]] constexpr auto pieceCount() const
     {
         return metainfo_.pieceCount();
-    }
-    [[nodiscard]] constexpr auto pieceForBlock(tr_block_index_t block) const
-    {
-        return metainfo_.pieceForBlock(block);
     }
     [[nodiscard]] constexpr auto pieceSize() const
     {

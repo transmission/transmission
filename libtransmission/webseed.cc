@@ -42,9 +42,9 @@ public:
         : webseed{ webseed_in }
         , session{ tor->session }
         , block{ span.begin }
-        , piece_index{ tor->pieceForBlock(this->block) }
-        , piece_offset{ static_cast<uint32_t>(
-              int64_t{ tor->blockSize() } * this->block - tor->pieceSize() * this->piece_index) }
+        // TODO(ckerr): just own the loc
+        , piece_index{ tor->blockLoc(this->block).piece }
+        , piece_offset{ tor->blockLoc(this->block).piece_offset }
         , block_size{ tor->blockSize() }
         , length{ (span.end - 1 - span.begin) * tor->blockSize() + tor->blockSize(span.end - 1) }
     {
