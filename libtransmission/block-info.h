@@ -56,10 +56,9 @@ struct tr_block_info
 
     [[nodiscard]] constexpr tr_piece_index_t pieceForBlock(tr_block_index_t block) const
     {
-        // if not initialized yet, don't divide by zero
-        if (n_blocks_in_piece == 0)
+        if (!isInitialized())
         {
-            return 0;
+            return {};
         }
 
         return block / n_blocks_in_piece;
@@ -73,10 +72,9 @@ struct tr_block_info
 
     [[nodiscard]] constexpr tr_piece_index_t pieceOf(uint64_t offset) const
     {
-        // if not initialized yet, don't divide by zero
-        if (piece_size == 0)
+        if (!isInitialized())
         {
-            return 0;
+            return {};
         }
 
         // handle 0-byte files at the end of a torrent
@@ -90,10 +88,9 @@ struct tr_block_info
 
     [[nodiscard]] constexpr tr_block_index_t blockOf(uint64_t offset) const
     {
-        // if not initialized yet, don't divide by zero
-        if (block_size == 0)
+        if (!isInitialized())
         {
-            return 0;
+            return {};
         }
 
         // handle 0-byte files at the end of a torrent
@@ -121,7 +118,7 @@ struct tr_block_info
 
     [[nodiscard]] constexpr tr_block_span_t blockSpanForPiece(tr_piece_index_t piece) const
     {
-        if (block_size == 0)
+        if (!isInitialized())
         {
             return {};
         }
@@ -167,7 +164,11 @@ struct tr_block_info
     // location of the last byte in `block`
     [[nodiscard]] Location blockLastLoc(tr_block_index_t block) const;
 
+    // location of the first byte in `piece`
     [[nodiscard]] Location pieceLoc(tr_piece_index_t piece) const;
+
+    // location of the first byte in `piece`
+    [[nodiscard]] Location pieceLastLoc(tr_piece_index_t piece) const;
 
     [[nodiscard]] Location byteLoc(uint64_t byte) const;
 
@@ -192,4 +193,10 @@ struct tr_block_info
     };
 
     [[nodiscard]] static uint32_t bestBlockSize(uint64_t piece_size);
+
+private:
+    bool constexpr isInitialized() const
+    {
+        return n_blocks_in_piece != 0;
+    }
 };

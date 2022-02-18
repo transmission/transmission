@@ -217,15 +217,6 @@ TEST_F(BlockInfoTest, blockLastLoc)
     EXPECT_EQ(info.totalSize() - 1 - (ExpectedBlockSize * (info.blockCount() - 1)), loc.block_offset);
     EXPECT_EQ(info.pieceCount() - 1, loc.piece);
     EXPECT_EQ(info.totalSize() - 1 - PieceSize * (PieceCount - 1), loc.piece_offset);
-
-#if 0
-    loc = info.blockLastLoc(0);
-    EXPECT_EQ(mmm, loc.byte);
-    EXPECT_EQ(mmm, loc.block);
-    EXPECT_EQ(mmm, loc.block_offset);
-    EXPECT_EQ(mmm, loc.piece);
-    EXPECT_EQ(mmm, loc.piece_offset);
-#endif
 }
 
 TEST_F(BlockInfoTest, pieceLoc)
@@ -253,6 +244,32 @@ TEST_F(BlockInfoTest, pieceLoc)
         EXPECT_EQ(i, loc.piece);
         EXPECT_EQ(0, loc.piece_offset);
     }
+}
+
+TEST_F(BlockInfoTest, pieceLastLoc)
+{
+    auto info = tr_block_info{};
+
+    uint64_t constexpr ExpectedBlockSize = 1024 * 16;
+    uint64_t constexpr ExpectedBlocksPerPiece = 4;
+    uint64_t constexpr PieceSize = ExpectedBlockSize * ExpectedBlocksPerPiece;
+    uint64_t constexpr PieceCount = 5;
+    uint64_t constexpr TotalSize = PieceSize * (PieceCount - 1) + 1;
+    info.initSizes(TotalSize, PieceSize);
+
+    auto loc = info.pieceLastLoc(0);
+    EXPECT_EQ(PieceSize - 1, loc.byte);
+    EXPECT_EQ(ExpectedBlocksPerPiece - 1, loc.block);
+    EXPECT_EQ(ExpectedBlockSize - 1, loc.block_offset);
+    EXPECT_EQ(0, loc.piece);
+    EXPECT_EQ(PieceSize - 1, loc.piece_offset);
+
+    loc = info.pieceLastLoc(info.pieceCount() - 1);
+    EXPECT_EQ(info.totalSize() - 1, loc.byte);
+    EXPECT_EQ(info.blockCount() - 1, loc.block);
+    EXPECT_EQ(info.totalSize() - 1 - (ExpectedBlockSize * (info.blockCount() - 1)), loc.block_offset);
+    EXPECT_EQ(info.pieceCount() - 1, loc.piece);
+    EXPECT_EQ(info.totalSize() - 1 - PieceSize * (PieceCount - 1), loc.piece_offset);
 }
 
 TEST_F(BlockInfoTest, byteLoc)

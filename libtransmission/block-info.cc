@@ -84,7 +84,7 @@ void tr_block_info::initSizes(uint64_t total_size_in, uint64_t piece_size_in)
 
 tr_block_info::Location tr_block_info::blockLoc(tr_block_index_t block) const
 {
-    if (n_blocks_in_piece == 0) // if not initialized yet
+    if (!isInitialized())
     {
         return {};
     }
@@ -106,7 +106,7 @@ tr_block_info::Location tr_block_info::blockLoc(tr_block_index_t block) const
 
 tr_block_info::Location tr_block_info::blockLastLoc(tr_block_index_t block) const
 {
-    if (n_blocks_in_piece == 0) // if not initialized yet
+    if (!isInitialized())
     {
         return {};
     }
@@ -119,7 +119,7 @@ tr_block_info::Location tr_block_info::blockLastLoc(tr_block_index_t block) cons
 
 tr_block_info::Location tr_block_info::pieceLoc(tr_piece_index_t piece) const
 {
-    if (n_blocks_in_piece == 0) // if not initialized yet
+    if (!isInitialized())
     {
         return {};
     }
@@ -139,9 +139,22 @@ tr_block_info::Location tr_block_info::pieceLoc(tr_piece_index_t piece) const
     return loc;
 }
 
+tr_block_info::Location tr_block_info::pieceLastLoc(tr_piece_index_t piece) const
+{
+    if (!isInitialized())
+    {
+        return {};
+    }
+
+    auto byte = uint64_t{ piece };
+    byte *= pieceSize();
+    byte += pieceSize(piece) - 1;
+    return byteLoc(byte);
+}
+
 tr_block_info::Location tr_block_info::byteLoc(uint64_t byte) const
 {
-    if (n_blocks_in_piece == 0) // if not initialized yet
+    if (!isInitialized())
     {
         return {};
     }
