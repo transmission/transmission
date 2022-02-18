@@ -85,10 +85,6 @@ struct tr_block_info
         tr_block_index_t block = 0;
         uint32_t block_offset = 0;
 
-        // TODO
-        // tr_file_index_t file = 0;
-        // uint32_t file_offset = 0;a
-
         bool operator==(Location const& that) const
         {
             return this->byte == that.byte;
@@ -107,7 +103,15 @@ struct tr_block_info
     }
 
     // Location of the last byte in `block`.
-    [[nodiscard]] Location blockLastLoc(tr_block_index_t block) const;
+    [[nodiscard]] Location blockLastLoc(tr_block_index_t block) const
+    {
+        if (!isInitialized())
+        {
+            return {};
+        }
+
+        return byteLoc(uint64_t{ block } * blockSize() + blockSize(block) - 1);
+    }
 
     // Location of the first byte (+ optional offset and length) in `piece`
     [[nodiscard]] Location pieceLoc(tr_piece_index_t piece, uint32_t offset = 0, uint32_t length = 0) const
@@ -116,15 +120,35 @@ struct tr_block_info
     }
 
     // Location of the last byte in `piece`.
-    [[nodiscard]] Location pieceLastLoc(tr_piece_index_t piece) const;
-
-    [[nodiscard]] Location byteLoc(uint64_t byte) const;
-
-    struct Span
+    [[nodiscard]] Location pieceLastLoc(tr_piece_index_t piece) const
     {
-        Location begin;
-        Location end;
-    };
+        if (!isInitialized())
+        {
+            return {};
+        }
+
+        return byteLoc(uint64_t{ piece } * pieceSize() + pieceSize(piece) - 1);
+    }
+
+    // Location of the torrent's nth byte
+    [[nodiscard]] Location byteLoc(uint64_t byte) const
+    {
+        if (!isInitialized())
+        {
+            return {};
+        }
+
+        auto loc = Location{};
+        loc.byte = byte;
+
+        loc.block = blockOf(loc.byte);
+        loc.block_offset = static_cast<uint32_t>(loc.byte - (uint64_t{ loc.block } * blockSize()));
+
+        loc.piece = pieceOf(loc.byte);
+        loc.piece_offset = static_cast<uint32_t>(loc.byte - (uint64_t{ loc.piece } * pieceSize()));
+
+        return loc;
+    }
 
     [[nodiscard]] static uint32_t bestBlockSize(uint64_t piece_size);
 
