@@ -19,6 +19,7 @@
 #include "Typedefs.h"
 
 #include "ui_DetailsDialog.h"
+#include "ui_TrackersDialog.h"
 
 class QTreeWidgetItem;
 
@@ -68,10 +69,11 @@ private slots:
     // Tracker tab
     void onTrackerSelectionChanged();
     void onAddTrackerClicked();
-    void onEditTrackerClicked();
+    void onEditTrackersClicked();
     void onRemoveTrackerClicked();
     void onShowTrackerScrapesToggled(bool);
     void onShowBackupTrackersToggled(bool);
+    void onTrackerListEdited(QString);
 
     // Files tab
     void onFilePriorityChanged(QSet<int> const& file_indices, int);
@@ -124,6 +126,7 @@ private:
     TorrentModel const& model_;
 
     Ui::DetailsDialog ui_ = {};
+    Ui::TrackersDialog trackers_ui_ = {};
 
     torrent_ids_t ids_;
     QTimer model_timer_;
