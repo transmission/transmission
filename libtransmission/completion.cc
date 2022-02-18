@@ -222,9 +222,8 @@ uint64_t tr_completion::countHasBytesInSpan(tr_byte_span_t span) const
     }
 
     // get the block span of the byte span
-    auto const begin_block = block_info_->blockOf(begin_byte);
-    auto const final_byte = end_byte - 1;
-    auto const final_block = block_info_->blockOf(final_byte);
+    auto const begin_block = block_info_->byteLoc(begin_byte).block;
+    auto const final_block = block_info_->byteLoc(end_byte - 1).block;
 
     // if the entire span is in a single block
     if (begin_block == final_block)

@@ -155,13 +155,13 @@ public:
     {
         return metainfo_.blockCount();
     }
-    [[nodiscard]] constexpr auto blockOf(uint64_t offset) const
+    [[nodiscard]] auto byteLoc(uint64_t byte) const
     {
-        return metainfo_.blockOf(offset);
+        return metainfo_.byteLoc(byte);
     }
     [[nodiscard]] auto pieceLoc(tr_piece_index_t piece, uint32_t offset, uint32_t length = 0) const
     {
-        return blockInfo().pieceLoc(piece, offset, length);
+        return metainfo_.pieceLoc(piece, offset, length);
     }
     [[nodiscard]] constexpr auto blockSize() const
     {

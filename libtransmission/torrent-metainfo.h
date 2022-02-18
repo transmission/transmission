@@ -44,9 +44,9 @@ public:
     {
         return blockInfo().blockCount();
     }
-    [[nodiscard]] constexpr auto blockOf(uint64_t offset) const
+    [[nodiscard]] auto byteLoc(uint64_t byte) const
     {
-        return blockInfo().blockOf(offset);
+        return blockInfo().byteLoc(byte);
     }
     [[nodiscard]] auto pieceLoc(tr_piece_index_t piece, uint32_t offset, uint32_t length = 0) const
     {

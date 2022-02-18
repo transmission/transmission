@@ -2001,14 +2001,14 @@ tr_block_span_t tr_torGetFileBlockSpan(tr_torrent const* tor, tr_file_index_t i)
 {
     auto const [begin_byte, end_byte] = tor->fpm_.byteSpan(i);
 
-    auto const begin_block = tor->blockOf(begin_byte);
+    auto const begin_block = tor->byteLoc(begin_byte).block;
     if (begin_byte >= end_byte)
     {
         return { begin_block, begin_block };
     }
 
-    auto const final_byte = end_byte - 1;
-    auto const end_block = tor->blockOf(final_byte) + 1;
+    auto const final_block = tor->byteLoc(end_byte - 1).block;
+    auto const end_block = final_block + 1;
     return { begin_block, end_block };
 }
 
