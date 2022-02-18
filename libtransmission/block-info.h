@@ -20,35 +20,6 @@ struct tr_block_info
     uint32_t final_block_size = 0;
     uint32_t final_piece_size = 0;
 
-    struct Location
-    {
-        uint64_t byte = 0;
-
-        tr_piece_index_t piece = 0;
-        uint32_t piece_offset = 0;
-
-        tr_block_index_t block = 0;
-        uint32_t block_offset = 0;
-
-        // tr_file_index_t file = 0;
-        // uint32_t file_offset = 0;
-        bool operator==(Location const& that) const
-        {
-            return this->byte == that.byte;
-        }
-
-        bool operator<(Location const& that) const
-        {
-            return this->byte < that.byte;
-        }
-    };
-
-    struct Span
-    {
-        Location begin;
-        Location end;
-    };
-
     tr_block_info() = default;
     tr_block_info(uint64_t total_size_in, uint64_t piece_size_in)
     {
@@ -165,19 +136,71 @@ struct tr_block_info
         return total_size;
     }
 
+    struct Location
+    {
+        uint64_t byte = 0;
+
+        tr_piece_index_t piece = 0;
+        uint32_t piece_offset = 0;
+
+        tr_block_index_t block = 0;
+        uint32_t block_offset = 0;
+
+        // TODO
+        // tr_file_index_t file = 0;
+        // uint32_t file_offset = 0;a
+
+        bool operator==(Location const& that) const
+        {
+            return this->byte == that.byte;
+        }
+
+        bool operator<(Location const& that) const
+        {
+            return this->byte < that.byte;
+        }
+    };
+
     [[nodiscard]] Location blockLoc(tr_block_index_t block) const;
 
     [[nodiscard]] Location pieceLoc(tr_piece_index_t piece) const;
 
     [[nodiscard]] Location byteLoc(uint64_t byte) const;
 
-    [[nodiscard]] Location polLoc(tr_piece_index_t piece, uint32_t offset, uint32_t length = 0) const;
+    [[nodiscard]] Location polLoc(tr_piece_index_t piece, uint32_t offset, uint32_t length = 0) const
+    {
+        auto byte = uint64_t{ piece };
+        byte *= pieceSize();
+        byte += offset;
+        byte += length;
+        return byteLoc(byte);
+    }
 
-    [[nodiscard]] Span blockSpan(tr_block_index_t block) const;
-
-    [[nodiscard]] constexpr Location endLoc() const
+    [[nodiscard]] Location endLoc() const
     {
         return byteLoc(totalSize());
+    }
+
+    struct Span
+    {
+        Location begin;
+        Location end;
+    };
+
+    [[nodiscard]] auto blockSpan(tr_block_index_t block) const
+    {
+        auto ret = Span{};
+        ret.begin = blockLoc(block);
+        ret.end = byteLoc(ret.begin.byte + blockSize(block));
+        return ret;
+    }
+
+    [[nodiscard]] Span pieceSpan(tr_piece_index_t piece) const
+    {
+        auto ret = Span{};
+        ret.begin = pieceLoc(piece);
+        ret.end = byteLoc(ret.begin.byte + pieceSize(piece));
+        return ret;
     }
 
     static uint32_t bestBlockSize(uint64_t piece_size);
