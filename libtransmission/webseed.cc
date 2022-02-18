@@ -327,7 +327,7 @@ void write_block_func(void* vdata)
             while (len > 0)
             {
                 uint32_t const bytes_this_pass = std::min(len, block_size);
-                tr_cacheWriteBlock(cache, tor, piece, offset_end - len, bytes_this_pass, buf);
+                tr_cacheWriteBlock(cache, tor, tor->pieceLoc(piece, offset_end - len), bytes_this_pass, buf);
                 len -= bytes_this_pass;
             }
 
@@ -457,8 +457,7 @@ void onPartialDataFetched(tr_web::FetchResponse const& web_response)
                     tr_cacheWriteBlock(
                         session->cache,
                         tor,
-                        t->piece_index,
-                        t->piece_offset + bytes_done,
+                        tor->pieceLoc(t->piece_index, t->piece_offset + bytes_done),
                         buf_len,
                         t->content());
 

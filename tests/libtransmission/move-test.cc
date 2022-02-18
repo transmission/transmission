@@ -77,7 +77,12 @@ TEST_P(IncompleteDirTest, incompleteDir)
     auto const test_incomplete_dir_threadfunc = [](void* vdata) noexcept
     {
         auto* data = static_cast<TestIncompleteDirData*>(vdata);
-        tr_cacheWriteBlock(data->session->cache, data->tor, 0, data->offset, data->tor->blockSize(), data->buf);
+        tr_cacheWriteBlock(
+            data->session->cache,
+            data->tor,
+            data->tor->pieceLoc(0, data->offset),
+            data->tor->blockSize(),
+            data->buf);
         tr_torrentGotBlock(data->tor, data->block);
         data->done = true;
     };

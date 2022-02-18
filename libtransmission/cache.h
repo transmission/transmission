@@ -11,6 +11,10 @@
 
 #include <cstdint> // intX_t, uintX_t
 
+#include "transmission.h"
+
+#include "block-info.h"
+
 struct evbuffer;
 struct tr_cache;
 struct tr_torrent;
@@ -34,20 +38,13 @@ int64_t tr_cacheGetLimit(tr_cache const*);
 int tr_cacheWriteBlock(
     tr_cache* cache,
     tr_torrent* torrent,
-    tr_piece_index_t piece,
-    uint32_t offset,
+    tr_block_info::Location loc,
     uint32_t len,
     struct evbuffer* writeme);
 
-int tr_cacheReadBlock(
-    tr_cache* cache,
-    tr_torrent* torrent,
-    tr_piece_index_t piece,
-    uint32_t offset,
-    uint32_t len,
-    uint8_t* setme);
+int tr_cacheReadBlock(tr_cache* cache, tr_torrent* torrent, tr_block_info::Location loc, uint32_t len, uint8_t* setme);
 
-int tr_cachePrefetchBlock(tr_cache* cache, tr_torrent* torrent, tr_piece_index_t piece, uint32_t offset, uint32_t len);
+int tr_cachePrefetchBlock(tr_cache* cache, tr_torrent* torrent, tr_block_info::Location loc, uint32_t len);
 
 /***
 ****
