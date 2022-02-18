@@ -747,7 +747,7 @@ bool trashDataFile(char const* filename, tr_error** error)
     }
 
     char* old_list = tr_torrentGetTrackerList(fHandle);
-    auto new_list = tr_strvJoin(old_list, "\n\n"sv, new_tracker.UTF8String);
+    auto new_list = tr_strvJoin(old_list, "\n\n", new_tracker.UTF8String);
     BOOL const success = tr_torrentSetTrackerList(fHandle, new_list.c_str());
     tr_free(old_list);
 
@@ -774,7 +774,7 @@ bool trashDataFile(char const* filename, tr_error** error)
         }
 
         new_list += tracker.announce;
-        new_list += '\n';a
+        new_list += '\n';
 
         current_tier = tracker.tier;
     }
