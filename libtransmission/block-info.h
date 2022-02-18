@@ -172,6 +172,7 @@ struct tr_block_info
 
     [[nodiscard]] Location byteLoc(uint64_t byte) const;
 
+    // location of a [piece, offset, length] request
     [[nodiscard]] Location polLoc(tr_piece_index_t piece, uint32_t offset, uint32_t length = 0) const
     {
         auto byte = uint64_t{ piece };
@@ -179,11 +180,6 @@ struct tr_block_info
         byte += offset;
         byte += length;
         return byteLoc(byte);
-    }
-
-    [[nodiscard]] Location endLoc() const
-    {
-        return byteLoc(totalSize());
     }
 
     struct Span
