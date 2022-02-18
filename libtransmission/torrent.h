@@ -777,9 +777,6 @@ char* tr_torrentBuildPartial(tr_torrent const*, tr_file_index_t fileNo);
 
 tr_peer_id_t const& tr_torrentGetPeerId(tr_torrent* tor);
 
-/** @brief free a metainfo */
-void tr_metainfoFree(tr_info* inf);
-
 tr_torrent_metainfo&& tr_ctorStealMetainfo(tr_ctor* ctor);
 
 bool tr_ctorSetMetainfoFromFile(tr_ctor* ctor, std::string const& filename, tr_error** error);

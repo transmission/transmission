@@ -20,6 +20,35 @@ struct tr_block_info
     uint32_t final_block_size = 0;
     uint32_t final_piece_size = 0;
 
+    struct Location
+    {
+        uint64_t byte = 0;
+
+        tr_piece_index_t piece = 0;
+        uint32_t piece_offset = 0;
+
+        tr_block_index_t block = 0;
+        uint32_t block_offset = 0;
+
+        // tr_file_index_t file = 0;
+        // uint32_t file_offset = 0;
+        bool operator== (Location const& that) const
+        {
+            return this->byte == that.byte;
+        }
+
+        bool operator< (Location const& that) const
+        {
+            return this->byte < that.byte;
+        }
+    };
+
+    struct Span
+    {
+        Location begin;
+        Location end;
+    };
+
     tr_block_info() = default;
     tr_block_info(uint64_t total_size_in, uint64_t piece_size_in)
     {
@@ -49,6 +78,11 @@ struct tr_block_info
         return n_pieces;
     }
 
+    [[nodiscard]] constexpr auto pieceSize() const
+    {
+        return piece_size;
+    }
+
     [[nodiscard]] constexpr tr_piece_index_t pieceForBlock(tr_block_index_t block) const
     {
         // if not initialized yet, don't divide by zero
@@ -58,11 +92,6 @@ struct tr_block_info
         }
 
         return block / n_blocks_in_piece;
-    }
-
-    [[nodiscard]] constexpr auto pieceSize() const
-    {
-        return piece_size;
     }
 
     [[nodiscard]] constexpr auto pieceSize(tr_piece_index_t piece) const
@@ -134,6 +163,29 @@ struct tr_block_info
     [[nodiscard]] constexpr auto totalSize() const
     {
         return total_size;
+    }
+
+    [[nodiscard]] Location constexpr blockLoc(tr_block_index_t block) const
+    {
+        // if not initialized yet, don't divide by zero
+        if (n_blocks_in_piece == 0)
+        {
+            return {};
+        }
+
+        auto loc = Location{};
+        loc.byte = block;
+        loc.byte *= blockSize();
+
+        loc.block = block;
+        loc.block_offset = 0;
+
+        loc.piece = pieceOf(loc.byte);
+        loc.piece_offset = loc.byte - (uint64_t{loc.piece} * pieceSize());
+
+        // FIXME: file
+
+        return loc;
     }
 
     static uint32_t bestBlockSize(uint64_t piece_size);

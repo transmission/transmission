@@ -160,3 +160,35 @@ TEST_F(BlockInfoTest, blockSpanForPiece)
     EXPECT_EQ(0, info.blockSpanForPiece(0).begin);
     EXPECT_EQ(0, info.blockSpanForPiece(0).end);
 }
+
+TEST_F(BlockInfoTest, blockLoc)
+{
+    auto info = tr_block_info{};
+
+    uint64_t constexpr ExpectedBlockSize = 1024 * 16;
+    uint64_t constexpr ExpectedBlocksPerPiece = 4;
+    uint64_t constexpr PieceSize = ExpectedBlockSize * ExpectedBlocksPerPiece;
+    uint64_t constexpr PieceCount = 5;
+    uint64_t constexpr TotalSize = PieceSize * (PieceCount - 1) + 1;
+    info.initSizes(TotalSize, PieceSize);
+
+    // begin
+    auto loc = info.blockLoc(0);
+    EXPECT_EQ(tr_block_info::Location{}, loc);
+
+    // third block is halfway through the first piece
+    loc = info.blockLoc(2);
+    EXPECT_EQ(ExpectedBlockSize * 2, loc.byte);
+    EXPECT_EQ(2, loc.block);
+    EXPECT_EQ(0, loc.block_offset);
+    EXPECT_EQ(0, loc.piece);
+    EXPECT_EQ(ExpectedBlockSize * 2, loc.piece_offset);
+
+    // second piece aligns with fifth block
+    loc = info.blockLoc(4);
+    EXPECT_EQ(PieceSize, loc.byte);
+    EXPECT_EQ(4, loc.block);
+    EXPECT_EQ(0, loc.block_offset);
+    EXPECT_EQ(1, loc.piece);
+    EXPECT_EQ(0, loc.piece_offset);
+}

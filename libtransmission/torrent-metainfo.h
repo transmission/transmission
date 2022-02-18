@@ -16,7 +16,6 @@
 #include "magnet-metainfo.h"
 
 struct tr_error;
-struct tr_info;
 
 struct tr_torrent_metainfo : public tr_magnet_metainfo
 {
@@ -147,12 +146,12 @@ public:
         return pieces_offset_;
     }
 
-    std::string torrentFile(std::string_view torrent_dir) const
+    [[nodiscard]] std::string torrentFile(std::string_view torrent_dir) const
     {
         return makeFilename(torrent_dir, name(), infoHashString(), BasenameFormat::Hash, ".torrent");
     }
 
-    std::string resumeFile(std::string_view resume_dir) const
+    [[nodiscard]] std::string resumeFile(std::string_view resume_dir) const
     {
         return makeFilename(resume_dir, name(), infoHashString(), BasenameFormat::Hash, ".resume");
     }
@@ -190,7 +189,7 @@ private:
         BasenameFormat format,
         std::string_view suffix);
 
-    std::string makeFilename(std::string_view dirname, BasenameFormat format, std::string_view suffix) const
+    [[nodiscard]] std::string makeFilename(std::string_view dirname, BasenameFormat format, std::string_view suffix) const
     {
         return makeFilename(dirname, name(), infoHashString(), format, suffix);
     }
@@ -198,7 +197,7 @@ private:
     struct file_t
     {
     public:
-        std::string const& path() const
+        [[nodiscard]] std::string const& path() const
         {
             return path_;
         }
@@ -208,7 +207,7 @@ private:
             path_ = subpath;
         }
 
-        uint64_t size() const
+        [[nodiscard]] uint64_t size() const
         {
             return size_;
         }
