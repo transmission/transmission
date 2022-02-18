@@ -500,7 +500,7 @@ void task_request_next_chunk(tr_webseed_task* t)
     auto const piece_size = tor->pieceSize();
     uint64_t const remain = t->length - t->blocks_done * tor->blockSize() - evbuffer_get_length(t->content());
 
-    auto const total_offset = tor->offset(t->piece_index, t->piece_offset, t->length - remain);
+    auto const total_offset = tor->pieceLoc(t->piece_index, t->piece_offset, t->length - remain).byte;
     tr_piece_index_t const step_piece = total_offset / piece_size;
     uint64_t const step_piece_offset = total_offset - uint64_t(piece_size) * step_piece;
 

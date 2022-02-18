@@ -64,10 +64,6 @@ public:
     {
         return blockInfo().blockSpanForPiece(piece);
     }
-    [[nodiscard]] constexpr auto offset(tr_piece_index_t piece, uint32_t offset, uint32_t length = 0) const
-    {
-        return blockInfo().offset(piece, offset, length);
-    }
     [[nodiscard]] constexpr auto pieceCount() const
     {
         return blockInfo().pieceCount();

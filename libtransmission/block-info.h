@@ -70,15 +70,6 @@ struct tr_block_info
         return piece + 1 == n_pieces ? final_piece_size : pieceSize();
     }
 
-    [[nodiscard]] constexpr uint64_t offset(tr_piece_index_t piece, uint32_t offset, uint32_t length = 0) const
-    {
-        auto ret = piece_size;
-        ret *= piece;
-        ret += offset;
-        ret += length;
-        return ret;
-    }
-
     [[nodiscard]] constexpr tr_block_span_t blockSpanForPiece(tr_piece_index_t piece) const
     {
         if (!isInitialized())
@@ -179,5 +170,14 @@ private:
         }
 
         return offset / piece_size;
+    }
+
+    [[nodiscard]] constexpr uint64_t offset(tr_piece_index_t piece, uint32_t offset, uint32_t length = 0) const
+    {
+        auto ret = piece_size;
+        ret *= piece;
+        ret += offset;
+        ret += length;
+        return ret;
     }
 };

@@ -1977,7 +1977,7 @@ bool tr_torrentReqIsValid(tr_torrent const* tor, tr_piece_index_t index, uint32_
     {
         err = 4;
     }
-    else if (tor->offset(index, offset, length) > tor->totalSize())
+    else if (tor->pieceLoc(index, offset, length).byte > tor->totalSize())
     {
         err = 5;
     }

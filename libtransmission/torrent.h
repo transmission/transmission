@@ -175,10 +175,6 @@ public:
     {
         return metainfo_.blockSpanForPiece(piece);
     }
-    [[nodiscard]] constexpr auto offset(tr_piece_index_t piece, uint32_t offset, uint32_t length = 0) const
-    {
-        return metainfo_.offset(piece, offset, length);
-    }
     [[nodiscard]] constexpr auto pieceCount() const
     {
         return metainfo_.pieceCount();
@@ -293,7 +289,7 @@ public:
 
     [[nodiscard]] auto fileOffset(tr_piece_index_t piece, uint32_t piece_offset) const
     {
-        return fpm_.fileOffset(this->offset(piece, piece_offset));
+        return fpm_.fileOffset(this->pieceLoc(piece, piece_offset).byte);
     }
 
     /// WANTED
