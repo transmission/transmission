@@ -76,10 +76,6 @@ public:
     {
         return blockInfo().pieceForBlock(block);
     }
-    [[nodiscard]] constexpr auto pieceOf(uint64_t offset) const
-    {
-        return blockInfo().pieceOf(offset);
-    }
     [[nodiscard]] constexpr auto pieceSize() const
     {
         return blockInfo().pieceSize();

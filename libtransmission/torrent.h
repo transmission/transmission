@@ -187,10 +187,6 @@ public:
     {
         return metainfo_.pieceForBlock(block);
     }
-    [[nodiscard]] constexpr auto pieceOf(uint64_t offset) const
-    {
-        return metainfo_.pieceOf(offset);
-    }
     [[nodiscard]] constexpr auto pieceSize() const
     {
         return metainfo_.pieceSize();

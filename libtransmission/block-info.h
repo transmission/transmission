@@ -70,22 +70,6 @@ struct tr_block_info
         return piece + 1 == n_pieces ? final_piece_size : pieceSize();
     }
 
-    [[nodiscard]] constexpr tr_piece_index_t pieceOf(uint64_t offset) const
-    {
-        if (!isInitialized())
-        {
-            return {};
-        }
-
-        // handle 0-byte files at the end of a torrent
-        if (offset == total_size)
-        {
-            return n_pieces - 1;
-        }
-
-        return offset / piece_size;
-    }
-
     [[nodiscard]] constexpr uint64_t offset(tr_piece_index_t piece, uint32_t offset, uint32_t length = 0) const
     {
         auto ret = piece_size;
@@ -179,5 +163,21 @@ private:
         }
 
         return offset / block_size;
+    }
+
+    [[nodiscard]] constexpr tr_piece_index_t pieceOf(uint64_t offset) const
+    {
+        if (!isInitialized())
+        {
+            return {};
+        }
+
+        // handle 0-byte files at the end of a torrent
+        if (offset == total_size)
+        {
+            return n_pieces - 1;
+        }
+
+        return offset / piece_size;
     }
 };
