@@ -124,21 +124,12 @@ tr_block_info::Location tr_block_info::pieceLoc(tr_piece_index_t piece, uint32_t
         return {};
     }
 
-    auto loc = Location{};
-    loc.byte = piece;
-    loc.byte *= pieceSize();
-    loc.byte += offset;
-    loc.byte += length;
+    auto byte = uint64_t{ piece };
+    byte *= pieceSize();
+    byte += offset;
+    byte += length;
 
-    loc.block = blockOf(loc.byte);
-    loc.block_offset = static_cast<uint32_t>(loc.byte - (uint64_t{ loc.block } * blockSize()));
-
-    loc.piece = pieceOf(loc.byte);
-    loc.piece_offset = static_cast<uint32_t>(loc.byte - (uint64_t{ loc.piece } * pieceSize()));
-
-    // FIXME: file
-
-    return loc;
+    return byteLoc(byte);
 }
 
 tr_block_info::Location tr_block_info::pieceLastLoc(tr_piece_index_t piece) const
