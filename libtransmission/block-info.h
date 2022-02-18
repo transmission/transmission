@@ -161,7 +161,11 @@ struct tr_block_info
         }
     };
 
+    // location of the first byte in `block`
     [[nodiscard]] Location blockLoc(tr_block_index_t block) const;
+
+    // location of the last byte in `block`
+    [[nodiscard]] Location blockLastLoc(tr_block_index_t block) const;
 
     [[nodiscard]] Location pieceLoc(tr_piece_index_t piece) const;
 
@@ -187,21 +191,5 @@ struct tr_block_info
         Location end;
     };
 
-    [[nodiscard]] auto blockSpan(tr_block_index_t block) const
-    {
-        auto ret = Span{};
-        ret.begin = blockLoc(block);
-        ret.end = byteLoc(ret.begin.byte + blockSize(block));
-        return ret;
-    }
-
-    [[nodiscard]] Span pieceSpan(tr_piece_index_t piece) const
-    {
-        auto ret = Span{};
-        ret.begin = pieceLoc(piece);
-        ret.end = byteLoc(ret.begin.byte + pieceSize(piece));
-        return ret;
-    }
-
-    static uint32_t bestBlockSize(uint64_t piece_size);
+    [[nodiscard]] static uint32_t bestBlockSize(uint64_t piece_size);
 };

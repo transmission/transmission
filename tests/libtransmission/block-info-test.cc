@@ -193,6 +193,41 @@ TEST_F(BlockInfoTest, blockLoc)
     EXPECT_EQ(0, loc.piece_offset);
 }
 
+TEST_F(BlockInfoTest, blockLastLoc)
+{
+    auto info = tr_block_info{};
+
+    uint64_t constexpr ExpectedBlockSize = 1024 * 16;
+    uint64_t constexpr ExpectedBlocksPerPiece = 4;
+    uint64_t constexpr PieceSize = ExpectedBlockSize * ExpectedBlocksPerPiece;
+    uint64_t constexpr PieceCount = 5;
+    uint64_t constexpr TotalSize = PieceSize * (PieceCount - 1) + 1;
+    info.initSizes(TotalSize, PieceSize);
+
+    auto loc = info.blockLastLoc(0);
+    EXPECT_EQ(ExpectedBlockSize - 1, loc.byte);
+    EXPECT_EQ(0, loc.block);
+    EXPECT_EQ(ExpectedBlockSize - 1, loc.block_offset);
+    EXPECT_EQ(0, loc.piece);
+    EXPECT_EQ(ExpectedBlockSize - 1, loc.piece_offset);
+
+    loc = info.blockLastLoc(info.blockCount() - 1);
+    EXPECT_EQ(info.totalSize() - 1, loc.byte);
+    EXPECT_EQ(info.blockCount() - 1, loc.block);
+    EXPECT_EQ(info.totalSize() - 1 - (ExpectedBlockSize * (info.blockCount() - 1)), loc.block_offset);
+    EXPECT_EQ(info.pieceCount() - 1, loc.piece);
+    EXPECT_EQ(info.totalSize() - 1 - PieceSize * (PieceCount - 1), loc.piece_offset);
+
+#if 0
+    loc = info.blockLastLoc(0);
+    EXPECT_EQ(mmm, loc.byte);
+    EXPECT_EQ(mmm, loc.block);
+    EXPECT_EQ(mmm, loc.block_offset);
+    EXPECT_EQ(mmm, loc.piece);
+    EXPECT_EQ(mmm, loc.piece_offset);
+#endif
+}
+
 TEST_F(BlockInfoTest, pieceLoc)
 {
     auto info = tr_block_info{};
@@ -280,40 +315,4 @@ TEST_F(BlockInfoTest, byteLoc)
     EXPECT_EQ(0, loc.block_offset);
     EXPECT_EQ(1, loc.piece);
     EXPECT_EQ(0, loc.piece_offset);
-}
-
-TEST_F(BlockInfoTest, blockSpan)
-{
-    auto info = tr_block_info{};
-
-    uint64_t constexpr ExpectedBlockSize = 1024 * 16;
-    uint64_t constexpr ExpectedBlocksPerPiece = 4;
-    uint64_t constexpr PieceSize = ExpectedBlockSize * ExpectedBlocksPerPiece;
-    uint64_t constexpr PieceCount = 5;
-    uint64_t constexpr TotalSize = PieceSize * (PieceCount - 1) + 1;
-    info.initSizes(TotalSize, PieceSize);
-
-    // first block
-    auto span = info.blockSpan(0);
-    EXPECT_EQ(0, span.begin.byte);
-    EXPECT_EQ(0, span.begin.block);
-    EXPECT_EQ(0, span.begin.block_offset);
-    EXPECT_EQ(0, span.begin.piece);
-    EXPECT_EQ(0, span.begin.piece_offset);
-    EXPECT_EQ(info.blockSize(0), span.end.byte);
-    EXPECT_EQ(1, span.end.block);
-    EXPECT_EQ(0, span.end.block_offset);
-    EXPECT_EQ(0, span.end.piece);
-    EXPECT_EQ(info.blockSize(0), span.end.piece_offset);
-
-    // last block
-    auto n = info.blockCount() - 1;
-    span = info.blockSpan(n);
-    EXPECT_EQ(ExpectedBlockSize * n, span.begin.byte);
-    EXPECT_EQ(n, span.begin.block);
-    EXPECT_EQ(0, span.begin.block_offset);
-    EXPECT_EQ(PieceCount - 1, span.begin.piece);
-    EXPECT_EQ((span.begin.block * ExpectedBlockSize) - ((PieceCount - 1) * PieceSize), span.begin.piece_offset);
-    EXPECT_EQ(info.totalSize(), span.end.byte);
-    EXPECT_EQ(info.endLoc(), span.end);
 }

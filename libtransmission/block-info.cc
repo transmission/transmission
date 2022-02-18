@@ -104,6 +104,19 @@ tr_block_info::Location tr_block_info::blockLoc(tr_block_index_t block) const
     return loc;
 }
 
+tr_block_info::Location tr_block_info::blockLastLoc(tr_block_index_t block) const
+{
+    if (n_blocks_in_piece == 0) // if not initialized yet
+    {
+        return {};
+    }
+
+    auto byte = uint64_t{ block };
+    byte *= blockSize();
+    byte += blockSize(block) - 1;
+    return byteLoc(byte);
+}
+
 tr_block_info::Location tr_block_info::pieceLoc(tr_piece_index_t piece) const
 {
     if (n_blocks_in_piece == 0) // if not initialized yet
