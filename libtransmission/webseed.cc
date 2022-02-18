@@ -41,8 +41,7 @@ public:
     tr_webseed_task(tr_torrent* tor, tr_webseed* webseed_in, tr_block_span_t span)
         : webseed{ webseed_in }
         , session{ tor->session }
-        , block{ span.begin }
-        // TODO(ckerr): just own the loc
+        , block{ span.begin } // TODO(ckerr): just own the loc
         , piece_index{ tor->blockLoc(this->block).piece }
         , piece_offset{ tor->blockLoc(this->block).piece_offset }
         , block_size{ tor->blockSize() }

@@ -38,9 +38,9 @@ struct tr_block_info
         return block_size;
     }
 
+    // return the number of bytes in `block`
     [[nodiscard]] constexpr auto blockSize(tr_block_index_t block) const
     {
-        // how many bytes are in this block?
         return block + 1 == n_blocks ? final_block_size : blockSize();
     }
 
@@ -54,9 +54,9 @@ struct tr_block_info
         return piece_size;
     }
 
+    // return the number of bytes in `piece`
     [[nodiscard]] constexpr auto pieceSize(tr_piece_index_t piece) const
     {
-        // how many bytes are in this piece?
         return piece + 1 == n_pieces ? final_piece_size : pieceSize();
     }
 
@@ -67,9 +67,7 @@ struct tr_block_info
             return {};
         }
 
-        auto const begin = blockOf(offset(piece, 0));
-        auto const end = 1 + blockOf(offset(piece, pieceSize(piece) - 1));
-        return { begin, end };
+        return { pieceLoc(piece).block, pieceLastLoc(piece).block + 1 };
     }
 
     [[nodiscard]] constexpr auto totalSize() const
