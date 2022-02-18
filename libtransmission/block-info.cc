@@ -103,18 +103,6 @@ tr_block_info::Location tr_block_info::byteLoc(uint64_t byte) const
     return loc;
 }
 
-tr_block_info::Location tr_block_info::blockLoc(tr_block_index_t block) const
-{
-    if (!isInitialized())
-    {
-        return {};
-    }
-
-    auto byte = uint64_t{ block };
-    byte *= blockSize();
-    return byteLoc(byte);
-}
-
 tr_block_info::Location tr_block_info::blockLastLoc(tr_block_index_t block) const
 {
     if (!isInitialized())
@@ -125,21 +113,6 @@ tr_block_info::Location tr_block_info::blockLastLoc(tr_block_index_t block) cons
     auto byte = uint64_t{ block };
     byte *= blockSize();
     byte += blockSize(block) - 1;
-    return byteLoc(byte);
-}
-
-tr_block_info::Location tr_block_info::pieceLoc(tr_piece_index_t piece, uint32_t offset, uint32_t length) const
-{
-    if (!isInitialized())
-    {
-        return {};
-    }
-
-    auto byte = uint64_t{ piece };
-    byte *= pieceSize();
-    byte += offset;
-    byte += length;
-
     return byteLoc(byte);
 }
 
