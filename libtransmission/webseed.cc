@@ -41,10 +41,9 @@ public:
     tr_webseed_task(tr_torrent* tor, tr_webseed* webseed_in, tr_block_span_t span)
         : webseed{ webseed_in }
         , session{ tor->session }
-        , block{ span.begin }
-        , piece_index{ tor->pieceForBlock(this->block) }
-        , piece_offset{ static_cast<uint32_t>(
-              int64_t{ tor->blockSize() } * this->block - tor->pieceSize() * this->piece_index) }
+        , block{ span.begin } // TODO(ckerr): just own the loc
+        , piece_index{ tor->blockLoc(this->block).piece }
+        , piece_offset{ tor->blockLoc(this->block).piece_offset }
         , block_size{ tor->blockSize() }
         , length{ (span.end - 1 - span.begin) * tor->blockSize() + tor->blockSize(span.end - 1) }
     {
@@ -500,7 +499,7 @@ void task_request_next_chunk(tr_webseed_task* t)
     auto const piece_size = tor->pieceSize();
     uint64_t const remain = t->length - t->blocks_done * tor->blockSize() - evbuffer_get_length(t->content());
 
-    auto const total_offset = tor->offset(t->piece_index, t->piece_offset, t->length - remain);
+    auto const total_offset = tor->pieceLoc(t->piece_index, t->piece_offset, t->length - remain).byte;
     tr_piece_index_t const step_piece = total_offset / piece_size;
     uint64_t const step_piece_offset = total_offset - uint64_t(piece_size) * step_piece;
 

@@ -48,7 +48,6 @@ public:
     virtual void update_active(tr_direction direction) = 0;
 
     virtual time_t get_connection_age() const = 0;
-    virtual bool is_reading_block(tr_block_index_t block) const = 0;
 
     virtual void cancel_block_request(tr_block_index_t block) = 0;
 

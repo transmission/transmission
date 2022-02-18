@@ -38,9 +38,9 @@ struct tr_block_info
         return block_size;
     }
 
+    // return the number of bytes in `block`
     [[nodiscard]] constexpr auto blockSize(tr_block_index_t block) const
     {
-        // how many bytes are in this block?
         return block + 1 == n_blocks ? final_block_size : blockSize();
     }
 
@@ -49,86 +49,25 @@ struct tr_block_info
         return n_pieces;
     }
 
-    [[nodiscard]] constexpr tr_piece_index_t pieceForBlock(tr_block_index_t block) const
-    {
-        // if not initialized yet, don't divide by zero
-        if (n_blocks_in_piece == 0)
-        {
-            return 0;
-        }
-
-        return block / n_blocks_in_piece;
-    }
-
     [[nodiscard]] constexpr auto pieceSize() const
     {
         return piece_size;
     }
 
+    // return the number of bytes in `piece`
     [[nodiscard]] constexpr auto pieceSize(tr_piece_index_t piece) const
     {
-        // how many bytes are in this piece?
         return piece + 1 == n_pieces ? final_piece_size : pieceSize();
-    }
-
-    [[nodiscard]] constexpr tr_piece_index_t pieceOf(uint64_t offset) const
-    {
-        // if not initialized yet, don't divide by zero
-        if (piece_size == 0)
-        {
-            return 0;
-        }
-
-        // handle 0-byte files at the end of a torrent
-        if (offset == total_size)
-        {
-            return n_pieces - 1;
-        }
-
-        return offset / piece_size;
-    }
-
-    [[nodiscard]] constexpr tr_block_index_t blockOf(uint64_t offset) const
-    {
-        // if not initialized yet, don't divide by zero
-        if (block_size == 0)
-        {
-            return 0;
-        }
-
-        // handle 0-byte files at the end of a torrent
-        if (offset == total_size)
-        {
-            return n_blocks - 1;
-        }
-
-        return offset / block_size;
-    }
-
-    [[nodiscard]] constexpr uint64_t offset(tr_piece_index_t piece, uint32_t offset, uint32_t length = 0) const
-    {
-        auto ret = piece_size;
-        ret *= piece;
-        ret += offset;
-        ret += length;
-        return ret;
-    }
-
-    [[nodiscard]] constexpr auto blockOf(tr_piece_index_t piece, uint32_t offset, uint32_t length = 0) const
-    {
-        return blockOf(this->offset(piece, offset, length));
     }
 
     [[nodiscard]] constexpr tr_block_span_t blockSpanForPiece(tr_piece_index_t piece) const
     {
-        if (block_size == 0)
+        if (!isInitialized())
         {
             return {};
         }
 
-        auto const begin = blockOf(offset(piece, 0));
-        auto const end = 1 + blockOf(offset(piece, pieceSize(piece) - 1));
-        return { begin, end };
+        return { pieceLoc(piece).block, pieceLastLoc(piece).block + 1 };
     }
 
     [[nodiscard]] constexpr auto totalSize() const
@@ -136,5 +75,95 @@ struct tr_block_info
         return total_size;
     }
 
-    static uint32_t bestBlockSize(uint64_t piece_size);
+    struct Location
+    {
+        uint64_t byte = 0;
+
+        tr_piece_index_t piece = 0;
+        uint32_t piece_offset = 0;
+
+        tr_block_index_t block = 0;
+        uint32_t block_offset = 0;
+
+        [[nodiscard]] bool operator==(Location const& that) const
+        {
+            return this->byte == that.byte;
+        }
+
+        [[nodiscard]] bool operator<(Location const& that) const
+        {
+            return this->byte < that.byte;
+        }
+    };
+
+    // Location of the first byte in `block`.
+    [[nodiscard]] Location constexpr blockLoc(tr_block_index_t block) const
+    {
+        return byteLoc(uint64_t{ block } * blockSize());
+    }
+
+    // Location of the last byte in `block`.
+    [[nodiscard]] Location constexpr blockLastLoc(tr_block_index_t block) const
+    {
+        if (!isInitialized())
+        {
+            return {};
+        }
+
+        return byteLoc(uint64_t{ block } * blockSize() + blockSize(block) - 1);
+    }
+
+    // Location of the first byte (+ optional offset and length) in `piece`
+    [[nodiscard]] Location constexpr pieceLoc(tr_piece_index_t piece, uint32_t offset = 0, uint32_t length = 0) const
+    {
+        return byteLoc(uint64_t{ piece } * pieceSize() + offset + length);
+    }
+
+    // Location of the last byte in `piece`.
+    [[nodiscard]] Location constexpr pieceLastLoc(tr_piece_index_t piece) const
+    {
+        if (!isInitialized())
+        {
+            return {};
+        }
+
+        return byteLoc(uint64_t{ piece } * pieceSize() + pieceSize(piece) - 1);
+    }
+
+    // Location of the torrent's nth byte
+    [[nodiscard]] Location constexpr byteLoc(uint64_t byte) const
+    {
+        if (!isInitialized())
+        {
+            return {};
+        }
+
+        auto loc = Location{};
+
+        loc.byte = byte;
+
+        if (byte == totalSize()) // handle 0-byte files at the end of a torrent
+        {
+            loc.block = blockCount() - 1;
+            loc.piece = pieceCount() - 1;
+        }
+        else
+        {
+            loc.block = byte / blockSize();
+            loc.piece = byte / pieceSize();
+        }
+
+        loc.block_offset = static_cast<uint32_t>(loc.byte - (uint64_t{ loc.block } * blockSize()));
+        loc.piece_offset = static_cast<uint32_t>(loc.byte - (uint64_t{ loc.piece } * pieceSize()));
+
+        return loc;
+    }
+
+    [[nodiscard]] static uint32_t bestBlockSize(uint64_t piece_size);
+
+private:
+    [[nodiscard]] bool constexpr isInitialized() const
+    {
+        return n_blocks_in_piece != 0;
+    }
 };
