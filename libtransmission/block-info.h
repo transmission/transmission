@@ -85,12 +85,12 @@ struct tr_block_info
         tr_block_index_t block = 0;
         uint32_t block_offset = 0;
 
-        bool operator==(Location const& that) const
+        [[nodiscard]] bool operator==(Location const& that) const
         {
             return this->byte == that.byte;
         }
 
-        bool operator<(Location const& that) const
+        [[nodiscard]] bool operator<(Location const& that) const
         {
             return this->byte < that.byte;
         }
@@ -139,17 +139,18 @@ struct tr_block_info
         }
 
         auto loc = Location{};
+
         loc.byte = byte;
 
         if (byte == totalSize()) // handle 0-byte files at the end of a torrent
         {
-            loc.block = n_blocks - 1;
-            loc.piece = n_pieces - 1;
+            loc.block = blockCount() - 1;
+            loc.piece = pieceCount() - 1;
         }
         else
         {
-            loc.block = byte / block_size;
-            loc.piece = byte / piece_size;
+            loc.block = byte / blockSize();
+            loc.piece = byte / pieceSize();
         }
 
         loc.block_offset = static_cast<uint32_t>(loc.byte - (uint64_t{ loc.block } * blockSize()));
