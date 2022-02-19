@@ -780,6 +780,7 @@ TODO: fix this when notifications get fixed
       this
     );
   }
+
   _verifyTorrents(torrents) {
     this.remote.verifyTorrents(
       Transmission._getTorrentIds(torrents),
@@ -803,6 +804,7 @@ TODO: fix this when notifications get fixed
       this
     );
   }
+
   changeFileCommand(torrentId, rowIndices, command) {
     this.remote.changeFileCommand(torrentId, rowIndices, command);
   }
@@ -815,6 +817,7 @@ TODO: fix this when notifications get fixed
       this
     );
   }
+
   _moveUp() {
     this.remote.moveTorrentsUp(
       this._getSelectedTorrentIds(),
@@ -822,6 +825,7 @@ TODO: fix this when notifications get fixed
       this
     );
   }
+
   _moveDown() {
     this.remote.moveTorrentsDown(
       this._getSelectedTorrentIds(),
@@ -829,6 +833,7 @@ TODO: fix this when notifications get fixed
       this
     );
   }
+
   _moveBottom() {
     this.remote.moveTorrentsToBottom(
       this._getSelectedTorrentIds(),
@@ -1069,7 +1074,7 @@ TODO: fix this when notifications get fixed
 
   setFilterTracker(sitename) {
     const e = document.querySelector('#filter-tracker');
-    e.value = sitename ? Transmission._getReadableDomain(sitename) : 'all';
+    e.value = sitename ? Transmission._displayName(sitename) : 'all';
 
     this.filterTracker = sitename;
     this.refilterAllSoon();

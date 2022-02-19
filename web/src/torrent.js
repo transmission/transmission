@@ -387,12 +387,12 @@ export class Torrent extends EventTarget {
     let pass = this.testState(state);
 
     // maybe filter by text...
-    if (pass && search) {
+    if (pass && search && search.length > 0) {
       pass = this.getCollatedName().includes(search.toLowerCase());
     }
 
     // maybe filter by labels...
-    if (pass) {
+    if (pass && labels && labels.length > 0) {
       // pass if this torrent has any of these labels
       const torrent_labels = this.getLabels();
       pass = labels.some((label) => torrent_labels.includes(label));

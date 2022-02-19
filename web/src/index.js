@@ -3,6 +3,8 @@
    or any future license endorsed by Mnemosyne LLC.
    License text can be found in the licenses/ folder. */
 
+import 'core-js/stable';
+
 import { ActionManager } from './action-manager.js';
 import { Notifications } from './notifications.js';
 import { Prefs } from './prefs.js';
