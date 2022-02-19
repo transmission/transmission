@@ -97,7 +97,12 @@ const config = {
   },
 
   plugins: [
-    new CleanWebpackPlugin(),
+    new CleanWebpackPlugin({
+      cleanOnceBeforeBuildPatterns: [
+        '**/*',
+        '!.gitignore'
+      ]
+    }),
     new MiniCssExtractPlugin({
       chunkFilename: path.join('assets', 'css', cssChunkfilename),
       filename: path.join('assets', 'css', cssFilename),

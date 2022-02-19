@@ -1,10 +1,10 @@
 @charset "UTF-8";
 
-@import './mixins';
-@import './variables';
-
 @use 'sass:color';
 @use 'sass:math';
+
+@import './mixins';
+@import './variables';
 
 
 /// GLOBAL

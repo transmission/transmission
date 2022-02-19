@@ -25,6 +25,7 @@ module.exports = {
     "no-empty-source": true,
     "no-extra-semicolons": true,
     "no-invalid-double-slash-comments": true,
+    "no-invalid-position-at-import-rule": null, // Pure CSS rule.
     "property-no-unknown": true,
     "scss/at-rule-no-unknown": true,
     "selector-max-compound-selectors": null,
