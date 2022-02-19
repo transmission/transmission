@@ -94,7 +94,7 @@ static struct event_base* ev_base = nullptr;
 ****  Config File
 ***/
 
-static auto constexpr Options = std::array<tr_option, 43>{
+static auto constexpr Options = std::array<tr_option, 44>{
     { { 'a', "allowed", "Allowed IP addresses. (Default: " TR_DEFAULT_RPC_WHITELIST ")", "a", true, "<list>" },
       { 'b', "blocklist", "Enable peer blocklists", "b", false, nullptr },
       { 'B', "no-blocklist", "Disable peer blocklists", "B", false, nullptr },
@@ -102,7 +102,8 @@ static auto constexpr Options = std::array<tr_option, 43>{
       { 'C', "no-watch-dir", "Disable the watch-dir", "C", false, nullptr },
       { 941, "incomplete-dir", "Where to store new torrents until they're complete", nullptr, true, "<directory>" },
       { 942, "no-incomplete-dir", "Don't store incomplete torrents in a different location", nullptr, false, nullptr },
-    { 943, "default-trackers", "Default trackers to be automatically added to public torrents", NULL, true, "<list>" },
+      { 'd', "dump-settings", "Dump the settings and exit", "d", false, nullptr },
+      { 943, "default-trackers", "Default trackers to be automatically added to public torrents", nullptr, true, "<list>" },
       { 'e', "logfile", "Dump the log messages to this filename", "e", true, "<filename>" },
       { 'f', "foreground", "Run in the foreground instead of daemonizing", "f", false, nullptr },
       { 'g', "config-dir", "Where to look for configuration files", "g", true, "<path>" },
@@ -417,7 +418,7 @@ static bool parse_args(
             break;
 
         case 943:
-            tr_variantDictAddStr(settings, TR_KEY_default_trackers, optarg);
+            tr_variantDictAddStr(settings, TR_KEY_default_trackers, optstr);
             break;
 
         case 'd':

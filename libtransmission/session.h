@@ -150,6 +150,15 @@ public:
         download_dir_ = dir;
     }
 
+    // default trackers
+
+    std::string const& defaultTrackers() const
+    {
+        return default_trackers_;
+    }
+
+    void setDefaultTrackers(std::string_view trackers);
+
     // incomplete dir
 
     std::string const& incompleteDir() const
@@ -387,8 +396,8 @@ public:
 
     std::unique_ptr<tr_rpc_server> rpc_server_;
 
-    struct tr_list* defaultTrackers;
-    char* defaultTrackersStr;
+    std::list<std::string> defaultTrackersList;
+
     // One of <netinet/ip.h>'s IPTOS_ values.
     // See tr_netTos*() in libtransmission/net.h for more info
     // Only session.cc should use this.
@@ -400,6 +409,7 @@ private:
     std::array<std::string, TR_SCRIPT_N_TYPES> scripts_;
     std::string blocklist_url_;
     std::string download_dir_;
+    std::string default_trackers_;
     std::string incomplete_dir_;
     std::string peer_congestion_algorithm_;
 

@@ -176,6 +176,39 @@ Gtk::Entry* new_entry(tr_quark const key, Glib::RefPtr<Session> const& core)
     return w;
 }
 
+void text_buffer_changed_cb(Glib::RefPtr<Gtk::TextBuffer> buffer, tr_quark const key, Glib::RefPtr<Session> const& core)
+{
+    Gtk::TextBuffer::iterator start, end;
+    buffer->get_bounds(start, end);
+    Glib::ustring value = buffer->get_text(start, end, FALSE);
+
+    core->set_pref(key, value);
+}
+
+Gtk::Widget* new_text_view(tr_quark const key, Glib::RefPtr<Session> const& core)
+{
+    auto* scroll = Gtk::make_managed<Gtk::ScrolledWindow>();
+    auto* w = Gtk::make_managed<Gtk::TextView>();
+    auto buffer = w->get_buffer();
+    auto value = gtr_pref_string_get(key);
+
+    if (!value.empty())
+    {
+        buffer->set_text(value);
+    }
+
+    /* set up the scrolled window and put the text view in it */
+    scroll->set_policy(Gtk::PolicyType::POLICY_AUTOMATIC, Gtk::PolicyType::POLICY_AUTOMATIC);
+    scroll->set_shadow_type(Gtk::ShadowType::SHADOW_IN);
+    scroll->add(*w);
+    scroll->set_size_request(-1, 200);
+
+    /* signal */
+    buffer->signal_changed().connect([buffer, key, core]() { text_buffer_changed_cb(buffer, key, core); });
+
+    return scroll;
+}
+
 void chosen_cb(Gtk::FileChooser* w, tr_quark const key, Glib::RefPtr<Session> const& core)
 {
     core->set_pref(key, w->get_filename());
@@ -1050,6 +1083,12 @@ Gtk::Widget* PrefsDialog::Impl::networkPage()
     w = new_check_button(_("Use _Local Peer Discovery to find more peers"), TR_KEY_lpd_enabled, core_);
     w->set_tooltip_text(_("LPD is a tool for finding peers on your local network."));
     t->add_wide_control(row, *w);
+
+    t->add_section_title(row, _("Default Trackers"));
+    auto tv = new_text_view(TR_KEY_default_trackers, core_);
+    tv->set_tooltip_text(
+        _("a list of default trackers to be added to new public torrents (and existing ones, after a reload)"));
+    t->add_wide_control(row, *tv);
 
     return t;
 }

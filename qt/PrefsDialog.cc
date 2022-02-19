@@ -237,10 +237,14 @@ void PrefsDialog::linkWidgetToPref(QWidget* widget, int pref_key)
     if (auto const* spin_box = qobject_cast<QAbstractSpinBox*>(widget); spin_box != nullptr)
     {
         connect(spin_box, &QAbstractSpinBox::editingFinished, this, &PrefsDialog::spinBoxEditingFinished);
+        return;
     }
-    else if (pref_widget.is<QPlainTextEdit>())
+
+    auto const* plain_text_edit = qobject_cast<QPlainTextEdit*>(widget);
+    if (plain_text_edit != nullptr)
     {
-        connect(widget, SIGNAL(textChanged()), SLOT(plainTextChanged()));
+        connect(plain_text_edit, &QPlainTextEdit::textChanged, this, &PrefsDialog::plainTextChanged);
+        return;
     }
 }
 

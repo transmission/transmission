@@ -332,8 +332,8 @@ void tr_sessionGetDefaultSettings(tr_variant* d)
     tr_variantDictAddBool(d, TR_KEY_dht_enabled, true);
     tr_variantDictAddBool(d, TR_KEY_utp_enabled, true);
     tr_variantDictAddBool(d, TR_KEY_lpd_enabled, false);
-    tr_variantDictAddStr(d, TR_KEY_default_trackers, "");
     tr_variantDictAddStr(d, TR_KEY_download_dir, tr_getDefaultDownloadDir());
+    tr_variantDictAddStr(d, TR_KEY_default_trackers, "");
     tr_variantDictAddInt(d, TR_KEY_speed_limit_down, 100);
     tr_variantDictAddBool(d, TR_KEY_speed_limit_down_enabled, false);
     tr_variantDictAddInt(d, TR_KEY_encryption, TR_DEFAULT_ENCRYPTION);
@@ -408,11 +408,12 @@ void tr_sessionGetSettings(tr_session const* s, tr_variant* d)
     tr_variantDictAddBool(d, TR_KEY_blocklist_enabled, s->useBlocklist());
     tr_variantDictAddStr(d, TR_KEY_blocklist_url, s->blocklistUrl());
     tr_variantDictAddInt(d, TR_KEY_cache_size_mb, tr_sessionGetCacheLimit_MB(s));
-    tr_variantDictAddStr(d, TR_KEY_default_trackers, tr_sessionGetDefaultTrackers(s));
+    tr_variantDictAddStr(d, TR_KEY_default_trackers, s->defaultTrackers());
     tr_variantDictAddBool(d, TR_KEY_dht_enabled, s->isDHTEnabled);
     tr_variantDictAddBool(d, TR_KEY_utp_enabled, s->isUTPEnabled);
     tr_variantDictAddBool(d, TR_KEY_lpd_enabled, s->isLPDEnabled);
     tr_variantDictAddStr(d, TR_KEY_download_dir, tr_sessionGetDownloadDir(s));
+    tr_variantDictAddStr(d, TR_KEY_default_trackers, s->defaultTrackers());
     tr_variantDictAddInt(d, TR_KEY_download_queue_size, tr_sessionGetQueueSize(s, TR_DOWN));
     tr_variantDictAddBool(d, TR_KEY_download_queue_enabled, tr_sessionGetQueueEnabled(s, TR_DOWN));
     tr_variantDictAddInt(d, TR_KEY_speed_limit_down, tr_sessionGetSpeedLimit_KBps(s, TR_DOWN));
@@ -813,9 +814,9 @@ static void sessionSetImpl(void* vdata)
         tr_sessionSetCacheLimit_MB(session, i);
     }
 
-    if (tr_variantDictFindStr(settings, TR_KEY_default_trackers, &str, NULL))
+    if (tr_variantDictFindStrView(settings, TR_KEY_default_trackers, &sv))
     {
-        tr_sessionSetDefaultTrackers(session, str);
+        session->setDefaultTrackers(sv);
     }
 
     if (tr_variantDictFindInt(settings, TR_KEY_peer_limit_per_torrent, &i))
@@ -2008,8 +2009,6 @@ void tr_sessionClose(tr_session* session)
     tr_session_id_free(session->session_id);
 
     delete session;
-    tr_list_free(&session->defaultTrackers, NULL);
-    tr_free(session->defaultTrackersStr);
 }
 
 struct sessionLoadTorrentsData
@@ -2253,49 +2252,55 @@ int tr_sessionGetCacheLimit_MB(tr_session const* session)
 ****
 ***/
 
-void tr_sessionSetDefaultTrackers(tr_session* session, char const* defaultTrackersStr)
+void tr_session::setDefaultTrackers(std::string_view trackers)
 {
-    void* tmp;
-    char const* walk;
-
-    TR_ASSERT(tr_isSession(session));
-
     /* keep the string */
-    tmp = session->defaultTrackersStr;
-    session->defaultTrackersStr = tr_strdup(defaultTrackersStr);
-    tr_free(tmp);
+    this->default_trackers_ = trackers;
 
     /* clear out the old list entries */
-    while ((tmp = tr_list_pop_front(&session->defaultTrackers)))
-    {
-        tr_free(tmp);
-    }
+    this->defaultTrackersList.clear();
 
     /* build the new list entries */
-    for (walk = defaultTrackersStr; walk && *walk;)
+    auto urlStart = std::string::npos;
+    auto urlEnd = std::string::npos;
+    char const* delimiters = " ,;\r\n\t";
+    auto fragment = default_trackers_;
+    while ((urlStart = fragment.find_first_not_of(delimiters)) != std::string::npos)
     {
-        char const* delimiters = " ,;\r\n\t";
-        size_t const len = strcspn(walk, delimiters);
-        if (len)
+        urlEnd = fragment.find_first_of(delimiters, urlStart);
+        if (urlEnd == std::string::npos)
         {
-            char* token = tr_strndup(walk, len);
-            tr_list_append(&session->defaultTrackers, token);
+            urlEnd = fragment.size() - 1;
         }
+        else
+        {
+            urlEnd -= 1;
+        }
+        this->defaultTrackersList.push_back(fragment.substr(urlStart, urlEnd));
 
-        if (walk[len] == '\0')
+        if (fragment.size() > (urlEnd + 1))
+        {
+            fragment = fragment.substr(urlEnd + 1, fragment.size());
+        }
+        else
         {
             break;
         }
-
-        walk += len + 1;
     }
+}
+
+void tr_sessionSetDefaultTrackers(tr_session* session, char const* trackers)
+{
+    TR_ASSERT(tr_isSession(session));
+
+    session->setDefaultTrackers(trackers ? trackers : "");
 }
 
 char const* tr_sessionGetDefaultTrackers(tr_session const* session)
 {
     TR_ASSERT(tr_isSession(session));
 
-    return session->defaultTrackersStr ? session->defaultTrackersStr : NULL;
+    return session->defaultTrackers().c_str();
 }
 
 /***
