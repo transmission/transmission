@@ -7,6 +7,7 @@
 #include <cerrno> /* error codes ERANGE, ... */
 #include <climits> /* INT_MAX */
 #include <cmath>
+#include <cstdint>
 #include <cstdlib> /* qsort */
 #include <ctime> // time_t
 #include <iterator> // std::back_inserter
@@ -14,11 +15,7 @@
 
 #include <event2/event.h>
 
-#include <cstdint>
-#include <libutp/utp.h>
-
 #define LIBTRANSMISSION_PEER_MODULE
-
 #include "transmission.h"
 
 #include "announcer.h"
@@ -1084,30 +1081,6 @@ static bool on_handshake_done(tr_handshake_result const& result)
     return success;
 }
 
-static void close_peer_socket(struct tr_peer_socket const socket, tr_session* session)
-{
-    switch (socket.type)
-    {
-    case TR_PEER_SOCKET_TYPE_NONE:
-        break;
-
-    case TR_PEER_SOCKET_TYPE_TCP:
-        tr_netClose(session, socket.handle.tcp);
-        break;
-
-#ifdef WITH_UTP
-
-    case TR_PEER_SOCKET_TYPE_UTP:
-        UTP_Close(socket.handle.utp);
-        break;
-
-#endif
-
-    default:
-        TR_ASSERT_MSG(false, "unsupported peer socket type %d", socket.type);
-    }
-}
-
 void tr_peerMgrAddIncoming(tr_peerMgr* manager, tr_address const* addr, tr_port port, struct tr_peer_socket const socket)
 {
     TR_ASSERT(tr_isSession(manager->session));
@@ -1118,11 +1091,11 @@ void tr_peerMgrAddIncoming(tr_peerMgr* manager, tr_address const* addr, tr_port 
     if (tr_sessionIsAddressBlocked(session, addr))
     {
         tr_logAddDebug("Banned IP address \"%s\" tried to connect to us", tr_address_to_string(addr));
-        close_peer_socket(socket, session);
+        tr_netClosePeerSocket(session, socket);
     }
     else if (getExistingHandshake(&manager->incomingHandshakes, addr) != nullptr)
     {
-        close_peer_socket(socket, session);
+        tr_netClosePeerSocket(session, socket);
     }
     else /* we don't have a connection to them yet... */
     {
