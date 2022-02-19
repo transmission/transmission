@@ -422,6 +422,28 @@ struct tr_peer_socket tr_netOpenPeerUTPSocket(tr_session* session, tr_address co
     return ret;
 }
 
+void tr_netClosePeerSocket(tr_session* session, tr_peer_socket socket)
+{
+    switch (socket.type)
+    {
+    case TR_PEER_SOCKET_TYPE_NONE:
+        break;
+
+    case TR_PEER_SOCKET_TYPE_TCP:
+        tr_netClose(session, socket.handle.tcp);
+        break;
+
+#ifdef WITH_UTP
+    case TR_PEER_SOCKET_TYPE_UTP:
+        UTP_Close(socket.handle.utp);
+        break;
+#endif
+
+    default:
+        TR_ASSERT_MSG(false, "unsupported peer socket type %d", socket.type);
+    }
+}
+
 static tr_socket_t tr_netBindTCPImpl(tr_address const* addr, tr_port port, bool suppressMsgs, int* errOut)
 {
     TR_ASSERT(tr_address_is_valid(addr));
