@@ -30,5 +30,6 @@
 
 @mixin rounded-button($radius) {
   @include button;
+
   border-radius: $radius;
 }

@@ -1,10 +1,11 @@
 @charset "UTF-8";
 
+@import './mixins';
+@import './variables';
+
 @use 'sass:color';
 @use 'sass:math';
 
-@import './mixins';
-@import './variables';
 
 /// GLOBAL
 
@@ -22,16 +23,19 @@
   --color-fg-on-popup: #{$grey-800};
   --color-fg-port-closed: #{$red-500};
   --color-fg-port-open: #{$green-500};
+
   @media (prefers-color-scheme: dark) {
     --color-fg-primary: #{$grey-100};
     --color-fg-secondary: #{$grey-400};
     --color-fg-tertiary: #{$grey-500};
   }
+
   @media (prefers-color-scheme: light) {
     --color-fg-primary: #{$grey-800};
     --color-fg-secondary: #{$grey-500};
     --color-fg-tertiary: #{$grey-400};
   }
+
   --color-progressbar-background-1: #{$grey-100};
   --color-progressbar-background-2: #{$grey-400};
   --color-progressbar-verify-1: #{$pink-300};
@@ -367,6 +371,7 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
     &:not(.compact) {
       $icon-size-num: 32;
       $icon-size: $icon-size-num * 1px;
+
       align-items: center;
       display: grid;
       grid-column-gap: 12px;
@@ -641,15 +646,14 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
 
   background: $background-color;
   bottom: 0;
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.7);
+  box-shadow: 0 3px 6px rgb(0 0 0 / 70%);
   position: absolute;
   right: 0;
   top: $popup-top;
   z-index: $z-index-popup;
 
   .tabs-page {
-    grid-column-gap: 8px;
-    grid-row-gap: 5px;
+    grid-gap: 5px 8px;
     grid-template-columns: 1fr 1fr;
     margin: 20px;
 
@@ -815,6 +819,7 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
 
   button {
     @include button;
+
     appearance: none;
     padding: 3px;
   }
@@ -856,15 +861,14 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
 /// INSPECTOR
 
 #inspector {
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.7);
+  box-shadow: 0 3px 6px rgb(0 0 0 / 70%);
 }
 
 .inspector-info-page {
   // TODO: this is (mostly) copied from prefs-dialog.
   // can it be folded into a single set of rules?
 
-  grid-column-gap: 8px;
-  grid-row-gap: 5px;
+  grid-gap: 5px 8px;
   grid-template-columns: auto 1fr;
   margin: 20px;
   padding: 12px;
@@ -994,8 +998,7 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
 
   .tier-list-row {
     display: grid;
-    grid-column-gap: 8px;
-    grid-row-gap: 4px;
+    grid-gap: 4px 8px;
     margin-top: 8px;
   }
 
@@ -1124,6 +1127,7 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
 
   > * {
     @include button;
+
     appearance: none;
     background-position: center;
     background-repeat: no-repeat;
@@ -1136,6 +1140,7 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
 
   > .low {
     @include tab-image($image-chevron-dn);
+
     border-right-width: 0;
   }
 
@@ -1145,6 +1150,7 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
 
   > .high {
     @include tab-image($image-chevron-up);
+
     border-left-width: 0;
   }
 }
@@ -1156,7 +1162,7 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
   $disabled-color: var(--color-fg-disabled);
 
   background: $background-color;
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.7);
+  box-shadow: 0 3px 6px rgb(0 0 0 / 70%);
   color: var(--color-fg-on-popup);
   position: absolute;
   z-index: $z-index-popup;
@@ -1196,7 +1202,7 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
     var(--color-bg-menu)
   );
   border-radius: 8px;
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.7);
+  box-shadow: 0 3px 6px rgb(0 0 0 / 70%);
   color: var(--color-fg-on-popup);
   padding: 20px;
   position: fixed;
@@ -1298,8 +1304,7 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
 
     .alt-speed {
       display: grid;
-      grid-column-gap: 5px;
-      grid-row-gap: 5px;
+      grid-gap: 5px;
       grid-template-areas:
         'check   lb'
         'turtle  values';
@@ -1356,7 +1361,7 @@ $logo-size: 64px;
   }
 
   .dialog-container {
-    opacity: 96%;
+    opacity: .96;
     position: absolute;
     top: $popup-top;
     width: 100%;
@@ -1438,7 +1443,7 @@ $logo-size: 64px;
 
 .dialog-container {
   border: 0;
-  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.7);
+  box-shadow: 0 3px 6px rgba(0 0 0 / 70%);
   color: var(--color-fg-primary);
   display: block;
   margin: 0;
@@ -1564,14 +1569,14 @@ $logo-size: 64px;
 
 /// UPLOAD DIALOG
 
-#free-space-text {
+.dialog-workarea .label-right {
   display: inline-block;
   float: right;
   font-size: smaller;
   font-style: italic;
 }
 
-#torrent-upload-frame {
+.torrent-upload-frame {
   border: 0;
   display: block; /* Don't change this : safari forms won't target hidden frames (they open a new window) */
   height: 0;

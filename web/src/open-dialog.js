@@ -161,7 +161,7 @@ export class OpenDialog extends EventTarget {
     workarea.append(label);
 
     const freespace = document.createElement('span');
-    freespace.id = 'free-space-text';
+    freespace.className = 'label-right';
     label.append(freespace);
     workarea.append(label);
     elements.freespace = freespace;

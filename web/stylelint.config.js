@@ -1,9 +1,12 @@
 
 module.exports = {
   "extends": [
-    "@primer/stylelint-config",
+    "stylelint-config-standard",
     "stylelint-config-sass-guidelines",
     "stylelint-config-prettier"
+  ],
+  "plugins": [
+    "stylelint-scss"
   ],
   "rules": {
     "block-no-empty": true,
@@ -14,18 +17,16 @@ module.exports = {
     "font-family-no-duplicate-names": true,
     "function-calc-no-unspaced-operator": true,
     "function-linear-gradient-no-nonstandard-direction": true,
+    "function-no-unknown": null, // https://github.com/stylelint-scss/stylelint-scss/issues/589
     "max-nesting-depth": null,
     "media-feature-name-no-unknown": true,
+    "no-descending-specificity": null,
     "no-duplicate-at-import-rules": true,
-    "no-duplicate-selectors": null,
     "no-empty-source": true,
     "no-extra-semicolons": true,
     "no-invalid-double-slash-comments": true,
-    "primer/no-undefined-vars": true,
-    "primer/no-unused-vars": true,
     "property-no-unknown": true,
     "scss/at-rule-no-unknown": true,
-    "selector-attribute-quotes": null,
     "selector-max-compound-selectors": null,
     "selector-max-id": null,
     "selector-no-qualifying-type": [
