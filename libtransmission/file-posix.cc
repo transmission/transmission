@@ -957,7 +957,7 @@ bool preallocate_fallocate64(tr_sys_file_t handle, uint64_t size)
 #ifdef HAVE_XFS_XFS_H
 bool full_preallocate_xfs(tr_sys_file_t handle, uint64_t size)
 {
-    if (!platform_test_xfs_fd(handle)) // true if on xfs filesystem
+    if (platform_test_xfs_fd(handle) == 0) // true if on xfs filesystem
     {
         return false;
     }
