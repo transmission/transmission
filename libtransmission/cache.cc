@@ -163,8 +163,7 @@ static int flushContiguous(tr_cache* cache, int pos, int n)
 
     auto* b = blocks[pos];
     auto* const tor = b->tor;
-    auto const piece = b->loc.piece;
-    auto const offset = b->loc.piece_offset;
+    auto const loc = b->loc;
 
     for (int i = 0; i < n; ++i)
     {
@@ -177,7 +176,7 @@ static int flushContiguous(tr_cache* cache, int pos, int n)
 
     tr_ptrArrayErase(&cache->blocks, pos, pos + n);
 
-    err = tr_ioWrite(tor, piece, offset, walk - buf, buf);
+    err = tr_ioWrite(tor, loc, walk - buf, buf);
     tr_free(buf);
 
     ++cache->disk_writes;
@@ -352,7 +351,7 @@ int tr_cacheReadBlock(tr_cache* cache, tr_torrent* torrent, tr_block_info::Locat
     }
     else
     {
-        err = tr_ioRead(torrent, loc.piece, loc.piece_offset, len, setme);
+        err = tr_ioRead(torrent, loc, len, setme);
     }
 
     return err;
@@ -364,7 +363,7 @@ int tr_cachePrefetchBlock(tr_cache* cache, tr_torrent* torrent, tr_block_info::L
 
     if (auto const* const cb = findBlock(cache, torrent, loc); cb == nullptr)
     {
-        err = tr_ioPrefetch(torrent, loc.piece, loc.piece_offset, len);
+        err = tr_ioPrefetch(torrent, loc, len);
     }
 
     return err;

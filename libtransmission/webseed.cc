@@ -502,7 +502,7 @@ void task_request_next_chunk(tr_webseed_task* t)
     tr_piece_index_t const step_piece = total_offset / piece_size;
     uint64_t const step_piece_offset = total_offset - uint64_t(piece_size) * step_piece;
 
-    auto const [file_index, file_offset] = tor->fileOffset(step_piece, step_piece_offset);
+    auto const [file_index, file_offset] = tor->fileOffset(tor->pieceLoc(step_piece, step_piece_offset));
     uint64_t this_pass = std::min(remain, tor->fileSize(file_index) - file_offset);
 
     auto const url = make_url(t->webseed, tor->fileSubpath(file_index));

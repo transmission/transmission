@@ -148,22 +148,16 @@ static int readOrWriteBytes(
 }
 
 /* returns 0 on success, or an errno on failure */
-static int readOrWritePiece(
-    tr_torrent* tor,
-    int ioMode,
-    tr_piece_index_t pieceIndex,
-    uint32_t pieceOffset,
-    uint8_t* buf,
-    size_t buflen)
+static int readOrWritePiece(tr_torrent* tor, int ioMode, tr_block_info::Location loc, uint8_t* buf, size_t buflen)
 {
     int err = 0;
 
-    if (pieceIndex >= tor->pieceCount())
+    if (loc.piece >= tor->pieceCount())
     {
         return EINVAL;
     }
 
-    auto [file_index, file_offset] = tor->fileOffset(pieceIndex, pieceOffset);
+    auto [file_index, file_offset] = tor->fileOffset(loc);
 
     while (buflen != 0 && err == 0)
     {
@@ -186,19 +180,19 @@ static int readOrWritePiece(
     return err;
 }
 
-int tr_ioRead(tr_torrent* tor, tr_piece_index_t pieceIndex, uint32_t begin, uint32_t len, uint8_t* buf)
+int tr_ioRead(tr_torrent* tor, tr_block_info::Location loc, uint32_t len, uint8_t* buf)
 {
-    return readOrWritePiece(tor, TR_IO_READ, pieceIndex, begin, buf, len);
+    return readOrWritePiece(tor, TR_IO_READ, loc, buf, len);
 }
 
-int tr_ioPrefetch(tr_torrent* tor, tr_piece_index_t pieceIndex, uint32_t begin, uint32_t len)
+int tr_ioPrefetch(tr_torrent* tor, tr_block_info::Location loc, uint32_t len)
 {
-    return readOrWritePiece(tor, TR_IO_PREFETCH, pieceIndex, begin, nullptr, len);
+    return readOrWritePiece(tor, TR_IO_PREFETCH, loc, nullptr, len);
 }
 
-int tr_ioWrite(tr_torrent* tor, tr_piece_index_t pieceIndex, uint32_t begin, uint32_t len, uint8_t const* buf)
+int tr_ioWrite(tr_torrent* tor, tr_block_info::Location loc, uint32_t len, uint8_t const* buf)
 {
-    return readOrWritePiece(tor, TR_IO_WRITE, pieceIndex, begin, (uint8_t*)buf, len);
+    return readOrWritePiece(tor, TR_IO_WRITE, loc, (uint8_t*)buf, len);
 }
 
 /****
@@ -211,25 +205,22 @@ static std::optional<tr_sha1_digest_t> recalculateHash(tr_torrent* tor, tr_piece
     TR_ASSERT(piece < tor->pieceCount());
 
     auto bytes_left = size_t(tor->pieceSize(piece));
-    auto offset = uint32_t{};
-    tr_ioPrefetch(tor, piece, offset, bytes_left);
+    auto loc = tor->pieceLoc(piece);
+    tr_ioPrefetch(tor, loc, bytes_left);
 
     auto sha = tr_sha1_init();
     auto buffer = std::vector<uint8_t>(tor->blockSize());
     while (bytes_left != 0)
     {
         size_t const len = std::min(bytes_left, std::size(buffer));
-        if (auto const
-                success = tr_cacheReadBlock(tor->session->cache, tor, tor->pieceLoc(piece, offset), len, std::data(buffer)) ==
-                0;
-            !success)
+        if (auto const success = tr_cacheReadBlock(tor->session->cache, tor, loc, len, std::data(buffer)) == 0; !success)
         {
             tr_sha1_final(sha);
             return {};
         }
 
         tr_sha1_update(sha, std::data(buffer), len);
-        offset += len;
+        loc = tor->byteLoc(loc.byte + len);
         bytes_left -= len;
     }
 

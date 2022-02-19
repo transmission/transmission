@@ -163,7 +163,7 @@ public:
     {
         return metainfo_.blockLoc(block);
     }
-    [[nodiscard]] auto pieceLoc(tr_piece_index_t piece, uint32_t offset, uint32_t length = 0) const
+    [[nodiscard]] auto pieceLoc(tr_piece_index_t piece, uint32_t offset = 0, uint32_t length = 0) const
     {
         return metainfo_.pieceLoc(piece, offset, length);
     }
@@ -282,14 +282,9 @@ public:
         return fpm_.pieceSpan(file);
     }
 
-    [[nodiscard]] auto fileOffset(uint64_t offset) const
+    [[nodiscard]] auto fileOffset(tr_block_info::Location loc) const
     {
-        return fpm_.fileOffset(offset);
-    }
-
-    [[nodiscard]] auto fileOffset(tr_piece_index_t piece, uint32_t piece_offset) const
-    {
-        return fpm_.fileOffset(this->pieceLoc(piece, piece_offset).byte);
+        return fpm_.fileOffset(loc.byte);
     }
 
     /// WANTED
