@@ -363,11 +363,6 @@ public:
         return tr_peerIoGetAge(io);
     }
 
-    [[nodiscard]] bool is_reading_block(tr_block_index_t block) const override
-    {
-        return state == AwaitingBt::Piece && block == torrent->blockOf(incoming.blockReq.index, incoming.blockReq.offset);
-    }
-
     void cancel_block_request(tr_block_index_t block) override
     {
         protocolSendCancel(this, blockToReq(torrent, block));
@@ -1467,7 +1462,11 @@ static void prefetchPieces(tr_peerMsgsImpl* msgs)
 
         if (requestIsValid(msgs, req))
         {
-            tr_cachePrefetchBlock(msgs->session->cache, msgs->torrent, req->index, req->offset, req->length);
+            tr_cachePrefetchBlock(
+                msgs->session->cache,
+                msgs->torrent,
+                msgs->torrent->pieceLoc(req->index, req->offset),
+                req->length);
             ++msgs->prefetchCount;
         }
     }
@@ -1888,8 +1887,8 @@ static int clientGotBlock(tr_peerMsgsImpl* msgs, struct evbuffer* data, struct p
     TR_ASSERT(msgs != nullptr);
     TR_ASSERT(req != nullptr);
 
-    tr_torrent* tor = msgs->torrent;
-    tr_block_index_t const block = tor->blockOf(req->index, req->offset);
+    tr_torrent* const tor = msgs->torrent;
+    auto const block = tor->pieceLoc(req->index, req->offset).block;
 
     if (!requestIsValid(msgs, req))
     {
@@ -1921,7 +1920,9 @@ static int clientGotBlock(tr_peerMsgsImpl* msgs, struct evbuffer* data, struct p
     ***  Save the block
     **/
 
-    if (int const err = tr_cacheWriteBlock(msgs->session->cache, tor, req->index, req->offset, req->length, data); err != 0)
+    if (int const
+            err = tr_cacheWriteBlock(msgs->session->cache, tor, tor->pieceLoc(req->index, req->offset), req->length, data);
+        err != 0)
     {
         return err;
     }
@@ -1952,7 +1953,7 @@ static ReadState canRead(tr_peerIo* io, void* vmsgs, size_t* piece)
     struct evbuffer* in = tr_peerIoGetReadBuffer(io);
     size_t const inlen = evbuffer_get_length(in);
 
-    dbgmsg(msgs, "canRead: inlen is %zu, msgs->state is %d", inlen, msgs->state);
+    dbgmsg(msgs, "canRead: inlen is %zu, msgs->state is %d", inlen, int(msgs->state));
 
     auto ret = ReadState{};
     if (inlen == 0)
@@ -2215,8 +2216,7 @@ static size_t fillOutputBuffer(tr_peerMsgsImpl* msgs, time_t now)
             bool err = tr_cacheReadBlock(
                            msgs->session->cache,
                            msgs->torrent,
-                           req.index,
-                           req.offset,
+                           msgs->torrent->pieceLoc(req.index, req.offset),
                            req.length,
                            static_cast<uint8_t*>(iovec[0].iov_base)) != 0;
             iovec[0].iov_len = req.length;
