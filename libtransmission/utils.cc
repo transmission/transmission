@@ -43,6 +43,7 @@
 #include "error.h"
 #include "log.h"
 #include "mime-types.h"
+#include "net.h" // ntohl()
 #include "platform-quota.h" /* tr_device_info_create(), tr_device_info_get_disk_space(), tr_device_info_free() */
 #include "tr-assert.h"
 #include "utils.h"
