@@ -180,9 +180,7 @@ void text_buffer_changed_cb(Glib::RefPtr<Gtk::TextBuffer> buffer, tr_quark const
 {
     Gtk::TextBuffer::iterator start, end;
     buffer->get_bounds(start, end);
-    Glib::ustring value = buffer->get_text(start, end, FALSE);
-
-    core->set_pref(key, value);
+    core->set_pref(key, buffer->get_text(start, end, FALSE));
 }
 
 Gtk::Widget* new_text_view(tr_quark const key, Glib::RefPtr<Session> const& core)
