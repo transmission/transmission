@@ -103,7 +103,7 @@ static auto constexpr Options = std::array<tr_option, 44>{
       { 941, "incomplete-dir", "Where to store new torrents until they're complete", nullptr, true, "<directory>" },
       { 942, "no-incomplete-dir", "Don't store incomplete torrents in a different location", nullptr, false, nullptr },
       { 'd', "dump-settings", "Dump the settings and exit", "d", false, nullptr },
-      { 943, "default-trackers", "Default trackers to be automatically added to public torrents", nullptr, true, "<list>" },
+      { 943, "default-trackers", "Trackers for public torrents to use automatically", nullptr, true, "<list>" },
       { 'e', "logfile", "Dump the log messages to this filename", "e", true, "<filename>" },
       { 'f', "foreground", "Run in the foreground instead of daemonizing", "f", false, nullptr },
       { 'g', "config-dir", "Where to look for configuration files", "g", true, "<path>" },
