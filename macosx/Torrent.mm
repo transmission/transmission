@@ -198,49 +198,57 @@ bool trashDataFile(char const* filename, tr_error** error)
 
 - (instancetype)initWithHistory:(NSDictionary*)history lib:(tr_session*)lib forcePause:(BOOL)pause
 {
-    self = [self initWithPath:history[@"InternalTorrentPath"] hash:history[@"TorrentHash"] torrentStruct:NULL magnetAddress:nil
-                            lib:lib
-                     groupValue:history[@"GroupValue"]
-        removeWhenFinishSeeding:history[@"RemoveWhenFinishSeeding"]
-                 downloadFolder:history[@"DownloadFolder"] //upgrading from versions < 1.80
-         legacyIncompleteFolder:[history[@"UseIncompleteFolder"] boolValue] //upgrading from versions < 1.80
-             ?
-             history[@"IncompleteFolder"] :
-             nil];
-
-    if (self)
+    if ([history[@"IsMagnet"] boolValue] == true)
     {
-        //start transfer
-        NSNumber* active;
-        if (!pause && (active = history[@"Active"]) && active.boolValue)
-        {
-            fStat = tr_torrentStat(fHandle);
-            [self startTransferNoQueue];
-        }
+        self = [self initWithMagnetAddress:history[@"MagnetLink"] location:history[@"MagnetLocation"] lib:lib];
+    }
+    else
+    {
+        self = [self initWithPath:history[@"InternalTorrentPath"] hash:history[@"TorrentHash"] torrentStruct:NULL magnetAddress:nil
+                                lib:lib
+                         groupValue:history[@"GroupValue"]
+            removeWhenFinishSeeding:history[@"RemoveWhenFinishSeeding"]
+                     downloadFolder:history[@"DownloadFolder"] //upgrading from versions < 1.80
+             legacyIncompleteFolder:[history[@"UseIncompleteFolder"] boolValue] //upgrading from versions < 1.80
+                 ?
+                 history[@"IncompleteFolder"] :
+                 nil];
 
-        //upgrading from versions < 1.60: get old stop ratio settings
-        NSNumber* ratioSetting;
-        if ((ratioSetting = history[@"RatioSetting"]))
+        if (self)
         {
-            switch (ratioSetting.intValue)
+            //start transfer
+            NSNumber* active;
+            if (!pause && (active = history[@"Active"]) && active.boolValue)
             {
-            case NSControlStateValueOn:
-                self.ratioSetting = TR_RATIOLIMIT_SINGLE;
-                break;
-            case NSControlStateValueOff:
-                self.ratioSetting = TR_RATIOLIMIT_UNLIMITED;
-                break;
-            case NSControlStateValueMixed:
-                self.ratioSetting = TR_RATIOLIMIT_GLOBAL;
-                break;
+                fStat = tr_torrentStat(fHandle);
+                [self startTransferNoQueue];
+            }
+
+            //upgrading from versions < 1.60: get old stop ratio settings
+            NSNumber* ratioSetting;
+            if ((ratioSetting = history[@"RatioSetting"]))
+            {
+                switch (ratioSetting.intValue)
+                {
+                case NSControlStateValueOn:
+                    self.ratioSetting = TR_RATIOLIMIT_SINGLE;
+                    break;
+                case NSControlStateValueOff:
+                    self.ratioSetting = TR_RATIOLIMIT_UNLIMITED;
+                    break;
+                case NSControlStateValueMixed:
+                    self.ratioSetting = TR_RATIOLIMIT_GLOBAL;
+                    break;
+                }
+            }
+            NSNumber* ratioLimit;
+            if ((ratioLimit = history[@"RatioLimit"]))
+            {
+                self.ratioLimit = ratioLimit.floatValue;
             }
         }
-        NSNumber* ratioLimit;
-        if ((ratioLimit = history[@"RatioLimit"]))
-        {
-            self.ratioLimit = ratioLimit.floatValue;
-        }
     }
+    
     return self;
 }
 
@@ -252,7 +260,10 @@ bool trashDataFile(char const* filename, tr_error** error)
         @"Active" : @(self.active),
         @"WaitToStart" : @(self.waitingToStart),
         @"GroupValue" : @(fGroupValue),
-        @"RemoveWhenFinishSeeding" : @(_removeWhenFinishSeeding)
+        @"RemoveWhenFinishSeeding" : @(_removeWhenFinishSeeding),
+        @"IsMagnet" : @(self.isMagnet),
+        @"MagnetLink" : self.magnetLink,
+        @"MagnetLocation" : self.magnetLocation
     };
 }
 
@@ -427,6 +438,18 @@ bool trashDataFile(char const* filename, tr_error** error)
 - (NSString*)magnetLink
 {
     return @(tr_torrentGetMagnetLink(fHandle));
+}
+
+- (NSString*)magnetLocation
+{
+    if (self.isMagnet)
+    {
+        if (tr_torrentGetDownloadDir(fHandle) != NULL)
+        {
+            return @(tr_torrentGetDownloadDir(fHandle));
+        }
+    }
+    return @"";
 }
 
 - (CGFloat)ratio
