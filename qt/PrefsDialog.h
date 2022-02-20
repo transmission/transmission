@@ -34,6 +34,7 @@ private slots:
     void timeEditingFinished();
     void lineEditingFinished();
     void pathChanged(QString const& path);
+    void plainTextChanged();
     void refreshPref(int key);
     void encryptionEdited(int);
     void altSpeedDaysEdited(int);

@@ -109,6 +109,7 @@ std::array<Prefs::PrefItem, Prefs::PREFS_COUNT> const Prefs::Items{
     { ALT_SPEED_LIMIT_TIME_DAY, TR_KEY_alt_speed_time_day, QVariant::Int },
     { BLOCKLIST_ENABLED, TR_KEY_blocklist_enabled, QVariant::Bool },
     { BLOCKLIST_URL, TR_KEY_blocklist_url, QVariant::String },
+    { DEFAULT_TRACKERS, TR_KEY_default_trackers, QVariant::String },
     { DSPEED, TR_KEY_speed_limit_down, QVariant::Int },
     { DSPEED_ENABLED, TR_KEY_speed_limit_down_enabled, QVariant::Bool },
     { DOWNLOAD_DIR, TR_KEY_download_dir, QVariant::String },

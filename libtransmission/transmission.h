@@ -392,6 +392,8 @@ bool tr_sessionIsRPCPasswordEnabled(tr_session const* session);
 
 char const* tr_sessionGetRPCBindAddress(tr_session const* session);
 
+void tr_sessionSetDefaultTrackers(tr_session* session, char const* trackers);
+
 enum tr_rpc_callback_type
 {
     TR_RPC_TORRENT_ADDED,
