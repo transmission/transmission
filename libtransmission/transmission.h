@@ -394,8 +394,6 @@ char const* tr_sessionGetRPCBindAddress(tr_session const* session);
 
 void tr_sessionSetDefaultTrackers(tr_session* session, char const* trackers);
 
-char const* tr_sessionGetDefaultTrackers(tr_session const* session);
-
 enum tr_rpc_callback_type
 {
     TR_RPC_TORRENT_ADDED,

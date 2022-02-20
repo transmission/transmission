@@ -861,7 +861,6 @@ static void tr_torrentAddDefaultTrackers(tr_torrent* tor)
     }
     /* tell the announcer to reload this torrent's tracker list */
     tr_announcerResetTorrent(tor->session->announcer, tor);
-    tor->announceList().save(tor->torrentFile());
 }
 
 tr_torrent* tr_torrentNew(tr_ctor* ctor, tr_torrent** setme_duplicate_of)

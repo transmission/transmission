@@ -154,7 +154,7 @@ public:
 
     std::string const& defaultTrackers() const
     {
-        return default_trackers_;
+        return default_trackers_str_;
     }
 
     void setDefaultTrackers(std::string_view trackers);
@@ -409,7 +409,7 @@ private:
     std::array<std::string, TR_SCRIPT_N_TYPES> scripts_;
     std::string blocklist_url_;
     std::string download_dir_;
-    std::string default_trackers_;
+    std::string default_trackers_str_;
     std::string incomplete_dir_;
     std::string peer_congestion_algorithm_;
 
