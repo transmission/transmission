@@ -198,7 +198,13 @@ bool trashDataFile(char const* filename, tr_error** error)
 
 - (instancetype)initWithHistory:(NSDictionary*)history lib:(tr_session*)lib forcePause:(BOOL)pause
 {
-    if ([history[@"IsMagnet"] boolValue] == true)
+    bool isMagnet = false;
+    if (history[@"IsMagnet"] != nil)
+    {
+        isMagnet = [history[@"IsMagnet"] boolValue];
+    }
+    
+    if (isMagnet == true)
     {
         self = [self initWithMagnetAddress:history[@"MagnetLink"] location:history[@"MagnetLocation"] lib:lib];
     }
