@@ -819,45 +819,14 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
 
 static void tr_torrentAddDefaultTrackers(tr_torrent* tor)
 {
-    std::list<std::string> trackerURLs = {};
-    int numExistingTrackers = tr_torrentTrackerCount(tor);
-    int numNewTrackers = tor->session->defaultTrackersList.size();
-
-    if (!numNewTrackers || tor->isPrivate())
+    if (tor->isPrivate())
     {
         return;
     }
-
-    // copy existing tracker URLs
-    for (int i = 0; i < numExistingTrackers; ++i)
+    
+    for (auto const& url : tor->session->defaultTrackersList)
     {
-        auto tracker = tr_torrentTracker(tor, i);
-        trackerURLs.push_back(tracker.announce);
-    }
-
-    // add the new ones
-    for (std::string_view url : tor->session->defaultTrackersList)
-    {
-        if (tr_urlIsValidTracker(url))
-        {
-            // check for duplicates
-            bool duplicate = false;
-            for (auto trackerURL : trackerURLs)
-            {
-                if (trackerURL == url)
-                {
-                    duplicate = true;
-                    break;
-                }
-            }
-
-            if (duplicate)
-            {
-                continue;
-            }
-
             tor->announceList().add(url);
-        }
     }
     /* tell the announcer to reload this torrent's tracker list */
     tr_announcerResetTorrent(tor->session->announcer, tor);
