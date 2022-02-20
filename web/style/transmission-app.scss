@@ -791,6 +791,11 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
     }
   }
 
+  #default-trackers,
+  .default-trackers-label {
+    grid-column: 1 / 3;
+  }
+
   .alt-speed-label {
     font-size: smaller;
     font-style: lighter;

@@ -176,13 +176,6 @@ Gtk::Entry* new_entry(tr_quark const key, Glib::RefPtr<Session> const& core)
     return w;
 }
 
-void text_buffer_changed_cb(Glib::RefPtr<Gtk::TextBuffer> buffer, tr_quark const key, Glib::RefPtr<Session> const& core)
-{
-    Gtk::TextBuffer::iterator start, end;
-    buffer->get_bounds(start, end);
-    core->set_pref(key, buffer->get_text(start, end, FALSE));
-}
-
 Gtk::Widget* new_text_view(tr_quark const key, Glib::RefPtr<Session> const& core)
 {
     auto* w = Gtk::make_managed<Gtk::TextView>();
@@ -195,10 +188,16 @@ Gtk::Widget* new_text_view(tr_quark const key, Glib::RefPtr<Session> const& core
     scroll->set_policy(Gtk::PolicyType::POLICY_AUTOMATIC, Gtk::PolicyType::POLICY_AUTOMATIC);
     scroll->set_shadow_type(Gtk::ShadowType::SHADOW_IN);
     scroll->add(*w);
-    scroll->set_size_request(-1, 200);
+    scroll->set_size_request(-1, 166);
 
     /* signal */
-    buffer->signal_changed().connect([buffer, key, core]() { text_buffer_changed_cb(buffer, key, core); });
+    w->add_events(Gdk::FOCUS_CHANGE_MASK);
+    w->signal_focus_out_event().connect(
+        [buffer, key, core](GdkEventFocus*)
+        {
+            core->set_pref(key, buffer->get_text());
+            return false;
+        });
 
     return scroll;
 }
@@ -1078,9 +1077,14 @@ Gtk::Widget* PrefsDialog::Impl::networkPage()
     w->set_tooltip_text(_("LPD is a tool for finding peers on your local network."));
     t->add_wide_control(row, *w);
 
-    t->add_section_title(row, _("Default Trackers"));
+    t->add_section_divider(row);
+    t->add_section_title(row, _("Default Public Trackers"));
+
     auto tv = new_text_view(TR_KEY_default_trackers, core_);
-    tv->set_tooltip_text(_("Trackers for public torrents to use automatically"));
+    tv->set_tooltip_text(
+        _("Trackers to use on all public torrents.\n\n"
+          "To add a backup URL, add it on the next line after a primary URL.\n"
+          "To add a new primary URL, add it after a blank line."));
     t->add_wide_control(row, *tv);
 
     return t;

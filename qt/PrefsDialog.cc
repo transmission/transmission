@@ -240,10 +240,9 @@ void PrefsDialog::linkWidgetToPref(QWidget* widget, int pref_key)
         return;
     }
 
-    auto const* plain_text_edit = qobject_cast<QPlainTextEdit*>(widget);
-    if (plain_text_edit != nullptr)
+    if (auto const* edit = qobject_cast<QPlainTextEdit*>(widget); edit != nullptr)
     {
-        connect(plain_text_edit, &QPlainTextEdit::textChanged, this, &PrefsDialog::plainTextChanged);
+        connect(edit, &QPlainTextEdit::textChanged, this, &PrefsDialog::plainTextChanged);
         return;
     }
 }
