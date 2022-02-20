@@ -823,11 +823,12 @@ static void tr_torrentAddDefaultTrackers(tr_torrent* tor)
     {
         return;
     }
-    
+
     for (auto const& url : tor->session->defaultTrackersList)
     {
-            tor->announceList().add(url);
+        tor->announceList().add(url);
     }
+
     /* tell the announcer to reload this torrent's tracker list */
     tr_announcerResetTorrent(tor->session->announcer, tor);
 }

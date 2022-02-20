@@ -1080,8 +1080,7 @@ Gtk::Widget* PrefsDialog::Impl::networkPage()
 
     t->add_section_title(row, _("Default Trackers"));
     auto tv = new_text_view(TR_KEY_default_trackers, core_);
-    tv->set_tooltip_text(
-        _("Trackers for public torrents to use automatically"));
+    tv->set_tooltip_text(_("Trackers for public torrents to use automatically"));
     t->add_wide_control(row, *tv);
 
     return t;
