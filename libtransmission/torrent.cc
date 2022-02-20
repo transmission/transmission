@@ -817,52 +817,6 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
     }
 }
 
-static void tr_torrentAddDefaultTrackers(tr_torrent* tor)
-{
-    std::list<std::string> trackerURLs = {};
-    int numExistingTrackers = tr_torrentTrackerCount(tor);
-    int numNewTrackers = tor->session->defaultTrackersList.size();
-
-    if (!numNewTrackers || tor->isPrivate())
-    {
-        return;
-    }
-
-    // copy existing tracker URLs
-    for (int i = 0; i < numExistingTrackers; ++i)
-    {
-        auto tracker = tr_torrentTracker(tor, i);
-        trackerURLs.push_back(tracker.announce);
-    }
-
-    // add the new ones
-    for (std::string_view url : tor->session->defaultTrackersList)
-    {
-        if (tr_urlIsValidTracker(url))
-        {
-            // check for duplicates
-            bool duplicate = false;
-            for (auto trackerURL : trackerURLs)
-            {
-                if (trackerURL == url)
-                {
-                    duplicate = true;
-                    break;
-                }
-            }
-
-            if (duplicate)
-            {
-                continue;
-            }
-
-            tor->announceList().add(url);
-        }
-    }
-    /* tell the announcer to reload this torrent's tracker list */
-    tr_announcerResetTorrent(tor->session->announcer, tor);
-}
-
 tr_torrent* tr_torrentNew(tr_ctor* ctor, tr_torrent** setme_duplicate_of)
 {
     TR_ASSERT(ctor != nullptr);
@@ -889,7 +843,6 @@ tr_torrent* tr_torrentNew(tr_ctor* ctor, tr_torrent** setme_duplicate_of)
 
     auto* const tor = new tr_torrent{ std::move(metainfo) };
     torrentInit(tor, ctor);
-    tr_torrentAddDefaultTrackers(tor);
     return tor;
 }
 

@@ -27,6 +27,7 @@
 
 #include "transmission.h"
 
+#include "announce-list.h"
 #include "net.h" // tr_socket_t
 #include "quark.h"
 #include "web.h"
@@ -151,10 +152,16 @@ public:
     }
 
     // default trackers
+    // (trackers to apply automatically to public torrents)
 
-    std::string const& defaultTrackers() const
+    auto const& defaultTrackersStr() const
     {
         return default_trackers_str_;
+    }
+
+    auto const& defaultTrackers() const
+    {
+        return default_trackers_;
     }
 
     void setDefaultTrackers(std::string_view trackers);
@@ -396,7 +403,7 @@ public:
 
     std::unique_ptr<tr_rpc_server> rpc_server_;
 
-    std::list<std::string> defaultTrackersList;
+    tr_announce_list default_trackers_;
 
     // One of <netinet/ip.h>'s IPTOS_ values.
     // See tr_netTos*() in libtransmission/net.h for more info

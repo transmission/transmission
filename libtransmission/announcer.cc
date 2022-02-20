@@ -505,7 +505,7 @@ struct tr_torrent_announcer
     {
         // build the trackers
         auto tier_to_infos = std::map<tr_tracker_tier_t, std::vector<tr_announce_list::tracker_info const*>>{};
-        auto const& announce_list = tor->announceList();
+        auto const announce_list = getAnnounceList(tor);
         for (auto const& info : announce_list)
         {
             tier_to_infos[info.tier].emplace_back(&info);
@@ -575,6 +575,20 @@ struct tr_torrent_announcer
 
     tr_tracker_callback callback = nullptr;
     void* callback_data = nullptr;
+
+private:
+    [[nodiscard]] static tr_announce_list getAnnounceList(tr_torrent const* tor)
+    {
+        auto announce_list = tor->announceList();
+
+        // if it's a public torrent, inject the default trackers
+        if (!tor->isPrivate())
+        {
+            announce_list.add(tor->session->defaultTrackers());
+        }
+
+        return announce_list;
+    }
 };
 
 static tr_tier* getTier(tr_announcer* announcer, tr_sha1_digest_t const& info_hash, int tier_id)

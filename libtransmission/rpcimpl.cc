@@ -2077,7 +2077,7 @@ static void addSessionField(tr_session* s, tr_variant* d, tr_quark key)
         break;
 
     case TR_KEY_default_trackers:
-        tr_variantDictAddStr(d, key, s->defaultTrackers());
+        tr_variantDictAddStr(d, key, s->defaultTrackersStr());
         break;
 
     case TR_KEY_download_dir:

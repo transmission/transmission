@@ -412,7 +412,7 @@ void tr_sessionGetSettings(tr_session const* s, tr_variant* d)
     tr_variantDictAddBool(d, TR_KEY_utp_enabled, s->isUTPEnabled);
     tr_variantDictAddBool(d, TR_KEY_lpd_enabled, s->isLPDEnabled);
     tr_variantDictAddStr(d, TR_KEY_download_dir, tr_sessionGetDownloadDir(s));
-    tr_variantDictAddStr(d, TR_KEY_default_trackers, s->defaultTrackers());
+    tr_variantDictAddStr(d, TR_KEY_default_trackers, s->defaultTrackersStr());
     tr_variantDictAddInt(d, TR_KEY_download_queue_size, tr_sessionGetQueueSize(s, TR_DOWN));
     tr_variantDictAddBool(d, TR_KEY_download_queue_enabled, tr_sessionGetQueueEnabled(s, TR_DOWN));
     tr_variantDictAddInt(d, TR_KEY_speed_limit_down, tr_sessionGetSpeedLimit_KBps(s, TR_DOWN));
@@ -2253,45 +2253,15 @@ int tr_sessionGetCacheLimit_MB(tr_session const* session)
 
 void tr_session::setDefaultTrackers(std::string_view trackers)
 {
-    /* keep the string */
     this->default_trackers_str_ = trackers;
-
-    /* clear out the old list entries */
-    this->defaultTrackersList.clear();
-
-    /* build the new list entries */
-    auto urlStart = std::string::npos;
-    auto constexpr Delimiters = " ,;\r\n\t"sv;
-    auto fragment = default_trackers_str_;
-    while ((urlStart = fragment.find_first_not_of(Delimiters)) != std::string::npos)
-    {
-        auto urlEnd = fragment.find_first_of(Delimiters, urlStart);
-        if (urlEnd == std::string::npos)
-        {
-            urlEnd = fragment.size() - 1;
-        }
-        else
-        {
-            urlEnd -= 1;
-        }
-        this->defaultTrackersList.push_back(fragment.substr(urlStart, urlEnd));
-
-        if (fragment.size() > (urlEnd + 1))
-        {
-            fragment = fragment.substr(urlEnd + 1, fragment.size());
-        }
-        else
-        {
-            break;
-        }
-    }
+    this->default_trackers_.parse(trackers);
 }
 
 void tr_sessionSetDefaultTrackers(tr_session* session, char const* trackers)
 {
     TR_ASSERT(tr_isSession(session));
 
-    session->setDefaultTrackers(trackers ? trackers : "");
+    session->setDefaultTrackers(trackers != nullptr ? trackers : "");
 }
 
 /***
