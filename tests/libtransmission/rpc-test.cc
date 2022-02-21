@@ -94,7 +94,7 @@ TEST_F(RpcTest, sessionGet)
     EXPECT_TRUE(tr_variantDictFindDict(&response, TR_KEY_arguments, &args));
 
     // what we expected
-    auto const expected_keys = std::array<tr_quark, 57>{
+    auto const expected_keys = std::array<tr_quark, 58>{
         TR_KEY_alt_speed_down,
         TR_KEY_alt_speed_enabled,
         TR_KEY_alt_speed_time_begin,
@@ -109,6 +109,7 @@ TEST_F(RpcTest, sessionGet)
         TR_KEY_blocklist_url,
         TR_KEY_cache_size_mb,
         TR_KEY_config_dir,
+        TR_KEY_default_trackers,
         TR_KEY_dht_enabled,
         TR_KEY_download_dir,
         TR_KEY_download_dir_free_space,

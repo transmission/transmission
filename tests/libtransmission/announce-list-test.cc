@@ -611,3 +611,83 @@ TEST_F(AnnounceListTest, parseDuplicateUrl)
 
     EXPECT_FALSE(announce_list.parse(Text));
 }
+
+TEST_F(AnnounceListTest, addAnnounceListWithSingleTracker)
+{
+    auto constexpr Trackers =
+        "https://www.foo.com/announce\n"
+        "\n"
+        "https://www.bar.com/announce\n"sv;
+    auto announce_list = tr_announce_list{};
+    announce_list.parse(Trackers);
+
+    auto constexpr AddStr = "https://www.baz.com/announce"sv;
+    auto tmp = tr_announce_list{};
+    tmp.parse(AddStr);
+
+    announce_list.add(tmp);
+
+    auto constexpr Expected =
+        "https://www.foo.com/announce\n"
+        "\n"
+        "https://www.bar.com/announce\n"
+        "\n"
+        "https://www.baz.com/announce\n"sv;
+    EXPECT_EQ(Expected, announce_list.toString());
+}
+
+TEST_F(AnnounceListTest, addAnnounceWithSingleTier)
+{
+    auto constexpr Trackers =
+        "https://www.foo.com/announce\n"
+        "\n"
+        "https://www.bar.com/announce\n"sv;
+    auto announce_list = tr_announce_list{};
+    announce_list.parse(Trackers);
+
+    auto constexpr AddStr =
+        "https://www.baz.com/announce\n"
+        "https://www.qux.com/announce\n"sv;
+    auto tmp = tr_announce_list{};
+    tmp.parse(AddStr);
+
+    announce_list.add(tmp);
+
+    auto constexpr Expected =
+        "https://www.foo.com/announce\n"
+        "\n"
+        "https://www.bar.com/announce\n"
+        "\n"
+        "https://www.baz.com/announce\n"
+        "https://www.qux.com/announce\n"sv;
+    EXPECT_EQ(Expected, announce_list.toString());
+}
+
+TEST_F(AnnounceListTest, addAnnounceListWithMultiTier)
+{
+    auto constexpr Trackers =
+        "https://www.foo.com/announce\n"
+        "\n"
+        "https://www.bar.com/announce\n"sv;
+    auto announce_list = tr_announce_list{};
+    announce_list.parse(Trackers);
+
+    auto constexpr AddStr =
+        "https://www.baz.com/announce\n"
+        "\n"
+        "https://www.qux.com/announce\n"sv;
+    auto tmp = tr_announce_list{};
+    tmp.parse(AddStr);
+
+    announce_list.add(tmp);
+
+    auto constexpr Expected =
+        "https://www.foo.com/announce\n"
+        "\n"
+        "https://www.bar.com/announce\n"
+        "\n"
+        "https://www.baz.com/announce\n"
+        "\n"
+        "https://www.qux.com/announce\n"sv;
+    EXPECT_EQ(Expected, announce_list.toString());
+}

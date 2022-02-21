@@ -392,6 +392,8 @@ bool tr_sessionIsRPCPasswordEnabled(tr_session const* session);
 
 char const* tr_sessionGetRPCBindAddress(tr_session const* session);
 
+void tr_sessionSetDefaultTrackers(tr_session* session, char const* trackers);
+
 enum tr_rpc_callback_type
 {
     TR_RPC_TORRENT_ADDED,
@@ -1187,7 +1189,13 @@ char* tr_torrentGetMagnetLink(tr_torrent const* tor);
 
 /**
  * Returns a newly-allocated string listing its tracker's announce URLs.
- * One URL per line, with a blank line between tiers
+ * One URL per line, with a blank line between tiers.
+ *
+ * NOTE: this only includes the trackers included in the torrent and,
+ * along with tr_torrentSetTrackerList(), is intended for import/export
+ * and user editing. It does *not* include the "default trackers" that
+ * are applied to all public torrents. If you want a full display of all
+ * trackers, use tr_torrentTracker() and tr_torrentTrackerCount()
  */
 char* tr_torrentGetTrackerList(tr_torrent const* tor);
 
@@ -1413,6 +1421,13 @@ struct tr_tracker_view
 
 struct tr_tracker_view tr_torrentTracker(tr_torrent const* torrent, size_t i);
 
+/**
+ * Count all the trackers (both active and backup) this torrent is using.
+ *
+ * NOTE: this is for a status display only and may include trackers from
+ * the default tracker list if this is a public torrent. If you want a
+ * list of trackers the  user can edit, see tr_torrentGetTrackerList().
+ */
 size_t tr_torrentTrackerCount(tr_torrent const* torrent);
 
 /*

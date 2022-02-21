@@ -333,6 +333,7 @@ void tr_sessionGetDefaultSettings(tr_variant* d)
     tr_variantDictAddBool(d, TR_KEY_utp_enabled, true);
     tr_variantDictAddBool(d, TR_KEY_lpd_enabled, false);
     tr_variantDictAddStr(d, TR_KEY_download_dir, tr_getDefaultDownloadDir());
+    tr_variantDictAddStr(d, TR_KEY_default_trackers, "");
     tr_variantDictAddInt(d, TR_KEY_speed_limit_down, 100);
     tr_variantDictAddBool(d, TR_KEY_speed_limit_down_enabled, false);
     tr_variantDictAddInt(d, TR_KEY_encryption, TR_DEFAULT_ENCRYPTION);
@@ -411,6 +412,7 @@ void tr_sessionGetSettings(tr_session const* s, tr_variant* d)
     tr_variantDictAddBool(d, TR_KEY_utp_enabled, s->isUTPEnabled);
     tr_variantDictAddBool(d, TR_KEY_lpd_enabled, s->isLPDEnabled);
     tr_variantDictAddStr(d, TR_KEY_download_dir, tr_sessionGetDownloadDir(s));
+    tr_variantDictAddStr(d, TR_KEY_default_trackers, s->defaultTrackersStr());
     tr_variantDictAddInt(d, TR_KEY_download_queue_size, tr_sessionGetQueueSize(s, TR_DOWN));
     tr_variantDictAddBool(d, TR_KEY_download_queue_enabled, tr_sessionGetQueueEnabled(s, TR_DOWN));
     tr_variantDictAddInt(d, TR_KEY_speed_limit_down, tr_sessionGetSpeedLimit_KBps(s, TR_DOWN));
@@ -809,6 +811,11 @@ static void sessionSetImpl(void* vdata)
     if (tr_variantDictFindInt(settings, TR_KEY_cache_size_mb, &i))
     {
         tr_sessionSetCacheLimit_MB(session, i);
+    }
+
+    if (tr_variantDictFindStrView(settings, TR_KEY_default_trackers, &sv))
+    {
+        session->setDefaultTrackers(sv);
     }
 
     if (tr_variantDictFindInt(settings, TR_KEY_peer_limit_per_torrent, &i))
@@ -2238,6 +2245,37 @@ int tr_sessionGetCacheLimit_MB(tr_session const* session)
     TR_ASSERT(tr_isSession(session));
 
     return tr_toMemMB(tr_cacheGetLimit(session->cache));
+}
+
+/***
+****
+***/
+
+void tr_session::setDefaultTrackers(std::string_view trackers)
+{
+    auto const oldval = default_trackers_;
+
+    default_trackers_str_ = trackers;
+    default_trackers_.parse(trackers);
+
+    // if the list changed, update all the public torrents
+    if (default_trackers_ != oldval)
+    {
+        for (auto* tor : torrents)
+        {
+            if (tor->isPublic())
+            {
+                tr_announcerResetTorrent(announcer, tor);
+            }
+        }
+    }
+}
+
+void tr_sessionSetDefaultTrackers(tr_session* session, char const* trackers)
+{
+    TR_ASSERT(tr_isSession(session));
+
+    session->setDefaultTrackers(trackers != nullptr ? trackers : "");
 }
 
 /***

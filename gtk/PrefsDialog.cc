@@ -176,6 +176,32 @@ Gtk::Entry* new_entry(tr_quark const key, Glib::RefPtr<Session> const& core)
     return w;
 }
 
+Gtk::Widget* new_text_view(tr_quark const key, Glib::RefPtr<Session> const& core)
+{
+    auto* w = Gtk::make_managed<Gtk::TextView>();
+    auto buffer = w->get_buffer();
+
+    buffer->set_text(gtr_pref_string_get(key));
+
+    /* set up the scrolled window and put the text view in it */
+    auto* scroll = Gtk::make_managed<Gtk::ScrolledWindow>();
+    scroll->set_policy(Gtk::PolicyType::POLICY_AUTOMATIC, Gtk::PolicyType::POLICY_AUTOMATIC);
+    scroll->set_shadow_type(Gtk::ShadowType::SHADOW_IN);
+    scroll->add(*w);
+    scroll->set_size_request(-1, 166);
+
+    /* signal */
+    w->add_events(Gdk::FOCUS_CHANGE_MASK);
+    w->signal_focus_out_event().connect(
+        [buffer, key, core](GdkEventFocus*)
+        {
+            core->set_pref(key, buffer->get_text());
+            return false;
+        });
+
+    return scroll;
+}
+
 void chosen_cb(Gtk::FileChooser* w, tr_quark const key, Glib::RefPtr<Session> const& core)
 {
     core->set_pref(key, w->get_filename());
@@ -1050,6 +1076,16 @@ Gtk::Widget* PrefsDialog::Impl::networkPage()
     w = new_check_button(_("Use _Local Peer Discovery to find more peers"), TR_KEY_lpd_enabled, core_);
     w->set_tooltip_text(_("LPD is a tool for finding peers on your local network."));
     t->add_wide_control(row, *w);
+
+    t->add_section_divider(row);
+    t->add_section_title(row, _("Default Public Trackers"));
+
+    auto tv = new_text_view(TR_KEY_default_trackers, core_);
+    tv->set_tooltip_text(
+        _("Trackers to use on all public torrents.\n\n"
+          "To add a backup URL, add it on the next line after a primary URL.\n"
+          "To add a new primary URL, add it after a blank line."));
+    t->add_wide_control(row, *tv);
 
     return t;
 }
