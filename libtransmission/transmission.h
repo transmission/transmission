@@ -314,7 +314,7 @@ bool tr_sessionIsIncompleteFileNamingEnabled(tr_session const* session);
  * @brief Set whether or not RPC calls are allowed in this session.
  *
  * @details If true, libtransmission will open a server socket to listen
- * for incoming http RPC requests as described in extras/rpc-spec.md.
+ * for incoming http RPC requests as described in docs/rpc-spec.md.
  *
  * This is intially set by tr_sessionInit() and can be
  * queried by tr_sessionIsRPCEnabled().
