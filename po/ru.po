@@ -6,19 +6,20 @@
 # Translators:
 # Stas Solovey <whats_up@tut.by>, 2017
 # Валерий Дмиртиевич Степанов <valera1111@yandex.ru>, 2017
-# Andrei Stepanov <adem4ik@gmail.com>, 2018
+# Andrei Stepanov, 2018
 # Sergey Alyoshin <alyoshin.s@gmail.com>, 2020
 # Mike Gelfand <mikedld@mikedld.com>, 2020
 # Fedor Katilov <fedor@katilov.ru>, 2020
+# hlm hlmfn, 2021
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-21 21:24+0000\n"
+"POT-Creation-Date: 2022-02-21 21:26+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Fedor Katilov <fedor@katilov.ru>, 2020\n"
+"Last-Translator: hlm hlmfn, 2021\n"
 "Language-Team: Russian (https://www.transifex.com/transmissionbt/teams/33778/ru/)\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -47,7 +48,7 @@ msgstr "Transmission — программа для обмена файлами. 
 #. make the dialog
 #: ../gtk/Application.cc:710 ../gtk/DetailsDialog.cc:2265 ../gtk/DetailsDialog.cc:2375 ../gtk/Dialogs.cc:114 ../gtk/MakeDialog.cc:208 ../gtk/MessageLogWindow.cc:229 ../gtk/OptionsDialog.cc:280 ../gtk/OptionsDialog.cc:440 ../gtk/OptionsDialog.cc:500 ../gtk/RelocateDialog.cc:160 ../gtk/StatsDialog.cc:100
 msgid "_Cancel"
-msgstr ""
+msgstr "_Отменить"
 
 #: ../gtk/Application.cc:711
 msgid "I _Agree"
@@ -531,7 +532,7 @@ msgstr "Редактирование трекеров — %s"
 
 #: ../gtk/DetailsDialog.cc:2266 ../gtk/MessageLogWindow.cc:230
 msgid "_Save"
-msgstr ""
+msgstr "_Сохранить"
 
 #: ../gtk/DetailsDialog.cc:2271
 msgid "Tracker Announce URLs"
@@ -583,7 +584,7 @@ msgstr "Показать _резервные трекеры"
 #. create the dialog
 #: ../gtk/DetailsDialog.cc:2560 ../gtk/MakeDialog.cc:209 ../gtk/MakeDialog.cc:439 ../gtk/PrefsDialog.cc:1148 ../gtk/StatsDialog.cc:139
 msgid "_Close"
-msgstr ""
+msgstr "_Закрыть"
 
 #: ../gtk/DetailsDialog.cc:2573 ../gtk/MessageLogWindow.cc:413
 msgid "Information"
@@ -675,7 +676,7 @@ msgstr[3] "Загрузка некоторых из этих торрентов 
 
 #: ../gtk/Dialogs.cc:115
 msgid "_Delete"
-msgstr ""
+msgstr "_Удалить"
 
 #: ../gtk/FileList.cc:558 ../gtk/Utils.cc:389
 msgid "High"
@@ -900,7 +901,7 @@ msgstr[3] "%1$'d частей по @ %2$s"
 
 #: ../gtk/MakeDialog.cc:440
 msgid "_New"
-msgstr ""
+msgstr "_Новый"
 
 #: ../gtk/MakeDialog.cc:449
 msgid "Sa_ve to:"
@@ -973,7 +974,7 @@ msgstr "Журнал сообщений"
 
 #: ../gtk/MessageLogWindow.cc:462
 msgid "Save _As"
-msgstr ""
+msgstr "Сохранить _Как"
 
 #: ../gtk/MessageLogWindow.cc:473
 msgid "Clear"
@@ -981,7 +982,7 @@ msgstr "Очистить"
 
 #: ../gtk/MessageLogWindow.cc:486
 msgid "P_ause"
-msgstr ""
+msgstr "П_ауза"
 
 #: ../gtk/MessageLogWindow.cc:495
 msgid "Level"
@@ -1021,7 +1022,7 @@ msgstr "Параметры торрента"
 
 #: ../gtk/OptionsDialog.cc:281 ../gtk/OptionsDialog.cc:441 ../gtk/OptionsDialog.cc:501
 msgid "_Open"
-msgstr ""
+msgstr "_Открыть"
 
 #: ../gtk/OptionsDialog.cc:295 ../gtk/PrefsDialog.cc:268
 msgid "Mo_ve .torrent file to the trash"
@@ -1474,7 +1475,7 @@ msgstr "Сеть"
 
 #: ../gtk/PrefsDialog.cc:1161
 msgid "Remote"
-msgstr "Удалённый доступ"
+msgstr "Удалённое управление"
 
 #: ../gtk/RelocateDialog.cc:75
 #, c-format
@@ -1495,7 +1496,7 @@ msgstr "Указать расположение торрента"
 
 #: ../gtk/RelocateDialog.cc:161
 msgid "_Apply"
-msgstr ""
+msgstr "_Применить"
 
 #: ../gtk/RelocateDialog.cc:167
 msgid "Location"
@@ -2109,7 +2110,7 @@ msgstr "Требуется пароль"
 #: ../libtransmission/rpc-server.cc:1052
 #, c-format
 msgid "Serving RPC and Web requests from directory '%s'"
-msgstr ""
+msgstr "Обслуживание RPC и веб-запросов из каталога '%s'"
 
 #. first %s is the application name
 #. second %s is the version number
@@ -2402,6 +2403,9 @@ msgstr "Проверка торрента"
 #~ msgid "Unable to parse file content"
 #~ msgstr "Невозможно разобрать содержимое файла"
 
+#~ msgid "_About"
+#~ msgstr "_О программе"
+
 #~ msgid "_Compact View"
 #~ msgstr "_Компактный вид"
 
@@ -2428,6 +2432,12 @@ msgstr "Проверка торрента"
 
 #~ msgid "_Pause All"
 #~ msgstr "_Приостановить все"
+
+#~ msgid "_Preferences"
+#~ msgstr "_Настройки"
+
+#~ msgid "_Properties"
+#~ msgstr "_Свойства"
 
 #~ msgid "_Queue"
 #~ msgstr "По_ложение в очереди"

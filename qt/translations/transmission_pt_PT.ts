@@ -69,9 +69,9 @@
     <message numerus="yes">
         <location line="-29"/>
         <source>Torrent Completed</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Torrent concluído</numerusform>
+            <numerusform>Torrents concluídos</numerusform>
         </translation>
     </message>
 </context>
@@ -2252,22 +2252,22 @@ Para adicionar outra hiperligação primária, adicione-a após a linha em branc
     <message>
         <location line="+57"/>
         <source>%1 (copy of %2)</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 (cópia de %2)</translation>
     </message>
     <message numerus="yes">
         <location line="+6"/>
         <source>Duplicate Torrent(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Torrent duplicado</numerusform>
+            <numerusform>Torrents duplicados</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location line="+2"/>
         <source>Unable to add %n duplicate torrent(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Não foi possível adicionar %n torrent duplicado</numerusform>
+            <numerusform>Não foi possível adicionar %n torrents duplicados</numerusform>
         </translation>
     </message>
 </context>

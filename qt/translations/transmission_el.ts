@@ -69,9 +69,9 @@
     <message numerus="yes">
         <location line="-29"/>
         <source>Torrent Completed</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Το Torrent ολοκληρώθηκε</numerusform>
+            <numerusform>Τα Torrent ολοκληρώθηκαν</numerusform>
         </translation>
     </message>
 </context>
@@ -1261,7 +1261,7 @@
         <location line="+6"/>
         <location line="+720"/>
         <source>Stop at Ratio (%1)</source>
-        <translation>Διακοπή στην Αναλογία (%1)</translation>
+        <translation>Διακοπή σε Αναλογία (%1)</translation>
     </message>
     <message>
         <location line="-393"/>
@@ -2252,22 +2252,22 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="+57"/>
         <source>%1 (copy of %2)</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 (αντίγραφο από %2)</translation>
     </message>
     <message numerus="yes">
         <location line="+6"/>
         <source>Duplicate Torrent(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Διπλότυπο Torrent</numerusform>
+            <numerusform>Διπλότυπα Torrent(s)</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location line="+2"/>
         <source>Unable to add %n duplicate torrent(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Αδυναμία προσθήκης %n διπλότυπου torrent</numerusform>
+            <numerusform>Αδυναμία προσθήκης %n διπλότυπων torrent(s)</numerusform>
         </translation>
     </message>
 </context>

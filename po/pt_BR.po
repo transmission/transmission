@@ -9,15 +9,17 @@
 # Rodrigo Piñero <rodrigo.pinero@yahoo.com.br>, 2017
 # Alex, 2020
 # Carlos Henrique De Freitas Ferreira <Neocazen@vivaldi.net>, 2020
+# 605a776b08d0e377e3f0087b0eb973ba_8278558 <193cc63c2e359b3031a6e006414fe84f_989921>, 2022
+# Gabriel P Machado <machado.gp@gmail.com>, 2022
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-21 21:24+0000\n"
+"POT-Creation-Date: 2022-02-21 21:26+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Carlos Henrique De Freitas Ferreira <Neocazen@vivaldi.net>, 2020\n"
+"Last-Translator: Gabriel P Machado <machado.gp@gmail.com>, 2022\n"
 "Language-Team: Portuguese (Brazil) (https://www.transifex.com/transmissionbt/teams/33778/pt_BR/)\n"
 "Language: pt_BR\n"
 "MIME-Version: 1.0\n"
@@ -2124,7 +2126,7 @@ msgstr "Senha requerida"
 #: ../libtransmission/rpc-server.cc:1052
 #, c-format
 msgid "Serving RPC and Web requests from directory '%s'"
-msgstr ""
+msgstr "Servindo requisições RPC e Web do diretório '%s'"
 
 #. first %s is the application name
 #. second %s is the version number
@@ -2360,13 +2362,13 @@ msgstr "Verificando torrent"
 #~ msgstr "Ordenar por _Atividade"
 
 #~ msgid "Sort by _Name"
-#~ msgstr "Por _Nome"
+#~ msgstr "Ordenar por: _Nome"
 
 #~ msgid "Sort by _Progress"
-#~ msgstr "Por _Progresso"
+#~ msgstr "Ordenar por: _Progresso"
 
 #~ msgid "Sort by _Queue"
-#~ msgstr "Por _Fila"
+#~ msgstr "Ordenar por: _Data"
 
 #~ msgid "Start _Now"
 #~ msgstr "Iniciar _Agora"

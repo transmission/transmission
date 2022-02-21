@@ -3,20 +3,23 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
+# Translators:
+# Mike Gelfand <mikedld@mikedld.com>, 2017
+#
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-21 21:24+0000\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"POT-Creation-Date: 2022-02-21 21:26+0000\n"
+"PO-Revision-Date: 2017-01-26 19:47+0000\n"
 "Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2017\n"
-"Language-Team: Uighur (https://www.transifex.com/transmissionbt/teams/33778/ug/)\n"
+"Language-Team: Uyghur (https://www.transifex.com/transmissionbt/teams/33778/ug/)\n"
 "Language: ug\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: ../cli/cli.cc:103 ../gtk/Utils.cc:90 ../libtransmission/utils.cc:1074
 msgid "None"
@@ -1648,6 +1651,7 @@ msgstr ""
 msgid "peer"
 msgid_plural "peers"
 msgstr[0] ""
+msgstr[1] ""
 
 #: ../gtk/TorrentCellRenderer.cc:263
 #, c-format
@@ -1658,6 +1662,7 @@ msgstr ""
 msgid "web seed"
 msgid_plural "web seeds"
 msgstr[0] ""
+msgstr[1] ""
 
 #: ../gtk/TorrentCellRenderer.cc:274
 #, c-format
@@ -1674,6 +1679,7 @@ msgstr ""
 msgid "Seeding to %1$'d of %2$'d connected peer"
 msgid_plural "Seeding to %1$'d of %2$'d connected peers"
 msgstr[0] ""
+msgstr[1] ""
 
 #: ../gtk/Utils.cc:36
 msgid "KiB"
@@ -2165,10 +2171,6 @@ msgstr "توررېنت تەكشۈرۈۋاتىدۇ"
 #~ msgstr "باشقا تېزلىك لىمىتىنى ئىناۋەتلىك قىل(_L)"
 
 #, c-format
-#~ msgid "Error opening \"%s\""
-#~ msgstr "«%s» نى ئېچىشتا خاتالىق كۆرۈلدى"
-
-#, c-format
 #~ msgid "Invalid metadata entry \"%s\""
 #~ msgstr "مېتا سانلىق-مەلۇمات كىرگۈسى ئىناۋەتسىز «%s»"
 
@@ -2220,10 +2222,6 @@ msgstr "توررېنت تەكشۈرۈۋاتىدۇ"
 
 #~ msgid "Select _All"
 #~ msgstr "ھەممىنى تاللا(_A)"
-
-#, c-format
-#~ msgid "Server returned \"%1$ld %2$s\""
-#~ msgstr "مۇلازىمېتىر «%1$ld %2$s» نى قايتۇردى"
 
 #~ msgid "Set _Location…"
 #~ msgstr "يەرلىك تەڭشەك…(_L)…"
@@ -2293,9 +2291,6 @@ msgstr "توررېنت تەكشۈرۈۋاتىدۇ"
 #, c-format
 #~ msgid "Tracker will allow requests in %s"
 #~ msgstr "ئىزلىغۇچ %s نىڭدىكى ئىلتىماسقا ئىجازەت بېرىدۇ"
-
-#~ msgid "Transmission BitTorrent Client"
-#~ msgstr "Transmission بىتتوررېنت خېرىدارى"
 
 #~ msgid "_Compact View"
 #~ msgstr "ئىخچام كۆرۈنۈش(_C)"

@@ -171,7 +171,7 @@
     <message>
         <location line="-28"/>
         <source>Optimistic unchoke</source>
-        <translation>Благоприятная передача</translation>
+        <translation>Cкоро начнётся передача</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -1511,7 +1511,7 @@
         <source>To add a backup URL, add it on the line after the primary URL.
 To add another primary URL, add it after a blank line.</source>
         <translation>Чтобы добавить резервный URL, добавьте его после основного URL в той же строке.
-Чтобы добавить ещё один основной URL, добавьте его в новой строке.</translation>
+Чтобы добавить ещё один основной URL, добавьте пустую строку, а затем его в новой строке.</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -2274,19 +2274,19 @@ To add another primary URL, add it after a blank line.</source>
     <message numerus="yes">
         <location line="+6"/>
         <source>Duplicate Torrent(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Дубликат торрент</numerusform>
+            <numerusform>Дубликат торрентов</numerusform>
+            <numerusform>Дубликат торрентов</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location line="+2"/>
         <source>Unable to add %n duplicate torrent(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Невозможно добавить %n дубликат торрента</numerusform>
+            <numerusform>Невозможно добавить %n дубликатов торрентов</numerusform>
+            <numerusform>Невозможно добавить %n дубликатов торрентов</numerusform>
         </translation>
     </message>
 </context>

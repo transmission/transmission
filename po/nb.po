@@ -6,16 +6,16 @@
 # Translators:
 # Allan Nordhøy <epost@anotheragency.no>, 2017
 # Thomas Gravdal <thomas.gravdal1@gmail.com>, 2020
-# Mike Gelfand <mikedld@mikedld.com>, 2020
+# Mike Gelfand <mikedld@mikedld.com>, 2021
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-21 21:24+0000\n"
+"POT-Creation-Date: 2022-02-21 21:26+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2020\n"
+"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2021\n"
 "Language-Team: Norwegian Bokmål (https://www.transifex.com/transmissionbt/teams/33778/nb/)\n"
 "Language: nb\n"
 "MIME-Version: 1.0\n"
@@ -740,7 +740,7 @@ msgstr "V_is:"
 #: ../gtk/FreeSpaceLabel.cc:50
 #, c-format
 msgid "%s free"
-msgstr "%s gratis"
+msgstr "%s ledig"
 
 #: ../gtk/MainWindow.cc:130
 msgid "Torrent"
@@ -2218,7 +2218,7 @@ msgstr "Kontrollerer torrent"
 
 #, c-format
 #~ msgid "DNS Lookup failed: %s"
-#~ msgstr "DNS Oppslag feilet: %s"
+#~ msgstr "DNS-oppslag feilet: %s"
 
 #~ msgid "Dese_lect All"
 #~ msgstr "Ve_lg bort alle"
@@ -2356,7 +2356,7 @@ msgstr "Kontrollerer torrent"
 
 #, c-format
 #~ msgid "Tracker gave HTTP response code %1$ld (%2$s)"
-#~ msgstr "Tracker gav HTTP svarkode %1$Ild (%2$s)"
+#~ msgstr "Sporer gav HTTP-svarkode %1$Ild (%2$s)"
 
 #, c-format
 #~ msgid "Tracker warning: \"%s\""

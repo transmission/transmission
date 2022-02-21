@@ -1926,7 +1926,7 @@ Per afegir un altre URL principal, afegiu-lo després d&apos;una línia en blanc
     <message>
         <location filename="../PrefsDialog.ui" line="-97"/>
         <source>Privacy</source>
-        <translation>Privacitat</translation>
+        <translation>Privadesa</translation>
     </message>
     <message>
         <location line="-435"/>

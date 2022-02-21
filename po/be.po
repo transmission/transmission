@@ -5,16 +5,16 @@
 #
 # Translators:
 # Mike Gelfand <mikedld@mikedld.com>, 2017
-# Zmicer Turok <nashtlumach@gmail.com>, 2020
+# Źmicier Turok <nashtlumach@gmail.com>, 2020
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-21 21:24+0000\n"
+"POT-Creation-Date: 2022-02-21 21:26+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Zmicer Turok <nashtlumach@gmail.com>, 2020\n"
+"Last-Translator: Źmicier Turok <nashtlumach@gmail.com>, 2020\n"
 "Language-Team: Belarusian (https://www.transifex.com/transmissionbt/teams/33778/be/)\n"
 "Language: be\n"
 "MIME-Version: 1.0\n"
@@ -43,7 +43,7 @@ msgstr "Transmission - праграма для абмену файламі. Ка
 #. make the dialog
 #: ../gtk/Application.cc:710 ../gtk/DetailsDialog.cc:2265 ../gtk/DetailsDialog.cc:2375 ../gtk/Dialogs.cc:114 ../gtk/MakeDialog.cc:208 ../gtk/MessageLogWindow.cc:229 ../gtk/OptionsDialog.cc:280 ../gtk/OptionsDialog.cc:440 ../gtk/OptionsDialog.cc:500 ../gtk/RelocateDialog.cc:160 ../gtk/StatsDialog.cc:100
 msgid "_Cancel"
-msgstr ""
+msgstr "_Скасаваць"
 
 #: ../gtk/Application.cc:711
 msgid "I _Agree"
@@ -449,7 +449,7 @@ msgstr "Скасавана іншымі ўдзельнікамі"
 
 #: ../gtk/DetailsDialog.cc:1709 ../gtk/DetailsDialog.cc:1783
 msgid "Down"
-msgstr "Спампоўка"
+msgstr "Спампоўванне"
 
 #: ../gtk/DetailsDialog.cc:1717
 msgid "Up"
@@ -543,7 +543,7 @@ msgstr "%s - Рэдагаваць трэкеры"
 
 #: ../gtk/DetailsDialog.cc:2266 ../gtk/MessageLogWindow.cc:230
 msgid "_Save"
-msgstr ""
+msgstr "_Захаваць"
 
 #: ../gtk/DetailsDialog.cc:2271
 msgid "Tracker Announce URLs"
@@ -595,7 +595,7 @@ msgstr "_Паказаць рэзервовыя трэкеры"
 #. create the dialog
 #: ../gtk/DetailsDialog.cc:2560 ../gtk/MakeDialog.cc:209 ../gtk/MakeDialog.cc:439 ../gtk/PrefsDialog.cc:1148 ../gtk/StatsDialog.cc:139
 msgid "_Close"
-msgstr ""
+msgstr "_Закрыць"
 
 #: ../gtk/DetailsDialog.cc:2573 ../gtk/MessageLogWindow.cc:413
 msgid "Information"
@@ -687,7 +687,7 @@ msgstr[3] "Спампоўванне некаторых з гэтых торэн�
 
 #: ../gtk/Dialogs.cc:115
 msgid "_Delete"
-msgstr ""
+msgstr "_Выдаліць"
 
 #: ../gtk/FileList.cc:558 ../gtk/Utils.cc:389
 msgid "High"
@@ -912,7 +912,7 @@ msgstr[3] "%1$'d частак @ %2$s"
 
 #: ../gtk/MakeDialog.cc:440
 msgid "_New"
-msgstr ""
+msgstr "_Новы"
 
 #: ../gtk/MakeDialog.cc:449
 msgid "Sa_ve to:"
@@ -985,15 +985,15 @@ msgstr "Журнал паведамленняў"
 
 #: ../gtk/MessageLogWindow.cc:462
 msgid "Save _As"
-msgstr ""
+msgstr "Захаваць _як"
 
 #: ../gtk/MessageLogWindow.cc:473
 msgid "Clear"
-msgstr ""
+msgstr "Ачысціць"
 
 #: ../gtk/MessageLogWindow.cc:486
 msgid "P_ause"
-msgstr ""
+msgstr "П_рыпыніць"
 
 #: ../gtk/MessageLogWindow.cc:495
 msgid "Level"
@@ -1033,7 +1033,7 @@ msgstr "Параметры торэнта"
 
 #: ../gtk/OptionsDialog.cc:281 ../gtk/OptionsDialog.cc:441 ../gtk/OptionsDialog.cc:501
 msgid "_Open"
-msgstr ""
+msgstr "_Адкрыць"
 
 #: ../gtk/OptionsDialog.cc:295 ../gtk/PrefsDialog.cc:268
 msgid "Mo_ve .torrent file to the trash"
@@ -1338,7 +1338,7 @@ msgstr "_Раздача (%s):"
 #: ../gtk/PrefsDialog.cc:882
 #, c-format
 msgid "_Download (%s):"
-msgstr "Спампоўка (%s):"
+msgstr "Спампоўванне (%s):"
 
 #: ../gtk/PrefsDialog.cc:893
 msgid "Alternative Speed Limits"
@@ -1356,7 +1356,7 @@ msgstr "Ра_здача (%s):"
 #: ../gtk/PrefsDialog.cc:918
 #, c-format
 msgid "Do_wnload (%s):"
-msgstr "Спампоўка (%s):"
+msgstr "Спампоўванне (%s):"
 
 #: ../gtk/PrefsDialog.cc:926
 msgid " _to "
@@ -1388,11 +1388,11 @@ msgstr "<i>Праверка TCP парта...</i>"
 
 #: ../gtk/PrefsDialog.cc:1024
 msgid "Listening Port"
-msgstr "Слухаю порт"
+msgstr "Назіранне за портам"
 
 #: ../gtk/PrefsDialog.cc:1027
 msgid "_Port used for incoming connections:"
-msgstr "_Порт, для ўваходных падлучэнняў:"
+msgstr "_Порт для ўваходных падлучэнняў:"
 
 #: ../gtk/PrefsDialog.cc:1034
 msgid "Te_st Port"
@@ -1507,7 +1507,7 @@ msgstr "Вызначыць месцазнаходжанне торэнта"
 
 #: ../gtk/RelocateDialog.cc:161
 msgid "_Apply"
-msgstr ""
+msgstr "_Ужыць"
 
 #: ../gtk/RelocateDialog.cc:167
 msgid "Location"
@@ -1723,7 +1723,7 @@ msgstr[3] "вузлоў"
 #: ../gtk/TorrentCellRenderer.cc:263
 #, c-format
 msgid "Downloading from %1$'d of %2$'d %3$s and %4$'d %5$s"
-msgstr "Спампоўванне з %1$'d з %2$'d %3$s і %4$'d %5$s"
+msgstr "Спампоўваецца з %1$'d вузла(оў). Даступна: %2$'d %3$s і %4$'d %5$s"
 
 #: ../gtk/TorrentCellRenderer.cc:268 ../gtk/TorrentCellRenderer.cc:276
 msgid "web seed"
@@ -1736,12 +1736,12 @@ msgstr[3] "сеціўных раздач"
 #: ../gtk/TorrentCellRenderer.cc:274
 #, c-format
 msgid "Downloading from %1$'d %2$s"
-msgstr "Спампоўванне з %1$'d %2$s"
+msgstr "Спампоўваецца з %1$'d %2$s"
 
 #: ../gtk/TorrentCellRenderer.cc:282
 #, c-format
 msgid "Downloading from %1$'d of %2$'d %3$s"
-msgstr "Спампоўванне з %1$'d з %2$'d %3$s"
+msgstr "Спампоўваецца з %1$'d вузла(оў). Даступна: %2$'d %3$s"
 
 #: ../gtk/TorrentCellRenderer.cc:294
 #, c-format
@@ -2121,7 +2121,7 @@ msgstr "Патрабуецца пароль"
 #: ../libtransmission/rpc-server.cc:1052
 #, c-format
 msgid "Serving RPC and Web requests from directory '%s'"
-msgstr ""
+msgstr "Адпраўленне RPC і сеціўных запытаў з каталога \"%s\""
 
 #. first %s is the application name
 #. second %s is the version number
@@ -2414,6 +2414,9 @@ msgstr "Правяраецца торэнт"
 #~ msgid "Unable to parse file content"
 #~ msgstr "Немагчыма разабраць змесціва файла"
 
+#~ msgid "_About"
+#~ msgstr "_Звесткі"
+
 #~ msgid "_Compact View"
 #~ msgstr "_Кампактны выгляд"
 
@@ -2440,6 +2443,12 @@ msgstr "Правяраецца торэнт"
 
 #~ msgid "_Pause All"
 #~ msgstr "_Прыпыніць усе"
+
+#~ msgid "_Preferences"
+#~ msgstr "_Налады"
+
+#~ msgid "_Properties"
+#~ msgstr "_Уласцівасці"
 
 #~ msgid "_Queue"
 #~ msgstr "_Чарга"

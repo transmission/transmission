@@ -5,16 +5,16 @@
 #
 # Translators:
 # Mike Gelfand <mikedld@mikedld.com>, 2018
-# Moo, 2019
+# Moo, 2020
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-21 21:24+0000\n"
+"POT-Creation-Date: 2022-02-21 21:26+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Moo, 2019\n"
+"Last-Translator: Moo, 2020\n"
 "Language-Team: Lithuanian (https://www.transifex.com/transmissionbt/teams/33778/lt/)\n"
 "Language: lt\n"
 "MIME-Version: 1.0\n"
@@ -43,7 +43,7 @@ msgstr "Transmission yra failų bendrinimo programa. Kai paleidžiate torentą, 
 #. make the dialog
 #: ../gtk/Application.cc:710 ../gtk/DetailsDialog.cc:2265 ../gtk/DetailsDialog.cc:2375 ../gtk/Dialogs.cc:114 ../gtk/MakeDialog.cc:208 ../gtk/MessageLogWindow.cc:229 ../gtk/OptionsDialog.cc:280 ../gtk/OptionsDialog.cc:440 ../gtk/OptionsDialog.cc:500 ../gtk/RelocateDialog.cc:160 ../gtk/StatsDialog.cc:100
 msgid "_Cancel"
-msgstr ""
+msgstr "_Atsisakyti"
 
 #: ../gtk/Application.cc:711
 msgid "I _Agree"
@@ -544,7 +544,7 @@ msgstr "%s – sekiklių taisa"
 
 #: ../gtk/DetailsDialog.cc:2266 ../gtk/MessageLogWindow.cc:230
 msgid "_Save"
-msgstr ""
+msgstr "Į_rašyti"
 
 #: ../gtk/DetailsDialog.cc:2271
 msgid "Tracker Announce URLs"
@@ -596,7 +596,7 @@ msgstr "Rodyti _atsarginius sekiklius"
 #. create the dialog
 #: ../gtk/DetailsDialog.cc:2560 ../gtk/MakeDialog.cc:209 ../gtk/MakeDialog.cc:439 ../gtk/PrefsDialog.cc:1148 ../gtk/StatsDialog.cc:139
 msgid "_Close"
-msgstr ""
+msgstr "_Užverti"
 
 #: ../gtk/DetailsDialog.cc:2573 ../gtk/MessageLogWindow.cc:413
 msgid "Information"
@@ -688,7 +688,7 @@ msgstr[3] "Kai kurie šių torentų dar neatsiųsti."
 
 #: ../gtk/Dialogs.cc:115
 msgid "_Delete"
-msgstr ""
+msgstr "_Ištrinti"
 
 #: ../gtk/FileList.cc:558 ../gtk/Utils.cc:389
 msgid "High"
@@ -1030,7 +1030,7 @@ msgstr "Torento parametrai"
 
 #: ../gtk/OptionsDialog.cc:281 ../gtk/OptionsDialog.cc:441 ../gtk/OptionsDialog.cc:501
 msgid "_Open"
-msgstr ""
+msgstr "_Atverti"
 
 #: ../gtk/OptionsDialog.cc:295 ../gtk/PrefsDialog.cc:268
 msgid "Mo_ve .torrent file to the trash"
@@ -2255,10 +2255,6 @@ msgstr "Tikrinamas torrentas"
 #~ msgstr "Įjungti alternatyviuosius greičio _ribojimus"
 
 #, c-format
-#~ msgid "Error opening \"%s\""
-#~ msgstr "Klaida atveriant „%s“"
-
-#, c-format
 #~ msgid "File \"%s\" is in the way"
 #~ msgstr "Operacijai trukdo failas „%s“"
 
@@ -2314,10 +2310,6 @@ msgstr "Tikrinamas torrentas"
 
 #~ msgid "Select _All"
 #~ msgstr "Pažymėti _viską"
-
-#, c-format
-#~ msgid "Server returned \"%1$ld %2$s\""
-#~ msgstr "Serveris grąžino „%1$ld %2$s“"
 
 #~ msgid "Set _Location…"
 #~ msgstr "Nustatyti _vietą…"
@@ -2395,6 +2387,9 @@ msgstr "Tikrinamas torrentas"
 #~ msgid "Unable to parse file content"
 #~ msgstr "Nepavyko išanalizuoti failo turinio"
 
+#~ msgid "_About"
+#~ msgstr "_Apie"
+
 #~ msgid "_Compact View"
 #~ msgstr "_Glaustasis rodinys"
 
@@ -2421,6 +2416,12 @@ msgstr "Tikrinamas torrentas"
 
 #~ msgid "_Pause All"
 #~ msgstr "Pri_stabdyti visus"
+
+#~ msgid "_Preferences"
+#~ msgstr "_Nuostatos"
+
+#~ msgid "_Properties"
+#~ msgstr "_Savybės"
 
 #~ msgid "_Queue"
 #~ msgstr "_Eilė"

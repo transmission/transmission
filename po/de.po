@@ -8,16 +8,16 @@
 # sfan5 <sfan5@ymail.com>, 2017
 # Sami Bosch <sami.bosch@student.uclouvain.be>, 2019
 # Ben Wiederhake <BenWiederhake.GitHub@gmx.de>, 2020
-# Mike Gelfand <mikedld@mikedld.com>, 2020
+# Mike Gelfand <mikedld@mikedld.com>, 2021
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-21 21:24+0000\n"
+"POT-Creation-Date: 2022-02-21 21:26+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2020\n"
+"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2021\n"
 "Language-Team: German (https://www.transifex.com/transmissionbt/teams/33778/de/)\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
@@ -1403,7 +1403,7 @@ msgstr "Port ist <b>offen</b>"
 
 #: ../gtk/PrefsDialog.cc:1002
 msgid "<i>Testing TCP port…</i>"
-msgstr "<i>TCP-Port wird getestet …<i>"
+msgstr "<i>TCP-Port wird getestet …</i>"
 
 #: ../gtk/PrefsDialog.cc:1024
 msgid "Listening Port"

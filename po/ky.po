@@ -3,14 +3,17 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
+# Translators:
+# Mike Gelfand <mikedld@mikedld.com>, 2018
+#
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-21 21:24+0000\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2017\n"
+"POT-Creation-Date: 2022-02-21 21:26+0000\n"
+"PO-Revision-Date: 2017-01-26 19:47+0000\n"
+"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2018\n"
 "Language-Team: Kyrgyz (https://www.transifex.com/transmissionbt/teams/33778/ky/)\n"
 "Language: ky\n"
 "MIME-Version: 1.0\n"
@@ -61,11 +64,13 @@ msgstr "Азыр _чыгуу"
 msgid "Couldn't add corrupt torrent"
 msgid_plural "Couldn't add corrupt torrents"
 msgstr[0] "Бузук торентти кошуу мүмкүн эмес"
+msgstr[1] "Бузук торентти кошуу мүмкүн эмес"
 
 #: ../gtk/Application.cc:962
 msgid "Couldn't add duplicate torrent"
 msgid_plural "Couldn't add duplicate torrents"
 msgstr[0] "Кайталанган торрентти кошуу мүмкүн эмес"
+msgstr[1] "Кайталанган торрентти кошуу мүмкүн эмес"
 
 #: ../gtk/Application.cc:1280
 msgid "A fast and easy BitTorrent client"
@@ -225,12 +230,14 @@ msgstr "Белгисиз"
 msgid "%1$s (%2$'d piece @ %3$s)"
 msgid_plural "%1$s (%2$'d pieces @ %3$s)"
 msgstr[0] "%1$s (%2$'d бөлүк @ %3$s)"
+msgstr[1] "%1$s (%2$'d бөлүк @ %3$s)"
 
 #: ../gtk/DetailsDialog.cc:855
 #, c-format
 msgid "%1$s (%2$'d piece)"
 msgid_plural "%1$s (%2$'d pieces)"
 msgstr[0] "%1$s (%2$'d бөлүк)"
+msgstr[1] "%1$s (%2$'d бөлүк)"
 
 #: ../gtk/DetailsDialog.cc:893
 #, c-format
@@ -603,37 +610,44 @@ msgstr "%'d торрентинин касиеттери"
 msgid "Remove torrent?"
 msgid_plural "Remove %d torrents?"
 msgstr[0] "%d торентти өчүрөсүзбү?"
+msgstr[1] "%d торентти өчүрөсүзбү?"
 
 #: ../gtk/Dialogs.cc:55
 #, c-format
 msgid "Delete this torrent's downloaded files?"
 msgid_plural "Delete these %d torrents' downloaded files?"
 msgstr[0] "%d торренттин жүктөлгөн файлдарын өчүрөсүзбү?"
+msgstr[1] "%d торренттин жүктөлгөн файлдарын өчүрөсүзбү?"
 
 #: ../gtk/Dialogs.cc:62
 msgid "Once removed, continuing the transfer will require the torrent file or magnet link."
 msgid_plural "Once removed, continuing the transfers will require the torrent files or magnet links."
 msgstr[0] "Өчүрүлгөндөн кийин, берүүнү улантуу үчүн, торрент файлы же magnet-шилтемеси талап кылынат."
+msgstr[1] "Өчүрүлгөндөн кийин, берүүнү улантуу үчүн, торрент файлы же magnet-шилтемеси талап кылынат."
 
 #: ../gtk/Dialogs.cc:69
 msgid "This torrent has not finished downloading."
 msgid_plural "These torrents have not finished downloading."
 msgstr[0] "Бул торренттин жүктөлүшү бүтө элек."
+msgstr[1] "Бул торренттин жүктөлүшү бүтө элек."
 
 #: ../gtk/Dialogs.cc:75
 msgid "This torrent is connected to peers."
 msgid_plural "These torrents are connected to peers."
 msgstr[0] "Бул торрент катышуучуларга туташтырылып турат."
+msgstr[1] "Бул торрент катышуучуларга туташтырылып турат."
 
 #: ../gtk/Dialogs.cc:82
 msgid "One of these torrents is connected to peers."
 msgid_plural "Some of these torrents are connected to peers."
 msgstr[0] "Бул торренттердин бирөөсү катышуучуларга туташтырылып турат."
+msgstr[1] "Бул торренттердин бирөөсү катышуучуларга туташтырылып турат."
 
 #: ../gtk/Dialogs.cc:95
 msgid "One of these torrents has not finished downloading."
 msgid_plural "Some of these torrents have not finished downloading."
 msgstr[0] "Бул торренттердин бирөөсүнүн жүктөлүшү бүтө элек."
+msgstr[1] "Бул торренттердин бирөөсүнүн жүктөлүшү бүтө элек."
 
 #: ../gtk/Dialogs.cc:115
 msgid "_Delete"
@@ -843,12 +857,14 @@ msgstr "Булак тандалган жок"
 msgid "%1$s; %2$'d File"
 msgid_plural "%1$s; %2$'d Files"
 msgstr[0] "%1$s; %2$'d файл"
+msgstr[1] "%1$s; %2$'d файл"
 
 #: ../gtk/MakeDialog.cc:344
 #, c-format
 msgid "%1$'d Piece @ %2$s"
 msgid_plural "%1$'d Pieces @ %2$s"
 msgstr[0] "%1$'d бөлүк @ %2$s"
+msgstr[1] "%1$'d бөлүк @ %2$s"
 
 #: ../gtk/MakeDialog.cc:440
 msgid "_New"
@@ -1118,6 +1134,7 @@ msgstr "Торренттер аякталганда ү_н ойнотуу"
 msgid "Blocklist contains %'d rule"
 msgid_plural "Blocklist contains %'d rules"
 msgstr[0] "Бөгөт тизмеси %'d эрежени камтыйт"
+msgstr[1] "Бөгөт тизмеси %'d эрежени камтыйт"
 
 #: ../gtk/PrefsDialog.cc:440
 msgid "<b>Unable to update.</b>"
@@ -1132,6 +1149,7 @@ msgstr "<b>Жаңылоо ийгиликтүү өттү!</b>"
 msgid "Blocklist has %'d rule."
 msgid_plural "Blocklist has %'d rules."
 msgstr[0] "Бөгөт тизмесинде %'d эреже бар."
+msgstr[1] "Бөгөт тизмесинде %'d эреже бар."
 
 #: ../gtk/PrefsDialog.cc:451
 msgid "Update Blocklist"
@@ -1494,6 +1512,7 @@ msgstr "Уктоо режимине кирүүгө уруксат берүү"
 msgid "Started %'d time"
 msgid_plural "Started %'d times"
 msgstr[0] "%'d жолу жүргүзүлгөн"
+msgstr[1] "%'d жолу жүргүзүлгөн"
 
 #: ../gtk/StatsDialog.cc:99
 msgid "Reset your statistics?"
@@ -1673,6 +1692,7 @@ msgstr ""
 msgid "Seeding to %1$'d of %2$'d connected peer"
 msgid_plural "Seeding to %1$'d of %2$'d connected peers"
 msgstr[0] "%1$'d катышуучуга таратылууда (бардыгы %2$'d катышуучу)"
+msgstr[1] "%1$'d катышуучуга таратылууда (бардыгы %2$'d катышуучу)"
 
 #: ../gtk/Utils.cc:36
 msgid "KiB"
@@ -1727,24 +1747,28 @@ msgstr "ТБ/с"
 msgid "%'d day"
 msgid_plural "%'d days"
 msgstr[0] "%'d күн"
+msgstr[1] "%'d күн"
 
 #: ../gtk/Utils.cc:106
 #, c-format
 msgid "%'d hour"
 msgid_plural "%'d hours"
 msgstr[0] "%'d саат"
+msgstr[1] "%'d саат"
 
 #: ../gtk/Utils.cc:107
 #, c-format
 msgid "%'d minute"
 msgid_plural "%'d minutes"
 msgstr[0] "%'d минута"
+msgstr[1] "%'d минута"
 
 #: ../gtk/Utils.cc:108
 #, c-format
 msgid "%'d second"
 msgid_plural "%'d seconds"
 msgstr[0] "%'d секунда"
+msgstr[1] "%'d секунда"
 
 #: ../gtk/Utils.cc:156
 #, c-format
@@ -2161,10 +2185,6 @@ msgstr "Торрент текшерилүүдө"
 #~ msgstr "Алтернативдүү ылдамдык _чектөөлөрүн колдонуу"
 
 #, c-format
-#~ msgid "Error opening \"%s\""
-#~ msgstr "Ачылуу учурундагы катасы \"%s\""
-
-#, c-format
 #~ msgid "File \"%s\" is in the way"
 #~ msgstr "«%s» файлы жол үстүндө"
 
@@ -2220,10 +2240,6 @@ msgstr "Торрент текшерилүүдө"
 
 #~ msgid "Select _All"
 #~ msgstr "_Баарын тандоо"
-
-#, c-format
-#~ msgid "Server returned \"%1$ld %2$s\""
-#~ msgstr "Сервер \"%1$ld %2$s\" кайтарды"
 
 #~ msgid "Set _Location…"
 #~ msgstr "_Жайгашкан жерин орнотуу…"
@@ -2293,9 +2309,6 @@ msgstr "Торрент текшерилүүдө"
 #, c-format
 #~ msgid "Tracker will allow requests in %s"
 #~ msgstr "Трекер %s аркылуу сурамдарга уруксат берет"
-
-#~ msgid "Transmission BitTorrent Client"
-#~ msgstr "Transmission BitTorrent-клиенти"
 
 #~ msgid "_Compact View"
 #~ msgstr "Ты_гыз көрүнүш"

@@ -4,17 +4,18 @@
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 # Translators:
-# Dingzhong Chen <wsxy162@gmail.com>, 2020
 # Clay Cheng <569735195@qq.com>, 2020
+# 玉堂白鹤 <yjwork@qq.com>, 2020
+# Dingzhong Chen <wsxy162@gmail.com>, 2022
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-21 21:24+0000\n"
+"POT-Creation-Date: 2022-02-21 21:26+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Clay Cheng <569735195@qq.com>, 2020\n"
+"Last-Translator: Dingzhong Chen <wsxy162@gmail.com>, 2022\n"
 "Language-Team: Chinese (China) (https://www.transifex.com/transmissionbt/teams/33778/zh_CN/)\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
@@ -43,7 +44,7 @@ msgstr "Transmission 是一个文件分享程序。当你运行种子任务时�
 #. make the dialog
 #: ../gtk/Application.cc:710 ../gtk/DetailsDialog.cc:2265 ../gtk/DetailsDialog.cc:2375 ../gtk/Dialogs.cc:114 ../gtk/MakeDialog.cc:208 ../gtk/MessageLogWindow.cc:229 ../gtk/OptionsDialog.cc:280 ../gtk/OptionsDialog.cc:440 ../gtk/OptionsDialog.cc:500 ../gtk/RelocateDialog.cc:160 ../gtk/StatsDialog.cc:100
 msgid "_Cancel"
-msgstr ""
+msgstr "取消(_C)"
 
 #: ../gtk/Application.cc:711
 msgid "I _Agree"
@@ -86,7 +87,8 @@ msgstr ""
 msgid "translator-credits"
 msgstr ""
 "Aron Xu <happyaron.xu@gmail.com>, 2012\n"
-"Dingzhong Chen <wsxy162@gmail.com>, 2020\n"
+"玉堂白鹤 <yjwork@qq.com>,2020\n"
+"Dingzhong Chen <wsxy162@gmail.com>, 2020-2022\n"
 "Launchpad 贡献者：\n"
 "  Alexey Kotlyarov https://launchpad.net/~koterpillar\n"
 "  Andrew Starr-Bochicchio https://launchpad.net/~andrewsomething\n"
@@ -184,11 +186,11 @@ msgstr "空闲(_I)："
 
 #: ../gtk/DetailsDialog.cc:534
 msgid "Peer Connections"
-msgstr "节点连接"
+msgstr "用户连接"
 
 #: ../gtk/DetailsDialog.cc:537
 msgid "_Maximum peers:"
-msgstr "最大节点数(_M)："
+msgstr "最大用户数(_M)："
 
 #: ../gtk/DetailsDialog.cc:558 ../gtk/TorrentCellRenderer.cc:184 ../libtransmission/verify.cc:249
 msgid "Queued for verification"
@@ -387,19 +389,19 @@ msgstr "积极解锁（Optimistic unchoke）"
 
 #: ../gtk/DetailsDialog.cc:1517
 msgid "Downloading from this peer"
-msgstr "正从此节点下载"
+msgstr "正从此对等网络用户下载"
 
 #: ../gtk/DetailsDialog.cc:1521
 msgid "We would download from this peer if they would let us"
-msgstr "若对方允许，将从此节点下载"
+msgstr "若对方允许，将从此对等网络用户下载"
 
 #: ../gtk/DetailsDialog.cc:1525
 msgid "Uploading to peer"
-msgstr "上传到节点"
+msgstr "正上传至此对等网络用户"
 
 #: ../gtk/DetailsDialog.cc:1529
 msgid "We would upload to this peer if they asked"
-msgstr "若对方请求，将上传至此节点"
+msgstr "若对方请求，将上传至此对等网络用户"
 
 #: ../gtk/DetailsDialog.cc:1533
 msgid "Peer has unchoked us, but we're not interested"
@@ -407,7 +409,7 @@ msgstr "对方已对我们解锁，但我们不感兴趣"
 
 #: ../gtk/DetailsDialog.cc:1537
 msgid "We unchoked this peer, but they're not interested"
-msgstr "我们已解锁此节点，但是对方不感兴趣"
+msgstr "我们已解锁此对等网络用户，但是对方不感兴趣"
 
 #: ../gtk/DetailsDialog.cc:1541
 msgid "Encrypted connection"
@@ -415,19 +417,19 @@ msgstr "加密连接"
 
 #: ../gtk/DetailsDialog.cc:1545
 msgid "Peer was found through Peer Exchange (PEX)"
-msgstr "通过 PEX 源交换找到的节点"
+msgstr "通过 PEX 源交换找到的对等网络用户"
 
 #: ../gtk/DetailsDialog.cc:1549
 msgid "Peer was found through DHT"
-msgstr "通过 DHT 找到的节点"
+msgstr "通过 DHT 找到的对等网络用户"
 
 #: ../gtk/DetailsDialog.cc:1553
 msgid "Peer is an incoming connection"
-msgstr "与该节点间的连接是入站连接"
+msgstr "通过入站连接的对等网络用户"
 
 #: ../gtk/DetailsDialog.cc:1557
 msgid "Peer is connected over µTP"
-msgstr "通过 µTP 协议连接到节点"
+msgstr "通过 µTP 协议连接到的对等网络用户"
 
 #: ../gtk/DetailsDialog.cc:1643
 msgid "Address"
@@ -488,12 +490,12 @@ msgstr "显示更多信息(_M)"
 #: ../gtk/DetailsDialog.cc:1869
 #, c-format
 msgid "Got a list of %1$s%2$'d peers%3$s %4$s ago"
-msgstr "在 %4$s前获得了载有 %1$s%2$'d 个节点%3$s的列表"
+msgstr "在 %4$s前获得了载有 %1$s%2$'d 个用户%3$s的列表"
 
 #: ../gtk/DetailsDialog.cc:1878
 #, c-format
 msgid "Peer list request %1$stimed out%2$s %3$s ago; will retry"
-msgstr "在 %3$s前节点列表请求%1$s超时%2$s，将重试"
+msgstr "在 %3$s前用户列表请求%1$s超时%2$s，将重试"
 
 #: ../gtk/DetailsDialog.cc:1886
 #, c-format
@@ -507,21 +509,21 @@ msgstr "无计划更新"
 #: ../gtk/DetailsDialog.cc:1905
 #, c-format
 msgid "Asking for more peers in %s"
-msgstr "将于 %s后请求更多节点"
+msgstr "将于 %s后请求更多用户"
 
 #: ../gtk/DetailsDialog.cc:1911
 msgid "Queued to ask for more peers"
-msgstr "已准备请求更多节点"
+msgstr "已准备请求更多用户"
 
 #: ../gtk/DetailsDialog.cc:1918
 #, c-format
 msgid "Asking for more peers now… <small>%s</small>"
-msgstr "正在请求更多的节点……<small>%s</small>"
+msgstr "正在请求更多的用户……<small>%s</small>"
 
 #: ../gtk/DetailsDialog.cc:1938
 #, c-format
 msgid "Tracker had %s%'d seeders and %'d leechers%s %s ago"
-msgstr "在 %5$s前 Tracker 有 %1$s%2$'d 个做种节点和 %3$'d 个下载节点%4$s"
+msgstr "在 %5$s前 Tracker 有 %1$s%2$'d 个做种用户和 %3$'d 个下载用户%4$s"
 
 #: ../gtk/DetailsDialog.cc:1948
 #, c-format
@@ -531,16 +533,16 @@ msgstr "在 %4$s前遇到错误“%1$s%2$s%3$s”"
 #: ../gtk/DetailsDialog.cc:1964
 #, c-format
 msgid "Asking for peer counts in %s"
-msgstr "将于 %s后询问节点数量"
+msgstr "将于 %s后询问用户数量"
 
 #: ../gtk/DetailsDialog.cc:1970
 msgid "Queued to ask for peer counts"
-msgstr "已准备询问节点数量"
+msgstr "已准备询问用户数量"
 
 #: ../gtk/DetailsDialog.cc:1977
 #, c-format
 msgid "Asking for peer counts now… <small>%s</small>"
-msgstr "正在询问节点数量……<small>%s</small>"
+msgstr "正在询问用户数量……<small>%s</small>"
 
 #: ../gtk/DetailsDialog.cc:2224
 msgid "List contains invalid URLs"
@@ -557,7 +559,7 @@ msgstr "%s—编辑 Tracker 列表"
 
 #: ../gtk/DetailsDialog.cc:2266 ../gtk/MessageLogWindow.cc:230
 msgid "_Save"
-msgstr ""
+msgstr "保存(_S)"
 
 #: ../gtk/DetailsDialog.cc:2271
 msgid "Tracker Announce URLs"
@@ -609,7 +611,7 @@ msgstr "显示备用 Tracker(_B)"
 #. create the dialog
 #: ../gtk/DetailsDialog.cc:2560 ../gtk/MakeDialog.cc:209 ../gtk/MakeDialog.cc:439 ../gtk/PrefsDialog.cc:1148 ../gtk/StatsDialog.cc:139
 msgid "_Close"
-msgstr ""
+msgstr "关闭(_C)"
 
 #: ../gtk/DetailsDialog.cc:2573 ../gtk/MessageLogWindow.cc:413
 msgid "Information"
@@ -617,7 +619,7 @@ msgstr "信息"
 
 #: ../gtk/DetailsDialog.cc:2574
 msgid "Peers"
-msgstr "节点"
+msgstr "用户"
 
 #: ../gtk/DetailsDialog.cc:2579
 msgid "File listing not available for combined torrent properties"
@@ -666,12 +668,12 @@ msgstr[0] "此种子尚未完成下载。"
 #: ../gtk/Dialogs.cc:75
 msgid "This torrent is connected to peers."
 msgid_plural "These torrents are connected to peers."
-msgstr[0] "此种子已连接到其他节点。"
+msgstr[0] "此种子已连接到其他用户。"
 
 #: ../gtk/Dialogs.cc:82
 msgid "One of these torrents is connected to peers."
 msgid_plural "Some of these torrents are connected to peers."
-msgstr[0] "有一个种子已连接到其他节点。"
+msgstr[0] "有一个种子已连接到其他用户。"
 
 #: ../gtk/Dialogs.cc:95
 msgid "One of these torrents has not finished downloading."
@@ -680,7 +682,7 @@ msgstr[0] "有一个种子尚未完成下载。"
 
 #: ../gtk/Dialogs.cc:115
 msgid "_Delete"
-msgstr ""
+msgstr "删除(_D)"
 
 #: ../gtk/FileList.cc:558 ../gtk/Utils.cc:389
 msgid "High"
@@ -763,7 +765,7 @@ msgid ""
 "Click to disable Alternative Speed Limits\n"
 " (%1$s down, %2$s up)"
 msgstr ""
-"点击禁用备用速度限制\n"
+"点击禁用速度限制\n"
 "（%1$s 下载，%2$s 上传）"
 
 #: ../gtk/MainWindow.cc:227
@@ -772,7 +774,7 @@ msgid ""
 "Click to enable Alternative Speed Limits\n"
 " (%1$s down, %2$s up)"
 msgstr ""
-"点击启用备用速度限制\n"
+"点击启用速度限制\n"
 "（%1$s 下载，%2$s 上传）"
 
 #: ../gtk/MainWindow.cc:275
@@ -899,7 +901,7 @@ msgstr[0] "%1$'d 块 @ %2$s"
 
 #: ../gtk/MakeDialog.cc:440
 msgid "_New"
-msgstr ""
+msgstr "新建(_N)"
 
 #: ../gtk/MakeDialog.cc:449
 msgid "Sa_ve to:"
@@ -972,7 +974,7 @@ msgstr "消息日志"
 
 #: ../gtk/MessageLogWindow.cc:462
 msgid "Save _As"
-msgstr ""
+msgstr "另存为(_A)"
 
 #: ../gtk/MessageLogWindow.cc:473
 msgid "Clear"
@@ -980,7 +982,7 @@ msgstr "清除"
 
 #: ../gtk/MessageLogWindow.cc:486
 msgid "P_ause"
-msgstr ""
+msgstr "暂停(_A)"
 
 #: ../gtk/MessageLogWindow.cc:495
 msgid "Level"
@@ -1020,7 +1022,7 @@ msgstr "种子选项"
 
 #: ../gtk/OptionsDialog.cc:281 ../gtk/OptionsDialog.cc:441 ../gtk/OptionsDialog.cc:501
 msgid "_Open"
-msgstr ""
+msgstr "打开(_O)"
 
 #: ../gtk/OptionsDialog.cc:295 ../gtk/PrefsDialog.cc:268
 msgid "Mo_ve .torrent file to the trash"
@@ -1323,7 +1325,7 @@ msgstr "下载(%s)(_D)："
 
 #: ../gtk/PrefsDialog.cc:893
 msgid "Alternative Speed Limits"
-msgstr "备用速度限制"
+msgstr "速度限制"
 
 #: ../gtk/PrefsDialog.cc:904
 msgid "Override normal speed limits manually or at scheduled times"
@@ -1389,19 +1391,19 @@ msgstr "启用路由器的 UPnP 或 NAT-PMP 端口转发功能(_F)"
 
 #: ../gtk/PrefsDialog.cc:1052
 msgid "Peer Limits"
-msgstr "节点限制"
+msgstr "用户数限制"
 
 #: ../gtk/PrefsDialog.cc:1054
 msgid "Maximum peers per _torrent:"
-msgstr "单个种子最大节点数(_T)："
+msgstr "单个种子最大用户数(_T)："
 
 #: ../gtk/PrefsDialog.cc:1055
 msgid "Maximum peers _overall:"
-msgstr "全局最大节点数(_O)："
+msgstr "全局最大用户数(_O)："
 
 #: ../gtk/PrefsDialog.cc:1063
 msgid "Enable _uTP for peer communication"
-msgstr "为节点连接启用 µTP"
+msgstr "为用户通信启用 µTP"
 
 #: ../gtk/PrefsDialog.cc:1064
 msgid "uTP is a tool for reducing network congestion."
@@ -1409,27 +1411,27 @@ msgstr "µTP 是一个用于减少网络拥堵的工具。"
 
 #: ../gtk/PrefsDialog.cc:1068
 msgid "Use PE_X to find more peers"
-msgstr "使用 PE_X 以寻找更多节点"
+msgstr "使用 PE_X 以寻找更多对等网络用户"
 
 #: ../gtk/PrefsDialog.cc:1069
 msgid "PEX is a tool for exchanging peer lists with the peers you're connected to."
-msgstr "PEX 是用于跟你相连接的节点交换节点名单的工具。"
+msgstr "PEX 是用于跟你相连接的用户交换对等网络用户名单的工具。"
 
 #: ../gtk/PrefsDialog.cc:1072
 msgid "Use _DHT to find more peers"
-msgstr "使用 _DHT 以寻找更多节点"
+msgstr "使用 _DHT 以寻找更多对等网络用户"
 
 #: ../gtk/PrefsDialog.cc:1073
 msgid "DHT is a tool for finding peers without a tracker."
-msgstr "DHT 是个无需 Tracker 的寻找节点的工具。"
+msgstr "DHT 是个无需 Tracker 的寻找对等网络用户的工具。"
 
 #: ../gtk/PrefsDialog.cc:1076
 msgid "Use _Local Peer Discovery to find more peers"
-msgstr "使用本地节点发现（LPD）寻找更多节点"
+msgstr "使用本地用户发现（LPD）寻找更多对等网络用户"
 
 #: ../gtk/PrefsDialog.cc:1077
 msgid "LPD is a tool for finding peers on your local network."
-msgstr "LPD 是用于在本地网络寻找节点的工具。"
+msgstr "LPD 是用于在本地网络寻找对等网络用户的工具。"
 
 #: ../gtk/PrefsDialog.cc:1081
 msgid "Default Public Trackers"
@@ -1488,7 +1490,7 @@ msgstr "设定种子位置"
 
 #: ../gtk/RelocateDialog.cc:161
 msgid "_Apply"
-msgstr ""
+msgstr "接受(_A)"
 
 #: ../gtk/RelocateDialog.cc:167
 msgid "Location"
@@ -1693,7 +1695,7 @@ msgstr "正在从 %1$'d 个%2$s中下载元数据（已完成 %3$d%%）"
 #: ../gtk/TorrentCellRenderer.cc:256 ../gtk/TorrentCellRenderer.cc:266 ../gtk/TorrentCellRenderer.cc:285
 msgid "peer"
 msgid_plural "peers"
-msgstr[0] "节点"
+msgstr[0] "用户"
 
 #: ../gtk/TorrentCellRenderer.cc:263
 #, c-format
@@ -1719,7 +1721,7 @@ msgstr "正在从 %1$'d / %2$'d 个%3$s中下载"
 #, c-format
 msgid "Seeding to %1$'d of %2$'d connected peer"
 msgid_plural "Seeding to %1$'d of %2$'d connected peers"
-msgstr[0] "正在向 %1$'d / %2$'d 个连接的节点做种上传"
+msgstr[0] "正在向 %1$'d / %2$'d 个连接的用户做种上传"
 
 #: ../gtk/Utils.cc:36
 msgid "KiB"
@@ -2078,7 +2080,7 @@ msgstr "需要密码"
 #: ../libtransmission/rpc-server.cc:1052
 #, c-format
 msgid "Serving RPC and Web requests from directory '%s'"
-msgstr ""
+msgstr "正在从目录 '%s' 提供 RPC 和 Web 请求"
 
 #. first %s is the application name
 #. second %s is the version number
@@ -2194,7 +2196,7 @@ msgstr "正在验证种子文件"
 #~ msgstr "%s 不是 IPv4 或 IPv6 地址。RPC 监听器必须是 IPv4 或 IPv6"
 
 #~ msgid "Ask Tracker for _More Peers"
-#~ msgstr "向 Traker 请求更多节点(_M)"
+#~ msgstr "向 Traker 请求更多用户(_M)"
 
 #~ msgid "BitTorrent is a peer-to-peer file-sharing protocol that is commonly used to distribute large amounts of data between multiple users."
 #~ msgstr "BitTorrent 是一个对等网络文件共享协议，多用于在多个用户间分发大量的数据。"
@@ -2223,7 +2225,7 @@ msgstr "正在验证种子文件"
 #~ msgstr "取消选择(_L)"
 
 #~ msgid "Enable Alternative Speed _Limits"
-#~ msgstr "启用备用速度限制(_L)"
+#~ msgstr "启用速度限制(_L)"
 
 #, c-format
 #~ msgid "Error uncompressing blocklist: %s (%d)"
@@ -2256,7 +2258,7 @@ msgstr "正在验证种子文件"
 #~ msgstr "移至顶部(_T)"
 
 #~ msgid "Notable features of Transmission include support for Local Peer Discovery, encryption, DHT, µTP, PEX and Magnet Link."
-#~ msgstr "Transmission 值得注意的功能包括支持本地节点发现（LPD）、加密、DHT、µTP、PEX 和磁力链接。"
+#~ msgstr "Transmission 值得注意的功能包括支持本地用户发现（LPD）、加密、DHT、µTP、PEX 和磁力链接。"
 
 #~ msgid "Open Fold_er"
 #~ msgstr "打开文件夹(_E)"
@@ -2371,6 +2373,9 @@ msgstr "正在验证种子文件"
 #~ msgid "Unable to parse file content"
 #~ msgstr "无法解析文件内容"
 
+#~ msgid "_About"
+#~ msgstr "关于(_A)"
+
 #~ msgid "_Compact View"
 #~ msgstr "紧凑视图(_C)"
 
@@ -2397,6 +2402,12 @@ msgstr "正在验证种子文件"
 
 #~ msgid "_Pause All"
 #~ msgstr "全部暂停(_P)"
+
+#~ msgid "_Preferences"
+#~ msgstr "首选项(_P)"
+
+#~ msgid "_Properties"
+#~ msgstr "属性(_P)"
 
 #~ msgid "_Queue"
 #~ msgstr "队列(_Q)"

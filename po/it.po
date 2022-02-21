@@ -7,15 +7,16 @@
 # c2ed1e40dec4c77110b8433ca0e8b4a8_488379a <85dd5f0e022835b2532b5ca0658d8435_534014>, 2017
 # Mike Gelfand <mikedld@mikedld.com>, 2020
 # Milo Casagrande <milo@ubuntu.com>, 2020
+# Joe Mauri <asbruff@gmail.com>, 2021
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-21 21:24+0000\n"
+"POT-Creation-Date: 2022-02-21 21:26+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Milo Casagrande <milo@ubuntu.com>, 2020\n"
+"Last-Translator: Joe Mauri <asbruff@gmail.com>, 2021\n"
 "Language-Team: Italian (https://www.transifex.com/transmissionbt/teams/33778/it/)\n"
 "Language: it\n"
 "MIME-Version: 1.0\n"
@@ -2093,7 +2094,7 @@ msgstr "È richiesta la password"
 #: ../libtransmission/rpc-server.cc:1052
 #, c-format
 msgid "Serving RPC and Web requests from directory '%s'"
-msgstr ""
+msgstr "RPC e richieste web fornite dalla directory «%s»"
 
 #. first %s is the application name
 #. second %s is the version number
@@ -2326,10 +2327,10 @@ msgstr "Verifica torrent"
 #~ msgstr "Ordina per tempo _mancante"
 
 #~ msgid "Sort by _Activity"
-#~ msgstr "Ordina per _attività"
+#~ msgstr "Ordina per _Attività"
 
 #~ msgid "Sort by _Name"
-#~ msgstr "Ordina per _nome"
+#~ msgstr "Ordina per _Nome"
 
 #~ msgid "Sort by _Progress"
 #~ msgstr "Ordina per avan_zamento"

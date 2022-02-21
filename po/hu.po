@@ -10,15 +10,16 @@
 # Balázs Meskó <meskobalazs@mailbox.org>, 2020
 # Kristóf Korcsog <kristofkorcsog@gmail.com>, 2020
 # Mike Gelfand <mikedld@mikedld.com>, 2020
+# Béla Bajza, 2021
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-21 21:24+0000\n"
+"POT-Creation-Date: 2022-02-21 21:26+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2020\n"
+"Last-Translator: Béla Bajza, 2021\n"
 "Language-Team: Hungarian (https://www.transifex.com/transmissionbt/teams/33778/hu/)\n"
 "Language: hu\n"
 "MIME-Version: 1.0\n"
@@ -47,7 +48,7 @@ msgstr "A Transmission egy fájlmegosztó program. Egy torrent futtatása során
 #. make the dialog
 #: ../gtk/Application.cc:710 ../gtk/DetailsDialog.cc:2265 ../gtk/DetailsDialog.cc:2375 ../gtk/Dialogs.cc:114 ../gtk/MakeDialog.cc:208 ../gtk/MessageLogWindow.cc:229 ../gtk/OptionsDialog.cc:280 ../gtk/OptionsDialog.cc:440 ../gtk/OptionsDialog.cc:500 ../gtk/RelocateDialog.cc:160 ../gtk/StatsDialog.cc:100
 msgid "_Cancel"
-msgstr ""
+msgstr "_Mégsem"
 
 #: ../gtk/Application.cc:711
 msgid "I _Agree"
@@ -556,7 +557,7 @@ msgstr "%s – Követők szerkesztése"
 
 #: ../gtk/DetailsDialog.cc:2266 ../gtk/MessageLogWindow.cc:230
 msgid "_Save"
-msgstr ""
+msgstr "_Mentés"
 
 #: ../gtk/DetailsDialog.cc:2271
 msgid "Tracker Announce URLs"
@@ -608,7 +609,7 @@ msgstr "Tartalék kö_vetők megjelenítése"
 #. create the dialog
 #: ../gtk/DetailsDialog.cc:2560 ../gtk/MakeDialog.cc:209 ../gtk/MakeDialog.cc:439 ../gtk/PrefsDialog.cc:1148 ../gtk/StatsDialog.cc:139
 msgid "_Close"
-msgstr ""
+msgstr "_Bezárás"
 
 #: ../gtk/DetailsDialog.cc:2573 ../gtk/MessageLogWindow.cc:413
 msgid "Information"
@@ -686,7 +687,7 @@ msgstr[1] "Néhány torrent letöltése még nem fejeződött be."
 
 #: ../gtk/Dialogs.cc:115
 msgid "_Delete"
-msgstr ""
+msgstr "_Törlés"
 
 #: ../gtk/FileList.cc:558 ../gtk/Utils.cc:389
 msgid "High"
@@ -907,7 +908,7 @@ msgstr[1] "%1$'d darab @ %2$s"
 
 #: ../gtk/MakeDialog.cc:440
 msgid "_New"
-msgstr ""
+msgstr "_Új"
 
 #: ../gtk/MakeDialog.cc:449
 msgid "Sa_ve to:"
@@ -980,7 +981,7 @@ msgstr "Üzenetnapló"
 
 #: ../gtk/MessageLogWindow.cc:462
 msgid "Save _As"
-msgstr ""
+msgstr "Mentés _másként"
 
 #: ../gtk/MessageLogWindow.cc:473
 msgid "Clear"
@@ -988,7 +989,7 @@ msgstr "Törlés"
 
 #: ../gtk/MessageLogWindow.cc:486
 msgid "P_ause"
-msgstr ""
+msgstr "Sz_üneteltetés"
 
 #: ../gtk/MessageLogWindow.cc:495
 msgid "Level"
@@ -1028,7 +1029,7 @@ msgstr "Torrentbeállítások"
 
 #: ../gtk/OptionsDialog.cc:281 ../gtk/OptionsDialog.cc:441 ../gtk/OptionsDialog.cc:501
 msgid "_Open"
-msgstr ""
+msgstr "_Megnyitás"
 
 #: ../gtk/OptionsDialog.cc:295 ../gtk/PrefsDialog.cc:268
 msgid "Mo_ve .torrent file to the trash"
@@ -1498,7 +1499,7 @@ msgstr "Torrent helyének beálltása"
 
 #: ../gtk/RelocateDialog.cc:161
 msgid "_Apply"
-msgstr ""
+msgstr "_Alkalmaz"
 
 #: ../gtk/RelocateDialog.cc:167
 msgid "Location"
@@ -2096,7 +2097,7 @@ msgstr "Jelszó szükséges"
 #: ../libtransmission/rpc-server.cc:1052
 #, c-format
 msgid "Serving RPC and Web requests from directory '%s'"
-msgstr ""
+msgstr "RPC és webes kérelmek kiszolgálása a '%s' könyvtárból"
 
 #. first %s is the application name
 #. second %s is the version number
@@ -2389,6 +2390,9 @@ msgstr "Torrent ellenőrzése"
 #~ msgid "Unable to parse file content"
 #~ msgstr "A fájl tartalma nem dolgozható fel"
 
+#~ msgid "_About"
+#~ msgstr "_Rólunk"
+
 #~ msgid "_Compact View"
 #~ msgstr "_Kompakt nézet"
 
@@ -2415,6 +2419,12 @@ msgstr "Torrent ellenőrzése"
 
 #~ msgid "_Pause All"
 #~ msgstr "Összes _megállítása"
+
+#~ msgid "_Preferences"
+#~ msgstr "_Beállítások"
+
+#~ msgid "_Properties"
+#~ msgstr "_Tulajdonságok"
 
 #~ msgid "_Queue"
 #~ msgstr "_Sor"

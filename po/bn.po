@@ -3,13 +3,16 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
+# Translators:
+# Mike Gelfand <mikedld@mikedld.com>, 2017
+#
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-21 21:24+0000\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"POT-Creation-Date: 2022-02-21 21:26+0000\n"
+"PO-Revision-Date: 2017-01-26 19:47+0000\n"
 "Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2017\n"
 "Language-Team: Bengali (https://www.transifex.com/transmissionbt/teams/33778/bn/)\n"
 "Language: bn\n"
@@ -2192,10 +2195,6 @@ msgstr "টরেন্ট পরীক্ষা করা হচ্ছে"
 #~ msgstr "বিকল্প গতি সীমা সক্রিয় (_L)"
 
 #, c-format
-#~ msgid "Error opening \"%s\""
-#~ msgstr "\"%s\" খোলার সময় ত্রুটি হচ্ছে"
-
-#, c-format
 #~ msgid "File \"%s\" is in the way"
 #~ msgstr "\"%s\" ফাইল আসছে"
 
@@ -2251,10 +2250,6 @@ msgstr "টরেন্ট পরীক্ষা করা হচ্ছে"
 
 #~ msgid "Select _All"
 #~ msgstr "সবগুলো নির্বাচন কর (_A)"
-
-#, c-format
-#~ msgid "Server returned \"%1$ld %2$s\""
-#~ msgstr "পুনরাগত সার্ভার \"%1$ld %2$s\""
 
 #~ msgid "Set _Location…"
 #~ msgstr "অবস্হান নির্ধারণ করুন (_L)"
@@ -2324,9 +2319,6 @@ msgstr "টরেন্ট পরীক্ষা করা হচ্ছে"
 #, c-format
 #~ msgid "Tracker will allow requests in %s"
 #~ msgstr "ট্র্যাকার আবেদন অনুমোদন করবেন %s এর মধ্যে"
-
-#~ msgid "Transmission BitTorrent Client"
-#~ msgstr "ট্রান্সমিশন BitTorrent ক্লায়েন্ট"
 
 #~ msgid "_Compact View"
 #~ msgstr "কম্প্যাক্ট দেখুন (_C)"

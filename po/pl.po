@@ -4,16 +4,16 @@
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 # Translators:
-# Piotr Drąg <piotrdrag@gmail.com>, 2020
+# Piotr Drąg <piotrdrag@gmail.com>, 2021
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-21 21:24+0000\n"
+"POT-Creation-Date: 2022-02-21 21:26+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Piotr Drąg <piotrdrag@gmail.com>, 2020\n"
+"Last-Translator: Piotr Drąg <piotrdrag@gmail.com>, 2021\n"
 "Language-Team: Polish (https://www.transifex.com/transmissionbt/teams/33778/pl/)\n"
 "Language: pl\n"
 "MIME-Version: 1.0\n"
@@ -91,7 +91,7 @@ msgstr ""
 msgid "translator-credits"
 msgstr ""
 "Tomasz Dominikowski <dominikowski@gmail.com>, 2006, 2007\n"
-"Piotr Drąg <piotrdrag@gmail.com>, 2008, 2017-2020\n"
+"Piotr Drąg <piotrdrag@gmail.com>, 2008, 2017-2021\n"
 "\n"
 "Launchpad Contributions:\n"
 "  Account Deactivated https://launchpad.net/~accountdeactivated\n"
@@ -625,7 +625,7 @@ msgstr "Za_mknij"
 
 #: ../gtk/DetailsDialog.cc:2573 ../gtk/MessageLogWindow.cc:413
 msgid "Information"
-msgstr "Informacja"
+msgstr "Informacje"
 
 #: ../gtk/DetailsDialog.cc:2574
 msgid "Peers"
@@ -2147,7 +2147,7 @@ msgstr "Wymagane jest hasło"
 #: ../libtransmission/rpc-server.cc:1052
 #, c-format
 msgid "Serving RPC and Web requests from directory '%s'"
-msgstr ""
+msgstr "Obsługiwanie żądań RPC i WWW z katalogu „%s”"
 
 #. first %s is the application name
 #. second %s is the version number

@@ -5,16 +5,16 @@
 #
 # Translators:
 # Mike Gelfand <mikedld@mikedld.com>, 2017
-# gogo <trebelnik2@gmail.com>, 2020
+# gogo <trebelnik2@gmail.com>, 2021
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-21 21:24+0000\n"
+"POT-Creation-Date: 2022-02-21 21:26+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: gogo <trebelnik2@gmail.com>, 2020\n"
+"Last-Translator: gogo <trebelnik2@gmail.com>, 2021\n"
 "Language-Team: Croatian (https://www.transifex.com/transmissionbt/teams/33778/hr/)\n"
 "Language: hr\n"
 "MIME-Version: 1.0\n"
@@ -43,7 +43,7 @@ msgstr "Transmission je program za dijeljenje datoteka. Kada pokrenete torrent, 
 #. make the dialog
 #: ../gtk/Application.cc:710 ../gtk/DetailsDialog.cc:2265 ../gtk/DetailsDialog.cc:2375 ../gtk/Dialogs.cc:114 ../gtk/MakeDialog.cc:208 ../gtk/MessageLogWindow.cc:229 ../gtk/OptionsDialog.cc:280 ../gtk/OptionsDialog.cc:440 ../gtk/OptionsDialog.cc:500 ../gtk/RelocateDialog.cc:160 ../gtk/StatsDialog.cc:100
 msgid "_Cancel"
-msgstr ""
+msgstr "_Odustani"
 
 #: ../gtk/Application.cc:711
 msgid "I _Agree"
@@ -533,7 +533,7 @@ msgstr "%s - uređivanje pratitelja"
 
 #: ../gtk/DetailsDialog.cc:2266 ../gtk/MessageLogWindow.cc:230
 msgid "_Save"
-msgstr ""
+msgstr "_Spremi"
 
 #: ../gtk/DetailsDialog.cc:2271
 msgid "Tracker Announce URLs"
@@ -585,7 +585,7 @@ msgstr "Prikaži _pomoćne pratitelje"
 #. create the dialog
 #: ../gtk/DetailsDialog.cc:2560 ../gtk/MakeDialog.cc:209 ../gtk/MakeDialog.cc:439 ../gtk/PrefsDialog.cc:1148 ../gtk/StatsDialog.cc:139
 msgid "_Close"
-msgstr ""
+msgstr "_Zatvori"
 
 #: ../gtk/DetailsDialog.cc:2573 ../gtk/MessageLogWindow.cc:413
 msgid "Information"
@@ -670,7 +670,7 @@ msgstr[2] "Preuzimanje nekih od ovih torrenta nije završeno."
 
 #: ../gtk/Dialogs.cc:115
 msgid "_Delete"
-msgstr ""
+msgstr "_Obriši"
 
 #: ../gtk/FileList.cc:558 ../gtk/Utils.cc:389
 msgid "High"
@@ -893,7 +893,7 @@ msgstr[2] "%1$'d dijelova @ %2$s"
 
 #: ../gtk/MakeDialog.cc:440
 msgid "_New"
-msgstr ""
+msgstr "_Novi"
 
 #: ../gtk/MakeDialog.cc:449
 msgid "Sa_ve to:"
@@ -966,7 +966,7 @@ msgstr "Zapis poruka"
 
 #: ../gtk/MessageLogWindow.cc:462
 msgid "Save _As"
-msgstr ""
+msgstr "Spremi _kao"
 
 #: ../gtk/MessageLogWindow.cc:473
 msgid "Clear"
@@ -974,7 +974,7 @@ msgstr "Ukloni"
 
 #: ../gtk/MessageLogWindow.cc:486
 msgid "P_ause"
-msgstr ""
+msgstr "P_auziraj"
 
 #: ../gtk/MessageLogWindow.cc:495
 msgid "Level"
@@ -1014,7 +1014,7 @@ msgstr "Mogućnosti torrenta"
 
 #: ../gtk/OptionsDialog.cc:281 ../gtk/OptionsDialog.cc:441 ../gtk/OptionsDialog.cc:501
 msgid "_Open"
-msgstr ""
+msgstr "_Otvori"
 
 #: ../gtk/OptionsDialog.cc:295 ../gtk/PrefsDialog.cc:268
 msgid "Mo_ve .torrent file to the trash"
@@ -1486,7 +1486,7 @@ msgstr "Postavi lokaciju torrenta"
 
 #: ../gtk/RelocateDialog.cc:161
 msgid "_Apply"
-msgstr ""
+msgstr "_Primijeni"
 
 #: ../gtk/RelocateDialog.cc:167
 msgid "Location"
@@ -2092,7 +2092,7 @@ msgstr "Potrebna je lozinka"
 #: ../libtransmission/rpc-server.cc:1052
 #, c-format
 msgid "Serving RPC and Web requests from directory '%s'"
-msgstr ""
+msgstr "Posluživanje RPC i web zahtjeva iz direktorija '%s'"
 
 #. first %s is the application name
 #. second %s is the version number
@@ -2385,6 +2385,9 @@ msgstr "Provjera torrenta"
 #~ msgid "Unable to parse file content"
 #~ msgstr "Neuspjela obrada sadržaja datoteke"
 
+#~ msgid "_About"
+#~ msgstr "_O programu"
+
 #~ msgid "_Compact View"
 #~ msgstr "_Zbijen pogled"
 
@@ -2411,6 +2414,12 @@ msgstr "Provjera torrenta"
 
 #~ msgid "_Pause All"
 #~ msgstr "_Pauziraj sve"
+
+#~ msgid "_Preferences"
+#~ msgstr "_Osobitosti"
+
+#~ msgid "_Properties"
+#~ msgstr "_Svojstva"
 
 #~ msgid "_Queue"
 #~ msgstr "_Red čekanja"

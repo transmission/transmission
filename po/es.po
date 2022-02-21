@@ -6,16 +6,17 @@
 # Translators:
 # Alfredo Monclus <alfredomonclus@gmail.com>, 2017
 # Mike Gelfand <mikedld@mikedld.com>, 2020
-# picodotdev <pico.dev@gmail.com>, 2020
+# Adolfo Jayme-Barrientos, 2021
+# picodotdev <pico.dev@gmail.com>, 2021
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-21 21:24+0000\n"
+"POT-Creation-Date: 2022-02-21 21:26+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: picodotdev <pico.dev@gmail.com>, 2020\n"
+"Last-Translator: picodotdev <pico.dev@gmail.com>, 2021\n"
 "Language-Team: Spanish (https://www.transifex.com/transmissionbt/teams/33778/es/)\n"
 "Language: es\n"
 "MIME-Version: 1.0\n"
@@ -39,7 +40,7 @@ msgstr "Se ha obtenido la señal %d y se está intentando detener limpiamente. V
 
 #: ../gtk/Application.cc:704
 msgid "Transmission is a file sharing program. When you run a torrent, its data will be made available to others by means of upload. Any content you share is your sole responsibility."
-msgstr "Transmission es un programa de compartición de archivos. Cuando ejecutas un Torrent, su contenido estará disponible públicamente por medio de upload. Y por supuesto, todo contenido que compartas es tu responsabilidad."
+msgstr "Transmission es un programa para compartir archivos. Cuando ejecuta un torrent, sus datos se pondrán a disposición de otros cargándolos a la red. La responsabilidad sobre cualquier contenido que comparta es completamente suya."
 
 #. make the dialog
 #: ../gtk/Application.cc:710 ../gtk/DetailsDialog.cc:2265 ../gtk/DetailsDialog.cc:2375 ../gtk/Dialogs.cc:114 ../gtk/MakeDialog.cc:208 ../gtk/MessageLogWindow.cc:229 ../gtk/OptionsDialog.cc:280 ../gtk/OptionsDialog.cc:440 ../gtk/OptionsDialog.cc:500 ../gtk/RelocateDialog.cc:160 ../gtk/StatsDialog.cc:100
@@ -56,11 +57,11 @@ msgstr "<b>Cerrando conexiones</b>"
 
 #: ../gtk/Application.cc:897
 msgid "Sending upload/download totals to tracker…"
-msgstr "Enviando totales de subida/bajada al rastreador..."
+msgstr "Enviando totales de carga/descarga al rastreador…"
 
 #: ../gtk/Application.cc:902
 msgid "_Quit Now"
-msgstr "_Salir inmediatamente"
+msgstr "_Salir ahora"
 
 #: ../gtk/Application.cc:955
 msgid "Couldn't add corrupt torrent"
@@ -88,15 +89,15 @@ msgstr ""
 #: ../gtk/Application.cc:1287
 msgid "translator-credits"
 msgstr ""
-"Vicente Carro Fernandez <vicentecarro@andaluciajunta.es>, 2006\n"
-"Festor Wailon Dacoba <festor90@gmail.com>, 2007, 2008\n"
-"QA: Jorge González <jorgegonz@svn.gnome.org>, 2008\n"
+"Vicente Carro Fernandez , 2006\n"
+"Festor Wailon Dacoba , 2007, 2008\n"
+"QA: Jorge González , 2008\n"
+"Adolfo Jayme Barrientos <fitojb@ubuntu.com>, 2012-2021\n"
 "\n"
 "Launchpad Contributions:\n"
 "  51114u9 https://launchpad.net/~marcoantoniofrias-deactivatedaccount\n"
 "  Abc https://launchpad.net/~abcdefghijk-deactivatedaccount\n"
 "  Abel O'Rian https://launchpad.net/~abel-orian\n"
-"  Adolfo Jayme https://launchpad.net/~fitojb\n"
 "  Aiguanachein https://launchpad.net/~aiguanachein\n"
 "  Alain Bustamante https://launchpad.net/~webmaster-inkedcity\n"
 "  AlexMorphine https://launchpad.net/~alecapi1\n"
@@ -182,12 +183,12 @@ msgstr "Satisfacer _límites globales"
 #: ../gtk/DetailsDialog.cc:466
 #, c-format
 msgid "Limit _download speed (%s):"
-msgstr "Limitar la velocidad de _descarga (%s):"
+msgstr "Limitar velocidad de _descarga (%s):"
 
 #: ../gtk/DetailsDialog.cc:477
 #, c-format
 msgid "Limit _upload speed (%s):"
-msgstr "Límite de velocidad de s_ubida (%s):"
+msgstr "Limitar velocidad de s_ubida (%s):"
 
 #: ../gtk/DetailsDialog.cc:489 ../gtk/OptionsDialog.cc:360
 msgid "Torrent _priority:"
@@ -219,7 +220,7 @@ msgstr "Compartir sin tener en cuenta la actividad"
 
 #: ../gtk/DetailsDialog.cc:518
 msgid "Stop seeding if idle for N minutes:"
-msgstr "Dejar de compartir si se está inactivo por N minutos:"
+msgstr "Dejar de compartir si está inactivo por N minutos:"
 
 #: ../gtk/DetailsDialog.cc:531
 msgid "_Idle:"
@@ -231,7 +232,7 @@ msgstr "Conexiones de pares"
 
 #: ../gtk/DetailsDialog.cc:537
 msgid "_Maximum peers:"
-msgstr "N.º _máximo de pares:"
+msgstr "_Máximo número de pares:"
 
 #: ../gtk/DetailsDialog.cc:558 ../gtk/TorrentCellRenderer.cc:184 ../libtransmission/verify.cc:249
 msgid "Queued for verification"
@@ -248,7 +249,7 @@ msgstr "Encolado para descargar"
 #: ../gtk/DetailsDialog.cc:567 ../gtk/FilterBar.cc:517
 msgctxt "Verb"
 msgid "Downloading"
-msgstr "Descargar"
+msgstr "Descargando"
 
 #: ../gtk/DetailsDialog.cc:570 ../gtk/TorrentCellRenderer.cc:192
 msgid "Queued for seeding"
@@ -376,7 +377,7 @@ msgstr "Tengo:"
 
 #: ../gtk/DetailsDialog.cc:1054 ../gtk/StatsDialog.cc:147 ../gtk/StatsDialog.cc:168
 msgid "Uploaded:"
-msgstr "Subido:"
+msgstr "Cargado:"
 
 #: ../gtk/DetailsDialog.cc:1059 ../gtk/StatsDialog.cc:150 ../gtk/StatsDialog.cc:171
 msgid "Downloaded:"
@@ -440,11 +441,11 @@ msgstr "Descargaríamos desde este par si nos lo permitiera"
 
 #: ../gtk/DetailsDialog.cc:1525
 msgid "Uploading to peer"
-msgstr "Subiendo al par"
+msgstr "Cargando al par"
 
 #: ../gtk/DetailsDialog.cc:1529
 msgid "We would upload to this peer if they asked"
-msgstr "Subiríamos a este par si nos lo solicitara"
+msgstr "Se cargaría a este par si lo solicitara"
 
 #: ../gtk/DetailsDialog.cc:1533
 msgid "Peer has unchoked us, but we're not interested"
@@ -488,7 +489,7 @@ msgstr "Pet. descarga"
 
 #: ../gtk/DetailsDialog.cc:1673
 msgid "Up Reqs"
-msgstr "Pet. subida"
+msgstr "Pets. carga"
 
 #: ../gtk/DetailsDialog.cc:1680
 msgid "Dn Blocks"
@@ -576,7 +577,7 @@ msgstr "Se obtuvo un error de búsqueda «%s%s%s» hace %s"
 #: ../gtk/DetailsDialog.cc:1964
 #, c-format
 msgid "Asking for peer counts in %s"
-msgstr "Buscando conteo de pares en %s"
+msgstr "Buscando recuento de pares en %s"
 
 #: ../gtk/DetailsDialog.cc:1970
 msgid "Queued to ask for peer counts"
@@ -883,7 +884,7 @@ msgstr "Proporción: %s"
 #: ../gtk/MainWindow.cc:602
 #, c-format
 msgid "Down: %1$s, Up: %2$s"
-msgstr "Bajada: %1$s, Subida: %2$s"
+msgstr "Bajado: %1$s, Subido: %2$s"
 
 #: ../gtk/MainWindow.cc:611
 #, c-format
@@ -898,7 +899,7 @@ msgstr "Creando «%s»"
 #: ../gtk/MakeDialog.cc:116
 #, c-format
 msgid "Created \"%s\"!"
-msgstr "¡«%s» creado!"
+msgstr "Se creó «%s»."
 
 #: ../gtk/MakeDialog.cc:120
 msgid "Cancelled"
@@ -1018,7 +1019,7 @@ msgstr "Hora"
 
 #: ../gtk/MessageLogWindow.cc:414
 msgid "Debug"
-msgstr "Depurar"
+msgstr "Depuración"
 
 #: ../gtk/MessageLogWindow.cc:444
 msgid "Message Log"
@@ -1148,11 +1149,11 @@ msgstr "Cola de descargas"
 
 #: ../gtk/PrefsDialog.cc:280
 msgid "Ma_ximum active downloads:"
-msgstr "Máximo de _descargas activas:"
+msgstr "Máximas _descargas activas:"
 
 #: ../gtk/PrefsDialog.cc:284
 msgid "Downloads sharing data in the last _N minutes are active:"
-msgstr "Datos de compartición de descargas en los últimos N minutos _activos:"
+msgstr "Descargas compartiendo datos activas en los últimos N minutos:"
 
 #: ../gtk/PrefsDialog.cc:288 ../libtransmission/torrent.cc:1648
 msgid "Incomplete"
@@ -1180,7 +1181,7 @@ msgstr "Deja_r de compartir al alcanzar la proporción:"
 
 #: ../gtk/PrefsDialog.cc:333
 msgid "Stop seeding if idle for _N minutes:"
-msgstr "Dejar de compartir si se está inactivo por _N minutos:"
+msgstr "Dejar de compartir si está inactivo por _N minutos:"
 
 #: ../gtk/PrefsDialog.cc:341
 msgid "Call scrip_t when done seeding:"
@@ -1282,7 +1283,7 @@ msgstr "Activar _actualizaciones automáticas"
 
 #: ../gtk/PrefsDialog.cc:683
 msgid "Remote Control"
-msgstr "Control Remoto"
+msgstr "Control remoto"
 
 #. "enabled" checkbutton
 #: ../gtk/PrefsDialog.cc:686
@@ -1437,11 +1438,11 @@ msgstr "_Comprobar puerto"
 
 #: ../gtk/PrefsDialog.cc:1043
 msgid "Pick a _random port every time Transmission is started"
-msgstr "Escoger un puerto aleato_rio cada vez que inicie Transmission"
+msgstr "Escoger un puerto al a_zar cada vez que inicie Transmission"
 
 #: ../gtk/PrefsDialog.cc:1049
 msgid "Use UPnP or NAT-PMP port _forwarding from my router"
-msgstr "Utilizar la _redirección del puerto UPnP o NAT-PMP desde mi router"
+msgstr "Utilizar _redirección de puertos UPnP o NAT-PMP desde mi enrutador"
 
 #: ../gtk/PrefsDialog.cc:1052
 msgid "Peer Limits"
@@ -1449,11 +1450,11 @@ msgstr "Límite de conexiones"
 
 #: ../gtk/PrefsDialog.cc:1054
 msgid "Maximum peers per _torrent:"
-msgstr "N.º máximo de pares por _torrent:"
+msgstr "Máximo número de pares por _torrent:"
 
 #: ../gtk/PrefsDialog.cc:1055
 msgid "Maximum peers _overall:"
-msgstr "N.º _máximo de pares permitidos:"
+msgstr "Máximo número de pares en total:"
 
 #: ../gtk/PrefsDialog.cc:1063
 msgid "Enable _uTP for peer communication"
@@ -1601,7 +1602,7 @@ msgstr[1] "Iniciado %'d veces"
 
 #: ../gtk/StatsDialog.cc:99
 msgid "Reset your statistics?"
-msgstr "¿Reiniciar sus estadísticas?"
+msgstr "¿Quiere restablecer las estadísticas?"
 
 #: ../gtk/StatsDialog.cc:101 ../gtk/StatsDialog.cc:138
 msgid "_Reset"
@@ -1648,7 +1649,7 @@ msgid ""
 "Down: %3$s %4$s"
 msgstr ""
 "Transmission\n"
-"Subida: %1$s %2$s\n"
+"Carga: %1$s %2$s\n"
 "Descarga: %3$s %4$s"
 
 #. %1$s is how much we've got,
@@ -1751,7 +1752,7 @@ msgstr "Descargando metadatos desde %1$'d %2$s (%3$d%% hecho)"
 msgid "peer"
 msgid_plural "peers"
 msgstr[0] "par"
-msgstr[1] "Pares"
+msgstr[1] "pares"
 
 #: ../gtk/TorrentCellRenderer.cc:263
 #, c-format
@@ -1873,13 +1874,13 @@ msgstr "Error al abrir el torrent"
 
 #: ../gtk/Utils.cc:453
 msgid "Unrecognized URL"
-msgstr "URL no reconocida"
+msgstr "URL no reconocido"
 
 #. modal
 #: ../gtk/Utils.cc:459
 #, c-format
 msgid "Transmission doesn't know how to use \"%s\""
-msgstr "Tranmission no sabe cómo usar «%s»"
+msgstr "Transmission no sabe cómo usar «%s»"
 
 #: ../gtk/Utils.cc:464
 msgid "This magnet link appears to be intended for something other than BitTorrent."
@@ -1938,7 +1939,7 @@ msgstr "Iniciar con todos los torrents pausados"
 
 #: ../gtk/transmission-gtk.desktop.in:25
 msgid "Start Transmission Minimized"
-msgstr "Iniciar Transmission Minimizado"
+msgstr "Iniciar Transmission minimizado"
 
 #: ../libtransmission/announcer-udp.cc:201 ../libtransmission/announcer-udp.cc:303
 msgid "Unknown error"
@@ -1950,7 +1951,7 @@ msgstr "Conexión fallida"
 
 #: ../libtransmission/announcer.cc:1000 ../libtransmission/announcer.cc:1324
 msgid "Could not connect to tracker"
-msgstr "No se pudo conectar al rastreador"
+msgstr "No se pudo conectar con el rastreador"
 
 #: ../libtransmission/announcer.cc:1004 ../libtransmission/announcer.cc:1328
 msgid "Tracker did not respond"
@@ -2124,7 +2125,7 @@ msgstr "Detenido"
 #: ../libtransmission/rpc-server.cc:854
 #, c-format
 msgid "Couldn't find settings key \"%s\""
-msgstr "No se pudo encontrar opción \"%s\""
+msgstr "No se encontró la clave de configuración «%s»"
 
 #: ../libtransmission/rpc-server.cc:1032
 #, c-format
@@ -2142,7 +2143,7 @@ msgstr "Contraseña requerida"
 #: ../libtransmission/rpc-server.cc:1052
 #, c-format
 msgid "Serving RPC and Web requests from directory '%s'"
-msgstr ""
+msgstr "Sirviendo peticiones RPC y Web desde el directorio «%s»"
 
 #. first %s is the application name
 #. second %s is the version number
@@ -2225,7 +2226,7 @@ msgstr "Reenvío de puertos realizado con éxito"
 
 #: ../libtransmission/utils.cc:242 ../libtransmission/utils.cc:295
 msgid "Not a regular file"
-msgstr "No es un archivo regular"
+msgstr "No es un archivo normal"
 
 #: ../libtransmission/utils.cc:365
 #, c-format
@@ -2235,7 +2236,7 @@ msgstr "«%s» guardado"
 #. did caller give us an uninitialized val?
 #: ../libtransmission/variant.cc:971
 msgid "Invalid metadata"
-msgstr "Metadatos inválidos"
+msgstr "Metadatos no válidos"
 
 #: ../libtransmission/variant.cc:1216
 msgid "Error saving \"%"
@@ -2267,10 +2268,10 @@ msgstr "Verificando el torrent"
 #~ msgstr "Ejecutar scrip_t al completar el torrent:"
 
 #~ msgid "Copy _Magnet Link to Clipboard"
-#~ msgstr "Copiar enlace _Magnet al portapapeles"
+#~ msgstr "Copiar enlace _magnet al portapapeles"
 
 #~ msgid "Copyright (c) The Transmission Project"
-#~ msgstr "Copyright (c) El proyecto Transmission"
+#~ msgstr "Derechos de autor © del proyecto Transmission"
 
 #, c-format
 #~ msgid "Couldn't save temporary file \"%1$s\": %2$s"
@@ -2302,7 +2303,7 @@ msgstr "Verificando el torrent"
 #~ msgstr "Entrada de metadatos no válida «%s»"
 
 #~ msgid "Magnet torrent's metadata is not usable"
-#~ msgstr "Metadatos del Magnet no utilizables"
+#~ msgstr "Metadatos del magnet no son usables"
 
 #~ msgid "Message _Log"
 #~ msgstr "_Registro de mensajes"
@@ -2320,7 +2321,7 @@ msgstr "Verificando el torrent"
 #~ msgstr "Mover al _principio"
 
 #~ msgid "Notable features of Transmission include support for Local Peer Discovery, encryption, DHT, µTP, PEX and Magnet Link."
-#~ msgstr "Las características mas notorias de transmission incluyen soporte para descubrimiento de pares locales, DHT, µTP, PEX y Magnet Links."
+#~ msgstr "Entre las funcionalidades más notorias de Transmission se incluyen el descubrimiento de pares locales, DHT, µTP, PEX y enlaces «magnet»."
 
 #~ msgid "Open Fold_er"
 #~ msgstr "Abrir carp_eta"
@@ -2487,7 +2488,7 @@ msgstr "Verificando el torrent"
 #~ msgstr "_Iniciar"
 
 #~ msgid "_Start All"
-#~ msgstr "_Iniciar todos"
+#~ msgstr "_Iniciar todo"
 
 #~ msgid "_Statistics"
 #~ msgstr "E_stadísticas"

@@ -3,13 +3,16 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
+# Translators:
+# Mike Gelfand <mikedld@mikedld.com>, 2017
+#
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-21 21:24+0000\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"POT-Creation-Date: 2022-02-21 21:26+0000\n"
+"PO-Revision-Date: 2017-01-26 19:47+0000\n"
 "Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2017\n"
 "Language-Team: Albanian (https://www.transifex.com/transmissionbt/teams/33778/sq/)\n"
 "Language: sq\n"
@@ -2189,10 +2192,6 @@ msgstr "Duke verifikuar torrentin"
 #~ msgstr "Aktivizo _Kufizime Altrenative të Shpejtësisë"
 
 #, c-format
-#~ msgid "Error opening \"%s\""
-#~ msgstr "Gabim në hapjen e \"%s\""
-
-#, c-format
 #~ msgid "File \"%s\" is in the way"
 #~ msgstr "Skedari \"%s\" është rrugës"
 
@@ -2248,10 +2247,6 @@ msgstr "Duke verifikuar torrentin"
 
 #~ msgid "Select _All"
 #~ msgstr "Përzgjidhi të _Gjitha"
-
-#, c-format
-#~ msgid "Server returned \"%1$ld %2$s\""
-#~ msgstr "Serveri ktheu \"%1$ld %2$s\""
 
 #~ msgid "Set _Location…"
 #~ msgstr "Vendos _Vendndodhjen..."
@@ -2321,9 +2316,6 @@ msgstr "Duke verifikuar torrentin"
 #, c-format
 #~ msgid "Tracker will allow requests in %s"
 #~ msgstr "Gjurmuesi do të lejojë kërkesat në %s"
-
-#~ msgid "Transmission BitTorrent Client"
-#~ msgstr "Transmission BitTorrent Klient"
 
 #~ msgid "_Compact View"
 #~ msgstr "_Pamje Kompakte"

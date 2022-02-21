@@ -5,16 +5,16 @@
 #
 # Translators:
 # Mike Gelfand <mikedld@mikedld.com>, 2017
-# Priit Uring, 2020
+# Priit Uring, 2022
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-21 21:24+0000\n"
+"POT-Creation-Date: 2022-02-21 21:26+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Priit Uring, 2020\n"
+"Last-Translator: Priit Uring, 2022\n"
 "Language-Team: Estonian (https://www.transifex.com/transmissionbt/teams/33778/et/)\n"
 "Language: et\n"
 "MIME-Version: 1.0\n"
@@ -241,14 +241,14 @@ msgstr "Tundmatu"
 msgid "%1$s (%2$'d piece @ %3$s)"
 msgid_plural "%1$s (%2$'d pieces @ %3$s)"
 msgstr[0] "%1$s (%2$'d osa @ %3$s)"
-msgstr[1] "%1$s (%2$'d osa @ %3$s)"
+msgstr[1] "%1$s (%2$'d tükke @ %3$s)"
 
 #: ../gtk/DetailsDialog.cc:855
 #, c-format
 msgid "%1$s (%2$'d piece)"
 msgid_plural "%1$s (%2$'d pieces)"
 msgstr[0] "%1$s (%2$'d osa)"
-msgstr[1] "%1$s (%2$'d osa)"
+msgstr[1] "%1$s (%2$'d tükke)"
 
 #: ../gtk/DetailsDialog.cc:893
 #, c-format
@@ -1379,15 +1379,15 @@ msgstr "Partnerite piirangud"
 
 #: ../gtk/PrefsDialog.cc:1054
 msgid "Maximum peers per _torrent:"
-msgstr "Ühendatud partnerite _arvu piirang torrenti kohta:"
+msgstr "Maksimum partnereid ühel _torrentil:"
 
 #: ../gtk/PrefsDialog.cc:1055
 msgid "Maximum peers _overall:"
-msgstr "Ühendatud partnerite _koguarvu piirang:"
+msgstr "Maksimum partnerite _koguarvu piirang:"
 
 #: ../gtk/PrefsDialog.cc:1063
 msgid "Enable _uTP for peer communication"
-msgstr "Partneritevaheliseks ühendumiseks kasutatakse _uTP-d"
+msgstr "Luba _uTP kasutamine partneritega ühendamiseks"
 
 #: ../gtk/PrefsDialog.cc:1064
 msgid "uTP is a tool for reducing network congestion."
@@ -1395,7 +1395,7 @@ msgstr "uTP on võrguummistuste vältimise tööriist."
 
 #: ../gtk/PrefsDialog.cc:1068
 msgid "Use PE_X to find more peers"
-msgstr "Partnerite leidmiseks kasutatakse _PEX-i"
+msgstr "Kasuta _PEX-i, et leida uusi partnereid"
 
 #: ../gtk/PrefsDialog.cc:1069
 msgid "PEX is a tool for exchanging peer lists with the peers you're connected to."
@@ -1411,7 +1411,7 @@ msgstr "DHT on tööriist järjepidajata parnterite leidmiseks."
 
 #: ../gtk/PrefsDialog.cc:1076
 msgid "Use _Local Peer Discovery to find more peers"
-msgstr "Lisapartnerite leidmiseks kasutatakse kohalikku partnerituvastust (_LPD)"
+msgstr "Kasuta kohalikku partnerituvastust (_LPD), et leida uusi partnereid"
 
 #: ../gtk/PrefsDialog.cc:1077
 msgid "LPD is a tool for finding peers on your local network."
@@ -1559,7 +1559,7 @@ msgstr "Kokku"
 
 #: ../gtk/SystemTrayIcon.cc:94
 msgid "Idle"
-msgstr "Jõude"
+msgstr "Ootel"
 
 #: ../gtk/SystemTrayIcon.cc:105 ../gtk/SystemTrayIcon.cc:116
 #, c-format
@@ -2118,7 +2118,7 @@ msgstr "Valmis"
 #: ../libtransmission/torrent.cc:2586
 #, c-format
 msgid "Piece %<PRIu32>, which was just downloaded, failed its checksum test"
-msgstr "Tükk %<PRIu32>, mis oli just allalaaditud, ebaõnnestus checksum'i testi"
+msgstr "Tükk %<PRIu32>, mis oli just allalaaditud, nurjus checksum'i testis"
 
 #: ../libtransmission/upnp.cc:26
 msgid "Port Forwarding (UPnP)"
@@ -2151,7 +2151,7 @@ msgstr "Pordi suuname \"%s\" kaudu, teenus \"%s\" (kohalik aadress: %s:%d)."
 
 #: ../libtransmission/upnp.cc:306
 msgid "Port forwarding successful!"
-msgstr "Pordi suunamine on edukas!"
+msgstr "Pordi suunamine oli edukas!"
 
 #: ../libtransmission/utils.cc:242 ../libtransmission/utils.cc:295
 msgid "Not a regular file"
@@ -2204,7 +2204,7 @@ msgstr "Torrenti kontrollimine"
 
 #, c-format
 #~ msgid "Couldn't save temporary file \"%1$s\": %2$s"
-#~ msgstr "Ajutist faili \"%1$s\" pole võimalik salvestada: %2$s"
+#~ msgstr "Nurjus ajutise faili salvestamine \"%1$s\": %2$s"
 
 #~ msgid "Create a torrent"
 #~ msgstr "Torrenti loomine"
@@ -2269,7 +2269,7 @@ msgstr "Torrenti kontrollimine"
 
 #, c-format
 #~ msgid "Please Verify Local Data! Piece #%zu is corrupt."
-#~ msgstr "Kontrolli kohalikke andmeid! Tükk nr %zu on rikutud."
+#~ msgstr "Palun kontrollige kohalikke andmeid! Tükk nr #%zu on rikutud."
 
 #~ msgid "Present Main Window"
 #~ msgstr "Põhiakna näitamine"
@@ -2296,7 +2296,7 @@ msgstr "Torrenti kontrollimine"
 #~ msgstr "Järjesta _suuruse järgi"
 
 #~ msgid "Sort by Stat_e"
-#~ msgstr "Järjesta _oleku järgi"
+#~ msgstr "Järjesta Olek_u järgi"
 
 #~ msgid "Sort by Time _Left"
 #~ msgstr "Järjesta _jäänud aja järgi"

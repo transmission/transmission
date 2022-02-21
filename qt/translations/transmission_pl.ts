@@ -360,7 +360,7 @@
     <message>
         <location line="+16"/>
         <source>Information</source>
-        <translation>Informacja</translation>
+        <translation>Informacje</translation>
     </message>
     <message>
         <location line="+9"/>

@@ -7,19 +7,19 @@
 # Ozancan Karataş <ozancankaratas96@outlook.com>, 2017
 # U. Ozan Basar <software@nano.net.tr>, 2017
 # Mehmet BEKGÖZ, 2020
-# Emin Tufan <etcetin@gmail.com>, 2020
 # Serdar Sağlam <teknomobil@msn.com>, 2020
 # Mike Gelfand <mikedld@mikedld.com>, 2020
 # BouRock, 2020
+# Emin Tufan Çetin <etcetin@gmail.com>, 2021
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-21 21:24+0000\n"
+"POT-Creation-Date: 2022-02-21 21:26+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: BouRock, 2020\n"
+"Last-Translator: Emin Tufan Çetin <etcetin@gmail.com>, 2021\n"
 "Language-Team: Turkish (https://www.transifex.com/transmissionbt/teams/33778/tr/)\n"
 "Language: tr\n"
 "MIME-Version: 1.0\n"
@@ -151,11 +151,11 @@ msgstr "_Boşta:"
 
 #: ../gtk/DetailsDialog.cc:534
 msgid "Peer Connections"
-msgstr "Kişi Bağlantıları"
+msgstr "Eş Bağlantıları"
 
 #: ../gtk/DetailsDialog.cc:537
 msgid "_Maximum peers:"
-msgstr "En _fazla kişi:"
+msgstr "En _çok eş:"
 
 #: ../gtk/DetailsDialog.cc:558 ../gtk/TorrentCellRenderer.cc:184 ../libtransmission/verify.cc:249
 msgid "Queued for verification"
@@ -356,27 +356,27 @@ msgstr "İyimser kesinti giderme"
 
 #: ../gtk/DetailsDialog.cc:1517
 msgid "Downloading from this peer"
-msgstr "Bu kişiden indiriliyor"
+msgstr "Bu eşten indiriliyor"
 
 #: ../gtk/DetailsDialog.cc:1521
 msgid "We would download from this peer if they would let us"
-msgstr "Bize izin verirlerse bu kişiden indirebiliriz"
+msgstr "Bize izin verirlerse bu eşten indirebiliriz"
 
 #: ../gtk/DetailsDialog.cc:1525
 msgid "Uploading to peer"
-msgstr "Kişiye gönderiliyor"
+msgstr "Eşe gönderiliyor"
 
 #: ../gtk/DetailsDialog.cc:1529
 msgid "We would upload to this peer if they asked"
-msgstr "Sorarlarsa bu kişiye gönderebiliriz"
+msgstr "Sorarlarsa bu eşe gönderebiliriz"
 
 #: ../gtk/DetailsDialog.cc:1533
 msgid "Peer has unchoked us, but we're not interested"
-msgstr "Kişi kesintimizi giderdi, ama ilgilenmiyoruz"
+msgstr "Eş kesintimizi giderdi, ama ilgilenmiyoruz"
 
 #: ../gtk/DetailsDialog.cc:1537
 msgid "We unchoked this peer, but they're not interested"
-msgstr "Bu kişinin kesintisini giderdik, ama ilgilenmiyorlar"
+msgstr "Bu eşin kesintisini giderdik, ama ilgilenmiyorlar"
 
 #: ../gtk/DetailsDialog.cc:1541
 msgid "Encrypted connection"
@@ -384,19 +384,19 @@ msgstr "Şifreli bağlantı"
 
 #: ../gtk/DetailsDialog.cc:1545
 msgid "Peer was found through Peer Exchange (PEX)"
-msgstr "Kişi Takası (PEX) aracılığıyla kişi bulundu"
+msgstr "Eş Takası (PEX) aracılığıyla eş bulundu"
 
 #: ../gtk/DetailsDialog.cc:1549
 msgid "Peer was found through DHT"
-msgstr "DHT aracılığıyla kişi bulundu"
+msgstr "DHT aracılığıyla eş bulundu"
 
 #: ../gtk/DetailsDialog.cc:1553
 msgid "Peer is an incoming connection"
-msgstr "Kişi, bir gelen bağlantıdır"
+msgstr "Eş, bir gelen bağlantıdır"
 
 #: ../gtk/DetailsDialog.cc:1557
 msgid "Peer is connected over µTP"
-msgstr "Kişi, µTP üzerinden bağlandı"
+msgstr "Eş, µTP üzerinden bağlandı"
 
 #: ../gtk/DetailsDialog.cc:1643
 msgid "Address"
@@ -457,12 +457,12 @@ msgstr "Daha _çok ayrıntı göster"
 #: ../gtk/DetailsDialog.cc:1869
 #, c-format
 msgid "Got a list of %1$s%2$'d peers%3$s %4$s ago"
-msgstr "%1$s%2$ kişiye sahip olan%3$s bir liste %4$s önce alındı"
+msgstr "%1$s%2$'d eşin%3$s listesi %4$s önce alındı"
 
 #: ../gtk/DetailsDialog.cc:1878
 #, c-format
 msgid "Peer list request %1$stimed out%2$s %3$s ago; will retry"
-msgstr "Kişi listesi isteği %3$s önce %1$szaman aşımına uğradı%2$s; yeniden denenecek"
+msgstr "%1$sEş listesi isteği%2$s %3$s önce zaman aşımına uğradı; yeniden deneyeceğiz"
 
 #: ../gtk/DetailsDialog.cc:1886
 #, c-format
@@ -476,16 +476,16 @@ msgstr "Belirlenmiş güncelleştirme yok"
 #: ../gtk/DetailsDialog.cc:1905
 #, c-format
 msgid "Asking for more peers in %s"
-msgstr "%s içinde daha çok kişi sorulacak"
+msgstr "%s içinde daha çok eş sorulacak"
 
 #: ../gtk/DetailsDialog.cc:1911
 msgid "Queued to ask for more peers"
-msgstr "Daha çok kişi sayısının sorulması için kuyruğa alındı"
+msgstr "Daha çok eş sayısının sorulması için kuyruğa alındı"
 
 #: ../gtk/DetailsDialog.cc:1918
 #, c-format
 msgid "Asking for more peers now… <small>%s</small>"
-msgstr "Şimdi daha çok kişi soruluyor… <small>%s</small>"
+msgstr "Şimdi daha çok eş soruluyor… <small>%s</small>"
 
 #: ../gtk/DetailsDialog.cc:1938
 #, c-format
@@ -500,16 +500,16 @@ msgstr "\"%s%s%s\" %s önce scrape hatası alındı"
 #: ../gtk/DetailsDialog.cc:1964
 #, c-format
 msgid "Asking for peer counts in %s"
-msgstr "%s içinde kişi sayısı sorulacak"
+msgstr "%s içinde eş sayısı sorulacak"
 
 #: ../gtk/DetailsDialog.cc:1970
 msgid "Queued to ask for peer counts"
-msgstr "Kişi sayısının sorulması için kuyruğa alındı"
+msgstr "Eş sayısının sorulması için kuyruğa alındı"
 
 #: ../gtk/DetailsDialog.cc:1977
 #, c-format
 msgid "Asking for peer counts now… <small>%s</small>"
-msgstr "Şimdi kişi sayısı soruluyor… <small>%s</small>"
+msgstr "Şimdi eş sayısı soruluyor… <small>%s</small>"
 
 #: ../gtk/DetailsDialog.cc:2224
 msgid "List contains invalid URLs"
@@ -530,7 +530,7 @@ msgstr "_Kaydet"
 
 #: ../gtk/DetailsDialog.cc:2271
 msgid "Tracker Announce URLs"
-msgstr "İzleyici Anons URL'leri"
+msgstr "İzleyici Duyuru URL'leri"
 
 #: ../gtk/DetailsDialog.cc:2275
 msgid ""
@@ -557,7 +557,7 @@ msgstr "İzleyici"
 
 #: ../gtk/DetailsDialog.cc:2387
 msgid "_Announce URL:"
-msgstr "_Anons URL'si:"
+msgstr "_Duyuru URL'si:"
 
 #: ../gtk/DetailsDialog.cc:2446 ../gtk/DetailsDialog.cc:2575
 msgid "Trackers"
@@ -586,7 +586,7 @@ msgstr "Bilgi"
 
 #: ../gtk/DetailsDialog.cc:2574
 msgid "Peers"
-msgstr "Kişiler"
+msgstr "Eşler"
 
 #: ../gtk/DetailsDialog.cc:2579
 msgid "File listing not available for combined torrent properties"
@@ -640,13 +640,13 @@ msgstr[1] "Bu torrentlerin indirilmesi bitmedi."
 msgid "This torrent is connected to peers."
 msgid_plural "These torrents are connected to peers."
 msgstr[0] "Bu torrent eşlere bağlı."
-msgstr[1] "Bu torrentler kişilere bağlandı."
+msgstr[1] "Bu torrentler eşlere bağlı."
 
 #: ../gtk/Dialogs.cc:82
 msgid "One of these torrents is connected to peers."
 msgid_plural "Some of these torrents are connected to peers."
 msgstr[0] "Bu torrentlerin biri eşlere bağlı."
-msgstr[1] "Bu torrentlerin bazıları kişilere bağlandı."
+msgstr[1] "Bu torrentlerin bazıları eşlere bağlı."
 
 #: ../gtk/Dialogs.cc:95
 msgid "One of these torrents has not finished downloading."
@@ -831,7 +831,7 @@ msgstr "İptal edildi"
 #: ../gtk/MakeDialog.cc:124
 #, c-format
 msgid "Error: invalid announce URL \"%s\""
-msgstr "Hata: Geçersiz anons URL'si \"%s\""
+msgstr "Hata: Geçersiz duyuru URL'si \"%s\""
 
 #: ../gtk/MakeDialog.cc:128
 #, c-format
@@ -1369,19 +1369,19 @@ msgstr "Yönelticimden _yönlendirirken UPnP ya da NAT-PMP bağlantı noktasın�
 
 #: ../gtk/PrefsDialog.cc:1052
 msgid "Peer Limits"
-msgstr "Kişi Sınırları"
+msgstr "Eş Sınırları"
 
 #: ../gtk/PrefsDialog.cc:1054
 msgid "Maximum peers per _torrent:"
-msgstr "_Torrent başına en fazla kişi:"
+msgstr "_Torrent başına azami eş sayısı:"
 
 #: ../gtk/PrefsDialog.cc:1055
 msgid "Maximum peers _overall:"
-msgstr "_Genel en fazla kişi:"
+msgstr "_Genel azami eş sayısı:"
 
 #: ../gtk/PrefsDialog.cc:1063
 msgid "Enable _uTP for peer communication"
-msgstr "Kişi iletişimi için _uTP'yi etkinleştir"
+msgstr "Eş iletişimi için _uTP'yi etkinleştir"
 
 #: ../gtk/PrefsDialog.cc:1064
 msgid "uTP is a tool for reducing network congestion."
@@ -1389,27 +1389,27 @@ msgstr "uTP, ağ tıkanıklığını azaltmaya yarayan araçtır."
 
 #: ../gtk/PrefsDialog.cc:1068
 msgid "Use PE_X to find more peers"
-msgstr "Daha fazla kişi bulmak için PE_X kullan"
+msgstr "Daha çok eş bulmak için PE_X kullan"
 
 #: ../gtk/PrefsDialog.cc:1069
 msgid "PEX is a tool for exchanging peer lists with the peers you're connected to."
-msgstr "PEX, bağlı olduğunuz kişilerle kişi listelerini takas etmeniz için bir araçtır."
+msgstr "PEX bağlı olduğunuz eşlerle, eş listenizi paylaşmanıza yarayan araçtır."
 
 #: ../gtk/PrefsDialog.cc:1072
 msgid "Use _DHT to find more peers"
-msgstr "Daha çok kişi bulmak için _DHT kullan"
+msgstr "Daha çok eş bulmak için _DHT kullan"
 
 #: ../gtk/PrefsDialog.cc:1073
 msgid "DHT is a tool for finding peers without a tracker."
-msgstr "DHT, bir izleyici olmadan kişi bulmak için bir araçtır."
+msgstr "DHT, izleyiciye gereksinmeden eş bulma aracıdır."
 
 #: ../gtk/PrefsDialog.cc:1076
 msgid "Use _Local Peer Discovery to find more peers"
-msgstr "Daha çok kişi bulmak için _Yerel Kişi Keşfini kullan"
+msgstr "Daha çok eş bulmak için _Yerel Eş Keşfini kullan"
 
 #: ../gtk/PrefsDialog.cc:1077
 msgid "LPD is a tool for finding peers on your local network."
-msgstr "LPD, yerel ağınızda kişileri bulmak için bir araçtır."
+msgstr "LPD, yerel ağınızda eşleri bulmak için bir araçtır."
 
 #: ../gtk/PrefsDialog.cc:1081
 msgid "Default Public Trackers"
@@ -1674,8 +1674,8 @@ msgstr "Üstveri %1$'d %2$s üzerinden indiriliyor (%3$d%% tamamlandı)"
 #: ../gtk/TorrentCellRenderer.cc:256 ../gtk/TorrentCellRenderer.cc:266 ../gtk/TorrentCellRenderer.cc:285
 msgid "peer"
 msgid_plural "peers"
-msgstr[0] "kişi"
-msgstr[1] "kişi"
+msgstr[0] "eş"
+msgstr[1] "eş"
 
 #: ../gtk/TorrentCellRenderer.cc:263
 #, c-format
@@ -1703,7 +1703,7 @@ msgstr "%1$'d / %2$'d %3$s üzerinden indiriliyor"
 msgid "Seeding to %1$'d of %2$'d connected peer"
 msgid_plural "Seeding to %1$'d of %2$'d connected peers"
 msgstr[0] "%1$'d / %2$'d bağlı eşe gönderiliyor"
-msgstr[1] "%1$'d / %2$'d bağlı kişiye gönderiliyor"
+msgstr[1] "%1$'d / %2$'d bağlı eşe gönderiliyor"
 
 #: ../gtk/Utils.cc:36
 msgid "KiB"
@@ -1854,7 +1854,7 @@ msgstr "Dosyaları BitTorrent üzerinden indir ve paylaş"
 #. Translators: Search terms to find this application. Do NOT translate or localize the semicolons! The list MUST also end with a semicolon!
 #: ../gtk/transmission-gtk.desktop.in:7
 msgid "torrents;downloading;uploading;share;sharing;"
-msgstr "torrentler;indirme;gönderme;paylaş;paylaşım;"
+msgstr "torrentler;indirme;yükleme;gönderme;paylaş;paylaşım;"
 
 #: ../gtk/transmission-gtk.desktop.in:21
 msgid "Start Transmission with All Torrents Paused"
@@ -2066,7 +2066,7 @@ msgstr "Parola gerekli"
 #: ../libtransmission/rpc-server.cc:1052
 #, c-format
 msgid "Serving RPC and Web requests from directory '%s'"
-msgstr ""
+msgstr "'%s' dizininden RPC ve Web istekleri sunuluyor"
 
 #. first %s is the application name
 #. second %s is the version number
@@ -2182,10 +2182,10 @@ msgstr "Torrent doğrulanıyor"
 #~ msgstr "%s bir IPv4 veya IPv6 adresi değil. RPC dinleyicileri, IPv4 veya IPv6 olmak zorundadır"
 
 #~ msgid "Ask Tracker for _More Peers"
-#~ msgstr "İzleyiciye Daha _Çok Kişi Sor"
+#~ msgstr "İzleyiciye Daha _Çok Eş Sor"
 
 #~ msgid "BitTorrent is a peer-to-peer file-sharing protocol that is commonly used to distribute large amounts of data between multiple users."
-#~ msgstr "BitTorrent, birden çok kullanıcı arasında büyük miktarda veriyi dağıtmak için yaygın olarak kullanılan, kişiden-kişiye bir dosya paylaşım protokolüdür."
+#~ msgstr "BitTorrent; çok sayıda kullanıcı arasında büyük miktarda veri dağıtmak için yaygınca kullanılan, eşten eşe dosya paylaşım iletişim kuralıdır."
 
 #~ msgid "Call scrip_t when torrent is completed:"
 #~ msgstr "Torrent tamamlandığında _betiği çağır:"
@@ -2244,7 +2244,7 @@ msgstr "Torrent doğrulanıyor"
 #~ msgstr "En _Üste Taşı"
 
 #~ msgid "Notable features of Transmission include support for Local Peer Discovery, encryption, DHT, µTP, PEX and Magnet Link."
-#~ msgstr "Transmission'ın dikkate değer özellikleri arasında Yerel Kişi Keşfi, şifreleme, DHT, µTP, PEX ve Magnet Bağlantısı desteği bulunur."
+#~ msgstr "Transmission'ın dikkate değer özellikleri arasında Yerel Eş Keşfi, şifreleme, DHT, µTP, PEX ve Magnet Bağlantısı desteği bulunur."
 
 #~ msgid "Open Fold_er"
 #~ msgstr "_Klasörü Aç"

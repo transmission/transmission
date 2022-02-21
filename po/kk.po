@@ -3,20 +3,24 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
+# Translators:
+# Mike Gelfand <mikedld@mikedld.com>, 2018
+# Baurzhan Muftakhidinov <baurthefirst@gmail.com>, 2020
+#
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-21 21:24+0000\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: Baurzhan Muftakhidinov <baurthefirst@gmail.com>, 2017\n"
+"POT-Creation-Date: 2022-02-21 21:26+0000\n"
+"PO-Revision-Date: 2017-01-26 19:47+0000\n"
+"Last-Translator: Baurzhan Muftakhidinov <baurthefirst@gmail.com>, 2020\n"
 "Language-Team: Kazakh (https://www.transifex.com/transmissionbt/teams/33778/kk/)\n"
 "Language: kk\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
+"Plural-Forms: nplurals=2; plural=(n!=1);\n"
 
 #: ../cli/cli.cc:103 ../gtk/Utils.cc:90 ../libtransmission/utils.cc:1074
 msgid "None"
@@ -34,7 +38,7 @@ msgstr "%d сигналы алынды; таза сөндіріп көреміз
 
 #: ../gtk/Application.cc:704
 msgid "Transmission is a file sharing program. When you run a torrent, its data will be made available to others by means of upload. Any content you share is your sole responsibility."
-msgstr ""
+msgstr "Transmission - бұл файлдармен бөлісу бағдарламасы. Торрентті іске қосқан кезде оның деректері кері жүктеу арқылы басқаларға қол жетімді болады. Сіз бөлісетін кез-келген мазмұн - сіздің жеке жауапкершілігіңіз."
 
 #. make the dialog
 #: ../gtk/Application.cc:710 ../gtk/DetailsDialog.cc:2265 ../gtk/DetailsDialog.cc:2375 ../gtk/Dialogs.cc:114 ../gtk/MakeDialog.cc:208 ../gtk/MessageLogWindow.cc:229 ../gtk/OptionsDialog.cc:280 ../gtk/OptionsDialog.cc:440 ../gtk/OptionsDialog.cc:500 ../gtk/RelocateDialog.cc:160 ../gtk/StatsDialog.cc:100
@@ -61,11 +65,13 @@ msgstr "Қазір _шығу"
 msgid "Couldn't add corrupt torrent"
 msgid_plural "Couldn't add corrupt torrents"
 msgstr[0] "Зақымдалған торренттерді қосу мүмкін емес"
+msgstr[1] "Зақымдалған торренттерді қосу мүмкін емес"
 
 #: ../gtk/Application.cc:962
 msgid "Couldn't add duplicate torrent"
 msgid_plural "Couldn't add duplicate torrents"
 msgstr[0] "Қайталанатын торренттерді қосу мүмкін емес"
+msgstr[1] "Қайталанатын торренттерді қосу мүмкін емес"
 
 #: ../gtk/Application.cc:1280
 msgid "A fast and easy BitTorrent client"
@@ -229,12 +235,14 @@ msgstr "Белгісіз"
 msgid "%1$s (%2$'d piece @ %3$s)"
 msgid_plural "%1$s (%2$'d pieces @ %3$s)"
 msgstr[0] "%1$s (%2$'d бөлім @ %3$s)"
+msgstr[1] "%1$s (%2$'d бөлім @ %3$s)"
 
 #: ../gtk/DetailsDialog.cc:855
 #, c-format
 msgid "%1$s (%2$'d piece)"
 msgid_plural "%1$s (%2$'d pieces)"
 msgstr[0] "%1$s (%2$'d бөлім)"
+msgstr[1] "%1$s (%2$'d бөлім)"
 
 #: ../gtk/DetailsDialog.cc:893
 #, c-format
@@ -607,37 +615,44 @@ msgstr "%'d Торрент қасиеттері"
 msgid "Remove torrent?"
 msgid_plural "Remove %d torrents?"
 msgstr[0] "%d торрентті өшіру керек пе?"
+msgstr[1] "%d торрентті өшіру керек пе?"
 
 #: ../gtk/Dialogs.cc:55
 #, c-format
 msgid "Delete this torrent's downloaded files?"
 msgid_plural "Delete these %d torrents' downloaded files?"
 msgstr[0] "Бұл %d торренттің жүктелген файлдарын өшіру керек пе?"
+msgstr[1] "Бұл %d торренттің жүктелген файлдарын өшіру керек пе?"
 
 #: ../gtk/Dialogs.cc:62
 msgid "Once removed, continuing the transfer will require the torrent file or magnet link."
 msgid_plural "Once removed, continuing the transfers will require the torrent files or magnet links."
 msgstr[0] "Өшірілсе, торренті қайта жалғастыру үшін торрент файлдар не сілтемесі керек болады."
+msgstr[1] "Өшірілсе, торренті қайта жалғастыру үшін торрент файлдар не сілтемесі керек болады."
 
 #: ../gtk/Dialogs.cc:69
 msgid "This torrent has not finished downloading."
 msgid_plural "These torrents have not finished downloading."
 msgstr[0] "Бұл торренттердің жүктелуі аяқталмаған."
+msgstr[1] "Бұл торренттердің жүктелуі аяқталмаған."
 
 #: ../gtk/Dialogs.cc:75
 msgid "This torrent is connected to peers."
 msgid_plural "These torrents are connected to peers."
 msgstr[0] "Бұл торренттер тораптарға қосулы тұр."
+msgstr[1] "Бұл торренттер тораптарға қосулы тұр."
 
 #: ../gtk/Dialogs.cc:82
 msgid "One of these torrents is connected to peers."
 msgid_plural "Some of these torrents are connected to peers."
 msgstr[0] "Бұл торренттердің кейбіреулері тораптарға қосулы тұр."
+msgstr[1] "Бұл торренттердің кейбіреулері тораптарға қосулы тұр."
 
 #: ../gtk/Dialogs.cc:95
 msgid "One of these torrents has not finished downloading."
 msgid_plural "Some of these torrents have not finished downloading."
 msgstr[0] "Бұл торренттердің кейбіреулерінің жүктелуі аяқталмаған."
+msgstr[1] "Бұл торренттердің кейбіреулерінің жүктелуі аяқталмаған."
 
 #: ../gtk/Dialogs.cc:115
 msgid "_Delete"
@@ -847,12 +862,14 @@ msgstr "Көзі таңдалмаған"
 msgid "%1$s; %2$'d File"
 msgid_plural "%1$s; %2$'d Files"
 msgstr[0] "%1$s; %2$'d файл"
+msgstr[1] "%1$s; %2$'d файл"
 
 #: ../gtk/MakeDialog.cc:344
 #, c-format
 msgid "%1$'d Piece @ %2$s"
 msgid_plural "%1$'d Pieces @ %2$s"
 msgstr[0] "%1$'d бөлім @ %2$s"
+msgstr[1] "%1$'d бөлім @ %2$s"
 
 #: ../gtk/MakeDialog.cc:440
 msgid "_New"
@@ -1122,6 +1139,7 @@ msgstr "Торрент аяқ_талғанда дыбысты ойнату"
 msgid "Blocklist contains %'d rule"
 msgid_plural "Blocklist contains %'d rules"
 msgstr[0] "Блоктізімде %'d ереже бар"
+msgstr[1] "Блоктізімде %'d ереже бар"
 
 #: ../gtk/PrefsDialog.cc:440
 msgid "<b>Unable to update.</b>"
@@ -1136,6 +1154,7 @@ msgstr "<b>Жаңарту сәтті аяқталды!</b>"
 msgid "Blocklist has %'d rule."
 msgid_plural "Blocklist has %'d rules."
 msgstr[0] "Блоктізімде %'d ереже бар."
+msgstr[1] "Блоктізімде %'d ереже бар."
 
 #: ../gtk/PrefsDialog.cc:451
 msgid "Update Blocklist"
@@ -1498,6 +1517,7 @@ msgstr "Ұйықтау режиміне өтуге рұқсат беру"
 msgid "Started %'d time"
 msgid_plural "Started %'d times"
 msgstr[0] "%'d рет қосылған"
+msgstr[1] "%'d рет қосылған"
 
 #: ../gtk/StatsDialog.cc:99
 msgid "Reset your statistics?"
@@ -1651,6 +1671,7 @@ msgstr ""
 msgid "peer"
 msgid_plural "peers"
 msgstr[0] "торап"
+msgstr[1] "торап"
 
 #: ../gtk/TorrentCellRenderer.cc:263
 #, c-format
@@ -1661,6 +1682,7 @@ msgstr ""
 msgid "web seed"
 msgid_plural "web seeds"
 msgstr[0] "веб-сидерлер"
+msgstr[1] "веб-сидерлер"
 
 #: ../gtk/TorrentCellRenderer.cc:274
 #, c-format
@@ -1677,6 +1699,7 @@ msgstr ""
 msgid "Seeding to %1$'d of %2$'d connected peer"
 msgid_plural "Seeding to %1$'d of %2$'d connected peers"
 msgstr[0] "Тарату %1$'d торапқа, барлығы %2$'d торап қосулы"
+msgstr[1] "Тарату %1$'d торапқа, барлығы %2$'d торап қосулы"
 
 #: ../gtk/Utils.cc:36
 msgid "KiB"
@@ -1731,24 +1754,28 @@ msgstr "ТБ/с"
 msgid "%'d day"
 msgid_plural "%'d days"
 msgstr[0] "%'d күн"
+msgstr[1] "%'d күн"
 
 #: ../gtk/Utils.cc:106
 #, c-format
 msgid "%'d hour"
 msgid_plural "%'d hours"
 msgstr[0] "%'d сағат"
+msgstr[1] "%'d сағат"
 
 #: ../gtk/Utils.cc:107
 #, c-format
 msgid "%'d minute"
 msgid_plural "%'d minutes"
 msgstr[0] "%'d минут"
+msgstr[1] "%'d минут"
 
 #: ../gtk/Utils.cc:108
 #, c-format
 msgid "%'d second"
 msgid_plural "%'d seconds"
 msgstr[0] "%'d секунд"
+msgstr[1] "%'d секунд"
 
 #: ../gtk/Utils.cc:156
 #, c-format
@@ -1843,7 +1870,7 @@ msgstr "Байланысты орнату сәтсіз аяқталды"
 
 #: ../libtransmission/announcer.cc:1000 ../libtransmission/announcer.cc:1324
 msgid "Could not connect to tracker"
-msgstr ""
+msgstr "Трекерге байланысу мүмкін емес"
 
 #: ../libtransmission/announcer.cc:1004 ../libtransmission/announcer.cc:1328
 msgid "Tracker did not respond"
@@ -2168,10 +2195,6 @@ msgstr "Торрентті тексеру"
 #~ msgstr "А_льтернативті жылдамдық шектеулерін іске қосу"
 
 #, c-format
-#~ msgid "Error opening \"%s\""
-#~ msgstr "\"%s\" ашу қатесі"
-
-#, c-format
 #~ msgid "File \"%s\" is in the way"
 #~ msgstr "«%s» файлы жол үстінде"
 
@@ -2227,10 +2250,6 @@ msgstr "Торрентті тексеру"
 
 #~ msgid "Select _All"
 #~ msgstr "Б_арлығын ерекшелеу"
-
-#, c-format
-#~ msgid "Server returned \"%1$ld %2$s\""
-#~ msgstr "Сервер \"%1$ld %2$s\" қайтарды"
 
 #~ msgid "Set _Location…"
 #~ msgstr "Ор_наласуды көрсету..."
@@ -2300,9 +2319,6 @@ msgstr "Торрентті тексеру"
 #, c-format
 #~ msgid "Tracker will allow requests in %s"
 #~ msgstr "Трекер сұранымдарды %s кейін рұсқат етеді"
-
-#~ msgid "Transmission BitTorrent Client"
-#~ msgstr "Transmission BitTorrent қолданбасы"
 
 #~ msgid "_Compact View"
 #~ msgstr "Ық_шам көрінісі"

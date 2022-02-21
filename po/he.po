@@ -6,17 +6,17 @@
 # Translators:
 # Mike Gelfand <mikedld@mikedld.com>, 2018
 # Yaron Shahrabani <sh.yaron@gmail.com>, 2020
-# Omer I.S., 2020
-# Avi Markovitz <avi.markovitz@gmail.com>, 2020
+# Avi Markovitz <avi.markovitz@gmail.com>, 2021
+# Omer I.S. <omeritzicschwartz@gmail.com>, 2021
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-21 21:24+0000\n"
+"POT-Creation-Date: 2022-02-21 21:26+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Avi Markovitz <avi.markovitz@gmail.com>, 2020\n"
+"Last-Translator: Omer I.S. <omeritzicschwartz@gmail.com>, 2021\n"
 "Language-Team: Hebrew (https://www.transifex.com/transmissionbt/teams/33778/he/)\n"
 "Language: he\n"
 "MIME-Version: 1.0\n"
@@ -31,7 +31,7 @@ msgstr "ללא"
 #: ../gtk/Application.cc:347
 #, c-format
 msgid "Error registering Transmission as a %s handler: %s"
-msgstr "Error registering Transmission as a %s handler: %s"
+msgstr "שגיאת רישום ‏Transmission כסדרן%s: %s"
 
 #: ../gtk/Application.cc:502
 #, c-format
@@ -40,7 +40,7 @@ msgstr "Got signal %d; trying to shut down cleanly. Do it again if it gets stuck
 
 #: ../gtk/Application.cc:704
 msgid "Transmission is a file sharing program. When you run a torrent, its data will be made available to others by means of upload. Any content you share is your sole responsibility."
-msgstr "Transmission היא תכנה לשיתוף קבצים. כאשר טורנט מופעל, הנתונים בו יהיו נגישים לאחרים דרך מנגנון ההעלאה. כל תוכן שישותף הוא על אחריותכם הבלעדית."
+msgstr "‏Transmission היא תכנה לשיתוף קבצים. כאשר טורנט מופעל, הנתונים בו יהיו נגישים לאחרים דרך מנגנון ההעלאה. כל תוכן שישותף הוא על אחריותכם הבלעדית."
 
 #. make the dialog
 #: ../gtk/Application.cc:710 ../gtk/DetailsDialog.cc:2265 ../gtk/DetailsDialog.cc:2375 ../gtk/Dialogs.cc:114 ../gtk/MakeDialog.cc:208 ../gtk/MessageLogWindow.cc:229 ../gtk/OptionsDialog.cc:280 ../gtk/OptionsDialog.cc:440 ../gtk/OptionsDialog.cc:500 ../gtk/RelocateDialog.cc:160 ../gtk/StatsDialog.cc:100
@@ -184,7 +184,7 @@ msgstr "בהמתנה לאימות"
 
 #: ../gtk/DetailsDialog.cc:561
 msgid "Verifying local data"
-msgstr "הנתונים המקומיים באימות"
+msgstr "הנתונים המקומיים בהליכי אימות"
 
 #: ../gtk/DetailsDialog.cc:564 ../gtk/TorrentCellRenderer.cc:188
 msgid "Queued for download"
@@ -193,7 +193,7 @@ msgstr "בתור להורדה"
 #: ../gtk/DetailsDialog.cc:567 ../gtk/FilterBar.cc:517
 msgctxt "Verb"
 msgid "Downloading"
-msgstr "בהורדה"
+msgstr "בהליכי הורדה"
 
 #: ../gtk/DetailsDialog.cc:570 ../gtk/TorrentCellRenderer.cc:192
 msgid "Queued for seeding"
@@ -202,7 +202,7 @@ msgstr "בתור לזריעה"
 #: ../gtk/DetailsDialog.cc:573 ../gtk/FilterBar.cc:518
 msgctxt "Verb"
 msgid "Seeding"
-msgstr "זריעה"
+msgstr "בזריעה"
 
 #: ../gtk/DetailsDialog.cc:576 ../gtk/FilterBar.cc:520 ../gtk/TorrentCellRenderer.cc:180
 msgid "Finished"
@@ -226,7 +226,7 @@ msgstr "לא נבחרו טורנטים"
 
 #: ../gtk/DetailsDialog.cc:645
 msgid "Private to this tracker -- DHT and PEX disabled"
-msgstr "פרטי לגשש זה -- DHT ו־ PEX מנוטרלים"
+msgstr "פרטי לגשש זה -- DHT ו־PEX מנוטרלים"
 
 #: ../gtk/DetailsDialog.cc:645
 msgid "Public torrent"
@@ -300,7 +300,7 @@ msgstr "אין שגיאות"
 
 #: ../gtk/DetailsDialog.cc:1014
 msgid "Never"
-msgstr "לעולם לא"
+msgstr "אף פעם"
 
 #: ../gtk/DetailsDialog.cc:1022
 msgid "Active now"
@@ -321,11 +321,11 @@ msgstr "גודל הטורנט:"
 
 #: ../gtk/DetailsDialog.cc:1049
 msgid "Have:"
-msgstr "יש:"
+msgstr "קיימים:"
 
 #: ../gtk/DetailsDialog.cc:1054 ../gtk/StatsDialog.cc:147 ../gtk/StatsDialog.cc:168
 msgid "Uploaded:"
-msgstr "עלו:"
+msgstr "הועלו:"
 
 #: ../gtk/DetailsDialog.cc:1059 ../gtk/StatsDialog.cc:150 ../gtk/StatsDialog.cc:171
 msgid "Downloaded:"
@@ -337,7 +337,7 @@ msgstr "מצב:"
 
 #: ../gtk/DetailsDialog.cc:1069
 msgid "Running time:"
-msgstr "זמן הפעילות:"
+msgstr "זמן פעילות:"
 
 #: ../gtk/DetailsDialog.cc:1074
 msgid "Remaining time:"
@@ -381,7 +381,7 @@ msgstr "שחרור בלימה אופטימי"
 
 #: ../gtk/DetailsDialog.cc:1517
 msgid "Downloading from this peer"
-msgstr "הורדה מהעמית הזה"
+msgstr "מתבצעת הורדה מעמית זה"
 
 #: ../gtk/DetailsDialog.cc:1521
 msgid "We would download from this peer if they would let us"
@@ -453,7 +453,7 @@ msgstr "בוטל מצדנו"
 
 #: ../gtk/DetailsDialog.cc:1701
 msgid "They Cancelled"
-msgstr "בוטל מצדם"
+msgstr "בוטל על ידם"
 
 #: ../gtk/DetailsDialog.cc:1709 ../gtk/DetailsDialog.cc:1783
 msgid "Down"
@@ -607,7 +607,7 @@ msgstr "_סגירה"
 
 #: ../gtk/DetailsDialog.cc:2573 ../gtk/MessageLogWindow.cc:413
 msgid "Information"
-msgstr "נתונים"
+msgstr "מידע"
 
 #: ../gtk/DetailsDialog.cc:2574
 msgid "Peers"
@@ -639,10 +639,10 @@ msgstr "מאפיינים של %'d טורנטים"
 #, c-format
 msgid "Remove torrent?"
 msgid_plural "Remove %d torrents?"
-msgstr[0] "הסרת טורנט?"
-msgstr[1] "הסרת %d טורנטים?"
-msgstr[2] "הסרת %d טורנטים?"
-msgstr[3] "הסרת %d טורנטים?"
+msgstr[0] "להסיר את הטורנט?"
+msgstr[1] "להסיר %d טורנטים?"
+msgstr[2] "להסיר %d טורנטים?"
+msgstr[3] "להסיר %d טורנטים?"
 
 #: ../gtk/Dialogs.cc:55
 #, c-format
@@ -703,7 +703,7 @@ msgstr "גבוהה"
 
 #: ../gtk/FileList.cc:562 ../gtk/Utils.cc:390
 msgid "Normal"
-msgstr "תקנית"
+msgstr "רגילה"
 
 #: ../gtk/FileList.cc:566 ../gtk/Utils.cc:391
 msgid "Low"
@@ -725,7 +725,7 @@ msgstr "גודל"
 #. add "progress" column
 #: ../gtk/FileList.cc:872
 msgid "Have"
-msgstr "יש"
+msgstr "קיימים"
 
 #. add "enabled" column
 #: ../gtk/FileList.cc:888
@@ -752,7 +752,7 @@ msgstr "באימות"
 
 #: ../gtk/FilterBar.cc:522 ../gtk/FreeSpaceLabel.cc:50 ../gtk/MessageLogWindow.cc:412
 msgid "Error"
-msgstr "שגויים"
+msgstr "שגיאה"
 
 #: ../gtk/FilterBar.cc:714
 #, c-format
@@ -829,7 +829,7 @@ msgstr "העברה כוללת"
 
 #: ../gtk/MainWindow.cc:426
 msgid "Session Transfer"
-msgstr "העברת מופע"
+msgstr "העברות מופע"
 
 #: ../gtk/MainWindow.cc:526 ../gtk/StatsDialog.cc:125
 msgid "Statistics"
@@ -851,12 +851,12 @@ msgstr "הורדה: %1$s, העלאה: %2$s"
 #: ../gtk/MainWindow.cc:611
 #, c-format
 msgid "size|Down: %1$s, Up: %2$s"
-msgstr "ירד: %1$s, הועלה: %2$s"
+msgstr "ירדו: %1$s, הועלו: %2$s"
 
 #: ../gtk/MakeDialog.cc:112
 #, c-format
 msgid "Creating \"%s\""
-msgstr "„%s” בהליכי יצירה"
+msgstr "מתבצעת יצירת „%s”"
 
 #: ../gtk/MakeDialog.cc:116
 #, c-format
@@ -870,7 +870,7 @@ msgstr "בוטל"
 #: ../gtk/MakeDialog.cc:124
 #, c-format
 msgid "Error: invalid announce URL \"%s\""
-msgstr "שגיאה: כתובת ההכרזה שגויה „%s”"
+msgstr "שגיאה: כתובת הכרזה שגויה „%s”"
 
 #: ../gtk/MakeDialog.cc:128
 #, c-format
@@ -947,8 +947,8 @@ msgid ""
 "To add a backup URL, add it on the line after the primary URL.\n"
 "To add another primary URL, add it after a blank line."
 msgstr ""
-"כדי להוסיף כתובת גיבוי יש להוסיף אותה בשורה שלאחר הכתובת העיקרית.\n"
-"כדי להוסיף כתובת עיקרית נוספת, יש להוסיף אותה לאחר שורה ריקה."
+"כדי להוסיף כתובת גיבוי יש להוסיפה בשורה שלאחר הכתובת העיקרית.\n"
+"כדי להוסיף כתובת עיקרית נוספת, יש להוסיפה לאחר שורה ריקה."
 
 #: ../gtk/MakeDialog.cc:496
 msgid "_Trackers:"
@@ -1091,15 +1091,15 @@ msgstr "_כתובת"
 #: ../gtk/PrefsDialog.cc:252
 msgctxt "Gerund"
 msgid "Adding"
-msgstr "מתווסף"
+msgstr "בהליכי הוספה"
 
 #: ../gtk/PrefsDialog.cc:255
 msgid "Automatically add .torrent files _from:"
-msgstr "להוסיף אוטומטית _קובצי ‎.torrent מ־:"
+msgstr "הוספה _קובצי .torrent אוטומטית מתוך:"
 
 #: ../gtk/PrefsDialog.cc:262
 msgid "Show the Torrent Options _dialog"
-msgstr "הצגת  _דו־ שיח אפשרויות טורנט"
+msgstr "הצגת _דו־שיח לאפשרויות הטורנט"
 
 #: ../gtk/PrefsDialog.cc:264
 msgid "_Start added torrents"
@@ -1119,7 +1119,7 @@ msgstr "כמות מ_רבית של הורדות פעילות:"
 
 #: ../gtk/PrefsDialog.cc:284
 msgid "Downloads sharing data in the last _N minutes are active:"
-msgstr "הורדות שחולקות נתונים ב־ N הדקות ה_אחרונות הן פעילות:"
+msgstr "הורדות שחולקות נתונים ב־N הדקות ה_אחרונות הן פעילות:"
 
 #: ../gtk/PrefsDialog.cc:288 ../libtransmission/torrent.cc:1648
 msgid "Incomplete"
@@ -1163,7 +1163,7 @@ msgstr "למ_נוע תרדמת כאשר יש טורנטים פעילים"
 
 #: ../gtk/PrefsDialog.cc:368
 msgid "Show Transmission icon in the _notification area"
-msgstr "הצגת הסמל של Transmission באזור ההו_דעות"
+msgstr "הצגת סמל ‏Transmission באזור ההו_דעות"
 
 #: ../gtk/PrefsDialog.cc:371
 msgid "Notification"
@@ -1258,7 +1258,7 @@ msgstr "גישה מרחוק"
 #. "enabled" checkbutton
 #: ../gtk/PrefsDialog.cc:686
 msgid "Allow _remote access"
-msgstr "אפשור _גישה מרחוק"
+msgstr "לאפשר _גישה מרחוק"
 
 #: ../gtk/PrefsDialog.cc:690
 msgid "_Open web client"
@@ -1279,12 +1279,12 @@ msgstr "שם _משתמש:"
 
 #: ../gtk/PrefsDialog.cc:716
 msgid "Pass_word:"
-msgstr "סס_מה:"
+msgstr "סיס_מה:"
 
 #. require authentication
 #: ../gtk/PrefsDialog.cc:719
 msgid "Only allow these IP a_ddresses:"
-msgstr "אפשור רק  _כתובות ה־ IP האלה:"
+msgstr "לאפשר רק את _כתובות IP אלו:"
 
 #: ../gtk/PrefsDialog.cc:733
 msgid "IP addresses may use wildcards, such as 192.168.*.*"
@@ -1300,7 +1300,7 @@ msgstr "כל יום"
 
 #: ../gtk/PrefsDialog.cc:848
 msgid "Weekdays"
-msgstr "ימות השבוע"
+msgstr "ימי השבוע"
 
 #: ../gtk/PrefsDialog.cc:849
 msgid "Weekends"
@@ -1332,7 +1332,7 @@ msgstr "יום שישי"
 
 #: ../gtk/PrefsDialog.cc:856
 msgid "Saturday"
-msgstr "שבת"
+msgstr "יום שבת"
 
 #: ../gtk/PrefsDialog.cc:871
 msgid "Speed Limits"
@@ -1392,7 +1392,7 @@ msgstr "הפתחה <b>פתוחה</b>"
 
 #: ../gtk/PrefsDialog.cc:1002
 msgid "<i>Testing TCP port…</i>"
-msgstr "<i>פתחת ה־ TCP בבדיקה…</i>"
+msgstr "<i>פתחת TCP נבדקת…</i>"
 
 #: ../gtk/PrefsDialog.cc:1024
 msgid "Listening Port"
@@ -1408,7 +1408,7 @@ msgstr "_בדיקת הפתחה"
 
 #: ../gtk/PrefsDialog.cc:1043
 msgid "Pick a _random port every time Transmission is started"
-msgstr "יש לבחור בפתחה _אקראית עם כל הפעלה של Transmission"
+msgstr "יש לבחור בפתחה _אקראית עם כל הפעלה של ‏Transmission"
 
 #: ../gtk/PrefsDialog.cc:1049
 msgid "Use UPnP or NAT-PMP port _forwarding from my router"
@@ -1436,7 +1436,7 @@ msgstr "uTP הוא כלי להפחתת העומס ברשת."
 
 #: ../gtk/PrefsDialog.cc:1068
 msgid "Use PE_X to find more peers"
-msgstr "להשתמש ב־ PEX כדי למ_צוא עוד עמיתים"
+msgstr "שימוש ב־PEX למ_ציאת עמיתים נוספים"
 
 #: ../gtk/PrefsDialog.cc:1069
 msgid "PEX is a tool for exchanging peer lists with the peers you're connected to."
@@ -1444,7 +1444,7 @@ msgstr "PEX הוא כלי להחלפת רשימות עמיתים עם העמית
 
 #: ../gtk/PrefsDialog.cc:1072
 msgid "Use _DHT to find more peers"
-msgstr "לה_שתמש ב־ DHT כדי למצוא עוד עמיתים"
+msgstr "לה_שתמש ב־DHT כדי למצוא עמיתים נוספים"
 
 #: ../gtk/PrefsDialog.cc:1073
 msgid "DHT is a tool for finding peers without a tracker."
@@ -1472,7 +1472,7 @@ msgstr ""
 
 #: ../gtk/PrefsDialog.cc:1131
 msgid "Transmission Preferences"
-msgstr "העדפות Transmission"
+msgstr "העדפות ‏Transmission"
 
 #: ../gtk/PrefsDialog.cc:1147
 msgid "_Help"
@@ -1481,7 +1481,7 @@ msgstr "_עזרה"
 #: ../gtk/PrefsDialog.cc:1156
 msgctxt "Gerund"
 msgid "Downloading"
-msgstr "בהורדה"
+msgstr "בהליכי הורדה"
 
 #: ../gtk/PrefsDialog.cc:1157
 msgctxt "Gerund"
@@ -1499,7 +1499,7 @@ msgstr "מרוחק"
 #: ../gtk/RelocateDialog.cc:75
 #, c-format
 msgid "Moving \"%s\""
-msgstr "„%s” מועבר"
+msgstr "‏„%s” בהליכי העברה"
 
 #: ../gtk/RelocateDialog.cc:84
 msgid "Couldn't move torrent"
@@ -1594,7 +1594,7 @@ msgstr "יחס שיתוף:"
 
 #: ../gtk/StatsDialog.cc:156 ../gtk/StatsDialog.cc:177
 msgid "Duration:"
-msgstr "פעילות:"
+msgstr "משך זמן:"
 
 #: ../gtk/StatsDialog.cc:159
 msgid "Total"
@@ -1620,7 +1620,7 @@ msgid ""
 "Up: %1$s %2$s\n"
 "Down: %3$s %4$s"
 msgstr ""
-"Transmission\n"
+"‏Transmission\n"
 "נשלח: %1$s %2$s\n"
 "מתקבל: %3$s %4$s"
 
@@ -1668,7 +1668,7 @@ msgstr "%1$s, הועלו %2$s (יחס: %3$s יעד: %4$s)"
 #: ../gtk/TorrentCellRenderer.cc:113
 #, c-format
 msgid "%1$s, uploaded %2$s (Ratio: %3$s)"
-msgstr "%1$s, הועלה %2$s (יחס שיתוף: %3$s)"
+msgstr "%1$s, הועלו %2$s (יחס שיתוף: %3$s)"
 
 #: ../gtk/TorrentCellRenderer.cc:128
 msgid "Remaining time unknown"
@@ -1678,7 +1678,7 @@ msgstr "הזמן שנותר לא ידוע"
 #: ../gtk/TorrentCellRenderer.cc:133
 #, c-format
 msgid "%s remaining"
-msgstr "נותר %s"
+msgstr "נותרו %s"
 
 #: ../gtk/TorrentCellRenderer.cc:152
 #, c-format
@@ -1698,7 +1698,7 @@ msgstr "מעוכב"
 #: ../gtk/TorrentCellRenderer.cc:196
 #, c-format
 msgid "Verifying local data (%.1f%% tested)"
-msgstr "בודק נתונים מקומיים (%.1f%% נבדקו)"
+msgstr "הנתונים המקומיים בהליכי אימות (%.1f%% נבדקו)"
 
 #: ../gtk/TorrentCellRenderer.cc:227
 #, c-format
@@ -1731,7 +1731,7 @@ msgstr[3] "עמיתים"
 #: ../gtk/TorrentCellRenderer.cc:263
 #, c-format
 msgid "Downloading from %1$'d of %2$'d %3$s and %4$'d %5$s"
-msgstr "הורדה מ־%1$'d מתוך %2$'d %3$s ו־%4$'d %5$s"
+msgstr "מתבצעת הורדה מ־%1$'d מתוך %2$'d %3$s ו־%4$'d %5$s"
 
 #: ../gtk/TorrentCellRenderer.cc:268 ../gtk/TorrentCellRenderer.cc:276
 msgid "web seed"
@@ -1749,16 +1749,16 @@ msgstr "הורדה מ־%1$'d %2$s"
 #: ../gtk/TorrentCellRenderer.cc:282
 #, c-format
 msgid "Downloading from %1$'d of %2$'d %3$s"
-msgstr "הורדה מ־%1$'d מתוך %2$'d %3$s"
+msgstr "כעת הורדה מ־%1$'d מתוך %2$'d %3$s"
 
 #: ../gtk/TorrentCellRenderer.cc:294
 #, c-format
 msgid "Seeding to %1$'d of %2$'d connected peer"
 msgid_plural "Seeding to %1$'d of %2$'d connected peers"
-msgstr[0] "זורע לטובת %1$'d מתוך %2$'d עמית מחובר"
-msgstr[1] "זורע לטובת %1$'d מתוך %2$'d עמיתים מחוברים"
-msgstr[2] "זורע לטובת %1$'d מתוך %2$'d עמיתים מחוברים"
-msgstr[3] "זריעה ל- %1$'d מ- %2$'d עמיתים מחוברים"
+msgstr[0] "מתבצעת זריעה אל %1$'d מתוך עמית מחובר %2$'d"
+msgstr[1] "מתבצעת זריעה אל %1$'d מתוך %2$'d עמיתים מחוברים"
+msgstr[2] "מתבצעת זריעה אל %1$'d מתוך %2$'d עמיתים מחוברים"
+msgstr[3] "מתבצעת זריעה אל %1$'d מתוך %2$'d עמיתים מחוברים"
 
 #: ../gtk/Utils.cc:36
 msgid "KiB"
@@ -1806,7 +1806,7 @@ msgstr "ג״ב/שנייה"
 
 #: ../gtk/Utils.cc:51
 msgid "TB/s"
-msgstr "ט״ב/ש"
+msgstr "ט״ב/שנ׳"
 
 #: ../gtk/Utils.cc:105
 #, c-format
@@ -1866,7 +1866,7 @@ msgstr "כתובת בלתי מזוהה"
 #: ../gtk/Utils.cc:459
 #, c-format
 msgid "Transmission doesn't know how to use \"%s\""
-msgstr "לא ידוע ל־ Transmission כיצד להשתמש ב־„%s”"
+msgstr "אין בידיעת ‏Transmission כיצד להשתמש ב־„%s”"
 
 #: ../gtk/Utils.cc:464
 msgid "This magnet link appears to be intended for something other than BitTorrent."
@@ -1874,7 +1874,7 @@ msgstr ""
 
 #: ../gtk/main.cc:49 ../gtk/transmission-gtk.desktop.in:3
 msgid "Transmission"
-msgstr "Transmission"
+msgstr "‏Transmission"
 
 #. parse the command line
 #: ../gtk/main.cc:58
@@ -1895,7 +1895,7 @@ msgstr "Show version number and exit"
 
 #: ../gtk/main.cc:69
 msgid "[torrent files or urls]"
-msgstr "[torrent files or urls]"
+msgstr "[כתובות או קובצי טורנט]"
 
 #: ../gtk/main.cc:80
 #, c-format
@@ -1921,11 +1921,11 @@ msgstr "טורנטים;טורנט;הורדה;העלאה;שיתוף;משותף;ל
 
 #: ../gtk/transmission-gtk.desktop.in:21
 msgid "Start Transmission with All Torrents Paused"
-msgstr "הפעלת Transmission כשכל הטורנטים מופסקים"
+msgstr "הפעלת ‏Transmission כשכל הטורנטים מופסקים"
 
 #: ../gtk/transmission-gtk.desktop.in:25
 msgid "Start Transmission Minimized"
-msgstr "הפעלת Transmission במצב ממוזער"
+msgstr "הפעלת ‏Transmission במצב ממוזער"
 
 #: ../libtransmission/announcer-udp.cc:201 ../libtransmission/announcer-udp.cc:303
 msgid "Unknown error"
@@ -1976,7 +1976,7 @@ msgstr "רשימת החסימה „%s” עודכנה ב־%zu רשומות"
 #: ../libtransmission/fdlimit.cc:171
 #, c-format
 msgid "Couldn't get directory for \"%1$s\": %2$s"
-msgstr "לא ניתן לקבל את המחיצה עבור „%1$s”: %2$s"
+msgstr "לא היה ניתן לקבל את התיקייה עבור „%1$s”: %2$s"
 
 #: ../libtransmission/fdlimit.cc:177 ../libtransmission/file-posix.cc:268
 #, c-format
@@ -2062,7 +2062,7 @@ msgstr "לא ניתן לחבר את השקע %<PRIdMAX> אל %s, פתחה %d (ש
 
 #: ../libtransmission/net.cc:493
 msgid "Is another copy of Transmission already running?"
-msgstr "האם עותק נוסף של Transmission כבר פועל?"
+msgstr "האם עותק נוסף של ‏Transmission כבר פועל?"
 
 #: ../libtransmission/net.cc:495
 #, c-format
@@ -2093,7 +2093,7 @@ msgstr "מועבר"
 
 #: ../libtransmission/port-forwarding.cc:59
 msgid "Stopping"
-msgstr "עוצר"
+msgstr "בהליכי עצירה"
 
 #: ../libtransmission/port-forwarding.cc:62
 msgid "Not forwarded"
@@ -2124,12 +2124,12 @@ msgstr "הופעלה רשימת היתר"
 
 #: ../libtransmission/rpc-server.cc:1045
 msgid "Password required"
-msgstr "נדרשת ססמה"
+msgstr "נדרשת סיסמה"
 
 #: ../libtransmission/rpc-server.cc:1052
 #, c-format
 msgid "Serving RPC and Web requests from directory '%s'"
-msgstr ""
+msgstr "בקשות דפדפן ו־RPC מוגשות מהתיקייה ‚%s’"
 
 #. first %s is the application name
 #. second %s is the version number
@@ -2157,7 +2157,7 @@ msgstr "הופעל מחדש ידנית -- יחס הזריעה שלו יושבת"
 
 #: ../libtransmission/torrent.cc:1561
 msgid "Removing torrent"
-msgstr "הטורנט מוסר"
+msgstr "הטורנט נמחק כעת"
 
 #. Translators: this is a minor point that's safe to skip over, but FYI:
 #. "Complete" and "Done" are specific, different terms in Transmission:
@@ -2230,7 +2230,7 @@ msgstr ""
 
 #: ../libtransmission/verify.cc:228
 msgid "Verifying torrent"
-msgstr "הטורנט מאומת"
+msgstr "אימות טורנט"
 
 #, c-format
 #~ msgid "%1$s (+%2$s corrupt)"
@@ -2242,7 +2242,7 @@ msgstr "הטורנט מאומת"
 
 #, c-format
 #~ msgid "%s is not an IPv4 or IPv6 address. RPC listeners must be IPv4 or IPv6"
-#~ msgstr "%s אינה כתובת IPv4 או IPv6. מאזיני ה־ RPC חייבים להיות IPv4 או IPv6"
+#~ msgstr "%s אינה כתובת IPv4 או IPv6. מאזיני RPC חייבים להיות IPv4 או IPv6"
 
 #~ msgid "Ask Tracker for _More Peers"
 #~ msgstr "בקשת עמיתים _נוספים מהגשש"
@@ -2251,13 +2251,13 @@ msgstr "הטורנט מאומת"
 #~ msgstr "ביטטורנט הוא פרוטוקול שיתוף קבצים ישירות בין עמיתים והוא משמש בדרך כלל להפיץ כמות גדולה של נתונים בין מגוון משתמשים."
 
 #~ msgid "Call scrip_t when torrent is completed:"
-#~ msgstr "לקרוא ל_סקריפט כאשר הורדת טורנט הושלמה:"
+#~ msgstr "לקרוא ל_תסריט כאשר הורדת טורנט הושלמה:"
 
 #~ msgid "Copy _Magnet Link to Clipboard"
 #~ msgstr "העתקת קישור מ_גנט אל לוח הגזירים"
 
 #~ msgid "Copyright (c) The Transmission Project"
-#~ msgstr "כל הזכויות שמורות (c) מיזם Transmission"
+#~ msgstr "כל הזכויות שמורות (c) מיזם ‏Transmission"
 
 #, c-format
 #~ msgid "Couldn't save temporary file \"%1$s\": %2$s"
@@ -2307,16 +2307,16 @@ msgstr "הטורנט מאומת"
 #~ msgstr "הצבה כע_ליון"
 
 #~ msgid "Notable features of Transmission include support for Local Peer Discovery, encryption, DHT, µTP, PEX and Magnet Link."
-#~ msgstr "תכונות בולטות של Transmission כוללות תמיכה בגילוי מקומי של עמיתים, הצפנה, DHT,‏ µTP,‏ PEX וקישורי מגנט."
+#~ msgstr "תכונות בולטות של ‏Transmission כוללות תמיכה בגילוי מקומי של עמיתים, הצפנה, DHT,‏ µTP,‏ PEX וקישורי מגנט."
 
 #~ msgid "Open Fold_er"
 #~ msgstr "פתיחת תי_קייה"
 
 #~ msgid "Open URL…"
-#~ msgstr "פתיחת כתובת…"
+#~ msgstr "פתיחה מכתובת…"
 
 #~ msgid "Open _URL…"
-#~ msgstr "פתיחת _כתובת…"
+#~ msgstr "פתיחה מ_כתובת…"
 
 #~ msgid "Open a torrent"
 #~ msgstr "פתיחת טורנט"
@@ -2417,13 +2417,13 @@ msgstr "הטורנט מאומת"
 #~ msgstr "הגשש יאפשר בקשות בעוד %s"
 
 #~ msgid "Transmission is a BitTorrent client with an easy-to-use frontend on top a cross-platform backend. Native frontends are available for OS X and Windows, as well as command line and web frontends."
-#~ msgstr "Transmission (בעברית: תמסורת) הוא לקוח ביטטורנט עם מנשק משתמש פשוט מבוסס  מנגנון חוצה פלטפורמות. יש מנשקי משתמש זמינים ל־ macOS ולחלונות לרבות שורת פקודה ומנשקי דפדפן מקוונים."
+#~ msgstr "‏Transmission היא לקוח ביטורנט בעלת ממשק משתמש קל לשימוש מבוסס מנגנון חוצה ריבוי-מסדת. ממשקי משתמש זמינים ל־macOS ול־Windows, לרבות אפשרות הפעלה משורת פקודה וממשקי דפדפן מקוונים."
 
 #~ msgid "Unable to parse file content"
 #~ msgstr "לא ניתן לפענח את תכני הקובץ"
 
 #~ msgid "_About"
-#~ msgstr " _אודות"
+#~ msgstr " על _אודות"
 
 #~ msgid "_Compact View"
 #~ msgstr "תצוגה _חסכונית"
@@ -2465,7 +2465,7 @@ msgstr "הטורנט מאומת"
 #~ msgstr "_יציאה"
 
 #~ msgid "_Show Transmission"
-#~ msgstr "ה_צגת Transmission"
+#~ msgstr "ה_צגת ‏Transmission"
 
 #~ msgid "_Sort Torrents By"
 #~ msgstr "_סידור טורנטים לפי"

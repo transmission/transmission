@@ -147,7 +147,7 @@
     <message>
         <location line="+69"/>
         <source>Created by %1</source>
-        <translation>Criado pelo %1</translation>
+        <translation>Criado por %1</translation>
     </message>
     <message>
         <location line="+5"/>
@@ -157,7 +157,7 @@
     <message>
         <location line="+5"/>
         <source>Created by %1 on %2</source>
-        <translation>Criado pelo %1 em %2</translation>
+        <translation>Criado por %1 em %2</translation>
     </message>
     <message>
         <location line="+173"/>
@@ -2252,14 +2252,14 @@ Adicione outra URL primária depois de uma linha em branco.</translation>
     <message>
         <location line="+57"/>
         <source>%1 (copy of %2)</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 (cópia de %2)</translation>
     </message>
     <message numerus="yes">
         <location line="+6"/>
         <source>Duplicate Torrent(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Duplicar Torrent</numerusform>
+            <numerusform>Duplicar Torrents</numerusform>
         </translation>
     </message>
     <message numerus="yes">

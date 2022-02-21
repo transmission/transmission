@@ -3,20 +3,23 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
+# Translators:
+# Mike Gelfand <mikedld@mikedld.com>, 2018
+#
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-21 21:24+0000\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2017\n"
+"POT-Creation-Date: 2022-02-21 21:26+0000\n"
+"PO-Revision-Date: 2017-01-26 19:47+0000\n"
+"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2018\n"
 "Language-Team: Georgian (https://www.transifex.com/transmissionbt/teams/33778/ka/)\n"
 "Language: ka\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
+"Plural-Forms: nplurals=2; plural=(n!=1);\n"
 
 #: ../cli/cli.cc:103 ../gtk/Utils.cc:90 ../libtransmission/utils.cc:1074
 msgid "None"
@@ -61,11 +64,13 @@ msgstr "_დახურვა"
 msgid "Couldn't add corrupt torrent"
 msgid_plural "Couldn't add corrupt torrents"
 msgstr[0] "ვერ ვამატებ გაუმართავ ტორენტს"
+msgstr[1] "ვერ ვამატებ გაუმართავ ტორენტს"
 
 #: ../gtk/Application.cc:962
 msgid "Couldn't add duplicate torrent"
 msgid_plural "Couldn't add duplicate torrents"
 msgstr[0] "ვერ ვამატებ ტორენტის დუბლიკატს"
+msgstr[1] "ვერ ვამატებ ტორენტის დუბლიკატს"
 
 #: ../gtk/Application.cc:1280
 msgid "A fast and easy BitTorrent client"
@@ -227,12 +232,14 @@ msgstr "უცნობი"
 msgid "%1$s (%2$'d piece @ %3$s)"
 msgid_plural "%1$s (%2$'d pieces @ %3$s)"
 msgstr[0] ""
+msgstr[1] ""
 
 #: ../gtk/DetailsDialog.cc:855
 #, c-format
 msgid "%1$s (%2$'d piece)"
 msgid_plural "%1$s (%2$'d pieces)"
 msgstr[0] ""
+msgstr[1] ""
 
 #: ../gtk/DetailsDialog.cc:893
 #, c-format
@@ -605,37 +612,44 @@ msgstr ""
 msgid "Remove torrent?"
 msgid_plural "Remove %d torrents?"
 msgstr[0] ""
+msgstr[1] ""
 
 #: ../gtk/Dialogs.cc:55
 #, c-format
 msgid "Delete this torrent's downloaded files?"
 msgid_plural "Delete these %d torrents' downloaded files?"
 msgstr[0] ""
+msgstr[1] ""
 
 #: ../gtk/Dialogs.cc:62
 msgid "Once removed, continuing the transfer will require the torrent file or magnet link."
 msgid_plural "Once removed, continuing the transfers will require the torrent files or magnet links."
 msgstr[0] ""
+msgstr[1] ""
 
 #: ../gtk/Dialogs.cc:69
 msgid "This torrent has not finished downloading."
 msgid_plural "These torrents have not finished downloading."
 msgstr[0] ""
+msgstr[1] ""
 
 #: ../gtk/Dialogs.cc:75
 msgid "This torrent is connected to peers."
 msgid_plural "These torrents are connected to peers."
 msgstr[0] ""
+msgstr[1] ""
 
 #: ../gtk/Dialogs.cc:82
 msgid "One of these torrents is connected to peers."
 msgid_plural "Some of these torrents are connected to peers."
 msgstr[0] ""
+msgstr[1] ""
 
 #: ../gtk/Dialogs.cc:95
 msgid "One of these torrents has not finished downloading."
 msgid_plural "Some of these torrents have not finished downloading."
 msgstr[0] ""
+msgstr[1] ""
 
 #: ../gtk/Dialogs.cc:115
 msgid "_Delete"
@@ -845,12 +859,14 @@ msgstr ""
 msgid "%1$s; %2$'d File"
 msgid_plural "%1$s; %2$'d Files"
 msgstr[0] ""
+msgstr[1] ""
 
 #: ../gtk/MakeDialog.cc:344
 #, c-format
 msgid "%1$'d Piece @ %2$s"
 msgid_plural "%1$'d Pieces @ %2$s"
 msgstr[0] ""
+msgstr[1] ""
 
 #: ../gtk/MakeDialog.cc:440
 msgid "_New"
@@ -1118,6 +1134,7 @@ msgstr ""
 msgid "Blocklist contains %'d rule"
 msgid_plural "Blocklist contains %'d rules"
 msgstr[0] ""
+msgstr[1] ""
 
 #: ../gtk/PrefsDialog.cc:440
 msgid "<b>Unable to update.</b>"
@@ -1132,6 +1149,7 @@ msgstr ""
 msgid "Blocklist has %'d rule."
 msgid_plural "Blocklist has %'d rules."
 msgstr[0] ""
+msgstr[1] ""
 
 #: ../gtk/PrefsDialog.cc:451
 msgid "Update Blocklist"
@@ -1494,6 +1512,7 @@ msgstr ""
 msgid "Started %'d time"
 msgid_plural "Started %'d times"
 msgstr[0] ""
+msgstr[1] ""
 
 #: ../gtk/StatsDialog.cc:99
 msgid "Reset your statistics?"
@@ -1644,6 +1663,7 @@ msgstr ""
 msgid "peer"
 msgid_plural "peers"
 msgstr[0] ""
+msgstr[1] ""
 
 #: ../gtk/TorrentCellRenderer.cc:263
 #, c-format
@@ -1654,6 +1674,7 @@ msgstr ""
 msgid "web seed"
 msgid_plural "web seeds"
 msgstr[0] ""
+msgstr[1] ""
 
 #: ../gtk/TorrentCellRenderer.cc:274
 #, c-format
@@ -1670,6 +1691,7 @@ msgstr ""
 msgid "Seeding to %1$'d of %2$'d connected peer"
 msgid_plural "Seeding to %1$'d of %2$'d connected peers"
 msgstr[0] ""
+msgstr[1] ""
 
 #: ../gtk/Utils.cc:36
 msgid "KiB"
@@ -1724,24 +1746,28 @@ msgstr ""
 msgid "%'d day"
 msgid_plural "%'d days"
 msgstr[0] ""
+msgstr[1] ""
 
 #: ../gtk/Utils.cc:106
 #, c-format
 msgid "%'d hour"
 msgid_plural "%'d hours"
 msgstr[0] ""
+msgstr[1] ""
 
 #: ../gtk/Utils.cc:107
 #, c-format
 msgid "%'d minute"
 msgid_plural "%'d minutes"
 msgstr[0] ""
+msgstr[1] ""
 
 #: ../gtk/Utils.cc:108
 #, c-format
 msgid "%'d second"
 msgid_plural "%'d seconds"
 msgstr[0] ""
+msgstr[1] ""
 
 #: ../gtk/Utils.cc:156
 #, c-format

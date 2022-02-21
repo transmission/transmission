@@ -561,7 +561,7 @@
 "Next announce in %@" = "Следующий анонс через %@";
 
 /* Group table row */
-"No Group" = "No Group";
+"No Group" = "✕";
 
 /* Inspector -> selected torrents */
 "No Torrents Selected" = "Ни один торрент не выбран";
@@ -569,7 +569,7 @@
 /* Groups -> Button
    Groups -> Menu
    inspector -> check all */
-"None" = "None";
+"None" = "✕";
 
 /* Donation beg -> button */
 "Nope" = "Нет";
@@ -752,7 +752,7 @@
 "remaining time unknown" = "оставшееся время неизвестно";
 
 /* Preferences -> toolbar item title */
-"Remote" = "Удалённый доступ";
+"Remote" = "Удаленное управление";
 
 /* Removal confirm panel -> button
    Remove completed confirm panel -> button

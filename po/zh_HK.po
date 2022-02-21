@@ -3,13 +3,16 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
+# Translators:
+# Mike Gelfand <mikedld@mikedld.com>, 2017
+#
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-21 21:24+0000\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"POT-Creation-Date: 2022-02-21 21:26+0000\n"
+"PO-Revision-Date: 2017-01-26 19:47+0000\n"
 "Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2017\n"
 "Language-Team: Chinese (Hong Kong) (https://www.transifex.com/transmissionbt/teams/33778/zh_HK/)\n"
 "Language: zh_HK\n"
@@ -2167,10 +2170,6 @@ msgstr "正在驗證 torrent"
 #~ msgstr "啟用替代速度限制(_L)"
 
 #, c-format
-#~ msgid "Error opening \"%s\""
-#~ msgstr "開啟「%s」時發生錯誤"
-
-#, c-format
 #~ msgid "File \"%s\" is in the way"
 #~ msgstr "檔案「%s」已存在"
 
@@ -2226,10 +2225,6 @@ msgstr "正在驗證 torrent"
 
 #~ msgid "Select _All"
 #~ msgstr "全選(_A)"
-
-#, c-format
-#~ msgid "Server returned \"%1$ld %2$s\""
-#~ msgstr "伺服器回傳「%1$ld %2$s」"
 
 #~ msgid "Set _Location…"
 #~ msgstr "設定位置(_L)..."
@@ -2299,9 +2294,6 @@ msgstr "正在驗證 torrent"
 #, c-format
 #~ msgid "Tracker will allow requests in %s"
 #~ msgstr "追蹤器會允許 %s 內的要求"
-
-#~ msgid "Transmission BitTorrent Client"
-#~ msgstr "Transmission BitTorrent 用戶端"
 
 #~ msgid "_Compact View"
 #~ msgstr "精簡檢視(_C)"

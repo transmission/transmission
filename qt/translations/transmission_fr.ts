@@ -101,7 +101,7 @@
     <message>
         <location line="+4"/>
         <source>Paused</source>
-        <translation>Interrompu</translation>
+        <translation>En pause</translation>
     </message>
     <message>
         <location line="+109"/>
@@ -137,7 +137,7 @@
     <message>
         <location line="+28"/>
         <source>Private to this tracker -- DHT and PEX disabled</source>
-        <translation>Privé pour ce traqueur -- DHT et PEX désactivés</translation>
+        <translation>Privé pour ce traceur -- DHT et PEX désactivés</translation>
     </message>
     <message>
         <location line="+0"/>
@@ -456,17 +456,17 @@
     <message>
         <location line="+32"/>
         <source>Tracker</source>
-        <translation>Traqueur</translation>
+        <translation>Traceur</translation>
     </message>
     <message>
         <location line="+22"/>
         <source>Add Tracker</source>
-        <translation>Ajouter un traqueur</translation>
+        <translation>Ajouter un traceur</translation>
     </message>
     <message>
         <location line="+20"/>
         <source>Remove Trackers</source>
-        <translation>Supprimer les traqueurs</translation>
+        <translation>Supprimer les traceurs</translation>
     </message>
     <message>
         <location line="+23"/>
@@ -476,7 +476,7 @@
     <message>
         <location line="+7"/>
         <source>Show &amp;backup trackers</source>
-        <translation>Afficher les traqueurs de &amp;secours</translation>
+        <translation>Afficher les traceurs de &amp;secours</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -656,7 +656,7 @@
     <message>
         <location line="+4"/>
         <source>Paused</source>
-        <translation>Interrompus</translation>
+        <translation>En pause</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -941,12 +941,12 @@
     <message>
         <location line="+11"/>
         <source>Ask Tracker for &amp;More Peers</source>
-        <translation>Demander &amp;plus de pairs au traqueur</translation>
+        <translation>Demander &amp;plus de pairs au traceur</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Ask tracker for more peers</source>
-        <translation>Demander plus de pairs au traqueur</translation>
+        <translation>Demander plus de pairs au traceur</translation>
     </message>
     <message>
         <location line="+5"/>
@@ -956,7 +956,7 @@
     <message>
         <location line="+3"/>
         <source>Pause torrent</source>
-        <translation>Interrompre le torrent</translation>
+        <translation>Mettre le torrent en pause</translation>
     </message>
     <message>
         <location line="+11"/>
@@ -1037,7 +1037,7 @@
     <message>
         <location line="+8"/>
         <source>&amp;Filterbar</source>
-        <translation>Barre des &amp;filtres</translation>
+        <translation>Barre du &amp;filtre</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -1127,7 +1127,7 @@
     <message>
         <location line="+8"/>
         <source>&amp;Tracker</source>
-        <translation>&amp;Traqueur</translation>
+        <translation>&amp;Traceur</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -1491,7 +1491,7 @@
     <message>
         <location line="+12"/>
         <source>&amp;Trackers:</source>
-        <translation>&amp;Traqueurs&#xa0;:</translation>
+        <translation>&amp;Traceurs&#xa0;:</translation>
     </message>
     <message>
         <location line="+23"/>
@@ -2092,7 +2092,7 @@ Pour ajouter une autre URL primaire, placez-la après une ligne vide.</translati
     <message>
         <location line="-3"/>
         <source>DHT is a tool for finding peers without a tracker.</source>
-        <translation>La table de hachage distribuée (DHT) est un outil pour trouver des pairs sans traqueur.</translation>
+        <translation>La table de hachage distribuée (DHT) est un outil pour trouver des pairs sans traceur.</translation>
     </message>
     <message>
         <location line="+13"/>
@@ -2414,12 +2414,12 @@ Pour ajouter une autre URL primaire, placez-la après une ligne vide.</translati
     <message>
         <location line="+18"/>
         <source>Tracker gave a warning: %1</source>
-        <translation>Le traqueur a retourné un avertissement&#xa0;: %1</translation>
+        <translation>Le traceur a retourné un avertissement&#xa0;: %1</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Tracker gave an error: %1</source>
-        <translation>Le traqueur a retourné une erreur&#xa0;: %1</translation>
+        <translation>Le traceur a retourné une erreur&#xa0;: %1</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -2594,8 +2594,8 @@ Pour ajouter une autre URL primaire, placez-la après une ligne vide.</translati
         <source>Tracker had%1 %Ln seeder(s)%2</source>
         <extracomment>First part of phrase &quot;Tracker had ... seeder(s) and ... leecher(s) ... ago&quot;, %1 and %2 are replaced with HTML markup</extracomment>
         <translation>
-            <numerusform>Le traqueur avait%1 %Ln propagateur%2</numerusform>
-            <numerusform>Le traqueur avait%1 %Ln propagateurs%2</numerusform>
+            <numerusform>Le traceur avait%1 %Ln propagateur%2</numerusform>
+            <numerusform>Le traceur avait%1 %Ln propagateurs%2</numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -2611,7 +2611,7 @@ Pour ajouter une autre URL primaire, placez-la après une ligne vide.</translati
         <location line="+8"/>
         <source>Tracker had %1no information%2 on peer counts %3 ago</source>
         <extracomment>%1 and %2 are replaced with HTML markup, %3 is duration</extracomment>
-        <translation>Le traqueur n’avait %1aucun renseignement%2 sur le nombre de pairs il y a %3</translation>
+        <translation>Le traceur n’avait %1aucun renseignement%2 sur le nombre de pairs il y a %3</translation>
     </message>
     <message>
         <location line="-24"/>

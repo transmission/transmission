@@ -3,13 +3,16 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
+# Translators:
+# Mike Gelfand <mikedld@mikedld.com>, 2017
+#
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-21 21:24+0000\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"POT-Creation-Date: 2022-02-21 21:26+0000\n"
+"PO-Revision-Date: 2017-01-26 19:47+0000\n"
 "Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2017\n"
 "Language-Team: Faroese (https://www.transifex.com/transmissionbt/teams/33778/fo/)\n"
 "Language: fo\n"
@@ -2186,10 +2189,6 @@ msgstr "Vátti torrent"
 #~ msgstr "Gilda annað møguligt Ferð_Mark"
 
 #, c-format
-#~ msgid "Error opening \"%s\""
-#~ msgstr "Villa við upplatan av \"%s\""
-
-#, c-format
 #~ msgid "File \"%s\" is in the way"
 #~ msgstr "Fíla \"%s\" er í vegin"
 
@@ -2237,10 +2236,6 @@ msgstr "Vátti torrent"
 
 #~ msgid "Select _All"
 #~ msgstr "Vel _Allar"
-
-#, c-format
-#~ msgid "Server returned \"%1$ld %2$s\""
-#~ msgstr "Ambætarin kom aftur við \"%1$ld %2$s\""
 
 #~ msgid "Set _Location…"
 #~ msgstr "Set_Stað..."
@@ -2302,9 +2297,6 @@ msgstr "Vátti torrent"
 #, c-format
 #~ msgid "Tracker warning: \"%s\""
 #~ msgstr "Leitara ávaring: \"%s\""
-
-#~ msgid "Transmission BitTorrent Client"
-#~ msgstr "Transmission BitTorrent-viðskiftari"
 
 #~ msgid "_Compact View"
 #~ msgstr "_Stappað sýn"

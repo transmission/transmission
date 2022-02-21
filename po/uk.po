@@ -7,16 +7,16 @@
 # Denis <prohibiti@gmail.com>, 2018
 # Mike Gelfand <mikedld@mikedld.com>, 2018
 # f6d3887df5c5bcb13fc1d4fb04e37f17, 2018
-# Yevhenii Shatalov <zhenya.shot@gmail.com>, 2020
+# Yevhenii Shatalov <zhenya.shot@gmail.com>, 2021
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-21 21:24+0000\n"
+"POT-Creation-Date: 2022-02-21 21:26+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Yevhenii Shatalov <zhenya.shot@gmail.com>, 2020\n"
+"Last-Translator: Yevhenii Shatalov <zhenya.shot@gmail.com>, 2021\n"
 "Language-Team: Ukrainian (https://www.transifex.com/transmissionbt/teams/33778/uk/)\n"
 "Language: uk\n"
 "MIME-Version: 1.0\n"
@@ -45,7 +45,7 @@ msgstr "Transmission є програмою для обміну даних. Ко�
 #. make the dialog
 #: ../gtk/Application.cc:710 ../gtk/DetailsDialog.cc:2265 ../gtk/DetailsDialog.cc:2375 ../gtk/Dialogs.cc:114 ../gtk/MakeDialog.cc:208 ../gtk/MessageLogWindow.cc:229 ../gtk/OptionsDialog.cc:280 ../gtk/OptionsDialog.cc:440 ../gtk/OptionsDialog.cc:500 ../gtk/RelocateDialog.cc:160 ../gtk/StatsDialog.cc:100
 msgid "_Cancel"
-msgstr ""
+msgstr "_Скасувати"
 
 #: ../gtk/Application.cc:711
 msgid "I _Agree"
@@ -553,7 +553,7 @@ msgstr "%s — зміна трекеру"
 
 #: ../gtk/DetailsDialog.cc:2266 ../gtk/MessageLogWindow.cc:230
 msgid "_Save"
-msgstr ""
+msgstr "_Зберегти"
 
 #: ../gtk/DetailsDialog.cc:2271
 msgid "Tracker Announce URLs"
@@ -605,7 +605,7 @@ msgstr "Показати резервні трекери"
 #. create the dialog
 #: ../gtk/DetailsDialog.cc:2560 ../gtk/MakeDialog.cc:209 ../gtk/MakeDialog.cc:439 ../gtk/PrefsDialog.cc:1148 ../gtk/StatsDialog.cc:139
 msgid "_Close"
-msgstr ""
+msgstr "_Закрити"
 
 #: ../gtk/DetailsDialog.cc:2573 ../gtk/MessageLogWindow.cc:413
 msgid "Information"
@@ -697,7 +697,7 @@ msgstr[3] "Завантаження деяких із цих торентів н
 
 #: ../gtk/Dialogs.cc:115
 msgid "_Delete"
-msgstr ""
+msgstr "_Видалити"
 
 #: ../gtk/FileList.cc:558 ../gtk/Utils.cc:389
 msgid "High"
@@ -918,7 +918,7 @@ msgstr[3] "%1$d частин @ %2$s"
 
 #: ../gtk/MakeDialog.cc:440
 msgid "_New"
-msgstr ""
+msgstr "_Новий"
 
 #: ../gtk/MakeDialog.cc:449
 msgid "Sa_ve to:"
@@ -991,15 +991,15 @@ msgstr "Журнал повідомлень"
 
 #: ../gtk/MessageLogWindow.cc:462
 msgid "Save _As"
-msgstr ""
+msgstr "Зберегти _Як"
 
 #: ../gtk/MessageLogWindow.cc:473
 msgid "Clear"
-msgstr ""
+msgstr "Очистити"
 
 #: ../gtk/MessageLogWindow.cc:486
 msgid "P_ause"
-msgstr ""
+msgstr "П_ризупинити"
 
 #: ../gtk/MessageLogWindow.cc:495
 msgid "Level"
@@ -1039,7 +1039,7 @@ msgstr "Параметри торенту"
 
 #: ../gtk/OptionsDialog.cc:281 ../gtk/OptionsDialog.cc:441 ../gtk/OptionsDialog.cc:501
 msgid "_Open"
-msgstr ""
+msgstr "_Відкрити"
 
 #: ../gtk/OptionsDialog.cc:295 ../gtk/PrefsDialog.cc:268
 msgid "Mo_ve .torrent file to the trash"
@@ -1513,7 +1513,7 @@ msgstr "Вибрати місце розташування для торенту
 
 #: ../gtk/RelocateDialog.cc:161
 msgid "_Apply"
-msgstr ""
+msgstr "_Застосувати"
 
 #: ../gtk/RelocateDialog.cc:167
 msgid "Location"
@@ -2264,10 +2264,6 @@ msgstr "Перевірка торенту"
 #~ msgstr "Увімкнути альтернативні о_бмеження на швидкість"
 
 #, c-format
-#~ msgid "Error opening \"%s\""
-#~ msgstr "Помилка під час відкриття «%s»"
-
-#, c-format
 #~ msgid "File \"%s\" is in the way"
 #~ msgstr "Файл «%s» на шляху"
 
@@ -2323,10 +2319,6 @@ msgstr "Перевірка торенту"
 
 #~ msgid "Select _All"
 #~ msgstr "Позначити _усе"
-
-#, c-format
-#~ msgid "Server returned \"%1$ld %2$s\""
-#~ msgstr "Сервером повернуто «%1$ld %2$s»"
 
 #~ msgid "Set _Location…"
 #~ msgstr "Вказати _місце…"
@@ -2401,6 +2393,9 @@ msgstr "Перевірка торенту"
 #~ msgid "Tracker will allow requests in %s"
 #~ msgstr "Трекер дозволить запити через %s"
 
+#~ msgid "_About"
+#~ msgstr "_Про"
+
 #~ msgid "_Compact View"
 #~ msgstr "_Стислий перегляд"
 
@@ -2427,6 +2422,12 @@ msgstr "Перевірка торенту"
 
 #~ msgid "_Pause All"
 #~ msgstr "П_ризупинити усі"
+
+#~ msgid "_Preferences"
+#~ msgstr "_Налаштування"
+
+#~ msgid "_Properties"
+#~ msgstr "_Властивості"
 
 #~ msgid "_Queue"
 #~ msgstr "Додати до _черги"

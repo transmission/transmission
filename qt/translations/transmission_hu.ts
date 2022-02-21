@@ -100,7 +100,7 @@
     <message>
         <location line="+4"/>
         <source>Paused</source>
-        <translation>Megállítva</translation>
+        <translation>Szüneteltetve</translation>
     </message>
     <message>
         <location line="+109"/>
@@ -134,7 +134,7 @@
     <message>
         <location line="+28"/>
         <source>Private to this tracker -- DHT and PEX disabled</source>
-        <translation>Privát ezen követő számára --DHT és PEX letiltva </translation>
+        <translation>Privát ezen tracker számára -- DHT és PEX letiltva </translation>
     </message>
     <message>
         <location line="+0"/>
@@ -149,7 +149,7 @@
     <message>
         <location line="+5"/>
         <source>Created on %1</source>
-        <translation>Készült: %1</translation>
+        <translation>Ekkor készült: %1</translation>
     </message>
     <message>
         <location line="+5"/>
@@ -175,7 +175,7 @@
     <message>
         <location line="+4"/>
         <source>We would download from this peer if they would let us</source>
-        <translation>Letöltés a partnertől, ha hagyná</translation>
+        <translation>Letöltenénk ettől a partnertől, ha hagyná</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -185,7 +185,7 @@
     <message>
         <location line="+4"/>
         <source>We would upload to this peer if they asked</source>
-        <translation>Feltöltés a partnernek, ha kérné</translation>
+        <translation>Feltöltenénk ennek a partnernek, ha kérné</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -292,7 +292,7 @@
         <location line="+2"/>
         <location line="+4"/>
         <source>Use Global Settings</source>
-        <translation>Globális sebességkorlátok használata</translation>
+        <translation>Globális beállítások használata</translation>
     </message>
     <message>
         <location line="-3"/>
@@ -312,7 +312,7 @@
     <message>
         <location line="+1"/>
         <source>Stop seeding if idle for:</source>
-        <translation>Megosztás befejezése ha inaktív a torrent:</translation>
+        <translation>Megosztás befejezése, ha inaktív a torrent:</translation>
     </message>
     <message>
         <location line="+75"/>
@@ -472,7 +472,7 @@
     <message>
         <location line="+7"/>
         <source>Show &amp;backup trackers</source>
-        <translation>Tartalék kö&amp;vetők megjelenítése</translation>
+        <translation>Tartalék &amp;trackerek megjelenítése</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -512,7 +512,7 @@
     <message>
         <location line="+34"/>
         <source>Seeding Limits</source>
-        <translation>Sebesség korlátok</translation>
+        <translation>Megosztási korlátok</translation>
     </message>
     <message>
         <location line="+12"/>
@@ -933,12 +933,12 @@
     <message>
         <location line="+11"/>
         <source>Ask Tracker for &amp;More Peers</source>
-        <translation>Több &amp;partner igénylése a követőtől</translation>
+        <translation>Több &amp;partner igénylése a trackertől</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Ask tracker for more peers</source>
-        <translation>Több partner igénylése a követőtől</translation>
+        <translation>Több partner igénylése a trackertől</translation>
     </message>
     <message>
         <location line="+5"/>
@@ -963,12 +963,12 @@
     <message>
         <location line="+8"/>
         <source>&amp;Remove</source>
-        <translation>&amp;Törlés</translation>
+        <translation>&amp;Eltávolítás</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Remove torrent</source>
-        <translation>Torrent törlése</translation>
+        <translation>Torrent eltávolítása</translation>
     </message>
     <message>
         <location line="+11"/>
@@ -978,7 +978,7 @@
     <message>
         <location line="+3"/>
         <source>Remove torrent and delete its files</source>
-        <translation>Törlés az adatokkal együtt</translation>
+        <translation>Torrent eltávolítása és adatok törlése</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -1003,7 +1003,7 @@
     <message>
         <location line="+8"/>
         <source>&amp;Deselect All</source>
-        <translation>Kijelölés &amp;megszüntetése</translation>
+        <translation>Összes kijelölés &amp;megszüntetése</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -2235,20 +2235,20 @@ Másik elsődleges URL-t új sorba írva adhatsz hozzá.</translation>
     <message>
         <location line="+57"/>
         <source>%1 (copy of %2)</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 (a %2 másolata)</translation>
     </message>
     <message numerus="yes">
         <location line="+6"/>
         <source>Duplicate Torrent(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Torrent(ek) duplikálása</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location line="+2"/>
         <source>Unable to add %n duplicate torrent(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Nem sikerült hozzáadni %n ismétlődő torrentet</numerusform>
         </translation>
     </message>
 </context>
@@ -2272,7 +2272,7 @@ Másik elsődleges URL-t új sorba írva adhatsz hozzá.</translation>
     <message>
         <location line="+7"/>
         <source>Connect to &amp;Remote Session</source>
-        <translation>Csatalkozás &amp;távoli munkamenethez</translation>
+        <translation>Csatlakozás &amp;távoli munkamenethez</translation>
     </message>
     <message>
         <location line="+7"/>

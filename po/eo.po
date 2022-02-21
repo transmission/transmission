@@ -3,14 +3,19 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
+# Translators:
+# Mike Gelfand <mikedld@mikedld.com>, 2017
+# Iris Ilexiris <iris.ilexiris@gmail.com>, 2018
+# Carmen Bianca Bakker <carmen@carmenbianca.eu>, 2019
+#
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-21 21:24+0000\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2017\n"
+"POT-Creation-Date: 2022-02-21 21:26+0000\n"
+"PO-Revision-Date: 2017-01-26 19:47+0000\n"
+"Last-Translator: Carmen Bianca Bakker <carmen@carmenbianca.eu>, 2019\n"
 "Language-Team: Esperanto (https://www.transifex.com/transmissionbt/teams/33778/eo/)\n"
 "Language: eo\n"
 "MIME-Version: 1.0\n"
@@ -25,7 +30,7 @@ msgstr "Neniom"
 #: ../gtk/Application.cc:347
 #, c-format
 msgid "Error registering Transmission as a %s handler: %s"
-msgstr ""
+msgstr "Eraro kiam registras Transmission kiel %s mastrumanto: %s"
 
 #: ../gtk/Application.cc:502
 #, c-format
@@ -43,7 +48,7 @@ msgstr ""
 
 #: ../gtk/Application.cc:711
 msgid "I _Agree"
-msgstr ""
+msgstr "Mi _konsentas"
 
 #: ../gtk/Application.cc:892
 msgid "<b>Closing Connections</b>"
@@ -108,7 +113,7 @@ msgstr ""
 
 #: ../gtk/DetailsDialog.cc:459 ../gtk/PrefsDialog.cc:1155
 msgid "Speed"
-msgstr "Rapido"
+msgstr "Rapideco"
 
 #: ../gtk/DetailsDialog.cc:461
 msgid "Honor global _limits"
@@ -134,7 +139,7 @@ msgstr "Fontsendaj limoj"
 
 #: ../gtk/DetailsDialog.cc:496 ../gtk/DetailsDialog.cc:516
 msgid "Use global settings"
-msgstr "Uzi ĝeneralajn agordojn"
+msgstr "Uzi mallokajn agordojn"
 
 #: ../gtk/DetailsDialog.cc:497
 msgid "Seed regardless of ratio"
@@ -183,7 +188,7 @@ msgstr "Envicigita por elŝutado"
 #: ../gtk/DetailsDialog.cc:567 ../gtk/FilterBar.cc:517
 msgctxt "Verb"
 msgid "Downloading"
-msgstr "Elŝutanta"
+msgstr "Elŝutante"
 
 #: ../gtk/DetailsDialog.cc:570 ../gtk/TorrentCellRenderer.cc:192
 msgid "Queued for seeding"
@@ -192,7 +197,7 @@ msgstr "Envicigita por fontsendado"
 #: ../gtk/DetailsDialog.cc:573 ../gtk/FilterBar.cc:518
 msgctxt "Verb"
 msgid "Seeding"
-msgstr "Fontsendanta"
+msgstr "Fontsendante"
 
 #: ../gtk/DetailsDialog.cc:576 ../gtk/FilterBar.cc:520 ../gtk/TorrentCellRenderer.cc:180
 msgid "Finished"
@@ -459,7 +464,7 @@ msgstr "Etikedoj"
 
 #: ../gtk/DetailsDialog.cc:1774
 msgid "Web Seeds"
-msgstr ""
+msgstr "Retfontoj"
 
 #: ../gtk/DetailsDialog.cc:1821 ../gtk/DetailsDialog.cc:2495
 msgid "Show _more details"
@@ -684,7 +689,7 @@ msgstr "Malgrava"
 #: ../gtk/FileList.cc:744
 #, c-format
 msgid "Unable to rename file as \"%s\": %s"
-msgstr ""
+msgstr "Ne povus renomi dosieron al «%s»: %s"
 
 #: ../gtk/FileList.cc:838 ../gtk/MessageLogWindow.cc:292
 msgid "Name"
@@ -697,7 +702,7 @@ msgstr "Grando"
 #. add "progress" column
 #: ../gtk/FileList.cc:872
 msgid "Have"
-msgstr ""
+msgstr "Posedata"
 
 #. add "enabled" column
 #: ../gtk/FileList.cc:888
@@ -729,7 +734,7 @@ msgstr "Eraro"
 #: ../gtk/FilterBar.cc:714
 #, c-format
 msgid "_Show %'d of:"
-msgstr ""
+msgstr "_Montri %'d de:"
 
 #: ../gtk/FilterBar.cc:714
 msgid "_Show:"
@@ -738,7 +743,7 @@ msgstr "_Montri:"
 #: ../gtk/FreeSpaceLabel.cc:50
 #, c-format
 msgid "%s free"
-msgstr ""
+msgstr "%s libera"
 
 #: ../gtk/MainWindow.cc:130
 msgid "Torrent"
@@ -768,11 +773,11 @@ msgstr "Fontsendi eterne"
 
 #: ../gtk/MainWindow.cc:350
 msgid "Limit Download Speed"
-msgstr "Limigi elŝutrapidecon"
+msgstr "Limigi elŝutan rapidecon"
 
 #: ../gtk/MainWindow.cc:354
 msgid "Limit Upload Speed"
-msgstr "Limigi alŝutrapidecon"
+msgstr "Limigi alŝutan rapidecon"
 
 #: ../gtk/MainWindow.cc:360
 msgid "Stop Seeding at Ratio"
@@ -814,7 +819,7 @@ msgstr "Rilatumo: %s"
 #: ../gtk/MainWindow.cc:602
 #, c-format
 msgid "Down: %1$s, Up: %2$s"
-msgstr ""
+msgstr "El: %1$s, Al: %2$s"
 
 #: ../gtk/MainWindow.cc:611
 #, c-format
@@ -824,7 +829,7 @@ msgstr "El: %1$s, Al: %2$s"
 #: ../gtk/MakeDialog.cc:112
 #, c-format
 msgid "Creating \"%s\""
-msgstr "Kreas \"%s\""
+msgstr "Kreante \"%s\""
 
 #: ../gtk/MakeDialog.cc:116
 #, c-format
@@ -833,7 +838,7 @@ msgstr "Kreis \"%s\"!"
 
 #: ../gtk/MakeDialog.cc:120
 msgid "Cancelled"
-msgstr "Nuligite"
+msgstr "Nuligita"
 
 #: ../gtk/MakeDialog.cc:124
 #, c-format
@@ -937,7 +942,7 @@ msgstr "Ne eblis konservi „%s“"
 
 #: ../gtk/MessageLogWindow.cc:228
 msgid "Save Log"
-msgstr "Konservi Protokolon"
+msgstr "Konservi protokolon"
 
 #: ../gtk/MessageLogWindow.cc:301
 msgid "Message"
@@ -1001,7 +1006,7 @@ msgstr "Ĉiuj dosieroj"
 
 #: ../gtk/OptionsDialog.cc:262
 msgid "Torrent Options"
-msgstr "Torentaj Opcioj"
+msgstr "Torentaj opcioj"
 
 #: ../gtk/OptionsDialog.cc:281 ../gtk/OptionsDialog.cc:441 ../gtk/OptionsDialog.cc:501
 msgid "_Open"
@@ -1055,19 +1060,19 @@ msgstr "_URL"
 #: ../gtk/PrefsDialog.cc:252
 msgctxt "Gerund"
 msgid "Adding"
-msgstr ""
+msgstr "Aldonante"
 
 #: ../gtk/PrefsDialog.cc:255
 msgid "Automatically add .torrent files _from:"
-msgstr ""
+msgstr "Aŭtomate aldoni .torrent-dosierojn el:"
 
 #: ../gtk/PrefsDialog.cc:262
 msgid "Show the Torrent Options _dialog"
-msgstr ""
+msgstr "Montri la dialogujon por torentaj opcioj"
 
 #: ../gtk/PrefsDialog.cc:264
 msgid "_Start added torrents"
-msgstr ""
+msgstr "_Komenci aldonitajn torentojn"
 
 #: ../gtk/PrefsDialog.cc:270
 msgid "Save to _Location:"
@@ -1075,11 +1080,11 @@ msgstr "Konservi al _loko:"
 
 #: ../gtk/PrefsDialog.cc:278
 msgid "Download Queue"
-msgstr ""
+msgstr "Elŝuta vico"
 
 #: ../gtk/PrefsDialog.cc:280
 msgid "Ma_ximum active downloads:"
-msgstr ""
+msgstr "Ma_ksimuma nombro da aktivaj elŝutoj:"
 
 #: ../gtk/PrefsDialog.cc:284
 msgid "Downloads sharing data in the last _N minutes are active:"
@@ -1135,22 +1140,22 @@ msgstr "Sciigo"
 
 #: ../gtk/PrefsDialog.cc:375
 msgid "Show a notification when torrents are a_dded"
-msgstr ""
+msgstr "Montri avizon kiam torentoj al_donas"
 
 #: ../gtk/PrefsDialog.cc:379
 msgid "Show a notification when torrents _finish"
-msgstr ""
+msgstr "Montri avizon kiam torentoj _finas"
 
 #: ../gtk/PrefsDialog.cc:383
 msgid "Play a _sound when torrents finish"
-msgstr ""
+msgstr "Ludi sonon kiam torentoj finas"
 
 #: ../gtk/PrefsDialog.cc:414
 #, c-format
 msgid "Blocklist contains %'d rule"
 msgid_plural "Blocklist contains %'d rules"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Bloklisto enhavas %'d regulon"
+msgstr[1] "Bloklisto enhavas %'d regulojn"
 
 #: ../gtk/PrefsDialog.cc:440
 msgid "<b>Unable to update.</b>"
@@ -1164,8 +1169,8 @@ msgstr "<b>Ĝisdatigo sukcesis!</b>"
 #, c-format
 msgid "Blocklist has %'d rule."
 msgid_plural "Blocklist has %'d rules."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Bloklisto enhavas %'d regulon."
+msgstr[1] "Bloklisto enhavas %'d regulojn."
 
 #: ../gtk/PrefsDialog.cc:451
 msgid "Update Blocklist"
@@ -1173,7 +1178,7 @@ msgstr "Ĝisdatigi blokliston"
 
 #: ../gtk/PrefsDialog.cc:456
 msgid "Getting new blocklist…"
-msgstr ""
+msgstr "Alportas nova ŝtoplisto…"
 
 #: ../gtk/PrefsDialog.cc:478
 msgid "Allow encryption"
@@ -1181,7 +1186,7 @@ msgstr "Permesi ĉifradon"
 
 #: ../gtk/PrefsDialog.cc:479
 msgid "Prefer encryption"
-msgstr "Preferata ĉifrado"
+msgstr "Preferi ĉifradon"
 
 #: ../gtk/PrefsDialog.cc:480
 msgid "Require encryption"
@@ -1213,12 +1218,12 @@ msgstr "Ŝalti _aŭtomatajn ĝisdatigojn"
 
 #: ../gtk/PrefsDialog.cc:683
 msgid "Remote Control"
-msgstr ""
+msgstr "Malproksima aliro"
 
 #. "enabled" checkbutton
 #: ../gtk/PrefsDialog.cc:686
 msgid "Allow _remote access"
-msgstr ""
+msgstr "Permesi _malproksima aliro"
 
 #: ../gtk/PrefsDialog.cc:690
 msgid "_Open web client"
@@ -1226,7 +1231,7 @@ msgstr "_Malfermi retklienton"
 
 #: ../gtk/PrefsDialog.cc:699
 msgid "HTTP _port:"
-msgstr ""
+msgstr "HTTP _pordo:"
 
 #. require authentication
 #: ../gtk/PrefsDialog.cc:702
@@ -1244,7 +1249,7 @@ msgstr "Pas_vorto:"
 #. require authentication
 #: ../gtk/PrefsDialog.cc:719
 msgid "Only allow these IP a_ddresses:"
-msgstr ""
+msgstr "Nur permesi ĉi tiujn IP a_dresojn:"
 
 #: ../gtk/PrefsDialog.cc:733
 msgid "IP addresses may use wildcards, such as 192.168.*.*"
@@ -1296,21 +1301,21 @@ msgstr "Sabato"
 
 #: ../gtk/PrefsDialog.cc:871
 msgid "Speed Limits"
-msgstr "Rapidec-limoj"
+msgstr "Rapideclimoj"
 
 #: ../gtk/PrefsDialog.cc:874
 #, c-format
 msgid "_Upload (%s):"
-msgstr ""
+msgstr "_Alŝuto (%s):"
 
 #: ../gtk/PrefsDialog.cc:882
 #, c-format
 msgid "_Download (%s):"
-msgstr ""
+msgstr "_Elŝuto (%s):"
 
 #: ../gtk/PrefsDialog.cc:893
 msgid "Alternative Speed Limits"
-msgstr ""
+msgstr "Alternativaj rapideclimoj"
 
 #: ../gtk/PrefsDialog.cc:904
 msgid "Override normal speed limits manually or at scheduled times"
@@ -1319,12 +1324,12 @@ msgstr "Transpasi normajn rapidec-limojn mane aŭ je planitaj tempoj"
 #: ../gtk/PrefsDialog.cc:913
 #, c-format
 msgid "U_pload (%s):"
-msgstr ""
+msgstr "A_lŝuto (%s):"
 
 #: ../gtk/PrefsDialog.cc:918
 #, c-format
 msgid "Do_wnload (%s):"
-msgstr ""
+msgstr "Elŝ_uto (%s):"
 
 #: ../gtk/PrefsDialog.cc:926
 msgid " _to "
@@ -1352,15 +1357,15 @@ msgstr "Pordo estas <b>malfermita</b>"
 
 #: ../gtk/PrefsDialog.cc:1002
 msgid "<i>Testing TCP port…</i>"
-msgstr ""
+msgstr "<i>Testas TCP-pordon…</i>"
 
 #: ../gtk/PrefsDialog.cc:1024
 msgid "Listening Port"
-msgstr ""
+msgstr "Aŭskultanta pordo"
 
 #: ../gtk/PrefsDialog.cc:1027
 msgid "_Port used for incoming connections:"
-msgstr ""
+msgstr "_Pordo por alvenantaj konektoj:"
 
 #: ../gtk/PrefsDialog.cc:1034
 msgid "Te_st Port"
@@ -1376,7 +1381,7 @@ msgstr "Uzi UPnP-n aŭ NAT-PMP-n alipordan plusendadon de mia enkursigilo"
 
 #: ../gtk/PrefsDialog.cc:1052
 msgid "Peer Limits"
-msgstr ""
+msgstr "Limoj de samtavolanoj"
 
 #: ../gtk/PrefsDialog.cc:1054
 msgid "Maximum peers per _torrent:"
@@ -1441,12 +1446,12 @@ msgstr "_Helpo"
 #: ../gtk/PrefsDialog.cc:1156
 msgctxt "Gerund"
 msgid "Downloading"
-msgstr ""
+msgstr "Elŝutanta"
 
 #: ../gtk/PrefsDialog.cc:1157
 msgctxt "Gerund"
 msgid "Seeding"
-msgstr ""
+msgstr "Fontsendanta"
 
 #: ../gtk/PrefsDialog.cc:1159
 msgid "Network"
@@ -1454,7 +1459,7 @@ msgstr "Reto"
 
 #: ../gtk/PrefsDialog.cc:1161
 msgid "Remote"
-msgstr ""
+msgstr "Malproksima aliro"
 
 #: ../gtk/RelocateDialog.cc:75
 #, c-format
@@ -1501,12 +1506,12 @@ msgstr ""
 #: ../gtk/Session.cc:1123
 #, c-format
 msgid "Couldn't read \"%s\": %s"
-msgstr ""
+msgstr "Ne povis legi \"%s\": %s"
 
 #: ../gtk/Session.cc:1171
 #, c-format
 msgid "Skipping unknown torrent \"%s\""
-msgstr ""
+msgstr "Preterpasante nekonatan torenton \"%s\""
 
 #. logging
 #: ../gtk/Session.cc:1440
@@ -1521,7 +1526,7 @@ msgstr ""
 #. logging
 #: ../gtk/Session.cc:1467
 msgid "Allowing desktop hibernation"
-msgstr "Permesas pasivumigon de la labortablo"
+msgstr "Permesante pasivumigon de la labortablo"
 
 #: ../gtk/StatsDialog.cc:80 ../gtk/StatsDialog.cc:161
 #, c-format
@@ -1565,7 +1570,7 @@ msgstr "Senokupa"
 #: ../gtk/SystemTrayIcon.cc:105 ../gtk/SystemTrayIcon.cc:116
 #, c-format
 msgid " (Limit: %s)"
-msgstr ""
+msgstr " (Limo: %s)"
 
 #. %1$s: current upload speed
 #. * %2$s: current upload limit, if any
@@ -1641,13 +1646,13 @@ msgstr "%s restas"
 #: ../gtk/TorrentCellRenderer.cc:152
 #, c-format
 msgid "%1$s %2$s  %3$s %4$s"
-msgstr ""
+msgstr "%1$s %2$s  %3$s %4$s"
 
 #. up speed, up symbol
 #: ../gtk/TorrentCellRenderer.cc:162
 #, c-format
 msgid "%1$s  %2$s"
-msgstr ""
+msgstr "%1$s  %2$s"
 
 #: ../gtk/TorrentCellRenderer.cc:167
 msgid "Stalled"
@@ -1676,41 +1681,41 @@ msgstr "Eraro: %s"
 #: ../gtk/TorrentCellRenderer.cc:254
 #, c-format
 msgid "Downloading metadata from %1$'d %2$s (%3$d%% done)"
-msgstr ""
+msgstr "Elŝutante metadatumojn el %1$'d %2$s (%3$d%% farita)"
 
 #: ../gtk/TorrentCellRenderer.cc:256 ../gtk/TorrentCellRenderer.cc:266 ../gtk/TorrentCellRenderer.cc:285
 msgid "peer"
 msgid_plural "peers"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "samtavolano"
+msgstr[1] "samtavolanoj"
 
 #: ../gtk/TorrentCellRenderer.cc:263
 #, c-format
 msgid "Downloading from %1$'d of %2$'d %3$s and %4$'d %5$s"
-msgstr ""
+msgstr "Elŝutante el %1$'d de %2$'d %3$skaj %4$'d %5$s"
 
 #: ../gtk/TorrentCellRenderer.cc:268 ../gtk/TorrentCellRenderer.cc:276
 msgid "web seed"
 msgid_plural "web seeds"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "retfonto"
+msgstr[1] "retfontoj"
 
 #: ../gtk/TorrentCellRenderer.cc:274
 #, c-format
 msgid "Downloading from %1$'d %2$s"
-msgstr ""
+msgstr "Elŝutas el %1$'d %2$s"
 
 #: ../gtk/TorrentCellRenderer.cc:282
 #, c-format
 msgid "Downloading from %1$'d of %2$'d %3$s"
-msgstr ""
+msgstr "Elŝutas el %1$'d de %2$'d %3$s"
 
 #: ../gtk/TorrentCellRenderer.cc:294
 #, c-format
 msgid "Seeding to %1$'d of %2$'d connected peer"
 msgid_plural "Seeding to %1$'d of %2$'d connected peers"
 msgstr[0] "Fontsendas al %1$'d el %2$'d konektita samtavolano"
-msgstr[1] "Fontsendas al %1$'d el %2$'d konektitaj samtavolanoj"
+msgstr[1] "Fontsendante al %1$'d el %2$'d konektitaj samtavolanoj"
 
 #: ../gtk/Utils.cc:36
 msgid "KiB"
@@ -1861,7 +1866,7 @@ msgstr "Elŝuti kaj kunhavigi dosierojn per BitTorrent"
 #. Translators: Search terms to find this application. Do NOT translate or localize the semicolons! The list MUST also end with a semicolon!
 #: ../gtk/transmission-gtk.desktop.in:7
 msgid "torrents;downloading;uploading;share;sharing;"
-msgstr ""
+msgstr "torentoj;alŝuti;elŝuti;konigi;"
 
 #: ../gtk/transmission-gtk.desktop.in:21
 msgid "Start Transmission with All Torrents Paused"
@@ -1869,27 +1874,27 @@ msgstr ""
 
 #: ../gtk/transmission-gtk.desktop.in:25
 msgid "Start Transmission Minimized"
-msgstr ""
+msgstr "Minimumigi Transmission kiam ĝi komencas"
 
 #: ../libtransmission/announcer-udp.cc:201 ../libtransmission/announcer-udp.cc:303
 msgid "Unknown error"
-msgstr ""
+msgstr "Nekonata eraro"
 
 #: ../libtransmission/announcer-udp.cc:546
 msgid "Connection failed"
-msgstr ""
+msgstr "Ne povus establi konekton"
 
 #: ../libtransmission/announcer.cc:1000 ../libtransmission/announcer.cc:1324
 msgid "Could not connect to tracker"
-msgstr ""
+msgstr "Ne povis konekti kun la ŝanĝospurilo"
 
 #: ../libtransmission/announcer.cc:1004 ../libtransmission/announcer.cc:1328
 msgid "Tracker did not respond"
-msgstr ""
+msgstr "Ŝanĝospurilo ne respondis"
 
 #: ../libtransmission/announcer.cc:1065
 msgid "Success"
-msgstr ""
+msgstr "Sukceso"
 
 #: ../libtransmission/blocklist.cc:56 ../libtransmission/blocklist.cc:357 ../libtransmission/utils.cc:228 ../libtransmission/utils.cc:280
 #, c-format
@@ -1920,7 +1925,7 @@ msgstr "Bloklisto \"%s\" ĝisdatigita kun %zu enskribigoj"
 #: ../libtransmission/fdlimit.cc:171
 #, c-format
 msgid "Couldn't get directory for \"%1$s\": %2$s"
-msgstr ""
+msgstr "Ne povis trovi dosierujon por \"%1$s\": %2$s"
 
 #: ../libtransmission/fdlimit.cc:177 ../libtransmission/file-posix.cc:268
 #, c-format
@@ -1934,11 +1939,11 @@ msgstr "Ne povis malfermi \"%1$s\": %2$s"
 
 #: ../libtransmission/fdlimit.cc:210
 msgid "full"
-msgstr ""
+msgstr "plena"
 
 #: ../libtransmission/fdlimit.cc:215
 msgid "sparse"
-msgstr ""
+msgstr "malabunda"
 
 #: ../libtransmission/fdlimit.cc:223
 #, c-format
@@ -2068,7 +2073,7 @@ msgstr ""
 
 #: ../libtransmission/rpc-server.cc:1045
 msgid "Password required"
-msgstr ""
+msgstr "Bezonas pasvorton"
 
 #: ../libtransmission/rpc-server.cc:1052
 #, c-format
@@ -2097,7 +2102,7 @@ msgstr ""
 
 #: ../libtransmission/torrent.cc:1395
 msgid "Restarted manually -- disabling its seed ratio"
-msgstr ""
+msgstr "Rekomencigis mane—malebligas sian fontan rilatumon"
 
 #: ../libtransmission/torrent.cc:1561
 msgid "Removing torrent"
@@ -2180,6 +2185,10 @@ msgstr "Kontrolas torenton"
 #~ msgid "%1$s (+%2$s corrupt)"
 #~ msgstr "%1$s (+%2$s difektita)"
 
+#, c-format
+#~ msgid "%s is not a valid address"
+#~ msgstr "%s estas malvalida adreso"
+
 #~ msgid "Ask Tracker for _More Peers"
 #~ msgstr "Peti por pli da sa_mtavolanoj al la ŝanĝospurilo"
 
@@ -2206,8 +2215,8 @@ msgstr "Kontrolas torenton"
 #~ msgstr "Enŝalti a_lternativajn rapideclimojn"
 
 #, c-format
-#~ msgid "Error opening \"%s\""
-#~ msgstr "\"%s\" estis nemalfermebla"
+#~ msgid "Error uncompressing blocklist: %s (%d)"
+#~ msgstr "Ne povis maldensigi ŝtopliston: %s (%d)"
 
 #, c-format
 #~ msgid "File \"%s\" is in the way"
@@ -2262,10 +2271,6 @@ msgstr "Kontrolas torenton"
 #~ msgid "Select _All"
 #~ msgstr "Elekti ĉi_ujn"
 
-#, c-format
-#~ msgid "Server returned \"%1$ld %2$s\""
-#~ msgstr "Servilo respondis \"%1$ld %2$s\""
-
 #~ msgid "Set _Location…"
 #~ msgstr "Agordi _lokon..."
 
@@ -2297,16 +2302,16 @@ msgstr "Kontrolas torenton"
 #~ msgstr "Ordigi laŭ _vico"
 
 #~ msgid "Start _Now"
-#~ msgstr "Startigi _nun"
+#~ msgstr "Komenci _nun"
 
 #~ msgid "Start all torrents"
 #~ msgstr "Startigi ĉiujn torentojn"
 
 #~ msgid "Start torrent"
-#~ msgstr "Startigi torenton"
+#~ msgstr "Komenci torenton"
 
 #~ msgid "Start torrent now"
-#~ msgstr "Startigi torenton nun"
+#~ msgstr "Komenci torenton nun"
 
 #, c-format
 #~ msgid "The torrent file \"%s\" contains invalid data."
@@ -2331,8 +2336,8 @@ msgstr "Kontrolas torenton"
 #~ msgid "Tracker will allow requests in %s"
 #~ msgstr "Ŝanĝospurilo permesos petojn post %s"
 
-#~ msgid "Transmission BitTorrent Client"
-#~ msgstr "Transmission BitTorrent-Kliento"
+#~ msgid "Unable to parse file content"
+#~ msgstr "Ne povis deĉifri dosieran enhavon"
 
 #~ msgid "_Compact View"
 #~ msgstr "_Kompakta vido"

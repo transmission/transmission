@@ -3,14 +3,18 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
+# Translators:
+# Mike Gelfand <mikedld@mikedld.com>, 2017
+# Nejc Bertoncelj, 2020
+#
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-21 21:24+0000\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2017\n"
+"POT-Creation-Date: 2022-02-21 21:26+0000\n"
+"PO-Revision-Date: 2017-01-26 19:47+0000\n"
+"Last-Translator: Nejc Bertoncelj, 2020\n"
 "Language-Team: Slovenian (https://www.transifex.com/transmissionbt/teams/33778/sl/)\n"
 "Language: sl\n"
 "MIME-Version: 1.0\n"
@@ -34,7 +38,7 @@ msgstr "Prejet je bil signal %d. Program se poizkuša končati. V primeru zmrznj
 
 #: ../gtk/Application.cc:704
 msgid "Transmission is a file sharing program. When you run a torrent, its data will be made available to others by means of upload. Any content you share is your sole responsibility."
-msgstr ""
+msgstr "Program Transmission je namenjen izmenjavi datotek. Podatki datotek torrent so na voljo za izmenjavo z drugimi uporabniki preko omrežja. Deljene datoteke so izključno vaša odgovornost."
 
 #. make the dialog
 #: ../gtk/Application.cc:710 ../gtk/DetailsDialog.cc:2265 ../gtk/DetailsDialog.cc:2375 ../gtk/Dialogs.cc:114 ../gtk/MakeDialog.cc:208 ../gtk/MessageLogWindow.cc:229 ../gtk/OptionsDialog.cc:280 ../gtk/OptionsDialog.cc:440 ../gtk/OptionsDialog.cc:500 ../gtk/RelocateDialog.cc:160 ../gtk/StatsDialog.cc:100
@@ -43,7 +47,7 @@ msgstr ""
 
 #: ../gtk/Application.cc:711
 msgid "I _Agree"
-msgstr ""
+msgstr "Strinj_am se"
 
 #: ../gtk/Application.cc:892
 msgid "<b>Closing Connections</b>"
@@ -463,7 +467,7 @@ msgstr "Zastavice"
 
 #: ../gtk/DetailsDialog.cc:1774
 msgid "Web Seeds"
-msgstr ""
+msgstr "Spletna semena"
 
 #: ../gtk/DetailsDialog.cc:1821 ../gtk/DetailsDialog.cc:2495
 msgid "Show _more details"
@@ -702,7 +706,7 @@ msgstr "Nizka"
 #: ../gtk/FileList.cc:744
 #, c-format
 msgid "Unable to rename file as \"%s\": %s"
-msgstr ""
+msgstr "Preimenovanje datoteke \"%s\" ni mogoče: %s"
 
 #: ../gtk/FileList.cc:838 ../gtk/MessageLogWindow.cc:292
 msgid "Name"
@@ -747,7 +751,7 @@ msgstr "Napaka"
 #: ../gtk/FilterBar.cc:714
 #, c-format
 msgid "_Show %'d of:"
-msgstr ""
+msgstr "_Prikaži %'d od:"
 
 #: ../gtk/FilterBar.cc:714
 msgid "_Show:"
@@ -1669,13 +1673,13 @@ msgstr "%s do konca"
 #: ../gtk/TorrentCellRenderer.cc:152
 #, c-format
 msgid "%1$s %2$s  %3$s %4$s"
-msgstr ""
+msgstr "%1$s %2$s  %3$s %4$s"
 
 #. up speed, up symbol
 #: ../gtk/TorrentCellRenderer.cc:162
 #, c-format
 msgid "%1$s  %2$s"
-msgstr ""
+msgstr "%1$s  %2$s"
 
 #: ../gtk/TorrentCellRenderer.cc:167
 msgid "Stalled"
@@ -1709,10 +1713,10 @@ msgstr ""
 #: ../gtk/TorrentCellRenderer.cc:256 ../gtk/TorrentCellRenderer.cc:266 ../gtk/TorrentCellRenderer.cc:285
 msgid "peer"
 msgid_plural "peers"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "soležnik"
+msgstr[1] "soležnika"
+msgstr[2] "soležniki"
+msgstr[3] "soležniki"
 
 #: ../gtk/TorrentCellRenderer.cc:263
 #, c-format
@@ -2248,10 +2252,6 @@ msgstr "Preverjanje torrenta"
 #~ msgstr "Omogoči nadomestne _omejitve hitrosti"
 
 #, c-format
-#~ msgid "Error opening \"%s\""
-#~ msgstr "Napaka med odpiranjem \"%s\""
-
-#, c-format
 #~ msgid "File \"%s\" is in the way"
 #~ msgstr "Datoteka \"%s\" je v napoto"
 
@@ -2307,10 +2307,6 @@ msgstr "Preverjanje torrenta"
 
 #~ msgid "Select _All"
 #~ msgstr "_Izberi vse"
-
-#, c-format
-#~ msgid "Server returned \"%1$ld %2$s\""
-#~ msgstr "Strežnik je vrnil \"%1$ld %2$s\""
 
 #~ msgid "Set _Location…"
 #~ msgstr "Nastavi m_esto ..."
@@ -2380,9 +2376,6 @@ msgstr "Preverjanje torrenta"
 #, c-format
 #~ msgid "Tracker will allow requests in %s"
 #~ msgstr "Sledilnik bo dovolil zahtevke v %s"
-
-#~ msgid "Transmission BitTorrent Client"
-#~ msgstr "Odjemalec BitTorrent Transmission"
 
 #~ msgid "_Compact View"
 #~ msgstr "_Zgoščen pogled"

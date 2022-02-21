@@ -3,13 +3,16 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
+# Translators:
+# Mike Gelfand <mikedld@mikedld.com>, 2017
+#
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-21 21:24+0000\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"POT-Creation-Date: 2022-02-21 21:26+0000\n"
+"PO-Revision-Date: 2017-01-26 19:47+0000\n"
 "Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2017\n"
 "Language-Team: Vietnamese (https://www.transifex.com/transmissionbt/teams/33778/vi/)\n"
 "Language: vi\n"
@@ -2172,10 +2175,6 @@ msgstr "Đang kiểm tra torrent"
 #~ msgstr "Bật chế độ Giới hạn tốc độ thủ công"
 
 #, c-format
-#~ msgid "Error opening \"%s\""
-#~ msgstr "Lỗi khi mở \"%s\""
-
-#, c-format
 #~ msgid "File \"%s\" is in the way"
 #~ msgstr "\"%s\" không phải một thư mục"
 
@@ -2210,10 +2209,6 @@ msgstr "Đang kiểm tra torrent"
 
 #~ msgid "Select _All"
 #~ msgstr "Chọn tất _cả"
-
-#, c-format
-#~ msgid "Server returned \"%1$ld %2$s\""
-#~ msgstr "Máy chủ trả về \"%1$ld %2$s\""
 
 #~ msgid "Sort by A_ge"
 #~ msgstr "Xếp theo Thời _gian"
@@ -2271,9 +2266,6 @@ msgstr "Đang kiểm tra torrent"
 #, c-format
 #~ msgid "Tracker will allow requests in %s"
 #~ msgstr "Tracker sẽ nhận yêu cầu trong %s nữa"
-
-#~ msgid "Transmission BitTorrent Client"
-#~ msgstr "Trình khách BitTorrent Transmission"
 
 #~ msgid "_Compact View"
 #~ msgstr "Chế độ thu _gọn"

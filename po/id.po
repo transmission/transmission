@@ -5,16 +5,16 @@
 #
 # Translators:
 # Mike Gelfand <mikedld@mikedld.com>, 2017
-# Andika Triwidada <andika@gmail.com>, 2020
+# Andika Triwidada <andika@gmail.com>, 2021
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-21 21:24+0000\n"
+"POT-Creation-Date: 2022-02-21 21:26+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Andika Triwidada <andika@gmail.com>, 2020\n"
+"Last-Translator: Andika Triwidada <andika@gmail.com>, 2021\n"
 "Language-Team: Indonesian (https://www.transifex.com/transmissionbt/teams/33778/id/)\n"
 "Language: id\n"
 "MIME-Version: 1.0\n"
@@ -43,7 +43,7 @@ msgstr "Transmission adalah sebuah program berbagi berkas. Ketika Anda menjalank
 #. make the dialog
 #: ../gtk/Application.cc:710 ../gtk/DetailsDialog.cc:2265 ../gtk/DetailsDialog.cc:2375 ../gtk/Dialogs.cc:114 ../gtk/MakeDialog.cc:208 ../gtk/MessageLogWindow.cc:229 ../gtk/OptionsDialog.cc:280 ../gtk/OptionsDialog.cc:440 ../gtk/OptionsDialog.cc:500 ../gtk/RelocateDialog.cc:160 ../gtk/StatsDialog.cc:100
 msgid "_Cancel"
-msgstr ""
+msgstr "_Batal"
 
 #: ../gtk/Application.cc:711
 msgid "I _Agree"
@@ -532,7 +532,7 @@ msgstr "%s - Sunting Pelacak"
 
 #: ../gtk/DetailsDialog.cc:2266 ../gtk/MessageLogWindow.cc:230
 msgid "_Save"
-msgstr ""
+msgstr "_Simpan"
 
 #: ../gtk/DetailsDialog.cc:2271
 msgid "Tracker Announce URLs"
@@ -584,7 +584,7 @@ msgstr "Tampilkan pelacak _cadangan"
 #. create the dialog
 #: ../gtk/DetailsDialog.cc:2560 ../gtk/MakeDialog.cc:209 ../gtk/MakeDialog.cc:439 ../gtk/PrefsDialog.cc:1148 ../gtk/StatsDialog.cc:139
 msgid "_Close"
-msgstr ""
+msgstr "_Tutup"
 
 #: ../gtk/DetailsDialog.cc:2573 ../gtk/MessageLogWindow.cc:413
 msgid "Information"
@@ -655,7 +655,7 @@ msgstr[0] "Satu atau lebih dari torrent-torrent ini belum selesai mengunduh."
 
 #: ../gtk/Dialogs.cc:115
 msgid "_Delete"
-msgstr ""
+msgstr "_Hapus"
 
 #: ../gtk/FileList.cc:558 ../gtk/Utils.cc:389
 msgid "High"
@@ -874,7 +874,7 @@ msgstr[0] "%1$'d Potong @ %2$s"
 
 #: ../gtk/MakeDialog.cc:440
 msgid "_New"
-msgstr ""
+msgstr "_Baru"
 
 #: ../gtk/MakeDialog.cc:449
 msgid "Sa_ve to:"
@@ -947,15 +947,15 @@ msgstr "Log Pesan"
 
 #: ../gtk/MessageLogWindow.cc:462
 msgid "Save _As"
-msgstr ""
+msgstr "Simp_an Sebagai"
 
 #: ../gtk/MessageLogWindow.cc:473
 msgid "Clear"
-msgstr ""
+msgstr "Bersihkan"
 
 #: ../gtk/MessageLogWindow.cc:486
 msgid "P_ause"
-msgstr ""
+msgstr "Jed_a"
 
 #: ../gtk/MessageLogWindow.cc:495
 msgid "Level"
@@ -995,7 +995,7 @@ msgstr "Pengaturan Torrent"
 
 #: ../gtk/OptionsDialog.cc:281 ../gtk/OptionsDialog.cc:441 ../gtk/OptionsDialog.cc:501
 msgid "_Open"
-msgstr ""
+msgstr "_Buka"
 
 #: ../gtk/OptionsDialog.cc:295 ../gtk/PrefsDialog.cc:268
 msgid "Mo_ve .torrent file to the trash"
@@ -1463,7 +1463,7 @@ msgstr "Tata Lokasi Torrent"
 
 #: ../gtk/RelocateDialog.cc:161
 msgid "_Apply"
-msgstr ""
+msgstr "Ter_apkan"
 
 #: ../gtk/RelocateDialog.cc:167
 msgid "Location"
@@ -2053,7 +2053,7 @@ msgstr "Perlu kata sandi"
 #: ../libtransmission/rpc-server.cc:1052
 #, c-format
 msgid "Serving RPC and Web requests from directory '%s'"
-msgstr ""
+msgstr "Melayani permintaan RPC dan Web dari direktori '%s'"
 
 #. first %s is the application name
 #. second %s is the version number
@@ -2346,6 +2346,9 @@ msgstr "Verifikasi torrent"
 #~ msgid "Unable to parse file content"
 #~ msgstr "Tidak dapat menguraikan konten berkas"
 
+#~ msgid "_About"
+#~ msgstr "Perih_al"
+
 #~ msgid "_Compact View"
 #~ msgstr "Tilikan _Kompak"
 
@@ -2372,6 +2375,12 @@ msgstr "Verifikasi torrent"
 
 #~ msgid "_Pause All"
 #~ msgstr "_Istirahat Semua"
+
+#~ msgid "_Preferences"
+#~ msgstr "_Preferensi"
+
+#~ msgid "_Properties"
+#~ msgstr "_Properti"
 
 #~ msgid "_Queue"
 #~ msgstr "_Antrian"

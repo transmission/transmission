@@ -3,13 +3,16 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
+# Translators:
+# Mike Gelfand <mikedld@mikedld.com>, 2017
+#
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-21 21:24+0000\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"POT-Creation-Date: 2022-02-21 21:26+0000\n"
+"PO-Revision-Date: 2017-01-26 19:47+0000\n"
 "Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2017\n"
 "Language-Team: Bosnian (https://www.transifex.com/transmissionbt/teams/33778/bs/)\n"
 "Language: bs\n"
@@ -2207,10 +2210,6 @@ msgstr ""
 #~ msgid "Enable Alternative Speed _Limits"
 #~ msgstr "Omogući Alternativnu Brzinsku_granicu"
 
-#, c-format
-#~ msgid "Error opening \"%s\""
-#~ msgstr "Greška prilikom otvaranja „%s“"
-
 #~ msgid "Message _Log"
 #~ msgstr "_Dnevnik Poruka"
 
@@ -2259,10 +2258,6 @@ msgstr ""
 
 #~ msgid "Select _All"
 #~ msgstr "Izaberi sve"
-
-#, c-format
-#~ msgid "Server returned \"%1$ld %2$s\""
-#~ msgstr "Server je vratio „%1$ld %2$s“"
 
 #~ msgid "Set _Location…"
 #~ msgstr "Podesi _mjesto…"

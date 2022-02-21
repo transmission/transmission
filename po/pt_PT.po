@@ -4,19 +4,20 @@
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 # Translators:
-# Gonçalo Matos , 2017
+# Gonçalo Matos, 2017
 # 7c6417e89b22a8ff879ae1c785868b50_dffeeef <c09a75da091a7c844bae1ff96a7d87ea_606937>, 2017
 # Rui <xymarior@yandex.com>, 2019
 # Mike Gelfand <mikedld@mikedld.com>, 2020
+# Hugo Carvalho <hugokarvalho@hotmail.com>, 2022
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-21 21:24+0000\n"
+"POT-Creation-Date: 2022-02-21 21:26+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2020\n"
+"Last-Translator: Hugo Carvalho <hugokarvalho@hotmail.com>, 2022\n"
 "Language-Team: Portuguese (Portugal) (https://www.transifex.com/transmissionbt/teams/33778/pt_PT/)\n"
 "Language: pt_PT\n"
 "MIME-Version: 1.0\n"
@@ -45,7 +46,7 @@ msgstr "O Transmission é um programa de partilha de ficheiros. Quando abre um t
 #. make the dialog
 #: ../gtk/Application.cc:710 ../gtk/DetailsDialog.cc:2265 ../gtk/DetailsDialog.cc:2375 ../gtk/Dialogs.cc:114 ../gtk/MakeDialog.cc:208 ../gtk/MessageLogWindow.cc:229 ../gtk/OptionsDialog.cc:280 ../gtk/OptionsDialog.cc:440 ../gtk/OptionsDialog.cc:500 ../gtk/RelocateDialog.cc:160 ../gtk/StatsDialog.cc:100
 msgid "_Cancel"
-msgstr ""
+msgstr "_Cancelar"
 
 #: ../gtk/Application.cc:711
 msgid "I _Agree"
@@ -89,6 +90,7 @@ msgstr ""
 #: ../gtk/Application.cc:1287
 msgid "translator-credits"
 msgstr ""
+"Hugo Carvalho <hugokarvalho@Hotmail.com>\n"
 "Gonçalo Matos (goncalomatos);\n"
 "Rui (xendez);\n"
 "StringYM;"
@@ -524,7 +526,7 @@ msgstr "%s - Editar Rastreadores"
 
 #: ../gtk/DetailsDialog.cc:2266 ../gtk/MessageLogWindow.cc:230
 msgid "_Save"
-msgstr ""
+msgstr "_Guardar"
 
 #: ../gtk/DetailsDialog.cc:2271
 msgid "Tracker Announce URLs"
@@ -576,7 +578,7 @@ msgstr "Mostrar rastreadores na cópia de segurança"
 #. create the dialog
 #: ../gtk/DetailsDialog.cc:2560 ../gtk/MakeDialog.cc:209 ../gtk/MakeDialog.cc:439 ../gtk/PrefsDialog.cc:1148 ../gtk/StatsDialog.cc:139
 msgid "_Close"
-msgstr ""
+msgstr "Fe_char"
 
 #: ../gtk/DetailsDialog.cc:2573 ../gtk/MessageLogWindow.cc:413
 msgid "Information"
@@ -654,7 +656,7 @@ msgstr[1] "Alguns destes torrents ainda não terminaram."
 
 #: ../gtk/Dialogs.cc:115
 msgid "_Delete"
-msgstr ""
+msgstr "_Eliminar"
 
 #: ../gtk/FileList.cc:558 ../gtk/Utils.cc:389
 msgid "High"
@@ -875,7 +877,7 @@ msgstr[1] "%1$'d Peças @ %2$s"
 
 #: ../gtk/MakeDialog.cc:440
 msgid "_New"
-msgstr ""
+msgstr "_Novo"
 
 #: ../gtk/MakeDialog.cc:449
 msgid "Sa_ve to:"
@@ -948,7 +950,7 @@ msgstr "Registo de mensagens"
 
 #: ../gtk/MessageLogWindow.cc:462
 msgid "Save _As"
-msgstr ""
+msgstr "Grav_ar como"
 
 #: ../gtk/MessageLogWindow.cc:473
 msgid "Clear"
@@ -956,7 +958,7 @@ msgstr "Limpar"
 
 #: ../gtk/MessageLogWindow.cc:486
 msgid "P_ause"
-msgstr ""
+msgstr "P_ausar"
 
 #: ../gtk/MessageLogWindow.cc:495
 msgid "Level"
@@ -996,7 +998,7 @@ msgstr "Opções de torrents"
 
 #: ../gtk/OptionsDialog.cc:281 ../gtk/OptionsDialog.cc:441 ../gtk/OptionsDialog.cc:501
 msgid "_Open"
-msgstr ""
+msgstr "Abrir"
 
 #: ../gtk/OptionsDialog.cc:295 ../gtk/PrefsDialog.cc:268
 msgid "Mo_ve .torrent file to the trash"
@@ -1192,7 +1194,7 @@ msgstr "Lista de bloqueio"
 
 #: ../gtk/PrefsDialog.cc:504
 msgid "Enable _blocklist:"
-msgstr "Ativar lista de _bloqueio"
+msgstr "Ativar lista de _bloqueio:"
 
 #: ../gtk/PrefsDialog.cc:517
 msgid "_Update"
@@ -1319,7 +1321,7 @@ msgstr "_Descarregar (%s):"
 
 #: ../gtk/PrefsDialog.cc:926
 msgid " _to "
-msgstr "_a"
+msgstr " _a "
 
 #: ../gtk/PrefsDialog.cc:933
 msgid "_Scheduled times:"
@@ -1466,7 +1468,7 @@ msgstr "Definir a localização do torrent"
 
 #: ../gtk/RelocateDialog.cc:161
 msgid "_Apply"
-msgstr ""
+msgstr "_Aplicar"
 
 #: ../gtk/RelocateDialog.cc:167
 msgid "Location"
@@ -2064,7 +2066,7 @@ msgstr "Necessária palavra-passe"
 #: ../libtransmission/rpc-server.cc:1052
 #, c-format
 msgid "Serving RPC and Web requests from directory '%s'"
-msgstr ""
+msgstr "Servir pedidos RPC e Web a partir do diretório '%s'"
 
 #. first %s is the application name
 #. second %s is the version number
@@ -2157,7 +2159,7 @@ msgstr "\"%s\" gravado"
 #. did caller give us an uninitialized val?
 #: ../libtransmission/variant.cc:971
 msgid "Invalid metadata"
-msgstr "metadados inválidos"
+msgstr "Metadados inválidos"
 
 #: ../libtransmission/variant.cc:1216
 msgid "Error saving \"%"
@@ -2357,6 +2359,9 @@ msgstr "A verificar o torrent"
 #~ msgid "Unable to parse file content"
 #~ msgstr "Não foi possível processar o conteúdo do ficheiro"
 
+#~ msgid "_About"
+#~ msgstr "_Acerca"
+
 #~ msgid "_Compact View"
 #~ msgstr "Vista _Compacta"
 
@@ -2376,13 +2381,19 @@ msgstr "A verificar o torrent"
 #~ msgstr "Barra de _Filtros"
 
 #~ msgid "_New…"
-#~ msgstr "_Novo"
+#~ msgstr "_Novo…"
 
 #~ msgid "_Pause"
 #~ msgstr "_Pausar"
 
 #~ msgid "_Pause All"
 #~ msgstr "Pausar tudo"
+
+#~ msgid "_Preferences"
+#~ msgstr "_Preferências"
+
+#~ msgid "_Properties"
+#~ msgstr "_Propriedades"
 
 #~ msgid "_Queue"
 #~ msgstr "F_ila"
@@ -2394,7 +2405,7 @@ msgstr "A verificar o torrent"
 #~ msgstr "_Mostrar o Transmission"
 
 #~ msgid "_Sort Torrents By"
-#~ msgstr "_Ordenar Torrents por:"
+#~ msgstr "_Ordenar Torrents por"
 
 #~ msgid "_Start"
 #~ msgstr "_Iniciar"

@@ -203,12 +203,12 @@
     <message>
         <location line="+8"/>
         <source>Peer was discovered through DHT</source>
-        <translation>Compañero encontrado a través de DHT</translation>
+        <translation>Par encontrado a través de DHT</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Peer was discovered through Peer Exchange (PEX)</source>
-        <translation>Compañero encontrado por Intercambio de Compañeros (PEX)</translation>
+        <translation>Compañero encontrado por Intercambio de pares (PEX)</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -275,7 +275,7 @@
     <message>
         <location line="+250"/>
         <source>Peer is connected over uTP</source>
-        <translation>Compañero conectado usando uTP</translation>
+        <translation>Par conectado usando uTP</translation>
     </message>
     <message>
         <location line="+260"/>
@@ -381,7 +381,7 @@
     <message>
         <location line="+26"/>
         <source>Downloaded:</source>
-        <translation>Descargados:</translation>
+        <translation>Descargado:</translation>
     </message>
     <message>
         <location line="+26"/>
@@ -451,7 +451,7 @@
     <message>
         <location line="+20"/>
         <source>Peers</source>
-        <translation>Compañeros</translation>
+        <translation>Pares</translation>
     </message>
     <message>
         <location line="+32"/>
@@ -461,12 +461,12 @@
     <message>
         <location line="+22"/>
         <source>Add Tracker</source>
-        <translation>Añadir tracker</translation>
+        <translation>Añadir rastreador</translation>
     </message>
     <message>
         <location line="+20"/>
         <source>Remove Trackers</source>
-        <translation>Borrar trackers</translation>
+        <translation>Borrar rastreadores</translation>
     </message>
     <message>
         <location line="+23"/>
@@ -476,7 +476,7 @@
     <message>
         <location line="+7"/>
         <source>Show &amp;backup trackers</source>
-        <translation>Muestra trackers de &amp;respaldo</translation>
+        <translation>Muestrar rastreadores de &amp;respaldo</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -531,12 +531,12 @@
     <message>
         <location line="+50"/>
         <source>Peer Connections</source>
-        <translation>Conexiones de compañeros</translation>
+        <translation>Conexiones de pares</translation>
     </message>
     <message>
         <location line="+12"/>
         <source>&amp;Maximum peers:</source>
-        <translation>&amp;Máximo nº de compañeros:</translation>
+        <translation>&amp;Máximo de pares:</translation>
     </message>
 </context>
 <context>
@@ -941,12 +941,12 @@
     <message>
         <location line="+11"/>
         <source>Ask Tracker for &amp;More Peers</source>
-        <translation>Pedirle al tracker &amp;más compañeros</translation>
+        <translation>Pedir al rastreador &amp;más pares</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Ask tracker for more peers</source>
-        <translation>Pedirle más compañeros al tracker</translation>
+        <translation>Pedir más pares al rastreador</translation>
     </message>
     <message>
         <location line="+5"/>
@@ -991,12 +991,12 @@
     <message>
         <location line="+8"/>
         <source>&amp;Start All</source>
-        <translation>Iniciar &amp;Todos</translation>
+        <translation>Iniciar &amp;todo</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>&amp;Pause All</source>
-        <translation>Dete&amp;ner todos</translation>
+        <translation>Dete&amp;ner todo</translation>
     </message>
     <message>
         <location line="+5"/>
@@ -1006,7 +1006,7 @@
     <message>
         <location line="+11"/>
         <source>&amp;Select All</source>
-        <translation>&amp;Seleccionar todos</translation>
+        <translation>&amp;Seleccionar todo</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -1067,7 +1067,7 @@
     <message>
         <location line="+8"/>
         <source>Sort by &amp;Progress</source>
-        <translation>Ordenar por a&amp;vance</translation>
+        <translation>Ordenar por &amp;progreso</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -1178,7 +1178,7 @@
     <message>
         <location line="+5"/>
         <source>&amp;Copy Magnet Link to Clipboard</source>
-        <translation>&amp;Copiar enlace magnético al portapapeles</translation>
+        <translation>&amp;Copiar enlace magnet al portapapeles</translation>
     </message>
     <message>
         <location line="+5"/>
@@ -1289,7 +1289,7 @@
     <message>
         <location line="+424"/>
         <source>Torrent Files (*.torrent);;All Files (*.*)</source>
-        <translation>Archivos de torrent (*.torrent);;Todos los archivos (*.*)</translation>
+        <translation>Archivos torrent (*.torrent);;Todos los archivos (*.*)</translation>
     </message>
     <message>
         <location line="+6"/>
@@ -1382,22 +1382,22 @@
     <message>
         <location line="+4"/>
         <source>This torrent is connected to peers.</source>
-        <translation>Este torrent está conectado a compañeros.</translation>
+        <translation>Este torrent está conectado a pares.</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>These torrents are connected to peers.</source>
-        <translation>Estos torrent están conectados a compañeros.</translation>
+        <translation>Estos torrent están conectados a pares.</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>One of these torrents is connected to peers.</source>
-        <translation>Uno de estos torrents está conectado a compañeros.</translation>
+        <translation>Uno de estos torrents está conectado a pares.</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Some of these torrents are connected to peers.</source>
-        <translation>Algunos de estos torrents están conectados a compañeros.</translation>
+        <translation>Algunos de estos torrents están conectados a pares.</translation>
     </message>
     <message>
         <location line="+10"/>
@@ -1446,16 +1446,16 @@
         <location line="+4"/>
         <source>%Ln File(s)</source>
         <translation>
-            <numerusform>%n Archivo</numerusform>
-            <numerusform>%Ln Archivos</numerusform>
+            <numerusform>%Ln archivo</numerusform>
+            <numerusform>%Ln archivos</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location line="+1"/>
         <source>%Ln Piece(s)</source>
         <translation>
-            <numerusform>%n Pieza</numerusform>
-            <numerusform>%Ln Piezas</numerusform>
+            <numerusform>%Ln pieza</numerusform>
+            <numerusform>%Ln piezas</numerusform>
         </translation>
     </message>
     <message>
@@ -1476,7 +1476,7 @@
     <message>
         <location line="+13"/>
         <source>Source f&amp;older:</source>
-        <translation>&amp;Folder fuente:</translation>
+        <translation>&amp;Carpeta fuente:</translation>
     </message>
     <message>
         <location line="+14"/>
@@ -1491,7 +1491,7 @@
     <message>
         <location line="+12"/>
         <source>&amp;Trackers:</source>
-        <translation>&amp;Trackers</translation>
+        <translation>&amp;Rastreadores</translation>
     </message>
     <message>
         <location line="+23"/>
@@ -1526,17 +1526,17 @@ Para añadir otra URL primaria, añádela después de una línea en blanco.</tra
     <message>
         <location filename="../MakeDialog.cc" line="-136"/>
         <source>Creating &quot;%1&quot;</source>
-        <translation>Creando &quot;%1&quot;</translation>
+        <translation>Creando «%1»</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Created &quot;%1&quot;!</source>
-        <translation>¡&quot;%1&quot; Creado!</translation>
+        <translation>¡«%1» creado!</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Error: invalid announce URL &quot;%1&quot;</source>
-        <translation>Error: URL para anuncio invalido &quot;%1&quot;</translation>
+        <translation>Error: URL para anuncio inválido «%1»</translation>
     </message>
     <message>
         <location line="-4"/>
@@ -1546,12 +1546,12 @@ Para añadir otra URL primaria, añádela después de una línea en blanco.</tra
     <message>
         <location line="+8"/>
         <source>Error reading &quot;%1&quot;: %2</source>
-        <translation>Error al leer &quot;%1&quot;: %2</translation>
+        <translation>Error al leer «%1»: %2</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Error writing &quot;%1&quot;: %2</source>
-        <translation>Error al escribir &quot;%1&quot;: %2</translation>
+        <translation>Error al escribir «%1»: %2</translation>
     </message>
 </context>
 <context>
@@ -1559,17 +1559,17 @@ Para añadir otra URL primaria, añádela después de una línea en blanco.</tra
     <message>
         <location filename="../OptionsDialog.cc" line="+62"/>
         <source>Open Torrent</source>
-        <translation>Abrir Torrent</translation>
+        <translation>Abrir torrent</translation>
     </message>
     <message>
         <location line="-17"/>
         <source>Open Torrent from File</source>
-        <translation>Abrir Torrent desde archivo</translation>
+        <translation>Abrir torrent desde archivo</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Open Torrent from URL or Magnet Link</source>
-        <translation>Abrir URL del Torrent o Magnet Link</translation>
+        <translation>Abrir URL del torrent o enlace magnet</translation>
     </message>
     <message>
         <location filename="../OptionsDialog.ui" line="+17"/>
@@ -1579,7 +1579,7 @@ Para añadir otra URL primaria, añádela después de una línea en blanco.</tra
     <message>
         <location line="+22"/>
         <source>&amp;Destination folder:</source>
-        <translation>Directorio &amp;destino:</translation>
+        <translation>Carpeta &amp;destino:</translation>
     </message>
     <message>
         <location filename="../OptionsDialog.cc" line="+52"/>
@@ -1782,7 +1782,7 @@ Para añadir otra URL primaria, añádela después de una línea en blanco.</tra
     <message>
         <location line="+15"/>
         <source>Enable &amp;uTP for peer connections</source>
-        <translation>Habilitar &amp;uTP en conexiones con compañeros</translation>
+        <translation>Habilitar &amp;uTP en conexiones con pares</translation>
     </message>
     <message>
         <location line="-3"/>
@@ -1840,7 +1840,7 @@ Para añadir otra URL primaria, añádela después de una línea en blanco.</tra
     <message>
         <location line="+12"/>
         <source>Ma&amp;ximum active downloads:</source>
-        <translation>Ma&amp;ximo de descargas activas:</translation>
+        <translation>Má&amp;ximo de descargas activas:</translation>
     </message>
     <message>
         <location line="+67"/>
@@ -1878,12 +1878,12 @@ Para añadir otra URL primaria, añádela después de una línea en blanco.</tra
     <message>
         <location line="+321"/>
         <source>Maximum peers per &amp;torrent:</source>
-        <translation>Máximo número de compañeros por &amp;torrent:</translation>
+        <translation>Máximo número de pares por &amp;torrent:</translation>
     </message>
     <message>
         <location line="+23"/>
         <source>Maximum peers &amp;overall:</source>
-        <translation>Máximo número de compañeros &amp;global:</translation>
+        <translation>Máximo número de pares &amp;global:</translation>
     </message>
     <message numerus="yes">
         <location filename="../PrefsDialog.cc" line="-253"/>
@@ -1967,7 +1967,7 @@ Para añadir otra URL primaria, añádela después de una línea en blanco.</tra
     <message>
         <location line="+505"/>
         <source>Remote Control</source>
-        <translation>Control Remoto</translation>
+        <translation>Control remoto</translation>
     </message>
     <message>
         <location line="+12"/>
@@ -2072,37 +2072,37 @@ Para añadir otra URL primaria, añádela después de una línea en blanco.</tra
     <message>
         <location filename="../PrefsDialog.ui" line="-281"/>
         <source>Peer Limits</source>
-        <translation>Limite de compañeros</translation>
+        <translation>Limite de pares</translation>
     </message>
     <message>
         <location line="+104"/>
         <source>Use PE&amp;X to find more peers</source>
-        <translation>Usar PE&amp;X para encontrar más compañeros</translation>
+        <translation>Usar PE&amp;X para encontrar más pares</translation>
     </message>
     <message>
         <location line="-3"/>
         <source>PEX is a tool for exchanging peer lists with the peers you&apos;re connected to.</source>
-        <translation>PEX es una herramienta para intercambiar listas de compañeros con los que ya están conectados.</translation>
+        <translation>PEX es una herramienta para intercambiar listas de pares con los que ya están conectados.</translation>
     </message>
     <message>
         <location line="+13"/>
         <source>Use &amp;DHT to find more peers</source>
-        <translation>Usar &amp;DHT para encontrar más compañeros</translation>
+        <translation>Usar &amp;DHT para encontrar más pares</translation>
     </message>
     <message>
         <location line="-3"/>
         <source>DHT is a tool for finding peers without a tracker.</source>
-        <translation>DHT es una herramienta para encontrar compañeros sin usar un tracker.</translation>
+        <translation>DHT es una herramienta para encontrar pares sin usar un rastreador.</translation>
     </message>
     <message>
         <location line="+13"/>
         <source>Use &amp;Local Peer Discovery to find more peers</source>
-        <translation>Usar Descubrimiento de Compañeros &amp;Local para encontrar más</translation>
+        <translation>Usar descubrimiento de pares &amp;local para encontrar más pares</translation>
     </message>
     <message>
         <location line="-3"/>
         <source>LPD is a tool for finding peers on your local network.</source>
-        <translation>LPD es una herramienta para encontrar compañeros en la red local.</translation>
+        <translation>LPD es una herramienta para encontrar pares en la red local.</translation>
     </message>
     <message>
         <location line="-325"/>
@@ -2487,16 +2487,16 @@ Para añadir otra URL primaria, añádela después de una línea en blanco.</tra
         <source>Downloading from %Ln peer(s)</source>
         <extracomment>First part of phrase &quot;Downloading from ... peer(s) and ... web seed(s)&quot;</extracomment>
         <translation>
-            <numerusform>Descargando desde %Ln compañero</numerusform>
-            <numerusform>Descargando desde %Ln compañeros</numerusform>
+            <numerusform>Descargando desde %Ln par</numerusform>
+            <numerusform>Descargando desde %Ln pares</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location line="+22"/>
         <source>Seeding to %Ln peer(s)</source>
         <translation>
-            <numerusform>Compartiendo a %Ln compañero</numerusform>
-            <numerusform>Compartiendo a %Ln compañeros</numerusform>
+            <numerusform>Compartiendo a %Ln par</numerusform>
+            <numerusform>Compartiendo a %Ln pares</numerusform>
         </translation>
     </message>
     <message>
@@ -2508,8 +2508,8 @@ Para añadir otra URL primaria, añádela después de una línea en blanco.</tra
         <location line="-50"/>
         <source>Downloading metadata from %Ln peer(s) (%1% done)</source>
         <translation>
-            <numerusform>Descargando metadata desde %Ln compañero (%1% obtenido)</numerusform>
-            <numerusform>Descargando metadatos desde %Ln compañeros (%1% obtenido)</numerusform>
+            <numerusform>Descargando metadata desde %Ln par (%1% obtenido)</numerusform>
+            <numerusform>Descargando metadatos desde %Ln pares (%1% obtenido)</numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -2517,8 +2517,8 @@ Para añadir otra URL primaria, añádela después de una línea en blanco.</tra
         <source>Downloading from %1 of %Ln connected peer(s)</source>
         <extracomment>First part of phrase &quot;Downloading from ... of ... connected peer(s) and ... web seed(s)&quot;</extracomment>
         <translation>
-            <numerusform>Descargando desde %1 de %Ln compañero conectado</numerusform>
-            <numerusform>Descargando desde %1 de %Ln compañeros conectados</numerusform>
+            <numerusform>Descargando desde %1 de %Ln par conectado</numerusform>
+            <numerusform>Descargando desde %1 de %Ln pares conectados</numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -2534,8 +2534,8 @@ Para añadir otra URL primaria, añádela después de una línea en blanco.</tra
         <location line="+13"/>
         <source>Seeding to %1 of %Ln connected peer(s)</source>
         <translation>
-            <numerusform>Compartiendo a %1 de %Ln compañero conectado</numerusform>
-            <numerusform>Compartiendo a %1 de %Ln compañeros conectados</numerusform>
+            <numerusform>Compartiendo a %1 de %Ln par conectado</numerusform>
+            <numerusform>Compartiendo a %1 de %Ln pares conectados</numerusform>
         </translation>
     </message>
     <message>
@@ -2551,15 +2551,15 @@ Para añadir otra URL primaria, añádela después de una línea en blanco.</tra
         <source>Got a list of%1 %Ln peer(s)%2 %3 ago</source>
         <extracomment>%1 and %2 are replaced with HTML markup, %3 is duration</extracomment>
         <translation>
-            <numerusform>Recibimos una lista de%1 %Ln compañero%2 hace %3</numerusform>
-            <numerusform>Recibimos una lista de%1 %Ln compañeros%2 hace %3</numerusform>
+            <numerusform>Recibimos una lista de%1 %Ln par%2 hace %3</numerusform>
+            <numerusform>Recibimos una lista de%1 %Ln pares%2 hace %3</numerusform>
         </translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Peer list request %1timed out%2 %3 ago; will retry</source>
         <extracomment>%1 and %2 are replaced with HTML markup, %3 is duration</extracomment>
-        <translation>El pedido de la lista de compañeros %1caducó hace %2 %3; se volverá a intentar</translation>
+        <translation>El pedido de la lista de pares %1caducó hace %2 %3; se volverá a intentar</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -2576,18 +2576,18 @@ Para añadir otra URL primaria, añádela después de una línea en blanco.</tra
         <location line="+6"/>
         <source>Asking for more peers in %1</source>
         <extracomment>%1 is duration</extracomment>
-        <translation>Solicitando más compañeros en %1</translation>
+        <translation>Solicitando más pares en %1</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Queued to ask for more peers</source>
-        <translation>En cola para pedir más compañeros</translation>
+        <translation>En cola para pedir más pares</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Asking for more peers now... &lt;small&gt;%1&lt;/small&gt;</source>
         <extracomment>%1 is duration</extracomment>
-        <translation>Solicitando más compañeros ahora... &lt;small&gt;%1&lt;/small&gt;</translation>
+        <translation>Solicitando más pares ahora... &lt;small&gt;%1&lt;/small&gt;</translation>
     </message>
     <message numerus="yes">
         <location line="+27"/>
@@ -2611,7 +2611,7 @@ Para añadir otra URL primaria, añádela después de una línea en blanco.</tra
         <location line="+8"/>
         <source>Tracker had %1no information%2 on peer counts %3 ago</source>
         <extracomment>%1 and %2 are replaced with HTML markup, %3 is duration</extracomment>
-        <translation>El tracker tenía %1nada%2 del conteo de compañeros %3 atrás</translation>
+        <translation>El rastredor tenía %1nada%2 del recuento de pares hace %3</translation>
     </message>
     <message>
         <location line="-24"/>
@@ -2623,18 +2623,18 @@ Para añadir otra URL primaria, añádela después de una línea en blanco.</tra
         <location line="+39"/>
         <source>Asking for peer counts in %1</source>
         <extracomment>%1 is duration</extracomment>
-        <translation>Solicitando cuenta de compañeros en %1</translation>
+        <translation>Solicitando recuento de pares en %1</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Queued to ask for peer counts</source>
-        <translation>En cola para pedir cuenta de compañeros</translation>
+        <translation>En cola para pedir recuento de pares</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Asking for peer counts now... &lt;small&gt;%1&lt;/small&gt;</source>
         <extracomment>%1 is duration</extracomment>
-        <translation>Solicitando cuenta de compañeros ahora... &lt;small&gt;%1&lt;/small&gt;</translation>
+        <translation>Solicitando recuento de pares ahora... &lt;small&gt;%1&lt;/small&gt;</translation>
     </message>
 </context>
 <context>

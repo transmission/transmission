@@ -2252,22 +2252,22 @@ Beste lehen URL bat gehitzeko, gehitu hura lerro huts baten ondoren.</translatio
     <message>
         <location line="+57"/>
         <source>%1 (copy of %2)</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 ( %2 horren kopia)</translation>
     </message>
     <message numerus="yes">
         <location line="+6"/>
         <source>Duplicate Torrent(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Bikoiztu Torrenta(k)</numerusform>
+            <numerusform>Bikoiztu Torrenta(k)</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location line="+2"/>
         <source>Unable to add %n duplicate torrent(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Ezin izan da %n bikoiztutako Torrent-a gehitu</numerusform>
+            <numerusform>Ezin izan dira %n bikoiztutako Torrent-a(k) gehitu</numerusform>
         </translation>
     </message>
 </context>

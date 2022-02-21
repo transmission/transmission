@@ -5,7 +5,7 @@
 #
 # Translators:
 # Mike Gelfand <mikedld@mikedld.com>, 2017
-# jmontane, 2020
+# Joan Montané, 2020
 # Robert Antoni Buj Gelonch <rbuj@fedoraproject.org>, 2020
 #
 #, fuzzy
@@ -13,7 +13,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-21 21:24+0000\n"
+"POT-Creation-Date: 2022-02-21 21:26+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
 "Last-Translator: Robert Antoni Buj Gelonch <rbuj@fedoraproject.org>, 2020\n"
 "Language-Team: Catalan (https://www.transifex.com/transmissionbt/teams/33778/ca/)\n"
@@ -169,7 +169,7 @@ msgstr "Nombre _màxim de clients connectats:"
 
 #: ../gtk/DetailsDialog.cc:558 ../gtk/TorrentCellRenderer.cc:184 ../libtransmission/verify.cc:249
 msgid "Queued for verification"
-msgstr "S'ha enviat la cua per a la verificació"
+msgstr "S'ha enviat a la cua per a la verificació"
 
 #: ../gtk/DetailsDialog.cc:561
 msgid "Verifying local data"
@@ -177,7 +177,7 @@ msgstr "S'estan verificant les dades locals"
 
 #: ../gtk/DetailsDialog.cc:564 ../gtk/TorrentCellRenderer.cc:188
 msgid "Queued for download"
-msgstr "S'ha enviat la cua per a la baixada"
+msgstr "S'ha enviat a la cua per a la baixada"
 
 #: ../gtk/DetailsDialog.cc:567 ../gtk/FilterBar.cc:517
 msgctxt "Verb"
@@ -186,7 +186,7 @@ msgstr "S'està baixant"
 
 #: ../gtk/DetailsDialog.cc:570 ../gtk/TorrentCellRenderer.cc:192
 msgid "Queued for seeding"
-msgstr "S'ha enviat la cua per a la compartició"
+msgstr "S'ha enviat a la cua per a la compartició"
 
 #: ../gtk/DetailsDialog.cc:573 ../gtk/FilterBar.cc:518
 msgctxt "Verb"
@@ -490,7 +490,7 @@ msgstr "Se sol·licitaran més clients d'aquí %s"
 
 #: ../gtk/DetailsDialog.cc:1911
 msgid "Queued to ask for more peers"
-msgstr "S'ha enviat la cua per a la sol·licitud de més clients"
+msgstr "S'ha enviat a la cua per a la sol·licitud de més clients"
 
 #: ../gtk/DetailsDialog.cc:1918
 #, c-format
@@ -514,7 +514,7 @@ msgstr "Se sol·licitarà el nombre de clients d'aquí %s"
 
 #: ../gtk/DetailsDialog.cc:1970
 msgid "Queued to ask for peer counts"
-msgstr "S'ha enviat la cua per a la sol·licitud del nombre de clients"
+msgstr "S'ha enviat a la cua per a la sol·licitud del nombre de clients"
 
 #: ../gtk/DetailsDialog.cc:1977
 #, c-format
@@ -631,8 +631,8 @@ msgstr[1] "Voleu suprimir %d torrents?"
 #, c-format
 msgid "Delete this torrent's downloaded files?"
 msgid_plural "Delete these %d torrents' downloaded files?"
-msgstr[0] "Voleu suprimir els fitxers baixats d'aquest torrent?"
-msgstr[1] "Voleu suprimir els fitxers baixats d'aquests %d torrents?"
+msgstr[0] "Voleu eliminar els fitxers baixats d'aquest torrent?"
+msgstr[1] "Voleu eliminar els fitxers baixats d'aquests %d torrents?"
 
 #: ../gtk/Dialogs.cc:62
 msgid "Once removed, continuing the transfer will require the torrent file or magnet link."
@@ -666,7 +666,7 @@ msgstr[1] "Alguns d'aquests torrents no han finalitzat la baixada."
 
 #: ../gtk/Dialogs.cc:115
 msgid "_Delete"
-msgstr "_Suprimeix"
+msgstr "_Elimina"
 
 #: ../gtk/FileList.cc:558 ../gtk/Utils.cc:389
 msgid "High"
@@ -964,7 +964,7 @@ msgstr "_Anomena i desa"
 
 #: ../gtk/MessageLogWindow.cc:473
 msgid "Clear"
-msgstr "Netejar"
+msgstr "Neteja"
 
 #: ../gtk/MessageLogWindow.cc:486
 msgid "P_ause"
@@ -1167,7 +1167,7 @@ msgstr "<b>L'actualització s'ha completat amb èxit</b>"
 #, c-format
 msgid "Blocklist has %'d rule."
 msgid_plural "Blocklist has %'d rules."
-msgstr[0] "La llista de bloquejats té %'d regla."
+msgstr[0] "La llista de bloqueigs té %'d regla."
 msgstr[1] "La llista de bloqueigs té %'d regles."
 
 #: ../gtk/PrefsDialog.cc:451
@@ -1192,7 +1192,7 @@ msgstr "Requereix el xifratge"
 
 #: ../gtk/PrefsDialog.cc:497 ../gtk/PrefsDialog.cc:1158
 msgid "Privacy"
-msgstr "Privacitat"
+msgstr "Privadesa"
 
 #: ../gtk/PrefsDialog.cc:499
 msgid "_Encryption mode:"
@@ -2285,7 +2285,7 @@ msgstr "S'està verificant el torrent"
 #~ msgstr "Mode d'ordenació _invertit"
 
 #~ msgid "Remove torrent"
-#~ msgstr "Suprimeix un torrent"
+#~ msgstr "Suprimeix el torrent"
 
 #~ msgid "Select _All"
 #~ msgstr "_Selecciona-ho tot"
@@ -2375,7 +2375,7 @@ msgstr "S'està verificant el torrent"
 #~ msgstr "_Continguts"
 
 #~ msgid "_Delete Files and Remove"
-#~ msgstr "Suprimeix i _esborra els fitxers"
+#~ msgstr "Suprimeix i _elimina els fitxers"
 
 #~ msgid "_Donate"
 #~ msgstr "_Donatius"
@@ -2417,7 +2417,7 @@ msgstr "S'està verificant el torrent"
 #~ msgstr "_Inicia"
 
 #~ msgid "_Start All"
-#~ msgstr "_Inicia'ls tots"
+#~ msgstr "_Inicia-ho tot"
 
 #~ msgid "_Statistics"
 #~ msgstr "_Estadístiques"

@@ -3,13 +3,16 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
+# Translators:
+# Mike Gelfand <mikedld@mikedld.com>, 2017
+#
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-21 21:24+0000\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"POT-Creation-Date: 2022-02-21 21:26+0000\n"
+"PO-Revision-Date: 2017-01-26 19:47+0000\n"
 "Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2017\n"
 "Language-Team: Telugu (https://www.transifex.com/transmissionbt/teams/33778/te/)\n"
 "Language: te\n"
@@ -2191,10 +2194,6 @@ msgstr "టోరెంట్ని తనిఖీచేస్తున్న�
 #~ msgstr "ప్రత్యామ్నాయ వేగ పరిమితులను చేతనపరుచు(_L)"
 
 #, c-format
-#~ msgid "Error opening \"%s\""
-#~ msgstr "\"%s\" తెరుచుటలో దోషం"
-
-#, c-format
 #~ msgid "Invalid metadata entry \"%s\""
 #~ msgstr "చెల్లని మెటాడేటా ప్రవేశం \"%s\""
 
@@ -2246,10 +2245,6 @@ msgstr "టోరెంట్ని తనిఖీచేస్తున్న�
 
 #~ msgid "Select _All"
 #~ msgstr "అన్నీ ఎంపికచేయి (_A)"
-
-#, c-format
-#~ msgid "Server returned \"%1$ld %2$s\""
-#~ msgstr "\"%1$ld %2$s\" సేవిక తిరిగియిచ్చింది"
 
 #~ msgid "Set _Location…"
 #~ msgstr "స్థానాన్ని అమర్చండి...(_L)"
@@ -2319,9 +2314,6 @@ msgstr "టోరెంట్ని తనిఖీచేస్తున్న�
 #, c-format
 #~ msgid "Tracker will allow requests in %s"
 #~ msgstr "%s లో విన్నపాలు ట్రాకర్ అనుమతించవచ్చు"
-
-#~ msgid "Transmission BitTorrent Client"
-#~ msgstr "ట్రాన్స్​మిషన్ బిట్ టోరెంట్ క్లయింటు"
 
 #~ msgid "_Compact View"
 #~ msgstr "సంక్షిప్త వీక్షణం(_C)"

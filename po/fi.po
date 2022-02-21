@@ -6,17 +6,17 @@
 # Translators:
 # Mike Gelfand <mikedld@mikedld.com>, 2017
 # Otto Koskelah <otto@nise.fi>, 2017
-# Kimmo Kujansuu <mrkujansuu@gmail.com>, 2020
 # Jiri Grönroos <jiri.gronroos@iki.fi>, 2020
+# Kimmo Kujansuu <mrkujansuu@gmail.com>, 2021
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-21 21:24+0000\n"
+"POT-Creation-Date: 2022-02-21 21:26+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Jiri Grönroos <jiri.gronroos@iki.fi>, 2020\n"
+"Last-Translator: Kimmo Kujansuu <mrkujansuu@gmail.com>, 2021\n"
 "Language-Team: Finnish (https://www.transifex.com/transmissionbt/teams/33778/fi/)\n"
 "Language: fi\n"
 "MIME-Version: 1.0\n"
@@ -2085,7 +2085,7 @@ msgstr "Salasana vaaditaan"
 #: ../libtransmission/rpc-server.cc:1052
 #, c-format
 msgid "Serving RPC and Web requests from directory '%s'"
-msgstr ""
+msgstr "RPC- ja verkkopyyntöjen tarjonta hakemistosta '%s'"
 
 #. first %s is the application name
 #. second %s is the version number

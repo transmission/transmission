@@ -3,14 +3,18 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
+# Translators:
+# Mike Gelfand <mikedld@mikedld.com>, 2017
+# Trendyne Horse, 2022
+#
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-21 21:24+0000\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2017\n"
+"POT-Creation-Date: 2022-02-21 21:26+0000\n"
+"PO-Revision-Date: 2017-01-26 19:47+0000\n"
+"Last-Translator: Trendyne Horse, 2022\n"
 "Language-Team: Icelandic (https://www.transifex.com/transmissionbt/teams/33778/is/)\n"
 "Language: is\n"
 "MIME-Version: 1.0\n"
@@ -270,7 +274,7 @@ msgstr ""
 
 #: ../gtk/DetailsDialog.cc:994
 msgid "No errors"
-msgstr ""
+msgstr "Engar villur"
 
 #: ../gtk/DetailsDialog.cc:1014
 msgid "Never"
@@ -699,7 +703,7 @@ msgstr "Forgangur"
 
 #: ../gtk/FilterBar.cc:286 ../gtk/FilterBar.cc:514
 msgid "All"
-msgstr ""
+msgstr "Allt"
 
 #: ../gtk/FilterBar.cc:516
 msgid "Active"
@@ -721,7 +725,7 @@ msgstr ""
 
 #: ../gtk/FilterBar.cc:714
 msgid "_Show:"
-msgstr ""
+msgstr "_Sýna:"
 
 #: ../gtk/FreeSpaceLabel.cc:50
 #, c-format
@@ -1201,12 +1205,12 @@ msgstr "Uppfæra listann _sjálfkrafa"
 
 #: ../gtk/PrefsDialog.cc:683
 msgid "Remote Control"
-msgstr ""
+msgstr "Fjarstýring"
 
 #. "enabled" checkbutton
 #: ../gtk/PrefsDialog.cc:686
 msgid "Allow _remote access"
-msgstr ""
+msgstr "Leyfa _fjarstýringu"
 
 #: ../gtk/PrefsDialog.cc:690
 msgid "_Open web client"
@@ -1442,7 +1446,7 @@ msgstr "Net"
 
 #: ../gtk/PrefsDialog.cc:1161
 msgid "Remote"
-msgstr ""
+msgstr "Fjarstýring"
 
 #: ../gtk/RelocateDialog.cc:75
 #, c-format
@@ -2174,6 +2178,9 @@ msgstr "Skoða torrent-skrá"
 #~ msgid "Call scrip_t when torrent is completed:"
 #~ msgstr "Ræsa skrif_tu þegar torrent er lokið:"
 
+#~ msgid "Copy _Magnet Link to Clipboard"
+#~ msgstr "Afrita _segultengill á klemmuspjald "
+
 #~ msgid "Copyright (c) The Transmission Project"
 #~ msgstr "Höfundarréttur (c) Transmission verkefnið"
 
@@ -2312,9 +2319,6 @@ msgstr "Skoða torrent-skrá"
 #~ msgid "Tracker will allow requests in %s"
 #~ msgstr "Rekjari mun svara beiðnum eftir %s"
 
-#~ msgid "Transmission BitTorrent Client"
-#~ msgstr "Transmission BitTorrent forrit"
-
 #~ msgid "_Contents"
 #~ msgstr "_Innihald"
 
@@ -2346,7 +2350,7 @@ msgstr "Skoða torrent-skrá"
 #~ msgstr "_Hætta"
 
 #~ msgid "_Sort Torrents By"
-#~ msgstr "_Flokka torrent-skrár eftir"
+#~ msgstr "_Raða torrent-skrár eftir"
 
 #~ msgid "_Start"
 #~ msgstr "_Sækja"

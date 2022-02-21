@@ -3,13 +3,16 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
+# Translators:
+# Mike Gelfand <mikedld@mikedld.com>, 2017
+#
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-21 21:24+0000\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"POT-Creation-Date: 2022-02-21 21:26+0000\n"
+"PO-Revision-Date: 2017-01-26 19:47+0000\n"
 "Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2017\n"
 "Language-Team: French (Canada) (https://www.transifex.com/transmissionbt/teams/33778/fr_CA/)\n"
 "Language: fr_CA\n"
@@ -2187,10 +2190,6 @@ msgstr "Vérification du torrent"
 #~ msgstr "Activer les _limites de vitesse alternatives"
 
 #, c-format
-#~ msgid "Error opening \"%s\""
-#~ msgstr "Erreur lors de l'ouverture de « %s »"
-
-#, c-format
 #~ msgid "File \"%s\" is in the way"
 #~ msgstr "Le fichier « %s » est en route"
 
@@ -2246,10 +2245,6 @@ msgstr "Vérification du torrent"
 
 #~ msgid "Select _All"
 #~ msgstr "Tout _sélectionner"
-
-#, c-format
-#~ msgid "Server returned \"%1$ld %2$s\""
-#~ msgstr "Le serveur a retourné « %1$ld%2$s »"
 
 #~ msgid "Set _Location…"
 #~ msgstr "Définir l'_emplacement…"
@@ -2319,9 +2314,6 @@ msgstr "Vérification du torrent"
 #, c-format
 #~ msgid "Tracker will allow requests in %s"
 #~ msgstr "Le traqueur autorisera les requêtes dans %s"
-
-#~ msgid "Transmission BitTorrent Client"
-#~ msgstr "Client BitTorrent Transmission"
 
 #~ msgid "_Compact View"
 #~ msgstr "Vue _compacte"

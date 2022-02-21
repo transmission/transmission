@@ -3,13 +3,16 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
+# Translators:
+# Mike Gelfand <mikedld@mikedld.com>, 2017
+#
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-21 21:24+0000\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"POT-Creation-Date: 2022-02-21 21:26+0000\n"
+"PO-Revision-Date: 2017-01-26 19:47+0000\n"
 "Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2017\n"
 "Language-Team: Arabic (https://www.transifex.com/transmissionbt/teams/33778/ar/)\n"
 "Language: ar\n"
@@ -2300,10 +2303,6 @@ msgstr "يتحقق من التورنت"
 #~ msgstr "فعّل _حدود السرعة البديلة"
 
 #, c-format
-#~ msgid "Error opening \"%s\""
-#~ msgstr "خطأ في فتح \"%s\""
-
-#, c-format
 #~ msgid "File \"%s\" is in the way"
 #~ msgstr "الملف « %s » يعترض السبيل"
 
@@ -2428,9 +2427,6 @@ msgstr "يتحقق من التورنت"
 #, c-format
 #~ msgid "Tracker will allow requests in %s"
 #~ msgstr "سيسمح المتتبع بالطلبات بعد %s"
-
-#~ msgid "Transmission BitTorrent Client"
-#~ msgstr "ترانزميشن، عميل «بت تورنت»"
 
 #~ msgid "_Compact View"
 #~ msgstr "منظور _مدمج"

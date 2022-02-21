@@ -85,7 +85,7 @@
 "%d tracker" = "%d izleyici";
 
 /* Torrent -> status string */
-"%d web seeds" = "%d web beslemeleri";
+"%d web seeds" = "%d web beslemesi";
 
 /* Add torrent -> info
    Create torrent -> info
@@ -117,7 +117,7 @@
 "A blocklist must first be downloaded" = "Önce bir kara dizelge indirilmeli";
 
 /* Create torrent -> file already exists warning -> warning */
-"A file with the name \"%@\" already exists in the directory \"%@\". Choose a new name or directory to create the torrent file." = "\"%1$@\" adında bir dosya \"%2$@\" dizininde zaten var. Torrent dosyasını yaratmak için yeni bir ad veya dizin seçin.";
+"A file with the name \"%@\" already exists in the directory \"%@\". Choose a new name or directory to create the torrent file." = "\"%1$@\" adında bir dosya \"%2$@\" dizininde zaten var. Torrent dosyasını oluşturmak için yeni bir ad veya dizin seçin.";
 
 /* Move inside itself alert -> title */
 "A folder cannot be moved to inside itself." = "Bir klasör kendi içine taşınamaz.";
@@ -184,32 +184,32 @@
 "Apply Selected" = "Seçileni Uygula";
 
 /* Confirm Quit panel -> title */
-"Are you sure you want to quit?" = "Çıkmak istediğinizden emin misiniz?";
+"Are you sure you want to quit?" = "Çıkmak istediğinize emin misiniz?";
 
 /* Remove completed confirm panel -> title */
-"Are you sure you want to remove %@ completed transfers from the transfer list?" = "%@ bitmiş aktarımı aktarımlar dizelgesinden kaldırmak istediğinizden emin misiniz?";
+"Are you sure you want to remove %@ completed transfers from the transfer list?" = "%@ bitmiş aktarımı aktarımlar dizelgesinden kaldırmak istediğinize emin misiniz?";
 
 /* Removal confirm panel -> title */
-"Are you sure you want to remove %@ transfers from the transfer list and trash the data files?" = "%@ aktarımı aktarımlar dizelgesinden kaldırıp veri dosyalarını Çöp Sepeti'ne taşımak istediğinizden emin misiniz?";
+"Are you sure you want to remove %@ transfers from the transfer list and trash the data files?" = "%@ aktarımı aktarımlar dizelgesinden kaldırıp veri dosyalarını Çöp Sepeti'ne taşımak istediğinize emin misiniz?";
 
 /* Removal confirm panel -> title */
-"Are you sure you want to remove %@ transfers from the transfer list?" = "%@ aktarımı aktarımlar dizelgesinden çıkarmak istediğinizden emin misiniz?";
+"Are you sure you want to remove %@ transfers from the transfer list?" = "%@ aktarımı aktarımlar dizelgesinden çıkarmak istediğinize emin misiniz?";
 
 /* Remove trackers alert -> title */
-"Are you sure you want to remove %d trackers?" = "%d izleyiciyi kaldırmak istediğinizden emin misiniz?";
+"Are you sure you want to remove %d trackers?" = "%d izleyiciyi kaldırmak istediğinize emin misiniz?";
 
 /* Removal confirm panel -> title */
-"Are you sure you want to remove \"%@\" from the transfer list and trash the data file?" = "\"%@\" aktarımını aktarım dizelgesinden kaldırıp veri dosyalarını Çöp Sepeti'ne taşımak istediğinizden emin misiniz?";
+"Are you sure you want to remove \"%@\" from the transfer list and trash the data file?" = "\"%@\" aktarımını aktarım dizelgesinden kaldırıp veri dosyalarını Çöp Sepeti'ne taşımak istediğinize emin misiniz?";
 
 /* Removal confirm panel -> title
    Remove completed confirm panel -> title */
 "Are you sure you want to remove \"%@\" from the transfer list?" = "\"%@\" aktarımını aktarım dizelgesinden çıkarmak istedinizden emin misiniz?";
 
 /* Remove trackers alert -> title */
-"Are you sure you want to remove this tracker?" = "Bu izleyiciyi kaldırmak istediğinizden emin misiniz?";
+"Are you sure you want to remove this tracker?" = "Bu izleyiciyi kaldırmak istediğinize emin misiniz?";
 
 /* Stats reset -> title */
-"Are you sure you want to reset usage statistics?" = "Kullanım istatistiklerini sıfırlamak istedinizden emin misiniz?";
+"Are you sure you want to reset usage statistics?" = "Kullanım istatistiklerini sıfırlamak istediğinize emin misiniz?";
 
 /* inspector -> peer table -> header tool tip */
 "Available" = "Kullanılabilir";
@@ -283,10 +283,10 @@
 "Creation of \"%@\" failed." = "\"%@\" oluşturulamadı.";
 
 /* Inspector -> peer -> status */
-"Currently downloading (interested and not choked)" = "Şu anda indiriliyor (ilgili ve izinli)";
+"Currently downloading (interested and not choked)" = "Şu an indiriliyor (ilgili ve izinli)";
 
 /* Inspector -> peer -> status */
-"Currently uploading (interested and not choked)" = "Şu anda gönderiliyor (ilgili ve izinli)";
+"Currently uploading (interested and not choked)" = "Şu an gönderiliyor (ilgili ve izinli)";
 
 /* Message window -> table column */
 "Date" = "Tarih";
@@ -302,10 +302,10 @@
    inspector -> web seed table -> header
    status bar -> status label
    Torrent -> status string */
-"DL" = "İD";
+"DL" = "İN";
 
 /* Inspector -> Peers tab -> peers */
-"DL from %d" = "%d konumundan İD";
+"DL from %d" = "%d konumundan İN";
 
 /* Torrent disk space alert -> button */
 "Do not check disk space again" = "Disk alanını bir daha denetleme";
@@ -409,7 +409,7 @@
 "GB" = "GB";
 
 /* Transfer speed (gigabytes per second) */
-"GB/s" = "GB/s";
+"GB/s" = "GB/sn";
 
 /* Preferences -> toolbar item title */
 "General" = "Genel";
@@ -486,7 +486,7 @@
 "KB" = "KB";
 
 /* Transfer speed (kilobytes per second) */
-"KB/s" = "KB/s";
+"KB/s" = "KB/sn";
 
 /* Tracker last announce */
 "Last Announce" = "Son Duyuru";
@@ -504,7 +504,7 @@
 "License" = "Lisans";
 
 /* torrent action menu -> upload/download limit */
-"Limit (%d KB/s)" = "Limit (%d KB/s)";
+"Limit (%d KB/s)" = "Limit (%d KB/sn)";
 
 /* Save log alert panel -> title */
 "Log Could Not Be Saved" = "Günlük Kaydedilemedi";
@@ -526,7 +526,7 @@
 "MB" = "MB";
 
 /* Transfer speed (megabytes per second) */
-"MB/s" = "MB/s";
+"MB/s" = "MB/sn";
 
 /* Message window -> table column */
 "Message" = "İleti";
@@ -650,10 +650,10 @@
 "Partial Seed" = "Kısımsal Besleme";
 
 /* All toolbar item -> palette label */
-"Pause / Resume All" = "Tümünü Duraklat / Sürdür";
+"Pause / Resume All" = "Tümünü Duraklat/Sürdür";
 
 /* Selected toolbar item -> palette label */
-"Pause / Resume Selected" = "Seçiliyi Duraklat / Sürdür";
+"Pause / Resume Selected" = "Seçiliyi Duraklat/Sürdür";
 
 /* All toolbar item -> label
    Dock item */
@@ -687,23 +687,23 @@
 "Peers" = "Eşler ";
 
 /* Inspector -> Peers tab -> table row tooltip */
-"Port" = "Port";
+"Port" = "Kapı";
 
 /* Preferences -> Network -> port status */
-"Port check site is down" = "Port denetim alanı çalışmıyor";
+"Port check site is down" = "Kapı denetim alanı çalışmıyor";
 
 /* Preferences -> Network -> port status */
-"Port is closed" = "Port kapalı";
+"Port is closed" = "Kapı kapalı";
 
 /* Preferences -> Network -> port status */
-"Port is open" = "Port açık";
+"Port is open" = "Kapı açık";
 
 /* File Outline -> Menu
    file table -> header tool tip */
 "Priority" = "Öncelik";
 
 /* files tab -> tooltip */
-"Priority Not Available" = "Öncelik Kullanılamaz";
+"Priority Not Available" = "Öncelik Kullanılamıyor";
 
 /* Inspector -> private torrent */
 "Private Torrent, non-tracker peer discovery disabled" = "Gizli Torrent, izleyicisiz eş bulumu etkisizleştirildi";
@@ -715,7 +715,7 @@
 "Processing blocklist" = "Kara dizelge işleniyor";
 
 /* Stats window -> label */
-"Program Started" = "Uygulama Başladı";
+"Program Started" = "Uygulama Başlatıldı";
 
 /* Inspector -> Peers tab -> table row tooltip */
 "Progress: %@" = "İlerleme: %@";
@@ -858,7 +858,7 @@
 "Select the new folder for \"%@\"." = "\"%@\" için yeni klasör seç.";
 
 /* Status Bar -> status menu */
-"Session Ratio" = "Oturumdaki Oran";
+"Session Ratio" = "Oturum Oranı";
 
 /* Status Bar -> status menu */
 "Session Transfer" = "Oturumdaki Aktarım";
@@ -911,10 +911,10 @@
 "Statistics" = "İstatistikler";
 
 /* torrent action menu -> ratio stop */
-"Stop at Ratio (%.2f)" = "(%.2f) oranında dur";
+"Stop at Ratio (%.2f)" = "Oranda Dur (%.2f)";
 
 /* Torrent cell -> button info */
-"Stop waiting to start" = "Başlamayı bekleme";
+"Stop waiting to start" = "Başlatılmayı bekleme";
 
 /* Donation beg -> title */
 "Support open-source indie software" = "Açık kaynaklı özgür yazılımları destekleyin";
@@ -923,7 +923,7 @@
 "TB" = "TB";
 
 /* Transfer speed (terabytes per second) */
-"TB/s" = "TB/s";
+"TB/s" = "TB/sn";
 
 /* Create torrent -> directory doesn't exist warning -> title */
 "The chosen torrent file location does not exist." = "Seçili torrent dosyası konumu mevcut değil.";
@@ -954,7 +954,7 @@
 "The torrent file cannot be opened because it contains invalid data." = "Bu torrent dosyası açılamaz çünkü geçersiz veri içeriyor.";
 
 /* Create torrent -> zero size -> title */
-"The total file size is zero bytes." = "Toplam dosya boyutu sıfır bit.";
+"The total file size is zero bytes." = "Toplam dosya boyutu sıfır bayt.";
 
 /* Open duplicate alert -> message */
 "The transfer cannot be added because it is a duplicate of an already existing transfer." = "Bu aktarım eklenemez çünkü var olan bir aktarımın aynısı.";
@@ -972,7 +972,7 @@
 "There are %@ transfers (%@ active)." = "%1$@ aktarım var (%2$@ etkin).";
 
 /* Confirm Quit panel -> message */
-"There are %d active transfers that will be paused on quit. The transfers will automatically resume on the next launch." = "Uygulamadan çıkarken duraklatılacak sümekte olan %d aktarım var. Uygulamayı yeniden açtığınızda aktarımlar kendiliğinden sürecektir.";
+"There are %d active transfers that will be paused on quit. The transfers will automatically resume on the next launch." = "Uygulamadan çıkarken duraklatılacak %d etkin aktarım var. Uygulamayı yeniden açtığınızda aktarımlar kendiliğinden sürecektir.";
 
 /* Create torrent -> blank address -> title */
 "There are no tracker addresses." = "İzleyici adresi yok.";
@@ -981,7 +981,7 @@
 "There is already a copy of Transmission running. This copy cannot be opened until that instance is quit." = "Transmission'ın bir kopyası zaten açık. Var olan oturum kapatılmadan bu kopyayı açamazsınız.";
 
 /* Confirm Quit panel -> message */
-"There is an active transfer that will be paused on quit. The transfer will automatically resume on the next launch." = "Uygulamadan çıkarken duraklatılacak sürmekte olan bir aktarım var. Uygulamayı yeniden açtığınızda aktarım kendiliğinden sürecektir.";
+"There is an active transfer that will be paused on quit. The transfer will automatically resume on the next launch." = "Uygulamadan çıkarken duraklatılacak bir etkin aktarım var. Uygulamayı yeniden açtığınızda aktarım kendiliğinden sürecektir.";
 
 /* Create torrent -> no files -> warning */
 "There must be at least one file in a folder to create a torrent file." = "Torrent dosyası oluşturmak için bir klasörde en az bir dosya olmalıdır.";
@@ -1008,16 +1008,16 @@
 "Tier %d" = "%d. sıra";
 
 /* Filter toolbar item -> palette label */
-"Toggle Filter" = "Süzgeci aç/kapa";
+"Toggle Filter" = "Süzgeci Aç/Kapat";
 
 /* Inspector toolbar item -> palette label */
-"Toggle Inspector" = "Denetçiyi aç/kapa";
+"Toggle Inspector" = "Denetçiyi Aç/Kapat";
 
 /* Filter toolbar item -> tooltip */
-"Toggle the filter bar" = "Süzgeç çubuğunu aç/kapa";
+"Toggle the filter bar" = "Süzgeç çubuğunu aç/kapat";
 
 /* Inspector toolbar item -> tooltip */
-"Toggle the torrent inspector" = "Denetçiyi aç/kapa";
+"Toggle the torrent inspector" = "Torrent denetçisini aç/kapat";
 
 /* Download not a torrent -> title
    Torrent download error -> title */
@@ -1064,7 +1064,7 @@
 "Transfers" = "Aktarımlar";
 
 /* Inspector -> Peers tab -> peers */
-"Transfers Not Active" = "Aktarımlar Etkin Değil";
+"Transfers Not Active" = "Etkin Olmayan Aktarımlar";
 
 /* Legal alert -> message */
 "Transmission is a file-sharing program. When you run a torrent, its data will be made available to others by means of upload. You and you alone are fully responsible for exercising proper judgement and abiding by your local laws." = "Transmission bir dosya paylaşım uygulamasıdır. Bir torrenti çalıştırdığınizda torrent verisi diğer herkese açık olacaktır. Bunun yerel kanunlarla olan uyumundan yalnız ve yalnız siz sorumlusunuz.";
@@ -1078,10 +1078,10 @@
 /* inspector -> peer table -> header
    status bar -> status label
    Torrent -> status string */
-"UL" = "YK";
+"UL" = "GN";
 
 /* Inspector -> Peers tab -> peers */
-"UL to %d" = "%d için YK";
+"UL to %d" = "%d için GN";
 
 /* File Outline -> Menu */
 "Uncheck Selected" = "Seçilinin İmini Kaldır";
@@ -1102,7 +1102,7 @@
 "Uploaded" = "Gönderildi";
 
 /* Torrent -> progress string */
-"uploaded %@ (Ratio: %@)" = "%1$@ gönderilen (Oran: %2$@)";
+"uploaded %@ (Ratio: %@)" = "%1$@ gönderildi (oran: %2$@)";
 
 /* inspector -> peer table -> header tool tip */
 "Uploading To Peer" = "Eşe Gönderiliyor";

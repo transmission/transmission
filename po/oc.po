@@ -5,16 +5,16 @@
 #
 # Translators:
 # Mike Gelfand <mikedld@mikedld.com>, 2017
-# Quentin PAGÈS, 2020
+# Quentin PAGÈS, 2021
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-21 21:24+0000\n"
+"POT-Creation-Date: 2022-02-21 21:26+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Quentin PAGÈS, 2020\n"
+"Last-Translator: Quentin PAGÈS, 2021\n"
 "Language-Team: Occitan (post 1500) (https://www.transifex.com/transmissionbt/teams/33778/oc/)\n"
 "Language: oc\n"
 "MIME-Version: 1.0\n"
@@ -123,15 +123,15 @@ msgstr "Utilizar los paramètres globals"
 
 #: ../gtk/DetailsDialog.cc:497
 msgid "Seed regardless of ratio"
-msgstr "Partejar quin que siá lo ratio"
+msgstr "Partejar quin que siá lo racio"
 
 #: ../gtk/DetailsDialog.cc:498
 msgid "Stop seeding at ratio:"
-msgstr "Partejar fins a un ratio de :"
+msgstr "Partejar fins a un racio de :"
 
 #: ../gtk/DetailsDialog.cc:512
 msgid "_Ratio:"
-msgstr "_Ratio :"
+msgstr "_Racio :"
 
 #: ../gtk/DetailsDialog.cc:517
 msgid "Seed regardless of activity"
@@ -263,7 +263,7 @@ msgstr ""
 #: ../gtk/DetailsDialog.cc:955
 #, c-format
 msgid "%s (Ratio: %s)"
-msgstr "%s (ratio : %s)"
+msgstr "%s (racio : %s)"
 
 #: ../gtk/DetailsDialog.cc:994
 msgid "No errors"
@@ -453,12 +453,12 @@ msgstr "Afichar _mai de detalhs"
 #: ../gtk/DetailsDialog.cc:1869
 #, c-format
 msgid "Got a list of %1$s%2$'d peers%3$s %4$s ago"
-msgstr "Lista de %1$s%2$'d pars recebuda i a %3$s  %4$s"
+msgstr "Lista de %1$s%2$'d pars recebuda fa %3$s  %4$s"
 
 #: ../gtk/DetailsDialog.cc:1878
 #, c-format
 msgid "Peer list request %1$stimed out%2$s %3$s ago; will retry"
-msgstr "Demanda de la lista de pars %1$sexpirada i a %2$s %3$s ; novèla temptativa programada"
+msgstr "Demanda de la lista de pars %1$sexpirada fa %2$s %3$s ; novèla temptativa programada"
 
 #: ../gtk/DetailsDialog.cc:1886
 #, c-format
@@ -486,7 +486,7 @@ msgstr "Demanda de pars suplementaris en cors… <small>%s</small>"
 #: ../gtk/DetailsDialog.cc:1938
 #, c-format
 msgid "Tracker had %s%'d seeders and %'d leechers%s %s ago"
-msgstr "Lo tracador aviá %s%'d provesidors e %'d telecargadors i a %s %s"
+msgstr "Lo traçador aviá %s%'d provesidors e %'d telecargadors i a %s %s"
 
 #: ../gtk/DetailsDialog.cc:1948
 #, c-format
@@ -765,20 +765,20 @@ msgstr "Limitar la velocitat de mandadís"
 
 #: ../gtk/MainWindow.cc:360
 msgid "Stop Seeding at Ratio"
-msgstr "Arrestar lo mandadís al ratio"
+msgstr "Arrestar lo mandadís al racio"
 
 #: ../gtk/MainWindow.cc:386
 #, c-format
 msgid "Stop at Ratio (%s)"
-msgstr "Arrestar al ratio (%s)"
+msgstr "Arrestar al racio (%s)"
 
 #: ../gtk/MainWindow.cc:423
 msgid "Total Ratio"
-msgstr "Ratio total"
+msgstr "Racio total"
 
 #: ../gtk/MainWindow.cc:424
 msgid "Session Ratio"
-msgstr "Ratio de la session"
+msgstr "Racio de la session"
 
 #: ../gtk/MainWindow.cc:425
 msgid "Total Transfer"
@@ -795,7 +795,7 @@ msgstr "Estatisticas"
 #: ../gtk/MainWindow.cc:594 ../gtk/MainWindow.cc:618 ../gtk/TorrentCellRenderer.cc:204
 #, c-format
 msgid "Ratio: %s"
-msgstr "Ratio : %s"
+msgstr "Racio : %s"
 
 #. Translators: "size|" is here for disambiguation. Please remove it from your translation.
 #. %1$s is the size of the data we've downloaded
@@ -1096,7 +1096,7 @@ msgstr "Limits"
 
 #: ../gtk/PrefsDialog.cc:325
 msgid "Stop seeding at _ratio:"
-msgstr "Partejar fins a un ratio de :"
+msgstr "Partejar fins a un racio de :"
 
 #: ../gtk/PrefsDialog.cc:333
 msgid "Stop seeding if idle for _N minutes:"
@@ -1537,7 +1537,7 @@ msgstr "Session en cors"
 
 #: ../gtk/StatsDialog.cc:153 ../gtk/StatsDialog.cc:174
 msgid "Ratio:"
-msgstr "Ratio :"
+msgstr "Racio :"
 
 #: ../gtk/StatsDialog.cc:156 ../gtk/StatsDialog.cc:177
 msgid "Duration:"
@@ -1607,7 +1607,7 @@ msgstr "%1$s de %2$s (%3$s% %), mandat %4$s (ratio : %5$s)"
 #: ../gtk/TorrentCellRenderer.cc:101
 #, c-format
 msgid "%1$s, uploaded %2$s (Ratio: %3$s Goal: %4$s)"
-msgstr "%1$s, mandat %2$s (ratio : %3$s objectiu : %4$s)"
+msgstr "%1$s, mandat %2$s (racio : %3$s objectiu : %4$s)"
 
 #. %1$s is the torrent's total size,
 #. %2$s is how much we've uploaded,
@@ -1615,7 +1615,7 @@ msgstr "%1$s, mandat %2$s (ratio : %3$s objectiu : %4$s)"
 #: ../gtk/TorrentCellRenderer.cc:113
 #, c-format
 msgid "%1$s, uploaded %2$s (Ratio: %3$s)"
-msgstr "%1$s, mandat %2$s (Ratio : %3$s)"
+msgstr "%1$s, mandat %2$s (Racio : %3$s)"
 
 #: ../gtk/TorrentCellRenderer.cc:128
 msgid "Remaining time unknown"
@@ -2062,7 +2062,7 @@ msgstr "Senhal requesit"
 #: ../libtransmission/rpc-server.cc:1052
 #, c-format
 msgid "Serving RPC and Web requests from directory '%s'"
-msgstr ""
+msgstr "Servici RPC e requèstas Web a partir del repertòri « %s »"
 
 #. first %s is the application name
 #. second %s is the version number
@@ -2086,7 +2086,7 @@ msgstr "Cap de donada pas trobada ! Asseguratz-vos que vòstres disques son con
 
 #: ../libtransmission/torrent.cc:1395
 msgid "Restarted manually -- disabling its seed ratio"
-msgstr "Reaviat manualament -- desactivacion de son ratio de font"
+msgstr "Reaviat manualament -- desactivacion de son racio de font"
 
 #: ../libtransmission/torrent.cc:1561
 msgid "Removing torrent"
@@ -2181,7 +2181,7 @@ msgstr "Verificacion del torrent"
 #~ msgstr "Demandar _mai de pars al tracador"
 
 #~ msgid "BitTorrent is a peer-to-peer file-sharing protocol that is commonly used to distribute large amounts of data between multiple users."
-#~ msgstr "BitTorrent es un protocòl de partiment de fichièrs en mòde par a par e es sovent utilizat per distribuir de bravas quantitat de donadas entre mantun utilizaires."
+#~ msgstr "BitTorrent es un protocòl de partiment de fichièrs en mòde par a par e es sovent utilizat per distribuir de bravas quantitat de donadas entre mantun utilizaire."
 
 #~ msgid "Call scrip_t when torrent is completed:"
 #~ msgstr "Apelar aqueste escrip_t quand un torrent es acabat :"

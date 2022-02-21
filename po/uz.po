@@ -3,14 +3,17 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
+# Translators:
+# Mike Gelfand <mikedld@mikedld.com>, 2018
+#
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-21 21:24+0000\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2017\n"
+"POT-Creation-Date: 2022-02-21 21:26+0000\n"
+"PO-Revision-Date: 2017-01-26 19:47+0000\n"
+"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2018\n"
 "Language-Team: Uzbek (https://www.transifex.com/transmissionbt/teams/33778/uz/)\n"
 "Language: uz\n"
 "MIME-Version: 1.0\n"
@@ -61,11 +64,13 @@ msgstr "Hozir _chiqish"
 msgid "Couldn't add corrupt torrent"
 msgid_plural "Couldn't add corrupt torrents"
 msgstr[0] "Buzilgan torrentlarni qo‘shib bo‘lmadi"
+msgstr[1] "Buzilgan torrentlarni qo‘shib bo‘lmadi"
 
 #: ../gtk/Application.cc:962
 msgid "Couldn't add duplicate torrent"
 msgid_plural "Couldn't add duplicate torrents"
 msgstr[0] "Nusxa torrentlarni qo‘shib bo‘lmadi"
+msgstr[1] "Nusxa torrentlarni qo‘shib bo‘lmadi"
 
 #: ../gtk/Application.cc:1280
 msgid "A fast and easy BitTorrent client"
@@ -614,26 +619,31 @@ msgstr[0] ""
 msgid "Once removed, continuing the transfer will require the torrent file or magnet link."
 msgid_plural "Once removed, continuing the transfers will require the torrent files or magnet links."
 msgstr[0] "Bir marta o‘chirilsa, ko‘chirib o‘tkazishlarni davom ettirish torrent fayllarni yoki magnet linklarni talab qiladi."
+msgstr[1] "Bir marta o‘chirilsa, ko‘chirib o‘tkazishlarni davom ettirish torrent fayllarni yoki magnet linklarni talab qiladi."
 
 #: ../gtk/Dialogs.cc:69
 msgid "This torrent has not finished downloading."
 msgid_plural "These torrents have not finished downloading."
 msgstr[0] "Ushbu torrentlar yuklab olishni tugatishmagan."
+msgstr[1] "Ushbu torrentlar yuklab olishni tugatishmagan."
 
 #: ../gtk/Dialogs.cc:75
 msgid "This torrent is connected to peers."
 msgid_plural "These torrents are connected to peers."
 msgstr[0] "Ushbu torrentlar manbalarga ulangan."
+msgstr[1] "Ushbu torrentlar manbalarga ulangan."
 
 #: ../gtk/Dialogs.cc:82
 msgid "One of these torrents is connected to peers."
 msgid_plural "Some of these torrents are connected to peers."
 msgstr[0] "Ushbu torrentlardan ba’zilari manbalarga ulangan."
+msgstr[1] "Ushbu torrentlardan ba’zilari manbalarga ulangan."
 
 #: ../gtk/Dialogs.cc:95
 msgid "One of these torrents has not finished downloading."
 msgid_plural "Some of these torrents have not finished downloading."
 msgstr[0] "Ushbu torrentlardan ba’zilari yuklab olishni tugatmagan."
+msgstr[1] "Ushbu torrentlardan ba’zilari yuklab olishni tugatmagan."
 
 #: ../gtk/Dialogs.cc:115
 msgid "_Delete"
@@ -843,12 +853,14 @@ msgstr "Birorta ham manba tanlanmadi"
 msgid "%1$s; %2$'d File"
 msgid_plural "%1$s; %2$'d Files"
 msgstr[0] "%1$s; %2$'d ta fayl"
+msgstr[1] "%1$s; %2$'d ta fayl"
 
 #: ../gtk/MakeDialog.cc:344
 #, c-format
 msgid "%1$'d Piece @ %2$s"
 msgid_plural "%1$'d Pieces @ %2$s"
 msgstr[0] "%1$'d ta bo‘lak @ %2$s"
+msgstr[1] "%1$'d ta bo‘lak @ %2$s"
 
 #: ../gtk/MakeDialog.cc:440
 msgid "_New"
@@ -1494,6 +1506,7 @@ msgstr "Ish stolini uyquga ketishiga ruxsat berish"
 msgid "Started %'d time"
 msgid_plural "Started %'d times"
 msgstr[0] "%'d marta boshlangan"
+msgstr[1] "%'d marta boshlangan"
 
 #: ../gtk/StatsDialog.cc:99
 msgid "Reset your statistics?"
@@ -1673,6 +1686,7 @@ msgstr ""
 msgid "Seeding to %1$'d of %2$'d connected peer"
 msgid_plural "Seeding to %1$'d of %2$'d connected peers"
 msgstr[0] "%1$'d/%2$'d ulangan manbalarga jo‘natilmoqda"
+msgstr[1] "%1$'d/%2$'d ulangan manbalarga jo‘natilmoqda"
 
 #: ../gtk/Utils.cc:36
 msgid "KiB"
@@ -1727,24 +1741,28 @@ msgstr "TB/s"
 msgid "%'d day"
 msgid_plural "%'d days"
 msgstr[0] "%'d kun"
+msgstr[1] "%'d kun"
 
 #: ../gtk/Utils.cc:106
 #, c-format
 msgid "%'d hour"
 msgid_plural "%'d hours"
 msgstr[0] "%'d soat"
+msgstr[1] "%'d soat"
 
 #: ../gtk/Utils.cc:107
 #, c-format
 msgid "%'d minute"
 msgid_plural "%'d minutes"
 msgstr[0] "%'d daqiqa"
+msgstr[1] "%'d daqiqa"
 
 #: ../gtk/Utils.cc:108
 #, c-format
 msgid "%'d second"
 msgid_plural "%'d seconds"
 msgstr[0] "%'d soniya"
+msgstr[1] "%'d soniya"
 
 #: ../gtk/Utils.cc:156
 #, c-format
@@ -2159,10 +2177,6 @@ msgstr "Torrent tasdiqlanmoqda"
 #~ msgstr "Muqobil tezlik _cheklovini yoqish"
 
 #, c-format
-#~ msgid "Error opening \"%s\""
-#~ msgstr "\"%s\"ni ochishda xatolik"
-
-#, c-format
 #~ msgid "File \"%s\" is in the way"
 #~ msgstr "\"%s\" fayli yo‘lda"
 
@@ -2218,10 +2232,6 @@ msgstr "Torrent tasdiqlanmoqda"
 
 #~ msgid "Select _All"
 #~ msgstr "_Hammasini tanlash"
-
-#, c-format
-#~ msgid "Server returned \"%1$ld %2$s\""
-#~ msgstr "Server \"%1$ld %2$s\"ni qaytardi"
 
 #~ msgid "Set _Location…"
 #~ msgstr "_Joylashuvini o‘rnatish…"
@@ -2291,9 +2301,6 @@ msgstr "Torrent tasdiqlanmoqda"
 #, c-format
 #~ msgid "Tracker will allow requests in %s"
 #~ msgstr "Kuzatgich %sdagi so‘rovlarga ruxsat beradi"
-
-#~ msgid "Transmission BitTorrent Client"
-#~ msgstr "Transmission BitTorrent mijozi"
 
 #~ msgid "_Compact View"
 #~ msgstr "_Yig‘ilgan holat ko‘rish"

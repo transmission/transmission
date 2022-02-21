@@ -8,18 +8,18 @@
 # Alexandre <a.github@jouand.in>, 2017
 # Benjamin Masse, 2018
 # Charles Monzat <c.monzat@laposte.net>, 2020
-# Jean de la Mouche, 2020
 # Mike Gelfand <mikedld@mikedld.com>, 2020
-# AO <ao@localizationlab.org>, 2020
+# Jean de la Mouche, 2020
+# AO <ao@localizationlab.org>, 2021
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-21 21:24+0000\n"
+"POT-Creation-Date: 2022-02-21 21:26+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: AO <ao@localizationlab.org>, 2020\n"
+"Last-Translator: AO <ao@localizationlab.org>, 2021\n"
 "Language-Team: French (https://www.transifex.com/transmissionbt/teams/33778/fr/)\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
@@ -60,7 +60,7 @@ msgstr "<b>Fermeture des connexions</b>"
 
 #: ../gtk/Application.cc:897
 msgid "Sending upload/download totals to tracker…"
-msgstr "Envoi des totaux de téléversement et de téléchargement au traqueur…"
+msgstr "Envoi des totaux de téléversement et de téléchargement au traceur…"
 
 #: ../gtk/Application.cc:902
 msgid "_Quit Now"
@@ -206,7 +206,7 @@ msgstr "Aucun torrent n’est sélectionné"
 
 #: ../gtk/DetailsDialog.cc:645
 msgid "Private to this tracker -- DHT and PEX disabled"
-msgstr "Privé pour ce traqueur -- La DHT et le PEX sont désactivés"
+msgstr "Privé pour ce traceur -- La DHT et le PEX sont désactivés"
 
 #: ../gtk/DetailsDialog.cc:645
 msgid "Public torrent"
@@ -491,7 +491,7 @@ msgstr "Demande davantage des pairs maintenant…<small>%s</small>"
 #: ../gtk/DetailsDialog.cc:1938
 #, c-format
 msgid "Tracker had %s%'d seeders and %'d leechers%s %s ago"
-msgstr "Le traqueur avait %s%'d propagateurs et %'d téléchargeurs il y a %s %s"
+msgstr "Le traceur avait %s%'d propagateurs et %'d téléchargeurs il y a %s %s"
 
 #: ../gtk/DetailsDialog.cc:1948
 #, c-format
@@ -523,7 +523,7 @@ msgstr "Veuillez corriger les erreurs et réessayer."
 #: ../gtk/DetailsDialog.cc:2262
 #, c-format
 msgid "%s - Edit Trackers"
-msgstr "%s – Modifier les traqueurs"
+msgstr "%s – Modifier les traceurs"
 
 #: ../gtk/DetailsDialog.cc:2266 ../gtk/MessageLogWindow.cc:230
 msgid "_Save"
@@ -531,7 +531,7 @@ msgstr "_Enregistrer"
 
 #: ../gtk/DetailsDialog.cc:2271
 msgid "Tracker Announce URLs"
-msgstr "URL d’annonce de traqueurs"
+msgstr "URL d’annonce de traceurs"
 
 #: ../gtk/DetailsDialog.cc:2275
 msgid ""
@@ -546,7 +546,7 @@ msgstr ""
 #: ../gtk/DetailsDialog.cc:2372
 #, c-format
 msgid "%s - Add Tracker"
-msgstr "%s – Ajouter un traqueur"
+msgstr "%s – Ajouter un traceur"
 
 #: ../gtk/DetailsDialog.cc:2376 ../gtk/DetailsDialog.cc:2479 ../gtk/MakeDialog.cc:210 ../gtk/PrefsDialog.cc:763
 msgid "_Add"
@@ -554,7 +554,7 @@ msgstr "_Ajouter"
 
 #: ../gtk/DetailsDialog.cc:2381
 msgid "Tracker"
-msgstr "Traqueur"
+msgstr "Traceur"
 
 #: ../gtk/DetailsDialog.cc:2387
 msgid "_Announce URL:"
@@ -562,7 +562,7 @@ msgstr "_URL d’annonce :"
 
 #: ../gtk/DetailsDialog.cc:2446 ../gtk/DetailsDialog.cc:2575
 msgid "Trackers"
-msgstr "Traqueurs"
+msgstr "Traceurs"
 
 #: ../gtk/DetailsDialog.cc:2483
 msgid "_Edit"
@@ -574,7 +574,7 @@ msgstr "_Enlever"
 
 #: ../gtk/DetailsDialog.cc:2500
 msgid "Show _backup trackers"
-msgstr "Afficher les traqueurs de _secours"
+msgstr "Afficher les traceurs de _secours"
 
 #. create the dialog
 #: ../gtk/DetailsDialog.cc:2560 ../gtk/MakeDialog.cc:209 ../gtk/MakeDialog.cc:439 ../gtk/PrefsDialog.cc:1148 ../gtk/StatsDialog.cc:139
@@ -910,7 +910,7 @@ msgstr ""
 
 #: ../gtk/MakeDialog.cc:496
 msgid "_Trackers:"
-msgstr "_Traqueurs :"
+msgstr "_Traceurs :"
 
 #: ../gtk/MakeDialog.cc:498
 msgid "Co_mment:"
@@ -1402,7 +1402,7 @@ msgstr "Utiliser la _DHT pour trouver plus de pairs"
 
 #: ../gtk/PrefsDialog.cc:1073
 msgid "DHT is a tool for finding peers without a tracker."
-msgstr "La table de hachage distribuée (DHT) est un outil pour trouver des pairs sans traqueur."
+msgstr "La table de hachage distribuée (DHT) est un outil pour trouver des pairs sans traceur."
 
 #: ../gtk/PrefsDialog.cc:1076
 msgid "Use _Local Peer Discovery to find more peers"
@@ -1534,7 +1534,7 @@ msgstr "_Réinitialiser"
 
 #: ../gtk/StatsDialog.cc:103
 msgid "These statistics are for your information only. Resetting them doesn't affect the statistics logged by your BitTorrent trackers."
-msgstr "Ces statistiques ne sont qu’à titre indicatif. Les réinitialiser n’affecte pas les statistiques enregistrées par vos traqueurs BitTorrent."
+msgstr "Ces statistiques ne sont qu’à titre indicatif. Les réinitialiser n’affecte pas les statistiques enregistrées par vos traceurs BitTorrent."
 
 #: ../gtk/StatsDialog.cc:143
 msgid "Current Session"
@@ -1655,12 +1655,12 @@ msgstr "Vérification des données locales (%.1f %% analysés)"
 #: ../gtk/TorrentCellRenderer.cc:227
 #, c-format
 msgid "Tracker gave a warning: \"%s\""
-msgstr "Le traqueur a retourné un avertissement : « %s »"
+msgstr "Le traceur a retourné un avertissement : « %s »"
 
 #: ../gtk/TorrentCellRenderer.cc:228
 #, c-format
 msgid "Tracker gave an error: \"%s\""
-msgstr "Le traqueur a retourné une erreur : « %s »"
+msgstr "Le traceur a retourné une erreur : « %s »"
 
 #: ../gtk/TorrentCellRenderer.cc:229
 #, c-format
@@ -1681,7 +1681,7 @@ msgstr[1] "pairs"
 #: ../gtk/TorrentCellRenderer.cc:263
 #, c-format
 msgid "Downloading from %1$'d of %2$'d %3$s and %4$'d %5$s"
-msgstr "Téléchargement à partir %1$'d sur %2$'d %3$s et %4$'d %5$s"
+msgstr "Téléchargement de %1$'d sur %2$'d %3$s et %4$'d %5$s"
 
 #: ../gtk/TorrentCellRenderer.cc:268 ../gtk/TorrentCellRenderer.cc:276
 msgid "web seed"
@@ -1875,11 +1875,11 @@ msgstr "La connexion a échoué"
 
 #: ../libtransmission/announcer.cc:1000 ../libtransmission/announcer.cc:1324
 msgid "Could not connect to tracker"
-msgstr "Impossible de se connecter au traqueur"
+msgstr "Impossible de se connecter au traceur"
 
 #: ../libtransmission/announcer.cc:1004 ../libtransmission/announcer.cc:1328
 msgid "Tracker did not respond"
-msgstr "Le traqueur n’a pas répondu"
+msgstr "Le traceur n’a pas répondu"
 
 #: ../libtransmission/announcer.cc:1065
 msgid "Success"
@@ -2067,7 +2067,7 @@ msgstr "Mot de passe exigé"
 #: ../libtransmission/rpc-server.cc:1052
 #, c-format
 msgid "Serving RPC and Web requests from directory '%s'"
-msgstr ""
+msgstr "Service de requêtes RPC et Web du répertoire « %s »"
 
 #. first %s is the application name
 #. second %s is the version number
@@ -2183,7 +2183,7 @@ msgstr "Vérification du torrent"
 #~ msgstr "%s n’est pas une adresse IPv4 ou IPv6. Les récepteurs RPC doivent être en IPv4 ou IPv6"
 
 #~ msgid "Ask Tracker for _More Peers"
-#~ msgstr "Demander _plus de pairs au traqueur"
+#~ msgstr "Demander _plus de pairs au traceur"
 
 #~ msgid "BitTorrent is a peer-to-peer file-sharing protocol that is commonly used to distribute large amounts of data between multiple users."
 #~ msgstr "BitTorrent est un protocole de partage de fichiers pair à pair qui est couramment utilisé pour distribuer de grandes quantités de données entre plusieurs utilisateurs."
@@ -2340,19 +2340,19 @@ msgstr "Vérification du torrent"
 
 #, c-format
 #~ msgid "Tracker error: \"%s\""
-#~ msgstr "Erreur du traqueur : « %s »"
+#~ msgstr "Erreur du traceur : « %s »"
 
 #, c-format
 #~ msgid "Tracker gave HTTP response code %1$ld (%2$s)"
-#~ msgstr "Le traqueur a retourné le code de réponse HTTP %1$ld (%2$s)"
+#~ msgstr "Le traceur a retourné le code de réponse HTTP %1$ld (%2$s)"
 
 #, c-format
 #~ msgid "Tracker warning: \"%s\""
-#~ msgstr "Avertissement du traqueur : « %s »"
+#~ msgstr "Avertissement du traceur : « %s »"
 
 #, c-format
 #~ msgid "Tracker will allow requests in %s"
-#~ msgstr "Le traqueur autorisera les requêtes dans %s"
+#~ msgstr "Le traceur autorisera les requêtes dans %s"
 
 #~ msgid "Transmission is a BitTorrent client with an easy-to-use frontend on top a cross-platform backend. Native frontends are available for OS X and Windows, as well as command line and web frontends."
 #~ msgstr "Transmission est un client BitTorrent muni d’une interface frontale conviviale sur une dorsale multiplate-forme. Des interfaces frontales natives sont proposées pour macOS et Windows, ainsi que des interfaces frontales en ligne de commande et Web."
@@ -2379,7 +2379,7 @@ msgstr "Vérification du torrent"
 #~ msgstr "_Fichier"
 
 #~ msgid "_Filterbar"
-#~ msgstr "Barre des _filtres"
+#~ msgstr "Barre du _filtre"
 
 #~ msgid "_New…"
 #~ msgstr "_Nouveau…"

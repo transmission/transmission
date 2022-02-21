@@ -3,20 +3,25 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
+# Translators:
+# Mike Gelfand <mikedld@mikedld.com>, 2018
+# Kurumi Tokisaki <amiryeganeh5683yeg@gmail.com>, 2020
+# Danial Behzadi <dani.behzi@ubuntu.com>, 2021
+#
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-21 21:24+0000\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2017\n"
+"POT-Creation-Date: 2022-02-21 21:26+0000\n"
+"PO-Revision-Date: 2017-01-26 19:47+0000\n"
+"Last-Translator: Danial Behzadi <dani.behzi@ubuntu.com>, 2021\n"
 "Language-Team: Persian (https://www.transifex.com/transmissionbt/teams/33778/fa/)\n"
 "Language: fa\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=1; plural=0;\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
 #: ../cli/cli.cc:103 ../gtk/Utils.cc:90 ../libtransmission/utils.cc:1074
 msgid "None"
@@ -34,16 +39,16 @@ msgstr "سیگنال %Id گرفته شد: در حال تلاش برای بستن
 
 #: ../gtk/Application.cc:704
 msgid "Transmission is a file sharing program. When you run a torrent, its data will be made available to others by means of upload. Any content you share is your sole responsibility."
-msgstr ""
+msgstr "ترنسمیشن یک برنامه به اشتراک گزاری فایل است. وقتی یک تورنت را اجرا می کنید،‎ ازطریق بارگزاری اطلاعات آن برای دیگران به قابل دسترسی در می آید. مسئولیت هر محتوایی که به اشتراک میگذارید به پای خودتان است."
 
 #. make the dialog
 #: ../gtk/Application.cc:710 ../gtk/DetailsDialog.cc:2265 ../gtk/DetailsDialog.cc:2375 ../gtk/Dialogs.cc:114 ../gtk/MakeDialog.cc:208 ../gtk/MessageLogWindow.cc:229 ../gtk/OptionsDialog.cc:280 ../gtk/OptionsDialog.cc:440 ../gtk/OptionsDialog.cc:500 ../gtk/RelocateDialog.cc:160 ../gtk/StatsDialog.cc:100
 msgid "_Cancel"
-msgstr ""
+msgstr "_لغو"
 
 #: ../gtk/Application.cc:711
 msgid "I _Agree"
-msgstr ""
+msgstr "_موافقم"
 
 #: ../gtk/Application.cc:892
 msgid "<b>Closing Connections</b>"
@@ -61,11 +66,13 @@ msgstr "خروج هم‌اکنون"
 msgid "Couldn't add corrupt torrent"
 msgid_plural "Couldn't add corrupt torrents"
 msgstr[0] "نمی‌توان تورنت‌های خراب را افزود"
+msgstr[1] "نمی‌توان تورنت‌های خراب را افزود"
 
 #: ../gtk/Application.cc:962
 msgid "Couldn't add duplicate torrent"
 msgid_plural "Couldn't add duplicate torrents"
 msgstr[0] "نمی‌توان تورنت‌های تکراری را افزود"
+msgstr[1] "نمی‌توان تورنت‌های تکراری را افزود"
 
 #: ../gtk/Application.cc:1280
 msgid "A fast and easy BitTorrent client"
@@ -229,12 +236,14 @@ msgstr "نامعلوم"
 msgid "%1$s (%2$'d piece @ %3$s)"
 msgid_plural "%1$s (%2$'d pieces @ %3$s)"
 msgstr[0] "%1$s (%2$'dقطعه @ %3$s)"
+msgstr[1] "%1$s (%2$'dقطعه @ %3$s)"
 
 #: ../gtk/DetailsDialog.cc:855
 #, c-format
 msgid "%1$s (%2$'d piece)"
 msgid_plural "%1$s (%2$'d pieces)"
 msgstr[0] "%1$s (%2$'d قطعه)"
+msgstr[1] "%1$s (%2$'d قطعه)"
 
 #: ../gtk/DetailsDialog.cc:893
 #, c-format
@@ -440,7 +449,7 @@ msgstr "پرچم‌ها"
 
 #: ../gtk/DetailsDialog.cc:1774
 msgid "Web Seeds"
-msgstr ""
+msgstr "دانه‌های وب"
 
 #: ../gtk/DetailsDialog.cc:1821 ../gtk/DetailsDialog.cc:2495
 msgid "Show _more details"
@@ -518,7 +527,7 @@ msgstr "%s - ویرایش ردیاب‌ها"
 
 #: ../gtk/DetailsDialog.cc:2266 ../gtk/MessageLogWindow.cc:230
 msgid "_Save"
-msgstr ""
+msgstr "_ذخیره"
 
 #: ../gtk/DetailsDialog.cc:2271
 msgid "Tracker Announce URLs"
@@ -570,7 +579,7 @@ msgstr "نمایش ردیاب‌های پشتیبان"
 #. create the dialog
 #: ../gtk/DetailsDialog.cc:2560 ../gtk/MakeDialog.cc:209 ../gtk/MakeDialog.cc:439 ../gtk/PrefsDialog.cc:1148 ../gtk/StatsDialog.cc:139
 msgid "_Close"
-msgstr ""
+msgstr "_ببستن"
 
 #: ../gtk/DetailsDialog.cc:2573 ../gtk/MessageLogWindow.cc:413
 msgid "Information"
@@ -600,48 +609,55 @@ msgstr "ویژگی‌‌های %s"
 #: ../gtk/DetailsDialog.cc:2623
 #, c-format
 msgid "%'d Torrent Properties"
-msgstr ""
+msgstr "ویژگی‌های %'Id تورنت"
 
 #: ../gtk/Dialogs.cc:54
 #, c-format
 msgid "Remove torrent?"
 msgid_plural "Remove %d torrents?"
 msgstr[0] "برداشتن %Id تورنت؟"
+msgstr[1] "برداشتن %Id تورنت؟"
 
 #: ../gtk/Dialogs.cc:55
 #, c-format
 msgid "Delete this torrent's downloaded files?"
 msgid_plural "Delete these %d torrents' downloaded files?"
 msgstr[0] "حذف پرونده‌های بارگیری شدهٔ این %Id تورنت؟"
+msgstr[1] "حذف پرونده‌های بارگیری شدهٔ این %Id تورنت؟"
 
 #: ../gtk/Dialogs.cc:62
 msgid "Once removed, continuing the transfer will require the torrent file or magnet link."
 msgid_plural "Once removed, continuing the transfers will require the torrent files or magnet links."
 msgstr[0] "پس از برداشته شدن، ادامهٔ انتقال، نیاز به پرونده‌ٔ تورنت‌ها یا پیوندهای مغناطیسی دارد."
+msgstr[1] "پس از برداشته شدن، ادامهٔ انتقال، نیاز به پرونده‌ٔ تورنت‌ها یا پیوندهای مغناطیسی دارد."
 
 #: ../gtk/Dialogs.cc:69
 msgid "This torrent has not finished downloading."
 msgid_plural "These torrents have not finished downloading."
 msgstr[0] "بارگیری این تورنت‌ها پایان نیافته است."
+msgstr[1] "بارگیری این تورنت‌ها پایان نیافته است."
 
 #: ../gtk/Dialogs.cc:75
 msgid "This torrent is connected to peers."
 msgid_plural "These torrents are connected to peers."
 msgstr[0] "این تورنت‌ها به جفت‌ها وصل هستند."
+msgstr[1] "این تورنت‌ها به جفت‌ها وصل هستند."
 
 #: ../gtk/Dialogs.cc:82
 msgid "One of these torrents is connected to peers."
 msgid_plural "Some of these torrents are connected to peers."
 msgstr[0] "برخی از این تورنت‌ها به جفت‌ها وصلند."
+msgstr[1] "برخی از این تورنت‌ها به جفت‌ها وصلند."
 
 #: ../gtk/Dialogs.cc:95
 msgid "One of these torrents has not finished downloading."
 msgid_plural "Some of these torrents have not finished downloading."
 msgstr[0] "بارگیری برخی از این تورنت‌ها به پایان نرسیده."
+msgstr[1] "بارگیری برخی از این تورنت‌ها به پایان نرسیده."
 
 #: ../gtk/Dialogs.cc:115
 msgid "_Delete"
-msgstr ""
+msgstr "_حذف"
 
 #: ../gtk/FileList.cc:558 ../gtk/Utils.cc:389
 msgid "High"
@@ -703,7 +719,7 @@ msgstr "خطا"
 #: ../gtk/FilterBar.cc:714
 #, c-format
 msgid "_Show %'d of:"
-msgstr ""
+msgstr "_نمایش %'Id از:"
 
 #: ../gtk/FilterBar.cc:714
 msgid "_Show:"
@@ -712,7 +728,7 @@ msgstr "نمایش:"
 #: ../gtk/FreeSpaceLabel.cc:50
 #, c-format
 msgid "%s free"
-msgstr ""
+msgstr "%s آزاد"
 
 #: ../gtk/MainWindow.cc:130
 msgid "Torrent"
@@ -847,16 +863,18 @@ msgstr "هیچ مبدأیی گزیده نشده"
 msgid "%1$s; %2$'d File"
 msgid_plural "%1$s; %2$'d Files"
 msgstr[0] ""
+msgstr[1] ""
 
 #: ../gtk/MakeDialog.cc:344
 #, c-format
 msgid "%1$'d Piece @ %2$s"
 msgid_plural "%1$'d Pieces @ %2$s"
 msgstr[0] ""
+msgstr[1] ""
 
 #: ../gtk/MakeDialog.cc:440
 msgid "_New"
-msgstr ""
+msgstr "_جدید"
 
 #: ../gtk/MakeDialog.cc:449
 msgid "Sa_ve to:"
@@ -929,15 +947,15 @@ msgstr "گزارش پیام"
 
 #: ../gtk/MessageLogWindow.cc:462
 msgid "Save _As"
-msgstr ""
+msgstr "ذخیره با _نام"
 
 #: ../gtk/MessageLogWindow.cc:473
 msgid "Clear"
-msgstr ""
+msgstr "پاک‌سازی"
 
 #: ../gtk/MessageLogWindow.cc:486
 msgid "P_ause"
-msgstr ""
+msgstr "_مکث"
 
 #: ../gtk/MessageLogWindow.cc:495
 msgid "Level"
@@ -977,7 +995,7 @@ msgstr "انتخاب‌های تورنت"
 
 #: ../gtk/OptionsDialog.cc:281 ../gtk/OptionsDialog.cc:441 ../gtk/OptionsDialog.cc:501
 msgid "_Open"
-msgstr ""
+msgstr "_گشودن"
 
 #: ../gtk/OptionsDialog.cc:295 ../gtk/PrefsDialog.cc:268
 msgid "Mo_ve .torrent file to the trash"
@@ -1035,11 +1053,11 @@ msgstr ""
 
 #: ../gtk/PrefsDialog.cc:262
 msgid "Show the Torrent Options _dialog"
-msgstr ""
+msgstr "نمایش _گفت‌وگوی گزینه‌های تورنت"
 
 #: ../gtk/PrefsDialog.cc:264
 msgid "_Start added torrents"
-msgstr ""
+msgstr "_آغاز تورنت‌های افزوده"
 
 #: ../gtk/PrefsDialog.cc:270
 msgid "Save to _Location:"
@@ -1047,15 +1065,15 @@ msgstr "دخیره در موقعیّت"
 
 #: ../gtk/PrefsDialog.cc:278
 msgid "Download Queue"
-msgstr ""
+msgstr "صف بارگیری"
 
 #: ../gtk/PrefsDialog.cc:280
 msgid "Ma_ximum active downloads:"
-msgstr ""
+msgstr "بیشینهء بارگیری‌های فعّال:"
 
 #: ../gtk/PrefsDialog.cc:284
 msgid "Downloads sharing data in the last _N minutes are active:"
-msgstr ""
+msgstr "بارگیری‌هایی که در این _دقیقهٔ اخیر داده‌ای هم‌رسانده‌اند، فعّالند:"
 
 #: ../gtk/PrefsDialog.cc:288 ../libtransmission/torrent.cc:1648
 msgid "Incomplete"
@@ -1121,7 +1139,8 @@ msgstr "پخش یک صدا هنگام پایان تورنت‌ها"
 #, c-format
 msgid "Blocklist contains %'d rule"
 msgid_plural "Blocklist contains %'d rules"
-msgstr[0] ""
+msgstr[0] "فهرست انسداد دارای %'Id قانون است"
+msgstr[1] "فهرست انسداد دارای %'Id قانون است"
 
 #: ../gtk/PrefsDialog.cc:440
 msgid "<b>Unable to update.</b>"
@@ -1135,15 +1154,16 @@ msgstr "<b>به‌روز رسانی موفّق بود!</b>"
 #, c-format
 msgid "Blocklist has %'d rule."
 msgid_plural "Blocklist has %'d rules."
-msgstr[0] ""
+msgstr[0] "فهرست انسداد %'Id قانون دارد"
+msgstr[1] "فهرست انسداد %'Id قانون دارد"
 
 #: ../gtk/PrefsDialog.cc:451
 msgid "Update Blocklist"
-msgstr "به‌روز رسانی سیاهه"
+msgstr "به‌روز رسانی فهرست انسداد"
 
 #: ../gtk/PrefsDialog.cc:456
 msgid "Getting new blocklist…"
-msgstr "گرفتن سیاههٔ جدید"
+msgstr "گرفتن فهرست انسداد جدید"
 
 #: ../gtk/PrefsDialog.cc:478
 msgid "Allow encryption"
@@ -1167,11 +1187,11 @@ msgstr "حالت رمزگذاری"
 
 #: ../gtk/PrefsDialog.cc:502
 msgid "Blocklist"
-msgstr "سیاهه"
+msgstr "فهرست انسداد"
 
 #: ../gtk/PrefsDialog.cc:504
 msgid "Enable _blocklist:"
-msgstr "فعّال کردن سیاهه"
+msgstr "به کار انداختن _فهرست انسداد"
 
 #: ../gtk/PrefsDialog.cc:517
 msgid "_Update"
@@ -1183,12 +1203,12 @@ msgstr "فعّال کردن به‌روز رسانی‌های خودکار"
 
 #: ../gtk/PrefsDialog.cc:683
 msgid "Remote Control"
-msgstr ""
+msgstr "واپایش از راه دور"
 
 #. "enabled" checkbutton
 #: ../gtk/PrefsDialog.cc:686
 msgid "Allow _remote access"
-msgstr ""
+msgstr "اجازه به _دسترسی از دور"
 
 #: ../gtk/PrefsDialog.cc:690
 msgid "_Open web client"
@@ -1214,7 +1234,7 @@ msgstr "گذرواژه"
 #. require authentication
 #: ../gtk/PrefsDialog.cc:719
 msgid "Only allow these IP a_ddresses:"
-msgstr ""
+msgstr "فقط اجازه به این _نشانی‌های آی‌پی:"
 
 #: ../gtk/PrefsDialog.cc:733
 msgid "IP addresses may use wildcards, such as 192.168.*.*"
@@ -1424,7 +1444,7 @@ msgstr "شبکه"
 
 #: ../gtk/PrefsDialog.cc:1161
 msgid "Remote"
-msgstr ""
+msgstr "دوردست"
 
 #: ../gtk/RelocateDialog.cc:75
 #, c-format
@@ -1445,7 +1465,7 @@ msgstr "تنظیم موقعّیت تورنت"
 
 #: ../gtk/RelocateDialog.cc:161
 msgid "_Apply"
-msgstr ""
+msgstr "_اعمال"
 
 #: ../gtk/RelocateDialog.cc:167
 msgid "Location"
@@ -1497,7 +1517,8 @@ msgstr "اجازه دادن به خواب زمستانی میزکار"
 #, c-format
 msgid "Started %'d time"
 msgid_plural "Started %'d times"
-msgstr[0] ""
+msgstr[0] "%'Id بار آغاز شده"
+msgstr[1] "%'Id بار آغاز شده"
 
 #: ../gtk/StatsDialog.cc:99
 msgid "Reset your statistics?"
@@ -1534,7 +1555,7 @@ msgstr "بی‌کار"
 #: ../gtk/SystemTrayIcon.cc:105 ../gtk/SystemTrayIcon.cc:116
 #, c-format
 msgid " (Limit: %s)"
-msgstr ""
+msgstr "(کران: %s)"
 
 #. %1$s: current upload speed
 #. * %2$s: current upload limit, if any
@@ -1595,7 +1616,7 @@ msgstr "%1$s, بارگذاری شده %2$s (نسبت: %3$s هدف: %4$s)"
 #: ../gtk/TorrentCellRenderer.cc:113
 #, c-format
 msgid "%1$s, uploaded %2$s (Ratio: %3$s)"
-msgstr "%1$s, بارگذاری شده %2$s (نسبت: %3$s)"
+msgstr "%1$s، بارگذاری شده %2$s (نسبت: %3$s)"
 
 #: ../gtk/TorrentCellRenderer.cc:128
 msgid "Remaining time unknown"
@@ -1610,13 +1631,13 @@ msgstr "%sI مانده"
 #: ../gtk/TorrentCellRenderer.cc:152
 #, c-format
 msgid "%1$s %2$s  %3$s %4$s"
-msgstr ""
+msgstr "%1$s %2$s %3$s %4$s"
 
 #. up speed, up symbol
 #: ../gtk/TorrentCellRenderer.cc:162
 #, c-format
 msgid "%1$s  %2$s"
-msgstr ""
+msgstr "%1$s %2$s"
 
 #: ../gtk/TorrentCellRenderer.cc:167
 msgid "Stalled"
@@ -1650,7 +1671,8 @@ msgstr ""
 #: ../gtk/TorrentCellRenderer.cc:256 ../gtk/TorrentCellRenderer.cc:266 ../gtk/TorrentCellRenderer.cc:285
 msgid "peer"
 msgid_plural "peers"
-msgstr[0] ""
+msgstr[0] "جفت"
+msgstr[1] "جفت‌ها"
 
 #: ../gtk/TorrentCellRenderer.cc:263
 #, c-format
@@ -1660,7 +1682,8 @@ msgstr ""
 #: ../gtk/TorrentCellRenderer.cc:268 ../gtk/TorrentCellRenderer.cc:276
 msgid "web seed"
 msgid_plural "web seeds"
-msgstr[0] ""
+msgstr[0] "دانهٔ وب"
+msgstr[1] "دانه‌های وب"
 
 #: ../gtk/TorrentCellRenderer.cc:274
 #, c-format
@@ -1676,7 +1699,8 @@ msgstr ""
 #, c-format
 msgid "Seeding to %1$'d of %2$'d connected peer"
 msgid_plural "Seeding to %1$'d of %2$'d connected peers"
-msgstr[0] ""
+msgstr[0] "در حال دانه‌دهی به %1$'Id از %2$'Id جفت وصل‌شده"
+msgstr[1] "در حال دانه‌دهی به %1$'Id از %2$'Id جفت وصل‌شده"
 
 #: ../gtk/Utils.cc:36
 msgid "KiB"
@@ -1730,25 +1754,29 @@ msgstr "ت‌ب/ث"
 #, c-format
 msgid "%'d day"
 msgid_plural "%'d days"
-msgstr[0] ""
+msgstr[0] "%'Id روز"
+msgstr[1] "%'Id روز"
 
 #: ../gtk/Utils.cc:106
 #, c-format
 msgid "%'d hour"
 msgid_plural "%'d hours"
-msgstr[0] ""
+msgstr[0] "%'Id ساعت"
+msgstr[1] "%'Id ساعت"
 
 #: ../gtk/Utils.cc:107
 #, c-format
 msgid "%'d minute"
 msgid_plural "%'d minutes"
-msgstr[0] ""
+msgstr[0] "%'Id دقیقه"
+msgstr[1] "%'Id دقیقه"
 
 #: ../gtk/Utils.cc:108
 #, c-format
 msgid "%'d second"
 msgid_plural "%'d seconds"
-msgstr[0] ""
+msgstr[0] "%'Id ثانیه"
+msgstr[1] "%'Id ثانیه"
 
 #: ../gtk/Utils.cc:156
 #, c-format
@@ -1835,23 +1863,23 @@ msgstr ""
 
 #: ../libtransmission/announcer-udp.cc:201 ../libtransmission/announcer-udp.cc:303
 msgid "Unknown error"
-msgstr ""
+msgstr "خطای ناشناخته"
 
 #: ../libtransmission/announcer-udp.cc:546
 msgid "Connection failed"
-msgstr ""
+msgstr "اتّصال شکست خورد"
 
 #: ../libtransmission/announcer.cc:1000 ../libtransmission/announcer.cc:1324
 msgid "Could not connect to tracker"
-msgstr ""
+msgstr "نمی‌توان به ردیاب وصل شد"
 
 #: ../libtransmission/announcer.cc:1004 ../libtransmission/announcer.cc:1328
 msgid "Tracker did not respond"
-msgstr ""
+msgstr "ردیاب پاسخ نداد"
 
 #: ../libtransmission/announcer.cc:1065
 msgid "Success"
-msgstr ""
+msgstr "موفّقیت"
 
 #: ../libtransmission/blocklist.cc:56 ../libtransmission/blocklist.cc:357 ../libtransmission/utils.cc:228 ../libtransmission/utils.cc:280
 #, c-format
@@ -1861,13 +1889,13 @@ msgstr "نمی‌توان «%1$s» را خواند: %2$s"
 #: ../libtransmission/blocklist.cc:94
 #, c-format
 msgid "Blocklist \"%s\" contains %zu entries"
-msgstr ""
+msgstr "فهرست انسداد %s دارای %zu ورودی است"
 
 #. don't try to display the actual lines - it causes issues
 #: ../libtransmission/blocklist.cc:399
 #, c-format
 msgid "blocklist skipped invalid address at line %d"
-msgstr ""
+msgstr "فهرست انسداد از نشانی‌های نامعتبر در خط %d پرید"
 
 #: ../libtransmission/blocklist.cc:456 ../libtransmission/rpcimpl.cc:1442
 #, c-format
@@ -1877,7 +1905,7 @@ msgstr ""
 #: ../libtransmission/blocklist.cc:462
 #, c-format
 msgid "Blocklist \"%s\" updated with %zu entries"
-msgstr ""
+msgstr "فهرست انسداد %s با %zu ورودی به‌روز شد"
 
 #: ../libtransmission/fdlimit.cc:171
 #, c-format
@@ -1896,11 +1924,11 @@ msgstr ""
 
 #: ../libtransmission/fdlimit.cc:210
 msgid "full"
-msgstr ""
+msgstr "پر"
 
 #: ../libtransmission/fdlimit.cc:215
 msgid "sparse"
-msgstr ""
+msgstr "تنک"
 
 #: ../libtransmission/fdlimit.cc:223
 #, c-format
@@ -1934,7 +1962,7 @@ msgstr ""
 
 #: ../libtransmission/natpmp.cc:27
 msgid "Port Forwarding (NAT-PMP)"
-msgstr ""
+msgstr "انتقال درگاه (NAT-PMP)"
 
 #: ../libtransmission/natpmp.cc:43
 #, c-format
@@ -1954,7 +1982,7 @@ msgstr ""
 #: ../libtransmission/natpmp.cc:197
 #, c-format
 msgid "Port %d forwarded successfully"
-msgstr ""
+msgstr "درگاه %d با موفّقیت منتقل شد"
 
 #: ../libtransmission/net.cc:362
 #, c-format
@@ -1987,23 +2015,23 @@ msgstr ""
 
 #: ../libtransmission/port-forwarding.cc:25
 msgid "Port Forwarding"
-msgstr ""
+msgstr "انتقال درگاه"
 
 #: ../libtransmission/port-forwarding.cc:53
 msgid "Starting"
-msgstr ""
+msgstr "در حال آغاز"
 
 #: ../libtransmission/port-forwarding.cc:56
 msgid "Forwarded"
-msgstr ""
+msgstr "منتقل‌شده"
 
 #: ../libtransmission/port-forwarding.cc:59
 msgid "Stopping"
-msgstr ""
+msgstr "در حال پایان"
 
 #: ../libtransmission/port-forwarding.cc:62
 msgid "Not forwarded"
-msgstr ""
+msgstr "منتقل نشده"
 
 #: ../libtransmission/port-forwarding.cc:114 ../libtransmission/torrent.cc:1797
 #, c-format
@@ -2012,7 +2040,7 @@ msgstr ""
 
 #: ../libtransmission/port-forwarding.cc:205
 msgid "Stopped"
-msgstr ""
+msgstr "متوقّف"
 
 #: ../libtransmission/rpc-server.cc:854
 #, c-format
@@ -2026,11 +2054,11 @@ msgstr ""
 
 #: ../libtransmission/rpc-server.cc:1040
 msgid "Whitelist enabled"
-msgstr ""
+msgstr "فهرست سفید به کار افتاده"
 
 #: ../libtransmission/rpc-server.cc:1045
 msgid "Password required"
-msgstr ""
+msgstr "نیازمند گذرواژه"
 
 #: ../libtransmission/rpc-server.cc:1052
 #, c-format
@@ -2063,7 +2091,7 @@ msgstr ""
 
 #: ../libtransmission/torrent.cc:1561
 msgid "Removing torrent"
-msgstr ""
+msgstr "برداشتن تورنت"
 
 #. Translators: this is a minor point that's safe to skip over, but FYI:
 #. "Complete" and "Done" are specific, different terms in Transmission:
@@ -2072,11 +2100,11 @@ msgstr ""
 #. that exist
 #: ../libtransmission/torrent.cc:1642
 msgid "Done"
-msgstr ""
+msgstr "انجام شده"
 
 #: ../libtransmission/torrent.cc:1645
 msgid "Complete"
-msgstr ""
+msgstr "کامل"
 
 #: ../libtransmission/torrent.cc:2586
 #, c-format
@@ -2085,7 +2113,7 @@ msgstr ""
 
 #: ../libtransmission/upnp.cc:26
 msgid "Port Forwarding (UPnP)"
-msgstr ""
+msgstr "انتقال درگاه (UPnP)"
 
 #: ../libtransmission/upnp.cc:228
 #, c-format
@@ -2100,7 +2128,7 @@ msgstr ""
 #: ../libtransmission/upnp.cc:252
 #, c-format
 msgid "Port %d isn't forwarded"
-msgstr ""
+msgstr "در گاه %d منتقل نشده است"
 
 #: ../libtransmission/upnp.cc:263
 #, c-format
@@ -2114,21 +2142,21 @@ msgstr ""
 
 #: ../libtransmission/upnp.cc:306
 msgid "Port forwarding successful!"
-msgstr ""
+msgstr "انتقال درگاه با موفّقیت انجام شد"
 
 #: ../libtransmission/utils.cc:242 ../libtransmission/utils.cc:295
 msgid "Not a regular file"
-msgstr ""
+msgstr "یک پروندهٔ عادی نیست"
 
 #: ../libtransmission/utils.cc:365
 #, c-format
 msgid "Saved \"%s\""
-msgstr ""
+msgstr "«%s» ذخیره شد"
 
 #. did caller give us an uninitialized val?
 #: ../libtransmission/variant.cc:971
 msgid "Invalid metadata"
-msgstr ""
+msgstr "فرادادهٔ نامعتبر"
 
 #: ../libtransmission/variant.cc:1216
 msgid "Error saving \"%"
@@ -2136,7 +2164,7 @@ msgstr ""
 
 #: ../libtransmission/verify.cc:228
 msgid "Verifying torrent"
-msgstr ""
+msgstr "صحت‌سنجی تورنت"
 
 #, c-format
 #~ msgid "%1$s (+%2$s corrupt)"
@@ -2154,8 +2182,16 @@ msgstr ""
 #~ msgid "Copyright (c) The Transmission Project"
 #~ msgstr "حق رونوشت (c) پروژهٔ ترنسمیشن"
 
+#, c-format
+#~ msgid "Couldn't save temporary file \"%1$s\": %2$s"
+#~ msgstr "نمی‌توان پروندهٔ موقّتی %1$s را ذخیره کرد: %2$s"
+
 #~ msgid "Create a torrent"
 #~ msgstr "ایجاد بک تورنت"
+
+#, c-format
+#~ msgid "DNS Lookup failed: %s"
+#~ msgstr "جست‌وجوی ساناد شکست خورد: %s"
 
 #~ msgid "Dese_lect All"
 #~ msgstr "گزینش هیچ"
@@ -2164,8 +2200,8 @@ msgstr ""
 #~ msgstr "فعّال کردن کران‌های سرعت جایگزین"
 
 #, c-format
-#~ msgid "Error opening \"%s\""
-#~ msgstr "گشا در گشودن «%s»"
+#~ msgid "Error uncompressing blocklist: %s (%d)"
+#~ msgstr "خطا در استخراج فهرست انسداد: %s (%d)"
 
 #~ msgid "Message _Log"
 #~ msgstr "گزارش پیام"
@@ -2211,10 +2247,6 @@ msgstr ""
 
 #~ msgid "Select _All"
 #~ msgstr "گزینش همه"
-
-#, c-format
-#~ msgid "Server returned \"%1$ld %2$s\""
-#~ msgstr "کارساز برگرداند «%1$ld %2$s»"
 
 #~ msgid "Set _Location…"
 #~ msgstr "تنظیم موقعیّت"
@@ -2277,8 +2309,11 @@ msgstr ""
 #~ msgid "Tracker will allow requests in %s"
 #~ msgstr "ردیاب‌ها اجازهٔ پرس‌وجو خواهند داد در %Is"
 
-#~ msgid "Transmission BitTorrent Client"
-#~ msgstr "کارخواه بیت‌تورنت ترنسمیشن"
+#~ msgid "Unable to parse file content"
+#~ msgstr "ناتوان در تجزیهٔ محتوای پرونده"
+
+#~ msgid "_About"
+#~ msgstr "_درباره"
 
 #~ msgid "_Compact View"
 #~ msgstr "نمای فشرده"
@@ -2306,6 +2341,12 @@ msgstr ""
 
 #~ msgid "_Pause All"
 #~ msgstr "مکث همه"
+
+#~ msgid "_Preferences"
+#~ msgstr "_ترجیحات"
+
+#~ msgid "_Properties"
+#~ msgstr "_ویژگی‌ها"
 
 #~ msgid "_Queue"
 #~ msgstr "صف"

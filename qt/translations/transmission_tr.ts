@@ -412,7 +412,7 @@
     <message>
         <location line="+109"/>
         <source>Size:</source>
-        <translation>Boyut</translation>
+        <translation>Boyut:</translation>
     </message>
     <message>
         <location line="+7"/>
@@ -1523,7 +1523,7 @@ Başka ana URL eklemek için, onu boş bir satırdan sonra ekleyin.</translation
     <message>
         <location line="+8"/>
         <source>Error: invalid announce URL &quot;%1&quot;</source>
-        <translation>Hata: geçersiz anons URL&apos;si &quot;%1&quot;</translation>
+        <translation>Hata: geçersiz duyuru URL&apos;si &quot;%1&quot;</translation>
     </message>
     <message>
         <location line="-4"/>

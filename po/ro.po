@@ -3,13 +3,16 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
+# Translators:
+# Mike Gelfand <mikedld@mikedld.com>, 2017
+#
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-21 21:24+0000\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"POT-Creation-Date: 2022-02-21 21:26+0000\n"
+"PO-Revision-Date: 2017-01-26 19:47+0000\n"
 "Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2017\n"
 "Language-Team: Romanian (https://www.transifex.com/transmissionbt/teams/33778/ro/)\n"
 "Language: ro\n"
@@ -2238,10 +2241,6 @@ msgstr "Se verifică torentul"
 #~ msgstr "Activează _limitele alternative de viteză"
 
 #, c-format
-#~ msgid "Error opening \"%s\""
-#~ msgstr "Eroare la deschiderea „%s”"
-
-#, c-format
 #~ msgid "File \"%s\" is in the way"
 #~ msgstr "Fişierul „%s” stă în cale"
 
@@ -2297,10 +2296,6 @@ msgstr "Se verifică torentul"
 
 #~ msgid "Select _All"
 #~ msgstr "Selectează to_ate"
-
-#, c-format
-#~ msgid "Server returned \"%1$ld %2$s\""
-#~ msgstr "Serverul a returnat „%1$ld %2$s”"
 
 #~ msgid "Set _Location…"
 #~ msgstr "Stabiliți _locul"
@@ -2370,9 +2365,6 @@ msgstr "Se verifică torentul"
 #, c-format
 #~ msgid "Tracker will allow requests in %s"
 #~ msgstr "Trackerul va permite cereri în %s"
-
-#~ msgid "Transmission BitTorrent Client"
-#~ msgstr "Client BitTorrent Transmission"
 
 #~ msgid "_Compact View"
 #~ msgstr "Vizualizare _Compactă"

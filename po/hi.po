@@ -12,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-21 21:24+0000\n"
+"POT-Creation-Date: 2022-02-21 21:26+0000\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
 "Last-Translator: Panwar108 <caspian7pena@gmail.com>, 2020\n"
 "Language-Team: Hindi (https://www.transifex.com/transmissionbt/teams/33778/hi/)\n"
@@ -2054,7 +2054,7 @@ msgstr "सेटिंग्स कुंजी \"%s\" खोज विफल"
 #: ../libtransmission/rpc-server.cc:1032
 #, c-format
 msgid "Serving RPC and Web requests on %s:%d%s"
-msgstr "आरपीसी व वेब अनुरोध हेतु %s कार्यरत : %d%s"
+msgstr "%s पर आरपीसी व वेब अनुरोध कार्यरत : %d%s"
 
 #: ../libtransmission/rpc-server.cc:1040
 msgid "Whitelist enabled"
@@ -2067,7 +2067,7 @@ msgstr "कूटशब्द आवश्यक"
 #: ../libtransmission/rpc-server.cc:1052
 #, c-format
 msgid "Serving RPC and Web requests from directory '%s'"
-msgstr ""
+msgstr "'%s' डायरेक्टरी से आरपीसी व वेब अनुरोध कार्यरत"
 
 #. first %s is the application name
 #. second %s is the version number
