@@ -346,40 +346,42 @@ void on_content_changed(evbuffer* buf, evbuffer_cb_info const* info, void* vtask
 {
     size_t const n_added = info->n_added;
     auto* const task = static_cast<tr_webseed_task*>(vtask);
+    if (n_added == 0 || task->dead)
+    {
+        return;
+    }
+
     auto* const session = task->session;
     auto const lock = session->unique_lock();
+    auto* const webseed = task->webseed;
 
-    if (!task->dead && n_added > 0)
+    webseed->bandwidth.notifyBandwidthConsumed(TR_DOWN, n_added, true, tr_time_msec());
+    fire_client_got_piece_data(webseed, n_added);
+    webseed->connection_limiter.gotData();
+
+    uint32_t const len = evbuffer_get_length(buf);
+    if (len < task->block_size)
     {
-        auto* const w = task->webseed;
-
-        w->bandwidth.notifyBandwidthConsumed(TR_DOWN, n_added, true, tr_time_msec());
-        fire_client_got_piece_data(w, n_added);
-        uint32_t const len = evbuffer_get_length(buf);
-
-        task->webseed->connection_limiter.gotData();
-
-        if (len >= task->block_size)
-        {
-            /* once we've got at least one full block, save it */
-
-            uint32_t const block_size = task->block_size;
-            tr_block_index_t const completed = len / block_size;
-
-            auto* const data = new write_block_data{ session, w->torrent_id, task->webseed };
-            data->piece_index = task->piece_index;
-            data->block_index = task->block + task->blocks_done;
-            data->count = completed;
-            data->block_offset = task->piece_offset + task->blocks_done * block_size;
-
-            /* we don't use locking on this evbuffer so we must copy out the data
-               that will be needed when writing the block in a different thread */
-            evbuffer_remove_buffer(task->content(), data->content(), (size_t)block_size * (size_t)completed);
-
-            tr_runInEventThread(w->session, write_block_func, data);
-            task->blocks_done += completed;
-        }
+        return;
     }
+
+    // once we've got at least one full block, save it
+
+    uint32_t const block_size = task->block_size;
+    tr_block_index_t const completed = len / block_size;
+
+    auto* const data = new write_block_data{ session, webseed->torrent_id, task->webseed };
+    data->piece_index = task->piece_index;
+    data->block_index = task->block + task->blocks_done;
+    data->count = completed;
+    data->block_offset = task->piece_offset + task->blocks_done * block_size;
+
+    /* we don't use locking on this evbuffer so we must copy out the data
+       that will be needed when writing the block in a different thread */
+    evbuffer_remove_buffer(task->content(), data->content(), (size_t)block_size * (size_t)completed);
+
+    tr_runInEventThread(session, write_block_func, data);
+    task->blocks_done += completed;
 }
 
 void task_request_next_chunk(tr_webseed_task* task);
@@ -421,55 +423,55 @@ void onPartialDataFetched(tr_web::FetchResponse const& web_response)
         return;
     }
 
-    tr_torrent* tor = tr_torrentFindFromId(session, w->torrent_id);
-
-    if (tor != nullptr)
+    auto* const tor = tr_torrentFindFromId(session, w->torrent_id);
+    if (tor == nullptr)
     {
-        if (!success)
+        return;
+    }
+
+    if (!success)
+    {
+        tr_block_index_t const blocks_remain = (t->length + tor->blockSize() - 1) / tor->blockSize() - t->blocks_done;
+
+        if (blocks_remain != 0)
         {
-            tr_block_index_t const blocks_remain = (t->length + tor->blockSize() - 1) / tor->blockSize() - t->blocks_done;
-
-            if (blocks_remain != 0)
-            {
-                fire_client_got_rejs(tor, w, t->block + t->blocks_done, blocks_remain);
-            }
-
-            w->tasks.erase(t);
-            delete t;
+            fire_client_got_rejs(tor, w, t->block + t->blocks_done, blocks_remain);
         }
-        else
+
+        w->tasks.erase(t);
+        delete t;
+        return;
+    }
+
+    uint32_t const bytes_done = t->blocks_done * tor->blockSize();
+    uint32_t const buf_len = evbuffer_get_length(t->content());
+
+    if (bytes_done + buf_len < t->length)
+    {
+        /* request finished successfully but there's still data missing. that
+           means we've reached the end of a file and need to request the next one */
+        task_request_next_chunk(t);
+    }
+    else
+    {
+        if (buf_len != 0 && !tor->hasPiece(t->piece_index))
         {
-            uint32_t const bytes_done = t->blocks_done * tor->blockSize();
-            uint32_t const buf_len = evbuffer_get_length(t->content());
+            /* on_content_changed() will not write a block if it is smaller than
+               the torrent's block size, i.e. the torrent's very last block */
+            tr_cacheWriteBlock(
+                session->cache,
+                tor,
+                tor->pieceLoc(t->piece_index, t->piece_offset + bytes_done),
+                buf_len,
+                t->content());
 
-            if (bytes_done + buf_len < t->length)
-            {
-                /* request finished successfully but there's still data missing. that
-                   means we've reached the end of a file and need to request the next one */
-                task_request_next_chunk(t);
-            }
-            else
-            {
-                if (buf_len != 0 && !tor->hasPiece(t->piece_index))
-                {
-                    /* on_content_changed() will not write a block if it is smaller than
-                       the torrent's block size, i.e. the torrent's very last block */
-                    tr_cacheWriteBlock(
-                        session->cache,
-                        tor,
-                        tor->pieceLoc(t->piece_index, t->piece_offset + bytes_done),
-                        buf_len,
-                        t->content());
-
-                    fire_client_got_blocks(tor, t->webseed, t->block + t->blocks_done, 1);
-                }
-
-                w->tasks.erase(t);
-                delete t;
-
-                on_idle(w);
-            }
+            fire_client_got_blocks(tor, t->webseed, t->block + t->blocks_done, 1);
         }
+
+        w->tasks.erase(t);
+        delete t;
+
+        on_idle(w);
     }
 }
 
@@ -489,7 +491,7 @@ void task_request_next_chunk(tr_webseed_task* t)
 {
     tr_webseed* w = t->webseed;
 
-    tr_torrent* const tor = tr_torrentFindFromId(w->session, w->torrent_id);
+    auto* const tor = tr_torrentFindFromId(w->session, w->torrent_id);
     if (tor == nullptr)
     {
         return;
