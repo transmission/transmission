@@ -218,6 +218,7 @@ static void libeventThreadFunc(tr_event_handle* events)
     {
         evdns_base_free(dns_base, 0);
     }
+    event_free(events->work_queue_event);
     event_base_free(base);
     events->session->event_base = nullptr;
     events->session->evdns_base = nullptr;
