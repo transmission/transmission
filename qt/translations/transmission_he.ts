@@ -9,22 +9,27 @@
         <translation> אודות Transmission</translation>
     </message>
     <message>
-        <location filename="../AboutDialog.cc" line="+27"/>
-        <source>&lt;b style=&apos;font-size:x-large&apos;&gt;Transmission %1&lt;/b&gt;</source>
-        <translation>&lt;b style=&apos;font-size:x-large&apos;&gt;Transmission %1&lt;/b&gt;</translation>
+        <location line="+39"/>
+        <source>Copyright © The Transmission Project</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="../AboutDialog.ui" line="+29"/>
+        <location line="-10"/>
         <source>A fast and easy BitTorrent client</source>
         <translation>לקוח ביטטורנט מהיר ופשוט</translation>
     </message>
     <message>
-        <location line="+10"/>
-        <source>Copyright (c) The Transmission Project</source>
-        <translation>כל הזכויות שמורות (c) מיזם Transmission</translation>
+        <location filename="../AboutDialog.cc" line="+37"/>
+        <source>Client</source>
+        <translation type="unfinished">לקוח</translation>
     </message>
     <message>
-        <location filename="../AboutDialog.cc" line="+2"/>
+        <location line="+2"/>
+        <source>Server</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+4"/>
         <source>C&amp;redits</source>
         <translation>&amp;תודות</translation>
     </message>
@@ -34,7 +39,7 @@
         <translation>&amp;רישיון</translation>
     </message>
     <message>
-        <location line="+8"/>
+        <location line="+10"/>
         <source>Credits</source>
         <translation>תודות</translation>
     </message>
@@ -42,12 +47,12 @@
 <context>
     <name>Application</name>
     <message>
-        <location filename="../Application.cc" line="+332"/>
+        <location filename="../Application.cc" line="+330"/>
         <source>&lt;b&gt;Transmission is a file sharing program.&lt;/b&gt;</source>
         <translation>&lt;b&gt;Transmission היא תכנית לשיתוף קבצים.&lt;/b&gt;</translation>
     </message>
     <message>
-        <location line="+1"/>
+        <location line="+4"/>
         <source>When you run a torrent, its data will be made available to others by means of upload. Any content you share is your sole responsibility.</source>
         <translation>בעת הרצת טורנט, הנתונים שלו נגישים לאחרים דרך העלאה. כל תוכן שישותף הוא על אחריותך הבלעדית.</translation>
     </message>
@@ -56,16 +61,13 @@
         <source>I &amp;Agree</source>
         <translation>מו&amp;סכם</translation>
     </message>
-    <message numerus="yes">
-        <location line="+77"/>
-        <source>Torrent(s) Added</source>
-        <translation>
-            <numerusform>נוסף טורנט</numerusform>
-            <numerusform>נוספו טורנטים</numerusform>
-        </translation>
+    <message>
+        <location line="+132"/>
+        <source>Torrent Added</source>
+        <translation type="unfinished"></translation>
     </message>
     <message numerus="yes">
-        <location line="+10"/>
+        <location line="-29"/>
         <source>Torrent Completed</source>
         <translation>
             <numerusform>טורנט הושלם</numerusform>
@@ -76,7 +78,7 @@
 <context>
     <name>DetailsDialog</name>
     <message>
-        <location filename="../DetailsDialog.cc" line="+410"/>
+        <location filename="../DetailsDialog.cc" line="+427"/>
         <source>None</source>
         <translation>אין</translation>
     </message>
@@ -87,12 +89,12 @@
     </message>
     <message>
         <location line="+1"/>
-        <location line="+272"/>
+        <location line="+265"/>
         <source>Unknown</source>
         <translation>לא ידוע</translation>
     </message>
     <message>
-        <location line="-216"/>
+        <location line="-208"/>
         <source>Finished</source>
         <translation>הסתיימו</translation>
     </message>
@@ -102,7 +104,12 @@
         <translation>מושהה</translation>
     </message>
     <message>
-        <location line="+250"/>
+        <location line="+109"/>
+        <source>%1 (+%2 discarded after failed checksum)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+133"/>
         <source>Active now</source>
         <translation>פעיל כעת</translation>
     </message>
@@ -120,7 +127,7 @@
         </translation>
     </message>
     <message numerus="yes">
-        <location line="+5"/>
+        <location line="+4"/>
         <source>%1 (%Ln pieces)</source>
         <translation>
             <numerusform>%1 (חלק אחד)</numerusform>
@@ -153,7 +160,7 @@
         <translation>נוצר על ידי %1 ב־%2</translation>
     </message>
     <message>
-        <location line="+183"/>
+        <location line="+173"/>
         <location line="+47"/>
         <source>Encrypted connection</source>
         <translation>חיבור מוצפן</translation>
@@ -209,7 +216,7 @@
         <translation>העמית הוא חיבור נכנס</translation>
     </message>
     <message numerus="yes">
-        <location line="+134"/>
+        <location line="+132"/>
         <source> minute(s)</source>
         <extracomment>Spin box suffix, &quot;Stop seeding if idle for: [ 5 minutes ]&quot; (includes leading space after the number, if needed)</extracomment>
         <translation>
@@ -218,19 +225,27 @@
         </translation>
     </message>
     <message>
-        <location line="+42"/>
-        <location line="+16"/>
-        <location line="+28"/>
+        <location line="+35"/>
+        <source>Add URL(s) </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+1"/>
+        <source>Add tracker announce URLs, one per line:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+27"/>
         <source>Error</source>
         <translation>שגיאה</translation>
     </message>
     <message>
-        <location line="-28"/>
-        <source>Tracker already exists.</source>
-        <translation>הגשש כבר קיים.</translation>
+        <location line="+0"/>
+        <source>No new URLs found.</source>
+        <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-807"/>
+        <location line="-799"/>
         <source>%1 (100%)</source>
         <extracomment>Text following the &quot;Have:&quot; label in torrent properties dialog; %1 is amount of downloaded and verified data</extracomment>
         <translation>%1 (100%)</translation>
@@ -242,59 +257,28 @@
         <translation>%1 מתוך %2 (%3%)</translation>
     </message>
     <message>
-        <location line="+11"/>
+        <location line="+9"/>
         <source>%1 of %2 (%3%), %4 Unverified</source>
         <extracomment>Text following the &quot;Have:&quot; label in torrent properties dialog; %1 is amount of downloaded data (both verified and unverified), %2 is overall size of torrent data, %3 is percentage (%1/%2*100), %4 is amount of downloaded but not yet verified data</extracomment>
         <translation>%1 מתוך %2 (%3%), %4 לא מאומת</translation>
     </message>
     <message>
-        <location line="+41"/>
-        <source>%1 (%2 corrupt)</source>
-        <translation>%1 (%2 פגום)</translation>
-    </message>
-    <message>
-        <location line="+26"/>
+        <location line="+70"/>
         <source>%1 (Ratio: %2)</source>
         <translation>%1 (יחס: %2)</translation>
     </message>
     <message>
-        <location line="+273"/>
+        <location line="+271"/>
         <source>N/A</source>
         <translation>לא זמין</translation>
     </message>
     <message>
-        <location line="+260"/>
+        <location line="+250"/>
         <source>Peer is connected over uTP</source>
         <translation>העמית מחובר דרך uTP</translation>
     </message>
     <message>
-        <location line="+163"/>
-        <source>Add URL </source>
-        <translation>הוספת כתובת</translation>
-    </message>
-    <message>
-        <location line="+0"/>
-        <source>Add tracker announce URL:</source>
-        <translation>הוספת כתובת הכרזה של גשש:</translation>
-    </message>
-    <message>
-        <location line="+9"/>
-        <location line="+44"/>
-        <source>Invalid URL &quot;%1&quot;</source>
-        <translation>כתובת שגויה „%1”</translation>
-    </message>
-    <message>
-        <location line="-9"/>
-        <source>Edit URL </source>
-        <translation>עריכת כתובת</translation>
-    </message>
-    <message>
-        <location line="+0"/>
-        <source>Edit tracker announce URL:</source>
-        <translation>עריכת כתובת הכרזה של גשש:</translation>
-    </message>
-    <message>
-        <location line="+57"/>
+        <location line="+260"/>
         <source>High</source>
         <translation>גבוהה</translation>
     </message>
@@ -335,7 +319,7 @@
         <translation>הפסקת זריעה בחוסר פעילות למשך:</translation>
     </message>
     <message>
-        <location line="+64"/>
+        <location line="+75"/>
         <source>Up</source>
         <translation>העלאה</translation>
     </message>
@@ -440,7 +424,12 @@
         <translation>מיקום:‏‪</translation>
     </message>
     <message>
-        <location line="-66"/>
+        <location line="+110"/>
+        <source>Edit Trackers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="-176"/>
         <source>Hash:</source>
         <translation>גיבוב:</translation>
     </message>
@@ -475,12 +464,7 @@
         <translation>הוספת גשש</translation>
     </message>
     <message>
-        <location line="+10"/>
-        <source>Edit Tracker</source>
-        <translation>עריכת גשש</translation>
-    </message>
-    <message>
-        <location line="+10"/>
+        <location line="+20"/>
         <source>Remove Trackers</source>
         <translation>הסרת גשש</translation>
     </message>
@@ -558,29 +542,29 @@
 <context>
     <name>FileTreeItem</name>
     <message>
-        <location filename="../FileTreeItem.cc" line="+292"/>
-        <location filename="../FileTreeView.cc" line="+111"/>
-        <location line="+285"/>
+        <location filename="../FileTreeItem.cc" line="+285"/>
+        <location filename="../FileTreeView.cc" line="+108"/>
+        <location line="+257"/>
         <source>Low</source>
         <translation>נמוכה</translation>
     </message>
     <message>
         <location line="+3"/>
-        <location filename="../FileTreeView.cc" line="-285"/>
-        <location line="+283"/>
+        <location filename="../FileTreeView.cc" line="-257"/>
+        <location line="+255"/>
         <source>High</source>
         <translation>גבוהה</translation>
     </message>
     <message>
         <location line="+3"/>
-        <location filename="../FileTreeView.cc" line="-283"/>
-        <location line="+284"/>
+        <location filename="../FileTreeView.cc" line="-255"/>
+        <location line="+256"/>
         <source>Normal</source>
         <translation>תקנית</translation>
     </message>
     <message>
         <location line="+3"/>
-        <location filename="../FileTreeView.cc" line="-283"/>
+        <location filename="../FileTreeView.cc" line="-255"/>
         <source>Mixed</source>
         <translation>מעורבת</translation>
     </message>
@@ -588,7 +572,7 @@
 <context>
     <name>FileTreeModel</name>
     <message>
-        <location filename="../FileTreeModel.cc" line="+199"/>
+        <location filename="../FileTreeModel.cc" line="+195"/>
         <source>File</source>
         <translation>קובץ</translation>
     </message>
@@ -616,7 +600,7 @@
 <context>
     <name>FileTreeView</name>
     <message>
-        <location filename="../FileTreeView.cc" line="+275"/>
+        <location filename="../FileTreeView.cc" line="+247"/>
         <source>Check Selected</source>
         <translation>סימון הפריטים שנבחרו</translation>
     </message>
@@ -649,13 +633,13 @@
 <context>
     <name>FilterBar</name>
     <message>
-        <location filename="../FilterBar.cc" line="+49"/>
-        <location line="+142"/>
+        <location filename="../FilterBar.cc" line="+47"/>
+        <location line="+145"/>
         <source>All</source>
         <translation>הכול</translation>
     </message>
     <message>
-        <location line="-135"/>
+        <location line="-136"/>
         <source>Active</source>
         <translation>פעילים</translation>
     </message>
@@ -690,7 +674,7 @@
         <translation>שגויים</translation>
     </message>
     <message>
-        <location line="+139"/>
+        <location line="+140"/>
         <source>Show:</source>
         <translation>הצגת:</translation>
     </message>
@@ -703,7 +687,7 @@
 <context>
     <name>Formatter</name>
     <message>
-        <location filename="../Formatter.cc" line="+27"/>
+        <location filename="../Formatter.cc" line="+24"/>
         <source>B/s</source>
         <translation>ב׳/ש</translation>
     </message>
@@ -774,25 +758,25 @@
         <translation>ט/ב</translation>
     </message>
     <message>
-        <location line="+34"/>
-        <location line="+17"/>
+        <location line="+37"/>
+        <location line="+25"/>
         <source>Unknown</source>
         <translation>לא ידוע</translation>
     </message>
     <message>
-        <location line="-12"/>
-        <location line="+17"/>
+        <location line="-20"/>
+        <location line="+10"/>
         <source>None</source>
         <translation>אין</translation>
     </message>
     <message>
-        <location line="+19"/>
+        <location line="+25"/>
         <location line="+7"/>
         <source>%1 %2</source>
         <translation>%1 %2</translation>
     </message>
     <message numerus="yes">
-        <location line="+23"/>
+        <location line="+21"/>
         <source>%Ln day(s)</source>
         <translation>
             <numerusform>יום</numerusform>
@@ -834,12 +818,12 @@
 <context>
     <name>FreeSpaceLabel</name>
     <message>
-        <location filename="../FreeSpaceLabel.cc" line="+55"/>
+        <location filename="../FreeSpaceLabel.cc" line="+52"/>
         <source>&lt;i&gt;Calculating Free Space...&lt;/i&gt;</source>
         <translation>&lt;i&gt;חישוב מקום פנוי…&lt;/i&gt;</translation>
     </message>
     <message>
-        <location line="+32"/>
+        <location line="+29"/>
         <source>%1 free</source>
         <translation>%1 פנויים</translation>
     </message>
@@ -860,7 +844,7 @@
         <translation>Transmission</translation>
     </message>
     <message>
-        <location line="+175"/>
+        <location line="+181"/>
         <source>&amp;Torrent</source>
         <translation>&amp;טורנט</translation>
     </message>
@@ -915,7 +899,17 @@
         <translation>תור</translation>
     </message>
     <message>
-        <location line="+122"/>
+        <location line="-132"/>
+        <source>Options</source>
+        <translation type="unfinished">אפשרויות</translation>
+    </message>
+    <message>
+        <location line="+83"/>
+        <source>Statistics</source>
+        <translation type="unfinished">סטטיסטיקה</translation>
+    </message>
+    <message>
+        <location line="+171"/>
         <source>&amp;Open...</source>
         <translation>&amp;פתיחה…</translation>
     </message>
@@ -1232,7 +1226,7 @@
         <translation>מיון לפי &amp;תור</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cc" line="+467"/>
+        <location filename="../MainWindow.cc" line="+471"/>
         <source>Limit Download Speed</source>
         <translation>הגבלת מהירות ההורדה</translation>
     </message>
@@ -1242,37 +1236,37 @@
         <translation>ללא הגבלה</translation>
     </message>
     <message>
-        <location line="+7"/>
-        <location line="+730"/>
+        <location line="+6"/>
+        <location line="+733"/>
         <location line="+9"/>
         <source>Limited at %1</source>
         <translation>מוגבל עד %1</translation>
     </message>
     <message>
-        <location line="-689"/>
+        <location line="-687"/>
         <source>Limit Upload Speed</source>
         <translation>הגבלת מהירות ההעלאה</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="+9"/>
         <source>Stop Seeding at Ratio</source>
         <translation>הפסקת זריעה ביחס</translation>
     </message>
     <message>
-        <location line="-31"/>
+        <location line="-40"/>
         <source>Seed Forever</source>
         <translation>זריעה לעד</translation>
     </message>
     <message>
         <location line="+6"/>
-        <location line="+718"/>
+        <location line="+720"/>
         <source>Stop at Ratio (%1)</source>
         <translation>להפסיק ביחס (%1)</translation>
     </message>
     <message>
-        <location line="-402"/>
+        <location line="-393"/>
         <source> - %1:%2</source>
-        <extracomment>Second (optional) part of main window title &quot;Transmission - host:port&quot; (added when connected to remote session); notice that leading space (before the dash) is included here</extracomment>
+        <extracomment>Second (optional) part of main window title &quot;Transmission - host:port&quot; (added when connected to remote session) notice that leading space (before the dash) is included here</extracomment>
         <translation> - %1:%2</translation>
     </message>
     <message>
@@ -1282,43 +1276,43 @@
     </message>
     <message>
         <location line="+30"/>
-        <location line="+20"/>
+        <location line="+15"/>
         <source>Ratio: %1</source>
         <translation>יחס: %1</translation>
     </message>
     <message>
-        <location line="-14"/>
-        <location line="+7"/>
+        <location line="-10"/>
+        <location line="+5"/>
         <source>Down: %1, Up: %2</source>
         <translation>הורדה: %1, העלאה: %2</translation>
     </message>
     <message>
-        <location line="+441"/>
+        <location line="+424"/>
         <source>Torrent Files (*.torrent);;All Files (*.*)</source>
         <translation>קובצי טורנט (‎*.torrent);;כל הקבצים (*.*)</translation>
     </message>
     <message>
-        <location line="+8"/>
+        <location line="+6"/>
         <source>Show &amp;options dialog</source>
         <translation>הצגת דו־ שיח &amp;אפשרויות</translation>
     </message>
     <message>
-        <location line="-9"/>
+        <location line="-8"/>
         <source>Open Torrent</source>
         <translation>פתיחת טורנט</translation>
     </message>
     <message>
-        <location line="-990"/>
+        <location line="-986"/>
         <source>Speed Limits</source>
         <translation>מגבלות מהירות</translation>
     </message>
     <message>
-        <location line="+503"/>
+        <location line="+520"/>
         <source>Network Error</source>
         <translation>שגיאת רשת</translation>
     </message>
     <message>
-        <location line="+460"/>
+        <location line="+434"/>
         <source>Click to disable Temporary Speed Limits
  (%1 down, %2 up)</source>
         <translation>יש ללחוץ כדי להשבית מגבלות מהירות חלופיות
@@ -1332,7 +1326,7 @@
 (%1 הורדה, %2 העלאה)</translation>
     </message>
     <message>
-        <location line="+135"/>
+        <location line="+136"/>
         <source>Remove torrent?</source>
         <translation>הסרת טורנט?</translation>
     </message>
@@ -1350,7 +1344,7 @@
         </translation>
     </message>
     <message numerus="yes">
-        <location line="-524"/>
+        <location line="-505"/>
         <source>Showing %L1 of %Ln torrent(s)</source>
         <translation>
             <numerusform>מוצג %L1 מתוך טורנט אחד</numerusform>
@@ -1358,7 +1352,7 @@
         </translation>
     </message>
     <message numerus="yes">
-        <location line="+529"/>
+        <location line="+510"/>
         <source>Delete these %Ln torrent(s)&apos; downloaded files?</source>
         <translation>
             <numerusform>מחיקת הקבצים שהתקבלו עבור הטורנט הזה?</numerusform>
@@ -1391,7 +1385,7 @@
         <translation>הטורנט הזה מחובר לעמיתים.</translation>
     </message>
     <message>
-        <location line="+1"/>
+        <location line="+0"/>
         <source>These torrents are connected to peers.</source>
         <translation>הטורנטים האלו מחוברים לעמיתים.</translation>
     </message>
@@ -1444,7 +1438,7 @@
         <translation>טורנט חדש</translation>
     </message>
     <message>
-        <location filename="../MakeDialog.cc" line="+218"/>
+        <location filename="../MakeDialog.cc" line="+230"/>
         <source>&lt;i&gt;No source selected&lt;/i&gt;</source>
         <translation>&lt;i&gt;לא נבחר מקור&lt;/i&gt;</translation>
     </message>
@@ -1513,6 +1507,11 @@ To add another primary URL, add it after a blank line.</source>
     </message>
     <message>
         <location line="+14"/>
+        <source>&amp;Source:</source>
+        <translation type="unfinished">מ&amp;קור:</translation>
+    </message>
+    <message>
+        <location line="+14"/>
         <source>&amp;Private torrent</source>
         <translation>טורנט &amp;פרטי</translation>
     </message>
@@ -1525,7 +1524,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation>טורנט חדש</translation>
     </message>
     <message>
-        <location filename="../MakeDialog.cc" line="-124"/>
+        <location filename="../MakeDialog.cc" line="-136"/>
         <source>Creating &quot;%1&quot;</source>
         <translation>„%1” נוצר</translation>
     </message>
@@ -1535,22 +1534,22 @@ To add another primary URL, add it after a blank line.</source>
         <translation>„%1” נוצר!</translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="+8"/>
         <source>Error: invalid announce URL &quot;%1&quot;</source>
         <translation>שגיאה: כתובת הכרזה שגויה „%1”</translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="-4"/>
         <source>Cancelled</source>
         <translation>בוטל</translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="+8"/>
         <source>Error reading &quot;%1&quot;: %2</source>
         <translation>שגיאה בקריאת „%2”: %1</translation>
     </message>
     <message>
-        <location line="+5"/>
+        <location line="+4"/>
         <source>Error writing &quot;%1&quot;: %2</source>
         <translation>שגיאה בכתיבת „%2”: %1</translation>
     </message>
@@ -1583,7 +1582,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation>תי&amp;קיית יעד:</translation>
     </message>
     <message>
-        <location filename="../OptionsDialog.cc" line="+53"/>
+        <location filename="../OptionsDialog.cc" line="+52"/>
         <source>High</source>
         <translation>גבוהה</translation>
     </message>
@@ -1608,17 +1607,12 @@ To add another primary URL, add it after a blank line.</source>
         <translation>ה&amp;תחלה מיד עם ההוספה</translation>
     </message>
     <message>
-        <location filename="../OptionsDialog.cc" line="-69"/>
-        <source>&amp;Verify Local Data</source>
-        <translation>&amp;אימות נתונים מקומיים</translation>
-    </message>
-    <message>
-        <location filename="../OptionsDialog.ui" line="+7"/>
+        <location line="+7"/>
         <source>Mo&amp;ve .torrent file to the trash</source>
         <translation>העברת קובץ ‎.torrent  kxk לסל המחזור</translation>
     </message>
     <message>
-        <location filename="../OptionsDialog.cc" line="+28"/>
+        <location filename="../OptionsDialog.cc" line="-40"/>
         <source>Torrent Files (*.torrent);;All Files (*.*)</source>
         <translation>קובצי טורנט (‎*.torrent);;כל הקבצים (*.*)</translation>
     </message>
@@ -1631,13 +1625,13 @@ To add another primary URL, add it after a blank line.</source>
 <context>
     <name>PathButton</name>
     <message>
-        <location filename="../PathButton.cc" line="+26"/>
-        <location line="+72"/>
+        <location filename="../PathButton.cc" line="+23"/>
+        <location line="+71"/>
         <source>(None)</source>
         <translation>((אין)</translation>
     </message>
     <message>
-        <location line="+88"/>
+        <location line="+86"/>
         <source>Select Folder</source>
         <translation>בחירת תיקייה</translation>
     </message>
@@ -1650,7 +1644,7 @@ To add another primary URL, add it after a blank line.</source>
 <context>
     <name>PrefsDialog</name>
     <message>
-        <location filename="../PrefsDialog.ui" line="+1139"/>
+        <location filename="../PrefsDialog.ui" line="+1223"/>
         <source>Use &amp;authentication</source>
         <translation>שימוש ב&amp;אימות</translation>
     </message>
@@ -1675,7 +1669,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation>כתובות:</translation>
     </message>
     <message>
-        <location line="-1150"/>
+        <location line="-1234"/>
         <source>Speed Limits</source>
         <translation>מגבלות מהירות</translation>
     </message>
@@ -1695,7 +1689,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation>&amp;בימים:</translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.cc" line="+349"/>
+        <location filename="../PrefsDialog.cc" line="+388"/>
         <source>Every Day</source>
         <translation>כל יום</translation>
     </message>
@@ -1710,7 +1704,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation>סופ״שים</translation>
     </message>
     <message>
-        <location line="-197"/>
+        <location line="-238"/>
         <source>Sunday</source>
         <translation>יום ראשון</translation>
     </message>
@@ -1745,7 +1739,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation>שבת</translation>
     </message>
     <message>
-        <location line="+258"/>
+        <location line="+299"/>
         <source>Port is &lt;b&gt;open&lt;/b&gt;</source>
         <translation>הפתחה &lt;b&gt;פתוחה&lt;/b&gt;</translation>
     </message>
@@ -1755,13 +1749,18 @@ To add another primary URL, add it after a blank line.</source>
         <translation>הפתחה &lt;b&gt;סגורה&lt;/b&gt;</translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.ui" line="+513"/>
+        <location line="+159"/>
+        <source>Select &quot;Torrent Done Downloading&quot; Script</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="../PrefsDialog.ui" line="+545"/>
         <source>Incoming Peers</source>
         <translation>עמיתים נכנסים</translation>
     </message>
     <message>
         <location line="+32"/>
-        <location filename="../PrefsDialog.cc" line="+342"/>
+        <location filename="../PrefsDialog.cc" line="+207"/>
         <source>Status unknown</source>
         <translation>מצב לא ידוע</translation>
     </message>
@@ -1791,7 +1790,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation>uTP הוא כלי להפחתת עומס רשת.</translation>
     </message>
     <message numerus="yes">
-        <location filename="../PrefsDialog.cc" line="-236"/>
+        <location filename="../PrefsDialog.cc" line="-255"/>
         <source> minute(s)</source>
         <extracomment>Spin box suffix, &quot;Stop seeding if idle for: [ 5 minutes ]&quot; (includes leading space after the number, if needed)</extracomment>
         <translation>
@@ -1799,8 +1798,13 @@ To add another primary URL, add it after a blank line.</source>
             <numerusform>דקות</numerusform>
         </translation>
     </message>
+    <message>
+        <location line="+10"/>
+        <source>Select &quot;Torrent Done Seeding&quot; Script</source>
+        <translation type="unfinished"></translation>
+    </message>
     <message numerus="yes">
-        <location line="+23"/>
+        <location line="+19"/>
         <source> minute(s) ago</source>
         <extracomment>Spin box suffix, &quot;Download is inactive if data sharing stopped: [ 5 minutes ago ]&quot; (includes leading space after the number, if needed)</extracomment>
         <translation>
@@ -1809,27 +1813,27 @@ To add another primary URL, add it after a blank line.</source>
         </translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.ui" line="-638"/>
+        <location filename="../PrefsDialog.ui" line="-663"/>
         <source>Automatically add .torrent files &amp;from:</source>
         <translation>הוספת  &amp;קובצי ‎.torrent אוטומטית מ־:</translation>
     </message>
     <message>
-        <location line="+22"/>
+        <location line="+27"/>
         <source>Show the Torrent Options &amp;dialog</source>
         <translation>הצגת  &amp;דו־ שיח אפשרויות הטורנט</translation>
     </message>
     <message>
-        <location line="+7"/>
+        <location line="-17"/>
         <source>&amp;Start added torrents</source>
         <translation>הת&amp;חלת הטורנטים שנוספו</translation>
     </message>
     <message>
-        <location line="+7"/>
+        <location line="+24"/>
         <source>Mo&amp;ve the .torrent file to the trash</source>
         <translation>העברת קובץ ה־‎.torrent לסל ה&amp;מחזור</translation>
     </message>
     <message>
-        <location line="+57"/>
+        <location line="+62"/>
         <source>Download Queue</source>
         <translation>תור הורדה</translation>
     </message>
@@ -1849,12 +1853,12 @@ To add another primary URL, add it after a blank line.</source>
         <translation>זריעה</translation>
     </message>
     <message>
-        <location line="+548"/>
+        <location line="+622"/>
         <source>Remote</source>
         <translation>מרוחק</translation>
     </message>
     <message numerus="yes">
-        <location filename="../PrefsDialog.cc" line="+155"/>
+        <location filename="../PrefsDialog.cc" line="+168"/>
         <source>&lt;i&gt;Blocklist contains %Ln rule(s)&lt;/i&gt;</source>
         <translation>
             <numerusform>&lt;i&gt;רשימת החסימה מכילה כלל אחד&lt;/i&gt;</numerusform>
@@ -1862,17 +1866,17 @@ To add another primary URL, add it after a blank line.</source>
         </translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.ui" line="-287"/>
+        <location filename="../PrefsDialog.ui" line="-339"/>
         <source>Pick a &amp;random port every time Transmission is started</source>
         <translation>יש לבחור בפתחה &amp;אקראית עם כל הפעלה של Transmission</translation>
     </message>
     <message>
-        <location line="-252"/>
+        <location line="-274"/>
         <source>Limits</source>
         <translation>מגבלו</translation>
     </message>
     <message>
-        <location line="+299"/>
+        <location line="+321"/>
         <source>Maximum peers per &amp;torrent:</source>
         <translation>כמות העמיתים המרבית לכל &amp;טורנט:</translation>
     </message>
@@ -1882,7 +1886,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation>כמות עמיתים &amp;כוללת:</translation>
     </message>
     <message numerus="yes">
-        <location filename="../PrefsDialog.cc" line="-230"/>
+        <location filename="../PrefsDialog.cc" line="-253"/>
         <source>&lt;b&gt;Update succeeded!&lt;/b&gt;&lt;p&gt;Blocklist now has %Ln rule(s).</source>
         <translation>
             <numerusform>&lt;b&gt;העדכון צלח!&lt;/b&gt;&lt;p&gt;ברשימת החסימה יש כעת כלל אחד.</numerusform>
@@ -1890,7 +1894,7 @@ To add another primary URL, add it after a blank line.</source>
         </translation>
     </message>
     <message>
-        <location line="+7"/>
+        <location line="+9"/>
         <source>&lt;b&gt;Update Blocklist&lt;/b&gt;&lt;p&gt;Getting new blocklist...</source>
         <translation>&lt;b&gt;עדכון רשימת החסימה&lt;/b&gt;&lt;p&gt;מתקבלת רשימת חסימה חדשה…</translation>
     </message>
@@ -1905,7 +1909,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation>הפעלת עדכונים &amp;אוטומטיים</translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.cc" line="+15"/>
+        <location filename="../PrefsDialog.cc" line="+17"/>
         <source>Allow encryption</source>
         <translation>אפשור הצפנה</translation>
     </message>
@@ -1925,12 +1929,12 @@ To add another primary URL, add it after a blank line.</source>
         <translation>פרטיות</translation>
     </message>
     <message>
-        <location line="-403"/>
+        <location line="-435"/>
         <source>&amp;to</source>
         <translation>&amp;עד</translation>
     </message>
     <message>
-        <location line="+763"/>
+        <location line="+847"/>
         <location line="+9"/>
         <source>Desktop</source>
         <translation>שולחן עבודה</translation>
@@ -1941,7 +1945,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation>הצגת הסמל של Transmission באזור ההו&amp;דעות</translation>
     </message>
     <message>
-        <location line="-213"/>
+        <location line="-265"/>
         <source>Te&amp;st Port</source>
         <translation>&amp;בדיקת פתחה</translation>
     </message>
@@ -1961,7 +1965,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation>מצב ה&amp;צפנה:</translation>
     </message>
     <message>
-        <location line="+453"/>
+        <location line="+505"/>
         <source>Remote Control</source>
         <translation>שלט רחוק</translation>
     </message>
@@ -1981,7 +1985,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation>אפשור רק &amp;כתובות ה־ IP האלה:</translation>
     </message>
     <message>
-        <location line="-1128"/>
+        <location line="-1212"/>
         <source>&amp;Upload:</source>
         <translation>ה&amp;עלאה:</translation>
     </message>
@@ -1991,12 +1995,12 @@ To add another primary URL, add it after a blank line.</source>
         <translation>הו&amp;רדה:</translation>
     </message>
     <message>
-        <location line="+53"/>
+        <location line="+46"/>
         <source>Alternative Speed Limits</source>
         <translation>מגבלות מהירות חלופיות</translation>
     </message>
     <message>
-        <location line="+21"/>
+        <location line="+28"/>
         <source>U&amp;pload:</source>
         <translation>הע&amp;לאה:</translation>
     </message>
@@ -2006,7 +2010,37 @@ To add another primary URL, add it after a blank line.</source>
         <translation>הור&amp;דה:</translation>
     </message>
     <message>
-        <location line="+836"/>
+        <location line="+186"/>
+        <source>Reads user clipboard content for torrents</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+3"/>
+        <source>Detect new torrents from clipboard</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+148"/>
+        <source>Call scrip&amp;t when downloading is completed:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+105"/>
+        <source>Call scrip&amp;t when seeding is completed:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+406"/>
+        <source>Default Public Trackers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+12"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Trackers to use on all public torrents.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;To add a backup URL, add it on the next line after a primary URL.&lt;/p&gt;&lt;p&gt;To add a new primary URL, add it after a blank line.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+60"/>
         <source>Start &amp;minimized in notification area</source>
         <translation>התחלה ממו&amp;זערת של אזור הודעות</translation>
     </message>
@@ -2031,12 +2065,12 @@ To add another primary URL, add it after a blank line.</source>
         <translation>השמעת &amp;צליל בעת סיום טורנטים</translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.cc" line="-73"/>
+        <location filename="../PrefsDialog.cc" line="-78"/>
         <source>Testing TCP Port...</source>
         <translation>פתחת ה־ TCP נבדקת…</translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.ui" line="-229"/>
+        <location filename="../PrefsDialog.ui" line="-281"/>
         <source>Peer Limits</source>
         <translation>מגבלות עמיתים</translation>
     </message>
@@ -2076,12 +2110,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation>הצפנה</translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.cc" line="+142"/>
-        <source>Select &quot;Torrent Done&quot; Script</source>
-        <translation>בחירת סקריפט „טורנט הושלם”</translation>
-    </message>
-    <message>
-        <location line="-1"/>
+        <location filename="../PrefsDialog.cc" line="+153"/>
         <source>Select Incomplete Directory</source>
         <translation>בחירת מחיצה  לטורנטים חלקיים</translation>
     </message>
@@ -2096,23 +2125,23 @@ To add another primary URL, add it after a blank line.</source>
         <translation>בחירת יעד</translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.ui" line="-355"/>
+        <location filename="../PrefsDialog.ui" line="-387"/>
         <source>Adding</source>
         <translation>מתווסף</translation>
     </message>
     <message>
-        <location line="+137"/>
+        <location line="+147"/>
         <source>Download is i&amp;nactive if data sharing stopped:</source>
         <extracomment>Please keep this phrase as short as possible, it&apos;s curently the longest and influences dialog width</extracomment>
         <translation>ההורדה &amp;אינה פעילה אם שיתוף הנתונים נעצר למשך:</translation>
     </message>
     <message>
-        <location line="-146"/>
+        <location line="-156"/>
         <source>Downloading</source>
         <translation>הורדה</translation>
     </message>
     <message>
-        <location line="+205"/>
+        <location line="+215"/>
         <source>Append &quot;.&amp;part&quot; to incomplete files&apos; names</source>
         <translation>הוספת „‎.part” לשמות קבצים שטרם הושלמו</translation>
     </message>
@@ -2122,17 +2151,12 @@ To add another primary URL, add it after a blank line.</source>
         <translation>להשאיר קבצים ש&amp;לא הושלמו תחת:</translation>
     </message>
     <message>
-        <location line="-148"/>
+        <location line="-201"/>
         <source>Save to &amp;Location:</source>
         <translation>&amp;שמירה למיקום:</translation>
     </message>
     <message>
-        <location line="+170"/>
-        <source>Call scrip&amp;t when torrent is completed:</source>
-        <translation>לקרוא ל&amp;סקריפט כאשר הורדת טורנט הושלמה:</translation>
-    </message>
-    <message>
-        <location line="+59"/>
+        <location line="+282"/>
         <source>Stop seeding at &amp;ratio:</source>
         <translation>הפסקת זריעה בי&amp;חס:</translation>
     </message>
@@ -2142,7 +2166,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation>הפסקת זריעה בחוסר &amp;פעילות למשך:</translation>
     </message>
     <message>
-        <location line="-557"/>
+        <location line="-567"/>
         <source>Transmission Preferences</source>
         <translation>העדפות Transmission</translation>
     </message>
@@ -2152,12 +2176,12 @@ To add another primary URL, add it after a blank line.</source>
         <translation>מהירות</translation>
     </message>
     <message>
-        <location line="+703"/>
+        <location line="+735"/>
         <source>Network</source>
         <translation>רשת</translation>
     </message>
     <message>
-        <location filename="../PrefsDialog.cc" line="+105"/>
+        <location filename="../PrefsDialog.cc" line="+116"/>
         <source>Not supported by remote sessions</source>
         <translation>לא נתמך ממופעים המרוחקים</translation>
     </message>
@@ -2165,15 +2189,20 @@ To add another primary URL, add it after a blank line.</source>
 <context>
     <name>QObject</name>
     <message>
-        <location filename="../Application.cc" line="-255"/>
+        <location filename="../Application.cc" line="-277"/>
         <source>Invalid option</source>
         <translation>אפשרות שגויה</translation>
+    </message>
+    <message>
+        <location line="+305"/>
+        <source>Start Now</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
     <name>RelocateDialog</name>
     <message>
-        <location filename="../RelocateDialog.cc" line="+66"/>
+        <location filename="../RelocateDialog.cc" line="+63"/>
         <source>Select Location</source>
         <translation>בחירת מיקום</translation>
     </message>
@@ -2206,7 +2235,7 @@ To add another primary URL, add it after a blank line.</source>
 <context>
     <name>Session</name>
     <message>
-        <location filename="../Session.cc" line="+518"/>
+        <location filename="../Session.cc" line="+510"/>
         <source>Error Renaming Path</source>
         <translation>שגיאה בשינוי שם הנתיב</translation>
     </message>
@@ -2216,17 +2245,17 @@ To add another primary URL, add it after a blank line.</source>
         <translation>&lt;p&gt;&lt;b&gt;לא ניתן לשנות את השם „%1” לשם „%2”: %3.&lt;/b&gt;&lt;/p&gt;&lt;p&gt;נא לתקן את השגיאות ולנסות שוב.&lt;/p&gt;</translation>
     </message>
     <message>
-        <location line="+576"/>
+        <location line="+531"/>
         <source>Error Adding Torrent</source>
         <translation>שגיאה בהוספת טורנט</translation>
     </message>
     <message>
-        <location line="+55"/>
+        <location line="+57"/>
         <source>%1 (copy of %2)</source>
         <translation>%1 (עותק של %2)</translation>
     </message>
     <message numerus="yes">
-        <location line="+8"/>
+        <location line="+6"/>
         <source>Duplicate Torrent(s)</source>
         <translation>
             <numerusform>טורנט כפול</numerusform>
@@ -2332,7 +2361,7 @@ To add another primary URL, add it after a blank line.</source>
         <translation>סך הכול</translation>
     </message>
     <message numerus="yes">
-        <location filename="../StatsDialog.cc" line="+66"/>
+        <location filename="../StatsDialog.cc" line="+63"/>
         <source>Started %Ln time(s)</source>
         <translation>
             <numerusform>התחיל פעם אחת</numerusform>
@@ -2343,7 +2372,7 @@ To add another primary URL, add it after a blank line.</source>
 <context>
     <name>Torrent</name>
     <message>
-        <location filename="../Torrent.cc" line="+322"/>
+        <location filename="../Torrent.cc" line="+308"/>
         <source>Verifying local data</source>
         <translation>הנתונים המקומיים באימות</translation>
     </message>
@@ -2401,60 +2430,60 @@ To add another primary URL, add it after a blank line.</source>
 <context>
     <name>TorrentDelegate</name>
     <message>
-        <location filename="../TorrentDelegate.cc" line="+154"/>
+        <location filename="../TorrentDelegate.cc" line="+171"/>
         <source>Magnetized transfer - retrieving metadata (%1%)</source>
-        <extracomment>First part of torrent progress string; %1 is the percentage of torrent metadata downloaded</extracomment>
+        <extracomment>First part of torrent progress string, %1 is the percentage of torrent metadata downloaded</extracomment>
         <translation>העברה מגנטית - נתוני העל מתקבלים (%1%)</translation>
     </message>
     <message>
-        <location line="+10"/>
+        <location line="+9"/>
         <source>%1 of %2 (%3%)</source>
-        <extracomment>First part of torrent progress string; %1 is how much we&apos;ve got, %2 is how much we&apos;ll have when done, %3 is a percentage of the two</extracomment>
+        <extracomment>First part of torrent progress string, %1 is how much we&apos;ve got, %2 is how much we&apos;ll have when done, %3 is a percentage of the two</extracomment>
         <translation>%1 מתוך %2 (%3%)</translation>
     </message>
     <message>
-        <location line="+15"/>
+        <location line="+16"/>
         <source>%1 of %2 (%3%), uploaded %4 (Ratio: %5 Goal: %6)</source>
-        <extracomment>First part of torrent progress string; %1 is how much we&apos;ve got, %2 is the torrent&apos;s total size, %3 is a percentage of the two, %4 is how much we&apos;ve uploaded, %5 is our upload-to-download ratio, %6 is the ratio we want to reach before we stop uploading</extracomment>
+        <extracomment>First part of torrent progress string, %1 is how much we&apos;ve got, %2 is the torrent&apos;s total size, %3 is a percentage of the two, %4 is how much we&apos;ve uploaded, %5 is our upload-to-download ratio, %6 is the ratio we want to reach before we stop uploading</extracomment>
         <translation>%1 מתוך %2 (%3%), הועלו %4 (יחס: %5 יעד: %6)</translation>
     </message>
     <message>
-        <location line="+14"/>
+        <location line="+16"/>
         <source>%1 of %2 (%3%), uploaded %4 (Ratio: %5)</source>
-        <extracomment>First part of torrent progress string; %1 is how much we&apos;ve got, %2 is the torrent&apos;s total size, %3 is a percentage of the two, %4 is how much we&apos;ve uploaded, %5 is our upload-to-download ratio</extracomment>
+        <extracomment>First part of torrent progress string, %1 is how much we&apos;ve got, %2 is the torrent&apos;s total size, %3 is a percentage of the two, %4 is how much we&apos;ve uploaded, %5 is our upload-to-download ratio</extracomment>
         <translation>%1 מתוך %2 (%3%), הועלו %4 (יחס: %5)</translation>
     </message>
     <message>
-        <location line="+15"/>
+        <location line="+17"/>
         <source>%1, uploaded %2 (Ratio: %3 Goal: %4)</source>
-        <extracomment>First part of torrent progress string; %1 is the torrent&apos;s total size, %2 is how much we&apos;ve uploaded, %3 is our upload-to-download ratio, %4 is the ratio we want to reach before we stop uploading</extracomment>
+        <extracomment>First part of torrent progress string, %1 is the torrent&apos;s total size, %2 is how much we&apos;ve uploaded, %3 is our upload-to-download ratio, %4 is the ratio we want to reach before we stop uploading</extracomment>
         <translation>%1, הועלו %2 (יחס: %3 יעד: %4)</translation>
     </message>
     <message>
-        <location line="+10"/>
+        <location line="+12"/>
         <source>%1, uploaded %2 (Ratio: %3)</source>
-        <extracomment>First part of torrent progress string; %1 is the torrent&apos;s total size, %2 is how much we&apos;ve uploaded, %3 is our upload-to-download ratio</extracomment>
+        <extracomment>First part of torrent progress string, %1 is the torrent&apos;s total size, %2 is how much we&apos;ve uploaded, %3 is our upload-to-download ratio</extracomment>
         <translation>%1, הועלו %2 (יחס: %3)</translation>
     </message>
     <message>
-        <location line="+13"/>
+        <location line="+15"/>
         <source> - %1 left</source>
-        <extracomment>Second (optional) part of torrent progress string; %1 is duration; notice that leading space (before the dash) is included here</extracomment>
+        <extracomment>Second (optional) part of torrent progress string, %1 is duration, notice that leading space (before the dash) is included here</extracomment>
         <translation> - %1 נותרו</translation>
     </message>
     <message>
         <location line="+6"/>
         <source> - Remaining time unknown</source>
-        <extracomment>Second (optional) part of torrent progress string; notice that leading space (before the dash) is included here</extracomment>
+        <extracomment>Second (optional) part of torrent progress string, notice that leading space (before the dash) is included here</extracomment>
         <translation>- הזמן שנותר לא ידוע</translation>
     </message>
     <message>
-        <location line="+39"/>
+        <location line="+40"/>
         <source>Ratio: %1</source>
         <translation>יחס: %1</translation>
     </message>
     <message numerus="yes">
-        <location line="+45"/>
+        <location line="+44"/>
         <source>Downloading from %Ln peer(s)</source>
         <extracomment>First part of phrase &quot;Downloading from ... peer(s) and ... web seed(s)&quot;</extracomment>
         <translation>
@@ -2495,7 +2524,7 @@ To add another primary URL, add it after a blank line.</source>
     <message numerus="yes">
         <location line="+8"/>
         <source> and %Ln web seed(s)</source>
-        <extracomment>Second (optional) part of phrase &quot;Downloading from ... of ... connected peer(s) and ... web seed(s)&quot;; notice that leading space (before &quot;and&quot;) is included here</extracomment>
+        <extracomment>Second (optional) part of phrase &quot;Downloading from ... of ... connected peer(s) and ... web seed(s)&quot;, notice that leading space (before &quot;and&quot;) is included here</extracomment>
         <translation>
             <numerusform>ועוד זורע רשת</numerusform>
             <numerusform>ו־%Ln זורעי רשת</numerusform>
@@ -2518,7 +2547,7 @@ To add another primary URL, add it after a blank line.</source>
 <context>
     <name>TrackerDelegate</name>
     <message numerus="yes">
-        <location filename="../TrackerDelegate.cc" line="+211"/>
+        <location filename="../TrackerDelegate.cc" line="+219"/>
         <source>Got a list of%1 %Ln peer(s)%2 %3 ago</source>
         <extracomment>%1 and %2 are replaced with HTML markup, %3 is duration</extracomment>
         <translation>
@@ -2527,19 +2556,19 @@ To add another primary URL, add it after a blank line.</source>
         </translation>
     </message>
     <message>
-        <location line="+6"/>
+        <location line="+8"/>
         <source>Peer list request %1timed out%2 %3 ago; will retry</source>
         <extracomment>%1 and %2 are replaced with HTML markup, %3 is duration</extracomment>
         <translation>זמן ההמתנה לרשימת העמיתים %פג%2 לפני %3, יתבצע ניסיון חוזר</translation>
     </message>
     <message>
-        <location line="+6"/>
+        <location line="+8"/>
         <source>Got an error %1&quot;%2&quot;%3 %4 ago</source>
         <extracomment>%1 and %3 are replaced with HTML markup, %2 is error message, %4 is duration</extracomment>
         <translation>התקבלה השגיאה  %1„%2”%3 לפני %4</translation>
     </message>
     <message>
-        <location line="+9"/>
+        <location line="+12"/>
         <source>No updates scheduled</source>
         <translation>אין עדכונים מתוזמנים</translation>
     </message>
@@ -2561,37 +2590,37 @@ To add another primary URL, add it after a blank line.</source>
         <translation>בקשה לעמיתים נוספים כעת… &lt;small&gt;%1&lt;/small&gt;</translation>
     </message>
     <message numerus="yes">
-        <location line="+24"/>
+        <location line="+27"/>
         <source>Tracker had%1 %Ln seeder(s)%2</source>
-        <extracomment>First part of phrase &quot;Tracker had ... seeder(s) and ... leecher(s) ... ago&quot;; %1 and %2 are replaced with HTML markup</extracomment>
+        <extracomment>First part of phrase &quot;Tracker had ... seeder(s) and ... leecher(s) ... ago&quot;, %1 and %2 are replaced with HTML markup</extracomment>
         <translation>
             <numerusform>לגשש היה%1 זורע אחד%2</numerusform>
             <numerusform>לגשש היו%1 %Ln זורעים%2</numerusform>
         </translation>
     </message>
     <message numerus="yes">
-        <location line="+5"/>
+        <location line="+6"/>
         <source> and%1 %Ln leecher(s)%2 %3 ago</source>
-        <extracomment>Second part of phrase &quot;Tracker had ... seeder(s) and ... leecher(s) ... ago&quot;; %1 and %2 are replaced with HTML markup, %3 is duration; notice that leading space (before &quot;and&quot;) is included here</extracomment>
+        <extracomment>Second part of phrase &quot;Tracker had ... seeder(s) and ... leecher(s) ... ago&quot;, %1 and %2 are replaced with HTML markup, %3 is duration; notice that leading space (before &quot;and&quot;) is included here</extracomment>
         <translation>
             <numerusform>ו%1יונק אחד%2 לפני %3</numerusform>
             <numerusform>ו־%1%Ln יונקים%2 לפני %3</numerusform>
         </translation>
     </message>
     <message>
-        <location line="+6"/>
+        <location line="+8"/>
         <source>Tracker had %1no information%2 on peer counts %3 ago</source>
         <extracomment>%1 and %2 are replaced with HTML markup, %3 is duration</extracomment>
         <translation>לגשש %1לא היה מידע%2 על ספירת עמיתים לפני %3</translation>
     </message>
     <message>
-        <location line="-18"/>
+        <location line="-24"/>
         <source>Got a scrape error %1&quot;%2&quot;%3 %4 ago</source>
         <extracomment>%1 and %3 are replaced with HTML markup, %2 is error message, %4 is duration</extracomment>
         <translation>התקבלה שגיאת scrape (בידוק) %1„%2”%3 לפני %4</translation>
     </message>
     <message>
-        <location line="+31"/>
+        <location line="+39"/>
         <source>Asking for peer counts in %1</source>
         <extracomment>%1 is duration</extracomment>
         <translation> בקשה לספירת עמיתים בעוד %1</translation>
@@ -2606,6 +2635,34 @@ To add another primary URL, add it after a blank line.</source>
         <source>Asking for peer counts now... &lt;small&gt;%1&lt;/small&gt;</source>
         <extracomment>%1 is duration</extracomment>
         <translation> בקשה לספירת עמיתים כעת… &lt;small&gt;%1&lt;/small&gt;</translation>
+    </message>
+</context>
+<context>
+    <name>TrackersDialog</name>
+    <message>
+        <location filename="../TrackersDialog.ui" line="+17"/>
+        <source>Edit Trackers</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+9"/>
+        <source>Tracker Announce URLs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+12"/>
+        <source>To add a new primary URL, add it after a blank line.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+14"/>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;To add a backup URL, add it on the next line after a primary URL.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+7"/>
+        <source>Also see Default Public Trackers in Edit &gt; Preferences &gt; Network</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 </TS>

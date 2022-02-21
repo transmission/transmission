@@ -18,9 +18,6 @@
 /* Torrent -> progress string */
 "%@ of torrent metadata retrieved" = "%@ torrent üstverisi alındı";
 
-/* time remaining string */
-"%@ remaining" = "%@ kaldı";
-
 /* Add torrent -> info
    Inspector -> Activity tab -> progress
    Torrent -> progress string */
@@ -90,24 +87,6 @@
 /* Torrent -> status string */
 "%d web seeds" = "%d web beslemeleri";
 
-/* time string */
-"%u days" = "%u gün";
-
-/* time string */
-"%u hr" = "%u sa";
-
-/* time string */
-"%u min" = "%u dk";
-
-/* time string */
-"%u sec" = "%u san";
-
-/* time string */
-"%u years" = "%u yıl";
-
-/* time string */
-"1 day" = "1 gün";
-
 /* Add torrent -> info
    Create torrent -> info
    Drag overlay -> torrents
@@ -130,9 +109,6 @@
    Status bar transfer count
    Torrent table -> group row -> tooltip */
 "1 transfer" = "1 aktarım";
-
-/* time string */
-"1 year" = "1 yıl";
 
 /* Open invalid alert -> title */
 "\"%@\" is not a valid torrent file." = "\"%@\" geçerli bir torrent dosyası değil.";
@@ -762,9 +738,6 @@
 /* Confirm Quit panel -> button
    Legal alert -> button */
 "Quit" = "Çık";
-
-/* Dock Badger -> quit */
-"Quitting" = "Kapanıyor";
 
 /* Stats window -> label
    status bar -> status label

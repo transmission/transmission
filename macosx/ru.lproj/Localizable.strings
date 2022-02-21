@@ -18,9 +18,6 @@
 /* Torrent -> progress string */
 "%@ of torrent metadata retrieved" = "%@ метаданных торрента получено";
 
-/* time remaining string */
-"%@ remaining" = "осталось %@";
-
 /* Add torrent -> info
    Inspector -> Activity tab -> progress
    Torrent -> progress string */
@@ -90,24 +87,6 @@
 /* Torrent -> status string */
 "%d web seeds" = "%d сайтов раздачи";
 
-/* time string */
-"%u days" = "%u дн";
-
-/* time string */
-"%u hr" = "%u ч";
-
-/* time string */
-"%u min" = "%u мин";
-
-/* time string */
-"%u sec" = "%u с";
-
-/* time string */
-"%u years" = "%u года";
-
-/* time string */
-"1 day" = "1 день";
-
 /* Add torrent -> info
    Create torrent -> info
    Drag overlay -> torrents
@@ -130,9 +109,6 @@
    Status bar transfer count
    Torrent table -> group row -> tooltip */
 "1 transfer" = "1 раздача";
-
-/* time string */
-"1 year" = "1 год";
 
 /* Open invalid alert -> title */
 "\"%@\" is not a valid torrent file." = "«%@» не является торрент-файлом.";
@@ -762,9 +738,6 @@
 /* Confirm Quit panel -> button
    Legal alert -> button */
 "Quit" = "Завершить";
-
-/* Dock Badger -> quit */
-"Quitting" = "Заверш.";
 
 /* Stats window -> label
    status bar -> status label
