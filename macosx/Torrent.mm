@@ -8,7 +8,7 @@
 
 #include <libtransmission/error.h>
 #include <libtransmission/log.h>
-#include <libtransmission/utils.h> // tr_new()
+#include <libtransmission/utils.h> // tr_free(), tr_strvJoin()
 
 #import "Torrent.h"
 #import "GroupsController.h"
@@ -745,28 +745,18 @@ bool trashDataFile(char const* filename, tr_error** error)
         new_tracker = [@"http://" stringByAppendingString:new_tracker];
     }
 
-    auto urls = std::vector<char const*>{};
-    auto tiers = std::vector<tr_tracker_tier_t>{};
-
-    for (size_t i = 0, n = tr_torrentTrackerCount(self.fHandle); i < n; ++i)
-    {
-        auto const tracker = tr_torrentTracker(self.fHandle, i);
-        urls.push_back(tracker.announce);
-        tiers.push_back(tracker.tier);
-    }
-
-    urls.push_back(new_tracker.UTF8String);
-    tiers.push_back(std::empty(tiers) ? 0 : tiers.back() + 1);
-
-    BOOL const success = tr_torrentSetAnnounceList(self.fHandle, std::data(urls), std::data(tiers), std::size(urls));
+    char* old_list = tr_torrentGetTrackerList(self.fHandle);
+    auto new_list = tr_strvJoin(old_list, "\n\n", new_tracker.UTF8String);
+    BOOL const success = tr_torrentSetTrackerList(self.fHandle, new_list.c_str());
+    tr_free(old_list);
 
     return success;
 }
 
 - (void)removeTrackers:(NSSet*)trackers
 {
-    auto urls = std::vector<char const*>{};
-    auto tiers = std::vector<tr_tracker_tier_t>{};
+    auto new_list = std::string{};
+    auto current_tier = std::optional<tr_tracker_tier_t>{};
 
     for (size_t i = 0, n = tr_torrentTrackerCount(self.fHandle); i < n; ++i)
     {
@@ -777,11 +767,18 @@ bool trashDataFile(char const* filename, tr_error** error)
             continue;
         }
 
-        urls.push_back(tracker.announce);
-        tiers.push_back(tracker.tier);
+        if (current_tier && *current_tier != tracker.tier)
+        {
+            new_list += '\n';
+        }
+
+        new_list += tracker.announce;
+        new_list += '\n';
+
+        current_tier = tracker.tier;
     }
 
-    BOOL const success = tr_torrentSetAnnounceList(self.fHandle, std::data(urls), std::data(tiers), std::size(urls));
+    BOOL const success = tr_torrentSetTrackerList(self.fHandle, new_list.c_str());
     NSAssert(success, @"Removing tracker addresses failed");
 }
 

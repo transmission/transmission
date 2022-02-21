@@ -41,10 +41,9 @@ public:
     tr_webseed_task(tr_torrent* tor, tr_webseed* webseed_in, tr_block_span_t span)
         : webseed{ webseed_in }
         , session{ tor->session }
-        , block{ span.begin }
-        , piece_index{ tor->pieceForBlock(this->block) }
-        , piece_offset{ static_cast<uint32_t>(
-              int64_t{ tor->blockSize() } * this->block - tor->pieceSize() * this->piece_index) }
+        , block{ span.begin } // TODO(ckerr): just own the loc
+        , piece_index{ tor->blockLoc(this->block).piece }
+        , piece_offset{ tor->blockLoc(this->block).piece_offset }
         , block_size{ tor->blockSize() }
         , length{ (span.end - 1 - span.begin) * tor->blockSize() + tor->blockSize(span.end - 1) }
     {
@@ -66,8 +65,6 @@ public:
 
     bool dead = false;
     tr_block_index_t blocks_done = 0;
-    tr_web_task* web_task = nullptr;
-    long response_code = 0;
 };
 
 /**
@@ -330,7 +327,7 @@ void write_block_func(void* vdata)
             while (len > 0)
             {
                 uint32_t const bytes_this_pass = std::min(len, block_size);
-                tr_cacheWriteBlock(cache, tor, piece, offset_end - len, bytes_this_pass, buf);
+                tr_cacheWriteBlock(cache, tor, tor->pieceLoc(piece, offset_end - len), bytes_this_pass, buf);
                 len -= bytes_this_pass;
             }
 
@@ -360,14 +357,9 @@ void on_content_changed(evbuffer* buf, evbuffer_cb_info const* info, void* vtask
         fire_client_got_piece_data(w, n_added);
         uint32_t const len = evbuffer_get_length(buf);
 
-        if (task->response_code == 0)
-        {
-            task->response_code = tr_webGetTaskResponseCode(task->web_task);
+        task->webseed->connection_limiter.gotData();
 
-            task->webseed->connection_limiter.gotData();
-        }
-
-        if (task->response_code == 206 && len >= task->block_size)
+        if (len >= task->block_size)
         {
             /* once we've got at least one full block, save it */
 
@@ -412,17 +404,14 @@ void on_idle(tr_webseed* w)
     }
 }
 
-void web_response_func(
-    tr_session* session,
-    bool /*did_connect*/,
-    bool /*did_timeout*/,
-    long response_code,
-    std::string_view /*response*/,
-    void* vtask)
+void onPartialDataFetched(tr_web::FetchResponse const& web_response)
 {
+    auto const& [status, body, did_connect, did_timeout, vtask] = web_response;
+    bool const success = status == 206;
+
     auto* const t = static_cast<tr_webseed_task*>(vtask);
-    bool const success = response_code == 206;
-    tr_webseed* w = t->webseed;
+    auto* const session = t->session;
+    auto* const w = t->webseed;
 
     w->connection_limiter.taskFinished(success);
 
@@ -457,7 +446,6 @@ void web_response_func(
             {
                 /* request finished successfully but there's still data missing. that
                    means we've reached the end of a file and need to request the next one */
-                t->response_code = 0;
                 task_request_next_chunk(t);
             }
             else
@@ -469,8 +457,7 @@ void web_response_func(
                     tr_cacheWriteBlock(
                         session->cache,
                         tor,
-                        t->piece_index,
-                        t->piece_offset + bytes_done,
+                        tor->pieceLoc(t->piece_index, t->piece_offset + bytes_done),
                         buf_len,
                         t->content());
 
@@ -511,19 +498,19 @@ void task_request_next_chunk(tr_webseed_task* t)
     auto const piece_size = tor->pieceSize();
     uint64_t const remain = t->length - t->blocks_done * tor->blockSize() - evbuffer_get_length(t->content());
 
-    auto const total_offset = tor->offset(t->piece_index, t->piece_offset, t->length - remain);
+    auto const total_offset = tor->pieceLoc(t->piece_index, t->piece_offset, t->length - remain).byte;
     tr_piece_index_t const step_piece = total_offset / piece_size;
     uint64_t const step_piece_offset = total_offset - uint64_t(piece_size) * step_piece;
 
-    auto const [file_index, file_offset] = tor->fileOffset(step_piece, step_piece_offset);
+    auto const [file_index, file_offset] = tor->fileOffset(tor->pieceLoc(step_piece, step_piece_offset));
     uint64_t this_pass = std::min(remain, tor->fileSize(file_index) - file_offset);
 
     auto const url = make_url(t->webseed, tor->fileSubpath(file_index));
-    auto options = tr_web_options{ url, web_response_func, t };
+    auto options = tr_web::FetchOptions{ url, onPartialDataFetched, t };
     options.range = tr_strvJoin(std::to_string(file_offset), "-"sv, std::to_string(file_offset + this_pass - 1));
-    options.torrent_id = tor->uniqueId;
+    options.speed_limit_tag = tor->uniqueId;
     options.buffer = t->content();
-    t->web_task = tr_webRun(tor->session, std::move(options));
+    tor->session->web->fetch(std::move(options));
 }
 
 } // namespace

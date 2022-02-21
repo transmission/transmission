@@ -8,6 +8,7 @@
 #include <cstddef>
 #include <optional>
 #include <set>
+#include <string>
 #include <string_view>
 #include <vector>
 
@@ -32,7 +33,7 @@ public:
         tr_tracker_tier_t tier = 0;
         tr_tracker_id_t id = 0;
 
-        int compare(tracker_info const& that) const // <=>
+        [[nodiscard]] int compare(tracker_info const& that) const // <=>
         {
             if (this->tier != that.tier)
             {
@@ -47,12 +48,12 @@ public:
             return 0;
         }
 
-        bool operator<(tracker_info const& that) const
+        [[nodiscard]] bool operator<(tracker_info const& that) const
         {
             return compare(that) < 0;
         }
 
-        bool operator==(tracker_info const& that) const
+        [[nodiscard]] bool operator==(tracker_info const& that) const
         {
             return compare(that) == 0;
         }
@@ -62,29 +63,44 @@ private:
     using trackers_t = std::vector<tracker_info>;
 
 public:
-    auto begin() const
+    [[nodiscard]] auto begin() const
     {
         return std::begin(trackers_);
     }
-    auto end() const
+
+    [[nodiscard]] auto end() const
     {
         return std::end(trackers_);
     }
-    bool empty() const
+
+    [[nodiscard]] bool empty() const
     {
         return std::empty(trackers_);
     }
-    size_t size() const
+
+    [[nodiscard]] size_t size() const
     {
         return std::size(trackers_);
     }
-    tracker_info const& at(size_t i) const
+
+    [[nodiscard]] tracker_info const& at(size_t i) const
     {
         return trackers_.at(i);
     }
 
-    std::set<tr_tracker_tier_t> tiers() const;
-    tr_tracker_tier_t nextTier() const;
+    [[nodiscard]] std::set<tr_tracker_tier_t> tiers() const;
+
+    [[nodiscard]] tr_tracker_tier_t nextTier() const;
+
+    [[nodiscard]] bool operator==(tr_announce_list const& that) const
+    {
+        return trackers_ == that.trackers_;
+    }
+
+    [[nodiscard]] bool operator!=(tr_announce_list const& that) const
+    {
+        return trackers_ != that.trackers_;
+    }
 
     bool add(std::string_view announce_url_sv)
     {
@@ -92,6 +108,7 @@ public:
     }
 
     bool add(std::string_view announce_url_sv, tr_tracker_tier_t tier);
+    void add(tr_announce_list const& that);
     bool remove(std::string_view announce_url);
     bool remove(tr_tracker_id_t id);
     bool replace(tr_tracker_id_t id, std::string_view announce_url_sv);
@@ -101,13 +118,21 @@ public:
         return trackers_.clear();
     }
 
+    /**
+     * Populate the announce list from a text string.
+     * - One announce URL per line
+     * - Blank line denotes a new tier
+     */
+    bool parse(std::string_view text);
+    [[nodiscard]] std::string toString() const;
+
     bool save(std::string const& torrent_file, tr_error** error = nullptr) const;
 
     static std::optional<std::string> announceToScrape(std::string_view announce);
     static tr_quark announceToScrape(tr_quark announce);
 
 private:
-    tr_tracker_tier_t getTier(tr_tracker_tier_t tier, tr_url_parsed_t const& announce) const;
+    [[nodiscard]] tr_tracker_tier_t getTier(tr_tracker_tier_t tier, tr_url_parsed_t const& announce) const;
 
     bool canAdd(tr_url_parsed_t const& announce);
     static tr_tracker_id_t nextUniqueId();

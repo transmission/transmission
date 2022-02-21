@@ -7,6 +7,7 @@
 #include <cerrno> /* error codes ERANGE, ... */
 #include <climits> /* INT_MAX */
 #include <cmath>
+#include <cstdint>
 #include <cstdlib> /* qsort */
 #include <ctime> // time_t
 #include <iterator> // std::back_inserter
@@ -14,11 +15,7 @@
 
 #include <event2/event.h>
 
-#include <cstdint>
-#include <libutp/utp.h>
-
 #define LIBTRANSMISSION_PEER_MODULE
-
 #include "transmission.h"
 
 #include "announcer.h"
@@ -816,7 +813,7 @@ static void peerCallbackFunc(tr_peer* peer, tr_peer_event const* e, void* vs)
         break;
 
     case TR_PEER_CLIENT_GOT_REJ:
-        s->active_requests.remove(s->tor->blockOf(e->pieceIndex, e->offset), peer);
+        s->active_requests.remove(s->tor->pieceLoc(e->pieceIndex, e->offset).block, peer);
         break;
 
     case TR_PEER_CLIENT_GOT_CHOKE:
@@ -841,12 +838,11 @@ static void peerCallbackFunc(tr_peer* peer, tr_peer_event const* e, void* vs)
 
     case TR_PEER_CLIENT_GOT_BLOCK:
         {
-            tr_torrent* tor = s->tor;
-            tr_piece_index_t const p = e->pieceIndex;
-            tr_block_index_t const block = tor->blockOf(p, e->offset);
-            cancelAllRequestsForBlock(s, block, peer);
+            auto* const tor = s->tor;
+            auto const loc = tor->pieceLoc(e->pieceIndex, e->offset);
+            cancelAllRequestsForBlock(s, loc.block, peer);
             peer->blocksSentToClient.add(tr_time(), 1);
-            tr_torrentGotBlock(tor, block);
+            tr_torrentGotBlock(tor, loc.block);
             break;
         }
 
@@ -1085,30 +1081,6 @@ static bool on_handshake_done(tr_handshake_result const& result)
     return success;
 }
 
-static void close_peer_socket(struct tr_peer_socket const socket, tr_session* session)
-{
-    switch (socket.type)
-    {
-    case TR_PEER_SOCKET_TYPE_NONE:
-        break;
-
-    case TR_PEER_SOCKET_TYPE_TCP:
-        tr_netClose(session, socket.handle.tcp);
-        break;
-
-#ifdef WITH_UTP
-
-    case TR_PEER_SOCKET_TYPE_UTP:
-        UTP_Close(socket.handle.utp);
-        break;
-
-#endif
-
-    default:
-        TR_ASSERT_MSG(false, "unsupported peer socket type %d", socket.type);
-    }
-}
-
 void tr_peerMgrAddIncoming(tr_peerMgr* manager, tr_address const* addr, tr_port port, struct tr_peer_socket const socket)
 {
     TR_ASSERT(tr_isSession(manager->session));
@@ -1119,11 +1091,11 @@ void tr_peerMgrAddIncoming(tr_peerMgr* manager, tr_address const* addr, tr_port 
     if (tr_sessionIsAddressBlocked(session, addr))
     {
         tr_logAddDebug("Banned IP address \"%s\" tried to connect to us", tr_address_to_string(addr));
-        close_peer_socket(socket, session);
+        tr_netClosePeerSocket(session, socket);
     }
     else if (getExistingHandshake(&manager->incomingHandshakes, addr) != nullptr)
     {
-        close_peer_socket(socket, session);
+        tr_netClosePeerSocket(session, socket);
     }
     else /* we don't have a connection to them yet... */
     {

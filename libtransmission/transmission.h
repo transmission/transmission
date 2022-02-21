@@ -314,7 +314,7 @@ bool tr_sessionIsIncompleteFileNamingEnabled(tr_session const* session);
  * @brief Set whether or not RPC calls are allowed in this session.
  *
  * @details If true, libtransmission will open a server socket to listen
- * for incoming http RPC requests as described in extras/rpc-spec.md.
+ * for incoming http RPC requests as described in docs/rpc-spec.md.
  *
  * This is intially set by tr_sessionInit() and can be
  * queried by tr_sessionIsRPCEnabled().
@@ -391,6 +391,8 @@ void tr_sessionSetRPCPasswordEnabled(tr_session* session, bool isEnabled);
 bool tr_sessionIsRPCPasswordEnabled(tr_session const* session);
 
 char const* tr_sessionGetRPCBindAddress(tr_session const* session);
+
+void tr_sessionSetDefaultTrackers(tr_session* session, char const* trackers);
 
 enum tr_rpc_callback_type
 {
@@ -1186,17 +1188,25 @@ char* tr_torrentGetMagnetLink(tr_torrent const* tor);
 **/
 
 /**
- * @brief Modify a torrent's tracker list.
+ * Returns a newly-allocated string listing its tracker's announce URLs.
+ * One URL per line, with a blank line between tiers.
+ *
+ * NOTE: this only includes the trackers included in the torrent and,
+ * along with tr_torrentSetTrackerList(), is intended for import/export
+ * and user editing. It does *not* include the "default trackers" that
+ * are applied to all public torrents. If you want a full display of all
+ * trackers, use tr_torrentTracker() and tr_torrentTrackerCount()
+ */
+char* tr_torrentGetTrackerList(tr_torrent const* tor);
+
+/**
+ * Sets a torrent's tracker list from a list of announce URLs with one
+ * URL per line and a blank line between tiers.
  *
  * This updates both the `torrent' object's tracker list
  * and the metainfo file in tr_sessionGetConfigDir()'s torrent subdirectory.
- *
- * @param torrent The torrent whose tracker list is to be modified
- * @param urls Array of n announce url strings
- * @param tiers Array of n tier numbers for grouping 'urls' into tiers
- * @param n the number of urls/tiers
  */
-bool tr_torrentSetAnnounceList(tr_torrent* torrent, char const* const* announce_urls, tr_tracker_tier_t const* tiers, size_t n);
+bool tr_torrentSetTrackerList(tr_torrent* tor, char const* text);
 
 /**
 ***
@@ -1411,6 +1421,13 @@ struct tr_tracker_view
 
 struct tr_tracker_view tr_torrentTracker(tr_torrent const* torrent, size_t i);
 
+/**
+ * Count all the trackers (both active and backup) this torrent is using.
+ *
+ * NOTE: this is for a status display only and may include trackers from
+ * the default tracker list if this is a public torrent. If you want a
+ * list of trackers the  user can edit, see tr_torrentGetTrackerList().
+ */
 size_t tr_torrentTrackerCount(tr_torrent const* torrent);
 
 /*
@@ -1599,8 +1616,8 @@ struct tr_stat
         This ONLY counts piece data. */
     float pieceDownloadSpeed_KBps;
 
-#define TR_ETA_NOT_AVAIL -1
-#define TR_ETA_UNKNOWN -2
+#define TR_ETA_NOT_AVAIL (-1)
+#define TR_ETA_UNKNOWN (-2)
     /** If downloading, estimated number of seconds left until the torrent is done.
         If seeding, estimated number of seconds left until seed ratio is reached. */
     int eta;

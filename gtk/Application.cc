@@ -1022,6 +1022,10 @@ void Application::Impl::on_prefs_changed(tr_quark const key)
         tr_sessionSetEncryption(tr, static_cast<tr_encryption_mode>(gtr_pref_int_get(key)));
         break;
 
+    case TR_KEY_default_trackers:
+        tr_sessionSetDefaultTrackers(tr, gtr_pref_string_get(key).c_str());
+        break;
+
     case TR_KEY_download_dir:
         tr_sessionSetDownloadDir(tr, gtr_pref_string_get(key).c_str());
         break;

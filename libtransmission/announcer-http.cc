@@ -121,26 +121,6 @@ static std::string announce_url_new(tr_session const* session, tr_announce_reque
     return evbuffer_free_to_str(buf);
 }
 
-struct announce_data
-{
-    tr_announce_response response;
-    tr_announce_response_func response_func;
-    void* response_func_user_data;
-    char log_name[128];
-};
-
-static void on_announce_done_eventthread(void* vdata)
-{
-    auto* data = static_cast<struct announce_data*>(vdata);
-
-    if (data->response_func != nullptr)
-    {
-        data->response_func(&data->response, data->response_func_user_data);
-    }
-
-    delete data;
-}
-
 static void verboseLog(std::string_view description, tr_direction direction, std::string_view message)
 {
     auto& out = std::cerr;
@@ -293,14 +273,17 @@ void tr_announcerParseHttpAnnounceResponse(tr_announce_response& response, std::
     }
 }
 
-static void on_announce_done(
-    tr_session* session,
-    bool did_connect,
-    bool did_timeout,
-    long response_code,
-    std::string_view msg,
-    void* vdata)
+struct announce_data
 {
+    tr_announce_response response;
+    tr_announce_response_func response_func;
+    void* response_func_user_data;
+    char log_name[128];
+};
+
+static void onAnnounceDone(tr_web::FetchResponse const& web_response)
+{
+    auto const& [status, body, did_connect, did_timeout, vdata] = web_response;
     auto* data = static_cast<struct announce_data*>(vdata);
 
     tr_announce_response* const response = &data->response;
@@ -308,14 +291,14 @@ static void on_announce_done(
     response->did_timeout = did_timeout;
     dbgmsg(data->log_name, "Got announce response");
 
-    if (response_code != HTTP_OK)
+    if (status != HTTP_OK)
     {
-        auto const* const response_str = tr_webGetResponseStr(response_code);
-        response->errmsg = tr_strvJoin("Tracker HTTP response "sv, std::to_string(response_code), " ("sv, response_str, ")"sv);
+        auto const* const response_str = tr_webGetResponseStr(status);
+        response->errmsg = tr_strvJoin("Tracker HTTP response "sv, std::to_string(status), " ("sv, response_str, ")"sv);
     }
     else
     {
-        tr_announcerParseHttpAnnounceResponse(*response, msg);
+        tr_announcerParseHttpAnnounceResponse(*response, body);
     }
 
     if (!std::empty(response->pex6))
@@ -328,7 +311,12 @@ static void on_announce_done(
         dbgmsg(data->log_name, "got a peers length of %zu", std::size(response->pex));
     }
 
-    tr_runInEventThread(session, on_announce_done_eventthread, data);
+    if (data->response_func != nullptr)
+    {
+        data->response_func(&data->response, data->response_func_user_data);
+    }
+
+    delete data;
 }
 
 void tr_tracker_http_announce(
@@ -345,7 +333,12 @@ void tr_tracker_http_announce(
 
     auto const url = announce_url_new(session, request);
     dbgmsg(request->log_name, "Sending announce to libcurl: \"%" TR_PRIsv "\"", TR_PRIsv_ARG(url));
-    tr_webRun(session, { url, on_announce_done, d });
+
+    auto options = tr_web::FetchOptions{ url, onAnnounceDone, d };
+    options.timeout_secs = 90L;
+    options.sndbuf = 1024;
+    options.rcvbuf = 3072;
+    session->web->fetch(std::move(options));
 }
 
 /****
@@ -353,26 +346,6 @@ void tr_tracker_http_announce(
 *****  SCRAPE
 *****
 ****/
-
-struct scrape_data
-{
-    tr_scrape_response response;
-    tr_scrape_response_func response_func;
-    void* response_func_user_data;
-    char log_name[128];
-};
-
-static void on_scrape_done_eventthread(void* vdata)
-{
-    auto* data = static_cast<struct scrape_data*>(vdata);
-
-    if (data->response_func != nullptr)
-    {
-        data->response_func(&data->response, data->response_func_user_data);
-    }
-
-    delete data;
-}
 
 void tr_announcerParseHttpScrapeResponse(tr_scrape_response& response, std::string_view benc)
 {
@@ -464,15 +437,18 @@ void tr_announcerParseHttpScrapeResponse(tr_scrape_response& response, std::stri
     }
 }
 
-static void on_scrape_done(
-    tr_session* session,
-    bool did_connect,
-    bool did_timeout,
-    long response_code,
-    std::string_view msg,
-    void* vdata)
+struct scrape_data
 {
-    auto* data = static_cast<struct scrape_data*>(vdata);
+    tr_scrape_response response;
+    tr_scrape_response_func response_func;
+    void* response_func_user_data;
+    char log_name[128];
+};
+
+static void onScrapeDone(tr_web::FetchResponse const& web_response)
+{
+    auto const& [status, body, did_connect, did_timeout, vdata] = web_response;
+    auto* const data = static_cast<struct scrape_data*>(vdata);
 
     tr_scrape_response& response = data->response;
     response.did_connect = did_connect;
@@ -481,20 +457,22 @@ static void on_scrape_done(
     auto const scrape_url_sv = response.scrape_url.sv();
     dbgmsg(data->log_name, "Got scrape response for \"%" TR_PRIsv "\"", TR_PRIsv_ARG(scrape_url_sv));
 
-    if (response_code != HTTP_OK)
+    if (status != HTTP_OK)
     {
-        char const* fmt = _("Tracker gave HTTP response code %1$ld (%2$s)");
-        char const* response_str = tr_webGetResponseStr(response_code);
-        char buf[512];
-        tr_snprintf(buf, sizeof(buf), fmt, response_code, response_str);
-        response.errmsg = buf;
+        auto const* const response_str = tr_webGetResponseStr(status);
+        response.errmsg = tr_strvJoin("Tracker HTTP response "sv, std::to_string(status), " ("sv, response_str, ")"sv);
     }
     else
     {
-        tr_announcerParseHttpScrapeResponse(response, msg);
+        tr_announcerParseHttpScrapeResponse(response, body);
     }
 
-    tr_runInEventThread(session, on_scrape_done_eventthread, data);
+    if (data->response_func != nullptr)
+    {
+        data->response_func(&data->response, data->response_func_user_data);
+    }
+
+    delete data;
 }
 
 static std::string scrape_url_new(tr_scrape_request const* req)
@@ -540,5 +518,10 @@ void tr_tracker_http_scrape(
 
     auto const url = scrape_url_new(request);
     dbgmsg(request->log_name, "Sending scrape to libcurl: \"%" TR_PRIsv "\"", TR_PRIsv_ARG(url));
-    tr_webRun(session, { url, on_scrape_done, d });
+
+    auto options = tr_web::FetchOptions{ url, onScrapeDone, d };
+    options.timeout_secs = 30L;
+    options.sndbuf = 4096;
+    options.rcvbuf = 4096;
+    session->web->fetch(std::move(options));
 }

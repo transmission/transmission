@@ -2211,39 +2211,10 @@ void DetailsDialog::Impl::on_edit_trackers_response(int response, std::shared_pt
     {
         auto const torrent_id = GPOINTER_TO_INT(dialog->get_data(TORRENT_ID_KEY));
         auto* const text_buffer = static_cast<Gtk::TextBuffer*>(dialog->get_data(TEXT_BUFFER_KEY));
-        tr_torrent* const tor = core_->find_torrent(torrent_id);
 
-        if (tor != nullptr)
+        if (auto* const tor = core_->find_torrent(torrent_id); tor != nullptr)
         {
-            /* build the array of trackers */
-            auto const tracker_text = text_buffer->get_text(false);
-            std::istringstream tracker_strings(tracker_text);
-
-            auto announce_url_strings = std::vector<std::string>{};
-            auto announce_urls = std::vector<char const*>{};
-            auto tiers = std::vector<tr_tracker_tier_t>{};
-            auto tier = tr_tracker_tier_t{ 0 };
-
-            std::string str;
-            while (std::getline(tracker_strings, str))
-            {
-                if (str.empty())
-                {
-                    ++tier;
-                }
-                else
-                {
-                    announce_url_strings.push_back(str);
-                    tiers.push_back(tier);
-                }
-            }
-
-            std::transform(
-                std::begin(announce_url_strings),
-                std::end(announce_url_strings),
-                std::back_inserter(announce_urls),
-                [](auto const& url) { return url.c_str(); });
-            if (tr_torrentSetAnnounceList(tor, std::data(announce_urls), std::data(tiers), std::size(announce_urls)))
+            if (tr_torrentSetTrackerList(tor, text_buffer->get_text(false).c_str()))
             {
                 refresh();
             }
@@ -2270,28 +2241,9 @@ namespace
 
 std::string get_editable_tracker_list(tr_torrent const* tor)
 {
-    std::ostringstream gstr;
-    int tier = 0;
-
-    for (size_t i = 0, n = tr_torrentTrackerCount(tor); i < n; ++i)
-    {
-        auto const tracker = tr_torrentTracker(tor, i);
-
-        if (tier != tracker.tier)
-        {
-            tier = tracker.tier;
-            gstr << '\n';
-        }
-
-        gstr << tracker.announce << '\n';
-    }
-
-    auto str = gstr.str();
-    if (!str.empty())
-    {
-        str.resize(str.size() - 1);
-    }
-
+    char* cstr = tr_torrentGetTrackerList(tor);
+    auto str = std::string{ cstr != nullptr ? cstr : "" };
+    tr_free(cstr);
     return str;
 }
 
@@ -2320,8 +2272,8 @@ void DetailsDialog::Impl::on_edit_trackers()
 
         auto* l = Gtk::make_managed<Gtk::Label>();
         l->set_markup(
-            _("To add a backup URL, add it on the line after the primary URL.\n"
-              "To add another primary URL, add it after a blank line."));
+            _("To add a backup URL, add it on the next line after a primary URL.\n"
+              "To add a new primary URL, add it after a blank line."));
         l->set_justify(Gtk::JUSTIFY_LEFT);
         l->set_halign(Gtk::ALIGN_START);
         l->set_valign(Gtk::ALIGN_CENTER);
@@ -2337,6 +2289,13 @@ void DetailsDialog::Impl::on_edit_trackers()
         fr->add(*sw);
         fr->set_size_request(500U, 166U);
         t->add_wide_tall_control(row, *fr);
+
+        l = Gtk::make_managed<Gtk::Label>();
+        l->set_markup(_("Also see Default Public Trackers in Edit > Preferences > Network"));
+        l->set_justify(Gtk::JUSTIFY_LEFT);
+        l->set_halign(Gtk::ALIGN_START);
+        l->set_valign(Gtk::ALIGN_CENTER);
+        t->add_wide_control(row, *l);
 
         gtr_dialog_set_content(*d, *t);
 

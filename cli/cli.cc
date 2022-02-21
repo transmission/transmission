@@ -19,7 +19,7 @@
 #include <libtransmission/variant.h>
 #include <libtransmission/version.h>
 #include <libtransmission/web-utils.h>
-#include <libtransmission/web.h> /* tr_webRun */
+#include <libtransmission/web.h> // tr_sessionFetch()
 
 /***
 ****
@@ -124,16 +124,10 @@ static char* tr_strlratio(char* buf, double ratio, size_t buflen)
 
 static bool waitingOnWeb;
 
-static void onTorrentFileDownloaded(
-    tr_session* /*session*/,
-    bool /*did_connect*/,
-    bool /*did_timeout*/,
-    long /*response_code*/,
-    std::string_view response,
-    void* vctor)
+static void onTorrentFileDownloaded(tr_web::FetchResponse const& response)
 {
-    auto* ctor = static_cast<tr_ctor*>(vctor);
-    tr_ctorSetMetainfo(ctor, std::data(response), std::size(response), nullptr);
+    auto* ctor = static_cast<tr_ctor*>(response.user_data);
+    tr_ctorSetMetainfo(ctor, std::data(response.body), std::size(response.body), nullptr);
     waitingOnWeb = false;
 }
 
@@ -286,7 +280,7 @@ int tr_main(int argc, char* argv[])
     else if (tr_urlIsValid(torrentPath))
     {
         // fetch it
-        tr_webRun(h, { torrentPath, onTorrentFileDownloaded, ctor });
+        tr_sessionFetch(h, { torrentPath, onTorrentFileDownloaded, ctor });
         waitingOnWeb = true;
         while (waitingOnWeb)
         {

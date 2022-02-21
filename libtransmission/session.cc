@@ -26,9 +26,6 @@
 
 #include <event2/event.h>
 
-#include <libutp/utp.h>
-
-// #define TR_SHOW_DEPRECATED
 #include "transmission.h"
 
 #include "announcer.h"
@@ -112,6 +109,74 @@ tr_peer_id_t tr_peerIdInit()
     *it = Pool[val];
 
     return peer_id;
+}
+
+/***
+****
+***/
+
+std::optional<std::string> tr_session::WebController::cookieFile() const
+{
+    auto const str = tr_strvPath(session_->config_dir, "cookies.txt");
+    return tr_sys_path_exists(str.c_str(), nullptr) ? std::optional<std::string>{ str } : std::nullopt;
+}
+
+std::optional<std::string> tr_session::WebController::userAgent() const
+{
+    return tr_strvJoin(TR_NAME, "/"sv, SHORT_VERSION_STRING);
+}
+
+std::optional<std::string> tr_session::WebController::publicAddress() const
+{
+    for (auto const type : { TR_AF_INET, TR_AF_INET6 })
+    {
+        auto is_default_value = bool{};
+        tr_address const* addr = tr_sessionGetPublicAddress(session_, type, &is_default_value);
+        if (addr != nullptr && !is_default_value)
+        {
+            return tr_address_to_string(addr);
+        }
+    }
+
+    return std::nullopt;
+}
+
+unsigned int tr_session::WebController::clamp(int torrent_id, unsigned int byte_count) const
+{
+    auto const lock = session_->unique_lock();
+    auto const it = session_->torrentsById.find(torrent_id);
+    return it == std::end(session_->torrentsById) ? 0U : it->second->bandwidth->clamp(TR_DOWN, byte_count);
+}
+
+void tr_session::WebController::notifyBandwidthConsumed(int torrent_id, size_t byte_count)
+{
+    auto const lock = session_->unique_lock();
+    auto const it = session_->torrentsById.find(torrent_id);
+    if (it != std::end(session_->torrentsById))
+    {
+        it->second->bandwidth->notifyBandwidthConsumed(TR_DOWN, byte_count, true, tr_time_msec());
+    }
+}
+
+void tr_session::WebController::run(tr_web::FetchDoneFunc&& func, tr_web::FetchResponse&& response) const
+{
+    // marshall the `func` call into the libtransmission thread
+
+    using wrapper_t = std::pair<tr_web::FetchDoneFunc, tr_web::FetchResponse>;
+
+    auto constexpr callback = [](void* vwrapped)
+    {
+        auto* const wrapped = static_cast<wrapper_t*>(vwrapped);
+        wrapped->first(wrapped->second);
+        delete wrapped;
+    };
+
+    tr_runInEventThread(session_, callback, new wrapper_t{ func, std::move(response) });
+}
+
+void tr_sessionFetch(tr_session* session, tr_web::FetchOptions&& options)
+{
+    session->web->fetch(std::move(options));
 }
 
 /***
@@ -268,6 +333,7 @@ void tr_sessionGetDefaultSettings(tr_variant* d)
     tr_variantDictAddBool(d, TR_KEY_utp_enabled, true);
     tr_variantDictAddBool(d, TR_KEY_lpd_enabled, false);
     tr_variantDictAddStr(d, TR_KEY_download_dir, tr_getDefaultDownloadDir());
+    tr_variantDictAddStr(d, TR_KEY_default_trackers, "");
     tr_variantDictAddInt(d, TR_KEY_speed_limit_down, 100);
     tr_variantDictAddBool(d, TR_KEY_speed_limit_down_enabled, false);
     tr_variantDictAddInt(d, TR_KEY_encryption, TR_DEFAULT_ENCRYPTION);
@@ -346,6 +412,7 @@ void tr_sessionGetSettings(tr_session const* s, tr_variant* d)
     tr_variantDictAddBool(d, TR_KEY_utp_enabled, s->isUTPEnabled);
     tr_variantDictAddBool(d, TR_KEY_lpd_enabled, s->isLPDEnabled);
     tr_variantDictAddStr(d, TR_KEY_download_dir, tr_sessionGetDownloadDir(s));
+    tr_variantDictAddStr(d, TR_KEY_default_trackers, s->defaultTrackersStr());
     tr_variantDictAddInt(d, TR_KEY_download_queue_size, tr_sessionGetQueueSize(s, TR_DOWN));
     tr_variantDictAddBool(d, TR_KEY_download_queue_enabled, tr_sessionGetQueueEnabled(s, TR_DOWN));
     tr_variantDictAddInt(d, TR_KEY_speed_limit_down, tr_sessionGetSpeedLimit_KBps(s, TR_DOWN));
@@ -693,6 +760,8 @@ static void tr_sessionInitImpl(void* vdata)
 
     tr_udpInit(session);
 
+    session->web = tr_web::create(session->web_controller);
+
     if (session->isLPDEnabled)
     {
         tr_lpdInit(session, &session->bind_ipv4->addr);
@@ -742,6 +811,11 @@ static void sessionSetImpl(void* vdata)
     if (tr_variantDictFindInt(settings, TR_KEY_cache_size_mb, &i))
     {
         tr_sessionSetCacheLimit_MB(session, i);
+    }
+
+    if (tr_variantDictFindStrView(settings, TR_KEY_default_trackers, &sv))
+    {
+        session->setDefaultTrackers(sv);
     }
 
     if (tr_variantDictFindInt(settings, TR_KEY_peer_limit_per_torrent, &i))
@@ -1799,7 +1873,7 @@ static void sessionCloseImplStart(tr_session* session)
 
     /* and this goes *after* announcer close so that
        it won't be idle until the announce events are sent... */
-    tr_webClose(session, TR_WEB_CLOSE_WHEN_IDLE);
+    session->web->closeSoon();
 
     tr_cacheFree(session->cache);
     session->cache = nullptr;
@@ -1890,7 +1964,7 @@ void tr_sessionClose(tr_session* session)
      * so we need to keep the transmission thread alive
      * for a bit while they tell the router & tracker
      * that we're closing now */
-    while ((session->shared != nullptr || session->web != nullptr || session->announcer != nullptr ||
+    while ((session->shared != nullptr || !session->web->isClosed() || session->announcer != nullptr ||
             session->announcer_udp != nullptr) &&
            !deadlineReached(deadline))
     {
@@ -1903,7 +1977,7 @@ void tr_sessionClose(tr_session* session)
         tr_wait_msec(50);
     }
 
-    tr_webClose(session, TR_WEB_CLOSE_NOW);
+    session->web.reset();
 
     /* close the libtransmission thread */
     tr_eventClose(session);
@@ -2171,6 +2245,37 @@ int tr_sessionGetCacheLimit_MB(tr_session const* session)
     TR_ASSERT(tr_isSession(session));
 
     return tr_toMemMB(tr_cacheGetLimit(session->cache));
+}
+
+/***
+****
+***/
+
+void tr_session::setDefaultTrackers(std::string_view trackers)
+{
+    auto const oldval = default_trackers_;
+
+    default_trackers_str_ = trackers;
+    default_trackers_.parse(trackers);
+
+    // if the list changed, update all the public torrents
+    if (default_trackers_ != oldval)
+    {
+        for (auto* tor : torrents)
+        {
+            if (tor->isPublic())
+            {
+                tr_announcerResetTorrent(announcer, tor);
+            }
+        }
+    }
+}
+
+void tr_sessionSetDefaultTrackers(tr_session* session, char const* trackers)
+{
+    TR_ASSERT(tr_isSession(session));
+
+    session->setDefaultTrackers(trackers != nullptr ? trackers : "");
 }
 
 /***

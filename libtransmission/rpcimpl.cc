@@ -777,6 +777,10 @@ static void initField(tr_torrent const* const tor, tr_stat const* const st, tr_v
         addTrackers(tor, initme);
         break;
 
+    case TR_KEY_trackerList:
+        tr_variantInitStr(initme, tor->trackerList());
+        break;
+
     case TR_KEY_trackerStats:
         {
             auto const n = tr_torrentTrackerCount(tor);
@@ -1258,6 +1262,14 @@ static char const* torrentSet(
             errmsg = replaceTrackers(tor, tmp_variant);
         }
 
+        if (std::string_view txt; errmsg == nullptr && tr_variantDictFindStrView(args_in, TR_KEY_trackerList, &txt))
+        {
+            if (!tor->setTrackerList(txt))
+            {
+                errmsg = "Invalid tracker list";
+            }
+        }
+
         notify(session, TR_RPC_TORRENT_CHANGED, tor);
     }
 
@@ -1340,29 +1352,19 @@ static char const* torrentRenamePath(
 ****
 ***/
 
-static void portTested(
-    tr_session* /*session*/,
-    bool /*did_connect*/,
-    bool /*did_timeout*/,
-    long response_code,
-    std::string_view response,
-    void* user_data)
+static void onPortTested(tr_web::FetchResponse const& web_response)
 {
+    auto const& [status, body, did_connect, did_tmieout, user_data] = web_response;
     char result[1024];
     auto* data = static_cast<struct tr_rpc_idle_data*>(user_data);
 
-    if (response_code != 200)
+    if (status != 200)
     {
-        tr_snprintf(
-            result,
-            sizeof(result),
-            "portTested: http error %ld: %s",
-            response_code,
-            tr_webGetResponseStr(response_code));
+        tr_snprintf(result, sizeof(result), "portTested: http error %ld: %s", status, tr_webGetResponseStr(status));
     }
     else /* success */
     {
-        bool const isOpen = tr_strvStartsWith(response, '1');
+        bool const isOpen = tr_strvStartsWith(body, '1');
         tr_variantDictAddBool(data->args_out, TR_KEY_port_is_open, isOpen);
         tr_snprintf(result, sizeof(result), "success");
     }
@@ -1378,7 +1380,7 @@ static char const* portTest(
 {
     auto const port = tr_sessionGetPeerPort(session);
     auto const url = tr_strvJoin("https://portcheck.transmissionbt.com/"sv, std::to_string(port));
-    tr_webRun(session, { url, portTested, idle_data });
+    session->web->fetch({ url, onPortTested, idle_data });
     return nullptr;
 }
 
@@ -1386,28 +1388,18 @@ static char const* portTest(
 ****
 ***/
 
-static void gotNewBlocklist(
-    tr_session* session,
-    bool /*did_connect*/,
-    bool /*did_timeout*/,
-    long response_code,
-    std::string_view response,
-    void* user_data)
+static void onBlocklistFetched(tr_web::FetchResponse const& web_response)
 {
-    char result[1024];
+    auto const& [status, body, did_connect, did_timeout, user_data] = web_response;
     auto* data = static_cast<struct tr_rpc_idle_data*>(user_data);
+    auto* const session = data->session;
 
-    *result = '\0';
+    char result[1024] = {};
 
-    if (response_code != 200)
+    if (status != 200)
     {
         // we failed to download the blocklist...
-        tr_snprintf(
-            result,
-            sizeof(result),
-            "gotNewBlocklist: http error %ld: %s",
-            response_code,
-            tr_webGetResponseStr(response_code));
+        tr_snprintf(result, sizeof(result), "gotNewBlocklist: http error %ld: %s", status, tr_webGetResponseStr(status));
         tr_idle_function_done(data, result);
         return;
     }
@@ -1422,8 +1414,8 @@ static void gotNewBlocklist(
         auto actual_size = size_t{};
         auto const decompress_result = libdeflate_gzip_decompress(
             decompressor.get(),
-            std::data(response),
-            std::size(response),
+            std::data(body),
+            std::size(body),
             std::data(content),
             std::size(content),
             &actual_size);
@@ -1436,7 +1428,7 @@ static void gotNewBlocklist(
         if (decompress_result == LIBDEFLATE_BAD_DATA)
         {
             // couldn't decompress it; maybe we downloaded an uncompressed file
-            content.assign(std::begin(response), std::end(response));
+            content.assign(std::begin(body), std::end(body));
         }
         break;
     }
@@ -1466,7 +1458,7 @@ static char const* blocklistUpdate(
     tr_variant* /*args_out*/,
     struct tr_rpc_idle_data* idle_data)
 {
-    tr_webRun(session, { session->blocklistUrl(), gotNewBlocklist, idle_data });
+    session->web->fetch({ session->blocklistUrl(), onBlocklistFetched, idle_data });
     return nullptr;
 }
 
@@ -1521,36 +1513,26 @@ struct add_torrent_idle_data
     tr_ctor* ctor;
 };
 
-static void gotMetadataFromURL(
-    tr_session* /*session*/,
-    bool /*did_connect*/,
-    bool /*did_timeout*/,
-    long response_code,
-    std::string_view response,
-    void* user_data)
+static void onMetadataFetched(tr_web::FetchResponse const& web_response)
 {
+    auto const& [status, body, did_connect, did_timeout, user_data] = web_response;
     auto* data = static_cast<struct add_torrent_idle_data*>(user_data);
 
     dbgmsg(
         "torrentAdd: HTTP response code was %ld (%s); response length was %zu bytes",
-        response_code,
-        tr_webGetResponseStr(response_code),
-        std::size(response));
+        status,
+        tr_webGetResponseStr(status),
+        std::size(body));
 
-    if (response_code == 200 || response_code == 221) /* http or ftp success.. */
+    if (status == 200 || status == 221) /* http or ftp success.. */
     {
-        tr_ctorSetMetainfo(data->ctor, std::data(response), std::size(response), nullptr);
+        tr_ctorSetMetainfo(data->ctor, std::data(body), std::size(body), nullptr);
         addTorrentImpl(data->data, data->ctor);
     }
     else
     {
         char result[1024];
-        tr_snprintf(
-            result,
-            sizeof(result),
-            "gotMetadataFromURL: http error %ld: %s",
-            response_code,
-            tr_webGetResponseStr(response_code));
+        tr_snprintf(result, sizeof(result), "onMetadataFetched: http error %ld: %s", status, tr_webGetResponseStr(status));
         tr_idle_function_done(data->data, result);
     }
 
@@ -1686,9 +1668,9 @@ static char const* torrentAdd(tr_session* session, tr_variant* args_in, tr_varia
         d->data = idle_data;
         d->ctor = ctor;
 
-        auto options = tr_web_options{ filename, gotMetadataFromURL, d };
+        auto options = tr_web::FetchOptions{ filename, onMetadataFetched, d };
         options.cookies = cookies;
-        tr_webRun(session, std::move(options));
+        session->web->fetch(std::move(options));
     }
     else
     {
@@ -1805,6 +1787,11 @@ static char const* sessionSet(
     if (tr_variantDictFindBool(args_in, TR_KEY_queue_stalled_enabled, &boolVal))
     {
         tr_sessionSetQueueStalledEnabled(session, boolVal);
+    }
+
+    if (tr_variantDictFindStrView(args_in, TR_KEY_default_trackers, &sv))
+    {
+        session->setDefaultTrackers(sv);
     }
 
     if (tr_variantDictFindInt(args_in, TR_KEY_download_queue_size, &i))
@@ -2087,6 +2074,10 @@ static void addSessionField(tr_session* s, tr_variant* d, tr_quark key)
 
     case TR_KEY_config_dir:
         tr_variantDictAddStr(d, key, tr_sessionGetConfigDir(s));
+        break;
+
+    case TR_KEY_default_trackers:
+        tr_variantDictAddStr(d, key, s->defaultTrackersStr());
         break;
 
     case TR_KEY_download_dir:

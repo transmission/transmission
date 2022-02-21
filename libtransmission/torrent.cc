@@ -798,6 +798,7 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
         else if (isNewTorrentASeed(tor))
         {
             tor->completion.setHasAll();
+            tor->doneDate = tor->addedDate;
             tor->recheckCompleteness();
         }
         else
@@ -1976,7 +1977,7 @@ bool tr_torrentReqIsValid(tr_torrent const* tor, tr_piece_index_t index, uint32_
     {
         err = 4;
     }
-    else if (tor->offset(index, offset, length) > tor->totalSize())
+    else if (tor->pieceLoc(index, offset, length).byte > tor->totalSize())
     {
         err = 5;
     }
@@ -2000,14 +2001,14 @@ tr_block_span_t tr_torGetFileBlockSpan(tr_torrent const* tor, tr_file_index_t i)
 {
     auto const [begin_byte, end_byte] = tor->fpm_.byteSpan(i);
 
-    auto const begin_block = tor->blockOf(begin_byte);
+    auto const begin_block = tor->byteLoc(begin_byte).block;
     if (begin_byte >= end_byte)
     {
         return { begin_block, begin_block };
     }
 
-    auto const final_byte = end_byte - 1;
-    auto const end_block = tor->blockOf(final_byte) + 1;
+    auto const final_block = tor->byteLoc(end_byte - 1).block;
+    auto const end_block = final_block + 1;
     return { begin_block, end_block };
 }
 
@@ -2027,40 +2028,49 @@ bool tr_torrent::checkPiece(tr_piece_index_t piece)
 ****
 ***/
 
-bool tr_torrentSetAnnounceList(tr_torrent* tor, char const* const* announce_urls, tr_tracker_tier_t const* tiers, size_t n)
+bool tr_torrent::setTrackerList(std::string_view text)
 {
-    TR_ASSERT(tr_isTorrent(tor));
-    auto const lock = tor->unique_lock();
+    auto const lock = this->unique_lock();
 
     auto announce_list = tr_announce_list();
-    if ((announce_list.set(announce_urls, tiers, n) == 0U) || !announce_list.save(tor->torrentFile()))
+    if (!announce_list.parse(text) || !announce_list.save(this->torrentFile()))
     {
         return false;
     }
 
-    tor->metainfo_.announceList() = announce_list;
-    tor->markEdited();
+    this->metainfo_.announceList() = announce_list;
+    this->markEdited();
 
     /* if we had a tracker-related error on this torrent,
      * and that tracker's been removed,
      * then clear the error */
-    if (tor->error == TR_STAT_TRACKER_WARNING || tor->error == TR_STAT_TRACKER_ERROR)
+    if (this->error == TR_STAT_TRACKER_WARNING || this->error == TR_STAT_TRACKER_ERROR)
     {
-        auto const error_url = tor->error_announce_url;
+        auto const error_url = this->error_announce_url;
 
         if (std::any_of(
-                std::begin(tor->announceList()),
-                std::end(tor->announceList()),
+                std::begin(this->announceList()),
+                std::end(this->announceList()),
                 [error_url](auto const& tracker) { return tracker.announce_str == error_url; }))
         {
-            tr_torrentClearError(tor);
+            tr_torrentClearError(this);
         }
     }
 
     /* tell the announcer to reload this torrent's tracker list */
-    tr_announcerResetTorrent(tor->session->announcer, tor);
+    tr_announcerResetTorrent(this->session->announcer, this);
 
     return true;
+}
+
+bool tr_torrentSetTrackerList(tr_torrent* tor, char const* text)
+{
+    return text != nullptr && tor->setTrackerList(text);
+}
+
+char* tr_torrentGetTrackerList(tr_torrent const* tor)
+{
+    return tr_strvDup(tor->trackerList());
 }
 
 /**
@@ -2562,21 +2572,21 @@ void tr_torrentGotBlock(tr_torrent* tor, tr_block_index_t block)
         tor->completion.addBlock(block);
         tor->setDirty();
 
-        tr_piece_index_t const p = tor->pieceForBlock(block);
+        auto const piece = tor->blockLoc(block).piece;
 
-        if (tor->hasPiece(p))
+        if (tor->hasPiece(piece))
         {
-            if (tor->checkPiece(p))
+            if (tor->checkPiece(piece))
             {
-                tr_torrentPieceCompleted(tor, p);
+                tr_torrentPieceCompleted(tor, piece);
             }
             else
             {
-                uint32_t const n = tor->pieceSize(p);
-                tr_logAddTorErr(tor, _("Piece %" PRIu32 ", which was just downloaded, failed its checksum test"), p);
+                uint32_t const n = tor->pieceSize(piece);
+                tr_logAddTorErr(tor, _("Piece %" PRIu32 ", which was just downloaded, failed its checksum test"), piece);
                 tor->corruptCur += n;
                 tor->downloadedCur -= std::min(tor->downloadedCur, uint64_t{ n });
-                tr_peerMgrGotBadPiece(tor, p);
+                tr_peerMgrGotBadPiece(tor, piece);
             }
         }
     }

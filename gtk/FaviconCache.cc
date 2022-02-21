@@ -10,7 +10,7 @@
 #include <glib/gstdio.h> /* g_remove() */
 
 #include <libtransmission/transmission.h>
-#include <libtransmission/web.h> /* tr_webRun() */
+#include <libtransmission/web.h> // tr_sessionFetch()
 #include <libtransmission/web-utils.h>
 
 #include "FaviconCache.h"
@@ -73,7 +73,7 @@ Glib::RefPtr<Gdk::Pixbuf> favicon_load_from_cache(std::string const& host)
     }
 }
 
-void favicon_web_done_cb(tr_session*, bool, bool, long, std::string_view, gpointer);
+void favicon_web_done_cb(tr_web::FetchResponse const& response);
 
 bool favicon_web_done_idle_cb(std::unique_ptr<favicon_data> fav)
 {
@@ -90,7 +90,7 @@ bool favicon_web_done_idle_cb(std::unique_ptr<favicon_data> fav)
         fav->contents.clear();
         auto* const session = fav->session;
         auto const next_url = get_url(fav->host, fav->type);
-        tr_webRun(session, { next_url.raw(), favicon_web_done_cb, fav.release() });
+        tr_sessionFetch(session, { next_url.raw(), favicon_web_done_cb, fav.release() });
     }
 
     // Not released into the next web request, means we're done trying (even if `pixbuf` is still invalid)
@@ -102,17 +102,10 @@ bool favicon_web_done_idle_cb(std::unique_ptr<favicon_data> fav)
     return false;
 }
 
-void favicon_web_done_cb(
-    tr_session* /*session*/,
-    bool /*did_connect*/,
-    bool /*did_timeout*/,
-    long /*code*/,
-    std::string_view data,
-    gpointer vfav)
+void favicon_web_done_cb(tr_web::FetchResponse const& response)
 {
-    auto* fav = static_cast<favicon_data*>(vfav);
-    fav->contents.assign(std::data(data), std::size(data));
-
+    auto* const fav = static_cast<favicon_data*>(response.user_data);
+    fav->contents = response.body;
     Glib::signal_idle().connect([fav]() { return favicon_web_done_idle_cb(std::unique_ptr<favicon_data>(fav)); });
 }
 
@@ -136,7 +129,7 @@ void gtr_get_favicon(
         data->func = pixbuf_ready_func;
         data->host = host;
 
-        tr_webRun(session, { get_url(host, 0).raw(), favicon_web_done_cb, data.release() });
+        tr_sessionFetch(session, { get_url(host, 0).raw(), favicon_web_done_cb, data.release() });
     }
 }
 

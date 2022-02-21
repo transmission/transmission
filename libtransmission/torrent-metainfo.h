@@ -16,7 +16,6 @@
 #include "magnet-metainfo.h"
 
 struct tr_error;
-struct tr_info;
 
 struct tr_torrent_metainfo : public tr_magnet_metainfo
 {
@@ -45,13 +44,17 @@ public:
     {
         return blockInfo().blockCount();
     }
-    [[nodiscard]] constexpr auto blockOf(uint64_t offset) const
+    [[nodiscard]] auto byteLoc(uint64_t byte) const
     {
-        return blockInfo().blockOf(offset);
+        return blockInfo().byteLoc(byte);
     }
-    [[nodiscard]] constexpr auto blockOf(tr_piece_index_t piece, uint32_t offset, uint32_t length = 0) const
+    [[nodiscard]] auto blockLoc(tr_block_index_t block) const
     {
-        return blockInfo().blockOf(piece, offset, length);
+        return blockInfo().blockLoc(block);
+    }
+    [[nodiscard]] auto pieceLoc(tr_piece_index_t piece, uint32_t offset = 0, uint32_t length = 0) const
+    {
+        return blockInfo().pieceLoc(piece, offset, length);
     }
     [[nodiscard]] constexpr auto blockSize() const
     {
@@ -65,21 +68,9 @@ public:
     {
         return blockInfo().blockSpanForPiece(piece);
     }
-    [[nodiscard]] constexpr auto offset(tr_piece_index_t piece, uint32_t offset, uint32_t length = 0) const
-    {
-        return blockInfo().offset(piece, offset, length);
-    }
     [[nodiscard]] constexpr auto pieceCount() const
     {
         return blockInfo().pieceCount();
-    }
-    [[nodiscard]] constexpr auto pieceForBlock(tr_block_index_t block) const
-    {
-        return blockInfo().pieceForBlock(block);
-    }
-    [[nodiscard]] constexpr auto pieceOf(uint64_t offset) const
-    {
-        return blockInfo().pieceOf(offset);
     }
     [[nodiscard]] constexpr auto pieceSize() const
     {
@@ -147,12 +138,12 @@ public:
         return pieces_offset_;
     }
 
-    std::string torrentFile(std::string_view torrent_dir) const
+    [[nodiscard]] std::string torrentFile(std::string_view torrent_dir) const
     {
         return makeFilename(torrent_dir, name(), infoHashString(), BasenameFormat::Hash, ".torrent");
     }
 
-    std::string resumeFile(std::string_view resume_dir) const
+    [[nodiscard]] std::string resumeFile(std::string_view resume_dir) const
     {
         return makeFilename(resume_dir, name(), infoHashString(), BasenameFormat::Hash, ".resume");
     }
@@ -190,7 +181,7 @@ private:
         BasenameFormat format,
         std::string_view suffix);
 
-    std::string makeFilename(std::string_view dirname, BasenameFormat format, std::string_view suffix) const
+    [[nodiscard]] std::string makeFilename(std::string_view dirname, BasenameFormat format, std::string_view suffix) const
     {
         return makeFilename(dirname, name(), infoHashString(), format, suffix);
     }
@@ -198,7 +189,7 @@ private:
     struct file_t
     {
     public:
-        std::string const& path() const
+        [[nodiscard]] std::string const& path() const
         {
             return path_;
         }
@@ -208,7 +199,7 @@ private:
             path_ = subpath;
         }
 
-        uint64_t size() const
+        [[nodiscard]] uint64_t size() const
         {
             return size_;
         }

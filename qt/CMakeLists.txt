@@ -132,6 +132,7 @@ tr_qt_wrap_ui(${PROJECT_NAME}_UI_SOURCES
     RelocateDialog.ui
     SessionDialog.ui
     StatsDialog.ui
+    TrackersDialog.ui
 )
 
 set(${PROJECT_NAME}_QRC_FILES application.qrc)
@@ -163,6 +164,7 @@ set(${PROJECT_NAME}_LINGUAS
     nb
     nl
     pl
+    pt
     pt_BR
     pt_PT
     ru

@@ -86,6 +86,7 @@ public:
     Tag torrentSet(torrent_ids_t const& ids, tr_quark const key, bool val);
     Tag torrentSet(torrent_ids_t const& ids, tr_quark const key, int val);
     Tag torrentSet(torrent_ids_t const& ids, tr_quark const key, double val);
+    Tag torrentSet(torrent_ids_t const& ids, tr_quark const key, QString const& val);
     Tag torrentSet(torrent_ids_t const& ids, tr_quark const key, QList<int> const& val);
     Tag torrentSet(torrent_ids_t const& ids, tr_quark const key, QStringList const& val);
     Tag torrentSet(torrent_ids_t const& ids, tr_quark const key, QPair<int, QString> const& val);

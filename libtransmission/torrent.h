@@ -155,13 +155,17 @@ public:
     {
         return metainfo_.blockCount();
     }
-    [[nodiscard]] constexpr auto blockOf(uint64_t offset) const
+    [[nodiscard]] auto byteLoc(uint64_t byte) const
     {
-        return metainfo_.blockOf(offset);
+        return metainfo_.byteLoc(byte);
     }
-    [[nodiscard]] constexpr auto blockOf(tr_piece_index_t piece, uint32_t offset, uint32_t length = 0) const
+    [[nodiscard]] auto blockLoc(tr_block_index_t block) const
     {
-        return metainfo_.blockOf(piece, offset, length);
+        return metainfo_.blockLoc(block);
+    }
+    [[nodiscard]] auto pieceLoc(tr_piece_index_t piece, uint32_t offset = 0, uint32_t length = 0) const
+    {
+        return metainfo_.pieceLoc(piece, offset, length);
     }
     [[nodiscard]] constexpr auto blockSize() const
     {
@@ -175,21 +179,9 @@ public:
     {
         return metainfo_.blockSpanForPiece(piece);
     }
-    [[nodiscard]] constexpr auto offset(tr_piece_index_t piece, uint32_t offset, uint32_t length = 0) const
-    {
-        return metainfo_.offset(piece, offset, length);
-    }
     [[nodiscard]] constexpr auto pieceCount() const
     {
         return metainfo_.pieceCount();
-    }
-    [[nodiscard]] constexpr auto pieceForBlock(tr_block_index_t block) const
-    {
-        return metainfo_.pieceForBlock(block);
-    }
-    [[nodiscard]] constexpr auto pieceOf(uint64_t offset) const
-    {
-        return metainfo_.pieceOf(offset);
     }
     [[nodiscard]] constexpr auto pieceSize() const
     {
@@ -290,14 +282,9 @@ public:
         return fpm_.pieceSpan(file);
     }
 
-    [[nodiscard]] auto fileOffset(uint64_t offset) const
+    [[nodiscard]] auto fileOffset(tr_block_info::Location loc) const
     {
-        return fpm_.fileOffset(offset);
-    }
-
-    [[nodiscard]] auto fileOffset(tr_piece_index_t piece, uint32_t piece_offset) const
-    {
-        return fpm_.fileOffset(this->offset(piece, piece_offset));
+        return fpm_.fileOffset(loc.byte);
     }
 
     /// WANTED
@@ -425,6 +412,13 @@ public:
     {
         return this->announceList().tiers();
     }
+
+    [[nodiscard]] auto trackerList() const
+    {
+        return this->announceList().toString();
+    }
+
+    bool setTrackerList(std::string_view text);
 
     /// METAINFO - WEBSEEDS
 
@@ -776,9 +770,6 @@ bool tr_torrentFindFile2(tr_torrent const*, tr_file_index_t fileNo, char const**
 char* tr_torrentBuildPartial(tr_torrent const*, tr_file_index_t fileNo);
 
 tr_peer_id_t const& tr_torrentGetPeerId(tr_torrent* tor);
-
-/** @brief free a metainfo */
-void tr_metainfoFree(tr_info* inf);
 
 tr_torrent_metainfo&& tr_ctorStealMetainfo(tr_ctor* ctor);
 

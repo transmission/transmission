@@ -3383,6 +3383,7 @@
 					"$(inherited)",
 					"-DWITH_UTP",
 					"-D__TRANSMISSION__",
+					"-DHAVE_FLOCK",
 					"-DHAVE_STRLCPY",
 					"-DHAVE_ASPRINTF",
 					"-DHAVE_LIBGEN",
@@ -3471,7 +3472,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = "Accent Color";
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
@@ -3577,6 +3577,7 @@
 					"$(inherited)",
 					"-DWITH_UTP",
 					"-D__TRANSMISSION__",
+					"-DHAVE_FLOCK",
 					"-DHAVE_STRLCPY",
 					"-DHAVE_ASPRINTF",
 					"-DHAVE_LIBGEN",
@@ -3629,7 +3630,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = "Accent Color";
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
@@ -3713,7 +3713,6 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = "Accent Color";
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
@@ -3829,6 +3828,7 @@
 					"$(inherited)",
 					"-DWITH_UTP",
 					"-D__TRANSMISSION__",
+					"-DHAVE_FLOCK",
 					"-DHAVE_STRLCPY",
 					"-DHAVE_ASPRINTF",
 					"-DHAVE_LIBGEN",
