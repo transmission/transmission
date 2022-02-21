@@ -56,7 +56,7 @@ typedef NS_ENUM(unsigned int, TorrentDeterminationType) {
 
 @property(nonatomic, getter=isMagnet, readonly) BOOL magnet;
 @property(nonatomic, readonly) NSString* magnetLink;
-@property(nonatomic, readonly) NSString* magnetLocation;
+@property(nonatomic, readonly) id magnetLocation;
 
 @property(nonatomic, readonly) CGFloat ratio;
 @property(nonatomic) tr_ratiolimit ratioSetting;
