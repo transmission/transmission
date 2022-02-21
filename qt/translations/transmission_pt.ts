@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="tr">
+<TS version="2.1" language="pt">
 <context>
     <name>AboutDialog</name>
     <message>
         <location filename="../AboutDialog.ui" line="+14"/>
         <source>About Transmission</source>
-        <translation>Transmission Hakkında</translation>
+        <translation>Acerca do Transmission</translation>
     </message>
     <message>
         <location line="+39"/>
@@ -16,12 +16,12 @@
     <message>
         <location line="-10"/>
         <source>A fast and easy BitTorrent client</source>
-        <translation>Hızlı ve kolay BitTorrent istemcisi</translation>
+        <translation>Um cliente do BitTorrent rápido e fácil de usar</translation>
     </message>
     <message>
         <location filename="../AboutDialog.cc" line="+37"/>
         <source>Client</source>
-        <translation type="unfinished">İstemci</translation>
+        <translation type="unfinished">Cliente</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -31,17 +31,17 @@
     <message>
         <location line="+4"/>
         <source>C&amp;redits</source>
-        <translation>H&amp;azırlayanlar</translation>
+        <translation>C&amp;réditos</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>&amp;License</source>
-        <translation>&amp;Lisans</translation>
+        <translation>&amp;Licença</translation>
     </message>
     <message>
         <location line="+10"/>
         <source>Credits</source>
-        <translation>Hazırlayanlar</translation>
+        <translation>Créditos</translation>
     </message>
 </context>
 <context>
@@ -49,17 +49,17 @@
     <message>
         <location filename="../Application.cc" line="+330"/>
         <source>&lt;b&gt;Transmission is a file sharing program.&lt;/b&gt;</source>
-        <translation>&lt;b&gt;Transmission, dosya paylaşım programıdır.&lt;/b&gt;</translation>
+        <translation>&lt;b&gt;O Transmission é um programa de partilha de ficheiros.&lt;/b&gt;</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>When you run a torrent, its data will be made available to others by means of upload. Any content you share is your sole responsibility.</source>
-        <translation>Bir torrent çalıştırdığınızda, veriler karşıya yükleme yoluyla herkesin erişimine açılacaktır. Her türlü içerik paylaşımı sizin sorumluluğunuzdadır.</translation>
+        <translation>Quando executar um torrent, os respetivos dados serão disponibilizados por outros utilizadores. Qualquer conteúdo que partilhar é da sua inteira responsabilidade.</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>I &amp;Agree</source>
-        <translation>&amp;Kabul Ediyorum</translation>
+        <translation>&amp;Concordo</translation>
     </message>
     <message>
         <location line="+132"/>
@@ -70,7 +70,8 @@
         <location line="-29"/>
         <source>Torrent Completed</source>
         <translation>
-            <numerusform>Torrent Tamamlandı</numerusform>
+            <numerusform>Torrent concluído</numerusform>
+            <numerusform>Torrents concluídos</numerusform>
         </translation>
     </message>
 </context>
@@ -79,28 +80,28 @@
     <message>
         <location filename="../DetailsDialog.cc" line="+427"/>
         <source>None</source>
-        <translation>Yok</translation>
+        <translation>Nenhum</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Mixed</source>
-        <translation>Karışık</translation>
+        <translation>Variado</translation>
     </message>
     <message>
         <location line="+1"/>
         <location line="+265"/>
         <source>Unknown</source>
-        <translation>Bilinmeyen</translation>
+        <translation>Desconhecido</translation>
     </message>
     <message>
         <location line="-208"/>
         <source>Finished</source>
-        <translation>Bitti</translation>
+        <translation>Terminado</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Paused</source>
-        <translation>Duraklatıldı</translation>
+        <translation>Em pausa</translation>
     </message>
     <message>
         <location line="+109"/>
@@ -110,114 +111,117 @@
     <message>
         <location line="+133"/>
         <source>Active now</source>
-        <translation>Şimdi etkin</translation>
+        <translation>Ativo</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>%1 ago</source>
-        <translation>%1 önce</translation>
+        <translation>há %1</translation>
     </message>
     <message numerus="yes">
         <location line="+63"/>
         <source>%1 (%Ln pieces @ %2)</source>
         <translation>
-            <numerusform>%1 (%Ln parça @ %2)</numerusform>
+            <numerusform>%1 (%Ln pedaço @ %2)</numerusform>
+            <numerusform>%1 (%Ln pedaços @ %2)</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location line="+4"/>
         <source>%1 (%Ln pieces)</source>
         <translation>
-            <numerusform>%1 (%Ln parça)</numerusform>
+            <numerusform>%1 (%Ln pedaço)</numerusform>
+            <numerusform>%1 (%Ln pedaços)</numerusform>
         </translation>
     </message>
     <message>
         <location line="+28"/>
         <source>Private to this tracker -- DHT and PEX disabled</source>
-        <translation>Bu izleyiciye özel -- DHT ve PEX devredışı</translation>
+        <translation>Privado para este tracker -- DHT e PEX desativos</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Public torrent</source>
-        <translation>Kamusal torrent</translation>
+        <translation>Torrent público</translation>
     </message>
     <message>
         <location line="+69"/>
         <source>Created by %1</source>
-        <translation>%1 tarafından oluşturuldu</translation>
+        <translation>Criado por %1</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Created on %1</source>
-        <translation>%1 tarihinde oluşturuldu</translation>
+        <translation>Criado a %1</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Created by %1 on %2</source>
-        <translation>%1 tarafından %2 üzerinde oluşturuldu</translation>
+        <translation>Criado por %1 a %2</translation>
     </message>
     <message>
         <location line="+173"/>
         <location line="+47"/>
         <source>Encrypted connection</source>
-        <translation>Şifrelenmiş bağlantı</translation>
+        <translation>Ligação encriptada</translation>
     </message>
     <message>
         <location line="-28"/>
         <source>Optimistic unchoke</source>
-        <translation>İyimser kesinti giderme</translation>
+        <translation>Desobstrução otimista</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Downloading from this peer</source>
-        <translation>Bu eşten indiriliyor</translation>
+        <translation>A transferir deste peer</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>We would download from this peer if they would let us</source>
-        <translation>Eğer bize izin verirse bu eşten indirebiliriz</translation>
+        <translation>Transferíamos deste peer se este nos deixasse</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Uploading to peer</source>
-        <translation>Eşe gönderiliyor</translation>
+        <translation>A carregar para o peer</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>We would upload to this peer if they asked</source>
-        <translation>Eğer isterse bu eşe gönderebiliriz</translation>
+        <translation>Carregaríamos para este peer se este nos perguntasse</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Peer has unchoked us, but we&apos;re not interested</source>
-        <translation>Eş kesintimizi giderdi, ama ilgilenmiyoruz</translation>
+        <translation>O peer desobstruiu-nos, mas não estamos interessados</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>We unchoked this peer, but they&apos;re not interested</source>
-        <translation>Bu eşin kesintisini giderdik, ama ilgilenmiyorlar</translation>
+        <translation>Desobstruímos este peer, mas este não está interessado</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Peer was discovered through DHT</source>
-        <translation>DHT yoluyla eş keşfedildi</translation>
+        <translation>O peer foi descoberto via DHT</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Peer was discovered through Peer Exchange (PEX)</source>
-        <translation>Peer Exchange (PEX) yoluyla eş keşfedildi</translation>
+        <translation>O peer foi descoberto via Peer Exchange (PEX)</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Peer is an incoming connection</source>
-        <translation>Eş, bir gelen bağlantıdır</translation>
+        <translation>O peer é uma ligação recebida</translation>
     </message>
     <message numerus="yes">
         <location line="+132"/>
         <source> minute(s)</source>
         <extracomment>Spin box suffix, &quot;Stop seeding if idle for: [ 5 minutes ]&quot; (includes leading space after the number, if needed)</extracomment>
         <translation>
-            <numerusform>dakika</numerusform>
+            <numerusform>minuto</numerusform>
+            <numerusform>minutos</numerusform>
         </translation>
     </message>
     <message>
@@ -233,7 +237,7 @@
     <message>
         <location line="+27"/>
         <source>Error</source>
-        <translation>Hata</translation>
+        <translation>Erro</translation>
     </message>
     <message>
         <location line="+0"/>
@@ -244,39 +248,39 @@
         <location line="-799"/>
         <source>%1 (100%)</source>
         <extracomment>Text following the &quot;Have:&quot; label in torrent properties dialog; %1 is amount of downloaded and verified data</extracomment>
-        <translation>%1 (%100)</translation>
+        <translation>%1 (100%)</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>%1 of %2 (%3%)</source>
         <extracomment>Text following the &quot;Have:&quot; label in torrent properties dialog; %1 is amount of downloaded and verified data, %2 is overall size of torrent data, %3 is percentage (%1/%2*100)</extracomment>
-        <translation>%1 / %2 (%%3)</translation>
+        <translation>%1 de %2 (%3%)</translation>
     </message>
     <message>
         <location line="+9"/>
         <source>%1 of %2 (%3%), %4 Unverified</source>
         <extracomment>Text following the &quot;Have:&quot; label in torrent properties dialog; %1 is amount of downloaded data (both verified and unverified), %2 is overall size of torrent data, %3 is percentage (%1/%2*100), %4 is amount of downloaded but not yet verified data</extracomment>
-        <translation>%1 / %2 (%%3), %4 Doğrulanmamış</translation>
+        <translation>%1 de %2 (%3%), %4 por confirmar</translation>
     </message>
     <message>
         <location line="+70"/>
         <source>%1 (Ratio: %2)</source>
-        <translation>%1 (Oran: %2)</translation>
+        <translation>%1 (Rácio: %2)</translation>
     </message>
     <message>
         <location line="+271"/>
         <source>N/A</source>
-        <translation>Yok</translation>
+        <translation>N/D</translation>
     </message>
     <message>
         <location line="+250"/>
         <source>Peer is connected over uTP</source>
-        <translation>uTP üstünden eşe bağlanıldı</translation>
+        <translation>Tipo de ligação do peer: uTP</translation>
     </message>
     <message>
         <location line="+260"/>
         <source>High</source>
-        <translation>Yüksek</translation>
+        <translation>Alta</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -286,43 +290,43 @@
     <message>
         <location line="+1"/>
         <source>Low</source>
-        <translation>Düşük</translation>
+        <translation>Baixa</translation>
     </message>
     <message>
         <location line="+2"/>
         <location line="+4"/>
         <source>Use Global Settings</source>
-        <translation>Genel Ayarları Kullan</translation>
+        <translation>Usar Definições Globais</translation>
     </message>
     <message>
         <location line="-3"/>
         <source>Seed regardless of ratio</source>
-        <translation>Oran ne olursa olsun gönder</translation>
+        <translation>Efetuar seed independentemente da rácio</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Stop seeding at ratio:</source>
-        <translation>Şu oranda göndermeyi durdur:</translation>
+        <translation>Parar de efetuar seed no rácio:</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Seed regardless of activity</source>
-        <translation>Etkinlik ne olursa olsun gönder</translation>
+        <translation>Efetuar seed independentemente da atividade</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Stop seeding if idle for:</source>
-        <translation>Eğer şu kadar boşlanırsa gönderimi durdur:</translation>
+        <translation>Parar de efetuar seed se inativo durante:</translation>
     </message>
     <message>
         <location line="+75"/>
         <source>Up</source>
-        <translation>Gönderme</translation>
+        <translation>Cima</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Down</source>
-        <translation>İndirme</translation>
+        <translation>Baixo</translation>
     </message>
     <message>
         <location line="+0"/>
@@ -332,92 +336,92 @@
     <message>
         <location line="+0"/>
         <source>Status</source>
-        <translation>Durum</translation>
+        <translation>Estado</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Address</source>
-        <translation>Adres</translation>
+        <translation>Endereço</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Client</source>
-        <translation>İstemci</translation>
+        <translation>Cliente</translation>
     </message>
     <message>
         <location filename="../DetailsDialog.ui" line="+14"/>
         <source>Torrent Properties</source>
-        <translation>Torrent Özellikleri</translation>
+        <translation>Propriedades de Torrent</translation>
     </message>
     <message>
         <location line="+16"/>
         <source>Information</source>
-        <translation>Bilgi</translation>
+        <translation>Informação</translation>
     </message>
     <message>
         <location line="+9"/>
         <source>Activity</source>
-        <translation>Etkinlik</translation>
+        <translation>Atividade</translation>
     </message>
     <message>
         <location line="+12"/>
         <source>Have:</source>
-        <translation>Sahip olunan:</translation>
+        <translation>Tem:</translation>
     </message>
     <message>
         <location line="+26"/>
         <source>Availability:</source>
-        <translation>Kullanılabilirlik:</translation>
+        <translation>Disponibilidade:</translation>
     </message>
     <message>
         <location line="+26"/>
         <source>Uploaded:</source>
-        <translation>Yüklendi:</translation>
+        <translation>Carregado:</translation>
     </message>
     <message>
         <location line="+26"/>
         <source>Downloaded:</source>
-        <translation>İndirildi:</translation>
+        <translation>Transferido:</translation>
     </message>
     <message>
         <location line="+26"/>
         <source>State:</source>
-        <translation>Durum:</translation>
+        <translation>Estado:</translation>
     </message>
     <message>
         <location line="+26"/>
         <source>Running time:</source>
-        <translation>Çalışma süresi:</translation>
+        <translation>Duração:</translation>
     </message>
     <message>
         <location line="+26"/>
         <source>Remaining time:</source>
-        <translation>Kalan süre:</translation>
+        <translation>Tempo Restante:</translation>
     </message>
     <message>
         <location line="+26"/>
         <source>Last activity:</source>
-        <translation>Son etkinlik:</translation>
+        <translation>Última Atividade:</translation>
     </message>
     <message>
         <location line="+26"/>
         <source>Error:</source>
-        <translation>Hata:</translation>
+        <translation>Erro:</translation>
     </message>
     <message>
         <location line="+47"/>
         <source>Details</source>
-        <translation>Ayrıntılar</translation>
+        <translation>Detalhes</translation>
     </message>
     <message>
         <location line="+109"/>
         <source>Size:</source>
-        <translation>Boyut:</translation>
+        <translation>Tamanho:</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Location:</source>
-        <translation>Konum:</translation>
+        <translation>Localização:</translation>
     </message>
     <message>
         <location line="+110"/>
@@ -427,112 +431,112 @@
     <message>
         <location line="-176"/>
         <source>Hash:</source>
-        <translation>Özet:</translation>
+        <translation>Hash:</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Privacy:</source>
-        <translation>Gizlilik:</translation>
+        <translation>Privacidade:</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Origin:</source>
-        <translation>Köken:</translation>
+        <translation>Origem:</translation>
     </message>
     <message>
         <location line="+78"/>
         <source>Comment:</source>
-        <translation>Yorum:</translation>
+        <translation>Comentário:</translation>
     </message>
     <message>
         <location line="+20"/>
         <source>Peers</source>
-        <translation>Eşler</translation>
+        <translation>Peers</translation>
     </message>
     <message>
         <location line="+32"/>
         <source>Tracker</source>
-        <translation>İzleyici</translation>
+        <translation>Tracker</translation>
     </message>
     <message>
         <location line="+22"/>
         <source>Add Tracker</source>
-        <translation>İzleyici Ekle</translation>
+        <translation>Adicionar Tracker</translation>
     </message>
     <message>
         <location line="+20"/>
         <source>Remove Trackers</source>
-        <translation>İzleyici Kaldır</translation>
+        <translation>Remover Tracker</translation>
     </message>
     <message>
         <location line="+23"/>
         <source>Show &amp;more details</source>
-        <translation>Daha &amp;çok ayrıntı göster</translation>
+        <translation>Mostrar &amp;mais detalhes</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Show &amp;backup trackers</source>
-        <translation>&amp;Yedek izleyicileri göster</translation>
+        <translation>Mostrar trackers de &amp;backup</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Files</source>
-        <translation>Dosyalar</translation>
+        <translation>Ficheiros</translation>
     </message>
     <message>
         <location line="+32"/>
         <source>Options</source>
-        <translation>Seçenekler</translation>
+        <translation>Opções</translation>
     </message>
     <message>
         <location line="+9"/>
         <source>Speed</source>
-        <translation>Hız</translation>
+        <translation>Velocidade</translation>
     </message>
     <message>
         <location line="+12"/>
         <source>Honor global &amp;limits</source>
-        <translation>Genel &amp;sınırlara uy</translation>
+        <translation>Honrar &amp;limites globais</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Limit &amp;download speed:</source>
-        <translation>&amp;İndirme hızını sınırla:</translation>
+        <translation>Velocidade limite de &amp;descarga:</translation>
     </message>
     <message>
         <location line="+20"/>
         <source>Limit &amp;upload speed:</source>
-        <translation>&amp;Gönderim hızını sınırla:</translation>
+        <translation>Velocidade limite de &amp;carregamento:</translation>
     </message>
     <message>
         <location line="+20"/>
         <source>Torrent &amp;priority:</source>
-        <translation>Torrent &amp;önceliği:</translation>
+        <translation>&amp;Prioridade do torrent:</translation>
     </message>
     <message>
         <location line="+34"/>
         <source>Seeding Limits</source>
-        <translation>Yükleme Sınırları</translation>
+        <translation>Limites de carregamento</translation>
     </message>
     <message>
         <location line="+12"/>
         <source>&amp;Ratio:</source>
-        <translation>&amp;Oran:</translation>
+        <translation>&amp;Rácio:</translation>
     </message>
     <message>
         <location line="+30"/>
         <source>&amp;Idle:</source>
-        <translation>&amp;Boşta:</translation>
+        <translation>&amp;Inativo:</translation>
     </message>
     <message>
         <location line="+50"/>
         <source>Peer Connections</source>
-        <translation>Eş Bağlantıları</translation>
+        <translation>Ligações de Peers</translation>
     </message>
     <message>
         <location line="+12"/>
         <source>&amp;Maximum peers:</source>
-        <translation>&amp;Azami eş:</translation>
+        <translation>Peers &amp;Máximos:</translation>
     </message>
 </context>
 <context>
@@ -542,14 +546,14 @@
         <location filename="../FileTreeView.cc" line="+108"/>
         <location line="+257"/>
         <source>Low</source>
-        <translation>Düşük</translation>
+        <translation>Baixa</translation>
     </message>
     <message>
         <location line="+3"/>
         <location filename="../FileTreeView.cc" line="-257"/>
         <location line="+255"/>
         <source>High</source>
-        <translation>Yüksek</translation>
+        <translation>Alta</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -562,7 +566,7 @@
         <location line="+3"/>
         <location filename="../FileTreeView.cc" line="-255"/>
         <source>Mixed</source>
-        <translation>Karışık</translation>
+        <translation>Variado</translation>
     </message>
 </context>
 <context>
@@ -570,27 +574,27 @@
     <message>
         <location filename="../FileTreeModel.cc" line="+195"/>
         <source>File</source>
-        <translation>Dosya</translation>
+        <translation>Ficheiro</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Size</source>
-        <translation>Boyut</translation>
+        <translation>Tamanh</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Progress</source>
-        <translation>İlerleme</translation>
+        <translation>Progresso</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Download</source>
-        <translation>İndirme</translation>
+        <translation>Transferência</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Priority</source>
-        <translation>Öncelik</translation>
+        <translation>Prioridade</translation>
     </message>
 </context>
 <context>
@@ -598,32 +602,32 @@
     <message>
         <location filename="../FileTreeView.cc" line="+247"/>
         <source>Check Selected</source>
-        <translation>Seçiliyi İmle</translation>
+        <translation>Marcar Selecionadas</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Uncheck Selected</source>
-        <translation>Seçilinin İmini Kaldır</translation>
+        <translation>Desmarcar Selecionadas</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Only Check Selected</source>
-        <translation>Yalnızca Seçiliyi İmle</translation>
+        <translation>Apenas Marcar Selecionadas</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Priority</source>
-        <translation>Öncelik</translation>
+        <translation>Prioridade</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>Open</source>
-        <translation>Aç</translation>
+        <translation>Abrir</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Rename...</source>
-        <translation>Yeniden Adlandır</translation>
+        <translation>Renomear…</translation>
     </message>
 </context>
 <context>
@@ -632,52 +636,52 @@
         <location filename="../FilterBar.cc" line="+47"/>
         <location line="+145"/>
         <source>All</source>
-        <translation>Tümü</translation>
+        <translation>Todos</translation>
     </message>
     <message>
         <location line="-136"/>
         <source>Active</source>
-        <translation>Etkin</translation>
+        <translation>Ativos</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Downloading</source>
-        <translation>İndiriliyor</translation>
+        <translation>Descargas</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Seeding</source>
-        <translation>Gönderiliyor</translation>
+        <translation>Carregamentos</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Paused</source>
-        <translation>Duraklatıldı</translation>
+        <translation>Em pausa</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Finished</source>
-        <translation>Bitti</translation>
+        <translation>Concluído</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Verifying</source>
-        <translation>Doğrulanıyor</translation>
+        <translation>A Verificar</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Error</source>
-        <translation>Hata</translation>
+        <translation>Erro</translation>
     </message>
     <message>
         <location line="+140"/>
         <source>Show:</source>
-        <translation>Göster:</translation>
+        <translation>Mostrar:</translation>
     </message>
     <message>
         <location line="+14"/>
         <source>Search...</source>
-        <translation>Ara...</translation>
+        <translation>Pesquisar...</translation>
     </message>
 </context>
 <context>
@@ -685,27 +689,27 @@
     <message>
         <location filename="../Formatter.cc" line="+24"/>
         <source>B/s</source>
-        <translation>B/sn</translation>
+        <translation>B/s</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>kB/s</source>
-        <translation>kB/sn</translation>
+        <translation>kB/s</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>MB/s</source>
-        <translation>MB/sn</translation>
+        <translation>MB/s</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>GB/s</source>
-        <translation>GB/sn</translation>
+        <translation>GB/s</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>TB/s</source>
-        <translation>TB/sn</translation>
+        <translation>TB/s</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -757,13 +761,13 @@
         <location line="+37"/>
         <location line="+25"/>
         <source>Unknown</source>
-        <translation>Bilinmeyen</translation>
+        <translation>Desconhecido</translation>
     </message>
     <message>
         <location line="-20"/>
         <location line="+10"/>
         <source>None</source>
-        <translation>Yok</translation>
+        <translation>Nenhum</translation>
     </message>
     <message>
         <location line="+25"/>
@@ -775,28 +779,32 @@
         <location line="+21"/>
         <source>%Ln day(s)</source>
         <translation>
-            <numerusform>%Ln gün</numerusform>
+            <numerusform>%Ln dia</numerusform>
+            <numerusform>%Ln dias</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location line="+1"/>
         <source>%Ln hour(s)</source>
         <translation>
-            <numerusform>%Ln saat</numerusform>
+            <numerusform>%Ln hora</numerusform>
+            <numerusform>%Ln horas</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location line="+1"/>
         <source>%Ln minute(s)</source>
         <translation>
-            <numerusform>%Ln dakika</numerusform>
+            <numerusform>%Ln minuto</numerusform>
+            <numerusform>%Ln minutos</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location line="+1"/>
         <source>%Ln second(s)</source>
         <translation>
-            <numerusform>%Ln saniye</numerusform>
+            <numerusform>%Ln segundo</numerusform>
+            <numerusform>%Ln segundos</numerusform>
         </translation>
     </message>
     <message>
@@ -812,12 +820,12 @@
     <message>
         <location filename="../FreeSpaceLabel.cc" line="+52"/>
         <source>&lt;i&gt;Calculating Free Space...&lt;/i&gt;</source>
-        <translation>&lt;i&gt;Boş Alan Hesaplanıyor...&lt;/i&gt;</translation>
+        <translation>&lt;i&gt;A calcular espaço disponível...&lt;/i&gt;</translation>
     </message>
     <message>
         <location line="+29"/>
         <source>%1 free</source>
-        <translation>%1 boş</translation>
+        <translation>%1 disponíveis</translation>
     </message>
 </context>
 <context>
@@ -825,7 +833,7 @@
     <message>
         <location filename="../LicenseDialog.ui" line="+14"/>
         <source>License</source>
-        <translation>Lisans</translation>
+        <translation>Licença</translation>
     </message>
 </context>
 <context>
@@ -843,417 +851,417 @@
     <message>
         <location line="+30"/>
         <source>&amp;Edit</source>
-        <translation>&amp;Düzenle</translation>
+        <translation>&amp;Edição</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>&amp;Help</source>
-        <translation>&amp;Yardım</translation>
+        <translation>&amp;Ajuda</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>&amp;View</source>
-        <translation>&amp;Görünüm</translation>
+        <translation>&amp;Visualização</translation>
     </message>
     <message>
         <location line="+22"/>
         <source>&amp;File</source>
-        <translation>&amp;Dosya</translation>
+        <translation>&amp;Ficheiro</translation>
     </message>
     <message>
         <location line="+66"/>
         <source>&amp;New...</source>
-        <translation>&amp;Yeni...</translation>
+        <translation>&amp;Novo...</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Create a new torrent</source>
-        <translation>Yeni torrent oluştur</translation>
+        <translation>Criar um novo torrent</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>&amp;Properties</source>
-        <translation>&amp;Özellikler</translation>
+        <translation>&amp;Propriedades</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Show torrent properties</source>
-        <translation>Torrent özelliklerini göster</translation>
+        <translation>Mostrar propriedades do torrent</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>Open the torrent&apos;s folder</source>
-        <translation>Torrentin klasörünü aç</translation>
+        <translation>Abrir pasta do torrent</translation>
     </message>
     <message>
         <location line="-161"/>
         <source>Queue</source>
-        <translation>Sıra</translation>
+        <translation>Fila</translation>
     </message>
     <message>
         <location line="-132"/>
         <source>Options</source>
-        <translation type="unfinished">Seçenekler</translation>
+        <translation type="unfinished">Opções</translation>
     </message>
     <message>
         <location line="+83"/>
         <source>Statistics</source>
-        <translation type="unfinished">İstatistikler</translation>
+        <translation type="unfinished">Estatísticas</translation>
     </message>
     <message>
         <location line="+171"/>
         <source>&amp;Open...</source>
-        <translation>&amp;Aç...</translation>
+        <translation>&amp;Abrir…</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Open</source>
-        <translation>Aç</translation>
+        <translation>Abrir</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Open a torrent</source>
-        <translation>Torrent Aç</translation>
+        <translation>Abrir um torrent</translation>
     </message>
     <message>
         <location line="+30"/>
         <source>Open Fold&amp;er</source>
-        <translation>Klasör Aç</translation>
+        <translation>Abrir &amp;pasta</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>&amp;Start</source>
-        <translation>&amp;Başlat</translation>
+        <translation>&amp;Iniciar</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Start torrent</source>
-        <translation>Torrenti başlat</translation>
+        <translation>Iniciar torrent</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>Ask Tracker for &amp;More Peers</source>
-        <translation>İzleyiciye Daha Çok &amp;Eş Sor</translation>
+        <translation>Pedir &amp;Mais Peers ao Tracker</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Ask tracker for more peers</source>
-        <translation>İzleyiciye daha çok eş sor</translation>
+        <translation>Pedir mais peers ao tracker</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>&amp;Pause</source>
-        <translation>&amp;Duraklat</translation>
+        <translation>&amp;Pausar</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Pause torrent</source>
-        <translation>Torrenti duraklat</translation>
+        <translation>Pausar torrent</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>&amp;Verify Local Data</source>
-        <translation>&amp;Yerel Veriyi Doğrula</translation>
+        <translation>&amp;Verificar Dados Locais</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Verify local data</source>
-        <translation>Yerel veriyi doğrula</translation>
+        <translation>Verificar dados locais</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>&amp;Remove</source>
-        <translation>&amp;Kaldır</translation>
+        <translation>&amp;Remover</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Remove torrent</source>
-        <translation>Torrenti kaldır</translation>
+        <translation>Remover torrent</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>&amp;Delete Files and Remove</source>
-        <translation>&amp;Dosyaları Sil ve Kaldır</translation>
+        <translation>&amp;Apagar ficheiros e remover</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Remove torrent and delete its files</source>
-        <translation>Torrenti kaldır ve dosyaları sil</translation>
+        <translation>Remover torrent e apagar os ficheiros</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>&amp;Start All</source>
-        <translation>&amp;Tümünü Başlat</translation>
+        <translation>Iniciar todo&amp;s</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>&amp;Pause All</source>
-        <translation>&amp;Tümünü Duraklat</translation>
+        <translation>&amp;Pausar todos</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>&amp;Quit</source>
-        <translation>&amp;Çık</translation>
+        <translation>&amp;Sair</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>&amp;Select All</source>
-        <translation>&amp;Tümünü Seç</translation>
+        <translation>&amp;Selecionar tudo</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>&amp;Deselect All</source>
-        <translation>&amp;Tüm Seçimleri Kaldır</translation>
+        <translation>&amp;Desselecionar tudo</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>&amp;Preferences</source>
-        <translation>&amp;Tercihler</translation>
+        <translation>&amp;Preferências</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>&amp;Compact View</source>
-        <translation>&amp;Sıkışık Görünüm</translation>
+        <translation>&amp;Visão comprimida</translation>
     </message>
     <message>
         <location line="+3"/>
         <location line="+3"/>
         <source>Compact View</source>
-        <translation>Sıkışık Görünüm</translation>
+        <translation>Visão comprimida</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>&amp;Toolbar</source>
-        <translation>&amp;Araç Çubuğu</translation>
+        <translation>Barra de ferramen&amp;tas</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>&amp;Filterbar</source>
-        <translation>&amp;Süzgeç Çubuğu</translation>
+        <translation>Barra de &amp;filtragem</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>&amp;Statusbar</source>
-        <translation>&amp;Durum Çubuğu</translation>
+        <translation>&amp;Barra de estado</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Sort by &amp;Activity</source>
-        <translation>&amp;Etkinliğe Göre Sırala</translation>
+        <translation>Ordenar por &amp;Atividade</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Sort by A&amp;ge</source>
-        <translation>&amp;Tarihe Göre Sırala</translation>
+        <translation>Ordenar por &amp;Período</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Sort by Time &amp;Left</source>
-        <translation>&amp;Kalan Süreye Göre Sırala</translation>
+        <translation>Ordenar por Tempo &amp;Restante</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Sort by &amp;Name</source>
-        <translation>&amp;Ada Göre Sırala</translation>
+        <translation>Ordenar por &amp;Nome</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Sort by &amp;Progress</source>
-        <translation>&amp;İlerlemeye Göre Sırala</translation>
+        <translation>Ordenar por &amp;Progresso</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Sort by Rati&amp;o</source>
-        <translation>&amp;Orana Göre Sırala</translation>
+        <translation>Ordenar por &amp;Rácio</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Sort by Si&amp;ze</source>
-        <translation>&amp;Boyuta Göre Sırala</translation>
+        <translation>Ordenar por &amp;Tamanho</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Sort by Stat&amp;e</source>
-        <translation>&amp;Duruma Göre Sırala</translation>
+        <translation>Ordenar por &amp;Estado</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Sort by T&amp;racker</source>
-        <translation>&amp;İzleyiciye Göre Sırala</translation>
+        <translation>Ordenar por &amp;Tracker</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Message &amp;Log</source>
-        <translation>İleti &amp;Günlüğü</translation>
+        <translation>&amp;Registo de Mensagens</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>&amp;Statistics</source>
-        <translation>&amp;İstatistikler</translation>
+        <translation>E&amp;statísticas</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>&amp;Contents</source>
-        <translation>&amp;İçindekiler</translation>
+        <translation>&amp;Conteúdos</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>&amp;About</source>
-        <translation>&amp;Hakkında</translation>
+        <translation>&amp;Informações</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>Re&amp;verse Sort Order</source>
-        <translation>Sıralamayı Ters Çe&amp;vir</translation>
+        <translation>&amp;Inverter Ordenação</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>&amp;Name</source>
-        <translation>&amp;Ad</translation>
+        <translation>&amp;Nome</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>&amp;Files</source>
-        <translation>&amp;Dosyalar</translation>
+        <translation>&amp;Ficheiros</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>&amp;Tracker</source>
-        <translation>&amp;İzleyici</translation>
+        <translation>&amp;Tracker</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Total Ratio</source>
-        <translation>Toplam Oran</translation>
+        <translation>Rácio Total</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Session Ratio</source>
-        <translation>Oturum Oranı</translation>
+        <translation>Rácio da Sessão</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Total Transfer</source>
-        <translation>Toplam Aktarım</translation>
+        <translation>Total de Transferências</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Session Transfer</source>
-        <translation>Oturum Aktarımı</translation>
+        <translation>Transferência da Sessão</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>&amp;Main Window</source>
-        <translation>&amp;Ana Pencere</translation>
+        <translation>&amp;Janela Principal</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Tray &amp;Icon</source>
-        <translation>Tepsi &amp;Simgesi</translation>
+        <translation>&amp;Ícone de Bandeja</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>&amp;Change Session...</source>
-        <translation>&amp;Oturumu Değiştir...</translation>
+        <translation>&amp;Alterar sessão…</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Choose Session</source>
         <extracomment>Start a local session or connect to a running session</extracomment>
-        <translation>Seçilen Oturum</translation>
+        <translation>Escolher Sessão</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Set &amp;Location...</source>
-        <translation>Konum &amp;Belirle...</translation>
+        <translation>Definir &amp;Localização...</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>&amp;Copy Magnet Link to Clipboard</source>
-        <translation>&amp;Mıknatıs Bağlantısını Panoya Kopyala</translation>
+        <translation>&amp;Copiar Hiperligação Magnética para a Área de Transferência</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Open &amp;URL...</source>
-        <translation>&amp;URL Aç...</translation>
+        <translation>Abrir &amp;Hiperligação...</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>&amp;Donate</source>
-        <translation>&amp;Bağış</translation>
+        <translation>&amp;Doar</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Start &amp;Now</source>
-        <translation>Şimdi &amp;Başlat</translation>
+        <translation>Começar &amp;Agora</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Bypass the queue and start now</source>
-        <translation>Kuyruğu atla ve hemen başla</translation>
+        <translation>Ultrapassar a fila e íniciar agora</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>Move to &amp;Top</source>
-        <translation>En &amp;Üste Taşı</translation>
+        <translation>Mover para &amp;primeiro</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Move &amp;Up</source>
-        <translation>&amp;Yukarı Taşı</translation>
+        <translation>Mover para &amp;cima</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Move &amp;Down</source>
-        <translation>&amp;Aşağı Taşı</translation>
+        <translation>Mover para &amp;baixo</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Move to &amp;Bottom</source>
-        <translation>&amp;En Alta Taşı</translation>
+        <translation>Mover para &amp;último</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Sort by &amp;Queue</source>
-        <translation>&amp;Kuyruğa Göre Sırala</translation>
+        <translation>Ordenar por &amp;Fila</translation>
     </message>
     <message>
         <location filename="../MainWindow.cc" line="+471"/>
         <source>Limit Download Speed</source>
-        <translation>İndirme Hızını Sınırla</translation>
+        <translation>Limitar Velocidade de Transferência</translation>
     </message>
     <message>
         <location line="-55"/>
         <source>Unlimited</source>
-        <translation>Sınırsız</translation>
+        <translation>Infinito</translation>
     </message>
     <message>
         <location line="+6"/>
         <location line="+733"/>
         <location line="+9"/>
         <source>Limited at %1</source>
-        <translation>%1 ile sınırlandı</translation>
+        <translation>Limite: %1</translation>
     </message>
     <message>
         <location line="-687"/>
         <source>Limit Upload Speed</source>
-        <translation>Gönderme Hızını Sınırla</translation>
+        <translation>Limitar Velocidade de Carregamento</translation>
     </message>
     <message>
         <location line="+9"/>
         <source>Stop Seeding at Ratio</source>
-        <translation>Belli Orana Ulaşıldığında Dağıtımı Durdur</translation>
+        <translation>Parar de Efetuar Seed no Rácio</translation>
     </message>
     <message>
         <location line="-40"/>
         <source>Seed Forever</source>
-        <translation>Sürekli Dağıt</translation>
+        <translation>Efetuar Seed Permanentemente</translation>
     </message>
     <message>
         <location line="+6"/>
         <location line="+720"/>
         <source>Stop at Ratio (%1)</source>
-        <translation>(%1) Oranında Durdur</translation>
+        <translation>Parar no Rácio (%1)</translation>
     </message>
     <message>
         <location line="-393"/>
@@ -1264,159 +1272,162 @@
     <message>
         <location line="+16"/>
         <source>Idle</source>
-        <translation>Boşta</translation>
+        <translation>Ocioso</translation>
     </message>
     <message>
         <location line="+30"/>
         <location line="+15"/>
         <source>Ratio: %1</source>
-        <translation>Oran: %1</translation>
+        <translation>Rácio: %1</translation>
     </message>
     <message>
         <location line="-10"/>
         <location line="+5"/>
         <source>Down: %1, Up: %2</source>
-        <translation>İndirme: %1, Yükleme: %2</translation>
+        <translation>Transferência: %1, Carregamento: %2</translation>
     </message>
     <message>
         <location line="+424"/>
         <source>Torrent Files (*.torrent);;All Files (*.*)</source>
-        <translation>Torrent Dosyaları (.torrent);;Tüm Dosyalar(*.*)</translation>
+        <translation>Ficheiros torrent (*.torrent);;Todos os ficheiros (*.*)</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Show &amp;options dialog</source>
-        <translation>&amp;Özellikler iletişim kutusunu göster</translation>
+        <translation>Mostrar &amp;Opções</translation>
     </message>
     <message>
         <location line="-8"/>
         <source>Open Torrent</source>
-        <translation>Torrent Aç</translation>
+        <translation>Abrir torrent</translation>
     </message>
     <message>
         <location line="-986"/>
         <source>Speed Limits</source>
-        <translation>Hız Sınırları</translation>
+        <translation>Limites de velocidade</translation>
     </message>
     <message>
         <location line="+520"/>
         <source>Network Error</source>
-        <translation>Ağ Hatası</translation>
+        <translation>Erro de rede</translation>
     </message>
     <message>
         <location line="+434"/>
         <source>Click to disable Temporary Speed Limits
  (%1 down, %2 up)</source>
-        <translation>Geçici Hız Sınırlarını devre dışı bırakmak için tıkla
-(%1 indirme, %2 yükleme)</translation>
+        <translation>Clique para desativar Limites de Velocidade Temporários
+(%1 Transferência, %2 Carregamento)</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Click to enable Temporary Speed Limits
  (%1 down, %2 up)</source>
-        <translation>Geçici Hız Sınırlarını etkinleştirmek için tıkla
-(%1 indirme, %2 yükleme)</translation>
+        <translation>Clique para ativar Limites de Velocidade Temporários
+(%1 Transferência, %2 Carregamento)</translation>
     </message>
     <message>
         <location line="+136"/>
         <source>Remove torrent?</source>
-        <translation>Torrenti kaldır?</translation>
+        <translation>Remover torrent?</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Delete this torrent&apos;s downloaded files?</source>
-        <translation>Bu torrentin indirilen dosyaları silinsin mi?</translation>
+        <translation>Apagar os ficheiros transferidos deste torrent?</translation>
     </message>
     <message numerus="yes">
         <location line="-4"/>
         <source>Remove %Ln torrent(s)?</source>
         <translation>
-            <numerusform>%Ln torrenti kaldırılsın mı?</numerusform>
+            <numerusform>Remover %Ln torrent?</numerusform>
+            <numerusform>Remover %Ln torrents?</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location line="-505"/>
         <source>Showing %L1 of %Ln torrent(s)</source>
         <translation>
-            <numerusform>%Ln torrentden %L1 tanesi gösteriliyor</numerusform>
+            <numerusform>A mostrar %L1 de %Ln torrent</numerusform>
+            <numerusform>A mostrar %L1 de %Ln torrents</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location line="+510"/>
         <source>Delete these %Ln torrent(s)&apos; downloaded files?</source>
         <translation>
-            <numerusform>Bu %Ln torrentin indirilen dosyaları silinsin mi?</numerusform>
+            <numerusform>Apagar os ficheiros transferidos de %Ln torrent?</numerusform>
+            <numerusform>Apagar os ficheiros transferidos de %Ln torrents?</numerusform>
         </translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Once removed, continuing the transfer will require the torrent file or magnet link.</source>
-        <translation>Bir kez silince, aktarımları sürdürmek için torrent dosyası veya mıknatıs bağlantısı gerekir.</translation>
+        <translation>Uma vez removida, para continuar a tranferência será necessário o ficheiro torrent ou a ligação magnet.</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Once removed, continuing the transfers will require the torrent files or magnet links.</source>
-        <translation>Bir kez silince, aktarımları sürdürmek için torrent dosyaları veya mıknatıs bağlantıları gerekir.</translation>
+        <translation>Uma vez removidas, para continuar as tranferências serão necessários os ficheiros torrent ou as ligações magnet.</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>This torrent has not finished downloading.</source>
-        <translation>Bu torrentin indirilmesi bitirilmedi.</translation>
+        <translation>O torrent não acabou de ser transferido.</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>These torrents have not finished downloading.</source>
-        <translation>Bu torrentlerin indirilmesi bitirilmedi.</translation>
+        <translation>Estes torrents não acabaram de ser transferidos.</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>This torrent is connected to peers.</source>
-        <translation>Bu torrent eşlere bağlı durumda.</translation>
+        <translation>Este torrent está ligado a peers.</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>These torrents are connected to peers.</source>
-        <translation>Bu torrentler eşlere bağlı durumda.</translation>
+        <translation>Estes torrents estão ligados a peers.</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>One of these torrents is connected to peers.</source>
-        <translation>Bu torrentlerden biri eşlere bağlı durumda.</translation>
+        <translation>Um destes torrents está ligado a peers.</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Some of these torrents are connected to peers.</source>
-        <translation>Bu torrentlerden bazıları eşlere bağlı durumda.</translation>
+        <translation>Alguns destes torrents estão ligados a peers.</translation>
     </message>
     <message>
         <location line="+10"/>
         <source>One of these torrents has not finished downloading.</source>
-        <translation>Bu torrentlerden biri indirmeyi bitirmedi.</translation>
+        <translation>Um destes torrents não acabou de ser transferido.</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Some of these torrents have not finished downloading.</source>
-        <translation>Bu torrentlerden bazıları indirmeyi bitirmedi.</translation>
+        <translation>Alguns destes torrents não acabaram de ser transferidos.</translation>
     </message>
     <message>
         <location line="+69"/>
         <source>%1 has not responded yet</source>
-        <translation>%1 henüz yanıtlamadı</translation>
+        <translation>%1 ainda não respondeu</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>%1 is responding</source>
-        <translation>%1 yanıtlıyor</translation>
+        <translation>%1 está a responder</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>%1 last responded %2 ago</source>
-        <translation>%1 en son %2 önce yanıtladı</translation>
+        <translation>%1 respondeu a %2 atrás</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>%1 is not responding</source>
-        <translation>%1 yanıtlamıyor</translation>
+        <translation>%1 não está a responder</translation>
     </message>
 </context>
 <context>
@@ -1424,83 +1435,85 @@
     <message>
         <location filename="../MakeDialog.ui" line="+17"/>
         <source>New Torrent</source>
-        <translation>Yeni Torrent</translation>
+        <translation>Novo torrent</translation>
     </message>
     <message>
         <location filename="../MakeDialog.cc" line="+230"/>
         <source>&lt;i&gt;No source selected&lt;/i&gt;</source>
-        <translation>&lt;i&gt;Hiçbir kaynak seçilmedi&lt;/i&gt; </translation>
+        <translation>&lt;i&gt;Nenhuma fonte selecionada&lt;i&gt;</translation>
     </message>
     <message numerus="yes">
         <location line="+4"/>
         <source>%Ln File(s)</source>
         <translation>
-            <numerusform>%Ln Dosya</numerusform>
+            <numerusform>%Ln ficheiro</numerusform>
+            <numerusform>%Ln ficheiros</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location line="+1"/>
         <source>%Ln Piece(s)</source>
         <translation>
-            <numerusform>%Ln Parça</numerusform>
+            <numerusform>%Ln pedaço</numerusform>
+            <numerusform>%Ln Pedaços</numerusform>
         </translation>
     </message>
     <message>
         <location line="+1"/>
         <source>%1 in %2; %3 @ %4</source>
-        <translation>%2 içinde %1; %3 @ %4 </translation>
+        <translation>%1 em %2; %3 @ %4</translation>
     </message>
     <message>
         <location filename="../MakeDialog.ui" line="+9"/>
         <source>Files</source>
-        <translation>Dosyalar</translation>
+        <translation>Ficheiros</translation>
     </message>
     <message>
         <location line="+12"/>
         <source>Sa&amp;ve to:</source>
-        <translation>Şuraya &amp;kaydet:</translation>
+        <translation>Guardar &amp;em:</translation>
     </message>
     <message>
         <location line="+13"/>
         <source>Source f&amp;older:</source>
-        <translation>Kaynak &amp;klasör:</translation>
+        <translation>Pasta de f&amp;onte:</translation>
     </message>
     <message>
         <location line="+14"/>
         <source>Source &amp;file:</source>
-        <translation>Kaynak &amp;dosya:</translation>
+        <translation>Ficheiro de &amp;fonte:</translation>
     </message>
     <message>
         <location line="+41"/>
         <source>Properties</source>
-        <translation>Özellikler</translation>
+        <translation>Propriedades</translation>
     </message>
     <message>
         <location line="+12"/>
         <source>&amp;Trackers:</source>
-        <translation>&amp;İzleyiciler:</translation>
+        <translation>&amp;Trackers:</translation>
     </message>
     <message>
         <location line="+23"/>
         <source>To add a backup URL, add it on the line after the primary URL.
 To add another primary URL, add it after a blank line.</source>
-        <translation>Yedek URL eklemek için, onu ana URL&apos;den sonraki satıra ekleyin.
-Başka ana URL eklemek için, onu boş bir satırdan sonra ekleyin.</translation>
+        <translation>Para adicionar uma hiperligação de backup, adicione-a na linha após a hiperligação primária.
+Para adicionar outra hiperligação primária, adicione-a após a linha em branco.</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Co&amp;mment:</source>
-        <translation>&amp;Yorum:</translation>
+        <translation>Co&amp;mentário:</translation>
     </message>
     <message>
         <location line="+14"/>
         <source>&amp;Source:</source>
-        <translation type="unfinished">&amp;Kaynak:</translation>
+        <translation type="unfinished">&amp;Fonte:</translation>
     </message>
     <message>
         <location line="+14"/>
         <source>&amp;Private torrent</source>
-        <translation>&amp;Özel torrent</translation>
+        <translation>&amp;Torrent Privado</translation>
     </message>
 </context>
 <context>
@@ -1508,37 +1521,37 @@ Başka ana URL eklemek için, onu boş bir satırdan sonra ekleyin.</translation
     <message>
         <location filename="../MakeProgressDialog.ui" line="+14"/>
         <source>New Torrent</source>
-        <translation>Yeni Torrent</translation>
+        <translation>Novo torrent</translation>
     </message>
     <message>
         <location filename="../MakeDialog.cc" line="-136"/>
         <source>Creating &quot;%1&quot;</source>
-        <translation>&quot;%1&quot; oluşturuluyor</translation>
+        <translation>A criar &quot;%1&quot;</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Created &quot;%1&quot;!</source>
-        <translation>&quot;%1&quot; oluşturuldu!</translation>
+        <translation>Criado &quot;%1&quot;!</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Error: invalid announce URL &quot;%1&quot;</source>
-        <translation>Hata: geçersiz duyuru URL&apos;si &quot;%1&quot;</translation>
+        <translation>Erro: hiperligação de anunciação &quot;%1&quot; inválida</translation>
     </message>
     <message>
         <location line="-4"/>
         <source>Cancelled</source>
-        <translation>İptal edildi</translation>
+        <translation>Cancelado</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Error reading &quot;%1&quot;: %2</source>
-        <translation>&quot;%1&quot; okunurken hata: %2</translation>
+        <translation>Erro na leitura de &quot;%1&quot;: %2</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Error writing &quot;%1&quot;: %2</source>
-        <translation>&quot;%1&quot; yazılırken hata: %2</translation>
+        <translation>Erro na escrita de &quot;%1&quot;: %2</translation>
     </message>
 </context>
 <context>
@@ -1546,32 +1559,32 @@ Başka ana URL eklemek için, onu boş bir satırdan sonra ekleyin.</translation
     <message>
         <location filename="../OptionsDialog.cc" line="+62"/>
         <source>Open Torrent</source>
-        <translation>Torrent Aç</translation>
+        <translation>Abrir torrent</translation>
     </message>
     <message>
         <location line="-17"/>
         <source>Open Torrent from File</source>
-        <translation>Dosyadan Torrent Aç</translation>
+        <translation>Abrir torrent a partir de um ficheiro</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Open Torrent from URL or Magnet Link</source>
-        <translation>URL veya Mıknatıs Bağlantısından Torrent Aç</translation>
+        <translation>Abrir torrent apartir de uma hiperligação ou ligação magnética</translation>
     </message>
     <message>
         <location filename="../OptionsDialog.ui" line="+17"/>
         <source>&amp;Source:</source>
-        <translation>&amp;Kaynak:</translation>
+        <translation>&amp;Fonte:</translation>
     </message>
     <message>
         <location line="+22"/>
         <source>&amp;Destination folder:</source>
-        <translation>&amp;Hedef klasör:</translation>
+        <translation>Pasta &amp;de destino:</translation>
     </message>
     <message>
         <location filename="../OptionsDialog.cc" line="+52"/>
         <source>High</source>
-        <translation>Yüksek</translation>
+        <translation>Alta</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -1581,32 +1594,32 @@ Başka ana URL eklemek için, onu boş bir satırdan sonra ekleyin.</translation
     <message>
         <location line="+1"/>
         <source>Low</source>
-        <translation>Düşük</translation>
+        <translation>Baixa</translation>
     </message>
     <message>
         <location filename="../OptionsDialog.ui" line="+35"/>
         <source>&amp;Priority:</source>
-        <translation>&amp;Öncelik:</translation>
+        <translation>&amp;Prioridade:</translation>
     </message>
     <message>
         <location line="+13"/>
         <source>S&amp;tart when added</source>
-        <translation>&amp;Eklendiğinde başlat</translation>
+        <translation>Inic&amp;iar após adicionar</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Mo&amp;ve .torrent file to the trash</source>
-        <translation>.torrent dosyasını çöpe &amp;taşı</translation>
+        <translation>Mo&amp;ver ficheiro .torrent para o Lixo</translation>
     </message>
     <message>
         <location filename="../OptionsDialog.cc" line="-40"/>
         <source>Torrent Files (*.torrent);;All Files (*.*)</source>
-        <translation>Torrent Dosyaları (.torrent);;Tüm Dosyalar(*.*)</translation>
+        <translation>Ficheiros torrent (*.torrent);;Todos os ficheiros (*.*)</translation>
     </message>
     <message>
         <location line="+24"/>
         <source>Select Destination</source>
-        <translation>Hedef Seç</translation>
+        <translation>Selecionar destino</translation>
     </message>
 </context>
 <context>
@@ -1615,17 +1628,17 @@ Başka ana URL eklemek için, onu boş bir satırdan sonra ekleyin.</translation
         <location filename="../PathButton.cc" line="+23"/>
         <location line="+71"/>
         <source>(None)</source>
-        <translation>(Yok)</translation>
+        <translation>(Nenhum)</translation>
     </message>
     <message>
         <location line="+86"/>
         <source>Select Folder</source>
-        <translation>Klasör Seç</translation>
+        <translation>Selecionar pasta</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Select File</source>
-        <translation>Dosya Seç</translation>
+        <translation>Selecionar ficheiro</translation>
     </message>
 </context>
 <context>
@@ -1633,107 +1646,107 @@ Başka ana URL eklemek için, onu boş bir satırdan sonra ekleyin.</translation
     <message>
         <location filename="../PrefsDialog.ui" line="+1223"/>
         <source>Use &amp;authentication</source>
-        <translation>&amp;Yetkilendirme kullan</translation>
+        <translation>Usar &amp;autenticação</translation>
     </message>
     <message>
         <location line="+10"/>
         <source>&amp;Username:</source>
-        <translation>&amp;Kullanıcı Adı:</translation>
+        <translation>Nome de &amp;utilizador:</translation>
     </message>
     <message>
         <location line="+13"/>
         <source>Pass&amp;word:</source>
-        <translation>Paro&amp;la:</translation>
+        <translation>Palavra-&amp;passe:</translation>
     </message>
     <message>
         <location line="-53"/>
         <source>&amp;Open web client</source>
-        <translation>Web istemcisini &amp;aç</translation>
+        <translation>&amp;Abrir cliente Web</translation>
     </message>
     <message>
         <location line="+80"/>
         <source>Addresses:</source>
-        <translation>Adresler:</translation>
+        <translation>Endereços:</translation>
     </message>
     <message>
         <location line="-1234"/>
         <source>Speed Limits</source>
-        <translation>Hız Sınırları</translation>
+        <translation>Limites de velocidade</translation>
     </message>
     <message>
         <location line="+99"/>
         <source>&lt;small&gt;Override normal speed limits manually or at scheduled times&lt;/small&gt;</source>
-        <translation>&lt;small&gt;Normal hız sınırlarını elle veya belirlenmiş zamanlarda geçersiz kıl&lt;small&gt;</translation>
+        <translation>&lt;small&gt;Anular limites de velocidade normais manualmente ou em tempos programados&lt;/small&gt;</translation>
     </message>
     <message>
         <location line="+47"/>
         <source>&amp;Scheduled times:</source>
-        <translation>&amp;Planlanmış zaman:</translation>
+        <translation>&amp;Tempos Programados:</translation>
     </message>
     <message>
         <location line="+44"/>
         <source>&amp;On days:</source>
-        <translation>&amp;Şu günler:</translation>
+        <translation>&amp;Dias ligados:</translation>
     </message>
     <message>
         <location filename="../PrefsDialog.cc" line="+388"/>
         <source>Every Day</source>
-        <translation>Her Gün</translation>
+        <translation>Todos os dias</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Weekdays</source>
-        <translation>Hafta İçi</translation>
+        <translation>Dias úteis</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Weekends</source>
-        <translation>Hafta Sonu</translation>
+        <translation>Fins de semana</translation>
     </message>
     <message>
         <location line="-238"/>
         <source>Sunday</source>
-        <translation>Pazar</translation>
+        <translation>Domingo</translation>
     </message>
     <message>
         <location line="-18"/>
         <source>Monday</source>
-        <translation>Pazartesi</translation>
+        <translation>Segunda-feira</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Tuesday</source>
-        <translation>Salı</translation>
+        <translation>Terça-feira</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Wednesday</source>
-        <translation>Çarşamba</translation>
+        <translation>Quarta-feira</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Thursday</source>
-        <translation>Perşembe</translation>
+        <translation>Quinta-feira</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Friday</source>
-        <translation>Cuma</translation>
+        <translation>Sexta-feira</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Saturday</source>
-        <translation>Cumartesi</translation>
+        <translation>Sábado</translation>
     </message>
     <message>
         <location line="+299"/>
         <source>Port is &lt;b&gt;open&lt;/b&gt;</source>
-        <translation>Bağlantı noktası &lt;b&gt;açık&lt;/b&gt;</translation>
+        <translation>A porta está &lt;b&gt;aberta&lt;/b&gt;</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Port is &lt;b&gt;closed&lt;/b&gt;</source>
-        <translation>Bağlantı noktası &lt;b&gt;kapalı&lt;/b&gt;</translation>
+        <translation>A porta está &lt;b&gt;fechada&lt;/b&gt;</translation>
     </message>
     <message>
         <location line="+159"/>
@@ -1743,45 +1756,46 @@ Başka ana URL eklemek için, onu boş bir satırdan sonra ekleyin.</translation
     <message>
         <location filename="../PrefsDialog.ui" line="+545"/>
         <source>Incoming Peers</source>
-        <translation>Gelen Eşler</translation>
+        <translation>Peers a chegar</translation>
     </message>
     <message>
         <location line="+32"/>
         <location filename="../PrefsDialog.cc" line="+207"/>
         <source>Status unknown</source>
-        <translation>Durum bilinmiyor </translation>
+        <translation>Estado desconhecido</translation>
     </message>
     <message>
         <location line="-20"/>
         <source>&amp;Port for incoming connections:</source>
-        <translation>Gelen bağlantılar için &amp;bağlantı noktası:</translation>
+        <translation>&amp;Porta para ligações recebidas:</translation>
     </message>
     <message>
         <location line="+44"/>
         <source>Use UPnP or NAT-PMP port &amp;forwarding from my router</source>
-        <translation>Yönelticimden &amp;yönlendirirken UPnP ya da NAT-PMP bağlantı noktasını kullan</translation>
+        <translation>Usar &amp;encaminhamento de portas UPnP ou NAT-PMP apartir do router</translation>
     </message>
     <message>
         <location line="+107"/>
         <source>Options</source>
-        <translation>Seçenekler</translation>
+        <translation>Opções</translation>
     </message>
     <message>
         <location line="+15"/>
         <source>Enable &amp;uTP for peer connections</source>
-        <translation>Eş bağlantıları için &amp;uTP&apos;yi etkinleştir</translation>
+        <translation>Ativar &amp;uTP para ligações peer</translation>
     </message>
     <message>
         <location line="-3"/>
         <source>uTP is a tool for reducing network congestion.</source>
-        <translation>uTP, ağ tıkanıklığını azaltmaya yarayan araçtır. </translation>
+        <translation>uTP é uma ferramenta para reduzir a congestão da rede.</translation>
     </message>
     <message numerus="yes">
         <location filename="../PrefsDialog.cc" line="-255"/>
         <source> minute(s)</source>
         <extracomment>Spin box suffix, &quot;Stop seeding if idle for: [ 5 minutes ]&quot; (includes leading space after the number, if needed)</extracomment>
         <translation>
-            <numerusform>dakika</numerusform>
+            <numerusform>minuto</numerusform>
+            <numerusform>minutos</numerusform>
         </translation>
     </message>
     <message>
@@ -1794,203 +1808,206 @@ Başka ana URL eklemek için, onu boş bir satırdan sonra ekleyin.</translation
         <source> minute(s) ago</source>
         <extracomment>Spin box suffix, &quot;Download is inactive if data sharing stopped: [ 5 minutes ago ]&quot; (includes leading space after the number, if needed)</extracomment>
         <translation>
-            <numerusform> dakika önce</numerusform>
+            <numerusform>minuto</numerusform>
+            <numerusform>minutos</numerusform>
         </translation>
     </message>
     <message>
         <location filename="../PrefsDialog.ui" line="-663"/>
         <source>Automatically add .torrent files &amp;from:</source>
-        <translation>Torrentlerin kendiliğinden &amp;eklendiği yer:</translation>
+        <translation>Adicionar ficheiros .torrent automaticamente &amp;apartir de:</translation>
     </message>
     <message>
         <location line="+27"/>
         <source>Show the Torrent Options &amp;dialog</source>
-        <translation>Torrent seçenekleri &amp;ileti penceresini göster</translation>
+        <translation>Mostrar &amp;Opções de Torrent</translation>
     </message>
     <message>
         <location line="-17"/>
         <source>&amp;Start added torrents</source>
-        <translation>Eklenen torrentleri &amp;başlat</translation>
+        <translation>&amp;Iniciar torrents adicionados</translation>
     </message>
     <message>
         <location line="+24"/>
         <source>Mo&amp;ve the .torrent file to the trash</source>
-        <translation>.torrent dosyasını çöpe ta&amp;şı</translation>
+        <translation>Mo&amp;ver o ficheiro .torrent para o Lixo</translation>
     </message>
     <message>
         <location line="+62"/>
         <source>Download Queue</source>
-        <translation>İndirme Sırası</translation>
+        <translation>Fila de Transferência</translation>
     </message>
     <message>
         <location line="+12"/>
         <source>Ma&amp;ximum active downloads:</source>
-        <translation>En çok &amp;etkin indirme sayısı:</translation>
+        <translation>Transferências ativas &amp;máximas:</translation>
     </message>
     <message>
         <location line="+67"/>
         <source>Incomplete</source>
-        <translation>Tamamlanmayan</translation>
+        <translation>Incompleto</translation>
     </message>
     <message>
         <location line="+79"/>
         <source>Seeding</source>
-        <translation>Gönderme</translation>
+        <translation>A enviar</translation>
     </message>
     <message>
         <location line="+622"/>
         <source>Remote</source>
-        <translation>Uzak</translation>
+        <translation>Remoto</translation>
     </message>
     <message numerus="yes">
         <location filename="../PrefsDialog.cc" line="+168"/>
         <source>&lt;i&gt;Blocklist contains %Ln rule(s)&lt;/i&gt;</source>
         <translation>
-            <numerusform>&lt;i&gt;Karaliste %Ln kurallar içeriyor&lt;i&gt;</numerusform>
+            <numerusform>&lt;i&gt;Lista de bloqueio contém regra %Ln&lt;/i&gt;</numerusform>
+            <numerusform>&lt;i&gt;A lista de bloqueio contém %Ln regras&lt;/i&gt;</numerusform>
         </translation>
     </message>
     <message>
         <location filename="../PrefsDialog.ui" line="-339"/>
         <source>Pick a &amp;random port every time Transmission is started</source>
-        <translation>Transmission her başladığında &amp;rastgele bağlantı noktası seç</translation>
+        <translation>Escolher uma porta &amp;aleatória sempre que o Transmission é iníciado</translation>
     </message>
     <message>
         <location line="-274"/>
         <source>Limits</source>
-        <translation>Sınırlar</translation>
+        <translation>Limites</translation>
     </message>
     <message>
         <location line="+321"/>
         <source>Maximum peers per &amp;torrent:</source>
-        <translation>&amp;Torrent başına azami eş sayısı</translation>
+        <translation>Peers máximos por &amp;torrent:</translation>
     </message>
     <message>
         <location line="+23"/>
         <source>Maximum peers &amp;overall:</source>
-        <translation>&amp;Genel azami eş sayısı</translation>
+        <translation>Peers máximos &amp;globais:</translation>
     </message>
     <message numerus="yes">
         <location filename="../PrefsDialog.cc" line="-253"/>
         <source>&lt;b&gt;Update succeeded!&lt;/b&gt;&lt;p&gt;Blocklist now has %Ln rule(s).</source>
         <translation>
-            <numerusform>&lt;b&gt;Güncelleme başarılı!&lt;/b&gt;&lt;p&gt;Engelli listesinde şimdi %Ln kural var.</numerusform>
+            <numerusform>&lt;b&gt;Atualizada com sucesso!&lt;/b&gt;&lt;p&gt;A lista de bloqueio tem agora %Ln regra.</numerusform>
+            <numerusform>&lt;b&gt;Atualizada com sucesso!&lt;/b&gt;&lt;p&gt;A lista de bloqueio tem agora %Ln regras.</numerusform>
         </translation>
     </message>
     <message>
         <location line="+9"/>
         <source>&lt;b&gt;Update Blocklist&lt;/b&gt;&lt;p&gt;Getting new blocklist...</source>
-        <translation>&lt;b&gt;Engel Listesini Güncelle&lt;b&gt;&lt;p&gt;Yeni engel listesi alınıyor...</translation>
+        <translation>&lt;b&gt;Atualizar lista de bloqueio&lt;/b&gt;&lt;p&gt;A obter uma nova lista de bloqueio...</translation>
     </message>
     <message>
         <location filename="../PrefsDialog.ui" line="-193"/>
         <source>Blocklist</source>
-        <translation>Engel Listesi</translation>
+        <translation>Lista de bloqueio</translation>
     </message>
     <message>
         <location line="+42"/>
         <source>Enable &amp;automatic updates</source>
-        <translation>&amp;Kendiliğinden güncelleştirmeleri etkinleştir</translation>
+        <translation>Ativar atualizações &amp;automáticas</translation>
     </message>
     <message>
         <location filename="../PrefsDialog.cc" line="+17"/>
         <source>Allow encryption</source>
-        <translation>Şifrelemeye izin ver</translation>
+        <translation>Permitir encriptação</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Prefer encryption</source>
-        <translation>Şifrelemeyi yeğle</translation>
+        <translation>Preferir encriptação</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Require encryption</source>
-        <translation>Şifreleme gerekli</translation>
+        <translation>Requerer encriptação</translation>
     </message>
     <message>
         <location filename="../PrefsDialog.ui" line="-97"/>
         <source>Privacy</source>
-        <translation>Gizlilik</translation>
+        <translation>Privacidade</translation>
     </message>
     <message>
         <location line="-435"/>
         <source>&amp;to</source>
-        <translation>&amp;ile</translation>
+        <translation>&amp;a</translation>
     </message>
     <message>
         <location line="+847"/>
         <location line="+9"/>
         <source>Desktop</source>
-        <translation>Masaüstü</translation>
+        <translation>Secretária</translation>
     </message>
     <message>
         <location line="+12"/>
         <source>Show Transmission icon in the &amp;notification area</source>
-        <translation>Transmission simgesini &amp;bildirim alanında göster</translation>
+        <translation>Mostrar o ícone do Transmission na área de &amp;notificações</translation>
     </message>
     <message>
         <location line="-265"/>
         <source>Te&amp;st Port</source>
-        <translation>Bağlantı Noktasını Sı&amp;na</translation>
+        <translation>Porta de &amp;Teste</translation>
     </message>
     <message>
         <location line="-101"/>
         <source>Enable &amp;blocklist:</source>
-        <translation>&amp;Engel listesini etkinleştir:</translation>
+        <translation>Ativar &amp;lista de bloqueio:</translation>
     </message>
     <message>
         <location line="+20"/>
         <source>&amp;Update</source>
-        <translation>&amp;Güncelle</translation>
+        <translation>&amp;Atualizar</translation>
     </message>
     <message>
         <location line="-66"/>
         <source>&amp;Encryption mode:</source>
-        <translation>&amp;Şifreleme kipi:</translation>
+        <translation>Modo de &amp;encriptação:</translation>
     </message>
     <message>
         <location line="+505"/>
         <source>Remote Control</source>
-        <translation>Uzaktan Denetim</translation>
+        <translation>Controlo à Distância</translation>
     </message>
     <message>
         <location line="+12"/>
         <source>Allow &amp;remote access</source>
-        <translation>Uzaktan &amp;erişime izin ver</translation>
+        <translation>Permitir acesso &amp;remoto</translation>
     </message>
     <message>
         <location line="+20"/>
         <source>HTTP &amp;port:</source>
-        <translation>HTTP &amp;bağlantı noktası:</translation>
+        <translation>&amp;Porta HTTP:</translation>
     </message>
     <message>
         <location line="+60"/>
         <source>Only allow these IP a&amp;ddresses:</source>
-        <translation>Yalnızca şu IP a&amp;dreslerine izni ver:</translation>
+        <translation>Permitir apenas estes &amp;endereços de IP:</translation>
     </message>
     <message>
         <location line="-1212"/>
         <source>&amp;Upload:</source>
-        <translation>&amp;Yükleme:</translation>
+        <translation>&amp;Carregamento:</translation>
     </message>
     <message>
         <location line="+20"/>
         <source>&amp;Download:</source>
-        <translation>&amp;İndirme:</translation>
+        <translation>&amp;Transferência:</translation>
     </message>
     <message>
         <location line="+46"/>
         <source>Alternative Speed Limits</source>
-        <translation>Alternatif Hız Sınırları</translation>
+        <translation>Limites de Velocidade Alternativos</translation>
     </message>
     <message>
         <location line="+28"/>
         <source>U&amp;pload:</source>
-        <translation>&amp;Yükleme:</translation>
+        <translation>&amp;Carregamento:</translation>
     </message>
     <message>
         <location line="+20"/>
         <source>Do&amp;wnload:</source>
-        <translation>&amp;İndirme:</translation>
+        <translation>&amp;Transferência:</translation>
     </message>
     <message>
         <location line="+186"/>
@@ -2025,148 +2042,148 @@ Başka ana URL eklemek için, onu boş bir satırdan sonra ekleyin.</translation
     <message>
         <location line="+60"/>
         <source>Start &amp;minimized in notification area</source>
-        <translation>Bildirim alanında &amp;küçültülmüş olarak başlat</translation>
+        <translation>Íniciar &amp;minimizado na área de notificações</translation>
     </message>
     <message>
         <location line="+28"/>
         <source>Notification</source>
-        <translation>Bildirim</translation>
+        <translation>Notificação</translation>
     </message>
     <message>
         <location line="+12"/>
         <source>Show a notification when torrents are a&amp;dded</source>
-        <translation>Torrent &amp;eklendiğinde bildirim göster</translation>
+        <translation>Mostrar uma notificação quando são &amp;adicionados torrents</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Show a notification when torrents &amp;finish</source>
-        <translation>Torrent &amp;bittiğinde bildirim göster</translation>
+        <translation>Mostrar uma notificação quando os torrents &amp;concluírem</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Play a &amp;sound when torrents finish</source>
-        <translation>Torrent bittiğinde &amp;ses çal</translation>
+        <translation>Tocar um &amp;som quando concluírem torrents</translation>
     </message>
     <message>
         <location filename="../PrefsDialog.cc" line="-78"/>
         <source>Testing TCP Port...</source>
-        <translation>TCP Bağlantı Noktası Sınanıyor…</translation>
+        <translation>A testar porta TCP...</translation>
     </message>
     <message>
         <location filename="../PrefsDialog.ui" line="-281"/>
         <source>Peer Limits</source>
-        <translation>Eş Sınırları</translation>
+        <translation>Limites do peer</translation>
     </message>
     <message>
         <location line="+104"/>
         <source>Use PE&amp;X to find more peers</source>
-        <translation>Daha çok eş bulmak için PE&amp;X kullan</translation>
+        <translation>Utilizar &amp;PEX para encontrar mais peers</translation>
     </message>
     <message>
         <location line="-3"/>
         <source>PEX is a tool for exchanging peer lists with the peers you&apos;re connected to.</source>
-        <translation>PEX bağlı olduğunuz eşlerle, eş listenizi paylaşmanıza yarayan bir araçtır.</translation>
+        <translation>PEX é uma ferramenta de intercâmbio de listas de peers com os peers que está ligado.</translation>
     </message>
     <message>
         <location line="+13"/>
         <source>Use &amp;DHT to find more peers</source>
-        <translation>Daha çok eş bulmak için &amp;DHT kullan</translation>
+        <translation>Utilizar &amp;DHT para encontrar mais peers</translation>
     </message>
     <message>
         <location line="-3"/>
         <source>DHT is a tool for finding peers without a tracker.</source>
-        <translation>DHT, izleyiciye gereksinim olmadan eş bulma aracıdır.</translation>
+        <translation>DHT é uma ferramenta para encontrar peers sem um tracker.</translation>
     </message>
     <message>
         <location line="+13"/>
         <source>Use &amp;Local Peer Discovery to find more peers</source>
-        <translation>Daha çok eş bulmak için &amp;Yerel Eş Keşfini kullan</translation>
+        <translation>Usar &amp;Descoberta de peers locais para encontrar mais peers</translation>
     </message>
     <message>
         <location line="-3"/>
         <source>LPD is a tool for finding peers on your local network.</source>
-        <translation>LPD yerel ağınızda eşleri bulmanıza yardımcı bir araçtır.</translation>
+        <translation>LPD é uma ferramenta para encontrar peers na rede local.</translation>
     </message>
     <message>
         <location line="-325"/>
         <source>Encryption</source>
-        <translation>Şifreleme</translation>
+        <translation>Encriptação</translation>
     </message>
     <message>
         <location filename="../PrefsDialog.cc" line="+153"/>
         <source>Select Incomplete Directory</source>
-        <translation>Tamamlanmayan Klasörünü Seç</translation>
+        <translation>Selecionar Diretório Incompleto</translation>
     </message>
     <message>
         <location line="-2"/>
         <source>Select Watch Directory</source>
-        <translation>İzlenen Klasörü Seç</translation>
+        <translation>Selecionar Diretório a Observar</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Select Destination</source>
-        <translation>Hedef Seç</translation>
+        <translation>Selecionar Destino</translation>
     </message>
     <message>
         <location filename="../PrefsDialog.ui" line="-387"/>
         <source>Adding</source>
-        <translation>Ekleme</translation>
+        <translation>A adicionar</translation>
     </message>
     <message>
         <location line="+147"/>
         <source>Download is i&amp;nactive if data sharing stopped:</source>
         <extracomment>Please keep this phrase as short as possible, it&apos;s curently the longest and influences dialog width</extracomment>
-        <translation>Veri paylaşımı durduğunda indirme işlemini durdur:</translation>
+        <translation>A transferência está &amp;inativa se a partilha de dados parar:</translation>
     </message>
     <message>
         <location line="-156"/>
         <source>Downloading</source>
-        <translation>İndirme</translation>
+        <translation>A Transferir</translation>
     </message>
     <message>
         <location line="+215"/>
         <source>Append &quot;.&amp;part&quot; to incomplete files&apos; names</source>
-        <translation>Tamamlanmayan dosya adlarının sonuna &quot;.&amp;part&quot; ekle</translation>
+        <translation>Anexar &quot;.&amp;part&quot; a nomes de ficheiros incompletos</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Keep &amp;incomplete files in:</source>
-        <translation>&amp;Tamamlanmayan torrentleri şurada tut:</translation>
+        <translation>Manter ficheiros &amp;incompletos em:</translation>
     </message>
     <message>
         <location line="-201"/>
         <source>Save to &amp;Location:</source>
-        <translation>&amp;Konuma Kaydet:</translation>
+        <translation>Guardar para &amp;localização:</translation>
     </message>
     <message>
         <location line="+282"/>
         <source>Stop seeding at &amp;ratio:</source>
-        <translation>&amp;Orana ulaşılınca göndermeyi durdur:</translation>
+        <translation>Parar de efetuar seed no &amp;rácio:</translation>
     </message>
     <message>
         <location line="+20"/>
         <source>Stop seedi&amp;ng if idle for:</source>
-        <translation>Eğer boş beklerse &amp;göndermeyi durdur:</translation>
+        <translation>Parar de efetuar &amp;seed se inativo durante:</translation>
     </message>
     <message>
         <location line="-567"/>
         <source>Transmission Preferences</source>
-        <translation>Transmission Tercihleri</translation>
+        <translation>Preferências do Transmission</translation>
     </message>
     <message>
         <location line="+16"/>
         <source>Speed</source>
-        <translation>Hız</translation>
+        <translation>Velocidade</translation>
     </message>
     <message>
         <location line="+735"/>
         <source>Network</source>
-        <translation>Ağ</translation>
+        <translation>Rede</translation>
     </message>
     <message>
         <location filename="../PrefsDialog.cc" line="+116"/>
         <source>Not supported by remote sessions</source>
-        <translation>Uzak oturumlarca desteklenmiyor</translation>
+        <translation>Não suportado em sessões remotas</translation>
     </message>
 </context>
 <context>
@@ -2174,7 +2191,7 @@ Başka ana URL eklemek için, onu boş bir satırdan sonra ekleyin.</translation
     <message>
         <location filename="../Application.cc" line="-277"/>
         <source>Invalid option</source>
-        <translation>Geçersiz seçenek</translation>
+        <translation>Opção inválida</translation>
     </message>
     <message>
         <location line="+305"/>
@@ -2187,32 +2204,32 @@ Başka ana URL eklemek için, onu boş bir satırdan sonra ekleyin.</translation
     <message>
         <location filename="../RelocateDialog.cc" line="+63"/>
         <source>Select Location</source>
-        <translation>Konum Seç</translation>
+        <translation>Selecionar localização</translation>
     </message>
     <message>
         <location filename="../RelocateDialog.ui" line="+14"/>
         <source>Set Torrent Location</source>
-        <translation>Torrent Konumunu Ayarla</translation>
+        <translation>Definir localização do torrent</translation>
     </message>
     <message>
         <location line="+12"/>
         <source>Set Location</source>
-        <translation>Konumu Ayarla</translation>
+        <translation>Definir localização</translation>
     </message>
     <message>
         <location line="+12"/>
         <source>New &amp;location:</source>
-        <translation>Yeni &amp;konum</translation>
+        <translation>Nova &amp;localização:</translation>
     </message>
     <message>
         <location line="+13"/>
         <source>&amp;Move from the current folder</source>
-        <translation>Şu anki dizinden &amp;taşı</translation>
+        <translation>&amp;Mover a partir da pasta atual</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Local data is &amp;already there</source>
-        <translation>Yerel veri &amp;zaten orada</translation>
+        <translation>Dados locais &amp;já estão aí</translation>
     </message>
 </context>
 <context>
@@ -2220,35 +2237,37 @@ Başka ana URL eklemek için, onu boş bir satırdan sonra ekleyin.</translation
     <message>
         <location filename="../Session.cc" line="+510"/>
         <source>Error Renaming Path</source>
-        <translation>Yolu Yeniden Adlandırırken Hata</translation>
+        <translation>Erro ao Renomear Caminho</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>&lt;p&gt;&lt;b&gt;Unable to rename &quot;%1&quot; as &quot;%2&quot;: %3.&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Please correct the errors and try again.&lt;/p&gt;</source>
-        <translation>&lt;p&gt;&lt;b&gt;&quot;%1&quot;, &quot;%2&quot; olarak yeniden adlandırılamadı: %3.&lt;b&gt;&lt;p&gt;&lt;p&gt;Lütfen hataları düzeltip yeniden deneyin.&lt;p&gt;</translation>
+        <translation>&lt;p&gt;&lt;b&gt;Incapaz de renomear &quot;%1&quot; para &quot;%2&quot;: %3.&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Por favor corrige os erros e tente novamente.&lt;/p&gt;</translation>
     </message>
     <message>
         <location line="+531"/>
         <source>Error Adding Torrent</source>
-        <translation>Torrent Eklenirken Hata</translation>
+        <translation>Erro ao Adicionar Torrent</translation>
     </message>
     <message>
         <location line="+57"/>
         <source>%1 (copy of %2)</source>
-        <translation>%1 (%2 kopyası)</translation>
+        <translation>%1 (cópia de %2)</translation>
     </message>
     <message numerus="yes">
         <location line="+6"/>
         <source>Duplicate Torrent(s)</source>
         <translation>
-            <numerusform>Yinelenen Torrent</numerusform>
+            <numerusform>Torrent duplicado</numerusform>
+            <numerusform>Torrents duplicados</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location line="+2"/>
         <source>Unable to add %n duplicate torrent(s)</source>
         <translation>
-            <numerusform>%n yinelenen torrent eklenemiyor</numerusform>
+            <numerusform>Não foi possível adicionar %n torrent duplicado</numerusform>
+            <numerusform>Não foi possível adicionar %n torrents duplicados</numerusform>
         </translation>
     </message>
 </context>
@@ -2257,47 +2276,47 @@ Başka ana URL eklemek için, onu boş bir satırdan sonra ekleyin.</translation
     <message>
         <location filename="../SessionDialog.ui" line="+14"/>
         <source>Change Session</source>
-        <translation>Oturumu Değiştir</translation>
+        <translation>Alterar sessão</translation>
     </message>
     <message>
         <location line="+12"/>
         <source>Source</source>
-        <translation>Kaynak</translation>
+        <translation>Fonte</translation>
     </message>
     <message>
         <location line="+12"/>
         <source>Start &amp;Local Session</source>
-        <translation>&amp;Yerel Oturum Başlat</translation>
+        <translation>Íniciar Sessão &amp;Local</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Connect to &amp;Remote Session</source>
-        <translation>&amp;Uzak Oturuma Bağlan</translation>
+        <translation>Ligar-se a Sessão Remota</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>&amp;Host:</source>
-        <translation>&amp;Sunucu:</translation>
+        <translation>&amp;Anfitrião:</translation>
     </message>
     <message>
         <location line="+13"/>
         <source>&amp;Port:</source>
-        <translation>&amp;Bağlantı noktası:</translation>
+        <translation>&amp;Porta:</translation>
     </message>
     <message>
         <location line="+20"/>
         <source>&amp;Authentication required</source>
-        <translation>&amp;Yetkilendirme gerekli</translation>
+        <translation>&amp;Autenticação Necessária</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>&amp;Username:</source>
-        <translation>&amp;Kullanıcı adı</translation>
+        <translation>Nome de &amp;utilizador:</translation>
     </message>
     <message>
         <location line="+13"/>
         <source>Pass&amp;word:</source>
-        <translation>Parola</translation>
+        <translation>Palavra-&amp;passe:</translation>
     </message>
 </context>
 <context>
@@ -2305,47 +2324,48 @@ Başka ana URL eklemek için, onu boş bir satırdan sonra ekleyin.</translation
     <message>
         <location filename="../StatsDialog.ui" line="+14"/>
         <source>Statistics</source>
-        <translation>İstatistikler</translation>
+        <translation>Estatísticas</translation>
     </message>
     <message>
         <location line="+12"/>
         <source>Current Session</source>
-        <translation>Geçerli Oturum</translation>
+        <translation>Sessão atual</translation>
     </message>
     <message>
         <location line="+12"/>
         <location line="+96"/>
         <source>Uploaded:</source>
-        <translation>Gönderildi:</translation>
+        <translation>Carregado:</translation>
     </message>
     <message>
         <location line="-82"/>
         <location line="+96"/>
         <source>Downloaded:</source>
-        <translation>İndirildi:</translation>
+        <translation>Transferido:</translation>
     </message>
     <message>
         <location line="-82"/>
         <location line="+96"/>
         <source>Ratio:</source>
-        <translation>Oran:</translation>
+        <translation>Rácio:</translation>
     </message>
     <message>
         <location line="-82"/>
         <location line="+96"/>
         <source>Duration:</source>
-        <translation>Süre:</translation>
+        <translation>Duração:</translation>
     </message>
     <message>
         <location line="-61"/>
         <source>Total</source>
-        <translation>Toplam</translation>
+        <translation>Total</translation>
     </message>
     <message numerus="yes">
         <location filename="../StatsDialog.cc" line="+63"/>
         <source>Started %Ln time(s)</source>
         <translation>
-            <numerusform>%Ln defa başladı</numerusform>
+            <numerusform>Íniciado %Ln vez</numerusform>
+            <numerusform>Íniciado %Ln vezes</numerusform>
         </translation>
     </message>
 </context>
@@ -2354,57 +2374,57 @@ Başka ana URL eklemek için, onu boş bir satırdan sonra ekleyin.</translation
     <message>
         <location filename="../Torrent.cc" line="+308"/>
         <source>Verifying local data</source>
-        <translation>Yerel veri doğrulanıyor</translation>
+        <translation>Verificar dados locais</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Downloading</source>
-        <translation>İndiriliyor</translation>
+        <translation>A transferir</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Seeding</source>
-        <translation>Gönderiliyor</translation>
+        <translation>A enviar</translation>
     </message>
     <message>
         <location line="-24"/>
         <source>Finished</source>
-        <translation>Bitti</translation>
+        <translation>Terminado</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Paused</source>
-        <translation>Duraklatıldı</translation>
+        <translation>Em pausa</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Queued for verification</source>
-        <translation>Doğrulama için kuyrukta</translation>
+        <translation>Em fila para verificação</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Queued for download</source>
-        <translation>İndirme sırasına eklendi</translation>
+        <translation>Em fila para transferência</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Queued for seeding</source>
-        <translation>Gönderme kuyruğuna eklendi</translation>
+        <translation>Em fila para carregamento</translation>
     </message>
     <message>
         <location line="+18"/>
         <source>Tracker gave a warning: %1</source>
-        <translation>İzleyici bir uyarı verdi: %1</translation>
+        <translation>O tracker devolveu um aviso: %1</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Tracker gave an error: %1</source>
-        <translation>İzleyici bir hata verdi: %1</translation>
+        <translation>O tracker devolveu um erro: %1</translation>
     </message>
     <message>
         <location line="+4"/>
         <source>Error: %1</source>
-        <translation>Hata: %1</translation>
+        <translation>Erro: %1</translation>
     </message>
 </context>
 <context>
@@ -2413,68 +2433,70 @@ Başka ana URL eklemek için, onu boş bir satırdan sonra ekleyin.</translation
         <location filename="../TorrentDelegate.cc" line="+171"/>
         <source>Magnetized transfer - retrieving metadata (%1%)</source>
         <extracomment>First part of torrent progress string, %1 is the percentage of torrent metadata downloaded</extracomment>
-        <translation>Mıknatıslı aktarım - üst veri alınıyor (%%1)</translation>
+        <translation>Transferência magnetizada - A consultar metadados (%1%)</translation>
     </message>
     <message>
         <location line="+9"/>
         <source>%1 of %2 (%3%)</source>
         <extracomment>First part of torrent progress string, %1 is how much we&apos;ve got, %2 is how much we&apos;ll have when done, %3 is a percentage of the two</extracomment>
-        <translation>%1 / %2 (%%3)</translation>
+        <translation>%1 de %2 (%3%)</translation>
     </message>
     <message>
         <location line="+16"/>
         <source>%1 of %2 (%3%), uploaded %4 (Ratio: %5 Goal: %6)</source>
         <extracomment>First part of torrent progress string, %1 is how much we&apos;ve got, %2 is the torrent&apos;s total size, %3 is a percentage of the two, %4 is how much we&apos;ve uploaded, %5 is our upload-to-download ratio, %6 is the ratio we want to reach before we stop uploading</extracomment>
-        <translation>%1 / %2 (%%3), Gönderilen: %4 (Oran: %5 Hedef: %6)</translation>
+        <translation>%1 de %2 (%3%), carregado %4 (Rácio: %5 Objetivo: %6)</translation>
     </message>
     <message>
         <location line="+16"/>
         <source>%1 of %2 (%3%), uploaded %4 (Ratio: %5)</source>
         <extracomment>First part of torrent progress string, %1 is how much we&apos;ve got, %2 is the torrent&apos;s total size, %3 is a percentage of the two, %4 is how much we&apos;ve uploaded, %5 is our upload-to-download ratio</extracomment>
-        <translation>%1 / %2 (%%3), Gönderilen: %4 (Oran: %5)</translation>
+        <translation>%1 de %2 (%3%), carregado %4 (Rácio: %5)</translation>
     </message>
     <message>
         <location line="+17"/>
         <source>%1, uploaded %2 (Ratio: %3 Goal: %4)</source>
         <extracomment>First part of torrent progress string, %1 is the torrent&apos;s total size, %2 is how much we&apos;ve uploaded, %3 is our upload-to-download ratio, %4 is the ratio we want to reach before we stop uploading</extracomment>
-        <translation>%1, Gönderilen: %2 (Oran: %3 Hedef: %4)</translation>
+        <translation>%1, carregado %2 (Rácio: %3 Objetivo: %4)</translation>
     </message>
     <message>
         <location line="+12"/>
         <source>%1, uploaded %2 (Ratio: %3)</source>
         <extracomment>First part of torrent progress string, %1 is the torrent&apos;s total size, %2 is how much we&apos;ve uploaded, %3 is our upload-to-download ratio</extracomment>
-        <translation>%1, Gönderilen: %2 (Oran: %3)</translation>
+        <translation>%1, carregado %2 (Rácio: %3)</translation>
     </message>
     <message>
         <location line="+15"/>
         <source> - %1 left</source>
         <extracomment>Second (optional) part of torrent progress string, %1 is duration, notice that leading space (before the dash) is included here</extracomment>
-        <translation> - %1 kaldı</translation>
+        <translation> - Tempo restante: %1</translation>
     </message>
     <message>
         <location line="+6"/>
         <source> - Remaining time unknown</source>
         <extracomment>Second (optional) part of torrent progress string, notice that leading space (before the dash) is included here</extracomment>
-        <translation> - Kalan zaman bilinmiyor</translation>
+        <translation> - Tempo restante: Desconhecido</translation>
     </message>
     <message>
         <location line="+40"/>
         <source>Ratio: %1</source>
-        <translation>Oran: %1</translation>
+        <translation>Rácio: %1</translation>
     </message>
     <message numerus="yes">
         <location line="+44"/>
         <source>Downloading from %Ln peer(s)</source>
         <extracomment>First part of phrase &quot;Downloading from ... peer(s) and ... web seed(s)&quot;</extracomment>
         <translation>
-            <numerusform>%Ln eşten indiriliyor</numerusform>
+            <numerusform>A transferir de %Ln peer</numerusform>
+            <numerusform>A transferir de %Ln peers</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location line="+22"/>
         <source>Seeding to %Ln peer(s)</source>
         <translation>
-            <numerusform>%Ln eşe gönderiliyor</numerusform>
+            <numerusform>A carregar para %Ln peer</numerusform>
+            <numerusform>A carregar para %Ln peers</numerusform>
         </translation>
     </message>
     <message>
@@ -2486,7 +2508,8 @@ Başka ana URL eklemek için, onu boş bir satırdan sonra ekleyin.</translation
         <location line="-50"/>
         <source>Downloading metadata from %Ln peer(s) (%1% done)</source>
         <translation>
-            <numerusform>%Ln eşinden üstveri indiriliyor (%1% tamamlandı)</numerusform>
+            <numerusform>A transferir metadados de %Ln peer (%1% concluído)</numerusform>
+            <numerusform>A transferir metadados de %Ln peers (%1% concluído)</numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -2494,7 +2517,8 @@ Başka ana URL eklemek için, onu boş bir satırdan sonra ekleyin.</translation
         <source>Downloading from %1 of %Ln connected peer(s)</source>
         <extracomment>First part of phrase &quot;Downloading from ... of ... connected peer(s) and ... web seed(s)&quot;</extracomment>
         <translation>
-            <numerusform>%Ln bağlı eşten %1 tanesinden indiriliyor</numerusform>
+            <numerusform>A transferir de %1 de %Ln peer ligado</numerusform>
+            <numerusform>A transferir de %1 de %Ln peers ligados</numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -2502,20 +2526,22 @@ Başka ana URL eklemek için, onu boş bir satırdan sonra ekleyin.</translation
         <source> and %Ln web seed(s)</source>
         <extracomment>Second (optional) part of phrase &quot;Downloading from ... of ... connected peer(s) and ... web seed(s)&quot;, notice that leading space (before &quot;and&quot;) is included here</extracomment>
         <translation>
-            <numerusform>ve %Ln web beslemeleri</numerusform>
+            <numerusform>e %ln carregamento web</numerusform>
+            <numerusform>e %ln carregamentos web</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location line="+13"/>
         <source>Seeding to %1 of %Ln connected peer(s)</source>
         <translation>
-            <numerusform>%Ln bağlı eşten %1 tanesine gönderiliyor</numerusform>
+            <numerusform>A carregar para %1 de %Ln peer ligado</numerusform>
+            <numerusform>A carregar para %1 de %Ln peers ligados</numerusform>
         </translation>
     </message>
     <message>
         <location line="-76"/>
         <source>Verifying local data (%1% tested)</source>
-        <translation>Yerel veri doğrulanıyor (%%1 doğrulandı)</translation>
+        <translation>A verificar dados locais (%1% verificado)</translation>
     </message>
 </context>
 <context>
@@ -2525,49 +2551,51 @@ Başka ana URL eklemek için, onu boş bir satırdan sonra ekleyin.</translation
         <source>Got a list of%1 %Ln peer(s)%2 %3 ago</source>
         <extracomment>%1 and %2 are replaced with HTML markup, %3 is duration</extracomment>
         <translation>
-            <numerusform>%1 %Ln eşitlerinin bir listesi var %2 %3 önce</numerusform>
+            <numerusform>Obteu-se uma lista de%1 %Ln peer%2 %3 atrás</numerusform>
+            <numerusform>Obteu-se uma lista de%1 %Ln peers%2 %3 atrás</numerusform>
         </translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Peer list request %1timed out%2 %3 ago; will retry</source>
         <extracomment>%1 and %2 are replaced with HTML markup, %3 is duration</extracomment>
-        <translation>Eş listesi istemi %3 önce %1zaman aşımına uğradı%2; yeniden denenecek</translation>
+        <translation>Pedido de peer list %1falhou%2 %3 atrás; A retentar brevemente</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Got an error %1&quot;%2&quot;%3 %4 ago</source>
         <extracomment>%1 and %3 are replaced with HTML markup, %2 is error message, %4 is duration</extracomment>
-        <translation>%1&quot;%2&quot;%3 %4 önce hata alındı</translation>
+        <translation>Obteu-se um erro %1&quot;%2&quot;%3 %4 atrás</translation>
     </message>
     <message>
         <location line="+12"/>
         <source>No updates scheduled</source>
-        <translation>Planlanlı güncelleme yok</translation>
+        <translation>Nenhuma atualização programada</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Asking for more peers in %1</source>
         <extracomment>%1 is duration</extracomment>
-        <translation>%1 içinde daha çok eş sorulacak</translation>
+        <translation>A pedir mais peers em %1</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Queued to ask for more peers</source>
-        <translation>Daha çok eş sayısının sorulması için kuyruğa alındı</translation>
+        <translation>Em fila para pedir mais peers</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Asking for more peers now... &lt;small&gt;%1&lt;/small&gt;</source>
         <extracomment>%1 is duration</extracomment>
-        <translation>Şimdi daha çok eş sayısı soruluyor... &lt;small&gt;%1&lt;/small&gt;</translation>
+        <translation>A pedir mais peers agora... &lt;small&gt;%1&lt;/small&gt;</translation>
     </message>
     <message numerus="yes">
         <location line="+27"/>
         <source>Tracker had%1 %Ln seeder(s)%2</source>
         <extracomment>First part of phrase &quot;Tracker had ... seeder(s) and ... leecher(s) ... ago&quot;, %1 and %2 are replaced with HTML markup</extracomment>
         <translation>
-            <numerusform> İzleyicide %1 %Ln gönderici vardı %2</numerusform>
+            <numerusform>Tracker tinha%1 %Ln seeder%2</numerusform>
+            <numerusform>Tracker tinha%1 %Ln seeders%2</numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -2575,37 +2603,38 @@ Başka ana URL eklemek için, onu boş bir satırdan sonra ekleyin.</translation
         <source> and%1 %Ln leecher(s)%2 %3 ago</source>
         <extracomment>Second part of phrase &quot;Tracker had ... seeder(s) and ... leecher(s) ... ago&quot;, %1 and %2 are replaced with HTML markup, %3 is duration; notice that leading space (before &quot;and&quot;) is included here</extracomment>
         <translation>
-            <numerusform>ve %1 %Ln alıcılar %2 %3 önce</numerusform>
+            <numerusform>e%1 %Ln leecher%2 %3 atrás</numerusform>
+            <numerusform>e%1 %Ln leechers%2 %3 atrás</numerusform>
         </translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Tracker had %1no information%2 on peer counts %3 ago</source>
         <extracomment>%1 and %2 are replaced with HTML markup, %3 is duration</extracomment>
-        <translation>İzleyicinin %3 önce eş sayısıyla ilgili %1bilgisi yoktu%2</translation>
+        <translation>O tracker %1não tinha informação%2 sobre contagens de peer %3 atrás</translation>
     </message>
     <message>
         <location line="-24"/>
         <source>Got a scrape error %1&quot;%2&quot;%3 %4 ago</source>
         <extracomment>%1 and %3 are replaced with HTML markup, %2 is error message, %4 is duration</extracomment>
-        <translation>%1&quot;%2&quot;%3 %4 önce scrape hatası oluştu</translation>
+        <translation>Obteu-se um erro scrape %1&quot;%2&quot;%3 %4 atrás</translation>
     </message>
     <message>
         <location line="+39"/>
         <source>Asking for peer counts in %1</source>
         <extracomment>%1 is duration</extracomment>
-        <translation>%1 içinde eş sayısı sorulacak</translation>
+        <translation>A pedir contagens de peers em %1</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Queued to ask for peer counts</source>
-        <translation>Eş sayısının sorulması için kuyruğa alındı</translation>
+        <translation>Em fila para pedir contagens de peers</translation>
     </message>
     <message>
         <location line="+6"/>
         <source>Asking for peer counts now... &lt;small&gt;%1&lt;/small&gt;</source>
         <extracomment>%1 is duration</extracomment>
-        <translation>Şimdi eş sayısı soruluyor... &lt;small&gt;%1&lt;/small&gt;</translation>
+        <translation>A pedir contagens de peers agora... &lt;small&gt;%1&lt;/small&gt;</translation>
     </message>
 </context>
 <context>
