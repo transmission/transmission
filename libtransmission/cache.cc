@@ -315,9 +315,11 @@ int tr_cacheWriteBlock(
     struct evbuffer* writeme)
 {
     TR_ASSERT(tr_amInEventThread(torrent->session));
+    TR_ASSERT(loc.block_offset == 0);
+    TR_ASSERT(torrent->blockSize(loc.block) == length);
+    TR_ASSERT(torrent->blockSize(loc.block) <= evbuffer_get_length(writeme));
 
-    struct cache_block* cb = findBlock(cache, torrent, loc);
-
+    auto* cb = findBlock(cache, torrent, loc);
     if (cb == nullptr)
     {
         cb = tr_new(struct cache_block, 1);
