@@ -254,17 +254,23 @@ bool trashDataFile(char const* filename, tr_error** error)
 
 - (NSDictionary*)history
 {
-    return @{
+    NSMutableDictionary *history = [NSMutableDictionary dictionaryWithDictionary:@{
         @"InternalTorrentPath" : self.torrentLocation,
         @"TorrentHash" : self.hashString,
         @"Active" : @(self.active),
         @"WaitToStart" : @(self.waitingToStart),
         @"GroupValue" : @(fGroupValue),
         @"RemoveWhenFinishSeeding" : @(_removeWhenFinishSeeding),
-        @"IsMagnet" : @(self.isMagnet),
-        @"MagnetLink" : self.magnetLink,
-        @"MagnetLocation" : self.magnetLocation
-    };
+        @"IsMagnet" : @(self.isMagnet)
+    }];
+
+    if (self.isMagnet)
+    {
+        [history setValue:self.magnetLink forKey:@"MagnetLink"];
+        [history setValue:self.magnetLocation forKey:@"MagnetLocation"];
+    }
+    
+    return history;
 }
 
 - (void)dealloc
@@ -449,7 +455,7 @@ bool trashDataFile(char const* filename, tr_error** error)
             return @(tr_torrentGetDownloadDir(fHandle));
         }
     }
-    return @"";
+    return nil;
 }
 
 - (CGFloat)ratio
