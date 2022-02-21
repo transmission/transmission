@@ -269,7 +269,7 @@ bool trashDataFile(char const* filename, tr_error** error)
         @"RemoveWhenFinishSeeding" : @(_removeWhenFinishSeeding),
         @"IsMagnet" : @(self.isMagnet),
         @"MagnetLink" : self.magnetLink,
-        @"MagnetLocation" : (NSString *)self.magnetLocation
+        @"MagnetLocation" : self.magnetLocation
     };
 }
 
@@ -446,7 +446,7 @@ bool trashDataFile(char const* filename, tr_error** error)
     return @(tr_torrentGetMagnetLink(fHandle));
 }
 
-- (id)magnetLocation
+- (NSString*)magnetLocation
 {
     if (self.isMagnet)
     {
@@ -455,7 +455,7 @@ bool trashDataFile(char const* filename, tr_error** error)
             return @(tr_torrentGetDownloadDir(fHandle));
         }
     }
-    return [NSNull null];
+    return @"";
 }
 
 - (CGFloat)ratio
