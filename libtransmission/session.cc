@@ -2253,8 +2253,22 @@ int tr_sessionGetCacheLimit_MB(tr_session const* session)
 
 void tr_session::setDefaultTrackers(std::string_view trackers)
 {
-    this->default_trackers_str_ = trackers;
-    this->default_trackers_.parse(trackers);
+    auto const oldval = default_trackers_;
+
+    default_trackers_str_ = trackers;
+    default_trackers_.parse(trackers);
+
+    // if the list changed, update all the public torrents
+    if (default_trackers_ != oldval)
+    {
+        for (auto* tor : torrents)
+        {
+            if (tor->isPublic())
+            {
+                tr_announcerResetTorrent(announcer, tor);
+            }
+        }
+    }
 }
 
 void tr_sessionSetDefaultTrackers(tr_session* session, char const* trackers)

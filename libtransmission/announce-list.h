@@ -92,6 +92,16 @@ public:
 
     [[nodiscard]] tr_tracker_tier_t nextTier() const;
 
+    [[nodiscard]] bool operator==(tr_announce_list const& that) const
+    {
+        return trackers_ == that.trackers_;
+    }
+
+    [[nodiscard]] bool operator!=(tr_announce_list const& that) const
+    {
+        return trackers_ != that.trackers_;
+    }
+
     bool add(std::string_view announce_url_sv)
     {
         return add(announce_url_sv, this->nextTier());

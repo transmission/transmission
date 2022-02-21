@@ -1195,7 +1195,7 @@ char* tr_torrentGetMagnetLink(tr_torrent const* tor);
  * along with tr_torrentSetTrackerList(), is intended for import/export
  * and user editing. It does *not* include the "default trackers" that
  * are applied to all public torrents. If you want a full display of all
- * trackers, use tr_torrentTracker() and tr_torrentTackerCount()
+ * trackers, use tr_torrentTracker() and tr_torrentTrackerCount()
  */
 char* tr_torrentGetTrackerList(tr_torrent const* tor);
 

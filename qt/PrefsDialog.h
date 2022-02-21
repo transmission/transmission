@@ -29,12 +29,12 @@ public:
     PrefsDialog(Session&, Prefs&, QWidget* parent = nullptr);
 
 private slots:
+    void focusChanged(QWidget* old, QWidget* now);
     void checkBoxToggled(bool checked);
     void spinBoxEditingFinished();
     void timeEditingFinished();
     void lineEditingFinished();
     void pathChanged(QString const& path);
-    void plainTextChanged();
     void refreshPref(int key);
     void encryptionEdited(int);
     void altSpeedDaysEdited(int);

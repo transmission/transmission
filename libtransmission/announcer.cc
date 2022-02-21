@@ -581,8 +581,8 @@ private:
     {
         auto announce_list = tor->announceList();
 
-        // if it's a public torrent, inject the default trackers
-        if (!tor->isPrivate())
+        // if it's a public torrent, add the default trackers
+        if (tor->isPublic())
         {
             announce_list.add(tor->session->defaultTrackers());
         }
