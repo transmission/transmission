@@ -435,6 +435,7 @@ protected:
     {
         EXPECT_NE(nullptr, tor->session);
         EXPECT_FALSE(tr_amInEventThread(tor->session));
+        tor->checked_pieces_.setHasNone();
         tr_torrentVerify(tor);
         tr_wait_msec(100);
         EXPECT_TRUE(waitFor(
