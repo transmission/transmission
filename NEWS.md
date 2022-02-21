@@ -6,7 +6,6 @@
 ### Mac Client
 - Updates for macOS 11 Big Sur ([#1535](https://github.com/transmission/transmission/pull/1535)
 	- Compressed toolbar
-	- Red accent color
 	- Updated toolbar icons (using SF Symbol)
 - A wonderful new icon designed for Big Sur by Rodger Werner ([#1650](https://github.com/transmission/transmission/pull/1650)
 
