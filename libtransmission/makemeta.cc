@@ -240,6 +240,7 @@ void tr_metaInfoBuilderFree(tr_metainfo_builder* builder)
         }
 
         tr_free(builder->trackers);
+        tr_free(builder->webseeds);
         tr_free(builder->outputFile);
         tr_free(builder);
     }
