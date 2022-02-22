@@ -14,6 +14,10 @@ Want to learn more?
   * Visit our [IRC](https://en.wikipedia.org/wiki/IRC) channel: [#transmission on Libera](http://irc.libera.chat/transmission)
   * Follow us on [twitter](https://twitter.com/transmissionbt)
 
+Want to contribute?
+
+Much of this documentation is out-of-date or could be improved. Pull requests are greatly appreciated!
+
 # 2. More Documentation #
 
  * [Configuration Files](./Configuration-Files.md)
