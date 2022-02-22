@@ -28,7 +28,7 @@ using namespace std::literals;
 namespace
 {
 
-struct tr_webseed;
+class tr_webseed;
 
 void on_idle(tr_webseed* w);
 
@@ -58,7 +58,7 @@ public:
     tr_block_span_t const blocks;
     uint64_t const end_byte;
 
-    // our current position in the task.
+    // the current position in the task; i.e., the next block to save
     tr_block_info::Location loc;
 
     bool dead = false;
@@ -145,7 +145,7 @@ private:
     time_t paused_until = 0;
 };
 
-struct tr_webseed : public tr_peer
+class tr_webseed : public tr_peer
 {
 public:
     tr_webseed(struct tr_torrent* tor, std::string_view url, tr_peer_callback callback_in, void* callback_data_in)
@@ -202,12 +202,31 @@ public:
         connection_limiter.gotData();
     }
 
-    void publish(tr_peer_event* event)
+    void publishRejection(tr_block_span_t block_span)
     {
-        if (callback != nullptr)
+        auto e = tr_peer_event{};
+        e.eventType = TR_PEER_CLIENT_GOT_REJ;
+
+        for (auto block = block_span.begin; block < block_span.end; ++block)
         {
-            (*callback)(this, event, callback_data);
+            auto const loc = getTorrent()->blockLoc(block);
+            e.pieceIndex = loc.piece;
+            e.offset = loc.piece_offset;
+            publish(&e);
         }
+    }
+
+    void publishGotBlock(tr_torrent const* tor, tr_block_info::Location loc)
+    {
+        TR_ASSERT(loc.block_offset == 0);
+        TR_ASSERT(loc.block < tor->blockCount());
+
+        auto e = tr_peer_event{};
+        e.eventType = TR_PEER_CLIENT_GOT_BLOCK;
+        e.pieceIndex = loc.piece;
+        e.offset = loc.piece_offset;
+        e.length = tor->blockSize(loc.block);
+        publish(&e);
     }
 
     int const torrent_id;
@@ -220,6 +239,14 @@ public:
     std::set<tr_webseed_task*> tasks;
 
 private:
+    void publish(tr_peer_event* event)
+    {
+        if (callback != nullptr)
+        {
+            (*callback)(this, event, callback_data);
+        }
+    }
+
     void publishClientGotPieceData(uint32_t length)
     {
         auto e = tr_peer_event{};
@@ -248,37 +275,6 @@ private:
 ****
 ***/
 
-void fire_client_got_rejs(tr_torrent* tor, tr_webseed* w, tr_block_span_t block_span)
-{
-    auto e = tr_peer_event{};
-    e.eventType = TR_PEER_CLIENT_GOT_REJ;
-
-    for (auto block = block_span.begin; block < block_span.end; ++block)
-    {
-        auto const loc = tor->blockLoc(block);
-        e.pieceIndex = loc.piece;
-        e.offset = loc.piece_offset;
-        w->publish(&e);
-    }
-}
-
-void fire_client_got_block(tr_torrent const* tor, tr_webseed* w, tr_block_info::Location loc)
-{
-    TR_ASSERT(loc.block_offset == 0);
-    TR_ASSERT(loc.block < tor->blockCount());
-
-    auto e = tr_peer_event{};
-    e.eventType = TR_PEER_CLIENT_GOT_BLOCK;
-    e.pieceIndex = loc.piece;
-    e.offset = loc.piece_offset;
-    e.length = tor->blockSize(loc.block);
-    w->publish(&e);
-}
-
-/***
-****
-***/
-
 struct write_block_data
 {
 private:
@@ -302,7 +298,7 @@ public:
     static void write_block_func(void* vdata)
     {
         auto* const data = static_cast<write_block_data*>(vdata);
-        struct tr_webseed* const w = data->webseed;
+        auto* const webseed = data->webseed;
         auto* const buf = data->content();
 
         auto* const tor = tr_torrentFindFromId(data->session, data->torrent_id);
@@ -315,7 +311,7 @@ public:
         auto const len = evbuffer_get_length(buf);
         TR_ASSERT(tor->blockSize(data->loc.block) == len);
         tr_cacheWriteBlock(tor->session->cache, tor, data->loc, len, buf);
-        fire_client_got_block(tor, w, data->loc);
+        webseed->publishGotBlock(tor, data->loc);
         TR_ASSERT(evbuffer_get_length(buf) == 0);
         delete data;
     }
@@ -445,7 +441,7 @@ void onPartialDataFetched(tr_web::FetchResponse const& web_response)
 
     if (!success)
     {
-        fire_client_got_rejs(tor, webseed, { task->loc.block, task->blocks.end });
+        webseed->publishRejection({ task->loc.block, task->blocks.end });
         webseed->tasks.erase(task);
         delete task;
         return;
