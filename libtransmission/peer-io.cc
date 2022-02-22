@@ -837,7 +837,7 @@ static void io_close_socket(tr_peerIo* io)
 #endif
 
     default:
-        TR_ASSERT_MSG(false, "unsupported peer socket type %d", io->socket.type);
+        dbgmsg(io, "unsupported peer socket type %d", io->socket.type);
     }
 
     io->socket = {};
@@ -1280,7 +1280,7 @@ static int tr_peerIoTryRead(tr_peerIo* io, size_t howmuch)
         }
 
     default:
-        TR_ASSERT_MSG(false, "unsupported peer socket type %d", io->socket.type);
+        dbgmsg(io, "unsupported peer socket type %d", io->socket.type);
     }
 
     return res;
@@ -1331,7 +1331,7 @@ static int tr_peerIoTryWrite(tr_peerIo* io, size_t howmuch)
         }
 
     default:
-        TR_ASSERT_MSG(false, "unsupported peer socket type %d", io->socket.type);
+        dbgmsg(io, "unsupported peer socket type %d", io->socket.type);
     }
 
     return n;
