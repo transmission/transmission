@@ -281,9 +281,10 @@ static std::vector<std::byte> getHashInfo(tr_metainfo_builder* b)
     {
         TR_ASSERT(b->pieceIndex < b->pieceCount);
 
+        uint32_t const this_piece_size = std::min(uint64_t{ b->pieceSize }, totalRemain);
+        buf.resize(this_piece_size);
         auto* bufptr = std::data(buf);
-        uint32_t const thisPieceSize = std::min(uint64_t{ b->pieceSize }, totalRemain);
-        uint64_t leftInPiece = thisPieceSize;
+        uint64_t leftInPiece = this_piece_size;
 
         while (leftInPiece != 0)
         {
@@ -316,7 +317,7 @@ static std::vector<std::byte> getHashInfo(tr_metainfo_builder* b)
             }
         }
 
-        TR_ASSERT(bufptr - std::data(buf) == (int)thisPieceSize);
+        TR_ASSERT(bufptr - std::data(buf) == (int)this_piece_size);
         TR_ASSERT(leftInPiece == 0);
         auto const digest = tr_sha1(buf);
         if (!digest)
@@ -335,7 +336,7 @@ static std::vector<std::byte> getHashInfo(tr_metainfo_builder* b)
             break;
         }
 
-        totalRemain -= thisPieceSize;
+        totalRemain -= this_piece_size;
         ++b->pieceIndex;
     }
 
@@ -415,7 +416,11 @@ static void makeInfoDict(tr_variant* dict, tr_metainfo_builder* builder)
         tr_variantDictAddRaw(dict, TR_KEY_pieces, std::data(piece_hashes), std::size(piece_hashes));
     }
 
-    tr_variantDictAddInt(dict, TR_KEY_private, builder->isPrivate ? 1 : 0);
+    if (builder->isPrivate)
+    {
+        tr_variantDictAddInt(dict, TR_KEY_private, 1);
+    }
+
     if (builder->source != nullptr)
     {
         tr_variantDictAddStr(dict, TR_KEY_source, builder->source);
