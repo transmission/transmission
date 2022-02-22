@@ -13,21 +13,11 @@ typedef NS_ENUM(unsigned int, blocklistDownloadState) { //
 };
 
 @interface BlocklistDownloader : NSObject<NSURLSessionDownloadDelegate>
-{
-    NSURLSession* fSession;
 
-    BlocklistDownloaderViewController* fViewController;
-
-    NSUInteger fCurrentSize;
-    long long fExpectedSize;
-
-    blocklistDownloadState fState;
-}
-
-+ (BlocklistDownloader*)downloader; //starts download if not already occuring
+@property(nonatomic) BlocklistDownloaderViewController* viewController;
 @property(nonatomic, class, readonly) BOOL isRunning;
 
-- (void)setViewController:(BlocklistDownloaderViewController*)viewController;
++ (BlocklistDownloader*)downloader; //starts download if not already occuring
 
 - (void)cancelDownload;
 

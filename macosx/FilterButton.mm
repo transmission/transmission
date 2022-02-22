@@ -11,23 +11,23 @@
 {
     if ((self = [super initWithCoder:coder]))
     {
-        fCount = NSNotFound;
+        _count = NSNotFound;
     }
     return self;
 }
 
 - (void)setCount:(NSUInteger)count
 {
-    if (count == fCount)
+    if (count == _count)
     {
         return;
     }
 
-    fCount = count;
+    _count = count;
 
-    self.toolTip = fCount == 1 ? NSLocalizedString(@"1 transfer", "Filter Button -> tool tip") :
+    self.toolTip = _count == 1 ? NSLocalizedString(@"1 transfer", "Filter Button -> tool tip") :
                                  [NSString stringWithFormat:NSLocalizedString(@"%@ transfers", "Filter Bar Button -> tool tip"),
-                                                            [NSString formattedUInteger:fCount]];
+                                                            [NSString formattedUInteger:_count]];
 }
 
 @end

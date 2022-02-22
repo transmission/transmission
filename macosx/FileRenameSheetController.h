@@ -17,11 +17,6 @@
                      modalForWindow:(NSWindow*)window
                   completionHandler:(void (^)(BOOL didRename))completionHandler;
 
-@property(weak) IBOutlet NSTextField* labelField;
-@property(weak) IBOutlet NSTextField* inputField;
-@property(weak) IBOutlet NSButton* renameButton;
-@property(weak) IBOutlet NSButton* cancelButton;
-
 - (IBAction)rename:(id)sender;
 - (IBAction)cancelRename:(id)sender;
 

@@ -22,11 +22,13 @@
 
 @interface FileNameCell ()
 
-- (NSRect)rectForTitleWithString:(NSAttributedString*)string inBounds:(NSRect)bounds;
-- (NSRect)rectForStatusWithString:(NSAttributedString*)string withTitleRect:(NSRect)titleRect inBounds:(NSRect)bounds;
-
 @property(nonatomic, readonly) NSAttributedString* attributedTitle;
 @property(nonatomic, readonly) NSAttributedString* attributedStatus;
+@property(nonatomic, readonly) NSMutableDictionary* fTitleAttributes;
+@property(nonatomic, readonly) NSMutableDictionary* fStatusAttributes;
+
+- (NSRect)rectForTitleWithString:(NSAttributedString*)string inBounds:(NSRect)bounds;
+- (NSRect)rectForStatusWithString:(NSAttributedString*)string withTitleRect:(NSRect)titleRect inBounds:(NSRect)bounds;
 
 @end
 
@@ -39,13 +41,13 @@
         NSMutableParagraphStyle* paragraphStyle = [NSParagraphStyle.defaultParagraphStyle mutableCopy];
         paragraphStyle.lineBreakMode = NSLineBreakByTruncatingMiddle;
 
-        fTitleAttributes = [[NSMutableDictionary alloc]
+        _fTitleAttributes = [[NSMutableDictionary alloc]
             initWithObjectsAndKeys:[NSFont messageFontOfSize:12.0], NSFontAttributeName, paragraphStyle, NSParagraphStyleAttributeName, nil];
 
         NSMutableParagraphStyle* statusParagraphStyle = [NSParagraphStyle.defaultParagraphStyle mutableCopy];
         statusParagraphStyle.lineBreakMode = NSLineBreakByTruncatingTail;
 
-        fStatusAttributes = [[NSMutableDictionary alloc]
+        _fStatusAttributes = [[NSMutableDictionary alloc]
             initWithObjectsAndKeys:[NSFont messageFontOfSize:9.0], NSFontAttributeName, statusParagraphStyle, NSParagraphStyleAttributeName, nil];
     }
     return self;
@@ -55,8 +57,8 @@
 {
     FileNameCell* copy = [super copyWithZone:zone];
 
-    copy->fTitleAttributes = fTitleAttributes;
-    copy->fStatusAttributes = fStatusAttributes;
+    copy->_fTitleAttributes = _fTitleAttributes;
+    copy->_fStatusAttributes = _fStatusAttributes;
 
     return copy;
 }
@@ -103,8 +105,8 @@
         statusColor = NSColor.secondaryLabelColor;
     }
 
-    fTitleAttributes[NSForegroundColorAttributeName] = titleColor;
-    fStatusAttributes[NSForegroundColorAttributeName] = statusColor;
+    self.fTitleAttributes[NSForegroundColorAttributeName] = titleColor;
+    self.fStatusAttributes[NSForegroundColorAttributeName] = statusColor;
 
     //title
     NSAttributedString* titleString = self.attributedTitle;
@@ -137,10 +139,12 @@
     cellFrame.origin.x += PADDING_EXPANSION_FRAME;
     cellFrame.origin.y += PADDING_EXPANSION_FRAME;
 
-    fTitleAttributes[NSForegroundColorAttributeName] = NSColor.controlTextColor;
+    self.fTitleAttributes[NSForegroundColorAttributeName] = NSColor.controlTextColor;
     NSAttributedString* titleString = self.attributedTitle;
     [titleString drawInRect:cellFrame];
 }
+
+#pragma mark - Private
 
 - (NSRect)rectForTitleWithString:(NSAttributedString*)string inBounds:(NSRect)bounds
 {
@@ -190,7 +194,7 @@
 - (NSAttributedString*)attributedTitle
 {
     NSString* title = ((FileListNode*)self.objectValue).name;
-    return [[NSAttributedString alloc] initWithString:title attributes:fTitleAttributes];
+    return [[NSAttributedString alloc] initWithString:title attributes:self.fTitleAttributes];
 }
 
 - (NSAttributedString*)attributedStatus
@@ -205,7 +209,7 @@
                                                   percentString,
                                                   [NSString stringForFileSize:node.size]];
 
-    return [[NSAttributedString alloc] initWithString:status attributes:fStatusAttributes];
+    return [[NSAttributedString alloc] initWithString:status attributes:self.fStatusAttributes];
 }
 
 @end

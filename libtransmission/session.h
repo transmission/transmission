@@ -352,14 +352,14 @@ public:
 
     struct tr_cache* cache;
 
-    class WebController final : public tr_web::Controller
+    class WebMediator final : public tr_web::Mediator
     {
     public:
-        explicit WebController(tr_session* session)
+        explicit WebMediator(tr_session* session)
             : session_{ session }
         {
         }
-        ~WebController() override = default;
+        ~WebMediator() override = default;
 
         [[nodiscard]] std::optional<std::string> cookieFile() const override;
         [[nodiscard]] std::optional<std::string> publicAddress() const override;
@@ -373,7 +373,7 @@ public:
         tr_session* const session_;
     };
 
-    WebController web_controller{ this };
+    WebMediator web_mediator{ this };
     std::unique_ptr<tr_web> web;
 
     struct tr_session_id* session_id;

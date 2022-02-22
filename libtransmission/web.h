@@ -54,7 +54,7 @@ public:
         // https://developer.mozilla.org/en-US/docs/Web/HTTP/Range_requests
         std::optional<std::string> range;
 
-        // Tag used by tr_web::Controller to limit some transfers' bandwidth
+        // Tag used by tr_web::Mediator to limit some transfers' bandwidth
         std::optional<int> speed_limit_tag;
 
         // Optionaly set the underlying sockets' send/receive buffers' size.
@@ -96,10 +96,10 @@ public:
      * NB: Note that tr_web calls all these methods from its own thread.
      * Overridden methods should take care to be threadsafe.
      */
-    class Controller
+    class Mediator
     {
     public:
-        virtual ~Controller() = default;
+        virtual ~Mediator() = default;
 
         // Return the location of the cookie file, or nullopt to not use one
         [[nodiscard]] virtual std::optional<std::string> cookieFile() const
@@ -137,14 +137,14 @@ public:
         }
     };
 
-    // Note that tr_web does no management of the `controller` reference.
-    // The caller must ensure `controller` is valid for tr_web's lifespan.
-    static std::unique_ptr<tr_web> create(Controller& controller);
+    // Note that tr_web does no management of the `mediator` reference.
+    // The caller must ensure `mediator` is valid for tr_web's lifespan.
+    static std::unique_ptr<tr_web> create(Mediator& mediator);
 
 private:
     class Impl;
     std::unique_ptr<Impl> const impl_;
-    explicit tr_web(Controller& controller);
+    explicit tr_web(Mediator& mediator);
 };
 
 void tr_sessionFetch(struct tr_session* session, tr_web::FetchOptions&& options);

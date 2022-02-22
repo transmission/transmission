@@ -1,20 +1,14 @@
-/* quicklook file count */
-"%@ files" = "%@ dosya";
-
 /* quicklook file header */
 "%@ Files" = "%@ Dosya";
+
+/* quicklook file count */
+"%@ files" = "%@ dosya";
 
 /* quicklook tracker header */
 "%@ Trackers" = "%@ İzleyici";
 
 /* quicklook web seed header */
 "%@ Web Seeds" = "%@ Web Beslemesi";
-
-/* quicklook file count */
-"1 file" = "1 dosya";
-
-/* quicklook file header */
-"1 File" = "1 Dosya";
 
 /* quicklook tracker header */
 "1 Tracker" = "1 İzleyici";

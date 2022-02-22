@@ -8,7 +8,6 @@ set(${PROJECT_NAME}_LINGUAS
     be
     bg
     bn
-    bo
     br
     bs
     ca
@@ -60,13 +59,10 @@ set(${PROJECT_NAME}_LINGUAS
     mr
     ms
     mt
-    my
     nb
-    nds
     nl
     nn
     oc
-    pa
     pl
     pt
     pt_BR
@@ -79,11 +75,9 @@ set(${PROJECT_NAME}_LINGUAS
     sq
     sr
     sv
-    sw
     ta
     te
     th
-    tl
     tr
     ug
     uk
