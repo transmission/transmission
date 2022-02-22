@@ -82,8 +82,12 @@ Here is a sample of the three basic types, respectively Boolean, Number and Stri
  * **pex-enabled:** Boolean (default =  true) Enable [http://en.wikipedia.org/wiki/Peer_exchange Peer Exchange (PEX)].
  * **prefetch-enabled:** Boolean (default = true). When enabled, Transmission will hint to the OS which piece data it's about to read from disk in order to satisfy requests from peers. On Linux, this is done by passing `POSIX_FADV_WILLNEED` to [posix_fadvise()](http://www.kernel.org/doc/man-pages/online/pages/man2/posix_fadvise.2.html). On OS X, this is done by passing `F_RDADVISE` to [fcntl()](http://developer.apple.com/library/IOS/#documentation/System/Conceptual/ManPages_iPhoneOS/man2/fcntl.2.html). This defaults to false if configured with --enable-lightweight.
  * **scrape-paused-torrents-enabled:** Boolean (default = true) 
- * **script-torrent-done-enabled:** Boolean (default = false) Run a script at torrent completion.
+ * **script-torrent-added-enabled:** Boolean (default = false) Run a script when a torrent is added to Transmission. Environmental variables are passed in as detailed on the [Scripts](./Scripts.md) page
+ * **script-torrent-added-filename:** String (default = "") Path to script.
+ * **script-torrent-done-enabled:** Boolean (default = false) Run a script when a torrent is done downloading. Environmental variables are passed in as detailed on the [Scripts](./Scripts.md) page
  * **script-torrent-done-filename:** String (default = "") Path to script.
+ * **script-torrent-done-seeding-enabled:** Boolean (default = false) Run a script when a torrent is done seeding. Environmental variables are passed in as detailed on the [Scripts](./Scripts.md) page
+ * **script-torrent-done-seeding-filename:** String (default = "") Path to script.
  * **utp-enabled:** Boolean (default = true) Enable [Micro Transport Protocol (µTP)](http://en.wikipedia.org/wiki/Micro_Transport_Protocol)
 
 #### Peers
