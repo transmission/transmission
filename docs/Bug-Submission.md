@@ -35,7 +35,7 @@ Additional information or steps are required for certain categories of problem:
 
 ### Slow Speeds ###
 
-If you're experiencing slow speeds and you've been through the wiki and [[FAQ|FrequentlyAskedQuestions]] then you need to provide the following information **in addition** to that above:
+If you're experiencing slow speeds and you've been through the wiki, then please provide the following information **in addition** to that above:
  * Do you have any per-torrent or global speed limits set?
  * What are your global and per-torrent peer limits?
  * How many seeds and peers does the "Peers" tab say there are in the swarm?

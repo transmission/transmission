@@ -7,7 +7,6 @@ New to Transmission?
   * Jun Azua has an introduction for [Transmission GUI on Linux](http://www.junauza.com/2009/01/how-to-use-bittorrent-in-linux.html).
   * Running Transmission [without a GUI](HeadlessUsage)
   * Using Transmission [from a web browser](Web Interface)
-  * Also see our [Frequently Asked Questions](FrequentlyAskedQuestions)
 
 Want to learn more?
 
@@ -29,7 +28,6 @@ Want to learn more?
 
 # 3. Report a problem / request a feature #
 
-  * If you're having trouble with Transmission, check the Troubleshooting section of our [Frequently Asked Questions](FrequentlyAskedQuestions)
   * [Check](https://github.com/transmission/transmission/issues) whether the problem has already been reported.
   * If you don't see a ticket matching your problem or feature, read [this post](https://forum.transmissionbt.com/viewtopic.php?f=1&t=3274) about what to write, then [add a new ticket](https://github.com/transmission/transmission/issues/new).
   * If you _do_ see an existing ticket, please add a comment there.  The more users interested in a ticket, the higher priority it's given.
