@@ -52,12 +52,12 @@ Here is a sample of the three basic types, respectively Boolean, Number and Stri
  * **speed-limit-up-enabled:** Boolean (default = false)
  * **upload-slots-per-torrent:** Number (default = 14)
 
-#### [[Blocklists]]
+#### [Blocklists](./Blocklists.md)
 
  * **blocklist-url:** String (default = http://www.example.com/blocklist)
  * **blocklist-enabled:** Boolean (default = false)
 
-#### [[Files and Locations|ConfigFiles]]
+#### [Files and Locations](./ConfigFiles.md)
 
  * **download-dir:** String (default = [[default locations|ConfigFiles#Locations]])
  * **incomplete-dir:** String (default = [[default locations|ConfigFiles#Locations]]) Directory to keep files in until torrent is complete.

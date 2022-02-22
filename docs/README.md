@@ -21,7 +21,7 @@ Want to learn more?
  * [Editing Configuration Files](./Editing-Configuration-Files.md)
  * [Environment Variables](Environment-Variables.md)
  * [Extending Transmission using Scripts](./Scripts.md)
- * Blocklists
+ * [Blocklists](./Blocklists.md)
  * [How to build Transmission](Building-Transmission.md)
  * [RPC Protocol Specification](rpc-spec.md)
  * [Transmisson's Peer ID and User-Agent headers](Peer-ID-and-User-Agent.md)
