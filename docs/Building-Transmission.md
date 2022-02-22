@@ -196,7 +196,7 @@ Version 2.83, no need to add quota.h, Cygwin added it.
 
 With a MinGW http://mingw.org/ development environment, the Gtk and the Qt GUI applications can be built.  The CLI tools can also be built, and in general work fine, but may fail if you use foreign characters as parameters (MinGW uses latin1 in parameters).
 
-The procedure: wiki:BuildingTransmissionQtWindows
+The procedure is documented at [Building Transmission Qt on Windows](https://trac.transmissionbt.com/wiki/BuildingTransmissionQtWindows).
 
 ## Switches ##
 
