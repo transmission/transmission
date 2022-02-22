@@ -108,7 +108,7 @@ Here is a sample of the three basic types, respectively Boolean, Number and Stri
 
  * **download-queue-enabled:** Boolean (default = true) When true, Transmission will only download `download-queue-size` non-stalled torrents at once.
  * **download-queue-size:** Number (default = 5) See download-queue-enabled.
- * **queue-stalled-enabled:** Boolean (default = true) When true, torrents that have not shared data for `queue-stalled-minutes` are treated as 'stalled' and are not counted against the `queue-download-size` and `seed-queue-size` limits.
+ * **queue-stalled-enabled:** Boolean (default = true) When true, torrents that have not shared data for `queue-stalled-minutes` are treated as 'stalled' and are not counted against the `download-queue-size` and `seed-queue-size` limits.
  * **queue-stalled-minutes:** Number (default = 30) See queue-stalled-enabled.
  * **seed-queue-enabled:** Boolean (default = false) When true. Transmission will only seed `seed-queue-size` non-stalled torrents at once.
  * **seed-queue-size:** Number (default = 10) See seed-queue-enabled.

@@ -32,6 +32,8 @@ If you want to swap between the two applications, all you have to do is pass in 
 <tr><td>Default download folder</td><td><tt>%LOCALAPPDATA%/Downloads</tt></td></tr>
 </table>
 
+`%LOCALAPPDATA%` will resolve to `C:\Users[username]\AppData\Local` under a user context, and `C:\Windows\ServiceProfiles\LocalService\AppData\Local` under a service context.
+
 ### Overriding the Defaults
 
 The per-user configuration folder's location can be overridden by setting `TRANSMISSION_HOME` and/or other [[environment variables|Environment-Variables]].
