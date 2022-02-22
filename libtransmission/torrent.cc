@@ -1939,22 +1939,6 @@ uint16_t tr_torrentGetPeerLimit(tr_torrent const* tor)
 ****
 ***/
 
-void tr_torrentGetBlockLocation(
-    tr_torrent const* tor,
-    tr_block_index_t block,
-    tr_piece_index_t* piece,
-    uint32_t* offset,
-    uint32_t* length)
-{
-    uint64_t pos = block;
-    pos *= tor->blockSize();
-    *piece = pos / tor->pieceSize();
-    uint64_t piece_begin = tor->pieceSize();
-    piece_begin *= *piece;
-    *offset = pos - piece_begin;
-    *length = tor->blockSize(block);
-}
-
 bool tr_torrentReqIsValid(tr_torrent const* tor, tr_piece_index_t index, uint32_t offset, uint32_t length)
 {
     TR_ASSERT(tr_isTorrent(tor));
