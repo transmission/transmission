@@ -7,6 +7,8 @@
 
 #include "transmission.h"
 
+#include "tr-assert.h"
+
 struct tr_block_info
 {
     uint64_t total_size = 0;
@@ -99,6 +101,8 @@ struct tr_block_info
     // Location of the first byte in `block`.
     [[nodiscard]] Location constexpr blockLoc(tr_block_index_t block) const
     {
+        TR_ASSERT(block < n_blocks);
+
         return byteLoc(uint64_t{ block } * blockSize());
     }
 
@@ -116,6 +120,8 @@ struct tr_block_info
     // Location of the first byte (+ optional offset and length) in `piece`
     [[nodiscard]] Location constexpr pieceLoc(tr_piece_index_t piece, uint32_t offset = 0, uint32_t length = 0) const
     {
+        TR_ASSERT(piece < n_pieces);
+
         return byteLoc(uint64_t{ piece } * pieceSize() + offset + length);
     }
 
@@ -133,6 +139,8 @@ struct tr_block_info
     // Location of the torrent's nth byte
     [[nodiscard]] Location constexpr byteLoc(uint64_t byte) const
     {
+        TR_ASSERT(byte <= total_size);
+
         if (!isInitialized())
         {
             return {};

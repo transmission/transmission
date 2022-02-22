@@ -42,8 +42,8 @@ public:
         : webseed{ webseed_in }
         , session{ tor->session }
         , blocks{ blocks_in }
-        , begin_byte{ tor->blockLoc(blocks.begin) }
-        , end_byte{ tor->blockLoc(blocks.end) }
+        , end_byte{ tor->blockLoc(blocks.end - 1).byte + tor->blockSize(blocks.end - 1) }
+        , loc{ tor->blockLoc(blocks.begin) }
     {
     }
 
@@ -56,11 +56,10 @@ public:
 
     tr_session* const session;
     tr_block_span_t const blocks;
-    tr_block_info::Location const begin_byte;
-    tr_block_info::Location const end_byte;
+    uint64_t const end_byte;
 
     // our current position in the task.
-    tr_block_info::Location loc = begin_byte;
+    tr_block_info::Location loc;
 
     bool dead = false;
 };
@@ -362,7 +361,7 @@ void useFetchedBlocks(tr_webseed_task* task)
 
         task->loc = tor->byteLoc(task->loc.byte + block_size);
 
-        TR_ASSERT(task->loc == task->end_byte || task->loc.block_offset == 0);
+        TR_ASSERT(task->loc.byte == task->end_byte || task->loc.block_offset == 0);
     }
 }
 
@@ -452,7 +451,7 @@ void onPartialDataFetched(tr_web::FetchResponse const& web_response)
         return;
     }
 
-    if (task->loc < task->end_byte)
+    if (task->loc.byte < task->end_byte)
     {
         // Request finished successfully but there's still data missing.
         // That means we've reached the end of a file and need to request
@@ -492,7 +491,7 @@ void task_request_next_chunk(tr_webseed_task* task)
     auto const [file_index, file_offset] = tor->fileOffset(task->loc);
 
     auto const left_in_file = tor->fileSize(file_index) - file_offset;
-    auto const left_in_task = task->end_byte.byte - task->loc.byte;
+    auto const left_in_task = task->end_byte - task->loc.byte;
     auto const this_chunk = std::min(left_in_file, left_in_task);
 
     auto const url = make_url(webseed, tor->fileSubpath(file_index));
