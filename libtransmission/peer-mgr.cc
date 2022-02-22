@@ -546,17 +546,17 @@ static void updateEndgame(tr_swarm* s)
 
 std::vector<tr_block_span_t> tr_peerMgrGetNextRequests(tr_torrent* torrent, tr_peer const* peer, size_t numwant)
 {
-    class PeerInfoImpl final : public Wishlist::PeerInfo
+    class MediatorImpl final : public Wishlist::Mediator
     {
     public:
-        PeerInfoImpl(tr_torrent const* torrent_in, tr_peer const* peer_in)
+        MediatorImpl(tr_torrent const* torrent_in, tr_peer const* peer_in)
             : torrent_{ torrent_in }
             , swarm_{ torrent_in->swarm }
             , peer_{ peer_in }
         {
         }
 
-        ~PeerInfoImpl() override = default;
+        ~MediatorImpl() override = default;
 
         [[nodiscard]] bool clientCanRequestBlock(tr_block_index_t block) const override
         {
@@ -606,7 +606,7 @@ std::vector<tr_block_span_t> tr_peerMgrGetNextRequests(tr_torrent* torrent, tr_p
 
     auto* const swarm = torrent->swarm;
     updateEndgame(swarm);
-    return Wishlist::next(PeerInfoImpl(torrent, peer), numwant);
+    return Wishlist::next(MediatorImpl(torrent, peer), numwant);
 }
 
 /****
