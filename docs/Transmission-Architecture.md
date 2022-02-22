@@ -18,8 +18,8 @@ The multiple methods of controlling Transmission and the various native GUIs ava
 
 The products are:
  * Transmission Desktop - OS X
+ * Transmission Desktop - Windows, Linux/Qt
  * Transmission Desktop - Linux/GTK+
- * Transmission Desktop - Un*x/Qt 
  * Transmission Daemon (headless)
  * Transmission Command Line
 

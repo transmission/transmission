@@ -2,7 +2,7 @@ Can I sequence the files I download? This is quite a common question. This entry
 
 ## Why is this "feature" not implemented in Transmission?
 
-Because it makes the overall swarm's health worse. 
+Because it makes the overall swarm's health worse.
 
 ## But I want to sequence the files I download, how do I do it?
 
@@ -17,7 +17,7 @@ There're two methods basically, one DIY that requires a bit of code changing and
    return tr_compareUint16( a->random, b->random );
    ```
 
-   With: 
+   With:
 
    ```c
    /* otherwise download the pieces in order */

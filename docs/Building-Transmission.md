@@ -19,7 +19,7 @@ Transmission has an Xcode project file (Transmission.xcodeproj) for building in 
 
 Building the project on Mac requires the source to be retrieved from GitHub. Pre-packaged source code will not compile.
 
-If building from source is too daunting for you, check out the [nightly builds](https://build.transmissionbt.com/job/trunk-mac/).  
+If building from source is too daunting for you, check out the [nightly builds](https://build.transmissionbt.com/job/trunk-mac/).
 (Note: These are untested snapshots. Use them with care.)
 
 ## On Unix ##
@@ -196,7 +196,7 @@ Version 2.83, no need to add quota.h, Cygwin added it.
 
 With a MinGW http://mingw.org/ development environment, the Gtk and the Qt GUI applications can be built.  The CLI tools can also be built, and in general work fine, but may fail if you use foreign characters as parameters (MinGW uses latin1 in parameters).
 
-The procedure: wiki:BuildingTransmissionQtWindows
+The procedure is documented at [Building Transmission Qt on Windows](https://trac.transmissionbt.com/wiki/BuildingTransmissionQtWindows).
 
 ## Switches ##
 

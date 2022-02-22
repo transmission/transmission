@@ -7,9 +7,6 @@
 @class Torrent;
 
 @interface GroupsController : NSObject
-{
-    NSMutableArray* fGroups;
-}
 
 @property(nonatomic, class, readonly) GroupsController* groups;
 

@@ -64,20 +64,20 @@ struct Candidate
     }
 };
 
-std::vector<Candidate> getCandidates(Wishlist::PeerInfo const& peer_info)
+std::vector<Candidate> getCandidates(Wishlist::Mediator const& mediator)
 {
     // count up the pieces that we still want
     auto wanted_pieces = std::vector<std::pair<tr_piece_index_t, size_t>>{};
-    auto const n_pieces = peer_info.countAllPieces();
+    auto const n_pieces = mediator.countAllPieces();
     wanted_pieces.reserve(n_pieces);
     for (tr_piece_index_t i = 0; i < n_pieces; ++i)
     {
-        if (!peer_info.clientCanRequestPiece(i))
+        if (!mediator.clientCanRequestPiece(i))
         {
             continue;
         }
 
-        size_t const n_missing = peer_info.countMissingBlocks(i);
+        size_t const n_missing = mediator.countMissingBlocks(i);
         if (n_missing == 0)
         {
             continue;
@@ -95,7 +95,7 @@ std::vector<Candidate> getCandidates(Wishlist::PeerInfo const& peer_info)
     for (size_t i = 0; i < n; ++i)
     {
         auto const [piece, n_missing] = wanted_pieces[i];
-        candidates.emplace_back(piece, n_missing, peer_info.priority(piece), saltbuf[i]);
+        candidates.emplace_back(piece, n_missing, mediator.priority(piece), saltbuf[i]);
     }
 
     return candidates;
@@ -129,7 +129,7 @@ std::vector<tr_block_span_t> makeSpans(tr_block_index_t const* sorted_blocks, si
 
 } // namespace
 
-std::vector<tr_block_span_t> Wishlist::next(Wishlist::PeerInfo const& peer_info, size_t n_wanted_blocks)
+std::vector<tr_block_span_t> Wishlist::next(Wishlist::Mediator const& mediator, size_t n_wanted_blocks)
 {
     if (n_wanted_blocks == 0)
     {
@@ -141,7 +141,7 @@ std::vector<tr_block_span_t> Wishlist::next(Wishlist::PeerInfo const& peer_info,
 
     // We usually won't need all the candidates until endgame, so don't
     // waste cycles sorting all of them here. partial sort is enough.
-    auto candidates = getCandidates(peer_info);
+    auto candidates = getCandidates(mediator);
     auto constexpr MaxSortedPieces = size_t{ 30 };
     auto const middle = std::min(std::size(candidates), MaxSortedPieces);
     std::partial_sort(std::begin(candidates), std::begin(candidates) + middle, std::end(candidates));
@@ -155,20 +155,20 @@ std::vector<tr_block_span_t> Wishlist::next(Wishlist::PeerInfo const& peer_info,
         }
 
         // walk the blocks in this piece
-        auto const [begin, end] = peer_info.blockSpan(candidate.piece);
+        auto const [begin, end] = mediator.blockSpan(candidate.piece);
         auto blocks = std::vector<tr_block_index_t>{};
         blocks.reserve(end - begin);
         for (tr_block_index_t block = begin; block < end && n_blocks + std::size(blocks) < n_wanted_blocks; ++block)
         {
             // don't request blocks we've already got
-            if (!peer_info.clientCanRequestBlock(block))
+            if (!mediator.clientCanRequestBlock(block))
             {
                 continue;
             }
 
             // don't request from too many peers
-            size_t const n_peers = peer_info.countActiveRequests(block);
-            if (size_t const max_peers = peer_info.isEndgame() ? 2 : 1; n_peers >= max_peers)
+            size_t const n_peers = mediator.countActiveRequests(block);
+            if (size_t const max_peers = mediator.isEndgame() ? 2 : 1; n_peers >= max_peers)
             {
                 continue;
             }

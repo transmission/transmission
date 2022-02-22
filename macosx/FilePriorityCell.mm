@@ -30,7 +30,7 @@
         [self setImage:[NSImage imageNamed:@"PriorityControlNormal"] forSegment:1];
         [self setImage:[NSImage imageNamed:@"PriorityControlHigh"] forSegment:2];
 
-        fHoverRow = NO;
+        _hovered = NO;
     }
     return self;
 }
@@ -86,11 +86,6 @@
     [controlView addTrackingArea:area];
 }
 
-- (void)setHovered:(BOOL)hovered
-{
-    fHoverRow = hovered;
-}
-
 - (void)drawWithFrame:(NSRect)cellFrame inView:(NSView*)controlView
 {
     FileListNode* node = self.representedObject;
@@ -98,7 +93,7 @@
     NSSet* priorities = [torrent filePrioritiesForIndexes:node.indexes];
 
     NSUInteger const count = priorities.count;
-    if (fHoverRow && count > 0)
+    if (self.hovered && count > 0)
     {
         [super setSelected:[priorities containsObject:@(TR_PRI_LOW)] forSegment:0];
         [super setSelected:[priorities containsObject:@(TR_PRI_NORMAL)] forSegment:1];

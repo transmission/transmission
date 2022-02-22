@@ -10,6 +10,16 @@
 
 @interface InfoFileViewController ()
 
+@property(nonatomic, copy) NSArray* fTorrents;
+
+@property(nonatomic) BOOL fSet;
+
+@property(nonatomic) IBOutlet FileOutlineController* fFileController;
+
+@property(nonatomic) IBOutlet NSSearchField* fFileFilterField;
+@property(nonatomic) IBOutlet NSButton* fCheckAllButton;
+@property(nonatomic) IBOutlet NSButton* fUncheckAllButton;
+
 - (void)setupInfo;
 
 - (BOOL)canQuickLookFile:(FileListNode*)item;
@@ -38,59 +48,59 @@
         self.view.frame = viewRect;
     }
 
-    [fFileFilterField.cell setPlaceholderString:NSLocalizedString(@"Filter", "inspector -> file filter")];
+    [self.fFileFilterField.cell setPlaceholderString:NSLocalizedString(@"Filter", "inspector -> file filter")];
 
     //localize and place all and none buttons
-    fCheckAllButton.title = NSLocalizedString(@"All", "inspector -> check all");
-    fUncheckAllButton.title = NSLocalizedString(@"None", "inspector -> check all");
+    self.fCheckAllButton.title = NSLocalizedString(@"All", "inspector -> check all");
+    self.fUncheckAllButton.title = NSLocalizedString(@"None", "inspector -> check all");
 
-    NSRect checkAllFrame = fCheckAllButton.frame;
-    NSRect uncheckAllFrame = fUncheckAllButton.frame;
+    NSRect checkAllFrame = self.fCheckAllButton.frame;
+    NSRect uncheckAllFrame = self.fUncheckAllButton.frame;
     CGFloat const oldAllWidth = checkAllFrame.size.width;
     CGFloat const oldNoneWidth = uncheckAllFrame.size.width;
 
-    [fCheckAllButton sizeToFit];
-    [fUncheckAllButton sizeToFit];
-    CGFloat const newWidth = MAX(fCheckAllButton.bounds.size.width, fUncheckAllButton.bounds.size.width);
+    [self.fCheckAllButton sizeToFit];
+    [self.fUncheckAllButton sizeToFit];
+    CGFloat const newWidth = MAX(self.fCheckAllButton.bounds.size.width, self.fUncheckAllButton.bounds.size.width);
 
     CGFloat const uncheckAllChange = newWidth - oldNoneWidth;
     uncheckAllFrame.size.width = newWidth;
     uncheckAllFrame.origin.x -= uncheckAllChange;
-    fUncheckAllButton.frame = uncheckAllFrame;
+    self.fUncheckAllButton.frame = uncheckAllFrame;
 
     CGFloat const checkAllChange = newWidth - oldAllWidth;
     checkAllFrame.size.width = newWidth;
     checkAllFrame.origin.x -= (checkAllChange + uncheckAllChange);
-    fCheckAllButton.frame = checkAllFrame;
+    self.fCheckAllButton.frame = checkAllFrame;
 }
 
 - (void)setInfoForTorrents:(NSArray*)torrents
 {
     //don't check if it's the same in case the metadata changed
-    fTorrents = torrents;
+    self.fTorrents = torrents;
 
-    fSet = NO;
+    self.fSet = NO;
 }
 
 - (void)updateInfo
 {
-    if (!fSet)
+    if (!self.fSet)
     {
         [self setupInfo];
     }
 
-    if (fTorrents.count == 1)
+    if (self.fTorrents.count == 1)
     {
-        [fFileController refresh];
+        [self.fFileController refresh];
 
 #warning use TorrentFileCheckChange notification as well
-        Torrent* torrent = fTorrents[0];
+        Torrent* torrent = self.fTorrents[0];
         if (torrent.folder)
         {
             NSInteger const filesCheckState = [torrent
                 checkForFiles:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, torrent.fileCount)]];
-            fCheckAllButton.enabled = filesCheckState != NSControlStateValueOn; //if anything is unchecked
-            fUncheckAllButton.enabled = !torrent.allDownloaded; //if there are any checked files that aren't finished
+            self.fCheckAllButton.enabled = filesCheckState != NSControlStateValueOn; //if anything is unchecked
+            self.fUncheckAllButton.enabled = !torrent.allDownloaded; //if there are any checked files that aren't finished
         }
     }
 }
@@ -102,23 +112,23 @@
 
 - (void)setFileFilterText:(id)sender
 {
-    [fFileController setFilterText:[sender stringValue]];
+    self.fFileController.filterText = [sender stringValue];
 }
 
 - (IBAction)checkAll:(id)sender
 {
-    [fFileController checkAll];
+    [self.fFileController checkAll];
 }
 
 - (IBAction)uncheckAll:(id)sender
 {
-    [fFileController uncheckAll];
+    [self.fFileController uncheckAll];
 }
 
 - (NSArray*)quickLookURLs
 {
-    FileOutlineView* fileOutlineView = fFileController.outlineView;
-    Torrent* torrent = fTorrents[0];
+    FileOutlineView* fileOutlineView = self.fFileController.outlineView;
+    Torrent* torrent = self.fTorrents[0];
     NSIndexSet* indexes = fileOutlineView.selectedRowIndexes;
     NSMutableArray* urlArray = [NSMutableArray arrayWithCapacity:indexes.count];
 
@@ -136,18 +146,18 @@
 
 - (BOOL)canQuickLook
 {
-    if (fTorrents.count != 1)
+    if (self.fTorrents.count != 1)
     {
         return NO;
     }
 
-    Torrent* torrent = fTorrents[0];
+    Torrent* torrent = self.fTorrents[0];
     if (!torrent.folder)
     {
         return NO;
     }
 
-    FileOutlineView* fileOutlineView = fFileController.outlineView;
+    FileOutlineView* fileOutlineView = self.fFileController.outlineView;
     NSIndexSet* indexes = fileOutlineView.selectedRowIndexes;
 
     for (NSUInteger i = indexes.firstIndex; i != NSNotFound; i = [indexes indexGreaterThanIndex:i])
@@ -163,10 +173,10 @@
 
 - (NSRect)quickLookSourceFrameForPreviewItem:(id<QLPreviewItem>)item
 {
-    FileOutlineView* fileOutlineView = fFileController.outlineView;
+    FileOutlineView* fileOutlineView = self.fFileController.outlineView;
 
     NSString* fullPath = ((NSURL*)item).path;
-    Torrent* torrent = fTorrents[0];
+    Torrent* torrent = self.fTorrents[0];
     NSRange visibleRows = [fileOutlineView rowsInRect:fileOutlineView.bounds];
 
     for (NSUInteger row = visibleRows.location; row < NSMaxRange(visibleRows); row++)
@@ -191,41 +201,43 @@
     return NSZeroRect;
 }
 
+#pragma mark - Private
+
 - (void)setupInfo
 {
-    fFileFilterField.stringValue = @"";
+    self.fFileFilterField.stringValue = @"";
 
-    if (fTorrents.count == 1)
+    if (self.fTorrents.count == 1)
     {
-        Torrent* torrent = fTorrents[0];
+        Torrent* torrent = self.fTorrents[0];
 
-        [fFileController setTorrent:torrent];
+        self.fFileController.torrent = torrent;
 
         BOOL const isFolder = torrent.folder;
-        fFileFilterField.enabled = isFolder;
+        self.fFileFilterField.enabled = isFolder;
 
         if (!isFolder)
         {
-            fCheckAllButton.enabled = NO;
-            fUncheckAllButton.enabled = NO;
+            self.fCheckAllButton.enabled = NO;
+            self.fUncheckAllButton.enabled = NO;
         }
     }
     else
     {
-        [fFileController setTorrent:nil];
+        self.fFileController.torrent = nil;
 
-        fFileFilterField.enabled = NO;
+        self.fFileFilterField.enabled = NO;
 
-        fCheckAllButton.enabled = NO;
-        fUncheckAllButton.enabled = NO;
+        self.fCheckAllButton.enabled = NO;
+        self.fUncheckAllButton.enabled = NO;
     }
 
-    fSet = YES;
+    self.fSet = YES;
 }
 
 - (BOOL)canQuickLookFile:(FileListNode*)item
 {
-    Torrent* torrent = fTorrents[0];
+    Torrent* torrent = self.fTorrents[0];
     return (item.isFolder || [torrent fileProgress:item] >= 1.0) && [torrent fileLocation:item];
 }
 
