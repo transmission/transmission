@@ -8,12 +8,12 @@ Some of Transmission's behavior can also be customized via EnvironmentVariables.
 
 ### Overview
 
-GTK, CLI and Daemon (both on a Mac and Linux) use a [JSON](http://www.json.org/) formatted file, mainly because of its human readability.  
+GTK, CLI and Daemon (both on a Mac and Linux) use a [JSON](http://www.json.org/) formatted file, mainly because of its human readability.
 (Consult the [JSON](http://www.json.org/) for detailed information)
 
 ### Reload Settings
 
-You can make the daemon reload the settings file by sending it the `SIGHUP` signal.  
+You can make the daemon reload the settings file by sending it the `SIGHUP` signal.
 Or, simply run either of the following commands:
 
 ```console
@@ -42,7 +42,7 @@ Here is a sample of the three basic types, respectively Boolean, Number and Stri
 
 #### Bandwidth
 
- * **alt-speed-enabled:** Boolean (default = false, aka 'Turtle Mode')  
+ * **alt-speed-enabled:** Boolean (default = false, aka 'Turtle Mode')
    _Note: Clicking the "Turtle" in the gui when the [[scheduler|EditConfigFiles#Scheduling]] is enabled, will only temporarily remove the scheduled limit until the next cycle._
  * **alt-speed-up:** Number (KB/s, default = 50)
  * **alt-speed-down:** Number (KB/s, default = 50)
@@ -52,12 +52,12 @@ Here is a sample of the three basic types, respectively Boolean, Number and Stri
  * **speed-limit-up-enabled:** Boolean (default = false)
  * **upload-slots-per-torrent:** Number (default = 14)
 
-#### [[Blocklists]]
+#### [Blocklists](./Blocklists.md)
 
  * **blocklist-url:** String (default = http://www.example.com/blocklist)
  * **blocklist-enabled:** Boolean (default = false)
 
-#### [[Files and Locations|ConfigFiles]]
+#### [Files and Locations](./ConfigFiles.md)
 
  * **download-dir:** String (default = [[default locations|ConfigFiles#Locations]])
  * **incomplete-dir:** String (default = [[default locations|ConfigFiles#Locations]]) Directory to keep files in until torrent is complete.
@@ -68,7 +68,7 @@ Here is a sample of the three basic types, respectively Boolean, Number and Stri
  * **trash-original-torrent-files:** Boolean (default = false) Delete torrents added from the watch directory.
  * **umask:** Number (default = 18) Sets transmission's file mode creation mask.  See [the umask(2) manpage](http://developer.apple.com/documentation/Darwin/Reference/ManPages/man2/umask.2.html) for more information.  Users who want their saved torrents to be world-writable may want to set this value to 0.  Bear in mind that the json markup language only accepts numbers in base 10, so the standard umask(2) octal notation "022" is written in settings.json as 18.
  * **watch-dir:** String
- * **watch-dir-enabled:** Boolean (default = false) Watch a directory for torrent files and add them to transmission.  
+ * **watch-dir-enabled:** Boolean (default = false) Watch a directory for torrent files and add them to transmission.
    _Note: When **watch-dir-enabled** is true, only the transmission-daemon, transmission-gtk, and transmission-qt applications will monitor **watch-dir** for new .torrent files and automatically load them._
 
 #### Misc
@@ -81,9 +81,13 @@ Here is a sample of the three basic types, respectively Boolean, Number and Stri
  * **message-level:** Number (0 = None, 1 = Error, 2 = Info, 3 = Debug, default = 2) Set verbosity of transmission messages.
  * **pex-enabled:** Boolean (default =  true) Enable [http://en.wikipedia.org/wiki/Peer_exchange Peer Exchange (PEX)].
  * **prefetch-enabled:** Boolean (default = true). When enabled, Transmission will hint to the OS which piece data it's about to read from disk in order to satisfy requests from peers. On Linux, this is done by passing `POSIX_FADV_WILLNEED` to [posix_fadvise()](http://www.kernel.org/doc/man-pages/online/pages/man2/posix_fadvise.2.html). On OS X, this is done by passing `F_RDADVISE` to [fcntl()](http://developer.apple.com/library/IOS/#documentation/System/Conceptual/ManPages_iPhoneOS/man2/fcntl.2.html). This defaults to false if configured with --enable-lightweight.
- * **scrape-paused-torrents-enabled:** Boolean (default = true) 
- * **script-torrent-done-enabled:** Boolean (default = false) Run a script at torrent completion.
+ * **scrape-paused-torrents-enabled:** Boolean (default = true)
+ * **script-torrent-added-enabled:** Boolean (default = false) Run a script when a torrent is added to Transmission. Environmental variables are passed in as detailed on the [Scripts](./Scripts.md) page
+ * **script-torrent-added-filename:** String (default = "") Path to script.
+ * **script-torrent-done-enabled:** Boolean (default = false) Run a script when a torrent is done downloading. Environmental variables are passed in as detailed on the [Scripts](./Scripts.md) page
  * **script-torrent-done-filename:** String (default = "") Path to script.
+ * **script-torrent-done-seeding-enabled:** Boolean (default = false) Run a script when a torrent is done seeding. Environmental variables are passed in as detailed on the [Scripts](./Scripts.md) page
+ * **script-torrent-done-seeding-filename:** String (default = "") Path to script.
  * **utp-enabled:** Boolean (default = true) Enable [Micro Transport Protocol (µTP)](http://en.wikipedia.org/wiki/Micro_Transport_Protocol)
 
 #### Peers
@@ -129,11 +133,11 @@ Here is a sample of the three basic types, respectively Boolean, Number and Stri
 
 #### Scheduling
 
- * **alt-speed-time-enabled:** Boolean (default = false)  
+ * **alt-speed-time-enabled:** Boolean (default = false)
    _Note: When enabled, this will toggle the **alt-speed-enabled** setting._
  * **alt-speed-time-begin:** Number (default = 540, in minutes from midnight, 9am)
  * **alt-speed-time-end:** Number (default = 1020, in minutes from midnight, 5pm)
- * **alt-speed-time-day:** Number/bitfield (default = 127, all days)  
+ * **alt-speed-time-day:** Number/bitfield (default = 127, all days)
    * Start with 0, then for each day you want the scheduler enabled, add:
      * **Sunday**: 1 (binary: `0000001`)
      * **Monday**: 2 (binary: `0000010`)
