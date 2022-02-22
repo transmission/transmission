@@ -56,8 +56,10 @@ public:
 
     tr_session* const session;
     tr_block_span_t const blocks;
-    tr_block_info::Location begin_byte;
-    tr_block_info::Location end_byte;
+    tr_block_info::Location const begin_byte;
+    tr_block_info::Location const end_byte;
+
+    // our current position in the task.
     tr_block_info::Location loc = begin_byte;
 
     bool dead = false;
