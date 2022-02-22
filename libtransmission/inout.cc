@@ -5,11 +5,11 @@
 
 #include <algorithm>
 #include <cerrno>
-#include <cstdlib> /* abort() */
 #include <optional>
 #include <vector>
 
 #include "transmission.h"
+
 #include "cache.h" /* tr_cacheReadBlock() */
 #include "crypto-utils.h"
 #include "error.h"
@@ -17,7 +17,6 @@
 #include "file.h"
 #include "inout.h"
 #include "log.h"
-#include "peer-common.h" /* MAX_BLOCK_SIZE */
 #include "stats.h" /* tr_statsFileCreated() */
 #include "torrent.h"
 #include "tr-assert.h"
@@ -25,32 +24,68 @@
 
 using namespace std::literals;
 
-/****
-*****  Low-level IO functions
-****/
-
-enum
+namespace
 {
-    TR_IO_READ,
-    TR_IO_PREFETCH,
-    /* Any operations that require write access must follow TR_IO_WRITE. */
-    TR_IO_WRITE
+
+bool readEntireBuf(tr_sys_file_t fd, uint64_t file_offset, uint8_t* buf, uint64_t buflen, tr_error** error)
+{
+    while (buflen > 0)
+    {
+        auto n_read = uint64_t{};
+
+        if (!tr_sys_file_read_at(fd, buf, buflen, file_offset, &n_read, error))
+        {
+            return false;
+        }
+
+        buf += n_read;
+        buflen -= n_read;
+        file_offset += n_read;
+    }
+
+    return true;
+}
+
+bool writeEntireBuf(tr_sys_file_t fd, uint64_t file_offset, uint8_t const* buf, uint64_t buflen, tr_error** error)
+{
+    while (buflen > 0)
+    {
+        auto n_written = uint64_t{};
+
+        if (!tr_sys_file_write_at(fd, buf, buflen, file_offset, &n_written, error))
+        {
+            return false;
+        }
+
+        buf += n_written;
+        buflen -= n_written;
+        file_offset += n_written;
+    }
+
+    return true;
+}
+
+enum class IoMode
+{
+    Read,
+    Prefetch,
+    Write
 };
 
 /* returns 0 on success, or an errno on failure */
-static int readOrWriteBytes(
+int readOrWriteBytes(
     tr_session* session,
     tr_torrent* tor,
-    int ioMode,
+    IoMode io_mode,
     tr_file_index_t file_index,
     uint64_t file_offset,
-    void* buf,
+    uint8_t* buf,
     size_t buflen)
 {
     TR_ASSERT(file_index < tor->fileCount());
 
     int err = 0;
-    bool const doWrite = ioMode >= TR_IO_WRITE;
+    bool const doWrite = io_mode == IoMode::Write;
     auto const file_size = tor->fileSize(file_index);
     TR_ASSERT(file_size == 0 || file_offset < file_size);
     TR_ASSERT(file_offset + buflen <= file_size);
@@ -108,47 +143,47 @@ static int readOrWriteBytes(
         tr_free(subpath);
     }
 
+    if (err != 0)
+    {
+        return err;
+    }
+
     /***
     ****  Use the fd
     ***/
 
-    if (err == 0)
-    {
-        tr_error* error = nullptr;
+    tr_error* error = nullptr;
 
-        if (ioMode == TR_IO_READ)
+    switch (io_mode)
+    {
+    case IoMode::Read:
+        if (!readEntireBuf(fd, file_offset, buf, buflen, &error))
         {
-            if (!tr_sys_file_read_at(fd, buf, buflen, file_offset, nullptr, &error))
-            {
-                err = error->code;
-                tr_logAddTorErr(tor, "read failed for \"%s\": %s", tor->fileSubpath(file_index).c_str(), error->message);
-                tr_error_free(error);
-            }
+            err = error->code;
+            tr_logAddTorErr(tor, "read failed for \"%s\": %s", tor->fileSubpath(file_index).c_str(), error->message);
+            tr_error_free(error);
         }
-        else if (ioMode == TR_IO_WRITE)
+        break;
+
+    case IoMode::Write:
+        if (!writeEntireBuf(fd, file_offset, buf, buflen, &error))
         {
-            if (!tr_sys_file_write_at(fd, buf, buflen, file_offset, nullptr, &error))
-            {
-                err = error->code;
-                tr_logAddTorErr(tor, "write failed for \"%s\": %s", tor->fileSubpath(file_index).c_str(), error->message);
-                tr_error_free(error);
-            }
+            err = error->code;
+            tr_logAddTorErr(tor, "write failed for \"%s\": %s", tor->fileSubpath(file_index).c_str(), error->message);
+            tr_error_free(error);
         }
-        else if (ioMode == TR_IO_PREFETCH)
-        {
-            tr_sys_file_advise(fd, file_offset, buflen, TR_SYS_FILE_ADVICE_WILL_NEED, nullptr);
-        }
-        else
-        {
-            abort();
-        }
+        break;
+
+    case IoMode::Prefetch:
+        tr_sys_file_advise(fd, file_offset, buflen, TR_SYS_FILE_ADVICE_WILL_NEED, nullptr);
+        break;
     }
 
     return err;
 }
 
 /* returns 0 on success, or an errno on failure */
-static int readOrWritePiece(tr_torrent* tor, int ioMode, tr_block_info::Location loc, uint8_t* buf, size_t buflen)
+int readOrWritePiece(tr_torrent* tor, IoMode io_mode, tr_block_info::Location loc, uint8_t* buf, size_t buflen)
 {
     int err = 0;
 
@@ -163,11 +198,11 @@ static int readOrWritePiece(tr_torrent* tor, int ioMode, tr_block_info::Location
     {
         uint64_t const bytes_this_pass = std::min(uint64_t{ buflen }, uint64_t{ tor->fileSize(file_index) - file_offset });
 
-        err = readOrWriteBytes(tor->session, tor, ioMode, file_index, file_offset, buf, bytes_this_pass);
+        err = readOrWriteBytes(tor->session, tor, io_mode, file_index, file_offset, buf, bytes_this_pass);
         buf += bytes_this_pass;
         buflen -= bytes_this_pass;
 
-        if (err != 0 && ioMode == TR_IO_WRITE && tor->error != TR_STAT_LOCAL_ERROR)
+        if (err != 0 && io_mode == IoMode::Write && tor->error != TR_STAT_LOCAL_ERROR)
         {
             auto const path = tr_strvPath(tor->downloadDir().sv(), tor->fileSubpath(file_index));
             tor->setLocalError(tr_strvJoin(tr_strerror(err), " ("sv, path, ")"sv));
@@ -180,26 +215,7 @@ static int readOrWritePiece(tr_torrent* tor, int ioMode, tr_block_info::Location
     return err;
 }
 
-int tr_ioRead(tr_torrent* tor, tr_block_info::Location loc, uint32_t len, uint8_t* buf)
-{
-    return readOrWritePiece(tor, TR_IO_READ, loc, buf, len);
-}
-
-int tr_ioPrefetch(tr_torrent* tor, tr_block_info::Location loc, uint32_t len)
-{
-    return readOrWritePiece(tor, TR_IO_PREFETCH, loc, nullptr, len);
-}
-
-int tr_ioWrite(tr_torrent* tor, tr_block_info::Location loc, uint32_t len, uint8_t const* buf)
-{
-    return readOrWritePiece(tor, TR_IO_WRITE, loc, (uint8_t*)buf, len);
-}
-
-/****
-*****
-****/
-
-static std::optional<tr_sha1_digest_t> recalculateHash(tr_torrent* tor, tr_piece_index_t piece)
+std::optional<tr_sha1_digest_t> recalculateHash(tr_torrent* tor, tr_piece_index_t piece)
 {
     TR_ASSERT(tor != nullptr);
     TR_ASSERT(piece < tor->pieceCount());
@@ -225,6 +241,23 @@ static std::optional<tr_sha1_digest_t> recalculateHash(tr_torrent* tor, tr_piece
     }
 
     return tr_sha1_final(sha);
+}
+
+} // namespace
+
+int tr_ioRead(tr_torrent* tor, tr_block_info::Location loc, uint32_t len, uint8_t* buf)
+{
+    return readOrWritePiece(tor, IoMode::Read, loc, buf, len);
+}
+
+int tr_ioPrefetch(tr_torrent* tor, tr_block_info::Location loc, uint32_t len)
+{
+    return readOrWritePiece(tor, IoMode::Prefetch, loc, nullptr, len);
+}
+
+int tr_ioWrite(tr_torrent* tor, tr_block_info::Location loc, uint32_t len, uint8_t const* buf)
+{
+    return readOrWritePiece(tor, IoMode::Write, loc, (uint8_t*)buf, len);
 }
 
 bool tr_ioTestPiece(tr_torrent* tor, tr_piece_index_t piece)
