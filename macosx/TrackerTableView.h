@@ -7,14 +7,9 @@
 @class Torrent;
 
 @interface TrackerTableView : NSTableView
-{
-    //weak references
-    Torrent* fTorrent;
-    NSArray* fTrackers;
-}
 
-- (void)setTorrent:(Torrent*)torrent;
-- (void)setTrackers:(NSArray*)trackers;
+@property(nonatomic, weak) Torrent* torrent;
+@property(nonatomic, weak) NSArray* trackers;
 
 - (void)copy:(id)sender;
 - (void)paste:(id)sender;

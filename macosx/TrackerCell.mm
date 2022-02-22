@@ -21,6 +21,10 @@
 @interface TrackerCell ()
 
 @property(nonatomic, readonly) NSImage* favIcon;
+@property(nonatomic, readonly) NSAttributedString* attributedName;
+@property(nonatomic, readonly) NSMutableDictionary* fNameAttributes;
+@property(nonatomic, readonly) NSMutableDictionary* fStatusAttributes;
+
 - (void)loadTrackerIcon:(NSString*)baseAddress;
 
 - (NSRect)imageRectForBounds:(NSRect)bounds;
@@ -32,7 +36,6 @@
                     withRightRect:(NSRect)rightRect
                          inBounds:(NSRect)bounds;
 
-@property(nonatomic, readonly) NSAttributedString* attributedName;
 - (NSAttributedString*)attributedStatusWithString:(NSString*)statusString;
 - (NSAttributedString*)attributedCount:(NSInteger)count;
 
@@ -57,10 +60,10 @@ NSMutableSet* fTrackerIconLoading;
         NSMutableParagraphStyle* paragraphStyle = [NSParagraphStyle.defaultParagraphStyle mutableCopy];
         paragraphStyle.lineBreakMode = NSLineBreakByTruncatingTail;
 
-        fNameAttributes = [[NSMutableDictionary alloc]
+        _fNameAttributes = [[NSMutableDictionary alloc]
             initWithObjectsAndKeys:[NSFont messageFontOfSize:12.0], NSFontAttributeName, paragraphStyle, NSParagraphStyleAttributeName, nil];
 
-        fStatusAttributes = [[NSMutableDictionary alloc]
+        _fStatusAttributes = [[NSMutableDictionary alloc]
             initWithObjectsAndKeys:[NSFont messageFontOfSize:9.0], NSFontAttributeName, paragraphStyle, NSParagraphStyleAttributeName, nil];
     }
     return self;
@@ -70,8 +73,8 @@ NSMutableSet* fTrackerIconLoading;
 {
     TrackerCell* copy = [super copyWithZone:zone];
 
-    copy->fNameAttributes = fNameAttributes;
-    copy->fStatusAttributes = fStatusAttributes;
+    copy->_fNameAttributes = _fNameAttributes;
+    copy->_fStatusAttributes = _fStatusAttributes;
 
     return copy;
 }
@@ -96,8 +99,8 @@ NSMutableSet* fTrackerIconLoading;
         statusColor = NSColor.secondaryLabelColor;
     }
 
-    fNameAttributes[NSForegroundColorAttributeName] = nameColor;
-    fStatusAttributes[NSForegroundColorAttributeName] = statusColor;
+    self.fNameAttributes[NSForegroundColorAttributeName] = nameColor;
+    self.fStatusAttributes[NSForegroundColorAttributeName] = statusColor;
 
     TrackerNode* node = (TrackerNode*)self.objectValue;
 
@@ -156,6 +159,8 @@ NSMutableSet* fTrackerIconLoading;
                                                        inBounds:cellFrame];
     [lastScrapeString drawInRect:lastScrapeRect];
 }
+
+#pragma mark - Private
 
 - (NSImage*)favIcon
 {
@@ -306,18 +311,18 @@ NSMutableSet* fTrackerIconLoading;
 - (NSAttributedString*)attributedName
 {
     NSString* name = ((TrackerNode*)self.objectValue).host;
-    return [[NSAttributedString alloc] initWithString:name attributes:fNameAttributes];
+    return [[NSAttributedString alloc] initWithString:name attributes:self.fNameAttributes];
 }
 
 - (NSAttributedString*)attributedStatusWithString:(NSString*)statusString
 {
-    return [[NSAttributedString alloc] initWithString:statusString attributes:fStatusAttributes];
+    return [[NSAttributedString alloc] initWithString:statusString attributes:self.fStatusAttributes];
 }
 
 - (NSAttributedString*)attributedCount:(NSInteger)count
 {
     NSString* countString = count != -1 ? [NSString stringWithFormat:@"%ld", count] : NSLocalizedString(@"N/A", "tracker peer stat");
-    return [[NSAttributedString alloc] initWithString:countString attributes:fStatusAttributes];
+    return [[NSAttributedString alloc] initWithString:countString attributes:self.fStatusAttributes];
 }
 
 @end

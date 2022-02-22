@@ -365,6 +365,60 @@ TEST_F(UtilsTest, trStrdupPrintf)
     tr_free(s3);
 }
 
+TEST_F(UtilsTest, trStrlcpy)
+{
+    // destination will be initialized with this char
+    char const initial_char = '1';
+    std::array<char, 100> destination = { initial_char };
+
+    std::vector<std::string> tests{
+        "a",
+        "",
+        "12345678901234567890",
+        "This, very usefull string contains total of 104 characters not counting null. Almost like an easter egg!"
+    };
+
+    for (auto& test : tests)
+    {
+        auto c_string = test.c_str();
+        auto length = strlen(c_string);
+
+        destination.fill(initial_char);
+
+        auto responce = tr_strlcpy(&destination, c_string, 98);
+
+        // Check response length
+        ASSERT_EQ(responce, length);
+
+        // Check what was copied
+        for (auto i = 0; i < 97; i++)
+        {
+            if (i <= length)
+            {
+                ASSERT_EQ(destination[i], c_string[i]);
+            }
+            else
+            {
+                ASSERT_EQ(destination[i], initial_char);
+            }
+        }
+
+        // tr_strlcpy should only write this far if (length >= 98)
+        if (length >= 98)
+        {
+            ASSERT_EQ(destination[97], '\0');
+        }
+        else
+        {
+            ASSERT_EQ(destination[97], initial_char);
+        }
+
+        // tr_strlcpy should not write this far
+        ASSERT_EQ(destination[98], initial_char);
+        ASSERT_EQ(destination[99], initial_char);
+    }
+}
+
 TEST_F(UtilsTest, env)
 {
     char const* test_key = "TR_TEST_ENV";

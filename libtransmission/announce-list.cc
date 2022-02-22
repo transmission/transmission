@@ -98,6 +98,29 @@ bool tr_announce_list::add(std::string_view announce_url_sv, tr_tracker_tier_t t
     return true;
 }
 
+void tr_announce_list::add(tr_announce_list const& src)
+{
+    if (std::empty(src))
+    {
+        return;
+    }
+
+    auto src_tier = src.at(0).tier;
+    auto& tgt = *this;
+    auto tgt_tier = tgt.nextTier();
+
+    for (auto const& tracker : src)
+    {
+        if (src_tier != tracker.tier)
+        {
+            src_tier = tracker.tier;
+            ++tgt_tier;
+        }
+
+        tgt.add(tracker.announce.full, tgt_tier);
+    }
+}
+
 std::optional<std::string> tr_announce_list::announceToScrape(std::string_view announce)
 {
     // To derive the scrape URL use the following steps:

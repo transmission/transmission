@@ -5,11 +5,7 @@
 #import <Cocoa/Cocoa.h>
 
 @interface PeerProgressIndicatorCell : NSLevelIndicatorCell
-{
-    NSDictionary* fAttributes;
-    BOOL fSeed;
-}
 
-- (void)setSeed:(BOOL)seed;
+@property(nonatomic) BOOL seed;
 
 @end

@@ -9,11 +9,6 @@
 @class Torrent;
 
 @interface Badger : NSObject
-{
-    tr_session* fLib;
-
-    NSMutableSet* fHashes;
-}
 
 - (instancetype)initWithLib:(tr_session*)lib;
 

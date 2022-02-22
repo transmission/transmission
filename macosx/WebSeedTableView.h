@@ -5,12 +5,8 @@
 #import <Cocoa/Cocoa.h>
 
 @interface WebSeedTableView : NSTableView
-{
-    //weak references
-    NSArray* fWebSeeds;
-}
 
-- (void)setWebSeeds:(NSArray*)webSeeds;
+@property(nonatomic, weak) NSArray* webSeeds;
 
 - (void)copy:(id)sender;
 
