@@ -195,58 +195,42 @@ bool trashDataFile(char const* filename, tr_error** error)
     return self;
 }
 
-- (instancetype)initWithHistory:(NSDictionary*)history lib:(tr_session*)lib forcePause:(BOOL)pause
+- (void)shouldResumeTorrent:(Torrent*)torrent WithHistory:(NSDictionary*)history forcePause:(BOOL)pause
 {
-    self = [self initWithPath:history[@"InternalTorrentPath"] hash:history[@"TorrentHash"] torrentStruct:NULL magnetAddress:nil
-                            lib:lib
-                     groupValue:history[@"GroupValue"]
-        removeWhenFinishSeeding:history[@"RemoveWhenFinishSeeding"]
-                 downloadFolder:history[@"DownloadFolder"] //upgrading from versions < 1.80
-         legacyIncompleteFolder:[history[@"UseIncompleteFolder"] boolValue] //upgrading from versions < 1.80
-             ?
-             history[@"IncompleteFolder"] :
-             nil];
-
-    if (self)
+    //start transfer
+    NSNumber* active;
+    if (!pause && (active = history[@"Active"]) && active.boolValue)
     {
-        //start transfer
-        NSNumber* active;
-        if (!pause && (active = history[@"Active"]) && active.boolValue)
-        {
-            _fStat = tr_torrentStat(_fHandle);
-            [self startTransferNoQueue];
-        }
+        [torrent startTransferNoQueue];
+    }
 
-        //upgrading from versions < 1.60: get old stop ratio settings
-        NSNumber* ratioSetting;
-        if ((ratioSetting = history[@"RatioSetting"]))
+    //upgrading from versions < 1.60: get old stop ratio settings
+    NSNumber* ratioSetting;
+    if ((ratioSetting = history[@"RatioSetting"]))
+    {
+        switch (ratioSetting.intValue)
         {
-            switch (ratioSetting.intValue)
-            {
-            case NSControlStateValueOn:
-                self.ratioSetting = TR_RATIOLIMIT_SINGLE;
-                break;
-            case NSControlStateValueOff:
-                self.ratioSetting = TR_RATIOLIMIT_UNLIMITED;
-                break;
-            case NSControlStateValueMixed:
-                self.ratioSetting = TR_RATIOLIMIT_GLOBAL;
-                break;
-            }
-        }
-        NSNumber* ratioLimit;
-        if ((ratioLimit = history[@"RatioLimit"]))
-        {
-            self.ratioLimit = ratioLimit.floatValue;
+        case NSControlStateValueOn:
+            self.ratioSetting = TR_RATIOLIMIT_SINGLE;
+            break;
+        case NSControlStateValueOff:
+            self.ratioSetting = TR_RATIOLIMIT_UNLIMITED;
+            break;
+        case NSControlStateValueMixed:
+            self.ratioSetting = TR_RATIOLIMIT_GLOBAL;
+            break;
         }
     }
-    return self;
+    NSNumber* ratioLimit;
+    if ((ratioLimit = history[@"RatioLimit"]))
+    {
+        self.ratioLimit = ratioLimit.floatValue;
+    }
 }
 
 - (NSDictionary*)history
 {
     return @{
-        @"InternalTorrentPath" : self.torrentLocation,
         @"TorrentHash" : self.hashString,
         @"Active" : @(self.active),
         @"WaitToStart" : @(self.waitingToStart),
