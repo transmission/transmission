@@ -8,20 +8,10 @@
 @class FileOutlineView;
 
 @interface FileOutlineController : NSObject
-{
-    Torrent* fTorrent;
-    NSMutableArray* fFileList;
-
-    IBOutlet FileOutlineView* fOutline;
-
-    NSString* fFilterText;
-}
 
 @property(nonatomic, readonly) FileOutlineView* outlineView;
-
-- (void)setTorrent:(Torrent*)torrent;
-
-- (void)setFilterText:(NSString*)text;
+@property(nonatomic) Torrent* torrent;
+@property(nonatomic) NSString* filterText;
 
 - (void)refresh;
 

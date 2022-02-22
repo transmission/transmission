@@ -103,8 +103,8 @@ static CURLcode ssl_context_func(CURL* /*curl*/, void* ssl_ctx, void* /*user_dat
 class tr_web::Impl
 {
 public:
-    explicit Impl(Controller& controller_in)
-        : controller{ controller_in }
+    explicit Impl(Mediator& mediator_in)
+        : mediator{ mediator_in }
     {
         std::call_once(curl_init_flag, curlInit);
 
@@ -122,12 +122,12 @@ public:
             tr_logAddNamedInfo("web", "NB: Invalid certs will appear as 'Could not connect to tracker' like many other errors");
         }
 
-        if (auto const& file = controller.cookieFile(); file)
+        if (auto const& file = mediator.cookieFile(); file)
         {
             this->cookie_file = *file;
         }
 
-        if (auto const& ua = controller.userAgent(); ua)
+        if (auto const& ua = mediator.userAgent(); ua)
         {
             this->user_agent = *ua;
         }
@@ -231,7 +231,7 @@ private:
             }
 
             response.body.assign(reinterpret_cast<char const*>(evbuffer_pullup(body(), -1)), evbuffer_get_length(body()));
-            impl.controller.run(std::move(options.done_func), std::move(this->response));
+            impl.mediator.run(std::move(options.done_func), std::move(this->response));
         }
 
         tr_web::Impl& impl;
@@ -245,7 +245,7 @@ private:
     bool const curl_ssl_verify = !tr_env_key_exists("TR_CURL_SSL_NO_VERIFY");
     bool const curl_proxy_ssl_verify = !tr_env_key_exists("TR_CURL_PROXY_SSL_NO_VERIFY");
 
-    Controller& controller;
+    Mediator& mediator;
 
     std::string curl_ca_bundle;
 
@@ -274,13 +274,13 @@ private:
             // If this is more bandwidth than is allocated for this tag,
             // then pause the torrent for a tick. curl will deliver `data`
             // again when the transfer is unpaused.
-            if (task->impl.controller.clamp(*tag, bytes_used) < bytes_used)
+            if (task->impl.mediator.clamp(*tag, bytes_used) < bytes_used)
             {
                 task->impl.paused_easy_handles.emplace(tr_time_msec(), task->easy());
                 return CURL_WRITEFUNC_PAUSE;
             }
 
-            task->impl.controller.notifyBandwidthConsumed(*tag, bytes_used);
+            task->impl.mediator.notifyBandwidthConsumed(*tag, bytes_used);
         }
 
         evbuffer_add(task->body(), data, bytes_used);
@@ -365,7 +365,7 @@ private:
         (void)curl_easy_setopt(e, CURLOPT_WRITEDATA, task);
         (void)curl_easy_setopt(e, CURLOPT_WRITEFUNCTION, onDataReceived);
 
-        if (auto const addrstr = impl->controller.publicAddress(); addrstr)
+        if (auto const addrstr = impl->mediator.publicAddress(); addrstr)
         {
             (void)curl_easy_setopt(e, CURLOPT_INTERFACE, addrstr->c_str());
         }
@@ -533,16 +533,16 @@ private:
 
 std::once_flag tr_web::Impl::curl_init_flag;
 
-tr_web::tr_web(Controller& controller)
-    : impl_{ std::make_unique<Impl>(controller) }
+tr_web::tr_web(Mediator& mediator)
+    : impl_{ std::make_unique<Impl>(mediator) }
 {
 }
 
 tr_web::~tr_web() = default;
 
-std::unique_ptr<tr_web> tr_web::create(Controller& controller)
+std::unique_ptr<tr_web> tr_web::create(Mediator& mediator)
 {
-    return std::unique_ptr<tr_web>(new tr_web(controller));
+    return std::unique_ptr<tr_web>(new tr_web(mediator));
 }
 
 void tr_web::fetch(FetchOptions&& options)

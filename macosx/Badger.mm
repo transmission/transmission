@@ -7,18 +7,26 @@
 #import "NSStringAdditions.h"
 #import "Torrent.h"
 
+@interface Badger ()
+
+@property(nonatomic, readonly) tr_session* fLib;
+
+@property(nonatomic, readonly) NSMutableSet* fHashes;
+
+@end
+
 @implementation Badger
 
 - (instancetype)initWithLib:(tr_session*)lib
 {
     if ((self = [super init]))
     {
-        fLib = lib;
+        _fLib = lib;
 
         BadgeView* view = [[BadgeView alloc] initWithLib:lib];
         NSApp.dockTile.contentView = view;
 
-        fHashes = [[NSMutableSet alloc] init];
+        _fHashes = [[NSMutableSet alloc] init];
     }
 
     return self;
@@ -40,18 +48,18 @@
 {
     NSParameterAssert(torrent != nil);
 
-    [fHashes addObject:torrent.hashString];
-    NSApp.dockTile.badgeLabel = [NSString formattedUInteger:fHashes.count];
+    [self.fHashes addObject:torrent.hashString];
+    NSApp.dockTile.badgeLabel = [NSString formattedUInteger:self.fHashes.count];
 }
 
 - (void)removeTorrent:(Torrent*)torrent
 {
-    if ([fHashes member:torrent.hashString])
+    if ([self.fHashes member:torrent.hashString])
     {
-        [fHashes removeObject:torrent.hashString];
-        if (fHashes.count > 0)
+        [self.fHashes removeObject:torrent.hashString];
+        if (self.fHashes.count > 0)
         {
-            NSApp.dockTile.badgeLabel = [NSString formattedUInteger:fHashes.count];
+            NSApp.dockTile.badgeLabel = [NSString formattedUInteger:self.fHashes.count];
         }
         else
         {
@@ -62,9 +70,9 @@
 
 - (void)clearCompleted
 {
-    if (fHashes.count > 0)
+    if (self.fHashes.count > 0)
     {
-        [fHashes removeAllObjects];
+        [self.fHashes removeAllObjects];
         NSApp.dockTile.badgeLabel = @"";
     }
 }
