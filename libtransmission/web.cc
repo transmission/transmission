@@ -382,8 +382,6 @@ private:
 
         if (auto const& range = task->range(); range)
         {
-            /* don't bother asking the server to compress webseed fragments */
-            (void)curl_easy_setopt(e, CURLOPT_ENCODING, "identity");
             (void)curl_easy_setopt(e, CURLOPT_RANGE, range->c_str());
         }
     }
