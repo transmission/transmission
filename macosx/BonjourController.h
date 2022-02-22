@@ -5,9 +5,6 @@
 #import <Cocoa/Cocoa.h>
 
 @interface BonjourController : NSObject<NSNetServiceDelegate>
-{
-    NSNetService* fService;
-}
 
 @property(nonatomic, class, readonly) BonjourController* defaultController;
 @property(nonatomic, class, readonly) BOOL defaultControllerExists;

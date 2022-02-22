@@ -4,18 +4,13 @@
 
 #import <Cocoa/Cocoa.h>
 
-#import "FileOutlineView.h"
-
 @interface FilePriorityCell : NSSegmentedCell
-{
-    BOOL fHoverRow;
-}
+
+@property(nonatomic) BOOL hovered;
 
 - (void)addTrackingAreasForView:(NSView*)controlView
                          inRect:(NSRect)cellFrame
                    withUserInfo:(NSDictionary*)userInfo
                   mouseLocation:(NSPoint)mouseLocation;
-
-- (void)setHovered:(BOOL)hovered;
 
 @end

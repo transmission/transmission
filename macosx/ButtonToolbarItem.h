@@ -5,7 +5,5 @@
 #import <Cocoa/Cocoa.h>
 
 @interface ButtonToolbarItem : NSToolbarItem
-{
-}
 
 @end
