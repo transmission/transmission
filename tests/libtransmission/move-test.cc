@@ -117,7 +117,7 @@ TEST_P(IncompleteDirTest, incompleteDir)
         tr_free(zero_block);
     }
 
-    blockingTorrentVerify(tor);
+    EXPECT_TRUE(blockingTorrentVerify(tor));
     EXPECT_EQ(0, tr_torrentStat(tor)->leftUntilDone);
 
     auto test = [&completeness]()
@@ -162,7 +162,7 @@ TEST_F(MoveTest, setLocation)
     // init a torrent.
     auto* tor = zeroTorrentInit();
     zeroTorrentPopulate(tor, true);
-    blockingTorrentVerify(tor);
+    EXPECT_TRUE(blockingTorrentVerify(tor));
     EXPECT_EQ(0, tr_torrentStat(tor)->leftUntilDone);
 
     // now move it
@@ -176,7 +176,7 @@ TEST_F(MoveTest, setLocation)
     EXPECT_EQ(TR_LOC_DONE, state);
 
     // confirm the torrent is still complete after being moved
-    blockingTorrentVerify(tor);
+    EXPECT_TRUE(blockingTorrentVerify(tor));
     EXPECT_EQ(0, tr_torrentStat(tor)->leftUntilDone);
 
     // confirm the files really got moved

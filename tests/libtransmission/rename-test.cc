@@ -156,13 +156,13 @@ TEST_F(RenameTest, singleFilenameTorrent)
     EXPECT_STREQ("hello-world.txt", tr_torrentFile(tor, 0).name);
 
     // sanity check the (empty) stats
-    blockingTorrentVerify(tor);
+    EXPECT_TRUE(blockingTorrentVerify(tor));
     expectHaveNone(tor, TotalSize);
 
     createSingleFileTorrentContents(tor->currentDir().sv());
 
     // sanity check the stats again, now that we've added the file
-    blockingTorrentVerify(tor);
+    EXPECT_TRUE(blockingTorrentVerify(tor));
     auto const* st = tr_torrentStat(tor);
     EXPECT_EQ(TR_STATUS_STOPPED, st->activity);
     EXPECT_EQ(TR_STAT_OK, st->error);
@@ -276,14 +276,14 @@ TEST_F(RenameTest, multifileTorrent)
     }
 
     // sanity check the (empty) stats
-    blockingTorrentVerify(tor);
+    EXPECT_TRUE(blockingTorrentVerify(tor));
     expectHaveNone(tor, TotalSize);
 
     // build the local data
     createMultifileTorrentContents(tor->currentDir().sv());
 
     // sanity check the (full) stats
-    blockingTorrentVerify(tor);
+    EXPECT_TRUE(blockingTorrentVerify(tor));
     auto const* st = tr_torrentStat(tor);
     EXPECT_EQ(TR_STATUS_STOPPED, st->activity);
     EXPECT_EQ(TR_STAT_OK, st->error);
@@ -353,7 +353,7 @@ TEST_F(RenameTest, multifileTorrent)
     tr_free(tmp);
     tr_free(str);
     sync();
-    blockingTorrentVerify(tor);
+    EXPECT_TRUE(blockingTorrentVerify(tor));
     testFileExistsAndConsistsOfThisString(tor, 0, expected_contents[0]);
 
     for (tr_file_index_t i = 1; i <= 2; ++i)

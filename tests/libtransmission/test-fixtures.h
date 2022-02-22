@@ -419,7 +419,7 @@ protected:
         }
 
         sync();
-        blockingTorrentVerify(tor);
+        EXPECT_TRUE(blockingTorrentVerify(tor));
 
         if (complete)
         {
@@ -431,19 +431,26 @@ protected:
         }
     }
 
-    void blockingTorrentVerify(tr_torrent* tor)
+    bool blockingTorrentVerify(tr_torrent* tor)
     {
         EXPECT_NE(nullptr, tor->session);
         EXPECT_FALSE(tr_amInEventThread(tor->session));
         tor->checked_pieces_.setHasNone();
+        waitFor(
+            [tor]()
+            {
+                auto const activity = tr_torrentGetActivity(tor);
+                return activity != TR_STATUS_CHECK && activity != TR_STATUS_CHECK_WAIT;
+            },
+            4000);
         tr_torrentVerify(tor);
-        EXPECT_TRUE(waitFor(
+        return waitFor(
             [tor]()
             {
                 auto const activity = tr_torrentGetActivity(tor);
                 return activity != TR_STATUS_CHECK && activity != TR_STATUS_CHECK_WAIT && tor->checked_pieces_.hasAll();
             },
-            10000));
+            10000);
     }
 
     tr_session* session_ = nullptr;
