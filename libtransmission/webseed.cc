@@ -194,6 +194,21 @@ public:
         return is_active;
     }
 
+    void gotPieceData(uint32_t n_bytes)
+    {
+        bandwidth.notifyBandwidthConsumed(TR_DOWN, n_bytes, true, tr_time_msec());
+        publishClientGotPieceData(n_bytes);
+        connection_limiter.gotData();
+    }
+
+    void publish(tr_peer_event* event)
+    {
+        if (callback != nullptr)
+        {
+            (*callback)(this, event, callback_data);
+        }
+    }
+
     int const torrent_id;
     std::string const base_url;
     tr_peer_callback const callback;
@@ -204,6 +219,14 @@ public:
     std::set<tr_webseed_task*> tasks;
 
 private:
+    void publishClientGotPieceData(uint32_t length)
+    {
+        auto e = tr_peer_event{};
+        e.eventType = TR_PEER_CLIENT_GOT_PIECE_DATA;
+        e.length = length;
+        publish(&e);
+    }
+
     void startTimer()
     {
         tr_timerAddMsec(pulse_timer.get(), IdleTimerMsec);
@@ -224,14 +247,6 @@ private:
 ****
 ***/
 
-void publish(tr_webseed* w, tr_peer_event* e)
-{
-    if (w->callback != nullptr)
-    {
-        (*w->callback)(w, e, w->callback_data);
-    }
-}
-
 void fire_client_got_rejs(tr_torrent* tor, tr_webseed* w, tr_block_span_t block_span)
 {
     auto e = tr_peer_event{};
@@ -242,34 +257,21 @@ void fire_client_got_rejs(tr_torrent* tor, tr_webseed* w, tr_block_span_t block_
         auto const loc = tor->blockLoc(block);
         e.pieceIndex = loc.piece;
         e.offset = loc.piece_offset;
-        publish(w, &e);
+        w->publish(&e);
     }
 }
 
-void fire_client_got_blocks(tr_torrent* tor, tr_webseed* w, tr_block_index_t block, tr_block_index_t count)
+void fire_client_got_block(tr_torrent const* tor, tr_webseed* w, tr_block_info::Location loc)
 {
+    TR_ASSERT(loc.block_offset == 0);
+    TR_ASSERT(loc.block < tor->blockCount());
+
     auto e = tr_peer_event{};
     e.eventType = TR_PEER_CLIENT_GOT_BLOCK;
-    tr_torrentGetBlockLocation(tor, block, &e.pieceIndex, &e.offset, &e.length);
-
-    for (tr_block_index_t i = 1; i <= count; i++)
-    {
-        if (i == count)
-        {
-            e.length = tor->blockSize(block + count - 1);
-        }
-
-        publish(w, &e);
-        e.offset += e.length;
-    }
-}
-
-void fire_client_got_piece_data(tr_webseed* w, uint32_t length)
-{
-    auto e = tr_peer_event{};
-    e.eventType = TR_PEER_CLIENT_GOT_PIECE_DATA;
-    e.length = length;
-    publish(w, &e);
+    e.pieceIndex = loc.piece;
+    e.offset = loc.piece_offset;
+    e.length = tor->blockSize(loc.block);
+    w->publish(&e);
 }
 
 /***
@@ -312,7 +314,7 @@ public:
         auto const len = evbuffer_get_length(buf);
         TR_ASSERT(tor->blockSize(data->loc.block) == len);
         tr_cacheWriteBlock(tor->session->cache, tor, data->loc, len, buf);
-        fire_client_got_blocks(tor, w, data->loc.block, 1);
+        fire_client_got_block(tor, w, data->loc);
         TR_ASSERT(evbuffer_get_length(buf) == 0);
         delete data;
     }
@@ -336,9 +338,9 @@ void useFetchedBlocks(tr_webseed_task* task)
         return;
     }
 
+    auto* const buf = task->content();
     for (;;)
     {
-        auto* const buf = task->content();
         auto const block_size = tor->blockSize(task->loc.block);
         if (evbuffer_get_length(buf) < block_size)
         {
@@ -351,7 +353,7 @@ void useFetchedBlocks(tr_webseed_task* task)
         }
         else
         {
-            auto* data = new write_block_data{ session, tor->uniqueId, webseed, task->loc };
+            auto* const data = new write_block_data{ session, tor->uniqueId, webseed, task->loc };
             evbuffer_remove_buffer(task->content(), data->content(), block_size);
             tr_runInEventThread(session, write_block_data::write_block_func, data);
         }
@@ -379,9 +381,7 @@ void onBufferGotData(evbuffer* /*buf*/, evbuffer_cb_info const* info, void* vtas
     auto const lock = session->unique_lock();
 
     auto* const webseed = task->webseed;
-    webseed->bandwidth.notifyBandwidthConsumed(TR_DOWN, n_added, true, tr_time_msec());
-    fire_client_got_piece_data(webseed, n_added);
-    webseed->connection_limiter.gotData();
+    webseed->gotPieceData(n_added);
 
     useFetchedBlocks(task);
 }
@@ -396,8 +396,20 @@ void on_idle(tr_webseed* w)
         return;
     }
 
-    for (auto const span : tr_peerMgrGetNextRequests(tor, w, w->connection_limiter.slotsAvailable()))
+    auto const slots_available = w->connection_limiter.slotsAvailable();
+    if (slots_available == 0)
     {
+        return;
+    }
+
+    // Prefer to request large, contiguous chunks from webseeds.
+    // The actual value of '64' is arbitrary here; we could probably
+    // be smarter about this.
+    auto constexpr PreferredBlocksPerTask = size_t{ 64 };
+    auto const spans = tr_peerMgrGetNextRequests(tor, w, slots_available * PreferredBlocksPerTask);
+    for (size_t i = 0; i < slots_available && i < std::size(spans); ++i)
+    {
+        auto const& span = spans[i];
         w->connection_limiter.taskStarted();
         auto* const task = new tr_webseed_task{ tor, w, span };
         evbuffer_add_cb(task->content(), onBufferGotData, task);
@@ -438,8 +450,6 @@ void onPartialDataFetched(tr_web::FetchResponse const& web_response)
         return;
     }
 
-    useFetchedBlocks(task);
-
     if (task->loc < task->end_byte)
     {
         // Request finished successfully but there's still data missing.
@@ -449,6 +459,7 @@ void onPartialDataFetched(tr_web::FetchResponse const& web_response)
         return;
     }
 
+    TR_ASSERT(evbuffer_get_length(task->content()) == 0);
     webseed->tasks.erase(task);
     delete task;
 
@@ -477,9 +488,9 @@ void task_request_next_chunk(tr_webseed_task* task)
     }
 
     auto const [file_index, file_offset] = tor->fileOffset(task->loc);
+
     auto const left_in_file = tor->fileSize(file_index) - file_offset;
     auto const left_in_task = task->end_byte.byte - task->loc.byte;
-
     auto const this_chunk = std::min(left_in_file, left_in_task);
 
     auto const url = make_url(webseed, tor->fileSubpath(file_index));
