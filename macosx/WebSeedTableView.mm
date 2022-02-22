@@ -12,16 +12,11 @@
     [super mouseDown:event];
 }
 
-- (void)setWebSeeds:(NSArray*)webSeeds
-{
-    fWebSeeds = webSeeds;
-}
-
 - (void)copy:(id)sender
 {
     NSIndexSet* indexes = self.selectedRowIndexes;
     NSMutableArray* addresses = [NSMutableArray arrayWithCapacity:indexes.count];
-    [fWebSeeds enumerateObjectsAtIndexes:indexes options:0 usingBlock:^(NSDictionary* webSeed, NSUInteger idx, BOOL* stop) {
+    [self.webSeeds enumerateObjectsAtIndexes:indexes options:0 usingBlock:^(NSDictionary* webSeed, NSUInteger idx, BOOL* stop) {
         [addresses addObject:webSeed[@"Address"]];
     }];
 
