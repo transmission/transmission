@@ -50,7 +50,7 @@ Connecting to a peer is like telephone calls: either you call up the peer, or th
 
 Many people don't want to mess with their firewall and/or router, so they decide that dialing out is good enough and leave their port closed. Other people panic and worry too much about getting their port open even if they have a troublesome router. The truth is in the middle &mdash; you _can_ get by with a closed port, but on average you'll get much faster speeds if peers can connect to you.
 
-Opening a closed port is often the most frustrating task in Bittorrent. The good news is that the Transmission wiki has two pages dedicated to this topic: the [[Port Forwarding Guide|PortForwardingGuide]] and the [[Why is my port closed|PortClosed]] page.
+Opening a closed port is often the most frustrating task in Bittorrent. The good news is that the Transmission wiki has two pages dedicated to this topic: the [[Port Forwarding Guide|PortForwardingGuide]] and the [Why is my port closed](Why-is-my-port-closed.md) page.
 
 You can also test your port status  at [canyouseeme.org](http://www.canyouseeme.org/).
 
