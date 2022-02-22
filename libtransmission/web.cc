@@ -240,6 +240,7 @@ private:
 
     static auto constexpr BandwidthPauseMsec = long{ 500 };
     static auto constexpr DnsCacheTimeoutSecs = long{ 60 * 60 };
+    static auto constexpr MaxRedirects = long{ 10 };
 
     bool const curl_verbose = tr_env_key_exists("TR_CURL_VERBOSE");
     bool const curl_ssl_verify = !tr_env_key_exists("TR_CURL_SSL_NO_VERIFY");
@@ -364,6 +365,7 @@ private:
         (void)curl_easy_setopt(e, CURLOPT_VERBOSE, impl->curl_verbose ? 1L : 0L);
         (void)curl_easy_setopt(e, CURLOPT_WRITEDATA, task);
         (void)curl_easy_setopt(e, CURLOPT_WRITEFUNCTION, onDataReceived);
+        (void)curl_easy_setopt(e, CURLOPT_MAXREDIRS, MaxRedirects);
 
         if (auto const addrstr = impl->controller.publicAddress(); addrstr)
         {
