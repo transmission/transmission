@@ -17,8 +17,8 @@ Users can set environmental variables to override Transmission's default behavio
 
  * If `TRANSMISSION_WEB_HOME` is _not_ set, non-Mac platforms will look for the [[Web Interface|WebInterface]] files in `XDG_DATA_HOME` and in `XDG_DATA_DIRS` as described in [the XDG Base Directory Specification](http://standards.freedesktop.org/basedir-spec/basedir-spec-latest.html#variables). `XDG_DATA_HOME` has a default value of `$HOME/.local/share/`.
  * If `TRANSMISSION_HOME` is _not_ set, Unix-based versions of Transmission will look for their settings in `$XDG_CONFIG_HOME/transmission/`. `XDG_CONFIG_HOME` has a default value of `$HOME/.config/`.
- * If `HOME` is set, it's used in three ways: 
-   1. by the `XDG` variables, as described above 
+ * If `HOME` is set, it's used in three ways:
+   1. by the `XDG` variables, as described above
    2. If `TRANSMISSION_HOME` is _not_ set, Mac-based versions of Transmission will look for their settings in `$HOME/Library/Application Support/Transmission`
    3. `$HOME/Downloads` is the default download directory.
 

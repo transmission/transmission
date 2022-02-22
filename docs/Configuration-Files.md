@@ -19,7 +19,7 @@
 <tr><td>Default download folder</td><td><tt>$HOME/Downloads</tt></td></tr>
 </table>
 
-Some Linux distributions' start script for transmission-daemon use different location. This varies by distribution, but two paths sometimes used are `/var/lib/transmission-daemon` and `/var/run/transmission`.  
+Some Linux distributions' start script for transmission-daemon use different location. This varies by distribution, but two paths sometimes used are `/var/lib/transmission-daemon` and `/var/run/transmission`.
 
 If you want to swap between the two applications, all you have to do is pass in a different config directory with the -g command-line option. For example, to have the daemon pick up where the gtk+ client left off, run `transmission-daemon -g ~/.config/transmission`.
 

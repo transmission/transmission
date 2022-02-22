@@ -19,7 +19,7 @@ Transmission has an Xcode project file (Transmission.xcodeproj) for building in 
 
 Building the project on Mac requires the source to be retrieved from GitHub. Pre-packaged source code will not compile.
 
-If building from source is too daunting for you, check out the [nightly builds](https://build.transmissionbt.com/job/trunk-mac/).  
+If building from source is too daunting for you, check out the [nightly builds](https://build.transmissionbt.com/job/trunk-mac/).
 (Note: These are untested snapshots. Use them with care.)
 
 ## On Unix ##

@@ -120,7 +120,7 @@
   * Fix toggle-downloading-by-pressing-spacebar in the file list
   * Fix "Open URL" crash from dangling pointer
   * Support launching downloaded files from inside Transmission
-  * On Windows, use native Windows icons 
+  * On Windows, use native Windows icons
   * Improved network status info and tooltip in the status bar
   * Fix "Open Torrent" dialog crash in Qt 5.2
 #### Daemon ####
@@ -275,7 +275,7 @@
 #### All Platforms ####
   * Fix a bug that prevented IPv6 addresses from being saved in dht.dat
   * Better handling of magnet links that contain 'tr.x#' parameters
-  * Add filtering of addresses used for uTP peer connections 
+  * Add filtering of addresses used for uTP peer connections
   * Fix detection of whether or not a peer supports uTP connections
 #### Mac ####
   * Auto-grouping won't apply until torrents are demagnetized
@@ -529,7 +529,7 @@
 #### Mac ####
   * Minor Lion interface tweaks
 #### GTK+ ####
-  * Remove deprecated GConf2 dependency 
+  * Remove deprecated GConf2 dependency
 #### Qt ####
   * Fix high CPU issues
   * Fix wrong torrent count on tracker filterbar
@@ -1103,7 +1103,7 @@ This is a huge listen-to-the-users release -- it uses 103 ideas from users, incl
   * Synchronize the statusbar's and torrent list's speeds
   * Fix the Properties dialog's "Origin" field for multiple torrents
 #### Qt ####
-  * New Russian Translation 
+  * New Russian Translation
   * If Transmission was minimized, clicking on it the icon tray didn't raise it
 #### Daemon ####
   * Speed Limit mode support added to transmission-remote
@@ -1163,7 +1163,7 @@ This is a huge listen-to-the-users release -- it uses 103 ideas from users, incl
   * Fix watchdir issue on OSes that don't have inotify
 #### GTK+ ####
   * Fix 1.70 intltool build problem
-  * Fix crash when the OS's stock mime-type icons are misconfigured 
+  * Fix crash when the OS's stock mime-type icons are misconfigured
   * Handle very long torrent file lists faster
 #### Web Client ####
   * Fix 1.70 bug where some torrents appeared to be duplicates
@@ -1256,7 +1256,7 @@ This is a huge listen-to-the-users release -- it uses 103 ideas from users, incl
   * Watch folder for auto-adding torrents
   * Many new features in the RPC/JSON interface
   * Allow users to specify a specific address when listening for peers
-#### Web Client #### 
+#### Web Client ####
   * File selection and prioritization
   * Add option to verify local data
   * Fix "Remove Data" bug
@@ -1265,7 +1265,7 @@ This is a huge listen-to-the-users release -- it uses 103 ideas from users, incl
 [http://trac.transmissionbt.com/query?milestone#1.52&group#component&order#severity All tickets closed by this release]
 #### Mac ####
   * Improve interface responsiveness when downloading
-#### GTK+ and Daemon #### 
+#### GTK+ and Daemon ####
   * Always honor the XDG setting for the download directory
 #### GTK+ ####
   * Fix formatting error when showing speeds measured in MB/s
@@ -1280,7 +1280,7 @@ This is a huge listen-to-the-users release -- it uses 103 ideas from users, incl
 ### Transmission 1.51 (2009/02/26) ###
 [http://trac.transmissionbt.com/query?milestone#1.51&group#component&order#severity All tickets closed by this release]
 #### All Platforms ####
-  * Fix configure script issues with non-gcc compilers and user-defined CFLAGS environment variables 
+  * Fix configure script issues with non-gcc compilers and user-defined CFLAGS environment variables
   * Decrease CPU usage in some situations
   * Close a rare race condition on startup
   * More efficient use of libcurl when curl 7.18.0 or newer is present
@@ -1299,12 +1299,12 @@ This is a huge listen-to-the-users release -- it uses 103 ideas from users, incl
   * Fix 1.42 error that made tracker announces slower over time
   * Fix a Mac-centric peer connection bug from 1.41
   * Use less CPU cycles when managing very fast peers
-  * Better handling of non-UTF-8 torrent files 
+  * Better handling of non-UTF-8 torrent files
   * When removing local data, only remove data from the torrent
   * Close potential DoS vulnerability in 1.41
   * Many other bug fixes
 #### GTK+ ####
-  * Various usability improvements 
+  * Various usability improvements
   * Better Gnome HIG compliance in the statusbar, properties dialog, and more
 #### Daemon ####
   * Lots of new options added to transmission-remote
@@ -1312,7 +1312,7 @@ This is a huge listen-to-the-users release -- it uses 103 ideas from users, incl
   * Make i18n support optional for cli and daemon clients
 #### CLI ####
   * Support session.json settings, just as the Daemon and GTK+ clients do
-#### Web Client #### 
+#### Web Client ####
   * Torrents can now be added by URL
   * Add the ability to "remove local data" from the web client
 
@@ -1455,7 +1455,7 @@ This is a huge listen-to-the-users release -- it uses 103 ideas from users, incl
   * Turkish localization
 #### GTK+ ####
   * Add options to inhibit hibernation and to toggle the tray icon
-  * Lots of small bug fixes and usability improvements 
+  * Lots of small bug fixes and usability improvements
   * Dozens of updated translations
 
 ### Transmission 1.22 (2008/06/13) ###
