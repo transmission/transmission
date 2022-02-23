@@ -160,10 +160,6 @@ public:
     {
         return metainfo_.pieceLoc(piece, offset, length);
     }
-    [[nodiscard]] constexpr auto blockSize() const
-    {
-        return metainfo_.blockSize();
-    }
     [[nodiscard]] constexpr auto blockSize(tr_block_index_t block) const
     {
         return metainfo_.blockSize(block);

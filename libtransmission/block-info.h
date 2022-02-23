@@ -11,6 +11,8 @@
 
 struct tr_block_info
 {
+    static auto constexpr BlockSize = uint32_t{ 1024 * 16 };
+
     uint64_t total_size = 0;
     uint64_t piece_size = 0;
     uint64_t n_pieces = 0;
@@ -18,7 +20,6 @@ struct tr_block_info
     tr_block_index_t n_blocks = 0;
     tr_block_index_t n_blocks_in_piece = 0;
     tr_block_index_t n_blocks_in_final_piece = 0;
-    uint32_t block_size = 0;
     uint32_t final_block_size = 0;
     uint32_t final_piece_size = 0;
 
@@ -35,15 +36,10 @@ struct tr_block_info
         return n_blocks;
     }
 
-    [[nodiscard]] constexpr auto blockSize() const
-    {
-        return block_size;
-    }
-
     // return the number of bytes in `block`
     [[nodiscard]] constexpr auto blockSize(tr_block_index_t block) const
     {
-        return block + 1 == n_blocks ? final_block_size : blockSize();
+        return block + 1 == n_blocks ? final_block_size : BlockSize;
     }
 
     [[nodiscard]] constexpr auto pieceCount() const
@@ -103,7 +99,7 @@ struct tr_block_info
     {
         TR_ASSERT(block < n_blocks);
 
-        return byteLoc(uint64_t{ block } * blockSize());
+        return byteLoc(uint64_t{ block } * BlockSize);
     }
 
     // Location of the last byte in `block`.
@@ -114,7 +110,7 @@ struct tr_block_info
             return {};
         }
 
-        return byteLoc(uint64_t{ block } * blockSize() + blockSize(block) - 1);
+        return byteLoc(uint64_t{ block } * BlockSize + blockSize(block) - 1);
     }
 
     // Location of the first byte (+ optional offset and length) in `piece`
@@ -157,11 +153,11 @@ struct tr_block_info
         }
         else
         {
-            loc.block = byte / blockSize();
+            loc.block = byte / BlockSize;
             loc.piece = byte / pieceSize();
         }
 
-        loc.block_offset = static_cast<uint32_t>(loc.byte - (uint64_t{ loc.block } * blockSize()));
+        loc.block_offset = static_cast<uint32_t>(loc.byte - (uint64_t{ loc.block } * BlockSize));
         loc.piece_offset = static_cast<uint32_t>(loc.byte - (uint64_t{ loc.piece } * pieceSize()));
 
         return loc;

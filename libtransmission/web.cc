@@ -132,6 +132,7 @@ public:
             this->user_agent = *ua;
         }
 
+        auto const lock = std::unique_lock(queued_tasks_mutex);
         curl_thread = std::make_unique<std::thread>(curlThreadFunc, this);
     }
 
@@ -445,9 +446,9 @@ private:
                     curl_multi_add_handle(multi.get(), task->easy());
                 }
                 impl->queued_tasks.clear();
-            }
 
-            impl->resumePausedTasks();
+                impl->resumePausedTasks();
+            }
 
             // Adapted from https://curl.se/libcurl/c/curl_multi_wait.html docs.
             // 'numfds' being zero means either a timeout or no file descriptors to
