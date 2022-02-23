@@ -179,62 +179,6 @@ void tr_torrent_metainfo::parseWebseeds(tr_torrent_metainfo& setme, tr_variant* 
     }
 }
 
-static bool appendSanitizedComponent(std::string& out, std::string_view in, bool* setme_is_adjusted)
-{
-    auto const original_out_len = std::size(out);
-    auto const original_in = in;
-    *setme_is_adjusted = false;
-
-    // remove leading spaces
-    auto constexpr leading_test = [](unsigned char ch)
-    {
-        return isspace(ch);
-    };
-    auto const it = std::find_if_not(std::begin(in), std::end(in), leading_test);
-    in.remove_prefix(std::distance(std::begin(in), it));
-
-    // remove trailing spaces and '.'
-    auto constexpr trailing_test = [](unsigned char ch)
-    {
-        return (isspace(ch) != 0) || ch == '.';
-    };
-    auto const rit = std::find_if_not(std::rbegin(in), std::rend(in), trailing_test);
-    in.remove_suffix(std::distance(std::rbegin(in), rit));
-
-    // munge banned characters
-    // https://docs.microsoft.com/en-us/windows/desktop/FileIO/naming-a-file
-    auto constexpr ensure_legal_char = [](auto ch)
-    {
-        auto constexpr Banned = std::string_view{ "<>:\"/\\|?*" };
-        auto const banned = Banned.find(ch) != std::string_view::npos || (unsigned char)ch < 0x20;
-        return banned ? '_' : ch;
-    };
-    auto const old_out_len = std::size(out);
-    std::transform(std::begin(in), std::end(in), std::back_inserter(out), ensure_legal_char);
-
-    // munge banned filenames
-    // https://docs.microsoft.com/en-us/windows/desktop/FileIO/naming-a-file
-    auto constexpr ReservedNames = std::array<std::string_view, 22>{
-        "CON"sv,  "PRN"sv,  "AUX"sv,  "NUL"sv,  "COM1"sv, "COM2"sv, "COM3"sv, "COM4"sv, "COM5"sv, "COM6"sv, "COM7"sv,
-        "COM8"sv, "COM9"sv, "LPT1"sv, "LPT2"sv, "LPT3"sv, "LPT4"sv, "LPT5"sv, "LPT6"sv, "LPT7"sv, "LPT8"sv, "LPT9"sv,
-    };
-    for (auto const& name : ReservedNames)
-    {
-        size_t const name_len = std::size(name);
-        if (evutil_ascii_strncasecmp(out.c_str() + old_out_len, std::data(name), name_len) != 0 ||
-            (out[old_out_len + name_len] != '\0' && out[old_out_len + name_len] != '.'))
-        {
-            continue;
-        }
-
-        out.insert(std::begin(out) + old_out_len + name_len, '_');
-        break;
-    }
-
-    *setme_is_adjusted = original_in != std::string_view{ out.c_str() + original_out_len };
-    return std::size(out) > original_out_len;
-}
-
 bool tr_torrent_metainfo::parsePath(std::string_view root, tr_variant* path, std::string& setme)
 {
     if (!tr_variantIsList(path))
@@ -245,20 +189,14 @@ bool tr_torrent_metainfo::parsePath(std::string_view root, tr_variant* path, std
     setme = root;
     for (size_t i = 0, n = tr_variantListSize(path); i < n; ++i)
     {
-        auto raw = std::string_view{};
-        if (!tr_variantGetStrView(tr_variantListChild(path, i), &raw))
+        auto segment = std::string_view{};
+        if (!tr_variantGetStrView(tr_variantListChild(path, i), &segment))
         {
             return false;
         }
 
-        auto is_component_adjusted = bool{};
-        auto const pos = std::size(setme);
-        if (!appendSanitizedComponent(setme, raw, &is_component_adjusted))
-        {
-            continue;
-        }
-
-        setme.insert(std::begin(setme) + pos, TR_PATH_DELIMITER);
+        setme += TR_PATH_DELIMITER;
+        setme += segment;
     }
 
     if (std::size(setme) <= std::size(root))
@@ -272,16 +210,11 @@ bool tr_torrent_metainfo::parsePath(std::string_view root, tr_variant* path, std
 
 std::string_view tr_torrent_metainfo::parseFiles(tr_torrent_metainfo& setme, tr_variant* info_dict, uint64_t* setme_total_size)
 {
-    auto is_root_adjusted = bool{ false };
-    auto root_name = std::string{};
     auto total_size = uint64_t{ 0 };
 
     setme.files_.clear();
 
-    if (!appendSanitizedComponent(root_name, setme.name_, &is_root_adjusted))
-    {
-        return "invalid name"sv;
-    }
+    auto root_name = std::string{ setme.name_ };
 
     // bittorrent 1.0 spec
     // http://bittorrent.org/beps/bep_0003.html
