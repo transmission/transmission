@@ -208,6 +208,14 @@ int tr_main(int argc, char* argv[])
         return EXIT_FAILURE;
     }
 
+    for (uint32_t i = 0; i < b->fileCount; ++i)
+    {
+        if (auto const& file = b->files[i]; !file.is_portable)
+        {
+            fprintf(stderr, "WARNING: consider renaming nonportable filename \"%s\".\n", file.filename);
+        }
+    }
+
     if (options.piecesize_kib != 0)
     {
         tr_metaInfoBuilderSetPieceSize(b, options.piecesize_kib * KiB);
