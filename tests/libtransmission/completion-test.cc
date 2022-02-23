@@ -285,7 +285,7 @@ TEST_F(CompletionTest, leftUntilDone)
 
     // check that adding a block adjusts by block_info.block_size
     completion.addBlock(0);
-    EXPECT_EQ(block_info.total_size - block_info.block_size, completion.leftUntilDone());
+    EXPECT_EQ(block_info.total_size - tr_block_info::BlockSize, completion.leftUntilDone());
 }
 
 TEST_F(CompletionTest, sizeWhenDone)
@@ -367,7 +367,7 @@ TEST_F(CompletionTest, countMissingBytesInPiece)
 
     EXPECT_EQ(block_info.pieceSize(0), completion.countMissingBytesInPiece(0));
     completion.addBlock(0);
-    EXPECT_EQ(block_info.pieceSize(0) - block_info.block_size, completion.countMissingBytesInPiece(0));
+    EXPECT_EQ(block_info.pieceSize(0) - tr_block_info::BlockSize, completion.countMissingBytesInPiece(0));
     completion.addPiece(0);
     EXPECT_EQ(0, completion.countMissingBytesInPiece(0));
 

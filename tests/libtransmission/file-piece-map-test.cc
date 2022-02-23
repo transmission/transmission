@@ -17,26 +17,39 @@
 class FilePieceMapTest : public ::testing::Test
 {
 protected:
-    static constexpr size_t TotalSize{ 1001 };
-    static constexpr size_t PieceSize{ 100 };
+    static constexpr size_t PieceSize{ tr_block_info::BlockSize };
+    static constexpr size_t TotalSize{ 10 * PieceSize + 1 };
     tr_block_info const block_info_{ TotalSize, PieceSize };
 
     static constexpr std::array<uint64_t, 17> FileSizes{
-        500, // [offset 0] begins and ends on a piece boundary
-        0, // [offset 500] zero-sized files
-        0,   0, 0,
-        50, // [offset 500] begins on a piece boundary
-        100, // [offset 550] neither begins nor ends on a piece boundary, spans >1 piece
-        10, // [offset 650] small files all contained in a single piece
-        9,   8, 7, 6,
-        311, // [offset 690] ends end-of-torrent
-        0, // [offset 1001] zero-sized files at the end-of-torrent
-        0,   0, 0,
-        // sum is 1001 == TotalSize
+        5 * PieceSize, // [offset 0] begins and ends on a piece boundary
+        0, // [offset 5 P] zero-sized files
+        0,
+        0,
+        0,
+        PieceSize / 2, // [offset 5 P] begins on a piece boundary
+        PieceSize, // [offset 5.5 P] neither begins nor ends on a piece boundary, spans >1 piece
+        10, // [offset 6.5 P] small files all contained in a single piece
+        9,
+        8,
+        7,
+        6,
+        (3 * PieceSize + PieceSize / 2 + 1 - 10 - 9 - 8 - 7 - 6), // [offset 5.75P +10+9+8+7+6] ends end-of-torrent
+        0, // [offset 10P+1] zero-sized files at the end-of-torrent
+        0,
+        0,
+        0,
+        // sum is 10P + 1 == TotalSize
     };
 
     void SetUp() override
     {
+        static_assert(
+            FileSizes[0] + FileSizes[1] + FileSizes[2] + FileSizes[3] + FileSizes[4] + FileSizes[5] + FileSizes[6] +
+                FileSizes[7] + FileSizes[8] + FileSizes[9] + FileSizes[10] + FileSizes[11] + FileSizes[12] + FileSizes[13] +
+                FileSizes[14] + FileSizes[15] + FileSizes[16] ==
+            TotalSize);
+
         EXPECT_EQ(11, block_info_.n_pieces);
         EXPECT_EQ(PieceSize, block_info_.piece_size);
         EXPECT_EQ(TotalSize, block_info_.total_size);

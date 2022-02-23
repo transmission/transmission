@@ -225,7 +225,7 @@ std::optional<tr_sha1_digest_t> recalculateHash(tr_torrent* tor, tr_piece_index_
     tr_ioPrefetch(tor, loc, bytes_left);
 
     auto sha = tr_sha1_init();
-    auto buffer = std::vector<uint8_t>(tor->blockSize());
+    auto buffer = std::vector<uint8_t>(tr_block_info::BlockSize);
     while (bytes_left != 0)
     {
         size_t const len = std::min(bytes_left, std::size(buffer));
