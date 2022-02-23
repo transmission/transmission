@@ -12,13 +12,12 @@
 #include <string_view>
 #include <vector>
 
-#include <event2/util.h> // evutil_ascii_strncasecmp
-
 #include "transmission.h"
 
 #include "crypto-utils.h"
 #include "error-types.h"
 #include "error.h"
+#include "file-info.h"
 #include "file.h"
 #include "log.h"
 #include "quark.h"
@@ -187,24 +186,31 @@ bool tr_torrent_metainfo::parsePath(std::string_view root, tr_variant* path, std
     }
 
     setme = root;
+
     for (size_t i = 0, n = tr_variantListSize(path); i < n; ++i)
     {
-        auto segment = std::string_view{};
-        if (!tr_variantGetStrView(tr_variantListChild(path, i), &segment))
+        auto raw = std::string_view{};
+
+        if (!tr_variantGetStrView(tr_variantListChild(path, i), &raw))
         {
             return false;
         }
 
-        setme += TR_PATH_DELIMITER;
-        setme += segment;
+        if (!std::empty(raw))
+        {
+            setme += TR_PATH_DELIMITER;
+            setme += raw;
+        }
     }
 
-    if (std::size(setme) <= std::size(root))
+    auto const sanitized = tr_file_info::sanitizePath(setme);
+
+    if (std::size(sanitized) <= std::size(root))
     {
         return false;
     }
 
-    tr_strvUtf8Clean(setme, setme);
+    tr_strvUtf8Clean(sanitized, setme);
     return true;
 }
 
@@ -214,7 +220,12 @@ std::string_view tr_torrent_metainfo::parseFiles(tr_torrent_metainfo& setme, tr_
 
     setme.files_.clear();
 
-    auto root_name = std::string{ setme.name_ };
+    auto const root_name = tr_file_info::sanitizePath(setme.name_);
+
+    if (std::empty(root_name))
+    {
+        return "invalid name"sv;
+    }
 
     // bittorrent 1.0 spec
     // http://bittorrent.org/beps/bep_0003.html

@@ -39,7 +39,6 @@ struct FileList
 {
     uint64_t size;
     char* filename;
-    bool is_portable;
     struct FileList* next;
 };
 

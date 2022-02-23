@@ -5,9 +5,15 @@
 
 #pragma once
 
+#include <string>
 #include <string_view>
 
 struct tr_file_info
 {
-    [[nodiscard]] static bool isPortable(std::string_view subpath);
+    [[nodiscard]] static std::string sanitizePath(std::string_view path);
+
+    [[nodiscard]] static bool isPortable(std::string_view path)
+    {
+        return sanitizePath(path) == path;
+    }
 };
