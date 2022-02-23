@@ -1,4 +1,4 @@
-It's not always possible to set all configurations from the GUI, especially on the Daemon or the Web Interface. This guide will try to give an overview of how and what you can change. For the location of these files, look at the [[Configuration Files|ConfigFiles]] page.
+It's not always possible to set all configurations from the GUI, especially on the Daemon or the Web Interface. This guide will try to give an overview of how and what you can change. For the location of these files, look at the [Configuration Files](Configuration-Files.md) page.
 
 Note: The client _should_ be closed before making changes, otherwise settings will be reverted to it's previous state.
 
@@ -43,7 +43,7 @@ Here is a sample of the three basic types, respectively Boolean, Number and Stri
 #### Bandwidth
 
  * **alt-speed-enabled:** Boolean (default = false, aka 'Turtle Mode')
-   _Note: Clicking the "Turtle" in the gui when the [[scheduler|EditConfigFiles#Scheduling]] is enabled, will only temporarily remove the scheduled limit until the next cycle._
+   _Note: Clicking the "Turtle" in the gui when the [scheduler](#Scheduling) is enabled, will only temporarily remove the scheduled limit until the next cycle._
  * **alt-speed-up:** Number (KB/s, default = 50)
  * **alt-speed-down:** Number (KB/s, default = 50)
  * **speed-limit-down:** Number (KB/s, default = 100)
@@ -59,8 +59,8 @@ Here is a sample of the three basic types, respectively Boolean, Number and Stri
 
 #### [Files and Locations](./ConfigFiles.md)
 
- * **download-dir:** String (default = [[default locations|ConfigFiles#Locations]])
- * **incomplete-dir:** String (default = [[default locations|ConfigFiles#Locations]]) Directory to keep files in until torrent is complete.
+ * **download-dir:** String (default = [default locations](Configuration-Files.md#Locations))
+ * **incomplete-dir:** String (default = [default locations](Configuration-Files.md#Locations)) Directory to keep files in until torrent is complete.
  * **incomplete-dir-enabled:** Boolean (default = false) When enabled, new torrents will download the files to **incomplete-dir**. When complete, the files will be moved to **download-dir**.
  * **preallocation:** Number (0 = Off, 1 = Fast, 2 = Full (slower but reduces disk fragmentation), default = 1)
  * **rename-partial-files:** Boolean (default = true) Postfix partially downloaded files with ".part".
@@ -117,7 +117,7 @@ Here is a sample of the three basic types, respectively Boolean, Number and Stri
  * **seed-queue-enabled:** Boolean (default = false) When true. Transmission will only seed `seed-queue-size` non-stalled torrents at once.
  * **seed-queue-size:** Number (default = 10) See seed-queue-enabled.
 
-#### [[RPC|rpc]]
+#### [RPC](rpc-spec.md)
 
  * **rpc-authentication-required:** Boolean (default = false)
  * **rpc-bind-address:** String (default = "0.0.0.0") Where to listen for RPC connections
@@ -195,7 +195,7 @@ Only keys that differ from above are listed here.  These options have been repla
 
 #### 1.3x (and older)
 
-##### [[RPC|rpc]]
+##### [RPC](rpc-spec.md)
 
  * **rpc-access-control-list:** String (Comma-delimited list of IP addresses prefixed with "+" or "-". Wildcards allowed using '\*'. Example: "+127.0.0.\*,-192.168.\*.\*", Default:  "+127.0.0.1")
 
