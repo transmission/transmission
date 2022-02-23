@@ -167,9 +167,8 @@ struct peer_request
 
 static peer_request blockToReq(tr_torrent const* tor, tr_block_index_t block)
 {
-    auto ret = peer_request{};
-    tr_torrentGetBlockLocation(tor, block, &ret.index, &ret.offset, &ret.length);
-    return ret;
+    auto const loc = tor->blockLoc(block);
+    return peer_request{ loc.piece, loc.piece_offset, tor->blockSize(block) };
 }
 
 /**
