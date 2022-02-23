@@ -647,16 +647,16 @@ static void removeKeRangerRansomware()
 
     //load previous transfers
     tr_torrent** torrentSet;
-    tr_ctor* ctor = tr_ctorNew(_fLib);
+    tr_ctor* ctor = tr_ctorNew(self.fLib);
 
     //start all torrents paused then check state in history
     tr_ctorSetPaused(ctor, TR_FORCE, true);
 
-    torrentSet = tr_sessionLoadTorrents(_fLib, ctor, nullptr);
+    torrentSet = tr_sessionLoadTorrents(self.fLib, ctor, nullptr);
     tr_ctorFree(ctor);
     tr_free(torrentSet);
         
-    auto* session = static_cast<tr_session*>(_fLib);
+    auto* session = static_cast<tr_session*>(self.fLib);
     auto torrents = tr_sessionGetTorrents(session);
     for (struct tr_torrent* tor : torrents)
     {
