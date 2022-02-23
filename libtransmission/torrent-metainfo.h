@@ -56,10 +56,6 @@ public:
     {
         return blockInfo().pieceLoc(piece, offset, length);
     }
-    [[nodiscard]] constexpr auto blockSize() const
-    {
-        return blockInfo().blockSize();
-    }
     [[nodiscard]] constexpr auto blockSize(tr_block_index_t block) const
     {
         return blockInfo().blockSize(block);
