@@ -698,7 +698,7 @@ Method name: `free-space`
 Request arguments:
 
 | Key | Value type | Description
-|:--|:--
+|:--|:--|:--
 | `path` | string | the directory to query
 
 Response arguments:
