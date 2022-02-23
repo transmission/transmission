@@ -5,11 +5,8 @@
 #import <Cocoa/Cocoa.h>
 
 @interface GroupToolbarItem : NSToolbarItem
-{
-    NSArray* fIdentifiers;
-}
 
-- (void)setIdentifiers:(NSArray*)identifiers;
+@property(nonatomic, copy) NSArray* identifiers;
 
 - (void)createMenu:(NSArray*)labels;
 

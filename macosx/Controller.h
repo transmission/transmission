@@ -21,7 +21,6 @@
 @class PrefsController;
 @class StatusBarController;
 @class Torrent;
-@class TorrentTableView;
 @class URLSheetWindowController;
 
 typedef NS_ENUM(unsigned int, addType) { //
@@ -34,30 +33,6 @@ typedef NS_ENUM(unsigned int, addType) { //
 
 @interface Controller
     : NSObject<NSApplicationDelegate, NSURLDownloadDelegate, NSUserNotificationCenterDelegate, NSPopoverDelegate, NSSharingServiceDelegate, NSSharingServicePickerDelegate, NSSoundDelegate, NSToolbarDelegate, NSWindowDelegate, QLPreviewPanelDataSource, QLPreviewPanelDelegate, VDKQueueDelegate, SUUpdaterDelegate>
-{
-    IBOutlet NSWindow* fWindow;
-    IBOutlet TorrentTableView* fTableView;
-
-    IBOutlet NSMenuItem* fOpenIgnoreDownloadFolder;
-    IBOutlet NSButton* fActionButton;
-    IBOutlet NSButton* fSpeedLimitButton;
-    IBOutlet NSButton* fClearCompletedButton;
-    IBOutlet NSTextField* fTotalTorrentsField;
-    IBOutlet NSMenuItem* fNextFilterItem;
-
-    IBOutlet NSMenuItem* fNextInfoTabItem;
-    IBOutlet NSMenuItem* fPrevInfoTabItem;
-
-    IBOutlet NSMenu* fSortMenu;
-
-    IBOutlet NSMenu* fGroupsSetMenu;
-    IBOutlet NSMenu* fGroupsSetContextMenu;
-
-    IBOutlet NSMenu* fShareMenu;
-    IBOutlet NSMenu* fShareContextMenu;
-    IBOutlet NSMenuItem* fShareMenuItem; // remove when dropping 10.6
-    IBOutlet NSMenuItem* fShareContextMenuItem; // remove when dropping 10.6
-}
 
 - (void)openFiles:(NSArray*)filenames addType:(addType)type forcePath:(NSString*)path;
 

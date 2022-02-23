@@ -115,18 +115,18 @@ tr_peer_id_t tr_peerIdInit()
 ****
 ***/
 
-std::optional<std::string> tr_session::WebController::cookieFile() const
+std::optional<std::string> tr_session::WebMediator::cookieFile() const
 {
     auto const str = tr_strvPath(session_->config_dir, "cookies.txt");
     return tr_sys_path_exists(str.c_str(), nullptr) ? std::optional<std::string>{ str } : std::nullopt;
 }
 
-std::optional<std::string> tr_session::WebController::userAgent() const
+std::optional<std::string> tr_session::WebMediator::userAgent() const
 {
     return tr_strvJoin(TR_NAME, "/"sv, SHORT_VERSION_STRING);
 }
 
-std::optional<std::string> tr_session::WebController::publicAddress() const
+std::optional<std::string> tr_session::WebMediator::publicAddress() const
 {
     for (auto const type : { TR_AF_INET, TR_AF_INET6 })
     {
@@ -141,14 +141,14 @@ std::optional<std::string> tr_session::WebController::publicAddress() const
     return std::nullopt;
 }
 
-unsigned int tr_session::WebController::clamp(int torrent_id, unsigned int byte_count) const
+unsigned int tr_session::WebMediator::clamp(int torrent_id, unsigned int byte_count) const
 {
     auto const lock = session_->unique_lock();
     auto const it = session_->torrentsById.find(torrent_id);
     return it == std::end(session_->torrentsById) ? 0U : it->second->bandwidth->clamp(TR_DOWN, byte_count);
 }
 
-void tr_session::WebController::notifyBandwidthConsumed(int torrent_id, size_t byte_count)
+void tr_session::WebMediator::notifyBandwidthConsumed(int torrent_id, size_t byte_count)
 {
     auto const lock = session_->unique_lock();
     auto const it = session_->torrentsById.find(torrent_id);
@@ -158,7 +158,7 @@ void tr_session::WebController::notifyBandwidthConsumed(int torrent_id, size_t b
     }
 }
 
-void tr_session::WebController::run(tr_web::FetchDoneFunc&& func, tr_web::FetchResponse&& response) const
+void tr_session::WebMediator::run(tr_web::FetchDoneFunc&& func, tr_web::FetchResponse&& response) const
 {
     // marshall the `func` call into the libtransmission thread
 
@@ -762,7 +762,7 @@ static void tr_sessionInitImpl(void* vdata)
 
     tr_udpInit(session);
 
-    session->web = tr_web::create(session->web_controller);
+    session->web = tr_web::create(session->web_mediator);
 
     if (session->isLPDEnabled)
     {

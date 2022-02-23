@@ -2,7 +2,7 @@ Transmission needs an open port to communicate. You can open one manually or let
 
 ## Open ports & forwarding
 
-For guide on how to open and forward your Transmission port, read the [[Port Forwarding|PortForwardingGuide]] guide. 
+For guide on how to open and forward your Transmission port, read the [Port Forwarding](Port-Forwarding-Guide.md) guide.
 
 ## Possible Problems
 

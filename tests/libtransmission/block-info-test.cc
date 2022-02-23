@@ -24,7 +24,6 @@ TEST_F(BlockInfoTest, fieldsAreSet)
     uint64_t constexpr TotalSize = PieceSize * PieceCount;
     info.initSizes(TotalSize, PieceSize);
 
-    EXPECT_EQ(ExpectedBlockSize, info.block_size);
     EXPECT_EQ(ExpectedBlockSize, info.final_block_size);
     EXPECT_EQ(ExpectedBlocksPerPiece, info.n_blocks_in_final_piece);
     EXPECT_EQ(ExpectedBlocksPerPiece, info.n_blocks_in_piece);
@@ -34,7 +33,6 @@ TEST_F(BlockInfoTest, fieldsAreSet)
     EXPECT_EQ(TotalSize, info.total_size);
 
     info.initSizes(0, 0);
-    EXPECT_EQ(0, info.block_size);
     EXPECT_EQ(0, info.final_block_size);
     EXPECT_EQ(0, info.n_blocks_in_final_piece);
     EXPECT_EQ(0, info.n_blocks_in_piece);
@@ -58,7 +56,6 @@ TEST_F(BlockInfoTest, handlesOddSize)
     EXPECT_EQ(1, info.final_block_size);
     EXPECT_EQ(1, info.final_piece_size);
     EXPECT_EQ(1, info.n_blocks_in_final_piece);
-    EXPECT_EQ(ExpectedBlockSize, info.block_size);
     EXPECT_EQ(ExpectedBlocksPerPiece, info.n_blocks_in_piece);
     EXPECT_EQ(PieceCount, info.n_pieces);
     EXPECT_EQ(PieceSize, info.piece_size);

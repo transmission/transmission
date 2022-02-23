@@ -167,9 +167,8 @@ struct peer_request
 
 static peer_request blockToReq(tr_torrent const* tor, tr_block_index_t block)
 {
-    auto ret = peer_request{};
-    tr_torrentGetBlockLocation(tor, block, &ret.index, &ret.offset, &ret.length);
-    return ret;
+    auto const loc = tor->blockLoc(block);
+    return peer_request{ loc.piece, loc.piece_offset, tor->blockSize(block) };
 }
 
 /**
@@ -2031,7 +2030,7 @@ static void updateDesiredRequestCount(tr_peerMsgsImpl* msgs)
          * many requests we should send to this peer */
         size_t constexpr Floor = 32;
         size_t constexpr Seconds = RequestBufSecs;
-        size_t const estimated_blocks_in_period = (rate_Bps * Seconds) / torrent->blockSize();
+        size_t const estimated_blocks_in_period = (rate_Bps * Seconds) / tr_block_info::BlockSize;
         size_t const ceil = msgs->reqq ? *msgs->reqq : 250;
         msgs->desired_request_count = std::clamp(estimated_blocks_in_period, Floor, ceil);
     }
@@ -2195,7 +2194,7 @@ static size_t fillOutputBuffer(tr_peerMsgsImpl* msgs, time_t now)
     ***  Data Blocks
     **/
 
-    if (tr_peerIoGetWriteBufferSpace(msgs->io, now) >= msgs->torrent->blockSize() && popNextRequest(msgs, &req))
+    if (tr_peerIoGetWriteBufferSpace(msgs->io, now) >= tr_block_info::BlockSize && popNextRequest(msgs, &req))
     {
         --msgs->prefetchCount;
 

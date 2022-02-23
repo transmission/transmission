@@ -541,22 +541,22 @@ static void updateEndgame(tr_swarm* s)
 {
     /* we consider ourselves to be in endgame if the number of bytes
        we've got requested is >= the number of bytes left to download */
-    s->endgame = uint64_t(std::size(s->active_requests)) * s->tor->blockSize() >= s->tor->leftUntilDone();
+    s->endgame = uint64_t(std::size(s->active_requests)) * tr_block_info::BlockSize >= s->tor->leftUntilDone();
 }
 
 std::vector<tr_block_span_t> tr_peerMgrGetNextRequests(tr_torrent* torrent, tr_peer const* peer, size_t numwant)
 {
-    class PeerInfoImpl final : public Wishlist::PeerInfo
+    class MediatorImpl final : public Wishlist::Mediator
     {
     public:
-        PeerInfoImpl(tr_torrent const* torrent_in, tr_peer const* peer_in)
+        MediatorImpl(tr_torrent const* torrent_in, tr_peer const* peer_in)
             : torrent_{ torrent_in }
             , swarm_{ torrent_in->swarm }
             , peer_{ peer_in }
         {
         }
 
-        ~PeerInfoImpl() override = default;
+        ~MediatorImpl() override = default;
 
         [[nodiscard]] bool clientCanRequestBlock(tr_block_index_t block) const override
         {
@@ -606,7 +606,7 @@ std::vector<tr_block_span_t> tr_peerMgrGetNextRequests(tr_torrent* torrent, tr_p
 
     auto* const swarm = torrent->swarm;
     updateEndgame(swarm);
-    return Wishlist::next(PeerInfoImpl(torrent, peer), numwant);
+    return Wishlist::next(MediatorImpl(torrent, peer), numwant);
 }
 
 /****

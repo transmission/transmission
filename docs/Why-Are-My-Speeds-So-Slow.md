@@ -36,7 +36,7 @@ If you try to upload to the limit of your connection bandwidth you may block you
 
 ## 7. Is it your ISP?
 
-If your ISP is one of those that manipulates Bittorrent packets &mdash; and even if it isn't &mdash; it's often a good idea to enable the [[Blocklist]] and also to tell Transmission to "Ignore Unencrypted Peers" to give your sessions slightly better privacy.
+If your ISP is one of those that manipulates Bittorrent packets &mdash; and even if it isn't &mdash; it's often a good idea to enable the [Blocklist](./Blocklist.md) and also to tell Transmission to "Ignore Unencrypted Peers" to give your sessions slightly better privacy.
 
 Update: Google now has [a free online tool](http://broadband.mpi-sws.org/transparency/bttest.php) to test what your ISP is doing. Follow that link and go down to the "Start testing" button.
 
@@ -50,7 +50,7 @@ Connecting to a peer is like telephone calls: either you call up the peer, or th
 
 Many people don't want to mess with their firewall and/or router, so they decide that dialing out is good enough and leave their port closed. Other people panic and worry too much about getting their port open even if they have a troublesome router. The truth is in the middle &mdash; you _can_ get by with a closed port, but on average you'll get much faster speeds if peers can connect to you.
 
-Opening a closed port is often the most frustrating task in Bittorrent. The good news is that the Transmission wiki has two pages dedicated to this topic: the [[Port Forwarding Guide|PortForwardingGuide]] and the [[Why is my port closed|PortClosed]] page.
+Opening a closed port is often the most frustrating task in Bittorrent. The good news is that the Transmission wiki has two pages dedicated to this topic: the [Port Forwarding Guide](Port-Forwarding-Guide.md) and the [Why is my port closed](Why-is-my-port-closed.md) page.
 
 You can also test your port status  at [canyouseeme.org](http://www.canyouseeme.org/).
 

@@ -5,25 +5,11 @@
 #import <AppKit/AppKit.h>
 
 @interface TorrentCell : NSActionCell
-{
-    NSUserDefaults* fDefaults;
 
-    NSMutableDictionary* fTitleAttributes;
-    NSMutableDictionary* fStatusAttributes;
-
-    BOOL fTracking;
-    BOOL fMouseDownControlButton;
-    BOOL fMouseDownRevealButton;
-    BOOL fMouseDownActionButton;
-    BOOL fHover;
-    BOOL fHoverControl;
-    BOOL fHoverReveal;
-    BOOL fHoverAction;
-
-    NSColor* fBarBorderColor;
-    NSColor* fBluePieceColor;
-    NSColor* fBarMinimalBorderColor;
-}
+@property(nonatomic) BOOL hover;
+@property(nonatomic) BOOL hoverControl;
+@property(nonatomic) BOOL hoverReveal;
+@property(nonatomic) BOOL hoverAction;
 
 - (NSRect)iconRectForBounds:(NSRect)bounds;
 
@@ -31,10 +17,5 @@
                          inRect:(NSRect)cellFrame
                    withUserInfo:(NSDictionary*)userInfo
                   mouseLocation:(NSPoint)mouseLocation;
-- (void)setHover:(BOOL)hover;
-- (void)setControlHover:(BOOL)hover;
-- (void)setRevealHover:(BOOL)hover;
-- (void)setActionHover:(BOOL)hover;
-- (void)setActionPushed:(BOOL)pushed;
 
 @end
