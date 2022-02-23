@@ -1,14 +1,6 @@
-If you are searching for a HOWTO, covering a specific distribution or device (NAS, router, ...), have a look at the [[Running Transmission on a headless machine|HeadlessUsage]] page
-
 ## Getting the Source ##
 
-#### Recommended ####
-
-Source code for official releases can be found on our [download page](https://transmissionbt.com/download/).
-
-#### Experimental ####
-
-Automated source code tarballs including the newest code [are now available, too!](https://build.transmissionbt.com/job/trunk-linux/)
+Source code for both official and nightly releases can be found on our [download page](https://transmissionbt.com/download/).
 
 ## On Mac OS X ##
 
