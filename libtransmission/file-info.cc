@@ -54,7 +54,7 @@ bool tr_file_info::isPortable(std::string_view subpath)
     auto segment = std::string_view{};
     while (tr_strvSep(&subpath, &segment, '/'))
     {
-        if (!isPortableSegment(segment))
+        if (!std::empty(segment) && !isPortableSegment(segment))
         {
             return false;
         }
