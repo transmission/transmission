@@ -252,7 +252,7 @@ static void removeKeRangerRansomware()
 
 @property(nonatomic, readonly) NSMutableArray* fTorrents;
 @property(nonatomic, readonly) NSMutableArray* fDisplayedTorrents;
-@property(nonatomic, readonly) NSMutableDictionary* torrentHashes;
+@property(nonatomic, readonly) NSMutableDictionary* fTorrentHashes;
 
 @property(nonatomic, readonly) InfoWindowController* fInfoController;
 @property(nonatomic) MessageWindowController* fMessageController;
@@ -515,7 +515,7 @@ static void removeKeRangerRansomware()
 
         _fTorrents = [[NSMutableArray alloc] init];
         _fDisplayedTorrents = [[NSMutableArray alloc] init];
-        _torrentHashes = [[NSMutableDictionary alloc] init];
+        _fTorrentHashes = [[NSMutableDictionary alloc] init];
 
         _fInfoController = [[InfoWindowController alloc] init];
 
@@ -667,7 +667,7 @@ static void removeKeRangerRansomware()
         }
         Torrent* torrent = [[Torrent alloc] initWithTorrentStruct:tor location:location lib:self.fLib];
         [self.fTorrents addObject:torrent];
-        [self.torrentHashes setObject:torrent forKey:torrent.hashString];
+        [self.fTorrentHashes setObject:torrent forKey:torrent.hashString];
     }
         
         
@@ -694,8 +694,8 @@ static void removeKeRangerRansomware()
         for (NSDictionary* historyItem in history)
         {
             NSString *hash = historyItem[@"TorrentHash"];
-            if ([[self.torrentHashes allKeys] containsObject:hash]) {
-                Torrent *torrent = [self.torrentHashes objectForKey:hash];
+            if ([[self.fTorrentHashes allKeys] containsObject:hash]) {
+                Torrent *torrent = [self.fTorrentHashes objectForKey:hash];
                 [t shouldResumeTorrent:torrent WithHistory:historyItem forcePause:self.fPauseOnLaunch];
                 
                 NSNumber* waitToStart;
@@ -2486,7 +2486,7 @@ static void removeKeRangerRansomware()
     for (Torrent* torrent in self.fTorrents)
     {
         [history addObject:torrent.history];
-        [self.torrentHashes setObject:torrent forKey:torrent.hashString];
+        [self.fTorrentHashes setObject:torrent forKey:torrent.hashString];
     }
 
     NSString* historyFile = [self.fConfigDirectory stringByAppendingPathComponent:TRANSFER_PLIST];
