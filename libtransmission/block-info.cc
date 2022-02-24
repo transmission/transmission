@@ -32,8 +32,6 @@ void tr_block_info::initSizes(uint64_t total_size_in, uint64_t piece_size_in)
     final_block_size = remainder != 0U ? remainder : BlockSize;
 
     n_blocks = (total_size + BlockSize - 1) / BlockSize;
-    n_blocks_in_piece = piece_size / BlockSize;
-    n_blocks_in_final_piece = (final_piece_size + BlockSize - 1) / BlockSize;
 
 #ifdef TR_ENABLE_ASSERTS
     uint64_t t = n_pieces - 1;
@@ -45,10 +43,5 @@ void tr_block_info::initSizes(uint64_t total_size_in, uint64_t piece_size_in)
     t *= BlockSize;
     t += final_block_size;
     TR_ASSERT(t == total_size);
-
-    t = n_pieces - 1;
-    t *= n_blocks_in_piece;
-    t += n_blocks_in_final_piece;
-    TR_ASSERT(t == n_blocks);
 #endif
 }
