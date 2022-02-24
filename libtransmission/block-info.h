@@ -18,8 +18,6 @@ struct tr_block_info
     uint64_t n_pieces = 0;
 
     tr_block_index_t n_blocks = 0;
-    tr_block_index_t n_blocks_in_piece = 0;
-    tr_block_index_t n_blocks_in_final_piece = 0;
     uint32_t final_block_size = 0;
     uint32_t final_piece_size = 0;
 
@@ -168,6 +166,6 @@ struct tr_block_info
 private:
     [[nodiscard]] bool constexpr isInitialized() const
     {
-        return n_blocks_in_piece != 0;
+        return piece_size != 0;
     }
 };
