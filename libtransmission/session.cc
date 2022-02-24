@@ -2051,13 +2051,10 @@ static void sessionLoadTorrents(void* vdata)
             // is a magnet link?
             if (!tr_ctorSetMetainfoFromFile(data->ctor, path, nullptr))
             {
-                auto buf = std::vector<char>{};
-                if (!tr_loadFile(buf, path))
+                if (auto buf = std::vector<char>{}; tr_loadFile(buf, path))
                 {
-                    continue;
+                    tr_ctorSetMetainfoFromMagnetLink(data->ctor, std::string{ std::data(buf), std::size(buf) }.c_str(), nullptr);
                 }
-                auto const magnet_link = std::string_view{ std::data(buf), std::size(buf) };
-                tr_ctorSetMetainfoFromMagnetLink(data->ctor, std::string{ magnet_link }, nullptr);
             }
             
             if (tr_torrent* const tor = tr_torrentNew(data->ctor, nullptr); tor != nullptr)
