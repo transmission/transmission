@@ -2041,13 +2041,25 @@ static void sessionLoadTorrents(void* vdata)
         char const* name = nullptr;
         while ((name = tr_sys_dir_read_name(odir, nullptr)) != nullptr)
         {
-            if (!tr_strvEndsWith(name, ".torrent"sv))
+            if (!tr_strvEndsWith(name, ".torrent"sv) && !tr_strvEndsWith(name, ".magnet"sv))
             {
                 continue;
             }
 
             tr_buildBuf(path, dirname_sv, "/", name);
-            tr_ctorSetMetainfoFromFile(data->ctor, path, nullptr);
+
+            // is a magnet link?
+            if (!tr_ctorSetMetainfoFromFile(data->ctor, path, nullptr))
+            {
+                if (auto buf = std::vector<char>{}; tr_loadFile(buf, path))
+                {
+                    tr_ctorSetMetainfoFromMagnetLink(
+                        data->ctor,
+                        std::string{ std::data(buf), std::size(buf) }.c_str(),
+                        nullptr);
+                }
+            }
+
             if (tr_torrent* const tor = tr_torrentNew(data->ctor, nullptr); tor != nullptr)
             {
                 torrents.push_back(tor);
