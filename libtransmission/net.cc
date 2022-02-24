@@ -115,7 +115,7 @@ bool tr_address_from_string(tr_address* dst, std::string_view src)
 {
     // inet_pton() requires zero-terminated strings,
     // so make a zero-terminated copy here on the stack.
-    auto buf = std::array<char, 64>{};
+    auto buf = std::array<char, TR_ADDRSTRLEN>{};
     if (std::size(src) >= std::size(buf))
     {
         // shouldn't ever be that large; malformed address
@@ -125,6 +125,28 @@ bool tr_address_from_string(tr_address* dst, std::string_view src)
     *std::copy(std::begin(src), std::end(src), std::begin(buf)) = '\0';
 
     return tr_address_from_string(dst, std::data(buf));
+}
+
+std::optional<tr_address> tr_address::from_string(std::string_view str)
+{
+    auto addr = tr_address{};
+
+    if (!tr_address_from_string(&addr, str))
+    {
+        return {};
+    }
+
+    return addr;
+}
+
+tr_address tr_address::from_4byte_ipv4(std::string_view in)
+{
+    TR_ASSERT(std::size(in) == 4);
+
+    auto addr = tr_address{};
+    addr.type = TR_AF_INET;
+    std::copy_n(std::begin(in), 4, reinterpret_cast<char*>(&addr.addr));
+    return addr;
 }
 
 /*

@@ -239,6 +239,16 @@ public:
 
     bool useRpcWhitelist() const;
 
+    auto externalIP() const
+    {
+        return external_ip_;
+    }
+
+    void setExternalIP(tr_address external_ip)
+    {
+        external_ip_ = external_ip;
+    }
+
     // peer networking
 
     std::string const& peerCongestionAlgorithm() const
@@ -419,6 +429,7 @@ private:
     std::string default_trackers_str_;
     std::string incomplete_dir_;
     std::string peer_congestion_algorithm_;
+    std::optional<tr_address> external_ip_;
 
     std::array<bool, TR_SCRIPT_N_TYPES> scripts_enabled_;
     bool blocklist_enabled_ = false;
