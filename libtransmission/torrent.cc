@@ -767,10 +767,10 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
 
     tr_sessionAddTorrent(session, tor);
 
-    // if we don't have a local .torrent or .magent file already, assume the torrent is new
+    // if we don't have a local .torrent or .magnet file already, assume the torrent is new
     auto const filename = tor->hasMetadata()
-        ? tor->torrentFile()
-        : tor->magnetFile();
+            ? tor->torrentFile()
+            : tor->magnetFile();
     
     bool const is_new_torrent = !tr_sys_path_exists(filename.c_str(), nullptr);
     if (is_new_torrent)

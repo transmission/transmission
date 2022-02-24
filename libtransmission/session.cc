@@ -2047,7 +2047,7 @@ static void sessionLoadTorrents(void* vdata)
             }
 
             tr_buildBuf(path, dirname_sv, "/", name);
-                    
+            
             // is a magnet link?
             if (!tr_ctorSetMetainfoFromFile(data->ctor, path, nullptr))
             {
@@ -2056,8 +2056,8 @@ static void sessionLoadTorrents(void* vdata)
                 {
                     continue;
                 }
-                auto const magnet_link = std::string{ std::data(buf), std::size(buf) };
-                tr_ctorSetMetainfoFromMagnetLink(data->ctor, magnet_link.c_str(), nullptr);
+                auto const magnet_link = std::string_view{ std::data(buf), std::size(buf) };
+                tr_ctorSetMetainfoFromMagnetLink(data->ctor, std::string{ magnet_link }, nullptr);
             }
             
             if (tr_torrent* const tor = tr_torrentNew(data->ctor, nullptr); tor != nullptr)
