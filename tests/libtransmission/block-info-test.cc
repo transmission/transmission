@@ -25,8 +25,6 @@ TEST_F(BlockInfoTest, fieldsAreSet)
     info.initSizes(TotalSize, PieceSize);
 
     EXPECT_EQ(ExpectedBlockSize, info.final_block_size);
-    EXPECT_EQ(ExpectedBlocksPerPiece, info.n_blocks_in_final_piece);
-    EXPECT_EQ(ExpectedBlocksPerPiece, info.n_blocks_in_piece);
     EXPECT_EQ(PieceCount, info.n_pieces);
     EXPECT_EQ(PieceSize, info.final_piece_size);
     EXPECT_EQ(PieceSize, info.piece_size);
@@ -34,8 +32,6 @@ TEST_F(BlockInfoTest, fieldsAreSet)
 
     info.initSizes(0, 0);
     EXPECT_EQ(0, info.final_block_size);
-    EXPECT_EQ(0, info.n_blocks_in_final_piece);
-    EXPECT_EQ(0, info.n_blocks_in_piece);
     EXPECT_EQ(0, info.n_pieces);
     EXPECT_EQ(0, info.final_piece_size);
     EXPECT_EQ(0, info.piece_size);
@@ -55,8 +51,6 @@ TEST_F(BlockInfoTest, handlesOddSize)
 
     EXPECT_EQ(1, info.final_block_size);
     EXPECT_EQ(1, info.final_piece_size);
-    EXPECT_EQ(1, info.n_blocks_in_final_piece);
-    EXPECT_EQ(ExpectedBlocksPerPiece, info.n_blocks_in_piece);
     EXPECT_EQ(PieceCount, info.n_pieces);
     EXPECT_EQ(PieceSize, info.piece_size);
     EXPECT_EQ(TotalSize, info.total_size);

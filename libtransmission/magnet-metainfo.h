@@ -27,6 +27,7 @@ public:
     {
         return info_hash_;
     }
+
     auto const& name() const
     {
         return name_;
