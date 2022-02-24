@@ -464,7 +464,7 @@ public:
     {
         return metainfo_.torrentFile(this->session->torrent_dir);
     }
-    
+
     [[nodiscard]] auto magnetFile() const
     {
         return metainfo_.magnetFile(this->session->torrent_dir);
@@ -474,7 +474,7 @@ public:
     {
         return metainfo_.resumeFile(this->session->resume_dir);
     }
-    
+
     [[nodiscard]] auto magnet() const
     {
         return metainfo_.magnet();

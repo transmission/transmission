@@ -131,7 +131,7 @@ bool tr_ctorSaveMagnetContents(tr_torrent* tor, std::string const& filename, tr_
 {
     TR_ASSERT(tor != nullptr);
     TR_ASSERT(!std::empty(filename));
-    
+
     auto const magnet = tor->magnet();
     if (std::empty(magnet))
     {

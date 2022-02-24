@@ -138,7 +138,7 @@ public:
     {
         return makeFilename(torrent_dir, name(), infoHashString(), BasenameFormat::Hash, ".torrent");
     }
-    
+
     [[nodiscard]] std::string magnetFile(std::string_view torrent_dir) const
     {
         return makeFilename(torrent_dir, name(), infoHashString(), BasenameFormat::Hash, ".magnet");
