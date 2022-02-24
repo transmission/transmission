@@ -253,6 +253,10 @@ void tr_announcerParseHttpAnnounceResponse(tr_announce_response& response, std::
             {
                 // unused
             }
+            else if (key == "external ip"sv && std::size(value) == 4)
+            {
+                response_.external_ip = tr_address::from_4byte_ipv4(value);
+            }
             else if (!tr_error_is_set(context.error))
             {
                 tr_error_set(context.error, EINVAL, tr_strvJoin("unexpected str: key["sv, key, "] value["sv, value, "]"sv));
@@ -401,6 +405,14 @@ void tr_announcerParseHttpScrapeResponse(tr_scrape_response& response, std::stri
             else if (row_ && key == "incomplete"sv)
             {
                 response_.rows[*row_].leechers = value;
+            }
+            else if (row_ && key == "downloaders"sv)
+            {
+                response_.rows[*row_].downloaders = value;
+            }
+            else if (key == "min_request_interval"sv)
+            {
+                response_.min_request_interval = value;
             }
             else if (!tr_error_is_set(context.error))
             {

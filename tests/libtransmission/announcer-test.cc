@@ -32,6 +32,7 @@ TEST_F(AnnouncerTest, parseHttpAnnounceResponseNoPeers)
             "8:interval" "i1803e"
             "12:min interval" "i1800e"
             "5:peers" "0:"
+            "11:external ip" "4:\x01\x02\x03\x04"
         "e"sv;
     // clang-format on
 
@@ -42,6 +43,7 @@ TEST_F(AnnouncerTest, parseHttpAnnounceResponseNoPeers)
     EXPECT_EQ(3, response.seeders);
     EXPECT_EQ(0, response.leechers);
     EXPECT_EQ(2, response.downloads);
+    EXPECT_EQ(*tr_address::from_string("1.2.3.4"), response.external_ip);
     EXPECT_EQ(0, std::size(response.pex));
     EXPECT_EQ(0, std::size(response.pex6));
     EXPECT_EQ(""sv, response.errmsg);

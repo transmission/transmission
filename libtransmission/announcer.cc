@@ -995,6 +995,11 @@ static void on_announce_done(tr_announce_response const* response, void* vdata)
         tier->isAnnouncing = false;
         tier->manualAnnounceAllowedAt = now + tier->announceMinIntervalSec;
 
+        if (response->external_ip)
+        {
+            data->session->setExternalIP(*response->external_ip);
+        }
+
         if (!response->did_connect)
         {
             on_announce_error(tier, _("Could not connect to tracker"), event);

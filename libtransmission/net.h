@@ -68,14 +68,37 @@ enum tr_address_type
     NUM_TR_AF_INET_TYPES
 };
 
+struct tr_address;
+
+int tr_address_compare(tr_address const* a, tr_address const* b);
+
 struct tr_address
 {
+    static tr_address from_4byte_ipv4(std::string_view in);
+
+    static std::optional<tr_address> from_string(std::string_view str);
+
     tr_address_type type;
     union
     {
         struct in6_addr addr6;
         struct in_addr addr4;
     } addr;
+
+    bool operator==(tr_address const& that) const
+    {
+        return tr_address_compare(this, &that) == 0;
+    }
+
+    bool operator<(tr_address const& that) const
+    {
+        return tr_address_compare(this, &that) < 0;
+    }
+
+    bool operator>(tr_address const& that) const
+    {
+        return tr_address_compare(this, &that) > 0;
+    }
 };
 
 extern tr_address const tr_inaddr_any;
@@ -92,8 +115,6 @@ bool tr_address_from_string(tr_address* setme, char const* string);
 bool tr_address_from_string(tr_address* dst, std::string_view src);
 
 bool tr_address_from_sockaddr_storage(tr_address* setme, tr_port* port, struct sockaddr_storage const* src);
-
-int tr_address_compare(tr_address const* a, tr_address const* b);
 
 bool tr_address_is_valid_for_peers(tr_address const* addr, tr_port port);
 
