@@ -124,7 +124,7 @@ Here is a sample of the three basic types, respectively Boolean, Number and Stri
  * **rpc-enabled:** Boolean (default = true)
  * **rpc-host-whitelist:** String (Comma-delimited list of domain names. Wildcards allowed using '\*'. Example: "*.foo.org,example.com", Default: "", Always allowed: "localhost", "localhost.", all the IP addresses. Added in v2.93)
  * **rpc-host-whitelist-enabled:** Boolean (default = true. Added in v2.93)
- * **rpc-password:** String
+ * **rpc-password:** String. You can enter this in as plaintext when Transmission is not running, and then Transmission will salt the value on startup and re-save the salted version as a security measure. **Note:** Transmission treats passwords starting with the character `{` as salted, so when you first create your password, the plaintext password you enter must not begin with `{`.
  * **rpc-port:** Number (default = 9091)
  * **rpc-url:** String (default = /transmission/. Added in v2.2)
  * **rpc-username:** String
