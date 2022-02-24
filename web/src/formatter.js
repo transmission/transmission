@@ -9,12 +9,36 @@ const number_format = new Intl.NumberFormat(current_locale);
 
 const kilo = 1000;
 const mem_formatters = [
-  new Intl.NumberFormat(current_locale, { maximumFractionDigits: 0, style: 'unit', unit: 'byte' }),
-  new Intl.NumberFormat(current_locale, { maximumFractionDigits: 0, style: 'unit', unit: 'kilobyte' }),
-  new Intl.NumberFormat(current_locale, { maximumFractionDigits: 0, style: 'unit', unit: 'megabyte' }),
-  new Intl.NumberFormat(current_locale, { maximumFractionDigits: 2, style: 'unit', unit: 'gigabyte' }),
-  new Intl.NumberFormat(current_locale, { maximumFractionDigits: 2, style: 'unit', unit: 'terabyte' }),
-  new Intl.NumberFormat(current_locale, { maximumFractionDigits: 2, style: 'unit', unit: 'petabyte' }),
+  new Intl.NumberFormat(current_locale, {
+    maximumFractionDigits: 0,
+    style: 'unit',
+    unit: 'byte',
+  }),
+  new Intl.NumberFormat(current_locale, {
+    maximumFractionDigits: 0,
+    style: 'unit',
+    unit: 'kilobyte',
+  }),
+  new Intl.NumberFormat(current_locale, {
+    maximumFractionDigits: 0,
+    style: 'unit',
+    unit: 'megabyte',
+  }),
+  new Intl.NumberFormat(current_locale, {
+    maximumFractionDigits: 2,
+    style: 'unit',
+    unit: 'gigabyte',
+  }),
+  new Intl.NumberFormat(current_locale, {
+    maximumFractionDigits: 2,
+    style: 'unit',
+    unit: 'terabyte',
+  }),
+  new Intl.NumberFormat(current_locale, {
+    maximumFractionDigits: 2,
+    style: 'unit',
+    unit: 'petabyte',
+  }),
 ];
 
 const fmt_kBps = new Intl.NumberFormat(current_locale, {
