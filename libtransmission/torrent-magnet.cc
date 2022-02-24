@@ -277,6 +277,10 @@ static bool useNewMetainfo(tr_torrent* tor, tr_incomplete_metadata const* m, tr_
     {
         return false;
     }
+    
+    // remove .magnet file
+    auto const magnetFilename = tor->magnetFile();
+    tr_sys_path_remove(magnetFilename.c_str(), nullptr);
 
     // tor should keep this metainfo
     tor->setMetainfo(metainfo);

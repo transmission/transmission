@@ -767,17 +767,35 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
 
     tr_sessionAddTorrent(session, tor);
 
-    // if we don't have a local .torrent file already, assume the torrent is new
-    auto const filename = tor->torrentFile();
+    // if we don't have a local .torrent or .magent file already, assume the torrent is new
+    auto filename = tor->torrentFile();
+    
+    // is a magnet link
+    if (!tor->hasMetadata()) {
+        filename = tor->magnetFile();
+    }
+    
     bool const is_new_torrent = !tr_sys_path_exists(filename.c_str(), nullptr);
     if (is_new_torrent)
     {
         tr_error* error = nullptr;
-        if (!tr_ctorSaveContents(ctor, filename, &error))
-        {
-            tor->setLocalError(
-                tr_strvJoin("Unable to save torrent file: ", error->message, " ("sv, std::to_string(error->code), ")"sv));
+        if (tor->hasMetadata()) {
+            if (!tr_ctorSaveContents(ctor, filename, &error))
+            {
+                tor->setLocalError(
+                    tr_strvJoin("Unable to save torrent file: ", error->message, " ("sv, std::to_string(error->code), ")"sv));
+            }
         }
+        else
+        {
+            // magnet link
+            if (!tr_ctorSaveMagnetContents(tor, filename, &error))
+            {
+                tor->setLocalError(
+                    tr_strvJoin("Unable to save magnet file: ", error->message, " ("sv, std::to_string(error->code), ")"sv));
+            }
+        }
+        
         tr_error_clear(&error);
     }
 
@@ -1566,6 +1584,7 @@ static void closeTorrent(void* vtor)
     if (tor->isDeleting)
     {
         tr_torrent_metainfo::removeFile(tor->session->torrent_dir, tor->name(), tor->infoHashString(), ".torrent"sv);
+        tr_torrent_metainfo::removeFile(tor->session->resume_dir, tor->name(), tor->infoHashString(), ".magnet"sv);
         tr_torrent_metainfo::removeFile(tor->session->resume_dir, tor->name(), tor->infoHashString(), ".resume"sv);
     }
 

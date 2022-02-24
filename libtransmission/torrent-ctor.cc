@@ -127,6 +127,21 @@ bool tr_ctorSaveContents(tr_ctor const* ctor, std::string const& filename, tr_er
     return tr_saveFile(filename, { std::data(ctor->contents), std::size(ctor->contents) }, error);
 }
 
+bool tr_ctorSaveMagnetContents(tr_torrent* tor, std::string const& filename, tr_error** error)
+{
+    TR_ASSERT(tor != nullptr);
+    TR_ASSERT(!std::empty(filename));
+    
+    if (std::empty(tor->metainfo_.magnetLink()))
+    {
+        tr_error_set(error, EINVAL, "torrent has no magnetlink to save"sv);
+        return false;
+    }
+
+    std::string magnet_link = tor->metainfo_.magnetLink();
+    return tr_saveFile(filename, std::string_view{ magnet_link }, error);
+}
+
 /***
 ****
 ***/

@@ -22,11 +22,14 @@ public:
     bool parseMagnet(std::string_view magnet_link, tr_error** error = nullptr);
 
     std::string magnet() const;
+    
+    std::string magnetLink() const;
 
     auto const& infoHash() const
     {
         return info_hash_;
     }
+    
     auto const& name() const
     {
         return name_;
@@ -61,6 +64,11 @@ public:
     {
         name_ = name;
     }
+    
+    void setMagnetLink(std::string_view magnet_link)
+    {
+        magnet_link_ = magnet_link;
+    }
 
 protected:
     tr_announce_list announce_list_;
@@ -68,4 +76,5 @@ protected:
     tr_sha1_digest_t info_hash_;
     std::string info_hash_str_;
     std::string name_;
+    std::string magnet_link_;
 };

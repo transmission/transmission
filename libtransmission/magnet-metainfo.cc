@@ -178,9 +178,15 @@ std::string tr_magnet_metainfo::magnet() const
     return s;
 }
 
+std::string tr_magnet_metainfo::magnetLink() const
+{
+    return magnet_link_;
+}
+
 bool tr_magnet_metainfo::parseMagnet(std::string_view magnet_link, tr_error** error)
 {
     magnet_link = tr_strvStrip(magnet_link);
+    this->setMagnetLink(magnet_link);
 
     if (auto const hash = parseHash(magnet_link); hash)
     {
