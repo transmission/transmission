@@ -766,8 +766,7 @@
         NSMenuItem* item;
         if (menu.numberOfItems == 3)
         {
-            NSInteger const speedLimitActionValue[] = { 0,   5,   10,  20,  30,  40,   50,   75,   100,
-                                                        150, 200, 250, 500, 750, 1000, 1500, 2000, -1 };
+            NSInteger const speedLimitActionValue[] = { 50, 100, 250, 500, 1000, 2500, 5000, 10000, -1 };
 
             for (NSInteger i = 0; speedLimitActionValue[i] != -1; i++)
             {

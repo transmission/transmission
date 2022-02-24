@@ -21,6 +21,7 @@
 struct event;
 struct evhttp;
 struct tr_variant;
+struct tr_rpc_address;
 struct libdeflate_compressor;
 
 class tr_rpc_server
@@ -43,7 +44,7 @@ public:
     std::string whitelistStr;
     std::string url;
 
-    struct tr_address bindAddress;
+    struct tr_rpc_address* bindAddress;
 
     struct event* start_retry_timer = nullptr;
     struct evhttp* httpd = nullptr;
@@ -52,6 +53,8 @@ public:
     int antiBruteForceThreshold = 0;
     int loginattempts = 0;
     int start_retry_counter = 0;
+    static int constexpr DefaultRpcSocketMode = 0750;
+    int rpc_socket_mode = DefaultRpcSocketMode;
 
     tr_port port = 0;
 
@@ -81,6 +84,8 @@ void tr_rpcSetWhitelistEnabled(tr_rpc_server* server, bool isEnabled);
 bool tr_rpcGetWhitelistEnabled(tr_rpc_server const* server);
 
 void tr_rpcSetWhitelist(tr_rpc_server* server, std::string_view whitelist);
+
+int tr_rpcGetRPCSocketMode(tr_rpc_server const* server);
 
 std::string const& tr_rpcGetWhitelist(tr_rpc_server const* server);
 

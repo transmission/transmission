@@ -18,6 +18,7 @@
 
 #include "crypto-utils.h"
 #include "error.h"
+#include "file-info.h"
 #include "file.h"
 #include "log.h"
 #include "makemeta.h"
@@ -73,7 +74,7 @@ static struct FileList* getFiles(char const* dir, char const* base, struct FileL
 
         tr_sys_dir_close(odir, nullptr);
     }
-    else if (info.type == TR_SYS_PATH_IS_FILE && info.size > 0)
+    else if (info.type == TR_SYS_PATH_IS_FILE)
     {
         auto* const node = tr_new0(FileList, 1);
         node->size = info.size;
@@ -154,7 +155,7 @@ tr_metainfo_builder* tr_metaInfoBuilderCreate(char const* topFileArg)
         tr_free(dir);
     }
 
-    for (struct FileList* walk = files; walk != nullptr; walk = walk->next)
+    for (auto* walk = files; walk != nullptr; walk = walk->next)
     {
         ++ret->fileCount;
     }
@@ -162,14 +163,16 @@ tr_metainfo_builder* tr_metaInfoBuilderCreate(char const* topFileArg)
     ret->files = tr_new0(tr_metainfo_builder_file, ret->fileCount);
 
     int i = 0;
+    auto const offset = strlen(ret->top);
     while (files != nullptr)
     {
         struct FileList* const tmp = files;
         files = files->next;
 
-        tr_metainfo_builder_file* const file = &ret->files[i++];
+        auto* const file = &ret->files[i++];
         file->filename = tmp->filename;
         file->size = tmp->size;
+        file->is_portable = tr_file_info::isPortable(file->filename + offset);
 
         ret->totalSize += tmp->size;
 

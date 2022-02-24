@@ -294,6 +294,7 @@ enum
     TR_KEY_rpc_host_whitelist_enabled,
     TR_KEY_rpc_password,
     TR_KEY_rpc_port,
+    TR_KEY_rpc_socket_mode,
     TR_KEY_rpc_url,
     TR_KEY_rpc_username,
     TR_KEY_rpc_version,
