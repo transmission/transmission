@@ -204,23 +204,6 @@ bool trashDataFile(char const* filename, tr_error** error)
         [torrent startTransferNoQueue];
     }
 
-    //upgrading from versions < 1.60: get old stop ratio settings
-    NSNumber* ratioSetting;
-    if ((ratioSetting = history[@"RatioSetting"]))
-    {
-        switch (ratioSetting.intValue)
-        {
-        case NSControlStateValueOn:
-            self.ratioSetting = TR_RATIOLIMIT_SINGLE;
-            break;
-        case NSControlStateValueOff:
-            self.ratioSetting = TR_RATIOLIMIT_UNLIMITED;
-            break;
-        case NSControlStateValueMixed:
-            self.ratioSetting = TR_RATIOLIMIT_GLOBAL;
-            break;
-        }
-    }
     NSNumber* ratioLimit;
     if ((ratioLimit = history[@"RatioLimit"]))
     {

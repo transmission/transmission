@@ -671,8 +671,8 @@ static void removeKeRangerRansomware()
     }
         
         
-    //update previous transfers state by recreating a torrint from history
-    //and cmoparing to torrents already loaded via tr_sessionLoadTorrents
+    //update previous transfers state by recreating a torrent from history
+    //and comparing to torrents already loaded via tr_sessionLoadTorrents
     NSString* historyFile = [self.fConfigDirectory stringByAppendingPathComponent:TRANSFER_PLIST];
     NSArray* history = [NSArray arrayWithContentsOfFile:historyFile];
     if (!history)
