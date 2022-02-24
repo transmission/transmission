@@ -74,7 +74,7 @@ static struct FileList* getFiles(char const* dir, char const* base, struct FileL
 
         tr_sys_dir_close(odir, nullptr);
     }
-    else if (info.type == TR_SYS_PATH_IS_FILE && info.size > 0)
+    else if (info.type == TR_SYS_PATH_IS_FILE)
     {
         auto* const node = tr_new0(FileList, 1);
         node->size = info.size;
