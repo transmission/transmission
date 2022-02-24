@@ -53,6 +53,8 @@ void tr_ctorInitTorrentWanted(tr_ctor const* ctor, tr_torrent* tor);
 
 bool tr_ctorSaveContents(tr_ctor const* ctor, std::string const& filename, tr_error** error);
 
+bool tr_ctorSaveMagnetContents(tr_torrent* tor, std::string const& filename, tr_error** error);
+
 std::string_view tr_ctorGetContents(tr_ctor const* ctor);
 
 tr_session* tr_ctorGetSession(tr_ctor const* ctor);
@@ -463,9 +465,19 @@ public:
         return metainfo_.torrentFile(this->session->torrent_dir);
     }
 
+    [[nodiscard]] auto magnetFile() const
+    {
+        return metainfo_.magnetFile(this->session->torrent_dir);
+    }
+
     [[nodiscard]] auto resumeFile() const
     {
         return metainfo_.resumeFile(this->session->resume_dir);
+    }
+
+    [[nodiscard]] auto magnet() const
+    {
+        return metainfo_.magnet();
     }
 
     [[nodiscard]] auto const& comment() const
@@ -763,4 +775,5 @@ tr_peer_id_t const& tr_torrentGetPeerId(tr_torrent* tor);
 tr_torrent_metainfo&& tr_ctorStealMetainfo(tr_ctor* ctor);
 
 bool tr_ctorSetMetainfoFromFile(tr_ctor* ctor, std::string const& filename, tr_error** error);
+bool tr_ctorSetMetainfoFromMagnetLink(tr_ctor* ctor, std::string const& filename, tr_error** error);
 void tr_ctorSetLabels(tr_ctor* ctor, tr_labels_t&& labels);
