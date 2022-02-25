@@ -86,9 +86,13 @@ struct tr_rpc_address
         struct in_addr;
         char unixSocketPath[TrUnixAddrStrLen];
     } addr;
-};
 
-static tr_rpc_address constexpr tr_rpc_inaddr_any = { TR_RPC_AF_INET, { INADDR_ANY } };
+    void set_inaddr_any()
+    {
+        type = TR_RPC_AF_INET;
+        addr = { INADDR_ANY };
+    }
+};
 
 #define MY_REALM "Transmission"
 
@@ -96,9 +100,9 @@ static tr_rpc_address constexpr tr_rpc_inaddr_any = { TR_RPC_AF_INET, { INADDR_A
 
 static int constexpr DeflateLevel = 6; // medium / default
 
-static bool constexpr tr_rpc_address_is_valid(tr_rpc_address const* a)
+static bool constexpr tr_rpc_address_is_valid(tr_rpc_address const& a)
 {
-    return a != nullptr && (a->type == TR_RPC_AF_INET || a->type == TR_RPC_AF_INET6 || a->type == TR_RPC_AF_UNIX);
+    return a.type == TR_RPC_AF_INET || a.type == TR_RPC_AF_INET6 || a.type == TR_RPC_AF_UNIX;
 }
 
 /***
@@ -588,20 +592,20 @@ static auto constexpr ServerStartRetryDelayIncrement = int{ 5 };
 static auto constexpr ServerStartRetryDelayStep = int{ 3 };
 static auto constexpr ServerStartRetryMaxDelay = int{ 60 };
 
-static char const* tr_rpc_address_to_string(tr_rpc_address const* addr, char* buf, size_t buflen)
+static char const* tr_rpc_address_to_string(tr_rpc_address const& addr, char* buf, size_t buflen)
 {
     TR_ASSERT(tr_rpc_address_is_valid(addr));
 
-    switch (addr->type)
+    switch (addr.type)
     {
     case TR_RPC_AF_INET:
-        return evutil_inet_ntop(AF_INET, &addr->addr, buf, buflen);
+        return evutil_inet_ntop(AF_INET, &addr.addr, buf, buflen);
 
     case TR_RPC_AF_INET6:
-        return evutil_inet_ntop(AF_INET6, &addr->addr, buf, buflen);
+        return evutil_inet_ntop(AF_INET6, &addr.addr, buf, buflen);
 
     case TR_RPC_AF_UNIX:
-        tr_strlcpy(buf, addr->addr.unixSocketPath, buflen);
+        tr_strlcpy(buf, addr.addr.unixSocketPath, buflen);
         return buf;
 
     default:
@@ -611,20 +615,19 @@ static char const* tr_rpc_address_to_string(tr_rpc_address const* addr, char* bu
 
 static std::string tr_rpc_address_with_port(tr_rpc_server const* server)
 {
-    tr_rpc_address const* addr = server->bindAddress;
 
     char addr_buf[TrUnixAddrStrLen];
-    tr_rpc_address_to_string(addr, addr_buf, sizeof(addr_buf));
+    tr_rpc_address_to_string(*server->bindAddress, addr_buf, sizeof(addr_buf));
 
     std::string addr_port_str{ addr_buf };
-    if (addr->type != TR_RPC_AF_UNIX)
+    if (server->bindAddress->type != TR_RPC_AF_UNIX)
     {
         addr_port_str.append(":" + std::to_string(tr_rpcGetPort(server)));
     }
     return addr_port_str;
 }
 
-static bool tr_rpc_address_from_string(tr_rpc_address* dst, std::string_view src)
+static bool tr_rpc_address_from_string(tr_rpc_address& dst, std::string_view src)
 {
     if (tr_strvStartsWith(src, TrUnixSocketPrefix))
     {
@@ -638,20 +641,20 @@ static bool tr_rpc_address_from_string(tr_rpc_address* dst, std::string_view src
             return false;
         }
 
-        dst->type = TR_RPC_AF_UNIX;
-        tr_strlcpy(dst->addr.unixSocketPath, std::string{ src }.c_str(), TrUnixAddrStrLen);
+        dst.type = TR_RPC_AF_UNIX;
+        tr_strlcpy(dst.addr.unixSocketPath, std::string{ src }.c_str(), TrUnixAddrStrLen);
         return true;
     }
 
-    if (evutil_inet_pton(AF_INET, std::string{ src }.c_str(), &dst->addr) == 1)
+    if (evutil_inet_pton(AF_INET, std::string{ src }.c_str(), &dst.addr) == 1)
     {
-        dst->type = TR_RPC_AF_INET;
+        dst.type = TR_RPC_AF_INET;
         return true;
     }
 
-    if (evutil_inet_pton(AF_INET6, std::string{ src }.c_str(), &dst->addr) == 1)
+    if (evutil_inet_pton(AF_INET6, std::string{ src }.c_str(), &dst.addr) == 1)
     {
-        dst->type = TR_RPC_AF_INET6;
+        dst.type = TR_RPC_AF_INET6;
         return true;
     }
 
@@ -985,7 +988,7 @@ bool tr_rpcIsPasswordEnabled(tr_rpc_server const* server)
 char const* tr_rpcGetBindAddress(tr_rpc_server const* server)
 {
     static char addr_buf[TrUnixAddrStrLen];
-    return tr_rpc_address_to_string(server->bindAddress, addr_buf, sizeof(addr_buf));
+    return tr_rpc_address_to_string(*server->bindAddress, addr_buf, sizeof(addr_buf));
 }
 
 bool tr_rpcGetAntiBruteForceEnabled(tr_rpc_server const* server)
@@ -1024,9 +1027,9 @@ static void missing_settings_key(tr_quark const q)
 
 tr_rpc_server::tr_rpc_server(tr_session* session_in, tr_variant* settings)
     : compressor{ libdeflate_alloc_compressor(DeflateLevel), libdeflate_free_compressor }
+    , bindAddress()
     , session{ session_in }
 {
-    auto address = tr_rpc_address{};
     auto boolVal = bool{};
     auto i = int64_t{};
     auto sv = std::string_view{};
@@ -1183,33 +1186,32 @@ tr_rpc_server::tr_rpc_server(tr_session* session_in, tr_variant* settings)
     if (!tr_variantDictFindStrView(settings, key, &sv))
     {
         missing_settings_key(key);
-        address = tr_rpc_inaddr_any;
+        bindAddress->set_inaddr_any();
     }
     else
     {
-        if (!tr_rpc_address_from_string(&address, sv))
+        if (!tr_rpc_address_from_string(*bindAddress, sv))
         {
             tr_logAddNamedError(MyName, _("%" TR_PRIsv " is not a valid address, falling back to 0.0.0.0."), TR_PRIsv_ARG(sv));
-            address = tr_rpc_inaddr_any;
+            bindAddress->set_inaddr_any();
         }
-        else if (address.type != TR_RPC_AF_INET && address.type != TR_RPC_AF_INET6 && address.type != TR_RPC_AF_UNIX)
+        else if (
+            bindAddress->type != TR_RPC_AF_INET && bindAddress->type != TR_RPC_AF_INET6 && bindAddress->type != TR_RPC_AF_UNIX)
         {
             tr_logAddNamedError(
                 MyName,
                 _("%" TR_PRIsv
                   " is not an IPv4 address, an IPv6 address, or a unix socket path. RPC listeners must be one of the previously mentioned types. Falling back to 0.0.0.0."),
                 TR_PRIsv_ARG(sv));
-            address = tr_rpc_inaddr_any;
+            bindAddress->set_inaddr_any();
         }
     }
 
-    if (address.type == TR_RPC_AF_UNIX)
+    if (bindAddress->type == TR_RPC_AF_UNIX)
     {
         this->isWhitelistEnabled = false;
         this->isHostWhitelistEnabled = false;
     }
-
-    this->bindAddress = (tr_rpc_address*)tr_memdup(&address, sizeof(tr_rpc_address));
 
     if (this->isEnabled)
     {
@@ -1244,7 +1246,4 @@ tr_rpc_server::~tr_rpc_server()
     TR_ASSERT(tr_amInEventThread(this->session));
 
     stopServer(this);
-
-    tr_free(this->bindAddress);
-    this->bindAddress = nullptr;
 }
