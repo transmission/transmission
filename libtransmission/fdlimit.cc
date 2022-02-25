@@ -511,8 +511,7 @@ tr_socket_t tr_fdSocketCreate(tr_session* session, int domain, int type)
 
         if ((s == TR_BAD_SOCKET) && (sockerrno != EAFNOSUPPORT))
         {
-            char err_buf[512];
-            tr_logAddError(_("Couldn't create socket: %s"), tr_net_strerror(err_buf, sizeof(err_buf), sockerrno));
+            tr_logAddError(_("Couldn't create socket: %s"), tr_net_strerror(sockerrno).c_str());
         }
     }
 
