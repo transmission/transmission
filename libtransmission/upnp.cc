@@ -32,7 +32,7 @@ char constexpr Key[] = "Port Forwarding (UPnP)";
 enum class UpnpState
 {
     IDLE,
-    ERR,
+    FAILED,
     WILL_DISCOVER, // next action is upnpDiscover()
     DISCOVERING, // currently making blocking upnpDiscover() call in a worker thread
     WILL_MAP, // next action is UPNP_AddPortMapping()
@@ -56,7 +56,7 @@ tr_port_forwarding portFwdState(UpnpState upnp_state, bool is_mapped)
     case UpnpState::IDLE:
         return is_mapped ? TR_PORT_MAPPED : TR_PORT_UNMAPPED;
 
-    case UpnpState::ERR:
+    case UpnpState::FAILED:
         return TR_PORT_ERROR;
     }
 }
@@ -69,7 +69,7 @@ struct tr_upnp
     {
         TR_ASSERT(!isMapped);
         TR_ASSERT(
-            state == UpnpState::IDLE || state == UpnpState::ERR || state == UpnpState::WILL_DISCOVER ||
+            state == UpnpState::IDLE || state == UpnpState::FAILED || state == UpnpState::WILL_DISCOVER ||
             state == UpnpState::DISCOVERING);
 
         FreeUPNPUrls(&urls);
@@ -292,7 +292,7 @@ tr_port_forwarding tr_upnpPulse(tr_upnp* handle, tr_port port, bool isEnabled, b
         }
         else
         {
-            handle->state = UpnpState::ERR;
+            handle->state = UpnpState::FAILED;
             tr_logAddNamedDbg(Key, "UPNP_GetValidIGD failed (errno %d - %s)", errno, tr_strerror(errno));
             tr_logAddNamedDbg(Key, "If your router supports UPnP, please make sure UPnP is enabled!");
         }
@@ -371,7 +371,7 @@ tr_port_forwarding tr_upnpPulse(tr_upnp* handle, tr_port port, bool isEnabled, b
         {
             tr_logAddNamedDbg(Key, "If your router supports UPnP, please make sure UPnP is enabled!");
             handle->port = -1;
-            handle->state = UpnpState::ERR;
+            handle->state = UpnpState::FAILED;
         }
     }
 
