@@ -82,15 +82,15 @@ struct tr_rpc_address
     tr_rpc_address_type type;
     union
     {
-        struct in6_addr;
-        struct in_addr;
+        struct in_addr addr4;
+        struct in6_addr addr6;
         char unixSocketPath[TrUnixAddrStrLen];
     } addr;
 
     void set_inaddr_any()
     {
         type = TR_RPC_AF_INET;
-        addr = { INADDR_ANY };
+        addr.addr4 = { INADDR_ANY };
     }
 };
 
@@ -631,7 +631,7 @@ static bool tr_rpc_address_from_string(tr_rpc_address& dst, std::string_view src
 {
     if (tr_strvStartsWith(src, TrUnixSocketPrefix))
     {
-        if (src.length() >= TrUnixAddrStrLen)
+        if (std::size(src) >= TrUnixAddrStrLen)
         {
             tr_logAddNamedError(
                 MyName,
@@ -661,13 +661,17 @@ static bool tr_rpc_address_from_string(tr_rpc_address& dst, std::string_view src
     return false;
 }
 
-static bool bindUnixSocket(struct event_base* base, struct evhttp* httpd, char const* path, int socket_mode)
+static bool bindUnixSocket(
+    [[maybe_unused]] struct event_base* base,
+    [[maybe_unused]] struct evhttp* httpd,
+    [[maybe_unused]] char const* path,
+    [[maybe_unused]] int socket_mode)
 {
 #ifdef _WIN32
     tr_logAddNamedError(
         MyName,
         _("Unix sockets are not supported on Windows. Please change \"%s\" in your configuration file."),
-        TR_KEY_rpc_bind_address);
+        tr_quark_get_string(TR_KEY_rpc_bind_address, nullptr));
     return false;
 #else
     struct sockaddr_un addr;
@@ -676,8 +680,14 @@ static bool bindUnixSocket(struct event_base* base, struct evhttp* httpd, char c
 
     unlink(addr.sun_path);
 
-    struct evconnlistener*
-        lev = evconnlistener_new_bind(base, nullptr, nullptr, LEV_OPT_CLOSE_ON_FREE, -1, (struct sockaddr*)&addr, sizeof(addr));
+    struct evconnlistener* lev = evconnlistener_new_bind(
+        base,
+        nullptr,
+        nullptr,
+        LEV_OPT_CLOSE_ON_FREE,
+        -1,
+        reinterpret_cast<sockaddr const*>(&addr),
+        sizeof(addr));
 
     if (lev == nullptr)
     {
@@ -1027,7 +1037,7 @@ static void missing_settings_key(tr_quark const q)
 
 tr_rpc_server::tr_rpc_server(tr_session* session_in, tr_variant* settings)
     : compressor{ libdeflate_alloc_compressor(DeflateLevel), libdeflate_free_compressor }
-    , bindAddress()
+    , bindAddress(std::make_unique<struct tr_rpc_address>())
     , session{ session_in }
 {
     auto boolVal = bool{};
@@ -1188,23 +1198,14 @@ tr_rpc_server::tr_rpc_server(tr_session* session_in, tr_variant* settings)
         missing_settings_key(key);
         bindAddress->set_inaddr_any();
     }
-    else
+    else if (!tr_rpc_address_from_string(*bindAddress, sv))
     {
-        if (!tr_rpc_address_from_string(*bindAddress, sv))
-        {
-            tr_logAddNamedError(MyName, _("%" TR_PRIsv " is not a valid address, falling back to 0.0.0.0."), TR_PRIsv_ARG(sv));
-            bindAddress->set_inaddr_any();
-        }
-        else if (
-            bindAddress->type != TR_RPC_AF_INET && bindAddress->type != TR_RPC_AF_INET6 && bindAddress->type != TR_RPC_AF_UNIX)
-        {
-            tr_logAddNamedError(
-                MyName,
-                _("%" TR_PRIsv
-                  " is not an IPv4 address, an IPv6 address, or a unix socket path. RPC listeners must be one of the previously mentioned types. Falling back to 0.0.0.0."),
-                TR_PRIsv_ARG(sv));
-            bindAddress->set_inaddr_any();
-        }
+        tr_logAddNamedError(
+            MyName,
+            _("%" TR_PRIsv
+              " is not an IPv4 address, an IPv6 address, or a unix socket path. RPC listeners must be one of the previously mentioned types. Falling back to 0.0.0.0."),
+            TR_PRIsv_ARG(sv));
+        bindAddress->set_inaddr_any();
     }
 
     if (bindAddress->type == TR_RPC_AF_UNIX)
@@ -1215,12 +1216,8 @@ tr_rpc_server::tr_rpc_server(tr_session* session_in, tr_variant* settings)
 
     if (this->isEnabled)
     {
-
-        tr_logAddNamedInfo(
-            MyName,
-            _("Serving RPC and Web requests on %s%s"),
-            tr_rpc_address_with_port(this).c_str(),
-            this->url.c_str());
+        auto const rpc_uri = tr_rpc_address_with_port(this) + this->url;
+        tr_logAddNamedInfo(MyName, _("Serving RPC and Web requests on %s"), rpc_uri.c_str());
         tr_runInEventThread(session, startServer, this);
 
         if (this->isWhitelistEnabled)
