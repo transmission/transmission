@@ -313,9 +313,7 @@ static void event_read_cb(evutil_socket_t fd, short /*event*/, void* vio)
             what |= BEV_EVENT_ERROR;
         }
 
-        char errstr[512];
-        tr_net_strerror(errstr, sizeof(errstr), e);
-        dbgmsg(io, "event_read_cb err: res:%d, what:%hd, errno:%d (%s)", res, what, e, errstr);
+        dbgmsg(io, "event_read_cb err: res:%d, what:%hd, errno:%d (%s)", res, what, e, tr_net_strerror(e).c_str());
 
         if (io->gotError != nullptr)
         {
@@ -326,12 +324,10 @@ static void event_read_cb(evutil_socket_t fd, short /*event*/, void* vio)
 
 static int tr_evbuffer_write(tr_peerIo* io, int fd, size_t howmuch)
 {
-    char errstr[256];
-
     EVUTIL_SET_SOCKET_ERROR(0);
     int const n = evbuffer_write_atmost(io->outbuf, fd, howmuch);
     int const e = EVUTIL_SOCKET_ERROR();
-    dbgmsg(io, "wrote %d to peer (%s)", n, (n == -1 ? tr_net_strerror(errstr, sizeof(errstr), e) : ""));
+    dbgmsg(io, "wrote %d to peer (%s)", n, (n == -1 ? tr_net_strerror(e).c_str() : ""));
 
     return n;
 }
@@ -404,9 +400,8 @@ RESCHEDULE:
     return;
 
 FAIL:
-    char errstr[1024];
-    tr_net_strerror(errstr, sizeof(errstr), e);
-    dbgmsg(io, "event_write_cb got an error. res is %d, what is %hd, errno is %d (%s)", res, what, e, errstr);
+    auto const errmsg = tr_net_strerror(e);
+    dbgmsg(io, "event_write_cb got an err. res:%d, what:%hd, errno:%d (%s)", res, what, e, errmsg.c_str());
 
     if (io->gotError != nullptr)
     {
@@ -1253,8 +1248,7 @@ static int tr_peerIoTryRead(tr_peerIo* io, size_t howmuch)
             res = evbuffer_read(io->inbuf, io->socket.handle.tcp, (int)howmuch);
             int const e = EVUTIL_SOCKET_ERROR();
 
-            char errstr[512];
-            dbgmsg(io, "read %d from peer (%s)", res, res == -1 ? tr_net_strerror(errstr, sizeof(errstr), e) : "");
+            dbgmsg(io, "read %d from peer (%s)", res, res == -1 ? tr_net_strerror(e).c_str() : "");
 
             if (evbuffer_get_length(io->inbuf) != 0)
             {
@@ -1270,8 +1264,7 @@ static int tr_peerIoTryRead(tr_peerIo* io, size_t howmuch)
                     what |= BEV_EVENT_EOF;
                 }
 
-                tr_net_strerror(errstr, sizeof(errstr), e);
-                dbgmsg(io, "tr_peerIoTryRead err: res:%d what:%hd, errno:%d (%s)", res, what, e, errstr);
+                dbgmsg(io, "tr_peerIoTryRead err: res:%d what:%hd, errno:%d (%s)", res, what, e, tr_net_strerror(e).c_str());
 
                 io->gotError(io, what, io->userData);
             }
@@ -1319,11 +1312,9 @@ static int tr_peerIoTryWrite(tr_peerIo* io, size_t howmuch)
 
             if (n < 0 && io->gotError != nullptr && e != 0 && e != EPIPE && e != EAGAIN && e != EINTR && e != EINPROGRESS)
             {
-                char errstr[512];
                 short const what = BEV_EVENT_WRITING | BEV_EVENT_ERROR;
 
-                tr_net_strerror(errstr, sizeof(errstr), e);
-                dbgmsg(io, "tr_peerIoTryWrite err: res:%d, what:%hd, errno:%d (%s)", n, what, e, errstr);
+                dbgmsg(io, "tr_peerIoTryWrite err: res:%d, what:%hd, errno:%d (%s)", n, what, e, tr_net_strerror(e).c_str());
                 io->gotError(io, what, io->userData);
             }
 
