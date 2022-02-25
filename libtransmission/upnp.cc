@@ -21,10 +21,7 @@
 #include "upnp.h"
 #include "utils.h"
 
-static char const* getKey()
-{
-    return _("Port Forwarding (UPnP)");
-}
+static char constexpr Key[] = "Port Forwarding (UPnP)";
 
 enum tr_upnp_state
 {
@@ -115,7 +112,7 @@ static struct UPNPDev* tr_upnpDiscover(int msec, char const* bindaddr)
 
     if (have_err)
     {
-        tr_logAddNamedDbg(getKey(), "upnpDiscover failed (errno %d - %s)", errno, tr_strerror(errno));
+        tr_logAddNamedDbg(Key, "upnpDiscover failed (errno %d - %s)", errno, tr_strerror(errno));
     }
 
     return ret;
@@ -202,7 +199,7 @@ static int tr_upnpAddPortMapping(tr_upnp const* handle, char const* proto, tr_po
     if (err != 0)
     {
         tr_logAddNamedDbg(
-            getKey(),
+            Key,
             "%s Port forwarding failed with error %d (errno %d - %s)",
             proto,
             err,
@@ -246,16 +243,16 @@ tr_port_forwarding tr_upnpPulse(tr_upnp* handle, tr_port port, bool isEnabled, b
         if (UPNP_GetValidIGD(devlist, &handle->urls, &handle->data, handle->lanaddr, sizeof(handle->lanaddr)) ==
             UPNP_IGD_VALID_CONNECTED)
         {
-            tr_logAddNamedInfo(getKey(), _("Found Internet Gateway Device \"%s\""), handle->urls.controlURL);
-            tr_logAddNamedInfo(getKey(), _("Local Address is \"%s\""), handle->lanaddr);
+            tr_logAddNamedInfo(Key, _("Found Internet Gateway Device \"%s\""), handle->urls.controlURL);
+            tr_logAddNamedInfo(Key, _("Local Address is \"%s\""), handle->lanaddr);
             handle->state = TR_UPNP_IDLE;
             handle->hasDiscovered = true;
         }
         else
         {
             handle->state = TR_UPNP_ERR;
-            tr_logAddNamedDbg(getKey(), "UPNP_GetValidIGD failed (errno %d - %s)", errno, tr_strerror(errno));
-            tr_logAddNamedDbg(getKey(), "If your router supports UPnP, please make sure UPnP is enabled!");
+            tr_logAddNamedDbg(Key, "UPNP_GetValidIGD failed (errno %d - %s)", errno, tr_strerror(errno));
+            tr_logAddNamedDbg(Key, "If your router supports UPnP, please make sure UPnP is enabled!");
         }
 
         freeUPNPDevlist(devlist);
@@ -270,7 +267,7 @@ tr_port_forwarding tr_upnpPulse(tr_upnp* handle, tr_port port, bool isEnabled, b
         ((tr_upnpGetSpecificPortMappingEntry(handle, "TCP") != UPNPCOMMAND_SUCCESS) ||
          (tr_upnpGetSpecificPortMappingEntry(handle, "UDP") != UPNPCOMMAND_SUCCESS)))
     {
-        tr_logAddNamedInfo(getKey(), _("Port %d isn't forwarded"), handle->port);
+        tr_logAddNamedInfo(Key, _("Port %d isn't forwarded"), handle->port);
         handle->isMapped = false;
     }
 
@@ -280,7 +277,7 @@ tr_port_forwarding tr_upnpPulse(tr_upnp* handle, tr_port port, bool isEnabled, b
         tr_upnpDeletePortMapping(handle, "UDP", handle->port);
 
         tr_logAddNamedInfo(
-            getKey(),
+            Key,
             _("Stopping port forwarding through \"%s\", service \"%s\""),
             handle->urls.controlURL,
             handle->data.first.servicetype);
@@ -315,7 +312,7 @@ tr_port_forwarding tr_upnpPulse(tr_upnp* handle, tr_port port, bool isEnabled, b
         }
 
         tr_logAddNamedInfo(
-            getKey(),
+            Key,
             _("Port forwarding through \"%s\", service \"%s\". (local address: %s:%d)"),
             handle->urls.controlURL,
             handle->data.first.servicetype,
@@ -324,13 +321,13 @@ tr_port_forwarding tr_upnpPulse(tr_upnp* handle, tr_port port, bool isEnabled, b
 
         if (handle->isMapped)
         {
-            tr_logAddNamedInfo(getKey(), "%s", _("Port forwarding successful!"));
+            tr_logAddNamedInfo(Key, "%s", _("Port forwarding successful!"));
             handle->port = port;
             handle->state = TR_UPNP_IDLE;
         }
         else
         {
-            tr_logAddNamedDbg(getKey(), "If your router supports UPnP, please make sure UPnP is enabled!");
+            tr_logAddNamedDbg(Key, "If your router supports UPnP, please make sure UPnP is enabled!");
             handle->port = -1;
             handle->state = TR_UPNP_ERR;
         }
