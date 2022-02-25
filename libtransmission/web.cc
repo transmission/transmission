@@ -4,6 +4,7 @@
 // License text can be found in the licenses/ folder.
 
 #include <algorithm>
+#include <condition_variable>
 #include <list>
 #include <map>
 #include <memory>
@@ -161,6 +162,7 @@ public:
 
         auto const lock = std::unique_lock(queued_tasks_mutex);
         queued_tasks.emplace_back(new Task{ *this, std::move(options) });
+        queued_tasks_cv.notify_one();
     }
 
 private:
@@ -436,9 +438,16 @@ private:
                 break;
             }
 
-            // add queued tasks
             {
-                auto const lock = std::unique_lock(impl->queued_tasks_mutex);
+                auto lock = std::unique_lock(impl->queued_tasks_mutex);
+
+                // sleep until there are either running or queued tasks
+                if (running_tasks == 0)
+                {
+                    impl->queued_tasks_cv.wait(lock, [impl]() { return !std::empty(impl->queued_tasks); });
+                }
+
+                // add queued tasks
                 for (auto* task : impl->queued_tasks)
                 {
                     dbgmsg("adding task to curl: [%s]", task->url().c_str());
@@ -509,7 +518,8 @@ private:
 private:
     std::shared_ptr<CURLSH> const curlsh_{ curl_share_init(), curl_share_cleanup };
 
-    std::recursive_mutex queued_tasks_mutex;
+    std::mutex queued_tasks_mutex;
+    std::condition_variable queued_tasks_cv;
     std::list<Task*> queued_tasks;
 
     CURLSH* shared()
