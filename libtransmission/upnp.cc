@@ -35,6 +35,27 @@ enum tr_upnp_state
     TR_UPNP_UNMAP
 };
 
+static tr_port_forwarding portFwdState(tr_upnp_state upnp_state, bool is_mapped)
+{
+    switch (upnp_state)
+    {
+    case TR_UPNP_DISCOVER:
+        return TR_PORT_UNMAPPED;
+
+    case TR_UPNP_MAP:
+        return TR_PORT_MAPPING;
+
+    case TR_UPNP_UNMAP:
+        return TR_PORT_UNMAPPING;
+
+    case TR_UPNP_IDLE:
+        return is_mapped ? TR_PORT_MAPPED : TR_PORT_UNMAPPED;
+
+    default:
+        return TR_PORT_ERROR;
+    }
+}
+
 struct tr_upnp
 {
     ~tr_upnp()
@@ -315,21 +336,5 @@ tr_port_forwarding tr_upnpPulse(tr_upnp* handle, tr_port port, bool isEnabled, b
         }
     }
 
-    switch (handle->state)
-    {
-    case TR_UPNP_DISCOVER:
-        return TR_PORT_UNMAPPED;
-
-    case TR_UPNP_MAP:
-        return TR_PORT_MAPPING;
-
-    case TR_UPNP_UNMAP:
-        return TR_PORT_UNMAPPING;
-
-    case TR_UPNP_IDLE:
-        return handle->isMapped ? TR_PORT_MAPPED : TR_PORT_UNMAPPED;
-
-    default:
-        return TR_PORT_ERROR;
-    }
+    return portFwdState(handle->state, handle->isMapped);
 }
