@@ -24,7 +24,7 @@ typedef NS_ENUM(unsigned int, TorrentDeterminationType) {
                          lib:(tr_session*)lib;
 - (instancetype)initWithTorrentStruct:(tr_torrent*)torrentStruct location:(NSString*)location lib:(tr_session*)lib;
 - (instancetype)initWithMagnetAddress:(NSString*)address location:(NSString*)location lib:(tr_session*)lib;
-- (void)shouldResumeTorrent:(Torrent*)torrent WithHistory:(NSDictionary*)history forcePause:(BOOL)pause;
+- (void)setResumeStatusForTorrent:(Torrent*)torrent withHistory:(NSDictionary*)history forcePause:(BOOL)pause;
 
 @property(nonatomic, readonly) NSDictionary* history;
 

@@ -715,15 +715,6 @@ tr_torrent** tr_sessionLoadTorrents(tr_session* session, tr_ctor* ctor, int* set
 ***
 **/
 
-/**
- *  List all the torrents in current session.
- */
-std::vector<tr_torrent*> tr_sessionGetTorrents(tr_session* session);
-
-/**
-***
-**/
-
 enum TrScript
 {
     TR_SCRIPT_ON_TORRENT_ADDED,

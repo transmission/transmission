@@ -195,7 +195,7 @@ bool trashDataFile(char const* filename, tr_error** error)
     return self;
 }
 
-- (void)shouldResumeTorrent:(Torrent*)torrent WithHistory:(NSDictionary*)history forcePause:(BOOL)pause
+- (void)setResumeStatusForTorrent:(Torrent*)torrent withHistory:(NSDictionary*)history forcePause:(BOOL)pause
 {
     //start transfer
     NSNumber* active;

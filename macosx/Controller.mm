@@ -644,30 +644,28 @@ static void removeKeRangerRansomware()
     {
         NSLog(@"Could not IORegisterForSystemPower");
     }
+    
+    auto* const session = self.fLib;
 
     //load previous transfers
-    tr_torrent** torrentSet;
-    tr_ctor* ctor = tr_ctorNew(self.fLib);
-
-    //start all torrents paused then check state in history
-    tr_ctorSetPaused(ctor, TR_FORCE, true);
-
-    torrentSet = tr_sessionLoadTorrents(self.fLib, ctor, nullptr);
+    tr_ctor* ctor = tr_ctorNew(session);
+    tr_ctorSetPaused(ctor, TR_FORCE, true); // paused by default; unpause below after checking state history
+    int n_torrents = 0;
+    tr_torrent** loaded_torrents = tr_sessionLoadTorrents(session, ctor, &n_torrents);
     tr_ctorFree(ctor);
-    tr_free(torrentSet);
         
-    auto* session = static_cast<tr_session*>(self.fLib);
-    auto torrents = tr_sessionGetTorrents(session);
-    for (struct tr_torrent* tor : torrents)
+    // process the loaded torrents
+    for (int i = 0; i < n_torrents; ++i)
     {
-        NSString* location = nil;
+        struct tr_torrent* tor = loaded_torrents[i];
+        NSString* location;
         if (tr_torrentGetDownloadDir(tor) != NULL)
         {
             location = @(tr_torrentGetDownloadDir(tor));
         }
         Torrent* torrent = [[Torrent alloc] initWithTorrentStruct:tor location:location lib:self.fLib];
         [self.fTorrents addObject:torrent];
-        [self.fTorrentHashes setObject:torrent forKey:torrent.hashString];
+        self.fTorrentHashes[torrent.hashString] = torrent;
     }
         
         
@@ -694,9 +692,9 @@ static void removeKeRangerRansomware()
         for (NSDictionary* historyItem in history)
         {
             NSString *hash = historyItem[@"TorrentHash"];
-            if ([[self.fTorrentHashes allKeys] containsObject:hash]) {
-                Torrent *torrent = [self.fTorrentHashes objectForKey:hash];
-                [t shouldResumeTorrent:torrent WithHistory:historyItem forcePause:self.fPauseOnLaunch];
+            if ([self.fTorrentHashes.allKeys containsObject:hash]) {
+                Torrent *torrent = self.fTorrentHashes[hash];
+                [t setResumeStatusForTorrent:torrent withHistory:historyItem forcePause:self.fPauseOnLaunch];
                 
                 NSNumber* waitToStart;
                 if (!self.fPauseOnLaunch && (waitToStart = historyItem[@"WaitToStart"]) && waitToStart.boolValue)
@@ -2486,7 +2484,7 @@ static void removeKeRangerRansomware()
     for (Torrent* torrent in self.fTorrents)
     {
         [history addObject:torrent.history];
-        [self.fTorrentHashes setObject:torrent forKey:torrent.hashString];
+        self.fTorrentHashes[torrent.hashString] = torrent;
     }
 
     NSString* historyFile = [self.fConfigDirectory stringByAppendingPathComponent:TRANSFER_PLIST];
