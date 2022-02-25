@@ -30,22 +30,22 @@ enum tr_upnp_state
 {
     TR_UPNP_IDLE,
     TR_UPNP_ERR,
-    TR_UPNP_DISCOVER,
-    TR_UPNP_MAP,
-    TR_UPNP_UNMAP
+    TR_UPNP_WILL_DISCOVER, // next action upnpDiscover()
+    TR_UPNP_WILL_MAP, // next action is UPNP_AddPortMapping()
+    TR_UPNP_WILL_UNMAP // next action is UPNP_DeletePortMapping()
 };
 
 static tr_port_forwarding portFwdState(tr_upnp_state upnp_state, bool is_mapped)
 {
     switch (upnp_state)
     {
-    case TR_UPNP_DISCOVER:
+    case TR_UPNP_WILL_DISCOVER:
         return TR_PORT_UNMAPPED;
 
-    case TR_UPNP_MAP:
+    case TR_UPNP_WILL_MAP:
         return TR_PORT_MAPPING;
 
-    case TR_UPNP_UNMAP:
+    case TR_UPNP_WILL_UNMAP:
         return TR_PORT_UNMAPPING;
 
     case TR_UPNP_IDLE:
@@ -61,7 +61,7 @@ struct tr_upnp
     ~tr_upnp()
     {
         TR_ASSERT(!isMapped);
-        TR_ASSERT(state == TR_UPNP_IDLE || state == TR_UPNP_ERR || state == TR_UPNP_DISCOVER);
+        TR_ASSERT(state == TR_UPNP_IDLE || state == TR_UPNP_ERR || state == TR_UPNP_WILL_DISCOVER);
 
         FreeUPNPUrls(&urls);
     }
@@ -72,7 +72,7 @@ struct tr_upnp
     int port = -1;
     char lanaddr[16] = {};
     bool isMapped = false;
-    tr_upnp_state state = TR_UPNP_DISCOVER;
+    tr_upnp_state state = TR_UPNP_WILL_DISCOVER;
 };
 
 /**
@@ -237,7 +237,7 @@ enum
 
 tr_port_forwarding tr_upnpPulse(tr_upnp* handle, tr_port port, bool isEnabled, bool doPortCheck, char const* bindaddr)
 {
-    if (isEnabled && handle->state == TR_UPNP_DISCOVER)
+    if (isEnabled && handle->state == TR_UPNP_WILL_DISCOVER)
     {
         auto* const devlist = tr_upnpDiscover(2000, bindaddr);
         errno = 0;
@@ -263,7 +263,7 @@ tr_port_forwarding tr_upnpPulse(tr_upnp* handle, tr_port port, bool isEnabled, b
 
     if ((handle->state == TR_UPNP_IDLE) && (handle->isMapped) && (!isEnabled || handle->port != port))
     {
-        handle->state = TR_UPNP_UNMAP;
+        handle->state = TR_UPNP_WILL_UNMAP;
     }
 
     if (isEnabled && handle->isMapped && doPortCheck &&
@@ -274,7 +274,7 @@ tr_port_forwarding tr_upnpPulse(tr_upnp* handle, tr_port port, bool isEnabled, b
         handle->isMapped = false;
     }
 
-    if (handle->state == TR_UPNP_UNMAP)
+    if (handle->state == TR_UPNP_WILL_UNMAP)
     {
         tr_upnpDeletePortMapping(handle, "TCP", handle->port);
         tr_upnpDeletePortMapping(handle, "UDP", handle->port);
@@ -292,10 +292,10 @@ tr_port_forwarding tr_upnpPulse(tr_upnp* handle, tr_port port, bool isEnabled, b
 
     if ((handle->state == TR_UPNP_IDLE) && isEnabled && !handle->isMapped)
     {
-        handle->state = TR_UPNP_MAP;
+        handle->state = TR_UPNP_WILL_MAP;
     }
 
-    if (handle->state == TR_UPNP_MAP)
+    if (handle->state == TR_UPNP_WILL_MAP)
     {
         errno = 0;
 
