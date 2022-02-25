@@ -58,16 +58,16 @@ using namespace std::literals;
 
 static char constexpr MyName[] = "RPC Server";
 
-static char constexpr TrUnixSocketPrefix[] = "unix:";
+static auto constexpr TrUnixSocketPrefix = "unix:"sv;
 
 /* The maximum size of a unix socket path is defined per-platform based on sockaddr_un.sun_path.
  * On Windows the fallback is the length of the unix prefix. Subtracting one at the end is for
  * double counting null terminators from sun_path and TrUnixSocketPrefix. */
 #ifdef _WIN32
-auto inline constexpr TrUnixAddrStrLen = size_t{ sizeof(TrUnixSocketPrefix) };
+auto inline constexpr TrUnixAddrStrLen = size_t{ std::size(TrUnixSocketPrefix) };
 #else
-auto inline constexpr TrUnixAddrStrLen = size_t{ sizeof(((struct sockaddr_un*)nullptr)->sun_path) + sizeof(TrUnixSocketPrefix) -
-                                                 1 };
+auto inline constexpr TrUnixAddrStrLen = size_t{ sizeof(((struct sockaddr_un*)nullptr)->sun_path) +
+                                                 std::size(TrUnixSocketPrefix) };
 #endif
 
 enum tr_rpc_address_type
@@ -635,9 +635,9 @@ static bool tr_rpc_address_from_string(tr_rpc_address& dst, std::string_view src
         {
             tr_logAddNamedError(
                 MyName,
-                _("Unix socket path must be fewer than %zu characters (including \"%s\" prefix)"),
+                _("Unix socket path must be fewer than %zu characters (including \"%" TR_PRIsv "\" prefix)"),
                 TrUnixAddrStrLen - 1,
-                TrUnixSocketPrefix);
+                TR_PRIsv_ARG(TrUnixSocketPrefix));
             return false;
         }
 
@@ -676,7 +676,7 @@ static bool bindUnixSocket(
 #else
     struct sockaddr_un addr;
     addr.sun_family = AF_UNIX;
-    tr_strlcpy(addr.sun_path, path + strlen(TrUnixSocketPrefix), sizeof(addr.sun_path));
+    tr_strlcpy(addr.sun_path, path + std::size(TrUnixSocketPrefix), sizeof(addr.sun_path));
 
     unlink(addr.sun_path);
 
@@ -810,7 +810,7 @@ static void stopServer(tr_rpc_server* server)
 
     if (server->bindAddress->type == TR_RPC_AF_UNIX)
     {
-        unlink(address + strlen(TrUnixSocketPrefix));
+        unlink(address + std::size(TrUnixSocketPrefix));
     }
 
     tr_logAddNamedDbg(MyName, "Stopped listening on %s", tr_rpc_address_with_port(server).c_str());
