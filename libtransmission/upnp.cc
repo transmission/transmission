@@ -4,6 +4,9 @@
 // License text can be found in the licenses/ folder.
 
 #include <cerrno>
+#include <future>
+#include <mutex>
+#include <thread>
 
 #ifdef SYSTEM_MINIUPNP
 #include <miniupnpc/miniupnpc.h>
@@ -27,7 +30,8 @@ enum tr_upnp_state
 {
     TR_UPNP_IDLE,
     TR_UPNP_ERR,
-    TR_UPNP_WILL_DISCOVER, // next action upnpDiscover()
+    TR_UPNP_WILL_DISCOVER, // next action is upnpDiscover()
+    TR_UPNP_DISCOVERING, // currently making blocking upnpDiscover() call in a worker thread
     TR_UPNP_WILL_MAP, // next action is UPNP_AddPortMapping()
     TR_UPNP_WILL_UNMAP // next action is UPNP_DeletePortMapping()
 };
@@ -37,6 +41,7 @@ static tr_port_forwarding portFwdState(tr_upnp_state upnp_state, bool is_mapped)
     switch (upnp_state)
     {
     case TR_UPNP_WILL_DISCOVER:
+    case TR_UPNP_DISCOVERING:
         return TR_PORT_UNMAPPED;
 
     case TR_UPNP_WILL_MAP:
@@ -70,6 +75,11 @@ struct tr_upnp
     char lanaddr[16] = {};
     bool isMapped = false;
     tr_upnp_state state = TR_UPNP_WILL_DISCOVER;
+
+    // Used to return the results of upnpDiscover() from a worker thread
+    // to be processed without blocking in tr_upnpPulse().
+    // This will be pending while the state is TR_UPNP_DISCOVERING.
+    std::optional<std::future<UPNPDev*>> discover_future;
 };
 
 /**
@@ -232,12 +242,36 @@ enum
     UPNP_IGD_INVALID = 3
 };
 
+static auto* discoverThreadfunc(char* bindaddr)
+{
+    auto* const ret = tr_upnpDiscover(2000, bindaddr);
+    tr_free(bindaddr);
+    return ret;
+}
+
+template<typename T>
+static bool isFutureReady(std::future<T> const& future)
+{
+    return future.wait_for(std::chrono::seconds(0)) == std::future_status::ready;
+}
+
 tr_port_forwarding tr_upnpPulse(tr_upnp* handle, tr_port port, bool isEnabled, bool doPortCheck, char const* bindaddr)
 {
     if (isEnabled && handle->state == TR_UPNP_WILL_DISCOVER)
     {
-        auto* const devlist = tr_upnpDiscover(2000, bindaddr);
-        errno = 0;
+        TR_ASSERT(!handle->discover_future);
+
+        auto task = std::packaged_task<UPNPDev*(char*)>{ discoverThreadfunc };
+        handle->discover_future = task.get_future();
+        handle->state = TR_UPNP_DISCOVERING;
+
+        std::thread(std::move(task), tr_strdup(bindaddr)).detach();
+    }
+
+    if (isEnabled && handle->state == TR_UPNP_DISCOVERING && handle->discover_future && isFutureReady(*handle->discover_future))
+    {
+        auto* const devlist = handle->discover_future->get();
+        handle->discover_future.reset();
 
         FreeUPNPUrls(&handle->urls);
         if (UPNP_GetValidIGD(devlist, &handle->urls, &handle->data, handle->lanaddr, sizeof(handle->lanaddr)) ==
