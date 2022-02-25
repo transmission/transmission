@@ -29,6 +29,23 @@ QString getNameFromMetainfo(QByteArray const& benc)
     return QString::fromStdString(metainfo.name());
 }
 
+QString getNameFromMagnet(QString const& magnet)
+{
+    auto tmp = tr_magnet_metainfo{};
+
+    if (!tmp.parseMagnet(magnet.toStdString()))
+    {
+        return magnet;
+    }
+
+    if (!std::empty(tmp.name()))
+    {
+        return QString::fromStdString(tmp.name());
+    }
+
+    return QString::fromStdString(tmp.infoHashString());
+}
+
 } // namespace
 
 int AddData::set(QString const& key)
@@ -79,7 +96,7 @@ QString AddData::readableName() const
         return filename;
 
     case MAGNET:
-        return magnet;
+        return getNameFromMagnet(magnet);
 
     case URL:
         return url.toString();
