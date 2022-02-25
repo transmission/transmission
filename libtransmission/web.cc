@@ -4,6 +4,7 @@
 // License text can be found in the licenses/ folder.
 
 #include <algorithm>
+#include <condition_variable>
 #include <list>
 #include <map>
 #include <memory>
@@ -139,12 +140,14 @@ public:
     ~Impl()
     {
         run_mode = RunMode::CloseNow;
+        queued_tasks_cv.notify_one();
         curl_thread->join();
     }
 
     void closeSoon()
     {
         run_mode = RunMode::CloseSoon;
+        queued_tasks_cv.notify_one();
     }
 
     [[nodiscard]] bool isClosed() const
@@ -161,6 +164,7 @@ public:
 
         auto const lock = std::unique_lock(queued_tasks_mutex);
         queued_tasks.emplace_back(new Task{ *this, std::move(options) });
+        queued_tasks_cv.notify_one();
     }
 
 private:
@@ -436,9 +440,20 @@ private:
                 break;
             }
 
-            // add queued tasks
             {
-                auto const lock = std::unique_lock(impl->queued_tasks_mutex);
+                auto lock = std::unique_lock(impl->queued_tasks_mutex);
+
+                // sleep until there's something to do
+                auto const has_work = [&running_tasks, impl]()
+                {
+                    return running_tasks > 0 || !std::empty(impl->queued_tasks) || impl->run_mode != RunMode::Run;
+                };
+                if (!has_work())
+                {
+                    impl->queued_tasks_cv.wait(lock, has_work);
+                }
+
+                // add queued tasks
                 for (auto* task : impl->queued_tasks)
                 {
                     dbgmsg("adding task to curl: [%s]", task->url().c_str());
@@ -509,7 +524,8 @@ private:
 private:
     std::shared_ptr<CURLSH> const curlsh_{ curl_share_init(), curl_share_cleanup };
 
-    std::recursive_mutex queued_tasks_mutex;
+    std::mutex queued_tasks_mutex;
+    std::condition_variable queued_tasks_cv;
     std::list<Task*> queued_tasks;
 
     CURLSH* shared()

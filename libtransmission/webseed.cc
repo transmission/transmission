@@ -407,7 +407,6 @@ void on_idle(tr_webseed* w)
     for (size_t i = 0; i < slots_available && i < std::size(spans); ++i)
     {
         auto const& span = spans[i];
-        w->connection_limiter.taskStarted();
         auto* const task = new tr_webseed_task{ tor, w, span };
         evbuffer_add_cb(task->content(), onBufferGotData, task);
         w->tasks.insert(task);
@@ -489,6 +488,8 @@ void task_request_next_chunk(tr_webseed_task* task)
     auto const left_in_file = tor->fileSize(file_index) - file_offset;
     auto const left_in_task = task->end_byte - task->loc.byte;
     auto const this_chunk = std::min(left_in_file, left_in_task);
+
+    webseed->connection_limiter.taskStarted();
 
     auto const url = make_url(webseed, tor->fileSubpath(file_index));
     auto options = tr_web::FetchOptions{ url, onPartialDataFetched, task };
