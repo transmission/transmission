@@ -68,7 +68,9 @@ struct tr_upnp
     ~tr_upnp()
     {
         TR_ASSERT(!isMapped);
-        TR_ASSERT(state == UpnpState::IDLE || state == UpnpState::ERR || state == UpnpState::WILL_DISCOVER);
+        TR_ASSERT(
+            state == UpnpState::IDLE || state == UpnpState::ERR || state == UpnpState::WILL_DISCOVER ||
+            state == UpnpState::DISCOVERING);
 
         FreeUPNPUrls(&urls);
     }
