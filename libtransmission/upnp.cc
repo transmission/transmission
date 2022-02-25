@@ -56,7 +56,7 @@ tr_port_forwarding portFwdState(UpnpState upnp_state, bool is_mapped)
     case UpnpState::IDLE:
         return is_mapped ? TR_PORT_MAPPED : TR_PORT_UNMAPPED;
 
-    case UpnpState::FAILED:
+    default: // UpnpState::FAILED:
         return TR_PORT_ERROR;
     }
 }
