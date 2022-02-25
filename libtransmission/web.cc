@@ -140,12 +140,14 @@ public:
     ~Impl()
     {
         run_mode = RunMode::CloseNow;
+        queued_tasks_cv.notify_one();
         curl_thread->join();
     }
 
     void closeSoon()
     {
         run_mode = RunMode::CloseSoon;
+        queued_tasks_cv.notify_one();
     }
 
     [[nodiscard]] bool isClosed() const
@@ -441,10 +443,14 @@ private:
             {
                 auto lock = std::unique_lock(impl->queued_tasks_mutex);
 
-                // sleep until there are either running or queued tasks
-                if (running_tasks == 0)
+                // sleep until there's something to do
+                auto const has_work = [&running_tasks, impl]()
                 {
-                    impl->queued_tasks_cv.wait(lock, [impl]() { return !std::empty(impl->queued_tasks); });
+                    return running_tasks > 0 || !std::empty(impl->queued_tasks) || impl->run_mode != RunMode::Run;
+                };
+                if (!has_work())
+                {
+                    impl->queued_tasks_cv.wait(lock, has_work);
                 }
 
                 // add queued tasks
