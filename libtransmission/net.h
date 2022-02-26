@@ -85,19 +85,24 @@ struct tr_address
         struct in_addr addr4;
     } addr;
 
-    bool operator==(tr_address const& that) const
+    [[nodiscard]] int compare(tr_address const& that) const
     {
-        return tr_address_compare(this, &that) == 0;
+        return tr_address_compare(this, &that);
     }
 
-    bool operator<(tr_address const& that) const
+    [[nodiscard]] bool operator==(tr_address const& that) const
     {
-        return tr_address_compare(this, &that) < 0;
+        return compare(that) == 0;
     }
 
-    bool operator>(tr_address const& that) const
+    [[nodiscard]] bool operator<(tr_address const& that) const
     {
-        return tr_address_compare(this, &that) > 0;
+        return compare(that) < 0;
+    }
+
+    [[nodiscard]] bool operator>(tr_address const& that) const
+    {
+        return compare(that) > 0;
     }
 };
 
