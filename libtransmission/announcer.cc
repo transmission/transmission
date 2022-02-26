@@ -868,10 +868,13 @@ static tr_announce_request* announce_request_new(
     tr_tier const* tier,
     tr_announce_event event)
 {
+    auto const* const current_tracker = tier->currentTracker();
+    TR_ASSERT(current_tracker != nullptr);
+
     auto* const req = new tr_announce_request();
     req->port = tr_sessionGetPublicPeerPort(announcer->session);
-    req->announce_url = tier->currentTracker()->announce_url;
-    req->tracker_id = tier->currentTracker()->tracker_id;
+    req->announce_url = current_tracker->announce_url;
+    req->tracker_id = current_tracker->tracker_id;
     req->info_hash = tor->infoHash();
     req->peer_id = tr_torrentGetPeerId(tor);
     req->up = tier->byteCounts[TR_ANN_UP];
@@ -1047,7 +1050,7 @@ static void on_announce_done(tr_announce_response const* response, void* vdata)
 
             publishErrorClear(tier);
 
-            tr_tracker* const tracker = tier->currentTracker();
+            auto* const tracker = tier->currentTracker();
             if (tracker != nullptr)
             {
                 tracker->consecutive_failures = 0;
@@ -1195,6 +1198,7 @@ static void tierAnnounce(tr_announcer* announcer, tr_tier* tier)
 {
     TR_ASSERT(!tier->isAnnouncing);
     TR_ASSERT(!std::empty(tier->announce_events));
+    TR_ASSERT(tier->currentTracker() != nullptr);
 
     time_t const now = tr_time();
 
@@ -1781,6 +1785,7 @@ void tr_announcerResetTorrent(tr_announcer* /*announcer*/, tr_torrent* tor)
         {
             if (!tier.current_tracker_index_)
             {
+                tier.useNextTracker();
                 tier_announce_event_push(&tier, TR_ANNOUNCE_EVENT_STARTED, now);
             }
         }
