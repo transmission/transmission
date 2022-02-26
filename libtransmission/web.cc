@@ -4,6 +4,7 @@
 // License text can be found in the licenses/ folder.
 
 #include <algorithm>
+#include <condition_variable>
 #include <list>
 #include <map>
 #include <memory>
@@ -103,8 +104,8 @@ static CURLcode ssl_context_func(CURL* /*curl*/, void* ssl_ctx, void* /*user_dat
 class tr_web::Impl
 {
 public:
-    explicit Impl(Controller& controller_in)
-        : controller{ controller_in }
+    explicit Impl(Mediator& mediator_in)
+        : mediator{ mediator_in }
     {
         std::call_once(curl_init_flag, curlInit);
 
@@ -122,28 +123,31 @@ public:
             tr_logAddNamedInfo("web", "NB: Invalid certs will appear as 'Could not connect to tracker' like many other errors");
         }
 
-        if (auto const& file = controller.cookieFile(); file)
+        if (auto const& file = mediator.cookieFile(); file)
         {
             this->cookie_file = *file;
         }
 
-        if (auto const& ua = controller.userAgent(); ua)
+        if (auto const& ua = mediator.userAgent(); ua)
         {
             this->user_agent = *ua;
         }
 
+        auto const lock = std::unique_lock(queued_tasks_mutex);
         curl_thread = std::make_unique<std::thread>(curlThreadFunc, this);
     }
 
     ~Impl()
     {
         run_mode = RunMode::CloseNow;
+        queued_tasks_cv.notify_one();
         curl_thread->join();
     }
 
     void closeSoon()
     {
         run_mode = RunMode::CloseSoon;
+        queued_tasks_cv.notify_one();
     }
 
     [[nodiscard]] bool isClosed() const
@@ -160,6 +164,7 @@ public:
 
         auto const lock = std::unique_lock(queued_tasks_mutex);
         queued_tasks.emplace_back(new Task{ *this, std::move(options) });
+        queued_tasks_cv.notify_one();
     }
 
 private:
@@ -231,7 +236,7 @@ private:
             }
 
             response.body.assign(reinterpret_cast<char const*>(evbuffer_pullup(body(), -1)), evbuffer_get_length(body()));
-            impl.controller.run(std::move(options.done_func), std::move(this->response));
+            impl.mediator.run(std::move(options.done_func), std::move(this->response));
         }
 
         tr_web::Impl& impl;
@@ -240,12 +245,13 @@ private:
 
     static auto constexpr BandwidthPauseMsec = long{ 500 };
     static auto constexpr DnsCacheTimeoutSecs = long{ 60 * 60 };
+    static auto constexpr MaxRedirects = long{ 10 };
 
     bool const curl_verbose = tr_env_key_exists("TR_CURL_VERBOSE");
     bool const curl_ssl_verify = !tr_env_key_exists("TR_CURL_SSL_NO_VERIFY");
     bool const curl_proxy_ssl_verify = !tr_env_key_exists("TR_CURL_PROXY_SSL_NO_VERIFY");
 
-    Controller& controller;
+    Mediator& mediator;
 
     std::string curl_ca_bundle;
 
@@ -274,13 +280,13 @@ private:
             // If this is more bandwidth than is allocated for this tag,
             // then pause the torrent for a tick. curl will deliver `data`
             // again when the transfer is unpaused.
-            if (task->impl.controller.clamp(*tag, bytes_used) < bytes_used)
+            if (task->impl.mediator.clamp(*tag, bytes_used) < bytes_used)
             {
                 task->impl.paused_easy_handles.emplace(tr_time_msec(), task->easy());
                 return CURL_WRITEFUNC_PAUSE;
             }
 
-            task->impl.controller.notifyBandwidthConsumed(*tag, bytes_used);
+            task->impl.mediator.notifyBandwidthConsumed(*tag, bytes_used);
         }
 
         evbuffer_add(task->body(), data, bytes_used);
@@ -364,8 +370,9 @@ private:
         (void)curl_easy_setopt(e, CURLOPT_VERBOSE, impl->curl_verbose ? 1L : 0L);
         (void)curl_easy_setopt(e, CURLOPT_WRITEDATA, task);
         (void)curl_easy_setopt(e, CURLOPT_WRITEFUNCTION, onDataReceived);
+        (void)curl_easy_setopt(e, CURLOPT_MAXREDIRS, MaxRedirects);
 
-        if (auto const addrstr = impl->controller.publicAddress(); addrstr)
+        if (auto const addrstr = impl->mediator.publicAddress(); addrstr)
         {
             (void)curl_easy_setopt(e, CURLOPT_INTERFACE, addrstr->c_str());
         }
@@ -433,9 +440,20 @@ private:
                 break;
             }
 
-            // add queued tasks
             {
-                auto const lock = std::unique_lock(impl->queued_tasks_mutex);
+                auto lock = std::unique_lock(impl->queued_tasks_mutex);
+
+                // sleep until there's something to do
+                auto const has_work = [&running_tasks, impl]()
+                {
+                    return running_tasks > 0 || !std::empty(impl->queued_tasks) || impl->run_mode != RunMode::Run;
+                };
+                if (!has_work())
+                {
+                    impl->queued_tasks_cv.wait(lock, has_work);
+                }
+
+                // add queued tasks
                 for (auto* task : impl->queued_tasks)
                 {
                     dbgmsg("adding task to curl: [%s]", task->url().c_str());
@@ -443,9 +461,9 @@ private:
                     curl_multi_add_handle(multi.get(), task->easy());
                 }
                 impl->queued_tasks.clear();
-            }
 
-            impl->resumePausedTasks();
+                impl->resumePausedTasks();
+            }
 
             // Adapted from https://curl.se/libcurl/c/curl_multi_wait.html docs.
             // 'numfds' being zero means either a timeout or no file descriptors to
@@ -506,7 +524,8 @@ private:
 private:
     std::shared_ptr<CURLSH> const curlsh_{ curl_share_init(), curl_share_cleanup };
 
-    std::recursive_mutex queued_tasks_mutex;
+    std::mutex queued_tasks_mutex;
+    std::condition_variable queued_tasks_cv;
     std::list<Task*> queued_tasks;
 
     CURLSH* shared()
@@ -533,16 +552,16 @@ private:
 
 std::once_flag tr_web::Impl::curl_init_flag;
 
-tr_web::tr_web(Controller& controller)
-    : impl_{ std::make_unique<Impl>(controller) }
+tr_web::tr_web(Mediator& mediator)
+    : impl_{ std::make_unique<Impl>(mediator) }
 {
 }
 
 tr_web::~tr_web() = default;
 
-std::unique_ptr<tr_web> tr_web::create(Controller& controller)
+std::unique_ptr<tr_web> tr_web::create(Mediator& mediator)
 {
-    return std::unique_ptr<tr_web>(new tr_web(controller));
+    return std::unique_ptr<tr_web>(new tr_web(mediator));
 }
 
 void tr_web::fetch(FetchOptions&& options)

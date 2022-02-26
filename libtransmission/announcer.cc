@@ -505,7 +505,7 @@ struct tr_torrent_announcer
     {
         // build the trackers
         auto tier_to_infos = std::map<tr_tracker_tier_t, std::vector<tr_announce_list::tracker_info const*>>{};
-        auto const& announce_list = tor->announceList();
+        auto const announce_list = getAnnounceList(tor);
         for (auto const& info : announce_list)
         {
             tier_to_infos[info.tier].emplace_back(&info);
@@ -575,6 +575,20 @@ struct tr_torrent_announcer
 
     tr_tracker_callback callback = nullptr;
     void* callback_data = nullptr;
+
+private:
+    [[nodiscard]] static tr_announce_list getAnnounceList(tr_torrent const* tor)
+    {
+        auto announce_list = tor->announceList();
+
+        // if it's a public torrent, add the default trackers
+        if (tor->isPublic())
+        {
+            announce_list.add(tor->session->defaultTrackers());
+        }
+
+        return announce_list;
+    }
 };
 
 static tr_tier* getTier(tr_announcer* announcer, tr_sha1_digest_t const& info_hash, int tier_id)
@@ -913,6 +927,15 @@ struct announce_data
     bool is_running_on_success = false;
 };
 
+static bool isUnregistered(char const* errmsg)
+{
+    auto const lower = tr_strlower(errmsg != nullptr ? errmsg : "");
+
+    auto constexpr Keys = std::array<std::string_view, 2>{ "unregistered torrent"sv, "torrent not registered"sv };
+
+    return std::any_of(std::begin(Keys), std::end(Keys), [&lower](auto const& key) { return tr_strvContains(lower, key); });
+}
+
 static void on_announce_error(tr_tier* tier, char const* err, tr_announce_event e)
 {
     /* increment the error count */
@@ -928,12 +951,20 @@ static void on_announce_error(tr_tier* tier, char const* err, tr_announce_event 
     /* switch to the next tracker */
     current_tracker = tier->useNextTracker();
 
-    /* schedule a reannounce */
-    int const interval = current_tracker->getRetryInterval();
     auto const* const host_cstr = current_tracker->host.c_str();
-    dbgmsg(tier, "Tracker '%s' announce error: %s (Retrying in %d seconds)", host_cstr, err, interval);
-    tr_logAddTorInfo(tier->tor, "Tracker '%s' announce error: %s (Retrying in %d seconds)", host_cstr, err, interval);
-    tier_announce_event_push(tier, e, tr_time() + interval);
+    if (isUnregistered(err))
+    {
+        dbgmsg(tier, "Tracker '%s' announce error: %s", host_cstr, err);
+        tr_logAddTorInfo(tier->tor, "Tracker '%s' announce error: %s", host_cstr, err);
+    }
+    else
+    {
+        /* schedule a reannounce */
+        int const interval = current_tracker->getRetryInterval();
+        dbgmsg(tier, "Tracker '%s' announce error: %s (Retrying in %d seconds)", host_cstr, err, interval);
+        tr_logAddTorInfo(tier->tor, "Tracker '%s' announce error: %s (Retrying in %d seconds)", host_cstr, err, interval);
+        tier_announce_event_push(tier, e, tr_time() + interval);
+    }
 }
 
 static void on_announce_done(tr_announce_response const* response, void* vdata)
@@ -980,6 +1011,11 @@ static void on_announce_done(tr_announce_response const* response, void* vdata)
         tier->lastAnnounceSucceeded = false;
         tier->isAnnouncing = false;
         tier->manualAnnounceAllowedAt = now + tier->announceMinIntervalSec;
+
+        if (response->external_ip)
+        {
+            data->session->setExternalIP(*response->external_ip);
+        }
 
         if (!response->did_connect)
         {

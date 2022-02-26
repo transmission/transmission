@@ -25,6 +25,7 @@
 #include <QLabel>
 #include <QLineEdit>
 #include <QMessageBox>
+#include <QPlainTextEdit>
 #include <QPushButton>
 #include <QSpinBox>
 #include <QStyle>
@@ -190,6 +191,10 @@ bool PrefsDialog::updateWidgetValue(QWidget* widget, int pref_key) const
     {
         pref_widget.as<FreeSpaceLabel>()->setPath(prefs_.getString(pref_key));
     }
+    else if (pref_widget.is<QPlainTextEdit>())
+    {
+        pref_widget.as<QPlainTextEdit>()->setPlainText(prefs_.getString(pref_key));
+    }
     else
     {
         return false;
@@ -233,7 +238,49 @@ void PrefsDialog::linkWidgetToPref(QWidget* widget, int pref_key)
     if (auto const* spin_box = qobject_cast<QAbstractSpinBox*>(widget); spin_box != nullptr)
     {
         connect(spin_box, &QAbstractSpinBox::editingFinished, this, &PrefsDialog::spinBoxEditingFinished);
+        return;
     }
+}
+
+static bool isDescendantOf(QObject const* descendant, QObject const* ancestor)
+{
+    if (ancestor == nullptr)
+    {
+        return false;
+    }
+    while (descendant != nullptr)
+    {
+        if (descendant == ancestor)
+        {
+            return true;
+        }
+
+        descendant = descendant->parent();
+    }
+    return false;
+}
+
+void PrefsDialog::focusChanged(QWidget* old, QWidget* cur)
+{
+    // We don't want to change the preference every time there's a keystroke
+    // in a QPlainTextEdit, so instead of connecting to the textChanged signal,
+    // only update the pref when the text changed AND focus was lost.
+    char const constexpr* const StartValue = "StartValue";
+
+    if (auto* const edit = qobject_cast<QPlainTextEdit*>(cur); isDescendantOf(edit, this))
+    {
+        edit->setProperty(StartValue, edit->toPlainText());
+    }
+
+    if (auto const* const edit = qobject_cast<QPlainTextEdit*>(old); isDescendantOf(edit, this))
+    {
+        if (auto const val = edit->toPlainText(); val != edit->property(StartValue).toString())
+        {
+            setPref(PreferenceWidget{ old }.getPrefKey(), val);
+        }
+    }
+
+    // (TODO: we probably want to do this for single-line text entries too?)
 }
 
 void PrefsDialog::checkBoxToggled(bool checked)
@@ -423,6 +470,7 @@ void PrefsDialog::initNetworkTab()
     linkWidgetToPref(ui_.enablePexCheck, Prefs::PEX_ENABLED);
     linkWidgetToPref(ui_.enableDhtCheck, Prefs::DHT_ENABLED);
     linkWidgetToPref(ui_.enableLpdCheck, Prefs::LPD_ENABLED);
+    linkWidgetToPref(ui_.defaultTrackersPlainTextEdit, Prefs::DEFAULT_TRACKERS);
 
     auto* cr = new ColumnResizer(this);
     cr->addLayout(ui_.incomingPeersSectionLayout);
@@ -676,6 +724,8 @@ PrefsDialog::PrefsDialog(Session& session, Prefs& prefs, QWidget* parent)
     }
 
     adjustSize();
+
+    connect(qApp, &QApplication::focusChanged, this, &PrefsDialog::focusChanged);
 }
 
 void PrefsDialog::setPref(int key, QVariant const& v)
@@ -775,11 +825,15 @@ void PrefsDialog::refreshPref(int key)
     {
         QWidget* w(it.value());
 
+        w->blockSignals(true);
+
         if (!updateWidgetValue(w, key) && (key == Prefs::ENCRYPTION))
         {
             auto* combo_box = qobject_cast<QComboBox*>(w);
             int const index = combo_box->findData(prefs_.getInt(key));
             combo_box->setCurrentIndex(index);
         }
+
+        w->blockSignals(false);
     }
 }

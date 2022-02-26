@@ -313,14 +313,7 @@ static void event_read_cb(evutil_socket_t fd, short /*event*/, void* vio)
             what |= BEV_EVENT_ERROR;
         }
 
-        char errstr[512];
-        dbgmsg(
-            io,
-            "event_read_cb got an error. res is %d, what is %hd, errno is %d (%s)",
-            res,
-            what,
-            e,
-            tr_net_strerror(errstr, sizeof(errstr), e));
+        dbgmsg(io, "event_read_cb err: res:%d, what:%hd, errno:%d (%s)", res, what, e, tr_net_strerror(e).c_str());
 
         if (io->gotError != nullptr)
         {
@@ -331,12 +324,10 @@ static void event_read_cb(evutil_socket_t fd, short /*event*/, void* vio)
 
 static int tr_evbuffer_write(tr_peerIo* io, int fd, size_t howmuch)
 {
-    char errstr[256];
-
     EVUTIL_SET_SOCKET_ERROR(0);
     int const n = evbuffer_write_atmost(io->outbuf, fd, howmuch);
     int const e = EVUTIL_SOCKET_ERROR();
-    dbgmsg(io, "wrote %d to peer (%s)", n, (n == -1 ? tr_net_strerror(errstr, sizeof(errstr), e) : ""));
+    dbgmsg(io, "wrote %d to peer (%s)", n, (n == -1 ? tr_net_strerror(e).c_str() : ""));
 
     return n;
 }
@@ -409,9 +400,8 @@ RESCHEDULE:
     return;
 
 FAIL:
-    char errstr[1024];
-    tr_net_strerror(errstr, sizeof(errstr), e);
-    dbgmsg(io, "event_write_cb got an error. res is %d, what is %hd, errno is %d (%s)", res, what, e, errstr);
+    auto const errmsg = tr_net_strerror(e);
+    dbgmsg(io, "event_write_cb got an err. res:%d, what:%hd, errno:%d (%s)", res, what, e, errmsg.c_str());
 
     if (io->gotError != nullptr)
     {
@@ -842,7 +832,7 @@ static void io_close_socket(tr_peerIo* io)
 #endif
 
     default:
-        TR_ASSERT_MSG(false, "unsupported peer socket type %d", io->socket.type);
+        dbgmsg(io, "unsupported peer socket type %d", io->socket.type);
     }
 
     io->socket = {};
@@ -1232,64 +1222,58 @@ void tr_peerIoDrain(tr_peerIo* io, struct evbuffer* inbuf, size_t byteCount)
 
 static int tr_peerIoTryRead(tr_peerIo* io, size_t howmuch)
 {
-    auto res = int{};
-
-    if ((howmuch = io->bandwidth->clamp(TR_DOWN, howmuch)) != 0)
+    howmuch = io->bandwidth->clamp(TR_DOWN, howmuch);
+    if (howmuch == 0)
     {
-        switch (io->socket.type)
+        return 0;
+    }
+
+    auto res = int{};
+    switch (io->socket.type)
+    {
+    case TR_PEER_SOCKET_TYPE_UTP:
+        /* UTP_RBDrained notifies libutp that your read buffer is emtpy.
+         * It opens up the congestion window by sending an ACK (soonish)
+         * if one was not going to be sent. */
+        if (evbuffer_get_length(io->inbuf) == 0)
         {
-        case TR_PEER_SOCKET_TYPE_UTP:
-            /* UTP_RBDrained notifies libutp that your read buffer is emtpy.
-             * It opens up the congestion window by sending an ACK (soonish)
-             * if one was not going to be sent. */
-            if (evbuffer_get_length(io->inbuf) == 0)
+            UTP_RBDrained(io->socket.handle.utp);
+        }
+
+        break;
+
+    case TR_PEER_SOCKET_TYPE_TCP:
+        {
+            EVUTIL_SET_SOCKET_ERROR(0);
+            res = evbuffer_read(io->inbuf, io->socket.handle.tcp, (int)howmuch);
+            int const e = EVUTIL_SOCKET_ERROR();
+
+            dbgmsg(io, "read %d from peer (%s)", res, res == -1 ? tr_net_strerror(e).c_str() : "");
+
+            if (evbuffer_get_length(io->inbuf) != 0)
             {
-                UTP_RBDrained(io->socket.handle.utp);
+                canReadWrapper(io);
+            }
+
+            if (res <= 0 && io->gotError != nullptr && e != EAGAIN && e != EINTR && e != EINPROGRESS)
+            {
+                short what = BEV_EVENT_READING | BEV_EVENT_ERROR;
+
+                if (res == 0)
+                {
+                    what |= BEV_EVENT_EOF;
+                }
+
+                dbgmsg(io, "tr_peerIoTryRead err: res:%d what:%hd, errno:%d (%s)", res, what, e, tr_net_strerror(e).c_str());
+
+                io->gotError(io, what, io->userData);
             }
 
             break;
-
-        case TR_PEER_SOCKET_TYPE_TCP:
-            {
-                char err_buf[512];
-
-                EVUTIL_SET_SOCKET_ERROR(0);
-                res = evbuffer_read(io->inbuf, io->socket.handle.tcp, (int)howmuch);
-                int const e = EVUTIL_SOCKET_ERROR();
-
-                dbgmsg(io, "read %d from peer (%s)", res, res == -1 ? tr_net_strerror(err_buf, sizeof(err_buf), e) : "");
-
-                if (evbuffer_get_length(io->inbuf) != 0)
-                {
-                    canReadWrapper(io);
-                }
-
-                if (res <= 0 && io->gotError != nullptr && e != EAGAIN && e != EINTR && e != EINPROGRESS)
-                {
-                    short what = BEV_EVENT_READING | BEV_EVENT_ERROR;
-
-                    if (res == 0)
-                    {
-                        what |= BEV_EVENT_EOF;
-                    }
-
-                    dbgmsg(
-                        io,
-                        "tr_peerIoTryRead got an error. res is %d, what is %hd, errno is %d (%s)",
-                        res,
-                        what,
-                        e,
-                        tr_net_strerror(err_buf, sizeof(err_buf), e));
-
-                    io->gotError(io, what, io->userData);
-                }
-
-                break;
-            }
-
-        default:
-            TR_ASSERT_MSG(false, "unsupported peer socket type %d", io->socket.type);
         }
+
+    default:
+        dbgmsg(io, "unsupported peer socket type %d", io->socket.type);
     }
 
     return res;
@@ -1298,57 +1282,47 @@ static int tr_peerIoTryRead(tr_peerIo* io, size_t howmuch)
 static int tr_peerIoTryWrite(tr_peerIo* io, size_t howmuch)
 {
     auto const old_len = size_t{ evbuffer_get_length(io->outbuf) };
-    auto n = int{};
 
     dbgmsg(io, "in tr_peerIoTryWrite %zu", howmuch);
-
-    if (howmuch > old_len)
+    howmuch = std::min(howmuch, old_len);
+    howmuch = io->bandwidth->clamp(TR_UP, howmuch);
+    if (howmuch == 0)
     {
-        howmuch = old_len;
+        return 0;
     }
 
-    if ((howmuch = io->bandwidth->clamp(TR_UP, howmuch)) != 0)
+    auto n = int{};
+    switch (io->socket.type)
     {
-        switch (io->socket.type)
+    case TR_PEER_SOCKET_TYPE_UTP:
+        UTP_Write(io->socket.handle.utp, howmuch);
+        n = old_len - evbuffer_get_length(io->outbuf);
+        break;
+
+    case TR_PEER_SOCKET_TYPE_TCP:
         {
-        case TR_PEER_SOCKET_TYPE_UTP:
-            UTP_Write(io->socket.handle.utp, howmuch);
-            n = old_len - evbuffer_get_length(io->outbuf);
-            break;
+            EVUTIL_SET_SOCKET_ERROR(0);
+            n = tr_evbuffer_write(io, io->socket.handle.tcp, howmuch);
+            int const e = EVUTIL_SOCKET_ERROR();
 
-        case TR_PEER_SOCKET_TYPE_TCP:
+            if (n > 0)
             {
-                EVUTIL_SET_SOCKET_ERROR(0);
-                n = tr_evbuffer_write(io, io->socket.handle.tcp, howmuch);
-                int const e = EVUTIL_SOCKET_ERROR();
-
-                if (n > 0)
-                {
-                    didWriteWrapper(io, n);
-                }
-
-                if (n < 0 && io->gotError != nullptr && e != 0 && e != EPIPE && e != EAGAIN && e != EINTR && e != EINPROGRESS)
-                {
-                    char errstr[512];
-                    short const what = BEV_EVENT_WRITING | BEV_EVENT_ERROR;
-
-                    dbgmsg(
-                        io,
-                        "tr_peerIoTryWrite got an error. res is %d, what is %hd, errno is %d (%s)",
-                        n,
-                        what,
-                        e,
-                        tr_net_strerror(errstr, sizeof(errstr), e));
-
-                    io->gotError(io, what, io->userData);
-                }
-
-                break;
+                didWriteWrapper(io, n);
             }
 
-        default:
-            TR_ASSERT_MSG(false, "unsupported peer socket type %d", io->socket.type);
+            if (n < 0 && io->gotError != nullptr && e != 0 && e != EPIPE && e != EAGAIN && e != EINTR && e != EINPROGRESS)
+            {
+                short const what = BEV_EVENT_WRITING | BEV_EVENT_ERROR;
+
+                dbgmsg(io, "tr_peerIoTryWrite err: res:%d, what:%hd, errno:%d (%s)", n, what, e, tr_net_strerror(e).c_str());
+                io->gotError(io, what, io->userData);
+            }
+
+            break;
         }
+
+    default:
+        dbgmsg(io, "unsupported peer socket type %d", io->socket.type);
     }
 
     return n;
@@ -1359,19 +1333,9 @@ int tr_peerIoFlush(tr_peerIo* io, tr_direction dir, size_t limit)
     TR_ASSERT(tr_isPeerIo(io));
     TR_ASSERT(tr_isDirection(dir));
 
-    int bytesUsed = 0;
-
-    if (dir == TR_DOWN)
-    {
-        bytesUsed = tr_peerIoTryRead(io, limit);
-    }
-    else
-    {
-        bytesUsed = tr_peerIoTryWrite(io, limit);
-    }
-
-    dbgmsg(io, "flushing peer-io, direction %d, limit %zu, notifyBandwidthConsumedBytes %d", (int)dir, limit, bytesUsed);
-    return bytesUsed;
+    int const bytes_used = dir == TR_DOWN ? tr_peerIoTryRead(io, limit) : tr_peerIoTryWrite(io, limit);
+    dbgmsg(io, "flushing peer-io, direction:%d, limit:%zu, byte_used:%d", (int)dir, limit, bytes_used);
+    return bytes_used;
 }
 
 int tr_peerIoFlushOutgoingProtocolMsgs(tr_peerIo* io)

@@ -467,7 +467,7 @@ Response arguments:
 
 * On success, a `torrent-added` object in the form of one of 3.3's torrent objects with the fields for `id`, `name`, and `hashString`.
 
-* On failure due to a duplicate torrent existing, a `torrent-duplicate` object in the same form.
+* When attempting to add a duplicate torrent, a `torrent-duplicate` object in the same form is returned, but the response's `result` value is still `success`.
 
 ### 3.5. Removing a Torrent
 
@@ -531,6 +531,7 @@ Response arguments: `path`, `name`, and `id`, holding the torrent ID integer
 | `blocklist-url` | string | location of the blocklist to use for `blocklist-update`
 | `cache-size-mb` | number | maximum size of the disk cache (MB)
 | `config-dir` | string | location of transmission's configuration directory
+| `default-trackers` | list of default trackers to use on public torrents
 | `dht-enabled` | boolean | true means allow dht in public torrents
 | `download-dir` | string | default path to download torrents
 | `download-dir-free-space` | number |  **DEPRECATED** Use the `free-space` method instead.
@@ -697,7 +698,7 @@ Method name: `free-space`
 Request arguments:
 
 | Key | Value type | Description
-|:--|:--
+|:--|:--|:--
 | `path` | string | the directory to query
 
 Response arguments:
@@ -940,6 +941,7 @@ Transmission 4.0.0 (`rpc-version-semver` 5.3.0, `rpc-version`: 17)
 | `/upload` | :warning: undocumented `/upload` endpoint removed
 | `session-get` | **DEPRECATED** `download-dir-free-space`. Use `free-space` instead.
 | `free-space` | new return arg `total-capacity`
+| `session-get` | new arg `default-trackers`
 | `session-get` | new arg `rpc-version-semver`
 | `session-get` | new arg `script-torrent-added-enabled`
 | `session-get` | new arg `script-torrent-added-filename`

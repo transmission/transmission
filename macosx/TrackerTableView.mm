@@ -14,28 +14,18 @@
     [super mouseDown:event];
 }
 
-- (void)setTorrent:(Torrent*)torrent
-{
-    fTorrent = torrent;
-}
-
-- (void)setTrackers:(NSArray*)trackers
-{
-    fTrackers = trackers;
-}
-
 - (void)copy:(id)sender
 {
-    NSMutableArray* addresses = [NSMutableArray arrayWithCapacity:fTrackers.count];
+    NSMutableArray* addresses = [NSMutableArray arrayWithCapacity:self.trackers.count];
     NSIndexSet* indexes = self.selectedRowIndexes;
     for (NSUInteger i = indexes.firstIndex; i != NSNotFound; i = [indexes indexGreaterThanIndex:i])
     {
-        id item = fTrackers[i];
+        id item = self.trackers[i];
         if (![item isKindOfClass:[TrackerNode class]])
         {
-            for (++i; i < fTrackers.count && [fTrackers[i] isKindOfClass:[TrackerNode class]]; ++i)
+            for (++i; i < self.trackers.count && [self.trackers[i] isKindOfClass:[TrackerNode class]]; ++i)
             {
-                [addresses addObject:((TrackerNode*)fTrackers[i]).fullAnnounceAddress];
+                [addresses addObject:((TrackerNode*)self.trackers[i]).fullAnnounceAddress];
             }
             --i;
         }
@@ -54,7 +44,7 @@
 
 - (void)paste:(id)sender
 {
-    NSAssert(fTorrent != nil, @"no torrent but trying to paste; should not be able to call this method");
+    NSAssert(self.torrent != nil, @"no torrent but trying to paste; should not be able to call this method");
 
     BOOL added = NO;
 
@@ -65,7 +55,7 @@
     {
         for (NSString* item in [pbItem componentsSeparatedByString:@"\n"])
         {
-            if ([fTorrent addTrackerToNewTier:item])
+            if ([self.torrent addTrackerToNewTier:item])
             {
                 added = YES;
             }
@@ -90,7 +80,7 @@
 
     if (action == @selector(paste:))
     {
-        return fTorrent && [NSPasteboard.generalPasteboard canReadObjectForClasses:@[ [NSString class] ] options:nil];
+        return self.torrent && [NSPasteboard.generalPasteboard canReadObjectForClasses:@[ [NSString class] ] options:nil];
     }
 
     return YES;

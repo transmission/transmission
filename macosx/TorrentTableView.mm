@@ -27,6 +27,32 @@
 
 @interface TorrentTableView ()
 
+@property(nonatomic) IBOutlet Controller* fController;
+
+@property(nonatomic) TorrentCell* fTorrentCell;
+
+@property(nonatomic, readonly) NSUserDefaults* fDefaults;
+
+@property(nonatomic, readonly) NSMutableIndexSet* fCollapsedGroups;
+
+@property(nonatomic) IBOutlet NSMenu* fContextRow;
+@property(nonatomic) IBOutlet NSMenu* fContextNoRow;
+
+@property(nonatomic) NSArray* fSelectedValues;
+
+@property(nonatomic) IBOutlet NSMenu* fActionMenu;
+@property(nonatomic) IBOutlet NSMenu* fUploadMenu;
+@property(nonatomic) IBOutlet NSMenu* fDownloadMenu;
+@property(nonatomic) IBOutlet NSMenu* fRatioMenu;
+@property(nonatomic) IBOutlet NSMenu* fPriorityMenu;
+@property(nonatomic) IBOutlet NSMenuItem* fGlobalLimitItem;
+@property(nonatomic, readonly) Torrent* fMenuTorrent;
+
+@property(nonatomic) CGFloat piecesBarPercent;
+@property(nonatomic) NSAnimation* fPiecesBarAnimation;
+
+@property(nonatomic) BOOL fActionPopoverShown;
+
 - (BOOL)pointInGroupStatusRect:(NSPoint)point;
 
 - (void)setGroupStatusColumns;
@@ -39,30 +65,30 @@
 {
     if ((self = [super initWithCoder:decoder]))
     {
-        fDefaults = NSUserDefaults.standardUserDefaults;
+        _fDefaults = NSUserDefaults.standardUserDefaults;
 
-        fTorrentCell = [[TorrentCell alloc] init];
+        _fTorrentCell = [[TorrentCell alloc] init];
 
-        NSData* groupData = [fDefaults dataForKey:@"CollapsedGroups"];
+        NSData* groupData = [_fDefaults dataForKey:@"CollapsedGroups"];
         if (groupData)
         {
-            fCollapsedGroups = [[NSUnarchiver unarchiveObjectWithData:groupData] mutableCopy];
+            _fCollapsedGroups = [[NSUnarchiver unarchiveObjectWithData:groupData] mutableCopy];
         }
         else
         {
-            fCollapsedGroups = [[NSMutableIndexSet alloc] init];
+            _fCollapsedGroups = [[NSMutableIndexSet alloc] init];
         }
 
-        fMouseRow = -1;
-        fMouseControlRow = -1;
-        fMouseRevealRow = -1;
-        fMouseActionRow = -1;
+        _hoverRow = -1;
+        _controlButtonHoverRow = -1;
+        _revealButtonHoverRow = -1;
+        _actionButtonHoverRow = -1;
 
-        fActionPopoverShown = NO;
+        _fActionPopoverShown = NO;
 
         self.delegate = self;
 
-        fPiecesBarPercent = [fDefaults boolForKey:@"PiecesBar"] ? 1.0 : 0.0;
+        _piecesBarPercent = [_fDefaults boolForKey:@"PiecesBar"] ? 1.0 : 0.0;
 
         if (@available(macOS 11.0, *))
         {
@@ -93,7 +119,7 @@
         value = MAX_GROUP;
     }
 
-    return [fCollapsedGroups containsIndex:value];
+    return [self.fCollapsedGroups containsIndex:value];
 }
 
 - (void)removeCollapsedGroup:(NSInteger)value
@@ -103,17 +129,17 @@
         value = MAX_GROUP;
     }
 
-    [fCollapsedGroups removeIndex:value];
+    [self.fCollapsedGroups removeIndex:value];
 }
 
 - (void)removeAllCollapsedGroups
 {
-    [fCollapsedGroups removeAllIndexes];
+    [self.fCollapsedGroups removeAllIndexes];
 }
 
 - (void)saveCollapsedGroups
 {
-    [fDefaults setObject:[NSArchiver archivedDataWithRootObject:fCollapsedGroups] forKey:@"CollapsedGroups"];
+    [self.fDefaults setObject:[NSArchiver archivedDataWithRootObject:self.fCollapsedGroups] forKey:@"CollapsedGroups"];
 }
 
 - (BOOL)outlineView:(NSOutlineView*)outlineView isGroupItem:(id)item
@@ -131,7 +157,7 @@
     BOOL const group = ![item isKindOfClass:[Torrent class]];
     if (!tableColumn)
     {
-        return !group ? fTorrentCell : nil;
+        return !group ? self.fTorrentCell : nil;
     }
     else
     {
@@ -152,10 +178,10 @@
             torrentCell.representedObject = item;
 
             NSInteger const row = [self rowForItem:item];
-            torrentCell.hover = (row == fMouseRow);
-            torrentCell.controlHover = (row == fMouseControlRow);
-            torrentCell.revealHover = (row == fMouseRevealRow);
-            torrentCell.actionHover = (row == fMouseActionRow);
+            torrentCell.hover = (row == self.hoverRow);
+            torrentCell.hoverControl = (row == self.controlButtonHoverRow);
+            torrentCell.hoverReveal = (row == self.revealButtonHoverRow);
+            torrentCell.hoverAction = (row == self.actionButtonHoverRow);
         }
     }
 }
@@ -207,7 +233,7 @@
     }
     else if ([ident isEqualToString:@"UL"] || [ident isEqualToString:@"UL Image"])
     {
-        return [fDefaults boolForKey:@"DisplayGroupRowRatio"] ?
+        return [self.fDefaults boolForKey:@"DisplayGroupRowRatio"] ?
             NSLocalizedString(@"Ratio", "Torrent table -> group row -> tooltip") :
             NSLocalizedString(@"Upload speed", "Torrent table -> group row -> tooltip");
     }
@@ -257,10 +283,10 @@
 
 - (void)removeTrackingAreas
 {
-    fMouseRow = -1;
-    fMouseControlRow = -1;
-    fMouseRevealRow = -1;
-    fMouseActionRow = -1;
+    _hoverRow = -1;
+    _controlButtonHoverRow = -1;
+    _revealButtonHoverRow = -1;
+    _actionButtonHoverRow = -1;
 
     for (NSTrackingArea* area in self.trackingAreas)
     {
@@ -271,38 +297,38 @@
     }
 }
 
-- (void)setRowHover:(NSInteger)row
+- (void)setHoverRow:(NSInteger)row
 {
-    NSAssert([fDefaults boolForKey:@"SmallView"], @"cannot set a hover row when not in compact view");
+    NSAssert([self.fDefaults boolForKey:@"SmallView"], @"cannot set a hover row when not in compact view");
 
-    fMouseRow = row;
+    _hoverRow = row;
     if (row >= 0)
     {
         [self setNeedsDisplayInRect:[self rectOfRow:row]];
     }
 }
 
-- (void)setControlButtonHover:(NSInteger)row
+- (void)setControlButtonHoverRow:(NSInteger)row
 {
-    fMouseControlRow = row;
+    _controlButtonHoverRow = row;
     if (row >= 0)
     {
         [self setNeedsDisplayInRect:[self rectOfRow:row]];
     }
 }
 
-- (void)setRevealButtonHover:(NSInteger)row
+- (void)setRevealButtonHoverRow:(NSInteger)row
 {
-    fMouseRevealRow = row;
+    _revealButtonHoverRow = row;
     if (row >= 0)
     {
         [self setNeedsDisplayInRect:[self rectOfRow:row]];
     }
 }
 
-- (void)setActionButtonHover:(NSInteger)row
+- (void)setActionButtonHoverRow:(NSInteger)row
 {
-    fMouseActionRow = row;
+    _actionButtonHoverRow = row;
     if (row >= 0)
     {
         [self setNeedsDisplayInRect:[self rectOfRow:row]];
@@ -320,20 +346,20 @@
         NSString* type = dict[@"Type"];
         if ([type isEqualToString:@"Action"])
         {
-            fMouseActionRow = rowVal;
+            _actionButtonHoverRow = rowVal;
         }
         else if ([type isEqualToString:@"Control"])
         {
-            fMouseControlRow = rowVal;
+            _controlButtonHoverRow = rowVal;
         }
         else if ([type isEqualToString:@"Reveal"])
         {
-            fMouseRevealRow = rowVal;
+            _revealButtonHoverRow = rowVal;
         }
         else
         {
-            fMouseRow = rowVal;
-            if (![fDefaults boolForKey:@"SmallView"])
+            _hoverRow = rowVal;
+            if (![self.fDefaults boolForKey:@"SmallView"])
             {
                 return;
             }
@@ -353,20 +379,20 @@
         NSString* type = dict[@"Type"];
         if ([type isEqualToString:@"Action"])
         {
-            fMouseActionRow = -1;
+            _actionButtonHoverRow = -1;
         }
         else if ([type isEqualToString:@"Control"])
         {
-            fMouseControlRow = -1;
+            _controlButtonHoverRow = -1;
         }
         else if ([type isEqualToString:@"Reveal"])
         {
-            fMouseRevealRow = -1;
+            _revealButtonHoverRow = -1;
         }
         else
         {
-            fMouseRow = -1;
-            if (![fDefaults boolForKey:@"SmallView"])
+            _hoverRow = -1;
+            if (![self.fDefaults boolForKey:@"SmallView"])
             {
                 return;
             }
@@ -380,9 +406,9 @@
 {
 #warning elliminate when view-based?
     //if pushing a button, don't change the selected rows
-    if (fSelectedValues)
+    if (self.fSelectedValues)
     {
-        [self selectValues:fSelectedValues];
+        [self selectValues:self.fSelectedValues];
     }
 }
 
@@ -395,9 +421,9 @@
         value = MAX_GROUP;
     }
 
-    if ([fCollapsedGroups containsIndex:value])
+    if ([self.fCollapsedGroups containsIndex:value])
     {
-        [fCollapsedGroups removeIndex:value];
+        [self.fCollapsedGroups removeIndex:value];
         [NSNotificationCenter.defaultCenter postNotificationName:@"OutlineExpandCollapse" object:self];
     }
 }
@@ -411,7 +437,7 @@
         value = MAX_GROUP;
     }
 
-    [fCollapsedGroups addIndex:value];
+    [self.fCollapsedGroups addIndex:value];
     [NSNotificationCenter.defaultCenter postNotificationName:@"OutlineExpandCollapse" object:self];
 }
 
@@ -423,26 +449,26 @@
     //check to toggle group status before anything else
     if ([self pointInGroupStatusRect:point])
     {
-        [fDefaults setBool:![fDefaults boolForKey:@"DisplayGroupRowRatio"] forKey:@"DisplayGroupRowRatio"];
+        [self.fDefaults setBool:![self.fDefaults boolForKey:@"DisplayGroupRowRatio"] forKey:@"DisplayGroupRowRatio"];
         [self setGroupStatusColumns];
 
         return;
     }
 
-    BOOL const pushed = row != -1 && (fMouseActionRow == row || fMouseRevealRow == row || fMouseControlRow == row);
+    BOOL const pushed = row != -1 && (self.actionButtonHoverRow == row || self.revealButtonHoverRow == row || self.controlButtonHoverRow == row);
 
     //if pushing a button, don't change the selected rows
     if (pushed)
     {
-        fSelectedValues = self.selectedValues;
+        self.fSelectedValues = self.selectedValues;
     }
 
     [super mouseDown:event];
 
-    fSelectedValues = nil;
+    self.fSelectedValues = nil;
 
     //avoid weird behavior when showing menu by doing this after mouse down
-    if (row != -1 && fMouseActionRow == row)
+    if (row != -1 && self.actionButtonHoverRow == row)
     {
 #warning maybe make appear on mouse down
         [self displayTorrentActionPopoverForEvent:event];
@@ -457,7 +483,7 @@
 
         if (!item || [item isKindOfClass:[Torrent class]])
         {
-            [fController showInfo:nil];
+            [self.fController showInfo:nil];
         }
         else
         {
@@ -554,12 +580,12 @@
         {
             [self selectRowIndexes:[NSIndexSet indexSetWithIndex:row] byExtendingSelection:NO];
         }
-        return fContextRow;
+        return self.fContextRow;
     }
     else
     {
         [self deselectAll:self];
-        return fContextNoRow;
+        return self.fContextNoRow;
     }
 }
 
@@ -579,11 +605,11 @@
         event.modifierFlags & NSEventModifierFlagOption &&
         event.modifierFlags & NSEventModifierFlagCommand)
     {
-        [fController focusFilterField];
+        [self.fController focusFilterField];
     }
     else if (firstChar == ' ')
     {
-        [fController toggleQuickLook:nil];
+        [self.fController toggleQuickLook:nil];
     }
     else if (event.keyCode == 53) //esc key
     {
@@ -597,7 +623,7 @@
 
 - (NSRect)iconRectForRow:(NSInteger)row
 {
-    return [fTorrentCell iconRectForBounds:[self rectOfRow:row]];
+    return [self.fTorrentCell iconRectForBounds:[self rectOfRow:row]];
 }
 
 - (void)paste:(id)sender
@@ -605,7 +631,7 @@
     NSURL* url;
     if ((url = [NSURL URLFromPasteboard:NSPasteboard.generalPasteboard]))
     {
-        [fController openURL:url.absoluteString];
+        [self.fController openURL:url.absoluteString];
     }
     else
     {
@@ -618,14 +644,14 @@
                 pbItem = [pbItem stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet];
                 if ([pbItem rangeOfString:@"magnet:" options:(NSAnchoredSearch | NSCaseInsensitiveSearch)].location != NSNotFound)
                 {
-                    [fController openURL:pbItem];
+                    [self.fController openURL:pbItem];
                 }
                 else
                 {
 #warning only accept full text?
                     for (NSTextCheckingResult* result in [detector matchesInString:pbItem options:0
                                                                              range:NSMakeRange(0, pbItem.length)])
-                        [fController openURL:result.URL.absoluteString];
+                        [self.fController openURL:result.URL.absoluteString];
                 }
             }
         }
@@ -668,21 +694,21 @@
 {
     if (torrent.active)
     {
-        [fController stopTorrents:@[ torrent ]];
+        [self.fController stopTorrents:@[ torrent ]];
     }
     else
     {
         if (NSEvent.modifierFlags & NSEventModifierFlagOption)
         {
-            [fController resumeTorrentsNoWait:@[ torrent ]];
+            [self.fController resumeTorrentsNoWait:@[ torrent ]];
         }
         else if (torrent.waitingToStart)
         {
-            [fController stopTorrents:@[ torrent ]];
+            [self.fController stopTorrents:@[ torrent ]];
         }
         else
         {
-            [fController resumeTorrents:@[ torrent ]];
+            [self.fController resumeTorrents:@[ torrent ]];
         }
     }
 }
@@ -695,9 +721,9 @@
         return;
     }
 
-    NSRect const rect = [fTorrentCell iconRectForBounds:[self rectOfRow:row]];
+    NSRect const rect = [self.fTorrentCell iconRectForBounds:[self rectOfRow:row]];
 
-    if (fActionPopoverShown)
+    if (self.fActionPopoverShown)
     {
         return;
     }
@@ -718,30 +744,29 @@
 //don't show multiple popovers when clicking the gear button repeatedly
 - (void)popoverWillShow:(NSNotification*)notification
 {
-    fActionPopoverShown = YES;
+    self.fActionPopoverShown = YES;
 }
 
 - (void)popoverWillClose:(NSNotification*)notification
 {
-    fActionPopoverShown = NO;
+    self.fActionPopoverShown = NO;
 }
 
 //eliminate when Lion-only, along with all the menu item instance variables
 - (void)menuNeedsUpdate:(NSMenu*)menu
 {
     //this method seems to be called when it shouldn't be
-    if (!fMenuTorrent || !menu.supermenu)
+    if (!self.fMenuTorrent || !menu.supermenu)
     {
         return;
     }
 
-    if (menu == fUploadMenu || menu == fDownloadMenu)
+    if (menu == self.fUploadMenu || menu == self.fDownloadMenu)
     {
         NSMenuItem* item;
         if (menu.numberOfItems == 3)
         {
-            NSInteger const speedLimitActionValue[] = { 0,   5,   10,  20,  30,  40,   50,   75,   100,
-                                                        150, 200, 250, 500, 750, 1000, 1500, 2000, -1 };
+            NSInteger const speedLimitActionValue[] = { 50, 100, 250, 500, 1000, 2500, 5000, 10000, -1 };
 
             for (NSInteger i = 0; speedLimitActionValue[i] != -1; i++)
             {
@@ -756,18 +781,18 @@
             }
         }
 
-        BOOL const upload = menu == fUploadMenu;
-        BOOL const limit = [fMenuTorrent usesSpeedLimit:upload];
+        BOOL const upload = menu == self.fUploadMenu;
+        BOOL const limit = [self.fMenuTorrent usesSpeedLimit:upload];
 
         item = [menu itemWithTag:ACTION_MENU_LIMIT_TAG];
         item.state = limit ? NSControlStateValueOn : NSControlStateValueOff;
         item.title = [NSString stringWithFormat:NSLocalizedString(@"Limit (%d KB/s)", "torrent action menu -> upload/download limit"),
-                                                [fMenuTorrent speedLimit:upload]];
+                                                [self.fMenuTorrent speedLimit:upload]];
 
         item = [menu itemWithTag:ACTION_MENU_UNLIMITED_TAG];
         item.state = !limit ? NSControlStateValueOn : NSControlStateValueOff;
     }
-    else if (menu == fRatioMenu)
+    else if (menu == self.fRatioMenu)
     {
         NSMenuItem* item;
         if (menu.numberOfItems == 4)
@@ -785,12 +810,12 @@
             }
         }
 
-        tr_ratiolimit const mode = fMenuTorrent.ratioSetting;
+        tr_ratiolimit const mode = self.fMenuTorrent.ratioSetting;
 
         item = [menu itemWithTag:ACTION_MENU_LIMIT_TAG];
         item.state = mode == TR_RATIOLIMIT_SINGLE ? NSControlStateValueOn : NSControlStateValueOff;
         item.title = [NSString localizedStringWithFormat:NSLocalizedString(@"Stop at Ratio (%.2f)", "torrent action menu -> ratio stop"),
-                                                         fMenuTorrent.ratioLimit];
+                                                         self.fMenuTorrent.ratioLimit];
 
         item = [menu itemWithTag:ACTION_MENU_UNLIMITED_TAG];
         item.state = mode == TR_RATIOLIMIT_UNLIMITED ? NSControlStateValueOn : NSControlStateValueOff;
@@ -798,9 +823,9 @@
         item = [menu itemWithTag:ACTION_MENU_GLOBAL_TAG];
         item.state = mode == TR_RATIOLIMIT_GLOBAL ? NSControlStateValueOn : NSControlStateValueOff;
     }
-    else if (menu == fPriorityMenu)
+    else if (menu == self.fPriorityMenu)
     {
-        tr_priority_t const priority = fMenuTorrent.priority;
+        tr_priority_t const priority = self.fMenuTorrent.priority;
 
         NSMenuItem* item = [menu itemWithTag:ACTION_MENU_PRIORITY_HIGH_TAG];
         item.state = priority == TR_PRI_HIGH ? NSControlStateValueOn : NSControlStateValueOff;
@@ -817,23 +842,23 @@
 - (void)setQuickLimitMode:(id)sender
 {
     BOOL const limit = [sender tag] == ACTION_MENU_LIMIT_TAG;
-    [fMenuTorrent setUseSpeedLimit:limit upload:[sender menu] == fUploadMenu];
+    [self.fMenuTorrent setUseSpeedLimit:limit upload:[sender menu] == self.fUploadMenu];
 
     [NSNotificationCenter.defaultCenter postNotificationName:@"UpdateOptions" object:nil];
 }
 
 - (void)setQuickLimit:(id)sender
 {
-    BOOL const upload = [sender menu] == fUploadMenu;
-    [fMenuTorrent setUseSpeedLimit:YES upload:upload];
-    [fMenuTorrent setSpeedLimit:[[sender representedObject] intValue] upload:upload];
+    BOOL const upload = [sender menu] == self.fUploadMenu;
+    [self.fMenuTorrent setUseSpeedLimit:YES upload:upload];
+    [self.fMenuTorrent setSpeedLimit:[[sender representedObject] intValue] upload:upload];
 
     [NSNotificationCenter.defaultCenter postNotificationName:@"UpdateOptions" object:nil];
 }
 
 - (void)setGlobalLimit:(id)sender
 {
-    fMenuTorrent.usesGlobalSpeedLimit = ((NSButton*)sender).state != NSControlStateValueOn;
+    self.fMenuTorrent.usesGlobalSpeedLimit = ((NSButton*)sender).state != NSControlStateValueOn;
 
     [NSNotificationCenter.defaultCenter postNotificationName:@"UpdateOptions" object:nil];
 }
@@ -856,15 +881,15 @@
         return;
     }
 
-    fMenuTorrent.ratioSetting = mode;
+    self.fMenuTorrent.ratioSetting = mode;
 
     [NSNotificationCenter.defaultCenter postNotificationName:@"UpdateOptions" object:nil];
 }
 
 - (void)setQuickRatio:(id)sender
 {
-    fMenuTorrent.ratioSetting = TR_RATIOLIMIT_SINGLE;
-    fMenuTorrent.ratioLimit = [[sender representedObject] floatValue];
+    self.fMenuTorrent.ratioSetting = TR_RATIOLIMIT_SINGLE;
+    self.fMenuTorrent.ratioLimit = [[sender representedObject] floatValue];
 
     [NSNotificationCenter.defaultCenter postNotificationName:@"UpdateOptions" object:nil];
 }
@@ -888,7 +913,7 @@
         priority = TR_PRI_NORMAL;
     }
 
-    fMenuTorrent.priority = priority;
+    self.fMenuTorrent.priority = priority;
 
     [NSNotificationCenter.defaultCenter postNotificationName:@"UpdateUI" object:nil];
 }
@@ -902,42 +927,37 @@
     }
 
     //this stops a previous animation
-    fPiecesBarAnimation = [[NSAnimation alloc] initWithDuration:TOGGLE_PROGRESS_SECONDS animationCurve:NSAnimationEaseIn];
-    fPiecesBarAnimation.animationBlockingMode = NSAnimationNonblocking;
-    fPiecesBarAnimation.progressMarks = progressMarks;
-    fPiecesBarAnimation.delegate = self;
+    self.fPiecesBarAnimation = [[NSAnimation alloc] initWithDuration:TOGGLE_PROGRESS_SECONDS animationCurve:NSAnimationEaseIn];
+    self.fPiecesBarAnimation.animationBlockingMode = NSAnimationNonblocking;
+    self.fPiecesBarAnimation.progressMarks = progressMarks;
+    self.fPiecesBarAnimation.delegate = self;
 
-    [fPiecesBarAnimation startAnimation];
+    [self.fPiecesBarAnimation startAnimation];
 }
 
 - (void)animationDidEnd:(NSAnimation*)animation
 {
-    if (animation == fPiecesBarAnimation)
+    if (animation == self.fPiecesBarAnimation)
     {
-        fPiecesBarAnimation = nil;
+        self.fPiecesBarAnimation = nil;
     }
 }
 
 - (void)animation:(NSAnimation*)animation didReachProgressMark:(NSAnimationProgress)progress
 {
-    if (animation == fPiecesBarAnimation)
+    if (animation == self.fPiecesBarAnimation)
     {
-        if ([fDefaults boolForKey:@"PiecesBar"])
+        if ([self.fDefaults boolForKey:@"PiecesBar"])
         {
-            fPiecesBarPercent = progress;
+            self.piecesBarPercent = progress;
         }
         else
         {
-            fPiecesBarPercent = 1.0 - progress;
+            self.piecesBarPercent = 1.0 - progress;
         }
 
         self.needsDisplay = YES;
     }
-}
-
-- (CGFloat)piecesBarPercent
-{
-    return fPiecesBarPercent;
 }
 
 - (void)selectAndScrollToRow:(NSInteger)row
@@ -960,6 +980,8 @@
     [[self.superview animator] setBoundsOrigin:scrollOrigin];
 }
 
+#pragma mark - Private
+
 - (BOOL)pointInGroupStatusRect:(NSPoint)point
 {
     NSInteger row = [self rowAtPoint:point];
@@ -975,7 +997,7 @@
 
 - (void)setGroupStatusColumns
 {
-    BOOL const ratio = [fDefaults boolForKey:@"DisplayGroupRowRatio"];
+    BOOL const ratio = [self.fDefaults boolForKey:@"DisplayGroupRowRatio"];
 
     [self tableColumnWithIdentifier:@"DL"].hidden = ratio;
     [self tableColumnWithIdentifier:@"DL Image"].hidden = ratio;

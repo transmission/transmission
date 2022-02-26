@@ -200,11 +200,11 @@ uint64_t tr_completion::countHasBytesInBlocks(tr_block_span_t span) const
     auto const [begin, end] = span;
 
     uint64_t n = blocks_.count(begin, end);
-    n *= block_info_->block_size;
+    n *= tr_block_info::BlockSize;
 
     if (end == block_info_->n_blocks && blocks_.test(end - 1))
     {
-        n -= block_info_->block_size - block_info_->final_block_size;
+        n -= tr_block_info::BlockSize - block_info_->final_block_size;
     }
 
     return n;
@@ -222,9 +222,8 @@ uint64_t tr_completion::countHasBytesInSpan(tr_byte_span_t span) const
     }
 
     // get the block span of the byte span
-    auto const begin_block = block_info_->blockOf(begin_byte);
-    auto const final_byte = end_byte - 1;
-    auto const final_block = block_info_->blockOf(final_byte);
+    auto const begin_block = block_info_->byteLoc(begin_byte).block;
+    auto const final_block = block_info_->byteLoc(end_byte - 1).block;
 
     // if the entire span is in a single block
     if (begin_block == final_block)
@@ -238,7 +237,7 @@ uint64_t tr_completion::countHasBytesInSpan(tr_byte_span_t span) const
     if (hasBlock(begin_block))
     {
         uint64_t u = begin_block + 1;
-        u *= block_info_->block_size;
+        u *= tr_block_info::BlockSize;
         u -= begin_byte;
         total += u;
     }
@@ -247,7 +246,7 @@ uint64_t tr_completion::countHasBytesInSpan(tr_byte_span_t span) const
     if (begin_block + 1 < final_block)
     {
         uint64_t u = blocks_.count(begin_block + 1, final_block);
-        u *= block_info_->block_size;
+        u *= tr_block_info::BlockSize;
         total += u;
     }
 
@@ -255,7 +254,7 @@ uint64_t tr_completion::countHasBytesInSpan(tr_byte_span_t span) const
     if (hasBlock(final_block))
     {
         uint64_t u = final_block;
-        u *= block_info_->block_size;
+        u *= tr_block_info::BlockSize;
         total += end_byte - u;
     }
 

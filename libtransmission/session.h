@@ -27,6 +27,7 @@
 
 #include "transmission.h"
 
+#include "announce-list.h"
 #include "net.h" // tr_socket_t
 #include "quark.h"
 #include "web.h"
@@ -150,6 +151,21 @@ public:
         download_dir_ = dir;
     }
 
+    // default trackers
+    // (trackers to apply automatically to public torrents)
+
+    auto const& defaultTrackersStr() const
+    {
+        return default_trackers_str_;
+    }
+
+    auto const& defaultTrackers() const
+    {
+        return default_trackers_;
+    }
+
+    void setDefaultTrackers(std::string_view trackers);
+
     // incomplete dir
 
     std::string const& incompleteDir() const
@@ -222,6 +238,16 @@ public:
     void useRpcWhitelist(bool enabled) const;
 
     bool useRpcWhitelist() const;
+
+    auto externalIP() const
+    {
+        return external_ip_;
+    }
+
+    void setExternalIP(tr_address external_ip)
+    {
+        external_ip_ = external_ip;
+    }
 
     // peer networking
 
@@ -336,14 +362,14 @@ public:
 
     struct tr_cache* cache;
 
-    class WebController final : public tr_web::Controller
+    class WebMediator final : public tr_web::Mediator
     {
     public:
-        explicit WebController(tr_session* session)
+        explicit WebMediator(tr_session* session)
             : session_{ session }
         {
         }
-        ~WebController() override = default;
+        ~WebMediator() override = default;
 
         [[nodiscard]] std::optional<std::string> cookieFile() const override;
         [[nodiscard]] std::optional<std::string> publicAddress() const override;
@@ -357,7 +383,7 @@ public:
         tr_session* const session_;
     };
 
-    WebController web_controller{ this };
+    WebMediator web_mediator{ this };
     std::unique_ptr<tr_web> web;
 
     struct tr_session_id* session_id;
@@ -387,6 +413,8 @@ public:
 
     std::unique_ptr<tr_rpc_server> rpc_server_;
 
+    tr_announce_list default_trackers_;
+
     // One of <netinet/ip.h>'s IPTOS_ values.
     // See tr_netTos*() in libtransmission/net.h for more info
     // Only session.cc should use this.
@@ -398,8 +426,10 @@ private:
     std::array<std::string, TR_SCRIPT_N_TYPES> scripts_;
     std::string blocklist_url_;
     std::string download_dir_;
+    std::string default_trackers_str_;
     std::string incomplete_dir_;
     std::string peer_congestion_algorithm_;
+    std::optional<tr_address> external_ip_;
 
     std::array<bool, TR_SCRIPT_N_TYPES> scripts_enabled_;
     bool blocklist_enabled_ = false;

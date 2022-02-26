@@ -152,7 +152,7 @@ TEST_F(CompletionTest, hasPiece)
     EXPECT_EQ(0, completion.hasValid());
 
     // check that adding all the blocks in a piece means we have it
-    for (size_t i = 1; i < block_info.n_blocks_in_piece; ++i)
+    for (tr_block_index_t i = 1, n = block_info.pieceLoc(1).block; i < n; ++i)
     {
         completion.addBlock(i);
     }
@@ -285,7 +285,7 @@ TEST_F(CompletionTest, leftUntilDone)
 
     // check that adding a block adjusts by block_info.block_size
     completion.addBlock(0);
-    EXPECT_EQ(block_info.total_size - block_info.block_size, completion.leftUntilDone());
+    EXPECT_EQ(block_info.total_size - tr_block_info::BlockSize, completion.leftUntilDone());
 }
 
 TEST_F(CompletionTest, sizeWhenDone)
@@ -367,7 +367,7 @@ TEST_F(CompletionTest, countMissingBytesInPiece)
 
     EXPECT_EQ(block_info.pieceSize(0), completion.countMissingBytesInPiece(0));
     completion.addBlock(0);
-    EXPECT_EQ(block_info.pieceSize(0) - block_info.block_size, completion.countMissingBytesInPiece(0));
+    EXPECT_EQ(block_info.pieceSize(0) - tr_block_info::BlockSize, completion.countMissingBytesInPiece(0));
     completion.addPiece(0);
     EXPECT_EQ(0, completion.countMissingBytesInPiece(0));
 
@@ -377,7 +377,6 @@ TEST_F(CompletionTest, countMissingBytesInPiece)
     completion.addBlock(final_block);
     EXPECT_EQ(1, block_info.final_piece_size);
     EXPECT_EQ(1, block_info.final_block_size);
-    EXPECT_EQ(1, block_info.n_blocks_in_final_piece);
     EXPECT_TRUE(completion.hasPiece(final_piece));
     EXPECT_EQ(0, completion.countMissingBytesInPiece(final_piece));
 }
@@ -403,7 +402,6 @@ TEST_F(CompletionTest, amountDone)
     // one block
     completion.addBlock(0);
     completion.amountDone(std::data(bins), std::size(bins));
-    EXPECT_DOUBLE_EQ(1.0 / block_info.n_blocks_in_piece, bins[0]);
     EXPECT_DOUBLE_EQ(0.0, bins[1]);
 
     // one piece

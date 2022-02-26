@@ -11,6 +11,7 @@ struct tr_metainfo_builder_file
 {
     char* filename;
     uint64_t size;
+    bool is_portable;
 };
 
 enum class TrMakemetaResult

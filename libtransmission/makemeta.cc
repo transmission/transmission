@@ -18,6 +18,7 @@
 
 #include "crypto-utils.h"
 #include "error.h"
+#include "file-info.h"
 #include "file.h"
 #include "log.h"
 #include "makemeta.h"
@@ -73,7 +74,7 @@ static struct FileList* getFiles(char const* dir, char const* base, struct FileL
 
         tr_sys_dir_close(odir, nullptr);
     }
-    else if (info.type == TR_SYS_PATH_IS_FILE && info.size > 0)
+    else if (info.type == TR_SYS_PATH_IS_FILE)
     {
         auto* const node = tr_new0(FileList, 1);
         node->size = info.size;
@@ -154,7 +155,7 @@ tr_metainfo_builder* tr_metaInfoBuilderCreate(char const* topFileArg)
         tr_free(dir);
     }
 
-    for (struct FileList* walk = files; walk != nullptr; walk = walk->next)
+    for (auto* walk = files; walk != nullptr; walk = walk->next)
     {
         ++ret->fileCount;
     }
@@ -162,14 +163,16 @@ tr_metainfo_builder* tr_metaInfoBuilderCreate(char const* topFileArg)
     ret->files = tr_new0(tr_metainfo_builder_file, ret->fileCount);
 
     int i = 0;
+    auto const offset = strlen(ret->top);
     while (files != nullptr)
     {
         struct FileList* const tmp = files;
         files = files->next;
 
-        tr_metainfo_builder_file* const file = &ret->files[i++];
+        auto* const file = &ret->files[i++];
         file->filename = tmp->filename;
         file->size = tmp->size;
+        file->is_portable = tr_file_info::isPortable(file->filename + offset);
 
         ret->totalSize += tmp->size;
 
@@ -240,6 +243,7 @@ void tr_metaInfoBuilderFree(tr_metainfo_builder* builder)
         }
 
         tr_free(builder->trackers);
+        tr_free(builder->webseeds);
         tr_free(builder->outputFile);
         tr_free(builder);
     }
@@ -280,9 +284,10 @@ static std::vector<std::byte> getHashInfo(tr_metainfo_builder* b)
     {
         TR_ASSERT(b->pieceIndex < b->pieceCount);
 
+        uint32_t const this_piece_size = std::min(uint64_t{ b->pieceSize }, totalRemain);
+        buf.resize(this_piece_size);
         auto* bufptr = std::data(buf);
-        uint32_t const thisPieceSize = std::min(uint64_t{ b->pieceSize }, totalRemain);
-        uint64_t leftInPiece = thisPieceSize;
+        uint64_t leftInPiece = this_piece_size;
 
         while (leftInPiece != 0)
         {
@@ -315,7 +320,7 @@ static std::vector<std::byte> getHashInfo(tr_metainfo_builder* b)
             }
         }
 
-        TR_ASSERT(bufptr - std::data(buf) == (int)thisPieceSize);
+        TR_ASSERT(bufptr - std::data(buf) == (int)this_piece_size);
         TR_ASSERT(leftInPiece == 0);
         auto const digest = tr_sha1(buf);
         if (!digest)
@@ -334,7 +339,7 @@ static std::vector<std::byte> getHashInfo(tr_metainfo_builder* b)
             break;
         }
 
-        totalRemain -= thisPieceSize;
+        totalRemain -= this_piece_size;
         ++b->pieceIndex;
     }
 
@@ -414,7 +419,11 @@ static void makeInfoDict(tr_variant* dict, tr_metainfo_builder* builder)
         tr_variantDictAddRaw(dict, TR_KEY_pieces, std::data(piece_hashes), std::size(piece_hashes));
     }
 
-    tr_variantDictAddInt(dict, TR_KEY_private, builder->isPrivate ? 1 : 0);
+    if (builder->isPrivate)
+    {
+        tr_variantDictAddInt(dict, TR_KEY_private, 1);
+    }
+
     if (builder->source != nullptr)
     {
         tr_variantDictAddStr(dict, TR_KEY_source, builder->source);

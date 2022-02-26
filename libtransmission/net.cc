@@ -44,26 +44,19 @@ tr_address const tr_in6addr_any = { TR_AF_INET6, { IN6ADDR_ANY_INIT } };
 
 tr_address const tr_inaddr_any = { TR_AF_INET, { { { { INADDR_ANY } } } } };
 
-char* tr_net_strerror(char* buf, size_t buflen, int err)
+std::string tr_net_strerror(int err)
 {
-    *buf = '\0';
-
 #ifdef _WIN32
 
-    DWORD len = FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM, nullptr, err, 0, buf, buflen, nullptr);
-
-    while (len > 0 && buf[len - 1] >= '\0' && buf[len - 1] <= ' ')
-    {
-        buf[--len] = '\0';
-    }
+    auto buf = std::array<char, 512>{};
+    auto const len = FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM, nullptr, err, 0, std::data(buf), std::size(buf), nullptr);
+    return std::string{ tr_strvStrip(std::data(buf)) };
 
 #else
 
-    tr_strlcpy(buf, tr_strerror(err), buflen);
+    return std::string{ tr_strerror(err) };
 
 #endif
-
-    return buf;
 }
 
 char const* tr_address_and_port_to_string(char* buf, size_t buflen, tr_address const* addr, tr_port port)
@@ -115,7 +108,7 @@ bool tr_address_from_string(tr_address* dst, std::string_view src)
 {
     // inet_pton() requires zero-terminated strings,
     // so make a zero-terminated copy here on the stack.
-    auto buf = std::array<char, 64>{};
+    auto buf = std::array<char, TR_ADDRSTRLEN>{};
     if (std::size(src) >= std::size(buf))
     {
         // shouldn't ever be that large; malformed address
@@ -125,6 +118,28 @@ bool tr_address_from_string(tr_address* dst, std::string_view src)
     *std::copy(std::begin(src), std::end(src), std::begin(buf)) = '\0';
 
     return tr_address_from_string(dst, std::data(buf));
+}
+
+std::optional<tr_address> tr_address::from_string(std::string_view str)
+{
+    auto addr = tr_address{};
+
+    if (!tr_address_from_string(&addr, str))
+    {
+        return {};
+    }
+
+    return addr;
+}
+
+tr_address tr_address::from_4byte_ipv4(std::string_view in)
+{
+    TR_ASSERT(std::size(in) == 4);
+
+    auto addr = tr_address{};
+    addr.type = TR_AF_INET;
+    std::copy_n(std::begin(in), 4, reinterpret_cast<char*>(&addr.addr));
+    return addr;
 }
 
 /*
@@ -220,9 +235,7 @@ void tr_netSetTOS([[maybe_unused]] tr_socket_t s, [[maybe_unused]] int tos, tr_a
 
         if (setsockopt(s, IPPROTO_IP, IP_TOS, (void const*)&tos, sizeof(tos)) == -1)
         {
-            char err_buf[512];
-            tr_net_strerror(err_buf, sizeof(err_buf), sockerrno);
-            tr_logAddNamedInfo("Net", "Can't set TOS '%d': %s", tos, err_buf);
+            tr_logAddNamedInfo("Net", "Can't set TOS '%d': %s", tos, tr_net_strerror(sockerrno).c_str());
         }
 #endif
     }
@@ -231,9 +244,7 @@ void tr_netSetTOS([[maybe_unused]] tr_socket_t s, [[maybe_unused]] int tos, tr_a
 #if defined(IPV6_TCLASS) && !defined(_WIN32)
         if (setsockopt(s, IPPROTO_IPV6, IPV6_TCLASS, (void const*)&tos, sizeof(tos)) == -1)
         {
-            char err_buf[512];
-            tr_net_strerror(err_buf, sizeof(err_buf), sockerrno);
-            tr_logAddNamedInfo("Net", "Can't set IPv6 QoS '%d': %s", tos, err_buf);
+            tr_logAddNamedInfo("Net", "Can't set IPv6 QoS '%d': %s", tos, tr_net_strerror(sockerrno).c_str());
         }
 #endif
     }
@@ -250,12 +261,11 @@ void tr_netSetCongestionControl([[maybe_unused]] tr_socket_t s, [[maybe_unused]]
 
     if (setsockopt(s, IPPROTO_TCP, TCP_CONGESTION, (void const*)algorithm, strlen(algorithm) + 1) == -1)
     {
-        char err_buf[512];
         tr_logAddNamedInfo(
             "Net",
             "Can't set congestion control algorithm '%s': %s",
             algorithm,
-            tr_net_strerror(err_buf, sizeof(err_buf), sockerrno));
+            tr_net_strerror(sockerrno).c_str());
     }
 
 #endif
@@ -316,7 +326,6 @@ struct tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const
     static int const domains[NUM_TR_AF_INET_TYPES] = { AF_INET, AF_INET6 };
     struct sockaddr_storage sock;
     struct sockaddr_storage source_sock;
-    char err_buf[512];
 
     if (!tr_address_is_valid_for_peers(addr, port))
     {
@@ -339,7 +348,7 @@ struct tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const
             tr_logAddInfo(
                 "Unable to set SO_RCVBUF on socket %" PRIdMAX ": %s",
                 (intmax_t)s,
-                tr_net_strerror(err_buf, sizeof(err_buf), sockerrno));
+                tr_net_strerror(sockerrno).c_str());
         }
     }
 
@@ -362,7 +371,7 @@ struct tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const
             _("Couldn't set source address %s on %" PRIdMAX ": %s"),
             tr_address_to_string(source_addr),
             (intmax_t)s,
-            tr_net_strerror(err_buf, sizeof(err_buf), sockerrno));
+            tr_net_strerror(sockerrno).c_str());
         tr_netClose(session, s);
         return ret;
     }
@@ -383,7 +392,7 @@ struct tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const
                 tr_address_to_string(addr),
                 (int)ntohs(port),
                 tmperrno,
-                tr_net_strerror(err_buf, sizeof(err_buf), tmperrno));
+                tr_net_strerror(tmperrno).c_str());
         }
 
         tr_netClose(session, s);
@@ -420,6 +429,28 @@ struct tr_peer_socket tr_netOpenPeerUTPSocket(tr_session* session, tr_address co
     }
 
     return ret;
+}
+
+void tr_netClosePeerSocket(tr_session* session, tr_peer_socket socket)
+{
+    switch (socket.type)
+    {
+    case TR_PEER_SOCKET_TYPE_NONE:
+        break;
+
+    case TR_PEER_SOCKET_TYPE_TCP:
+        tr_netClose(session, socket.handle.tcp);
+        break;
+
+#ifdef WITH_UTP
+    case TR_PEER_SOCKET_TYPE_UTP:
+        UTP_Close(socket.handle.utp);
+        break;
+#endif
+
+    default:
+        TR_ASSERT_MSG(false, "unsupported peer socket type %d", socket.type);
+    }
 }
 
 static tr_socket_t tr_netBindTCPImpl(tr_address const* addr, tr_port port, bool suppressMsgs, int* errOut)
@@ -473,8 +504,7 @@ static tr_socket_t tr_netBindTCPImpl(tr_address const* addr, tr_port port, bool 
             char const* const fmt = hint == nullptr ? _("Couldn't bind port %d on %s: %s") :
                                                       _("Couldn't bind port %d on %s: %s (%s)");
 
-            char err_buf[512];
-            tr_logAddError(fmt, port, tr_address_to_string(addr), tr_net_strerror(err_buf, sizeof(err_buf), err), hint);
+            tr_logAddError(fmt, port, tr_address_to_string(addr), tr_net_strerror(err).c_str(), hint);
         }
 
         tr_netCloseSocket(fd);

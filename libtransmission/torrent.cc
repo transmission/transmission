@@ -767,17 +767,31 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
 
     tr_sessionAddTorrent(session, tor);
 
-    // if we don't have a local .torrent file already, assume the torrent is new
-    auto const filename = tor->torrentFile();
+    // if we don't have a local .torrent or .magnet file already, assume the torrent is new
+    auto const filename = tor->hasMetadata() ? tor->torrentFile() : tor->magnetFile();
+
     bool const is_new_torrent = !tr_sys_path_exists(filename.c_str(), nullptr);
     if (is_new_torrent)
     {
         tr_error* error = nullptr;
-        if (!tr_ctorSaveContents(ctor, filename, &error))
+        if (tor->hasMetadata())
         {
-            tor->setLocalError(
-                tr_strvJoin("Unable to save torrent file: ", error->message, " ("sv, std::to_string(error->code), ")"sv));
+            if (!tr_ctorSaveContents(ctor, filename, &error))
+            {
+                tor->setLocalError(
+                    tr_strvJoin("Unable to save torrent file: ", error->message, " ("sv, std::to_string(error->code), ")"sv));
+            }
         }
+        else
+        {
+            // magnet link
+            if (!tr_ctorSaveMagnetContents(tor, filename, &error))
+            {
+                tor->setLocalError(
+                    tr_strvJoin("Unable to save magnet file: ", error->message, " ("sv, std::to_string(error->code), ")"sv));
+            }
+        }
+
         tr_error_clear(&error);
     }
 
@@ -1566,6 +1580,7 @@ static void closeTorrent(void* vtor)
     if (tor->isDeleting)
     {
         tr_torrent_metainfo::removeFile(tor->session->torrent_dir, tor->name(), tor->infoHashString(), ".torrent"sv);
+        tr_torrent_metainfo::removeFile(tor->session->torrent_dir, tor->name(), tor->infoHashString(), ".magnet"sv);
         tr_torrent_metainfo::removeFile(tor->session->resume_dir, tor->name(), tor->infoHashString(), ".resume"sv);
     }
 
@@ -1939,22 +1954,6 @@ uint16_t tr_torrentGetPeerLimit(tr_torrent const* tor)
 ****
 ***/
 
-void tr_torrentGetBlockLocation(
-    tr_torrent const* tor,
-    tr_block_index_t block,
-    tr_piece_index_t* piece,
-    uint32_t* offset,
-    uint32_t* length)
-{
-    uint64_t pos = block;
-    pos *= tor->blockSize();
-    *piece = pos / tor->pieceSize();
-    uint64_t piece_begin = tor->pieceSize();
-    piece_begin *= *piece;
-    *offset = pos - piece_begin;
-    *length = tor->blockSize(block);
-}
-
 bool tr_torrentReqIsValid(tr_torrent const* tor, tr_piece_index_t index, uint32_t offset, uint32_t length)
 {
     TR_ASSERT(tr_isTorrent(tor));
@@ -1977,7 +1976,7 @@ bool tr_torrentReqIsValid(tr_torrent const* tor, tr_piece_index_t index, uint32_
     {
         err = 4;
     }
-    else if (tor->offset(index, offset, length) > tor->totalSize())
+    else if (tor->pieceLoc(index, offset, length).byte > tor->totalSize())
     {
         err = 5;
     }
@@ -2001,14 +2000,14 @@ tr_block_span_t tr_torGetFileBlockSpan(tr_torrent const* tor, tr_file_index_t i)
 {
     auto const [begin_byte, end_byte] = tor->fpm_.byteSpan(i);
 
-    auto const begin_block = tor->blockOf(begin_byte);
-    if (begin_byte >= end_byte)
+    auto const begin_block = tor->byteLoc(begin_byte).block;
+    if (begin_byte >= end_byte) // 0-byte file
     {
-        return { begin_block, begin_block };
+        return { begin_block, begin_block + 1 };
     }
 
-    auto const final_byte = end_byte - 1;
-    auto const end_block = tor->blockOf(final_byte) + 1;
+    auto const final_block = tor->byteLoc(end_byte - 1).block;
+    auto const end_block = final_block + 1;
     return { begin_block, end_block };
 }
 
@@ -2572,21 +2571,21 @@ void tr_torrentGotBlock(tr_torrent* tor, tr_block_index_t block)
         tor->completion.addBlock(block);
         tor->setDirty();
 
-        tr_piece_index_t const p = tor->pieceForBlock(block);
+        auto const piece = tor->blockLoc(block).piece;
 
-        if (tor->hasPiece(p))
+        if (tor->hasPiece(piece))
         {
-            if (tor->checkPiece(p))
+            if (tor->checkPiece(piece))
             {
-                tr_torrentPieceCompleted(tor, p);
+                tr_torrentPieceCompleted(tor, piece);
             }
             else
             {
-                uint32_t const n = tor->pieceSize(p);
-                tr_logAddTorErr(tor, _("Piece %" PRIu32 ", which was just downloaded, failed its checksum test"), p);
+                uint32_t const n = tor->pieceSize(piece);
+                tr_logAddTorErr(tor, _("Piece %" PRIu32 ", which was just downloaded, failed its checksum test"), piece);
                 tor->corruptCur += n;
                 tor->downloadedCur -= std::min(tor->downloadedCur, uint64_t{ n });
-                tr_peerMgrGotBadPiece(tor, p);
+                tr_peerMgrGotBadPiece(tor, piece);
             }
         }
     }

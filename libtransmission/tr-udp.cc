@@ -14,7 +14,6 @@
 #include <event2/event.h>
 
 #include <cstdint>
-#include <libutp/utp.h>
 
 #include "transmission.h"
 #include "log.h"
@@ -38,14 +37,13 @@ static void set_socket_buffers(tr_socket_t fd, bool large)
     int sbuf = 0;
     socklen_t rbuf_len = sizeof(rbuf);
     socklen_t sbuf_len = sizeof(sbuf);
-    char err_buf[512];
 
     int size = large ? RECV_BUFFER_SIZE : SMALL_BUFFER_SIZE;
     int rc = setsockopt(fd, SOL_SOCKET, SO_RCVBUF, reinterpret_cast<char const*>(&size), sizeof(size));
 
     if (rc < 0)
     {
-        tr_logAddNamedError("UDP", "Failed to set receive buffer: %s", tr_net_strerror(err_buf, sizeof(err_buf), sockerrno));
+        tr_logAddNamedError("UDP", "Failed to set receive buffer: %s", tr_net_strerror(sockerrno).c_str());
     }
 
     size = large ? SEND_BUFFER_SIZE : SMALL_BUFFER_SIZE;
@@ -53,7 +51,7 @@ static void set_socket_buffers(tr_socket_t fd, bool large)
 
     if (rc < 0)
     {
-        tr_logAddNamedError("UDP", "Failed to set send buffer: %s", tr_net_strerror(err_buf, sizeof(err_buf), sockerrno));
+        tr_logAddNamedError("UDP", "Failed to set send buffer: %s", tr_net_strerror(sockerrno).c_str());
     }
 
     if (large)

@@ -155,6 +155,7 @@ void Session::updatePref(int key)
         case Prefs::BLOCKLIST_DATE:
         case Prefs::BLOCKLIST_ENABLED:
         case Prefs::BLOCKLIST_URL:
+        case Prefs::DEFAULT_TRACKERS:
         case Prefs::DHT_ENABLED:
         case Prefs::DOWNLOAD_QUEUE_ENABLED:
         case Prefs::DOWNLOAD_QUEUE_SIZE:

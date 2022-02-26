@@ -407,7 +407,6 @@ QMenu* MainWindow::createOptionsMenu()
 {
     auto const init_speed_sub_menu = [this](QMenu* menu, QAction*& off_action, QAction*& on_action, int pref, int enabled_pref)
     {
-        std::array<int, 13> stock_speeds = { 5, 10, 20, 30, 40, 50, 75, 100, 150, 200, 250, 500, 750 };
         int const current_value = prefs_.get<int>(pref);
 
         // NOLINTNEXTLINE(clang-analyzer-cplusplus.NewDeleteLeaks)
@@ -427,10 +426,10 @@ QMenu* MainWindow::createOptionsMenu()
 
         menu->addSeparator();
 
-        for (int const i : stock_speeds)
+        for (auto const KBps : { 50, 100, 250, 500, 1000, 2500, 5000, 10000 })
         {
-            QAction* action = menu->addAction(Formatter::get().speedToString(Speed::fromKBps(i)));
-            action->setProperty(PrefVariantsKey, QVariantList{ pref, i, enabled_pref, true });
+            auto* const action = menu->addAction(Formatter::get().speedToString(Speed::fromKBps(KBps)));
+            action->setProperty(PrefVariantsKey, QVariantList{ pref, KBps, enabled_pref, true });
             connect(action, &QAction::triggered, this, qOverload<>(&MainWindow::onSetPrefs));
         }
     };

@@ -267,8 +267,6 @@ void MainWindow::Impl::onSpeedSet(tr_direction dir, int KBps)
 
 Gtk::Menu* MainWindow::Impl::createSpeedMenu(tr_direction dir)
 {
-    static int const speeds_KBps[] = { 5, 10, 20, 30, 40, 50, 75, 100, 150, 200, 250, 500, 750 };
-
     auto* m = Gtk::make_managed<Gtk::Menu>();
     Gtk::RadioButtonGroup group;
 
@@ -283,10 +281,10 @@ Gtk::Menu* MainWindow::Impl::createSpeedMenu(tr_direction dir)
 
     m->append(*Gtk::make_managed<Gtk::SeparatorMenuItem>());
 
-    for (auto const speed : speeds_KBps)
+    for (auto const KBps : { 50, 100, 250, 500, 1000, 2500, 5000, 10000 })
     {
-        auto* w = Gtk::make_managed<Gtk::MenuItem>(tr_formatter_speed_KBps(speed));
-        w->signal_activate().connect([this, dir, speed]() { onSpeedSet(dir, speed); });
+        auto* w = Gtk::make_managed<Gtk::MenuItem>(tr_formatter_speed_KBps(KBps));
+        w->signal_activate().connect([this, dir, KBps]() { onSpeedSet(dir, KBps); });
         m->append(*w);
     }
 

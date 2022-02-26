@@ -53,6 +53,8 @@ void tr_ctorInitTorrentWanted(tr_ctor const* ctor, tr_torrent* tor);
 
 bool tr_ctorSaveContents(tr_ctor const* ctor, std::string const& filename, tr_error** error);
 
+bool tr_ctorSaveMagnetContents(tr_torrent* tor, std::string const& filename, tr_error** error);
+
 std::string_view tr_ctorGetContents(tr_ctor const* ctor);
 
 tr_session* tr_ctorGetSession(tr_ctor const* ctor);
@@ -72,13 +74,6 @@ void tr_torrentChangeMyPort(tr_torrent* session);
 tr_torrent* tr_torrentFindFromObfuscatedHash(tr_session* session, tr_sha1_digest_t const& hash);
 
 bool tr_torrentReqIsValid(tr_torrent const* tor, tr_piece_index_t index, uint32_t offset, uint32_t length);
-
-void tr_torrentGetBlockLocation(
-    tr_torrent const* tor,
-    tr_block_index_t block,
-    tr_piece_index_t* piece,
-    uint32_t* offset,
-    uint32_t* length);
 
 tr_block_span_t tr_torGetFileBlockSpan(tr_torrent const* tor, tr_file_index_t file);
 
@@ -155,17 +150,17 @@ public:
     {
         return metainfo_.blockCount();
     }
-    [[nodiscard]] constexpr auto blockOf(uint64_t offset) const
+    [[nodiscard]] auto byteLoc(uint64_t byte) const
     {
-        return metainfo_.blockOf(offset);
+        return metainfo_.byteLoc(byte);
     }
-    [[nodiscard]] constexpr auto blockOf(tr_piece_index_t piece, uint32_t offset, uint32_t length = 0) const
+    [[nodiscard]] auto blockLoc(tr_block_index_t block) const
     {
-        return metainfo_.blockOf(piece, offset, length);
+        return metainfo_.blockLoc(block);
     }
-    [[nodiscard]] constexpr auto blockSize() const
+    [[nodiscard]] auto pieceLoc(tr_piece_index_t piece, uint32_t offset = 0, uint32_t length = 0) const
     {
-        return metainfo_.blockSize();
+        return metainfo_.pieceLoc(piece, offset, length);
     }
     [[nodiscard]] constexpr auto blockSize(tr_block_index_t block) const
     {
@@ -175,21 +170,9 @@ public:
     {
         return metainfo_.blockSpanForPiece(piece);
     }
-    [[nodiscard]] constexpr auto offset(tr_piece_index_t piece, uint32_t offset, uint32_t length = 0) const
-    {
-        return metainfo_.offset(piece, offset, length);
-    }
     [[nodiscard]] constexpr auto pieceCount() const
     {
         return metainfo_.pieceCount();
-    }
-    [[nodiscard]] constexpr auto pieceForBlock(tr_block_index_t block) const
-    {
-        return metainfo_.pieceForBlock(block);
-    }
-    [[nodiscard]] constexpr auto pieceOf(uint64_t offset) const
-    {
-        return metainfo_.pieceOf(offset);
     }
     [[nodiscard]] constexpr auto pieceSize() const
     {
@@ -290,14 +273,9 @@ public:
         return fpm_.pieceSpan(file);
     }
 
-    [[nodiscard]] auto fileOffset(uint64_t offset) const
+    [[nodiscard]] auto fileOffset(tr_block_info::Location loc) const
     {
-        return fpm_.fileOffset(offset);
-    }
-
-    [[nodiscard]] auto fileOffset(tr_piece_index_t piece, uint32_t piece_offset) const
-    {
-        return fpm_.fileOffset(this->offset(piece, piece_offset));
+        return fpm_.fileOffset(loc.byte);
     }
 
     /// WANTED
@@ -487,9 +465,19 @@ public:
         return metainfo_.torrentFile(this->session->torrent_dir);
     }
 
+    [[nodiscard]] auto magnetFile() const
+    {
+        return metainfo_.magnetFile(this->session->torrent_dir);
+    }
+
     [[nodiscard]] auto resumeFile() const
     {
         return metainfo_.resumeFile(this->session->resume_dir);
+    }
+
+    [[nodiscard]] auto magnet() const
+    {
+        return metainfo_.magnet();
     }
 
     [[nodiscard]] auto const& comment() const
@@ -784,10 +772,8 @@ char* tr_torrentBuildPartial(tr_torrent const*, tr_file_index_t fileNo);
 
 tr_peer_id_t const& tr_torrentGetPeerId(tr_torrent* tor);
 
-/** @brief free a metainfo */
-void tr_metainfoFree(tr_info* inf);
-
 tr_torrent_metainfo&& tr_ctorStealMetainfo(tr_ctor* ctor);
 
 bool tr_ctorSetMetainfoFromFile(tr_ctor* ctor, std::string const& filename, tr_error** error);
+bool tr_ctorSetMetainfoFromMagnetLink(tr_ctor* ctor, std::string const& filename, tr_error** error);
 void tr_ctorSetLabels(tr_ctor* ctor, tr_labels_t&& labels);
