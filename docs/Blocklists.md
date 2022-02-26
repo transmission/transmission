@@ -12,13 +12,13 @@ When you press the "Update Blocklist" button, Transmission will download a new c
 
 ## Adding Other Blocklists ##
 
-Transmission stores blocklists in a folder named `blocklists` in its [configuration folder](Configuration-Files.md).
+Transmission stores blocklists in a folder named `blocklists` in its [[configuration folder|ConfigFiles]].
 
 In that directory, files ending in ".bin" are blocklists that Transmission has parsed into a binary format suitable for quick lookups.  When transmission starts, it scans this directory for files not ending in ".bin" and tries to parse them.  So to add another blocklist, all you have to do is put it in this directory and restart Transmission. Text and gzip formats are supported.
 
 ## Using Blocklists in transmission-daemon ##
 
-transmission-daemon doesn't have an "update blocklist" button, so its users have two options. They can either copy blocklists from transmission-gtk's directory to transmission-daemon's directory, or they can download a blocklist by hand, uncompress it, and place it in the daemon's `blocklists` folder. In both cases, the daemon's [settings.json file](Configuration-Files.md) will need to be edited to set "blocklist-enabled" to "true".
+transmission-daemon doesn't have an "update blocklist" button, so its users have two options. They can either copy blocklists from transmission-gtk's directory to transmission-daemon's directory, or they can download a blocklist by hand, uncompress it, and place it in the daemon's `blocklists` folder. In both cases, the daemon's [[settings.json file|ConfigFiles]] will need to be edited to set "blocklist-enabled" to "true".
 
 Also in both cases, the daemon is unaware of blocklist updates.  Only when it starts it creates new .bin files.
 

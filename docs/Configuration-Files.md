@@ -36,7 +36,7 @@ If you want to swap between the two applications, all you have to do is pass in 
 
 ### Overriding the Defaults
 
-The per-user configuration folder's location can be overridden by setting `TRANSMISSION_HOME` and/or other [environment variables](Environment-Variables.md).
+The per-user configuration folder's location can be overridden by setting `TRANSMISSION_HOME` and/or other [[environment variables|Environment-Variables]].
 
 ## Files
 
@@ -44,7 +44,7 @@ The configuration folder typically has the following files:
 
 ### settings.json
 
-This is a json-encoded file that holds all the client's settings and preferences.  It's currently only used by the daemon, GTK+ and CLI clients.  json was chosen because it's mostly human-readable and -writable, but also allows data hierarchies to be stored. See the [Editing Configuration Files](Editing-Configuration-Files.md) page on how to modify them.
+This is a json-encoded file that holds all the client's settings and preferences.  It's currently only used by the daemon, GTK+ and CLI clients.  json was chosen because it's mostly human-readable and -writable, but also allows data hierarchies to be stored. See the [[Editing Configuration Files|Editing-Configuration-Files]] page on how to modify them.
 
 ### stats.json
 

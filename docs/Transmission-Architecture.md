@@ -1,5 +1,5 @@
 Transmission is fundamentally a Bit Torrent client and communicates with other Bit Torrent peers.
-In addition to this Transmission supports network-based remote control, whereby an authorised user may control the Transmission core from another machine via the [Transmission JSON RPC protocol](rpc-spec.md).
+In addition to this Transmission supports network-based remote control, whereby an authorised user may control the Transmission core from another machine via the [[Transmission JSON RPC protocol|rpc]].
 To make remote control easier from an arbitrary machine, Transmission Core can also serve a javascript web application to any browser and which in turn makes JSON RPC calls back to the Transmission core.
 
 The Core components and methods of control are shown below:

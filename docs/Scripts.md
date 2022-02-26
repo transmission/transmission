@@ -63,7 +63,3 @@ Scripts which have not yet been ported and may not work with the latest version:
  * http://pastie.org/443058: Perl - Network traffic graph, based on rrdtool (example: http://skitch.com/werehamster/bmjg8/bittorrent-traffic)
  * http://transmission.pastebin.com/QzVxQDtM: Bash - (cron)script to keep a maximum number of torrents running; starting and pausing torrents as necessary
  * https://github.com/jaboto/Transmission-script - (cron)script set network limits according to the number of clients in the network
-
-## Security on systemd
-
-`transmission-daemon`'s packaging has many permissions disabled as a standard safety measure. If your script needs more permissions than are provided by the default, users have [reported](https://github.com/transmission/transmission/issues/1951) that it can be resolved by changing to `NoNewPrivileges=false` in `/lib/systemd/system/transmission-daemon.service`.
