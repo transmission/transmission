@@ -368,8 +368,7 @@ static void ensureMgrTimersExist(struct tr_peerMgr* m);
 
 tr_peerMgr* tr_peerMgrNew(tr_session* session)
 {
-    auto* const m = new tr_peerMgr{};
-    m->session = session;
+    auto* const m = new tr_peerMgr{ session };
     ensureMgrTimersExist(m);
     return m;
 }
