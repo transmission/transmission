@@ -44,7 +44,7 @@ public:
     std::string whitelistStr;
     std::string url;
 
-    struct tr_rpc_address* bindAddress;
+    std::unique_ptr<struct tr_rpc_address> bindAddress;
 
     struct event* start_retry_timer = nullptr;
     struct evhttp* httpd = nullptr;
