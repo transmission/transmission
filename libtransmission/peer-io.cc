@@ -597,9 +597,10 @@ static tr_peerIo* tr_peerIoNew(
     Bandwidth* parent,
     tr_address const* addr,
     tr_port port,
+    time_t current_time,
     tr_sha1_digest_t const* torrent_hash,
     bool is_incoming,
-    bool isSeed,
+    bool is_seed,
     struct tr_peer_socket const socket)
 {
     TR_ASSERT(session != nullptr);
@@ -618,7 +619,7 @@ static tr_peerIo* tr_peerIoNew(
         maybeSetCongestionAlgorithm(socket.handle.tcp, session->peerCongestionAlgorithm());
     }
 
-    auto* io = new tr_peerIo{ session, torrent_hash, is_incoming, *addr, port, isSeed };
+    auto* io = new tr_peerIo{ session, torrent_hash, is_incoming, *addr, port, is_seed, current_time };
     io->socket = socket;
     io->bandwidth = new Bandwidth(parent);
     io->bandwidth->setPeer(io);
@@ -662,12 +663,13 @@ tr_peerIo* tr_peerIoNewIncoming(
     Bandwidth* parent,
     tr_address const* addr,
     tr_port port,
+    time_t current_time,
     struct tr_peer_socket const socket)
 {
     TR_ASSERT(session != nullptr);
     TR_ASSERT(tr_address_is_valid(addr));
 
-    return tr_peerIoNew(session, parent, addr, port, nullptr, true, false, socket);
+    return tr_peerIoNew(session, parent, addr, port, current_time, nullptr, true, false, socket);
 }
 
 tr_peerIo* tr_peerIoNewOutgoing(
@@ -675,8 +677,9 @@ tr_peerIo* tr_peerIoNewOutgoing(
     Bandwidth* parent,
     tr_address const* addr,
     tr_port port,
+    time_t current_time,
     tr_sha1_digest_t const& torrent_hash,
-    bool isSeed,
+    bool is_seed,
     bool utp)
 {
     TR_ASSERT(session != nullptr);
@@ -686,12 +689,12 @@ tr_peerIo* tr_peerIoNewOutgoing(
 
     if (utp)
     {
-        socket = tr_netOpenPeerUTPSocket(session, addr, port, isSeed);
+        socket = tr_netOpenPeerUTPSocket(session, addr, port, is_seed);
     }
 
     if (socket.type == TR_PEER_SOCKET_TYPE_NONE)
     {
-        socket = tr_netOpenPeerSocket(session, addr, port, isSeed);
+        socket = tr_netOpenPeerSocket(session, addr, port, is_seed);
         dbgmsg(
             nullptr,
             "tr_netOpenPeerSocket returned fd %" PRIdMAX,
@@ -703,7 +706,7 @@ tr_peerIo* tr_peerIoNewOutgoing(
         return nullptr;
     }
 
-    return tr_peerIoNew(session, parent, addr, port, &torrent_hash, false, isSeed, socket);
+    return tr_peerIoNew(session, parent, addr, port, current_time, &torrent_hash, false, is_seed, socket);
 }
 
 /***
@@ -958,7 +961,7 @@ int tr_peerIoReconnect(tr_peerIo* io)
 
     io_close_socket(io);
 
-    io->socket = tr_netOpenPeerSocket(session, &io->addr, io->port, io->isSeed);
+    io->socket = tr_netOpenPeerSocket(session, &io->addr, io->port, io->is_seed);
 
     if (io->socket.type != TR_PEER_SOCKET_TYPE_TCP)
     {

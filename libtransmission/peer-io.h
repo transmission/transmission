@@ -27,7 +27,6 @@
 #include "net.h" /* tr_address */
 #include "peer-socket.h"
 #include "tr-assert.h"
-#include "utils.h" // tr_time()
 
 class tr_peerIo;
 struct Bandwidth;
@@ -70,14 +69,16 @@ public:
         bool is_incoming,
         tr_address const& addr_in,
         tr_port port_in,
-        bool is_seed_in)
+        bool is_seed_in,
+        time_t current_time)
         : crypto{ torrent_hash, is_incoming }
         , addr{ addr_in }
         , session{ session_in }
+        , time_created{ current_time }
         , inbuf{ evbuffer_new() }
         , outbuf{ evbuffer_new() }
         , port{ port_in }
-        , isSeed{ is_seed_in }
+        , is_seed{ is_seed_in }
     {
     }
 
@@ -99,9 +100,9 @@ public:
 
     struct tr_peer_socket socket = {};
 
-    time_t const timeCreated = tr_time();
-
     tr_session* const session;
+
+    time_t const time_created;
 
     tr_can_read_cb canRead = nullptr;
     tr_did_write_cb didWrite = nullptr;
@@ -131,7 +132,7 @@ public:
 
     tr_priority_t priority = TR_PRI_NORMAL;
 
-    bool const isSeed;
+    bool const is_seed;
     bool dhtSupported = false;
     bool extendedProtocolSupported = false;
     bool fastExtensionSupported = false;
@@ -147,8 +148,9 @@ tr_peerIo* tr_peerIoNewOutgoing(
     Bandwidth* parent,
     struct tr_address const* addr,
     tr_port port,
+    time_t current_time,
     tr_sha1_digest_t const& torrent_hash,
-    bool isSeed,
+    bool is_seed,
     bool utp);
 
 tr_peerIo* tr_peerIoNewIncoming(
@@ -156,6 +158,7 @@ tr_peerIo* tr_peerIoNewIncoming(
     Bandwidth* parent,
     struct tr_address const* addr,
     tr_port port,
+    time_t current_time,
     struct tr_peer_socket const socket);
 
 void tr_peerIoRefImpl(char const* file, int line, tr_peerIo* io);
@@ -235,12 +238,6 @@ int tr_peerIoReconnect(tr_peerIo* io);
 constexpr bool tr_peerIoIsIncoming(tr_peerIo const* io)
 {
     return io->crypto.is_incoming;
-}
-
-// TODO: remove this func; let caller get the current time instead
-static inline int tr_peerIoGetAge(tr_peerIo const* io)
-{
-    return tr_time() - io->timeCreated;
 }
 
 /**
