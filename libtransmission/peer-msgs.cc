@@ -357,9 +357,9 @@ public:
         set_active(direction, calculate_active(direction));
     }
 
-    [[nodiscard]] time_t get_connection_age() const override
+    [[nodiscard]] bool is_connection_older_than(time_t timestamp) const override
     {
-        return tr_peerIoGetAge(io);
+        return io->time_created < timestamp;
     }
 
     void cancel_block_request(tr_block_index_t block) override

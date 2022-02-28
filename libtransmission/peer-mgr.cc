@@ -1096,7 +1096,7 @@ void tr_peerMgrAddIncoming(tr_peerMgr* manager, tr_address const* addr, tr_port 
     }
     else /* we don't have a connection to them yet... */
     {
-        tr_peerIo* const io = tr_peerIoNewIncoming(session, session->bandwidth, addr, port, socket);
+        tr_peerIo* const io = tr_peerIoNewIncoming(session, session->bandwidth, addr, port, tr_time(), socket);
         tr_handshake* const handshake = tr_handshakeNew(io, session->encryptionMode, on_handshake_done, manager);
 
         tr_peerIoUnref(io); /* balanced by the implicit ref in tr_peerIoNewIncoming() */
@@ -2054,7 +2054,8 @@ static int compareChoke(void const* va, void const* vb)
 /* is this a new connection? */
 static bool isNew(tr_peerMsgs const* msgs)
 {
-    return msgs != nullptr && msgs->get_connection_age() < 45;
+    auto constexpr CutoffSecs = time_t{ 45 };
+    return msgs != nullptr && !msgs->is_connection_older_than(tr_time() - CutoffSecs);
 }
 
 /* get a rate for deciding which peers to choke and unchoke. */
@@ -3011,6 +3012,7 @@ static void initiateConnection(tr_peerMgr* mgr, tr_swarm* s, struct peer_atom* a
         mgr->session->bandwidth,
         &atom->addr,
         atom->port,
+        tr_time(),
         s->tor->infoHash(),
         s->tor->completeness == TR_SEED,
         utp);

@@ -25,7 +25,11 @@ TEST_F(BencTest, MalformedBenc)
     auto handler = TestHandler{};
     tr_error* error = nullptr;
     EXPECT_FALSE(transmission::benc::parse(Benc, stack, handler, nullptr, &error));
-    EXPECT_NE(nullptr, error->message);
+    EXPECT_NE(nullptr, error);
+    if (error != nullptr)
+    {
+        EXPECT_NE(nullptr, error->message);
+    }
     tr_error_clear(&error);
 }
 
