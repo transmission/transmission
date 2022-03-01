@@ -133,7 +133,7 @@ static auto getTorrents(tr_session* session, tr_variant* args)
             }
             else if (tr_variantGetStrView(node, &sv))
             {
-                tor = session->getTorrent(sv);
+                tor = session->torrents().get(sv);
             }
 
             if (tor != nullptr)
@@ -155,16 +155,16 @@ static auto getTorrents(tr_session* session, tr_variant* args)
         {
             time_t const cutoff = tr_time() - RecentlyActiveSeconds;
 
-            torrents.reserve(std::size(session->torrents));
+            torrents.reserve(std::size(session->torrents()));
             std::copy_if(
-                std::begin(session->torrents),
-                std::end(session->torrents),
+                std::begin(session->torrents()),
+                std::end(session->torrents()),
                 std::back_inserter(torrents),
                 [&cutoff](auto const* tor) { return tor->anyDate >= cutoff; });
         }
         else
         {
-            auto* const tor = session->getTorrent(sv);
+            auto* const tor = session->torrents().get(sv);
             if (tor != nullptr)
             {
                 torrents.push_back(tor);
@@ -173,8 +173,8 @@ static auto getTorrents(tr_session* session, tr_variant* args)
     }
     else // all of them
     {
-        torrents.reserve(std::size(session->torrents));
-        std::copy(std::begin(session->torrents), std::end(session->torrents), std::back_inserter(torrents));
+        torrents.reserve(std::size(session->torrents()));
+        std::copy(std::begin(session->torrents()), std::end(session->torrents()), std::back_inserter(torrents));
     }
 
     return torrents;
@@ -1977,11 +1977,9 @@ static char const* sessionStats(
     auto currentStats = tr_session_stats{};
     auto cumulativeStats = tr_session_stats{};
 
-    int const total = std::size(session->torrents);
-    int const running = std::count_if(
-        std::begin(session->torrents),
-        std::end(session->torrents),
-        [](auto const* tor) { return tor->isRunning; });
+    auto const& torrents = session->torrents();
+    int const total = std::size(torrents);
+    int const running = std::count_if(std::begin(torrents), std::end(torrents), [](auto const* tor) { return tor->isRunning; });
 
     tr_sessionGetStats(session, &currentStats);
     tr_sessionGetCumulativeStats(session, &cumulativeStats);

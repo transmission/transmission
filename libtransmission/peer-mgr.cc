@@ -294,7 +294,7 @@ tr_address const* tr_peerAddress(tr_peer const* peer)
 
 static tr_swarm* getExistingSwarm(tr_peerMgr* manager, tr_sha1_digest_t const& hash)
 {
-    tr_torrent* tor = manager->session->getTorrent(hash);
+    auto* const tor = manager->session->torrents().get(hash);
 
     return tor == nullptr ? nullptr : tor->swarm;
 }
@@ -414,7 +414,7 @@ void tr_peerMgrOnBlocklistChanged(tr_peerMgr* mgr)
 {
     /* we cache whether or not a peer is blocklisted...
        since the blocklist has changed, erase that cached value */
-    for (auto* tor : mgr->session->torrents)
+    for (auto* const tor : mgr->session->torrents())
     {
         tr_swarm* s = tor->swarm;
 
@@ -657,7 +657,7 @@ static void refillUpkeep(evutil_socket_t /*fd*/, short /*what*/, void* vmgr)
     auto* mgr = static_cast<tr_peerMgr*>(vmgr);
     auto const lock = mgr->unique_lock();
 
-    auto& torrents = mgr->session->torrents;
+    auto& torrents = mgr->session->torrents();
     std::for_each(std::begin(torrents), std::end(torrents), [](auto* tor) { tr_swarmCancelOldRequests(tor->swarm); });
 
     tr_timerAddMsec(mgr->refillUpkeepTimer, RefillUpkeepPeriodMsec);
@@ -2224,7 +2224,7 @@ static void rechokePulse(evutil_socket_t /*fd*/, short /*what*/, void* vmgr)
     auto const lock = mgr->unique_lock();
     uint64_t const now = tr_time_msec();
 
-    for (auto* tor : mgr->session->torrents)
+    for (auto* const tor : mgr->session->torrents())
     {
         if (tor->isRunning)
         {
@@ -2479,9 +2479,10 @@ static void enforceTorrentPeerLimit(tr_swarm* s)
 static void enforceSessionPeerLimit(tr_session* session)
 {
     // do we have too many peers?
+    auto const& torrents = session->torrents();
     size_t const n_peers = std::accumulate(
-        std::begin(session->torrents),
-        std::end(session->torrents),
+        std::begin(torrents),
+        std::end(torrents),
         size_t{},
         [](size_t sum, tr_torrent const* tor) { return sum + tr_ptrArraySize(&tor->swarm->peers); });
     size_t const max = tr_sessionGetPeerLimit(session);
@@ -2493,7 +2494,7 @@ static void enforceSessionPeerLimit(tr_session* session)
     // make a list of all the peers
     auto peers = std::vector<tr_peer*>{};
     peers.reserve(n_peers);
-    for (auto* tor : session->torrents)
+    for (auto* const tor : session->torrents())
     {
         size_t const n = tr_ptrArraySize(&tor->swarm->peers);
         auto** base = (tr_peer**)tr_ptrArrayBase(&tor->swarm->peers);
@@ -2513,7 +2514,7 @@ static void reconnectPulse(evutil_socket_t /*fd*/, short /*what*/, void* vmgr)
     time_t const now_sec = tr_time();
 
     // remove crappy peers
-    for (auto* tor : mgr->session->torrents)
+    for (auto* const tor : mgr->session->torrents())
     {
         if (!tor->swarm->isRunning)
         {
@@ -2526,7 +2527,7 @@ static void reconnectPulse(evutil_socket_t /*fd*/, short /*what*/, void* vmgr)
     }
 
     // if we're over the per-torrent peer limits, cull some peers
-    for (auto* tor : mgr->session->torrents)
+    for (auto* const tor : mgr->session->torrents())
     {
         if (tor->isRunning)
         {
@@ -2550,7 +2551,7 @@ static void reconnectPulse(evutil_socket_t /*fd*/, short /*what*/, void* vmgr)
 
 static void pumpAllPeers(tr_peerMgr* mgr)
 {
-    for (auto* tor : mgr->session->torrents)
+    for (auto* const tor : mgr->session->torrents())
     {
         tr_swarm* s = tor->swarm;
 
@@ -2595,7 +2596,7 @@ static void bandwidthPulse(evutil_socket_t /*fd*/, short /*what*/, void* vmgr)
     session->bandwidth->allocate(TR_DOWN, BandwidthPeriodMsec);
 
     /* torrent upkeep */
-    for (auto* tor : session->torrents)
+    for (auto* const tor : session->torrents())
     {
         /* possibly stop torrents that have seeded enough */
         tr_torrentCheckSeedLimit(tor);
@@ -2693,7 +2694,7 @@ static void atomPulse(evutil_socket_t /*fd*/, short /*what*/, void* vmgr)
     auto* mgr = static_cast<tr_peerMgr*>(vmgr);
     auto const lock = mgr->unique_lock();
 
-    for (auto* tor : mgr->session->torrents)
+    for (auto* const tor : mgr->session->torrents())
     {
         tr_swarm* s = tor->swarm;
         int const maxAtomCount = getMaxAtomCount(tor);
@@ -2920,7 +2921,7 @@ static std::vector<peer_candidate> getPeerCandidates(tr_session* session, size_t
     /* count how many peers and atoms we've got */
     int atomCount = 0;
     int peerCount = 0;
-    for (auto const* tor : session->torrents)
+    for (auto const* tor : session->torrents())
     {
         atomCount += tr_ptrArraySize(&tor->swarm->pool);
         peerCount += tr_ptrArraySize(&tor->swarm->peers);
@@ -2936,7 +2937,7 @@ static std::vector<peer_candidate> getPeerCandidates(tr_session* session, size_t
     candidates.reserve(atomCount);
 
     /* populate the candidate array */
-    for (auto* tor : session->torrents)
+    for (auto* tor : session->torrents())
     {
         if (!tor->swarm->isRunning)
         {

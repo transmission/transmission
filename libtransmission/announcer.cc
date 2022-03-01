@@ -598,7 +598,7 @@ static tr_tier* getTier(tr_announcer* announcer, tr_sha1_digest_t const& info_ha
         return nullptr;
     }
 
-    auto* const tor = announcer->session->getTorrent(info_hash);
+    auto* const tor = announcer->session->torrents().get(info_hash);
     if (tor == nullptr || tor->torrent_announcer == nullptr)
     {
         return nullptr;
@@ -1305,7 +1305,7 @@ static void on_scrape_done(tr_scrape_response const* response, void* vsession)
     for (int i = 0; i < response->row_count; ++i)
     {
         auto const& row = response->rows[i];
-        auto* const tor = session->getTorrent(row.info_hash);
+        auto* const tor = session->torrents().get(row.info_hash);
 
         if (tor != nullptr)
         {
@@ -1535,7 +1535,7 @@ static void scrapeAndAnnounceMore(tr_announcer* announcer)
     /* build a list of tiers that need to be announced */
     auto announce_me = std::vector<tr_tier*>{};
     auto scrape_me = std::vector<tr_tier*>{};
-    for (auto* tor : announcer->session->torrents)
+    for (auto* const tor : announcer->session->torrents())
     {
         for (auto& tier : tor->torrent_announcer->tiers)
         {

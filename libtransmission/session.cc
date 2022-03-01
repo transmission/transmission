@@ -144,17 +144,17 @@ std::optional<std::string> tr_session::WebMediator::publicAddress() const
 unsigned int tr_session::WebMediator::clamp(int torrent_id, unsigned int byte_count) const
 {
     auto const lock = session_->unique_lock();
-    auto const it = session_->torrentsById.find(torrent_id);
-    return it == std::end(session_->torrentsById) ? 0U : it->second->bandwidth->clamp(TR_DOWN, byte_count);
+    auto const* const tor = session_->torrents().get(torrent_id);
+    return tor == nullptr ? 0U : tor->bandwidth->clamp(TR_DOWN, byte_count);
 }
 
 void tr_session::WebMediator::notifyBandwidthConsumed(int torrent_id, size_t byte_count)
 {
     auto const lock = session_->unique_lock();
-    auto const it = session_->torrentsById.find(torrent_id);
-    if (it != std::end(session_->torrentsById))
+    auto const* const tor = session_->torrents().get(torrent_id);
+    if (tor != nullptr)
     {
-        it->second->bandwidth->notifyBandwidthConsumed(TR_DOWN, byte_count, true, tr_time_msec());
+        tor->bandwidth->notifyBandwidthConsumed(TR_DOWN, byte_count, true, tr_time_msec());
     }
 }
 
@@ -574,7 +574,7 @@ static void onSaveTimer(evutil_socket_t /*fd*/, short /*what*/, void* vsession)
         tr_logAddError("Error while flushing completed pieces from cache");
     }
 
-    for (auto* tor : session->torrents)
+    for (auto* const tor : session->torrents())
     {
         tr_torrentSave(tor);
     }
@@ -671,7 +671,7 @@ static void onNowTimer(evutil_socket_t /*fd*/, short /*what*/, void* vsession)
     // TODO: this seems a little silly. Why do we increment this
     // every second instead of computing the value as needed by
     // subtracting the current time from a start time?
-    for (auto* tor : session->torrents)
+    for (auto* const tor : session->torrents())
     {
         if (tor->isRunning)
         {
@@ -1233,7 +1233,7 @@ static void peerPortChanged(void* vsession)
     open_incoming_peer_port(session);
     tr_sharedPortChanged(session);
 
-    for (auto* tor : session->torrents)
+    for (auto* const tor : session->torrents())
     {
         tr_torrentChangeMyPort(tor);
     }
@@ -1805,17 +1805,16 @@ double tr_sessionGetRawSpeed_KBps(tr_session const* session, tr_direction dir)
 
 int tr_sessionCountTorrents(tr_session const* session)
 {
-    return tr_isSession(session) ? std::size(session->torrents) : 0;
+    return tr_isSession(session) ? std::size(session->torrents()) : 0;
 }
 
 std::vector<tr_torrent*> tr_sessionGetTorrents(tr_session* session)
 {
     TR_ASSERT(tr_isSession(session));
 
-    auto const& src = session->torrents;
-    auto const n = std::size(src);
+    auto const n = std::size(session->torrents());
     auto torrents = std::vector<tr_torrent*>{ n };
-    std::copy(std::begin(src), std::end(src), std::begin(torrents));
+    std::copy(std::begin(session->torrents()), std::end(session->torrents()), std::begin(torrents));
     return torrents;
 }
 
@@ -2275,7 +2274,7 @@ void tr_session::setDefaultTrackers(std::string_view trackers)
     // if the list changed, update all the public torrents
     if (default_trackers_ != oldval)
     {
-        for (auto* tor : torrents)
+        for (auto* const tor : torrents())
         {
             if (tor->isPublic())
             {
@@ -2808,7 +2807,7 @@ std::vector<tr_torrent*> tr_sessionGetNextQueuedTorrents(tr_session* session, tr
     // build an array of the candidates
     auto candidates = std::vector<tr_torrent*>{};
     candidates.reserve(tr_sessionCountTorrents(session));
-    for (auto* tor : session->torrents)
+    for (auto* const tor : session->torrents())
     {
         if (tor->isQueued() && (direction == tor->queueDirection()))
         {
@@ -2846,7 +2845,7 @@ int tr_sessionCountQueueFreeSlots(tr_session* session, tr_direction dir)
     bool const stalled_enabled = tr_sessionGetQueueStalledEnabled(session);
     int const stalled_if_idle_for_n_seconds = tr_sessionGetQueueStalledMinutes(session) * 60;
     time_t const now = tr_time();
-    for (auto const* tor : session->torrents)
+    for (auto const* const tor : session->torrents())
     {
         /* is it the right activity? */
         if (activity != tr_torrentGetActivity(tor))
@@ -2874,24 +2873,4 @@ int tr_sessionCountQueueFreeSlots(tr_session* session, tr_direction dir)
     }
 
     return max - active_count;
-}
-
-void tr_sessionAddTorrent(tr_session* session, tr_torrent* tor)
-{
-    session->torrents.insert(tor);
-    session->torrentsById.insert_or_assign(tor->uniqueId, tor);
-    session->torrentsByHash.insert_or_assign(tor->infoHash(), tor);
-}
-
-void tr_sessionRemoveTorrent(tr_session* session, tr_torrent* tor)
-{
-    session->torrents.erase(tor);
-    session->torrentsById.erase(tor->uniqueId);
-    session->torrentsByHash.erase(tor->infoHash());
-}
-
-tr_torrent* tr_session::getTorrent(std::string_view info_dict_hash_string)
-{
-    auto const info_hash = tr_sha1_from_string(info_dict_hash_string);
-    return info_hash ? this->getTorrent(*info_hash) : nullptr;
 }
