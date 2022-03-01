@@ -30,6 +30,7 @@
 #include "announce-list.h"
 #include "net.h" // tr_socket_t
 #include "quark.h"
+#include "torrents.h"
 #include "web.h"
 
 enum tr_auto_switch_state_t
@@ -108,6 +109,16 @@ struct tr_turtle_info
 struct tr_session
 {
 public:
+    [[nodiscard]] auto const& torrents() const
+    {
+        return torrents_;
+    }
+
+    [[nodiscard]] auto& torrents()
+    {
+        return torrents_;
+    }
+
     [[nodiscard]] auto unique_lock() const
     {
         return std::unique_lock(session_mutex_);
@@ -116,27 +127,6 @@ public:
     [[nodiscard]] bool isClosing() const
     {
         return is_closing_;
-    }
-
-    [[nodiscard]] auto const* getTorrent(tr_sha1_digest_t const& info_dict_hash) const
-    {
-        auto& src = this->torrentsByHash;
-        auto it = src.find(info_dict_hash);
-        return it == std::end(src) ? nullptr : it->second;
-    }
-
-    [[nodiscard]] auto* getTorrent(tr_sha1_digest_t const& info_dict_hash)
-    {
-        auto& src = this->torrentsByHash;
-        auto it = src.find(info_dict_hash);
-        return it == std::end(src) ? nullptr : it->second;
-    }
-
-    [[nodiscard]] tr_torrent* getTorrent(std::string_view info_dict_hash_string);
-
-    [[nodiscard]] auto contains(tr_sha1_digest_t const& info_dict_hash) const
-    {
-        return getTorrent(info_dict_hash) != nullptr;
     }
 
     // download dir
@@ -348,10 +338,6 @@ public:
     tr_port randomPortLow;
     tr_port randomPortHigh;
 
-    std::unordered_set<tr_torrent*> torrents;
-    std::map<int, tr_torrent*> torrentsById;
-    std::map<tr_sha1_digest_t, tr_torrent*> torrentsByHash;
-
     std::string config_dir;
     std::string resume_dir;
     std::string torrent_dir;
@@ -423,6 +409,8 @@ public:
 private:
     static std::recursive_mutex session_mutex_;
 
+    tr_torrents torrents_;
+
     std::array<std::string, TR_SCRIPT_N_TYPES> scripts_;
     std::string blocklist_url_;
     std::string download_dir_;
@@ -492,6 +480,3 @@ bool tr_sessionGetActiveSpeedLimit_Bps(tr_session const* session, tr_direction d
 std::vector<tr_torrent*> tr_sessionGetNextQueuedTorrents(tr_session* session, tr_direction dir, size_t numwanted);
 
 int tr_sessionCountQueueFreeSlots(tr_session* session, tr_direction);
-
-void tr_sessionAddTorrent(tr_session* session, tr_torrent* tor);
-void tr_sessionRemoveTorrent(tr_session* session, tr_torrent* tor);

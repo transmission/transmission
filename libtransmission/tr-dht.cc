@@ -600,7 +600,7 @@ static void callback(void* /*ignore*/, int event, unsigned char const* info_hash
     auto hash = tr_sha1_digest_t{};
     std::copy_n(reinterpret_cast<std::byte const*>(info_hash), std::size(hash), std::data(hash));
     auto const lock = session_->unique_lock();
-    tr_torrent* const tor = session_->getTorrent(hash);
+    auto* const tor = session_->torrents().get(hash);
 
     if (event == DHT_EVENT_VALUES || event == DHT_EVENT_VALUES6)
     {
@@ -700,7 +700,7 @@ void tr_dhtUpkeep(tr_session* session)
 {
     time_t const now = tr_time();
 
-    for (auto* tor : session->torrents)
+    for (auto* const tor : session->torrents())
     {
         if (!tor->isRunning || !tor->allowsDht())
         {

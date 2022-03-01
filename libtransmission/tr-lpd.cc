@@ -533,7 +533,7 @@ static int tr_lpdConsiderAnnounce(tr_pex* peer, char const* const msg)
             return res;
         }
 
-        tor = session->getTorrent(hashString);
+        tor = session->torrents().get(hashString);
 
         if (tr_isTorrent(tor) && tor->allowsLpd())
         {
@@ -576,7 +576,7 @@ static int tr_lpdAnnounceMore(time_t const now, int const interval)
 
     if (tr_sessionAllowsLPD(session))
     {
-        for (auto* tor : session->torrents)
+        for (auto* const tor : session->torrents())
         {
             int announcePrio = 0;
 
