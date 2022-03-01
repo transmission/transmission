@@ -85,16 +85,6 @@ tr_torrent* tr_torrents::get(std::string_view magnet_link)
     return magnet.parseMagnet(magnet_link) ? get(magnet.infoHash()) : nullptr;
 }
 
-tr_torrent const* tr_torrents::get(tr_torrent_metainfo const& metainfo) const
-{
-    return get(metainfo.infoHash());
-}
-
-tr_torrent* tr_torrents::get(tr_torrent_metainfo const& metainfo)
-{
-    return get(metainfo.infoHash());
-}
-
 tr_torrent* tr_torrents::get(tr_sha1_digest_t const& hash)
 {
     auto [begin, end] = std::equal_range(std::begin(by_hash_), std::end(by_hash_), hash, CompareTorrentByHash{});
