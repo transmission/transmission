@@ -10,13 +10,12 @@
 #endif
 
 #include <ctime>
-#include <iterator>
 #include <map>
 #include <set>
 #include <string_view>
 #include <vector>
 
-#include "tr-macros.h" // tr_sha1_digest_t
+#include "transmission.h"
 
 #include "torrent-metainfo.h"
 
@@ -27,6 +26,8 @@ struct tr_torrent_metainfo;
 class tr_torrents
 {
 public:
+    tr_torrents();
+
     // returns a fast lookup id for `tor`
     [[nodiscard]] int add(tr_torrent* tor);
 

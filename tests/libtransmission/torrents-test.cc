@@ -31,6 +31,7 @@ TEST_F(TorrentsTest, simpleTests)
     EXPECT_EQ(0U, std::size(torrents));
 
     auto const id = torrents.add(tor);
+    EXPECT_GT(id, 0);
     tor->uniqueId = id;
 
     EXPECT_TRUE(std::empty(torrents.removedSince(0)));
