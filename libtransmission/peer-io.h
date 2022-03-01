@@ -143,6 +143,7 @@ public:
 ***
 **/
 
+// TODO: 8 constructor args is too many; maybe a builder object?
 tr_peerIo* tr_peerIoNewOutgoing(
     tr_session* session,
     Bandwidth* parent,
