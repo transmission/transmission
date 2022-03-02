@@ -60,6 +60,7 @@ set(PROJECT_FILES
   torrent-magnet.cc
   torrent-metainfo.cc
   torrent.cc
+  torrents.cc
   tr-assert.cc
   tr-assert.mm
   tr-dht.cc
@@ -194,6 +195,7 @@ set(${PROJECT_NAME}_PRIVATE_HEADERS
     torrent-magnet.h
     torrent-metainfo.h
     torrent.h
+    torrents.h
     tr-dht.h
     tr-lpd.h
     tr-udp.h

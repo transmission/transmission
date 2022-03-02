@@ -88,14 +88,12 @@ int tr_torrentId(tr_torrent const* tor)
 
 tr_torrent* tr_torrentFindFromId(tr_session* session, int id)
 {
-    auto& src = session->torrentsById;
-    auto it = src.find(id);
-    return it == std::end(src) ? nullptr : it->second;
+    return session->torrents().get(id);
 }
 
 tr_torrent* tr_torrentFindFromHash(tr_session* session, tr_sha1_digest_t const* hash)
 {
-    return hash == nullptr ? nullptr : session->getTorrent(*hash);
+    return hash == nullptr ? nullptr : session->torrents().get(*hash);
 }
 
 tr_torrent* tr_torrentFindFromMetainfo(tr_session* session, tr_torrent_metainfo const* metainfo)
@@ -105,18 +103,17 @@ tr_torrent* tr_torrentFindFromMetainfo(tr_session* session, tr_torrent_metainfo 
         return nullptr;
     }
 
-    return tr_torrentFindFromHash(session, &metainfo->infoHash());
+    return session->torrents().get(metainfo->infoHash());
 }
 
 tr_torrent* tr_torrentFindFromMagnetLink(tr_session* session, char const* magnet_link)
 {
-    auto mm = tr_magnet_metainfo{};
-    return mm.parseMagnet(magnet_link != nullptr ? magnet_link : "") ? session->getTorrent(mm.infoHash()) : nullptr;
+    return magnet_link == nullptr ? nullptr : session->torrents().get(magnet_link);
 }
 
 tr_torrent* tr_torrentFindFromObfuscatedHash(tr_session* session, tr_sha1_digest_t const& obfuscated_hash)
 {
-    for (auto* tor : session->torrents)
+    for (auto* const tor : session->torrents())
     {
         if (tor->obfuscated_hash == obfuscated_hash)
         {
@@ -675,14 +672,12 @@ static void refreshCurrentDir(tr_torrent* tor);
 
 static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
 {
-    static auto next_unique_id = int{ 1 };
     auto const lock = tor->unique_lock();
 
     tr_session* session = tr_ctorGetSession(ctor);
     TR_ASSERT(session != nullptr);
 
     tor->session = session;
-    tor->uniqueId = next_unique_id++;
     tor->queuePosition = tr_sessionCountTorrents(session);
 
     torrentInitFromInfoDict(tor);
@@ -765,7 +760,7 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
         tr_torrentSetIdleLimit(tor, tr_sessionGetIdleLimit(tor->session));
     }
 
-    tr_sessionAddTorrent(session, tor);
+    tor->uniqueId = session->torrents().add(tor);
 
     // if we don't have a local .torrent or .magnet file already, assume the torrent is new
     auto const filename = tor->hasMetadata() ? tor->torrentFile() : tor->magnetFile();
@@ -845,7 +840,7 @@ tr_torrent* tr_torrentNew(tr_ctor* ctor, tr_torrent** setme_duplicate_of)
     }
 
     // is it a duplicate?
-    if (auto* const duplicate_of = session->getTorrent(metainfo.infoHash()); duplicate_of != nullptr)
+    if (auto* const duplicate_of = session->torrents().get(metainfo.infoHash()); duplicate_of != nullptr)
     {
         if (setme_duplicate_of != nullptr)
         {
@@ -1298,13 +1293,13 @@ static void freeTorrent(tr_torrent* tor)
 
     tr_announcerRemoveTorrent(session->announcer, tor);
 
-    tr_sessionRemoveTorrent(session, tor);
+    session->torrents().remove(tor, tr_time());
 
     if (!session->isClosing())
     {
         // "so you die, captain, and we all move up in rank."
         // resequence the queue positions
-        for (auto* t : session->torrents)
+        for (auto* t : session->torrents())
         {
             if (t->queuePosition > tor->queuePosition)
             {
@@ -2768,7 +2763,7 @@ void tr_torrentSetQueuePosition(tr_torrent* tor, int pos)
 
     tor->queuePosition = -1;
 
-    for (auto* walk : tor->session->torrents)
+    for (auto* const walk : tor->session->torrents())
     {
         if ((old_pos < pos) && (old_pos <= walk->queuePosition) && (walk->queuePosition <= pos))
         {
