@@ -6,6 +6,7 @@
 #include <algorithm> // std::partial_sort(), std::min(), std::max()
 #include <cerrno> /* ENOENT */
 #include <climits> /* INT_MAX */
+#include <condition_variable>
 #include <csignal>
 #include <cstdint>
 #include <cstdlib>
@@ -592,11 +593,11 @@ static void tr_sessionInitImpl(void* /*vdata*/);
 
 struct init_data
 {
-    bool done;
     bool messageQueuingEnabled;
     tr_session* session;
     char const* config_dir;
     tr_variant* clientSettings;
+    std::condition_variable_any done_cv;
 };
 
 tr_session* tr_sessionInit(char const* config_dir, bool messageQueuingEnabled, tr_variant* clientSettings)
@@ -626,19 +627,22 @@ tr_session* tr_sessionInit(char const* config_dir, bool messageQueuingEnabled, t
     tr_eventInit(session);
     TR_ASSERT(session->events != nullptr);
 
-    /* run the rest in the libtransmission thread */
-
     auto data = init_data{};
-    data.done = false;
     data.session = session;
     data.config_dir = config_dir;
     data.messageQueuingEnabled = messageQueuingEnabled;
     data.clientSettings = clientSettings;
-    tr_runInEventThread(session, tr_sessionInitImpl, &data);
 
-    while (!data.done)
+    // run it in the libtransmission thread
+    if (tr_amInEventThread(session))
     {
-        tr_wait_msec(50);
+        tr_sessionInitImpl(&data);
+    }
+    else
+    {
+        auto lock = session->unique_lock();
+        tr_runInEventThread(session, tr_sessionInitImpl, &data);
+        data.done_cv.wait(lock); // wait for the session to be ready
     }
 
     return session;
@@ -771,7 +775,7 @@ static void tr_sessionInitImpl(void* vdata)
 
     /* cleanup */
     tr_variantFree(&settings);
-    data->done = true;
+    data->done_cv.notify_one();
 }
 
 static void turtleBootstrap(tr_session* /*session*/, struct tr_turtle_info* /*turtle*/);
@@ -1133,22 +1137,26 @@ static void sessionSetImpl(void* vdata)
         tr_sessionSetAntiBruteForceEnabled(session, boolVal);
     }
 
-    data->done = true;
+    data->done_cv.notify_one();
 }
 
 void tr_sessionSet(tr_session* session, tr_variant* settings)
 {
-    struct init_data data;
-    data.done = false;
+    auto data = init_data{};
     data.session = session;
     data.clientSettings = settings;
 
-    /* run the rest in the libtransmission thread */
-    tr_runInEventThread(session, sessionSetImpl, &data);
+    // run it in the libtransmission thread
 
-    while (!data.done)
+    if (tr_amInEventThread(session))
     {
-        tr_wait_msec(100);
+        sessionSetImpl(&data);
+    }
+    else
+    {
+        auto lock = session->unique_lock();
+        tr_runInEventThread(session, sessionSetImpl, &data);
+        data.done_cv.wait(lock);
     }
 }
 
@@ -1958,7 +1966,7 @@ void tr_sessionClose(tr_session* session)
     while (!session->isClosed && !deadlineReached(deadline))
     {
         dbgmsg("waiting for the libtransmission thread to finish");
-        tr_wait_msec(100);
+        tr_wait_msec(10);
     }
 
     /* "shared" and "tracker" have live sockets,
@@ -1987,7 +1995,7 @@ void tr_sessionClose(tr_session* session)
     {
         static bool forced = false;
         dbgmsg("waiting for libtransmission thread to finish... now %zu deadline %zu", (size_t)time(nullptr), (size_t)deadline);
-        tr_wait_msec(100);
+        tr_wait_msec(10);
 
         if (deadlineReached(deadline) && !forced)
         {

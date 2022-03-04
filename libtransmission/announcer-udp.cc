@@ -7,7 +7,6 @@
 #include <cstring> /* memset() */
 #include <ctime>
 #include <list>
-#include <set>
 #include <string_view>
 #include <vector>
 
