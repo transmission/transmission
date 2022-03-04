@@ -61,10 +61,10 @@ static char constexpr MyName[] = "RPC Server";
 static auto constexpr TrUnixSocketPrefix = "unix:"sv;
 
 /* The maximum size of a unix socket path is defined per-platform based on sockaddr_un.sun_path.
- * On Windows the fallback is the length of the unix prefix. Subtracting one at the end is for
+ * On Windows the fallback is the length of an ipv6 address. Subtracting one at the end is for
  * double counting null terminators from sun_path and TrUnixSocketPrefix. */
 #ifdef _WIN32
-auto inline constexpr TrUnixAddrStrLen = size_t{ std::size(TrUnixSocketPrefix) };
+auto inline constexpr TrUnixAddrStrLen = size_t{ INET6_ADDRSTRLEN };
 #else
 auto inline constexpr TrUnixAddrStrLen = size_t{ sizeof(((struct sockaddr_un*)nullptr)->sun_path) +
                                                  std::size(TrUnixSocketPrefix) };
