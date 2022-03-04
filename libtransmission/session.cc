@@ -6,6 +6,7 @@
 #include <algorithm> // std::partial_sort(), std::min(), std::max()
 #include <cerrno> /* ENOENT */
 #include <climits> /* INT_MAX */
+#include <condition_variable>
 #include <csignal>
 #include <cstdint>
 #include <cstdlib>
