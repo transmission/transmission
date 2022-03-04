@@ -54,7 +54,7 @@ tr_torrents::tr_torrents()
 
 tr_torrent const* tr_torrents::get(int id) const
 {
-    TR_ASSERT(0 <= id);
+    TR_ASSERT(0 < id);
     TR_ASSERT(static_cast<size_t>(id) < std::size(by_id_));
     if (static_cast<size_t>(id) >= std::size(by_id_))
     {
@@ -69,7 +69,7 @@ tr_torrent const* tr_torrents::get(int id) const
 
 tr_torrent* tr_torrents::get(int id)
 {
-    TR_ASSERT(0 <= id);
+    TR_ASSERT(0 < id);
     TR_ASSERT(static_cast<size_t>(id) < std::size(by_id_));
     if (static_cast<size_t>(id) >= std::size(by_id_))
     {

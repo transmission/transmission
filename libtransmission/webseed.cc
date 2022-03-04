@@ -455,7 +455,7 @@ void onPartialDataFetched(tr_web::FetchResponse const& web_response)
         return;
     }
 
-    TR_ASSERT(evbuffer_get_length(task->content()) == 0);
+    TR_ASSERT(evbuffer_get_length(task->content()) < tr_block_info::BlockSize);
     webseed->tasks.erase(task);
     delete task;
 
