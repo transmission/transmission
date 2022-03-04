@@ -706,6 +706,8 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
 
     tor->labels = tr_ctorGetLabels(ctor);
 
+    tor->uniqueId = session->torrents().add(tor);
+
     tr_peerMgrAddTorrent(session->peerMgr, tor);
 
     TR_ASSERT(tor->downloadedCur == 0);
@@ -759,8 +761,6 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
         tr_torrentSetIdleMode(tor, TR_IDLELIMIT_GLOBAL);
         tr_torrentSetIdleLimit(tor, tr_sessionGetIdleLimit(tor->session));
     }
-
-    tor->uniqueId = session->torrents().add(tor);
 
     // if we don't have a local .torrent or .magnet file already, assume the torrent is new
     auto const filename = tor->hasMetadata() ? tor->torrentFile() : tor->magnetFile();
