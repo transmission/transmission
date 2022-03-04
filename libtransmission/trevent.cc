@@ -162,6 +162,7 @@ struct tr_event_handle
 
     using work_queue_t = std::list<callback>;
     work_queue_t work_queue;
+    std::condition_variable work_queue_cv;
     std::mutex work_queue_mutex;
     event* work_queue_event = nullptr;
 
@@ -210,6 +211,10 @@ static void libeventThreadFunc(tr_event_handle* events)
     events->session->evdns_base = dns_base;
     events->session->events = events;
 
+    // tell the thread that's waiting in tr_eventInit()
+    // that this thread is ready for business
+    events->work_queue_cv.notify_one();
+
     // loop until `tr_eventClose()` kills the loop
     event_base_loop(base, EVLOOP_NO_EXIT_ON_EMPTY);
 
@@ -234,15 +239,12 @@ void tr_eventInit(tr_session* session)
     auto* const events = new tr_event_handle();
     events->session = session;
 
+    auto lock = std::unique_lock(events->work_queue_mutex);
     auto thread = std::thread(libeventThreadFunc, events);
     events->thread_id = thread.get_id();
     thread.detach();
-
     // wait until the libevent thread is running
-    while (session->events == nullptr)
-    {
-        tr_wait_msec(100);
-    }
+    events->work_queue_cv.wait(lock);
 }
 
 void tr_eventClose(tr_session* session)

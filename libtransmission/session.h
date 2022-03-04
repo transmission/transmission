@@ -16,13 +16,11 @@
 #include <cstdint> // uintX_t
 #include <ctime>
 #include <list>
-#include <map>
 #include <memory>
 #include <mutex>
 #include <string>
 #include <string_view>
 #include <tuple>
-#include <unordered_set>
 #include <vector>
 
 #include "transmission.h"
