@@ -12,7 +12,6 @@
 #include "cache.h"
 #include "inout.h"
 #include "log.h"
-#include "peer-common.h" /* MAX_BLOCK_SIZE */
 #include "ptrarray.h"
 #include "torrent.h"
 #include "tr-assert.h"
@@ -157,7 +156,7 @@ static int calcRuns(tr_cache const* cache, struct run_info* runs)
 static int flushContiguous(tr_cache* cache, int pos, int n)
 {
     int err = 0;
-    auto* const buf = tr_new(uint8_t, n * MAX_BLOCK_SIZE);
+    auto* const buf = tr_new(uint8_t, n * tr_block_info::BlockSize);
     auto* walk = buf;
     auto** blocks = (struct cache_block**)tr_ptrArrayBase(&cache->blocks);
 
@@ -237,7 +236,7 @@ static int cacheTrim(tr_cache* cache)
 
 static int getMaxBlocks(int64_t max_bytes)
 {
-    return max_bytes / (double)MAX_BLOCK_SIZE;
+    return max_bytes / static_cast<double>(tr_block_info::BlockSize);
 }
 
 int tr_cacheSetLimit(tr_cache* cache, int64_t max_bytes)

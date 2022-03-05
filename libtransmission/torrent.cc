@@ -41,7 +41,6 @@
 #include "inout.h" /* tr_ioTestPiece() */
 #include "log.h"
 #include "magnet-metainfo.h"
-#include "peer-common.h" /* MAX_BLOCK_SIZE */
 #include "peer-mgr.h"
 #include "resume.h"
 #include "session.h"
@@ -1959,7 +1958,7 @@ bool tr_torrentReqIsValid(tr_torrent const* tor, tr_piece_index_t index, uint32_
     {
         err = 3;
     }
-    else if (length > MAX_BLOCK_SIZE)
+    else if (length > tr_block_info::BlockSize)
     {
         err = 4;
     }
