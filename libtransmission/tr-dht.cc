@@ -465,10 +465,8 @@ struct getstatus_closure
     sig_atomic_t count;
 };
 
-static void getstatus(void* cl)
+static void getstatus(getstatus_closure* const closure)
 {
-    auto* closure = static_cast<struct getstatus_closure*>(cl);
-
     int good = 0;
     int dubious = 0;
     int incoming = 0;

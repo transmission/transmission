@@ -4,6 +4,7 @@
 // License text can be found in the licenses/ folder.
 
 #include <condition_variable>
+#include <functional>
 #include <list>
 #include <mutex>
 #include <shared_mutex>
@@ -139,26 +140,7 @@ void tr_evthread_init()
 
 struct tr_event_handle
 {
-    // would it be more expensive to use std::function here?
-    struct callback
-    {
-        callback(void (*func)(void*) = nullptr, void* user_data = nullptr)
-            : func_{ func }
-            , user_data_{ user_data }
-        {
-        }
-
-        void invoke() const
-        {
-            if (func_ != nullptr)
-            {
-                func_(user_data_);
-            }
-        }
-
-        void (*func_)(void*);
-        void* user_data_;
-    };
+    using callback = std::function<void(void)>;
 
     using work_queue_t = std::list<callback>;
     work_queue_t work_queue;
@@ -185,9 +167,9 @@ static void onWorkAvailable(evutil_socket_t /*fd*/, short /*flags*/, void* vsess
     work_queue_lock.unlock();
 
     // process the work queue
-    for (auto const& work : work_queue)
+    for (auto const& func : work_queue)
     {
-        work.invoke();
+        func();
     }
 }
 
@@ -281,7 +263,7 @@ bool tr_amInEventThread(tr_session const* session)
 ***
 **/
 
-void tr_runInEventThread(tr_session* session, void (*func)(void*), void* user_data)
+void tr_runInEventThread(tr_session* session, std::function<void(void)>&& func)
 {
     TR_ASSERT(tr_isSession(session));
     auto* events = session->events;
@@ -289,12 +271,12 @@ void tr_runInEventThread(tr_session* session, void (*func)(void*), void* user_da
 
     if (tr_amInEventThread(session))
     {
-        (*func)(user_data);
+        func();
     }
     else
     {
         auto lock = std::unique_lock(events->work_queue_mutex);
-        events->work_queue.emplace_back(func, user_data);
+        events->work_queue.emplace_back(std::move(func));
         lock.unlock();
 
         event_active(events->work_queue_event, 0, {});

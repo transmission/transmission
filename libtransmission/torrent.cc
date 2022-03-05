@@ -897,10 +897,8 @@ void tr_torrentChangeMyPort(tr_torrent* tor)
     }
 }
 
-static inline void tr_torrentManualUpdateImpl(void* vtor)
+static inline void tr_torrentManualUpdateImpl(tr_torrent* const tor)
 {
-    auto* tor = static_cast<tr_torrent*>(vtor);
-
     TR_ASSERT(tr_isTorrent(tor));
 
     if (tor->isRunning)
@@ -1321,9 +1319,8 @@ static void freeTorrent(tr_torrent* tor)
 
 static void torrentSetQueued(tr_torrent* tor, bool queued);
 
-static void torrentStartImpl(void* vtor)
+static void torrentStartImpl(tr_torrent* const tor)
 {
-    auto* tor = static_cast<tr_torrent*>(vtor);
     auto const lock = tor->unique_lock();
 
     TR_ASSERT(tr_isTorrent(tor));
@@ -1432,9 +1429,8 @@ void tr_torrentStartNow(tr_torrent* tor)
     }
 }
 
-static void onVerifyDoneThreadFunc(void* vtor)
+static void onVerifyDoneThreadFunc(tr_torrent* const tor)
 {
-    auto* const tor = static_cast<tr_torrent*>(vtor);
     TR_ASSERT(tr_amInEventThread(tor->session));
 
     if (tor->isDeleting)
@@ -1461,9 +1457,8 @@ static void onVerifyDone(tr_torrent* tor, bool aborted, void* /*unused*/)
     tr_runInEventThread(tor->session, onVerifyDoneThreadFunc, tor);
 }
 
-static void verifyTorrent(void* vtor)
+static void verifyTorrent(tr_torrent* const tor)
 {
-    auto* tor = static_cast<tr_torrent*>(vtor);
     TR_ASSERT(tr_amInEventThread(tor->session));
     auto const lock = tor->unique_lock();
 
@@ -1509,9 +1504,8 @@ void tr_torrentSave(tr_torrent* tor)
     }
 }
 
-static void stopTorrent(void* vtor)
+static void stopTorrent(tr_torrent* const tor)
 {
-    auto* tor = static_cast<tr_torrent*>(vtor);
     TR_ASSERT(tr_isTorrent(tor));
     TR_ASSERT(tr_amInEventThread(tor->session));
     auto const lock = tor->unique_lock();
@@ -1559,9 +1553,8 @@ void tr_torrentStop(tr_torrent* tor)
     tr_runInEventThread(tor->session, stopTorrent, tor);
 }
 
-static void closeTorrent(void* vtor)
+static void closeTorrent(tr_torrent* const tor)
 {
-    auto* const tor = static_cast<tr_torrent*>(vtor);
     TR_ASSERT(tr_isTorrent(tor));
     TR_ASSERT(tr_amInEventThread(tor->session));
 
@@ -1607,9 +1600,8 @@ struct remove_data
 
 static void tr_torrentDeleteLocalData(tr_torrent* /*tor*/, tr_fileFunc /*func*/);
 
-static void removeTorrent(void* vdata)
+static void removeTorrent(struct remove_data* const data)
 {
-    auto* const data = static_cast<struct remove_data*>(vdata);
     auto const lock = data->tor->unique_lock();
 
     if (data->deleteFlag)
@@ -2336,10 +2328,9 @@ struct LocationData
     bool move_from_old_location = false;
 };
 
-static void setLocationImpl(void* vdata)
+static void setLocationImpl(struct LocationData* const data)
 {
-    auto* data = static_cast<struct LocationData*>(vdata);
-    tr_torrent* tor = data->tor;
+    auto* const tor = data->tor;
     TR_ASSERT(tr_isTorrent(tor));
     auto const lock = tor->unique_lock();
 
@@ -2982,11 +2973,9 @@ struct rename_data
     void* callback_user_data;
 };
 
-static void torrentRenamePath(void* vdata)
+static void torrentRenamePath(struct rename_data* data)
 {
-    auto* data = static_cast<struct rename_data*>(vdata);
-    tr_torrent* const tor = data->tor;
-
+    auto* const tor = data->tor;
     TR_ASSERT(tr_isTorrent(tor));
 
     /***

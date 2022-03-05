@@ -295,25 +295,20 @@ public:
         return content_.get();
     }
 
-    static void write_block_func(void* vdata)
+    void write_block_func()
     {
-        auto* const data = static_cast<write_block_data*>(vdata);
-        auto* const webseed = data->webseed;
-        auto* const buf = data->content();
-
-        auto* const tor = tr_torrentFindFromId(data->session, data->torrent_id);
-        if (tor == nullptr)
+        auto* const buf = this->content();
+        auto* const tor = tr_torrentFindFromId(this->session, this->torrent_id);
+        if (tor != nullptr)
         {
-            delete data;
-            return;
+            auto const len = evbuffer_get_length(buf);
+            TR_ASSERT(tor->blockSize(this->loc.block) == len);
+            tr_cacheWriteBlock(tor->session->cache, tor, this->loc, len, buf);
+            webseed->publishGotBlock(tor, this->loc);
+            TR_ASSERT(evbuffer_get_length(buf) == 0);
         }
 
-        auto const len = evbuffer_get_length(buf);
-        TR_ASSERT(tor->blockSize(data->loc.block) == len);
-        tr_cacheWriteBlock(tor->session->cache, tor, data->loc, len, buf);
-        webseed->publishGotBlock(tor, data->loc);
-        TR_ASSERT(evbuffer_get_length(buf) == 0);
-        delete data;
+        delete this;
     }
 
 private:
@@ -352,7 +347,7 @@ void useFetchedBlocks(tr_webseed_task* task)
         {
             auto* const data = new write_block_data{ session, tor->uniqueId, webseed, task->loc };
             evbuffer_remove_buffer(task->content(), data->content(), block_size);
-            tr_runInEventThread(session, write_block_data::write_block_func, data);
+            tr_runInEventThread(session, &write_block_data::write_block_func, data);
         }
 
         task->loc = tor->byteLoc(task->loc.byte + block_size);
