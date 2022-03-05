@@ -24,11 +24,6 @@ class tr_peer;
 class tr_swarm;
 struct peer_atom;
 
-/* This is the maximum size of a block request.
-   most bittorrent clients will reject requests
-   larger than this size. */
-auto inline constexpr MAX_BLOCK_SIZE = 1024 * 16;
-
 /**
 ***  Peer Publish / Subscribe
 **/

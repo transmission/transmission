@@ -20,7 +20,6 @@
 #include "bandwidth.h"
 #include "log.h"
 #include "net.h"
-#include "peer-common.h" /* MAX_BLOCK_SIZE */
 #include "peer-io.h"
 #include "tr-assert.h"
 #include "tr-utp.h"
@@ -1007,7 +1006,7 @@ static unsigned int getDesiredOutputBufferSize(tr_peerIo const* io, uint64_t now
     unsigned int const currentSpeed_Bps = io->bandwidth->getPieceSpeedBytesPerSecond(now, TR_UP);
     unsigned int const period = 15U; /* arbitrary */
     /* the 3 is arbitrary; the .5 is to leave room for messages */
-    static auto const ceiling = (unsigned int)(MAX_BLOCK_SIZE * 3.5);
+    static auto const ceiling = (unsigned int)(tr_block_info::BlockSize * 3.5);
     return std::max(ceiling, currentSpeed_Bps * period);
 }
 
