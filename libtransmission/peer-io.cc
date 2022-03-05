@@ -853,10 +853,8 @@ static void io_close_socket(tr_peerIo* io)
     }
 }
 
-static void io_dtor(void* vio)
+static void io_dtor(tr_peerIo* const io)
 {
-    auto* io = static_cast<tr_peerIo*>(vio);
-
     TR_ASSERT(tr_isPeerIo(io));
     TR_ASSERT(tr_amInEventThread(io->session));
     TR_ASSERT(io->session->events != nullptr);

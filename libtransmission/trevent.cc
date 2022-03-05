@@ -263,7 +263,7 @@ bool tr_amInEventThread(tr_session const* session)
 ***
 **/
 
-void tr_runInEventThread(tr_session* session, void (*func)(void*), void* user_data)
+void tr_runInEventThread(tr_session* session, std::function<void(void)>&& func)
 {
     TR_ASSERT(tr_isSession(session));
     auto* events = session->events;
@@ -271,16 +271,12 @@ void tr_runInEventThread(tr_session* session, void (*func)(void*), void* user_da
 
     if (tr_amInEventThread(session))
     {
-        (*func)(user_data);
+        func();
     }
     else
     {
         auto lock = std::unique_lock(events->work_queue_mutex);
-        auto wrapper = std::function<void(void)>{ [func, user_data]()
-                                                  {
-                                                      func(user_data);
-                                                  } };
-        events->work_queue.emplace_back(std::move(wrapper));
+        events->work_queue.emplace_back(std::move(func));
         lock.unlock();
 
         event_active(events->work_queue_event, 0, {});

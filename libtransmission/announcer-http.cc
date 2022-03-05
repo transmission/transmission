@@ -27,7 +27,6 @@
 #include "peer-mgr.h" /* pex */
 #include "quark.h"
 #include "torrent.h"
-#include "trevent.h" /* tr_runInEventThread() */
 #include "utils.h"
 #include "web-utils.h"
 #include "web.h"

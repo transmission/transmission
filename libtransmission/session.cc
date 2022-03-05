@@ -161,18 +161,7 @@ void tr_session::WebMediator::notifyBandwidthConsumed(int torrent_id, size_t byt
 
 void tr_session::WebMediator::run(tr_web::FetchDoneFunc&& func, tr_web::FetchResponse&& response) const
 {
-    // marshall the `func` call into the libtransmission thread
-
-    using wrapper_t = std::pair<tr_web::FetchDoneFunc, tr_web::FetchResponse>;
-
-    auto constexpr callback = [](void* vwrapped)
-    {
-        auto* const wrapped = static_cast<wrapper_t*>(vwrapped);
-        wrapped->first(wrapped->second);
-        delete wrapped;
-    };
-
-    tr_runInEventThread(session_, callback, new wrapper_t{ func, std::move(response) });
+    tr_runInEventThread(session_, std::move(func), std::move(response));
 }
 
 void tr_sessionFetch(tr_session* session, tr_web::FetchOptions&& options)
@@ -589,8 +578,6 @@ static void onSaveTimer(evutil_socket_t /*fd*/, short /*what*/, void* vsession)
 ****
 ***/
 
-static void tr_sessionInitImpl(void* /*vdata*/);
-
 struct init_data
 {
     bool messageQueuingEnabled;
@@ -599,6 +586,8 @@ struct init_data
     tr_variant* clientSettings;
     std::condition_variable_any done_cv;
 };
+
+static void tr_sessionInitImpl(init_data* data);
 
 tr_session* tr_sessionInit(char const* config_dir, bool messageQueuingEnabled, tr_variant* clientSettings)
 {
@@ -705,9 +694,8 @@ static void onNowTimer(evutil_socket_t /*fd*/, short /*what*/, void* vsession)
 
 static void loadBlocklists(tr_session* session);
 
-static void tr_sessionInitImpl(void* vdata)
+static void tr_sessionInitImpl(init_data* data)
 {
-    auto* data = static_cast<struct init_data*>(vdata);
     tr_variant const* const clientSettings = data->clientSettings;
     tr_session* session = data->session;
 
@@ -781,11 +769,10 @@ static void tr_sessionInitImpl(void* vdata)
 static void turtleBootstrap(tr_session* /*session*/, struct tr_turtle_info* /*turtle*/);
 static void setPeerPort(tr_session* session, tr_port port);
 
-static void sessionSetImpl(void* vdata)
+static void sessionSetImpl(struct init_data* const data)
 {
-    auto* data = static_cast<struct init_data*>(vdata);
-    tr_session* session = data->session;
-    tr_variant* settings = data->clientSettings;
+    tr_session* const session = data->session;
+    tr_variant* const settings = data->clientSettings;
 
     TR_ASSERT(tr_isSession(session));
     TR_ASSERT(tr_variantIsDict(settings));
@@ -1232,9 +1219,8 @@ bool tr_sessionIsIncompleteDirEnabled(tr_session const* session)
 ****  Peer Port
 ***/
 
-static void peerPortChanged(void* vsession)
+static void peerPortChanged(tr_session* const session)
 {
-    auto* session = static_cast<tr_session*>(vsession);
     TR_ASSERT(tr_isSession(session));
 
     close_incoming_peer_port(session);
@@ -1441,10 +1427,8 @@ static void turtleUpdateTable(struct tr_turtle_info* t)
     }
 }
 
-static void altSpeedToggled(void* vsession)
+static void altSpeedToggled(tr_session* const session)
 {
-    auto* session = static_cast<tr_session*>(vsession);
-
     TR_ASSERT(tr_isSession(session));
 
     updateBandwidth(session, TR_UP);
@@ -1932,10 +1916,8 @@ static void sessionCloseImplFinish(tr_session* session)
     session->isClosed = true;
 }
 
-static void sessionCloseImpl(void* vsession)
+static void sessionCloseImpl(tr_session* const session)
 {
-    auto* session = static_cast<tr_session*>(vsession);
-
     TR_ASSERT(tr_isSession(session));
 
     sessionCloseImplStart(session);
@@ -2028,9 +2010,8 @@ struct sessionLoadTorrentsData
     bool done;
 };
 
-static void sessionLoadTorrents(void* vdata)
+static void sessionLoadTorrents(struct sessionLoadTorrentsData* const data)
 {
-    auto* data = static_cast<struct sessionLoadTorrentsData*>(vdata);
     TR_ASSERT(tr_isSession(data->session));
 
     tr_sys_path_info info;
@@ -2143,10 +2124,8 @@ bool tr_sessionIsDHTEnabled(tr_session const* session)
     return session->isDHTEnabled;
 }
 
-static void toggleDHTImpl(void* vsession)
+static void toggleDHTImpl(tr_session* const session)
 {
-    auto* session = static_cast<tr_session*>(vsession);
-
     TR_ASSERT(tr_isSession(session));
 
     tr_udpUninit(session);
@@ -2179,10 +2158,8 @@ bool tr_sessionIsUTPEnabled(tr_session const* session)
 #endif
 }
 
-static void toggle_utp(void* vsession)
+static void toggle_utp(tr_session* const session)
 {
-    auto* session = static_cast<tr_session*>(vsession);
-
     TR_ASSERT(tr_isSession(session));
 
     session->isUTPEnabled = !session->isUTPEnabled;
@@ -2209,10 +2186,8 @@ void tr_sessionSetUTPEnabled(tr_session* session, bool enabled)
 ****
 ***/
 
-static void toggleLPDImpl(void* vsession)
+static void toggleLPDImpl(tr_session* const session)
 {
-    auto* session = static_cast<tr_session*>(vsession);
-
     TR_ASSERT(tr_isSession(session));
 
     if (session->isLPDEnabled)
@@ -2309,9 +2284,8 @@ struct port_forwarding_data
     struct tr_shared* shared;
 };
 
-static void setPortForwardingEnabled(void* vdata)
+static void setPortForwardingEnabled(struct port_forwarding_data* const data)
 {
-    auto* data = static_cast<struct port_forwarding_data*>(vdata);
     tr_sharedTraversalEnable(data->shared, data->enabled);
     tr_free(data);
 }

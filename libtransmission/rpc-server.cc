@@ -703,11 +703,11 @@ static bool bindUnixSocket(
 #endif
 }
 
-static void startServer(void* vserver);
+static void startServer(tr_rpc_server* server);
 
 static void rpc_server_on_start_retry(evutil_socket_t /*fd*/, short /*type*/, void* context)
 {
-    startServer(context);
+    startServer(static_cast<tr_rpc_server*>(context));
 }
 
 static int rpc_server_start_retry(tr_rpc_server* server)
@@ -737,10 +737,8 @@ static void rpc_server_start_retry_cancel(tr_rpc_server* server)
     server->start_retry_counter = 0;
 }
 
-static void startServer(void* vserver)
+static void startServer(tr_rpc_server* server)
 {
-    auto* server = static_cast<tr_rpc_server*>(vserver);
-
     if (server->httpd != nullptr)
     {
         return;
@@ -816,10 +814,8 @@ static void stopServer(tr_rpc_server* server)
     tr_logAddNamedDbg(MyName, "Stopped listening on %s", tr_rpc_address_with_port(server).c_str());
 }
 
-static void onEnabledChanged(void* vserver)
+static void onEnabledChanged(tr_rpc_server* const server)
 {
-    auto* server = static_cast<tr_rpc_server*>(vserver);
-
     if (!server->isEnabled)
     {
         stopServer(server);
@@ -842,10 +838,8 @@ bool tr_rpcIsEnabled(tr_rpc_server const* server)
     return server->isEnabled;
 }
 
-static void restartServer(void* vserver)
+static void restartServer(tr_rpc_server* const server)
 {
-    auto* server = static_cast<tr_rpc_server*>(vserver);
-
     if (server->isEnabled)
     {
         stopServer(server);
