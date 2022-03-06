@@ -744,18 +744,19 @@ bool tr_sessionIsScriptEnabled(tr_session const*, TrScript);
 
 enum tr_log_level
 {
-    TR_LOG_SILENT = 0,
-    TR_LOG_ERROR = 1,
-    TR_LOG_INFO = 2,
-    TR_LOG_DEBUG = 3,
-    TR_LOG_FIREHOSE = 4
+    TR_LOG_OFF,
+    TR_LOG_CRITICAL,
+    TR_LOG_ERROR,
+    TR_LOG_WARN,
+    TR_LOG_INFO,
+    TR_LOG_DEBUG,
+    TR_LOG_TRACE
 };
 
 void tr_logSetLevel(tr_log_level);
 
 struct tr_log_message
 {
-    /* TR_LOG_ERROR, TR_LOG_INFO, or TR_LOG_DEBUG */
     tr_log_level level;
 
     /* The line number in the source file where this message originated */

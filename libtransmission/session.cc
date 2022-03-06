@@ -25,6 +25,8 @@
 #include <sys/stat.h> /* umask() */
 #endif
 
+#include <fmt/core.h>
+
 #include <event2/event.h>
 
 #include "transmission.h"
@@ -75,7 +77,14 @@ static auto constexpr DefaultPrefetchEnabled = bool{ true };
 #endif
 static auto constexpr SaveIntervalSecs = int{ 360 };
 
-#define dbgmsg(...) tr_logAddDeepNamed(nullptr, __VA_ARGS__)
+#define dbgmsg(msg) \
+    do \
+    { \
+        if (tr_log::debug::enabled()) \
+        { \
+            tr_log::debug::add(TR_LOC, msg); \
+        } \
+    } while (0)
 
 static tr_port getRandomPort(tr_session const* s)
 {
@@ -561,7 +570,7 @@ static void onSaveTimer(evutil_socket_t /*fd*/, short /*what*/, void* vsession)
 
     if (tr_cacheFlushDone(session->cache) != 0)
     {
-        tr_logAddError("Error while flushing completed pieces from cache");
+        tr_log::error::add(TR_LOC, "Error while flushing completed pieces from cache");
     }
 
     for (auto* const tor : session->torrents())
@@ -702,8 +711,6 @@ static void tr_sessionInitImpl(init_data* data)
     TR_ASSERT(tr_amInEventThread(session));
     TR_ASSERT(tr_variantIsDict(clientSettings));
 
-    dbgmsg("tr_sessionInit: the session's top-level bandwidth object is %p", (void*)&session->bandwidth);
-
     tr_variant settings;
 
     tr_variantInitDict(&settings, 0);
@@ -744,9 +751,10 @@ static void tr_sessionInitImpl(init_data* data)
 
     tr_announcerInit(session);
 
-    /* first %s is the application name
-       second %s is the version number */
-    tr_logAddInfo(_("%s %s started"), TR_NAME, LONG_VERSION_STRING);
+    if (tr_log::info::enabled())
+    {
+        tr_log::info::add(TR_LOC, fmt::format("{0} {1} started", TR_NAME, LONG_VERSION_STRING));
+    }
 
     tr_statsInit(session);
 
@@ -1489,7 +1497,11 @@ static void turtleCheckClock(tr_session* s, struct tr_turtle_info* t)
 
     if (!alreadySwitched)
     {
-        tr_logAddInfo("Time to turn %s turtle mode!", enabled ? "on" : "off");
+        tr_log::info::add(
+            TR_LOC,
+            enabled ? "Turning on alt speed limits due to time scheduling" :
+                      "Turning off alt speed limits due to time scheduling");
+
         t->autoTurtleState = newAutoTurtleState;
         useAltSpeed(s, t, enabled, false);
     }
@@ -1600,7 +1612,7 @@ unsigned int tr_sessionGetAltSpeed_KBps(tr_session const* s, tr_direction d)
 
 static void userPokedTheClock(tr_session* s, struct tr_turtle_info* t)
 {
-    tr_logAddDebug("Refreshing the turtle mode clock due to user changes");
+    dbgmsg("Refreshing the turtle mode clock due to user changes");
 
     t->autoTurtleState = TR_AUTO_SWITCH_UNUSED;
 
@@ -1936,11 +1948,11 @@ void tr_sessionClose(tr_session* session)
 
     time_t const deadline = time(nullptr) + ShutdownMaxSeconds;
 
-    dbgmsg(
-        "shutting down transmission session %p... now is %zu, deadline is %zu",
-        (void*)session,
-        (size_t)time(nullptr),
-        (size_t)deadline);
+    dbgmsg(fmt::format(
+        "shutting down transmission session {0}... now is {1} deadline is {2}",
+        static_cast<void*>(session),
+        time(nullptr),
+        deadline));
 
     /* close the session */
     tr_runInEventThread(session, sessionCloseImpl, session);
@@ -1959,12 +1971,13 @@ void tr_sessionClose(tr_session* session)
             session->announcer_udp != nullptr) &&
            !deadlineReached(deadline))
     {
-        dbgmsg(
-            "waiting on port unmap (%p) or announcer (%p)... now %zu deadline %zu",
-            (void*)session->shared,
-            (void*)session->announcer,
-            (size_t)time(nullptr),
-            (size_t)deadline);
+        dbgmsg(fmt::format(
+            "waiting on port unmap ({0}) or announcer ({1})... now {2} deadline {3}",
+            static_cast<void*>(session->shared),
+            static_cast<void*>(session->announcer),
+            time(nullptr),
+            deadline));
+
         tr_wait_msec(50);
     }
 
@@ -1976,7 +1989,9 @@ void tr_sessionClose(tr_session* session)
     while (session->events != nullptr)
     {
         static bool forced = false;
-        dbgmsg("waiting for libtransmission thread to finish... now %zu deadline %zu", (size_t)time(nullptr), (size_t)deadline);
+
+        dbgmsg(fmt::format("waiting for libtransmission thread to finish... now {0} deadline {1}", time(nullptr), deadline));
+
         tr_wait_msec(10);
 
         if (deadlineReached(deadline) && !forced)
@@ -1988,7 +2003,7 @@ void tr_sessionClose(tr_session* session)
 
         if (deadlineReached(deadline + 3))
         {
-            dbgmsg("deadline+3 reached... calling break...\n");
+            dbgmsg("deadline=3 reached... calling break...");
             break;
         }
     }
@@ -2063,7 +2078,7 @@ static void sessionLoadTorrents(struct sessionLoadTorrentsData* const data)
 
     if (n != 0)
     {
-        tr_logAddInfo(_("Loaded %d torrents"), n);
+        tr_log::info::add(TR_LOC, fmt::format("Loaded {0} torrents", n));
     }
 
     if (data->setmeCount != nullptr)

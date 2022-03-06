@@ -215,6 +215,7 @@ endif()
 
 add_definitions(
     -D__TRANSMISSION__
+    -DFMT_HEADER_ONLY
     "-DPACKAGE_DATA_DIR=\"${CMAKE_INSTALL_FULL_DATAROOTDIR}\""
     ${NATPMP_DEFINITIONS}
     ${MINIUPNPC_DEFINITIONS}
@@ -256,6 +257,7 @@ include_directories(
 
 include_directories(
     SYSTEM
+    ${LIBFMT_INCLUDE_DIRS}
     ${UTFCPP_INCLUDE_DIRS}
     ${DEFLATE_INCLUDE_DIRS}
     ${CRYPTO_INCLUDE_DIRS}

@@ -146,6 +146,7 @@ if(WIN32)
     endforeach()
 endif()
 
+find_package(Fmt)
 find_package(UtfCpp)
 find_package(Threads)
 find_package(PkgConfig QUIET)

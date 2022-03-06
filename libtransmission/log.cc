@@ -312,3 +312,9 @@ void tr_logAddMessage(
 
     errno = err;
 }
+
+void tr_logAddMessage(char const* file, int line, tr_log_level level, std::string_view name, std::string_view msg)
+{
+    // FIXME: the two temporary strings here are warty
+    tr_logAddMessage(file, line, level, std::string{ name }.c_str(), "%s", std::string{ msg }.c_str());
+}

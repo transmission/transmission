@@ -31,6 +31,8 @@
 #include <xlocale.h>
 #endif
 
+#include "fmt/core.h"
+
 #include <event2/buffer.h>
 
 #define LIBTRANSMISSION_VARIANT_MODULE
@@ -968,7 +970,7 @@ void tr_variantWalk(tr_variant const* v_in, struct VariantWalkFuncs const* walkF
 
             default:
                 /* did caller give us an uninitialized val? */
-                tr_logAddError("%s", _("Invalid metadata"));
+                tr_log::error::add(TR_LOC, "Invalid metadata");
                 break;
             }
         }
@@ -1056,7 +1058,7 @@ static void tr_variantListCopy(tr_variant* target, tr_variant const* src)
         }
         else
         {
-            tr_logAddError("tr_variantListCopy skipping item");
+            tr_log::error::add(TR_LOC, "tr_variantListCopy skipping item");
         }
 
         ++i;
@@ -1159,7 +1161,7 @@ void tr_variantMergeDicts(tr_variant* target, tr_variant const* source)
             }
             else
             {
-                tr_logAddDebug("tr_variantMergeDicts skipping \"%s\"", tr_quark_get_string(key));
+                tr_log::debug::add(TR_LOC, fmt::format("tr_variantMergeDicts skipping '{0}'", tr_quark_get_string(key)));
             }
         }
     }
@@ -1213,7 +1215,10 @@ int tr_variantToFile(tr_variant const* v, tr_variant_fmt fmt, std::string const&
     tr_saveFile(filename, { std::data(contents), std::size(contents) }, &error);
     if (error != nullptr)
     {
-        tr_logAddError(_("Error saving \"%" TR_PRIsv "\": %s (%d)"), TR_PRIsv_ARG(filename), error->message, error->code);
+        tr_log::error::add(TR_LOC, fmt::format("Error saving '{filename}': {message} ({code})",
+            fmt::arg("filename", filename),
+            fmt::arg("message", error->message),
+            fmt::arg("code", error->code)));
         error_code = error->code;
         tr_error_clear(&error);
     }

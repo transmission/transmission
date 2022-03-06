@@ -39,3 +39,6 @@
 	path = third-party/libpsl
 	url = https://github.com/transmission/libpsl.git
 	branch = post-3.0.0-transmission
+[submodule "third-party/fmt"]
+	path = third-party/fmt
+	url = https://github.com/transmission/fmt.git
