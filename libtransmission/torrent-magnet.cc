@@ -9,6 +9,8 @@
 #include <string>
 #include <string_view>
 
+#include <fmt/core.h>
+
 #include <event2/buffer.h>
 
 #include "transmission.h"
@@ -29,7 +31,14 @@
 
 using namespace std::literals;
 
-#define dbgmsg(tor, ...) tr_logAddDeepNamed(tr_torrentName(tor), __VA_ARGS__)
+#define dbgmsg(tor, msg) \
+    do \
+    { \
+        if (tr_log::debug::enabled()) \
+        { \
+            tr_log::debug::add(TR_LOC, msg, tr_torrentName(tor)); \
+        } \
+    } while (0)
 
 /***
 ****
@@ -76,7 +85,7 @@ bool tr_torrentSetMetadataSizeHint(tr_torrent* tor, int64_t size)
 
     int const n = (size <= 0 || size > INT_MAX) ? -1 : size / METADATA_PIECE_SIZE + (size % METADATA_PIECE_SIZE != 0 ? 1 : 0);
 
-    dbgmsg(tor, "metadata is %" PRId64 " bytes in %d pieces", size, n);
+    dbgmsg(tor, fmt::format("metadata is {0} bytes in {1} pieces", size, n));
 
     if (n <= 0)
     {
@@ -311,7 +320,7 @@ static void onHaveAllMetainfo(tr_torrent* tor, tr_incomplete_metadata* m)
 
         m->piecesNeededCount = n;
         char const* const msg = error != nullptr && error->message != nullptr ? error->message : "unknown error";
-        dbgmsg(tor, "metadata error: %s. (trying again; %d pieces left)", msg, n);
+        dbgmsg(tor, fmt::format("metadata error: {0}. (trying again; {1} pieces left)", msg, n));
         tr_error_clear(&error);
     }
 }
@@ -322,7 +331,7 @@ void tr_torrentSetMetadataPiece(tr_torrent* tor, int piece, void const* data, in
     TR_ASSERT(data != nullptr);
     TR_ASSERT(len >= 0);
 
-    dbgmsg(tor, "got metadata piece %d of %d bytes", piece, len);
+    dbgmsg(tor, fmt::format("got metadata piece {0} of {1} bytes", piece, len));
 
     // are we set up to download metadata?
     tr_incomplete_metadata* const m = tor->incompleteMetadata;
@@ -356,12 +365,12 @@ void tr_torrentSetMetadataPiece(tr_torrent* tor, int piece, void const* data, in
     tr_removeElementFromArray(m->piecesNeeded, idx, sizeof(struct metadata_node), m->piecesNeededCount);
     --m->piecesNeededCount;
 
-    dbgmsg(tor, "saving metainfo piece %d... %d remain", piece, m->piecesNeededCount);
+    dbgmsg(tor, fmt::format("saving metainfo piece {0}... {1} remain", piece, m->piecesNeededCount));
 
     /* are we done? */
     if (m->piecesNeededCount == 0)
     {
-        dbgmsg(tor, "metainfo piece %d was the last one", piece);
+        dbgmsg(tor, fmt::format("metainfo piece {0} was the last one", piece));
         onHaveAllMetainfo(tor, m);
     }
 }
@@ -382,7 +391,7 @@ bool tr_torrentGetNextMetadataRequest(tr_torrent* tor, time_t now, int* setme_pi
         m->piecesNeeded[i].piece = piece;
         m->piecesNeeded[i].requestedAt = now;
 
-        dbgmsg(tor, "next piece to request: %d", piece);
+        dbgmsg(tor, fmt::format("next piece to request: {0}", piece));
         *setme_piece = piece;
         have_request = true;
     }

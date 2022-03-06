@@ -318,11 +318,12 @@ tr_port_forwarding tr_upnpPulse(tr_upnp* handle, tr_port port, bool isEnabled, b
         tr_upnpDeletePortMapping(handle, "TCP", handle->port);
         tr_upnpDeletePortMapping(handle, "UDP", handle->port);
 
-        tr_logAddNamedInfo(
-            Key,
-            _("Stopping port forwarding through \"%s\", service \"%s\""),
-            handle->urls.controlURL,
-            handle->data.first.servicetype);
+        tr_log::info::add(
+            TR_LOC,
+            fmt::format(
+                "Stopping port forwarding through '{}', service '{}')",
+                handle->urls.controlURL,
+                handle->data.first.servicetype));
 
         handle->isMapped = false;
         handle->state = UpnpState::IDLE;
@@ -344,12 +345,9 @@ tr_port_forwarding tr_upnpPulse(tr_upnp* handle, tr_port port, bool isEnabled, b
         }
         else
         {
-            char desc[64];
-            tr_snprintf(desc, sizeof(desc), "%s at %d", TR_NAME, port);
-
-            int const err_tcp = tr_upnpAddPortMapping(handle, "TCP", port, desc);
-            int const err_udp = tr_upnpAddPortMapping(handle, "UDP", port, desc);
-
+            auto const desc = fmt::format("{} at {}", TR_NAME, port);
+            int const err_tcp = tr_upnpAddPortMapping(handle, "TCP", port, desc.c_str());
+            int const err_udp = tr_upnpAddPortMapping(handle, "UDP", port, desc.c_str());
             handle->isMapped = err_tcp == 0 || err_udp == 0;
         }
 
