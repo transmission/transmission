@@ -22,6 +22,8 @@
 
 #include <event2/buffer.h>
 
+#include <fmt/core.h>
+
 #include "crypto-utils.h"
 #include "log.h"
 #include "tr-assert.h"
@@ -34,7 +36,25 @@ using namespace std::literals;
 #define USE_LIBCURL_SOCKOPT
 #endif
 
-#define dbgmsg(...) tr_logAddDeepNamed("web", __VA_ARGS__)
+static char constexpr CodeName[] = "web";
+
+#define loginfo(msg) \
+    do \
+    { \
+        if (tr_log::info::enabled()) \
+        { \
+            tr_log::info::add(TR_LOC, msg, CodeName); \
+        } \
+    } while (0)
+
+#define logtrace(msg) \
+    do \
+    { \
+        if (tr_log::trace::enabled()) \
+        { \
+            tr_log::trace::add(TR_LOC, msg, CodeName); \
+        } \
+    } while (0)
 
 /***
 ****
@@ -115,12 +135,13 @@ public:
             tr_free(bundle);
         }
 
-        if (curl_ssl_verify)
+        if (curl_ssl_verify && tr_log::info::enabled())
         {
             auto const* bundle = std::empty(curl_ca_bundle) ? "none" : curl_ca_bundle.c_str();
-            tr_logAddNamedInfo("web", "will verify tracker certs using envvar CURL_CA_BUNDLE: %s", bundle);
-            tr_logAddNamedInfo("web", "NB: this only works if you built against libcurl with openssl or gnutls, NOT nss");
-            tr_logAddNamedInfo("web", "NB: Invalid certs will appear as 'Could not connect to tracker' like many other errors");
+            loginfo(
+                fmt::format(_("Will verify tracker certs using envvar CURL_CA_BUNDLE: '{text}'"), fmt::arg("text", bundle)));
+            loginfo(_("NB: this only works if you built against libcurl with openssl or gnutls, NOT nss"));
+            loginfo(_("NB: Invalid certs will appear as 'Could not connect to tracker' like many other errors"));
         }
 
         if (auto const& file = mediator.cookieFile(); file)
@@ -290,7 +311,7 @@ private:
         }
 
         evbuffer_add(task->body(), data, bytes_used);
-        dbgmsg("wrote %zu bytes to task %p's buffer", bytes_used, (void*)task);
+        logtrace(fmt::format("wrote {} bytes to task {}'s buffer", bytes_used, fmt::ptr(task)));
         return bytes_used;
     }
 
@@ -456,7 +477,7 @@ private:
                 // add queued tasks
                 for (auto* task : impl->queued_tasks)
                 {
-                    dbgmsg("adding task to curl: [%s]", task->url().c_str());
+                    logtrace(fmt::format("adding task to curl: '{}'", task->url()));
                     initEasy(impl, task);
                     curl_multi_add_handle(multi.get(), task->easy());
                 }
