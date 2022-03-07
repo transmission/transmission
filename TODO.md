@@ -1,0 +1,50 @@
+- [ ] conversion
+  - [ ] utils/remote.cc
+  - [ ] macosx/Torrent.mm
+  - [ ] daemon/daemon-win32.cc
+  - [ ] libtransmission/makemeta.cc
+  - [ ] libtransmission/watchdir-win32.cc
+  - [ ] libtransmission/crypto-utils-ccrypto.cc
+  - [ ] libtransmission/cache.cc
+  - [ ] libtransmission/net.cc
+  - [ ] libtransmission/tr-lpd.cc
+  - [ ] libtransmission/trevent.cc
+  - [ ] libtransmission/watchdir-kqueue.cc
+  - [ ] libtransmission/peer-mgr.cc
+  - [ ] libtransmission/crypto-utils-polarssl.cc
+  - [ ] libtransmission/session-id.cc
+  - [x] libtransmission/announcer-http.cc
+  - [ ] libtransmission/watchdir.cc
+  - [ ] libtransmission/natpmp.cc
+  - [ ] libtransmission/inout.cc
+  - [ ] libtransmission/watchdir-inotify.cc
+  - [ ] libtransmission/web.cc
+  - [ ] libtransmission/rpcimpl.cc
+  - [ ] libtransmission/port-forwarding.cc
+  - [ ] libtransmission/blocklist.cc
+  - [ ] libtransmission/crypto-utils-cyassl.cc
+  - [ ] libtransmission/torrent-metainfo.cc
+  - [ ] libtransmission/log.h
+  - [ ] libtransmission/watchdir-generic.cc
+  - [ ] libtransmission/crypto-utils-openssl.cc
+  - [ ] gtk/Session.cc
+  - [ ] libtransmission/log.cc
+  - [ ] daemon/daemon.cc
+
+- [ ] migrate all 'dbgmsg' macros
+- [ ] ensure log::info strings are marked for translation using \_()
+- [ ] ensure log::info strings use fmt::arg
+- [ ] ensure log::warn strings are marked for translation using \_()
+- [ ] ensure log::warn strings use fmt::arg
+- [ ] ensure log::error strings are marked for translation using \_()
+- [ ] ensure log::error strings use fmt::arg
+- [ ] ensure log::critical strings are marked for translation using \_()
+- [ ] ensure log::critical strings use fmt::arg
+- [ ] ensure no '%' format strings
+- [ ] remove deep logging code
+- [ ] remove old log API
+- [ ] ensure no excess copies of strings are being made
+- [ ] consider && in log API?
+- [ ] ensure all log messages are the correct logging level
+- [ ] is TR_PRIsv_ARG still needed or can it be removed
+- [ ] mac xcode
