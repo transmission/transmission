@@ -9,9 +9,12 @@
 
 #include <event2/event.h>
 
+#include <fmt/core.h>
+
 #define LIBTRANSMISSION_WATCHDIR_MODULE
 
 #include "transmission.h"
+
 #include "log.h"
 #include "tr-assert.h"
 #include "utils.h"
@@ -22,9 +25,14 @@
 ****
 ***/
 
-#define log_error(...) \
-    (!tr_logLevelIsActive(TR_LOG_ERROR) ? (void)0 : \
-                                          tr_logAddMessage(__FILE__, __LINE__, TR_LOG_ERROR, "watchdir:generic", __VA_ARGS__))
+#define logerr(msg) \
+    do \
+    { \
+        if (tr_log::error::enabled()) \
+        { \
+            tr_log::error::add(TR_LOC, msg, "watchdir:generic"); \
+        } \
+    } while (0)
 
 /***
 ****
@@ -84,13 +92,21 @@ tr_watchdir_backend* tr_watchdir_generic_new(tr_watchdir_t handle)
              ->event = event_new(tr_watchdir_get_event_base(handle), -1, EV_PERSIST, &tr_watchdir_generic_on_event, handle)) ==
         nullptr)
     {
-        log_error("Failed to create event: %s", tr_strerror(errno));
+        auto const errcode = errno;
+        logerr(fmt::format(
+            _("Failed to create event: {errmsg} ({errcode})"),
+            fmt::arg("errmsg", tr_strerror(errcode)),
+            fmt::arg("errcode", errcode)));
         goto FAIL;
     }
 
     if (event_add(backend->event, &tr_watchdir_generic_interval) == -1)
     {
-        log_error("Failed to add event: %s", tr_strerror(errno));
+        auto const errcode = errno;
+        logerr(fmt::format(
+            _("Failed to add event: {errmsg} ({errcode})"),
+            fmt::arg("errmsg", tr_strerror(errcode)),
+            fmt::arg("errcode", errcode)));
         goto FAIL;
     }
 

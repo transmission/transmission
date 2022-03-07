@@ -22,7 +22,7 @@
   - [ ] libtransmission/torrent-metainfo.cc
   - [ ] libtransmission/tr-lpd.cc
   - [ ] libtransmission/trevent.cc
-  - [ ] libtransmission/watchdir-generic.cc
+  - [x] libtransmission/watchdir-generic.cc
   - [ ] libtransmission/watchdir-inotify.cc
   - [ ] libtransmission/watchdir-kqueue.cc
   - [ ] libtransmission/watchdir-win32.cc
