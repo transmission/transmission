@@ -309,7 +309,7 @@ tr_port_forwarding tr_upnpPulse(tr_upnp* handle, tr_port port, bool isEnabled, b
         ((tr_upnpGetSpecificPortMappingEntry(handle, "TCP") != UPNPCOMMAND_SUCCESS) ||
          (tr_upnpGetSpecificPortMappingEntry(handle, "UDP") != UPNPCOMMAND_SUCCESS)))
     {
-        tr_logAddNamedInfo(Key, _("Port %d isn't forwarded"), handle->port);
+        tr_log::warn::add(TR_LOC, fmt::format(_("Port {0} isn't forwarded"), handle->port), Key);
         handle->isMapped = false;
     }
 
