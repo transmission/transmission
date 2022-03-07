@@ -1161,7 +1161,7 @@ void tr_variantMergeDicts(tr_variant* target, tr_variant const* source)
             }
             else
             {
-                tr_log::debug::add(TR_LOC, fmt::format("tr_variantMergeDicts skipping '{0}'", tr_quark_get_string(key)));
+                tr_log::debug::add(TR_LOC, fmt::format("tr_variantMergeDicts skipping '{}'", tr_quark_get_string(key)));
             }
         }
     }

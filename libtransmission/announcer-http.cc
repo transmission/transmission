@@ -324,12 +324,12 @@ static void onAnnounceDone(tr_web::FetchResponse const& web_response)
 
     if (!std::empty(response->pex6))
     {
-        logtrace(data->log_name, fmt::format("got a peers6 length of {0}", std::size(response->pex6)));
+        logtrace(data->log_name, fmt::format("got a peers6 length of {}", std::size(response->pex6)));
     }
 
     if (!std::empty(response->pex))
     {
-        logtrace(data->log_name, fmt::format("got a peers length of {0}", std::size(response->pex)));
+        logtrace(data->log_name, fmt::format("got a peers length of {}", std::size(response->pex)));
     }
 
     if (data->response_func != nullptr)
@@ -353,7 +353,7 @@ void tr_tracker_http_announce(
     tr_strlcpy(d->log_name, request->log_name, sizeof(d->log_name));
 
     auto const url = announce_url_new(session, request);
-    logtrace(request->log_name, fmt::format("Sending announce to libcurl: '{0}'", url));
+    logtrace(request->log_name, fmt::format("Sending announce to libcurl: '{}'", url));
 
     auto options = tr_web::FetchOptions{ url, onAnnounceDone, d };
     options.timeout_secs = 90L;
@@ -484,7 +484,7 @@ static void onScrapeDone(tr_web::FetchResponse const& web_response)
     response.did_timeout = did_timeout;
 
     auto const scrape_url_sv = response.scrape_url.sv();
-    logtrace(data->log_name, fmt::format("Got scrape response for '{0}'", scrape_url_sv));
+    logtrace(data->log_name, fmt::format("Got scrape response for '{}'", scrape_url_sv));
 
     if (status != HTTP_OK)
     {
@@ -546,7 +546,7 @@ void tr_tracker_http_scrape(
     tr_strlcpy(d->log_name, request->log_name, sizeof(d->log_name));
 
     auto const url = scrape_url_new(request);
-    logtrace(request->log_name, fmt::format("Sending scrape to libcurl: '{0}'", url));
+    logtrace(request->log_name, fmt::format("Sending scrape to libcurl: '{}'", url));
 
     auto options = tr_web::FetchOptions{ url, onScrapeDone, d };
     options.timeout_secs = 30L;

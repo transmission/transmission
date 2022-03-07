@@ -555,7 +555,7 @@ static void onTrackerResponse(tr_torrent* tor, tr_tracker_event const* event, vo
     switch (event->messageType)
     {
     case TR_TRACKER_PEERS:
-        logdbg(tor, fmt::format("Got {0} peers from tracker", std::size(event->pex)));
+        logdbg(tor, fmt::format("Got {} peers from tracker", std::size(event->pex)));
         tr_peerMgrAddPex(tor, TR_PEER_FROM_TRACKER, std::data(event->pex), std::size(event->pex));
         break;
 
@@ -568,7 +568,7 @@ static void onTrackerResponse(tr_torrent* tor, tr_tracker_event const* event, vo
         break;
 
     case TR_TRACKER_WARNING:
-        logwarn(tor, fmt::format("Tracker warning: '{0}'", event->text));
+        logwarn(tor, fmt::format(_("Tracker warning: '{errmsg}'"), fmt::arg("errmsg", event->text)));
         tor->error = TR_STAT_TRACKER_WARNING;
         tor->error_announce_url = event->announce_url;
         tor->error_string = event->text;
@@ -1805,13 +1805,19 @@ static void torrentCallScript(tr_torrent const* tor, char const* script)
         { "TR_TORRENT_TRACKERS"sv, trackers_str },
     };
 
-    loginfo(tor, fmt::format(_("Calling script '{0}'"), script));
+    loginfo(tor, fmt::format(_("Calling script '{filename}'"), fmt::arg("filename", script)));
 
     tr_error* error = nullptr;
 
     if (!tr_spawn_async(std::data(cmd), env, TR_IF_WIN32("\\", "/"), &error))
     {
-        logerr(tor, fmt::format(_("Error executing script '{0}': {1} ({2})"), script, error->message, error->code));
+        logerr(
+            tor,
+            fmt::format(
+                _("Error executing script '{filename}': {errmsg} ({errcode})"),
+                fmt::arg("filename", script),
+                fmt::arg("errmsg", error->message),
+                fmt::arg("errcode", error->code)));
         tr_error_free(error);
     }
 }
@@ -1833,9 +1839,9 @@ void tr_torrent::recheckCompleteness()
             loginfo(
                 this,
                 fmt::format(
-                    _("State changed from '{0}' to '{1}'"),
-                    getCompletionString(this->completeness),
-                    getCompletionString(completeness)));
+                    _("State changed from '{oldstate}' to '{state}'"),
+                    fmt::arg("oldstate", getCompletionString(this->completeness)),
+                    fmt::arg("state", getCompletionString(completeness))));
         }
 
         this->completeness = new_completeness;
@@ -2007,7 +2013,7 @@ bool tr_torrentReqIsValid(tr_torrent const* tor, tr_piece_index_t index, uint32_
 
     if (err != 0)
     {
-        logdbg(tor, fmt::format("index {0} offset {1} length {2} err {3}", index, offset, length, err));
+        logdbg(tor, fmt::format("index {} offset {} length {} err {}", index, offset, length, err));
     }
 
     return err == 0;
@@ -2037,7 +2043,7 @@ tr_block_span_t tr_torGetFileBlockSpan(tr_torrent const* tor, tr_file_index_t i)
 bool tr_torrent::checkPiece(tr_piece_index_t piece)
 {
     bool const pass = tr_ioTestPiece(this, piece);
-    logdbg(this, fmt::format("[LAZY] tr_torrent.checkPiece tested piece {0}, pass=={1}", piece, pass));
+    logdbg(this, fmt::format("[LAZY] tr_torrent.checkPiece tested piece {}, pass=={}", piece, pass));
     return pass;
 }
 
@@ -2370,7 +2376,12 @@ static void setLocationImpl(struct LocationData* const data)
     auto const& location = data->location;
     double bytesHandled = 0;
 
-    loginfo(tor, fmt::format(_("Moving files from '{1}' to '{2}'"), tor->currentDir().c_str(), location.c_str()));
+    loginfo(
+        tor,
+        fmt::format(
+            _("Moving files from '{oldpath}' to '{path}'"),
+            fmt::arg("oldpath", tor->currentDir()),
+            fmt::arg("path", location)));
 
     tr_sys_dir_create(location.c_str(), TR_SYS_DIR_CREATE_PARENTS, 0777, nullptr);
 
@@ -2393,18 +2404,30 @@ static void setLocationImpl(struct LocationData* const data)
                 auto const oldpath = tr_strvPath(oldbase, sub);
                 auto const newpath = tr_strvPath(location, sub);
 
-                logdbg(tor, fmt::format("Found file #{0}: {1}", i, oldpath));
+                logdbg(tor, fmt::format("Found file #{}: {}", i, oldpath));
 
                 if (do_move && !tr_sys_path_is_same(oldpath.c_str(), newpath.c_str(), nullptr))
                 {
                     tr_error* error = nullptr;
 
-                    loginfo(tor, fmt::format(_("Moving '{0}' to '{1}'"), oldpath, newpath));
+                    loginfo(
+                        tor,
+                        fmt::format(
+                            _("Moving '{oldpath}' to '{path}'"),
+                            fmt::arg("oldpath", oldpath),
+                            fmt::arg("path", newpath)));
 
                     if (!tr_moveFile(oldpath.c_str(), newpath.c_str(), &error))
                     {
                         err = true;
-                        logerr(tor, fmt::format(_("Error moving '{0}' to '{1}': {2}"), oldpath, newpath, error->message));
+                        logerr(
+                            tor,
+                            fmt::format(
+                                _("Error moving '{oldpath}' to '{path}': {errmsg} ({errcode})"),
+                                fmt::arg("oldpath", oldpath),
+                                fmt::arg("path", newpath),
+                                fmt::arg("errmsg", error->message),
+                                fmt::arg("errcode", error->code)));
                         tr_error_free(error);
                     }
                 }
@@ -2543,7 +2566,14 @@ static void tr_torrentFileCompleted(tr_torrent* tor, tr_file_index_t i)
 
             if (!tr_sys_path_rename(oldpath.c_str(), newpath.c_str(), &error))
             {
-                logerr(tor, fmt::format(_("Error moving '{0}' to '{1}': {2}"), oldpath, newpath, error->message));
+                logerr(
+                    tor,
+                    fmt::format(
+                        _("Error moving '{oldpath}' to '{path}': {errmsg} ({errcode})"),
+                        fmt::arg("oldpath", oldpath),
+                        fmt::arg("newpath", path),
+                        fmt::arg("errmsg", error->messsage),
+                        fmt::arg("errcode", error->code)));
                 tr_error_free(error);
             }
         }
@@ -2590,7 +2620,9 @@ void tr_torrentGotBlock(tr_torrent* tor, tr_block_index_t block)
             else
             {
                 uint32_t const n = tor->pieceSize(piece);
-                logerr(tor, fmt::format(_("Piece {0}, which was just downloaded, failed its checksum test"), piece));
+                logerr(
+                    tor,
+                    fmt::format(_("Piece {qty}, which was just downloaded, failed its checksum test"), fmt::arg("qty", piece)));
                 tor->corruptCur += n;
                 tor->downloadedCur -= std::min(tor->downloadedCur, uint64_t{ n });
                 tr_peerMgrGotBadPiece(tor, piece);

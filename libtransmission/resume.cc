@@ -97,14 +97,14 @@ static auto loadPeers(tr_variant* dict, tr_torrent* tor)
     if (tr_variantDictFindRaw(dict, TR_KEY_peers2, &str, &len))
     {
         size_t const numAdded = addPeers(tor, str, len);
-        logdbg(tor, fmt::format("Loaded {0} IPv4 peers from resume file", numAdded));
+        logdbg(tor, fmt::format("Loaded {} IPv4 peers from resume file", numAdded));
         ret = tr_resume::Peers;
     }
 
     if (tr_variantDictFindRaw(dict, TR_KEY_peers2_6, &str, &len))
     {
         size_t const numAdded = addPeers(tor, str, len);
-        logdbg(tor, fmt::format("Loaded {0} IPv6 peers from resume file", numAdded));
+        logdbg(tor, fmt::format("Loaded {} IPv6 peers from resume file", numAdded));
         ret = tr_resume::Peers;
     }
 
@@ -584,7 +584,12 @@ static auto loadProgress(tr_variant* dict, tr_torrent* tor)
 
         if (std::size(mtimes) != n_files)
         {
-            logwarn(tor, fmt::format(_("Got {0} mtimes; expected {1}"), std::size(mtimes), size_t(n_files)));
+            logwarn(
+                tor,
+                fmt::format(
+                    _("Got {qty mtimes; expected {req}"),
+                    fmt::arg("qty", std::size(mtimes)),
+                    fmt::arg("req", size_t(n_files))));
             // if resizing grows the vector, we'll get 0 mtimes for the
             // new items which is exactly what we want since the pieces
             // in an unknown state should be treated as untested
@@ -633,7 +638,7 @@ static auto loadProgress(tr_variant* dict, tr_torrent* tor)
 
         if (err != nullptr)
         {
-            logdbg(tor, fmt::format("Torrent needs to be verified - {0}", err));
+            logdbg(tor, fmt::format("Torrent needs to be verified - {}", err));
         }
         else
         {
@@ -683,7 +688,7 @@ static auto loadFromFile(tr_torrent* tor, tr_resume::fields_t fieldsToLoad, bool
         return fields_loaded;
     }
 
-    logdbg(tor, fmt::format("Read resume file '{0}'", filename));
+    logdbg(tor, fmt::format("Read resume file '{}'", filename));
 
     auto boolVal = false;
     auto i = int64_t{};

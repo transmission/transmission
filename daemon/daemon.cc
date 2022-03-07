@@ -245,13 +245,19 @@ static auto onFileAdded(tr_watchdir_t dir, char const* name, void* vsession)
         bool trash = false;
         bool const test = tr_ctorGetDeleteSource(ctor, &trash);
 
-        tr_log::debug::add(TR_LOC, fmt::format("Parsing .torrent file successful '{0}'", name), MyName);
+        tr_log::debug::add(
+            TR_LOC,
+            fmt::format("Parsing .torrent file successful '{filename}'", fmt::arg("filename", name)),
+            MyName);
 
         if (test && trash)
         {
             tr_error* error = nullptr;
 
-            tr_log::debug::add(TR_LOC, fmt::format("Deleting input .torrent file '{0}'", name), MyName);
+            tr_log::debug::add(
+                TR_LOC,
+                fmt::format("Deleting input .torrent file '{filename}'", fmt::arg("filename", name)),
+                MyName);
 
             if (!tr_sys_path_remove(filename.c_str(), &error))
             {
@@ -682,7 +688,10 @@ static int daemon_start(void* varg, [[maybe_unused]] bool foreground)
             auto const out = std::to_string(getpid());
             tr_sys_file_write(fp, std::data(out), std::size(out), nullptr, nullptr);
             tr_sys_file_close(fp, nullptr);
-            tr_log::debug::add(TR_LOC, fmt::format("Saved pidfile '{0}'", sz_pid_filename), MyName);
+            tr_log::debug::add(
+                TR_LOC,
+                fmt::format("Saved pidfile '{filename}'", fmt::arg("filename", sz_pid_filename)),
+                MyName);
             pidfile_created = true;
         }
         else

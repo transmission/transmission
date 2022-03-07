@@ -242,7 +242,7 @@ static void accept_incoming_peer(evutil_socket_t fd, short /*what*/, void* vsess
         {
             char addrstr[TR_ADDRSTRLEN];
             tr_address_and_port_to_string(addrstr, sizeof(addrstr), &clientAddr, clientPort);
-            tr_log::debug::add(TR_LOC, fmt::format("new incoming connection {0} ({1})", clientSocket, addrstr));
+            tr_log::debug::add(TR_LOC, fmt::format("new incoming connection {} ({})", clientSocket, addrstr));
         }
 
         tr_peerMgrAddIncoming(session->peerMgr, &clientAddr, clientPort, tr_peer_socket_tcp_create(clientSocket));
@@ -1945,7 +1945,7 @@ void tr_sessionClose(tr_session* session)
     time_t const deadline = time(nullptr) + ShutdownMaxSeconds;
 
     logdbg(fmt::format(
-        "shutting down transmission session {0}... now is {1} deadline is {2}",
+        "shutting down transmission session {}... now is {} deadline is {}",
         static_cast<void*>(session),
         time(nullptr),
         deadline));
@@ -1968,7 +1968,7 @@ void tr_sessionClose(tr_session* session)
            !deadlineReached(deadline))
     {
         logdbg(fmt::format(
-            "waiting on port unmap ({0}) or announcer ({1})... now {2} deadline {3}",
+            "waiting on port unmap ({}) or announcer ({})... now {} deadline {}",
             static_cast<void*>(session->shared),
             static_cast<void*>(session->announcer),
             time(nullptr),
@@ -1986,7 +1986,7 @@ void tr_sessionClose(tr_session* session)
     {
         static bool forced = false;
 
-        logdbg(fmt::format("waiting for libtransmission thread to finish... now {0} deadline {1}", time(nullptr), deadline));
+        logdbg(fmt::format("waiting for libtransmission thread to finish... now {} deadline {}", time(nullptr), deadline));
 
         tr_wait_msec(10);
 
@@ -2074,7 +2074,7 @@ static void sessionLoadTorrents(struct sessionLoadTorrentsData* const data)
 
     if (n != 0)
     {
-        tr_log::info::add(TR_LOC, fmt::format(_("Loaded {0} torrents"), n));
+        tr_log::info::add(TR_LOC, fmt::format(_("Loaded {qty} torrents"), fmt::arg("num", n)));
     }
 
     if (data->setmeCount != nullptr)

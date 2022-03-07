@@ -79,7 +79,7 @@ static bool preallocate_file_fast(tr_sys_file_t fd, uint64_t length, tr_error** 
         return true;
     }
 
-    logdbg(fmt::format("Preallocating (fast, normal) failed: {0} ({1})", my_error->message, my_error->code));
+    logdbg(fmt::format("Preallocating (fast, normal) failed: {} ({})", my_error->message, my_error->code));
 
     if (!TR_ERROR_IS_ENOSPC(my_error->code))
     {
@@ -93,7 +93,7 @@ static bool preallocate_file_fast(tr_sys_file_t fd, uint64_t length, tr_error** 
             return true;
         }
 
-        logdbg(fmt::format("Preallocating (fast, fallback) failed: {0} ({1})", my_error->message, my_error->code));
+        logdbg(fmt::format("Preallocating (fast, fallback) failed: {} ({})", my_error->message, my_error->code));
     }
 
     tr_error_propagate(error, &my_error);
@@ -114,7 +114,7 @@ static bool preallocate_file_full(tr_sys_file_t fd, uint64_t length, tr_error** 
         return true;
     }
 
-    logdbg(fmt::format("Preallocating (full, normal) failed: {1} ({2})", my_error->message, my_error->code));
+    logdbg(fmt::format("Preallocating (full, normal) failed: {} ({})", my_error->message, my_error->code));
 
     if (!TR_ERROR_IS_ENOSPC(my_error->code))
     {
@@ -137,7 +137,7 @@ static bool preallocate_file_full(tr_sys_file_t fd, uint64_t length, tr_error** 
             return true;
         }
 
-        logdbg(fmt::format("Preallocating (full, fallback) failed: {1} ({2})", my_error->message, my_error->code));
+        logdbg(fmt::format("Preallocating (full, fallback) failed: {} ({})", my_error->message, my_error->code));
     }
 
     tr_error_propagate(error, &my_error);
@@ -535,11 +535,11 @@ tr_sys_file_t tr_fdFileCheckout(
             return TR_BAD_SYS_FILE;
         }
 
-        logtrace(fmt::format("opened '{0}' writable:{1}", filename, writable));
+        logtrace(fmt::format("opened '{}' writable:{}", filename, writable));
         o->is_writable = writable;
     }
 
-    logtrace(fmt::format("checking out '{0}'", filename));
+    logtrace(fmt::format("checking out '{}'", filename));
     o->torrent_id = torrent_id;
     o->file_index = i;
     o->used_at = tr_time();
@@ -592,7 +592,7 @@ tr_socket_t tr_fdSocketCreate(tr_session* session, int domain, int type)
 
             if (getsockopt(s, SOL_SOCKET, SO_SNDBUF, reinterpret_cast<char*>(&i), &size) != -1)
             {
-                logtrace(fmt::format("SO_SNDBUF size is {0}", i));
+                logtrace(fmt::format("SO_SNDBUF size is {}", i));
             }
 
             i = 0;
@@ -600,7 +600,7 @@ tr_socket_t tr_fdSocketCreate(tr_session* session, int domain, int type)
 
             if (getsockopt(s, SOL_SOCKET, SO_RCVBUF, reinterpret_cast<char*>(&i), &size) != -1)
             {
-                logtrace(fmt::format("SO_RCVBUF size is {0}", i));
+                logtrace(fmt::format("SO_RCVBUF size is {}", i));
             }
 
             buf_logged = true;

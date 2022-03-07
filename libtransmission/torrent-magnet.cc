@@ -31,7 +31,7 @@
 
 using namespace std::literals;
 
-#define dbgmsg(tor, msg) \
+#define logdbg(tor, msg) \
     do \
     { \
         if (tr_log::debug::enabled()) \
@@ -85,7 +85,7 @@ bool tr_torrentSetMetadataSizeHint(tr_torrent* tor, int64_t size)
 
     int const n = (size <= 0 || size > INT_MAX) ? -1 : size / METADATA_PIECE_SIZE + (size % METADATA_PIECE_SIZE != 0 ? 1 : 0);
 
-    dbgmsg(tor, fmt::format("metadata is {0} bytes in {1} pieces", size, n));
+    logdbg(tor, fmt::format("metadata is {} bytes in {} pieces", size, n));
 
     if (n <= 0)
     {
@@ -320,7 +320,7 @@ static void onHaveAllMetainfo(tr_torrent* tor, tr_incomplete_metadata* m)
 
         m->piecesNeededCount = n;
         char const* const msg = error != nullptr && error->message != nullptr ? error->message : "unknown error";
-        dbgmsg(tor, fmt::format("metadata error: {0}. (trying again; {1} pieces left)", msg, n));
+        logdbg(tor, fmt::format("metadata error: {}. (trying again; {} pieces left)", msg, n));
         tr_error_clear(&error);
     }
 }
@@ -331,7 +331,7 @@ void tr_torrentSetMetadataPiece(tr_torrent* tor, int piece, void const* data, in
     TR_ASSERT(data != nullptr);
     TR_ASSERT(len >= 0);
 
-    dbgmsg(tor, fmt::format("got metadata piece {0} of {1} bytes", piece, len));
+    logdbg(tor, fmt::format("got metadata piece {} of {} bytes", piece, len));
 
     // are we set up to download metadata?
     tr_incomplete_metadata* const m = tor->incompleteMetadata;
@@ -365,12 +365,12 @@ void tr_torrentSetMetadataPiece(tr_torrent* tor, int piece, void const* data, in
     tr_removeElementFromArray(m->piecesNeeded, idx, sizeof(struct metadata_node), m->piecesNeededCount);
     --m->piecesNeededCount;
 
-    dbgmsg(tor, fmt::format("saving metainfo piece {0}... {1} remain", piece, m->piecesNeededCount));
+    logdbg(tor, fmt::format("saving metainfo piece {}... {} remain", piece, m->piecesNeededCount));
 
     /* are we done? */
     if (m->piecesNeededCount == 0)
     {
-        dbgmsg(tor, fmt::format("metainfo piece {0} was the last one", piece));
+        logdbg(tor, fmt::format("metainfo piece {} was the last one", piece));
         onHaveAllMetainfo(tor, m);
     }
 }
@@ -391,7 +391,7 @@ bool tr_torrentGetNextMetadataRequest(tr_torrent* tor, time_t now, int* setme_pi
         m->piecesNeeded[i].piece = piece;
         m->piecesNeeded[i].requestedAt = now;
 
-        dbgmsg(tor, fmt::format("next piece to request: {0}", piece));
+        logdbg(tor, fmt::format("next piece to request: {}", piece));
         *setme_piece = piece;
         have_request = true;
     }

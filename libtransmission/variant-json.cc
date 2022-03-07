@@ -84,10 +84,10 @@ static void error_handler(jsonsl_t jsn, jsonsl_error_t error, jsonsl_state_st* /
         tr_log::error::add(
             TR_LOC,
             fmt::format(
-                "JSON parse failed at pos {0}: {1} -- remaining text '{2:.16s}'",
-                jsn->pos,
-                jsonsl_strerror(error),
-                buf));
+                "JSON parse failed at pos {qty}: {errmsg} -- remaining text '{text:.16s}'",
+                fmt::arg("qty", jsn->pos),
+                fmt::arg("errmsg", jsonsl_strerror(error)),
+                fmt::arg("text", buf)));
 
         static_cast<struct json_wrapper_data*>(jsn->data)->error = EILSEQ;
     }

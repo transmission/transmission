@@ -318,7 +318,7 @@ static bool isWebClientDir(std::string_view path)
 {
     auto tmp = tr_strvPath(path, "index.html");
     bool const ret = tr_sys_path_exists(tmp.c_str(), nullptr);
-    tr_log::debug::add(TR_LOC, fmt::format("Searching for web interface file '{0}'", tmp));
+    tr_log::debug::add(TR_LOC, fmt::format("Searching for web interface file '{}'", tmp));
     return ret;
 }
 

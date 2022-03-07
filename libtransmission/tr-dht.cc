@@ -150,7 +150,7 @@ static void bootstrap_from_name(char const* name, tr_port port, int af)
     addrinfo* info = nullptr;
     if (int const rc = getaddrinfo(name, pp, &hints, &info); rc != 0)
     {
-        logerr(fmt::format("{0}:{1}: {2} ({3})", name, pp, gai_strerror(rc), rc), ModuleName);
+        logerr(fmt::format("{}:{}: {} ({})", name, pp, gai_strerror(rc), rc), ModuleName);
         return;
     }
 
@@ -188,7 +188,7 @@ static void dht_boostrap_from_file(tr_session* session)
     }
 
     // format is each line has address, a space char, and port number
-    loginfo(fmt::format(_("Bootstrapping from {0}"), bootstrap_file), ModuleName);
+    loginfo(fmt::format(_("Bootstrapping from {filename}"), fmt::arg("filename", bootstrap_file)), ModuleName);
     auto line = std::string{};
     while (!bootstrap_done(session, 0) && std::getline(in, line))
     {
@@ -199,7 +199,7 @@ static void dht_boostrap_from_file(tr_session* session)
 
         if (line_stream.bad() || std::empty(addrstr) || port <= 0)
         {
-            logwarn(fmt::format(_("Couldn't parse line: '{0}'"), line), ModuleName);
+            logwarn(fmt::format(_("Couldn't parse line: '{text}'"), fmt::arg("text", line)), ModuleName);
         }
         else
         {
@@ -221,12 +221,12 @@ static void dht_bootstrap(void* closure)
 
     if (cl->len > 0)
     {
-        loginfo(fmt::format(_("Bootstrapping from {0} IPv4 nodes"), num), ModuleName);
+        loginfo(fmt::format(_("Bootstrapping from {qty} IPv4 nodes"), fmt::arg("qty", num)), ModuleName);
     }
 
     if (cl->len6 > 0)
     {
-        loginfo(fmt::format(_("Bootstrapping from {0} IPv6 nodes"), num6), ModuleName);
+        loginfo(fmt::format(_("Bootstrapping from {qty} IPv6 nodes"), fmt::arg("qty", num6)), ModuleName);
     }
 
     for (int i = 0; i < std::max(num, num6); ++i)
@@ -389,7 +389,13 @@ int tr_dhtInit(tr_session* ss)
         tr_free(nodes6);
         tr_free(nodes);
 
-        logwarn(fmt::format(_("DHT initialization failed: {0} ({1})"), tr_strerror(errno), errno), ModuleName);
+        auto const errcode = errno;
+        logwarn(
+            fmt::format(
+                _("DHT initialization failed: {errmsg} ({errcode})"),
+                fmt::arg("errmsg", tr_strerror(errcode)),
+                fmt::arg("errcode", errcode)),
+            ModuleName);
         session_ = nullptr;
         return -1;
     }
@@ -447,7 +453,7 @@ void tr_dhtUninit(tr_session* ss)
         int num = MaxNodes;
         int num6 = MaxNodes;
         int n = dht_get_nodes(sins, &num, sins6, &num6);
-        logdbg(fmt::format("Saving {0} ({1} + {2}) nodes", n, num, num6), ModuleName);
+        logdbg(fmt::format("Saving {} ({} + {}) nodes", n, num, num6), ModuleName);
 
         tr_variant benc;
         tr_variantInitDict(&benc, 3);
@@ -650,7 +656,7 @@ static void callback(void* /*ignore*/, int event, unsigned char const* info_hash
             tr_peerMgrAddPex(tor, TR_PEER_FROM_DHT, std::data(pex), std::size(pex));
 
             auto msg = fmt::format(
-                "Learned {0} {1} peers from DHT",
+                "Learned {} {} peers from DHT",
                 std::size(pex),
                 event == DHT_EVENT_VALUES6 ? "IPv6" : "IPv4");
             tr_log::debug::add(TR_LOC, msg, tor->name());
@@ -700,7 +706,7 @@ static AnnounceResult tr_dhtAnnounce(tr_torrent* tor, int af, bool announce)
     {
         logdbg(
             fmt::format(
-                "{0} DHT not ready ({1}, {2} nodes)",
+                "{} DHT not ready ({}, {} nodes)",
                 af == AF_INET6 ? "IPv6" : "IPv4",
                 tr_dhtPrintableStatus(status),
                 numnodes),
@@ -712,20 +718,22 @@ static AnnounceResult tr_dhtAnnounce(tr_torrent* tor, int af, bool announce)
     int const rc = dht_search(dht_hash, announce ? tr_sessionGetPeerPort(session_) : 0, af, callback, nullptr);
     if (rc < 0)
     {
+        auto const errcode = errno;
         logwarn(
             fmt::format(
-                "{0} DHT announce failed ({1}, {2} nodes): {3}",
-                af == AF_INET6 ? "IPv6" : "IPv4",
-                tr_dhtPrintableStatus(status),
-                numnodes,
-                tr_strerror(errno)),
+                _("{type} DHT announce failed ({status}, {qty} nodes): {errmsg} ({errcode})"),
+                fmt::arg("type", af == AF_INET6 ? "IPv6" : "IPv4"),
+                fmt::arg("status", tr_dhtPrintableStatus(status)),
+                fmt::arg("qty", numnodes),
+                fmt::arg("errmsg", tr_strerror(errcode)),
+                fmt::arg("errcode", errcode)),
             tor->name());
         return AnnounceResult::FAILED;
     }
 
     logdbg(
         fmt::format(
-            "Starting {0} DHT announce ({1}, {2} nodes)",
+            "Starting {} DHT announce ({}, {} nodes)",
             af == AF_INET6 ? "IPv6" : "IPv4",
             tr_dhtPrintableStatus(status),
             numnodes),
@@ -792,7 +800,13 @@ void tr_dhtCallback(unsigned char* buf, int buflen, struct sockaddr* from, sockl
         }
         else
         {
-            logwarn(fmt::format(_("dht_periodic failed: {0}"), tr_strerror(errno)), ModuleName);
+            auto const errcode = errno;
+            logwarn(
+                fmt::format(
+                    _("dht_periodic failed: {errmsg} ({errcode})"),
+                    fmt::arg("errmsg", tr_strerror(errcode)),
+                    fmt::arg("errcode", errcode)),
+                ModuleName);
 
             if (errno == EINVAL || errno == EFAULT)
             {

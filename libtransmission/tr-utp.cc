@@ -23,12 +23,12 @@
 
 static char constexpr MyName[] = "UTP";
 
-#define dbgmsg(sv) \
+#define logtrace(sv) \
     do \
     { \
-        if (tr_log::debug::enabled()) \
+        if (tr_log::trace::enabled()) \
         { \
-            tr_log::debug::add(TR_LOC, (sv), MyName); \
+            tr_log::trace::add(TR_LOC, (sv), MyName); \
         } \
         while (0)
 
@@ -36,17 +36,17 @@ static char constexpr MyName[] = "UTP";
 
 void UTP_Close(struct UTPSocket* socket)
 {
-    dbgmsg(fmt::format("UTP_Close({0}) was called.", fmt::ptr(socket)));
+    logtrace(fmt::format("UTP_Close({}) was called.", fmt::ptr(socket)));
 }
 
 void UTP_RBDrained(struct UTPSocket* socket)
 {
-    dbgmsg(fmt::format("UTP_RBDrained({0}) was called.", fmt::ptr(socket)));
+    logtrace(fmt::format("UTP_RBDrained({}) was called.", fmt::ptr(socket)));
 }
 
 bool UTP_Write(struct UTPSocket* socket, size_t count)
 {
-    dbgmsg(fmt::format("UTP_RBDrained({0}, {1}) was called.", fmt::ptr(socket), count);
+    logtrace(fmt::format("UTP_RBDrained({}, {}) was called.", fmt::ptr(socket), count);
     return false;
 }
 
@@ -107,7 +107,7 @@ static void incoming(void* vsession, struct UTPSocket* s)
 
     if (!tr_address_from_sockaddr_storage(&addr, &port, &from_storage))
     {
-        tr_log::warn::add(TR_LOC, "Unknown socket family", MyName);
+        tr_log::warn::add(TR_LOC, _("Unknown socket family"), MyName);
         UTP_Close(s);
         return;
     }

@@ -132,7 +132,13 @@ static struct UPNPDev* tr_upnpDiscover(int msec, char const* bindaddr)
 
     if (have_err)
     {
-        tr_log::warn::add(TR_LOC, fmt::format("upnpDiscover failed (errno {0} - {1})", errno, tr_strerror(errno)), Key);
+        auto const errcode = errno;
+        tr_log::warn::add(
+            TR_LOC,
+            fmt::format(
+                _("upnpDiscover failed: {errmsg} ({errcode})"),
+                fmt::arg("errmsg", tr_strerror(errcode)),
+                fmt::arg("errcode", errcode)));
     }
 
     return ret;
@@ -218,9 +224,15 @@ static int tr_upnpAddPortMapping(tr_upnp const* handle, char const* proto, tr_po
 
     if (err != 0)
     {
+        auto const errcode = errno;
         tr_log::error::add(
             TR_LOC,
-            fmt::format("{0} Port forwarding failed with {1} (errno {2} - {3})", proto, err, errno, tr_strerror(errno)),
+            fmt::format(
+                _("{proto} Port forwarding failed with {msg}: {errmsg} ({errcode})"),
+                fmt::arg("proto", proto),
+                fmt::arg("msg", err),
+                fmt::arg("errmsg", tr_strerror(errcode)),
+                fmt::arg("errcode", errcode)),
             Key);
     }
 
@@ -293,7 +305,7 @@ tr_port_forwarding tr_upnpPulse(tr_upnp* handle, tr_port port, bool isEnabled, b
         else
         {
             handle->state = UpnpState::FAILED;
-            tr_log::debug::add(TR_LOC, fmt::format("UPNP_GetValidIGD failed (errno {0} -{1})", errno, tr_strerror(errno)), Key);
+            tr_log::debug::add(TR_LOC, fmt::format("UPNP_GetValidIGD failed: {} ({})", tr_strerror(errno), errno), Key);
             tr_log::debug::add(TR_LOC, "If your router supports UPnP, please make sure UPnP is enabled!", Key);
         }
 
@@ -309,7 +321,7 @@ tr_port_forwarding tr_upnpPulse(tr_upnp* handle, tr_port port, bool isEnabled, b
         ((tr_upnpGetSpecificPortMappingEntry(handle, "TCP") != UPNPCOMMAND_SUCCESS) ||
          (tr_upnpGetSpecificPortMappingEntry(handle, "UDP") != UPNPCOMMAND_SUCCESS)))
     {
-        tr_log::warn::add(TR_LOC, fmt::format(_("Port {0} isn't forwarded"), handle->port), Key);
+        tr_log::warn::add(TR_LOC, fmt::format(_("Port {port} isn't forwarded"), fmt::arg("port", handle->port)), Key);
         handle->isMapped = false;
     }
 
@@ -354,11 +366,11 @@ tr_port_forwarding tr_upnpPulse(tr_upnp* handle, tr_port port, bool isEnabled, b
         tr_log::info::add(
             TR_LOC,
             fmt::format(
-                "Port forwarding through '{0}', service '{1}'. (local address: {2}:{3})",
-                handle->urls.controlURL,
-                handle->data.first.servicetype,
-                handle->lanaddr,
-                port),
+                _("Port forwarding through '{url}', service '{service}'. (local address: {address}:{port})"),
+                fmt::arg("url", handle->urls.controlURL),
+                fmt::arg("service", handle->data.first.servicetype),
+                fmt::arg("address", handle->lanaddr),
+                fmt::arg("port", port)),
             Key);
 
         if (handle->isMapped)

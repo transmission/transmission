@@ -176,7 +176,7 @@ void Bandwidth::phaseOne(std::vector<tr_peerIo*>& peerArray, tr_direction dir)
      * peers from starving the others. Loop through the peers, giving each a
      * small chunk of bandwidth. Keep looping until we run out of bandwidth
      * and/or peers that can use it */
-    dbgmsg(fmt::format("{0} peers to go round-robin for {1}", peerArray.size(), dir == TR_UP ? "upload" : "download"));
+    dbgmsg(fmt::format("{} peers to go round-robin for {}", peerArray.size(), dir == TR_UP ? "upload" : "download"));
 
     size_t n = peerArray.size();
     while (n > 0)
@@ -190,7 +190,7 @@ void Bandwidth::phaseOne(std::vector<tr_peerIo*>& peerArray, tr_direction dir)
 
         int const bytes_used = tr_peerIoFlush(peerArray[i], dir, increment);
 
-        dbgmsg(fmt::format("peer #{0} of {1} used {2} bytes in this pass", i, n, bytes_used));
+        dbgmsg(fmt::format("peer #{} of {} used {} bytes in this pass", i, n, bytes_used));
 
         if (bytes_used != int(increment))
         {

@@ -670,9 +670,9 @@ static bool tr_rpc_address_from_string(tr_rpc_address& dst, std::string_view src
         if (std::size(src) >= TrUnixAddrStrLen)
         {
             logerr(fmt::format(
-                _("Unix socket path must be fewer than {0} characters (including '{1}' prefix)"),
-                TrUnixAddrStrLen - 1,
-                TR_PRIsv_ARG(TrUnixSocketPrefix)));
+                _("Unix socket path must be fewer than {qty} characters (including '{text}' prefix)"),
+                fmt::arg("qty", TrUnixAddrStrLen - 1),
+                fmt::arg("text", TrUnixSocketPrefix)));
             return false;
         }
 
@@ -704,8 +704,8 @@ static bool bindUnixSocket(
 {
 #ifdef _WIN32
     logerr(fmt::format(
-        _("Unix sockets are not supported on Windows. Please change '{0}' in your settings."),
-        tr_quark_get_string(TR_KEY_rpc_bind_address, nullptr)));
+        _("Unix sockets are not supported on Windows. Please change '{text}' in your settings."),
+        fmt::arg("text", tr_quark_get_string(TR_KEY_rpc_bind_address))));
     return false;
 #else
     struct sockaddr_un addr;
@@ -730,7 +730,8 @@ static bool bindUnixSocket(
 
     if (chmod(addr.sun_path, (mode_t)socket_mode) != 0)
     {
-        logwarn(fmt::format(_("Could not set RPC socket mode to {0:#o}, defaulting to 0755"), socket_mode));
+        logwarn(
+            fmt::format(_("Could not set RPC socket mode to {mode:#o}, defaulting to 0755"), fmt::arg("mode", socket_mode)));
     }
 
     return evhttp_bind_listener(httpd, lev) != nullptr;
@@ -801,18 +802,21 @@ static void startServer(tr_rpc_server* server)
         {
             int const retry_delay = rpc_server_start_retry(server);
 
-            logdbg(fmt::format("Unable to bind to {0}, retrying in {1} seconds", addr_port_str.c_str(), retry_delay));
+            logdbg(fmt::format("Unable to bind to {}, retrying in {} seconds", addr_port_str.c_str(), retry_delay));
             return;
         }
 
-        logerr(fmt::format(_("Unable to bind to {0} after {1} attempts, giving up"), addr_port_str, ServerStartRetryCount));
+        logerr(fmt::format(
+            _("Unable to bind to {address} after {qty} attempts, giving up"),
+            fmt::format("address", addr_port_str),
+            fmt::format("qty", ServerStartRetryCount)));
     }
     else
     {
         evhttp_set_gencb(httpd, handle_request, server);
         server->httpd = httpd;
 
-        logdbg(fmt::format("Started listening on {0}", addr_port_str));
+        logdbg(fmt::format("Started listening on {}", addr_port_str));
     }
 
     rpc_server_start_retry_cancel(server);
@@ -841,7 +845,7 @@ static void stopServer(tr_rpc_server* server)
         unlink(address + std::size(TrUnixSocketPrefix));
     }
 
-    logdbg(fmt::format("Stopped listening on {0}", tr_rpc_address_with_port(server)));
+    logdbg(fmt::format("Stopped listening on {}", tr_rpc_address_with_port(server)));
 }
 
 static void onEnabledChanged(tr_rpc_server* const server)
@@ -900,7 +904,7 @@ tr_port tr_rpcGetPort(tr_rpc_server const* server)
 void tr_rpcSetUrl(tr_rpc_server* server, std::string_view url)
 {
     server->url = url;
-    logdbg(fmt::format("setting our URL to '{0}'", server->url));
+    logdbg(fmt::format("setting our URL to '{}'", server->url));
 }
 
 std::string const& tr_rpcGetUrl(tr_rpc_server const* server)
@@ -922,12 +926,12 @@ static auto parseWhitelist(std::string_view whitelist)
         if (token.find_first_of("+-"sv) != std::string_view::npos)
         {
             logwarn(fmt::format(
-                "Adding address to whitelist: {0} (And it has a '+' or '-'!  Are you using an old ACL by mistake?)",
-                token));
+                "Adding address to whitelist: {text} (And it has a '+' or '-'!  Are you using an old ACL by mistake?)",
+                fmt::arg("text", token)));
         }
         else
         {
-            loginfo(fmt::format(_("Adding address to whitelist: {0}"), token));
+            loginfo(fmt::format(_("Adding address to whitelist: {text}"), fmt::arg("text", token)));
         }
     }
 
@@ -982,7 +986,7 @@ static void tr_rpcSetRPCSocketMode(tr_rpc_server* server, int socket_mode)
 void tr_rpcSetUsername(tr_rpc_server* server, std::string_view username)
 {
     server->username = username;
-    logdbg(fmt::format("setting our username to '{0}'", server->username));
+    logdbg(fmt::format("setting our username to '{}'", server->username));
 }
 
 std::string const& tr_rpcGetUsername(tr_rpc_server const* server)
@@ -999,7 +1003,7 @@ void tr_rpcSetPassword(tr_rpc_server* server, std::string_view password)
 {
     server->salted_password = isSalted(password) ? password : tr_ssha1(password);
 
-    logdbg(fmt::format("setting our salted password to '{0}'", server->salted_password));
+    logdbg(fmt::format("setting our salted password to '{}'", server->salted_password));
 }
 
 std::string const& tr_rpcGetPassword(tr_rpc_server const* server)
@@ -1010,7 +1014,7 @@ std::string const& tr_rpcGetPassword(tr_rpc_server const* server)
 void tr_rpcSetPasswordEnabled(tr_rpc_server* server, bool is_enabled)
 {
     server->isPasswordEnabled = is_enabled;
-    logdbg(fmt::format("setting 'password enabled' to {0}", is_enabled));
+    logdbg(fmt::format("setting 'password enabled' to {}", is_enabled));
 }
 
 bool tr_rpcIsPasswordEnabled(tr_rpc_server const* server)
@@ -1054,7 +1058,7 @@ void tr_rpcSetAntiBruteForceThreshold(tr_rpc_server* server, int badRequests)
 
 static void missing_settings_key(tr_quark const q)
 {
-    logwarn(fmt::format(_("Couldn't find settings key '{0}'"), tr_quark_get_string(q)));
+    logwarn(fmt::format(_("Couldn't find settings key '{text}'"), fmt::arg("text", tr_quark_get_string(q))));
 }
 
 tr_rpc_server::tr_rpc_server(tr_session* session_in, tr_variant* settings)
@@ -1223,8 +1227,8 @@ tr_rpc_server::tr_rpc_server(tr_session* session_in, tr_variant* settings)
     else if (!tr_rpc_address_from_string(*bindAddress, sv))
     {
         logerr(fmt::format(
-            _("{0} is not an IPv4 address, an IPv6 address, or a unix socket path. RPC listeners must be one of the previously mentioned types. Using fallback value of 0.0.0.0."),
-            sv));
+            _("{text} is not an IPv4 address, an IPv6 address, or a unix socket path. RPC listeners must be one of the previously mentioned types. Using fallback value of 0.0.0.0."),
+            fmt::arg("text", sv)));
         bindAddress->set_inaddr_any();
     }
 
@@ -1237,7 +1241,7 @@ tr_rpc_server::tr_rpc_server(tr_session* session_in, tr_variant* settings)
     if (this->isEnabled)
     {
         auto const rpc_uri = tr_rpc_address_with_port(this) + this->url;
-        loginfo(fmt::format(_("Serving RPC and Web requests on {0}"), rpc_uri));
+        loginfo(fmt::format(_("Serving RPC and Web requests on {url}"), fmt::arg("url", rpc_uri)));
         tr_runInEventThread(session, startServer, this);
 
         if (this->isWhitelistEnabled)
@@ -1254,7 +1258,7 @@ tr_rpc_server::tr_rpc_server(tr_session* session_in, tr_variant* settings)
     char const* webClientDir = tr_getWebClientDir(this->session);
     if (!tr_str_is_empty(webClientDir))
     {
-        loginfo(fmt::format(_("Serving RPC and Web requests from directory '{0}'"), webClientDir));
+        loginfo(fmt::format(_("Serving RPC and Web requests from directory '{path}'"), fmt::arg("path", webClientDir)));
     }
 }
 
