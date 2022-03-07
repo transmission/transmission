@@ -21,6 +21,8 @@
 
 #include <event2/util.h>
 
+#include <fmt/core.h>
+
 #include <cstdint>
 #include <libutp/utp.h>
 
@@ -34,11 +36,53 @@
 #include "tr-assert.h"
 #include "tr-macros.h"
 #include "tr-utp.h" /* tr_utpSendTo() */
-#include "utils.h" /* tr_time(), tr_logAddDebug() */
+#include "utils.h"
 
 #ifndef IN_MULTICAST
 #define IN_MULTICAST(a) (((a)&0xf0000000) == 0xe0000000)
 #endif
+
+static char constexpr ModuleName[] = "Net";
+
+#define logerr(msg) \
+    do \
+    { \
+        if (tr_log::error::enabled()) \
+        { \
+            tr_log::error::add(TR_LOC, msg, ModuleName); \
+        } \
+    } while (0)
+
+#define logwarn(msg) \
+    do \
+    { \
+        if (tr_log::warn::enabled()) \
+        { \
+            tr_log::warn::add(TR_LOC, msg, ModuleName); \
+        } \
+    } while (0)
+
+#define logdbg(msg) \
+    do \
+    { \
+        if (tr_log::debug::enabled()) \
+        { \
+            tr_log::debug::add(TR_LOC, msg, ModuleName); \
+        } \
+    } while (0)
+
+#define logtrace(msg) \
+    do \
+    { \
+        if (tr_log::trace::enabled()) \
+        { \
+            tr_log::trace::add(TR_LOC, msg, ModuleName); \
+        } \
+    } while (0)
+
+/***
+****
+***/
 
 tr_address const tr_in6addr_any = { TR_AF_INET6, { IN6ADDR_ANY_INIT } };
 
@@ -235,7 +279,12 @@ void tr_netSetTOS([[maybe_unused]] tr_socket_t s, [[maybe_unused]] int tos, tr_a
 
         if (setsockopt(s, IPPROTO_IP, IP_TOS, (void const*)&tos, sizeof(tos)) == -1)
         {
-            tr_logAddNamedInfo("Net", "Can't set TOS '%d': %s", tos, tr_net_strerror(sockerrno).c_str());
+            auto const errcode = sockerrno;
+            logwarn(fmt::format(
+                _("Can't set TOS '{number}': {errmsg} ({errcode})"),
+                fmt::arg("number", tos),
+                fmt::arg("errmsg", tr_net_strerror(errcode)),
+                fmt::arg("errcode", errcode)));
         }
 #endif
     }
@@ -244,14 +293,19 @@ void tr_netSetTOS([[maybe_unused]] tr_socket_t s, [[maybe_unused]] int tos, tr_a
 #if defined(IPV6_TCLASS) && !defined(_WIN32)
         if (setsockopt(s, IPPROTO_IPV6, IPV6_TCLASS, (void const*)&tos, sizeof(tos)) == -1)
         {
-            tr_logAddNamedInfo("Net", "Can't set IPv6 QoS '%d': %s", tos, tr_net_strerror(sockerrno).c_str());
+            auto const errcode = sockerrno;
+            logwarn(fmt::format(
+                _("Can't set IPv6 QoS '{number}': {errmsg} ({errcode})"),
+                fmt::arg("number", tos),
+                fmt::arg("errmsg", tr_net_strerror(errcode)),
+                fmt::arg("errcode", errcode)));
         }
 #endif
     }
     else
     {
         /* program should never reach here! */
-        tr_logAddNamedInfo("Net", "Something goes wrong while setting TOS/Traffic-Class");
+        logdbg(fmt::format("Unhandled socket type: {}", type));
     }
 }
 
@@ -261,11 +315,12 @@ void tr_netSetCongestionControl([[maybe_unused]] tr_socket_t s, [[maybe_unused]]
 
     if (setsockopt(s, IPPROTO_TCP, TCP_CONGESTION, (void const*)algorithm, strlen(algorithm) + 1) == -1)
     {
-        tr_logAddNamedInfo(
-            "Net",
-            "Can't set congestion control algorithm '%s': %s",
-            algorithm,
-            tr_net_strerror(sockerrno).c_str());
+        auto const errcode = sockerrno;
+        logwarn(fmt::format(
+            _("Unable to set congestion control algorithm '{text}': {errmsg} ({errcode})"),
+            fmt::arg("text", algorithm),
+            fmt::arg("errmsg", tr_net_strerror(errcode)),
+            fmt::arg("errcode", errcode)));
     }
 
 #endif
@@ -345,10 +400,12 @@ struct tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const
 
         if (setsockopt(s, SOL_SOCKET, SO_RCVBUF, reinterpret_cast<char const*>(&n), sizeof(n)) == -1)
         {
-            tr_logAddInfo(
-                "Unable to set SO_RCVBUF on socket %" PRIdMAX ": %s",
-                (intmax_t)s,
-                tr_net_strerror(sockerrno).c_str());
+            auto const errcode = sockerrno;
+            logwarn(fmt::format(
+                _("Unable to set SO_RCVBUF on socket {number}: {errmsg} ({errcode})"),
+                fmt::arg("number", s),
+                fmt::arg("errmsg", tr_net_strerror(errcode)),
+                fmt::arg("errcode", errcode)));
         }
     }
 
@@ -367,11 +424,13 @@ struct tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const
 
     if (bind(s, (struct sockaddr*)&source_sock, sourcelen) == -1)
     {
-        tr_logAddError(
-            _("Couldn't set source address %s on %" PRIdMAX ": %s"),
-            tr_address_to_string(source_addr),
-            (intmax_t)s,
-            tr_net_strerror(sockerrno).c_str());
+        auto const errcode = sockerrno;
+        logwarn(fmt::format(
+            _("Unable to set source address {address} on socket {number}: {errmsg} ({errcode})"),
+            fmt::arg("address", tr_address_to_string(source_addr)),
+            fmt::arg("number", s),
+            fmt::arg("errmsg", tr_net_strerror(errcode)),
+            fmt::arg("errcode", errcode)));
         tr_netClose(session, s);
         return ret;
     }
@@ -386,13 +445,13 @@ struct tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const
 
         if ((tmperrno != ENETUNREACH && tmperrno != EHOSTUNREACH) || addr->type == TR_AF_INET)
         {
-            tr_logAddError(
-                _("Couldn't connect socket %" PRIdMAX " to %s, port %d (errno %d - %s)"),
-                (intmax_t)s,
-                tr_address_to_string(addr),
-                (int)ntohs(port),
-                tmperrno,
-                tr_net_strerror(tmperrno).c_str());
+            logwarn(fmt::format(
+                _("Couldn't connect socket {number} to {address}, port {port}: {errmsg} ({errcode})"),
+                fmt::arg("number", s),
+                fmt::arg("address", tr_address_to_string(addr)),
+                fmt::arg("port", ntohs(port)),
+                fmt::arg("errmsg", tr_net_strerror(tmperrno)),
+                fmt::arg("errcode", tmperrno)));
         }
 
         tr_netClose(session, s);
@@ -406,7 +465,7 @@ struct tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const
     {
         char addrstr[TR_ADDRSTRLEN];
         tr_address_and_port_to_string(addrstr, sizeof(addrstr), addr, port);
-        tr_logAddDeep(__FILE__, __LINE__, nullptr, "New OUTGOING connection %" PRIdMAX " (%s)", (intmax_t)s, addrstr);
+        logtrace(fmt::format("New OUTGOING connection {} ({})", s, addrstr));
     }
 
     return ret;
@@ -499,12 +558,24 @@ static tr_socket_t tr_netBindTCPImpl(tr_address const* addr, tr_port port, bool 
 
         if (!suppressMsgs)
         {
-            char const* const hint = err == EADDRINUSE ? _("Is another copy of Transmission already running?") : nullptr;
-
-            char const* const fmt = hint == nullptr ? _("Couldn't bind port %d on %s: %s") :
-                                                      _("Couldn't bind port %d on %s: %s (%s)");
-
-            tr_logAddError(fmt, port, tr_address_to_string(addr), tr_net_strerror(err).c_str(), hint);
+            if (err == EADDRINUSE)
+            {
+                logerr(fmt::format(
+                    _("Couldn't bind port {port} on {address}: {errmsg} ({errcode}). Is another copy of Transmission already running?"),
+                    fmt::arg("port", port),
+                    fmt::arg("address", tr_address_to_string(addr)),
+                    fmt::arg("errmsg", tr_net_strerror(err)),
+                    fmt::arg("errcode", err)));
+            }
+            else
+            {
+                logerr(fmt::format(
+                    _("Couldn't bind port {port} on {address}: {errmsg} ({errcode})"),
+                    fmt::arg("port", port),
+                    fmt::arg("address", tr_address_to_string(addr)),
+                    fmt::arg("errmsg", tr_net_strerror(err)),
+                    fmt::arg("errcode", err)));
+            }
         }
 
         tr_netCloseSocket(fd);
@@ -514,7 +585,7 @@ static tr_socket_t tr_netBindTCPImpl(tr_address const* addr, tr_port port, bool 
 
     if (!suppressMsgs)
     {
-        tr_logAddDebug("Bound socket %" PRIdMAX " to port %d on %s", (intmax_t)fd, port, tr_address_to_string(addr));
+        logdbg(fmt::format("Bound socket {} to port {} on {}", fd, port, tr_address_to_string(addr)));
     }
 
 #ifdef TCP_FASTOPEN
