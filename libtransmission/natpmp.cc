@@ -6,6 +6,9 @@
 #include <cerrno>
 #include <ctime>
 #include <cinttypes>
+#include <string_view>
+
+#include <fmt/core.h>
 
 #include <event2/util.h> /* evutil_inet_ntop() */
 
@@ -13,8 +16,9 @@
 #include "natpmp.h"
 
 #include "transmission.h"
-#include "natpmp_local.h"
+
 #include "log.h"
+#include "natpmp_local.h"
 #include "net.h" /* tr_netCloseSocket */
 #include "port-forwarding.h"
 #include "utils.h"
@@ -22,10 +26,38 @@
 static auto constexpr LifetimeSecs = uint32_t{ 3600 };
 static auto constexpr CommandWaitSecs = time_t{ 8 };
 
-static char const* getKey()
-{
-    return _("Port Forwarding (NAT-PMP)");
-}
+/**
+***
+**/
+
+static auto constexpr Key = std::string_view{ "Port Forwarding (NAT-PMP)" };
+
+#define loginfo(msg) \
+    do \
+    { \
+        if (tr_log::info::enabled()) \
+        { \
+            tr_log::info::add(TR_LOC, msg, Key); \
+        } \
+    } while (0)
+
+#define logdbg(msg) \
+    do \
+    { \
+        if (tr_log::debug::enabled()) \
+        { \
+            tr_log::debug::add(TR_LOC, msg, Key); \
+        } \
+    } while (0)
+
+#define logtrace(msg) \
+    do \
+    { \
+        if (tr_log::trace::enabled()) \
+        { \
+            tr_log::trace::add(TR_LOC, msg, Key); \
+        } \
+    } while (0)
 
 /**
 ***
@@ -40,18 +72,11 @@ static void logVal(char const* func, int ret)
 
     if (ret >= 0)
     {
-        tr_logAddNamedInfo(getKey(), _("%s succeeded (%d)"), func, ret);
+        logdbg(fmt::format("{} succeeded ({})", func, ret));
     }
     else
     {
-        tr_logAddNamedDbg(
-            getKey(),
-            "%s failed. Natpmp returned %d (%s); errno is %d (%s)",
-            func,
-            ret,
-            strnatpmperr(ret),
-            errno,
-            tr_strerror(errno));
+        logdbg(fmt::format("{} failed ({} {}, errno {} {})", func, ret, strnatpmperr(ret), errno, tr_strerror(errno)));
     }
 }
 
@@ -112,7 +137,7 @@ tr_port_forwarding tr_natpmpPulse(
         {
             char str[128];
             evutil_inet_ntop(AF_INET, &response.pnu.publicaddress.addr, str, sizeof(str));
-            tr_logAddNamedInfo(getKey(), _("Found public address \"%s\""), str);
+            loginfo(fmt::format(_("Found public address '{address}'"), fmt::arg("address", str)));
             nat->state = TR_NATPMP_IDLE;
         }
         else if (val != NATPMP_TRYAGAIN)
@@ -145,7 +170,7 @@ tr_port_forwarding tr_natpmpPulse(
         {
             int const unmapped_port = resp.pnu.newportmapping.privateport;
 
-            tr_logAddNamedInfo(getKey(), _("no longer forwarding port %d"), unmapped_port);
+            logdbg(fmt::format("No longer forwarding port {}", unmapped_port));
 
             if (nat->private_port == unmapped_port)
             {
@@ -194,7 +219,7 @@ tr_port_forwarding tr_natpmpPulse(
             nat->renew_time = tr_time() + (resp.pnu.newportmapping.lifetime / 2);
             nat->private_port = resp.pnu.newportmapping.privateport;
             nat->public_port = resp.pnu.newportmapping.mappedpublicport;
-            tr_logAddNamedInfo(getKey(), _("Port %d forwarded successfully"), nat->private_port);
+            loginfo(fmt::format(_("Port {port} forwarded successfully"), fmt::arg("port", nat->private_port)));
         }
         else if (val != NATPMP_TRYAGAIN)
         {

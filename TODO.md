@@ -13,7 +13,7 @@
   - [ ] libtransmission/log.cc
   - [ ] libtransmission/log.h
   - [ ] libtransmission/makemeta.cc
-  - [ ] libtransmission/natpmp.cc
+  - [x] libtransmission/natpmp.cc
   - [ ] libtransmission/net.cc
   - [ ] libtransmission/peer-mgr.cc
   - [ ] libtransmission/port-forwarding.cc
