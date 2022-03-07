@@ -77,7 +77,7 @@ static auto constexpr DefaultPrefetchEnabled = bool{ true };
 #endif
 static auto constexpr SaveIntervalSecs = int{ 360 };
 
-#define dbgmsg(msg) \
+#define logdbg(msg) \
     do \
     { \
         if (tr_log::debug::enabled()) \
@@ -238,17 +238,11 @@ static void accept_incoming_peer(evutil_socket_t fd, short /*what*/, void* vsess
 
     if (clientSocket != TR_BAD_SOCKET)
     {
-        if (tr_logGetDeepEnabled())
+        if (tr_log::debug::enabled())
         {
             char addrstr[TR_ADDRSTRLEN];
             tr_address_and_port_to_string(addrstr, sizeof(addrstr), &clientAddr, clientPort);
-            tr_logAddDeep(
-                __FILE__,
-                __LINE__,
-                nullptr,
-                "new incoming connection %" PRIdMAX " (%s)",
-                (intmax_t)clientSocket,
-                addrstr);
+            tr_log::debug::add(TR_LOC, fmt::format("new incoming connection {0} ({1})", clientSocket, addrstr));
         }
 
         tr_peerMgrAddIncoming(session->peerMgr, &clientAddr, clientPort, tr_peer_socket_tcp_create(clientSocket));
@@ -570,7 +564,7 @@ static void onSaveTimer(evutil_socket_t /*fd*/, short /*what*/, void* vsession)
 
     if (tr_cacheFlushDone(session->cache) != 0)
     {
-        tr_log::error::add(TR_LOC, "Error while flushing completed pieces from cache");
+        tr_log::error::add(TR_LOC, _("Error while flushing completed pieces from cache"));
     }
 
     for (auto* const tor : session->torrents())
@@ -753,7 +747,9 @@ static void tr_sessionInitImpl(init_data* data)
 
     if (tr_log::info::enabled())
     {
-        tr_log::info::add(TR_LOC, fmt::format("{0} {1} started", TR_NAME, LONG_VERSION_STRING));
+        tr_log::info::add(
+            TR_LOC,
+            fmt::format(_("{app} {version} started"), fmt::arg("app", TR_NAME), fmt::arg("version", LONG_VERSION_STRING)));
     }
 
     tr_statsInit(session);
@@ -1499,8 +1495,8 @@ static void turtleCheckClock(tr_session* s, struct tr_turtle_info* t)
     {
         tr_log::info::add(
             TR_LOC,
-            enabled ? "Turning on alt speed limits due to time scheduling" :
-                      "Turning off alt speed limits due to time scheduling");
+            enabled ? _("Turning on alt speed limits due to time scheduling") :
+                      _("Turning off alt speed limits due to time scheduling"));
 
         t->autoTurtleState = newAutoTurtleState;
         useAltSpeed(s, t, enabled, false);
@@ -1612,7 +1608,7 @@ unsigned int tr_sessionGetAltSpeed_KBps(tr_session const* s, tr_direction d)
 
 static void userPokedTheClock(tr_session* s, struct tr_turtle_info* t)
 {
-    dbgmsg("Refreshing the turtle mode clock due to user changes");
+    logdbg("Refreshing the turtle mode clock due to user changes");
 
     t->autoTurtleState = TR_AUTO_SWITCH_UNUSED;
 
@@ -1948,7 +1944,7 @@ void tr_sessionClose(tr_session* session)
 
     time_t const deadline = time(nullptr) + ShutdownMaxSeconds;
 
-    dbgmsg(fmt::format(
+    logdbg(fmt::format(
         "shutting down transmission session {0}... now is {1} deadline is {2}",
         static_cast<void*>(session),
         time(nullptr),
@@ -1959,7 +1955,7 @@ void tr_sessionClose(tr_session* session)
 
     while (!session->isClosed && !deadlineReached(deadline))
     {
-        dbgmsg("waiting for the libtransmission thread to finish");
+        logdbg("waiting for the libtransmission thread to finish");
         tr_wait_msec(10);
     }
 
@@ -1971,7 +1967,7 @@ void tr_sessionClose(tr_session* session)
             session->announcer_udp != nullptr) &&
            !deadlineReached(deadline))
     {
-        dbgmsg(fmt::format(
+        logdbg(fmt::format(
             "waiting on port unmap ({0}) or announcer ({1})... now {2} deadline {3}",
             static_cast<void*>(session->shared),
             static_cast<void*>(session->announcer),
@@ -1990,20 +1986,20 @@ void tr_sessionClose(tr_session* session)
     {
         static bool forced = false;
 
-        dbgmsg(fmt::format("waiting for libtransmission thread to finish... now {0} deadline {1}", time(nullptr), deadline));
+        logdbg(fmt::format("waiting for libtransmission thread to finish... now {0} deadline {1}", time(nullptr), deadline));
 
         tr_wait_msec(10);
 
         if (deadlineReached(deadline) && !forced)
         {
-            dbgmsg("calling event_loopbreak()");
+            logdbg("calling event_loopbreak()");
             forced = true;
             event_base_loopbreak(session->event_base);
         }
 
         if (deadlineReached(deadline + 3))
         {
-            dbgmsg("deadline=3 reached... calling break...");
+            logdbg("deadline=3 reached... calling break...");
             break;
         }
     }
@@ -2078,7 +2074,7 @@ static void sessionLoadTorrents(struct sessionLoadTorrentsData* const data)
 
     if (n != 0)
     {
-        tr_log::info::add(TR_LOC, fmt::format("Loaded {0} torrents", n));
+        tr_log::info::add(TR_LOC, fmt::format(_("Loaded {0} torrents"), n));
     }
 
     if (data->setmeCount != nullptr)
