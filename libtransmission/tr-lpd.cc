@@ -21,6 +21,7 @@ using in_port_t = uint16_t; /* all missing */
 #endif
 
 /* third party */
+#include <fmt/core.h>
 #include <event2/event.h>
 #include <event2/util.h>
 
@@ -36,6 +37,35 @@ using in_port_t = uint16_t; /* all missing */
 #include "utils.h"
 
 static auto constexpr SIZEOF_HASH_STRING = TR_SHA1_DIGEST_STRLEN;
+
+static char constexpr ModuleName[] = "LPD";
+
+#define logwarn(msg) \
+    do \
+    { \
+        if (tr_log::warn::enabled()) \
+        { \
+            tr_log::warn::add(TR_LOC, msg, ModuleName); \
+        } \
+    } while (0)
+
+#define logdbg(msg) \
+    do \
+    { \
+        if (tr_log::debug::enabled()) \
+        { \
+            tr_log::debug::add(TR_LOC, msg, ModuleName); \
+        } \
+    } while (0)
+
+#define logtrace(msg) \
+    do \
+    { \
+        if (tr_log::trace::enabled()) \
+        { \
+            tr_log::trace::add(TR_LOC, msg, ModuleName); \
+        } \
+    } while (0)
 
 /**
 * @brief Local Peer Discovery
@@ -278,7 +308,7 @@ int tr_lpdInit(tr_session* ss, tr_address* /*tr_addr*/)
         return -1;
     }
 
-    tr_logAddNamedDbg("LPD", "Initialising Local Peer Discovery");
+    logdbg("Initialising Local Peer Discovery");
 
     /* setup datagram socket (receive) */
     {
@@ -371,7 +401,7 @@ int tr_lpdInit(tr_session* ss, tr_address* /*tr_addr*/)
     upkeep_timer = evtimer_new(ss->event_base, on_upkeep_timer, ss);
     tr_timerAdd(upkeep_timer, UpkeepIntervalSecs, 0);
 
-    tr_logAddNamedDbg("LPD", "Local Peer Discovery initialised");
+    logdbg("Local Peer Discovery initialised");
 
     return 1;
 
@@ -382,7 +412,10 @@ fail:
         evutil_closesocket(lpd_socket2);
         lpd_socket = lpd_socket2 = TR_BAD_SOCKET;
         session = nullptr;
-        tr_logAddNamedDbg("LPD", "LPD initialisation failed (errno = %d)", save);
+        logwarn(fmt::format(
+            _("Unable to initialize LPD: {errmsg} ({errcode})"),
+            fmt::arg("errmsg", tr_strerror(save)),
+            fmt::arg("errcode", save)));
         errno = save;
     }
 
@@ -396,7 +429,7 @@ void tr_lpdUninit(tr_session* ss)
         return;
     }
 
-    tr_logAddNamedDbg("LPD", "Uninitialising Local Peer Discovery");
+    logtrace("Uninitialising Local Peer Discovery");
 
     event_free(lpd_event);
     lpd_event = nullptr;
@@ -407,7 +440,7 @@ void tr_lpdUninit(tr_session* ss)
     /* just shut down, we won't remember any former nodes */
     evutil_closesocket(lpd_socket);
     evutil_closesocket(lpd_socket2);
-    tr_logAddNamedDbg("LPD", "Done uninitialising Local Peer Discovery");
+    logtrace("Done uninitialising Local Peer Discovery");
 
     session = nullptr;
 }
@@ -471,7 +504,7 @@ bool tr_lpdSendAnnounce(tr_torrent const* t)
         }
     }
 
-    tr_logAddTorDbg(t, "LPD announce message away");
+    tr_log::trace::add(TR_LOC, "LPD announce message away", t->name());
 
     return true;
 }
@@ -539,14 +572,17 @@ static int tr_lpdConsiderAnnounce(tr_pex* peer, char const* const msg)
         {
             /* we found a suitable peer, add it to the torrent */
             tr_peerMgrAddPex(tor, TR_PEER_FROM_LPD, peer, 1);
-            tr_logAddTorDbg(tor, "Learned %d local peer from LPD (%s:%u)", 1, tr_address_to_string(&peer->addr), peerPort);
+            tr_log::debug::add(
+                TR_LOC,
+                fmt::format("Learned {} local peer from LPD ({}:{})", 1, tr_address_to_string(&peer->addr), peerPort),
+                tor->name());
 
             /* periodic reconnectPulse() deals with the rest... */
 
             return 1;
         }
 
-        tr_logAddNamedDbg("LPD", "Cannot serve torrent #%s", hashString);
+        logdbg(fmt::format("Cannot save torrent {}", hashString));
     }
 
     return res;
@@ -620,11 +656,10 @@ static int tr_lpdAnnounceMore(time_t const now, int const interval)
 
         if (lpd_unsolicitedMsgCounter < 0)
         {
-            tr_logAddNamedInfo(
-                "LPD",
-                "Dropped %d announces in the last interval (max. %d allowed)",
+            logtrace(fmt::format(
+                "Dropped {} announces in the last interval (max. {} allowed)",
                 -lpd_unsolicitedMsgCounter,
-                maxAnnounceCap);
+                maxAnnounceCap));
         }
 
         lpd_unsolicitedMsgCounter = maxAnnounceCap;
@@ -690,6 +725,6 @@ static void event_callback(evutil_socket_t /*s*/, short type, void* /*user_data*
             }
         }
 
-        tr_logAddNamedDbg("LPD", "Discarded invalid multicast message");
+        logtrace("Discarded invalid multicast message");
     }
 }

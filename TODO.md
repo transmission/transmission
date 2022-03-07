@@ -7,7 +7,7 @@
   - [ ] libtransmission/cache.cc
   - [ ] libtransmission/crypto-utils-ccrypto.cc
   - [ ] libtransmission/crypto-utils-cyassl.cc
-  - [ ] libtransmission/crypto-utils-openssl.cc
+  - [x] libtransmission/crypto-utils-openssl.cc
   - [ ] libtransmission/crypto-utils-polarssl.cc
   - [ ] libtransmission/inout.cc
   - [ ] libtransmission/log.cc
@@ -20,7 +20,7 @@
   - [ ] libtransmission/rpcimpl.cc
   - [ ] libtransmission/session-id.cc
   - [ ] libtransmission/torrent-metainfo.cc
-  - [ ] libtransmission/tr-lpd.cc
+  - [x] libtransmission/tr-lpd.cc
   - [ ] libtransmission/trevent.cc
   - [x] libtransmission/watchdir-generic.cc
   - [ ] libtransmission/watchdir-inotify.cc
