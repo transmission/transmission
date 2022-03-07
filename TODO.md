@@ -3,7 +3,7 @@
   - [x] daemon/daemon.cc
   - [ ] gtk/Session.cc
   - [x] libtransmission/announcer-http.cc
-  - [ ] libtransmission/blocklist.cc
+  - [x] libtransmission/blocklist.cc
   - [ ] libtransmission/cache.cc
   - [ ] libtransmission/crypto-utils-ccrypto.cc
   - [ ] libtransmission/crypto-utils-cyassl.cc
