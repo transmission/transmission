@@ -1,7 +1,6 @@
 - [ ] conversion
   - [ ] daemon/daemon-win32.cc
   - [ ] gtk/Session.cc
-  - [ ] libtransmission/cache.cc
   - [ ] libtransmission/crypto-utils-ccrypto.cc
   - [ ] libtransmission/crypto-utils-cyassl.cc
   - [ ] libtransmission/crypto-utils-polarssl.cc

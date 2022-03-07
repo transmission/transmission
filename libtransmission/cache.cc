@@ -8,6 +8,8 @@
 
 #include <event2/buffer.h>
 
+#include <fmt/core.h>
+
 #include "transmission.h"
 #include "cache.h"
 #include "inout.h"
@@ -20,7 +22,23 @@
 
 static char constexpr MyName[] = "Cache";
 
-#define dbgmsg(...) tr_logAddDeepNamed(MyName, __VA_ARGS__)
+#define logdbg(msg) \
+    do \
+    { \
+        if (tr_log::debug::enabled()) \
+        { \
+            tr_log::debug::add(TR_LOC, msg, MyName); \
+        } \
+    } while (0)
+
+#define logtrace(msg) \
+    do \
+    { \
+        if (tr_log::trace::enabled()) \
+        { \
+            tr_log::trace::add(TR_LOC, msg, MyName); \
+        } \
+    } while (0)
 
 /****
 *****
@@ -244,11 +262,7 @@ int tr_cacheSetLimit(tr_cache* cache, int64_t max_bytes)
     cache->max_bytes = max_bytes;
     cache->max_blocks = getMaxBlocks(max_bytes);
 
-    tr_logAddNamedDbg(
-        MyName,
-        "Maximum cache size set to %s (%d blocks)",
-        tr_formatter_mem_B(cache->max_bytes).c_str(),
-        cache->max_blocks);
+    logdbg(fmt::format("Maximum cache size set to {} ({} blocks)", tr_formatter_mem_B(cache->max_bytes), cache->max_blocks));
 
     return cacheTrim(cache);
 }
@@ -409,7 +423,7 @@ int tr_cacheFlushFile(tr_cache* cache, tr_torrent* torrent, tr_file_index_t i)
     auto const [begin, end] = tr_torGetFileBlockSpan(torrent, i);
 
     int pos = findBlockPos(cache, torrent, torrent->blockLoc(begin));
-    dbgmsg("flushing file %d from cache to disk: blocks [%zu...%zu)", (int)i, (size_t)begin, (size_t)end);
+    logtrace(fmt::format("flushing file {} from cache to disk: blocks [{}...{})", i, begin, end));
 
     /* flush out all the blocks in that file */
     int err = 0;
