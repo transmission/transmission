@@ -25,7 +25,7 @@
   - [x] libtransmission/watchdir-generic.cc
   - [ ] libtransmission/watchdir-inotify.cc
   - [ ] libtransmission/watchdir-kqueue.cc
-  - [ ] libtransmission/watchdir-win32.cc
+  - [x] libtransmission/watchdir-win32.cc
   - [ ] libtransmission/watchdir.cc
   - [ ] libtransmission/web.cc
   - [ ] macosx/Torrent.mm
