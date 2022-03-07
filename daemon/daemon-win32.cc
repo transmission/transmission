@@ -3,9 +3,13 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include <string>
+
 #include <process.h> /* _beginthreadex() */
 
 #include <windows.h>
+
+#include <fmt/core.h>
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/error.h>
@@ -40,30 +44,36 @@ static HANDLE service_stop_thread = nullptr;
 ****
 ***/
 
-static void set_system_error(tr_error** error, DWORD code, char const* message)
+static std::string get_system_error(DWORD code, char const* message)
 {
     auto* const system_message = tr_win32_format_message(code);
-    auto* const buf = tr_strdup_printf("%s (0x%08lx): %s", message, code, system_message);
-    tr_error_set(error, code, buf);
-    tr_free(buf);
+    auto ret = fmt::format("{} ({:8x}): {}", message, code, system_message);
     tr_free(system_message);
+    return ret;
 }
 
-static void do_log_system_error(char const* file, int line, tr_log_level level, DWORD code, char const* message)
+static void set_system_error(tr_error** error, DWORD code, char const* message)
 {
-    char* const system_message = tr_win32_format_message(code);
-    tr_logAddMessage(file, line, level, "[dtr_daemon] %s (0x%08lx): %s", message, code, system_message);
-    tr_free(system_message);
+    tr_error_set(error, code, get_system_error(code, message));
 }
 
-#define log_system_error(level, code, message) \
+auto constexpr MyName = std::string_view{ "dtr_daemon" };
+
+#define logerr(code, message) \
     do \
     { \
-        DWORD const local_code = (code); \
-\
-        if (tr_logLevelIsActive((level))) \
+        if (tr_log::err::enabled()) \
         { \
-            do_log_system_error(__FILE__, __LINE__, (level), local_code, (message)); \
+            tr_log::err::add(TR_LOC, get_system_error((code), (message)), MyName); \
+        } \
+    } while (0)
+
+#define logdbg(code, message) \
+    do \
+    { \
+        if (tr_log::debug::enabled()) \
+        { \
+            tr_log::debug::add(TR_LOC, get_system_error((code), (message)), MyName); \
         } \
     } while (0)
 
@@ -101,7 +111,7 @@ static void update_service_status(
     }
     else
     {
-        log_system_error(TR_LOG_DEBUG, GetLastError(), "SetServiceStatus() failed");
+        logdbg(GetLastError(), "SetServiceStatus() failed");
     }
 }
 
@@ -139,7 +149,7 @@ static void stop_service(void)
 
     if (service_stop_thread == nullptr)
     {
-        log_system_error(TR_LOG_DEBUG, GetLastError(), "_beginthreadex() failed, trying to stop synchronously");
+        logdbg(GetLastError(), "_beginthreadex() failed, trying to stop synchronously");
         service_stop_thread_main((LPVOID)(UINT_PTR)wait_time);
     }
 }
@@ -177,7 +187,7 @@ static VOID WINAPI service_main(DWORD /*argc*/, LPWSTR* /*argv*/)
 
     if (status_handle == nullptr)
     {
-        log_system_error(TR_LOG_ERROR, GetLastError(), "RegisterServiceCtrlHandlerEx() failed");
+        logerr(GetLastError(), "RegisterServiceCtrlHandlerEx() failed");
         return;
     }
 
@@ -187,7 +197,7 @@ static VOID WINAPI service_main(DWORD /*argc*/, LPWSTR* /*argv*/)
 
     if (service_thread == nullptr)
     {
-        log_system_error(TR_LOG_ERROR, GetLastError(), "_beginthreadex() failed");
+        logerr(GetLastError(), "_beginthreadex() failed");
         return;
     }
 
@@ -195,7 +205,7 @@ static VOID WINAPI service_main(DWORD /*argc*/, LPWSTR* /*argv*/)
 
     if (WaitForSingleObject(service_thread, INFINITE) != WAIT_OBJECT_0)
     {
-        log_system_error(TR_LOG_ERROR, GetLastError(), "WaitForSingleObject() failed");
+        logerr(GetLastError(), "WaitForSingleObject() failed");
     }
 
     if (service_stop_thread != nullptr)
