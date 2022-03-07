@@ -8,6 +8,8 @@
 #include <optional>
 #include <vector>
 
+#include <fmt/core.h>
+
 #include "transmission.h"
 
 #include "cache.h" /* tr_cacheReadBlock() */
@@ -131,7 +133,14 @@ int readOrWriteBytes(
             if (fd == TR_BAD_SYS_FILE)
             {
                 err = errno;
-                tr_logAddTorErr(tor, "tr_fdFileCheckout failed for \"%s\": %s", filename.c_str(), tr_strerror(err));
+                tr_log::error::add(
+                    TR_LOC,
+                    fmt::format(
+                        _("Unable to open '{filename}': {errmsg} ({errcode})"),
+                        fmt::arg("filename", filename),
+                        fmt::arg("errmsg", tr_strerror(err)),
+                        fmt::arg("errcode", err)),
+                    tor->name());
             }
             else if (doWrite)
             {
@@ -160,7 +169,14 @@ int readOrWriteBytes(
         if (!readEntireBuf(fd, file_offset, buf, buflen, &error))
         {
             err = error->code;
-            tr_logAddTorErr(tor, "read failed for \"%s\": %s", tor->fileSubpath(file_index).c_str(), error->message);
+            tr_log::error::add(
+                TR_LOC,
+                fmt::format(
+                    _("Error reading from '{filename}': {errmsg} ({errcode})"),
+                    fmt::arg("filename", tor->fileSubpath(file_index)),
+                    fmt::arg("errmsg", error->message),
+                    fmt::arg("errcode", error->code)),
+                tor->name());
             tr_error_free(error);
         }
         break;
@@ -169,7 +185,14 @@ int readOrWriteBytes(
         if (!writeEntireBuf(fd, file_offset, buf, buflen, &error))
         {
             err = error->code;
-            tr_logAddTorErr(tor, "write failed for \"%s\": %s", tor->fileSubpath(file_index).c_str(), error->message);
+            tr_log::error::add(
+                TR_LOC,
+                fmt::format(
+                    _("Error writing to '{filename}': {errmsg} ({errcode})"),
+                    fmt::arg("filename", tor->fileSubpath(file_index)),
+                    fmt::arg("errmsg", error->message),
+                    fmt::arg("errcode", error->code)),
+                tor->name());
             tr_error_free(error);
         }
         break;
