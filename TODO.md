@@ -15,7 +15,7 @@
   - [ ] libtransmission/makemeta.cc
   - [x] libtransmission/natpmp.cc
   - [ ] libtransmission/net.cc
-  - [ ] libtransmission/peer-mgr.cc
+  - [x] libtransmission/peer-mgr.cc
   - [ ] libtransmission/port-forwarding.cc
   - [ ] libtransmission/rpcimpl.cc
   - [ ] libtransmission/session-id.cc
