@@ -51,7 +51,10 @@
 #define USE_COPY_FILE_RANGE
 #endif /* __linux__ */
 
+#include <fmt/core.h>
+
 #include "transmission.h"
+
 #include "error.h"
 #include "file.h"
 #include "log.h"
@@ -265,7 +268,7 @@ FAILURE:
     TR_ASSERT(!ret);
     TR_ASSERT(my_error != nullptr);
 
-    tr_logAddError(_("Couldn't create \"%1$s\": %2$s"), path, my_error->message);
+    tr_log::error::add(TR_LOC, fmt::format(_("Couldn't create '{0}': {1}"), path, my_error->message));
     tr_error_propagate(error, &my_error);
 
 CLEANUP:
