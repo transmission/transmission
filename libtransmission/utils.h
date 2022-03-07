@@ -33,8 +33,6 @@ struct tr_error;
  * @{
  */
 
-char const* tr_strip_positional_args(char const* fmt);
-
 #if !defined(_)
 #if defined(HAVE_LIBINTL_H) && !defined(__APPLE__)
 #include <libintl.h>
@@ -52,7 +50,7 @@ char const* tr_strip_positional_args(char const* fmt);
 #endif
 #ifdef DISABLE_GETTEXT
 #undef _
-#define _(a) tr_strip_positional_args(a)
+#define _(a) (a)
 #endif
 
 /****

@@ -34,6 +34,8 @@
 #define UTF_CPP_CPLUSPLUS 201703L
 #include <utf8.h>
 
+#include <fmt/core.h>
+
 #include <event2/buffer.h>
 #include <event2/event.h>
 
@@ -158,47 +160,6 @@ void* tr_memdup(void const* src, size_t byteCount)
 ****
 ***/
 
-char const* tr_strip_positional_args(char const* str)
-{
-    static auto buf = std::array<char, 512>{};
-
-    char const* in = str;
-    size_t pos = 0;
-
-    for (; (str != nullptr) && (*str != 0) && pos + 1 < std::size(buf); ++str)
-    {
-        buf[pos++] = *str;
-
-        if (*str == '%' && (isdigit(str[1]) != 0))
-        {
-            char const* tmp = str + 1;
-
-            while (isdigit(*tmp) != 0)
-            {
-                ++tmp;
-            }
-
-            if (*tmp == '$')
-            {
-                str = tmp[1] == '\'' ? tmp + 1 : tmp;
-            }
-        }
-
-        if (*str == '%' && str[1] == '\'')
-        {
-            str = str + 1;
-        }
-    }
-
-    buf[pos] = '\0';
-
-    return (in != nullptr) && (strcmp(buf.data(), in) == 0) ? in : buf.data();
-}
-
-/**
-***
-**/
-
 void tr_timerAdd(struct event* timer, int seconds, int microseconds)
 {
     auto tv = timeval{};
@@ -225,21 +186,19 @@ void tr_timerAddMsec(struct event* timer, int msec)
 
 uint8_t* tr_loadFile(char const* path, size_t* size, tr_error** error)
 {
-    char const* const err_fmt = _("Couldn't read \"%1$s\": %2$s");
-
     /* try to stat the file */
     auto info = tr_sys_path_info{};
     tr_error* my_error = nullptr;
     if (!tr_sys_path_get_info(path, 0, &info, &my_error))
     {
-        tr_logAddDebug(err_fmt, path, my_error->message);
+        tr_log::warn::add(TR_LOC, fmt::format(_("Couldn't read '{0}': {1}"), path, my_error->message));
         tr_error_propagate(error, &my_error);
         return nullptr;
     }
 
     if (info.type != TR_SYS_PATH_IS_FILE)
     {
-        tr_logAddError(err_fmt, path, _("Not a regular file"));
+        tr_log::warn::add(TR_LOC, fmt::format(_("Couldn't read '{0}': Not a regular file"), path));
         tr_error_set(error, TR_ERROR_EISDIR, "Not a regular file"sv);
         return nullptr;
     }
@@ -254,7 +213,7 @@ uint8_t* tr_loadFile(char const* path, size_t* size, tr_error** error)
     auto const fd = tr_sys_file_open(path, TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0, &my_error);
     if (fd == TR_BAD_SYS_FILE)
     {
-        tr_logAddError(err_fmt, path, my_error->message);
+        tr_log::warn::add(TR_LOC, fmt::format(_("Couldn't read '{0}': {1}"), path, my_error->message));
         tr_error_propagate(error, &my_error);
         return nullptr;
     }
@@ -262,7 +221,7 @@ uint8_t* tr_loadFile(char const* path, size_t* size, tr_error** error)
     auto* buf = static_cast<uint8_t*>(tr_malloc(info.size + 1));
     if (!tr_sys_file_read(fd, buf, info.size, nullptr, &my_error))
     {
-        tr_logAddError(err_fmt, path, my_error->message);
+        tr_log::warn::add(TR_LOC, fmt::format(_("Couldn't read '{0}': {1}"), path, my_error->message));
         tr_sys_file_close(fd, nullptr);
         tr_free(buf);
         tr_error_propagate(error, &my_error);
@@ -277,7 +236,6 @@ uint8_t* tr_loadFile(char const* path, size_t* size, tr_error** error)
 
 bool tr_loadFile(std::vector<char>& setme, std::string const& path, tr_error** error)
 {
-    char const* const err_fmt = _("Couldn't read \"%1$s\": %2$s");
     auto const* const path_sz = path.c_str();
 
     /* try to stat the file */
@@ -285,14 +243,14 @@ bool tr_loadFile(std::vector<char>& setme, std::string const& path, tr_error** e
     tr_error* my_error = nullptr;
     if (!tr_sys_path_get_info(path_sz, 0, &info, &my_error))
     {
-        tr_logAddDebug(err_fmt, path_sz, my_error->message);
+        tr_log::warn::add(TR_LOC, fmt::format(_("Couldn't read '{0}': {1}"), path, my_error->message));
         tr_error_propagate(error, &my_error);
         return false;
     }
 
     if (info.type != TR_SYS_PATH_IS_FILE)
     {
-        tr_logAddError(err_fmt, path_sz, _("Not a regular file"));
+        tr_log::warn::add(TR_LOC, fmt::format(_("Couldn't read '{0}': Not a regular file"), path));
         tr_error_set(error, TR_ERROR_EISDIR, "Not a regular file"sv);
         return false;
     }
@@ -301,7 +259,7 @@ bool tr_loadFile(std::vector<char>& setme, std::string const& path, tr_error** e
     auto const fd = tr_sys_file_open(path_sz, TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0, &my_error);
     if (fd == TR_BAD_SYS_FILE)
     {
-        tr_logAddError(err_fmt, path_sz, my_error->message);
+        tr_log::warn::add(TR_LOC, fmt::format(_("Couldn't read '{0}': {1}"), path, my_error->message));
         tr_error_propagate(error, &my_error);
         return false;
     }
@@ -309,7 +267,7 @@ bool tr_loadFile(std::vector<char>& setme, std::string const& path, tr_error** e
     setme.resize(info.size);
     if (!tr_sys_file_read(fd, std::data(setme), info.size, nullptr, &my_error))
     {
-        tr_logAddError(err_fmt, path_sz, my_error->message);
+        tr_log::warn::add(TR_LOC, fmt::format(_("Couldn't read '{0}': {1}"), path, my_error->message));
         tr_sys_file_close(fd, nullptr);
         tr_error_propagate(error, &my_error);
         return false;
@@ -362,7 +320,7 @@ bool tr_saveFile(std::string const& filename, std::string_view contents, tr_erro
         return false;
     }
 
-    tr_logAddInfo(_("Saved \"%s\""), filename.c_str());
+    tr_log::debug::add(TR_LOC, fmt::format("Saved '{0}'", filename));
     return true;
 }
 
@@ -1136,7 +1094,7 @@ bool tr_moveFile(char const* oldpath, char const* newpath, tr_error** error)
 
         if (!tr_sys_path_remove(oldpath, &my_error))
         {
-            tr_logAddError("Unable to remove file at old path: %s", my_error->message);
+            tr_log::warn::add(TR_LOC, fmt::format(_("Unable to remove file at old path: {0}"), my_error->message));
             tr_error_free(my_error);
         }
     }
