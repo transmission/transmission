@@ -9,6 +9,8 @@
 #include <cinttypes>
 #include <ctime>
 
+#include <fmt/core.h>
+
 #include "transmission.h"
 
 #include "error-types.h"
@@ -21,7 +23,41 @@
 #include "tr-assert.h"
 #include "utils.h" // tr_time()
 
-#define dbgmsg(...) tr_logAddDeepNamed(nullptr, __VA_ARGS__)
+#define logerr(msg) \
+    do \
+    { \
+        if (tr_log::error::enabled()) \
+        { \
+            tr_log::error::add(TR_LOC, (msg)); \
+        } \
+    } while (0)
+
+#define logwarn(msg) \
+    do \
+    { \
+        if (tr_log::warn::enabled()) \
+        { \
+            tr_log::warn::add(TR_LOC, (msg)); \
+        } \
+    } while (0)
+
+#define logdbg(msg) \
+    do \
+    { \
+        if (tr_log::debug::enabled()) \
+        { \
+            tr_log::debug::add(TR_LOC, (msg)); \
+        } \
+    } while (0)
+
+#define logtrace(msg) \
+    do \
+    { \
+        if (tr_log::trace::enabled()) \
+        { \
+            tr_log::trace::add(TR_LOC, (msg)); \
+        } \
+    } while (0)
 
 /***
 ****
@@ -29,7 +65,7 @@
 ****
 ***/
 
-static bool preallocate_file_sparse(tr_sys_file_t fd, uint64_t length, tr_error** error)
+static bool preallocate_file_fast(tr_sys_file_t fd, uint64_t length, tr_error** error)
 {
     tr_error* my_error = nullptr;
 
@@ -43,7 +79,7 @@ static bool preallocate_file_sparse(tr_sys_file_t fd, uint64_t length, tr_error*
         return true;
     }
 
-    dbgmsg("Preallocating (sparse, normal) failed (%d): %s", my_error->code, my_error->message);
+    logdbg(fmt::format("Preallocating (fast, normal) failed: {0} ({1})", my_error->message, my_error->code));
 
     if (!TR_ERROR_IS_ENOSPC(my_error->code))
     {
@@ -57,7 +93,7 @@ static bool preallocate_file_sparse(tr_sys_file_t fd, uint64_t length, tr_error*
             return true;
         }
 
-        dbgmsg("Preallocating (sparse, fallback) failed (%d): %s", my_error->code, my_error->message);
+        logdbg(fmt::format("Preallocating (fast, fallback) failed: {0} ({1})", my_error->message, my_error->code));
     }
 
     tr_error_propagate(error, &my_error);
@@ -78,7 +114,7 @@ static bool preallocate_file_full(tr_sys_file_t fd, uint64_t length, tr_error** 
         return true;
     }
 
-    dbgmsg("Preallocating (full, normal) failed (%d): %s", my_error->code, my_error->message);
+    logdbg(fmt::format("Preallocating (full, normal) failed: {1} ({2})", my_error->message, my_error->code));
 
     if (!TR_ERROR_IS_ENOSPC(my_error->code))
     {
@@ -101,7 +137,7 @@ static bool preallocate_file_full(tr_sys_file_t fd, uint64_t length, tr_error** 
             return true;
         }
 
-        dbgmsg("Preallocating (full, fallback) failed (%d): %s", my_error->code, my_error->message);
+        logdbg(fmt::format("Preallocating (full, fallback) failed: {1} ({2})", my_error->message, my_error->code));
     }
 
     tr_error_propagate(error, &my_error);
@@ -168,13 +204,21 @@ static int cached_file_open(
 
         if (dir == nullptr)
         {
-            tr_logAddError(_("Couldn't get directory for \"%1$s\": %2$s"), filename, error->message);
+            logerr(fmt::format(
+                _("Couldn't get directory for '{filename}': {errmsg} ({errcode})"),
+                fmt::arg("filename", filename),
+                fmt::arg("errmsg", error->message),
+                fmt::arg("errcode", error->code)));
             goto FAIL;
         }
 
         if (!tr_sys_dir_create(dir, TR_SYS_DIR_CREATE_PARENTS, 0777, &error))
         {
-            tr_logAddError(_("Couldn't create \"%1$s\": %2$s"), dir, error->message);
+            logerr(fmt::format(
+                _("Couldn't create '{dirname}': {errmsg} ({errcode})"),
+                fmt::arg("dirname", dir),
+                fmt::arg("errmsg", error->message),
+                fmt::arg("errcode", error->code)));
             tr_free(dir);
             goto FAIL;
         }
@@ -195,7 +239,11 @@ static int cached_file_open(
 
     if (fd == TR_BAD_SYS_FILE)
     {
-        tr_logAddError(_("Couldn't open \"%1$s\": %2$s"), filename, error->message);
+        logerr(fmt::format(
+            _("Couldn't open '{filename}': {errmsg} ({errcode})"),
+            fmt::arg("filename", filename),
+            fmt::arg("errmsg", error->message),
+            fmt::arg("errcode", error->code)));
         goto FAIL;
     }
 
@@ -211,24 +259,28 @@ static int cached_file_open(
         }
         else if (allocation == TR_PREALLOCATE_SPARSE)
         {
-            success = preallocate_file_sparse(fd, file_size, &error);
-            type = _("sparse");
+            success = preallocate_file_fast(fd, file_size, &error);
+            type = _("fast");
         }
 
         TR_ASSERT(type != nullptr);
 
         if (!success)
         {
-            tr_logAddError(
-                _("Couldn't preallocate file \"%1$s\" (%2$s, size: %3$" PRIu64 "): %4$s"),
-                filename,
-                type,
-                file_size,
-                error->message);
+            logwarn(fmt::format(
+                _("Couldn't preallocate '{filename}' mode '{mode}' to {size} bytes: {errmsg}"),
+                fmt::arg("filename", filename),
+                fmt::arg("mode", type),
+                fmt::arg("size", file_size),
+                fmt::arg("errmsg", error->message)));
             goto FAIL;
         }
 
-        tr_logAddDebug(_("Preallocated file \"%1$s\" (%2$s, size: %3$" PRIu64 ")"), filename, type, file_size);
+        logdbg(fmt::format(
+            "Preallocated file '{filename}' with mode {mode} to {size} bytes",
+            fmt::arg("filename", filename),
+            fmt::arg("mode", type),
+            fmt::arg("size", file_size)));
     }
 
     /* If the file already exists and it's too large, truncate it.
@@ -239,7 +291,11 @@ static int cached_file_open(
      */
     if (resize_needed && !tr_sys_file_truncate(fd, file_size, &error))
     {
-        tr_logAddError(_("Couldn't truncate \"%1$s\": %2$s"), filename, error->message);
+        logwarn(fmt::format(
+            _("Couldn't truncate '{filename}': {errmsg} ({errcode})"),
+            fmt::arg("filename", filename),
+            fmt::arg("errmsg", error->message),
+            fmt::arg("errcode", error->code)));
         goto FAIL;
     }
 
@@ -479,11 +535,11 @@ tr_sys_file_t tr_fdFileCheckout(
             return TR_BAD_SYS_FILE;
         }
 
-        dbgmsg("opened '%s' writable %c", filename, writable ? 'y' : 'n');
+        logtrace(fmt::format("opened '{0}' writable:{1}", filename, writable));
         o->is_writable = writable;
     }
 
-    dbgmsg("checking out '%s'", filename);
+    logtrace(fmt::format("checking out '{0}'", filename));
     o->torrent_id = torrent_id;
     o->file_index = i;
     o->used_at = tr_time();
@@ -511,7 +567,10 @@ tr_socket_t tr_fdSocketCreate(tr_session* session, int domain, int type)
 
         if ((s == TR_BAD_SOCKET) && (sockerrno != EAFNOSUPPORT))
         {
-            tr_logAddError(_("Couldn't create socket: %s"), tr_net_strerror(sockerrno).c_str());
+            logwarn(fmt::format(
+                _("Couldn't create socket: {errmsg} ({errcode})"),
+                fmt::arg("errmsg", tr_net_strerror(sockerrno)),
+                fmt::arg("errcode", sockerrno)));
         }
     }
 
@@ -533,7 +592,7 @@ tr_socket_t tr_fdSocketCreate(tr_session* session, int domain, int type)
 
             if (getsockopt(s, SOL_SOCKET, SO_SNDBUF, reinterpret_cast<char*>(&i), &size) != -1)
             {
-                tr_logAddDebug("SO_SNDBUF size is %d", i);
+                logtrace(fmt::format("SO_SNDBUF size is {0}", i));
             }
 
             i = 0;
@@ -541,7 +600,7 @@ tr_socket_t tr_fdSocketCreate(tr_session* session, int domain, int type)
 
             if (getsockopt(s, SOL_SOCKET, SO_RCVBUF, reinterpret_cast<char*>(&i), &size) != -1)
             {
-                tr_logAddDebug("SO_RCVBUF size is %d", i);
+                logtrace(fmt::format("SO_RCVBUF size is {0}", i));
             }
 
             buf_logged = true;
@@ -560,7 +619,7 @@ tr_socket_t tr_fdSocketAccept(tr_session* s, tr_socket_t sockfd, tr_address* add
     ensureSessionFdInfoExists(s);
     tr_fdInfo* const gFd = s->fdInfo;
 
-    struct sockaddr_storage sock;
+    sockaddr_storage sock;
     socklen_t len = sizeof(struct sockaddr_storage);
     tr_socket_t fd = accept(sockfd, (struct sockaddr*)&sock, &len);
 

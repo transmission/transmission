@@ -132,6 +132,19 @@ bool enabled()
 }
 } // namespace debug
 
+namespace trace
+{
+void add(char const* file, int line, std::string_view msg, std::string_view name = ""sv)
+{
+    tr_logAddMessage(file, line, TR_LOG_TRACE, std::string{ name }.c_str(), "%s", std::string{ msg }.c_str());
+}
+
+bool enabled()
+{
+    return tr_logLevelIsActive(TR_LOG_TRACE);
+}
+} // namespace trace
+
 } // namespace tr_log
 
 #define tr_logMsgErr(sv) tr_logMsg(TR_LOG_ERROR, __VA_ARGS__)
