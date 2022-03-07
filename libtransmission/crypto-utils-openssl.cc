@@ -8,6 +8,8 @@
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
 
+#include <fmt/core.h>
+
 #include <openssl/bn.h>
 #include <openssl/crypto.h>
 #include <openssl/dh.h>
@@ -19,6 +21,7 @@
 #include <openssl/x509.h>
 
 #include "transmission.h"
+
 #include "crypto-utils.h"
 #include "log.h"
 #include "tr-assert.h"
@@ -35,35 +38,36 @@ static char constexpr MyName[] = "tr_crypto_utils";
 
 static void log_openssl_error(char const* file, int line)
 {
-    unsigned long const error_code = ERR_get_error();
-
-    if (tr_logLevelIsActive(TR_LOG_ERROR))
+    if (!tr_log::error::enabled())
     {
-        char buf[512];
+        return;
+    }
+
+    unsigned long const error_code = ERR_get_error();
+    char buf[512];
 
 #ifndef TR_LIGHTWEIGHT
 
-        static bool strings_loaded = false;
+    static bool strings_loaded = false;
 
-        if (!strings_loaded)
-        {
+    if (!strings_loaded)
+    {
 #if OPENSSL_VERSION_NUMBER < 0x10100000 || (defined(LIBRESSL_VERSION_NUMBER) && LIBRESSL_VERSION_NUMBER < 0x20700000)
-            ERR_load_crypto_strings();
+        ERR_load_crypto_strings();
 #else
-            OPENSSL_init_crypto(OPENSSL_INIT_LOAD_CRYPTO_STRINGS, nullptr);
+        OPENSSL_init_crypto(OPENSSL_INIT_LOAD_CRYPTO_STRINGS, nullptr);
 #endif
 
-            strings_loaded = true;
-        }
-
-#endif
-
-        ERR_error_string_n(error_code, buf, sizeof(buf));
-        tr_logAddMessage(file, line, TR_LOG_ERROR, MyName, "OpenSSL error: %s", buf);
+        strings_loaded = true;
     }
+
+#endif
+
+    ERR_error_string_n(error_code, buf, sizeof(buf));
+    tr_log::error::add(file, line, fmt::format(_("OpenSSL error: {errmsg}"), fmt::arg("errmsg", buf)), MyName);
 }
 
-#define log_error() log_openssl_error(__FILE__, __LINE__)
+#define logerr() log_openssl_error(__FILE__, __LINE__)
 
 static bool check_openssl_result(int result, int expected_result, bool expected_equal, char const* file, int line)
 {
@@ -367,7 +371,7 @@ tr_x509_cert_t tr_x509_cert_new(void const* der, size_t der_length)
 
     if (ret == nullptr)
     {
-        log_error();
+        logerr();
     }
 
     return ret;
