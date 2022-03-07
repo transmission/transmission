@@ -10,7 +10,6 @@
   - [ ] libtransmission/makemeta.cc
   - [ ] libtransmission/port-forwarding.cc
   - [ ] libtransmission/session-id.cc
-  - [ ] libtransmission/trevent.cc
   - [ ] libtransmission/watchdir-kqueue.cc
   - [ ] libtransmission/web.cc
   - [ ] macosx/Torrent.mm

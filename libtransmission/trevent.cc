@@ -29,6 +29,17 @@
 #include "trevent.h"
 #include "utils.h"
 
+static char constexpr CodeName[] = "trevent";
+
+#define logtrace(msg) \
+    do \
+    { \
+        if (tr_log::trace::enabled()) \
+        { \
+            tr_log::trace::add(TR_LOC, msg, CodeName); \
+        } \
+    } while (0)
+
 /***
 ****
 ***/
@@ -211,7 +222,7 @@ static void libeventThreadFunc(tr_event_handle* events)
     events->session->evdns_base = nullptr;
     events->session->events = nullptr;
     delete events;
-    tr_logAddDebug("Closing libevent thread");
+    logtrace("Closing libevent thread");
 }
 
 void tr_eventInit(tr_session* session)
@@ -243,7 +254,7 @@ void tr_eventClose(tr_session* session)
 
     if (tr_logGetDeepEnabled())
     {
-        tr_logAddDeep(__FILE__, __LINE__, nullptr, "closing trevent pipe");
+        logtrace("closing trevent pipe");
     }
 }
 
