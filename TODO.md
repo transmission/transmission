@@ -13,7 +13,6 @@
   - [ ] libtransmission/session-id.cc
   - [ ] libtransmission/torrent-metainfo.cc
   - [ ] libtransmission/trevent.cc
-  - [ ] libtransmission/watchdir-inotify.cc
   - [ ] libtransmission/watchdir-kqueue.cc
   - [ ] libtransmission/web.cc
   - [ ] macosx/Torrent.mm
