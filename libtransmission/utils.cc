@@ -194,8 +194,8 @@ uint8_t* tr_loadFile(char const* path, size_t* size, tr_error** error)
         tr_log::warn::add(
             TR_LOC,
             fmt::format(
-                _("Couldn't read '{filename}': {errmsg} ({errcode})"),
-                fmt::arg("filename", path),
+                _("Couldn't read '{path}': {errmsg} ({errcode})"),
+                fmt::arg("path", path),
                 fmt::arg("errmsg", my_error->message),
                 fmt::arg("errcode", my_error->code)));
         tr_error_propagate(error, &my_error);
@@ -204,7 +204,7 @@ uint8_t* tr_loadFile(char const* path, size_t* size, tr_error** error)
 
     if (info.type != TR_SYS_PATH_IS_FILE)
     {
-        tr_log::warn::add(TR_LOC, fmt::format(_("Couldn't read '{filename}': Not a regular file"), fmt::arg("filename", path))),
+        tr_log::warn::add(TR_LOC, fmt::format(_("Couldn't read '{path}': Not a regular file"), fmt::arg("path", path))),
             tr_error_set(error, TR_ERROR_EISDIR, "Not a regular file"sv);
         return nullptr;
     }
@@ -222,8 +222,8 @@ uint8_t* tr_loadFile(char const* path, size_t* size, tr_error** error)
         tr_log::warn::add(
             TR_LOC,
             fmt::format(
-                _("Couldn't read '{filename}': {errmsg} ({errcode})"),
-                fmt::arg("filename", path),
+                _("Couldn't read '{path}': {errmsg} ({errcode})"),
+                fmt::arg("path", path),
                 fmt::arg("errmsg", my_error->message),
                 fmt::arg("errcode", my_error->code)));
         tr_error_propagate(error, &my_error);
@@ -236,8 +236,8 @@ uint8_t* tr_loadFile(char const* path, size_t* size, tr_error** error)
         tr_log::warn::add(
             TR_LOC,
             fmt::format(
-                _("Couldn't read '{filename}': {errmsg} ({errcode})"),
-                fmt::arg("filename", path),
+                _("Couldn't read '{path}': {errmsg} ({errcode})"),
+                fmt::arg("path", path),
                 fmt::arg("errmsg", my_error->message),
                 fmt::arg("errcode", my_error->code)));
         tr_sys_file_close(fd, nullptr);
@@ -264,8 +264,8 @@ bool tr_loadFile(std::vector<char>& setme, std::string const& path, tr_error** e
         tr_log::warn::add(
             TR_LOC,
             fmt::format(
-                _("Couldn't read '{filename}': {errmsg} ({errcode})"),
-                fmt::arg("filename", path),
+                _("Couldn't read '{path}': {errmsg} ({errcode})"),
+                fmt::arg("path", path),
                 fmt::arg("errmsg", my_error->message),
                 fmt::arg("errcode", my_error->code)));
         tr_error_propagate(error, &my_error);
@@ -274,7 +274,7 @@ bool tr_loadFile(std::vector<char>& setme, std::string const& path, tr_error** e
 
     if (info.type != TR_SYS_PATH_IS_FILE)
     {
-        tr_log::warn::add(TR_LOC, fmt::format(_("Couldn't read '{filename}': Not a regular file"), fmt::arg("filename", path)));
+        tr_log::warn::add(TR_LOC, fmt::format(_("Couldn't read '{path}': Not a regular file"), fmt::arg("path", path)));
         tr_error_set(error, TR_ERROR_EISDIR, "Not a regular file"sv);
         return false;
     }
@@ -286,8 +286,8 @@ bool tr_loadFile(std::vector<char>& setme, std::string const& path, tr_error** e
         tr_log::warn::add(
             TR_LOC,
             fmt::format(
-                _("Couldn't read '{filename}': {errmsg} ({errcode})"),
-                fmt::arg("filename", path),
+                _("Couldn't read '{path}': {errmsg} ({errcode})"),
+                fmt::arg("path", path),
                 fmt::arg("errmsg", my_error->message),
                 fmt::arg("errcode", my_error->code)));
         tr_error_propagate(error, &my_error);
@@ -300,8 +300,8 @@ bool tr_loadFile(std::vector<char>& setme, std::string const& path, tr_error** e
         tr_log::warn::add(
             TR_LOC,
             fmt::format(
-                _("Couldn't read '{filename}': {errmsg} ({errcode})"),
-                fmt::arg("filename", path),
+                _("Couldn't read '{path}': {errmsg} ({errcode})"),
+                fmt::arg("path", path),
                 fmt::arg("errmsg", my_error->message),
                 fmt::arg("errcode", my_error->code)));
         tr_sys_file_close(fd, nullptr);

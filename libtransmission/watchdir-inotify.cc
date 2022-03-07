@@ -182,8 +182,8 @@ tr_watchdir_backend* tr_watchdir_inotify_new(tr_watchdir_t handle)
     {
         auto const errcode = errno;
         logerr(fmt::format(
-            _("Watchdir '{filename}' setup failed: {errmsg} ({errcode})"),
-            fmt::format("filename", path),
+            _("Watchdir '{path}' setup failed: {errmsg} ({errcode})"),
+            fmt::format("path", path),
             fmt::format("errmsg", tr_strerror(errcode)),
             fmt::format("errcode", errcode)));
         goto FAIL;
@@ -193,8 +193,8 @@ tr_watchdir_backend* tr_watchdir_inotify_new(tr_watchdir_t handle)
     {
         auto const errcode = errno;
         logerr(fmt::format(
-            _("Watchdir '{filename}' setup failed: {errmsg} ({errcode})"),
-            fmt::format("filename", path),
+            _("Watchdir '{path}' setup failed: {errmsg} ({errcode})"),
+            fmt::format("path", path),
             fmt::format("errmsg", tr_strerror(errcode)),
             fmt::format("errcode", errcode)));
         goto FAIL;
@@ -204,8 +204,8 @@ tr_watchdir_backend* tr_watchdir_inotify_new(tr_watchdir_t handle)
     {
         auto const errcode = errno;
         logerr(fmt::format(
-            _("Watchdir '{filename}' setup failed: {errmsg} ({errcode})"),
-            fmt::format("filename", path),
+            _("Watchdir '{path}' setup failed: {errmsg} ({errcode})"),
+            fmt::format("path", path),
             fmt::format("errmsg", tr_strerror(errcode)),
             fmt::format("errcode", errcode)));
         goto FAIL;
@@ -228,8 +228,8 @@ tr_watchdir_backend* tr_watchdir_inotify_new(tr_watchdir_t handle)
     {
         auto const errcode = errno;
         logerr(fmt::format(
-            _("Error reading from '{filename}': {errmsg} ({errcode})"),
-            fmt::arg("filename", path),
+            _("Error reading from '{path}': {errmsg} ({errcode})"),
+            fmt::arg("path", path),
             fmt::arg("errmsg", tr_strerror(errcode)),
             fmt::arg("errcode", errcode)));
     }

@@ -1218,10 +1218,10 @@ int tr_variantToFile(tr_variant const* v, tr_variant_fmt fmt, std::string const&
         tr_log::error::add(
             TR_LOC,
             fmt::format(
-                "Error saving '{filename}': {message} ({code})",
-                fmt::arg("filename", filename),
-                fmt::arg("message", error->message),
-                fmt::arg("code", error->code)));
+                "Error saving '{path}': {errmsg} ({errcode})",
+                fmt::arg("path", filename),
+                fmt::arg("errmsg", error->message),
+                fmt::arg("errcode", error->code)));
         error_code = error->code;
         tr_error_clear(&error);
     }

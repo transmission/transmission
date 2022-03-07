@@ -90,8 +90,8 @@ static bool is_regular_file(char const* dir, char const* name)
         if (!TR_ERROR_IS_ENOENT(error->code))
         {
             logerr(fmt::format(
-                _("Failed to get type of '{filename}': {errmsg} ({errcode})"),
-                fmt::arg("filename", path),
+                _("Failed to get type of '{path}': {errmsg} ({errcode})"),
+                fmt::arg("path", path),
                 fmt::arg("errmsg", error->message),
                 fmt::arg("errcode", error->code)));
         }
@@ -191,7 +191,7 @@ static void tr_watchdir_on_retry_timer(evutil_socket_t /*fd*/, short /*type*/, v
             return;
         }
 
-        logerr(fmt::format(_("Unable to add torrent file '{filename}'"), fmt::format("filename", retry->name)));
+        logerr(fmt::format(_("Unable to add torrent file '{path}'"), fmt::format("path", retry->name)));
     }
 
     tr_watchdir_retries_remove(&handle->active_retries, retry);
@@ -358,8 +358,8 @@ void tr_watchdir_scan(tr_watchdir_t handle, std::unordered_set<std::string>* dir
     if (dir == TR_BAD_SYS_DIR)
     {
         logerr(fmt::format(
-            _("Unable to open '{filename}': {errmsg} ({errcode})"),
-            fmt::arg("filename", handle->path),
+            _("Unable to open '{path}': {errmsg} ({errcode})"),
+            fmt::arg("path", handle->path),
             fmt::arg("errmsg", error->message),
             fmt::arg("errcode", error->code)));
         tr_error_free(error);
@@ -391,8 +391,8 @@ void tr_watchdir_scan(tr_watchdir_t handle, std::unordered_set<std::string>* dir
     if (error != nullptr)
     {
         logerr(fmt::format(
-            _("Error reading from '{filename}': {errmsg} ({errcode})"),
-            fmt::arg("filename", handle->path),
+            _("Error reading from '{path}': {errmsg} ({errcode})"),
+            fmt::arg("path", handle->path),
             fmt::arg("errmsg", error->message),
             fmt::arg("errcode", error->code)));
         tr_error_free(error);

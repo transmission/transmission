@@ -235,37 +235,28 @@ static auto onFileAdded(tr_watchdir_t dir, char const* name, void* vsession)
 
     if (tr_torrentNew(ctor, nullptr) == nullptr)
     {
-        tr_log::error::add(
-            TR_LOC,
-            fmt::format(_("Unable to add .torrent file '{filename}'"), fmt::arg("filename", name)),
-            MyName);
+        tr_log::error::add(TR_LOC, fmt::format(_("Unable to add .torrent file '{path}'"), fmt::arg("path", name)), MyName);
     }
     else
     {
         bool trash = false;
         bool const test = tr_ctorGetDeleteSource(ctor, &trash);
 
-        tr_log::debug::add(
-            TR_LOC,
-            fmt::format("Parsing .torrent file successful '{filename}'", fmt::arg("filename", name)),
-            MyName);
+        tr_log::debug::add(TR_LOC, fmt::format("Parsing .torrent file successful '{path}'", fmt::arg("path", name)), MyName);
 
         if (test && trash)
         {
             tr_error* error = nullptr;
 
-            tr_log::debug::add(
-                TR_LOC,
-                fmt::format("Deleting input .torrent file '{filename}'", fmt::arg("filename", name)),
-                MyName);
+            tr_log::debug::add(TR_LOC, fmt::format("Deleting input .torrent file '{path}'", fmt::arg("path", name)), MyName);
 
             if (!tr_sys_path_remove(filename.c_str(), &error))
             {
                 tr_log::warn::add(
                     TR_LOC,
                     fmt::format(
-                        _("Error deleting .torrent file '{filename}': {errmsg} ({errcode})"),
-                        fmt::arg("filename", name),
+                        _("Error deleting .torrent file '{path}': {errmsg} ({errcode})"),
+                        fmt::arg("path", name),
                         fmt::arg("errmsg", error->message),
                         fmt::arg("errcode", error->code)));
                 tr_error_free(error);
@@ -688,10 +679,7 @@ static int daemon_start(void* varg, [[maybe_unused]] bool foreground)
             auto const out = std::to_string(getpid());
             tr_sys_file_write(fp, std::data(out), std::size(out), nullptr, nullptr);
             tr_sys_file_close(fp, nullptr);
-            tr_log::debug::add(
-                TR_LOC,
-                fmt::format("Saved pidfile '{filename}'", fmt::arg("filename", sz_pid_filename)),
-                MyName);
+            tr_log::debug::add(TR_LOC, fmt::format("Saved pidfile '{path}'", fmt::arg("path", sz_pid_filename)), MyName);
             pidfile_created = true;
         }
         else
@@ -699,8 +687,8 @@ static int daemon_start(void* varg, [[maybe_unused]] bool foreground)
             tr_log::warn::add(
                 TR_LOC,
                 fmt::format(
-                    _("Unable to save pidfile '{filename}': {errmsg} ({errcode})"),
-                    fmt::arg("filename", sz_pid_filename),
+                    _("Unable to save pidfile '{path}': {errmsg} ({errcode})"),
+                    fmt::arg("path", sz_pid_filename),
                     fmt::arg("errmsg", error->message),
                     fmt::arg("errcode", error->code)),
                 MyName);

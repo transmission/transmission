@@ -205,8 +205,8 @@ static int cached_file_open(
         if (dir == nullptr)
         {
             logerr(fmt::format(
-                _("Couldn't get directory for '{filename}': {errmsg} ({errcode})"),
-                fmt::arg("filename", filename),
+                _("Couldn't get directory for '{path}': {errmsg} ({errcode})"),
+                fmt::arg("path", filename),
                 fmt::arg("errmsg", error->message),
                 fmt::arg("errcode", error->code)));
             goto FAIL;
@@ -215,8 +215,8 @@ static int cached_file_open(
         if (!tr_sys_dir_create(dir, TR_SYS_DIR_CREATE_PARENTS, 0777, &error))
         {
             logerr(fmt::format(
-                _("Couldn't create '{dirname}': {errmsg} ({errcode})"),
-                fmt::arg("dirname", dir),
+                _("Couldn't create '{path}': {errmsg} ({errcode})"),
+                fmt::arg("path", dir),
                 fmt::arg("errmsg", error->message),
                 fmt::arg("errcode", error->code)));
             tr_free(dir);
@@ -240,8 +240,8 @@ static int cached_file_open(
     if (fd == TR_BAD_SYS_FILE)
     {
         logerr(fmt::format(
-            _("Couldn't open '{filename}': {errmsg} ({errcode})"),
-            fmt::arg("filename", filename),
+            _("Couldn't open '{path}': {errmsg} ({errcode})"),
+            fmt::arg("path", filename),
             fmt::arg("errmsg", error->message),
             fmt::arg("errcode", error->code)));
         goto FAIL;
@@ -268,8 +268,8 @@ static int cached_file_open(
         if (!success)
         {
             logwarn(fmt::format(
-                _("Couldn't preallocate '{filename}' mode '{mode}' to {size} bytes: {errmsg}"),
-                fmt::arg("filename", filename),
+                _("Couldn't preallocate '{path}' mode '{mode}' to {size} bytes: {errmsg}"),
+                fmt::arg("path", filename),
                 fmt::arg("mode", type),
                 fmt::arg("size", file_size),
                 fmt::arg("errmsg", error->message)));
@@ -277,8 +277,8 @@ static int cached_file_open(
         }
 
         logdbg(fmt::format(
-            "Preallocated file '{filename}' with mode {mode} to {size} bytes",
-            fmt::arg("filename", filename),
+            "Preallocated file '{path}' with mode {mode} to {size} bytes",
+            fmt::arg("path", filename),
             fmt::arg("mode", type),
             fmt::arg("size", file_size)));
     }
@@ -292,8 +292,8 @@ static int cached_file_open(
     if (resize_needed && !tr_sys_file_truncate(fd, file_size, &error))
     {
         logwarn(fmt::format(
-            _("Couldn't truncate '{filename}': {errmsg} ({errcode})"),
-            fmt::arg("filename", filename),
+            _("Couldn't truncate '{path}': {errmsg} ({errcode})"),
+            fmt::arg("path", filename),
             fmt::arg("errmsg", error->message),
             fmt::arg("errcode", error->code)));
         goto FAIL;

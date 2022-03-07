@@ -136,8 +136,8 @@ int readOrWriteBytes(
                 tr_log::error::add(
                     TR_LOC,
                     fmt::format(
-                        _("Unable to open '{filename}': {errmsg} ({errcode})"),
-                        fmt::arg("filename", filename),
+                        _("Unable to open '{path}': {errmsg} ({errcode})"),
+                        fmt::arg("path", filename),
                         fmt::arg("errmsg", tr_strerror(err)),
                         fmt::arg("errcode", err)),
                     tor->name());
@@ -172,8 +172,8 @@ int readOrWriteBytes(
             tr_log::error::add(
                 TR_LOC,
                 fmt::format(
-                    _("Error reading from '{filename}': {errmsg} ({errcode})"),
-                    fmt::arg("filename", tor->fileSubpath(file_index)),
+                    _("Error reading from '{path}': {errmsg} ({errcode})"),
+                    fmt::arg("path", tor->fileSubpath(file_index)),
                     fmt::arg("errmsg", error->message),
                     fmt::arg("errcode", error->code)),
                 tor->name());
@@ -188,8 +188,8 @@ int readOrWriteBytes(
             tr_log::error::add(
                 TR_LOC,
                 fmt::format(
-                    _("Error writing to '{filename}': {errmsg} ({errcode})"),
-                    fmt::arg("filename", tor->fileSubpath(file_index)),
+                    _("Error writing to '{path}': {errmsg} ({errcode})"),
+                    fmt::arg("path", tor->fileSubpath(file_index)),
                     fmt::arg("errmsg", error->message),
                     fmt::arg("errcode", error->code)),
                 tor->name());

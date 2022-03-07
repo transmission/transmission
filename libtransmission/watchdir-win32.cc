@@ -292,7 +292,7 @@ tr_watchdir_backend* tr_watchdir_win32_new(tr_watchdir_t handle)
 
     if ((wide_path = tr_win32_utf8_to_native(path, -1)) == nullptr)
     {
-        logwarn(fmt::format(_("Failed to convert '{filename}' to native path"), fmt::arg("filename", path)));
+        logwarn(fmt::format(_("Failed to convert '{path}' to native path"), fmt::arg("path", path)));
         goto fail;
     }
 
@@ -306,8 +306,8 @@ tr_watchdir_backend* tr_watchdir_win32_new(tr_watchdir_t handle)
              nullptr)) == INVALID_HANDLE_VALUE)
     {
         logwarn(fmt::format(
-            _("Unable to open '{filename}': {errmsg} ({errcode})"),
-            fmt::arg("filename", path),
+            _("Unable to open '{path}': {errmsg} ({errcode})"),
+            fmt::arg("path", path),
             fmt::arg("errmsg", tr_win32_format_message(GetLastError())),
             fmt::arg("errcode", GetLastError())));
         goto fail;

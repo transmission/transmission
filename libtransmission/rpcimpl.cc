@@ -1446,7 +1446,12 @@ static void onBlocklistFetched(tr_web::FetchResponse const& web_response)
     tr_error* error = nullptr;
     if (!tr_saveFile(filename, std::string_view{ std::data(content), std::size(content) }, &error))
     {
-        tr_snprintf(result, sizeof(result), _("Couldn't save file \"%1$s\": %2$s"), filename.c_str(), error->message);
+        auto msg = fmt::format(
+            _("Error saving '{path}': {errmsg} ({errcode})"),
+            fmt::arg("path", filename),
+            fmt::arg("errmsg", error->message),
+            fmt::arg("errcode", error->code));
+        tr_strlcpy(result, msg.c_str(), sizeof(result));
         tr_error_clear(&error);
         tr_idle_function_done(data, result);
         return;

@@ -271,7 +271,7 @@ FAILURE:
     tr_log::error::add(
         TR_LOC,
         fmt::format(
-            _("Couldn't create '{path}': {errmsg} ({errcode}"),
+            _("Couldn't create '{path}': {errmsg} ({errcode})"),
             fmt::arg("path", path),
             fmt::arg("errmsg", my_error->message),
             fmt::arg("errcode", my_error->code)));

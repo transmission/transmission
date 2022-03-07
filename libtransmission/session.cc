@@ -2074,7 +2074,7 @@ static void sessionLoadTorrents(struct sessionLoadTorrentsData* const data)
 
     if (n != 0)
     {
-        tr_log::info::add(TR_LOC, fmt::format(_("Loaded {qty} torrents"), fmt::arg("num", n)));
+        tr_log::info::add(TR_LOC, fmt::format(_("Loaded {number} torrents"), fmt::arg("number", n)));
     }
 
     if (data->setmeCount != nullptr)

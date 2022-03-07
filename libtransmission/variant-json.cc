@@ -84,8 +84,8 @@ static void error_handler(jsonsl_t jsn, jsonsl_error_t error, jsonsl_state_st* /
         tr_log::error::add(
             TR_LOC,
             fmt::format(
-                "JSON parse failed at pos {qty}: {errmsg} -- remaining text '{text:.16s}'",
-                fmt::arg("qty", jsn->pos),
+                "JSON parse failed at pos {number}: {errmsg} -- remaining text '{text:.16s}'",
+                fmt::arg("number", jsn->pos),
                 fmt::arg("errmsg", jsonsl_strerror(error)),
                 fmt::arg("text", buf)));
 

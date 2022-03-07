@@ -1277,10 +1277,10 @@ static void on_scrape_error(tr_session const* /*session*/, tr_tier* tier, char c
     logwarn(
         tier,
         fmt::format(
-            _("Tracker '{host}' scrape error: {errmsg} (Retrying in {qty} seconds)"),
+            _("Tracker '{host}' scrape error: {errmsg} (Retrying in {number} seconds)"),
             fmt::arg("host", current_tracker->host),
             fmt::arg("errmsg", errmsg),
-            fmt::arg("qty", interval)));
+            fmt::arg("number", interval)));
     tier->lastScrapeSucceeded = false;
     tier->scheduleNextScrape(interval);
 }

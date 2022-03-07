@@ -188,7 +188,7 @@ static void dht_boostrap_from_file(tr_session* session)
     }
 
     // format is each line has address, a space char, and port number
-    loginfo(fmt::format(_("Bootstrapping from {filename}"), fmt::arg("filename", bootstrap_file)), ModuleName);
+    loginfo(fmt::format(_("Bootstrapping from {path}"), fmt::arg("path", bootstrap_file)), ModuleName);
     auto line = std::string{};
     while (!bootstrap_done(session, 0) && std::getline(in, line))
     {
@@ -221,12 +221,12 @@ static void dht_bootstrap(void* closure)
 
     if (cl->len > 0)
     {
-        loginfo(fmt::format(_("Bootstrapping from {qty} IPv4 nodes"), fmt::arg("qty", num)), ModuleName);
+        loginfo(fmt::format(_("Bootstrapping from {number} IPv4 nodes"), fmt::arg("number", num)), ModuleName);
     }
 
     if (cl->len6 > 0)
     {
-        loginfo(fmt::format(_("Bootstrapping from {qty} IPv6 nodes"), fmt::arg("qty", num6)), ModuleName);
+        loginfo(fmt::format(_("Bootstrapping from {number} IPv6 nodes"), fmt::arg("number", num6)), ModuleName);
     }
 
     for (int i = 0; i < std::max(num, num6); ++i)
@@ -721,10 +721,10 @@ static AnnounceResult tr_dhtAnnounce(tr_torrent* tor, int af, bool announce)
         auto const errcode = errno;
         logwarn(
             fmt::format(
-                _("{type} DHT announce failed ({status}, {qty} nodes): {errmsg} ({errcode})"),
+                _("{type} DHT announce failed ({status}, {number} nodes): {errmsg} ({errcode})"),
                 fmt::arg("type", af == AF_INET6 ? "IPv6" : "IPv4"),
                 fmt::arg("status", tr_dhtPrintableStatus(status)),
-                fmt::arg("qty", numnodes),
+                fmt::arg("number", numnodes),
                 fmt::arg("errmsg", tr_strerror(errcode)),
                 fmt::arg("errcode", errcode)),
             tor->name());

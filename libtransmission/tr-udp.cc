@@ -123,26 +123,26 @@ static void set_socket_buffers(tr_socket_t fd, bool large)
         if (rbuf < RECV_BUFFER_SIZE)
         {
             logerr(fmt::format(
-                _("Failed to set receive buffer: requested {req}, got {qty}"),
+                _("Failed to set receive buffer: requested {req}, got {number}"),
                 fmt::arg("req", RECV_BUFFER_SIZE),
-                fmt::arg("qty", rbuf)));
+                fmt::arg("number", rbuf)));
 #ifdef __linux__
             loginfo(fmt::format(
-                _("Please add the line `net.core.rmem_max = {qty}` to /etc/sysctl.conf"),
-                fmt::arg("qty", RECV_BUFFER_SIZE)));
+                _("Please add the line `net.core.rmem_max = {number}` to /etc/sysctl.conf"),
+                fmt::arg("number", RECV_BUFFER_SIZE)));
 #endif
         }
 
         if (sbuf < SEND_BUFFER_SIZE)
         {
             logerr(fmt::format(
-                _("Failed to set send buffer: requested {req}, got {qty}"),
+                _("Failed to set send buffer: requested {req}, got {number}"),
                 fmt::arg("req", SEND_BUFFER_SIZE),
-                fmt::arg("qty", sbuf)));
+                fmt::arg("number", sbuf)));
 #ifdef __linux__
             loginfo(fmt::format(
-                _("Please add the line `net.core.wmem_max = {qty}` to /etc/sysctl.conf"),
-                fmt::arg("qty", SEND_BUFFER_SIZE)));
+                _("Please add the line `net.core.wmem_max = {number}` to /etc/sysctl.conf"),
+                fmt::arg("number", SEND_BUFFER_SIZE)));
 #endif
         }
     }

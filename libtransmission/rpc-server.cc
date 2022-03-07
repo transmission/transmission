@@ -670,8 +670,8 @@ static bool tr_rpc_address_from_string(tr_rpc_address& dst, std::string_view src
         if (std::size(src) >= TrUnixAddrStrLen)
         {
             logerr(fmt::format(
-                _("Unix socket path must be fewer than {qty} characters (including '{text}' prefix)"),
-                fmt::arg("qty", TrUnixAddrStrLen - 1),
+                _("Unix socket path must be fewer than {number} characters (including '{text}' prefix)"),
+                fmt::arg("number", TrUnixAddrStrLen - 1),
                 fmt::arg("text", TrUnixSocketPrefix)));
             return false;
         }
@@ -807,9 +807,9 @@ static void startServer(tr_rpc_server* server)
         }
 
         logerr(fmt::format(
-            _("Unable to bind to {address} after {qty} attempts, giving up"),
+            _("Unable to bind to {address} after {number} attempts, giving up"),
             fmt::format("address", addr_port_str),
-            fmt::format("qty", ServerStartRetryCount)));
+            fmt::format("number", ServerStartRetryCount)));
     }
     else
     {

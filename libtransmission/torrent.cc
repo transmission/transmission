@@ -1805,7 +1805,7 @@ static void torrentCallScript(tr_torrent const* tor, char const* script)
         { "TR_TORRENT_TRACKERS"sv, trackers_str },
     };
 
-    loginfo(tor, fmt::format(_("Calling script '{filename}'"), fmt::arg("filename", script)));
+    loginfo(tor, fmt::format(_("Calling script '{path}'"), fmt::arg("path", script)));
 
     tr_error* error = nullptr;
 
@@ -1814,8 +1814,8 @@ static void torrentCallScript(tr_torrent const* tor, char const* script)
         logerr(
             tor,
             fmt::format(
-                _("Error executing script '{filename}': {errmsg} ({errcode})"),
-                fmt::arg("filename", script),
+                _("Error executing script '{path}': {errmsg} ({errcode})"),
+                fmt::arg("path", script),
                 fmt::arg("errmsg", error->message),
                 fmt::arg("errcode", error->code)));
         tr_error_free(error);
@@ -2571,8 +2571,8 @@ static void tr_torrentFileCompleted(tr_torrent* tor, tr_file_index_t i)
                     fmt::format(
                         _("Error moving '{oldpath}' to '{path}': {errmsg} ({errcode})"),
                         fmt::arg("oldpath", oldpath),
-                        fmt::arg("newpath", path),
-                        fmt::arg("errmsg", error->messsage),
+                        fmt::arg("path", newpath),
+                        fmt::arg("errmsg", error->message),
                         fmt::arg("errcode", error->code)));
                 tr_error_free(error);
             }
@@ -2622,7 +2622,9 @@ void tr_torrentGotBlock(tr_torrent* tor, tr_block_index_t block)
                 uint32_t const n = tor->pieceSize(piece);
                 logerr(
                     tor,
-                    fmt::format(_("Piece {qty}, which was just downloaded, failed its checksum test"), fmt::arg("qty", piece)));
+                    fmt::format(
+                        _("Piece {number}, which was just downloaded, failed its checksum test"),
+                        fmt::arg("number", piece)));
                 tor->corruptCur += n;
                 tor->downloadedCur -= std::min(tor->downloadedCur, uint64_t{ n });
                 tr_peerMgrGotBadPiece(tor, piece);
