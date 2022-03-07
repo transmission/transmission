@@ -5,40 +5,48 @@
 #include <event2/event.h>
 
 #include <cstdint>
+
 #include <libutp/utp.h>
 
+#include <fmt/core.h>
+
 #include "transmission.h"
+
+#include "crypto-utils.h" /* tr_rand_int_weak() */
 #include "log.h"
 #include "net.h"
-#include "session.h"
-#include "crypto-utils.h" /* tr_rand_int_weak() */
 #include "peer-mgr.h"
 #include "peer-socket.h"
+#include "session.h"
 #include "tr-utp.h"
 #include "utils.h"
 
-#ifndef WITH_UTP
-
 static char constexpr MyName[] = "UTP";
 
-#define dbgmsg(...) tr_logAddDeepNamed(MyName, __VA_ARGS__)
+#define dbgmsg(sv) \
+    do \
+    { \
+        if (tr_log::debug::enabled()) \
+        { \
+            tr_log::debug::add(TR_LOC, (sv), MyName); \
+        } \
+        while (0)
+
+#ifndef WITH_UTP
 
 void UTP_Close(struct UTPSocket* socket)
 {
-    tr_logAddNamedError(MyName, "UTP_Close(%p) was called.", socket);
-    dbgmsg("UTP_Close(%p) was called.", socket);
+    dbgmsg(fmt::format("UTP_Close({0}) was called.", fmt::ptr(socket)));
 }
 
 void UTP_RBDrained(struct UTPSocket* socket)
 {
-    tr_logAddNamedError(MyName, "UTP_RBDrained(%p) was called.", socket);
-    dbgmsg("UTP_RBDrained(%p) was called.", socket);
+    dbgmsg(fmt::format("UTP_RBDrained({0}) was called.", fmt::ptr(socket)));
 }
 
 bool UTP_Write(struct UTPSocket* socket, size_t count)
 {
-    tr_logAddNamedError(MyName, "UTP_RBDrained(%p, %zu) was called.", socket, count);
-    dbgmsg("UTP_RBDrained(%p, %zu) was called.", socket, count);
+    dbgmsg(fmt::format("UTP_RBDrained({0}, {1}) was called.", fmt::ptr(socket), count);
     return false;
 }
 
@@ -99,7 +107,7 @@ static void incoming(void* vsession, struct UTPSocket* s)
 
     if (!tr_address_from_sockaddr_storage(&addr, &port, &from_storage))
     {
-        tr_logAddNamedError("UTP", "Unknown socket family");
+        tr_log::warn::add(TR_LOC, "Unknown socket family", MyName);
         UTP_Close(s);
         return;
     }
