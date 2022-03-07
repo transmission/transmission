@@ -8,7 +8,6 @@
   - [ ] libtransmission/log.cc
   - [ ] libtransmission/log.h
   - [ ] libtransmission/makemeta.cc
-  - [ ] libtransmission/port-forwarding.cc
   - [ ] libtransmission/session-id.cc
   - [ ] libtransmission/watchdir-kqueue.cc
   - [ ] libtransmission/web.cc

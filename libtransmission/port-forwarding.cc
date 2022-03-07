@@ -8,9 +8,12 @@
 
 #include <event2/event.h>
 
+#include <fmt/core.h>
+
 #include "transmission.h"
-#include "natpmp_local.h"
+
 #include "log.h"
+#include "natpmp_local.h"
 #include "net.h"
 #include "peer-mgr.h"
 #include "port-forwarding.h"
@@ -20,10 +23,33 @@
 #include "upnp.h"
 #include "utils.h"
 
-static char const* getKey()
-{
-    return _("Port Forwarding");
-}
+/***
+****
+***/
+
+static char constexpr CodeName[] = "port-forwarding";
+
+#define loginfo(msg) \
+    do \
+    { \
+        if (tr_log::info::enabled()) \
+        { \
+            tr_log::info::add(TR_LOC, msg, CodeName); \
+        } \
+    } while (0)
+
+#define logtrace(msg) \
+    do \
+    { \
+        if (tr_log::trace::enabled()) \
+        { \
+            tr_log::trace::add(TR_LOC, msg, CodeName); \
+        } \
+    } while (0)
+
+/***
+****
+***/
 
 struct tr_shared
 {
@@ -91,11 +117,10 @@ static void natPulse(tr_shared* s, bool do_check)
     {
         s->session->public_peer_port = public_peer_port;
         s->session->private_peer_port = received_private_port;
-        tr_logAddNamedInfo(
-            getKey(),
-            "public peer port %d (private %d) ",
-            s->session->public_peer_port,
-            s->session->private_peer_port);
+        loginfo(fmt::format(
+            _("public peer port {port} (private {number}) "),
+            fmt::arg("port", s->session->public_peer_port),
+            fmt::arg("number", s->session->private_peer_port)));
     }
 
     s->upnpStatus = tr_upnpPulse(
@@ -109,11 +134,10 @@ static void natPulse(tr_shared* s, bool do_check)
 
     if (new_status != old_status)
     {
-        tr_logAddNamedInfo(
-            getKey(),
-            _("State changed from \"%1$s\" to \"%2$s\""),
-            getNatStateStr(old_status),
-            getNatStateStr(new_status));
+        loginfo(fmt::format(
+            _("State changed from '{oldstate}' to '{state}'"),
+            fmt::arg("oldstate", getNatStateStr(old_status)),
+            fmt::arg("state", getNatStateStr(new_status))));
     }
 }
 
@@ -202,7 +226,7 @@ static void stop_timer(tr_shared* s)
 
 static void stop_forwarding(tr_shared* s)
 {
-    tr_logAddNamedInfo(getKey(), "%s", _("Stopped"));
+    logtrace("stopped");
     natPulse(s, false);
 
     tr_natpmpClose(s->natpmp);
