@@ -17,6 +17,8 @@
 #include <string_view>
 #include <vector>
 
+#include <fmt/core.h>
+
 #include <event2/buffer.h>
 #include <event2/event.h> /* evtimer */
 
@@ -38,14 +40,36 @@
 
 using namespace std::literals;
 
-#define dbgmsg(tier, ...) \
+#define logerr(tier, msg) \
     do \
     { \
-        if (tr_logGetDeepEnabled()) \
+        if (tr_log::error::enabled()) \
         { \
             auto name = std::array<char, 128>{}; \
-            tier->buildLogName(std::data(name), std::size(name)); \
-            tr_logAddDeep(__FILE__, __LINE__, std::data(name), __VA_ARGS__); \
+            (tier)->buildLogName(std::data(name), std::size(name)); \
+            tr_log::error::add(TR_LOC, msg, std::data(name)); \
+        } \
+    } while (0)
+
+#define logwarn(tier, msg) \
+    do \
+    { \
+        if (tr_log::warn::enabled()) \
+        { \
+            auto name = std::array<char, 128>{}; \
+            (tier)->buildLogName(std::data(name), std::size(name)); \
+            tr_log::warn::add(TR_LOC, msg, std::data(name)); \
+        } \
+    } while (0)
+
+#define logdbg(tier, msg) \
+    do \
+    { \
+        if (tr_log::debug::enabled()) \
+        { \
+            auto name = std::array<char, 128>{}; \
+            (tier)->buildLogName(std::data(name), std::size(name)); \
+            tr_log::debug::add(TR_LOC, msg, std::data(name)); \
         } \
     } while (0)
 
@@ -653,7 +677,7 @@ static void publishPeerCounts(tr_tier* tier, int seeders, int leechers)
         e.messageType = TR_TRACKER_COUNTS;
         e.seeders = seeders;
         e.leechers = leechers;
-        dbgmsg(tier, "peer counts: %d seeders, %d leechers.", seeders, leechers);
+        logdbg(tier, fmt::format("peer counts: {0} seeders, {1} leechers.", seeders, leechers));
 
         (*tier->tor->torrent_announcer->callback)(tier->tor, &e, nullptr);
     }
@@ -668,12 +692,7 @@ static void publishPeersPex(tr_tier* tier, int seeders, int leechers, std::vecto
         e.seeders = seeders;
         e.leechers = leechers;
         e.pex = pex;
-        dbgmsg(
-            tier,
-            "tracker knows of %d seeders and %d leechers and gave a list of %zu peers.",
-            seeders,
-            leechers,
-            std::size(pex));
+        logdbg(tier, fmt::format("tracker has %d seeders, %d leechers, gave %zu peers.", seeders, leechers, std::size(pex)));
 
         (*tier->tor->torrent_announcer->callback)(tier->tor, &e, nullptr);
     }
@@ -720,24 +739,26 @@ time_t tr_announcerNextManualAnnounce(tr_torrent const* tor)
     return ret;
 }
 
-static void dbgmsg_tier_announce_queue(tr_tier const* tier)
+static void logdbg_tier_announce_queue(tr_tier const* tier)
 {
-    if (tr_logGetDeepEnabled())
+    if (!tr_log::debug::enabled())
     {
-        auto name = std::array<char, 128>{};
-        tier->buildLogName(std::data(name), std::size(name));
-
-        auto* const buf = evbuffer_new();
-        for (size_t i = 0, n = std::size(tier->announce_events); i < n; ++i)
-        {
-            tr_announce_event const e = tier->announce_events[i];
-            char const* str = tr_announce_event_get_string(e);
-            evbuffer_add_printf(buf, "[%zu:%s]", i, str);
-        }
-
-        auto const message = evbuffer_free_to_str(buf);
-        tr_logAddDeep(__FILE__, __LINE__, std::data(name), "announce queue is %" TR_PRIsv, TR_PRIsv_ARG(message));
+        return;
     }
+
+    auto name = std::array<char, 128>{};
+    tier->buildLogName(std::data(name), std::size(name));
+
+    auto* const buf = evbuffer_new();
+    for (size_t i = 0, n = std::size(tier->announce_events); i < n; ++i)
+    {
+        tr_announce_event const e = tier->announce_events[i];
+        char const* str = tr_announce_event_get_string(e);
+        evbuffer_add_printf(buf, "[%zu:%s]", i, str);
+    }
+
+    auto const message = evbuffer_free_to_str(buf);
+    tr_log::debug::add(TR_LOC, fmt::format("announce queue is {0}", message), std::data(name));
 }
 
 // higher priorities go to the front of the announce queue
@@ -767,8 +788,8 @@ static void tier_announce_event_push(tr_tier* tier, tr_announce_event e, time_t 
 {
     TR_ASSERT(tier != nullptr);
 
-    dbgmsg_tier_announce_queue(tier);
-    dbgmsg(tier, "queued \"%s\"", tr_announce_event_get_string(e));
+    logdbg_tier_announce_queue(tier);
+    logdbg(tier, fmt::format("queued '{0}'", tr_announce_event_get_string(e)));
 
     auto& events = tier->announce_events;
     if (!std::empty(events))
@@ -797,8 +818,8 @@ static void tier_announce_event_push(tr_tier* tier, tr_announce_event e, time_t 
     tier->announceAt = announceAt;
     tier_update_announce_priority(tier);
 
-    dbgmsg_tier_announce_queue(tier);
-    dbgmsg(tier, "announcing in %d seconds", (int)difftime(announceAt, tr_time()));
+    logdbg_tier_announce_queue(tier);
+    logdbg(tier, fmt::format("announcing in {0} seconds", difftime(announceAt, tr_time())));
 }
 
 static auto tier_announce_event_pull(tr_tier* tier)
@@ -957,15 +978,13 @@ static void on_announce_error(tr_tier* tier, char const* err, tr_announce_event 
     auto const* const host_cstr = current_tracker->host.c_str();
     if (isUnregistered(err))
     {
-        dbgmsg(tier, "Tracker '%s' announce error: %s", host_cstr, err);
-        tr_logAddTorInfo(tier->tor, "Tracker '%s' announce error: %s", host_cstr, err);
+        logerr(tier, fmt::format("Tracker '{0}' announce error: {1}", host_cstr, err));
     }
     else
     {
         /* schedule a reannounce */
         int const interval = current_tracker->getRetryInterval();
-        dbgmsg(tier, "Tracker '%s' announce error: %s (Retrying in %d seconds)", host_cstr, err, interval);
-        tr_logAddTorInfo(tier->tor, "Tracker '%s' announce error: %s (Retrying in %d seconds)", host_cstr, err, interval);
+        logwarn(tier, fmt::format("Tracker '{0}' announce error: {1} (Retrying in {2} seconds)", host_cstr, err, interval));
         tier_announce_event_push(tier, e, tr_time() + interval);
     }
 }
@@ -981,33 +1000,34 @@ static void on_announce_done(tr_announce_response const* response, void* vdata)
 
     if (tier != nullptr)
     {
-        dbgmsg(
+        logdbg(
             tier,
-            "Got announce response: "
-            "connected:%d "
-            "timeout:%d "
-            "seeders:%d "
-            "leechers:%d "
-            "downloads:%d "
-            "interval:%d "
-            "min_interval:%d "
-            "tracker_id_str:%s "
-            "pex:%zu "
-            "pex6:%zu "
-            "err:%s "
-            "warn:%s",
-            (int)response->did_connect,
-            (int)response->did_timeout,
-            response->seeders,
-            response->leechers,
-            response->downloads,
-            response->interval,
-            response->min_interval,
-            (!std::empty(response->tracker_id) ? response->tracker_id.c_str() : "none"),
-            std::size(response->pex),
-            std::size(response->pex6),
-            (!std::empty(response->errmsg) ? response->errmsg.c_str() : "none"),
-            (!std::empty(response->warning) ? response->warning.c_str() : "none"));
+            fmt::format(
+                "Got announce response: "
+                "connected:{0} "
+                "timeout:{1} "
+                "seeders:{2} "
+                "leechers:{3} "
+                "downloads:{4} "
+                "interval:{5} "
+                "min_interval:{6} "
+                "tracker_id_str:{7} "
+                "pex:{8} "
+                "pex6:{9} "
+                "err:{10} "
+                "warn:{11}",
+                response->did_connect,
+                response->did_timeout,
+                response->seeders,
+                response->leechers,
+                response->downloads,
+                response->interval,
+                response->min_interval,
+                (!std::empty(response->tracker_id) ? response->tracker_id.c_str() : "none"),
+                std::size(response->pex),
+                std::size(response->pex6),
+                (!std::empty(response->errmsg) ? response->errmsg.c_str() : "none"),
+                (!std::empty(response->warning) ? response->warning.c_str() : "none")));
 
         tier->lastAnnounceTime = now;
         tier->lastAnnounceTimedOut = response->did_timeout;
@@ -1082,7 +1102,7 @@ static void on_announce_done(tr_announce_response const* response, void* vdata)
             if (auto const& warning = response->warning; !std::empty(warning))
             {
                 tier->last_announce_str = warning;
-                dbgmsg(tier, "tracker gave \"%s\"", warning.c_str());
+                logdbg(tier, fmt::format("tracker gave '{0}'", warning));
                 publishWarning(tier, warning);
             }
             else
@@ -1118,11 +1138,12 @@ static void on_announce_done(tr_announce_response const* response, void* vdata)
                then a separate scrape isn't needed */
             if (scrape_fields >= 3 || (scrape_fields >= 1 && tracker->scrape_info == nullptr))
             {
-                tr_logAddTorDbg(
-                    tier->tor,
-                    "Announce response contained scrape info; "
-                    "rescheduling next scrape to %d seconds from now.",
-                    tier->scrapeIntervalSec);
+                logdbg(
+                    tier,
+                    fmt::format(
+                        "Announce response contained scrape info; "
+                        "rescheduling next scrape to {0} seconds from now.",
+                        tier->scrapeIntervalSec));
                 tier->scheduleNextScrape();
                 tier->lastScrapeTime = now;
                 tier->lastScrapeSucceeded = true;
@@ -1149,7 +1170,7 @@ static void on_announce_done(tr_announce_response const* response, void* vdata)
             {
                 /* the queue is empty, so enqueue a perodic update */
                 int const i = tier->announceIntervalSec;
-                dbgmsg(tier, "Sending periodic reannounce in %d seconds", i);
+                logdbg(tier, fmt::format("Sending periodic reannounce in {0} seconds", i));
                 tier_announce_event_push(tier, TR_ANNOUNCE_EVENT_NONE, now + i);
             }
         }
@@ -1187,7 +1208,7 @@ static void announce_request_delegate(
     }
     else
     {
-        tr_logAddError("Unsupported url: %" TR_PRIsv, TR_PRIsv_ARG(announce_sv));
+        tr_log::error::add(TR_LOC, fmt::format("Unsupported url: {0}", announce_sv));
         delete callback_data;
     }
 
@@ -1254,8 +1275,7 @@ static void on_scrape_error(tr_session const* /*session*/, tr_tier* tier, char c
     // schedule a rescrape
     auto const interval = current_tracker->getRetryInterval();
     auto const* const host_cstr = current_tracker->host.c_str();
-    dbgmsg(tier, "Tracker '%s' scrape error: %s (Retrying in %zu seconds)", host_cstr, errmsg, (size_t)interval);
-    tr_logAddTorInfo(tier->tor, "Tracker '%s' error: %s (Retrying in %zu seconds)", host_cstr, errmsg, (size_t)interval);
+    logwarn(tier, fmt::format("Tracker '{0}' scrape error: {1} (Retrying in {2} seconds)", host_cstr, errmsg, interval));
     tier->lastScrapeSucceeded = false;
     tier->scheduleNextScrape(interval);
 }
@@ -1291,7 +1311,7 @@ static void checkMultiscrapeMax(tr_announcer* announcer, tr_scrape_response cons
         auto const parsed = *tr_urlParse(url.sv());
         auto clean_url = std::string{};
         tr_buildBuf(clean_url, parsed.scheme, "://"sv, parsed.host, ":"sv, parsed.portstr);
-        tr_logAddNamedInfo(clean_url.c_str(), "Reducing multiscrape max to %d", n);
+        tr_log::debug::add(TR_LOC, fmt::format("reducing multiscrape max to {0}", n), clean_url);
         multiscrape_max = n;
     }
 }
@@ -1318,27 +1338,28 @@ static void on_scrape_done(tr_scrape_response const* response, void* vsession)
 
             auto const scrape_url_sv = response->scrape_url.sv();
 
-            dbgmsg(
+            logdbg(
                 tier,
-                "scraped url:%" TR_PRIsv
-                " -- "
-                "did_connect:%d "
-                "did_timeout:%d "
-                "seeders:%d "
-                "leechers:%d "
-                "downloads:%d "
-                "downloaders:%d "
-                "min_request_interval:%d "
-                "err:%s ",
-                TR_PRIsv_ARG(scrape_url_sv),
-                (int)response->did_connect,
-                (int)response->did_timeout,
-                row.seeders,
-                row.leechers,
-                row.downloads,
-                row.downloaders,
-                response->min_request_interval,
-                std::empty(response->errmsg) ? "none" : response->errmsg.c_str());
+                fmt::format(
+                    "scraped url:{0}"
+                    " -- "
+                    "did_connect:{1} "
+                    "did_timeout:{2} "
+                    "seeders:{3} "
+                    "leechers:{4} "
+                    "downloads:{5} "
+                    "downloaders:{6} "
+                    "min_request_interval:{7} "
+                    "err:{8} ",
+                    scrape_url_sv,
+                    response->did_connect,
+                    response->did_timeout,
+                    row.seeders,
+                    row.leechers,
+                    row.downloads,
+                    row.downloaders,
+                    response->min_request_interval,
+                    std::empty(response->errmsg) ? "none" : response->errmsg.c_str()));
 
             tier->isScraping = false;
             tier->lastScrapeTime = now;
@@ -1362,7 +1383,7 @@ static void on_scrape_done(tr_scrape_response const* response, void* vsession)
                 tier->lastScrapeSucceeded = true;
                 tier->scrapeIntervalSec = std::max(int{ DefaultScrapeIntervalSec }, response->min_request_interval);
                 tier->scheduleNextScrape();
-                tr_logAddTorDbg(tier->tor, "Scrape successful. Rescraping in %d seconds.", tier->scrapeIntervalSec);
+                logdbg(tier, fmt::format("Scrape successful. Rescraping in {0} seconds.", tier->scrapeIntervalSec));
 
                 if (tr_tracker* const tracker = tier->currentTracker(); tracker != nullptr)
                 {
@@ -1416,7 +1437,7 @@ static void scrape_request_delegate(
     }
     else
     {
-        tr_logAddError("Unsupported url: %" TR_PRIsv, TR_PRIsv_ARG(scrape_sv));
+        tr_log::error::add(TR_LOC, fmt::format("Unsupported url: {0}", scrape_sv));
     }
 }
 
@@ -1571,7 +1592,7 @@ static void scrapeAndAnnounceMore(tr_announcer* announcer)
 
     for (auto*& tier : announce_me)
     {
-        tr_logAddTorDbg(tier->tor, "%s", "Announcing to tracker");
+        logdbg(tier, "Announcing to tracker");
         tierAnnounce(announcer, tier);
     }
 }
