@@ -9,6 +9,8 @@
 #include <string_view>
 #include <vector>
 
+#include <fmt/core.h>
+
 #include "transmission.h"
 
 #include "error.h"
@@ -22,6 +24,24 @@
 #include "tr-assert.h"
 #include "utils.h"
 #include "variant.h"
+
+#define logwarn(tor, msg) \
+    do \
+    { \
+        if (tr_log::warn::enabled()) \
+        { \
+            tr_log::warn::add(TR_LOC, (msg), (tor)->name()); \
+        } \
+    } while (0)
+
+#define logdbg(tor, msg) \
+    do \
+    { \
+        if (tr_log::debug::enabled()) \
+        { \
+            tr_log::debug::add(TR_LOC, (msg), (tor)->name()); \
+        } \
+    } while (0)
 
 using namespace std::literals;
 
@@ -77,14 +97,14 @@ static auto loadPeers(tr_variant* dict, tr_torrent* tor)
     if (tr_variantDictFindRaw(dict, TR_KEY_peers2, &str, &len))
     {
         size_t const numAdded = addPeers(tor, str, len);
-        tr_logAddTorDbg(tor, "Loaded %zu IPv4 peers from resume file", numAdded);
+        logdbg(tor, fmt::format("Loaded {0} IPv4 peers from resume file", numAdded));
         ret = tr_resume::Peers;
     }
 
     if (tr_variantDictFindRaw(dict, TR_KEY_peers2_6, &str, &len))
     {
         size_t const numAdded = addPeers(tor, str, len);
-        tr_logAddTorDbg(tor, "Loaded %zu IPv6 peers from resume file", numAdded);
+        logdbg(tor, fmt::format("Loaded {0} IPv6 peers from resume file", numAdded));
         ret = tr_resume::Peers;
     }
 
@@ -174,13 +194,13 @@ static auto loadDND(tr_variant* dict, tr_torrent* tor)
     }
     else
     {
-        tr_logAddTorDbg(
+        logdbg(
             tor,
-            "Couldn't load DND flags. DND list (%p) has %zu"
-            " children; torrent has %d files",
-            (void*)list,
-            tr_variantListSize(list),
-            (int)n);
+            fmt::format(
+                "Couldn't load DND flags. DND list (%p) has %zu children; torrent has %d files",
+                fmt::ptr(list),
+                tr_variantListSize(list),
+                n));
     }
 
     return ret;
@@ -564,7 +584,7 @@ static auto loadProgress(tr_variant* dict, tr_torrent* tor)
 
         if (std::size(mtimes) != n_files)
         {
-            tr_logAddTorErr(tor, "got %zu mtimes; expected %zu", std::size(mtimes), size_t(n_files));
+            logwarn(tor, fmt::format(_("Got {0} mtimes; expected {1}"), std::size(mtimes), size_t(n_files)));
             // if resizing grows the vector, we'll get 0 mtimes for the
             // new items which is exactly what we want since the pieces
             // in an unknown state should be treated as untested
@@ -613,7 +633,7 @@ static auto loadProgress(tr_variant* dict, tr_torrent* tor)
 
         if (err != nullptr)
         {
-            tr_logAddTorDbg(tor, "Torrent needs to be verified - %s", err);
+            logdbg(tor, fmt::format("Torrent needs to be verified - {0}", err));
         }
         else
         {
@@ -659,12 +679,11 @@ static auto loadFromFile(tr_torrent* tor, tr_resume::fields_t fieldsToLoad, bool
             nullptr,
             &error))
     {
-        tr_logAddTorDbg(tor, "Couldn't read \"%s\": %s", filename.c_str(), error->message);
         tr_error_clear(&error);
         return fields_loaded;
     }
 
-    tr_logAddTorDbg(tor, "Read resume file \"%s\"", filename.c_str());
+    logdbg(tor, fmt::format("Read resume file '{0}'", filename));
 
     auto boolVal = false;
     auto i = int64_t{};
