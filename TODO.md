@@ -11,7 +11,6 @@
   - [ ] libtransmission/port-forwarding.cc
   - [ ] libtransmission/rpcimpl.cc
   - [ ] libtransmission/session-id.cc
-  - [ ] libtransmission/torrent-metainfo.cc
   - [ ] libtransmission/trevent.cc
   - [ ] libtransmission/watchdir-kqueue.cc
   - [ ] libtransmission/web.cc
