@@ -15,7 +15,6 @@
   - [ ] libtransmission/trevent.cc
   - [ ] libtransmission/watchdir-inotify.cc
   - [ ] libtransmission/watchdir-kqueue.cc
-  - [ ] libtransmission/watchdir.cc
   - [ ] libtransmission/web.cc
   - [ ] macosx/Torrent.mm
   - [ ] utils/remote.cc
