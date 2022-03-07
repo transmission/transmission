@@ -2698,7 +2698,7 @@ static void removeKeRangerRansomware()
 - (void)applyFilter
 {
     NSString* filterType = [self.fDefaults stringForKey:@"Filter"];
-    BOOL filterActive = NO, filterDownload = NO, filterSeed = NO, filterPause = NO, filterStatus = YES;
+    BOOL filterActive = NO, filterDownload = NO, filterSeed = NO, filterPause = NO, filterError = NO, filterStatus = YES;
     if ([filterType isEqualToString:FILTER_ACTIVE])
     {
         filterActive = YES;
@@ -2715,6 +2715,10 @@ static void removeKeRangerRansomware()
     {
         filterPause = YES;
     }
+    else if ([filterType isEqualToString:FILTER_ERROR])
+    {
+        filterError = YES;
+    }
     else
     {
         filterStatus = NO;
@@ -2730,12 +2734,13 @@ static void removeKeRangerRansomware()
     }
     BOOL const filterTracker = searchStrings && [[self.fDefaults stringForKey:@"FilterSearchType"] isEqualToString:FILTER_TYPE_TRACKER];
 
-    std::atomic<int32_t> active{0}, downloading{0}, seeding{0}, paused{0};
+    std::atomic<int32_t> active{0}, downloading{0}, seeding{0}, paused{0}, error{0};
     // Pointers to be captured by Obj-C Block as const*
     auto* activeRef = &active;
     auto* downloadingRef = &downloading;
     auto* seedingRef = &seeding;
     auto* pausedRef = &paused;
+    auto* errorRef = &error;
     //filter & get counts of each type
     NSIndexSet* indexesOfNonFilteredTorrents = [self.fTorrents
         indexesOfObjectsWithOptions:NSEnumerationConcurrent passingTest:^BOOL(Torrent* torrent, NSUInteger idx, BOOL* stop) {
@@ -2763,6 +2768,13 @@ static void removeKeRangerRansomware()
                     {
                         return NO;
                     }
+                }
+            }
+            else if (torrent.error) {
+                std::atomic_fetch_add_explicit(errorRef, 1, std::memory_order_relaxed);
+                if (filterStatus && !filterError)
+                {
+                    return NO;
                 }
             }
             else
@@ -2837,7 +2849,8 @@ static void removeKeRangerRansomware()
                               active:active.load()
                          downloading:downloading.load()
                              seeding:seeding.load()
-                              paused:paused.load()];
+                              paused:paused.load()
+                               error:error.load()];
     }
 
     //if either the previous or current lists are blank, set its value to the other

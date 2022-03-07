@@ -20,6 +20,7 @@
 @property(nonatomic) IBOutlet FilterButton* fDownloadFilterButton;
 @property(nonatomic) IBOutlet FilterButton* fSeedFilterButton;
 @property(nonatomic) IBOutlet FilterButton* fPauseFilterButton;
+@property(nonatomic) IBOutlet FilterButton* fErrorFilterButton;
 
 @property(nonatomic) IBOutlet NSSearchField* fSearchField;
 
@@ -46,12 +47,14 @@
     self.fDownloadFilterButton.title = NSLocalizedString(@"Downloading", "Filter Bar -> filter button");
     self.fSeedFilterButton.title = NSLocalizedString(@"Seeding", "Filter Bar -> filter button");
     self.fPauseFilterButton.title = NSLocalizedString(@"Paused", "Filter Bar -> filter button");
+    self.fErrorFilterButton.title = NSLocalizedString(@"Error", "Filter Bar -> filter button");
 
     self.fNoFilterButton.cell.backgroundStyle = NSBackgroundStyleRaised;
     self.fActiveFilterButton.cell.backgroundStyle = NSBackgroundStyleRaised;
     self.fDownloadFilterButton.cell.backgroundStyle = NSBackgroundStyleRaised;
     self.fSeedFilterButton.cell.backgroundStyle = NSBackgroundStyleRaised;
     self.fPauseFilterButton.cell.backgroundStyle = NSBackgroundStyleRaised;
+    self.fErrorFilterButton.cell.backgroundStyle = NSBackgroundStyleRaised;
 
     [self.fSearchField.searchMenuTemplate itemWithTag:FILTER_TYPE_TAG_NAME].title = NSLocalizedString(@"Name", "Filter Bar -> filter menu");
     [self.fSearchField.searchMenuTemplate itemWithTag:FILTER_TYPE_TAG_TRACKER].title = NSLocalizedString(@"Tracker", "Filter Bar -> filter menu");
@@ -79,6 +82,10 @@
     else if ([filterType isEqualToString:FILTER_DOWNLOAD])
     {
         currentFilterButton = self.fDownloadFilterButton;
+    }
+    else if ([filterType isEqualToString:FILTER_ERROR])
+    {
+        currentFilterButton = self.fErrorFilterButton;
     }
     else
     {
@@ -152,6 +159,10 @@
     {
         prevFilterButton = self.fDownloadFilterButton;
     }
+    else if ([oldFilterType isEqualToString:FILTER_ERROR])
+    {
+        prevFilterButton = self.fErrorFilterButton;
+    }
     else
     {
         prevFilterButton = self.fNoFilterButton;
@@ -179,6 +190,10 @@
         {
             filterType = FILTER_SEED;
         }
+        else if (sender == self.fErrorFilterButton)
+        {
+            filterType = FILTER_ERROR;
+        }
         else
         {
             filterType = FILTER_NONE;
@@ -201,7 +216,7 @@
     NSButton* button;
     if ([filterType isEqualToString:FILTER_NONE])
     {
-        button = right ? self.fActiveFilterButton : self.fPauseFilterButton;
+        button = right ? self.fActiveFilterButton : self.fErrorFilterButton;
     }
     else if ([filterType isEqualToString:FILTER_ACTIVE])
     {
@@ -217,7 +232,11 @@
     }
     else if ([filterType isEqualToString:FILTER_PAUSE])
     {
-        button = right ? self.fNoFilterButton : self.fSeedFilterButton;
+        button = right ? self.fErrorFilterButton : self.fSeedFilterButton;
+    }
+    else if ([filterType isEqualToString:FILTER_ERROR])
+    {
+        button = right ? self.fNoFilterButton : self.fPauseFilterButton;
     }
     else
     {
@@ -310,12 +329,14 @@
         downloading:(NSUInteger)downloading
             seeding:(NSUInteger)seeding
              paused:(NSUInteger)paused
+              error:(NSUInteger)error
 {
     self.fNoFilterButton.count = all;
     self.fActiveFilterButton.count = active;
     self.fDownloadFilterButton.count = downloading;
     self.fSeedFilterButton.count = seeding;
     self.fPauseFilterButton.count = paused;
+    self.fErrorFilterButton.count = error;
 }
 
 - (void)menuNeedsUpdate:(NSMenu*)menu
@@ -383,16 +404,18 @@
     [self.fDownloadFilterButton sizeToFit];
     [self.fSeedFilterButton sizeToFit];
     [self.fPauseFilterButton sizeToFit];
+    [self.fErrorFilterButton sizeToFit];
 
     NSRect allRect = self.fNoFilterButton.frame;
     NSRect activeRect = self.fActiveFilterButton.frame;
     NSRect downloadRect = self.fDownloadFilterButton.frame;
     NSRect seedRect = self.fSeedFilterButton.frame;
     NSRect pauseRect = self.fPauseFilterButton.frame;
+    NSRect errorRect = self.fErrorFilterButton.frame;
 
     //size search filter to not overlap buttons
     NSRect searchFrame = self.fSearchField.frame;
-    searchFrame.origin.x = NSMaxX(pauseRect) + 5.0;
+    searchFrame.origin.x = NSMaxX(errorRect) + 5.0;
     searchFrame.size.width = NSWidth(self.view.frame) - searchFrame.origin.x - 5.0;
 
     //make sure it is not too long
@@ -409,7 +432,7 @@
         //calculate width the buttons can take up
         CGFloat const allowedWidth = (searchFrame.origin.x - 5.0) - allRect.origin.x;
         CGFloat const currentWidth = NSWidth(allRect) + NSWidth(activeRect) + NSWidth(downloadRect) + NSWidth(seedRect) +
-            NSWidth(pauseRect) + 4.0; //add 4 for space between buttons
+            NSWidth(pauseRect) + NSWidth(errorRect) + 4.0; //add 4 for space between buttons
         CGFloat const ratio = allowedWidth / currentWidth;
 
         //decrease button widths proportionally
@@ -418,18 +441,21 @@
         downloadRect.size.width = NSWidth(downloadRect) * ratio;
         seedRect.size.width = NSWidth(seedRect) * ratio;
         pauseRect.size.width = NSWidth(pauseRect) * ratio;
+        errorRect.size.width = NSWidth(errorRect) * ratio;
     }
 
     activeRect.origin.x = NSMaxX(allRect) + 1.0;
     downloadRect.origin.x = NSMaxX(activeRect) + 1.0;
     seedRect.origin.x = NSMaxX(downloadRect) + 1.0;
     pauseRect.origin.x = NSMaxX(seedRect) + 1.0;
+    errorRect.origin.x = NSMaxX(pauseRect) + 1.0;
 
     self.fNoFilterButton.frame = allRect;
     self.fActiveFilterButton.frame = activeRect;
     self.fDownloadFilterButton.frame = downloadRect;
     self.fSeedFilterButton.frame = seedRect;
     self.fPauseFilterButton.frame = pauseRect;
+    self.fErrorFilterButton.frame = errorRect;
 
     self.fSearchField.frame = searchFrame;
 }
