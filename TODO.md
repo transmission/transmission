@@ -1,35 +1,35 @@
 - [ ] conversion
-  - [ ] utils/remote.cc
-  - [ ] macosx/Torrent.mm
   - [ ] daemon/daemon-win32.cc
-  - [ ] libtransmission/makemeta.cc
-  - [ ] libtransmission/watchdir-win32.cc
-  - [ ] libtransmission/crypto-utils-ccrypto.cc
+  - [x] daemon/daemon.cc
+  - [ ] gtk/Session.cc
+  - [x] libtransmission/announcer-http.cc
+  - [ ] libtransmission/blocklist.cc
   - [ ] libtransmission/cache.cc
+  - [ ] libtransmission/crypto-utils-ccrypto.cc
+  - [ ] libtransmission/crypto-utils-cyassl.cc
+  - [ ] libtransmission/crypto-utils-openssl.cc
+  - [ ] libtransmission/crypto-utils-polarssl.cc
+  - [ ] libtransmission/inout.cc
+  - [ ] libtransmission/log.cc
+  - [ ] libtransmission/log.h
+  - [ ] libtransmission/makemeta.cc
+  - [ ] libtransmission/natpmp.cc
   - [ ] libtransmission/net.cc
+  - [ ] libtransmission/peer-mgr.cc
+  - [ ] libtransmission/port-forwarding.cc
+  - [ ] libtransmission/rpcimpl.cc
+  - [ ] libtransmission/session-id.cc
+  - [ ] libtransmission/torrent-metainfo.cc
   - [ ] libtransmission/tr-lpd.cc
   - [ ] libtransmission/trevent.cc
-  - [ ] libtransmission/watchdir-kqueue.cc
-  - [ ] libtransmission/peer-mgr.cc
-  - [ ] libtransmission/crypto-utils-polarssl.cc
-  - [ ] libtransmission/session-id.cc
-  - [x] libtransmission/announcer-http.cc
-  - [ ] libtransmission/watchdir.cc
-  - [ ] libtransmission/natpmp.cc
-  - [ ] libtransmission/inout.cc
-  - [ ] libtransmission/watchdir-inotify.cc
-  - [ ] libtransmission/web.cc
-  - [ ] libtransmission/rpcimpl.cc
-  - [ ] libtransmission/port-forwarding.cc
-  - [ ] libtransmission/blocklist.cc
-  - [ ] libtransmission/crypto-utils-cyassl.cc
-  - [ ] libtransmission/torrent-metainfo.cc
-  - [ ] libtransmission/log.h
   - [ ] libtransmission/watchdir-generic.cc
-  - [ ] libtransmission/crypto-utils-openssl.cc
-  - [ ] gtk/Session.cc
-  - [ ] libtransmission/log.cc
-  - [ ] daemon/daemon.cc
+  - [ ] libtransmission/watchdir-inotify.cc
+  - [ ] libtransmission/watchdir-kqueue.cc
+  - [ ] libtransmission/watchdir-win32.cc
+  - [ ] libtransmission/watchdir.cc
+  - [ ] libtransmission/web.cc
+  - [ ] macosx/Torrent.mm
+  - [ ] utils/remote.cc
 
 - [ ] migrate all 'dbgmsg' macros
 - [ ] ensure log::info strings are marked for translation using \_()
@@ -48,3 +48,4 @@
 - [ ] ensure all log messages are the correct logging level
 - [ ] is TR_PRIsv_ARG still needed or can it be removed
 - [ ] mac xcode
+- [ ] index all the fmt::arg and ensure consistency, e.g. don't use both "dir" and "path", just use one
