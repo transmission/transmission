@@ -64,7 +64,15 @@ static void log_openssl_error(char const* file, int line)
 #endif
 
     ERR_error_string_n(error_code, buf, sizeof(buf));
-    tr_log::error::add(file, line, fmt::format(_("OpenSSL error: {errmsg}"), fmt::arg("errmsg", buf)), MyName);
+    tr_log::error::add(
+        file,
+        line,
+        fmt::format(
+            _("{cryptolib} error: {errmsg} ({errcode})"),
+            fmt::arg("cryptolib", "OpenSSL"),
+            fmt::arg("errmsg", buf),
+            fmt::arg("errcode", error_code)),
+        MyName);
 }
 
 #define logerr() log_openssl_error(__FILE__, __LINE__)

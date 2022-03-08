@@ -56,7 +56,14 @@ static void log_polarssl_error(int error_code, char const* file, int line)
         error_strerror(error_code, error_message, sizeof(error_message));
 #endif
 
-        tr_logAddMessage(file, line, TR_LOG_ERROR, MyName, "PolarSSL error: %s", error_message);
+        tr_log::error::add(
+            file,
+            line,
+            fmt::format(
+                _("{cryptolib} error: {errmsg} ({errcode})"),
+                fmt::arg("cryptolib", "PolarSSL"),
+                fmt::arg("errmsg", error_message),
+                fmt::arg("errcode", error_code)));
     }
 }
 

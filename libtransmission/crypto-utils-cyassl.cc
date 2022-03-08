@@ -24,6 +24,8 @@
 #include API_HEADER_CRYPT(sha.h)
 #include API_HEADER(version.h)
 
+#include <fmt/core.h>
+
 #include "transmission.h"
 #include "crypto-utils.h"
 #include "log.h"
@@ -50,7 +52,7 @@ static char constexpr MyName[] = "tr_crypto_utils";
 
 static void log_cyassl_error(int error_code, char const* file, int line)
 {
-    if (tr_logLevelIsActive(TR_LOG_ERROR))
+    if (tr_log::error::enabled())
     {
 #if API_VERSION_HEX >= 0x03004000
         char const* error_message = API(GetErrorString)(error_code);
@@ -61,7 +63,15 @@ static void log_cyassl_error(int error_code, char const* file, int line)
         CTaoCryptErrorString(error_code, error_message);
 #endif
 
-        tr_logAddMessage(file, line, TR_LOG_ERROR, MyName, "CyaSSL error: %s", error_message);
+        tr_log::error::add(
+            file,
+            line,
+            fmt::format(
+                _("{cryptolib} error: {errmsg} ({errcode})"),
+                fmt::arg("cryptolib", "CyaSSL"),
+                fmt::arg("errmsg", error_message),
+                fmt::arg("errcode", error_code)),
+            MyName);
     }
 }
 

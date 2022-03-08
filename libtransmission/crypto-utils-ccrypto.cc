@@ -100,8 +100,9 @@ void log_ccrypto_error(CCCryptorStatus error_code, char const* file, int line)
         file,
         line,
         fmt::format(
-            _("CCrypto error: {errmsg} ({errcode})"),
-            fmt::arg("errmsg", ccrypto_error_to_str(error_code)),
+            _("{cryptolib} error: {errmsg} ({errcode})"),
+            fmt::arg("cryptolib", "CCrypto"),
+            fmt::arg("errmsg", buf),
             fmt::arg("errcode", error_code)),
         MyName);
 }
