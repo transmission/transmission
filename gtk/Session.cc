@@ -11,9 +11,11 @@
 #include <string>
 #include <string_view>
 
-#include <glibmm/i18n.h>
-
 #include <event2/buffer.h>
+
+#include <fmt/core.h>
+
+#include <glibmm/i18n.h>
 
 #include <libtransmission/transmission.h>
 
@@ -1437,13 +1439,13 @@ bool gtr_inhibit_hibernation(guint32& cookie)
         cookie = Glib::VariantBase::cast_dynamic<Glib::Variant<guint32>>(response.get_child(0)).get();
 
         /* logging */
-        tr_logAddInfo("%s", _("Inhibiting desktop hibernation"));
+        tr_log::info::add(TR_LOC, _("Inhibiting desktop hibernation"));
 
         success = true;
     }
     catch (Glib::Error const& e)
     {
-        tr_logAddError(_("Couldn't inhibit desktop hibernation: %s"), e.what().c_str());
+        tr_log::warn::add(TR_LOC, fmt::format(_("Couldn't inhibit desktop hibernation: {errmsg}"), e.what().raw()));
     }
 
     return success;
@@ -1463,8 +1465,7 @@ void gtr_uninhibit_hibernation(guint inhibit_cookie)
             SessionManagerServiceName,
             1000);
 
-        /* logging */
-        tr_logAddInfo("%s", _("Allowing desktop hibernation"));
+        tr_log::info::add(TR_LOC, _("Allowing desktop hibernation"));
     }
     catch (Glib::Error const& e)
     {

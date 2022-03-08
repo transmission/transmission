@@ -7,13 +7,13 @@ endif()
 add_compile_options(${CXX_WARNING_FLAGS})
 
 include_directories(
-    ${LIBFMT_INCLUDE_DIRS}
     ${CMAKE_SOURCE_DIR}
 )
 include_directories(
     SYSTEM
     ${CURL_INCLUDE_DIRS}
     ${EVENT2_INCLUDE_DIRS}
+    ${LIBFMT_INCLUDE_DIRS}
 )
 
 add_definitions(
