@@ -17,12 +17,12 @@
 #include "tr-assert.h"
 #include "utils.h"
 
-#define dbgmsg(msg) \
+#define logtrace(msg) \
     do \
     { \
-        if (tr_log::debug::enabled()) \
+        if (tr_log::trace::enabled()) \
         { \
-            tr_log::debug::add(TR_LOC, msg); \
+            tr_log::trace::add(TR_LOC, msg); \
         } \
     } while (0)
 
@@ -176,7 +176,7 @@ void Bandwidth::phaseOne(std::vector<tr_peerIo*>& peerArray, tr_direction dir)
      * peers from starving the others. Loop through the peers, giving each a
      * small chunk of bandwidth. Keep looping until we run out of bandwidth
      * and/or peers that can use it */
-    dbgmsg(fmt::format("{} peers to go round-robin for {}", peerArray.size(), dir == TR_UP ? "upload" : "download"));
+    logtrace(fmt::format("{} peers to go round-robin for {}", peerArray.size(), dir == TR_UP ? "upload" : "download"));
 
     size_t n = peerArray.size();
     while (n > 0)
@@ -190,7 +190,7 @@ void Bandwidth::phaseOne(std::vector<tr_peerIo*>& peerArray, tr_direction dir)
 
         int const bytes_used = tr_peerIoFlush(peerArray[i], dir, increment);
 
-        dbgmsg(fmt::format("peer #{} of {} used {} bytes in this pass", i, n, bytes_used));
+        logtrace(fmt::format("peer #{} of {} used {} bytes in this pass", i, n, bytes_used));
 
         if (bytes_used != int(increment))
         {
