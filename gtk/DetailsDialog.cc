@@ -14,6 +14,8 @@
 #include <string_view>
 #include <unordered_map>
 
+#include <fmt/core.h>
+
 #include <glibmm/i18n.h>
 
 #include <libtransmission/transmission.h>
@@ -686,15 +688,18 @@ void DetailsDialog::Impl::refreshInfo(std::vector<tr_torrent*> const& torrents)
         {
             if (empty_date && !empty_creator)
             {
-                str = gtr_sprintf(_("Created by %1$s"), creator);
+                str = fmt::format(_("Created by {text}"), fmt::arg("text", creator.raw()));
             }
             else if (empty_creator && !empty_date)
             {
-                str = gtr_sprintf(_("Created on %1$s"), datestr);
+                str = fmt::format(_("Created on {date}"), fmt::arg("date", datestr.raw()));
             }
             else
             {
-                str = gtr_sprintf(_("Created by %1$s on %2$s"), creator, datestr);
+                str = fmt::format(
+                    _("Created by {text} on {date}"),
+                    fmt::arg("text", creator.raw()),
+                    fmt::arg("date", datestr.raw()));
             }
         }
     }
@@ -844,15 +849,20 @@ void DetailsDialog::Impl::refreshInfo(std::vector<tr_torrent*> const& torrents)
         }
         else if (pieceSize >= 0)
         {
-            str = gtr_sprintf(
-                ngettext("%1$s (%2$'d piece @ %3$s)", "%1$s (%2$'d pieces @ %3$s)", pieces),
-                sizebuf,
-                pieces,
-                tr_formatter_mem_B(pieceSize));
+            str = fmt::format(
+                _("{total_size} ({piece_count} {pieces} @ {piece_size})"),
+                fmt::arg("total_size", sizebuf.raw()),
+                fmt::arg("piece_count", pieces),
+                fmt::arg("pieces", ngettext("piece", "pieces", pieces)),
+                fmt::arg("piece_size", tr_formatter_mem_B(pieceSize)));
         }
         else
         {
-            str = gtr_sprintf(ngettext("%1$s (%2$'d piece)", "%1$s (%2$'d pieces)", pieces), sizebuf, pieces);
+            str = fmt::format(
+                _("{total_size} ({piece_count} {pieces})"),
+                fmt::arg("total_size", sizebuf.raw()),
+                fmt::arg("piece_count", pieces),
+                fmt::arg("pieces", ngettext("piece", "pieces", pieces)));
         }
 
         size_lb_->set_text(str);
@@ -890,15 +900,27 @@ void DetailsDialog::Impl::refreshInfo(std::vector<tr_torrent*> const& torrents)
 
             if (haveUnchecked == 0 && leftUntilDone == 0)
             {
-                str = gtr_sprintf(_("%1$s (%2$s%%)"), total, buf2);
+                str = fmt::format(
+                    _("{current_size} ({percent_done})"),
+                    fmt::arg("current_size", total.raw()),
+                    fmt::arg("percent_done", buf2.raw()));
             }
             else if (haveUnchecked == 0)
             {
-                str = gtr_sprintf(_("%1$s (%2$s%% of %3$s%% Available)"), total, buf2, avail);
+                str = fmt::format(
+                    _("{current_size} ({percent_done} of {available_size} available)"),
+                    fmt::arg("current_size", total.raw()),
+                    fmt::arg("percent_done", buf2.raw()),
+                    fmt::arg("available_size", avail.raw()));
             }
             else
             {
-                str = gtr_sprintf(_("%1$s (%2$s%% of %3$s%% Available); %4$s Unverified"), total, buf2, avail, unver);
+                str = fmt::format(
+                    _("{current_size} ({percent_done} of {available_size} available; {unverified_size} unverified)"),
+                    fmt::arg("current_size", total.raw()),
+                    fmt::arg("percent_done", buf2.raw()),
+                    fmt::arg("available_size", avail.raw()),
+                    fmt::arg("unverified_size", unver.raw()));
             }
         }
     }
@@ -926,7 +948,10 @@ void DetailsDialog::Impl::refreshInfo(std::vector<tr_torrent*> const& torrents)
 
         if (f != 0)
         {
-            str = gtr_sprintf(_("%1$s (+%2$s discarded after failed checksum)"), dbuf, fbuf);
+            str = fmt::format(
+                _("{downloaded_ever} (+{discarded_ever} discarded after failed checksum)"),
+                fmt::arg("downloaded_ever", dbuf.raw()),
+                fmt::arg("discarded_ever", fbuf.raw()));
         }
         else
         {
@@ -952,7 +977,10 @@ void DetailsDialog::Impl::refreshInfo(std::vector<tr_torrent*> const& torrents)
             down += st->downloadedEver;
         }
 
-        str = gtr_sprintf(_("%s (Ratio: %s)"), tr_strlsize(up), tr_strlratio(tr_getRatio(up, down)));
+        str = fmt::format(
+            _("{uploaded_ever} (Radio: {ratio})"),
+            fmt::arg("uploaded_ever", tr_strlsize(up).raw()),
+            fmt::arg("ratio", tr_strlratio(tr_getRatio(up, down)).raw()));
     }
 
     ul_lb_->set_text(str);
@@ -1023,7 +1051,7 @@ void DetailsDialog::Impl::refreshInfo(std::vector<tr_torrent*> const& torrents)
             }
             else
             {
-                str = gtr_sprintf(_("%1$s ago"), tr_strltime(period));
+                str = fmt::format(_("{duration} ago"), fmt::arg("duration", tr_strltime(period).raw()));
             }
         }
     }
@@ -1865,29 +1893,30 @@ void appendAnnounceInfo(tr_tracker_view const& tracker, time_t const now, Gtk::T
 
         if (tracker.lastAnnounceSucceeded)
         {
-            gstr << gtr_sprintf(
-                _("Got a list of %1$s%2$'d peers%3$s %4$s ago"),
-                success_markup_begin,
-                tracker.lastAnnouncePeerCount,
-                success_markup_end,
-                timebuf);
+            gstr << fmt::format(
+                _("Got a list of {success_markup_begin}{peer_count}{success_markup_end} {peers} {duration} ago"),
+                fmt::arg("success_markup_begin", success_markup_begin),
+                fmt::arg("success_markup_end", success_markup_end),
+                fmt::arg("peer_count", tracker.lastAnnouncePeerCount),
+                fmt::arg("peers", ngettext("peer", "peers", tracker.lastAnnouncePeerCount)),
+                fmt::arg("duration", timebuf.raw()));
         }
         else if (tracker.lastAnnounceTimedOut)
         {
-            gstr << gtr_sprintf(
-                _("Peer list request %1$stimed out%2$s %3$s ago; will retry"),
-                timeout_markup_begin,
-                timeout_markup_end,
-                timebuf);
+            gstr << fmt::format(
+                _("Peer list request {timeout_markup_begin}timed out{timeout_markup_end} {duration} ago; will retry"),
+                fmt::arg("timeout_markup_begin", timeout_markup_begin),
+                fmt::arg("timeout_markup_end", timeout_markup_end),
+                fmt::arg("duration", timebuf.raw()));
         }
         else
         {
-            gstr << gtr_sprintf(
-                _("Got an error %1$s\"%2$s\"%3$s %4$s ago"),
-                err_markup_begin,
-                tracker.lastAnnounceResult,
-                err_markup_end,
-                timebuf);
+            gstr << fmt::format(
+                _("Got an error {err_markup_begin}{errmsg}{err_markup_end} {duration} ago"),
+                fmt::arg("err_markup_begin", err_markup_begin),
+                fmt::arg("err_markup_end", err_markup_end),
+                fmt::arg("errmsg", tracker.lastAnnounceResult),
+                fmt::arg("duration", timebuf.raw()));
         }
     }
 

@@ -6,6 +6,8 @@
 #include <memory>
 #include <string>
 
+#include <fmt/core.h>
+
 #include <glibmm.h>
 #include <glibmm/i18n.h>
 
@@ -335,15 +337,19 @@ void MakeDialog::Impl::updatePiecesLabel()
     }
     else
     {
-        gstr += gtr_sprintf(
-            ngettext("%1$s; %2$'d File", "%1$s; %2$'d Files", builder_->fileCount),
-            tr_strlsize(builder_->totalSize),
-            builder_->fileCount);
+        gstr += fmt::format(
+            _("{total_size}; ({file_count:L} {files:s}"),
+            fmt::arg("total_size", tr_strlsize(builder_->totalSize).raw()),
+            fmt::arg("file_count", builder_->fileCount),
+            fmt::arg("files", ngettext("file", "files", builder_->fileCount)));
+
         gstr += "; ";
-        gstr += gtr_sprintf(
-            ngettext("%1$'d Piece @ %2$s", "%1$'d Pieces @ %2$s", builder_->pieceCount),
-            builder_->pieceCount,
-            tr_formatter_mem_B(builder_->pieceSize));
+
+        gstr += fmt::format(
+            _("{piece_count:L} {pieces:s} @ {piece_size}"),
+            fmt::arg("piece_count", builder_->pieceCount),
+            fmt::arg("pieces", ngettext("piece", "pieces", builder_->pieceCount)),
+            fmt::arg("piece_size", tr_formatter_mem_B(builder_->pieceSize)));
     }
 
     gstr += "</i>";

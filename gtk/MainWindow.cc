@@ -4,6 +4,8 @@
 
 #include <string>
 
+#include <fmt/core.h>
+
 #include <glibmm/i18n.h>
 
 #include <libtransmission/transmission.h>
@@ -223,14 +225,14 @@ void MainWindow::Impl::syncAltSpeedButton()
     auto const u = tr_formatter_speed_KBps(gtr_pref_int_get(TR_KEY_alt_speed_up));
     auto const d = tr_formatter_speed_KBps(gtr_pref_int_get(TR_KEY_alt_speed_down));
 
-    auto const str = b ? gtr_sprintf(_("Click to disable Alternative Speed Limits\n (%1$s down, %2$s up)"), d, u) :
-                         gtr_sprintf(_("Click to enable Alternative Speed Limits\n (%1$s down, %2$s up)"), d, u);
+    char const* const format_str = b ? _("Click to disable Alternative Speed Limits\n ({down_limit} down, {up_limit} up)") :
+                                       _("Click to enable Alternative Speed Limits\n ({down_limit} down, {up_limit} up)");
 
     alt_speed_button_->set_active(b);
     alt_speed_image_->set_from_icon_name(stock, Gtk::BuiltinIconSize::ICON_SIZE_MENU);
     alt_speed_button_->set_halign(Gtk::ALIGN_CENTER);
     alt_speed_button_->set_valign(Gtk::ALIGN_CENTER);
-    alt_speed_button_->set_tooltip_text(str);
+    alt_speed_button_->set_tooltip_text(fmt::format(format_str, fmt::arg("down_limit", d), fmt::arg("up_limit", u)));
 }
 
 void MainWindow::Impl::alt_speed_toggled_cb()
@@ -589,31 +591,28 @@ void MainWindow::Impl::updateStats()
     if (auto const pch = gtr_pref_string_get(TR_KEY_statusbar_stats); pch == "session-ratio")
     {
         tr_sessionGetStats(session, &stats);
-        buf = gtr_sprintf(_("Ratio: %s"), tr_strlratio(stats.ratio));
+        buf = fmt::format(_("Ratio: {percent}"), fmt::arg("percent", tr_strlratio(stats.ratio).raw()));
     }
     else if (pch == "session-transfer")
     {
         tr_sessionGetStats(session, &stats);
-        /* Translators: "size|" is here for disambiguation. Please remove it from your translation.
-           %1$s is the size of the data we've downloaded
-           %2$s is the size of the data we've uploaded */
-        buf = gtr_sprintf(Q_("Down: %1$s, Up: %2$s"), tr_strlsize(stats.downloadedBytes), tr_strlsize(stats.uploadedBytes));
+        buf = fmt::format(
+            _("Down: {downloaded_this_session}, Up: {uploaded_this_session}"),
+            fmt::arg("downloaded_this_session", tr_strlsize(stats.downloadedBytes).raw()),
+            fmt::arg("uploaded_this_session", tr_strlsize(stats.uploadedBytes).raw()));
     }
     else if (pch == "total-transfer")
     {
         tr_sessionGetCumulativeStats(session, &stats);
-        /* Translators: "size|" is here for disambiguation. Please remove it from your translation.
-           %1$s is the size of the data we've downloaded
-           %2$s is the size of the data we've uploaded */
-        buf = gtr_sprintf(
-            Q_("size|Down: %1$s, Up: %2$s"),
-            tr_strlsize(stats.downloadedBytes),
-            tr_strlsize(stats.uploadedBytes));
+        buf = fmt::format(
+            _("Down: {downloaded_ever}, Up: {uploaded_ever}"),
+            fmt::arg("downloaded_ever", tr_strlsize(stats.downloadedBytes).raw()),
+            fmt::arg("uploaded_ever", tr_strlsize(stats.uploadedBytes).raw()));
     }
     else /* default is total-ratio */
     {
         tr_sessionGetCumulativeStats(session, &stats);
-        buf = gtr_sprintf(_("Ratio: %s"), tr_strlratio(stats.ratio));
+        buf = gtr_sprintf(_("Ratio: %s"), tr_strlratio(stats.ratio).raw());
     }
 
     stats_lb_->set_text(buf);

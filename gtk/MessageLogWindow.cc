@@ -71,7 +71,7 @@ private:
     Glib::RefPtr<Gtk::ListStore> store_;
     Glib::RefPtr<Gtk::TreeModelFilter> filter_;
     Glib::RefPtr<Gtk::TreeModelSort> sort_;
-    tr_log_level maxLevel_ = TR_LOG_SILENT;
+    tr_log_level maxLevel_ = TR_LOG_OFF;
     bool isPaused_ = false;
     sigc::connection refresh_tag_;
 };

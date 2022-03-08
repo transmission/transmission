@@ -11,6 +11,8 @@
 
 #include <sys/types.h>
 
+#include <fmt/format.h>
+
 #include <glibmm.h>
 #include <gtkmm.h>
 

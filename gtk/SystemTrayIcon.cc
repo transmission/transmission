@@ -15,6 +15,8 @@
 #include <libappindicator/app-indicator.h>
 #endif
 
+#include <fmt/core.h>
+
 #include <libtransmission/transmission.h>
 #include <libtransmission/utils.h>
 
@@ -116,13 +118,12 @@ void SystemTrayIcon::Impl::refresh()
         downLimit = gtr_sprintf(_(" (Limit: %s)"), tr_formatter_speed_KBps(limit));
     }
 
-    /* %1$s: current upload speed
-     * %2$s: current upload limit, if any
-     * %3$s: current download speed
-     * %4$s: current download limit, if any */
-    auto const tip = gtr_sprintf(_("Transmission\nUp: %1$s %2$s\nDown: %3$s %4$s"), up, upLimit, down, downLimit);
-
-    icon_->set_tooltip_text(tip);
+    icon_->set_tooltip_text(fmt::format(
+        _("Transmission\nUp: {up_speed} {up_limit}\nDown: {down_speed} {down_limit}"),
+        fmt::arg("up_speed", up),
+        fmt::arg("up_limit", upLimit),
+        fmt::arg("down_speed", down),
+        fmt::arg("down_limit", downLimit)));
 }
 
 #endif
