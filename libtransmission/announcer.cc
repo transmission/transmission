@@ -989,10 +989,10 @@ static void on_announce_error(tr_tier* tier, char const* err, tr_announce_event 
         logwarn(
             tier,
             fmt::format(
-                _("Tracker '{url}' announce error: {errmsg} (Retrying in {number} seconds)"),
+                _("Tracker '{url}' announce error: {errmsg} (Retrying in {count} seconds)"),
                 fmt::arg("url", host_sv),
                 fmt::arg("errmsg", err),
-                fmt::arg("number", interval)));
+                fmt::arg("count", interval)));
         tier_announce_event_push(tier, e, tr_time() + interval);
     }
 }
@@ -1285,10 +1285,10 @@ static void on_scrape_error(tr_session const* /*session*/, tr_tier* tier, char c
     logwarn(
         tier,
         fmt::format(
-            _("Tracker '{host}' scrape error: {errmsg} (Retrying in {number} seconds)"),
+            _("Tracker '{host}' scrape error: {errmsg} (Retrying in {count} seconds)"),
             fmt::arg("host", current_tracker->host.sv()),
             fmt::arg("errmsg", errmsg),
-            fmt::arg("number", interval)));
+            fmt::arg("count", interval)));
     tier->lastScrapeSucceeded = false;
     tier->scheduleNextScrape(interval);
 }

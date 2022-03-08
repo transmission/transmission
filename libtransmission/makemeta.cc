@@ -211,9 +211,9 @@ bool tr_metaInfoBuilderSetPieceSize(tr_metainfo_builder* b, uint32_t bytes)
         tr_log::warn::add(
             TR_LOC,
             fmt::format(
-                _("Failed to set piece size to {size}, leaving it at {number}"),
-                fmt::arg("size", tr_formatter_mem_B(bytes)),
-                fmt::arg("number", tr_formatter_mem_B(b->pieceSize))));
+                _("Failed to set piece size to {req}, leaving it at {piece_size}"),
+                fmt::arg("req", tr_formatter_mem_B(bytes)),
+                fmt::arg("piece_size", tr_formatter_mem_B(b->pieceSize))));
         return false;
     }
 

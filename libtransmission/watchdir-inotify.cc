@@ -97,9 +97,9 @@ static void tr_watchdir_inotify_on_event(struct bufferevent* event, void* contex
         if (nread != sizeof(ev))
         {
             logerr(fmt::format(
-                _("Failed to read inotify event: expected {req}, got {number} bytes"),
+                _("Failed to read inotify event: expected {req}, got {count} bytes"),
                 fmt::arg("req", sizeof(ev)),
-                fmt::arg("number", nread)));
+                fmt::arg("count", nread)));
             break;
         }
 
@@ -127,9 +127,9 @@ static void tr_watchdir_inotify_on_event(struct bufferevent* event, void* contex
         if (nread != ev.len)
         {
             logerr(fmt::format(
-                _("Failed to read inotify name: expected {req}, got {number} bytes"),
+                _("Failed to read inotify name: expected {req}, got {count} bytes"),
                 fmt::arg("req", ev.len),
-                fmt::arg("number", nread)));
+                fmt::arg("count", nread)));
             break;
         }
 

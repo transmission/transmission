@@ -281,8 +281,8 @@ void tr_netSetTOS([[maybe_unused]] tr_socket_t s, [[maybe_unused]] int tos, tr_a
         {
             auto const errcode = sockerrno;
             logwarn(fmt::format(
-                _("Can't set TOS '{number}': {errmsg} ({errcode})"),
-                fmt::arg("number", tos),
+                _("Can't set TOS '{tos}': {errmsg} ({errcode})"),
+                fmt::arg("tos", tos),
                 fmt::arg("errmsg", tr_net_strerror(errcode)),
                 fmt::arg("errcode", errcode)));
         }
@@ -295,8 +295,8 @@ void tr_netSetTOS([[maybe_unused]] tr_socket_t s, [[maybe_unused]] int tos, tr_a
         {
             auto const errcode = sockerrno;
             logwarn(fmt::format(
-                _("Can't set IPv6 QoS '{number}': {errmsg} ({errcode})"),
-                fmt::arg("number", tos),
+                _("Can't set IPv6 QoS '{tos}': {errmsg} ({errcode})"),
+                fmt::arg("tos", tos),
                 fmt::arg("errmsg", tr_net_strerror(errcode)),
                 fmt::arg("errcode", errcode)));
         }
@@ -402,8 +402,8 @@ struct tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const
         {
             auto const errcode = sockerrno;
             logwarn(fmt::format(
-                _("Unable to set SO_RCVBUF on socket {number}: {errmsg} ({errcode})"),
-                fmt::arg("number", s),
+                _("Unable to set SO_RCVBUF on socket {socket}: {errmsg} ({errcode})"),
+                fmt::arg("socket", s),
                 fmt::arg("errmsg", tr_net_strerror(errcode)),
                 fmt::arg("errcode", errcode)));
         }
@@ -426,9 +426,9 @@ struct tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const
     {
         auto const errcode = sockerrno;
         logwarn(fmt::format(
-            _("Unable to set source address {address} on socket {number}: {errmsg} ({errcode})"),
+            _("Unable to set source address {address} on socket {socket}: {errmsg} ({errcode})"),
             fmt::arg("address", tr_address_to_string(source_addr)),
-            fmt::arg("number", s),
+            fmt::arg("socket", s),
             fmt::arg("errmsg", tr_net_strerror(errcode)),
             fmt::arg("errcode", errcode)));
         tr_netClose(session, s);
@@ -446,8 +446,8 @@ struct tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const
         if ((tmperrno != ENETUNREACH && tmperrno != EHOSTUNREACH) || addr->type == TR_AF_INET)
         {
             logwarn(fmt::format(
-                _("Couldn't connect socket {number} to {address}, port {port}: {errmsg} ({errcode})"),
-                fmt::arg("number", s),
+                _("Couldn't connect socket {socket} to {address}, port {port}: {errmsg} ({errcode})"),
+                fmt::arg("socket", s),
                 fmt::arg("address", tr_address_to_string(addr)),
                 fmt::arg("port", ntohs(port)),
                 fmt::arg("errmsg", tr_net_strerror(tmperrno)),

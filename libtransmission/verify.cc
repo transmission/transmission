@@ -168,9 +168,9 @@ static bool verifyTorrent(tr_torrent* tor, bool const* stopFlag)
     loginfo(
         tor,
         fmt::format(
-            _("Verification done after {number} seconds ({size} bytes per second)"),
-            fmt::arg("number", end - begin),
-            fmt::arg("size", tor->totalSize() / (1 + (end - begin)))));
+            _("Verification done after {count} seconds ({speed} bytes per second)"),
+            fmt::arg("count", end - begin),
+            fmt::arg("speed", tor->totalSize() / (1 + (end - begin)))));
 
     return changed;
 }

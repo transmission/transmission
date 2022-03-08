@@ -132,8 +132,7 @@ static void blocklistLoad(tr_blocklistFile* b)
     b->ruleCount = byteCount / sizeof(struct tr_ipv4_range);
 
     char* const base = tr_sys_path_basename(b->filename, nullptr);
-    loginfo(
-        fmt::format(_("Blocklist '{path}' has {number} entries"), fmt::arg("path", base), fmt::arg("number", b->ruleCount)));
+    loginfo(fmt::format(_("Blocklist '{path}' has {count} entries"), fmt::arg("path", base), fmt::arg("count", b->ruleCount)));
     tr_free(base);
 }
 
@@ -445,7 +444,7 @@ int tr_blocklistFileSetContent(tr_blocklistFile* b, char const* filename)
         if (!parseLine(line, &range))
         {
             /* don't try to display the actual lines - it causes issues */
-            logwarn(fmt::format(_("blocklist skipped invalid address at line {number}"), fmt::arg("number", inCount)));
+            logwarn(fmt::format(_("blocklist skipped invalid address at line {count}"), fmt::arg("count", inCount)));
             continue;
         }
 
@@ -513,9 +512,9 @@ int tr_blocklistFileSetContent(tr_blocklistFile* b, char const* filename)
     {
         char* base = tr_sys_path_basename(b->filename, nullptr);
         loginfo(fmt::format(
-            _("Blocklist '{path}' updated with {number} entries"),
+            _("Blocklist '{path}' updated with {count} entries"),
             fmt::arg("path", base),
-            fmt::arg("number", ranges_count)));
+            fmt::arg("count", ranges_count)));
         tr_free(base);
     }
 

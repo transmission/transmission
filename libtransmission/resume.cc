@@ -587,8 +587,8 @@ static auto loadProgress(tr_variant* dict, tr_torrent* tor)
             logwarn(
                 tor,
                 fmt::format(
-                    _("Got {number} mtimes; expected {req}"),
-                    fmt::arg("number", std::size(mtimes)),
+                    _("Got {count} mtimes; expected {req}"),
+                    fmt::arg("count", std::size(mtimes)),
                     fmt::arg("req", size_t(n_files))));
             // if resizing grows the vector, we'll get 0 mtimes for the
             // new items which is exactly what we want since the pieces

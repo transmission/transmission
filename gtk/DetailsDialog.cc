@@ -1894,10 +1894,10 @@ void appendAnnounceInfo(tr_tracker_view const& tracker, time_t const now, Gtk::T
         if (tracker.lastAnnounceSucceeded)
         {
             gstr << fmt::format(
-                _("Got a list of {success_markup_begin}{peer_count}{success_markup_end} {peers} {duration} ago"),
+                _("Got a list of {success_markup_begin}{count}{success_markup_end} {peers} {duration} ago"),
                 fmt::arg("success_markup_begin", success_markup_begin),
                 fmt::arg("success_markup_end", success_markup_end),
-                fmt::arg("peer_count", tracker.lastAnnouncePeerCount),
+                fmt::arg("count", tracker.lastAnnouncePeerCount),
                 fmt::arg("peers", ngettext("peer", "peers", tracker.lastAnnouncePeerCount)),
                 fmt::arg("duration", timebuf.raw()));
         }

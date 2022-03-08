@@ -118,9 +118,9 @@ static void natPulse(tr_shared* s, bool do_check)
         s->session->public_peer_port = public_peer_port;
         s->session->private_peer_port = received_private_port;
         loginfo(fmt::format(
-            _("public peer port {port} (private {number}) "),
-            fmt::arg("port", s->session->public_peer_port),
-            fmt::arg("number", s->session->private_peer_port)));
+            _("public peer port {public_port} (private {private_port}) "),
+            fmt::arg("public_port", s->session->public_peer_port),
+            fmt::arg("private_port", s->session->private_peer_port)));
     }
 
     s->upnpStatus = tr_upnpPulse(

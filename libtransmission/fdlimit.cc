@@ -268,19 +268,19 @@ static int cached_file_open(
         if (!success)
         {
             logwarn(fmt::format(
-                _("Couldn't preallocate '{path}' mode '{mode}' to {size} bytes: {errmsg}"),
+                _("Couldn't preallocate '{path}' mode '{mode}' to {count} bytes: {errmsg}"),
                 fmt::arg("path", filename),
                 fmt::arg("mode", type),
-                fmt::arg("size", file_size),
+                fmt::arg("count", file_size),
                 fmt::arg("errmsg", error->message)));
             goto FAIL;
         }
 
         logdbg(fmt::format(
-            "Preallocated file '{path}' with mode {mode} to {size} bytes",
+            "Preallocated file '{path}' with mode {mode} to {count} bytes",
             fmt::arg("path", filename),
             fmt::arg("mode", type),
-            fmt::arg("size", file_size)));
+            fmt::arg("count", file_size)));
     }
 
     /* If the file already exists and it's too large, truncate it.

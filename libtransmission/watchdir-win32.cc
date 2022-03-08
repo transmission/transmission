@@ -180,9 +180,9 @@ static void tr_watchdir_win32_on_event(struct bufferevent* event, void* context)
         if (nread != header_size)
         {
             logwarn(
-                _("Failed to read event: expected {req} bytes but got {number}"),
+                _("Failed to read event: expected {req} bytes but got {count}"),
                 fmt::arg("req", header_size),
-                fmt::arg("number", nread));
+                fmt::arg("count", nread));
             break;
         }
 
@@ -213,9 +213,9 @@ static void tr_watchdir_win32_on_event(struct bufferevent* event, void* context)
         if (nread != nleft)
         {
             logwarn(
-                _("Failed to read name: expected {req} bytes but got {number}"),
+                _("Failed to read name: expected {req} bytes but got {count}"),
                 fmt::arg("req", nleft),
-                fmt::arg("number", nread));
+                fmt::arg("count", nread));
             break;
         }
 

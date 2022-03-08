@@ -43,6 +43,7 @@
 
 #include "error-types.h"
 #include "error.h"
+#include "file.h"
 #include "log.h"
 #include "mime-types.h"
 #include "net.h" // ntohl()
