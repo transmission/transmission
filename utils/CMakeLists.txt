@@ -2,6 +2,10 @@ project(trutils)
 
 add_compile_options(${CXX_WARNING_FLAGS})
 
+add_definitions(
+    ${LIBFMT_DEFINITIONS}
+)
+
 include_directories(
     ${CMAKE_SOURCE_DIR}
 )
@@ -9,6 +13,7 @@ include_directories(
     SYSTEM
     ${EVENT2_INCLUDE_DIRS}
     ${CURL_INCLUDE_DIRS}
+    ${LIBFMT_INCLUDE_DIRS}
 )
 
 foreach(P create edit remote show)

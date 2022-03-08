@@ -17,6 +17,8 @@
 #include <event2/buffer.h>
 #include <event2/util.h>
 
+#include <fmt/core.h>
+
 #include <curl/curl.h>
 
 #include <libtransmission/transmission.h>
@@ -1991,16 +1993,13 @@ static int processResponse(char const* rpcurl, std::string_view response)
 
     if (debug)
     {
-        fprintf(
-            stderr,
-            "got response (len %d):\n--------\n%" TR_PRIsv "\n--------\n",
-            int(std::size(response)),
-            TR_PRIsv_ARG(response));
+        auto const msg = fmt::format("got response (len {):\n---{}\n---\n", std::size(response), response);
+        fputs(msg.c_str(), stderr);
     }
 
     if (!tr_variantFromBuf(&top, TR_VARIANT_PARSE_JSON | TR_VARIANT_PARSE_INPLACE, response))
     {
-        tr_logAddNamedError(MyName, "Unable to parse response \"%" TR_PRIsv "\"", TR_PRIsv_ARG(response));
+        tr_log::warn::add(TR_LOC, fmt::format("Unable to parse response '{}'", response), MyName);
         status |= EXIT_FAILURE;
     }
     else
@@ -2172,7 +2171,7 @@ static int flush(char const* rpcurl, tr_variant** benc)
     auto const res = curl_easy_perform(curl);
     if (res != CURLE_OK)
     {
-        tr_logAddNamedError(MyName, " (%s) %s", rpcurl_http.c_str(), curl_easy_strerror(res));
+        tr_log::warn::add(TR_LOC, fmt::format("URL '{}' failed: {}", rpcurl_http, curl_easy_strerror(res)));
         status |= EXIT_FAILURE;
     }
     else
