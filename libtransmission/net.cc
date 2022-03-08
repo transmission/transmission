@@ -42,7 +42,7 @@
 #define IN_MULTICAST(a) (((a)&0xf0000000) == 0xe0000000)
 #endif
 
-static char constexpr ModuleName[] = "Net";
+static char constexpr ModuleName[] = "net";
 
 #define logerr(msg) \
     do \

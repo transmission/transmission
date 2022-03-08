@@ -58,7 +58,7 @@ using namespace std::literals;
  * http://www.webappsec.org/lists/websecurity/archive/2008-04/msg00037.html */
 #define REQUIRE_SESSION_ID
 
-static char constexpr MyName[] = "RPC Server";
+static char constexpr MyName[] = "rpc";
 
 static auto constexpr TrUnixSocketPrefix = "unix:"sv;
 

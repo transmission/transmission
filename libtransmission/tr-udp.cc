@@ -35,7 +35,7 @@
 #define SEND_BUFFER_SIZE (1 * 1024 * 1024)
 #define SMALL_BUFFER_SIZE (32 * 1024)
 
-static char constexpr ModuleName[] = "UDP";
+static char constexpr ModuleName[] = "udp";
 
 #define logerr(sv) \
     do \
