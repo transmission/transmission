@@ -8,7 +8,6 @@
   - [ ] libtransmission/log.cc
   - [ ] libtransmission/log.h
   - [ ] libtransmission/makemeta.cc
-  - [ ] libtransmission/session-id.cc
   - [ ] macosx/Torrent.mm
   - [ ] utils/remote.cc
 

@@ -10,6 +10,8 @@
 #include <sys/stat.h>
 #endif
 
+#include <fmt/core.h>
+
 #include "transmission.h"
 #include "crypto-utils.h"
 #include "error.h"
@@ -91,7 +93,13 @@ static tr_sys_file_t create_session_id_lock_file(char const* session_id)
 
     if (error != nullptr)
     {
-        tr_logAddError("Unable to create session lock file (%d): %s", error->code, error->message);
+        tr_log::warn::add(
+            TR_LOC,
+            fmt::format(
+                _("Error saving '{path}': {errmsg} ({errcode})"),
+                fmt::arg("path", lock_file),
+                fmt::arg("errmsg", error->message),
+                fmt::arg("errcode", error->code)));
         tr_error_free(error);
     }
 
@@ -194,7 +202,13 @@ bool tr_session_id_is_local(char const* session_id)
 
         if (error != nullptr)
         {
-            tr_logAddError("Unable to open session lock file (%d): %s", error->code, error->message);
+            tr_log::warn::add(
+                TR_LOC,
+                fmt::format(
+                    _("Unable to open '{path}': {errmsg} ({errcode})"),
+                    fmt::arg("path", lock_file_path),
+                    fmt::arg("errmsg", error->message),
+                    fmt::arg("errcode", error->code)));
             tr_error_free(error);
         }
     }
