@@ -1,4 +1,2 @@
 - [ ] ensure all log messages are the correct logging level
-- [ ] is TR_PRIsv_ARG still needed or can it be removed
 - [ ] mac xcode
-- [ ] index all the fmt::arg and ensure consistency, e.g. don't use both "dir" and "path", just use one
