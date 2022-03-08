@@ -4,12 +4,14 @@
 // License text can be found in the licenses/ folder.
 
 #include <cerrno>
+#include <chrono>
 #include <cstdio>
 #include <mutex>
 
 #include <event2/buffer.h>
 
 #include <fmt/core.h>
+#include <fmt/chrono.h>
 
 #include "transmission.h"
 #include "file.h"
@@ -111,27 +113,6 @@ void tr_logFreeQueue(tr_log_message* list)
     }
 }
 
-/**
-***
-**/
-
-static char* tr_logGetTimeStr(char* buf, size_t buflen)
-{
-    auto const tv = tr_gettimeofday();
-    time_t const seconds = tv.tv_sec;
-    auto const milliseconds = int(tv.tv_usec / 1000);
-    char msec_str[8];
-    tr_snprintf(msec_str, sizeof msec_str, "%03d", milliseconds);
-
-    struct tm now_tm;
-    tr_localtime_r(&seconds, &now_tm);
-    char date_str[32];
-    strftime(date_str, sizeof(date_str), "%Y-%m-%d %H:%M:%S", &now_tm);
-
-    tr_snprintf(buf, buflen, "%s.%s", date_str, msec_str);
-    return buf;
-}
-
 /***
 ****
 ***/
@@ -139,11 +120,11 @@ static char* tr_logGetTimeStr(char* buf, size_t buflen)
 void tr_logAddMessage(
     [[maybe_unused]] char const* file,
     [[maybe_unused]] int line,
-    [[maybe_unused]] tr_log_level level,
-    [[maybe_unused]] std::string_view msg,
+    tr_log_level level,
+    std::string_view msg,
     [[maybe_unused]] std::string_view name)
 {
-    if (std::empty(msg))
+    if (std::empty(msg) || !tr_logLevelIsActive(level))
     {
         return;
     }
@@ -214,11 +195,9 @@ void tr_logAddMessage(
             fp = tr_sys_file_get_std(TR_STD_SYS_FILE_ERR, nullptr);
         }
 
-        char timestr[64];
-        tr_logGetTimeStr(timestr, sizeof(timestr));
-
-        auto const out = std::empty(name) ? fmt::format("[{}] {}", timestr, msg) :
-                                            fmt::format("[{}] {}: {}", timestr, name, msg);
+        auto const now = std::chrono::system_clock::now();
+        auto const out = std::empty(name) ? fmt::format("[{:%F %H:%M}:{:%S}] {}", now, now.time_since_epoch(), msg) :
+                                            fmt::format("[{:%F %H:%M}:{:%S}] {}: {}", now, now.time_since_epoch(), name, msg);
         tr_sys_file_write_line(fp, out, nullptr);
         tr_sys_file_flush(fp, nullptr);
     }

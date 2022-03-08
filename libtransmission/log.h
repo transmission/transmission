@@ -5,14 +5,9 @@
 
 #pragma once
 
-#include <cstddef> // size_t
-#include <string>
 #include <string_view>
 
 #include "transmission.h"
-
-#include "file.h" // tr_sys_file_t
-#include "tr-macros.h"
 
 #define TR_LOG_MAX_QUEUE_LENGTH 10000
 

@@ -4,9 +4,10 @@
 // License text can be found in the licenses/ folder.
 
 #include <array>
-#include <errno.h>
-#include <stdio.h> /* printf */
-#include <stdlib.h> /* atoi */
+#include <cerrno>
+#include <chrono>
+#include <cstdio> /* printf */
+#include <cstdlib> /* atoi */
 #include <string_view>
 
 #ifdef HAVE_SYSLOG
@@ -20,6 +21,7 @@
 #endif
 
 #include <fmt/core.h>
+#include <fmt/chrono.h>
 
 #include <event2/event.h>
 
@@ -281,14 +283,16 @@ static void printMessage(
     std::string_view filename,
     int line)
 {
-    auto const out = std::empty(name) ? fmt::format("{} ({}:{})", message, filename, line) :
-                                        fmt::format("{} {} ({}:{})", name, message, filename, line);
+    auto* const path = tr_sys_path_basename(filename, nullptr);
+    auto const now = std::chrono::system_clock::now();
+    auto const out = std::empty(name) ?
+        fmt::format("[{:%F %H:%M}:{:%S}] {} ({}:{})", now, now.time_since_epoch(), message, path, line) :
+        fmt::format("[{:%F %H:%M}:{:%S}] {}: {} ({}:{})", now, now.time_since_epoch(), name, message, path, line);
+    tr_free(path);
 
     if (file != TR_BAD_SYS_FILE)
     {
-        auto timestr = std::array<char, 64>{};
-        tr_logGetTimeStr(std::data(timestr), std::size(timestr));
-        tr_sys_file_write_line(file, tr_strvJoin("["sv, std::data(timestr), "] "sv, out), nullptr);
+        tr_sys_file_write_line(file, out.c_str(), nullptr);
     }
 
 #ifdef HAVE_SYSLOG
