@@ -1546,7 +1546,10 @@ static void stopTorrent(tr_torrent* const tor)
     TR_ASSERT(tr_amInEventThread(tor->session));
     auto const lock = tor->unique_lock();
 
-    loginfo(tor, _("Pausing"));
+    if (!tor->session->isClosing())
+    {
+        loginfo(tor, _("Pausing"));
+    }
 
     tr_verifyRemove(tor);
     tr_peerMgrStopTorrent(tor);
@@ -1596,7 +1599,10 @@ static void closeTorrent(tr_torrent* const tor)
 
     tor->session->removed_torrents.emplace_back(tor->uniqueId, tr_time());
 
-    loginfo(tor, _("Removing torrent"));
+    if (!tor->session->isClosing())
+    {
+        loginfo(tor, _("Removing torrent"));
+    }
 
     tor->magnetVerify = false;
     stopTorrent(tor);
