@@ -3092,23 +3092,10 @@ static void initiateConnection(tr_peerMgr* mgr, tr_swarm* s, struct peer_atom* a
     atom->time = now;
 }
 
-static void initiateCandidateConnection(tr_peerMgr* mgr, peer_candidate& c)
-{
-#if 0
-
-    fprintf(stderr, "Starting an OUTGOING connection with %s - [%s] %s, %s\n", tr_atomAddrStr(c->atom),
-        tr_torrentName(c->tor), c->tor->isPrivate() ? "private" : "public",
-        c->tor->isDone() ? "seed" : "downloader");
-
-#endif
-
-    initiateConnection(mgr, c.tor->swarm, c.atom);
-}
-
 static void makeNewPeerConnections(struct tr_peerMgr* mgr, size_t max)
 {
     for (auto& candidate : getPeerCandidates(mgr->session, max))
     {
-        initiateCandidateConnection(mgr, candidate);
+        initiateConnection(mgr, candidate.tor->swarm, candidate.atom);
     }
 }
