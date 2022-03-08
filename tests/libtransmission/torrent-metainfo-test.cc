@@ -75,7 +75,7 @@ TEST_F(TorrentMetainfoTest, bucket)
         { "", false },
     } };
 
-    tr_logSetLevel(TR_LOG_SILENT);
+    tr_logSetLevel(TR_LOG_OFF);
 
     for (auto const& test : tests)
     {

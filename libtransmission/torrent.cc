@@ -67,7 +67,7 @@
     { \
         if (tr_log::error::enabled()) \
         { \
-            tr_log::error::add(TR_LOC, msg, tor->name()); \
+            tr_log::error::add(TR_LOC, msg, (tor)->name()); \
         } \
     } while (0)
 
@@ -76,7 +76,7 @@
     { \
         if (tr_log::warn::enabled()) \
         { \
-            tr_log::warn::add(TR_LOC, msg, tor->name()); \
+            tr_log::warn::add(TR_LOC, msg, (tor)->name()); \
         } \
     } while (0)
 
@@ -85,7 +85,7 @@
     { \
         if (tr_log::info::enabled()) \
         { \
-            tr_log::info::add(TR_LOC, msg, tor->name()); \
+            tr_log::info::add(TR_LOC, msg, (tor)->name()); \
         } \
     } while (0)
 
@@ -94,7 +94,7 @@
     { \
         if (tr_log::debug::enabled()) \
         { \
-            tr_log::debug::add(TR_LOC, msg, tor->name()); \
+            tr_log::debug::add(TR_LOC, msg, (tor)->name()); \
         } \
     } while (0)
 
@@ -2380,7 +2380,7 @@ static void setLocationImpl(struct LocationData* const data)
         tor,
         fmt::format(
             _("Moving files from '{oldpath}' to '{path}'"),
-            fmt::arg("oldpath", tor->currentDir()),
+            fmt::arg("oldpath", tor->currentDir().sv()),
             fmt::arg("path", location)));
 
     tr_sys_dir_create(location.c_str(), TR_SYS_DIR_CREATE_PARENTS, 0777, nullptr);

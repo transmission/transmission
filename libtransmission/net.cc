@@ -461,12 +461,9 @@ struct tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const
         ret = tr_peer_socket_tcp_create(s);
     }
 
-    if (tr_logGetDeepEnabled())
-    {
-        char addrstr[TR_ADDRSTRLEN];
-        tr_address_and_port_to_string(addrstr, sizeof(addrstr), addr, port);
-        logtrace(fmt::format("New OUTGOING connection {} ({})", s, addrstr));
-    }
+    char addrstr[TR_ADDRSTRLEN];
+    tr_address_and_port_to_string(addrstr, sizeof(addrstr), addr, port);
+    logtrace(fmt::format("New OUTGOING connection {} ({})", s, addrstr));
 
     return ret;
 }

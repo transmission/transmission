@@ -252,10 +252,7 @@ void tr_eventClose(tr_session* session)
 
     event_base_loopexit(events->base, nullptr);
 
-    if (tr_logGetDeepEnabled())
-    {
-        logtrace("closing trevent pipe");
-    }
+    logtrace("closing trevent pipe");
 }
 
 /**
