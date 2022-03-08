@@ -508,7 +508,7 @@ void tr_torrentCheckSeedLimit(tr_torrent* tor)
     /* if we're seeding and reach our seed ratio limit, stop the torrent */
     if (tr_torrentIsSeedRatioDone(tor))
     {
-        loginfo(tor, "Seed ratio reached; pausing torrent");
+        loginfo(tor, _("Seed ratio reached; pausing torrent"));
 
         tor->isStopping = true;
 
@@ -521,7 +521,7 @@ void tr_torrentCheckSeedLimit(tr_torrent* tor)
     /* if we're seeding and reach our inactivity limit, stop the torrent */
     else if (tr_torrentIsSeedIdleLimitDone(tor))
     {
-        loginfo(tor, "Seeding idle limit reached; pausing torrent");
+        loginfo(tor, _("Seeding idle limit reached; pausing torrent"));
 
         tor->isStopping = true;
         tor->finishedSeedingByIdle = true;

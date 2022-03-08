@@ -41,15 +41,6 @@ static char constexpr CodeName[] = "watchdir";
         } \
     } while (0)
 
-#define logwarn(msg) \
-    do \
-    { \
-        if (tr_log::warn::enabled()) \
-        { \
-            tr_log::warn::add(TR_LOC, msg, CodeName); \
-        } \
-    } while (0)
-
 #define logdbg(msg) \
     do \
     { \

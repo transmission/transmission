@@ -926,7 +926,7 @@ static auto parseWhitelist(std::string_view whitelist)
         if (token.find_first_of("+-"sv) != std::string_view::npos)
         {
             logwarn(fmt::format(
-                "Adding address to whitelist: {text} (And it has a '+' or '-'!  Are you using an old ACL by mistake?)",
+                _("Adding address to whitelist: {text} (And it has a '+' or '-'!  Are you using an old ACL by mistake?)"),
                 fmt::arg("text", token)));
         }
         else

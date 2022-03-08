@@ -975,16 +975,24 @@ static void on_announce_error(tr_tier* tier, char const* err, tr_announce_event 
     /* switch to the next tracker */
     current_tracker = tier->useNextTracker();
 
-    auto const* const host_cstr = current_tracker->host.c_str();
+    auto const host_sv = current_tracker->host.sv();
     if (isUnregistered(err))
     {
-        logerr(tier, fmt::format("Tracker '{}' announce error: {}", host_cstr, err));
+        logerr(
+            tier,
+            fmt::format(_("Tracker '{url}' announce error: {errmsg}"), fmt::arg("url", host_sv), fmt::arg("errmsg", err)));
     }
     else
     {
         /* schedule a reannounce */
         int const interval = current_tracker->getRetryInterval();
-        logwarn(tier, fmt::format("Tracker '{}' announce error: {} (Retrying in {} seconds)", host_cstr, err, interval));
+        logwarn(
+            tier,
+            fmt::format(
+                _("Tracker '{url}' announce error: {errmsg} (Retrying in {number} seconds)"),
+                fmt::arg("url", host_sv),
+                fmt::arg("errmsg", err),
+                fmt::arg("number", interval)));
         tier_announce_event_push(tier, e, tr_time() + interval);
     }
 }
