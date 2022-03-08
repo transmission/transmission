@@ -1,8 +1,3 @@
-- [ ] ensure no '%' format strings
-- [ ] remove deep logging code
-- [ ] remove old log API
-- [ ] ensure no excess copies of strings are being made
-- [ ] consider && in log API?
 - [ ] ensure all log messages are the correct logging level
 - [ ] is TR_PRIsv_ARG still needed or can it be removed
 - [ ] mac xcode
