@@ -9,7 +9,6 @@
   - [ ] libtransmission/log.h
   - [ ] libtransmission/makemeta.cc
   - [ ] libtransmission/session-id.cc
-  - [ ] libtransmission/watchdir-kqueue.cc
   - [ ] macosx/Torrent.mm
   - [ ] utils/remote.cc
 

@@ -19,6 +19,8 @@
 
 #include <event2/event.h>
 
+#include <fmt/core.h>
+
 #define LIBTRANSMISSION_WATCHDIR_MODULE
 
 #include "transmission.h"
@@ -32,9 +34,16 @@
 ****
 ***/
 
-#define log_error(...) \
-    (!tr_logLevelIsActive(TR_LOG_ERROR) ? (void)0 : \
-                                          tr_logAddMessage(__FILE__, __LINE__, TR_LOG_ERROR, "watchdir:kqueue", __VA_ARGS__))
+static char constexpr CodeName[] = "watchdir:kqueue";
+
+#define logerr(msg) \
+    do \
+    { \
+        if (tr_log::warn::enabled()) \
+        { \
+            tr_log::warn::add(TR_LOC, msg, CodeName); \
+        } \
+    } while (0)
 
 /***
 ****
@@ -67,7 +76,11 @@ static void tr_watchdir_kqueue_on_event(evutil_socket_t /*fd*/, short /*type*/, 
 
     if (kevent(backend->kq, nullptr, 0, &ke, 1, &ts) == -1)
     {
-        log_error("Failed to fetch kevent: %s", tr_strerror(errno));
+        auto const errcode = errno;
+        logerr(fmt::format(
+            _("Failed to read event: {errmsg} ({errcode})"),
+            fmt::arg("errmsg", tr_strerror(errcode)),
+            fmt::arg("errcode", errcode)));
         return;
     }
 
@@ -117,14 +130,24 @@ tr_watchdir_backend* tr_watchdir_kqueue_new(tr_watchdir_t handle)
 
     if ((backend->kq = kqueue()) == -1)
     {
-        log_error("Failed to start kqueue");
+        auto const errcode = errno;
+        logerr(fmt::format(
+            _("Watchdir '{path}' setup failed: {errmsg} ({errcode})"),
+            fmt::arg("path", path),
+            fmt::arg("errmsg", tr_strerror(errcode)),
+            fmt::arg("errcode", errcode)));
         goto fail;
     }
 
     /* Open fd for watching */
     if ((backend->dirfd = open(path, O_RDONLY | O_EVTONLY)) == -1)
     {
-        log_error("Failed to passively watch directory \"%s\": %s", path, tr_strerror(errno));
+        auto const errcode = errno;
+        logerr(fmt::format(
+            _("Watchdir '{path}' setup failed: {errmsg} ({errcode})"),
+            fmt::arg("path", path),
+            fmt::arg("errmsg", tr_strerror(errcode)),
+            fmt::arg("errcode", errcode)));
         goto fail;
     }
 
@@ -133,7 +156,12 @@ tr_watchdir_backend* tr_watchdir_kqueue_new(tr_watchdir_t handle)
 
     if (kevent(backend->kq, &ke, 1, nullptr, 0, nullptr) == -1)
     {
-        log_error("Failed to set directory event filter with fd %d: %s", backend->kq, tr_strerror(errno));
+        auto const errcode = errno;
+        logerr(fmt::format(
+            _("Watchdir '{path}' setup failed: {errmsg} ({errcode})"),
+            fmt::arg("path", path),
+            fmt::arg("errmsg", tr_strerror(errcode)),
+            fmt::arg("errcode", errcode)));
         goto fail;
     }
 
@@ -145,13 +173,21 @@ tr_watchdir_backend* tr_watchdir_kqueue_new(tr_watchdir_t handle)
              &tr_watchdir_kqueue_on_event,
              handle)) == nullptr)
     {
-        log_error("Failed to create event: %s", tr_strerror(errno));
+        auto const errcode = errno;
+        logerr(fmt::format(
+            _("Failed to create event: {errmsg} ({errcode})"),
+            fmt::arg("errmsg", tr_strerror(errcode)),
+            fmt::arg("errcode", errcode)));
         goto fail;
     }
 
     if (event_add(backend->event, nullptr) == -1)
     {
-        log_error("Failed to add event: %s", tr_strerror(errno));
+        auto const errcode = errno;
+        logerr(fmt::format(
+            _("Failed to add event: {errmsg} ({errcode})"),
+            fmt::arg("errmsg", tr_strerror(errcode)),
+            fmt::arg("errcode", errcode)));
         goto fail;
     }
 
