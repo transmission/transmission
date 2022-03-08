@@ -14,6 +14,8 @@
 
 #include <event2/util.h> /* evutil_ascii_strcasecmp() */
 
+#include <fmt/base.h>
+
 #include "transmission.h"
 
 #include "crypto-utils.h"
@@ -55,7 +57,11 @@ static struct FileList* getFiles(char const* dir, char const* base, struct FileL
     tr_sys_path_info info;
     if (tr_error* error = nullptr; !tr_sys_path_get_info(buf.c_str(), 0, &info, &error))
     {
-        tr_logAddError(_("Torrent Creator is skipping file \"%s\": %s"), buf.c_str(), error->message);
+        tr_log::error::add(fmt::format(
+            _("Torrent Creator is skipping file '{path}': {errmsg} ({errcode})"),
+            fmt::arg("path", buf),
+            fmt::arg("errmsg", error->message),
+            fmt::arg("errcode", error->code)));
         tr_error_free(error);
         return list;
     }
@@ -200,10 +206,10 @@ bool tr_metaInfoBuilderSetPieceSize(tr_metainfo_builder* b, uint32_t bytes)
 {
     if (!isValidPieceSize(bytes))
     {
-        tr_logAddError(
-            _("Failed to set piece size to %s, leaving it at %s"),
-            tr_formatter_mem_B(bytes).c_str(),
-            tr_formatter_mem_B(b->pieceSize).c_str());
+        tr_log::warn::add(fmt::format(
+            _("Failed to set piece size to {size}, leaving it at {number}"),
+            fmt::arg("size", tr_formatter_mem_B(bytes)),
+            fmt::arg("number", tr_formatter_mem_B(b->pieceSize))));
         return false;
     }
 

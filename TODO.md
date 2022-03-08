@@ -7,7 +7,6 @@
   - [ ] libtransmission/inout.cc
   - [ ] libtransmission/log.cc
   - [ ] libtransmission/log.h
-  - [ ] libtransmission/makemeta.cc
   - [ ] macosx/Torrent.mm
   - [ ] utils/remote.cc
 
