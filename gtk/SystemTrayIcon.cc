@@ -121,9 +121,9 @@ void SystemTrayIcon::Impl::refresh()
     icon_->set_tooltip_text(fmt::format(
         _("Transmission\nUp: {up_speed} {up_limit}\nDown: {down_speed} {down_limit}"),
         fmt::arg("up_speed", up),
-        fmt::arg("up_limit", upLimit),
+        fmt::arg("up_limit", upLimit.raw()),
         fmt::arg("down_speed", down),
-        fmt::arg("down_limit", downLimit)));
+        fmt::arg("down_limit", downLimit.raw())));
 }
 
 #endif
