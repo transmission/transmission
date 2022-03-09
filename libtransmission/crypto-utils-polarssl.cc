@@ -5,6 +5,8 @@
 
 #include <mutex>
 
+#include <fmt/core.h>
+
 #if defined(POLARSSL_IS_MBEDTLS)
 #define API_HEADER(x) <mbedtls/x>
 #define API(x) mbedtls_##x

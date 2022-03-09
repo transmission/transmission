@@ -410,8 +410,7 @@ struct blocklist_data
 void updateBlocklistText(Gtk::Label* w, Glib::RefPtr<Session> const& core)
 {
     int const n = tr_blocklistGetRuleCount(core->get_session());
-    w->set_markup(
-        gtr_sprintf("<i>%s</i>", gtr_sprintf(ngettext("Blocklist contains %'d rule", "Blocklist contains %'d rules", n), n)));
+    w->set_markup(gtr_sprintf("<i>%s</i>", gtr_sprintf(ngettext("Blocklist has %'d rule", "Blocklist has %'d rules", n), n)));
 }
 
 /* prefs dialog is being destroyed, so stop listening to blocklist updates */

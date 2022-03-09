@@ -6,6 +6,8 @@
 #include <memory>
 #include <type_traits>
 
+#include <fmt/core.h>
+
 #ifdef HAVE_COMMONCRYPTO_COMMONBIGNUM_H
 #include <CommonCrypto/CommonBigNum.h>
 #endif

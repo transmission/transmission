@@ -228,7 +228,7 @@ tr_watchdir_backend* tr_watchdir_inotify_new(tr_watchdir_t handle)
     {
         auto const errcode = errno;
         logerr(fmt::format(
-            _("Error reading from '{path}': {errmsg} ({errcode})"),
+            _("Couldn't read '{path}': {errmsg} ({errcode})"),
             fmt::arg("path", path),
             fmt::arg("errmsg", tr_strerror(errcode)),
             fmt::arg("errcode", errcode)));

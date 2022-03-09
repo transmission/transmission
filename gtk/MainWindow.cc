@@ -612,7 +612,7 @@ void MainWindow::Impl::updateStats()
     else /* default is total-ratio */
     {
         tr_sessionGetCumulativeStats(session, &stats);
-        buf = gtr_sprintf(_("Ratio: %s"), tr_strlratio(stats.ratio).raw());
+        buf = fmt::format(_("Ratio: {percent}"), fmt::arg("percent", tr_strlratio(stats.ratio).raw()));
     }
 
     stats_lb_->set_text(buf);

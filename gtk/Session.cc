@@ -1109,7 +1109,9 @@ void Session::Impl::add_file_async_callback(
     {
         if (!file->load_contents_finish(result, contents, length))
         {
-            g_message(_("Couldn't read \"%s\""), file->get_parse_name().c_str());
+            tr_log::error::add(
+                TR_LOC,
+                fmt::format(_("Couldn't read '{path}'"), fmt::arg("path", file->get_parse_name().raw())));
         }
         else if (tr_ctorSetMetainfo(ctor, contents, length, nullptr))
         {
@@ -1122,7 +1124,13 @@ void Session::Impl::add_file_async_callback(
     }
     catch (Glib::Error const& e)
     {
-        g_message(_("Couldn't read \"%s\": %s"), file->get_parse_name().c_str(), e.what().c_str());
+        tr_log::error::add(
+            TR_LOC,
+            fmt::format(
+                _("Couldn't read '{path}': {errmsg} ({errcode})"),
+                fmt::arg("path", file->get_parse_name().raw()),
+                fmt::arg("errmsg", e.what().raw()),
+                fmt::arg("errcode", e.code())));
     }
 
     dec_busy();

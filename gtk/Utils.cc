@@ -159,7 +159,7 @@ void gtr_add_torrent_error_dialog(Gtk::Widget& child, tr_torrent* duplicate_torr
     }
     else
     {
-        secondary = gtr_sprintf(_("Unable to add torrent file \"%s\"."), filename);
+        secondary = fmt::format(_("Unable to add .torrent file '{path}'"), fmt::arg("path", filename));
     }
 
     auto w = std::make_shared<Gtk::MessageDialog>(
@@ -450,7 +450,7 @@ void gtr_unrecognized_url_dialog(Gtk::Widget& parent, Glib::ustring const& url)
 
     auto w = std::make_shared<Gtk::MessageDialog>(
         *window,
-        _("Unrecognized URL"),
+        _("Unsupported URL"),
         false /*use markup*/,
         Gtk::MESSAGE_ERROR,
         Gtk::BUTTONS_CLOSE,

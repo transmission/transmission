@@ -31,7 +31,7 @@
 #include <xlocale.h>
 #endif
 
-#include "fmt/core.h"
+#include <fmt/core.h>
 
 #include <event2/buffer.h>
 

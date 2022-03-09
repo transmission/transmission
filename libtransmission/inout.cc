@@ -172,7 +172,7 @@ int readOrWriteBytes(
             tr_log::error::add(
                 TR_LOC,
                 fmt::format(
-                    _("Error reading from '{path}': {errmsg} ({errcode})"),
+                    _("Couldn't read '{path}': {errmsg} ({errcode})"),
                     fmt::arg("path", tor->fileSubpath(file_index)),
                     fmt::arg("errmsg", error->message),
                     fmt::arg("errcode", error->code)),

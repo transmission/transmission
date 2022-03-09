@@ -240,7 +240,7 @@ static int cached_file_open(
     if (fd == TR_BAD_SYS_FILE)
     {
         logerr(fmt::format(
-            _("Couldn't open '{path}': {errmsg} ({errcode})"),
+            _("Unable to open '{path}': {errmsg} ({errcode})"),
             fmt::arg("path", filename),
             fmt::arg("errmsg", error->message),
             fmt::arg("errcode", error->code)));

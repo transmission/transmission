@@ -691,7 +691,7 @@ static int daemon_start(void* varg, [[maybe_unused]] bool foreground)
             tr_log::warn::add(
                 TR_LOC,
                 fmt::format(
-                    _("Unable to save pidfile '{path}': {errmsg} ({errcode})"),
+                    _("Error saving '{path}': {errmsg} ({errcode})"),
                     fmt::arg("path", sz_pid_filename),
                     fmt::arg("errmsg", error->message),
                     fmt::arg("errcode", error->code)),

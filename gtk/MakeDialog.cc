@@ -123,15 +123,23 @@ bool MakeProgressDialog::onProgressDialogRefresh()
     }
     else if (builder_.result == TrMakemetaResult::ERR_URL)
     {
-        str = gtr_sprintf(_("Error: invalid announce URL \"%s\""), builder_.errfile);
+        str = fmt::format(_("Unsupported URL: {url}"), fmt::arg("url", builder_.errfile));
     }
     else if (builder_.result == TrMakemetaResult::ERR_IO_READ)
     {
-        str = gtr_sprintf(_("Error reading \"%s\": %s"), builder_.errfile, Glib::strerror(builder_.my_errno));
+        str = fmt::format(
+            _("Couldn't read '{path}': {errmsg} ({errcode})"),
+            fmt::arg("path", builder_.errfile),
+            fmt::arg("errmsg", Glib::strerror(builder_.my_errno).raw()),
+            fmt::arg("errcode", builder_.my_errno));
     }
     else if (builder_.result == TrMakemetaResult::ERR_IO_WRITE)
     {
-        str = gtr_sprintf(_("Error writing \"%s\": %s"), builder_.errfile, Glib::strerror(builder_.my_errno));
+        str = fmt::format(
+            _("Error writing to '{path}': {errmsg} ({errcode})"),
+            fmt::arg("path", builder_.errfile),
+            fmt::arg("errmsg", Glib::strerror(builder_.my_errno).raw()),
+            fmt::arg("errcode", builder_.my_errno));
     }
     else
     {

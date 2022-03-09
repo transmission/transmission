@@ -118,7 +118,7 @@ static void blocklistLoad(tr_blocklistFile* b)
     if (b->rules == nullptr)
     {
         logwarn(fmt::format(
-            _("Error reading from '{path}': {errmsg} ({errcode})"),
+            _("Couldn't read '{path}': {errmsg} ({errcode})"),
             fmt::arg("path", b->filename),
             fmt::arg("errmsg", error->message),
             fmt::arg("errcode", error->code)));
@@ -132,7 +132,7 @@ static void blocklistLoad(tr_blocklistFile* b)
     b->ruleCount = byteCount / sizeof(struct tr_ipv4_range);
 
     char* const base = tr_sys_path_basename(b->filename, nullptr);
-    loginfo(fmt::format(_("Blocklist '{path}' has {count} entries"), fmt::arg("path", base), fmt::arg("count", b->ruleCount)));
+    loginfo(fmt::format(_("Blocklist '{path}' has {count} rules"), fmt::arg("path", base), fmt::arg("count", b->ruleCount)));
     tr_free(base);
 }
 
@@ -512,7 +512,7 @@ int tr_blocklistFileSetContent(tr_blocklistFile* b, char const* filename)
     {
         char* base = tr_sys_path_basename(b->filename, nullptr);
         loginfo(fmt::format(
-            _("Blocklist '{path}' updated with {count} entries"),
+            _("Blocklist '{path}' updated with {count} rules"),
             fmt::arg("path", base),
             fmt::arg("count", ranges_count)));
         tr_free(base);

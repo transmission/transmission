@@ -180,7 +180,7 @@ Glib::ustring getShortStatusString(tr_torrent const* tor, tr_stat const* st, dou
         {
             /* download/upload speed, ratio */
             gstr += gtr_sprintf("%s  ", getShortTransferString(tor, st, uploadSpeed_KBps, downloadSpeed_KBps));
-            gstr += gtr_sprintf(_("Ratio: %s"), tr_strlratio(st->ratio));
+            gstr += fmt::format(_("Ratio: {percent}"), fmt::arg("percent", tr_strlratio(st->ratio).raw()));
             break;
         }
 

@@ -182,7 +182,7 @@ static void tr_watchdir_on_retry_timer(evutil_socket_t /*fd*/, short /*type*/, v
             return;
         }
 
-        logerr(fmt::format(_("Unable to add torrent file '{path}'"), fmt::format("path", retry->name)));
+        logerr(fmt::format(_("Unable to add .torrent file '{path}'"), fmt::format("path", retry->name)));
     }
 
     tr_watchdir_retries_remove(&handle->active_retries, retry);
@@ -382,7 +382,7 @@ void tr_watchdir_scan(tr_watchdir_t handle, std::unordered_set<std::string>* dir
     if (error != nullptr)
     {
         logerr(fmt::format(
-            _("Error reading from '{path}': {errmsg} ({errcode})"),
+            _("Couldn't read '{path}': {errmsg} ({errcode})"),
             fmt::arg("path", handle->path),
             fmt::arg("errmsg", error->message),
             fmt::arg("errcode", error->code)));

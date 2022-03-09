@@ -741,7 +741,12 @@ bool FileList::Impl::on_rename_done_idle(Glib::ustring const& path_string, Glib:
     {
         Gtk::MessageDialog w(
             *static_cast<Gtk::Window*>(widget_.get_toplevel()),
-            gtr_sprintf(_("Unable to rename file as \"%s\": %s"), newname, tr_strerror(error)),
+            fmt::format(
+                _("Error moving '{oldpath}' to '{path}': {errmsg} ({errcode})"),
+                fmt::arg("oldpath", path_string.raw()),
+                fmt::arg("path", newname.raw()),
+                fmt::arg("errmsg", tr_strerror(error)),
+                fmt::arg("errcode", error)),
             false,
             Gtk::MESSAGE_ERROR,
             Gtk::BUTTONS_CLOSE,

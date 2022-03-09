@@ -1216,7 +1216,7 @@ static void announce_request_delegate(
     }
     else
     {
-        tr_log::error::add(TR_LOC, fmt::format("Unsupported url: {}", announce_sv));
+        tr_log::error::add(TR_LOC, fmt::format("Unsupported URL: {}", announce_sv));
         delete callback_data;
     }
 
@@ -1450,7 +1450,7 @@ static void scrape_request_delegate(
     }
     else
     {
-        tr_log::error::add(TR_LOC, fmt::format(_("Unsupported url: {url}"), fmt::arg("url", scrape_sv)));
+        tr_log::error::add(TR_LOC, fmt::format(_("Unsupported URL: {url}"), fmt::arg("url", scrape_sv)));
     }
 }
 
