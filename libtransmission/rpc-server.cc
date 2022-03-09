@@ -790,7 +790,7 @@ static void startServer(tr_rpc_server* server)
 
 static void stopServer(tr_rpc_server* server)
 {
-    TR_ASSERT(tr_amInEventThread(server->session));
+    auto const lock = server->session->unique_lock();
 
     rpc_server_start_retry_cancel(server);
 
@@ -1234,7 +1234,5 @@ tr_rpc_server::tr_rpc_server(tr_session* session_in, tr_variant* settings)
 
 tr_rpc_server::~tr_rpc_server()
 {
-    TR_ASSERT(tr_amInEventThread(this->session));
-
     stopServer(this);
 }
