@@ -218,7 +218,12 @@ void tr_bitfield::freeArray()
 
 void tr_bitfield::setTrueCount(size_t n)
 {
-    TR_ASSERT(bit_count_ == 0 || n <= bit_count_);
+    TR_ASSERT_MSG(
+        bit_count_ == 0 || n <= bit_count_,
+        "bit_count_:%zu, n:%zu, std::size(flags_):%zu",
+        bit_count_,
+        n,
+        size_t(std::size(flags_)));
 
     true_count_ = n;
     have_all_hint_ = n == bit_count_;
@@ -285,7 +290,7 @@ void tr_bitfield::setHasAll()
 
 void tr_bitfield::setRaw(uint8_t const* raw, size_t byte_count)
 {
-    flags_ = std::vector<uint8_t>(raw, raw + byte_count);
+    flags_.assign(raw, raw + byte_count);
 
     // ensure any excess bits at the end of the array are set to '0'.
     if (byte_count == getBytesNeeded(bit_count_))
