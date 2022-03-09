@@ -38,6 +38,7 @@ add_executable(libtransmission-test
 
 target_compile_definitions(libtransmission-test
     PRIVATE
+        ${LIBFMT_DEFINITIONS}
         -DLIBTRANSMISSION_TEST_ASSETS_DIR="${CMAKE_CURRENT_SOURCE_DIR}/assets"
         __TRANSMISSION__)
 
@@ -48,6 +49,8 @@ target_include_directories(libtransmission-test
 
 target_include_directories(libtransmission-test SYSTEM
     PRIVATE
+    SYSTEM
+        ${LIBFMT_INCLUDE_DIRS}
         ${CURL_INCLUDE_DIRS}
         ${EVENT2_INCLUDE_DIRS})
 
