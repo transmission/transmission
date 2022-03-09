@@ -179,7 +179,7 @@ static void tr_watchdir_win32_on_event(struct bufferevent* event, void* context)
 
         if (nread != header_size)
         {
-            logwarn(format::fmt(
+            logwarn(fmt::format(
                 _("Failed to read event: expected {req} bytes but got {count}"),
                 fmt::arg("req", header_size),
                 fmt::arg("count", nread)));
