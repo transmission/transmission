@@ -10,6 +10,7 @@
 #endif
 
 #include <cstddef>
+#include <cstdint>
 #include <vector>
 
 /**
