@@ -10,7 +10,7 @@
 #include <string_view>
 #include <vector>
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include <event2/buffer.h>
 #include <event2/dns.h>

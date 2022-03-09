@@ -22,7 +22,7 @@
 
 #include <event2/buffer.h>
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include "crypto-utils.h"
 #include "log.h"
