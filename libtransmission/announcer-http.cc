@@ -8,6 +8,7 @@
 #include <cstring> /* strchr(), memcmp(), memcpy() */
 #include <iostream>
 #include <iomanip>
+#include <optional>
 #include <string>
 #include <string_view>
 
@@ -29,6 +30,7 @@
 #include "peer-mgr.h" /* pex */
 #include "quark.h"
 #include "torrent.h"
+#include "tr-assert.h"
 #include "utils.h"
 #include "web-utils.h"
 #include "web.h"
@@ -48,7 +50,10 @@ static char const* get_event_string(tr_announce_request const* req)
     return req->partial_seed && (req->event != TR_ANNOUNCE_EVENT_STOPPED) ? "paused" : tr_announce_event_get_string(req->event);
 }
 
-static std::string announce_url_new(tr_session const* session, tr_announce_request const* req)
+static std::tuple<std::string, size_t> announce_url_new(
+    tr_session const* session,
+    tr_announce_request const* req,
+    unsigned char const* ipv6)
 {
     auto const announce_sv = req->announce_url.sv();
 
@@ -102,16 +107,9 @@ static std::string announce_url_new(tr_session const* session, tr_announce_reque
         evbuffer_add_printf(buf, "&trackerid=%" TR_PRIsv, TR_PRIsv_ARG(req->tracker_id));
     }
 
-    /* There are two incompatible techniques for announcing an IPv6 address.
-       BEP-7 suggests adding an "ipv6=" parameter to the announce URL,
-       while OpenTracker requires that peers announce twice, once over IPv4
-       and once over IPv6.
+    size_t no_ipv6_cutoff = evbuffer_get_length(buf);
 
-       To be safe, we should do both: add the "ipv6=" parameter and
-       announce twice. At any rate, we're already computing our IPv6
-       address (for the LTEP handshake), so this comes for free. */
-
-    if (auto const* const ipv6 = tr_globalIPv6(session); ipv6 != nullptr)
+    if (ipv6 != nullptr)
     {
         auto ipv6_readable = std::array<char, INET6_ADDRSTRLEN>{};
         evutil_inet_ntop(AF_INET6, ipv6, std::data(ipv6_readable), std::size(ipv6_readable));
@@ -119,7 +117,7 @@ static std::string announce_url_new(tr_session const* session, tr_announce_reque
         tr_http_escape(buf, std::data(ipv6_readable), true);
     }
 
-    return evbuffer_free_to_str(buf);
+    return { evbuffer_free_to_str(buf), no_ipv6_cutoff };
 }
 
 static void verboseLog(std::string_view description, tr_direction direction, std::string_view message)
@@ -284,18 +282,24 @@ void tr_announcerParseHttpAnnounceResponse(tr_announce_response& response, std::
 
 struct announce_data
 {
-    tr_announce_response response;
+    tr_sha1_digest_t info_hash;
+    std::optional<tr_announce_response> previous_response;
+
     tr_announce_response_func response_func;
     void* response_func_user_data;
+    bool http_success = false;
+
+    uint8_t requests_sent_count;
+    uint8_t requests_answered_count;
+
     char log_name[128];
 };
 
-static void onAnnounceDone(tr_web::FetchResponse const& web_response)
+static bool handleAnnounceResponse(tr_web::FetchResponse const& web_response, tr_announce_response* const response)
 {
     auto const& [status, body, did_connect, did_timeout, vdata] = web_response;
     auto* data = static_cast<struct announce_data*>(vdata);
 
-    tr_announce_response* const response = &data->response;
     response->did_connect = did_connect;
     response->did_timeout = did_timeout;
     logtrace(data->log_name, "Got announce response");
@@ -304,11 +308,11 @@ static void onAnnounceDone(tr_web::FetchResponse const& web_response)
     {
         auto const* const response_str = tr_webGetResponseStr(status);
         response->errmsg = tr_strvJoin("Tracker HTTP response "sv, std::to_string(status), " ("sv, response_str, ")"sv);
+
+        return false;
     }
-    else
-    {
-        tr_announcerParseHttpAnnounceResponse(*response, body, data->log_name);
-    }
+
+    tr_announcerParseHttpAnnounceResponse(*response, body, data->log_name);
 
     if (!std::empty(response->pex6))
     {
@@ -320,12 +324,61 @@ static void onAnnounceDone(tr_web::FetchResponse const& web_response)
         logtrace(data->log_name, "got a peers length of %zu", std::size(response->pex));
     }
 
-    if (data->response_func != nullptr)
+    return true;
+}
+
+static void onAnnounceDone(tr_web::FetchResponse const& web_response)
+{
+    auto const& [status, body, did_connect, did_timeout, vdata] = web_response;
+    auto* data = static_cast<struct announce_data*>(vdata);
+
+    ++data->requests_answered_count;
+
+    // If another request already succeeded (or we don't have a registered callback),
+    // skip processing this response:
+    if (!data->http_success && data->response_func != nullptr)
     {
-        data->response_func(&data->response, data->response_func_user_data);
+        tr_announce_response response;
+        response.info_hash = data->info_hash;
+
+        data->http_success = handleAnnounceResponse(web_response, &response);
+
+        if (data->http_success)
+        {
+            data->response_func(&response, data->response_func_user_data);
+        }
+        else if (data->requests_answered_count == data->requests_sent_count)
+        {
+            auto const* response_used = &response;
+
+            // All requests have been answered, but none were successfull.
+            // Choose the one that went further to report.
+            if (data->previous_response && !response.did_connect && !response.did_timeout)
+            {
+                response_used = &*data->previous_response;
+            }
+
+            data->response_func(response_used, data->response_func_user_data);
+        }
+        else
+        {
+            // There is still one request pending that might succeed, so store
+            // the response for later. There is only room for 1 previous response,
+            // because there can be at most 2 requests.
+            TR_ASSERT(!data->previous_response);
+            data->previous_response = std::move(response);
+        }
+    }
+    else
+    {
+        logtrace(data->log_name, "Ignoring redundant announce response");
     }
 
-    delete data;
+    // Free data if no more responses are expected:
+    if (data->requests_answered_count == data->requests_sent_count)
+    {
+        delete data;
+    }
 }
 
 void tr_tracker_http_announce(
@@ -337,16 +390,54 @@ void tr_tracker_http_announce(
     auto* const d = new announce_data();
     d->response_func = response_func;
     d->response_func_user_data = response_func_user_data;
-    d->response.info_hash = request->info_hash;
+    d->info_hash = request->info_hash;
     tr_strlcpy(d->log_name, request->log_name, sizeof(d->log_name));
 
-    auto const url = announce_url_new(session, request);
-    logtrace(request->log_name, "Sending announce to libcurl: \"%" TR_PRIsv "\"", TR_PRIsv_ARG(url));
+    /* There are two alternative techniques for announcing both IPv4 and
+       IPv6 addresses. Previous version of BEP-7 suggests adding "ipv4="
+       and "ipv6=" parameters to the announce URL, while OpenTracker and
+       newer version of BEP-7 requires that peers announce once per each
+       public address they want to use.
+
+       We should ensure that we send the announce both via IPv6 and IPv4,
+       and to be safe we also add the "ipv6=" parameter, because we're
+       already computing our global IPv6 address (for the LTEP handshake),
+       so this comes for free.
+
+       We don't set the "ipv4=" parameter because it is much harder to
+       figure the public IPv4 address of the machine due to pervasive use
+       of NAT, so it is probably not worth it.
+     */
+    auto ipv6 = tr_globalIPv6(session);
+    auto [url, no_ipv6_cutoff] = announce_url_new(session, request, ipv6);
 
     auto options = tr_web::FetchOptions{ url, onAnnounceDone, d };
     options.timeout_secs = 90L;
     options.sndbuf = 1024;
     options.rcvbuf = 3072;
+
+    if (ipv6 != nullptr)
+    {
+        d->requests_sent_count = 2;
+
+        // First try to send the announce via IPv4:
+        logtrace(request->log_name, "Sending IPv4 announce to libcurl: \"%" TR_PRIsv "\"", TR_PRIsv_ARG(options.url));
+        tr_web::FetchOptions ipv4_options = options;
+        ipv4_options.ip_proto = tr_web::FetchOptions::IPProtocol::V4;
+        session->web->fetch(std::move(ipv4_options));
+
+        // Then strip the "ipv6=..." part and try to send via IPv6:
+        options.url.resize(no_ipv6_cutoff);
+        options.ip_proto = tr_web::FetchOptions::IPProtocol::V6;
+        logtrace(request->log_name, "Sending IPv6 announce to libcurl: \"%" TR_PRIsv "\"", TR_PRIsv_ARG(options.url));
+    }
+    else
+    {
+        d->requests_sent_count = 1;
+
+        // Don't care about IP version when announcing
+        logtrace(request->log_name, "Sending announce to libcurl: \"%" TR_PRIsv "\"", TR_PRIsv_ARG(options.url));
+    }
     session->web->fetch(std::move(options));
 }
 
