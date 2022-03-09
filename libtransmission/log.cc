@@ -6,6 +6,7 @@
 #include <cerrno>
 #include <chrono>
 #include <cstdio>
+#include <map>
 #include <mutex>
 
 #include <event2/buffer.h>
@@ -117,18 +118,13 @@ void tr_logFreeQueue(tr_log_message* list)
 ****
 ***/
 
-void tr_logAddMessage(
+static void logAddMessageImpl(
     [[maybe_unused]] char const* file,
     [[maybe_unused]] int line,
     tr_log_level level,
     std::string_view msg,
     [[maybe_unused]] std::string_view name)
 {
-    if (std::empty(msg) || !tr_logLevelIsActive(level))
-    {
-        return;
-    }
-
     auto const lock = std::lock_guard(message_mutex_);
     int const err = errno; // message logging shouldn't affect errno
 
@@ -205,4 +201,39 @@ void tr_logAddMessage(
 #endif
 
     errno = err;
+}
+
+void tr_logAddMessage(char const* file, int line, tr_log_level level, std::string_view msg, std::string_view name)
+{
+    if (std::empty(msg) || !tr_logLevelIsActive(level))
+    {
+        return;
+    }
+
+    static auto constexpr MaxRepeat = 25;
+    static auto* error_counts = new std::map<std::pair<std::string_view, int>, int>{};
+
+    switch (level)
+    {
+    case TR_LOG_CRITICAL:
+    case TR_LOG_ERROR:
+    case TR_LOG_WARN:
+        if (auto const count = (*error_counts)[std::make_pair(file, line)]++; count < MaxRepeat)
+        {
+            logAddMessageImpl(file, line, level, msg, name);
+        }
+        else if (count == MaxRepeat)
+        {
+            logAddMessageImpl(file, line, level, msg, name);
+            auto const enough_msg = fmt::format(
+                _("That last message has appeared {count} times; I won't log it anymore."),
+                fmt::arg("count", MaxRepeat));
+            logAddMessageImpl(file, line, level, enough_msg, name);
+        }
+        break;
+
+    default:
+        logAddMessageImpl(file, line, level, msg, name);
+        return;
+    }
 }
