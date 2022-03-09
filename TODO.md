@@ -1,2 +1,1 @@
-- [ ] ensure all log messages are the correct logging level
 - [ ] mac xcode
