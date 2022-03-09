@@ -47,6 +47,8 @@ tr_log_level tr_logGetLevel()
 
 static std::recursive_mutex message_mutex_;
 
+#if !defined(_WIN32)
+
 static tr_sys_file_t tr_logGetFile()
 {
     static bool initialized = false;
@@ -74,6 +76,8 @@ static tr_sys_file_t tr_logGetFile()
 
     return file;
 }
+
+#endif
 
 void tr_logSetLevel(tr_log_level level)
 {

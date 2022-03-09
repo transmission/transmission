@@ -62,9 +62,9 @@ auto constexpr MyName = std::string_view{ "dtr_daemon" };
 #define logerr(code, message) \
     do \
     { \
-        if (tr_log::err::enabled()) \
+        if (tr_log::error::enabled()) \
         { \
-            tr_log::err::add(TR_LOC, get_system_error((code), (message)), MyName); \
+            tr_log::error::add(TR_LOC, get_system_error((code), (message)), MyName); \
         } \
     } while (0)
 

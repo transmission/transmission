@@ -171,18 +171,18 @@ static void tr_watchdir_win32_on_event(struct bufferevent* event, void* context)
         {
             auto const errcode = errno;
             logwarn(fmt::format(
-                _("Failed to read event: {errmsg} ({errcode})",
-                  fmt::arg("errmsg", tr_strerror(errcode)),
-                  fmt::arg("errcode", errcode))));
+                _("Failed to read event: {errmsg} ({errcode})"),
+                fmt::arg("errmsg", tr_strerror(errcode)),
+                fmt::arg("errcode", errcode)));
             break;
         }
 
         if (nread != header_size)
         {
-            logwarn(
+            logwarn(format::fmt(
                 _("Failed to read event: expected {req} bytes but got {count}"),
                 fmt::arg("req", header_size),
-                fmt::arg("count", nread));
+                fmt::arg("count", nread)));
             break;
         }
 
@@ -212,10 +212,10 @@ static void tr_watchdir_win32_on_event(struct bufferevent* event, void* context)
 
         if (nread != nleft)
         {
-            logwarn(
+            logwarn(fmt::format(
                 _("Failed to read name: expected {req} bytes but got {count}"),
                 fmt::arg("req", nleft),
-                fmt::arg("count", nread));
+                fmt::arg("count", nread)));
             break;
         }
 
