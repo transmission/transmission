@@ -265,9 +265,28 @@ static auto onFileAdded(tr_watchdir_t dir, char const* name, void* vsession)
     return TR_WATCHDIR_ACCEPT;
 }
 
+static char const* levelName(tr_log_level level)
+{
+    switch (level)
+    {
+    case TR_LOG_CRITICAL:
+        return "CRIT ";
+    case TR_LOG_ERROR:
+        return "ERROR";
+    case TR_LOG_WARN:
+        return "WARN ";
+    case TR_LOG_DEBUG:
+        return "DEBUG";
+    case TR_LOG_TRACE:
+        return "TRACE";
+    default:
+        return "INFO ";
+    }
+}
+
 static void printMessage(
     tr_sys_file_t file,
-    [[maybe_unused]] int level,
+    tr_log_level level,
     std::string_view name,
     std::string_view message,
     std::string_view filename,
@@ -280,7 +299,7 @@ static void printMessage(
     {
         auto timestr = std::array<char, 64>{};
         tr_logGetTimeStr(std::data(timestr), std::size(timestr));
-        tr_sys_file_write_line(file, tr_strvJoin("["sv, std::data(timestr), "] "sv, out), nullptr);
+        tr_sys_file_write_line(file, tr_strvJoin("["sv, std::data(timestr), "] "sv, levelName(level), " "sv, out), nullptr);
     }
 
 #ifdef HAVE_SYSLOG
@@ -292,16 +311,24 @@ static void printMessage(
         /* figure out the syslog priority */
         switch (level)
         {
+        case TR_LOG_CRITICAL:
+            priority = LOG_CRIT;
+            break;
+
         case TR_LOG_ERROR:
             priority = LOG_ERR;
             break;
 
-        case TR_LOG_DEBUG:
-            priority = LOG_DEBUG;
+        case TR_LOG_WARN:
+            priority = LOG_WARNING;
+            break;
+
+        case TR_LOG_INFO:
+            priority = LOG_INFO;
             break;
 
         default:
-            priority = LOG_INFO;
+            priority = LOG_DEBUG;
             break;
         }
 
