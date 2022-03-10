@@ -21,6 +21,8 @@ using AnnouncerTest = ::testing::Test;
 
 using namespace std::literals;
 
+static char const* const LogName = "LogName";
+
 TEST_F(AnnouncerTest, parseHttpAnnounceResponseNoPeers)
 {
     // clang-format off
@@ -37,7 +39,7 @@ TEST_F(AnnouncerTest, parseHttpAnnounceResponseNoPeers)
     // clang-format on
 
     auto response = tr_announce_response{};
-    tr_announcerParseHttpAnnounceResponse(response, NoPeers);
+    tr_announcerParseHttpAnnounceResponse(response, NoPeers, LogName);
     EXPECT_EQ(1803, response.interval);
     EXPECT_EQ(1800, response.min_interval);
     EXPECT_EQ(3, response.seeders);
@@ -66,7 +68,7 @@ TEST_F(AnnouncerTest, parseHttpAnnounceResponsePexCompact)
     // clang-format on
 
     auto response = tr_announce_response{};
-    tr_announcerParseHttpAnnounceResponse(response, IPv4Peers);
+    tr_announcerParseHttpAnnounceResponse(response, IPv4Peers, LogName);
     EXPECT_EQ(1803, response.interval);
     EXPECT_EQ(1800, response.min_interval);
     EXPECT_EQ(3, response.seeders);
@@ -105,7 +107,7 @@ TEST_F(AnnouncerTest, parseHttpAnnounceResponsePexList)
     // clang-format on
 
     auto response = tr_announce_response{};
-    tr_announcerParseHttpAnnounceResponse(response, IPv4Peers);
+    tr_announcerParseHttpAnnounceResponse(response, IPv4Peers, LogName);
     EXPECT_EQ(1803, response.interval);
     EXPECT_EQ(1800, response.min_interval);
     EXPECT_EQ(3, response.seeders);
@@ -138,7 +140,7 @@ TEST_F(AnnouncerTest, parseHttpAnnounceResponseFailureReason)
     // clang-format on
 
     auto response = tr_announce_response{};
-    tr_announcerParseHttpAnnounceResponse(response, NoPeers);
+    tr_announcerParseHttpAnnounceResponse(response, NoPeers, LogName);
     EXPECT_EQ(1803, response.interval);
     EXPECT_EQ(1800, response.min_interval);
     EXPECT_EQ(3, response.seeders);
@@ -186,7 +188,7 @@ TEST_F(AnnouncerTest, parseHttpScrapeResponseMulti)
     std::fill_n(std::data(response.rows[1].info_hash), std::size(response.rows[1].info_hash), std::byte{ 'b' });
     std::fill_n(std::data(response.rows[2].info_hash), std::size(response.rows[2].info_hash), std::byte{ 'c' });
     response.row_count = 3;
-    tr_announcerParseHttpScrapeResponse(response, ResponseBenc);
+    tr_announcerParseHttpScrapeResponse(response, ResponseBenc, LogName);
 
     EXPECT_EQ(1, response.rows[0].seeders);
     EXPECT_EQ(2, response.rows[0].leechers);
@@ -244,7 +246,7 @@ TEST_F(AnnouncerTest, parseHttpScrapeResponseMultiWithUnexpected)
     std::fill_n(std::data(response.rows[1].info_hash), std::size(response.rows[1].info_hash), std::byte{ 'b' });
     std::fill_n(std::data(response.rows[2].info_hash), std::size(response.rows[2].info_hash), std::byte{ 'c' });
     response.row_count = 3;
-    tr_announcerParseHttpScrapeResponse(response, ResponseBenc);
+    tr_announcerParseHttpScrapeResponse(response, ResponseBenc, LogName);
 
     EXPECT_EQ(1, response.rows[0].seeders);
     EXPECT_EQ(2, response.rows[0].leechers);
@@ -288,7 +290,7 @@ TEST_F(AnnouncerTest, parseHttpScrapeResponseMultiWithMissing)
     std::fill_n(std::data(response.rows[1].info_hash), std::size(response.rows[1].info_hash), std::byte{ 'b' });
     std::fill_n(std::data(response.rows[2].info_hash), std::size(response.rows[2].info_hash), std::byte{ 'c' });
     response.row_count = 3;
-    tr_announcerParseHttpScrapeResponse(response, ResponseBenc);
+    tr_announcerParseHttpScrapeResponse(response, ResponseBenc, LogName);
 
     EXPECT_EQ(1, response.rows[0].seeders);
     EXPECT_EQ(2, response.rows[0].leechers);

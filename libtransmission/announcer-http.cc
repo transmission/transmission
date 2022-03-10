@@ -31,7 +31,7 @@
 #include "web-utils.h"
 #include "web.h"
 
-#define dbgmsg(name, ...) tr_logAddDeepNamed(name, __VA_ARGS__)
+#define logtrace(name, ...) tr_logAddMessage(__FILE__, __LINE__, TR_LOG_TRACE, name, __VA_ARGS__)
 
 using namespace std::literals;
 
@@ -148,7 +148,7 @@ static void verboseLog(std::string_view description, tr_direction direction, std
 
 static auto constexpr MaxBencDepth = 8;
 
-void tr_announcerParseHttpAnnounceResponse(tr_announce_response& response, std::string_view benc)
+void tr_announcerParseHttpAnnounceResponse(tr_announce_response& response, std::string_view benc, char const* log_name)
 {
     verboseLog("Announce response:", TR_DOWN, benc);
 
@@ -271,7 +271,7 @@ void tr_announcerParseHttpAnnounceResponse(tr_announce_response& response, std::
     transmission::benc::parse(benc, stack, handler, nullptr, &error);
     if (error != nullptr)
     {
-        tr_logAddError("%s", error->message);
+        tr_logAddMessage(__FILE__, __LINE__, TR_LOG_WARN, log_name, "%s (%d)", error->message, error->code);
         tr_error_clear(&error);
     }
 }
@@ -292,7 +292,7 @@ static void onAnnounceDone(tr_web::FetchResponse const& web_response)
     tr_announce_response* const response = &data->response;
     response->did_connect = did_connect;
     response->did_timeout = did_timeout;
-    dbgmsg(data->log_name, "Got announce response");
+    logtrace(data->log_name, "Got announce response");
 
     if (status != HTTP_OK)
     {
@@ -301,17 +301,17 @@ static void onAnnounceDone(tr_web::FetchResponse const& web_response)
     }
     else
     {
-        tr_announcerParseHttpAnnounceResponse(*response, body);
+        tr_announcerParseHttpAnnounceResponse(*response, body, data->log_name);
     }
 
     if (!std::empty(response->pex6))
     {
-        dbgmsg(data->log_name, "got a peers6 length of %zu", std::size(response->pex6));
+        logtrace(data->log_name, "got a peers6 length of %zu", std::size(response->pex6));
     }
 
     if (!std::empty(response->pex))
     {
-        dbgmsg(data->log_name, "got a peers length of %zu", std::size(response->pex));
+        logtrace(data->log_name, "got a peers length of %zu", std::size(response->pex));
     }
 
     if (data->response_func != nullptr)
@@ -335,7 +335,7 @@ void tr_tracker_http_announce(
     tr_strlcpy(d->log_name, request->log_name, sizeof(d->log_name));
 
     auto const url = announce_url_new(session, request);
-    dbgmsg(request->log_name, "Sending announce to libcurl: \"%" TR_PRIsv "\"", TR_PRIsv_ARG(url));
+    logtrace(request->log_name, "Sending announce to libcurl: \"%" TR_PRIsv "\"", TR_PRIsv_ARG(url));
 
     auto options = tr_web::FetchOptions{ url, onAnnounceDone, d };
     options.timeout_secs = 90L;
@@ -350,7 +350,7 @@ void tr_tracker_http_announce(
 *****
 ****/
 
-void tr_announcerParseHttpScrapeResponse(tr_scrape_response& response, std::string_view benc)
+void tr_announcerParseHttpScrapeResponse(tr_scrape_response& response, std::string_view benc, char const* log_name)
 {
     verboseLog("Scrape response:", TR_DOWN, benc);
 
@@ -443,7 +443,7 @@ void tr_announcerParseHttpScrapeResponse(tr_scrape_response& response, std::stri
     transmission::benc::parse(benc, stack, handler, nullptr, &error);
     if (error != nullptr)
     {
-        tr_logAddError("%s", error->message);
+        tr_logAddMessage(__FILE__, __LINE__, TR_LOG_WARN, log_name, "%s (%d)", error->message, error->code);
         tr_error_clear(&error);
     }
 }
@@ -466,7 +466,7 @@ static void onScrapeDone(tr_web::FetchResponse const& web_response)
     response.did_timeout = did_timeout;
 
     auto const scrape_url_sv = response.scrape_url.sv();
-    dbgmsg(data->log_name, "Got scrape response for \"%" TR_PRIsv "\"", TR_PRIsv_ARG(scrape_url_sv));
+    logtrace(data->log_name, "Got scrape response for \"%" TR_PRIsv "\"", TR_PRIsv_ARG(scrape_url_sv));
 
     if (status != HTTP_OK)
     {
@@ -475,7 +475,7 @@ static void onScrapeDone(tr_web::FetchResponse const& web_response)
     }
     else
     {
-        tr_announcerParseHttpScrapeResponse(response, body);
+        tr_announcerParseHttpScrapeResponse(response, body, data->log_name);
     }
 
     if (data->response_func != nullptr)
@@ -528,7 +528,7 @@ void tr_tracker_http_scrape(
     tr_strlcpy(d->log_name, request->log_name, sizeof(d->log_name));
 
     auto const url = scrape_url_new(request);
-    dbgmsg(request->log_name, "Sending scrape to libcurl: \"%" TR_PRIsv "\"", TR_PRIsv_ARG(url));
+    logtrace(request->log_name, "Sending scrape to libcurl: \"%" TR_PRIsv "\"", TR_PRIsv_ARG(url));
 
     auto options = tr_web::FetchOptions{ url, onScrapeDone, d };
     options.timeout_secs = 30L;

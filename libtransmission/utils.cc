@@ -51,6 +51,8 @@
 
 using namespace std::literals;
 
+#define logtrace(...) tr_logAddNamed(TR_LOG_TRACE, nullptr, __VA_ARGS__)
+
 time_t __tr_current_time = 0;
 
 /***
@@ -362,7 +364,7 @@ bool tr_saveFile(std::string const& filename, std::string_view contents, tr_erro
         return false;
     }
 
-    tr_logAddInfo(_("Saved \"%s\""), filename.c_str());
+    logtrace("Saved \"%s\"", filename.c_str());
     return true;
 }
 

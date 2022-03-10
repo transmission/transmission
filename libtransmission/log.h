@@ -8,7 +8,7 @@
 #include <stddef.h> /* size_t */
 
 #include "file.h" /* tr_sys_file_t */
-#include "tr-macros.h"
+#include "transmission.h"
 
 #define TR_LOG_MAX_QUEUE_LENGTH 10000
 
@@ -48,21 +48,6 @@ void tr_logAddMessage(char const* file, int line, tr_log_level level, char const
 #define tr_logAddDebug(...) tr_logAdd(TR_LOG_DEBUG, __VA_ARGS__)
 
 tr_sys_file_t tr_logGetFile(void);
-
-/** @brief return true if deep logging has been enabled by the user, false otherwise */
-bool tr_logGetDeepEnabled(void);
-
-void tr_logAddDeep(char const* file, int line, char const* name, char const* fmt, ...) TR_GNUC_PRINTF(4, 5)
-    TR_GNUC_NONNULL(1, 4);
-
-#define tr_logAddDeepNamed(name, ...) \
-    do \
-    { \
-        if (tr_logGetDeepEnabled()) \
-        { \
-            tr_logAddDeep(__FILE__, __LINE__, name, __VA_ARGS__); \
-        } \
-    } while (0)
 
 /** @brief set the buffer with the current time formatted for deep logging. */
 char* tr_logGetTimeStr(char* buf, size_t buflen) TR_GNUC_NONNULL(1);

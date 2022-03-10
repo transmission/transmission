@@ -28,16 +28,6 @@ static tr_log_message* myQueue = nullptr;
 static tr_log_message** myQueueTail = &myQueue;
 static int myQueueLength = 0;
 
-#ifndef _WIN32
-
-/* make null versions of these win32 functions */
-static inline bool IsDebuggerPresent()
-{
-    return false;
-}
-
-#endif
-
 /***
 ****
 ***/
@@ -141,56 +131,6 @@ char* tr_logGetTimeStr(char* buf, size_t buflen)
     return buf;
 }
 
-bool tr_logGetDeepEnabled()
-{
-    static int8_t deepLoggingIsActive = -1;
-
-    if (deepLoggingIsActive < 0)
-    {
-        deepLoggingIsActive = (int8_t)(IsDebuggerPresent() || tr_logGetFile() != TR_BAD_SYS_FILE);
-    }
-
-    return deepLoggingIsActive != 0;
-}
-
-void tr_logAddDeep(char const* file, int line, char const* name, char const* fmt, ...)
-{
-    tr_sys_file_t const fp = tr_logGetFile();
-
-    if (fp != TR_BAD_SYS_FILE || IsDebuggerPresent())
-    {
-        struct evbuffer* buf = evbuffer_new();
-        char* base = tr_sys_path_basename(file, nullptr);
-
-        char timestr[64];
-        evbuffer_add_printf(buf, "[%s] ", tr_logGetTimeStr(timestr, sizeof(timestr)));
-
-        if (name != nullptr)
-        {
-            evbuffer_add_printf(buf, "%s ", name);
-        }
-
-        va_list args;
-        va_start(args, fmt);
-        evbuffer_add_vprintf(buf, fmt, args);
-        va_end(args);
-        evbuffer_add_printf(buf, " (%s:%d)" TR_NATIVE_EOL_STR, base, line);
-
-        auto const message = evbuffer_free_to_str(buf);
-
-#ifdef _WIN32
-        OutputDebugStringA(message.c_str());
-#endif
-
-        if (fp != TR_BAD_SYS_FILE)
-        {
-            tr_sys_file_write(fp, std::data(message), std::size(message), nullptr, nullptr);
-        }
-
-        tr_free(base);
-    }
-}
-
 /***
 ****
 ***/
@@ -198,11 +138,16 @@ void tr_logAddDeep(char const* file, int line, char const* name, char const* fmt
 void tr_logAddMessage(
     [[maybe_unused]] char const* file,
     [[maybe_unused]] int line,
-    [[maybe_unused]] tr_log_level level,
+    tr_log_level level,
     [[maybe_unused]] char const* name,
     char const* fmt,
     ...)
 {
+    if (!tr_logLevelIsActive(level))
+    {
+        return;
+    }
+
     int const err = errno; /* message logging shouldn't affect errno */
     char buf[1024];
     va_list ap;

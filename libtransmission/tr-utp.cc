@@ -17,28 +17,24 @@
 #include "tr-utp.h"
 #include "utils.h"
 
+#define logwarn(...) tr_logAddNamed(TR_LOG_WARN, "utp", __VA_ARGS__)
+#define logtrace(...) tr_logAddNamed(TR_LOG_TRACE, "utp", __VA_ARGS__)
+
 #ifndef WITH_UTP
-
-static char constexpr MyName[] = "UTP";
-
-#define dbgmsg(...) tr_logAddDeepNamed(MyName, __VA_ARGS__)
 
 void UTP_Close(struct UTPSocket* socket)
 {
-    tr_logAddNamedError(MyName, "UTP_Close(%p) was called.", socket);
-    dbgmsg("UTP_Close(%p) was called.", socket);
+    logtrace("UTP_Close(%p) was called.", socket);
 }
 
 void UTP_RBDrained(struct UTPSocket* socket)
 {
-    tr_logAddNamedError(MyName, "UTP_RBDrained(%p) was called.", socket);
-    dbgmsg("UTP_RBDrained(%p) was called.", socket);
+    logtrace("UTP_RBDrained(%p) was called.", socket);
 }
 
 bool UTP_Write(struct UTPSocket* socket, size_t count)
 {
-    tr_logAddNamedError(MyName, "UTP_RBDrained(%p, %zu) was called.", socket, count);
-    dbgmsg("UTP_RBDrained(%p, %zu) was called.", socket, count);
+    logtrace("UTP_RBDrained(%p, %zu) was called.", socket, count);
     return false;
 }
 
@@ -99,7 +95,7 @@ static void incoming(void* vsession, struct UTPSocket* s)
 
     if (!tr_address_from_sockaddr_storage(&addr, &port, &from_storage))
     {
-        tr_logAddNamedError("UTP", "Unknown socket family");
+        logwarn("Unknown socket family");
         UTP_Close(s);
         return;
     }

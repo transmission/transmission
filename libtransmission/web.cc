@@ -34,7 +34,8 @@ using namespace std::literals;
 #define USE_LIBCURL_SOCKOPT
 #endif
 
-#define dbgmsg(...) tr_logAddDeepNamed("web", __VA_ARGS__)
+#define loginfo(...) tr_logAddNamed(TR_LOG_INFO, "web", __VA_ARGS__)
+#define logtrace(...) tr_logAddNamed(TR_LOG_TRACE, "web", __VA_ARGS__)
 
 /***
 ****
@@ -118,9 +119,9 @@ public:
         if (curl_ssl_verify)
         {
             auto const* bundle = std::empty(curl_ca_bundle) ? "none" : curl_ca_bundle.c_str();
-            tr_logAddNamedInfo("web", "will verify tracker certs using envvar CURL_CA_BUNDLE: %s", bundle);
-            tr_logAddNamedInfo("web", "NB: this only works if you built against libcurl with openssl or gnutls, NOT nss");
-            tr_logAddNamedInfo("web", "NB: Invalid certs will appear as 'Could not connect to tracker' like many other errors");
+            loginfo("will verify tracker certs using envvar CURL_CA_BUNDLE: %s", bundle);
+            loginfo("NB: this only works if you built against libcurl with openssl or gnutls, NOT nss");
+            loginfo("NB: Invalid certs will appear as 'Could not connect to tracker' like many other errors");
         }
 
         if (auto const& file = mediator.cookieFile(); file)
@@ -290,7 +291,7 @@ private:
         }
 
         evbuffer_add(task->body(), data, bytes_used);
-        dbgmsg("wrote %zu bytes to task %p's buffer", bytes_used, (void*)task);
+        logtrace("wrote %zu bytes to task %p's buffer", bytes_used, (void*)task);
         return bytes_used;
     }
 
@@ -456,7 +457,7 @@ private:
                 // add queued tasks
                 for (auto* task : impl->queued_tasks)
                 {
-                    dbgmsg("adding task to curl: [%s]", task->url().c_str());
+                    logtrace("adding task to curl: [%s]", task->url().c_str());
                     initEasy(impl, task);
                     curl_multi_add_handle(multi.get(), task->easy());
                 }
