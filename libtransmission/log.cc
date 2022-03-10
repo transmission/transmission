@@ -138,11 +138,16 @@ char* tr_logGetTimeStr(char* buf, size_t buflen)
 void tr_logAddMessage(
     [[maybe_unused]] char const* file,
     [[maybe_unused]] int line,
-    [[maybe_unused]] tr_log_level level,
+    tr_log_level level,
     [[maybe_unused]] char const* name,
     char const* fmt,
     ...)
 {
+    if (!tr_logLevelIsActive(level))
+    {
+        return;
+    }
+
     int const err = errno; /* message logging shouldn't affect errno */
     char buf[1024];
     va_list ap;
