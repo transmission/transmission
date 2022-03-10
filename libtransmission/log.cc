@@ -43,7 +43,7 @@ tr_log_level tr_logGetLevel()
 
 static std::recursive_mutex message_mutex_;
 
-tr_sys_file_t tr_logGetFile()
+static tr_sys_file_t tr_logGetFile()
 {
     static bool initialized = false;
     static tr_sys_file_t file = TR_BAD_SYS_FILE;
@@ -139,7 +139,7 @@ void tr_logAddMessage(
     [[maybe_unused]] char const* file,
     [[maybe_unused]] int line,
     tr_log_level level,
-    [[maybe_unused]] char const* name,
+    [[maybe_unused]] std::string_view name,
     char const* fmt,
     ...)
 {
@@ -218,7 +218,7 @@ void tr_logAddMessage(
             newmsg->message = tr_strndup(buf, buf_len);
             newmsg->file = file;
             newmsg->line = line;
-            newmsg->name = tr_strdup(name);
+            newmsg->name = tr_strvDup(name);
 
             *myQueueTail = newmsg;
             myQueueTail = &newmsg->next;
@@ -247,8 +247,8 @@ void tr_logAddMessage(
 
             tr_logGetTimeStr(timestr, sizeof(timestr));
 
-            auto const out = name != nullptr ? tr_strvJoin("["sv, timestr, "] "sv, name, ": "sv, buf) :
-                                               tr_strvJoin("["sv, timestr, "] "sv, buf);
+            auto const out = !std::empty(name) ? tr_strvJoin("["sv, timestr, "] "sv, name, ": "sv, buf) :
+                                                 tr_strvJoin("["sv, timestr, "] "sv, buf);
             tr_sys_file_write_line(fp, out, nullptr);
             tr_sys_file_flush(fp, nullptr);
         }

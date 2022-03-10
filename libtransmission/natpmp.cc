@@ -6,6 +6,7 @@
 #include <cerrno>
 #include <ctime>
 #include <cinttypes>
+#include <string_view>
 
 #include <event2/util.h> /* evutil_inet_ntop() */
 
@@ -22,10 +23,7 @@
 static auto constexpr LifetimeSecs = uint32_t{ 3600 };
 static auto constexpr CommandWaitSecs = time_t{ 8 };
 
-static char const* getKey()
-{
-    return _("Port Forwarding (NAT-PMP)");
-}
+static auto constexpr CodeName = std::string_view{ "nat-pmp" };
 
 /**
 ***
@@ -40,12 +38,12 @@ static void logVal(char const* func, int ret)
 
     if (ret >= 0)
     {
-        tr_logAddNamedInfo(getKey(), _("%s succeeded (%d)"), func, ret);
+        tr_logInfoNamed(CodeName, _("%s succeeded (%d)"), func, ret);
     }
     else
     {
-        tr_logAddNamedDbg(
-            getKey(),
+        tr_logDebugNamed(
+            CodeName,
             "%s failed. Natpmp returned %d (%s); errno is %d (%s)",
             func,
             ret,
@@ -112,7 +110,7 @@ tr_port_forwarding tr_natpmpPulse(
         {
             char str[128];
             evutil_inet_ntop(AF_INET, &response.pnu.publicaddress.addr, str, sizeof(str));
-            tr_logAddNamedInfo(getKey(), _("Found public address \"%s\""), str);
+            tr_logInfoNamed(CodeName, _("Found public address \"%s\""), str);
             nat->state = TR_NATPMP_IDLE;
         }
         else if (val != NATPMP_TRYAGAIN)
@@ -145,7 +143,7 @@ tr_port_forwarding tr_natpmpPulse(
         {
             int const unmapped_port = resp.pnu.newportmapping.privateport;
 
-            tr_logAddNamedInfo(getKey(), _("no longer forwarding port %d"), unmapped_port);
+            tr_logInfoNamed(CodeName, _("no longer forwarding port %d"), unmapped_port);
 
             if (nat->private_port == unmapped_port)
             {
@@ -194,7 +192,7 @@ tr_port_forwarding tr_natpmpPulse(
             nat->renew_time = tr_time() + (resp.pnu.newportmapping.lifetime / 2);
             nat->private_port = resp.pnu.newportmapping.privateport;
             nat->public_port = resp.pnu.newportmapping.mappedpublicport;
-            tr_logAddNamedInfo(getKey(), _("Port %d forwarded successfully"), nat->private_port);
+            tr_logInfoNamed(CodeName, _("Port %d forwarded successfully"), nat->private_port);
         }
         else if (val != NATPMP_TRYAGAIN)
         {

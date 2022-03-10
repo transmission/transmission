@@ -18,9 +18,7 @@
 #include "trevent.h"
 #include "utils.h"
 
-static char constexpr MyName[] = "Cache";
-
-#define logtrace(...) tr_logAddMessage(__FILE__, __LINE__, TR_LOG_TRACE, nullptr, __VA_ARGS__)
+auto constexpr CodeName = std::string_view{ "cache" };
 
 /****
 *****
@@ -244,8 +242,8 @@ int tr_cacheSetLimit(tr_cache* cache, int64_t max_bytes)
     cache->max_bytes = max_bytes;
     cache->max_blocks = getMaxBlocks(max_bytes);
 
-    tr_logAddNamedDbg(
-        MyName,
+    tr_logDebugNamed(
+        CodeName,
         "Maximum cache size set to %s (%d blocks)",
         tr_formatter_mem_B(cache->max_bytes).c_str(),
         cache->max_blocks);
@@ -409,7 +407,7 @@ int tr_cacheFlushFile(tr_cache* cache, tr_torrent* torrent, tr_file_index_t i)
     auto const [begin, end] = tr_torGetFileBlockSpan(torrent, i);
 
     int pos = findBlockPos(cache, torrent, torrent->blockLoc(begin));
-    logtrace("flushing file %d from cache to disk: blocks [%zu...%zu)", (int)i, (size_t)begin, (size_t)end);
+    tr_logTraceNamed(CodeName, "flushing file %d from cache to disk: blocks [%zu...%zu)", (int)i, (size_t)begin, (size_t)end);
 
     /* flush out all the blocks in that file */
     int err = 0;

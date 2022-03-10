@@ -21,11 +21,6 @@
 #include "tr-assert.h"
 #include "utils.h" // tr_time()
 
-#define logerr(...) tr_logAddNamed(TR_LOG_ERROR, nullptr, __VA_ARGS__)
-#define logwarn(...) tr_logAddNamed(TR_LOG_WARN, nullptr, __VA_ARGS__)
-#define logdbg(...) tr_logAddNamed(TR_LOG_DEBUG, nullptr, __VA_ARGS__)
-#define logtrace(...) tr_logAddNamed(TR_LOG_TRACE, nullptr, __VA_ARGS__)
-
 /***
 ****
 ****  Local Files
@@ -46,7 +41,7 @@ static bool preallocate_file_sparse(tr_sys_file_t fd, uint64_t length, tr_error*
         return true;
     }
 
-    logdbg("Preallocating (sparse, normal) failed (%d): %s", my_error->code, my_error->message);
+    tr_logDebug("Preallocating (sparse, normal) failed (%d): %s", my_error->code, my_error->message);
 
     if (!TR_ERROR_IS_ENOSPC(my_error->code))
     {
@@ -60,7 +55,7 @@ static bool preallocate_file_sparse(tr_sys_file_t fd, uint64_t length, tr_error*
             return true;
         }
 
-        logdbg("Preallocating (sparse, fallback) failed (%d): %s", my_error->code, my_error->message);
+        tr_logDebug("Preallocating (sparse, fallback) failed (%d): %s", my_error->code, my_error->message);
     }
 
     tr_error_propagate(error, &my_error);
@@ -81,7 +76,7 @@ static bool preallocate_file_full(tr_sys_file_t fd, uint64_t length, tr_error** 
         return true;
     }
 
-    logdbg("Preallocating (full, normal) failed (%d): %s", my_error->code, my_error->message);
+    tr_logDebug("Preallocating (full, normal) failed (%d): %s", my_error->code, my_error->message);
 
     if (!TR_ERROR_IS_ENOSPC(my_error->code))
     {
@@ -104,7 +99,7 @@ static bool preallocate_file_full(tr_sys_file_t fd, uint64_t length, tr_error** 
             return true;
         }
 
-        logdbg("Preallocating (full, fallback) failed (%d): %s", my_error->code, my_error->message);
+        tr_logDebug("Preallocating (full, fallback) failed (%d): %s", my_error->code, my_error->message);
     }
 
     tr_error_propagate(error, &my_error);
@@ -171,13 +166,13 @@ static int cached_file_open(
 
         if (dir == nullptr)
         {
-            logerr(_("Couldn't get directory for \"%1$s\": %2$s"), filename, error->message);
+            tr_logError(_("Couldn't get directory for \"%1$s\": %2$s"), filename, error->message);
             goto FAIL;
         }
 
         if (!tr_sys_dir_create(dir, TR_SYS_DIR_CREATE_PARENTS, 0777, &error))
         {
-            logerr(_("Couldn't create \"%1$s\": %2$s"), dir, error->message);
+            tr_logError(_("Couldn't create \"%1$s\": %2$s"), dir, error->message);
             tr_free(dir);
             goto FAIL;
         }
@@ -198,7 +193,7 @@ static int cached_file_open(
 
     if (fd == TR_BAD_SYS_FILE)
     {
-        logerr(_("Couldn't open \"%1$s\": %2$s"), filename, error->message);
+        tr_logError(_("Couldn't open \"%1$s\": %2$s"), filename, error->message);
         goto FAIL;
     }
 
@@ -222,7 +217,7 @@ static int cached_file_open(
 
         if (!success)
         {
-            logwarn(
+            tr_logWarn(
                 _("Couldn't preallocate file \"%1$s\" (%2$s, size: %3$" PRIu64 "): %4$s"),
                 filename,
                 type,
@@ -231,7 +226,7 @@ static int cached_file_open(
             goto FAIL;
         }
 
-        logdbg(_("Preallocated file \"%1$s\" (%2$s, size: %3$" PRIu64 ")"), filename, type, file_size);
+        tr_logDebug(_("Preallocated file \"%1$s\" (%2$s, size: %3$" PRIu64 ")"), filename, type, file_size);
     }
 
     /* If the file already exists and it's too large, truncate it.
@@ -242,7 +237,7 @@ static int cached_file_open(
      */
     if (resize_needed && !tr_sys_file_truncate(fd, file_size, &error))
     {
-        logwarn(_("Couldn't truncate \"%1$s\": %2$s"), filename, error->message);
+        tr_logWarn(_("Couldn't truncate \"%1$s\": %2$s"), filename, error->message);
         goto FAIL;
     }
 
@@ -482,11 +477,11 @@ tr_sys_file_t tr_fdFileCheckout(
             return TR_BAD_SYS_FILE;
         }
 
-        logtrace("opened '%s' writable %c", filename, writable ? 'y' : 'n');
+        tr_logTrace("opened '%s' writable %c", filename, writable ? 'y' : 'n');
         o->is_writable = writable;
     }
 
-    logtrace("checking out '%s'", filename);
+    tr_logTrace("checking out '%s'", filename);
     o->torrent_id = torrent_id;
     o->file_index = i;
     o->used_at = tr_time();
@@ -514,7 +509,7 @@ tr_socket_t tr_fdSocketCreate(tr_session* session, int domain, int type)
 
         if ((s == TR_BAD_SOCKET) && (sockerrno != EAFNOSUPPORT))
         {
-            logwarn(_("Couldn't create socket: %s"), tr_net_strerror(sockerrno).c_str());
+            tr_logWarn(_("Couldn't create socket: %s"), tr_net_strerror(sockerrno).c_str());
         }
     }
 
@@ -536,7 +531,7 @@ tr_socket_t tr_fdSocketCreate(tr_session* session, int domain, int type)
 
             if (getsockopt(s, SOL_SOCKET, SO_SNDBUF, reinterpret_cast<char*>(&i), &size) != -1)
             {
-                logtrace("SO_SNDBUF size is %d", i);
+                tr_logTrace("SO_SNDBUF size is %d", i);
             }
 
             i = 0;
@@ -544,7 +539,7 @@ tr_socket_t tr_fdSocketCreate(tr_session* session, int domain, int type)
 
             if (getsockopt(s, SOL_SOCKET, SO_RCVBUF, reinterpret_cast<char*>(&i), &size) != -1)
             {
-                logtrace("SO_RCVBUF size is %d", i);
+                tr_logTrace("SO_RCVBUF size is %d", i);
             }
 
             buf_logged = true;

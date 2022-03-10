@@ -41,6 +41,7 @@
 
 #include "error-types.h"
 #include "error.h"
+#include "file.h"
 #include "log.h"
 #include "mime-types.h"
 #include "net.h" // ntohl()
@@ -50,8 +51,6 @@
 #include "variant.h"
 
 using namespace std::literals;
-
-#define logtrace(...) tr_logAddNamed(TR_LOG_TRACE, nullptr, __VA_ARGS__)
 
 time_t __tr_current_time = 0;
 
@@ -234,14 +233,14 @@ uint8_t* tr_loadFile(char const* path, size_t* size, tr_error** error)
     tr_error* my_error = nullptr;
     if (!tr_sys_path_get_info(path, 0, &info, &my_error))
     {
-        tr_logAddDebug(err_fmt, path, my_error->message);
+        tr_logDebug(err_fmt, path, my_error->message);
         tr_error_propagate(error, &my_error);
         return nullptr;
     }
 
     if (info.type != TR_SYS_PATH_IS_FILE)
     {
-        tr_logAddError(err_fmt, path, _("Not a regular file"));
+        tr_logError(err_fmt, path, _("Not a regular file"));
         tr_error_set(error, TR_ERROR_EISDIR, "Not a regular file"sv);
         return nullptr;
     }
@@ -256,7 +255,7 @@ uint8_t* tr_loadFile(char const* path, size_t* size, tr_error** error)
     auto const fd = tr_sys_file_open(path, TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0, &my_error);
     if (fd == TR_BAD_SYS_FILE)
     {
-        tr_logAddError(err_fmt, path, my_error->message);
+        tr_logError(err_fmt, path, my_error->message);
         tr_error_propagate(error, &my_error);
         return nullptr;
     }
@@ -264,7 +263,7 @@ uint8_t* tr_loadFile(char const* path, size_t* size, tr_error** error)
     auto* buf = static_cast<uint8_t*>(tr_malloc(info.size + 1));
     if (!tr_sys_file_read(fd, buf, info.size, nullptr, &my_error))
     {
-        tr_logAddError(err_fmt, path, my_error->message);
+        tr_logError(err_fmt, path, my_error->message);
         tr_sys_file_close(fd, nullptr);
         tr_free(buf);
         tr_error_propagate(error, &my_error);
@@ -287,14 +286,14 @@ bool tr_loadFile(std::vector<char>& setme, std::string const& path, tr_error** e
     tr_error* my_error = nullptr;
     if (!tr_sys_path_get_info(path_sz, 0, &info, &my_error))
     {
-        tr_logAddDebug(err_fmt, path_sz, my_error->message);
+        tr_logDebug(err_fmt, path_sz, my_error->message);
         tr_error_propagate(error, &my_error);
         return false;
     }
 
     if (info.type != TR_SYS_PATH_IS_FILE)
     {
-        tr_logAddError(err_fmt, path_sz, _("Not a regular file"));
+        tr_logError(err_fmt, path_sz, _("Not a regular file"));
         tr_error_set(error, TR_ERROR_EISDIR, "Not a regular file"sv);
         return false;
     }
@@ -303,7 +302,7 @@ bool tr_loadFile(std::vector<char>& setme, std::string const& path, tr_error** e
     auto const fd = tr_sys_file_open(path_sz, TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0, &my_error);
     if (fd == TR_BAD_SYS_FILE)
     {
-        tr_logAddError(err_fmt, path_sz, my_error->message);
+        tr_logError(err_fmt, path_sz, my_error->message);
         tr_error_propagate(error, &my_error);
         return false;
     }
@@ -311,7 +310,7 @@ bool tr_loadFile(std::vector<char>& setme, std::string const& path, tr_error** e
     setme.resize(info.size);
     if (!tr_sys_file_read(fd, std::data(setme), info.size, nullptr, &my_error))
     {
-        tr_logAddError(err_fmt, path_sz, my_error->message);
+        tr_logError(err_fmt, path_sz, my_error->message);
         tr_sys_file_close(fd, nullptr);
         tr_error_propagate(error, &my_error);
         return false;
@@ -364,7 +363,7 @@ bool tr_saveFile(std::string const& filename, std::string_view contents, tr_erro
         return false;
     }
 
-    logtrace("Saved \"%s\"", filename.c_str());
+    tr_logTrace("Saved \"%s\"", filename.c_str());
     return true;
 }
 
@@ -1138,7 +1137,7 @@ bool tr_moveFile(char const* oldpath, char const* newpath, tr_error** error)
 
         if (!tr_sys_path_remove(oldpath, &my_error))
         {
-            tr_logAddError("Unable to remove file at old path: %s", my_error->message);
+            tr_logError("Unable to remove file at old path: %s", my_error->message);
             tr_error_free(my_error);
         }
     }

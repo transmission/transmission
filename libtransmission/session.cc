@@ -75,10 +75,6 @@ static auto constexpr DefaultPrefetchEnabled = bool{ true };
 #endif
 static auto constexpr SaveIntervalSecs = int{ 360 };
 
-#define loginf(...) tr_logAddNamed(TR_LOG_INFO, nullptr, __VA_ARGS__)
-#define logdbg(...) tr_logAddNamed(TR_LOG_DEBUG, nullptr, __VA_ARGS__)
-#define logtrace(...) tr_logAddNamed(TR_LOG_TRACE, nullptr, __VA_ARGS__)
-
 static tr_port getRandomPort(tr_session const* s)
 {
     return tr_port(tr_rand_int_weak(s->randomPortHigh - s->randomPortLow + 1) + s->randomPortLow);
@@ -233,7 +229,7 @@ static void accept_incoming_peer(evutil_socket_t fd, short /*what*/, void* vsess
     {
         char addrstr[TR_ADDRSTRLEN];
         tr_address_and_port_to_string(addrstr, sizeof(addrstr), &clientAddr, clientPort);
-        logtrace("new incoming connection %" PRIdMAX " (%s)", (intmax_t)clientSocket, addrstr);
+        tr_logTrace("new incoming connection %" PRIdMAX " (%s)", (intmax_t)clientSocket, addrstr);
 
         tr_peerMgrAddIncoming(session->peerMgr, &clientAddr, clientPort, tr_peer_socket_tcp_create(clientSocket));
     }
@@ -554,7 +550,7 @@ static void onSaveTimer(evutil_socket_t /*fd*/, short /*what*/, void* vsession)
 
     if (tr_cacheFlushDone(session->cache) != 0)
     {
-        tr_logAddError("Error while flushing completed pieces from cache");
+        tr_logError("Error while flushing completed pieces from cache");
     }
 
     for (auto* const tor : session->torrents())
@@ -695,7 +691,7 @@ static void tr_sessionInitImpl(init_data* data)
     TR_ASSERT(tr_amInEventThread(session));
     TR_ASSERT(tr_variantIsDict(clientSettings));
 
-    logtrace("tr_sessionInit: the session's top-level bandwidth object is %p", (void*)&session->bandwidth);
+    tr_logTrace("tr_sessionInit: the session's top-level bandwidth object is %p", (void*)&session->bandwidth);
 
     tr_variant settings;
 
@@ -739,7 +735,7 @@ static void tr_sessionInitImpl(init_data* data)
 
     /* first %s is the application name
        second %s is the version number */
-    tr_logAddInfo(_("%s %s started"), TR_NAME, LONG_VERSION_STRING);
+    tr_logInfo(_("%s %s started"), TR_NAME, LONG_VERSION_STRING);
 
     tr_statsInit(session);
 
@@ -1482,7 +1478,7 @@ static void turtleCheckClock(tr_session* s, struct tr_turtle_info* t)
 
     if (!alreadySwitched)
     {
-        tr_logAddInfo("Time to turn %s turtle mode!", enabled ? "on" : "off");
+        tr_logInfo("Time to turn %s turtle mode!", enabled ? "on" : "off");
         t->autoTurtleState = newAutoTurtleState;
         useAltSpeed(s, t, enabled, false);
     }
@@ -1593,7 +1589,7 @@ unsigned int tr_sessionGetAltSpeed_KBps(tr_session const* s, tr_direction d)
 
 static void userPokedTheClock(tr_session* s, struct tr_turtle_info* t)
 {
-    tr_logAddDebug("Refreshing the turtle mode clock due to user changes");
+    tr_logTrace("Refreshing the turtle mode clock due to user changes");
 
     t->autoTurtleState = TR_AUTO_SWITCH_UNUSED;
 
@@ -1929,15 +1925,15 @@ void tr_sessionClose(tr_session* session)
 
     time_t const deadline = time(nullptr) + ShutdownMaxSeconds;
 
-    loginf("Shutting down transmission session %p", (void*)session);
-    logdbg("now is %zu, deadline is %zu", (size_t)time(nullptr), (size_t)deadline);
+    tr_logInfo("Shutting down transmission session %p", (void*)session);
+    tr_logDebug("now is %zu, deadline is %zu", (size_t)time(nullptr), (size_t)deadline);
 
     /* close the session */
     tr_runInEventThread(session, sessionCloseImpl, session);
 
     while (!session->isClosed && !deadlineReached(deadline))
     {
-        logtrace("waiting for the libtransmission thread to finish");
+        tr_logTrace("waiting for the libtransmission thread to finish");
         tr_wait_msec(10);
     }
 
@@ -1949,7 +1945,7 @@ void tr_sessionClose(tr_session* session)
             session->announcer_udp != nullptr) &&
            !deadlineReached(deadline))
     {
-        logtrace(
+        tr_logTrace(
             "waiting on port unmap (%p) or announcer (%p)... now %zu deadline %zu",
             (void*)session->shared,
             (void*)session->announcer,
@@ -1966,7 +1962,7 @@ void tr_sessionClose(tr_session* session)
     while (session->events != nullptr)
     {
         static bool forced = false;
-        logtrace(
+        tr_logTrace(
             "waiting for libtransmission thread to finish... now %zu deadline %zu",
             (size_t)time(nullptr),
             (size_t)deadline);
@@ -1974,14 +1970,14 @@ void tr_sessionClose(tr_session* session)
 
         if (deadlineReached(deadline) && !forced)
         {
-            logtrace("calling event_loopbreak()");
+            tr_logTrace("calling event_loopbreak()");
             forced = true;
             event_base_loopbreak(session->event_base);
         }
 
         if (deadlineReached(deadline + 3))
         {
-            logtrace("deadline+3 reached... calling break...\n");
+            tr_logTrace("deadline+3 reached... calling break...\n");
             break;
         }
     }
@@ -2056,7 +2052,7 @@ static void sessionLoadTorrents(struct sessionLoadTorrentsData* const data)
 
     if (n != 0)
     {
-        tr_logAddInfo(_("Loaded %d torrents"), n);
+        tr_logInfo(_("Loaded %d torrents"), n);
     }
 
     if (data->setmeCount != nullptr)

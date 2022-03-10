@@ -38,21 +38,10 @@
 
 using namespace std::literals;
 
-#define logimpl(tier, level, ...) \
-    do \
-    { \
-        if (tr_logLevelIsActive(level)) \
-        { \
-            auto name = std::array<char, 512>{}; \
-            tier->buildLogName(std::data(name), std::size(name)); \
-            tr_logAddMessage(__FILE__, __LINE__, level, std::data(name), __VA_ARGS__); \
-        } \
-    } while (0)
-
-#define logerr(io, ...) logimpl(io, TR_LOG_ERROR, __VA_ARGS__)
-#define logwarn(io, ...) logimpl(io, TR_LOG_WARN, __VA_ARGS__)
-#define logdbg(io, ...) logimpl(io, TR_LOG_DEBUG, __VA_ARGS__)
-#define logtrace(io, ...) logimpl(io, TR_LOG_TRACE, __VA_ARGS__)
+#define tr_logErrorTier(tier, ...) tr_logErrorNamed(tier->buildLogName().c_str(), __VA_ARGS__)
+#define tr_logWarnTier(tier, ...) tr_logWarnNamed(tier->buildLogName().c_str(), __VA_ARGS__)
+#define tr_logDebugTier(tier, ...) tr_logDebugNamed(tier->buildLogName().c_str(), __VA_ARGS__)
+#define tr_logTraceTier(tier, ...) tr_logTraceNamed(tier->buildLogName().c_str(), __VA_ARGS__)
 
 /* unless the tracker says otherwise, rescrape this frequently */
 static auto constexpr DefaultScrapeIntervalSec = int{ 60 * 30 };
@@ -401,12 +390,19 @@ struct tr_tier
         return std::nullopt;
     }
 
+    [[nodiscard]] std::string buildLogName() const
+    {
+        auto buf = std::array<char, 512>{};
+        buildLogName(std::data(buf), std::size(buf));
+        return std::string{ std::data(buf) };
+    }
+
     void buildLogName(char* buf, size_t buflen) const
     {
         auto const* const torrent_name = tr_torrentName(tor);
         auto const* const current_tracker = currentTracker();
         auto const host_sv = current_tracker == nullptr ? "?"sv : current_tracker->host.sv();
-        tr_snprintf(buf, buflen, "[%s---%" TR_PRIsv "]", torrent_name, TR_PRIsv_ARG(host_sv));
+        tr_snprintf(buf, buflen, "%s at %" TR_PRIsv, torrent_name, TR_PRIsv_ARG(host_sv));
     }
 
     [[nodiscard]] bool canManualAnnounce() const
@@ -658,7 +654,7 @@ static void publishPeerCounts(tr_tier* tier, int seeders, int leechers)
         e.messageType = TR_TRACKER_COUNTS;
         e.seeders = seeders;
         e.leechers = leechers;
-        logdbg(tier, "peer counts: %d seeders, %d leechers.", seeders, leechers);
+        tr_logDebugTier(tier, "peer counts: %d seeders, %d leechers.", seeders, leechers);
 
         (*tier->tor->torrent_announcer->callback)(tier->tor, &e, nullptr);
     }
@@ -673,7 +669,7 @@ static void publishPeersPex(tr_tier* tier, int seeders, int leechers, std::vecto
         e.seeders = seeders;
         e.leechers = leechers;
         e.pex = pex;
-        logdbg(
+        tr_logDebugTier(
             tier,
             "tracker knows of %d seeders and %d leechers and gave a list of %zu peers.",
             seeders,
@@ -725,7 +721,7 @@ time_t tr_announcerNextManualAnnounce(tr_torrent const* tor)
     return ret;
 }
 
-static void logtrace_tier_announce_queue(tr_tier const* tier)
+static void tr_logTrace_tier_announce_queue(tr_tier const* tier)
 {
     if (!tr_logLevelIsActive(TR_LOG_TRACE))
     {
@@ -741,7 +737,7 @@ static void logtrace_tier_announce_queue(tr_tier const* tier)
     }
 
     auto const str = evbuffer_free_to_str(buf);
-    logtrace(tier, "%s", str.c_str());
+    tr_logTraceTier(tier, "%s", str.c_str());
 }
 
 // higher priorities go to the front of the announce queue
@@ -771,8 +767,8 @@ static void tier_announce_event_push(tr_tier* tier, tr_announce_event e, time_t 
 {
     TR_ASSERT(tier != nullptr);
 
-    logtrace_tier_announce_queue(tier);
-    logtrace(tier, "queued \"%s\"", tr_announce_event_get_string(e));
+    tr_logTrace_tier_announce_queue(tier);
+    tr_logTraceTier(tier, "queued \"%s\"", tr_announce_event_get_string(e));
 
     auto& events = tier->announce_events;
     if (!std::empty(events))
@@ -801,8 +797,8 @@ static void tier_announce_event_push(tr_tier* tier, tr_announce_event e, time_t 
     tier->announceAt = announceAt;
     tier_update_announce_priority(tier);
 
-    logtrace_tier_announce_queue(tier);
-    logtrace(tier, "announcing in %d seconds", (int)difftime(announceAt, tr_time()));
+    tr_logTrace_tier_announce_queue(tier);
+    tr_logTraceTier(tier, "announcing in %d seconds", (int)difftime(announceAt, tr_time()));
 }
 
 static auto tier_announce_event_pull(tr_tier* tier)
@@ -961,13 +957,13 @@ static void on_announce_error(tr_tier* tier, char const* err, tr_announce_event 
     auto const* const host_cstr = current_tracker->host.c_str();
     if (isUnregistered(err))
     {
-        logerr(tier, "Tracker '%s' announce error: %s", host_cstr, err);
+        tr_logErrorTier(tier, "Tracker '%s' announce error: %s", host_cstr, err);
     }
     else
     {
         /* schedule a reannounce */
         int const interval = current_tracker->getRetryInterval();
-        logwarn(tier, "Tracker '%s' announce error: %s (Retrying in %d seconds)", host_cstr, err, interval);
+        tr_logWarnTier(tier, "Tracker '%s' announce error: %s (Retrying in %d seconds)", host_cstr, err, interval);
         tier_announce_event_push(tier, e, tr_time() + interval);
     }
 }
@@ -983,7 +979,7 @@ static void on_announce_done(tr_announce_response const* response, void* vdata)
 
     if (tier != nullptr)
     {
-        logtrace(
+        tr_logTraceTier(
             tier,
             "Got announce response: "
             "connected:%d "
@@ -1084,7 +1080,7 @@ static void on_announce_done(tr_announce_response const* response, void* vdata)
             if (auto const& warning = response->warning; !std::empty(warning))
             {
                 tier->last_announce_str = warning;
-                logtrace(tier, "tracker gave \"%s\"", warning.c_str());
+                tr_logTraceTier(tier, "tracker gave \"%s\"", warning.c_str());
                 publishWarning(tier, warning);
             }
             else
@@ -1120,7 +1116,7 @@ static void on_announce_done(tr_announce_response const* response, void* vdata)
                then a separate scrape isn't needed */
             if (scrape_fields >= 3 || (scrape_fields >= 1 && tracker->scrape_info == nullptr))
             {
-                logtrace(
+                tr_logTraceTier(
                     tier,
                     "Announce response has scrape info; bumping next scrape to %d seconds from now.",
                     tier->scrapeIntervalSec);
@@ -1150,7 +1146,7 @@ static void on_announce_done(tr_announce_response const* response, void* vdata)
             {
                 /* the queue is empty, so enqueue a perodic update */
                 int const i = tier->announceIntervalSec;
-                logtrace(tier, "Sending periodic reannounce in %d seconds", i);
+                tr_logTraceTier(tier, "Sending periodic reannounce in %d seconds", i);
                 tier_announce_event_push(tier, TR_ANNOUNCE_EVENT_NONE, now + i);
             }
         }
@@ -1188,7 +1184,7 @@ static void announce_request_delegate(
     }
     else
     {
-        tr_logAddMessage(__FILE__, __LINE__, TR_LOG_WARN, nullptr, "Unsupported url: %" TR_PRIsv, TR_PRIsv_ARG(announce_sv));
+        tr_logWarn("Unsupported url: %" TR_PRIsv, TR_PRIsv_ARG(announce_sv));
         delete callback_data;
     }
 
@@ -1255,7 +1251,7 @@ static void on_scrape_error(tr_session const* /*session*/, tr_tier* tier, char c
     // schedule a rescrape
     auto const interval = current_tracker->getRetryInterval();
     auto const* const host_cstr = current_tracker->host.c_str();
-    logdbg(tier, "Tracker '%s' scrape error: %s (Retrying in %zu seconds)", host_cstr, errmsg, (size_t)interval);
+    tr_logDebugTier(tier, "Tracker '%s' scrape error: %s (Retrying in %zu seconds)", host_cstr, errmsg, (size_t)interval);
     tier->lastScrapeSucceeded = false;
     tier->scheduleNextScrape(interval);
 }
@@ -1291,7 +1287,7 @@ static void checkMultiscrapeMax(tr_announcer* announcer, tr_scrape_response cons
         auto const parsed = *tr_urlParse(url.sv());
         auto clean_url = std::string{};
         tr_buildBuf(clean_url, parsed.scheme, "://"sv, parsed.host, ":"sv, parsed.portstr);
-        tr_logAddNamedInfo(clean_url.c_str(), "Reducing multiscrape max to %d", n);
+        tr_logInfoNamed(clean_url.c_str(), "Reducing multiscrape max to %d", n);
         multiscrape_max = n;
     }
 }
@@ -1318,7 +1314,7 @@ static void on_scrape_done(tr_scrape_response const* response, void* vsession)
 
             auto const scrape_url_sv = response->scrape_url.sv();
 
-            logtrace(
+            tr_logTraceTier(
                 tier,
                 "scraped url:%" TR_PRIsv
                 " -- "
@@ -1362,7 +1358,7 @@ static void on_scrape_done(tr_scrape_response const* response, void* vsession)
                 tier->lastScrapeSucceeded = true;
                 tier->scrapeIntervalSec = std::max(int{ DefaultScrapeIntervalSec }, response->min_request_interval);
                 tier->scheduleNextScrape();
-                logtrace(tier, "Scrape successful. Rescraping in %d seconds.", tier->scrapeIntervalSec);
+                tr_logTraceTier(tier, "Scrape successful. Rescraping in %d seconds.", tier->scrapeIntervalSec);
 
                 if (tr_tracker* const tracker = tier->currentTracker(); tracker != nullptr)
                 {
@@ -1416,7 +1412,7 @@ static void scrape_request_delegate(
     }
     else
     {
-        tr_logAddError("Unsupported url: %" TR_PRIsv, TR_PRIsv_ARG(scrape_sv));
+        tr_logError("Unsupported url: %" TR_PRIsv, TR_PRIsv_ARG(scrape_sv));
     }
 }
 
@@ -1571,7 +1567,7 @@ static void scrapeAndAnnounceMore(tr_announcer* announcer)
 
     for (auto*& tier : announce_me)
     {
-        logtrace(tier, "%s", "Announcing to tracker");
+        tr_logTraceTier(tier, "%s", "Announcing to tracker");
         tierAnnounce(announcer, tier);
     }
 }

@@ -55,7 +55,7 @@ static struct FileList* getFiles(char const* dir, char const* base, struct FileL
     tr_sys_path_info info;
     if (tr_error* error = nullptr; !tr_sys_path_get_info(buf.c_str(), 0, &info, &error))
     {
-        tr_logAddError(_("Torrent Creator is skipping file \"%s\": %s"), buf.c_str(), error->message);
+        tr_logWarn(_("Torrent Creator is skipping file \"%s\": %s"), buf.c_str(), error->message);
         tr_error_free(error);
         return list;
     }
@@ -200,7 +200,7 @@ bool tr_metaInfoBuilderSetPieceSize(tr_metainfo_builder* b, uint32_t bytes)
 {
     if (!isValidPieceSize(bytes))
     {
-        tr_logAddError(
+        tr_logWarn(
             _("Failed to set piece size to %s, leaving it at %s"),
             tr_formatter_mem_B(bytes).c_str(),
             tr_formatter_mem_B(b->pieceSize).c_str());

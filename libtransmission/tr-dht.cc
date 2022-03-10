@@ -683,7 +683,7 @@ static AnnounceResult tr_dhtAnnounce(tr_torrent* tor, int af, bool announce)
         return AnnounceResult::FAILED;
     }
 
-    tr_logAddTorInfo(
+    logtraceTor(
         tor,
         "Starting %s DHT announce (%s, %d nodes)",
         af == AF_INET6 ? "IPv6" : "IPv4",
