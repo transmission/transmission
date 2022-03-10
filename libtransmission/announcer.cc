@@ -43,7 +43,7 @@ using namespace std::literals;
     { \
         if (tr_logLevelIsActive(level)) \
         { \
-            auto name = std::array<char, TR_ADDRSTRLEN>{}; \
+            auto name = std::array<char, 512>{}; \
             tier->buildLogName(std::data(name), std::size(name)); \
             tr_logAddMessage(__FILE__, __LINE__, level, std::data(name), __VA_ARGS__); \
         } \
@@ -732,7 +732,7 @@ static void logtrace_tier_announce_queue(tr_tier const* tier)
         return;
     }
 
-    auto name = std::array<char, 128>{};
+    auto name = std::array<char, 512>{};
     tier->buildLogName(std::data(name), std::size(name));
 
     auto* const buf = evbuffer_new();

@@ -148,7 +148,7 @@ static void verboseLog(std::string_view description, tr_direction direction, std
 
 static auto constexpr MaxBencDepth = 8;
 
-void tr_announcerParseHttpAnnounceResponse(tr_announce_response& response, std::string_view benc)
+void tr_announcerParseHttpAnnounceResponse(tr_announce_response& response, std::string_view benc, char const* log_name)
 {
     verboseLog("Announce response:", TR_DOWN, benc);
 
@@ -271,7 +271,7 @@ void tr_announcerParseHttpAnnounceResponse(tr_announce_response& response, std::
     transmission::benc::parse(benc, stack, handler, nullptr, &error);
     if (error != nullptr)
     {
-        tr_logAddError("%s", error->message);
+        tr_logAddMessage(__FILE__, __LINE__, TR_LOG_WARN, log_name, "%s (%d)", error->message, error->code);
         tr_error_clear(&error);
     }
 }
@@ -301,7 +301,7 @@ static void onAnnounceDone(tr_web::FetchResponse const& web_response)
     }
     else
     {
-        tr_announcerParseHttpAnnounceResponse(*response, body);
+        tr_announcerParseHttpAnnounceResponse(*response, body, data->log_name);
     }
 
     if (!std::empty(response->pex6))
@@ -350,7 +350,7 @@ void tr_tracker_http_announce(
 *****
 ****/
 
-void tr_announcerParseHttpScrapeResponse(tr_scrape_response& response, std::string_view benc)
+void tr_announcerParseHttpScrapeResponse(tr_scrape_response& response, std::string_view benc, char const* log_name)
 {
     verboseLog("Scrape response:", TR_DOWN, benc);
 
@@ -443,7 +443,7 @@ void tr_announcerParseHttpScrapeResponse(tr_scrape_response& response, std::stri
     transmission::benc::parse(benc, stack, handler, nullptr, &error);
     if (error != nullptr)
     {
-        tr_logAddError("%s", error->message);
+        tr_logAddMessage(__FILE__, __LINE__, TR_LOG_WARN, log_name, "%s (%d)", error->message, error->code);
         tr_error_clear(&error);
     }
 }
@@ -475,7 +475,7 @@ static void onScrapeDone(tr_web::FetchResponse const& web_response)
     }
     else
     {
-        tr_announcerParseHttpScrapeResponse(response, body);
+        tr_announcerParseHttpScrapeResponse(response, body, data->log_name);
     }
 
     if (data->response_func != nullptr)
