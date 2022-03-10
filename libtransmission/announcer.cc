@@ -965,14 +965,12 @@ static void on_announce_error(tr_tier* tier, char const* err, tr_announce_event 
     if (isUnregistered(err))
     {
         logerr(tier, "Tracker '%s' announce error: %s", host_cstr, err);
-        tr_logAddTorInfo(tier->tor, "Tracker '%s' announce error: %s", host_cstr, err);
     }
     else
     {
         /* schedule a reannounce */
         int const interval = current_tracker->getRetryInterval();
         logwarn(tier, "Tracker '%s' announce error: %s (Retrying in %d seconds)", host_cstr, err, interval);
-        tr_logAddTorInfo(tier->tor, "Tracker '%s' announce error: %s (Retrying in %d seconds)", host_cstr, err, interval);
         tier_announce_event_push(tier, e, tr_time() + interval);
     }
 }
