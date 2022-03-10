@@ -272,7 +272,7 @@ static char const* levelName(tr_log_level level)
     case TR_LOG_CRITICAL:
         return "CRIT ";
     case TR_LOG_ERROR:
-        return "ERROR";
+        return "ERR  ";
     case TR_LOG_WARN:
         return "WARN ";
     case TR_LOG_DEBUG:
