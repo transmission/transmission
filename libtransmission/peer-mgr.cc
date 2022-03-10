@@ -225,9 +225,9 @@ struct tr_peerMgr
     event* atomTimer = nullptr;
 };
 
-#define tordbg(t, ...) tr_logAddDeepNamed(tr_torrentName((t)->tor), __VA_ARGS__)
-
-#define dbgmsg(...) tr_logAddDeepNamed(nullptr, __VA_ARGS__)
+#define logdbgSwarm(swarm, ...) tr_logAddNamed(TR_LOG_DEBUG, tr_torrentName((swarm)->tor), __VA_ARGS__)
+#define logtraceSwarm(swarm, ...) tr_logAddNamed(TR_LOG_TRACE, tr_torrentName((swarm)->tor), __VA_ARGS__)
+#define logtrace(...) tr_logAddNamed(TR_LOG_TRACE, nullptr, __VA_ARGS__)
 
 /**
 *** tr_peer virtual functions
@@ -447,7 +447,7 @@ static constexpr bool atomIsSeed(struct peer_atom const* atom)
 
 static void atomSetSeed(tr_swarm* s, struct peer_atom* atom)
 {
-    tordbg(s, "marking peer %s as a seed", tr_atomAddrStr(atom));
+    logtraceSwarm(s, "marking peer %s as a seed", tr_atomAddrStr(atom));
     atom->flags |= ADDED_F_SEED_FLAG;
     s->poolIsAllSeedsDirty = true;
 }
@@ -665,14 +665,14 @@ static void refillUpkeep(evutil_socket_t /*fd*/, short /*what*/, void* vmgr)
 
 static void addStrike(tr_swarm* s, tr_peer* peer)
 {
-    tordbg(s, "increasing peer %s strike count to %d", tr_atomAddrStr(peer->atom), peer->strikes + 1);
+    logtraceSwarm(s, "increasing peer %s strike count to %d", tr_atomAddrStr(peer->atom), peer->strikes + 1);
 
     if (++peer->strikes >= MaxBadPiecesPerPeer)
     {
         struct peer_atom* atom = peer->atom;
         atom->flags2 |= MyflagBanned;
         peer->doPurge = true;
-        tordbg(s, "banning peer %s", tr_atomAddrStr(atom));
+        logtraceSwarm(s, "banning peer %s", tr_atomAddrStr(atom));
     }
 }
 
@@ -848,14 +848,14 @@ static void peerCallbackFunc(tr_peer* peer, tr_peer_event const* e, void* vs)
         {
             /* some protocol error from the peer */
             peer->doPurge = true;
-            tordbg(
+            logdbgSwarm(
                 s,
                 "setting %s doPurge flag because we got an ERANGE, EMSGSIZE, or ENOTCONN error",
                 tr_atomAddrStr(peer->atom));
         }
         else
         {
-            tordbg(s, "unhandled error: %s", tr_strerror(e->err));
+            logdbgSwarm(s, "unhandled error: %s", tr_strerror(e->err));
         }
 
         break;
@@ -922,7 +922,7 @@ static struct peer_atom* ensureAtomExists(
         a->blocklisted = -1;
         tr_ptrArrayInsertSorted(&s->pool, a, compareAtomsByAddress);
 
-        tordbg(s, "got a new atom: %s", tr_atomAddrStr(a));
+        logtraceSwarm(s, "got a new atom: %s", tr_atomAddrStr(a));
     }
     else
     {
@@ -1012,7 +1012,11 @@ static bool on_handshake_done(tr_handshake_result const& result)
 
                 if (!result.readAnythingFromPeer)
                 {
-                    tordbg(s, "marking peer %s as unreachable... numFails is %d", tr_atomAddrStr(atom), int(atom->numFails));
+                    logtraceSwarm(
+                        s,
+                        "marking peer %s as unreachable... numFails is %d",
+                        tr_atomAddrStr(atom),
+                        int(atom->numFails));
                     atom->flags2 |= MyflagUnreachable;
                 }
             }
@@ -1041,7 +1045,7 @@ static bool on_handshake_done(tr_handshake_result const& result)
 
         if ((atom->flags2 & MyflagBanned) != 0)
         {
-            tordbg(s, "banned peer %s tried to reconnect", tr_atomAddrStr(atom));
+            logtraceSwarm(s, "banned peer %s tried to reconnect", tr_atomAddrStr(atom));
         }
         else if (tr_peerIoIsIncoming(result.io) && getPeerCount(s) >= getMaxPeerCount(s->tor))
         {
@@ -1202,7 +1206,7 @@ void tr_peerMgrGotBadPiece(tr_torrent* tor, tr_piece_index_t pieceIndex)
 
         if (peer->blame.test(pieceIndex))
         {
-            tordbg(
+            logtraceSwarm(
                 s,
                 "peer %s contributed to corrupt piece (%d); now has %d strikes",
                 tr_atomAddrStr(peer->atom),
@@ -1902,7 +1906,7 @@ static void rechokeDownloads(tr_swarm* s)
             double const cancelRate = cancels / (double)(cancels + blocks);
             double const mult = 1 - std::min(cancelRate, 0.5);
             maxPeers = s->interestedCount * mult;
-            tordbg(
+            logtraceSwarm(
                 s,
                 "cancel rate is %.3f -- reducing the number of peers we're interested in by %.0f percent",
                 cancelRate,
@@ -1919,7 +1923,7 @@ static void rechokeDownloads(tr_swarm* s)
             double const mult = std::min(timeSinceCancel, maxHistory) / (double)maxHistory;
             int const inc = maxIncrease * mult;
             maxPeers = s->maxPeers + inc;
-            tordbg(
+            logtraceSwarm(
                 s,
                 "time since last cancel is %jd -- increasing the number of peers we're interested in by %d",
                 (intmax_t)timeSinceCancel,
@@ -2255,7 +2259,7 @@ static bool shouldPeerBeClosed(tr_swarm const* s, tr_peer const* peer, int peerC
     /* if it's marked for purging, close it */
     if (peer->doPurge)
     {
-        tordbg(s, "purging peer %s because its doPurge flag is set", tr_atomAddrStr(atom));
+        logtraceSwarm(s, "purging peer %s because its doPurge flag is set", tr_atomAddrStr(atom));
         return true;
     }
 
@@ -2280,7 +2284,11 @@ static bool shouldPeerBeClosed(tr_swarm const* s, tr_peer const* peer, int peerC
 
         if (idleTime > limit)
         {
-            tordbg(s, "purging peer %s because it's been %d secs since we shared anything", tr_atomAddrStr(atom), idleTime);
+            logtraceSwarm(
+                s,
+                "purging peer %s because it's been %d secs since we shared anything",
+                tr_atomAddrStr(atom),
+                idleTime);
             return true;
         }
     }
@@ -2344,7 +2352,7 @@ static int getReconnectIntervalSecs(struct peer_atom const* atom, time_t const n
         }
     }
 
-    dbgmsg("reconnect interval for %s is %d seconds", tr_atomAddrStr(atom), sec);
+    logtrace("reconnect interval for %s is %d seconds", tr_atomAddrStr(atom), sec);
     return sec;
 }
 
@@ -2378,16 +2386,16 @@ static void closePeer(tr_peer* peer)
        to them fruitlessly, so mark it as another fail */
     if (auto* const atom = peer->atom; atom->piece_data_time != 0)
     {
-        tordbg(s, "resetting atom %s numFails to 0", tr_atomAddrStr(atom));
+        logtraceSwarm(s, "resetting atom %s numFails to 0", tr_atomAddrStr(atom));
         atom->numFails = 0;
     }
     else
     {
         ++atom->numFails;
-        tordbg(s, "incremented atom %s numFails to %d", tr_atomAddrStr(atom), int(atom->numFails));
+        logtraceSwarm(s, "incremented atom %s numFails to %d", tr_atomAddrStr(atom), int(atom->numFails));
     }
 
-    tordbg(s, "removing bad peer %s", tr_atomAddrStr(peer->atom));
+    logtraceSwarm(s, "removing bad peer %s", tr_atomAddrStr(peer->atom));
     removePeer(peer);
 }
 
@@ -2752,7 +2760,7 @@ static void atomPulse(evutil_socket_t /*fd*/, short /*what*/, void* vmgr)
                 tr_ptrArrayAppend(&s->pool, keep[i]);
             }
 
-            tordbg(s, "max atom count is %d... pruned from %d to %d\n", maxAtomCount, atomCount, keepCount);
+            logtraceSwarm(s, "max atom count is %d... pruned from %d to %d\n", maxAtomCount, atomCount, keepCount);
 
             /* cleanup */
             tr_free(test);
@@ -3006,7 +3014,7 @@ static void initiateConnection(tr_peerMgr* mgr, tr_swarm* s, struct peer_atom* a
         utp = utp && (atom->flags & ADDED_F_UTP_FLAGS) != 0;
     }
 
-    tordbg(s, "Starting an OUTGOING%s connection with %s", utp ? " µTP" : "", tr_atomAddrStr(atom));
+    logtraceSwarm(s, "Starting an OUTGOING%s connection with %s", utp ? " µTP" : "", tr_atomAddrStr(atom));
 
     tr_peerIo* const io = tr_peerIoNewOutgoing(
         mgr->session,
@@ -3020,7 +3028,7 @@ static void initiateConnection(tr_peerMgr* mgr, tr_swarm* s, struct peer_atom* a
 
     if (io == nullptr)
     {
-        tordbg(s, "peerIo not created; marking peer %s as unreachable", tr_atomAddrStr(atom));
+        logtraceSwarm(s, "peerIo not created; marking peer %s as unreachable", tr_atomAddrStr(atom));
         atom->flags2 |= MyflagUnreachable;
         atom->numFails++;
     }

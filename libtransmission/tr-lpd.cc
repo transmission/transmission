@@ -37,6 +37,12 @@ using in_port_t = uint16_t; /* all missing */
 
 static auto constexpr SIZEOF_HASH_STRING = TR_SHA1_DIGEST_STRLEN;
 
+#define logwarn(...) tr_logAddNamed(TR_LOG_WARN, "lpd", __VA_ARGS__)
+#define logdbg(...) tr_logAddNamed(TR_LOG_DEBUG, "lpd", __VA_ARGS__)
+#define logtrace(...) tr_logAddNamed(TR_LOG_TRACE, "lpd", __VA_ARGS__)
+#define logdbgTor(tor, ...) tr_logAddNamed(TR_LOG_DEBUG, tr_torrentName(tor), __VA_ARGS__)
+#define logtraceTor(tor, ...) tr_logAddNamed(TR_LOG_TRACE, tr_torrentName(tor), __VA_ARGS__)
+
 /**
 * @brief Local Peer Discovery
 * @file tr-lpd.c
@@ -278,7 +284,7 @@ int tr_lpdInit(tr_session* ss, tr_address* /*tr_addr*/)
         return -1;
     }
 
-    tr_logAddNamedDbg("LPD", "Initialising Local Peer Discovery");
+    logdbg("Initialising Local Peer Discovery");
 
     /* setup datagram socket (receive) */
     {
@@ -371,7 +377,7 @@ int tr_lpdInit(tr_session* ss, tr_address* /*tr_addr*/)
     upkeep_timer = evtimer_new(ss->event_base, on_upkeep_timer, ss);
     tr_timerAdd(upkeep_timer, UpkeepIntervalSecs, 0);
 
-    tr_logAddNamedDbg("LPD", "Local Peer Discovery initialised");
+    logdbg("Local Peer Discovery initialised");
 
     return 1;
 
@@ -382,7 +388,7 @@ fail:
         evutil_closesocket(lpd_socket2);
         lpd_socket = lpd_socket2 = TR_BAD_SOCKET;
         session = nullptr;
-        tr_logAddNamedDbg("LPD", "LPD initialisation failed (errno = %d)", save);
+        logwarn("LPD initialisation failed (errno = %d)", save);
         errno = save;
     }
 
@@ -396,7 +402,7 @@ void tr_lpdUninit(tr_session* ss)
         return;
     }
 
-    tr_logAddNamedDbg("LPD", "Uninitialising Local Peer Discovery");
+    logtrace("Uninitialising Local Peer Discovery");
 
     event_free(lpd_event);
     lpd_event = nullptr;
@@ -407,7 +413,7 @@ void tr_lpdUninit(tr_session* ss)
     /* just shut down, we won't remember any former nodes */
     evutil_closesocket(lpd_socket);
     evutil_closesocket(lpd_socket2);
-    tr_logAddNamedDbg("LPD", "Done uninitialising Local Peer Discovery");
+    logtrace("Done uninitialising Local Peer Discovery");
 
     session = nullptr;
 }
@@ -471,7 +477,7 @@ bool tr_lpdSendAnnounce(tr_torrent const* t)
         }
     }
 
-    tr_logAddTorDbg(t, "LPD announce message away");
+    logtraceTor(t, "LPD announce message away");
 
     return true;
 }
@@ -539,14 +545,14 @@ static int tr_lpdConsiderAnnounce(tr_pex* peer, char const* const msg)
         {
             /* we found a suitable peer, add it to the torrent */
             tr_peerMgrAddPex(tor, TR_PEER_FROM_LPD, peer, 1);
-            tr_logAddTorDbg(tor, "Learned %d local peer from LPD (%s:%u)", 1, tr_address_to_string(&peer->addr), peerPort);
+            logdbgTor(tor, "Learned %d local peer from LPD (%s:%u)", 1, tr_address_to_string(&peer->addr), peerPort);
 
             /* periodic reconnectPulse() deals with the rest... */
 
             return 1;
         }
 
-        tr_logAddNamedDbg("LPD", "Cannot serve torrent #%s", hashString);
+        logdbg("Cannot serve torrent #%s", hashString);
     }
 
     return res;
@@ -620,11 +626,7 @@ static int tr_lpdAnnounceMore(time_t const now, int const interval)
 
         if (lpd_unsolicitedMsgCounter < 0)
         {
-            tr_logAddNamedInfo(
-                "LPD",
-                "Dropped %d announces in the last interval (max. %d allowed)",
-                -lpd_unsolicitedMsgCounter,
-                maxAnnounceCap);
+            logtrace("Dropped %d announces in the last interval (max. %d allowed)", -lpd_unsolicitedMsgCounter, maxAnnounceCap);
         }
 
         lpd_unsolicitedMsgCounter = maxAnnounceCap;
@@ -690,6 +692,6 @@ static void event_callback(evutil_socket_t /*s*/, short type, void* /*user_data*
             }
         }
 
-        tr_logAddNamedDbg("LPD", "Discarded invalid multicast message");
+        logtrace("Discarded invalid multicast message");
     }
 }

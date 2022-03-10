@@ -46,11 +46,7 @@ static auto constexpr RecentlyActiveSeconds = time_t{ 60 };
 
 using namespace std::literals;
 
-#if 0
-#define dbgmsg(fmt, ...) fprintf(stderr, "%s:%d " fmt "\n", __FILE__, __LINE__, __VA_ARGS__)
-#else
-#define dbgmsg(...) tr_logAddDeepNamed("RPC", __VA_ARGS__)
-#endif
+#define logtrace(...) tr_logAddNamed(TR_LOG_TRACE, "rpc", __VA_ARGS__)
 
 enum class TrFormat
 {
@@ -1518,7 +1514,7 @@ static void onMetadataFetched(tr_web::FetchResponse const& web_response)
     auto const& [status, body, did_connect, did_timeout, user_data] = web_response;
     auto* data = static_cast<struct add_torrent_idle_data*>(user_data);
 
-    dbgmsg(
+    logtrace(
         "torrentAdd: HTTP response code was %ld (%s); response length was %zu bytes",
         status,
         tr_webGetResponseStr(status),
@@ -1660,7 +1656,7 @@ static char const* torrentAdd(tr_session* session, tr_variant* args_in, tr_varia
         tr_ctorSetLabels(ctor, std::move(labels));
     }
 
-    dbgmsg("torrentAdd: filename is \"%" TR_PRIsv "\"", TR_PRIsv_ARG(filename));
+    logtrace("torrentAdd: filename is \"%" TR_PRIsv "\"", TR_PRIsv_ARG(filename));
 
     if (isCurlURL(filename))
     {

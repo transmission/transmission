@@ -44,6 +44,11 @@ tr_address const tr_in6addr_any = { TR_AF_INET6, { IN6ADDR_ANY_INIT } };
 
 tr_address const tr_inaddr_any = { TR_AF_INET, { { { { INADDR_ANY } } } } };
 
+#define logerr(...) tr_logAddNamed(TR_LOG_ERROR, "net", __VA_ARGS__)
+#define logwarn(...) tr_logAddNamed(TR_LOG_WARN, "net", __VA_ARGS__)
+#define logdbg(...) tr_logAddNamed(TR_LOG_DEBUG, "net", __VA_ARGS__)
+#define logtrace(...) tr_logAddNamed(TR_LOG_TRACE, "net", __VA_ARGS__)
+
 std::string tr_net_strerror(int err)
 {
 #ifdef _WIN32
@@ -235,7 +240,7 @@ void tr_netSetTOS([[maybe_unused]] tr_socket_t s, [[maybe_unused]] int tos, tr_a
 
         if (setsockopt(s, IPPROTO_IP, IP_TOS, (void const*)&tos, sizeof(tos)) == -1)
         {
-            tr_logAddNamedInfo("Net", "Can't set TOS '%d': %s", tos, tr_net_strerror(sockerrno).c_str());
+            logwarn("Can't set TOS '%d': %s", tos, tr_net_strerror(sockerrno).c_str());
         }
 #endif
     }
@@ -244,14 +249,14 @@ void tr_netSetTOS([[maybe_unused]] tr_socket_t s, [[maybe_unused]] int tos, tr_a
 #if defined(IPV6_TCLASS) && !defined(_WIN32)
         if (setsockopt(s, IPPROTO_IPV6, IPV6_TCLASS, (void const*)&tos, sizeof(tos)) == -1)
         {
-            tr_logAddNamedInfo("Net", "Can't set IPv6 QoS '%d': %s", tos, tr_net_strerror(sockerrno).c_str());
+            logwarn("Can't set IPv6 QoS '%d': %s", tos, tr_net_strerror(sockerrno).c_str());
         }
 #endif
     }
     else
     {
         /* program should never reach here! */
-        tr_logAddNamedInfo("Net", "Something goes wrong while setting TOS/Traffic-Class");
+        logdbg("Something goes wrong while setting TOS/Traffic-Class");
     }
 }
 
@@ -261,11 +266,7 @@ void tr_netSetCongestionControl([[maybe_unused]] tr_socket_t s, [[maybe_unused]]
 
     if (setsockopt(s, IPPROTO_TCP, TCP_CONGESTION, (void const*)algorithm, strlen(algorithm) + 1) == -1)
     {
-        tr_logAddNamedInfo(
-            "Net",
-            "Can't set congestion control algorithm '%s': %s",
-            algorithm,
-            tr_net_strerror(sockerrno).c_str());
+        logwarn("Can't set congestion control algorithm '%s': %s", algorithm, tr_net_strerror(sockerrno).c_str());
     }
 
 #endif
@@ -345,10 +346,7 @@ struct tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const
 
         if (setsockopt(s, SOL_SOCKET, SO_RCVBUF, reinterpret_cast<char const*>(&n), sizeof(n)) == -1)
         {
-            tr_logAddInfo(
-                "Unable to set SO_RCVBUF on socket %" PRIdMAX ": %s",
-                (intmax_t)s,
-                tr_net_strerror(sockerrno).c_str());
+            logwarn("Unable to set SO_RCVBUF on socket %" PRIdMAX ": %s", (intmax_t)s, tr_net_strerror(sockerrno).c_str());
         }
     }
 
@@ -367,7 +365,7 @@ struct tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const
 
     if (bind(s, (struct sockaddr*)&source_sock, sourcelen) == -1)
     {
-        tr_logAddError(
+        logwarn(
             _("Couldn't set source address %s on %" PRIdMAX ": %s"),
             tr_address_to_string(source_addr),
             (intmax_t)s,
@@ -386,7 +384,7 @@ struct tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const
 
         if ((tmperrno != ENETUNREACH && tmperrno != EHOSTUNREACH) || addr->type == TR_AF_INET)
         {
-            tr_logAddError(
+            logwarn(
                 _("Couldn't connect socket %" PRIdMAX " to %s, port %d (errno %d - %s)"),
                 (intmax_t)s,
                 tr_address_to_string(addr),
@@ -402,12 +400,9 @@ struct tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const
         ret = tr_peer_socket_tcp_create(s);
     }
 
-    if (tr_logGetDeepEnabled())
-    {
-        char addrstr[TR_ADDRSTRLEN];
-        tr_address_and_port_to_string(addrstr, sizeof(addrstr), addr, port);
-        tr_logAddDeep(__FILE__, __LINE__, nullptr, "New OUTGOING connection %" PRIdMAX " (%s)", (intmax_t)s, addrstr);
-    }
+    char addrstr[TR_ADDRSTRLEN];
+    tr_address_and_port_to_string(addrstr, sizeof(addrstr), addr, port);
+    logtrace("New OUTGOING connection %" PRIdMAX " (%s)", (intmax_t)s, addrstr);
 
     return ret;
 }
@@ -504,7 +499,7 @@ static tr_socket_t tr_netBindTCPImpl(tr_address const* addr, tr_port port, bool 
             char const* const fmt = hint == nullptr ? _("Couldn't bind port %d on %s: %s") :
                                                       _("Couldn't bind port %d on %s: %s (%s)");
 
-            tr_logAddError(fmt, port, tr_address_to_string(addr), tr_net_strerror(err).c_str(), hint);
+            logerr(fmt, port, tr_address_to_string(addr), tr_net_strerror(err).c_str(), hint);
         }
 
         tr_netCloseSocket(fd);
@@ -514,7 +509,7 @@ static tr_socket_t tr_netBindTCPImpl(tr_address const* addr, tr_port port, bool 
 
     if (!suppressMsgs)
     {
-        tr_logAddDebug("Bound socket %" PRIdMAX " to port %d on %s", (intmax_t)fd, port, tr_address_to_string(addr));
+        logdbg("Bound socket %" PRIdMAX " to port %d on %s", (intmax_t)fd, port, tr_address_to_string(addr));
     }
 
 #ifdef TCP_FASTOPEN
