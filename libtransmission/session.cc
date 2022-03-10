@@ -75,6 +75,7 @@ static auto constexpr DefaultPrefetchEnabled = bool{ true };
 #endif
 static auto constexpr SaveIntervalSecs = int{ 360 };
 
+#define loginf(...) tr_logAddNamed(TR_LOG_INFO, nullptr, __VA_ARGS__)
 #define logdbg(...) tr_logAddNamed(TR_LOG_DEBUG, nullptr, __VA_ARGS__)
 #define logtrace(...) tr_logAddNamed(TR_LOG_TRACE, nullptr, __VA_ARGS__)
 
@@ -1928,11 +1929,8 @@ void tr_sessionClose(tr_session* session)
 
     time_t const deadline = time(nullptr) + ShutdownMaxSeconds;
 
-    logdbg(
-        "shutting down transmission session %p... now is %zu, deadline is %zu",
-        (void*)session,
-        (size_t)time(nullptr),
-        (size_t)deadline);
+    loginf("Shutting down transmission session %p", (void*)session);
+    logdbg("now is %zu, deadline is %zu", (size_t)time(nullptr), (size_t)deadline);
 
     /* close the session */
     tr_runInEventThread(session, sessionCloseImpl, session);
