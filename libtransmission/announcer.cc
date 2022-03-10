@@ -732,9 +732,6 @@ static void logtrace_tier_announce_queue(tr_tier const* tier)
         return;
     }
 
-    auto name = std::array<char, 512>{};
-    tier->buildLogName(std::data(name), std::size(name));
-
     auto* const buf = evbuffer_new();
     for (size_t i = 0, n = std::size(tier->announce_events); i < n; ++i)
     {
@@ -743,8 +740,8 @@ static void logtrace_tier_announce_queue(tr_tier const* tier)
         evbuffer_add_printf(buf, "[%zu:%s]", i, str);
     }
 
-    auto const message = evbuffer_free_to_str(buf);
-    tr_logAddMessage(__FILE__, __LINE__, TR_LOG_TRACE, std::data(name), "%s", message.c_str());
+    auto const str = evbuffer_free_to_str(buf);
+    logtrace(tier, "%s", str.c_str());
 }
 
 // higher priorities go to the front of the announce queue
@@ -1123,10 +1120,9 @@ static void on_announce_done(tr_announce_response const* response, void* vdata)
                then a separate scrape isn't needed */
             if (scrape_fields >= 3 || (scrape_fields >= 1 && tracker->scrape_info == nullptr))
             {
-                tr_logAddTorDbg(
-                    tier->tor,
-                    "Announce response contained scrape info; "
-                    "rescheduling next scrape to %d seconds from now.",
+                logtrace(
+                    tier,
+                    "Announce response has scrape info; bumping next scrape to %d seconds from now.",
                     tier->scrapeIntervalSec);
                 tier->scheduleNextScrape();
                 tier->lastScrapeTime = now;
@@ -1192,7 +1188,7 @@ static void announce_request_delegate(
     }
     else
     {
-        tr_logAddError("Unsupported url: %" TR_PRIsv, TR_PRIsv_ARG(announce_sv));
+        tr_logAddMessage(__FILE__, __LINE__, TR_LOG_WARN, nullptr, "Unsupported url: %" TR_PRIsv, TR_PRIsv_ARG(announce_sv));
         delete callback_data;
     }
 
@@ -1259,8 +1255,7 @@ static void on_scrape_error(tr_session const* /*session*/, tr_tier* tier, char c
     // schedule a rescrape
     auto const interval = current_tracker->getRetryInterval();
     auto const* const host_cstr = current_tracker->host.c_str();
-    logtrace(tier, "Tracker '%s' scrape error: %s (Retrying in %zu seconds)", host_cstr, errmsg, (size_t)interval);
-    tr_logAddTorInfo(tier->tor, "Tracker '%s' error: %s (Retrying in %zu seconds)", host_cstr, errmsg, (size_t)interval);
+    logdbg(tier, "Tracker '%s' scrape error: %s (Retrying in %zu seconds)", host_cstr, errmsg, (size_t)interval);
     tier->lastScrapeSucceeded = false;
     tier->scheduleNextScrape(interval);
 }
@@ -1367,7 +1362,7 @@ static void on_scrape_done(tr_scrape_response const* response, void* vsession)
                 tier->lastScrapeSucceeded = true;
                 tier->scrapeIntervalSec = std::max(int{ DefaultScrapeIntervalSec }, response->min_request_interval);
                 tier->scheduleNextScrape();
-                tr_logAddTorDbg(tier->tor, "Scrape successful. Rescraping in %d seconds.", tier->scrapeIntervalSec);
+                logtrace(tier, "Scrape successful. Rescraping in %d seconds.", tier->scrapeIntervalSec);
 
                 if (tr_tracker* const tracker = tier->currentTracker(); tracker != nullptr)
                 {
@@ -1576,7 +1571,7 @@ static void scrapeAndAnnounceMore(tr_announcer* announcer)
 
     for (auto*& tier : announce_me)
     {
-        tr_logAddTorDbg(tier->tor, "%s", "Announcing to tracker");
+        logtrace(tier, "%s", "Announcing to tracker");
         tierAnnounce(announcer, tier);
     }
 }
