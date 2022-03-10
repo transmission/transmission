@@ -954,16 +954,15 @@ static void on_announce_error(tr_tier* tier, char const* err, tr_announce_event 
     /* switch to the next tracker */
     current_tracker = tier->useNextTracker();
 
-    auto const* const host_cstr = current_tracker->host.c_str();
     if (isUnregistered(err))
     {
-        tr_logErrorTier(tier, "Tracker '%s' announce error: %s", host_cstr, err);
+        tr_logErrorTier(tier, "announce error: %s", err);
     }
     else
     {
         /* schedule a reannounce */
         int const interval = current_tracker->getRetryInterval();
-        tr_logWarnTier(tier, "Tracker '%s' announce error: %s (Retrying in %d seconds)", host_cstr, err, interval);
+        tr_logWarnTier(tier, "announce error: %s (Retrying in %d seconds)", err, interval);
         tier_announce_event_push(tier, e, tr_time() + interval);
     }
 }
