@@ -270,17 +270,17 @@ static char const* levelName(tr_log_level level)
     switch (level)
     {
     case TR_LOG_CRITICAL:
-        return "CRIT ";
+        return "CRT";
     case TR_LOG_ERROR:
-        return "ERR  ";
+        return "ERR";
     case TR_LOG_WARN:
-        return "WARN ";
+        return "WRN";
     case TR_LOG_DEBUG:
-        return "DEBUG";
+        return "DBG";
     case TR_LOG_TRACE:
-        return "TRACE";
+        return "TRC";
     default:
-        return "INFO ";
+        return "INF";
     }
 }
 
