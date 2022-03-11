@@ -443,7 +443,7 @@ void tr_announcerParseHttpScrapeResponse(tr_scrape_response& response, std::stri
     transmission::benc::parse(benc, stack, handler, nullptr, &error);
     if (error != nullptr)
     {
-        tr_logAddMessage(__FILE__, __LINE__, TR_LOG_WARN, log_name, "%s (%d)", error->message, error->code);
+        tr_logAddMessage(__FILE__, __LINE__, TR_LOG_WARN, log_name, "scrape response: %s (%d)", error->message, error->code);
         tr_error_clear(&error);
     }
 }
@@ -473,7 +473,7 @@ static void onScrapeDone(tr_web::FetchResponse const& web_response)
         auto const* const response_str = tr_webGetResponseStr(status);
         response.errmsg = tr_strvJoin("Tracker HTTP response "sv, std::to_string(status), " ("sv, response_str, ")"sv);
     }
-    else
+    else if (!std::empty(body))
     {
         tr_announcerParseHttpScrapeResponse(response, body, data->log_name);
     }

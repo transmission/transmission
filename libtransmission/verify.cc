@@ -43,7 +43,7 @@ static bool verifyTorrent(tr_torrent* tor, bool const* stopFlag)
     auto buffer = std::vector<std::byte>(1024 * 256);
     auto sha = tr_sha1_init();
 
-    tr_logAddTorDbg(tor, "%s", "verifying torrent...");
+    tr_logAddDebugTor(tor, "%s", "verifying torrent...");
     tor->verify_progress = 0;
 
     while (!*stopFlag && piece < tor->pieceCount())
@@ -144,7 +144,7 @@ static bool verifyTorrent(tr_torrent* tor, bool const* stopFlag)
 
     /* stopwatch */
     time_t const end = tr_time();
-    tr_logAddTorDbg(
+    tr_logAddDebugTor(
         tor,
         "Verification is done. It took %d seconds to verify %" PRIu64 " bytes (%" PRIu64 " bytes per second)",
         (int)(end - begin),
@@ -225,7 +225,7 @@ static void verifyThreadFunc()
         }
 
         tr_torrent* tor = currentNode.torrent;
-        tr_logAddTorInfo(tor, "%s", _("Verifying torrent"));
+        tr_logAddTraceTor(tor, "%s", _("Verifying torrent"));
         tor->setVerifyState(TR_VERIFY_NOW);
         auto const changed = verifyTorrent(tor, &stopCurrent);
         tor->setVerifyState(TR_VERIFY_NONE);
@@ -246,7 +246,7 @@ static void verifyThreadFunc()
 void tr_verifyAdd(tr_torrent* tor, tr_verify_done_func callback_func, void* callback_data)
 {
     TR_ASSERT(tr_isTorrent(tor));
-    tr_logAddTorInfo(tor, "%s", _("Queued for verification"));
+    tr_logAddTraceTor(tor, "%s", _("Queued for verification"));
 
     auto node = verify_node{};
     node.torrent = tor;

@@ -78,6 +78,9 @@ struct tr_address
 
     static std::optional<tr_address> from_string(std::string_view str);
 
+    std::string to_string() const;
+    std::string to_string(tr_port port) const;
+
     tr_address_type type;
     union
     {

@@ -131,7 +131,7 @@ int readOrWriteBytes(
             if (fd == TR_BAD_SYS_FILE)
             {
                 err = errno;
-                tr_logAddTorErr(tor, "tr_fdFileCheckout failed for \"%s\": %s", filename.c_str(), tr_strerror(err));
+                tr_logAddErrorTor(tor, "tr_fdFileCheckout failed for \"%s\": %s", filename.c_str(), tr_strerror(err));
             }
             else if (doWrite)
             {
@@ -160,7 +160,7 @@ int readOrWriteBytes(
         if (!readEntireBuf(fd, file_offset, buf, buflen, &error))
         {
             err = error->code;
-            tr_logAddTorErr(tor, "read failed for \"%s\": %s", tor->fileSubpath(file_index).c_str(), error->message);
+            tr_logAddErrorTor(tor, "read failed for \"%s\": %s", tor->fileSubpath(file_index).c_str(), error->message);
             tr_error_free(error);
         }
         break;
@@ -169,7 +169,7 @@ int readOrWriteBytes(
         if (!writeEntireBuf(fd, file_offset, buf, buflen, &error))
         {
             err = error->code;
-            tr_logAddTorErr(tor, "write failed for \"%s\": %s", tor->fileSubpath(file_index).c_str(), error->message);
+            tr_logAddErrorTor(tor, "write failed for \"%s\": %s", tor->fileSubpath(file_index).c_str(), error->message);
             tr_error_free(error);
         }
         break;

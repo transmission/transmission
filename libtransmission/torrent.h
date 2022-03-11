@@ -27,6 +27,7 @@
 #include "file.h"
 #include "file-piece-map.h"
 #include "interned-string.h"
+#include "log.h"
 #include "session.h"
 #include "torrent-metainfo.h"
 #include "tr-macros.h"
@@ -777,3 +778,10 @@ tr_torrent_metainfo&& tr_ctorStealMetainfo(tr_ctor* ctor);
 bool tr_ctorSetMetainfoFromFile(tr_ctor* ctor, std::string const& filename, tr_error** error);
 bool tr_ctorSetMetainfoFromMagnetLink(tr_ctor* ctor, std::string const& filename, tr_error** error);
 void tr_ctorSetLabels(tr_ctor* ctor, tr_labels_t&& labels);
+
+#define tr_logAddCriticalTor(tor, ...) tr_logAddNamed(TR_LOG_CRITICAL, (tor)->name(), __VA_ARGS__)
+#define tr_logAddErrorTor(tor, ...) tr_logAddNamed(TR_LOG_ERROR, (tor)->name(), __VA_ARGS__)
+#define tr_logAddWarnTor(tor, ...) tr_logAddNamed(TR_LOG_WARN, (tor)->name(), __VA_ARGS__)
+#define tr_logAddInfoTor(tor, ...) tr_logAddNamed(TR_LOG_INFO, (tor)->name(), __VA_ARGS__)
+#define tr_logAddDebugTor(tor, ...) tr_logAddNamed(TR_LOG_DEBUG, (tor)->name(), __VA_ARGS__)
+#define tr_logAddTraceTor(tor, ...) tr_logAddNamed(TR_LOG_TRACE, (tor)->name(), __VA_ARGS__)

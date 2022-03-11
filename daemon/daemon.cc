@@ -54,6 +54,28 @@ static void sd_notifyf(int /*status*/, char const* /*fmt*/, ...)
 
 using namespace std::literals;
 
+/***
+****
+***/
+
+static auto constexpr CodeName = "daemon"sv;
+
+#undef tr_logAddError
+#undef tr_logAddWarn
+#undef tr_logAddInfo
+#undef tr_logAddDebug
+#undef tr_logAddTrace
+
+#define tr_logAddError(...) tr_logAddNamedError(CodeName, __VA_ARGS__)
+#define tr_logAddWarn(...) tr_logAddNamedWarn(CodeName, __VA_ARGS__)
+#define tr_logAddInfo(...) tr_logAddNamedInfo(CodeName, __VA_ARGS__)
+#define tr_logAddDebug(...) tr_logAddNamedDebug(CodeName, __VA_ARGS__)
+#define tr_logAddTrace(...) tr_logAddNamedTrace(CodeName, __VA_ARGS__)
+
+/***
+****
+***/
+
 static char constexpr MyName[] = "transmission-daemon";
 static char constexpr Usage[] = "Transmission " LONG_VERSION_STRING
                                 "  https://transmissionbt.com/\n"
@@ -270,17 +292,17 @@ static char const* levelName(tr_log_level level)
     switch (level)
     {
     case TR_LOG_CRITICAL:
-        return "CRIT ";
+        return "CRT";
     case TR_LOG_ERROR:
-        return "ERR  ";
+        return "ERR";
     case TR_LOG_WARN:
-        return "WARN ";
+        return "WRN";
     case TR_LOG_DEBUG:
-        return "DEBUG";
+        return "dbg";
     case TR_LOG_TRACE:
-        return "TRACE";
+        return "trc";
     default:
-        return "INFO ";
+        return "inf";
     }
 }
 
@@ -678,7 +700,7 @@ static int daemon_start(void* varg, [[maybe_unused]] bool foreground)
     tr_formatter_speed_init(SpeedK, SpeedKStr, SpeedMStr, SpeedGStr, SpeedTStr);
     session = tr_sessionInit(configDir, true, settings);
     tr_sessionSetRPCCallback(session, on_rpc_callback, nullptr);
-    tr_logAddNamedInfo(nullptr, "Using settings from \"%s\"", configDir);
+    tr_logAddNamedInfo(MyName, "Using settings from \"%s\"", configDir);
     tr_sessionSaveSettings(session, configDir, settings);
 
     auto sv = std::string_view{};

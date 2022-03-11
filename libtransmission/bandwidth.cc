@@ -14,7 +14,7 @@
 #include "tr-assert.h"
 #include "utils.h"
 
-#define logtrace(...) tr_logAddMessage(__FILE__, __LINE__, TR_LOG_TRACE, nullptr, __VA_ARGS__)
+#define logtrace(...) tr_logAddMessage(__FILE__, __LINE__, TR_LOG_TRACE, "", __VA_ARGS__)
 
 /***
 ****

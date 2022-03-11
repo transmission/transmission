@@ -88,6 +88,8 @@ public:
         evbuffer_free(inbuf);
     }
 
+    std::string addrStr() const;
+
     tr_crypto crypto;
 
     tr_address const addr;

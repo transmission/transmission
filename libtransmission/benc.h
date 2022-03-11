@@ -378,7 +378,7 @@ bool parse(
     if (stack.stack[0].n_children_walked == 0)
     {
         err = EILSEQ;
-        tr_error_set(error, err, "no data found");
+        tr_error_set(error, err, "no bencoded data to parse");
         errno = err;
         return false;
     }

@@ -91,7 +91,7 @@ static tr_sys_file_t create_session_id_lock_file(char const* session_id)
 
     if (error != nullptr)
     {
-        tr_logAddError("Unable to create session lock file (%d): %s", error->code, error->message);
+        tr_logAddWarn("Unable to create session lock file (%d): %s", error->code, error->message);
         tr_error_free(error);
     }
 
@@ -194,7 +194,7 @@ bool tr_session_id_is_local(char const* session_id)
 
         if (error != nullptr)
         {
-            tr_logAddError("Unable to open session lock file (%d): %s", error->code, error->message);
+            tr_logAddWarn("Unable to open session lock file (%d): %s", error->code, error->message);
             tr_error_free(error);
         }
     }
