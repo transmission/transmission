@@ -231,13 +231,7 @@ void logAddImpl(
 #endif
 }
 
-void tr_logAddMessage(
-    [[maybe_unused]] char const* file,
-    [[maybe_unused]] int line,
-    tr_log_level level,
-    [[maybe_unused]] std::string_view name,
-    char const* fmt,
-    ...)
+void tr_logAddMessage(char const* file, int line, tr_log_level level, std::string_view name, std::string_view msg)
 {
     // message logging shouldn't affect errno
     int const err = errno;
@@ -269,6 +263,27 @@ void tr_logAddMessage(
         }
     }
 
+    // log the messages
+    logAddImpl(file, line, level, name, msg);
+    if (last_one)
+    {
+        logAddImpl(file, line, level, "", _("Too many messages like this! I won't log this message anymore this session."));
+    }
+
+    errno = err;
+}
+
+void tr_logAddMessage(
+    [[maybe_unused]] char const* file,
+    [[maybe_unused]] int line,
+    tr_log_level level,
+    [[maybe_unused]] std::string_view name,
+    char const* fmt,
+    ...)
+{
+    // message logging shouldn't affect errno
+    int const err = errno;
+
     // build the message
     auto buf = std::array<char, 2048>{};
     va_list ap;
@@ -281,12 +296,5 @@ void tr_logAddMessage(
         return;
     }
 
-    // log the messages
-    logAddImpl(file, line, level, name, std::data(buf));
-    if (last_one)
-    {
-        logAddImpl(file, line, level, "", _("Too many messages like this! I won't log this message anymore this session."));
-    }
-
-    errno = err;
+    tr_logAddMessage(file, line, level, name, std::string_view{ std::data(buf) });
 }

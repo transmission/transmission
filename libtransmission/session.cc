@@ -27,6 +27,8 @@
 
 #include <event2/event.h>
 
+#include <fmt/core.h>
+
 #include "transmission.h"
 
 #include "announcer.h"
@@ -735,7 +737,7 @@ static void tr_sessionInitImpl(init_data* data)
 
     /* first %s is the application name
        second %s is the version number */
-    tr_logAddInfo(_("%s %s started"), TR_NAME, LONG_VERSION_STRING);
+    tr_logAddInfo(fmt::format(_("Transmission version {} started"), LONG_VERSION_STRING));
 
     tr_statsInit(session);
 
