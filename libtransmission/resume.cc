@@ -77,14 +77,14 @@ static auto loadPeers(tr_variant* dict, tr_torrent* tor)
     if (tr_variantDictFindRaw(dict, TR_KEY_peers2, &str, &len))
     {
         size_t const numAdded = addPeers(tor, str, len);
-        tr_logTraceTor(tor, "Loaded %zu IPv4 peers from resume file", numAdded);
+        tr_logAddTraceTor(tor, "Loaded %zu IPv4 peers from resume file", numAdded);
         ret = tr_resume::Peers;
     }
 
     if (tr_variantDictFindRaw(dict, TR_KEY_peers2_6, &str, &len))
     {
         size_t const numAdded = addPeers(tor, str, len);
-        tr_logTraceTor(tor, "Loaded %zu IPv6 peers from resume file", numAdded);
+        tr_logAddTraceTor(tor, "Loaded %zu IPv6 peers from resume file", numAdded);
         ret = tr_resume::Peers;
     }
 
@@ -174,7 +174,7 @@ static auto loadDND(tr_variant* dict, tr_torrent* tor)
     }
     else
     {
-        tr_logDebugTor(
+        tr_logAddDebugTor(
             tor,
             "Couldn't load DND flags. DND list (%p) has %zu"
             " children; torrent has %d files",
@@ -564,7 +564,7 @@ static auto loadProgress(tr_variant* dict, tr_torrent* tor)
 
         if (std::size(mtimes) != n_files)
         {
-            tr_logWarnTor(tor, "got %zu mtimes; expected %zu", std::size(mtimes), size_t(n_files));
+            tr_logAddWarnTor(tor, "got %zu mtimes; expected %zu", std::size(mtimes), size_t(n_files));
             // if resizing grows the vector, we'll get 0 mtimes for the
             // new items which is exactly what we want since the pieces
             // in an unknown state should be treated as untested
@@ -613,7 +613,7 @@ static auto loadProgress(tr_variant* dict, tr_torrent* tor)
 
         if (err != nullptr)
         {
-            tr_logDebugTor(tor, "Torrent needs to be verified - %s", err);
+            tr_logAddDebugTor(tor, "Torrent needs to be verified - %s", err);
         }
         else
         {
@@ -659,12 +659,12 @@ static auto loadFromFile(tr_torrent* tor, tr_resume::fields_t fieldsToLoad, bool
             nullptr,
             &error))
     {
-        tr_logDebugTor(tor, "Couldn't read \"%s\": %s", filename.c_str(), error->message);
+        tr_logAddDebugTor(tor, "Couldn't read \"%s\": %s", filename.c_str(), error->message);
         tr_error_clear(&error);
         return fields_loaded;
     }
 
-    tr_logDebugTor(tor, "Read resume file \"%s\"", filename.c_str());
+    tr_logAddDebugTor(tor, "Read resume file \"%s\"", filename.c_str());
 
     auto boolVal = false;
     auto i = int64_t{};

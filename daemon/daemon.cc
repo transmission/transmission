@@ -60,17 +60,17 @@ using namespace std::literals;
 
 static auto constexpr CodeName = "daemon"sv;
 
-#undef tr_logError
-#undef tr_logWarn
-#undef tr_logInfo
-#undef tr_logDebug
-#undef tr_logTrace
+#undef tr_logAddError
+#undef tr_logAddWarn
+#undef tr_logAddInfo
+#undef tr_logAddDebug
+#undef tr_logAddTrace
 
-#define tr_logError(...) tr_logErrorNamed(CodeName, __VA_ARGS__)
-#define tr_logWarn(...) tr_logWarnNamed(CodeName, __VA_ARGS__)
-#define tr_logInfo(...) tr_logInfoNamed(CodeName, __VA_ARGS__)
-#define tr_logDebug(...) tr_logDebugNamed(CodeName, __VA_ARGS__)
-#define tr_logTrace(...) tr_logTraceNamed(CodeName, __VA_ARGS__)
+#define tr_logAddError(...) tr_logAddNamedError(CodeName, __VA_ARGS__)
+#define tr_logAddWarn(...) tr_logAddNamedWarn(CodeName, __VA_ARGS__)
+#define tr_logAddInfo(...) tr_logAddNamedInfo(CodeName, __VA_ARGS__)
+#define tr_logAddDebug(...) tr_logAddNamedDebug(CodeName, __VA_ARGS__)
+#define tr_logAddTrace(...) tr_logAddNamedTrace(CodeName, __VA_ARGS__)
 
 /***
 ****
@@ -255,24 +255,24 @@ static auto onFileAdded(tr_watchdir_t dir, char const* name, void* vsession)
 
     if (tr_torrentNew(ctor, nullptr) == nullptr)
     {
-        tr_logError("Unable to add .torrent file \"%s\"", name);
+        tr_logAddError("Unable to add .torrent file \"%s\"", name);
     }
     else
     {
         bool trash = false;
         bool const test = tr_ctorGetDeleteSource(ctor, &trash);
 
-        tr_logInfo("Parsing .torrent file successful \"%s\"", name);
+        tr_logAddInfo("Parsing .torrent file successful \"%s\"", name);
 
         if (test && trash)
         {
             tr_error* error = nullptr;
 
-            tr_logInfo("Deleting input .torrent file \"%s\"", name);
+            tr_logAddInfo("Deleting input .torrent file \"%s\"", name);
 
             if (!tr_sys_path_remove(filename.c_str(), &error))
             {
-                tr_logError("Error deleting .torrent file: %s", error->message);
+                tr_logAddError("Error deleting .torrent file: %s", error->message);
                 tr_error_free(error);
             }
         }
@@ -636,7 +636,7 @@ static void daemon_reconfigure(void* /*arg*/)
 {
     if (mySession == nullptr)
     {
-        tr_logInfo("Deferring reload until session is fully started.");
+        tr_logAddInfo("Deferring reload until session is fully started.");
         seenHUP = true;
     }
     else
@@ -651,7 +651,7 @@ static void daemon_reconfigure(void* /*arg*/)
         }
 
         configDir = tr_sessionGetConfigDir(mySession);
-        tr_logInfo("Reloading settings from \"%s\"", configDir);
+        tr_logAddInfo("Reloading settings from \"%s\"", configDir);
         tr_variantInitDict(&settings, 0);
         tr_variantDictAddBool(&settings, TR_KEY_rpc_enabled, true);
         tr_sessionLoadSettings(&settings, configDir, MyName);
@@ -700,7 +700,7 @@ static int daemon_start(void* varg, [[maybe_unused]] bool foreground)
     tr_formatter_speed_init(SpeedK, SpeedKStr, SpeedMStr, SpeedGStr, SpeedTStr);
     session = tr_sessionInit(configDir, true, settings);
     tr_sessionSetRPCCallback(session, on_rpc_callback, nullptr);
-    tr_logInfoNamed(MyName, "Using settings from \"%s\"", configDir);
+    tr_logAddNamedInfo(MyName, "Using settings from \"%s\"", configDir);
     tr_sessionSaveSettings(session, configDir, settings);
 
     auto sv = std::string_view{};
@@ -720,19 +720,19 @@ static int daemon_start(void* varg, [[maybe_unused]] bool foreground)
             auto const out = std::to_string(getpid());
             tr_sys_file_write(fp, std::data(out), std::size(out), nullptr, nullptr);
             tr_sys_file_close(fp, nullptr);
-            tr_logInfo("Saved pidfile \"%s\"", sz_pid_filename.c_str());
+            tr_logAddInfo("Saved pidfile \"%s\"", sz_pid_filename.c_str());
             pidfile_created = true;
         }
         else
         {
-            tr_logError("Unable to save pidfile \"%s\": %s", sz_pid_filename.c_str(), error->message);
+            tr_logAddError("Unable to save pidfile \"%s\": %s", sz_pid_filename.c_str(), error->message);
             tr_error_free(error);
         }
     }
 
     if (tr_variantDictFindBool(settings, TR_KEY_rpc_authentication_required, &boolVal) && boolVal)
     {
-        tr_logInfoNamed(MyName, "requiring authentication");
+        tr_logAddNamedInfo(MyName, "requiring authentication");
     }
 
     mySession = session;
@@ -753,7 +753,7 @@ static int daemon_start(void* varg, [[maybe_unused]] bool foreground)
         (void)tr_variantDictFindStrView(settings, TR_KEY_watch_dir, &dir);
         if (!std::empty(dir))
         {
-            tr_logInfo("Watching \"%" TR_PRIsv "\" for new .torrent files", TR_PRIsv_ARG(dir));
+            tr_logAddInfo("Watching \"%" TR_PRIsv "\" for new .torrent files", TR_PRIsv_ARG(dir));
 
             watchdir = tr_watchdir_new(dir, &onFileAdded, mySession, ev_base, force_generic);
             if (watchdir == nullptr)
@@ -794,13 +794,13 @@ static int daemon_start(void* varg, [[maybe_unused]] bool foreground)
 
         if (status_ev == nullptr)
         {
-            tr_logError("Failed to create status event %s", tr_strerror(errno));
+            tr_logAddError("Failed to create status event %s", tr_strerror(errno));
             goto CLEANUP;
         }
 
         if (event_add(status_ev, &one_sec) == -1)
         {
-            tr_logError("Failed to add status event %s", tr_strerror(errno));
+            tr_logAddError("Failed to add status event %s", tr_strerror(errno));
             goto CLEANUP;
         }
     }
@@ -810,7 +810,7 @@ static int daemon_start(void* varg, [[maybe_unused]] bool foreground)
     /* Run daemon event loop */
     if (event_base_dispatch(ev_base) == -1)
     {
-        tr_logError("Failed to launch daemon event loop: %s", tr_strerror(errno));
+        tr_logAddError("Failed to launch daemon event loop: %s", tr_strerror(errno));
         goto CLEANUP;
     }
 

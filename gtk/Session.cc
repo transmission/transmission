@@ -1437,13 +1437,13 @@ bool gtr_inhibit_hibernation(guint32& cookie)
         cookie = Glib::VariantBase::cast_dynamic<Glib::Variant<guint32>>(response.get_child(0)).get();
 
         /* logging */
-        tr_logInfo("%s", _("Inhibiting desktop hibernation"));
+        tr_logAddInfo("%s", _("Inhibiting desktop hibernation"));
 
         success = true;
     }
     catch (Glib::Error const& e)
     {
-        tr_logError(_("Couldn't inhibit desktop hibernation: %s"), e.what().c_str());
+        tr_logAddError(_("Couldn't inhibit desktop hibernation: %s"), e.what().c_str());
     }
 
     return success;
@@ -1464,7 +1464,7 @@ void gtr_uninhibit_hibernation(guint inhibit_cookie)
             1000);
 
         /* logging */
-        tr_logInfo("%s", _("Allowing desktop hibernation"));
+        tr_logAddInfo("%s", _("Allowing desktop hibernation"));
     }
     catch (Glib::Error const& e)
     {

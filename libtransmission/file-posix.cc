@@ -265,7 +265,7 @@ FAILURE:
     TR_ASSERT(!ret);
     TR_ASSERT(my_error != nullptr);
 
-    tr_logError(_("Couldn't create \"%1$s\": %2$s"), path, my_error->message);
+    tr_logAddError(_("Couldn't create \"%1$s\": %2$s"), path, my_error->message);
     tr_error_propagate(error, &my_error);
 
 CLEANUP:

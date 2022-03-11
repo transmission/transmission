@@ -38,11 +38,11 @@ static void logVal(char const* func, int ret)
 
     if (ret >= 0)
     {
-        tr_logInfoNamed(CodeName, _("%s succeeded (%d)"), func, ret);
+        tr_logAddNamedInfo(CodeName, _("%s succeeded (%d)"), func, ret);
     }
     else
     {
-        tr_logDebugNamed(
+        tr_logAddNamedDebug(
             CodeName,
             "%s failed. Natpmp returned %d (%s); errno is %d (%s)",
             func,
@@ -110,7 +110,7 @@ tr_port_forwarding tr_natpmpPulse(
         {
             char str[128];
             evutil_inet_ntop(AF_INET, &response.pnu.publicaddress.addr, str, sizeof(str));
-            tr_logInfoNamed(CodeName, _("Found public address \"%s\""), str);
+            tr_logAddNamedInfo(CodeName, _("Found public address \"%s\""), str);
             nat->state = TR_NATPMP_IDLE;
         }
         else if (val != NATPMP_TRYAGAIN)
@@ -143,7 +143,7 @@ tr_port_forwarding tr_natpmpPulse(
         {
             int const unmapped_port = resp.pnu.newportmapping.privateport;
 
-            tr_logInfoNamed(CodeName, _("no longer forwarding port %d"), unmapped_port);
+            tr_logAddNamedInfo(CodeName, _("no longer forwarding port %d"), unmapped_port);
 
             if (nat->private_port == unmapped_port)
             {
@@ -192,7 +192,7 @@ tr_port_forwarding tr_natpmpPulse(
             nat->renew_time = tr_time() + (resp.pnu.newportmapping.lifetime / 2);
             nat->private_port = resp.pnu.newportmapping.privateport;
             nat->public_port = resp.pnu.newportmapping.mappedpublicport;
-            tr_logInfoNamed(CodeName, _("Port %d forwarded successfully"), nat->private_port);
+            tr_logAddNamedInfo(CodeName, _("Port %d forwarded successfully"), nat->private_port);
         }
         else if (val != NATPMP_TRYAGAIN)
         {

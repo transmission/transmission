@@ -538,7 +538,7 @@ bool tr_torrent_metainfo::migrateFile(
     if (old_filename_exists && tr_sys_path_rename(old_filename.c_str(), new_filename.c_str(), nullptr))
     {
         auto const name_sz = std::string{ name };
-        tr_logErrorNamed(name_sz, "Migrated torrent file from \"%s\" to \"%s\"", old_filename.c_str(), new_filename.c_str());
+        tr_logAddNamedError(name_sz, "Migrated torrent file from \"%s\" to \"%s\"", old_filename.c_str(), new_filename.c_str());
         return true;
     }
 
