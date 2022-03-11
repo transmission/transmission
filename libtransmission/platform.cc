@@ -45,7 +45,7 @@
 
 using namespace std::literals;
 
-static char* tr_buildPath(char const* first_element, ...)
+char* tr_buildPath(char const* first_element, ...)
 {
     // pass 1: allocate enough space for the string
     va_list vl;

@@ -26,6 +26,7 @@
 #include "transmission.h"
 
 #include "announce-list.h"
+#include "bandwidth.h"
 #include "net.h" // tr_socket_t
 #include "quark.h"
 #include "torrents.h"
@@ -403,6 +404,8 @@ public:
     // See tr_netTos*() in libtransmission/net.h for more info
     // Only session.cc should use this.
     int peer_socket_tos_ = *tr_netTosFromName(TR_DEFAULT_PEER_SOCKET_TOS_STR);
+
+    tr_bandwidth_group* groups;
 
 private:
     static std::recursive_mutex session_mutex_;

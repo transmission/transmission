@@ -68,6 +68,9 @@ tr_labels_t tr_ctorGetLabels(tr_ctor const* ctor);
 ***
 **/
 
+/* Set the bandwidth group the torrent belongs to */
+void tr_torrentSetGroup(tr_torrent* tor, std::string_view group);
+
 void tr_torrentSetLabels(tr_torrent* tor, tr_labels_t&& labels);
 
 void tr_torrentChangeMyPort(tr_torrent* session);
@@ -711,6 +714,8 @@ public:
     bool finishedSeedingByIdle = false;
 
     tr_labels_t labels;
+
+    std::string group;
 
     static auto constexpr MagicNumber = int{ 95549 };
 

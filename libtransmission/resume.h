@@ -42,6 +42,7 @@ auto inline constexpr TimeDownloading = fields_t{ 1 << 19 };
 auto inline constexpr Filenames = fields_t{ 1 << 20 };
 auto inline constexpr Name = fields_t{ 1 << 21 };
 auto inline constexpr Labels = fields_t{ 1 << 22 };
+auto inline constexpr Group = fields_t{ 1 << 23 };
 
 auto inline constexpr All = ~fields_t{ 0 };
 

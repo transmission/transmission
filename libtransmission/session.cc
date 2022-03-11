@@ -536,6 +536,9 @@ void tr_sessionSaveSettings(tr_session* session, char const* config_dir, tr_vari
 
     /* cleanup */
     tr_variantFree(&settings);
+
+    /* Write bandwidth groups limits to file  */
+    tr_bandwidthGroupWrite(session, config_dir);
 }
 
 /***
@@ -596,6 +599,7 @@ tr_session* tr_sessionInit(char const* config_dir, bool messageQueuingEnabled, t
     session->session_id = tr_session_id_new();
     session->bandwidth = new Bandwidth(nullptr);
     session->removed_torrents.clear();
+    tr_bandwidthGroupRead(session, config_dir);
 
     /* nice to start logging at the very beginning */
     if (auto i = int64_t{}; tr_variantDictFindInt(clientSettings, TR_KEY_message_level, &i))

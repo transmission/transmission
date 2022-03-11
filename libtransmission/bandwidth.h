@@ -12,6 +12,7 @@
 #include <array>
 #include <cstddef> // size_t
 #include <vector>
+#include <string>
 
 #include "transmission.h"
 
@@ -251,3 +252,27 @@ private:
 };
 
 /* @} */
+
+typedef struct tr_bandwidth_group
+{
+    Bandwidth* bandwidth;
+    std::string name;
+    struct tr_bandwidth_group* next;
+} tr_bandwidth_group;
+
+void tr_bandwidthGroupSetLimits(
+    tr_bandwidth_group* group,
+    bool up_limited,
+    unsigned int up_limit,
+    bool down_limited,
+    unsigned int down_limit);
+void tr_bandwidthGroupGetLimits(
+    tr_bandwidth_group* group,
+    bool* up_limited,
+    unsigned int* up_limit,
+    bool* down_limited,
+    unsigned int* down_limit);
+tr_bandwidth_group* tr_bandwidthGroupNew(tr_session* session, std::string name);
+tr_bandwidth_group* tr_bandwidthGroupFind(tr_session* session, std::string_view name);
+void tr_bandwidthGroupRead(tr_session* session, char const* configDir);
+int tr_bandwidthGroupWrite(tr_session* session, char const* configDir);
