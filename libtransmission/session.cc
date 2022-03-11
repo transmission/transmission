@@ -231,7 +231,7 @@ static void accept_incoming_peer(evutil_socket_t fd, short /*what*/, void* vsess
     {
         char addrstr[TR_ADDRSTRLEN];
         tr_address_and_port_to_string(addrstr, sizeof(addrstr), &clientAddr, clientPort);
-        tr_logAddTrace("new incoming connection %" PRIdMAX " (%s)", (intmax_t)clientSocket, addrstr);
+        tr_logAddTrace(fmt::format("new incoming connection {} ({})", clientSocket, addrstr));
 
         tr_peerMgrAddIncoming(session->peerMgr, &clientAddr, clientPort, tr_peer_socket_tcp_create(clientSocket));
     }
@@ -693,7 +693,8 @@ static void tr_sessionInitImpl(init_data* data)
     TR_ASSERT(tr_amInEventThread(session));
     TR_ASSERT(tr_variantIsDict(clientSettings));
 
-    tr_logAddTrace("tr_sessionInit: the session's top-level bandwidth object is %p", (void*)&session->bandwidth);
+    tr_logAddTrace(
+        fmt::format("tr_sessionInit: the session's top-level bandwidth object is {}", fmt::ptr(&session->bandwidth)));
 
     tr_variant settings;
 
@@ -735,9 +736,7 @@ static void tr_sessionInitImpl(init_data* data)
 
     tr_announcerInit(session);
 
-    /* first %s is the application name
-       second %s is the version number */
-    tr_logAddInfo(fmt::format(_("Transmission version {} started"), LONG_VERSION_STRING));
+    tr_logAddInfo(fmt::format(_("Transmission version {version} started"), fmt::arg("version", LONG_VERSION_STRING)));
 
     tr_statsInit(session);
 
@@ -1480,7 +1479,7 @@ static void turtleCheckClock(tr_session* s, struct tr_turtle_info* t)
 
     if (!alreadySwitched)
     {
-        tr_logAddInfo("Time to turn %s turtle mode!", enabled ? "on" : "off");
+        tr_logAddInfo(enabled ? _("Time to turn on turtle mode") : _("Time to turn off turtle mode"));
         t->autoTurtleState = newAutoTurtleState;
         useAltSpeed(s, t, enabled, false);
     }
@@ -1927,8 +1926,8 @@ void tr_sessionClose(tr_session* session)
 
     time_t const deadline = time(nullptr) + ShutdownMaxSeconds;
 
-    tr_logAddInfo("Shutting down transmission session %p", (void*)session);
-    tr_logAddDebug("now is %zu, deadline is %zu", (size_t)time(nullptr), (size_t)deadline);
+    tr_logAddInfo(fmt::format(_("Shutting down transmission session {}"), fmt::ptr(session)));
+    tr_logAddDebug(fmt::format("now is {}, deadline is {}", time(nullptr), deadline));
 
     /* close the session */
     tr_runInEventThread(session, sessionCloseImpl, session);
@@ -1947,12 +1946,12 @@ void tr_sessionClose(tr_session* session)
             session->announcer_udp != nullptr) &&
            !deadlineReached(deadline))
     {
-        tr_logAddTrace(
-            "waiting on port unmap (%p) or announcer (%p)... now %zu deadline %zu",
-            (void*)session->shared,
-            (void*)session->announcer,
-            (size_t)time(nullptr),
-            (size_t)deadline);
+        tr_logAddTrace(fmt::format(
+            "waiting on port unmap ({}) or announcer ({})... now {} deadline {}",
+            fmt::ptr(session->shared),
+            fmt::ptr(session->announcer),
+            time(nullptr),
+            deadline));
         tr_wait_msec(50);
     }
 
@@ -1965,9 +1964,7 @@ void tr_sessionClose(tr_session* session)
     {
         static bool forced = false;
         tr_logAddTrace(
-            "waiting for libtransmission thread to finish... now %zu deadline %zu",
-            (size_t)time(nullptr),
-            (size_t)deadline);
+            fmt::format("waiting for libtransmission thread to finish... now {} deadline {}", time(nullptr), deadline));
         tr_wait_msec(10);
 
         if (deadlineReached(deadline) && !forced)
@@ -1979,7 +1976,7 @@ void tr_sessionClose(tr_session* session)
 
         if (deadlineReached(deadline + 3))
         {
-            tr_logAddTrace("deadline+3 reached... calling break...\n");
+            tr_logAddTrace("deadline+3 reached... calling break...");
             break;
         }
     }
@@ -2054,7 +2051,7 @@ static void sessionLoadTorrents(struct sessionLoadTorrentsData* const data)
 
     if (n != 0)
     {
-        tr_logAddInfo(_("Loaded %d torrents"), n);
+        tr_logAddInfo(fmt::format(_("Loaded {count} torrents"), fmt::arg("count", n)));
     }
 
     if (data->setmeCount != nullptr)
