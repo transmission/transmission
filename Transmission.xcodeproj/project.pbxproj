@@ -3392,6 +3392,7 @@
 					"third-party/libevent/include",
 					"third-party/libutp",
 					"third-party/utfcpp/source",
+					"third-party/fmt/include",
 					"third-party/libdeflate",
 					"third-party/libpsl/include",
 				);
@@ -3586,6 +3587,7 @@
 					"third-party/libevent/include",
 					"third-party/libutp",
 					"third-party/utfcpp/source",
+					"third-party/fmt/include",
 					"third-party/libdeflate",
 					"third-party/libpsl/include",
 				);
@@ -3837,6 +3839,7 @@
 					"third-party/libevent/include",
 					"third-party/libutp",
 					"third-party/utfcpp/source",
+					"third-party/fmt/include",
 					"third-party/libdeflate",
 					"third-party/libpsl/include",
 				);
