@@ -473,7 +473,7 @@ static void onScrapeDone(tr_web::FetchResponse const& web_response)
         auto const* const response_str = tr_webGetResponseStr(status);
         response.errmsg = tr_strvJoin("Tracker HTTP response "sv, std::to_string(status), " ("sv, response_str, ")"sv);
     }
-    else
+    else if (!std::empty(body))
     {
         tr_announcerParseHttpScrapeResponse(response, body, data->log_name);
     }

@@ -354,7 +354,7 @@ bool trashDataFile(char const* filename, tr_error** error)
 {
     if (self.fResumeOnWake)
     {
-        tr_logAddNamedInfo(tr_torrentName(self.fHandle), "restarting because of wakeUp");
+        tr_logAddNamedTrace(tr_torrentName(self.fHandle), "restarting because of wakeUp");
         tr_torrentStart(self.fHandle);
     }
 }
