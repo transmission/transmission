@@ -12,8 +12,10 @@
 #import "NSStringAdditions.h"
 
 #define LEVEL_ERROR 0
-#define LEVEL_INFO 1
-#define LEVEL_DEBUG 2
+#define LEVEL_WARN 1
+#define LEVEL_INFO 2
+#define LEVEL_DEBUG 3
+#define LEVEL_TRACE 4
 
 #define UPDATE_SECONDS 0.75
 
@@ -66,8 +68,10 @@
 
     //set images and text for popup button items
     [self.fLevelButton itemAtIndex:LEVEL_ERROR].title = NSLocalizedString(@"Error", "Message window -> level string");
+    [self.fLevelButton itemAtIndex:LEVEL_WARN].title = NSLocalizedString(@"Warn", "Message window -> level string");
     [self.fLevelButton itemAtIndex:LEVEL_INFO].title = NSLocalizedString(@"Info", "Message window -> level string");
     [self.fLevelButton itemAtIndex:LEVEL_DEBUG].title = NSLocalizedString(@"Debug", "Message window -> level string");
+    [self.fLevelButton itemAtIndex:LEVEL_TRACE].title = NSLocalizedString(@"Trace", "Message window -> level string");
 
     CGFloat const levelButtonOldWidth = NSWidth(self.fLevelButton.frame);
     [self.fLevelButton sizeToFit];
@@ -110,11 +114,17 @@
     case TR_LOG_ERROR:
         [self.fLevelButton selectItemAtIndex:LEVEL_ERROR];
         break;
+    case TR_LOG_WARN:
+        [self.fLevelButton selectItemAtIndex:LEVEL_WARN];
+        break;
     case TR_LOG_INFO:
         [self.fLevelButton selectItemAtIndex:LEVEL_INFO];
         break;
     case TR_LOG_DEBUG:
         [self.fLevelButton selectItemAtIndex:LEVEL_DEBUG];
+        break;
+    case TR_LOG_TRACE:
+        [self.fLevelButton selectItemAtIndex:LEVEL_TRACE];
         break;
     default: //safety
         [NSUserDefaults.standardUserDefaults setInteger:TR_LOG_ERROR forKey:@"MessageLevel"];
@@ -256,12 +266,18 @@
         NSInteger const level = [message[@"Level"] integerValue];
         switch (level)
         {
+        case TR_LOG_CRITICAL:
         case TR_LOG_ERROR:
+        case TR_LOG_WARN:
             return [NSImage imageNamed:@"RedDotFlat"];
+
         case TR_LOG_INFO:
             return [NSImage imageNamed:@"YellowDotFlat"];
+
         case TR_LOG_DEBUG:
+        case TR_LOG_TRACE:
             return [NSImage imageNamed:@"PurpleDotFlat"];
+
         default:
             NSAssert1(NO, @"Unknown message log level: %ld", level);
             return nil;
@@ -342,11 +358,17 @@
     case LEVEL_ERROR:
         level = TR_LOG_ERROR;
         break;
+    case LEVEL_WARN:
+        level = TR_LOG_WARN;
+        break;
     case LEVEL_INFO:
         level = TR_LOG_INFO;
         break;
     case LEVEL_DEBUG:
         level = TR_LOG_DEBUG;
+        break;
+    case LEVEL_TRACE:
+        level = TR_LOG_TRACE;
         break;
     default:
         NSAssert1(NO, @"Unknown message log level: %ld", [self.fLevelButton indexOfSelectedItem]);

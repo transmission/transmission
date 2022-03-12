@@ -71,7 +71,7 @@ private:
     Glib::RefPtr<Gtk::ListStore> store_;
     Glib::RefPtr<Gtk::TreeModelFilter> filter_;
     Glib::RefPtr<Gtk::TreeModelSort> sort_;
-    tr_log_level maxLevel_ = TR_LOG_OFF;
+    tr_log_level maxLevel_ = TR_LOG_INFO;
     bool isPaused_ = false;
     sigc::connection refresh_tag_;
 };
@@ -187,16 +187,24 @@ void MessageLogWindow::Impl::doSave(Gtk::Window& parent, Glib::ustring const& fi
 
             switch (node->level)
             {
+            case TR_LOG_TRACE:
+                levelStr = _("trace");
+                break;
+
             case TR_LOG_DEBUG:
-                levelStr = "debug";
+                levelStr = _("debug");
+                break;
+
+            case TR_LOG_WARN:
+                levelStr = _("warn");
                 break;
 
             case TR_LOG_ERROR:
-                levelStr = "error";
+                levelStr = _("error");
                 break;
 
             default:
-                levelStr = "     ";
+                levelStr = _("info");
                 break;
             }
 
@@ -248,19 +256,25 @@ void MessageLogWindow::Impl::onPauseToggled(Gtk::ToggleToolButton* w)
 namespace
 {
 
-void setForegroundColor(Gtk::CellRendererText* renderer, int msgLevel)
+void setForegroundColor(Gtk::CellRendererText* renderer, tr_log_level level)
 {
-    if (msgLevel == TR_LOG_DEBUG)
+    switch (level)
     {
-        renderer->property_foreground() = "forestgreen";
-    }
-    else if (msgLevel == TR_LOG_ERROR)
-    {
+    case TR_LOG_CRITICAL:
+    case TR_LOG_ERROR:
+    case TR_LOG_WARN:
         renderer->property_foreground() = "red";
-    }
-    else
-    {
+        break;
+
+    case TR_LOG_DEBUG:
+    case TR_LOG_TRACE:
+        renderer->property_foreground() = "forestgreen";
+        break;
+
+    case TR_LOG_INFO:
+    case TR_LOG_OFF:
         renderer->property_foreground_set() = false;
+        break;
     }
 }
 
@@ -410,8 +424,10 @@ Gtk::ComboBox* debug_level_combo_new()
 {
     auto* w = gtr_combo_box_new_enum({
         { _("Error"), TR_LOG_ERROR },
+        { _("Warnings"), TR_LOG_WARN },
         { _("Information"), TR_LOG_INFO },
         { _("Debug"), TR_LOG_DEBUG },
+        { _("Trace"), TR_LOG_TRACE },
     });
     gtr_combo_box_set_active_enum(*w, gtr_pref_int_get(TR_KEY_message_level));
     return w;
