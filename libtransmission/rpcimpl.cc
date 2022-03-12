@@ -676,7 +676,7 @@ static void initField(tr_torrent const* const tor, tr_stat const* const st, tr_v
         {
             auto const bytes = tor->createPieceBitfield();
             auto const enc = tr_base64_encode({ reinterpret_cast<char const*>(std::data(bytes)), std::size(bytes) });
-            tr_variantInitStrView(initme, enc);
+            tr_variantInitStr(initme, enc);
         }
         else
         {
