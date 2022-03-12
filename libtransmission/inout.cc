@@ -8,6 +8,8 @@
 #include <optional>
 #include <vector>
 
+#include <fmt/core.h>
+
 #include "transmission.h"
 
 #include "cache.h" /* tr_cacheReadBlock() */
@@ -131,7 +133,13 @@ int readOrWriteBytes(
             if (fd == TR_BAD_SYS_FILE)
             {
                 err = errno;
-                tr_logAddErrorTor(tor, "tr_fdFileCheckout failed for \"%s\": %s", filename.c_str(), tr_strerror(err));
+                tr_logAddErrorTor(
+                    tor,
+                    fmt::format(
+                        _("tr_fdFileCheckout failed for '{path}': {errmsg} ({errcode})"),
+                        fmt::arg("path", filename),
+                        fmt::arg("errmsg", tr_strerror(err)),
+                        fmt::arg("errcode", err)));
             }
             else if (doWrite)
             {
@@ -160,7 +168,13 @@ int readOrWriteBytes(
         if (!readEntireBuf(fd, file_offset, buf, buflen, &error))
         {
             err = error->code;
-            tr_logAddErrorTor(tor, "read failed for \"%s\": %s", tor->fileSubpath(file_index).c_str(), error->message);
+            tr_logAddErrorTor(
+                tor,
+                fmt::format(
+                    _("Couldn't read '{path}': {errmsg} ({errcode})"),
+                    fmt::arg("path", tor->fileSubpath(file_index)),
+                    fmt::arg("errmsg", error->message),
+                    fmt::arg("errcode", error->code)));
             tr_error_free(error);
         }
         break;
@@ -169,7 +183,13 @@ int readOrWriteBytes(
         if (!writeEntireBuf(fd, file_offset, buf, buflen, &error))
         {
             err = error->code;
-            tr_logAddErrorTor(tor, "write failed for \"%s\": %s", tor->fileSubpath(file_index).c_str(), error->message);
+            tr_logAddErrorTor(
+                tor,
+                fmt::format(
+                    _("Couldn't save '{path}': {errmsg} ({errcode})"),
+                    fmt::arg("path", tor->fileSubpath(file_index)),
+                    fmt::arg("errmsg", error->message),
+                    fmt::arg("errcode", error->code)));
             tr_error_free(error);
         }
         break;

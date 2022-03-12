@@ -10,6 +10,8 @@
 
 #include <event2/util.h> /* evutil_inet_ntop() */
 
+#include <fmt/core.h>
+
 #define ENABLE_STRNATPMPERR
 #include "natpmp.h"
 
@@ -38,18 +40,19 @@ static void logVal(char const* func, int ret)
 
     if (ret >= 0)
     {
-        tr_logAddNamedInfo(CodeName, _("%s succeeded (%d)"), func, ret);
+        tr_logAddNamedDebug(CodeName, fmt::format("{} succeeded ({})", func, ret));
     }
     else
     {
         tr_logAddNamedDebug(
             CodeName,
-            "%s failed. Natpmp returned %d (%s); errno is %d (%s)",
-            func,
-            ret,
-            strnatpmperr(ret),
-            errno,
-            tr_strerror(errno));
+            fmt::format(
+                "{} failed. Natpmp returned {} ({}); errno is {} ({})",
+                func,
+                ret,
+                strnatpmperr(ret),
+                errno,
+                tr_strerror(errno)));
     }
 }
 
@@ -110,7 +113,7 @@ tr_port_forwarding tr_natpmpPulse(
         {
             char str[128];
             evutil_inet_ntop(AF_INET, &response.pnu.publicaddress.addr, str, sizeof(str));
-            tr_logAddNamedInfo(CodeName, _("Found public address \"%s\""), str);
+            tr_logAddNamedInfo(CodeName, fmt::format(_("Found public address '{address}'"), fmt::arg("address", str)));
             nat->state = TR_NATPMP_IDLE;
         }
         else if (val != NATPMP_TRYAGAIN)
@@ -143,7 +146,7 @@ tr_port_forwarding tr_natpmpPulse(
         {
             int const unmapped_port = resp.pnu.newportmapping.privateport;
 
-            tr_logAddNamedInfo(CodeName, _("no longer forwarding port %d"), unmapped_port);
+            tr_logAddNamedInfo(CodeName, fmt::format(_("No longer forwarding port {port}"), fmt::arg("port", unmapped_port)));
 
             if (nat->private_port == unmapped_port)
             {
@@ -192,7 +195,9 @@ tr_port_forwarding tr_natpmpPulse(
             nat->renew_time = tr_time() + (resp.pnu.newportmapping.lifetime / 2);
             nat->private_port = resp.pnu.newportmapping.privateport;
             nat->public_port = resp.pnu.newportmapping.mappedpublicport;
-            tr_logAddNamedInfo(CodeName, _("Port %d forwarded successfully"), nat->private_port);
+            tr_logAddNamedInfo(
+                CodeName,
+                fmt::format(_("Port {port} forwarded successfully"), fmt::arg("port", nat->private_port)));
         }
         else if (val != NATPMP_TRYAGAIN)
         {
