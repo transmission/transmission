@@ -7,6 +7,8 @@
 
 #include <windows.h>
 
+#include <fmt/core.h>
+
 #include <libtransmission/transmission.h>
 #include <libtransmission/error.h>
 #include <libtransmission/log.h>
@@ -52,7 +54,7 @@ static void set_system_error(tr_error** error, DWORD code, char const* message)
 static void do_log_system_error(char const* file, int line, tr_log_level level, DWORD code, char const* message)
 {
     char* const system_message = tr_win32_format_message(code);
-    tr_logAddMessage(file, line, level, "[dtr_daemon] %s (0x%08lx): %s", message, code, system_message);
+    tr_logAddMessage(file, line, level, fmt::format("[dtr_daemon] {} ({:#x}): {}", message, code, system_message));
     tr_free(system_message);
 }
 

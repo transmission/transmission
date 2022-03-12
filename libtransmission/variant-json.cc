@@ -16,6 +16,8 @@
 
 #include <event2/buffer.h>
 
+#include <fmt/core.h>
+
 #define LIBTRANSMISSION_VARIANT_MODULE
 
 #include "transmission.h"
@@ -79,7 +81,8 @@ static void error_handler(jsonsl_t jsn, jsonsl_error_t error, jsonsl_state_st* /
 {
     auto* data = static_cast<struct json_wrapper_data*>(jsn->data);
 
-    tr_logAddError("JSON parse failed at pos %zu: %s -- remaining text \"%.16s\"", jsn->pos, jsonsl_strerror(error), buf);
+    tr_logAddError(
+        fmt::format(_("JSON parse failed at pos {}: {} -- remaining text '{:16s}'"), jsn->pos, jsonsl_strerror(error), buf));
 
     data->error = EILSEQ;
 }

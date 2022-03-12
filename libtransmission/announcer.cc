@@ -1579,7 +1579,7 @@ static void scrapeAndAnnounceMore(tr_announcer* announcer)
 
     for (auto*& tier : announce_me)
     {
-        tr_logAddTraceTier(tier, "%s", "Announcing to tracker");
+        tr_logAddTraceTier(tier, "Announcing to tracker");
         tierAnnounce(announcer, tier);
     }
 }

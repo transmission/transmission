@@ -15,6 +15,8 @@
 
 #include <event2/buffer.h>
 
+#include <fmt/core.h>
+
 #include <libtransmission/transmission.h>
 
 #include <libtransmission/log.h>
@@ -1107,7 +1109,8 @@ void Session::Impl::add_file_async_callback(
     {
         if (!file->load_contents_finish(result, contents, length))
         {
-            g_message(_("Couldn't read \"%s\""), file->get_parse_name().c_str());
+            auto const errmsg = fmt::format(_("Couldn't read '{path}'"), fmt::arg("path", file->get_parse_name().raw()));
+            g_message("%s", errmsg.c_str());
         }
         else if (tr_ctorSetMetainfo(ctor, contents, length, nullptr))
         {
@@ -1120,7 +1123,11 @@ void Session::Impl::add_file_async_callback(
     }
     catch (Glib::Error const& e)
     {
-        g_message(_("Couldn't read \"%s\": %s"), file->get_parse_name().c_str(), e.what().c_str());
+        auto const errmsg = fmt::format(
+            _("Couldn't read '{path}': {errmsg}"),
+            fmt::arg("path", file->get_parse_name().raw()),
+            fmt::arg("errmsg", e.what().raw()));
+        g_message("%s", errmsg.c_str());
     }
 
     dec_busy();
@@ -1437,13 +1444,13 @@ bool gtr_inhibit_hibernation(guint32& cookie)
         cookie = Glib::VariantBase::cast_dynamic<Glib::Variant<guint32>>(response.get_child(0)).get();
 
         /* logging */
-        tr_logAddInfo("%s", _("Inhibiting desktop hibernation"));
+        tr_logAddInfo(_("Inhibiting desktop hibernation"));
 
         success = true;
     }
     catch (Glib::Error const& e)
     {
-        tr_logAddError(_("Couldn't inhibit desktop hibernation: %s"), e.what().c_str());
+        tr_logAddError(fmt::format(_("Couldn't inhibit desktop hibernation: {}"), e.what().raw()));
     }
 
     return success;
@@ -1464,7 +1471,7 @@ void gtr_uninhibit_hibernation(guint inhibit_cookie)
             1000);
 
         /* logging */
-        tr_logAddInfo("%s", _("Allowing desktop hibernation"));
+        tr_logAddInfo(_("Allowing desktop hibernation"));
     }
     catch (Glib::Error const& e)
     {

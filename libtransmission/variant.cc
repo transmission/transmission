@@ -1215,7 +1215,11 @@ int tr_variantToFile(tr_variant const* v, tr_variant_fmt fmt, std::string const&
     tr_saveFile(filename, { std::data(contents), std::size(contents) }, &error);
     if (error != nullptr)
     {
-        tr_logAddError(_("Error saving \"%" TR_PRIsv "\": %s (%d)"), TR_PRIsv_ARG(filename), error->message, error->code);
+        tr_logAddError(fmt::format(
+            _("Couldn't save '{path}': {errmsg} ({errcode})"),
+            fmt::arg("path", filename),
+            fmt::arg("errmsg", error->message),
+            fmt::arg("errcode", error->code)));
         error_code = error->code;
         tr_error_clear(&error);
     }

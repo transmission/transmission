@@ -672,7 +672,7 @@ static void myDebug(char const* file, int line, tr_log_level level, tr_peerMsgsI
     evbuffer_add_vprintf(buf, fmt, args);
     va_end(args);
     auto const message = evbuffer_free_to_str(buf);
-    tr_logAddMessage(file, line, level, tr_torrentName(msgs->torrent), "%s", message.c_str());
+    tr_logAddMessage(file, line, level, tr_torrentName(msgs->torrent), message);
 }
 
 #define logdbg(msgs, ...) myDebug(__FILE__, __LINE__, TR_LOG_DEBUG, msgs, __VA_ARGS__)
