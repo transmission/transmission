@@ -33,6 +33,8 @@
 
 #include <event2/buffer.h>
 
+#include <fmt/core.h>
+
 #define LIBTRANSMISSION_VARIANT_MODULE
 
 #include "transmission.h"
@@ -968,7 +970,7 @@ void tr_variantWalk(tr_variant const* v_in, struct VariantWalkFuncs const* walkF
 
             default:
                 /* did caller give us an uninitialized val? */
-                tr_logAddError("%s", _("Invalid metadata"));
+                tr_logAddError(_("Invalid metadata"));
                 break;
             }
         }
@@ -1056,7 +1058,7 @@ static void tr_variantListCopy(tr_variant* target, tr_variant const* src)
         }
         else
         {
-            tr_logAddError("tr_variantListCopy skipping item");
+            tr_logAddWarn("tr_variantListCopy skipping item");
         }
 
         ++i;
@@ -1159,7 +1161,7 @@ void tr_variantMergeDicts(tr_variant* target, tr_variant const* source)
             }
             else
             {
-                tr_logAddDebug("tr_variantMergeDicts skipping \"%s\"", tr_quark_get_string(key));
+                tr_logAddDebug(fmt::format("tr_variantMergeDicts skipping '{}'", tr_quark_get_string(key)));
             }
         }
     }
