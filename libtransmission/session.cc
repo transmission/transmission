@@ -2051,7 +2051,7 @@ static void sessionLoadTorrents(struct sessionLoadTorrentsData* const data)
 
     if (n != 0)
     {
-        tr_logAddInfo(fmt::format(_("Loaded {count} torrents"), fmt::arg("count", n)));
+        tr_logAddInfo(fmt::format(ngettext_("Loaded {count} torrent", "Loaded {count} torrents", n), fmt::arg("count", n)));
     }
 
     if (data->setmeCount != nullptr)
