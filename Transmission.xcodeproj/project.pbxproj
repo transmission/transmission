@@ -3460,9 +3460,11 @@
 					"$(inherited)",
 					.,
 					"third-party/libevent/include",
+					"third-party/fmt/include",
 				);
 				OTHER_CFLAGS = (
 					"$(inherited)",
+					"-DFMT_HEADER_ONLY",
 					"-DHAVE_DAEMON",
 				);
 				OTHER_LDFLAGS = "-lc++";
@@ -3872,10 +3874,12 @@
 					"$(inherited)",
 					.,
 					"third-party/libevent/include",
+					"third-party/fmt/include",
 				);
 				OTHER_CFLAGS = (
 					"$(inherited)",
 					"-DHAVE_DAEMON",
+					"-DFMT_HEADER_ONLY",
 				);
 				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_NAME = "transmission-daemon";
@@ -4039,9 +4043,11 @@
 					"$(inherited)",
 					.,
 					"third-party/libevent/include",
+					"third-party/fmt/include",
 				);
 				OTHER_CFLAGS = (
 					"$(inherited)",
+					"-DFMT_HEADER_ONLY",
 					"-DHAVE_DAEMON",
 				);
 				OTHER_LDFLAGS = "-lc++";
