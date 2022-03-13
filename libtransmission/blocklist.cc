@@ -415,7 +415,7 @@ int tr_blocklistFileSetContent(tr_blocklistFile* b, char const* filename)
         if (!parseLine(line, &range))
         {
             /* don't try to display the actual lines - it causes issues */
-            tr_logAddWarn(fmt::format(_("blocklist skipped invalid address at line {count}"), fmt::arg("count", inCount)));
+            tr_logAddWarn(fmt::format(_("Blocklist skipped invalid address at line {line}"), fmt::arg("line", inCount)));
             continue;
         }
 
