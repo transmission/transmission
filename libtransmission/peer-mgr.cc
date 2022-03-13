@@ -2399,7 +2399,7 @@ static void closePeer(tr_peer* peer)
     else
     {
         ++atom->numFails;
-        tr_logAddTraceSwarm(s, fmt::format("incremented atom {} numFails to {}", tr_atomAddrStr(atom), int(atom->numFails)));
+        tr_logAddTraceSwarm(s, fmt::format("incremented atom {} numFails to {}", tr_atomAddrStr(atom), atom->numFails));
     }
 
     tr_logAddTraceSwarm(s, fmt::format("removing bad peer {}", tr_atomAddrStr(peer->atom)));
