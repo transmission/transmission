@@ -28,6 +28,7 @@
 #include <event2/event.h>
 
 #include <fmt/core.h>
+#include <fmt/format.h> // fmt::ptr
 
 #include "transmission.h"
 

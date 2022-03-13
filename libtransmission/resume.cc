@@ -10,6 +10,7 @@
 #include <vector>
 
 #include <fmt/core.h>
+#include <fmt/format.h> // fmt::ptr
 
 #include "transmission.h"
 
