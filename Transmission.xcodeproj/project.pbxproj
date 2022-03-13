@@ -3399,6 +3399,7 @@
 				OTHER_CFLAGS = (
 					"$(inherited)",
 					"-DWITH_UTP",
+					"-DFMT_HEADER_ONLY",
 					"-D__TRANSMISSION__",
 					"-DHAVE_FLOCK",
 					"-DHAVE_STRLCPY",
@@ -3594,6 +3595,7 @@
 				OTHER_CFLAGS = (
 					"$(inherited)",
 					"-DWITH_UTP",
+					"-DFMT_HEADER_ONLY",
 					"-D__TRANSMISSION__",
 					"-DHAVE_FLOCK",
 					"-DHAVE_STRLCPY",
@@ -3846,6 +3848,7 @@
 				OTHER_CFLAGS = (
 					"$(inherited)",
 					"-DWITH_UTP",
+					"-DFMT_HEADER_ONLY",
 					"-D__TRANSMISSION__",
 					"-DHAVE_FLOCK",
 					"-DHAVE_STRLCPY",
