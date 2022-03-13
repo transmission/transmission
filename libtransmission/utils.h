@@ -49,7 +49,7 @@ char const* tr_strip_positional_args(char const* fmt);
 #include <libintl.h>
 #define ngettext_(singular, plural, count) ngettext(singular, plural, count)
 #else
-#define ngettext_(singular, plural, count) (singular)
+#define ngettext_(singular, plural, count) ((count) == 1 ? (singular) : (plural))
 #endif
 #endif
 
@@ -63,7 +63,7 @@ char const* tr_strip_positional_args(char const* fmt);
 #undef _
 #undef ngettext_
 #define _(a) tr_strip_positional_args(a)
-#define ngettext_(singular, plural, count) tr_strip_positional_args(singular)
+#define ngettext_(singular, plural, count) tr_strip_positional_args((count) == 1 ? (singular) : (plural))
 #endif
 
 /****
