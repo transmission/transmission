@@ -510,7 +510,7 @@ static void utp_on_state_change(void* vio, int state)
     }
     else
     {
-        tr_logAddErrorIo(io, fmt::format(_("Unknown state: {}"), state));
+        tr_logAddErrorIo(io, fmt::format(_("Unknown state: {state}"), fmt::arg("state", state)));
     }
 }
 
