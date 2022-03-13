@@ -136,7 +136,7 @@ int readOrWriteBytes(
                 tr_logAddErrorTor(
                     tor,
                     fmt::format(
-                        _("tr_fdFileCheckout failed for '{path}': {errmsg} ({errcode})"),
+                        _("Couldn't get '{path}': {errmsg} ({errcode})"),
                         fmt::arg("path", filename),
                         fmt::arg("errmsg", tr_strerror(err)),
                         fmt::arg("errcode", err)));
