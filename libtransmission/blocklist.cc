@@ -101,7 +101,7 @@ static void blocklistLoad(tr_blocklistFile* b)
 
     char* const base = tr_sys_path_basename(b->filename, nullptr);
     tr_logAddInfo(fmt::format(
-        ngettext("Blocklist '{path}' has {count} entry", "Blocklist '{path}' has {count} entries", b->ruleCount),
+        ngettext_("Blocklist '{path}' has {count} entry", "Blocklist '{path}' has {count} entries", b->ruleCount),
         fmt::arg("path", base),
         fmt::arg("count", b->ruleCount)));
     tr_free(base);
