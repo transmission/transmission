@@ -36,11 +36,20 @@ struct tr_error;
 char const* tr_strip_positional_args(char const* fmt);
 
 #if !defined(_)
-#if defined(HAVE_LIBINTL_H) && !defined(__APPLE__)
+#if defined(HAVE_GETTEXT) && !defined(__APPLE__)
 #include <libintl.h>
 #define _(a) gettext(a)
 #else
 #define _(a) (a)
+#endif
+#endif
+
+#if !defined(ngettext_)
+#if defined(HAVE_NGETTEXT) && !defined(__APPLE__)
+#include <libintl.h>
+#define ngettext_(singular, plural, count) ngettext(singular, plural, count)
+#else
+#define ngettext_(singular, plural, count) (singular)
 #endif
 #endif
 
@@ -52,7 +61,9 @@ char const* tr_strip_positional_args(char const* fmt);
 #endif
 #ifdef DISABLE_GETTEXT
 #undef _
+#undef ngettext_
 #define _(a) tr_strip_positional_args(a)
+#define ngettext_(singular, plural, count) tr_strip_positional_args(singular)
 #endif
 
 /****

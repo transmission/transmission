@@ -606,6 +606,8 @@ if(ENABLE_NLS)
     if(HAVE_LIBINTL)
         set(LIBINTL_LIBRARY intl)
     endif()
+    check_function_exists(gettext "libintl.h" HAVE_GETTEXT)
+    check_function_exists(ngettext "libintl.h" HAVE_NGETTEXT)
 endif()
 
 check_library_exists(m sqrt "" HAVE_LIBM)
