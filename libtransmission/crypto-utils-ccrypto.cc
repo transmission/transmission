@@ -12,7 +12,10 @@
 #include <CommonCrypto/CommonDigest.h>
 #include <CommonCrypto/CommonRandom.h>
 
+#include <fmt/base.h>
+
 #include "transmission.h"
+
 #include "crypto-utils.h"
 #include "log.h"
 #include "tr-assert.h"
