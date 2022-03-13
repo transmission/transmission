@@ -448,7 +448,7 @@ static void utp_on_write(void* vio, unsigned char* buf, size_t buflen)
 
     if (rc < (long)buflen)
     {
-        tr_logAddWarnIo(io, fmt::format(_("Short write: {} < {}"), rc, (long)buflen));
+        tr_logAddWarnIo(io, fmt::format(_("Short write: {} < {}"), rc, buflen));
     }
 
     didWriteWrapper(io, buflen);
