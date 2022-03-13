@@ -483,7 +483,10 @@ int tr_blocklistFileSetContent(tr_blocklistFile* b, char const* filename)
     {
         char* base = tr_sys_path_basename(b->filename, nullptr);
         tr_logAddInfo(fmt::format(
-            _("Blocklist '{path}' updated with {count} entries"),
+            ngettext_(
+                "Blocklist '{path}' updated with {count} entry",
+                "Blocklist '{path}' updated with {count} entries",
+                ranges_count),
             fmt::arg("path", base),
             fmt::arg("count", ranges_count)));
         tr_free(base);
