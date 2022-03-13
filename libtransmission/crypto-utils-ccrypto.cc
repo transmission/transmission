@@ -12,7 +12,7 @@
 #include <CommonCrypto/CommonDigest.h>
 #include <CommonCrypto/CommonRandom.h>
 
-#include <fmt/base.h>
+#include <fmt/core.h>
 
 #include "transmission.h"
 
