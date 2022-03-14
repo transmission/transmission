@@ -1427,7 +1427,7 @@ static void scrape_request_delegate(
     }
     else
     {
-        tr_logAddError(fmt::format(_("Unsupported URL: {url}"), fmt::arg("url", scrape_sv)));
+        tr_logAddError(fmt::format(_("Unsupported URL: '{url}'"), fmt::arg("url", scrape_sv)));
     }
 }
 

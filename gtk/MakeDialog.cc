@@ -123,7 +123,7 @@ bool MakeProgressDialog::onProgressDialogRefresh()
     }
     else if (builder_.result == TrMakemetaResult::ERR_URL)
     {
-        str = fmt::format(_("Unsupported URL: {url}"), fmt::arg("url", builder_.errfile));
+        str = fmt::format(_("Unsupported URL: '{url}'"), fmt::arg("url", builder_.errfile));
     }
     else if (builder_.result == TrMakemetaResult::ERR_IO_READ)
     {

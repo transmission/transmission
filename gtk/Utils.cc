@@ -452,7 +452,7 @@ void gtr_unrecognized_url_dialog(Gtk::Widget& parent, Glib::ustring const& url)
 
     auto w = std::make_shared<Gtk::MessageDialog>(
         *window,
-        fmt::format(_("Unsupported URL: {url}"), fmt::arg("url", url.raw())),
+        fmt::format(_("Unsupported URL: '{url}'"), fmt::arg("url", url.raw())),
         false /*use markup*/,
         Gtk::MESSAGE_ERROR,
         Gtk::BUTTONS_CLOSE,
