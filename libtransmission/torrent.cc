@@ -28,7 +28,7 @@
 
 #include <event2/util.h> /* evutil_vsnprintf() */
 
-#include <fmt/base.h>
+#include <fmt/core.h>
 
 #include "transmission.h"
 
@@ -1807,9 +1807,10 @@ void tr_torrent::recheckCompleteness()
         {
             logtrace(
                 this,
-                fmt::format("State changed from {} to {}"),
-                getCompletionString(this->completeness),
-                getCompletionString(completeness));
+                fmt::format(
+                    "State changed from {} to {}",
+                    getCompletionString(this->completeness),
+                    getCompletionString(completeness)));
         }
 
         this->completeness = new_completeness;

@@ -12,7 +12,7 @@
 #include <giomm.h> /* g_file_trash() */
 #include <glibmm/i18n.h>
 
-#include <fmt/base.h>
+#include <fmt/core.h>
 
 #include <libtransmission/transmission.h> /* TR_RATIO_NA, TR_RATIO_INF */
 

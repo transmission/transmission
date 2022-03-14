@@ -841,19 +841,30 @@ Gtk::ComboBox* new_time_combo(Glib::RefPtr<Session> const& core, tr_quark const 
     return w;
 }
 
+static auto get_weekday_string(Glib::Date::Weekday weekday)
+{
+    auto date = Glib::Date{};
+    date.set_time_current();
+    while (date.get_weekday() != weekday)
+    {
+        date.add_days(1);
+    }
+    return date.format_string("%A");
+}
+
 Gtk::ComboBox* new_week_combo(Glib::RefPtr<Session> const& core, tr_quark const key)
 {
     auto* w = gtr_combo_box_new_enum({
         { _("Every Day"), TR_SCHED_ALL },
         { _("Weekdays"), TR_SCHED_WEEKDAY },
         { _("Weekends"), TR_SCHED_WEEKEND },
-        { _("Sunday"), TR_SCHED_SUN },
-        { _("Monday"), TR_SCHED_MON },
-        { _("Tuesday"), TR_SCHED_TUES },
-        { _("Wednesday"), TR_SCHED_WED },
-        { _("Thursday"), TR_SCHED_THURS },
-        { _("Friday"), TR_SCHED_FRI },
-        { _("Saturday"), TR_SCHED_SAT },
+        { get_weekday_string(Glib::Date::MONDAY), TR_SCHED_MON },
+        { get_weekday_string(Glib::Date::TUESDAY), TR_SCHED_TUES },
+        { get_weekday_string(Glib::Date::WEDNESDAY), TR_SCHED_WED },
+        { get_weekday_string(Glib::Date::THURSDAY), TR_SCHED_THURS },
+        { get_weekday_string(Glib::Date::FRIDAY), TR_SCHED_FRI },
+        { get_weekday_string(Glib::Date::SATURDAY), TR_SCHED_SAT },
+        { get_weekday_string(Glib::Date::SUNDAY), TR_SCHED_SUN },
     });
     gtr_combo_box_set_active_enum(*w, gtr_pref_int_get(key));
     w->signal_changed().connect([w, key, core]() { onIntComboChanged(w, key, core); });

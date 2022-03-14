@@ -7,9 +7,9 @@
 #include <string>
 
 #include <glibmm.h>
-#include <glibmm/i18n.h>a
+#include <glibmm/i18n.h>
 
-#include <fmt/base.h>
+#include <fmt/core.h>
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/makemeta.h>
