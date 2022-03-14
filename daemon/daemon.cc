@@ -264,8 +264,6 @@ static auto onFileAdded(tr_watchdir_t dir, char const* name, void* vsession)
         bool trash = false;
         bool const test = tr_ctorGetDeleteSource(ctor, &trash);
 
-        tr_logAddInfo(fmt::format(_("Couldn't parse .torrent file '{path}'"), fmt::arg("path", name)));
-
         if (test && trash)
         {
             tr_error* error = nullptr;
