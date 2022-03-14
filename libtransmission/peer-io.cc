@@ -449,7 +449,11 @@ static void utp_on_write(void* vio, unsigned char* buf, size_t buflen)
 
     if (rc < (long)buflen)
     {
-        tr_logAddWarnIo(io, fmt::format(_("Short write: {} < {}"), rc, buflen));
+        auto const errmsg = fmt::format(
+            _("Unable to write {expected_size} bytes to peer; wrote {actual_size}"),
+            fmt::arg("expected_size", buflen),
+            fmt::arg("actual-size", rc));
+        tr_logAddWarnIo(io, errmsg);
     }
 
     didWriteWrapper(io, buflen);
