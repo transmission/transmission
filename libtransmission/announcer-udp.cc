@@ -465,7 +465,8 @@ static void tau_tracker_on_dns(int errcode, struct evutil_addrinfo* addr, void* 
     if (errcode != 0)
     {
         auto const errmsg = fmt::format(
-            _("DNS lookup failed: {errmsg} ({errcode})"),
+            _("Couldn't find address of tracker '{host}': {errmsg} ({errcode})"),
+            fmt::arg("host", tracker->host.sv()),
             fmt::arg("errmsg", evutil_gai_strerror(errcode)),
             fmt::arg("errcode", errcode));
         logwarn(tracker->key, errmsg);
