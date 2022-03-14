@@ -1161,7 +1161,8 @@ bool tr_moveFile(char const* oldpath, char const* newpath, tr_error** error)
         if (!tr_sys_path_remove(oldpath, &my_error))
         {
             tr_logAddError(fmt::format(
-                _("Unable to remove file at old path: {errmsg} ({errcode})"),
+                _("Couldn't remove '{path}': {errmsg} ({errcode})"),
+                fmt::arg("path", oldpath),
                 fmt::arg("errmsg", my_error->message),
                 fmt::arg("errcode", my_error->code)));
             tr_error_free(my_error);
