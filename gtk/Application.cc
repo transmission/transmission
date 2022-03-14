@@ -346,7 +346,12 @@ void register_magnet_link_handler()
     }
     catch (Gio::Error const& e)
     {
-        g_warning(_("Error registering Transmission as a %s handler: %s"), content_type.c_str(), e.what().c_str());
+        auto const msg = fmt::format(
+            _("Couldn't register Transmission as a {content_type} handler: {errmsg} ({errcode})"),
+            fmt::arg("content_type", content_type),
+            fmt::arg("errmsg", e.what().raw()),
+            fmt::arg("errcode", e.code()));
+        g_warning("%s", msg.c_str());
     }
 }
 
