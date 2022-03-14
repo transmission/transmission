@@ -58,7 +58,10 @@ static void log_polarssl_error(int error_code, char const* file, int line)
         error_strerror(error_code, error_message, sizeof(error_message));
 #endif
 
-        auto const errmsg = fmt::format(_("PolarSSL error: {errmsg}"), fmt::arg("errmsg", error_message));
+        auto const errmsg = fmt::format(
+            _("PolarSSL error: {errmsg} ({errcode})"),
+            fmt::arg("errmsg", error_message),
+            fmt::arg("errcode", error_code));
         tr_logAddMessage(file, line, TR_LOG_ERROR, MyName, errmsg);
     }
 }
