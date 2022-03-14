@@ -786,7 +786,10 @@ static void startServer(tr_rpc_server* server)
         }
 
         tr_logAddError(fmt::format(
-            _("Couldn't bind to {address} after {count} attempts, giving up"),
+            ngettext(
+                "Couldn't bind to {address} after {count} attempt, giving up",
+                "Couldn't bind to {address} after {count} attempts, giving up",
+                ServerStartRetryCount),
             fmt::arg("address", addr_port_str),
             fmt::arg("count", ServerStartRetryCount)));
     }
