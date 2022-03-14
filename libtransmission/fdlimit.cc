@@ -219,12 +219,12 @@ static int cached_file_open(
         if (allocation == TR_PREALLOCATE_FULL)
         {
             success = preallocate_file_full(fd, file_size, &error);
-            type = _("full");
+            type = "full";
         }
         else if (allocation == TR_PREALLOCATE_SPARSE)
         {
             success = preallocate_file_sparse(fd, file_size, &error);
-            type = _("sparse");
+            type = "sparse";
         }
 
         TR_ASSERT(type != nullptr);
