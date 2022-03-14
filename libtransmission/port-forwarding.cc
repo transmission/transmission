@@ -8,6 +8,8 @@
 
 #include <event2/event.h>
 
+#include <fmt/core.h>
+
 #include "transmission.h"
 #include "natpmp_local.h"
 #include "log.h"
@@ -104,7 +106,10 @@ static void natPulse(tr_shared* s, bool do_check)
 
     if (new_status != old_status)
     {
-        loginfo(_("State changed from \"%1$s\" to \"%2$s\""), getNatStateStr(old_status), getNatStateStr(new_status));
+        loginfo(fmt::format(
+            _("State changed from '{old_state}' to '{state}"),
+            fmt::arg("old_state", getNatStateStr(old_status)),
+            fmt::arg("state", getNatStateStr(new_status))));
     }
 }
 
