@@ -361,9 +361,9 @@ tr_port_forwarding tr_upnpPulse(tr_upnp* handle, tr_port port, bool isEnabled, b
         }
 
         tr_logAddInfo(fmt::format(
-            _("Port forwarding through '{url}', service '{text}. (local address: {address}:{port})"),
+            _("Port forwarding through '{url}', service '{type}'. (local address: {address}:{port})"),
             fmt::arg("url", handle->urls.controlURL),
-            fmt::arg("text", handle->data.first.servicetype),
+            fmt::arg("type", handle->data.first.servicetype),
             fmt::arg("address", handle->lanaddr),
             fmt::arg("port", port)));
 
