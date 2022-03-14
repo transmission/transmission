@@ -1016,10 +1016,7 @@ static bool on_handshake_done(tr_handshake_result const& result)
                 {
                     tr_logAddTraceSwarm(
                         s,
-                        fmt::format(
-                            "marking peer {} as unreachable... numFails is {}",
-                            tr_atomAddrStr(atom),
-                            int(atom->numFails)));
+                        fmt::format("marking peer {} as unreachable... numFails is {}", tr_atomAddrStr(atom), atom->numFails));
                     atom->flags2 |= MyflagUnreachable;
                 }
             }
