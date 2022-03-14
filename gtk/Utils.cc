@@ -12,6 +12,8 @@
 #include <giomm.h> /* g_file_trash() */
 #include <glibmm/i18n.h>
 
+#include <fmt/base.h>
+
 #include <libtransmission/transmission.h> /* TR_RATIO_NA, TR_RATIO_INF */
 
 #include <libtransmission/error.h>
@@ -450,7 +452,7 @@ void gtr_unrecognized_url_dialog(Gtk::Widget& parent, Glib::ustring const& url)
 
     auto w = std::make_shared<Gtk::MessageDialog>(
         *window,
-        _("Unrecognized URL"),
+        fmt::format(_("Unsupported URL: {url}"), fmt::arg("url", url.raw())),
         false /*use markup*/,
         Gtk::MESSAGE_ERROR,
         Gtk::BUTTONS_CLOSE,

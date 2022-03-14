@@ -7,7 +7,9 @@
 #include <string>
 
 #include <glibmm.h>
-#include <glibmm/i18n.h>
+#include <glibmm/i18n.h>a
+
+#include <fmt/base.h>
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/makemeta.h>
@@ -121,7 +123,7 @@ bool MakeProgressDialog::onProgressDialogRefresh()
     }
     else if (builder_.result == TrMakemetaResult::ERR_URL)
     {
-        str = gtr_sprintf(_("Error: invalid announce URL \"%s\""), builder_.errfile);
+        str = fmt::format(_("Unsupported URL: {url}"), fmt::arg("url", builder_.errfile));
     }
     else if (builder_.result == TrMakemetaResult::ERR_IO_READ)
     {

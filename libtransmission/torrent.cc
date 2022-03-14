@@ -28,6 +28,8 @@
 
 #include <event2/util.h> /* evutil_vsnprintf() */
 
+#include <fmt/base.h>
+
 #include "transmission.h"
 
 #include "announcer.h"
@@ -1650,13 +1652,13 @@ static char const* getCompletionString(int type)
            "Complete" means we've downloaded every file in the torrent.
            "Done" means we're done downloading the files we wanted, but NOT all
            that exist */
-        return _("Done");
+        return "Done";
 
     case TR_SEED:
-        return _("Complete");
+        return "Complete";
 
     default:
-        return _("Incomplete");
+        return "Incomplete";
     }
 }
 
@@ -1805,7 +1807,7 @@ void tr_torrent::recheckCompleteness()
         {
             logtrace(
                 this,
-                _("State changed from \"%1$s\" to \"%2$s\""),
+                fmt::format("State changed from {} to {}"),
                 getCompletionString(this->completeness),
                 getCompletionString(completeness));
         }
