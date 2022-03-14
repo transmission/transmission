@@ -327,9 +327,9 @@ tr_port_forwarding tr_upnpPulse(tr_upnp* handle, tr_port port, bool isEnabled, b
         tr_upnpDeletePortMapping(handle, "UDP", handle->port);
 
         tr_logAddInfo(fmt::format(
-            _("Stopping port forwarding through '{url}', service '{text}'"),
+            _("Stopping port forwarding through '{url}', service '{type}'"),
             fmt::arg("url", handle->urls.controlURL),
-            fmt::arg("text", handle->data.first.servicetype)));
+            fmt::arg("type", handle->data.first.servicetype)));
 
         handle->isMapped = false;
         handle->state = UpnpState::IDLE;
