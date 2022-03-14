@@ -160,10 +160,7 @@ std::string tr_address::to_string(tr_port port) const
 {
     auto addrbuf = std::array<char, TR_ADDRSTRLEN>{};
     tr_address_to_string_with_buf(this, std::data(addrbuf), std::size(addrbuf));
-
-    auto buf = std::array<char, TR_ADDRSTRLEN>{};
-    tr_snprintf(std::data(buf), std::size(buf), "[%s]:%u", std::data(addrbuf), ntohs(port));
-    return std::data(buf);
+    return fmt::format("[{}]:{}", std::data(addrbuf), ntohs(port));
 }
 
 tr_address tr_address::from_4byte_ipv4(std::string_view in)
