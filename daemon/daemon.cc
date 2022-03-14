@@ -268,12 +268,12 @@ static auto onFileAdded(tr_watchdir_t dir, char const* name, void* vsession)
         {
             tr_error* error = nullptr;
 
-            tr_logAddInfo(fmt::format(_("Deleting .torrent file '{path}'"), fmt::arg("path", name)));
+            tr_logAddInfo(fmt::format(_("Removing .torrent file '{path}'"), fmt::arg("path", name)));
 
             if (!tr_sys_path_remove(filename.c_str(), &error))
             {
                 tr_logAddError(fmt::format(
-                    _("Couldn't delete '{path}': {errmsg} ({errcode})"),
+                    _("Couldn't remove '{path}': {errmsg} ({errcode})"),
                     fmt::arg("path", name),
                     fmt::arg("errmsg", error->message),
                     fmt::arg("errcode", error->code)));
