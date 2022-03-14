@@ -1918,14 +1918,14 @@ void tr_torrentSetGroup(tr_torrent* tor, std::string_view group)
     auto const lock = tor->unique_lock();
 
     tor->group = std::string{ group };
-    tr_bandwidth_group* bw_group = tr_bandwidthGroupFind(tor->session, group);
-    if (bw_group == nullptr)
+    Bandwidth* bw = tor->session->bandwidthGroupFind(group);
+    if (bw == nullptr)
     {
         tor->bandwidth->setParent(tor->session->bandwidth);
     }
     else
     {
-        tor->bandwidth->setParent(bw_group->bandwidth);
+        tor->bandwidth->setParent(bw);
     }
 
     tor->setDirty();

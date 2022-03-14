@@ -348,159 +348,27 @@ void Bandwidth::notifyBandwidthConsumed(tr_direction dir, size_t byte_count, boo
 ***/
 
 void tr_bandwidthGroupGetLimits(
-    tr_bandwidth_group* group,
+    Bandwidth* group,
     bool* up_limited,
     unsigned int* up_limit,
     bool* down_limited,
     unsigned int* down_limit)
 {
-    *up_limit = tr_toSpeedKBps(group->bandwidth->getDesiredSpeedBytesPerSecond(TR_UP));
-    *down_limit = tr_toSpeedKBps(group->bandwidth->getDesiredSpeedBytesPerSecond(TR_DOWN));
-    *up_limited = group->bandwidth->isLimited(TR_UP);
-    *down_limited = group->bandwidth->isLimited(TR_DOWN);
+    *up_limit = tr_toSpeedKBps(group->getDesiredSpeedBytesPerSecond(TR_UP));
+    *down_limit = tr_toSpeedKBps(group->getDesiredSpeedBytesPerSecond(TR_DOWN));
+    *up_limited = group->isLimited(TR_UP);
+    *down_limited = group->isLimited(TR_DOWN);
 }
 
 void tr_bandwidthGroupSetLimits(
-    tr_bandwidth_group* group,
+    Bandwidth* group,
     bool up_limited,
     unsigned int up_limit,
     bool down_limited,
     unsigned int down_limit)
 {
-    group->bandwidth->setDesiredSpeedBytesPerSecond(TR_UP, tr_toSpeedBytes(up_limit));
-    group->bandwidth->setDesiredSpeedBytesPerSecond(TR_DOWN, tr_toSpeedBytes(down_limit));
-    group->bandwidth->setLimited(TR_UP, up_limited);
-    group->bandwidth->setLimited(TR_DOWN, down_limited);
-}
-
-/* Should only be called if the group does not exist */
-tr_bandwidth_group* tr_bandwidthGroupNew(tr_session* session, std::string name)
-{
-    tr_bandwidth_group* newGroup = tr_new0(tr_bandwidth_group, 1);
-    newGroup->next = nullptr;
-    newGroup->name = name;
-    newGroup->bandwidth = new Bandwidth(session->bandwidth);
-    return newGroup;
-}
-
-/* Find a bandwidth group by name. Create if it does not exist */
-tr_bandwidth_group* tr_bandwidthGroupFind(tr_session* session, std::string_view name)
-{
-    if (name.empty())
-    {
-        return nullptr;
-    }
-
-    tr_bandwidth_group* found = session->groups;
-    tr_bandwidth_group* last = nullptr;
-    while (found != nullptr && name != found->name)
-    {
-        last = found;
-        found = found->next;
-    }
-
-    if (found == nullptr)
-    {
-        found = tr_bandwidthGroupNew(session, std::string{ name });
-        if (last != nullptr)
-        {
-            last->next = found;
-        }
-        else
-        {
-            session->groups = found;
-        }
-    }
-    return found;
-}
-
-void tr_bandwidthGroupRead(tr_session* session, char const* configDir)
-{
-    tr_variant group_list;
-    char* filename = tr_buildPath(configDir, "bandwidthGroups", nullptr);
-    if (tr_variantFromFile(&group_list, TR_VARIANT_PARSE_JSON, filename, nullptr) && tr_variantIsList(&group_list))
-    {
-        int n = tr_variantListSize(&group_list);
-
-        for (int i = 0; i < n; i++)
-        {
-            tr_variant* dict = tr_variantListChild(&group_list, i);
-            std::string_view name;
-            if (tr_variantDictFindStrView(dict, TR_KEY_name, &name) && !name.empty())
-            {
-                bool u = false;
-                bool d = false;
-                bool honors = false;
-                uint32_t up = 0;
-                uint32_t down = 0;
-                int64_t val = 0;
-
-                tr_variantDictFindBool(dict, TR_KEY_uploadLimited, &u);
-                if (tr_variantDictFindInt(dict, TR_KEY_uploadLimit, &val))
-                {
-                    up = val;
-                }
-
-                tr_variantDictFindBool(dict, TR_KEY_downloadLimited, &d);
-                if (tr_variantDictFindInt(dict, TR_KEY_downloadLimit, &val))
-                {
-                    down = val;
-                }
-
-                tr_bandwidth_group* group = tr_bandwidthGroupFind(session, name);
-
-                if (group == nullptr)
-                {
-                    continue;
-                }
-
-                tr_bandwidthGroupSetLimits(group, u, up, d, down);
-
-                if (tr_variantDictFindBool(dict, TR_KEY_honorsSessionLimits, &honors))
-                {
-                    group->bandwidth->honorParentLimits(TR_UP, honors);
-                    group->bandwidth->honorParentLimits(TR_DOWN, honors);
-                }
-            }
-        }
-    }
-}
-
-int tr_bandwidthGroupWrite(tr_session* session, char const* configDir)
-{
-    tr_variant group_list;
-    tr_bandwidth_group* group = session->groups;
-    int n = 0;
-
-    while (group != nullptr)
-    {
-        n++;
-        group = group->next;
-    }
-
-    tr_variantInitList(&group_list, n);
-    group = session->groups;
-    while (group != nullptr)
-    {
-        tr_variant* dict = nullptr;
-        bool u = false;
-        bool d = false;
-        uint32_t up = 0;
-        uint32_t down = 0;
-        dict = tr_variantListAddDict(&group_list, 5);
-        tr_bandwidthGroupGetLimits(group, &u, &up, &d, &down);
-        tr_variantDictAddStr(dict, TR_KEY_name, group->name);
-        tr_variantDictAddBool(dict, TR_KEY_uploadLimited, u);
-        tr_variantDictAddInt(dict, TR_KEY_uploadLimit, up);
-        tr_variantDictAddBool(dict, TR_KEY_downloadLimited, d);
-        tr_variantDictAddInt(dict, TR_KEY_downloadLimit, down);
-        tr_variantDictAddBool(dict, TR_KEY_honorsSessionLimits, group->bandwidth->areParentLimitsHonored(TR_UP));
-        group = group->next;
-    }
-
-    char* filename = tr_buildPath(configDir, "bandwidthGroups", nullptr);
-    int ret = tr_variantToFile(&group_list, TR_VARIANT_FMT_JSON, filename);
-    tr_free(filename);
-    tr_variantFree(&group_list);
-    return ret;
+    group->setDesiredSpeedBytesPerSecond(TR_UP, tr_toSpeedBytes(up_limit));
+    group->setDesiredSpeedBytesPerSecond(TR_DOWN, tr_toSpeedBytes(down_limit));
+    group->setLimited(TR_UP, up_limited);
+    group->setLimited(TR_DOWN, down_limited);
 }
