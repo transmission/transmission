@@ -8,6 +8,8 @@
 
 #include <event2/buffer.h>
 
+#include <fmt/base.h>
+
 #include "transmission.h"
 #include "cache.h"
 #include "inout.h"
@@ -18,7 +20,7 @@
 #include "trevent.h"
 #include "utils.h"
 
-auto constexpr CodeName = std::string_view{ "cache" };
+auto constexpr LogName = std::string_view{ "cache" };
 
 /****
 *****
@@ -243,10 +245,8 @@ int tr_cacheSetLimit(tr_cache* cache, int64_t max_bytes)
     cache->max_blocks = getMaxBlocks(max_bytes);
 
     tr_logAddNamedDebug(
-        CodeName,
-        "Maximum cache size set to %s (%d blocks)",
-        tr_formatter_mem_B(cache->max_bytes).c_str(),
-        cache->max_blocks);
+        LogName,
+        fmt::format("Maximum cache size set to {} ({} blocks)", tr_formatter_mem_B(cache->max_bytes), cache->max_blocks));
 
     return cacheTrim(cache);
 }
@@ -406,13 +406,9 @@ int tr_cacheFlushFile(tr_cache* cache, tr_torrent* torrent, tr_file_index_t i)
 {
     auto const [begin, end] = tr_torGetFileBlockSpan(torrent, i);
 
-    int pos = findBlockPos(cache, torrent, torrent->blockLoc(begin));
-    tr_logAddNamedTrace(
-        CodeName,
-        "flushing file %d from cache to disk: blocks [%zu...%zu)",
-        (int)i,
-        (size_t)begin,
-        (size_t)end);
+    int const pos = findBlockPos(cache, torrent, torrent->blockLoc(begin));
+
+    tr_logAddNamedTrace(LogName, fmt::format("flushing file {} from cache to disk: blocks [{}...{})", i, begin, end));
 
     /* flush out all the blocks in that file */
     int err = 0;
