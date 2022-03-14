@@ -1301,7 +1301,7 @@ static void checkMultiscrapeMax(tr_announcer* announcer, tr_scrape_response cons
         auto const parsed = *tr_urlParse(url.sv());
         auto clean_url = std::string{};
         tr_buildBuf(clean_url, parsed.scheme, "://"sv, parsed.host, ":"sv, parsed.portstr);
-        tr_logAddNamedInfo(clean_url.c_str(), fmt::format(_("Reducing multiscrape max to {}"), n));
+        tr_logAddNamedDebug(clean_url.c_str(), fmt::format("Reducing multiscrape max to {}", n));
         multiscrape_max = n;
     }
 }
