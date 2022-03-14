@@ -14,6 +14,8 @@
 #include <event2/dns.h>
 #include <event2/util.h>
 
+#include <fmt/core.h>
+
 #define LIBTRANSMISSION_ANNOUNCER_MODULE
 
 #include "transmission.h"
@@ -462,8 +464,11 @@ static void tau_tracker_on_dns(int errcode, struct evutil_addrinfo* addr, void* 
 
     if (errcode != 0)
     {
-        auto const errmsg = tr_strvJoin("DNS Lookup failed: "sv, evutil_gai_strerror(errcode));
-        logwarn(tracker->key, "%s", errmsg.c_str());
+        auto const errmsg = fmt::format(
+            _("DNS lookup failed: {errmsg} ({errcode})"),
+            fmt::arg("errmsg", evutil_gai_strerror(errcode)),
+            fmt::arg("errcode", errcode));
+        logwarn(tracker->key, errmsg);
         tracker->failAll(false, false, errmsg.c_str());
     }
     else
