@@ -244,7 +244,7 @@ uint8_t* tr_loadFile(char const* path, size_t* size, tr_error** error)
 
     if (info.type != TR_SYS_PATH_IS_FILE)
     {
-        tr_logAddError(fmt::format(_("Couldn't read '{path}': Not a regular file)"), fmt::arg("path", path)));
+        tr_logAddError(fmt::format(_("Couldn't read '{path}': Not a regular file"), fmt::arg("path", path)));
         tr_error_set(error, TR_ERROR_EISDIR, "Not a regular file"sv);
         return nullptr;
     }
