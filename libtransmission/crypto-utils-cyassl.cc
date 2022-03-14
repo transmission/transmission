@@ -64,7 +64,8 @@ static void log_cyassl_error(int error_code, char const* file, int line)
 #endif
 
         auto const errmsg = fmt::format(
-            _("CyaSSL error: {errmsg} ({errcode})"),
+            _("{crypto_library} error: {errmsg} ({errcode})"),
+            fmt::arg("crypto_library", "CyaSSL"),
             fmt::arg("errmsg", error_message),
             fmt::arg("errcode", error_code));
         tr_logAddMessage(file, line, TR_LOG_ERROR, MyName, errmsg);

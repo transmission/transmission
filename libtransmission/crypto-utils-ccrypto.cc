@@ -97,7 +97,8 @@ void log_ccrypto_error(CCCryptorStatus error_code, char const* file, int line)
     if (tr_logLevelIsActive(TR_LOG_ERROR))
     {
         auto const errmsg = fmt::format(
-            _("CCrypto error: {errmsg} ({errcode})"),
+            _("{crypto_library} error: {errmsg} ({errcode})"),
+            fmt::arg("crypto_library", "CCrypto"),
             fmt::arg("errmsg", ccrypto_error_to_str(error_code)),
             fmt::arg("errcode", error_code));
         tr_logAddMessage(file, line, TR_LOG_ERROR, MyName, errmsg);
