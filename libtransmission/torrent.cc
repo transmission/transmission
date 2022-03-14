@@ -2576,7 +2576,7 @@ void tr_torrentGotBlock(tr_torrent* tor, tr_block_index_t block)
             else
             {
                 uint32_t const n = tor->pieceSize(piece);
-                logdbg(tor, _("Piece %" PRIu32 ", which was just downloaded, failed its checksum test"), piece);
+                logdbg(tor, fmt::format("Piece {}, which was just downloaded, failed its checksum test", piece));
                 tor->corruptCur += n;
                 tor->downloadedCur -= std::min(tor->downloadedCur, uint64_t{ n });
                 tr_peerMgrGotBadPiece(tor, piece);
