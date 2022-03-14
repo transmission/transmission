@@ -562,12 +562,14 @@ set(NEEDED_FUNCTIONS
     fallocate64
     flock
     getmntent
+    gettext
     gmtime_r
     gmtime_s
     htonll
     localtime_r
     localtime_s
     mkdtemp
+    ngettext
     ntohll
     posix_fadvise
     posix_fallocate
@@ -606,9 +608,6 @@ if(ENABLE_NLS)
     if(HAVE_LIBINTL)
         set(LIBINTL_LIBRARY intl)
     endif()
-
-    check_function_exists(gettext HAVE_GETTEXT)
-    check_function_exists(ngettext HAVE_NGETTEXT)
 endif()
 
 check_library_exists(m sqrt "" HAVE_LIBM)
