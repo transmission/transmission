@@ -101,7 +101,7 @@ static void blocklistLoad(tr_blocklistFile* b)
 
     char* const base = tr_sys_path_basename(b->filename, nullptr);
     tr_logAddInfo(fmt::format(
-        ngettext_("Blocklist '{path}' has {count} entry", "Blocklist '{path}' has {count} entries", b->ruleCount),
+        ngettext("Blocklist '{path}' has {count} entry", "Blocklist '{path}' has {count} entries", b->ruleCount),
         fmt::arg("path", base),
         fmt::arg("count", b->ruleCount)));
     tr_free(base);
@@ -483,12 +483,9 @@ int tr_blocklistFileSetContent(tr_blocklistFile* b, char const* filename)
     {
         char* base = tr_sys_path_basename(b->filename, nullptr);
         tr_logAddInfo(fmt::format(
-            ngettext_(
-                "Blocklist '{path}' updated with {count} entry",
-                "Blocklist '{path}' updated with {count} entries",
-                ranges_count),
+            ngettext("Blocklist '{path}' has {count} entry", "Blocklist '{path}' has {count} entries", b->ruleCount),
             fmt::arg("path", base),
-            fmt::arg("count", ranges_count)));
+            fmt::arg("count", b->ruleCount)));
         tr_free(base);
     }
 

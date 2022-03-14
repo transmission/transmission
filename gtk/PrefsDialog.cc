@@ -10,6 +10,8 @@
 #include <glibmm.h>
 #include <glibmm/i18n.h>
 
+#include <fmt/core.h>
+
 #include <libtransmission/transmission.h>
 #include <libtransmission/utils.h>
 #include <libtransmission/version.h>
@@ -410,8 +412,10 @@ struct blocklist_data
 void updateBlocklistText(Gtk::Label* w, Glib::RefPtr<Session> const& core)
 {
     int const n = tr_blocklistGetRuleCount(core->get_session());
-    w->set_markup(
-        gtr_sprintf("<i>%s</i>", gtr_sprintf(ngettext("Blocklist contains %'d rule", "Blocklist contains %'d rules", n), n)));
+    auto const msg = fmt::format(
+        ngettext("Blocklist has {count} entry", "Blocklist has {count} entries", n),
+        fmt::arg("count", n));
+    w->set_markup(gtr_sprintf("<i>%s</i>", msg.c_str()));
 }
 
 /* prefs dialog is being destroyed, so stop listening to blocklist updates */
@@ -436,10 +440,12 @@ void onBlocklistUpdated(Glib::RefPtr<Session> const& core, int n, blocklist_data
 {
     bool const success = n >= 0;
     int const count = n >= 0 ? n : tr_blocklistGetRuleCount(core->get_session());
+    auto const msg = fmt::format(
+        ngettext("Blocklist has {count} entry", "Blocklist has {count} entries", count),
+        fmt::arg("count", count));
     data->updateBlocklistButton->set_sensitive(true);
     data->updateBlocklistDialog->set_message(success ? _("<b>Update succeeded!</b>") : _("<b>Unable to update.</b>"), true);
-    data->updateBlocklistDialog->set_secondary_text(
-        gtr_sprintf(ngettext("Blocklist has %'d rule.", "Blocklist has %'d rules.", count), count));
+    data->updateBlocklistDialog->set_secondary_text(msg);
     updateBlocklistText(data->label, core);
 }
 
