@@ -12,7 +12,10 @@
 #include <CommonCrypto/CommonDigest.h>
 #include <CommonCrypto/CommonRandom.h>
 
+#include <fmt/core.h>
+
 #include "transmission.h"
+
 #include "crypto-utils.h"
 #include "log.h"
 #include "tr-assert.h"
@@ -93,14 +96,12 @@ void log_ccrypto_error(CCCryptorStatus error_code, char const* file, int line)
 {
     if (tr_logLevelIsActive(TR_LOG_ERROR))
     {
-        tr_logAddMessage(
-            file,
-            line,
-            TR_LOG_ERROR,
-            MyName,
-            "CCrypto error (%d): %s",
-            error_code,
-            ccrypto_error_to_str(error_code));
+        auto const errmsg = fmt::format(
+            _("{crypto_library} error: {errmsg} ({errcode})"),
+            fmt::arg("crypto_library", "CCrypto"),
+            fmt::arg("errmsg", ccrypto_error_to_str(error_code)),
+            fmt::arg("errcode", error_code));
+        tr_logAddMessage(file, line, TR_LOG_ERROR, MyName, errmsg);
     }
 }
 

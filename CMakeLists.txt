@@ -146,6 +146,7 @@ if(WIN32)
     endforeach()
 endif()
 
+find_package(Fmt)
 find_package(UtfCpp)
 find_package(Threads)
 find_package(PkgConfig QUIET)
@@ -341,6 +342,8 @@ tr_add_external_auto_library(NATPMP libnatpmp natpmp)
 if(NOT USE_SYSTEM_NATPMP)
     set(NATPMP_DEFINITIONS -DNATPMP_STATICLIB)
 endif()
+
+set(LIBFMT_DEFINITIONS -DFMT_HEADER_ONLY)
 
 tr_add_external_auto_library(MINIUPNPC miniupnpc miniupnpc
     CMAKE_ARGS
@@ -603,6 +606,8 @@ if(ENABLE_NLS)
     if(HAVE_LIBINTL)
         set(LIBINTL_LIBRARY intl)
     endif()
+    check_function_exists(gettext "libintl.h" HAVE_GETTEXT)
+    check_function_exists(ngettext "libintl.h" HAVE_NGETTEXT)
 endif()
 
 check_library_exists(m sqrt "" HAVE_LIBM)

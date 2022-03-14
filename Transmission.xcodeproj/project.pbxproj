@@ -3392,12 +3392,14 @@
 					"third-party/libevent/include",
 					"third-party/libutp",
 					"third-party/utfcpp/source",
+					"third-party/fmt/include",
 					"third-party/libdeflate",
 					"third-party/libpsl/include",
 				);
 				OTHER_CFLAGS = (
 					"$(inherited)",
 					"-DWITH_UTP",
+					"-DFMT_HEADER_ONLY",
 					"-D__TRANSMISSION__",
 					"-DHAVE_FLOCK",
 					"-DHAVE_STRLCPY",
@@ -3458,9 +3460,11 @@
 					"$(inherited)",
 					.,
 					"third-party/libevent/include",
+					"third-party/fmt/include",
 				);
 				OTHER_CFLAGS = (
 					"$(inherited)",
+					"-DFMT_HEADER_ONLY",
 					"-DHAVE_DAEMON",
 				);
 				OTHER_LDFLAGS = "-lc++";
@@ -3478,6 +3482,11 @@
 					"$(inherited)",
 					.,
 					"third-party/libevent/include",
+					"third-party/fmt/include",
+				);
+				OTHER_CFLAGS = (
+					"$(inherited)",
+					"-DFMT_HEADER_ONLY",
 				);
 				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_NAME = "transmission-remote";
@@ -3586,12 +3595,14 @@
 					"third-party/libevent/include",
 					"third-party/libutp",
 					"third-party/utfcpp/source",
+					"third-party/fmt/include",
 					"third-party/libdeflate",
 					"third-party/libpsl/include",
 				);
 				OTHER_CFLAGS = (
 					"$(inherited)",
 					"-DWITH_UTP",
+					"-DFMT_HEADER_ONLY",
 					"-D__TRANSMISSION__",
 					"-DHAVE_FLOCK",
 					"-DHAVE_STRLCPY",
@@ -3837,12 +3848,14 @@
 					"third-party/libevent/include",
 					"third-party/libutp",
 					"third-party/utfcpp/source",
+					"third-party/fmt/include",
 					"third-party/libdeflate",
 					"third-party/libpsl/include",
 				);
 				OTHER_CFLAGS = (
 					"$(inherited)",
 					"-DWITH_UTP",
+					"-DFMT_HEADER_ONLY",
 					"-D__TRANSMISSION__",
 					"-DHAVE_FLOCK",
 					"-DHAVE_STRLCPY",
@@ -3866,10 +3879,12 @@
 					"$(inherited)",
 					.,
 					"third-party/libevent/include",
+					"third-party/fmt/include",
 				);
 				OTHER_CFLAGS = (
 					"$(inherited)",
 					"-DHAVE_DAEMON",
+					"-DFMT_HEADER_ONLY",
 				);
 				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_NAME = "transmission-daemon";
@@ -3886,8 +3901,13 @@
 					"$(inherited)",
 					.,
 					"third-party/libevent/include",
+					"third-party/fmt/include",
 				);
 				OTHER_LDFLAGS = "-lc++";
+				OTHER_CFLAGS = (
+					"$(inherited)",
+					"-DFMT_HEADER_ONLY",
+				);
 				PRODUCT_NAME = "transmission-remote";
 			};
 			name = "Release - Debug";
@@ -4033,9 +4053,11 @@
 					"$(inherited)",
 					.,
 					"third-party/libevent/include",
+					"third-party/fmt/include",
 				);
 				OTHER_CFLAGS = (
 					"$(inherited)",
+					"-DFMT_HEADER_ONLY",
 					"-DHAVE_DAEMON",
 				);
 				OTHER_LDFLAGS = "-lc++";
@@ -4053,8 +4075,13 @@
 					"$(inherited)",
 					.,
 					"third-party/libevent/include",
+					"third-party/fmt/include",
 				);
 				OTHER_LDFLAGS = "-lc++";
+				OTHER_CFLAGS = (
+					"$(inherited)",
+					"-DFMT_HEADER_ONLY",
+				);
 				PRODUCT_NAME = "transmission-remote";
 			};
 			name = Release;

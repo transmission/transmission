@@ -12,6 +12,8 @@
 #include <string_view>
 #include <vector>
 
+#include <fmt/core.h>
+
 #include "transmission.h"
 
 #include "crypto-utils.h"
@@ -537,8 +539,12 @@ bool tr_torrent_metainfo::migrateFile(
 
     if (old_filename_exists && tr_sys_path_rename(old_filename.c_str(), new_filename.c_str(), nullptr))
     {
-        auto const name_sz = std::string{ name };
-        tr_logAddNamedError(name_sz, "Migrated torrent file from \"%s\" to \"%s\"", old_filename.c_str(), new_filename.c_str());
+        tr_logAddNamedError(
+            name,
+            fmt::format(
+                _("Migrated torrent file from '{oldpath}' to '{path}'"),
+                fmt::arg("oldpath", old_filename),
+                fmt::arg("path", new_filename)));
         return true;
     }
 

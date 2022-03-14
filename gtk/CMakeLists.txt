@@ -130,6 +130,7 @@ include_directories(
 )
 include_directories(
     SYSTEM
+    ${LIBFMT_INCLUDE_DIRS}
     ${LIBAPPINDICATOR_INCLUDE_DIRS}
     ${GTK_INCLUDE_DIRS}
     ${CURL_INCLUDE_DIRS}
@@ -158,6 +159,7 @@ add_definitions(
     -DPANGOMM_DISABLE_DEPRECATED
     -DSIGCXX_DISABLE_DEPRECATED
     ${GTK_CFLAGS_OTHER}
+    ${LIBFMT_DEFINITIONS}
 )
 
 tr_win32_app_info(${PROJECT_NAME}_WIN32_RC_FILE

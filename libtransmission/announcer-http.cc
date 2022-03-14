@@ -14,6 +14,8 @@
 #include <event2/buffer.h>
 #include <event2/http.h> /* for HTTP_OK */
 
+#include <fmt/core.h>
+
 #define LIBTRANSMISSION_ANNOUNCER_MODULE
 
 #include "transmission.h"
@@ -271,7 +273,11 @@ void tr_announcerParseHttpAnnounceResponse(tr_announce_response& response, std::
     transmission::benc::parse(benc, stack, handler, nullptr, &error);
     if (error != nullptr)
     {
-        tr_logAddMessage(__FILE__, __LINE__, TR_LOG_WARN, log_name, "%s (%d)", error->message, error->code);
+        auto const errmsg = fmt::format(
+            _("Couldn't parse announce response: {errmsg} ({errcode})"),
+            fmt::arg("errmsg", error->message),
+            fmt::arg("errcode", error->code));
+        tr_logAddMessage(__FILE__, __LINE__, TR_LOG_WARN, log_name, errmsg);
         tr_error_clear(&error);
     }
 }
@@ -443,7 +449,11 @@ void tr_announcerParseHttpScrapeResponse(tr_scrape_response& response, std::stri
     transmission::benc::parse(benc, stack, handler, nullptr, &error);
     if (error != nullptr)
     {
-        tr_logAddMessage(__FILE__, __LINE__, TR_LOG_WARN, log_name, "scrape response: %s (%d)", error->message, error->code);
+        auto const errmsg = fmt::format(
+            _("Couldn't parse scrape response: {errmsg} ({errcode})"),
+            fmt::arg("errmsg", error->message),
+            fmt::arg("errcode", error->code));
+        tr_logAddMessage(__FILE__, __LINE__, TR_LOG_WARN, log_name, errmsg);
         tr_error_clear(&error);
     }
 }

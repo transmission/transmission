@@ -18,6 +18,8 @@
     return tr_logGetLevel() >= level;
 }
 
+void tr_logAddMessage(char const* file, int line, tr_log_level level, std::string_view name, std::string_view msg);
+
 void tr_logAddMessage(char const* file, int line, tr_log_level level, std::string_view name, char const* fmt, ...)
     TR_GNUC_PRINTF(5, 6);
 

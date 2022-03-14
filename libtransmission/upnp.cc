@@ -8,6 +8,8 @@
 #include <mutex>
 #include <thread>
 
+#include <fmt/core.h>
+
 #ifdef SYSTEM_MINIUPNP
 #include <miniupnpc/miniupnpc.h>
 #include <miniupnpc/upnpcommands.h>
@@ -141,7 +143,7 @@ static struct UPNPDev* tr_upnpDiscover(int msec, char const* bindaddr)
 
     if (have_err)
     {
-        tr_logAddDebug("upnpDiscover failed (errno %d - %s)", errno, tr_strerror(errno));
+        tr_logAddDebug(fmt::format("upnpDiscover failed: {} ({})", tr_strerror(errno), errno));
     }
 
     return ret;
@@ -227,7 +229,7 @@ static int tr_upnpAddPortMapping(tr_upnp const* handle, char const* proto, tr_po
 
     if (err != 0)
     {
-        tr_logAddDebug("%s Port forwarding failed with error %d (errno %d - %s)", proto, err, errno, tr_strerror(errno));
+        tr_logAddDebug(fmt::format("{} Port forwarding failed with error {}: {} ({})", proto, err, tr_strerror(errno), errno));
     }
 
     errno = old_errno;
@@ -291,15 +293,15 @@ tr_port_forwarding tr_upnpPulse(tr_upnp* handle, tr_port port, bool isEnabled, b
         if (UPNP_GetValidIGD(devlist, &handle->urls, &handle->data, handle->lanaddr, sizeof(handle->lanaddr)) ==
             UPNP_IGD_VALID_CONNECTED)
         {
-            tr_logAddInfo(_("Found Internet Gateway Device \"%s\""), handle->urls.controlURL);
-            tr_logAddInfo(_("Local Address is \"%s\""), handle->lanaddr);
+            tr_logAddInfo(fmt::format(_("Found Internet Gateway Device '{url}'"), fmt::arg("url", handle->urls.controlURL)));
+            tr_logAddInfo(fmt::format(_("Local Address is '{address}')"), fmt::arg("address", handle->lanaddr)));
             handle->state = UpnpState::IDLE;
             handle->hasDiscovered = true;
         }
         else
         {
             handle->state = UpnpState::FAILED;
-            tr_logAddDebug("UPNP_GetValidIGD failed (errno %d - %s)", errno, tr_strerror(errno));
+            tr_logAddDebug(fmt::format("UPNP_GetValidIGD failed: {} ({})", tr_strerror(errno), errno));
             tr_logAddDebug("If your router supports UPnP, please make sure UPnP is enabled!");
         }
 
@@ -315,7 +317,7 @@ tr_port_forwarding tr_upnpPulse(tr_upnp* handle, tr_port port, bool isEnabled, b
         ((tr_upnpGetSpecificPortMappingEntry(handle, "TCP") != UPNPCOMMAND_SUCCESS) ||
          (tr_upnpGetSpecificPortMappingEntry(handle, "UDP") != UPNPCOMMAND_SUCCESS)))
     {
-        tr_logAddInfo(_("Port %d isn't forwarded"), handle->port);
+        tr_logAddInfo(fmt::format(_("Port {port} is not forwarded"), fmt::arg("port", handle->port)));
         handle->isMapped = false;
     }
 
@@ -324,10 +326,10 @@ tr_port_forwarding tr_upnpPulse(tr_upnp* handle, tr_port port, bool isEnabled, b
         tr_upnpDeletePortMapping(handle, "TCP", handle->port);
         tr_upnpDeletePortMapping(handle, "UDP", handle->port);
 
-        tr_logAddInfo(
-            _("Stopping port forwarding through \"%s\", service \"%s\""),
-            handle->urls.controlURL,
-            handle->data.first.servicetype);
+        tr_logAddInfo(fmt::format(
+            _("Stopping port forwarding through '{url}', service '{type}'"),
+            fmt::arg("url", handle->urls.controlURL),
+            fmt::arg("type", handle->data.first.servicetype)));
 
         handle->isMapped = false;
         handle->state = UpnpState::IDLE;
@@ -358,22 +360,22 @@ tr_port_forwarding tr_upnpPulse(tr_upnp* handle, tr_port port, bool isEnabled, b
             handle->isMapped = err_tcp == 0 || err_udp == 0;
         }
 
-        tr_logAddInfo(
-            _("Port forwarding through \"%s\", service \"%s\". (local address: %s:%d)"),
-            handle->urls.controlURL,
-            handle->data.first.servicetype,
-            handle->lanaddr,
-            port);
+        tr_logAddInfo(fmt::format(
+            _("Port forwarding through '{url}', service '{type}'. (local address: {address}:{port})"),
+            fmt::arg("url", handle->urls.controlURL),
+            fmt::arg("type", handle->data.first.servicetype),
+            fmt::arg("address", handle->lanaddr),
+            fmt::arg("port", port)));
 
         if (handle->isMapped)
         {
-            tr_logAddInfo("%s", _("Port forwarding successful!"));
+            tr_logAddInfo(_("Port forwarding successful!"));
             handle->port = port;
             handle->state = UpnpState::IDLE;
         }
         else
         {
-            tr_logAddInfo("%s", _("If your router supports UPnP, please make sure UPnP is enabled!"));
+            tr_logAddInfo(_("If your router supports UPnP, please make sure UPnP is enabled!"));
             handle->port = -1;
             handle->state = UpnpState::FAILED;
         }

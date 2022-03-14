@@ -24,6 +24,8 @@
 #include API_HEADER_CRYPT(sha.h)
 #include API_HEADER(version.h)
 
+#include <fmt/core.h>
+
 #include "transmission.h"
 #include "crypto-utils.h"
 #include "log.h"
@@ -61,7 +63,12 @@ static void log_cyassl_error(int error_code, char const* file, int line)
         CTaoCryptErrorString(error_code, error_message);
 #endif
 
-        tr_logAddMessage(file, line, TR_LOG_ERROR, MyName, "CyaSSL error: %s", error_message);
+        auto const errmsg = fmt::format(
+            _("{crypto_library} error: {errmsg} ({errcode})"),
+            fmt::arg("crypto_library", "CyaSSL"),
+            fmt::arg("errmsg", error_message),
+            fmt::arg("errcode", error_code));
+        tr_logAddMessage(file, line, TR_LOG_ERROR, MyName, errmsg);
     }
 }
 

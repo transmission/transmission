@@ -9,6 +9,8 @@
 #include <cinttypes>
 #include <ctime>
 
+#include <fmt/core.h>
+
 #include "transmission.h"
 
 #include "error-types.h"
@@ -41,7 +43,7 @@ static bool preallocate_file_sparse(tr_sys_file_t fd, uint64_t length, tr_error*
         return true;
     }
 
-    tr_logAddDebug("Preallocating (sparse, normal) failed (%d): %s", my_error->code, my_error->message);
+    tr_logAddDebug(fmt::format("Fast preallocation failed: {} ({})", my_error->message, my_error->code));
 
     if (!TR_ERROR_IS_ENOSPC(my_error->code))
     {
@@ -55,7 +57,7 @@ static bool preallocate_file_sparse(tr_sys_file_t fd, uint64_t length, tr_error*
             return true;
         }
 
-        tr_logAddDebug("Preallocating (sparse, fallback) failed (%d): %s", my_error->code, my_error->message);
+        tr_logAddDebug(fmt::format("Fast prellocation fallback failed: {} ({})", my_error->message, my_error->code));
     }
 
     tr_error_propagate(error, &my_error);
@@ -76,7 +78,7 @@ static bool preallocate_file_full(tr_sys_file_t fd, uint64_t length, tr_error** 
         return true;
     }
 
-    tr_logAddDebug("Preallocating (full, normal) failed (%d): %s", my_error->code, my_error->message);
+    tr_logAddDebug(fmt::format("Full preallocation failed: {} ({})", my_error->message, my_error->code));
 
     if (!TR_ERROR_IS_ENOSPC(my_error->code))
     {
@@ -99,7 +101,7 @@ static bool preallocate_file_full(tr_sys_file_t fd, uint64_t length, tr_error** 
             return true;
         }
 
-        tr_logAddDebug("Preallocating (full, fallback) failed (%d): %s", my_error->code, my_error->message);
+        tr_logAddDebug(fmt::format("Full preallocation fallback failed: {} ({})", my_error->message, my_error->code));
     }
 
     tr_error_propagate(error, &my_error);
@@ -166,13 +168,21 @@ static int cached_file_open(
 
         if (dir == nullptr)
         {
-            tr_logAddError(_("Couldn't get directory for \"%1$s\": %2$s"), filename, error->message);
+            tr_logAddError(fmt::format(
+                _("Couldn't create '{path}': {errmsg} ({errcode})"),
+                fmt::arg("path", filename),
+                fmt::arg("errmsg", error->message),
+                fmt::arg("errcode", error->code)));
             goto FAIL;
         }
 
         if (!tr_sys_dir_create(dir, TR_SYS_DIR_CREATE_PARENTS, 0777, &error))
         {
-            tr_logAddError(_("Couldn't create \"%1$s\": %2$s"), dir, error->message);
+            tr_logAddError(fmt::format(
+                _("Couldn't create '{path}': {errmsg} ({errcode})"),
+                fmt::arg("path", dir),
+                fmt::arg("errmsg", error->message),
+                fmt::arg("errcode", error->code)));
             tr_free(dir);
             goto FAIL;
         }
@@ -193,7 +203,11 @@ static int cached_file_open(
 
     if (fd == TR_BAD_SYS_FILE)
     {
-        tr_logAddError(_("Couldn't open \"%1$s\": %2$s"), filename, error->message);
+        tr_logAddError(fmt::format(
+            _("Couldn't open '{path}': {errmsg} ({errcode})"),
+            fmt::arg("path", filename),
+            fmt::arg("errmsg", error->message),
+            fmt::arg("errcode", error->code)));
         goto FAIL;
     }
 
@@ -217,16 +231,15 @@ static int cached_file_open(
 
         if (!success)
         {
-            tr_logAddWarn(
-                _("Couldn't preallocate file \"%1$s\" (%2$s, size: %3$" PRIu64 "): %4$s"),
-                filename,
-                type,
-                file_size,
-                error->message);
+            tr_logAddError(fmt::format(
+                _("Couldn't preallocate '{path}': {errmsg} ({errcode})"),
+                fmt::arg("path", filename),
+                fmt::arg("errmsg", error->message),
+                fmt::arg("errcode", error->code)));
             goto FAIL;
         }
 
-        tr_logAddDebug(_("Preallocated file \"%1$s\" (%2$s, size: %3$" PRIu64 ")"), filename, type, file_size);
+        tr_logAddDebug(fmt::format("Preallocated file '{}' ({}, size: {})", filename, type, file_size));
     }
 
     /* If the file already exists and it's too large, truncate it.
@@ -237,7 +250,11 @@ static int cached_file_open(
      */
     if (resize_needed && !tr_sys_file_truncate(fd, file_size, &error))
     {
-        tr_logAddWarn(_("Couldn't truncate \"%1$s\": %2$s"), filename, error->message);
+        tr_logAddWarn(fmt::format(
+            _("Couldn't truncate '{path}': {errmsg} ({errcode})"),
+            fmt::arg("path", filename),
+            fmt::arg("errmsg", error->message),
+            fmt::arg("errcode", error->code)));
         goto FAIL;
     }
 
@@ -477,11 +494,11 @@ tr_sys_file_t tr_fdFileCheckout(
             return TR_BAD_SYS_FILE;
         }
 
-        tr_logAddTrace("opened '%s' writable %c", filename, writable ? 'y' : 'n');
+        tr_logAddTrace(fmt::format("opened '{}' writable {}", filename, writable ? 'y' : 'n'));
         o->is_writable = writable;
     }
 
-    tr_logAddTrace("checking out '%s'", filename);
+    tr_logAddTrace(fmt::format("checking out '{}'", filename));
     o->torrent_id = torrent_id;
     o->file_index = i;
     o->used_at = tr_time();
@@ -509,7 +526,10 @@ tr_socket_t tr_fdSocketCreate(tr_session* session, int domain, int type)
 
         if ((s == TR_BAD_SOCKET) && (sockerrno != EAFNOSUPPORT))
         {
-            tr_logAddWarn(_("Couldn't create socket: %s"), tr_net_strerror(sockerrno).c_str());
+            tr_logAddWarn(fmt::format(
+                _("Couldn't create socket: {errmsg} ({errcode})"),
+                fmt::arg("errmsg", tr_net_strerror(sockerrno)),
+                fmt::arg("errcode", sockerrno)));
         }
     }
 
@@ -531,7 +551,7 @@ tr_socket_t tr_fdSocketCreate(tr_session* session, int domain, int type)
 
             if (getsockopt(s, SOL_SOCKET, SO_SNDBUF, reinterpret_cast<char*>(&i), &size) != -1)
             {
-                tr_logAddTrace("SO_SNDBUF size is %d", i);
+                tr_logAddTrace(fmt::format("SO_SNDBUF size is {}", i));
             }
 
             i = 0;
@@ -539,7 +559,7 @@ tr_socket_t tr_fdSocketCreate(tr_session* session, int domain, int type)
 
             if (getsockopt(s, SOL_SOCKET, SO_RCVBUF, reinterpret_cast<char*>(&i), &size) != -1)
             {
-                tr_logAddTrace("SO_RCVBUF size is %d", i);
+                tr_logAddTrace(fmt::format("SO_RCVBUF size is {}", i));
             }
 
             buf_logged = true;

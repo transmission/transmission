@@ -8,6 +8,8 @@
 #include <cstdlib> /* bsearch(), qsort() */
 #include <cstring>
 
+#include <fmt/core.h>
+
 #include "transmission.h"
 
 #include "blocklist.h"
@@ -53,9 +55,6 @@ static void blocklistClose(tr_blocklistFile* b)
 
 static void blocklistLoad(tr_blocklistFile* b)
 {
-    tr_error* error = nullptr;
-    char const* err_fmt = _("Couldn't read \"%1$s\": %2$s");
-
     blocklistClose(b);
 
     auto info = tr_sys_path_info{};
@@ -70,10 +69,15 @@ static void blocklistLoad(tr_blocklistFile* b)
         return;
     }
 
+    tr_error* error = nullptr;
     auto const fd = tr_sys_file_open(b->filename, TR_SYS_FILE_READ, 0, &error);
     if (fd == TR_BAD_SYS_FILE)
     {
-        tr_logAddWarn(err_fmt, b->filename, error->message);
+        tr_logAddWarn(fmt::format(
+            _("Couldn't read '{path}': {errmsg} ({errcode})"),
+            fmt::arg("path", b->filename),
+            fmt::arg("errmsg", error->message),
+            fmt::arg("errcode", error->code)));
         tr_error_free(error);
         return;
     }
@@ -81,7 +85,11 @@ static void blocklistLoad(tr_blocklistFile* b)
     b->rules = static_cast<struct tr_ipv4_range*>(tr_sys_file_map_for_reading(fd, 0, byteCount, &error));
     if (b->rules == nullptr)
     {
-        tr_logAddWarn(err_fmt, b->filename, error->message);
+        tr_logAddWarn(fmt::format(
+            _("Couldn't read '{path}': {errmsg} ({errcode})"),
+            fmt::arg("path", b->filename),
+            fmt::arg("errmsg", error->message),
+            fmt::arg("errcode", error->code)));
         tr_sys_file_close(fd, nullptr);
         tr_error_free(error);
         return;
@@ -92,7 +100,10 @@ static void blocklistLoad(tr_blocklistFile* b)
     b->ruleCount = byteCount / sizeof(struct tr_ipv4_range);
 
     char* const base = tr_sys_path_basename(b->filename, nullptr);
-    tr_logAddInfo(_("Blocklist \"%s\" contains %zu entries"), base, b->ruleCount);
+    tr_logAddInfo(fmt::format(
+        ngettext_("Blocklist '{path}' has {count} entry", "Blocklist '{path}' has {count} entries", b->ruleCount),
+        fmt::arg("path", base),
+        fmt::arg("count", b->ruleCount)));
     tr_free(base);
 }
 
@@ -355,7 +366,6 @@ int tr_blocklistFileSetContent(tr_blocklistFile* b, char const* filename)
 {
     int inCount = 0;
     char line[2048];
-    char const* err_fmt = _("Couldn't read \"%1$s\": %2$s");
     // TODO: should be a vector
     struct tr_ipv4_range* ranges = nullptr;
     size_t ranges_alloc = 0;
@@ -371,7 +381,11 @@ int tr_blocklistFileSetContent(tr_blocklistFile* b, char const* filename)
     auto const in = tr_sys_file_open(filename, TR_SYS_FILE_READ, 0, &error);
     if (in == TR_BAD_SYS_FILE)
     {
-        tr_logAddWarn(err_fmt, filename, error->message);
+        tr_logAddWarn(fmt::format(
+            _("Couldn't read '{path}': {errmsg} ({errcode})"),
+            fmt::arg("path", filename),
+            fmt::arg("errmsg", error->message),
+            fmt::arg("errcode", error->code)));
         tr_error_free(error);
         return 0;
     }
@@ -381,7 +395,11 @@ int tr_blocklistFileSetContent(tr_blocklistFile* b, char const* filename)
     auto const out = tr_sys_file_open(b->filename, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_TRUNCATE, 0666, &error);
     if (out == TR_BAD_SYS_FILE)
     {
-        tr_logAddWarn(err_fmt, b->filename, error->message);
+        tr_logAddWarn(fmt::format(
+            _("Couldn't read '{path}': {errmsg} ({errcode})"),
+            fmt::arg("path", b->filename),
+            fmt::arg("errmsg", error->message),
+            fmt::arg("errcode", error->code)));
         tr_error_free(error);
         tr_sys_file_close(in, nullptr);
         return 0;
@@ -397,7 +415,7 @@ int tr_blocklistFileSetContent(tr_blocklistFile* b, char const* filename)
         if (!parseLine(line, &range))
         {
             /* don't try to display the actual lines - it causes issues */
-            tr_logAddWarn(_("blocklist skipped invalid address at line %d"), inCount);
+            tr_logAddWarn(fmt::format(_("Couldn't parse line: '{line}'"), fmt::arg("line", inCount)));
             continue;
         }
 
@@ -454,13 +472,23 @@ int tr_blocklistFileSetContent(tr_blocklistFile* b, char const* filename)
 
     if (!tr_sys_file_write(out, ranges, sizeof(struct tr_ipv4_range) * ranges_count, nullptr, &error))
     {
-        tr_logAddWarn(_("Couldn't save file \"%1$s\": %2$s"), b->filename, error->message);
+        tr_logAddWarn(fmt::format(
+            _("Couldn't save '{path}': {errmsg} ({errcode})"),
+            fmt::arg("path", b->filename),
+            fmt::arg("errmsg", error->message),
+            fmt::arg("errcode", error->code)));
         tr_error_free(error);
     }
     else
     {
         char* base = tr_sys_path_basename(b->filename, nullptr);
-        tr_logAddInfo(_("Blocklist \"%s\" updated with %zu entries"), base, ranges_count);
+        tr_logAddInfo(fmt::format(
+            ngettext_(
+                "Blocklist '{path}' updated with {count} entry",
+                "Blocklist '{path}' updated with {count} entries",
+                ranges_count),
+            fmt::arg("path", base),
+            fmt::arg("count", ranges_count)));
         tr_free(base);
     }
 

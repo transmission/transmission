@@ -18,6 +18,8 @@
 #include <openssl/ssl.h>
 #include <openssl/x509.h>
 
+#include <fmt/core.h>
+
 #include "transmission.h"
 #include "crypto-utils.h"
 #include "log.h"
@@ -59,7 +61,12 @@ static void log_openssl_error(char const* file, int line)
 #endif
 
         ERR_error_string_n(error_code, buf, sizeof(buf));
-        tr_logAddMessage(file, line, TR_LOG_ERROR, MyName, "OpenSSL error: %s", buf);
+        auto const errmsg = fmt::format(
+            _("{crypto_library} error: {errmsg} ({errcode})"),
+            fmt::arg("crypto_library", "OpenSSL"),
+            fmt::arg("errmsg", buf),
+            fmt::arg("errcode", error_code));
+        tr_logAddMessage(file, line, TR_LOG_ERROR, MyName, errmsg);
     }
 }
 

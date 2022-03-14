@@ -15,6 +15,9 @@
 
 #include <libutp/utp.h>
 
+#include <fmt/core.h>
+#include <fmt/format.h> // fmt::ptr
+
 #include "transmission.h"
 #include "session.h"
 #include "bandwidth.h"
@@ -302,7 +305,9 @@ static void event_read_cb(evutil_socket_t fd, short /*event*/, void* vio)
             what |= BEV_EVENT_ERROR;
         }
 
-        tr_logAddDebugIo(io, "event_read_cb err: res:%d, what:%hd, errno:%d (%s)", res, what, e, tr_net_strerror(e).c_str());
+        tr_logAddDebugIo(
+            io,
+            fmt::format("event_read_cb err: res:{}, what:{}, errno:{} ({})", res, what, e, tr_net_strerror(e)));
 
         if (io->gotError != nullptr)
         {
@@ -316,7 +321,7 @@ static int tr_evbuffer_write(tr_peerIo* io, int fd, size_t howmuch)
     EVUTIL_SET_SOCKET_ERROR(0);
     int const n = evbuffer_write_atmost(io->outbuf, fd, howmuch);
     int const e = EVUTIL_SOCKET_ERROR();
-    tr_logAddTraceIo(io, "wrote %d to peer (%s)", n, (n == -1 ? tr_net_strerror(e).c_str() : ""));
+    tr_logAddTraceIo(io, fmt::format("wrote {} to peer ({})", n, (n == -1 ? tr_net_strerror(e).c_str() : "")));
 
     return n;
 }
@@ -390,7 +395,7 @@ RESCHEDULE:
 
 FAIL:
     auto const errmsg = tr_net_strerror(e);
-    tr_logAddDebugIo(io, "event_write_cb got an err. res:%d, what:%hd, errno:%d (%s)", res, what, e, errmsg.c_str());
+    tr_logAddDebugIo(io, fmt::format("event_write_cb got an err. res:{}, what:{}, errno:{} ({})", res, what, e, errmsg));
 
     if (io->gotError != nullptr)
     {
@@ -420,7 +425,7 @@ static void utp_on_read(void* vio, unsigned char const* buf, size_t buflen)
     TR_ASSERT(tr_isPeerIo(io));
 
     int rc = evbuffer_add(io->inbuf, buf, buflen);
-    tr_logAddTraceIo(io, "utp_on_read got %zu bytes", buflen);
+    tr_logAddTraceIo(io, fmt::format("utp_on_read got {} bytes", buflen));
 
     if (rc < 0)
     {
@@ -439,12 +444,16 @@ static void utp_on_write(void* vio, unsigned char* buf, size_t buflen)
     TR_ASSERT(tr_isPeerIo(io));
 
     int rc = evbuffer_remove(io->outbuf, buf, buflen);
-    tr_logAddTraceIo(io, "utp_on_write sending %zu bytes... evbuffer_remove returned %d", buflen, rc);
+    tr_logAddTraceIo(io, fmt::format("utp_on_write sending {} bytes... evbuffer_remove returned {}", buflen, rc));
     TR_ASSERT(rc == (int)buflen); /* if this fails, we've corrupted our bookkeeping somewhere */
 
     if (rc < (long)buflen)
     {
-        tr_logAddWarnIo(io, "Short write: %d < %ld", rc, (long)buflen);
+        auto const errmsg = fmt::format(
+            _("Couldn't write {expected_size} bytes to peer; wrote {actual_size}"),
+            fmt::arg("expected_size", buflen),
+            fmt::arg("actual_size", rc));
+        tr_logAddWarnIo(io, errmsg);
     }
 
     didWriteWrapper(io, buflen);
@@ -458,7 +467,7 @@ static size_t utp_get_rb_size(void* vio)
 
     size_t bytes = io->bandwidth->clamp(TR_DOWN, UTP_READ_BUFFER_SIZE);
 
-    tr_logAddTraceIo(io, "utp_get_rb_size is saying it's ready to read %zu bytes", bytes);
+    tr_logAddTraceIo(io, fmt::format("utp_get_rb_size is saying it's ready to read {} bytes", bytes));
     return UTP_READ_BUFFER_SIZE - bytes;
 }
 
@@ -506,7 +515,7 @@ static void utp_on_state_change(void* vio, int state)
     }
     else
     {
-        tr_logAddErrorIo(io, "Unknown state %d", state);
+        tr_logAddErrorIo(io, fmt::format(_("Unknown state: {state}"), fmt::arg("state", state)));
     }
 }
 
@@ -516,7 +525,7 @@ static void utp_on_error(void* vio, int errcode)
 
     TR_ASSERT(tr_isPeerIo(io));
 
-    tr_logAddDebugIo(io, "utp_on_error -- errcode is %d", errcode);
+    tr_logAddDebugIo(io, fmt::format("utp_on_error -- errcode is {}", errcode));
 
     if (io->gotError != nullptr)
     {
@@ -531,7 +540,7 @@ static void utp_on_overhead(void* vio, bool send, size_t count, int /*type*/)
 
     TR_ASSERT(tr_isPeerIo(io));
 
-    tr_logAddTraceIo(io, "utp_on_overhead -- count is %zu", count);
+    tr_logAddTraceIo(io, fmt::format("utp_on_overhead -- count is {}", count));
 
     io->bandwidth->notifyBandwidthConsumed(send ? TR_UP : TR_DOWN, count, false, tr_time_msec());
 }
@@ -612,12 +621,12 @@ static tr_peerIo* tr_peerIoNew(
     io->socket = socket;
     io->bandwidth = new Bandwidth(parent);
     io->bandwidth->setPeer(io);
-    tr_logAddTraceIo(io, "bandwidth is %p; its parent is %p", (void*)&io->bandwidth, (void*)parent);
+    tr_logAddTraceIo(io, fmt::format("bandwidth is {}; its parent is {}", fmt::ptr(&io->bandwidth), fmt::ptr(parent)));
 
     switch (socket.type)
     {
     case TR_PEER_SOCKET_TYPE_TCP:
-        tr_logAddTraceIo(io, "socket (tcp) is %" PRIdMAX, (intmax_t)socket.handle.tcp);
+        tr_logAddTraceIo(io, fmt::format("socket (tcp) is {}", socket.handle.tcp));
         io->event_read = event_new(session->event_base, socket.handle.tcp, EV_READ, event_read_cb, io);
         io->event_write = event_new(session->event_base, socket.handle.tcp, EV_WRITE, event_write_cb, io);
         break;
@@ -625,14 +634,14 @@ static tr_peerIo* tr_peerIoNew(
 #ifdef WITH_UTP
 
     case TR_PEER_SOCKET_TYPE_UTP:
-        tr_logAddTraceIo(io, "socket (utp) is %p", (void*)socket.handle.utp);
+        tr_logAddTraceIo(io, fmt::format("socket (utp) is {}", fmt::ptr(socket.handle.utp)));
         UTP_SetSockopt(socket.handle.utp, SO_RCVBUF, UTP_READ_BUFFER_SIZE);
-        tr_logAddTraceIo(io, "%s", "calling UTP_SetCallbacks &utp_function_table");
+        tr_logAddTraceIo(io, "calling UTP_SetCallbacks &utp_function_table");
         UTP_SetCallbacks(socket.handle.utp, &utp_function_table, io);
 
         if (!is_incoming)
         {
-            tr_logAddTraceIo(io, "%s", "calling UTP_Connect");
+            tr_logAddTraceIo(io, "calling UTP_Connect");
             UTP_Connect(socket.handle.utp);
         }
 
@@ -684,9 +693,9 @@ tr_peerIo* tr_peerIoNewOutgoing(
     if (socket.type == TR_PEER_SOCKET_TYPE_NONE)
     {
         socket = tr_netOpenPeerSocket(session, addr, port, is_seed);
-        tr_logAddDebug(
-            "tr_netOpenPeerSocket returned fd %" PRIdMAX,
-            (intmax_t)(socket.type != TR_PEER_SOCKET_TYPE_NONE ? socket.handle.tcp : TR_BAD_SOCKET));
+        tr_logAddDebug(fmt::format(
+            "tr_netOpenPeerSocket returned {}",
+            socket.type != TR_PEER_SOCKET_TYPE_NONE ? socket.handle.tcp : TR_BAD_SOCKET));
     }
 
     if (socket.type == TR_PEER_SOCKET_TYPE_NONE)
@@ -823,7 +832,7 @@ static void io_close_socket(tr_peerIo* io)
 #endif
 
     default:
-        tr_logAddDebugIo(io, "unsupported peer socket type %d", io->socket.type);
+        tr_logAddDebugIo(io, fmt::format("unsupported peer socket type {}", io->socket.type));
     }
 
     io->socket = {};
@@ -877,7 +886,9 @@ void tr_peerIoRefImpl(char const* file, int line, tr_peerIo* io)
 {
     TR_ASSERT(tr_isPeerIo(io));
 
-    tr_logAddTraceIo(io, "%s:%d is incrementing the IO's refcount from %d to %d", file, line, io->refCount, io->refCount + 1);
+    tr_logAddTraceIo(
+        io,
+        fmt::format("{}:{} incrementing the IO's refcount from {} to {}", file, line, io->refCount, io->refCount + 1));
 
     ++io->refCount;
 }
@@ -886,7 +897,9 @@ void tr_peerIoUnrefImpl(char const* file, int line, tr_peerIo* io)
 {
     TR_ASSERT(tr_isPeerIo(io));
 
-    tr_logAddTraceIo(io, "%s:%d is decrementing the IO's refcount from %d to %d", file, line, io->refCount, io->refCount - 1);
+    tr_logAddTraceIo(
+        io,
+        fmt::format("{}:{} decrementing the IO's refcount from {} to {}", file, line, io->refCount, io->refCount - 1));
 
     if (--io->refCount == 0)
     {
@@ -1242,7 +1255,7 @@ static int tr_peerIoTryRead(tr_peerIo* io, size_t howmuch)
             res = evbuffer_read(io->inbuf, io->socket.handle.tcp, (int)howmuch);
             int const e = EVUTIL_SOCKET_ERROR();
 
-            tr_logAddTraceIo(io, "read %d from peer (%s)", res, res == -1 ? tr_net_strerror(e).c_str() : "");
+            tr_logAddTraceIo(io, fmt::format("read {} from peer ({})", res, res == -1 ? tr_net_strerror(e).c_str() : ""));
 
             if (evbuffer_get_length(io->inbuf) != 0)
             {
@@ -1260,11 +1273,7 @@ static int tr_peerIoTryRead(tr_peerIo* io, size_t howmuch)
 
                 tr_logAddTraceIo(
                     io,
-                    "tr_peerIoTryRead err: res:%d what:%hd, errno:%d (%s)",
-                    res,
-                    what,
-                    e,
-                    tr_net_strerror(e).c_str());
+                    fmt::format("tr_peerIoTryRead err: res:{} what:{}, errno:{} ({})", res, what, e, tr_net_strerror(e)));
 
                 io->gotError(io, what, io->userData);
             }
@@ -1273,7 +1282,7 @@ static int tr_peerIoTryRead(tr_peerIo* io, size_t howmuch)
         }
 
     default:
-        tr_logAddDebugIo(io, "unsupported peer socket type %d", io->socket.type);
+        tr_logAddDebugIo(io, fmt::format("unsupported peer socket type {}", io->socket.type));
     }
 
     return res;
@@ -1283,7 +1292,7 @@ static int tr_peerIoTryWrite(tr_peerIo* io, size_t howmuch)
 {
     auto const old_len = size_t{ evbuffer_get_length(io->outbuf) };
 
-    tr_logAddTraceIo(io, "in tr_peerIoTryWrite %zu", howmuch);
+    tr_logAddTraceIo(io, fmt::format("in tr_peerIoTryWrite {}", howmuch));
     howmuch = std::min(howmuch, old_len);
     howmuch = io->bandwidth->clamp(TR_UP, howmuch);
     if (howmuch == 0)
@@ -1316,11 +1325,7 @@ static int tr_peerIoTryWrite(tr_peerIo* io, size_t howmuch)
 
                 tr_logAddTraceIo(
                     io,
-                    "tr_peerIoTryWrite err: res:%d, what:%hd, errno:%d (%s)",
-                    n,
-                    what,
-                    e,
-                    tr_net_strerror(e).c_str());
+                    fmt::format("tr_peerIoTryWrite err: res:{}, what:{}, errno:{} ({})", n, what, e, tr_net_strerror(e)));
                 io->gotError(io, what, io->userData);
             }
 
@@ -1328,7 +1333,7 @@ static int tr_peerIoTryWrite(tr_peerIo* io, size_t howmuch)
         }
 
     default:
-        tr_logAddDebugIo(io, "unsupported peer socket type %d", io->socket.type);
+        tr_logAddDebugIo(io, fmt::format("unsupported peer socket type {}", io->socket.type));
     }
 
     return n;
@@ -1340,7 +1345,7 @@ int tr_peerIoFlush(tr_peerIo* io, tr_direction dir, size_t limit)
     TR_ASSERT(tr_isDirection(dir));
 
     int const bytes_used = dir == TR_DOWN ? tr_peerIoTryRead(io, limit) : tr_peerIoTryWrite(io, limit);
-    tr_logAddTraceIo(io, "flushing peer-io, direction:%d, limit:%zu, byte_used:%d", (int)dir, limit, bytes_used);
+    tr_logAddTraceIo(io, fmt::format("flushing peer-io, direction:{}, limit:{}, byte_used:{}", dir, limit, bytes_used));
     return bytes_used;
 }
 

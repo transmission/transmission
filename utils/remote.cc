@@ -14,10 +14,12 @@
 #include <string>
 #include <string_view>
 
+#include <curl/curl.h>
+
 #include <event2/buffer.h>
 #include <event2/util.h>
 
-#include <curl/curl.h>
+#include <fmt/core.h>
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/crypto-utils.h>
@@ -2000,7 +2002,7 @@ static int processResponse(char const* rpcurl, std::string_view response)
 
     if (!tr_variantFromBuf(&top, TR_VARIANT_PARSE_JSON | TR_VARIANT_PARSE_INPLACE, response))
     {
-        tr_logAddNamedWarn(MyName, "Unable to parse response \"%" TR_PRIsv "\"", TR_PRIsv_ARG(response));
+        tr_logAddNamedWarn(MyName, fmt::format("Unable to parse response '{}'", response));
         status |= EXIT_FAILURE;
     }
     else
@@ -2172,7 +2174,7 @@ static int flush(char const* rpcurl, tr_variant** benc)
     auto const res = curl_easy_perform(curl);
     if (res != CURLE_OK)
     {
-        tr_logAddNamedWarn(MyName, " (%s) %s", rpcurl_http.c_str(), curl_easy_strerror(res));
+        tr_logAddNamedWarn(MyName, fmt::format(" ({}) {}", rpcurl_http, curl_easy_strerror(res)));
         status |= EXIT_FAILURE;
     }
     else
