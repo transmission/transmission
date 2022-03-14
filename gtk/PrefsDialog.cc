@@ -444,7 +444,9 @@ void onBlocklistUpdated(Glib::RefPtr<Session> const& core, int n, blocklist_data
         ngettext("Blocklist has {count} entry", "Blocklist has {count} entries", count),
         fmt::arg("count", count));
     data->updateBlocklistButton->set_sensitive(true);
-    data->updateBlocklistDialog->set_message(success ? _("<b>Update succeeded!</b>") : _("<b>Unable to update.</b>"), true);
+    data->updateBlocklistDialog->set_message(
+        fmt::format("<b>{}</b>", success ? _("Blocklist updated!") : _("Couldn't update blocklist")),
+        true);
     data->updateBlocklistDialog->set_secondary_text(msg);
     updateBlocklistText(data->label, core);
 }
@@ -1016,7 +1018,7 @@ void onPortTest(std::shared_ptr<network_page_data> const& data)
 {
     data->portButton->set_sensitive(false);
     data->portSpin->set_sensitive(false);
-    data->portLabel->set_markup(_("<i>Testing TCP port…</i>"));
+    data->portLabel->set_markup(fmt::format("<i>{}</i>", _("Testing TCP port…")));
 
     if (!data->portTag.connected())
     {
