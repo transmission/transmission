@@ -203,8 +203,10 @@ void MessageLogWindow::Impl::doSave(Gtk::Window& parent, Glib::ustring const& fi
         for (auto const& row : store_->children())
         {
             auto const* const node = row.get_value(message_log_cols.tr_msg);
-            auto const* const level_str = level_names_.at(node->level);
             auto const date = gtr_asctime(node->when);
+
+            auto const it = level_names_.find(node->level);
+            auto const* const level_str = it != std::end(level_names_) ? it->second : "???";
 
             fprintf(
                 fp,
