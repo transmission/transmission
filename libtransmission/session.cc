@@ -1927,7 +1927,7 @@ void tr_sessionClose(tr_session* session)
 
     time_t const deadline = time(nullptr) + ShutdownMaxSeconds;
 
-    tr_logAddInfo(fmt::format(_("Shutting down transmission session {address}"), fmt::arg("address", fmt::ptr(session))));
+    tr_logAddInfo(fmt::format(_("Shutting down Transmission session {address}"), fmt::arg("address", fmt::ptr(session))));
     tr_logAddDebug(fmt::format("now is {}, deadline is {}", time(nullptr), deadline));
 
     /* close the session */
