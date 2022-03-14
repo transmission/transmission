@@ -43,10 +43,7 @@ static bool preallocate_file_sparse(tr_sys_file_t fd, uint64_t length, tr_error*
         return true;
     }
 
-    tr_logAddDebug(fmt::format(
-        "Fast preallocation failed: {errmsg} ({errcode})",
-        fmt::arg("errmsg", my_error->message),
-        fmt::arg("errcode", my_error->code)));
+    tr_logAddDebug(fmt::format("Fast preallocation failed: {} ({})", my_error->message, my_error->code));
 
     if (!TR_ERROR_IS_ENOSPC(my_error->code))
     {
