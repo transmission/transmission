@@ -693,7 +693,7 @@ static int daemon_start(void* varg, [[maybe_unused]] bool foreground)
     if (ev_base == nullptr)
     {
         char buf[256];
-        tr_snprintf(buf, sizeof(buf), "Failed to init daemon event state: %s", tr_strerror(errno));
+        tr_snprintf(buf, sizeof(buf), "Couldn't initialize daemon event state: %s", tr_strerror(errno));
         printMessage(logfile, TR_LOG_ERROR, MyName, buf, __FILE__, __LINE__);
         return 1;
     }
@@ -804,7 +804,7 @@ static int daemon_start(void* varg, [[maybe_unused]] bool foreground)
         {
             auto const errcode = errno;
             tr_logAddError(fmt::format(
-                _("Failed to create status event: {errmsg} ({errcode})"),
+                _("Couldn't create status event: {errmsg} ({errcode})"),
                 fmt::arg("errmsg", tr_strerror(errcode)),
                 fmt::arg("errcode", errcode)));
             goto CLEANUP;
@@ -814,7 +814,7 @@ static int daemon_start(void* varg, [[maybe_unused]] bool foreground)
         {
             auto const errcode = errno;
             tr_logAddError(fmt::format(
-                _("Failed to add status event: {errmsg} ({errcode})"),
+                _("Couldn't add status event: {errmsg} ({errcode})"),
                 fmt::arg("errmsg", tr_strerror(errcode)),
                 fmt::arg("errcode", errcode)));
             goto CLEANUP;
@@ -828,7 +828,7 @@ static int daemon_start(void* varg, [[maybe_unused]] bool foreground)
     {
         auto const errcode = errno;
         tr_logAddError(fmt::format(
-            _("Failed to launch daemon event loop: {errmsg} ({errcode})"),
+            _("Couldn't launch daemon event loop: {errmsg} ({errcode})"),
             fmt::arg("errmsg", tr_strerror(errcode)),
             fmt::arg("errcode", errcode)));
         goto CLEANUP;
@@ -942,7 +942,7 @@ int tr_main(int argc, char* argv[])
 
     if (tr_error* error = nullptr; !dtr_daemon(&cb, &data, foreground, &ret, &error))
     {
-        printMessage(logfile, TR_LOG_ERROR, MyName, tr_strvJoin("Failed to daemonize: ", error->message), __FILE__, __LINE__);
+        printMessage(logfile, TR_LOG_ERROR, MyName, tr_strvJoin("Couldn't daemonize: ", error->message), __FILE__, __LINE__);
         tr_error_free(error);
     }
 

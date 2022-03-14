@@ -450,7 +450,7 @@ static void utp_on_write(void* vio, unsigned char* buf, size_t buflen)
     if (rc < (long)buflen)
     {
         auto const errmsg = fmt::format(
-            _("Unable to write {expected_size} bytes to peer; wrote {actual_size}"),
+            _("Couldn't write {expected_size} bytes to peer; wrote {actual_size}"),
             fmt::arg("expected_size", buflen),
             fmt::arg("actual_size", rc));
         tr_logAddWarnIo(io, errmsg);

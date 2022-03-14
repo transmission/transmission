@@ -1451,7 +1451,7 @@ bool gtr_inhibit_hibernation(guint32& cookie)
     }
     catch (Glib::Error const& e)
     {
-        tr_logAddError(fmt::format(_("Couldn't inhibit desktop hibernation: {}"), e.what().raw()));
+        tr_logAddError(fmt::format(_("Couldn't inhibit desktop hibernation: {errmsg}"), fmt::arg("errmsg", e.what().raw())));
     }
 
     return success;
