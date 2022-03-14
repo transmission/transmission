@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <array>
 #include <limits.h> /* INT_MAX */
+#include <numeric>
 #include <sstream>
 #include <stddef.h>
 #include <stdio.h> /* sscanf() */
@@ -943,16 +944,17 @@ void DetailsDialog::Impl::refreshInfo(std::vector<tr_torrent*> const& torrents)
     }
     else
     {
-        uint64_t up = 0;
-        uint64_t down = 0;
-
-        for (auto const* const st : stats)
-        {
-            up += st->uploadedEver;
-            down += st->downloadedEver;
-        }
-
-        str = gtr_sprintf(_("%s (Ratio: %s)"), tr_strlsize(up), tr_strlratio(tr_getRatio(up, down)));
+        auto const uploaded = std::accumulate(
+            std::begin(stats),
+            std::end(stats),
+            uint64_t{},
+            [](auto sum, auto const* st) { return sum + st->uploadedEver; });
+        auto const denominator = std::accumulate(
+            std::begin(torrents),
+            std::end(torrents),
+            uint64_t{},
+            [](auto sum, auto const* tor) { return sum + tr_torrentTotalSize(tor); });
+        str = gtr_sprintf(_("%s (Ratio: %s)"), tr_strlsize(uploaded), tr_strlratio(tr_getRatio(uploaded, denominator)));
     }
 
     ul_lb_->set_text(str);

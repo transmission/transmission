@@ -1034,7 +1034,7 @@ static void printDetails(tr_variant* top)
                 }
             }
 
-            if (tr_variantDictFindInt(t, TR_KEY_downloadedEver, &i) && tr_variantDictFindInt(t, TR_KEY_uploadedEver, &j))
+            if (tr_variantDictFindInt(t, TR_KEY_totalSize, &i) && tr_variantDictFindInt(t, TR_KEY_uploadedEver, &j))
             {
                 if (auto corrupt = int64_t{}; tr_variantDictFindInt(t, TR_KEY_corruptEver, &corrupt) && corrupt != 0)
                 {
