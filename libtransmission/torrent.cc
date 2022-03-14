@@ -478,7 +478,7 @@ void tr_torrentCheckSeedLimit(tr_torrent* tor)
     /* if we're seeding and reach our seed ratio limit, stop the torrent */
     if (tr_torrentIsSeedRatioDone(tor))
     {
-        loginfo(tor, "%s", "Seed ratio reached; pausing torrent");
+        loginfo(tor, "Seed ratio reached; pausing torrent");
 
         tor->isStopping = true;
 
@@ -491,7 +491,7 @@ void tr_torrentCheckSeedLimit(tr_torrent* tor)
     /* if we're seeding and reach our inactivity limit, stop the torrent */
     else if (tr_torrentIsSeedIdleLimitDone(tor))
     {
-        loginfo(tor, "%s", "Seeding idle limit reached; pausing torrent");
+        loginfo(tor, "Seeding idle limit reached; pausing torrent");
 
         tor->isStopping = true;
         tor->finishedSeedingByIdle = true;
@@ -622,7 +622,7 @@ static bool setLocalErrorIfFilesDisappeared(tr_torrent* tor)
 
     if (disappeared)
     {
-        logtrace(tor, "%s", "[LAZY] uh oh, the files disappeared");
+        logtrace(tor, "[LAZY] uh oh, the files disappeared");
         tor->setLocalError(_(
             "No data found! Ensure your drives are connected or use \"Set Location\". To re-download, remove the torrent and re-add it."));
     }
@@ -1403,7 +1403,7 @@ static void torrentStart(tr_torrent* tor, bool bypass_queue)
     /* allow finished torrents to be resumed */
     if (tr_torrentIsSeedRatioDone(tor))
     {
-        loginfo(tor, "%s", _("Restarted manually -- disabling its seed ratio"));
+        loginfo(tor, _("Restarted manually -- disabling its seed ratio"));
         tr_torrentSetRatioMode(tor, TR_RATIOLIMIT_UNLIMITED);
     }
 
@@ -1537,7 +1537,7 @@ static void stopTorrent(tr_torrent* const tor)
     if (tor->magnetVerify)
     {
         tor->magnetVerify = false;
-        logtrace(tor, "%s", "Magnet Verify");
+        logtrace(tor, "Magnet Verify");
         refreshCurrentDir(tor);
         tr_torrentVerify(tor);
 
@@ -1570,7 +1570,7 @@ static void closeTorrent(tr_torrent* const tor)
 
     if (!tor->session->isClosing())
     {
-        loginfo(tor, "%s", _("Removing torrent"));
+        loginfo(tor, _("Removing torrent"));
     }
 
     tor->magnetVerify = false;
@@ -1780,13 +1780,19 @@ static void torrentCallScript(tr_torrent const* tor, char const* script)
         { "TR_TORRENT_TRACKERS"sv, trackers_str },
     };
 
-    loginfo(tor, "Calling script \"%s\"", script);
+    loginfo(tor, fmt::format(_("Calling script '{path}'"), script));
 
     tr_error* error = nullptr;
 
     if (!tr_spawn_async(std::data(cmd), env, TR_IF_WIN32("\\", "/"), &error))
     {
-        logwarn(tor, "Error executing script \"%s\" (%d): %s", script, error->code, error->message);
+        logwarn(
+            tor,
+            fmt::format(
+                _("Couldn't call script '{path}': {errmsg} ({errcode})"),
+                fmt::arg("path", script),
+                fmt::arg("errmsg", error->message),
+                fmt::arg("errcode", error->code)));
         tr_error_free(error);
     }
 }
@@ -2353,10 +2359,7 @@ static void setLocationImpl(struct LocationData* const data)
 
     logtrace(
         tor,
-        "Moving \"%s\" location from currentDir \"%s\" to \"%s\"",
-        tr_torrentName(tor),
-        tor->currentDir().c_str(),
-        location.c_str());
+        fmt::format("Moving '{}' location from currentDir '{}' to '{}'", tor->name(), tor->currentDir().sv(), location));
 
     tr_sys_dir_create(location.c_str(), TR_SYS_DIR_CREATE_PARENTS, 0777, nullptr);
 
@@ -2379,18 +2382,25 @@ static void setLocationImpl(struct LocationData* const data)
                 auto const oldpath = tr_strvPath(oldbase, sub);
                 auto const newpath = tr_strvPath(location, sub);
 
-                logtrace(tor, "Found file #%d: %s", (int)i, oldpath.c_str());
+                logtrace(tor, fmt::format("Found file #{}: {}", i, oldpath));
 
                 if (do_move && !tr_sys_path_is_same(oldpath.c_str(), newpath.c_str(), nullptr))
                 {
                     tr_error* error = nullptr;
 
-                    logtrace(tor, "moving \"%s\" to \"%s\"", oldpath.c_str(), newpath.c_str());
+                    logtrace(tor, fmt::format("moving '{}' to '{}'", oldpath, newpath));
 
                     if (!tr_moveFile(oldpath.c_str(), newpath.c_str(), &error))
                     {
                         err = true;
-                        logerr(tor, "error moving \"%s\" to \"%s\": %s", oldpath.c_str(), newpath.c_str(), error->message);
+                        logerr(
+                            tor,
+                            fmt::format(
+                                _("Couldn't move '{oldpath}' to '{path}': {errmsg} ({errcode})"),
+                                fmt::arg("oldpath", oldpath),
+                                fmt::arg("path", newpath),
+                                fmt::arg("errmsg", error->message),
+                                fmt::arg("errcode", error->code)));
                         tr_error_free(error);
                     }
                 }
@@ -2529,7 +2539,14 @@ static void tr_torrentFileCompleted(tr_torrent* tor, tr_file_index_t i)
 
             if (!tr_sys_path_rename(oldpath.c_str(), newpath.c_str(), &error))
             {
-                logerr(tor, "Error moving \"%s\" to \"%s\": %s", oldpath.c_str(), newpath.c_str(), error->message);
+                logerr(
+                    tor,
+                    fmt::format(
+                        _("Couldn't move '{oldpath}' to '{path}': {errmsg} ({errcode})"),
+                        fmt::arg("oldpath", oldpath),
+                        fmt::arg("path", newpath),
+                        fmt::arg("errmsg", error->message),
+                        fmt::arg("errcode", error->code)));
                 tr_error_free(error);
             }
         }
