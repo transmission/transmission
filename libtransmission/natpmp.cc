@@ -146,7 +146,7 @@ tr_port_forwarding tr_natpmpPulse(
         {
             int const unmapped_port = resp.pnu.newportmapping.privateport;
 
-            tr_logAddNamedInfo(CodeName, fmt::format(_("No longer forwarding port {port}"), fmt::arg("port", unmapped_port)));
+            tr_logAddNamedInfo(CodeName, fmt::format(_("Port {port} is no longer forwarded"), fmt::arg("port", unmapped_port)));
 
             if (nat->private_port == unmapped_port)
             {
