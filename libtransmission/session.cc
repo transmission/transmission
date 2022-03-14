@@ -737,7 +737,7 @@ static void tr_sessionInitImpl(init_data* data)
 
     tr_announcerInit(session);
 
-    tr_logAddInfo(fmt::format(_("Transmission version {version} started"), fmt::arg("version", LONG_VERSION_STRING)));
+    tr_logAddInfo(fmt::format(_("Transmission version {version} starting"), fmt::arg("version", LONG_VERSION_STRING)));
 
     tr_statsInit(session);
 
@@ -1927,7 +1927,7 @@ void tr_sessionClose(tr_session* session)
 
     time_t const deadline = time(nullptr) + ShutdownMaxSeconds;
 
-    tr_logAddInfo(fmt::format(_("Shutting down Transmission session {address}"), fmt::arg("address", fmt::ptr(session))));
+    tr_logAddInfo(fmt::format(_("Transmission version {version} shutting down"), fmt::arg("version", LONG_VERSION_STRING)));
     tr_logAddDebug(fmt::format("now is {}, deadline is {}", time(nullptr), deadline));
 
     /* close the session */
