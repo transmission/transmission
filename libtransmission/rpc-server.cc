@@ -781,12 +781,12 @@ static void startServer(tr_rpc_server* server)
         {
             int const retry_delay = rpc_server_start_retry(server);
 
-            tr_logAddDebug(fmt::format("Unable to bind to {}, retrying in {} seconds", addr_port_str, retry_delay));
+            tr_logAddDebug(fmt::format("Couldn't bind to {}, retrying in {} seconds", addr_port_str, retry_delay));
             return;
         }
 
         tr_logAddError(fmt::format(
-            _("Unable to bind to {address} after {count} attempts, giving up"),
+            _("Couldn't bind to {address} after {count} attempts, giving up"),
             fmt::arg("address", addr_port_str),
             fmt::arg("count", ServerStartRetryCount)));
     }
