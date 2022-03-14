@@ -166,7 +166,7 @@ void gtr_add_torrent_error_dialog(Gtk::Widget& child, tr_torrent* duplicate_torr
 
     auto w = std::make_shared<Gtk::MessageDialog>(
         *win,
-        _("Error opening torrent"),
+        _("Couldn't open torrent"),
         false,
         Gtk::MESSAGE_ERROR,
         Gtk::BUTTONS_CLOSE);
