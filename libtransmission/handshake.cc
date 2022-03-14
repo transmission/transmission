@@ -249,7 +249,8 @@ static handshake_parse_err_t parseHandshake(tr_handshake* handshake, struct evbu
     handshake->peer_id = peer_id;
 
     /* peer id */
-    tr_logAddTraceHand(handshake, fmt::format("peer-id is '{}'", std::data(peer_id)));
+    auto const peer_id_sv = std::string_view{ std::data(peer_id), std::size(peer_id) };
+    tr_logAddTraceHand(handshake, fmt::format("peer-id is '{}'", peer_id_sv));
 
     if (auto* const tor = handshake->session->torrents().get(hash); peer_id == tr_torrentGetPeerId(tor))
     {
