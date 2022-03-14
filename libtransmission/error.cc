@@ -30,11 +30,12 @@ void tr_error_free(tr_error* error)
 
 void tr_error_set(tr_error** error, int code, std::string_view message)
 {
-    if (error == nullptr || *error != nullptr)
+    if (error == nullptr)
     {
         return;
     }
 
+    TR_ASSERT(*error == nullptr);
     *error = new tr_error{ code, tr_strvDup(message) };
 }
 
