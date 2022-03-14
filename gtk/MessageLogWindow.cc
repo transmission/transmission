@@ -5,9 +5,12 @@
 
 #include <errno.h>
 #include <stdio.h>
+#include <map>
 
 #include <glibmm.h>
 #include <glibmm/i18n.h>
+
+#include <fmt/core.h>
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/log.h>
@@ -158,6 +161,16 @@ Glib::ustring gtr_asctime(time_t t)
     return Glib::DateTime::create_now_local(t).format("%a %b %e %T %Y"); /* ctime equiv */
 }
 
+auto logLevelNames()
+{
+    return std::map<tr_log_level, char const*>{ { { TR_LOG_CRITICAL, _("Critical") },
+                                                  { TR_LOG_ERROR, _("Error") },
+                                                  { TR_LOG_WARN, _("Warning") },
+                                                  { TR_LOG_INFO, _("Information") },
+                                                  { TR_LOG_DEBUG, _("Debug") },
+                                                  { TR_LOG_TRACE, _("Trace") } } };
+}
+
 } // namespace
 
 void MessageLogWindow::Impl::doSave(Gtk::Window& parent, Glib::ustring const& filename)
@@ -166,9 +179,14 @@ void MessageLogWindow::Impl::doSave(Gtk::Window& parent, Glib::ustring const& fi
 
     if (fp == nullptr)
     {
+        auto const errcode = errno;
         auto w = std::make_shared<Gtk::MessageDialog>(
             parent,
-            gtr_sprintf(_("Couldn't save \"%s\""), filename),
+            fmt::format(
+                _("Couldn't save '{path}': {errmsg} ({errcode})"),
+                fmt::arg("path", filename.raw()),
+                fmt::arg("errmsg", g_strerror(errcode)),
+                fmt::arg("errcode", errcode)),
             false,
             Gtk::MESSAGE_ERROR,
             Gtk::BUTTONS_CLOSE);
@@ -178,41 +196,19 @@ void MessageLogWindow::Impl::doSave(Gtk::Window& parent, Glib::ustring const& fi
     }
     else
     {
+        auto const keys = logLevelNames();
+
         for (auto const& row : store_->children())
         {
-            char const* levelStr;
             auto const* const node = row.get_value(message_log_cols.tr_msg);
-
+            auto const* const level_str = keys.at(node->level);
             auto const date = gtr_asctime(node->when);
-
-            switch (node->level)
-            {
-            case TR_LOG_TRACE:
-                levelStr = _("trace");
-                break;
-
-            case TR_LOG_DEBUG:
-                levelStr = _("debug");
-                break;
-
-            case TR_LOG_WARN:
-                levelStr = _("warn");
-                break;
-
-            case TR_LOG_ERROR:
-                levelStr = _("error");
-                break;
-
-            default:
-                levelStr = _("info");
-                break;
-            }
 
             fprintf(
                 fp,
                 "%s\t%s\t%s\t%s\n",
                 date.c_str(),
-                levelStr,
+                level_str != nullptr ? level_str : "",
                 node->name != nullptr ? node->name : "",
                 node->message != nullptr ? node->message : "");
         }
@@ -422,13 +418,12 @@ namespace
 
 Gtk::ComboBox* debug_level_combo_new()
 {
-    auto* w = gtr_combo_box_new_enum({
-        { _("Error"), TR_LOG_ERROR },
-        { _("Warnings"), TR_LOG_WARN },
-        { _("Information"), TR_LOG_INFO },
-        { _("Debug"), TR_LOG_DEBUG },
-        { _("Trace"), TR_LOG_TRACE },
-    });
+    auto items = std::vector<std::pair<Glib::ustring, int>>{};
+    for (auto const& [level, name] : logLevelNames())
+    {
+        items.emplace_back(level, name);
+    }
+    auto* w = gtr_combo_box_new_enum(items);
     gtr_combo_box_set_active_enum(*w, gtr_pref_int_get(TR_KEY_message_level));
     return w;
 }
