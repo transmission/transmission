@@ -11,6 +11,8 @@
 
 #include <event2/buffer.h>
 
+#include <fmt/core.h>
+
 #include "transmission.h"
 
 #include "crypto-utils.h" /* tr_sha1() */
@@ -311,7 +313,7 @@ static void onHaveAllMetainfo(tr_torrent* tor, tr_incomplete_metadata* m)
 
         m->piecesNeededCount = n;
         char const* const msg = error != nullptr && error->message != nullptr ? error->message : "unknown error";
-        logdbg(tor, "metadata error: %s. (trying again; %d pieces left)", msg, n);
+        logdbg(tor, fmt::format("metadata error: {}. (trying again; {} pieces left)", msg, n));
         tr_error_clear(&error);
     }
 }
