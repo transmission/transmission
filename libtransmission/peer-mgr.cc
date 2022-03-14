@@ -863,7 +863,7 @@ static void peerCallbackFunc(tr_peer* peer, tr_peer_event const* e, void* vs)
         break;
 
     default:
-        TR_ASSERT_MSG(false, "%s", fmt::format("unhandled peer event type {}", int(e->eventType)).c_str());
+        TR_ASSERT_MSG(false, "%s", fmt::format("unhandled peer event type {}", e->eventType).c_str());
     }
 }
 
@@ -1215,7 +1215,7 @@ void tr_peerMgrGotBadPiece(tr_torrent* tor, tr_piece_index_t pieceIndex)
                     "peer {} contributed to corrupt piece ({}); now has {} strikes",
                     tr_atomAddrStr(peer->atom),
                     pieceIndex,
-                    int(peer->strikes + 1)));
+                    peer->strikes + 1));
             addStrike(s, peer);
         }
     }
