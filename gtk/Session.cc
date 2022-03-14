@@ -1124,9 +1124,10 @@ void Session::Impl::add_file_async_callback(
     catch (Glib::Error const& e)
     {
         auto const errmsg = fmt::format(
-            _("Couldn't read '{path}': {errmsg}"),
+            _("Couldn't read '{path}': {errmsg} ({errcode})"),
             fmt::arg("path", file->get_parse_name().raw()),
-            fmt::arg("errmsg", e.what().raw()));
+            fmt::arg("errmsg", e.what().raw()),
+            fmt::arg("errmsg", e.code()));
         g_message("%s", errmsg.c_str());
     }
 
