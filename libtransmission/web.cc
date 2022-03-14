@@ -22,6 +22,9 @@
 
 #include <event2/buffer.h>
 
+#include <fmt/core.h>
+#include <fmt/format.h>
+
 #include "crypto-utils.h"
 #include "log.h"
 #include "tr-assert.h"
@@ -119,9 +122,10 @@ public:
         if (curl_ssl_verify)
         {
             auto const* bundle = std::empty(curl_ca_bundle) ? "none" : curl_ca_bundle.c_str();
-            loginfo("will verify tracker certs using envvar CURL_CA_BUNDLE: %s", bundle);
-            loginfo("NB: this only works if you built against libcurl with openssl or gnutls, NOT nss");
-            loginfo("NB: Invalid certs will appear as 'Could not connect to tracker' like many other errors");
+            loginfo(
+                fmt::format(_("Will verify tracker certs using envvar CURL_CA_BUNDLE: {bundle}"), fmt::arg("bundle", bundle)));
+            loginfo(_("NB: this only works if you built against libcurl with openssl or gnutls, NOT nss"));
+            loginfo(_("NB: Invalid certs will appear as 'Could not connect to tracker' like many other errors"));
         }
 
         if (auto const& file = mediator.cookieFile(); file)
@@ -291,7 +295,7 @@ private:
         }
 
         evbuffer_add(task->body(), data, bytes_used);
-        logtrace("wrote %zu bytes to task %p's buffer", bytes_used, (void*)task);
+        logtrace(fmt::format("wrote {} bytes to task {}'s buffer", bytes_used, fmt::ptr(task)));
         return bytes_used;
     }
 
@@ -457,7 +461,7 @@ private:
                 // add queued tasks
                 for (auto* task : impl->queued_tasks)
                 {
-                    logtrace("adding task to curl: [%s]", task->url().c_str());
+                    logtrace(fmt::format("adding task to curl: '{}'", task->url()));
                     initEasy(impl, task);
                     curl_multi_add_handle(multi.get(), task->easy());
                 }
