@@ -1475,7 +1475,7 @@ void gtr_uninhibit_hibernation(guint inhibit_cookie)
     }
     catch (Glib::Error const& e)
     {
-        g_warning("Couldn't uninhibit desktop hibernation: %s.", e.what().c_str());
+        tr_logAddError(fmt::format(_("Couldn't inhibit desktop hibernation: {errmsg}"), fmt::arg("errmsg", e.what().raw())));
     }
 }
 
