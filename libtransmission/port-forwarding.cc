@@ -107,8 +107,8 @@ static void natPulse(tr_shared* s, bool do_check)
     if (new_status != old_status)
     {
         loginfo(fmt::format(
-            _("State changed from '{old_state}' to '{state}"),
-            fmt::arg("old_state", getNatStateStr(old_status)),
+            _("State changed from '{oldstate}' to '{state}"),
+            fmt::arg("oldstate", getNatStateStr(old_status)),
             fmt::arg("state", getNatStateStr(new_status))));
     }
 }
