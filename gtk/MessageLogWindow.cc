@@ -62,6 +62,7 @@ private:
 
     void scroll_to_bottom();
     void level_combo_changed_cb(Gtk::ComboBox* combo_box);
+    Gtk::ComboBox* level_combo_new() const;
 
     bool is_pinned_to_new() const;
     bool isRowVisible(Gtk::TreeModel::const_iterator const& iter) const;
@@ -77,6 +78,7 @@ private:
     tr_log_level maxLevel_ = TR_LOG_INFO;
     bool isPaused_ = false;
     sigc::connection refresh_tag_;
+    std::map<tr_log_level, char const*> const level_names_;
 };
 
 namespace
@@ -136,6 +138,18 @@ void MessageLogWindow::Impl::scroll_to_bottom()
 *****
 ****/
 
+Gtk::ComboBox* MessageLogWindow::Impl::level_combo_new() const
+{
+    auto items = std::vector<std::pair<Glib::ustring, int>>{};
+    for (auto const& [level, name] : level_names_)
+    {
+        items.emplace_back(name, level);
+    }
+    auto* w = gtr_combo_box_new_enum(items);
+    gtr_combo_box_set_active_enum(*w, gtr_pref_int_get(TR_KEY_message_level));
+    return w;
+}
+
 void MessageLogWindow::Impl::level_combo_changed_cb(Gtk::ComboBox* combo_box)
 {
     auto const level = static_cast<tr_log_level>(gtr_combo_box_get_active_enum(*combo_box));
@@ -159,16 +173,6 @@ namespace
 Glib::ustring gtr_asctime(time_t t)
 {
     return Glib::DateTime::create_now_local(t).format("%a %b %e %T %Y"); /* ctime equiv */
-}
-
-auto logLevelNames()
-{
-    return std::map<tr_log_level, char const*>{ { { TR_LOG_CRITICAL, _("Critical") },
-                                                  { TR_LOG_ERROR, _("Error") },
-                                                  { TR_LOG_WARN, _("Warning") },
-                                                  { TR_LOG_INFO, _("Information") },
-                                                  { TR_LOG_DEBUG, _("Debug") },
-                                                  { TR_LOG_TRACE, _("Trace") } } };
 }
 
 } // namespace
@@ -196,12 +200,10 @@ void MessageLogWindow::Impl::doSave(Gtk::Window& parent, Glib::ustring const& fi
     }
     else
     {
-        auto const keys = logLevelNames();
-
         for (auto const& row : store_->children())
         {
             auto const* const node = row.get_value(message_log_cols.tr_msg);
-            auto const* const level_str = keys.at(node->level);
+            auto const* const level_str = level_names_.at(node->level);
             auto const date = gtr_asctime(node->when);
 
             fprintf(
@@ -416,18 +418,6 @@ bool MessageLogWindow::Impl::onRefresh()
 namespace
 {
 
-Gtk::ComboBox* debug_level_combo_new()
-{
-    auto items = std::vector<std::pair<Glib::ustring, int>>{};
-    for (auto const& [level, name] : logLevelNames())
-    {
-        items.emplace_back(level, name);
-    }
-    auto* w = gtr_combo_box_new_enum(items);
-    gtr_combo_box_set_active_enum(*w, gtr_pref_int_get(TR_KEY_message_level));
-    return w;
-}
-
 } // namespace
 
 /**
@@ -451,6 +441,12 @@ MessageLogWindow::~MessageLogWindow() = default;
 MessageLogWindow::Impl::Impl(MessageLogWindow& window, Glib::RefPtr<Session> const& core)
     : window_(window)
     , core_(core)
+    , level_names_{ { { TR_LOG_CRITICAL, _("Critical") },
+                      { TR_LOG_ERROR, _("Error") },
+                      { TR_LOG_WARN, _("Warning") },
+                      { TR_LOG_INFO, _("Information") },
+                      { TR_LOG_DEBUG, _("Debug") },
+                      { TR_LOG_TRACE, _("Trace") } } }
 {
     window_.set_title(_("Message Log"));
     window_.set_default_size(560, 350);
@@ -511,7 +507,7 @@ MessageLogWindow::Impl::Impl(MessageLogWindow& window, Glib::RefPtr<Session> con
     }
 
     {
-        auto* w = debug_level_combo_new();
+        auto* w = level_combo_new();
         w->signal_changed().connect([this, w]() { level_combo_changed_cb(w); });
         auto* item = Gtk::make_managed<Gtk::ToolItem>();
         item->add(*w);

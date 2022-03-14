@@ -8,7 +8,7 @@
 
 #include <event2/buffer.h>
 
-#include <fmt/base.h>
+#include <fmt/core.h>
 
 #include "transmission.h"
 #include "cache.h"
