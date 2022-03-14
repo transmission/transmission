@@ -853,10 +853,7 @@ static auto get_weekday_string(Glib::Date::Weekday weekday)
 {
     auto date = Glib::Date{};
     date.set_time_current();
-    while (date.get_weekday() != weekday)
-    {
-        date.add_days(1);
-    }
+    date.add_days(weekday - date.get_weekday());
     return date.format_string("%A");
 }
 
