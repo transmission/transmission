@@ -28,8 +28,11 @@
 #include <netinet/in.h> /* sockaddr_in */
 #endif
 
-#include <event2/event.h>
 #include <dht/dht.h>
+
+#include <event2/event.h>
+
+#include <fmt/core.h>
 
 #include "transmission.h"
 
@@ -46,16 +49,9 @@
 #include "utils.h"
 #include "variant.h"
 
-#define logdbg(...) tr_logAddNamed(TR_LOG_DEBUG, "dht", __VA_ARGS__)
-#define logdbgTor(tor, ...) tr_logAddNamed(TR_LOG_DEBUG, tr_torrentName(tor), __VA_ARGS__)
-#define loginfo(...) tr_logAddNamed(TR_LOG_INFO, "dht", __VA_ARGS__)
-#define logtrace(...) tr_logAddNamed(TR_LOG_TRACE, "dht", __VA_ARGS__)
-#define logtraceTor(tor, ...) tr_logAddNamed(TR_LOG_TRACE, tr_torrentName(tor), __VA_ARGS__)
-#define logwarn(...) tr_logAddNamed(TR_LOG_WARN, "dht", __VA_ARGS__)
-#define logwarnTor(tor, ...) tr_logAddNamed(TR_LOG_WARN, tr_torrentName(tor), __VA_ARGS__)
-
 using namespace std::literals;
 
+static auto constexpr CodeName = "dht"sv;
 static struct event* dht_timer = nullptr;
 static unsigned char myid[20];
 static tr_session* session_ = nullptr;
@@ -117,7 +113,7 @@ static void bootstrap_from_name(char const* name, tr_port port, int af)
     addrinfo* info = nullptr;
     if (int const rc = getaddrinfo(name, pp, &hints, &info); rc != 0)
     {
-        logwarn("%s:%s: %s", name, pp, gai_strerror(rc));
+        tr_logAddNamedWarn(CodeName, fmt::format("{}:{}: {}", name, pp, gai_strerror(rc)));
         return;
     }
 
@@ -155,7 +151,7 @@ static void dht_boostrap_from_file(tr_session* session)
     }
 
     // format is each line has address, a space char, and port number
-    logtrace("Attempting manual bootstrap");
+    tr_logAddNamedTrace(CodeName, "Attempting manual bootstrap");
     auto line = std::string{};
     while (!bootstrap_done(session, 0) && std::getline(in, line))
     {
@@ -166,7 +162,7 @@ static void dht_boostrap_from_file(tr_session* session)
 
         if (line_stream.bad() || std::empty(addrstr) || port <= 0)
         {
-            logwarn("Couldn't parse line: \"%s\"", line.c_str());
+            tr_logAddNamedWarn(CodeName, fmt::format(_("Couldn't parse line: '{line}'"), fmt::arg("line", line)));
         }
         else
         {
@@ -177,9 +173,9 @@ static void dht_boostrap_from_file(tr_session* session)
 
 static void dht_bootstrap(void* closure)
 {
-    auto* cl = static_cast<struct bootstrap_closure*>(closure);
-    int num = cl->len / 6;
-    int num6 = cl->len6 / 18;
+    auto* const cl = static_cast<struct bootstrap_closure*>(closure);
+    int const num = cl->len / 6;
+    int const num6 = cl->len6 / 18;
 
     if (session_ != cl->session)
     {
@@ -188,12 +184,12 @@ static void dht_bootstrap(void* closure)
 
     if (cl->len > 0)
     {
-        logdbg("Bootstrapping from %d IPv4 nodes", num);
+        tr_logAddNamedDebug(CodeName, fmt::format("Bootstrapping from {} IPv4 nodes", num));
     }
 
     if (cl->len6 > 0)
     {
-        logdbg("Bootstrapping from %d IPv6 nodes", num6);
+        tr_logAddNamedDebug(CodeName, fmt::format("Bootstrapping from {} IPv6 nodes", num6));
     }
 
     for (int i = 0; i < std::max(num, num6); ++i)
@@ -264,7 +260,7 @@ static void dht_bootstrap(void* closure)
 
             if (i == 0)
             {
-                logdbg("Attempting bootstrap from dht.transmissionbt.com");
+                tr_logAddNamedDebug(CodeName, "Attempting bootstrap from dht.transmissionbt.com");
             }
 
             bootstrap_from_name("dht.transmissionbt.com", 6881, bootstrap_af(session_));
@@ -282,7 +278,7 @@ static void dht_bootstrap(void* closure)
     }
 
     tr_free(closure);
-    logtrace("Finished bootstrapping");
+    tr_logAddNamedTrace(CodeName, "Finished bootstrapping");
 }
 
 int tr_dhtInit(tr_session* ss)
@@ -292,7 +288,7 @@ int tr_dhtInit(tr_session* ss)
         return -1;
     }
 
-    loginfo("Initializing DHT");
+    tr_logAddNamedInfo(CodeName, _("Initializing DHT"));
 
     if (tr_env_key_exists("TR_DHT_VERBOSE"))
     {
@@ -341,13 +337,13 @@ int tr_dhtInit(tr_session* ss)
 
     if (have_id)
     {
-        logtrace("Reusing old id");
+        tr_logAddNamedTrace(CodeName, "Reusing old id");
     }
     else
     {
         /* Note that DHT ids need to be distributed uniformly,
          * so it should be something truly random. */
-        logtrace("Generating new id");
+        tr_logAddNamedTrace(CodeName, "Generating new id");
         tr_rand_buffer(myid, 20);
     }
 
@@ -356,7 +352,8 @@ int tr_dhtInit(tr_session* ss)
         tr_free(nodes6);
         tr_free(nodes);
 
-        logdbg("DHT initialization failed (errno = %d)", errno);
+        auto const errcode = errno;
+        tr_logAddNamedDebug(CodeName, fmt::format("DHT initialization failed: {} ({})", tr_strerror(errcode), errcode));
         session_ = nullptr;
         return -1;
     }
@@ -374,7 +371,7 @@ int tr_dhtInit(tr_session* ss)
     dht_timer = evtimer_new(session_->event_base, timer_callback, session_);
     tr_timerAdd(dht_timer, 0, tr_rand_int_weak(1000000));
 
-    logdbg("DHT initialized");
+    tr_logAddNamedDebug(CodeName, "DHT initialized");
 
     return 1;
 }
@@ -386,7 +383,7 @@ void tr_dhtUninit(tr_session* ss)
         return;
     }
 
-    logtrace("Uninitializing DHT");
+    tr_logAddNamedTrace(CodeName, "Uninitializing DHT");
 
     if (dht_timer != nullptr)
     {
@@ -398,7 +395,7 @@ void tr_dhtUninit(tr_session* ss)
        don't know enough nodes. */
     if (tr_dhtStatus(ss, AF_INET, nullptr) < TR_DHT_FIREWALLED && tr_dhtStatus(ss, AF_INET6, nullptr) < TR_DHT_FIREWALLED)
     {
-        logtrace("Not saving nodes, DHT not ready");
+        tr_logAddNamedTrace(CodeName, "Not saving nodes, DHT not ready");
     }
     else
     {
@@ -414,7 +411,7 @@ void tr_dhtUninit(tr_session* ss)
         int num = MaxNodes;
         int num6 = MaxNodes;
         int n = dht_get_nodes(sins, &num, sins6, &num6);
-        logtrace("Saving %d (%d + %d) nodes", n, num, num6);
+        tr_logAddNamedTrace(CodeName, fmt::format("Saving {} ({} + {}) nodes", n, num, num6));
 
         tr_variant benc;
         tr_variantInitDict(&benc, 3);
@@ -456,7 +453,7 @@ void tr_dhtUninit(tr_session* ss)
     }
 
     dht_uninit();
-    logtrace("Done uninitializing DHT");
+    tr_logAddNamedTrace(CodeName, "Done uninitializing DHT");
 
     session_ = nullptr;
 }
@@ -615,7 +612,9 @@ static void callback(void* /*ignore*/, int event, unsigned char const* info_hash
             auto const pex = event == DHT_EVENT_VALUES ? tr_peerMgrCompactToPex(data, data_len, nullptr, 0) :
                                                          tr_peerMgrCompact6ToPex(data, data_len, nullptr, 0);
             tr_peerMgrAddPex(tor, TR_PEER_FROM_DHT, std::data(pex), std::size(pex));
-            logdbgTor(tor, "Learned %zu %s peers from DHT", std::size(pex), event == DHT_EVENT_VALUES6 ? "IPv6" : "IPv4");
+            tr_logAddDebugTor(
+                tor,
+                fmt::format("Learned {} {} peers from DHT", std::size(pex), event == DHT_EVENT_VALUES6 ? "IPv6" : "IPv4"));
         }
     }
     else if (event == DHT_EVENT_SEARCH_DONE || event == DHT_EVENT_SEARCH_DONE6)
@@ -624,12 +623,12 @@ static void callback(void* /*ignore*/, int event, unsigned char const* info_hash
         {
             if (event == DHT_EVENT_SEARCH_DONE)
             {
-                logtraceTor(tor, "%s", "IPv4 DHT announce done");
+                tr_logAddTraceTor(tor, "IPv4 DHT announce done");
                 tor->dhtAnnounceInProgress = false;
             }
             else
             {
-                logtraceTor(tor, "%s", "IPv6 DHT announce done");
+                tr_logAddTraceTor(tor, "IPv6 DHT announce done");
                 tor->dhtAnnounce6InProgress = false;
             }
         }
@@ -660,12 +659,13 @@ static AnnounceResult tr_dhtAnnounce(tr_torrent* tor, int af, bool announce)
 
     if (status < TR_DHT_POOR)
     {
-        logtraceTor(
+        tr_logAddTraceTor(
             tor,
-            "%s DHT not ready (%s, %d nodes)",
-            af == AF_INET6 ? "IPv6" : "IPv4",
-            tr_dhtPrintableStatus(status),
-            numnodes);
+            fmt::format(
+                "{} DHT not ready ({}, {} nodes)",
+                af == AF_INET6 ? "IPv6" : "IPv4",
+                tr_dhtPrintableStatus(status),
+                numnodes));
         return AnnounceResult::FAILED;
     }
 
@@ -673,22 +673,25 @@ static AnnounceResult tr_dhtAnnounce(tr_torrent* tor, int af, bool announce)
     int const rc = dht_search(dht_hash, announce ? tr_sessionGetPeerPort(session_) : 0, af, callback, nullptr);
     if (rc < 0)
     {
-        logwarnTor(
+        auto const errcode = errno;
+        tr_logAddWarnTor(
             tor,
-            "%s DHT announce failed (%s, %d nodes): %s",
-            af == AF_INET6 ? "IPv6" : "IPv4",
-            tr_dhtPrintableStatus(status),
-            numnodes,
-            tr_strerror(errno));
+            fmt::format(
+                _("Unable to announce torrent in DHT with {type}: {errmsg} ({errcode}); status is {status}"),
+                fmt::arg("type", af == AF_INET6 ? "IPv6" : "IPv4"),
+                fmt::arg("status", tr_dhtPrintableStatus(status)),
+                fmt::arg("errcode", errcode),
+                fmt::arg("errmsg", tr_strerror(errcode))));
         return AnnounceResult::FAILED;
     }
 
-    logtraceTor(
+    tr_logAddTraceTor(
         tor,
-        "Starting %s DHT announce (%s, %d nodes)",
-        af == AF_INET6 ? "IPv6" : "IPv4",
-        tr_dhtPrintableStatus(status),
-        numnodes);
+        fmt::format(
+            "Starting {} DHT announce ({}, {} nodes)",
+            af == AF_INET6 ? "IPv6" : "IPv4",
+            tr_dhtPrintableStatus(status),
+            numnodes));
 
     if (af == AF_INET)
     {
@@ -751,10 +754,11 @@ void tr_dhtCallback(unsigned char* buf, int buflen, struct sockaddr* from, sockl
         }
         else
         {
-            logwarn("dht_periodic failed: %s", tr_strerror(errno));
-
-            if (errno == EINVAL || errno == EFAULT)
+            auto const errcode = errno;
+            tr_logAddNamedDebug(CodeName, fmt::format("dht_periodic failed: {} ({})", tr_strerror(errcode), errcode));
+            if (errcode == EINVAL || errcode == EFAULT)
             {
+                // TODO: maybe just turn it off instead of crashing?
                 abort();
             }
 
