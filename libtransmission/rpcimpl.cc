@@ -42,7 +42,7 @@
 
 using namespace std::literals;
 
-static auto constexpr CodeName = "rpc"sv;
+static auto constexpr LogName = "rpc"sv;
 static auto constexpr RecentlyActiveSeconds = time_t{ 60 };
 static auto constexpr RpcVersion = int64_t{ 17 };
 static auto constexpr RpcVersionMin = int64_t{ 14 };
@@ -1515,7 +1515,7 @@ static void onMetadataFetched(tr_web::FetchResponse const& web_response)
     auto* data = static_cast<struct add_torrent_idle_data*>(user_data);
 
     tr_logAddNamedTrace(
-        CodeName,
+        LogName,
         fmt::format(
             "torrentAdd: HTTP response code was {} ({}); response length was {} bytes",
             status,
@@ -1658,7 +1658,7 @@ static char const* torrentAdd(tr_session* session, tr_variant* args_in, tr_varia
         tr_ctorSetLabels(ctor, std::move(labels));
     }
 
-    tr_logAddNamedTrace(CodeName, fmt::format("torrentAdd: filename is '{}'", filename));
+    tr_logAddNamedTrace(LogName, fmt::format("torrentAdd: filename is '{}'", filename));
 
     if (isCurlURL(filename))
     {

@@ -24,7 +24,7 @@
 #include "upnp.h"
 #include "utils.h"
 
-static auto constexpr CodeName = std::string_view{ "port-fwd" };
+static auto constexpr LogName = std::string_view{ "port-fwd" };
 
 struct tr_shared
 {
@@ -94,7 +94,7 @@ static void natPulse(tr_shared* s, bool do_check)
         session->public_peer_port = public_peer_port;
         session->private_peer_port = received_private_port;
         tr_logAddNamedInfo(
-            CodeName,
+            LogName,
             fmt::format(
                 _("Mapped private port '{private_port}' to public port '{public_port}'"),
                 fmt::arg("public_port", session->public_peer_port),
@@ -113,7 +113,7 @@ static void natPulse(tr_shared* s, bool do_check)
     if (new_status != old_status)
     {
         tr_logAddNamedInfo(
-            CodeName,
+            LogName,
             fmt::format(
                 _("State changed from '{old_state}' to '{state}"),
                 fmt::arg("old_state", getNatStateStr(old_status)),
@@ -206,7 +206,7 @@ static void stop_timer(tr_shared* s)
 
 static void stop_forwarding(tr_shared* s)
 {
-    tr_logAddNamedTrace(CodeName, "stopped");
+    tr_logAddNamedTrace(LogName, "stopped");
     natPulse(s, false);
 
     tr_natpmpClose(s->natpmp);

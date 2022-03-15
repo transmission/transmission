@@ -37,7 +37,7 @@ using in_port_t = uint16_t; /* all missing */
 #include "tr-lpd.h"
 #include "utils.h"
 
-static auto constexpr CodeName = std::string_view{ "lpd" };
+static auto constexpr LogName = std::string_view{ "lpd" };
 
 static auto constexpr SIZEOF_HASH_STRING = TR_SHA1_DIGEST_STRLEN;
 
@@ -282,7 +282,7 @@ int tr_lpdInit(tr_session* ss, tr_address* /*tr_addr*/)
         return -1;
     }
 
-    tr_logAddNamedDebug(CodeName, "Initialising Local Peer Discovery");
+    tr_logAddNamedDebug(LogName, "Initialising Local Peer Discovery");
 
     /* setup datagram socket (receive) */
     {
@@ -375,7 +375,7 @@ int tr_lpdInit(tr_session* ss, tr_address* /*tr_addr*/)
     upkeep_timer = evtimer_new(ss->event_base, on_upkeep_timer, ss);
     tr_timerAdd(upkeep_timer, UpkeepIntervalSecs, 0);
 
-    tr_logAddNamedDebug(CodeName, "Local Peer Discovery initialised");
+    tr_logAddNamedDebug(LogName, "Local Peer Discovery initialised");
 
     return 1;
 
@@ -387,7 +387,7 @@ fail:
         lpd_socket = lpd_socket2 = TR_BAD_SOCKET;
         session = nullptr;
         tr_logAddNamedWarn(
-            CodeName,
+            LogName,
             fmt::format(
                 _("Couldn't initialize LPD: {error} ({error_code})"),
                 fmt::arg("error", tr_strerror(save)),
@@ -405,7 +405,7 @@ void tr_lpdUninit(tr_session* ss)
         return;
     }
 
-    tr_logAddNamedTrace(CodeName, "Uninitialising Local Peer Discovery");
+    tr_logAddNamedTrace(LogName, "Uninitialising Local Peer Discovery");
 
     event_free(lpd_event);
     lpd_event = nullptr;
@@ -416,7 +416,7 @@ void tr_lpdUninit(tr_session* ss)
     /* just shut down, we won't remember any former nodes */
     evutil_closesocket(lpd_socket);
     evutil_closesocket(lpd_socket2);
-    tr_logAddNamedTrace(CodeName, "Done uninitialising Local Peer Discovery");
+    tr_logAddNamedTrace(LogName, "Done uninitialising Local Peer Discovery");
 
     session = nullptr;
 }
@@ -555,7 +555,7 @@ static int tr_lpdConsiderAnnounce(tr_pex* peer, char const* const msg)
             return 1;
         }
 
-        tr_logAddNamedDebug(CodeName, fmt::format("Cannot serve torrent #{}", hashString));
+        tr_logAddNamedDebug(LogName, fmt::format("Cannot serve torrent #{}", hashString));
     }
 
     return res;
@@ -630,7 +630,7 @@ static int tr_lpdAnnounceMore(time_t const now, int const interval)
         if (lpd_unsolicitedMsgCounter < 0)
         {
             tr_logAddNamedTrace(
-                CodeName,
+                LogName,
                 fmt::format(
                     "Dropped {} announces in the last interval (max. {} allowed)",
                     -lpd_unsolicitedMsgCounter,
@@ -700,6 +700,6 @@ static void event_callback(evutil_socket_t /*s*/, short type, void* /*user_data*
             }
         }
 
-        tr_logAddNamedTrace(CodeName, "Discarded invalid multicast message");
+        tr_logAddNamedTrace(LogName, "Discarded invalid multicast message");
     }
 }

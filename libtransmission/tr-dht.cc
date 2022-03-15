@@ -51,7 +51,7 @@
 
 using namespace std::literals;
 
-static auto constexpr CodeName = "dht"sv;
+static auto constexpr LogName = "dht"sv;
 static struct event* dht_timer = nullptr;
 static unsigned char myid[20];
 static tr_session* session_ = nullptr;
@@ -113,7 +113,7 @@ static void bootstrap_from_name(char const* name, tr_port port, int af)
     addrinfo* info = nullptr;
     if (int const rc = getaddrinfo(name, pp, &hints, &info); rc != 0)
     {
-        tr_logAddNamedWarn(CodeName, fmt::format("{}:{}: {}", name, pp, gai_strerror(rc)));
+        tr_logAddNamedWarn(LogName, fmt::format("{}:{}: {}", name, pp, gai_strerror(rc)));
         return;
     }
 
@@ -151,7 +151,7 @@ static void dht_boostrap_from_file(tr_session* session)
     }
 
     // format is each line has address, a space char, and port number
-    tr_logAddNamedTrace(CodeName, "Attempting manual bootstrap");
+    tr_logAddNamedTrace(LogName, "Attempting manual bootstrap");
     auto line = std::string{};
     while (!bootstrap_done(session, 0) && std::getline(in, line))
     {
@@ -162,7 +162,7 @@ static void dht_boostrap_from_file(tr_session* session)
 
         if (line_stream.bad() || std::empty(addrstr) || port <= 0)
         {
-            tr_logAddNamedWarn(CodeName, fmt::format(_("Couldn't parse line: '{line}'"), fmt::arg("line", line)));
+            tr_logAddNamedWarn(LogName, fmt::format(_("Couldn't parse line: '{line}'"), fmt::arg("line", line)));
         }
         else
         {
@@ -184,12 +184,12 @@ static void dht_bootstrap(void* closure)
 
     if (cl->len > 0)
     {
-        tr_logAddNamedDebug(CodeName, fmt::format("Bootstrapping from {} IPv4 nodes", num));
+        tr_logAddNamedDebug(LogName, fmt::format("Bootstrapping from {} IPv4 nodes", num));
     }
 
     if (cl->len6 > 0)
     {
-        tr_logAddNamedDebug(CodeName, fmt::format("Bootstrapping from {} IPv6 nodes", num6));
+        tr_logAddNamedDebug(LogName, fmt::format("Bootstrapping from {} IPv6 nodes", num6));
     }
 
     for (int i = 0; i < std::max(num, num6); ++i)
@@ -260,7 +260,7 @@ static void dht_bootstrap(void* closure)
 
             if (i == 0)
             {
-                tr_logAddNamedDebug(CodeName, "Attempting bootstrap from dht.transmissionbt.com");
+                tr_logAddNamedDebug(LogName, "Attempting bootstrap from dht.transmissionbt.com");
             }
 
             bootstrap_from_name("dht.transmissionbt.com", 6881, bootstrap_af(session_));
@@ -278,7 +278,7 @@ static void dht_bootstrap(void* closure)
     }
 
     tr_free(closure);
-    tr_logAddNamedTrace(CodeName, "Finished bootstrapping");
+    tr_logAddNamedTrace(LogName, "Finished bootstrapping");
 }
 
 int tr_dhtInit(tr_session* ss)
@@ -288,7 +288,7 @@ int tr_dhtInit(tr_session* ss)
         return -1;
     }
 
-    tr_logAddNamedInfo(CodeName, _("Initializing DHT"));
+    tr_logAddNamedInfo(LogName, _("Initializing DHT"));
 
     if (tr_env_key_exists("TR_DHT_VERBOSE"))
     {
@@ -337,13 +337,13 @@ int tr_dhtInit(tr_session* ss)
 
     if (have_id)
     {
-        tr_logAddNamedTrace(CodeName, "Reusing old id");
+        tr_logAddNamedTrace(LogName, "Reusing old id");
     }
     else
     {
         /* Note that DHT ids need to be distributed uniformly,
          * so it should be something truly random. */
-        tr_logAddNamedTrace(CodeName, "Generating new id");
+        tr_logAddNamedTrace(LogName, "Generating new id");
         tr_rand_buffer(myid, 20);
     }
 
@@ -353,7 +353,7 @@ int tr_dhtInit(tr_session* ss)
         tr_free(nodes);
 
         auto const errcode = errno;
-        tr_logAddNamedDebug(CodeName, fmt::format("DHT initialization failed: {} ({})", tr_strerror(errcode), errcode));
+        tr_logAddNamedDebug(LogName, fmt::format("DHT initialization failed: {} ({})", tr_strerror(errcode), errcode));
         session_ = nullptr;
         return -1;
     }
@@ -371,7 +371,7 @@ int tr_dhtInit(tr_session* ss)
     dht_timer = evtimer_new(session_->event_base, timer_callback, session_);
     tr_timerAdd(dht_timer, 0, tr_rand_int_weak(1000000));
 
-    tr_logAddNamedDebug(CodeName, "DHT initialized");
+    tr_logAddNamedDebug(LogName, "DHT initialized");
 
     return 1;
 }
@@ -383,7 +383,7 @@ void tr_dhtUninit(tr_session* ss)
         return;
     }
 
-    tr_logAddNamedTrace(CodeName, "Uninitializing DHT");
+    tr_logAddNamedTrace(LogName, "Uninitializing DHT");
 
     if (dht_timer != nullptr)
     {
@@ -395,7 +395,7 @@ void tr_dhtUninit(tr_session* ss)
        don't know enough nodes. */
     if (tr_dhtStatus(ss, AF_INET, nullptr) < TR_DHT_FIREWALLED && tr_dhtStatus(ss, AF_INET6, nullptr) < TR_DHT_FIREWALLED)
     {
-        tr_logAddNamedTrace(CodeName, "Not saving nodes, DHT not ready");
+        tr_logAddNamedTrace(LogName, "Not saving nodes, DHT not ready");
     }
     else
     {
@@ -411,7 +411,7 @@ void tr_dhtUninit(tr_session* ss)
         int num = MaxNodes;
         int num6 = MaxNodes;
         int n = dht_get_nodes(sins, &num, sins6, &num6);
-        tr_logAddNamedTrace(CodeName, fmt::format("Saving {} ({} + {}) nodes", n, num, num6));
+        tr_logAddNamedTrace(LogName, fmt::format("Saving {} ({} + {}) nodes", n, num, num6));
 
         tr_variant benc;
         tr_variantInitDict(&benc, 3);
@@ -453,7 +453,7 @@ void tr_dhtUninit(tr_session* ss)
     }
 
     dht_uninit();
-    tr_logAddNamedTrace(CodeName, "Done uninitializing DHT");
+    tr_logAddNamedTrace(LogName, "Done uninitializing DHT");
 
     session_ = nullptr;
 }
@@ -755,7 +755,7 @@ void tr_dhtCallback(unsigned char* buf, int buflen, struct sockaddr* from, sockl
         else
         {
             auto const errcode = errno;
-            tr_logAddNamedDebug(CodeName, fmt::format("dht_periodic failed: {} ({})", tr_strerror(errcode), errcode));
+            tr_logAddNamedDebug(LogName, fmt::format("dht_periodic failed: {} ({})", tr_strerror(errcode), errcode));
             if (errcode == EINVAL || errcode == EFAULT)
             {
                 // TODO: maybe just turn it off instead of crashing?
