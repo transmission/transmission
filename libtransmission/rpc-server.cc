@@ -826,7 +826,7 @@ static void stopServer(tr_rpc_server* server)
     }
 
     tr_logAddInfo(fmt::format(
-        _("Listening for RPC and Web requests on '{address}'"),
+        _("Stopped listening for RPC and Web requests on '{address}'"),
         fmt::arg("address", tr_rpc_address_with_port(server))));
 }
 
