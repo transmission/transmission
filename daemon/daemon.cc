@@ -804,7 +804,7 @@ static int daemon_start(void* varg, [[maybe_unused]] bool foreground)
         {
             auto const error_code = errno;
             tr_logAddError(fmt::format(
-                _("Couldn't create status event: {error} ({error_code})"),
+                _("Couldn't create event: {error} ({error_code})"),
                 fmt::arg("error", tr_strerror(error_code)),
                 fmt::arg("error_code", error_code)));
             goto CLEANUP;
@@ -814,7 +814,7 @@ static int daemon_start(void* varg, [[maybe_unused]] bool foreground)
         {
             auto const error_code = errno;
             tr_logAddError(fmt::format(
-                _("Couldn't add status event: {error} ({error_code})"),
+                _("Couldn't add event: {error} ({error_code})"),
                 fmt::arg("error", tr_strerror(error_code)),
                 fmt::arg("error_code", error_code)));
             goto CLEANUP;

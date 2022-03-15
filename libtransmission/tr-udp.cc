@@ -50,7 +50,7 @@ static void set_socket_buffers(tr_socket_t fd, bool large)
 
     if (rc < 0)
     {
-        logdbg(fmt::format("Failed to set receive buffer: {}", tr_net_strerror(sockerrno)));
+        logdbg(fmt::format("Couldn't set receive buffer: {}", tr_net_strerror(sockerrno)));
     }
 
     size = large ? SEND_BUFFER_SIZE : SMALL_BUFFER_SIZE;
@@ -58,7 +58,7 @@ static void set_socket_buffers(tr_socket_t fd, bool large)
 
     if (rc < 0)
     {
-        logdbg(fmt::format("Failed to set send buffer: {}", tr_net_strerror(sockerrno)));
+        logdbg(fmt::format("Couldn't set send buffer: {}", tr_net_strerror(sockerrno)));
     }
 
     if (large)
@@ -79,7 +79,7 @@ static void set_socket_buffers(tr_socket_t fd, bool large)
 
         if (rbuf < RECV_BUFFER_SIZE)
         {
-            logdbg(fmt::format("Failed to set receive buffer: requested {}, got {}", RECV_BUFFER_SIZE, rbuf));
+            logdbg(fmt::format("Couldn't set receive buffer: requested {}, got {}", RECV_BUFFER_SIZE, rbuf));
 #ifdef __linux__
             logdbg(fmt::format("Please add the line 'net.core.rmem_max = {}' to /etc/sysctl.conf", RECV_BUFFER_SIZE));
 #endif
@@ -87,7 +87,7 @@ static void set_socket_buffers(tr_socket_t fd, bool large)
 
         if (sbuf < SEND_BUFFER_SIZE)
         {
-            logdbg(fmt::format("Failed to set send buffer: requested {}, got {}", SEND_BUFFER_SIZE, sbuf));
+            logdbg(fmt::format("Couldn't set send buffer: requested {}, got {}", SEND_BUFFER_SIZE, sbuf));
 #ifdef __linux__
             logdbg(fmt::format("Please add the line 'net.core.wmem_max = {}' to /etc/sysctl.conf", SEND_BUFFER_SIZE));
 #endif

@@ -1457,7 +1457,10 @@ bool gtr_inhibit_hibernation(guint32& cookie)
     }
     catch (Glib::Error const& e)
     {
-        tr_logAddError(fmt::format(_("Couldn't inhibit desktop hibernation: {error}"), fmt::arg("error", e.what().raw())));
+        tr_logAddError(fmt::format(
+            _("Couldn't inhibit desktop hibernation: {error} ({error_code})"),
+            fmt::arg("error", e.what().raw()),
+            fmt::arg("error_code", e.code())));
     }
 
     return success;
@@ -1482,7 +1485,10 @@ void gtr_uninhibit_hibernation(guint inhibit_cookie)
     }
     catch (Glib::Error const& e)
     {
-        tr_logAddError(fmt::format(_("Couldn't inhibit desktop hibernation: {error}"), fmt::arg("error", e.what().raw())));
+        tr_logAddError(fmt::format(
+            _("Couldn't inhibit desktop hibernation: {error} ({error_code})"),
+            fmt::arg("error", e.what().raw()),
+            fmt::arg("error_code", e.code())));
     }
 }
 
