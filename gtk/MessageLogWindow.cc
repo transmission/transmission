@@ -212,7 +212,7 @@ void MessageLogWindow::Impl::doSave(Gtk::Window& parent, Glib::ustring const& fi
                 fp,
                 "%s\t%s\t%s\t%s\n",
                 date.c_str(),
-                level_str != nullptr ? level_str : "",
+                level_str,
                 node->name != nullptr ? node->name : "",
                 node->message != nullptr ? node->message : "");
         }
