@@ -417,11 +417,6 @@ bool MessageLogWindow::Impl::onRefresh()
     return true;
 }
 
-namespace
-{
-
-} // namespace
-
 /**
 ***  Public Functions
 **/
