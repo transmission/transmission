@@ -11,6 +11,8 @@
 #include <event2/event.h>
 #include <event2/util.h>
 
+#include <fmt/core.h>
+
 #define LIBTRANSMISSION_WATCHDIR_MODULE
 
 #include "transmission.h"
@@ -24,15 +26,7 @@
 #include "watchdir.h"
 #include "watchdir-common.h"
 
-/***
-****
-***/
-
-#define log_debug(...) \
-    (!tr_logLevelIsActive(TR_LOG_DEBUG) ? (void)0 : tr_logAddMessage(__FILE__, __LINE__, TR_LOG_DEBUG, "watchdir", __VA_ARGS__))
-
-#define log_error(...) \
-    (!tr_logLevelIsActive(TR_LOG_ERROR) ? (void)0 : tr_logAddMessage(__FILE__, __LINE__, TR_LOG_ERROR, "watchdir", __VA_ARGS__))
+static auto constexpr LogName = std::string_view{ "watchdir" };
 
 /***
 ****
@@ -64,7 +58,13 @@ static bool is_regular_file(char const* dir, char const* name)
     {
         if (!TR_ERROR_IS_ENOENT(error->code))
         {
-            log_error("Failed to get type of \"%s\" (%d): %s", path.c_str(), error->code, error->message);
+            tr_logAddNamedWarn(
+                LogName,
+                fmt::format(
+                    _("Skipping '{path}': {error} ({error_code})"),
+                    fmt::arg("path", path),
+                    fmt::arg("error", error->message),
+                    fmt::arg("error_code", error->code)));
         }
 
         tr_error_free(error);
@@ -103,7 +103,7 @@ static tr_watchdir_status tr_watchdir_process_impl(tr_watchdir_t handle, char co
 
     TR_ASSERT(ret == TR_WATCHDIR_ACCEPT || ret == TR_WATCHDIR_IGNORE || ret == TR_WATCHDIR_RETRY);
 
-    log_debug("Callback decided to %s file \"%s\"", watchdir_status_to_string(ret), name);
+    tr_logAddNamedDebug(LogName, fmt::format("Callback decided to {} file '{}'", watchdir_status_to_string(ret), name));
 
     return ret;
 }
@@ -162,7 +162,7 @@ static void tr_watchdir_on_retry_timer(evutil_socket_t /*fd*/, short /*type*/, v
             return;
         }
 
-        log_error("Failed to add (corrupted?) torrent file: %s", retry->name);
+        tr_logAddNamedWarn(LogName, fmt::format(_("Couldn't add .torrent file '{path}'"), fmt::arg("path", retry->name)));
     }
 
     tr_watchdir_retries_remove(&handle->active_retries, retry);
@@ -328,7 +328,13 @@ void tr_watchdir_scan(tr_watchdir_t handle, std::unordered_set<std::string>* dir
     auto const dir = tr_sys_dir_open(handle->path, &error);
     if (dir == TR_BAD_SYS_DIR)
     {
-        log_error("Failed to open directory \"%s\" (%d): %s", handle->path, error->code, error->message);
+        tr_logAddNamedWarn(
+            LogName,
+            fmt::format(
+                _("Couldn't read '{path}': {error} ({error_code})"),
+                fmt::arg("path", handle->path),
+                fmt::arg("error", error->message),
+                fmt::arg("error_code", error->code)));
         tr_error_free(error);
         return;
     }
@@ -357,7 +363,13 @@ void tr_watchdir_scan(tr_watchdir_t handle, std::unordered_set<std::string>* dir
 
     if (error != nullptr)
     {
-        log_error("Failed to read directory \"%s\" (%d): %s", handle->path, error->code, error->message);
+        tr_logAddNamedWarn(
+            LogName,
+            fmt::format(
+                _("Couldn't read '{path}': {error} ({error_code})"),
+                fmt::arg("path", handle->path),
+                fmt::arg("error", error->message),
+                fmt::arg("error_code", error->code)));
         tr_error_free(error);
     }
 

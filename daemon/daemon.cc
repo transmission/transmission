@@ -60,7 +60,7 @@ using namespace std::literals;
 ****
 ***/
 
-static auto constexpr CodeName = "daemon"sv;
+static auto constexpr LogName = "daemon"sv;
 
 #undef tr_logAddError
 #undef tr_logAddWarn
@@ -68,11 +68,11 @@ static auto constexpr CodeName = "daemon"sv;
 #undef tr_logAddDebug
 #undef tr_logAddTrace
 
-#define tr_logAddError(...) tr_logAddNamedError(CodeName, __VA_ARGS__)
-#define tr_logAddWarn(...) tr_logAddNamedWarn(CodeName, __VA_ARGS__)
-#define tr_logAddInfo(...) tr_logAddNamedInfo(CodeName, __VA_ARGS__)
-#define tr_logAddDebug(...) tr_logAddNamedDebug(CodeName, __VA_ARGS__)
-#define tr_logAddTrace(...) tr_logAddNamedTrace(CodeName, __VA_ARGS__)
+#define tr_logAddError(...) tr_logAddNamedError(LogName, __VA_ARGS__)
+#define tr_logAddWarn(...) tr_logAddNamedWarn(LogName, __VA_ARGS__)
+#define tr_logAddInfo(...) tr_logAddNamedInfo(LogName, __VA_ARGS__)
+#define tr_logAddDebug(...) tr_logAddNamedDebug(LogName, __VA_ARGS__)
+#define tr_logAddTrace(...) tr_logAddNamedTrace(LogName, __VA_ARGS__)
 
 /***
 ****
