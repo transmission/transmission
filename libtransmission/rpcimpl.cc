@@ -13,6 +13,8 @@
 #include <utility>
 #include <vector>
 
+#include <fmt/core.h>
+
 #include <libdeflate.h>
 
 #include "transmission.h"
@@ -38,15 +40,13 @@
 #include "web-utils.h"
 #include "web.h"
 
-static auto constexpr RpcVersion = int64_t{ 17 };
-static auto constexpr RpcVersionMin = int64_t{ 14 };
-static char constexpr RpcVersionSemver[] = "5.3.0";
-
-static auto constexpr RecentlyActiveSeconds = time_t{ 60 };
-
 using namespace std::literals;
 
-#define logtrace(...) tr_logAddNamed(TR_LOG_TRACE, "rpc", __VA_ARGS__)
+static auto constexpr CodeName = "rpc"sv;
+static auto constexpr RecentlyActiveSeconds = time_t{ 60 };
+static auto constexpr RpcVersion = int64_t{ 17 };
+static auto constexpr RpcVersionMin = int64_t{ 14 };
+static auto constexpr RpcVersionSemver = "5.3.0"sv;
 
 enum class TrFormat
 {
@@ -1514,11 +1514,13 @@ static void onMetadataFetched(tr_web::FetchResponse const& web_response)
     auto const& [status, body, did_connect, did_timeout, user_data] = web_response;
     auto* data = static_cast<struct add_torrent_idle_data*>(user_data);
 
-    logtrace(
-        "torrentAdd: HTTP response code was %ld (%s); response length was %zu bytes",
-        status,
-        tr_webGetResponseStr(status),
-        std::size(body));
+    tr_logAddNamedTrace(
+        CodeName,
+        fmt::format(
+            "torrentAdd: HTTP response code was {} ({}); response length was {} bytes",
+            status,
+            tr_webGetResponseStr(status),
+            std::size(body)));
 
     if (status == 200 || status == 221) /* http or ftp success.. */
     {
@@ -1656,7 +1658,7 @@ static char const* torrentAdd(tr_session* session, tr_variant* args_in, tr_varia
         tr_ctorSetLabels(ctor, std::move(labels));
     }
 
-    logtrace("torrentAdd: filename is \"%" TR_PRIsv "\"", TR_PRIsv_ARG(filename));
+    tr_logAddNamedTrace(CodeName, fmt::format("torrentAdd: filename is '{}'", filename));
 
     if (isCurlURL(filename))
     {
