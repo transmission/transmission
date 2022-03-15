@@ -51,7 +51,6 @@
 
 using namespace std::literals;
 
-#undef tr_logAddCritical
 #undef tr_logAddError
 #undef tr_logAddWarn
 #undef tr_logAddInfo
@@ -59,7 +58,6 @@ using namespace std::literals;
 #undef tr_logAddTrace
 
 auto constexpr LogName = "rpc"sv;
-#define tr_logAddCritical(...) tr_logAddNamed(TR_LOG_CRITICAL, LogName, __VA_ARGS__)
 #define tr_logAddError(...) tr_logAddNamed(TR_LOG_ERROR, LogName, __VA_ARGS__)
 #define tr_logAddWarn(...) tr_logAddNamed(TR_LOG_WARN, LogName, __VA_ARGS__)
 #define tr_logAddInfo(...) tr_logAddNamed(TR_LOG_INFO, LogName, __VA_ARGS__)
@@ -683,7 +681,7 @@ static bool bindUnixSocket(
 {
 #ifdef _WIN32
     tr_logAddError(fmt::format(
-        _("Unix sockets are not supported on Windows. Please change '{key}' in your configuration file."),
+        _("Unix sockets are unsupported on Windows. Please change '{key}' in your settings."),
         fmt::arg("key", tr_quark_get_string(TR_KEY_rpc_bind_address))));
     return false;
 #else
@@ -710,7 +708,7 @@ static bool bindUnixSocket(
     if (chmod(addr.sun_path, (mode_t)socket_mode) != 0)
     {
         tr_logAddWarn(
-            fmt::format(_("Could not set RPC socket mode to {mode:o}, defaulting to 755"), fmt::arg("mode", socket_mode)));
+            fmt::format(_("Could not set RPC socket mode to {mode:o}, defaulting to 0755"), fmt::arg("mode", socket_mode)));
     }
 
     return evhttp_bind_listener(httpd, lev) != nullptr;
@@ -798,7 +796,7 @@ static void startServer(tr_rpc_server* server)
         evhttp_set_gencb(httpd, handle_request, server);
         server->httpd = httpd;
 
-        tr_logAddInfo(fmt::format(_("Started listening on {address}"), fmt::arg("address", addr_port_str)));
+        tr_logAddInfo(fmt::format(_("Listening for RPC and Web requests on '{address}'"), fmt::arg("address", addr_port_str)));
     }
 
     rpc_server_start_retry_cancel(server);
@@ -827,7 +825,9 @@ static void stopServer(tr_rpc_server* server)
         unlink(address + std::size(TrUnixSocketPrefix));
     }
 
-    tr_logAddInfo(fmt::format(_("Stopped listening on {address}"), fmt::arg("address", tr_rpc_address_with_port(server))));
+    tr_logAddInfo(fmt::format(
+        _("Listening for RPC and Web requests on '{address}'"),
+        fmt::arg("address", tr_rpc_address_with_port(server))));
 }
 
 static void onEnabledChanged(tr_rpc_server* const server)
@@ -908,12 +908,12 @@ static auto parseWhitelist(std::string_view whitelist)
         if (token.find_first_of("+-"sv) != std::string_view::npos)
         {
             tr_logAddWarn(fmt::format(
-                _("Adding entry to whitelist: {entry} (And it has a '+' or '-'!  Are you using an old ACL by mistake?)"),
+                _("Added '{entry}' to host whitelist and it has a '+' or '-'!  Are you using an old ACL by mistake?)"),
                 fmt::arg("entry", token)));
         }
         else
         {
-            tr_logAddInfo(fmt::format(_("Adding entry to whitelist: {entry}"), fmt::arg("entry", token)));
+            tr_logAddInfo(fmt::format(_("Added '{entry}' to host whitelist"), fmt::arg("entry", token)));
         }
     }
 
@@ -1209,7 +1209,7 @@ tr_rpc_server::tr_rpc_server(tr_session* session_in, tr_variant* settings)
     else if (!tr_rpc_address_from_string(*bindAddress, sv))
     {
         tr_logAddWarn(fmt::format(
-            _("{key} value ({address}) must be an IPv4 or IPv6 address or a unix socket path. Using default value '0.0.0.0'"),
+            _("The '{key}' setting is '{address}' but must be an IPv4 or IPv6 address or a Unix socket path. Using default value '0.0.0.0'"),
             fmt::format("key", tr_quark_get_string(key)),
             fmt::format("address", sv)));
         bindAddress->set_inaddr_any();
