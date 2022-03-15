@@ -708,7 +708,7 @@ static bool bindUnixSocket(
     if (chmod(addr.sun_path, (mode_t)socket_mode) != 0)
     {
         tr_logAddWarn(
-            fmt::format(_("Could not set RPC socket mode to {mode:o}, defaulting to 0755"), fmt::arg("mode", socket_mode)));
+            fmt::format(_("Could not set RPC socket mode to {mode:#o}, defaulting to 0755"), fmt::arg("mode", socket_mode)));
     }
 
     return evhttp_bind_listener(httpd, lev) != nullptr;
