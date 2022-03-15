@@ -44,13 +44,8 @@ char const* tr_strip_positional_args(char const* fmt);
 #endif
 #endif
 
-#if !defined(ngettext_)
-#if defined(HAVE_NGETTEXT) && !defined(__APPLE__)
-#include <libintl.h>
-#define ngettext_(singular, plural, count) ngettext(singular, plural, count)
-#else
-#define ngettext_(singular, plural, count) ((count) == 1 ? (singular) : (plural))
-#endif
+#if !defined(HAVE_NGETTEXT)
+#define ngettext(singular, plural, count) ((count) == 1 ? (singular) : (plural))
 #endif
 
 /* #define DISABLE_GETTEXT */
@@ -61,9 +56,9 @@ char const* tr_strip_positional_args(char const* fmt);
 #endif
 #ifdef DISABLE_GETTEXT
 #undef _
-#undef ngettext_
+#undef ngettext
 #define _(a) tr_strip_positional_args(a)
-#define ngettext_(singular, plural, count) tr_strip_positional_args((count) == 1 ? (singular) : (plural))
+#define ngettext(singular, plural, count) tr_strip_positional_args((count) == 1 ? (singular) : (plural))
 #endif
 
 /****

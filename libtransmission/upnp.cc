@@ -6,6 +6,7 @@
 #include <cerrno>
 #include <future>
 #include <mutex>
+#include <string_view>
 #include <thread>
 
 #include <fmt/core.h>
@@ -29,19 +30,18 @@
 namespace
 {
 
-char constexpr Key[] = "Port Forwarding (UPnP)";
-
 #undef tr_logAddError
 #undef tr_logAddWarn
 #undef tr_logAddInfo
 #undef tr_logAddDebug
 #undef tr_logAddTrace
 
-#define tr_logAddError(...) tr_logAddNamedError(Key, __VA_ARGS__)
-#define tr_logAddWarn(...) tr_logAddNamedWarn(Key, __VA_ARGS__)
-#define tr_logAddInfo(...) tr_logAddNamedInfo(Key, __VA_ARGS__)
-#define tr_logAddDebug(...) tr_logAddNamedDebug(Key, __VA_ARGS__)
-#define tr_logAddTrace(...) tr_logAddNamedTrace(Key, __VA_ARGS__)
+auto constexpr LogName = std::string_view{ "Port Forwarding (UPnP)" };
+#define tr_logAddError(...) tr_logAddNamedError(LogName, __VA_ARGS__)
+#define tr_logAddWarn(...) tr_logAddNamedWarn(LogName, __VA_ARGS__)
+#define tr_logAddInfo(...) tr_logAddNamedInfo(LogName, __VA_ARGS__)
+#define tr_logAddDebug(...) tr_logAddNamedDebug(LogName, __VA_ARGS__)
+#define tr_logAddTrace(...) tr_logAddNamedTrace(LogName, __VA_ARGS__)
 
 enum class UpnpState
 {

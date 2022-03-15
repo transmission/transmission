@@ -2,6 +2,7 @@
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
+#include <cstdint>
 #include <cstring> /* memcmp(), memcpy(), memset() */
 #include <cstdlib> /* malloc(), free() */
 
@@ -13,7 +14,7 @@
 
 #include <event2/event.h>
 
-#include <cstdint>
+#include <fmt/core.h>
 
 #include "transmission.h"
 #include "log.h"
@@ -23,6 +24,7 @@
 #include "tr-dht.h"
 #include "tr-utp.h"
 #include "tr-udp.h"
+#include "utils.h"
 
 #define logwarn(...) tr_logAddNamed(TR_LOG_WARN, "udp", __VA_ARGS__)
 #define loginfo(...) tr_logAddNamed(TR_LOG_INFO, "udp", __VA_ARGS__)
@@ -48,7 +50,7 @@ static void set_socket_buffers(tr_socket_t fd, bool large)
 
     if (rc < 0)
     {
-        logdbg("Failed to set receive buffer: %s", tr_net_strerror(sockerrno).c_str());
+        logdbg(fmt::format("Failed to set receive buffer: {}", tr_net_strerror(sockerrno)));
     }
 
     size = large ? SEND_BUFFER_SIZE : SMALL_BUFFER_SIZE;
@@ -56,7 +58,7 @@ static void set_socket_buffers(tr_socket_t fd, bool large)
 
     if (rc < 0)
     {
-        logdbg("Failed to set send buffer: %s", tr_net_strerror(sockerrno).c_str());
+        logdbg(fmt::format("Failed to set send buffer: {}", tr_net_strerror(sockerrno)));
     }
 
     if (large)
@@ -77,17 +79,17 @@ static void set_socket_buffers(tr_socket_t fd, bool large)
 
         if (rbuf < RECV_BUFFER_SIZE)
         {
-            loginfo("Failed to set receive buffer: requested %d, got %d", RECV_BUFFER_SIZE, rbuf);
+            logdbg(fmt::format("Failed to set receive buffer: requested {}, got {}", RECV_BUFFER_SIZE, rbuf));
 #ifdef __linux__
-            loginfo("Please add the line \"net.core.rmem_max = %d\" to /etc/sysctl.conf", RECV_BUFFER_SIZE);
+            logdbg(fmt::format("Please add the line 'net.core.rmem_max = {}' to /etc/sysctl.conf", RECV_BUFFER_SIZE));
 #endif
         }
 
         if (sbuf < SEND_BUFFER_SIZE)
         {
-            loginfo("Failed to set send buffer: requested %d, got %d", SEND_BUFFER_SIZE, sbuf);
+            logdbg(fmt::format("Failed to set send buffer: requested {}, got {}", SEND_BUFFER_SIZE, sbuf));
 #ifdef __linux__
-            loginfo("Please add the line \"net.core.wmem_max = %d\" to /etc/sysctl.conf", SEND_BUFFER_SIZE);
+            logdbg(fmt::format("Please add the line 'net.core.wmem_max = {}' to /etc/sysctl.conf", SEND_BUFFER_SIZE));
 #endif
         }
     }
@@ -205,7 +207,7 @@ static void rebind_ipv6(tr_session* ss, bool force)
 FAIL:
     /* Something went wrong.  It's difficult to recover, so let's simply
        set things up so that we try again next time. */
-    logwarn("Couldn't rebind IPv6 socket");
+    logwarn(_("Couldn't rebind IPv6 socket"));
 
     if (s != TR_BAD_SOCKET)
     {
@@ -232,7 +234,7 @@ static void event_callback(evutil_socket_t s, [[maybe_unused]] short type, void*
     int rc = recvfrom(s, reinterpret_cast<char*>(buf), 4096 - 1, 0, (struct sockaddr*)&from, &fromlen);
 
     /* Since most packets we receive here are ÂµTP, make quick inline
-       checks for the other protocols.  The logic is as follows:
+       checks for the other protocols. The logic is as follows:
        - all DHT packets start with 'd'
        - all UDP tracker packets start with a 32-bit (!) "action", which
          is between 0 and 3
@@ -284,7 +286,7 @@ void tr_udpInit(tr_session* ss)
 
     if (ss->udp_socket == TR_BAD_SOCKET)
     {
-        logwarn("Couldn't create IPv4 socket");
+        logwarn(_("Couldn't create IPv4 socket"));
     }
     else
     {
@@ -303,7 +305,7 @@ void tr_udpInit(tr_session* ss)
 
         if (rc == -1)
         {
-            logwarn("Couldn't bind IPv4 socket");
+            logwarn(_("Couldn't bind IPv4 socket"));
             tr_netCloseSocket(ss->udp_socket);
             ss->udp_socket = TR_BAD_SOCKET;
         }
@@ -313,7 +315,7 @@ void tr_udpInit(tr_session* ss)
 
             if (ss->udp_event == nullptr)
             {
-                logwarn("Couldn't allocate IPv4 event");
+                logwarn(_("Couldn't allocate IPv4 event"));
             }
         }
     }
@@ -331,7 +333,7 @@ void tr_udpInit(tr_session* ss)
 
         if (ss->udp6_event == nullptr)
         {
-            logwarn("Couldn't allocate IPv6 event");
+            logwarn(_("Couldn't allocate IPv6 event"));
         }
     }
 

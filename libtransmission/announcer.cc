@@ -968,7 +968,7 @@ static void on_announce_error(tr_tier* tier, char const* err, tr_announce_event 
         tr_logAddWarnTier(
             tier,
             fmt::format(
-                ngettext_(
+                ngettext(
                     "Announce error: {errmsg} (Retrying in {count} second)",
                     "Announce error: {errmsg} (Retrying in {count} seconds)",
                     interval),
@@ -1301,7 +1301,7 @@ static void checkMultiscrapeMax(tr_announcer* announcer, tr_scrape_response cons
         auto const parsed = *tr_urlParse(url.sv());
         auto clean_url = std::string{};
         tr_buildBuf(clean_url, parsed.scheme, "://"sv, parsed.host, ":"sv, parsed.portstr);
-        tr_logAddNamedInfo(clean_url.c_str(), fmt::format(_("Reducing multiscrape max to {}"), n));
+        tr_logAddNamedDebug(clean_url.c_str(), fmt::format("Reducing multiscrape max to {}", n));
         multiscrape_max = n;
     }
 }
@@ -1427,7 +1427,7 @@ static void scrape_request_delegate(
     }
     else
     {
-        tr_logAddError(fmt::format(_("Unsupported URL: {url}"), fmt::arg("url", scrape_sv)));
+        tr_logAddError(fmt::format(_("Unsupported URL: '{url}'"), fmt::arg("url", scrape_sv)));
     }
 }
 

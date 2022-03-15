@@ -10,6 +10,8 @@
 #include <glibmm.h>
 #include <glibmm/i18n.h>
 
+#include <fmt/core.h>
+
 #include <libtransmission/transmission.h>
 #include <libtransmission/utils.h>
 #include <libtransmission/version.h>
@@ -410,8 +412,10 @@ struct blocklist_data
 void updateBlocklistText(Gtk::Label* w, Glib::RefPtr<Session> const& core)
 {
     int const n = tr_blocklistGetRuleCount(core->get_session());
-    w->set_markup(
-        gtr_sprintf("<i>%s</i>", gtr_sprintf(ngettext("Blocklist contains %'d rule", "Blocklist contains %'d rules", n), n)));
+    auto const msg = fmt::format(
+        ngettext("Blocklist has {count} entry", "Blocklist has {count} entries", n),
+        fmt::arg("count", n));
+    w->set_markup(gtr_sprintf("<i>%s</i>", msg.c_str()));
 }
 
 /* prefs dialog is being destroyed, so stop listening to blocklist updates */
@@ -436,10 +440,14 @@ void onBlocklistUpdated(Glib::RefPtr<Session> const& core, int n, blocklist_data
 {
     bool const success = n >= 0;
     int const count = n >= 0 ? n : tr_blocklistGetRuleCount(core->get_session());
+    auto const msg = fmt::format(
+        ngettext("Blocklist has {count} entry", "Blocklist has {count} entries", count),
+        fmt::arg("count", count));
     data->updateBlocklistButton->set_sensitive(true);
-    data->updateBlocklistDialog->set_message(success ? _("<b>Update succeeded!</b>") : _("<b>Unable to update.</b>"), true);
-    data->updateBlocklistDialog->set_secondary_text(
-        gtr_sprintf(ngettext("Blocklist has %'d rule.", "Blocklist has %'d rules.", count), count));
+    data->updateBlocklistDialog->set_message(
+        fmt::format("<b>{}</b>", success ? _("Blocklist updated!") : _("Couldn't update blocklist")),
+        true);
+    data->updateBlocklistDialog->set_secondary_text(msg);
     updateBlocklistText(data->label, core);
 }
 
@@ -841,19 +849,27 @@ Gtk::ComboBox* new_time_combo(Glib::RefPtr<Session> const& core, tr_quark const 
     return w;
 }
 
+static auto get_weekday_string(Glib::Date::Weekday weekday)
+{
+    auto date = Glib::Date{};
+    date.set_time_current();
+    date.add_days(weekday - date.get_weekday());
+    return date.format_string("%A");
+}
+
 Gtk::ComboBox* new_week_combo(Glib::RefPtr<Session> const& core, tr_quark const key)
 {
     auto* w = gtr_combo_box_new_enum({
         { _("Every Day"), TR_SCHED_ALL },
         { _("Weekdays"), TR_SCHED_WEEKDAY },
         { _("Weekends"), TR_SCHED_WEEKEND },
-        { _("Sunday"), TR_SCHED_SUN },
-        { _("Monday"), TR_SCHED_MON },
-        { _("Tuesday"), TR_SCHED_TUES },
-        { _("Wednesday"), TR_SCHED_WED },
-        { _("Thursday"), TR_SCHED_THURS },
-        { _("Friday"), TR_SCHED_FRI },
-        { _("Saturday"), TR_SCHED_SAT },
+        { get_weekday_string(Glib::Date::MONDAY), TR_SCHED_MON },
+        { get_weekday_string(Glib::Date::TUESDAY), TR_SCHED_TUES },
+        { get_weekday_string(Glib::Date::WEDNESDAY), TR_SCHED_WED },
+        { get_weekday_string(Glib::Date::THURSDAY), TR_SCHED_THURS },
+        { get_weekday_string(Glib::Date::FRIDAY), TR_SCHED_FRI },
+        { get_weekday_string(Glib::Date::SATURDAY), TR_SCHED_SAT },
+        { get_weekday_string(Glib::Date::SUNDAY), TR_SCHED_SUN },
     });
     gtr_combo_box_set_active_enum(*w, gtr_pref_int_get(key));
     w->signal_changed().connect([w, key, core]() { onIntComboChanged(w, key, core); });
@@ -999,7 +1015,7 @@ void onPortTest(std::shared_ptr<network_page_data> const& data)
 {
     data->portButton->set_sensitive(false);
     data->portSpin->set_sensitive(false);
-    data->portLabel->set_markup(_("<i>Testing TCP port…</i>"));
+    data->portLabel->set_markup(fmt::format("<i>{}</i>", _("Testing TCP port…")));
 
     if (!data->portTag.connected())
     {

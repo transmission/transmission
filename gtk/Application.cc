@@ -14,6 +14,8 @@
 #include <locale.h>
 #include <signal.h>
 
+#include <fmt/core.h>
+
 #include <giomm.h>
 #include <glib/gmessages.h>
 #include <glibmm/i18n.h>
@@ -344,7 +346,12 @@ void register_magnet_link_handler()
     }
     catch (Gio::Error const& e)
     {
-        g_warning(_("Error registering Transmission as a %s handler: %s"), content_type.c_str(), e.what().c_str());
+        auto const msg = fmt::format(
+            _("Couldn't register Transmission as a {content_type} handler: {errmsg} ({errcode})"),
+            fmt::arg("content_type", content_type),
+            fmt::arg("errmsg", e.what().raw()),
+            fmt::arg("errcode", e.code()));
+        g_warning("%s", msg.c_str());
     }
 }
 
@@ -889,7 +896,7 @@ void Application::Impl::on_app_exit()
     p->attach(*icon, 0, 0, 1, 2);
 
     auto* top_label = Gtk::make_managed<Gtk::Label>();
-    top_label->set_markup(_("<b>Closing Connections</b>"));
+    top_label->set_markup(fmt::format("<b>{}</b>", _("Closing Connections…")));
     top_label->set_halign(Gtk::ALIGN_START);
     top_label->set_valign(Gtk::ALIGN_CENTER);
     p->attach(*top_label, 1, 0, 1, 1);
