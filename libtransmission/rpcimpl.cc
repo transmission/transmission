@@ -1707,21 +1707,19 @@ static char const* torrentAdd(tr_session* session, tr_variant* args_in, tr_varia
 
 static char const* groupGet(tr_session* s, tr_variant* args_in, tr_variant* args_out, struct tr_rpc_idle_data* /*idle_data*/)
 {
-    tr_variant* namesList = nullptr;
     std::set<std::string_view> names;
 
     if (std::string_view one_name; tr_variantDictFindStrView(args_in, TR_KEY_name, &one_name))
     {
         names.insert(one_name);
     }
-    else if (tr_variantDictFindList(args_in, TR_KEY_name, &namesList))
+    else if (tr_variant* namesList = nullptr; tr_variantDictFindList(args_in, TR_KEY_name, &namesList))
     {
         int names_count = tr_variantListSize(namesList);
         for (int i = 0; i < names_count; i++)
         {
             tr_variant* v = tr_variantListChild(namesList, i);
-            std::string_view l;
-            if (tr_variantIsString(v) && tr_variantGetStrView(v, &l))
+            if (std::string_view l; tr_variantIsString(v) && tr_variantGetStrView(v, &l))
             {
                 names.insert(l);
             }
@@ -1734,8 +1732,7 @@ static char const* groupGet(tr_session* s, tr_variant* args_in, tr_variant* args
         if (names.empty() || names.count(name) > 0)
         {
             tr_variant* dict = tr_variantListAddDict(list, 5);
-            bandwidth_limits limits;
-            group->getLimits(&limits);
+            auto limits = group->getLimits();
             tr_variantDictAddStrView(dict, TR_KEY_name, name);
             tr_variantDictAddBool(dict, TR_KEY_uploadLimited, limits.up_limited);
             tr_variantDictAddInt(dict, TR_KEY_uploadLimit, limits.up_limit_KBps);
@@ -1767,18 +1764,17 @@ static char const* groupSet(
         return "No such group";
     }
 
-    bandwidth_limits limits;
-    group->getLimits(&limits);
+    auto limits = group->getLimits();
 
     tr_variantDictFindBool(args_in, TR_KEY_speed_limit_down_enabled, &limits.down_limited);
     int64_t intVal = 0;
-    if (limits.down_limited && tr_variantDictFindInt(args_in, TR_KEY_speed_limit_down, &intVal))
+    if (tr_variantDictFindInt(args_in, TR_KEY_speed_limit_down, &intVal))
     {
         limits.down_limit_KBps = intVal;
     }
 
     tr_variantDictFindBool(args_in, TR_KEY_speed_limit_up_enabled, &limits.up_limited);
-    if (limits.up_limited && tr_variantDictFindInt(args_in, TR_KEY_speed_limit_up, &intVal))
+    if (tr_variantDictFindInt(args_in, TR_KEY_speed_limit_up, &intVal))
     {
         limits.up_limit_KBps = intVal;
     }

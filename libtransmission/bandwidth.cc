@@ -347,15 +347,17 @@ void Bandwidth::notifyBandwidthConsumed(tr_direction dir, size_t byte_count, boo
 ****
 ***/
 
-void Bandwidth::getLimits(bandwidth_limits* limits)
+tr_bandwidth_limits Bandwidth::getLimits() const
 {
-    limits->up_limit_KBps = tr_toSpeedKBps(this->getDesiredSpeedBytesPerSecond(TR_UP));
-    limits->down_limit_KBps = tr_toSpeedKBps(this->getDesiredSpeedBytesPerSecond(TR_DOWN));
-    limits->up_limited = this->isLimited(TR_UP);
-    limits->down_limited = this->isLimited(TR_DOWN);
+    tr_bandwidth_limits limits;
+    limits.up_limit_KBps = tr_toSpeedKBps(this->getDesiredSpeedBytesPerSecond(TR_UP));
+    limits.down_limit_KBps = tr_toSpeedKBps(this->getDesiredSpeedBytesPerSecond(TR_DOWN));
+    limits.up_limited = this->isLimited(TR_UP);
+    limits.down_limited = this->isLimited(TR_DOWN);
+    return limits;
 }
 
-void Bandwidth::setLimits(bandwidth_limits const* limits)
+void Bandwidth::setLimits(tr_bandwidth_limits const* limits)
 {
     this->setDesiredSpeedBytesPerSecond(TR_UP, tr_toSpeedBytes(limits->up_limit_KBps));
     this->setDesiredSpeedBytesPerSecond(TR_DOWN, tr_toSpeedBytes(limits->down_limit_KBps));

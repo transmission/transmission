@@ -2899,7 +2899,7 @@ static void bandwidthGroupRead(tr_session* session, char const* configDir)
         }
 
         int64_t val = 0;
-        bandwidth_limits limits;
+        tr_bandwidth_limits limits;
         tr_variantDictFindBool(dict, TR_KEY_uploadLimited, &limits.up_limited);
         if (tr_variantDictFindInt(dict, TR_KEY_uploadLimit, &val))
         {
@@ -2931,10 +2931,9 @@ static int bandwidthGroupWrite(tr_session* session, char const* configDir)
     tr_variantInitList(&group_list, n);
     for (auto const& [name, group] : session->bandwidth_groups)
     {
-        tr_variant* dict = nullptr;
-        bandwidth_limits limits;
-        dict = tr_variantListAddDict(&group_list, 5);
-        group->getLimits(&limits);
+        tr_variant* dict = tr_variantListAddDict(&group_list, 5);
+        auto limits = group->getLimits();
+
         tr_variantDictAddStr(dict, TR_KEY_name, name);
         tr_variantDictAddBool(dict, TR_KEY_uploadLimited, limits.up_limited);
         tr_variantDictAddInt(dict, TR_KEY_uploadLimit, limits.up_limit_KBps);

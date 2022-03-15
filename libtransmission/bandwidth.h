@@ -25,7 +25,7 @@ class tr_peerIo;
  * @{
  */
 
-struct bandwidth_limits
+struct tr_bandwidth_limits
 {
     bool up_limited;
     unsigned int up_limit_KBps;
@@ -237,8 +237,8 @@ public:
         bool honor_parent_limits_;
     };
 
-    void getLimits(bandwidth_limits* limits);
-    void setLimits(bandwidth_limits const* limits);
+    tr_bandwidth_limits getLimits() const;
+    void setLimits(tr_bandwidth_limits const* limits);
 
 private:
     static unsigned int getSpeedBytesPerSecond(RateControl& r, unsigned int interval_msec, uint64_t now);
