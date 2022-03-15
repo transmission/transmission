@@ -28,8 +28,8 @@
 #include "log.h"
 #include "tr-assert.h"
 #include "utils.h"
-#include "watchdir.h"
 #include "watchdir-common.h"
+#include "watchdir.h"
 
 static auto constexpr LogName = std::string_view{ "watchdir:kqueue" };
 
