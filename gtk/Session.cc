@@ -1133,7 +1133,7 @@ void Session::Impl::add_file_async_callback(
             _("Couldn't read '{path}': {error} ({error_code})"),
             fmt::arg("path", file->get_parse_name().raw()),
             fmt::arg("error", e.what().raw()),
-            fmt::arg("error", e.code()));
+            fmt::arg("error_code", e.code()));
         g_message("%s", errmsg.c_str());
     }
 
