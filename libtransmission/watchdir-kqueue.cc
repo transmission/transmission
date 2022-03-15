@@ -58,17 +58,17 @@ struct tr_watchdir_kqueue
 static void tr_watchdir_kqueue_on_event(evutil_socket_t /*fd*/, short /*type*/, void* context)
 {
     auto const handle = static_cast<tr_watchdir_t>(context);
-    tr_watchdir_kqueue* const backend = BACKEND_UPCAST(tr_watchdir_get_backend(handle));
-    struct kevent ke;
-    auto ts = timespec{};
+    auto* const backend = BACKEND_UPCAST(tr_watchdir_get_backend(handle));
 
+    auto ke = kevent{};
+    auto ts = timespec{};
     if (kevent(backend->kq, nullptr, 0, &ke, 1, &ts) == -1)
     {
         auto const error_code = errno;
         tr_logAddNamedError(
             LogName,
             fmt::format(
-                _("Failed to fetch kevent: {error} ({error_code})"),
+                _("Couldn't read event: {error} ({error_code})"),
                 fmt::arg("error", tr_strerror(error_code)),
                 fmt::arg("error_code", error_code)));
         return;
@@ -124,7 +124,7 @@ tr_watchdir_backend* tr_watchdir_kqueue_new(tr_watchdir_t handle)
         tr_logAddNamedError(
             LogName,
             fmt::format(
-                _("Couldn't start kqueue: {error} ({error_code})"),
+                _("Couldn't watch '{path}': {error} ({error_code})"),
                 fmt::arg("error", tr_strerror(error_code)),
                 fmt::arg("error_code", error_code)));
         goto fail;
@@ -154,7 +154,7 @@ tr_watchdir_backend* tr_watchdir_kqueue_new(tr_watchdir_t handle)
         tr_logAddNamedError(
             LogName,
             fmt::format(
-                _("Couldn't set directory event filter for '{path}': {error} ({error_code})"),
+                _("Couldn't watch '{path}': {error} ({error_code})"),
                 fmt::arg("path", path),
                 fmt::arg("error", tr_strerror(error_code)),
                 fmt::arg("error_code", error_code)));

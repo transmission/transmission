@@ -78,7 +78,7 @@ static void tr_watchdir_inotify_on_event(struct bufferevent* event, void* contex
             tr_logAddNamedError(
                 LogName,
                 fmt::format(
-                    _("Failed to read inotify event: {error} ({error_code})"),
+                    _("Couldn't read event: {error} ({error_code})"),
                     fmt::arg("error", tr_strerror(error_code)),
                     fmt::arg("error_code", error_code)));
             break;
@@ -89,7 +89,7 @@ static void tr_watchdir_inotify_on_event(struct bufferevent* event, void* contex
             tr_logAddNamedError(
                 LogName,
                 fmt::format(
-                    _("Failed to read inotify event: expected {expected_size}, got {actual_size}"),
+                    _("Couldn't read event: expected {expected_size}, got {actual_size}"),
                     fmt::arg("expected_size", sizeof(ev)),
                     fmt::arg("actual_size", nread)));
             break;
@@ -112,7 +112,7 @@ static void tr_watchdir_inotify_on_event(struct bufferevent* event, void* contex
             tr_logAddNamedError(
                 LogName,
                 fmt::format(
-                    _("Failed to read filename from inotify: {error} ({error_code})"),
+                    _("Couldn't read filename: {error} ({error_code})"),
                     fmt::arg("error", tr_strerror(error_code)),
                     fmt::arg("error_code", error_code)));
             break;
@@ -123,7 +123,7 @@ static void tr_watchdir_inotify_on_event(struct bufferevent* event, void* contex
             tr_logAddNamedError(
                 LogName,
                 fmt::format(
-                    _("Failed to read filename from inotify: expected {expected_size}, got {actual_size}"),
+                    _("Couldn't read filename: expected {expected_size}, got {actual_size}"),
                     fmt::arg("expected_size", sizeof(ev)),
                     fmt::arg("actual_size", nread)));
             break;
@@ -179,7 +179,7 @@ tr_watchdir_backend* tr_watchdir_inotify_new(tr_watchdir_t handle)
         tr_logAddNamedError(
             LogName,
             fmt::format(
-                _("Couldn't watch '{path} for new .torrent files': {error} ({error_code})"),
+                _("Couldn't watch '{path}': {error} ({error_code})"),
                 fmt::arg("path", path),
                 fmt::arg("error", tr_strerror(error_code)),
                 fmt::arg("error_code", error_code)));
@@ -193,7 +193,7 @@ tr_watchdir_backend* tr_watchdir_inotify_new(tr_watchdir_t handle)
         tr_logAddNamedError(
             LogName,
             fmt::format(
-                _("Couldn't watch '{path} for new .torrent files': {error} ({error_code})"),
+                _("Couldn't watch '{path}': {error} ({error_code})"),
                 fmt::arg("path", path),
                 fmt::arg("error", tr_strerror(error_code)),
                 fmt::arg("error_code", error_code)));
@@ -207,7 +207,7 @@ tr_watchdir_backend* tr_watchdir_inotify_new(tr_watchdir_t handle)
         tr_logAddNamedError(
             LogName,
             fmt::format(
-                _("Couldn't watch '{path} for new .torrent files': {error} ({error_code})"),
+                _("Couldn't watch '{path}': {error} ({error_code})"),
                 fmt::arg("path", path),
                 fmt::arg("error", tr_strerror(error_code)),
                 fmt::arg("error_code", error_code)));
@@ -233,7 +233,7 @@ tr_watchdir_backend* tr_watchdir_inotify_new(tr_watchdir_t handle)
         tr_logAddNamedWarn(
             LogName,
             fmt::format(
-                _("Couldn't scan '{path} for new .torrent files': {error} ({error_code})"),
+                _("Couldn't scan '{path}': {error} ({error_code})"),
                 fmt::arg("path", path),
                 fmt::arg("error", tr_strerror(error_code)),
                 fmt::arg("error_code", error_code)));

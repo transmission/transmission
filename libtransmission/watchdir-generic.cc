@@ -85,7 +85,7 @@ tr_watchdir_backend* tr_watchdir_generic_new(tr_watchdir_t handle)
         tr_logAddNamedError(
             LogName,
             fmt::format(
-                _("Failed to create event: {error} ({error_code})"),
+                _("Couldn't create event: {error} ({error_code})"),
                 fmt::arg("error", tr_strerror(error_code)),
                 fmt::arg("error_code", error_code)));
         goto FAIL;
@@ -97,7 +97,7 @@ tr_watchdir_backend* tr_watchdir_generic_new(tr_watchdir_t handle)
         tr_logAddNamedError(
             LogName,
             fmt::format(
-                _("Failed to add event: {error} ({error_code})"),
+                _("Couldn't add event: {error} ({error_code})"),
                 fmt::arg("error", tr_strerror(error_code)),
                 fmt::arg("error_code", error_code)));
         goto FAIL;
