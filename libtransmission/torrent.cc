@@ -1912,23 +1912,15 @@ void tr_torrentSetLabels(tr_torrent* tor, tr_labels_t&& labels)
 ****
 ***/
 
-void tr_torrentSetGroup(tr_torrent* tor, std::string_view group)
+void tr_torrent::setGroup(std::string_view groupName)
 {
-    TR_ASSERT(tr_isTorrent(tor));
-    auto const lock = tor->unique_lock();
+    auto const lock = this->unique_lock();
 
-    tor->group = std::string{ group };
-    Bandwidth* bw = tor->session->bandwidthGroupFind(group);
-    if (bw == nullptr)
-    {
-        tor->bandwidth->setParent(tor->session->bandwidth);
-    }
-    else
-    {
-        tor->bandwidth->setParent(bw);
-    }
+    this->group.assign(groupName);
+    Bandwidth* bw = this->session->bandwidthGroupFind(group);
+    this->bandwidth->setParent(bw != nullptr ? bw : this->session->bandwidth);
 
-    tor->setDirty();
+    this->setDirty();
 }
 
 /***

@@ -36,7 +36,6 @@ char const* tr_getWebClientDir(tr_session const*);
 /** @brief return the directory where session id lock files are stored */
 std::string tr_getSessionIdDir();
 
-char* tr_buildPath(char const* first_element, ...);
 /** @} */
 
 /* @} */

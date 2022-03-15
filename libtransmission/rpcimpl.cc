@@ -1150,7 +1150,6 @@ static char const* torrentSet(
         auto tmp = int64_t{};
         auto d = double{};
         auto boolVal = bool{};
-        std::string_view group;
         tr_variant* tmp_variant = nullptr;
 
         if (tr_variantDictFindInt(args_in, TR_KEY_bandwidthPriority, &tmp))
@@ -1163,9 +1162,9 @@ static char const* torrentSet(
             }
         }
 
-        if (tr_variantDictFindStrView(args_in, TR_KEY_group, &group))
+        if (std::string_view group; tr_variantDictFindStrView(args_in, TR_KEY_group, &group))
         {
-            tr_torrentSetGroup(tor, group);
+            tor->setGroup(group);
         }
 
         if (errmsg == nullptr && tr_variantDictFindList(args_in, TR_KEY_labels, &tmp_variant))
@@ -1708,49 +1707,40 @@ static char const* torrentAdd(tr_session* session, tr_variant* args_in, tr_varia
 
 static char const* groupGet(tr_session* s, tr_variant* args_in, tr_variant* args_out, struct tr_rpc_idle_data* /*idle_data*/)
 {
-    tr_variant* names = nullptr;
-    std::string_view one_name;
-    int names_count = 0;
+    tr_variant* namesList = nullptr;
+    std::set<std::string_view> names;
 
-    if (tr_variantDictFindStrView(args_in, TR_KEY_name, &one_name))
+    if (std::string_view one_name; tr_variantDictFindStrView(args_in, TR_KEY_name, &one_name))
     {
-        names_count = -1;
+        names.insert(one_name);
     }
-    else if (tr_variantDictFindList(args_in, TR_KEY_name, &names))
+    else if (tr_variantDictFindList(args_in, TR_KEY_name, &namesList))
     {
-        names_count = tr_variantListSize(names);
+        int names_count = tr_variantListSize(namesList);
+        for (int i = 0; i < names_count; i++)
+        {
+            tr_variant* v = tr_variantListChild(namesList, i);
+            std::string_view l;
+            if (tr_variantIsString(v) && tr_variantGetStrView(v, &l))
+            {
+                names.insert(l);
+            }
+        }
     }
 
     tr_variant* list = tr_variantDictAddList(args_out, TR_KEY_group, 1);
     for (auto const& [name, group] : s->bandwidth_groups)
     {
-        bool nameInList = false;
-        if (names_count > 0)
+        if (names.empty() || names.count(name) > 0)
         {
-            for (int i = 0; !nameInList && i < names_count; i++)
-            {
-                tr_variant* v = tr_variantListChild(names, i);
-                std::string_view l;
-                if (tr_variantIsString(v) && tr_variantGetStrView(v, &l))
-                {
-                    nameInList = name == l;
-                }
-            }
-        }
-
-        if (nameInList || (name == one_name) || (names_count == 0))
-        {
-            bool u = false;
-            bool d = false;
-            uint32_t up = 0;
-            uint32_t down = 0;
             tr_variant* dict = tr_variantListAddDict(list, 5);
-            tr_bandwidthGroupGetLimits(group, &u, &up, &d, &down);
+            bandwidth_limits limits;
+            group->getLimits(&limits);
             tr_variantDictAddStrView(dict, TR_KEY_name, name);
-            tr_variantDictAddBool(dict, TR_KEY_uploadLimited, u);
-            tr_variantDictAddBool(dict, TR_KEY_downloadLimited, d);
-            tr_variantDictAddInt(dict, TR_KEY_downloadLimit, down);
-            tr_variantDictAddInt(dict, TR_KEY_uploadLimit, up);
+            tr_variantDictAddBool(dict, TR_KEY_uploadLimited, limits.up_limited);
+            tr_variantDictAddInt(dict, TR_KEY_uploadLimit, limits.up_limit_KBps);
+            tr_variantDictAddBool(dict, TR_KEY_downloadLimited, limits.down_limited);
+            tr_variantDictAddInt(dict, TR_KEY_downloadLimit, limits.down_limit_KBps);
             tr_variantDictAddBool(dict, TR_KEY_honorsSessionLimits, group->areParentLimitsHonored(TR_UP));
         }
     }
@@ -1777,26 +1767,23 @@ static char const* groupSet(
         return "No such group";
     }
 
-    bool u = false;
-    bool d = false;
-    uint32_t down = 0;
-    uint32_t up = 0;
-    tr_bandwidthGroupGetLimits(group, &u, &up, &d, &down);
+    bandwidth_limits limits;
+    group->getLimits(&limits);
 
-    tr_variantDictFindBool(args_in, TR_KEY_speed_limit_down_enabled, &d);
+    tr_variantDictFindBool(args_in, TR_KEY_speed_limit_down_enabled, &limits.down_limited);
     int64_t intVal = 0;
-    if (d && tr_variantDictFindInt(args_in, TR_KEY_speed_limit_down, &intVal))
+    if (limits.down_limited && tr_variantDictFindInt(args_in, TR_KEY_speed_limit_down, &intVal))
     {
-        down = intVal;
+        limits.down_limit_KBps = intVal;
     }
 
-    tr_variantDictFindBool(args_in, TR_KEY_speed_limit_up_enabled, &u);
-    if (u && tr_variantDictFindInt(args_in, TR_KEY_speed_limit_up, &intVal))
+    tr_variantDictFindBool(args_in, TR_KEY_speed_limit_up_enabled, &limits.up_limited);
+    if (limits.up_limited && tr_variantDictFindInt(args_in, TR_KEY_speed_limit_up, &intVal))
     {
-        up = intVal;
+        limits.up_limit_KBps = intVal;
     }
 
-    tr_bandwidthGroupSetLimits(group, u, up, d, down);
+    group->setLimits(&limits);
 
     bool honors = false;
     if (tr_variantDictFindBool(args_in, TR_KEY_honorsSessionLimits, &honors))

@@ -144,7 +144,7 @@ static auto loadGroup(tr_variant* dict, tr_torrent* tor)
 
     if (tr_variantDictFindStrView(dict, TR_KEY_group, &groupName) && !groupName.empty())
     {
-        tr_torrentSetGroup(tor, groupName);
+        tor->setGroup(groupName);
         return tr_resume::Group;
     }
     return tr_resume::fields_t{};

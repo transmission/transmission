@@ -347,28 +347,18 @@ void Bandwidth::notifyBandwidthConsumed(tr_direction dir, size_t byte_count, boo
 ****
 ***/
 
-void tr_bandwidthGroupGetLimits(
-    Bandwidth* group,
-    bool* up_limited,
-    unsigned int* up_limit,
-    bool* down_limited,
-    unsigned int* down_limit)
+void Bandwidth::getLimits(bandwidth_limits* limits)
 {
-    *up_limit = tr_toSpeedKBps(group->getDesiredSpeedBytesPerSecond(TR_UP));
-    *down_limit = tr_toSpeedKBps(group->getDesiredSpeedBytesPerSecond(TR_DOWN));
-    *up_limited = group->isLimited(TR_UP);
-    *down_limited = group->isLimited(TR_DOWN);
+    limits->up_limit_KBps = tr_toSpeedKBps(this->getDesiredSpeedBytesPerSecond(TR_UP));
+    limits->down_limit_KBps = tr_toSpeedKBps(this->getDesiredSpeedBytesPerSecond(TR_DOWN));
+    limits->up_limited = this->isLimited(TR_UP);
+    limits->down_limited = this->isLimited(TR_DOWN);
 }
 
-void tr_bandwidthGroupSetLimits(
-    Bandwidth* group,
-    bool up_limited,
-    unsigned int up_limit,
-    bool down_limited,
-    unsigned int down_limit)
+void Bandwidth::setLimits(bandwidth_limits const* limits)
 {
-    group->setDesiredSpeedBytesPerSecond(TR_UP, tr_toSpeedBytes(up_limit));
-    group->setDesiredSpeedBytesPerSecond(TR_DOWN, tr_toSpeedBytes(down_limit));
-    group->setLimited(TR_UP, up_limited);
-    group->setLimited(TR_DOWN, down_limited);
+    this->setDesiredSpeedBytesPerSecond(TR_UP, tr_toSpeedBytes(limits->up_limit_KBps));
+    this->setDesiredSpeedBytesPerSecond(TR_DOWN, tr_toSpeedBytes(limits->down_limit_KBps));
+    this->setLimited(TR_UP, limits->up_limited);
+    this->setLimited(TR_DOWN, limits->down_limited);
 }

@@ -25,6 +25,14 @@ class tr_peerIo;
  * @{
  */
 
+struct bandwidth_limits
+{
+    bool up_limited;
+    unsigned int up_limit_KBps;
+    bool down_limited;
+    unsigned int down_limit_KBps;
+};
+
 /**
  * Bandwidth is an object for measuring and constraining bandwidth speeds.
  *
@@ -229,6 +237,9 @@ public:
         bool honor_parent_limits_;
     };
 
+    void getLimits(bandwidth_limits* limits);
+    void setLimits(bandwidth_limits const* limits);
+
 private:
     static unsigned int getSpeedBytesPerSecond(RateControl& r, unsigned int interval_msec, uint64_t now);
 
@@ -252,16 +263,3 @@ private:
 };
 
 /* @} */
-
-void tr_bandwidthGroupSetLimits(
-    Bandwidth* group,
-    bool up_limited,
-    unsigned int up_limit,
-    bool down_limited,
-    unsigned int down_limit);
-void tr_bandwidthGroupGetLimits(
-    Bandwidth* group,
-    bool* up_limited,
-    unsigned int* up_limit,
-    bool* down_limited,
-    unsigned int* down_limit);
