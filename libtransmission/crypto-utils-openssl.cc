@@ -62,10 +62,10 @@ static void log_openssl_error(char const* file, int line)
 
         ERR_error_string_n(error_code, buf, sizeof(buf));
         auto const errmsg = fmt::format(
-            _("{crypto_library} error: {errmsg} ({errcode})"),
+            _("{crypto_library} error: {error} ({error_code})"),
             fmt::arg("crypto_library", "OpenSSL"),
-            fmt::arg("errmsg", buf),
-            fmt::arg("errcode", error_code));
+            fmt::arg("error", buf),
+            fmt::arg("error_code", error_code));
         tr_logAddMessage(file, line, TR_LOG_ERROR, MyName, errmsg);
     }
 }

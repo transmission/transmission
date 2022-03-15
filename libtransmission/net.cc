@@ -390,11 +390,11 @@ struct tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const
     if (bind(s, (struct sockaddr*)&source_sock, sourcelen) == -1)
     {
         tr_logAddWarn(fmt::format(
-            _("Couldn't set source address {address} on {socket}: {errmsg} ({errcode})"),
+            _("Couldn't set source address {address} on {socket}: {error} ({error_code})"),
             fmt::arg("address", source_addr->to_string()),
             fmt::arg("socket", s),
-            fmt::arg("errmsg", tr_net_strerror(sockerrno)),
-            fmt::arg("errcode", sockerrno)));
+            fmt::arg("error", tr_net_strerror(sockerrno)),
+            fmt::arg("error_code", sockerrno)));
         tr_netClose(session, s);
         return ret;
     }
@@ -410,12 +410,12 @@ struct tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const
         if ((tmperrno != ENETUNREACH && tmperrno != EHOSTUNREACH) || addr->type == TR_AF_INET)
         {
             tr_logAddWarn(fmt::format(
-                _("Couldn't connect socket {socket} to {address}:{port}: {errmsg} ({errcode})"),
+                _("Couldn't connect socket {socket} to {address}:{port}: {error} ({error_code})"),
                 fmt::arg("socket", s),
                 fmt::arg("address", addr->to_string()),
                 fmt::arg("port", ntohs(port)),
-                fmt::arg("errmsg", tr_net_strerror(tmperrno)),
-                fmt::arg("errcode", tmperrno)));
+                fmt::arg("error", tr_net_strerror(tmperrno)),
+                fmt::arg("error_code", tmperrno)));
         }
 
         tr_netClose(session, s);
@@ -521,12 +521,12 @@ static tr_socket_t tr_netBindTCPImpl(tr_address const* addr, tr_port port, bool 
         {
             tr_logAddError(fmt::format(
                 err == EADDRINUSE ?
-                    _("Couldn't bind port {port} on {address}: {errmsg} ({errcode}) -- Is another copy of Transmission already running?") :
-                    _("Couldn't bind port {port} on {address}: {errmsg} ({errcode})"),
+                    _("Couldn't bind port {port} on {address}: {error} ({error_code}) -- Is another copy of Transmission already running?") :
+                    _("Couldn't bind port {port} on {address}: {error} ({error_code})"),
                 fmt::arg("address", addr->to_string()),
                 fmt::arg("port", port),
-                fmt::arg("errmsg", tr_net_strerror(err)),
-                fmt::arg("errcode", err)));
+                fmt::arg("error", tr_net_strerror(err)),
+                fmt::arg("error_code", err)));
         }
 
         tr_netCloseSocket(fd);

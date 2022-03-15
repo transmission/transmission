@@ -673,15 +673,15 @@ static AnnounceResult tr_dhtAnnounce(tr_torrent* tor, int af, bool announce)
     int const rc = dht_search(dht_hash, announce ? tr_sessionGetPeerPort(session_) : 0, af, callback, nullptr);
     if (rc < 0)
     {
-        auto const errcode = errno;
+        auto const error_code = errno;
         tr_logAddWarnTor(
             tor,
             fmt::format(
-                _("Unable to announce torrent in DHT with {type}: {errmsg} ({errcode}); status is {status}"),
+                _("Unable to announce torrent in DHT with {type}: {error} ({error_code}); state is {state}"),
                 fmt::arg("type", af == AF_INET6 ? "IPv6" : "IPv4"),
-                fmt::arg("status", tr_dhtPrintableStatus(status)),
-                fmt::arg("errcode", errcode),
-                fmt::arg("errmsg", tr_strerror(errcode))));
+                fmt::arg("state", tr_dhtPrintableStatus(status)),
+                fmt::arg("error_code", error_code),
+                fmt::arg("error", tr_strerror(error_code))));
         return AnnounceResult::FAILED;
     }
 

@@ -272,9 +272,9 @@ void tr_announcerParseHttpAnnounceResponse(tr_announce_response& response, std::
     if (error != nullptr)
     {
         auto const errmsg = fmt::format(
-            _("Couldn't parse announce response: {errmsg} ({errcode})"),
-            fmt::arg("errmsg", error->message),
-            fmt::arg("errcode", error->code));
+            _("Couldn't parse announce response: {error} ({error_code})"),
+            fmt::arg("error", error->message),
+            fmt::arg("error_code", error->code));
         tr_logAddNamedWarn(log_name, errmsg);
         tr_error_clear(&error);
     }
@@ -450,9 +450,9 @@ void tr_announcerParseHttpScrapeResponse(tr_scrape_response& response, std::stri
         tr_logAddNamedWarn(
             log_name,
             fmt::format(
-                _("Couldn't parse scrape response: {errmsg} ({errcode})"),
-                fmt::arg("errmsg", error->message),
-                fmt::arg("errcode", error->code)));
+                _("Couldn't parse scrape response: {error} ({error_code})"),
+                fmt::arg("error", error->message),
+                fmt::arg("error_code", error->code)));
         tr_error_clear(&error);
     }
 }

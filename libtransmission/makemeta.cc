@@ -58,10 +58,10 @@ static struct FileList* getFiles(char const* dir, char const* base, struct FileL
     if (tr_error* error = nullptr; !tr_sys_path_get_info(buf.c_str(), 0, &info, &error))
     {
         tr_logAddWarn(fmt::format(
-            _("Skipping '{path}': {errmsg} ({errcode})"),
+            _("Skipping '{path}': {error} ({error_code})"),
             fmt::arg("path", buf),
-            fmt::arg("errmsg", error->message),
-            fmt::arg("errcode", error->code)));
+            fmt::arg("error", error->message),
+            fmt::arg("error_code", error->code)));
         tr_error_free(error);
         return list;
     }

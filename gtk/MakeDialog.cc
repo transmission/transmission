@@ -128,18 +128,18 @@ bool MakeProgressDialog::onProgressDialogRefresh()
     else if (builder_.result == TrMakemetaResult::ERR_IO_READ)
     {
         str = fmt::format(
-            _("Couldn't read '{path}': {errmsg} ({errcode})"),
+            _("Couldn't read '{path}': {error} ({error_code})"),
             fmt::arg("path", builder_.errfile),
-            fmt::arg("errmsg", Glib::strerror(builder_.my_errno).raw()),
-            fmt::arg("errcode", builder_.my_errno));
+            fmt::arg("error", Glib::strerror(builder_.my_errno).raw()),
+            fmt::arg("error_code", builder_.my_errno));
     }
     else if (builder_.result == TrMakemetaResult::ERR_IO_WRITE)
     {
         str = fmt::format(
-            _("Couldn't save '{path}': {errmsg} ({errcode})"),
+            _("Couldn't save '{path}': {error} ({error_code})"),
             fmt::arg("path", builder_.errfile),
-            fmt::arg("errmsg", Glib::strerror(builder_.my_errno).raw()),
-            fmt::arg("errcode", builder_.my_errno));
+            fmt::arg("error", Glib::strerror(builder_.my_errno).raw()),
+            fmt::arg("error_code", builder_.my_errno));
     }
     else
     {

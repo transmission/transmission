@@ -74,10 +74,10 @@ static void blocklistLoad(tr_blocklistFile* b)
     if (fd == TR_BAD_SYS_FILE)
     {
         tr_logAddWarn(fmt::format(
-            _("Couldn't read '{path}': {errmsg} ({errcode})"),
+            _("Couldn't read '{path}': {error} ({error_code})"),
             fmt::arg("path", b->filename),
-            fmt::arg("errmsg", error->message),
-            fmt::arg("errcode", error->code)));
+            fmt::arg("error", error->message),
+            fmt::arg("error_code", error->code)));
         tr_error_free(error);
         return;
     }
@@ -86,10 +86,10 @@ static void blocklistLoad(tr_blocklistFile* b)
     if (b->rules == nullptr)
     {
         tr_logAddWarn(fmt::format(
-            _("Couldn't read '{path}': {errmsg} ({errcode})"),
+            _("Couldn't read '{path}': {error} ({error_code})"),
             fmt::arg("path", b->filename),
-            fmt::arg("errmsg", error->message),
-            fmt::arg("errcode", error->code)));
+            fmt::arg("error", error->message),
+            fmt::arg("error_code", error->code)));
         tr_sys_file_close(fd, nullptr);
         tr_error_free(error);
         return;
@@ -382,10 +382,10 @@ int tr_blocklistFileSetContent(tr_blocklistFile* b, char const* filename)
     if (in == TR_BAD_SYS_FILE)
     {
         tr_logAddWarn(fmt::format(
-            _("Couldn't read '{path}': {errmsg} ({errcode})"),
+            _("Couldn't read '{path}': {error} ({error_code})"),
             fmt::arg("path", filename),
-            fmt::arg("errmsg", error->message),
-            fmt::arg("errcode", error->code)));
+            fmt::arg("error", error->message),
+            fmt::arg("error_code", error->code)));
         tr_error_free(error);
         return 0;
     }
@@ -396,10 +396,10 @@ int tr_blocklistFileSetContent(tr_blocklistFile* b, char const* filename)
     if (out == TR_BAD_SYS_FILE)
     {
         tr_logAddWarn(fmt::format(
-            _("Couldn't read '{path}': {errmsg} ({errcode})"),
+            _("Couldn't read '{path}': {error} ({error_code})"),
             fmt::arg("path", b->filename),
-            fmt::arg("errmsg", error->message),
-            fmt::arg("errcode", error->code)));
+            fmt::arg("error", error->message),
+            fmt::arg("error_code", error->code)));
         tr_error_free(error);
         tr_sys_file_close(in, nullptr);
         return 0;
@@ -473,10 +473,10 @@ int tr_blocklistFileSetContent(tr_blocklistFile* b, char const* filename)
     if (!tr_sys_file_write(out, ranges, sizeof(struct tr_ipv4_range) * ranges_count, nullptr, &error))
     {
         tr_logAddWarn(fmt::format(
-            _("Couldn't save '{path}': {errmsg} ({errcode})"),
+            _("Couldn't save '{path}': {error} ({error_code})"),
             fmt::arg("path", b->filename),
-            fmt::arg("errmsg", error->message),
-            fmt::arg("errcode", error->code)));
+            fmt::arg("error", error->message),
+            fmt::arg("error_code", error->code)));
         tr_error_free(error);
     }
     else

@@ -389,9 +389,9 @@ fail:
         tr_logAddNamedWarn(
             CodeName,
             fmt::format(
-                _("Couldn't initialize LPD: {errmsg} ({errcode})"),
-                fmt::arg("errmsg", tr_strerror(save)),
-                fmt::arg("errcode", save)));
+                _("Couldn't initialize LPD: {error} ({error_code})"),
+                fmt::arg("error", tr_strerror(save)),
+                fmt::arg("error_code", save)));
         errno = save;
     }
 

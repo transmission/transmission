@@ -115,8 +115,8 @@ static void natPulse(tr_shared* s, bool do_check)
         tr_logAddNamedInfo(
             CodeName,
             fmt::format(
-                _("State changed from '{oldstate}' to '{state}"),
-                fmt::arg("oldstate", getNatStateStr(old_status)),
+                _("State changed from '{old_state}' to '{state}"),
+                fmt::arg("old_state", getNatStateStr(old_status)),
                 fmt::arg("state", getNatStateStr(new_status))));
     }
 }

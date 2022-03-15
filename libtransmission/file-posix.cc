@@ -268,10 +268,10 @@ FAILURE:
     TR_ASSERT(my_error != nullptr);
 
     tr_logAddError(fmt::format(
-        _("Couldn't create '{path}': {errmsg} ({errcode})"),
+        _("Couldn't create '{path}': {error} ({error_code})"),
         fmt::arg("path", path),
-        fmt::arg("errmsg", my_error->message),
-        fmt::arg("errcode", my_error->code)));
+        fmt::arg("error", my_error->message),
+        fmt::arg("error_code", my_error->code)));
     tr_error_propagate(error, &my_error);
 
 CLEANUP:

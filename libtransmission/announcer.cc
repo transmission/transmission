@@ -959,7 +959,7 @@ static void on_announce_error(tr_tier* tier, char const* err, tr_announce_event 
 
     if (isUnregistered(err))
     {
-        tr_logAddErrorTier(tier, fmt::format(_("Announce error: {errmsg}"), fmt::arg("errmsg", err)));
+        tr_logAddErrorTier(tier, fmt::format(_("Announce error: {error}"), fmt::arg("error", err)));
     }
     else
     {
@@ -969,10 +969,10 @@ static void on_announce_error(tr_tier* tier, char const* err, tr_announce_event 
             tier,
             fmt::format(
                 ngettext(
-                    "Announce error: {errmsg} (Retrying in {count} second)",
-                    "Announce error: {errmsg} (Retrying in {count} seconds)",
+                    "Announce error: {error} (Retrying in {count} second)",
+                    "Announce error: {error} (Retrying in {count} seconds)",
                     interval),
-                fmt::arg("errmsg", err),
+                fmt::arg("error", err),
                 fmt::arg("count", interval)));
         tier_announce_event_push(tier, e, tr_time() + interval);
     }
