@@ -42,7 +42,6 @@
 #define IN_MULTICAST(a) (((a)&0xf0000000) == 0xe0000000)
 #endif
 
-#undef tr_logAddCritical
 #undef tr_logAddError
 #undef tr_logAddWarn
 #undef tr_logAddInfo
@@ -50,7 +49,6 @@
 #undef tr_logAddTrace
 
 auto constexpr LogName = std::string_view{ "net" };
-#define tr_logAddCritical(...) tr_logAddNamed(TR_LOG_CRITICAL, LogName, __VA_ARGS__)
 #define tr_logAddError(...) tr_logAddNamed(TR_LOG_ERROR, LogName, __VA_ARGS__)
 #define tr_logAddWarn(...) tr_logAddNamed(TR_LOG_WARN, LogName, __VA_ARGS__)
 #define tr_logAddInfo(...) tr_logAddNamed(TR_LOG_INFO, LogName, __VA_ARGS__)
