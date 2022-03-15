@@ -207,9 +207,9 @@ bool tr_metaInfoBuilderSetPieceSize(tr_metainfo_builder* b, uint32_t bytes)
     if (!isValidPieceSize(bytes))
     {
         tr_logAddWarn(fmt::format(
-            _("Couldn't use invalid piece size {size_requested}; using {size_used} instead"),
-            fmt::arg("size_requested", tr_formatter_mem_B(bytes)),
-            fmt::arg("size_used", tr_formatter_mem_B(b->pieceSize))));
+            _("Couldn't use invalid piece size {expected_size}; using {actual_size} instead"),
+            fmt::arg("expected_size", tr_formatter_mem_B(bytes)),
+            fmt::arg("actual_size", tr_formatter_mem_B(b->pieceSize))));
         return false;
     }
 
