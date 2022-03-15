@@ -50,10 +50,7 @@ static char const* get_event_string(tr_announce_request const* req)
     return req->partial_seed && (req->event != TR_ANNOUNCE_EVENT_STOPPED) ? "paused" : tr_announce_event_get_string(req->event);
 }
 
-static std::tuple<std::string, size_t> announce_url_new(
-    tr_session const* session,
-    tr_announce_request const* req,
-    unsigned char const* ipv6)
+static std::string announce_url_new(tr_session const* session, tr_announce_request const* req)
 {
     auto const announce_sv = req->announce_url.sv();
 
@@ -107,17 +104,26 @@ static std::tuple<std::string, size_t> announce_url_new(
         evbuffer_add_printf(buf, "&trackerid=%" TR_PRIsv, TR_PRIsv_ARG(req->tracker_id));
     }
 
-    size_t no_ipv6_cutoff = evbuffer_get_length(buf);
+    return evbuffer_free_to_str(buf);
+}
 
-    if (ipv6 != nullptr)
-    {
-        auto ipv6_readable = std::array<char, INET6_ADDRSTRLEN>{};
-        evutil_inet_ntop(AF_INET6, ipv6, std::data(ipv6_readable), std::size(ipv6_readable));
-        evbuffer_add_printf(buf, "&ipv6=");
-        tr_http_escape(buf, std::data(ipv6_readable), true);
-    }
+static std::string format_ipv4_url_arg(tr_address const& ipv4_address)
+{
+    std::array<char, INET_ADDRSTRLEN> readable;
+    evutil_inet_ntop(AF_INET, &ipv4_address.addr, readable.data(), readable.size());
 
-    return { evbuffer_free_to_str(buf), no_ipv6_cutoff };
+    return "&ipv4="s + readable.data();
+}
+
+static std::string format_ipv6_url_arg(unsigned char const* ipv6_address)
+{
+    std::array<char, INET6_ADDRSTRLEN> readable;
+    evutil_inet_ntop(AF_INET6, ipv6_address, readable.data(), readable.size());
+
+    auto arg = "&ipv6="s;
+    tr_http_escape(arg, std::data(readable), true);
+
+    return arg;
 }
 
 static void verboseLog(std::string_view description, tr_direction direction, std::string_view message)
@@ -400,34 +406,39 @@ void tr_tracker_http_announce(
        public address they want to use.
 
        We should ensure that we send the announce both via IPv6 and IPv4,
-       and to be safe we also add the "ipv6=" parameter, because we're
-       already computing our global IPv6 address (for the LTEP handshake),
-       so this comes for free.
-
-       We don't set the "ipv4=" parameter because it is much harder to
-       figure the public IPv4 address of the machine due to pervasive use
-       of NAT, so it is probably not worth it.
+       and to be safe we also add the "ipv6=" and "ipv4=" parameters, if
+       we already have them. Our global IPv6 address is computed for the
+       LTEP handshake, so this comes for free. Our public IPv4 address
+       may have been returned from a previous announce and stored in the
+       session.
      */
-    auto ipv6 = tr_globalIPv6(session);
-    auto [url, no_ipv6_cutoff] = announce_url_new(session, request, ipv6);
+    auto url_base = announce_url_new(session, request);
 
-    auto options = tr_web::FetchOptions{ url, onAnnounceDone, d };
+    auto options = tr_web::FetchOptions{ url_base, onAnnounceDone, d };
     options.timeout_secs = 90L;
     options.sndbuf = 1024;
     options.rcvbuf = 3072;
 
+    auto ipv6 = tr_globalIPv6(session);
     if (ipv6 != nullptr)
     {
         d->requests_sent_count = 2;
 
         // First try to send the announce via IPv4:
         logtrace(request->log_name, "Sending IPv4 announce to libcurl: \"%" TR_PRIsv "\"", TR_PRIsv_ARG(options.url));
-        tr_web::FetchOptions ipv4_options = options;
+
+        auto ipv4_options = options;
+        // Set the "&ipv6=" argument
+        ipv4_options.url += format_ipv6_url_arg(ipv6);
+        // Set protocol to IPv4
         ipv4_options.ip_proto = tr_web::FetchOptions::IPProtocol::V4;
         session->web->fetch(std::move(ipv4_options));
 
-        // Then strip the "ipv6=..." part and try to send via IPv6:
-        options.url.resize(no_ipv6_cutoff);
+        // Then maybe set the "&ipv4=..." part and try to send via IPv6:
+        if (auto public_ipv4 = session->externalIP(); public_ipv4.has_value())
+        {
+            options.url += format_ipv4_url_arg(*public_ipv4);
+        }
         options.ip_proto = tr_web::FetchOptions::IPProtocol::V6;
         logtrace(request->log_name, "Sending IPv6 announce to libcurl: \"%" TR_PRIsv "\"", TR_PRIsv_ARG(options.url));
     }
