@@ -1209,9 +1209,9 @@ tr_rpc_server::tr_rpc_server(tr_session* session_in, tr_variant* settings)
     else if (!tr_rpc_address_from_string(*bindAddress, sv))
     {
         tr_logAddWarn(fmt::format(
-            _("The '{key}' setting is '{address}' but must be an IPv4 or IPv6 address or a Unix socket path. Using default value '0.0.0.0'"),
+            _("The '{key}' setting is '{value}' but must be an IPv4 or IPv6 address or a Unix socket path. Using default value '0.0.0.0'"),
             fmt::format("key", tr_quark_get_string(key)),
-            fmt::format("address", sv)));
+            fmt::format("value", sv)));
         bindAddress->set_inaddr_any();
     }
 
