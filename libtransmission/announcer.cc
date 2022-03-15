@@ -1196,7 +1196,7 @@ static void announce_request_delegate(
     }
     else
     {
-        tr_logAddWarn(fmt::format("Unsupported url: {}", announce_sv));
+        tr_logAddWarn(fmt::format(_("Unsupported URL: '{url}'"), fmt::arg("url", announce_sv)));
         delete callback_data;
     }
 
