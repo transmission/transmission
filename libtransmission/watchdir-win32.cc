@@ -284,7 +284,7 @@ tr_watchdir_backend* tr_watchdir_win32_new(tr_watchdir_t handle)
     backend->fd = INVALID_HANDLE_VALUE;
     backend->notify_pipe[0] = backend->notify_pipe[1] = TR_BAD_SOCKET;
 
-    wchar_t* const wide_path = tr_win32_utf8_to_native(path, -1);
+    wchar_t* wide_path = tr_win32_utf8_to_native(path, -1);
     if (wide_path == nullptr)
     {
         log_error(fmt::format(_("Couldn't convert '{path}' to native path"), fmt::arg("path", path)));

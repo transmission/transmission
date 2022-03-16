@@ -60,7 +60,7 @@ static void tr_watchdir_kqueue_on_event(evutil_socket_t /*fd*/, short /*type*/, 
     auto const handle = static_cast<tr_watchdir_t>(context);
     auto* const backend = BACKEND_UPCAST(tr_watchdir_get_backend(handle));
 
-    auto ke = kevent{};
+    struct kevent ke;
     auto ts = timespec{};
     if (kevent(backend->kq, nullptr, 0, &ke, 1, &ts) == -1)
     {
@@ -181,6 +181,7 @@ tr_watchdir_backend* tr_watchdir_kqueue_new(tr_watchdir_t handle)
 
     if (event_add(backend->event, nullptr) == -1)
     {
+        auto const error_code = errno;
         tr_logAddNamedError(
             LogName,
             fmt::format(
