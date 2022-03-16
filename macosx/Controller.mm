@@ -11,6 +11,8 @@
 #include <atomic> /* atomic, atomic_fetch_add_explicit, memory_order_relaxed */
 
 #include <libtransmission/transmission.h>
+
+#include <libtransmission/log.h>
 #include <libtransmission/torrent-metainfo.h>
 #include <libtransmission/utils.h>
 #include <libtransmission/variant.h>
