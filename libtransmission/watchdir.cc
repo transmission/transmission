@@ -61,7 +61,7 @@ static bool is_regular_file(char const* dir, char const* name)
             tr_logAddNamedWarn(
                 LogName,
                 fmt::format(
-                    _("Skipping '{path}': {error} ({error_code})"),
+                    _("Couldn't read '{path}': {error} ({error_code})"),
                     fmt::arg("path", path),
                     fmt::arg("error", error->message),
                     fmt::arg("error_code", error->code)));
