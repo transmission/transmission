@@ -344,20 +344,6 @@ private:
         (void)curl_easy_setopt(e, CURLOPT_MAXREDIRS, -1L);
         (void)curl_easy_setopt(e, CURLOPT_NOSIGNAL, 1L);
         (void)curl_easy_setopt(e, CURLOPT_PRIVATE, task);
-
-#if LIBCURL_VERSION_NUM <= CURL_VERSION_BITS(7, 76, 1)
-        /*
-         * Up to Curl 7.76.1, if we explicitly choose the IP version we want to
-         * use, it is still possible that the wrong IP version is used. To work
-         * around the issue, we must disable DNS cache and connection reuse.
-         */
-        if (task->ipProtocol() != CURL_IPRESOLVE_WHATEVER)
-        {
-            (void)curl_easy_setopt(e, CURLOPT_DNS_CACHE_TIMEOUT, 0L);
-            (void)curl_easy_setopt(e, CURLOPT_FORBID_REUSE, 1L);
-        }
-#endif
-
         (void)curl_easy_setopt(e, CURLOPT_IPRESOLVE, task->ipProtocol());
 
 #ifdef USE_LIBCURL_SOCKOPT

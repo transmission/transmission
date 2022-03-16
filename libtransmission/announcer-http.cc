@@ -12,6 +12,8 @@
 #include <string>
 #include <string_view>
 
+#include <curl/curl.h>
+
 #include <event2/buffer.h>
 #include <event2/http.h> /* for HTTP_OK */
 
@@ -420,6 +422,23 @@ void tr_tracker_http_announce(
     options.rcvbuf = 3072;
 
     auto ipv6 = tr_globalIPv6(session);
+
+#if LIBCURL_VERSION_NUM < CURL_VERSION_BITS(7, 77, 0)
+    /*
+     * Before Curl 7.77.0, if we explicitly choose the IP version we want
+     * to use, it is still possible that the wrong one is used. The workaround
+     * is expensive (disabling DNS cache), so instead we have to make do with
+     * a request that we don't know if will go through IPv6 or IPv4.
+     */
+    if (ipv6 != nullptr)
+    {
+        if (auto public_ipv4 = session->externalIP(); public_ipv4.has_value())
+        {
+            options.url += format_ipv4_url_arg(*public_ipv4);
+        }
+        options.url += format_ipv6_url_arg(ipv6);
+    }
+#else
     if (ipv6 != nullptr)
     {
         d->requests_sent_count = 2;
@@ -443,6 +462,7 @@ void tr_tracker_http_announce(
         logtrace(request->log_name, "Sending IPv6 announce to libcurl: \"%" TR_PRIsv "\"", TR_PRIsv_ARG(options.url));
     }
     else
+#endif
     {
         d->requests_sent_count = 1;
 
