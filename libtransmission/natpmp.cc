@@ -25,7 +25,7 @@
 static auto constexpr LifetimeSecs = uint32_t{ 3600 };
 static auto constexpr CommandWaitSecs = time_t{ 8 };
 
-static auto constexpr CodeName = std::string_view{ "nat-pmp" };
+static auto constexpr LogName = std::string_view{ "nat-pmp" };
 
 /**
 ***
@@ -40,12 +40,12 @@ static void logVal(char const* func, int ret)
 
     if (ret >= 0)
     {
-        tr_logAddNamedDebug(CodeName, fmt::format("{} succeeded ({})", func, ret));
+        tr_logAddNamedDebug(LogName, fmt::format("{} succeeded ({})", func, ret));
     }
     else
     {
         tr_logAddNamedDebug(
-            CodeName,
+            LogName,
             fmt::format(
                 "{} failed. Natpmp returned {} ({}); errno is {} ({})",
                 func,
@@ -113,7 +113,7 @@ tr_port_forwarding tr_natpmpPulse(
         {
             char str[128];
             evutil_inet_ntop(AF_INET, &response.pnu.publicaddress.addr, str, sizeof(str));
-            tr_logAddNamedInfo(CodeName, fmt::format(_("Found public address '{address}'"), fmt::arg("address", str)));
+            tr_logAddNamedInfo(LogName, fmt::format(_("Found public address '{address}'"), fmt::arg("address", str)));
             nat->state = TR_NATPMP_IDLE;
         }
         else if (val != NATPMP_TRYAGAIN)
@@ -146,7 +146,7 @@ tr_port_forwarding tr_natpmpPulse(
         {
             int const unmapped_port = resp.pnu.newportmapping.privateport;
 
-            tr_logAddNamedInfo(CodeName, fmt::format(_("Port {port} is no longer forwarded"), fmt::arg("port", unmapped_port)));
+            tr_logAddNamedInfo(LogName, fmt::format(_("Port {port} is no longer forwarded"), fmt::arg("port", unmapped_port)));
 
             if (nat->private_port == unmapped_port)
             {
@@ -196,7 +196,7 @@ tr_port_forwarding tr_natpmpPulse(
             nat->private_port = resp.pnu.newportmapping.privateport;
             nat->public_port = resp.pnu.newportmapping.mappedpublicport;
             tr_logAddNamedInfo(
-                CodeName,
+                LogName,
                 fmt::format(_("Port {port} forwarded successfully"), fmt::arg("port", nat->private_port)));
         }
         else if (val != NATPMP_TRYAGAIN)

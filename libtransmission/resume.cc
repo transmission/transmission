@@ -588,7 +588,7 @@ static auto loadProgress(tr_variant* dict, tr_torrent* tor)
 
         if (std::size(mtimes) != n_files)
         {
-            tr_logAddWarnTor(tor, fmt::format("got {} mtimes; expected {}", std::size(mtimes), n_files));
+            tr_logAddDebugTor(tor, fmt::format("Couldn't load mtimes: expected {} got {}", std::size(mtimes), n_files));
             // if resizing grows the vector, we'll get 0 mtimes for the
             // new items which is exactly what we want since the pieces
             // in an unknown state should be treated as untested

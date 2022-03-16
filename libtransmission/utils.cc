@@ -234,10 +234,10 @@ uint8_t* tr_loadFile(char const* path, size_t* size, tr_error** error)
     if (!tr_sys_path_get_info(path, 0, &info, &my_error))
     {
         tr_logAddError(fmt::format(
-            _("Couldn't read '{path}': {errmsg} ({errcode})"),
+            _("Couldn't read '{path}': {error} ({error_code})"),
             fmt::arg("path", path),
-            fmt::arg("errmsg", my_error->message),
-            fmt::arg("errcode", my_error->code)));
+            fmt::arg("error", my_error->message),
+            fmt::arg("error_code", my_error->code)));
         tr_error_propagate(error, &my_error);
         return nullptr;
     }
@@ -260,10 +260,10 @@ uint8_t* tr_loadFile(char const* path, size_t* size, tr_error** error)
     if (fd == TR_BAD_SYS_FILE)
     {
         tr_logAddError(fmt::format(
-            _("Couldn't read '{path}': {errmsg} ({errcode})"),
+            _("Couldn't read '{path}': {error} ({error_code})"),
             fmt::arg("path", path),
-            fmt::arg("errmsg", my_error->message),
-            fmt::arg("errcode", my_error->code)));
+            fmt::arg("error", my_error->message),
+            fmt::arg("error_code", my_error->code)));
         tr_error_propagate(error, &my_error);
         return nullptr;
     }
@@ -272,10 +272,10 @@ uint8_t* tr_loadFile(char const* path, size_t* size, tr_error** error)
     if (!tr_sys_file_read(fd, buf, info.size, nullptr, &my_error))
     {
         tr_logAddError(fmt::format(
-            _("Couldn't read '{path}': {errmsg} ({errcode})"),
+            _("Couldn't read '{path}': {error} ({error_code})"),
             fmt::arg("path", path),
-            fmt::arg("errmsg", my_error->message),
-            fmt::arg("errcode", my_error->code)));
+            fmt::arg("error", my_error->message),
+            fmt::arg("error_code", my_error->code)));
         tr_sys_file_close(fd, nullptr);
         tr_free(buf);
         tr_error_propagate(error, &my_error);
@@ -298,10 +298,10 @@ bool tr_loadFile(std::vector<char>& setme, std::string const& path, tr_error** e
     if (!tr_sys_path_get_info(path_sz, 0, &info, &my_error))
     {
         tr_logAddError(fmt::format(
-            _("Couldn't read '{path}': {errmsg} ({errcode})"),
+            _("Couldn't read '{path}': {error} ({error_code})"),
             fmt::arg("path", path),
-            fmt::arg("errmsg", my_error->message),
-            fmt::arg("errcode", my_error->code)));
+            fmt::arg("error", my_error->message),
+            fmt::arg("error_code", my_error->code)));
         tr_error_propagate(error, &my_error);
         return false;
     }
@@ -318,10 +318,10 @@ bool tr_loadFile(std::vector<char>& setme, std::string const& path, tr_error** e
     if (fd == TR_BAD_SYS_FILE)
     {
         tr_logAddError(fmt::format(
-            _("Couldn't read '{path}': {errmsg} ({errcode})"),
+            _("Couldn't read '{path}': {error} ({error_code})"),
             fmt::arg("path", path),
-            fmt::arg("errmsg", my_error->message),
-            fmt::arg("errcode", my_error->code)));
+            fmt::arg("error", my_error->message),
+            fmt::arg("error_code", my_error->code)));
         tr_error_propagate(error, &my_error);
         return false;
     }
@@ -330,10 +330,10 @@ bool tr_loadFile(std::vector<char>& setme, std::string const& path, tr_error** e
     if (!tr_sys_file_read(fd, std::data(setme), info.size, nullptr, &my_error))
     {
         tr_logAddError(fmt::format(
-            _("Couldn't read '{path}': {errmsg} ({errcode})"),
+            _("Couldn't read '{path}': {error} ({error_code})"),
             fmt::arg("path", path),
-            fmt::arg("errmsg", my_error->message),
-            fmt::arg("errcode", my_error->code)));
+            fmt::arg("error", my_error->message),
+            fmt::arg("error_code", my_error->code)));
         tr_sys_file_close(fd, nullptr);
         tr_error_propagate(error, &my_error);
         return false;
@@ -1161,10 +1161,10 @@ bool tr_moveFile(char const* oldpath, char const* newpath, tr_error** error)
         if (!tr_sys_path_remove(oldpath, &my_error))
         {
             tr_logAddError(fmt::format(
-                _("Couldn't remove '{path}': {errmsg} ({errcode})"),
+                _("Couldn't remove '{path}': {error} ({error_code})"),
                 fmt::arg("path", oldpath),
-                fmt::arg("errmsg", my_error->message),
-                fmt::arg("errcode", my_error->code)));
+                fmt::arg("error", my_error->message),
+                fmt::arg("error_code", my_error->code)));
             tr_error_free(my_error);
         }
     }

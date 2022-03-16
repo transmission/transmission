@@ -744,11 +744,11 @@ bool FileList::Impl::on_rename_done_idle(Glib::ustring const& path_string, Glib:
         Gtk::MessageDialog w(
             *static_cast<Gtk::Window*>(widget_.get_toplevel()),
             fmt::format(
-                _("Couldn't rename '{oldpath}' as '{path}': {errmsg} ({errcode})"),
-                fmt::arg("oldpath", path_string.raw()),
+                _("Couldn't rename '{old_path}' as '{path}': {error} ({error_code})"),
+                fmt::arg("old_path", path_string.raw()),
                 fmt::arg("path", newname.raw()),
-                fmt::arg("errmsg", tr_strerror(error)),
-                fmt::arg("errcode", error)),
+                fmt::arg("error", tr_strerror(error)),
+                fmt::arg("error_code", error)),
             false,
             Gtk::MESSAGE_ERROR,
             Gtk::BUTTONS_CLOSE,

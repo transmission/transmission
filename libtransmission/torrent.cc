@@ -1789,10 +1789,10 @@ static void torrentCallScript(tr_torrent const* tor, char const* script)
         logwarn(
             tor,
             fmt::format(
-                _("Couldn't call script '{path}': {errmsg} ({errcode})"),
+                _("Couldn't call script '{path}': {error} ({error_code})"),
                 fmt::arg("path", script),
-                fmt::arg("errmsg", error->message),
-                fmt::arg("errcode", error->code)));
+                fmt::arg("error", error->message),
+                fmt::arg("error_code", error->code)));
         tr_error_free(error);
     }
 }
@@ -2411,11 +2411,11 @@ static void setLocationImpl(struct LocationData* const data)
                         logerr(
                             tor,
                             fmt::format(
-                                _("Couldn't move '{oldpath}' to '{path}': {errmsg} ({errcode})"),
-                                fmt::arg("oldpath", oldpath),
+                                _("Couldn't move '{old_path}' to '{path}': {error} ({error_code})"),
+                                fmt::arg("old_path", oldpath),
                                 fmt::arg("path", newpath),
-                                fmt::arg("errmsg", error->message),
-                                fmt::arg("errcode", error->code)));
+                                fmt::arg("error", error->message),
+                                fmt::arg("error_code", error->code)));
                         tr_error_free(error);
                     }
                 }
@@ -2557,11 +2557,11 @@ static void tr_torrentFileCompleted(tr_torrent* tor, tr_file_index_t i)
                 logerr(
                     tor,
                     fmt::format(
-                        _("Couldn't move '{oldpath}' to '{path}': {errmsg} ({errcode})"),
-                        fmt::arg("oldpath", oldpath),
+                        _("Couldn't move '{old_path}' to '{path}': {error} ({error_code})"),
+                        fmt::arg("old_path", oldpath),
                         fmt::arg("path", newpath),
-                        fmt::arg("errmsg", error->message),
-                        fmt::arg("errcode", error->code)));
+                        fmt::arg("error", error->message),
+                        fmt::arg("error_code", error->code)));
                 tr_error_free(error);
             }
         }

@@ -1216,10 +1216,10 @@ int tr_variantToFile(tr_variant const* v, tr_variant_fmt fmt, std::string const&
     if (error != nullptr)
     {
         tr_logAddError(fmt::format(
-            _("Couldn't save '{path}': {errmsg} ({errcode})"),
+            _("Couldn't save '{path}': {error} ({error_code})"),
             fmt::arg("path", filename),
-            fmt::arg("errmsg", error->message),
-            fmt::arg("errcode", error->code)));
+            fmt::arg("error", error->message),
+            fmt::arg("error_code", error->code)));
         error_code = error->code;
         tr_error_clear(&error);
     }

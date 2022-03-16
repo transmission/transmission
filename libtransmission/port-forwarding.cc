@@ -4,6 +4,8 @@
 // License text can be found in the licenses/ folder.
 
 #include <algorithm>
+#include <string_view>
+
 #include <sys/types.h>
 
 #include <event2/event.h>
@@ -22,8 +24,7 @@
 #include "upnp.h"
 #include "utils.h"
 
-#define loginfo(...) tr_logAddNamed(TR_LOG_INFO, "port-forwarding", __VA_ARGS__)
-#define logtrace(...) tr_logAddNamed(TR_LOG_TRACE, "port-forwarding", __VA_ARGS__)
+static auto constexpr LogName = std::string_view{ "port-fwd" };
 
 struct tr_shared
 {
@@ -92,7 +93,12 @@ static void natPulse(tr_shared* s, bool do_check)
     {
         session->public_peer_port = public_peer_port;
         session->private_peer_port = received_private_port;
-        loginfo("public peer port %d (private %d) ", session->public_peer_port, session->private_peer_port);
+        tr_logAddNamedInfo(
+            LogName,
+            fmt::format(
+                _("Mapped private port '{private_port}' to public port '{public_port}'"),
+                fmt::arg("public_port", session->public_peer_port),
+                fmt::arg("private_port", session->private_peer_port)));
     }
 
     s->upnpStatus = tr_upnpPulse(
@@ -106,10 +112,12 @@ static void natPulse(tr_shared* s, bool do_check)
 
     if (new_status != old_status)
     {
-        loginfo(fmt::format(
-            _("State changed from '{oldstate}' to '{state}"),
-            fmt::arg("oldstate", getNatStateStr(old_status)),
-            fmt::arg("state", getNatStateStr(new_status))));
+        tr_logAddNamedInfo(
+            LogName,
+            fmt::format(
+                _("State changed from '{old_state}' to '{state}"),
+                fmt::arg("old_state", getNatStateStr(old_status)),
+                fmt::arg("state", getNatStateStr(new_status))));
     }
 }
 
@@ -198,7 +206,7 @@ static void stop_timer(tr_shared* s)
 
 static void stop_forwarding(tr_shared* s)
 {
-    logtrace("stopped");
+    tr_logAddNamedTrace(LogName, "stopped");
     natPulse(s, false);
 
     tr_natpmpClose(s->natpmp);
