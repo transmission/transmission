@@ -331,7 +331,7 @@ void tr_watchdir_scan(tr_watchdir_t handle, std::unordered_set<std::string>* dir
         tr_logAddNamedWarn(
             LogName,
             fmt::format(
-                _("Couldn't read '{path}': {error} ({error_code})"),
+                _("Couldn't open '{path}': {error} ({error_code})"),
                 fmt::arg("path", handle->path),
                 fmt::arg("error", error->message),
                 fmt::arg("error_code", error->code)));
