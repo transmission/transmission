@@ -207,7 +207,14 @@ static void rebind_ipv6(tr_session* ss, bool force)
 FAIL:
     /* Something went wrong.  It's difficult to recover, so let's simply
        set things up so that we try again next time. */
-    logwarn(_("Couldn't rebind IPv6 socket"));
+    auto const error_code = errno;
+    auto ipv6_readable = std::array<char, INET6_ADDRSTRLEN>{};
+    evutil_inet_ntop(AF_INET6, ipv6, std::data(ipv6_readable), std::size(ipv6_readable));
+    logwarn(fmt::format(
+        _("Couldn't rebind IPv6 socket {address}: {error} ({error_code})"),
+        fmt::arg("address", std::data(ipv6_readable)),
+        fmt::arg("error", tr_strerror(error_code)),
+        fmt::arg("error_code", error_code)));
 
     if (s != TR_BAD_SOCKET)
     {
@@ -305,7 +312,12 @@ void tr_udpInit(tr_session* ss)
 
         if (rc == -1)
         {
-            logwarn(_("Couldn't bind IPv4 socket"));
+            auto const error_code = errno;
+            logwarn(fmt::format(
+                _("Couldn't bind IPv4 socket {address}: {error} ({error_code})"),
+                fmt::arg("address", public_addr->to_string(ss->udp_port)),
+                fmt::arg("error", tr_strerror(error_code)),
+                fmt::arg("error_code", error_code)));
             tr_netCloseSocket(ss->udp_socket);
             ss->udp_socket = TR_BAD_SOCKET;
         }
