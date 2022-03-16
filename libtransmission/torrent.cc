@@ -1770,7 +1770,7 @@ static void torrentCallScript(tr_torrent const* tor, char const* script)
         { "TR_TORRENT_TRACKERS"sv, trackers_str },
     };
 
-    tr_logAddInfoTor(tor, fmt::format(_("Calling script '{path}'"), script));
+    tr_logAddInfoTor(tor, fmt::format(_("Calling script '{path}'"), fmt::arg("path", script)));
 
     tr_error* error = nullptr;
 
