@@ -198,11 +198,11 @@ static void tr_watchdir_win32_on_event(struct bufferevent* event, void* context)
         /* Consume entire name into buffer */
         if ((nread = bufferevent_read(event, buffer + header_size, nleft)) == (size_t)-1)
         {
-            auto const error_code = erro;
+            auto const error_code = errno;
             log_error(fmt::format(
                 _("Couldn't read filename: {error} ({error_code})"),
                 fmt::arg("error", tr_strerror(error_code)),
-                fmt::arg("error_code", error)));
+                fmt::arg("error_code", error_code)));
             break;
         }
 
