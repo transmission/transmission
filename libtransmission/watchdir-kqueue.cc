@@ -125,6 +125,7 @@ tr_watchdir_backend* tr_watchdir_kqueue_new(tr_watchdir_t handle)
             LogName,
             fmt::format(
                 _("Couldn't watch '{path}': {error} ({error_code})"),
+                fmt::arg("path", path),
                 fmt::arg("error", tr_strerror(error_code)),
                 fmt::arg("error_code", error_code)));
         goto fail;
