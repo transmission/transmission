@@ -826,7 +826,7 @@ msgstr "Preuzimanje: %1$s, Slanje: %2$s"
 #: ../gtk/MainWindow.cc:611
 #, c-format
 msgid "size|Down: %1$s, Up: %2$s"
-msgstr "veličina|Preuzimanje: %1$s, Slanje: %2$s"
+msgstr "Preuzimanje: %1$s, Slanje: %2$s"
 
 #: ../gtk/MakeDialog.cc:112
 #, c-format

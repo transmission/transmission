@@ -802,7 +802,7 @@ msgstr ""
 #: ../gtk/MainWindow.cc:611
 #, c-format
 msgid "size|Down: %1$s, Up: %2$s"
-msgstr "size|ดาวน์: %1$s, อัพ: %2$s"
+msgstr "ดาวน์: %1$s, อัพ: %2$s"
 
 #: ../gtk/MakeDialog.cc:112
 #, c-format

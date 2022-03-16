@@ -838,7 +838,7 @@ msgstr "下载：%1$s，上传：%2$s"
 #: ../gtk/MainWindow.cc:611
 #, c-format
 msgid "size|Down: %1$s, Up: %2$s"
-msgstr "量|下载：%s，上传：%s"
+msgstr "下载：%s，上传：%s"
 
 #: ../gtk/MakeDialog.cc:112
 #, c-format

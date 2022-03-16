@@ -799,7 +799,7 @@ msgstr "Pastga: %1$s, Yuqoriga: %2$s"
 #: ../gtk/MainWindow.cc:611
 #, c-format
 msgid "size|Down: %1$s, Up: %2$s"
-msgstr "hajmi|Past: %1$s, Yuqori: %2$s"
+msgstr "Past: %1$s, Yuqori: %2$s"
 
 #: ../gtk/MakeDialog.cc:112
 #, c-format

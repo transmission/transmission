@@ -815,7 +815,7 @@ msgstr "다운로드: %1$s, 업로드: %2$s"
 #: ../gtk/MainWindow.cc:611
 #, c-format
 msgid "size|Down: %1$s, Up: %2$s"
-msgstr "크기|다운로드: %1$s, 업로드: %2$s"
+msgstr "다운로드: %1$s, 업로드: %2$s"
 
 #: ../gtk/MakeDialog.cc:112
 #, c-format

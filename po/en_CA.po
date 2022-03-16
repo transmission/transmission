@@ -808,7 +808,7 @@ msgstr "Down: %1$s, Up: %2$s"
 #: ../gtk/MainWindow.cc:611
 #, c-format
 msgid "size|Down: %1$s, Up: %2$s"
-msgstr "size|Down: %1$s, Up: %2$s"
+msgstr "Down: %1$s, Up: %2$s"
 
 #: ../gtk/MakeDialog.cc:112
 #, c-format
