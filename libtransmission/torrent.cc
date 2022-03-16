@@ -2366,7 +2366,7 @@ static void setLocationImpl(struct LocationData* const data)
                 auto const oldpath = tr_strvPath(oldbase, sub);
                 auto const newpath = tr_strvPath(location, sub);
 
-                tr_logAddTraceTor(tor, fmt::format("Found file #{}: {}", i, oldpath));
+                tr_logAddTraceTor(tor, fmt::format("Found file #{}: '{}'", i, oldpath));
 
                 if (do_move && !tr_sys_path_is_same(oldpath.c_str(), newpath.c_str(), nullptr))
                 {
