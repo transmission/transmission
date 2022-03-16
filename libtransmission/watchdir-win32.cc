@@ -6,7 +6,6 @@
 #include <cstddef> /* offsetof */
 #include <cstdlib> /* realloc() */
 #include <errno.h>
-#include <string_view>
 
 #include <process.h> /* _beginthreadex() */
 
@@ -27,14 +26,6 @@
 #include "utils.h"
 #include "watchdir.h"
 #include "watchdir-common.h"
-
-/***
-****
-***/
-
-static auto constexpr LogName = std::string_view{ "watchdir:win32" };
-
-#define log_error(...) tr_logAddNamedError(LogName, __VA_ARGS__)
 
 /***
 ****
@@ -130,14 +121,14 @@ static unsigned int __stdcall tr_watchdir_win32_thread(void* context)
                 &backend->overlapped,
                 nullptr))
         {
-            log_error(_("Couldn't read directory changes"));
+            tr_logAddError(_("Couldn't read directory changes"));
             return 0;
         }
     }
 
     if (GetLastError() != ERROR_OPERATION_ABORTED)
     {
-        log_error(_("Couldn't wait for directory changes"));
+        tr_logAddError(_("Couldn't wait for directory changes"));
     }
 
     return 0;
@@ -166,7 +157,7 @@ static void tr_watchdir_win32_on_event(struct bufferevent* event, void* context)
         if (nread == (size_t)-1)
         {
             auto const error_code = errno;
-            log_error(fmt::format(
+            tr_logAddError(fmt::format(
                 _("Couldn't read event: {error} ({error_code})"),
                 fmt::arg("error", tr_strerror(error_code)),
                 fmt::arg("error_code", error_code)));
@@ -175,7 +166,7 @@ static void tr_watchdir_win32_on_event(struct bufferevent* event, void* context)
 
         if (nread != header_size)
         {
-            log_error(fmt::format(
+            tr_logAddError(fmt::format(
                 _("Couldn't read event: expected {expected_size}, got {actual_size}"),
                 fmt::arg("expected_size", header_size),
                 fmt::arg("actual_size", nread)));
@@ -199,7 +190,7 @@ static void tr_watchdir_win32_on_event(struct bufferevent* event, void* context)
         if ((nread = bufferevent_read(event, buffer + header_size, nleft)) == (size_t)-1)
         {
             auto const error_code = errno;
-            log_error(fmt::format(
+            tr_logAddError(fmt::format(
                 _("Couldn't read filename: {error} ({error_code})"),
                 fmt::arg("error", tr_strerror(error_code)),
                 fmt::arg("error_code", error_code)));
@@ -208,7 +199,7 @@ static void tr_watchdir_win32_on_event(struct bufferevent* event, void* context)
 
         if (nread != nleft)
         {
-            log_error(fmt::format(
+            tr_logAddError(fmt::format(
                 _("Couldn't read filename: expected {expected_size}, got {actual_size}"),
                 fmt::arg("expected_size", nleft),
                 fmt::arg("actual_size", nread)));
@@ -287,7 +278,7 @@ tr_watchdir_backend* tr_watchdir_win32_new(tr_watchdir_t handle)
     wchar_t* wide_path = tr_win32_utf8_to_native(path, -1);
     if (wide_path == nullptr)
     {
-        log_error(fmt::format(_("Couldn't convert '{path}' to native path"), fmt::arg("path", path)));
+        tr_logAddError(fmt::format(_("Couldn't convert '{path}' to native path"), fmt::arg("path", path)));
         goto fail;
     }
 
@@ -300,7 +291,7 @@ tr_watchdir_backend* tr_watchdir_win32_new(tr_watchdir_t handle)
              FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OVERLAPPED,
              nullptr)) == INVALID_HANDLE_VALUE)
     {
-        log_error(fmt::format(_("Couldn't read '{path}'"), fmt::arg("path", path)));
+        tr_logAddError(fmt::format(_("Couldn't read '{path}'"), fmt::arg("path", path)));
         goto fail;
     }
 
@@ -319,14 +310,14 @@ tr_watchdir_backend* tr_watchdir_win32_new(tr_watchdir_t handle)
             &backend->overlapped,
             nullptr))
     {
-        log_error(fmt::format(_("Couldn't read '{path}'"), fmt::arg("path", path)));
+        tr_logAddError(fmt::format(_("Couldn't read '{path}'"), fmt::arg("path", path)));
         goto fail;
     }
 
     if (evutil_socketpair(AF_INET, SOCK_STREAM, 0, backend->notify_pipe) == -1)
     {
         auto const error_code = errno;
-        log_error(fmt::format(
+        tr_logAddError(fmt::format(
             _("Couldn't create pipe: {error} ({error_code})"),
             fmt::arg("error", tr_strerror(error_code)),
             fmt::arg("error_code", error_code)));
@@ -336,7 +327,7 @@ tr_watchdir_backend* tr_watchdir_win32_new(tr_watchdir_t handle)
     if ((backend->event = bufferevent_socket_new(tr_watchdir_get_event_base(handle), backend->notify_pipe[0], 0)) == nullptr)
     {
         auto const error_code = errno;
-        log_error(fmt::format(
+        tr_logAddError(fmt::format(
             _("Couldn't create event: {error} ({error_code})"),
             fmt::arg("error", tr_strerror(error_code)),
             fmt::arg("error_code", error_code)));
@@ -349,7 +340,7 @@ tr_watchdir_backend* tr_watchdir_win32_new(tr_watchdir_t handle)
 
     if ((backend->thread = (HANDLE)_beginthreadex(nullptr, 0, &tr_watchdir_win32_thread, handle, 0, nullptr)) == nullptr)
     {
-        log_error(_("Couldn't create thread"));
+        tr_logAddError(_("Couldn't create thread"));
         goto fail;
     }
 
@@ -363,7 +354,7 @@ tr_watchdir_backend* tr_watchdir_win32_new(tr_watchdir_t handle)
             nullptr) == -1)
     {
         auto const error_code = errno;
-        log_error(fmt::format(
+        tr_logAddError(fmt::format(
             _("Couldn't scan '{path}': {error} ({error_code})"),
             fmt::arg("path", path),
             fmt::arg("error", tr_strerror(error_code)),

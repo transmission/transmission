@@ -31,8 +31,6 @@
 #include "watchdir.h"
 #include "watchdir-common.h"
 
-static auto constexpr LogName = std::string_view{ "watchdir:kqueue" };
-
 /***
 ****
 ***/
@@ -65,12 +63,10 @@ static void tr_watchdir_kqueue_on_event(evutil_socket_t /*fd*/, short /*type*/, 
     if (kevent(backend->kq, nullptr, 0, &ke, 1, &ts) == -1)
     {
         auto const error_code = errno;
-        tr_logAddNamedError(
-            LogName,
-            fmt::format(
-                _("Couldn't read event: {error} ({error_code})"),
-                fmt::arg("error", tr_strerror(error_code)),
-                fmt::arg("error_code", error_code)));
+        tr_logAddError(fmt::format(
+            _("Couldn't read event: {error} ({error_code})"),
+            fmt::arg("error", tr_strerror(error_code)),
+            fmt::arg("error_code", error_code)));
         return;
     }
 
@@ -121,13 +117,10 @@ tr_watchdir_backend* tr_watchdir_kqueue_new(tr_watchdir_t handle)
     if (backend->kq == -1)
     {
         auto const error_code = errno;
-        tr_logAddNamedError(
-            LogName,
-            fmt::format(
-                _("Couldn't watch '{path}': {error} ({error_code})"),
-                fmt::arg("path", path),
-                fmt::arg("error", tr_strerror(error_code)),
-                fmt::arg("error_code", error_code)));
+        tr_logAddError(fmt::format(
+            _("Couldn't watch '{path}': {error} ({error_code})"),
+            fmt::arg("error", tr_strerror(error_code)),
+            fmt::arg("error_code", error_code)));
         goto fail;
     }
 
@@ -136,13 +129,11 @@ tr_watchdir_backend* tr_watchdir_kqueue_new(tr_watchdir_t handle)
     if (backend->dirfd == -1)
     {
         auto const error_code = errno;
-        tr_logAddNamedError(
-            LogName,
-            fmt::format(
-                _("Couldn't watch '{path}': {error} ({error_code})"),
-                fmt::arg("path", path),
-                fmt::arg("error", tr_strerror(error_code)),
-                fmt::arg("error_code", error_code)));
+        tr_logAddError(fmt::format(
+            _("Couldn't watch '{path}': {error} ({error_code})"),
+            fmt::arg("path", path),
+            fmt::arg("error", tr_strerror(error_code)),
+            fmt::arg("error_code", error_code)));
         goto fail;
     }
 
@@ -152,13 +143,11 @@ tr_watchdir_backend* tr_watchdir_kqueue_new(tr_watchdir_t handle)
     if (kevent(backend->kq, &ke, 1, nullptr, 0, nullptr) == -1)
     {
         auto const error_code = errno;
-        tr_logAddNamedError(
-            LogName,
-            fmt::format(
-                _("Couldn't watch '{path}': {error} ({error_code})"),
-                fmt::arg("path", path),
-                fmt::arg("error", tr_strerror(error_code)),
-                fmt::arg("error_code", error_code)));
+        tr_logAddError(fmt::format(
+            _("Couldn't watch '{path}': {error} ({error_code})"),
+            fmt::arg("path", path),
+            fmt::arg("error", tr_strerror(error_code)),
+            fmt::arg("error_code", error_code)));
         goto fail;
     }
 
@@ -171,24 +160,20 @@ tr_watchdir_backend* tr_watchdir_kqueue_new(tr_watchdir_t handle)
              handle)) == nullptr)
     {
         auto const error_code = errno;
-        tr_logAddNamedError(
-            LogName,
-            fmt::format(
-                _("Couldn't create event: {error} ({error_code})"),
-                fmt::arg("error", tr_strerror(error_code)),
-                fmt::arg("error_code", error_code)));
+        tr_logAddError(fmt::format(
+            _("Couldn't create event: {error} ({error_code})"),
+            fmt::arg("error", tr_strerror(error_code)),
+            fmt::arg("error_code", error_code)));
         goto fail;
     }
 
     if (event_add(backend->event, nullptr) == -1)
     {
         auto const error_code = errno;
-        tr_logAddNamedError(
-            LogName,
-            fmt::format(
-                _("Couldn't add event: {error} ({error_code})"),
-                fmt::arg("error", tr_strerror(error_code)),
-                fmt::arg("error_code", error_code)));
+        tr_logAddError(fmt::format(
+            _("Couldn't add event: {error} ({error_code})"),
+            fmt::arg("error", tr_strerror(error_code)),
+            fmt::arg("error_code", error_code)));
         goto fail;
     }
 

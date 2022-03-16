@@ -29,8 +29,6 @@
 #include "trevent.h"
 #include "utils.h"
 
-#define logtrace(...) tr_logAddNamed(TR_LOG_TRACE, "trevent", __VA_ARGS__)
-
 /***
 ****
 ***/
@@ -213,7 +211,7 @@ static void libeventThreadFunc(tr_event_handle* events)
     events->session->evdns_base = nullptr;
     events->session->events = nullptr;
     delete events;
-    logtrace("Closing libevent thread");
+    tr_logAddTrace("Closing libevent thread");
 }
 
 void tr_eventInit(tr_session* session)
@@ -243,7 +241,7 @@ void tr_eventClose(tr_session* session)
 
     event_base_loopexit(events->base, nullptr);
 
-    logtrace("closing trevent pipe");
+    tr_logAddTrace("closing trevent pipe");
 }
 
 /**

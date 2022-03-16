@@ -17,6 +17,7 @@
 #include <libtransmission/transmission.h>
 
 #include <libtransmission/error.h>
+#include <libtransmission/log.h>
 #include <libtransmission/torrent-metainfo.h>
 #include <libtransmission/tr-getopt.h>
 #include <libtransmission/tr-macros.h>

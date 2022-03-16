@@ -15,12 +15,14 @@
 #include <event2/util.h>
 
 #include <fmt/core.h>
+#include <fmt/format.h>
 
 #define LIBTRANSMISSION_ANNOUNCER_MODULE
 
 #include "transmission.h"
-#include "announcer.h"
+
 #include "announcer-common.h"
+#include "announcer.h"
 #include "crypto-utils.h" /* tr_rand_buffer() */
 #include "log.h"
 #include "peer-io.h"
@@ -30,9 +32,9 @@
 #include "tr-udp.h"
 #include "utils.h"
 
-#define logwarn(interned, ...) tr_logAddNamed(TR_LOG_WARN, (interned).c_str(), __VA_ARGS__)
-#define logdbg(interned, ...) tr_logAddNamed(TR_LOG_DEBUG, (interned).c_str(), __VA_ARGS__)
-#define logtrace(interned, ...) tr_logAddNamed(TR_LOG_TRACE, (interned).c_str(), __VA_ARGS__)
+#define logwarn(interned, msg) tr_logAddWarn(msg, (interned).sv())
+#define logdbg(interned, msg) tr_logAddDebug(msg, (interned).sv())
+#define logtrace(interned, msg) tr_logAddTrace(msg, (interned).sv())
 
 using namespace std::literals;
 
@@ -483,7 +485,7 @@ static void tau_tracker_on_dns(int errcode, struct evutil_addrinfo* addr, void* 
 static void tau_tracker_send_request(struct tau_tracker* tracker, void const* payload, size_t payload_len)
 {
     struct evbuffer* buf = evbuffer_new();
-    logdbg(tracker->key, "sending request w/connection id %" PRIu64 "\n", tracker->connection_id);
+    logdbg(tracker->key, fmt::format("sending request w/connection id {}", tracker->connection_id));
     evbuffer_add_hton_64(buf, tracker->connection_id);
     evbuffer_add_reference(buf, payload, payload_len, nullptr, nullptr);
     (void)tau_sendto(tracker->session, tracker->addr, tracker->port, evbuffer_pullup(buf, -1), evbuffer_get_length(buf));
@@ -505,7 +507,7 @@ static void tau_tracker_send_requests(tau_tracker* tracker, std::list<T>& reqs)
             continue;
         }
 
-        logdbg(tracker->key, "sending req %p", (void*)&req);
+        logdbg(tracker->key, fmt::format("sending req {}", fmt::ptr(&req)));
         req.sent_at = now;
         tau_tracker_send_request(tracker, std::data(req.payload), std::size(req.payload));
 
@@ -542,7 +544,7 @@ static void on_tracker_connection_response(struct tau_tracker* tracker, tau_acti
     {
         tracker->connection_id = evbuffer_read_ntoh_64(buf);
         tracker->connection_expiration_time = now + TauConnectionTtlSecs;
-        logdbg(tracker->key, "Got a new connection ID from tracker: %" PRIu64, tracker->connection_id);
+        logdbg(tracker->key, fmt::format("Got a new connection ID from tracker: {}", tracker->connection_id));
     }
     else
     {
@@ -552,7 +554,7 @@ static void on_tracker_connection_response(struct tau_tracker* tracker, tau_acti
             std::string_view{ reinterpret_cast<char const*>(evbuffer_pullup(buf, -1)), buflen } :
             std::string_view{ _("Connection failed") };
 
-        logdbg(tracker->key, "%" TR_PRIsv, TR_PRIsv_ARG(errmsg));
+        logdbg(tracker->key, errmsg);
         tracker->failAll(true, false, errmsg);
     }
 
@@ -576,7 +578,7 @@ static void tau_tracker_timeout_reqs(struct tau_tracker* tracker)
             auto& req = *it;
             if (cancel_all || req.created_at + TauRequestTtl < now)
             {
-                logtrace(tracker->key, "timeout announce req %p", (void*)&req);
+                logtrace(tracker->key, fmt::format("timeout announce req {}", fmt::ptr(&req)));
                 req.fail(false, true, "");
                 it = reqs.erase(it);
             }
@@ -594,7 +596,7 @@ static void tau_tracker_timeout_reqs(struct tau_tracker* tracker)
             auto& req = *it;
             if (cancel_all || req.created_at + TauRequestTtl < now)
             {
-                logtrace(tracker->key, "timeout scrape req %p", &req);
+                logtrace(tracker->key, fmt::format("timeout scrape req {}", fmt::ptr(&req)));
                 req.fail(false, true, "");
                 it = reqs.erase(it);
             }
@@ -653,12 +655,13 @@ static void tau_tracker_upkeep_ex(struct tau_tracker* tracker, bool timeout_reqs
 
     logtrace(
         tracker->key,
-        "addr %p -- connected %d (%zu %zu) -- connecting_at %zu",
-        (void*)tracker->addr,
-        (int)(tracker->connection_expiration_time > now),
-        (size_t)tracker->connection_expiration_time,
-        (size_t)now,
-        (size_t)tracker->connecting_at);
+        fmt::format(
+            "addr {} -- connected {} ({} {}) -- connecting_at {}",
+            fmt::ptr(tracker->addr),
+            tracker->connection_expiration_time > now,
+            tracker->connection_expiration_time,
+            now,
+            tracker->connecting_at));
 
     /* also need a valid connection ID... */
     if (tracker->addr != nullptr && tracker->connection_expiration_time <= now && tracker->connecting_at == 0)
@@ -666,7 +669,7 @@ static void tau_tracker_upkeep_ex(struct tau_tracker* tracker, bool timeout_reqs
         struct evbuffer* buf = evbuffer_new();
         tracker->connecting_at = now;
         tracker->connection_transaction_id = tau_transaction_new();
-        logtrace(tracker->key, "Trying to connect. Transaction ID is %u", tracker->connection_transaction_id);
+        logtrace(tracker->key, fmt::format("Trying to connect. Transaction ID is {}", tracker->connection_transaction_id));
         evbuffer_add_hton_64(buf, 0x41727101980LL);
         evbuffer_add_hton_32(buf, TAU_ACTION_CONNECT);
         evbuffer_add_hton_32(buf, tracker->connection_transaction_id);
@@ -842,7 +845,7 @@ bool tau_handle_message(tr_session* session, uint8_t const* msg, size_t msglen)
         // is it a connection response?
         if (tracker.connecting_at != 0 && transaction_id == tracker.connection_transaction_id)
         {
-            logtrace(tracker.key, "%" PRIu32 " is my connection request!", transaction_id);
+            logtrace(tracker.key, fmt::format("{} is my connection request!", transaction_id));
             on_tracker_connection_response(&tracker, action_id, buf);
             evbuffer_free(buf);
             return true;
@@ -857,7 +860,7 @@ bool tau_handle_message(tr_session* session, uint8_t const* msg, size_t msglen)
                 [&transaction_id](auto const& req) { return req.transaction_id == transaction_id; });
             if (it != std::end(reqs))
             {
-                logtrace(tracker.key, "%" PRIu32 " is an announce request!", transaction_id);
+                logtrace(tracker.key, fmt::format("{} is an announce request!", transaction_id));
                 auto req = *it;
                 it = reqs.erase(it);
                 req.onResponse(action_id, buf);
@@ -875,7 +878,7 @@ bool tau_handle_message(tr_session* session, uint8_t const* msg, size_t msglen)
                 [&transaction_id](auto const& req) { return req.transaction_id == transaction_id; });
             if (it != std::end(reqs))
             {
-                logtrace(tracker.key, "%" PRIu32 " is a scrape request!", transaction_id);
+                logtrace(tracker.key, fmt::format("{} is a scrape request!", transaction_id));
                 auto req = *it;
                 it = reqs.erase(it);
                 req.onResponse(action_id, buf);
