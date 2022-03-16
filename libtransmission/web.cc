@@ -233,12 +233,12 @@ private:
         {
             switch (options.ip_proto)
             {
-            case FetchOptions::IPProtocol::ANY:
-                return CURL_IPRESOLVE_WHATEVER;
             case FetchOptions::IPProtocol::V4:
                 return CURL_IPRESOLVE_V4;
             case FetchOptions::IPProtocol::V6:
                 return CURL_IPRESOLVE_V6;
+            default:
+                return CURL_IPRESOLVE_WHATEVER;
             }
         }
 
