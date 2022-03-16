@@ -528,7 +528,7 @@ static void onTrackerResponse(tr_torrent* tor, tr_tracker_event const* event, vo
         break;
 
     case TR_TRACKER_WARNING:
-        tr_logAddWarnTor(tor, fmt::format(_("Tracker warning: '{error}'"), fmt::arg("error", event->text)));
+        tr_logAddWarnTor(tor, fmt::format(_("Tracker warning: '{warning}'"), fmt::arg("warning", event->text)));
         tor->error = TR_STAT_TRACKER_WARNING;
         tor->error_announce_url = event->announce_url;
         tor->error_string = event->text;
