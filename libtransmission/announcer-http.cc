@@ -37,8 +37,6 @@
 #include "web-utils.h"
 #include "web.h"
 
-#define logtrace(name, ...) tr_logAddMessage(__FILE__, __LINE__, TR_LOG_TRACE, name, __VA_ARGS__)
-
 using namespace std::literals;
 
 /****
@@ -280,10 +278,10 @@ void tr_announcerParseHttpAnnounceResponse(tr_announce_response& response, std::
     if (error != nullptr)
     {
         auto const errmsg = fmt::format(
-            _("Couldn't parse announce response: {errmsg} ({errcode})"),
-            fmt::arg("errmsg", error->message),
-            fmt::arg("errcode", error->code));
-        tr_logAddMessage(__FILE__, __LINE__, TR_LOG_WARN, log_name, errmsg);
+            _("Couldn't parse announce response: {error} ({error_code})"),
+            fmt::arg("error", error->message),
+            fmt::arg("error_code", error->code));
+        tr_logAddNamedWarn(log_name, errmsg);
         tr_error_clear(&error);
     }
 }
@@ -310,7 +308,7 @@ static bool handleAnnounceResponse(tr_web::FetchResponse const& web_response, tr
 
     response->did_connect = did_connect;
     response->did_timeout = did_timeout;
-    logtrace(data->log_name, "Got announce response");
+    tr_logAddNamedTrace(data->log_name, "Got announce response");
 
     if (status != HTTP_OK)
     {
@@ -324,12 +322,12 @@ static bool handleAnnounceResponse(tr_web::FetchResponse const& web_response, tr
 
     if (!std::empty(response->pex6))
     {
-        logtrace(data->log_name, "got a peers6 length of %zu", std::size(response->pex6));
+        tr_logAddNamedTrace(data->log_name, fmt::format("got a peers6 length of {}", std::size(response->pex6)));
     }
 
     if (!std::empty(response->pex))
     {
-        logtrace(data->log_name, "got a peers length of %zu", std::size(response->pex));
+        tr_logAddNamedTrace(data->log_name, fmt::format("got a peers length of {}", std::size(response->pex)));
     }
 
     return true;
@@ -379,7 +377,7 @@ static void onAnnounceDone(tr_web::FetchResponse const& web_response)
     }
     else
     {
-        logtrace(data->log_name, "Ignoring redundant announce response");
+        tr_logAddNamedTrace(data->log_name, "Ignoring redundant announce response");
     }
 
     // Free data if no more responses are expected:
@@ -421,6 +419,12 @@ void tr_tracker_http_announce(
     options.sndbuf = 1024;
     options.rcvbuf = 3072;
 
+    auto do_make_request = [&](std::string_view const& protocol_name, tr_web::FetchOptions&& options)
+    {
+        tr_logAddNamedTrace(request->log_name, fmt::format("Sending {} announce to libcurl: '{}'", protocol_name, options.url));
+        session->web->fetch(std::move(options));
+    };
+
     auto ipv6 = tr_globalIPv6(session);
 
 #if LIBCURL_VERSION_NUM < CURL_VERSION_BITS(7, 77, 0)
@@ -444,14 +448,12 @@ void tr_tracker_http_announce(
         d->requests_sent_count = 2;
 
         // First try to send the announce via IPv4:
-        logtrace(request->log_name, "Sending IPv4 announce to libcurl: \"%" TR_PRIsv "\"", TR_PRIsv_ARG(options.url));
-
         auto ipv4_options = options;
         // Set the "&ipv6=" argument
         ipv4_options.url += format_ipv6_url_arg(ipv6);
         // Set protocol to IPv4
         ipv4_options.ip_proto = tr_web::FetchOptions::IPProtocol::V4;
-        session->web->fetch(std::move(ipv4_options));
+        do_make_request("IPv4"sv, std::move(ipv4_options));
 
         // Then maybe set the "&ipv4=..." part and try to send via IPv6:
         if (auto public_ipv4 = session->externalIP(); public_ipv4.has_value())
@@ -459,17 +461,14 @@ void tr_tracker_http_announce(
             options.url += format_ipv4_url_arg(*public_ipv4);
         }
         options.ip_proto = tr_web::FetchOptions::IPProtocol::V6;
-        logtrace(request->log_name, "Sending IPv6 announce to libcurl: \"%" TR_PRIsv "\"", TR_PRIsv_ARG(options.url));
+        do_make_request("IPv6"sv, std::move(options));
     }
     else
 #endif
     {
         d->requests_sent_count = 1;
-
-        // Don't care about IP version when announcing
-        logtrace(request->log_name, "Sending announce to libcurl: \"%" TR_PRIsv "\"", TR_PRIsv_ARG(options.url));
+        do_make_request(""sv, std::move(options));
     }
-    session->web->fetch(std::move(options));
 }
 
 /****
@@ -571,11 +570,12 @@ void tr_announcerParseHttpScrapeResponse(tr_scrape_response& response, std::stri
     transmission::benc::parse(benc, stack, handler, nullptr, &error);
     if (error != nullptr)
     {
-        auto const errmsg = fmt::format(
-            _("Couldn't parse scrape response: {errmsg} ({errcode})"),
-            fmt::arg("errmsg", error->message),
-            fmt::arg("errcode", error->code));
-        tr_logAddMessage(__FILE__, __LINE__, TR_LOG_WARN, log_name, errmsg);
+        tr_logAddNamedWarn(
+            log_name,
+            fmt::format(
+                _("Couldn't parse scrape response: {error} ({error_code})"),
+                fmt::arg("error", error->message),
+                fmt::arg("error_code", error->code)));
         tr_error_clear(&error);
     }
 }
@@ -598,7 +598,7 @@ static void onScrapeDone(tr_web::FetchResponse const& web_response)
     response.did_timeout = did_timeout;
 
     auto const scrape_url_sv = response.scrape_url.sv();
-    logtrace(data->log_name, "Got scrape response for \"%" TR_PRIsv "\"", TR_PRIsv_ARG(scrape_url_sv));
+    tr_logAddNamedTrace(data->log_name, fmt::format("Got scrape response for '{}'", scrape_url_sv));
 
     if (status != HTTP_OK)
     {
@@ -660,7 +660,7 @@ void tr_tracker_http_scrape(
     tr_strlcpy(d->log_name, request->log_name, sizeof(d->log_name));
 
     auto const url = scrape_url_new(request);
-    logtrace(request->log_name, "Sending scrape to libcurl: \"%" TR_PRIsv "\"", TR_PRIsv_ARG(url));
+    tr_logAddNamedTrace(request->log_name, fmt::format("Sending scrape to libcurl: '{}'", url));
 
     auto options = tr_web::FetchOptions{ url, onScrapeDone, d };
     options.timeout_secs = 30L;

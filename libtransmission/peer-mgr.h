@@ -68,8 +68,7 @@ struct tr_pex
 
     [[nodiscard]] std::string to_string() const
     {
-        auto buf = std::array<char, 64>{};
-        return std::string{ to_string(std::data(buf), std::size(buf)) };
+        return addr.to_string(port);
     }
 };
 

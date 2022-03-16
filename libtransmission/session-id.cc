@@ -94,10 +94,10 @@ static tr_sys_file_t create_session_id_lock_file(char const* session_id)
     if (error != nullptr)
     {
         tr_logAddWarn(fmt::format(
-            _("Couldn't create '{path}': {errmsg} ({errcode})"),
+            _("Couldn't create '{path}': {error} ({error_code})"),
             fmt::arg("path", lock_file_path),
-            fmt::arg("errmsg", error->message),
-            fmt::arg("errcode", error->code)));
+            fmt::arg("error", error->message),
+            fmt::arg("error_code", error->code)));
         tr_error_free(error);
     }
 
@@ -201,10 +201,10 @@ bool tr_session_id_is_local(char const* session_id)
         if (error != nullptr)
         {
             tr_logAddWarn(fmt::format(
-                _("Couldn't open session lock file '{path}': {errmsg} ({errcode})"),
+                _("Couldn't open session lock file '{path}': {error} ({error_code})"),
                 fmt::arg("path", lock_file_path),
-                fmt::arg("errmsg", error->message),
-                fmt::arg("errcode", error->code)));
+                fmt::arg("error", error->message),
+                fmt::arg("error_code", error->code)));
             tr_error_free(error);
         }
     }

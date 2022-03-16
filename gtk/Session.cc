@@ -615,7 +615,13 @@ void rename_torrent(Glib::RefPtr<Gio::File> const& file)
         }
         catch (Glib::Error const& e)
         {
-            g_message("Unable to rename \"%s\" as \"%s\": %s", old_name.c_str(), new_name.c_str(), e.what().c_str());
+            auto const errmsg = fmt::format(
+                _("Couldn't rename '{old_path}' as '{path}': {error} ({error_code})"),
+                fmt::arg("old_path", old_name.raw()),
+                fmt::arg("path", new_name.raw()),
+                fmt::arg("error", e.what().raw()),
+                fmt::arg("error_code", e.code()));
+            g_message("%s", errmsg.c_str());
         }
     }
 }
@@ -1124,10 +1130,10 @@ void Session::Impl::add_file_async_callback(
     catch (Glib::Error const& e)
     {
         auto const errmsg = fmt::format(
-            _("Couldn't read '{path}': {errmsg} ({errcode})"),
+            _("Couldn't read '{path}': {error} ({error_code})"),
             fmt::arg("path", file->get_parse_name().raw()),
-            fmt::arg("errmsg", e.what().raw()),
-            fmt::arg("errmsg", e.code()));
+            fmt::arg("error", e.what().raw()),
+            fmt::arg("error_code", e.code()));
         g_message("%s", errmsg.c_str());
     }
 
@@ -1451,7 +1457,7 @@ bool gtr_inhibit_hibernation(guint32& cookie)
     }
     catch (Glib::Error const& e)
     {
-        tr_logAddError(fmt::format(_("Couldn't inhibit desktop hibernation: {errmsg}"), fmt::arg("errmsg", e.what().raw())));
+        tr_logAddError(fmt::format(_("Couldn't inhibit desktop hibernation: {error}"), fmt::arg("error", e.what().raw())));
     }
 
     return success;
@@ -1476,7 +1482,7 @@ void gtr_uninhibit_hibernation(guint inhibit_cookie)
     }
     catch (Glib::Error const& e)
     {
-        tr_logAddError(fmt::format(_("Couldn't inhibit desktop hibernation: {errmsg}"), fmt::arg("errmsg", e.what().raw())));
+        tr_logAddError(fmt::format(_("Couldn't inhibit desktop hibernation: {error}"), fmt::arg("error", e.what().raw())));
     }
 }
 

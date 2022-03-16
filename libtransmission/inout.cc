@@ -136,10 +136,10 @@ int readOrWriteBytes(
                 tr_logAddErrorTor(
                     tor,
                     fmt::format(
-                        _("Couldn't get '{path}': {errmsg} ({errcode})"),
+                        _("Couldn't get '{path}': {error} ({error_code})"),
                         fmt::arg("path", filename),
-                        fmt::arg("errmsg", tr_strerror(err)),
-                        fmt::arg("errcode", err)));
+                        fmt::arg("error", tr_strerror(err)),
+                        fmt::arg("error_code", err)));
             }
             else if (doWrite)
             {
@@ -171,10 +171,10 @@ int readOrWriteBytes(
             tr_logAddErrorTor(
                 tor,
                 fmt::format(
-                    _("Couldn't read '{path}': {errmsg} ({errcode})"),
+                    _("Couldn't read '{path}': {error} ({error_code})"),
                     fmt::arg("path", tor->fileSubpath(file_index)),
-                    fmt::arg("errmsg", error->message),
-                    fmt::arg("errcode", error->code)));
+                    fmt::arg("error", error->message),
+                    fmt::arg("error_code", error->code)));
             tr_error_free(error);
         }
         break;
@@ -186,10 +186,10 @@ int readOrWriteBytes(
             tr_logAddErrorTor(
                 tor,
                 fmt::format(
-                    _("Couldn't save '{path}': {errmsg} ({errcode})"),
+                    _("Couldn't save '{path}': {error} ({error_code})"),
                     fmt::arg("path", tor->fileSubpath(file_index)),
-                    fmt::arg("errmsg", error->message),
-                    fmt::arg("errcode", error->code)));
+                    fmt::arg("error", error->message),
+                    fmt::arg("error_code", error->code)));
             tr_error_free(error);
         }
         break;

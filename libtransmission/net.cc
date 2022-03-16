@@ -21,6 +21,8 @@
 
 #include <event2/util.h>
 
+#include <fmt/core.h>
+
 #include <cstdint>
 #include <libutp/utp.h>
 
@@ -34,20 +36,28 @@
 #include "tr-assert.h"
 #include "tr-macros.h"
 #include "tr-utp.h" /* tr_utpSendTo() */
-#include "utils.h" /* tr_time(), tr_logAddDebug() */
+#include "utils.h" /* tr_time() */
 
 #ifndef IN_MULTICAST
 #define IN_MULTICAST(a) (((a)&0xf0000000) == 0xe0000000)
 #endif
 
+#undef tr_logAddError
+#undef tr_logAddWarn
+#undef tr_logAddInfo
+#undef tr_logAddDebug
+#undef tr_logAddTrace
+
+auto constexpr LogName = std::string_view{ "net" };
+#define tr_logAddError(...) tr_logAddNamed(TR_LOG_ERROR, LogName, __VA_ARGS__)
+#define tr_logAddWarn(...) tr_logAddNamed(TR_LOG_WARN, LogName, __VA_ARGS__)
+#define tr_logAddInfo(...) tr_logAddNamed(TR_LOG_INFO, LogName, __VA_ARGS__)
+#define tr_logAddDebug(...) tr_logAddNamed(TR_LOG_DEBUG, LogName, __VA_ARGS__)
+#define tr_logAddTrace(...) tr_logAddNamed(TR_LOG_TRACE, LogName, __VA_ARGS__)
+
 tr_address const tr_in6addr_any = { TR_AF_INET6, { IN6ADDR_ANY_INIT } };
 
 tr_address const tr_inaddr_any = { TR_AF_INET, { { { { INADDR_ANY } } } } };
-
-#define logerr(...) tr_logAddNamed(TR_LOG_ERROR, "net", __VA_ARGS__)
-#define logwarn(...) tr_logAddNamed(TR_LOG_WARN, "net", __VA_ARGS__)
-#define logdbg(...) tr_logAddNamed(TR_LOG_DEBUG, "net", __VA_ARGS__)
-#define logtrace(...) tr_logAddNamed(TR_LOG_TRACE, "net", __VA_ARGS__)
 
 std::string tr_net_strerror(int err)
 {
@@ -148,10 +158,7 @@ std::string tr_address::to_string(tr_port port) const
 {
     auto addrbuf = std::array<char, TR_ADDRSTRLEN>{};
     tr_address_to_string_with_buf(this, std::data(addrbuf), std::size(addrbuf));
-
-    auto buf = std::array<char, TR_ADDRSTRLEN>{};
-    tr_snprintf(std::data(buf), std::size(buf), "[%s]:%u", std::data(addrbuf), ntohs(port));
-    return std::data(buf);
+    return fmt::format("[{}]:{}", std::data(addrbuf), ntohs(port));
 }
 
 tr_address tr_address::from_4byte_ipv4(std::string_view in)
@@ -257,7 +264,7 @@ void tr_netSetTOS([[maybe_unused]] tr_socket_t s, [[maybe_unused]] int tos, tr_a
 
         if (setsockopt(s, IPPROTO_IP, IP_TOS, (void const*)&tos, sizeof(tos)) == -1)
         {
-            logwarn("Can't set TOS '%d': %s", tos, tr_net_strerror(sockerrno).c_str());
+            tr_logAddDebug(fmt::format("Can't set TOS '{}': {}", tos, tr_net_strerror(sockerrno)));
         }
 #endif
     }
@@ -266,14 +273,14 @@ void tr_netSetTOS([[maybe_unused]] tr_socket_t s, [[maybe_unused]] int tos, tr_a
 #if defined(IPV6_TCLASS) && !defined(_WIN32)
         if (setsockopt(s, IPPROTO_IPV6, IPV6_TCLASS, (void const*)&tos, sizeof(tos)) == -1)
         {
-            logwarn("Can't set IPv6 QoS '%d': %s", tos, tr_net_strerror(sockerrno).c_str());
+            tr_logAddDebug(fmt::format("Can't set IPv6 QoS '{}': {}", tos, tr_net_strerror(sockerrno)));
         }
 #endif
     }
     else
     {
         /* program should never reach here! */
-        logdbg("Something goes wrong while setting TOS/Traffic-Class");
+        tr_logAddDebug("Something goes wrong while setting TOS/Traffic-Class");
     }
 }
 
@@ -283,7 +290,7 @@ void tr_netSetCongestionControl([[maybe_unused]] tr_socket_t s, [[maybe_unused]]
 
     if (setsockopt(s, IPPROTO_TCP, TCP_CONGESTION, (void const*)algorithm, strlen(algorithm) + 1) == -1)
     {
-        logwarn("Can't set congestion control algorithm '%s': %s", algorithm, tr_net_strerror(sockerrno).c_str());
+        tr_logAddDebug(fmt::format("Can't set congestion control algorithm '{}': {}", algorithm, tr_net_strerror(sockerrno)));
     }
 
 #endif
@@ -363,7 +370,7 @@ struct tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const
 
         if (setsockopt(s, SOL_SOCKET, SO_RCVBUF, reinterpret_cast<char const*>(&n), sizeof(n)) == -1)
         {
-            logwarn("Unable to set SO_RCVBUF on socket %" PRIdMAX ": %s", (intmax_t)s, tr_net_strerror(sockerrno).c_str());
+            tr_logAddDebug(fmt::format("Unable to set SO_RCVBUF on socket {}: {}", s, tr_net_strerror(sockerrno)));
         }
     }
 
@@ -382,11 +389,12 @@ struct tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const
 
     if (bind(s, (struct sockaddr*)&source_sock, sourcelen) == -1)
     {
-        logwarn(
-            _("Couldn't set source address %s on %" PRIdMAX ": %s"),
-            tr_address_to_string(source_addr),
-            (intmax_t)s,
-            tr_net_strerror(sockerrno).c_str());
+        tr_logAddWarn(fmt::format(
+            _("Couldn't set source address {address} on {socket}: {error} ({error_code})"),
+            fmt::arg("address", source_addr->to_string()),
+            fmt::arg("socket", s),
+            fmt::arg("error", tr_net_strerror(sockerrno)),
+            fmt::arg("error_code", sockerrno)));
         tr_netClose(session, s);
         return ret;
     }
@@ -401,13 +409,13 @@ struct tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const
 
         if ((tmperrno != ENETUNREACH && tmperrno != EHOSTUNREACH) || addr->type == TR_AF_INET)
         {
-            logwarn(
-                _("Couldn't connect socket %" PRIdMAX " to %s, port %d (errno %d - %s)"),
-                (intmax_t)s,
-                tr_address_to_string(addr),
-                (int)ntohs(port),
-                tmperrno,
-                tr_net_strerror(tmperrno).c_str());
+            tr_logAddWarn(fmt::format(
+                _("Couldn't connect socket {socket} to {address}:{port}: {error} ({error_code})"),
+                fmt::arg("socket", s),
+                fmt::arg("address", addr->to_string()),
+                fmt::arg("port", ntohs(port)),
+                fmt::arg("error", tr_net_strerror(tmperrno)),
+                fmt::arg("error_code", tmperrno)));
         }
 
         tr_netClose(session, s);
@@ -419,7 +427,7 @@ struct tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const
 
     char addrstr[TR_ADDRSTRLEN];
     tr_address_and_port_to_string(addrstr, sizeof(addrstr), addr, port);
-    logtrace("New OUTGOING connection %" PRIdMAX " (%s)", (intmax_t)s, addrstr);
+    tr_logAddTrace(fmt::format("New OUTGOING connection {} ({})", s, addrstr));
 
     return ret;
 }
@@ -511,12 +519,14 @@ static tr_socket_t tr_netBindTCPImpl(tr_address const* addr, tr_port port, bool 
 
         if (!suppressMsgs)
         {
-            char const* const hint = err == EADDRINUSE ? _("Is another copy of Transmission already running?") : nullptr;
-
-            char const* const fmt = hint == nullptr ? _("Couldn't bind port %d on %s: %s") :
-                                                      _("Couldn't bind port %d on %s: %s (%s)");
-
-            logerr(fmt, port, tr_address_to_string(addr), tr_net_strerror(err).c_str(), hint);
+            tr_logAddError(fmt::format(
+                err == EADDRINUSE ?
+                    _("Couldn't bind port {port} on {address}: {error} ({error_code}) -- Is another copy of Transmission already running?") :
+                    _("Couldn't bind port {port} on {address}: {error} ({error_code})"),
+                fmt::arg("address", addr->to_string()),
+                fmt::arg("port", port),
+                fmt::arg("error", tr_net_strerror(err)),
+                fmt::arg("error_code", err)));
         }
 
         tr_netCloseSocket(fd);
@@ -526,7 +536,7 @@ static tr_socket_t tr_netBindTCPImpl(tr_address const* addr, tr_port port, bool 
 
     if (!suppressMsgs)
     {
-        logdbg("Bound socket %" PRIdMAX " to port %d on %s", (intmax_t)fd, port, tr_address_to_string(addr));
+        tr_logAddDebug(fmt::format("Bound socket {} to port {} on {}", fd, port, addr->to_string()));
     }
 
 #ifdef TCP_FASTOPEN

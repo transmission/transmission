@@ -169,20 +169,20 @@ static int cached_file_open(
         if (dir == nullptr)
         {
             tr_logAddError(fmt::format(
-                _("Couldn't create '{path}': {errmsg} ({errcode})"),
+                _("Couldn't create '{path}': {error} ({error_code})"),
                 fmt::arg("path", filename),
-                fmt::arg("errmsg", error->message),
-                fmt::arg("errcode", error->code)));
+                fmt::arg("error", error->message),
+                fmt::arg("error_code", error->code)));
             goto FAIL;
         }
 
         if (!tr_sys_dir_create(dir, TR_SYS_DIR_CREATE_PARENTS, 0777, &error))
         {
             tr_logAddError(fmt::format(
-                _("Couldn't create '{path}': {errmsg} ({errcode})"),
+                _("Couldn't create '{path}': {error} ({error_code})"),
                 fmt::arg("path", dir),
-                fmt::arg("errmsg", error->message),
-                fmt::arg("errcode", error->code)));
+                fmt::arg("error", error->message),
+                fmt::arg("error_code", error->code)));
             tr_free(dir);
             goto FAIL;
         }
@@ -204,10 +204,10 @@ static int cached_file_open(
     if (fd == TR_BAD_SYS_FILE)
     {
         tr_logAddError(fmt::format(
-            _("Couldn't open '{path}': {errmsg} ({errcode})"),
+            _("Couldn't open '{path}': {error} ({error_code})"),
             fmt::arg("path", filename),
-            fmt::arg("errmsg", error->message),
-            fmt::arg("errcode", error->code)));
+            fmt::arg("error", error->message),
+            fmt::arg("error_code", error->code)));
         goto FAIL;
     }
 
@@ -219,12 +219,12 @@ static int cached_file_open(
         if (allocation == TR_PREALLOCATE_FULL)
         {
             success = preallocate_file_full(fd, file_size, &error);
-            type = _("full");
+            type = "full";
         }
         else if (allocation == TR_PREALLOCATE_SPARSE)
         {
             success = preallocate_file_sparse(fd, file_size, &error);
-            type = _("sparse");
+            type = "sparse";
         }
 
         TR_ASSERT(type != nullptr);
@@ -232,10 +232,10 @@ static int cached_file_open(
         if (!success)
         {
             tr_logAddError(fmt::format(
-                _("Couldn't preallocate '{path}': {errmsg} ({errcode})"),
+                _("Couldn't preallocate '{path}': {error} ({error_code})"),
                 fmt::arg("path", filename),
-                fmt::arg("errmsg", error->message),
-                fmt::arg("errcode", error->code)));
+                fmt::arg("error", error->message),
+                fmt::arg("error_code", error->code)));
             goto FAIL;
         }
 
@@ -251,10 +251,10 @@ static int cached_file_open(
     if (resize_needed && !tr_sys_file_truncate(fd, file_size, &error))
     {
         tr_logAddWarn(fmt::format(
-            _("Couldn't truncate '{path}': {errmsg} ({errcode})"),
+            _("Couldn't truncate '{path}': {error} ({error_code})"),
             fmt::arg("path", filename),
-            fmt::arg("errmsg", error->message),
-            fmt::arg("errcode", error->code)));
+            fmt::arg("error", error->message),
+            fmt::arg("error_code", error->code)));
         goto FAIL;
     }
 
@@ -527,9 +527,9 @@ tr_socket_t tr_fdSocketCreate(tr_session* session, int domain, int type)
         if ((s == TR_BAD_SOCKET) && (sockerrno != EAFNOSUPPORT))
         {
             tr_logAddWarn(fmt::format(
-                _("Couldn't create socket: {errmsg} ({errcode})"),
-                fmt::arg("errmsg", tr_net_strerror(sockerrno)),
-                fmt::arg("errcode", sockerrno)));
+                _("Couldn't create socket: {error} ({error_code})"),
+                fmt::arg("error", tr_net_strerror(sockerrno)),
+                fmt::arg("error_code", sockerrno)));
         }
     }
 

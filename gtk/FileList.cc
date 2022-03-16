@@ -11,6 +11,8 @@
 #include <glibmm.h>
 #include <glibmm/i18n.h>
 
+#include <fmt/core.h>
+
 #include <libtransmission/transmission.h>
 #include <libtransmission/utils.h>
 
@@ -741,7 +743,12 @@ bool FileList::Impl::on_rename_done_idle(Glib::ustring const& path_string, Glib:
     {
         Gtk::MessageDialog w(
             *static_cast<Gtk::Window*>(widget_.get_toplevel()),
-            gtr_sprintf(_("Unable to rename file as \"%s\": %s"), newname, tr_strerror(error)),
+            fmt::format(
+                _("Couldn't rename '{old_path}' as '{path}': {error} ({error_code})"),
+                fmt::arg("old_path", path_string.raw()),
+                fmt::arg("path", newname.raw()),
+                fmt::arg("error", tr_strerror(error)),
+                fmt::arg("error_code", error)),
             false,
             Gtk::MESSAGE_ERROR,
             Gtk::BUTTONS_CLOSE,

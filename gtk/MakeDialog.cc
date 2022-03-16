@@ -9,6 +9,8 @@
 #include <glibmm.h>
 #include <glibmm/i18n.h>
 
+#include <fmt/core.h>
+
 #include <libtransmission/transmission.h>
 #include <libtransmission/makemeta.h>
 #include <libtransmission/utils.h> /* tr_formatter_mem_B() */
@@ -121,15 +123,23 @@ bool MakeProgressDialog::onProgressDialogRefresh()
     }
     else if (builder_.result == TrMakemetaResult::ERR_URL)
     {
-        str = gtr_sprintf(_("Error: invalid announce URL \"%s\""), builder_.errfile);
+        str = fmt::format(_("Unsupported URL: '{url}'"), fmt::arg("url", builder_.errfile));
     }
     else if (builder_.result == TrMakemetaResult::ERR_IO_READ)
     {
-        str = gtr_sprintf(_("Error reading \"%s\": %s"), builder_.errfile, Glib::strerror(builder_.my_errno));
+        str = fmt::format(
+            _("Couldn't read '{path}': {error} ({error_code})"),
+            fmt::arg("path", builder_.errfile),
+            fmt::arg("error", Glib::strerror(builder_.my_errno).raw()),
+            fmt::arg("error_code", builder_.my_errno));
     }
     else if (builder_.result == TrMakemetaResult::ERR_IO_WRITE)
     {
-        str = gtr_sprintf(_("Error writing \"%s\": %s"), builder_.errfile, Glib::strerror(builder_.my_errno));
+        str = fmt::format(
+            _("Couldn't save '{path}': {error} ({error_code})"),
+            fmt::arg("path", builder_.errfile),
+            fmt::arg("error", Glib::strerror(builder_.my_errno).raw()),
+            fmt::arg("error_code", builder_.my_errno));
     }
     else
     {
@@ -146,7 +156,9 @@ bool MakeProgressDialog::onProgressDialogRefresh()
     else
     {
         /* how much data we've scanned through to generate checksums */
-        str = gtr_sprintf(_("Scanned %s"), tr_strlsize((uint64_t)builder_.pieceIndex * (uint64_t)builder_.pieceSize));
+        str = fmt::format(
+            _("Scanned {file_size}"),
+            fmt::arg("file_size", tr_strlsize((uint64_t)builder_.pieceIndex * (uint64_t)builder_.pieceSize).raw()));
     }
 
     progress_bar_->set_fraction(fraction);
@@ -468,7 +480,7 @@ MakeDialog::Impl::Impl(MakeDialog& dialog, Glib::RefPtr<Session> const& core)
     t->add_row_w(row, *file_radio_, *file_chooser_);
 
     pieces_lb_ = Gtk::make_managed<Gtk::Label>();
-    pieces_lb_->set_markup(_("<i>No source selected</i>"));
+    pieces_lb_->set_markup(fmt::format("<i>{}</i>", _("No source selected")));
     t->add_row(row, {}, *pieces_lb_);
 
     t->add_section_divider(row);
