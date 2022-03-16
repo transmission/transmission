@@ -82,11 +82,11 @@ static void error_handler(jsonsl_t jsn, jsonsl_error_t error, jsonsl_state_st* /
     auto* data = static_cast<struct json_wrapper_data*>(jsn->data);
 
     tr_logAddError(fmt::format(
-        _("JSON parse failed at pos {pos} '{text:16s}': {errmsg} ({errcode})"),
+        _("JSON parse failed at pos {pos} '{text:16s}': {error} ({error_code})"),
         fmt::arg("pos", jsn->pos),
         fmt::arg("text", buf),
-        fmt::arg("errmsg", jsonsl_strerror(error)),
-        fmt::arg("errcode", error)));
+        fmt::arg("error", jsonsl_strerror(error)),
+        fmt::arg("error_code", error)));
 
     data->error = EILSEQ;
 }

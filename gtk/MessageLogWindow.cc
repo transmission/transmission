@@ -183,14 +183,14 @@ void MessageLogWindow::Impl::doSave(Gtk::Window& parent, Glib::ustring const& fi
 
     if (fp == nullptr)
     {
-        auto const errcode = errno;
+        auto const error_code = errno;
         auto w = std::make_shared<Gtk::MessageDialog>(
             parent,
             fmt::format(
-                _("Couldn't save '{path}': {errmsg} ({errcode})"),
+                _("Couldn't save '{path}': {error} ({error_code})"),
                 fmt::arg("path", filename.raw()),
-                fmt::arg("errmsg", g_strerror(errcode)),
-                fmt::arg("errcode", errcode)),
+                fmt::arg("error", g_strerror(error_code)),
+                fmt::arg("error_code", error_code)),
             false,
             Gtk::MESSAGE_ERROR,
             Gtk::BUTTONS_CLOSE);
@@ -416,11 +416,6 @@ bool MessageLogWindow::Impl::onRefresh()
 
     return true;
 }
-
-namespace
-{
-
-} // namespace
 
 /**
 ***  Public Functions

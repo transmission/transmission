@@ -542,8 +542,8 @@ bool tr_torrent_metainfo::migrateFile(
         tr_logAddNamedError(
             name,
             fmt::format(
-                _("Migrated torrent file from '{oldpath}' to '{path}'"),
-                fmt::arg("oldpath", old_filename),
+                _("Migrated torrent file from '{old_path}' to '{path}'"),
+                fmt::arg("old_path", old_filename),
                 fmt::arg("path", new_filename)));
         return true;
     }

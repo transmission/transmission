@@ -42,7 +42,6 @@
 #define IN_MULTICAST(a) (((a)&0xf0000000) == 0xe0000000)
 #endif
 
-#undef tr_logAddCritical
 #undef tr_logAddError
 #undef tr_logAddWarn
 #undef tr_logAddInfo
@@ -50,7 +49,6 @@
 #undef tr_logAddTrace
 
 auto constexpr LogName = std::string_view{ "net" };
-#define tr_logAddCritical(...) tr_logAddNamed(TR_LOG_CRITICAL, LogName, __VA_ARGS__)
 #define tr_logAddError(...) tr_logAddNamed(TR_LOG_ERROR, LogName, __VA_ARGS__)
 #define tr_logAddWarn(...) tr_logAddNamed(TR_LOG_WARN, LogName, __VA_ARGS__)
 #define tr_logAddInfo(...) tr_logAddNamed(TR_LOG_INFO, LogName, __VA_ARGS__)
@@ -392,11 +390,11 @@ struct tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const
     if (bind(s, (struct sockaddr*)&source_sock, sourcelen) == -1)
     {
         tr_logAddWarn(fmt::format(
-            _("Couldn't set source address {address} on {socket}: {errmsg} ({errcode})"),
+            _("Couldn't set source address {address} on {socket}: {error} ({error_code})"),
             fmt::arg("address", source_addr->to_string()),
             fmt::arg("socket", s),
-            fmt::arg("errmsg", tr_net_strerror(sockerrno)),
-            fmt::arg("errcode", sockerrno)));
+            fmt::arg("error", tr_net_strerror(sockerrno)),
+            fmt::arg("error_code", sockerrno)));
         tr_netClose(session, s);
         return ret;
     }
@@ -412,12 +410,12 @@ struct tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const
         if ((tmperrno != ENETUNREACH && tmperrno != EHOSTUNREACH) || addr->type == TR_AF_INET)
         {
             tr_logAddWarn(fmt::format(
-                _("Couldn't connect socket {socket} to {address}:{port}: {errmsg} ({errcode})"),
+                _("Couldn't connect socket {socket} to {address}:{port}: {error} ({error_code})"),
                 fmt::arg("socket", s),
                 fmt::arg("address", addr->to_string()),
                 fmt::arg("port", ntohs(port)),
-                fmt::arg("errmsg", tr_net_strerror(tmperrno)),
-                fmt::arg("errcode", tmperrno)));
+                fmt::arg("error", tr_net_strerror(tmperrno)),
+                fmt::arg("error_code", tmperrno)));
         }
 
         tr_netClose(session, s);
@@ -523,12 +521,12 @@ static tr_socket_t tr_netBindTCPImpl(tr_address const* addr, tr_port port, bool 
         {
             tr_logAddError(fmt::format(
                 err == EADDRINUSE ?
-                    _("Couldn't bind port {port} on {address}: {errmsg} ({errcode}) -- Is another copy of Transmission already running?") :
-                    _("Couldn't bind port {port} on {address}: {errmsg} ({errcode})"),
+                    _("Couldn't bind port {port} on {address}: {error} ({error_code}) -- Is another copy of Transmission already running?") :
+                    _("Couldn't bind port {port} on {address}: {error} ({error_code})"),
                 fmt::arg("address", addr->to_string()),
                 fmt::arg("port", port),
-                fmt::arg("errmsg", tr_net_strerror(err)),
-                fmt::arg("errcode", err)));
+                fmt::arg("error", tr_net_strerror(err)),
+                fmt::arg("error_code", err)));
         }
 
         tr_netCloseSocket(fd);

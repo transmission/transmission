@@ -273,10 +273,10 @@ static auto onFileAdded(tr_watchdir_t dir, char const* name, void* vsession)
             if (!tr_sys_path_remove(filename.c_str(), &error))
             {
                 tr_logAddError(fmt::format(
-                    _("Couldn't remove '{path}': {errmsg} ({errcode})"),
+                    _("Couldn't remove '{path}': {error} ({error_code})"),
                     fmt::arg("path", name),
-                    fmt::arg("errmsg", error->message),
-                    fmt::arg("errcode", error->code)));
+                    fmt::arg("error", error->message),
+                    fmt::arg("error_code", error->code)));
                 tr_error_free(error);
             }
         }
@@ -730,10 +730,10 @@ static int daemon_start(void* varg, [[maybe_unused]] bool foreground)
         else
         {
             tr_logAddError(fmt::format(
-                _("Couldn't save '{path}': {errmsg} ({errcode})"),
+                _("Couldn't save '{path}': {error} ({error_code})"),
                 fmt::arg("path", sz_pid_filename),
-                fmt::arg("errmsg", error->message),
-                fmt::arg("errcode", error->code)));
+                fmt::arg("error", error->message),
+                fmt::arg("error_code", error->code)));
             tr_error_free(error);
         }
     }
@@ -802,21 +802,21 @@ static int daemon_start(void* varg, [[maybe_unused]] bool foreground)
 
         if (status_ev == nullptr)
         {
-            auto const errcode = errno;
+            auto const error_code = errno;
             tr_logAddError(fmt::format(
-                _("Couldn't create status event: {errmsg} ({errcode})"),
-                fmt::arg("errmsg", tr_strerror(errcode)),
-                fmt::arg("errcode", errcode)));
+                _("Couldn't create status event: {error} ({error_code})"),
+                fmt::arg("error", tr_strerror(error_code)),
+                fmt::arg("error_code", error_code)));
             goto CLEANUP;
         }
 
         if (event_add(status_ev, &one_sec) == -1)
         {
-            auto const errcode = errno;
+            auto const error_code = errno;
             tr_logAddError(fmt::format(
-                _("Couldn't add status event: {errmsg} ({errcode})"),
-                fmt::arg("errmsg", tr_strerror(errcode)),
-                fmt::arg("errcode", errcode)));
+                _("Couldn't add status event: {error} ({error_code})"),
+                fmt::arg("error", tr_strerror(error_code)),
+                fmt::arg("error_code", error_code)));
             goto CLEANUP;
         }
     }
@@ -826,11 +826,11 @@ static int daemon_start(void* varg, [[maybe_unused]] bool foreground)
     /* Run daemon event loop */
     if (event_base_dispatch(ev_base) == -1)
     {
-        auto const errcode = errno;
+        auto const error_code = errno;
         tr_logAddError(fmt::format(
-            _("Couldn't launch daemon event loop: {errmsg} ({errcode})"),
-            fmt::arg("errmsg", tr_strerror(errcode)),
-            fmt::arg("errcode", errcode)));
+            _("Couldn't launch daemon event loop: {error} ({error_code})"),
+            fmt::arg("error", tr_strerror(error_code)),
+            fmt::arg("error_code", error_code)));
         goto CLEANUP;
     }
 
