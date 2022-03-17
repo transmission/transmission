@@ -3,9 +3,10 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include <cstddef> /* offsetof */
+#include <cstdlib> /* realloc() */
 #include <errno.h>
-#include <stddef.h> /* offsetof */
-#include <stdlib.h> /* realloc() */
+#include <string_view>
 
 #include <process.h> /* _beginthreadex() */
 
@@ -14,6 +15,8 @@
 #include <event2/bufferevent.h>
 #include <event2/event.h>
 #include <event2/util.h>
+
+#include <fmt/core.h>
 
 #define LIBTRANSMISSION_WATCHDIR_MODULE
 
@@ -29,9 +32,9 @@
 ****
 ***/
 
-#define log_error(...) \
-    (!tr_logLevelIsActive(TR_LOG_ERROR) ? (void)0 : \
-                                          tr_logAddMessage(__FILE__, __LINE__, TR_LOG_ERROR, "watchdir:win32", __VA_ARGS__))
+static auto constexpr LogName = std::string_view{ "watchdir:win32" };
+
+#define log_error(...) tr_logAddNamedError(LogName, __VA_ARGS__)
 
 /***
 ****
@@ -127,14 +130,14 @@ static unsigned int __stdcall tr_watchdir_win32_thread(void* context)
                 &backend->overlapped,
                 nullptr))
         {
-            log_error("Failed to read directory changes");
+            log_error(_("Couldn't read directory changes"));
             return 0;
         }
     }
 
     if (GetLastError() != ERROR_OPERATION_ABORTED)
     {
-        log_error("Failed to wait for directory changes");
+        log_error(_("Couldn't wait for directory changes"));
     }
 
     return 0;
@@ -162,13 +165,20 @@ static void tr_watchdir_win32_on_event(struct bufferevent* event, void* context)
     {
         if (nread == (size_t)-1)
         {
-            log_error("Failed to read event: %s", tr_strerror(errno));
+            auto const error_code = errno;
+            log_error(fmt::format(
+                _("Couldn't read event: {error} ({error_code})"),
+                fmt::arg("error", tr_strerror(error_code)),
+                fmt::arg("error_code", error_code)));
             break;
         }
 
         if (nread != header_size)
         {
-            log_error("Failed to read event: expected %zu, got %zu bytes.", header_size, nread);
+            log_error(fmt::format(
+                _("Couldn't read event: expected {expected_size}, got {actual_size}"),
+                fmt::arg("expected_size", header_size),
+                fmt::arg("actual_size", nread)));
             break;
         }
 
@@ -188,13 +198,20 @@ static void tr_watchdir_win32_on_event(struct bufferevent* event, void* context)
         /* Consume entire name into buffer */
         if ((nread = bufferevent_read(event, buffer + header_size, nleft)) == (size_t)-1)
         {
-            log_error("Failed to read name: %s", tr_strerror(errno));
+            auto const error_code = errno;
+            log_error(fmt::format(
+                _("Couldn't read filename: {error} ({error_code})"),
+                fmt::arg("error", tr_strerror(error_code)),
+                fmt::arg("error_code", error_code)));
             break;
         }
 
         if (nread != nleft)
         {
-            log_error("Failed to read name: expected %zu, got %zu bytes.", nleft, nread);
+            log_error(fmt::format(
+                _("Couldn't read filename: expected {expected_size}, got {actual_size}"),
+                fmt::arg("expected_size", nleft),
+                fmt::arg("actual_size", nread)));
             break;
         }
 
@@ -261,17 +278,16 @@ static void tr_watchdir_win32_free(tr_watchdir_backend* backend_base)
 tr_watchdir_backend* tr_watchdir_win32_new(tr_watchdir_t handle)
 {
     char const* const path = tr_watchdir_get_path(handle);
-    wchar_t* wide_path;
-    tr_watchdir_win32* backend;
 
-    backend = tr_new0(tr_watchdir_win32, 1);
+    auto* const backend = tr_new0(tr_watchdir_win32, 1);
     backend->base.free_func = &tr_watchdir_win32_free;
     backend->fd = INVALID_HANDLE_VALUE;
     backend->notify_pipe[0] = backend->notify_pipe[1] = TR_BAD_SOCKET;
 
-    if ((wide_path = tr_win32_utf8_to_native(path, -1)) == nullptr)
+    wchar_t* wide_path = tr_win32_utf8_to_native(path, -1);
+    if (wide_path == nullptr)
     {
-        log_error("Failed to convert \"%s\" to native path", path);
+        log_error(fmt::format(_("Couldn't convert '{path}' to native path"), fmt::arg("path", path)));
         goto fail;
     }
 
@@ -284,7 +300,7 @@ tr_watchdir_backend* tr_watchdir_win32_new(tr_watchdir_t handle)
              FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OVERLAPPED,
              nullptr)) == INVALID_HANDLE_VALUE)
     {
-        log_error("Failed to open directory \"%s\"", path);
+        log_error(fmt::format(_("Couldn't read '{path}'"), fmt::arg("path", path)));
         goto fail;
     }
 
@@ -303,19 +319,27 @@ tr_watchdir_backend* tr_watchdir_win32_new(tr_watchdir_t handle)
             &backend->overlapped,
             nullptr))
     {
-        log_error("Failed to read directory changes");
+        log_error(fmt::format(_("Couldn't read '{path}'"), fmt::arg("path", path)));
         goto fail;
     }
 
     if (evutil_socketpair(AF_INET, SOCK_STREAM, 0, backend->notify_pipe) == -1)
     {
-        log_error("Failed to create notify pipe: %s", tr_strerror(errno));
+        auto const error_code = errno;
+        log_error(fmt::format(
+            _("Couldn't create pipe: {error} ({error_code})"),
+            fmt::arg("error", tr_strerror(error_code)),
+            fmt::arg("error_code", error_code)));
         goto fail;
     }
 
     if ((backend->event = bufferevent_socket_new(tr_watchdir_get_event_base(handle), backend->notify_pipe[0], 0)) == nullptr)
     {
-        log_error("Failed to create event buffer: %s", tr_strerror(errno));
+        auto const error_code = errno;
+        log_error(fmt::format(
+            _("Couldn't create event: {error} ({error_code})"),
+            fmt::arg("error", tr_strerror(error_code)),
+            fmt::arg("error_code", error_code)));
         goto fail;
     }
 
@@ -325,7 +349,7 @@ tr_watchdir_backend* tr_watchdir_win32_new(tr_watchdir_t handle)
 
     if ((backend->thread = (HANDLE)_beginthreadex(nullptr, 0, &tr_watchdir_win32_thread, handle, 0, nullptr)) == nullptr)
     {
-        log_error("Failed to create thread");
+        log_error(_("Couldn't create thread"));
         goto fail;
     }
 
@@ -338,7 +362,12 @@ tr_watchdir_backend* tr_watchdir_win32_new(tr_watchdir_t handle)
             handle,
             nullptr) == -1)
     {
-        log_error("Failed to perform initial scan: %s", tr_strerror(errno));
+        auto const error_code = errno;
+        log_error(fmt::format(
+            _("Couldn't scan '{path}': {error} ({error_code})"),
+            fmt::arg("path", path),
+            fmt::arg("error", tr_strerror(error_code)),
+            fmt::arg("error_code", error_code)));
     }
 
     return BACKEND_DOWNCAST(backend);

@@ -50,7 +50,7 @@ static void set_socket_buffers(tr_socket_t fd, bool large)
 
     if (rc < 0)
     {
-        logdbg(fmt::format("Failed to set receive buffer: {}", tr_net_strerror(sockerrno)));
+        logdbg(fmt::format("Couldn't set receive buffer: {}", tr_net_strerror(sockerrno)));
     }
 
     size = large ? SEND_BUFFER_SIZE : SMALL_BUFFER_SIZE;
@@ -58,7 +58,7 @@ static void set_socket_buffers(tr_socket_t fd, bool large)
 
     if (rc < 0)
     {
-        logdbg(fmt::format("Failed to set send buffer: {}", tr_net_strerror(sockerrno)));
+        logdbg(fmt::format("Couldn't set send buffer: {}", tr_net_strerror(sockerrno)));
     }
 
     if (large)
@@ -79,7 +79,7 @@ static void set_socket_buffers(tr_socket_t fd, bool large)
 
         if (rbuf < RECV_BUFFER_SIZE)
         {
-            logdbg(fmt::format("Failed to set receive buffer: requested {}, got {}", RECV_BUFFER_SIZE, rbuf));
+            logdbg(fmt::format("Couldn't set receive buffer: requested {}, got {}", RECV_BUFFER_SIZE, rbuf));
 #ifdef __linux__
             logdbg(fmt::format("Please add the line 'net.core.rmem_max = {}' to /etc/sysctl.conf", RECV_BUFFER_SIZE));
 #endif
@@ -87,7 +87,7 @@ static void set_socket_buffers(tr_socket_t fd, bool large)
 
         if (sbuf < SEND_BUFFER_SIZE)
         {
-            logdbg(fmt::format("Failed to set send buffer: requested {}, got {}", SEND_BUFFER_SIZE, sbuf));
+            logdbg(fmt::format("Couldn't set send buffer: requested {}, got {}", SEND_BUFFER_SIZE, sbuf));
 #ifdef __linux__
             logdbg(fmt::format("Please add the line 'net.core.wmem_max = {}' to /etc/sysctl.conf", SEND_BUFFER_SIZE));
 #endif
@@ -207,7 +207,14 @@ static void rebind_ipv6(tr_session* ss, bool force)
 FAIL:
     /* Something went wrong.  It's difficult to recover, so let's simply
        set things up so that we try again next time. */
-    logwarn(_("Couldn't rebind IPv6 socket"));
+    auto const error_code = errno;
+    auto ipv6_readable = std::array<char, INET6_ADDRSTRLEN>{};
+    evutil_inet_ntop(AF_INET6, ipv6, std::data(ipv6_readable), std::size(ipv6_readable));
+    logwarn(fmt::format(
+        _("Couldn't rebind IPv6 socket {address}: {error} ({error_code})"),
+        fmt::arg("address", std::data(ipv6_readable)),
+        fmt::arg("error", tr_strerror(error_code)),
+        fmt::arg("error_code", error_code)));
 
     if (s != TR_BAD_SOCKET)
     {
@@ -305,7 +312,12 @@ void tr_udpInit(tr_session* ss)
 
         if (rc == -1)
         {
-            logwarn(_("Couldn't bind IPv4 socket"));
+            auto const error_code = errno;
+            logwarn(fmt::format(
+                _("Couldn't bind IPv4 socket {address}: {error} ({error_code})"),
+                fmt::arg("address", public_addr->to_string(ss->udp_port)),
+                fmt::arg("error", tr_strerror(error_code)),
+                fmt::arg("error_code", error_code)));
             tr_netCloseSocket(ss->udp_socket);
             ss->udp_socket = TR_BAD_SOCKET;
         }

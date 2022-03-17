@@ -82,8 +82,8 @@ static void error_handler(jsonsl_t jsn, jsonsl_error_t error, jsonsl_state_st* /
     auto* data = static_cast<struct json_wrapper_data*>(jsn->data);
 
     tr_logAddError(fmt::format(
-        _("JSON parse failed at pos {pos} '{text:16s}': {error} ({error_code})"),
-        fmt::arg("pos", jsn->pos),
+        _("Couldn't parse JSON at position {position} '{text:16s}': {error} ({error_code})"),
+        fmt::arg("position", jsn->pos),
         fmt::arg("text", buf),
         fmt::arg("error", jsonsl_strerror(error)),
         fmt::arg("error_code", error)));
