@@ -30,19 +30,6 @@
 namespace
 {
 
-#undef tr_logAddError
-#undef tr_logAddWarn
-#undef tr_logAddInfo
-#undef tr_logAddDebug
-#undef tr_logAddTrace
-
-auto constexpr LogName = std::string_view{ "Port Forwarding (UPnP)" };
-#define tr_logAddError(...) tr_logAddNamedError(LogName, __VA_ARGS__)
-#define tr_logAddWarn(...) tr_logAddNamedWarn(LogName, __VA_ARGS__)
-#define tr_logAddInfo(...) tr_logAddNamedInfo(LogName, __VA_ARGS__)
-#define tr_logAddDebug(...) tr_logAddNamedDebug(LogName, __VA_ARGS__)
-#define tr_logAddTrace(...) tr_logAddNamedTrace(LogName, __VA_ARGS__)
-
 enum class UpnpState
 {
     IDLE,

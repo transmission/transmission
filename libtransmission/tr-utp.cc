@@ -23,23 +23,21 @@
 #include "tr-utp.h"
 #include "utils.h"
 
-static auto constexpr LogName = std::string_view{ "utp" };
-
 #ifndef WITH_UTP
 
 void UTP_Close(struct UTPSocket* socket)
 {
-    tr_logAddNamedTrace(LogName, fmt::format("UTP_Close({}) was called.", fmt::ptr(socket)));
+    tr_logAddTrace(fmt::format("UTP_Close({}) was called.", fmt::ptr(socket)));
 }
 
 void UTP_RBDrained(struct UTPSocket* socket)
 {
-    tr_logAddNamedTrace(LogName, fmt::format("UTP_RBDrained({}) was called.", fmt::ptr(socket)));
+    tr_logAddTrace(fmt::format("UTP_RBDrained({}) was called.", fmt::ptr(socket)));
 }
 
 bool UTP_Write(struct UTPSocket* socket, size_t count)
 {
-    tr_logAddNamedTrace(LogName, fmt::format("UTP_Write({}, {}) was called.", fmt::ptr(socket), count));
+    tr_logAddTrace(fmt::format("UTP_Write({}, {}) was called.", fmt::ptr(socket), count));
     return false;
 }
 
@@ -100,7 +98,7 @@ static void incoming(void* vsession, struct UTPSocket* s)
 
     if (!tr_address_from_sockaddr_storage(&addr, &port, &from_storage))
     {
-        tr_logAddNamedWarn(LogName, _("Unknown socket family"));
+        tr_logAddWarn(_("Unknown socket family"));
         UTP_Close(s);
         return;
     }

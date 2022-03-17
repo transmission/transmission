@@ -21,8 +21,6 @@
 #include "watchdir.h"
 #include "watchdir-common.h"
 
-static auto constexpr LogName = std::string_view{ "watchdir:generic" };
-
 /***
 ****
 ***/
@@ -82,24 +80,20 @@ tr_watchdir_backend* tr_watchdir_generic_new(tr_watchdir_t handle)
         nullptr)
     {
         auto const error_code = errno;
-        tr_logAddNamedError(
-            LogName,
-            fmt::format(
-                _("Couldn't create event: {error} ({error_code})"),
-                fmt::arg("error", tr_strerror(error_code)),
-                fmt::arg("error_code", error_code)));
+        tr_logAddError(fmt::format(
+            _("Couldn't create event: {error} ({error_code})"),
+            fmt::arg("error", tr_strerror(error_code)),
+            fmt::arg("error_code", error_code)));
         goto FAIL;
     }
 
     if (event_add(backend->event, &tr_watchdir_generic_interval) == -1)
     {
         auto const error_code = errno;
-        tr_logAddNamedError(
-            LogName,
-            fmt::format(
-                _("Couldn't add event: {error} ({error_code})"),
-                fmt::arg("error", tr_strerror(error_code)),
-                fmt::arg("error_code", error_code)));
+        tr_logAddError(fmt::format(
+            _("Couldn't add event: {error} ({error_code})"),
+            fmt::arg("error", tr_strerror(error_code)),
+            fmt::arg("error_code", error_code)));
         goto FAIL;
     }
 

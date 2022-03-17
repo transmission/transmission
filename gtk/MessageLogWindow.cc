@@ -183,14 +183,14 @@ void MessageLogWindow::Impl::doSave(Gtk::Window& parent, Glib::ustring const& fi
 
     if (fp == nullptr)
     {
-        auto const error_code = errno;
+        auto const errcode = errno;
         auto w = std::make_shared<Gtk::MessageDialog>(
             parent,
             fmt::format(
                 _("Couldn't save '{path}': {error} ({error_code})"),
                 fmt::arg("path", filename.raw()),
-                fmt::arg("error", g_strerror(error_code)),
-                fmt::arg("error_code", error_code)),
+                fmt::arg("error", g_strerror(errcode)),
+                fmt::arg("error_code", errcode)),
             false,
             Gtk::MESSAGE_ERROR,
             Gtk::BUTTONS_CLOSE);

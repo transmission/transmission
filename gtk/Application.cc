@@ -21,6 +21,8 @@
 #include <glibmm/i18n.h>
 
 #include <libtransmission/transmission.h>
+
+#include <libtransmission/log.h>
 #include <libtransmission/rpcimpl.h>
 #include <libtransmission/utils.h>
 #include <libtransmission/version.h>

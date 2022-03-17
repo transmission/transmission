@@ -25,8 +25,6 @@
 #include "watchdir.h"
 #include "watchdir-common.h"
 
-static auto constexpr LogName = std::string_view{ "watchdir:inotify" };
-
 /***
 ****
 ***/
@@ -75,23 +73,19 @@ static void tr_watchdir_inotify_on_event(struct bufferevent* event, void* contex
         if (nread == (size_t)-1)
         {
             auto const error_code = errno;
-            tr_logAddNamedError(
-                LogName,
-                fmt::format(
-                    _("Couldn't read event: {error} ({error_code})"),
-                    fmt::arg("error", tr_strerror(error_code)),
-                    fmt::arg("error_code", error_code)));
+            tr_logAddError(fmt::format(
+                _("Couldn't read event: {error} ({error_code})"),
+                fmt::arg("error", tr_strerror(error_code)),
+                fmt::arg("error_code", error_code)));
             break;
         }
 
         if (nread != sizeof(ev))
         {
-            tr_logAddNamedError(
-                LogName,
-                fmt::format(
-                    _("Couldn't read event: expected {expected_size}, got {actual_size}"),
-                    fmt::arg("expected_size", sizeof(ev)),
-                    fmt::arg("actual_size", nread)));
+            tr_logAddError(fmt::format(
+                _("Couldn't read event: expected {expected_size}, got {actual_size}"),
+                fmt::arg("expected_size", sizeof(ev)),
+                fmt::arg("actual_size", nread)));
             break;
         }
 
@@ -109,23 +103,19 @@ static void tr_watchdir_inotify_on_event(struct bufferevent* event, void* contex
         if ((nread = bufferevent_read(event, name, ev.len)) == (size_t)-1)
         {
             auto const error_code = errno;
-            tr_logAddNamedError(
-                LogName,
-                fmt::format(
-                    _("Couldn't read filename: {error} ({error_code})"),
-                    fmt::arg("error", tr_strerror(error_code)),
-                    fmt::arg("error_code", error_code)));
+            tr_logAddError(fmt::format(
+                _("Couldn't read filename: {error} ({error_code})"),
+                fmt::arg("error", tr_strerror(error_code)),
+                fmt::arg("error_code", error_code)));
             break;
         }
 
         if (nread != ev.len)
         {
-            tr_logAddNamedError(
-                LogName,
-                fmt::format(
-                    _("Couldn't read filename: expected {expected_size}, got {actual_size}"),
-                    fmt::arg("expected_size", sizeof(ev)),
-                    fmt::arg("actual_size", nread)));
+            tr_logAddError(fmt::format(
+                _("Couldn't read filename: expected {expected_size}, got {actual_size}"),
+                fmt::arg("expected_size", sizeof(ev)),
+                fmt::arg("actual_size", nread)));
             break;
         }
 
@@ -176,13 +166,11 @@ tr_watchdir_backend* tr_watchdir_inotify_new(tr_watchdir_t handle)
     if (backend->infd == -1)
     {
         auto const error_code = errno;
-        tr_logAddNamedError(
-            LogName,
-            fmt::format(
-                _("Couldn't watch '{path}': {error} ({error_code})"),
-                fmt::arg("path", path),
-                fmt::arg("error", tr_strerror(error_code)),
-                fmt::arg("error_code", error_code)));
+        tr_logAddError(fmt::format(
+            _("Couldn't watch '{path}': {error} ({error_code})"),
+            fmt::arg("path", path),
+            fmt::arg("error", tr_strerror(error_code)),
+            fmt::arg("error_code", error_code)));
         goto FAIL;
     }
 
@@ -190,13 +178,11 @@ tr_watchdir_backend* tr_watchdir_inotify_new(tr_watchdir_t handle)
     if (backend->inwd == -1)
     {
         auto const error_code = errno;
-        tr_logAddNamedError(
-            LogName,
-            fmt::format(
-                _("Couldn't watch '{path}': {error} ({error_code})"),
-                fmt::arg("path", path),
-                fmt::arg("error", tr_strerror(error_code)),
-                fmt::arg("error_code", error_code)));
+        tr_logAddError(fmt::format(
+            _("Couldn't watch '{path}': {error} ({error_code})"),
+            fmt::arg("path", path),
+            fmt::arg("error", tr_strerror(error_code)),
+            fmt::arg("error_code", error_code)));
         goto FAIL;
     }
 
@@ -204,13 +190,11 @@ tr_watchdir_backend* tr_watchdir_inotify_new(tr_watchdir_t handle)
     if (backend->event == nullptr)
     {
         auto const error_code = errno;
-        tr_logAddNamedError(
-            LogName,
-            fmt::format(
-                _("Couldn't watch '{path}': {error} ({error_code})"),
-                fmt::arg("path", path),
-                fmt::arg("error", tr_strerror(error_code)),
-                fmt::arg("error_code", error_code)));
+        tr_logAddError(fmt::format(
+            _("Couldn't watch '{path}': {error} ({error_code})"),
+            fmt::arg("path", path),
+            fmt::arg("error", tr_strerror(error_code)),
+            fmt::arg("error_code", error_code)));
         goto FAIL;
     }
 
@@ -230,13 +214,11 @@ tr_watchdir_backend* tr_watchdir_inotify_new(tr_watchdir_t handle)
             nullptr) == -1)
     {
         auto const error_code = errno;
-        tr_logAddNamedWarn(
-            LogName,
-            fmt::format(
-                _("Couldn't scan '{path}': {error} ({error_code})"),
-                fmt::arg("path", path),
-                fmt::arg("error", tr_strerror(error_code)),
-                fmt::arg("error_code", error_code)));
+        tr_logAddWarn(fmt::format(
+            _("Couldn't scan '{path}': {error} ({error_code})"),
+            fmt::arg("path", path),
+            fmt::arg("error", tr_strerror(error_code)),
+            fmt::arg("error_code", error_code)));
     }
 
     return BACKEND_DOWNCAST(backend);
