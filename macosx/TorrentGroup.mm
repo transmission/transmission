@@ -37,7 +37,7 @@
     for (Torrent* torrent in self.torrents)
     {
         uploaded += torrent.uploadedTotal;
-        total_size += torrent.size;
+        total_size += torrent.totalSizeSelected;
     }
 
     return tr_getRatio(uploaded, total_size);

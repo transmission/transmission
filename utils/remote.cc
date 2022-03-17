@@ -1034,7 +1034,7 @@ static void printDetails(tr_variant* top)
                 }
             }
 
-            if (tr_variantDictFindInt(t, TR_KEY_totalSize, &i) && tr_variantDictFindInt(t, TR_KEY_uploadedEver, &j))
+            if (tr_variantDictFindInt(t, TR_KEY_downloaded, &i))
             {
                 if (auto corrupt = int64_t{}; tr_variantDictFindInt(t, TR_KEY_corruptEver, &corrupt) && corrupt != 0)
                 {
@@ -1047,8 +1047,16 @@ static void printDetails(tr_variant* top)
                 {
                     printf("  Downloaded: %s\n", strlsize(i).c_str());
                 }
-                printf("  Uploaded: %s\n", strlsize(j).c_str());
-                printf("  Ratio: %s\n", strlratio(j, i).c_str());
+            }
+
+            if (tr_variantDictFindInt(t, TR_KEY_uploadedEver, &i))
+            {
+                printf("  Uploaded: %s\n", strlsize(i).c_str());
+
+                if (tr_variantDictFindInt(t, TR_KEY_sizeWhenDone, &j))
+                {
+                    printf("  Ratio: %s\n", strlratio(i, j).c_str());
+                }
             }
 
             if (tr_variantDictFindStrView(t, TR_KEY_errorString, &sv) && !std::empty(sv) &&

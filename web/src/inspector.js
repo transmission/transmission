@@ -356,7 +356,7 @@ export class Inspector extends EventTarget {
       );
       const denominator =
         torrents.reduce(
-          (accumulator, t) => accumulator + t.getTotalSize(),
+          (accumulator, t) => accumulator + t.getSizeWhenDone(),
           0
         ) ||
         torrents.reduce((accumulator, t) => accumulator + t.getHaveValid(), 0);

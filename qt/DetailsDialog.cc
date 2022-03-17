@@ -619,7 +619,7 @@ void DetailsDialog::refreshUI()
         for (Torrent const* const t : torrents)
         {
             uploaded += t->uploadedEver();
-            denominator += t->totalSize();
+            denominator += t->sizeWhenDone();
         }
 
         string = tr("%1 (Ratio: %2)")

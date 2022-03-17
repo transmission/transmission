@@ -950,10 +950,10 @@ void DetailsDialog::Impl::refreshInfo(std::vector<tr_torrent*> const& torrents)
             uint64_t{},
             [](auto sum, auto const* st) { return sum + st->uploadedEver; });
         auto const denominator = std::accumulate(
-            std::begin(torrents),
-            std::end(torrents),
+            std::begin(stats),
+            std::end(stats),
             uint64_t{},
-            [](auto sum, auto const* tor) { return sum + tr_torrentTotalSize(tor); });
+            [](auto sum, auto const* st) { return sum + st->sizeWhenDone; });
         str = gtr_sprintf(_("%s (Ratio: %s)"), tr_strlsize(uploaded), tr_strlratio(tr_getRatio(uploaded, denominator)));
     }
 
