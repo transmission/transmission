@@ -350,17 +350,19 @@ export class Inspector extends EventTarget {
     if (torrents.length === 0) {
       string = none;
     } else {
-      const u = torrents.reduce(
+      const uploaded = torrents.reduce(
         (accumulator, t) => accumulator + t.getUploadedEver(),
         0
       );
-      const d =
+      const denominator =
         torrents.reduce(
-          (accumulator, t) => accumulator + t.getDownloadedEver(),
+          (accumulator, t) => accumulator + t.getSizeWhenDone(),
           0
         ) ||
         torrents.reduce((accumulator, t) => accumulator + t.getHaveValid(), 0);
-      string = `${fmt.size(u)} (Ratio: ${fmt.ratioString(Utils.ratio(u, d))})`;
+      string = `${fmt.size(uploaded)} (Ratio: ${fmt.ratioString(
+        Utils.ratio(uploaded, denominator)
+      )})`;
     }
     setTextContent(e.info.uploaded, string);
 

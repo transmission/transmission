@@ -190,47 +190,52 @@ public:
 
     /// COMPLETION
 
-    [[nodiscard]] uint64_t leftUntilDone() const
+    [[nodiscard]] auto leftUntilDone() const
     {
         return completion.leftUntilDone();
     }
 
-    [[nodiscard]] bool hasAll() const
+    [[nodiscard]] auto sizeWhenDone() const
+    {
+        return completion.sizeWhenDone();
+    }
+
+    [[nodiscard]] auto hasAll() const
     {
         return completion.hasAll();
     }
 
-    [[nodiscard]] bool hasNone() const
+    [[nodiscard]] auto hasNone() const
     {
         return completion.hasNone();
     }
 
-    [[nodiscard]] bool hasPiece(tr_piece_index_t piece) const
+    [[nodiscard]] auto hasPiece(tr_piece_index_t piece) const
     {
         return completion.hasPiece(piece);
     }
 
-    [[nodiscard]] bool hasBlock(tr_block_index_t block) const
+    [[nodiscard]] auto hasBlock(tr_block_index_t block) const
     {
         return completion.hasBlock(block);
     }
 
-    [[nodiscard]] size_t countMissingBlocksInPiece(tr_piece_index_t piece) const
+    [[nodiscard]] auto countMissingBlocksInPiece(tr_piece_index_t piece) const
     {
         return completion.countMissingBlocksInPiece(piece);
     }
 
-    [[nodiscard]] size_t countMissingBytesInPiece(tr_piece_index_t piece) const
+    [[nodiscard]] auto countMissingBytesInPiece(tr_piece_index_t piece) const
     {
         return completion.countMissingBytesInPiece(piece);
     }
 
-    [[nodiscard]] uint64_t hasTotal() const
+    [[nodiscard]] auto hasTotal() const
     {
         return completion.hasTotal();
     }
 
-    [[nodiscard]] std::vector<uint8_t> createPieceBitfield() const
+    [[nodiscard]] auto createPieceBitfield() const
     {
         return completion.createPieceBitfield();
     }
