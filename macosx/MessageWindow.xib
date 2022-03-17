@@ -48,10 +48,10 @@
                             <menu key="menu" title="OtherViews" id="16">
                                 <items>
                                     <menuItem title="Error" state="on" image="RedDotFlat" id="17"/>
-                                    <menuItem title="Warn" image="RedDotFlat" id="yoL-9H-kTt"/>
-                                    <menuItem title="Info" image="YellowDotFlat" id="18"/>
+                                    <menuItem title="Warn" image="OrangeDotFlat" id="yoL-9H-kTt"/>
+                                    <menuItem title="Info" image="GreenDotFlat" id="18"/>
                                     <menuItem title="Debug" image="PurpleDotFlat" id="19"/>
-                                    <menuItem title="Trace" image="PurpleDotFlat" id="2hu-LL-6A5"/>
+                                    <menuItem title="Trace" image="BlueDotFlat" id="2hu-LL-6A5"/>
                                 </items>
                             </menu>
                         </popUpButtonCell>
@@ -176,7 +176,9 @@
     <resources>
         <image name="PurpleDotFlat" width="16" height="16"/>
         <image name="RedDotFlat" width="16" height="16"/>
-        <image name="YellowDotFlat" width="16" height="16"/>
+        <image name="OrangeDotFlat" width="16" height="16"/>
+        <image name="BlueDotFlat" width="16" height="16"/>
+        <image name="GreenDotFlat" width="16" height="16"/>
         <image name="imageCell:63:image" width="14" height="14">
             <mutableData key="keyedArchiveRepresentation">
 YnBsaXN0MDDUAQIDBAUGBwpYJHZlcnNpb25ZJGFyY2hpdmVyVCR0b3BYJG9iamVjdHMSAAGGoF8QD05T
