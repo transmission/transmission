@@ -1699,9 +1699,9 @@ struct tr_stat
         or 0 if you can't */
     time_t manualAnnounceTime;
 
-    /** Total uploaded bytes / total torrent size.
+    /** Total uploaded bytes / sizeWhenDone.
         NB: In Transmission 3.00 and earlier, this was total upload / download,
-        which caused edge cases when total download was less than the total size. */
+        which caused edge cases when total download was less than sizeWhenDone. */
     float ratio;
 
     /** When the torrent was first added. */

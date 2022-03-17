@@ -331,7 +331,7 @@ static bool tr_torrentGetSeedRatioBytes(tr_torrent const* tor, uint64_t* setme_l
     if (auto seed_ratio = double{}; tr_torrentGetSeedRatio(tor, &seed_ratio))
     {
         auto const uploaded = tor->uploadedCur + tor->uploadedPrev;
-        auto const baseline = tor->totalSize();
+        auto const baseline = tor->sizeWhenDone();
         auto const goal = baseline * seed_ratio;
 
         if (setme_left != nullptr)
@@ -1043,7 +1043,7 @@ tr_stat const* tr_torrentStat(tr_torrent* tor)
     s->haveUnchecked = tor->hasTotal() - s->haveValid;
     s->desiredAvailable = tr_peerMgrGetDesiredAvailable(tor);
 
-    s->ratio = tr_getRatio(s->uploadedEver, tor->totalSize());
+    s->ratio = tr_getRatio(s->uploadedEver, tor->sizeWhenDone());
 
     auto seedRatioBytesLeft = uint64_t{};
     auto seedRatioBytesGoal = uint64_t{};
