@@ -16,6 +16,7 @@
 #include <cstdint> // uintX_t
 #include <ctime>
 #include <list>
+#include <map>
 #include <memory>
 #include <mutex>
 #include <string>
@@ -27,6 +28,7 @@
 
 #include "announce-list.h"
 #include "bandwidth.h"
+#include "interned-string.h"
 #include "net.h" // tr_socket_t
 #include "quark.h"
 #include "torrents.h"
@@ -391,7 +393,7 @@ public:
     // monitors the "global pool" speeds
     Bandwidth top_bandwidth_;
 
-    std::map<std::string, std::unique_ptr<Bandwidth>> bandwidth_groups_;
+    std::map<tr_interned_string, std::unique_ptr<Bandwidth>> bandwidth_groups_;
 
     float desiredRatio;
 

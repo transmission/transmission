@@ -2275,7 +2275,16 @@ void tr_sessionSetDefaultTrackers(tr_session* session, char const* trackers)
 
 Bandwidth& tr_session::getBandwidthGroup(std::string_view name)
 {
-    auto const [it, is_new] = bandwidth_groups_.try_emplace(std::string{ name }, &top_bandwidth_);
+    auto& groups = this->bandwidth_groups_;
+    auto const key = tr_interned_string{ name };
+
+    auto it = groups.find(key);
+
+    if (it == std::end(groups))
+    {
+        it = groups.try_emplace(key, std::make_unique<Bandwidth>(&top_bandwidth_)).first;
+    }
+
     return *it->second;
 }
 
@@ -2864,25 +2873,21 @@ int tr_sessionCountQueueFreeSlots(tr_session* session, tr_direction dir)
 
 static void bandwidthGroupRead(tr_session* session, std::string_view config_dir)
 {
-    auto group_list = tr_variant{};
+    auto groups_dict = tr_variant{};
 
     if (auto const path = tr_strvPath(config_dir, BandwidthGroupsFilename);
-        !tr_variantFromFile(&group_list, TR_VARIANT_PARSE_JSON, path, nullptr) || !tr_variantIsList(&group_list))
+        !tr_variantFromFile(&groups_dict, TR_VARIANT_PARSE_JSON, path, nullptr) || !tr_variantIsList(&groups_dict))
     {
         return;
     }
 
-    for (size_t i = 0, n = tr_variantListSize(&group_list); i < n; ++i)
+    auto idx = size_t{ 0 };
+    auto key = tr_quark{};
+    tr_variant* dict = nullptr;
+    while (tr_variantDictChild(&groups_dict, idx++, &key, &dict))
     {
-        auto* const dict = tr_variantListChild(&group_list, i);
-
-        std::string_view name;
-        if (!tr_variantDictFindStrView(dict, TR_KEY_name, &name) || name.empty())
-        {
-            continue;
-        }
-
-        auto& group = session->getBandwidthGroup(name);
+        auto name = tr_interned_string(key);
+        auto& group = session->getBandwidthGroup(name.sv());
 
         auto limits = tr_bandwidth_limits{};
         tr_variantDictFindBool(dict, TR_KEY_uploadLimited, &limits.up_limited);
@@ -2906,21 +2911,22 @@ static void bandwidthGroupRead(tr_session* session, std::string_view config_dir)
             group.honorParentLimits(TR_DOWN, honors);
         }
     }
-    tr_variantFree(&group_list);
+    tr_variantFree(&groups_dict);
 }
 
 static int bandwidthGroupWrite(tr_session const* session, std::string_view config_dir)
 {
-    auto group_list = tr_variant{};
-
     auto const& groups = session->bandwidth_groups_;
-    tr_variantInitList(&group_list, std::size(groups));
+
+    auto groups_dict = tr_variant{};
+    tr_variantInitDict(&groups_dict, std::size(groups));
+
     for (auto const& [name, group] : groups)
     {
-        auto* const dict = tr_variantListAddDict(&group_list, 5);
         auto const limits = group->getLimits();
 
-        tr_variantDictAddStr(dict, TR_KEY_name, name);
+        auto* const dict = tr_variantDictAddDict(&groups_dict, name.quark(), 5);
+        tr_variantDictAddStrView(dict, TR_KEY_name, name.sv());
         tr_variantDictAddBool(dict, TR_KEY_uploadLimited, limits.up_limited);
         tr_variantDictAddInt(dict, TR_KEY_uploadLimit, limits.up_limit_KBps);
         tr_variantDictAddBool(dict, TR_KEY_downloadLimited, limits.down_limited);
@@ -2929,7 +2935,7 @@ static int bandwidthGroupWrite(tr_session const* session, std::string_view confi
     }
 
     auto const filename = tr_strvPath(config_dir, BandwidthGroupsFilename);
-    auto const ret = tr_variantToFile(&group_list, TR_VARIANT_FMT_JSON, filename);
-    tr_variantFree(&group_list);
+    auto const ret = tr_variantToFile(&groups_dict, TR_VARIANT_FMT_JSON, filename);
+    tr_variantFree(&groups_dict);
     return ret;
 }

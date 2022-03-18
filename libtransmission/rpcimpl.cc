@@ -1725,14 +1725,14 @@ static char const* groupGet(tr_session* s, tr_variant* args_in, tr_variant* args
         }
     }
 
-    tr_variant* list = tr_variantDictAddList(args_out, TR_KEY_group, 1);
+    auto* const list = tr_variantDictAddList(args_out, TR_KEY_group, 1);
     for (auto const& [name, group] : s->bandwidth_groups_)
     {
-        if (names.empty() || names.count(name) > 0)
+        if (names.empty() || names.count(name.sv()) > 0)
         {
             tr_variant* dict = tr_variantListAddDict(list, 5);
             auto limits = group->getLimits();
-            tr_variantDictAddStrView(dict, TR_KEY_name, name);
+            tr_variantDictAddStrView(dict, TR_KEY_name, name.sv());
             tr_variantDictAddBool(dict, TR_KEY_uploadLimited, limits.up_limited);
             tr_variantDictAddInt(dict, TR_KEY_uploadLimit, limits.up_limit_KBps);
             tr_variantDictAddBool(dict, TR_KEY_downloadLimited, limits.down_limited);
