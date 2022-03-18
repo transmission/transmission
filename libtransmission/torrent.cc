@@ -565,7 +565,7 @@ struct torrent_start_opts
     std::optional<bool> has_local_data;
 };
 
-static void torrentStart(tr_torrent* tor, torrent_start_opts opts = {});
+static void torrentStart(tr_torrent* tor, torrent_start_opts opts);
 
 static void tr_torrentFireMetadataCompleted(tr_torrent* tor);
 
@@ -816,7 +816,11 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
         if (!tor->hasMetadata() && !doStart)
         {
             tor->prefetchMagnetMetadata = true;
-            torrentStart(tor, { .bypass_queue = true, .has_local_data = has_local_data });
+
+            auto opts = torrent_start_opts{};
+            opts.bypass_queue = true;
+            opts.has_local_data = has_local_data;
+            torrentStart(tor, opts);
         }
         else if (isNewTorrentASeed(tor))
         {
@@ -834,7 +838,9 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
     {
         // if checked_pieces_ got populated from the loading the resume
         // file above, then torrentStart doesn't need to check again
-        torrentStart(tor, { .has_local_data = has_local_data });
+        auto opts = torrent_start_opts{};
+        opts.has_local_data = has_local_data;
+        torrentStart(tor, opts);
     }
     else
     {
@@ -1432,7 +1438,7 @@ void tr_torrentStart(tr_torrent* tor)
 {
     if (tr_isTorrent(tor))
     {
-        torrentStart(tor);
+        torrentStart(tor, {});
     }
 }
 
@@ -1440,7 +1446,9 @@ void tr_torrentStartNow(tr_torrent* tor)
 {
     if (tr_isTorrent(tor))
     {
-        torrentStart(tor, { .bypass_queue = true, .has_local_data = {} });
+        auto opts = torrent_start_opts{};
+        opts.bypass_queue = true;
+        torrentStart(tor, opts);
     }
 }
 
@@ -1459,8 +1467,9 @@ static void onVerifyDoneThreadFunc(tr_torrent* const tor)
     {
         tor->startAfterVerify = false;
 
-        bool const has_local_data = !tor->checked_pieces_.hasNone();
-        torrentStart(tor, { .has_local_data = has_local_data });
+        auto opts = torrent_start_opts{};
+        opts.has_local_data = !tor->checked_pieces_.hasNone();
+        torrentStart(tor, opts);
     }
 }
 
