@@ -6,7 +6,10 @@
 #pragma once
 
 #include <ctime>
+#include <optional>
 #include <string_view>
+
+///
 
 enum tr_log_level
 {
@@ -34,6 +37,12 @@ enum tr_log_level
     // High-volume debug messages, e.g. tracing peer protocol messages
     TR_LOG_TRACE
 };
+
+std::optional<tr_log_level> tr_logGetLevelFromKey(std::string_view key);
+
+std::string_view tr_logLevelToKey(tr_log_level);
+
+///
 
 struct tr_log_message
 {
