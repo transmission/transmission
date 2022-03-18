@@ -122,11 +122,11 @@ bool tr_address_from_string(tr_address* dst, std::string_view src)
     return tr_address_from_string(dst, std::data(buf));
 }
 
-std::optional<tr_address> tr_address::from_string(std::string_view str)
+std::optional<tr_address> tr_address::from_string(std::string_view address_str)
 {
     auto addr = tr_address{};
 
-    if (!tr_address_from_string(&addr, str))
+    if (!tr_address_from_string(&addr, address_str))
     {
         return {};
     }

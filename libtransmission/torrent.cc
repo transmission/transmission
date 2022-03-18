@@ -556,7 +556,16 @@ static void onTrackerResponse(tr_torrent* tor, tr_tracker_event const* event, vo
 ****
 ***/
 
-static void torrentStart(tr_torrent* tor, bool bypass_queue);
+struct torrent_start_opts
+{
+    bool bypass_queue = false;
+
+    // true or false if we know whether or not local data exists,
+    // or unset if we don't know and need to check for ourselves
+    std::optional<bool> has_local_data;
+};
+
+static void torrentStart(tr_torrent* tor, torrent_start_opts opts);
 
 static void tr_torrentFireMetadataCompleted(tr_torrent* tor);
 
@@ -606,18 +615,22 @@ static bool hasAnyLocalData(tr_torrent const* tor)
     return false;
 }
 
-static bool setLocalErrorIfFilesDisappeared(tr_torrent* tor)
+static bool setLocalErrorIfFilesDisappeared(tr_torrent* tor, std::optional<bool> has_local_data = {})
 {
-    bool const disappeared = tor->hasTotal() > 0 && !hasAnyLocalData(tor);
+    if (!has_local_data)
+    {
+        has_local_data = hasAnyLocalData(tor);
+    }
 
-    if (disappeared)
+    bool const files_disappeared = tor->hasTotal() > 0 && !*has_local_data;
+    if (files_disappeared)
     {
         tr_logAddTraceTor(tor, "[LAZY] uh oh, the files disappeared");
         tor->setLocalError(_(
             "No data found! Ensure your drives are connected or use \"Set Location\". To re-download, remove the torrent and re-add it."));
     }
 
-    return disappeared;
+    return files_disappeared;
 }
 
 /**
@@ -755,6 +768,14 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
         tr_torrentSetIdleLimit(tor, tr_sessionGetIdleLimit(tor->session));
     }
 
+    auto has_local_data = std::optional<bool>{};
+    if ((loaded & tr_resume::Progress) != 0)
+    {
+        // if tr_resume::load() populated checked_pieces_, initCheckedPieces()
+        // already looked for local data on the filesystem
+        has_local_data = !tor->checked_pieces_.hasNone();
+    }
+
     // if we don't have a local .torrent or .magnet file already, assume the torrent is new
     auto const filename = tor->hasMetadata() ? tor->torrentFile() : tor->magnetFile();
 
@@ -795,7 +816,11 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
         if (!tor->hasMetadata() && !doStart)
         {
             tor->prefetchMagnetMetadata = true;
-            tr_torrentStartNow(tor);
+
+            auto opts = torrent_start_opts{};
+            opts.bypass_queue = true;
+            opts.has_local_data = has_local_data;
+            torrentStart(tor, opts);
         }
         else if (isNewTorrentASeed(tor))
         {
@@ -811,11 +836,15 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
     }
     else if (doStart)
     {
-        tr_torrentStart(tor);
+        // if checked_pieces_ got populated from the loading the resume
+        // file above, then torrentStart doesn't need to check again
+        auto opts = torrent_start_opts{};
+        opts.has_local_data = has_local_data;
+        torrentStart(tor, opts);
     }
     else
     {
-        setLocalErrorIfFilesDisappeared(tor);
+        setLocalErrorIfFilesDisappeared(tor, has_local_data);
     }
 }
 
@@ -1344,7 +1373,7 @@ static bool torrentShouldQueue(tr_torrent const* tor)
     return tr_sessionCountQueueFreeSlots(tor->session, dir) == 0;
 }
 
-static void torrentStart(tr_torrent* tor, bool bypass_queue)
+static void torrentStart(tr_torrent* tor, torrent_start_opts opts)
 {
     switch (tr_torrentGetActivity(tor))
     {
@@ -1354,7 +1383,7 @@ static void torrentStart(tr_torrent* tor, bool bypass_queue)
 
     case TR_STATUS_SEED_WAIT:
     case TR_STATUS_DOWNLOAD_WAIT:
-        if (!bypass_queue)
+        if (!opts.bypass_queue)
         {
             return; /* already queued */
         }
@@ -1369,7 +1398,7 @@ static void torrentStart(tr_torrent* tor, bool bypass_queue)
         return;
 
     case TR_STATUS_STOPPED:
-        if (!bypass_queue && torrentShouldQueue(tor))
+        if (!opts.bypass_queue && torrentShouldQueue(tor))
         {
             torrentSetQueued(tor, true);
             return;
@@ -1379,7 +1408,7 @@ static void torrentStart(tr_torrent* tor, bool bypass_queue)
     }
 
     /* don't allow the torrent to be started if the files disappeared */
-    if (setLocalErrorIfFilesDisappeared(tor))
+    if (setLocalErrorIfFilesDisappeared(tor, opts.has_local_data))
     {
         return;
     }
@@ -1409,7 +1438,7 @@ void tr_torrentStart(tr_torrent* tor)
 {
     if (tr_isTorrent(tor))
     {
-        torrentStart(tor, false);
+        torrentStart(tor, {});
     }
 }
 
@@ -1417,7 +1446,9 @@ void tr_torrentStartNow(tr_torrent* tor)
 {
     if (tr_isTorrent(tor))
     {
-        torrentStart(tor, true);
+        auto opts = torrent_start_opts{};
+        opts.bypass_queue = true;
+        torrentStart(tor, opts);
     }
 }
 
@@ -1435,7 +1466,10 @@ static void onVerifyDoneThreadFunc(tr_torrent* const tor)
     if (tor->startAfterVerify)
     {
         tor->startAfterVerify = false;
-        torrentStart(tor, false);
+
+        auto opts = torrent_start_opts{};
+        opts.has_local_data = !tor->checked_pieces_.hasNone();
+        torrentStart(tor, opts);
     }
 }
 
@@ -3137,7 +3171,7 @@ void tr_torrent::setBlocks(tr_bitfield blocks)
 {
     TR_ASSERT(piece < this->pieceCount());
 
-    if (checked_pieces_.test(piece))
+    if (isPieceChecked(piece))
     {
         return true;
     }
