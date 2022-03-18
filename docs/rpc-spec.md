@@ -144,6 +144,7 @@ Request arguments:
 | `downloadLimited`     | boolean  | true if `downloadLimit` is honored
 | `files-unwanted`      | array    | indices of file(s) to not download
 | `files-wanted`        | array    | indices of file(s) to download
+| `group`               | string   | The name of this torrent's bandwidth group
 | `honorsSessionLimits` | boolean  | true if session upload limits are honored
 | `ids`                 | array    | torrent list, as described in 3.1
 | `labels`              | array    | array of string labels
@@ -228,6 +229,7 @@ The 'source' column here corresponds to the data structure there.
 | `file-count` | number | tr_info
 | `files`| array (see below)| n/a
 | `fileStats`| array (see below)| n/a
+| `group`| string| n/a
 | `hashString`| string| tr_torrent_view
 | `haveUnchecked`| number| tr_stat
 | `haveValid`| number| tr_stat
@@ -709,6 +711,50 @@ Response arguments:
 | `size-bytes` | number | the size, in bytes, of the free space in that directory
 | `total_size` | number | the total capacity, in bytes, of that directory
 
+### 4.8 Bandwidth groups
+
+#### 4.8.1 Bandwidth group Mutator: `group-set`
+
+Method name: `group-set`
+
+Request parameters:
+
+| Key | Value type | Description
+|:--|:--|:--
+| `honorsSessionLimits` | boolean  | true if session upload limits are honored
+| `name` | string | Bandwidth group name
+| `speed-limit-down-enabled` | boolean | true means enabled
+| `speed-limit-down` | number | max global download speed (KBps)
+| `speed-limit-up-enabled` | boolean | true means enabled
+| `speed-limit-up` | number | max global upload speed (KBps)
+
+Response arguments: none
+
+#### 4.8.2 Bandwidth group Accessor: `group-get`
+
+Method name: `group-get`
+
+Request arguments: An optional argument `group`.
+`group` is either a string naming the bandwidth group,
+or a list of such strings.
+If `group` is omitted, all bandwidth groups are used.
+
+Response arguments:
+
+| Key | Value type | Description
+|:--|:--|:--
+|`group`| array | A list of bandwidth group description objects
+
+A bandwidth group description object has:
+
+| Key | Value type | Description
+|:--|:--|:--
+| `honorsSessionLimits` | boolean  | true if session upload limits are honored
+| `name` | string | Bandwidth group name
+| `speed-limit-down-enabled` | boolean | true means enabled
+| `speed-limit-down` | number | max global download speed (KBps)
+| `speed-limit-up-enabled` | boolean | true means enabled
+| `speed-limit-up` | number | max global upload speed (KBps)
 
 ## 5. Protocol Versions
 
@@ -949,13 +995,17 @@ Transmission 4.0.0 (`rpc-version-semver` 5.3.0, `rpc-version`: 17)
 | `session-get` | new arg `script-torrent-done-seeding-filename`
 | `torrent-add` | new arg `labels`
 | `torrent-get` | new arg `file-count`
+| `torrent-get` | new arg `group`
 | `torrent-get` | new arg `percentComplete`
 | `torrent-get` | new arg `primary-mime-type`
 | `torrent-get` | new arg `tracker.sitename`
 | `torrent-get` | new arg `trackerStats.sitename`
 | `torrent-get` | new arg `trackerList`
+| `torrent-set` | new arg `group`
 | `torrent-set` | new arg `trackerList`
 | `torrent-set` | **DEPRECATED** `trackerAdd`. Use `trackerList` instead.
 | `torrent-set` | **DEPRECATED** `trackerRemove`. Use `trackerList` instead.
 | `torrent-set` | **DEPRECATED** `trackerReplace`. Use `trackerList` instead.
+| `group-set` | new method
+| `group-get` | new method
 

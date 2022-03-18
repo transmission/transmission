@@ -133,6 +133,27 @@ static auto loadLabels(tr_variant* dict, tr_torrent* tor)
 ****
 ***/
 
+static void saveGroup(tr_variant* dict, tr_torrent const* tor)
+{
+    tr_variantDictAddStrView(dict, TR_KEY_group, tor->group);
+}
+
+static auto loadGroup(tr_variant* dict, tr_torrent* tor)
+{
+    std::string_view groupName;
+
+    if (tr_variantDictFindStrView(dict, TR_KEY_group, &groupName) && !groupName.empty())
+    {
+        tor->setGroup(groupName);
+        return tr_resume::Group;
+    }
+    return tr_resume::fields_t{};
+}
+
+/***
+****
+***/
+
 static void saveDND(tr_variant* dict, tr_torrent const* tor)
 {
     auto const n = tor->fileCount();
@@ -819,6 +840,11 @@ static auto loadFromFile(tr_torrent* tor, tr_resume::fields_t fieldsToLoad, bool
         fields_loaded |= loadLabels(&top, tor);
     }
 
+    if ((fieldsToLoad & tr_resume::Group) != 0)
+    {
+        fields_loaded |= loadGroup(&top, tor);
+    }
+
     /* loading the resume file triggers of a lot of changes,
      * but none of them needs to trigger a re-saving of the
      * same resume information... */
@@ -930,6 +956,7 @@ void save(tr_torrent* tor)
     saveFilenames(&top, tor);
     saveName(&top, tor);
     saveLabels(&top, tor);
+    saveGroup(&top, tor);
 
     if (auto const err = tr_variantToFile(&top, TR_VARIANT_FMT_BENC, tor->resumeFile()); err != 0)
     {

@@ -1902,6 +1902,21 @@ void tr_torrentSetLabels(tr_torrent* tor, tr_labels_t&& labels)
 ****
 ***/
 
+void tr_torrent::setGroup(std::string_view groupName)
+{
+    auto const lock = this->unique_lock();
+
+    this->group.assign(groupName);
+    Bandwidth* bw = this->session->bandwidthGroupFind(group);
+    this->bandwidth->setParent(bw != nullptr ? bw : this->session->bandwidth);
+
+    this->setDirty();
+}
+
+/***
+****
+***/
+
 tr_priority_t tr_torrentGetPriority(tr_torrent const* tor)
 {
     TR_ASSERT(tr_isTorrent(tor));

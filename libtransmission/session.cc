@@ -78,6 +78,9 @@ static auto constexpr DefaultPrefetchEnabled = bool{ true };
 #endif
 static auto constexpr SaveIntervalSecs = int{ 360 };
 
+static void bandwidthGroupRead(tr_session* session, char const* configDir);
+static int bandwidthGroupWrite(tr_session* session, char const* configDir);
+
 static tr_port getRandomPort(tr_session const* s)
 {
     return tr_port(tr_rand_int_weak(s->randomPortHigh - s->randomPortLow + 1) + s->randomPortLow);
@@ -536,6 +539,9 @@ void tr_sessionSaveSettings(tr_session* session, char const* config_dir, tr_vari
 
     /* cleanup */
     tr_variantFree(&settings);
+
+    /* Write bandwidth groups limits to file  */
+    bandwidthGroupWrite(session, config_dir);
 }
 
 /***
@@ -596,6 +602,7 @@ tr_session* tr_sessionInit(char const* config_dir, bool messageQueuingEnabled, t
     session->session_id = tr_session_id_new();
     session->bandwidth = new Bandwidth(nullptr);
     session->removed_torrents.clear();
+    bandwidthGroupRead(session, config_dir);
 
     /* nice to start logging at the very beginning */
     if (auto i = int64_t{}; tr_variantDictFindInt(clientSettings, TR_KEY_message_level, &i))
@@ -2267,6 +2274,26 @@ void tr_sessionSetDefaultTrackers(tr_session* session, char const* trackers)
 ****
 ***/
 
+Bandwidth* tr_session::bandwidthGroupFind(std::string_view name)
+{
+    std::string str_name{ name };
+    if (name.empty())
+    {
+        return nullptr;
+    }
+
+    if (bandwidth_groups[str_name] == nullptr)
+    {
+        Bandwidth* bw = new Bandwidth(bandwidth);
+        bandwidth_groups[str_name] = bw;
+    }
+    return bandwidth_groups[str_name];
+}
+
+/***
+****
+***/
+
 struct port_forwarding_data
 {
     bool enabled;
@@ -2844,4 +2871,79 @@ int tr_sessionCountQueueFreeSlots(tr_session* session, tr_direction dir)
     }
 
     return max - active_count;
+}
+
+static void bandwidthGroupRead(tr_session* session, char const* configDir)
+{
+    tr_variant group_list;
+    auto const filename = tr_strvPath(configDir, "bandwidthGroups");
+    if (!tr_variantFromFile(&group_list, TR_VARIANT_PARSE_JSON, filename, nullptr) || !tr_variantIsList(&group_list))
+    {
+        return;
+    }
+    int n = tr_variantListSize(&group_list);
+
+    for (int i = 0; i < n; i++)
+    {
+        tr_variant* dict = tr_variantListChild(&group_list, i);
+        std::string_view name;
+        if (!tr_variantDictFindStrView(dict, TR_KEY_name, &name) || name.empty())
+        {
+            continue;
+        }
+
+        Bandwidth* group = session->bandwidthGroupFind(name);
+        if (group == nullptr)
+        {
+            continue;
+        }
+
+        int64_t val = 0;
+        tr_bandwidth_limits limits;
+        tr_variantDictFindBool(dict, TR_KEY_uploadLimited, &limits.up_limited);
+        if (tr_variantDictFindInt(dict, TR_KEY_uploadLimit, &val))
+        {
+            limits.up_limit_KBps = val;
+        }
+
+        tr_variantDictFindBool(dict, TR_KEY_downloadLimited, &limits.down_limited);
+        if (tr_variantDictFindInt(dict, TR_KEY_downloadLimit, &val))
+        {
+            limits.down_limit_KBps = val;
+        }
+
+        group->setLimits(&limits);
+
+        bool honors = false;
+        if (tr_variantDictFindBool(dict, TR_KEY_honorsSessionLimits, &honors))
+        {
+            group->honorParentLimits(TR_UP, honors);
+            group->honorParentLimits(TR_DOWN, honors);
+        }
+    }
+    tr_variantFree(&group_list);
+}
+
+static int bandwidthGroupWrite(tr_session* session, char const* configDir)
+{
+    tr_variant group_list;
+    int n = session->bandwidth_groups.size();
+    tr_variantInitList(&group_list, n);
+    for (auto const& [name, group] : session->bandwidth_groups)
+    {
+        tr_variant* dict = tr_variantListAddDict(&group_list, 5);
+        auto limits = group->getLimits();
+
+        tr_variantDictAddStr(dict, TR_KEY_name, name);
+        tr_variantDictAddBool(dict, TR_KEY_uploadLimited, limits.up_limited);
+        tr_variantDictAddInt(dict, TR_KEY_uploadLimit, limits.up_limit_KBps);
+        tr_variantDictAddBool(dict, TR_KEY_downloadLimited, limits.down_limited);
+        tr_variantDictAddInt(dict, TR_KEY_downloadLimit, limits.down_limit_KBps);
+        tr_variantDictAddBool(dict, TR_KEY_honorsSessionLimits, group->areParentLimitsHonored(TR_UP));
+    }
+
+    auto const filename = tr_strvPath(configDir, "bandwidthGroups");
+    auto const ret = tr_variantToFile(&group_list, TR_VARIANT_FMT_JSON, filename);
+    tr_variantFree(&group_list);
+    return ret;
 }

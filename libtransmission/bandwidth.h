@@ -12,6 +12,7 @@
 #include <array>
 #include <cstddef> // size_t
 #include <vector>
+#include <string>
 
 #include "transmission.h"
 
@@ -23,6 +24,14 @@ class tr_peerIo;
  * @addtogroup networked_io Networked IO
  * @{
  */
+
+struct tr_bandwidth_limits
+{
+    bool up_limited;
+    unsigned int up_limit_KBps;
+    bool down_limited;
+    unsigned int down_limit_KBps;
+};
 
 /**
  * Bandwidth is an object for measuring and constraining bandwidth speeds.
@@ -227,6 +236,9 @@ public:
         bool is_limited_;
         bool honor_parent_limits_;
     };
+
+    tr_bandwidth_limits getLimits() const;
+    void setLimits(tr_bandwidth_limits const* limits);
 
 private:
     static unsigned int getSpeedBytesPerSecond(RateControl& r, unsigned int interval_msec, uint64_t now);

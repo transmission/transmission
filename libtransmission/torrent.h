@@ -717,6 +717,10 @@ public:
 
     tr_labels_t labels;
 
+    std::string group;
+    /* Set the bandwidth group the torrent belongs to */
+    void setGroup(std::string_view groupName);
+
     static auto constexpr MagicNumber = int{ 95549 };
 
     tr_file_piece_map fpm_ = tr_file_piece_map{ metainfo_ };

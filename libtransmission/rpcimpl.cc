@@ -562,6 +562,10 @@ static void initField(tr_torrent const* const tor, tr_stat const* const st, tr_v
         addFileStats(tor, initme);
         break;
 
+    case TR_KEY_group:
+        tr_variantInitStrView(initme, tor->group);
+        break;
+
     case TR_KEY_hashString:
         tr_variantInitStrView(initme, tor->infoHashString());
         break;
@@ -1157,6 +1161,11 @@ static char const* torrentSet(
             }
         }
 
+        if (std::string_view group; tr_variantDictFindStrView(args_in, TR_KEY_group, &group))
+        {
+            tor->setGroup(group);
+        }
+
         if (errmsg == nullptr && tr_variantDictFindList(args_in, TR_KEY_labels, &tmp_variant))
         {
             errmsg = setLabels(tor, tmp_variant);
@@ -1686,6 +1695,96 @@ static char const* torrentAdd(tr_session* session, tr_variant* args_in, tr_varia
         }
 
         addTorrentImpl(idle_data, ctor);
+    }
+
+    return nullptr;
+}
+
+/***
+****
+***/
+
+static char const* groupGet(tr_session* s, tr_variant* args_in, tr_variant* args_out, struct tr_rpc_idle_data* /*idle_data*/)
+{
+    std::set<std::string_view> names;
+
+    if (std::string_view one_name; tr_variantDictFindStrView(args_in, TR_KEY_name, &one_name))
+    {
+        names.insert(one_name);
+    }
+    else if (tr_variant* namesList = nullptr; tr_variantDictFindList(args_in, TR_KEY_name, &namesList))
+    {
+        int names_count = tr_variantListSize(namesList);
+        for (int i = 0; i < names_count; i++)
+        {
+            tr_variant* v = tr_variantListChild(namesList, i);
+            if (std::string_view l; tr_variantIsString(v) && tr_variantGetStrView(v, &l))
+            {
+                names.insert(l);
+            }
+        }
+    }
+
+    tr_variant* list = tr_variantDictAddList(args_out, TR_KEY_group, 1);
+    for (auto const& [name, group] : s->bandwidth_groups)
+    {
+        if (names.empty() || names.count(name) > 0)
+        {
+            tr_variant* dict = tr_variantListAddDict(list, 5);
+            auto limits = group->getLimits();
+            tr_variantDictAddStrView(dict, TR_KEY_name, name);
+            tr_variantDictAddBool(dict, TR_KEY_uploadLimited, limits.up_limited);
+            tr_variantDictAddInt(dict, TR_KEY_uploadLimit, limits.up_limit_KBps);
+            tr_variantDictAddBool(dict, TR_KEY_downloadLimited, limits.down_limited);
+            tr_variantDictAddInt(dict, TR_KEY_downloadLimit, limits.down_limit_KBps);
+            tr_variantDictAddBool(dict, TR_KEY_honorsSessionLimits, group->areParentLimitsHonored(TR_UP));
+        }
+    }
+
+    return nullptr;
+}
+
+static char const* groupSet(
+    tr_session* session,
+    tr_variant* args_in,
+    tr_variant* /*args_out*/,
+    struct tr_rpc_idle_data* /*idle_data*/)
+{
+    std::string_view name;
+
+    if (!tr_variantDictFindStrView(args_in, TR_KEY_name, &name))
+    {
+        return "No group name given";
+    }
+
+    Bandwidth* group = session->bandwidthGroupFind(name);
+    if (group == nullptr)
+    {
+        return "No such group";
+    }
+
+    auto limits = group->getLimits();
+
+    tr_variantDictFindBool(args_in, TR_KEY_speed_limit_down_enabled, &limits.down_limited);
+    int64_t intVal = 0;
+    if (tr_variantDictFindInt(args_in, TR_KEY_speed_limit_down, &intVal))
+    {
+        limits.down_limit_KBps = intVal;
+    }
+
+    tr_variantDictFindBool(args_in, TR_KEY_speed_limit_up_enabled, &limits.up_limited);
+    if (tr_variantDictFindInt(args_in, TR_KEY_speed_limit_up, &intVal))
+    {
+        limits.up_limit_KBps = intVal;
+    }
+
+    group->setLimits(&limits);
+
+    bool honors = false;
+    if (tr_variantDictFindBool(args_in, TR_KEY_honorsSessionLimits, &honors))
+    {
+        group->honorParentLimits(TR_UP, honors);
+        group->honorParentLimits(TR_DOWN, honors);
     }
 
     return nullptr;
@@ -2346,9 +2445,11 @@ struct rpc_method
     handler func;
 };
 
-static auto constexpr Methods = std::array<rpc_method, 22>{ {
+static auto constexpr Methods = std::array<rpc_method, 24>{ {
     { "blocklist-update"sv, false, blocklistUpdate },
     { "free-space"sv, true, freeSpace },
+    { "group-get"sv, true, groupGet },
+    { "group-set"sv, true, groupSet },
     { "port-test"sv, false, portTest },
     { "queue-move-bottom"sv, true, queueMoveBottom },
     { "queue-move-down"sv, true, queueMoveDown },
