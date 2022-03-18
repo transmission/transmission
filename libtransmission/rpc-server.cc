@@ -51,21 +51,6 @@
 
 using namespace std::literals;
 
-#undef tr_logAddError
-#undef tr_logAddWarn
-#undef tr_logAddInfo
-#undef tr_logAddDebug
-#undef tr_logAddTrace
-
-auto constexpr LogName = "rpc"sv;
-#define tr_logAddError(...) tr_logAddNamed(TR_LOG_ERROR, LogName, __VA_ARGS__)
-#define tr_logAddWarn(...) tr_logAddNamed(TR_LOG_WARN, LogName, __VA_ARGS__)
-#define tr_logAddInfo(...) tr_logAddNamed(TR_LOG_INFO, LogName, __VA_ARGS__)
-#define tr_logAddDebug(...) tr_logAddNamed(TR_LOG_DEBUG, LogName, __VA_ARGS__)
-#define tr_logAddTrace(...) tr_logAddNamed(TR_LOG_TRACE, LogName, __VA_ARGS__)
-
-///
-
 /* session-id is used to make cross-site request forgery attacks difficult.
  * Don't disable this feature unless you really know what you're doing!
  * http://en.wikipedia.org/wiki/Cross-site_request_forgery
@@ -708,7 +693,7 @@ static bool bindUnixSocket(
     if (chmod(addr.sun_path, (mode_t)socket_mode) != 0)
     {
         tr_logAddWarn(
-            fmt::format(_("Could not set RPC socket mode to {mode:#o}, defaulting to 0755"), fmt::arg("mode", socket_mode)));
+            fmt::format(_("Couldn't set RPC socket mode to {mode:#o}, defaulting to 0755"), fmt::arg("mode", socket_mode)));
     }
 
     return evhttp_bind_listener(httpd, lev) != nullptr;

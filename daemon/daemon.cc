@@ -60,24 +60,6 @@ using namespace std::literals;
 ****
 ***/
 
-static auto constexpr CodeName = "daemon"sv;
-
-#undef tr_logAddError
-#undef tr_logAddWarn
-#undef tr_logAddInfo
-#undef tr_logAddDebug
-#undef tr_logAddTrace
-
-#define tr_logAddError(...) tr_logAddNamedError(CodeName, __VA_ARGS__)
-#define tr_logAddWarn(...) tr_logAddNamedWarn(CodeName, __VA_ARGS__)
-#define tr_logAddInfo(...) tr_logAddNamedInfo(CodeName, __VA_ARGS__)
-#define tr_logAddDebug(...) tr_logAddNamedDebug(CodeName, __VA_ARGS__)
-#define tr_logAddTrace(...) tr_logAddNamedTrace(CodeName, __VA_ARGS__)
-
-/***
-****
-***/
-
 static char constexpr MyName[] = "transmission-daemon";
 static char constexpr Usage[] = "Transmission " LONG_VERSION_STRING
                                 "  https://transmissionbt.com/\n"
@@ -704,7 +686,7 @@ static int daemon_start(void* varg, [[maybe_unused]] bool foreground)
     tr_formatter_speed_init(SpeedK, SpeedKStr, SpeedMStr, SpeedGStr, SpeedTStr);
     session = tr_sessionInit(configDir, true, settings);
     tr_sessionSetRPCCallback(session, on_rpc_callback, nullptr);
-    tr_logAddNamedInfo(MyName, fmt::format(_("Loading settings from '{path}'"), fmt::arg("path", configDir)));
+    tr_logAddInfo(fmt::format(_("Loading settings from '{path}'"), fmt::arg("path", configDir)));
     tr_sessionSaveSettings(session, configDir, settings);
 
     auto sv = std::string_view{};
@@ -740,7 +722,7 @@ static int daemon_start(void* varg, [[maybe_unused]] bool foreground)
 
     if (tr_variantDictFindBool(settings, TR_KEY_rpc_authentication_required, &boolVal) && boolVal)
     {
-        tr_logAddNamedInfo(MyName, _("Requiring authentication"));
+        tr_logAddInfo(_("Requiring authentication"));
     }
 
     mySession = session;
@@ -804,7 +786,7 @@ static int daemon_start(void* varg, [[maybe_unused]] bool foreground)
         {
             auto const error_code = errno;
             tr_logAddError(fmt::format(
-                _("Couldn't create status event: {error} ({error_code})"),
+                _("Couldn't create event: {error} ({error_code})"),
                 fmt::arg("error", tr_strerror(error_code)),
                 fmt::arg("error_code", error_code)));
             goto CLEANUP;
@@ -814,7 +796,7 @@ static int daemon_start(void* varg, [[maybe_unused]] bool foreground)
         {
             auto const error_code = errno;
             tr_logAddError(fmt::format(
-                _("Couldn't add status event: {error} ({error_code})"),
+                _("Couldn't add event: {error} ({error_code})"),
                 fmt::arg("error", tr_strerror(error_code)),
                 fmt::arg("error_code", error_code)));
             goto CLEANUP;

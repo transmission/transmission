@@ -197,6 +197,9 @@ bool trashDataFile(char const* filename, tr_error** error)
 
 - (void)setResumeStatusForTorrent:(Torrent*)torrent withHistory:(NSDictionary*)history forcePause:(BOOL)pause
 {
+    //restore GroupValue
+    torrent.groupValue = [history[@"GroupValue"] intValue];
+    
     //start transfer
     NSNumber* active;
     if (!pause && (active = history[@"Active"]) && active.boolValue)
@@ -354,7 +357,7 @@ bool trashDataFile(char const* filename, tr_error** error)
 {
     if (self.fResumeOnWake)
     {
-        tr_logAddNamedTrace(tr_torrentName(self.fHandle), "restarting because of wakeUp");
+        tr_logAddTrace("restarting because of wakeup", tr_torrentName(self.fHandle));
         tr_torrentStart(self.fHandle);
     }
 }
@@ -642,7 +645,8 @@ bool trashDataFile(char const* filename, tr_error** error)
 
     if (!self.fIcon)
     {
-        self.fIcon = self.folder ? [NSImage imageNamed:NSImageNameFolder] : [NSWorkspace.sharedWorkspace iconForFileType:self.name.pathExtension];
+        self.fIcon = self.folder ? [NSImage imageNamed:NSImageNameFolder] :
+                                   [NSWorkspace.sharedWorkspace iconForFileType:self.name.pathExtension];
     }
     return self.fIcon;
 }
@@ -913,7 +917,8 @@ bool trashDataFile(char const* filename, tr_error** error)
 
 - (BOOL)isActive
 {
-    return self.fStat->activity != TR_STATUS_STOPPED && self.fStat->activity != TR_STATUS_DOWNLOAD_WAIT && self.fStat->activity != TR_STATUS_SEED_WAIT;
+    return self.fStat->activity != TR_STATUS_STOPPED && self.fStat->activity != TR_STATUS_DOWNLOAD_WAIT &&
+        self.fStat->activity != TR_STATUS_SEED_WAIT;
 }
 
 - (BOOL)isSeeding
@@ -964,7 +969,8 @@ bool trashDataFile(char const* filename, tr_error** error)
     }
 
     NSString* error;
-    if (!(error = @(self.fStat->errorString)) && !(error = [NSString stringWithCString:self.fStat->errorString encoding:NSISOLatin1StringEncoding]))
+    if (!(error = @(self.fStat->errorString)) &&
+        !(error = [NSString stringWithCString:self.fStat->errorString encoding:NSISOLatin1StringEncoding]))
     {
         error = [NSString stringWithFormat:@"(%@)", NSLocalizedString(@"unreadable error", "Torrent -> error string unreadable")];
     }
@@ -1867,11 +1873,7 @@ bool trashDataFile(char const* filename, tr_error** error)
                 tempNode = [[FileListNode alloc] initWithFolderName:pathComponents[0] path:@"" torrent:self];
             }
 
-            [self insertPathForComponents:pathComponents
-                       withComponentIndex:1
-                                forParent:tempNode
-                                 fileSize:file.length
-                                    index:i
+            [self insertPathForComponents:pathComponents withComponentIndex:1 forParent:tempNode fileSize:file.length index:i
                                  flatList:flatFileList];
         }
 

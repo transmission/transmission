@@ -13,7 +13,9 @@
 #include <event2/buffer.h>
 
 #include <libtransmission/transmission.h>
+
 #include <libtransmission/error.h>
+#include <libtransmission/log.h>
 #include <libtransmission/tr-getopt.h>
 #include <libtransmission/utils.h>
 #include <libtransmission/variant.h>

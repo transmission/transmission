@@ -133,7 +133,7 @@ struct tr_handshake
 ***
 **/
 
-#define tr_logAddTraceHand(handshake, ...) tr_logAddNamedTrace(handshake->io->addrStr(), __VA_ARGS__)
+#define tr_logAddTraceHand(handshake, msg) tr_logAddTrace(msg, (handshake)->io->addrStr())
 
 static char const* getStateName(handshake_state_t const state)
 {

@@ -227,8 +227,8 @@ struct tr_peerMgr
     event* atomTimer = nullptr;
 };
 
-#define tr_logAddDebugSwarm(swarm, ...) tr_logAddNamedDebug(tr_torrentName((swarm)->tor), __VA_ARGS__)
-#define tr_logAddTraceSwarm(swarm, ...) tr_logAddNamedTrace(tr_torrentName((swarm)->tor), __VA_ARGS__)
+#define tr_logAddDebugSwarm(swarm, msg) tr_logAddDebugTor((swarm)->tor, msg)
+#define tr_logAddTraceSwarm(swarm, msg) tr_logAddTraceTor((swarm)->tor, msg)
 
 /**
 *** tr_peer virtual functions

@@ -1049,7 +1049,7 @@ static void printDetails(tr_variant* top)
                 }
             }
 
-            if (tr_variantDictFindInt(t, TR_KEY_downloadedEver, &i) && tr_variantDictFindInt(t, TR_KEY_uploadedEver, &j))
+            if (tr_variantDictFindInt(t, TR_KEY_downloaded, &i))
             {
                 if (auto corrupt = int64_t{}; tr_variantDictFindInt(t, TR_KEY_corruptEver, &corrupt) && corrupt != 0)
                 {
@@ -1062,8 +1062,16 @@ static void printDetails(tr_variant* top)
                 {
                     printf("  Downloaded: %s\n", strlsize(i).c_str());
                 }
-                printf("  Uploaded: %s\n", strlsize(j).c_str());
-                printf("  Ratio: %s\n", strlratio(j, i).c_str());
+            }
+
+            if (tr_variantDictFindInt(t, TR_KEY_uploadedEver, &i))
+            {
+                printf("  Uploaded: %s\n", strlsize(i).c_str());
+
+                if (tr_variantDictFindInt(t, TR_KEY_sizeWhenDone, &j))
+                {
+                    printf("  Ratio: %s\n", strlratio(i, j).c_str());
+                }
             }
 
             if (tr_variantDictFindStrView(t, TR_KEY_errorString, &sv) && !std::empty(sv) &&
@@ -2017,7 +2025,7 @@ static int processResponse(char const* rpcurl, std::string_view response)
 
     if (!tr_variantFromBuf(&top, TR_VARIANT_PARSE_JSON | TR_VARIANT_PARSE_INPLACE, response))
     {
-        tr_logAddNamedWarn(MyName, fmt::format("Unable to parse response '{}'", response));
+        tr_logAddWarn(fmt::format("Unable to parse response '{}'", response));
         status |= EXIT_FAILURE;
     }
     else
@@ -2189,7 +2197,7 @@ static int flush(char const* rpcurl, tr_variant** benc)
     auto const res = curl_easy_perform(curl);
     if (res != CURLE_OK)
     {
-        tr_logAddNamedWarn(MyName, fmt::format(" ({}) {}", rpcurl_http, curl_easy_strerror(res)));
+        tr_logAddWarn(fmt::format(" ({}) {}", rpcurl_http, curl_easy_strerror(res)));
         status |= EXIT_FAILURE;
     }
     else
