@@ -516,7 +516,14 @@ public:
         return metainfo_.infoDictOffset();
     }
 
-    /// METAINFO - CHECKSUMS
+    /// METAINFO - PIECE CHECKSUMS
+
+    [[nodiscard]] bool isPieceChecked(tr_piece_index_t piece) const
+    {
+        return checked_pieces_.test(piece);
+    }
+
+    [[nodiscard]] bool checkPiece(tr_piece_index_t piece);
 
     [[nodiscard]] bool ensurePieceIsChecked(tr_piece_index_t piece);
 
@@ -578,8 +585,6 @@ public:
 
     tr_torrent_metainfo metainfo_;
 
-    tr_bitfield checked_pieces_ = tr_bitfield{ 0 };
-
     // TODO(ckerr): make private once some of torrent.cc's `tr_torrentFoo()` methods are member functions
     tr_completion completion;
 
@@ -599,8 +604,6 @@ public:
     tr_stat_errtype error = TR_STAT_OK;
     tr_interned_string error_announce_url;
     std::string error_string;
-
-    bool checkPiece(tr_piece_index_t piece);
 
     tr_sha1_digest_t obfuscated_hash = {};
 
@@ -725,7 +728,13 @@ public:
     tr_file_priorities file_priorities_{ &fpm_ };
     tr_files_wanted files_wanted_{ &fpm_ };
 
+    // when Transmission thinks the torrent's files were last changed
     std::vector<time_t> file_mtimes_;
+
+    // true iff the piece was verified more recently than any of the piece's
+    // files' mtimes (file_mtimes_). If checked_pieces_.test(piece) is false,
+    // it means that piece needs to be checked before its data is used.
+    tr_bitfield checked_pieces_ = tr_bitfield{ 0 };
 
 private:
     void setFilesWanted(tr_file_index_t const* files, size_t n_files, bool wanted, bool is_bootstrapping)
