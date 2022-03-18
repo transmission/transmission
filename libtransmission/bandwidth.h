@@ -27,10 +27,10 @@ class tr_peerIo;
 
 struct tr_bandwidth_limits
 {
-    bool up_limited;
-    unsigned int up_limit_KBps;
-    bool down_limited;
-    unsigned int down_limit_KBps;
+    unsigned int up_limit_KBps = 0;
+    unsigned int down_limit_KBps = 0;
+    bool up_limited = false;
+    bool down_limited = false;
 };
 
 /**
@@ -233,8 +233,8 @@ public:
         RateControl piece_;
         unsigned int bytes_left_;
         unsigned int desired_speed_bps_;
-        bool is_limited_;
-        bool honor_parent_limits_;
+        bool is_limited_ = false;
+        bool honor_parent_limits_ = true;
     };
 
     tr_bandwidth_limits getLimits() const;
