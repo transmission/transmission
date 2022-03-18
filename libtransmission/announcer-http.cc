@@ -157,11 +157,13 @@ void tr_announcerParseHttpAnnounceResponse(tr_announce_response& response, std::
         using BasicHandler = transmission::benc::BasicHandler<MaxBencDepth>;
 
         tr_announce_response& response_;
+        std::string_view const log_name_;
         std::optional<size_t> row_;
         tr_pex pex_ = {};
 
-        explicit AnnounceHandler(tr_announce_response& response)
+        explicit AnnounceHandler(tr_announce_response& response, std::string_view log_name)
             : response_{ response }
+            , log_name_{ log_name }
         {
         }
 
@@ -187,7 +189,7 @@ void tr_announcerParseHttpAnnounceResponse(tr_announce_response& response, std::
             return true;
         }
 
-        bool Int64(int64_t value, Context const& context) override
+        bool Int64(int64_t value, Context const& /*context*/) override
         {
             if (auto const key = currentKey(); key == "interval")
             {
@@ -213,16 +215,15 @@ void tr_announcerParseHttpAnnounceResponse(tr_announce_response& response, std::
             {
                 pex_.port = htons(uint16_t(value));
             }
-            else if (!tr_error_is_set(context.error))
+            else
             {
-                auto const msg = tr_strvJoin("unexpected int: key["sv, key, "] value["sv, std::to_string(value), "]"sv);
-                tr_error_set(context.error, EINVAL, msg);
+                tr_logAddDebug(fmt::format("unexpected key '{}' int '{}'", key, value), log_name_);
             }
 
             return true;
         }
 
-        bool String(std::string_view value, Context const& context) override
+        bool String(std::string_view value, Context const& /*context*/) override
         {
             if (auto const key = currentKey(); key == "failure reason"sv)
             {
@@ -256,9 +257,9 @@ void tr_announcerParseHttpAnnounceResponse(tr_announce_response& response, std::
             {
                 response_.external_ip = tr_address::from_4byte_ipv4(value);
             }
-            else if (!tr_error_is_set(context.error))
+            else
             {
-                tr_error_set(context.error, EINVAL, tr_strvJoin("unexpected str: key["sv, key, "] value["sv, value, "]"sv));
+                tr_logAddDebug(fmt::format("unexpected key '{}' int '{}'", key, value), log_name_);
             }
 
             return true;
@@ -266,7 +267,7 @@ void tr_announcerParseHttpAnnounceResponse(tr_announce_response& response, std::
     };
 
     auto stack = transmission::benc::ParserStack<MaxBencDepth>{};
-    auto handler = AnnounceHandler{ response };
+    auto handler = AnnounceHandler{ response, log_name };
     tr_error* error = nullptr;
     transmission::benc::parse(benc, stack, handler, nullptr, &error);
     if (error != nullptr)
@@ -364,10 +365,12 @@ void tr_announcerParseHttpScrapeResponse(tr_scrape_response& response, std::stri
         using BasicHandler = transmission::benc::BasicHandler<MaxBencDepth>;
 
         tr_scrape_response& response_;
+        std::string_view const log_name_;
         std::optional<size_t> row_;
 
-        explicit ScrapeHandler(tr_scrape_response& response)
+        explicit ScrapeHandler(tr_scrape_response& response, std::string_view const log_name)
             : response_{ response }
+            , log_name_{ log_name }
         {
         }
 
@@ -396,7 +399,7 @@ void tr_announcerParseHttpScrapeResponse(tr_scrape_response& response, std::stri
             return true;
         }
 
-        bool Int64(int64_t value, Context const& context) override
+        bool Int64(int64_t value, Context const& /*context*/) override
         {
             if (auto const key = currentKey(); row_ && key == "complete"sv)
             {
@@ -418,24 +421,23 @@ void tr_announcerParseHttpScrapeResponse(tr_scrape_response& response, std::stri
             {
                 response_.min_request_interval = value;
             }
-            else if (!tr_error_is_set(context.error))
+            else
             {
-                auto const errmsg = tr_strvJoin("unexpected int: key["sv, key, "] value["sv, std::to_string(value), "]"sv);
-                tr_error_set(context.error, EINVAL, errmsg);
+                tr_logAddDebug(fmt::format("unexpected key '{}' int '{}'", key, value), log_name_);
             }
 
             return true;
         }
 
-        bool String(std::string_view value, Context const& context) override
+        bool String(std::string_view value, Context const& /*context*/) override
         {
             if (auto const key = currentKey(); depth() == 1 && key == "failure reason"sv)
             {
                 response_.errmsg = value;
             }
-            else if (!tr_error_is_set(context.error))
+            else
             {
-                tr_error_set(context.error, EINVAL, tr_strvJoin("unexpected string: key["sv, key, "] value["sv, value, "]"sv));
+                tr_logAddDebug(fmt::format("unexpected key '{}' str '{}'", key, value), log_name_);
             }
 
             return true;
@@ -443,7 +445,7 @@ void tr_announcerParseHttpScrapeResponse(tr_scrape_response& response, std::stri
     };
 
     auto stack = transmission::benc::ParserStack<MaxBencDepth>{};
-    auto handler = ScrapeHandler{ response };
+    auto handler = ScrapeHandler{ response, log_name };
     tr_error* error = nullptr;
     transmission::benc::parse(benc, stack, handler, nullptr, &error);
     if (error != nullptr)
