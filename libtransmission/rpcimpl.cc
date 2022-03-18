@@ -1725,14 +1725,14 @@ static char const* groupGet(tr_session* s, tr_variant* args_in, tr_variant* args
         }
     }
 
-    tr_variant* list = tr_variantDictAddList(args_out, TR_KEY_group, 1);
-    for (auto const& [name, group] : s->bandwidth_groups)
+    auto* const list = tr_variantDictAddList(args_out, TR_KEY_group, 1);
+    for (auto const& [name, group] : s->bandwidth_groups_)
     {
-        if (names.empty() || names.count(name) > 0)
+        if (names.empty() || names.count(name.sv()) > 0)
         {
             tr_variant* dict = tr_variantListAddDict(list, 5);
             auto limits = group->getLimits();
-            tr_variantDictAddStrView(dict, TR_KEY_name, name);
+            tr_variantDictAddStrView(dict, TR_KEY_name, name.sv());
             tr_variantDictAddBool(dict, TR_KEY_uploadLimited, limits.up_limited);
             tr_variantDictAddInt(dict, TR_KEY_uploadLimit, limits.up_limit_KBps);
             tr_variantDictAddBool(dict, TR_KEY_downloadLimited, limits.down_limited);
@@ -1750,41 +1750,36 @@ static char const* groupSet(
     tr_variant* /*args_out*/,
     struct tr_rpc_idle_data* /*idle_data*/)
 {
-    std::string_view name;
-
-    if (!tr_variantDictFindStrView(args_in, TR_KEY_name, &name))
+    auto name = std::string_view{};
+    tr_variantDictFindStrView(args_in, TR_KEY_name, &name);
+    name = tr_strvStrip(name);
+    if (std::empty(name))
     {
         return "No group name given";
     }
 
-    Bandwidth* group = session->bandwidthGroupFind(name);
-    if (group == nullptr)
-    {
-        return "No such group";
-    }
-
-    auto limits = group->getLimits();
+    auto& group = session->getBandwidthGroup(name);
+    auto limits = group.getLimits();
 
     tr_variantDictFindBool(args_in, TR_KEY_speed_limit_down_enabled, &limits.down_limited);
-    int64_t intVal = 0;
-    if (tr_variantDictFindInt(args_in, TR_KEY_speed_limit_down, &intVal))
-    {
-        limits.down_limit_KBps = intVal;
-    }
-
     tr_variantDictFindBool(args_in, TR_KEY_speed_limit_up_enabled, &limits.up_limited);
-    if (tr_variantDictFindInt(args_in, TR_KEY_speed_limit_up, &intVal))
+
+    if (auto limit = int64_t{}; tr_variantDictFindInt(args_in, TR_KEY_speed_limit_down, &limit))
     {
-        limits.up_limit_KBps = intVal;
+        limits.down_limit_KBps = limit;
     }
 
-    group->setLimits(&limits);
-
-    bool honors = false;
-    if (tr_variantDictFindBool(args_in, TR_KEY_honorsSessionLimits, &honors))
+    if (auto limit = int64_t{}; tr_variantDictFindInt(args_in, TR_KEY_speed_limit_up, &limit))
     {
-        group->honorParentLimits(TR_UP, honors);
-        group->honorParentLimits(TR_DOWN, honors);
+        limits.up_limit_KBps = limit;
+    }
+
+    group.setLimits(&limits);
+
+    if (auto honors = bool{}; tr_variantDictFindBool(args_in, TR_KEY_honorsSessionLimits, &honors))
+    {
+        group.honorParentLimits(TR_UP, honors);
+        group.honorParentLimits(TR_DOWN, honors);
     }
 
     return nullptr;

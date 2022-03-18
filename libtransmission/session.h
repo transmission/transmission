@@ -16,6 +16,7 @@
 #include <cstdint> // uintX_t
 #include <ctime>
 #include <list>
+#include <map>
 #include <memory>
 #include <mutex>
 #include <string>
@@ -27,6 +28,7 @@
 
 #include "announce-list.h"
 #include "bandwidth.h"
+#include "interned-string.h"
 #include "net.h" // tr_socket_t
 #include "quark.h"
 #include "torrents.h"
@@ -255,6 +257,10 @@ public:
         tr_netSetTOS(sock, peer_socket_tos_, type);
     }
 
+    // bandwidth
+
+    Bandwidth& getBandwidthGroup(std::string_view name);
+
 public:
     static constexpr std::array<std::tuple<tr_quark, tr_quark, TrScript>, 3> Scripts{
         { { TR_KEY_script_torrent_added_enabled, TR_KEY_script_torrent_added_filename, TR_SCRIPT_ON_TORRENT_ADDED },
@@ -384,10 +390,10 @@ public:
     struct event* nowTimer;
     struct event* saveTimer;
 
-    /* monitors the "global pool" speeds */
-    // Changed to non-owning pointer temporarily till tr_session becomes C++-constructible and destructible
-    // TODO: change tr_bandwidth* to owning pointer to the bandwidth, or remove * and own the value
-    Bandwidth* bandwidth;
+    // monitors the "global pool" speeds
+    Bandwidth top_bandwidth_;
+
+    std::map<tr_interned_string, std::unique_ptr<Bandwidth>> bandwidth_groups_;
 
     float desiredRatio;
 
@@ -404,9 +410,6 @@ public:
     // See tr_netTos*() in libtransmission/net.h for more info
     // Only session.cc should use this.
     int peer_socket_tos_ = *tr_netTosFromName(TR_DEFAULT_PEER_SOCKET_TOS_STR);
-
-    Bandwidth* bandwidthGroupFind(std::string_view name);
-    std::map<std::string, Bandwidth*> bandwidth_groups;
 
 private:
     static std::recursive_mutex session_mutex_;

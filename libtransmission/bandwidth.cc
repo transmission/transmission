@@ -86,11 +86,9 @@ void Bandwidth::notifyBandwidthConsumedBytes(uint64_t const now, RateControl* r,
 ****
 ***/
 
-Bandwidth::Bandwidth(Bandwidth* new_parent)
+Bandwidth::Bandwidth(Bandwidth* parent)
 {
-    this->band_[TR_UP].honor_parent_limits_ = true;
-    this->band_[TR_DOWN].honor_parent_limits_ = true;
-    this->setParent(new_parent);
+    this->setParent(parent);
 }
 
 /***
