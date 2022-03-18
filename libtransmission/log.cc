@@ -3,10 +3,13 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include <array>
 #include <cerrno>
 #include <cstdio>
 #include <map>
 #include <mutex>
+#include <string_view>
+#include <utility>
 
 #include <event2/buffer.h>
 
@@ -288,4 +291,54 @@ void tr_logAddMessage(char const* file, int line, tr_log_level level, std::strin
     }
 
     errno = err;
+}
+
+///
+
+namespace
+{
+
+auto constexpr LogKeys = std::array<std::pair<std::string_view, tr_log_level>, 7>{ { { "off", TR_LOG_OFF },
+                                                                                     { "critical", TR_LOG_CRITICAL },
+                                                                                     { "error", TR_LOG_ERROR },
+                                                                                     { "warn", TR_LOG_WARN },
+                                                                                     { "info", TR_LOG_INFO },
+                                                                                     { "debug", TR_LOG_DEBUG },
+                                                                                     { "trace", TR_LOG_TRACE } } };
+
+bool constexpr keysAreOrdered()
+{
+    for (size_t i = 0, n = std::size(LogKeys); i < n; ++i)
+    {
+        if (LogKeys[i].second != i)
+        {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+static_assert(keysAreOrdered());
+
+} // unnamed namespace
+
+std::optional<tr_log_level> tr_logGetLevelFromKey(std::string_view key_in)
+{
+    auto const key = tr_strlower(tr_strvStrip(key_in));
+
+    for (auto const& [name, level] : LogKeys)
+    {
+        if (key == name)
+        {
+            return level;
+        }
+    }
+
+    return std::nullopt;
+}
+
+std::string_view tr_logLevelToKey(tr_log_level key)
+{
+    return LogKeys[key].first;
 }

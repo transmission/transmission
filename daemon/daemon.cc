@@ -4,10 +4,12 @@
 // License text can be found in the licenses/ folder.
 
 #include <array>
-#include <errno.h>
-#include <stdio.h> /* printf */
-#include <stdlib.h> /* atoi */
+#include <cerrno>
+#include <cstdio> /* printf */
+#include <cstdlib> /* atoi */
+#include <iostream>
 #include <string_view>
+#include <utility>
 
 #ifdef HAVE_SYSLOG
 #include <syslog.h>
@@ -24,11 +26,12 @@
 #include <fmt/core.h>
 
 #include <libtransmission/transmission.h>
+
 #include <libtransmission/error.h>
 #include <libtransmission/file.h>
+#include <libtransmission/log.h>
 #include <libtransmission/tr-getopt.h>
 #include <libtransmission/tr-macros.h>
-#include <libtransmission/log.h>
 #include <libtransmission/utils.h>
 #include <libtransmission/variant.h>
 #include <libtransmission/version.h>
@@ -100,7 +103,7 @@ static struct event_base* ev_base = nullptr;
 ****  Config File
 ***/
 
-static auto constexpr Options = std::array<tr_option, 44>{
+static auto constexpr Options = std::array<tr_option, 45>{
     { { 'a', "allowed", "Allowed IP addresses. (Default: " TR_DEFAULT_RPC_WHITELIST ")", "a", true, "<list>" },
       { 'b', "blocklist", "Enable peer blocklists", "b", false, nullptr },
       { 'B', "no-blocklist", "Disable peer blocklists", "B", false, nullptr },
@@ -119,9 +122,10 @@ static auto constexpr Options = std::array<tr_option, 44>{
       { 'u', "username", "Set username for authentication", "u", true, "<username>" },
       { 'v', "password", "Set password for authentication", "v", true, "<password>" },
       { 'V', "version", "Show version number and exit", "V", false, nullptr },
-      { 810, "log-error", "Show error messages", nullptr, false, nullptr },
-      { 811, "log-info", "Show error and info messages", nullptr, false, nullptr },
-      { 812, "log-debug", "Show error, info, and debug messages", nullptr, false, nullptr },
+      { 810, "log-level", "Must be 'critical', 'error', 'warn', 'info', 'debug', or 'trace'.", nullptr, true, "<level>" },
+      { 811, "log-error", "Deprecated. Use --log-level=error", nullptr, false, nullptr },
+      { 812, "log-info", "Deprecated. Use --log-level=info", nullptr, false, nullptr },
+      { 813, "log-debug", "Deprecated. Use --log-level=debug", nullptr, false, nullptr },
       { 'w', "download-dir", "Where to save downloaded data", "w", true, "<path>" },
       { 800, "paused", "Pause all torrents on startup", nullptr, false, nullptr },
       { 'o', "dht", "Enable distributed hash tables (DHT)", "o", false, nullptr },
@@ -582,14 +586,28 @@ static bool parse_args(
             break;
 
         case 810:
-            tr_variantDictAddInt(settings, TR_KEY_message_level, TR_LOG_ERROR);
+            if (auto const level = tr_logGetLevelFromKey(optstr); level)
+            {
+                tr_variantDictAddInt(settings, TR_KEY_message_level, *level);
+            }
+            else
+            {
+                std::cerr << fmt::format(_("Couldn't parse log level '{level}'"), fmt::arg("level", optstr)) << std::endl;
+            }
             break;
 
         case 811:
-            tr_variantDictAddInt(settings, TR_KEY_message_level, TR_LOG_INFO);
+            std::cerr << "WARN: --log-error is deprecated. Use --log-level=error" << std::endl;
+            tr_variantDictAddInt(settings, TR_KEY_message_level, TR_LOG_ERROR);
             break;
 
         case 812:
+            std::cerr << "WARN: --log-info is deprecated. Use --log-level=info" << std::endl;
+            tr_variantDictAddInt(settings, TR_KEY_message_level, TR_LOG_INFO);
+            break;
+
+        case 813:
+            std::cerr << "WARN: --log-debug is deprecated. Use --log-level=debug" << std::endl;
             tr_variantDictAddInt(settings, TR_KEY_message_level, TR_LOG_DEBUG);
             break;
 
