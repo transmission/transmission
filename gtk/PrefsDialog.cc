@@ -415,7 +415,7 @@ void updateBlocklistText(Gtk::Label* w, Glib::RefPtr<Session> const& core)
     auto const msg = fmt::format(
         ngettext("Blocklist has {count} entry", "Blocklist has {count} entries", n),
         fmt::arg("count", n));
-    w->set_markup(gtr_sprintf("<i>%s</i>", msg.c_str()));
+    w->set_markup(fmt::format("<i>{}</i>", msg));
 }
 
 /* prefs dialog is being destroyed, so stop listening to blocklist updates */
@@ -887,7 +887,11 @@ Gtk::Widget* PrefsDialog::Impl::speedPage()
     t->add_section_title(row, _("Speed Limits"));
 
     {
-        auto* w = new_check_button(gtr_sprintf(_("_Upload (%s):"), _(speed_K_str)), TR_KEY_speed_limit_up_enabled, core_);
+        auto* w = new_check_button(
+            // checkbox to limit upload speed
+            fmt::format(_("_Upload ({speed_units}):"), fmt::arg("speed_units", speed_K_str)),
+            TR_KEY_speed_limit_up_enabled,
+            core_);
         auto* w2 = new_spin_button(TR_KEY_speed_limit_up, core_, 0, INT_MAX, 5);
         w2->set_sensitive(gtr_pref_flag_get(TR_KEY_speed_limit_up_enabled));
         w->signal_toggled().connect([w, w2]() { target_cb(w, w2); });
@@ -895,7 +899,11 @@ Gtk::Widget* PrefsDialog::Impl::speedPage()
     }
 
     {
-        auto* w = new_check_button(gtr_sprintf(_("_Download (%s):"), _(speed_K_str)), TR_KEY_speed_limit_down_enabled, core_);
+        auto* w = new_check_button(
+            // checkbox to limit download speed
+            fmt::format(_("_Download ({speed_units}):"), fmt::arg("speed_units", speed_K_str)),
+            TR_KEY_speed_limit_down_enabled,
+            core_);
         auto* w2 = new_spin_button(TR_KEY_speed_limit_down, core_, 0, INT_MAX, 5);
         w2->set_sensitive(gtr_pref_flag_get(TR_KEY_speed_limit_down_enabled));
         w->signal_toggled().connect([w, w2]() { target_cb(w, w2); });
@@ -906,7 +914,7 @@ Gtk::Widget* PrefsDialog::Impl::speedPage()
 
     {
         auto* h = Gtk::make_managed<Gtk::Box>(Gtk::ORIENTATION_HORIZONTAL, GUI_PAD);
-        auto* w = Gtk::make_managed<Gtk::Label>(gtr_sprintf("<b>%s</b>", _("Alternative Speed Limits")));
+        auto* w = Gtk::make_managed<Gtk::Label>(fmt::format("<b>{}</b>", _("Alternative Speed Limits")));
         w->set_halign(Gtk::ALIGN_START);
         w->set_valign(Gtk::ALIGN_CENTER);
         w->set_use_markup(true);
@@ -917,7 +925,7 @@ Gtk::Widget* PrefsDialog::Impl::speedPage()
 
     {
         auto* w = Gtk::make_managed<Gtk::Label>(
-            gtr_sprintf("<small>%s</small>", _("Override normal speed limits manually or at scheduled times")));
+            fmt::format("<small>{}</small>", _("Override normal speed limits manually or at scheduled times")));
         w->set_use_markup(true);
         w->set_halign(Gtk::ALIGN_START);
         w->set_valign(Gtk::ALIGN_CENTER);
@@ -926,12 +934,14 @@ Gtk::Widget* PrefsDialog::Impl::speedPage()
 
     t->add_row(
         row,
-        gtr_sprintf(_("U_pload (%s):"), _(speed_K_str)),
+        // checkbox for alternate upload speed limits
+        fmt::format(_("U_pload ({speed_units})"), fmt::arg("speed_units", speed_K_str)),
         *new_spin_button(TR_KEY_alt_speed_up, core_, 0, INT_MAX, 5));
 
     t->add_row(
         row,
-        gtr_sprintf(_("Do_wnload (%s):"), _(speed_K_str)),
+        // checkbox for alternate download speed limits
+        fmt::format(_("Do_wnload ({speed_units})"), fmt::arg("speed_units", speed_K_str)),
         *new_spin_button(TR_KEY_alt_speed_down, core_, 0, INT_MAX, 5));
 
     {
@@ -939,6 +949,7 @@ Gtk::Widget* PrefsDialog::Impl::speedPage()
         auto* start_combo = new_time_combo(core_, TR_KEY_alt_speed_time_begin);
         page->sched_widgets.push_back(start_combo);
         h->pack_start(*start_combo, true, true, 0);
+        // label goes between two time selectors, e.g. "limit speeds from [time] to [time]"
         auto* to_label = Gtk::make_managed<Gtk::Label>(_(" _to "), true);
         page->sched_widgets.push_back(to_label);
         h->pack_start(*to_label, false, false, 0);
@@ -1006,7 +1017,10 @@ network_page_data::~network_page_data()
 
 void onPortTested(bool isOpen, network_page_data* data)
 {
-    data->portLabel->set_markup(isOpen ? _("Port is <b>open</b>") : _("Port is <b>closed</b>"));
+    data->portLabel->set_markup(fmt::format(
+        isOpen ? _("Port is {markup_begin}open{markup_end}") : _("Port is {markup_begin}closed{markup_end}"),
+        fmt::arg("markup_begin", "<b>"),
+        fmt::arg("markup_end", "</b>")));
     data->portButton->set_sensitive(true);
     data->portSpin->set_sensitive(true);
 }

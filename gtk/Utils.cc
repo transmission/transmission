@@ -56,7 +56,7 @@ char const* const speed_T_str = N_("TB/s");
 ****
 ***/
 
-std::string gtr_get_unicode_string(GtrUnicode uni)
+Glib::ustring gtr_get_unicode_string(GtrUnicode uni)
 {
     switch (uni)
     {
@@ -77,24 +77,27 @@ std::string gtr_get_unicode_string(GtrUnicode uni)
     }
 }
 
-std::string tr_strlratio(double ratio)
+Glib::ustring tr_strlratio(double ratio)
 {
     return tr_strratio(ratio, gtr_get_unicode_string(GtrUnicode::Inf).c_str());
 }
 
-std::string tr_strlpercent(double x)
+Glib::ustring tr_strlpercent(double x)
 {
     return tr_strpercent(x);
 }
 
-std::string tr_strlsize(guint64 bytes)
+Glib::ustring tr_strlsize(guint64 bytes)
 {
     return bytes == 0 ? Q_("None") : tr_formatter_size_B(bytes);
 }
 
-std::string tr_strltime(time_t seconds)
+Glib::ustring tr_strltime(time_t seconds)
 {
-    seconds = std::max(time_t{ 0 }, seconds);
+    if (seconds < 0)
+    {
+        seconds = 0;
+    }
 
     auto const days = (int)(seconds / 86400);
     auto const d = fmt::format(ngettext("{days} day", "{days} days", days), fmt::arg("days", days));
@@ -149,14 +152,14 @@ void gtr_add_torrent_error_dialog(Gtk::Widget& child, tr_torrent* duplicate_torr
 
     if (duplicate_torrent != nullptr)
     {
-        secondary = gtr_sprintf(
-            _("The torrent file \"%s\" is already in use by \"%s.\""),
-            filename,
-            tr_torrentName(duplicate_torrent));
+        secondary = fmt::format(
+            _("The torrent file '{path}' is already in use by '{torrent_name}'."),
+            fmt::arg("path", filename),
+            fmt::arg("torrent_name", tr_torrentName(duplicate_torrent)));
     }
     else
     {
-        secondary = gtr_sprintf(_("Unable to add torrent file \"%s\"."), filename);
+        secondary = fmt::format(_("Couldn't add .torrent file '{path}'"), fmt::arg("path", filename));
     }
 
     auto w = std::make_shared<Gtk::MessageDialog>(
@@ -447,13 +450,13 @@ void gtr_unrecognized_url_dialog(Gtk::Widget& parent, Glib::ustring const& url)
 
     auto w = std::make_shared<Gtk::MessageDialog>(
         *window,
-        fmt::format(_("Unsupported URL: '{url}'"), fmt::arg("url", url.raw())),
+        fmt::format(_("Unsupported URL: '{url}'"), fmt::arg("url", url)),
         false /*use markup*/,
         Gtk::MESSAGE_ERROR,
         Gtk::BUTTONS_CLOSE,
         true /*modal*/);
 
-    gstr += gtr_sprintf(_("Transmission doesn't know how to use \"%s\""), url);
+    gstr += fmt::format(_("Transmission doesn't know how to use '{url}'"), fmt::arg("url", url));
 
     if (tr_magnet_metainfo{}.parseMagnet(url.raw()))
     {

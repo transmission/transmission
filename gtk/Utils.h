@@ -14,6 +14,9 @@
 #include <glibmm.h>
 #include <gtkmm.h>
 
+#include <fmt/core.h>
+#include <fmt/format.h>
+
 #include <libtransmission/transmission.h>
 #include <libtransmission/tr-macros.h>
 
@@ -43,19 +46,19 @@ enum class GtrUnicode
     Bullet
 };
 
-std::string gtr_get_unicode_string(GtrUnicode);
+Glib::ustring gtr_get_unicode_string(GtrUnicode);
 
 /* return a percent formatted string of either x.xx, xx.x or xxx */
-std::string tr_strlpercent(double x);
+Glib::ustring tr_strlpercent(double x);
 
 /* return a human-readable string for the size given in bytes. */
-std::string tr_strlsize(guint64 size);
+Glib::ustring tr_strlsize(guint64 size);
 
 /* return a human-readable string for the given ratio. */
-std::string tr_strlratio(double ratio);
+Glib::ustring tr_strlratio(double ratio);
 
 /* return a human-readable string for the time given in seconds. */
-std::string tr_strltime(time_t secs);
+Glib::ustring tr_strltime(time_t secs);
 
 /***
 ****
@@ -201,6 +204,16 @@ struct std::hash<Glib::ustring>
     std::size_t operator()(Glib::ustring const& s) const
     {
         return std::hash<std::string>()(s.raw());
+    }
+};
+
+template<>
+struct fmt::formatter<Glib::ustring> : formatter<std::string>
+{
+    template<typename FormatContext>
+    auto format(Glib::ustring const& ustr, FormatContext& ctx) const
+    {
+        return formatter<std::string>::format(ustr.raw(), ctx);
     }
 };
 

@@ -111,11 +111,11 @@ bool MakeProgressDialog::onProgressDialogRefresh()
     /* progress label */
     if (!builder_.isDone)
     {
-        str = gtr_sprintf(_("Creating \"%s\""), base);
+        str = fmt::format(_("Creating '{path}'"), fmt::arg("path", base));
     }
     else if (builder_.result == TrMakemetaResult::OK)
     {
-        str = gtr_sprintf(_("Created \"%s\"!"), base);
+        str = fmt::format(_("Created '{path}'"), fmt::arg("path", base));
     }
     else if (builder_.result == TrMakemetaResult::CANCELLED)
     {
@@ -130,7 +130,7 @@ bool MakeProgressDialog::onProgressDialogRefresh()
         str = fmt::format(
             _("Couldn't read '{path}': {error} ({error_code})"),
             fmt::arg("path", builder_.errfile),
-            fmt::arg("error", Glib::strerror(builder_.my_errno).raw()),
+            fmt::arg("error", Glib::strerror(builder_.my_errno)),
             fmt::arg("error_code", builder_.my_errno));
     }
     else if (builder_.result == TrMakemetaResult::ERR_IO_WRITE)
@@ -138,7 +138,7 @@ bool MakeProgressDialog::onProgressDialogRefresh()
         str = fmt::format(
             _("Couldn't save '{path}': {error} ({error_code})"),
             fmt::arg("path", builder_.errfile),
-            fmt::arg("error", Glib::strerror(builder_.my_errno).raw()),
+            fmt::arg("error", Glib::strerror(builder_.my_errno)),
             fmt::arg("error_code", builder_.my_errno));
     }
     else
@@ -276,7 +276,7 @@ void MakeDialog::Impl::onResponse(int response)
             /* destination file */
             auto const dir = destination_chooser_->get_filename();
             auto const base = Glib::path_get_basename(builder_->top);
-            auto const target = gtr_sprintf("%s/%s.torrent", dir, base).raw();
+            auto const target = gtr_sprintf("%s/%s.torrent", dir, base);
 
             /* build the array of trackers */
             auto const tracker_text = announce_text_buffer_->get_text(false);
@@ -498,9 +498,8 @@ MakeDialog::Impl::Impl(MakeDialog& dialog, Glib::RefPtr<Session> const& core)
     fr->add(*sw);
     v->pack_start(*fr, true, true, 0);
     auto* l = Gtk::make_managed<Gtk::Label>();
-    l->set_markup(
-        _("To add a backup URL, add it on the line after the primary URL.\n"
-          "To add another primary URL, add it after a blank line."));
+    l->set_markup(_(
+        "To add a backup URL, add it on the next line after a primary URL.\nTo add a new primary URL, add it after a blank line."));
     l->set_justify(Gtk::JUSTIFY_LEFT);
     l->set_halign(Gtk::ALIGN_START);
     l->set_valign(Gtk::ALIGN_CENTER);

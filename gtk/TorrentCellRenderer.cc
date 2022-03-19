@@ -59,39 +59,39 @@ auto getProgressString(tr_torrent const* tor, uint64_t total_size, tr_stat const
     {
         // 50 MB of 200 MB (25%), uploaded 30 MB (Ratio: X%, Goal: Y%)
         gstr += fmt::format(
-            _("{current_size} of {complete_size} ({percent_complete}%), uploaded {uploaded_ever} (Ratio: {ratio}, Goal: {seed_ratio})"),
+            _("{current_size} of {complete_size} ({percent_complete}%), uploaded {uploaded_size} (Ratio: {ratio}, Goal: {seed_ratio})"),
             fmt::arg("current_size", tr_strlsize(haveTotal)),
             fmt::arg("complete_size", tr_strlsize(total_size)),
             fmt::arg("percent_done", tr_strlpercent(st->percentComplete * 100.0)),
-            fmt::arg("uploaded_ever", tr_strlsize(st->uploadedEver)),
+            fmt::arg("uploaded_size", tr_strlsize(st->uploadedEver)),
             fmt::arg("ratio", tr_strlratio(st->ratio)),
             fmt::arg("seed_ratio", tr_strlratio(seedRatio)));
     }
     else if (!isSeed) // partial seed, no seed ratio
     {
         gstr += fmt::format(
-            _("{current_size} of {complete_size} ({percent_complete}%), uploaded {uploaded_ever} (Ratio: {ratio})"),
+            _("{current_size} of {complete_size} ({percent_complete}%), uploaded {uploaded_size} (Ratio: {ratio})"),
             fmt::arg("current_size", tr_strlsize(haveTotal)),
             fmt::arg("complete_size", tr_strlsize(total_size)),
             fmt::arg("percent_complete", tr_strlpercent(st->percentComplete * 100.0)),
-            fmt::arg("uploaded_ever", tr_strlsize(st->uploadedEver)),
+            fmt::arg("uploaded_size", tr_strlsize(st->uploadedEver)),
             fmt::arg("ratio", tr_strlratio(st->ratio)));
     }
     else if (hasSeedRatio) // seed, seed ratio
     {
         gstr += fmt::format(
-            _("{complete_size}, uploaded {uploaded_ever} (Ratio: {ratio}, Goal: {seed_ratio})"),
+            _("{complete_size}, uploaded {uploaded_size} (Ratio: {ratio}, Goal: {seed_ratio})"),
             fmt::arg("complete_size", tr_strlsize(total_size)),
-            fmt::arg("uploaded_ever", tr_strlsize(st->uploadedEver)),
+            fmt::arg("uploaded_size", tr_strlsize(st->uploadedEver)),
             fmt::arg("ratio", tr_strlratio(st->ratio)),
             fmt::arg("seed_ratio", tr_strlratio(seedRatio)));
     }
     else // seed, no seed ratio
     {
         gstr += fmt::format(
-            _("{complete_size}, uploaded {uploaded_ever} (Ratio: {ratio})"),
+            _("{complete_size}, uploaded {uploaded_size} (Ratio: {ratio})"),
             fmt::arg("complete_size", tr_strlsize(total_size)),
-            fmt::arg("uploaded_ever", tr_strlsize(st->uploadedEver)),
+            fmt::arg("uploaded_size", tr_strlsize(st->uploadedEver)),
             fmt::arg("ratio", tr_strlratio(st->ratio)));
     }
 

@@ -3,9 +3,10 @@
 // A copy of this license can be found in licenses/ .
 
 #include <algorithm>
-#include <cmath> /* pow() */
+#include <cmath> // pow()
 #include <cstring> // strstr
 #include <functional>
+#include <iostream>
 #include <map>
 #include <memory>
 #include <string>
@@ -617,9 +618,9 @@ void rename_torrent(Glib::RefPtr<Gio::File> const& file)
         {
             auto const errmsg = fmt::format(
                 _("Couldn't rename '{old_path}' as '{path}': {error} ({error_code})"),
-                fmt::arg("old_path", old_name.raw()),
-                fmt::arg("path", new_name.raw()),
-                fmt::arg("error", e.what().raw()),
+                fmt::arg("old_path", old_name),
+                fmt::arg("path", new_name),
+                fmt::arg("error", e.what()),
                 fmt::arg("error_code", e.code()));
             g_message("%s", errmsg.c_str());
         }
@@ -1115,7 +1116,7 @@ void Session::Impl::add_file_async_callback(
     {
         if (!file->load_contents_finish(result, contents, length))
         {
-            auto const errmsg = fmt::format(_("Couldn't read '{path}'"), fmt::arg("path", file->get_parse_name().raw()));
+            auto const errmsg = fmt::format(_("Couldn't read '{path}'"), fmt::arg("path", file->get_parse_name()));
             g_message("%s", errmsg.c_str());
         }
         else if (tr_ctorSetMetainfo(ctor, contents, length, nullptr))
@@ -1131,8 +1132,8 @@ void Session::Impl::add_file_async_callback(
     {
         auto const errmsg = fmt::format(
             _("Couldn't read '{path}': {error} ({error_code})"),
-            fmt::arg("path", file->get_parse_name().raw()),
-            fmt::arg("error", e.what().raw()),
+            fmt::arg("path", file->get_parse_name()),
+            fmt::arg("error", e.what()),
             fmt::arg("error_code", e.code()));
         g_message("%s", errmsg.c_str());
     }
@@ -1182,7 +1183,8 @@ bool Session::Impl::add_file(Glib::RefPtr<Gio::File> const& file, bool do_start,
     else
     {
         tr_ctorFree(ctor);
-        g_message(_("Skipping unknown torrent \"%s\""), file->get_parse_name().c_str());
+        std::cerr << fmt::format(_("Couldn't add .torrent file '{path}'"), fmt::arg("path", file->get_parse_name()))
+                  << std::endl;
     }
 
     return handled;
@@ -1457,7 +1459,7 @@ bool gtr_inhibit_hibernation(guint32& cookie)
     }
     catch (Glib::Error const& e)
     {
-        tr_logAddError(fmt::format(_("Couldn't inhibit desktop hibernation: {error}"), fmt::arg("error", e.what().raw())));
+        tr_logAddError(fmt::format(_("Couldn't inhibit desktop hibernation: {error}"), fmt::arg("error", e.what())));
     }
 
     return success;
@@ -1482,7 +1484,7 @@ void gtr_uninhibit_hibernation(guint inhibit_cookie)
     }
     catch (Glib::Error const& e)
     {
-        tr_logAddError(fmt::format(_("Couldn't inhibit desktop hibernation: {error}"), fmt::arg("error", e.what().raw())));
+        tr_logAddError(fmt::format(_("Couldn't inhibit desktop hibernation: {error}"), fmt::arg("error", e.what())));
     }
 }
 
