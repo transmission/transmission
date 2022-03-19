@@ -158,7 +158,7 @@ bool MakeProgressDialog::onProgressDialogRefresh()
         /* how much data we've scanned through to generate checksums */
         str = fmt::format(
             _("Scanned {file_size}"),
-            fmt::arg("file_size", tr_strlsize((uint64_t)builder_.pieceIndex * (uint64_t)builder_.pieceSize).raw()));
+            fmt::arg("file_size", tr_strlsize((uint64_t)builder_.pieceIndex * (uint64_t)builder_.pieceSize)));
     }
 
     progress_bar_->set_fraction(fraction);

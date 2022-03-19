@@ -43,19 +43,19 @@ enum class GtrUnicode
     Bullet
 };
 
-Glib::ustring gtr_get_unicode_string(GtrUnicode);
+std::string gtr_get_unicode_string(GtrUnicode);
 
 /* return a percent formatted string of either x.xx, xx.x or xxx */
-Glib::ustring tr_strlpercent(double x);
+std::string tr_strlpercent(double x);
 
 /* return a human-readable string for the size given in bytes. */
-Glib::ustring tr_strlsize(guint64 size);
+std::string tr_strlsize(guint64 size);
 
 /* return a human-readable string for the given ratio. */
-Glib::ustring tr_strlratio(double ratio);
+std::string tr_strlratio(double ratio);
 
 /* return a human-readable string for the time given in seconds. */
-Glib::ustring tr_strltime(time_t secs);
+std::string tr_strltime(time_t secs);
 
 /***
 ****

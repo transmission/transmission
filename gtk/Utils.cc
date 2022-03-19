@@ -56,7 +56,7 @@ char const* const speed_T_str = N_("TB/s");
 ****
 ***/
 
-Glib::ustring gtr_get_unicode_string(GtrUnicode uni)
+std::string gtr_get_unicode_string(GtrUnicode uni)
 {
     switch (uni)
     {
@@ -77,54 +77,49 @@ Glib::ustring gtr_get_unicode_string(GtrUnicode uni)
     }
 }
 
-Glib::ustring tr_strlratio(double ratio)
+std::string tr_strlratio(double ratio)
 {
     return tr_strratio(ratio, gtr_get_unicode_string(GtrUnicode::Inf).c_str());
 }
 
-Glib::ustring tr_strlpercent(double x)
+std::string tr_strlpercent(double x)
 {
     return tr_strpercent(x);
 }
 
-Glib::ustring tr_strlsize(guint64 bytes)
+std::string tr_strlsize(guint64 bytes)
 {
     return bytes == 0 ? Q_("None") : tr_formatter_size_B(bytes);
 }
 
-Glib::ustring tr_strltime(time_t seconds)
+std::string tr_strltime(time_t seconds)
 {
-    if (seconds < 0)
-    {
-        seconds = 0;
-    }
+    seconds = std::max(time_t{ 0 }, seconds);
 
     auto const days = (int)(seconds / 86400);
+    auto const d = fmt::format(ngettext("{days} day", "{days} days", days), fmt::arg("days", days));
     int const hours = (seconds % 86400) / 3600;
-    int const minutes = (seconds % 3600) / 60;
-    seconds = (seconds % 3600) % 60;
-
-    auto const d = gtr_sprintf(ngettext("%'d day", "%'d days", days), days);
-    auto const h = gtr_sprintf(ngettext("%'d hour", "%'d hours", hours), hours);
-    auto const m = gtr_sprintf(ngettext("%'d minute", "%'d minutes", minutes), minutes);
-    auto const s = gtr_sprintf(ngettext("%'d second", "%'d seconds", (int)seconds), (int)seconds);
-
+    auto const h = fmt::format(ngettext("{hours} hour", "{hours} hours", hours), fmt::arg("hours", hours));
     if (days != 0)
     {
-        return (days >= 4 || hours == 0) ? d : gtr_sprintf("%s, %s", d, h);
+        return (days >= 4 || hours == 0) ? d : fmt::format("{}, {}", d, h);
     }
-    else if (hours != 0)
+
+    int const minutes = (seconds % 3600) / 60;
+    auto const m = fmt::format(ngettext("{minutes} minute", "{minutes} minutes", minutes), fmt::arg("minutes", minutes));
+    if (hours != 0)
     {
-        return (hours >= 4 || minutes == 0) ? h : gtr_sprintf("%s, %s", h, m);
+        return (hours >= 4 || minutes == 0) ? h : fmt::format("{}, {}", h, m);
     }
-    else if (minutes != 0)
+
+    seconds = (seconds % 3600) % 60;
+    auto const s = fmt::format(ngettext("{seconds} second", "{seconds} seconds", seconds), fmt::arg("seconds", seconds));
+    if (minutes != 0)
     {
-        return (minutes >= 4 || seconds == 0) ? m : gtr_sprintf("%s, %s", m, s);
+        return (minutes >= 4 || seconds == 0) ? m : fmt::format("{}, {}", m, s);
     }
-    else
-    {
-        return s;
-    }
+
+    return s;
 }
 
 namespace
