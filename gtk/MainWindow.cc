@@ -608,7 +608,7 @@ void MainWindow::Impl::updateStats()
     else /* default is total-ratio */
     {
         tr_sessionGetCumulativeStats(session, &stats);
-        buf = fmt::format(_("Ratio: {ratio}"), tr_strlratio(stats.ratio));
+        buf = fmt::format(_("Ratio: {ratio}"), fmt::arg("ratio", tr_strlratio(stats.ratio)));
     }
 
     stats_lb_->set_text(buf);

@@ -608,7 +608,7 @@ std::string get_date_string(time_t t)
 
     struct tm tm;
     tr_localtime_r(&t, &tm);
-    return fmt::format("{c}", tm);
+    return fmt::format("{:%x}", tm);
 }
 
 } // namespace
