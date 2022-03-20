@@ -408,7 +408,6 @@ char const* tr_getWebClientDir([[maybe_unused]] tr_session const* session)
                 if (!std::empty(dir))
                 {
                     char* path = tr_buildPath(dir.c_str(), "Web", nullptr);
-                    tr_free(dir);
 
                     if (isWebClientDir(path))
                     {
