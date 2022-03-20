@@ -935,13 +935,13 @@ Gtk::Widget* PrefsDialog::Impl::speedPage()
     t->add_row(
         row,
         // labels a spinbutton for alternate upload speed limits
-        fmt::format(_("U_pload ({speed_units})"), fmt::arg("speed_units", speed_K_str)),
+        fmt::format(_("U_pload ({speed_units}):"), fmt::arg("speed_units", speed_K_str)),
         *new_spin_button(TR_KEY_alt_speed_up, core_, 0, INT_MAX, 5));
 
     t->add_row(
         row,
         // labels a spinbutton for alternate download speed limits
-        fmt::format(_("Do_wnload ({speed_units})"), fmt::arg("speed_units", speed_K_str)),
+        fmt::format(_("Do_wnload ({speed_units}):"), fmt::arg("speed_units", speed_K_str)),
         *new_spin_button(TR_KEY_alt_speed_down, core_, 0, INT_MAX, 5));
 
     {
