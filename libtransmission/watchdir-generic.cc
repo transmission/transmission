@@ -5,9 +5,12 @@
 
 #include <cerrno>
 #include <string>
+#include <string_view>
 #include <unordered_set>
 
 #include <event2/event.h>
+
+#include <fmt/core.h>
 
 #define LIBTRANSMISSION_WATCHDIR_MODULE
 
@@ -17,14 +20,6 @@
 #include "utils.h"
 #include "watchdir.h"
 #include "watchdir-common.h"
-
-/***
-****
-***/
-
-#define log_error(...) \
-    (!tr_logLevelIsActive(TR_LOG_ERROR) ? (void)0 : \
-                                          tr_logAddMessage(__FILE__, __LINE__, TR_LOG_ERROR, "watchdir:generic", __VA_ARGS__))
 
 /***
 ****
@@ -84,13 +79,21 @@ tr_watchdir_backend* tr_watchdir_generic_new(tr_watchdir_t handle)
              ->event = event_new(tr_watchdir_get_event_base(handle), -1, EV_PERSIST, &tr_watchdir_generic_on_event, handle)) ==
         nullptr)
     {
-        log_error("Failed to create event: %s", tr_strerror(errno));
+        auto const error_code = errno;
+        tr_logAddError(fmt::format(
+            _("Couldn't create event: {error} ({error_code})"),
+            fmt::arg("error", tr_strerror(error_code)),
+            fmt::arg("error_code", error_code)));
         goto FAIL;
     }
 
     if (event_add(backend->event, &tr_watchdir_generic_interval) == -1)
     {
-        log_error("Failed to add event: %s", tr_strerror(errno));
+        auto const error_code = errno;
+        tr_logAddError(fmt::format(
+            _("Couldn't add event: {error} ({error_code})"),
+            fmt::arg("error", tr_strerror(error_code)),
+            fmt::arg("error_code", error_code)));
         goto FAIL;
     }
 

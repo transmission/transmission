@@ -613,16 +613,18 @@ void DetailsDialog::refreshUI()
     }
     else
     {
-        auto u = uint64_t{};
-        auto d = uint64_t{};
+        auto uploaded = uint64_t{};
+        auto denominator = uint64_t{};
 
         for (Torrent const* const t : torrents)
         {
-            u += t->uploadedEver();
-            d += t->downloadedEver();
+            uploaded += t->uploadedEver();
+            denominator += t->sizeWhenDone();
         }
 
-        string = tr("%1 (Ratio: %2)").arg(fmt.sizeToString(u)).arg(fmt.ratioToString(tr_getRatio(u, d)));
+        string = tr("%1 (Ratio: %2)")
+                     .arg(fmt.sizeToString(uploaded))
+                     .arg(fmt.ratioToString(tr_getRatio(uploaded, denominator)));
     }
 
     ui_.uploadedValueLabel->setText(string);

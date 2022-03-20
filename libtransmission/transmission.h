@@ -738,70 +738,6 @@ bool tr_sessionIsScriptEnabled(tr_session const*, TrScript);
 ***
 **/
 
-/***********************************************************************
-** Message Logging
-*/
-
-enum tr_log_level
-{
-    // No logging at all
-    TR_LOG_OFF,
-
-    // Errors that prevent Transmission from running
-    TR_LOG_CRITICAL,
-
-    // Errors that could prevent a single torrent from running, e.g. missing
-    // files or a private torrent's tracker responding "unregistered torrent"
-    TR_LOG_ERROR,
-
-    // Smaller errors that don't stop the overall system,
-    // e.g. unable to preallocate a file, or unable to connect to a tracker
-    // when other trackers are available
-    TR_LOG_WARN,
-
-    // User-visible info, e.g. "torrent completed" or "running script"
-    TR_LOG_INFO,
-
-    // Debug messages
-    TR_LOG_DEBUG,
-
-    // High-volume debug messages, e.g. tracing peer protocol messages
-    TR_LOG_TRACE
-};
-
-void tr_logSetLevel(tr_log_level);
-
-struct tr_log_message
-{
-    /* TR_LOG_ERROR, TR_LOG_INFO, or TR_LOG_DEBUG */
-    tr_log_level level;
-
-    /* The line number in the source file where this message originated */
-    int line;
-
-    /* Time the message was generated */
-    time_t when;
-
-    /* The torrent associated with this message,
-     * or a module name such as "Port Forwarding" for non-torrent messages,
-     * or nullptr. */
-    char* name;
-
-    /* The message */
-    char* message;
-
-    /* The source file where this message originated */
-    char const* file;
-
-    /* linked list of messages */
-    struct tr_log_message* next;
-};
-
-tr_log_message* tr_logGetQueue(void);
-bool tr_logGetQueueEnabled(void);
-void tr_logSetQueueEnabled(bool isEnabled);
-void tr_logFreeQueue(tr_log_message* freeme);
-
 /** @addtogroup Blocklists
     @{ */
 
@@ -1699,9 +1635,9 @@ struct tr_stat
         or 0 if you can't */
     time_t manualAnnounceTime;
 
-    /** Total uploaded bytes / total torrent size.
+    /** Total uploaded bytes / sizeWhenDone.
         NB: In Transmission 3.00 and earlier, this was total upload / download,
-        which caused edge cases when total download was less than the total size. */
+        which caused edge cases when total download was less than sizeWhenDone. */
     float ratio;
 
     /** When the torrent was first added. */

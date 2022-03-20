@@ -227,8 +227,8 @@ struct tr_peerMgr
     event* atomTimer = nullptr;
 };
 
-#define tr_logAddDebugSwarm(swarm, ...) tr_logAddNamedDebug(tr_torrentName((swarm)->tor), __VA_ARGS__)
-#define tr_logAddTraceSwarm(swarm, ...) tr_logAddNamedTrace(tr_torrentName((swarm)->tor), __VA_ARGS__)
+#define tr_logAddDebugSwarm(swarm, msg) tr_logAddDebugTor((swarm)->tor, msg)
+#define tr_logAddTraceSwarm(swarm, msg) tr_logAddTraceTor((swarm)->tor, msg)
 
 /**
 *** tr_peer virtual functions
@@ -1071,7 +1071,7 @@ static bool on_handshake_done(tr_handshake_result const& result)
 
                 /* this steals its refcount too, which is balanced by our unref in peerDelete() */
                 tr_peerIo* stolen = tr_handshakeStealIO(result.handshake);
-                tr_peerIoSetParent(stolen, s->tor->bandwidth);
+                tr_peerIoSetParent(stolen, &s->tor->bandwidth_);
                 createBitTorrentPeer(s->tor, stolen, atom, client);
 
                 success = true;
@@ -1100,7 +1100,7 @@ void tr_peerMgrAddIncoming(tr_peerMgr* manager, tr_address const* addr, tr_port 
     }
     else /* we don't have a connection to them yet... */
     {
-        tr_peerIo* const io = tr_peerIoNewIncoming(session, session->bandwidth, addr, port, tr_time(), socket);
+        tr_peerIo* const io = tr_peerIoNewIncoming(session, &session->top_bandwidth_, addr, port, tr_time(), socket);
         tr_handshake* const handshake = tr_handshakeNew(io, session->encryptionMode, on_handshake_done, manager);
 
         tr_peerIoUnref(io); /* balanced by the implicit ref in tr_peerIoNewIncoming() */
@@ -2091,15 +2091,15 @@ static int getRate(tr_torrent const* tor, struct peer_atom const* atom, uint64_t
     return Bps;
 }
 
-static inline bool isBandwidthMaxedOut(Bandwidth const* b, uint64_t const now_msec, tr_direction dir)
+static inline bool isBandwidthMaxedOut(Bandwidth const& b, uint64_t const now_msec, tr_direction dir)
 {
-    if (!b->isLimited(dir))
+    if (!b.isLimited(dir))
     {
         return false;
     }
 
-    unsigned int const got = b->getPieceSpeedBytesPerSecond(now_msec, dir);
-    unsigned int const want = b->getDesiredSpeedBytesPerSecond(dir);
+    unsigned int const got = b.getPieceSpeedBytesPerSecond(now_msec, dir);
+    unsigned int const want = b.getDesiredSpeedBytesPerSecond(dir);
     return got >= want;
 }
 
@@ -2112,7 +2112,7 @@ static void rechokeUploads(tr_swarm* s, uint64_t const now)
     auto* const choke = tr_new0(struct ChokeData, peerCount);
     tr_session const* session = s->manager->session;
     bool const chokeAll = !s->tor->clientCanUpload();
-    bool const isMaxedOut = isBandwidthMaxedOut(s->tor->bandwidth, now, TR_UP);
+    bool const isMaxedOut = isBandwidthMaxedOut(s->tor->bandwidth_, now, TR_UP);
 
     /* an optimistic unchoke peer's "optimistic"
      * state lasts for N calls to rechokeUploads(). */
@@ -2604,8 +2604,8 @@ static void bandwidthPulse(evutil_socket_t /*fd*/, short /*what*/, void* vmgr)
     pumpAllPeers(mgr);
 
     /* allocate bandwidth to the peers */
-    session->bandwidth->allocate(TR_UP, BandwidthPeriodMsec);
-    session->bandwidth->allocate(TR_DOWN, BandwidthPeriodMsec);
+    session->top_bandwidth_.allocate(TR_UP, BandwidthPeriodMsec);
+    session->top_bandwidth_.allocate(TR_DOWN, BandwidthPeriodMsec);
 
     /* torrent upkeep */
     for (auto* const tor : session->torrents())
@@ -2973,7 +2973,7 @@ static std::vector<peer_candidate> getPeerCandidates(tr_session* session, size_t
         }
 
         /* if we've already got enough speed in this torrent... */
-        if (seeding && isBandwidthMaxedOut(tor->bandwidth, now_msec, TR_UP))
+        if (seeding && isBandwidthMaxedOut(tor->bandwidth_, now_msec, TR_UP))
         {
             continue;
         }
@@ -3026,7 +3026,7 @@ static void initiateConnection(tr_peerMgr* mgr, tr_swarm* s, struct peer_atom* a
 
     tr_peerIo* const io = tr_peerIoNewOutgoing(
         mgr->session,
-        mgr->session->bandwidth,
+        &mgr->session->top_bandwidth_,
         &atom->addr,
         atom->port,
         tr_time(),

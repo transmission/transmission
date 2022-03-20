@@ -14,6 +14,7 @@
 
 #include <libtransmission/error.h>
 #include <libtransmission/file.h>
+#include <libtransmission/log.h>
 #include <libtransmission/makemeta.h>
 #include <libtransmission/tr-getopt.h>
 #include <libtransmission/utils.h>

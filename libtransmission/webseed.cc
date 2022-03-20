@@ -154,7 +154,7 @@ public:
         , base_url{ url }
         , callback{ callback_in }
         , callback_data{ callback_data_in }
-        , bandwidth(tor->bandwidth)
+        , bandwidth(&tor->bandwidth_)
         , pulse_timer(evtimer_new(session->event_base, &tr_webseed::onTimer, this), event_free)
     {
         // init parent bits

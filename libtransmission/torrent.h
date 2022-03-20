@@ -190,47 +190,52 @@ public:
 
     /// COMPLETION
 
-    [[nodiscard]] uint64_t leftUntilDone() const
+    [[nodiscard]] auto leftUntilDone() const
     {
         return completion.leftUntilDone();
     }
 
-    [[nodiscard]] bool hasAll() const
+    [[nodiscard]] auto sizeWhenDone() const
+    {
+        return completion.sizeWhenDone();
+    }
+
+    [[nodiscard]] auto hasAll() const
     {
         return completion.hasAll();
     }
 
-    [[nodiscard]] bool hasNone() const
+    [[nodiscard]] auto hasNone() const
     {
         return completion.hasNone();
     }
 
-    [[nodiscard]] bool hasPiece(tr_piece_index_t piece) const
+    [[nodiscard]] auto hasPiece(tr_piece_index_t piece) const
     {
         return completion.hasPiece(piece);
     }
 
-    [[nodiscard]] bool hasBlock(tr_block_index_t block) const
+    [[nodiscard]] auto hasBlock(tr_block_index_t block) const
     {
         return completion.hasBlock(block);
     }
 
-    [[nodiscard]] size_t countMissingBlocksInPiece(tr_piece_index_t piece) const
+    [[nodiscard]] auto countMissingBlocksInPiece(tr_piece_index_t piece) const
     {
         return completion.countMissingBlocksInPiece(piece);
     }
 
-    [[nodiscard]] size_t countMissingBytesInPiece(tr_piece_index_t piece) const
+    [[nodiscard]] auto countMissingBytesInPiece(tr_piece_index_t piece) const
     {
         return completion.countMissingBytesInPiece(piece);
     }
 
-    [[nodiscard]] uint64_t hasTotal() const
+    [[nodiscard]] auto hasTotal() const
     {
         return completion.hasTotal();
     }
 
-    [[nodiscard]] std::vector<uint8_t> createPieceBitfield() const
+    [[nodiscard]] auto createPieceBitfield() const
     {
         return completion.createPieceBitfield();
     }
@@ -511,7 +516,14 @@ public:
         return metainfo_.infoDictOffset();
     }
 
-    /// METAINFO - CHECKSUMS
+    /// METAINFO - PIECE CHECKSUMS
+
+    [[nodiscard]] bool isPieceChecked(tr_piece_index_t piece) const
+    {
+        return checked_pieces_.test(piece);
+    }
+
+    [[nodiscard]] bool checkPiece(tr_piece_index_t piece);
 
     [[nodiscard]] bool ensurePieceIsChecked(tr_piece_index_t piece);
 
@@ -573,8 +585,6 @@ public:
 
     tr_torrent_metainfo metainfo_;
 
-    tr_bitfield checked_pieces_ = tr_bitfield{ 0 };
-
     // TODO(ckerr): make private once some of torrent.cc's `tr_torrentFoo()` methods are member functions
     tr_completion completion;
 
@@ -582,9 +592,7 @@ public:
 
     tr_torrent_announcer* torrent_announcer = nullptr;
 
-    // Changed to non-owning pointer temporarily till tr_torrent becomes C++-constructible and destructible
-    // TODO: change tr_bandwidth* to owning pointer to the bandwidth, or remove * and own the value
-    Bandwidth* bandwidth = nullptr;
+    Bandwidth bandwidth_;
 
     tr_swarm* swarm = nullptr;
 
@@ -596,8 +604,6 @@ public:
     tr_stat_errtype error = TR_STAT_OK;
     tr_interned_string error_announce_url;
     std::string error_string;
-
-    bool checkPiece(tr_piece_index_t piece);
 
     tr_sha1_digest_t obfuscated_hash = {};
 
@@ -712,13 +718,23 @@ public:
 
     tr_labels_t labels;
 
+    std::string group;
+    /* Set the bandwidth group the torrent belongs to */
+    void setGroup(std::string_view groupName);
+
     static auto constexpr MagicNumber = int{ 95549 };
 
     tr_file_piece_map fpm_ = tr_file_piece_map{ metainfo_ };
     tr_file_priorities file_priorities_{ &fpm_ };
     tr_files_wanted files_wanted_{ &fpm_ };
 
+    // when Transmission thinks the torrent's files were last changed
     std::vector<time_t> file_mtimes_;
+
+    // true iff the piece was verified more recently than any of the piece's
+    // files' mtimes (file_mtimes_). If checked_pieces_.test(piece) is false,
+    // it means that piece needs to be checked before its data is used.
+    tr_bitfield checked_pieces_ = tr_bitfield{ 0 };
 
 private:
     void setFilesWanted(tr_file_index_t const* files, size_t n_files, bool wanted, bool is_bootstrapping)
@@ -779,9 +795,9 @@ bool tr_ctorSetMetainfoFromFile(tr_ctor* ctor, std::string const& filename, tr_e
 bool tr_ctorSetMetainfoFromMagnetLink(tr_ctor* ctor, std::string const& filename, tr_error** error);
 void tr_ctorSetLabels(tr_ctor* ctor, tr_labels_t&& labels);
 
-#define tr_logAddCriticalTor(tor, ...) tr_logAddNamed(TR_LOG_CRITICAL, (tor)->name(), __VA_ARGS__)
-#define tr_logAddErrorTor(tor, ...) tr_logAddNamed(TR_LOG_ERROR, (tor)->name(), __VA_ARGS__)
-#define tr_logAddWarnTor(tor, ...) tr_logAddNamed(TR_LOG_WARN, (tor)->name(), __VA_ARGS__)
-#define tr_logAddInfoTor(tor, ...) tr_logAddNamed(TR_LOG_INFO, (tor)->name(), __VA_ARGS__)
-#define tr_logAddDebugTor(tor, ...) tr_logAddNamed(TR_LOG_DEBUG, (tor)->name(), __VA_ARGS__)
-#define tr_logAddTraceTor(tor, ...) tr_logAddNamed(TR_LOG_TRACE, (tor)->name(), __VA_ARGS__)
+#define tr_logAddCriticalTor(tor, msg) tr_logAddCritical(msg, (tor)->name())
+#define tr_logAddErrorTor(tor, msg) tr_logAddError(msg, (tor)->name())
+#define tr_logAddWarnTor(tor, msg) tr_logAddWarn(msg, (tor)->name())
+#define tr_logAddInfoTor(tor, msg) tr_logAddInfo(msg, (tor)->name())
+#define tr_logAddDebugTor(tor, msg) tr_logAddDebug(msg, (tor)->name())
+#define tr_logAddTraceTor(tor, msg) tr_logAddTrace(msg, (tor)->name())

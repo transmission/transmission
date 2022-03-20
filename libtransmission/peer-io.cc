@@ -44,10 +44,10 @@
 
 #define UTP_READ_BUFFER_SIZE (256 * 1024)
 
-#define tr_logAddErrorIo(io, ...) tr_logAddNamedError((io)->addrStr(), __VA_ARGS__)
-#define tr_logAddWarnIo(io, ...) tr_logAddNamedWarn((io)->addrStr(), __VA_ARGS__)
-#define tr_logAddDebugIo(io, ...) tr_logAddNamedDebug((io)->addrStr(), __VA_ARGS__)
-#define tr_logAddTraceIo(io, ...) tr_logAddNamedTrace((io)->addrStr(), __VA_ARGS__)
+#define tr_logAddErrorIo(io, msg) tr_logAddError(msg, (io)->addrStr())
+#define tr_logAddWarnIo(io, msg) tr_logAddWarn(msg, (io)->addrStr())
+#define tr_logAddDebugIo(io, msg) tr_logAddDebug(msg, (io)->addrStr())
+#define tr_logAddTraceIo(io, msg) tr_logAddTrace(msg, (io)->addrStr())
 
 static size_t guessPacketOverhead(size_t d)
 {
@@ -429,7 +429,7 @@ static void utp_on_read(void* vio, unsigned char const* buf, size_t buflen)
 
     if (rc < 0)
     {
-        tr_logAddNamedError("UTP", "On read evbuffer_add");
+        tr_logAddError("On read evbuffer_add");
         return;
     }
 
@@ -556,14 +556,14 @@ static auto utp_function_table = UTPFunctionTable{
 static void dummy_read(void* /*closure*/, unsigned char const* /*buf*/, size_t /*buflen*/)
 {
     // This cannot happen, as far as I'm aware. */
-    tr_logAddNamedError("UTP", "On_read called on closed socket");
+    tr_logAddTrace("On_read called on closed socket");
 }
 
 static void dummy_write(void* /*closure*/, unsigned char* buf, size_t buflen)
 {
     /* This can very well happen if we've shut down a peer connection that
        had unflushed buffers.Complain and send zeroes.*/
-    tr_logAddNamedWarn("UTP", "On_write called on closed socket");
+    tr_logAddTrace("On_write called on closed socket");
     memset(buf, 0, buflen);
 }
 

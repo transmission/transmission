@@ -5,6 +5,7 @@
 
 #include <algorithm>
 #include <vector>
+#include <cstring>
 
 #include <fmt/core.h>
 
@@ -12,10 +13,15 @@
 
 #include "bandwidth.h"
 #include "crypto-utils.h" /* tr_rand_int_weak() */
+#include "error.h"
 #include "log.h"
 #include "peer-io.h"
+#include "platform.h"
+#include "quark.h"
+#include "session.h"
 #include "tr-assert.h"
 #include "utils.h"
+#include "variant.h"
 
 /***
 ****
@@ -80,11 +86,9 @@ void Bandwidth::notifyBandwidthConsumedBytes(uint64_t const now, RateControl* r,
 ****
 ***/
 
-Bandwidth::Bandwidth(Bandwidth* new_parent)
+Bandwidth::Bandwidth(Bandwidth* parent)
 {
-    this->band_[TR_UP].honor_parent_limits_ = true;
-    this->band_[TR_DOWN].honor_parent_limits_ = true;
-    this->setParent(new_parent);
+    this->setParent(parent);
 }
 
 /***
@@ -335,4 +339,26 @@ void Bandwidth::notifyBandwidthConsumed(tr_direction dir, size_t byte_count, boo
     {
         this->parent_->notifyBandwidthConsumed(dir, byte_count, is_piece_data, now);
     }
+}
+
+/***
+****
+***/
+
+tr_bandwidth_limits Bandwidth::getLimits() const
+{
+    tr_bandwidth_limits limits;
+    limits.up_limit_KBps = tr_toSpeedKBps(this->getDesiredSpeedBytesPerSecond(TR_UP));
+    limits.down_limit_KBps = tr_toSpeedKBps(this->getDesiredSpeedBytesPerSecond(TR_DOWN));
+    limits.up_limited = this->isLimited(TR_UP);
+    limits.down_limited = this->isLimited(TR_DOWN);
+    return limits;
+}
+
+void Bandwidth::setLimits(tr_bandwidth_limits const* limits)
+{
+    this->setDesiredSpeedBytesPerSecond(TR_UP, tr_toSpeedBytes(limits->up_limit_KBps));
+    this->setDesiredSpeedBytesPerSecond(TR_DOWN, tr_toSpeedBytes(limits->down_limit_KBps));
+    this->setLimited(TR_UP, limits->up_limited);
+    this->setLimited(TR_DOWN, limits->down_limited);
 }

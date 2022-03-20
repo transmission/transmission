@@ -163,11 +163,13 @@ void tr_announcerParseHttpAnnounceResponse(tr_announce_response& response, std::
         using BasicHandler = transmission::benc::BasicHandler<MaxBencDepth>;
 
         tr_announce_response& response_;
+        std::string_view const log_name_;
         std::optional<size_t> row_;
         tr_pex pex_ = {};
 
-        explicit AnnounceHandler(tr_announce_response& response)
+        explicit AnnounceHandler(tr_announce_response& response, std::string_view log_name)
             : response_{ response }
+            , log_name_{ log_name }
         {
         }
 
@@ -193,7 +195,7 @@ void tr_announcerParseHttpAnnounceResponse(tr_announce_response& response, std::
             return true;
         }
 
-        bool Int64(int64_t value, Context const& context) override
+        bool Int64(int64_t value, Context const& /*context*/) override
         {
             if (auto const key = currentKey(); key == "interval")
             {
@@ -219,16 +221,15 @@ void tr_announcerParseHttpAnnounceResponse(tr_announce_response& response, std::
             {
                 pex_.port = htons(uint16_t(value));
             }
-            else if (!tr_error_is_set(context.error))
+            else
             {
-                auto const msg = tr_strvJoin("unexpected int: key["sv, key, "] value["sv, std::to_string(value), "]"sv);
-                tr_error_set(context.error, EINVAL, msg);
+                tr_logAddDebug(fmt::format("unexpected key '{}' int '{}'", key, value), log_name_);
             }
 
             return true;
         }
 
-        bool String(std::string_view value, Context const& context) override
+        bool String(std::string_view value, Context const& /*context*/) override
         {
             if (auto const key = currentKey(); key == "failure reason"sv)
             {
@@ -262,9 +263,9 @@ void tr_announcerParseHttpAnnounceResponse(tr_announce_response& response, std::
             {
                 response_.external_ip = tr_address::from_4byte_ipv4(value);
             }
-            else if (!tr_error_is_set(context.error))
+            else
             {
-                tr_error_set(context.error, EINVAL, tr_strvJoin("unexpected str: key["sv, key, "] value["sv, value, "]"sv));
+                tr_logAddDebug(fmt::format("unexpected key '{}' int '{}'", key, value), log_name_);
             }
 
             return true;
@@ -272,16 +273,17 @@ void tr_announcerParseHttpAnnounceResponse(tr_announce_response& response, std::
     };
 
     auto stack = transmission::benc::ParserStack<MaxBencDepth>{};
-    auto handler = AnnounceHandler{ response };
+    auto handler = AnnounceHandler{ response, log_name };
     tr_error* error = nullptr;
     transmission::benc::parse(benc, stack, handler, nullptr, &error);
     if (error != nullptr)
     {
-        auto const errmsg = fmt::format(
-            _("Couldn't parse announce response: {error} ({error_code})"),
-            fmt::arg("error", error->message),
-            fmt::arg("error_code", error->code));
-        tr_logAddNamedWarn(log_name, errmsg);
+        tr_logAddWarn(
+            fmt::format(
+                _("Couldn't parse announce response: {error} ({error_code})"),
+                fmt::arg("error", error->message),
+                fmt::arg("error_code", error->code)),
+            log_name);
         tr_error_clear(&error);
     }
 }
@@ -308,7 +310,7 @@ static bool handleAnnounceResponse(tr_web::FetchResponse const& web_response, tr
 
     response->did_connect = did_connect;
     response->did_timeout = did_timeout;
-    tr_logAddNamedTrace(data->log_name, "Got announce response");
+    tr_logAddTrace("Got announce response", data->log_name);
 
     if (status != HTTP_OK)
     {
@@ -322,12 +324,12 @@ static bool handleAnnounceResponse(tr_web::FetchResponse const& web_response, tr
 
     if (!std::empty(response->pex6))
     {
-        tr_logAddNamedTrace(data->log_name, fmt::format("got a peers6 length of {}", std::size(response->pex6)));
+        tr_logAddTrace(fmt::format("got a peers6 length of {}", std::size(response->pex6)), data->log_name);
     }
 
     if (!std::empty(response->pex))
     {
-        tr_logAddNamedTrace(data->log_name, fmt::format("got a peers length of {}", std::size(response->pex)));
+        tr_logAddTrace(fmt::format("got a peers length of {}", std::size(response->pex)), data->log_name);
     }
 
     return true;
@@ -377,7 +379,7 @@ static void onAnnounceDone(tr_web::FetchResponse const& web_response)
     }
     else
     {
-        tr_logAddNamedTrace(data->log_name, "Ignoring redundant announce response");
+        tr_logAddTrace("Ignoring redundant announce response", data->log_name);
     }
 
     // Free data if no more responses are expected:
@@ -421,7 +423,7 @@ void tr_tracker_http_announce(
 
     auto do_make_request = [&](std::string_view const& protocol_name, tr_web::FetchOptions&& options)
     {
-        tr_logAddNamedTrace(request->log_name, fmt::format("Sending {} announce to libcurl: '{}'", protocol_name, options.url));
+        tr_logAddTrace(fmt::format("Sending {} announce to libcurl: '{}'", protocol_name, options.url), request->log_name);
         session->web->fetch(std::move(options));
     };
 
@@ -486,10 +488,12 @@ void tr_announcerParseHttpScrapeResponse(tr_scrape_response& response, std::stri
         using BasicHandler = transmission::benc::BasicHandler<MaxBencDepth>;
 
         tr_scrape_response& response_;
+        std::string_view const log_name_;
         std::optional<size_t> row_;
 
-        explicit ScrapeHandler(tr_scrape_response& response)
+        explicit ScrapeHandler(tr_scrape_response& response, std::string_view const log_name)
             : response_{ response }
+            , log_name_{ log_name }
         {
         }
 
@@ -518,7 +522,7 @@ void tr_announcerParseHttpScrapeResponse(tr_scrape_response& response, std::stri
             return true;
         }
 
-        bool Int64(int64_t value, Context const& context) override
+        bool Int64(int64_t value, Context const& /*context*/) override
         {
             if (auto const key = currentKey(); row_ && key == "complete"sv)
             {
@@ -540,24 +544,23 @@ void tr_announcerParseHttpScrapeResponse(tr_scrape_response& response, std::stri
             {
                 response_.min_request_interval = value;
             }
-            else if (!tr_error_is_set(context.error))
+            else
             {
-                auto const errmsg = tr_strvJoin("unexpected int: key["sv, key, "] value["sv, std::to_string(value), "]"sv);
-                tr_error_set(context.error, EINVAL, errmsg);
+                tr_logAddDebug(fmt::format("unexpected key '{}' int '{}'", key, value), log_name_);
             }
 
             return true;
         }
 
-        bool String(std::string_view value, Context const& context) override
+        bool String(std::string_view value, Context const& /*context*/) override
         {
             if (auto const key = currentKey(); depth() == 1 && key == "failure reason"sv)
             {
                 response_.errmsg = value;
             }
-            else if (!tr_error_is_set(context.error))
+            else
             {
-                tr_error_set(context.error, EINVAL, tr_strvJoin("unexpected string: key["sv, key, "] value["sv, value, "]"sv));
+                tr_logAddDebug(fmt::format("unexpected key '{}' str '{}'", key, value), log_name_);
             }
 
             return true;
@@ -565,17 +568,17 @@ void tr_announcerParseHttpScrapeResponse(tr_scrape_response& response, std::stri
     };
 
     auto stack = transmission::benc::ParserStack<MaxBencDepth>{};
-    auto handler = ScrapeHandler{ response };
+    auto handler = ScrapeHandler{ response, log_name };
     tr_error* error = nullptr;
     transmission::benc::parse(benc, stack, handler, nullptr, &error);
     if (error != nullptr)
     {
-        tr_logAddNamedWarn(
-            log_name,
+        tr_logAddWarn(
             fmt::format(
                 _("Couldn't parse scrape response: {error} ({error_code})"),
                 fmt::arg("error", error->message),
-                fmt::arg("error_code", error->code)));
+                fmt::arg("error_code", error->code)),
+            log_name);
         tr_error_clear(&error);
     }
 }
@@ -598,7 +601,7 @@ static void onScrapeDone(tr_web::FetchResponse const& web_response)
     response.did_timeout = did_timeout;
 
     auto const scrape_url_sv = response.scrape_url.sv();
-    tr_logAddNamedTrace(data->log_name, fmt::format("Got scrape response for '{}'", scrape_url_sv));
+    tr_logAddTrace(fmt::format("Got scrape response for '{}'", scrape_url_sv), data->log_name);
 
     if (status != HTTP_OK)
     {
@@ -660,7 +663,7 @@ void tr_tracker_http_scrape(
     tr_strlcpy(d->log_name, request->log_name, sizeof(d->log_name));
 
     auto const url = scrape_url_new(request);
-    tr_logAddNamedTrace(request->log_name, fmt::format("Sending scrape to libcurl: '{}'", url));
+    tr_logAddTrace(fmt::format("Sending scrape to libcurl: '{}'", url), request->log_name);
 
     auto options = tr_web::FetchOptions{ url, onScrapeDone, d };
     options.timeout_secs = 30L;

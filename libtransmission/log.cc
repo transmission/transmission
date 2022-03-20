@@ -3,15 +3,20 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include <array>
 #include <cerrno>
-#include <cstdarg>
 #include <cstdio>
 #include <map>
 #include <mutex>
+#include <string_view>
+#include <utility>
 
 #include <event2/buffer.h>
 
+#include <fmt/core.h>
+
 #include "transmission.h"
+
 #include "file.h"
 #include "log.h"
 #include "tr-assert.h"
@@ -23,28 +28,24 @@
 
 using namespace std::literals;
 
-static tr_log_level tr_message_level = TR_LOG_ERROR;
-static bool myQueueEnabled = false;
-static tr_log_message* myQueue = nullptr;
-static tr_log_message** myQueueTail = &myQueue;
-static int myQueueLength = 0;
-
-/***
-****
-***/
-
-tr_log_level tr_logGetLevel()
+namespace
 {
-    return tr_message_level;
-}
 
-/***
-****
-***/
+tr_log_level tr_message_level = TR_LOG_ERROR;
 
-static std::recursive_mutex message_mutex_;
+bool myQueueEnabled = false;
 
-static tr_sys_file_t tr_logGetFile()
+tr_log_message* myQueue = nullptr;
+
+tr_log_message** myQueueTail = &myQueue;
+
+int myQueueLength = 0;
+
+std::recursive_mutex message_mutex_;
+
+///
+
+tr_sys_file_t tr_logGetFile()
 {
     static bool initialized = false;
     static tr_sys_file_t file = TR_BAD_SYS_FILE;
@@ -72,76 +73,12 @@ static tr_sys_file_t tr_logGetFile()
     return file;
 }
 
-void tr_logSetLevel(tr_log_level level)
-{
-    tr_message_level = level;
-}
-
-void tr_logSetQueueEnabled(bool isEnabled)
-{
-    myQueueEnabled = isEnabled;
-}
-
-bool tr_logGetQueueEnabled()
-{
-    return myQueueEnabled;
-}
-
-tr_log_message* tr_logGetQueue()
-{
-    auto const lock = std::lock_guard(message_mutex_);
-
-    auto* const ret = myQueue;
-    myQueue = nullptr;
-    myQueueTail = &myQueue;
-    myQueueLength = 0;
-
-    return ret;
-}
-
-void tr_logFreeQueue(tr_log_message* list)
-{
-    while (list != nullptr)
-    {
-        tr_log_message* next = list->next;
-        tr_free(list->message);
-        tr_free(list->name);
-        tr_free(list);
-        list = next;
-    }
-}
-
-/**
-***
-**/
-
-char* tr_logGetTimeStr(char* buf, size_t buflen)
-{
-    auto const tv = tr_gettimeofday();
-    time_t const seconds = tv.tv_sec;
-    auto const milliseconds = int(tv.tv_usec / 1000);
-    char msec_str[8];
-    tr_snprintf(msec_str, sizeof msec_str, "%03d", milliseconds);
-
-    struct tm now_tm;
-    tr_localtime_r(&seconds, &now_tm);
-    char date_str[32];
-    strftime(date_str, sizeof(date_str), "%Y-%m-%d %H:%M:%S", &now_tm);
-
-    tr_snprintf(buf, buflen, "%s.%s", date_str, msec_str);
-    return buf;
-}
-
-/***
-****
-***/
-
 void logAddImpl(
     [[maybe_unused]] char const* file,
     [[maybe_unused]] int line,
     tr_log_level level,
-    [[maybe_unused]] std::string_view name,
-    std::string_view msg)
+    std::string_view msg,
+    [[maybe_unused]] std::string_view name)
 {
     if (std::empty(msg))
     {
@@ -231,8 +168,91 @@ void logAddImpl(
 #endif
 }
 
-void tr_logAddMessage(char const* file, int line, tr_log_level level, std::string_view name, std::string_view msg)
+} // unnamed namespace
+
+tr_log_level tr_logGetLevel()
 {
+    return tr_message_level;
+}
+
+bool tr_logLevelIsActive(tr_log_level level)
+{
+    return tr_logGetLevel() >= level;
+}
+
+void tr_logSetLevel(tr_log_level level)
+{
+    tr_message_level = level;
+}
+
+void tr_logSetQueueEnabled(bool isEnabled)
+{
+    myQueueEnabled = isEnabled;
+}
+
+bool tr_logGetQueueEnabled()
+{
+    return myQueueEnabled;
+}
+
+tr_log_message* tr_logGetQueue()
+{
+    auto const lock = std::lock_guard(message_mutex_);
+
+    auto* const ret = myQueue;
+    myQueue = nullptr;
+    myQueueTail = &myQueue;
+    myQueueLength = 0;
+
+    return ret;
+}
+
+void tr_logFreeQueue(tr_log_message* list)
+{
+    while (list != nullptr)
+    {
+        tr_log_message* next = list->next;
+        tr_free(list->message);
+        tr_free(list->name);
+        tr_free(list);
+        list = next;
+    }
+}
+
+/**
+***
+**/
+
+char* tr_logGetTimeStr(char* buf, size_t buflen)
+{
+    auto const tv = tr_gettimeofday();
+    time_t const seconds = tv.tv_sec;
+    auto const milliseconds = int(tv.tv_usec / 1000);
+    char msec_str[8];
+    tr_snprintf(msec_str, sizeof msec_str, "%03d", milliseconds);
+
+    struct tm now_tm;
+    tr_localtime_r(&seconds, &now_tm);
+    char date_str[32];
+    strftime(date_str, sizeof(date_str), "%Y-%m-%d %H:%M:%S", &now_tm);
+
+    tr_snprintf(buf, buflen, "%s.%s", date_str, msec_str);
+    return buf;
+}
+
+void tr_logAddMessage(char const* file, int line, tr_log_level level, std::string_view msg, std::string_view name)
+{
+    TR_ASSERT(!std::empty(msg));
+
+    auto name_fallback = std::string{};
+    if (std::empty(name))
+    {
+        auto* base = tr_sys_path_basename(file, nullptr);
+        name_fallback = fmt::format("{}:{}", (base != nullptr ? base : "?"), line);
+        name = name_fallback;
+        tr_free(base);
+    }
+
     // message logging shouldn't affect errno
     int const err = errno;
 
@@ -264,37 +284,61 @@ void tr_logAddMessage(char const* file, int line, tr_log_level level, std::strin
     }
 
     // log the messages
-    logAddImpl(file, line, level, name, msg);
+    logAddImpl(file, line, level, msg, name);
     if (last_one)
     {
-        logAddImpl(file, line, level, "", _("Too many messages like this! I won't log this message anymore this session."));
+        logAddImpl(file, line, level, _("Too many messages like this! I won't log this message anymore this session."), name);
     }
 
     errno = err;
 }
 
-void tr_logAddMessage(
-    [[maybe_unused]] char const* file,
-    [[maybe_unused]] int line,
-    tr_log_level level,
-    [[maybe_unused]] std::string_view name,
-    char const* fmt,
-    ...)
-{
-    // message logging shouldn't affect errno
-    int const err = errno;
+///
 
-    // build the message
-    auto buf = std::array<char, 2048>{};
-    va_list ap;
-    va_start(ap, fmt);
-    int const buf_len = evutil_vsnprintf(std::data(buf), std::size(buf), fmt, ap);
-    va_end(ap);
-    if (buf_len <= 0)
+namespace
+{
+
+auto constexpr LogKeys = std::array<std::pair<std::string_view, tr_log_level>, 7>{ { { "off", TR_LOG_OFF },
+                                                                                     { "critical", TR_LOG_CRITICAL },
+                                                                                     { "error", TR_LOG_ERROR },
+                                                                                     { "warn", TR_LOG_WARN },
+                                                                                     { "info", TR_LOG_INFO },
+                                                                                     { "debug", TR_LOG_DEBUG },
+                                                                                     { "trace", TR_LOG_TRACE } } };
+
+bool constexpr keysAreOrdered()
+{
+    for (size_t i = 0, n = std::size(LogKeys); i < n; ++i)
     {
-        errno = err;
-        return;
+        if (LogKeys[i].second != i)
+        {
+            return false;
+        }
     }
 
-    tr_logAddMessage(file, line, level, name, std::string_view{ std::data(buf) });
+    return true;
+}
+
+static_assert(keysAreOrdered());
+
+} // unnamed namespace
+
+std::optional<tr_log_level> tr_logGetLevelFromKey(std::string_view key_in)
+{
+    auto const key = tr_strlower(tr_strvStrip(key_in));
+
+    for (auto const& [name, level] : LogKeys)
+    {
+        if (key == name)
+        {
+            return level;
+        }
+    }
+
+    return std::nullopt;
+}
+
+std::string_view tr_logLevelToKey(tr_log_level key)
+{
+    return LogKeys[key].first;
 }

@@ -243,7 +243,7 @@ enum
 ****
 ***/
 
-static auto constexpr Options = std::array<tr_option, 89>{
+static auto constexpr Options = std::array<tr_option, 91>{
     { { 'a', "add", "Add torrent files by filename or URL", "a", false, nullptr },
       { 970, "alt-speed", "Use the alternate Limits", "as", false, nullptr },
       { 971, "no-alt-speed", "Don't use the alternate Limits", "AS", false, nullptr },
@@ -258,6 +258,8 @@ static auto constexpr Options = std::array<tr_option, 89>{
       { 'c', "incomplete-dir", "Where to store new torrents until they're complete", "c", true, "<dir>" },
       { 'C', "no-incomplete-dir", "Don't store incomplete torrents in a different location", "C", false, nullptr },
       { 'b', "debug", "Print debugging information", "b", false, nullptr },
+      { 730, "bandwidth-group", "Set the current torrents' bandwidth group", "bwg", true, "<group>" },
+      { 731, "no-bandwidth-group", "Reset the current torrents' bandwidth group", "nwg", false, nullptr },
       { 'd',
         "downlimit",
         "Set the max download speed in " SPEED_K_STR " for the current torrent(s) or globally",
@@ -481,6 +483,8 @@ static int getOptMode(int val)
     case 900: /* file priority-high */
     case 901: /* file priority-normal */
     case 902: /* file priority-low */
+    case 730: /* set bandwidth group */
+    case 731: /* reset bandwidth group */
         return MODE_TORRENT_SET | MODE_TORRENT_ADD;
 
     case 961: /* find */
@@ -673,6 +677,11 @@ static void addLabels(tr_variant* args, std::string_view comma_delimited_labels)
     }
 }
 
+static void setGroup(tr_variant* args, std::string_view group)
+{
+    tr_variantDictAddStrView(args, TR_KEY_group, group);
+}
+
 static void addFiles(tr_variant* args, tr_quark const key, char const* arg)
 {
     tr_variant* files = tr_variantDictAddList(args, key, 100);
@@ -716,6 +725,7 @@ static tr_quark const details_keys[] = {
     TR_KEY_error,
     TR_KEY_errorString,
     TR_KEY_eta,
+    TR_KEY_group,
     TR_KEY_hashString,
     TR_KEY_haveUnchecked,
     TR_KEY_haveValid,
@@ -979,6 +989,11 @@ static void printDetails(tr_variant* top)
                 printf("\n");
             }
 
+            if (tr_variantDictFindStrView(t, TR_KEY_group, &sv) && !sv.empty())
+            {
+                printf("  Bandwidth group: %" TR_PRIsv "\n", TR_PRIsv_ARG(sv));
+            }
+
             printf("\n");
 
             printf("TRANSFER\n");
@@ -1034,7 +1049,7 @@ static void printDetails(tr_variant* top)
                 }
             }
 
-            if (tr_variantDictFindInt(t, TR_KEY_downloadedEver, &i) && tr_variantDictFindInt(t, TR_KEY_uploadedEver, &j))
+            if (tr_variantDictFindInt(t, TR_KEY_downloaded, &i))
             {
                 if (auto corrupt = int64_t{}; tr_variantDictFindInt(t, TR_KEY_corruptEver, &corrupt) && corrupt != 0)
                 {
@@ -1047,8 +1062,16 @@ static void printDetails(tr_variant* top)
                 {
                     printf("  Downloaded: %s\n", strlsize(i).c_str());
                 }
-                printf("  Uploaded: %s\n", strlsize(j).c_str());
-                printf("  Ratio: %s\n", strlratio(j, i).c_str());
+            }
+
+            if (tr_variantDictFindInt(t, TR_KEY_uploadedEver, &i))
+            {
+                printf("  Uploaded: %s\n", strlsize(i).c_str());
+
+                if (tr_variantDictFindInt(t, TR_KEY_sizeWhenDone, &j))
+                {
+                    printf("  Ratio: %s\n", strlratio(i, j).c_str());
+                }
             }
 
             if (tr_variantDictFindStrView(t, TR_KEY_errorString, &sv) && !std::empty(sv) &&
@@ -2002,7 +2025,7 @@ static int processResponse(char const* rpcurl, std::string_view response)
 
     if (!tr_variantFromBuf(&top, TR_VARIANT_PARSE_JSON | TR_VARIANT_PARSE_INPLACE, response))
     {
-        tr_logAddNamedWarn(MyName, fmt::format("Unable to parse response '{}'", response));
+        tr_logAddWarn(fmt::format("Unable to parse response '{}'", response));
         status |= EXIT_FAILURE;
     }
     else
@@ -2174,7 +2197,7 @@ static int flush(char const* rpcurl, tr_variant** benc)
     auto const res = curl_easy_perform(curl);
     if (res != CURLE_OK)
     {
-        tr_logAddNamedWarn(MyName, fmt::format(" ({}) {}", rpcurl_http, curl_easy_strerror(res)));
+        tr_logAddWarn(fmt::format(" ({}) {}", rpcurl_http, curl_easy_strerror(res)));
         status |= EXIT_FAILURE;
     }
     else
@@ -2775,6 +2798,14 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
 
             case 'L':
                 addLabels(args, optarg ? optarg : "");
+                break;
+
+            case 730:
+                setGroup(args, optarg ? optarg : "");
+                break;
+
+            case 731:
+                setGroup(args, "");
                 break;
 
             case 900:

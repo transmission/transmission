@@ -48,8 +48,6 @@ struct tr_dh_ctx
 ****
 ***/
 
-static char constexpr MyName[] = "tr_crypto_utils";
-
 static void log_cyassl_error(int error_code, char const* file, int line)
 {
     if (tr_logLevelIsActive(TR_LOG_ERROR))
@@ -63,12 +61,15 @@ static void log_cyassl_error(int error_code, char const* file, int line)
         CTaoCryptErrorString(error_code, error_message);
 #endif
 
-        auto const errmsg = fmt::format(
-            _("{crypto_library} error: {error} ({error_code})"),
-            fmt::arg("crypto_library", "CyaSSL"),
-            fmt::arg("error", error_message),
-            fmt::arg("error_code", error_code));
-        tr_logAddMessage(file, line, TR_LOG_ERROR, MyName, errmsg);
+        tr_logAddMessage(
+            file,
+            line,
+            TR_LOG_ERROR,
+            fmt::format(
+                _("{crypto_library} error: {error} ({error_code})"),
+                fmt::arg("crypto_library", "CyaSSL"),
+                fmt::arg("error", error_message),
+                fmt::arg("error_code", error_code)));
     }
 }
 

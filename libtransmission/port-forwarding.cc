@@ -24,8 +24,6 @@
 #include "upnp.h"
 #include "utils.h"
 
-static auto constexpr LogName = std::string_view{ "port-fwd" };
-
 struct tr_shared
 {
     bool isEnabled;
@@ -93,12 +91,10 @@ static void natPulse(tr_shared* s, bool do_check)
     {
         session->public_peer_port = public_peer_port;
         session->private_peer_port = received_private_port;
-        tr_logAddNamedInfo(
-            LogName,
-            fmt::format(
-                _("Mapped private port '{private_port}' to public port '{public_port}'"),
-                fmt::arg("public_port", session->public_peer_port),
-                fmt::arg("private_port", session->private_peer_port)));
+        tr_logAddInfo(fmt::format(
+            _("Mapped private port '{private_port}' to public port '{public_port}'"),
+            fmt::arg("public_port", session->public_peer_port),
+            fmt::arg("private_port", session->private_peer_port)));
     }
 
     s->upnpStatus = tr_upnpPulse(
@@ -112,12 +108,10 @@ static void natPulse(tr_shared* s, bool do_check)
 
     if (new_status != old_status)
     {
-        tr_logAddNamedInfo(
-            LogName,
-            fmt::format(
-                _("State changed from '{old_state}' to '{state}"),
-                fmt::arg("old_state", getNatStateStr(old_status)),
-                fmt::arg("state", getNatStateStr(new_status))));
+        tr_logAddInfo(fmt::format(
+            _("State changed from '{old_state}' to '{state}"),
+            fmt::arg("old_state", getNatStateStr(old_status)),
+            fmt::arg("state", getNatStateStr(new_status))));
     }
 }
 
@@ -206,7 +200,7 @@ static void stop_timer(tr_shared* s)
 
 static void stop_forwarding(tr_shared* s)
 {
-    tr_logAddNamedTrace(LogName, "stopped");
+    tr_logAddTrace("stopped");
     natPulse(s, false);
 
     tr_natpmpClose(s->natpmp);

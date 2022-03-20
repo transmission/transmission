@@ -33,14 +33,14 @@
 
 - (CGFloat)ratio
 {
-    uint64_t uploaded = 0, downloaded = 0;
+    uint64_t uploaded = 0, total_size = 0;
     for (Torrent* torrent in self.torrents)
     {
         uploaded += torrent.uploadedTotal;
-        downloaded += torrent.downloadedTotal;
+        total_size += torrent.totalSizeSelected;
     }
 
-    return tr_getRatio(uploaded, downloaded);
+    return tr_getRatio(uploaded, total_size);
 }
 
 - (CGFloat)uploadRate

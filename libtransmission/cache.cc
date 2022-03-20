@@ -20,8 +20,6 @@
 #include "trevent.h"
 #include "utils.h"
 
-auto constexpr LogName = std::string_view{ "cache" };
-
 /****
 *****
 ****/
@@ -244,8 +242,7 @@ int tr_cacheSetLimit(tr_cache* cache, int64_t max_bytes)
     cache->max_bytes = max_bytes;
     cache->max_blocks = getMaxBlocks(max_bytes);
 
-    tr_logAddNamedDebug(
-        LogName,
+    tr_logAddDebug(
         fmt::format("Maximum cache size set to {} ({} blocks)", tr_formatter_mem_B(cache->max_bytes), cache->max_blocks));
 
     return cacheTrim(cache);
@@ -408,7 +405,7 @@ int tr_cacheFlushFile(tr_cache* cache, tr_torrent* torrent, tr_file_index_t i)
 
     int const pos = findBlockPos(cache, torrent, torrent->blockLoc(begin));
 
-    tr_logAddNamedTrace(LogName, fmt::format("flushing file {} from cache to disk: blocks [{}...{})", i, begin, end));
+    tr_logAddTrace(fmt::format("flushing file {} from cache to disk: blocks [{}...{})", i, begin, end));
 
     /* flush out all the blocks in that file */
     int err = 0;

@@ -44,9 +44,9 @@ public:
     {
         return blockInfo().blockCount();
     }
-    [[nodiscard]] auto byteLoc(uint64_t byte) const
+    [[nodiscard]] auto byteLoc(uint64_t nth_byte) const
     {
-        return blockInfo().byteLoc(byte);
+        return blockInfo().byteLoc(nth_byte);
     }
     [[nodiscard]] auto blockLoc(tr_block_index_t block) const
     {

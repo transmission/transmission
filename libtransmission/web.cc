@@ -37,9 +37,6 @@ using namespace std::literals;
 #define USE_LIBCURL_SOCKOPT
 #endif
 
-#define loginfo(...) tr_logAddNamed(TR_LOG_INFO, "web", __VA_ARGS__)
-#define logtrace(...) tr_logAddNamed(TR_LOG_TRACE, "web", __VA_ARGS__)
-
 /***
 ****
 ***/
@@ -122,10 +119,10 @@ public:
         if (curl_ssl_verify)
         {
             auto const* bundle = std::empty(curl_ca_bundle) ? "none" : curl_ca_bundle.c_str();
-            loginfo(
+            tr_logAddInfo(
                 fmt::format(_("Will verify tracker certs using envvar CURL_CA_BUNDLE: {bundle}"), fmt::arg("bundle", bundle)));
-            loginfo(_("NB: this only works if you built against libcurl with openssl or gnutls, NOT nss"));
-            loginfo(_("NB: Invalid certs will appear as 'Could not connect to tracker' like many other errors"));
+            tr_logAddInfo(_("NB: this only works if you built against libcurl with openssl or gnutls, NOT nss"));
+            tr_logAddInfo(_("NB: Invalid certs will appear as 'Could not connect to tracker' like many other errors"));
         }
 
         if (auto const& file = mediator.cookieFile(); file)
@@ -308,7 +305,7 @@ private:
         }
 
         evbuffer_add(task->body(), data, bytes_used);
-        logtrace(fmt::format("wrote {} bytes to task {}'s buffer", bytes_used, fmt::ptr(task)));
+        tr_logAddTrace(fmt::format("wrote {} bytes to task {}'s buffer", bytes_used, fmt::ptr(task)));
         return bytes_used;
     }
 
@@ -475,7 +472,7 @@ private:
                 // add queued tasks
                 for (auto* task : impl->queued_tasks)
                 {
-                    logtrace(fmt::format("adding task to curl: '{}'", task->url()));
+                    tr_logAddTrace(fmt::format("adding task to curl: '{}'", task->url()));
                     initEasy(impl, task);
                     curl_multi_add_handle(multi.get(), task->easy());
                 }

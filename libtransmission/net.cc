@@ -42,19 +42,6 @@
 #define IN_MULTICAST(a) (((a)&0xf0000000) == 0xe0000000)
 #endif
 
-#undef tr_logAddError
-#undef tr_logAddWarn
-#undef tr_logAddInfo
-#undef tr_logAddDebug
-#undef tr_logAddTrace
-
-auto constexpr LogName = std::string_view{ "net" };
-#define tr_logAddError(...) tr_logAddNamed(TR_LOG_ERROR, LogName, __VA_ARGS__)
-#define tr_logAddWarn(...) tr_logAddNamed(TR_LOG_WARN, LogName, __VA_ARGS__)
-#define tr_logAddInfo(...) tr_logAddNamed(TR_LOG_INFO, LogName, __VA_ARGS__)
-#define tr_logAddDebug(...) tr_logAddNamed(TR_LOG_DEBUG, LogName, __VA_ARGS__)
-#define tr_logAddTrace(...) tr_logAddNamed(TR_LOG_TRACE, LogName, __VA_ARGS__)
-
 tr_address const tr_in6addr_any = { TR_AF_INET6, { IN6ADDR_ANY_INIT } };
 
 tr_address const tr_inaddr_any = { TR_AF_INET, { { { { INADDR_ANY } } } } };
@@ -135,11 +122,11 @@ bool tr_address_from_string(tr_address* dst, std::string_view src)
     return tr_address_from_string(dst, std::data(buf));
 }
 
-std::optional<tr_address> tr_address::from_string(std::string_view str)
+std::optional<tr_address> tr_address::from_string(std::string_view address_str)
 {
     auto addr = tr_address{};
 
-    if (!tr_address_from_string(&addr, str))
+    if (!tr_address_from_string(&addr, address_str))
     {
         return {};
     }

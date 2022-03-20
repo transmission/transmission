@@ -42,7 +42,6 @@
 
 using namespace std::literals;
 
-static auto constexpr LogName = "rpc"sv;
 static auto constexpr RecentlyActiveSeconds = time_t{ 60 };
 static auto constexpr RpcVersion = int64_t{ 17 };
 static auto constexpr RpcVersionMin = int64_t{ 14 };
@@ -561,6 +560,10 @@ static void initField(tr_torrent const* const tor, tr_stat const* const st, tr_v
     case TR_KEY_fileStats:
         tr_variantInitList(initme, tor->fileCount());
         addFileStats(tor, initme);
+        break;
+
+    case TR_KEY_group:
+        tr_variantInitStrView(initme, tor->group);
         break;
 
     case TR_KEY_hashString:
@@ -1158,6 +1161,11 @@ static char const* torrentSet(
             }
         }
 
+        if (std::string_view group; tr_variantDictFindStrView(args_in, TR_KEY_group, &group))
+        {
+            tor->setGroup(group);
+        }
+
         if (errmsg == nullptr && tr_variantDictFindList(args_in, TR_KEY_labels, &tmp_variant))
         {
             errmsg = setLabels(tor, tmp_variant);
@@ -1514,13 +1522,11 @@ static void onMetadataFetched(tr_web::FetchResponse const& web_response)
     auto const& [status, body, did_connect, did_timeout, user_data] = web_response;
     auto* data = static_cast<struct add_torrent_idle_data*>(user_data);
 
-    tr_logAddNamedTrace(
-        LogName,
-        fmt::format(
-            "torrentAdd: HTTP response code was {} ({}); response length was {} bytes",
-            status,
-            tr_webGetResponseStr(status),
-            std::size(body)));
+    tr_logAddTrace(fmt::format(
+        "torrentAdd: HTTP response code was {} ({}); response length was {} bytes",
+        status,
+        tr_webGetResponseStr(status),
+        std::size(body)));
 
     if (status == 200 || status == 221) /* http or ftp success.. */
     {
@@ -1658,7 +1664,7 @@ static char const* torrentAdd(tr_session* session, tr_variant* args_in, tr_varia
         tr_ctorSetLabels(ctor, std::move(labels));
     }
 
-    tr_logAddNamedTrace(LogName, fmt::format("torrentAdd: filename is '{}'", filename));
+    tr_logAddTrace(fmt::format("torrentAdd: filename is '{}'", filename));
 
     if (isCurlURL(filename))
     {
@@ -1689,6 +1695,91 @@ static char const* torrentAdd(tr_session* session, tr_variant* args_in, tr_varia
         }
 
         addTorrentImpl(idle_data, ctor);
+    }
+
+    return nullptr;
+}
+
+/***
+****
+***/
+
+static char const* groupGet(tr_session* s, tr_variant* args_in, tr_variant* args_out, struct tr_rpc_idle_data* /*idle_data*/)
+{
+    std::set<std::string_view> names;
+
+    if (std::string_view one_name; tr_variantDictFindStrView(args_in, TR_KEY_name, &one_name))
+    {
+        names.insert(one_name);
+    }
+    else if (tr_variant* namesList = nullptr; tr_variantDictFindList(args_in, TR_KEY_name, &namesList))
+    {
+        int names_count = tr_variantListSize(namesList);
+        for (int i = 0; i < names_count; i++)
+        {
+            tr_variant* v = tr_variantListChild(namesList, i);
+            if (std::string_view l; tr_variantIsString(v) && tr_variantGetStrView(v, &l))
+            {
+                names.insert(l);
+            }
+        }
+    }
+
+    auto* const list = tr_variantDictAddList(args_out, TR_KEY_group, 1);
+    for (auto const& [name, group] : s->bandwidth_groups_)
+    {
+        if (names.empty() || names.count(name.sv()) > 0)
+        {
+            tr_variant* dict = tr_variantListAddDict(list, 5);
+            auto limits = group->getLimits();
+            tr_variantDictAddStrView(dict, TR_KEY_name, name.sv());
+            tr_variantDictAddBool(dict, TR_KEY_uploadLimited, limits.up_limited);
+            tr_variantDictAddInt(dict, TR_KEY_uploadLimit, limits.up_limit_KBps);
+            tr_variantDictAddBool(dict, TR_KEY_downloadLimited, limits.down_limited);
+            tr_variantDictAddInt(dict, TR_KEY_downloadLimit, limits.down_limit_KBps);
+            tr_variantDictAddBool(dict, TR_KEY_honorsSessionLimits, group->areParentLimitsHonored(TR_UP));
+        }
+    }
+
+    return nullptr;
+}
+
+static char const* groupSet(
+    tr_session* session,
+    tr_variant* args_in,
+    tr_variant* /*args_out*/,
+    struct tr_rpc_idle_data* /*idle_data*/)
+{
+    auto name = std::string_view{};
+    tr_variantDictFindStrView(args_in, TR_KEY_name, &name);
+    name = tr_strvStrip(name);
+    if (std::empty(name))
+    {
+        return "No group name given";
+    }
+
+    auto& group = session->getBandwidthGroup(name);
+    auto limits = group.getLimits();
+
+    tr_variantDictFindBool(args_in, TR_KEY_speed_limit_down_enabled, &limits.down_limited);
+    tr_variantDictFindBool(args_in, TR_KEY_speed_limit_up_enabled, &limits.up_limited);
+
+    if (auto limit = int64_t{}; tr_variantDictFindInt(args_in, TR_KEY_speed_limit_down, &limit))
+    {
+        limits.down_limit_KBps = limit;
+    }
+
+    if (auto limit = int64_t{}; tr_variantDictFindInt(args_in, TR_KEY_speed_limit_up, &limit))
+    {
+        limits.up_limit_KBps = limit;
+    }
+
+    group.setLimits(&limits);
+
+    if (auto honors = bool{}; tr_variantDictFindBool(args_in, TR_KEY_honorsSessionLimits, &honors))
+    {
+        group.honorParentLimits(TR_UP, honors);
+        group.honorParentLimits(TR_DOWN, honors);
     }
 
     return nullptr;
@@ -2349,9 +2440,11 @@ struct rpc_method
     handler func;
 };
 
-static auto constexpr Methods = std::array<rpc_method, 22>{ {
+static auto constexpr Methods = std::array<rpc_method, 24>{ {
     { "blocklist-update"sv, false, blocklistUpdate },
     { "free-space"sv, true, freeSpace },
+    { "group-get"sv, true, groupGet },
+    { "group-set"sv, true, groupSet },
     { "port-test"sv, false, portTest },
     { "queue-move-bottom"sv, true, queueMoveBottom },
     { "queue-move-down"sv, true, queueMoveDown },

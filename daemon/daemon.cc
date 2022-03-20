@@ -4,10 +4,12 @@
 // License text can be found in the licenses/ folder.
 
 #include <array>
-#include <errno.h>
-#include <stdio.h> /* printf */
-#include <stdlib.h> /* atoi */
+#include <cerrno>
+#include <cstdio> /* printf */
+#include <cstdlib> /* atoi */
+#include <iostream>
 #include <string_view>
+#include <utility>
 
 #ifdef HAVE_SYSLOG
 #include <syslog.h>
@@ -24,11 +26,12 @@
 #include <fmt/core.h>
 
 #include <libtransmission/transmission.h>
+
 #include <libtransmission/error.h>
 #include <libtransmission/file.h>
+#include <libtransmission/log.h>
 #include <libtransmission/tr-getopt.h>
 #include <libtransmission/tr-macros.h>
-#include <libtransmission/log.h>
 #include <libtransmission/utils.h>
 #include <libtransmission/variant.h>
 #include <libtransmission/version.h>
@@ -55,24 +58,6 @@ static void sd_notifyf(int /*status*/, char const* /*fmt*/, ...)
 #endif
 
 using namespace std::literals;
-
-/***
-****
-***/
-
-static auto constexpr CodeName = "daemon"sv;
-
-#undef tr_logAddError
-#undef tr_logAddWarn
-#undef tr_logAddInfo
-#undef tr_logAddDebug
-#undef tr_logAddTrace
-
-#define tr_logAddError(...) tr_logAddNamedError(CodeName, __VA_ARGS__)
-#define tr_logAddWarn(...) tr_logAddNamedWarn(CodeName, __VA_ARGS__)
-#define tr_logAddInfo(...) tr_logAddNamedInfo(CodeName, __VA_ARGS__)
-#define tr_logAddDebug(...) tr_logAddNamedDebug(CodeName, __VA_ARGS__)
-#define tr_logAddTrace(...) tr_logAddNamedTrace(CodeName, __VA_ARGS__)
 
 /***
 ****
@@ -118,7 +103,7 @@ static struct event_base* ev_base = nullptr;
 ****  Config File
 ***/
 
-static auto constexpr Options = std::array<tr_option, 44>{
+static auto constexpr Options = std::array<tr_option, 45>{
     { { 'a', "allowed", "Allowed IP addresses. (Default: " TR_DEFAULT_RPC_WHITELIST ")", "a", true, "<list>" },
       { 'b', "blocklist", "Enable peer blocklists", "b", false, nullptr },
       { 'B', "no-blocklist", "Disable peer blocklists", "B", false, nullptr },
@@ -137,9 +122,10 @@ static auto constexpr Options = std::array<tr_option, 44>{
       { 'u', "username", "Set username for authentication", "u", true, "<username>" },
       { 'v', "password", "Set password for authentication", "v", true, "<password>" },
       { 'V', "version", "Show version number and exit", "V", false, nullptr },
-      { 810, "log-error", "Show error messages", nullptr, false, nullptr },
-      { 811, "log-info", "Show error and info messages", nullptr, false, nullptr },
-      { 812, "log-debug", "Show error, info, and debug messages", nullptr, false, nullptr },
+      { 810, "log-level", "Must be 'critical', 'error', 'warn', 'info', 'debug', or 'trace'.", nullptr, true, "<level>" },
+      { 811, "log-error", "Deprecated. Use --log-level=error", nullptr, false, nullptr },
+      { 812, "log-info", "Deprecated. Use --log-level=info", nullptr, false, nullptr },
+      { 813, "log-debug", "Deprecated. Use --log-level=debug", nullptr, false, nullptr },
       { 'w', "download-dir", "Where to save downloaded data", "w", true, "<path>" },
       { 800, "paused", "Pause all torrents on startup", nullptr, false, nullptr },
       { 'o', "dht", "Enable distributed hash tables (DHT)", "o", false, nullptr },
@@ -600,14 +586,28 @@ static bool parse_args(
             break;
 
         case 810:
-            tr_variantDictAddInt(settings, TR_KEY_message_level, TR_LOG_ERROR);
+            if (auto const level = tr_logGetLevelFromKey(optstr); level)
+            {
+                tr_variantDictAddInt(settings, TR_KEY_message_level, *level);
+            }
+            else
+            {
+                std::cerr << fmt::format(_("Couldn't parse log level '{level}'"), fmt::arg("level", optstr)) << std::endl;
+            }
             break;
 
         case 811:
-            tr_variantDictAddInt(settings, TR_KEY_message_level, TR_LOG_INFO);
+            std::cerr << "WARN: --log-error is deprecated. Use --log-level=error" << std::endl;
+            tr_variantDictAddInt(settings, TR_KEY_message_level, TR_LOG_ERROR);
             break;
 
         case 812:
+            std::cerr << "WARN: --log-info is deprecated. Use --log-level=info" << std::endl;
+            tr_variantDictAddInt(settings, TR_KEY_message_level, TR_LOG_INFO);
+            break;
+
+        case 813:
+            std::cerr << "WARN: --log-debug is deprecated. Use --log-level=debug" << std::endl;
             tr_variantDictAddInt(settings, TR_KEY_message_level, TR_LOG_DEBUG);
             break;
 
@@ -704,7 +704,7 @@ static int daemon_start(void* varg, [[maybe_unused]] bool foreground)
     tr_formatter_speed_init(SpeedK, SpeedKStr, SpeedMStr, SpeedGStr, SpeedTStr);
     session = tr_sessionInit(configDir, true, settings);
     tr_sessionSetRPCCallback(session, on_rpc_callback, nullptr);
-    tr_logAddNamedInfo(MyName, fmt::format(_("Loading settings from '{path}'"), fmt::arg("path", configDir)));
+    tr_logAddInfo(fmt::format(_("Loading settings from '{path}'"), fmt::arg("path", configDir)));
     tr_sessionSaveSettings(session, configDir, settings);
 
     auto sv = std::string_view{};
@@ -740,7 +740,7 @@ static int daemon_start(void* varg, [[maybe_unused]] bool foreground)
 
     if (tr_variantDictFindBool(settings, TR_KEY_rpc_authentication_required, &boolVal) && boolVal)
     {
-        tr_logAddNamedInfo(MyName, _("Requiring authentication"));
+        tr_logAddInfo(_("Requiring authentication"));
     }
 
     mySession = session;
@@ -804,7 +804,7 @@ static int daemon_start(void* varg, [[maybe_unused]] bool foreground)
         {
             auto const error_code = errno;
             tr_logAddError(fmt::format(
-                _("Couldn't create status event: {error} ({error_code})"),
+                _("Couldn't create event: {error} ({error_code})"),
                 fmt::arg("error", tr_strerror(error_code)),
                 fmt::arg("error_code", error_code)));
             goto CLEANUP;
@@ -814,7 +814,7 @@ static int daemon_start(void* varg, [[maybe_unused]] bool foreground)
         {
             auto const error_code = errno;
             tr_logAddError(fmt::format(
-                _("Couldn't add status event: {error} ({error_code})"),
+                _("Couldn't add event: {error} ({error_code})"),
                 fmt::arg("error", tr_strerror(error_code)),
                 fmt::arg("error_code", error_code)));
             goto CLEANUP;

@@ -786,7 +786,7 @@ bool tr_sys_file_read_at(
 
     static_assert(sizeof(*bytes_read) >= sizeof(my_bytes_read));
 
-    if (my_bytes_read != -1)
+    if (my_bytes_read > 0)
     {
         if (bytes_read != nullptr)
         {

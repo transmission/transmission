@@ -40,10 +40,10 @@
 
 using namespace std::literals;
 
-#define tr_logAddErrorTier(tier, ...) tr_logAddNamedError(tier->buildLogName().c_str(), __VA_ARGS__)
-#define tr_logAddWarnTier(tier, ...) tr_logAddNamedWarn(tier->buildLogName().c_str(), __VA_ARGS__)
-#define tr_logAddDebugTier(tier, ...) tr_logAddNamedDebug(tier->buildLogName().c_str(), __VA_ARGS__)
-#define tr_logAddTraceTier(tier, ...) tr_logAddNamedTrace(tier->buildLogName().c_str(), __VA_ARGS__)
+#define tr_logAddErrorTier(tier, msg) tr_logAddError(msg, (tier)->buildLogName())
+#define tr_logAddWarnTier(tier, msg) tr_logAddWarn(msg, (tier)->buildLogName())
+#define tr_logAddDebugTier(tier, msg) tr_logAddDebug(msg, (tier)->buildLogName())
+#define tr_logAddTraceTier(tier, msg) tr_logAddTrace(msg, (tier)->buildLogName())
 
 /* unless the tracker says otherwise, rescrape this frequently */
 static auto constexpr DefaultScrapeIntervalSec = int{ 60 * 30 };
@@ -726,7 +726,7 @@ time_t tr_announcerNextManualAnnounce(tr_torrent const* tor)
 
 static void tr_logAddTrace_tier_announce_queue(tr_tier const* tier)
 {
-    if (!tr_logLevelIsActive(TR_LOG_TRACE))
+    if (!tr_logLevelIsActive(TR_LOG_TRACE) || std::empty(tier->announce_events))
     {
         return;
     }
@@ -739,8 +739,7 @@ static void tr_logAddTrace_tier_announce_queue(tr_tier const* tier)
         evbuffer_add_printf(buf, "[%zu:%s]", i, str);
     }
 
-    auto const str = evbuffer_free_to_str(buf);
-    tr_logAddTraceTier(tier, str);
+    tr_logAddTraceTier(tier, evbuffer_free_to_str(buf));
 }
 
 // higher priorities go to the front of the announce queue
@@ -1301,7 +1300,7 @@ static void checkMultiscrapeMax(tr_announcer* announcer, tr_scrape_response cons
         auto const parsed = *tr_urlParse(url.sv());
         auto clean_url = std::string{};
         tr_buildBuf(clean_url, parsed.scheme, "://"sv, parsed.host, ":"sv, parsed.portstr);
-        tr_logAddNamedDebug(clean_url.c_str(), fmt::format("Reducing multiscrape max to {}", n));
+        tr_logAddDebug(fmt::format("Reducing multiscrape max to {}", n), clean_url);
         multiscrape_max = n;
     }
 }
