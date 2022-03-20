@@ -156,23 +156,22 @@ protected:
         char const* output;
     };
 
-    static void testPathXname(XnameTestData const* data, size_t data_size, char* (*func)(std::string_view, tr_error**))
+    static void testPathXname(XnameTestData const* data, size_t data_size, std::string (*func)(std::string_view, tr_error**))
     {
         for (size_t i = 0; i < data_size; ++i)
         {
             tr_error* err = nullptr;
-            char* name = func(data[i].input, &err);
+            auto const name = func(data[i].input, &err);
 
             if (data[i].output != nullptr)
             {
-                EXPECT_NE(nullptr, name);
+                EXPECT_NE(""sv, name);
                 EXPECT_EQ(nullptr, err);
-                EXPECT_STREQ(data[i].output, name);
-                tr_free(name);
+                EXPECT_EQ(data[i].output, name);
             }
             else
             {
-                EXPECT_EQ(nullptr, name);
+                EXPECT_EQ(""sv, name);
                 EXPECT_NE(nullptr, err);
                 tr_error_clear(&err);
             }

@@ -12,6 +12,8 @@
 #include <shlobj.h> /* SHCreateDirectoryEx() */
 #include <winioctl.h> /* FSCTL_SET_SPARSE */
 
+#include <fmt/base.h>
+
 #include "transmission.h"
 #include "crypto-utils.h" /* tr_rand_int() */
 #include "error.h"
@@ -646,17 +648,17 @@ cleanup:
     return ret;
 }
 
-char* tr_sys_path_basename(std::string_view path, tr_error** error)
+std::string tr_sys_path_basename(std::string_view path, tr_error** error)
 {
     if (std::empty(path))
     {
-        return tr_strdup(".");
+        return ".";
     }
 
     if (!is_valid_path(path))
     {
         set_system_error(error, ERROR_PATH_NOT_FOUND);
-        return nullptr;
+        return {};
     }
 
     char const* const begin = std::data(path);
@@ -669,7 +671,7 @@ char* tr_sys_path_basename(std::string_view path, tr_error** error)
 
     if (end == begin)
     {
-        return tr_strdup("/");
+        return "/";
     }
 
     char const* name = end;
@@ -681,30 +683,30 @@ char* tr_sys_path_basename(std::string_view path, tr_error** error)
 
     if (name == end)
     {
-        return tr_strdup("/");
+        return "/";
     }
 
-    return tr_strndup(name, end - name);
+    return { name, end - name };
 }
 
-char* tr_sys_path_dirname(std::string_view path, tr_error** error)
+std::string tr_sys_path_dirname(std::string_view path, tr_error** error)
 {
     if (std::empty(path))
     {
-        return tr_strdup(".");
+        return ".";
     }
 
     if (!is_valid_path(path))
     {
         set_system_error(error, ERROR_PATH_NOT_FOUND);
-        return nullptr;
+        return {};
     }
 
     bool const is_unc = is_unc_path(path);
 
     if (is_unc && path[2] == '\0')
     {
-        return tr_strvDup(path);
+        return path;
     }
 
     char const* const begin = std::data(path);
@@ -717,7 +719,7 @@ char* tr_sys_path_dirname(std::string_view path, tr_error** error)
 
     if (end == begin)
     {
-        return tr_strdup("/");
+        return "/";
     }
 
     char const* name = end;
@@ -734,15 +736,15 @@ char* tr_sys_path_dirname(std::string_view path, tr_error** error)
 
     if (name == begin)
     {
-        return tr_strdup(is_unc ? "\\\\" : ".");
+        return is_unc ? "\\\\" : ".";
     }
 
     if (name > begin && *(name - 1) == ':' && *name != '\0' && !is_slash(*name))
     {
-        return tr_strdup_printf("%c:.", begin[0]);
+        return fmt::format("{}:.", begin[0]);
     }
 
-    return tr_strndup(begin, name - begin);
+    return { begin, name - begin };
 }
 
 bool tr_sys_path_rename(char const* src_path, char const* dst_path, tr_error** error)

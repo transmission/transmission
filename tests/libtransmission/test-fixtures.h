@@ -176,7 +176,7 @@ protected:
     {
         auto const tmperr = errno;
 
-        auto const dir = makeString(tr_sys_path_dirname(path.c_str(), nullptr));
+        auto const dir = tr_sys_path_dirname(path);
         tr_error* error = nullptr;
         tr_sys_dir_create(dir.data(), TR_SYS_DIR_CREATE_PARENTS, 0700, &error);
         EXPECT_EQ(nullptr, error) << "path[" << path << "] dir[" << dir << "] " << error->code << ", " << error->message;
@@ -397,7 +397,7 @@ protected:
             auto path = (!complete && i == 0) ? tr_strvJoin(tor->currentDir().sv(), TR_PATH_DELIMITER_STR, file.name, ".part") :
                                                 tr_strvJoin(tor->currentDir().sv(), TR_PATH_DELIMITER_STR, file.name);
 
-            auto const dirname = makeString(tr_sys_path_dirname(path.c_str(), nullptr));
+            auto const dirname = tr_sys_path_dirname(path);
             tr_sys_dir_create(dirname.data(), TR_SYS_DIR_CREATE_PARENTS, 0700, nullptr);
             auto fd = tr_sys_file_open(
                 path.c_str(),
