@@ -107,7 +107,7 @@ auto getProgressString(tr_torrent const* tor, uint64_t total_size, tr_stat const
         }
         else
         {
-            gstr += fmt::format(_("{duration} remaining"), fmt::arg("duration", tr_strltime(eta)));
+            gstr += fmt::format(_("{time_span} remaining"), fmt::arg("time_span", tr_strltime(eta)));
         }
     }
 
