@@ -1984,12 +1984,20 @@ void appendScrapeInfo(tr_tracker_view const& tracker, time_t const now, Gtk::Tex
         if (tracker.lastScrapeSucceeded)
         {
             gstr << fmt::format(
-                // {markup_begin} and {markup_end} should surround the seeder/leecher text
-                _("Tracker had {markup_begin}{seeder_count} {seeders_ngettexted} and {leecher_count} {leechers_ngettexted}{markup_end} {time_span} ago"),
+                ngettext(
+                    ngettext(
+                        "Tracker had {markup_begin}{seeder_count} seeder and {leecher_count} leecher {markup_end} {time_span} ago",
+                        "Tracker had {markup_begin}{seeder_count} seeder and {leecher_count} leechers {markup_end} {time_span} ago",
+                        tracker.leecherCount),
+                    ngettext(
+                        "Tracker had {markup_begin}{seeder_count} seeders and {leecher_count} leecher {markup_end} {time_span} ago",
+                        "Tracker had {markup_begin}{seeder_count} seeders and {leecher_count} leechers {markup_end} {time_span} ago",
+                        tracker.leecherCount),
+                    tracker.seederCount),
                 fmt::arg("seeder_count", tracker.seederCount),
-                fmt::arg("seeders_ngettexted", ngettext("seeder", "seeders", tracker.seederCount)),
+                fmt::arg("seeder_or_seeders", ngettext("seeder", "seeders", tracker.seederCount)),
                 fmt::arg("leecher_count", tracker.leecherCount),
-                fmt::arg("leechers_ngettexted", ngettext("leecher", "leechers", tracker.leecherCount)),
+                fmt::arg("leecher_or_leechers", ngettext("leecher", "leechers", tracker.leecherCount)),
                 fmt::arg("time_span", timebuf),
                 fmt::arg("markup_begin", SuccessMarkupBegin),
                 fmt::arg("markup_end", SuccessMarkupEnd));
