@@ -23,6 +23,8 @@ namespace libtransmission
 namespace test
 {
 
+auto constexpr MaxWaitMsec = 5000;
+
 class IncompleteDirTest
     : public SessionTest
     , public ::testing::WithParamInterface<std::pair<std::string, std::string>>
@@ -126,7 +128,7 @@ TEST_P(IncompleteDirTest, incompleteDir)
     {
         return completeness != -1;
     };
-    EXPECT_TRUE(waitFor(test, 300));
+    EXPECT_TRUE(waitFor(test, MaxWaitMsec));
     EXPECT_EQ(TR_SEED, completeness);
 
     auto const n = tr_torrentFileCount(tor);
@@ -174,7 +176,7 @@ TEST_F(MoveTest, setLocation)
     {
         return state == TR_LOC_DONE;
     };
-    EXPECT_TRUE(waitFor(test, 300));
+    EXPECT_TRUE(waitFor(test, MaxWaitMsec));
     EXPECT_EQ(TR_LOC_DONE, state);
 
     // confirm the torrent is still complete after being moved

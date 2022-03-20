@@ -40,7 +40,7 @@ protected:
         tr_error* err = nullptr;
         /* Copy it. */
         EXPECT_TRUE(tr_sys_path_copy(path1.c_str(), path2.c_str(), &err));
-        EXPECT_EQ(nullptr, err);
+        EXPECT_EQ(nullptr, err) << ' ' << err->message << ' ' << err->code;
         tr_error_clear(&err);
 
         EXPECT_TRUE(filesAreIdentical(path1.c_str(), path2.c_str()));

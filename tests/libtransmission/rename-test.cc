@@ -74,7 +74,7 @@ protected:
         EXPECT_LT(0, std::size(benc));
         tr_error* error = nullptr;
         EXPECT_TRUE(tr_ctorSetMetainfo(ctor, std::data(benc), std::size(benc), &error));
-        EXPECT_EQ(nullptr, error);
+        EXPECT_EQ(nullptr, error) << *error;
         tr_ctorSetPaused(ctor, TR_FORCE, true);
 
         // create the torrent

@@ -118,7 +118,7 @@ TEST_P(SubprocessTest, SpawnAsyncArgs)
     tr_error* error = nullptr;
     bool const ret = tr_spawn_async(std::data(args), {}, nullptr, &error);
     EXPECT_TRUE(ret) << args[0] << ' ' << args[1];
-    EXPECT_EQ(nullptr, error) << error->code << ", " << error->message;
+    EXPECT_EQ(nullptr, error) << *error;
 
     waitForFileToExist(result_path);
 
@@ -199,7 +199,7 @@ TEST_P(SubprocessTest, SpawnAsyncEnv)
     tr_error* error = nullptr;
     bool const ret = tr_spawn_async(std::data(args), env, nullptr, &error);
     EXPECT_TRUE(ret);
-    EXPECT_EQ(nullptr, error);
+    EXPECT_EQ(nullptr, error) << *error;
 
     waitForFileToExist(result_path);
 
@@ -247,7 +247,7 @@ TEST_P(SubprocessTest, SpawnAsyncCwdExplicit)
     tr_error* error = nullptr;
     bool const ret = tr_spawn_async(std::data(args), {}, test_dir.c_str(), &error);
     EXPECT_TRUE(ret);
-    EXPECT_EQ(nullptr, error);
+    EXPECT_EQ(nullptr, error) << *error;
 
     waitForFileToExist(result_path);
 
@@ -275,7 +275,7 @@ TEST_P(SubprocessTest, SpawnAsyncCwdInherit)
     tr_error* error = nullptr;
     auto const ret = tr_spawn_async(std::data(args), {}, nullptr, &error);
     EXPECT_TRUE(ret);
-    EXPECT_EQ(nullptr, error);
+    EXPECT_EQ(nullptr, error) << *error;
 
     waitForFileToExist(result_path);
     auto fd = tr_sys_file_open(result_path.data(), TR_SYS_FILE_READ, 0, nullptr); // NOLINT
