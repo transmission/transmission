@@ -686,7 +686,7 @@ std::string tr_sys_path_basename(std::string_view path, tr_error** error)
         return "/";
     }
 
-    return { name, end - name };
+    return { name, size_t(end - name) };
 }
 
 std::string tr_sys_path_dirname(std::string_view path, tr_error** error)
@@ -706,7 +706,7 @@ std::string tr_sys_path_dirname(std::string_view path, tr_error** error)
 
     if (is_unc && path[2] == '\0')
     {
-        return path;
+        return std::string{ path };
     }
 
     char const* const begin = std::data(path);
@@ -744,7 +744,7 @@ std::string tr_sys_path_dirname(std::string_view path, tr_error** error)
         return fmt::format("{}:.", begin[0]);
     }
 
-    return { begin, name - begin };
+    return { begin, size_t(name - begin) };
 }
 
 bool tr_sys_path_rename(char const* src_path, char const* dst_path, tr_error** error)
