@@ -1927,7 +1927,7 @@ void appendAnnounceInfo(tr_tracker_view const& tracker, time_t const now, Gtk::T
         {
             gstr << fmt::format(
                 // {markup_begin} and {markup_end} should surround the error
-                _("Got an error {markup_begin}{error}{markup_end} {time_span} ago"),
+                _("Got an error '{markup_begin}{error}{markup_end}' {time_span} ago"),
                 fmt::arg("markup_begin", ErrMarkupBegin),
                 fmt::arg("error", tracker.lastAnnounceResult),
                 fmt::arg("markup_end", ErrMarkupEnd),
@@ -1998,7 +1998,7 @@ void appendScrapeInfo(tr_tracker_view const& tracker, time_t const now, Gtk::Tex
         {
             gstr << fmt::format(
                 // {markup_begin} and {markup_end} should surround the error text
-                _("Got a scrape error {markup_begin}{error}{markup_end} {time_span} ago"),
+                _("Got a scrape error '{markup_begin}{error}{markup_end}' {time_span} ago"),
                 fmt::arg("error", tracker.lastScrapeResult),
                 fmt::arg("time_span", timebuf),
                 fmt::arg("markup_begin", ErrMarkupBegin),
