@@ -45,7 +45,7 @@
 
 using namespace std::literals;
 
-// FIXME: use tr_strvPath
+// TODO: use remove this and use tr_strvPath() instead
 static char* tr_buildPath(char const* first_element, ...)
 {
     // pass 1: allocate enough space for the string
