@@ -468,7 +468,7 @@ Gtk::Widget* DetailsDialog::Impl::options_page_new()
         [this]() { torrent_set_bool(TR_KEY_honorsSessionLimits, honor_limits_check_->get_active()); });
 
     down_limited_check_ = Gtk::make_managed<Gtk::CheckButton>(
-        fmt::format(_("Limit _download speed ({speed_units})"), fmt::arg("speed_units", speed_K_str)),
+        fmt::format(_("Limit _download speed ({speed_units}):"), fmt::arg("speed_units", speed_K_str)),
         true);
     down_limited_check_->set_active(false);
     down_limited_check_tag_ = down_limited_check_->signal_toggled().connect(
@@ -480,7 +480,7 @@ Gtk::Widget* DetailsDialog::Impl::options_page_new()
     t->add_row_w(row, *down_limited_check_, *down_limit_spin_);
 
     up_limited_check_ = Gtk::make_managed<Gtk::CheckButton>(
-        fmt::format(_("Limit _upload speed ({speed_units})"), fmt::arg("speed_units", speed_K_str)),
+        fmt::format(_("Limit _upload speed ({speed_units}):"), fmt::arg("speed_units", speed_K_str)),
         true);
     up_limited_check_tag_ = up_limited_check_->signal_toggled().connect(
         [this]() { torrent_set_bool(TR_KEY_uploadLimited, up_limited_check_->get_active()); });
