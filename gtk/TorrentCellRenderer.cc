@@ -242,8 +242,8 @@ static auto getActivityString(
         {
             return fmt::format(
                 ngettext(
-                    "Downloading from {active_count} of webseed",
-                    "Downloading from {active_count} of webseeds",
+                    "Downloading from {active_count} webseed",
+                    "Downloading from {active_count} webseeds",
                     st->webseedsSendingToUs),
                 fmt::arg("active_count", st->webseedsSendingToUs));
         }
