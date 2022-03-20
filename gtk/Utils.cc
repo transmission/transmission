@@ -159,7 +159,7 @@ void gtr_add_torrent_error_dialog(Gtk::Widget& child, tr_torrent* duplicate_torr
     }
     else
     {
-        secondary = fmt::format(_("Couldn't add .torrent file '{path}'"), fmt::arg("path", filename));
+        secondary = fmt::format(_("Couldn't add torrent file '{path}'"), fmt::arg("path", filename));
     }
 
     auto w = std::make_shared<Gtk::MessageDialog>(

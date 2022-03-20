@@ -254,7 +254,7 @@ Gtk::Widget* PrefsDialog::Impl::downloadingPage()
     t->add_section_title(row, C_("Gerund", "Adding"));
 
     {
-        auto* l = new_check_button(_("Automatically add .torrent files _from:"), TR_KEY_watch_dir_enabled, core_);
+        auto* l = new_check_button(_("Automatically add torrent files _from:"), TR_KEY_watch_dir_enabled, core_);
         auto* w = new_path_chooser_button(TR_KEY_watch_dir, core_);
         w->set_sensitive(gtr_pref_flag_get(TR_KEY_watch_dir_enabled));
         l->signal_toggled().connect([l, w]() { target_cb(l, w); });
@@ -267,7 +267,7 @@ Gtk::Widget* PrefsDialog::Impl::downloadingPage()
 
     t->add_wide_control(
         row,
-        *new_check_button(_("Mo_ve .torrent file to the trash"), TR_KEY_trash_original_torrent_files, core_));
+        *new_check_button(_("Mo_ve torrent file to the trash"), TR_KEY_trash_original_torrent_files, core_));
 
     t->add_row(row, _("Save to _Location:"), *new_path_chooser_button(TR_KEY_download_dir, core_));
 

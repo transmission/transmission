@@ -107,7 +107,7 @@ static auto constexpr Options = std::array<tr_option, 45>{
     { { 'a', "allowed", "Allowed IP addresses. (Default: " TR_DEFAULT_RPC_WHITELIST ")", "a", true, "<list>" },
       { 'b', "blocklist", "Enable peer blocklists", "b", false, nullptr },
       { 'B', "no-blocklist", "Disable peer blocklists", "B", false, nullptr },
-      { 'c', "watch-dir", "Where to watch for new .torrent files", "c", true, "<directory>" },
+      { 'c', "watch-dir", "Where to watch for new torrent files", "c", true, "<directory>" },
       { 'C', "no-watch-dir", "Disable the watch-dir", "C", false, nullptr },
       { 941, "incomplete-dir", "Where to store new torrents until they're complete", nullptr, true, "<directory>" },
       { 942, "no-incomplete-dir", "Don't store incomplete torrents in a different location", nullptr, false, nullptr },
@@ -243,7 +243,7 @@ static auto onFileAdded(tr_watchdir_t dir, char const* name, void* vsession)
 
     if (tr_torrentNew(ctor, nullptr) == nullptr)
     {
-        tr_logAddError(fmt::format(_("Couldn't add .torrent file '{path}'"), fmt::arg("path", name)));
+        tr_logAddError(fmt::format(_("Couldn't add torrent file '{path}'"), fmt::arg("path", name)));
     }
     else
     {
@@ -254,7 +254,7 @@ static auto onFileAdded(tr_watchdir_t dir, char const* name, void* vsession)
         {
             tr_error* error = nullptr;
 
-            tr_logAddInfo(fmt::format(_("Removing .torrent file '{path}'"), fmt::arg("path", name)));
+            tr_logAddInfo(fmt::format(_("Removing torrent file '{path}'"), fmt::arg("path", name)));
 
             if (!tr_sys_path_remove(filename.c_str(), &error))
             {
@@ -761,7 +761,7 @@ static int daemon_start(void* varg, [[maybe_unused]] bool foreground)
         (void)tr_variantDictFindStrView(settings, TR_KEY_watch_dir, &dir);
         if (!std::empty(dir))
         {
-            tr_logAddInfo(fmt::format(_("Watching '{path}' for new .torrent files"), fmt::arg("path", dir)));
+            tr_logAddInfo(fmt::format(_("Watching '{path}' for new torrent files"), fmt::arg("path", dir)));
 
             watchdir = tr_watchdir_new(dir, &onFileAdded, mySession, ev_base, force_generic);
             if (watchdir == nullptr)

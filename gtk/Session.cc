@@ -1038,7 +1038,7 @@ int Session::Impl::add_ctor(tr_ctor* ctor, bool do_prompt, bool do_notify)
 
     if (tr_torrentFindFromMetainfo(get_session(), metainfo) != nullptr)
     {
-        /* don't complain about .torrent files in the watch directory
+        /* don't complain about torrent files in the watch directory
          * that have already been added... that gets annoying and we
          * don't want to be nagging users to clean up their watch dirs */
         if (tr_ctorGetSourceFile(ctor) == nullptr || !adding_from_watch_dir_)
@@ -1183,7 +1183,7 @@ bool Session::Impl::add_file(Glib::RefPtr<Gio::File> const& file, bool do_start,
     else
     {
         tr_ctorFree(ctor);
-        std::cerr << fmt::format(_("Couldn't add .torrent file '{path}'"), fmt::arg("path", file->get_parse_name()))
+        std::cerr << fmt::format(_("Couldn't add torrent file '{path}'"), fmt::arg("path", file->get_parse_name()))
                   << std::endl;
     }
 
