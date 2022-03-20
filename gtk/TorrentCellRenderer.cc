@@ -173,7 +173,7 @@ std::string getShortStatusString(
         return fmt::format(
             "{} {}",
             getShortTransferString(tor, st, uploadSpeed_KBps, downloadSpeed_KBps),
-            fmt::format(_("Ratio: {percent}"), fmt::arg("percent", tr_strlratio(st->ratio))));
+            fmt::format(_("Ratio: {ratio}"), fmt::arg("ratio", tr_strlratio(st->ratio))));
 
     default:
         return {};
