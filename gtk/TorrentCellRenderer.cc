@@ -233,7 +233,7 @@ static auto getActivityString(
                 ngettext(
                     "Downloading from {active_count} of {connected_count} connected peer and webseed",
                     "Downloading from {active_count} of {connected_count} connected peers and webseeds",
-                    st->peersSendingToUs + st->webseedsSendingToUs),
+                    st->peersConnected + st->webseedsSendingToUs),
                 fmt::arg("active_count", st->peersSendingToUs + st->webseedsSendingToUs),
                 fmt::arg("connected_count", st->peersConnected + st->webseedsSendingToUs));
         }
