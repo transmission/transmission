@@ -12,7 +12,7 @@
 #include <shlobj.h> /* SHCreateDirectoryEx() */
 #include <winioctl.h> /* FSCTL_SET_SPARSE */
 
-#include <fmt/base.h>
+#include <fmt/core.h>
 
 #include "transmission.h"
 #include "crypto-utils.h" /* tr_rand_int() */
