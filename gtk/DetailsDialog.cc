@@ -857,7 +857,7 @@ void DetailsDialog::Impl::refreshInfo(std::vector<tr_torrent*> const& torrents)
         else
         {
             str = fmt::format(
-                ngettext("{file_size} ({piece_count} piece", "{file_size} ({piece_count} pieces", pieces),
+                ngettext("{file_size} ({piece_count} piece)", "{file_size} ({piece_count} pieces)", pieces),
                 fmt::arg("file_size", sizebuf),
                 fmt::arg("piece_count", pieces));
         }
