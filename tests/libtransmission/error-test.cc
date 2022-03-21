@@ -6,6 +6,8 @@
 #include "transmission.h"
 #include "error.h"
 
+#include "test-fixtures.h"
+
 #include "gtest/gtest.h"
 
 using namespace std::literals;
@@ -15,7 +17,7 @@ TEST(Error, errorSet)
     tr_error* err = nullptr;
 
     tr_error_prefix(&err, "error: ");
-    EXPECT_EQ(nullptr, err);
+    EXPECT_EQ(nullptr, err) << *err;
 
     tr_error_set(&err, 2, "oops"sv);
     EXPECT_NE(nullptr, err);
@@ -45,7 +47,7 @@ TEST(Error, propagate)
     EXPECT_NE(nullptr, err2);
     EXPECT_EQ(Code, err2->code);
     EXPECT_STREQ("oops", err2->message);
-    EXPECT_EQ(nullptr, err);
+    EXPECT_EQ(nullptr, err) << *err;
 
     tr_error_clear(&err2);
 }

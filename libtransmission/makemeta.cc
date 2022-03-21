@@ -44,9 +44,9 @@ struct FileList
     struct FileList* next;
 };
 
-static struct FileList* getFiles(char const* dir, char const* base, struct FileList* list)
+static struct FileList* getFiles(std::string_view dir, std::string_view base, struct FileList* list)
 {
-    if (dir == nullptr || base == nullptr)
+    if (std::empty(dir) || std::empty(base))
     {
         return nullptr;
     }
@@ -152,14 +152,7 @@ tr_metainfo_builder* tr_metaInfoBuilderCreate(char const* topFileArg)
 
     /* build a list of files containing top file and,
        if it's a directory, all of its children */
-    FileList* files = nullptr;
-    {
-        char* dir = tr_sys_path_dirname(ret->top, nullptr);
-        char* base = tr_sys_path_basename(ret->top, nullptr);
-        files = getFiles(dir, base, nullptr);
-        tr_free(base);
-        tr_free(dir);
-    }
+    auto* files = getFiles(tr_sys_path_dirname(ret->top), tr_sys_path_basename(ret->top), nullptr);
 
     for (auto* walk = files; walk != nullptr; walk = walk->next)
     {
@@ -172,7 +165,7 @@ tr_metainfo_builder* tr_metaInfoBuilderCreate(char const* topFileArg)
     auto const offset = strlen(ret->top);
     while (files != nullptr)
     {
-        struct FileList* const tmp = files;
+        auto* const tmp = files;
         files = files->next;
 
         auto* const file = &ret->files[i++];
@@ -412,10 +405,9 @@ static void makeInfoDict(tr_variant* dict, tr_metainfo_builder* builder)
         tr_variantDictAddInt(dict, TR_KEY_length, builder->files[0].size);
     }
 
-    if (auto* const base = tr_sys_path_basename(builder->top, nullptr); base != nullptr)
+    if (auto const base = tr_sys_path_basename(builder->top); !std::empty(base))
     {
         tr_variantDictAddStr(dict, TR_KEY_name, base);
-        tr_free(base);
     }
 
     tr_variantDictAddInt(dict, TR_KEY_piece_length, builder->pieceSize);

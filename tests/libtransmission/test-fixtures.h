@@ -8,6 +8,7 @@
 #include <chrono>
 #include <cstdlib> // getenv()
 #include <cstring> // strlen()
+#include <iostream>
 #include <memory>
 #include <mutex> // std::once_flag()
 #include <string>
@@ -24,6 +25,12 @@
 #include "variant.h"
 
 #include "gtest/gtest.h"
+
+inline std::ostream& operator<<(std::ostream& os, tr_error const& err)
+{
+    os << err.message << ' ' << err.code;
+    return os;
+}
 
 namespace libtransmission
 {
@@ -176,10 +183,10 @@ protected:
     {
         auto const tmperr = errno;
 
-        auto const dir = makeString(tr_sys_path_dirname(path.c_str(), nullptr));
+        auto const dir = tr_sys_path_dirname(path);
         tr_error* error = nullptr;
         tr_sys_dir_create(dir.data(), TR_SYS_DIR_CREATE_PARENTS, 0700, &error);
-        EXPECT_EQ(nullptr, error) << "path[" << path << "] dir[" << dir << "] " << error->code << ", " << error->message;
+        EXPECT_EQ(nullptr, error) << "path[" << path << "] dir[" << dir << "] " << *error;
 
         errno = tmperr;
     }
@@ -376,7 +383,7 @@ protected:
         auto* ctor = tr_ctorNew(session_);
         tr_error* error = nullptr;
         EXPECT_TRUE(tr_ctorSetMetainfo(ctor, std::data(metainfo), std::size(metainfo), &error));
-        EXPECT_EQ(nullptr, error);
+        EXPECT_EQ(nullptr, error) << *error;
         tr_ctorSetPaused(ctor, TR_FORCE, true);
 
         // create the torrent
@@ -397,7 +404,7 @@ protected:
             auto path = (!complete && i == 0) ? tr_strvJoin(tor->currentDir().sv(), TR_PATH_DELIMITER_STR, file.name, ".part") :
                                                 tr_strvJoin(tor->currentDir().sv(), TR_PATH_DELIMITER_STR, file.name);
 
-            auto const dirname = makeString(tr_sys_path_dirname(path.c_str(), nullptr));
+            auto const dirname = tr_sys_path_dirname(path);
             tr_sys_dir_create(dirname.data(), TR_SYS_DIR_CREATE_PARENTS, 0700, nullptr);
             auto fd = tr_sys_file_open(
                 path.c_str(),

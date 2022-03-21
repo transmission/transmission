@@ -17,6 +17,8 @@
 #include "utils.h"
 #include "variant.h"
 
+#include "test-fixtures.h"
+
 #include "gtest/gtest.h"
 
 using AnnounceListTest = ::testing::Test;
@@ -344,9 +346,9 @@ TEST_F(AnnounceListTest, save)
     auto const test_file = tr_strvJoin(::testing::TempDir(), "transmission-announce-list-test.torrent"sv);
     tr_error* error = nullptr;
     EXPECT_TRUE(tr_loadFile(original_content, OriginalFile, &error));
-    EXPECT_EQ(nullptr, error);
+    EXPECT_EQ(nullptr, error) << *error;
     EXPECT_TRUE(tr_saveFile(test_file, { std::data(original_content), std::size(original_content) }, &error));
-    EXPECT_EQ(nullptr, error);
+    EXPECT_EQ(nullptr, error) << *error;
 
     // make an announce_list for it
     auto announce_list = tr_announce_list();
@@ -362,7 +364,7 @@ TEST_F(AnnounceListTest, save)
 
     // now save to a real torrent file
     EXPECT_TRUE(announce_list.save(test_file, &error));
-    EXPECT_EQ(nullptr, error);
+    EXPECT_EQ(nullptr, error) << *error;
 
     // load the original
     auto original_tm = tr_torrent_metainfo{};

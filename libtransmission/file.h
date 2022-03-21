@@ -8,6 +8,7 @@
 #include <cstddef> // size_t
 #include <cinttypes> // uintX_t
 #include <ctime>
+#include <string>
 #include <string_view>
 
 #ifdef _WIN32
@@ -223,7 +224,7 @@ char* tr_sys_path_resolve(char const* path, struct tr_error** error);
  *         it when no longer needed), `nullptr` otherwise (with `error` set
  *         accordingly).
  */
-char* tr_sys_path_basename(std::string_view path, struct tr_error** error);
+std::string tr_sys_path_basename(std::string_view path, struct tr_error** error = nullptr);
 
 /**
  * @brief Portability wrapper for `dirname()`.
@@ -237,7 +238,7 @@ char* tr_sys_path_basename(std::string_view path, struct tr_error** error);
  *         when no longer needed), `nullptr` otherwise (with `error` set
  *         accordingly).
  */
-char* tr_sys_path_dirname(std::string_view path, struct tr_error** error);
+std::string tr_sys_path_dirname(std::string_view path, struct tr_error** error = nullptr);
 
 /**
  * @brief Portability wrapper for `rename()`.

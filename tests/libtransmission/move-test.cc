@@ -3,6 +3,7 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include <iostream>
 #include <string>
 #include <utility>
 
@@ -23,6 +24,8 @@ namespace libtransmission
 namespace test
 {
 
+auto constexpr MaxWaitMsec = 5000;
+
 class IncompleteDirTest
     : public SessionTest
     , public ::testing::WithParamInterface<std::pair<std::string, std::string>>
@@ -30,10 +33,10 @@ class IncompleteDirTest
 protected:
     void SetUp() override
     {
-        auto const incomplete_dir = GetParam().first;
         auto const download_dir = GetParam().second;
-        tr_variantDictAddStr(settings(), TR_KEY_download_dir, download_dir.data());
-        tr_variantDictAddStr(settings(), TR_KEY_incomplete_dir, incomplete_dir.data());
+        tr_variantDictAddStr(settings(), TR_KEY_download_dir, download_dir.c_str());
+        auto const incomplete_dir = GetParam().first;
+        tr_variantDictAddStr(settings(), TR_KEY_incomplete_dir, incomplete_dir.c_str());
         tr_variantDictAddBool(settings(), TR_KEY_incomplete_dir_enabled, true);
 
         SessionTest::SetUp();
@@ -126,7 +129,7 @@ TEST_P(IncompleteDirTest, incompleteDir)
     {
         return completeness != -1;
     };
-    EXPECT_TRUE(waitFor(test, 300));
+    EXPECT_TRUE(waitFor(test, MaxWaitMsec));
     EXPECT_EQ(TR_SEED, completeness);
 
     auto const n = tr_torrentFileCount(tor);
@@ -174,7 +177,7 @@ TEST_F(MoveTest, setLocation)
     {
         return state == TR_LOC_DONE;
     };
-    EXPECT_TRUE(waitFor(test, 300));
+    EXPECT_TRUE(waitFor(test, MaxWaitMsec));
     EXPECT_EQ(TR_LOC_DONE, state);
 
     // confirm the torrent is still complete after being moved

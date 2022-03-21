@@ -384,42 +384,32 @@ char* tr_sys_path_resolve(char const* path, tr_error** error)
     return ret;
 }
 
-char* tr_sys_path_basename(std::string_view path, tr_error** error)
+std::string tr_sys_path_basename(std::string_view path, tr_error** error)
 {
-    char* const tmp = tr_strvDup(path);
-    char* ret = basename(tmp);
+    auto tmp = std::string{ path };
+    char* ret = basename(std::data(tmp));
 
     if (ret != nullptr)
     {
-        ret = tr_strdup(ret);
-    }
-    else
-    {
-        set_system_error(error, errno);
+        return ret;
     }
 
-    tr_free(tmp);
-
-    return ret;
+    set_system_error(error, errno);
+    return {};
 }
 
-char* tr_sys_path_dirname(std::string_view path, tr_error** error)
+std::string tr_sys_path_dirname(std::string_view path, tr_error** error)
 {
-    char* const tmp = tr_strvDup(path);
-    char* ret = dirname(tmp);
+    auto tmp = std::string{ path };
+    char* ret = dirname(std::data(tmp));
 
     if (ret != nullptr)
     {
-        ret = tr_strdup(ret);
-    }
-    else
-    {
-        set_system_error(error, errno);
+        return ret;
     }
 
-    tr_free(tmp);
-
-    return ret;
+    set_system_error(error, errno);
+    return {};
 }
 
 bool tr_sys_path_rename(char const* src_path, char const* dst_path, tr_error** error)
