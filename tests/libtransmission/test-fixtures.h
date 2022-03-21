@@ -302,7 +302,6 @@ private:
 
     tr_session* sessionInit(tr_variant* settings)
     {
-        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
         ensureFormattersInited();
 
         // download dir
@@ -343,17 +342,12 @@ private:
             tr_variantDictAddInt(settings, q, verbose ? TR_LOG_DEBUG : TR_LOG_ERROR);
         }
 
-        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
-        auto* session = tr_sessionInit(sandboxDir().data(), !verbose, settings);
-        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
-        return session;
+        return tr_sessionInit(sandboxDir().data(), !verbose, settings);
     }
 
     void sessionClose(tr_session* session)
     {
-        std::cerr << __FILE__ << ':' << __LINE__ << " SessionTest::sessionClose() calling tr_closeSession()" << std::endl;
         tr_sessionClose(session);
-        std::cerr << __FILE__ << ':' << __LINE__ << " session is closed" << std::endl;
         tr_logFreeQueue(tr_logGetQueue());
     }
 
@@ -480,12 +474,9 @@ protected:
 
     virtual void SetUp() override
     {
-        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
         SandboxedTest::SetUp();
 
-        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
         session_ = sessionInit(settings());
-        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     }
 
     virtual void TearDown() override
