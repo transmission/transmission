@@ -745,8 +745,8 @@ bool FileList::Impl::on_rename_done_idle(Glib::ustring const& path_string, Glib:
             *static_cast<Gtk::Window*>(widget_.get_toplevel()),
             fmt::format(
                 _("Couldn't rename '{old_path}' as '{path}': {error} ({error_code})"),
-                fmt::arg("old_path", path_string.raw()),
-                fmt::arg("path", newname.raw()),
+                fmt::arg("old_path", path_string),
+                fmt::arg("path", newname),
                 fmt::arg("error", tr_strerror(error)),
                 fmt::arg("error_code", error)),
             false,

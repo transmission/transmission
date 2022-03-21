@@ -10,6 +10,8 @@
 #include <glibmm.h>
 #include <glibmm/i18n.h>
 
+#include <fmt/core.h>
+
 #include <libtransmission/transmission.h>
 
 #include "HigWorkarea.h"
@@ -72,7 +74,9 @@ void RelocateDialog::Impl::startMovingNextTorrent()
 
     torrent_ids_.pop_back();
 
-    message_dialog_->set_message(gtr_sprintf(_("Moving \"%s\""), tr_torrentName(tor)), true);
+    message_dialog_->set_message(
+        fmt::format(_("Moving '{torrent_name}'"), fmt::arg("torrent_name", tr_torrentName(tor))),
+        true);
 }
 
 /* every once in awhile, check to see if the move is done.

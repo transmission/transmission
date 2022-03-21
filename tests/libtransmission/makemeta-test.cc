@@ -56,8 +56,8 @@ protected:
         EXPECT_FALSE(builder->isFolder);
         EXPECT_FALSE(builder->abortFlag);
 
-        // have tr_makeMetaInfo() build the .torrent file
-        auto const torrent_file = tr_strvJoin(input_file, ".torrent");
+        // have tr_makeMetaInfo() build the torrent file
+        auto const torrent_file = tr_strvJoin(input_file, ".torrent"sv);
         tr_makeMetaInfo(
             builder,
             torrent_file.c_str(),
@@ -80,7 +80,7 @@ protected:
         }
         sync();
 
-        // now let's check our work: parse the  .torrent file
+        // now let's check our work: parse the  torrent file
         EXPECT_TRUE(metainfo.parseTorrentFile(torrent_file));
 
         // quick check of some of the parsed metainfo
@@ -147,7 +147,7 @@ protected:
             EXPECT_EQ(payload_sizes[i], builder->files[i].size);
         }
 
-        // build the .torrent file
+        // build the torrent file
         auto torrent_file = tr_strvJoin(top, ".torrent"sv);
         tr_makeMetaInfo(
             builder,
@@ -171,7 +171,7 @@ protected:
         EXPECT_TRUE(waitFor(test, 5000));
         sync();
 
-        // now let's check our work: parse the  .torrent file
+        // now let's check our work: parse the  torrent file
         auto metainfo = tr_torrent_metainfo{};
         EXPECT_TRUE(metainfo.parseTorrentFile(torrent_file));
 

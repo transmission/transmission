@@ -351,7 +351,7 @@ void register_magnet_link_handler()
         auto const msg = fmt::format(
             _("Couldn't register Transmission as a {content_type} handler: {error} ({error_code})"),
             fmt::arg("content_type", content_type),
-            fmt::arg("error", e.what().raw()),
+            fmt::arg("error", e.what()),
             fmt::arg("error_code", e.code()));
         g_warning("%s", msg.c_str());
     }

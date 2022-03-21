@@ -171,7 +171,7 @@ void OptionsDialog::Impl::updateTorrent()
 }
 
 /**
- * When the source .torrent file is deleted
+ * When the source torrent file is deleted
  * (such as, if it was a temp file that a web browser passed to us),
  * gtk invokes this callback and `filename' will be nullptr.
  * The `filename' tests here are to prevent us from losing the current
@@ -292,7 +292,7 @@ OptionsDialog::Impl::Impl(
     filename_ = tr_ctorGetSourceFile(ctor_.get()) != nullptr ? tr_ctorGetSourceFile(ctor_.get()) : "";
     downloadDir_ = str;
     file_list_ = Gtk::make_managed<FileList>(core_, 0);
-    trash_check_ = Gtk::make_managed<Gtk::CheckButton>(_("Mo_ve .torrent file to the trash"), true);
+    trash_check_ = Gtk::make_managed<Gtk::CheckButton>(_("Mo_ve torrent file to the trash"), true);
     run_check_ = Gtk::make_managed<Gtk::CheckButton>(_("_Start when added"), true);
 
     priority_combo_ = gtr_priority_combo_new();
@@ -376,7 +376,7 @@ OptionsDialog::Impl::Impl(
     run_check_->set_active(!flag);
     grid->attach(*run_check_, 0, row, 2, 1);
 
-    /* "trash .torrent file" row */
+    /* "trash torrent file" row */
     row++;
 
     if (!tr_ctorGetDeleteSource(ctor_.get(), &flag))
