@@ -593,11 +593,14 @@ static void tr_sessionInitImpl(init_data* data);
 
 tr_session* tr_sessionInit(char const* config_dir, bool messageQueuingEnabled, tr_variant* clientSettings)
 {
+    std::cerr << __FILE__ << ':' << __LINE__ << " tr_sessionInit()" << std::endl;
     tr_logSetLevel(TR_LOG_TRACE); // FIXME: for debugging only. do not merge into main
     TR_ASSERT(tr_variantIsDict(clientSettings));
 
+    std::cerr << __FILE__ << ':' << __LINE__ << " tr_sessionInit()" << std::endl;
     tr_timeUpdate(time(nullptr));
 
+    std::cerr << __FILE__ << ':' << __LINE__ << " tr_sessionInit()" << std::endl;
     /* initialize the bare skeleton of the session object */
     auto* session = new tr_session{};
     session->udp_socket = TR_BAD_SOCKET;
@@ -608,35 +611,50 @@ tr_session* tr_sessionInit(char const* config_dir, bool messageQueuingEnabled, t
     session->removed_torrents.clear();
     bandwidthGroupRead(session, config_dir);
 
+    std::cerr << __FILE__ << ':' << __LINE__ << " tr_sessionInit()" << std::endl;
     /* nice to start logging at the very beginning */
     if (auto i = int64_t{}; tr_variantDictFindInt(clientSettings, TR_KEY_message_level, &i))
     {
         tr_logSetLevel(tr_log_level(i));
     }
 
+    std::cerr << __FILE__ << ':' << __LINE__ << " tr_sessionInit()" << std::endl;
     /* start the libtransmission thread */
+    std::cerr << __FILE__ << ':' << __LINE__ << " tr_sessionInit()" << std::endl;
     tr_net_init(); /* must go before tr_eventInit */
+    std::cerr << __FILE__ << ':' << __LINE__ << " tr_sessionInit()" << std::endl;
     tr_eventInit(session);
+    std::cerr << __FILE__ << ':' << __LINE__ << " tr_sessionInit()" << std::endl;
     TR_ASSERT(session->events != nullptr);
+    std::cerr << __FILE__ << ':' << __LINE__ << " tr_sessionInit()" << std::endl;
 
+    std::cerr << __FILE__ << ':' << __LINE__ << " tr_sessionInit()" << std::endl;
     auto data = init_data{};
     data.session = session;
     data.config_dir = config_dir;
     data.messageQueuingEnabled = messageQueuingEnabled;
     data.clientSettings = clientSettings;
 
+    std::cerr << __FILE__ << ':' << __LINE__ << " tr_sessionInit()" << std::endl;
     // run it in the libtransmission thread
     if (tr_amInEventThread(session))
     {
+        std::cerr << __FILE__ << ':' << __LINE__ << " tr_sessionInit()" << std::endl;
         tr_sessionInitImpl(&data);
+        std::cerr << __FILE__ << ':' << __LINE__ << " tr_sessionInit()" << std::endl;
     }
     else
     {
+        std::cerr << __FILE__ << ':' << __LINE__ << " tr_sessionInit()" << std::endl;
         auto lock = session->unique_lock();
+        std::cerr << __FILE__ << ':' << __LINE__ << " tr_sessionInit()" << std::endl;
         tr_runInEventThread(session, tr_sessionInitImpl, &data);
+        std::cerr << __FILE__ << ':' << __LINE__ << " tr_sessionInit()" << std::endl;
         data.done_cv.wait(lock); // wait for the session to be ready
+        std::cerr << __FILE__ << ':' << __LINE__ << " tr_sessionInit()" << std::endl;
     }
 
+    std::cerr << __FILE__ << ':' << __LINE__ << " tr_sessionInit()" << std::endl;
     return session;
 }
 
@@ -699,21 +717,30 @@ static void loadBlocklists(tr_session* session);
 
 static void tr_sessionInitImpl(init_data* data)
 {
+    std::cerr << __FILE__ << ':' << __LINE__ << " tr_sessionInitImpl()" << std::endl;
     tr_variant const* const clientSettings = data->clientSettings;
     tr_session* session = data->session;
 
+    std::cerr << __FILE__ << ':' << __LINE__ << " tr_sessionInitImpl()" << std::endl;
     TR_ASSERT(tr_amInEventThread(session));
     TR_ASSERT(tr_variantIsDict(clientSettings));
 
+    std::cerr << __FILE__ << ':' << __LINE__ << " tr_sessionInitImpl()" << std::endl;
     tr_logAddTrace(
         fmt::format("tr_sessionInit: the session's top-level bandwidth object is {}", fmt::ptr(&session->top_bandwidth_)));
 
+    std::cerr << __FILE__ << ':' << __LINE__ << " tr_sessionInitImpl()" << std::endl;
     tr_variant settings;
 
+    std::cerr << __FILE__ << ':' << __LINE__ << " tr_sessionInitImpl()" << std::endl;
     tr_variantInitDict(&settings, 0);
+    std::cerr << __FILE__ << ':' << __LINE__ << " tr_sessionInitImpl()" << std::endl;
     tr_sessionGetDefaultSettings(&settings);
+    std::cerr << __FILE__ << ':' << __LINE__ << " tr_sessionInitImpl()" << std::endl;
     tr_variantMergeDicts(&settings, clientSettings);
+    std::cerr << __FILE__ << ':' << __LINE__ << " tr_sessionInitImpl()" << std::endl;
 
+    std::cerr << __FILE__ << ':' << __LINE__ << " tr_sessionInitImpl()" << std::endl;
     TR_ASSERT(session->event_base != nullptr);
     session->nowTimer = evtimer_new(session->event_base, onNowTimer, session);
     onNowTimer(0, 0, session);
@@ -727,9 +754,12 @@ static void tr_sessionInitImpl(init_data* data)
 
     tr_setConfigDir(session, data->config_dir);
 
+    std::cerr << __FILE__ << ':' << __LINE__ << " tr_sessionInitImpl()" << std::endl;
     session->peerMgr = tr_peerMgrNew(session);
 
+    std::cerr << __FILE__ << ':' << __LINE__ << " tr_sessionInitImpl()" << std::endl;
     session->shared = tr_sharedInit(session);
+    std::cerr << __FILE__ << ':' << __LINE__ << " tr_sessionInitImpl()" << std::endl;
 
     /**
     ***  Blocklist
@@ -738,34 +768,50 @@ static void tr_sessionInitImpl(init_data* data)
     {
         auto const filename = tr_strvPath(session->config_dir, "blocklists"sv);
         tr_sys_dir_create(filename.c_str(), TR_SYS_DIR_CREATE_PARENTS, 0777, nullptr);
+        std::cerr << __FILE__ << ':' << __LINE__ << " tr_sessionInitImpl()" << std::endl;
         loadBlocklists(session);
+        std::cerr << __FILE__ << ':' << __LINE__ << " tr_sessionInitImpl()" << std::endl;
     }
 
+    std::cerr << __FILE__ << ':' << __LINE__ << " tr_sessionInitImpl()" << std::endl;
     TR_ASSERT(tr_isSession(session));
 
+    std::cerr << __FILE__ << ':' << __LINE__ << " tr_sessionInitImpl()" << std::endl;
     session->saveTimer = evtimer_new(session->event_base, onSaveTimer, session);
     tr_timerAdd(session->saveTimer, SaveIntervalSecs, 0);
 
+    std::cerr << __FILE__ << ':' << __LINE__ << " tr_sessionInitImpl()" << std::endl;
     tr_announcerInit(session);
 
+    std::cerr << __FILE__ << ':' << __LINE__ << " tr_sessionInitImpl()" << std::endl;
     tr_logAddInfo(fmt::format(_("Transmission version {version} starting"), fmt::arg("version", LONG_VERSION_STRING)));
 
+    std::cerr << __FILE__ << ':' << __LINE__ << " tr_sessionInitImpl()" << std::endl;
     tr_statsInit(session);
+    std::cerr << __FILE__ << ':' << __LINE__ << " tr_sessionInitImpl()" << std::endl;
 
+    std::cerr << __FILE__ << ':' << __LINE__ << " tr_sessionInitImpl()" << std::endl;
     tr_sessionSet(session, &settings);
 
+    std::cerr << __FILE__ << ':' << __LINE__ << " tr_sessionInitImpl()" << std::endl;
     tr_udpInit(session);
 
+    std::cerr << __FILE__ << ':' << __LINE__ << " tr_sessionInitImpl()" << std::endl;
     session->web = tr_web::create(session->web_mediator);
 
+    std::cerr << __FILE__ << ':' << __LINE__ << " tr_sessionInitImpl()" << std::endl;
     if (session->isLPDEnabled)
     {
+        std::cerr << __FILE__ << ':' << __LINE__ << " tr_sessionInitImpl()" << std::endl;
         tr_lpdInit(session, &session->bind_ipv4->addr);
     }
 
     /* cleanup */
+    std::cerr << __FILE__ << ':' << __LINE__ << " tr_sessionInitImpl()" << std::endl;
     tr_variantFree(&settings);
+    std::cerr << __FILE__ << ':' << __LINE__ << " tr_sessionInitImpl()" << std::endl;
     data->done_cv.notify_one();
+    std::cerr << __FILE__ << ':' << __LINE__ << " tr_sessionInitImpl()" << std::endl;
 }
 
 static void turtleBootstrap(tr_session* /*session*/, struct tr_turtle_info* /*turtle*/);
