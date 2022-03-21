@@ -593,6 +593,7 @@ static void tr_sessionInitImpl(init_data* data);
 
 tr_session* tr_sessionInit(char const* config_dir, bool messageQueuingEnabled, tr_variant* clientSettings)
 {
+    tr_logSetLevel(TR_LOG_TRACE); // FIXME: for debugging only. do not merge into main
     TR_ASSERT(tr_variantIsDict(clientSettings));
 
     tr_timeUpdate(time(nullptr));
