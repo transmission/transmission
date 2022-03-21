@@ -720,6 +720,7 @@ static void tr_sessionInitImpl(init_data* data)
     std::cerr << __FILE__ << ':' << __LINE__ << " tr_sessionInitImpl()" << std::endl;
     tr_variant const* const clientSettings = data->clientSettings;
     tr_session* session = data->session;
+    auto lock = session->unique_lock();
 
     std::cerr << __FILE__ << ':' << __LINE__ << " tr_sessionInitImpl()" << std::endl;
     TR_ASSERT(tr_amInEventThread(session));
