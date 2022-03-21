@@ -20,6 +20,8 @@
 #include <unordered_set>
 #include <vector>
 
+#include <iostream> // FIXME do not merge into main
+
 #ifndef _WIN32
 #include <sys/types.h> /* umask() */
 #include <sys/stat.h> /* umask() */
@@ -1870,6 +1872,7 @@ static void sessionCloseImplStart(tr_session* session)
     session->cache = nullptr;
 
     /* saveTimer is not used at this point, reusing for UDP shutdown wait */
+    std::cerr << __FILE__ << ':' << __LINE__ << " shutting down UDP" << std::endl;
     TR_ASSERT(session->saveTimer == nullptr);
     session->saveTimer = evtimer_new(session->event_base, sessionCloseImplWaitForIdleUdp, session);
     tr_timerAdd(session->saveTimer, 0, 0);
@@ -1930,6 +1933,7 @@ static auto constexpr ShutdownMaxSeconds = time_t{ 20 };
 
 void tr_sessionClose(tr_session* session)
 {
+    tr_logSetLevel(TR_LOG_TRACE); // FIXME: for debugging only. do not merge into main
     TR_ASSERT(tr_isSession(session));
 
     time_t const deadline = time(nullptr) + ShutdownMaxSeconds;

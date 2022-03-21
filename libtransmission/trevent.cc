@@ -10,6 +10,8 @@
 #include <shared_mutex>
 #include <thread>
 
+#include <iostream> // FIXME: do not merge into main
+
 #include <csignal>
 
 #ifdef _WIN32
@@ -32,8 +34,6 @@
 /***
 ****
 ***/
-
-#include <iostream>
 
 namespace
 {
@@ -199,6 +199,7 @@ static void libeventThreadFunc(tr_event_handle* events)
 
     // loop until `tr_eventClose()` kills the loop
     event_base_loop(base, EVLOOP_NO_EXIT_ON_EMPTY);
+    std::cerr << __FILE__ << ':' << __LINE__ << " libevent event loop exited" << std::endl;
 
     // shut down the thread
     if (dns_base != nullptr)
@@ -241,6 +242,7 @@ void tr_eventClose(tr_session* session)
 
     event_base_loopexit(events->base, nullptr);
 
+    std::cerr << __FILE__ << ':' << __LINE__ << " closing trevent pipe" << std::endl;
     tr_logAddTrace("closing trevent pipe");
 }
 

@@ -347,7 +347,9 @@ private:
 
     void sessionClose(tr_session* session)
     {
+        std::cerr << __FILE__ << ':' << __LINE__ << " SessionTest::sessionClose() calling tr_closeSession()" << std::endl;
         tr_sessionClose(session);
+        std::cerr << __FILE__ << ':' << __LINE__ << " session is closed" << std::endl;
         tr_logFreeQueue(tr_logGetQueue());
     }
 
