@@ -3,6 +3,7 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include <iostream>
 #include <string>
 #include <utility>
 
@@ -32,13 +33,16 @@ class IncompleteDirTest
 protected:
     void SetUp() override
     {
-        auto const incomplete_dir = GetParam().first;
+        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
         auto const download_dir = GetParam().second;
-        tr_variantDictAddStr(settings(), TR_KEY_download_dir, download_dir.data());
-        tr_variantDictAddStr(settings(), TR_KEY_incomplete_dir, incomplete_dir.data());
+        tr_variantDictAddStr(settings(), TR_KEY_download_dir, download_dir.c_str());
+        auto const incomplete_dir = GetParam().first;
+        tr_variantDictAddStr(settings(), TR_KEY_incomplete_dir, incomplete_dir.c_str());
         tr_variantDictAddBool(settings(), TR_KEY_incomplete_dir_enabled, true);
 
+        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
         SessionTest::SetUp();
+        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     }
 
     static auto constexpr MaxWaitMsec = 3000;
@@ -160,6 +164,7 @@ using MoveTest = SessionTest;
 
 TEST_F(MoveTest, setLocation)
 {
+    stds::cerr << __FILE__ << ':' << __LINE__ << " setLocation() begin" << std::endl;
     auto const target_dir = tr_strvPath(tr_sessionGetConfigDir(session_), "target");
     tr_sys_dir_create(target_dir.data(), TR_SYS_DIR_CREATE_PARENTS, 0777, nullptr);
 
@@ -193,6 +198,7 @@ TEST_F(MoveTest, setLocation)
 
     // cleanup
     tr_torrentRemove(tor, true, tr_sys_path_remove);
+    stds::cerr << __FILE__ << ':' << __LINE__ << " setLocation() end" << std::endl;
 }
 
 } // namespace test
