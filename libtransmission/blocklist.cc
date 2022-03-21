@@ -99,12 +99,10 @@ static void blocklistLoad(tr_blocklistFile* b)
     b->byteCount = byteCount;
     b->ruleCount = byteCount / sizeof(struct tr_ipv4_range);
 
-    char* const base = tr_sys_path_basename(b->filename, nullptr);
     tr_logAddInfo(fmt::format(
         ngettext("Blocklist '{path}' has {count} entry", "Blocklist '{path}' has {count} entries", b->ruleCount),
-        fmt::arg("path", base),
+        fmt::arg("path", tr_sys_path_basename(b->filename)),
         fmt::arg("count", b->ruleCount)));
-    tr_free(base);
 }
 
 static void blocklistEnsureLoaded(tr_blocklistFile* b)
@@ -481,12 +479,10 @@ int tr_blocklistFileSetContent(tr_blocklistFile* b, char const* filename)
     }
     else
     {
-        char* base = tr_sys_path_basename(b->filename, nullptr);
         tr_logAddInfo(fmt::format(
             ngettext("Blocklist '{path}' has {count} entry", "Blocklist '{path}' has {count} entries", b->ruleCount),
-            fmt::arg("path", base),
+            fmt::arg("path", tr_sys_path_basename(b->filename)),
             fmt::arg("count", b->ruleCount)));
-        tr_free(base);
     }
 
     tr_free(ranges);

@@ -85,13 +85,13 @@ protected:
 
         // quick check of some of the parsed metainfo
         EXPECT_EQ(payloadSize, metainfo.totalSize());
-        EXPECT_EQ(makeString(tr_sys_path_basename(input_file.data(), nullptr)), metainfo.name());
+        EXPECT_EQ(tr_sys_path_basename(input_file), metainfo.name());
         EXPECT_EQ(comment, metainfo.comment());
         EXPECT_EQ(isPrivate, metainfo.isPrivate());
         EXPECT_EQ(size_t(trackerCount), std::size(metainfo.announceList()));
         EXPECT_EQ(size_t(webseedCount), metainfo.webseedCount());
         EXPECT_EQ(tr_file_index_t{ 1 }, metainfo.fileCount());
-        EXPECT_EQ(makeString(tr_sys_path_basename(input_file.data(), nullptr)), metainfo.fileSubpath(0));
+        EXPECT_EQ(tr_sys_path_basename(input_file), metainfo.fileSubpath(0));
         EXPECT_EQ(payloadSize, metainfo.fileSize(0));
 
         // cleanup
@@ -177,9 +177,7 @@ protected:
 
         // quick check of some of the parsed metainfo
         EXPECT_EQ(total_size, metainfo.totalSize());
-        auto* tmpstr = tr_sys_path_basename(top.c_str(), nullptr);
-        EXPECT_EQ(tmpstr, metainfo.name());
-        tr_free(tmpstr);
+        EXPECT_EQ(tr_sys_path_basename(top), metainfo.name());
         EXPECT_EQ(comment, metainfo.comment());
         EXPECT_EQ(source, metainfo.source());
         EXPECT_EQ(payload_count, metainfo.fileCount());
