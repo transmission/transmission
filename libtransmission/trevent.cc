@@ -180,13 +180,16 @@ static void libeventThreadFunc(tr_event_handle* events)
     signal(SIGPIPE, SIG_IGN);
 #endif
 
+    std::cerr << __FILE__ << ':' << __LINE__ << " tr_eventInit()" << std::endl;
     tr_evthread_init();
 
     // create the libevent base
+    std::cerr << __FILE__ << ':' << __LINE__ << " tr_eventInit()" << std::endl;
     auto* const base = event_base_new();
     auto* const dns_base = evdns_base_new(base, EVDNS_BASE_INITIALIZE_NAMESERVERS);
 
     // initialize the session struct's event fields
+    std::cerr << __FILE__ << ':' << __LINE__ << " tr_eventInit()" << std::endl;
     events->base = base;
     events->work_queue_event = event_new(base, -1, 0, onWorkAvailable, events->session);
     events->session->event_base = base;
@@ -195,9 +198,12 @@ static void libeventThreadFunc(tr_event_handle* events)
 
     // tell the thread that's waiting in tr_eventInit()
     // that this thread is ready for business
+    events->work_queue_mutex.lock();
     events->work_queue_cv.notify_one();
+    events->work_queue_mutex.unlock();
 
     // loop until `tr_eventClose()` kills the loop
+    std::cerr << __FILE__ << ':' << __LINE__ << " tr_eventInit()" << std::endl;
     event_base_loop(base, EVLOOP_NO_EXIT_ON_EMPTY);
     std::cerr << __FILE__ << ':' << __LINE__ << " libevent event loop exited" << std::endl;
 
@@ -212,22 +218,33 @@ static void libeventThreadFunc(tr_event_handle* events)
     events->session->evdns_base = nullptr;
     events->session->events = nullptr;
     delete events;
+    std::cerr << __FILE__ << ':' << __LINE__ << " tr_eventInit()" << std::endl;
     tr_logAddTrace("Closing libevent thread");
+    std::cerr << __FILE__ << ':' << __LINE__ << " tr_eventInit()" << std::endl;
 }
 
 void tr_eventInit(tr_session* session)
 {
+    std::cerr << __FILE__ << ':' << __LINE__ << " tr_eventInit()" << std::endl;
     session->events = nullptr;
 
+    std::cerr << __FILE__ << ':' << __LINE__ << " tr_eventInit()" << std::endl;
     auto* const events = new tr_event_handle();
+    std::cerr << __FILE__ << ':' << __LINE__ << " tr_eventInit()" << std::endl;
     events->session = session;
 
+    std::cerr << __FILE__ << ':' << __LINE__ << " tr_eventInit()" << std::endl;
     auto lock = std::unique_lock(events->work_queue_mutex);
+    std::cerr << __FILE__ << ':' << __LINE__ << " tr_eventInit()" << std::endl;
     auto thread = std::thread(libeventThreadFunc, events);
+    std::cerr << __FILE__ << ':' << __LINE__ << " tr_eventInit()" << std::endl;
     events->thread_id = thread.get_id();
+    std::cerr << __FILE__ << ':' << __LINE__ << " tr_eventInit()" << std::endl;
     thread.detach();
     // wait until the libevent thread is running
+    std::cerr << __FILE__ << ':' << __LINE__ << " tr_eventInit()" << std::endl;
     events->work_queue_cv.wait(lock);
+    std::cerr << __FILE__ << ':' << __LINE__ << " tr_eventInit()" << std::endl;
 }
 
 void tr_eventClose(tr_session* session)
