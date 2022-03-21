@@ -119,7 +119,7 @@ tr_completeness tr_completion::status() const
         return TR_SEED;
     }
 
-    if (!hasNone() && size_now_ == sizeWhenDone())
+    if (hasMetainfo() && size_now_ == sizeWhenDone())
     {
         return TR_PARTIAL_SEED;
     }
