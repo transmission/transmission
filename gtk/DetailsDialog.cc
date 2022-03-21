@@ -1984,16 +1984,8 @@ void appendScrapeInfo(tr_tracker_view const& tracker, time_t const now, Gtk::Tex
         if (tracker.lastScrapeSucceeded)
         {
             gstr << fmt::format(
-                ngettext(
-                    ngettext(
-                        "Tracker had {markup_begin}{seeder_count} seeder and {leecher_count} leecher {markup_end} {time_span} ago",
-                        "Tracker had {markup_begin}{seeder_count} seeder and {leecher_count} leechers {markup_end} {time_span} ago",
-                        tracker.leecherCount),
-                    ngettext(
-                        "Tracker had {markup_begin}{seeder_count} seeders and {leecher_count} leecher {markup_end} {time_span} ago",
-                        "Tracker had {markup_begin}{seeder_count} seeders and {leecher_count} leechers {markup_end} {time_span} ago",
-                        tracker.leecherCount),
-                    tracker.seederCount),
+                // {markup_begin} and {markup_end} should surround the seeder/leecher text
+                _("Tracker had {markup_begin}{seeder_count} {seeder_or_seeders} and {leecher_count} {leecher_or_leechers}{markup_end} {time_span} ago"),
                 fmt::arg("seeder_count", tracker.seederCount),
                 fmt::arg("seeder_or_seeders", ngettext("seeder", "seeders", tracker.seederCount)),
                 fmt::arg("leecher_count", tracker.leecherCount),
