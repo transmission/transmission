@@ -171,9 +171,9 @@ int tr_main(int argc, char* argv[])
     if (std::empty(options.outfile))
     {
         tr_error* error = nullptr;
-        char* base = tr_sys_path_basename(options.infile, &error);
+        auto const base = tr_sys_path_basename(options.infile, &error);
 
-        if (base == nullptr)
+        if (std::empty(base))
         {
             fprintf(stderr, "ERROR: Cannot deduce output path from input path: %s\n", error->message);
             return EXIT_FAILURE;
@@ -183,7 +183,6 @@ int tr_main(int argc, char* argv[])
         char* cwd = tr_getcwd();
         options.outfile = tr_strvDup(tr_strvPath(cwd, end.c_str()));
         tr_free(cwd);
-        tr_free(base);
     }
 
     if (std::empty(options.trackers))

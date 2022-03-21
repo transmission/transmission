@@ -164,9 +164,9 @@ static int cached_file_open(
     /* create subfolders, if any */
     if (writable)
     {
-        char* dir = tr_sys_path_dirname(filename, &error);
+        auto const dir = tr_sys_path_dirname(filename, &error);
 
-        if (dir == nullptr)
+        if (std::empty(dir))
         {
             tr_logAddError(fmt::format(
                 _("Couldn't create '{path}': {error} ({error_code})"),
@@ -176,18 +176,15 @@ static int cached_file_open(
             goto FAIL;
         }
 
-        if (!tr_sys_dir_create(dir, TR_SYS_DIR_CREATE_PARENTS, 0777, &error))
+        if (!tr_sys_dir_create(dir.c_str(), TR_SYS_DIR_CREATE_PARENTS, 0777, &error))
         {
             tr_logAddError(fmt::format(
                 _("Couldn't create '{path}': {error} ({error_code})"),
                 fmt::arg("path", dir),
                 fmt::arg("error", error->message),
                 fmt::arg("error_code", error->code)));
-            tr_free(dir);
             goto FAIL;
         }
-
-        tr_free(dir);
     }
 
     already_existed = tr_sys_path_get_info(filename, 0, &info, nullptr) && info.type == TR_SYS_PATH_IS_FILE;

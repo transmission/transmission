@@ -45,6 +45,7 @@
 
 using namespace std::literals;
 
+// TODO: use remove this and use tr_strvPath() instead
 static char* tr_buildPath(char const* first_element, ...)
 {
     // pass 1: allocate enough space for the string
@@ -401,13 +402,12 @@ char const* tr_getWebClientDir([[maybe_unused]] tr_session const* session)
                 wchar_t wide_module_path[MAX_PATH];
                 GetModuleFileNameW(nullptr, wide_module_path, TR_N_ELEMENTS(wide_module_path));
                 char* module_path = tr_win32_native_to_utf8(wide_module_path, -1);
-                char* dir = tr_sys_path_dirname(module_path, nullptr);
+                auto const dir = tr_sys_path_dirname(module_path);
                 tr_free(module_path);
 
-                if (dir != nullptr)
+                if (!std::empty(dir))
                 {
-                    char* path = tr_buildPath(dir, "Web", nullptr);
-                    tr_free(dir);
+                    char* path = tr_buildPath(dir.c_str(), "Web", nullptr);
 
                     if (isWebClientDir(path))
                     {

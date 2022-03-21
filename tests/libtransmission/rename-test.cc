@@ -74,7 +74,7 @@ protected:
         EXPECT_LT(0, std::size(benc));
         tr_error* error = nullptr;
         EXPECT_TRUE(tr_ctorSetMetainfo(ctor, std::data(benc), std::size(benc), &error));
-        EXPECT_EQ(nullptr, error);
+        EXPECT_EQ(nullptr, error) << *error;
         tr_ctorSetPaused(ctor, TR_FORCE, true);
 
         // create the torrent
@@ -348,9 +348,7 @@ TEST_F(RenameTest, multifileTorrent)
     str = tr_torrentFindFile(tor, 2);
     EXPECT_NE(nullptr, str);
     tr_sys_path_remove(str, nullptr);
-    auto* tmp = tr_sys_path_dirname(str, nullptr);
-    tr_sys_path_remove(tmp, nullptr);
-    tr_free(tmp);
+    tr_sys_path_remove(tr_sys_path_dirname(str).c_str(), nullptr);
     tr_free(str);
     sync();
     blockingTorrentVerify(tor);

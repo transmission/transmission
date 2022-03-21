@@ -698,6 +698,7 @@ static void tr_sessionInitImpl(init_data* data)
 {
     tr_variant const* const clientSettings = data->clientSettings;
     tr_session* session = data->session;
+    auto lock = session->unique_lock();
 
     TR_ASSERT(tr_amInEventThread(session));
     TR_ASSERT(tr_variantIsDict(clientSettings));
