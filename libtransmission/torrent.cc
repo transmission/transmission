@@ -774,9 +774,9 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
         // if tr_resume::load() loaded progress info, then initCheckedPieces()
         // has already looked for local data on the filesystem
         has_local_data = std::any_of(
-        std::begin(tor->file_mtimes_),
-        std::end(tor->file_mtimes_),
-        [](auto mtime) { return mtime > 0; });
+            std::begin(tor->file_mtimes_),
+            std::end(tor->file_mtimes_),
+            [](auto mtime) { return mtime > 0; });
     }
 
     // if we don't have a local .torrent or .magnet file already, assume the torrent is new
