@@ -100,31 +100,29 @@ Glib::ustring tr_strltime(time_t seconds)
     }
 
     auto const days = (int)(seconds / 86400);
+    auto const d = fmt::format(ngettext("{days} day", "{days} days", days), fmt::arg("days", days));
     int const hours = (seconds % 86400) / 3600;
-    int const minutes = (seconds % 3600) / 60;
-    seconds = (seconds % 3600) % 60;
-
-    auto const d = gtr_sprintf(ngettext("%'d day", "%'d days", days), days);
-    auto const h = gtr_sprintf(ngettext("%'d hour", "%'d hours", hours), hours);
-    auto const m = gtr_sprintf(ngettext("%'d minute", "%'d minutes", minutes), minutes);
-    auto const s = gtr_sprintf(ngettext("%'d second", "%'d seconds", (int)seconds), (int)seconds);
-
+    auto const h = fmt::format(ngettext("{hours} hour", "{hours} hours", hours), fmt::arg("hours", hours));
     if (days != 0)
     {
-        return (days >= 4 || hours == 0) ? d : gtr_sprintf("%s, %s", d, h);
+        return (days >= 4 || hours == 0) ? d : fmt::format("{}, {}", d, h);
     }
-    else if (hours != 0)
+
+    int const minutes = (seconds % 3600) / 60;
+    auto const m = fmt::format(ngettext("{minutes} minute", "{minutes} minutes", minutes), fmt::arg("minutes", minutes));
+    if (hours != 0)
     {
-        return (hours >= 4 || minutes == 0) ? h : gtr_sprintf("%s, %s", h, m);
+        return (hours >= 4 || minutes == 0) ? h : fmt::format("{}, {}", h, m);
     }
-    else if (minutes != 0)
+
+    seconds = (seconds % 3600) % 60;
+    auto const s = fmt::format(ngettext("{seconds} second", "{seconds} seconds", seconds), fmt::arg("seconds", seconds));
+    if (minutes != 0)
     {
-        return (minutes >= 4 || seconds == 0) ? m : gtr_sprintf("%s, %s", m, s);
+        return (minutes >= 4 || seconds == 0) ? m : fmt::format("{}, {}", m, s);
     }
-    else
-    {
-        return s;
-    }
+
+    return s;
 }
 
 namespace
@@ -154,14 +152,14 @@ void gtr_add_torrent_error_dialog(Gtk::Widget& child, tr_torrent* duplicate_torr
 
     if (duplicate_torrent != nullptr)
     {
-        secondary = gtr_sprintf(
-            _("The torrent file \"%s\" is already in use by \"%s.\""),
-            filename,
-            tr_torrentName(duplicate_torrent));
+        secondary = fmt::format(
+            _("The torrent file '{path}' is already in use by '{torrent_name}'."),
+            fmt::arg("path", filename),
+            fmt::arg("torrent_name", tr_torrentName(duplicate_torrent)));
     }
     else
     {
-        secondary = gtr_sprintf(_("Unable to add torrent file \"%s\"."), filename);
+        secondary = fmt::format(_("Couldn't add torrent file '{path}'"), fmt::arg("path", filename));
     }
 
     auto w = std::make_shared<Gtk::MessageDialog>(
@@ -452,13 +450,13 @@ void gtr_unrecognized_url_dialog(Gtk::Widget& parent, Glib::ustring const& url)
 
     auto w = std::make_shared<Gtk::MessageDialog>(
         *window,
-        fmt::format(_("Unsupported URL: '{url}'"), fmt::arg("url", url.raw())),
+        fmt::format(_("Unsupported URL: '{url}'"), fmt::arg("url", url)),
         false /*use markup*/,
         Gtk::MESSAGE_ERROR,
         Gtk::BUTTONS_CLOSE,
         true /*modal*/);
 
-    gstr += gtr_sprintf(_("Transmission doesn't know how to use \"%s\""), url);
+    gstr += fmt::format(_("Transmission doesn't know how to use '{url}'"), fmt::arg("url", url));
 
     if (tr_magnet_metainfo{}.parseMagnet(url.raw()))
     {

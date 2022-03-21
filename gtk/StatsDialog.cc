@@ -8,6 +8,8 @@
 #include <glibmm.h>
 #include <glibmm/i18n.h>
 
+#include <fmt/core.h>
+
 #include "HigWorkarea.h"
 #include "PrefsDialog.h"
 #include "Session.h"
@@ -60,6 +62,11 @@ void setLabelFromRatio(Gtk::Label* l, double d)
     setLabel(l, tr_strlratio(d));
 }
 
+auto startedTimesText(uint64_t n)
+{
+    return fmt::format(ngettext("Started {count:L} time", "Started {count:L} times", n), fmt::arg("count", n));
+}
+
 } // namespace
 
 bool StatsDialog::Impl::updateStats()
@@ -75,10 +82,7 @@ bool StatsDialog::Impl::updateStats()
     setLabel(one_time_lb_, tr_strltime(one.secondsActive));
     setLabelFromRatio(one_ratio_lb_, one.ratio);
 
-    setLabel(
-        all_sessions_lb_,
-        gtr_sprintf(ngettext("Started %'d time", "Started %'d times", (int)all.sessionCount), (int)all.sessionCount));
-
+    setLabel(all_sessions_lb_, startedTimesText(all.sessionCount));
     setLabel(all_up_lb_, tr_strlsize(all.uploadedBytes));
     setLabel(all_down_lb_, tr_strlsize(all.downloadedBytes));
     setLabel(all_time_lb_, tr_strltime(all.secondsActive));
@@ -158,7 +162,7 @@ StatsDialog::Impl::Impl(StatsDialog& dialog, Glib::RefPtr<Session> const& core)
     t->add_section_divider(row);
     t->add_section_title(row, _("Total"));
 
-    all_sessions_lb_ = Gtk::make_managed<Gtk::Label>(_("Started %'d time"));
+    all_sessions_lb_ = Gtk::make_managed<Gtk::Label>(startedTimesText(1));
     all_sessions_lb_->set_single_line_mode(true);
     t->add_label_w(row, *all_sessions_lb_);
     ++row;

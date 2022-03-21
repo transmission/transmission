@@ -101,7 +101,7 @@ bool tr_metaInfoBuilderSetPieceSize(tr_metainfo_builder* builder, uint32_t bytes
 void tr_metaInfoBuilderFree(tr_metainfo_builder*);
 
 /**
- * @brief create a new .torrent file
+ * @brief create a new torrent file
  *
  * This is actually done in a worker thread, not the main thread!
  * Otherwise the client's interface would lock up while this runs.

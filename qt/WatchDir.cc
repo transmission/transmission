@@ -69,7 +69,7 @@ void WatchDir::setPath(QString const& path, bool is_enabled)
     {
         watcher_ = std::make_unique<QFileSystemWatcher>(QStringList{ path });
         connect(watcher_.get(), &QFileSystemWatcher::directoryChanged, this, &WatchDir::watcherActivated);
-        // trigger the watchdir for .torrent files in there already
+        // trigger the watchdir for torrent files in there already
         QTimer::singleShot(0, this, SLOT(rescanAllWatchedDirectories()));
     }
 }
@@ -86,7 +86,7 @@ void WatchDir::watcherActivated(QString const& path)
         files.insert(str);
     }
 
-    // try to add any new files which end in .torrent
+    // try to add any new files which end in torrent
     auto const new_files = files - watch_dir_files_;
     auto const torrent_suffix = QStringLiteral(".torrent");
 
@@ -107,7 +107,7 @@ void WatchDir::watcherActivated(QString const& path)
 
             case ERROR:
                 {
-                    // give the .torrent a few seconds to finish downloading
+                    // give the torrent a few seconds to finish downloading
                     auto* t = new QTimer(this);
                     t->setObjectName(dir.absoluteFilePath(name));
                     t->setSingleShot(true);

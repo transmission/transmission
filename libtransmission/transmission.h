@@ -234,7 +234,7 @@ void tr_sessionClose(tr_session*);
 /**
  * @brief Return the session's configuration directory.
  *
- * This is where transmission stores its .torrent files, .resume files,
+ * This is where transmission stores its torrent files, .resume files,
  * blocklists, etc. It's set in tr_transmissionInit() and is immutable
  * during the session.
  */
@@ -780,7 +780,7 @@ char const* tr_blocklistGetURL(tr_session const*);
 /** @} */
 
 /**
- * Instantiating tr_torrents and wrangling .torrent file metadata
+ * Instantiating tr_torrents and wrangling torrent file metadata
  *
  * 1. Torrent metadata is handled in the tr_torrent_metadata class.
  *
@@ -803,7 +803,7 @@ tr_ctor* tr_ctorNew(tr_session const* session);
 /** @brief Free a torrent constructor object */
 void tr_ctorFree(tr_ctor* ctor);
 
-/** @brief Set whether or not to delete the source .torrent file
+/** @brief Set whether or not to delete the source torrent file
            when the torrent is added. (Default: False) */
 void tr_ctorSetDeleteSource(tr_ctor* ctor, bool doDelete);
 
@@ -813,7 +813,7 @@ bool tr_ctorSetMetainfoFromMagnetLink(tr_ctor* ctor, char const* magnet, tr_erro
 /** @brief Set the constructor's metainfo from a raw benc already in memory */
 bool tr_ctorSetMetainfo(tr_ctor* ctor, char const* metainfo, size_t len, tr_error** error);
 
-/** @brief Set the constructor's metainfo from a local .torrent file */
+/** @brief Set the constructor's metainfo from a local torrent file */
 bool tr_ctorSetMetainfoFromFile(tr_ctor* ctor, char const* filename, tr_error** error);
 
 tr_torrent_metainfo const* tr_ctorGetMetainfo(tr_ctor const* ctor);
@@ -859,10 +859,10 @@ bool tr_ctorGetPaused(tr_ctor const* ctor, tr_ctorMode mode, bool* setmeIsPaused
 /** @brief Get the download path from this peer constructor */
 bool tr_ctorGetDownloadDir(tr_ctor const* ctor, tr_ctorMode mode, char const** setmeDownloadDir);
 
-/** @brief Get the "delete .torrent file" flag from this peer constructor */
+/** @brief Get the "delete torrent file" flag from this peer constructor */
 bool tr_ctorGetDeleteSource(tr_ctor const* ctor, bool* setmeDoDelete);
 
-/** @brief Get the .torrent file that this ctor's metainfo came from,
+/** @brief Get the torrent file that this ctor's metainfo came from,
            or nullptr if tr_ctorSetMetainfoFromFile() wasn't used */
 char const* tr_ctorGetSourceFile(tr_ctor const* ctor);
 
@@ -897,7 +897,7 @@ tr_torrent* tr_torrentNew(tr_ctor* ctor, tr_torrent** setme_duplicate_of);
 
 using tr_fileFunc = bool (*)(char const* filename, struct tr_error** error);
 
-/** @brief Removes our .torrent and .resume files for this torrent */
+/** @brief Removes our torrent and .resume files for this torrent */
 void tr_torrentRemove(tr_torrent* torrent, bool removeLocalData, tr_fileFunc removeFunc);
 
 /** @brief Start a torrent */
@@ -1443,7 +1443,7 @@ struct tr_torrent_view
 struct tr_torrent_view tr_torrentView(tr_torrent const* tor);
 
 /*
- * Get the filename of Transmission's internal copy of the .torrent file.
+ * Get the filename of Transmission's internal copy of the torrent file.
  * This is a duplicate that must be freed with tr_free() when done.
  */
 char* tr_torrentFilename(tr_torrent const* tor);
@@ -1538,7 +1538,7 @@ struct tr_stat
     float percentComplete;
 
     /** How much of the metadata the torrent has.
-        For torrents added from a .torrent this will always be 1.
+        For torrents added from a torrent this will always be 1.
         For magnet links, this number will from from 0 to 1 as the metadata is downloaded.
         Range is [0..1] */
     float metadataPercentComplete;

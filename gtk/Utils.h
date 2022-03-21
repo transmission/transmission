@@ -14,6 +14,9 @@
 #include <glibmm.h>
 #include <gtkmm.h>
 
+#include <fmt/core.h>
+#include <fmt/format.h>
+
 #include <libtransmission/transmission.h>
 #include <libtransmission/tr-macros.h>
 
@@ -201,6 +204,16 @@ struct std::hash<Glib::ustring>
     std::size_t operator()(Glib::ustring const& s) const
     {
         return std::hash<std::string>()(s.raw());
+    }
+};
+
+template<>
+struct fmt::formatter<Glib::ustring> : formatter<std::string>
+{
+    template<typename FormatContext>
+    auto format(Glib::ustring const& ustr, FormatContext& ctx) const
+    {
+        return formatter<std::string>::format(ustr.raw(), ctx);
     }
 };
 

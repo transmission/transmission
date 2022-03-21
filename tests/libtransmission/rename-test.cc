@@ -199,7 +199,7 @@ TEST_F(RenameTest, singleFilenameTorrent)
     EXPECT_STREQ("foobar", tr_torrentName(tor)); // confirm the torrent's name is now 'foobar'
     EXPECT_STREQ("foobar", tr_torrentFile(tor, 0).name); // confirm the file's name is now 'foobar'
     char* const torrent_filename = tr_torrentFilename(tor);
-    EXPECT_STREQ(nullptr, strstr(torrent_filename, "foobar")); // confirm .torrent file hasn't changed
+    EXPECT_STREQ(nullptr, strstr(torrent_filename, "foobar")); // confirm torrent file hasn't changed
     tr_free(torrent_filename);
     tmpstr = tr_strvPath(tor->currentDir().sv(), "foobar");
     EXPECT_TRUE(tr_sys_path_exists(tmpstr.c_str(), nullptr)); // confirm the file's name is now 'foobar' on the disk
