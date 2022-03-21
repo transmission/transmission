@@ -158,7 +158,7 @@ static void tr_watchdir_on_retry_timer(evutil_socket_t /*fd*/, short /*type*/, v
             return;
         }
 
-        tr_logAddWarn(fmt::format(_("Couldn't add .torrent file '{path}'"), fmt::arg("path", retry->name)));
+        tr_logAddWarn(fmt::format(_("Couldn't add torrent file '{path}'"), fmt::arg("path", retry->name)));
     }
 
     tr_watchdir_retries_remove(&handle->active_retries, retry);

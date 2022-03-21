@@ -38,6 +38,8 @@ protected:
 
         SessionTest::SetUp();
     }
+
+    static auto constexpr MaxWaitMsec = 3000;
 };
 
 TEST_P(IncompleteDirTest, incompleteDir)
@@ -110,7 +112,7 @@ TEST_P(IncompleteDirTest, incompleteDir)
             {
                 return data.done;
             };
-            EXPECT_TRUE(waitFor(test, 1000));
+            EXPECT_TRUE(waitFor(test, MaxWaitMsec));
         }
 
         evbuffer_free(data.buf);

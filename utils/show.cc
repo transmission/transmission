@@ -36,7 +36,7 @@ namespace
 auto constexpr TimeoutSecs = long{ 30 };
 
 char constexpr MyName[] = "transmission-show";
-char constexpr Usage[] = "Usage: transmission-show [options] <.torrent file>";
+char constexpr Usage[] = "Usage: transmission-show [options] <torrent-file>";
 char constexpr UserAgent[] = "transmission-show/" LONG_VERSION_STRING;
 
 auto options = std::array<tr_option, 5>{
@@ -328,13 +328,13 @@ int tr_main(int argc, char* argv[])
     /* make sure the user specified a filename */
     if (std::empty(opts.filename))
     {
-        fprintf(stderr, "ERROR: No .torrent file specified.\n");
+        fprintf(stderr, "ERROR: No torrent file specified.\n");
         tr_getopt_usage(MyName, Usage, std::data(options));
         fprintf(stderr, "\n");
         return EXIT_FAILURE;
     }
 
-    /* try to parse the .torrent file */
+    /* try to parse the torrent file */
     auto metainfo = tr_torrent_metainfo{};
     tr_error* error = nullptr;
     auto const parsed = metainfo.parseTorrentFile(opts.filename, nullptr, &error);
@@ -342,7 +342,7 @@ int tr_main(int argc, char* argv[])
     {
         fprintf(
             stderr,
-            "Error parsing .torrent file \"%" TR_PRIsv "\": %s (%d)\n",
+            "Error parsing torrent file \"%" TR_PRIsv "\": %s (%d)\n",
             TR_PRIsv_ARG(opts.filename),
             error->message,
             error->code);
