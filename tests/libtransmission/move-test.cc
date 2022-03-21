@@ -164,7 +164,7 @@ using MoveTest = SessionTest;
 
 TEST_F(MoveTest, setLocation)
 {
-    stds::cerr << __FILE__ << ':' << __LINE__ << " setLocation() begin" << std::endl;
+    std::cerr << __FILE__ << ':' << __LINE__ << " setLocation() begin" << std::endl;
     auto const target_dir = tr_strvPath(tr_sessionGetConfigDir(session_), "target");
     tr_sys_dir_create(target_dir.data(), TR_SYS_DIR_CREATE_PARENTS, 0777, nullptr);
 
@@ -198,7 +198,7 @@ TEST_F(MoveTest, setLocation)
 
     // cleanup
     tr_torrentRemove(tor, true, tr_sys_path_remove);
-    stds::cerr << __FILE__ << ':' << __LINE__ << " setLocation() end" << std::endl;
+    std::cerr << __FILE__ << ':' << __LINE__ << " setLocation() end" << std::endl;
 }
 
 } // namespace test
