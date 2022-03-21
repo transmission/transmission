@@ -622,7 +622,7 @@ static bool setLocalErrorIfFilesDisappeared(tr_torrent* tor, std::optional<bool>
         has_local_data = hasAnyLocalData(tor);
     }
 
-    bool const files_disappeared = tor->hasTotal() > 0 && !has_local_data;
+    bool const files_disappeared = tor->hasTotal() > 0 && !*has_local_data;
     if (files_disappeared)
     {
         tr_logAddTraceTor(tor, "[LAZY] uh oh, the files disappeared");
@@ -771,9 +771,12 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
     auto has_local_data = std::optional<bool>{};
     if ((loaded & tr_resume::Progress) != 0)
     {
-        // if tr_resume::load() populated checked_pieces_, initCheckedPieces()
-        // already looked for local data on the filesystem
-        has_local_data = !tor->checked_pieces_.hasNone();
+        // if tr_resume::load() loaded progress info, then initCheckedPieces()
+        // has already looked for local data on the filesystem
+        has_local_data = std::any_of(
+        std::begin(tor->file_mtimes_),
+        std::end(tor->file_mtimes_),
+        [](auto mtime) { return mtime > 0; });
     }
 
     // if we don't have a local .torrent or .magnet file already, assume the torrent is new
