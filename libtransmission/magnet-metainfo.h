@@ -18,6 +18,8 @@ struct tr_variant;
 
 class tr_magnet_metainfo
 {
+    friend struct MetainfoHandler;
+
 public:
     bool parseMagnet(std::string_view magnet_link, tr_error** error = nullptr);
 
@@ -62,6 +64,8 @@ public:
     {
         name_ = name;
     }
+
+    void addWebseed(std::string_view webseed);
 
 protected:
     tr_announce_list announce_list_;

@@ -308,14 +308,17 @@ std::string_view getSiteName(std::string_view host)
 
     // is it an IP?
     auto addr = tr_address{};
-    auto const szhost = std::string(host);
-    if (tr_address_from_string(&addr, szhost.c_str()))
+    auto szhost = std::array<char, 256>{};
+    auto const n = std::min(std::size(szhost) - 1, std::size(host));
+    std::copy_n(std::data(host), n, std::data(szhost));
+    szhost[n] = '\0';
+    if (tr_address_from_string(&addr, std::data(szhost)))
     {
         return host;
     }
 
     // is it a registered name?
-    if (char* lower = nullptr; psl_str_to_utf8lower(szhost.c_str(), nullptr, nullptr, &lower) == PSL_SUCCESS)
+    if (char* lower = nullptr; psl_str_to_utf8lower(std::data(szhost), nullptr, nullptr, &lower) == PSL_SUCCESS)
     {
         // www.example.com -> example.com
         if (char const* const top = psl_registrable_domain(psl_builtin(), lower); top != nullptr)

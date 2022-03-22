@@ -78,6 +78,9 @@ TEST_F(TorrentsTest, rangedLoop)
     }
     EXPECT_EQ(0U, std::size(torrents_set));
     EXPECT_EQ(0U, std::size(torrents_set));
+
+    auto const delme = std::vector<tr_torrent*>{ std::begin(torrents), std::end(torrents) };
+    std::for_each(std::begin(delme), std::end(delme), [](auto* tor) { delete tor; });
 }
 
 TEST_F(TorrentsTest, removedSince)
@@ -119,4 +122,7 @@ TEST_F(TorrentsTest, removedSince)
     EXPECT_EQ(remove, torrents.removedSince(200));
     remove = { torrents_v[0]->uniqueId, torrents_v[1]->uniqueId, torrents_v[2]->uniqueId, torrents_v[3]->uniqueId };
     EXPECT_EQ(remove, torrents.removedSince(50));
+
+    auto const delme = std::vector<tr_torrent*>{ std::begin(torrents), std::end(torrents) };
+    std::for_each(std::begin(delme), std::end(delme), [](auto* tor) { delete tor; });
 }

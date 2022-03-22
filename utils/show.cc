@@ -14,6 +14,10 @@
 
 #include <event2/buffer.h>
 
+#include <fmt/core.h>
+#include <fmt/chrono.h>
+#include <fmt/compile.h>
+
 #include <libtransmission/transmission.h>
 
 #include <libtransmission/error.h>
@@ -95,16 +99,7 @@ int parseCommandLine(app_opts& opts, int argc, char const* const* argv)
 
 auto toString(time_t timestamp)
 {
-    if (timestamp == 0)
-    {
-        return std::string{ "Unknown" };
-    }
-
-    struct tm tm;
-    tr_localtime_r(&timestamp, &tm);
-    auto buf = std::array<char, 64>{};
-    strftime(std::data(buf), std::size(buf), "%a %b %d %T %Y%n", &tm); /* ctime equiv */
-    return std::string{ std::data(buf) };
+    return timestamp == 0 ? std::string{ "Unknown" } : fmt::format("{:%a %b %e %H:%M:%S %Y}", fmt::localtime(timestamp));
 }
 
 void showInfo(app_opts const& opts, tr_torrent_metainfo const& metainfo)

@@ -3,6 +3,7 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include <algorithm>
 #include <array>
 #include <cstring>
 #include <cctype> // isxdigit()
@@ -176,6 +177,23 @@ std::string tr_magnet_metainfo::magnet() const
     }
 
     return s;
+}
+
+void tr_magnet_metainfo::addWebseed(std::string_view webseed)
+{
+    if (!tr_urlIsValid(webseed))
+    {
+        return;
+    }
+
+    auto& urls = webseed_urls_;
+    auto const it = std::find(std::begin(urls), std::end(urls), webseed);
+    if (it != std::end(urls))
+    {
+        return;
+    }
+
+    urls.emplace_back(std::string{ webseed });
 }
 
 bool tr_magnet_metainfo::parseMagnet(std::string_view magnet_link, tr_error** error)
