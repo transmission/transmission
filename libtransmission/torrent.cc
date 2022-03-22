@@ -2079,7 +2079,13 @@ bool tr_torrent::setTrackerList(std::string_view text)
     auto const lock = this->unique_lock();
 
     auto announce_list = tr_announce_list();
-    if (!announce_list.parse(text) || !announce_list.save(this->hasMetadata() ? this->torrentFile() : this->magnetFile()))
+    if (!announce_list.parse(text))
+    {
+        return false;
+    }
+    
+    auto const has_metadata = this->hasMetadata();
+    if (has_metadata && !announce_list.save(this->torrentFile()))
     {
         return false;
     }
@@ -2088,12 +2094,15 @@ bool tr_torrent::setTrackerList(std::string_view text)
     this->markEdited();
     
     // magnet links
-    if (!this->hasMetadata()) {
+    if (!has_metadata) {
         tr_error* error = nullptr;
         if (!tr_ctorSaveMagnetContents(this, this->magnetFile(), &error))
         {
-            this->setLocalError(
-                tr_strvJoin("Unable to save magnet file: ", error->message, " ("sv, std::to_string(error->code), ")"sv));
+            this->setLocalError(fmt::format(
+                _("Couldn't save '{path}': {error} ({error_code})"),
+                fmt::arg("path", this->magnetFile()),
+                fmt::arg("error", error->message),
+                fmt::arg("error_code", error->code)));
         }
     }
     
