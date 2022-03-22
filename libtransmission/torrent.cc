@@ -2083,7 +2083,7 @@ bool tr_torrent::setTrackerList(std::string_view text)
     {
         return false;
     }
-    
+
     auto const has_metadata = this->hasMetadata();
     if (has_metadata && !announce_list.save(this->torrentFile()))
     {
@@ -2092,9 +2092,10 @@ bool tr_torrent::setTrackerList(std::string_view text)
 
     this->metainfo_.announceList() = announce_list;
     this->markEdited();
-    
+
     // magnet links
-    if (!has_metadata) {
+    if (!has_metadata)
+    {
         tr_error* error = nullptr;
         if (!tr_ctorSaveMagnetContents(this, this->magnetFile(), &error))
         {
@@ -2105,7 +2106,7 @@ bool tr_torrent::setTrackerList(std::string_view text)
                 fmt::arg("error_code", error->code)));
         }
     }
-    
+
     /* if we had a tracker-related error on this torrent,
      * and that tracker's been removed,
      * then clear the error */
