@@ -176,7 +176,7 @@ std::vector<uint8_t> tr_bitfield::raw() const
 
     if (hasAll())
     {
-        setAllTrue(std::data(raw), std::size(raw));
+        setAllTrue(std::data(raw), bit_count_);
     }
 
     return raw;
