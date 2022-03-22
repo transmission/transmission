@@ -425,14 +425,13 @@ static void utp_on_read(void* vio, unsigned char const* buf, size_t buflen)
     TR_ASSERT(tr_isPeerIo(io));
 
     int rc = evbuffer_add(io->inbuf, buf, buflen);
-    tr_logAddTraceIo(io, fmt::format("utp_on_read got {} bytes", buflen));
-
     if (rc < 0)
     {
-        tr_logAddError("On read evbuffer_add");
+        tr_logAddWarn(_("Couldn't write to peer"));
         return;
     }
 
+    tr_logAddTraceIo(io, fmt::format("utp_on_read got {} bytes", buflen));
     tr_peerIoSetEnabled(io, TR_DOWN, true);
     canReadWrapper(io);
 }
