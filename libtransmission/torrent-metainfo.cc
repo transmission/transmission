@@ -159,7 +159,6 @@ std::string tr_torrent_metainfo::fixWebseedUrl(tr_torrent_metainfo const& tm, st
 }
 
 static auto constexpr MaxBencDepth = 32;
-static auto constexpr PathMax = 4096;
 using tr_membuf = fmt::basic_memory_buffer<char, 4096>;
 
 struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDepth>

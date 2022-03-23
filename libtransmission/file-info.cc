@@ -40,10 +40,13 @@ static void appendSanitizedComponent(tr_membuf& out, std::string_view in)
         "LPT1"sv,  "LPT1."sv, "LPT2"sv,  "LPT2."sv, "LPT3"sv,  "LPT3."sv, "LPT4"sv,  "LPT4."sv, "LPT5"sv,  "LPT5."sv, "LPT6"sv,
         "LPT6."sv, "LPT7"sv,  "LPT7."sv, "LPT8"sv,  "LPT8."sv, "LPT9"sv,  "LPT9."sv, "NUL"sv,   "NUL."sv,  "PRN"sv,   "PRN."sv,
     };
+    auto in_lower = tr_membuf{};
+    std::transform(std::begin(in), std::end(in), std::back_inserter(in_lower), [](auto ch) { return tolower(ch); });
+    auto const in_lower_sv = std::string_view{ std::data(in_lower), std::size(in_lower) };
     if (std::any_of(
             std::begin(ReservedNames),
             std::end(ReservedNames),
-            [key = tr_strupper(in)](auto const& prefix) { return tr_strvStartsWith(key, prefix); }))
+            [in_lower_sv](auto const& prefix) { return tr_strvStartsWith(in_lower_sv, prefix); }))
     {
         out.append("_"sv);
     }
