@@ -495,17 +495,16 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
                 {
                     tr_strvUtf8Clean(value, tm_.name_);
 
-                    auto membuf = tr_membuf{};
                     auto const token = tr_file_info::sanitizePath(value);
                     if (!std::empty(token))
                     {
+                        auto membuf = tr_membuf{};
+                        membuf.append(token);
+                        membuf.push_back('/');
+                        auto const prefix_sv = std::string_view{ std::data(membuf), std::size(membuf) };
                         for (auto& file : tm_.files_)
                         {
-                            membuf.clear();
-                            membuf.append(token);
-                            membuf.append("/"sv);
-                            membuf.append(file.path());
-                            file.setSubpath(fmt::to_string(membuf));
+                            file.path_.insert(0, prefix_sv);
                         }
                     }
                 }
@@ -557,7 +556,7 @@ private:
 
         // Check to see if we already added this file. This is a safeguard for
         // hybrid torrents with duplicate info between "file tree" and "files"
-        if (auto const filename = buildPath(); std::empty(filename))
+        if (auto filename = buildPath(); std::empty(filename))
         {
             auto const errmsg = tr_strvJoin("invalid path ["sv, filename, "]"sv);
             tr_error_set(context.error, EINVAL, errmsg);
@@ -565,7 +564,7 @@ private:
         }
         else
         {
-            tm_.files_.emplace_back(filename, file_length_);
+            tm_.files_.emplace_back(std::move(filename), file_length_);
         }
 
         file_length_ = 0;

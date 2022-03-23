@@ -217,7 +217,6 @@ private:
         {
         }
 
-    private:
         std::string path_;
         uint64_t size_ = 0;
     };
