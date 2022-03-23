@@ -109,7 +109,7 @@ size_t tr_completion::countMissingBytesInPiece(tr_piece_index_t piece) const
 
 tr_completeness tr_completion::status() const
 {
-    if (!hasMetainfo())
+    if (hasNone())
     {
         return TR_LEECH;
     }
@@ -119,7 +119,7 @@ tr_completeness tr_completion::status() const
         return TR_SEED;
     }
 
-    if (hasMetainfo() && size_now_ == sizeWhenDone())
+    if (size_now_ == sizeWhenDone())
     {
         return TR_PARTIAL_SEED;
     }
