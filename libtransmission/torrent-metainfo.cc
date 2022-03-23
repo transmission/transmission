@@ -160,6 +160,7 @@ std::string tr_torrent_metainfo::fixWebseedUrl(tr_torrent_metainfo const& tm, st
 
 static auto constexpr MaxBencDepth = 32;
 static auto constexpr PathMax = 4096;
+using tr_membuf = fmt::basic_memory_buffer<char, 4096>;
 
 struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDepth>
 {
@@ -495,14 +496,16 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
                 {
                     tr_strvUtf8Clean(value, tm_.name_);
 
-                    auto membuf = fmt::basic_memory_buffer<char, PathMax>{};
+                    auto membuf = tr_membuf{};
                     auto const token = tr_file_info::sanitizePath(value);
                     if (!std::empty(token))
                     {
                         for (auto& file : tm_.files_)
                         {
                             membuf.clear();
-                            fmt::format_to(std::back_inserter(membuf), "{}/{}", token, file.path());
+                            membuf.append(token);
+                            membuf.append("/"sv);
+                            membuf.append(file.path());
                             file.setSubpath(fmt::to_string(membuf));
                         }
                     }
@@ -575,7 +578,7 @@ private:
 
     [[nodiscard]] std::string buildPath() const
     {
-        auto path = fmt::basic_memory_buffer<char, PathMax>{};
+        auto path = tr_membuf{};
 
         for (auto const& token : file_tree_)
         {

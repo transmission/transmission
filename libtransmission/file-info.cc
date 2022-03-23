@@ -18,7 +18,9 @@
 
 using namespace std::literals;
 
-static void appendSanitizedComponent(fmt::memory_buffer& out, std::string_view in)
+using tr_membuf = fmt::basic_memory_buffer<char, 4096>;
+
+static void appendSanitizedComponent(tr_membuf& out, std::string_view in)
 {
     // remove leading and trailing spaces
     in = tr_strvStrip(in);
@@ -57,7 +59,7 @@ static void appendSanitizedComponent(fmt::memory_buffer& out, std::string_view i
 
 std::string tr_file_info::sanitizePath(std::string_view in)
 {
-    auto out = fmt::memory_buffer();
+    auto out = tr_membuf{};
 
     auto segment = std::string_view{};
     while (tr_strvSep(&in, &segment, '/'))
