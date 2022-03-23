@@ -196,6 +196,11 @@ private:
             return path_;
         }
 
+        void setSubpath(std::string&& subpath)
+        {
+            path_ = std::move(subpath);
+        }
+
         void setSubpath(std::string_view subpath)
         {
             path_ = subpath;

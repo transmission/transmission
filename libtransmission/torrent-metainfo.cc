@@ -14,6 +14,7 @@
 #include <vector>
 
 #include <fmt/core.h>
+#include <fmt/format.h>
 
 #include "transmission.h"
 
@@ -158,6 +159,7 @@ std::string tr_torrent_metainfo::fixWebseedUrl(tr_torrent_metainfo const& tm, st
 }
 
 static auto constexpr MaxBencDepth = 32;
+static auto constexpr PathMax = 4096;
 
 struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDepth>
 {
@@ -202,10 +204,9 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
 
         if (state_ == State::FileTree)
         {
-            auto const token = tr_file_info::sanitizePath(key(depth() - 1));
-            if (!std::empty(token))
+            if (auto token = tr_file_info::sanitizePath(key(depth() - 1)); !std::empty(token))
             {
-                file_tree_.emplace_back(token);
+                file_tree_.emplace_back(std::move(token));
             }
         }
         else if (state_ == State::Top && depth() == 2)
@@ -427,8 +428,7 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
         {
             if (curdepth > 1 && key(curdepth - 1) == "path"sv)
             {
-                auto const token = tr_file_info::sanitizePath(value);
-                file_tree_.emplace_back(token);
+                file_tree_.emplace_back(tr_file_info::sanitizePath(value));
             }
             else if (curkey == "attr"sv)
             {
@@ -494,12 +494,16 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
                 else if (key(1) == "info"sv && (curkey == "name"sv || curkey == "name.utf-8"sv))
                 {
                     tr_strvUtf8Clean(value, tm_.name_);
+
+                    auto membuf = fmt::basic_memory_buffer<char, PathMax>{};
                     auto const token = tr_file_info::sanitizePath(value);
                     if (!std::empty(token))
                     {
                         for (auto& file : tm_.files_)
                         {
-                            file.setSubpath(tr_strvJoin(token, "/"sv, file.path()));
+                            membuf.clear();
+                            fmt::format_to(std::back_inserter(membuf), "{}/{}", token, file.path());
+                            file.setSubpath(fmt::to_string(membuf));
                         }
                     }
                 }
@@ -571,21 +575,25 @@ private:
 
     [[nodiscard]] std::string buildPath() const
     {
-        auto path = std::string{};
+        auto path = fmt::basic_memory_buffer<char, PathMax>{};
+
         for (auto const& token : file_tree_)
         {
-            path += token;
+            path.append(token);
+
             if (!std::empty(token))
             {
-                path += '/';
+                path.append("/"sv);
             }
         }
+
         auto const n = std::size(path);
         if (n > 0)
         {
             path.resize(n - 1);
         }
-        return path;
+
+        return fmt::to_string(path);
     }
 
     bool finishInfoDict(Context const& context)

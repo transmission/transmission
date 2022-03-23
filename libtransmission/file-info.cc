@@ -10,74 +10,66 @@
 
 #include <event2/util.h> // evutil_ascii_strncasecmp
 
+#include <fmt/core.h>
+#include <fmt/format.h>
+
 #include "file-info.h"
 #include "utils.h"
 
 using namespace std::literals;
 
-static void appendSanitizedComponent(std::string& out, std::string_view in)
+static void appendSanitizedComponent(fmt::memory_buffer& out, std::string_view in)
 {
-    // remove leading spaces
-    auto constexpr leading_test = [](unsigned char ch)
-    {
-        return isspace(ch);
-    };
-    auto const it = std::find_if_not(std::begin(in), std::end(in), leading_test);
-    in.remove_prefix(std::distance(std::begin(in), it));
+    // remove leading and trailing spaces
+    in = tr_strvStrip(in);
 
-    // remove trailing spaces and '.'
-    auto constexpr trailing_test = [](unsigned char ch)
+    // remove trailing periods
+    while (tr_strvEndsWith(in, '.'))
     {
-        return (isspace(ch) != 0) || ch == '.';
+        in.remove_suffix(1);
+    }
+
+    // if `in` begins with any of these prefixes, insert a leading character
+    // to ensure that it _doesn't_ start with that prefix
+    // https://docs.microsoft.com/en-us/windows/desktop/FileIO/naming-a-file
+    static auto constexpr ReservedNames = std::array<std::string_view, 44>{
+        "AUX"sv,   "AUX."sv,  "COM1"sv,  "COM1."sv, "COM2"sv,  "COM2."sv, "COM3"sv,  "COM3."sv, "COM4"sv,  "COM4."sv, "COM5"sv,
+        "COM5."sv, "COM6"sv,  "COM6."sv, "COM7"sv,  "COM7."sv, "COM8"sv,  "COM8."sv, "COM9"sv,  "COM9."sv, "CON"sv,   "CON."sv,
+        "LPT1"sv,  "LPT1."sv, "LPT2"sv,  "LPT2."sv, "LPT3"sv,  "LPT3."sv, "LPT4"sv,  "LPT4."sv, "LPT5"sv,  "LPT5."sv, "LPT6"sv,
+        "LPT6."sv, "LPT7"sv,  "LPT7."sv, "LPT8"sv,  "LPT8."sv, "LPT9"sv,  "LPT9."sv, "NUL"sv,   "NUL."sv,  "PRN"sv,   "PRN."sv,
     };
-    auto const rit = std::find_if_not(std::rbegin(in), std::rend(in), trailing_test);
-    in.remove_suffix(std::distance(std::rbegin(in), rit));
+    if (std::any_of(
+            std::begin(ReservedNames),
+            std::end(ReservedNames),
+            [key = tr_strupper(in)](auto const& prefix) { return tr_strvStartsWith(key, prefix); }))
+    {
+        out.append("_"sv);
+    }
 
     // munge banned characters
     // https://docs.microsoft.com/en-us/windows/desktop/FileIO/naming-a-file
-    auto constexpr ensure_legal_char = [](auto ch)
-    {
-        auto constexpr Banned = std::string_view{ "<>:\"/\\|?*" };
-        auto const banned = Banned.find(ch) != std::string_view::npos || (unsigned char)ch < 0x20;
-        return banned ? '_' : ch;
-    };
-    auto const old_out_len = std::size(out);
-    std::transform(std::begin(in), std::end(in), std::back_inserter(out), ensure_legal_char);
-
-    // munge banned filenames
-    // https://docs.microsoft.com/en-us/windows/desktop/FileIO/naming-a-file
-    auto constexpr ReservedNames = std::array<std::string_view, 22>{
-        "CON"sv,  "PRN"sv,  "AUX"sv,  "NUL"sv,  "COM1"sv, "COM2"sv, "COM3"sv, "COM4"sv, "COM5"sv, "COM6"sv, "COM7"sv,
-        "COM8"sv, "COM9"sv, "LPT1"sv, "LPT2"sv, "LPT3"sv, "LPT4"sv, "LPT5"sv, "LPT6"sv, "LPT7"sv, "LPT8"sv, "LPT9"sv,
-    };
-    for (auto const& name : ReservedNames)
-    {
-        size_t const name_len = std::size(name);
-        if (evutil_ascii_strncasecmp(out.c_str() + old_out_len, std::data(name), name_len) != 0 ||
-            (out[old_out_len + name_len] != '\0' && out[old_out_len + name_len] != '.'))
-        {
-            continue;
-        }
-
-        out.insert(std::begin(out) + old_out_len + name_len, '_');
-        break;
-    }
+    std::transform(
+        std::begin(in),
+        std::end(in),
+        std::back_inserter(out),
+        [](auto ch) { return !tr_strvContains("<>:\"/\\|?*"sv, ch) ? ch : '_'; });
 }
 
 std::string tr_file_info::sanitizePath(std::string_view in)
 {
-    auto out = std::string{};
+    auto out = fmt::memory_buffer();
 
     auto segment = std::string_view{};
     while (tr_strvSep(&in, &segment, '/'))
     {
         appendSanitizedComponent(out, segment);
-        out += '/';
-    }
-    if (!std::empty(out)) // remove trailing slash
-    {
-        out.resize(std::size(out) - 1);
+        out.append("/"sv);
     }
 
-    return out;
+    if (auto const n = std::size(out); n > 0)
+    {
+        out.resize(n - 1); // remove trailing slash
+    }
+
+    return fmt::to_string(out);
 }
