@@ -14,6 +14,8 @@
 #include <event2/buffer.h>
 
 #include <fmt/core.h>
+#include <fmt/compile.h>
+#include <fmt/format.h>
 
 #include "transmission.h"
 
@@ -248,7 +250,7 @@ void tr_logAddMessage(char const* file, int line, tr_log_level level, std::strin
     if (std::empty(name))
     {
         auto const base = tr_sys_path_basename(file);
-        name_fallback = fmt::format("{}:{}", !std::empty(base) ? base : "?", line);
+        name_fallback = fmt::format(FMT_COMPILE("{}:{}"), !std::empty(base) ? base : "?", line);
         name = name_fallback;
     }
 
