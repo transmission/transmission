@@ -144,6 +144,7 @@ set(${PROJECT_NAME}_PUBLIC_HEADERS
     tr-assert.h
     tr-getopt.h
     tr-macros.h
+    tr-strbuf.h
     transmission.h
     utils.h
     variant.h
