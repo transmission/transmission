@@ -2096,14 +2096,15 @@ bool tr_torrent::setTrackerList(std::string_view text)
     // magnet links
     if (!has_metadata)
     {
-        tr_error* error = nullptr;
-        if (!tr_ctorSaveMagnetContents(this, this->magnetFile(), &error))
+        tr_error* save_error = nullptr;
+        if (!tr_ctorSaveMagnetContents(this, this->magnetFile(), &save_error))
         {
             this->setLocalError(fmt::format(
                 _("Couldn't save '{path}': {error} ({error_code})"),
                 fmt::arg("path", this->magnetFile()),
-                fmt::arg("error", error->message),
-                fmt::arg("error_code", error->code)));
+                fmt::arg("error", save_error->message),
+                fmt::arg("error_code", save_error->code)));
+            tr_error_clear(&save_error);
         }
     }
 
