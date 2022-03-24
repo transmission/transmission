@@ -116,6 +116,13 @@ public:
             tr_free(bundle);
         }
 
+        // share + reuse pretty much anything we can.
+        // https://curl.se/libcurl/c/CURLSHOPT_SHARE.html
+        for (long type = CURL_LOCK_DATA_SHARE; type < CURL_LOCK_DATA_LAST; ++type)
+        {
+            (void)curl_share_setopt(shared(), CURLSHOPT_SHARE, type);
+        }
+
         if (curl_ssl_verify)
         {
             auto const* bundle = std::empty(curl_ca_bundle) ? "none" : curl_ca_bundle.c_str();
