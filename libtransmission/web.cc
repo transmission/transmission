@@ -116,12 +116,7 @@ public:
             tr_free(bundle);
         }
 
-        // share + reuse pretty much anything we can.
-        // https://curl.se/libcurl/c/CURLSHOPT_SHARE.html
-        for (long type = CURL_LOCK_DATA_SHARE; type < CURL_LOCK_DATA_LAST; ++type)
-        {
-            (void)curl_share_setopt(shared(), CURLSHOPT_SHARE, type);
-        }
+        shareEverything();
 
         if (curl_ssl_verify)
         {
@@ -540,6 +535,26 @@ private:
     CURLSH* shared()
     {
         return curlsh_.get();
+    }
+
+    void shareEverything()
+    {
+        // Tell curl to share whatever it can.
+        // https://curl.se/libcurl/c/CURLSHOPT_SHARE.html
+        //
+        // The user's system probably has a different version of curl than
+        // we're compiling with; so instead of listing fields by name, just
+        // loop until curl says we've exhausted the list.
+
+        auto* const sh = shared();
+        for (long type = CURL_LOCK_DATA_COOKIE;; ++type)
+        {
+            if (curl_share_setopt(sh, CURLSHOPT_SHARE, type) != CURLSHE_OK)
+            {
+                tr_logAddDebug(fmt::format("CURLOPT_SHARE ended at {}", type));
+                return;
+            }
+        }
     }
 
     static std::once_flag curl_init_flag;
