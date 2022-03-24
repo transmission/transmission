@@ -2079,13 +2079,34 @@ bool tr_torrent::setTrackerList(std::string_view text)
     auto const lock = this->unique_lock();
 
     auto announce_list = tr_announce_list();
-    if (!announce_list.parse(text) || !announce_list.save(this->torrentFile()))
+    if (!announce_list.parse(text))
+    {
+        return false;
+    }
+
+    auto const has_metadata = this->hasMetadata();
+    if (has_metadata && !announce_list.save(this->torrentFile()))
     {
         return false;
     }
 
     this->metainfo_.announceList() = announce_list;
     this->markEdited();
+
+    // magnet links
+    if (!has_metadata)
+    {
+        tr_error* save_error = nullptr;
+        if (!tr_ctorSaveMagnetContents(this, this->magnetFile(), &save_error))
+        {
+            this->setLocalError(fmt::format(
+                _("Couldn't save '{path}': {error} ({error_code})"),
+                fmt::arg("path", this->magnetFile()),
+                fmt::arg("error", save_error->message),
+                fmt::arg("error_code", save_error->code)));
+            tr_error_clear(&save_error);
+        }
+    }
 
     /* if we had a tracker-related error on this torrent,
      * and that tracker's been removed,
