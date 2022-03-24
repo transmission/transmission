@@ -108,7 +108,7 @@ tr_torrent const* tr_torrents::get(tr_sha1_digest_t const& hash) const
 
 int tr_torrents::add(tr_torrent* tor)
 {
-    int const id = static_cast<int>(std::size(by_id_));
+    auto const id = static_cast<int>(std::size(by_id_));
     by_id_.push_back(tor);
     by_hash_.insert(std::lower_bound(std::begin(by_hash_), std::end(by_hash_), tor, CompareTorrentByHash{}), tor);
     return id;
