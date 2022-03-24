@@ -2506,7 +2506,7 @@ static void enforceSessionPeerLimit(tr_session* session)
     // make a list of all the peers
     auto peers = std::vector<tr_peer*>{};
     peers.reserve(n_peers);
-    for (auto* const tor : session->torrents())
+    for (auto const* const tor : session->torrents())
     {
         size_t const n = tr_ptrArraySize(&tor->swarm->peers);
         auto** base = (tr_peer**)tr_ptrArrayBase(&tor->swarm->peers);
