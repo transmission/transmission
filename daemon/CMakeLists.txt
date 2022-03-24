@@ -13,11 +13,6 @@ include_directories(
     SYSTEM
     ${CURL_INCLUDE_DIRS}
     ${EVENT2_INCLUDE_DIRS}
-    ${LIBFMT_INCLUDE_DIRS}
-)
-
-add_definitions(
-    ${LIBFMT_DEFINITIONS}
 )
 
 set(${PROJECT_NAME}_SOURCES

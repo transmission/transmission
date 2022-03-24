@@ -147,6 +147,9 @@ if(WIN32)
 endif()
 
 find_package(Fmt)
+add_definitions(-DFMT_HEADER_ONLY)
+include_directories(SYSTEM ${LIBFMT_INCLUDE_DIRS})
+
 find_package(UtfCpp)
 find_package(Threads)
 find_package(PkgConfig QUIET)
@@ -342,8 +345,6 @@ tr_add_external_auto_library(NATPMP libnatpmp natpmp)
 if(NOT USE_SYSTEM_NATPMP)
     set(NATPMP_DEFINITIONS -DNATPMP_STATICLIB)
 endif()
-
-set(LIBFMT_DEFINITIONS -DFMT_HEADER_ONLY)
 
 tr_add_external_auto_library(MINIUPNPC miniupnpc miniupnpc
     CMAKE_ARGS
