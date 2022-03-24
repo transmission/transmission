@@ -186,11 +186,9 @@ static std::optional<std::string> getErrorString(tr_stat const* st)
     {
     case TR_STAT_TRACKER_WARNING:
         return fmt::format(_("Tracker warning: '{warning}'"), fmt::arg("warning", st->errorString));
-        break;
 
     case TR_STAT_TRACKER_ERROR:
         return fmt::format(_("Tracker Error: '{error}'"), fmt::arg("error", st->errorString));
-        break;
 
     case TR_STAT_LOCAL_ERROR:
         return fmt::format(_("Local error: '{error}'"), fmt::arg("error", st->errorString));
