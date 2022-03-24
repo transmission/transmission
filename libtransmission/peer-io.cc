@@ -488,12 +488,12 @@ static void utp_on_state_change(void* vio, int state)
 
     if (state == UTP_STATE_CONNECT)
     {
-        tr_logAddDebugIo(io, "utp_on_state_change -- changed to connected");
+        tr_logAddTraceIo(io, "utp_on_state_change -- changed to connected");
         io->utpSupported = true;
     }
     else if (state == UTP_STATE_WRITABLE)
     {
-        tr_logAddDebugIo(io, "utp_on_state_change -- changed to writable");
+        tr_logAddTraceIo(io, "utp_on_state_change -- changed to writable");
 
         if ((io->pendingEvents & EV_WRITE) != 0)
         {
