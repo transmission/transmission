@@ -298,8 +298,8 @@ public:
     void write_block_func()
     {
         auto* const buf = this->content();
-        auto* const tor = tr_torrentFindFromId(this->session, this->torrent_id);
-        if (tor != nullptr)
+
+        if (auto* const tor = tr_torrentFindFromId(this->session, this->torrent_id); tor != nullptr)
         {
             auto const len = evbuffer_get_length(buf);
             TR_ASSERT(tor->blockSize(this->loc.block) == len);
