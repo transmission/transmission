@@ -109,7 +109,7 @@ size_t tr_completion::countMissingBytesInPiece(tr_piece_index_t piece) const
 
 tr_completeness tr_completion::status() const
 {
-    if (hasNone())
+    if (!hasMetainfo() || hasNone())
     {
         return TR_LEECH;
     }
