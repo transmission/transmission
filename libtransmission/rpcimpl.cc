@@ -2067,8 +2067,11 @@ static char const* sessionStats(
     auto cumulativeStats = tr_session_stats{};
 
     auto const& torrents = session->torrents();
-    int const total = std::size(torrents);
-    int const running = std::count_if(std::begin(torrents), std::end(torrents), [](auto const* tor) { return tor->isRunning; });
+    auto const total = std::size(torrents);
+    auto const running = std::count_if(
+        std::begin(torrents),
+        std::end(torrents),
+        [](auto const* tor) { return tor->isRunning; });
 
     tr_sessionGetStats(session, &currentStats);
     tr_sessionGetCumulativeStats(session, &cumulativeStats);
