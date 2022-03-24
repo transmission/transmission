@@ -87,7 +87,7 @@ size_t tr_bitfield::countFlags(size_t begin, size_t end) const
     {
         uint8_t val = flags_[first_byte];
 
-        int i = begin - (first_byte * 8);
+        auto i = begin - (first_byte * 8);
         val <<= i;
         val >>= i;
         i = (last_byte + 1) * 8 - end;
@@ -295,9 +295,8 @@ void tr_bitfield::setRaw(uint8_t const* raw, size_t byte_count)
     // ensure any excess bits at the end of the array are set to '0'.
     if (byte_count == getBytesNeeded(bit_count_))
     {
-        int const excess_bit_count = byte_count * 8 - bit_count_;
+        auto const excess_bit_count = byte_count * 8 - bit_count_;
 
-        TR_ASSERT(excess_bit_count >= 0);
         TR_ASSERT(excess_bit_count <= 7);
 
         if (excess_bit_count != 0)
@@ -376,8 +375,8 @@ void tr_bitfield::setSpan(size_t begin, size_t end, bool value)
         return;
     }
 
-    size_t walk = begin >> 3;
-    size_t const last_byte = end >> 3;
+    auto walk = begin >> 3;
+    auto const last_byte = end >> 3;
 
     if (value)
     {
@@ -395,7 +394,7 @@ void tr_bitfield::setSpan(size_t begin, size_t end, bool value)
 
             if (++walk < last_byte)
             {
-                std::fill_n(std::begin(flags_) + walk, last_byte - walk, 0xff);
+                std::fill_n(std::data(flags_) + walk, last_byte - walk, 0xff);
             }
         }
 
@@ -417,7 +416,7 @@ void tr_bitfield::setSpan(size_t begin, size_t end, bool value)
 
             if (++walk < last_byte)
             {
-                std::fill_n(std::begin(flags_) + walk, last_byte - walk, 0);
+                std::fill_n(std::data(flags_) + walk, last_byte - walk, 0);
             }
         }
 
