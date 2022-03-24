@@ -6,6 +6,7 @@
 #include <libtransmission/makemeta.h>
 #include <libtransmission/utils.h>
 #include <libtransmission/web-utils.h> // tr_urlIsValidTracker()
+#include <cmath>
 
 #import "CreatorWindowController.h"
 #import "Controller.h"
@@ -28,6 +29,7 @@
 @property(nonatomic) IBOutlet NSButton* fPrivateCheck;
 @property(nonatomic) IBOutlet NSButton* fOpenCheck;
 @property(nonatomic) IBOutlet NSTextField* fSource;
+@property(nonatomic) IBOutlet NSStepper* fPieceSizeStepper;
 
 @property(nonatomic) IBOutlet NSView* fProgressView;
 @property(nonatomic) IBOutlet NSProgressIndicator* fProgressIndicator;
@@ -187,17 +189,8 @@ NSMutableSet* creatorWindowControllerSet = nil;
     }
     self.fStatusField.stringValue = statusString;
 
-    if (self.fInfo->pieceCount == 1)
-    {
-        self.fPiecesField.stringValue = [NSString stringWithFormat:NSLocalizedString(@"1 piece, %@", "Create torrent -> info"),
-                                                              [NSString stringForFileSize:self.fInfo->pieceSize]];
-    }
-    else
-    {
-        self.fPiecesField.stringValue = [NSString stringWithFormat:NSLocalizedString(@"%d pieces, %@ each", "Create torrent -> info"),
-                                                              self.fInfo->pieceCount,
-                                                              [NSString stringForFileSize:self.fInfo->pieceSize]];
-    }
+    [self updatePiecesField];
+    [self.fPieceSizeStepper setIntValue:(int)log2((double)self.fInfo->pieceSize)];
 
     self.fLocation = [[self.fDefaults URLForKey:@"CreatorLocationURL"] URLByAppendingPathComponent:[name stringByAppendingPathExtension:@"torrent"]];
     if (!self.fLocation)
@@ -364,6 +357,14 @@ NSMutableSet* creatorWindowControllerSet = nil;
     [self.fTimer fire];
 }
 
+- (IBAction)incrementOrDecrementPieceSize:(id)sender
+{
+    uint32_t pieceSize = (uint32_t)pow(2.0, [sender intValue]);
+    if (tr_metaInfoBuilderSetPieceSize(self.fInfo, pieceSize)) {
+        [self updatePiecesField];
+    }
+}
+
 - (NSInteger)numberOfRowsInTableView:(NSTableView*)tableView
 {
     return self.fTrackers.count;
@@ -506,6 +507,21 @@ NSMutableSet* creatorWindowControllerSet = nil;
 }
 
 #pragma mark - Private
+
+- (void)updatePiecesField
+{
+    if (self.fInfo->pieceCount == 1)
+    {
+        self.fPiecesField.stringValue = [NSString stringWithFormat:NSLocalizedString(@"1 piece, %@", "Create torrent -> info"),
+                                                              [NSString stringForFileSize:self.fInfo->pieceSize]];
+    }
+    else
+    {
+        self.fPiecesField.stringValue = [NSString stringWithFormat:NSLocalizedString(@"%d pieces, %@ each", "Create torrent -> info"),
+                                                              self.fInfo->pieceCount,
+                                                              [NSString stringForFileSize:self.fInfo->pieceSize]];
+    }
+}
 
 - (void)updateLocationField
 {
