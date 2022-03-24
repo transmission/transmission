@@ -42,16 +42,6 @@ struct CompareTorrentByHash
 
 } // namespace
 
-tr_torrents::tr_torrents()
-    // Insert an empty pointer at by_id_[0] to ensure that the first added
-    // torrent doesn't get an ID of 0; ie, that every torrent has a positive
-    // ID number. This constraint isn't needed by libtransmission code but
-    // the ID is exported in the RPC API to 3rd party clients that may be
-    // testing for >0 as a validity check.
-    : by_id_{ nullptr }
-{
-}
-
 tr_torrent const* tr_torrents::get(int id) const
 {
     TR_ASSERT(0 < id);

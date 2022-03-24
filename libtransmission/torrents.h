@@ -26,8 +26,6 @@ struct tr_torrent_metainfo;
 class tr_torrents
 {
 public:
-    tr_torrents();
-
     // returns a fast lookup id for `tor`
     [[nodiscard]] int add(tr_torrent* tor);
 
@@ -111,8 +109,14 @@ private:
     // of a wasted slot in the lookup table whenever a torrent is
     // removed. This improves speed for all use cases at the cost of
     // wasting a small amount of memory in uncommon use cases, e.g. a
-    // long-lived session where thousands of torrents are removed
-    std::vector<tr_torrent*> by_id_;
+    // long-lived session where thousands of torrents are removed.
+    //
+    // Insert an empty pointer at by_id_[0] to ensure that the first
+    // added torrent doesn't get an ID of 0; ie, that every torrent has
+    // a positive ID number. This constraint isn't needed by libtransmission
+    // code but the ID is exported in the RPC API to 3rd party clients that
+    // may be testing for >0 as a validity check.
+    std::vector<tr_torrent*> by_id_{ nullptr };
 
     std::map<int, time_t> removed_;
 };
