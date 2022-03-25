@@ -43,6 +43,19 @@ TEST_F(StrbufTest, buildPath)
     EXPECT_EQ("foo/bar/baz", buf.sv());
 }
 
+TEST_F(StrbufTest, cStr)
+{
+    static char const* const Value = "Hello, World!";
+
+    auto buf = tr_pathbuf{ Value };
+    EXPECT_STREQ(Value, buf.c_str());
+    EXPECT_EQ(strlen(Value), std::size(buf));
+
+    buf = tr_pathbuf{ "H", Value + 1 };
+    EXPECT_STREQ(Value, buf.c_str());
+    EXPECT_EQ(strlen(Value), std::size(buf));
+}
+
 TEST_F(StrbufTest, clear)
 {
     static auto constexpr Value = "Hello, World!"sv;
@@ -128,19 +141,6 @@ TEST_F(StrbufTest, iterators)
         EXPECT_EQ(Value.front(), *begin);
         EXPECT_EQ(std::size(Value), std::distance(begin, end));
     }
-}
-
-TEST_F(StrbufTest, sz)
-{
-    static char const* const Value = "Hello, World!";
-
-    auto buf = tr_pathbuf{ Value };
-    EXPECT_STREQ(Value, buf.c_str());
-    EXPECT_EQ(strlen(Value), std::size(buf));
-
-    buf = tr_pathbuf{ "H", Value + 1 };
-    EXPECT_STREQ(Value, buf.c_str());
-    EXPECT_EQ(strlen(Value), std::size(buf));
 }
 
 TEST_F(StrbufTest, startsWith)

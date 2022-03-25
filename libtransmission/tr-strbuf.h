@@ -35,8 +35,8 @@ public:
         return *this;
     }
 
-    template<typename... ContiguousRange>
-    tr_strbuf(ContiguousRange const&... args)
+    template<typename... Args>
+    tr_strbuf(Args const&... args)
     {
         append(args...);
     }
