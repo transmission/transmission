@@ -100,6 +100,7 @@ bool tr_ctorSetMetainfo(tr_ctor* ctor, char const* metainfo, size_t len, tr_erro
 bool tr_ctorSetMetainfoFromMagnetLink(tr_ctor* ctor, char const* magnet_link, tr_error** error)
 {
     ctor->torrent_filename.clear();
+    ctor->metainfo = {};
     return ctor->metainfo.parseMagnet(magnet_link != nullptr ? magnet_link : "", error);
 }
 
