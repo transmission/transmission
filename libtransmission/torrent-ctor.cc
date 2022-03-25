@@ -124,7 +124,7 @@ bool tr_ctorSaveContents(tr_ctor const* ctor, std::string const& filename, tr_er
         return false;
     }
 
-    return tr_saveFile(filename, { std::data(ctor->contents), std::size(ctor->contents) }, error);
+    return tr_saveFile(filename, ctor->contents, error);
 }
 
 bool tr_ctorSaveMagnetContents(tr_torrent* tor, std::string const& filename, tr_error** error)

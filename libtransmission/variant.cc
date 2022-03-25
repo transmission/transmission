@@ -1212,7 +1212,7 @@ int tr_variantToFile(tr_variant const* v, tr_variant_fmt fmt, std::string const&
     auto const contents = tr_variantToStr(v, fmt);
 
     tr_error* error = nullptr;
-    tr_saveFile(filename, { std::data(contents), std::size(contents) }, &error);
+    tr_saveFile(filename, contents, &error);
     if (error != nullptr)
     {
         tr_logAddError(fmt::format(
