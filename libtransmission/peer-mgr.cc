@@ -209,7 +209,7 @@ public:
 
 struct tr_peerMgr
 {
-    tr_peerMgr(tr_session* session_in)
+    explicit tr_peerMgr(tr_session* session_in)
         : session{ session_in }
     {
     }
