@@ -121,18 +121,19 @@ public:
         ensure_sz();
     }
 
-    template<typename ContiguousRange>
-    void append(ContiguousRange const& range)
-    {
-        buffer_.append(std::data(range), std::data(range) + std::size(range));
-        ensure_sz();
-    }
-
     template<typename... ContiguousRange>
     void append(ContiguousRange const&... args)
     {
         buffer_.reserve((std::size(args) + ...));
-        (append(args), ...);
+        (buffer_.append(std::data(args), std::data(args) + std::size(args)), ...);
+        ensure_sz();
+    }
+
+    template<typename... ContiguousRange>
+    void assign(ContiguousRange const&... args)
+    {
+        clear();
+        append(args...);
     }
 
     template<typename ContiguousRange>
@@ -153,6 +154,7 @@ public:
     template<typename... ContiguousRange>
     void buildPath(ContiguousRange const&... args)
     {
+        clear();
         buffer_.reserve(sizeof...(args) + (std::size(args) + ...));
         ((append(args), push_back('/')), ...);
         resize(size() - 1);
