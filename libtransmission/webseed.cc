@@ -369,7 +369,7 @@ void onBufferGotData(evbuffer* /*buf*/, evbuffer_cb_info const* info, void* vtas
         return;
     }
 
-    auto* const session = task->session;
+    auto const* const session = task->session;
     auto const lock = session->unique_lock();
 
     auto* const webseed = task->webseed;
@@ -427,8 +427,7 @@ void onPartialDataFetched(tr_web::FetchResponse const& web_response)
         return;
     }
 
-    auto* const tor = webseed->getTorrent();
-    if (tor == nullptr)
+    if (auto const* const tor = webseed->getTorrent(); tor == nullptr)
     {
         return;
     }

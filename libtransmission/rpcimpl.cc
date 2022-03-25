@@ -1714,10 +1714,11 @@ static char const* groupGet(tr_session* s, tr_variant* args_in, tr_variant* args
     }
     else if (tr_variant* namesList = nullptr; tr_variantDictFindList(args_in, TR_KEY_name, &namesList))
     {
-        int names_count = tr_variantListSize(namesList);
-        for (int i = 0; i < names_count; i++)
+        auto const names_count = tr_variantListSize(namesList);
+
+        for (size_t i = 0; i < names_count; ++i)
         {
-            tr_variant* v = tr_variantListChild(namesList, i);
+            auto const* const v = tr_variantListChild(namesList, i);
             if (std::string_view l; tr_variantIsString(v) && tr_variantGetStrView(v, &l))
             {
                 names.insert(l);
@@ -1751,7 +1752,7 @@ static char const* groupSet(
     struct tr_rpc_idle_data* /*idle_data*/)
 {
     auto name = std::string_view{};
-    tr_variantDictFindStrView(args_in, TR_KEY_name, &name);
+    (void)tr_variantDictFindStrView(args_in, TR_KEY_name, &name);
     name = tr_strvStrip(name);
     if (std::empty(name))
     {

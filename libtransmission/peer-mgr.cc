@@ -209,7 +209,7 @@ public:
 
 struct tr_peerMgr
 {
-    tr_peerMgr(tr_session* session_in)
+    explicit tr_peerMgr(tr_session* session_in)
         : session{ session_in }
     {
     }
@@ -315,7 +315,7 @@ static struct peer_atom* getExistingAtom(tr_swarm const* cswarm, tr_address cons
 
 static bool peerIsInUse(tr_swarm const* cs, struct peer_atom const* atom)
 {
-    auto* s = const_cast<tr_swarm*>(cs);
+    auto const* const s = const_cast<tr_swarm*>(cs);
     auto const lock = s->manager->unique_lock();
 
     return atom->peer != nullptr || s->outgoing_handshakes.count(atom->addr) != 0 ||
@@ -1105,7 +1105,7 @@ void tr_peerMgrAddIncoming(tr_peerMgr* manager, tr_address const* addr, tr_port 
 
         tr_peerIoUnref(io); /* balanced by the implicit ref in tr_peerIoNewIncoming() */
 
-        manager->incoming_handshakes.insert({ *addr, handshake });
+        manager->incoming_handshakes.try_emplace(*addr, handshake);
     }
 }
 
@@ -3048,7 +3048,7 @@ static void initiateConnection(tr_peerMgr* mgr, tr_swarm* s, struct peer_atom* a
 
         tr_peerIoUnref(io); /* balanced by the initial ref in tr_peerIoNewOutgoing() */
 
-        s->outgoing_handshakes.insert({ atom->addr, handshake });
+        s->outgoing_handshakes.try_emplace(atom->addr, handshake);
     }
 
     atom->lastConnectionAttemptAt = now;
