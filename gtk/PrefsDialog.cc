@@ -849,7 +849,7 @@ Gtk::ComboBox* new_time_combo(Glib::RefPtr<Session> const& core, tr_quark const 
     return w;
 }
 
-static auto get_weekday_string(Glib::Date::Weekday weekday)
+auto get_weekday_string(Glib::Date::Weekday weekday)
 {
     auto date = Glib::Date{};
     date.set_time_current();

@@ -180,7 +180,7 @@ std::string getShortStatusString(
     }
 }
 
-static std::optional<std::string> getErrorString(tr_stat const* st)
+std::optional<std::string> getErrorString(tr_stat const* st)
 {
     switch (st->error)
     {
@@ -198,7 +198,7 @@ static std::optional<std::string> getErrorString(tr_stat const* st)
     }
 }
 
-static auto getActivityString(
+auto getActivityString(
     tr_torrent const* const tor,
     tr_stat const* const st,
     double const uploadSpeed_KBps,
