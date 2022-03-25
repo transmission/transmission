@@ -67,6 +67,12 @@ TEST_F(StrbufTest, constructorAssign)
 
     auto buf = tr_pathbuf{ Value };
     EXPECT_EQ(Value, buf.sv());
+
+    buf = tr_pathbuf{ Value.substr(7, 5), Value.substr(5, 2), Value.substr(0, 5), Value.substr(12, 1) };
+    EXPECT_EQ("World, Hello!"sv, buf.sv());
+
+    buf = tr_pathbuf{ "Hello, ", "World!" };
+    EXPECT_EQ(Value, buf.sv());
 }
 
 TEST_F(StrbufTest, heap)
@@ -127,7 +133,12 @@ TEST_F(StrbufTest, iterators)
 TEST_F(StrbufTest, sz)
 {
     static char const* const Value = "Hello, World!";
-    auto buf = tr_pathbuf{ std::string_view{ Value } };
+
+    auto buf = tr_pathbuf{ Value };
+    EXPECT_STREQ(Value, buf.c_str());
+    EXPECT_EQ(strlen(Value), std::size(buf));
+
+    buf = tr_pathbuf{ "H", Value + 1 };
     EXPECT_STREQ(Value, buf.c_str());
     EXPECT_EQ(strlen(Value), std::size(buf));
 }

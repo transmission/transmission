@@ -121,41 +121,52 @@ public:
         ensure_sz();
     }
 
-    template<typename... ContiguousRange>
-    void append(ContiguousRange const&... args)
+    template<typename ContiguousRange>
+    void append(ContiguousRange const& args)
     {
-        buffer_.reserve((std::size(args) + ...));
-        (buffer_.append(std::data(args), std::data(args) + std::size(args)), ...);
+        buffer_.append(std::data(args), std::data(args) + std::size(args));
         ensure_sz();
     }
 
-    template<typename... ContiguousRange>
-    void assign(ContiguousRange const&... args)
+    void append(T const* sz_value)
+    {
+        if (sz_value != nullptr)
+        {
+            append(std::basic_string_view<T>{ sz_value });
+        }
+    }
+
+    template<typename... Args>
+    void append(Args const&... args)
+    {
+        (append(args), ...);
+    }
+
+    template<typename Arg>
+    auto& operator+=(Arg const& arg)
+    {
+        append(arg);
+        return *this;
+    }
+
+    template<typename... Args>
+    void assign(Args const&... args)
     {
         clear();
         append(args...);
     }
 
-    template<typename ContiguousRange>
-    auto& operator+=(ContiguousRange const& range)
+    template<typename Arg>
+    auto& operator=(Arg const& arg)
     {
-        append(range);
+        assign(arg);
         return *this;
     }
 
-    template<typename ContiguousRange>
-    auto& operator=(ContiguousRange const& range)
+    template<typename... Args>
+    void buildPath(Args const&... args)
     {
         clear();
-        append(range);
-        return *this;
-    }
-
-    template<typename... ContiguousRange>
-    void buildPath(ContiguousRange const&... args)
-    {
-        clear();
-        buffer_.reserve(sizeof...(args) + (std::size(args) + ...));
         ((append(args), push_back('/')), ...);
         resize(size() - 1);
     }
