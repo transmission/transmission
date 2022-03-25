@@ -1752,7 +1752,7 @@ static char const* groupSet(
     struct tr_rpc_idle_data* /*idle_data*/)
 {
     auto name = std::string_view{};
-    tr_variantDictFindStrView(args_in, TR_KEY_name, &name);
+    (void)tr_variantDictFindStrView(args_in, TR_KEY_name, &name);
     name = tr_strvStrip(name);
     if (std::empty(name))
     {
