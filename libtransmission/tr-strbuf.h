@@ -14,7 +14,7 @@
  * but falls back to heap allocation when necessary.
  * Useful for building temp strings without heap allocation.
  *
- * `fmt::basic_memory_buffer` is final, so aggregate intead
+ * `fmt::basic_memory_buffer` is final, so aggregate instead
  * of subclassing ¯\_(ツ)_/¯
  */
 template<typename T, size_t N>
@@ -35,10 +35,10 @@ public:
         return *this;
     }
 
-    template<typename ContiguousRange>
-    tr_strbuf(ContiguousRange const& in)
+    template<typename... Args>
+    tr_strbuf(Args const&... args)
     {
-        buffer_.append(in);
+        append(args...);
     }
 
     [[nodiscard]] constexpr auto begin()
@@ -61,82 +61,175 @@ public:
         return buffer_.end();
     }
 
-    [[nodiscard]] T& operator[](size_t pos)
+    [[nodiscard]] constexpr auto& operator[](size_t pos)
     {
         return buffer_[pos];
     }
 
-    [[nodiscard]] constexpr T const& operator[](size_t pos) const
+    [[nodiscard]] constexpr auto const& operator[](size_t pos) const
     {
         return buffer_[pos];
     }
 
-    [[nodiscard]] auto size() const
+    [[nodiscard]] constexpr auto size() const
     {
         return buffer_.size();
     }
 
-    [[nodiscard]] bool empty() const
+    [[nodiscard]] constexpr bool empty() const
     {
         return size() == 0;
     }
 
-    [[nodiscard]] auto* data()
+    [[nodiscard]] constexpr auto* data()
     {
         return buffer_.data();
     }
 
-    [[nodiscard]] auto const* data() const
+    [[nodiscard]] constexpr auto const* data() const
     {
         return buffer_.data();
+    }
+
+    [[nodiscard]] constexpr auto const* c_str() const
+    {
+        return data();
+    }
+
+    [[nodiscard]] constexpr auto sv() const
+    {
+        return std::basic_string_view<T>{ data(), size() };
     }
 
     ///
 
-    auto clear()
+    [[nodiscard]] constexpr bool ends_with(T const& x) const
     {
-        return buffer_.clear();
-    }
-
-    auto resize(size_t n)
-    {
-        return buffer_.resize(n);
-    }
-
-    auto push_back(T const& value)
-    {
-        return buffer_.push_back(value);
+        auto const n = size();
+        return n != 0 && data()[n - 1] == x;
     }
 
     template<typename ContiguousRange>
-    auto append(ContiguousRange const& range)
+    [[nodiscard]] constexpr bool ends_with(ContiguousRange const& x) const
     {
-        return buffer_.append(std::data(range), std::data(range) + std::size(range));
+        auto const x_len = std::size(x);
+        auto const len = size();
+        return len >= x_len && this->sv().substr(len - x_len) == x;
+    }
+
+    [[nodiscard]] constexpr bool ends_with(T const* x) const
+    {
+        return x != nullptr && ends_with(std::basic_string_view<T>(x));
+    }
+
+    ///
+
+    [[nodiscard]] constexpr bool starts_with(T const& x) const
+    {
+        return !empty() && *data() == x;
     }
 
     template<typename ContiguousRange>
-    auto& operator+=(ContiguousRange const& range)
+    [[nodiscard]] constexpr bool starts_with(ContiguousRange const& x) const
     {
-        append(range);
+        auto const x_len = std::size(x);
+        return size() >= x_len && this->sv().substr(0, x_len) == x;
+    }
+
+    [[nodiscard]] constexpr bool starts_with(T const* x) const
+    {
+        return x != nullptr && starts_with(std::basic_string_view<T>(x));
+    }
+
+    ///
+
+    void clear()
+    {
+        buffer_.clear();
+        ensure_sz();
+    }
+
+    void resize(size_t n)
+    {
+        buffer_.resize(n);
+        ensure_sz();
+    }
+
+    ///
+
+    void append(T const& value)
+    {
+        buffer_.push_back(value);
+        ensure_sz();
+    }
+
+    template<typename ContiguousRange>
+    void append(ContiguousRange const& args)
+    {
+        buffer_.append(std::data(args), std::data(args) + std::size(args));
+        ensure_sz();
+    }
+
+    void append(T const* sz_value)
+    {
+        if (sz_value != nullptr)
+        {
+            append(std::basic_string_view<T>{ sz_value });
+        }
+    }
+
+    template<typename... Args>
+    void append(Args const&... args)
+    {
+        (append(args), ...);
+    }
+
+    template<typename Arg>
+    auto& operator+=(Arg const& arg)
+    {
+        append(arg);
         return *this;
     }
 
-    template<typename ContiguousRange>
-    auto& operator=(ContiguousRange const& range)
+    ///
+
+    template<typename... Args>
+    void assign(Args const&... args)
     {
         clear();
-        append(range);
+        append(args...);
+    }
+
+    template<typename Arg>
+    auto& operator=(Arg const& arg)
+    {
+        assign(arg);
         return *this;
     }
 
-    template<typename... ContiguousRange>
-    void buildPath(ContiguousRange const&... args)
+    ///
+
+    template<typename... Args>
+    void join(T delim, Args const&... args)
     {
-        buffer_.reserve(sizeof...(args) + (std::size(args) + ...));
-        ((append(args), push_back('/')), ...);
+        ((append(args), append(delim)), ...);
         resize(size() - 1);
     }
 
+    template<typename ContiguousRange, typename... Args>
+    void join(ContiguousRange const& delim, Args const&... args)
+    {
+        ((append(args), append(delim)), ...);
+        resize(size() - std::size(delim));
+    }
+
+    template<typename... Args>
+    void join(T const* sz_delim, Args const&... args)
+    {
+        join(std::basic_string_view<T>{ sz_delim }, args...);
+    }
+
+private:
     /**
      * Ensure that the buffer's string is zero-terminated, e.g. for
      * external APIs that require char* strings.
@@ -147,19 +240,8 @@ public:
     void ensure_sz()
     {
         auto const n = size();
-        buffer_.try_reserve(n + 1);
+        buffer_.reserve(n + 1);
         buffer_[n] = '\0';
-    }
-
-    auto const* c_str()
-    {
-        ensure_sz();
-        return data();
-    }
-
-    [[nodiscard]] constexpr auto sv() const
-    {
-        return std::string_view{ data(), size() };
     }
 };
 
