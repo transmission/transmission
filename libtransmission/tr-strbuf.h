@@ -61,7 +61,7 @@ public:
         return buffer_.end();
     }
 
-    [[nodiscard]] auto& operator[](size_t pos)
+    [[nodiscard]] constexpr auto& operator[](size_t pos)
     {
         return buffer_[pos];
     }
@@ -71,12 +71,12 @@ public:
         return buffer_[pos];
     }
 
-    [[nodiscard]] auto size() const
+    [[nodiscard]] constexpr auto size() const
     {
         return buffer_.size();
     }
 
-    [[nodiscard]] bool empty() const
+    [[nodiscard]] constexpr bool empty() const
     {
         return size() == 0;
     }
@@ -101,6 +101,8 @@ public:
         return std::basic_string_view<T>{ data(), size() };
     }
 
+    ///
+
     [[nodiscard]] constexpr bool ends_with(T const& x) const
     {
         auto const n = size();
@@ -108,16 +110,35 @@ public:
     }
 
     template<typename ContiguousRange>
-    [[nodiscard]] bool ends_with(ContiguousRange const& x) const
+    [[nodiscard]] constexpr bool ends_with(ContiguousRange const& x) const
     {
         auto const x_len = std::size(x);
         auto const len = size();
         return len >= x_len && this->sv().substr(len - x_len) == x;
     }
 
-    [[nodiscard]] bool ends_with(T const* x) const
+    [[nodiscard]] constexpr bool ends_with(T const* x) const
     {
         return x != nullptr && ends_with(std::basic_string_view<T>(x));
+    }
+
+    ///
+
+    [[nodiscard]] constexpr bool starts_with(T const& x) const
+    {
+        return !empty() && *data() == x;
+    }
+
+    template<typename ContiguousRange>
+    [[nodiscard]] constexpr bool starts_with(ContiguousRange const& x) const
+    {
+        auto const x_len = std::size(x);
+        return size() >= x_len && this->sv().substr(0, x_len) == x;
+    }
+
+    [[nodiscard]] constexpr bool starts_with(T const* x) const
+    {
+        return x != nullptr && starts_with(std::basic_string_view<T>(x));
     }
 
     ///

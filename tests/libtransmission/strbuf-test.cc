@@ -143,16 +143,42 @@ TEST_F(StrbufTest, sz)
     EXPECT_EQ(strlen(Value), std::size(buf));
 }
 
+TEST_F(StrbufTest, startsWith)
+{
+    auto const buf = tr_pathbuf{ "/hello/world" };
+    EXPECT_TRUE(buf.starts_with('/'));
+    EXPECT_TRUE(buf.starts_with("/"));
+    EXPECT_TRUE(buf.starts_with("/"sv));
+    EXPECT_TRUE(buf.starts_with("/hello"));
+    EXPECT_TRUE(buf.starts_with("/hello"sv));
+    EXPECT_TRUE(buf.starts_with("/hello/world"));
+    EXPECT_TRUE(buf.starts_with("/hello/world"sv));
+
+    EXPECT_FALSE(buf.starts_with('g'));
+    EXPECT_FALSE(buf.starts_with("g"));
+    EXPECT_FALSE(buf.starts_with("g"sv));
+    EXPECT_FALSE(buf.starts_with("ghello"));
+    EXPECT_FALSE(buf.starts_with("ghello"sv));
+    EXPECT_FALSE(buf.starts_with("/hellg"));
+    EXPECT_FALSE(buf.starts_with("/hellg"sv));
+    EXPECT_FALSE(buf.starts_with("/hellg/world"));
+    EXPECT_FALSE(buf.starts_with("/hellg/world"sv));
+}
+
 TEST_F(StrbufTest, endsWith)
 {
     auto const buf = tr_pathbuf{ "/hello/world" };
     EXPECT_TRUE(buf.ends_with('d'));
+    EXPECT_TRUE(buf.ends_with("d"));
+    EXPECT_TRUE(buf.ends_with("d"sv));
     EXPECT_TRUE(buf.ends_with("world"));
     EXPECT_TRUE(buf.ends_with("world"sv));
     EXPECT_TRUE(buf.ends_with("/hello/world"));
     EXPECT_TRUE(buf.ends_with("/hello/world"sv));
 
     EXPECT_FALSE(buf.ends_with('g'));
+    EXPECT_FALSE(buf.ends_with("g"));
+    EXPECT_FALSE(buf.ends_with("g"sv));
     EXPECT_FALSE(buf.ends_with("gorld"));
     EXPECT_FALSE(buf.ends_with("gorld"sv));
     EXPECT_FALSE(buf.ends_with("worlg"));
