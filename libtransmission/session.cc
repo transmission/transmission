@@ -2935,8 +2935,8 @@ static int bandwidthGroupWrite(tr_session const* session, std::string_view confi
         tr_variantDictAddBool(dict, TR_KEY_honorsSessionLimits, group->areParentLimitsHonored(TR_UP));
     }
 
-    auto const filename = tr_strvPath(config_dir, BandwidthGroupsFilename);
-    auto const ret = tr_variantToFile(&groups_dict, TR_VARIANT_FMT_JSON, filename);
+    auto const filename = tr_pathbuf{ config_dir, "/"sv, BandwidthGroupsFilename };
+    auto const ret = tr_variantToFile(&groups_dict, TR_VARIANT_FMT_JSON, filename.sv());
     tr_variantFree(&groups_dict);
     return ret;
 }

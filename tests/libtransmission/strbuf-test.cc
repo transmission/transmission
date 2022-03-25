@@ -142,3 +142,21 @@ TEST_F(StrbufTest, sz)
     EXPECT_STREQ(Value, buf.c_str());
     EXPECT_EQ(strlen(Value), std::size(buf));
 }
+
+TEST_F(StrbufTest, endsWith)
+{
+    auto const buf = tr_pathbuf{ "/hello/world" };
+    EXPECT_TRUE(buf.ends_with('d'));
+    EXPECT_TRUE(buf.ends_with("world"));
+    EXPECT_TRUE(buf.ends_with("world"sv));
+    EXPECT_TRUE(buf.ends_with("/hello/world"));
+    EXPECT_TRUE(buf.ends_with("/hello/world"sv));
+
+    EXPECT_FALSE(buf.ends_with('g'));
+    EXPECT_FALSE(buf.ends_with("gorld"));
+    EXPECT_FALSE(buf.ends_with("gorld"sv));
+    EXPECT_FALSE(buf.ends_with("worlg"));
+    EXPECT_FALSE(buf.ends_with("worlg"sv));
+    EXPECT_FALSE(buf.ends_with("/hellg/world"));
+    EXPECT_FALSE(buf.ends_with("/hellg/world"sv));
+}

@@ -81,24 +81,43 @@ public:
         return size() == 0;
     }
 
-    [[nodiscard]] auto* data()
+    [[nodiscard]] constexpr auto* data()
     {
         return buffer_.data();
     }
 
-    [[nodiscard]] auto const* data() const
+    [[nodiscard]] constexpr auto const* data() const
     {
         return buffer_.data();
     }
 
-    [[nodiscard]] auto const* c_str() const
+    [[nodiscard]] constexpr auto const* c_str() const
     {
         return data();
     }
 
     [[nodiscard]] constexpr auto sv() const
     {
-        return std::string_view{ data(), size() };
+        return std::basic_string_view<T>{ data(), size() };
+    }
+
+    [[nodiscard]] constexpr bool ends_with(T const& x) const
+    {
+        auto const n = size();
+        return n != 0 && data()[n - 1] == x;
+    }
+
+    template<typename ContiguousRange>
+    [[nodiscard]] bool ends_with(ContiguousRange const& x) const
+    {
+        auto const x_len = std::size(x);
+        auto const len = size();
+        return len >= x_len && this->sv().substr(len - x_len) == x;
+    }
+
+    [[nodiscard]] bool ends_with(T const* x) const
+    {
+        return x != nullptr && ends_with(std::basic_string_view<T>(x));
     }
 
     ///
