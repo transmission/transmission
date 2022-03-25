@@ -315,7 +315,7 @@ static struct peer_atom* getExistingAtom(tr_swarm const* cswarm, tr_address cons
 
 static bool peerIsInUse(tr_swarm const* cs, struct peer_atom const* atom)
 {
-    auto* s = const_cast<tr_swarm*>(cs);
+    auto const* const s = const_cast<tr_swarm*>(cs);
     auto const lock = s->manager->unique_lock();
 
     return atom->peer != nullptr || s->outgoing_handshakes.count(atom->addr) != 0 ||
