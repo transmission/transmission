@@ -126,13 +126,13 @@ std::string getShortTransferString(
     {
         return fmt::format(
             _("{upload_speed} ▲ {download_speed} ▼"),
-            tr_formatter_speed_KBps(downloadSpeed_KBps),
-            tr_formatter_speed_KBps(uploadSpeed_KBps));
+            fmt::arg("upload_speed", tr_formatter_speed_KBps(uploadSpeed_KBps)),
+            fmt::arg("download_speed", tr_formatter_speed_KBps(downloadSpeed_KBps)));
     }
 
     if (bool const have_up = have_meta && st->peersGettingFromUs > 0; have_up)
     {
-        return fmt::format(_("{upload_speed} ▲"), tr_formatter_speed_KBps(downloadSpeed_KBps));
+        return fmt::format(_("{upload_speed} ▲"), fmt::arg("upload_speed", tr_formatter_speed_KBps(downloadSpeed_KBps)));
     }
 
     if (st->isStalled)
