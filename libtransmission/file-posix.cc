@@ -387,9 +387,8 @@ char* tr_sys_path_resolve(char const* path, tr_error** error)
 std::string tr_sys_path_basename(std::string_view path, tr_error** error)
 {
     auto tmp = std::string{ path };
-    char* ret = basename(std::data(tmp));
 
-    if (ret != nullptr)
+    if (char const* ret = basename(std::data(tmp)); ret != nullptr)
     {
         return ret;
     }
@@ -401,9 +400,8 @@ std::string tr_sys_path_basename(std::string_view path, tr_error** error)
 std::string tr_sys_path_dirname(std::string_view path, tr_error** error)
 {
     auto tmp = std::string{ path };
-    char* ret = dirname(std::data(tmp));
 
-    if (ret != nullptr)
+    if (char const* ret = dirname(std::data(tmp)); ret != nullptr)
     {
         return ret;
     }
