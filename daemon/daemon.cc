@@ -228,14 +228,49 @@ static auto onFileAdded(tr_watchdir_t dir, char const* name, void* vsession)
 {
     auto const* session = static_cast<tr_session const*>(vsession);
 
-    if (!tr_str_has_suffix(name, ".torrent"))
+    if (!tr_str_has_suffix(name, ".torrent") && !tr_str_has_suffix(name, ".magnet"))
     {
         return TR_WATCHDIR_IGNORE;
     }
 
     auto filename = tr_strvPath(tr_watchdir_get_path(dir), name);
     tr_ctor* ctor = tr_ctorNew(session);
-    if (!tr_ctorSetMetainfoFromFile(ctor, filename.c_str(), nullptr))
+
+    bool retry = false;
+
+    if (tr_str_has_suffix(name, ".torrent"))
+    {
+        if (!tr_ctorSetMetainfoFromFile(ctor, filename.c_str(), nullptr))
+        {
+            retry = true;
+        }
+    }
+    else // ".magnet" suffix
+    {
+        auto content = std::vector<char>{};
+        tr_error* error = nullptr;
+        if (!tr_loadFile(content, filename, &error))
+        {
+            tr_logAddWarn(fmt::format(
+                _("Couldn't read '{path}': {error} ({error_code})"),
+                fmt::arg("path", name),
+                fmt::arg("error", error->message),
+                fmt::arg("error_code", error->code)));
+            tr_error_free(error);
+            retry = true;
+        }
+        else
+        {
+            content.push_back('\0'); // zero-terminated string
+            auto const* data = std::data(content);
+            if (!tr_ctorSetMetainfoFromMagnetLink(ctor, data, nullptr))
+            {
+                retry = true;
+            }
+        }
+    }
+
+    if (retry)
     {
         tr_ctorFree(ctor);
         return TR_WATCHDIR_RETRY;
