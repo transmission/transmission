@@ -855,7 +855,7 @@ static void io_dtor(tr_peerIo* const io)
     TR_ASSERT(tr_amInEventThread(io->session));
     TR_ASSERT(io->session->events != nullptr);
 
-    tr_logAddDebugIo(io, "in tr_peerIo destructor");
+    tr_logAddTraceIo(io, "in tr_peerIo destructor");
     event_disable(io, EV_READ | EV_WRITE);
     delete io->bandwidth;
     io_close_socket(io);
@@ -873,7 +873,7 @@ static void tr_peerIoFree(tr_peerIo* io)
 {
     if (io != nullptr)
     {
-        tr_logAddDebugIo(io, "in tr_peerIoFree");
+        tr_logAddTraceIo(io, "in tr_peerIoFree");
         io->canRead = nullptr;
         io->didWrite = nullptr;
         io->gotError = nullptr;
