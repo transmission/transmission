@@ -79,9 +79,9 @@ bool tr_wildmat(char const* text, char const* pattern) TR_GNUC_NONNULL(1, 2);
  * @brief Loads a file and returns its contents.
  * On failure, NULL is returned and errno is set.
  */
-uint8_t* tr_loadFile(char const* filename, size_t* size, struct tr_error** error) TR_GNUC_MALLOC TR_GNUC_NONNULL(1);
+uint8_t* tr_loadFile(std::string_view filename, size_t* size, struct tr_error** error) TR_GNUC_MALLOC;
 
-bool tr_loadFile(std::vector<char>& setme, std::string const& filename, tr_error** error = nullptr);
+bool tr_loadFile(std::string_view filename, std::vector<char>& contents, tr_error** error = nullptr);
 
 bool tr_saveFile(std::string_view filename, std::string_view contents, tr_error** error = nullptr);
 

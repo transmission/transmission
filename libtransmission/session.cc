@@ -56,6 +56,7 @@
 #include "tr-assert.h"
 #include "tr-dht.h" /* tr_dhtUpkeep() */
 #include "tr-lpd.h"
+#include "tr-strbuf.h"
 #include "tr-udp.h"
 #include "tr-utp.h"
 #include "trevent.h"
@@ -2020,7 +2021,6 @@ static void sessionLoadTorrents(struct sessionLoadTorrentsData* const data)
     if (odir != TR_BAD_SYS_DIR)
     {
         auto const dirname_sv = std::string_view{ dirname };
-        auto path = std::string{};
 
         char const* name = nullptr;
         while ((name = tr_sys_dir_read_name(odir, nullptr)) != nullptr)
@@ -2030,12 +2030,12 @@ static void sessionLoadTorrents(struct sessionLoadTorrentsData* const data)
                 continue;
             }
 
-            tr_buildBuf(path, dirname_sv, "/", name);
+            auto const path = tr_pathbuf{ dirname_sv, "/"sv, name };
 
             // is a magnet link?
-            if (!tr_ctorSetMetainfoFromFile(data->ctor, path, nullptr))
+            if (!tr_ctorSetMetainfoFromFile(data->ctor, std::string{ path.sv() }, nullptr))
             {
-                if (auto buf = std::vector<char>{}; tr_loadFile(buf, path))
+                if (auto buf = std::vector<char>{}; tr_loadFile(path.sv(), buf))
                 {
                     tr_ctorSetMetainfoFromMagnetLink(
                         data->ctor,

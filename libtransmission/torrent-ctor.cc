@@ -74,7 +74,7 @@ bool tr_ctorSetMetainfoFromFile(tr_ctor* ctor, std::string const& filename, tr_e
         return false;
     }
 
-    if (!tr_loadFile(ctor->contents, filename, error))
+    if (!tr_loadFile(filename, ctor->contents, error))
     {
         return false;
     }

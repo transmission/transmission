@@ -1268,7 +1268,7 @@ bool tr_variantFromFile(tr_variant* setme, tr_variant_parse_opts opts, std::stri
     TR_ASSERT((opts & TR_VARIANT_PARSE_INPLACE) == 0);
 
     auto buf = std::vector<char>{};
-    if (!tr_loadFile(buf, filename, error))
+    if (!tr_loadFile(filename, buf, error))
     {
         return false;
     }

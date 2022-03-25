@@ -227,16 +227,18 @@ void tr_timerAddMsec(struct event* timer, int msec)
 ***
 **/
 
-uint8_t* tr_loadFile(char const* path, size_t* size, tr_error** error)
+uint8_t* tr_loadFile(std::string_view path_in, size_t* size, tr_error** error)
 {
+    auto const path = tr_pathbuf{ path_in };
+
     /* try to stat the file */
     auto info = tr_sys_path_info{};
     tr_error* my_error = nullptr;
-    if (!tr_sys_path_get_info(path, 0, &info, &my_error))
+    if (!tr_sys_path_get_info(path.c_str(), 0, &info, &my_error))
     {
         tr_logAddError(fmt::format(
             _("Couldn't read '{path}': {error} ({error_code})"),
-            fmt::arg("path", path),
+            fmt::arg("path", path.sv()),
             fmt::arg("error", my_error->message),
             fmt::arg("error_code", my_error->code)));
         tr_error_propagate(error, &my_error);
@@ -245,7 +247,7 @@ uint8_t* tr_loadFile(char const* path, size_t* size, tr_error** error)
 
     if (info.type != TR_SYS_PATH_IS_FILE)
     {
-        tr_logAddError(fmt::format(_("Couldn't read '{path}': Not a regular file"), fmt::arg("path", path)));
+        tr_logAddError(fmt::format(_("Couldn't read '{path}': Not a regular file"), fmt::arg("path", path.sv())));
         tr_error_set(error, TR_ERROR_EISDIR, "Not a regular file"sv);
         return nullptr;
     }
@@ -257,12 +259,12 @@ uint8_t* tr_loadFile(char const* path, size_t* size, tr_error** error)
     }
 
     /* Load the torrent file into our buffer */
-    auto const fd = tr_sys_file_open(path, TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0, &my_error);
+    auto const fd = tr_sys_file_open(path.c_str(), TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0, &my_error);
     if (fd == TR_BAD_SYS_FILE)
     {
         tr_logAddError(fmt::format(
             _("Couldn't read '{path}': {error} ({error_code})"),
-            fmt::arg("path", path),
+            fmt::arg("path", path.sv()),
             fmt::arg("error", my_error->message),
             fmt::arg("error_code", my_error->code)));
         tr_error_propagate(error, &my_error);
@@ -274,7 +276,7 @@ uint8_t* tr_loadFile(char const* path, size_t* size, tr_error** error)
     {
         tr_logAddError(fmt::format(
             _("Couldn't read '{path}': {error} ({error_code})"),
-            fmt::arg("path", path),
+            fmt::arg("path", path.sv()),
             fmt::arg("error", my_error->message),
             fmt::arg("error_code", my_error->code)));
         tr_sys_file_close(fd, nullptr);
@@ -289,18 +291,18 @@ uint8_t* tr_loadFile(char const* path, size_t* size, tr_error** error)
     return buf;
 }
 
-bool tr_loadFile(std::vector<char>& setme, std::string const& path, tr_error** error)
+bool tr_loadFile(std::string_view path_in, std::vector<char>& setme, tr_error** error)
 {
-    auto const* const path_sz = path.c_str();
+    auto const path = tr_pathbuf{ path_in };
 
     /* try to stat the file */
     auto info = tr_sys_path_info{};
     tr_error* my_error = nullptr;
-    if (!tr_sys_path_get_info(path_sz, 0, &info, &my_error))
+    if (!tr_sys_path_get_info(path.c_str(), 0, &info, &my_error))
     {
         tr_logAddError(fmt::format(
             _("Couldn't read '{path}': {error} ({error_code})"),
-            fmt::arg("path", path),
+            fmt::arg("path", path.sv()),
             fmt::arg("error", my_error->message),
             fmt::arg("error_code", my_error->code)));
         tr_error_propagate(error, &my_error);
@@ -309,18 +311,18 @@ bool tr_loadFile(std::vector<char>& setme, std::string const& path, tr_error** e
 
     if (info.type != TR_SYS_PATH_IS_FILE)
     {
-        tr_logAddError(fmt::format(_("Couldn't read '{path}': Not a regular file"), fmt::arg("path", path)));
+        tr_logAddError(fmt::format(_("Couldn't read '{path}': Not a regular file"), fmt::arg("path", path.sv())));
         tr_error_set(error, TR_ERROR_EISDIR, "Not a regular file"sv);
         return false;
     }
 
     /* Load the torrent file into our buffer */
-    auto const fd = tr_sys_file_open(path_sz, TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0, &my_error);
+    auto const fd = tr_sys_file_open(path.c_str(), TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0, &my_error);
     if (fd == TR_BAD_SYS_FILE)
     {
         tr_logAddError(fmt::format(
             _("Couldn't read '{path}': {error} ({error_code})"),
-            fmt::arg("path", path),
+            fmt::arg("path", path.sv()),
             fmt::arg("error", my_error->message),
             fmt::arg("error_code", my_error->code)));
         tr_error_propagate(error, &my_error);
@@ -332,7 +334,7 @@ bool tr_loadFile(std::vector<char>& setme, std::string const& path, tr_error** e
     {
         tr_logAddError(fmt::format(
             _("Couldn't read '{path}': {error} ({error_code})"),
-            fmt::arg("path", path),
+            fmt::arg("path", path.sv()),
             fmt::arg("error", my_error->message),
             fmt::arg("error_code", my_error->code)));
         tr_sys_file_close(fd, nullptr);

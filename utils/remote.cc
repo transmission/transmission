@@ -552,10 +552,10 @@ static char* netrc = nullptr;
 static char* session_id = nullptr;
 static bool UseSSL = false;
 
-static std::string getEncodedMetainfo(char const* filename)
+static std::string getEncodedMetainfo(std::string_view filename)
 {
     auto contents = std::vector<char>{};
-    if (tr_loadFile(contents, filename))
+    if (tr_loadFile(filename, contents))
     {
         return tr_base64_encode({ std::data(contents), std::size(contents) });
     }
@@ -2386,7 +2386,7 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
                 if (tadd != nullptr)
                 {
                     tr_variant* args = tr_variantDictFind(tadd, Arguments);
-                    std::string const tmp = getEncodedMetainfo(optarg);
+                    auto const tmp = getEncodedMetainfo(optarg);
 
                     if (!std::empty(tmp))
                     {

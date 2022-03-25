@@ -473,7 +473,7 @@ TEST_F(UtilsTest, saveFile)
 
     // now read the file back in and confirm the contents are the same
     auto buf = std::vector<char>{};
-    EXPECT_TRUE(tr_loadFile(buf, std::string{ filename.sv() }, &error));
+    EXPECT_TRUE(tr_loadFile(filename.sv(), buf, &error));
     EXPECT_EQ(nullptr, error) << *error;
     auto sv = std::string_view{ std::data(buf), std::size(buf) };
     EXPECT_EQ(contents, sv);

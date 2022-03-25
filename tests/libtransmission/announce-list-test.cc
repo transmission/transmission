@@ -346,7 +346,7 @@ TEST_F(AnnounceListTest, save)
     auto original_content = std::vector<char>{};
     auto const test_file = tr_pathbuf{ ::testing::TempDir(), "transmission-announce-list-test.torrent"sv };
     tr_error* error = nullptr;
-    EXPECT_TRUE(tr_loadFile(original_content, OriginalFile, &error));
+    EXPECT_TRUE(tr_loadFile(OriginalFile, original_content, &error));
     EXPECT_EQ(nullptr, error) << *error;
     EXPECT_TRUE(tr_saveFile(test_file.sv(), original_content, &error));
     EXPECT_EQ(nullptr, error) << *error;
