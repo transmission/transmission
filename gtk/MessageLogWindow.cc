@@ -271,8 +271,7 @@ void setForegroundColor(Gtk::CellRendererText* renderer, tr_log_level level)
         renderer->property_foreground() = "forestgreen";
         break;
 
-    case TR_LOG_INFO:
-    case TR_LOG_OFF:
+    default:
         renderer->property_foreground_set() = false;
         break;
     }

@@ -33,17 +33,29 @@ using namespace std::literals;
 namespace
 {
 
-tr_log_level tr_message_level = TR_LOG_ERROR;
+class tr_log_state
+{
+public:
+    [[nodiscard]] auto unique_lock()
+    {
+        return std::unique_lock(message_mutex_);
+    }
 
-bool myQueueEnabled = false;
+    tr_log_level level = TR_LOG_ERROR;
 
-tr_log_message* myQueue = nullptr;
+    bool queue_enabled_ = false;
 
-tr_log_message** myQueueTail = &myQueue;
+    tr_log_message* queue_ = nullptr;
 
-int myQueueLength = 0;
+    tr_log_message** queue_tail_ = &queue_;
 
-std::recursive_mutex message_mutex_;
+    int queue_length_ = 0;
+
+private:
+    std::recursive_mutex message_mutex_;
+};
+
+auto log_state = tr_log_state{};
 
 ///
 
@@ -87,7 +99,7 @@ void logAddImpl(
         return;
     }
 
-    auto const lock = std::lock_guard(message_mutex_);
+    auto const lock = log_state.unique_lock();
 #ifdef _WIN32
 
     OutputDebugStringA(tr_strvJoin(msg, "\r\n").c_str());
@@ -135,18 +147,18 @@ void logAddImpl(
         newmsg->line = line;
         newmsg->name = tr_strvDup(name);
 
-        *myQueueTail = newmsg;
-        myQueueTail = &newmsg->next;
-        ++myQueueLength;
+        *log_state.queue_tail_ = newmsg;
+        log_state.queue_tail_ = &newmsg->next;
+        ++log_state.queue_length_;
 
-        if (myQueueLength > TR_LOG_MAX_QUEUE_LENGTH)
+        if (log_state.queue_length_ > TR_LOG_MAX_QUEUE_LENGTH)
         {
-            tr_log_message* old = myQueue;
-            myQueue = old->next;
+            tr_log_message* old = log_state.queue_;
+            log_state.queue_ = old->next;
             old->next = nullptr;
             tr_logFreeQueue(old);
-            --myQueueLength;
-            TR_ASSERT(myQueueLength == TR_LOG_MAX_QUEUE_LENGTH);
+            --log_state.queue_length_;
+            TR_ASSERT(log_state.queue_length_ == TR_LOG_MAX_QUEUE_LENGTH);
         }
     }
     else
@@ -174,7 +186,7 @@ void logAddImpl(
 
 tr_log_level tr_logGetLevel()
 {
-    return tr_message_level;
+    return log_state.level;
 }
 
 bool tr_logLevelIsActive(tr_log_level level)
@@ -184,27 +196,27 @@ bool tr_logLevelIsActive(tr_log_level level)
 
 void tr_logSetLevel(tr_log_level level)
 {
-    tr_message_level = level;
+    log_state.level = level;
 }
 
 void tr_logSetQueueEnabled(bool isEnabled)
 {
-    myQueueEnabled = isEnabled;
+    log_state.queue_enabled_ = isEnabled;
 }
 
 bool tr_logGetQueueEnabled()
 {
-    return myQueueEnabled;
+    return log_state.queue_enabled_;
 }
 
 tr_log_message* tr_logGetQueue()
 {
-    auto const lock = std::lock_guard(message_mutex_);
+    auto const lock = log_state.unique_lock();
 
-    auto* const ret = myQueue;
-    myQueue = nullptr;
-    myQueueTail = &myQueue;
-    myQueueLength = 0;
+    auto* const ret = log_state.queue_;
+    log_state.queue_ = nullptr;
+    log_state.queue_tail_ = &log_state.queue_;
+    log_state.queue_length_ = 0;
 
     return ret;
 }
@@ -264,7 +276,7 @@ void tr_logAddMessage(char const* file, int line, tr_log_level level, std::strin
         return;
     }
 
-    auto const lock = std::lock_guard(message_mutex_);
+    auto const lock = log_state.unique_lock();
 
     // don't log the same warning ad infinitum.
     // it's not useful after some point.
