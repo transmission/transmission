@@ -275,16 +275,7 @@ std::string getStatusString(
     double const uploadSpeed_KBps,
     double const downloadSpeed_KBps)
 {
-    auto status_str = std::string{};
-
-    if (auto error_string = getErrorString(st); error_string)
-    {
-        status_str = *error_string;
-    }
-    else
-    {
-        status_str = getActivityString(tor, st, uploadSpeed_KBps, downloadSpeed_KBps);
-    }
+    auto status_str = getErrorString(st).value_or(getActivityString(tor, st, uploadSpeed_KBps, downloadSpeed_KBps));
 
     if (st->activity != TR_STATUS_CHECK_WAIT && st->activity != TR_STATUS_CHECK && st->activity != TR_STATUS_DOWNLOAD_WAIT &&
         st->activity != TR_STATUS_SEED_WAIT && st->activity != TR_STATUS_STOPPED)
