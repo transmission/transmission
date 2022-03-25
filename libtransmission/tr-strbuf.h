@@ -35,10 +35,10 @@ public:
         return *this;
     }
 
-    template<typename ContiguousRange>
-    tr_strbuf(ContiguousRange const& in)
+    template<typename... ContiguousRange>
+    tr_strbuf(ContiguousRange const&... args)
     {
-        buffer_.append(in);
+        append(args...);
     }
 
     [[nodiscard]] constexpr auto begin()
@@ -61,12 +61,12 @@ public:
         return buffer_.end();
     }
 
-    [[nodiscard]] T& operator[](size_t pos)
+    [[nodiscard]] auto& operator[](size_t pos)
     {
         return buffer_[pos];
     }
 
-    [[nodiscard]] constexpr T const& operator[](size_t pos) const
+    [[nodiscard]] constexpr auto const& operator[](size_t pos) const
     {
         return buffer_[pos];
     }
@@ -91,27 +91,48 @@ public:
         return buffer_.data();
     }
 
+    [[nodiscard]] auto const* c_str() const
+    {
+        return data();
+    }
+
+    [[nodiscard]] constexpr auto sv() const
+    {
+        return std::string_view{ data(), size() };
+    }
+
     ///
 
-    auto clear()
+    void clear()
     {
-        return buffer_.clear();
+        buffer_.clear();
+        ensure_sz();
     }
 
-    auto resize(size_t n)
+    void resize(size_t n)
     {
-        return buffer_.resize(n);
+        buffer_.resize(n);
+        ensure_sz();
     }
 
-    auto push_back(T const& value)
+    void push_back(T const& value)
     {
-        return buffer_.push_back(value);
+        buffer_.push_back(value);
+        ensure_sz();
     }
 
     template<typename ContiguousRange>
-    auto append(ContiguousRange const& range)
+    void append(ContiguousRange const& range)
     {
-        return buffer_.append(std::data(range), std::data(range) + std::size(range));
+        buffer_.append(std::data(range), std::data(range) + std::size(range));
+        ensure_sz();
+    }
+
+    template<typename... ContiguousRange>
+    void append(ContiguousRange const&... args)
+    {
+        buffer_.reserve((std::size(args) + ...));
+        (append(args), ...);
     }
 
     template<typename ContiguousRange>
@@ -137,6 +158,7 @@ public:
         resize(size() - 1);
     }
 
+private:
     /**
      * Ensure that the buffer's string is zero-terminated, e.g. for
      * external APIs that require char* strings.
@@ -147,19 +169,8 @@ public:
     void ensure_sz()
     {
         auto const n = size();
-        buffer_.try_reserve(n + 1);
+        buffer_.reserve(n + 1);
         buffer_[n] = '\0';
-    }
-
-    auto const* c_str()
-    {
-        ensure_sz();
-        return data();
-    }
-
-    [[nodiscard]] constexpr auto sv() const
-    {
-        return std::string_view{ data(), size() };
     }
 };
 
