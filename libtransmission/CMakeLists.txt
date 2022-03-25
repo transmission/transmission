@@ -144,6 +144,7 @@ set(${PROJECT_NAME}_PUBLIC_HEADERS
     tr-assert.h
     tr-getopt.h
     tr-macros.h
+    tr-strbuf.h
     transmission.h
     utils.h
     variant.h
@@ -216,7 +217,6 @@ endif()
 add_definitions(
     -D__TRANSMISSION__
     "-DPACKAGE_DATA_DIR=\"${CMAKE_INSTALL_FULL_DATAROOTDIR}\""
-    ${LIBFMT_DEFINITIONS}
     ${NATPMP_DEFINITIONS}
     ${MINIUPNPC_DEFINITIONS}
 )
@@ -257,7 +257,6 @@ include_directories(
 
 include_directories(
     SYSTEM
-    ${LIBFMT_INCLUDE_DIRS}
     ${UTFCPP_INCLUDE_DIRS}
     ${DEFLATE_INCLUDE_DIRS}
     ${CRYPTO_INCLUDE_DIRS}

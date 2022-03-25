@@ -26,6 +26,7 @@ add_executable(libtransmission-test
     rename-test.cc
     rpc-test.cc
     session-test.cc
+    strbuf-test.cc
     subprocess-test-script.cmd
     subprocess-test.cc
     test-fixtures.h
@@ -38,7 +39,6 @@ add_executable(libtransmission-test
 
 target_compile_definitions(libtransmission-test
     PRIVATE
-        ${LIBFMT_DEFINITIONS}
         -DLIBTRANSMISSION_TEST_ASSETS_DIR="${CMAKE_CURRENT_SOURCE_DIR}/assets"
         __TRANSMISSION__)
 
