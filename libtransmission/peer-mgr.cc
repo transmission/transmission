@@ -1105,7 +1105,7 @@ void tr_peerMgrAddIncoming(tr_peerMgr* manager, tr_address const* addr, tr_port 
 
         tr_peerIoUnref(io); /* balanced by the implicit ref in tr_peerIoNewIncoming() */
 
-        manager->incoming_handshakes.insert({ *addr, handshake });
+        manager->incoming_handshakes.try_emplace(*addr, handshake);
     }
 }
 
@@ -3048,7 +3048,7 @@ static void initiateConnection(tr_peerMgr* mgr, tr_swarm* s, struct peer_atom* a
 
         tr_peerIoUnref(io); /* balanced by the initial ref in tr_peerIoNewOutgoing() */
 
-        s->outgoing_handshakes.insert({ atom->addr, handshake });
+        s->outgoing_handshakes.try_emplace(atom->addr, handshake);
     }
 
     atom->lastConnectionAttemptAt = now;
