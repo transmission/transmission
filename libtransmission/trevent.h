@@ -30,7 +30,7 @@ void tr_runInEventThread(tr_session* session, Func&& func, Args&&... args)
 {
     tr_runInEventThread(
         session,
-        std::function<void(void)>{ [func = std::move(func), args = std::make_tuple((std::move(args), ...))]()
+        std::function<void(void)>{ [func = std::move(func), args = std::make_tuple(std::forward<Args>(args)...)]()
                                    {
                                        std::apply(std::move(func), std::move(args));
                                    } });
