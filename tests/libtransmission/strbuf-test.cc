@@ -36,13 +36,6 @@ TEST_F(StrbufTest, assign)
     EXPECT_EQ(Value, buf.sv());
 }
 
-TEST_F(StrbufTest, buildPath)
-{
-    auto buf = tr_pathbuf{};
-    buf.buildPath("foo"sv, "bar"sv, "baz"sv);
-    EXPECT_EQ("foo/bar/baz", buf.sv());
-}
-
 TEST_F(StrbufTest, cStr)
 {
     static char const* const Value = "Hello, World!";
@@ -141,6 +134,23 @@ TEST_F(StrbufTest, iterators)
         EXPECT_EQ(Value.front(), *begin);
         EXPECT_EQ(std::size(Value), std::distance(begin, end));
     }
+}
+
+TEST_F(StrbufTest, join)
+{
+    auto buf = tr_pathbuf{};
+
+    buf.clear();
+    buf.join(' ', 'A', "short", "phrase"sv);
+    EXPECT_EQ("A short phrase"sv, buf.sv());
+
+    buf.clear();
+    buf.join("  ", 'A', "short", "phrase"sv);
+    EXPECT_EQ("A  short  phrase"sv, buf.sv());
+
+    buf.clear();
+    buf.join("--"sv, 'A', "short", "phrase"sv);
+    EXPECT_EQ("A--short--phrase"sv, buf.sv());
 }
 
 TEST_F(StrbufTest, startsWith)

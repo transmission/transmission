@@ -14,7 +14,7 @@
  * but falls back to heap allocation when necessary.
  * Useful for building temp strings without heap allocation.
  *
- * `fmt::basic_memory_buffer` is final, so aggregate intead
+ * `fmt::basic_memory_buffer` is final, so aggregate instead
  * of subclassing ¯\_(ツ)_/¯
  */
 template<typename T, size_t N>
@@ -155,7 +155,9 @@ public:
         ensure_sz();
     }
 
-    void push_back(T const& value)
+    ///
+
+    void append(T const& value)
     {
         buffer_.push_back(value);
         ensure_sz();
@@ -189,6 +191,8 @@ public:
         return *this;
     }
 
+    ///
+
     template<typename... Args>
     void assign(Args const&... args)
     {
@@ -203,12 +207,26 @@ public:
         return *this;
     }
 
+    ///
+
     template<typename... Args>
-    void buildPath(Args const&... args)
+    void join(T delim, Args const&... args)
     {
-        clear();
-        ((append(args), push_back('/')), ...);
+        ((append(args), append(delim)), ...);
         resize(size() - 1);
+    }
+
+    template<typename ContiguousRange, typename... Args>
+    void join(ContiguousRange const& delim, Args const&... args)
+    {
+        ((append(args), append(delim)), ...);
+        resize(size() - std::size(delim));
+    }
+
+    template<typename... Args>
+    void join(T const* sz_delim, Args const&... args)
+    {
+        join(std::basic_string_view<T>{ sz_delim }, args...);
     }
 
 private:
