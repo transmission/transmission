@@ -14,7 +14,6 @@
 #include <cstdlib> // getenv()
 #include <cstring> /* strerror() */
 #include <ctime> // nanosleep()
-#include <iterator> // std::back_inserter
 #include <set>
 #include <string>
 #include <string_view>

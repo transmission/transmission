@@ -31,6 +31,7 @@
 #include "session.h"
 #include "torrent-metainfo.h"
 #include "tr-macros.h"
+#include "tr-strbuf.h"
 
 class tr_swarm;
 struct tr_error;
@@ -479,9 +480,10 @@ public:
         return metainfo_.resumeFile(this->session->resume_dir);
     }
 
-    [[nodiscard]] auto magnet() const
+    template<typename OutputIt>
+    void magnet(OutputIt out) const
     {
-        return metainfo_.magnet();
+        metainfo_.magnet(out);
     }
 
     [[nodiscard]] auto const& comment() const

@@ -6,6 +6,7 @@
 #include <array>
 #include <cerrno>
 #include <cstring>
+#include <iterator>
 #include <string_view>
 
 #include "transmission.h"
@@ -42,7 +43,10 @@ TEST_F(TorrentMetainfoTest, magnetLink)
     EXPECT_TRUE(metainfo.parseMagnet(MagnetLink));
     EXPECT_EQ(0, metainfo.fileCount()); // because it's a magnet link
     EXPECT_EQ(2, std::size(metainfo.announceList()));
-    EXPECT_EQ(MagnetLink, metainfo.magnet());
+
+    auto magnet_link = tr_urlbuf{};
+    metainfo.magnet(std::back_inserter(magnet_link));
+    EXPECT_EQ(MagnetLink, magnet_link.sv());
 }
 
 #define BEFORE_PATH \

@@ -3,6 +3,10 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include <cstring>
+#include <iterator>
+#include <set>
+
 #include "transmission.h"
 
 #include "torrent.h"
@@ -10,9 +14,6 @@
 #include "utils.h"
 
 #include "gtest/gtest.h"
-
-#include <cstring>
-#include <set>
 
 using namespace std::literals;
 
@@ -40,7 +41,9 @@ TEST_F(TorrentsTest, simpleTests)
 
     EXPECT_EQ(tor, torrents.get(id));
     EXPECT_EQ(tor, torrents.get(tor->infoHash()));
-    EXPECT_EQ(tor, torrents.get(tor->magnet()));
+    auto magnet_link = tr_urlbuf{};
+    tor->magnet(std::back_inserter(magnet_link));
+    EXPECT_EQ(tor, torrents.get(magnet_link.sv()));
 
     tm = tr_torrent_metainfo{};
     EXPECT_TRUE(tm.parseTorrentFile(TorrentFile));

@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <climits> /* INT_MAX */
 #include <ctime>
+#include <iterator>
 #include <string>
 #include <string_view>
 
@@ -411,5 +412,7 @@ double tr_torrentGetMetadataPercent(tr_torrent const* tor)
 
 char* tr_torrentGetMagnetLink(tr_torrent const* tor)
 {
-    return tr_strvDup(tor->metainfo_.magnet());
+    auto urlbuf = tr_urlbuf{};
+    tor->metainfo_.magnet(std::back_inserter(urlbuf));
+    return tr_strvDup(urlbuf.sv());
 }

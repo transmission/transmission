@@ -3,14 +3,14 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <algorithm> /* EINVAL */
+#include <algorithm>
 #include <array>
-#include <cerrno> /* EINVAL */
+#include <cerrno> // EINVAL
 #include <climits> /* INT_MAX */
 #include <cmath>
 #include <csignal> /* signal() */
-#include <cstring> /* memcmp */
 #include <ctime>
+#include <iterator>
 #include <map>
 #include <set>
 #include <sstream>
@@ -793,7 +793,9 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
         }
         else // magnet link
         {
-            tr_saveFile(filename, tor->magnet(), &error);
+            auto magnet_link = tr_urlbuf{};
+            tor->magnet(std::back_inserter(magnet_link));
+            tr_saveFile(filename, magnet_link.sv(), &error);
         }
 
         if (error != nullptr)
@@ -2099,7 +2101,10 @@ bool tr_torrent::setTrackerList(std::string_view text)
     if (!has_metadata)
     {
         tr_error* save_error = nullptr;
-        if (!tr_saveFile(this->magnetFile(), this->magnet(), &save_error))
+        auto magnet_link = tr_urlbuf{};
+        this->magnet(std::back_inserter(magnet_link));
+
+        if (!tr_saveFile(this->magnetFile(), magnet_link.sv(), &save_error))
         {
             this->setLocalError(fmt::format(
                 _("Couldn't save '{path}': {error} ({error_code})"),

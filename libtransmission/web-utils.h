@@ -11,6 +11,8 @@
 #include <utility>
 
 #include "tr-macros.h" // tr_sha1_digest_t
+#include "tr-strbuf.h" // tr_urlbuf
+#include "utils.h"
 
 struct evbuffer;
 
@@ -91,10 +93,28 @@ struct tr_url_query_view
     }
 };
 
-void tr_http_escape(std::string& appendme, std::string_view str, bool escape_reserved);
+template<typename OutputIt>
+void tr_http_escape(OutputIt out, std::string_view str, bool escape_reserved)
+{
+    auto constexpr ReservedChars = std::string_view{ "!*'();:@&=+$,/?%#[]" };
+    auto constexpr UnescapedChars = std::string_view{ "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_.~" };
 
-// TODO: remove evbuffer version
-void tr_http_escape(struct evbuffer* out, std::string_view str, bool escape_reserved);
+    for (auto const& ch : str)
+    {
+        if (tr_strvContains(UnescapedChars, ch) || (tr_strvContains(ReservedChars, ch) && !escape_reserved))
+        {
+            out = ch;
+        }
+        else
+        {
+            fmt::format_to(out, "%{:02X}", unsigned(ch & 0xFF));
+        }
+    }
+}
+
+[[deprecated]] void tr_http_escape(std::string& appendme, std::string_view str, bool escape_reserved);
+
+[[deprecated]] void tr_http_escape(struct evbuffer* out, std::string_view str, bool escape_reserved);
 
 void tr_http_escape_sha1(char* out, uint8_t const* sha1_digest);
 

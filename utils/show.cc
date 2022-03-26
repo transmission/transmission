@@ -7,6 +7,7 @@
 #include <array>
 #include <cstdio>
 #include <ctime>
+#include <iterator>
 #include <string>
 #include <string_view>
 
@@ -355,7 +356,9 @@ int tr_main(int argc, char* argv[])
 
     if (opts.show_magnet)
     {
-        printf("%s", metainfo.magnet().c_str());
+        auto magnet_link = tr_urlbuf{};
+        metainfo.magnet(std::back_inserter(magnet_link));
+        printf("%s", magnet_link.c_str());
     }
     else
     {

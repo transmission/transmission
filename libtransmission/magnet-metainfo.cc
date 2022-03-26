@@ -150,34 +150,6 @@ std::optional<tr_sha1_digest_t> parseHash(std::string_view sv)
 ****
 ***/
 
-std::string tr_magnet_metainfo::magnet() const
-{
-    auto s = std::string{};
-
-    s += "magnet:?xt=urn:btih:"sv;
-    s += infoHashString();
-
-    if (!std::empty(name_))
-    {
-        s += "&dn="sv;
-        tr_http_escape(s, name_, true);
-    }
-
-    for (auto const& tracker : this->announceList())
-    {
-        s += "&tr="sv;
-        tr_http_escape(s, tracker.announce.full, true);
-    }
-
-    for (auto const& webseed : webseed_urls_)
-    {
-        s += "&ws="sv;
-        tr_http_escape(s, webseed, true);
-    }
-
-    return s;
-}
-
 bool tr_magnet_metainfo::parseMagnet(std::string_view magnet_link, tr_error** error)
 {
     magnet_link = tr_strvStrip(magnet_link);
