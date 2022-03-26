@@ -786,22 +786,24 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
     if (is_new_torrent)
     {
         tr_error* error = nullptr;
-        if (tor->hasMetadata())
+
+        if (tor->hasMetadata()) // torrent file
         {
-            if (!tr_ctorSaveContents(ctor, filename, &error))
-            {
-                tor->setLocalError(
-                    tr_strvJoin("Unable to save torrent file: ", error->message, " ("sv, std::to_string(error->code), ")"sv));
-            }
+            tr_ctorSaveContents(ctor, filename, &error);
         }
-        else
+        else // magnet link
         {
-            // magnet link
-            if (!tr_ctorSaveMagnetContents(tor, filename, &error))
-            {
-                tor->setLocalError(
-                    tr_strvJoin("Unable to save magnet file: ", error->message, " ("sv, std::to_string(error->code), ")"sv));
-            }
+            tr_saveFile(filename, tor->magnet(), &error);
+        }
+
+        if (error != nullptr)
+        {
+            tor->setLocalError(fmt::format(
+                _("Couldn't save '{path}': {error} ({error_code})"),
+                fmt::arg("path", filename),
+                fmt::arg("error", error->message),
+                fmt::arg("error_code", error->code)));
+            tr_error_clear(&error);
         }
 
         tr_error_clear(&error);
@@ -2097,7 +2099,7 @@ bool tr_torrent::setTrackerList(std::string_view text)
     if (!has_metadata)
     {
         tr_error* save_error = nullptr;
-        if (!tr_ctorSaveMagnetContents(this, this->magnetFile(), &save_error))
+        if (!tr_saveFile(this->magnetFile(), this->magnet(), &save_error))
         {
             this->setLocalError(fmt::format(
                 _("Couldn't save '{path}': {error} ({error_code})"),

@@ -54,8 +54,6 @@ void tr_ctorInitTorrentWanted(tr_ctor const* ctor, tr_torrent* tor);
 
 bool tr_ctorSaveContents(tr_ctor const* ctor, std::string_view filename, tr_error** error);
 
-bool tr_ctorSaveMagnetContents(tr_torrent* tor, std::string const& filename, tr_error** error);
-
 std::string_view tr_ctorGetContents(tr_ctor const* ctor);
 
 tr_session* tr_ctorGetSession(tr_ctor const* ctor);
