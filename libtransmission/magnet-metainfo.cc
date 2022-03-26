@@ -5,7 +5,7 @@
 
 #include <array>
 #include <cstring>
-#include <cctype> // isxdigit()
+#include <iterator> // back_inserter
 #include <string>
 #include <string_view>
 
@@ -149,6 +149,31 @@ std::optional<tr_sha1_digest_t> parseHash(std::string_view sv)
 /***
 ****
 ***/
+
+tr_urlbuf tr_magnet_metainfo::magnet() const
+{
+    auto s = tr_urlbuf{ "magnet:?xt=urn:btih:"sv, infoHashString() };
+
+    if (!std::empty(name_))
+    {
+        s += "&dn="sv;
+        tr_http_escape(std::back_inserter(s), name_, true);
+    }
+
+    for (auto const& tracker : this->announceList())
+    {
+        s += "&tr="sv;
+        tr_http_escape(std::back_inserter(s), tracker.announce.full, true);
+    }
+
+    for (auto const& webseed : webseed_urls_)
+    {
+        s += "&ws="sv;
+        tr_http_escape(std::back_inserter(s), webseed, true);
+    }
+
+    return s;
+}
 
 bool tr_magnet_metainfo::parseMagnet(std::string_view magnet_link, tr_error** error)
 {

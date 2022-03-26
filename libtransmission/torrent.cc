@@ -10,7 +10,6 @@
 #include <cmath>
 #include <csignal> /* signal() */
 #include <ctime>
-#include <iterator>
 #include <map>
 #include <set>
 #include <sstream>

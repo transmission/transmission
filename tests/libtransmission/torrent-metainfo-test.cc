@@ -6,7 +6,6 @@
 #include <array>
 #include <cerrno>
 #include <cstring>
-#include <iterator>
 #include <string_view>
 
 #include "transmission.h"
