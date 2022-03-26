@@ -113,7 +113,7 @@ char const* tr_ctorGetSourceFile(tr_ctor const* ctor)
     return ctor->torrent_filename.c_str();
 }
 
-bool tr_ctorSaveContents(tr_ctor const* ctor, std::string const& filename, tr_error** error)
+bool tr_ctorSaveContents(tr_ctor const* ctor, std::string_view filename, tr_error** error)
 {
     TR_ASSERT(ctor != nullptr);
     TR_ASSERT(!std::empty(filename));
