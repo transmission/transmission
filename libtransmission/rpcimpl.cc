@@ -794,7 +794,11 @@ static void initField(tr_torrent const* const tor, tr_stat const* const st, tr_v
         }
 
     case TR_KEY_torrentFile:
-        tr_variantInitStrView(initme, tor->torrentFile());
+        {
+            auto filename = tr_pathbuf{};
+            tor->torrentFile(std::back_inserter(filename));
+            tr_variantInitStr(initme, filename);
+        }
         break;
 
     case TR_KEY_totalSize:
@@ -1083,7 +1087,10 @@ static char const* addTrackerUrls(tr_torrent* tor, tr_variant* urls)
         return "error setting announce list";
     }
 
-    tor->announceList().save(tor->torrentFile());
+    auto filename = tr_pathbuf{};
+    tor->torrentFile(std::back_inserter(filename));
+    tor->announceList().save(filename.sv());
+
     return nullptr;
 }
 
@@ -1108,7 +1115,10 @@ static char const* replaceTrackers(tr_torrent* tor, tr_variant* urls)
         return "error setting announce list";
     }
 
-    tor->announceList().save(tor->torrentFile());
+    auto filename = tr_pathbuf{};
+    tor->torrentFile(std::back_inserter(filename));
+    tor->announceList().save(filename.sv());
+
     return nullptr;
 }
 
@@ -1133,7 +1143,10 @@ static char const* removeTrackers(tr_torrent* tor, tr_variant* ids)
         return "error setting announce list";
     }
 
-    tor->announceList().save(tor->torrentFile());
+    auto filename = tr_pathbuf{};
+    tor->torrentFile(std::back_inserter(filename));
+    tor->announceList().save(filename.sv());
+
     return nullptr;
 }
 

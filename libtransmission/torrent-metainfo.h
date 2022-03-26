@@ -10,6 +10,8 @@
 #include <string_view>
 #include <vector>
 
+#include <fmt/core.h>
+
 #include "transmission.h"
 
 #include "block-info.h"
@@ -134,19 +136,22 @@ public:
         return pieces_offset_;
     }
 
-    [[nodiscard]] std::string torrentFile(std::string_view torrent_dir) const
+    template<typename OutputIt>
+    void torrentFile(OutputIt out, std::string_view torrent_dir) const
     {
-        return makeFilename(torrent_dir, name(), infoHashString(), BasenameFormat::Hash, ".torrent");
+        return makeFilename(out, torrent_dir, name(), infoHashString(), BasenameFormat::Hash, ".torrent");
     }
 
-    [[nodiscard]] std::string magnetFile(std::string_view torrent_dir) const
+    template<typename OutputIt>
+    void magnetFile(OutputIt out, std::string_view torrent_dir) const
     {
-        return makeFilename(torrent_dir, name(), infoHashString(), BasenameFormat::Hash, ".magnet");
+        return makeFilename(out, torrent_dir, name(), infoHashString(), BasenameFormat::Hash, ".magnet");
     }
 
-    [[nodiscard]] std::string resumeFile(std::string_view resume_dir) const
+    template<typename OutputIt>
+    void resumeFile(OutputIt out, std::string_view resume_dir) const
     {
-        return makeFilename(resume_dir, name(), infoHashString(), BasenameFormat::Hash, ".resume");
+        return makeFilename(out, resume_dir, name(), infoHashString(), BasenameFormat::Hash, ".resume");
     }
 
     static bool migrateFile(
@@ -175,16 +180,31 @@ private:
         NameAndPartialHash
     };
 
-    static std::string makeFilename(
+    template<typename OutputIt>
+    static void makeFilename(
+        OutputIt out,
         std::string_view dirname,
         std::string_view name,
         std::string_view info_hash_string,
         BasenameFormat format,
-        std::string_view suffix);
-
-    [[nodiscard]] std::string makeFilename(std::string_view dirname, BasenameFormat format, std::string_view suffix) const
+        std::string_view suffix)
     {
-        return makeFilename(dirname, name(), infoHashString(), format, suffix);
+        // `${dirname}/${name}.${info_hash}${suffix}`
+        // `${dirname}/${info_hash}${suffix}`
+        if (format == BasenameFormat::Hash)
+        {
+            fmt::format_to(out, "{}/{}{}", dirname, info_hash_string, suffix);
+        }
+        else
+        {
+            fmt::format_to(out, "{}/{}.{}{}", dirname, name, info_hash_string.substr(0, 16), suffix);
+        }
+    }
+
+    template<typename OutputIt>
+    void makeFilename(OutputIt out, std::string_view dirname, BasenameFormat format, std::string_view suffix) const
+    {
+        makeFilename(out, dirname, name(), infoHashString(), format, suffix);
     }
 
     struct file_t

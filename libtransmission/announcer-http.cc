@@ -67,8 +67,8 @@ static void makeAnnounceUrl(tr_session const* session, tr_announce_request const
         "&key={key}"
         "&compact=1"
         "&supportcrypto=1",
-        fmt::arg("url", req->announce_url.sv()),
-        fmt::arg("sep", req->announce_url.sv().find('?') == std::string_view::npos ? '?' : '&'),
+        fmt::arg("url", req->announce_url),
+        fmt::arg("sep", tr_strvContains(req->announce_url.sv(), '?') ? '&' : '?'),
         fmt::arg("info_hash", std::data(escaped_info_hash)),
         fmt::arg("peer_id", std::data(req->peer_id)),
         fmt::arg("port", req->port),
@@ -338,7 +338,7 @@ void tr_tracker_http_announce(
 
     auto url = tr_urlbuf{};
     makeAnnounceUrl(session, request, std::back_inserter(url));
-    tr_logAddTrace(fmt::format("Sending announce to libcurl: '{}'", url.sv()), request->log_name);
+    tr_logAddTrace(fmt::format("Sending announce to libcurl: '{}'", url), request->log_name);
 
     auto options = tr_web::FetchOptions{ url.sv(), onAnnounceDone, d };
     options.timeout_secs = 90L;

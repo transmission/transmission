@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <cstring>
 #include <ctime>
+#include <iterator>
 #include <string_view>
 #include <vector>
 
@@ -671,7 +672,8 @@ static auto loadFromFile(tr_torrent* tor, tr_resume::fields_t fieldsToLoad, bool
         *did_migrate_filename = migrated;
     }
 
-    auto const filename = tor->resumeFile();
+    auto filename = tr_pathbuf{};
+    tor->resumeFile(std::back_inserter(filename));
     auto buf = std::vector<char>{};
     tr_error* error = nullptr;
     auto top = tr_variant{};
@@ -958,7 +960,9 @@ void save(tr_torrent* tor)
     saveLabels(&top, tor);
     saveGroup(&top, tor);
 
-    if (auto const err = tr_variantToFile(&top, TR_VARIANT_FMT_BENC, tor->resumeFile()); err != 0)
+    auto resume_file = tr_pathbuf{};
+    tor->resumeFile(std::back_inserter(resume_file));
+    if (auto const err = tr_variantToFile(&top, TR_VARIANT_FMT_BENC, resume_file); err != 0)
     {
         tor->setLocalError(tr_strvJoin("Unable to save resume file: ", tr_strerror(err)));
     }

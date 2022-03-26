@@ -500,28 +500,18 @@ tr_sha1_digest_t const& tr_torrent_metainfo::pieceHash(tr_piece_index_t piece) c
     return this->pieces_[piece];
 }
 
-std::string tr_torrent_metainfo::makeFilename(
-    std::string_view dirname,
-    std::string_view name,
-    std::string_view info_hash_string,
-    BasenameFormat format,
-    std::string_view suffix)
-{
-    // `${dirname}/${name}.${info_hash}${suffix}`
-    // `${dirname}/${info_hash}${suffix}`
-    return format == BasenameFormat::Hash ? tr_strvJoin(dirname, "/"sv, info_hash_string, suffix) :
-                                            tr_strvJoin(dirname, "/"sv, name, "."sv, info_hash_string.substr(0, 16), suffix);
-}
-
 bool tr_torrent_metainfo::migrateFile(
     std::string_view dirname,
     std::string_view name,
     std::string_view info_hash_string,
     std::string_view suffix)
 {
-    auto const old_filename = makeFilename(dirname, name, info_hash_string, BasenameFormat::NameAndPartialHash, suffix);
+    auto old_filename = tr_pathbuf{};
+    makeFilename(std::back_inserter(old_filename), dirname, name, info_hash_string, BasenameFormat::NameAndPartialHash, suffix);
     auto const old_filename_exists = tr_sys_path_exists(old_filename.c_str());
-    auto const new_filename = makeFilename(dirname, name, info_hash_string, BasenameFormat::Hash, suffix);
+
+    auto new_filename = tr_pathbuf{};
+    makeFilename(std::back_inserter(new_filename), dirname, name, info_hash_string, BasenameFormat::Hash, suffix);
     auto const new_filename_exists = tr_sys_path_exists(new_filename.c_str());
 
     if (old_filename_exists && new_filename_exists)
@@ -555,10 +545,12 @@ void tr_torrent_metainfo::removeFile(
     std::string_view info_hash_string,
     std::string_view suffix)
 {
-    auto filename = makeFilename(dirname, name, info_hash_string, BasenameFormat::NameAndPartialHash, suffix);
+    auto filename = tr_pathbuf{};
+    makeFilename(std::back_inserter(filename), dirname, name, info_hash_string, BasenameFormat::NameAndPartialHash, suffix);
     tr_sys_path_remove(filename.c_str());
 
-    filename = makeFilename(dirname, name, info_hash_string, BasenameFormat::Hash, suffix);
+    filename.clear();
+    makeFilename(std::back_inserter(filename), dirname, name, info_hash_string, BasenameFormat::Hash, suffix);
     tr_sys_path_remove(filename.c_str());
 }
 

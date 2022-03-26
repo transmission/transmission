@@ -465,19 +465,22 @@ public:
         return metainfo_.dateCreated();
     }
 
-    [[nodiscard]] auto torrentFile() const
+    template<typename OutputIt>
+    void torrentFile(OutputIt out) const
     {
-        return metainfo_.torrentFile(this->session->torrent_dir);
+        metainfo_.torrentFile(out, this->session->torrent_dir);
     }
 
-    [[nodiscard]] auto magnetFile() const
+    template<typename OutputIt>
+    void magnetFile(OutputIt out) const
     {
-        return metainfo_.magnetFile(this->session->torrent_dir);
+        metainfo_.magnetFile(out, this->session->torrent_dir);
     }
 
-    [[nodiscard]] auto resumeFile() const
+    template<typename OutputIt>
+    void resumeFile(OutputIt out) const
     {
-        return metainfo_.resumeFile(this->session->resume_dir);
+        metainfo_.resumeFile(out, this->session->resume_dir);
     }
 
     template<typename OutputIt>
