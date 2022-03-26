@@ -234,7 +234,8 @@ enum
     TAG_PIECES,
     TAG_PORTTEST,
     TAG_TORRENT_ADD,
-    TAG_TRACKERS
+    TAG_TRACKERS,
+    TAG_GROUPS
 };
 
 /***
@@ -243,7 +244,7 @@ enum
 ****
 ***/
 
-static auto constexpr Options = std::array<tr_option, 91>{
+static auto constexpr Options = std::array<tr_option, 92>{
     { { 'a', "add", "Add torrent files by filename or URL", "a", false, nullptr },
       { 970, "alt-speed", "Use the alternate Limits", "as", false, nullptr },
       { 971, "no-alt-speed", "Don't use the alternate Limits", "AS", false, nullptr },
@@ -260,6 +261,7 @@ static auto constexpr Options = std::array<tr_option, 91>{
       { 'b', "debug", "Print debugging information", "b", false, nullptr },
       { 730, "bandwidth-group", "Set the current torrents' bandwidth group", "bwg", true, "<group>" },
       { 731, "no-bandwidth-group", "Reset the current torrents' bandwidth group", "nwg", false, nullptr },
+      { 732, "list-groups", "Show bandwidth groups with their parameters", "lg", false, nullptr },
       { 'd',
         "downlimit",
         "Set the max download speed in " SPEED_K_STR " for the current torrent(s) or globally",
@@ -404,7 +406,8 @@ enum
     MODE_SESSION_STATS = (1 << 11),
     MODE_SESSION_CLOSE = (1 << 12),
     MODE_BLOCKLIST_UPDATE = (1 << 13),
-    MODE_PORT_TEST = (1 << 14)
+    MODE_PORT_TEST = (1 << 14),
+    MODE_GROUP_GET = (1 << 15)
 };
 
 static int getOptMode(int val)
@@ -538,6 +541,9 @@ static int getOptMode(int val)
 
     case 960: /* move */
         return MODE_TORRENT_SET_LOCATION;
+
+    case 732: /* List groups */
+        return MODE_GROUP_GET;
 
     default:
         fprintf(stderr, "unrecognized argument %d\n", val);
@@ -2007,6 +2013,39 @@ static void printSessionStats(tr_variant* top)
     }
 }
 
+static void printGroups(tr_variant* top)
+{
+    tr_variant* args;
+    tr_variant* groups;
+
+    if (tr_variantDictFindDict(top, TR_KEY_arguments, &args) && tr_variantDictFindList(args, TR_KEY_group, &groups))
+    {
+        for (int i = 0, n = tr_variantListSize(groups); i < n; ++i)
+        {
+            tr_variant* group = tr_variantListChild(groups, i);
+            std::string_view name;
+            bool upEnabled;
+            bool downEnabled;
+            int64_t upLimit;
+            int64_t downLimit;
+            bool honors;
+            if (tr_variantDictFindStrView(group, TR_KEY_name, &name) &&
+                tr_variantDictFindInt(group, TR_KEY_downloadLimit, &downLimit) &&
+                tr_variantDictFindBool(group, TR_KEY_downloadLimited, &downEnabled) &&
+                tr_variantDictFindInt(group, TR_KEY_uploadLimit, &upLimit) &&
+                tr_variantDictFindBool(group, TR_KEY_uploadLimited, &upEnabled) &&
+                tr_variantDictFindBool(group, TR_KEY_honorsSessionLimits, &honors))
+            {
+                printf("%" TR_PRIsv ": ", TR_PRIsv_ARG(name));
+                printf(
+                    "Upload speed limit: %s, Download speed limit: %s, %s session bandwidth limits\n",
+                    upEnabled ? tr_formatter_speed_KBps(upLimit).c_str() : "unlimited",
+                    downEnabled ? tr_formatter_speed_KBps(downLimit).c_str() : "unlimited",
+                    honors ? "honors" : "does not honor");
+            }
+        }
+    }
+}
 static char id[4096];
 
 static int processResponse(char const* rpcurl, std::string_view response)
@@ -2080,6 +2119,10 @@ static int processResponse(char const* rpcurl, std::string_view response)
 
                 case TAG_TRACKERS:
                     printTrackers(&top);
+                    break;
+
+                case TAG_GROUPS:
+                    printGroups(&top);
                     break;
 
                 case TAG_TORRENT_ADD:
@@ -3017,6 +3060,16 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
                     tr_variantDictAddStr(args, TR_KEY_location, optarg);
                     tr_variantDictAddBool(args, TR_KEY_move, true);
                     addIdArg(args, id, nullptr);
+                    status |= flush(rpcurl, &top);
+                    break;
+                }
+
+            case 732:
+                {
+                    auto* top = tr_new0(tr_variant, 1);
+                    tr_variantInitDict(top, 2);
+                    tr_variantDictAddStrView(top, TR_KEY_method, "group-get"sv);
+                    tr_variantDictAddInt(top, TR_KEY_tag, TAG_GROUPS);
                     status |= flush(rpcurl, &top);
                     break;
                 }

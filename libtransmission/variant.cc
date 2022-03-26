@@ -1206,7 +1206,7 @@ std::string tr_variantToStr(tr_variant const* v, tr_variant_fmt fmt)
     return evbuffer_free_to_str(tr_variantToBuf(v, fmt));
 }
 
-int tr_variantToFile(tr_variant const* v, tr_variant_fmt fmt, std::string const& filename)
+int tr_variantToFile(tr_variant const* v, tr_variant_fmt fmt, std::string_view filename)
 {
     auto error_code = int{ 0 };
     auto const contents = tr_variantToStr(v, fmt);
@@ -1262,7 +1262,7 @@ bool tr_variantFromBuf(tr_variant* setme, int opts, std::string_view buf, char c
     return success;
 }
 
-bool tr_variantFromFile(tr_variant* setme, tr_variant_parse_opts opts, std::string const& filename, tr_error** error)
+bool tr_variantFromFile(tr_variant* setme, tr_variant_parse_opts opts, std::string_view filename, tr_error** error)
 {
     // can't do inplace when this function is allocating & freeing the memory...
     TR_ASSERT((opts & TR_VARIANT_PARSE_INPLACE) == 0);
