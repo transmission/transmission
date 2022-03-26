@@ -779,15 +779,7 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
             [](auto mtime) { return mtime > 0; });
     }
 
-    auto filename = tr_pathbuf{};
-    if (tor->hasMetadata())
-    {
-        tor->torrentFile(std::back_inserter(filename));
-    }
-    else
-    {
-        tor->magnetFile(std::back_inserter(filename));
-    }
+    auto const filename = tor->hasMetadata() ? tor->torrentFile() : tor->magnetFile();
 
     // if we don't have a local .torrent or .magnet file already,
     // assume the torrent is new
@@ -803,8 +795,7 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
         }
         else // magnet link
         {
-            auto magnet_link = tr_urlbuf{};
-            tor->magnet(std::back_inserter(magnet_link));
+            auto const magnet_link = tor->magnet();
             tr_saveFile(filename, magnet_link, &error);
         }
 
@@ -1262,9 +1253,7 @@ tr_torrent_view tr_torrentView(tr_torrent const* tor)
 
 char* tr_torrentFilename(tr_torrent const* tor)
 {
-    auto filename = tr_pathbuf{};
-    tor->torrentFile(std::back_inserter(filename));
-    return tr_strvDup(filename);
+    return tr_strvDup(tor->torrentFile());
 }
 
 /***
@@ -2101,14 +2090,9 @@ bool tr_torrent::setTrackerList(std::string_view text)
     }
 
     auto const has_metadata = this->hasMetadata();
-    if (has_metadata)
+    if (has_metadata && !announce_list.save(torrentFile()))
     {
-        auto torrent_filename = tr_pathbuf{};
-        this->torrentFile(std::back_inserter(torrent_filename));
-        if (!announce_list.save(torrent_filename))
-        {
-            return false;
-        }
+        return false;
     }
 
     this->metainfo_.announceList() = announce_list;
@@ -2117,18 +2101,14 @@ bool tr_torrent::setTrackerList(std::string_view text)
     // magnet links
     if (!has_metadata)
     {
+        auto const magnet_file = magnetFile();
+        auto const magnet_link = this->magnet();
         tr_error* save_error = nullptr;
-        auto magnet_link = tr_urlbuf{};
-        this->magnet(std::back_inserter(magnet_link));
-
-        auto magnet_filename = tr_pathbuf{};
-        this->magnetFile(std::back_inserter(magnet_filename));
-
-        if (!tr_saveFile(magnet_filename, magnet_link, &save_error))
+        if (!tr_saveFile(magnet_file, magnet_link, &save_error))
         {
             this->setLocalError(fmt::format(
                 _("Couldn't save '{path}': {error} ({error_code})"),
-                fmt::arg("path", magnet_filename),
+                fmt::arg("path", magnet_file),
                 fmt::arg("error", save_error->message),
                 fmt::arg("error_code", save_error->code)));
             tr_error_clear(&save_error);

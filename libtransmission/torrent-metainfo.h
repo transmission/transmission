@@ -6,6 +6,7 @@
 #pragma once
 
 #include <ctime>
+#include <iterator>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -136,22 +137,25 @@ public:
         return pieces_offset_;
     }
 
-    template<typename OutputIt>
-    void torrentFile(OutputIt out, std::string_view torrent_dir) const
+    [[nodiscard]] auto torrentFile(std::string_view torrent_dir) const
     {
-        return makeFilename(out, torrent_dir, name(), infoHashString(), BasenameFormat::Hash, ".torrent");
+        auto filename = tr_pathbuf{};
+        makeFilename(std::back_inserter(filename), torrent_dir, name(), infoHashString(), BasenameFormat::Hash, ".torrent");
+        return filename;
     }
 
-    template<typename OutputIt>
-    void magnetFile(OutputIt out, std::string_view torrent_dir) const
+    [[nodiscard]] auto magnetFile(std::string_view torrent_dir) const
     {
-        return makeFilename(out, torrent_dir, name(), infoHashString(), BasenameFormat::Hash, ".magnet");
+        auto filename = tr_pathbuf{};
+        makeFilename(std::back_inserter(filename), torrent_dir, name(), infoHashString(), BasenameFormat::Hash, ".magnet");
+        return filename;
     }
 
-    template<typename OutputIt>
-    void resumeFile(OutputIt out, std::string_view resume_dir) const
+    [[nodiscard]] auto resumeFile(std::string_view resume_dir) const
     {
-        return makeFilename(out, resume_dir, name(), infoHashString(), BasenameFormat::Hash, ".resume");
+        auto filename = tr_pathbuf{};
+        makeFilename(std::back_inserter(filename), resume_dir, name(), infoHashString(), BasenameFormat::Hash, ".resume");
+        return filename;
     }
 
     static bool migrateFile(

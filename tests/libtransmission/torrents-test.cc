@@ -41,9 +41,7 @@ TEST_F(TorrentsTest, simpleTests)
 
     EXPECT_EQ(tor, torrents.get(id));
     EXPECT_EQ(tor, torrents.get(tor->infoHash()));
-    auto magnet_link = tr_urlbuf{};
-    tor->magnet(std::back_inserter(magnet_link));
-    EXPECT_EQ(tor, torrents.get(magnet_link.sv()));
+    EXPECT_EQ(tor, torrents.get(tor->magnet()));
 
     tm = tr_torrent_metainfo{};
     EXPECT_TRUE(tm.parseTorrentFile(TorrentFile));

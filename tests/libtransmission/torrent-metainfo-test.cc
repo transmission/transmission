@@ -43,10 +43,7 @@ TEST_F(TorrentMetainfoTest, magnetLink)
     EXPECT_TRUE(metainfo.parseMagnet(MagnetLink));
     EXPECT_EQ(0, metainfo.fileCount()); // because it's a magnet link
     EXPECT_EQ(2, std::size(metainfo.announceList()));
-
-    auto magnet_link = tr_urlbuf{};
-    metainfo.magnet(std::back_inserter(magnet_link));
-    EXPECT_EQ(MagnetLink, magnet_link.sv());
+    EXPECT_EQ(MagnetLink, metainfo.magnet().sv());
 }
 
 #define BEFORE_PATH \

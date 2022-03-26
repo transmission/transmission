@@ -356,9 +356,7 @@ int tr_main(int argc, char* argv[])
 
     if (opts.show_magnet)
     {
-        auto magnet_link = tr_urlbuf{};
-        metainfo.magnet(std::back_inserter(magnet_link));
-        printf("%s", magnet_link.c_str());
+        printf("%s", metainfo.magnet().c_str());
     }
     else
     {

@@ -124,9 +124,7 @@ void* tr_torrentGetMetadataPiece(tr_torrent const* tor, int piece, size_t* len)
         return nullptr;
     }
 
-    auto filename = tr_pathbuf{};
-    tor->torrentFile(std::back_inserter(filename));
-    auto const fd = tr_sys_file_open(filename, TR_SYS_FILE_READ, 0);
+    auto const fd = tr_sys_file_open(tor->torrentFile(), TR_SYS_FILE_READ, 0);
     if (fd == TR_BAD_SYS_FILE)
     {
         return nullptr;
@@ -276,17 +274,13 @@ static bool useNewMetainfo(tr_torrent* tor, tr_incomplete_metadata const* m, tr_
     }
 
     // save it
-    auto filename = tr_pathbuf{};
-    tor->torrentFile(std::back_inserter(filename));
-    if (!tr_saveFile(filename, benc, error))
+    if (!tr_saveFile(tor->torrentFile(), benc, error))
     {
         return false;
     }
 
     // remove .magnet file
-    auto magnet_filename = tr_pathbuf{};
-    tor->magnetFile(std::back_inserter(magnet_filename));
-    tr_sys_path_remove(magnet_filename.c_str());
+    tr_sys_path_remove(tor->magnetFile());
 
     // tor should keep this metainfo
     tor->setMetainfo(metainfo);
@@ -418,7 +412,5 @@ double tr_torrentGetMetadataPercent(tr_torrent const* tor)
 
 char* tr_torrentGetMagnetLink(tr_torrent const* tor)
 {
-    auto urlbuf = tr_urlbuf{};
-    tor->metainfo_.magnet(std::back_inserter(urlbuf));
-    return tr_strvDup(urlbuf.sv());
+    return tr_strvDup(tor->metainfo_.magnet());
 }

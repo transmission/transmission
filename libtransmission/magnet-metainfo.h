@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <iterator>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -92,6 +93,13 @@ public:
             out = append(out, "&ws="sv);
             tr_http_escape(out, webseed, true);
         }
+    }
+
+    [[nodiscard]] tr_urlbuf magnet() const
+    {
+        auto url = tr_urlbuf{};
+        this->magnet(std::back_inserter(url));
+        return url;
     }
 
 protected:
