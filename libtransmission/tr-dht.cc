@@ -45,6 +45,7 @@
 #include "torrent.h"
 #include "tr-assert.h"
 #include "tr-dht.h"
+#include "tr-strbuf.h"
 #include "trevent.h"
 #include "utils.h"
 #include "variant.h"
@@ -299,9 +300,9 @@ int tr_dhtInit(tr_session* ss)
         dht_debug = stderr;
     }
 
-    auto const dat_file = tr_strvPath(ss->config_dir, "dht.dat"sv);
     auto benc = tr_variant{};
-    auto const ok = tr_variantFromFile(&benc, TR_VARIANT_PARSE_BENC, dat_file);
+    auto const dat_file = tr_pathbuf{ ss->config_dir, "/dht.dat"sv };
+    auto const ok = tr_variantFromFile(&benc, TR_VARIANT_PARSE_BENC, dat_file.sv());
 
     bool have_id = false;
     uint8_t* nodes = nullptr;
@@ -451,8 +452,8 @@ void tr_dhtUninit(tr_session* ss)
             tr_variantDictAddRaw(&benc, TR_KEY_nodes6, compact6, out6 - compact6);
         }
 
-        auto const dat_file = tr_strvPath(ss->config_dir, "dht.dat");
-        tr_variantToFile(&benc, TR_VARIANT_FMT_BENC, dat_file);
+        auto const dat_file = tr_pathbuf{ ss->config_dir, "/dht.dat" };
+        tr_variantToFile(&benc, TR_VARIANT_FMT_BENC, dat_file.sv());
         tr_variantFree(&benc);
     }
 

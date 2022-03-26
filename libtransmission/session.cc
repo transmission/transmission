@@ -487,9 +487,9 @@ bool tr_sessionLoadSettings(tr_variant* dict, char const* config_dir, char const
 
     /* file settings override the defaults */
     auto fileSettings = tr_variant{};
-    auto const filename = tr_strvPath(config_dir, "settings.json"sv);
+    auto const filename = tr_pathbuf{ config_dir, "/settings.json"sv };
     auto success = bool{};
-    if (tr_error* error = nullptr; tr_variantFromFile(&fileSettings, TR_VARIANT_PARSE_JSON, filename, &error))
+    if (tr_error* error = nullptr; tr_variantFromFile(&fileSettings, TR_VARIANT_PARSE_JSON, filename.sv(), &error))
     {
         tr_variantMergeDicts(dict, &fileSettings);
         tr_variantFree(&fileSettings);
@@ -510,7 +510,7 @@ void tr_sessionSaveSettings(tr_session* session, char const* config_dir, tr_vari
     TR_ASSERT(tr_variantIsDict(clientSettings));
 
     tr_variant settings;
-    auto const filename = tr_strvPath(config_dir, "settings.json"sv);
+    auto const filename = tr_pathbuf{ config_dir, "/settings.json"sv };
 
     tr_variantInitDict(&settings, 0);
 
@@ -518,7 +518,7 @@ void tr_sessionSaveSettings(tr_session* session, char const* config_dir, tr_vari
     {
         tr_variant fileSettings;
 
-        if (tr_variantFromFile(&fileSettings, TR_VARIANT_PARSE_JSON, filename, nullptr))
+        if (tr_variantFromFile(&fileSettings, TR_VARIANT_PARSE_JSON, filename.sv(), nullptr))
         {
             tr_variantMergeDicts(&settings, &fileSettings);
             tr_variantFree(&fileSettings);
@@ -538,7 +538,7 @@ void tr_sessionSaveSettings(tr_session* session, char const* config_dir, tr_vari
     }
 
     /* save the result */
-    tr_variantToFile(&settings, TR_VARIANT_FMT_JSON, filename);
+    tr_variantToFile(&settings, TR_VARIANT_FMT_JSON, filename.sv());
 
     /* cleanup */
     tr_variantFree(&settings);
@@ -2874,10 +2874,9 @@ int tr_sessionCountQueueFreeSlots(tr_session* session, tr_direction dir)
 
 static void bandwidthGroupRead(tr_session* session, std::string_view config_dir)
 {
+    auto const filename = tr_pathbuf{ config_dir, "/"sv, BandwidthGroupsFilename };
     auto groups_dict = tr_variant{};
-
-    if (auto const path = tr_strvPath(config_dir, BandwidthGroupsFilename);
-        !tr_variantFromFile(&groups_dict, TR_VARIANT_PARSE_JSON, path, nullptr) || !tr_variantIsList(&groups_dict))
+    if (!tr_variantFromFile(&groups_dict, TR_VARIANT_PARSE_JSON, filename.sv(), nullptr) || !tr_variantIsList(&groups_dict))
     {
         return;
     }
@@ -2935,8 +2934,8 @@ static int bandwidthGroupWrite(tr_session const* session, std::string_view confi
         tr_variantDictAddBool(dict, TR_KEY_honorsSessionLimits, group->areParentLimitsHonored(TR_UP));
     }
 
-    auto const filename = tr_strvPath(config_dir, BandwidthGroupsFilename);
-    auto const ret = tr_variantToFile(&groups_dict, TR_VARIANT_FMT_JSON, filename);
+    auto const filename = tr_pathbuf{ config_dir, "/"sv, BandwidthGroupsFilename };
+    auto const ret = tr_variantToFile(&groups_dict, TR_VARIANT_FMT_JSON, filename.sv());
     tr_variantFree(&groups_dict);
     return ret;
 }

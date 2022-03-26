@@ -427,13 +427,13 @@ Prefs::~Prefs()
     tr_variant file_settings;
     QFile const file(QDir(config_dir_).absoluteFilePath(QStringLiteral("settings.json")));
 
-    if (!tr_variantFromFile(&file_settings, TR_VARIANT_PARSE_JSON, file.fileName().toUtf8().constData(), nullptr))
+    if (!tr_variantFromFile(&file_settings, TR_VARIANT_PARSE_JSON, file.fileName().toStdString(), nullptr))
     {
         tr_variantInitDict(&file_settings, PREFS_COUNT);
     }
 
     tr_variantMergeDicts(&file_settings, &current_settings);
-    tr_variantToFile(&file_settings, TR_VARIANT_FMT_JSON, file.fileName().toUtf8().constData());
+    tr_variantToFile(&file_settings, TR_VARIANT_FMT_JSON, file.fileName().toStdString());
     tr_variantFree(&file_settings);
 
     // cleanup
