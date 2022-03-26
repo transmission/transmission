@@ -131,9 +131,9 @@ struct tr_block_info
     }
 
     // Location of the torrent's nth byte
-    [[nodiscard]] Location constexpr byteLoc(uint64_t byte) const
+    [[nodiscard]] Location constexpr byteLoc(uint64_t byte_idx) const
     {
-        TR_ASSERT(byte <= total_size);
+        TR_ASSERT(byte_idx <= total_size);
 
         if (!isInitialized())
         {
@@ -142,17 +142,17 @@ struct tr_block_info
 
         auto loc = Location{};
 
-        loc.byte = byte;
+        loc.byte = byte_idx;
 
-        if (byte == totalSize()) // handle 0-byte files at the end of a torrent
+        if (byte_idx == totalSize()) // handle 0-byte files at the end of a torrent
         {
             loc.block = blockCount() - 1;
             loc.piece = pieceCount() - 1;
         }
         else
         {
-            loc.block = byte / BlockSize;
-            loc.piece = byte / pieceSize();
+            loc.block = byte_idx / BlockSize;
+            loc.piece = byte_idx / pieceSize();
         }
 
         loc.block_offset = static_cast<uint32_t>(loc.byte - (uint64_t{ loc.block } * BlockSize));
