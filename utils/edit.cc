@@ -26,7 +26,7 @@ static char constexpr Usage[] = "Usage: transmission-edit [options] torrent-file
 
 struct app_options
 {
-    std::vector<char const*> files;
+    std::vector<std::string_view> files;
     char const* add = nullptr;
     char const* deleteme = nullptr;
     std::array<char const*, 2> replace;
@@ -338,7 +338,7 @@ int tr_main(int argc, char* argv[])
         bool changed = false;
         tr_error* error = nullptr;
 
-        printf("%s\n", filename);
+        printf("%" TR_PRIsv "\n", TR_PRIsv_ARG(filename));
 
         if (!tr_variantFromFile(&top, TR_VARIANT_PARSE_BENC, filename, &error))
         {
