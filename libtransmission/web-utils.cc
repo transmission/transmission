@@ -14,12 +14,8 @@
 #include <string>
 #include <string_view>
 
-#include <event2/buffer.h>
-
 #define PSL_STATIC
 #include <libpsl.h>
-
-#include <fmt/core.h>
 
 #include "transmission.h"
 
@@ -171,64 +167,6 @@ char const* tr_webGetResponseStr(long code)
 
     default:
         return "Unknown Error";
-    }
-}
-
-#if 0
-void tr_http_escape(tr_urlbuf& append_me, std::string_view str, bool escape_reserved)
-{
-    auto constexpr ReservedChars = std::string_view{ "!*'();:@&=+$,/?%#[]" };
-    auto constexpr UnescapedChars = std::string_view{ "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_.~" };
-
-    for (auto const& ch : str)
-    {
-        if (tr_strvContains(UnescapedChars, ch) || (tr_strvContains(ReservedChars, ch) && !escape_reserved))
-        {
-            append_me.append(ch);
-        }
-        else
-        {
-            fmt::format_to(std::back_inserter(append_me), "%{:02X}", unsigned(ch & 0xFF));
-        }
-    }
-}
-#endif
-
-void tr_http_escape(struct evbuffer* out, std::string_view str, bool escape_reserved)
-{
-    auto constexpr ReservedChars = std::string_view{ "!*'();:@&=+$,/?%#[]" };
-    auto constexpr UnescapedChars = std::string_view{ "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_.~" };
-
-    for (auto const& ch : str)
-    {
-        if (tr_strvContains(UnescapedChars, ch) || (tr_strvContains(ReservedChars, ch) && !escape_reserved))
-        {
-            evbuffer_add_printf(out, "%c", ch);
-        }
-        else
-        {
-            evbuffer_add_printf(out, "%%%02X", (unsigned)(ch & 0xFF));
-        }
-    }
-}
-
-void tr_http_escape(std::string& appendme, std::string_view str, bool escape_reserved)
-{
-    auto constexpr ReservedChars = std::string_view{ "!*'();:@&=+$,/?%#[]" };
-    auto constexpr UnescapedChars = std::string_view{ "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_.~" };
-
-    for (auto const& ch : str)
-    {
-        if (tr_strvContains(UnescapedChars, ch) || (!escape_reserved && tr_strvContains(ReservedChars, ch)))
-        {
-            appendme += ch;
-        }
-        else
-        {
-            char buf[16];
-            tr_snprintf(buf, sizeof(buf), "%%%02X", (unsigned)(ch & 0xFF));
-            appendme += buf;
-        }
     }
 }
 
