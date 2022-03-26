@@ -493,8 +493,7 @@ bool tr_torrent_metainfo::parseTorrentFile(std::string_view filename, std::vecto
         contents = &local_contents;
     }
 
-    auto const sz_filename = std::string{ filename };
-    return tr_loadFile(*contents, sz_filename, error) && parseBenc({ std::data(*contents), std::size(*contents) }, error);
+    return tr_loadFile(filename, *contents, error) && parseBenc({ std::data(*contents), std::size(*contents) }, error);
 }
 
 tr_sha1_digest_t const& tr_torrent_metainfo::pieceHash(tr_piece_index_t piece) const
