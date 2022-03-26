@@ -4,6 +4,7 @@
 // License text can be found in the licenses/ folder.
 
 #include <algorithm>
+#include <array>
 #include <cerrno>
 #include <cstring> /* memcpy */
 #include <ctime>
@@ -43,6 +44,7 @@
 #include "session-id.h"
 #include "session.h"
 #include "tr-assert.h"
+#include "tr-strbuf.h"
 #include "trevent.h"
 #include "utils.h"
 #include "variant.h"
@@ -137,29 +139,24 @@ static void send_simple_response(struct evhttp_request* req, int code, char cons
 ****
 ***/
 
-static char const* mimetype_guess(char const* path)
+static char const* mimetype_guess(std::string_view path)
 {
-    struct
-    {
-        char const* suffix;
-        char const* mime_type;
-    } const types[] = {
-        /* these are the ones we need for serving the web client's files... */
-        { "css", "text/css" },
-        { "gif", "image/gif" },
-        { "html", "text/html" },
-        { "ico", "image/vnd.microsoft.icon" },
-        { "js", "application/javascript" },
-        { "png", "image/png" },
-        { "svg", "image/svg+xml" },
-    };
-    char const* dot = strrchr(path, '.');
+    // these are the ones we need for serving the web client's files...
+    static auto constexpr Types = std::array<std::pair<std::string_view, char const*>, 7>{ {
+        { ".css"sv, "text/css" },
+        { ".gif"sv, "image/gif" },
+        { ".html"sv, "text/html" },
+        { ".ico"sv, "image/vnd.microsoft.icon" },
+        { ".js"sv, "application/javascript" },
+        { ".png"sv, "image/png" },
+        { ".svg"sv, "image/svg+xml" },
+    } };
 
-    for (unsigned int i = 0; dot != nullptr && i < TR_N_ELEMENTS(types); ++i)
+    for (auto const& [suffix, mime_type] : Types)
     {
-        if (strcmp(dot + 1, types[i].suffix) == 0)
+        if (tr_strvEndsWith(path, suffix))
         {
-            return types[i].mime_type;
+            return mime_type;
         }
     }
 
@@ -222,7 +219,7 @@ static void evbuffer_ref_cleanup_tr_free(void const* /*data*/, size_t /*datalen*
     tr_free(extra);
 }
 
-static void serve_file(struct evhttp_request* req, tr_rpc_server* server, char const* filename)
+static void serve_file(struct evhttp_request* req, tr_rpc_server* server, std::string_view filename)
 {
     if (req->type != EVHTTP_REQ_GET)
     {
@@ -294,11 +291,8 @@ static void handle_web_client(struct evhttp_request* req, tr_rpc_server* server)
         }
         else
         {
-            auto const filename = tr_strvJoin(
-                webClientDir,
-                TR_PATH_DELIMITER_STR,
-                tr_str_is_empty(subpath) ? "index.html" : subpath);
-            serve_file(req, server, filename.c_str());
+            auto const filename = tr_pathbuf{ webClientDir, "/"sv, tr_str_is_empty(subpath) ? "index.html" : subpath };
+            serve_file(req, server, filename.sv());
         }
 
         tr_free(subpath);

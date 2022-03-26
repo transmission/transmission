@@ -16,6 +16,7 @@
 #include "crypto-utils.h" // tr_rand_int_weak()
 #include "platform.h"
 #include "ptrarray.h"
+#include "tr-strbuf.h"
 #include "utils.h"
 
 #include "test-fixtures.h"
@@ -461,16 +462,18 @@ TEST_F(UtilsTest, mimeTypes)
 
 TEST_F(UtilsTest, saveFile)
 {
+    auto filename = tr_pathbuf{};
+
     // save a file to GoogleTest's temp dir
-    auto filename = tr_strvJoin(::testing::TempDir(), "filename.txt");
+    filename.assign(::testing::TempDir(), "filename.txt"sv);
     auto contents = "these are the contents"sv;
     tr_error* error = nullptr;
-    EXPECT_TRUE(tr_saveFile(filename, contents, &error));
+    EXPECT_TRUE(tr_saveFile(filename.sv(), contents, &error));
     EXPECT_EQ(nullptr, error) << *error;
 
     // now read the file back in and confirm the contents are the same
     auto buf = std::vector<char>{};
-    EXPECT_TRUE(tr_loadFile(buf, filename, &error));
+    EXPECT_TRUE(tr_loadFile(filename.sv(), buf, &error));
     EXPECT_EQ(nullptr, error) << *error;
     auto sv = std::string_view{ std::data(buf), std::size(buf) };
     EXPECT_EQ(contents, sv);
@@ -481,7 +484,7 @@ TEST_F(UtilsTest, saveFile)
 
     // try saving a file to a path that doesn't exist
     filename = "/this/path/does/not/exist/foo.txt";
-    EXPECT_FALSE(tr_saveFile(filename, contents, &error));
+    EXPECT_FALSE(tr_saveFile(filename.sv(), contents, &error));
     ASSERT_NE(nullptr, error);
     EXPECT_NE(0, error->code);
     tr_error_clear(&error);

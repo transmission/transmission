@@ -675,7 +675,7 @@ static auto loadFromFile(tr_torrent* tor, tr_resume::fields_t fieldsToLoad, bool
     auto buf = std::vector<char>{};
     tr_error* error = nullptr;
     auto top = tr_variant{};
-    if (!tr_loadFile(buf, filename, &error) ||
+    if (!tr_loadFile(filename, buf, &error) ||
         !tr_variantFromBuf(
             &top,
             TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE,
