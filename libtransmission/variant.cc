@@ -1212,7 +1212,7 @@ int tr_variantToFile(tr_variant const* v, tr_variant_fmt fmt, std::string const&
     auto const contents = tr_variantToStr(v, fmt);
 
     tr_error* error = nullptr;
-    tr_saveFile(filename, { std::data(contents), std::size(contents) }, &error);
+    tr_saveFile(filename, contents, &error);
     if (error != nullptr)
     {
         tr_logAddError(fmt::format(
@@ -1268,7 +1268,7 @@ bool tr_variantFromFile(tr_variant* setme, tr_variant_parse_opts opts, std::stri
     TR_ASSERT((opts & TR_VARIANT_PARSE_INPLACE) == 0);
 
     auto buf = std::vector<char>{};
-    if (!tr_loadFile(buf, filename, error))
+    if (!tr_loadFile(filename, buf, error))
     {
         return false;
     }

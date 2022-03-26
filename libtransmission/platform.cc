@@ -250,7 +250,7 @@ static std::string getUserDirsFilename()
 static std::string getXdgEntryFromUserDirs(std::string_view key)
 {
     auto content = std::vector<char>{};
-    if (!tr_loadFile(content, getUserDirsFilename()) && std::empty(content))
+    if (!tr_loadFile(getUserDirsFilename(), content) && std::empty(content))
     {
         return {};
     }

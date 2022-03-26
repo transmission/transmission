@@ -34,6 +34,7 @@
 #include "torrent.h"
 #include "tr-assert.h"
 #include "tr-macros.h"
+#include "tr-strbuf.h"
 #include "utils.h"
 #include "variant.h"
 #include "version.h"
@@ -1439,11 +1440,17 @@ static void onBlocklistFetched(tr_web::FetchResponse const& web_response)
 
     // tr_blocklistSetContent needs a source file,
     // so save content into a tmpfile
-    auto const filename = tr_strvJoin(tr_sessionGetConfigDir(session), "blocklist.tmp");
+    auto const filename = tr_pathbuf{ session->config_dir, "/blocklist.tmp"sv };
     tr_error* error = nullptr;
-    if (!tr_saveFile(filename, std::string_view{ std::data(content), std::size(content) }, &error))
+    if (!tr_saveFile(filename.sv(), content, &error))
     {
-        tr_snprintf(result, sizeof(result), _("Couldn't save file \"%1$s\": %2$s"), filename.c_str(), error->message);
+        fmt::format_to_n(
+            result,
+            sizeof(result),
+            _("Couldn't save '{path}': {error} ({error_code})"),
+            fmt::arg("path", filename.sv()),
+            fmt::arg("error", error->message),
+            fmt::arg("error_code", error->code));
         tr_error_clear(&error);
         tr_idle_function_done(data, result);
         return;

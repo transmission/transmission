@@ -210,7 +210,7 @@ bool tr_sys_path_is_same(char const* path1, char const* path2, struct tr_error**
  *         when no longer needed), `nullptr` otherwise (with `error` set
  *         accordingly).
  */
-char* tr_sys_path_resolve(char const* path, struct tr_error** error);
+char* tr_sys_path_resolve(char const* path, struct tr_error** error = nullptr);
 
 /**
  * @brief Portability wrapper for `basename()`.
