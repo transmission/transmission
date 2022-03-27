@@ -1781,6 +1781,16 @@
 			name = QuickLookPlugin;
 			path = macosx/QuickLookPlugin;
 			sourceTree = "<group>";
+			buildSettings = {
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"third-party/fmt/include",
+				);
+				OTHER_CFLAGS = (
+					"$(inherited)",
+					"-DFMT_HEADER_ONLY",
+				);
+			};
 		};
 		A2F35BC415C5A0A100EBF632 /* Supporting Files */ = {
 			isa = PBXGroup;
