@@ -12,7 +12,6 @@
 #include <string>
 #include <string_view>
 
-#include <event2/buffer.h>
 #include <event2/http.h> /* for HTTP_OK */
 
 #include <fmt/core.h>
@@ -47,13 +46,14 @@ static char const* get_event_string(tr_announce_request const* req)
     return req->partial_seed && (req->event != TR_ANNOUNCE_EVENT_STOPPED) ? "paused" : tr_announce_event_get_string(req->event);
 }
 
-template<typename OutputIt>
-static void makeAnnounceUrl(tr_session const* session, tr_announce_request const* req, OutputIt out)
+static tr_urlbuf announce_url_new(tr_session const* session, tr_announce_request const* req)
 {
+    auto url = tr_urlbuf{};
+    auto out = std::back_inserter(url);
+
     auto escaped_info_hash = std::array<char, SHA_DIGEST_LENGTH * 3 + 1>{};
     tr_http_escape_sha1(std::data(escaped_info_hash), req->info_hash);
 
-    auto url = tr_urlbuf{};
     fmt::format_to(
         out,
         "{url}"
@@ -70,7 +70,7 @@ static void makeAnnounceUrl(tr_session const* session, tr_announce_request const
         fmt::arg("url", req->announce_url),
         fmt::arg("sep", tr_strvContains(req->announce_url.sv(), '?') ? '&' : '?'),
         fmt::arg("info_hash", std::data(escaped_info_hash)),
-        fmt::arg("peer_id", std::data(req->peer_id)),
+        fmt::arg("peer_id", std::string_view{ std::data(req->peer_id), std::size(req->peer_id) }),
         fmt::arg("port", req->port),
         fmt::arg("uploaded", req->up),
         fmt::arg("downloaded", req->down),
@@ -114,6 +114,8 @@ static void makeAnnounceUrl(tr_session const* session, tr_announce_request const
         fmt::format_to(out, "&ipv6=");
         tr_http_escape(out, std::data(ipv6_readable), true);
     }
+
+    return url;
 }
 
 static void verboseLog(std::string_view description, tr_direction direction, std::string_view message)
@@ -336,8 +338,7 @@ void tr_tracker_http_announce(
     d->response.info_hash = request->info_hash;
     tr_strlcpy(d->log_name, request->log_name, sizeof(d->log_name));
 
-    auto url = tr_urlbuf{};
-    makeAnnounceUrl(session, request, std::back_inserter(url));
+    auto const url = announce_url_new(session, request);
     tr_logAddTrace(fmt::format("Sending announce to libcurl: '{}'", url), request->log_name);
 
     auto options = tr_web::FetchOptions{ url.sv(), onAnnounceDone, d };
@@ -495,23 +496,22 @@ static void onScrapeDone(tr_web::FetchResponse const& web_response)
     delete data;
 }
 
-static std::string scrape_url_new(tr_scrape_request const* req)
+static auto scrape_url_new(tr_scrape_request const* req)
 {
     auto const sv = req->scrape_url.sv();
+    char delimiter = tr_strvContains(sv, '?') ? '&' : '?';
 
-    auto* const buf = evbuffer_new();
-    evbuffer_add(buf, std::data(sv), std::size(sv));
+    auto scrape_url = tr_pathbuf{ sv };
 
-    char delimiter = sv.find('?') == std::string_view::npos ? '?' : '&';
     for (int i = 0; i < req->info_hash_count; ++i)
     {
         char str[SHA_DIGEST_LENGTH * 3 + 1];
         tr_http_escape_sha1(str, req->info_hash[i]);
-        evbuffer_add_printf(buf, "%cinfo_hash=%s", delimiter, str);
+        scrape_url.append(delimiter, "info_hash=", str);
         delimiter = '&';
     }
 
-    return evbuffer_free_to_str(buf);
+    return scrape_url;
 }
 
 void tr_tracker_http_scrape(
