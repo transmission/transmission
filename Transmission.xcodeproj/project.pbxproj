@@ -3409,6 +3409,7 @@
 					"-DHAVE_ZLIB",
 					"-DHAVE_ICONV",
 				);
+				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
 				PRODUCT_NAME = transmission;
 				SYSTEM_HEADER_SEARCH_PATHS = "$(inherited) third-party/fmt/include third-party/libevent/include";
 				USER_HEADER_SEARCH_PATHS = "$(inherited) third-party/libnatpmp third-party/miniupnpc";
@@ -3430,10 +3431,8 @@
 					.,
 				);
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks";
-				OTHER_CPLUSPLUSFLAGS = (
-					"$(OTHER_CFLAGS)",
-					"-DFMT_HEADER_ONLY",
-				);
+				OTHER_CFLAGS = "$(inherited)";
+				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
 				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_NAME = Transmission;
 				SYSTEM_HEADER_SEARCH_PATHS = "$(inherited) third-party/fmt/include";
@@ -3451,6 +3450,8 @@
 					"$(inherited)",
 					.,
 				);
+				OTHER_CFLAGS = "$(inherited)";
+				OTHER_CPLUSPLUSFLAGS = "$(inherited)";
 				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_NAME = transmissioncli;
 				SYSTEM_HEADER_SEARCH_PATHS = "$(inherited) third-party/fmt/include third-party/libevent/include";
@@ -3471,6 +3472,7 @@
 					"$(inherited)",
 					"-DHAVE_DAEMON",
 				);
+				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
 				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_NAME = "transmission-daemon";
 				SYSTEM_HEADER_SEARCH_PATHS = "$(inherited) third-party/fmt/include third-party/libevent/include";
@@ -3487,6 +3489,8 @@
 					"$(inherited)",
 					.,
 				);
+				OTHER_CFLAGS = "$(inherited)";
+				OTHER_CPLUSPLUSFLAGS = "$(inherited)";
 				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_NAME = "transmission-remote";
 				SYSTEM_HEADER_SEARCH_PATHS = "$(inherited) third-party/fmt/include third-party/libevent/include";
@@ -3549,6 +3553,11 @@
 				INFOPLIST_PREPROCESS = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				ONLY_ACTIVE_ARCH = YES;
+				OTHER_CFLAGS = (
+					"$(inherited)",
+					"-DFMT_HEADER_ONLY",
+				);
+				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
 				SDKROOT = macosx;
 				STRIP_INSTALLED_PRODUCT = NO;
 			};
@@ -3608,6 +3617,7 @@
 					"-DHAVE_ZLIB",
 					"-DHAVE_ICONV",
 				);
+				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
 				PRODUCT_NAME = transmission;
 				SYSTEM_HEADER_SEARCH_PATHS = "$(inherited) third-party/fmt/include third-party/libevent/include";
 				USER_HEADER_SEARCH_PATHS = "$(inherited) third-party/libnatpmp third-party/miniupnpc";
@@ -3624,6 +3634,8 @@
 					"$(inherited)",
 					.,
 				);
+				OTHER_CFLAGS = "$(inherited)";
+				OTHER_CPLUSPLUSFLAGS = "$(inherited)";
 				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_NAME = transmissioncli;
 				SYSTEM_HEADER_SEARCH_PATHS = "$(inherited) third-party/fmt/include third-party/libevent/include";
@@ -3645,10 +3657,8 @@
 					.,
 				);
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks";
-				OTHER_CPLUSPLUSFLAGS = (
-					"$(OTHER_CFLAGS)",
-					"-DFMT_HEADER_ONLY",
-				);
+				OTHER_CFLAGS = "$(inherited)";
+				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
 				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_NAME = Transmission;
 				SYSTEM_HEADER_SEARCH_PATHS = "$(inherited) third-party/fmt/include";
@@ -3710,7 +3720,12 @@
 				INFOPLIST_PREFIX_HEADER = libtransmission/version.h;
 				INFOPLIST_PREPROCESS = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
-				OTHER_CFLAGS = "-DNDEBUG";
+				OTHER_CFLAGS = (
+					"$(inherited)",
+					"-DFMT_HEADER_ONLY",
+					"-DNDEBUG",
+				);
+				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
 				SDKROOT = macosx;
 			};
 			name = Release;
@@ -3719,6 +3734,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_ARC = NO;
+				OTHER_CFLAGS = "$(inherited)";
+				OTHER_CPLUSPLUSFLAGS = "$(inherited)";
 				PRODUCT_NAME = dht;
 			};
 			name = Debug;
@@ -3727,6 +3744,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_ARC = NO;
+				OTHER_CFLAGS = "$(inherited)";
+				OTHER_CPLUSPLUSFLAGS = "$(inherited)";
 				PRODUCT_NAME = dht;
 			};
 			name = "Release - Debug";
@@ -3735,6 +3754,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_ARC = NO;
+				OTHER_CFLAGS = "$(inherited)";
+				OTHER_CPLUSPLUSFLAGS = "$(inherited)";
 				PRODUCT_NAME = dht;
 			};
 			name = Release;
@@ -3795,6 +3816,11 @@
 				INFOPLIST_PREPROCESS = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.10;
 				ONLY_ACTIVE_ARCH = YES;
+				OTHER_CFLAGS = (
+					"$(inherited)",
+					"-DFMT_HEADER_ONLY",
+				);
+				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
 				SDKROOT = macosx;
 				STRIP_INSTALLED_PRODUCT = NO;
 			};
@@ -3815,10 +3841,8 @@
 					.,
 				);
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks";
-				OTHER_CPLUSPLUSFLAGS = (
-					"$(OTHER_CFLAGS)",
-					"-DFMT_HEADER_ONLY",
-				);
+				OTHER_CFLAGS = "$(inherited)";
+				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
 				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_NAME = Transmission;
 				SYSTEM_HEADER_SEARCH_PATHS = "$(inherited) third-party/fmt/include";
@@ -3836,6 +3860,8 @@
 					"$(inherited)",
 					.,
 				);
+				OTHER_CFLAGS = "$(inherited)";
+				OTHER_CPLUSPLUSFLAGS = "$(inherited)";
 				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_NAME = transmissioncli;
 				SYSTEM_HEADER_SEARCH_PATHS = "$(inherited) third-party/fmt/include third-party/libevent/include";
@@ -3869,6 +3895,7 @@
 					"-DHAVE_ZLIB",
 					"-DHAVE_ICONV",
 				);
+				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
 				PRODUCT_NAME = transmission;
 				SYSTEM_HEADER_SEARCH_PATHS = "$(inherited) third-party/fmt/include third-party/libevent/include";
 				USER_HEADER_SEARCH_PATHS = "$(inherited) third-party/libnatpmp third-party/miniupnpc";
@@ -3889,6 +3916,7 @@
 					"$(inherited)",
 					"-DHAVE_DAEMON",
 				);
+				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
 				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_NAME = "transmission-daemon";
 				SYSTEM_HEADER_SEARCH_PATHS = "$(inherited) third-party/fmt/include third-party/libevent/include";
@@ -3905,6 +3933,8 @@
 					"$(inherited)",
 					.,
 				);
+				OTHER_CFLAGS = "$(inherited)";
+				OTHER_CPLUSPLUSFLAGS = "$(inherited)";
 				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_NAME = "transmission-remote";
 				SYSTEM_HEADER_SEARCH_PATHS = "$(inherited) third-party/fmt/include third-party/libevent/include";
@@ -3964,6 +3994,8 @@
 				);
 				INFOPLIST_FILE = "macosx/QuickLookPlugin/QuickLookPlugin-Info.plist";
 				INSTALL_PATH = /Library/QuickLook;
+				OTHER_CFLAGS = "$(inherited)";
+				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
 				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SYSTEM_HEADER_SEARCH_PATHS = "$(inherited) third-party/fmt/include";
@@ -3984,6 +4016,8 @@
 				);
 				INFOPLIST_FILE = "macosx/QuickLookPlugin/QuickLookPlugin-Info.plist";
 				INSTALL_PATH = /Library/QuickLook;
+				OTHER_CFLAGS = "$(inherited)";
+				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
 				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SYSTEM_HEADER_SEARCH_PATHS = "$(inherited) third-party/fmt/include";
@@ -4004,6 +4038,8 @@
 				);
 				INFOPLIST_FILE = "macosx/QuickLookPlugin/QuickLookPlugin-Info.plist";
 				INSTALL_PATH = /Library/QuickLook;
+				OTHER_CFLAGS = "$(inherited)";
+				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
 				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SYSTEM_HEADER_SEARCH_PATHS = "$(inherited) third-party/fmt/include";
@@ -4059,6 +4095,7 @@
 					"$(inherited)",
 					"-DHAVE_DAEMON",
 				);
+				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
 				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_NAME = "transmission-daemon";
 				SYSTEM_HEADER_SEARCH_PATHS = "$(inherited) third-party/fmt/include third-party/libevent/include";
@@ -4075,6 +4112,8 @@
 					"$(inherited)",
 					.,
 				);
+				OTHER_CFLAGS = "$(inherited)";
+				OTHER_CPLUSPLUSFLAGS = "$(inherited)";
 				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_NAME = "transmission-remote";
 				SYSTEM_HEADER_SEARCH_PATHS = "$(inherited) third-party/fmt/include third-party/libevent/include";
