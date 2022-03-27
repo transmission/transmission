@@ -31,7 +31,7 @@ namespace test
 
 std::string getTestProgramPath(std::string const& filename)
 {
-    auto const exe_path = makeString(tr_sys_path_resolve(testing::internal::GetArgvs().front().data(), nullptr));
+    auto const exe_path = makeString(tr_sys_path_resolve(testing::internal::GetArgvs().front().data()));
     auto const exe_dir = tr_sys_path_dirname(exe_path);
     return exe_dir + TR_PATH_DELIMITER + filename;
 }
@@ -69,7 +69,7 @@ protected:
     {
         auto const test = [path]()
         {
-            return tr_sys_path_exists(path.data(), nullptr);
+            return tr_sys_path_exists(path.data());
         };
         EXPECT_TRUE(waitFor(test, 30000));
     }
@@ -122,38 +122,38 @@ TEST_P(SubprocessTest, SpawnAsyncArgs)
 
     waitForFileToExist(result_path);
 
-    auto fd = tr_sys_file_open(result_path.data(), TR_SYS_FILE_READ, 0, nullptr); // NOLINT
+    auto fd = tr_sys_file_open(result_path.data(), TR_SYS_FILE_READ, 0); // NOLINT
     EXPECT_NE(TR_BAD_SYS_FILE, fd);
 
     auto buffer = std::array<char, 1024>{};
 
     buffer[0] = '\0';
-    EXPECT_TRUE(tr_sys_file_read_line(fd, buffer.data(), buffer.size(), nullptr));
+    EXPECT_TRUE(tr_sys_file_read_line(fd, buffer.data(), buffer.size()));
     buffer.back() = '\0';
     EXPECT_EQ(test_arg1, buffer.data());
 
     buffer[0] = '\0';
-    EXPECT_TRUE(tr_sys_file_read_line(fd, buffer.data(), buffer.size(), nullptr));
+    EXPECT_TRUE(tr_sys_file_read_line(fd, buffer.data(), buffer.size()));
     buffer.back() = '\0';
     EXPECT_EQ(test_arg2, buffer.data());
 
     buffer[0] = '\0';
-    EXPECT_TRUE(tr_sys_file_read_line(fd, buffer.data(), buffer.size(), nullptr));
+    EXPECT_TRUE(tr_sys_file_read_line(fd, buffer.data(), buffer.size()));
     buffer.back() = '\0';
     EXPECT_EQ(test_arg3, buffer.data());
 
     if (allow_batch_metachars)
     {
         buffer[0] = '\0';
-        EXPECT_TRUE(tr_sys_file_read_line(fd, buffer.data(), buffer.size(), nullptr));
+        EXPECT_TRUE(tr_sys_file_read_line(fd, buffer.data(), buffer.size()));
         buffer.back() = '\0';
         EXPECT_EQ(test_arg4, buffer.data());
     }
 
-    EXPECT_FALSE(tr_sys_file_read_line(fd, buffer.data(), buffer.size(), nullptr));
+    EXPECT_FALSE(tr_sys_file_read_line(fd, buffer.data(), buffer.size()));
     buffer.back() = '\0';
 
-    tr_sys_file_close(fd, nullptr);
+    tr_sys_file_close(fd);
 }
 
 TEST_P(SubprocessTest, SpawnAsyncEnv)
@@ -203,38 +203,38 @@ TEST_P(SubprocessTest, SpawnAsyncEnv)
 
     waitForFileToExist(result_path);
 
-    auto fd = tr_sys_file_open(result_path.data(), TR_SYS_FILE_READ, 0, nullptr); // NOLINT
+    auto fd = tr_sys_file_open(result_path.data(), TR_SYS_FILE_READ, 0); // NOLINT
     EXPECT_NE(TR_BAD_SYS_FILE, fd);
 
     auto buffer = std::array<char, 1024>{};
 
     buffer[0] = '\0';
-    EXPECT_TRUE(tr_sys_file_read_line(fd, buffer.data(), buffer.size(), nullptr));
+    EXPECT_TRUE(tr_sys_file_read_line(fd, buffer.data(), buffer.size()));
     EXPECT_EQ(test_env_value1, buffer.data());
 
     buffer[0] = '\0';
-    EXPECT_TRUE(tr_sys_file_read_line(fd, buffer.data(), buffer.size(), nullptr));
+    EXPECT_TRUE(tr_sys_file_read_line(fd, buffer.data(), buffer.size()));
     EXPECT_EQ(test_env_value2, buffer.data());
 
     buffer[0] = '\0';
-    EXPECT_TRUE(tr_sys_file_read_line(fd, buffer.data(), buffer.size(), nullptr));
+    EXPECT_TRUE(tr_sys_file_read_line(fd, buffer.data(), buffer.size()));
     EXPECT_EQ(test_env_value3, buffer.data());
 
     buffer[0] = '\0';
-    EXPECT_TRUE(tr_sys_file_read_line(fd, buffer.data(), buffer.size(), nullptr));
+    EXPECT_TRUE(tr_sys_file_read_line(fd, buffer.data(), buffer.size()));
     EXPECT_EQ(test_env_value4, buffer.data());
 
     buffer[0] = '\0';
-    EXPECT_TRUE(tr_sys_file_read_line(fd, buffer.data(), buffer.size(), nullptr));
+    EXPECT_TRUE(tr_sys_file_read_line(fd, buffer.data(), buffer.size()));
     EXPECT_EQ(test_env_value5, buffer.data());
 
     buffer[0] = '\0';
-    EXPECT_TRUE(tr_sys_file_read_line(fd, buffer.data(), buffer.size(), nullptr));
+    EXPECT_TRUE(tr_sys_file_read_line(fd, buffer.data(), buffer.size()));
     EXPECT_STREQ("<null>", buffer.data());
 
-    EXPECT_FALSE(tr_sys_file_read_line(fd, buffer.data(), buffer.size(), nullptr));
+    EXPECT_FALSE(tr_sys_file_read_line(fd, buffer.data(), buffer.size()));
 
-    tr_sys_file_close(fd, nullptr);
+    tr_sys_file_close(fd);
 }
 
 TEST_P(SubprocessTest, SpawnAsyncCwdExplicit)
@@ -251,18 +251,18 @@ TEST_P(SubprocessTest, SpawnAsyncCwdExplicit)
 
     waitForFileToExist(result_path);
 
-    auto fd = tr_sys_file_open(result_path.data(), TR_SYS_FILE_READ, 0, nullptr); // NOLINT
+    auto fd = tr_sys_file_open(result_path.data(), TR_SYS_FILE_READ, 0); // NOLINT
     EXPECT_NE(TR_BAD_SYS_FILE, fd);
 
     auto buffer = std::array<char, 1024>{};
-    EXPECT_TRUE(tr_sys_file_read_line(fd, buffer.data(), buffer.size(), nullptr));
+    EXPECT_TRUE(tr_sys_file_read_line(fd, buffer.data(), buffer.size()));
     EXPECT_EQ(
         makeString(tr_sys_path_native_separators(tr_strdup(test_dir.c_str()))),
         tr_sys_path_native_separators(&buffer.front()));
 
-    EXPECT_FALSE(tr_sys_file_read_line(fd, buffer.data(), buffer.size(), nullptr));
+    EXPECT_FALSE(tr_sys_file_read_line(fd, buffer.data(), buffer.size()));
 
-    tr_sys_file_close(fd, nullptr);
+    tr_sys_file_close(fd);
 }
 
 TEST_P(SubprocessTest, SpawnAsyncCwdInherit)
@@ -278,15 +278,15 @@ TEST_P(SubprocessTest, SpawnAsyncCwdInherit)
     EXPECT_EQ(nullptr, error) << *error;
 
     waitForFileToExist(result_path);
-    auto fd = tr_sys_file_open(result_path.data(), TR_SYS_FILE_READ, 0, nullptr); // NOLINT
+    auto fd = tr_sys_file_open(result_path.data(), TR_SYS_FILE_READ, 0); // NOLINT
     EXPECT_NE(TR_BAD_SYS_FILE, fd);
 
     auto buffer = std::array<char, 1024>{};
-    EXPECT_TRUE(tr_sys_file_read_line(fd, buffer.data(), buffer.size(), nullptr));
+    EXPECT_TRUE(tr_sys_file_read_line(fd, buffer.data(), buffer.size()));
     EXPECT_EQ(expected_cwd, tr_sys_path_native_separators(&buffer.front()));
-    EXPECT_FALSE(tr_sys_file_read_line(fd, buffer.data(), buffer.size(), nullptr));
+    EXPECT_FALSE(tr_sys_file_read_line(fd, buffer.data(), buffer.size()));
 
-    tr_sys_file_close(fd, nullptr);
+    tr_sys_file_close(fd);
 }
 
 TEST_P(SubprocessTest, SpawnAsyncCwdMissing)

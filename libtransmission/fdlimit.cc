@@ -136,7 +136,7 @@ static void cached_file_close(struct tr_cached_file* o)
 
     if (o != nullptr)
     {
-        tr_sys_file_close(o->fd, nullptr);
+        tr_sys_file_close(o->fd);
         o->fd = TR_BAD_SYS_FILE;
     }
 }
@@ -187,7 +187,7 @@ static int cached_file_open(
         }
     }
 
-    already_existed = tr_sys_path_get_info(filename, 0, &info, nullptr) && info.type == TR_SYS_PATH_IS_FILE;
+    already_existed = tr_sys_path_get_info(filename, 0, &info) && info.type == TR_SYS_PATH_IS_FILE;
 
     /* we can't resize the file w/o write permissions */
     resize_needed = already_existed && (file_size < info.size);
@@ -264,7 +264,7 @@ FAIL:
 
     if (fd != TR_BAD_SYS_FILE)
     {
-        tr_sys_file_close(fd, nullptr);
+        tr_sys_file_close(fd);
     }
 
     return err;
@@ -434,7 +434,7 @@ void tr_fdFileClose(tr_session* s, tr_torrent const* tor, tr_file_index_t i)
          * up-to-date when this function returns to the caller... */
         if (o->is_writable)
         {
-            tr_sys_file_flush(o->fd, nullptr);
+            tr_sys_file_flush(o->fd);
         }
 
         cached_file_close(o);
