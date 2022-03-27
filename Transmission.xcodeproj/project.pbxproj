@@ -1781,16 +1781,6 @@
 			name = QuickLookPlugin;
 			path = macosx/QuickLookPlugin;
 			sourceTree = "<group>";
-			buildSettings = {
-				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
-					"third-party/fmt/include",
-				);
-				OTHER_CFLAGS = (
-					"$(inherited)",
-					"-DFMT_HEADER_ONLY",
-				);
-			};
 		};
 		A2F35BC415C5A0A100EBF632 /* Supporting Files */ = {
 			isa = PBXGroup;
@@ -2393,6 +2383,16 @@
 			dependencies = (
 				A2F35BD615C5A1A100EBF632 /* PBXTargetDependency */,
 			);
+			buildSettings = {
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"third-party/fmt/include",
+				);
+				OTHER_CFLAGS = (
+					"$(inherited)",
+					"-DFMT_HEADER_ONLY",
+				);
+			};
 			name = QuickLookPlugin;
 			productName = QuickLookPlugin;
 			productReference = A2F35BB915C5A0A100EBF632 /* QuickLookPlugin.qlgenerator */;
