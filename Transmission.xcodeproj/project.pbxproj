@@ -3393,7 +3393,6 @@
 					"third-party/arc4/src",
 					"third-party/dht",
 					"third-party/libb64/include",
-					"third-party/libevent/include",
 					"third-party/libutp",
 					"third-party/utfcpp/source",
 					"third-party/libdeflate",
@@ -3411,6 +3410,7 @@
 					"-DHAVE_ICONV",
 				);
 				PRODUCT_NAME = transmission;
+				SYSTEM_HEADER_SEARCH_PATHS = "$(inherited) third-party/fmt/include third-party/libevent/include";
 				USER_HEADER_SEARCH_PATHS = "$(inherited) third-party/libnatpmp third-party/miniupnpc";
 			};
 			name = Debug;
@@ -3427,7 +3427,6 @@
 				GCC_PREFIX_HEADER = macosx/Transmission_Prefix.pch;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"third-party/fmt/include",
 					.,
 				);
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks";
@@ -3437,6 +3436,7 @@
 				);
 				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_NAME = Transmission;
+				SYSTEM_HEADER_SEARCH_PATHS = "$(inherited) third-party/fmt/include";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -3449,11 +3449,11 @@
 				CLANG_ENABLE_OBJC_ARC = NO;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"third-party/libevent/include",
 					.,
 				);
 				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_NAME = transmissioncli;
+				SYSTEM_HEADER_SEARCH_PATHS = "$(inherited) third-party/fmt/include third-party/libevent/include";
 			};
 			name = Debug;
 		};
@@ -3465,7 +3465,6 @@
 				CLANG_ENABLE_OBJC_ARC = NO;
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
-					"third-party/libevent/include",
 					.,
 				);
 				OTHER_CFLAGS = (
@@ -3474,6 +3473,7 @@
 				);
 				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_NAME = "transmission-daemon";
+				SYSTEM_HEADER_SEARCH_PATHS = "$(inherited) third-party/fmt/include third-party/libevent/include";
 			};
 			name = Debug;
 		};
@@ -3486,10 +3486,10 @@
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					.,
-					"third-party/libevent/include",
 				);
 				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_NAME = "transmission-remote";
+				SYSTEM_HEADER_SEARCH_PATHS = "$(inherited) third-party/fmt/include third-party/libevent/include";
 			};
 			name = Debug;
 		};
@@ -3592,7 +3592,6 @@
 					"third-party/arc4/src",
 					"third-party/dht",
 					"third-party/libb64/include",
-					"third-party/libevent/include",
 					"third-party/libutp",
 					"third-party/utfcpp/source",
 					"third-party/libdeflate",
@@ -3610,6 +3609,7 @@
 					"-DHAVE_ICONV",
 				);
 				PRODUCT_NAME = transmission;
+				SYSTEM_HEADER_SEARCH_PATHS = "$(inherited) third-party/fmt/include third-party/libevent/include";
 				USER_HEADER_SEARCH_PATHS = "$(inherited) third-party/libnatpmp third-party/miniupnpc";
 			};
 			name = Release;
@@ -3623,10 +3623,10 @@
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					.,
-					"third-party/libevent/include",
 				);
 				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_NAME = transmissioncli;
+				SYSTEM_HEADER_SEARCH_PATHS = "$(inherited) third-party/fmt/include third-party/libevent/include";
 			};
 			name = Release;
 		};
@@ -3643,7 +3643,6 @@
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					.,
-					"third-party/fmt/include",
 				);
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks";
 				OTHER_CPLUSPLUSFLAGS = (
@@ -3652,6 +3651,7 @@
 				);
 				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_NAME = Transmission;
+				SYSTEM_HEADER_SEARCH_PATHS = "$(inherited) third-party/fmt/include";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;
@@ -3813,7 +3813,6 @@
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					.,
-					"third-party/fmt/include",
 				);
 				LD_RUNPATH_SEARCH_PATHS = "@executable_path/../Frameworks";
 				OTHER_CPLUSPLUSFLAGS = (
@@ -3822,6 +3821,7 @@
 				);
 				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_NAME = Transmission;
+				SYSTEM_HEADER_SEARCH_PATHS = "$(inherited) third-party/fmt/include";
 				WRAPPER_EXTENSION = app;
 			};
 			name = "Release - Debug";
@@ -3835,10 +3835,10 @@
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					.,
-					"third-party/libevent/include",
 				);
 				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_NAME = transmissioncli;
+				SYSTEM_HEADER_SEARCH_PATHS = "$(inherited) third-party/fmt/include third-party/libevent/include";
 			};
 			name = "Release - Debug";
 		};
@@ -3853,7 +3853,6 @@
 					"third-party/arc4/src",
 					"third-party/dht",
 					"third-party/libb64/include",
-					"third-party/libevent/include",
 					"third-party/libutp",
 					"third-party/utfcpp/source",
 					"third-party/libdeflate",
@@ -3871,6 +3870,7 @@
 					"-DHAVE_ICONV",
 				);
 				PRODUCT_NAME = transmission;
+				SYSTEM_HEADER_SEARCH_PATHS = "$(inherited) third-party/fmt/include third-party/libevent/include";
 				USER_HEADER_SEARCH_PATHS = "$(inherited) third-party/libnatpmp third-party/miniupnpc";
 			};
 			name = "Release - Debug";
@@ -3884,7 +3884,6 @@
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					.,
-					"third-party/libevent/include",
 				);
 				OTHER_CFLAGS = (
 					"$(inherited)",
@@ -3892,6 +3891,7 @@
 				);
 				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_NAME = "transmission-daemon";
+				SYSTEM_HEADER_SEARCH_PATHS = "$(inherited) third-party/fmt/include third-party/libevent/include";
 			};
 			name = "Release - Debug";
 		};
@@ -3904,10 +3904,10 @@
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					.,
-					"third-party/libevent/include",
 				);
 				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_NAME = "transmission-remote";
+				SYSTEM_HEADER_SEARCH_PATHS = "$(inherited) third-party/fmt/include third-party/libevent/include";
 			};
 			name = "Release - Debug";
 		};
@@ -3966,6 +3966,7 @@
 				INSTALL_PATH = /Library/QuickLook;
 				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SYSTEM_HEADER_SEARCH_PATHS = "$(inherited) third-party/fmt/include";
 				WRAPPER_EXTENSION = qlgenerator;
 			};
 			name = Debug;
@@ -3985,6 +3986,7 @@
 				INSTALL_PATH = /Library/QuickLook;
 				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SYSTEM_HEADER_SEARCH_PATHS = "$(inherited) third-party/fmt/include";
 				WRAPPER_EXTENSION = qlgenerator;
 			};
 			name = "Release - Debug";
@@ -4004,6 +4006,7 @@
 				INSTALL_PATH = /Library/QuickLook;
 				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SYSTEM_HEADER_SEARCH_PATHS = "$(inherited) third-party/fmt/include";
 				WRAPPER_EXTENSION = qlgenerator;
 			};
 			name = Release;
@@ -4051,7 +4054,6 @@
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					.,
-					"third-party/libevent/include",
 				);
 				OTHER_CFLAGS = (
 					"$(inherited)",
@@ -4059,6 +4061,7 @@
 				);
 				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_NAME = "transmission-daemon";
+				SYSTEM_HEADER_SEARCH_PATHS = "$(inherited) third-party/fmt/include third-party/libevent/include";
 			};
 			name = Release;
 		};
@@ -4071,10 +4074,10 @@
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					.,
-					"third-party/libevent/include",
 				);
 				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_NAME = "transmission-remote";
+				SYSTEM_HEADER_SEARCH_PATHS = "$(inherited) third-party/fmt/include third-party/libevent/include";
 			};
 			name = Release;
 		};
