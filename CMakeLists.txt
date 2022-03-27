@@ -702,7 +702,6 @@ list(APPEND CPACK_SOURCE_IGNORE_FILES
     "[.]git"
     "node_modules"
 )
-set(CPACK_INSTALL_SCRIPTS "${CMAKE_CURRENT_LIST_DIR}/cmake/CPackSourceFixDirLinks.cmake")
 
 ## Code Formatting
 
