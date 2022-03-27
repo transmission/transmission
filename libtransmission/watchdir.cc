@@ -365,7 +365,7 @@ void tr_watchdir_scan(tr_watchdir_t handle, std::unordered_set<std::string>* dir
         tr_error_free(error);
     }
 
-    tr_sys_dir_close(dir, nullptr);
+    tr_sys_dir_close(dir);
 
     if (dir_entries != nullptr)
     {

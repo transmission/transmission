@@ -36,7 +36,7 @@ int main(int argc, char** argv)
     {
         for (int i = 3; i < argc; ++i)
         {
-            tr_sys_file_write_line(fd, argv[i], nullptr);
+            tr_sys_file_write_line(fd, argv[i]);
         }
     }
     else if (test_action == "--dump-env")
@@ -44,24 +44,24 @@ int main(int argc, char** argv)
         for (int i = 3; i < argc; ++i)
         {
             char* const value = tr_env_get_string(argv[i], "<null>");
-            tr_sys_file_write_line(fd, value, nullptr);
+            tr_sys_file_write_line(fd, value);
             tr_free(value);
         }
     }
     else if (test_action == "--dump-cwd")
     {
         char* const value = tr_sys_dir_get_current(nullptr);
-        tr_sys_file_write_line(fd, value != nullptr ? value : "<null>", nullptr);
+        tr_sys_file_write_line(fd, value != nullptr ? value : "<null>");
         tr_free(value);
     }
     else
     {
-        tr_sys_file_close(fd, nullptr);
-        tr_sys_path_remove(tmp_result_path.data(), nullptr);
+        tr_sys_file_close(fd);
+        tr_sys_path_remove(tmp_result_path.data());
         return 1;
     }
 
-    tr_sys_file_close(fd, nullptr);
-    tr_sys_path_rename(tmp_result_path.data(), result_path.data(), nullptr);
+    tr_sys_file_close(fd);
+    tr_sys_path_rename(tmp_result_path.data(), result_path.data());
     return 0;
 }

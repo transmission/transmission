@@ -456,7 +456,7 @@ bool tr_sys_path_copy(char const* src_path, char const* dst_path, tr_error** err
     if (!tr_sys_file_get_info(in, &info, error))
     {
         tr_error_prefix(error, "Unable to get information on source file: ");
-        tr_sys_file_close(in, nullptr);
+        tr_sys_file_close(in);
         return false;
     }
 
@@ -464,7 +464,7 @@ bool tr_sys_path_copy(char const* src_path, char const* dst_path, tr_error** err
     if (out == TR_BAD_SYS_FILE)
     {
         tr_error_prefix(error, "Unable to open destination file: ");
-        tr_sys_file_close(in, nullptr);
+        tr_sys_file_close(in);
         return false;
     }
 
@@ -530,8 +530,8 @@ bool tr_sys_path_copy(char const* src_path, char const* dst_path, tr_error** err
 #endif /* USE_COPY_FILE_RANGE || USE_SENDFILE64 */
 
     /* cleanup */
-    tr_sys_file_close(out, nullptr);
-    tr_sys_file_close(in, nullptr);
+    tr_sys_file_close(out);
+    tr_sys_file_close(in);
 
     if (file_size != 0)
     {

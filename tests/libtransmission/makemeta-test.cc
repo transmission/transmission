@@ -113,7 +113,7 @@ protected:
         // create the top temp directory
         auto top = tr_strvPath(sandboxDir(), "folder.XXXXXX");
         tr_sys_path_native_separators(std::data(top));
-        tr_sys_dir_create_temp(std::data(top), nullptr);
+        tr_sys_dir_create_temp(std::data(top));
 
         // build the payload files that go into the top temp directory
         auto files = std::vector<std::string>{};

@@ -63,7 +63,7 @@ static bool verifyTorrent(tr_torrent* tor, bool const* stopFlag)
         {
             char* const filename = tr_torrentFindFile(tor, fileIndex);
             fd = filename == nullptr ? TR_BAD_SYS_FILE :
-                                       tr_sys_file_open(filename, TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0, nullptr);
+                                       tr_sys_file_open(filename, TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0);
             tr_free(filename);
             prevFileIndex = fileIndex;
         }
@@ -78,11 +78,11 @@ static bool verifyTorrent(tr_torrent* tor, bool const* stopFlag)
         if (fd != TR_BAD_SYS_FILE)
         {
             auto numRead = uint64_t{};
-            if (tr_sys_file_read_at(fd, std::data(buffer), bytesThisPass, filePos, &numRead, nullptr) && numRead > 0)
+            if (tr_sys_file_read_at(fd, std::data(buffer), bytesThisPass, filePos, &numRead) && numRead > 0)
             {
                 bytesThisPass = numRead;
                 tr_sha1_update(sha, std::data(buffer), bytesThisPass);
-                tr_sys_file_advise(fd, filePos, bytesThisPass, TR_SYS_FILE_ADVICE_DONT_NEED, nullptr);
+                tr_sys_file_advise(fd, filePos, bytesThisPass, TR_SYS_FILE_ADVICE_DONT_NEED);
             }
         }
 
@@ -126,7 +126,7 @@ static bool verifyTorrent(tr_torrent* tor, bool const* stopFlag)
         {
             if (fd != TR_BAD_SYS_FILE)
             {
-                tr_sys_file_close(fd, nullptr);
+                tr_sys_file_close(fd);
                 fd = TR_BAD_SYS_FILE;
             }
 
@@ -138,7 +138,7 @@ static bool verifyTorrent(tr_torrent* tor, bool const* stopFlag)
     /* cleanup */
     if (fd != TR_BAD_SYS_FILE)
     {
-        tr_sys_file_close(fd, nullptr);
+        tr_sys_file_close(fd);
     }
 
     tor->verify_progress.reset();
