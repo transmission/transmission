@@ -2383,16 +2383,6 @@
 			dependencies = (
 				A2F35BD615C5A1A100EBF632 /* PBXTargetDependency */,
 			);
-			buildSettings = {
-				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
-					"third-party/fmt/include",
-				);
-				OTHER_CFLAGS = (
-					"$(inherited)",
-					"-DFMT_HEADER_ONLY",
-				);
-			};
 			name = QuickLookPlugin;
 			productName = QuickLookPlugin;
 			productReference = A2F35BB915C5A0A100EBF632 /* QuickLookPlugin.qlgenerator */;
@@ -2563,6 +2553,16 @@
 				};
 			};
 			buildConfigurationList = 4DF0C59A089918A300DD8943 /* Build configuration list for PBXProject "Transmission" */;
+			buildSettings = {
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"third-party/fmt/include",
+				);
+				OTHER_CFLAGS = (
+					"$(inherited)",
+					"-DFMT_HEADER_ONLY",
+				);
+			};
 			compatibilityVersion = "Xcode 8.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 1;
@@ -3406,14 +3406,12 @@
 					"third-party/libevent/include",
 					"third-party/libutp",
 					"third-party/utfcpp/source",
-					"third-party/fmt/include",
 					"third-party/libdeflate",
 					"third-party/libpsl/include",
 				);
 				OTHER_CFLAGS = (
 					"$(inherited)",
 					"-DWITH_UTP",
-					"-DFMT_HEADER_ONLY",
 					"-D__TRANSMISSION__",
 					"-DHAVE_FLOCK",
 					"-DHAVE_STRLCPY",
@@ -3474,11 +3472,9 @@
 					"$(inherited)",
 					.,
 					"third-party/libevent/include",
-					"third-party/fmt/include",
 				);
 				OTHER_CFLAGS = (
 					"$(inherited)",
-					"-DFMT_HEADER_ONLY",
 					"-DHAVE_DAEMON",
 				);
 				OTHER_LDFLAGS = "-lc++";
@@ -3496,11 +3492,6 @@
 					"$(inherited)",
 					.,
 					"third-party/libevent/include",
-					"third-party/fmt/include",
-				);
-				OTHER_CFLAGS = (
-					"$(inherited)",
-					"-DFMT_HEADER_ONLY",
 				);
 				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_NAME = "transmission-remote";
@@ -3609,14 +3600,12 @@
 					"third-party/libevent/include",
 					"third-party/libutp",
 					"third-party/utfcpp/source",
-					"third-party/fmt/include",
 					"third-party/libdeflate",
 					"third-party/libpsl/include",
 				);
 				OTHER_CFLAGS = (
 					"$(inherited)",
 					"-DWITH_UTP",
-					"-DFMT_HEADER_ONLY",
 					"-D__TRANSMISSION__",
 					"-DHAVE_FLOCK",
 					"-DHAVE_STRLCPY",
@@ -3862,14 +3851,12 @@
 					"third-party/libevent/include",
 					"third-party/libutp",
 					"third-party/utfcpp/source",
-					"third-party/fmt/include",
 					"third-party/libdeflate",
 					"third-party/libpsl/include",
 				);
 				OTHER_CFLAGS = (
 					"$(inherited)",
 					"-DWITH_UTP",
-					"-DFMT_HEADER_ONLY",
 					"-D__TRANSMISSION__",
 					"-DHAVE_FLOCK",
 					"-DHAVE_STRLCPY",
@@ -3893,12 +3880,10 @@
 					"$(inherited)",
 					.,
 					"third-party/libevent/include",
-					"third-party/fmt/include",
 				);
 				OTHER_CFLAGS = (
 					"$(inherited)",
 					"-DHAVE_DAEMON",
-					"-DFMT_HEADER_ONLY",
 				);
 				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_NAME = "transmission-daemon";
@@ -3915,13 +3900,8 @@
 					"$(inherited)",
 					.,
 					"third-party/libevent/include",
-					"third-party/fmt/include",
 				);
 				OTHER_LDFLAGS = "-lc++";
-				OTHER_CFLAGS = (
-					"$(inherited)",
-					"-DFMT_HEADER_ONLY",
-				);
 				PRODUCT_NAME = "transmission-remote";
 			};
 			name = "Release - Debug";
@@ -4067,11 +4047,9 @@
 					"$(inherited)",
 					.,
 					"third-party/libevent/include",
-					"third-party/fmt/include",
 				);
 				OTHER_CFLAGS = (
 					"$(inherited)",
-					"-DFMT_HEADER_ONLY",
 					"-DHAVE_DAEMON",
 				);
 				OTHER_LDFLAGS = "-lc++";
@@ -4089,13 +4067,8 @@
 					"$(inherited)",
 					.,
 					"third-party/libevent/include",
-					"third-party/fmt/include",
 				);
 				OTHER_LDFLAGS = "-lc++";
-				OTHER_CFLAGS = (
-					"$(inherited)",
-					"-DFMT_HEADER_ONLY",
-				);
 				PRODUCT_NAME = "transmission-remote";
 			};
 			name = Release;
