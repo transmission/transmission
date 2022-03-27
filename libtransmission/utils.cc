@@ -279,13 +279,13 @@ uint8_t* tr_loadFile(std::string_view path_in, size_t* size, tr_error** error)
             fmt::arg("path", path.sv()),
             fmt::arg("error", my_error->message),
             fmt::arg("error_code", my_error->code)));
-        tr_sys_file_close(fd, nullptr);
+        tr_sys_file_close(fd);
         tr_free(buf);
         tr_error_propagate(error, &my_error);
         return nullptr;
     }
 
-    tr_sys_file_close(fd, nullptr);
+    tr_sys_file_close(fd);
     buf[info.size] = '\0';
     *size = info.size;
     return buf;
@@ -337,12 +337,12 @@ bool tr_loadFile(std::string_view path_in, std::vector<char>& setme, tr_error** 
             fmt::arg("path", path.sv()),
             fmt::arg("error", my_error->message),
             fmt::arg("error_code", my_error->code)));
-        tr_sys_file_close(fd, nullptr);
+        tr_sys_file_close(fd);
         tr_error_propagate(error, &my_error);
         return false;
     }
 
-    tr_sys_file_close(fd, nullptr);
+    tr_sys_file_close(fd);
     return true;
 }
 
@@ -1146,7 +1146,7 @@ bool tr_moveFile(char const* oldpath, char const* newpath, tr_error** error)
     }
 
     /* they might be on the same filesystem... */
-    if (tr_sys_path_rename(oldpath, newpath, nullptr))
+    if (tr_sys_path_rename(oldpath, newpath))
     {
         return true;
     }

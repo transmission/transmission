@@ -66,11 +66,11 @@ static struct FileList* getFiles(std::string_view dir, std::string_view base, st
         return list;
     }
 
-    if (tr_sys_dir_t odir = info.type == TR_SYS_PATH_IS_DIRECTORY ? tr_sys_dir_open(buf.c_str(), nullptr) : TR_BAD_SYS_DIR;
+    if (tr_sys_dir_t odir = info.type == TR_SYS_PATH_IS_DIRECTORY ? tr_sys_dir_open(buf.c_str()) : TR_BAD_SYS_DIR;
         odir != TR_BAD_SYS_DIR)
     {
         char const* name = nullptr;
-        while ((name = tr_sys_dir_read_name(odir, nullptr)) != nullptr)
+        while ((name = tr_sys_dir_read_name(odir)) != nullptr)
         {
             if (name[0] != '.') /* skip dotfiles */
             {
@@ -78,7 +78,7 @@ static struct FileList* getFiles(std::string_view dir, std::string_view base, st
             }
         }
 
-        tr_sys_dir_close(odir, nullptr);
+        tr_sys_dir_close(odir);
     }
     else if (info.type == TR_SYS_PATH_IS_FILE)
     {
@@ -133,7 +133,7 @@ static uint32_t bestPieceSize(uint64_t totalSize)
 
 tr_metainfo_builder* tr_metaInfoBuilderCreate(char const* topFileArg)
 {
-    char* const real_top = tr_sys_path_resolve(topFileArg, nullptr);
+    char* const real_top = tr_sys_path_resolve(topFileArg);
 
     if (real_top == nullptr)
     {
@@ -147,7 +147,7 @@ tr_metainfo_builder* tr_metaInfoBuilderCreate(char const* topFileArg)
 
     {
         tr_sys_path_info info;
-        ret->isFolder = tr_sys_path_get_info(ret->top, 0, &info, nullptr) && info.type == TR_SYS_PATH_IS_DIRECTORY;
+        ret->isFolder = tr_sys_path_get_info(ret->top, 0, &info) && info.type == TR_SYS_PATH_IS_DIRECTORY;
     }
 
     /* build a list of files containing top file and,
@@ -292,7 +292,7 @@ static std::vector<std::byte> getHashInfo(tr_metainfo_builder* b)
         {
             uint64_t const n_this_pass = std::min(b->files[fileIndex].size - off, leftInPiece);
             uint64_t n_read = 0;
-            (void)tr_sys_file_read(fd, bufptr, n_this_pass, &n_read, nullptr);
+            (void)tr_sys_file_read(fd, bufptr, n_this_pass, &n_read);
             bufptr += n_read;
             off += n_read;
             leftInPiece -= n_read;
@@ -300,7 +300,7 @@ static std::vector<std::byte> getHashInfo(tr_metainfo_builder* b)
             if (off == b->files[fileIndex].size)
             {
                 off = 0;
-                tr_sys_file_close(fd, nullptr);
+                tr_sys_file_close(fd);
                 fd = TR_BAD_SYS_FILE;
 
                 if (++fileIndex < b->fileCount)
@@ -347,7 +347,7 @@ static std::vector<std::byte> getHashInfo(tr_metainfo_builder* b)
 
     if (fd != TR_BAD_SYS_FILE)
     {
-        tr_sys_file_close(fd, nullptr);
+        tr_sys_file_close(fd);
     }
 
     return ret;

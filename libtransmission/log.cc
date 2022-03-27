@@ -69,11 +69,11 @@ tr_sys_file_t tr_logGetFile()
         switch (tr_env_get_int("TR_DEBUG_FD", 0))
         {
         case 1:
-            file = tr_sys_file_get_std(TR_STD_SYS_FILE_OUT, nullptr);
+            file = tr_sys_file_get_std(TR_STD_SYS_FILE_OUT);
             break;
 
         case 2:
-            file = tr_sys_file_get_std(TR_STD_SYS_FILE_ERR, nullptr);
+            file = tr_sys_file_get_std(TR_STD_SYS_FILE_ERR);
             break;
 
         default:
@@ -169,15 +169,15 @@ void logAddImpl(
 
         if (fp == TR_BAD_SYS_FILE)
         {
-            fp = tr_sys_file_get_std(TR_STD_SYS_FILE_ERR, nullptr);
+            fp = tr_sys_file_get_std(TR_STD_SYS_FILE_ERR);
         }
 
         tr_logGetTimeStr(timestr, sizeof(timestr));
 
         auto const out = !std::empty(name) ? tr_strvJoin("["sv, timestr, "] "sv, name, ": "sv, msg) :
                                              tr_strvJoin("["sv, timestr, "] "sv, msg);
-        tr_sys_file_write_line(fp, out, nullptr);
-        tr_sys_file_flush(fp, nullptr);
+        tr_sys_file_write_line(fp, out);
+        tr_sys_file_flush(fp);
     }
 #endif
 }

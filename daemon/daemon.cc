@@ -192,7 +192,7 @@ static bool reopen_log_file(char const* filename)
 
     if (old_log_file != TR_BAD_SYS_FILE)
     {
-        tr_sys_file_close(old_log_file, nullptr);
+        tr_sys_file_close(old_log_file);
     }
 
     return true;
@@ -269,7 +269,7 @@ static auto onFileAdded(tr_watchdir_t dir, char const* name, void* vsession)
         else
         {
             auto const new_filename = filename + ".added";
-            tr_sys_path_rename(filename.c_str(), new_filename.c_str(), nullptr);
+            tr_sys_path_rename(filename.c_str(), new_filename.c_str());
         }
     }
 
@@ -311,7 +311,7 @@ static void printMessage(
     {
         auto timestr = std::array<char, 64>{};
         tr_logGetTimeStr(std::data(timestr), std::size(timestr));
-        tr_sys_file_write_line(file, tr_strvJoin("["sv, std::data(timestr), "] "sv, levelName(level), " "sv, out), nullptr);
+        tr_sys_file_write_line(file, tr_strvJoin("["sv, std::data(timestr), "] "sv, levelName(level), " "sv, out));
     }
 
 #ifdef HAVE_SYSLOG
@@ -362,7 +362,7 @@ static void pumpLogMessages(tr_sys_file_t file)
 
     if (file != TR_BAD_SYS_FILE)
     {
-        tr_sys_file_flush(file, nullptr);
+        tr_sys_file_flush(file);
     }
 
     tr_logFreeQueue(list);
@@ -722,8 +722,8 @@ static int daemon_start(void* varg, [[maybe_unused]] bool foreground)
         if (fp != TR_BAD_SYS_FILE)
         {
             auto const out = std::to_string(getpid());
-            tr_sys_file_write(fp, std::data(out), std::size(out), nullptr, nullptr);
-            tr_sys_file_close(fp, nullptr);
+            tr_sys_file_write(fp, std::data(out), std::size(out), nullptr);
+            tr_sys_file_close(fp);
             tr_logAddInfo(fmt::format(_("Saved pidfile '{path}'"), fmt::arg("path", sz_pid_filename)));
             pidfile_created = true;
         }
@@ -867,7 +867,7 @@ CLEANUP:
     /* cleanup */
     if (pidfile_created)
     {
-        tr_sys_path_remove(sz_pid_filename.c_str(), nullptr);
+        tr_sys_path_remove(sz_pid_filename.c_str());
     }
 
     sd_notify(0, "STATUS=\n");
@@ -896,7 +896,7 @@ static bool init_daemon_data(int argc, char* argv[], struct daemon_data* data, b
 
     if (*foreground && logfile == TR_BAD_SYS_FILE)
     {
-        logfile = tr_sys_file_get_std(TR_STD_SYS_FILE_ERR, nullptr);
+        logfile = tr_sys_file_get_std(TR_STD_SYS_FILE_ERR);
     }
 
     if (!loaded)

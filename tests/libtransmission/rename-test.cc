@@ -93,7 +93,7 @@ protected:
         auto* path = tr_torrentFindFile(tor, file_index);
         if (path != nullptr)
         {
-            EXPECT_TRUE(tr_sys_path_exists(path, nullptr));
+            EXPECT_TRUE(tr_sys_path_exists(path));
 
             size_t contents_len;
             uint8_t* contents = tr_loadFile(path, &contents_len, nullptr);
@@ -192,17 +192,17 @@ TEST_F(RenameTest, singleFilenameTorrent)
     ***/
 
     auto tmpstr = tr_strvPath(tor->currentDir().sv(), "hello-world.txt");
-    EXPECT_TRUE(tr_sys_path_exists(tmpstr.c_str(), nullptr));
+    EXPECT_TRUE(tr_sys_path_exists(tmpstr.c_str()));
     EXPECT_STREQ("hello-world.txt", tr_torrentName(tor));
     EXPECT_EQ(0, torrentRenameAndWait(tor, tr_torrentName(tor), "foobar"));
-    EXPECT_FALSE(tr_sys_path_exists(tmpstr.c_str(), nullptr)); // confirm the old filename can't be found
+    EXPECT_FALSE(tr_sys_path_exists(tmpstr.c_str())); // confirm the old filename can't be found
     EXPECT_STREQ("foobar", tr_torrentName(tor)); // confirm the torrent's name is now 'foobar'
     EXPECT_STREQ("foobar", tr_torrentFile(tor, 0).name); // confirm the file's name is now 'foobar'
     char* const torrent_filename = tr_torrentFilename(tor);
     EXPECT_STREQ(nullptr, strstr(torrent_filename, "foobar")); // confirm torrent file hasn't changed
     tr_free(torrent_filename);
     tmpstr = tr_strvPath(tor->currentDir().sv(), "foobar");
-    EXPECT_TRUE(tr_sys_path_exists(tmpstr.c_str(), nullptr)); // confirm the file's name is now 'foobar' on the disk
+    EXPECT_TRUE(tr_sys_path_exists(tmpstr.c_str())); // confirm the file's name is now 'foobar' on the disk
     EXPECT_TRUE(testFileExistsAndConsistsOfThisString(tor, 0, "hello, world!\n")); // confirm the contents are right
 
     // (while it's renamed: confirm that the .resume file remembers the changes)
@@ -217,9 +217,9 @@ TEST_F(RenameTest, singleFilenameTorrent)
     ***/
 
     tmpstr = tr_strvPath(tor->currentDir().sv(), "foobar");
-    EXPECT_TRUE(tr_sys_path_exists(tmpstr.c_str(), nullptr));
+    EXPECT_TRUE(tr_sys_path_exists(tmpstr.c_str()));
     EXPECT_EQ(0, torrentRenameAndWait(tor, "foobar", "hello-world.txt"));
-    EXPECT_FALSE(tr_sys_path_exists(tmpstr.c_str(), nullptr));
+    EXPECT_FALSE(tr_sys_path_exists(tmpstr.c_str()));
     EXPECT_STREQ("hello-world.txt", tr_torrentName(tor));
     EXPECT_STREQ("hello-world.txt", tr_torrentFile(tor, 0).name);
     EXPECT_TRUE(testFileExistsAndConsistsOfThisString(tor, 0, "hello, world!\n"));
@@ -343,12 +343,12 @@ TEST_F(RenameTest, multifileTorrent)
     // remove the directory Felidae/Felinae/Felis/catus
     str = tr_torrentFindFile(tor, 1);
     EXPECT_NE(nullptr, str);
-    tr_sys_path_remove(str, nullptr);
+    tr_sys_path_remove(str);
     tr_free(str);
     str = tr_torrentFindFile(tor, 2);
     EXPECT_NE(nullptr, str);
-    tr_sys_path_remove(str, nullptr);
-    tr_sys_path_remove(tr_sys_path_dirname(str).c_str(), nullptr);
+    tr_sys_path_remove(str);
+    tr_sys_path_remove(tr_sys_path_dirname(str).c_str());
     tr_free(str);
     sync();
     blockingTorrentVerify(tor);

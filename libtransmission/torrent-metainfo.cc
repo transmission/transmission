@@ -521,13 +521,13 @@ bool tr_torrent_metainfo::migrateFile(
     std::string_view suffix)
 {
     auto const old_filename = makeFilename(dirname, name, info_hash_string, BasenameFormat::NameAndPartialHash, suffix);
-    auto const old_filename_exists = tr_sys_path_exists(old_filename.c_str(), nullptr);
+    auto const old_filename_exists = tr_sys_path_exists(old_filename.c_str());
     auto const new_filename = makeFilename(dirname, name, info_hash_string, BasenameFormat::Hash, suffix);
-    auto const new_filename_exists = tr_sys_path_exists(new_filename.c_str(), nullptr);
+    auto const new_filename_exists = tr_sys_path_exists(new_filename.c_str());
 
     if (old_filename_exists && new_filename_exists)
     {
-        tr_sys_path_remove(old_filename.c_str(), nullptr);
+        tr_sys_path_remove(old_filename.c_str());
         return false;
     }
 
@@ -536,7 +536,7 @@ bool tr_torrent_metainfo::migrateFile(
         return false;
     }
 
-    if (old_filename_exists && tr_sys_path_rename(old_filename.c_str(), new_filename.c_str(), nullptr))
+    if (old_filename_exists && tr_sys_path_rename(old_filename.c_str(), new_filename.c_str()))
     {
         tr_logAddError(
             fmt::format(
@@ -557,10 +557,10 @@ void tr_torrent_metainfo::removeFile(
     std::string_view suffix)
 {
     auto filename = makeFilename(dirname, name, info_hash_string, BasenameFormat::NameAndPartialHash, suffix);
-    tr_sys_path_remove(filename.c_str(), nullptr);
+    tr_sys_path_remove(filename.c_str());
 
     filename = makeFilename(dirname, name, info_hash_string, BasenameFormat::Hash, suffix);
-    tr_sys_path_remove(filename.c_str(), nullptr);
+    tr_sys_path_remove(filename.c_str());
 }
 
 std::string const& tr_torrent_metainfo::fileSubpath(tr_file_index_t i) const

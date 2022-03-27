@@ -195,7 +195,7 @@ int readOrWriteBytes(
         break;
 
     case IoMode::Prefetch:
-        tr_sys_file_advise(fd, file_offset, buflen, TR_SYS_FILE_ADVICE_WILL_NEED, nullptr);
+        tr_sys_file_advise(fd, file_offset, buflen, TR_SYS_FILE_ADVICE_WILL_NEED);
         break;
     }
 
