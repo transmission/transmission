@@ -468,7 +468,7 @@ static void tau_tracker_on_dns(int errcode, struct evutil_addrinfo* addr, void* 
     {
         auto const errmsg = fmt::format(
             _("Couldn't find address of tracker '{host}': {error} ({error_code})"),
-            fmt::arg("host", tracker->host.sv()),
+            fmt::arg("host", tracker->host),
             fmt::arg("error", evutil_gai_strerror(errcode)),
             fmt::arg("error_code", errcode));
         logwarn(tracker->key, errmsg);
@@ -729,8 +729,7 @@ static struct tr_announcer_udp* announcer_udp_get(tr_session* session)
 static tau_tracker* tau_session_get_tracker(tr_announcer_udp* tau, tr_interned_string announce_url)
 {
     // build a lookup key for this tracker
-    auto const announce_sv = announce_url.sv();
-    auto parsed = tr_urlParseTracker(announce_sv);
+    auto const parsed = tr_urlParseTracker(announce_url);
     TR_ASSERT(parsed);
     if (!parsed)
     {
