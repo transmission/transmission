@@ -3,13 +3,12 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <algorithm> /* EINVAL */
+#include <algorithm>
 #include <array>
-#include <cerrno> /* EINVAL */
+#include <cerrno> // EINVAL
 #include <climits> /* INT_MAX */
 #include <cmath>
 #include <csignal> /* signal() */
-#include <cstring> /* memcmp */
 #include <ctime>
 #include <map>
 #include <set>
@@ -779,29 +778,34 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
             [](auto mtime) { return mtime > 0; });
     }
 
-    // if we don't have a local .torrent or .magnet file already, assume the torrent is new
     auto const filename = tor->hasMetadata() ? tor->torrentFile() : tor->magnetFile();
 
+    // if we don't have a local .torrent or .magnet file already,
+    // assume the torrent is new
     bool const is_new_torrent = !tr_sys_path_exists(filename.c_str());
+
     if (is_new_torrent)
     {
         tr_error* error = nullptr;
-        if (tor->hasMetadata())
+
+        if (tor->hasMetadata()) // torrent file
         {
-            if (!tr_ctorSaveContents(ctor, filename, &error))
-            {
-                tor->setLocalError(
-                    tr_strvJoin("Unable to save torrent file: ", error->message, " ("sv, std::to_string(error->code), ")"sv));
-            }
+            tr_ctorSaveContents(ctor, filename, &error);
         }
-        else
+        else // magnet link
         {
-            // magnet link
-            if (!tr_ctorSaveMagnetContents(tor, filename, &error))
-            {
-                tor->setLocalError(
-                    tr_strvJoin("Unable to save magnet file: ", error->message, " ("sv, std::to_string(error->code), ")"sv));
-            }
+            auto const magnet_link = tor->magnet();
+            tr_saveFile(filename, magnet_link, &error);
+        }
+
+        if (error != nullptr)
+        {
+            tor->setLocalError(fmt::format(
+                _("Couldn't save '{path}': {error} ({error_code})"),
+                fmt::arg("path", filename),
+                fmt::arg("error", error->message),
+                fmt::arg("error_code", error->code)));
+            tr_error_clear(&error);
         }
 
         tr_error_clear(&error);
@@ -1782,7 +1786,7 @@ static void torrentCallScript(tr_torrent const* tor, char const* script)
     tr_localtime_r(&now, &tm);
     strftime(ctime_str, sizeof(ctime_str), "%a %b %d %T %Y%n", &tm); /* ctime equiv */
 
-    auto torrent_dir = std::string{ tor->currentDir().sv() };
+    auto torrent_dir = std::string{ tor->currentDir() };
     tr_sys_path_native_separators(std::data(torrent_dir));
 
     auto const cmd = std::array<char const*, 2>{ script, nullptr };
@@ -2085,7 +2089,7 @@ bool tr_torrent::setTrackerList(std::string_view text)
     }
 
     auto const has_metadata = this->hasMetadata();
-    if (has_metadata && !announce_list.save(this->torrentFile()))
+    if (has_metadata && !announce_list.save(torrentFile()))
     {
         return false;
     }
@@ -2096,12 +2100,14 @@ bool tr_torrent::setTrackerList(std::string_view text)
     // magnet links
     if (!has_metadata)
     {
+        auto const magnet_file = magnetFile();
+        auto const magnet_link = this->magnet();
         tr_error* save_error = nullptr;
-        if (!tr_ctorSaveMagnetContents(this, this->magnetFile(), &save_error))
+        if (!tr_saveFile(magnet_file, magnet_link, &save_error))
         {
             this->setLocalError(fmt::format(
                 _("Couldn't save '{path}': {error} ({error_code})"),
-                fmt::arg("path", this->magnetFile()),
+                fmt::arg("path", magnet_file),
                 fmt::arg("error", save_error->message),
                 fmt::arg("error_code", save_error->code)));
             tr_error_clear(&save_error);
@@ -2242,7 +2248,7 @@ static void deleteLocalData(tr_torrent const* tor, tr_fileFunc func)
 {
     auto files = std::vector<std::string>{};
     auto folders = std::set<std::string>{};
-    auto const top = std::string{ tor->currentDir().sv() };
+    auto const top = std::string{ tor->currentDir() };
 
     /* don't try to delete local data if the directory's gone missing */
     if (!tr_sys_path_exists(top.c_str()))
@@ -2674,7 +2680,7 @@ std::optional<tr_torrent::tr_found_file_t> tr_torrent::findFile(std::string& fil
 
     if (!std::empty(this->downloadDir()))
     {
-        auto const base = this->downloadDir().sv();
+        auto const base = this->downloadDir();
 
         tr_buildBuf(filename, base, "/"sv, subpath);
         if (tr_sys_path_get_info(filename.c_str(), 0, &file_info))
@@ -2691,7 +2697,7 @@ std::optional<tr_torrent::tr_found_file_t> tr_torrent::findFile(std::string& fil
 
     if (!std::empty(this->incompleteDir()))
     {
-        auto const base = this->incompleteDir().sv();
+        auto const base = this->incompleteDir();
 
         tr_buildBuf(filename, base, "/"sv, subpath);
         if (tr_sys_path_get_info(filename.c_str(), 0, &file_info))
@@ -2960,7 +2966,7 @@ static int renamePath(tr_torrent* tor, char const* oldpath, char const* newname)
 {
     int err = 0;
 
-    auto const base = tor->isDone() || std::empty(tor->incompleteDir()) ? tor->downloadDir().sv() : tor->incompleteDir().sv();
+    auto const base = tor->isDone() || std::empty(tor->incompleteDir()) ? tor->downloadDir() : tor->incompleteDir();
 
     auto src = tr_strvPath(base, oldpath);
 
