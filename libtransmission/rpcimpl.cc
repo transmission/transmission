@@ -34,6 +34,7 @@
 #include "torrent.h"
 #include "tr-assert.h"
 #include "tr-macros.h"
+#include "tr-strbuf.h"
 #include "utils.h"
 #include "variant.h"
 #include "version.h"
@@ -1439,11 +1440,17 @@ static void onBlocklistFetched(tr_web::FetchResponse const& web_response)
 
     // tr_blocklistSetContent needs a source file,
     // so save content into a tmpfile
-    auto const filename = tr_strvJoin(tr_sessionGetConfigDir(session), "blocklist.tmp");
+    auto const filename = tr_pathbuf{ session->config_dir, "/blocklist.tmp"sv };
     tr_error* error = nullptr;
-    if (!tr_saveFile(filename, std::string_view{ std::data(content), std::size(content) }, &error))
+    if (!tr_saveFile(filename, content, &error))
     {
-        tr_snprintf(result, sizeof(result), _("Couldn't save file \"%1$s\": %2$s"), filename.c_str(), error->message);
+        fmt::format_to_n(
+            result,
+            sizeof(result),
+            _("Couldn't save '{path}': {error} ({error_code})"),
+            fmt::arg("path", filename),
+            fmt::arg("error", error->message),
+            fmt::arg("error_code", error->code));
         tr_error_clear(&error);
         tr_idle_function_done(data, result);
         return;
@@ -1452,7 +1459,7 @@ static void onBlocklistFetched(tr_web::FetchResponse const& web_response)
     // feed it to the session and give the client a response
     int const rule_count = tr_blocklistSetContent(session, filename.c_str());
     tr_variantDictAddInt(data->args_out, TR_KEY_blocklist_size, rule_count);
-    tr_sys_path_remove(filename.c_str(), nullptr);
+    tr_sys_path_remove(filename.c_str());
     tr_idle_function_done(data, "success");
 }
 
@@ -1733,7 +1740,7 @@ static char const* groupGet(tr_session* s, tr_variant* args_in, tr_variant* args
         {
             tr_variant* dict = tr_variantListAddDict(list, 5);
             auto limits = group->getLimits();
-            tr_variantDictAddStrView(dict, TR_KEY_name, name.sv());
+            tr_variantDictAddStr(dict, TR_KEY_name, name);
             tr_variantDictAddBool(dict, TR_KEY_uploadLimited, limits.up_limited);
             tr_variantDictAddInt(dict, TR_KEY_uploadLimit, limits.up_limit_KBps);
             tr_variantDictAddBool(dict, TR_KEY_downloadLimited, limits.down_limited);

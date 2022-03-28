@@ -14,6 +14,7 @@
 #include "announce-list.h"
 #include "error.h"
 #include "torrent-metainfo.h"
+#include "tr-strbuf.h"
 #include "utils.h"
 #include "variant.h"
 
@@ -343,11 +344,11 @@ TEST_F(AnnounceListTest, save)
     // first, set up a scratch torrent
     auto constexpr* const OriginalFile = LIBTRANSMISSION_TEST_ASSETS_DIR "/Android-x86 8.1 r6 iso.torrent";
     auto original_content = std::vector<char>{};
-    auto const test_file = tr_strvJoin(::testing::TempDir(), "transmission-announce-list-test.torrent"sv);
+    auto const test_file = tr_pathbuf{ ::testing::TempDir(), "transmission-announce-list-test.torrent"sv };
     tr_error* error = nullptr;
-    EXPECT_TRUE(tr_loadFile(original_content, OriginalFile, &error));
+    EXPECT_TRUE(tr_loadFile(OriginalFile, original_content, &error));
     EXPECT_EQ(nullptr, error) << *error;
-    EXPECT_TRUE(tr_saveFile(test_file, { std::data(original_content), std::size(original_content) }, &error));
+    EXPECT_TRUE(tr_saveFile(test_file.sv(), original_content, &error));
     EXPECT_EQ(nullptr, error) << *error;
 
     // make an announce_list for it
@@ -363,7 +364,7 @@ TEST_F(AnnounceListTest, save)
     tr_error_clear(&error);
 
     // now save to a real torrent file
-    EXPECT_TRUE(announce_list.save(test_file, &error));
+    EXPECT_TRUE(announce_list.save(std::string{ test_file.sv() }, &error));
     EXPECT_EQ(nullptr, error) << *error;
 
     // load the original
@@ -372,7 +373,7 @@ TEST_F(AnnounceListTest, save)
 
     // load the scratch that we saved to
     auto modified_tm = tr_torrent_metainfo{};
-    EXPECT_TRUE(modified_tm.parseTorrentFile(test_file));
+    EXPECT_TRUE(modified_tm.parseTorrentFile(test_file.sv()));
 
     // test that non-announce parts of the metainfo are the same
     EXPECT_EQ(original_tm.name(), modified_tm.name());

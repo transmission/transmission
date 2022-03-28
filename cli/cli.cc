@@ -255,7 +255,7 @@ int tr_main(int argc, char* argv[])
         // tr_sys_path_exists and tr_sys_dir_create need zero-terminated strs
         auto const sz_download_dir = std::string{ sv };
 
-        if (!tr_sys_path_exists(sz_download_dir.c_str(), nullptr))
+        if (!tr_sys_path_exists(sz_download_dir.c_str()))
         {
             tr_error* error = nullptr;
 
