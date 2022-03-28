@@ -245,7 +245,7 @@ public:
         return sv();
     }
 
-    [[nodiscard]] constexpr operator Char const*() const noexcept
+    [[nodiscard]] constexpr operator auto() const noexcept
     {
         return c_str();
     }
