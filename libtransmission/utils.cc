@@ -238,7 +238,7 @@ uint8_t* tr_loadFile(std::string_view path_in, size_t* size, tr_error** error)
     {
         tr_logAddError(fmt::format(
             _("Couldn't read '{path}': {error} ({error_code})"),
-            fmt::arg("path", path.sv()),
+            fmt::arg("path", path),
             fmt::arg("error", my_error->message),
             fmt::arg("error_code", my_error->code)));
         tr_error_propagate(error, &my_error);
@@ -247,7 +247,7 @@ uint8_t* tr_loadFile(std::string_view path_in, size_t* size, tr_error** error)
 
     if (info.type != TR_SYS_PATH_IS_FILE)
     {
-        tr_logAddError(fmt::format(_("Couldn't read '{path}': Not a regular file"), fmt::arg("path", path.sv())));
+        tr_logAddError(fmt::format(_("Couldn't read '{path}': Not a regular file"), fmt::arg("path", path)));
         tr_error_set(error, TR_ERROR_EISDIR, "Not a regular file"sv);
         return nullptr;
     }
@@ -264,7 +264,7 @@ uint8_t* tr_loadFile(std::string_view path_in, size_t* size, tr_error** error)
     {
         tr_logAddError(fmt::format(
             _("Couldn't read '{path}': {error} ({error_code})"),
-            fmt::arg("path", path.sv()),
+            fmt::arg("path", path),
             fmt::arg("error", my_error->message),
             fmt::arg("error_code", my_error->code)));
         tr_error_propagate(error, &my_error);
@@ -276,7 +276,7 @@ uint8_t* tr_loadFile(std::string_view path_in, size_t* size, tr_error** error)
     {
         tr_logAddError(fmt::format(
             _("Couldn't read '{path}': {error} ({error_code})"),
-            fmt::arg("path", path.sv()),
+            fmt::arg("path", path),
             fmt::arg("error", my_error->message),
             fmt::arg("error_code", my_error->code)));
         tr_sys_file_close(fd);
@@ -302,7 +302,7 @@ bool tr_loadFile(std::string_view path_in, std::vector<char>& setme, tr_error** 
     {
         tr_logAddError(fmt::format(
             _("Couldn't read '{path}': {error} ({error_code})"),
-            fmt::arg("path", path.sv()),
+            fmt::arg("path", path),
             fmt::arg("error", my_error->message),
             fmt::arg("error_code", my_error->code)));
         tr_error_propagate(error, &my_error);
@@ -311,7 +311,7 @@ bool tr_loadFile(std::string_view path_in, std::vector<char>& setme, tr_error** 
 
     if (info.type != TR_SYS_PATH_IS_FILE)
     {
-        tr_logAddError(fmt::format(_("Couldn't read '{path}': Not a regular file"), fmt::arg("path", path.sv())));
+        tr_logAddError(fmt::format(_("Couldn't read '{path}': Not a regular file"), fmt::arg("path", path)));
         tr_error_set(error, TR_ERROR_EISDIR, "Not a regular file"sv);
         return false;
     }
@@ -322,7 +322,7 @@ bool tr_loadFile(std::string_view path_in, std::vector<char>& setme, tr_error** 
     {
         tr_logAddError(fmt::format(
             _("Couldn't read '{path}': {error} ({error_code})"),
-            fmt::arg("path", path.sv()),
+            fmt::arg("path", path),
             fmt::arg("error", my_error->message),
             fmt::arg("error_code", my_error->code)));
         tr_error_propagate(error, &my_error);
@@ -334,7 +334,7 @@ bool tr_loadFile(std::string_view path_in, std::vector<char>& setme, tr_error** 
     {
         tr_logAddError(fmt::format(
             _("Couldn't read '{path}': {error} ({error_code})"),
-            fmt::arg("path", path.sv()),
+            fmt::arg("path", path),
             fmt::arg("error", my_error->message),
             fmt::arg("error_code", my_error->code)));
         tr_sys_file_close(fd);
@@ -391,7 +391,7 @@ bool tr_saveFile(std::string_view filename_in, std::string_view contents, tr_err
         return false;
     }
 
-    tr_logAddTrace(fmt::format("Saved '{}'", filename.sv()));
+    tr_logAddTrace(fmt::format("Saved '{}'", filename));
     return true;
 }
 

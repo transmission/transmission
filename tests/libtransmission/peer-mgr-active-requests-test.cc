@@ -43,17 +43,17 @@ TEST_F(PeerMgrActiveRequestsTest, requestsMadeAreCounted)
 
     auto const block = tr_block_index_t{ 100 };
     auto const peer = static_cast<tr_peer*>(nullptr);
-    auto const when = time_t(0);
+    auto const when = time_t{};
 
-    EXPECT_EQ(0, requests.count(block));
-    EXPECT_EQ(0, requests.count(peer));
-    EXPECT_EQ(0, requests.size());
+    EXPECT_EQ(0U, requests.count(block));
+    EXPECT_EQ(0U, requests.count(peer));
+    EXPECT_EQ(0U, requests.size());
 
     EXPECT_TRUE(requests.add(block, peer, when));
 
-    EXPECT_EQ(1, requests.count(block));
-    EXPECT_EQ(1, requests.count(peer));
-    EXPECT_EQ(1, requests.size());
+    EXPECT_EQ(1U, requests.count(block));
+    EXPECT_EQ(1U, requests.count(peer));
+    EXPECT_EQ(1U, requests.size());
 }
 
 TEST_F(PeerMgrActiveRequestsTest, requestsAreRemoved)
