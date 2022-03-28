@@ -1442,13 +1442,13 @@ static void onBlocklistFetched(tr_web::FetchResponse const& web_response)
     // so save content into a tmpfile
     auto const filename = tr_pathbuf{ session->config_dir, "/blocklist.tmp"sv };
     tr_error* error = nullptr;
-    if (!tr_saveFile(filename.sv(), content, &error))
+    if (!tr_saveFile(filename, content, &error))
     {
         fmt::format_to_n(
             result,
             sizeof(result),
             _("Couldn't save '{path}': {error} ({error_code})"),
-            fmt::arg("path", filename.sv()),
+            fmt::arg("path", filename),
             fmt::arg("error", error->message),
             fmt::arg("error_code", error->code));
         tr_error_clear(&error);
@@ -1740,7 +1740,7 @@ static char const* groupGet(tr_session* s, tr_variant* args_in, tr_variant* args
         {
             tr_variant* dict = tr_variantListAddDict(list, 5);
             auto limits = group->getLimits();
-            tr_variantDictAddStrView(dict, TR_KEY_name, name.sv());
+            tr_variantDictAddStr(dict, TR_KEY_name, name);
             tr_variantDictAddBool(dict, TR_KEY_uploadLimited, limits.up_limited);
             tr_variantDictAddInt(dict, TR_KEY_uploadLimit, limits.up_limit_KBps);
             tr_variantDictAddBool(dict, TR_KEY_downloadLimited, limits.down_limited);

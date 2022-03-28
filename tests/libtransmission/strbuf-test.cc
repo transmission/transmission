@@ -102,14 +102,14 @@ TEST_F(StrbufTest, indexOperator)
     // mutable
     {
         auto buf = tr_pathbuf{ Value1 };
-        buf[0] = 'W';
+        buf.at(0) = 'W';
         EXPECT_EQ(Value2, buf.sv());
     }
 
     // const
     {
         auto const buf = tr_pathbuf{ Value1 };
-        EXPECT_EQ(Value1.front(), buf[0]);
+        EXPECT_EQ(Value1.front(), buf.at(0));
     }
 }
 

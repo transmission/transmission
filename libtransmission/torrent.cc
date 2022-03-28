@@ -1863,7 +1863,7 @@ void tr_torrent::recheckCompleteness()
 
             if (this->currentDir() == this->incompleteDir())
             {
-                this->setLocation(this->downloadDir().sv(), true, nullptr, nullptr);
+                this->setLocation(this->downloadDir(), true, nullptr, nullptr);
             }
         }
 
@@ -2414,7 +2414,7 @@ static void setLocationImpl(struct LocationData* const data)
 
     tr_logAddTraceTor(
         tor,
-        fmt::format("Moving '{}' location from currentDir '{}' to '{}'", tor->name(), tor->currentDir().sv(), location));
+        fmt::format("Moving '{}' location from currentDir '{}' to '{}'", tor->name(), tor->currentDir(), location));
 
     tr_sys_dir_create(location.c_str(), TR_SYS_DIR_CREATE_PARENTS, 0777);
 

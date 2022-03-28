@@ -27,7 +27,7 @@ protected:
 
 TEST_F(QuarkTest, allPredefinedKeysCanBeLookedUp)
 {
-    for (int i = 0; i < TR_N_KEYS; i++)
+    for (size_t i = 0; i < TR_N_KEYS; ++i)
     {
         auto const str = quarkGetString(i);
         auto const q = tr_quark_lookup(str);
