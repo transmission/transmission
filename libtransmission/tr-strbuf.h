@@ -67,12 +67,12 @@ public:
         return buffer_.end();
     }
 
-    [[nodiscard]] constexpr auto& operator[](size_t pos) noexcept
+    constexpr Char& operator[](size_t pos) noexcept
     {
         return buffer_[pos];
     }
 
-    [[nodiscard]] constexpr auto const& operator[](size_t pos) const noexcept
+    [[nodiscard]] constexpr Char operator[](size_t pos) const noexcept
     {
         return buffer_[pos];
     }
