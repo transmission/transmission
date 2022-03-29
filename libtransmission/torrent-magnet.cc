@@ -123,7 +123,7 @@ void* tr_torrentGetMetadataPiece(tr_torrent const* tor, int piece, size_t* len)
         return nullptr;
     }
 
-    auto const fd = tr_sys_file_open(tor->torrentFile().c_str(), TR_SYS_FILE_READ, 0, nullptr);
+    auto const fd = tr_sys_file_open(tor->torrentFile(), TR_SYS_FILE_READ, 0);
     if (fd == TR_BAD_SYS_FILE)
     {
         return nullptr;
@@ -133,7 +133,7 @@ void* tr_torrentGetMetadataPiece(tr_torrent const* tor, int piece, size_t* len)
     TR_ASSERT(info_dict_size > 0);
 
     char* ret = nullptr;
-    if (size_t o = piece * METADATA_PIECE_SIZE; tr_sys_file_seek(fd, tor->infoDictOffset() + o, TR_SEEK_SET, nullptr, nullptr))
+    if (size_t o = piece * METADATA_PIECE_SIZE; tr_sys_file_seek(fd, tor->infoDictOffset() + o, TR_SEEK_SET, nullptr))
     {
         size_t const l = o + METADATA_PIECE_SIZE <= info_dict_size ? METADATA_PIECE_SIZE : info_dict_size - o;
 
@@ -141,7 +141,7 @@ void* tr_torrentGetMetadataPiece(tr_torrent const* tor, int piece, size_t* len)
         {
             auto* buf = tr_new(char, l);
 
-            if (auto n = uint64_t{}; tr_sys_file_read(fd, buf, l, &n, nullptr) && n == l)
+            if (auto n = uint64_t{}; tr_sys_file_read(fd, buf, l, &n) && n == l)
             {
                 *len = l;
                 ret = buf;
@@ -152,7 +152,7 @@ void* tr_torrentGetMetadataPiece(tr_torrent const* tor, int piece, size_t* len)
         }
     }
 
-    tr_sys_file_close(fd, nullptr);
+    tr_sys_file_close(fd);
 
     TR_ASSERT(ret == nullptr || *len > 0);
     return ret;
@@ -273,13 +273,13 @@ static bool useNewMetainfo(tr_torrent* tor, tr_incomplete_metadata const* m, tr_
     }
 
     // save it
-    if (auto const filename = tor->torrentFile(); !tr_saveFile(filename, benc, error))
+    if (!tr_saveFile(tor->torrentFile(), benc, error))
     {
         return false;
     }
 
     // remove .magnet file
-    tr_sys_path_remove(tor->magnetFile().c_str(), nullptr);
+    tr_sys_path_remove(tor->magnetFile());
 
     // tor should keep this metainfo
     tor->setMetainfo(metainfo);

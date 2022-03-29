@@ -56,6 +56,7 @@
 #include "tr-assert.h"
 #include "tr-dht.h" /* tr_dhtUpkeep() */
 #include "tr-lpd.h"
+#include "tr-strbuf.h"
 #include "tr-udp.h"
 #include "tr-utp.h"
 #include "trevent.h"
@@ -123,8 +124,14 @@ tr_peer_id_t tr_peerIdInit()
 
 std::optional<std::string> tr_session::WebMediator::cookieFile() const
 {
-    auto const str = tr_strvPath(session_->config_dir, "cookies.txt");
-    return tr_sys_path_exists(str.c_str(), nullptr) ? std::optional<std::string>{ str } : std::nullopt;
+    auto const path = tr_pathbuf{ session_->config_dir, "/cookies.txt" };
+
+    if (!tr_sys_path_exists(path))
+    {
+        return {};
+    }
+
+    return std::string{ path };
 }
 
 std::optional<std::string> tr_session::WebMediator::userAgent() const
@@ -486,7 +493,7 @@ bool tr_sessionLoadSettings(tr_variant* dict, char const* config_dir, char const
 
     /* file settings override the defaults */
     auto fileSettings = tr_variant{};
-    auto const filename = tr_strvPath(config_dir, "settings.json"sv);
+    auto const filename = tr_pathbuf{ config_dir, "/settings.json"sv };
     auto success = bool{};
     if (tr_error* error = nullptr; tr_variantFromFile(&fileSettings, TR_VARIANT_PARSE_JSON, filename, &error))
     {
@@ -509,7 +516,7 @@ void tr_sessionSaveSettings(tr_session* session, char const* config_dir, tr_vari
     TR_ASSERT(tr_variantIsDict(clientSettings));
 
     tr_variant settings;
-    auto const filename = tr_strvPath(config_dir, "settings.json"sv);
+    auto const filename = tr_pathbuf{ config_dir, "/settings.json"sv };
 
     tr_variantInitDict(&settings, 0);
 
@@ -735,7 +742,7 @@ static void tr_sessionInitImpl(init_data* data)
 
     {
         auto const filename = tr_strvPath(session->config_dir, "blocklists"sv);
-        tr_sys_dir_create(filename.c_str(), TR_SYS_DIR_CREATE_PARENTS, 0777, nullptr);
+        tr_sys_dir_create(filename.c_str(), TR_SYS_DIR_CREATE_PARENTS, 0777);
         loadBlocklists(session);
     }
 
@@ -2012,30 +2019,29 @@ static void sessionLoadTorrents(struct sessionLoadTorrentsData* const data)
 
     tr_sys_path_info info;
     char const* const dirname = tr_getTorrentDir(data->session);
-    tr_sys_dir_t odir = (tr_sys_path_get_info(dirname, 0, &info, nullptr) && info.type == TR_SYS_PATH_IS_DIRECTORY) ?
-        tr_sys_dir_open(dirname, nullptr) :
+    tr_sys_dir_t odir = (tr_sys_path_get_info(dirname, 0, &info) && info.type == TR_SYS_PATH_IS_DIRECTORY) ?
+        tr_sys_dir_open(dirname) :
         TR_BAD_SYS_DIR;
 
     auto torrents = std::list<tr_torrent*>{};
     if (odir != TR_BAD_SYS_DIR)
     {
         auto const dirname_sv = std::string_view{ dirname };
-        auto path = std::string{};
 
         char const* name = nullptr;
-        while ((name = tr_sys_dir_read_name(odir, nullptr)) != nullptr)
+        while ((name = tr_sys_dir_read_name(odir)) != nullptr)
         {
             if (!tr_strvEndsWith(name, ".torrent"sv) && !tr_strvEndsWith(name, ".magnet"sv))
             {
                 continue;
             }
 
-            tr_buildBuf(path, dirname_sv, "/", name);
+            auto const path = tr_pathbuf{ dirname_sv, "/"sv, name };
 
             // is a magnet link?
-            if (!tr_ctorSetMetainfoFromFile(data->ctor, path, nullptr))
+            if (!tr_ctorSetMetainfoFromFile(data->ctor, std::string{ path }, nullptr))
             {
-                if (auto buf = std::vector<char>{}; tr_loadFile(buf, path))
+                if (auto buf = std::vector<char>{}; tr_loadFile(path, buf))
                 {
                     tr_ctorSetMetainfoFromMagnetLink(
                         data->ctor,
@@ -2050,7 +2056,7 @@ static void sessionLoadTorrents(struct sessionLoadTorrentsData* const data)
             }
         }
 
-        tr_sys_dir_close(odir, nullptr);
+        tr_sys_dir_close(odir);
     }
 
     int const n = std::size(torrents);
@@ -2331,7 +2337,7 @@ static void loadBlocklists(tr_session* session)
 
     /* walk the blocklist directory... */
     auto const dirname = tr_strvPath(session->config_dir, "blocklists"sv);
-    auto const odir = tr_sys_dir_open(dirname.c_str(), nullptr);
+    auto const odir = tr_sys_dir_open(dirname.c_str());
 
     if (odir == TR_BAD_SYS_DIR)
     {
@@ -2339,7 +2345,7 @@ static void loadBlocklists(tr_session* session)
     }
 
     char const* name = nullptr;
-    while ((name = tr_sys_dir_read_name(odir, nullptr)) != nullptr)
+    while ((name = tr_sys_dir_read_name(odir)) != nullptr)
     {
         auto load = std::string{};
 
@@ -2359,7 +2365,7 @@ static void loadBlocklists(tr_session* session)
 
             auto const binname = tr_strvJoin(dirname, TR_PATH_DELIMITER_STR, name, ".bin"sv);
 
-            if (!tr_sys_path_get_info(binname.c_str(), 0, &binname_info, nullptr)) /* create it */
+            if (!tr_sys_path_get_info(binname.c_str(), 0, &binname_info)) /* create it */
             {
                 tr_blocklistFile* b = tr_blocklistFileNew(binname.c_str(), isEnabled);
 
@@ -2371,22 +2377,22 @@ static void loadBlocklists(tr_session* session)
                 tr_blocklistFileFree(b);
             }
             else if (
-                tr_sys_path_get_info(path.c_str(), 0, &path_info, nullptr) &&
+                tr_sys_path_get_info(path.c_str(), 0, &path_info) &&
                 path_info.last_modified_at >= binname_info.last_modified_at) /* update it */
             {
                 auto const old = binname + ".old";
-                tr_sys_path_remove(old.c_str(), nullptr);
-                tr_sys_path_rename(binname.c_str(), old.c_str(), nullptr);
+                tr_sys_path_remove(old.c_str());
+                tr_sys_path_rename(binname.c_str(), old.c_str());
                 auto* const b = tr_blocklistFileNew(binname.c_str(), isEnabled);
 
                 if (tr_blocklistFileSetContent(b, path.c_str()) > 0)
                 {
-                    tr_sys_path_remove(old.c_str(), nullptr);
+                    tr_sys_path_remove(old.c_str());
                 }
                 else
                 {
-                    tr_sys_path_remove(binname.c_str(), nullptr);
-                    tr_sys_path_rename(old.c_str(), binname.c_str(), nullptr);
+                    tr_sys_path_remove(binname.c_str());
+                    tr_sys_path_rename(old.c_str(), binname.c_str());
                 }
 
                 tr_blocklistFileFree(b);
@@ -2407,7 +2413,7 @@ static void loadBlocklists(tr_session* session)
         [&isEnabled](auto const& path) { return tr_blocklistFileNew(path.c_str(), isEnabled); });
 
     /* cleanup */
-    tr_sys_dir_close(odir, nullptr);
+    tr_sys_dir_close(odir);
 }
 
 static void closeBlocklists(tr_session* session)
@@ -2874,10 +2880,9 @@ int tr_sessionCountQueueFreeSlots(tr_session* session, tr_direction dir)
 
 static void bandwidthGroupRead(tr_session* session, std::string_view config_dir)
 {
+    auto const filename = tr_pathbuf{ config_dir, "/"sv, BandwidthGroupsFilename };
     auto groups_dict = tr_variant{};
-
-    if (auto const path = tr_strvPath(config_dir, BandwidthGroupsFilename);
-        !tr_variantFromFile(&groups_dict, TR_VARIANT_PARSE_JSON, path, nullptr) || !tr_variantIsList(&groups_dict))
+    if (!tr_variantFromFile(&groups_dict, TR_VARIANT_PARSE_JSON, filename, nullptr) || !tr_variantIsList(&groups_dict))
     {
         return;
     }
@@ -2888,7 +2893,7 @@ static void bandwidthGroupRead(tr_session* session, std::string_view config_dir)
     while (tr_variantDictChild(&groups_dict, idx++, &key, &dict))
     {
         auto name = tr_interned_string(key);
-        auto& group = session->getBandwidthGroup(name.sv());
+        auto& group = session->getBandwidthGroup(name);
 
         auto limits = tr_bandwidth_limits{};
         tr_variantDictFindBool(dict, TR_KEY_uploadLimited, &limits.up_limited);
@@ -2935,7 +2940,7 @@ static int bandwidthGroupWrite(tr_session const* session, std::string_view confi
         tr_variantDictAddBool(dict, TR_KEY_honorsSessionLimits, group->areParentLimitsHonored(TR_UP));
     }
 
-    auto const filename = tr_strvPath(config_dir, BandwidthGroupsFilename);
+    auto const filename = tr_pathbuf{ config_dir, "/"sv, BandwidthGroupsFilename };
     auto const ret = tr_variantToFile(&groups_dict, TR_VARIANT_FMT_JSON, filename);
     tr_variantFree(&groups_dict);
     return ret;

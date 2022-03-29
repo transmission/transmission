@@ -14,7 +14,6 @@
 #include <cstdlib> // getenv()
 #include <cstring> /* strerror() */
 #include <ctime> // nanosleep()
-#include <iterator> // std::back_inserter
 #include <set>
 #include <string>
 #include <string_view>
@@ -49,6 +48,7 @@
 #include "net.h" // ntohl()
 #include "platform-quota.h" /* tr_device_info_create(), tr_device_info_get_disk_space(), tr_device_info_free() */
 #include "tr-assert.h"
+#include "tr-strbuf.h"
 #include "utils.h"
 #include "variant.h"
 
@@ -226,12 +226,14 @@ void tr_timerAddMsec(struct event* timer, int msec)
 ***
 **/
 
-uint8_t* tr_loadFile(char const* path, size_t* size, tr_error** error)
+uint8_t* tr_loadFile(std::string_view path_in, size_t* size, tr_error** error)
 {
+    auto const path = tr_pathbuf{ path_in };
+
     /* try to stat the file */
     auto info = tr_sys_path_info{};
     tr_error* my_error = nullptr;
-    if (!tr_sys_path_get_info(path, 0, &info, &my_error))
+    if (!tr_sys_path_get_info(path.c_str(), 0, &info, &my_error))
     {
         tr_logAddError(fmt::format(
             _("Couldn't read '{path}': {error} ({error_code})"),
@@ -256,7 +258,7 @@ uint8_t* tr_loadFile(char const* path, size_t* size, tr_error** error)
     }
 
     /* Load the torrent file into our buffer */
-    auto const fd = tr_sys_file_open(path, TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0, &my_error);
+    auto const fd = tr_sys_file_open(path.c_str(), TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0, &my_error);
     if (fd == TR_BAD_SYS_FILE)
     {
         tr_logAddError(fmt::format(
@@ -276,26 +278,26 @@ uint8_t* tr_loadFile(char const* path, size_t* size, tr_error** error)
             fmt::arg("path", path),
             fmt::arg("error", my_error->message),
             fmt::arg("error_code", my_error->code)));
-        tr_sys_file_close(fd, nullptr);
+        tr_sys_file_close(fd);
         tr_free(buf);
         tr_error_propagate(error, &my_error);
         return nullptr;
     }
 
-    tr_sys_file_close(fd, nullptr);
+    tr_sys_file_close(fd);
     buf[info.size] = '\0';
     *size = info.size;
     return buf;
 }
 
-bool tr_loadFile(std::vector<char>& setme, std::string const& path, tr_error** error)
+bool tr_loadFile(std::string_view path_in, std::vector<char>& setme, tr_error** error)
 {
-    auto const* const path_sz = path.c_str();
+    auto const path = tr_pathbuf{ path_in };
 
     /* try to stat the file */
     auto info = tr_sys_path_info{};
     tr_error* my_error = nullptr;
-    if (!tr_sys_path_get_info(path_sz, 0, &info, &my_error))
+    if (!tr_sys_path_get_info(path.c_str(), 0, &info, &my_error))
     {
         tr_logAddError(fmt::format(
             _("Couldn't read '{path}': {error} ({error_code})"),
@@ -314,7 +316,7 @@ bool tr_loadFile(std::vector<char>& setme, std::string const& path, tr_error** e
     }
 
     /* Load the torrent file into our buffer */
-    auto const fd = tr_sys_file_open(path_sz, TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0, &my_error);
+    auto const fd = tr_sys_file_open(path.c_str(), TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0, &my_error);
     if (fd == TR_BAD_SYS_FILE)
     {
         tr_logAddError(fmt::format(
@@ -334,33 +336,35 @@ bool tr_loadFile(std::vector<char>& setme, std::string const& path, tr_error** e
             fmt::arg("path", path),
             fmt::arg("error", my_error->message),
             fmt::arg("error_code", my_error->code)));
-        tr_sys_file_close(fd, nullptr);
+        tr_sys_file_close(fd);
         tr_error_propagate(error, &my_error);
         return false;
     }
 
-    tr_sys_file_close(fd, nullptr);
+    tr_sys_file_close(fd);
     return true;
 }
 
-bool tr_saveFile(std::string const& filename, std::string_view contents, tr_error** error)
+bool tr_saveFile(std::string_view filename_in, std::string_view contents, tr_error** error)
 {
+    auto const filename = tr_pathbuf{ filename_in };
     // follow symlinks to find the "real" file, to make sure the temporary
     // we build with tr_sys_file_open_temp() is created on the right partition
-    if (char* const real_filename_c_str = tr_sys_path_resolve(filename.c_str(), nullptr); real_filename_c_str != nullptr)
+    if (char* const real_filename = tr_sys_path_resolve(filename.c_str()); real_filename != nullptr)
     {
-        auto const real_filename = std::string{ real_filename_c_str };
-        tr_free(real_filename_c_str);
-
-        if (real_filename != filename)
+        if (filename_in != real_filename)
         {
-            return tr_saveFile(real_filename, contents, error);
+            auto const saved = tr_saveFile(real_filename, contents, error);
+            tr_free(real_filename);
+            return saved;
         }
+
+        tr_free(real_filename);
     }
 
     // Write it to a temp file first.
     // This is a safeguard against edge cases, e.g. disk full, crash while writing, etc.
-    auto tmp = tr_strvJoin(filename, ".tmp.XXXXXX"sv);
+    auto tmp = tr_pathbuf{ filename.sv(), ".tmp.XXXXXX"sv };
     auto const fd = tr_sys_file_open_temp(std::data(tmp), error);
     if (fd == TR_BAD_SYS_FILE)
     {
@@ -1141,7 +1145,7 @@ bool tr_moveFile(char const* oldpath, char const* newpath, tr_error** error)
     }
 
     /* they might be on the same filesystem... */
-    if (tr_sys_path_rename(oldpath, newpath, nullptr))
+    if (tr_sys_path_rename(oldpath, newpath))
     {
         return true;
     }

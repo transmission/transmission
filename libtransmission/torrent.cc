@@ -3,13 +3,12 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <algorithm> /* EINVAL */
+#include <algorithm>
 #include <array>
-#include <cerrno> /* EINVAL */
+#include <cerrno> // EINVAL
 #include <climits> /* INT_MAX */
 #include <cmath>
 #include <csignal> /* signal() */
-#include <cstring> /* memcmp */
 #include <ctime>
 #include <map>
 #include <set>
@@ -779,29 +778,34 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
             [](auto mtime) { return mtime > 0; });
     }
 
-    // if we don't have a local .torrent or .magnet file already, assume the torrent is new
     auto const filename = tor->hasMetadata() ? tor->torrentFile() : tor->magnetFile();
 
-    bool const is_new_torrent = !tr_sys_path_exists(filename.c_str(), nullptr);
+    // if we don't have a local .torrent or .magnet file already,
+    // assume the torrent is new
+    bool const is_new_torrent = !tr_sys_path_exists(filename.c_str());
+
     if (is_new_torrent)
     {
         tr_error* error = nullptr;
-        if (tor->hasMetadata())
+
+        if (tor->hasMetadata()) // torrent file
         {
-            if (!tr_ctorSaveContents(ctor, filename, &error))
-            {
-                tor->setLocalError(
-                    tr_strvJoin("Unable to save torrent file: ", error->message, " ("sv, std::to_string(error->code), ")"sv));
-            }
+            tr_ctorSaveContents(ctor, filename, &error);
         }
-        else
+        else // magnet link
         {
-            // magnet link
-            if (!tr_ctorSaveMagnetContents(tor, filename, &error))
-            {
-                tor->setLocalError(
-                    tr_strvJoin("Unable to save magnet file: ", error->message, " ("sv, std::to_string(error->code), ")"sv));
-            }
+            auto const magnet_link = tor->magnet();
+            tr_saveFile(filename, magnet_link, &error);
+        }
+
+        if (error != nullptr)
+        {
+            tor->setLocalError(fmt::format(
+                _("Couldn't save '{path}': {error} ({error_code})"),
+                fmt::arg("path", filename),
+                fmt::arg("error", error->message),
+                fmt::arg("error_code", error->code)));
+            tr_error_clear(&error);
         }
 
         tr_error_clear(&error);
@@ -1782,7 +1786,7 @@ static void torrentCallScript(tr_torrent const* tor, char const* script)
     tr_localtime_r(&now, &tm);
     strftime(ctime_str, sizeof(ctime_str), "%a %b %d %T %Y%n", &tm); /* ctime equiv */
 
-    auto torrent_dir = std::string{ tor->currentDir().sv() };
+    auto torrent_dir = std::string{ tor->currentDir() };
     tr_sys_path_native_separators(std::data(torrent_dir));
 
     auto const cmd = std::array<char const*, 2>{ script, nullptr };
@@ -1863,7 +1867,7 @@ void tr_torrent::recheckCompleteness()
 
             if (this->currentDir() == this->incompleteDir())
             {
-                this->setLocation(this->downloadDir().sv(), true, nullptr, nullptr);
+                this->setLocation(this->downloadDir(), true, nullptr, nullptr);
             }
         }
 
@@ -2085,7 +2089,7 @@ bool tr_torrent::setTrackerList(std::string_view text)
     }
 
     auto const has_metadata = this->hasMetadata();
-    if (has_metadata && !announce_list.save(this->torrentFile()))
+    if (has_metadata && !announce_list.save(torrentFile()))
     {
         return false;
     }
@@ -2096,12 +2100,14 @@ bool tr_torrent::setTrackerList(std::string_view text)
     // magnet links
     if (!has_metadata)
     {
+        auto const magnet_file = magnetFile();
+        auto const magnet_link = this->magnet();
         tr_error* save_error = nullptr;
-        if (!tr_ctorSaveMagnetContents(this, this->magnetFile(), &save_error))
+        if (!tr_saveFile(magnet_file, magnet_link, &save_error))
         {
             this->setLocalError(fmt::format(
                 _("Couldn't save '{path}': {error} ({error_code})"),
-                fmt::arg("path", this->magnetFile()),
+                fmt::arg("path", magnet_file),
                 fmt::arg("error", save_error->message),
                 fmt::arg("error_code", save_error->code)));
             tr_error_clear(&save_error);
@@ -2162,7 +2168,7 @@ uint64_t tr_torrentGetBytesLeftToAllocate(tr_torrent const* tor)
             bytesLeft += length;
 
             tr_sys_path_info info;
-            if (path != nullptr && tr_sys_path_get_info(path, 0, &info, nullptr) && info.type == TR_SYS_PATH_IS_FILE &&
+            if (path != nullptr && tr_sys_path_get_info(path, 0, &info) && info.type == TR_SYS_PATH_IS_FILE &&
                 info.size <= length)
             {
                 bytesLeft -= info.size;
@@ -2200,34 +2206,33 @@ static bool isJunkFile(std::string_view base)
 
 static void removeEmptyFoldersAndJunkFiles(char const* folder)
 {
-    auto const odir = tr_sys_dir_open(folder, nullptr);
+    auto const odir = tr_sys_dir_open(folder);
     if (odir == TR_BAD_SYS_DIR)
     {
         return;
     }
 
     char const* name = nullptr;
-    while ((name = tr_sys_dir_read_name(odir, nullptr)) != nullptr)
+    while ((name = tr_sys_dir_read_name(odir)) != nullptr)
     {
         if (strcmp(name, ".") != 0 && strcmp(name, "..") != 0)
         {
             auto const filename = tr_strvPath(folder, name);
 
             auto info = tr_sys_path_info{};
-            if (tr_sys_path_get_info(filename.c_str(), TR_SYS_PATH_NO_FOLLOW, &info, nullptr) &&
-                info.type == TR_SYS_PATH_IS_DIRECTORY)
+            if (tr_sys_path_get_info(filename.c_str(), TR_SYS_PATH_NO_FOLLOW, &info) && info.type == TR_SYS_PATH_IS_DIRECTORY)
             {
                 removeEmptyFoldersAndJunkFiles(filename.c_str());
             }
             else if (isJunkFile(name))
             {
-                tr_sys_path_remove(filename.c_str(), nullptr);
+                tr_sys_path_remove(filename.c_str());
             }
         }
     }
 
-    tr_sys_path_remove(folder, nullptr);
-    tr_sys_dir_close(odir, nullptr);
+    tr_sys_path_remove(folder);
+    tr_sys_dir_close(odir);
 }
 
 /**
@@ -2243,10 +2248,10 @@ static void deleteLocalData(tr_torrent const* tor, tr_fileFunc func)
 {
     auto files = std::vector<std::string>{};
     auto folders = std::set<std::string>{};
-    auto const top = std::string{ tor->currentDir().sv() };
+    auto const top = std::string{ tor->currentDir() };
 
     /* don't try to delete local data if the directory's gone missing */
-    if (!tr_sys_path_exists(top.c_str(), nullptr))
+    if (!tr_sys_path_exists(top.c_str()))
     {
         return;
     }
@@ -2262,18 +2267,18 @@ static void deleteLocalData(tr_torrent const* tor, tr_fileFunc func)
     ***/
 
     auto tmpdir = tr_strvPath(top, tr_torrentName(tor) + "__XXXXXX"s);
-    tr_sys_dir_create_temp(std::data(tmpdir), nullptr);
+    tr_sys_dir_create_temp(std::data(tmpdir));
 
     for (tr_file_index_t f = 0, n = tor->fileCount(); f < n; ++f)
     {
         /* try to find the file, looking in the partial and download dirs */
         auto filename = tr_strvPath(top, tor->fileSubpath(f));
 
-        if (!tr_sys_path_exists(filename.c_str(), nullptr))
+        if (!tr_sys_path_exists(filename.c_str()))
         {
             filename += ".part"sv;
 
-            if (!tr_sys_path_exists(filename.c_str(), nullptr))
+            if (!tr_sys_path_exists(filename.c_str()))
             {
                 filename.clear();
             }
@@ -2298,10 +2303,10 @@ static void deleteLocalData(tr_torrent const* tor, tr_fileFunc func)
     ***/
 
     /* try deleting the local data's top-level files & folders */
-    if (auto const odir = tr_sys_dir_open(tmpdir.c_str(), nullptr); odir != TR_BAD_SYS_DIR)
+    if (auto const odir = tr_sys_dir_open(tmpdir.c_str()); odir != TR_BAD_SYS_DIR)
     {
         char const* name = nullptr;
-        while ((name = tr_sys_dir_read_name(odir, nullptr)) != nullptr)
+        while ((name = tr_sys_dir_read_name(odir)) != nullptr)
         {
             if (strcmp(name, ".") != 0 && strcmp(name, "..") != 0)
             {
@@ -2310,7 +2315,7 @@ static void deleteLocalData(tr_torrent const* tor, tr_fileFunc func)
             }
         }
 
-        tr_sys_dir_close(odir, nullptr);
+        tr_sys_dir_close(odir);
     }
 
     /* go from the bottom up */
@@ -2318,7 +2323,7 @@ static void deleteLocalData(tr_torrent const* tor, tr_fileFunc func)
     {
         auto walk = file;
 
-        while (tr_sys_path_exists(walk.c_str(), nullptr) && !tr_sys_path_is_same(tmpdir.c_str(), walk.c_str(), nullptr))
+        while (tr_sys_path_exists(walk.c_str()) && !tr_sys_path_is_same(tmpdir.c_str(), walk.c_str()))
         {
             (*func)(walk.c_str(), nullptr);
 
@@ -2344,13 +2349,13 @@ static void deleteLocalData(tr_torrent const* tor, tr_fileFunc func)
         }
 
         /* walk up the directory tree until we reach 'top' */
-        if (!tr_sys_path_is_same(top.c_str(), dir.c_str(), nullptr) && dir == top)
+        if (!tr_sys_path_is_same(top.c_str(), dir.c_str()) && dir == top)
         {
             for (;;)
             {
                 auto const parent = tr_sys_path_dirname(dir);
 
-                if (tr_sys_path_is_same(top.c_str(), parent.c_str(), nullptr) || parent == top)
+                if (tr_sys_path_is_same(top.c_str(), parent.c_str()) || parent == top)
                 {
                     folders.emplace(dir);
                     break;
@@ -2368,7 +2373,7 @@ static void deleteLocalData(tr_torrent const* tor, tr_fileFunc func)
     }
 
     /* cleanup */
-    tr_sys_path_remove(tmpdir.c_str(), nullptr);
+    tr_sys_path_remove(tmpdir.c_str());
 }
 
 static void tr_torrentDeleteLocalData(tr_torrent* tor, tr_fileFunc func)
@@ -2415,11 +2420,11 @@ static void setLocationImpl(struct LocationData* const data)
 
     tr_logAddTraceTor(
         tor,
-        fmt::format("Moving '{}' location from currentDir '{}' to '{}'", tor->name(), tor->currentDir().sv(), location));
+        fmt::format("Moving '{}' location from currentDir '{}' to '{}'", tor->name(), tor->currentDir(), location));
 
-    tr_sys_dir_create(location.c_str(), TR_SYS_DIR_CREATE_PARENTS, 0777, nullptr);
+    tr_sys_dir_create(location.c_str(), TR_SYS_DIR_CREATE_PARENTS, 0777);
 
-    if (!tr_sys_path_is_same(location.c_str(), tor->currentDir().c_str(), nullptr))
+    if (!tr_sys_path_is_same(location.c_str(), tor->currentDir().c_str()))
     {
         /* bad idea to move files while they're being verified... */
         tr_verifyRemove(tor);
@@ -2440,7 +2445,7 @@ static void setLocationImpl(struct LocationData* const data)
 
                 tr_logAddTraceTor(tor, fmt::format("Found file #{}: '{}'", i, oldpath));
 
-                if (do_move && !tr_sys_path_is_same(oldpath.c_str(), newpath.c_str(), nullptr))
+                if (do_move && !tr_sys_path_is_same(oldpath.c_str(), newpath.c_str()))
                 {
                     tr_error* error = nullptr;
 
@@ -2675,16 +2680,16 @@ std::optional<tr_torrent::tr_found_file_t> tr_torrent::findFile(std::string& fil
 
     if (!std::empty(this->downloadDir()))
     {
-        auto const base = this->downloadDir().sv();
+        auto const base = this->downloadDir();
 
         tr_buildBuf(filename, base, "/"sv, subpath);
-        if (tr_sys_path_get_info(filename.c_str(), 0, &file_info, nullptr))
+        if (tr_sys_path_get_info(filename.c_str(), 0, &file_info))
         {
             return tr_found_file_t{ file_info, filename, base };
         }
 
         tr_buildBuf(filename, base, "/"sv, subpath, ".part"sv);
-        if (tr_sys_path_get_info(filename.c_str(), 0, &file_info, nullptr))
+        if (tr_sys_path_get_info(filename.c_str(), 0, &file_info))
         {
             return tr_found_file_t{ file_info, filename, base };
         }
@@ -2692,16 +2697,16 @@ std::optional<tr_torrent::tr_found_file_t> tr_torrent::findFile(std::string& fil
 
     if (!std::empty(this->incompleteDir()))
     {
-        auto const base = this->incompleteDir().sv();
+        auto const base = this->incompleteDir();
 
         tr_buildBuf(filename, base, "/"sv, subpath);
-        if (tr_sys_path_get_info(filename.c_str(), 0, &file_info, nullptr))
+        if (tr_sys_path_get_info(filename.c_str(), 0, &file_info))
         {
             return tr_found_file_t{ file_info, filename, base };
         }
 
         tr_buildBuf(filename, base, "/"sv, subpath, ".part"sv);
-        if (tr_sys_path_get_info(filename.c_str(), 0, &file_info, nullptr))
+        if (tr_sys_path_get_info(filename.c_str(), 0, &file_info))
         {
             return tr_found_file_t{ file_info, filename, base };
         }
@@ -2961,23 +2966,23 @@ static int renamePath(tr_torrent* tor, char const* oldpath, char const* newname)
 {
     int err = 0;
 
-    auto const base = tor->isDone() || std::empty(tor->incompleteDir()) ? tor->downloadDir().sv() : tor->incompleteDir().sv();
+    auto const base = tor->isDone() || std::empty(tor->incompleteDir()) ? tor->downloadDir() : tor->incompleteDir();
 
     auto src = tr_strvPath(base, oldpath);
 
-    if (!tr_sys_path_exists(src.c_str(), nullptr)) /* check for it as a partial */
+    if (!tr_sys_path_exists(src.c_str())) /* check for it as a partial */
     {
         src += ".part"sv;
     }
 
-    if (tr_sys_path_exists(src.c_str(), nullptr))
+    if (tr_sys_path_exists(src.c_str()))
     {
         auto const parent = tr_sys_path_dirname(src);
         auto const tgt = tr_strvEndsWith(src, ".part"sv) ? tr_strvJoin(parent, TR_PATH_DELIMITER_STR, newname, ".part"sv) :
                                                            tr_strvPath(parent, newname);
 
         auto tmp = errno;
-        bool const tgt_exists = tr_sys_path_exists(tgt.c_str(), nullptr);
+        bool const tgt_exists = tr_sys_path_exists(tgt.c_str());
         errno = tmp;
 
         if (!tgt_exists)

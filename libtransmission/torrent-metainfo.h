@@ -14,6 +14,7 @@
 
 #include "block-info.h"
 #include "magnet-metainfo.h"
+#include "tr-strbuf.h"
 
 struct tr_error;
 
@@ -134,17 +135,17 @@ public:
         return pieces_offset_;
     }
 
-    [[nodiscard]] std::string torrentFile(std::string_view torrent_dir) const
+    [[nodiscard]] auto torrentFile(std::string_view torrent_dir) const
     {
         return makeFilename(torrent_dir, name(), infoHashString(), BasenameFormat::Hash, ".torrent");
     }
 
-    [[nodiscard]] std::string magnetFile(std::string_view torrent_dir) const
+    [[nodiscard]] auto magnetFile(std::string_view torrent_dir) const
     {
         return makeFilename(torrent_dir, name(), infoHashString(), BasenameFormat::Hash, ".magnet");
     }
 
-    [[nodiscard]] std::string resumeFile(std::string_view resume_dir) const
+    [[nodiscard]] auto resumeFile(std::string_view resume_dir) const
     {
         return makeFilename(resume_dir, name(), infoHashString(), BasenameFormat::Hash, ".resume");
     }
@@ -175,14 +176,14 @@ private:
         NameAndPartialHash
     };
 
-    static std::string makeFilename(
+    [[nodiscard]] static tr_pathbuf makeFilename(
         std::string_view dirname,
         std::string_view name,
         std::string_view info_hash_string,
         BasenameFormat format,
         std::string_view suffix);
 
-    [[nodiscard]] std::string makeFilename(std::string_view dirname, BasenameFormat format, std::string_view suffix) const
+    auto makeFilename(std::string_view dirname, BasenameFormat format, std::string_view suffix) const
     {
         return makeFilename(dirname, name(), infoHashString(), format, suffix);
     }

@@ -675,7 +675,7 @@ static auto loadFromFile(tr_torrent* tor, tr_resume::fields_t fieldsToLoad, bool
     auto buf = std::vector<char>{};
     tr_error* error = nullptr;
     auto top = tr_variant{};
-    if (!tr_loadFile(buf, filename, &error) ||
+    if (!tr_loadFile(filename, buf, &error) ||
         !tr_variantFromBuf(
             &top,
             TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE,
@@ -958,7 +958,8 @@ void save(tr_torrent* tor)
     saveLabels(&top, tor);
     saveGroup(&top, tor);
 
-    if (auto const err = tr_variantToFile(&top, TR_VARIANT_FMT_BENC, tor->resumeFile()); err != 0)
+    auto const resume_file = tor->resumeFile();
+    if (auto const err = tr_variantToFile(&top, TR_VARIANT_FMT_BENC, resume_file); err != 0)
     {
         tor->setLocalError(tr_strvJoin("Unable to save resume file: ", tr_strerror(err)));
     }

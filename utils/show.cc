@@ -7,6 +7,7 @@
 #include <array>
 #include <cstdio>
 #include <ctime>
+#include <iterator>
 #include <string>
 #include <string_view>
 
@@ -39,8 +40,17 @@ char constexpr MyName[] = "transmission-show";
 char constexpr Usage[] = "Usage: transmission-show [options] <torrent-file>";
 char constexpr UserAgent[] = "transmission-show/" LONG_VERSION_STRING;
 
-auto options = std::array<tr_option, 5>{
-    { { 'm', "magnet", "Give a magnet link for the specified torrent", "m", false, nullptr },
+auto options = std::array<tr_option, 14>{
+    { { 'd', "header", "Show only header section", "d", false, nullptr },
+      { 'i', "info", "Show only info section", "i", false, nullptr },
+      { 't', "trackers", "Show only trackers section", "t", false, nullptr },
+      { 'f', "files", "Show only file list", "f", false, nullptr },
+      { 'D', "no-header", "Do not show header section", "D", false, nullptr },
+      { 'I', "no-info", "Do not show info section", "I", false, nullptr },
+      { 'T', "no-trackers", "Do not show trackers section", "T", false, nullptr },
+      { 'F', "no-files", "Do not show files section", "F", false, nullptr },
+      { 'b', "bytes", "Show file sizes in bytes", "b", false, nullptr },
+      { 'm', "magnet", "Give a magnet link for the specified torrent", "m", false, nullptr },
       { 's', "scrape", "Ask the torrent's trackers how many peers are in the torrent's swarm", "s", false, nullptr },
       { 'u', "unsorted", "Do not sort files by name", "u", false, nullptr },
       { 'V', "version", "Show version number and exit", "V", false, nullptr },
@@ -54,6 +64,11 @@ struct app_opts
     bool show_magnet = false;
     bool show_version = false;
     bool unsorted = false;
+    bool print_header = true;
+    bool print_info = true;
+    bool print_trackers = true;
+    bool print_files = true;
+    bool show_bytesize = false;
 };
 
 int parseCommandLine(app_opts& opts, int argc, char const* const* argv)
@@ -65,6 +80,54 @@ int parseCommandLine(app_opts& opts, int argc, char const* const* argv)
     {
         switch (c)
         {
+        case 'b':
+            opts.show_bytesize = true;
+            break;
+
+        case 'f':
+            opts.print_header = false;
+            opts.print_info = false;
+            opts.print_trackers = false;
+            opts.print_files = true;
+            break;
+
+        case 'd':
+            opts.print_header = true;
+            opts.print_info = false;
+            opts.print_trackers = false;
+            opts.print_files = false;
+            break;
+
+        case 'i':
+            opts.print_header = false;
+            opts.print_info = true;
+            opts.print_trackers = false;
+            opts.print_files = false;
+            break;
+
+        case 't':
+            opts.print_header = false;
+            opts.print_info = false;
+            opts.print_trackers = true;
+            opts.print_files = false;
+            break;
+
+        case 'D':
+            opts.print_header = false;
+            break;
+
+        case 'I':
+            opts.print_info = false;
+            break;
+
+        case 'T':
+            opts.print_trackers = false;
+            break;
+
+        case 'F':
+            opts.print_files = false;
+            break;
+
         case 'm':
             opts.show_magnet = true;
             break;
@@ -107,63 +170,84 @@ auto toString(time_t timestamp)
     return std::string{ std::data(buf) };
 }
 
+bool compare_2nd_field(std::string_view const& l, std::string_view const& r)
+{
+    auto l_ = l.find(" ");
+    auto r_ = r.find(" ");
+
+    if (l_ == std::string_view::npos)
+    {
+        return false;
+    }
+    if (r_ == std::string_view::npos)
+    {
+        return true;
+    }
+    return l.substr(l_) <= r.substr(r_);
+}
+
 void showInfo(app_opts const& opts, tr_torrent_metainfo const& metainfo)
 {
     /**
     ***  General Info
     **/
-
-    printf("GENERAL\n\n");
-    printf("  Name: %s\n", metainfo.name().c_str());
-    printf("  Hash: %" TR_PRIsv "\n", TR_PRIsv_ARG(metainfo.infoHashString()));
-    printf("  Created by: %s\n", std::empty(metainfo.creator()) ? "Unknown" : metainfo.creator().c_str());
-    printf("  Created on: %s\n", toString(metainfo.dateCreated()).c_str());
-
-    if (!std::empty(metainfo.comment()))
+    if (opts.print_info)
     {
-        printf("  Comment: %s\n", metainfo.comment().c_str());
-    }
+        printf("GENERAL\n\n");
+        printf("  Name: %s\n", metainfo.name().c_str());
+        printf("  Hash: %" TR_PRIsv "\n", TR_PRIsv_ARG(metainfo.infoHashString()));
+        printf("  Created by: %s\n", std::empty(metainfo.creator()) ? "Unknown" : metainfo.creator().c_str());
+        printf("  Created on: %s\n", toString(metainfo.dateCreated()).c_str());
 
-    if (!std::empty(metainfo.source()))
-    {
-        printf("  Source: %s\n", metainfo.source().c_str());
-    }
+        if (!std::empty(metainfo.comment()))
+        {
+            printf("  Comment: %s\n", metainfo.comment().c_str());
+        }
 
-    printf("  Piece Count: %" PRIu64 "\n", metainfo.pieceCount());
-    printf("  Piece Size: %s\n", tr_formatter_mem_B(metainfo.pieceSize()).c_str());
-    printf("  Total Size: %s\n", tr_formatter_size_B(metainfo.totalSize()).c_str());
-    printf("  Privacy: %s\n", metainfo.isPrivate() ? "Private torrent" : "Public torrent");
+        if (!std::empty(metainfo.source()))
+        {
+            printf("  Source: %s\n", metainfo.source().c_str());
+        }
+
+        printf("  Piece Count: %" PRIu64 "\n", metainfo.pieceCount());
+        printf("  Piece Size: %s\n", tr_formatter_mem_B(metainfo.pieceSize()).c_str());
+        printf("  Total Size: %s\n", tr_formatter_size_B(metainfo.totalSize()).c_str());
+        printf("  Privacy: %s\n", metainfo.isPrivate() ? "Private torrent" : "Public torrent");
+    }
 
     /**
     ***  Trackers
     **/
 
-    printf("\nTRACKERS\n");
-    auto current_tier = std::optional<tr_tracker_tier_t>{};
-    auto print_tier = size_t{ 1 };
-    for (auto const& tracker : metainfo.announceList())
+    if (opts.print_trackers)
     {
-        if (!current_tier || current_tier != tracker.tier)
+        printf("\nTRACKERS\n");
+        auto current_tier = std::optional<tr_tracker_tier_t>{};
+        auto print_tier = size_t{ 1 };
+        for (auto const& tracker : metainfo.announceList())
         {
-            current_tier = tracker.tier;
-            printf("\n  Tier #%zu\n", print_tier);
-            ++print_tier;
+            if (!current_tier || current_tier != tracker.tier)
+            {
+                current_tier = tracker.tier;
+                printf("\n  Tier #%zu\n", print_tier);
+                ++print_tier;
+            }
+
+            printf("  %" TR_PRIsv "\n", TR_PRIsv_ARG(tracker.announce.full));
         }
 
-        printf("  %" TR_PRIsv "\n", TR_PRIsv_ARG(tracker.announce.full));
-    }
-
-    /**
+        /**
     ***
     **/
 
-    if (auto const n_webseeds = metainfo.webseedCount(); n_webseeds > 0)
-    {
-        printf("\nWEBSEEDS\n\n");
-
-        for (size_t i = 0; i < n_webseeds; ++i)
+        if (auto const n_webseeds = metainfo.webseedCount(); n_webseeds > 0)
         {
-            printf("  %s\n", metainfo.webseed(i).c_str());
+            printf("\nWEBSEEDS\n\n");
+
+            for (size_t i = 0; i < n_webseeds; ++i)
+            {
+                printf("  %s\n", metainfo.webseed(i).c_str());
+            }
         }
     }
 
@@ -171,26 +255,50 @@ void showInfo(app_opts const& opts, tr_torrent_metainfo const& metainfo)
     ***  Files
     **/
 
-    printf("\nFILES\n\n");
-
-    auto filenames = std::vector<std::string>{};
-    for (tr_file_index_t i = 0, n = metainfo.fileCount(); i < n; ++i)
+    if (opts.print_files)
     {
-        std::string filename = metainfo.fileSubpath(i);
-        filename += " (";
-        filename += tr_formatter_size_B(metainfo.fileSize(i));
-        filename += ')';
-        filenames.emplace_back(filename);
-    }
+        if (!opts.show_bytesize)
+        {
+            printf("\nFILES\n\n");
+        }
 
-    if (!opts.unsorted)
-    {
-        std::sort(std::begin(filenames), std::end(filenames));
-    }
+        auto filenames = std::vector<std::string>{};
+        for (tr_file_index_t i = 0, n = metainfo.fileCount(); i < n; ++i)
+        {
+            std::string filename;
+            if (opts.show_bytesize)
+            {
+                filename = std::to_string(metainfo.fileSize(i));
+                filename += " ";
+                filename += metainfo.fileSubpath(i);
+            }
+            else
+            {
+                filename = "  ";
+                filename += metainfo.fileSubpath(i);
+                filename += " (";
+                filename += tr_formatter_size_B(metainfo.fileSize(i));
+                filename += ')';
+            }
+            filenames.emplace_back(filename);
+        }
 
-    for (auto const& filename : filenames)
-    {
-        printf("  %s\n", filename.c_str());
+        if (!opts.unsorted)
+        {
+            if (opts.show_bytesize)
+            {
+                std::sort(std::begin(filenames), std::end(filenames), compare_2nd_field);
+            }
+            else
+            {
+                std::sort(std::begin(filenames), std::end(filenames));
+            }
+        }
+
+        for (auto const& filename : filenames)
+        {
+            printf("%s\n", filename.c_str());
+        }
     }
 }
 
@@ -359,10 +467,13 @@ int tr_main(int argc, char* argv[])
     }
     else
     {
-        printf("Name: %s\n", metainfo.name().c_str());
-        printf("File: %" TR_PRIsv "\n", TR_PRIsv_ARG(opts.filename));
-        printf("\n");
-        fflush(stdout);
+        if (opts.print_header)
+        {
+            printf("Name: %s\n", metainfo.name().c_str());
+            printf("File: %" TR_PRIsv "\n", TR_PRIsv_ARG(opts.filename));
+            printf("\n");
+            fflush(stdout);
+        }
 
         if (opts.scrape)
         {

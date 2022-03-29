@@ -10,133 +10,247 @@
 #include <fmt/format.h>
 
 /**
- * A memory buffer which uses a builtin array of N bytes,
- * but falls back to heap allocation when necessary.
- * Useful for building temp strings without heap allocation.
+ * A memory buffer which uses a builtin array of N bytes, using heap
+ * memory only if its string gets too big. Its main use case is building
+ * temporary strings in stack memory.
  *
- * `fmt::basic_memory_buffer` is final, so aggregate intead
- * of subclassing ¯\_(ツ)_/¯
+ * It is a convenience wrapper arouund `fmt::basic_memory_buffer`.
  */
-template<typename T, size_t N>
+template<typename Char, size_t N>
 class tr_strbuf
 {
 private:
-    fmt::basic_memory_buffer<T, N> buffer_;
+    fmt::basic_memory_buffer<Char, N> buffer_;
 
 public:
-    using value_type = T;
-    using const_reference = const T&;
+    using value_type = Char;
+    using const_reference = const Char&;
 
     tr_strbuf() = default;
+    tr_strbuf(tr_strbuf const& other) = delete;
+    tr_strbuf& operator=(tr_strbuf const& other) = delete;
 
-    auto& operator=(tr_strbuf&& other)
+    tr_strbuf(tr_strbuf&& other) noexcept
+    {
+        buffer_ = std::move(other.buffer_);
+    }
+
+    auto& operator=(tr_strbuf&& other) noexcept
     {
         buffer_ = std::move(other.buffer_);
         return *this;
     }
 
-    template<typename ContiguousRange>
-    tr_strbuf(ContiguousRange const& in)
+    template<typename... Args>
+    tr_strbuf(Args const&... args)
     {
-        buffer_.append(in);
+        append(args...);
     }
 
-    [[nodiscard]] constexpr auto begin()
-    {
-        return buffer_.begin();
-    }
-
-    [[nodiscard]] constexpr auto end()
-    {
-        return buffer_.end();
-    }
-
-    [[nodiscard]] constexpr auto begin() const
+    [[nodiscard]] constexpr auto begin() noexcept
     {
         return buffer_.begin();
     }
 
-    [[nodiscard]] constexpr auto end() const
+    [[nodiscard]] constexpr auto end() noexcept
     {
         return buffer_.end();
     }
 
-    [[nodiscard]] T& operator[](size_t pos)
+    [[nodiscard]] constexpr auto begin() const noexcept
+    {
+        return buffer_.begin();
+    }
+
+    [[nodiscard]] constexpr auto end() const noexcept
+    {
+        return buffer_.end();
+    }
+
+    [[nodiscard]] constexpr Char& at(size_t pos) noexcept
     {
         return buffer_[pos];
     }
 
-    [[nodiscard]] constexpr T const& operator[](size_t pos) const
+    [[nodiscard]] constexpr Char at(size_t pos) const noexcept
     {
         return buffer_[pos];
     }
 
-    [[nodiscard]] auto size() const
+    [[nodiscard]] constexpr auto size() const noexcept
     {
         return buffer_.size();
     }
 
-    [[nodiscard]] bool empty() const
+    [[nodiscard]] constexpr bool empty() const noexcept
     {
         return size() == 0;
     }
 
-    [[nodiscard]] auto* data()
+    [[nodiscard]] constexpr auto* data() noexcept
     {
         return buffer_.data();
     }
 
-    [[nodiscard]] auto const* data() const
+    [[nodiscard]] constexpr auto const* data() const noexcept
     {
         return buffer_.data();
+    }
+
+    [[nodiscard]] constexpr auto const* c_str() const noexcept
+    {
+        return data();
+    }
+
+    [[nodiscard]] constexpr auto sv() const noexcept
+    {
+        return std::basic_string_view<Char>{ data(), size() };
     }
 
     ///
 
-    auto clear()
+    [[nodiscard]] constexpr bool ends_with(Char const& x) const noexcept
     {
-        return buffer_.clear();
-    }
-
-    auto resize(size_t n)
-    {
-        return buffer_.resize(n);
-    }
-
-    auto push_back(T const& value)
-    {
-        return buffer_.push_back(value);
+        auto const n = size();
+        return n != 0 && data()[n - 1] == x;
     }
 
     template<typename ContiguousRange>
-    auto append(ContiguousRange const& range)
+    [[nodiscard]] constexpr bool ends_with(ContiguousRange const& x) const noexcept
     {
-        return buffer_.append(std::data(range), std::data(range) + std::size(range));
+        auto const x_len = std::size(x);
+        auto const len = size();
+        return len >= x_len && this->sv().substr(len - x_len) == x;
+    }
+
+    [[nodiscard]] constexpr bool ends_with(Char const* x) const noexcept
+    {
+        return x != nullptr && ends_with(std::basic_string_view<Char>(x));
+    }
+
+    ///
+
+    [[nodiscard]] constexpr bool starts_with(Char const& x) const noexcept
+    {
+        return !empty() && *data() == x;
     }
 
     template<typename ContiguousRange>
-    auto& operator+=(ContiguousRange const& range)
+    [[nodiscard]] constexpr bool starts_with(ContiguousRange const& x) const noexcept
     {
-        append(range);
+        auto const x_len = std::size(x);
+        return size() >= x_len && this->sv().substr(0, x_len) == x;
+    }
+
+    [[nodiscard]] constexpr bool starts_with(Char const* x) const noexcept
+    {
+        return x != nullptr && starts_with(std::basic_string_view<Char>(x));
+    }
+
+    ///
+
+    void clear()
+    {
+        buffer_.clear();
+        ensure_sz();
+    }
+
+    void resize(size_t n)
+    {
+        buffer_.resize(n);
+        ensure_sz();
+    }
+
+    ///
+
+    void append(Char const& value)
+    {
+        buffer_.push_back(value);
+        ensure_sz();
+    }
+
+    template<typename ContiguousRange>
+    void append(ContiguousRange const& args)
+    {
+        buffer_.append(std::data(args), std::data(args) + std::size(args));
+        ensure_sz();
+    }
+
+    void append(Char const* sz_value)
+    {
+        if (sz_value != nullptr)
+        {
+            append(std::basic_string_view<Char>{ sz_value });
+        }
+    }
+
+    template<typename... Args>
+    void append(Args const&... args)
+    {
+        (append(args), ...);
+    }
+
+    template<typename Arg>
+    auto& operator+=(Arg const& arg)
+    {
+        append(arg);
         return *this;
     }
 
-    template<typename ContiguousRange>
-    auto& operator=(ContiguousRange const& range)
+    ///
+
+    template<typename... Args>
+    void assign(Args const&... args)
     {
         clear();
-        append(range);
+        append(args...);
+    }
+
+    template<typename Arg>
+    auto& operator=(Arg const& arg)
+    {
+        assign(arg);
         return *this;
     }
 
-    template<typename... ContiguousRange>
-    void buildPath(ContiguousRange const&... args)
+    void push_back(Char const& value)
     {
-        buffer_.reserve(sizeof...(args) + (std::size(args) + ...));
-        ((append(args), push_back('/')), ...);
+        append(value);
+    }
+
+    ///
+
+    template<typename... Args>
+    void join(Char delim, Args const&... args)
+    {
+        ((append(args), append(delim)), ...);
         resize(size() - 1);
     }
 
+    template<typename ContiguousRange, typename... Args>
+    void join(ContiguousRange const& delim, Args const&... args)
+    {
+        ((append(args), append(delim)), ...);
+        resize(size() - std::size(delim));
+    }
+
+    template<typename... Args>
+    void join(Char const* sz_delim, Args const&... args)
+    {
+        join(std::basic_string_view<Char>{ sz_delim }, args...);
+    }
+
+    [[nodiscard]] constexpr operator std::basic_string_view<Char>() const noexcept
+    {
+        return sv();
+    }
+
+    [[nodiscard]] constexpr operator auto() const noexcept
+    {
+        return c_str();
+    }
+
+private:
     /**
      * Ensure that the buffer's string is zero-terminated, e.g. for
      * external APIs that require char* strings.
@@ -147,19 +261,18 @@ public:
     void ensure_sz()
     {
         auto const n = size();
-        buffer_.try_reserve(n + 1);
+        buffer_.reserve(n + 1);
         buffer_[n] = '\0';
     }
+};
 
-    auto const* c_str()
+template<typename Char, size_t N>
+struct fmt::formatter<tr_strbuf<Char, N>> : formatter<std::basic_string_view<Char>, Char>
+{
+    template<typename FormatContext>
+    constexpr auto format(tr_strbuf<Char, N> const& strbuf, FormatContext& ctx) const
     {
-        ensure_sz();
-        return data();
-    }
-
-    [[nodiscard]] constexpr auto sv() const
-    {
-        return std::string_view{ data(), size() };
+        return formatter<std::basic_string_view<Char>, Char>::format(strbuf.sv(), ctx);
     }
 };
 

@@ -13,6 +13,7 @@
 #include "error.h"
 #include "torrent-metainfo.h"
 #include "torrent.h"
+#include "tr-strbuf.h"
 #include "utils.h"
 
 #include "test-fixtures.h"
@@ -41,7 +42,7 @@ TEST_F(TorrentMetainfoTest, magnetLink)
     EXPECT_TRUE(metainfo.parseMagnet(MagnetLink));
     EXPECT_EQ(0, metainfo.fileCount()); // because it's a magnet link
     EXPECT_EQ(2, std::size(metainfo.announceList()));
-    EXPECT_EQ(MagnetLink, metainfo.magnet());
+    EXPECT_EQ(MagnetLink, metainfo.magnet().sv());
 }
 
 #define BEFORE_PATH \
@@ -159,13 +160,13 @@ TEST_F(TorrentMetainfoTest, AndroidTorrent)
 
 TEST_F(TorrentMetainfoTest, ctorSaveContents)
 {
-    auto const src_filename = tr_strvJoin(LIBTRANSMISSION_TEST_ASSETS_DIR, "/Android-x86 8.1 r6 iso.torrent"sv);
-    auto const tgt_filename = tr_strvJoin(::testing::TempDir(), "save-contents-test.torrent");
+    auto const src_filename = tr_pathbuf{ LIBTRANSMISSION_TEST_ASSETS_DIR, "/Android-x86 8.1 r6 iso.torrent"sv };
+    auto const tgt_filename = tr_pathbuf{ ::testing::TempDir(), "save-contents-test.torrent" };
 
     // try saving without passing any metainfo.
     auto* ctor = tr_ctorNew(session_);
     tr_error* error = nullptr;
-    EXPECT_FALSE(tr_ctorSaveContents(ctor, tgt_filename, &error));
+    EXPECT_FALSE(tr_ctorSaveContents(ctor, tgt_filename.sv(), &error));
     EXPECT_NE(nullptr, error);
     if (error != nullptr)
     {
@@ -176,14 +177,14 @@ TEST_F(TorrentMetainfoTest, ctorSaveContents)
     // now try saving _with_ metainfo
     EXPECT_TRUE(tr_ctorSetMetainfoFromFile(ctor, src_filename.c_str(), &error));
     EXPECT_EQ(nullptr, error) << *error;
-    EXPECT_TRUE(tr_ctorSaveContents(ctor, tgt_filename, &error));
+    EXPECT_TRUE(tr_ctorSaveContents(ctor, tgt_filename.sv(), &error));
     EXPECT_EQ(nullptr, error) << *error;
 
     // the saved contents should match the source file's contents
     auto src_contents = std::vector<char>{};
-    EXPECT_TRUE(tr_loadFile(src_contents, src_filename, &error));
+    EXPECT_TRUE(tr_loadFile(src_filename.sv(), src_contents, &error));
     auto tgt_contents = std::vector<char>{};
-    EXPECT_TRUE(tr_loadFile(tgt_contents, tgt_filename, &error));
+    EXPECT_TRUE(tr_loadFile(tgt_filename.sv(), tgt_contents, &error));
     EXPECT_EQ(src_contents, tgt_contents);
 
     // cleanup

@@ -3,6 +3,9 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include <cstring>
+#include <set>
+
 #include "transmission.h"
 
 #include "torrent.h"
@@ -10,9 +13,6 @@
 #include "utils.h"
 
 #include "gtest/gtest.h"
-
-#include <cstring>
-#include <set>
 
 using namespace std::literals;
 

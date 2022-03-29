@@ -44,8 +44,8 @@ static void blocklistClose(tr_blocklistFile* b)
 {
     if (b->rules != nullptr)
     {
-        tr_sys_file_unmap(b->rules, b->byteCount, nullptr);
-        tr_sys_file_close(b->fd, nullptr);
+        tr_sys_file_unmap(b->rules, b->byteCount);
+        tr_sys_file_close(b->fd);
         b->rules = nullptr;
         b->ruleCount = 0;
         b->byteCount = 0;
@@ -58,7 +58,7 @@ static void blocklistLoad(tr_blocklistFile* b)
     blocklistClose(b);
 
     auto info = tr_sys_path_info{};
-    if (!tr_sys_path_get_info(b->filename, 0, &info, nullptr))
+    if (!tr_sys_path_get_info(b->filename, 0, &info))
     {
         return;
     }
@@ -90,7 +90,7 @@ static void blocklistLoad(tr_blocklistFile* b)
             fmt::arg("path", b->filename),
             fmt::arg("error", error->message),
             fmt::arg("error_code", error->code)));
-        tr_sys_file_close(fd, nullptr);
+        tr_sys_file_close(fd);
         tr_error_free(error);
         return;
     }
@@ -134,7 +134,7 @@ static int compareAddressToRange(void const* va, void const* vb)
 static void blocklistDelete(tr_blocklistFile* b)
 {
     blocklistClose(b);
-    tr_sys_path_remove(b->filename, nullptr);
+    tr_sys_path_remove(b->filename);
 }
 
 /***
@@ -165,7 +165,7 @@ void tr_blocklistFileFree(tr_blocklistFile* b)
 
 bool tr_blocklistFileExists(tr_blocklistFile const* b)
 {
-    return tr_sys_path_exists(b->filename, nullptr);
+    return tr_sys_path_exists(b->filename);
 }
 
 int tr_blocklistFileGetRuleCount(tr_blocklistFile const* b)
@@ -399,12 +399,12 @@ int tr_blocklistFileSetContent(tr_blocklistFile* b, char const* filename)
             fmt::arg("error", error->message),
             fmt::arg("error_code", error->code)));
         tr_error_free(error);
-        tr_sys_file_close(in, nullptr);
+        tr_sys_file_close(in);
         return 0;
     }
 
     /* load the rules into memory */
-    while (tr_sys_file_read_line(in, line, sizeof(line), nullptr))
+    while (tr_sys_file_read_line(in, line, sizeof(line)))
     {
         struct tr_ipv4_range range;
 
@@ -486,8 +486,8 @@ int tr_blocklistFileSetContent(tr_blocklistFile* b, char const* filename)
     }
 
     tr_free(ranges);
-    tr_sys_file_close(out, nullptr);
-    tr_sys_file_close(in, nullptr);
+    tr_sys_file_close(out);
+    tr_sys_file_close(in);
 
     blocklistLoad(b);
 

@@ -111,7 +111,7 @@ protected:
     static std::string create_sandbox(std::string const& parent_dir, std::string const& tmpl)
     {
         auto path = tr_strvPath(parent_dir, tmpl);
-        tr_sys_dir_create_temp(std::data(path), nullptr);
+        tr_sys_dir_create_temp(std::data(path));
         tr_sys_path_native_separators(std::data(path));
         return path;
     }
@@ -121,13 +121,13 @@ protected:
         std::vector<std::string> ret;
 
         tr_sys_path_info info;
-        if (tr_sys_path_get_info(path.data(), 0, &info, nullptr) && (info.type == TR_SYS_PATH_IS_DIRECTORY))
+        if (tr_sys_path_get_info(path.data(), 0, &info) && (info.type == TR_SYS_PATH_IS_DIRECTORY))
         {
-            auto const odir = tr_sys_dir_open(path.data(), nullptr);
+            auto const odir = tr_sys_dir_open(path.data());
             if (odir != TR_BAD_SYS_DIR)
             {
                 char const* name;
-                while ((name = tr_sys_dir_read_name(odir, nullptr)) != nullptr)
+                while ((name = tr_sys_dir_read_name(odir)) != nullptr)
                 {
                     if (strcmp(name, ".") != 0 && strcmp(name, "..") != 0)
                     {
@@ -135,7 +135,7 @@ protected:
                     }
                 }
 
-                tr_sys_dir_close(odir, nullptr);
+                tr_sys_dir_close(odir);
             }
         }
 
@@ -154,7 +154,7 @@ protected:
             std::cerr << "cleanup: removing '" << path << "'" << std::endl;
         }
 
-        tr_sys_path_remove(path.data(), nullptr);
+        tr_sys_path_remove(path.data());
     }
 
 private:
@@ -219,9 +219,9 @@ protected:
         buildParentDir(tmpl);
 
         // NOLINTNEXTLINE(clang-analyzer-cplusplus.InnerPointer)
-        auto const fd = tr_sys_file_open_temp(&tmpl.front(), nullptr);
+        auto const fd = tr_sys_file_open_temp(&tmpl.front());
         blockingFileWrite(fd, payload, n);
-        tr_sys_file_close(fd, nullptr);
+        tr_sys_file_close(fd);
         sync();
 
         errno = tmperr;
@@ -239,7 +239,7 @@ protected:
             0600,
             nullptr);
         blockingFileWrite(fd, payload, n);
-        tr_sys_file_close(fd, nullptr);
+        tr_sys_file_close(fd);
         sync();
 
         errno = tmperr;
@@ -309,7 +309,7 @@ private:
         auto q = TR_KEY_download_dir;
         auto const download_dir = tr_variantDictFindStrView(settings, q, &sv) ? tr_strvPath(sandboxDir(), sv) :
                                                                                 tr_strvPath(sandboxDir(), "Downloads");
-        tr_sys_dir_create(download_dir.data(), TR_SYS_DIR_CREATE_PARENTS, 0700, nullptr);
+        tr_sys_dir_create(download_dir.data(), TR_SYS_DIR_CREATE_PARENTS, 0700);
         tr_variantDictAddStr(settings, q, download_dir.data());
 
         // incomplete dir
@@ -320,7 +320,7 @@ private:
 
         // blocklists
         auto const blocklist_dir = tr_strvPath(sandboxDir(), "blocklists");
-        tr_sys_dir_create(blocklist_dir.data(), TR_SYS_DIR_CREATE_PARENTS, 0700, nullptr);
+        tr_sys_dir_create(blocklist_dir.data(), TR_SYS_DIR_CREATE_PARENTS, 0700);
 
         // fill in any missing settings
 
@@ -405,7 +405,7 @@ protected:
                                                 tr_strvJoin(tor->currentDir().sv(), TR_PATH_DELIMITER_STR, file.name);
 
             auto const dirname = tr_sys_path_dirname(path);
-            tr_sys_dir_create(dirname.data(), TR_SYS_DIR_CREATE_PARENTS, 0700, nullptr);
+            tr_sys_dir_create(dirname.data(), TR_SYS_DIR_CREATE_PARENTS, 0700);
             auto fd = tr_sys_file_open(
                 path.c_str(),
                 TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_TRUNCATE,
@@ -414,14 +414,14 @@ protected:
 
             for (uint64_t j = 0; j < file.length; ++j)
             {
-                tr_sys_file_write(fd, (!complete && i == 0 && j < tor->pieceSize()) ? "\1" : "\0", 1, nullptr, nullptr);
+                tr_sys_file_write(fd, (!complete && i == 0 && j < tor->pieceSize()) ? "\1" : "\0", 1, nullptr);
             }
 
-            tr_sys_file_close(fd, nullptr);
+            tr_sys_file_close(fd);
 
             path = makeString(tr_torrentFindFile(tor, i));
             auto const err = errno;
-            EXPECT_TRUE(tr_sys_path_exists(path.c_str(), nullptr));
+            EXPECT_TRUE(tr_sys_path_exists(path.c_str()));
             errno = err;
         }
 

@@ -36,11 +36,17 @@ TEST_F(StrbufTest, assign)
     EXPECT_EQ(Value, buf.sv());
 }
 
-TEST_F(StrbufTest, buildPath)
+TEST_F(StrbufTest, cStr)
 {
-    auto buf = tr_pathbuf{};
-    buf.buildPath("foo"sv, "bar"sv, "baz"sv);
-    EXPECT_EQ("foo/bar/baz", buf.sv());
+    static char const* const Value = "Hello, World!";
+
+    auto buf = tr_pathbuf{ Value };
+    EXPECT_STREQ(Value, buf.c_str());
+    EXPECT_EQ(strlen(Value), std::size(buf));
+
+    buf = tr_pathbuf{ "H", Value + 1 };
+    EXPECT_STREQ(Value, buf.c_str());
+    EXPECT_EQ(strlen(Value), std::size(buf));
 }
 
 TEST_F(StrbufTest, clear)
@@ -67,6 +73,12 @@ TEST_F(StrbufTest, constructorAssign)
 
     auto buf = tr_pathbuf{ Value };
     EXPECT_EQ(Value, buf.sv());
+
+    buf = tr_pathbuf{ Value.substr(7, 5), Value.substr(5, 2), Value.substr(0, 5), Value.substr(12, 1) };
+    EXPECT_EQ("World, Hello!"sv, buf.sv());
+
+    buf = tr_pathbuf{ "Hello, ", "World!" };
+    EXPECT_EQ(Value, buf.sv());
 }
 
 TEST_F(StrbufTest, heap)
@@ -90,14 +102,14 @@ TEST_F(StrbufTest, indexOperator)
     // mutable
     {
         auto buf = tr_pathbuf{ Value1 };
-        buf[0] = 'W';
+        buf.at(0) = 'W';
         EXPECT_EQ(Value2, buf.sv());
     }
 
     // const
     {
         auto const buf = tr_pathbuf{ Value1 };
-        EXPECT_EQ(Value1.front(), buf[0]);
+        EXPECT_EQ(Value1.front(), buf.at(0));
     }
 }
 
@@ -124,10 +136,63 @@ TEST_F(StrbufTest, iterators)
     }
 }
 
-TEST_F(StrbufTest, sz)
+TEST_F(StrbufTest, join)
 {
-    static char const* const Value = "Hello, World!";
-    auto buf = tr_pathbuf{ std::string_view{ Value } };
-    EXPECT_STREQ(Value, buf.c_str());
-    EXPECT_EQ(strlen(Value), std::size(buf));
+    auto buf = tr_pathbuf{};
+
+    buf.clear();
+    buf.join(' ', 'A', "short", "phrase"sv);
+    EXPECT_EQ("A short phrase"sv, buf.sv());
+
+    buf.clear();
+    buf.join("  ", 'A', "short", "phrase"sv);
+    EXPECT_EQ("A  short  phrase"sv, buf.sv());
+
+    buf.clear();
+    buf.join("--"sv, 'A', "short", "phrase"sv);
+    EXPECT_EQ("A--short--phrase"sv, buf.sv());
+}
+
+TEST_F(StrbufTest, startsWith)
+{
+    auto const buf = tr_pathbuf{ "/hello/world" };
+    EXPECT_TRUE(buf.starts_with('/'));
+    EXPECT_TRUE(buf.starts_with("/"));
+    EXPECT_TRUE(buf.starts_with("/"sv));
+    EXPECT_TRUE(buf.starts_with("/hello"));
+    EXPECT_TRUE(buf.starts_with("/hello"sv));
+    EXPECT_TRUE(buf.starts_with("/hello/world"));
+    EXPECT_TRUE(buf.starts_with("/hello/world"sv));
+
+    EXPECT_FALSE(buf.starts_with('g'));
+    EXPECT_FALSE(buf.starts_with("g"));
+    EXPECT_FALSE(buf.starts_with("g"sv));
+    EXPECT_FALSE(buf.starts_with("ghello"));
+    EXPECT_FALSE(buf.starts_with("ghello"sv));
+    EXPECT_FALSE(buf.starts_with("/hellg"));
+    EXPECT_FALSE(buf.starts_with("/hellg"sv));
+    EXPECT_FALSE(buf.starts_with("/hellg/world"));
+    EXPECT_FALSE(buf.starts_with("/hellg/world"sv));
+}
+
+TEST_F(StrbufTest, endsWith)
+{
+    auto const buf = tr_pathbuf{ "/hello/world" };
+    EXPECT_TRUE(buf.ends_with('d'));
+    EXPECT_TRUE(buf.ends_with("d"));
+    EXPECT_TRUE(buf.ends_with("d"sv));
+    EXPECT_TRUE(buf.ends_with("world"));
+    EXPECT_TRUE(buf.ends_with("world"sv));
+    EXPECT_TRUE(buf.ends_with("/hello/world"));
+    EXPECT_TRUE(buf.ends_with("/hello/world"sv));
+
+    EXPECT_FALSE(buf.ends_with('g'));
+    EXPECT_FALSE(buf.ends_with("g"));
+    EXPECT_FALSE(buf.ends_with("g"sv));
+    EXPECT_FALSE(buf.ends_with("gorld"));
+    EXPECT_FALSE(buf.ends_with("gorld"sv));
+    EXPECT_FALSE(buf.ends_with("worlg"));
+    EXPECT_FALSE(buf.ends_with("worlg"sv));
+    EXPECT_FALSE(buf.ends_with("/hellg/world"));
+    EXPECT_FALSE(buf.ends_with("/hellg/world"sv));
 }
