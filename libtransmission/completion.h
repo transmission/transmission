@@ -129,12 +129,12 @@ struct tr_completion
 
     [[nodiscard]] uint64_t countHasBytesInSpan(tr_byte_span_t) const;
 
-private:
-    [[nodiscard]] constexpr bool hasMetainfo() const
+    [[nodiscard]] constexpr bool hasMetainfo() const noexcept
     {
         return !std::empty(blocks_);
     }
 
+private:
     [[nodiscard]] uint64_t computeHasValid() const;
     [[nodiscard]] uint64_t computeSizeWhenDone() const;
     [[nodiscard]] uint64_t countHasBytesInBlocks(tr_block_span_t) const;

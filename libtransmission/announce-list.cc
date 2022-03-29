@@ -223,7 +223,7 @@ bool tr_announce_list::canAdd(tr_url_parsed_t const& announce)
     return std::none_of(std::begin(trackers_), std::end(trackers_), is_same);
 }
 
-bool tr_announce_list::save(std::string const& torrent_file, tr_error** error) const
+bool tr_announce_list::save(std::string_view torrent_file, tr_error** error) const
 {
     // load the torrent file
     auto metainfo = tr_variant{};

@@ -4,6 +4,7 @@
 // License text can be found in the licenses/ folder.
 
 #include <algorithm>
+#include <iterator>
 #include <set>
 #include <string>
 #include <string_view>
@@ -456,16 +457,17 @@ void onPartialDataFetched(tr_web::FetchResponse const& web_response)
     on_idle(webseed);
 }
 
-std::string make_url(tr_webseed* w, std::string_view name)
+template<typename OutputIt>
+void makeUrl(tr_webseed* w, std::string_view name, OutputIt out)
 {
-    auto url = w->base_url;
+    auto const url = w->base_url;
+
+    out = std::copy(std::begin(url), std::end(url), out);
 
     if (tr_strvEndsWith(url, "/"sv) && !std::empty(name))
     {
-        tr_http_escape(url, name, false);
+        tr_http_escape(out, name, false);
     }
-
-    return url;
 }
 
 void task_request_next_chunk(tr_webseed_task* task)
@@ -485,8 +487,9 @@ void task_request_next_chunk(tr_webseed_task* task)
 
     webseed->connection_limiter.taskStarted();
 
-    auto const url = make_url(webseed, tor->fileSubpath(file_index));
-    auto options = tr_web::FetchOptions{ url, onPartialDataFetched, task };
+    auto url = tr_urlbuf{};
+    makeUrl(webseed, tor->fileSubpath(file_index), std::back_inserter(url));
+    auto options = tr_web::FetchOptions{ url.sv(), onPartialDataFetched, task };
     options.range = tr_strvJoin(std::to_string(file_offset), "-"sv, std::to_string(file_offset + this_chunk - 1));
     options.speed_limit_tag = tor->uniqueId;
     options.buffer = task->content();

@@ -6,7 +6,6 @@
 #include <algorithm>
 #include <array>
 #include <cctype>
-#include <iterator>
 #include <numeric>
 #include <string>
 #include <string_view>
@@ -501,7 +500,7 @@ tr_sha1_digest_t const& tr_torrent_metainfo::pieceHash(tr_piece_index_t piece) c
     return this->pieces_[piece];
 }
 
-std::string tr_torrent_metainfo::makeFilename(
+tr_pathbuf tr_torrent_metainfo::makeFilename(
     std::string_view dirname,
     std::string_view name,
     std::string_view info_hash_string,
@@ -510,8 +509,8 @@ std::string tr_torrent_metainfo::makeFilename(
 {
     // `${dirname}/${name}.${info_hash}${suffix}`
     // `${dirname}/${info_hash}${suffix}`
-    return format == BasenameFormat::Hash ? tr_strvJoin(dirname, "/"sv, info_hash_string, suffix) :
-                                            tr_strvJoin(dirname, "/"sv, name, "."sv, info_hash_string.substr(0, 16), suffix);
+    return format == BasenameFormat::Hash ? tr_pathbuf{ dirname, "/"sv, info_hash_string, suffix } :
+                                            tr_pathbuf{ dirname, "/"sv, name, "."sv, info_hash_string.substr(0, 16), suffix };
 }
 
 bool tr_torrent_metainfo::migrateFile(
@@ -556,11 +555,8 @@ void tr_torrent_metainfo::removeFile(
     std::string_view info_hash_string,
     std::string_view suffix)
 {
-    auto filename = makeFilename(dirname, name, info_hash_string, BasenameFormat::NameAndPartialHash, suffix);
-    tr_sys_path_remove(filename.c_str());
-
-    filename = makeFilename(dirname, name, info_hash_string, BasenameFormat::Hash, suffix);
-    tr_sys_path_remove(filename.c_str());
+    tr_sys_path_remove(makeFilename(dirname, name, info_hash_string, BasenameFormat::NameAndPartialHash, suffix));
+    tr_sys_path_remove(makeFilename(dirname, name, info_hash_string, BasenameFormat::Hash, suffix));
 }
 
 std::string const& tr_torrent_metainfo::fileSubpath(tr_file_index_t i) const

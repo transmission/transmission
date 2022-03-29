@@ -676,7 +676,7 @@ static void initField(tr_torrent const* const tor, tr_stat const* const st, tr_v
         break;
 
     case TR_KEY_pieces:
-        if (tor->hasMetadata())
+        if (tor->hasMetainfo())
         {
             auto const bytes = tor->createPieceBitfield();
             auto const enc = tr_base64_encode({ reinterpret_cast<char const*>(std::data(bytes)), std::size(bytes) });
@@ -794,7 +794,7 @@ static void initField(tr_torrent const* const tor, tr_stat const* const st, tr_v
         }
 
     case TR_KEY_torrentFile:
-        tr_variantInitStrView(initme, tor->torrentFile());
+        tr_variantInitStr(initme, tor->torrentFile());
         break;
 
     case TR_KEY_totalSize:
@@ -1084,6 +1084,7 @@ static char const* addTrackerUrls(tr_torrent* tor, tr_variant* urls)
     }
 
     tor->announceList().save(tor->torrentFile());
+
     return nullptr;
 }
 
@@ -1109,6 +1110,7 @@ static char const* replaceTrackers(tr_torrent* tor, tr_variant* urls)
     }
 
     tor->announceList().save(tor->torrentFile());
+
     return nullptr;
 }
 
@@ -1134,6 +1136,7 @@ static char const* removeTrackers(tr_torrent* tor, tr_variant* ids)
     }
 
     tor->announceList().save(tor->torrentFile());
+
     return nullptr;
 }
 

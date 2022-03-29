@@ -943,7 +943,7 @@ void save(tr_torrent* tor)
     tr_variantDictAddBool(&top, TR_KEY_paused, !tor->isRunning && !tor->isQueued());
     savePeers(&top, tor);
 
-    if (tor->hasMetadata())
+    if (tor->hasMetainfo())
     {
         saveFilePriorities(&top, tor);
         saveDND(&top, tor);
@@ -958,7 +958,8 @@ void save(tr_torrent* tor)
     saveLabels(&top, tor);
     saveGroup(&top, tor);
 
-    if (auto const err = tr_variantToFile(&top, TR_VARIANT_FMT_BENC, tor->resumeFile()); err != 0)
+    auto const resume_file = tor->resumeFile();
+    if (auto const err = tr_variantToFile(&top, TR_VARIANT_FMT_BENC, resume_file); err != 0)
     {
         tor->setLocalError(tr_strvJoin("Unable to save resume file: ", tr_strerror(err)));
     }

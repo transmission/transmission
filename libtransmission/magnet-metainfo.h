@@ -12,6 +12,7 @@
 #include "transmission.h"
 
 #include "announce-list.h"
+#include "tr-strbuf.h" // tr_urlbuf
 
 struct tr_error;
 struct tr_variant;
@@ -21,7 +22,7 @@ class tr_magnet_metainfo
 public:
     bool parseMagnet(std::string_view magnet_link, tr_error** error = nullptr);
 
-    std::string magnet() const;
+    [[nodiscard]] tr_urlbuf magnet() const;
 
     auto const& infoHash() const
     {

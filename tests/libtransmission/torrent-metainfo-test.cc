@@ -42,7 +42,7 @@ TEST_F(TorrentMetainfoTest, magnetLink)
     EXPECT_TRUE(metainfo.parseMagnet(MagnetLink));
     EXPECT_EQ(0, metainfo.fileCount()); // because it's a magnet link
     EXPECT_EQ(2, std::size(metainfo.announceList()));
-    EXPECT_EQ(MagnetLink, metainfo.magnet());
+    EXPECT_EQ(MagnetLink, metainfo.magnet().sv());
 }
 
 #define BEFORE_PATH \
@@ -166,7 +166,7 @@ TEST_F(TorrentMetainfoTest, ctorSaveContents)
     // try saving without passing any metainfo.
     auto* ctor = tr_ctorNew(session_);
     tr_error* error = nullptr;
-    EXPECT_FALSE(tr_ctorSaveContents(ctor, tgt_filename.c_str(), &error));
+    EXPECT_FALSE(tr_ctorSaveContents(ctor, tgt_filename.sv(), &error));
     EXPECT_NE(nullptr, error);
     if (error != nullptr)
     {
@@ -177,7 +177,7 @@ TEST_F(TorrentMetainfoTest, ctorSaveContents)
     // now try saving _with_ metainfo
     EXPECT_TRUE(tr_ctorSetMetainfoFromFile(ctor, src_filename.c_str(), &error));
     EXPECT_EQ(nullptr, error) << *error;
-    EXPECT_TRUE(tr_ctorSaveContents(ctor, tgt_filename.c_str(), &error));
+    EXPECT_TRUE(tr_ctorSaveContents(ctor, tgt_filename.sv(), &error));
     EXPECT_EQ(nullptr, error) << *error;
 
     // the saved contents should match the source file's contents

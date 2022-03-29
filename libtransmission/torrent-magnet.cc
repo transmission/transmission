@@ -64,7 +64,7 @@ static void incompleteMetadataFree(struct tr_incomplete_metadata* m)
 
 bool tr_torrentSetMetadataSizeHint(tr_torrent* tor, int64_t size)
 {
-    if (tor->hasMetadata())
+    if (tor->hasMetainfo())
     {
         return false;
     }
@@ -118,12 +118,12 @@ void* tr_torrentGetMetadataPiece(tr_torrent const* tor, int piece, size_t* len)
     TR_ASSERT(piece >= 0);
     TR_ASSERT(len != nullptr);
 
-    if (!tor->hasMetadata())
+    if (!tor->hasMetainfo())
     {
         return nullptr;
     }
 
-    auto const fd = tr_sys_file_open(tor->torrentFile().c_str(), TR_SYS_FILE_READ, 0);
+    auto const fd = tr_sys_file_open(tor->torrentFile(), TR_SYS_FILE_READ, 0);
     if (fd == TR_BAD_SYS_FILE)
     {
         return nullptr;
@@ -273,13 +273,13 @@ static bool useNewMetainfo(tr_torrent* tor, tr_incomplete_metadata const* m, tr_
     }
 
     // save it
-    if (auto const filename = tor->torrentFile(); !tr_saveFile(filename, benc, error))
+    if (!tr_saveFile(tor->torrentFile(), benc, error))
     {
         return false;
     }
 
     // remove .magnet file
-    tr_sys_path_remove(tor->magnetFile().c_str());
+    tr_sys_path_remove(tor->magnetFile());
 
     // tor should keep this metainfo
     tor->setMetainfo(metainfo);
@@ -400,7 +400,7 @@ bool tr_torrentGetNextMetadataRequest(tr_torrent* tor, time_t now, int* setme_pi
 
 double tr_torrentGetMetadataPercent(tr_torrent const* tor)
 {
-    if (tor->hasMetadata())
+    if (tor->hasMetainfo())
     {
         return 1.0;
     }

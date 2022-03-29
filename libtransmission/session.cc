@@ -124,8 +124,14 @@ tr_peer_id_t tr_peerIdInit()
 
 std::optional<std::string> tr_session::WebMediator::cookieFile() const
 {
-    auto const str = tr_strvPath(session_->config_dir, "cookies.txt");
-    return tr_sys_path_exists(str.c_str()) ? std::optional<std::string>{ str } : std::nullopt;
+    auto const path = tr_pathbuf{ session_->config_dir, "/cookies.txt" };
+
+    if (!tr_sys_path_exists(path))
+    {
+        return {};
+    }
+
+    return std::string{ path };
 }
 
 std::optional<std::string> tr_session::WebMediator::userAgent() const
@@ -489,7 +495,7 @@ bool tr_sessionLoadSettings(tr_variant* dict, char const* config_dir, char const
     auto fileSettings = tr_variant{};
     auto const filename = tr_pathbuf{ config_dir, "/settings.json"sv };
     auto success = bool{};
-    if (tr_error* error = nullptr; tr_variantFromFile(&fileSettings, TR_VARIANT_PARSE_JSON, filename.sv(), &error))
+    if (tr_error* error = nullptr; tr_variantFromFile(&fileSettings, TR_VARIANT_PARSE_JSON, filename, &error))
     {
         tr_variantMergeDicts(dict, &fileSettings);
         tr_variantFree(&fileSettings);
@@ -518,7 +524,7 @@ void tr_sessionSaveSettings(tr_session* session, char const* config_dir, tr_vari
     {
         tr_variant fileSettings;
 
-        if (tr_variantFromFile(&fileSettings, TR_VARIANT_PARSE_JSON, filename.sv(), nullptr))
+        if (tr_variantFromFile(&fileSettings, TR_VARIANT_PARSE_JSON, filename, nullptr))
         {
             tr_variantMergeDicts(&settings, &fileSettings);
             tr_variantFree(&fileSettings);
@@ -538,7 +544,7 @@ void tr_sessionSaveSettings(tr_session* session, char const* config_dir, tr_vari
     }
 
     /* save the result */
-    tr_variantToFile(&settings, TR_VARIANT_FMT_JSON, filename.sv());
+    tr_variantToFile(&settings, TR_VARIANT_FMT_JSON, filename);
 
     /* cleanup */
     tr_variantFree(&settings);
@@ -2033,9 +2039,9 @@ static void sessionLoadTorrents(struct sessionLoadTorrentsData* const data)
             auto const path = tr_pathbuf{ dirname_sv, "/"sv, name };
 
             // is a magnet link?
-            if (!tr_ctorSetMetainfoFromFile(data->ctor, std::string{ path.sv() }, nullptr))
+            if (!tr_ctorSetMetainfoFromFile(data->ctor, std::string{ path }, nullptr))
             {
-                if (auto buf = std::vector<char>{}; tr_loadFile(path.sv(), buf))
+                if (auto buf = std::vector<char>{}; tr_loadFile(path, buf))
                 {
                     tr_ctorSetMetainfoFromMagnetLink(
                         data->ctor,
@@ -2876,7 +2882,7 @@ static void bandwidthGroupRead(tr_session* session, std::string_view config_dir)
 {
     auto const filename = tr_pathbuf{ config_dir, "/"sv, BandwidthGroupsFilename };
     auto groups_dict = tr_variant{};
-    if (!tr_variantFromFile(&groups_dict, TR_VARIANT_PARSE_JSON, filename.sv(), nullptr) || !tr_variantIsList(&groups_dict))
+    if (!tr_variantFromFile(&groups_dict, TR_VARIANT_PARSE_JSON, filename, nullptr) || !tr_variantIsList(&groups_dict))
     {
         return;
     }
@@ -2887,7 +2893,7 @@ static void bandwidthGroupRead(tr_session* session, std::string_view config_dir)
     while (tr_variantDictChild(&groups_dict, idx++, &key, &dict))
     {
         auto name = tr_interned_string(key);
-        auto& group = session->getBandwidthGroup(name.sv());
+        auto& group = session->getBandwidthGroup(name);
 
         auto limits = tr_bandwidth_limits{};
         tr_variantDictFindBool(dict, TR_KEY_uploadLimited, &limits.up_limited);
@@ -2935,7 +2941,7 @@ static int bandwidthGroupWrite(tr_session const* session, std::string_view confi
     }
 
     auto const filename = tr_pathbuf{ config_dir, "/"sv, BandwidthGroupsFilename };
-    auto const ret = tr_variantToFile(&groups_dict, TR_VARIANT_FMT_JSON, filename.sv());
+    auto const ret = tr_variantToFile(&groups_dict, TR_VARIANT_FMT_JSON, filename);
     tr_variantFree(&groups_dict);
     return ret;
 }

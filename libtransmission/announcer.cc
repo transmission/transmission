@@ -10,7 +10,6 @@
 #include <cstring>
 #include <ctime>
 #include <deque>
-#include <iterator>
 #include <map>
 #include <set>
 #include <string>
@@ -882,7 +881,7 @@ static tr_announce_request* announce_request_new(
     req->up = tier->byteCounts[TR_ANN_UP];
     req->down = tier->byteCounts[TR_ANN_DOWN];
     req->corrupt = tier->byteCounts[TR_ANN_CORRUPT];
-    req->leftUntilComplete = tor->hasMetadata() ? tor->totalSize() - tor->hasTotal() : INT64_MAX;
+    req->leftUntilComplete = tor->hasMetainfo() ? tor->totalSize() - tor->hasTotal() : INT64_MAX;
     req->event = event;
     req->numwant = event == TR_ANNOUNCE_EVENT_STOPPED ? 0 : Numwant;
     req->key = announcer->key;
@@ -1297,7 +1296,7 @@ static void checkMultiscrapeMax(tr_announcer* announcer, tr_scrape_response cons
     {
         // don't log the full URL, since that might have a personal announce id
         // (note: we know 'parsed' will be successful since this url has a scrape_info)
-        auto const parsed = *tr_urlParse(url.sv());
+        auto const parsed = *tr_urlParse(url);
         auto clean_url = std::string{};
         tr_buildBuf(clean_url, parsed.scheme, "://"sv, parsed.host, ":"sv, parsed.portstr);
         tr_logAddDebug(fmt::format("Reducing multiscrape max to {}", n), clean_url);
@@ -1325,8 +1324,6 @@ static void on_scrape_done(tr_scrape_response const* response, void* vsession)
                 continue;
             }
 
-            auto const scrape_url_sv = response->scrape_url.sv();
-
             tr_logAddTraceTier(
                 tier,
                 fmt::format(
@@ -1340,7 +1337,7 @@ static void on_scrape_done(tr_scrape_response const* response, void* vsession)
                     "downloaders:{} "
                     "min_request_interval:{} "
                     "err:{} ",
-                    scrape_url_sv,
+                    response->scrape_url.sv(),
                     response->did_connect,
                     response->did_timeout,
                     row.seeders,
