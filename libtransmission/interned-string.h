@@ -158,8 +158,8 @@ template<>
 struct fmt::formatter<tr_interned_string> : formatter<std::string_view>
 {
     template<typename FormatContext>
-    constexpr auto format(tr_interned_string const& str, FormatContext& ctx) const
+    constexpr auto format(tr_interned_string const& is, FormatContext& ctx) const
     {
-        return formatter<std::string_view>::format(str.sv(), ctx);
+        return formatter<std::string_view>::format(is.sv(), ctx);
     }
 };

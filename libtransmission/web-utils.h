@@ -94,12 +94,12 @@ struct tr_url_query_view
 };
 
 template<typename OutputIt>
-void tr_http_escape(OutputIt out, std::string_view str, bool escape_reserved)
+void tr_http_escape(OutputIt out, std::string_view in, bool escape_reserved)
 {
     auto constexpr ReservedChars = std::string_view{ "!*'();:@&=+$,/?%#[]" };
     auto constexpr UnescapedChars = std::string_view{ "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_.~" };
 
-    for (auto const& ch : str)
+    for (auto const& ch : in)
     {
         if (tr_strvContains(UnescapedChars, ch) || (tr_strvContains(ReservedChars, ch) && !escape_reserved))
         {

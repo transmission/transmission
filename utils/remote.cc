@@ -560,8 +560,7 @@ static bool UseSSL = false;
 
 static std::string getEncodedMetainfo(std::string_view filename)
 {
-    auto contents = std::vector<char>{};
-    if (tr_loadFile(filename, contents))
+    if (auto contents = std::vector<char>{}; tr_loadFile(filename, contents))
     {
         return tr_base64_encode({ std::data(contents), std::size(contents) });
     }
@@ -2020,7 +2019,7 @@ static void printGroups(tr_variant* top)
 
     if (tr_variantDictFindDict(top, TR_KEY_arguments, &args) && tr_variantDictFindList(args, TR_KEY_group, &groups))
     {
-        for (int i = 0, n = tr_variantListSize(groups); i < n; ++i)
+        for (size_t i = 0, n = tr_variantListSize(groups); i < n; ++i)
         {
             tr_variant* group = tr_variantListChild(groups, i);
             std::string_view name;
