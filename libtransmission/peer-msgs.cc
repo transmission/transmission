@@ -1690,13 +1690,6 @@ static ReadState readBtMessage(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, si
 
     case BtPeerMsgs::Bitfield:
         {
-            TR_ASSERT_MSG(
-                !msgs->torrent->hasMetainfo() || msglen == msgs->torrent->pieceCount() / 8,
-                "pieceCount:%zu msglen:%zu peer_id:%s",
-                size_t(msgs->torrent->pieceCount()),
-                size_t(msglen),
-                msgs->client.c_str());
-
             auto* const tmp = tr_new(uint8_t, msglen);
             logtrace(msgs, "got a bitfield");
             tr_peerIoReadBytes(msgs->io, inbuf, tmp, msglen);
