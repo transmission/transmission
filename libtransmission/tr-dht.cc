@@ -179,8 +179,8 @@ static void dht_boostrap_from_file(tr_session* session)
 static void dht_bootstrap(void* closure)
 {
     auto* const cl = static_cast<struct bootstrap_closure*>(closure);
-    int const num = cl->len / 6;
-    int const num6 = cl->len6 / 18;
+    auto const num = cl->len / 6;
+    auto const num6 = cl->len6 / 18;
 
     if (session_ != cl->session)
     {
@@ -197,7 +197,7 @@ static void dht_bootstrap(void* closure)
         tr_logAddDebug(fmt::format("Bootstrapping from {} IPv6 nodes", num6));
     }
 
-    for (int i = 0; i < std::max(num, num6); ++i)
+    for (size_t i = 0; i < std::max(num, num6); ++i)
     {
         if (i < num && !bootstrap_done(cl->session, AF_INET))
         {
@@ -228,7 +228,7 @@ static void dht_bootstrap(void* closure)
         /* Our DHT code is able to take up to 9 nodes in a row without
            dropping any. After that, it takes some time to split buckets.
            So ping the first 8 nodes quickly, then slow down. */
-        if (i < 8)
+        if (i < 8U)
         {
             nap(2);
         }

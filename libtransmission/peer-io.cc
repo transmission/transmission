@@ -424,8 +424,7 @@ static void utp_on_read(void* vio, unsigned char const* buf, size_t buflen)
 
     TR_ASSERT(tr_isPeerIo(io));
 
-    int rc = evbuffer_add(io->inbuf, buf, buflen);
-    if (rc < 0)
+    if (auto const rc = evbuffer_add(io->inbuf, buf, buflen); rc < 0)
     {
         tr_logAddWarn(_("Couldn't write to peer"));
         return;
