@@ -199,6 +199,11 @@ public:
         return completion.sizeWhenDone();
     }
 
+    [[nodiscard]] auto hasMetainfo() const noexcept
+    {
+        return completion.hasMetainfo() > 0;
+    }
+
     [[nodiscard]] auto hasAll() const
     {
         return completion.hasAll();
@@ -498,11 +503,6 @@ public:
     [[nodiscard]] auto const& source() const
     {
         return metainfo_.source();
-    }
-
-    [[nodiscard]] auto hasMetadata() const
-    {
-        return fileCount() > 0;
     }
 
     [[nodiscard]] auto infoDictSize() const
