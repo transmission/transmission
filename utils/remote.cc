@@ -2020,7 +2020,7 @@ static void printGroups(tr_variant* top)
 
     if (tr_variantDictFindDict(top, TR_KEY_arguments, &args) && tr_variantDictFindList(args, TR_KEY_group, &groups))
     {
-        for (int i = 0, n = tr_variantListSize(groups); i < n; ++i)
+        for (size_t i = 0, n = tr_variantListSize(groups); i < n; ++i)
         {
             tr_variant* group = tr_variantListChild(groups, i);
             std::string_view name;
