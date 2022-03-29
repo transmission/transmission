@@ -140,13 +140,12 @@ static void saveGroup(tr_variant* dict, tr_torrent const* tor)
 
 static auto loadGroup(tr_variant* dict, tr_torrent* tor)
 {
-    std::string_view groupName;
-
-    if (tr_variantDictFindStrView(dict, TR_KEY_group, &groupName) && !groupName.empty())
+    if (std::string_view groupName; tr_variantDictFindStrView(dict, TR_KEY_group, &groupName) && !groupName.empty())
     {
         tor->setGroup(groupName);
         return tr_resume::Group;
     }
+
     return tr_resume::fields_t{};
 }
 
