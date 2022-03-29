@@ -560,8 +560,7 @@ static bool UseSSL = false;
 
 static std::string getEncodedMetainfo(std::string_view filename)
 {
-    auto contents = std::vector<char>{};
-    if (tr_loadFile(filename, contents))
+    if (auto contents = std::vector<char>{}; tr_loadFile(filename, contents))
     {
         return tr_base64_encode({ std::data(contents), std::size(contents) });
     }
