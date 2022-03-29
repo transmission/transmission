@@ -51,7 +51,6 @@ public:
 
     int queue_length_ = 0;
 
-private:
     std::recursive_mutex message_mutex_;
 };
 

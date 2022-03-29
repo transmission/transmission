@@ -27,6 +27,7 @@ public:
     using const_reference = const Char&;
 
     tr_strbuf() = default;
+    ~tr_strbuf() = default;
     tr_strbuf(tr_strbuf const& other) = delete;
     tr_strbuf& operator=(tr_strbuf const& other) = delete;
 
@@ -35,14 +36,14 @@ public:
         buffer_ = std::move(other.buffer_);
     }
 
-    auto& operator=(tr_strbuf&& other) noexcept
+    tr_strbuf& operator=(tr_strbuf&& other) noexcept
     {
         buffer_ = std::move(other.buffer_);
         return *this;
     }
 
     template<typename... Args>
-    tr_strbuf(Args const&... args)
+    explicit tr_strbuf(Args const&... args)
     {
         append(args...);
     }

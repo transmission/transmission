@@ -2890,8 +2890,10 @@ static void bandwidthGroupRead(tr_session* session, std::string_view config_dir)
     auto idx = size_t{ 0 };
     auto key = tr_quark{};
     tr_variant* dict = nullptr;
-    while (tr_variantDictChild(&groups_dict, idx++, &key, &dict))
+    while (tr_variantDictChild(&groups_dict, idx, &key, &dict))
     {
+        ++idx;
+
         auto name = tr_interned_string(key);
         auto& group = session->getBandwidthGroup(name);
 
