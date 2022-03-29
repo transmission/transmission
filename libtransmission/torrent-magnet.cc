@@ -64,7 +64,7 @@ static void incompleteMetadataFree(struct tr_incomplete_metadata* m)
 
 bool tr_torrentSetMetadataSizeHint(tr_torrent* tor, int64_t size)
 {
-    if (tor->hasMetadata())
+    if (tor->hasMetainfo())
     {
         return false;
     }
@@ -118,7 +118,7 @@ void* tr_torrentGetMetadataPiece(tr_torrent const* tor, int piece, size_t* len)
     TR_ASSERT(piece >= 0);
     TR_ASSERT(len != nullptr);
 
-    if (!tor->hasMetadata())
+    if (!tor->hasMetainfo())
     {
         return nullptr;
     }
@@ -400,7 +400,7 @@ bool tr_torrentGetNextMetadataRequest(tr_torrent* tor, time_t now, int* setme_pi
 
 double tr_torrentGetMetadataPercent(tr_torrent const* tor)
 {
-    if (tor->hasMetadata())
+    if (tor->hasMetainfo())
     {
         return 1.0;
     }

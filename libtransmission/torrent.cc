@@ -637,7 +637,7 @@ static bool setLocalErrorIfFilesDisappeared(tr_torrent* tor, std::optional<bool>
  */
 static bool isNewTorrentASeed(tr_torrent* tor)
 {
-    if (!tor->hasMetadata())
+    if (!tor->hasMetainfo())
     {
         return false;
     }
@@ -778,7 +778,7 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
             [](auto mtime) { return mtime > 0; });
     }
 
-    auto const filename = tor->hasMetadata() ? tor->torrentFile() : tor->magnetFile();
+    auto const filename = tor->hasMetainfo() ? tor->torrentFile() : tor->magnetFile();
 
     // if we don't have a local .torrent or .magnet file already,
     // assume the torrent is new
@@ -788,7 +788,7 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
     {
         tr_error* error = nullptr;
 
-        if (tor->hasMetadata()) // torrent file
+        if (tor->hasMetainfo()) // torrent file
         {
             tr_ctorSaveContents(ctor, filename, &error);
         }
@@ -815,12 +815,12 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
 
     if (is_new_torrent)
     {
-        if (tor->hasMetadata())
+        if (tor->hasMetainfo())
         {
             callScriptIfEnabled(tor, TR_SCRIPT_ON_TORRENT_ADDED);
         }
 
-        if (!tor->hasMetadata() && !doStart)
+        if (!tor->hasMetainfo() && !doStart)
         {
             tor->prefetchMagnetMetadata = true;
 
@@ -2088,7 +2088,7 @@ bool tr_torrent::setTrackerList(std::string_view text)
         return false;
     }
 
-    auto const has_metadata = this->hasMetadata();
+    auto const has_metadata = this->hasMetainfo();
     if (has_metadata && !announce_list.save(torrentFile()))
     {
         return false;
@@ -2257,7 +2257,7 @@ static void deleteLocalData(tr_torrent const* tor, tr_fileFunc func)
     }
 
     /* if it's a magnet link, there's nothing to move... */
-    if (!tor->hasMetadata())
+    if (!tor->hasMetainfo())
     {
         return;
     }
@@ -2761,7 +2761,7 @@ static void refreshCurrentDir(tr_torrent* tor)
     {
         dir = tor->downloadDir();
     }
-    else if (!tor->hasMetadata()) /* no files to find */
+    else if (!tor->hasMetainfo()) /* no files to find */
     {
         dir = tor->incompleteDir();
     }
@@ -3161,7 +3161,7 @@ void tr_torrentSetFilePriorities(
 
 bool tr_torrentHasMetadata(tr_torrent const* tor)
 {
-    return tor->hasMetadata();
+    return tor->hasMetainfo();
 }
 
 void tr_torrent::markEdited()
