@@ -270,13 +270,17 @@
         {
         case TR_LOG_CRITICAL:
         case TR_LOG_ERROR:
-        case TR_LOG_WARN:
             return [NSImage imageNamed:@"RedDotFlat"];
+            
+        case TR_LOG_WARN:
+            return [NSImage imageNamed:@"OrangeDotFlat"];
 
         case TR_LOG_INFO:
-            return [NSImage imageNamed:@"YellowDotFlat"];
+            return [NSImage imageNamed:@"GreenDotFlat"];
 
         case TR_LOG_DEBUG:
+            return [NSImage imageNamed:@"BlueDotFlat"];
+        
         case TR_LOG_TRACE:
             return [NSImage imageNamed:@"PurpleDotFlat"];
 
