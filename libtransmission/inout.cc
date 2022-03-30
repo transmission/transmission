@@ -9,6 +9,7 @@
 #include <vector>
 
 #include <fmt/core.h>
+#include <fmt/compile.h>
 
 #include "transmission.h"
 
@@ -220,7 +221,7 @@ int readOrWritePiece(tr_torrent* tor, IoMode io_mode, tr_block_info::Location lo
         if (err != 0 && io_mode == IoMode::Write && tor->error != TR_STAT_LOCAL_ERROR)
         {
             auto const path = tr_strvPath(tor->downloadDir().sv(), tor->fileSubpath(file_index));
-            tor->setLocalError(tr_strvJoin(tr_strerror(err), " ("sv, path, ")"sv));
+            tor->setLocalError(fmt::format(FMT_COMPILE("{:s} ({:s})"), tr_strerror(err), path));
         }
 
         ++file_index;
