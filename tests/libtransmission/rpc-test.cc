@@ -79,7 +79,7 @@ TEST_F(RpcTest, sessionGet)
         tr_variantInitBool(response, false);
     };
 
-    auto* tor = zeroTorrentInit();
+    auto* tor = zeroTorrentInit(ZeroTorrentState::NoFiles);
     EXPECT_NE(nullptr, tor);
 
     tr_variant request;

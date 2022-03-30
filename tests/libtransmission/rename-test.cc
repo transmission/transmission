@@ -458,15 +458,14 @@ TEST_F(RenameTest, partialFile)
     ****  create our test torrent with an incomplete .part file
     ***/
 
-    auto* tor = zeroTorrentInit();
+    auto* tor = zeroTorrentInit(ZeroTorrentState::Partial);
     EXPECT_EQ(TotalSize, tor->totalSize());
     EXPECT_EQ(PieceSize, tor->pieceSize());
     EXPECT_EQ(PieceCount, tor->pieceCount());
     EXPECT_EQ("files-filled-with-zeroes/1048576"sv, tor->fileSubpath(0));
     EXPECT_EQ("files-filled-with-zeroes/4096"sv, tor->fileSubpath(1));
     EXPECT_EQ("files-filled-with-zeroes/512"sv, tor->fileSubpath(2));
-
-    zeroTorrentPopulate(tor, false);
+    EXPECT_NE(0, tr_torrentFile(tor, 0).have);
     EXPECT_EQ(Length[0], tr_torrentFile(tor, 0).have + PieceSize);
     EXPECT_EQ(Length[1], tr_torrentFile(tor, 1).have);
     EXPECT_EQ(Length[2], tr_torrentFile(tor, 2).have);

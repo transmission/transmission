@@ -106,7 +106,7 @@ public:
 
     [[nodiscard]] uint64_t fileSize(tr_file_index_t i) const;
 
-    [[nodiscard]] auto const& isPrivate() const
+    [[nodiscard]] auto const& isPrivate() const noexcept
     {
         return is_private_;
     }
@@ -191,7 +191,7 @@ private:
     struct file_t
     {
     public:
-        [[nodiscard]] std::string const& path() const
+        [[nodiscard]] std::string const& path() const noexcept
         {
             return path_;
         }
@@ -201,7 +201,7 @@ private:
             path_ = subpath;
         }
 
-        [[nodiscard]] uint64_t size() const
+        [[nodiscard]] uint64_t size() const noexcept
         {
             return size_;
         }
