@@ -316,7 +316,7 @@ private:
         q = TR_KEY_incomplete_dir;
         auto const incomplete_dir = tr_variantDictFindStrView(settings, q, &sv) ? tr_strvPath(sandboxDir(), sv) :
                                                                                   tr_strvPath(sandboxDir(), "Incomplete");
-        tr_variantDictAddStr(settings, q, incomplete_dir.data());
+        tr_variantDictAddStr(settings, q, incomplete_dir.c_str());
 
         // blocklists
         auto const blocklist_dir = tr_strvPath(sandboxDir(), "blocklists");
@@ -352,12 +352,19 @@ private:
     }
 
 protected:
-    tr_torrent* zeroTorrentInit() const
+    enum class ZeroTorrentState
+    {
+        NoFiles,
+        Partial,
+        Complete
+    };
+
+    tr_torrent* zeroTorrentInit(ZeroTorrentState state) const
     {
         // 1048576 files-filled-with-zeroes/1048576
         //    4096 files-filled-with-zeroes/4096
         //     512 files-filled-with-zeroes/512
-        char const* metainfo_base64 =
+        char const* benc_base64 =
             "ZDg6YW5ub3VuY2UzMTpodHRwOi8vd3d3LmV4YW1wbGUuY29tL2Fubm91bmNlMTA6Y3JlYXRlZCBi"
             "eTI1OlRyYW5zbWlzc2lvbi8yLjYxICgxMzQwNykxMzpjcmVhdGlvbiBkYXRlaTEzNTg3MDQwNzVl"
             "ODplbmNvZGluZzU6VVRGLTg0OmluZm9kNTpmaWxlc2xkNjpsZW5ndGhpMTA0ODU3NmU0OnBhdGhs"
@@ -378,71 +385,57 @@ protected:
             "OnByaXZhdGVpMGVlZQ==";
 
         // create the torrent ctor
-        auto const metainfo = tr_base64_decode(metainfo_base64);
-        EXPECT_LT(0, std::size(metainfo));
+        auto const benc = tr_base64_decode(benc_base64);
+        EXPECT_LT(0, std::size(benc));
         auto* ctor = tr_ctorNew(session_);
         tr_error* error = nullptr;
-        EXPECT_TRUE(tr_ctorSetMetainfo(ctor, std::data(metainfo), std::size(metainfo), &error));
+        EXPECT_TRUE(tr_ctorSetMetainfo(ctor, std::data(benc), std::size(benc), &error));
         EXPECT_EQ(nullptr, error) << *error;
         tr_ctorSetPaused(ctor, TR_FORCE, true);
+
+        // maybe create the files
+        if (state != ZeroTorrentState::NoFiles)
+        {
+            auto const* const metainfo = tr_ctorGetMetainfo(ctor);
+            for (size_t i = 0, n = metainfo->fileCount(); i < n; ++i)
+            {
+                auto const base = state == ZeroTorrentState::Partial && tr_sessionIsIncompleteDirEnabled(session_) ?
+                    tr_sessionGetIncompleteDir(session_) :
+                    tr_sessionGetDownloadDir(session_);
+                auto const subpath = metainfo->fileSubpath(i);
+                auto const partial = state == ZeroTorrentState::Partial && i == 0;
+                auto const suffix = std::string_view{ partial ? ".part" : "" };
+                auto const filename = tr_pathbuf{ base, '/', subpath, suffix };
+
+                auto const dirname = tr_sys_path_dirname(filename);
+                tr_sys_dir_create(dirname.c_str(), TR_SYS_DIR_CREATE_PARENTS, 0700);
+
+                auto fd = tr_sys_file_open(filename, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_TRUNCATE, 0600);
+                auto const file_size = metainfo->fileSize(i);
+                for (uint64_t j = 0; j < file_size; ++j)
+                {
+                    auto const ch = partial && j < metainfo->pieceSize() ? '\1' : '\0';
+                    tr_sys_file_write(fd, &ch, 1, nullptr);
+                }
+
+                tr_sys_file_flush(fd);
+                tr_sys_file_close(fd);
+            }
+        }
 
         // create the torrent
         auto* const tor = tr_torrentNew(ctor, nullptr);
         EXPECT_NE(nullptr, tor);
+        waitForVerify(tor);
 
         // cleanup
         tr_ctorFree(ctor);
         return tor;
     }
 
-    void zeroTorrentPopulate(tr_torrent* tor, bool complete)
-    {
-        for (size_t i = 0, n = tr_torrentFileCount(tor); i < n; ++i)
-        {
-            auto const file = tr_torrentFile(tor, i);
-
-            auto path = (!complete && i == 0) ? tr_strvJoin(tor->currentDir().sv(), TR_PATH_DELIMITER_STR, file.name, ".part") :
-                                                tr_strvJoin(tor->currentDir().sv(), TR_PATH_DELIMITER_STR, file.name);
-
-            auto const dirname = tr_sys_path_dirname(path);
-            tr_sys_dir_create(dirname.data(), TR_SYS_DIR_CREATE_PARENTS, 0700);
-            auto fd = tr_sys_file_open(
-                path.c_str(),
-                TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_TRUNCATE,
-                0600,
-                nullptr);
-
-            for (uint64_t j = 0; j < file.length; ++j)
-            {
-                tr_sys_file_write(fd, (!complete && i == 0 && j < tor->pieceSize()) ? "\1" : "\0", 1, nullptr);
-            }
-
-            tr_sys_file_close(fd);
-
-            path = makeString(tr_torrentFindFile(tor, i));
-            auto const err = errno;
-            EXPECT_TRUE(tr_sys_path_exists(path.c_str()));
-            errno = err;
-        }
-
-        sync();
-        blockingTorrentVerify(tor);
-
-        if (complete)
-        {
-            EXPECT_EQ(0, tr_torrentStat(tor)->leftUntilDone);
-        }
-        else
-        {
-            EXPECT_EQ(tor->pieceSize(), tr_torrentStat(tor)->leftUntilDone);
-        }
-    }
-
-    void blockingTorrentVerify(tr_torrent* tor)
+    void waitForVerify(tr_torrent* tor) const
     {
         EXPECT_NE(nullptr, tor->session);
-        EXPECT_FALSE(tr_amInEventThread(tor->session));
-        tr_torrentVerify(tor);
         tr_wait_msec(100);
         EXPECT_TRUE(waitFor(
             [tor]()
@@ -451,6 +444,14 @@ protected:
                 return activity != TR_STATUS_CHECK && activity != TR_STATUS_CHECK_WAIT && tor->checked_pieces_.hasAll();
             },
             4000));
+    }
+
+    void blockingTorrentVerify(tr_torrent* tor)
+    {
+        EXPECT_NE(nullptr, tor->session);
+        EXPECT_FALSE(tr_amInEventThread(tor->session));
+        tr_torrentVerify(tor);
+        waitForVerify(tor);
     }
 
     tr_session* session_ = nullptr;
