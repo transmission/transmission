@@ -45,6 +45,7 @@ public:
         add(label);
         add(label_esc);
         add(prog);
+        add(prog_str);
         add(index);
         add(size);
         add(size_str);
@@ -57,6 +58,7 @@ public:
     Gtk::TreeModelColumn<Glib::ustring> label;
     Gtk::TreeModelColumn<Glib::ustring> label_esc;
     Gtk::TreeModelColumn<int> prog;
+    Gtk::TreeModelColumn<Glib::ustring> prog_str;
     Gtk::TreeModelColumn<unsigned int> index;
     Gtk::TreeModelColumn<uint64_t> size;
     Gtk::TreeModelColumn<Glib::ustring> size_str;
@@ -178,6 +180,7 @@ bool refreshFilesForeach(
             (*iter)[file_cols.enabled] = enabled;
             (*iter)[file_cols.have] = have;
             (*iter)[file_cols.prog] = prog;
+            (*iter)[file_cols.prog_str] = fmt::format("{}%", prog);
         }
     }
     else
@@ -233,6 +236,7 @@ bool refreshFilesForeach(
             (*iter)[file_cols.priority] = priority;
             (*iter)[file_cols.enabled] = enabled;
             (*iter)[file_cols.prog] = prog;
+            (*iter)[file_cols.prog_str] = fmt::format("{}%", prog);
         }
     }
 
@@ -883,7 +887,8 @@ FileList::Impl::Impl(FileList& widget, Glib::RefPtr<Session> const& core, int to
         width += 30; /* room for the sort indicator */
         auto* rend = Gtk::make_managed<Gtk::CellRendererProgress>();
         auto* col = Gtk::make_managed<Gtk::TreeViewColumn>(title, *rend);
-        col->add_attribute(rend->property_text(), file_cols.prog);
+        col->add_attribute(rend->property_text(), file_cols.prog_str);
+        col->add_attribute(rend->property_value(), file_cols.prog);
         col->set_fixed_width(width);
         col->set_sizing(Gtk::TREE_VIEW_COLUMN_FIXED);
         col->set_sort_column(file_cols.prog);
