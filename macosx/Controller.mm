@@ -587,8 +587,10 @@ static void removeKeRangerRansomware()
 
     if (@available(macOS 11.0, *))
     {
+#ifdef __MAC_11_0
         self.fActionButton.image = [NSImage imageWithSystemSymbolName:@"gearshape.fill" accessibilityDescription:nil];
         self.fSpeedLimitButton.image = [NSImage imageWithSystemSymbolName:@"tortoise.fill" accessibilityDescription:nil];
+#endif
     }
     self.fClearCompletedButton.toolTip = NSLocalizedString(
         @"Remove all transfers that have completed seeding.",
@@ -4276,7 +4278,9 @@ static void removeKeRangerRansomware()
         item.toolTip = NSLocalizedString(@"Create torrent file", "Create toolbar item -> tooltip");
         if (@available(macOS 11.0, *))
         {
+#ifdef __MAC_11_0
             item.image = [NSImage imageWithSystemSymbolName:@"doc.badge.plus" accessibilityDescription:nil];
+#endif
         }
         else
         {
@@ -4297,7 +4301,9 @@ static void removeKeRangerRansomware()
         item.toolTip = NSLocalizedString(@"Open torrent files", "Open toolbar item -> tooltip");
         if (@available(macOS 11.0, *))
         {
+#ifdef __MAC_11_0
             item.image = [NSImage imageWithSystemSymbolName:@"folder" accessibilityDescription:nil];
+#endif
         }
         else
         {
@@ -4318,7 +4324,9 @@ static void removeKeRangerRansomware()
         item.toolTip = NSLocalizedString(@"Open torrent web address", "Open address toolbar item -> tooltip");
         if (@available(macOS 11.0, *))
         {
+#ifdef __MAC_11_0
             item.image = [NSImage imageWithSystemSymbolName:@"globe" accessibilityDescription:nil];
+#endif
         }
         else
         {
@@ -4339,7 +4347,9 @@ static void removeKeRangerRansomware()
         item.toolTip = NSLocalizedString(@"Remove selected transfers", "Remove toolbar item -> tooltip");
         if (@available(macOS 11.0, *))
         {
+#ifdef __MAC_11_0
             item.image = [NSImage imageWithSystemSymbolName:@"nosign" accessibilityDescription:nil];
+#endif
         }
         else
         {
@@ -4361,7 +4371,9 @@ static void removeKeRangerRansomware()
         item.toolTip = NSLocalizedString(@"Toggle the torrent inspector", "Inspector toolbar item -> tooltip");
         if (@available(macOS 11.0, *))
         {
+#ifdef __MAC_11_0
             item.image = [NSImage imageWithSystemSymbolName:@"info.circle" accessibilityDescription:nil];
+#endif
         }
         else
         {
@@ -4406,9 +4418,11 @@ static void removeKeRangerRansomware()
         [segmentedCell setTag:TOOLBAR_PAUSE_TAG forSegment:TOOLBAR_PAUSE_TAG];
         if (@available(macOS 11.0, *))
         {
+#ifdef __MAC_11_0
             [segmentedControl setImage:[[NSImage imageWithSystemSymbolName:@"pause.circle.fill" accessibilityDescription:nil]
                                            imageWithSymbolConfiguration:[NSImageSymbolConfiguration configurationWithScale:NSImageSymbolScaleLarge]]
                             forSegment:TOOLBAR_PAUSE_TAG];
+#endif
         }
         else
         {
@@ -4421,10 +4435,12 @@ static void removeKeRangerRansomware()
         [segmentedControl setImage:[NSImage imageNamed:@"ToolbarResumeAllTemplate"] forSegment:TOOLBAR_RESUME_TAG];
         if (@available(macOS 11.0, *))
         {
+#ifdef __MAC_11_0
             [segmentedControl
                   setImage:[[NSImage imageWithSystemSymbolName:@"arrow.clockwise.circle.fill" accessibilityDescription:nil]
                                imageWithSymbolConfiguration:[NSImageSymbolConfiguration configurationWithScale:NSImageSymbolScaleLarge]]
                 forSegment:TOOLBAR_RESUME_TAG];
+#endif
         }
         else
         {
@@ -4475,9 +4491,11 @@ static void removeKeRangerRansomware()
         [segmentedCell setTag:TOOLBAR_PAUSE_TAG forSegment:TOOLBAR_PAUSE_TAG];
         if (@available(macOS 11.0, *))
         {
+#ifdef __MAC_11_0
             [segmentedControl setImage:[[NSImage imageWithSystemSymbolName:@"pause" accessibilityDescription:nil]
                                            imageWithSymbolConfiguration:[NSImageSymbolConfiguration configurationWithScale:NSImageSymbolScaleLarge]]
                             forSegment:TOOLBAR_PAUSE_TAG];
+#endif
         }
         else
         {
@@ -4489,8 +4507,10 @@ static void removeKeRangerRansomware()
         [segmentedCell setTag:TOOLBAR_RESUME_TAG forSegment:TOOLBAR_RESUME_TAG];
         if (@available(macOS 11.0, *))
         {
+#ifdef __MAC_11_0
             [segmentedControl setImage:[NSImage imageWithSystemSymbolName:@"arrow.clockwise" accessibilityDescription:nil]
                             forSegment:TOOLBAR_RESUME_TAG];
+#endif
         }
         else
         {
@@ -4518,7 +4538,9 @@ static void removeKeRangerRansomware()
         item.toolTip = NSLocalizedString(@"Toggle the filter bar", "Filter toolbar item -> tooltip");
         if (@available(macOS 11.0, *))
         {
+#ifdef __MAC_11_0
             item.image = [NSImage imageWithSystemSymbolName:@"magnifyingglass" accessibilityDescription:nil];
+#endif
         }
         else
         {

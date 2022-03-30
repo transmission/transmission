@@ -26,7 +26,9 @@
 {
     if (@available(macOS 11.0, *))
     {
+#ifdef __MAC_11_0
         return [NSImage imageWithSystemSymbolName:symbolName accessibilityDescription:nil];
+#endif
     }
 
     return [NSImage imageNamed:fallbackName];

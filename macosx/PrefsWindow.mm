@@ -12,7 +12,9 @@
 
     if (@available(macOS 11.0, *))
     {
+#ifdef __MAC_11_0
         self.toolbarStyle = NSWindowToolbarStylePreference;
+#endif
     }
 }
 
