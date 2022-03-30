@@ -8,8 +8,6 @@
 #include <optional>
 #include <vector>
 
-#include <iostream>
-
 #include <fmt/core.h>
 
 #include "transmission.h"
@@ -120,8 +118,6 @@ int readOrWriteBytes(
             auto const base = tor->currentDir();
             auto const suffix = tor->session->isIncompleteFileNamingEnabled ? tr_torrent::PartialFileSuffix : ""sv;
             found = { {}, tr_pathbuf{ base, "/"sv, tor->fileSubpath(file_index), suffix }, std::size(base) };
-            std::cerr << __FILE__ << ':' << __LINE__ << " base [" << base.sv() << ']' << std::endl;
-            std::cerr << __FILE__ << ':' << __LINE__ << " filename [" << found->filename.sv() << ']' << std::endl;
         }
 
         if (err == 0)
