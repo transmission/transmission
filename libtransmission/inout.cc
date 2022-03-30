@@ -8,6 +8,8 @@
 #include <optional>
 #include <vector>
 
+#include <iostream>
+
 #include <fmt/core.h>
 
 #include "transmission.h"
@@ -87,7 +89,7 @@ int readOrWriteBytes(
     TR_ASSERT(file_index < tor->fileCount());
 
     int err = 0;
-    bool const doWrite = io_mode == IoMode::Write;
+    bool const do_write = io_mode == IoMode::Write;
     auto const file_size = tor->fileSize(file_index);
     TR_ASSERT(file_size == 0 || file_offset < file_size);
     TR_ASSERT(file_offset + buflen <= file_size);
@@ -101,35 +103,34 @@ int readOrWriteBytes(
     ****  Find the fd
     ***/
 
-    auto fd = tr_fdFileGetCached(session, tr_torrentId(tor), file_index, doWrite);
+    auto fd = tr_fdFileGetCached(session, tr_torrentId(tor), file_index, do_write);
 
-    if (fd == TR_BAD_SYS_FILE) /* it's not cached, so open/create it now */
+    if (fd == TR_BAD_SYS_FILE) // it's not cached, so open/create it now
     {
-        /* see if the file exists... */
-        char const* base = nullptr;
-        char* subpath = nullptr;
-        if (!tr_torrentFindFile2(tor, file_index, &base, &subpath, nullptr))
+        auto found = tor->findFile(file_index); // see if the file exists...
+        if (!found)
         {
-            /* we can't read a file that doesn't exist... */
-            if (!doWrite)
+            if (!do_write)
             {
                 err = ENOENT;
             }
 
-            /* figure out where the file should go, so we can create it */
-            base = tr_torrentGetCurrentDir(tor);
-            subpath = tr_sessionIsIncompleteFileNamingEnabled(tor->session) ? tr_torrentBuildPartial(tor, file_index) :
-                                                                              tr_strvDup(tor->fileSubpath(file_index));
+            // We didn't find the file that we want to write to.
+            // Let's figure out where it goes so that we can create it.
+            auto const base = tor->currentDir();
+            auto const suffix = tor->session->isIncompleteFileNamingEnabled ? tr_torrent::PartialFileSuffix : ""sv;
+            found = { {}, tr_pathbuf{ base, "/"sv, tor->fileSubpath(file_index), suffix }, std::size(base) };
+            std::cerr << __FILE__ << ':' << __LINE__ << " base [" << base.sv() << ']' << std::endl;
+            std::cerr << __FILE__ << ':' << __LINE__ << " filename [" << found->filename.sv() << ']' << std::endl;
         }
 
         if (err == 0)
         {
-            /* open (and maybe create) the file */
-            auto const filename = tr_strvPath(base, subpath);
-            auto const prealloc = (!doWrite || !tor->fileIsWanted(file_index)) ? TR_PREALLOCATE_NONE :
-                                                                                 tor->session->preallocationMode;
+            // open (and maybe create) the file
+            auto const prealloc = (!do_write || !tor->fileIsWanted(file_index)) ? TR_PREALLOCATE_NONE :
+                                                                                  tor->session->preallocationMode;
 
-            fd = tr_fdFileCheckout(session, tor->uniqueId, file_index, filename.c_str(), doWrite, prealloc, file_size);
+            fd = tr_fdFileCheckout(session, tor->uniqueId, file_index, found->filename, do_write, prealloc, file_size);
             if (fd == TR_BAD_SYS_FILE)
             {
                 err = errno;
@@ -137,18 +138,16 @@ int readOrWriteBytes(
                     tor,
                     fmt::format(
                         _("Couldn't get '{path}': {error} ({error_code})"),
-                        fmt::arg("path", filename),
+                        fmt::arg("path", found->filename),
                         fmt::arg("error", tr_strerror(err)),
                         fmt::arg("error_code", err)));
             }
-            else if (doWrite)
+            else if (do_write)
             {
                 /* make a note that we just created a file */
                 tr_statsFileCreated(tor->session);
             }
         }
-
-        tr_free(subpath);
     }
 
     if (err != 0)
