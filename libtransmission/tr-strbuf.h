@@ -26,19 +26,25 @@ public:
     using value_type = Char;
     using const_reference = const Char&;
 
-    tr_strbuf() = default;
+    tr_strbuf()
+    {
+        ensure_sz();
+    }
+
     ~tr_strbuf() = default;
     tr_strbuf(tr_strbuf const& other) = delete;
     tr_strbuf& operator=(tr_strbuf const& other) = delete;
 
-    tr_strbuf(tr_strbuf&& other) noexcept
+    tr_strbuf(tr_strbuf&& other)
+        : buffer_{ std::move(other.buffer_) }
     {
-        buffer_ = std::move(other.buffer_);
+        ensure_sz();
     }
 
-    tr_strbuf& operator=(tr_strbuf&& other) noexcept
+    tr_strbuf& operator=(tr_strbuf&& other)
     {
         buffer_ = std::move(other.buffer_);
+        ensure_sz();
         return *this;
     }
 
