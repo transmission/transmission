@@ -64,10 +64,11 @@ Most routers manufactured since 2001 have either the UPnP or NAT-PMP feature.
 
  1. Find out what your IP address is.
   * On Mac OS X
-   * Go to System Preferencess >> Network, double-clicking on your connection (for instance, Built-in Ethernet), and clicking the TCP/IP tab. The address is probably something like 192.168.1.100, or 10.0.1.2. The IP of your router is here too.
+   ** Go to System Preferencess >> Network, double-clicking on your connection (for instance, Built-in Ethernet), and clicking the TCP/IP tab. The address is probably something like 192.168.1.100, or 10.0.1.2. The IP of your router is here too.
   * On Unix
-   * In Ubuntu, right click the Network Manager applet in the menu bar, and select 'Connection Information'. The address is probably something like 192.168.1.2, or 10.0.1.2.
-   * If you don't have Network Manager, open a Terminal and type 'ifconfig'. It will list information for each of your network devices. Find the one you are using, and use the number after 'inet addr:'.
+   ** In Ubuntu, right click the Network Manager applet in the menu bar, and select 'Connection Information'. The address is probably something like 192.168.1.2, or 10.0.1.2.
+   ** If you don't have Network Manager, open a Terminal and type 'ifconfig'. It will list information for each of your network devices. Find the one you are using, and use the number after 'inet addr:'.
+   ** Using the command "ip a" will achieve the same results in a different format.
  2. Open Transmission, go to preferences, and enter a number for the port. It is recommended you pick a random number between 49152 and 65535. The default is 51413. Then quit Transmission.
  3. Go into your router configuration screen. Normally this is done via your web browser using the address 192.168.0.1 etc.
  4. Find the port forwarding (sometimes called port mapping) screen. While the page will be different for each router generally you will enter something similar to the following:
