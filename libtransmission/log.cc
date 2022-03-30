@@ -14,7 +14,6 @@
 #include <event2/buffer.h>
 
 #include <fmt/core.h>
-#include <fmt/compile.h>
 #include <fmt/format.h>
 
 #include "transmission.h"
@@ -101,7 +100,7 @@ void logAddImpl(
     auto const lock = log_state.unique_lock();
 #ifdef _WIN32
 
-    OutputDebugStringA(fmt::format(FMT_COMPILE("{:s}\r\n"), msg).c_str());
+    OutputDebugStringA(fmt::format(FMT_STRING("{:s}\r\n"), msg).c_str());
 
 #elif defined(__ANDROID__)
 
@@ -175,8 +174,8 @@ void logAddImpl(
 
         tr_sys_file_write_line(
             fp,
-            !std::empty(name) ? fmt::format(FMT_COMPILE("[{:s}] {:s}: {:s}"), timestr, name, msg) :
-                                fmt::format(FMT_COMPILE("[{:s}] {:s}"), timestr, msg));
+            !std::empty(name) ? fmt::format(FMT_STRING("[{:s}] {:s}: {:s}"), timestr, name, msg) :
+                                fmt::format(FMT_STRING("[{:s}] {:s}"), timestr, msg));
         tr_sys_file_flush(fp);
     }
 #endif
@@ -262,7 +261,7 @@ void tr_logAddMessage(char const* file, int line, tr_log_level level, std::strin
     if (std::empty(name))
     {
         auto const base = tr_sys_path_basename(file);
-        name_fallback = fmt::format(FMT_COMPILE("{}:{}"), !std::empty(base) ? base : "?", line);
+        name_fallback = fmt::format(FMT_STRING("{}:{}"), !std::empty(base) ? base : "?", line);
         name = name_fallback;
     }
 

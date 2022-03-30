@@ -51,8 +51,7 @@
 #define USE_COPY_FILE_RANGE
 #endif /* __linux__ */
 
-#include <fmt/compile.h>
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include "transmission.h"
 #include "error.h"
@@ -178,7 +177,7 @@ static bool create_path_require_dir(char const* path, tr_error** error)
 
     if ((sb.st_mode & S_IFMT) != S_IFDIR)
     {
-        tr_error_set(error, ENOTDIR, fmt::format(FMT_COMPILE("File is in the way: {:s}"), path));
+        tr_error_set(error, ENOTDIR, fmt::format(FMT_STRING("File is in the way: {:s}"), path));
         return false;
     }
 

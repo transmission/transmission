@@ -5,7 +5,7 @@
 
 #include <string_view>
 
-#include <fmt/compile.h>
+#include <fmt/format.h>
 
 #include "transmission.h"
 
@@ -81,7 +81,7 @@ void tr_error_prefix(tr_error** error, char const* prefix)
     }
 
     auto* err = *error;
-    auto* const new_message = tr_strvDup(fmt::format(FMT_COMPILE("{:s}{:s}"), prefix, err->message));
+    auto* const new_message = tr_strvDup(fmt::format(FMT_STRING("{:s}{:s}"), prefix, err->message));
     tr_free(err->message);
     err->message = new_message;
 }

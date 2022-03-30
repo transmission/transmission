@@ -15,8 +15,6 @@
 #include <event2/bufferevent.h>
 #include <event2/event.h>
 
-#include <fmt/compile.h>
-
 #include "transmission.h"
 
 #include "cache.h"
@@ -2210,7 +2208,7 @@ static size_t fillOutputBuffer(tr_peerMsgsImpl* msgs, time_t now)
                 if (err)
                 {
                     msgs->torrent->setLocalError(
-                        fmt::format(FMT_COMPILE("Please Verify Local Data! Piece #{:d} is corrupt."), req.index));
+                        fmt::format(FMT_STRING("Please Verify Local Data! Piece #{:d} is corrupt."), req.index));
                 }
             }
 

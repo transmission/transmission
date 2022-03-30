@@ -15,7 +15,6 @@
 #include <event2/http.h> /* for HTTP_OK */
 
 #include <fmt/core.h>
-#include <fmt/compile.h>
 
 #define LIBTRANSMISSION_ANNOUNCER_MODULE
 
@@ -302,7 +301,7 @@ static void onAnnounceDone(tr_web::FetchResponse const& web_response)
     if (status != HTTP_OK)
     {
         auto const* const response_str = tr_webGetResponseStr(status);
-        response->errmsg = fmt::format(FMT_COMPILE("Tracker HTTP response {:d} ({:s}"), status, response_str);
+        response->errmsg = fmt::format(FMT_STRING("Tracker HTTP response {:d} ({:s}"), status, response_str);
     }
     else
     {
@@ -482,7 +481,7 @@ static void onScrapeDone(tr_web::FetchResponse const& web_response)
     if (status != HTTP_OK)
     {
         auto const* const response_str = tr_webGetResponseStr(status);
-        response.errmsg = fmt::format(FMT_COMPILE("Tracker HTTP response {:d} ({:s})"), status, response_str);
+        response.errmsg = fmt::format(FMT_STRING("Tracker HTTP response {:d} ({:s})"), status, response_str);
     }
     else if (!std::empty(body))
     {
