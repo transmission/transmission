@@ -197,11 +197,12 @@ NSMutableSet* fTrackerIconLoading;
         return icon;
     }
 
-    if (@available(macOS 11.0, *)) {
+    if (@available(macOS 11.0, *))
+    {
         NSImage* result = [NSImage imageWithSystemSymbolName:@"globe" accessibilityDescription:nil];
         [result lockFocus];
         [NSColor.textColor set];
-        NSRect imageRect = {NSZeroPoint, [result size]};
+        NSRect imageRect = { NSZeroPoint, [result size] };
         NSRectFillUsingOperation(imageRect, NSCompositingOperationSourceIn);
         [result unlockFocus];
         return result;

@@ -455,7 +455,8 @@
         return;
     }
 
-    BOOL const pushed = row != -1 && (self.actionButtonHoverRow == row || self.revealButtonHoverRow == row || self.controlButtonHoverRow == row);
+    BOOL const pushed = row != -1 &&
+        (self.actionButtonHoverRow == row || self.revealButtonHoverRow == row || self.controlButtonHoverRow == row);
 
     //if pushing a button, don't change the selected rows
     if (pushed)
@@ -601,9 +602,7 @@
 {
     unichar const firstChar = [event.charactersIgnoringModifiers characterAtIndex:0];
 
-    if (firstChar == 'f' &&
-        event.modifierFlags & NSEventModifierFlagOption &&
-        event.modifierFlags & NSEventModifierFlagCommand)
+    if (firstChar == 'f' && event.modifierFlags & NSEventModifierFlagOption && event.modifierFlags & NSEventModifierFlagCommand)
     {
         [self.fController focusFilterField];
     }

@@ -186,10 +186,8 @@
         {
             [NSApp sendEvent:event];
         }
-        event = [controlView.window nextEventMatchingMask:(NSEventMaskLeftMouseUp |
-                                                           NSEventMaskLeftMouseDragged |
-                                                           NSEventMaskMouseEntered |
-                                                           NSEventMaskMouseExited)];
+        event = [controlView.window nextEventMatchingMask:(NSEventMaskLeftMouseUp | NSEventMaskLeftMouseDragged |
+                                                           NSEventMaskMouseEntered | NSEventMaskMouseExited)];
     }
 
     self.fTracking = NO;
@@ -332,7 +330,8 @@
     if (!minimal || !(!self.fTracking && self.hoverAction)) //don't show in minimal mode when hovered over
     {
         NSImage* icon = (minimal && error) ? [NSImage imageNamed:NSImageNameCaution] : torrent.icon;
-        [icon drawInRect:iconRect fromRect:NSZeroRect operation:NSCompositingOperationSourceOver fraction:1.0 respectFlipped:YES hints:nil];
+        [icon drawInRect:iconRect fromRect:NSZeroRect operation:NSCompositingOperationSourceOver fraction:1.0 respectFlipped:YES
+                     hints:nil];
     }
 
     //error badge
@@ -340,7 +339,8 @@
     {
         NSImage* errorImage = [NSImage imageNamed:NSImageNameCaution];
         NSRect const errorRect = NSMakeRect(NSMaxX(iconRect) - ERROR_IMAGE_SIZE, NSMaxY(iconRect) - ERROR_IMAGE_SIZE, ERROR_IMAGE_SIZE, ERROR_IMAGE_SIZE);
-        [errorImage drawInRect:errorRect fromRect:NSZeroRect operation:NSCompositingOperationSourceOver fraction:1.0 respectFlipped:YES
+        [errorImage drawInRect:errorRect fromRect:NSZeroRect operation:NSCompositingOperationSourceOver fraction:1.0
+                respectFlipped:YES
                          hints:nil];
     }
 
@@ -422,7 +422,8 @@
         }
 
         NSRect const controlRect = [self controlButtonRectForBounds:cellFrame];
-        [controlImage drawInRect:controlRect fromRect:NSZeroRect operation:NSCompositingOperationSourceOver fraction:1.0 respectFlipped:YES
+        [controlImage drawInRect:controlRect fromRect:NSZeroRect operation:NSCompositingOperationSourceOver fraction:1.0
+                  respectFlipped:YES
                            hints:nil];
         minimalTitleRightBound = MIN(minimalTitleRightBound, NSMinX(controlRect));
 
@@ -442,7 +443,8 @@
         }
 
         NSImage* revealImage = [NSImage imageNamed:revealImageString];
-        [revealImage drawInRect:[self revealButtonRectForBounds:cellFrame] fromRect:NSZeroRect operation:NSCompositingOperationSourceOver
+        [revealImage drawInRect:[self revealButtonRectForBounds:cellFrame] fromRect:NSZeroRect
+                      operation:NSCompositingOperationSourceOver
                        fraction:1.0
                  respectFlipped:YES
                           hints:nil];
@@ -489,8 +491,7 @@
             PRIORITY_ICON_WIDTH,
             PRIORITY_ICON_HEIGHT);
 
-        NSColor* priorityColor = self.backgroundStyle == NSBackgroundStyleEmphasized ? NSColor.whiteColor
-                                                                                     : NSColor.labelColor;
+        NSColor* priorityColor = self.backgroundStyle == NSBackgroundStyleEmphasized ? NSColor.whiteColor : NSColor.labelColor;
 
         NSImage* priorityImage = [[NSImage imageNamed:(torrent.priority == TR_PRI_HIGH ? @"PriorityHighTemplate" : @"PriorityLowTemplate")]
             imageWithColor:priorityColor];

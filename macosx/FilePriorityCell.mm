@@ -156,7 +156,8 @@
                 imageSize.width,
                 imageSize.height);
 
-            [image drawInRect:imageRect fromRect:NSZeroRect operation:NSCompositingOperationSourceOver fraction:1.0 respectFlipped:YES
+            [image drawInRect:imageRect fromRect:NSZeroRect operation:NSCompositingOperationSourceOver fraction:1.0
+                respectFlipped:YES
                          hints:nil];
 
             currentWidth += imageSize.width - IMAGE_OVERLAP;

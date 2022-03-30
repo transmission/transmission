@@ -385,9 +385,8 @@
 
     if (action == @selector(setGroupFilter:))
     {
-        menuItem.state = menuItem.tag == [NSUserDefaults.standardUserDefaults integerForKey:@"FilterGroup"]
-                ? NSControlStateValueOn
-                : NSControlStateValueOff;
+        menuItem.state = menuItem.tag == [NSUserDefaults.standardUserDefaults integerForKey:@"FilterGroup"] ? NSControlStateValueOn :
+                                                                                                              NSControlStateValueOff;
         return YES;
     }
 

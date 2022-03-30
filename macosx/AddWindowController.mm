@@ -146,8 +146,8 @@
     }
     [self.fPriorityPopUp selectItemAtIndex:priorityIndex];
 
-    self.fStartCheck.state = [NSUserDefaults.standardUserDefaults boolForKey:@"AutoStartDownload"] ? NSControlStateValueOn
-                                                                                              : NSControlStateValueOff;
+    self.fStartCheck.state = [NSUserDefaults.standardUserDefaults boolForKey:@"AutoStartDownload"] ? NSControlStateValueOn :
+                                                                                                     NSControlStateValueOff;
 
     self.fDeleteCheck.state = self.fDeleteTorrentEnableInitially ? NSControlStateValueOn : NSControlStateValueOff;
     self.fDeleteCheck.enabled = self.fCanToggleDelete;
@@ -163,8 +163,9 @@
         self.fLocationImageView.image = nil;
     }
 
-    self.fTimer = [NSTimer scheduledTimerWithTimeInterval:UPDATE_SECONDS target:self selector:@selector(updateFiles) userInfo:nil
-                                             repeats:YES];
+    self.fTimer = [NSTimer scheduledTimerWithTimeInterval:UPDATE_SECONDS target:self selector:@selector(updateFiles)
+                                                 userInfo:nil
+                                                  repeats:YES];
     [self updateFiles];
 }
 
