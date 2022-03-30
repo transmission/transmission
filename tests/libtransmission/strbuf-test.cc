@@ -153,6 +153,19 @@ TEST_F(StrbufTest, join)
     EXPECT_EQ("A--short--phrase"sv, buf.sv());
 }
 
+TEST_F(StrbufTest, move)
+{
+    static auto constexpr Value = "/hello/world"sv;
+
+    auto generator = []()
+    {
+        return tr_pathbuf{ Value };
+    };
+    auto const path = generator();
+    EXPECT_EQ(Value, path.sv());
+    EXPECT_EQ(Value, path.c_str());
+}
+
 TEST_F(StrbufTest, startsWith)
 {
     auto const buf = tr_pathbuf{ "/hello/world" };
