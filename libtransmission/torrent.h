@@ -372,20 +372,20 @@ public:
 
     struct tr_found_file_t : public tr_sys_path_info
     {
-        std::string& filename; // /home/foo/Downloads/torrent/01-file-one.txt
+        tr_pathbuf filename; // /home/foo/Downloads/torrent/01-file-one.txt
         std::string_view base; // /home/foo/Downloads
         std::string_view subpath; // /torrent/01-file-one.txt
 
-        tr_found_file_t(tr_sys_path_info info, std::string& f, std::string_view b)
+        tr_found_file_t(tr_sys_path_info info, tr_pathbuf&& filename_in, size_t base_len)
             : tr_sys_path_info{ info }
-            , filename{ f }
-            , base{ b }
-            , subpath{ f.c_str() + std::size(b) + 1 }
+            , filename{ std::move(filename_in) }
+            , base{ filename.sv().substr(0, base_len) }
+            , subpath{ filename.sv().substr(base_len + 1) }
         {
         }
     };
 
-    std::optional<tr_found_file_t> findFile(std::string& filename, tr_file_index_t i) const;
+    std::optional<tr_found_file_t> findFile(tr_file_index_t i) const;
 
     /// METAINFO - TRACKERS
 
@@ -582,6 +582,8 @@ public:
         torrent's content than any other mime-type. */
     std::string_view primaryMimeType() const;
 
+    static constexpr std::string_view PartialFileSuffix = std::string_view{ ".part" };
+
     tr_torrent_metainfo metainfo_;
 
     // TODO(ckerr): make private once some of torrent.cc's `tr_torrentFoo()` methods are member functions
@@ -764,27 +766,6 @@ constexpr bool tr_isTorrent(tr_torrent const* tor)
  * Tell the tr_torrent that it's gotten a block
  */
 void tr_torrentGotBlock(tr_torrent* tor, tr_block_index_t blockIndex);
-
-/**
- * @brief Like tr_torrentFindFile(), but splits the filename into base and subpath.
- *
- * If the file is found, "tr_strvPath(base, subpath, nullptr)"
- * will generate the complete filename.
- *
- * @return true if the file is found, false otherwise.
- *
- * @param base if the torrent is found, this will be either
- *             tor->downloadDir or tor->incompleteDir
- * @param subpath on success, this pointer is assigned a newly-allocated
- *                string holding the second half of the filename.
- */
-bool tr_torrentFindFile2(tr_torrent const*, tr_file_index_t fileNo, char const** base, char** subpath, time_t* mtime);
-
-/* Returns a newly-allocated version of the tr_file.name string
- * that's been modified to denote that it's not a complete file yet.
- * In the current implementation this is done by appending ".part"
- * a la Firefox. */
-char* tr_torrentBuildPartial(tr_torrent const*, tr_file_index_t fileNo);
 
 tr_peer_id_t const& tr_torrentGetPeerId(tr_torrent* tor);
 
