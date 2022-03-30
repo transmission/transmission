@@ -43,6 +43,8 @@ If this doesn't happen, you can add Transmission to Leopard's firewall manually:
  1. Here in "Actions" you choose to either "Allow the connection", "Allow the connection if it is secure" (only allow packets using IPsec), choose based on personal preference here then click "Next".
  1. Choose the profile accordingly to the type of network you are connected to and hit "Next".
  1. The last thing is to give the rule a name. It can be whatever just make sure it's something you can read and remember exactly what it's for.
+
+  * Note this only opens the port in Windows and has no effect on the router
 	
 ## Open ports & forwarding
 
