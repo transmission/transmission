@@ -15,7 +15,7 @@
 #define ANIMATION_ID_KEY @"animationId"
 #define WEB_SEED_ANIMATION_ID @"webSeed"
 
-@interface InfoPeersViewController () <CAAnimationDelegate>
+@interface InfoPeersViewController ()<CAAnimationDelegate>
 
 @property(nonatomic, copy) NSArray* fTorrents;
 
@@ -71,7 +71,9 @@
     [self.fWebSeedTable tableColumnWithIdentifier:@"DL From"].headerCell.stringValue = NSLocalizedString(@"DL", "inspector -> web seed table -> header");
 
     //set table header tool tips
-    [self.fPeerTable tableColumnWithIdentifier:@"Encryption"].headerToolTip = NSLocalizedString(@"Encrypted Connection", "inspector -> peer table -> header tool tip");
+    [self.fPeerTable tableColumnWithIdentifier:@"Encryption"].headerToolTip = NSLocalizedString(
+        @"Encrypted Connection",
+        "inspector -> peer table -> header tool tip");
     [self.fPeerTable tableColumnWithIdentifier:@"Progress"].headerToolTip = NSLocalizedString(@"Available", "inspector -> peer table -> header tool tip");
     [self.fPeerTable tableColumnWithIdentifier:@"DL From"].headerToolTip = NSLocalizedString(@"Downloading From Peer", "inspector -> peer table -> header tool tip");
     [self.fPeerTable tableColumnWithIdentifier:@"UL To"].headerToolTip = NSLocalizedString(@"Uploading To Peer", "inspector -> peer table -> header tool tip");

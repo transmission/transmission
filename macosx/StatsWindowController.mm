@@ -60,8 +60,9 @@ tr_session* fLib = NULL;
 {
     [self updateStats];
 
-    self.fTimer = [NSTimer scheduledTimerWithTimeInterval:UPDATE_SECONDS target:self selector:@selector(updateStats) userInfo:nil
-                                             repeats:YES];
+    self.fTimer = [NSTimer scheduledTimerWithTimeInterval:UPDATE_SECONDS target:self selector:@selector(updateStats)
+                                                 userInfo:nil
+                                                  repeats:YES];
     [NSRunLoop.currentRunLoop addTimer:self.fTimer forMode:NSModalPanelRunLoopMode];
     [NSRunLoop.currentRunLoop addTimer:self.fTimer forMode:NSEventTrackingRunLoopMode];
 
@@ -79,7 +80,13 @@ tr_session* fLib = NULL;
     //size of all labels
     CGFloat const oldWidth = self.fUploadedLabelField.frame.size.width;
 
-    NSArray* labels = @[ self.fUploadedLabelField, self.fDownloadedLabelField, self.fRatioLabelField, self.fTimeLabelField, self.fNumOpenedLabelField ];
+    NSArray* labels = @[
+        self.fUploadedLabelField,
+        self.fDownloadedLabelField,
+        self.fRatioLabelField,
+        self.fTimeLabelField,
+        self.fNumOpenedLabelField
+    ];
 
     CGFloat maxWidth = CGFLOAT_MIN;
     for (NSTextField* label in labels)
@@ -211,7 +218,7 @@ tr_session* fLib = NULL;
 
     self.fTimeField.stringValue = [timeFormatter stringFromTimeInterval:statsSession.secondsActive];
     self.fTimeAllField.stringValue = [NSString stringWithFormat:NSLocalizedString(@"%@ total", "stats total"),
-                                                           [timeFormatter stringFromTimeInterval:statsAll.secondsActive]];
+                                                                [timeFormatter stringFromTimeInterval:statsAll.secondsActive]];
 
     if (statsAll.sessionCount == 1)
     {
@@ -220,7 +227,7 @@ tr_session* fLib = NULL;
     else
     {
         self.fNumOpenedField.stringValue = [NSString stringWithFormat:NSLocalizedString(@"%@ times", "stats window -> times opened"),
-                                                                 [NSString formattedUInteger:statsAll.sessionCount]];
+                                                                      [NSString formattedUInteger:statsAll.sessionCount]];
     }
 }
 

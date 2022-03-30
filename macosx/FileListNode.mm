@@ -78,7 +78,8 @@
 {
     if (!_iconInternal)
     {
-        _iconInternal = [NSWorkspace.sharedWorkspace iconForFileType:_isFolder ? NSFileTypeForHFSTypeCode(kGenericFolderIcon) : _name.pathExtension];
+        _iconInternal = [NSWorkspace.sharedWorkspace
+            iconForFileType:_isFolder ? NSFileTypeForHFSTypeCode(kGenericFolderIcon) : _name.pathExtension];
     }
     return _iconInternal;
 }

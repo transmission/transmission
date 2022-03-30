@@ -59,7 +59,8 @@
                 imageSize.width,
                 imageSize.height);
 
-            [checkImage drawInRect:rect fromRect:NSZeroRect operation:NSCompositingOperationSourceOver fraction:1.0 respectFlipped:YES
+            [checkImage drawInRect:rect fromRect:NSZeroRect operation:NSCompositingOperationSourceOver fraction:1.0
+                    respectFlipped:YES
                              hints:nil];
         }
     }

@@ -20,6 +20,7 @@ cfile_includes=(
   '*.cc'
   '*.h'
   '*.m'
+  '*.mm'
 )
 cfile_excludes=(
   'build/*'
