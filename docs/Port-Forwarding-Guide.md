@@ -1,6 +1,6 @@
 # Port Forwarding Guide
 
-[http://en.wikipedia.org/wiki/BitTorrent_protocol BitTorrent] is a system that ''requires'' you to share the file you're downloading.
+[BitTorrent](http://en.wikipedia.org/wiki/BitTorrent_protocol) is a system that ''requires'' you to share the file you're downloading.
 
 For this to be possible, it is required to be accessible from the internet. However, this isn't always as straight forward as it may seem. Because of the nature of the internet and security reasons, routers create a local network that makes your computer invisible to the internet. This technology is called [NAT](http://en.wikipedia.org/wiki/Network_address_translation).
 
@@ -78,11 +78,13 @@ Most routers manufactured since 2001 have either the UPnP or NAT-PMP feature.
 
 For more comprehensive instructions specific to your router, visit [portforward.com](http://www.portforward.com/english/routers/port_forwarding/routerindex.htm) and choose your router from the list.
 
-== Verify ==
+#### Verify
+
  1. Go to [CanYouSeeMe.org](http://www.canyouseeme.org/)
  1. Enter the Port Transmission uses
  1. If Transmission reports that the 'Port is open' then you have successfully forwarded the port!
 
-== Common Problems ==
+#### Common Problems
+
 Go to the [Why is my port closed?](Why-is-my-port-closed.md) page.
 
