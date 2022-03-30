@@ -105,21 +105,21 @@ Glib::ustring tr_strltime(time_t seconds)
     auto const h = fmt::format(ngettext("{hours} hour", "{hours} hours", hours), fmt::arg("hours", hours));
     if (days != 0)
     {
-        return (days >= 4 || hours == 0) ? d : fmt::format("{}, {}", d, h);
+        return (days >= 4 || hours == 0) ? d : fmt::format(FMT_STRING("{:s}, {:s}"), d, h);
     }
 
     int const minutes = (seconds % 3600) / 60;
     auto const m = fmt::format(ngettext("{minutes} minute", "{minutes} minutes", minutes), fmt::arg("minutes", minutes));
     if (hours != 0)
     {
-        return (hours >= 4 || minutes == 0) ? h : fmt::format("{}, {}", h, m);
+        return (hours >= 4 || minutes == 0) ? h : fmt::format(FMT_STRING("{:s}, {:s}"), h, m);
     }
 
     seconds = (seconds % 3600) % 60;
     auto const s = fmt::format(ngettext("{seconds} second", "{seconds} seconds", seconds), fmt::arg("seconds", seconds));
     if (minutes != 0)
     {
-        return (minutes >= 4 || seconds == 0) ? m : fmt::format("{}, {}", m, s);
+        return (minutes >= 4 || seconds == 0) ? m : fmt::format(FMT_STRING("{:s}, {:s}"), m, s);
     }
 
     return s;

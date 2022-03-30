@@ -415,7 +415,7 @@ void updateBlocklistText(Gtk::Label* w, Glib::RefPtr<Session> const& core)
     auto const msg = fmt::format(
         ngettext("Blocklist has {count} entry", "Blocklist has {count} entries", n),
         fmt::arg("count", n));
-    w->set_markup(fmt::format("<i>{}</i>", msg));
+    w->set_markup(fmt::format(FMT_STRING("<i>{:s}</i>"), msg));
 }
 
 /* prefs dialog is being destroyed, so stop listening to blocklist updates */
@@ -445,7 +445,7 @@ void onBlocklistUpdated(Glib::RefPtr<Session> const& core, int n, blocklist_data
         fmt::arg("count", count));
     data->updateBlocklistButton->set_sensitive(true);
     data->updateBlocklistDialog->set_message(
-        fmt::format("<b>{}</b>", success ? _("Blocklist updated!") : _("Couldn't update blocklist")),
+        fmt::format(FMT_STRING("<b>{:s}</b>"), success ? _("Blocklist updated!") : _("Couldn't update blocklist")),
         true);
     data->updateBlocklistDialog->set_secondary_text(msg);
     updateBlocklistText(data->label, core);
@@ -914,7 +914,7 @@ Gtk::Widget* PrefsDialog::Impl::speedPage()
 
     {
         auto* h = Gtk::make_managed<Gtk::Box>(Gtk::ORIENTATION_HORIZONTAL, GUI_PAD);
-        auto* w = Gtk::make_managed<Gtk::Label>(fmt::format("<b>{}</b>", _("Alternative Speed Limits")));
+        auto* w = Gtk::make_managed<Gtk::Label>(fmt::format(FMT_STRING("<b>{:s}</b>"), _("Alternative Speed Limits")));
         w->set_halign(Gtk::ALIGN_START);
         w->set_valign(Gtk::ALIGN_CENTER);
         w->set_use_markup(true);
@@ -925,7 +925,7 @@ Gtk::Widget* PrefsDialog::Impl::speedPage()
 
     {
         auto* w = Gtk::make_managed<Gtk::Label>(
-            fmt::format("<small>{}</small>", _("Override normal speed limits manually or at scheduled times")));
+            fmt::format(FMT_STRING("<small>{:s}</small>"), _("Override normal speed limits manually or at scheduled times")));
         w->set_use_markup(true);
         w->set_halign(Gtk::ALIGN_START);
         w->set_valign(Gtk::ALIGN_CENTER);
@@ -1029,7 +1029,7 @@ void onPortTest(std::shared_ptr<network_page_data> const& data)
 {
     data->portButton->set_sensitive(false);
     data->portSpin->set_sensitive(false);
-    data->portLabel->set_markup(fmt::format("<i>{}</i>", _("Testing TCP port…")));
+    data->portLabel->set_markup(fmt::format(FMT_STRING("<i>{:s}</i>"), _("Testing TCP port…")));
 
     if (!data->portTag.connected())
     {
