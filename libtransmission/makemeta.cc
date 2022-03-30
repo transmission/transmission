@@ -15,6 +15,7 @@
 #include <event2/util.h> /* evutil_ascii_strcasecmp() */
 
 #include <fmt/core.h>
+#include <fmt/compile.h>
 
 #include "transmission.h"
 
@@ -615,14 +616,8 @@ void tr_makeMetaInfo(
     builder->isPrivate = isPrivate;
     builder->source = tr_strdup(source);
 
-    if (!tr_str_is_empty(outputFile))
-    {
-        builder->outputFile = tr_strdup(outputFile);
-    }
-    else
-    {
-        builder->outputFile = tr_strvDup(tr_strvJoin(builder->top, ".torrent"sv));
-    }
+    builder->outputFile = !tr_str_is_empty(outputFile) ? tr_strdup(outputFile) :
+                                                         tr_strvDup(fmt::format(FMT_COMPILE("{:s}.torrent"), builder->top));
 
     /* enqueue the builder */
     auto const lock = std::lock_guard(queue_mutex_);
