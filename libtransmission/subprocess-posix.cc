@@ -13,6 +13,8 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
+#include <fmt/compile.h>
+
 #include "transmission.h"
 #include "error.h"
 #include "subprocess.h"
@@ -42,7 +44,7 @@ static void set_system_error(tr_error** error, int code, std::string_view what)
         return;
     }
 
-    tr_error_set(error, code, tr_strvJoin(what, " failed "sv, tr_strerror(code)));
+    tr_error_set(error, code, fmt::format(FMT_COMPILE("{:s} failed: {:s} ({:d})"), what, tr_strerror(code), code));
 }
 
 static bool tr_spawn_async_in_child(
