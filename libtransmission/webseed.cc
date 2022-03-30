@@ -12,6 +12,8 @@
 #include <event2/buffer.h>
 #include <event2/event.h>
 
+#include <fmt/compile.h>
+
 #include "transmission.h"
 
 #include "bandwidth.h"
@@ -490,7 +492,7 @@ void task_request_next_chunk(tr_webseed_task* task)
     auto url = tr_urlbuf{};
     makeUrl(webseed, tor->fileSubpath(file_index), std::back_inserter(url));
     auto options = tr_web::FetchOptions{ url.sv(), onPartialDataFetched, task };
-    options.range = tr_strvJoin(std::to_string(file_offset), "-"sv, std::to_string(file_offset + this_chunk - 1));
+    options.range = fmt::format(FMT_COMPILE("{:d}-{:d}"), file_offset, file_offset + this_chunk - 1);
     options.speed_limit_tag = tor->uniqueId;
     options.buffer = task->content();
     tor->session->web->fetch(std::move(options));
