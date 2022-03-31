@@ -38,7 +38,7 @@ static void set_system_error(tr_error** error, DWORD code, std::string_view what
 
     if (message == nullptr)
     {
-        message = tr_strdup_printf("Unknown error: 0x%08lx", code);
+        message = fmt::format(FMT_STRING("Unknown error: {:#08x}"), code);
     }
 
     tr_error_set(error, code, tr_strvJoin(what, " failed: "sv, message));

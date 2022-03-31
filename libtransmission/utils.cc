@@ -36,7 +36,7 @@
 #include <event2/buffer.h>
 #include <event2/event.h>
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include "transmission.h"
 
@@ -466,18 +466,6 @@ bool tr_wildmat(char const* text, char const* p)
     return (p[0] == '*' && p[1] == '\0') || (DoMatch(text, p) != 0);
 }
 
-char* tr_strdup_printf(char const* fmt, ...)
-{
-    evbuffer* const buf = evbuffer_new();
-
-    va_list ap;
-    va_start(ap, fmt);
-    evbuffer_add_vprintf(buf, fmt, ap);
-    va_end(ap);
-
-    return evbuffer_free_to_str(buf, nullptr);
-}
-
 char const* tr_strerror(int i)
 {
     char const* ret = strerror(i);
@@ -899,7 +887,7 @@ char* tr_win32_format_message(uint32_t code)
 
     if (wide_size == 0)
     {
-        return tr_strdup_printf("Unknown error (0x%08x)", code);
+        return tr_strvDup(fmt::format(FMT_STRING("Unknown error ({:#08x})"), code);
     }
 
     if (wide_size != 0 && wide_text != nullptr)
