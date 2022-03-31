@@ -2289,7 +2289,7 @@ Bandwidth& tr_session::getBandwidthGroup(std::string_view name)
 
     if (it == std::end(groups))
     {
-        it = groups.try_emplace(key, std::make_unique<Bandwidth>(&top_bandwidth_)).first;
+        it = groups.try_emplace(key, std::make_unique<Bandwidth>(new Bandwidth(&top_bandwidth_))).first;
     }
 
     return *it->second;
