@@ -419,22 +419,6 @@ std::string evbuffer_free_to_str(evbuffer* buf)
     return ret;
 }
 
-static char* evbuffer_free_to_str(struct evbuffer* buf, size_t* result_len)
-{
-    size_t const n = evbuffer_get_length(buf);
-    auto* const ret = tr_new(char, n + 1);
-    evbuffer_copyout(buf, ret, n);
-    evbuffer_free(buf);
-    ret[n] = '\0';
-
-    if (result_len != nullptr)
-    {
-        *result_len = n;
-    }
-
-    return ret;
-}
-
 char* tr_strvDup(std::string_view in)
 {
     auto const n = std::size(in);
