@@ -198,6 +198,10 @@ void tr_completion::removePiece(tr_piece_index_t piece)
 uint64_t tr_completion::countHasBytesInBlocks(tr_block_span_t span) const
 {
     auto const [begin, end] = span;
+    if (begin >= end)
+    {
+        return 0;
+    }
 
     uint64_t n = blocks_.count(begin, end);
     n *= tr_block_info::BlockSize;
