@@ -115,7 +115,11 @@ std::optional<tr_sha1_digest_t> parseBase32Hash(std::string_view sv)
         return {};
     }
 
-    if (!std::all_of(std::begin(sv), std::end(sv), [](unsigned char ch) { return bitzi::Base32Lookup[ch] - '0' != 0xFF; }))
+    if (!std::all_of(
+            std::begin(sv),
+            std::end(sv),
+            [](unsigned char ch)
+            { return '0' <= ch && ch <= '0' + std::size(bitzi::Base32Lookup) && bitzi::Base32Lookup[ch - '0'] != 0xFF; }))
     {
         return {};
     }
@@ -211,7 +215,7 @@ bool tr_magnet_metainfo::parseMagnet(std::string_view magnet_link, tr_error** er
                 this->webseed_urls_.emplace_back(url_sv);
             }
         }
-        else if (auto constexpr ValPrefix = "urn:btih:"sv; key == "xt"sv && tr_strvStartsWith(value, ValPrefix))
+        else if (static auto constexpr ValPrefix = "urn:btih:"sv; key == "xt"sv && tr_strvStartsWith(value, ValPrefix))
         {
             if (auto const hash = parseHash(value.substr(std::size(ValPrefix))); hash)
             {
