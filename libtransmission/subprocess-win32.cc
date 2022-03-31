@@ -38,7 +38,7 @@ static void set_system_error(tr_error** error, DWORD code, std::string_view what
 
     if (char* message = tr_win32_format_message(code); message != nullptr)
     {
-        tr_error_set(error, code, fmt::format(FMT_STRING("{:s} failed: {:s}"), what, message);
+        tr_error_set(error, code, fmt::format(FMT_STRING("{:s} failed: {:s}"), what, message));
         tr_free(message);
     }
     else
