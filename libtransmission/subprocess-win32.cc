@@ -11,6 +11,8 @@
 #include <map>
 #include <string_view>
 
+#include <fmt/format.h>
+
 #include <windows.h>
 
 #include "transmission.h"
