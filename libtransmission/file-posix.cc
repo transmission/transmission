@@ -384,26 +384,26 @@ char* tr_sys_path_resolve(char const* path, tr_error** error)
     return ret;
 }
 
-std::string tr_sys_path_basename(std::string_view path, tr_error** error)
+tr_pathbuf tr_sys_path_basename(std::string_view in, tr_error** error)
 {
-    auto tmp = std::string{ path };
+    auto buf = tr_pathbuf{ in };
 
-    if (char const* ret = basename(std::data(tmp)); ret != nullptr)
+    if (char const* ret = basename(std::data(buf)); ret != nullptr)
     {
-        return ret;
+        return tr_pathbuf{ ret };
     }
 
     set_system_error(error, errno);
     return {};
 }
 
-std::string tr_sys_path_dirname(std::string_view path, tr_error** error)
+tr_pathbuf tr_sys_path_dirname(std::string_view in, tr_error** error)
 {
-    auto tmp = std::string{ path };
+    auto buf = tr_pathbuf{ in };
 
-    if (char const* ret = dirname(std::data(tmp)); ret != nullptr)
+    if (char const* ret = dirname(std::data(buf)); ret != nullptr)
     {
-        return ret;
+        return tr_pathbuf{ ret };
     }
 
     set_system_error(error, errno);

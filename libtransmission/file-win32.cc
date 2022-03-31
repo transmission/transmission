@@ -648,7 +648,7 @@ cleanup:
     return ret;
 }
 
-std::string tr_sys_path_basename(std::string_view path, tr_error** error)
+tr_pathbuf tr_sys_path_basename(std::string_view path, tr_error** error)
 {
     if (std::empty(path))
     {
@@ -686,10 +686,10 @@ std::string tr_sys_path_basename(std::string_view path, tr_error** error)
         return "/";
     }
 
-    return { name, size_t(end - name) };
+    return std::string_view{ name, size_t(end - name) };
 }
 
-std::string tr_sys_path_dirname(std::string_view path, tr_error** error)
+tr_pathbuf tr_sys_path_dirname(std::string_view path, tr_error** error)
 {
     if (std::empty(path))
     {
@@ -706,7 +706,7 @@ std::string tr_sys_path_dirname(std::string_view path, tr_error** error)
 
     if (is_unc && path[2] == '\0')
     {
-        return std::string{ path };
+        return tr_pathbuf{ path };
     }
 
     char const* const begin = std::data(path);
@@ -741,7 +741,7 @@ std::string tr_sys_path_dirname(std::string_view path, tr_error** error)
 
     if (name > begin && *(name - 1) == ':' && *name != '\0' && !is_slash(*name))
     {
-        return fmt::format("{}:.", begin[0]);
+        return tr_pathbuf{ begin[0], ":."sv };
     }
 
     return { begin, size_t(name - begin) };

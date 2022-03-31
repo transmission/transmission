@@ -158,7 +158,7 @@ protected:
         char const* output;
     };
 
-    static void testPathXname(XnameTestData const* data, size_t data_size, std::string (*func)(std::string_view, tr_error**))
+    static void testPathXname(XnameTestData const* data, size_t data_size, tr_pathbuf (*func)(std::string_view, tr_error**))
     {
         for (size_t i = 0; i < data_size; ++i)
         {
@@ -169,11 +169,11 @@ protected:
             {
                 EXPECT_NE(""sv, name);
                 EXPECT_EQ(nullptr, err) << *err;
-                EXPECT_EQ(data[i].output, name);
+                EXPECT_EQ(data[i].output, name.sv());
             }
             else
             {
-                EXPECT_EQ(""sv, name);
+                EXPECT_EQ(""sv, name.sv());
                 EXPECT_NE(nullptr, err);
                 tr_error_clear(&err);
             }

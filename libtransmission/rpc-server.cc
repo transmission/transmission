@@ -291,7 +291,7 @@ static void handle_web_client(struct evhttp_request* req, tr_rpc_server* server)
         }
         else
         {
-            auto const filename = tr_pathbuf{ webClientDir, "/"sv, tr_str_is_empty(subpath) ? "index.html" : subpath };
+            auto const filename = tr_pathbuf{ webClientDir, '/', tr_str_is_empty(subpath) ? "index.html" : subpath };
             serve_file(req, server, filename.sv());
         }
 

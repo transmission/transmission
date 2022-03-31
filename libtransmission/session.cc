@@ -2036,7 +2036,7 @@ static void sessionLoadTorrents(struct sessionLoadTorrentsData* const data)
                 continue;
             }
 
-            auto const path = tr_pathbuf{ dirname_sv, "/"sv, name };
+            auto const path = tr_pathbuf{ dirname_sv, '/', name };
 
             // is a magnet link?
             if (!tr_ctorSetMetainfoFromFile(data->ctor, std::string{ path }, nullptr))
@@ -2880,7 +2880,7 @@ int tr_sessionCountQueueFreeSlots(tr_session* session, tr_direction dir)
 
 static void bandwidthGroupRead(tr_session* session, std::string_view config_dir)
 {
-    auto const filename = tr_pathbuf{ config_dir, "/"sv, BandwidthGroupsFilename };
+    auto const filename = tr_pathbuf{ config_dir, '/', BandwidthGroupsFilename };
     auto groups_dict = tr_variant{};
     if (!tr_variantFromFile(&groups_dict, TR_VARIANT_PARSE_JSON, filename, nullptr) || !tr_variantIsList(&groups_dict))
     {
@@ -2942,7 +2942,7 @@ static int bandwidthGroupWrite(tr_session const* session, std::string_view confi
         tr_variantDictAddBool(dict, TR_KEY_honorsSessionLimits, group->areParentLimitsHonored(TR_UP));
     }
 
-    auto const filename = tr_pathbuf{ config_dir, "/"sv, BandwidthGroupsFilename };
+    auto const filename = tr_pathbuf{ config_dir, '/', BandwidthGroupsFilename };
     auto const ret = tr_variantToFile(&groups_dict, TR_VARIANT_FMT_JSON, filename);
     tr_variantFree(&groups_dict);
     return ret;

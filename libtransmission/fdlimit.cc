@@ -176,7 +176,7 @@ static int cached_file_open(
             goto FAIL;
         }
 
-        if (!tr_sys_dir_create(dir.c_str(), TR_SYS_DIR_CREATE_PARENTS, 0777, &error))
+        if (!tr_sys_dir_create(dir, TR_SYS_DIR_CREATE_PARENTS, 0777, &error))
         {
             tr_logAddError(fmt::format(
                 _("Couldn't create '{path}': {error} ({error_code})"),

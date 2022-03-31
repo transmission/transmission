@@ -54,6 +54,12 @@ public:
         append(args...);
     }
 
+    template<typename ContiguousRange>
+    [[nodiscard]] bool operator==(ContiguousRange const& x) const noexcept
+    {
+        return size() == x.size() && std::equal(begin(), end(), x.begin());
+    }
+
     [[nodiscard]] constexpr auto begin() noexcept
     {
         return buffer_.begin();

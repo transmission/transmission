@@ -63,7 +63,7 @@ TEST_F(TorrentsTest, rangedLoop)
 
     for (auto const& name : Filenames)
     {
-        auto const path = tr_strvJoin(LIBTRANSMISSION_TEST_ASSETS_DIR, "/"sv, name);
+        auto const path = tr_pathbuf{ LIBTRANSMISSION_TEST_ASSETS_DIR, '/', name };
         auto tm = tr_torrent_metainfo{};
         EXPECT_TRUE(tm.parseTorrentFile(path));
         auto* const tor = new tr_torrent(std::move(tm));

@@ -317,10 +317,9 @@ char const* tr_getDefaultDownloadDir()
 
 static bool isWebClientDir(std::string_view path)
 {
-    auto tmp = tr_strvPath(path, "index.html");
-    bool const ret = tr_sys_path_exists(tmp.c_str());
+    auto const tmp = tr_pathbuf{ path, '/', "index.html"sv };
     tr_logAddTrace(fmt::format("Searching for web interface file '{}'", tmp));
-    return ret;
+    return tr_sys_path_exists(tmp);
 }
 
 char const* tr_getWebClientDir([[maybe_unused]] tr_session const* session)
@@ -402,12 +401,12 @@ char const* tr_getWebClientDir([[maybe_unused]] tr_session const* session)
                 wchar_t wide_module_path[MAX_PATH];
                 GetModuleFileNameW(nullptr, wide_module_path, TR_N_ELEMENTS(wide_module_path));
                 char* module_path = tr_win32_native_to_utf8(wide_module_path, -1);
-                auto const dir = tr_sys_path_dirname(module_path);
+                auto dir = tr_sys_path_dirname(module_path);
                 tr_free(module_path);
 
                 if (!std::empty(dir))
                 {
-                    char* path = tr_buildPath(dir.c_str(), "Web", nullptr);
+                    dir.append('/', "Web"sv);
 
                     if (isWebClientDir(path))
                     {

@@ -171,17 +171,17 @@ int tr_main(int argc, char* argv[])
     if (std::empty(options.outfile))
     {
         tr_error* error = nullptr;
-        auto const base = tr_sys_path_basename(options.infile, &error);
+        auto basename = tr_sys_path_basename(options.infile, &error);
 
-        if (std::empty(base))
+        if (std::empty(basename))
         {
             fprintf(stderr, "ERROR: Cannot deduce output path from input path: %s\n", error->message);
             return EXIT_FAILURE;
         }
 
-        auto const end = tr_strvJoin(base, ".torrent"sv);
+        basename.append(".torrent"sv);
         char* cwd = tr_getcwd();
-        options.outfile = tr_strvDup(tr_strvPath(cwd, end.c_str()));
+        options.outfile = tr_strvDup(fmt::format("{}/{}", cwd, basename.sv()));
         tr_free(cwd);
     }
 

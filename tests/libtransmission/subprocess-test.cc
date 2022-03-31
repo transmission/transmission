@@ -29,11 +29,11 @@ namespace libtransmission
 namespace test
 {
 
-std::string getTestProgramPath(std::string const& filename)
+auto getTestProgramPath(std::string const& filename)
 {
     auto const exe_path = makeString(tr_sys_path_resolve(testing::internal::GetArgvs().front().data()));
     auto const exe_dir = tr_sys_path_dirname(exe_path);
-    return exe_dir + TR_PATH_DELIMITER + filename;
+    return tr_pathbuf{ exe_dir, '/', filename };
 }
 
 class SubprocessTest
