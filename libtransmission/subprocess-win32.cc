@@ -36,16 +36,15 @@ static void set_system_error(tr_error** error, DWORD code, std::string_view what
         return;
     }
 
-    char* message = tr_win32_format_message(code);
-
-    if (message == nullptr)
+    if (char* message = tr_win32_format_message(code); message != nullptr)
     {
-        message = fmt::format(FMT_STRING("Unknown error: {:#08x}"), code);
+        tr_error_set(error, code, fmt::format(FMT_STRING("{:s} failed: {:s}"), what, message);
+        tr_free(message);
     }
-
-    tr_error_set(error, code, tr_strvJoin(what, " failed: "sv, message));
-
-    tr_free(message);
+    else
+    {
+        tr_error_set(error, code, fmt::format(FMT_STRING("{:s} failed: Unknown error: {:#08x}"), what, code));
+    }
 }
 
 static void append_to_env_block(wchar_t** env_block, size_t* env_block_len, wchar_t const* part, size_t part_len)
