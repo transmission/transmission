@@ -332,7 +332,8 @@ TEST_F(CompletionTest, createPieceBitfield)
 
     // make a completion object that has a random assortment of pieces
     auto completion = tr_completion(&torrent, &block_info);
-    auto buf = std::array<char, 64>{};
+    auto buf = std::array<char, 65>{};
+    ASSERT_EQ(std::size(buf), block_info.pieceCount());
     EXPECT_TRUE(tr_rand_buffer(std::data(buf), std::size(buf)));
     for (uint64_t i = 0; i < block_info.n_pieces; ++i)
     {

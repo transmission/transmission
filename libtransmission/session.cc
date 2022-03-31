@@ -2289,7 +2289,7 @@ Bandwidth& tr_session::getBandwidthGroup(std::string_view name)
 
     if (it == std::end(groups))
     {
-        it = groups.try_emplace(key, std::make_unique<Bandwidth>(&top_bandwidth_)).first;
+        it = groups.try_emplace(key, std::make_unique<Bandwidth>(new Bandwidth(&top_bandwidth_))).first;
     }
 
     return *it->second;
@@ -2882,7 +2882,7 @@ static void bandwidthGroupRead(tr_session* session, std::string_view config_dir)
 {
     auto const filename = tr_pathbuf{ config_dir, "/"sv, BandwidthGroupsFilename };
     auto groups_dict = tr_variant{};
-    if (!tr_variantFromFile(&groups_dict, TR_VARIANT_PARSE_JSON, filename, nullptr) || !tr_variantIsList(&groups_dict))
+    if (!tr_variantFromFile(&groups_dict, TR_VARIANT_PARSE_JSON, filename, nullptr) || !tr_variantIsDict(&groups_dict))
     {
         return;
     }

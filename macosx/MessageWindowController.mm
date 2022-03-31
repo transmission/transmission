@@ -105,8 +105,9 @@
     filterButtonFrame.origin.x -= NSWidth(clearButtonFrame) - oldClearButtonWidth;
     self.fFilterField.frame = filterButtonFrame;
 
-    self.fAttributes = [[[self.fMessageTable tableColumnWithIdentifier:@"Message"].dataCell attributedStringValue] attributesAtIndex:0
-                                                                                                            effectiveRange:NULL];
+    self.fAttributes = [[[self.fMessageTable tableColumnWithIdentifier:@"Message"].dataCell attributedStringValue]
+        attributesAtIndex:0
+           effectiveRange:NULL];
 
     //select proper level in popup button
     switch ([NSUserDefaults.standardUserDefaults integerForKey:@"MessageLevel"])
@@ -147,8 +148,9 @@
 {
     if (!self.fTimer)
     {
-        self.fTimer = [NSTimer scheduledTimerWithTimeInterval:UPDATE_SECONDS target:self selector:@selector(updateLog:) userInfo:nil
-                                                 repeats:YES];
+        self.fTimer = [NSTimer scheduledTimerWithTimeInterval:UPDATE_SECONDS target:self selector:@selector(updateLog:)
+                                                     userInfo:nil
+                                                      repeats:YES];
         [self updateLog:nil];
     }
 }
@@ -173,7 +175,7 @@
 {
     [self.fTimer invalidate];
     self.fTimer = [NSTimer scheduledTimerWithTimeInterval:UPDATE_SECONDS target:self selector:@selector(updateLog:) userInfo:nil
-                                             repeats:YES];
+                                                  repeats:YES];
     [self updateLog:nil];
 }
 
@@ -406,7 +408,7 @@
 
     [self.fMessageTable beginUpdates];
     [self.fMessageTable removeRowsAtIndexes:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, self.fDisplayedMessages.count)]
-                         withAnimation:NSTableViewAnimationSlideLeft];
+                              withAnimation:NSTableViewAnimationSlideLeft];
 
     [self.fDisplayedMessages removeAllObjects];
 
@@ -460,7 +462,8 @@
 
 - (void)resizeColumn
 {
-    [self.fMessageTable noteHeightOfRowsWithIndexesChanged:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, self.fMessageTable.numberOfRows)]];
+    [self.fMessageTable
+        noteHeightOfRowsWithIndexesChanged:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, self.fMessageTable.numberOfRows)]];
 }
 
 - (BOOL)shouldIncludeMessageForFilter:(NSString*)filterString message:(NSDictionary*)message
@@ -481,10 +484,10 @@
     NSString* filterString = self.fFilterField.stringValue;
 
     NSIndexSet* indexes = [self.fMessages indexesOfObjectsWithOptions:NSEnumerationConcurrent
-                                                     passingTest:^BOOL(id message, NSUInteger idx, BOOL* stop) {
-                                                         return [((NSDictionary*)message)[@"Level"] integerValue] <= level &&
-                                                             [self shouldIncludeMessageForFilter:filterString message:message];
-                                                     }];
+                                                          passingTest:^BOOL(id message, NSUInteger idx, BOOL* stop) {
+                                                              return [((NSDictionary*)message)[@"Level"] integerValue] <= level &&
+                                                                  [self shouldIncludeMessageForFilter:filterString message:message];
+                                                          }];
 
     NSArray* tempMessages = [[self.fMessages objectsAtIndexes:indexes] sortedArrayUsingDescriptors:self.fMessageTable.sortDescriptors];
 
@@ -524,7 +527,7 @@
         NSRange const removeRange = NSMakeRange(currentIndex, self.fDisplayedMessages.count - currentIndex);
         [self.fDisplayedMessages removeObjectsInRange:removeRange];
         [self.fMessageTable removeRowsAtIndexes:[NSIndexSet indexSetWithIndexesInRange:removeRange]
-                             withAnimation:NSTableViewAnimationSlideDown];
+                                  withAnimation:NSTableViewAnimationSlideDown];
     }
 
     //add new items

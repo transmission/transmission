@@ -122,9 +122,8 @@
     NSInteger globalUseSpeedLimit = torrent.usesGlobalSpeedLimit ? NSControlStateValueOn : NSControlStateValueOff;
 
     while ((torrent = [enumerator nextObject]) &&
-           (uploadUseSpeedLimit != NSControlStateValueMixed || uploadSpeedLimit != INVALID ||
-            downloadUseSpeedLimit != NSControlStateValueMixed || downloadSpeedLimit != INVALID ||
-            globalUseSpeedLimit != NSControlStateValueMixed))
+           (uploadUseSpeedLimit != NSControlStateValueMixed || uploadSpeedLimit != INVALID || downloadUseSpeedLimit != NSControlStateValueMixed ||
+            downloadSpeedLimit != INVALID || globalUseSpeedLimit != NSControlStateValueMixed))
     {
         if (uploadUseSpeedLimit != NSControlStateValueMixed &&
             uploadUseSpeedLimit != ([torrent usesSpeedLimit:YES] ? NSControlStateValueOn : NSControlStateValueOff))
@@ -195,8 +194,7 @@
 
     NSInteger checkRatio = torrent.ratioSetting;
     NSInteger checkIdle = torrent.idleSetting;
-    NSInteger removeWhenFinishSeeding = torrent.removeWhenFinishSeeding ? NSControlStateValueOn
-                                                                        : NSControlStateValueOff;
+    NSInteger removeWhenFinishSeeding = torrent.removeWhenFinishSeeding ? NSControlStateValueOn : NSControlStateValueOff;
     CGFloat ratioLimit = torrent.ratioLimit;
     NSUInteger idleLimit = torrent.idleLimitMinutes;
 
@@ -224,8 +222,7 @@
         }
 
         if (removeWhenFinishSeeding != NSControlStateValueMixed &&
-            removeWhenFinishSeeding != (torrent.removeWhenFinishSeeding ? NSControlStateValueOn
-                                                                        : NSControlStateValueOff))
+            removeWhenFinishSeeding != (torrent.removeWhenFinishSeeding ? NSControlStateValueOn : NSControlStateValueOff))
         {
             removeWhenFinishSeeding = NSControlStateValueMixed;
         }

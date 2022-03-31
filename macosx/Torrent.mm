@@ -199,7 +199,7 @@ bool trashDataFile(char const* filename, tr_error** error)
 {
     //restore GroupValue
     torrent.groupValue = [history[@"GroupValue"] intValue];
-    
+
     //start transfer
     NSNumber* active;
     if (!pause && (active = history[@"Active"]) && active.boolValue)
@@ -1873,7 +1873,11 @@ bool trashDataFile(char const* filename, tr_error** error)
                 tempNode = [[FileListNode alloc] initWithFolderName:pathComponents[0] path:@"" torrent:self];
             }
 
-            [self insertPathForComponents:pathComponents withComponentIndex:1 forParent:tempNode fileSize:file.length index:i
+            [self insertPathForComponents:pathComponents
+                       withComponentIndex:1
+                                forParent:tempNode
+                                 fileSize:file.length
+                                    index:i
                                  flatList:flatFileList];
         }
 
