@@ -79,7 +79,8 @@ Most routers manufactured since 2001 have either the UPnP or NAT-PMP feature.
 
 For more comprehensive instructions specific to your router, visit [portforward.com](http://www.portforward.com/english/routers/port_forwarding/routerindex.htm) and choose your router from the list.
 
-  * Please note that port mapping changes will not take effect until the router is rebooted
+  * Please note that port mapping changes might not take effect until the router is rebooted
+
 
 #### Verify
 
