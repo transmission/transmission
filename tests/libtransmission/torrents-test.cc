@@ -66,15 +66,16 @@ TEST_F(TorrentsTest, rangedLoop)
         auto const path = tr_strvJoin(LIBTRANSMISSION_TEST_ASSETS_DIR, "/"sv, name);
         auto tm = tr_torrent_metainfo{};
         EXPECT_TRUE(tm.parseTorrentFile(path));
-        auto* const tor = new tr_torrent(std::move(tm));
+        auto* const tor = new tr_torrent{ std::move(tm) };
         tor->uniqueId = torrents.add(tor);
         EXPECT_EQ(tor, torrents.get(tor->uniqueId));
         torrents_set.insert(tor);
     }
 
-    for (auto const* tor : torrents)
+    for (auto* const tor : torrents)
     {
         EXPECT_EQ(1U, torrents_set.erase(tor));
+        delete tor;
     }
     EXPECT_EQ(0U, std::size(torrents_set));
     EXPECT_EQ(0U, std::size(torrents_set));
@@ -96,7 +97,7 @@ TEST_F(TorrentsTest, removedSince)
     {
         auto const path = tr_strvJoin(LIBTRANSMISSION_TEST_ASSETS_DIR, "/"sv, name);
         auto tm = tr_torrent_metainfo{};
-        auto* const tor = new tr_torrent(std::move(tm));
+        auto* const tor = new tr_torrent{ std::move(tm) };
         tor->uniqueId = torrents.add(tor);
         torrents_v.push_back(tor);
     }
@@ -119,4 +120,6 @@ TEST_F(TorrentsTest, removedSince)
     EXPECT_EQ(remove, torrents.removedSince(200));
     remove = { torrents_v[0]->uniqueId, torrents_v[1]->uniqueId, torrents_v[2]->uniqueId, torrents_v[3]->uniqueId };
     EXPECT_EQ(remove, torrents.removedSince(50));
+
+    std::for_each(std::begin(torrents_v), std::end(torrents_v), [](auto* tor) { delete tor; });
 }
