@@ -50,8 +50,8 @@
                                     <menuItem title="Error" state="on" image="RedDotFlat" id="17"/>
                                     <menuItem title="Warn" image="OrangeDotFlat" id="yoL-9H-kTt"/>
                                     <menuItem title="Info" image="GreenDotFlat" id="18"/>
-                                    <menuItem title="Debug" image="PurpleDotFlat" id="19"/>
-                                    <menuItem title="Trace" image="BlueDotFlat" id="2hu-LL-6A5"/>
+                                    <menuItem title="Debug" image="BlueDotFlat" id="19"/>
+                                    <menuItem title="Trace" image="PurpleDotFlat" id="2hu-LL-6A5"/>
                                 </items>
                             </menu>
                         </popUpButtonCell>
