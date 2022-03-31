@@ -199,7 +199,6 @@ NSMutableSet* fTrackerIconLoading;
 
     if (@available(macOS 11.0, *))
     {
-#ifdef __MAC_11_0
         NSImage* result = [NSImage imageWithSystemSymbolName:@"globe" accessibilityDescription:nil];
         [result lockFocus];
         [NSColor.textColor set];
@@ -207,7 +206,6 @@ NSMutableSet* fTrackerIconLoading;
         NSRectFillUsingOperation(imageRect, NSCompositingOperationSourceIn);
         [result unlockFocus];
         return result;
-#endif
     }
 
     return [NSImage imageNamed:@"FavIcon"];

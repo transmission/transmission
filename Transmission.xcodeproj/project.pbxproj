@@ -409,6 +409,7 @@
 		C3D9062727B7E3E800EF2386 /* psl.c in Sources */ = {isa = PBXBuildFile; fileRef = C3D9061827B7E1DE00EF2386 /* psl.c */; };
 		C3D9062A27B7EAC600EF2386 /* libpsl.h in Headers */ = {isa = PBXBuildFile; fileRef = C3D9061B27B7E31100EF2386 /* libpsl.h */; };
 		C3D9062F27B7F7E200EF2386 /* libpsl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C3D9062127B7E3C900EF2386 /* libpsl.a */; };
+		C81E411327F5BABD00652F56 /* Compatibility.m in Sources */ = {isa = PBXBuildFile; fileRef = C81E411227F5BABD00652F56 /* Compatibility.m */; };
 		CAB35C64252F6F5E00552A55 /* mime-types.h in Headers */ = {isa = PBXBuildFile; fileRef = CAB35C62252F6F5E00552A55 /* mime-types.h */; };
 		E138A9780C04D88F00C5426C /* ProgressGradients.mm in Sources */ = {isa = PBXBuildFile; fileRef = E138A9760C04D88F00C5426C /* ProgressGradients.mm */; };
 		E23B55A5FC3B557F7746D510 /* interned-string.h in Headers */ = {isa = PBXBuildFile; fileRef = E23B55A5FC3B557F7746D511 /* interned-string.h */; settings = {ATTRIBUTES = (Project, ); }; };
@@ -1137,6 +1138,8 @@
 		C3D9061827B7E1DE00EF2386 /* psl.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = psl.c; path = src/psl.c; sourceTree = "<group>"; };
 		C3D9061B27B7E31100EF2386 /* libpsl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = libpsl.h; path = include/libpsl.h; sourceTree = "<group>"; };
 		C3D9062127B7E3C900EF2386 /* libpsl.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libpsl.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		C81E411127F5BABD00652F56 /* Compatibility.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Compatibility.h; sourceTree = "<group>"; };
+		C81E411227F5BABD00652F56 /* Compatibility.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Compatibility.m; sourceTree = "<group>"; };
 		CAB35C62252F6F5E00552A55 /* mime-types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "mime-types.h"; sourceTree = "<group>"; };
 		E138A9750C04D88F00C5426C /* ProgressGradients.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ProgressGradients.h; sourceTree = "<group>"; };
 		E138A9760C04D88F00C5426C /* ProgressGradients.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ProgressGradients.mm; sourceTree = "<group>"; };
@@ -1346,6 +1349,7 @@
 				A2F7CF5E13035FFD0016FF10 /* URLSheetWindowController.mm */,
 				A2966E8513DAF74C007B52DF /* GlobalOptionsPopoverViewController.h */,
 				A2966E8613DAF74C007B52DF /* GlobalOptionsPopoverViewController.mm */,
+				C81E411027F5BA8300652F56 /* Compatibility */,
 				A234D0D40C79FB6000A82373 /* Additions */,
 				E1B6FBF80C0D719B0015FE4D /* Info Window */,
 				A26AF2220D2DA42800FF7140 /* File Outline View */,
@@ -1980,6 +1984,15 @@
 			);
 			name = libpsl;
 			path = "third-party/libpsl";
+			sourceTree = "<group>";
+		};
+		C81E411027F5BA8300652F56 /* Compatibility */ = {
+			isa = PBXGroup;
+			children = (
+				C81E411127F5BABD00652F56 /* Compatibility.h */,
+				C81E411227F5BABD00652F56 /* Compatibility.m */,
+			);
+			name = Compatibility;
 			sourceTree = "<group>";
 		};
 		E1B6FBF80C0D719B0015FE4D /* Info Window */ = {
@@ -2874,6 +2887,7 @@
 				A2385DD40BFE06C800B24EF6 /* DragOverlayWindow.mm in Sources */,
 				A2FB057F0BFEB6800095564D /* DragOverlayView.mm in Sources */,
 				E138A9780C04D88F00C5426C /* ProgressGradients.mm in Sources */,
+				C81E411327F5BABD00652F56 /* Compatibility.m in Sources */,
 				A2DF37070C220D03006523C1 /* CreatorWindowController.mm in Sources */,
 				35F373030C2DA89000DAA8F2 /* FilePriorityCell.mm in Sources */,
 				A2085DDC0C53BC74000BC3B7 /* AboutWindowController.mm in Sources */,

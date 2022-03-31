@@ -298,9 +298,7 @@
         item.label = NSLocalizedString(@"General", "Preferences -> toolbar item title");
         if (@available(macOS 11.0, *))
         {
-#ifdef __MAC_11_0
             item.image = [NSImage imageWithSystemSymbolName:@"gearshape" accessibilityDescription:nil];
-#endif
         }
         else
         {
@@ -315,9 +313,7 @@
         item.label = NSLocalizedString(@"Transfers", "Preferences -> toolbar item title");
         if (@available(macOS 11.0, *))
         {
-#ifdef __MAC_11_0
             item.image = [NSImage imageWithSystemSymbolName:@"arrow.up.arrow.down" accessibilityDescription:nil];
-#endif
         }
         else
         {
@@ -332,9 +328,7 @@
         item.label = NSLocalizedString(@"Groups", "Preferences -> toolbar item title");
         if (@available(macOS 11.0, *))
         {
-#ifdef __MAC_11_0
             item.image = [NSImage imageWithSystemSymbolName:@"pin" accessibilityDescription:nil];
-#endif
         }
         else
         {
@@ -349,9 +343,7 @@
         item.label = NSLocalizedString(@"Bandwidth", "Preferences -> toolbar item title");
         if (@available(macOS 11.0, *))
         {
-#ifdef __MAC_11_0
             item.image = [NSImage imageWithSystemSymbolName:@"speedometer" accessibilityDescription:nil];
-#endif
         }
         else
         {
@@ -366,9 +358,7 @@
         item.label = NSLocalizedString(@"Peers", "Preferences -> toolbar item title");
         if (@available(macOS 11.0, *))
         {
-#ifdef __MAC_11_0
             item.image = [NSImage imageWithSystemSymbolName:@"person.2" accessibilityDescription:nil];
-#endif
         }
         else
         {
@@ -383,9 +373,7 @@
         item.label = NSLocalizedString(@"Network", "Preferences -> toolbar item title");
         if (@available(macOS 11.0, *))
         {
-#ifdef __MAC_11_0
             item.image = [NSImage imageWithSystemSymbolName:@"network" accessibilityDescription:nil];
-#endif
         }
         else
         {
@@ -400,9 +388,7 @@
         item.label = NSLocalizedString(@"Remote", "Preferences -> toolbar item title");
         if (@available(macOS 11.0, *))
         {
-#ifdef __MAC_11_0
             item.image = [NSImage imageWithSystemSymbolName:@"antenna.radiowaves.left.and.right" accessibilityDescription:nil];
-#endif
         }
         else
         {
