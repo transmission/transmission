@@ -871,7 +871,7 @@ char* tr_win32_format_message(uint32_t code)
 
     if (wide_size == 0)
     {
-        return tr_strvDup(fmt::format(FMT_STRING("Unknown error ({:#08x})"), code);
+        return tr_strvDup(fmt::format(FMT_STRING("Unknown error ({:#08x})"), code));
     }
 
     if (wide_size != 0 && wide_text != nullptr)
