@@ -100,24 +100,13 @@ typedef NS_ENUM(unsigned int, tabTag) {
     [self.fTabs.cell setToolTip:NSLocalizedString(@"Files", "Inspector -> tab") forSegment:TAB_FILE_TAG];
     [self.fTabs.cell setToolTip:NSLocalizedString(@"Options", "Inspector -> tab") forSegment:TAB_OPTIONS_TAG];
 
-    [self.fTabs setImage:[NSImage systemSymbol:@"info.circle"
-                             withFallback:@"InfoGeneral"]
-         forSegment:TAB_GENERAL_TAG];
-    [self.fTabs setImage:[NSImage systemSymbol:@"square.grid.3x3.fill.square"
-                             withFallback:@"InfoActivity"]
-         forSegment:TAB_ACTIVITY_TAG];
-    [self.fTabs setImage:[NSImage systemSymbol:@"antenna.radiowaves.left.and.right"
-                             withFallback:@"InfoTracker"]
-         forSegment:TAB_TRACKERS_TAG];
-    [self.fTabs setImage:[NSImage systemSymbol:@"person.2"
-                             withFallback:@"InfoPeers"]
-         forSegment:TAB_PEERS_TAG];
-    [self.fTabs setImage:[NSImage systemSymbol:@"doc.on.doc"
-                             withFallback:@"InfoFiles"]
-         forSegment:TAB_FILE_TAG];
-    [self.fTabs setImage:[NSImage systemSymbol:@"gearshape"
-                             withFallback:@"InfoOptions"]
-         forSegment:TAB_OPTIONS_TAG];
+    [self.fTabs setImage:[NSImage systemSymbol:@"info.circle" withFallback:@"InfoGeneral"] forSegment:TAB_GENERAL_TAG];
+    [self.fTabs setImage:[NSImage systemSymbol:@"square.grid.3x3.fill.square" withFallback:@"InfoActivity"] forSegment:TAB_ACTIVITY_TAG];
+    [self.fTabs setImage:[NSImage systemSymbol:@"antenna.radiowaves.left.and.right" withFallback:@"InfoTracker"]
+              forSegment:TAB_TRACKERS_TAG];
+    [self.fTabs setImage:[NSImage systemSymbol:@"person.2" withFallback:@"InfoPeers"] forSegment:TAB_PEERS_TAG];
+    [self.fTabs setImage:[NSImage systemSymbol:@"doc.on.doc" withFallback:@"InfoFiles"] forSegment:TAB_FILE_TAG];
+    [self.fTabs setImage:[NSImage systemSymbol:@"gearshape" withFallback:@"InfoOptions"] forSegment:TAB_OPTIONS_TAG];
 
     //set selected tab
     self.fCurrentTabTag = INVALID;
@@ -446,7 +435,7 @@ typedef NS_ENUM(unsigned int, tabTag) {
             self.fImageView.image = [NSImage imageNamed:NSImageNameMultipleDocuments];
 
             self.fNameField.stringValue = [NSString stringWithFormat:NSLocalizedString(@"%@ Torrents Selected", "Inspector -> selected torrents"),
-                                                                [NSString formattedUInteger:numberSelected]];
+                                                                     [NSString formattedUInteger:numberSelected]];
             self.fNameField.hidden = NO;
 
             uint64_t size = 0;

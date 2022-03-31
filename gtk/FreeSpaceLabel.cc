@@ -50,7 +50,7 @@ bool FreeSpaceLabel::Impl::on_freespace_timer()
 
     auto const bytes = tr_dirSpace(dir_).free;
     auto const text = bytes < 0 ? _("Error") : fmt::format(_("{disk_space} free"), fmt::arg("disk_space", tr_strlsize(bytes)));
-    label_.set_markup(fmt::format("<i>{}</i>", text));
+    label_.set_markup(fmt::format(FMT_STRING("<i>{:s}</i>"), text));
 
     return true;
 }

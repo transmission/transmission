@@ -51,9 +51,9 @@
 - (void)awakeFromNib
 {
     [self.fTrackerAddRemoveControl.cell setToolTip:NSLocalizedString(@"Add a tracker", "Inspector view -> tracker buttons")
-                                   forSegment:TRACKER_ADD_TAG];
+                                        forSegment:TRACKER_ADD_TAG];
     [self.fTrackerAddRemoveControl.cell setToolTip:NSLocalizedString(@"Remove selected trackers", "Inspector view -> tracker buttons")
-                                   forSegment:TRACKER_REMOVE_TAG];
+                                        forSegment:TRACKER_REMOVE_TAG];
 
     CGFloat const height = [NSUserDefaults.standardUserDefaults floatForKey:@"InspectorContentHeightTracker"];
     if (height != 0.0)
@@ -319,7 +319,9 @@
     self.fTrackerTable.trackers = self.fTrackers;
     [self.fTrackerTable reloadData];
     [self.fTrackerTable selectRowIndexes:[NSIndexSet indexSetWithIndex:self.fTrackers.count - 1] byExtendingSelection:NO];
-    [self.fTrackerTable editColumn:[self.fTrackerTable columnWithIdentifier:@"Tracker"] row:self.fTrackers.count - 1 withEvent:nil select:YES];
+    [self.fTrackerTable editColumn:[self.fTrackerTable columnWithIdentifier:@"Tracker"] row:self.fTrackers.count - 1
+                         withEvent:nil
+                            select:YES];
 }
 
 - (void)removeTrackers

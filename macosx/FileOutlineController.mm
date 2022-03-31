@@ -185,7 +185,7 @@ typedef NS_ENUM(unsigned int, filePriorityMenuTag) { //
         NSRange const removeRange = NSMakeRange(currentIndex, self.fFileList.count - currentIndex);
         [self.fFileList removeObjectsInRange:removeRange];
         [self.fOutline removeItemsAtIndexes:[NSIndexSet indexSetWithIndexesInRange:removeRange] inParent:nil
-                         withAnimation:NSTableViewAnimationSlideDown];
+                              withAnimation:NSTableViewAnimationSlideDown];
     }
 
     //add new items
@@ -282,9 +282,8 @@ typedef NS_ENUM(unsigned int, filePriorityMenuTag) { //
             indexSet = ((FileListNode*)item).indexes;
         }
 
-        [self.torrent setFileCheckState:[object intValue] != NSControlStateValueOff ? NSControlStateValueOn
-                                                                                : NSControlStateValueOff
-                         forIndexes:indexSet];
+        [self.torrent setFileCheckState:[object intValue] != NSControlStateValueOff ? NSControlStateValueOn : NSControlStateValueOff
+                             forIndexes:indexSet];
         self.fOutline.needsDisplay = YES;
 
         [NSNotificationCenter.defaultCenter postNotificationName:@"UpdateUI" object:nil];

@@ -12,6 +12,7 @@
 #include <vector>
 
 #include <fmt/core.h>
+#include <fmt/format.h>
 
 #include "transmission.h"
 
@@ -476,7 +477,7 @@ bool tr_torrent_metainfo::parseBenc(std::string_view benc, tr_error** error)
     tr_variantFree(&top);
     if (!std::empty(errmsg))
     {
-        tr_error_set(error, TR_ERROR_EINVAL, tr_strvJoin("Error parsing metainfo: ", errmsg));
+        tr_error_set(error, TR_ERROR_EINVAL, fmt::format(FMT_STRING("Error parsing metainfo: {:s}"), errmsg));
         return false;
     }
 

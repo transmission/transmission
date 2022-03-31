@@ -171,7 +171,7 @@ std::string getShortStatusString(
     case TR_STATUS_DOWNLOAD:
     case TR_STATUS_SEED:
         return fmt::format(
-            "{} {}",
+            FMT_STRING("{:s} {:s}"),
             getShortTransferString(tor, st, uploadSpeed_KBps, downloadSpeed_KBps),
             fmt::format(_("Ratio: {ratio}"), fmt::arg("ratio", tr_strlratio(st->ratio))));
 
@@ -282,7 +282,7 @@ std::string getStatusString(
     {
         if (auto const buf = getShortTransferString(tor, st, uploadSpeed_KBps, downloadSpeed_KBps); !std::empty(buf))
         {
-            status_str += fmt::format(" - {}", buf);
+            status_str += fmt::format(FMT_STRING(" - {:s}"), buf);
         }
     }
 

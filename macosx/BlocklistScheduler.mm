@@ -13,7 +13,7 @@
 
 @interface BlocklistScheduler ()
 
-@property (nonatomic) NSTimer* fTimer;
+@property(nonatomic) NSTimer* fTimer;
 
 - (void)runUpdater;
 
@@ -58,7 +58,7 @@ BlocklistScheduler* fScheduler = nil;
     NSDate* useDate = lastUpdateDate ? [lastUpdateDate laterDate:closeDate] : closeDate;
 
     self.fTimer = [[NSTimer alloc] initWithFireDate:useDate interval:0 target:self selector:@selector(runUpdater) userInfo:nil
-                                       repeats:NO];
+                                            repeats:NO];
 
     //current run loop usually means a second update won't work
     NSRunLoop* loop = NSRunLoop.mainRunLoop;

@@ -237,8 +237,9 @@
     self.fNatStatus = -1;
 
     [self updatePortStatus];
-    self.fPortStatusTimer = [NSTimer scheduledTimerWithTimeInterval:5.0 target:self selector:@selector(updatePortStatus) userInfo:nil
-                                                       repeats:YES];
+    self.fPortStatusTimer = [NSTimer scheduledTimerWithTimeInterval:5.0 target:self selector:@selector(updatePortStatus)
+                                                           userInfo:nil
+                                                            repeats:YES];
 
     //set peer connections
     self.fPeersGlobalField.intValue = [self.fDefaults integerForKey:@"PeersTotal"];
@@ -789,7 +790,7 @@
 - (void)setSpeedLimit:(id)sender
 {
     [self.fDefaults setInteger:[sender intValue]
-                   forKey:sender == self.fSpeedLimitUploadField ? @"SpeedLimitUploadLimit" : @"SpeedLimitDownloadLimit"];
+                        forKey:sender == self.fSpeedLimitUploadField ? @"SpeedLimitUploadLimit" : @"SpeedLimitDownloadLimit"];
     [self applyAltSpeedSettings];
 }
 

@@ -180,7 +180,7 @@ bool refreshFilesForeach(
             (*iter)[file_cols.enabled] = enabled;
             (*iter)[file_cols.have] = have;
             (*iter)[file_cols.prog] = prog;
-            (*iter)[file_cols.prog_str] = fmt::format("{}%", prog);
+            (*iter)[file_cols.prog_str] = fmt::format(FMT_STRING("{:d}%"), prog);
         }
     }
     else
@@ -236,7 +236,7 @@ bool refreshFilesForeach(
             (*iter)[file_cols.priority] = priority;
             (*iter)[file_cols.enabled] = enabled;
             (*iter)[file_cols.prog] = prog;
-            (*iter)[file_cols.prog_str] = fmt::format("{}%", prog);
+            (*iter)[file_cols.prog_str] = fmt::format(FMT_STRING("{:d}%"), prog);
         }
     }
 

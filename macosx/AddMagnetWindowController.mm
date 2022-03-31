@@ -95,8 +95,8 @@
     }
     [self.fPriorityPopUp selectItemAtIndex:priorityIndex];
 
-    self.fStartCheck.state = [NSUserDefaults.standardUserDefaults boolForKey:@"AutoStartDownload"] ? NSControlStateValueOn
-                                                                                              : NSControlStateValueOff;
+    self.fStartCheck.state = [NSUserDefaults.standardUserDefaults boolForKey:@"AutoStartDownload"] ? NSControlStateValueOn :
+                                                                                                     NSControlStateValueOff;
 
     if (self.fDestination)
     {

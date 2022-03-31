@@ -480,7 +480,7 @@ MakeDialog::Impl::Impl(MakeDialog& dialog, Glib::RefPtr<Session> const& core)
     t->add_row_w(row, *file_radio_, *file_chooser_);
 
     pieces_lb_ = Gtk::make_managed<Gtk::Label>();
-    pieces_lb_->set_markup(fmt::format("<i>{}</i>", _("No source selected")));
+    pieces_lb_->set_markup(fmt::format(FMT_STRING("<i>{:s}</i>"), _("No source selected")));
     t->add_row(row, {}, *pieces_lb_);
 
     t->add_section_divider(row);
