@@ -269,12 +269,6 @@ constexpr bool tr_str_is_empty(char const* value)
 
 std::string evbuffer_free_to_str(evbuffer* buf);
 
-/**
- * @brief sprintf() a string into a newly-allocated buffer large enough to hold it
- * @return a newly-allocated string that can be freed with tr_free()
- */
-char* tr_strdup_printf(char const* fmt, ...) TR_GNUC_MALLOC TR_GNUC_PRINTF(1, 2);
-
 /** @brief Portability wrapper for strlcpy() that uses the system implementation if available */
 size_t tr_strlcpy(void* dst, void const* src, size_t siz);
 
