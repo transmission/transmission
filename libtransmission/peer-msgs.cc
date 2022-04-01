@@ -15,6 +15,8 @@
 #include <event2/bufferevent.h>
 #include <event2/event.h>
 
+#include <fmt/format.h>
+
 #include "transmission.h"
 
 #include "cache.h"
@@ -1961,7 +1963,7 @@ static ReadState canRead(tr_peerIo* io, void* vmsgs, size_t* piece)
 
         default:
 #ifdef TR_ENABLE_ASSERTS
-            TR_ASSERT_MSG(false, "unhandled peer messages state %d", int(msgs->state));
+            TR_ASSERT_MSG(false, fmt::format(FMT_STRING("unhandled peer messages state {:d}"), int(msgs->state)));
 #else
             ret = READ_ERR;
             break;
