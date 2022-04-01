@@ -16,8 +16,8 @@
 
 [[noreturn]] bool tr_assert_report(std::string_view file, int line, std::string_view message)
 {
-    auto const message = fmt::format(FMT_STRING("assertion failed: {:s} ({:s}:{:d})"), buffer, file, line);
-    [NSException raise:NSInternalInconsistencyException format:@"%s", message.c_str()];
+    auto const full_text = fmt::format(FMT_STRING("assertion failed: {:s} ({:s}:{:d})"), buffer, file, line);
+    [NSException raise:NSInternalInconsistencyException format:@"%s", full_text.c_str()];
 
     // We should not reach this anyway, but it helps mark the function as propertly noreturn
     // (the Objective-C NSException method does not).
