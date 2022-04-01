@@ -14,11 +14,6 @@
 #include "tr-macros.h"
 #include "utils.h"
 
-bool tr_error_is_set(tr_error const* const* error)
-{
-    return (error != nullptr) && (*error != nullptr);
-}
-
 void tr_error_free(tr_error* error)
 {
     if (error == nullptr)
