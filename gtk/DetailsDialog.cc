@@ -463,7 +463,7 @@ Gtk::Widget* DetailsDialog::Impl::options_page_new()
     auto* t = Gtk::make_managed<HigWorkarea>();
     t->add_section_title(row, _("Speed"));
 
-    honor_limits_check_ = t->add_wide_checkbutton(row, _("Honor global _limits"), 0);
+    honor_limits_check_ = t->add_wide_checkbutton(row, _("Honor global _limits"), false);
     honor_limits_check_tag_ = honor_limits_check_->signal_toggled().connect(
         [this]() { torrent_set_bool(TR_KEY_honorsSessionLimits, honor_limits_check_->get_active()); });
 
