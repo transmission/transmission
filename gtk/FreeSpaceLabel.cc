@@ -29,7 +29,6 @@ public:
 private:
     bool on_freespace_timer();
 
-private:
     FreeSpaceLabel& label_;
     Glib::RefPtr<Session> const core_;
     std::string dir_;

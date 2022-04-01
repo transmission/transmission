@@ -1261,16 +1261,10 @@ void initPeerRow(Gtk::TreeIter const& iter, std::string const& key, std::string_
         client = "";
     }
 
-    int q[4];
-    Glib::ustring collated_name;
-    if (sscanf(peer->addr, "%d.%d.%d.%d", q, q + 1, q + 2, q + 3) != 4)
-    {
-        collated_name = peer->addr;
-    }
-    else
-    {
-        collated_name = gtr_sprintf("%03d.%03d.%03d.%03d", q[0], q[1], q[2], q[3]);
-    }
+    auto q = std::array<int, 4>{};
+    auto const collated_name = sscanf(peer->addr, "%d.%d.%d.%d", &q[0], &q[1], &q[2], &q[3]) != 4
+        ? peer->addr
+        : fmt::format(FMT_STRING("{:03d}.{:03d}.{:03d}.{:03d}"), q[0], q[1], q[2], q[3]);
 
     (*iter)[peer_cols.address] = peer->addr;
     (*iter)[peer_cols.address_collated] = collated_name;
