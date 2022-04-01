@@ -104,11 +104,6 @@ bool tr_ctorSetMetainfoFromMagnetLink(tr_ctor* ctor, char const* magnet_link, tr
     return ctor->metainfo.parseMagnet(magnet_link != nullptr ? magnet_link : "", error);
 }
 
-std::string_view tr_ctorGetContents(tr_ctor const* ctor)
-{
-    return std::string_view{ std::data(ctor->contents), std::size(ctor->contents) };
-}
-
 char const* tr_ctorGetSourceFile(tr_ctor const* ctor)
 {
     return ctor->torrent_filename.c_str();

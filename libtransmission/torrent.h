@@ -55,8 +55,6 @@ void tr_ctorInitTorrentWanted(tr_ctor const* ctor, tr_torrent* tor);
 
 bool tr_ctorSaveContents(tr_ctor const* ctor, std::string_view filename, tr_error** error);
 
-std::string_view tr_ctorGetContents(tr_ctor const* ctor);
-
 tr_session* tr_ctorGetSession(tr_ctor const* ctor);
 
 bool tr_ctorGetIncompleteDir(tr_ctor const* ctor, char const** setmeIncompleteDir);
