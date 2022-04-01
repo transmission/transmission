@@ -769,7 +769,7 @@ void tr_torrentGotBlock(tr_torrent* tor, tr_block_index_t blockIndex);
 
 tr_peer_id_t const& tr_torrentGetPeerId(tr_torrent* tor);
 
-tr_torrent_metainfo&& tr_ctorStealMetainfo(tr_ctor* ctor);
+tr_torrent_metainfo tr_ctorStealMetainfo(tr_ctor* ctor);
 
 bool tr_ctorSetMetainfoFromFile(tr_ctor* ctor, std::string const& filename, tr_error** error);
 bool tr_ctorSetMetainfoFromMagnetLink(tr_ctor* ctor, std::string const& filename, tr_error** error);
