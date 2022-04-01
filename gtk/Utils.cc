@@ -180,13 +180,10 @@ bool on_tree_view_button_pressed(
         Gtk::TreeModel::Path path;
         auto const selection = view->get_selection();
 
-        if (view->get_path_at_pos((int)event->x, (int)event->y, path))
+        if (view->get_path_at_pos((int)event->x, (int)event->y, path) && !selection->is_selected(path))
         {
-            if (!selection->is_selected(path))
-            {
-                selection->unselect_all();
-                selection->select(path);
-            }
+            selection->unselect_all();
+            selection->select(path);
         }
 
         if (callback)
