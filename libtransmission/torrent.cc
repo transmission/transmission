@@ -85,11 +85,6 @@ tr_torrent* tr_torrentFindFromId(tr_session* session, int id)
     return session->torrents().get(id);
 }
 
-tr_torrent* tr_torrentFindFromHash(tr_session* session, tr_sha1_digest_t const* hash)
-{
-    return hash == nullptr ? nullptr : session->torrents().get(*hash);
-}
-
 tr_torrent* tr_torrentFindFromMetainfo(tr_session* session, tr_torrent_metainfo const* metainfo)
 {
     if (session == nullptr || metainfo == nullptr)
@@ -1716,11 +1711,6 @@ void tr_torrentSetRatioLimitHitCallback(tr_torrent* tor, tr_torrent_ratio_limit_
 
     tor->ratio_limit_hit_func = func;
     tor->ratio_limit_hit_func_user_data = user_data;
-}
-
-void tr_torrentClearRatioLimitHitCallback(tr_torrent* torrent)
-{
-    tr_torrentSetRatioLimitHitCallback(torrent, nullptr, nullptr);
 }
 
 void tr_torrentSetIdleLimitHitCallback(tr_torrent* tor, tr_torrent_idle_limit_hit_func func, void* user_data)
