@@ -118,7 +118,7 @@ protected:
 
     using file_func_t = std::function<void(char const* filename)>;
 
-    static void depthFirstWalk(const char* path, file_func_t func)
+    static void depthFirstWalk(char const* path, file_func_t func)
     {
         auto info = tr_sys_path_info{};
         if (tr_sys_path_get_info(path, 0, &info) && (info.type == TR_SYS_PATH_IS_DIRECTORY))
