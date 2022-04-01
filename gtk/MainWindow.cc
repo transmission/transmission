@@ -634,10 +634,10 @@ void MainWindow::Impl::updateSpeeds()
             up_speed += row.get_value(torrent_cols.speed_up);
         }
 
-        dl_lb_->set_text(fmt::format(_("{download_speed} ▼"), fmt::arg("download_speed", dn_speed)));
+        dl_lb_->set_text(fmt::format(_("{download_speed} ▼"), fmt::arg("download_speed", tr_formatter_speed_KBps(dn_speed))));
         dl_lb_->set_visible(dn_count > 0);
 
-        ul_lb_->set_text(fmt::format(_("{upload_speed} ▲"), fmt::arg("upload_speed", up_speed)));
+        ul_lb_->set_text(fmt::format(_("{upload_speed} ▲"), fmt::arg("upload_speed", tr_formatter_speed_KBps(up_speed))));
         ul_lb_->set_visible(dn_count > 0 || up_count > 0);
     }
 }
