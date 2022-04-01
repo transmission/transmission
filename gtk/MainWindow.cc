@@ -1,7 +1,8 @@
-// This file Copyright © 2005-2021 Transmission authors and contributors.
+// This file Copyright © 2005-2022 Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
+#include <array>
 #include <string>
 
 #include <glibmm/i18n.h>
@@ -61,8 +62,8 @@ private:
 
     MainWindow& window_;
 
-    Gtk::RadioMenuItem* speedlimit_on_item_[2] = { nullptr, nullptr };
-    Gtk::RadioMenuItem* speedlimit_off_item_[2] = { nullptr, nullptr };
+    std::array<Gtk::RadioMenuItem*, 2> speedlimit_on_item_;
+    std::array<Gtk::RadioMenuItem*, 2> speedlimit_off_item_;
     Gtk::RadioMenuItem* ratio_on_item_ = nullptr;
     Gtk::RadioMenuItem* ratio_off_item_ = nullptr;
     Gtk::ScrolledWindow* scroll_ = nullptr;
