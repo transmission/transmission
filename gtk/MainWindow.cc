@@ -59,7 +59,6 @@ private:
     void alt_speed_toggled_cb();
     void onAltSpeedToggledIdle();
 
-private:
     MainWindow& window_;
 
     Gtk::RadioMenuItem* speedlimit_on_item_[2] = { nullptr, nullptr };
