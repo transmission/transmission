@@ -95,6 +95,7 @@ private:
 
     void addResponseCB(int response);
 
+private:
     OptionsDialog& dialog_;
 
     Glib::RefPtr<Session> const core_;
