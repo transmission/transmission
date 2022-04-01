@@ -417,11 +417,6 @@ void tr_lpdUninit(tr_session* ss)
     session = nullptr;
 }
 
-bool tr_lpdEnabled(tr_session const* ss)
-{
-    return ss != nullptr && ss == session;
-}
-
 /**
 * @endcond */
 
