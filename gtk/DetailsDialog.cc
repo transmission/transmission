@@ -890,8 +890,8 @@ void DetailsDialog::Impl::refreshInfo(std::vector<tr_torrent*> const& torrents)
             double const d = sizeWhenDone != 0 ? (100.0 * available) / sizeWhenDone : 0;
             double const ratio = 100.0 * (sizeWhenDone != 0 ? (haveValid + haveUnchecked) / (double)sizeWhenDone : 1);
 
-            auto const avail = tr_strlpercent(d);
-            auto const buf2 = tr_strlpercent(ratio);
+            auto const avail = tr_strpercent(d);
+            auto const buf2 = tr_strpercent(ratio);
             auto const total = tr_strlsize(haveUnchecked + haveValid);
             auto const unver = tr_strlsize(haveUnchecked);
 
