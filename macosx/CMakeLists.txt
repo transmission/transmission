@@ -49,6 +49,7 @@ set(${PROJECT_NAME}_SOURCES
     BonjourController.mm
     ButtonToolbarItem.mm
     ColorTextField.mm
+    Compatibility.m
     Controller.mm
     CreatorWindowController.mm
     DragOverlayView.mm
@@ -404,6 +405,7 @@ include_directories(
 add_definitions(
     -Wno-unused-parameter
     "-Wno-#warnings"
+    "-include macosx/Transmission_Prefix.pch"
 )
 
 add_library(vdkqueue STATIC
