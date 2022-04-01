@@ -244,17 +244,17 @@ public:
         return completion.createPieceBitfield();
     }
 
-    [[nodiscard]] constexpr bool isDone() const
+    [[nodiscard]] constexpr bool isDone() const noexcept
     {
         return completeness != TR_LEECH;
     }
 
-    [[nodiscard]] constexpr bool isSeed() const
+    [[nodiscard]] constexpr bool isSeed() const noexcept
     {
         return completeness == TR_SEED;
     }
 
-    [[nodiscard]] constexpr bool isPartialSeed() const
+    [[nodiscard]] constexpr bool isPartialSeed() const noexcept
     {
         return completeness == TR_PARTIAL_SEED;
     }
@@ -333,17 +333,17 @@ public:
 
     /// LOCATION
 
-    [[nodiscard]] tr_interned_string currentDir() const
+    [[nodiscard]] constexpr tr_interned_string currentDir() const noexcept
     {
         return this->current_dir;
     }
 
-    [[nodiscard]] tr_interned_string downloadDir() const
+    [[nodiscard]] constexpr tr_interned_string downloadDir() const noexcept
     {
         return this->download_dir;
     }
 
-    [[nodiscard]] tr_interned_string incompleteDir() const
+    [[nodiscard]] constexpr tr_interned_string incompleteDir() const noexcept
     {
         return this->incomplete_dir;
     }
@@ -530,7 +530,7 @@ public:
 
     ///
 
-    [[nodiscard]] auto isQueued() const
+    [[nodiscard]] constexpr auto isQueued() const noexcept
     {
         return this->is_queued;
     }

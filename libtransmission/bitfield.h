@@ -39,8 +39,8 @@ class tr_bitfield
 public:
     explicit tr_bitfield(size_t bit_count);
 
-    void setHasAll();
-    void setHasNone();
+    void setHasAll() noexcept;
+    void setHasNone() noexcept;
 
     // set one or more bits
     void set(size_t bit, bool value = true);
@@ -59,56 +59,66 @@ public:
     // corresponds to indices 0 - 7 from high bit to low bit, respectively.
     // The next one 8-15, etc. Spare bits at the end are set to zero.
     void setRaw(uint8_t const* bits, size_t byte_count);
-    std::vector<uint8_t> raw() const;
+    [[nodiscard]] std::vector<uint8_t> raw() const;
 
-    [[nodiscard]] constexpr bool hasAll() const
+    [[nodiscard]] constexpr bool hasAll() const noexcept
     {
         return have_all_hint_ || (bit_count_ > 0 && bit_count_ == true_count_);
     }
 
-    [[nodiscard]] constexpr bool hasNone() const
+    [[nodiscard]] constexpr bool hasNone() const noexcept
     {
         return have_none_hint_ || (bit_count_ > 0 && true_count_ == 0);
     }
 
-    [[nodiscard]] bool test(size_t bit) const
+    [[nodiscard]] constexpr bool test(size_t bit) const
     {
         return hasAll() || (!hasNone() && testFlag(bit));
     }
 
-    [[nodiscard]] constexpr size_t count() const
+    [[nodiscard]] constexpr size_t count() const noexcept
     {
         return true_count_;
     }
 
     [[nodiscard]] size_t count(size_t begin, size_t end) const;
 
-    [[nodiscard]] constexpr size_t size() const
+    [[nodiscard]] constexpr size_t size() const noexcept
     {
         return bit_count_;
     }
 
-    [[nodiscard]] constexpr size_t empty() const
+    [[nodiscard]] constexpr size_t empty() const noexcept
     {
         return size() == 0;
     }
 
-    bool isValid() const;
+    [[nodiscard]] bool isValid() const;
 
 private:
     std::vector<uint8_t> flags_;
-    [[nodiscard]] size_t countFlags() const;
-    [[nodiscard]] size_t countFlags(size_t begin, size_t end) const;
-    [[nodiscard]] bool testFlag(size_t bit) const;
+    [[nodiscard]] size_t countFlags() const noexcept;
+    [[nodiscard]] size_t countFlags(size_t begin, size_t end) const noexcept;
+
+    [[nodiscard]] constexpr bool testFlag(size_t n) const
+    {
+        if (n >> 3U >= std::size(flags_))
+        {
+            return false;
+        }
+
+        bool ret = (flags_[n >> 3U] << (n & 7U) & 0x80) != 0;
+        return ret;
+    }
 
     void ensureBitsAlloced(size_t n);
     [[nodiscard]] bool ensureNthBitAlloced(size_t nth);
-    void freeArray();
+    void freeArray() noexcept;
 
-    void setTrueCount(size_t n);
-    void rebuildTrueCount();
-    void incrementTrueCount(size_t inc);
-    void decrementTrueCount(size_t dec);
+    void setTrueCount(size_t n) noexcept;
+    void rebuildTrueCount() noexcept;
+    void incrementTrueCount(size_t inc) noexcept;
+    void decrementTrueCount(size_t dec) noexcept;
 
     size_t bit_count_ = 0;
     size_t true_count_ = 0;

@@ -63,40 +63,40 @@ public:
 
     [[nodiscard]] std::set<int> removedSince(time_t) const;
 
-    [[nodiscard]] auto cbegin() const
+    [[nodiscard]] constexpr auto cbegin() const noexcept
     {
         return std::cbegin(by_hash_);
     }
-    [[nodiscard]] auto begin() const
+    [[nodiscard]] constexpr auto begin() const noexcept
     {
         return cbegin();
     }
-    [[nodiscard]] auto begin()
+    [[nodiscard]] constexpr auto begin() noexcept
     {
         return std::begin(by_hash_);
     }
 
-    [[nodiscard]] auto cend() const
+    [[nodiscard]] constexpr auto cend() const noexcept
     {
         return std::cend(by_hash_);
     }
 
-    [[nodiscard]] auto end() const
+    [[nodiscard]] constexpr auto end() const noexcept
     {
         return cend();
     }
 
-    [[nodiscard]] auto end()
+    [[nodiscard]] constexpr auto end() noexcept
     {
         return std::end(by_hash_);
     }
 
-    [[nodiscard]] auto size() const
+    [[nodiscard]] constexpr auto size() const noexcept
     {
         return std::size(by_hash_);
     }
 
-    [[nodiscard]] auto empty() const
+    [[nodiscard]] constexpr auto empty() const noexcept
     {
         return std::empty(by_hash_);
     }
