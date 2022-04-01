@@ -5,9 +5,7 @@
 
 #import <Foundation/Foundation.h>
 
-#include <cstdarg>
-#include <cstdio>
-#include <cstdlib>
+#include <fmt/format.h>
 
 #include "tr-assert.h"
 
@@ -16,16 +14,10 @@
 // macOS implementation of tr_assert_report() that provides the message in the crash report
 // This replaces the generic implementation of the function in tr-assert.cc
 
-[[noreturn]] bool tr_assert_report(char const* file, int line, char const* message_fmt, ...)
+[[noreturn]] bool tr_assert_report(std::string_view file, int line, std::string_view message)
 {
-    char buffer[1024];
-    va_list args;
-
-    va_start(args, message_fmt);
-    vsnprintf(buffer, sizeof(buffer), message_fmt, args);
-    va_end(args);
-
-    [NSException raise:NSInternalInconsistencyException format:@"assertion failed: %s (%s:%d)", buffer, file, line];
+    auto const message = fmt::format(FMT_STRING("assertion failed: {:s} ({:s}:{:d})"), buffer, file, line);
+    [NSException raise:NSInternalInconsistencyException format:@"%s", message.c_str()];
 
     // We should not reach this anyway, but it helps mark the function as propertly noreturn
     // (the Objective-C NSException method does not).

@@ -6,22 +6,15 @@
 #include <cstdarg>
 #include <cstdio>
 #include <cstdlib>
+#include <iostream>
 
 #include "tr-assert.h"
 
 #if !defined(NDEBUG) || defined(TR_FORCE_ASSERTIONS)
 
-[[noreturn]] bool tr_assert_report(char const* file, int line, char const* message_fmt, ...)
+[[noreturn]] bool tr_assert_report(std::string_view file, int line, std::string_view message)
 {
-    va_list args;
-    va_start(args, message_fmt);
-
-    fprintf(stderr, "assertion failed: ");
-    vfprintf(stderr, message_fmt, args);
-    fprintf(stderr, " (%s:%d)\n", file, line);
-
-    va_end(args);
-
+    std::cerr << "assertion failed: " << message << " (" << file << ':' << line << ')' << std::endl;
     abort();
 }
 
