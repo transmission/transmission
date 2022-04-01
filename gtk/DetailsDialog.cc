@@ -1251,7 +1251,7 @@ public:
 
 PeerModelColumns const peer_cols;
 
-void initPeerRow(Gtk::TreeIter const& iter, std::string const& key, std::string const& torrentName, tr_peer_stat const* peer)
+void initPeerRow(Gtk::TreeIter const& iter, std::string const& key, std::string_view torrent_name, tr_peer_stat const* peer)
 {
     g_return_if_fail(peer != nullptr);
 
@@ -1277,7 +1277,7 @@ void initPeerRow(Gtk::TreeIter const& iter, std::string const& key, std::string 
     (*iter)[peer_cols.client] = client;
     (*iter)[peer_cols.encryption_stock_id] = peer->isEncrypted ? "lock" : "";
     (*iter)[peer_cols.key] = key;
-    (*iter)[peer_cols.torrent_name] = torrentName;
+    (*iter)[peer_cols.torrent_name] = Glib::ustring{ std::data(torrent_name), std::size(torrent_name) };
 }
 
 void refreshPeerRow(Gtk::TreeIter const& iter, tr_peer_stat const* peer)
