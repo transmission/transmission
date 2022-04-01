@@ -291,9 +291,11 @@ bool tr_ctorGetIncompleteDir(tr_ctor const* ctor, char const** setme)
     return true;
 }
 
-tr_torrent_metainfo&& tr_ctorStealMetainfo(tr_ctor* ctor)
+tr_torrent_metainfo tr_ctorStealMetainfo(tr_ctor* ctor)
 {
-    return std::move(ctor->metainfo);
+    auto metainfo = tr_torrent_metainfo{};
+    std::swap(ctor->metainfo, metainfo);
+    return metainfo;
 }
 
 tr_torrent_metainfo const* tr_ctorGetMetainfo(tr_ctor const* ctor)
