@@ -41,6 +41,7 @@ private:
 
     void startMovingNextTorrent();
 
+private:
     RelocateDialog& dialog_;
     Glib::RefPtr<Session> const core_;
     std::vector<int> torrent_ids_;
