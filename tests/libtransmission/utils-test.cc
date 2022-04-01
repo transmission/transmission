@@ -331,41 +331,6 @@ TEST_F(UtilsTest, truncd)
 #endif
 }
 
-TEST_F(UtilsTest, trStrdupPrintfFmtS)
-{
-    auto s = makeString(tr_strdup_printf("%s", "test"));
-    EXPECT_EQ("test", s);
-}
-
-TEST_F(UtilsTest, trStrdupPrintf)
-{
-    auto s = makeString(tr_strdup_printf("%d %s %c %u", -1, "0", '1', 2));
-    EXPECT_EQ("-1 0 1 2", s);
-
-    auto* s3 = reinterpret_cast<char*>(tr_malloc0(4098));
-    memset(s3, '-', 4097);
-    s3[2047] = 't';
-    s3[2048] = 'e';
-    s3[2049] = 's';
-    s3[2050] = 't';
-
-    auto* s2 = reinterpret_cast<char*>(tr_malloc0(4096));
-    memset(s2, '-', 4095);
-    s2[2047] = '%';
-    s2[2048] = 's';
-
-    // NOLINTNEXTLINE(clang-diagnostic-format-nonliteral)
-    s = makeString(tr_strdup_printf(s2, "test"));
-    EXPECT_EQ(s3, s);
-
-    tr_free(s2);
-
-    s = makeString(tr_strdup_printf("%s", s3));
-    EXPECT_EQ(s3, s);
-
-    tr_free(s3);
-}
-
 TEST_F(UtilsTest, trStrlcpy)
 {
     // destination will be initialized with this char
