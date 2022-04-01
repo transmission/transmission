@@ -44,7 +44,6 @@ private:
 
     void addTorrent();
 
-private:
     tr_metainfo_builder& builder_;
     std::string const target_;
     Glib::RefPtr<Session> const core_;
@@ -82,7 +81,6 @@ private:
 
     void makeProgressDialog(std::string const& target);
 
-private:
     MakeDialog& dialog_;
     Glib::RefPtr<Session> const core_;
 
