@@ -116,22 +116,22 @@ protected:
         return path;
     }
 
-    static auto get_folder_files(std::string const& path)
-    {
-        std::vector<std::string> ret;
+    using file_func_t = std::function<void(char const* filename)>;
 
-        tr_sys_path_info info;
-        if (tr_sys_path_get_info(path.data(), 0, &info) && (info.type == TR_SYS_PATH_IS_DIRECTORY))
+    static void depthFirstWalk(const char* path, file_func_t func)
+    {
+        auto info = tr_sys_path_info{};
+        if (tr_sys_path_get_info(path, 0, &info) && (info.type == TR_SYS_PATH_IS_DIRECTORY))
         {
-            auto const odir = tr_sys_dir_open(path.data());
-            if (odir != TR_BAD_SYS_DIR)
+            if (auto const odir = tr_sys_dir_open(path); odir != TR_BAD_SYS_DIR)
             {
                 char const* name;
                 while ((name = tr_sys_dir_read_name(odir)) != nullptr)
                 {
                     if (strcmp(name, ".") != 0 && strcmp(name, "..") != 0)
                     {
-                        ret.push_back(tr_strvPath(path, name));
+                        auto const filename = tr_strvPath(path, name);
+                        depthFirstWalk(tr_strvPath(path, name).c_str(), func);
                     }
                 }
 
@@ -139,22 +139,22 @@ protected:
             }
         }
 
-        return ret;
+        func(path);
     }
 
     static void rimraf(std::string const& path, bool verbose = false)
     {
-        for (auto const& child : get_folder_files(path))
+        auto remove = [verbose](char const* filename)
         {
-            rimraf(child, verbose);
-        }
+            if (verbose)
+            {
+                std::cerr << "cleanup: removing '" << filename << "'" << std::endl;
+            }
 
-        if (verbose)
-        {
-            std::cerr << "cleanup: removing '" << path << "'" << std::endl;
-        }
+            tr_sys_path_remove(filename);
+        };
 
-        tr_sys_path_remove(path.data());
+        depthFirstWalk(path.c_str(), remove);
     }
 
 private:
