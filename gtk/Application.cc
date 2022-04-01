@@ -91,6 +91,7 @@ private:
         int stopped_count = 0;
     };
 
+private:
     void show_details_dialog_for_selected_torrents();
     void show_about_dialog();
 
@@ -152,6 +153,7 @@ private:
         tr_torrent* tor,
         gpointer gdata);
 
+private:
     Application& app_;
 
     std::string config_dir_;
