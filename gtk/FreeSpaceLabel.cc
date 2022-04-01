@@ -19,12 +19,12 @@
 class FreeSpaceLabel::Impl
 {
 public:
-    Impl(FreeSpaceLabel& label, Glib::RefPtr<Session> const& core, std::string const& dir);
+    Impl(FreeSpaceLabel& label, Glib::RefPtr<Session> const& core, std::string_view dir);
     ~Impl();
 
     TR_DISABLE_COPY_MOVE(Impl)
 
-    void set_dir(std::string const& dir);
+    void set_dir(std::string_view dir);
 
 private:
     bool on_freespace_timer();
@@ -54,7 +54,7 @@ bool FreeSpaceLabel::Impl::on_freespace_timer()
     return true;
 }
 
-FreeSpaceLabel::FreeSpaceLabel(Glib::RefPtr<Session> const& core, std::string const& dir)
+FreeSpaceLabel::FreeSpaceLabel(Glib::RefPtr<Session> const& core, std::string_view dir)
     : Gtk::Label()
     , impl_(std::make_unique<Impl>(*this, core, dir))
 {
@@ -62,7 +62,7 @@ FreeSpaceLabel::FreeSpaceLabel(Glib::RefPtr<Session> const& core, std::string co
 
 FreeSpaceLabel::~FreeSpaceLabel() = default;
 
-FreeSpaceLabel::Impl::Impl(FreeSpaceLabel& label, Glib::RefPtr<Session> const& core, std::string const& dir)
+FreeSpaceLabel::Impl::Impl(FreeSpaceLabel& label, Glib::RefPtr<Session> const& core, std::string_view dir)
     : label_(label)
     , core_(core)
     , dir_(dir)
@@ -71,12 +71,12 @@ FreeSpaceLabel::Impl::Impl(FreeSpaceLabel& label, Glib::RefPtr<Session> const& c
     on_freespace_timer();
 }
 
-void FreeSpaceLabel::set_dir(std::string const& dir)
+void FreeSpaceLabel::set_dir(std::string_view dir)
 {
     impl_->set_dir(dir);
 }
 
-void FreeSpaceLabel::Impl::set_dir(std::string const& dir)
+void FreeSpaceLabel::Impl::set_dir(std::string_view dir)
 {
     dir_ = dir;
     on_freespace_timer();
