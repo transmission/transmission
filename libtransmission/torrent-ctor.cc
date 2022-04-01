@@ -329,17 +329,6 @@ tr_priority_t tr_ctorGetBandwidthPriority(tr_ctor const* ctor)
 ****
 ***/
 
-void tr_ctorSetLabels(tr_ctor* ctor, char const** labels, size_t len)
-{
-    auto labels_set = tr_labels_t{};
-    for (size_t i = 0; i < len; i++)
-    {
-        labels_set.emplace(labels[i]);
-    }
-
-    tr_ctorSetLabels(ctor, std::move(labels_set));
-}
-
 void tr_ctorSetLabels(tr_ctor* ctor, tr_labels_t&& labels)
 {
     ctor->labels = std::move(labels);

@@ -846,10 +846,6 @@ void tr_ctorSetFilePriorities(tr_ctor* ctor, tr_file_index_t const* files, tr_fi
 /** @brief Set the download flag for files in a torrent */
 void tr_ctorSetFilesWanted(tr_ctor* ctor, tr_file_index_t const* fileIndices, tr_file_index_t fileCount, bool wanted);
 
-/** @brief Set labels for this torrent, the length of the labels array
-    must be the same size as len. */
-void tr_ctorSetLabels(tr_ctor* ctor, char const** labels, size_t len);
-
 /** @brief Get this peer constructor's peer limit */
 bool tr_ctorGetPeerLimit(tr_ctor const* ctor, tr_ctorMode mode, uint16_t* setmeCount);
 
