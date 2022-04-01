@@ -60,6 +60,7 @@ private:
     void alt_speed_toggled_cb();
     void onAltSpeedToggledIdle();
 
+private:
     MainWindow& window_;
 
     std::array<Gtk::RadioMenuItem*, 2> speedlimit_on_item_;
