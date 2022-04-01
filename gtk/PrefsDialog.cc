@@ -49,7 +49,6 @@ private:
 
     void response_cb(int response);
 
-private:
     PrefsDialog& dialog_;
 
     Glib::RefPtr<Session> const core_;
