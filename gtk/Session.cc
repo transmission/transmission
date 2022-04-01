@@ -131,7 +131,7 @@ private:
 
     tr_torrent* create_new_torrent(tr_ctor* ctor);
 
-    void set_sort_mode(std::string const& mode, bool is_reversed);
+    void set_sort_mode(std::string_view mode, bool is_reversed);
 
     void maybe_inhibit_hibernation();
     void set_hibernation_allowed(bool allowed);
@@ -537,7 +537,7 @@ int compare_by_state(Gtk::TreeModel::iterator const& a, Gtk::TreeModel::iterator
 
 } // namespace
 
-void Session::Impl::set_sort_mode(std::string const& mode, bool is_reversed)
+void Session::Impl::set_sort_mode(std::string_view mode, bool is_reversed)
 {
     auto const& col = torrent_cols.torrent;
     Gtk::TreeSortable::SlotCompare sort_func;
