@@ -52,6 +52,7 @@ private:
     bool update_count_label();
     void filter_entry_changed();
 
+private:
     FilterBar& widget_;
 
     Gtk::ComboBox* activity_ = nullptr;
