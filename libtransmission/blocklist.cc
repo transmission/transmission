@@ -170,11 +170,6 @@ int tr_blocklistFileGetRuleCount(tr_blocklistFile const* b)
     return b->ruleCount;
 }
 
-bool tr_blocklistFileIsEnabled(tr_blocklistFile* b)
-{
-    return b->isEnabled;
-}
-
 void tr_blocklistFileSetEnabled(tr_blocklistFile* b, bool isEnabled)
 {
     TR_ASSERT(b != nullptr);
