@@ -317,7 +317,6 @@ public:
         Gdk::Rectangle const& background_area,
         Gtk::CellRendererState flags);
 
-public:
     Glib::Property<gpointer> torrent;
     Glib::Property<int> bar_height;
 
