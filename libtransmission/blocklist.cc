@@ -163,11 +163,6 @@ void tr_blocklistFileFree(tr_blocklistFile* b)
     tr_free(b);
 }
 
-bool tr_blocklistFileExists(tr_blocklistFile const* b)
-{
-    return tr_sys_path_exists(b->filename);
-}
-
 int tr_blocklistFileGetRuleCount(tr_blocklistFile const* b)
 {
     blocklistEnsureLoaded((tr_blocklistFile*)b);

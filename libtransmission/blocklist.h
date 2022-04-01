@@ -14,8 +14,6 @@ struct tr_blocklistFile;
 
 tr_blocklistFile* tr_blocklistFileNew(char const* filename, bool isEnabled);
 
-bool tr_blocklistFileExists(tr_blocklistFile const* b);
-
 char const* tr_blocklistFileGetFilename(tr_blocklistFile const* b);
 
 int tr_blocklistFileGetRuleCount(tr_blocklistFile const* b);
