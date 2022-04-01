@@ -98,15 +98,12 @@ QVariant TorrentModel::data(QModelIndex const& index, int role) const
         {
         case Qt::DisplayRole:
             return t->name();
-            break;
 
         case Qt::DecorationRole:
             return t->getMimeTypeIcon();
-            break;
 
         case TorrentRole:
             return QVariant::fromValue(t);
-            break;
 
         default:
             break;
