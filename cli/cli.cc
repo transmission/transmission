@@ -321,7 +321,7 @@ int tr_main(int argc, char* argv[])
     {
         char line[LineWidth];
         tr_stat const* st;
-        auto constexpr messageName = std::array<char const*, 4>{
+        static auto constexpr messageName = std::array<char const*, 4>{
             nullptr,
             "Tracker gave a warning:",
             "Tracker gave an error:",

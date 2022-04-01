@@ -1251,7 +1251,7 @@ public:
 
 PeerModelColumns const peer_cols;
 
-void initPeerRow(Gtk::TreeIter const& iter, std::string const& key, std::string_view torrent_name, tr_peer_stat const* peer)
+void initPeerRow(Gtk::TreeIter const& iter, std::string_view key, std::string_view torrent_name, tr_peer_stat const* peer)
 {
     g_return_if_fail(peer != nullptr);
 
@@ -1262,15 +1262,15 @@ void initPeerRow(Gtk::TreeIter const& iter, std::string const& key, std::string_
     }
 
     auto q = std::array<int, 4>{};
-    auto const collated_name = sscanf(peer->addr, "%d.%d.%d.%d", &q[0], &q[1], &q[2], &q[3]) != 4
-        ? peer->addr
-        : fmt::format(FMT_STRING("{:03d}.{:03d}.{:03d}.{:03d}"), q[0], q[1], q[2], q[3]);
+    auto const collated_name = sscanf(peer->addr, "%d.%d.%d.%d", &q[0], &q[1], &q[2], &q[3]) != 4 ?
+        peer->addr :
+        fmt::format(FMT_STRING("{:03d}.{:03d}.{:03d}.{:03d}"), q[0], q[1], q[2], q[3]);
 
     (*iter)[peer_cols.address] = peer->addr;
     (*iter)[peer_cols.address_collated] = collated_name;
     (*iter)[peer_cols.client] = client;
     (*iter)[peer_cols.encryption_stock_id] = peer->isEncrypted ? "lock" : "";
-    (*iter)[peer_cols.key] = key;
+    (*iter)[peer_cols.key] = Glib::ustring{ std::data(key), std::size(key) };
     (*iter)[peer_cols.torrent_name] = Glib::ustring{ std::data(torrent_name), std::size(torrent_name) };
 }
 
