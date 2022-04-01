@@ -4,7 +4,7 @@
 // License text can be found in the licenses/ folder.
 
 #include <memory>
-#include <string>
+#include <string_view>
 
 #include <glibmm.h>
 #include <gtkmm.h>
@@ -16,12 +16,12 @@ class Session;
 class FreeSpaceLabel : public Gtk::Label
 {
 public:
-    FreeSpaceLabel(Glib::RefPtr<Session> const& core, std::string const& dir = {});
+    FreeSpaceLabel(Glib::RefPtr<Session> const& core, std::string_view dir = {});
     ~FreeSpaceLabel() override;
 
     TR_DISABLE_COPY_MOVE(FreeSpaceLabel)
 
-    void set_dir(std::string const& dir);
+    void set_dir(std::string_view dir);
 
 private:
     class Impl;
