@@ -1228,8 +1228,6 @@ void tr_torrentClearRatioLimitHitCallback(tr_torrent* torrent);
  */
 void tr_torrentSetIdleLimitHitCallback(tr_torrent* torrent, tr_torrent_idle_limit_hit_func func, void* user_data);
 
-void tr_torrentClearIdleLimitHitCallback(tr_torrent* torrent);
-
 /**
  * MANUAL ANNOUNCE
  *

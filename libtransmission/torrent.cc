@@ -1731,11 +1731,6 @@ void tr_torrentSetIdleLimitHitCallback(tr_torrent* tor, tr_torrent_idle_limit_hi
     tor->idle_limit_hit_func_user_data = user_data;
 }
 
-void tr_torrentClearIdleLimitHitCallback(tr_torrent* torrent)
-{
-    tr_torrentSetIdleLimitHitCallback(torrent, nullptr, nullptr);
-}
-
 static std::string buildLabelsString(tr_torrent const* tor)
 {
     auto buf = std::stringstream{};
