@@ -201,7 +201,7 @@ public:
 
     [[nodiscard]] auto hasMetainfo() const noexcept
     {
-        return completion.hasMetainfo() > 0;
+        return completion.hasMetainfo();
     }
 
     [[nodiscard]] auto hasAll() const
