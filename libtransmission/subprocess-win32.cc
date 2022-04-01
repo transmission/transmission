@@ -343,7 +343,7 @@ static void append_app_launcher_arguments(enum tr_app_type app_type, char** args
         break;
 
     default:
-        TR_ASSERT_MSG(false, "unsupported application type %d", (int)app_type);
+        TR_ASSERT_MSG(false, fmt::format(FMT_STRING("unsupported application type {:d}"), app_type));
         break;
     }
 }

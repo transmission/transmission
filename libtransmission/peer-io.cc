@@ -1189,7 +1189,7 @@ void tr_peerIoReadBytes(tr_peerIo* io, struct evbuffer* inbuf, void* bytes, size
         break;
 
     default:
-        TR_ASSERT_MSG(false, fmt::format(FMT_STRING("unhandled encryption type {:d}"), static_cast<int>(io->encryption_type)));
+        TR_ASSERT_MSG(false, fmt::format(FMT_STRING("unhandled encryption type {:d}"), io->encryption_type));
     }
 }
 
