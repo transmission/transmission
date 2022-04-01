@@ -456,7 +456,7 @@ void tr_netClosePeerSocket(tr_session* session, tr_peer_socket socket)
 #endif
 
     default:
-        TR_ASSERT_MSG(false, "unsupported peer socket type %d", socket.type);
+        TR_ASSERT_MSG(false, fmt::format(FMT_STRING("unsupported peer socket type {:d}"), socket.type));
     }
 }
 

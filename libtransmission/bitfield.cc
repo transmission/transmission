@@ -218,12 +218,7 @@ void tr_bitfield::freeArray()
 
 void tr_bitfield::setTrueCount(size_t n)
 {
-    TR_ASSERT_MSG(
-        bit_count_ == 0 || n <= bit_count_,
-        "bit_count_:%zu, n:%zu, std::size(flags_):%zu",
-        bit_count_,
-        n,
-        size_t(std::size(flags_)));
+    TR_ASSERT(bit_count_ == 0 || n <= bit_count_);
 
     true_count_ = n;
     have_all_hint_ = n == bit_count_;

@@ -15,8 +15,7 @@
 
 #include <libutp/utp.h>
 
-#include <fmt/core.h>
-#include <fmt/format.h> // fmt::ptr
+#include <fmt/format.h>
 
 #include "transmission.h"
 #include "session.h"
@@ -648,7 +647,7 @@ static tr_peerIo* tr_peerIoNew(
 #endif
 
     default:
-        TR_ASSERT_MSG(false, "unsupported peer socket type %d", socket.type);
+        TR_ASSERT_MSG(false, fmt::format(FMT_STRING("unsupported peer socket type {:d}"), socket.type));
     }
 
     return io;
@@ -1190,7 +1189,7 @@ void tr_peerIoReadBytes(tr_peerIo* io, struct evbuffer* inbuf, void* bytes, size
         break;
 
     default:
-        TR_ASSERT_MSG(false, "unhandled encryption type %d", (int)io->encryption_type);
+        TR_ASSERT_MSG(false, fmt::format(FMT_STRING("unhandled encryption type {:d}"), io->encryption_type));
     }
 }
 
