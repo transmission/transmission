@@ -165,7 +165,7 @@ tr_address tr_address::from_4byte_ipv4(std::string_view in)
  * >0 if a > b
  * 0  if a == b
  */
-int tr_address_compare(tr_address const* a, tr_address const* b)
+int tr_address_compare(tr_address const* a, tr_address const* b) noexcept
 {
     // IPv6 addresses are always "greater than" IPv4
     if (a->type != b->type)

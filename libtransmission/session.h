@@ -110,12 +110,12 @@ struct tr_turtle_info
 struct tr_session
 {
 public:
-    [[nodiscard]] auto const& torrents() const
+    [[nodiscard]] constexpr auto& torrents()
     {
         return torrents_;
     }
 
-    [[nodiscard]] auto& torrents()
+    [[nodiscard]] constexpr auto const& torrents() const
     {
         return torrents_;
     }
@@ -125,14 +125,14 @@ public:
         return std::unique_lock(session_mutex_);
     }
 
-    [[nodiscard]] bool isClosing() const
+    [[nodiscard]] constexpr auto isClosing() const noexcept
     {
         return is_closing_;
     }
 
     // download dir
 
-    std::string const& downloadDir() const
+    [[nodiscard]] constexpr auto const& downloadDir() const noexcept
     {
         return download_dir_;
     }
@@ -145,12 +145,12 @@ public:
     // default trackers
     // (trackers to apply automatically to public torrents)
 
-    auto const& defaultTrackersStr() const
+    [[nodiscard]] constexpr auto const& defaultTrackersStr() const noexcept
     {
         return default_trackers_str_;
     }
 
-    auto const& defaultTrackers() const
+    [[nodiscard]] constexpr auto const& defaultTrackers() const noexcept
     {
         return default_trackers_;
     }
@@ -159,7 +159,7 @@ public:
 
     // incomplete dir
 
-    std::string const& incompleteDir() const
+    [[nodiscard]] constexpr auto const& incompleteDir() const noexcept
     {
         return incomplete_dir_;
     }
@@ -169,24 +169,24 @@ public:
         incomplete_dir_ = dir;
     }
 
-    bool useIncompleteDir() const
+    [[nodiscard]] constexpr auto useIncompleteDir() const noexcept
     {
         return incomplete_dir_enabled_;
     }
 
-    void useIncompleteDir(bool enabled)
+    constexpr void useIncompleteDir(bool enabled) noexcept
     {
         incomplete_dir_enabled_ = enabled;
     }
 
     // scripts
 
-    void useScript(TrScript i, bool enabled)
+    constexpr void useScript(TrScript i, bool enabled)
     {
         scripts_enabled_[i] = enabled;
     }
 
-    bool useScript(TrScript i) const
+    [[nodiscard]] auto useScript(TrScript i) const
     {
         return scripts_enabled_[i];
     }
@@ -196,21 +196,21 @@ public:
         scripts_[i] = path;
     }
 
-    std::string const& script(TrScript i) const
+    [[nodiscard]] constexpr auto const& script(TrScript i) const
     {
         return scripts_[i];
     }
 
     // blocklist
 
-    bool useBlocklist() const
+    [[nodiscard]] constexpr auto useBlocklist() const noexcept
     {
         return blocklist_enabled_;
     }
 
     void useBlocklist(bool enabled);
 
-    std::string const& blocklistUrl() const
+    [[nodiscard]] constexpr auto const& blocklistUrl() const noexcept
     {
         return blocklist_url_;
     }
@@ -228,9 +228,9 @@ public:
 
     void useRpcWhitelist(bool enabled) const;
 
-    bool useRpcWhitelist() const;
+    [[nodiscard]] bool useRpcWhitelist() const;
 
-    auto externalIP() const
+    [[nodiscard]] auto externalIP() const noexcept
     {
         return external_ip_;
     }
@@ -242,7 +242,7 @@ public:
 
     // peer networking
 
-    std::string const& peerCongestionAlgorithm() const
+    [[nodiscard]] constexpr auto const& peerCongestionAlgorithm() const noexcept
     {
         return peer_congestion_algorithm_;
     }
@@ -259,7 +259,7 @@ public:
 
     // bandwidth
 
-    Bandwidth& getBandwidthGroup(std::string_view name);
+    [[nodiscard]] Bandwidth& getBandwidthGroup(std::string_view name);
 
 public:
     static constexpr std::array<std::tuple<tr_quark, tr_quark, TrScript>, 3> Scripts{
