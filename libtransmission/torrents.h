@@ -61,15 +61,15 @@ public:
 
     [[nodiscard]] std::set<int> removedSince(time_t) const;
 
-    [[nodiscard]] constexpr auto cbegin() const noexcept
+    [[nodiscard]] auto cbegin() const noexcept
     {
         return std::cbegin(by_hash_);
     }
-    [[nodiscard]] constexpr auto begin() const noexcept
+    [[nodiscard]] auto begin() const noexcept
     {
         return cbegin();
     }
-    [[nodiscard]] constexpr auto begin() noexcept
+    [[nodiscard]] auto begin() noexcept
     {
         return std::begin(by_hash_);
     }
