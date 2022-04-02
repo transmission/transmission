@@ -464,17 +464,6 @@ Session::Tag Session::torrentSet(torrent_ids_t const& ids, tr_quark const key, Q
     return torrentSetImpl(&args);
 }
 
-Session::Tag Session::torrentSet(torrent_ids_t const& ids, tr_quark const key, QPair<int, QString> const& value)
-{
-    tr_variant args;
-    tr_variantInitDict(&args, 2);
-    addOptionalIds(&args, ids);
-    tr_variant* list(tr_variantDictAddList(&args, key, 2));
-    listAdd(list, value.first);
-    listAdd(list, value.second);
-    return torrentSetImpl(&args);
-}
-
 void Session::torrentSetLocation(torrent_ids_t const& ids, QString const& location, bool do_move)
 {
     tr_variant args;
