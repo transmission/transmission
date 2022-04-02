@@ -57,12 +57,6 @@ tr_torrent* tr_torrents::get(int id)
     return tor;
 }
 
-tr_torrent const* tr_torrents::get(std::string_view magnet_link) const
-{
-    auto magnet = tr_magnet_metainfo{};
-    return magnet.parseMagnet(magnet_link) ? get(magnet.infoHash()) : nullptr;
-}
-
 tr_torrent* tr_torrents::get(std::string_view magnet_link)
 {
     auto magnet = tr_magnet_metainfo{};

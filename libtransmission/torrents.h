@@ -51,7 +51,6 @@ public:
     // These convenience functions use get(tr_sha1_digest_t const&)
     // after parsing the magnet link to get the info hash. If you have
     // the info hash already, use get() instead to avoid excess parsing.
-    [[nodiscard]] tr_torrent const* get(std::string_view magnet_link) const;
     [[nodiscard]] tr_torrent* get(std::string_view magnet_link);
 
     template<typename T>
