@@ -13,7 +13,7 @@
 
 #include <event2/buffer.h>
 
-#include <fmt/core.h>
+#include <fmt/chrono.h>
 #include <fmt/format.h>
 
 #include "transmission.h"
