@@ -397,12 +397,12 @@ protected:
         if (state != ZeroTorrentState::NoFiles)
         {
             auto const* const metainfo = tr_ctorGetMetainfo(ctor);
-            for (size_t i = 0, n = metainfo->fileCount(); i < n; ++i)
+            for (tr_file_index_t i = 0, n = metainfo->fileCount(); i < n; ++i)
             {
                 auto const base = state == ZeroTorrentState::Partial && tr_sessionIsIncompleteDirEnabled(session_) ?
                     tr_sessionGetIncompleteDir(session_) :
                     tr_sessionGetDownloadDir(session_);
-                auto const subpath = metainfo->fileSubpath(i);
+                auto const& subpath = metainfo->fileSubpath(i);
                 auto const partial = state == ZeroTorrentState::Partial && i == 0;
                 auto const suffix = std::string_view{ partial ? ".part" : "" };
                 auto const filename = tr_pathbuf{ base, '/', subpath, suffix };
