@@ -48,19 +48,19 @@
                             <menu key="menu" title="OtherViews" id="16">
                                 <items>
                                     <menuItem title="Error" state="on" image="RedDotFlat" id="17"/>
-                                    <menuItem title="Warn" image="OrangeDotFlat" id="18"/>
-                                    <menuItem title="Info" image="GreenDotFlat" id="19"/>
-                                    <menuItem title="Debug" image="BlueDotFlat" id="20"/>
-                                    <menuItem title="Trace" image="PurpleDotFlat" id="21"/>
+                                    <menuItem title="Warn" image="RedDotFlat" id="yoL-9H-kTt"/>
+                                    <menuItem title="Info" image="GreenDotFlat" id="18"/>
+                                    <menuItem title="Debug" image="BlueDotFlat" id="19"/>
+                                    <menuItem title="Trace" image="PurpleDotFlat" id="2hu-LL-6A5"/>
                                 </items>
                             </menu>
                         </popUpButtonCell>
                         <connections>
-                            <action selector="changeLevel:" target="-2" id="22"/>
+                            <action selector="changeLevel:" target="-2" id="21"/>
                         </connections>
                     </popUpButton>
-                    <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="23">
-                        <rect key="frame" x="129" y="6" width="82" height="24"/>
+                    <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="24">
+                        <rect key="frame" x="129" y="6" width="82" height="25"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <buttonCell key="cell" type="roundTextured" title="Save…" bezelStyle="texturedRounded" alignment="center" borderStyle="border" inset="2" id="61">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
@@ -176,9 +176,7 @@
     <resources>
         <image name="PurpleDotFlat" width="16" height="16"/>
         <image name="RedDotFlat" width="16" height="16"/>
-        <image name="OrangeDotFlat" width="16" height="16"/>
-        <image name="BlueDotFlat" width="16" height="16"/>
-        <image name="GreenDotFlat" width="16" height="16"/>
+        <image name="YellowDotFlat" width="16" height="16"/>
         <image name="imageCell:63:image" width="14" height="14">
             <mutableData key="keyedArchiveRepresentation">
 YnBsaXN0MDDUAQIDBAUGBwpYJHZlcnNpb25ZJGFyY2hpdmVyVCR0b3BYJG9iamVjdHMSAAGGoF8QD05T
