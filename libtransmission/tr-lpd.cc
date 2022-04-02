@@ -32,7 +32,7 @@ using in_port_t = uint16_t; /* all missing */
 #include "net.h"
 #include "peer-mgr.h" /* tr_peerMgrAddPex() */
 #include "session.h"
-#include "torrent.h" /* tr_torrentFindFromHash() */
+#include "torrent.h"
 #include "tr-assert.h"
 #include "tr-lpd.h"
 #include "utils.h"
@@ -415,11 +415,6 @@ void tr_lpdUninit(tr_session* ss)
     tr_logAddTrace("Done uninitialising Local Peer Discovery");
 
     session = nullptr;
-}
-
-bool tr_lpdEnabled(tr_session const* ss)
-{
-    return ss != nullptr && ss == session;
 }
 
 /**

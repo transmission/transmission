@@ -1237,11 +1237,3 @@ tr_peerIo* tr_handshakeStealIO(tr_handshake* handshake)
     handshake->io = nullptr;
     return io;
 }
-
-tr_address const* tr_handshakeGetAddr(struct tr_handshake const* handshake, tr_port* port)
-{
-    TR_ASSERT(handshake != nullptr);
-    TR_ASSERT(handshake->io != nullptr);
-
-    return tr_peerIoGetAddress(handshake->io, port);
-}

@@ -458,16 +458,6 @@ constexpr bool tr_isSession(tr_session const* session)
     return session != nullptr && session->magicNumber == SESSION_MAGIC_NUMBER;
 }
 
-constexpr bool tr_isPreallocationMode(tr_preallocation_mode m)
-{
-    return m == TR_PREALLOCATE_NONE || m == TR_PREALLOCATE_SPARSE || m == TR_PREALLOCATE_FULL;
-}
-
-constexpr bool tr_isEncryptionMode(tr_encryption_mode m)
-{
-    return m == TR_CLEAR_PREFERRED || m == TR_ENCRYPTION_PREFERRED || m == TR_ENCRYPTION_REQUIRED;
-}
-
 constexpr bool tr_isPriority(tr_priority_t p)
 {
     return p == TR_PRI_LOW || p == TR_PRI_NORMAL || p == TR_PRI_HIGH;

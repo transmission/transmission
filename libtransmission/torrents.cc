@@ -42,21 +42,6 @@ struct CompareTorrentByHash
 
 } // namespace
 
-tr_torrent const* tr_torrents::get(int id) const
-{
-    TR_ASSERT(0 < id);
-    TR_ASSERT(static_cast<size_t>(id) < std::size(by_id_));
-    if (static_cast<size_t>(id) >= std::size(by_id_))
-    {
-        return nullptr;
-    }
-
-    auto const* tor = by_id_.at(id);
-    TR_ASSERT(tor == nullptr || tor->uniqueId == id);
-    TR_ASSERT(removed_.count(id) == (tor == nullptr ? 1 : 0));
-    return tor;
-}
-
 tr_torrent* tr_torrents::get(int id)
 {
     TR_ASSERT(0 < id);
@@ -70,12 +55,6 @@ tr_torrent* tr_torrents::get(int id)
     TR_ASSERT(tor == nullptr || tor->uniqueId == id);
     TR_ASSERT(removed_.count(id) == (tor == nullptr ? 1 : 0));
     return tor;
-}
-
-tr_torrent const* tr_torrents::get(std::string_view magnet_link) const
-{
-    auto magnet = tr_magnet_metainfo{};
-    return magnet.parseMagnet(magnet_link) ? get(magnet.infoHash()) : nullptr;
 }
 
 tr_torrent* tr_torrents::get(std::string_view magnet_link)

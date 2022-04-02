@@ -163,21 +163,11 @@ void tr_blocklistFileFree(tr_blocklistFile* b)
     tr_free(b);
 }
 
-bool tr_blocklistFileExists(tr_blocklistFile const* b)
-{
-    return tr_sys_path_exists(b->filename);
-}
-
 int tr_blocklistFileGetRuleCount(tr_blocklistFile const* b)
 {
     blocklistEnsureLoaded((tr_blocklistFile*)b);
 
     return b->ruleCount;
-}
-
-bool tr_blocklistFileIsEnabled(tr_blocklistFile* b)
-{
-    return b->isEnabled;
 }
 
 void tr_blocklistFileSetEnabled(tr_blocklistFile* b, bool isEnabled)

@@ -43,8 +43,6 @@ tr_handshake* tr_handshakeNew(
     tr_handshake_done_func when_done,
     void* when_done_user_data);
 
-tr_address const* tr_handshakeGetAddr(struct tr_handshake const* handshake, tr_port* port);
-
 void tr_handshakeAbort(tr_handshake* handshake);
 
 tr_peerIo* tr_handshakeStealIO(tr_handshake* handshake);

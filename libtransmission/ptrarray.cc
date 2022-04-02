@@ -104,18 +104,6 @@ int tr_ptrArrayInsert(tr_ptrArray* t, void* ptr, int pos)
     return pos;
 }
 
-void* tr_ptrArrayPop(tr_ptrArray* t)
-{
-    void* ret = nullptr;
-
-    if (t->n_items != 0)
-    {
-        ret = t->items[--t->n_items];
-    }
-
-    return ret;
-}
-
 void tr_ptrArrayErase(tr_ptrArray* t, int begin, int end)
 {
     if (end < 0)

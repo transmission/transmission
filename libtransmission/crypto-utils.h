@@ -182,12 +182,6 @@ std::string tr_base64_decode(std::string_view input);
 
 /**
  * @brief Generate an ascii hex string for a sha1 digest.
- * @return address pointing past the last element written.
- */
-char* tr_sha1_to_string(tr_sha1_digest_t const& digest, char* strbuf);
-
-/**
- * @brief Generate an ascii hex string for a sha1 digest.
  */
 std::string tr_sha1_to_string(tr_sha1_digest_t const&);
 

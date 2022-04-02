@@ -104,11 +104,6 @@ bool tr_ctorSetMetainfoFromMagnetLink(tr_ctor* ctor, char const* magnet_link, tr
     return ctor->metainfo.parseMagnet(magnet_link != nullptr ? magnet_link : "", error);
 }
 
-std::string_view tr_ctorGetContents(tr_ctor const* ctor)
-{
-    return std::string_view{ std::data(ctor->contents), std::size(ctor->contents) };
-}
-
 char const* tr_ctorGetSourceFile(tr_ctor const* ctor)
 {
     return ctor->torrent_filename.c_str();
@@ -333,17 +328,6 @@ tr_priority_t tr_ctorGetBandwidthPriority(tr_ctor const* ctor)
 /***
 ****
 ***/
-
-void tr_ctorSetLabels(tr_ctor* ctor, char const** labels, size_t len)
-{
-    auto labels_set = tr_labels_t{};
-    for (size_t i = 0; i < len; i++)
-    {
-        labels_set.emplace(labels[i]);
-    }
-
-    tr_ctorSetLabels(ctor, std::move(labels_set));
-}
 
 void tr_ctorSetLabels(tr_ctor* ctor, tr_labels_t&& labels)
 {
