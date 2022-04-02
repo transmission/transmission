@@ -56,11 +56,6 @@ static inline void tr_ptrArrayRemove(tr_ptrArray* t, int pos)
 /** @brief Peek at the array pointer and its size, for easy iteration */
 void** tr_ptrArrayPeek(tr_ptrArray* array, int* size);
 
-constexpr void tr_ptrArrayClear(tr_ptrArray* a)
-{
-    a->n_items = 0;
-}
-
 /** @brief Insert a pointer into the array at the specified position
     @return the index of the stored pointer */
 int tr_ptrArrayInsert(tr_ptrArray* array, void* insertMe, int pos);
