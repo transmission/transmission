@@ -2416,7 +2416,7 @@ static void setLocationImpl(struct LocationData* const data)
             if (auto found = tor->findFile(i); found)
             {
                 auto const& oldpath = found->filename;
-                auto const newpath = tr_pathbuf{ location, "/"sv, found->subpath };
+                auto const newpath = tr_pathbuf{ location, '/', found->subpath() };
 
                 tr_logAddTraceTor(tor, fmt::format("Found file #{}: '{}'", i, oldpath));
 
@@ -2563,10 +2563,10 @@ static void tr_torrentFileCompleted(tr_torrent* tor, tr_file_index_t i)
      * it until now -- then rename it to match the one in the metadata */
     if (auto found = tor->findFile(i); found)
     {
-        if (auto const& file_subpath = tor->fileSubpath(i); file_subpath != found->subpath)
+        if (auto const& file_subpath = tor->fileSubpath(i); file_subpath != found->subpath())
         {
-            auto const oldpath = tr_pathbuf{ found->base, "/"sv, found->subpath };
-            auto const newpath = tr_pathbuf{ found->base, "/"sv, file_subpath };
+            auto const& oldpath = found->filename;
+            auto const newpath = tr_pathbuf{ found->base(), '/', file_subpath };
             tr_error* error = nullptr;
 
             if (!tr_sys_path_rename(oldpath, newpath, &error))
@@ -2708,7 +2708,7 @@ static void refreshCurrentDir(tr_torrent* tor)
     else
     {
         auto const found = tor->findFile(0);
-        dir = found ? tr_interned_string{ found->base } : tor->incompleteDir();
+        dir = found ? tr_interned_string{ found->base() } : tor->incompleteDir();
     }
 
     TR_ASSERT(!std::empty(dir));

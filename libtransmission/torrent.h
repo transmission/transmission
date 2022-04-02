@@ -370,16 +370,27 @@ public:
 
     struct tr_found_file_t : public tr_sys_path_info
     {
-        tr_pathbuf filename; // /home/foo/Downloads/torrent/01-file-one.txt
-        std::string_view base; // /home/foo/Downloads
-        std::string_view subpath; // /torrent/01-file-one.txt
+        // /home/foo/Downloads/torrent/01-file-one.txt
+        tr_pathbuf filename;
+        size_t base_len;
 
-        tr_found_file_t(tr_sys_path_info info, tr_pathbuf&& filename_in, size_t base_len)
+        tr_found_file_t(tr_sys_path_info info, tr_pathbuf&& filename_in, size_t base_len_in)
             : tr_sys_path_info{ info }
             , filename{ std::move(filename_in) }
-            , base{ filename.sv().substr(0, base_len) }
-            , subpath{ filename.sv().substr(base_len + 1) }
+            , base_len{ base_len_in }
         {
+        }
+
+        [[nodiscard]] constexpr auto base() const
+        {
+            // /home/foo/Downloads
+            return filename.sv().substr(0, base_len);
+        }
+
+        [[nodiscard]] constexpr auto subpath() const
+        {
+            // torrent/01-file-one.txt
+            return filename.sv().substr(base_len + 1);
         }
     };
 
