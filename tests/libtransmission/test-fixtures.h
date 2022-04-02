@@ -88,17 +88,16 @@ public:
 protected:
     static std::string get_default_parent_dir()
     {
-        auto* path = getenv("TMPDIR");
-        if (path != NULL)
+        if (auto* const path = getenv("TMPDIR"); path != nullptr)
         {
             return path;
         }
 
         tr_error* error = nullptr;
-        path = tr_sys_dir_get_current(&error);
-        if (path != nullptr)
+
+        if (auto* path = tr_sys_dir_get_current(&error); path != nullptr)
         {
-            std::string const ret = path;
+            auto ret = std::string{ path };
             tr_free(path);
             return ret;
         }
