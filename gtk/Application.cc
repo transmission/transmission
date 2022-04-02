@@ -542,12 +542,12 @@ void Application::Impl::on_startup()
     /* ensure the directories are created */
     if (auto const str = gtr_pref_string_get(TR_KEY_download_dir); !str.empty())
     {
-        g_mkdir_with_parents(str.c_str(), 0777);
+        (void)g_mkdir_with_parents(str.c_str(), 0777);
     }
 
     if (auto const str = gtr_pref_string_get(TR_KEY_incomplete_dir); !str.empty())
     {
-        g_mkdir_with_parents(str.c_str(), 0777);
+        (void)g_mkdir_with_parents(str.c_str(), 0777);
     }
 
     /* initialize the libtransmission session */
