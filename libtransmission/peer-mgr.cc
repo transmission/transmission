@@ -128,11 +128,6 @@ struct peer_atom
     time_t shelf_date;
     tr_peer* peer; /* will be nullptr if not connected */
     tr_address addr;
-
-    [[nodiscard]] int compare(peer_atom const& that) const
-    {
-        return addr.compare(that.addr);
-    }
 };
 
 #ifndef TR_ENABLE_ASSERTS
