@@ -54,7 +54,6 @@ FileTreeItem::~FileTreeItem()
 
     // invalidate the row numbers of the siblings that came after this child
     parent_->first_unhashed_row_ = std::distance(std::begin(siblings), it);
-    ;
 }
 
 void FileTreeItem::appendChild(FileTreeItem* child)
