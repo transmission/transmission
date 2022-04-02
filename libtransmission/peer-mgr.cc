@@ -133,21 +133,6 @@ struct peer_atom
     {
         return addr.compare(that.addr);
     }
-
-    [[nodiscard]] bool operator==(peer_atom const& that) const
-    {
-        return compare(that) == 0;
-    }
-
-    [[nodiscard]] bool operator<(peer_atom const& that) const
-    {
-        return compare(that) < 0;
-    }
-
-    [[nodiscard]] bool operator>(peer_atom const& that) const
-    {
-        return compare(that) > 0;
-    }
 };
 
 #ifndef TR_ENABLE_ASSERTS
