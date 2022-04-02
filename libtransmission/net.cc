@@ -165,7 +165,7 @@ tr_address tr_address::from_4byte_ipv4(std::string_view in)
  * >0 if a > b
  * 0  if a == b
  */
-int tr_address_compare(tr_address const* a, tr_address const* b)
+int tr_address_compare(tr_address const* a, tr_address const* b) noexcept
 {
     // IPv6 addresses are always "greater than" IPv4
     if (a->type != b->type)
@@ -456,7 +456,7 @@ void tr_netClosePeerSocket(tr_session* session, tr_peer_socket socket)
 #endif
 
     default:
-        TR_ASSERT_MSG(false, "unsupported peer socket type %d", socket.type);
+        TR_ASSERT_MSG(false, fmt::format(FMT_STRING("unsupported peer socket type {:d}"), socket.type));
     }
 }
 

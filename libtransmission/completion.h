@@ -40,7 +40,7 @@ struct tr_completion
         blocks_.setHasNone();
     }
 
-    [[nodiscard]] constexpr tr_bitfield const& blocks() const
+    [[nodiscard]] constexpr tr_bitfield const& blocks() const noexcept
     {
         return blocks_;
     }
@@ -70,7 +70,7 @@ struct tr_completion
         return block_info_->piece_size != 0 && countMissingBlocksInPiece(piece) == 0;
     }
 
-    [[nodiscard]] constexpr uint64_t hasTotal() const
+    [[nodiscard]] constexpr uint64_t hasTotal() const noexcept
     {
         return size_now_;
     }

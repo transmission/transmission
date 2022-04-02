@@ -48,9 +48,6 @@ enum class GtrUnicode
 
 Glib::ustring gtr_get_unicode_string(GtrUnicode);
 
-/* return a percent formatted string of either x.xx, xx.x or xxx */
-Glib::ustring tr_strlpercent(double x);
-
 /* return a human-readable string for the size given in bytes. */
 Glib::ustring tr_strlsize(guint64 size);
 

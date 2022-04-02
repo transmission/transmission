@@ -1444,8 +1444,7 @@ static void onBlocklistFetched(tr_web::FetchResponse const& web_response)
     // tr_blocklistSetContent needs a source file,
     // so save content into a tmpfile
     auto const filename = tr_pathbuf{ session->config_dir, "/blocklist.tmp"sv };
-    tr_error* error = nullptr;
-    if (!tr_saveFile(filename, content, &error))
+    if (tr_error* error = nullptr; !tr_saveFile(filename, content, &error))
     {
         fmt::format_to_n(
             result,
@@ -1460,9 +1459,9 @@ static void onBlocklistFetched(tr_web::FetchResponse const& web_response)
     }
 
     // feed it to the session and give the client a response
-    int const rule_count = tr_blocklistSetContent(session, filename.c_str());
+    int const rule_count = tr_blocklistSetContent(session, filename);
     tr_variantDictAddInt(data->args_out, TR_KEY_blocklist_size, rule_count);
-    tr_sys_path_remove(filename.c_str());
+    tr_sys_path_remove(filename);
     tr_idle_function_done(data, "success");
 }
 

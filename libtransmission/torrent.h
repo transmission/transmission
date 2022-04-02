@@ -55,8 +55,6 @@ void tr_ctorInitTorrentWanted(tr_ctor const* ctor, tr_torrent* tor);
 
 bool tr_ctorSaveContents(tr_ctor const* ctor, std::string_view filename, tr_error** error);
 
-std::string_view tr_ctorGetContents(tr_ctor const* ctor);
-
 tr_session* tr_ctorGetSession(tr_ctor const* ctor);
 
 bool tr_ctorGetIncompleteDir(tr_ctor const* ctor, char const** setmeIncompleteDir);
@@ -244,17 +242,17 @@ public:
         return completion.createPieceBitfield();
     }
 
-    [[nodiscard]] constexpr bool isDone() const
+    [[nodiscard]] constexpr bool isDone() const noexcept
     {
         return completeness != TR_LEECH;
     }
 
-    [[nodiscard]] constexpr bool isSeed() const
+    [[nodiscard]] constexpr bool isSeed() const noexcept
     {
         return completeness == TR_SEED;
     }
 
-    [[nodiscard]] constexpr bool isPartialSeed() const
+    [[nodiscard]] constexpr bool isPartialSeed() const noexcept
     {
         return completeness == TR_PARTIAL_SEED;
     }
@@ -333,17 +331,17 @@ public:
 
     /// LOCATION
 
-    [[nodiscard]] tr_interned_string currentDir() const
+    [[nodiscard]] constexpr tr_interned_string currentDir() const noexcept
     {
         return this->current_dir;
     }
 
-    [[nodiscard]] tr_interned_string downloadDir() const
+    [[nodiscard]] constexpr tr_interned_string downloadDir() const noexcept
     {
         return this->download_dir;
     }
 
-    [[nodiscard]] tr_interned_string incompleteDir() const
+    [[nodiscard]] constexpr tr_interned_string incompleteDir() const noexcept
     {
         return this->incomplete_dir;
     }
@@ -372,16 +370,27 @@ public:
 
     struct tr_found_file_t : public tr_sys_path_info
     {
-        tr_pathbuf filename; // /home/foo/Downloads/torrent/01-file-one.txt
-        std::string_view base; // /home/foo/Downloads
-        std::string_view subpath; // /torrent/01-file-one.txt
+        // /home/foo/Downloads/torrent/01-file-one.txt
+        tr_pathbuf filename;
+        size_t base_len;
 
-        tr_found_file_t(tr_sys_path_info info, tr_pathbuf&& filename_in, size_t base_len)
+        tr_found_file_t(tr_sys_path_info info, tr_pathbuf&& filename_in, size_t base_len_in)
             : tr_sys_path_info{ info }
             , filename{ std::move(filename_in) }
-            , base{ filename.sv().substr(0, base_len) }
-            , subpath{ filename.sv().substr(base_len + 1) }
+            , base_len{ base_len_in }
         {
+        }
+
+        [[nodiscard]] constexpr auto base() const
+        {
+            // /home/foo/Downloads
+            return filename.sv().substr(0, base_len);
+        }
+
+        [[nodiscard]] constexpr auto subpath() const
+        {
+            // torrent/01-file-one.txt
+            return filename.sv().substr(base_len + 1);
         }
     };
 
@@ -530,7 +539,7 @@ public:
 
     ///
 
-    [[nodiscard]] auto isQueued() const
+    [[nodiscard]] constexpr auto isQueued() const noexcept
     {
         return this->is_queued;
     }
@@ -769,7 +778,7 @@ void tr_torrentGotBlock(tr_torrent* tor, tr_block_index_t blockIndex);
 
 tr_peer_id_t const& tr_torrentGetPeerId(tr_torrent* tor);
 
-tr_torrent_metainfo&& tr_ctorStealMetainfo(tr_ctor* ctor);
+tr_torrent_metainfo tr_ctorStealMetainfo(tr_ctor* ctor);
 
 bool tr_ctorSetMetainfoFromFile(tr_ctor* ctor, std::string const& filename, tr_error** error);
 bool tr_ctorSetMetainfoFromMagnetLink(tr_ctor* ctor, std::string const& filename, tr_error** error);

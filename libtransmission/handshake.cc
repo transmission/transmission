@@ -12,7 +12,7 @@
 #include <event2/buffer.h>
 #include <event2/event.h>
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include "transmission.h"
 #include "clients.h"
@@ -992,7 +992,7 @@ static ReadState canRead(tr_peerIo* io, void* vhandshake, size_t* piece)
 
     auto* handshake = static_cast<tr_handshake*>(vhandshake);
 
-    struct evbuffer* inbuf = tr_peerIoGetReadBuffer(io);
+    evbuffer* const inbuf = io->getReadBuffer();
     bool readyForMore = true;
 
     /* no piece data in handshake */
@@ -1055,7 +1055,7 @@ static ReadState canRead(tr_peerIo* io, void* vhandshake, size_t* piece)
 
         default:
 #ifdef TR_ENABLE_ASSERTS
-            TR_ASSERT_MSG(false, "unhandled handshake state %d", (int)handshake->state);
+            TR_ASSERT_MSG(false, fmt::format(FMT_STRING("unhandled handshake state {:d}"), handshake->state));
 #else
             ret = READ_ERR;
             break;
@@ -1236,12 +1236,4 @@ tr_peerIo* tr_handshakeStealIO(tr_handshake* handshake)
     tr_peerIo* io = handshake->io;
     handshake->io = nullptr;
     return io;
-}
-
-tr_address const* tr_handshakeGetAddr(struct tr_handshake const* handshake, tr_port* port)
-{
-    TR_ASSERT(handshake != nullptr);
-    TR_ASSERT(handshake->io != nullptr);
-
-    return tr_peerIoGetAddress(handshake->io, port);
 }

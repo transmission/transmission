@@ -542,12 +542,12 @@ void Application::Impl::on_startup()
     /* ensure the directories are created */
     if (auto const str = gtr_pref_string_get(TR_KEY_download_dir); !str.empty())
     {
-        g_mkdir_with_parents(str.c_str(), 0777);
+        (void)g_mkdir_with_parents(str.c_str(), 0777);
     }
 
     if (auto const str = gtr_pref_string_get(TR_KEY_incomplete_dir); !str.empty())
     {
-        g_mkdir_with_parents(str.c_str(), 0777);
+        (void)g_mkdir_with_parents(str.c_str(), 0777);
     }
 
     /* initialize the libtransmission session */
@@ -720,14 +720,13 @@ void Application::Impl::app_setup()
         w.add_button(_("I _Agree"), Gtk::RESPONSE_ACCEPT);
         w.set_default_response(Gtk::RESPONSE_ACCEPT);
 
-        switch (w.run())
+        if (w.run() == Gtk::RESPONSE_ACCEPT)
         {
-        case Gtk::RESPONSE_ACCEPT:
-            /* only show it once */
+            // only show it once
             gtr_pref_flag_set(TR_KEY_user_has_given_informed_consent, true);
-            break;
-
-        default:
+        }
+        else
+        {
             exit(0);
         }
     }

@@ -192,13 +192,6 @@ void tr_http_escape_sha1(char* out, tr_sha1_digest_t const& digest)
     *out = '\0';
 }
 
-void tr_http_escape_sha1(char* out, uint8_t const* sha1_digest)
-{
-    auto digest = tr_sha1_digest_t{};
-    std::copy_n(reinterpret_cast<std::byte const*>(sha1_digest), std::size(digest), std::begin(digest));
-    tr_http_escape_sha1(out, digest);
-}
-
 //// URLs
 
 namespace

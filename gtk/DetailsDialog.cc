@@ -463,7 +463,7 @@ Gtk::Widget* DetailsDialog::Impl::options_page_new()
     auto* t = Gtk::make_managed<HigWorkarea>();
     t->add_section_title(row, _("Speed"));
 
-    honor_limits_check_ = t->add_wide_checkbutton(row, _("Honor global _limits"), 0);
+    honor_limits_check_ = t->add_wide_checkbutton(row, _("Honor global _limits"), false);
     honor_limits_check_tag_ = honor_limits_check_->signal_toggled().connect(
         [this]() { torrent_set_bool(TR_KEY_honorsSessionLimits, honor_limits_check_->get_active()); });
 
@@ -890,8 +890,8 @@ void DetailsDialog::Impl::refreshInfo(std::vector<tr_torrent*> const& torrents)
             double const d = sizeWhenDone != 0 ? (100.0 * available) / sizeWhenDone : 0;
             double const ratio = 100.0 * (sizeWhenDone != 0 ? (haveValid + haveUnchecked) / (double)sizeWhenDone : 1);
 
-            auto const avail = tr_strlpercent(d);
-            auto const buf2 = tr_strlpercent(ratio);
+            auto const avail = tr_strpercent(d);
+            auto const buf2 = tr_strpercent(ratio);
             auto const total = tr_strlsize(haveUnchecked + haveValid);
             auto const unver = tr_strlsize(haveUnchecked);
 
@@ -1251,7 +1251,7 @@ public:
 
 PeerModelColumns const peer_cols;
 
-void initPeerRow(Gtk::TreeIter const& iter, std::string const& key, std::string const& torrentName, tr_peer_stat const* peer)
+void initPeerRow(Gtk::TreeIter const& iter, std::string_view key, std::string_view torrent_name, tr_peer_stat const* peer)
 {
     g_return_if_fail(peer != nullptr);
 
@@ -1261,23 +1261,17 @@ void initPeerRow(Gtk::TreeIter const& iter, std::string const& key, std::string 
         client = "";
     }
 
-    int q[4];
-    Glib::ustring collated_name;
-    if (sscanf(peer->addr, "%d.%d.%d.%d", q, q + 1, q + 2, q + 3) != 4)
-    {
-        collated_name = peer->addr;
-    }
-    else
-    {
-        collated_name = gtr_sprintf("%03d.%03d.%03d.%03d", q[0], q[1], q[2], q[3]);
-    }
+    auto q = std::array<int, 4>{};
+    auto const collated_name = sscanf(peer->addr, "%d.%d.%d.%d", &q[0], &q[1], &q[2], &q[3]) != 4 ?
+        peer->addr :
+        fmt::format(FMT_STRING("{:03d}.{:03d}.{:03d}.{:03d}"), q[0], q[1], q[2], q[3]);
 
     (*iter)[peer_cols.address] = peer->addr;
     (*iter)[peer_cols.address_collated] = collated_name;
     (*iter)[peer_cols.client] = client;
     (*iter)[peer_cols.encryption_stock_id] = peer->isEncrypted ? "lock" : "";
-    (*iter)[peer_cols.key] = key;
-    (*iter)[peer_cols.torrent_name] = torrentName;
+    (*iter)[peer_cols.key] = Glib::ustring{ std::data(key), std::size(key) };
+    (*iter)[peer_cols.torrent_name] = Glib::ustring{ std::data(torrent_name), std::size(torrent_name) };
 }
 
 void refreshPeerRow(Gtk::TreeIter const& iter, tr_peer_stat const* peer)

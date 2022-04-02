@@ -1519,15 +1519,12 @@ static constexpr tr_quark priorityKey(int priority)
     {
     case TR_PRI_LOW:
         return TR_KEY_priority_low;
-        break;
 
     case TR_PRI_HIGH:
         return TR_KEY_priority_high;
-        break;
 
     default:
         return TR_KEY_priority_normal;
-        break;
     }
 }
 

@@ -521,14 +521,10 @@ void tr_sessionSaveSettings(tr_session* session, char const* config_dir, tr_vari
     tr_variantInitDict(&settings, 0);
 
     /* the existing file settings are the fallback values */
+    if (auto file_settings = tr_variant{}; tr_variantFromFile(&file_settings, TR_VARIANT_PARSE_JSON, filename))
     {
-        tr_variant fileSettings;
-
-        if (tr_variantFromFile(&fileSettings, TR_VARIANT_PARSE_JSON, filename, nullptr))
-        {
-            tr_variantMergeDicts(&settings, &fileSettings);
-            tr_variantFree(&fileSettings);
-        }
+        tr_variantMergeDicts(&settings, &file_settings);
+        tr_variantFree(&file_settings);
     }
 
     /* the client's settings override the file settings */

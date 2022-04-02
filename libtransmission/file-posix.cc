@@ -582,7 +582,7 @@ tr_sys_file_t tr_sys_file_get_std(tr_std_sys_file_t std_file, tr_error** error)
         break;
 
     default:
-        TR_ASSERT_MSG(false, "unknown standard file %d", (int)std_file);
+        TR_ASSERT_MSG(false, fmt::format(FMT_STRING("unknown standard file {:d}"), std_file));
         set_system_error(error, EINVAL);
     }
 

@@ -82,11 +82,6 @@ Glib::ustring tr_strlratio(double ratio)
     return tr_strratio(ratio, gtr_get_unicode_string(GtrUnicode::Inf).c_str());
 }
 
-Glib::ustring tr_strlpercent(double x)
-{
-    return tr_strpercent(x);
-}
-
 Glib::ustring tr_strlsize(guint64 bytes)
 {
     return bytes == 0 ? Q_("None") : tr_formatter_size_B(bytes);
@@ -185,13 +180,10 @@ bool on_tree_view_button_pressed(
         Gtk::TreeModel::Path path;
         auto const selection = view->get_selection();
 
-        if (view->get_path_at_pos((int)event->x, (int)event->y, path))
+        if (view->get_path_at_pos((int)event->x, (int)event->y, path) && !selection->is_selected(path))
         {
-            if (!selection->is_selected(path))
-            {
-                selection->unselect_all();
-                selection->select(path);
-            }
+            selection->unselect_all();
+            selection->select(path);
         }
 
         if (callback)

@@ -203,12 +203,6 @@ std::string tr_sha1_to_string(tr_sha1_digest_t const& digest)
     return str;
 }
 
-char* tr_sha1_to_string(tr_sha1_digest_t const& digest, char* strbuf)
-{
-    tr_binary_to_hex(std::data(digest), strbuf, std::size(digest));
-    return strbuf + (std::size(digest) * 2);
-}
-
 static void tr_hex_to_binary(char const* input, void* voutput, size_t byte_length)
 {
     static char constexpr Hex[] = "0123456789abcdef";
