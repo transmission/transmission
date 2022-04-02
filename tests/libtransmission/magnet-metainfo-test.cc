@@ -66,14 +66,14 @@ TEST(MagnetMetainfo, magnetParse)
         EXPECT_TRUE(mm.parseMagnet(uri));
         EXPECT_EQ(2U, std::size(mm.announceList()));
         auto it = std::begin(mm.announceList());
-        EXPECT_EQ(0, it->tier);
+        EXPECT_EQ(0U, it->tier);
         EXPECT_EQ("http://tracker.openbittorrent.com/announce"sv, it->announce.full);
         EXPECT_EQ("http://tracker.openbittorrent.com/scrape"sv, it->scrape.full);
         ++it;
-        EXPECT_EQ(1, it->tier);
+        EXPECT_EQ(1U, it->tier);
         EXPECT_EQ("http://tracker.opentracker.org/announce", it->announce.full);
         EXPECT_EQ("http://tracker.opentracker.org/scrape", it->scrape.full);
-        EXPECT_EQ(1, mm.webseedCount());
+        EXPECT_EQ(1U, mm.webseedCount());
         EXPECT_EQ("http://server.webseed.org/path/to/file"sv, mm.webseed(0));
         EXPECT_EQ("Display Name"sv, mm.name());
         EXPECT_EQ(ExpectedHash, mm.infoHash());

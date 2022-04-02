@@ -231,7 +231,7 @@ TEST_F(BlockInfoTest, pieceLastLoc)
     EXPECT_EQ(PieceSize - 1, loc.byte);
     EXPECT_EQ(ExpectedBlocksPerPiece - 1, loc.block);
     EXPECT_EQ(ExpectedBlockSize - 1, loc.block_offset);
-    EXPECT_EQ(0, loc.piece);
+    EXPECT_EQ(0U, loc.piece);
     EXPECT_EQ(PieceSize - 1, loc.piece_offset);
 
     loc = info.pieceLastLoc(info.pieceCount() - 1);

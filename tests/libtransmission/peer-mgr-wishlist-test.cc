@@ -130,9 +130,9 @@ TEST_F(PeerMgrWishlistTest, doesNotRequestBlocksThatCannotBeRequested)
     {
         requested.setSpan(span.begin, span.end);
     }
-    EXPECT_EQ(240, requested.count());
-    EXPECT_EQ(0, requested.count(0, 10));
-    EXPECT_EQ(240, requested.count(10, 250));
+    EXPECT_EQ(240U, requested.count());
+    EXPECT_EQ(0U, requested.count(0, 10));
+    EXPECT_EQ(240U, requested.count(10, 250));
 }
 
 TEST_F(PeerMgrWishlistTest, doesNotRequestTooManyBlocks)
@@ -257,9 +257,9 @@ TEST_F(PeerMgrWishlistTest, onlyRequestsDupesDuringEndgame)
     {
         requested.setSpan(span.begin, span.end);
     }
-    EXPECT_EQ(150, requested.count());
-    EXPECT_EQ(0, requested.count(0, 150));
-    EXPECT_EQ(150, requested.count(150, 300));
+    EXPECT_EQ(150U, requested.count());
+    EXPECT_EQ(0U, requested.count(0, 150));
+    EXPECT_EQ(150U, requested.count(150, 300));
 
     // BUT during endgame it's OK to request dupes,
     // so then we _should_ see the first 150 in the list
@@ -270,9 +270,9 @@ TEST_F(PeerMgrWishlistTest, onlyRequestsDupesDuringEndgame)
     {
         requested.setSpan(span.begin, span.end);
     }
-    EXPECT_EQ(300, requested.count());
-    EXPECT_EQ(150, requested.count(0, 150));
-    EXPECT_EQ(150, requested.count(150, 300));
+    EXPECT_EQ(300U, requested.count());
+    EXPECT_EQ(150U, requested.count(0, 150));
+    EXPECT_EQ(150U, requested.count(150, 300));
 }
 
 TEST_F(PeerMgrWishlistTest, prefersNearlyCompletePieces)
@@ -320,9 +320,9 @@ TEST_F(PeerMgrWishlistTest, prefersNearlyCompletePieces)
         {
             requested.setSpan(range.begin, range.end);
         }
-        EXPECT_EQ(10, requested.count());
-        EXPECT_EQ(10, requested.count(0, 100));
-        EXPECT_EQ(0, requested.count(100, 300));
+        EXPECT_EQ(10U, requested.count());
+        EXPECT_EQ(10U, requested.count(0, 100));
+        EXPECT_EQ(0U, requested.count(100, 300));
     }
 
     // Same premise as previous test, but ask for more blocks.
@@ -336,9 +336,9 @@ TEST_F(PeerMgrWishlistTest, prefersNearlyCompletePieces)
         {
             requested.setSpan(range.begin, range.end);
         }
-        EXPECT_EQ(20, requested.count());
-        EXPECT_EQ(10, requested.count(0, 100));
-        EXPECT_EQ(10, requested.count(100, 200));
-        EXPECT_EQ(0, requested.count(200, 300));
+        EXPECT_EQ(20U, requested.count());
+        EXPECT_EQ(10U, requested.count(0, 100));
+        EXPECT_EQ(10U, requested.count(100, 200));
+        EXPECT_EQ(0U, requested.count(200, 300));
     }
 }

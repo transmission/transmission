@@ -98,13 +98,13 @@ TEST_F(AnnounceListTest, canNotAddDuplicateAnnounce)
 
     auto announce_list = tr_announce_list{};
     EXPECT_TRUE(announce_list.add(Announce, Tier));
-    EXPECT_EQ(1, announce_list.size());
+    EXPECT_EQ(1U, announce_list.size());
     EXPECT_FALSE(announce_list.add(Announce, Tier));
-    EXPECT_EQ(1, announce_list.size());
+    EXPECT_EQ(1U, announce_list.size());
 
     auto constexpr Announce2 = "https://example.org:443/announce"sv;
     EXPECT_FALSE(announce_list.add(Announce2, Tier));
-    EXPECT_EQ(1, announce_list.size());
+    EXPECT_EQ(1U, announce_list.size());
 }
 
 TEST_F(AnnounceListTest, canNotAddInvalidUrl)
@@ -114,7 +114,7 @@ TEST_F(AnnounceListTest, canNotAddInvalidUrl)
 
     auto announce_list = tr_announce_list{};
     EXPECT_FALSE(announce_list.add(Announce, Tier));
-    EXPECT_EQ(0, announce_list.size());
+    EXPECT_EQ(0U, announce_list.size());
 }
 
 TEST_F(AnnounceListTest, canSet)
@@ -127,8 +127,8 @@ TEST_F(AnnounceListTest, canSet)
     auto constexpr Tiers = std::array<tr_tracker_tier_t, 3>{ 1, 2, 3 };
 
     auto announce_list = tr_announce_list{};
-    EXPECT_EQ(3, announce_list.set(std::data(Urls), std::data(Tiers), 3));
-    EXPECT_EQ(3, announce_list.size());
+    EXPECT_EQ(3U, announce_list.set(std::data(Urls), std::data(Tiers), 3));
+    EXPECT_EQ(3U, announce_list.size());
     EXPECT_EQ(Tiers[0], announce_list.at(0).tier);
     EXPECT_EQ(Tiers[1], announce_list.at(1).tier);
     EXPECT_EQ(Tiers[2], announce_list.at(2).tier);
@@ -149,8 +149,8 @@ TEST_F(AnnounceListTest, canSetUnsortedWithBackupsInTiers)
     auto constexpr Tiers = std::array<tr_tracker_tier_t, 6>{ 0, 1, 2, 0, 1, 2 };
 
     auto announce_list = tr_announce_list{};
-    EXPECT_EQ(6, announce_list.set(std::data(Urls), std::data(Tiers), 6));
-    EXPECT_EQ(6, announce_list.size());
+    EXPECT_EQ(6U, announce_list.set(std::data(Urls), std::data(Tiers), 6));
+    EXPECT_EQ(6U, announce_list.size());
     EXPECT_EQ(0, announce_list.at(0).tier);
     EXPECT_EQ(0, announce_list.at(1).tier);
     EXPECT_EQ(1, announce_list.at(2).tier);
@@ -183,8 +183,8 @@ TEST_F(AnnounceListTest, canSetExceptDuplicate)
     auto constexpr Tiers = std::array<tr_tracker_tier_t, 3>{ 3, 2, 1 };
 
     auto announce_list = tr_announce_list{};
-    EXPECT_EQ(2, announce_list.set(std::data(Urls), std::data(Tiers), 3));
-    EXPECT_EQ(2, announce_list.size());
+    EXPECT_EQ(2U, announce_list.set(std::data(Urls), std::data(Tiers), 3));
+    EXPECT_EQ(2U, announce_list.size());
     EXPECT_EQ(Tiers[0], announce_list.at(1).tier);
     EXPECT_EQ(Tiers[1], announce_list.at(0).tier);
     EXPECT_EQ(Urls[0], announce_list.at(1).announce.full);
@@ -201,8 +201,8 @@ TEST_F(AnnounceListTest, canSetExceptInvalid)
     auto constexpr Tiers = std::array<tr_tracker_tier_t, 3>{ 1, 2, 3 };
 
     auto announce_list = tr_announce_list{};
-    EXPECT_EQ(2, announce_list.set(std::data(Urls), std::data(Tiers), 3));
-    EXPECT_EQ(2, announce_list.size());
+    EXPECT_EQ(2U, announce_list.set(std::data(Urls), std::data(Tiers), 3));
+    EXPECT_EQ(2U, announce_list.size());
     EXPECT_EQ(Tiers[0], announce_list.at(0).tier);
     EXPECT_EQ(Tiers[2], announce_list.at(1).tier);
     EXPECT_EQ(Urls[0], announce_list.at(0).announce.full);
