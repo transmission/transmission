@@ -47,11 +47,11 @@
                             <font key="font" metaFont="menu"/>
                             <menu key="menu" title="OtherViews" id="16">
                                 <items>
-                                    <menuItem title="Error" state="on" image="RedDotFlat" id="17"/>
-                                    <menuItem title="Warn" image="RedDotFlat" id="yoL-9H-kTt"/>
-                                    <menuItem title="Info" image="GreenDotFlat" id="18"/>
-                                    <menuItem title="Debug" image="BlueDotFlat" id="19"/>
-                                    <menuItem title="Trace" image="PurpleDotFlat" id="2hu-LL-6A5"/>
+                                    <menuItem title="Error" state="on" image="RedDotFlat"/>
+                                    <menuItem title="Warn" image="RedDotFlat"/>
+                                    <menuItem title="Info" image="GreenDotFlat"/>
+                                    <menuItem title="Debug" image="BlueDotFlat"/>
+                                    <menuItem title="Trace" image="PurpleDotFlat"/>
                                 </items>
                             </menu>
                         </popUpButtonCell>
