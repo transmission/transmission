@@ -225,27 +225,25 @@ static std::string_view extract_escaped_string(char const* in, size_t in_len, st
                 break;
 
             case 'u':
+                if (in_end - in >= 6)
                 {
-                    if (in_end - in >= 6)
-                    {
-                        unsigned int val = 0;
+                    unsigned int val = 0;
 
-                        if (decode_hex_string(in, &val))
+                    if (decode_hex_string(in, &val))
+                    {
+                        try
                         {
-                            try
-                            {
-                                auto buf8 = std::array<char, 8>{};
-                                auto const it = utf8::append(val, std::data(buf8));
-                                evbuffer_add(buf, std::data(buf8), it - std::data(buf8));
-                            }
-                            catch (utf8::exception const&)
-                            { // invalid codepoint
-                                evbuffer_add(buf, "?", 1);
-                            }
-                            unescaped = true;
-                            in += 6;
-                            break;
+                            auto buf8 = std::array<char, 8>{};
+                            auto const it = utf8::append(val, std::data(buf8));
+                            evbuffer_add(buf, std::data(buf8), it - std::data(buf8));
                         }
+                        catch (utf8::exception const&)
+                        { // invalid codepoint
+                            evbuffer_add(buf, "?", 1);
+                        }
+                        unescaped = true;
+                        in += 6;
+                        break;
                     }
                 }
             }
@@ -311,7 +309,7 @@ static void action_callback_POP(
     else if (state->type == JSONSL_T_LIST || state->type == JSONSL_T_OBJECT)
     {
         int const depth = std::size(data->stack);
-        auto* v = data->stack.back();
+        auto const* const v = data->stack.back();
         data->stack.pop_back();
         if (depth < MaxDepth)
         {
@@ -457,16 +455,14 @@ static void jsonChildFunc(struct jsonWalk* data)
             }
 
         case TR_VARIANT_TYPE_LIST:
+            ++pstate.childIndex;
+            if (bool const is_last = pstate.childIndex == pstate.childCount; !is_last)
             {
-                ++pstate.childIndex;
-                if (bool const is_last = pstate.childIndex == pstate.childCount; !is_last)
-                {
-                    evbuffer_add(data->out, ",", 1);
-                    jsonIndent(data);
-                }
-
-                break;
+                evbuffer_add(data->out, ",", 1);
+                jsonIndent(data);
             }
+
+            break;
 
         default:
             break;

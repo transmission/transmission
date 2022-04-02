@@ -344,7 +344,7 @@ TEST_F(UtilsTest, trStrlcpy)
         "This, very usefull string contains total of 104 characters not counting null. Almost like an easter egg!"
     };
 
-    for (auto& test : tests)
+    for (auto const& test : tests)
     {
         auto c_string = test.c_str();
         auto length = strlen(c_string);
