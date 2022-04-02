@@ -992,7 +992,7 @@ static ReadState canRead(tr_peerIo* io, void* vhandshake, size_t* piece)
 
     auto* handshake = static_cast<tr_handshake*>(vhandshake);
 
-    struct evbuffer* inbuf = tr_peerIoGetReadBuffer(io);
+    evbuffer* const inbuf = io->getReadBuffer();
     bool readyForMore = true;
 
     /* no piece data in handshake */

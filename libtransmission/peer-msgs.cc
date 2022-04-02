@@ -1931,7 +1931,7 @@ static void didWrite(tr_peerIo* io, size_t bytesWritten, bool wasPieceData, void
 static ReadState canRead(tr_peerIo* io, void* vmsgs, size_t* piece)
 {
     auto* msgs = static_cast<tr_peerMsgsImpl*>(vmsgs);
-    struct evbuffer* in = tr_peerIoGetReadBuffer(io);
+    evbuffer* const in = io->getReadBuffer();
     size_t const inlen = evbuffer_get_length(in);
 
     logtrace(msgs, "canRead: inlen is %zu, msgs->state is %d", inlen, int(msgs->state));
