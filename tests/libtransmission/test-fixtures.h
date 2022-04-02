@@ -446,7 +446,7 @@ protected:
             4000));
     }
 
-    void blockingTorrentVerify(tr_torrent* tor)
+    void blockingTorrentVerify(tr_torrent* tor) const
     {
         EXPECT_NE(nullptr, tor->session);
         EXPECT_FALSE(tr_amInEventThread(tor->session));
