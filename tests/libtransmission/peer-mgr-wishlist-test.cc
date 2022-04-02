@@ -204,7 +204,7 @@ TEST_F(PeerMgrWishlistTest, prefersHighPriorityPieces)
     auto const num_runs = 1000;
     for (int run = 0; run < num_runs; ++run)
     {
-        auto const n_wanted = 10;
+        auto const n_wanted = 10U;
         auto spans = Wishlist::next(mediator, n_wanted);
         auto n_got = size_t{};
         for (auto const& span : spans)
