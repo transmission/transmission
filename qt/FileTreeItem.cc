@@ -33,23 +33,35 @@ QHash<QString, int> const& FileTreeItem::getMyChildRows()
 
 FileTreeItem::~FileTreeItem()
 {
-    assert(children_.isEmpty());
+    assert(std::empty(children_));
 
-    if (parent_ != nullptr)
+    if (parent_ == nullptr)
     {
-        int const pos = row();
-        assert(pos >= 0 && "couldn't find child in parent's lookup");
-        parent_->children_.removeAt(pos);
-        parent_->child_rows_.remove(name());
-        parent_->first_unhashed_row_ = pos;
+        return;
     }
+
+    // find the parent's reference to this child
+    auto& siblings = parent_->children_;
+    auto it = std::find(std::begin(siblings), std::end(siblings), this);
+    if (it == std::end(siblings))
+    {
+        return;
+    }
+
+    // remove this child from the parent
+    parent_->child_rows_.remove(name());
+    it = siblings.erase(it);
+
+    // invalidate the row numbers of the siblings that came after this child
+    parent_->first_unhashed_row_ = std::distance(std::begin(siblings), it);
+    ;
 }
 
 void FileTreeItem::appendChild(FileTreeItem* child)
 {
     int const n = childCount();
     child->parent_ = this;
-    children_.append(child);
+    children_.push_back(child);
     first_unhashed_row_ = n;
 }
 
@@ -214,7 +226,7 @@ QString FileTreeItem::sizeString() const
 
 uint64_t FileTreeItem::size() const
 {
-    if (children_.isEmpty())
+    if (std::empty(children_))
     {
         return total_size_;
     }
@@ -299,7 +311,7 @@ int FileTreeItem::priority() const
 {
     int i(0);
 
-    if (children_.isEmpty())
+    if (std::empty(children_))
     {
         switch (priority_)
         {
@@ -345,7 +357,7 @@ void FileTreeItem::setSubtreePriority(int i, QSet<int>& ids)
 
 int FileTreeItem::isSubtreeWanted() const
 {
-    if (children_.isEmpty())
+    if (std::empty(children_))
     {
         return is_wanted_ ? Qt::Checked : Qt::Unchecked;
     }
