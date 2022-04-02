@@ -393,7 +393,7 @@ auto const ChildHiddenKey = Glib::Quark("gtr-child-hidden");
 void gtr_widget_set_visible(Gtk::Widget& w, bool b)
 {
     /* toggle the transient children, too */
-    if (auto* const window = dynamic_cast<Gtk::Window*>(&w); window != nullptr)
+    if (auto const* const window = dynamic_cast<Gtk::Window*>(&w); window != nullptr)
     {
         for (auto* const l : Gtk::Window::list_toplevels())
         {

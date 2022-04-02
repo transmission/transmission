@@ -201,8 +201,8 @@ protected:
     {
         // build random payloads
         size_t payload_count = 1 + tr_rand_int_weak(max_file_count);
-        void** payloads = tr_new0(void*, payload_count);
-        size_t* payload_sizes = tr_new0(size_t, payload_count);
+        auto** payloads = tr_new0(void*, payload_count);
+        auto* payload_sizes = tr_new0(size_t, payload_count);
 
         for (size_t i = 0; i < payload_count; i++)
         {

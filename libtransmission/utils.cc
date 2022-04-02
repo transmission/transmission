@@ -1129,18 +1129,14 @@ bool tr_moveFile(char const* oldpath, char const* newpath, tr_error** error)
         return false;
     }
 
+    if (tr_error* my_error = nullptr; !tr_sys_path_remove(oldpath, &my_error))
     {
-        tr_error* my_error = nullptr;
-
-        if (!tr_sys_path_remove(oldpath, &my_error))
-        {
-            tr_logAddError(fmt::format(
-                _("Couldn't remove '{path}': {error} ({error_code})"),
-                fmt::arg("path", oldpath),
-                fmt::arg("error", my_error->message),
-                fmt::arg("error_code", my_error->code)));
-            tr_error_free(my_error);
-        }
+        tr_logAddError(fmt::format(
+            _("Couldn't remove '{path}': {error} ({error_code})"),
+            fmt::arg("path", oldpath),
+            fmt::arg("error", my_error->message),
+            fmt::arg("error_code", my_error->code)));
+        tr_error_free(my_error);
     }
 
     return true;

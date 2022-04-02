@@ -194,8 +194,8 @@ static tr_scrape_info* tr_announcerGetScrapeInfo(tr_announcer* announcer, tr_int
     }
 
     auto& scrapes = announcer->scrape_info;
-    auto const it = scrapes.try_emplace(url, url, TR_MULTISCRAPE_MAX);
-    return &it.first->second;
+    auto const [it, is_new] = scrapes.try_emplace(url, url, TR_MULTISCRAPE_MAX);
+    return &it->second;
 }
 
 void tr_announcerInit(tr_session* session)

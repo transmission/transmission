@@ -2844,22 +2844,19 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
                 }
 
             case 's': /* start */
+                if (tadd != nullptr)
                 {
-                    if (tadd != nullptr)
-                    {
-                        tr_variantDictAddBool(tr_variantDictFind(tadd, TR_KEY_arguments), TR_KEY_paused, false);
-                    }
-                    else
-                    {
-                        auto* top = tr_new0(tr_variant, 1);
-                        tr_variantInitDict(top, 2);
-                        tr_variantDictAddStrView(top, TR_KEY_method, "torrent-start"sv);
-                        addIdArg(tr_variantDictAddDict(top, Arguments, 1), id, nullptr);
-                        status |= flush(rpcurl, &top);
-                    }
-
-                    break;
+                    tr_variantDictAddBool(tr_variantDictFind(tadd, TR_KEY_arguments), TR_KEY_paused, false);
                 }
+                else
+                {
+                    auto* top = tr_new0(tr_variant, 1);
+                    tr_variantInitDict(top, 2);
+                    tr_variantDictAddStrView(top, TR_KEY_method, "torrent-start"sv);
+                    addIdArg(tr_variantDictAddDict(top, Arguments, 1), id, nullptr);
+                    status |= flush(rpcurl, &top);
+                }
+                break;
 
             case 'S': /* stop */
                 if (tadd != nullptr)

@@ -62,7 +62,7 @@ std::string _icon_cache_get_icon_key(Glib::RefPtr<Gio::Icon> const& icon)
 {
     std::string key;
 
-    if (auto* const ticon = dynamic_cast<Gio::ThemedIcon*>(gtr_get_ptr(icon)); ticon != nullptr)
+    if (auto const* const ticon = dynamic_cast<Gio::ThemedIcon*>(gtr_get_ptr(icon)); ticon != nullptr)
     {
         std::ostringstream names;
         for (auto const& name : ticon->get_names())
