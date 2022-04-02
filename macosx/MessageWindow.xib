@@ -48,7 +48,7 @@
                             <menu key="menu" title="OtherViews" id="16">
                                 <items>
                                     <menuItem title="Error" state="on" image="RedDotFlat"/>
-                                    <menuItem title="Warn" image="RedDotFlat"/>
+                                    <menuItem title="Warn" image="OrangeDotFlat"/>
                                     <menuItem title="Info" image="GreenDotFlat"/>
                                     <menuItem title="Debug" image="BlueDotFlat"/>
                                     <menuItem title="Trace" image="PurpleDotFlat"/>
