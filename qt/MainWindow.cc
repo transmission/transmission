@@ -84,7 +84,7 @@ QIcon MainWindow::addEmblem(QIcon base_icon, QStringList const& emblem_names) co
         return base_icon;
     }
 
-    auto& icons = IconCache::get();
+    auto const& icons = IconCache::get();
     QIcon emblem_icon;
 
     for (QString const& emblem_name : emblem_names)
@@ -144,7 +144,7 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
     ui_.listView->setStyle(lvp_style_.get());
     ui_.listView->setAttribute(Qt::WA_MacShowFocusRect, false);
 
-    auto& icons = IconCache::get();
+    auto const& icons = IconCache::get();
 
     // icons
     QIcon const icon_play = icons.getThemeIcon(QStringLiteral("media-playback-start"), QStyle::SP_MediaPlay);

@@ -93,7 +93,7 @@ TEST_P(IncompleteDirTest, incompleteDir)
 
     // now finish writing it
     {
-        char* zero_block = tr_new0(char, tr_block_info::BlockSize);
+        auto* const zero_block = tr_new0(char, tr_block_info::BlockSize);
 
         struct TestIncompleteDirData data = {};
         data.session = session_;

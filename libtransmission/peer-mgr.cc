@@ -2111,7 +2111,7 @@ static void rechokeUploads(tr_swarm* s, uint64_t const now)
     for (int i = 0; i < peerCount; ++i)
     {
         auto* const peer = peers[i];
-        struct peer_atom* const atom = peer->atom;
+        peer_atom const* const atom = peer->atom;
 
         if (tr_peerIsSeed(peer))
         {
@@ -2363,7 +2363,7 @@ static void removePeer(tr_peer* peer)
 static void closePeer(tr_peer* peer)
 {
     TR_ASSERT(peer != nullptr);
-    auto* const s = peer->swarm;
+    auto const* const s = peer->swarm;
 
     /* if we transferred piece data, then they might be good peers,
        so reset their `numFails' weight to zero. otherwise we connected

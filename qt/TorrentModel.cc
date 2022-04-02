@@ -123,7 +123,7 @@ void TorrentModel::removeTorrents(tr_variant* list)
     torrents.reserve(tr_variantListSize(list));
 
     int i = 0;
-    tr_variant* child = nullptr;
+    tr_variant const* child = nullptr;
     while ((child = tr_variantListChild(list, i++)) != nullptr)
     {
         if (auto const id = getValue<int>(child); id)
