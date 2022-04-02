@@ -313,12 +313,12 @@ size_t writeFunc(void* ptr, size_t size, size_t nmemb, void* vbuf)
 CURL* tr_curl_easy_init(struct evbuffer* writebuf)
 {
     CURL* curl = curl_easy_init();
-    curl_easy_setopt(curl, CURLOPT_USERAGENT, UserAgent);
-    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeFunc);
-    curl_easy_setopt(curl, CURLOPT_WRITEDATA, writebuf);
-    curl_easy_setopt(curl, CURLOPT_HTTPAUTH, CURLAUTH_ANY);
-    curl_easy_setopt(curl, CURLOPT_VERBOSE, tr_env_key_exists("TR_CURL_VERBOSE"));
-    curl_easy_setopt(curl, CURLOPT_ENCODING, "");
+    (void)curl_easy_setopt(curl, CURLOPT_USERAGENT, UserAgent);
+    (void)curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeFunc);
+    (void)curl_easy_setopt(curl, CURLOPT_WRITEDATA, writebuf);
+    (void)curl_easy_setopt(curl, CURLOPT_HTTPAUTH, CURLAUTH_ANY);
+    (void)curl_easy_setopt(curl, CURLOPT_VERBOSE, tr_env_key_exists("TR_CURL_VERBOSE"));
+    (void)curl_easy_setopt(curl, CURLOPT_ENCODING, "");
     return curl;
 }
 
