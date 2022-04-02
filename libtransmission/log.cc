@@ -88,7 +88,7 @@ tr_sys_file_t tr_logGetFile()
 void logAddImpl(
     [[maybe_unused]] char const* file,
     [[maybe_unused]] int line,
-    tr_log_level level,
+    [[maybe_unused]] tr_log_level level,
     std::string_view msg,
     [[maybe_unused]] std::string_view name)
 {
@@ -318,7 +318,7 @@ bool constexpr keysAreOrdered()
 {
     for (size_t i = 0, n = std::size(LogKeys); i < n; ++i)
     {
-        if (LogKeys[i].second != i)
+        if (LogKeys[i].second != static_cast<tr_log_level>(i))
         {
             return false;
         }
