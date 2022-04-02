@@ -2943,22 +2943,20 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
                 }
 
             case 'S': /* stop */
+                if (tadd != nullptr)
                 {
-                    if (tadd != nullptr)
-                    {
-                        tr_variantDictAddBool(tr_variantDictFind(tadd, TR_KEY_arguments), TR_KEY_paused, true);
-                    }
-                    else
-                    {
-                        auto* top = tr_new0(tr_variant, 1);
-                        tr_variantInitDict(top, 2);
-                        tr_variantDictAddStrView(top, TR_KEY_method, "torrent-stop"sv);
-                        addIdArg(tr_variantDictAddDict(top, Arguments, 1), id, nullptr);
-                        status |= flush(rpcurl, &top);
-                    }
-
-                    break;
+                    tr_variantDictAddBool(tr_variantDictFind(tadd, TR_KEY_arguments), TR_KEY_paused, true);
                 }
+                else
+                {
+                    auto* top = tr_new0(tr_variant, 1);
+                    tr_variantInitDict(top, 2);
+                    tr_variantDictAddStrView(top, TR_KEY_method, "torrent-stop"sv);
+                    addIdArg(tr_variantDictAddDict(top, Arguments, 1), id, nullptr);
+                    status |= flush(rpcurl, &top);
+                }
+
+                break;
 
             case 'w':
                 {
@@ -3074,11 +3072,9 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
                 }
 
             default:
-                {
-                    fprintf(stderr, "got opt [%d]\n", c);
-                    showUsage();
-                    break;
-                }
+                fprintf(stderr, "got opt [%d]\n", c);
+                showUsage();
+                break;
             }
         }
     }
