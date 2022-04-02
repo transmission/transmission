@@ -443,16 +443,14 @@ int tr_blocklistFileSetContent(tr_blocklistFile* b, char const* filename)
 #ifdef TR_ENABLE_ASSERTS
 
         /* sanity checks: make sure the rules are sorted in ascending order and don't overlap */
+        for (size_t i = 0; i < ranges_count; ++i)
         {
-            for (size_t i = 0; i < ranges_count; ++i)
-            {
-                TR_ASSERT(ranges[i].begin <= ranges[i].end);
-            }
+            TR_ASSERT(ranges[i].begin <= ranges[i].end);
+        }
 
-            for (size_t i = 1; i < ranges_count; ++i)
-            {
-                TR_ASSERT(ranges[i - 1].end < ranges[i].begin);
-            }
+        for (size_t i = 1; i < ranges_count; ++i)
+        {
+            TR_ASSERT(ranges[i - 1].end < ranges[i].begin);
         }
 
 #endif

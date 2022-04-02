@@ -40,7 +40,7 @@ TEST_F(RpcTest, list)
 
     tr_rpc_parse_list_str(&top, "6,7"sv);
     EXPECT_TRUE(tr_variantIsList(&top));
-    EXPECT_EQ(2, tr_variantListSize(&top));
+    EXPECT_EQ(2U, tr_variantListSize(&top));
     EXPECT_TRUE(tr_variantGetInt(tr_variantListChild(&top, 0), &i));
     EXPECT_EQ(6, i);
     EXPECT_TRUE(tr_variantGetInt(tr_variantListChild(&top, 1), &i));
@@ -55,7 +55,7 @@ TEST_F(RpcTest, list)
 
     tr_rpc_parse_list_str(&top, "1,3-5"sv);
     EXPECT_TRUE(tr_variantIsList(&top));
-    EXPECT_EQ(4, tr_variantListSize(&top));
+    EXPECT_EQ(4U, tr_variantListSize(&top));
     EXPECT_TRUE(tr_variantGetInt(tr_variantListChild(&top, 0), &i));
     EXPECT_EQ(1, i);
     EXPECT_TRUE(tr_variantGetInt(tr_variantListChild(&top, 1), &i));

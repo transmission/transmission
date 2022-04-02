@@ -7,6 +7,7 @@
 #include <cstring> /* memset() */
 #include <ctime>
 #include <list>
+#include <memory>
 #include <string_view>
 #include <vector>
 
@@ -402,14 +403,6 @@ struct tau_tracker
         return std::empty(announces) && std::empty(scrapes) && dns_request == nullptr;
     }
 
-    ~tau_tracker()
-    {
-        if (this->addr != nullptr)
-        {
-            evutil_freeaddrinfo(this->addr);
-        }
-    }
-
     void failAll(bool did_connect, bool did_timeout, std::string_view errmsg)
     {
         for (auto& req : this->scrapes)
@@ -433,7 +426,7 @@ struct tau_tracker
     int const port;
 
     evdns_getaddrinfo_request* dns_request = nullptr;
-    evutil_addrinfo* addr = nullptr;
+    std::shared_ptr<evutil_addrinfo> addr;
     time_t addr_expiration_time = 0;
 
     time_t connecting_at = 0;
@@ -477,7 +470,7 @@ static void tau_tracker_on_dns(int errcode, struct evutil_addrinfo* addr, void* 
     else
     {
         logdbg(tracker->key, "DNS lookup succeeded");
-        tracker->addr = addr;
+        tracker->addr.reset(addr, evutil_freeaddrinfo);
         tau_tracker_upkeep(tracker);
     }
 }
@@ -488,7 +481,7 @@ static void tau_tracker_send_request(struct tau_tracker* tracker, void const* pa
     logdbg(tracker->key, fmt::format("sending request w/connection id {}", tracker->connection_id));
     evbuffer_add_hton_64(buf, tracker->connection_id);
     evbuffer_add_reference(buf, payload, payload_len, nullptr, nullptr);
-    (void)tau_sendto(tracker->session, tracker->addr, tracker->port, evbuffer_pullup(buf, -1), evbuffer_get_length(buf));
+    (void)tau_sendto(tracker->session, tracker->addr.get(), tracker->port, evbuffer_pullup(buf, -1), evbuffer_get_length(buf));
     evbuffer_free(buf);
 }
 
@@ -617,8 +610,7 @@ static void tau_tracker_upkeep_ex(struct tau_tracker* tracker, bool timeout_reqs
     if (tracker->addr != nullptr && (closing || tracker->addr_expiration_time <= now))
     {
         logtrace(tracker->host, "Expiring old DNS result");
-        evutil_freeaddrinfo(tracker->addr);
-        tracker->addr = nullptr;
+        tracker->addr.reset();
         tracker->addr_expiration_time = 0;
     }
 
@@ -673,7 +665,12 @@ static void tau_tracker_upkeep_ex(struct tau_tracker* tracker, bool timeout_reqs
         evbuffer_add_hton_64(buf, 0x41727101980LL);
         evbuffer_add_hton_32(buf, TAU_ACTION_CONNECT);
         evbuffer_add_hton_32(buf, tracker->connection_transaction_id);
-        (void)tau_sendto(tracker->session, tracker->addr, tracker->port, evbuffer_pullup(buf, -1), evbuffer_get_length(buf));
+        (void)tau_sendto(
+            tracker->session,
+            tracker->addr.get(),
+            tracker->port,
+            evbuffer_pullup(buf, -1),
+            evbuffer_get_length(buf));
         evbuffer_free(buf);
         return;
     }

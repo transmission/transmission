@@ -357,7 +357,7 @@ TEST_F(UtilsTest, trStrlcpy)
         ASSERT_EQ(responce, length);
 
         // Check what was copied
-        for (auto i = 0; i < 97; i++)
+        for (unsigned i = 0U; i < 97U; ++i)
         {
             if (i <= length)
             {
