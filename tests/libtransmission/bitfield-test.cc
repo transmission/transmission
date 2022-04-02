@@ -137,7 +137,7 @@ TEST(Bitfield, setRaw)
 
     // check that the spare bits t the end are zero
     bf = tr_bitfield{ 1 };
-    uint8_t by = ~uint8_t{};
+    uint8_t by = std::numeric_limits<uint8_t>::max();
     bf.setRaw(&by, 1);
     EXPECT_TRUE(bf.hasAll());
     EXPECT_FALSE(bf.hasNone());

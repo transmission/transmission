@@ -160,7 +160,7 @@ TEST_F(PeerMgrWishlistTest, doesNotRequestTooManyBlocks)
 
     // but we only ask for 10 blocks,
     // so that's how many we should get back
-    auto const n_wanted = 10;
+    auto const n_wanted = 10U;
     auto const spans = Wishlist::next(mediator, n_wanted);
     auto n_got = size_t{};
     for (auto const& span : spans)

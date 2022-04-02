@@ -151,12 +151,12 @@ TEST_F(AnnounceListTest, canSetUnsortedWithBackupsInTiers)
     auto announce_list = tr_announce_list{};
     EXPECT_EQ(6U, announce_list.set(std::data(Urls), std::data(Tiers), 6));
     EXPECT_EQ(6U, announce_list.size());
-    EXPECT_EQ(0, announce_list.at(0).tier);
-    EXPECT_EQ(0, announce_list.at(1).tier);
-    EXPECT_EQ(1, announce_list.at(2).tier);
-    EXPECT_EQ(1, announce_list.at(3).tier);
-    EXPECT_EQ(2, announce_list.at(4).tier);
-    EXPECT_EQ(2, announce_list.at(5).tier);
+    EXPECT_EQ(0U, announce_list.at(0).tier);
+    EXPECT_EQ(0U, announce_list.at(1).tier);
+    EXPECT_EQ(1U, announce_list.at(2).tier);
+    EXPECT_EQ(1U, announce_list.at(3).tier);
+    EXPECT_EQ(2U, announce_list.at(4).tier);
+    EXPECT_EQ(2U, announce_list.at(5).tier);
     EXPECT_EQ(Urls[0], announce_list.at(0).announce.full);
     EXPECT_EQ(Urls[3], announce_list.at(1).announce.full);
     EXPECT_EQ(Urls[1], announce_list.at(2).announce.full);
