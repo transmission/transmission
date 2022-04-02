@@ -77,11 +77,6 @@ void favicon_web_done_cb(tr_web::FetchResponse const& response);
 
 bool favicon_web_done_idle_cb(std::unique_ptr<favicon_data> fav)
 {
-    if (!fav)
-    {
-        return false;
-    }
-
     Glib::RefPtr<Gdk::Pixbuf> pixbuf;
 
     if (!fav->contents.empty()) /* we got something... try to make a pixbuf from it */
@@ -99,7 +94,10 @@ bool favicon_web_done_idle_cb(std::unique_ptr<favicon_data> fav)
     }
 
     // Not released into the next web request, means we're done trying (even if `pixbuf` is still invalid)
-    fav->func(pixbuf);
+    if (fav != nullptr)
+    {
+        fav->func(pixbuf);
+    }
 
     return false;
 }
