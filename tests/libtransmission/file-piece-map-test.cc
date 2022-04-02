@@ -63,26 +63,26 @@ TEST_F(FilePieceMapTest, fileOffset)
 
     // first byte of the first file
     auto file_offset = fpm.fileOffset(0);
-    EXPECT_EQ(0, file_offset.index);
-    EXPECT_EQ(0, file_offset.offset);
+    EXPECT_EQ(0U, file_offset.index);
+    EXPECT_EQ(0U, file_offset.offset);
 
     // final byte of the first file
     file_offset = fpm.fileOffset(FileSizes[0] - 1);
-    EXPECT_EQ(0, file_offset.index);
+    EXPECT_EQ(0U, file_offset.index);
     EXPECT_EQ(FileSizes[0] - 1, file_offset.offset);
 
     // first byte of the second file
     // NB: this is an edge case, second file is 0 bytes.
     // The second nonzero file is file #5
     file_offset = fpm.fileOffset(FileSizes[0]);
-    EXPECT_EQ(5, file_offset.index);
-    EXPECT_EQ(0, file_offset.offset);
+    EXPECT_EQ(5U, file_offset.index);
+    EXPECT_EQ(0U, file_offset.offset);
 
     // the last byte of in the torrent.
     // NB: reverse of previous edge case, since
     // the final 4 files in the torrent are all 0 bytes
     file_offset = fpm.fileOffset(TotalSize - 1);
-    EXPECT_EQ(12, file_offset.index);
+    EXPECT_EQ(12U, file_offset.index);
     EXPECT_EQ(FileSizes[12] - 1, file_offset.offset);
 }
 

@@ -64,7 +64,7 @@ TEST(MagnetMetainfo, magnetParse)
         auto mm = tr_magnet_metainfo{};
 
         EXPECT_TRUE(mm.parseMagnet(uri));
-        EXPECT_EQ(2, std::size(mm.announceList()));
+        EXPECT_EQ(2U, std::size(mm.announceList()));
         auto it = std::begin(mm.announceList());
         EXPECT_EQ(0, it->tier);
         EXPECT_EQ("http://tracker.openbittorrent.com/announce"sv, it->announce.full);
@@ -84,8 +84,8 @@ TEST(MagnetMetainfo, magnetParse)
         auto mm = tr_magnet_metainfo{};
 
         EXPECT_TRUE(mm.parseMagnet(uri));
-        EXPECT_EQ(0, std::size(mm.announceList()));
-        EXPECT_EQ(0, mm.webseedCount());
+        EXPECT_EQ(0U, std::size(mm.announceList()));
+        EXPECT_EQ(0U, mm.webseedCount());
         EXPECT_EQ(ExpectedHash, mm.infoHash());
     }
 }

@@ -63,7 +63,7 @@ TEST_F(StrbufTest, clear)
 TEST_F(StrbufTest, constructorDefault)
 {
     auto buf = tr_pathbuf{};
-    EXPECT_EQ(0, std::size(buf));
+    EXPECT_EQ(0U, std::size(buf));
     EXPECT_TRUE(std::empty(buf));
 }
 

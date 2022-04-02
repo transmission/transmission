@@ -92,7 +92,7 @@ TEST_F(PeerMgrWishlistTest, doesNotRequestPiecesThatCannotBeRequested)
 
     // we should only get the first piece back
     auto spans = Wishlist::next(mediator, 1000);
-    ASSERT_EQ(1, std::size(spans));
+    ASSERT_EQ(1U, std::size(spans));
     EXPECT_EQ(mediator.block_span_[0].begin, spans[0].begin);
     EXPECT_EQ(mediator.block_span_[0].end, spans[0].end);
 }
