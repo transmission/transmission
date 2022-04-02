@@ -1261,6 +1261,14 @@ tr_port tr_sessionGetPeerPort(tr_session const* session)
     return tr_isSession(session) ? session->public_peer_port : 0;
 }
 
+tr_port tr_sessionSetPeerPortRandom(tr_session* session)
+{
+    TR_ASSERT(tr_isSession(session));
+
+    tr_sessionSetPeerPort(session, getRandomPort(session));
+    return session->private_peer_port;
+}
+
 void tr_sessionSetPeerPortRandomOnStart(tr_session* session, bool random)
 {
     TR_ASSERT(tr_isSession(session));

@@ -495,6 +495,8 @@ void tr_sessionSetPeerPort(tr_session* session, tr_port port);
 
 tr_port tr_sessionGetPeerPort(tr_session const* session);
 
+tr_port tr_sessionSetPeerPortRandom(tr_session* session);
+
 void tr_sessionSetPeerPortRandomOnStart(tr_session* session, bool random);
 
 bool tr_sessionGetPeerPortRandomOnStart(tr_session* session);
