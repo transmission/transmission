@@ -30,26 +30,18 @@ bool InteropHelper::addMetainfo(QString const& metainfo) const
 {
 #ifdef ENABLE_DBUS_INTEROP
 
+    if (auto const response = dbus_client_.addMetainfo(metainfo); response.isValid() && response.toBool())
     {
-        QVariant const response = dbus_client_.addMetainfo(metainfo);
-
-        if (response.isValid() && response.toBool())
-        {
-            return true;
-        }
+        return true;
     }
 
 #endif
 
 #ifdef ENABLE_COM_INTEROP
 
+    if (const response = com_client_.addMetainfo(metainfo); response.isValid() && response.toBool())
     {
-        QVariant const response = com_client_.addMetainfo(metainfo);
-
-        if (response.isValid() && response.toBool())
-        {
-            return true;
-        }
+        return true;
     }
 
 #endif
