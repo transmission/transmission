@@ -428,12 +428,6 @@ char* tr_strvDup(std::string_view in)
     return ret;
 }
 
-char* tr_strndup(void const* vin, size_t len)
-{
-    auto const* const in = static_cast<char const*>(vin);
-    return in == nullptr ? nullptr : tr_strvDup({ in, len });
-}
-
 char* tr_strdup(void const* in)
 {
     return in == nullptr ? nullptr : tr_strvDup(static_cast<char const*>(in));
@@ -722,7 +716,7 @@ static char* to_utf8(std::string_view sv)
         iconv_close(cd);
         if (rv != size_t(-1))
         {
-            char* const ret = tr_strndup(out, buflen - outbytesleft);
+            char* const ret = tr_strvDup({ out, buflen - outbytesleft });
             tr_free(out);
             return ret;
         }
