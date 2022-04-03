@@ -16,7 +16,7 @@
 
 #include <event2/buffer.h>
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #define LIBTRANSMISSION_VARIANT_MODULE
 
@@ -587,7 +587,7 @@ static void jsonStringFunc(tr_variant const* val, void* vdata)
                     auto const* const end8 = begin8 + std::size(sv);
                     auto const* walk8 = begin8;
                     auto const uch32 = utf8::next(walk8, end8);
-                    outwalk += tr_snprintf(outwalk, outend - outwalk, "\\u%04x", uch32);
+                    outwalk = fmt::format_to_n(outwalk, outend - outwalk - 1, FMT_STRING("\\u{:04x}"), uch32).out;
                     sv.remove_prefix(walk8 - begin8 - 1);
                 }
                 catch (utf8::exception const&)
