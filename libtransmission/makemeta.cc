@@ -325,12 +325,7 @@ static std::vector<std::byte> getHashInfo(tr_metainfo_builder* b)
         if (!digest)
         {
             b->my_errno = EIO;
-            auto const [out, len] = fmt::format_to_n(
-                b->errfile,
-                sizeof(b->errfile) - 1,
-                FMT_STRING("error hashing piece {:d}"),
-                b->pieceIndex);
-            *out = '\0';
+            *fmt::format_to_n(b->errfile, sizeof(b->errfile) - 1, "error hashing piece {:d}", b->pieceIndex).out = '\0';
             b->result = TrMakemetaResult::ERR_IO_READ;
             break;
         }

@@ -297,8 +297,7 @@ static void saveRealFunc(tr_variant const* val, void* vevbuf)
     // the benc spec doesn't handle floats; save it as a string.
 
     auto buf = std::array<char, 64>{};
-    auto const [out, len] = fmt::format_to_n(std::data(buf), std::size(buf) - 1, FMT_STRING("{:f}"), val->val.d);
-
+    auto out = fmt::format_to(std::data(buf), FMT_STRING("{:f}"), val->val.d);
     auto* const evbuf = static_cast<evbuffer*>(vevbuf);
     saveStringImpl(evbuf, { std::data(buf), static_cast<size_t>(out - std::data(buf)) });
 }

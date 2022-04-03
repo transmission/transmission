@@ -1323,8 +1323,7 @@ static void torrentRenamePathDone(tr_torrent* tor, char const* oldpath, char con
     tr_variantDictAddStr(data->args_out, TR_KEY_path, oldpath);
     tr_variantDictAddStr(data->args_out, TR_KEY_name, newname);
 
-    auto const result = error == 0 ? SuccessResult : tr_strerror(error);
-    tr_idle_function_done(data, result);
+    tr_idle_function_done(data, error != 0 ? tr_strerror(error) : SuccessResult);
 }
 
 static char const* torrentRenamePath(
