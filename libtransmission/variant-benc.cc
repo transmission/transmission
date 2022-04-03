@@ -12,6 +12,8 @@
 
 #include <event2/buffer.h>
 
+#include <fmt/format.h>
+
 #define LIBTRANSMISSION_VARIANT_MODULE
 
 #include "transmission.h"
@@ -19,7 +21,7 @@
 #include "benc.h"
 #include "tr-assert.h"
 #include "quark.h"
-#include "utils.h" /* tr_snprintf() */
+#include "utils.h"
 #include "variant-common.h"
 #include "variant.h"
 
@@ -273,41 +275,49 @@ static void saveBoolFunc(tr_variant const* val, void* vevbuf)
     }
 }
 
-static void saveRealFunc(tr_variant const* val, void* vevbuf)
+static void saveStringImpl(evbuffer* evbuf, std::string_view sv)
 {
-    auto buf = std::array<char, 64>{};
-    int const len = tr_snprintf(std::data(buf), std::size(buf), "%f", val->val.d);
-
-    auto* evbuf = static_cast<evbuffer*>(vevbuf);
-    evbuffer_add_printf(evbuf, "%d:", len);
-    evbuffer_add(evbuf, std::data(buf), len);
+    // `${sv.size()}:${sv}`
+    auto prefix = std::array<char, 32>{};
+    auto out = fmt::format_to(std::data(prefix), FMT_STRING("{:d}:"), std::size(sv));
+    evbuffer_add(evbuf, std::data(prefix), out - std::data(prefix));
+    evbuffer_add(evbuf, std::data(sv), std::size(sv));
 }
 
 static void saveStringFunc(tr_variant const* v, void* vevbuf)
 {
     auto sv = std::string_view{};
     (void)!tr_variantGetStrView(v, &sv);
+    auto* const evbuf = static_cast<struct evbuffer*>(vevbuf);
+    saveStringImpl(evbuf, sv);
+}
 
-    auto* evbuf = static_cast<struct evbuffer*>(vevbuf);
-    evbuffer_add_printf(evbuf, "%zu:", std::size(sv));
-    evbuffer_add(evbuf, std::data(sv), std::size(sv));
+static void saveRealFunc(tr_variant const* val, void* vevbuf)
+{
+    // the benc spec doesn't handle floats; save it as a string.
+
+    auto buf = std::array<char, 64>{};
+    auto const [out, len] = fmt::format_to_n(std::data(buf), std::size(buf) - 1, FMT_STRING("{:f}"), val->val.d);
+
+    auto* const evbuf = static_cast<evbuffer*>(vevbuf);
+    saveStringImpl(evbuf, { std::data(buf), static_cast<size_t>(out - std::data(buf)) });
 }
 
 static void saveDictBeginFunc(tr_variant const* /*val*/, void* vevbuf)
 {
-    auto* evbuf = static_cast<struct evbuffer*>(vevbuf);
+    auto* const evbuf = static_cast<struct evbuffer*>(vevbuf);
     evbuffer_add(evbuf, "d", 1);
 }
 
 static void saveListBeginFunc(tr_variant const* /*val*/, void* vevbuf)
 {
-    auto* evbuf = static_cast<struct evbuffer*>(vevbuf);
+    auto* const evbuf = static_cast<struct evbuffer*>(vevbuf);
     evbuffer_add(evbuf, "l", 1);
 }
 
 static void saveContainerEndFunc(tr_variant const* /*val*/, void* vevbuf)
 {
-    auto* evbuf = static_cast<struct evbuffer*>(vevbuf);
+    auto* const evbuf = static_cast<struct evbuffer*>(vevbuf);
     evbuffer_add(evbuf, "e", 1);
 }
 
