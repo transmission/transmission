@@ -32,4 +32,16 @@
     return [NSImage imageNamed:fallbackName];
 }
 
++ (NSImage*)largeSystemSymbol:(NSString*)symbolName withFallback:(NSString*)fallbackName
+{
+#ifdef __MAC_11_0
+    if (@available(macOS 11.0, *))
+    {
+        return [[NSImage imageWithSystemSymbolName:symbolName accessibilityDescription:nil] imageWithSymbolConfiguration:[NSImageSymbolConfiguration configurationWithScale:NSImageSymbolScaleLarge]];
+    }
+#endif
+
+    return [NSImage imageNamed:fallbackName];
+}
+
 @end

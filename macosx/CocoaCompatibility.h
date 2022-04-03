@@ -14,15 +14,9 @@ typedef NS_ENUM(NSInteger, NSImageSymbolScale)
     NSImageSymbolScaleLarge = 3,
 } API_AVAILABLE(macos(11.0));
 
-API_AVAILABLE(macos(11.0))
-@interface NSImageSymbolConfiguration : NSObject<NSCopying, NSSecureCoding>
-+ (instancetype)configurationWithScale:(NSImageSymbolScale)scale;
-@end
-
 @interface NSImage ()
 + (nullable instancetype)imageWithSystemSymbolName:(NSString*)symbolName
                           accessibilityDescription:(nullable NSString*)description API_AVAILABLE(macos(11.0));
-- (nullable NSImage*)imageWithSymbolConfiguration:(NSImageSymbolConfiguration*)configuration API_AVAILABLE(macos(11.0));
 @end
 
 typedef NS_ENUM(NSInteger, NSWindowToolbarStyle)

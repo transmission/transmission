@@ -1,4 +1,4 @@
 #ifdef __OBJC__
     #import <Cocoa/Cocoa.h>
-    #import "Compatibility.h"
+    #import "CocoaCompatibility.h"
 #endif

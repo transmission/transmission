@@ -49,7 +49,6 @@ set(${PROJECT_NAME}_SOURCES
     BonjourController.mm
     ButtonToolbarItem.mm
     ColorTextField.mm
-    Compatibility.m
     Controller.mm
     CreatorWindowController.mm
     DragOverlayView.mm
