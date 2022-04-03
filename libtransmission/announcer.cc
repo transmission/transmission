@@ -403,7 +403,7 @@ struct tr_tier
         auto const* const torrent_name = tr_torrentName(tor);
         auto const* const current_tracker = currentTracker();
         auto const host_sv = current_tracker == nullptr ? "?"sv : current_tracker->host.sv();
-        *fmt::format_to_n(buf, buflen, FMT_STRING("{:s} at {:s}"), torrent_name, host_sv).out = '\0';
+        *fmt::format_to_n(buf, buflen - 1, FMT_STRING("{:s} at {:s}"), torrent_name, host_sv).out = '\0';
     }
 
     [[nodiscard]] bool canManualAnnounce() const
