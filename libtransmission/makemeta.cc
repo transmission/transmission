@@ -14,7 +14,6 @@
 
 #include <event2/util.h> /* evutil_ascii_strcasecmp() */
 
-#include <fmt/core.h>
 #include <fmt/format.h>
 
 #include "transmission.h"
@@ -326,7 +325,12 @@ static std::vector<std::byte> getHashInfo(tr_metainfo_builder* b)
         if (!digest)
         {
             b->my_errno = EIO;
-            tr_snprintf(b->errfile, sizeof(b->errfile), "error hashing piece %" PRIu32, b->pieceIndex);
+            auto const [out, len] = fmt::format_to_n(
+                b->errfile,
+                sizeof(b->errfile) - 1,
+                FMT_STRING("error hashing piece {:d}"),
+                b->pieceIndex);
+            *out = '\0';
             b->result = TrMakemetaResult::ERR_IO_READ;
             break;
         }
