@@ -178,7 +178,7 @@ protected:
         return child;
     }
 
-    void buildParentDir(std::string const& path) const
+    void buildParentDir(std::string_view path) const
     {
         auto const tmperr = errno;
 
@@ -211,14 +211,14 @@ protected:
         }
     }
 
-    void createTmpfileWithContents(std::string& tmpl, void const* payload, size_t n) const
+    void createTmpfileWithContents(char* tmpl, void const* payload, size_t n) const
     {
         auto const tmperr = errno;
 
         buildParentDir(tmpl);
 
         // NOLINTNEXTLINE(clang-analyzer-cplusplus.InnerPointer)
-        auto const fd = tr_sys_file_open_temp(&tmpl.front());
+        auto const fd = tr_sys_file_open_temp(tmpl);
         blockingFileWrite(fd, payload, n);
         tr_sys_file_close(fd);
         sync();

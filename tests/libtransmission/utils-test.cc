@@ -3,7 +3,13 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include <algorithm>
 #include <array>
+#include <cmath> // sqrt()
+#include <cstdlib> // setenv(), unsetenv()
+#include <iostream>
+#include <sstream>
+#include <string>
 #include <string_view>
 #include <utility>
 
@@ -22,14 +28,6 @@
 #include "utils.h"
 
 #include "test-fixtures.h"
-
-#include <algorithm>
-#include <array>
-#include <cmath> // sqrt()
-#include <cstdlib> // setenv(), unsetenv()
-#include <iostream>
-#include <sstream>
-#include <string>
 
 using ::libtransmission::test::makeString;
 using UtilsTest = ::testing::Test;

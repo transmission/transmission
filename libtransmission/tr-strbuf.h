@@ -114,6 +114,12 @@ public:
         return std::basic_string_view<Char>{ data(), size() };
     }
 
+    template<typename ContiguousRange>
+    [[nodiscard]] constexpr auto operator==(ContiguousRange const& x) const noexcept
+    {
+        return sv() == x;
+    }
+
     ///
 
     [[nodiscard]] constexpr bool ends_with(Char const& x) const noexcept
