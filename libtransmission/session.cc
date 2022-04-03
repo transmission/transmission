@@ -521,14 +521,10 @@ void tr_sessionSaveSettings(tr_session* session, char const* config_dir, tr_vari
     tr_variantInitDict(&settings, 0);
 
     /* the existing file settings are the fallback values */
+    if (auto file_settings = tr_variant{}; tr_variantFromFile(&file_settings, TR_VARIANT_PARSE_JSON, filename))
     {
-        tr_variant fileSettings;
-
-        if (tr_variantFromFile(&fileSettings, TR_VARIANT_PARSE_JSON, filename, nullptr))
-        {
-            tr_variantMergeDicts(&settings, &fileSettings);
-            tr_variantFree(&fileSettings);
-        }
+        tr_variantMergeDicts(&settings, &file_settings);
+        tr_variantFree(&file_settings);
     }
 
     /* the client's settings override the file settings */
@@ -2289,7 +2285,7 @@ Bandwidth& tr_session::getBandwidthGroup(std::string_view name)
 
     if (it == std::end(groups))
     {
-        it = groups.try_emplace(key, std::make_unique<Bandwidth>(&top_bandwidth_)).first;
+        it = groups.try_emplace(key, std::make_unique<Bandwidth>(new Bandwidth(&top_bandwidth_))).first;
     }
 
     return *it->second;
@@ -2882,7 +2878,7 @@ static void bandwidthGroupRead(tr_session* session, std::string_view config_dir)
 {
     auto const filename = tr_pathbuf{ config_dir, "/"sv, BandwidthGroupsFilename };
     auto groups_dict = tr_variant{};
-    if (!tr_variantFromFile(&groups_dict, TR_VARIANT_PARSE_JSON, filename, nullptr) || !tr_variantIsList(&groups_dict))
+    if (!tr_variantFromFile(&groups_dict, TR_VARIANT_PARSE_JSON, filename, nullptr) || !tr_variantIsDict(&groups_dict))
     {
         return;
     }
@@ -2890,8 +2886,10 @@ static void bandwidthGroupRead(tr_session* session, std::string_view config_dir)
     auto idx = size_t{ 0 };
     auto key = tr_quark{};
     tr_variant* dict = nullptr;
-    while (tr_variantDictChild(&groups_dict, idx++, &key, &dict))
+    while (tr_variantDictChild(&groups_dict, idx, &key, &dict))
     {
+        ++idx;
+
         auto name = tr_interned_string(key);
         auto& group = session->getBandwidthGroup(name);
 

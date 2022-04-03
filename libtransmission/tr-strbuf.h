@@ -26,23 +26,30 @@ public:
     using value_type = Char;
     using const_reference = const Char&;
 
-    tr_strbuf() = default;
+    tr_strbuf()
+    {
+        ensure_sz();
+    }
+
+    ~tr_strbuf() = default;
     tr_strbuf(tr_strbuf const& other) = delete;
     tr_strbuf& operator=(tr_strbuf const& other) = delete;
 
-    tr_strbuf(tr_strbuf&& other) noexcept
+    tr_strbuf(tr_strbuf&& other)
+        : buffer_{ std::move(other.buffer_) }
     {
-        buffer_ = std::move(other.buffer_);
+        ensure_sz();
     }
 
-    auto& operator=(tr_strbuf&& other) noexcept
+    tr_strbuf& operator=(tr_strbuf&& other)
     {
         buffer_ = std::move(other.buffer_);
+        ensure_sz();
         return *this;
     }
 
     template<typename... Args>
-    tr_strbuf(Args const&... args)
+    explicit tr_strbuf(Args const&... args)
     {
         append(args...);
     }
@@ -105,6 +112,12 @@ public:
     [[nodiscard]] constexpr auto sv() const noexcept
     {
         return std::basic_string_view<Char>{ data(), size() };
+    }
+
+    template<typename ContiguousRange>
+    [[nodiscard]] constexpr auto operator==(ContiguousRange const& x) const noexcept
+    {
+        return sv() == x;
     }
 
     ///

@@ -82,11 +82,6 @@ Glib::ustring tr_strlratio(double ratio)
     return tr_strratio(ratio, gtr_get_unicode_string(GtrUnicode::Inf).c_str());
 }
 
-Glib::ustring tr_strlpercent(double x)
-{
-    return tr_strpercent(x);
-}
-
 Glib::ustring tr_strlsize(guint64 bytes)
 {
     return bytes == 0 ? Q_("None") : tr_formatter_size_B(bytes);
@@ -105,21 +100,21 @@ Glib::ustring tr_strltime(time_t seconds)
     auto const h = fmt::format(ngettext("{hours} hour", "{hours} hours", hours), fmt::arg("hours", hours));
     if (days != 0)
     {
-        return (days >= 4 || hours == 0) ? d : fmt::format("{}, {}", d, h);
+        return (days >= 4 || hours == 0) ? d : fmt::format(FMT_STRING("{:s}, {:s}"), d, h);
     }
 
     int const minutes = (seconds % 3600) / 60;
     auto const m = fmt::format(ngettext("{minutes} minute", "{minutes} minutes", minutes), fmt::arg("minutes", minutes));
     if (hours != 0)
     {
-        return (hours >= 4 || minutes == 0) ? h : fmt::format("{}, {}", h, m);
+        return (hours >= 4 || minutes == 0) ? h : fmt::format(FMT_STRING("{:s}, {:s}"), h, m);
     }
 
     seconds = (seconds % 3600) % 60;
     auto const s = fmt::format(ngettext("{seconds} second", "{seconds} seconds", seconds), fmt::arg("seconds", seconds));
     if (minutes != 0)
     {
-        return (minutes >= 4 || seconds == 0) ? m : fmt::format("{}, {}", m, s);
+        return (minutes >= 4 || seconds == 0) ? m : fmt::format(FMT_STRING("{:s}, {:s}"), m, s);
     }
 
     return s;
@@ -185,13 +180,10 @@ bool on_tree_view_button_pressed(
         Gtk::TreeModel::Path path;
         auto const selection = view->get_selection();
 
-        if (view->get_path_at_pos((int)event->x, (int)event->y, path))
+        if (view->get_path_at_pos((int)event->x, (int)event->y, path) && !selection->is_selected(path))
         {
-            if (!selection->is_selected(path))
-            {
-                selection->unselect_all();
-                selection->select(path);
-            }
+            selection->unselect_all();
+            selection->select(path);
         }
 
         if (callback)
@@ -401,7 +393,7 @@ auto const ChildHiddenKey = Glib::Quark("gtr-child-hidden");
 void gtr_widget_set_visible(Gtk::Widget& w, bool b)
 {
     /* toggle the transient children, too */
-    if (auto* const window = dynamic_cast<Gtk::Window*>(&w); window != nullptr)
+    if (auto const* const window = dynamic_cast<Gtk::Window*>(&w); window != nullptr)
     {
         for (auto* const l : Gtk::Window::list_toplevels())
         {

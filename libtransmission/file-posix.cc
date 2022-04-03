@@ -51,7 +51,7 @@
 #define USE_COPY_FILE_RANGE
 #endif /* __linux__ */
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include "transmission.h"
 #include "error.h"
@@ -177,7 +177,7 @@ static bool create_path_require_dir(char const* path, tr_error** error)
 
     if ((sb.st_mode & S_IFMT) != S_IFDIR)
     {
-        tr_error_set(error, ENOTDIR, tr_strvJoin("File is in the way: "sv, path));
+        tr_error_set(error, ENOTDIR, fmt::format(FMT_STRING("File is in the way: {:s}"), path));
         return false;
     }
 
@@ -582,7 +582,7 @@ tr_sys_file_t tr_sys_file_get_std(tr_std_sys_file_t std_file, tr_error** error)
         break;
 
     default:
-        TR_ASSERT_MSG(false, "unknown standard file %d", (int)std_file);
+        TR_ASSERT_MSG(false, fmt::format(FMT_STRING("unknown standard file {:d}"), std_file));
         set_system_error(error, EINVAL);
     }
 

@@ -85,11 +85,6 @@ tr_torrent* tr_torrentFindFromId(tr_session* session, int id)
     return session->torrents().get(id);
 }
 
-tr_torrent* tr_torrentFindFromHash(tr_session* session, tr_sha1_digest_t const* hash)
-{
-    return hash == nullptr ? nullptr : session->torrents().get(*hash);
-}
-
 tr_torrent* tr_torrentFindFromMetainfo(tr_session* session, tr_torrent_metainfo const* metainfo)
 {
     if (session == nullptr || metainfo == nullptr)
@@ -601,11 +596,9 @@ void tr_torrent::setMetainfo(tr_torrent_metainfo const& tm)
 
 static bool hasAnyLocalData(tr_torrent const* tor)
 {
-    auto filename = std::string{};
-
     for (tr_file_index_t i = 0, n = tor->fileCount(); i < n; ++i)
     {
-        if (tor->findFile(filename, i))
+        if (tor->findFile(i))
         {
             return true;
         }
@@ -637,23 +630,22 @@ static bool setLocalErrorIfFilesDisappeared(tr_torrent* tor, std::optional<bool>
  */
 static bool isNewTorrentASeed(tr_torrent* tor)
 {
-    if (!tor->hasMetadata())
+    if (!tor->hasMetainfo())
     {
         return false;
     }
 
-    auto filename_buf = std::string{};
     for (tr_file_index_t i = 0, n = tor->fileCount(); i < n; ++i)
     {
         // it's not a new seed if a file is missing
-        auto const found = tor->findFile(filename_buf, i);
+        auto const found = tor->findFile(i);
         if (!found)
         {
             return false;
         }
 
         // it's not a new seed if a file is partial
-        if (tr_strvEndsWith(found->filename, ".part"sv))
+        if (tr_strvEndsWith(found->filename, tr_torrent::PartialFileSuffix))
         {
             return false;
         }
@@ -778,7 +770,7 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
             [](auto mtime) { return mtime > 0; });
     }
 
-    auto const filename = tor->hasMetadata() ? tor->torrentFile() : tor->magnetFile();
+    auto const filename = tor->hasMetainfo() ? tor->torrentFile() : tor->magnetFile();
 
     // if we don't have a local .torrent or .magnet file already,
     // assume the torrent is new
@@ -788,7 +780,7 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
     {
         tr_error* error = nullptr;
 
-        if (tor->hasMetadata()) // torrent file
+        if (tor->hasMetainfo()) // torrent file
         {
             tr_ctorSaveContents(ctor, filename, &error);
         }
@@ -815,12 +807,12 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
 
     if (is_new_torrent)
     {
-        if (tor->hasMetadata())
+        if (tor->hasMetainfo())
         {
             callScriptIfEnabled(tor, TR_SCRIPT_ON_TORRENT_ADDED);
         }
 
-        if (!tor->hasMetadata() && !doStart)
+        if (!tor->hasMetainfo() && !doStart)
         {
             tor->prefetchMagnetMetadata = true;
 
@@ -1721,22 +1713,12 @@ void tr_torrentSetRatioLimitHitCallback(tr_torrent* tor, tr_torrent_ratio_limit_
     tor->ratio_limit_hit_func_user_data = user_data;
 }
 
-void tr_torrentClearRatioLimitHitCallback(tr_torrent* torrent)
-{
-    tr_torrentSetRatioLimitHitCallback(torrent, nullptr, nullptr);
-}
-
 void tr_torrentSetIdleLimitHitCallback(tr_torrent* tor, tr_torrent_idle_limit_hit_func func, void* user_data)
 {
     TR_ASSERT(tr_isTorrent(tor));
 
     tor->idle_limit_hit_func = func;
     tor->idle_limit_hit_func_user_data = user_data;
-}
-
-void tr_torrentClearIdleLimitHitCallback(tr_torrent* torrent)
-{
-    tr_torrentSetIdleLimitHitCallback(torrent, nullptr, nullptr);
 }
 
 static std::string buildLabelsString(tr_torrent const* tor)
@@ -2088,7 +2070,7 @@ bool tr_torrent::setTrackerList(std::string_view text)
         return false;
     }
 
-    auto const has_metadata = this->hasMetadata();
+    auto const has_metadata = this->hasMetainfo();
     if (has_metadata && !announce_list.save(torrentFile()))
     {
         return false;
@@ -2154,31 +2136,26 @@ uint64_t tr_torrentGetBytesLeftToAllocate(tr_torrent const* tor)
 {
     TR_ASSERT(tr_isTorrent(tor));
 
-    uint64_t bytesLeft = 0;
+    uint64_t bytes_left = 0;
 
     for (tr_file_index_t i = 0, n = tor->fileCount(); i < n; ++i)
     {
-        auto const file = tr_torrentFile(tor, i);
-
-        if (file.wanted)
+        if (auto const wanted = tor->files_wanted_.fileWanted(i); !wanted)
         {
-            uint64_t const length = file.length;
-            char* path = tr_torrentFindFile(tor, i);
+            continue;
+        }
 
-            bytesLeft += length;
+        auto const length = tor->fileSize(i);
+        bytes_left += length;
 
-            tr_sys_path_info info;
-            if (path != nullptr && tr_sys_path_get_info(path, 0, &info) && info.type == TR_SYS_PATH_IS_FILE &&
-                info.size <= length)
-            {
-                bytesLeft -= info.size;
-            }
-
-            tr_free(path);
+        auto const found = tor->findFile(i);
+        if (found)
+        {
+            bytes_left -= found->size;
         }
     }
 
-    return bytesLeft;
+    return bytes_left;
 }
 
 /****
@@ -2257,7 +2234,7 @@ static void deleteLocalData(tr_torrent const* tor, tr_fileFunc func)
     }
 
     /* if it's a magnet link, there's nothing to move... */
-    if (!tor->hasMetadata())
+    if (!tor->hasMetainfo())
     {
         return;
     }
@@ -2276,7 +2253,7 @@ static void deleteLocalData(tr_torrent const* tor, tr_fileFunc func)
 
         if (!tr_sys_path_exists(filename.c_str()))
         {
-            filename += ".part"sv;
+            filename += tr_torrent::PartialFileSuffix;
 
             if (!tr_sys_path_exists(filename.c_str()))
             {
@@ -2436,22 +2413,20 @@ static void setLocationImpl(struct LocationData* const data)
         {
             auto const file_size = tor->fileSize(i);
 
-            char const* oldbase = nullptr;
-
-            if (char* sub = nullptr; tr_torrentFindFile2(tor, i, &oldbase, &sub, nullptr))
+            if (auto found = tor->findFile(i); found)
             {
-                auto const oldpath = tr_strvPath(oldbase, sub);
-                auto const newpath = tr_strvPath(location, sub);
+                auto const& oldpath = found->filename;
+                auto const newpath = tr_pathbuf{ location, '/', found->subpath() };
 
                 tr_logAddTraceTor(tor, fmt::format("Found file #{}: '{}'", i, oldpath));
 
-                if (do_move && !tr_sys_path_is_same(oldpath.c_str(), newpath.c_str()))
+                if (do_move && !tr_sys_path_is_same(oldpath, newpath))
                 {
                     tr_error* error = nullptr;
 
                     tr_logAddTraceTor(tor, fmt::format("moving '{}' to '{}'", oldpath, newpath));
 
-                    if (!tr_moveFile(oldpath.c_str(), newpath.c_str(), &error))
+                    if (!tr_moveFile(oldpath, newpath, &error))
                     {
                         err = true;
                         tr_logAddErrorTor(
@@ -2465,8 +2440,6 @@ static void setLocationImpl(struct LocationData* const data)
                         tr_error_free(error);
                     }
                 }
-
-                tr_free(sub);
             }
 
             if (data->setme_progress != nullptr)
@@ -2588,17 +2561,15 @@ static void tr_torrentFileCompleted(tr_torrent* tor, tr_file_index_t i)
     /* if the torrent's current filename isn't the same as the one in the
      * metadata -- for example, if it had the ".part" suffix appended to
      * it until now -- then rename it to match the one in the metadata */
-    char const* base = nullptr;
-    char* sub = nullptr;
-    if (tr_torrentFindFile2(tor, i, &base, &sub, nullptr))
+    if (auto found = tor->findFile(i); found)
     {
-        if (auto const& file_subpath = tor->fileSubpath(i); file_subpath != sub)
+        if (auto const& file_subpath = tor->fileSubpath(i); file_subpath != found->subpath())
         {
-            auto const oldpath = tr_strvPath(base, sub);
-            auto const newpath = tr_strvPath(base, file_subpath);
+            auto const& oldpath = found->filename;
+            auto const newpath = tr_pathbuf{ found->base(), '/', file_subpath };
             tr_error* error = nullptr;
 
-            if (!tr_sys_path_rename(oldpath.c_str(), newpath.c_str(), &error))
+            if (!tr_sys_path_rename(oldpath, newpath, &error))
             {
                 tr_logAddErrorTor(
                     tor,
@@ -2611,8 +2582,6 @@ static void tr_torrentFileCompleted(tr_torrent* tor, tr_file_index_t i)
                 tr_error_free(error);
             }
         }
-
-        tr_free(sub);
     }
 }
 
@@ -2673,8 +2642,9 @@ void tr_torrentGotBlock(tr_torrent* tor, tr_block_index_t block)
 ****
 ***/
 
-std::optional<tr_torrent::tr_found_file_t> tr_torrent::findFile(std::string& filename, tr_file_index_t i) const
+std::optional<tr_torrent::tr_found_file_t> tr_torrent::findFile(tr_file_index_t i) const
 {
+    auto filename = tr_pathbuf{};
     auto const subpath = std::string_view{ this->fileSubpath(i) };
     auto file_info = tr_sys_path_info{};
 
@@ -2682,16 +2652,16 @@ std::optional<tr_torrent::tr_found_file_t> tr_torrent::findFile(std::string& fil
     {
         auto const base = this->downloadDir();
 
-        tr_buildBuf(filename, base, "/"sv, subpath);
-        if (tr_sys_path_get_info(filename.c_str(), 0, &file_info))
+        filename.assign(base, "/"sv, subpath);
+        if (tr_sys_path_get_info(filename, 0, &file_info))
         {
-            return tr_found_file_t{ file_info, filename, base };
+            return tr_found_file_t{ file_info, std::move(filename), std::size(base) };
         }
 
-        tr_buildBuf(filename, base, "/"sv, subpath, ".part"sv);
-        if (tr_sys_path_get_info(filename.c_str(), 0, &file_info))
+        filename.assign(filename, base, "/"sv, subpath, PartialFileSuffix);
+        if (tr_sys_path_get_info(filename, 0, &file_info))
         {
-            return tr_found_file_t{ file_info, filename, base };
+            return tr_found_file_t{ file_info, std::move(filename), std::size(base) };
         }
     }
 
@@ -2699,16 +2669,16 @@ std::optional<tr_torrent::tr_found_file_t> tr_torrent::findFile(std::string& fil
     {
         auto const base = this->incompleteDir();
 
-        tr_buildBuf(filename, base, "/"sv, subpath);
-        if (tr_sys_path_get_info(filename.c_str(), 0, &file_info))
+        filename.assign(base, "/"sv, subpath);
+        if (tr_sys_path_get_info(filename, 0, &file_info))
         {
-            return tr_found_file_t{ file_info, filename, base };
+            return tr_found_file_t{ file_info, std::move(filename), std::size(base) };
         }
 
-        tr_buildBuf(filename, base, "/"sv, subpath, ".part"sv);
-        if (tr_sys_path_get_info(filename.c_str(), 0, &file_info))
+        filename.assign(base, "/"sv, subpath, PartialFileSuffix);
+        if (tr_sys_path_get_info(filename, 0, &file_info))
         {
-            return tr_found_file_t{ file_info, filename, base };
+            return tr_found_file_t{ file_info, std::move(filename), std::size(base) };
         }
     }
 
@@ -2716,71 +2686,35 @@ std::optional<tr_torrent::tr_found_file_t> tr_torrent::findFile(std::string& fil
 }
 
 // TODO: clients that call this should call tr_torrent::findFile() instead
-bool tr_torrentFindFile2(tr_torrent const* tor, tr_file_index_t fileNum, char const** base, char** subpath, time_t* mtime)
-{
-    auto filename = std::string{};
-    auto const found = tor->findFile(filename, fileNum);
-
-    if (!found)
-    {
-        return false;
-    }
-
-    if (base != nullptr)
-    {
-        *base = std::data(found->base);
-    }
-
-    if (subpath != nullptr)
-    {
-        *subpath = tr_strvDup(found->subpath);
-    }
-
-    if (mtime != nullptr)
-    {
-        *mtime = found->last_modified_at;
-    }
-
-    return true;
-}
-
-// TODO: clients that call this should call tr_torrent::findFile() instead
 char* tr_torrentFindFile(tr_torrent const* tor, tr_file_index_t fileNum)
 {
-    auto filename = std::string{};
-    auto const found = tor->findFile(filename, fileNum);
-    return found ? tr_strdup(filename.c_str()) : nullptr;
+    auto const found = tor->findFile(fileNum);
+    return found ? tr_strdup(found->filename.c_str()) : nullptr;
 }
 
 /* Decide whether we should be looking for files in downloadDir or incompleteDir. */
 static void refreshCurrentDir(tr_torrent* tor)
 {
-    tr_interned_string dir;
+    auto dir = tr_interned_string{};
 
     if (std::empty(tor->incompleteDir()))
     {
         dir = tor->downloadDir();
     }
-    else if (!tor->hasMetadata()) /* no files to find */
+    else if (!tor->hasMetainfo()) /* no files to find */
     {
         dir = tor->incompleteDir();
     }
     else
     {
-        auto filename = std::string{};
-        auto const found = tor->findFile(filename, 0);
-        dir = found ? tr_interned_string{ found->base } : tor->incompleteDir();
+        auto const found = tor->findFile(0);
+        dir = found ? tr_interned_string{ found->base() } : tor->incompleteDir();
     }
 
     TR_ASSERT(!std::empty(dir));
     TR_ASSERT(dir == tor->downloadDir() || dir == tor->incompleteDir());
 
     tor->current_dir = dir;
-}
-
-char* tr_torrentBuildPartial(tr_torrent const* tor, tr_file_index_t i)
-{
-    return tr_strvDup(tr_strvJoin(tor->fileSubpath(i), ".part"sv));
 }
 
 /***
@@ -2972,14 +2906,15 @@ static int renamePath(tr_torrent* tor, char const* oldpath, char const* newname)
 
     if (!tr_sys_path_exists(src.c_str())) /* check for it as a partial */
     {
-        src += ".part"sv;
+        src += tr_torrent::PartialFileSuffix;
     }
 
     if (tr_sys_path_exists(src.c_str()))
     {
         auto const parent = tr_sys_path_dirname(src);
-        auto const tgt = tr_strvEndsWith(src, ".part"sv) ? tr_strvJoin(parent, TR_PATH_DELIMITER_STR, newname, ".part"sv) :
-                                                           tr_strvPath(parent, newname);
+        auto const tgt = tr_strvEndsWith(src, tr_torrent::PartialFileSuffix) ?
+            tr_strvJoin(parent, TR_PATH_DELIMITER_STR, newname, tr_torrent::PartialFileSuffix) :
+            tr_strvPath(parent, newname);
 
         auto tmp = errno;
         bool const tgt_exists = tr_sys_path_exists(tgt.c_str());
@@ -3161,7 +3096,7 @@ void tr_torrentSetFilePriorities(
 
 bool tr_torrentHasMetadata(tr_torrent const* tor)
 {
-    return tor->hasMetadata();
+    return tor->hasMetainfo();
 }
 
 void tr_torrent::markEdited()
@@ -3210,10 +3145,9 @@ void tr_torrent::initCheckedPieces(tr_bitfield const& checked, time_t const* mti
     auto const n = this->fileCount();
     this->file_mtimes_.resize(n);
 
-    auto filename = std::string{};
     for (size_t i = 0; i < n; ++i)
     {
-        auto const found = this->findFile(filename, i);
+        auto const found = this->findFile(i);
         auto const mtime = found ? found->last_modified_at : 0;
 
         this->file_mtimes_[i] = mtime;

@@ -16,6 +16,7 @@
 #include <cstddef> // size_t
 #include <cstdint> // uintX_t
 #include <ctime>
+#include <memory>
 #include <optional>
 
 #include <event2/buffer.h>
@@ -60,6 +61,16 @@ using tr_net_error_cb = void (*)(tr_peerIo* io, short what, void* userData);
 
 auto inline constexpr PEER_IO_MAGIC_NUMBER = 206745;
 
+struct evbuffer_deleter
+{
+    void operator()(struct evbuffer* buf) const noexcept
+    {
+        evbuffer_free(buf);
+    }
+};
+
+using tr_evbuffer_ptr = std::unique_ptr<evbuffer, evbuffer_deleter>;
+
 class tr_peerIo
 {
 public:
@@ -75,20 +86,17 @@ public:
         , addr{ addr_in }
         , session{ session_in }
         , time_created{ current_time }
-        , inbuf{ evbuffer_new() }
-        , outbuf{ evbuffer_new() }
         , port{ port_in }
         , is_seed{ is_seed_in }
     {
     }
 
-    ~tr_peerIo()
-    {
-        evbuffer_free(outbuf);
-        evbuffer_free(inbuf);
-    }
-
     std::string addrStr() const;
+
+    [[nodiscard]] auto getReadBuffer() noexcept
+    {
+        return inbuf.get();
+    }
 
     tr_crypto crypto;
 
@@ -115,8 +123,9 @@ public:
     // TODO: change tr_bandwidth* to owning pointer to the bandwidth, or remove * and own the value
     Bandwidth* bandwidth = nullptr;
 
-    evbuffer* const inbuf;
-    evbuffer* const outbuf;
+    tr_evbuffer_ptr const inbuf = tr_evbuffer_ptr{ evbuffer_new() };
+    tr_evbuffer_ptr const outbuf = tr_evbuffer_ptr{ evbuffer_new() };
+
     struct tr_datatype* outbuf_datatypes = nullptr;
 
     struct event* event_read = nullptr;
@@ -344,14 +353,5 @@ void tr_peerIoSetEnabled(tr_peerIo* io, tr_direction dir, bool isEnabled);
 int tr_peerIoFlush(tr_peerIo* io, tr_direction dir, size_t byteLimit);
 
 int tr_peerIoFlushOutgoingProtocolMsgs(tr_peerIo* io);
-
-/**
-***
-**/
-
-constexpr struct evbuffer* tr_peerIoGetReadBuffer(tr_peerIo* io)
-{
-    return io->inbuf;
-}
 
 /* @} */

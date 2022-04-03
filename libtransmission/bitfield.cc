@@ -4,6 +4,7 @@
 // License text can be found in the licenses/ folder.
 
 #include <algorithm>
+#include <array>
 #include <vector>
 
 #include "transmission.h"
@@ -19,7 +20,7 @@
 namespace
 {
 
-constexpr size_t getBytesNeeded(size_t bit_count)
+[[nodiscard]] constexpr size_t getBytesNeeded(size_t bit_count) noexcept
 {
     return (bit_count >> 3) + ((bit_count & 7) != 0 ? 1 : 0);
 }
@@ -36,7 +37,7 @@ void setAllTrue(uint8_t* array, size_t bit_count)
     }
 }
 
-constexpr int8_t const trueBitCount[256] = {
+auto constexpr TrueBitCount = std::array<size_t, 256>{
     0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4, 1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5, 1, 2, 2, 3, 2,
     3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5, 2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6, 1, 2, 2, 3, 2, 3, 3, 4, 2, 3,
     3, 4, 3, 4, 4, 5, 2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6, 2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5,
@@ -46,25 +47,30 @@ constexpr int8_t const trueBitCount[256] = {
     6, 7, 3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7, 4, 5, 5, 6, 5, 6, 6, 7, 5, 6, 6, 7, 6, 7, 7, 8
 };
 
+[[nodiscard]] constexpr size_t rawCountFlags(uint8_t const* flags, size_t n) noexcept
+{
+    auto ret = size_t{};
+
+    for (auto const* const end = flags + n; flags != end; ++flags)
+    {
+        ret += TrueBitCount[*flags];
+    }
+
+    return ret;
+}
+
 } // namespace
 
 /****
 *****
 ****/
 
-size_t tr_bitfield::countFlags() const
+size_t tr_bitfield::countFlags() const noexcept
 {
-    size_t ret = 0;
-
-    for (auto ch : flags_)
-    {
-        ret += trueBitCount[ch];
-    }
-
-    return ret;
+    return rawCountFlags(std::data(flags_), std::size(flags_));
 }
 
-size_t tr_bitfield::countFlags(size_t begin, size_t end) const
+size_t tr_bitfield::countFlags(size_t begin, size_t end) const noexcept
 {
     size_t ret = 0;
     size_t const first_byte = begin >> 3U;
@@ -94,7 +100,7 @@ size_t tr_bitfield::countFlags(size_t begin, size_t end) const
         val >>= i;
         val <<= i;
 
-        ret += trueBitCount[val];
+        ret += TrueBitCount[val];
     }
     else
     {
@@ -105,12 +111,12 @@ size_t tr_bitfield::countFlags(size_t begin, size_t end) const
         uint8_t val = flags_[first_byte];
         val <<= first_shift;
         val >>= first_shift;
-        ret += trueBitCount[val];
+        ret += TrueBitCount[val];
 
         /* middle bytes */
         for (size_t i = first_byte + 1; i < walk_end; ++i)
         {
-            ret += trueBitCount[flags_[i]];
+            ret += TrueBitCount[flags_[i]];
         }
 
         /* last byte */
@@ -120,7 +126,7 @@ size_t tr_bitfield::countFlags(size_t begin, size_t end) const
             val = flags_[last_byte];
             val >>= last_shift;
             val <<= last_shift;
-            ret += trueBitCount[val];
+            ret += TrueBitCount[val];
         }
     }
 
@@ -141,17 +147,6 @@ size_t tr_bitfield::count(size_t begin, size_t end) const
     }
 
     return countFlags(begin, end);
-}
-
-bool tr_bitfield::testFlag(size_t n) const
-{
-    if (n >> 3U >= std::size(flags_))
-    {
-        return false;
-    }
-
-    bool ret = (flags_[n >> 3U] << (n & 7U) & 0x80) != 0;
-    return ret;
 }
 
 /***
@@ -211,19 +206,14 @@ bool tr_bitfield::ensureNthBitAlloced(size_t nth)
     return true;
 }
 
-void tr_bitfield::freeArray()
+void tr_bitfield::freeArray() noexcept
 {
     flags_ = std::vector<uint8_t>{};
 }
 
-void tr_bitfield::setTrueCount(size_t n)
+void tr_bitfield::setTrueCount(size_t n) noexcept
 {
-    TR_ASSERT_MSG(
-        bit_count_ == 0 || n <= bit_count_,
-        "bit_count_:%zu, n:%zu, std::size(flags_):%zu",
-        bit_count_,
-        n,
-        size_t(std::size(flags_)));
+    TR_ASSERT(bit_count_ == 0 || n <= bit_count_);
 
     true_count_ = n;
     have_all_hint_ = n == bit_count_;
@@ -237,12 +227,12 @@ void tr_bitfield::setTrueCount(size_t n)
     TR_ASSERT(isValid());
 }
 
-void tr_bitfield::rebuildTrueCount()
+void tr_bitfield::rebuildTrueCount() noexcept
 {
     setTrueCount(countFlags());
 }
 
-void tr_bitfield::incrementTrueCount(size_t inc)
+void tr_bitfield::incrementTrueCount(size_t inc) noexcept
 {
     TR_ASSERT(bit_count_ == 0 || inc <= bit_count_);
     TR_ASSERT(bit_count_ == 0 || true_count_ <= bit_count_ - inc);
@@ -250,7 +240,7 @@ void tr_bitfield::incrementTrueCount(size_t inc)
     setTrueCount(true_count_ + inc);
 }
 
-void tr_bitfield::decrementTrueCount(size_t dec)
+void tr_bitfield::decrementTrueCount(size_t dec) noexcept
 {
     TR_ASSERT(bit_count_ == 0 || dec <= bit_count_);
     TR_ASSERT(bit_count_ == 0 || true_count_ >= dec);
@@ -268,7 +258,7 @@ tr_bitfield::tr_bitfield(size_t bit_count)
     TR_ASSERT(isValid());
 }
 
-void tr_bitfield::setHasNone()
+void tr_bitfield::setHasNone() noexcept
 {
     freeArray();
     true_count_ = 0;
@@ -278,7 +268,7 @@ void tr_bitfield::setHasNone()
     TR_ASSERT(isValid());
 }
 
-void tr_bitfield::setHasAll()
+void tr_bitfield::setHasAll() noexcept
 {
     freeArray();
     true_count_ = bit_count_;

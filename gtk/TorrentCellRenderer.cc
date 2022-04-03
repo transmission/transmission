@@ -53,7 +53,7 @@ auto getProgressString(tr_torrent const* tor, uint64_t total_size, tr_stat const
             _("{current_size} of {complete_size} ({percent_done}%)"),
             fmt::arg("current_size", tr_strlsize(haveTotal)),
             fmt::arg("complete_size", tr_strlsize(st->sizeWhenDone)),
-            fmt::arg("percent_done", tr_strlpercent(st->percentDone * 100.0)));
+            fmt::arg("percent_done", tr_strpercent(st->percentDone * 100.0)));
     }
     else if (!isSeed && hasSeedRatio) // partial seed, seed ratio
     {
@@ -62,7 +62,7 @@ auto getProgressString(tr_torrent const* tor, uint64_t total_size, tr_stat const
             _("{current_size} of {complete_size} ({percent_complete}%), uploaded {uploaded_size} (Ratio: {ratio}, Goal: {seed_ratio})"),
             fmt::arg("current_size", tr_strlsize(haveTotal)),
             fmt::arg("complete_size", tr_strlsize(total_size)),
-            fmt::arg("percent_done", tr_strlpercent(st->percentComplete * 100.0)),
+            fmt::arg("percent_complete", tr_strpercent(st->percentComplete * 100.0)),
             fmt::arg("uploaded_size", tr_strlsize(st->uploadedEver)),
             fmt::arg("ratio", tr_strlratio(st->ratio)),
             fmt::arg("seed_ratio", tr_strlratio(seedRatio)));
@@ -73,7 +73,7 @@ auto getProgressString(tr_torrent const* tor, uint64_t total_size, tr_stat const
             _("{current_size} of {complete_size} ({percent_complete}%), uploaded {uploaded_size} (Ratio: {ratio})"),
             fmt::arg("current_size", tr_strlsize(haveTotal)),
             fmt::arg("complete_size", tr_strlsize(total_size)),
-            fmt::arg("percent_complete", tr_strlpercent(st->percentComplete * 100.0)),
+            fmt::arg("percent_complete", tr_strpercent(st->percentComplete * 100.0)),
             fmt::arg("uploaded_size", tr_strlsize(st->uploadedEver)),
             fmt::arg("ratio", tr_strlratio(st->ratio)));
     }
@@ -165,13 +165,13 @@ std::string getShortStatusString(
 
     case TR_STATUS_CHECK:
         return fmt::format(
-            _("Verifying local data ({percent_done:.1}% tested)"),
+            _("Verifying local data ({percent_done}% tested)"),
             fmt::arg("percent_done", tr_truncd(st->recheckProgress * 100.0, 1)));
 
     case TR_STATUS_DOWNLOAD:
     case TR_STATUS_SEED:
         return fmt::format(
-            "{} {}",
+            FMT_STRING("{:s} {:s}"),
             getShortTransferString(tor, st, uploadSpeed_KBps, downloadSpeed_KBps),
             fmt::format(_("Ratio: {ratio}"), fmt::arg("ratio", tr_strlratio(st->ratio))));
 
@@ -222,7 +222,7 @@ auto getActivityString(
                     "Downloading metadata from {active_count} connected peers ({percent_done:d}% done)",
                     st->peersConnected),
                 fmt::arg("active_count", st->peersConnected),
-                fmt::arg("percent_done", 100.0 * st->metadataPercentComplete));
+                fmt::arg("percent_done", tr_strpercent(st->metadataPercentComplete * 100.0)));
         }
 
         if (st->peersSendingToUs != 0 && st->webseedsSendingToUs != 0)
@@ -282,7 +282,7 @@ std::string getStatusString(
     {
         if (auto const buf = getShortTransferString(tor, st, uploadSpeed_KBps, downloadSpeed_KBps); !std::empty(buf))
         {
-            status_str += fmt::format(" - {}", buf);
+            status_str += fmt::format(FMT_STRING(" - {:s}"), buf);
         }
     }
 
@@ -611,8 +611,9 @@ void TorrentCellRenderer::Impl::render_compact(
     icon_renderer_->property_sensitive() = sensitive;
     icon_renderer_->render(cr, widget, icon_area, icon_area, flags);
 
-    progress_renderer_->property_value() = (int)(percentDone * 100.0);
-    progress_renderer_->property_text() = Glib::ustring();
+    auto const percent_done = static_cast<int>(percentDone * 100.0);
+    progress_renderer_->property_value() = percent_done;
+    progress_renderer_->property_text() = fmt::format(FMT_STRING("{:d}%"), percent_done);
     progress_renderer_->property_sensitive() = sensitive;
     progress_renderer_->render(cr, widget, prog_area, prog_area, flags);
 
@@ -748,7 +749,7 @@ void TorrentCellRenderer::Impl::render_full(
     text_renderer_->property_weight() = Pango::WEIGHT_NORMAL;
     text_renderer_->render(cr, widget, prog_area, prog_area, flags);
 
-    progress_renderer_->property_value() = (int)(percentDone * 100.0);
+    progress_renderer_->property_value() = static_cast<int>(percentDone * 100.0);
     progress_renderer_->property_text() = Glib::ustring();
     progress_renderer_->property_sensitive() = sensitive;
     progress_renderer_->render(cr, widget, prct_area, prct_area, flags);

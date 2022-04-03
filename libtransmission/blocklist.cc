@@ -163,21 +163,11 @@ void tr_blocklistFileFree(tr_blocklistFile* b)
     tr_free(b);
 }
 
-bool tr_blocklistFileExists(tr_blocklistFile const* b)
-{
-    return tr_sys_path_exists(b->filename);
-}
-
 int tr_blocklistFileGetRuleCount(tr_blocklistFile const* b)
 {
     blocklistEnsureLoaded((tr_blocklistFile*)b);
 
     return b->ruleCount;
-}
-
-bool tr_blocklistFileIsEnabled(tr_blocklistFile* b)
-{
-    return b->isEnabled;
 }
 
 void tr_blocklistFileSetEnabled(tr_blocklistFile* b, bool isEnabled)
@@ -453,16 +443,14 @@ int tr_blocklistFileSetContent(tr_blocklistFile* b, char const* filename)
 #ifdef TR_ENABLE_ASSERTS
 
         /* sanity checks: make sure the rules are sorted in ascending order and don't overlap */
+        for (size_t i = 0; i < ranges_count; ++i)
         {
-            for (size_t i = 0; i < ranges_count; ++i)
-            {
-                TR_ASSERT(ranges[i].begin <= ranges[i].end);
-            }
+            TR_ASSERT(ranges[i].begin <= ranges[i].end);
+        }
 
-            for (size_t i = 1; i < ranges_count; ++i)
-            {
-                TR_ASSERT(ranges[i - 1].end < ranges[i].begin);
-            }
+        for (size_t i = 1; i < ranges_count; ++i)
+        {
+            TR_ASSERT(ranges[i - 1].end < ranges[i].begin);
         }
 
 #endif

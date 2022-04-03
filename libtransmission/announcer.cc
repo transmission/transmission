@@ -194,8 +194,8 @@ static tr_scrape_info* tr_announcerGetScrapeInfo(tr_announcer* announcer, tr_int
     }
 
     auto& scrapes = announcer->scrape_info;
-    auto const it = scrapes.try_emplace(url, url, TR_MULTISCRAPE_MAX);
-    return &it.first->second;
+    auto const [it, is_new] = scrapes.try_emplace(url, url, TR_MULTISCRAPE_MAX);
+    return &it->second;
 }
 
 void tr_announcerInit(tr_session* session)
@@ -403,7 +403,7 @@ struct tr_tier
         auto const* const torrent_name = tr_torrentName(tor);
         auto const* const current_tracker = currentTracker();
         auto const host_sv = current_tracker == nullptr ? "?"sv : current_tracker->host.sv();
-        tr_snprintf(buf, buflen, "%s at %" TR_PRIsv, torrent_name, TR_PRIsv_ARG(host_sv));
+        *fmt::format_to_n(buf, buflen - 1, FMT_STRING("{:s} at {:s}"), torrent_name, host_sv).out = '\0';
     }
 
     [[nodiscard]] bool canManualAnnounce() const
@@ -881,7 +881,7 @@ static tr_announce_request* announce_request_new(
     req->up = tier->byteCounts[TR_ANN_UP];
     req->down = tier->byteCounts[TR_ANN_DOWN];
     req->corrupt = tier->byteCounts[TR_ANN_CORRUPT];
-    req->leftUntilComplete = tor->hasMetadata() ? tor->totalSize() - tor->hasTotal() : INT64_MAX;
+    req->leftUntilComplete = tor->hasMetainfo() ? tor->totalSize() - tor->hasTotal() : INT64_MAX;
     req->event = event;
     req->numwant = event == TR_ANNOUNCE_EVENT_STOPPED ? 0 : Numwant;
     req->key = announcer->key;

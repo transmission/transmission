@@ -24,37 +24,37 @@ public:
 
     [[nodiscard]] tr_urlbuf magnet() const;
 
-    auto const& infoHash() const
+    [[nodiscard]] constexpr auto const& infoHash() const noexcept
     {
         return info_hash_;
     }
 
-    auto const& name() const
+    [[nodiscard]] constexpr auto const& name() const noexcept
     {
         return name_;
     }
 
-    auto webseedCount() const
+    [[nodiscard]] constexpr auto webseedCount() const noexcept
     {
         return std::size(webseed_urls_);
     }
 
-    auto const& webseed(size_t i) const
+    [[nodiscard]] auto const& webseed(size_t i) const
     {
         return webseed_urls_[i];
     }
 
-    auto& announceList()
+    [[nodiscard]] constexpr auto& announceList() noexcept
     {
         return announce_list_;
     }
 
-    auto const& announceList() const
+    [[nodiscard]] constexpr auto const& announceList() const noexcept
     {
         return announce_list_;
     }
 
-    std::string const& infoHashString() const
+    [[nodiscard]] constexpr std::string const& infoHashString() const noexcept
     {
         return info_hash_str_;
     }
@@ -67,7 +67,7 @@ public:
 protected:
     tr_announce_list announce_list_;
     std::vector<std::string> webseed_urls_;
-    tr_sha1_digest_t info_hash_;
+    tr_sha1_digest_t info_hash_ = {};
     std::string info_hash_str_;
     std::string name_;
 };

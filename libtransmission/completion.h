@@ -40,7 +40,7 @@ struct tr_completion
         blocks_.setHasNone();
     }
 
-    [[nodiscard]] constexpr tr_bitfield const& blocks() const
+    [[nodiscard]] constexpr tr_bitfield const& blocks() const noexcept
     {
         return blocks_;
     }
@@ -70,7 +70,7 @@ struct tr_completion
         return block_info_->piece_size != 0 && countMissingBlocksInPiece(piece) == 0;
     }
 
-    [[nodiscard]] constexpr uint64_t hasTotal() const
+    [[nodiscard]] constexpr uint64_t hasTotal() const noexcept
     {
         return size_now_;
     }
@@ -129,12 +129,12 @@ struct tr_completion
 
     [[nodiscard]] uint64_t countHasBytesInSpan(tr_byte_span_t) const;
 
-private:
-    [[nodiscard]] constexpr bool hasMetainfo() const
+    [[nodiscard]] constexpr bool hasMetainfo() const noexcept
     {
         return !std::empty(blocks_);
     }
 
+private:
     [[nodiscard]] uint64_t computeHasValid() const;
     [[nodiscard]] uint64_t computeSizeWhenDone() const;
     [[nodiscard]] uint64_t countHasBytesInBlocks(tr_block_span_t) const;

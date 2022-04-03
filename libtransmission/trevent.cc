@@ -193,9 +193,7 @@ static void libeventThreadFunc(tr_event_handle* events)
 
     // tell the thread that's waiting in tr_eventInit()
     // that this thread is ready for business
-    events->work_queue_mutex.lock();
     events->work_queue_cv.notify_one();
-    events->work_queue_mutex.unlock();
 
     // loop until `tr_eventClose()` kills the loop
     event_base_loop(base, EVLOOP_NO_EXIT_ON_EMPTY);
@@ -226,7 +224,7 @@ void tr_eventInit(tr_session* session)
     events->thread_id = thread.get_id();
     thread.detach();
     // wait until the libevent thread is running
-    events->work_queue_cv.wait(lock);
+    events->work_queue_cv.wait(lock, [session] { return session->events != nullptr; });
 }
 
 void tr_eventClose(tr_session* session)

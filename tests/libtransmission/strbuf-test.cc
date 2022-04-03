@@ -63,7 +63,7 @@ TEST_F(StrbufTest, clear)
 TEST_F(StrbufTest, constructorDefault)
 {
     auto buf = tr_pathbuf{};
-    EXPECT_EQ(0, std::size(buf));
+    EXPECT_EQ(0U, std::size(buf));
     EXPECT_TRUE(std::empty(buf));
 }
 
@@ -123,7 +123,7 @@ TEST_F(StrbufTest, iterators)
         auto begin = std::begin(buf);
         auto end = std::end(buf);
         EXPECT_EQ(Value.front(), *begin);
-        EXPECT_EQ(std::size(Value), std::distance(begin, end));
+        EXPECT_EQ(std::size(Value), static_cast<size_t>(std::distance(begin, end)));
     }
 
     // const
@@ -132,7 +132,7 @@ TEST_F(StrbufTest, iterators)
         auto const begin = std::begin(buf);
         auto const end = std::end(buf);
         EXPECT_EQ(Value.front(), *begin);
-        EXPECT_EQ(std::size(Value), std::distance(begin, end));
+        EXPECT_EQ(std::size(Value), static_cast<size_t>(std::distance(begin, end)));
     }
 }
 
@@ -151,6 +151,19 @@ TEST_F(StrbufTest, join)
     buf.clear();
     buf.join("--"sv, 'A', "short", "phrase"sv);
     EXPECT_EQ("A--short--phrase"sv, buf.sv());
+}
+
+TEST_F(StrbufTest, move)
+{
+    static auto constexpr Value = "/hello/world"sv;
+
+    auto generator = []()
+    {
+        return tr_pathbuf{ Value };
+    };
+    auto const path = generator();
+    EXPECT_EQ(Value, path.sv());
+    EXPECT_EQ(Value, path.c_str());
 }
 
 TEST_F(StrbufTest, startsWith)

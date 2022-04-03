@@ -193,23 +193,18 @@ QVariant FileTreeModel::headerData(int column, Qt::Orientation orientation, int 
         {
         case COL_NAME:
             return tr("File");
-            break;
 
         case COL_SIZE:
             return tr("Size");
-            break;
 
         case COL_PROGRESS:
             return tr("Progress");
-            break;
 
         case COL_WANTED:
             return tr("Download");
-            break;
 
         case COL_PRIORITY:
             return tr("Priority");
-            break;
 
         default:
             break;

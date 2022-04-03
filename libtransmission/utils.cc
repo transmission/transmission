@@ -36,7 +36,7 @@
 #include <event2/buffer.h>
 #include <event2/event.h>
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include "transmission.h"
 
@@ -419,22 +419,6 @@ std::string evbuffer_free_to_str(evbuffer* buf)
     return ret;
 }
 
-static char* evbuffer_free_to_str(struct evbuffer* buf, size_t* result_len)
-{
-    size_t const n = evbuffer_get_length(buf);
-    auto* const ret = tr_new(char, n + 1);
-    evbuffer_copyout(buf, ret, n);
-    evbuffer_free(buf);
-    ret[n] = '\0';
-
-    if (result_len != nullptr)
-    {
-        *result_len = n;
-    }
-
-    return ret;
-}
-
 char* tr_strvDup(std::string_view in)
 {
     auto const n = std::size(in);
@@ -442,12 +426,6 @@ char* tr_strvDup(std::string_view in)
     std::copy(std::begin(in), std::end(in), ret);
     ret[n] = '\0';
     return ret;
-}
-
-char* tr_strndup(void const* vin, size_t len)
-{
-    auto const* const in = static_cast<char const*>(vin);
-    return in == nullptr ? nullptr : tr_strvDup({ in, len });
 }
 
 char* tr_strdup(void const* in)
@@ -464,18 +442,6 @@ extern "C"
 bool tr_wildmat(char const* text, char const* p)
 {
     return (p[0] == '*' && p[1] == '\0') || (DoMatch(text, p) != 0);
-}
-
-char* tr_strdup_printf(char const* fmt, ...)
-{
-    evbuffer* const buf = evbuffer_new();
-
-    va_list ap;
-    va_start(ap, fmt);
-    evbuffer_add_vprintf(buf, fmt, ap);
-    va_end(ap);
-
-    return evbuffer_free_to_str(buf, nullptr);
 }
 
 char const* tr_strerror(int i)
@@ -750,7 +716,7 @@ static char* to_utf8(std::string_view sv)
         iconv_close(cd);
         if (rv != size_t(-1))
         {
-            char* const ret = tr_strndup(out, buflen - outbytesleft);
+            char* const ret = tr_strvDup({ out, buflen - outbytesleft });
             tr_free(out);
             return ret;
         }
@@ -899,7 +865,7 @@ char* tr_win32_format_message(uint32_t code)
 
     if (wide_size == 0)
     {
-        return tr_strdup_printf("Unknown error (0x%08x)", code);
+        return tr_strvDup(fmt::format(FMT_STRING("Unknown error ({:#08x})"), code));
     }
 
     if (wide_size != 0 && wide_text != nullptr)
@@ -1157,18 +1123,14 @@ bool tr_moveFile(char const* oldpath, char const* newpath, tr_error** error)
         return false;
     }
 
+    if (tr_error* my_error = nullptr; !tr_sys_path_remove(oldpath, &my_error))
     {
-        tr_error* my_error = nullptr;
-
-        if (!tr_sys_path_remove(oldpath, &my_error))
-        {
-            tr_logAddError(fmt::format(
-                _("Couldn't remove '{path}': {error} ({error_code})"),
-                fmt::arg("path", oldpath),
-                fmt::arg("error", my_error->message),
-                fmt::arg("error_code", my_error->code)));
-            tr_error_free(my_error);
-        }
+        tr_logAddError(fmt::format(
+            _("Couldn't remove '{path}': {error} ({error_code})"),
+            fmt::arg("path", oldpath),
+            fmt::arg("error", my_error->message),
+            fmt::arg("error_code", my_error->code)));
+        tr_error_free(my_error);
     }
 
     return true;

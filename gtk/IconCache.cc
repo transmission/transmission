@@ -62,7 +62,7 @@ std::string _icon_cache_get_icon_key(Glib::RefPtr<Gio::Icon> const& icon)
 {
     std::string key;
 
-    if (auto* const ticon = dynamic_cast<Gio::ThemedIcon*>(gtr_get_ptr(icon)); ticon != nullptr)
+    if (auto const* const ticon = dynamic_cast<Gio::ThemedIcon*>(gtr_get_ptr(icon)); ticon != nullptr)
     {
         std::ostringstream names;
         for (auto const& name : ticon->get_names())
@@ -108,7 +108,7 @@ Glib::RefPtr<Gdk::Pixbuf> get_file_icon_pixbuf(Gio::FileIcon& icon, int size)
     {
         return Gdk::Pixbuf::create_from_file(icon.get_file()->get_path(), size, -1, false);
     }
-    catch (Glib::Error const& e)
+    catch (Glib::Error const&)
     {
         return {};
     }

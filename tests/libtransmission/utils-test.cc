@@ -3,7 +3,15 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include <algorithm>
+#include <array>
+#include <cmath> // sqrt()
+#include <cstdlib> // setenv(), unsetenv()
+#include <iostream>
+#include <sstream>
+#include <string>
 #include <string_view>
+#include <utility>
 
 #ifdef _WIN32
 #include <windows.h>
@@ -20,14 +28,6 @@
 #include "utils.h"
 
 #include "test-fixtures.h"
-
-#include <algorithm>
-#include <array>
-#include <cmath> // sqrt()
-#include <cstdlib> // setenv(), unsetenv()
-#include <iostream>
-#include <sstream>
-#include <string>
 
 using ::libtransmission::test::makeString;
 using UtilsTest = ::testing::Test;
@@ -331,41 +331,6 @@ TEST_F(UtilsTest, truncd)
 #endif
 }
 
-TEST_F(UtilsTest, trStrdupPrintfFmtS)
-{
-    auto s = makeString(tr_strdup_printf("%s", "test"));
-    EXPECT_EQ("test", s);
-}
-
-TEST_F(UtilsTest, trStrdupPrintf)
-{
-    auto s = makeString(tr_strdup_printf("%d %s %c %u", -1, "0", '1', 2));
-    EXPECT_EQ("-1 0 1 2", s);
-
-    auto* s3 = reinterpret_cast<char*>(tr_malloc0(4098));
-    memset(s3, '-', 4097);
-    s3[2047] = 't';
-    s3[2048] = 'e';
-    s3[2049] = 's';
-    s3[2050] = 't';
-
-    auto* s2 = reinterpret_cast<char*>(tr_malloc0(4096));
-    memset(s2, '-', 4095);
-    s2[2047] = '%';
-    s2[2048] = 's';
-
-    // NOLINTNEXTLINE(clang-diagnostic-format-nonliteral)
-    s = makeString(tr_strdup_printf(s2, "test"));
-    EXPECT_EQ(s3, s);
-
-    tr_free(s2);
-
-    s = makeString(tr_strdup_printf("%s", s3));
-    EXPECT_EQ(s3, s);
-
-    tr_free(s3);
-}
-
 TEST_F(UtilsTest, trStrlcpy)
 {
     // destination will be initialized with this char
@@ -379,7 +344,7 @@ TEST_F(UtilsTest, trStrlcpy)
         "This, very usefull string contains total of 104 characters not counting null. Almost like an easter egg!"
     };
 
-    for (auto& test : tests)
+    for (auto const& test : tests)
     {
         auto c_string = test.c_str();
         auto length = strlen(c_string);
@@ -392,7 +357,7 @@ TEST_F(UtilsTest, trStrlcpy)
         ASSERT_EQ(responce, length);
 
         // Check what was copied
-        for (auto i = 0; i < 97; i++)
+        for (unsigned i = 0U; i < 97U; ++i)
         {
             if (i <= length)
             {
@@ -493,12 +458,22 @@ TEST_F(UtilsTest, saveFile)
 TEST_F(UtilsTest, ratioToString)
 {
     // Testpairs contain ratio as a double and a string
-    std::vector<std::pair<double, std::string>> const tests{
-        { 0.0, "0.00" },        { 0.01, "0.01" },  { 0.1, "0.10" },    { 1.0, "1.00" },        { 1.015, "1.01" },
-        { 4.99, "4.99" },       { 4.996, "4.99" }, { 5.0, "5.0" },     { 5.09999, "5.0" },     { 5.1, "5.1" },
-        { 99.99, "99.9" },      { 100.0, "100" },  { 4000.4, "4000" }, { 600000.0, "600000" }, { 900000000.0, "900000000" },
-        { TR_RATIO_INF, "inf" }
-    };
+    static auto constexpr Tests = std::array<std::pair<double, std::string_view>, 16>{ { { 0.0, "0.00" },
+                                                                                         { 0.01, "0.01" },
+                                                                                         { 0.1, "0.10" },
+                                                                                         { 1.0, "1.00" },
+                                                                                         { 1.015, "1.01" },
+                                                                                         { 4.99, "4.99" },
+                                                                                         { 4.996, "4.99" },
+                                                                                         { 5.0, "5.0" },
+                                                                                         { 5.09999, "5.0" },
+                                                                                         { 5.1, "5.1" },
+                                                                                         { 99.99, "99.9" },
+                                                                                         { 100.0, "100" },
+                                                                                         { 4000.4, "4000" },
+                                                                                         { 600000.0, "600000" },
+                                                                                         { 900000000.0, "900000000" },
+                                                                                         { TR_RATIO_INF, "inf" } } };
     char const nullchar = '\0';
 
     ASSERT_EQ(tr_strratio(TR_RATIO_NA, "Ratio is NaN"), "None");
@@ -506,8 +481,8 @@ TEST_F(UtilsTest, ratioToString)
     // Inf contains only null character
     ASSERT_EQ(tr_strratio(TR_RATIO_INF, &nullchar), "");
 
-    for (auto& test : tests)
+    for (auto const& [input, expected] : Tests)
     {
-        ASSERT_EQ(tr_strratio(test.first, "inf"), test.second);
+        ASSERT_EQ(tr_strratio(input, "inf"), expected);
     }
 }

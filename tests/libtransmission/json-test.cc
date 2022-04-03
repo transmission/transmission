@@ -163,7 +163,7 @@ TEST_P(JSONTest, test1)
     auto* ids = tr_variantDictFind(args, TR_KEY_ids);
     EXPECT_NE(nullptr, ids);
     EXPECT_TRUE(tr_variantIsList(ids));
-    EXPECT_EQ(2, tr_variantListSize(ids));
+    EXPECT_EQ(2U, tr_variantListSize(ids));
     EXPECT_TRUE(tr_variantGetInt(tr_variantListChild(ids, 0), &i));
     EXPECT_EQ(7, i);
     EXPECT_TRUE(tr_variantGetInt(tr_variantListChild(ids, 1), &i));

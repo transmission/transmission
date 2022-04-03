@@ -208,8 +208,8 @@ TEST_F(WebUtilsTest, urlPercentDecode)
           "http://www.example.com/~user/?test=1&test1=2"sv },
     } };
 
-    for (auto const& test : Tests)
+    for (auto const& [encoded, decoded] : Tests)
     {
-        EXPECT_EQ(test.second, tr_urlPercentDecode(test.first));
+        EXPECT_EQ(decoded, tr_urlPercentDecode(encoded));
     }
 }

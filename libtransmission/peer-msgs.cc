@@ -15,6 +15,8 @@
 #include <event2/bufferevent.h>
 #include <event2/event.h>
 
+#include <fmt/format.h>
+
 #include "transmission.h"
 
 #include "cache.h"
@@ -536,7 +538,7 @@ private:
 
         // TR_PEER_TO_CLIENT
 
-        if (!torrent->hasMetadata())
+        if (!torrent->hasMetainfo())
         {
             return true;
         }
@@ -1039,7 +1041,7 @@ static void sendLtepHandshake(tr_peerMsgsImpl* msgs)
     // "m" dictionary) specifying an integer value of the number of
     // bytes of the metadata.
     auto const info_dict_size = msgs->torrent->infoDictSize();
-    if (allow_metadata_xfer && msgs->torrent->hasMetadata() && info_dict_size > 0)
+    if (allow_metadata_xfer && msgs->torrent->hasMetainfo() && info_dict_size > 0)
     {
         tr_variantDictAddInt(&val, TR_KEY_metadata_size, info_dict_size);
     }
@@ -1237,7 +1239,7 @@ static void parseUtMetadata(tr_peerMsgsImpl* msgs, uint32_t msglen, struct evbuf
         /* NOOP */
     }
 
-    if (msg_type == MetadataMsgType::Data && !msgs->torrent->hasMetadata() && msg_end - benc_end <= METADATA_PIECE_SIZE &&
+    if (msg_type == MetadataMsgType::Data && !msgs->torrent->hasMetainfo() && msg_end - benc_end <= METADATA_PIECE_SIZE &&
         piece * METADATA_PIECE_SIZE + (msg_end - benc_end) <= total_size)
     {
         int const pieceLen = msg_end - benc_end;
@@ -1246,7 +1248,7 @@ static void parseUtMetadata(tr_peerMsgsImpl* msgs, uint32_t msglen, struct evbuf
 
     if (msg_type == MetadataMsgType::Request)
     {
-        if (piece >= 0 && msgs->torrent->hasMetadata() && msgs->torrent->isPublic() &&
+        if (piece >= 0 && msgs->torrent->hasMetainfo() && msgs->torrent->isPublic() &&
             msgs->peerAskedForMetadataCount < MetadataReqQ)
         {
             msgs->peerAskedForMetadata[msgs->peerAskedForMetadataCount++] = piece;
@@ -1510,7 +1512,7 @@ static bool messageLengthIsCorrect(tr_peerMsgsImpl const* msg, uint8_t id, uint3
         return len == 5;
 
     case BtPeerMsgs::Bitfield:
-        if (msg->torrent->hasMetadata())
+        if (msg->torrent->hasMetainfo())
         {
             return len == (msg->torrent->pieceCount() >> 3) + ((msg->torrent->pieceCount() & 7) != 0 ? 1 : 0) + 1U;
         }
@@ -1672,7 +1674,7 @@ static ReadState readBtMessage(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, si
         tr_peerIoReadUint32(msgs->io, inbuf, &ui32);
         logtrace(msgs, "got Have: %u", ui32);
 
-        if (msgs->torrent->hasMetadata() && ui32 >= msgs->torrent->pieceCount())
+        if (msgs->torrent->hasMetainfo() && ui32 >= msgs->torrent->pieceCount())
         {
             msgs->publishError(ERANGE);
             return READ_ERR;
@@ -1929,7 +1931,7 @@ static void didWrite(tr_peerIo* io, size_t bytesWritten, bool wasPieceData, void
 static ReadState canRead(tr_peerIo* io, void* vmsgs, size_t* piece)
 {
     auto* msgs = static_cast<tr_peerMsgsImpl*>(vmsgs);
-    struct evbuffer* in = tr_peerIoGetReadBuffer(io);
+    evbuffer* const in = io->getReadBuffer();
     size_t const inlen = evbuffer_get_length(in);
 
     logtrace(msgs, "canRead: inlen is %zu, msgs->state is %d", inlen, int(msgs->state));
@@ -1961,7 +1963,7 @@ static ReadState canRead(tr_peerIo* io, void* vmsgs, size_t* piece)
 
         default:
 #ifdef TR_ENABLE_ASSERTS
-            TR_ASSERT_MSG(false, "unhandled peer messages state %d", int(msgs->state));
+            TR_ASSERT_MSG(false, fmt::format(FMT_STRING("unhandled peer messages state {:d}"), int(msgs->state)));
 #else
             ret = READ_ERR;
             break;
@@ -1983,7 +1985,7 @@ static void updateDesiredRequestCount(tr_peerMsgsImpl* msgs)
     tr_torrent const* const torrent = msgs->torrent;
 
     /* there are lots of reasons we might not want to request any blocks... */
-    if (torrent->isDone() || !torrent->hasMetadata() || msgs->client_is_choked_ || !msgs->client_is_interested_)
+    if (torrent->isDone() || !torrent->hasMetainfo() || msgs->client_is_choked_ || !msgs->client_is_interested_)
     {
         msgs->desired_request_count = 0;
     }
@@ -2207,11 +2209,8 @@ static size_t fillOutputBuffer(tr_peerMsgsImpl* msgs, time_t now)
                 err = !msgs->torrent->ensurePieceIsChecked(req.index);
                 if (err)
                 {
-                    auto const errmsg = tr_strvJoin(
-                        "Please Verify Local Data! Piece #",
-                        std::to_string(req.index),
-                        " is corrupt.");
-                    msgs->torrent->setLocalError(errmsg);
+                    msgs->torrent->setLocalError(
+                        fmt::format(FMT_STRING("Please Verify Local Data! Piece #{:d} is corrupt."), req.index));
                 }
             }
 
@@ -2306,7 +2305,7 @@ static void gotError(tr_peerIo* /*io*/, short what, void* vmsgs)
 
 static void sendBitfield(tr_peerMsgsImpl* msgs)
 {
-    TR_ASSERT(msgs->torrent->hasMetadata());
+    TR_ASSERT(msgs->torrent->hasMetainfo());
 
     struct evbuffer* out = msgs->outMessages;
 

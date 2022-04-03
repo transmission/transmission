@@ -85,7 +85,8 @@
 - (void)drawWithFrame:(NSRect)cellFrame inView:(NSView*)controlView
 {
     //icon
-    [self.image drawInRect:[self imageRectForBounds:cellFrame] fromRect:NSZeroRect operation:NSCompositingOperationSourceOver fraction:1.0
+    [self.image drawInRect:[self imageRectForBounds:cellFrame] fromRect:NSZeroRect operation:NSCompositingOperationSourceOver
+                  fraction:1.0
             respectFlipped:YES
                      hints:nil];
 

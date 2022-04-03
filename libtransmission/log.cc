@@ -13,8 +13,7 @@
 
 #include <event2/buffer.h>
 
-#include <fmt/core.h>
-#include <fmt/compile.h>
+#include <fmt/chrono.h>
 #include <fmt/format.h>
 
 #include "transmission.h"
@@ -51,7 +50,6 @@ public:
 
     int queue_length_ = 0;
 
-private:
     std::recursive_mutex message_mutex_;
 };
 
@@ -90,7 +88,7 @@ tr_sys_file_t tr_logGetFile()
 void logAddImpl(
     [[maybe_unused]] char const* file,
     [[maybe_unused]] int line,
-    tr_log_level level,
+    [[maybe_unused]] tr_log_level level,
     std::string_view msg,
     [[maybe_unused]] std::string_view name)
 {
@@ -102,7 +100,7 @@ void logAddImpl(
     auto const lock = log_state.unique_lock();
 #ifdef _WIN32
 
-    OutputDebugStringA(tr_strvJoin(msg, "\r\n").c_str());
+    OutputDebugStringA(fmt::format(FMT_STRING("{:s}\r\n"), msg).c_str());
 
 #elif defined(__ANDROID__)
 
@@ -174,9 +172,10 @@ void logAddImpl(
 
         tr_logGetTimeStr(timestr, sizeof(timestr));
 
-        auto const out = !std::empty(name) ? tr_strvJoin("["sv, timestr, "] "sv, name, ": "sv, msg) :
-                                             tr_strvJoin("["sv, timestr, "] "sv, msg);
-        tr_sys_file_write_line(fp, out);
+        tr_sys_file_write_line(
+            fp,
+            !std::empty(name) ? fmt::format(FMT_STRING("[{:s}] {:s}: {:s}"), timestr, name, msg) :
+                                fmt::format(FMT_STRING("[{:s}] {:s}"), timestr, msg));
         tr_sys_file_flush(fp);
     }
 #endif
@@ -239,18 +238,14 @@ void tr_logFreeQueue(tr_log_message* list)
 
 char* tr_logGetTimeStr(char* buf, size_t buflen)
 {
-    auto const tv = tr_gettimeofday();
-    time_t const seconds = tv.tv_sec;
-    auto const milliseconds = int(tv.tv_usec / 1000);
-    char msec_str[8];
-    tr_snprintf(msec_str, sizeof msec_str, "%03d", milliseconds);
-
-    struct tm now_tm;
-    tr_localtime_r(&seconds, &now_tm);
-    char date_str[32];
-    strftime(date_str, sizeof(date_str), "%Y-%m-%d %H:%M:%S", &now_tm);
-
-    tr_snprintf(buf, buflen, "%s.%s", date_str, msec_str);
+    auto const a = std::chrono::system_clock::now();
+    auto const [out, len] = fmt::format_to_n(
+        buf,
+        buflen - 1,
+        "{0:%F %H:%M:}{1:%S}\n",
+        a,
+        std::chrono::duration_cast<std::chrono::milliseconds>(a.time_since_epoch()));
+    *out = '\0';
     return buf;
 }
 
@@ -262,7 +257,7 @@ void tr_logAddMessage(char const* file, int line, tr_log_level level, std::strin
     if (std::empty(name))
     {
         auto const base = tr_sys_path_basename(file);
-        name_fallback = fmt::format(FMT_COMPILE("{}:{}"), !std::empty(base) ? base : "?", line);
+        name_fallback = fmt::format(FMT_STRING("{}:{}"), !std::empty(base) ? base : "?", line);
         name = name_fallback;
     }
 
@@ -323,7 +318,7 @@ bool constexpr keysAreOrdered()
 {
     for (size_t i = 0, n = std::size(LogKeys); i < n; ++i)
     {
-        if (LogKeys[i].second != i)
+        if (LogKeys[i].second != static_cast<tr_log_level>(i))
         {
             return false;
         }

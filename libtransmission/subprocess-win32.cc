@@ -11,6 +11,8 @@
 #include <map>
 #include <string_view>
 
+#include <fmt/format.h>
+
 #include <windows.h>
 
 #include "transmission.h"
@@ -34,16 +36,15 @@ static void set_system_error(tr_error** error, DWORD code, std::string_view what
         return;
     }
 
-    char* message = tr_win32_format_message(code);
-
-    if (message == nullptr)
+    if (char* message = tr_win32_format_message(code); message != nullptr)
     {
-        message = tr_strdup_printf("Unknown error: 0x%08lx", code);
+        tr_error_set(error, code, fmt::format(FMT_STRING("{:s} failed: {:s}"), what, message));
+        tr_free(message);
     }
-
-    tr_error_set(error, code, tr_strvJoin(what, " failed: "sv, message));
-
-    tr_free(message);
+    else
+    {
+        tr_error_set(error, code, fmt::format(FMT_STRING("{:s} failed: Unknown error: {:#08x}"), what, code));
+    }
 }
 
 static void append_to_env_block(wchar_t** env_block, size_t* env_block_len, wchar_t const* part, size_t part_len)
@@ -342,7 +343,7 @@ static void append_app_launcher_arguments(enum tr_app_type app_type, char** args
         break;
 
     default:
-        TR_ASSERT_MSG(false, "unsupported application type %d", (int)app_type);
+        TR_ASSERT_MSG(false, fmt::format(FMT_STRING("unsupported application type {:d}"), app_type));
         break;
     }
 }

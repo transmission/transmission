@@ -727,9 +727,12 @@ static int daemon_start(void* varg, [[maybe_unused]] bool foreground)
 
     if (ev_base == nullptr)
     {
-        char buf[256];
-        tr_snprintf(buf, sizeof(buf), "Couldn't initialize daemon event state: %s", tr_strerror(errno));
-        printMessage(logfile, TR_LOG_ERROR, MyName, buf, __FILE__, __LINE__);
+        auto const error_code = errno;
+        auto const errmsg = fmt::format(
+            _("Couldn't initialize daemon: {error} ({error_code})"),
+            fmt::arg("error", tr_strerror(error_code)),
+            fmt::arg("error_code", error_code));
+        printMessage(logfile, TR_LOG_ERROR, MyName, errmsg, __FILE__, __LINE__);
         return 1;
     }
 

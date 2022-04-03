@@ -46,19 +46,6 @@ void tr_ptrArrayForeach(tr_ptrArray* array, PtrArrayForeachFunc func);
     @return the nth item in a tr_ptrArray */
 void* tr_ptrArrayNth(tr_ptrArray* array, int i);
 
-/** @brief Remove the last item from the array and return it
-    @return the pointer that's been removed from the array
-    @see tr_ptrArrayBack() */
-void* tr_ptrArrayPop(tr_ptrArray* array);
-
-/** @brief Return the last item in a tr_ptrArray
-    @return the last item in a tr_ptrArray, or nullptr if the array is empty
-    @see tr_ptrArrayPop() */
-constexpr void* tr_ptrArrayBack(tr_ptrArray* array)
-{
-    return array->n_items > 0 ? tr_ptrArrayNth(array, array->n_items - 1) : nullptr;
-}
-
 void tr_ptrArrayErase(tr_ptrArray* t, int begin, int end);
 
 static inline void tr_ptrArrayRemove(tr_ptrArray* t, int pos)
@@ -68,11 +55,6 @@ static inline void tr_ptrArrayRemove(tr_ptrArray* t, int pos)
 
 /** @brief Peek at the array pointer and its size, for easy iteration */
 void** tr_ptrArrayPeek(tr_ptrArray* array, int* size);
-
-constexpr void tr_ptrArrayClear(tr_ptrArray* a)
-{
-    a->n_items = 0;
-}
 
 /** @brief Insert a pointer into the array at the specified position
     @return the index of the stored pointer */

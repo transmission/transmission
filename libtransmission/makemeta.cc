@@ -14,7 +14,7 @@
 
 #include <event2/util.h> /* evutil_ascii_strcasecmp() */
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include "transmission.h"
 
@@ -325,7 +325,7 @@ static std::vector<std::byte> getHashInfo(tr_metainfo_builder* b)
         if (!digest)
         {
             b->my_errno = EIO;
-            tr_snprintf(b->errfile, sizeof(b->errfile), "error hashing piece %" PRIu32, b->pieceIndex);
+            *fmt::format_to_n(b->errfile, sizeof(b->errfile) - 1, "error hashing piece {:d}", b->pieceIndex).out = '\0';
             b->result = TrMakemetaResult::ERR_IO_READ;
             break;
         }
@@ -615,14 +615,8 @@ void tr_makeMetaInfo(
     builder->isPrivate = isPrivate;
     builder->source = tr_strdup(source);
 
-    if (!tr_str_is_empty(outputFile))
-    {
-        builder->outputFile = tr_strdup(outputFile);
-    }
-    else
-    {
-        builder->outputFile = tr_strvDup(tr_strvJoin(builder->top, ".torrent"sv));
-    }
+    builder->outputFile = !tr_str_is_empty(outputFile) ? tr_strdup(outputFile) :
+                                                         tr_strvDup(fmt::format(FMT_STRING("{:s}.torrent"), builder->top));
 
     /* enqueue the builder */
     auto const lock = std::lock_guard(queue_mutex_);

@@ -237,13 +237,14 @@ GroupsController* fGroupsInstance = nil;
     NSInteger const index = candidates.firstIndex;
 
     [self.fGroups addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:@(index),
-                                                                         @"Index",
-                                                                         [NSColor colorWithCalibratedRed:0.0 green:0.65 blue:1.0
-                                                                                                   alpha:1.0],
-                                                                         @"Color",
-                                                                         @"",
-                                                                         @"Name",
-                                                                         nil]];
+                                                                              @"Index",
+                                                                              [NSColor colorWithCalibratedRed:0.0 green:0.65
+                                                                                                         blue:1.0
+                                                                                                        alpha:1.0],
+                                                                              @"Color",
+                                                                              @"",
+                                                                              @"Name",
+                                                                              nil]];
 
     [NSNotificationCenter.defaultCenter postNotificationName:@"UpdateGroups" object:self];
     [self saveGroups];

@@ -332,7 +332,8 @@ TEST_F(CompletionTest, createPieceBitfield)
 
     // make a completion object that has a random assortment of pieces
     auto completion = tr_completion(&torrent, &block_info);
-    auto buf = std::array<char, 64>{};
+    auto buf = std::array<char, 65>{};
+    ASSERT_EQ(std::size(buf), block_info.pieceCount());
     EXPECT_TRUE(tr_rand_buffer(std::data(buf), std::size(buf)));
     for (uint64_t i = 0; i < block_info.n_pieces; ++i)
     {
@@ -369,16 +370,16 @@ TEST_F(CompletionTest, countMissingBytesInPiece)
     completion.addBlock(0);
     EXPECT_EQ(block_info.pieceSize(0) - tr_block_info::BlockSize, completion.countMissingBytesInPiece(0));
     completion.addPiece(0);
-    EXPECT_EQ(0, completion.countMissingBytesInPiece(0));
+    EXPECT_EQ(0U, completion.countMissingBytesInPiece(0));
 
     auto const final_piece = block_info.n_pieces - 1;
     auto const final_block = block_info.n_blocks - 1;
     EXPECT_EQ(block_info.pieceSize(final_piece), completion.countMissingBytesInPiece(final_piece));
     completion.addBlock(final_block);
-    EXPECT_EQ(1, block_info.final_piece_size);
-    EXPECT_EQ(1, block_info.final_block_size);
+    EXPECT_EQ(1U, block_info.final_piece_size);
+    EXPECT_EQ(1U, block_info.final_block_size);
     EXPECT_TRUE(completion.hasPiece(final_piece));
-    EXPECT_EQ(0, completion.countMissingBytesInPiece(final_piece));
+    EXPECT_EQ(0U, completion.countMissingBytesInPiece(final_piece));
 }
 
 TEST_F(CompletionTest, amountDone)

@@ -100,12 +100,8 @@ bool tr_ctorSetMetainfo(tr_ctor* ctor, char const* metainfo, size_t len, tr_erro
 bool tr_ctorSetMetainfoFromMagnetLink(tr_ctor* ctor, char const* magnet_link, tr_error** error)
 {
     ctor->torrent_filename.clear();
+    ctor->metainfo = {};
     return ctor->metainfo.parseMagnet(magnet_link != nullptr ? magnet_link : "", error);
-}
-
-std::string_view tr_ctorGetContents(tr_ctor const* ctor)
-{
-    return std::string_view{ std::data(ctor->contents), std::size(ctor->contents) };
 }
 
 char const* tr_ctorGetSourceFile(tr_ctor const* ctor)
@@ -290,9 +286,11 @@ bool tr_ctorGetIncompleteDir(tr_ctor const* ctor, char const** setme)
     return true;
 }
 
-tr_torrent_metainfo&& tr_ctorStealMetainfo(tr_ctor* ctor)
+tr_torrent_metainfo tr_ctorStealMetainfo(tr_ctor* ctor)
 {
-    return std::move(ctor->metainfo);
+    auto metainfo = tr_torrent_metainfo{};
+    std::swap(ctor->metainfo, metainfo);
+    return metainfo;
 }
 
 tr_torrent_metainfo const* tr_ctorGetMetainfo(tr_ctor const* ctor)
@@ -330,17 +328,6 @@ tr_priority_t tr_ctorGetBandwidthPriority(tr_ctor const* ctor)
 /***
 ****
 ***/
-
-void tr_ctorSetLabels(tr_ctor* ctor, char const** labels, size_t len)
-{
-    auto labels_set = tr_labels_t{};
-    for (size_t i = 0; i < len; i++)
-    {
-        labels_set.emplace(labels[i]);
-    }
-
-    tr_ctorSetLabels(ctor, std::move(labels_set));
-}
 
 void tr_ctorSetLabels(tr_ctor* ctor, tr_labels_t&& labels)
 {
