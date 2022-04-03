@@ -1,10 +1,6 @@
-//
-//  Compatibility.m
-//  Transmission
-//
-//  Created by Antoine Coeur on 31/03/2022.
-//  Copyright © 2022 The Transmission Project. All rights reserved.
-//
+// This file Copyright © 2007-2022 Transmission authors and contributors.
+// It may be used under the MIT (SPDX: MIT) license.
+// License text can be found in the licenses/ folder.
 
 #import "Compatibility.h"
 
