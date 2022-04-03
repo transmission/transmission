@@ -88,17 +88,16 @@ public:
 protected:
     static std::string get_default_parent_dir()
     {
-        auto* path = getenv("TMPDIR");
-        if (path != NULL)
+        if (auto* const path = getenv("TMPDIR"); path != nullptr)
         {
             return path;
         }
 
         tr_error* error = nullptr;
-        path = tr_sys_dir_get_current(&error);
-        if (path != nullptr)
+
+        if (auto* path = tr_sys_dir_get_current(&error); path != nullptr)
         {
-            std::string const ret = path;
+            auto ret = std::string{ path };
             tr_free(path);
             return ret;
         }
@@ -179,7 +178,7 @@ protected:
         return child;
     }
 
-    void buildParentDir(std::string const& path) const
+    void buildParentDir(std::string_view path) const
     {
         auto const tmperr = errno;
 
@@ -212,14 +211,14 @@ protected:
         }
     }
 
-    void createTmpfileWithContents(std::string& tmpl, void const* payload, size_t n) const
+    void createTmpfileWithContents(char* tmpl, void const* payload, size_t n) const
     {
         auto const tmperr = errno;
 
         buildParentDir(tmpl);
 
         // NOLINTNEXTLINE(clang-analyzer-cplusplus.InnerPointer)
-        auto const fd = tr_sys_file_open_temp(&tmpl.front());
+        auto const fd = tr_sys_file_open_temp(tmpl);
         blockingFileWrite(fd, payload, n);
         tr_sys_file_close(fd);
         sync();

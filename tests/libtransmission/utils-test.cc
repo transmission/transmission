@@ -3,7 +3,15 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include <algorithm>
+#include <array>
+#include <cmath> // sqrt()
+#include <cstdlib> // setenv(), unsetenv()
+#include <iostream>
+#include <sstream>
+#include <string>
 #include <string_view>
+#include <utility>
 
 #ifdef _WIN32
 #include <windows.h>
@@ -20,14 +28,6 @@
 #include "utils.h"
 
 #include "test-fixtures.h"
-
-#include <algorithm>
-#include <array>
-#include <cmath> // sqrt()
-#include <cstdlib> // setenv(), unsetenv()
-#include <iostream>
-#include <sstream>
-#include <string>
 
 using ::libtransmission::test::makeString;
 using UtilsTest = ::testing::Test;
@@ -344,7 +344,7 @@ TEST_F(UtilsTest, trStrlcpy)
         "This, very usefull string contains total of 104 characters not counting null. Almost like an easter egg!"
     };
 
-    for (auto& test : tests)
+    for (auto const& test : tests)
     {
         auto c_string = test.c_str();
         auto length = strlen(c_string);
@@ -458,12 +458,22 @@ TEST_F(UtilsTest, saveFile)
 TEST_F(UtilsTest, ratioToString)
 {
     // Testpairs contain ratio as a double and a string
-    std::vector<std::pair<double, std::string>> const tests{
-        { 0.0, "0.00" },        { 0.01, "0.01" },  { 0.1, "0.10" },    { 1.0, "1.00" },        { 1.015, "1.01" },
-        { 4.99, "4.99" },       { 4.996, "4.99" }, { 5.0, "5.0" },     { 5.09999, "5.0" },     { 5.1, "5.1" },
-        { 99.99, "99.9" },      { 100.0, "100" },  { 4000.4, "4000" }, { 600000.0, "600000" }, { 900000000.0, "900000000" },
-        { TR_RATIO_INF, "inf" }
-    };
+    static auto constexpr Tests = std::array<std::pair<double, std::string_view>, 16>{ { { 0.0, "0.00" },
+                                                                                         { 0.01, "0.01" },
+                                                                                         { 0.1, "0.10" },
+                                                                                         { 1.0, "1.00" },
+                                                                                         { 1.015, "1.01" },
+                                                                                         { 4.99, "4.99" },
+                                                                                         { 4.996, "4.99" },
+                                                                                         { 5.0, "5.0" },
+                                                                                         { 5.09999, "5.0" },
+                                                                                         { 5.1, "5.1" },
+                                                                                         { 99.99, "99.9" },
+                                                                                         { 100.0, "100" },
+                                                                                         { 4000.4, "4000" },
+                                                                                         { 600000.0, "600000" },
+                                                                                         { 900000000.0, "900000000" },
+                                                                                         { TR_RATIO_INF, "inf" } } };
     char const nullchar = '\0';
 
     ASSERT_EQ(tr_strratio(TR_RATIO_NA, "Ratio is NaN"), "None");
@@ -471,8 +481,8 @@ TEST_F(UtilsTest, ratioToString)
     // Inf contains only null character
     ASSERT_EQ(tr_strratio(TR_RATIO_INF, &nullchar), "");
 
-    for (auto& test : tests)
+    for (auto const& [input, expected] : Tests)
     {
-        ASSERT_EQ(tr_strratio(test.first, "inf"), test.second);
+        ASSERT_EQ(tr_strratio(input, "inf"), expected);
     }
 }

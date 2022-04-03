@@ -65,7 +65,7 @@ char const* tr_address_and_port_to_string(char* buf, size_t buflen, tr_address c
 {
     char addr_buf[INET6_ADDRSTRLEN];
     tr_address_to_string_with_buf(addr, addr_buf, sizeof(addr_buf));
-    tr_snprintf(buf, buflen, "[%s]:%u", addr_buf, ntohs(port));
+    *fmt::format_to_n(buf, buflen - 1, FMT_STRING("[{:s}]:{:d}"), addr_buf, ntohs(port)).out = '\0';
     return buf;
 }
 

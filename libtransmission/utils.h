@@ -243,14 +243,6 @@ void* tr_memdup(void const* src, size_t byteCount);
     (static_cast<struct_type*>(tr_realloc((mem), sizeof(struct_type) * (size_t)(n_structs))))
 
 /**
- * @brief make a newly-allocated copy of a substring
- * @param in is a void* so that callers can pass in both signed & unsigned without a cast
- * @param len length of the substring to copy. if a length less than zero is passed in, strlen(len) is used
- * @return a newly-allocated copy of `in' that can be freed with tr_free()
- */
-char* tr_strndup(void const* in, size_t len) TR_GNUC_MALLOC;
-
-/**
  * @brief make a newly-allocated copy of a string
  * @param in is a void* so that callers can pass in both signed & unsigned without a cast
  * @return a newly-allocated copy of `in' that can be freed with tr_free()

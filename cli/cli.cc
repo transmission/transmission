@@ -10,6 +10,8 @@
 #include <string>
 #include <string_view>
 
+#include <fmt/format.h>
+
 #include <libtransmission/transmission.h>
 
 #include <libtransmission/error.h>
@@ -96,30 +98,29 @@ static int parseCommandLine(tr_variant*, int argc, char const** argv);
 
 static void sigHandler(int signal);
 
-static char* tr_strlratio(char* buf, double ratio, size_t buflen)
+static std::string tr_strlratio(double ratio)
 {
-    if ((int)ratio == TR_RATIO_NA)
+    if (static_cast<int>(ratio) == TR_RATIO_NA)
     {
-        tr_strlcpy(buf, _("None"), buflen);
-    }
-    else if ((int)ratio == TR_RATIO_INF)
-    {
-        tr_strlcpy(buf, "Inf", buflen);
-    }
-    else if (ratio < 10.0)
-    {
-        tr_snprintf(buf, buflen, "%.2f", ratio);
-    }
-    else if (ratio < 100.0)
-    {
-        tr_snprintf(buf, buflen, "%.1f", ratio);
-    }
-    else
-    {
-        tr_snprintf(buf, buflen, "%.0f", ratio);
+        return _("None");
     }
 
-    return buf;
+    if (static_cast<int>(ratio) == TR_RATIO_INF)
+    {
+        return _("Inf");
+    }
+
+    if (ratio < 10.0)
+    {
+        return fmt::format(FMT_STRING("{:.2f}"), ratio);
+    }
+
+    if (ratio < 100.0)
+    {
+        return fmt::format(FMT_STRING("{:.1f}"), ratio);
+    }
+
+    return fmt::format(FMT_STRING("{:.0f}"), ratio);
 }
 
 static bool waitingOnWeb;
@@ -131,56 +132,45 @@ static void onTorrentFileDownloaded(tr_web::FetchResponse const& response)
     waitingOnWeb = false;
 }
 
-static void getStatusStr(tr_stat const* st, char* buf, size_t buflen)
+static std::string getStatusStr(tr_stat const* st)
 {
     if (st->activity == TR_STATUS_CHECK_WAIT)
     {
-        tr_snprintf(buf, buflen, "Waiting to verify local files");
+        return "Waiting to verify local files";
     }
-    else if (st->activity == TR_STATUS_CHECK)
+
+    if (st->activity == TR_STATUS_CHECK)
     {
-        tr_snprintf(
-            buf,
-            buflen,
-            "Verifying local files (%.2f%%, %.2f%% valid)",
+        return fmt::format(
+            FMT_STRING("Verifying local files ({:.2f}%, {:.2f}% valid)"),
             tr_truncd(100 * st->recheckProgress, 2),
             tr_truncd(100 * st->percentDone, 2));
     }
-    else if (st->activity == TR_STATUS_DOWNLOAD)
-    {
-        char ratioStr[80];
-        tr_strlratio(ratioStr, st->ratio, sizeof(ratioStr));
 
-        tr_snprintf(
-            buf,
-            buflen,
-            "Progress: %.1f%%, dl from %d of %d peers (%s), ul to %d (%s) [%s]",
+    if (st->activity == TR_STATUS_DOWNLOAD)
+    {
+        return fmt::format(
+            FMT_STRING("Progress: {:.1f}%, dl from {:d} of {:d} peers ({:s}), ul to {:d} ({:s}) [{:s}]"),
             tr_truncd(100 * st->percentDone, 1),
             st->peersSendingToUs,
             st->peersConnected,
-            tr_formatter_speed_KBps(st->pieceDownloadSpeed_KBps).c_str(),
+            tr_formatter_speed_KBps(st->pieceDownloadSpeed_KBps),
             st->peersGettingFromUs,
-            tr_formatter_speed_KBps(st->pieceUploadSpeed_KBps).c_str(),
-            ratioStr);
+            tr_formatter_speed_KBps(st->pieceUploadSpeed_KBps),
+            tr_strlratio(st->ratio));
     }
-    else if (st->activity == TR_STATUS_SEED)
-    {
-        char ratioStr[80];
-        tr_strlratio(ratioStr, st->ratio, sizeof(ratioStr));
 
-        tr_snprintf(
-            buf,
-            buflen,
-            "Seeding, uploading to %d of %d peer(s), %s [%s]",
+    if (st->activity == TR_STATUS_SEED)
+    {
+        return fmt::format(
+            FMT_STRING("Seeding, uploading to {:d} of {:d} peer(s), {:s} [{:s}]"),
             st->peersGettingFromUs,
             st->peersConnected,
-            tr_formatter_speed_KBps(st->pieceUploadSpeed_KBps).c_str(),
-            ratioStr);
+            tr_formatter_speed_KBps(st->pieceUploadSpeed_KBps),
+            tr_strlratio(st->ratio));
     }
-    else
-    {
-        *buf = '\0';
-    }
+
+    return "";
 }
 
 static char const* getConfigDir(int argc, char const** argv)
@@ -319,8 +309,6 @@ int tr_main(int argc, char* argv[])
 
     for (;;)
     {
-        char line[LineWidth];
-        tr_stat const* st;
         static auto constexpr messageName = std::array<char const*, 4>{
             nullptr,
             "Tracker gave a warning:",
@@ -352,15 +340,14 @@ int tr_main(int argc, char* argv[])
             }
         }
 
-        st = tr_torrentStat(tor);
-
+        auto const* const st = tr_torrentStat(tor);
         if (st->activity == TR_STATUS_STOPPED)
         {
             break;
         }
 
-        getStatusStr(st, line, sizeof(line));
-        printf("\r%-*s", TR_ARG_TUPLE(LineWidth, line));
+        auto const status_str = getStatusStr(st);
+        printf("\r%-*s", TR_ARG_TUPLE(LineWidth, status_str.c_str()));
 
         if (messageName[st->error])
         {

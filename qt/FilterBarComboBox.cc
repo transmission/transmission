@@ -87,7 +87,7 @@ void FilterBarComboBox::paintEvent(QPaintEvent* e)
 
     if (model_index.isValid())
     {
-        QStyle* s = style();
+        QStyle const* const s = style();
         int const hmargin = getHSpacing(this);
 
         QRect rect = s->subControlRect(QStyle::CC_ComboBox, &opt, QStyle::SC_ComboBoxEditField, this);

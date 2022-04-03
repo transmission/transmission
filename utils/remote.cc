@@ -80,38 +80,33 @@ static char constexpr SpeedTStr[] = "TB/s";
 ****
 ***/
 
-static void etaToString(char* buf, size_t buflen, int64_t eta)
+static std::string etaToString(int64_t eta)
 {
     if (eta < 0)
     {
-        tr_snprintf(buf, buflen, "Unknown");
+        return "Unknown";
     }
-    else if (eta < 60)
+
+    if (eta < 60)
     {
-        tr_snprintf(buf, buflen, "%" PRId64 " sec", eta);
+        return fmt::format(FMT_STRING("{:d} sec"), eta);
     }
-    else if (eta < (60 * 60))
+
+    if (eta < (60 * 60))
     {
-        tr_snprintf(buf, buflen, "%" PRId64 " min", eta / 60);
+        return fmt::format(FMT_STRING("{:d} min"), eta / 60);
     }
-    else if (eta < (60 * 60 * 24))
+
+    if (eta < (60 * 60 * 24))
     {
-        tr_snprintf(buf, buflen, "%" PRId64 " hrs", eta / (60 * 60));
+        return fmt::format(FMT_STRING("{:d} hrs"), eta / (60 * 60));
     }
-    else
-    {
-        tr_snprintf(buf, buflen, "%" PRId64 " days", eta / (60 * 60 * 24));
-    }
+
+    return fmt::format(FMT_STRING("{:d} days"), eta / (60 * 60 * 24));
 }
 
-static char* tr_strltime(char* buf, int seconds, size_t buflen)
+static std::string tr_strltime(int seconds)
 {
-    char b[128];
-    char h[128];
-    char m[128];
-    char s[128];
-    char t[128];
-
     if (seconds < 0)
     {
         seconds = 0;
@@ -123,54 +118,32 @@ static char* tr_strltime(char* buf, int seconds, size_t buflen)
     auto const minutes = (seconds % 3600) / 60;
     seconds = (seconds % 3600) % 60;
 
-    tr_snprintf(h, sizeof(h), "%d %s", hours, hours == 1 ? "hour" : "hours");
-    tr_snprintf(m, sizeof(m), "%d %s", minutes, minutes == 1 ? "minute" : "minutes");
-    tr_snprintf(s, sizeof(s), "%d %s", seconds, seconds == 1 ? "second" : "seconds");
-    tr_snprintf(t, sizeof(t), "%d %s", total_seconds, total_seconds == 1 ? "second" : "seconds");
+    auto tmpstr = std::string{};
 
-    if (days != 0)
-    {
-        char d[128];
-        tr_snprintf(d, sizeof(d), "%d %s", days, days == 1 ? "day" : "days");
+    auto const hstr = fmt::format(FMT_STRING("{:d} {:s}"), hours, ngettext("hour", "hours", hours));
+    auto const mstr = fmt::format(FMT_STRING("{:d} {:s}"), minutes, ngettext("minute", "minutes", minutes));
+    auto const sstr = fmt::format(FMT_STRING("{:d} {:s}"), seconds, ngettext("seconds", "seconds", seconds));
 
-        if (days >= 4 || hours == 0)
-        {
-            tr_strlcpy(b, d, sizeof(b));
-        }
-        else
-        {
-            tr_snprintf(b, sizeof(b), "%s, %s", d, h);
-        }
-    }
-    else if (hours != 0)
+    if (days > 0)
     {
-        if (hours >= 4 || minutes == 0)
-        {
-            tr_strlcpy(b, h, sizeof(b));
-        }
-        else
-        {
-            tr_snprintf(b, sizeof(b), "%s, %s", h, m);
-        }
+        auto const dstr = fmt::format(FMT_STRING("{:d} {:s}"), hours, ngettext("day", "days", days));
+        tmpstr = days >= 4 || hours == 0 ? dstr : fmt::format(FMT_STRING("{:s}, {:s}"), dstr, hstr);
     }
-    else if (minutes != 0)
+    else if (hours > 0)
     {
-        if (minutes >= 4 || seconds == 0)
-        {
-            tr_strlcpy(b, m, sizeof(b));
-        }
-        else
-        {
-            tr_snprintf(b, sizeof(b), "%s, %s", m, s);
-        }
+        tmpstr = hours >= 4 || minutes == 0 ? hstr : fmt::format(FMT_STRING("{:s}, {:s}"), hstr, mstr);
+    }
+    else if (minutes > 0)
+    {
+        tmpstr = minutes >= 4 || seconds == 0 ? mstr : fmt::format(FMT_STRING("{:s}, {:s}"), mstr, sstr);
     }
     else
     {
-        tr_strlcpy(b, s, sizeof(b));
+        tmpstr = sstr;
     }
 
-    tr_snprintf(buf, buflen, "%s (%s)", b, t);
-    return buf;
+    auto const totstr = fmt::format(FMT_STRING("{:d} {:s}"), total_seconds, ngettext("seconds", "seconds", total_seconds));
+    return fmt::format(FMT_STRING("{:s} ({:s})"), tmpstr, totstr);
 }
 
 static std::string strlpercent(double x)
@@ -826,99 +799,70 @@ static long getTimeoutSecs(std::string_view req)
     return 60L; /* default value */
 }
 
-static char* getStatusString(tr_variant* t, char* buf, size_t buflen)
+static std::string getStatusString(tr_variant* t)
 {
-    int64_t status;
-    bool boolVal;
+    auto from_us = int64_t{};
+    auto status = int64_t{};
+    auto to_us = int64_t{};
 
     if (!tr_variantDictFindInt(t, TR_KEY_status, &status))
     {
-        *buf = '\0';
+        return "";
     }
-    else
+
+    switch (status)
     {
-        switch (status)
+    case TR_STATUS_DOWNLOAD_WAIT:
+    case TR_STATUS_SEED_WAIT:
+        return "Queued";
+
+    case TR_STATUS_STOPPED:
+        if (auto flag = bool{}; tr_variantDictFindBool(t, TR_KEY_isFinished, &flag) && flag)
         {
-        case TR_STATUS_DOWNLOAD_WAIT:
-        case TR_STATUS_SEED_WAIT:
-            tr_strlcpy(buf, "Queued", buflen);
-            break;
-
-        case TR_STATUS_STOPPED:
-            if (tr_variantDictFindBool(t, TR_KEY_isFinished, &boolVal) && boolVal)
-            {
-                tr_strlcpy(buf, "Finished", buflen);
-            }
-            else
-            {
-                tr_strlcpy(buf, "Stopped", buflen);
-            }
-
-            break;
-
-        case TR_STATUS_CHECK_WAIT:
-        case TR_STATUS_CHECK:
-            {
-                char const* str = status == TR_STATUS_CHECK_WAIT ? "Will Verify" : "Verifying";
-                double percent;
-
-                if (tr_variantDictFindReal(t, TR_KEY_recheckProgress, &percent))
-                {
-                    tr_snprintf(buf, buflen, "%s (%.0f%%)", str, floor(percent * 100.0));
-                }
-                else
-                {
-                    tr_strlcpy(buf, str, buflen);
-                }
-
-                break;
-            }
-
-        case TR_STATUS_DOWNLOAD:
-        case TR_STATUS_SEED:
-            {
-                int64_t fromUs = 0;
-                int64_t toUs = 0;
-                tr_variantDictFindInt(t, TR_KEY_peersGettingFromUs, &fromUs);
-                tr_variantDictFindInt(t, TR_KEY_peersSendingToUs, &toUs);
-
-                if (fromUs != 0 && toUs != 0)
-                {
-                    tr_strlcpy(buf, "Up & Down", buflen);
-                }
-                else if (toUs != 0)
-                {
-                    tr_strlcpy(buf, "Downloading", buflen);
-                }
-                else if (fromUs != 0)
-                {
-                    int64_t leftUntilDone = 0;
-                    tr_variantDictFindInt(t, TR_KEY_leftUntilDone, &leftUntilDone);
-
-                    if (leftUntilDone > 0)
-                    {
-                        tr_strlcpy(buf, "Uploading", buflen);
-                    }
-                    else
-                    {
-                        tr_strlcpy(buf, "Seeding", buflen);
-                    }
-                }
-                else
-                {
-                    tr_strlcpy(buf, "Idle", buflen);
-                }
-
-                break;
-            }
-
-        default:
-            tr_strlcpy(buf, "Unknown", buflen);
-            break;
+            return "Finished";
         }
-    }
+        return "Stopped";
 
-    return buf;
+    case TR_STATUS_CHECK_WAIT:
+        if (auto percent = double{}; tr_variantDictFindReal(t, TR_KEY_recheckProgress, &percent))
+        {
+            return fmt::format(FMT_STRING("Will Verify ({:.0f}%)"), floor(percent * 100.0));
+        }
+        return "Will Verify";
+
+    case TR_STATUS_CHECK:
+        if (auto percent = double{}; tr_variantDictFindReal(t, TR_KEY_recheckProgress, &percent))
+        {
+            return fmt::format(FMT_STRING("Verifying ({:.0f}%)"), floor(percent * 100.0));
+        }
+        return "Verifying";
+
+    case TR_STATUS_DOWNLOAD:
+    case TR_STATUS_SEED:
+        tr_variantDictFindInt(t, TR_KEY_peersGettingFromUs, &from_us);
+        tr_variantDictFindInt(t, TR_KEY_peersSendingToUs, &to_us);
+        if (from_us != 0 && to_us != 0)
+        {
+            return "Up & Down";
+        }
+        if (to_us != 0)
+        {
+            return "Downloading";
+        }
+        if (from_us == 0)
+        {
+            return "Idle";
+        }
+        if (auto left_until_done = int64_t{};
+            tr_variantDictFindInt(t, TR_KEY_leftUntilDone, &left_until_done) && left_until_done > 0)
+        {
+            return "Uploading";
+        }
+        return "Seeding";
+
+    default:
+        return "Unknown";
+    }
 }
 
 static char const* bandwidthPriorityNames[] = {
@@ -1002,8 +946,7 @@ static void printDetails(tr_variant* top)
             printf("\n");
 
             printf("TRANSFER\n");
-            getStatusString(t, buf, sizeof(buf));
-            printf("  State: %s\n", buf);
+            printf("  State: %s\n", getStatusString(t).c_str());
 
             if (tr_variantDictFindStrView(t, TR_KEY_downloadDir, &sv))
             {
@@ -1017,7 +960,7 @@ static void printDetails(tr_variant* top)
 
             if (tr_variantDictFindInt(t, TR_KEY_eta, &i))
             {
-                printf("  ETA: %s\n", tr_strltime(buf, i, sizeof(buf)));
+                printf("  ETA: %s\n", tr_strltime(i).c_str());
             }
 
             if (tr_variantDictFindInt(t, TR_KEY_rateDownload, &i))
@@ -1144,12 +1087,12 @@ static void printDetails(tr_variant* top)
 
             if (tr_variantDictFindInt(t, TR_KEY_secondsDownloading, &i) && i > 0)
             {
-                printf("  Downloading Time: %s\n", tr_strltime(buf, i, sizeof(buf)));
+                printf("  Downloading Time: %s\n", tr_strltime(i).c_str());
             }
 
             if (tr_variantDictFindInt(t, TR_KEY_secondsSeeding, &i) && i > 0)
             {
-                printf("  Seeding Time:     %s\n", tr_strltime(buf, i, sizeof(buf)));
+                printf("  Seeding Time:     %s\n", tr_strltime(i).c_str());
             }
 
             printf("\n");
@@ -1508,50 +1451,25 @@ static void printTorrentList(tr_variant* top)
                 tr_variantDictFindInt(d, TR_KEY_sizeWhenDone, &sizeWhenDone) &&
                 tr_variantDictFindInt(d, TR_KEY_status, &status) && tr_variantDictFindReal(d, TR_KEY_uploadRatio, &ratio))
             {
-                char etaStr[16];
-                char statusStr[64];
-                char doneStr[8];
                 int64_t error;
-                char errorMark;
 
-                if (sizeWhenDone != 0)
-                {
-                    tr_snprintf(doneStr, sizeof(doneStr), "%d%%", (int)(100.0 * (sizeWhenDone - leftUntilDone) / sizeWhenDone));
-                }
-                else
-                {
-                    tr_strlcpy(doneStr, "n/a", sizeof(doneStr));
-                }
-
-                if (leftUntilDone != 0 || eta != -1)
-                {
-                    etaToString(etaStr, sizeof(etaStr), eta);
-                }
-                else
-                {
-                    tr_snprintf(etaStr, sizeof(etaStr), "Done");
-                }
-
-                if (tr_variantDictFindInt(d, TR_KEY_error, &error) && error)
-                {
-                    errorMark = '*';
-                }
-                else
-                {
-                    errorMark = ' ';
-                }
+                auto const eta_str = leftUntilDone != 0 || eta != -1 ? etaToString(eta) : "Done";
+                auto const error_mark = tr_variantDictFindInt(d, TR_KEY_error, &error) && error ? '*' : ' ';
+                auto const done_str = sizeWhenDone != 0 ?
+                    fmt::format(FMT_STRING("{:.0f}%"), (100.0 * (sizeWhenDone - leftUntilDone) / sizeWhenDone)) :
+                    std::string{ "n/a" };
 
                 printf(
                     "%6d%c  %4s  %9s  %-8s  %6.1f  %6.1f  %5s  %-11s  %" TR_PRIsv "\n",
                     (int)torId,
-                    errorMark,
-                    doneStr,
+                    error_mark,
+                    done_str.c_str(),
                     strlsize(sizeWhenDone - leftUntilDone).c_str(),
-                    etaStr,
+                    eta_str.c_str(),
                     up / (double)tr_speed_K,
                     down / (double)tr_speed_K,
                     strlratio2(ratio).c_str(),
-                    getStatusString(d, statusStr, sizeof(statusStr)),
+                    getStatusString(d).c_str(),
                     TR_PRIsv_ARG(name));
 
                 total_up += up;
@@ -1570,8 +1488,6 @@ static void printTorrentList(tr_variant* top)
 
 static void printTrackersImpl(tr_variant* trackerStats)
 {
-    char buf[512];
-
     for (size_t i = 0, n = tr_variantListSize(trackerStats); i < n; ++i)
     {
         tr_variant* const t = tr_variantListChild(trackerStats, i);
@@ -1641,11 +1557,11 @@ static void printTrackersImpl(tr_variant* trackerStats)
             {
                 if (hasAnnounced && announceState != TR_TRACKER_INACTIVE)
                 {
-                    tr_strltime(buf, now - lastAnnounceTime, sizeof(buf));
+                    auto const timestr = tr_strltime(now - lastAnnounceTime);
 
                     if (lastAnnounceSucceeded)
                     {
-                        printf("  Got a list of %d peers %s ago\n", (int)lastAnnouncePeerCount, buf);
+                        printf("  Got a list of %d peers %s ago\n", (int)lastAnnouncePeerCount, timestr.c_str());
                     }
                     else if (lastAnnounceTimedOut)
                     {
@@ -1653,7 +1569,7 @@ static void printTrackersImpl(tr_variant* trackerStats)
                     }
                     else
                     {
-                        printf("  Got an error \"%" TR_PRIsv "\" %s ago\n", TR_PRIsv_ARG(lastAnnounceResult), buf);
+                        printf("  Got an error \"%" TR_PRIsv "\" %s ago\n", TR_PRIsv_ARG(lastAnnounceResult), timestr.c_str());
                     }
                 }
 
@@ -1664,8 +1580,7 @@ static void printTrackersImpl(tr_variant* trackerStats)
                     break;
 
                 case TR_TRACKER_WAITING:
-                    tr_strltime(buf, nextAnnounceTime - now, sizeof(buf));
-                    printf("  Asking for more peers in %s\n", buf);
+                    printf("  Asking for more peers in %s\n", tr_strltime(nextAnnounceTime - now).c_str());
                     break;
 
                 case TR_TRACKER_QUEUED:
@@ -1673,18 +1588,21 @@ static void printTrackersImpl(tr_variant* trackerStats)
                     break;
 
                 case TR_TRACKER_ACTIVE:
-                    tr_strltime(buf, now - lastAnnounceStartTime, sizeof(buf));
-                    printf("  Asking for more peers now... %s\n", buf);
+                    printf("  Asking for more peers now... %s\n", tr_strltime(now - lastAnnounceStartTime).c_str());
                     break;
                 }
 
                 if (hasScraped)
                 {
-                    tr_strltime(buf, now - lastScrapeTime, sizeof(buf));
+                    auto const timestr = tr_strltime(now - lastScrapeTime);
 
                     if (lastScrapeSucceeded)
                     {
-                        printf("  Tracker had %d seeders and %d leechers %s ago\n", (int)seederCount, (int)leecherCount, buf);
+                        printf(
+                            "  Tracker had %d seeders and %d leechers %s ago\n",
+                            (int)seederCount,
+                            (int)leecherCount,
+                            timestr.c_str());
                     }
                     else if (lastScrapeTimedOut)
                     {
@@ -1692,7 +1610,10 @@ static void printTrackersImpl(tr_variant* trackerStats)
                     }
                     else
                     {
-                        printf("  Got a scrape error \"%" TR_PRIsv "\" %s ago\n", TR_PRIsv_ARG(lastScrapeResult), buf);
+                        printf(
+                            "  Got a scrape error \"%" TR_PRIsv "\" %s ago\n",
+                            TR_PRIsv_ARG(lastScrapeResult),
+                            timestr.c_str());
                     }
                 }
 
@@ -1702,8 +1623,7 @@ static void printTrackersImpl(tr_variant* trackerStats)
                     break;
 
                 case TR_TRACKER_WAITING:
-                    tr_strltime(buf, nextScrapeTime - now, sizeof(buf));
-                    printf("  Asking for peer counts in %s\n", buf);
+                    printf("  Asking for peer counts in %s\n", tr_strltime(nextScrapeTime - now).c_str());
                     break;
 
                 case TR_TRACKER_QUEUED:
@@ -1711,8 +1631,7 @@ static void printTrackersImpl(tr_variant* trackerStats)
                     break;
 
                 case TR_TRACKER_ACTIVE:
-                    tr_strltime(buf, now - lastScrapeStartTime, sizeof(buf));
-                    printf("  Asking for peer counts now... %s\n", buf);
+                    printf("  Asking for peer counts now... %s\n", tr_strltime(now - lastScrapeStartTime).c_str());
                     break;
                 }
             }
@@ -1982,7 +1901,6 @@ static void printSessionStats(tr_variant* top)
 
     if (tr_variantDictFindDict(top, TR_KEY_arguments, &args))
     {
-        char buf[512];
         int64_t up;
         int64_t down;
         int64_t secs;
@@ -1995,7 +1913,7 @@ static void printSessionStats(tr_variant* top)
             printf("  Uploaded:   %s\n", strlsize(up).c_str());
             printf("  Downloaded: %s\n", strlsize(down).c_str());
             printf("  Ratio:      %s\n", strlratio(up, down).c_str());
-            printf("  Duration:   %s\n", tr_strltime(buf, secs, sizeof(buf)));
+            printf("  Duration:   %s\n", tr_strltime(secs).c_str());
         }
 
         if (tr_variantDictFindDict(args, TR_KEY_cumulative_stats, &d) &&
@@ -2007,7 +1925,7 @@ static void printSessionStats(tr_variant* top)
             printf("  Uploaded:   %s\n", strlsize(up).c_str());
             printf("  Downloaded: %s\n", strlsize(down).c_str());
             printf("  Ratio:      %s\n", strlratio(up, down).c_str());
-            printf("  Duration:   %s\n", tr_strltime(buf, secs, sizeof(buf)));
+            printf("  Duration:   %s\n", tr_strltime(secs).c_str());
         }
     }
 }
@@ -2132,7 +2050,8 @@ static int processResponse(char const* rpcurl, std::string_view response)
                         if (tr_variantDictFindDict(&top, Arguments, &b) &&
                             tr_variantDictFindDict(b, TR_KEY_torrent_added, &b) && tr_variantDictFindInt(b, TR_KEY_id, &i))
                         {
-                            tr_snprintf(id, sizeof(id), "%" PRId64, i);
+                            auto const [out, len] = fmt::format_to_n(id, sizeof(id) - 1, FMT_STRING("{:d}"), i);
+                            *out = '\0';
                         }
                         [[fallthrough]];
                     }
@@ -2925,22 +2844,19 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
                 }
 
             case 's': /* start */
+                if (tadd != nullptr)
                 {
-                    if (tadd != nullptr)
-                    {
-                        tr_variantDictAddBool(tr_variantDictFind(tadd, TR_KEY_arguments), TR_KEY_paused, false);
-                    }
-                    else
-                    {
-                        auto* top = tr_new0(tr_variant, 1);
-                        tr_variantInitDict(top, 2);
-                        tr_variantDictAddStrView(top, TR_KEY_method, "torrent-start"sv);
-                        addIdArg(tr_variantDictAddDict(top, Arguments, 1), id, nullptr);
-                        status |= flush(rpcurl, &top);
-                    }
-
-                    break;
+                    tr_variantDictAddBool(tr_variantDictFind(tadd, TR_KEY_arguments), TR_KEY_paused, false);
                 }
+                else
+                {
+                    auto* top = tr_new0(tr_variant, 1);
+                    tr_variantInitDict(top, 2);
+                    tr_variantDictAddStrView(top, TR_KEY_method, "torrent-start"sv);
+                    addIdArg(tr_variantDictAddDict(top, Arguments, 1), id, nullptr);
+                    status |= flush(rpcurl, &top);
+                }
+                break;
 
             case 'S': /* stop */
                 if (tadd != nullptr)

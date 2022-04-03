@@ -61,6 +61,7 @@ If you're new to building programs from source code, this is typically easier th
 
     $ cd Transmission/build
     $ make clean
+    $ git submodule foreach --recursive git clean -xfd
     $ git pull --rebase --prune
     $ git submodule update --recursive
     $ # Use -DCMAKE_BUILD_TYPE=RelWithDebInfo to build optimized binary.

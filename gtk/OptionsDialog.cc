@@ -413,7 +413,7 @@ void TorrentFileChooserDialog::onOpenDialogResponse(int response, Glib::RefPtr<S
 
     if (response == Gtk::RESPONSE_ACCEPT)
     {
-        auto* tb = static_cast<Gtk::CheckButton*>(get_extra_widget());
+        auto const* const tb = static_cast<Gtk::CheckButton*>(get_extra_widget());
         bool const do_start = gtr_pref_flag_get(TR_KEY_start_added_torrents);
         bool const do_prompt = tb->get_active();
         bool const do_notify = false;
