@@ -16,6 +16,7 @@
 
 #include <event2/buffer.h>
 
+#include <fmt/compile.h>
 #include <fmt/format.h>
 
 #define LIBTRANSMISSION_VARIANT_MODULE
@@ -162,7 +163,7 @@ static bool decode_hex_string(char const* in, unsigned int* setme)
     return true;
 }
 
-static std::string_view extract_escaped_string(char const* in, size_t in_len, struct evbuffer* buf)
+static std::string_view extract_escaped_string(char const* in, size_t in_len, evbuffer* buf)
 {
     char const* const in_end = in + in_len;
 
@@ -259,7 +260,7 @@ static std::string_view extract_escaped_string(char const* in, size_t in_len, st
     return { (char const*)evbuffer_pullup(buf, -1), evbuffer_get_length(buf) };
 }
 
-static std::pair<std::string_view, bool> extract_string(jsonsl_t jsn, struct jsonsl_state_st* state, struct evbuffer* buf)
+static std::pair<std::string_view, bool> extract_string(jsonsl_t jsn, struct jsonsl_state_st* state, evbuffer* buf)
 {
     // figure out where the string is
     char const* in_begin = jsn->base + state->pos_begin;
@@ -405,7 +406,7 @@ struct jsonWalk
 {
     bool doIndent;
     std::deque<ParentState> parents;
-    struct evbuffer* out;
+    evbuffer* out;
 };
 
 static void jsonIndent(struct jsonWalk* data)
@@ -483,8 +484,10 @@ static void jsonPopParent(struct jsonWalk* data)
 
 static void jsonIntFunc(tr_variant const* val, void* vdata)
 {
-    auto* data = static_cast<struct jsonWalk*>(vdata);
-    evbuffer_add_printf(data->out, "%" PRId64, val->val.i);
+    auto buf = std::array<char, 64>{};
+    auto const out = fmt::format_to(std::data(buf), FMT_COMPILE("{:d}"), val->val.i);
+    auto* const data = static_cast<jsonWalk*>(vdata);
+    evbuffer_add(data->out, std::data(buf), static_cast<size_t>(out - std::data(buf)));
     jsonChildFunc(data);
 }
 
@@ -510,11 +513,15 @@ static void jsonRealFunc(tr_variant const* val, void* vdata)
 
     if (fabs(val->val.d - (int)val->val.d) < 0.00001)
     {
-        evbuffer_add_printf(data->out, "%d", (int)val->val.d);
+        auto buf = std::array<char, 64>{};
+        auto const out = fmt::format_to(std::data(buf), FMT_COMPILE("{:.0f}"), val->val.d);
+        evbuffer_add(data->out, std::data(buf), static_cast<size_t>(out - std::data(buf)));
     }
     else
     {
-        evbuffer_add_printf(data->out, "%.4f", tr_truncd(val->val.d, 4));
+        auto buf = std::array<char, 64>{};
+        auto const out = fmt::format_to(std::data(buf), FMT_COMPILE("{:.4f}"), val->val.d);
+        evbuffer_add(data->out, std::data(buf), static_cast<size_t>(out - std::data(buf)));
     }
 
     jsonChildFunc(data);
@@ -522,7 +529,7 @@ static void jsonRealFunc(tr_variant const* val, void* vdata)
 
 static void jsonStringFunc(tr_variant const* val, void* vdata)
 {
-    struct evbuffer_iovec vec[1];
+    evbuffer_iovec vec[1];
     auto* data = static_cast<struct jsonWalk*>(vdata);
 
     auto sv = std::string_view{};
@@ -587,7 +594,7 @@ static void jsonStringFunc(tr_variant const* val, void* vdata)
                     auto const* const end8 = begin8 + std::size(sv);
                     auto const* walk8 = begin8;
                     auto const uch32 = utf8::next(walk8, end8);
-                    outwalk = fmt::format_to_n(outwalk, outend - outwalk - 1, FMT_STRING("\\u{:04x}"), uch32).out;
+                    outwalk = fmt::format_to_n(outwalk, outend - outwalk - 1, FMT_COMPILE("\\u{:04x}"), uch32).out;
                     sv.remove_prefix(walk8 - begin8 - 1);
                 }
                 catch (utf8::exception const&)
@@ -663,7 +670,7 @@ static struct VariantWalkFuncs const walk_funcs = {
     jsonContainerEndFunc, //
 };
 
-void tr_variantToBufJson(tr_variant const* top, struct evbuffer* buf, bool lean)
+void tr_variantToBufJson(tr_variant const* top, evbuffer* buf, bool lean)
 {
     struct jsonWalk data;
 

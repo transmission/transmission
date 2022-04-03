@@ -12,6 +12,7 @@
 
 #include <event2/buffer.h>
 
+#include <fmt/compile.h>
 #include <fmt/format.h>
 
 #define LIBTRANSMISSION_VARIANT_MODULE
@@ -258,13 +259,15 @@ bool tr_variantParseBenc(tr_variant& top, int parse_opts, std::string_view benc,
 
 static void saveIntFunc(tr_variant const* val, void* vevbuf)
 {
-    auto* evbuf = static_cast<struct evbuffer*>(vevbuf);
-    evbuffer_add_printf(evbuf, "i%" PRId64 "e", val->val.i);
+    auto buf = std::array<char, 64>{};
+    auto const out = fmt::format_to(std::data(buf), FMT_COMPILE("i{:d}e"), val->val.i);
+    auto* const evbuf = static_cast<evbuffer*>(vevbuf);
+    evbuffer_add(evbuf, std::data(buf), static_cast<size_t>(out - std::data(buf)));
 }
 
 static void saveBoolFunc(tr_variant const* val, void* vevbuf)
 {
-    auto* evbuf = static_cast<struct evbuffer*>(vevbuf);
+    auto* const evbuf = static_cast<evbuffer*>(vevbuf);
     if (val->val.b)
     {
         evbuffer_add(evbuf, "i1e", 3);
@@ -279,7 +282,7 @@ static void saveStringImpl(evbuffer* evbuf, std::string_view sv)
 {
     // `${sv.size()}:${sv}`
     auto prefix = std::array<char, 32>{};
-    auto out = fmt::format_to(std::data(prefix), FMT_STRING("{:d}:"), std::size(sv));
+    auto out = fmt::format_to(std::data(prefix), FMT_COMPILE("{:d}:"), std::size(sv));
     evbuffer_add(evbuf, std::data(prefix), out - std::data(prefix));
     evbuffer_add(evbuf, std::data(sv), std::size(sv));
 }
@@ -288,7 +291,7 @@ static void saveStringFunc(tr_variant const* v, void* vevbuf)
 {
     auto sv = std::string_view{};
     (void)!tr_variantGetStrView(v, &sv);
-    auto* const evbuf = static_cast<struct evbuffer*>(vevbuf);
+    auto* const evbuf = static_cast<evbuffer*>(vevbuf);
     saveStringImpl(evbuf, sv);
 }
 
@@ -297,26 +300,26 @@ static void saveRealFunc(tr_variant const* val, void* vevbuf)
     // the benc spec doesn't handle floats; save it as a string.
 
     auto buf = std::array<char, 64>{};
-    auto out = fmt::format_to(std::data(buf), FMT_STRING("{:f}"), val->val.d);
+    auto out = fmt::format_to(std::data(buf), FMT_COMPILE("{:f}"), val->val.d);
     auto* const evbuf = static_cast<evbuffer*>(vevbuf);
     saveStringImpl(evbuf, { std::data(buf), static_cast<size_t>(out - std::data(buf)) });
 }
 
 static void saveDictBeginFunc(tr_variant const* /*val*/, void* vevbuf)
 {
-    auto* const evbuf = static_cast<struct evbuffer*>(vevbuf);
+    auto* const evbuf = static_cast<evbuffer*>(vevbuf);
     evbuffer_add(evbuf, "d", 1);
 }
 
 static void saveListBeginFunc(tr_variant const* /*val*/, void* vevbuf)
 {
-    auto* const evbuf = static_cast<struct evbuffer*>(vevbuf);
+    auto* const evbuf = static_cast<evbuffer*>(vevbuf);
     evbuffer_add(evbuf, "l", 1);
 }
 
 static void saveContainerEndFunc(tr_variant const* /*val*/, void* vevbuf)
 {
-    auto* const evbuf = static_cast<struct evbuffer*>(vevbuf);
+    auto* const evbuf = static_cast<evbuffer*>(vevbuf);
     evbuffer_add(evbuf, "e", 1);
 }
 
@@ -330,7 +333,7 @@ static struct VariantWalkFuncs const walk_funcs = {
     saveContainerEndFunc, //
 };
 
-void tr_variantToBufBenc(tr_variant const* top, struct evbuffer* buf)
+void tr_variantToBufBenc(tr_variant const* top, evbuffer* buf)
 {
     tr_variantWalk(top, &walk_funcs, buf, true);
 }
