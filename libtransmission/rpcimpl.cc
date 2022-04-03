@@ -1405,7 +1405,8 @@ static void onBlocklistFetched(tr_web::FetchResponse const& web_response)
         // we failed to download the blocklist...
         tr_idle_function_done(
             data,
-            fmt::format(_("Couldn't fetch blocklist: {error} ({error_code})"),
+            fmt::format(
+                _("Couldn't fetch blocklist: {error} ({error_code})"),
                 fmt::arg("error", tr_webGetResponseStr(status)),
                 fmt::arg("error_code", status)));
         return;
