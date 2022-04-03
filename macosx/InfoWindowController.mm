@@ -198,7 +198,7 @@ typedef NS_ENUM(unsigned int, tabTag) {
 - (void)setTab:(id)sender
 {
     NSInteger const oldTabTag = self.fCurrentTabTag;
-    self.fCurrentTabTag = self.fTabs.selectedTag;
+    self.fCurrentTabTag = self.fTabs.selectedSegment;
     if (self.fCurrentTabTag == oldTabTag)
     {
         return;
