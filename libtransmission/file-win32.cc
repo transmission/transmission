@@ -60,9 +60,7 @@ static void set_system_error(tr_error** error, DWORD code)
     }
     else
     {
-        auto buf = std::array<char, 32>{};
-        tr_snprintf(std::data(buf), std::size(buf), "Unknown error: 0x%08lx", code);
-        tr_error_set(error, code, std::data(buf));
+        tr_error_set(error, code, fmt::format("Unknown error: {:#08x}", code);
     }
 }
 
