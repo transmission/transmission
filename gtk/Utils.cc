@@ -7,7 +7,6 @@
 #include <ctype.h> /* isxdigit() */
 #include <errno.h>
 #include <limits.h> /* INT_MAX */
-#include <stdarg.h>
 
 #include <giomm.h> /* g_file_trash() */
 #include <glibmm/i18n.h>
