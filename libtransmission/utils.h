@@ -264,9 +264,6 @@ std::string evbuffer_free_to_str(evbuffer* buf);
 /** @brief Portability wrapper for strlcpy() that uses the system implementation if available */
 size_t tr_strlcpy(void* dst, void const* src, size_t siz);
 
-/** @brief Portability wrapper for snprintf() that uses the system implementation if available */
-int tr_snprintf(void* buf, size_t buflen, char const* fmt, ...) TR_GNUC_PRINTF(3, 4) TR_GNUC_NONNULL(1, 3);
-
 /** @brief Convenience wrapper around strerorr() guaranteed to not return nullptr
     @param errnum the error number to describe */
 char const* tr_strerror(int errnum);

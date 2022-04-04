@@ -549,16 +549,6 @@ void tr_wait_msec(long int msec)
 ****
 ***/
 
-int tr_snprintf(void* buf, size_t buflen, char const* fmt, ...)
-{
-    va_list args;
-
-    va_start(args, fmt);
-    int len = evutil_vsnprintf(static_cast<char*>(buf), buflen, fmt, args);
-    va_end(args);
-    return len;
-}
-
 /*
  * Copy src to string dst of size siz. At most siz-1 characters
  * will be copied. Always NUL terminates (unless siz == 0).
@@ -1255,7 +1245,7 @@ static char* formatter_get_size_str(formatter_units const& u, char* buf, uint64_
         precision = 1;
     }
 
-    auto const [out, len] = fmt::format_to_n(buf, buflen - 1, "{:{}f} {:s}", value, precision, units);
+    auto const [out, len] = fmt::format_to_n(buf, buflen - 1, "{:.{}f} {:s}", value, precision, units);
     *out = '\0';
     return buf;
 }
