@@ -307,18 +307,18 @@ char const* tr_getWebClientDir([[maybe_unused]] tr_session const* session)
     {
         auto app_url = CFBundleCopyBundleURL(CFBundleGetMainBundle());
         auto app_ref = CFURLCopyFileSystemPath(app_url, kCFURLPOSIXPathStyle);
-        auto const buflen = CFStringGetMaximumSizeOfFileSystemRepresentation(appRef);
+        auto const buflen = CFStringGetMaximumSizeOfFileSystemRepresentation(app_ref);
         auto buf = std::vector<char>(buflen, '\0');
         bool const success = CFStringGetFileSystemRepresentation(app_ref, std::data(buf), std::size(buf));
         TR_ASSERT(success);
         CFRelease(app_url);
         CFRelease(app_ref);
 
-        if (auto const path = tr_pathbuf{
-            std::string_view{ std::data(buf), "/Contents/Resources/public_html"sv }; isWebClientDir(path))
-            {
-                s = tr_strvDup(path);
-            }
+        if (auto const path = tr_pathbuf{ std::string_view{ std::data(buf) }, "/Contents/Resources/public_html"sv };
+            isWebClientDir(path))
+        {
+            s = tr_strvDup(path);
+        }
     }
 
 #elif defined(_WIN32)
@@ -413,13 +413,13 @@ char const* tr_getWebClientDir([[maybe_unused]] tr_session const* session)
 #endif
 
     return s;
-    }
+}
 
-    std::string tr_getSessionIdDir()
-    {
+std::string tr_getSessionIdDir()
+{
 #ifndef _WIN32
 
-        return std::string{ "/tmp"sv };
+    return std::string{ "/tmp"sv };
 
 #else
 
@@ -430,4 +430,4 @@ char const* tr_getWebClientDir([[maybe_unused]] tr_session const* session)
     return result;
 
 #endif
-    }
+}
