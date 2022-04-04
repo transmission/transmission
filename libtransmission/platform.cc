@@ -4,7 +4,6 @@
 // License text can be found in the licenses/ folder.
 
 #include <algorithm>
-#include <cstdarg>
 #include <cstring>
 #include <list>
 #include <string>
@@ -44,51 +43,6 @@
 #include "utils.h"
 
 using namespace std::literals;
-
-// TODO: use remove this and use tr_strvPath() instead
-static char* tr_buildPath(char const* first_element, ...)
-{
-    // pass 1: allocate enough space for the string
-    va_list vl;
-    va_start(vl, first_element);
-    auto bufLen = size_t{};
-    for (char const* element = first_element; element != nullptr;)
-    {
-        bufLen += strlen(element) + 1;
-        element = va_arg(vl, char const*);
-    }
-    va_end(vl);
-    auto* const buf = tr_new(char, bufLen);
-    if (buf == nullptr)
-    {
-        return nullptr;
-    }
-
-    /* pass 2: build the string piece by piece */
-    char* pch = buf;
-    va_start(vl, first_element);
-    for (char const* element = first_element; element != nullptr;)
-    {
-        size_t const elementLen = strlen(element);
-        pch = std::copy_n(element, elementLen, pch);
-        *pch++ = TR_PATH_DELIMITER;
-        element = va_arg(vl, char const*);
-    }
-    va_end(vl);
-
-    // if nonempty, eat the unwanted trailing slash
-    if (pch != buf)
-    {
-        --pch;
-    }
-
-    // zero-terminate the string
-    *pch++ = '\0';
-
-    /* sanity checks & return */
-    TR_ASSERT(pch - buf == (ptrdiff_t)bufLen);
-    return buf;
-}
 
 /***
 ****  PATHS
@@ -202,19 +156,19 @@ char const* tr_getDefaultConfigDir(char const* appname)
         {
 #ifdef __APPLE__
 
-            s = tr_buildPath(getHomeDir(), "Library", "Application Support", appname, nullptr);
+            s = tr_strvDup(tr_strvPath(getHomeDir(), "Library", "Application Support", appname));
 
 #elif defined(_WIN32)
 
             char* appdata = win32_get_known_folder(FOLDERID_LocalAppData);
-            s = tr_buildPath(appdata, appname, nullptr);
+            s = tr_strvDup(tr_strvPath(appdata, appname));
             tr_free(appdata);
 
 #elif defined(__HAIKU__)
 
             char buf[PATH_MAX];
             find_directory(B_USER_SETTINGS_DIRECTORY, -1, true, buf, sizeof(buf));
-            s = tr_buildPath(buf, appname, nullptr);
+            s = tr_strvDup(tr_strvPath(buf, appname));
 
 #else
 
@@ -222,12 +176,12 @@ char const* tr_getDefaultConfigDir(char const* appname)
 
             if (xdg_config_home != nullptr)
             {
-                s = tr_buildPath(xdg_config_home, appname, nullptr);
+                s = tr_strvDup(tr_strvPath(xdg_config_home, appname));
                 tr_free(xdg_config_home);
             }
             else
             {
-                s = tr_buildPath(getHomeDir(), ".config", appname, nullptr);
+                s = tr_strvDup(tr_strvPath(getHomeDir(), ".config", appname));
             }
 
 #endif
@@ -301,9 +255,9 @@ char const* tr_getDefaultDownloadDir()
         if (user_dir == nullptr)
         {
 #ifdef __HAIKU__
-            user_dir = tr_buildPath(getHomeDir(), "Desktop", nullptr);
+            user_dir = tr_strvDup(tr_strvPath(getHomeDir(), "Desktop"));
 #else
-            user_dir = tr_buildPath(getHomeDir(), "Downloads", nullptr);
+            user_dir = tr_strvDup(tr_strvPath(getHomeDir(), "Downloads"));
 #endif
         }
     }
@@ -341,7 +295,7 @@ char const* tr_getWebClientDir([[maybe_unused]] tr_session const* session)
 #ifdef BUILD_MAC_CLIENT /* on Mac, look in the Application Support folder first, then in the app bundle. */
 
             /* Look in the Application Support folder */
-            s = tr_buildPath(tr_sessionGetConfigDir(session), "public_html", nullptr);
+            s = tr_strvDup(tr_strvPath(session->config_dir, "public_html"));
 
             if (!isWebClientDir(s))
             {
@@ -359,7 +313,7 @@ char const* tr_getWebClientDir([[maybe_unused]] tr_session const* session)
                 CFRelease(appRef);
 
                 /* Fallback to the app bundle */
-                s = tr_buildPath(appString, "Contents", "Resources", "public_html", nullptr);
+                s = tr_strvDup(tr_strvPath(appString, "Contents", "Resources", "public_html"));
 
                 if (!isWebClientDir(s))
                 {
@@ -384,7 +338,7 @@ char const* tr_getWebClientDir([[maybe_unused]] tr_session const* session)
             for (size_t i = 0; s == nullptr && i < TR_N_ELEMENTS(known_folder_ids); ++i)
             {
                 char* dir = win32_get_known_folder(*known_folder_ids[i]);
-                char* path = tr_buildPath(dir, "Transmission", "Web", nullptr);
+                char* path = tr_strvDup(tr_strvPath(dir, "Transmission", "Web"));
                 tr_free(dir);
 
                 if (isWebClientDir(path))
@@ -407,7 +361,7 @@ char const* tr_getWebClientDir([[maybe_unused]] tr_session const* session)
 
                 if (!std::empty(dir))
                 {
-                    char* path = tr_buildPath(dir.c_str(), "Web", nullptr);
+                    char* path = tr_strvDup(tr_strvPath(dir, "Web"));
 
                     if (isWebClientDir(path))
                     {
