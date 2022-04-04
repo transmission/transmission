@@ -819,7 +819,7 @@ int dht_sendto(int sockfd, void const* buf, int len, int flags, struct sockaddr 
 
 #if defined(_WIN32) && !defined(__MINGW32__)
 
-extern "C" int dht_gettimeofday(struct timeval* tv, struct timezone* tz)
+extern "C" int dht_gettimeofday(struct timeval* tv, [[maybe_unused]] timezone* tz)
 {
     TR_ASSERT(tz == nullptr);
     *tv = tr_gettimeofday();

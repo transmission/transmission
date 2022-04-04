@@ -549,16 +549,6 @@ void tr_wait_msec(long int msec)
 ****
 ***/
 
-int tr_snprintf(void* buf, size_t buflen, char const* fmt, ...)
-{
-    va_list args;
-
-    va_start(args, fmt);
-    int len = evutil_vsnprintf(static_cast<char*>(buf), buflen, fmt, args);
-    va_end(args);
-    return len;
-}
-
 /*
  * Copy src to string dst of size siz. At most siz-1 characters
  * will be copied. Always NUL terminates (unless siz == 0).
@@ -1023,42 +1013,31 @@ std::vector<int> tr_parseNumberRange(std::string_view str)
 
 double tr_truncd(double x, int precision)
 {
-    char buf[128];
-    tr_snprintf(buf, sizeof(buf), "%.*f", TR_ARG_TUPLE(DBL_DIG, x));
+    auto buf = std::array<char, 128>{};
+    auto const [out, len] = fmt::format_to_n(std::data(buf), std::size(buf) - 1, "{:.{}f}", x, DBL_DIG);
+    *out = '\0';
 
-    if (auto* const pt = strstr(buf, localeconv()->decimal_point); pt != nullptr)
+    if (auto* const pt = strstr(std::data(buf), localeconv()->decimal_point); pt != nullptr)
     {
         pt[precision != 0 ? precision + 1 : 0] = '\0';
     }
 
-    return atof(buf);
-}
-
-/* return a truncated double as a string */
-static char* tr_strtruncd(char* buf, double x, int precision, size_t buflen)
-{
-    tr_snprintf(buf, buflen, "%.*f", precision, tr_truncd(x, precision));
-    return buf;
+    return atof(std::data(buf));
 }
 
 std::string tr_strpercent(double x)
 {
-    auto buf = std::array<char, 64>{};
-
     if (x < 5.0)
     {
-        tr_strtruncd(std::data(buf), x, 2, std::size(buf));
-    }
-    else if (x < 100.0)
-    {
-        tr_strtruncd(std::data(buf), x, 1, std::size(buf));
-    }
-    else
-    {
-        tr_strtruncd(std::data(buf), x, 0, std::size(buf));
+        return fmt::format("{:.2f}", tr_truncd(x, 2));
     }
 
-    return std::data(buf);
+    if (x < 100.0)
+    {
+        return fmt::format("{:.1f}", tr_truncd(x, 1));
+    }
+
+    return fmt::format("{:.0f}", x);
 }
 
 std::string tr_strratio(double ratio, char const* infinity)
@@ -1266,7 +1245,8 @@ static char* formatter_get_size_str(formatter_units const& u, char* buf, uint64_
         precision = 1;
     }
 
-    tr_snprintf(buf, buflen, "%.*f %s", TR_ARG_TUPLE(precision, value), units);
+    auto const [out, len] = fmt::format_to_n(buf, buflen - 1, "{:.{}f} {:s}", value, precision, units);
+    *out = '\0';
     return buf;
 }
 
@@ -1295,33 +1275,27 @@ void tr_formatter_speed_init(size_t kilo, char const* kb, char const* mb, char c
 
 std::string tr_formatter_speed_KBps(double KBps)
 {
-    auto buf = std::array<char, 64>{};
+    auto speed = KBps;
 
-    if (auto speed = KBps; speed <= 999.95) /* 0.0 KB to 999.9 KB */
+    if (speed <= 999.95) // 0.0 KB to 999.9 KB
     {
-        tr_snprintf(std::data(buf), std::size(buf), "%d %s", int(speed), std::data(speed_units[TR_FMT_KB].name));
-    }
-    else
-    {
-        double const K = speed_units[TR_FMT_KB].value;
-
-        speed /= K;
-
-        if (speed <= 99.995) /* 0.98 MB to 99.99 MB */
-        {
-            tr_snprintf(std::data(buf), std::size(buf), "%.2f %s", speed, std::data(speed_units[TR_FMT_MB].name));
-        }
-        else if (speed <= 999.95) /* 100.0 MB to 999.9 MB */
-        {
-            tr_snprintf(std::data(buf), std::size(buf), "%.1f %s", speed, std::data(speed_units[TR_FMT_MB].name));
-        }
-        else
-        {
-            tr_snprintf(std::data(buf), std::size(buf), "%.1f %s", speed / K, std::data(speed_units[TR_FMT_GB].name));
-        }
+        return fmt::format("{:d} {:s}", int(speed), std::data(speed_units[TR_FMT_KB].name));
     }
 
-    return std::data(buf);
+    double const K = speed_units[TR_FMT_KB].value;
+    speed /= K;
+
+    if (speed <= 99.995) // 0.98 MB to 99.99 MB
+    {
+        return fmt::format("{:.2f} {:s}", speed, std::data(speed_units[TR_FMT_MB].name));
+    }
+
+    if (speed <= 999.95) // 100.0 MB to 999.9 MB
+    {
+        return fmt::format("{:.1f} {:s}", speed, std::data(speed_units[TR_FMT_MB].name));
+    }
+
+    return fmt::format("{:.1f} {:s}", speed / K, std::data(speed_units[TR_FMT_GB].name));
 }
 
 static formatter_units mem_units;

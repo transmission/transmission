@@ -297,37 +297,20 @@ TEST_F(UtilsTest, array)
 
 TEST_F(UtilsTest, truncd)
 {
-    auto buf = std::array<char, 32>{};
-
-    tr_snprintf(buf.data(), buf.size(), "%.2f%%", 99.999);
-    EXPECT_STREQ("100.00%", buf.data());
-
-    tr_snprintf(buf.data(), buf.size(), "%.2f%%", tr_truncd(99.999, 2));
-    EXPECT_STREQ("99.99%", buf.data());
-
-    tr_snprintf(buf.data(), buf.size(), "%.4f", tr_truncd(403650.656250, 4));
-    EXPECT_STREQ("403650.6562", buf.data());
-
-    tr_snprintf(buf.data(), buf.size(), "%.2f", tr_truncd(2.15, 2));
-    EXPECT_STREQ("2.15", buf.data());
-
-    tr_snprintf(buf.data(), buf.size(), "%.2f", tr_truncd(2.05, 2));
-    EXPECT_STREQ("2.05", buf.data());
-
-    tr_snprintf(buf.data(), buf.size(), "%.2f", tr_truncd(3.3333, 2));
-    EXPECT_STREQ("3.33", buf.data());
-
-    tr_snprintf(buf.data(), buf.size(), "%.0f", tr_truncd(3.3333, 0));
-    EXPECT_STREQ("3", buf.data());
-
-    tr_snprintf(buf.data(), buf.size(), "%.0f", tr_truncd(3.9999, 0));
-    EXPECT_STREQ("3", buf.data());
+    EXPECT_EQ("100.00%"sv, fmt::format("{:.2f}%", 99.999));
+    EXPECT_EQ("99.99%"sv, fmt::format("{:.2f}%", tr_truncd(99.999, 2)));
+    EXPECT_EQ("403650.6562"sv, fmt::format("{:.4f}", tr_truncd(403650.656250, 4)));
+    EXPECT_EQ("2.15"sv, fmt::format("{:.2f}", tr_truncd(2.15, 2)));
+    EXPECT_EQ("2.05"sv, fmt::format("{:.2f}", tr_truncd(2.05, 2)));
+    EXPECT_EQ("3.33"sv, fmt::format("{:.2f}", tr_truncd(3.333333, 2)));
+    EXPECT_EQ("3"sv, fmt::format("{:.0f}", tr_truncd(3.333333, 0)));
+    EXPECT_EQ("3"sv, fmt::format("{:.0f}", tr_truncd(3.9999, 0)));
 
 #if !(defined(_MSC_VER) || (defined(__MINGW32__) && defined(__MSVCRT__)))
     /* FIXME: MSCVRT behaves differently in case of nan */
     auto const nan = sqrt(-1.0);
-    tr_snprintf(buf.data(), buf.size(), "%.2f", tr_truncd(nan, 2));
-    EXPECT_TRUE(strstr(buf.data(), "nan") != nullptr || strstr(buf.data(), "NaN") != nullptr);
+    auto const nanstr = fmt::format("{:.2f}", tr_truncd(nan, 2));
+    EXPECT_TRUE(strstr(nanstr.c_str(), "nan") != nullptr || strstr(nanstr.c_str(), "NaN") != nullptr);
 #endif
 }
 
