@@ -271,10 +271,10 @@ char const* tr_getDefaultDownloadDir()
 
 static bool isWebClientDir(std::string_view path)
 {
-    auto tmp = tr_strvPath(path, "index.html");
-    bool const ret = tr_sys_path_exists(tmp.c_str());
-    tr_logAddTrace(fmt::format("Searching for web interface file '{}'", tmp));
-    return ret;
+    auto const filename = tr_pathbuf{ path, '/', "index.html"sv };
+    bool const found = tr_sys_path_exists(filename);
+    tr_logAddTrace(fmt::format(FMT_STRING("Searching for web interface file '{:s}'"), filename));
+    return found;
 }
 
 char const* tr_getWebClientDir([[maybe_unused]] tr_session const* session)
@@ -313,12 +313,9 @@ char const* tr_getWebClientDir([[maybe_unused]] tr_session const* session)
                 CFRelease(appRef);
 
                 /* Fallback to the app bundle */
-                s = tr_strvDup(tr_strvPath(appString, "Contents", "Resources", "public_html"));
-
-                if (!isWebClientDir(s))
+                if (auto const path = tr_pathbuf{ appString, "/Contents/Resources/public_html"sv }; isWebClientDir(path))
                 {
-                    tr_free(const_cast<char*>(s));
-                    s = nullptr;
+                    s = tr_strvDup(path);
                 }
 
                 tr_free(appString);
@@ -338,16 +335,10 @@ char const* tr_getWebClientDir([[maybe_unused]] tr_session const* session)
             for (size_t i = 0; s == nullptr && i < TR_N_ELEMENTS(known_folder_ids); ++i)
             {
                 char* dir = win32_get_known_folder(*known_folder_ids[i]);
-                char* path = tr_strvDup(tr_strvPath(dir, "Transmission", "Web"));
-                tr_free(dir);
 
-                if (isWebClientDir(path))
+                if (auto const path = tr_pathbuf{ dir, "/Transmission/Web"sv }; isWebClientDir(path))
                 {
-                    s = path;
-                }
-                else
-                {
-                    tr_free(path);
+                    s = tr_strvDup(path);
                 }
             }
 
@@ -356,22 +347,16 @@ char const* tr_getWebClientDir([[maybe_unused]] tr_session const* session)
                 wchar_t wide_module_path[MAX_PATH];
                 GetModuleFileNameW(nullptr, wide_module_path, TR_N_ELEMENTS(wide_module_path));
                 char* module_path = tr_win32_native_to_utf8(wide_module_path, -1);
-                auto const dir = tr_sys_path_dirname(module_path);
-                tr_free(module_path);
 
-                if (!std::empty(dir))
+                if (auto const dir = tr_sys_path_dirname(module_path); !std::empty(dir))
                 {
-                    char* path = tr_strvDup(tr_strvPath(dir, "Web"));
-
-                    if (isWebClientDir(path))
+                    if (auto const path = tr_pathbuf{ dir, "/Web"sv }; isWebClientDir(path))
                     {
-                        s = path;
-                    }
-                    else
-                    {
-                        tr_free(path);
+                        s = tr_strvDup(path);
                     }
                 }
+
+                tr_free(module_path);
             }
 
 #else /* everyone else, follow the XDG spec */
@@ -412,8 +397,7 @@ char const* tr_getWebClientDir([[maybe_unused]] tr_session const* session)
             /* walk through the candidates & look for a match */
             for (auto const& dir : candidates)
             {
-                auto const path = tr_strvPath(dir, "transmission"sv, "public_html"sv);
-                if (isWebClientDir(path))
+                if (auto const path = tr_pathbuf{ dir, "/transmission/public_html"sv }; isWebClientDir(path))
                 {
                     s = tr_strvDup(path);
                     break;
