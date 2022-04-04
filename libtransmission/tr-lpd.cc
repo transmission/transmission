@@ -452,7 +452,7 @@ bool tr_lpdSendAnnounce(tr_torrent const* t)
             0,
             (struct sockaddr const*)&lpd_mcastAddr,
             sizeof(lpd_mcastAddr));
-        res != static_cast<ssize_t>(std::size(query)))
+        res != static_cast<int>(std::size(query)))
     {
         return false;
     }

@@ -60,7 +60,7 @@ static void set_system_error(tr_error** error, DWORD code)
     }
     else
     {
-        tr_error_set(error, code, fmt::format("Unknown error: {:#08x}", code);
+        tr_error_set(error, code, fmt::format(FMT_STRING("Unknown error: {:#08x}"), code));
     }
 }
 
