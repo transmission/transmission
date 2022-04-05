@@ -822,7 +822,7 @@ void DetailsDialog::Impl::refreshInfo(std::vector<tr_torrent*> const& torrents)
             std::begin(infos),
             std::end(infos),
             uint64_t{},
-            [](auto sum, auto const& info){ return sum + info.n_pieces; });
+            [](auto sum, auto const& info) { return sum + info.n_pieces; });
 
         if (piece_count == 0)
         {
@@ -834,19 +834,16 @@ void DetailsDialog::Impl::refreshInfo(std::vector<tr_torrent*> const& torrents)
                 std::begin(infos),
                 std::end(infos),
                 uint64_t{},
-                [](auto sum, auto const& info){ return sum + info.total_size; });
+                [](auto sum, auto const& info) { return sum + info.total_size; });
 
             auto const file_count = std::accumulate(
                 std::begin(torrents),
                 std::end(torrents),
                 std::size_t{},
-                [](auto sum, auto const* tor){ return sum + tr_torrentFileCount(tor); });
+                [](auto sum, auto const* tor) { return sum + tr_torrentFileCount(tor); });
 
             str = fmt::format(
-                ngettext(
-                    "{total_size} in {file_count:L} file",
-                    "{total_size} in {file_count:L} files",
-                    file_count),
+                ngettext("{total_size} in {file_count:L} file", "{total_size} in {file_count:L} files", file_count),
                 fmt::arg("total_size", tr_strlsize(total_size)),
                 fmt::arg("file_count", file_count));
 
@@ -854,7 +851,7 @@ void DetailsDialog::Impl::refreshInfo(std::vector<tr_torrent*> const& torrents)
             auto const piece_size_is_uniform = std::all_of(
                 std::begin(infos),
                 std::end(infos),
-                [piece_size](auto const& info){ return info.piece_size == piece_size; });
+                [piece_size](auto const& info) { return info.piece_size == piece_size; });
 
             if (piece_size_is_uniform)
             {

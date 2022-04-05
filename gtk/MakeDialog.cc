@@ -348,10 +348,7 @@ void MakeDialog::Impl::updatePiecesLabel()
     else
     {
         gstr += fmt::format(
-            ngettext(
-                "{total_size} in {file_count:L} file",
-                "{total_size} in {file_count:L} files",
-                builder_->fileCount),
+            ngettext("{total_size} in {file_count:L} file", "{total_size} in {file_count:L} files", builder_->fileCount),
             fmt::arg("total_size", tr_strlsize(builder_->totalSize)),
             fmt::arg("file_count", builder_->fileCount));
         gstr += ' ';
