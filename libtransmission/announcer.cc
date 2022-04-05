@@ -91,7 +91,7 @@ namespace
 
 struct StopsCompare
 {
-    [[nodiscard]] static constexpr int compare(tr_announce_request const* a, tr_announce_request const* b) noexcept // <=>
+    [[nodiscard]] static int compare(tr_announce_request const* a, tr_announce_request const* b) noexcept // <=>
     {
         // primary key: volume of data transferred
         auto const ax = a->up + a->down;
@@ -128,7 +128,7 @@ struct StopsCompare
         return 0;
     }
 
-    [[nodiscard]] bool constexpr operator()(tr_announce_request const* a, tr_announce_request const* b)
+    [[nodiscard]] bool operator()(tr_announce_request const* a, tr_announce_request const* b)
         const noexcept // less than
     {
         return compare(a, b) < 0;
