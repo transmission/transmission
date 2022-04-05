@@ -144,7 +144,7 @@ public:
         return metainfo_.blockInfo();
     }
 
-    [[nodiscard]] constexpr auto blockCount() const
+    [[nodiscard]] constexpr auto blockCount() const noexcept
     {
         return metainfo_.blockCount();
     }
@@ -160,7 +160,7 @@ public:
     {
         return metainfo_.pieceLoc(piece, offset, length);
     }
-    [[nodiscard]] constexpr auto blockSize(tr_block_index_t block) const
+    [[nodiscard]] constexpr auto blockSize(tr_block_index_t block) const noexcept
     {
         return metainfo_.blockSize(block);
     }
@@ -168,19 +168,19 @@ public:
     {
         return metainfo_.blockSpanForPiece(piece);
     }
-    [[nodiscard]] constexpr auto pieceCount() const
+    [[nodiscard]] constexpr auto pieceCount() const noexcept
     {
         return metainfo_.pieceCount();
     }
-    [[nodiscard]] constexpr auto pieceSize() const
+    [[nodiscard]] constexpr auto pieceSize() const noexcept
     {
         return metainfo_.pieceSize();
     }
-    [[nodiscard]] constexpr auto pieceSize(tr_piece_index_t piece) const
+    [[nodiscard]] constexpr auto pieceSize(tr_piece_index_t piece) const noexcept
     {
         return metainfo_.pieceSize(piece);
     }
-    [[nodiscard]] constexpr auto totalSize() const
+    [[nodiscard]] constexpr auto totalSize() const noexcept
     {
         return metainfo_.totalSize();
     }
@@ -202,12 +202,12 @@ public:
         return completion.hasMetainfo();
     }
 
-    [[nodiscard]] auto hasAll() const
+    [[nodiscard]] auto hasAll() const noexcept
     {
         return completion.hasAll();
     }
 
-    [[nodiscard]] auto hasNone() const
+    [[nodiscard]] auto hasNone() const noexcept
     {
         return completion.hasNone();
     }
@@ -257,7 +257,7 @@ public:
         return completeness == TR_PARTIAL_SEED;
     }
 
-    [[nodiscard]] tr_bitfield const& blocks() const
+    [[nodiscard]] tr_bitfield const& blocks() const noexcept
     {
         return completion.blocks();
     }
@@ -348,7 +348,7 @@ public:
 
     /// METAINFO - FILES
 
-    [[nodiscard]] tr_file_index_t fileCount() const
+    [[nodiscard]] tr_file_index_t fileCount() const noexcept
     {
         return metainfo_.fileCount();
     }
@@ -398,17 +398,17 @@ public:
 
     /// METAINFO - TRACKERS
 
-    [[nodiscard]] auto const& announceList() const
+    [[nodiscard]] auto const& announceList() const noexcept
     {
         return metainfo_.announceList();
     }
 
-    [[nodiscard]] auto& announceList()
+    [[nodiscard]] auto& announceList() noexcept
     {
         return metainfo_.announceList();
     }
 
-    [[nodiscard]] auto trackerCount() const
+    [[nodiscard]] auto trackerCount() const noexcept
     {
         return std::size(this->announceList());
     }
@@ -432,7 +432,7 @@ public:
 
     /// METAINFO - WEBSEEDS
 
-    [[nodiscard]] auto webseedCount() const
+    [[nodiscard]] auto webseedCount() const noexcept
     {
         return metainfo_.webseedCount();
     }
@@ -449,32 +449,32 @@ public:
         metainfo_.setName(name);
     }
 
-    [[nodiscard]] auto const& name() const
+    [[nodiscard]] auto const& name() const noexcept
     {
         return metainfo_.name();
     }
 
-    [[nodiscard]] auto const& infoHash() const
+    [[nodiscard]] auto const& infoHash() const noexcept
     {
         return metainfo_.infoHash();
     }
 
-    [[nodiscard]] auto isPrivate() const
+    [[nodiscard]] auto isPrivate() const noexcept
     {
         return metainfo_.isPrivate();
     }
 
-    [[nodiscard]] auto isPublic() const
+    [[nodiscard]] auto isPublic() const noexcept
     {
         return !this->isPrivate();
     }
 
-    [[nodiscard]] auto const& infoHashString() const
+    [[nodiscard]] auto const& infoHashString() const noexcept
     {
         return metainfo_.infoHashString();
     }
 
-    [[nodiscard]] auto dateCreated() const
+    [[nodiscard]] auto dateCreated() const noexcept
     {
         return metainfo_.dateCreated();
     }
@@ -499,27 +499,27 @@ public:
         return metainfo_.magnet();
     }
 
-    [[nodiscard]] auto const& comment() const
+    [[nodiscard]] auto const& comment() const noexcept
     {
         return metainfo_.comment();
     }
 
-    [[nodiscard]] auto const& creator() const
+    [[nodiscard]] auto const& creator() const noexcept
     {
         return metainfo_.creator();
     }
 
-    [[nodiscard]] auto const& source() const
+    [[nodiscard]] auto const& source() const noexcept
     {
         return metainfo_.source();
     }
 
-    [[nodiscard]] auto infoDictSize() const
+    [[nodiscard]] auto infoDictSize() const noexcept
     {
         return metainfo_.infoDictSize();
     }
 
-    [[nodiscard]] auto infoDictOffset() const
+    [[nodiscard]] auto infoDictOffset() const noexcept
     {
         return metainfo_.infoDictOffset();
     }
@@ -544,12 +544,12 @@ public:
         return this->is_queued;
     }
 
-    [[nodiscard]] constexpr auto queueDirection() const
+    [[nodiscard]] constexpr auto queueDirection() const noexcept
     {
         return this->isDone() ? TR_UP : TR_DOWN;
     }
 
-    [[nodiscard]] auto allowsPex() const
+    [[nodiscard]] auto allowsPex() const noexcept
     {
         return this->isPublic() && this->session->isPexEnabled;
     }
@@ -589,7 +589,7 @@ public:
 
     /** Return the mime-type (e.g. "audio/x-flac") that matches more of the
         torrent's content than any other mime-type. */
-    std::string_view primaryMimeType() const;
+    [[nodiscard]] std::string_view primaryMimeType() const;
 
     static constexpr std::string_view PartialFileSuffix = std::string_view{ ".part" };
 
