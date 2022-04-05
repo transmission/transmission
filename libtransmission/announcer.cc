@@ -128,8 +128,7 @@ struct StopsCompare
         return 0;
     }
 
-    [[nodiscard]] bool operator()(tr_announce_request const* a, tr_announce_request const* b)
-        const noexcept // less than
+    [[nodiscard]] bool operator()(tr_announce_request const* a, tr_announce_request const* b) const noexcept // less than
     {
         return compare(a, b) < 0;
     }
