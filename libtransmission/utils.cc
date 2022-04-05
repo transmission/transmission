@@ -414,26 +414,6 @@ char const* tr_strerror(int i)
     return ret;
 }
 
-int tr_strcmp0(char const* str1, char const* str2)
-{
-    if (str1 != nullptr && str2 != nullptr)
-    {
-        return strcmp(str1, str2);
-    }
-
-    if (str1 != nullptr)
-    {
-        return 1;
-    }
-
-    if (str2 != nullptr)
-    {
-        return -1;
-    }
-
-    return 0;
-}
-
 /****
 *****
 ****/
