@@ -5,7 +5,6 @@
 
 #include <algorithm> // std::sort
 #include <array> // std::array
-#include <cctype> /* isdigit() */
 #include <cerrno>
 #include <cfloat> // DBL_DIG
 #include <chrono>
@@ -160,47 +159,6 @@ void* tr_memdup(void const* src, size_t byteCount)
 /***
 ****
 ***/
-
-char const* tr_strip_positional_args(char const* str)
-{
-    static auto buf = std::array<char, 512>{};
-
-    char const* in = str;
-    size_t pos = 0;
-
-    for (; (str != nullptr) && (*str != 0) && pos + 1 < std::size(buf); ++str)
-    {
-        buf[pos++] = *str;
-
-        if (*str == '%' && (isdigit(str[1]) != 0))
-        {
-            char const* tmp = str + 1;
-
-            while (isdigit(*tmp) != 0)
-            {
-                ++tmp;
-            }
-
-            if (*tmp == '$')
-            {
-                str = tmp[1] == '\'' ? tmp + 1 : tmp;
-            }
-        }
-
-        if (*str == '%' && str[1] == '\'')
-        {
-            str = str + 1;
-        }
-    }
-
-    buf[pos] = '\0';
-
-    return (in != nullptr) && (strcmp(buf.data(), in) == 0) ? in : buf.data();
-}
-
-/**
-***
-**/
 
 void tr_timerAdd(struct event* timer, int seconds, int microseconds)
 {

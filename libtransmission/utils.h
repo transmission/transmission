@@ -33,8 +33,6 @@ struct tr_error;
  * @{
  */
 
-char const* tr_strip_positional_args(char const* fmt);
-
 #if !defined(_)
 #if defined(HAVE_GETTEXT) && !defined(__APPLE__)
 #include <libintl.h>
@@ -57,8 +55,8 @@ char const* tr_strip_positional_args(char const* fmt);
 #ifdef DISABLE_GETTEXT
 #undef _
 #undef ngettext
-#define _(a) tr_strip_positional_args(a)
-#define ngettext(singular, plural, count) tr_strip_positional_args((count) == 1 ? (singular) : (plural))
+#define _(a) (a)
+#define ngettext(singular, plural, count) ((count) == 1 ? (singular) : (plural))
 #endif
 
 /****

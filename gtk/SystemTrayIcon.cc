@@ -165,7 +165,7 @@ std::string SystemTrayIcon::Impl::make_tooltip_text() const
     double speed_current = tr_sessionGetRawSpeed_KBps(session, TR_UP);
     double speed_limit;
     bool is_limited = tr_sessionGetActiveSpeedLimit_KBps(session, TR_UP, &speed_limit);
-    tooltip = fmt::format(
+    tooltip += fmt::format(
         is_limited ? _("Up: {upload_speed} ({upload_speed_limit})") : _("Up: {upload_speed}"),
         fmt::arg("upload_speed", tr_formatter_speed_KBps(speed_current)),
         fmt::arg("upload_speed_limit", tr_formatter_speed_KBps(speed_limit)));
@@ -174,7 +174,7 @@ std::string SystemTrayIcon::Impl::make_tooltip_text() const
 
     speed_current = tr_sessionGetRawSpeed_KBps(session, TR_DOWN);
     is_limited = tr_sessionGetActiveSpeedLimit_KBps(session, TR_DOWN, &speed_limit);
-    tooltip = fmt::format(
+    tooltip += fmt::format(
         is_limited ? _("Down: {download_speed} ({download_speed_limit})") : _("Down: {download_speed}"),
         fmt::arg("download_speed", tr_formatter_speed_KBps(speed_current)),
         fmt::arg("download_speed_limit", tr_formatter_speed_KBps(speed_limit)));
