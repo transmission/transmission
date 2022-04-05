@@ -358,10 +358,6 @@ void MakeDialog::Impl::updatePiecesLabel()
             ngettext("{piece_size}; {piece_count:L} Piece", "{piece_size}; {piece_count:L} Pieces", builder_->pieceCount),
             fmt::arg("piece_size", tr_formatter_mem_B(builder_->pieceSize)),
             fmt::arg("piece_count", builder_->pieceCount));
-        gtr_sprintf(
-            ngettext("%1$'d Piece @ %2$s", "%1$'d Pieces @ %2$s", builder_->pieceCount),
-            builder_->pieceCount,
-            tr_formatter_mem_B(builder_->pieceSize));
     }
 
     gstr += "</i>";
