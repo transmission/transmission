@@ -249,11 +249,6 @@ void tr_free(void* p);
  */
 [[nodiscard]] char* tr_strdup(void const* in);
 
-/**
- * @brief like strcmp() but gracefully handles nullptr strings
- */
-int tr_strcmp0(char const* str1, char const* str2);
-
 constexpr bool tr_str_is_empty(char const* value)
 {
     return value == nullptr || *value == '\0';

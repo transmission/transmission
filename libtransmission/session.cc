@@ -299,7 +299,7 @@ tr_address const* tr_sessionGetPublicAddress(tr_session const* session, int tr_a
 
     if (is_default_value != nullptr && bindinfo != nullptr)
     {
-        *is_default_value = tr_strcmp0(default_value, tr_address_to_string(&bindinfo->addr)) == 0;
+        *is_default_value = bindinfo->addr.to_string() == default_value;
     }
 
     return bindinfo != nullptr ? &bindinfo->addr : nullptr;
