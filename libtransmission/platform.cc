@@ -338,10 +338,12 @@ char const* tr_getWebClientDir([[maybe_unused]] tr_session const* session)
         {
             char* dir = win32_get_known_folder(*known_folder_ids[i]);
 
-            if (auto const path = tr_pathbuf{ dir, "/Transmission/Web"sv }; isWebClientDir(path))
+            if (auto const path = tr_pathbuf{ std::string_view{ dir }, "/Transmission/Web"sv }; isWebClientDir(path))
             {
                 s = tr_strvDup(path);
             }
+
+            tr_free(dir);
         }
     }
 
