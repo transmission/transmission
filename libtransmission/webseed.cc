@@ -79,7 +79,7 @@ public:
 class ConnectionLimiter
 {
 public:
-    void taskStarted()
+    constexpr void taskStarted() noexcept
     {
         ++n_tasks;
     }
@@ -95,14 +95,14 @@ public:
         --n_tasks;
     }
 
-    void gotData()
+    constexpr void gotData() noexcept
     {
         TR_ASSERT(n_tasks > 0);
         n_consecutive_failures = 0;
         paused_until = 0;
     }
 
-    [[nodiscard]] size_t slotsAvailable() const
+    [[nodiscard]] size_t slotsAvailable() const noexcept
     {
         if (isPaused())
         {
@@ -119,12 +119,12 @@ public:
     }
 
 private:
-    [[nodiscard]] bool isPaused() const
+    [[nodiscard]] bool isPaused() const noexcept
     {
         return paused_until > tr_time();
     }
 
-    [[nodiscard]] size_t maxConnections() const
+    [[nodiscard]] constexpr size_t maxConnections() const noexcept
     {
         return n_consecutive_failures > 0 ? 1 : MaxConnections;
     }

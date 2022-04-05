@@ -63,22 +63,22 @@ private:
     using trackers_t = std::vector<tracker_info>;
 
 public:
-    [[nodiscard]] auto begin() const
+    [[nodiscard]] auto begin() const noexcept
     {
         return std::begin(trackers_);
     }
 
-    [[nodiscard]] auto end() const
+    [[nodiscard]] auto end() const noexcept
     {
         return std::end(trackers_);
     }
 
-    [[nodiscard]] bool empty() const
+    [[nodiscard]] bool empty() const noexcept
     {
         return std::empty(trackers_);
     }
 
-    [[nodiscard]] size_t size() const
+    [[nodiscard]] size_t size() const noexcept
     {
         return std::size(trackers_);
     }

@@ -308,27 +308,27 @@ public:
         return Bps > 0;
     }
 
-    [[nodiscard]] bool is_peer_choked() const override
+    [[nodiscard]] bool is_peer_choked() const noexcept override
     {
         return peer_is_choked_;
     }
 
-    [[nodiscard]] bool is_peer_interested() const override
+    [[nodiscard]] bool is_peer_interested() const noexcept override
     {
         return peer_is_interested_;
     }
 
-    [[nodiscard]] bool is_client_choked() const override
+    [[nodiscard]] bool is_client_choked() const noexcept override
     {
         return client_is_choked_;
     }
 
-    [[nodiscard]] bool is_client_interested() const override
+    [[nodiscard]] bool is_client_interested() const noexcept override
     {
         return client_is_interested_;
     }
 
-    [[nodiscard]] bool is_utp_connection() const override
+    [[nodiscard]] bool is_utp_connection() const noexcept override
     {
         return io->socket.type == TR_PEER_SOCKET_TYPE_UTP;
     }
@@ -358,7 +358,7 @@ public:
         set_active(direction, calculate_active(direction));
     }
 
-    [[nodiscard]] bool is_connection_older_than(time_t timestamp) const override
+    [[nodiscard]] bool is_connection_older_than(time_t timestamp) const noexcept override
     {
         return io->time_created < timestamp;
     }

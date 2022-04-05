@@ -67,13 +67,13 @@ char const* tr_strip_positional_args(char const* fmt);
 
 #define TR_N_ELEMENTS(ary) (sizeof(ary) / sizeof(*(ary)))
 
-std::string_view tr_get_mime_type_for_filename(std::string_view filename);
+[[nodiscard]] std::string_view tr_get_mime_type_for_filename(std::string_view filename);
 
 /**
  * @brief Rich Salz's classic implementation of shell-style pattern matching for ?, \, [], and * characters.
  * @return 1 if the pattern matches, 0 if it doesn't, or -1 if an error occured
  */
-bool tr_wildmat(char const* text, char const* pattern) TR_GNUC_NONNULL(1, 2);
+[[nodiscard]] bool tr_wildmat(char const* text, char const* pattern) TR_GNUC_NONNULL(1, 2);
 
 /**
  * @brief Loads a file and returns its contents.
@@ -136,7 +136,7 @@ void tr_wait_msec(long int delay_milliseconds);
 #include <sstream>
 
 template<typename T>
-std::optional<T> tr_parseNum(std::string_view& sv)
+[[nodiscard]] std::optional<T> tr_parseNum(std::string_view& sv)
 {
     auto val = T{};
     auto const str = std::string(std::data(sv), std::min(std::size(sv), size_t{ 64 }));
@@ -157,7 +157,7 @@ std::optional<T> tr_parseNum(std::string_view& sv)
 #include <charconv> // std::from_chars()
 
 template<typename T>
-std::optional<T> tr_parseNum(std::string_view& sv)
+[[nodiscard]] std::optional<T> tr_parseNum(std::string_view& sv)
 {
     auto val = T{};
     auto const* const begin_ch = std::data(sv);
@@ -233,7 +233,7 @@ void tr_free(void* p);
  * @param byteCount the number of bytes to copy
  * @return a newly-allocated copy of `src' that can be freed with tr_free()
  */
-void* tr_memdup(void const* src, size_t byteCount);
+[[nodiscard]] void* tr_memdup(void const* src, size_t byteCount);
 
 #define tr_new(struct_type, n_structs) (static_cast<struct_type*>(tr_malloc(sizeof(struct_type) * (size_t)(n_structs))))
 
@@ -247,7 +247,7 @@ void* tr_memdup(void const* src, size_t byteCount);
  * @param in is a void* so that callers can pass in both signed & unsigned without a cast
  * @return a newly-allocated copy of `in' that can be freed with tr_free()
  */
-char* tr_strdup(void const* in);
+[[nodiscard]] char* tr_strdup(void const* in);
 
 /**
  * @brief like strcmp() but gracefully handles nullptr strings
@@ -266,13 +266,13 @@ size_t tr_strlcpy(void* dst, void const* src, size_t siz);
 
 /** @brief Convenience wrapper around strerorr() guaranteed to not return nullptr
     @param errnum the error number to describe */
-char const* tr_strerror(int errnum);
+[[nodiscard]] char const* tr_strerror(int errnum);
 
 /** @brief Returns true if the string ends with the specified case-insensitive suffix */
-bool tr_str_has_suffix(char const* str, char const* suffix);
+[[nodiscard]] bool tr_str_has_suffix(char const* str, char const* suffix);
 
 template<typename T>
-std::string tr_strlower(T in)
+[[nodiscard]] std::string tr_strlower(T in)
 {
     auto out = std::string{ in };
     std::for_each(std::begin(out), std::end(out), [](char& ch) { ch = std::tolower(ch); });
@@ -280,7 +280,7 @@ std::string tr_strlower(T in)
 }
 
 template<typename T>
-std::string tr_strupper(T in)
+[[nodiscard]] std::string tr_strupper(T in)
 {
     auto out = std::string{ in };
     std::for_each(std::begin(out), std::end(out), [](char& ch) { ch = std::toupper(ch); });
@@ -292,7 +292,7 @@ std::string tr_strupper(T in)
 ***/
 
 template<typename... T, typename std::enable_if_t<(std::is_convertible_v<T, std::string_view> && ...), bool> = true>
-std::string tr_strvPath(T... args)
+[[nodiscard]] std::string tr_strvPath(T... args)
 {
     auto setme = std::string{};
     auto const n_args = sizeof...(args);
@@ -313,7 +313,7 @@ std::string tr_strvPath(T... args)
 }
 
 template<typename... T, typename std::enable_if_t<(std::is_convertible_v<T, std::string_view> && ...), bool> = true>
-std::string tr_strvJoin(T... args)
+[[nodiscard]] std::string tr_strvJoin(T... args)
 {
     auto setme = std::string{};
     auto const n = (std::size(std::string_view{ args }) + ...);
@@ -326,27 +326,27 @@ std::string tr_strvJoin(T... args)
 }
 
 template<typename T>
-constexpr bool tr_strvContains(std::string_view sv, T key) // c++23
+[[nodiscard]] constexpr bool tr_strvContains(std::string_view sv, T key) // c++23
 {
     return sv.find(key) != sv.npos;
 }
 
-constexpr bool tr_strvStartsWith(std::string_view sv, char key) // c++20
+[[nodiscard]] constexpr bool tr_strvStartsWith(std::string_view sv, char key) // c++20
 {
     return !std::empty(sv) && sv.front() == key;
 }
 
-constexpr bool tr_strvStartsWith(std::string_view sv, std::string_view key) // c++20
+[[nodiscard]] constexpr bool tr_strvStartsWith(std::string_view sv, std::string_view key) // c++20
 {
     return std::size(key) <= std::size(sv) && sv.substr(0, std::size(key)) == key;
 }
 
-constexpr bool tr_strvEndsWith(std::string_view sv, std::string_view key) // c++20
+[[nodiscard]] constexpr bool tr_strvEndsWith(std::string_view sv, std::string_view key) // c++20
 {
     return std::size(key) <= std::size(sv) && sv.substr(std::size(sv) - std::size(key)) == key;
 }
 
-constexpr bool tr_strvEndsWith(std::string_view sv, char key) // c++20
+[[nodiscard]] constexpr bool tr_strvEndsWith(std::string_view sv, char key) // c++20
 {
     return !std::empty(sv) && sv.back() == key;
 }
@@ -370,9 +370,9 @@ constexpr bool tr_strvSep(std::string_view* sv, std::string_view* token, char de
     return true;
 }
 
-std::string_view tr_strvStrip(std::string_view sv);
+[[nodiscard]] std::string_view tr_strvStrip(std::string_view sv);
 
-char* tr_strvDup(std::string_view) TR_GNUC_MALLOC;
+[[nodiscard]] char* tr_strvDup(std::string_view) TR_GNUC_MALLOC;
 
 std::string& tr_strvUtf8Clean(std::string_view cleanme, std::string& setme);
 
@@ -382,7 +382,7 @@ std::string& tr_strvUtf8Clean(std::string_view cleanme, std::string& setme);
 
 /** @brief return TR_RATIO_NA, TR_RATIO_INF, or a number in [0..1]
     @return TR_RATIO_NA, TR_RATIO_INF, or a number in [0..1] */
-double tr_getRatio(uint64_t numerator, uint64_t denominator);
+[[nodiscard]] double tr_getRatio(uint64_t numerator, uint64_t denominator);
 
 /**
  * @brief Given a string like "1-4" or "1-4,6,9,14-51", this returns a
@@ -392,7 +392,7 @@ double tr_getRatio(uint64_t numerator, uint64_t denominator);
  *
  * For example, "5-8" will return [ 5, 6, 7, 8 ] and setmeCount will be 4.
  */
-std::vector<int> tr_parseNumberRange(std::string_view str);
+[[nodiscard]] std::vector<int> tr_parseNumberRange(std::string_view str);
 
 /**
  * @brief truncate a double value at a given number of decimal places.
@@ -408,16 +408,16 @@ std::vector<int> tr_parseNumberRange(std::string_view str);
  *             |   These should match   |
  *             +------------------------+
  */
-double tr_truncd(double x, int decimal_places);
+[[nodiscard]] double tr_truncd(double x, int decimal_places);
 
 /* return a percent formatted string of either x.xx, xx.x or xxx */
-std::string tr_strpercent(double x);
+[[nodiscard]] std::string tr_strpercent(double x);
 
 /**
  * @param ratio    the ratio to convert to a string
  * @param infinity the string represntation of "infinity"
  */
-std::string tr_strratio(double ratio, char const* infinity);
+[[nodiscard]] std::string tr_strratio(double ratio, char const* infinity);
 
 /** @brief Portability wrapper for localtime_r() that uses the system implementation if available */
 struct tm* tr_localtime_r(time_t const* _clock, struct tm* _result);
@@ -454,13 +454,13 @@ extern time_t __tr_current_time;
  * to always be accurate. However, it is *much* faster when 100% accuracy
  * isn't needed
  */
-static inline time_t tr_time()
+[[nodiscard]] static inline time_t tr_time() noexcept
 {
     return __tr_current_time;
 }
 
 /** @brief Private libtransmission function to update tr_time()'s counter */
-constexpr void tr_timeUpdate(time_t now)
+constexpr void tr_timeUpdate(time_t now) noexcept
 {
     __tr_current_time = now;
 }
