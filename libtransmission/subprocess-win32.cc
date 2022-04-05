@@ -314,9 +314,10 @@ static bool contains_batch_metachars(char const* text)
                "%!^\"") != nullptr;
 }
 
-static enum tr_app_type get_app_type(char const* app)
+static enum tr_app_type get_app_type(char const* app_in)
 {
-    if (tr_str_has_suffix(app, ".cmd") || tr_str_has_suffix(app, ".bat"))
+    if (auto const app = tr_strlower(app_in != nullptr ? app_in : "");
+        tr_strvEndsWith(app, ".cmd") || tr_strvEndsWith(app, ".bat"))
     {
         return TR_APP_TYPE_BATCH;
     }
