@@ -347,12 +347,18 @@ void MakeDialog::Impl::updatePiecesLabel()
     }
     else
     {
-        gstr += gtr_sprintf(
-            ngettext("%1$s; %2$'d File", "%1$s; %2$'d Files", builder_->fileCount),
-            tr_strlsize(builder_->totalSize),
-            builder_->fileCount);
+        gstr += fmt::format(
+            ngettext("{complete_size}; {file_count} File", "{complete_size}; {file_count} Files", builder_->fileCount),
+            fmt::arg("complete_size", tr_strlsize(builder_->totalSize)),
+            fmt::arg("file_count", fmt::group_digits(builder_->fileCount)));
+
         gstr += "; ";
-        gstr += gtr_sprintf(
+
+        gstr += fmt::format(
+            ngettext("{piece_size}; {piece_count} Piece", "{piece_size}; {piece_count} Pieces", builder_->pieceCount),
+            fmt::arg("piece_size", tr_formatter_mem_B(builder_->pieceSize)),
+            fmt::arg("piece_count", fmt::group_digits(builder_->pieceCount)));
+        gtr_sprintf(
             ngettext("%1$'d Piece @ %2$s", "%1$'d Pieces @ %2$s", builder_->pieceCount),
             builder_->pieceCount,
             tr_formatter_mem_B(builder_->pieceSize));
