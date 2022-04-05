@@ -3,6 +3,7 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include <iostream>
 #include <memory>
 #include <string>
 
@@ -337,9 +338,8 @@ void onSourceToggled(Gtk::ToggleButton* tb, Gtk::Widget* widget)
 void MakeDialog::Impl::updatePiecesLabel()
 {
     char const* filename = builder_ != nullptr ? builder_->top : nullptr;
-    Glib::ustring gstr;
 
-    gstr += "<i>";
+    auto gstr = Glib::ustring{ "<i>" };
 
     if (filename == nullptr)
     {
@@ -348,16 +348,20 @@ void MakeDialog::Impl::updatePiecesLabel()
     else
     {
         gstr += fmt::format(
-            ngettext("{complete_size}; {file_count:L} File", "{complete_size}; {file_count:L} Files", builder_->fileCount),
-            fmt::arg("complete_size", tr_strlsize(builder_->totalSize)),
+            ngettext(
+                "{total_size} in {file_count:L} file",
+                "{total_size} in {file_count:L} files",
+                builder_->fileCount),
+            fmt::arg("total_size", tr_strlsize(builder_->totalSize)),
             fmt::arg("file_count", builder_->fileCount));
-
-        gstr += "; ";
-
+        gstr += ' ';
         gstr += fmt::format(
-            ngettext("{piece_size}; {piece_count:L} Piece", "{piece_size}; {piece_count:L} Pieces", builder_->pieceCount),
-            fmt::arg("piece_size", tr_formatter_mem_B(builder_->pieceSize)),
-            fmt::arg("piece_count", builder_->pieceCount));
+            ngettext(
+                "({piece_count} BitTorrent piece @ {piece_size})",
+                "({piece_count} BitTorrent pieces @ {piece_size})",
+                builder_->pieceCount),
+            fmt::arg("piece_count", builder_->pieceCount),
+            fmt::arg("piece_size", tr_formatter_mem_B(builder_->pieceSize)));
     }
 
     gstr += "</i>";

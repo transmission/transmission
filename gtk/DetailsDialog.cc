@@ -818,46 +818,55 @@ void DetailsDialog::Impl::refreshInfo(std::vector<tr_torrent*> const& torrents)
 
     /* size_lb */
     {
-        uint64_t size = 0;
-        int pieces = 0;
-        int32_t pieceSize = 0;
+        auto const piece_count = std::accumulate(
+            std::begin(infos),
+            std::end(infos),
+            uint64_t{},
+            [](auto sum, auto const& info){ return sum + info.n_pieces; });
 
-        for (auto const& info : infos)
-        {
-            size += info.total_size;
-            pieces += info.n_pieces;
-
-            if (pieceSize == 0)
-            {
-                pieceSize = info.piece_size;
-            }
-            else if (pieceSize != (int)info.piece_size)
-            {
-                pieceSize = -1;
-            }
-        }
-
-        if (size == 0)
+        if (piece_count == 0)
         {
             str.clear();
         }
-        else if (pieceSize >= 0)
-        {
-            str = fmt::format(
-                ngettext(
-                    "{file_size} ({piece_count:L} piece @ {piece_size})",
-                    "{file_size} ({piece_count:L} pieces @ {piece_size})",
-                    pieces),
-                fmt::arg("file_size", tr_strlsize(size)),
-                fmt::arg("piece_count", pieces),
-                fmt::arg("piece_size", tr_formatter_mem_B(pieceSize)));
-        }
         else
         {
+            auto const total_size = std::accumulate(
+                std::begin(infos),
+                std::end(infos),
+                uint64_t{},
+                [](auto sum, auto const& info){ return sum + info.total_size; });
+
+            auto const file_count = std::accumulate(
+                std::begin(torrents),
+                std::end(torrents),
+                std::size_t{},
+                [](auto sum, auto const* tor){ return sum + tr_torrentFileCount(tor); });
+
             str = fmt::format(
-                ngettext("{file_size} ({piece_count:L} piece)", "{file_size} ({piece_count:L} pieces)", pieces),
-                fmt::arg("file_size", tr_strlsize(size)),
-                fmt::arg("piece_count", pieces));
+                ngettext(
+                    "{total_size} in {file_count:L} file",
+                    "{total_size} in {file_count:L} files",
+                    file_count),
+                fmt::arg("total_size", tr_strlsize(total_size)),
+                fmt::arg("file_count", file_count));
+
+            auto const piece_size = std::empty(infos) ? uint32_t{} : infos.front().piece_size;
+            auto const piece_size_is_uniform = std::all_of(
+                std::begin(infos),
+                std::end(infos),
+                [piece_size](auto const& info){ return info.piece_size == piece_size; });
+
+            if (piece_size_is_uniform)
+            {
+                str += ' ';
+                str += fmt::format(
+                    ngettext(
+                        "({piece_count} BitTorrent piece @ {piece_size})",
+                        "({piece_count} BitTorrent pieces @ {piece_size})",
+                        piece_count),
+                    fmt::arg("piece_count", piece_count),
+                    fmt::arg("piece_size", tr_formatter_mem_B(piece_size)));
+            }
         }
 
         size_lb_->set_text(str);
