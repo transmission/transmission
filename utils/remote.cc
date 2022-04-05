@@ -554,11 +554,14 @@ static void addIdArg(tr_variant* args, char const* id_str, char const* fallback)
         }
     }
 
-    if (tr_strcmp0(id_str, "active") == 0)
+    static auto constexpr IdActive = "active"sv;
+    static auto constexpr IdAll = "all"sv;
+
+    if (IdActive == id_str)
     {
         tr_variantDictAddStrView(args, TR_KEY_ids, "recently-active"sv);
     }
-    else if (strcmp(id_str, "all") != 0)
+    else if (IdAll != id_str)
     {
         bool isList = strchr(id_str, ',') != nullptr || strchr(id_str, '-') != nullptr;
         bool isNum = true;
