@@ -48,6 +48,8 @@ private:
     void activated();
     void popup(guint button, guint when);
 
+    [[nodiscard]] std::string make_tooltip_text() const;
+
 private:
     Glib::RefPtr<Session> const core_;
 
@@ -87,42 +89,7 @@ void SystemTrayIcon::Impl::popup(guint /*button*/, guint /*when*/)
 
 void SystemTrayIcon::Impl::refresh()
 {
-    double KBps;
-    double limit;
-    Glib::ustring upLimit;
-    Glib::ustring downLimit;
-    char const* const idle = _("Idle");
-    auto* session = core_->get_session();
-
-    /* up */
-    KBps = tr_sessionGetRawSpeed_KBps(session, TR_UP);
-
-    auto const up = KBps < 0.001 ? idle : tr_formatter_speed_KBps(KBps);
-
-    /* up limit */
-    if (tr_sessionGetActiveSpeedLimit_KBps(session, TR_UP, &limit))
-    {
-        upLimit = gtr_sprintf(_(" (Limit: %s)"), tr_formatter_speed_KBps(limit));
-    }
-
-    /* down */
-    KBps = tr_sessionGetRawSpeed_KBps(session, TR_DOWN);
-
-    auto const down = KBps < 0.001 ? idle : tr_formatter_speed_KBps(KBps);
-
-    /* down limit */
-    if (tr_sessionGetActiveSpeedLimit_KBps(session, TR_DOWN, &limit))
-    {
-        downLimit = gtr_sprintf(_(" (Limit: %s)"), tr_formatter_speed_KBps(limit));
-    }
-
-    /* %1$s: current upload speed
-     * %2$s: current upload limit, if any
-     * %3$s: current download speed
-     * %4$s: current download limit, if any */
-    auto const tip = gtr_sprintf(_("Transmission\nUp: %1$s %2$s\nDown: %3$s %4$s"), up, upLimit, down, downLimit);
-
-    icon_->set_tooltip_text(tip);
+    icon_->set_tooltip_text(make_tooltip_text());
 }
 
 #endif
@@ -186,4 +153,31 @@ SystemTrayIcon::Impl::Impl(Gtk::Window& main_window, Glib::RefPtr<Session> const
     icon_->signal_popup_menu().connect(sigc::mem_fun(*this, &Impl::popup));
 
 #endif
+}
+
+std::string SystemTrayIcon::Impl::make_tooltip_text() const
+{
+    std::string tooltip = _("Transmission");
+
+    tooltip += '\n';
+
+    auto const* const session = core_->get_session();
+    double speed_current = tr_sessionGetRawSpeed_KBps(session, TR_UP);
+    double speed_limit;
+    bool is_limited = tr_sessionGetActiveSpeedLimit_KBps(session, TR_UP, &speed_limit);
+    tooltip = fmt::format(
+        is_limited ? _("Up: {upload_speed} ({upload_speed_limit})") : _("Up: {upload_speed}"),
+        fmt::arg("upload_speed", tr_formatter_speed_KBps(speed_current)),
+        fmt::arg("upload_speed_limit", tr_formatter_speed_KBps(speed_limit)));
+
+    tooltip += '\n';
+
+    speed_current = tr_sessionGetRawSpeed_KBps(session, TR_DOWN);
+    is_limited = tr_sessionGetActiveSpeedLimit_KBps(session, TR_DOWN, &speed_limit);
+    tooltip = fmt::format(
+        is_limited ? _("Down: {download_speed} ({download_speed_limit})") : _("Down: {download_speed}"),
+        fmt::arg("download_speed", tr_formatter_speed_KBps(speed_current)),
+        fmt::arg("download_speed_limit", tr_formatter_speed_KBps(speed_limit)));
+
+    return tooltip;
 }
