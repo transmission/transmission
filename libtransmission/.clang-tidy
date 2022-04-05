@@ -10,7 +10,6 @@ Checks: >
   -cert-err33-c,
   -cert-err34-c,
   -cert-err58-cpp,
-  -cert-str34-c,
   clang-analyzer-core.*,
   clang-analyzer-cplusplus.*,
   clang-analyzer-deadcode.*,
