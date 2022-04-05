@@ -713,7 +713,7 @@ bool FilterBar::Impl::update_count_label()
     show_lb_->set_markup_with_mnemonic(
         visibleCount == std::min(activityCount, trackerCount) ?
             _("_Show:") :
-            fmt::format(_("_Show {count:L} of:"), fmt::arg("count", visibleCount)));
+            fmt::format(_("_Show {count} of:"), fmt::arg("count", fmt::group_digits(visibleCount))));
 
     show_lb_->steal_data(DIRTY_KEY);
     return false;

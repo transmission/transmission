@@ -64,7 +64,7 @@ void setLabelFromRatio(Gtk::Label* l, double d)
 
 auto startedTimesText(uint64_t n)
 {
-    return fmt::format(ngettext("Started {count:L} time", "Started {count:L} times", n), fmt::arg("count", n));
+    return fmt::format(ngettext("Started {count} time", "Started {count} times", n), fmt::arg("count", fmt::group_digits(n)));
 }
 
 } // namespace

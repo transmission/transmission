@@ -414,7 +414,7 @@ void updateBlocklistText(Gtk::Label* w, Glib::RefPtr<Session> const& core)
     int const n = tr_blocklistGetRuleCount(core->get_session());
     auto const msg = fmt::format(
         ngettext("Blocklist has {count} entry", "Blocklist has {count} entries", n),
-        fmt::arg("count", n));
+        fmt::arg("count", fmt::group_digits(n)));
     w->set_markup(fmt::format(FMT_STRING("<i>{:s}</i>"), msg));
 }
 
@@ -442,7 +442,7 @@ void onBlocklistUpdated(Glib::RefPtr<Session> const& core, int n, blocklist_data
     int const count = n >= 0 ? n : tr_blocklistGetRuleCount(core->get_session());
     auto const msg = fmt::format(
         ngettext("Blocklist has {count} entry", "Blocklist has {count} entries", count),
-        fmt::arg("count", count));
+        fmt::arg("count", fmt::group_digits(count)));
     data->updateBlocklistButton->set_sensitive(true);
     data->updateBlocklistDialog->set_message(
         fmt::format(FMT_STRING("<b>{:s}</b>"), success ? _("Blocklist updated!") : _("Couldn't update blocklist")),
