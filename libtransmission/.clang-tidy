@@ -13,6 +13,8 @@ Checks: >
   -cert-str34-c,
   clang-analyzer-core.*,
   clang-analyzer-cplusplus.*,
+  clang-analyzer-deadcode.*,
+  clang-analyzer-optin.cplusplus.*,
   clang-analyzer-security.*,
   clang-analyzer-valist.*,
   cppcoreguidelines-init-variables,
