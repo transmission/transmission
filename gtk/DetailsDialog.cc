@@ -845,19 +845,19 @@ void DetailsDialog::Impl::refreshInfo(std::vector<tr_torrent*> const& torrents)
         {
             str = fmt::format(
                 ngettext(
-                    "{file_size} ({piece_count} piece @ {piece_size})",
-                    "{file_size} ({piece_count} pieces @ {piece_size})",
+                    "{file_size} ({piece_count:L} piece @ {piece_size})",
+                    "{file_size} ({piece_count:L} pieces @ {piece_size})",
                     pieces),
                 fmt::arg("file_size", tr_strlsize(size)),
-                fmt::arg("piece_count", fmt::group_digits(pieces)),
+                fmt::arg("piece_count", pieces),
                 fmt::arg("piece_size", tr_formatter_mem_B(pieceSize)));
         }
         else
         {
             str = fmt::format(
-                ngettext("{file_size} ({piece_count} piece)", "{file_size} ({piece_count} pieces)", pieces),
+                ngettext("{file_size} ({piece_count:L} piece)", "{file_size} ({piece_count:L} pieces)", pieces),
                 fmt::arg("file_size", tr_strlsize(size)),
-                fmt::arg("piece_count", fmt::group_digits(pieces)));
+                fmt::arg("piece_count", pieces));
         }
 
         size_lb_->set_text(str);
@@ -1978,9 +1978,9 @@ void appendScrapeInfo(tr_tracker_view const& tracker, time_t const now, Gtk::Tex
             gstr << fmt::format(
                 // {markup_begin} and {markup_end} should surround the seeder/leecher text
                 _("Tracker had {markup_begin}{seeder_count} {seeder_or_seeders} and {leecher_count} {leecher_or_leechers}{markup_end} {time_span} ago"),
-                fmt::arg("seeder_count", fmt::group_digits(tracker.seederCount)),
+                fmt::arg("seeder_count", tracker.seederCount),
                 fmt::arg("seeder_or_seeders", ngettext("seeder", "seeders", tracker.seederCount)),
-                fmt::arg("leecher_count", fmt::group_digits(tracker.leecherCount)),
+                fmt::arg("leecher_count", tracker.leecherCount),
                 fmt::arg("leecher_or_leechers", ngettext("leecher", "leechers", tracker.leecherCount)),
                 fmt::arg("time_span", timebuf),
                 fmt::arg("markup_begin", SuccessMarkupBegin),
@@ -2667,8 +2667,8 @@ void DetailsDialog::Impl::set_torrents(std::vector<int> const& ids)
     else
     {
         title = fmt::format(
-            ngettext("Properties - {torrent_count} Torrent", "Properties - {torrent_count} Torrents", len),
-            fmt::arg("torrent_count", fmt::group_digits(len)));
+            ngettext("Properties - {torrent_count:L} Torrent", "Properties - {torrent_count:L} Torrents", len),
+            fmt::arg("torrent_count", len));
 
         file_list_->clear();
         file_list_->hide();

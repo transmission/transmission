@@ -221,7 +221,7 @@ auto getActivityString(
                     "Downloading metadata from {active_count} connected peer ({percent_done:d}% done)",
                     "Downloading metadata from {active_count} connected peers ({percent_done:d}% done)",
                     st->peersConnected),
-                fmt::arg("active_count", fmt::group_digits(st->peersConnected)),
+                fmt::arg("active_count", st->peersConnected),
                 fmt::arg("percent_done", tr_strpercent(st->metadataPercentComplete * 100.0)));
         }
 
@@ -232,8 +232,8 @@ auto getActivityString(
                     "Downloading from {active_count} of {connected_count} connected peer and webseed",
                     "Downloading from {active_count} of {connected_count} connected peers and webseeds",
                     st->peersConnected + st->webseedsSendingToUs),
-                fmt::arg("active_count", fmt::group_digits(st->peersSendingToUs + st->webseedsSendingToUs)),
-                fmt::arg("connected_count", fmt::group_digits(st->peersConnected + st->webseedsSendingToUs)));
+                fmt::arg("active_count", st->peersSendingToUs + st->webseedsSendingToUs),
+                fmt::arg("connected_count", st->peersConnected + st->webseedsSendingToUs));
         }
 
         if (st->webseedsSendingToUs != 0)
@@ -243,7 +243,7 @@ auto getActivityString(
                     "Downloading from {active_count} webseed",
                     "Downloading from {active_count} webseeds",
                     st->webseedsSendingToUs),
-                fmt::arg("active_count", fmt::group_digits(st->webseedsSendingToUs)));
+                fmt::arg("active_count", st->webseedsSendingToUs));
         }
 
         return fmt::format(
@@ -251,8 +251,8 @@ auto getActivityString(
                 "Downloading from {active_count} of {connected_count} connected peer",
                 "Downloading from {active_count} of {connected_count} connected peers",
                 st->peersConnected),
-            fmt::arg("active_count", fmt::group_digits(st->peersSendingToUs)),
-            fmt::arg("connected_count", fmt::group_digits(st->peersConnected)));
+            fmt::arg("active_count", st->peersSendingToUs),
+            fmt::arg("connected_count", st->peersConnected));
 
     case TR_STATUS_SEED:
         return fmt::format(
@@ -260,8 +260,8 @@ auto getActivityString(
                 "Seeding to {active_count} of {connected_count} connected peer",
                 "Seeding to {active_count} of {connected_count} connected peers",
                 st->peersConnected),
-            fmt::arg("active_count", fmt::group_digits(st->peersGettingFromUs)),
-            fmt::arg("connected_count", fmt::group_digits(st->peersConnected)));
+            fmt::arg("active_count", st->peersGettingFromUs),
+            fmt::arg("connected_count", st->peersConnected));
 
     default:
         g_assert_not_reached();

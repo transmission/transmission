@@ -94,7 +94,7 @@ Glib::ustring tr_strltime(time_t seconds)
     }
 
     auto const days = (int)(seconds / 86400);
-    auto const d = fmt::format(ngettext("{days} day", "{days} days", days), fmt::arg("days", fmt::group_digits(days)));
+    auto const d = fmt::format(ngettext("{days} day", "{days:L} days", days), fmt::arg("days", days));
     int const hours = (seconds % 86400) / 3600;
     auto const h = fmt::format(ngettext("{hours} hour", "{hours} hours", hours), fmt::arg("hours", hours));
     if (days != 0)
