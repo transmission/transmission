@@ -72,24 +72,28 @@ constexpr std::pair<char*, size_t> buf_append(char* buf, size_t buflen, T t, Arg
     return buf_append(buf, buflen, args...);
 }
 
-// ['0'..'9']: ch - '0'
-// ['A'..'Z']: 10 + ch - '9'
-// ['a'..'z']: 36 + ch - '9'
-auto constexpr charints = std::array<std::string_view, 256>{
-    { "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",
-      "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",
-      "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "0",  "1",  "2",  "3",  "4",  "5",  "6",  "7",  "8",  "9",  "x",  "x",
-      "x",  "x",  "x",  "x",  "x",  "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24",
-      "25", "26", "27", "28", "29", "30", "31", "32", "33", "34", "35", "x",  "x",  "x",  "x",  "x",  "x",  "36", "37", "38",
-      "39", "40", "41", "42", "43", "44", "45", "46", "47", "48", "49", "50", "51", "52", "53", "54", "55", "56", "57", "58",
-      "59", "60", "61", "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",
-      "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",
-      "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",
-      "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",
-      "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",
-      "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",
-      "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x" }
-};
+constexpr std::string_view charint(char ch)
+{
+    if (ch < 0)
+    {
+        return "x";
+    }
+
+    // ['0'..'9']: ch - '0'
+    // ['A'..'Z']: 10 + ch - '9'
+    // ['a'..'z']: 36 + ch - '9'
+    auto constexpr CharInts = std::array<std::string_view, 128>{
+        { "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",
+          "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",
+          "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "0",  "1",  "2",  "3",  "4",  "5",  "6",  "7",  "8",  "9",  "x",  "x",
+          "x",  "x",  "x",  "x",  "x",  "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24",
+          "25", "26", "27", "28", "29", "30", "31", "32", "33", "34", "35", "x",  "x",  "x",  "x",  "x",  "x",  "36", "37", "38",
+          "39", "40", "41", "42", "43", "44", "45", "46", "47", "48", "49", "50", "51", "52", "53", "54", "55", "56", "57", "58",
+          "59", "60", "61", "x",  "x",  "x",  "x",  "x" }
+    };
+
+    return CharInts[ch];
+}
 
 int strint(void const* pch, int span, int base = 0)
 {
@@ -249,15 +253,15 @@ using format_func = void (*)(char* buf, size_t buflen, std::string_view name, tr
 
 constexpr void three_digit_formatter(char* buf, size_t buflen, std::string_view name, tr_peer_id_t id)
 {
-    buf_append(buf, buflen, name, ' ', charints[id[3]], '.', charints[id[4]], '.', charints[id[5]]);
+    buf_append(buf, buflen, name, ' ', charint(id[3]), '.', charint(id[4]), '.', charint(id[5]));
 }
 
 constexpr void four_digit_formatter(char* buf, size_t buflen, std::string_view name, tr_peer_id_t id)
 {
-    buf_append(buf, buflen, name, ' ', charints[id[3]], '.', charints[id[4]], '.', charints[id[5]], '.', charints[id[6]]);
+    buf_append(buf, buflen, name, ' ', charint(id[3]), '.', charint(id[4]), '.', charint(id[5]), '.', charint(id[6]));
 }
 
-constexpr void no_version_formatter(char* buf, size_t buflen, std::string_view name, tr_peer_id_t /*id*/)
+void no_version_formatter(char* buf, size_t buflen, std::string_view name, tr_peer_id_t /*id*/)
 {
     buf_append(buf, buflen, name);
 }
@@ -344,23 +348,23 @@ constexpr void burst_formatter(char* buf, size_t buflen, std::string_view name, 
 
 constexpr void ctorrent_formatter(char* buf, size_t buflen, std::string_view name, tr_peer_id_t id)
 {
-    buf_append(buf, buflen, name, ' ', charints[id[3]], '.', charints[id[4]], '.', id[5], id[6]);
+    buf_append(buf, buflen, name, ' ', charint(id[3]), '.', charint(id[4]), '.', id[5], id[6]);
 }
 
 constexpr void folx_formatter(char* buf, size_t buflen, std::string_view name, tr_peer_id_t id)
 {
-    buf_append(buf, buflen, name, ' ', charints[id[3]], '.', 'x');
+    buf_append(buf, buflen, name, ' ', charint(id[3]), '.', 'x');
 }
 
 constexpr void ktorrent_formatter(char* buf, size_t buflen, std::string_view name, tr_peer_id_t id)
 {
     if (id[5] == 'D')
     {
-        buf_append(buf, buflen, name, ' ', charints[id[3]], '.', charints[id[4]], " Dev "sv, charints[id[6]]);
+        buf_append(buf, buflen, name, ' ', charint(id[3]), '.', charint(id[4]), " Dev "sv, charint(id[6]));
     }
     else if (id[5] == 'R')
     {
-        buf_append(buf, buflen, name, ' ', charints[id[3]], '.', charints[id[4]], " RC "sv, charints[id[6]]);
+        buf_append(buf, buflen, name, ' ', charint(id[3]), '.', charint(id[4]), " RC "sv, charint(id[6]));
     }
     else
     {
@@ -389,7 +393,7 @@ constexpr void mainline_formatter(char* buf, size_t buflen, std::string_view nam
 
 constexpr void mediaget_formatter(char* buf, size_t buflen, std::string_view name, tr_peer_id_t id)
 {
-    buf_append(buf, buflen, name, ' ', charints[id[3]], '.', charints[id[4]]);
+    buf_append(buf, buflen, name, ' ', charint(id[3]), '.', charint(id[4]));
 }
 
 constexpr void mldonkey_formatter(char* buf, size_t buflen, std::string_view name, tr_peer_id_t id)
@@ -411,7 +415,7 @@ constexpr void opera_formatter(char* buf, size_t buflen, std::string_view name, 
 
 constexpr void picotorrent_formatter(char* buf, size_t buflen, std::string_view name, tr_peer_id_t id)
 {
-    buf_append(buf, buflen, name, ' ', charints[id[3]], '.', id[4], id[5], '.', charints[id[6]]);
+    buf_append(buf, buflen, name, ' ', charint(id[3]), '.', id[4], id[5], '.', charint(id[6]));
 }
 
 constexpr void plus_formatter(char* buf, size_t buflen, std::string_view name, tr_peer_id_t id)
@@ -421,7 +425,7 @@ constexpr void plus_formatter(char* buf, size_t buflen, std::string_view name, t
 
 constexpr void qvod_formatter(char* buf, size_t buflen, std::string_view name, tr_peer_id_t id)
 {
-    buf_append(buf, buflen, name, ' ', charints[id[4]], '.', charints[id[5]], '.', charints[id[6]], '.', charints[id[7]]);
+    buf_append(buf, buflen, name, ' ', charint(id[4]), '.', charint(id[5]), '.', charint(id[6]), '.', charint(id[7]));
 }
 
 void transmission_formatter(char* buf, size_t buflen, std::string_view name, tr_peer_id_t id)
@@ -500,7 +504,7 @@ constexpr void xfplay_formatter(char* buf, size_t buflen, std::string_view name,
 
 void xtorrent_formatter(char* buf, size_t buflen, std::string_view name, tr_peer_id_t id)
 {
-    std::tie(buf, buflen) = buf_append(buf, buflen, name, ' ', charints[id[3]], '.', charints[id[4]], " ("sv);
+    std::tie(buf, buflen) = buf_append(buf, buflen, name, ' ', charint(id[3]), '.', charint(id[4]), " ("sv);
     *fmt::format_to_n(buf, buflen - 1, FMT_STRING("{:d}"), strint(&id[5], 2)).out = '\0';
 }
 
