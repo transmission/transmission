@@ -2,7 +2,7 @@ It's not always possible to set all configurations from the GUI, especially on t
 
 Note: The client _should_ be closed before making changes, otherwise settings will be reverted to it's previous state.
 
-Some of Transmission's behavior can also be customized via EnvironmentVariables.
+Some of Transmission's behavior can also be customized via environment variables.
 
 # GTK / Daemon / CLI
 

@@ -24,7 +24,7 @@ If you're downloading, things are a little better because you can download from 
 
 ## 4. Is it your speed limits?
 
-This falls into the are-you-sure-it-is-plugged-in category, but don't be embarassed: lots of people have been bitten by this. Note: remember that there are both per-torrent and overall speed limits. :)
+This falls into the are-you-sure-it-is-plugged-in category, but don't be embarrassed: lots of people have been bitten by this. Note: remember that there are both per-torrent and overall speed limits. :)
 
 ## 5. Is it a small swarm?
 
