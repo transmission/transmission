@@ -261,7 +261,7 @@ bool tr_variantParseBenc(tr_variant& top, int parse_opts, std::string_view benc,
     using Stack = transmission::benc::ParserStack<512>;
     auto stack = Stack{};
     auto handler = MyHandler{ &top, parse_opts };
-    return transmission::benc::parse(benc, stack, handler, setme_end, error);
+    return transmission::benc::parse(benc, stack, handler, setme_end, error) && std::empty(stack);
 }
 
 /****
