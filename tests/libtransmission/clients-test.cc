@@ -74,3 +74,31 @@ TEST(Client, clientForId)
         EXPECT_EQ(test.expected_client, std::string_view{ buf.data() });
     }
 }
+
+TEST(Client, fuzzRegressions)
+{
+    auto constexpr Tests = std::array<std::string_view, 5>{
+        "LVJTp3u+Aptl01HjzTHXVC5b9g4="sv, "LWJrHb2OpoNsJdODHA7iyXjnHxc="sv, "LU1PjpTjmvUth+f15YTOOggXl3k="sv,
+        "LUxU1gO7xhfBD4bmyZkB+neZIx0="sv, "LVJTp3u+Aptl01HjzTHXVC5b9g4="sv,
+    };
+
+    for (auto const& test : Tests)
+    {
+        auto const input = tr_base64_decode(test);
+        auto peer_id = tr_peer_id_t{};
+        std::copy(std::begin(input), std::end(input), std::begin(peer_id));
+        auto buf = std::array<char, 128>{};
+        tr_clientForId(buf.data(), buf.size(), peer_id);
+    }
+}
+
+TEST(Client, fuzz)
+{
+    for (size_t i = 0; i < 100000; ++i)
+    {
+        auto peer_id = tr_peer_id_t{};
+        tr_rand_buffer(std::data(peer_id), std::size(peer_id));
+        auto buf = std::array<char, 128>{};
+        tr_clientForId(buf.data(), buf.size(), peer_id);
+    }
+}
