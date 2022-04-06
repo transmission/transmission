@@ -167,6 +167,11 @@ struct ParserStack
         depth = 0;
     }
 
+    [[nodiscard]] constexpr auto empty() const noexcept
+    {
+        return depth == 0;
+    }
+
     constexpr void tokenWalked()
     {
         ++stack[depth].n_children_walked;
