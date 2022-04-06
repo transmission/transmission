@@ -1240,20 +1240,14 @@ bool tr_variantFromBuf(tr_variant* setme, int opts, std::string_view buf, char c
     auto locale_ctx = locale_context{};
     use_numeric_locale(&locale_ctx, "C");
 
-    auto success = bool{};
-    if ((opts & TR_VARIANT_PARSE_BENC) != 0)
+    *setme = {};
+
+    auto const success = ((opts & TR_VARIANT_PARSE_BENC) != 0) ? tr_variantParseBenc(*setme, opts, buf, setme_end, error) :
+                                                                 tr_variantParseJson(*setme, opts, buf, setme_end, error);
+
+    if (!success)
     {
-        success = tr_variantParseBenc(*setme, opts, buf, setme_end, error);
-    }
-    else
-    {
-        // TODO: tr_variantParseJson() should take a tr_error* same as ParseBenc
-        auto err = tr_variantParseJson(*setme, opts, buf, setme_end);
-        if (err != 0)
-        {
-            tr_error_set(error, EILSEQ, "error parsing encoded data"sv);
-        }
-        success = err == 0;
+        tr_variantFree(setme);
     }
 
     /* restore the previous locale */
