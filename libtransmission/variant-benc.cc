@@ -101,6 +101,11 @@ std::optional<std::string_view> ParseString(std::string_view* benc)
 
     // get the string length
     auto svtmp = benc->substr(0, colon_pos);
+    if (!std::all_of(std::begin(svtmp), std::end(svtmp), [](auto ch) { return isdigit(ch) != 0; }))
+    {
+        return {};
+    }
+
     auto const len = tr_parseNum<size_t>(svtmp);
     if (!len || *len >= MaxBencStrLength)
     {
