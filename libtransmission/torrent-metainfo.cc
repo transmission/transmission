@@ -470,6 +470,7 @@ bool tr_torrent_metainfo::parseBenc(std::string_view benc, tr_error** error)
     auto top = tr_variant{};
     if (!tr_variantFromBuf(&top, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, benc, nullptr, error))
     {
+        tr_variantFree(&top);
         return false;
     }
 
