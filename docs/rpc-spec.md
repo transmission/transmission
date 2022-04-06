@@ -9,7 +9,7 @@ RPC requests and responses are formatted in JSON.
 
 ### 1.2 Tools
 
-If `transmission-remote` is called with a `--debug` argument, its RPC traffic to the Transmission server will be dumped to the terinal. This can be useful when you want to compare requests in your application to another for reference.
+If `transmission-remote` is called with a `--debug` argument, its RPC traffic to the Transmission server will be dumped to the terminal. This can be useful when you want to compare requests in your application to another for reference.
 
 If `transmission-qt` is run with an environment variable `TR_RPC_VERBOSE` set, it too will dump the RPC requests and responses to the terminal for inspection.
 

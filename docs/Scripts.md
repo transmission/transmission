@@ -2,9 +2,9 @@
 
 ## Introduction
 
-Thanks to the powerful [RPC](./rpc-spec.md), `transmission-remote` can talk to any client that has the RPC enabled. This means that a script written using `transmission-remote` or [RPC](./rpc-spec.md) can, without rewrite, comunicate with all the Transmission clients: Mac, Linux, Windows, and headless.
+Thanks to the powerful [RPC](./rpc-spec.md), `transmission-remote` can talk to any client that has the RPC enabled. This means that a script written using `transmission-remote` or [RPC](./rpc-spec.md) can, without rewrite, communicate with all the Transmission clients: Mac, Linux, Windows, and headless.
 
-Mac OS users may wonder wether there will be Applescript scripts, the answer is ''no''. Although Applescript is a nice technology, it's a pain to implement. However, Mac OS X is a Unix after all, so any script you find here will also work on the Mac. Even from within Applescript, you can run these scripts by typing: `do shell script "path/to/script"`.
+Mac OS users may wonder whether there will be Applescript scripts, the answer is ''no''. Although Applescript is a nice technology, it's a pain to implement. However, Mac OS X is a Unix after all, so any script you find here will also work on the Mac. Even from within Applescript, you can run these scripts by typing: `do shell script "path/to/script"`.
 
 ## How-To
 
@@ -21,7 +21,7 @@ For those who need more information how to use the scripts, have a look at the f
 ## Scripts
 
 ### Start/Stop
- * [wiki:Scripts/initd init.d script] (Debian, Ubuntu and BSD deratives)
+ * [wiki:Scripts/initd init.d script] (Debian, Ubuntu and BSD derivatives)
  * [wiki:Scripts/runscript runscript] (Gentoo and other `runscript`-compatible systems)
 
 
@@ -32,7 +32,7 @@ Transmission can be set to invoke a script when downloads complete. The environm
  * `TR_APP_VERSION` - Transmission's short version string, e.g. `4.0.0`
  * `TR_TIME_LOCALTIME`
  * `TR_TORRENT_BYTES_DOWNLOADED` - Number of bytes that were downloaded for this torrent
- * `TR_TORRENT_DIR` - Loation of the downloaded data
+ * `TR_TORRENT_DIR` - Location of the downloaded data
  * `TR_TORRENT_HASH` - The torrent's info hash
  * `TR_TORRENT_ID`
  * `TR_TORRENT_LABELS` - A comma-delimited list of the torrent's labels
@@ -52,7 +52,7 @@ Functionality of these scripts has been implemented in libtransmission and is th
 
 ## contrib/scripts
 
-Tomas Carnecky (aka wereHamster) is maintaining a set of scripts in his [http://github.com/wereHamster/transmission/tree/master/contrib/scripts/ github repository].
+Tomas Carnecky (aka wereHamster) is maintaining a set of scripts in his [http://github.com/wereHamster/transmission/tree/master/contrib/scripts/ GitHub repository].
 
 Falk Husemann (aka hxgn) is maintaining scripts in his [http://falkhusemann.de/blog/category/tcp_ip/transmission-tcp_ip/ blog].
 
