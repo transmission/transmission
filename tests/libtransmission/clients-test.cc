@@ -94,7 +94,7 @@ TEST(Client, fuzzRegressions)
 
 TEST(Client, fuzz)
 {
-    for (size_t i = 0; i < 100000; ++i)
+    for (size_t i = 0; i < 10000; ++i)
     {
         auto peer_id = tr_peer_id_t{};
         tr_rand_buffer(std::data(peer_id), std::size(peer_id));

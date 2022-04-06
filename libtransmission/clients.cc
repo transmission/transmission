@@ -74,25 +74,109 @@ constexpr std::pair<char*, size_t> buf_append(char* buf, size_t buflen, T t, Arg
 
 constexpr std::string_view charint(char ch)
 {
-    if (ch < 0)
+    switch (ch)
     {
-        return "x";
+    case '0':
+        return "0"sv;
+    case '1':
+        return "1"sv;
+    case '2':
+        return "2"sv;
+    case '3':
+        return "3"sv;
+    case '4':
+        return "4"sv;
+    case '5':
+        return "5"sv;
+    case '6':
+        return "6"sv;
+    case '7':
+        return "7"sv;
+    case '8':
+        return "8"sv;
+    case '9':
+        return "9"sv;
+    case 'a':
+    case 'A':
+        return "10"sv;
+    case 'b':
+    case 'B':
+        return "11"sv;
+    case 'c':
+    case 'C':
+        return "12"sv;
+    case 'd':
+    case 'D':
+        return "13"sv;
+    case 'e':
+    case 'E':
+        return "14"sv;
+    case 'f':
+    case 'F':
+        return "15"sv;
+    case 'g':
+    case 'G':
+        return "16"sv;
+    case 'h':
+    case 'H':
+        return "17"sv;
+    case 'i':
+    case 'I':
+        return "18"sv;
+    case 'j':
+    case 'J':
+        return "19"sv;
+    case 'k':
+    case 'K':
+        return "20"sv;
+    case 'l':
+    case 'L':
+        return "21"sv;
+    case 'm':
+    case 'M':
+        return "22"sv;
+    case 'n':
+    case 'N':
+        return "23"sv;
+    case 'o':
+    case 'O':
+        return "24"sv;
+    case 'p':
+    case 'P':
+        return "25"sv;
+    case 'q':
+    case 'Q':
+        return "26"sv;
+    case 'r':
+    case 'R':
+        return "27"sv;
+    case 's':
+    case 'S':
+        return "28"sv;
+    case 't':
+    case 'T':
+        return "29"sv;
+    case 'u':
+    case 'U':
+        return "30"sv;
+    case 'v':
+    case 'V':
+        return "31"sv;
+    case 'w':
+    case 'W':
+        return "32"sv;
+    case 'x':
+    case 'X':
+        return "33"sv;
+    case 'y':
+    case 'Y':
+        return "34"sv;
+    case 'z':
+    case 'Z':
+        return "35"sv;
+    default:
+        return "x"sv;
     }
-
-    // ['0'..'9']: ch - '0'
-    // ['A'..'Z']: 10 + ch - '9'
-    // ['a'..'z']: 36 + ch - '9'
-    auto constexpr CharInts = std::array<std::string_view, 128>{
-        { "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",
-          "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",
-          "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "0",  "1",  "2",  "3",  "4",  "5",  "6",  "7",  "8",
-          "9",  "x",  "x",  "x",  "x",  "x",  "x",  "x",  "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20",
-          "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31", "32", "33", "34", "35", "x",  "x",  "x",  "x",
-          "x",  "x",  "36", "37", "38", "39", "40", "41", "42", "43", "44", "45", "46", "47", "48", "49", "50", "51", "52",
-          "53", "54", "55", "56", "57", "58", "59", "60", "61", "x",  "x",  "x",  "x",  "x" }
-    };
-
-    return CharInts[ch];
 }
 
 int strint(void const* pch, int span, int base = 0)
