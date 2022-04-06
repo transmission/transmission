@@ -3,14 +3,16 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include "transmission.h"
-#include "magnet-metainfo.h"
-#include "utils.h"
+#include <array>
+#include <string_view>
 
 #include "gtest/gtest.h"
 
-#include <array>
-#include <string_view>
+#include "transmission.h"
+
+#include "crypto-utils.h"
+#include "magnet-metainfo.h"
+#include "utils.h"
 
 using namespace std::literals;
 
@@ -87,5 +89,33 @@ TEST(MagnetMetainfo, magnetParse)
         EXPECT_EQ(0U, std::size(mm.announceList()));
         EXPECT_EQ(0U, mm.webseedCount());
         EXPECT_EQ(ExpectedHash, mm.infoHash());
+    }
+}
+
+TEST(WebUtilsTest, parseMagnetFuzzRegressions)
+{
+    auto buf = std::vector<char>{};
+
+    static auto constexpr Tests = std::array<std::string_view, 1>{
+        "UICOl7RLjChs/QZZwNH4sSQwuH890UMHuoxoWBmMkr0=",
+    };
+
+    for (auto const& test : Tests)
+    {
+        auto mm = tr_magnet_metainfo{};
+        mm.parseMagnet(tr_base64_decode(test));
+    }
+}
+
+TEST(WebUtilsTest, parseMagnetFuzz)
+{
+    auto buf = std::vector<char>{};
+
+    for (size_t i = 0; i < 100000; ++i)
+    {
+        buf.resize(tr_rand_int(1024));
+        tr_rand_buffer(std::data(buf), std::size(buf));
+        auto mm = tr_magnet_metainfo{};
+        EXPECT_FALSE(mm.parseMagnet({ std::data(buf), std::size(buf) }));
     }
 }

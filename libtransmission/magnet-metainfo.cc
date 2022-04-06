@@ -119,7 +119,7 @@ std::optional<tr_sha1_digest_t> parseBase32Hash(std::string_view sv)
             std::begin(sv),
             std::end(sv),
             [](unsigned char ch)
-            { return '0' <= ch && ch <= '0' + std::size(bitzi::Base32Lookup) && bitzi::Base32Lookup[ch - '0'] != 0xFF; }))
+            { return '0' <= ch && ch < '0' + std::size(bitzi::Base32Lookup) && bitzi::Base32Lookup[ch - '0'] != 0xFF; }))
     {
         return {};
     }
