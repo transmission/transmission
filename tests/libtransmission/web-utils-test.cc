@@ -12,6 +12,8 @@
 #endif
 
 #include "transmission.h"
+
+#include "crypto-utils.h"
 #include "platform.h"
 #include "web-utils.h"
 
@@ -126,6 +128,18 @@ TEST_F(WebUtilsTest, urlParse)
     EXPECT_EQ("/some/path"sv, parsed->path);
     EXPECT_EQ("8080"sv, parsed->portstr);
     EXPECT_EQ(8080, parsed->port);
+}
+
+TEST(WebUtilsTest, urlParseFuzz)
+{
+    auto buf = std::vector<char>{};
+
+    for (size_t i = 0; i < 100000; ++i)
+    {
+        buf.resize(tr_rand_int(1024));
+        tr_rand_buffer(std::data(buf), std::size(buf));
+        tr_urlParse({ std::data(buf), std::size(buf) });
+    }
 }
 
 TEST_F(WebUtilsTest, urlNextQueryPair)
