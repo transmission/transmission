@@ -703,7 +703,7 @@ char* tr_clientForId(char* buf, size_t buflen, tr_peer_id_t peer_id)
             }
             else
             {
-                walk = fmt::format_to_n(walk, end - walk - 1, FMT_STRING("%{:02X}"), unsigned(c)).out;
+                walk = fmt::format_to_n(walk, end - walk - 1, FMT_STRING("%{:02X}"), static_cast<unsigned char>(c)).out;
             }
         }
 
