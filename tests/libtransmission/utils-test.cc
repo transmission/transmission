@@ -206,33 +206,6 @@ TEST_F(UtilsTest, trParseNumberRange)
     EXPECT_EQ(empty_string, tostring(numbers));
 }
 
-namespace
-{
-
-int compareInts(void const* va, void const* vb) noexcept
-{
-    auto const a = *static_cast<int const*>(va);
-    auto const b = *static_cast<int const*>(vb);
-    return a - b;
-}
-
-} // namespace
-
-TEST_F(UtilsTest, lowerbound)
-{
-    auto const a = std::array<int, 7>{ 1, 2, 3, 3, 3, 5, 8 };
-    auto const expected_pos = std::array<int, 10>{ 0, 1, 2, 5, 5, 6, 6, 6, 7, 7 };
-    auto const expected_exact = std::array<bool, 10>{ true, true, true, false, true, false, false, true, false, false };
-
-    for (int i = 1; i <= 10; i++)
-    {
-        bool exact;
-        auto const pos = tr_lowerBound(&i, a.data(), a.size(), sizeof(int), compareInts, &exact);
-        EXPECT_EQ(expected_pos[i - 1], pos);
-        EXPECT_EQ(expected_exact[i - 1], exact);
-    }
-}
-
 TEST_F(UtilsTest, trStrlower)
 {
     EXPECT_EQ(""sv, tr_strlower(""sv));
