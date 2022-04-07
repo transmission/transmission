@@ -91,12 +91,6 @@
 #define TR_GNUC_PRINTF(fmt, args)
 #endif
 
-#if __has_attribute(__nonnull__) || TR_GNUC_CHECK_VERSION(3, 3)
-#define TR_GNUC_NONNULL(...) __attribute__((__nonnull__(__VA_ARGS__)))
-#else
-#define TR_GNUC_NONNULL(...)
-#endif
-
 #if __has_attribute(__sentinel__) || TR_GNUC_CHECK_VERSION(4, 3)
 #define TR_GNUC_NULL_TERMINATED __attribute__((__sentinel__))
 #else
