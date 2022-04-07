@@ -4372,8 +4372,7 @@ static void removeKeRangerRansomware()
         [segmentedCell setTag:TOOLBAR_PAUSE_TAG forSegment:TOOLBAR_PAUSE_TAG];
         [segmentedControl setImage:[NSImage largeSystemSymbol:@"pause.circle.fill" withFallback:@"ToolbarPauseAllTemplate"]
                         forSegment:TOOLBAR_PAUSE_TAG];
-        [segmentedCell setToolTip:NSLocalizedString(@"Pause all transfers", "All toolbar item -> tooltip")
-                       forSegment:TOOLBAR_PAUSE_TAG];
+        [segmentedCell setToolTip:NSLocalizedString(@"Pause all transfers", "All toolbar item -> tooltip") forSegment:TOOLBAR_PAUSE_TAG];
 
         [segmentedCell setTag:TOOLBAR_RESUME_TAG forSegment:TOOLBAR_RESUME_TAG];
         [segmentedControl setImage:[NSImage imageNamed:@"ToolbarResumeAllTemplate"] forSegment:TOOLBAR_RESUME_TAG];
