@@ -85,12 +85,6 @@
 #define TR_DEPRECATED
 #endif
 
-#if __has_attribute(__hot__) || TR_GNUC_CHECK_VERSION(4, 3)
-#define TR_GNUC_HOT __attribute__((__hot__))
-#else
-#define TR_GNUC_HOT
-#endif
-
 #if __has_attribute(__malloc__) || TR_GNUC_CHECK_VERSION(2, 96)
 #define TR_GNUC_MALLOC __attribute__((__malloc__))
 #else
