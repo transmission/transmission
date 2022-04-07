@@ -53,17 +53,11 @@
 #define TR_UNLIKELY(x) (x)
 #endif
 
-#define TR_DISABLE_COPY(Class) \
-    Class(Class const&) = delete; \
-    Class& operator=(Class const&) = delete;
-
-#define TR_DISABLE_MOVE(Class) \
-    Class(Class&&) = delete; \
-    Class& operator=(Class&&) = delete;
-
 #define TR_DISABLE_COPY_MOVE(Class) \
-    TR_DISABLE_COPY(Class) \
-    TR_DISABLE_MOVE(Class)
+    Class& operator=(Class const&) = delete; \
+    Class& operator=(Class&&) = delete; \
+    Class(Class const&) = delete; \
+    Class(Class&&) = delete;
 
 /***
 ****
