@@ -85,12 +85,6 @@
 #define TR_DEPRECATED
 #endif
 
-#if __has_attribute(__format__) || TR_GNUC_CHECK_VERSION(2, 3)
-#define TR_GNUC_PRINTF(fmt, args) __attribute__((__format__(printf, fmt, args)))
-#else
-#define TR_GNUC_PRINTF(fmt, args)
-#endif
-
 #if __has_attribute(__sentinel__) || TR_GNUC_CHECK_VERSION(4, 3)
 #define TR_GNUC_NULL_TERMINATED __attribute__((__sentinel__))
 #else
