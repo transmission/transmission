@@ -397,9 +397,11 @@ extern "C"
 }
 
 /* User-level routine. returns whether or not 'text' and 'p' matched */
-bool tr_wildmat(char const* text, char const* p)
+bool tr_wildmat(std::string_view text, std::string_view pattern)
 {
-    return (p[0] == '*' && p[1] == '\0') || (DoMatch(text, p) != 0);
+    // TODO(ckerr): replace wildmat with base/strings/pattern.cc
+    // wildmat wants these to be zero-terminated.
+    return pattern == "*"sv || DoMatch(std::string{ text }.c_str(), std::string{ pattern }.c_str()) != 0;
 }
 
 char const* tr_strerror(int i)

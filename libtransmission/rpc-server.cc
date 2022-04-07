@@ -369,7 +369,7 @@ static bool isAddressAllowed(tr_rpc_server const* server, char const* address)
     auto const& src = server->whitelist;
 
     return !server->isWhitelistEnabled ||
-        std::any_of(std::begin(src), std::end(src), [&address](auto const& s) { return tr_wildmat(address, s.c_str()); });
+        std::any_of(std::begin(src), std::end(src), [&address](auto const& s) { return tr_wildmat(address, s); });
 }
 
 static bool isIPAddressWithOptionalPort(char const* host)

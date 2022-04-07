@@ -71,7 +71,7 @@ struct tr_error;
  * @brief Rich Salz's classic implementation of shell-style pattern matching for ?, \, [], and * characters.
  * @return 1 if the pattern matches, 0 if it doesn't, or -1 if an error occured
  */
-[[nodiscard]] bool tr_wildmat(char const* text, char const* pattern) TR_GNUC_NONNULL(1, 2);
+[[nodiscard]] bool tr_wildmat(std::string_view text, std::string_view pattern);
 
 /**
  * @brief Loads a file and returns its contents.
