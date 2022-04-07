@@ -719,7 +719,7 @@ bool trashDataFile(char const* filename, tr_error** error)
     }
 
     char* old_list = tr_torrentGetTrackerList(self.fHandle);
-    auto const new_list = fmt::format(FMT_STRING("{:s}\n\n{:s}", old_list, new_tracker.UTF8String);
+    auto const new_list = fmt::format(FMT_STRING("{:s}\n\n{:s}"), old_list, new_tracker.UTF8String);
     BOOL const success = tr_torrentSetTrackerList(self.fHandle, new_list.c_str());
     tr_free(old_list);
 
