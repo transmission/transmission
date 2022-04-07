@@ -114,7 +114,7 @@ tr_disk_space tr_dirSpace(std::string_view path);
  * @param seconds       seconds to wait
  * @param microseconds  microseconds to wait
  */
-void tr_timerAdd(struct event* timer, int seconds, int microseconds) TR_GNUC_NONNULL(1);
+void tr_timerAdd(struct event& timer, int seconds, int microseconds);
 
 /**
  * @brief Convenience wrapper around timer_add() to have a timer wake up in a number of milliseconds

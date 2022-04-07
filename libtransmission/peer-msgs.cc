@@ -243,7 +243,7 @@ public:
         if (torrent->allowsPex())
         {
             pex_timer.reset(evtimer_new(torrent->session->event_base, pexPulse, this));
-            tr_timerAdd(pex_timer.get(), PexIntervalSecs, 0);
+            tr_timerAdd(*pex_timer, PexIntervalSecs, 0);
         }
 
         if (tr_peerIoSupportsUTP(io))
@@ -2683,5 +2683,5 @@ static void pexPulse(evutil_socket_t /*fd*/, short /*what*/, void* vmsgs)
     sendPex(msgs);
 
     TR_ASSERT(msgs->pex_timer);
-    tr_timerAdd(msgs->pex_timer.get(), PexIntervalSecs, 0);
+    tr_timerAdd(*msgs->pex_timer, PexIntervalSecs, 0);
 }

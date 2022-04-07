@@ -709,7 +709,7 @@ static int rpc_server_start_retry(tr_rpc_server* server)
         server->start_retry_timer = evtimer_new(server->session->event_base, rpc_server_on_start_retry, server);
     }
 
-    tr_timerAdd(server->start_retry_timer, retry_delay, 0);
+    tr_timerAdd(*server->start_retry_timer, retry_delay, 0);
     ++server->start_retry_counter;
 
     return retry_delay;

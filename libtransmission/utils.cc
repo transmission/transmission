@@ -160,7 +160,7 @@ void* tr_memdup(void const* src, size_t byteCount)
 ****
 ***/
 
-void tr_timerAdd(struct event* timer, int seconds, int microseconds)
+void tr_timerAdd(struct event& timer, int seconds, int microseconds)
 {
     auto tv = timeval{};
     tv.tv_sec = seconds;
@@ -170,14 +170,14 @@ void tr_timerAdd(struct event* timer, int seconds, int microseconds)
     TR_ASSERT(tv.tv_usec >= 0);
     TR_ASSERT(tv.tv_usec < 1000000);
 
-    evtimer_add(timer, &tv);
+    evtimer_add(&timer, &tv);
 }
 
 void tr_timerAddMsec(struct event* timer, int msec)
 {
     int const seconds = msec / 1000;
     int const usec = (msec % 1000) * 1000;
-    tr_timerAdd(timer, seconds, usec);
+    tr_timerAdd(*timer, seconds, usec);
 }
 
 /**

@@ -1201,7 +1201,7 @@ tr_handshake* tr_handshakeNew(
     handshake->done_func_user_data = done_func_user_data;
     handshake->session = session;
     handshake->timeout_timer = evtimer_new(session->event_base, handshakeTimeout, handshake);
-    tr_timerAdd(handshake->timeout_timer, HANDSHAKE_TIMEOUT_SEC, 0);
+    tr_timerAdd(*handshake->timeout_timer, HANDSHAKE_TIMEOUT_SEC, 0);
 
     tr_peerIoRef(io); /* balanced by the unref in tr_handshakeFree */
     tr_peerIoSetIOFuncs(handshake->io, canRead, nullptr, gotError, handshake);
