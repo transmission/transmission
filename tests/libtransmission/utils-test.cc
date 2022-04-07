@@ -33,19 +33,6 @@ using ::libtransmission::test::makeString;
 using UtilsTest = ::testing::Test;
 using namespace std::literals;
 
-TEST_F(UtilsTest, trStripPositionalArgs)
-{
-    auto const* in = "Hello %1$s foo %2$.*f";
-    auto const* expected = "Hello %s foo %.*f";
-    auto const* out = tr_strip_positional_args(in);
-    EXPECT_STREQ(expected, out);
-
-    in = "Hello %1$'d foo %2$'f";
-    expected = "Hello %d foo %f";
-    out = tr_strip_positional_args(in);
-    EXPECT_STREQ(expected, out);
-}
-
 TEST_F(UtilsTest, trStrvJoin)
 {
     EXPECT_EQ(""sv, tr_strvJoin(""sv));
