@@ -69,14 +69,6 @@
 ****
 ***/
 
-#if __has_attribute(__deprecated__) || TR_GNUC_CHECK_VERSION(3, 1)
-#define TR_DEPRECATED __attribute__((__deprecated__))
-#elif defined(_MSC_VER)
-#define TR_DEPRECATED __declspec(deprecated)
-#else
-#define TR_DEPRECATED
-#endif
-
 #if __has_attribute(__malloc__) || TR_GNUC_CHECK_VERSION(2, 96)
 #define TR_GNUC_MALLOC __attribute__((__malloc__))
 #else
