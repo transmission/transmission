@@ -4,11 +4,13 @@
 
 #include <optional>
 
+#include <fmt/format.h>
+
 #include <libtransmission/transmission.h>
 
 #include <libtransmission/error.h>
 #include <libtransmission/log.h>
-#include <libtransmission/utils.h> // tr_free(), tr_strvJoin()
+#include <libtransmission/utils.h> // tr_free()
 
 #import "Torrent.h"
 #import "GroupsController.h"
@@ -717,7 +719,7 @@ bool trashDataFile(char const* filename, tr_error** error)
     }
 
     char* old_list = tr_torrentGetTrackerList(self.fHandle);
-    auto new_list = tr_strvJoin(old_list, "\n\n", new_tracker.UTF8String);
+    auto const new_list = fmt::format(FMT_STRING("{:s}\n\n{:s}"), old_list, new_tracker.UTF8String);
     BOOL const success = tr_torrentSetTrackerList(self.fHandle, new_list.c_str());
     tr_free(old_list);
 

@@ -172,7 +172,7 @@ TEST_F(TorrentMetainfoTest, sanitize)
 
 TEST_F(TorrentMetainfoTest, AndroidTorrent)
 {
-    auto const filename = tr_strvJoin(LIBTRANSMISSION_TEST_ASSETS_DIR, "/Android-x86 8.1 r6 iso.torrent"sv);
+    auto const filename = tr_pathbuf{ LIBTRANSMISSION_TEST_ASSETS_DIR, "/Android-x86 8.1 r6 iso.torrent"sv };
 
     auto* ctor = tr_ctorNew(session_);
     tr_error* error = nullptr;

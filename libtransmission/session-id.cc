@@ -10,7 +10,7 @@
 #include <sys/stat.h>
 #endif
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include "transmission.h"
 #include "crypto-utils.h"
@@ -57,7 +57,7 @@ static char* generate_new_session_id_value()
 
 static std::string get_session_id_lock_file_path(std::string_view session_id)
 {
-    return tr_strvJoin(tr_getSessionIdDir(), TR_PATH_DELIMITER_STR, "tr_session_id_"sv, session_id);
+    return fmt::format(FMT_STRING("{:s}/tr_session_id_{:s}"), tr_getSessionIdDir(), session_id);
 }
 
 static tr_sys_file_t create_session_id_lock_file(char const* session_id)

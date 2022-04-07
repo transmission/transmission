@@ -17,6 +17,7 @@
 #include <libtransmission/log.h>
 #include <libtransmission/makemeta.h>
 #include <libtransmission/tr-getopt.h>
+#include <libtransmission/tr-strbuf.h>
 #include <libtransmission/utils.h>
 #include <libtransmission/version.h>
 
@@ -179,9 +180,8 @@ int tr_main(int argc, char* argv[])
             return EXIT_FAILURE;
         }
 
-        auto const end = tr_strvJoin(base, ".torrent"sv);
-        char* cwd = tr_getcwd();
-        options.outfile = tr_strvDup(tr_strvPath(cwd, end.c_str()));
+        char* const cwd = tr_getcwd();
+        options.outfile = tr_strvDup(tr_pathbuf{ std::string_view{ cwd }, '/', base, ".torrent"sv });
         tr_free(cwd);
     }
 
