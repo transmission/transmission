@@ -305,19 +305,6 @@ template<typename... T, typename std::enable_if_t<(std::is_convertible_v<T, std:
     return setme;
 }
 
-template<typename... T, typename std::enable_if_t<(std::is_convertible_v<T, std::string_view> && ...), bool> = true>
-[[nodiscard]] std::string tr_strvJoin(T... args)
-{
-    auto setme = std::string{};
-    auto const n = (std::size(std::string_view{ args }) + ...);
-    if (setme.capacity() < n)
-    {
-        setme.reserve(n);
-    }
-    ((setme += args), ...);
-    return setme;
-}
-
 template<typename T>
 [[nodiscard]] constexpr bool tr_strvContains(std::string_view sv, T key) // c++23
 {

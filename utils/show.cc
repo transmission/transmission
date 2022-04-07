@@ -22,6 +22,7 @@
 #include <libtransmission/torrent-metainfo.h>
 #include <libtransmission/tr-getopt.h>
 #include <libtransmission/tr-macros.h>
+#include <libtransmission/tr-strbuf.h>
 #include <libtransmission/utils.h>
 #include <libtransmission/variant.h>
 #include <libtransmission/version.h>
@@ -338,11 +339,10 @@ void doScrape(tr_torrent_metainfo const& metainfo)
         auto escaped = std::array<char, TR_SHA1_DIGEST_LEN * 3 + 1>{};
         tr_http_escape_sha1(std::data(escaped), metainfo.infoHash());
         auto const scrape = tracker.scrape.full;
-        auto const url = tr_strvJoin(
-            scrape,
-            (tr_strvContains(scrape, '?') ? "&"sv : "?"sv),
-            "info_hash="sv,
-            std::data(escaped));
+        auto const url = tr_urlbuf{ scrape,
+                                    tr_strvContains(scrape, '?') ? '&' : '?',
+                                    "info_hash="sv,
+                                    std::string_view{ std::data(escaped) } };
 
         printf("%" TR_PRIsv " ... ", TR_PRIsv_ARG(url));
         fflush(stdout);

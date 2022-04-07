@@ -32,7 +32,7 @@
 #include <FindDirectory.h>
 #endif
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include "transmission.h"
 
@@ -210,7 +210,7 @@ static std::string getXdgEntryFromUserDirs(std::string_view key)
     }
 
     // search for key="val" and extract val
-    auto const search = tr_strvJoin(key, R"(=")");
+    auto const search = fmt::format(FMT_STRING("{:s}=\""), key);
     auto begin = std::search(std::begin(content), std::end(content), std::begin(search), std::end(search));
     if (begin == std::end(content))
     {
@@ -386,7 +386,7 @@ char const* tr_getWebClientDir([[maybe_unused]] tr_session const* session)
         {
             char const* const pkg = PACKAGE_DATA_DIR;
             auto* xdg = tr_env_get_string("XDG_DATA_DIRS", "");
-            auto const buf = tr_strvJoin(pkg, ":", xdg, ":/usr/local/share:/usr/share");
+            auto const buf = fmt::format(FMT_STRING("{:s}:{:s}:/usr/local/share:/usr/share"), pkg, xdg);
             tr_free(xdg);
 
             auto sv = std::string_view{ buf };

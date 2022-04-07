@@ -9,6 +9,8 @@
 #include <string>
 #include <string_view>
 
+#include <fmt/format.h>
+
 #include "transmission.h"
 
 #include "crypto-utils.h"
@@ -184,7 +186,7 @@ bool tr_magnet_metainfo::parseMagnet(std::string_view magnet_link, tr_error** er
     magnet_link = tr_strvStrip(magnet_link);
     if (auto const hash = parseHash(magnet_link); hash)
     {
-        return parseMagnet(tr_strvJoin("magnet:?xt=urn:btih:", tr_sha1_to_string(*hash)));
+        return parseMagnet(fmt::format(FMT_STRING("magnet:?xt=urn:btih:{:s}"), tr_sha1_to_string(*hash)));
     }
 
     auto const parsed = tr_urlParse(magnet_link);

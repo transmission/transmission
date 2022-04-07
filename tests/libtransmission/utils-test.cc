@@ -33,14 +33,6 @@ using ::libtransmission::test::makeString;
 using UtilsTest = ::testing::Test;
 using namespace std::literals;
 
-TEST_F(UtilsTest, trStrvJoin)
-{
-    EXPECT_EQ(""sv, tr_strvJoin(""sv));
-    EXPECT_EQ("test"sv, tr_strvJoin("test"sv));
-    EXPECT_EQ("foo/bar"sv, tr_strvJoin("foo"sv, "/", std::string{ "bar" }));
-    EXPECT_EQ("abcde"sv, tr_strvJoin("a", "b", "c", "d", "e"));
-}
-
 TEST_F(UtilsTest, trStrvContains)
 {
     EXPECT_FALSE(tr_strvContains("a test is this"sv, "TEST"sv));

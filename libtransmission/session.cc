@@ -136,7 +136,7 @@ std::optional<std::string> tr_session::WebMediator::cookieFile() const
 
 std::optional<std::string> tr_session::WebMediator::userAgent() const
 {
-    return tr_strvJoin(TR_NAME, "/"sv, SHORT_VERSION_STRING);
+    return fmt::format(FMT_STRING("{:s}/{:s}"), TR_NAME, SHORT_VERSION_STRING);
 }
 
 std::optional<std::string> tr_session::WebMediator::publicAddress() const
@@ -2359,11 +2359,11 @@ static void loadBlocklists(tr_session* session)
             tr_sys_path_info path_info;
             tr_sys_path_info binname_info;
 
-            auto const binname = tr_strvJoin(dirname, TR_PATH_DELIMITER_STR, name, ".bin"sv);
+            auto const binname = tr_pathbuf{ dirname, '/', name, ".bin"sv };
 
-            if (!tr_sys_path_get_info(binname.c_str(), 0, &binname_info)) /* create it */
+            if (!tr_sys_path_get_info(binname, 0, &binname_info)) /* create it */
             {
-                tr_blocklistFile* b = tr_blocklistFileNew(binname.c_str(), isEnabled);
+                tr_blocklistFile* b = tr_blocklistFileNew(binname, isEnabled);
 
                 if (auto const n = tr_blocklistFileSetContent(b, path.c_str()); n > 0)
                 {
@@ -2376,19 +2376,19 @@ static void loadBlocklists(tr_session* session)
                 tr_sys_path_get_info(path.c_str(), 0, &path_info) &&
                 path_info.last_modified_at >= binname_info.last_modified_at) /* update it */
             {
-                auto const old = binname + ".old";
-                tr_sys_path_remove(old.c_str());
-                tr_sys_path_rename(binname.c_str(), old.c_str());
-                auto* const b = tr_blocklistFileNew(binname.c_str(), isEnabled);
+                auto const old = tr_pathbuf{ binname, ".old"sv };
+                tr_sys_path_remove(old);
+                tr_sys_path_rename(binname, old);
+                auto* const b = tr_blocklistFileNew(binname, isEnabled);
 
                 if (tr_blocklistFileSetContent(b, path.c_str()) > 0)
                 {
-                    tr_sys_path_remove(old.c_str());
+                    tr_sys_path_remove(old);
                 }
                 else
                 {
-                    tr_sys_path_remove(binname.c_str());
-                    tr_sys_path_rename(old.c_str(), binname.c_str());
+                    tr_sys_path_remove(binname);
+                    tr_sys_path_rename(old, binname);
                 }
 
                 tr_blocklistFileFree(b);
@@ -2485,8 +2485,7 @@ int tr_blocklistSetContent(tr_session* session, char const* contentFilename)
 
     if (it == std::end(src))
     {
-        auto path = tr_strvJoin(session->config_dir, "blocklists"sv, name);
-        b = tr_blocklistFileNew(path.c_str(), session->useBlocklist());
+        b = tr_blocklistFileNew(tr_pathbuf{ session->config_dir, "/blocklists/"sv, name }, session->useBlocklist());
         src.push_back(b);
     }
     else
