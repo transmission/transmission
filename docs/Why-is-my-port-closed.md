@@ -1,4 +1,4 @@
-Transmission needs an open port to communicate. You can open one manually or let transmission try to aquire one using NAT PMP or UPnP. If both automatic port mapping and manual forwarding failed
+Transmission needs an open port to communicate. You can open one manually or let transmission try to acquire one using NAT PMP or UPnP. If both automatic port mapping and manual forwarding failed
 
 ## Open ports & forwarding
 
@@ -10,7 +10,7 @@ If you get the Message 'Port is closed'/'Port is Stealth' in the 'Ports' section
 
 ### Port check website is down
 
-Transmission needs an external site to check wether the port is open. However, if that site is down, Transmission has no way to check wether the port is open or not. If you suspect this is the case, go to [CanYouSeeMe.org](http://www.canyouseeme.org/).
+Transmission needs an external site to check whether the port is open. However, if that site is down, Transmission has no way to check whether the port is open or not. If you suspect this is the case, go to [CanYouSeeMe.org](http://www.canyouseeme.org/).
 
 ### UPnP / NAT-PMP
 
@@ -19,7 +19,7 @@ For UPnP/NAT-PMP compatible routers, make sure:
   * DMZ mode is disabled.
   * The port has not already been forwarded manually.
   * The port is not taken by another application
-  * The port has been released properly by Transmission. In some rare situations Transmission won't be able to release the port so it can't be aquired by Transmission afterwards.
+  * The port has been released properly by Transmission. In some rare situations Transmission won't be able to release the port so it can't be acquired by Transmission afterwards.
 
 Note: NAT-PMP is only for Apple Airport routers.
 
@@ -41,8 +41,8 @@ Though initially this was done to "combat viruses and spam", it is sometimes use
 
 ### LAN ISP
 
-eg. Universities, Wifi hotspots, RV parks and some 'true' ISPs (common in Rome, Italy).
+e.g. Universities, Wifi hotspots, RV parks and some 'true' ISPs (common in Rome, Italy).
 
-Though these ISPs are often very interesting, offering high speeds, unlimited bandwidth (sometimes) and low prizes. This because they don't buy IP adresses for their clients and provide the (local) network themselves.
+Though these ISPs are often very interesting, offering high speeds, unlimited bandwidth (sometimes) and low prizes. This because they don't buy IP addresses for their clients and provide the (local) network themselves.
 
 Basically the only thing you can do, is to ''politely'' ask for them to open (forward) a port for you.

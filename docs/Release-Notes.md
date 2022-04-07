@@ -182,7 +182,7 @@
 [http://trac.transmissionbt.com/query?milestone#2.80&group#component&order#severity All tickets closed by this release]
 #### All Platforms ####
   * Support renaming a transfer's files and folders
-  * Remove the most frequent thread locks in libtransmission (ie, fewer beachballs)
+  * Remove the most frequent thread locks in libtransmission (i.e., fewer beachballs)
   * Show the free disk space available when adding torrent
   * Faster reading and parsing of local data files
   * Better use of the OS's filesystem cache
@@ -1332,7 +1332,7 @@ This is a huge listen-to-the-users release -- it uses 103 ideas from users, incl
   * Fix 1.40 "lazy bitfield" error
   * Fix 1.40 "jumpy upload speed" bug
   * Fix handshake peer_id error
-  * Corrrectly handle Windows-style newlines in Bluetack blocklists
+  * Correctly handle Windows-style newlines in Bluetack blocklists
   * More accurate bandwidth measurement
   * File selection & priority was reset when editing a torrent's tracker list
   * Fix autoconf/automake build warnings
@@ -1524,7 +1524,7 @@ This is a huge listen-to-the-users release -- it uses 103 ideas from users, incl
   * Various backend bug fixes & improvements
 #### Mac ####
   * Window when adding torrents to select files and other settings
-  * Leopard: Collapsable group dividers
+  * Leopard: Collapsible group dividers
   * Use the file icon as the per-torrent action button
   * Tracker tab in the inspector
   * Message log specifies the torrent/activity the message relates to

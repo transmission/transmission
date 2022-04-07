@@ -192,7 +192,7 @@ The procedure is documented at [Building Transmission Qt on Windows](https://tra
 
 ## Switches ##
 
-The transmission `./configure` (or `./autogen.sh`) script allows you to switch on/off certain parts. To use these, you'll either use `--enable-*` or `--disable-*`. eg. To disable the GTK client: `--disable-gtk`.
+The transmission `./configure` (or `./autogen.sh`) script allows you to switch on/off certain parts. To use these, you'll either use `--enable-*` or `--disable-*`. e.g. To disable the GTK client: `--disable-gtk`.
 
 The switches that are available are:
  * **gtk** = enables GTK+ client (default)
@@ -204,4 +204,4 @@ The switches that are available are:
  * **wx** = enables wxWidgets client (unsupported)
  * **beos** = enables beos client (unsupported)
 
-Note: _`--disable-nls` removes the dependancy on gettext and intltool. It's designed for, and should only be used on, [HeadlessUsage embedded devices]. If you do have GTK+ installed on your box, you must also specify `--disable-gtk`._
+Note: _`--disable-nls` removes the dependency on gettext and intltool. It's designed for, and should only be used on, [HeadlessUsage embedded devices]. If you do have GTK+ installed on your box, you must also specify `--disable-gtk`._

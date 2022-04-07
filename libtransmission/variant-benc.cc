@@ -6,7 +6,6 @@
 #include <array>
 #include <cctype> /* isdigit() */
 #include <deque>
-#include <cerrno>
 #include <string_view>
 #include <optional>
 
@@ -102,6 +101,11 @@ std::optional<std::string_view> ParseString(std::string_view* benc)
 
     // get the string length
     auto svtmp = benc->substr(0, colon_pos);
+    if (!std::all_of(std::begin(svtmp), std::end(svtmp), [](auto ch) { return isdigit(ch) != 0; }))
+    {
+        return {};
+    }
+
     auto const len = tr_parseNum<size_t>(svtmp);
     if (!len || *len >= MaxBencStrLength)
     {
@@ -144,26 +148,31 @@ struct MyHandler : public transmission::benc::Handler
 
     bool Int64(int64_t value, Context const& /*context*/) final
     {
-        if (tr_variant* variant = get_node(); variant != nullptr)
+        auto* const variant = get_node();
+        if (variant == nullptr)
         {
-            tr_variantInitInt(variant, value);
+            return false;
         }
 
+        tr_variantInitInt(variant, value);
         return true;
     }
 
     bool String(std::string_view sv, Context const& /*context*/) final
     {
-        if (tr_variant* variant = get_node(); variant != nullptr)
+        auto* const variant = get_node();
+        if (variant == nullptr)
         {
-            if ((parse_opts_ & TR_VARIANT_PARSE_INPLACE) != 0)
-            {
-                tr_variantInitStrView(variant, sv);
-            }
-            else
-            {
-                tr_variantInitStr(variant, sv);
-            }
+            return false;
+        }
+
+        if ((parse_opts_ & TR_VARIANT_PARSE_INPLACE) != 0)
+        {
+            tr_variantInitStrView(variant, sv);
+        }
+        else
+        {
+            tr_variantInitStr(variant, sv);
         }
 
         return true;
@@ -171,12 +180,14 @@ struct MyHandler : public transmission::benc::Handler
 
     bool StartDict(Context const& /*context*/) final
     {
-        if (tr_variant* variant = get_node(); variant != nullptr)
+        auto* const variant = get_node();
+        if (variant == nullptr)
         {
-            tr_variantInitDict(variant, 0);
-            stack_.push_back(variant);
+            return false;
         }
 
+        tr_variantInitDict(variant, 0);
+        stack_.push_back(variant);
         return true;
     }
 
@@ -189,26 +200,36 @@ struct MyHandler : public transmission::benc::Handler
 
     bool EndDict(Context const& /*context*/) final
     {
-        stack_.pop_back();
+        if (std::empty(stack_))
+        {
+            return false;
+        }
 
+        stack_.pop_back();
         return true;
     }
 
     bool StartArray(Context const& /*context*/) final
     {
-        if (tr_variant* variant = get_node(); variant != nullptr)
+        auto* const variant = get_node();
+        if (variant == nullptr)
         {
-            tr_variantInitList(variant, 0);
-            stack_.push_back(variant);
+            return false;
         }
 
+        tr_variantInitList(variant, 0);
+        stack_.push_back(variant);
         return true;
     }
 
     bool EndArray(Context const& /*context*/) final
     {
-        stack_.pop_back();
+        if (std::empty(stack_))
+        {
+            return false;
+        }
 
+        stack_.pop_back();
         return true;
     }
 
@@ -221,19 +242,14 @@ private:
         {
             node = top_;
         }
-        else
+        else if (auto* parent = stack_.back(); tr_variantIsList(parent))
         {
-            auto* parent = stack_.back();
-
-            if (tr_variantIsList(parent))
-            {
-                node = tr_variantListAdd(parent);
-            }
-            else if (key_ && tr_variantIsDict(parent))
-            {
-                node = tr_variantDictAdd(parent, *key_);
-                key_.reset();
-            }
+            node = tr_variantListAdd(parent);
+        }
+        else if (key_ && tr_variantIsDict(parent))
+        {
+            node = tr_variantDictAdd(parent, *key_);
+            key_.reset();
         }
 
         return node;
@@ -245,12 +261,7 @@ bool tr_variantParseBenc(tr_variant& top, int parse_opts, std::string_view benc,
     using Stack = transmission::benc::ParserStack<512>;
     auto stack = Stack{};
     auto handler = MyHandler{ &top, parse_opts };
-    bool const ok = transmission::benc::parse(benc, stack, handler, setme_end, error);
-    if (!ok)
-    {
-        tr_variantFree(&top);
-    }
-    return ok;
+    return transmission::benc::parse(benc, stack, handler, setme_end, error) && std::empty(stack);
 }
 
 /****
