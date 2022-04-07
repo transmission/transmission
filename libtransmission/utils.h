@@ -121,7 +121,7 @@ void tr_timerAdd(struct event& timer, int seconds, int microseconds);
  * @param timer         the timer to set
  * @param milliseconds  milliseconds to wait
  */
-void tr_timerAddMsec(struct event* timer, int milliseconds) TR_GNUC_NONNULL(1);
+void tr_timerAddMsec(struct event& timer, int milliseconds);
 
 /** @brief return the current date in milliseconds */
 uint64_t tr_time_msec();

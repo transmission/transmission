@@ -260,7 +260,7 @@ private:
 
     void startTimer()
     {
-        tr_timerAddMsec(pulse_timer.get(), IdleTimerMsec);
+        tr_timerAddMsec(*pulse_timer, IdleTimerMsec);
     }
 
     static void onTimer(evutil_socket_t /*fd*/, short /*what*/, void* vwebseed)

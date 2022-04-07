@@ -173,11 +173,11 @@ void tr_timerAdd(struct event& timer, int seconds, int microseconds)
     evtimer_add(&timer, &tv);
 }
 
-void tr_timerAddMsec(struct event* timer, int msec)
+void tr_timerAddMsec(struct event& timer, int msec)
 {
     int const seconds = msec / 1000;
     int const usec = (msec % 1000) * 1000;
-    tr_timerAdd(*timer, seconds, usec);
+    tr_timerAdd(timer, seconds, usec);
 }
 
 /**
