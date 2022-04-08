@@ -7,6 +7,7 @@
 
 #include <cmath>
 #include <limits>
+#include <string_view>
 
 #include <QUrl>
 

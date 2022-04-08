@@ -3,7 +3,6 @@
 // License text can be found in the licenses/ folder.
 
 #include <cstdint>
-#include <string_view>
 
 #include <event2/event.h>
 

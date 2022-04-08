@@ -6,7 +6,6 @@
 #include <cerrno>
 #include <ctime>
 #include <cstdint> // uint32_t
-#include <string_view>
 
 #include <event2/util.h> /* evutil_inet_ntop() */
 
