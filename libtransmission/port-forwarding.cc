@@ -143,7 +143,7 @@ static void set_evtimer_from_status(tr_shared* s)
 
     if (s->timer != nullptr)
     {
-        tr_timerAdd(s->timer, sec, msec);
+        tr_timerAdd(*s->timer, sec, msec);
     }
 }
 

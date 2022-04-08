@@ -362,7 +362,7 @@ int tr_lpdInit(tr_session* ss, tr_address* /*tr_addr*/)
     event_add(lpd_event, nullptr);
 
     upkeep_timer = evtimer_new(ss->event_base, on_upkeep_timer, ss);
-    tr_timerAdd(upkeep_timer, UpkeepIntervalSecs, 0);
+    tr_timerAdd(*upkeep_timer, UpkeepIntervalSecs, 0);
 
     tr_logAddDebug("Local Peer Discovery initialised");
 
@@ -622,7 +622,7 @@ static void on_upkeep_timer(evutil_socket_t /*s*/, short /*type*/, void* /*user_
 {
     time_t const now = tr_time();
     tr_lpdAnnounceMore(now, UpkeepIntervalSecs);
-    tr_timerAdd(upkeep_timer, UpkeepIntervalSecs, 0);
+    tr_timerAdd(*upkeep_timer, UpkeepIntervalSecs, 0);
 }
 
 /**

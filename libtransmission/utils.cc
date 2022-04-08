@@ -160,7 +160,7 @@ void* tr_memdup(void const* src, size_t byteCount)
 ****
 ***/
 
-void tr_timerAdd(struct event* timer, int seconds, int microseconds)
+void tr_timerAdd(struct event& timer, int seconds, int microseconds)
 {
     auto tv = timeval{};
     tv.tv_sec = seconds;
@@ -170,10 +170,10 @@ void tr_timerAdd(struct event* timer, int seconds, int microseconds)
     TR_ASSERT(tv.tv_usec >= 0);
     TR_ASSERT(tv.tv_usec < 1000000);
 
-    evtimer_add(timer, &tv);
+    evtimer_add(&timer, &tv);
 }
 
-void tr_timerAddMsec(struct event* timer, int msec)
+void tr_timerAddMsec(struct event& timer, int msec)
 {
     int const seconds = msec / 1000;
     int const usec = (msec % 1000) * 1000;
@@ -397,9 +397,11 @@ extern "C"
 }
 
 /* User-level routine. returns whether or not 'text' and 'p' matched */
-bool tr_wildmat(char const* text, char const* p)
+bool tr_wildmat(std::string_view text, std::string_view pattern)
 {
-    return (p[0] == '*' && p[1] == '\0') || (DoMatch(text, p) != 0);
+    // TODO(ckerr): replace wildmat with base/strings/pattern.cc
+    // wildmat wants these to be zero-terminated.
+    return pattern == "*"sv || DoMatch(std::string{ text }.c_str(), std::string{ pattern }.c_str()) != 0;
 }
 
 char const* tr_strerror(int i)
@@ -999,17 +1001,18 @@ std::string tr_strratio(double ratio, char const* infinity)
 ****
 ***/
 
-bool tr_moveFile(char const* oldpath, char const* newpath, tr_error** error)
+bool tr_moveFile(std::string_view oldpath_in, std::string_view newpath_in, tr_error** error)
 {
-    tr_sys_path_info info;
+    auto const oldpath = tr_pathbuf{ oldpath_in };
+    auto const newpath = tr_pathbuf{ newpath_in };
 
-    /* make sure the old file exists */
+    // make sure the old file exists
+    auto info = tr_sys_path_info{};
     if (!tr_sys_path_get_info(oldpath, 0, &info, error))
     {
         tr_error_prefix(error, "Unable to get information on old file: ");
         return false;
     }
-
     if (info.type != TR_SYS_PATH_IS_FILE)
     {
         tr_error_set(error, TR_ERROR_EINVAL, "Old path does not point to a file."sv);
@@ -1017,14 +1020,11 @@ bool tr_moveFile(char const* oldpath, char const* newpath, tr_error** error)
     }
 
     // ensure the target directory exists
+    if (auto const newdir = tr_sys_path_dirname(newpath, error);
+        std::empty(newdir) || !tr_sys_dir_create(newdir.c_str(), TR_SYS_DIR_CREATE_PARENTS, 0777, error))
     {
-        auto const newdir = tr_sys_path_dirname(newpath, error);
-        bool const i = !std::empty(newdir) && tr_sys_dir_create(newdir.c_str(), TR_SYS_DIR_CREATE_PARENTS, 0777, error);
-        if (!i)
-        {
-            tr_error_prefix(error, "Unable to create directory for new file: ");
-            return false;
-        }
+        tr_error_prefix(error, "Unable to create directory for new file: ");
+        return false;
     }
 
     /* they might be on the same filesystem... */

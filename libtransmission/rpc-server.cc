@@ -369,7 +369,7 @@ static bool isAddressAllowed(tr_rpc_server const* server, char const* address)
     auto const& src = server->whitelist;
 
     return !server->isWhitelistEnabled ||
-        std::any_of(std::begin(src), std::end(src), [&address](auto const& s) { return tr_wildmat(address, s.c_str()); });
+        std::any_of(std::begin(src), std::end(src), [&address](auto const& s) { return tr_wildmat(address, s); });
 }
 
 static bool isIPAddressWithOptionalPort(char const* host)
@@ -709,7 +709,7 @@ static int rpc_server_start_retry(tr_rpc_server* server)
         server->start_retry_timer = evtimer_new(server->session->event_base, rpc_server_on_start_retry, server);
     }
 
-    tr_timerAdd(server->start_retry_timer, retry_delay, 0);
+    tr_timerAdd(*server->start_retry_timer, retry_delay, 0);
     ++server->start_retry_counter;
 
     return retry_delay;
