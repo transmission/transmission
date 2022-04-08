@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <cstdint> // uint32_t, uint64_t
 #include <ctime>
 #include <string>
 #include <string_view>
@@ -21,7 +22,7 @@ struct tr_error;
 struct tr_torrent_metainfo : public tr_magnet_metainfo
 {
 public:
-    [[nodiscard]] auto empty() const
+    [[nodiscard]] constexpr auto empty() const noexcept
     {
         return std::empty(files_);
     }
@@ -36,12 +37,12 @@ public:
 
     /// BLOCK INFO
 
-    [[nodiscard]] constexpr auto const& blockInfo() const
+    [[nodiscard]] constexpr auto const& blockInfo() const noexcept
     {
         return block_info_;
     }
 
-    [[nodiscard]] constexpr auto blockCount() const
+    [[nodiscard]] constexpr auto blockCount() const noexcept
     {
         return blockInfo().blockCount();
     }
@@ -57,7 +58,7 @@ public:
     {
         return blockInfo().pieceLoc(piece, offset, length);
     }
-    [[nodiscard]] constexpr auto blockSize(tr_block_index_t block) const
+    [[nodiscard]] constexpr auto blockSize(tr_block_index_t block) const noexcept
     {
         return blockInfo().blockSize(block);
     }
@@ -65,72 +66,72 @@ public:
     {
         return blockInfo().blockSpanForPiece(piece);
     }
-    [[nodiscard]] constexpr auto pieceCount() const
+    [[nodiscard]] constexpr auto pieceCount() const noexcept
     {
         return blockInfo().pieceCount();
     }
-    [[nodiscard]] constexpr auto pieceSize() const
+    [[nodiscard]] constexpr auto pieceSize() const noexcept
     {
         return blockInfo().pieceSize();
     }
-    [[nodiscard]] constexpr auto pieceSize(tr_piece_index_t piece) const
+    [[nodiscard]] constexpr auto pieceSize(tr_piece_index_t piece) const noexcept
     {
         return blockInfo().pieceSize(piece);
     }
-    [[nodiscard]] constexpr auto totalSize() const
+    [[nodiscard]] constexpr auto totalSize() const noexcept
     {
         return blockInfo().totalSize();
     }
 
-    [[nodiscard]] auto const& comment() const
+    [[nodiscard]] constexpr auto const& comment() const noexcept
     {
         return comment_;
     }
-    [[nodiscard]] auto const& creator() const
+    [[nodiscard]] constexpr auto const& creator() const noexcept
     {
         return creator_;
     }
-    [[nodiscard]] auto const& source() const
+    [[nodiscard]] constexpr auto const& source() const noexcept
     {
         return source_;
     }
 
-    [[nodiscard]] auto fileCount() const
+    [[nodiscard]] constexpr auto fileCount() const noexcept
     {
         return std::size(files_);
     }
+
+    [[nodiscard]] uint64_t fileSize(tr_file_index_t i) const;
 
     [[nodiscard]] std::string const& fileSubpath(tr_file_index_t i) const;
 
     void setFileSubpath(tr_file_index_t i, std::string_view subpath);
 
-    [[nodiscard]] uint64_t fileSize(tr_file_index_t i) const;
-
-    [[nodiscard]] auto const& isPrivate() const noexcept
+    [[nodiscard]] constexpr auto const& isPrivate() const noexcept
     {
         return is_private_;
     }
 
     [[nodiscard]] tr_sha1_digest_t const& pieceHash(tr_piece_index_t piece) const;
 
-    [[nodiscard]] auto const& dateCreated() const
+    [[nodiscard]] constexpr auto const& dateCreated() const noexcept
     {
         return date_created_;
     }
 
     [[nodiscard]] std::string benc() const;
 
-    [[nodiscard]] auto infoDictSize() const
+    [[nodiscard]] constexpr auto infoDictSize() const noexcept
     {
         return info_dict_size_;
     }
 
-    [[nodiscard]] auto infoDictOffset() const
+    [[nodiscard]] constexpr auto infoDictOffset() const noexcept
     {
         return info_dict_offset_;
     }
 
-    [[nodiscard]] auto piecesOffset() const
+    [[nodiscard]] constexpr auto piecesOffset() const noexcept
     {
         return pieces_offset_;
     }

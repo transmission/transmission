@@ -85,11 +85,6 @@ tr_torrent* tr_torrentFindFromId(tr_session* session, int id)
     return session->torrents().get(id);
 }
 
-tr_torrent* tr_torrentFindFromHash(tr_session* session, tr_sha1_digest_t const* hash)
-{
-    return hash == nullptr ? nullptr : session->torrents().get(*hash);
-}
-
 tr_torrent* tr_torrentFindFromMetainfo(tr_session* session, tr_torrent_metainfo const* metainfo)
 {
     if (session == nullptr || metainfo == nullptr)
@@ -1718,22 +1713,12 @@ void tr_torrentSetRatioLimitHitCallback(tr_torrent* tor, tr_torrent_ratio_limit_
     tor->ratio_limit_hit_func_user_data = user_data;
 }
 
-void tr_torrentClearRatioLimitHitCallback(tr_torrent* torrent)
-{
-    tr_torrentSetRatioLimitHitCallback(torrent, nullptr, nullptr);
-}
-
 void tr_torrentSetIdleLimitHitCallback(tr_torrent* tor, tr_torrent_idle_limit_hit_func func, void* user_data)
 {
     TR_ASSERT(tr_isTorrent(tor));
 
     tor->idle_limit_hit_func = func;
     tor->idle_limit_hit_func_user_data = user_data;
-}
-
-void tr_torrentClearIdleLimitHitCallback(tr_torrent* torrent)
-{
-    tr_torrentSetIdleLimitHitCallback(torrent, nullptr, nullptr);
 }
 
 static std::string buildLabelsString(tr_torrent const* tor)
@@ -2280,7 +2265,7 @@ static void deleteLocalData(tr_torrent const* tor, tr_fileFunc func)
         if (!std::empty(filename))
         {
             auto target = tr_strvPath(tmpdir, tor->fileSubpath(f));
-            tr_moveFile(filename.c_str(), target.c_str(), nullptr);
+            tr_moveFile(filename, target);
             files.emplace_back(target);
         }
     }
@@ -2431,7 +2416,7 @@ static void setLocationImpl(struct LocationData* const data)
             if (auto found = tor->findFile(i); found)
             {
                 auto const& oldpath = found->filename;
-                auto const newpath = tr_pathbuf{ location, "/"sv, found->subpath };
+                auto const newpath = tr_pathbuf{ location, '/', found->subpath() };
 
                 tr_logAddTraceTor(tor, fmt::format("Found file #{}: '{}'", i, oldpath));
 
@@ -2578,10 +2563,10 @@ static void tr_torrentFileCompleted(tr_torrent* tor, tr_file_index_t i)
      * it until now -- then rename it to match the one in the metadata */
     if (auto found = tor->findFile(i); found)
     {
-        if (auto const& file_subpath = tor->fileSubpath(i); file_subpath != found->subpath)
+        if (auto const& file_subpath = tor->fileSubpath(i); file_subpath != found->subpath())
         {
-            auto const oldpath = tr_pathbuf{ found->base, "/"sv, found->subpath };
-            auto const newpath = tr_pathbuf{ found->base, "/"sv, file_subpath };
+            auto const& oldpath = found->filename;
+            auto const newpath = tr_pathbuf{ found->base(), '/', file_subpath };
             tr_error* error = nullptr;
 
             if (!tr_sys_path_rename(oldpath, newpath, &error))
@@ -2723,7 +2708,7 @@ static void refreshCurrentDir(tr_torrent* tor)
     else
     {
         auto const found = tor->findFile(0);
-        dir = found ? tr_interned_string{ found->base } : tor->incompleteDir();
+        dir = found ? tr_interned_string{ found->base() } : tor->incompleteDir();
     }
 
     TR_ASSERT(!std::empty(dir));
@@ -2896,7 +2881,7 @@ static bool renameArgsAreValid(char const* oldpath, char const* newname)
 static auto renameFindAffectedFiles(tr_torrent const* tor, std::string_view oldpath)
 {
     auto indices = std::vector<tr_file_index_t>{};
-    auto oldpath_as_dir = tr_strvJoin(oldpath, "/"sv);
+    auto const oldpath_as_dir = tr_pathbuf{ oldpath, '/' };
     auto const n_files = tor->fileCount();
 
     for (tr_file_index_t i = 0; i < n_files; ++i)
@@ -2928,11 +2913,11 @@ static int renamePath(tr_torrent* tor, char const* oldpath, char const* newname)
     {
         auto const parent = tr_sys_path_dirname(src);
         auto const tgt = tr_strvEndsWith(src, tr_torrent::PartialFileSuffix) ?
-            tr_strvJoin(parent, TR_PATH_DELIMITER_STR, newname, tr_torrent::PartialFileSuffix) :
-            tr_strvPath(parent, newname);
+            tr_pathbuf{ parent, '/', newname, tr_torrent::PartialFileSuffix } :
+            tr_pathbuf{ parent, '/', newname };
 
         auto tmp = errno;
-        bool const tgt_exists = tr_sys_path_exists(tgt.c_str());
+        bool const tgt_exists = tr_sys_path_exists(tgt);
         errno = tmp;
 
         if (!tgt_exists)
@@ -2941,7 +2926,7 @@ static int renamePath(tr_torrent* tor, char const* oldpath, char const* newname)
 
             tmp = errno;
 
-            if (!tr_sys_path_rename(src.c_str(), tgt.c_str(), &error))
+            if (!tr_sys_path_rename(src.c_str(), tgt, &error))
             {
                 err = error->code;
                 tr_error_free(error);

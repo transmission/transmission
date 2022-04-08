@@ -65,7 +65,7 @@ char const* tr_address_and_port_to_string(char* buf, size_t buflen, tr_address c
 {
     char addr_buf[INET6_ADDRSTRLEN];
     tr_address_to_string_with_buf(addr, addr_buf, sizeof(addr_buf));
-    tr_snprintf(buf, buflen, "[%s]:%u", addr_buf, ntohs(port));
+    *fmt::format_to_n(buf, buflen - 1, FMT_STRING("[{:s}]:{:d}"), addr_buf, ntohs(port)).out = '\0';
     return buf;
 }
 
@@ -165,7 +165,7 @@ tr_address tr_address::from_4byte_ipv4(std::string_view in)
  * >0 if a > b
  * 0  if a == b
  */
-int tr_address_compare(tr_address const* a, tr_address const* b)
+int tr_address_compare(tr_address const* a, tr_address const* b) noexcept
 {
     // IPv6 addresses are always "greater than" IPv4
     if (a->type != b->type)

@@ -13,6 +13,8 @@
 #include <string>
 #include <string_view>
 
+#include <fmt/format.h>
+
 #define PSL_STATIC
 #include <libpsl.h>
 
@@ -185,18 +187,11 @@ void tr_http_escape_sha1(char* out, tr_sha1_digest_t const& digest)
         }
         else
         {
-            out += tr_snprintf(out, 4, "%%%02x", (unsigned int)b);
+            out = fmt::format_to(out, FMT_STRING("%{:02x}"), unsigned(b));
         }
     }
 
     *out = '\0';
-}
-
-void tr_http_escape_sha1(char* out, uint8_t const* sha1_digest)
-{
-    auto digest = tr_sha1_digest_t{};
-    std::copy_n(reinterpret_cast<std::byte const*>(sha1_digest), std::size(digest), std::begin(digest));
-    tr_http_escape_sha1(out, digest);
 }
 
 //// URLs

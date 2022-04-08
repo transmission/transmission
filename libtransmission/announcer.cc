@@ -5,7 +5,8 @@
 
 #include <algorithm>
 #include <array>
-#include <climits> /* INT_MAX */
+#include <cinttypes> // PRIu64
+#include <climits> // INT_MAX
 #include <cstdio>
 #include <cstring>
 #include <ctime>
@@ -91,7 +92,7 @@ namespace
 
 struct StopsCompare
 {
-    static int compare(tr_announce_request const* a, tr_announce_request const* b) // <=>
+    [[nodiscard]] static int compare(tr_announce_request const* a, tr_announce_request const* b) noexcept // <=>
     {
         // primary key: volume of data transferred
         auto const ax = a->up + a->down;
@@ -128,7 +129,7 @@ struct StopsCompare
         return 0;
     }
 
-    bool operator()(tr_announce_request const* a, tr_announce_request const* b) const // less than
+    [[nodiscard]] bool operator()(tr_announce_request const* a, tr_announce_request const* b) const noexcept // less than
     {
         return compare(a, b) < 0;
     }
@@ -174,7 +175,7 @@ struct tr_announcer
 
     void scheduleNextUpdate() const
     {
-        tr_timerAddMsec(this->upkeep_timer, UpkeepIntervalMsec);
+        tr_timerAddMsec(*this->upkeep_timer, UpkeepIntervalMsec);
     }
 
     std::set<tr_announce_request*, StopsCompare> stops;
@@ -194,8 +195,8 @@ static tr_scrape_info* tr_announcerGetScrapeInfo(tr_announcer* announcer, tr_int
     }
 
     auto& scrapes = announcer->scrape_info;
-    auto const it = scrapes.try_emplace(url, url, TR_MULTISCRAPE_MAX);
-    return &it.first->second;
+    auto const [it, is_new] = scrapes.try_emplace(url, url, TR_MULTISCRAPE_MAX);
+    return &it->second;
 }
 
 void tr_announcerInit(tr_session* session)
@@ -331,7 +332,7 @@ struct tr_tier
         return &trackers[*current_tracker_index_];
     }
 
-    [[nodiscard]] bool needsToAnnounce(time_t now) const
+    [[nodiscard]] constexpr bool needsToAnnounce(time_t now) const
     {
         return !isAnnouncing && !isScraping && announceAt != 0 && announceAt <= now && !std::empty(announce_events);
     }
@@ -403,7 +404,7 @@ struct tr_tier
         auto const* const torrent_name = tr_torrentName(tor);
         auto const* const current_tracker = currentTracker();
         auto const host_sv = current_tracker == nullptr ? "?"sv : current_tracker->host.sv();
-        tr_snprintf(buf, buflen, "%s at %" TR_PRIsv, torrent_name, TR_PRIsv_ARG(host_sv));
+        *fmt::format_to_n(buf, buflen - 1, FMT_STRING("{:s} at {:s}"), torrent_name, host_sv).out = '\0';
     }
 
     [[nodiscard]] bool canManualAnnounce() const

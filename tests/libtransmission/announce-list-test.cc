@@ -53,7 +53,7 @@ TEST_F(AnnounceListTest, groupsSiblingsIntoSameTier)
     EXPECT_TRUE(announce_list.add(Announce2, Tier2));
     EXPECT_TRUE(announce_list.add(Announce3, Tier3));
 
-    EXPECT_EQ(3, std::size(announce_list));
+    EXPECT_EQ(3U, std::size(announce_list));
     EXPECT_EQ(Tier1, announce_list.at(0).tier);
     EXPECT_EQ(Tier1, announce_list.at(1).tier);
     EXPECT_EQ(Tier1, announce_list.at(2).tier);
@@ -98,13 +98,13 @@ TEST_F(AnnounceListTest, canNotAddDuplicateAnnounce)
 
     auto announce_list = tr_announce_list{};
     EXPECT_TRUE(announce_list.add(Announce, Tier));
-    EXPECT_EQ(1, announce_list.size());
+    EXPECT_EQ(1U, announce_list.size());
     EXPECT_FALSE(announce_list.add(Announce, Tier));
-    EXPECT_EQ(1, announce_list.size());
+    EXPECT_EQ(1U, announce_list.size());
 
     auto constexpr Announce2 = "https://example.org:443/announce"sv;
     EXPECT_FALSE(announce_list.add(Announce2, Tier));
-    EXPECT_EQ(1, announce_list.size());
+    EXPECT_EQ(1U, announce_list.size());
 }
 
 TEST_F(AnnounceListTest, canNotAddInvalidUrl)
@@ -114,7 +114,7 @@ TEST_F(AnnounceListTest, canNotAddInvalidUrl)
 
     auto announce_list = tr_announce_list{};
     EXPECT_FALSE(announce_list.add(Announce, Tier));
-    EXPECT_EQ(0, announce_list.size());
+    EXPECT_EQ(0U, announce_list.size());
 }
 
 TEST_F(AnnounceListTest, canSet)
@@ -127,8 +127,8 @@ TEST_F(AnnounceListTest, canSet)
     auto constexpr Tiers = std::array<tr_tracker_tier_t, 3>{ 1, 2, 3 };
 
     auto announce_list = tr_announce_list{};
-    EXPECT_EQ(3, announce_list.set(std::data(Urls), std::data(Tiers), 3));
-    EXPECT_EQ(3, announce_list.size());
+    EXPECT_EQ(3U, announce_list.set(std::data(Urls), std::data(Tiers), 3));
+    EXPECT_EQ(3U, announce_list.size());
     EXPECT_EQ(Tiers[0], announce_list.at(0).tier);
     EXPECT_EQ(Tiers[1], announce_list.at(1).tier);
     EXPECT_EQ(Tiers[2], announce_list.at(2).tier);
@@ -149,14 +149,14 @@ TEST_F(AnnounceListTest, canSetUnsortedWithBackupsInTiers)
     auto constexpr Tiers = std::array<tr_tracker_tier_t, 6>{ 0, 1, 2, 0, 1, 2 };
 
     auto announce_list = tr_announce_list{};
-    EXPECT_EQ(6, announce_list.set(std::data(Urls), std::data(Tiers), 6));
-    EXPECT_EQ(6, announce_list.size());
-    EXPECT_EQ(0, announce_list.at(0).tier);
-    EXPECT_EQ(0, announce_list.at(1).tier);
-    EXPECT_EQ(1, announce_list.at(2).tier);
-    EXPECT_EQ(1, announce_list.at(3).tier);
-    EXPECT_EQ(2, announce_list.at(4).tier);
-    EXPECT_EQ(2, announce_list.at(5).tier);
+    EXPECT_EQ(6U, announce_list.set(std::data(Urls), std::data(Tiers), 6));
+    EXPECT_EQ(6U, announce_list.size());
+    EXPECT_EQ(0U, announce_list.at(0).tier);
+    EXPECT_EQ(0U, announce_list.at(1).tier);
+    EXPECT_EQ(1U, announce_list.at(2).tier);
+    EXPECT_EQ(1U, announce_list.at(3).tier);
+    EXPECT_EQ(2U, announce_list.at(4).tier);
+    EXPECT_EQ(2U, announce_list.at(5).tier);
     EXPECT_EQ(Urls[0], announce_list.at(0).announce.full);
     EXPECT_EQ(Urls[3], announce_list.at(1).announce.full);
     EXPECT_EQ(Urls[1], announce_list.at(2).announce.full);
@@ -183,8 +183,8 @@ TEST_F(AnnounceListTest, canSetExceptDuplicate)
     auto constexpr Tiers = std::array<tr_tracker_tier_t, 3>{ 3, 2, 1 };
 
     auto announce_list = tr_announce_list{};
-    EXPECT_EQ(2, announce_list.set(std::data(Urls), std::data(Tiers), 3));
-    EXPECT_EQ(2, announce_list.size());
+    EXPECT_EQ(2U, announce_list.set(std::data(Urls), std::data(Tiers), 3));
+    EXPECT_EQ(2U, announce_list.size());
     EXPECT_EQ(Tiers[0], announce_list.at(1).tier);
     EXPECT_EQ(Tiers[1], announce_list.at(0).tier);
     EXPECT_EQ(Urls[0], announce_list.at(1).announce.full);
@@ -201,8 +201,8 @@ TEST_F(AnnounceListTest, canSetExceptInvalid)
     auto constexpr Tiers = std::array<tr_tracker_tier_t, 3>{ 1, 2, 3 };
 
     auto announce_list = tr_announce_list{};
-    EXPECT_EQ(2, announce_list.set(std::data(Urls), std::data(Tiers), 3));
-    EXPECT_EQ(2, announce_list.size());
+    EXPECT_EQ(2U, announce_list.set(std::data(Urls), std::data(Tiers), 3));
+    EXPECT_EQ(2U, announce_list.size());
     EXPECT_EQ(Tiers[0], announce_list.at(0).tier);
     EXPECT_EQ(Tiers[2], announce_list.at(1).tier);
     EXPECT_EQ(Urls[0], announce_list.at(0).announce.full);
@@ -216,11 +216,11 @@ TEST_F(AnnounceListTest, canRemoveById)
 
     auto announce_list = tr_announce_list{};
     announce_list.add(Announce, Tier);
-    EXPECT_EQ(1, std::size(announce_list));
+    EXPECT_EQ(1U, std::size(announce_list));
     auto const id = announce_list.at(0).id;
 
     EXPECT_TRUE(announce_list.remove(id));
-    EXPECT_EQ(0, std::size(announce_list));
+    EXPECT_EQ(0U, std::size(announce_list));
 }
 
 TEST_F(AnnounceListTest, canNotRemoveByInvalidId)
@@ -230,11 +230,11 @@ TEST_F(AnnounceListTest, canNotRemoveByInvalidId)
 
     auto announce_list = tr_announce_list{};
     announce_list.add(Announce, Tier);
-    EXPECT_EQ(1, std::size(announce_list));
+    EXPECT_EQ(1U, std::size(announce_list));
     auto const id = announce_list.at(0).id;
 
     EXPECT_FALSE(announce_list.remove(id + 1));
-    EXPECT_EQ(1, std::size(announce_list));
+    EXPECT_EQ(1U, std::size(announce_list));
     EXPECT_EQ(Announce, announce_list.at(0).announce.full);
 }
 
@@ -245,10 +245,10 @@ TEST_F(AnnounceListTest, canRemoveByAnnounce)
 
     auto announce_list = tr_announce_list{};
     announce_list.add(Announce, Tier);
-    EXPECT_EQ(1, std::size(announce_list));
+    EXPECT_EQ(1U, std::size(announce_list));
 
     EXPECT_TRUE(announce_list.remove(Announce));
-    EXPECT_EQ(0, std::size(announce_list));
+    EXPECT_EQ(0U, std::size(announce_list));
 }
 
 TEST_F(AnnounceListTest, canNotRemoveByInvalidAnnounce)
@@ -258,10 +258,10 @@ TEST_F(AnnounceListTest, canNotRemoveByInvalidAnnounce)
 
     auto announce_list = tr_announce_list{};
     announce_list.add(Announce, Tier);
-    EXPECT_EQ(1, std::size(announce_list));
+    EXPECT_EQ(1U, std::size(announce_list));
 
     EXPECT_FALSE(announce_list.remove("https://www.not-example.com/announce"sv));
-    EXPECT_EQ(1, std::size(announce_list));
+    EXPECT_EQ(1U, std::size(announce_list));
 }
 
 TEST_F(AnnounceListTest, canReplace)
@@ -398,7 +398,7 @@ TEST_F(AnnounceListTest, SingleAnnounce)
 
     auto constexpr Text = "https://www.example.com/a/announce";
     EXPECT_TRUE(announce_list.parse(Text));
-    EXPECT_EQ(1, std::size(announce_list));
+    EXPECT_EQ(1U, std::size(announce_list));
     EXPECT_EQ("https://www.example.com/a/announce", announce_list.at(0).announce.full);
 }
 
@@ -414,14 +414,14 @@ TEST_F(AnnounceListTest, parseThreeTier)
         "https://www.example.com/c/announce"sv;
 
     EXPECT_TRUE(announce_list.parse(Text));
-    EXPECT_EQ(3, std::size(announce_list));
+    EXPECT_EQ(3U, std::size(announce_list));
     EXPECT_EQ("https://www.example.com/a/announce", announce_list.at(0).announce.full);
-    EXPECT_EQ(0, announce_list.at(0).tier);
+    EXPECT_EQ(0U, announce_list.at(0).tier);
     EXPECT_EQ("https://www.example.com/b/announce", announce_list.at(1).announce.full);
-    EXPECT_EQ(1, announce_list.at(1).tier);
+    EXPECT_EQ(1U, announce_list.at(1).tier);
     EXPECT_EQ("https://www.example.com/c/announce", announce_list.at(2).announce.full);
-    EXPECT_EQ(2, announce_list.at(2).tier);
-    EXPECT_EQ(tr_strvJoin(Text, "\n"sv), announce_list.toString());
+    EXPECT_EQ(2U, announce_list.at(2).tier);
+    EXPECT_EQ(fmt::format("{:s}\n", Text), announce_list.toString());
 }
 
 TEST_F(AnnounceListTest, parseThreeTierWithTrailingLf)
@@ -436,13 +436,13 @@ TEST_F(AnnounceListTest, parseThreeTierWithTrailingLf)
         "https://www.example.com/c/announce\n"sv;
 
     EXPECT_TRUE(announce_list.parse(Text));
-    EXPECT_EQ(3, std::size(announce_list));
+    EXPECT_EQ(3U, std::size(announce_list));
     EXPECT_EQ("https://www.example.com/a/announce", announce_list.at(0).announce.full);
-    EXPECT_EQ(0, announce_list.at(0).tier);
+    EXPECT_EQ(0U, announce_list.at(0).tier);
     EXPECT_EQ("https://www.example.com/b/announce", announce_list.at(1).announce.full);
-    EXPECT_EQ(1, announce_list.at(1).tier);
+    EXPECT_EQ(1U, announce_list.at(1).tier);
     EXPECT_EQ("https://www.example.com/c/announce", announce_list.at(2).announce.full);
-    EXPECT_EQ(2, announce_list.at(2).tier);
+    EXPECT_EQ(2U, announce_list.at(2).tier);
     EXPECT_EQ(Text, announce_list.toString());
 }
 
@@ -467,13 +467,13 @@ TEST_F(AnnounceListTest, parseThreeTierWithExcessLf)
         "https://www.example.com/c/announce\n"sv;
 
     EXPECT_TRUE(announce_list.parse(Text));
-    EXPECT_EQ(3, std::size(announce_list));
+    EXPECT_EQ(3U, std::size(announce_list));
     EXPECT_EQ("https://www.example.com/a/announce", announce_list.at(0).announce.full);
-    EXPECT_EQ(0, announce_list.at(0).tier);
+    EXPECT_EQ(0U, announce_list.at(0).tier);
     EXPECT_EQ("https://www.example.com/b/announce", announce_list.at(1).announce.full);
-    EXPECT_EQ(1, announce_list.at(1).tier);
+    EXPECT_EQ(1U, announce_list.at(1).tier);
     EXPECT_EQ("https://www.example.com/c/announce", announce_list.at(2).announce.full);
-    EXPECT_EQ(2, announce_list.at(2).tier);
+    EXPECT_EQ(2U, announce_list.at(2).tier);
 
     auto constexpr ExpectedText =
         "https://www.example.com/a/announce\n"
@@ -500,13 +500,13 @@ TEST_F(AnnounceListTest, parseThreeTierWithWhitespace)
         "  https://www.example.com/c/announce\n"sv;
 
     EXPECT_TRUE(announce_list.parse(Text));
-    EXPECT_EQ(3, std::size(announce_list));
+    EXPECT_EQ(3U, std::size(announce_list));
     EXPECT_EQ("https://www.example.com/a/announce", announce_list.at(0).announce.full);
-    EXPECT_EQ(0, announce_list.at(0).tier);
+    EXPECT_EQ(0U, announce_list.at(0).tier);
     EXPECT_EQ("https://www.example.com/b/announce", announce_list.at(1).announce.full);
-    EXPECT_EQ(1, announce_list.at(1).tier);
+    EXPECT_EQ(1U, announce_list.at(1).tier);
     EXPECT_EQ("https://www.example.com/c/announce", announce_list.at(2).announce.full);
-    EXPECT_EQ(2, announce_list.at(2).tier);
+    EXPECT_EQ(2U, announce_list.at(2).tier);
 
     auto constexpr ExpectedText =
         "https://www.example.com/a/announce\n"
@@ -529,13 +529,13 @@ TEST_F(AnnounceListTest, parseThreeTierCrLf)
         "https://www.example.com/c/announce\r\n"sv;
 
     EXPECT_TRUE(announce_list.parse(Text));
-    EXPECT_EQ(3, std::size(announce_list));
+    EXPECT_EQ(3U, std::size(announce_list));
     EXPECT_EQ("https://www.example.com/a/announce", announce_list.at(0).announce.full);
-    EXPECT_EQ(0, announce_list.at(0).tier);
+    EXPECT_EQ(0U, announce_list.at(0).tier);
     EXPECT_EQ("https://www.example.com/b/announce", announce_list.at(1).announce.full);
-    EXPECT_EQ(1, announce_list.at(1).tier);
+    EXPECT_EQ(1U, announce_list.at(1).tier);
     EXPECT_EQ("https://www.example.com/c/announce", announce_list.at(2).announce.full);
-    EXPECT_EQ(2, announce_list.at(2).tier);
+    EXPECT_EQ(2U, announce_list.at(2).tier);
 
     auto constexpr ExpectedText =
         "https://www.example.com/a/announce\n"
@@ -564,28 +564,28 @@ TEST_F(AnnounceListTest, parseMultiTrackerInTier)
         "https://www.example.com/i/announce\n"sv;
 
     EXPECT_TRUE(announce_list.parse(Text));
-    EXPECT_EQ(9, std::size(announce_list));
+    EXPECT_EQ(9U, std::size(announce_list));
 
     EXPECT_EQ("https://www.example.com/a/announce", announce_list.at(0).announce.full);
-    EXPECT_EQ(0, announce_list.at(0).tier);
+    EXPECT_EQ(0U, announce_list.at(0).tier);
     EXPECT_EQ("https://www.example.com/b/announce", announce_list.at(1).announce.full);
-    EXPECT_EQ(0, announce_list.at(1).tier);
+    EXPECT_EQ(0U, announce_list.at(1).tier);
 
     EXPECT_EQ("https://www.example.com/c/announce", announce_list.at(2).announce.full);
-    EXPECT_EQ(1, announce_list.at(2).tier);
+    EXPECT_EQ(1U, announce_list.at(2).tier);
     EXPECT_EQ("https://www.example.com/d/announce", announce_list.at(3).announce.full);
-    EXPECT_EQ(1, announce_list.at(3).tier);
+    EXPECT_EQ(1U, announce_list.at(3).tier);
     EXPECT_EQ("https://www.example.com/e/announce", announce_list.at(4).announce.full);
-    EXPECT_EQ(1, announce_list.at(4).tier);
+    EXPECT_EQ(1U, announce_list.at(4).tier);
     EXPECT_EQ("https://www.example.com/f/announce", announce_list.at(5).announce.full);
-    EXPECT_EQ(1, announce_list.at(5).tier);
+    EXPECT_EQ(1U, announce_list.at(5).tier);
 
     EXPECT_EQ("https://www.example.com/g/announce", announce_list.at(6).announce.full);
-    EXPECT_EQ(2, announce_list.at(6).tier);
+    EXPECT_EQ(2U, announce_list.at(6).tier);
     EXPECT_EQ("https://www.example.com/h/announce", announce_list.at(7).announce.full);
-    EXPECT_EQ(2, announce_list.at(7).tier);
+    EXPECT_EQ(2U, announce_list.at(7).tier);
     EXPECT_EQ("https://www.example.com/i/announce", announce_list.at(8).announce.full);
-    EXPECT_EQ(2, announce_list.at(8).tier);
+    EXPECT_EQ(2U, announce_list.at(8).tier);
 
     EXPECT_EQ(Text, announce_list.toString());
 }

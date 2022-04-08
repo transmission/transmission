@@ -846,10 +846,6 @@ void tr_ctorSetFilePriorities(tr_ctor* ctor, tr_file_index_t const* files, tr_fi
 /** @brief Set the download flag for files in a torrent */
 void tr_ctorSetFilesWanted(tr_ctor* ctor, tr_file_index_t const* fileIndices, tr_file_index_t fileCount, bool wanted);
 
-/** @brief Set labels for this torrent, the length of the labels array
-    must be the same size as len. */
-void tr_ctorSetLabels(tr_ctor* ctor, char const** labels, size_t len);
-
 /** @brief Get this peer constructor's peer limit */
 bool tr_ctorGetPeerLimit(tr_ctor const* ctor, tr_ctorMode mode, uint16_t* setmeCount);
 
@@ -997,9 +993,6 @@ tr_torrent* tr_torrentFindFromId(tr_session* session, int id);
 
 tr_torrent* tr_torrentFindFromMetainfo(tr_session*, tr_torrent_metainfo const*);
 
-tr_torrent* tr_torrentFindFromHash(tr_session* session, tr_sha1_digest_t const* hash);
-
-/** @brief Convenience function similar to tr_torrentFindFromHash() */
 tr_torrent* tr_torrentFindFromMagnetLink(tr_session* session, char const* link);
 
 /**
@@ -1223,8 +1216,6 @@ void tr_torrentSetMetadataCallback(tr_torrent* tor, tr_torrent_metadata_func fun
  */
 void tr_torrentSetRatioLimitHitCallback(tr_torrent* torrent, tr_torrent_ratio_limit_hit_func func, void* user_data);
 
-void tr_torrentClearRatioLimitHitCallback(tr_torrent* torrent);
-
 /**
  * Register to be notified whenever a torrent's idle limit
  * has been hit. This will be called when the seeding torrent's
@@ -1233,8 +1224,6 @@ void tr_torrentClearRatioLimitHitCallback(tr_torrent* torrent);
  * Has the same restrictions as tr_torrentSetCompletenessCallback
  */
 void tr_torrentSetIdleLimitHitCallback(tr_torrent* torrent, tr_torrent_idle_limit_hit_func func, void* user_data);
-
-void tr_torrentClearIdleLimitHitCallback(tr_torrent* torrent);
 
 /**
  * MANUAL ANNOUNCE

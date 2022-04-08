@@ -13,12 +13,12 @@ TEST(History, recentHistory)
     auto h = tr_recentHistory{};
 
     h.add(10000, 1);
-    EXPECT_EQ(0, h.count(12000, 1000));
-    EXPECT_EQ(1, h.count(12000, 3000));
-    EXPECT_EQ(1, h.count(12000, 5000));
+    EXPECT_EQ(0U, h.count(12000, 1000));
+    EXPECT_EQ(1U, h.count(12000, 3000));
+    EXPECT_EQ(1U, h.count(12000, 5000));
     h.add(20000, 1);
-    EXPECT_EQ(0, h.count(22000, 1000));
-    EXPECT_EQ(1, h.count(22000, 3000));
-    EXPECT_EQ(2, h.count(22000, 15000));
-    EXPECT_EQ(2, h.count(22000, 20000));
+    EXPECT_EQ(0U, h.count(22000, 1000));
+    EXPECT_EQ(1U, h.count(22000, 3000));
+    EXPECT_EQ(2U, h.count(22000, 15000));
+    EXPECT_EQ(2U, h.count(22000, 20000));
 }

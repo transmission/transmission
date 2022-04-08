@@ -8,12 +8,13 @@
 #include <cstdio>
 #include <map>
 #include <mutex>
+#include <string>
 #include <string_view>
 #include <utility>
 
 #include <event2/buffer.h>
 
-#include <fmt/core.h>
+#include <fmt/chrono.h>
 #include <fmt/format.h>
 
 #include "transmission.h"
@@ -88,7 +89,7 @@ tr_sys_file_t tr_logGetFile()
 void logAddImpl(
     [[maybe_unused]] char const* file,
     [[maybe_unused]] int line,
-    tr_log_level level,
+    [[maybe_unused]] tr_log_level level,
     std::string_view msg,
     [[maybe_unused]] std::string_view name)
 {
@@ -238,18 +239,14 @@ void tr_logFreeQueue(tr_log_message* list)
 
 char* tr_logGetTimeStr(char* buf, size_t buflen)
 {
-    auto const tv = tr_gettimeofday();
-    time_t const seconds = tv.tv_sec;
-    auto const milliseconds = int(tv.tv_usec / 1000);
-    char msec_str[8];
-    tr_snprintf(msec_str, sizeof msec_str, "%03d", milliseconds);
-
-    struct tm now_tm;
-    tr_localtime_r(&seconds, &now_tm);
-    char date_str[32];
-    strftime(date_str, sizeof(date_str), "%Y-%m-%d %H:%M:%S", &now_tm);
-
-    tr_snprintf(buf, buflen, "%s.%s", date_str, msec_str);
+    auto const a = std::chrono::system_clock::now();
+    auto const [out, len] = fmt::format_to_n(
+        buf,
+        buflen - 1,
+        "{0:%F %H:%M:}{1:%S}\n",
+        a,
+        std::chrono::duration_cast<std::chrono::milliseconds>(a.time_since_epoch()));
+    *out = '\0';
     return buf;
 }
 
@@ -322,7 +319,7 @@ bool constexpr keysAreOrdered()
 {
     for (size_t i = 0, n = std::size(LogKeys); i < n; ++i)
     {
-        if (LogKeys[i].second != i)
+        if (LogKeys[i].second != static_cast<tr_log_level>(i))
         {
             return false;
         }

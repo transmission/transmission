@@ -992,7 +992,7 @@ static ReadState canRead(tr_peerIo* io, void* vhandshake, size_t* piece)
 
     auto* handshake = static_cast<tr_handshake*>(vhandshake);
 
-    struct evbuffer* inbuf = tr_peerIoGetReadBuffer(io);
+    evbuffer* const inbuf = io->getReadBuffer();
     bool readyForMore = true;
 
     /* no piece data in handshake */
@@ -1201,7 +1201,7 @@ tr_handshake* tr_handshakeNew(
     handshake->done_func_user_data = done_func_user_data;
     handshake->session = session;
     handshake->timeout_timer = evtimer_new(session->event_base, handshakeTimeout, handshake);
-    tr_timerAdd(handshake->timeout_timer, HANDSHAKE_TIMEOUT_SEC, 0);
+    tr_timerAdd(*handshake->timeout_timer, HANDSHAKE_TIMEOUT_SEC, 0);
 
     tr_peerIoRef(io); /* balanced by the unref in tr_handshakeFree */
     tr_peerIoSetIOFuncs(handshake->io, canRead, nullptr, gotError, handshake);
@@ -1236,12 +1236,4 @@ tr_peerIo* tr_handshakeStealIO(tr_handshake* handshake)
     tr_peerIo* io = handshake->io;
     handshake->io = nullptr;
     return io;
-}
-
-tr_address const* tr_handshakeGetAddr(struct tr_handshake const* handshake, tr_port* port)
-{
-    TR_ASSERT(handshake != nullptr);
-    TR_ASSERT(handshake->io != nullptr);
-
-    return tr_peerIoGetAddress(handshake->io, port);
 }

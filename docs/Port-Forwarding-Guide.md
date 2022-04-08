@@ -1,6 +1,6 @@
 # Port Forwarding Guide
 
-[BitTorrent](http://en.wikipedia.org/wiki/BitTorrent_protocol) is a peer-to-peer protocol which allows users to send and recieve bits of files without the need of it being hosted on a centralized server.
+[BitTorrent](http://en.wikipedia.org/wiki/BitTorrent_protocol) is a peer-to-peer protocol which allows users to send and receive bits of files without the need of it being hosted on a centralized server.
 
 For this to be possible, it is required to be accessible from the internet. However, this isn't always as straight forward as it may seem. Because of the nature of the internet and security reasons, routers create a local network that makes your computer invisible to the internet. This technology is called [NAT](http://en.wikipedia.org/wiki/Network_address_translation).
 
@@ -28,7 +28,7 @@ If this doesn't happen, you can add Transmission to Leopard's firewall manually:
 
 ### On Unix
 
- * For instructions on how to use it, open a Terminal open the man page of your Firewall. (eg. 'man ufw, man firewalld')
+ * For instructions on how to use it, open a Terminal open the man page of your Firewall. (e.g. 'man ufw, man firewalld')
  * You need to ensure that Transmission's port (displayed in Preferences) is opened in the firewall.
 
 ### Windows
@@ -45,7 +45,7 @@ If this doesn't happen, you can add Transmission to Leopard's firewall manually:
  1. The last thing is to give the rule a name. It can be whatever just make sure it's something you can read and remember exactly what it's for.
 
   * Note this only opens the port in Windows and has no effect on the router
-	
+
 ## Open ports & forwarding
 
 To allow other peers to connect to you, you'll need to forward a port from the router to your computer.
@@ -63,7 +63,7 @@ Most routers manufactured since 2001 have either the UPnP or NAT-PMP feature.
 ### Forward manually through a Router
 
  1. Find out what your IP address is.
-  * *On Mac OS X*- Go to System Preferencess >> Network, double-clicking on your connection (for instance, Built-in Ethernet), and clicking the TCP/IP tab. The address is probably something like 192.168.1.100, or 10.0.1.2. The IP of your router is here too.
+  * *On Mac OS X*- Go to System Preferences >> Network, double-clicking on your connection (for instance, Built-in Ethernet), and clicking the TCP/IP tab. The address is probably something like 192.168.1.100, or 10.0.1.2. The IP of your router is here too.
   * *On Unix*- In Ubuntu, right click the Network Manager applet in the menu bar, and select 'Connection Information'. The address is probably something like 192.168.1.2, or 10.0.1.2.
    * If you don't have Network Manager, open a Terminal and type 'ifconfig'. It will list information for each of your network devices. Find the one you are using, and use the number after 'inet addr:'.
    * Using the command "ip a" will achieve the same results in a different format.
@@ -71,9 +71,9 @@ Most routers manufactured since 2001 have either the UPnP or NAT-PMP feature.
  3. Go into your router configuration screen. Normally this is done via your web browser using the address 192.168.0.1 etc.
  4. Find the port forwarding (sometimes called port mapping) screen. While the page will be different for each router generally you will enter something similar to the following:
  5. For 'Application' type 'Trans'.
- 6. For 'Start Port' and 'End port' type in the port you chose in Step 2. (eg. 51413).
+ 6. For 'Start Port' and 'End port' type in the port you chose in Step 2. (e.g. 51413).
  7. For Protocol, choose Both.
- 8. For IP address, type in your IP address you found in Step 1. (eg. 192.168.1.2).
+ 8. For IP address, type in your IP address you found in Step 1. (e.g. 192.168.1.2).
  9. Check Enable.
  10. Click save settings.
 

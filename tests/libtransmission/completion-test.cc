@@ -370,16 +370,16 @@ TEST_F(CompletionTest, countMissingBytesInPiece)
     completion.addBlock(0);
     EXPECT_EQ(block_info.pieceSize(0) - tr_block_info::BlockSize, completion.countMissingBytesInPiece(0));
     completion.addPiece(0);
-    EXPECT_EQ(0, completion.countMissingBytesInPiece(0));
+    EXPECT_EQ(0U, completion.countMissingBytesInPiece(0));
 
     auto const final_piece = block_info.n_pieces - 1;
     auto const final_block = block_info.n_blocks - 1;
     EXPECT_EQ(block_info.pieceSize(final_piece), completion.countMissingBytesInPiece(final_piece));
     completion.addBlock(final_block);
-    EXPECT_EQ(1, block_info.final_piece_size);
-    EXPECT_EQ(1, block_info.final_block_size);
+    EXPECT_EQ(1U, block_info.final_piece_size);
+    EXPECT_EQ(1U, block_info.final_block_size);
     EXPECT_TRUE(completion.hasPiece(final_piece));
-    EXPECT_EQ(0, completion.countMissingBytesInPiece(final_piece));
+    EXPECT_EQ(0U, completion.countMissingBytesInPiece(final_piece));
 }
 
 TEST_F(CompletionTest, amountDone)

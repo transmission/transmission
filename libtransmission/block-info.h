@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include <cstdint> // uint32_t, uint64_t
+
 #include "transmission.h"
 
 #include "tr-assert.h"
@@ -29,7 +31,7 @@ struct tr_block_info
 
     void initSizes(uint64_t total_size_in, uint64_t piece_size_in);
 
-    [[nodiscard]] constexpr auto blockCount() const
+    [[nodiscard]] constexpr auto blockCount() const noexcept
     {
         return n_blocks;
     }
@@ -40,18 +42,18 @@ struct tr_block_info
         return block + 1 == n_blocks ? final_block_size : BlockSize;
     }
 
-    [[nodiscard]] constexpr auto pieceCount() const
+    [[nodiscard]] constexpr auto pieceCount() const noexcept
     {
         return n_pieces;
     }
 
-    [[nodiscard]] constexpr auto pieceSize() const
+    [[nodiscard]] constexpr auto pieceSize() const noexcept
     {
         return piece_size;
     }
 
     // return the number of bytes in `piece`
-    [[nodiscard]] constexpr auto pieceSize(tr_piece_index_t piece) const
+    [[nodiscard]] constexpr auto pieceSize(tr_piece_index_t piece) const noexcept
     {
         return piece + 1 == n_pieces ? final_piece_size : pieceSize();
     }
@@ -66,7 +68,7 @@ struct tr_block_info
         return { pieceLoc(piece).block, pieceLastLoc(piece).block + 1 };
     }
 
-    [[nodiscard]] constexpr auto totalSize() const
+    [[nodiscard]] constexpr auto totalSize() const noexcept
     {
         return total_size;
     }
@@ -164,7 +166,7 @@ struct tr_block_info
     [[nodiscard]] static uint32_t bestBlockSize(uint64_t piece_size);
 
 private:
-    [[nodiscard]] bool constexpr isInitialized() const
+    [[nodiscard]] bool constexpr isInitialized() const noexcept
     {
         return piece_size != 0;
     }

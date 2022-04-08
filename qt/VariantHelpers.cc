@@ -7,6 +7,7 @@
 
 #include <cmath>
 #include <limits>
+#include <string_view>
 
 #include <QUrl>
 
@@ -198,11 +199,6 @@ void variantInit(tr_variant* init_me, int64_t value)
 }
 
 void variantInit(tr_variant* init_me, int value)
-{
-    tr_variantInitInt(init_me, value);
-}
-
-void variantInit(tr_variant* init_me, unsigned int value)
 {
     tr_variantInitInt(init_me, value);
 }

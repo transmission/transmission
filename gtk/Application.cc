@@ -304,7 +304,7 @@ bool Application::Impl::refresh_actions()
         sel_->selected_foreach(
             [&canUpdate](auto const& /*path*/, auto const& iter)
             {
-                auto* tor = static_cast<tr_torrent*>(iter->get_value(torrent_cols.torrent));
+                auto const* tor = static_cast<tr_torrent const*>(iter->get_value(torrent_cols.torrent));
                 canUpdate = canUpdate || tr_torrentCanManualUpdate(tor);
             });
         gtr_action_set_sensitive("torrent-reannounce", canUpdate);
@@ -424,7 +424,7 @@ bool Application::Impl::on_rpc_changed_idle(tr_rpc_callback_type type, int torre
             tr_variant* oldvals = gtr_pref_get_all();
             tr_quark key;
             std::vector<tr_quark> changed_keys;
-            auto* session = core_->get_session();
+            auto const* const session = core_->get_session();
             tr_variantInitDict(&tmp, 100);
             tr_sessionGetSettings(session, &tmp);
 
@@ -542,12 +542,12 @@ void Application::Impl::on_startup()
     /* ensure the directories are created */
     if (auto const str = gtr_pref_string_get(TR_KEY_download_dir); !str.empty())
     {
-        g_mkdir_with_parents(str.c_str(), 0777);
+        (void)g_mkdir_with_parents(str.c_str(), 0777);
     }
 
     if (auto const str = gtr_pref_string_get(TR_KEY_incomplete_dir); !str.empty())
     {
-        g_mkdir_with_parents(str.c_str(), 0777);
+        (void)g_mkdir_with_parents(str.c_str(), 0777);
     }
 
     /* initialize the libtransmission session */
@@ -1319,7 +1319,7 @@ bool Application::Impl::call_rpc_for_selected_torrents(std::string const& method
     sel_->selected_foreach(
         [ids](auto const& /*path*/, auto const& iter)
         {
-            auto* tor = static_cast<tr_torrent*>(iter->get_value(torrent_cols.torrent));
+            auto const* const tor = static_cast<tr_torrent*>(iter->get_value(torrent_cols.torrent));
             tr_variantListAddInt(ids, tr_torrentId(tor));
         });
 

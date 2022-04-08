@@ -239,6 +239,7 @@ set(${PROJECT_NAME}_HIDPI_IMAGES
     ActionHover
     ActionOn
     Bandwidth
+    BlueDotFlat
     CleanupTemplate
     CompleteCheck
     CreateLarge
@@ -246,6 +247,7 @@ set(${PROJECT_NAME}_HIDPI_IMAGES
     DownArrowTemplate
     FavIcon
     Globe
+    GreenDotFlat
     Groups
     GroupsNoneTemplate
     InfoActivity
@@ -256,6 +258,7 @@ set(${PROJECT_NAME}_HIDPI_IMAGES
     InfoTracker
     Lock
     Magnet
+    OrangeDotFlat
     PauseHover
     PauseOff
     PauseOn

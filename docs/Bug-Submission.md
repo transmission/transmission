@@ -16,15 +16,15 @@ If you're having trouble with Transmission then the things you should do in orde
 
 ## Information Required in a Bug Report ##
 
- * State the version of Transmission you're using (eg Linux/GTK+ 1.80).
+ * State the version of Transmission you're using (e.g. Linux/GTK+ 1.80).
    If you're using a GUI version of Transmission, you can find its version in the `About` dialog in the Help menu.
    **Don't** say _the latest version_ it's ambiguous.
- * State what operating system and version (eg Mac OS X 10.5.8, Ubuntu 8.04, ...)
+ * State what operating system and version (e.g. Mac OS X 10.5.8, Ubuntu 8.04, ...)
  * Describe the symptoms in a short precise manner.
  * If the problem is reproducible and you explain how to reproduce it, then it stands a high chance of being addressed.
    If the problem is intermittent then we still want to know, but if you can't tell us how to reproduce it we can't easily work on it.
  * See if the problem only occurs under certain conditions.
-   Eg: If you're seeing the bug with 50 torrents running and speed limits turned on, see if it persists with speed limits turned off.
+   E.g.: If you're seeing the bug with 50 torrents running and speed limits turned on, see if it persists with speed limits turned off.
    See if it persists with 1 torrent running. See if it persists after pausing and restarting the torrent. etc.
 
 **The more work you do to narrow down the bug, the more chance we have of finding and fixing it.**
@@ -50,7 +50,7 @@ If you're experiencing slow speeds and you've been through the wiki, then please
 ### Crash on the Mac ###
 
 If you have problems on the Mac version then please do these extra steps:
-  * Make sure your system is updated to the latest version of your operating sytem. Note As of 1.60 Transmission requires Mac OS X 10.5 or later.
+  * Make sure your system is updated to the latest version of your operating system. Note As of 1.60 Transmission requires Mac OS X 10.5 or later.
   * If you're running a nightly build, set the language to English. The localizations will sometimes crash the nightly builds until they are updated right before an official release.
   * OS X collects two pieces of crash information that can help us fix the crash:
      1. In Console.app, look under LOG FILES > ~/Library/Logs/ > CrashReporter > for Transmission. If you find one, include it in your forum post.

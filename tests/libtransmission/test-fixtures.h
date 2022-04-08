@@ -12,6 +12,7 @@
 #include <memory>
 #include <mutex> // std::once_flag()
 #include <string>
+#include <string_view>
 #include <thread>
 
 #include "crypto-utils.h" // tr_base64_decode()
@@ -88,17 +89,16 @@ public:
 protected:
     static std::string get_default_parent_dir()
     {
-        auto* path = getenv("TMPDIR");
-        if (path != NULL)
+        if (auto* const path = getenv("TMPDIR"); path != nullptr)
         {
             return path;
         }
 
         tr_error* error = nullptr;
-        path = tr_sys_dir_get_current(&error);
-        if (path != nullptr)
+
+        if (auto* path = tr_sys_dir_get_current(&error); path != nullptr)
         {
-            std::string const ret = path;
+            auto ret = std::string{ path };
             tr_free(path);
             return ret;
         }
@@ -179,7 +179,7 @@ protected:
         return child;
     }
 
-    void buildParentDir(std::string const& path) const
+    void buildParentDir(std::string_view path) const
     {
         auto const tmperr = errno;
 
@@ -212,14 +212,14 @@ protected:
         }
     }
 
-    void createTmpfileWithContents(std::string& tmpl, void const* payload, size_t n) const
+    void createTmpfileWithContents(char* tmpl, void const* payload, size_t n) const
     {
         auto const tmperr = errno;
 
         buildParentDir(tmpl);
 
         // NOLINTNEXTLINE(clang-analyzer-cplusplus.InnerPointer)
-        auto const fd = tr_sys_file_open_temp(&tmpl.front());
+        auto const fd = tr_sys_file_open_temp(tmpl);
         blockingFileWrite(fd, payload, n);
         tr_sys_file_close(fd);
         sync();
@@ -386,7 +386,7 @@ protected:
 
         // create the torrent ctor
         auto const benc = tr_base64_decode(benc_base64);
-        EXPECT_LT(0, std::size(benc));
+        EXPECT_LT(0U, std::size(benc));
         auto* ctor = tr_ctorNew(session_);
         tr_error* error = nullptr;
         EXPECT_TRUE(tr_ctorSetMetainfo(ctor, std::data(benc), std::size(benc), &error));
@@ -397,12 +397,12 @@ protected:
         if (state != ZeroTorrentState::NoFiles)
         {
             auto const* const metainfo = tr_ctorGetMetainfo(ctor);
-            for (size_t i = 0, n = metainfo->fileCount(); i < n; ++i)
+            for (tr_file_index_t i = 0, n = metainfo->fileCount(); i < n; ++i)
             {
                 auto const base = state == ZeroTorrentState::Partial && tr_sessionIsIncompleteDirEnabled(session_) ?
                     tr_sessionGetIncompleteDir(session_) :
                     tr_sessionGetDownloadDir(session_);
-                auto const subpath = metainfo->fileSubpath(i);
+                auto const& subpath = metainfo->fileSubpath(i);
                 auto const partial = state == ZeroTorrentState::Partial && i == 0;
                 auto const suffix = std::string_view{ partial ? ".part" : "" };
                 auto const filename = tr_pathbuf{ base, '/', subpath, suffix };
@@ -446,7 +446,7 @@ protected:
             4000));
     }
 
-    void blockingTorrentVerify(tr_torrent* tor)
+    void blockingTorrentVerify(tr_torrent* tor) const
     {
         EXPECT_NE(nullptr, tor->session);
         EXPECT_FALSE(tr_amInEventThread(tor->session));

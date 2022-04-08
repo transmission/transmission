@@ -16,7 +16,6 @@
 #include <thread>
 
 #ifdef _WIN32
-#include <inttypes.h>
 #include <ws2tcpip.h>
 #undef gai_strerror
 #define gai_strerror gai_strerrorA
@@ -32,7 +31,7 @@
 
 #include <event2/event.h>
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include "transmission.h"
 
@@ -106,12 +105,11 @@ static void bootstrap_from_name(char const* name, tr_port port, int af)
     hints.ai_socktype = SOCK_DGRAM;
     hints.ai_family = af;
 
-    /* No, just passing p + 1 to gai won't work. */
-    char pp[10];
-    tr_snprintf(pp, sizeof(pp), "%d", (int)port);
+    auto port_str = std::array<char, 16>{};
+    *fmt::format_to(std::data(port_str), FMT_STRING("{:d}"), port) = '\0';
 
     addrinfo* info = nullptr;
-    if (int const rc = getaddrinfo(name, pp, &hints, &info); rc != 0)
+    if (int const rc = getaddrinfo(name, std::data(port_str), &hints, &info); rc != 0)
     {
         tr_logAddWarn(fmt::format(
             _("Couldn't look up '{addresss}:{port}': {error} ({error_code})"),
@@ -374,7 +372,7 @@ int tr_dhtInit(tr_session* ss)
     std::thread(dht_bootstrap, cl).detach();
 
     dht_timer = evtimer_new(session_->event_base, timer_callback, session_);
-    tr_timerAdd(dht_timer, 0, tr_rand_int_weak(1000000));
+    tr_timerAdd(*dht_timer, 0, tr_rand_int_weak(1000000));
 
     tr_logAddDebug("DHT initialized");
 
@@ -773,7 +771,7 @@ void tr_dhtCallback(unsigned char* buf, int buflen, struct sockaddr* from, sockl
 
     /* Being slightly late is fine,
        and has the added benefit of adding some jitter. */
-    tr_timerAdd(dht_timer, (int)tosleep, tr_rand_int_weak(1000000));
+    tr_timerAdd(*dht_timer, (int)tosleep, tr_rand_int_weak(1000000));
 }
 
 static void timer_callback(evutil_socket_t /*s*/, short /*type*/, void* session)
@@ -820,7 +818,7 @@ int dht_sendto(int sockfd, void const* buf, int len, int flags, struct sockaddr 
 
 #if defined(_WIN32) && !defined(__MINGW32__)
 
-extern "C" int dht_gettimeofday(struct timeval* tv, struct timezone* tz)
+extern "C" int dht_gettimeofday(struct timeval* tv, [[maybe_unused]] timezone* tz)
 {
     TR_ASSERT(tz == nullptr);
     *tv = tr_gettimeofday();

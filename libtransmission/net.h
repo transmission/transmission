@@ -14,7 +14,6 @@
 #include <string_view>
 
 #ifdef _WIN32
-#include <inttypes.h>
 #include <ws2tcpip.h>
 #else
 #include <errno.h>
@@ -70,7 +69,7 @@ enum tr_address_type
 
 struct tr_address;
 
-int tr_address_compare(tr_address const* a, tr_address const* b);
+[[nodiscard]] int tr_address_compare(tr_address const* a, tr_address const* b) noexcept;
 
 struct tr_address
 {
@@ -88,22 +87,22 @@ struct tr_address
         struct in_addr addr4;
     } addr;
 
-    [[nodiscard]] int compare(tr_address const& that) const
+    [[nodiscard]] int compare(tr_address const& that) const noexcept
     {
         return tr_address_compare(this, &that);
     }
 
-    [[nodiscard]] bool operator==(tr_address const& that) const
+    [[nodiscard]] bool operator==(tr_address const& that) const noexcept
     {
         return compare(that) == 0;
     }
 
-    [[nodiscard]] bool operator<(tr_address const& that) const
+    [[nodiscard]] bool operator<(tr_address const& that) const noexcept
     {
         return compare(that) < 0;
     }
 
-    [[nodiscard]] bool operator>(tr_address const& that) const
+    [[nodiscard]] bool operator>(tr_address const& that) const noexcept
     {
         return compare(that) > 0;
     }

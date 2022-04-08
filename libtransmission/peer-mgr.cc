@@ -128,26 +128,6 @@ struct peer_atom
     time_t shelf_date;
     tr_peer* peer; /* will be nullptr if not connected */
     tr_address addr;
-
-    [[nodiscard]] int compare(peer_atom const& that) const
-    {
-        return addr.compare(that.addr);
-    }
-
-    [[nodiscard]] bool operator==(peer_atom const& that) const
-    {
-        return compare(that) == 0;
-    }
-
-    [[nodiscard]] bool operator<(peer_atom const& that) const
-    {
-        return compare(that) < 0;
-    }
-
-    [[nodiscard]] bool operator>(peer_atom const& that) const
-    {
-        return compare(that) > 0;
-    }
 };
 
 #ifndef TR_ENABLE_ASSERTS
@@ -661,7 +641,7 @@ static void refillUpkeep(evutil_socket_t /*fd*/, short /*what*/, void* vmgr)
     auto& torrents = mgr->session->torrents();
     std::for_each(std::begin(torrents), std::end(torrents), [](auto* tor) { tr_swarmCancelOldRequests(tor->swarm); });
 
-    tr_timerAddMsec(mgr->refillUpkeepTimer, RefillUpkeepPeriodMsec);
+    tr_timerAddMsec(*mgr->refillUpkeepTimer, RefillUpkeepPeriodMsec);
 }
 
 static void addStrike(tr_swarm* s, tr_peer* peer)
@@ -1382,7 +1362,7 @@ static void reconnectPulse(evutil_socket_t, short /*unused*/, void* /*vmgr*/);
 static struct event* createTimer(tr_session* session, int msec, event_callback_fn callback, void* cbdata)
 {
     struct event* timer = evtimer_new(session->event_base, callback, cbdata);
-    tr_timerAddMsec(timer, msec);
+    tr_timerAddMsec(*timer, msec);
     return timer;
 }
 
@@ -1422,7 +1402,7 @@ void tr_peerMgrStartTorrent(tr_torrent* tor)
     s->maxPeers = tor->maxConnectedPeers;
 
     // rechoke soon
-    tr_timerAddMsec(s->manager->rechokeTimer, 100);
+    tr_timerAddMsec(*s->manager->rechokeTimer, 100);
 }
 
 static void removeAllPeers(tr_swarm* /*swarm*/);
@@ -2131,7 +2111,7 @@ static void rechokeUploads(tr_swarm* s, uint64_t const now)
     for (int i = 0; i < peerCount; ++i)
     {
         auto* const peer = peers[i];
-        struct peer_atom* const atom = peer->atom;
+        peer_atom const* const atom = peer->atom;
 
         if (tr_peerIsSeed(peer))
         {
@@ -2245,7 +2225,7 @@ static void rechokePulse(evutil_socket_t /*fd*/, short /*what*/, void* vmgr)
         }
     }
 
-    tr_timerAddMsec(mgr->rechokeTimer, RechokePeriodMsec);
+    tr_timerAddMsec(*mgr->rechokeTimer, RechokePeriodMsec);
 }
 
 /***
@@ -2383,7 +2363,7 @@ static void removePeer(tr_peer* peer)
 static void closePeer(tr_peer* peer)
 {
     TR_ASSERT(peer != nullptr);
-    auto* const s = peer->swarm;
+    auto const* const s = peer->swarm;
 
     /* if we transferred piece data, then they might be good peers,
        so reset their `numFails' weight to zero. otherwise we connected
@@ -2637,7 +2617,7 @@ static void bandwidthPulse(evutil_socket_t /*fd*/, short /*what*/, void* vmgr)
 
     reconnectPulse(0, 0, mgr);
 
-    tr_timerAddMsec(mgr->bandwidthTimer, BandwidthPeriodMsec);
+    tr_timerAddMsec(*mgr->bandwidthTimer, BandwidthPeriodMsec);
 }
 
 /***
@@ -2774,7 +2754,7 @@ static void atomPulse(evutil_socket_t /*fd*/, short /*what*/, void* vmgr)
         }
     }
 
-    tr_timerAddMsec(mgr->atomTimer, AtomPeriodMsec);
+    tr_timerAddMsec(*mgr->atomTimer, AtomPeriodMsec);
 }
 
 /***

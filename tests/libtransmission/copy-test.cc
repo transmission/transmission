@@ -30,7 +30,7 @@ protected:
         auto const path1 = tr_strvPath(sandboxDir(), filename1);
 
         /* Create a file. */
-        char* file_content = static_cast<char*>(tr_malloc(file_length));
+        auto* file_content = static_cast<char*>(tr_malloc(file_length));
         tr_rand_buffer(file_content, file_length);
         createFileWithContents(path1, file_content, file_length);
         tr_free(file_content);
@@ -91,8 +91,8 @@ private:
         uint64_t bytes_left2 = info2.size;
 
         size_t const buflen = 2 * 1024 * 1024; /* 2 MiB buffer */
-        char* readbuf1 = static_cast<char*>(tr_malloc(buflen));
-        char* readbuf2 = static_cast<char*>(tr_malloc(buflen));
+        auto* readbuf1 = static_cast<char*>(tr_malloc(buflen));
+        auto* readbuf2 = static_cast<char*>(tr_malloc(buflen));
 
         while (bytes_left1 > 0 || bytes_left2 > 0)
         {

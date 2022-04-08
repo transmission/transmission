@@ -818,48 +818,52 @@ void DetailsDialog::Impl::refreshInfo(std::vector<tr_torrent*> const& torrents)
 
     /* size_lb */
     {
-        uint64_t size = 0;
-        int pieces = 0;
-        int32_t pieceSize = 0;
+        auto const piece_count = std::accumulate(
+            std::begin(infos),
+            std::end(infos),
+            uint64_t{},
+            [](auto sum, auto const& info) { return sum + info.n_pieces; });
 
-        for (auto const& info : infos)
-        {
-            size += info.total_size;
-            pieces += info.n_pieces;
-
-            if (pieceSize == 0)
-            {
-                pieceSize = info.piece_size;
-            }
-            else if (pieceSize != (int)info.piece_size)
-            {
-                pieceSize = -1;
-            }
-        }
-
-        auto const sizebuf = tr_strlsize(size);
-
-        if (size == 0)
+        if (piece_count == 0)
         {
             str.clear();
         }
-        else if (pieceSize >= 0)
-        {
-            str = fmt::format(
-                ngettext(
-                    "{file_size} ({piece_count} piece @ {piece_size})",
-                    "{file_size} ({piece_count} pieces @ {piece_size})",
-                    pieces),
-                fmt::arg("file_size", sizebuf),
-                fmt::arg("piece_count", pieces),
-                fmt::arg("piece_size", tr_formatter_mem_B(pieceSize)));
-        }
         else
         {
+            auto const total_size = std::accumulate(
+                std::begin(infos),
+                std::end(infos),
+                uint64_t{},
+                [](auto sum, auto const& info) { return sum + info.total_size; });
+
+            auto const file_count = std::accumulate(
+                std::begin(torrents),
+                std::end(torrents),
+                std::size_t{},
+                [](auto sum, auto const* tor) { return sum + tr_torrentFileCount(tor); });
+
             str = fmt::format(
-                ngettext("{file_size} ({piece_count} piece)", "{file_size} ({piece_count} pieces)", pieces),
-                fmt::arg("file_size", sizebuf),
-                fmt::arg("piece_count", pieces));
+                ngettext("{total_size} in {file_count:L} file", "{total_size} in {file_count:L} files", file_count),
+                fmt::arg("total_size", tr_strlsize(total_size)),
+                fmt::arg("file_count", file_count));
+
+            auto const piece_size = std::empty(infos) ? uint32_t{} : infos.front().piece_size;
+            auto const piece_size_is_uniform = std::all_of(
+                std::begin(infos),
+                std::end(infos),
+                [piece_size](auto const& info) { return info.piece_size == piece_size; });
+
+            if (piece_size_is_uniform)
+            {
+                str += ' ';
+                str += fmt::format(
+                    ngettext(
+                        "({piece_count} BitTorrent piece @ {piece_size})",
+                        "({piece_count} BitTorrent pieces @ {piece_size})",
+                        piece_count),
+                    fmt::arg("piece_count", piece_count),
+                    fmt::arg("piece_size", tr_formatter_mem_B(piece_size)));
+            }
         }
 
         size_lb_->set_text(str);
@@ -1353,7 +1357,7 @@ void refreshPeerRow(Gtk::TreeIter const& iter, tr_peer_stat const* peer)
 void DetailsDialog::Impl::refreshPeerList(std::vector<tr_torrent*> const& torrents)
 {
     auto& hash = peer_hash_;
-    auto& store = peer_store_;
+    auto const& store = peer_store_;
 
     /* step 1: get all the peers */
     std::vector<tr_peer_stat*> peers;
@@ -1440,7 +1444,7 @@ void DetailsDialog::Impl::refreshWebseedList(std::vector<tr_torrent*> const& tor
 {
     auto has_any_webseeds = bool{ false };
     auto& hash = webseed_hash_;
-    auto& store = webseed_store_;
+    auto const& store = webseed_store_;
 
     auto make_key = [](tr_torrent const* tor, char const* url)
     {
@@ -2152,7 +2156,7 @@ void DetailsDialog::Impl::refreshTracker(std::vector<tr_torrent*> const& torrent
 {
     std::ostringstream gstr;
     auto& hash = tracker_hash_;
-    auto& store = tracker_store_;
+    auto const& store = tracker_store_;
     auto* session = core_->get_session();
     bool const showScrape = scrape_check_->get_active();
 
@@ -2261,7 +2265,7 @@ void DetailsDialog::Impl::on_edit_trackers_response(int response, std::shared_pt
     if (response == Gtk::RESPONSE_ACCEPT)
     {
         auto const torrent_id = GPOINTER_TO_INT(dialog->get_data(TORRENT_ID_KEY));
-        auto* const text_buffer = static_cast<Gtk::TextBuffer*>(dialog->get_data(TEXT_BUFFER_KEY));
+        auto const* const text_buffer = static_cast<Gtk::TextBuffer*>(dialog->get_data(TEXT_BUFFER_KEY));
 
         if (auto* const tor = core_->find_torrent(torrent_id); tor != nullptr)
         {
@@ -2360,7 +2364,7 @@ void DetailsDialog::Impl::on_edit_trackers()
 void DetailsDialog::Impl::on_tracker_list_selection_changed()
 {
     int const n = tracker_view_->get_selection()->count_selected_rows();
-    auto* tor = tracker_list_get_current_torrent();
+    auto const* const tor = tracker_list_get_current_torrent();
 
     remove_tracker_button_->set_sensitive(n > 0);
     add_tracker_button_->set_sensitive(tor != nullptr);
@@ -2373,7 +2377,7 @@ void DetailsDialog::Impl::on_add_tracker_response(int response, std::shared_ptr<
 
     if (response == Gtk::RESPONSE_ACCEPT)
     {
-        auto* e = static_cast<Gtk::Entry*>(dialog->get_data(URL_ENTRY_KEY));
+        auto const* const e = static_cast<Gtk::Entry*>(dialog->get_data(URL_ENTRY_KEY));
         auto const torrent_id = GPOINTER_TO_INT(dialog->get_data(TORRENT_ID_KEY));
         auto const url = gtr_str_strip(e->get_text());
 
@@ -2669,8 +2673,8 @@ void DetailsDialog::Impl::set_torrents(std::vector<int> const& ids)
     else
     {
         title = fmt::format(
-            ngettext("Properties - {count} Torrent", "Properties - {count} Torrents", len),
-            fmt::arg("count", len));
+            ngettext("Properties - {torrent_count:L} Torrent", "Properties - {torrent_count:L} Torrents", len),
+            fmt::arg("torrent_count", len));
 
         file_list_->clear();
         file_list_->hide();

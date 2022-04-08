@@ -324,7 +324,7 @@ int tr_main(int argc, char* argv[])
         return EXIT_FAILURE;
     }
 
-    if (options.add == nullptr && options.deleteme == nullptr && options.replace[0] == 0)
+    if (options.add == nullptr && options.deleteme == nullptr && options.replace[0] == nullptr)
     {
         fprintf(stderr, "ERROR: Must specify -a, -d or -r\n");
         tr_getopt_usage(MyName, Usage, std::data(Options));

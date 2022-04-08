@@ -33,7 +33,6 @@ public:
 
     // O(1)
     [[nodiscard]] tr_torrent* get(int id);
-    [[nodiscard]] tr_torrent const* get(int id) const;
 
     // O(log n)
     [[nodiscard]] tr_torrent const* get(tr_sha1_digest_t const& hash) const;
@@ -52,7 +51,6 @@ public:
     // These convenience functions use get(tr_sha1_digest_t const&)
     // after parsing the magnet link to get the info hash. If you have
     // the info hash already, use get() instead to avoid excess parsing.
-    [[nodiscard]] tr_torrent const* get(std::string_view magnet_link) const;
     [[nodiscard]] tr_torrent* get(std::string_view magnet_link);
 
     template<typename T>
@@ -63,40 +61,40 @@ public:
 
     [[nodiscard]] std::set<int> removedSince(time_t) const;
 
-    [[nodiscard]] auto cbegin() const
+    [[nodiscard]] auto cbegin() const noexcept
     {
         return std::cbegin(by_hash_);
     }
-    [[nodiscard]] auto begin() const
+    [[nodiscard]] auto begin() const noexcept
     {
         return cbegin();
     }
-    [[nodiscard]] auto begin()
+    [[nodiscard]] auto begin() noexcept
     {
         return std::begin(by_hash_);
     }
 
-    [[nodiscard]] auto cend() const
+    [[nodiscard]] auto cend() const noexcept
     {
         return std::cend(by_hash_);
     }
 
-    [[nodiscard]] auto end() const
+    [[nodiscard]] auto end() const noexcept
     {
         return cend();
     }
 
-    [[nodiscard]] auto end()
+    [[nodiscard]] auto end() noexcept
     {
         return std::end(by_hash_);
     }
 
-    [[nodiscard]] auto size() const
+    [[nodiscard]] constexpr auto size() const noexcept
     {
         return std::size(by_hash_);
     }
 
-    [[nodiscard]] auto empty() const
+    [[nodiscard]] constexpr auto empty() const noexcept
     {
         return std::empty(by_hash_);
     }

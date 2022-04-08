@@ -15,6 +15,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <string_view>
+#include <string>
 #include <vector>
 
 #include <dirent.h>

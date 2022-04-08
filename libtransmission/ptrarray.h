@@ -46,19 +46,6 @@ void tr_ptrArrayForeach(tr_ptrArray* array, PtrArrayForeachFunc func);
     @return the nth item in a tr_ptrArray */
 void* tr_ptrArrayNth(tr_ptrArray* array, int i);
 
-/** @brief Remove the last item from the array and return it
-    @return the pointer that's been removed from the array
-    @see tr_ptrArrayBack() */
-void* tr_ptrArrayPop(tr_ptrArray* array);
-
-/** @brief Return the last item in a tr_ptrArray
-    @return the last item in a tr_ptrArray, or nullptr if the array is empty
-    @see tr_ptrArrayPop() */
-constexpr void* tr_ptrArrayBack(tr_ptrArray* array)
-{
-    return array->n_items > 0 ? tr_ptrArrayNth(array, array->n_items - 1) : nullptr;
-}
-
 void tr_ptrArrayErase(tr_ptrArray* t, int begin, int end);
 
 static inline void tr_ptrArrayRemove(tr_ptrArray* t, int pos)
@@ -68,11 +55,6 @@ static inline void tr_ptrArrayRemove(tr_ptrArray* t, int pos)
 
 /** @brief Peek at the array pointer and its size, for easy iteration */
 void** tr_ptrArrayPeek(tr_ptrArray* array, int* size);
-
-constexpr void tr_ptrArrayClear(tr_ptrArray* a)
-{
-    a->n_items = 0;
-}
 
 /** @brief Insert a pointer into the array at the specified position
     @return the index of the stored pointer */
@@ -115,14 +97,5 @@ void tr_ptrArrayRemoveSortedPointer(tr_ptrArray* t, void const* ptr, tr_voidptr_
 /** @brief Find a pointer from an array sorted by the specified sort function
     @return the matching pointer, or nullptr if no match was found */
 void* tr_ptrArrayFindSorted(tr_ptrArray* array, void const* key, tr_voidptr_compare_func compare);
-
-/** @brief similar to bsearch() but returns the index of the lower bound */
-int tr_lowerBound(
-    void const* key,
-    void const* base,
-    size_t nmemb,
-    size_t size,
-    tr_voidptr_compare_func compar,
-    bool* exact_match) TR_GNUC_HOT TR_GNUC_NONNULL(1, 5, 6);
 
 /* @} */

@@ -7,7 +7,6 @@
 #include <ctype.h> /* isxdigit() */
 #include <errno.h>
 #include <limits.h> /* INT_MAX */
-#include <stdarg.h>
 
 #include <giomm.h> /* g_file_trash() */
 #include <glibmm/i18n.h>
@@ -95,7 +94,7 @@ Glib::ustring tr_strltime(time_t seconds)
     }
 
     auto const days = (int)(seconds / 86400);
-    auto const d = fmt::format(ngettext("{days} day", "{days} days", days), fmt::arg("days", days));
+    auto const d = fmt::format(ngettext("{days:L} day", "{days:L} days", days), fmt::arg("days", days));
     int const hours = (seconds % 86400) / 3600;
     auto const h = fmt::format(ngettext("{hours} hour", "{hours} hours", hours), fmt::arg("hours", hours));
     if (days != 0)
@@ -393,7 +392,7 @@ auto const ChildHiddenKey = Glib::Quark("gtr-child-hidden");
 void gtr_widget_set_visible(Gtk::Widget& w, bool b)
 {
     /* toggle the transient children, too */
-    if (auto* const window = dynamic_cast<Gtk::Window*>(&w); window != nullptr)
+    if (auto const* const window = dynamic_cast<Gtk::Window*>(&w); window != nullptr)
     {
         for (auto* const l : Gtk::Window::list_toplevels())
         {

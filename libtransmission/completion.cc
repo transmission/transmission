@@ -13,13 +13,6 @@
 #include "torrent.h"
 #include "tr-assert.h"
 
-uint64_t tr_completion::leftUntilDone() const
-{
-    auto const size_when_done = sizeWhenDone();
-    auto const has_total = hasTotal();
-    return size_when_done - has_total;
-}
-
 uint64_t tr_completion::computeHasValid() const
 {
     uint64_t size = 0;
@@ -167,7 +160,7 @@ void tr_completion::setBlocks(tr_bitfield blocks)
     has_valid_.reset();
 }
 
-void tr_completion::setHasAll()
+void tr_completion::setHasAll() noexcept
 {
     auto const total_size = block_info_->totalSize();
 

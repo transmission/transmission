@@ -5,6 +5,7 @@
 
 #include <algorithm>
 #include <array>
+#include <cinttypes> // PRIu64
 #include <cstdio>
 #include <ctime>
 #include <iterator>
@@ -22,6 +23,7 @@
 #include <libtransmission/torrent-metainfo.h>
 #include <libtransmission/tr-getopt.h>
 #include <libtransmission/tr-macros.h>
+#include <libtransmission/tr-strbuf.h>
 #include <libtransmission/utils.h>
 #include <libtransmission/variant.h>
 #include <libtransmission/version.h>
@@ -313,12 +315,12 @@ size_t writeFunc(void* ptr, size_t size, size_t nmemb, void* vbuf)
 CURL* tr_curl_easy_init(struct evbuffer* writebuf)
 {
     CURL* curl = curl_easy_init();
-    curl_easy_setopt(curl, CURLOPT_USERAGENT, UserAgent);
-    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeFunc);
-    curl_easy_setopt(curl, CURLOPT_WRITEDATA, writebuf);
-    curl_easy_setopt(curl, CURLOPT_HTTPAUTH, CURLAUTH_ANY);
-    curl_easy_setopt(curl, CURLOPT_VERBOSE, tr_env_key_exists("TR_CURL_VERBOSE"));
-    curl_easy_setopt(curl, CURLOPT_ENCODING, "");
+    (void)curl_easy_setopt(curl, CURLOPT_USERAGENT, UserAgent);
+    (void)curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeFunc);
+    (void)curl_easy_setopt(curl, CURLOPT_WRITEDATA, writebuf);
+    (void)curl_easy_setopt(curl, CURLOPT_HTTPAUTH, CURLAUTH_ANY);
+    (void)curl_easy_setopt(curl, CURLOPT_VERBOSE, tr_env_key_exists("TR_CURL_VERBOSE"));
+    (void)curl_easy_setopt(curl, CURLOPT_ENCODING, "");
     return curl;
 }
 
@@ -338,11 +340,10 @@ void doScrape(tr_torrent_metainfo const& metainfo)
         auto escaped = std::array<char, TR_SHA1_DIGEST_LEN * 3 + 1>{};
         tr_http_escape_sha1(std::data(escaped), metainfo.infoHash());
         auto const scrape = tracker.scrape.full;
-        auto const url = tr_strvJoin(
-            scrape,
-            (tr_strvContains(scrape, '?') ? "&"sv : "?"sv),
-            "info_hash="sv,
-            std::data(escaped));
+        auto const url = tr_urlbuf{ scrape,
+                                    tr_strvContains(scrape, '?') ? '&' : '?',
+                                    "info_hash="sv,
+                                    std::string_view{ std::data(escaped) } };
 
         printf("%" TR_PRIsv " ... ", TR_PRIsv_ARG(url));
         fflush(stdout);

@@ -12,6 +12,8 @@
 #endif
 
 #include "transmission.h"
+
+#include "crypto-utils.h"
 #include "platform.h"
 #include "web-utils.h"
 
@@ -128,6 +130,18 @@ TEST_F(WebUtilsTest, urlParse)
     EXPECT_EQ(8080, parsed->port);
 }
 
+TEST(WebUtilsTest, urlParseFuzz)
+{
+    auto buf = std::vector<char>{};
+
+    for (size_t i = 0; i < 100000; ++i)
+    {
+        buf.resize(tr_rand_int(1024));
+        tr_rand_buffer(std::data(buf), std::size(buf));
+        tr_urlParse({ std::data(buf), std::size(buf) });
+    }
+}
+
 TEST_F(WebUtilsTest, urlNextQueryPair)
 {
     auto constexpr Query = "a=1&b=two&c=si&d_has_no_val&e=&f&g=gee"sv;
@@ -208,8 +222,8 @@ TEST_F(WebUtilsTest, urlPercentDecode)
           "http://www.example.com/~user/?test=1&test1=2"sv },
     } };
 
-    for (auto const& test : Tests)
+    for (auto const& [encoded, decoded] : Tests)
     {
-        EXPECT_EQ(test.second, tr_urlPercentDecode(test.first));
+        EXPECT_EQ(decoded, tr_urlPercentDecode(encoded));
     }
 }

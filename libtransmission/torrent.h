@@ -55,8 +55,6 @@ void tr_ctorInitTorrentWanted(tr_ctor const* ctor, tr_torrent* tor);
 
 bool tr_ctorSaveContents(tr_ctor const* ctor, std::string_view filename, tr_error** error);
 
-std::string_view tr_ctorGetContents(tr_ctor const* ctor);
-
 tr_session* tr_ctorGetSession(tr_ctor const* ctor);
 
 bool tr_ctorGetIncompleteDir(tr_ctor const* ctor, char const** setmeIncompleteDir);
@@ -146,7 +144,7 @@ public:
         return metainfo_.blockInfo();
     }
 
-    [[nodiscard]] constexpr auto blockCount() const
+    [[nodiscard]] constexpr auto blockCount() const noexcept
     {
         return metainfo_.blockCount();
     }
@@ -162,7 +160,7 @@ public:
     {
         return metainfo_.pieceLoc(piece, offset, length);
     }
-    [[nodiscard]] constexpr auto blockSize(tr_block_index_t block) const
+    [[nodiscard]] constexpr auto blockSize(tr_block_index_t block) const noexcept
     {
         return metainfo_.blockSize(block);
     }
@@ -170,19 +168,19 @@ public:
     {
         return metainfo_.blockSpanForPiece(piece);
     }
-    [[nodiscard]] constexpr auto pieceCount() const
+    [[nodiscard]] constexpr auto pieceCount() const noexcept
     {
         return metainfo_.pieceCount();
     }
-    [[nodiscard]] constexpr auto pieceSize() const
+    [[nodiscard]] constexpr auto pieceSize() const noexcept
     {
         return metainfo_.pieceSize();
     }
-    [[nodiscard]] constexpr auto pieceSize(tr_piece_index_t piece) const
+    [[nodiscard]] constexpr auto pieceSize(tr_piece_index_t piece) const noexcept
     {
         return metainfo_.pieceSize(piece);
     }
-    [[nodiscard]] constexpr auto totalSize() const
+    [[nodiscard]] constexpr auto totalSize() const noexcept
     {
         return metainfo_.totalSize();
     }
@@ -204,12 +202,12 @@ public:
         return completion.hasMetainfo();
     }
 
-    [[nodiscard]] auto hasAll() const
+    [[nodiscard]] auto hasAll() const noexcept
     {
         return completion.hasAll();
     }
 
-    [[nodiscard]] auto hasNone() const
+    [[nodiscard]] auto hasNone() const noexcept
     {
         return completion.hasNone();
     }
@@ -244,22 +242,22 @@ public:
         return completion.createPieceBitfield();
     }
 
-    [[nodiscard]] constexpr bool isDone() const
+    [[nodiscard]] constexpr bool isDone() const noexcept
     {
         return completeness != TR_LEECH;
     }
 
-    [[nodiscard]] constexpr bool isSeed() const
+    [[nodiscard]] constexpr bool isSeed() const noexcept
     {
         return completeness == TR_SEED;
     }
 
-    [[nodiscard]] constexpr bool isPartialSeed() const
+    [[nodiscard]] constexpr bool isPartialSeed() const noexcept
     {
         return completeness == TR_PARTIAL_SEED;
     }
 
-    [[nodiscard]] tr_bitfield const& blocks() const
+    [[nodiscard]] tr_bitfield const& blocks() const noexcept
     {
         return completion.blocks();
     }
@@ -333,24 +331,24 @@ public:
 
     /// LOCATION
 
-    [[nodiscard]] tr_interned_string currentDir() const
+    [[nodiscard]] constexpr tr_interned_string currentDir() const noexcept
     {
         return this->current_dir;
     }
 
-    [[nodiscard]] tr_interned_string downloadDir() const
+    [[nodiscard]] constexpr tr_interned_string downloadDir() const noexcept
     {
         return this->download_dir;
     }
 
-    [[nodiscard]] tr_interned_string incompleteDir() const
+    [[nodiscard]] constexpr tr_interned_string incompleteDir() const noexcept
     {
         return this->incomplete_dir;
     }
 
     /// METAINFO - FILES
 
-    [[nodiscard]] tr_file_index_t fileCount() const
+    [[nodiscard]] tr_file_index_t fileCount() const noexcept
     {
         return metainfo_.fileCount();
     }
@@ -372,16 +370,27 @@ public:
 
     struct tr_found_file_t : public tr_sys_path_info
     {
-        tr_pathbuf filename; // /home/foo/Downloads/torrent/01-file-one.txt
-        std::string_view base; // /home/foo/Downloads
-        std::string_view subpath; // /torrent/01-file-one.txt
+        // /home/foo/Downloads/torrent/01-file-one.txt
+        tr_pathbuf filename;
+        size_t base_len;
 
-        tr_found_file_t(tr_sys_path_info info, tr_pathbuf&& filename_in, size_t base_len)
+        tr_found_file_t(tr_sys_path_info info, tr_pathbuf&& filename_in, size_t base_len_in)
             : tr_sys_path_info{ info }
             , filename{ std::move(filename_in) }
-            , base{ filename.sv().substr(0, base_len) }
-            , subpath{ filename.sv().substr(base_len + 1) }
+            , base_len{ base_len_in }
         {
+        }
+
+        [[nodiscard]] constexpr auto base() const
+        {
+            // /home/foo/Downloads
+            return filename.sv().substr(0, base_len);
+        }
+
+        [[nodiscard]] constexpr auto subpath() const
+        {
+            // torrent/01-file-one.txt
+            return filename.sv().substr(base_len + 1);
         }
     };
 
@@ -389,17 +398,17 @@ public:
 
     /// METAINFO - TRACKERS
 
-    [[nodiscard]] auto const& announceList() const
+    [[nodiscard]] auto const& announceList() const noexcept
     {
         return metainfo_.announceList();
     }
 
-    [[nodiscard]] auto& announceList()
+    [[nodiscard]] auto& announceList() noexcept
     {
         return metainfo_.announceList();
     }
 
-    [[nodiscard]] auto trackerCount() const
+    [[nodiscard]] auto trackerCount() const noexcept
     {
         return std::size(this->announceList());
     }
@@ -423,7 +432,7 @@ public:
 
     /// METAINFO - WEBSEEDS
 
-    [[nodiscard]] auto webseedCount() const
+    [[nodiscard]] auto webseedCount() const noexcept
     {
         return metainfo_.webseedCount();
     }
@@ -440,32 +449,32 @@ public:
         metainfo_.setName(name);
     }
 
-    [[nodiscard]] auto const& name() const
+    [[nodiscard]] auto const& name() const noexcept
     {
         return metainfo_.name();
     }
 
-    [[nodiscard]] auto const& infoHash() const
+    [[nodiscard]] auto const& infoHash() const noexcept
     {
         return metainfo_.infoHash();
     }
 
-    [[nodiscard]] auto isPrivate() const
+    [[nodiscard]] auto isPrivate() const noexcept
     {
         return metainfo_.isPrivate();
     }
 
-    [[nodiscard]] auto isPublic() const
+    [[nodiscard]] auto isPublic() const noexcept
     {
         return !this->isPrivate();
     }
 
-    [[nodiscard]] auto const& infoHashString() const
+    [[nodiscard]] auto const& infoHashString() const noexcept
     {
         return metainfo_.infoHashString();
     }
 
-    [[nodiscard]] auto dateCreated() const
+    [[nodiscard]] auto dateCreated() const noexcept
     {
         return metainfo_.dateCreated();
     }
@@ -490,27 +499,27 @@ public:
         return metainfo_.magnet();
     }
 
-    [[nodiscard]] auto const& comment() const
+    [[nodiscard]] auto const& comment() const noexcept
     {
         return metainfo_.comment();
     }
 
-    [[nodiscard]] auto const& creator() const
+    [[nodiscard]] auto const& creator() const noexcept
     {
         return metainfo_.creator();
     }
 
-    [[nodiscard]] auto const& source() const
+    [[nodiscard]] auto const& source() const noexcept
     {
         return metainfo_.source();
     }
 
-    [[nodiscard]] auto infoDictSize() const
+    [[nodiscard]] auto infoDictSize() const noexcept
     {
         return metainfo_.infoDictSize();
     }
 
-    [[nodiscard]] auto infoDictOffset() const
+    [[nodiscard]] auto infoDictOffset() const noexcept
     {
         return metainfo_.infoDictOffset();
     }
@@ -530,17 +539,17 @@ public:
 
     ///
 
-    [[nodiscard]] auto isQueued() const
+    [[nodiscard]] constexpr auto isQueued() const noexcept
     {
         return this->is_queued;
     }
 
-    [[nodiscard]] constexpr auto queueDirection() const
+    [[nodiscard]] constexpr auto queueDirection() const noexcept
     {
         return this->isDone() ? TR_UP : TR_DOWN;
     }
 
-    [[nodiscard]] auto allowsPex() const
+    [[nodiscard]] auto allowsPex() const noexcept
     {
         return this->isPublic() && this->session->isPexEnabled;
     }
@@ -580,7 +589,7 @@ public:
 
     /** Return the mime-type (e.g. "audio/x-flac") that matches more of the
         torrent's content than any other mime-type. */
-    std::string_view primaryMimeType() const;
+    [[nodiscard]] std::string_view primaryMimeType() const;
 
     static constexpr std::string_view PartialFileSuffix = std::string_view{ ".part" };
 

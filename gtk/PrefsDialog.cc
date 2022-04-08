@@ -99,7 +99,7 @@ bool spun_cb_idle(Gtk::SpinButton* spin, tr_quark const key, Glib::RefPtr<Sessio
     bool keep_waiting = true;
 
     /* has the user stopped making changes? */
-    if (auto* last_change = static_cast<Glib::Timer*>(spin->get_data(IdleDataKey)); last_change->elapsed() > 0.33)
+    if (auto const* const last_change = static_cast<Glib::Timer*>(spin->get_data(IdleDataKey)); last_change->elapsed() > 0.33)
     {
         /* update the core */
         if (isDouble)
@@ -413,7 +413,7 @@ void updateBlocklistText(Gtk::Label* w, Glib::RefPtr<Session> const& core)
 {
     int const n = tr_blocklistGetRuleCount(core->get_session());
     auto const msg = fmt::format(
-        ngettext("Blocklist has {count} entry", "Blocklist has {count} entries", n),
+        ngettext("Blocklist has {count:L} entry", "Blocklist has {count:L} entries", n),
         fmt::arg("count", n));
     w->set_markup(fmt::format(FMT_STRING("<i>{:s}</i>"), msg));
 }
@@ -441,7 +441,7 @@ void onBlocklistUpdated(Glib::RefPtr<Session> const& core, int n, blocklist_data
     bool const success = n >= 0;
     int const count = n >= 0 ? n : tr_blocklistGetRuleCount(core->get_session());
     auto const msg = fmt::format(
-        ngettext("Blocklist has {count} entry", "Blocklist has {count} entries", count),
+        ngettext("Blocklist has {count:L} entry", "Blocklist has {count:L} entries", count),
         fmt::arg("count", count));
     data->updateBlocklistButton->set_sensitive(true);
     data->updateBlocklistDialog->set_message(

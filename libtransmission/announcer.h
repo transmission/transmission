@@ -10,6 +10,7 @@
 #endif
 
 #include <cstddef> // size_t
+#include <cstdint> // uint32_t
 #include <ctime>
 #include <string_view>
 #include <vector>

@@ -4,7 +4,6 @@
 // License text can be found in the licenses/ folder.
 
 #include <algorithm>
-#include <cstdarg>
 #include <cstring>
 #include <list>
 #include <string>
@@ -21,6 +20,7 @@
 #include <windows.h>
 #include <shlobj.h> /* SHGetKnownFolderPath(), FOLDERID_... */
 #else
+#include <pwd.h>
 #include <unistd.h> /* getuid() */
 #endif
 
@@ -32,7 +32,7 @@
 #include <FindDirectory.h>
 #endif
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include "transmission.h"
 
@@ -45,58 +45,9 @@
 
 using namespace std::literals;
 
-// TODO: use remove this and use tr_strvPath() instead
-static char* tr_buildPath(char const* first_element, ...)
-{
-    // pass 1: allocate enough space for the string
-    va_list vl;
-    va_start(vl, first_element);
-    auto bufLen = size_t{};
-    for (char const* element = first_element; element != nullptr;)
-    {
-        bufLen += strlen(element) + 1;
-        element = va_arg(vl, char const*);
-    }
-    va_end(vl);
-    auto* const buf = tr_new(char, bufLen);
-    if (buf == nullptr)
-    {
-        return nullptr;
-    }
-
-    /* pass 2: build the string piece by piece */
-    char* pch = buf;
-    va_start(vl, first_element);
-    for (char const* element = first_element; element != nullptr;)
-    {
-        size_t const elementLen = strlen(element);
-        pch = std::copy_n(element, elementLen, pch);
-        *pch++ = TR_PATH_DELIMITER;
-        element = va_arg(vl, char const*);
-    }
-    va_end(vl);
-
-    // if nonempty, eat the unwanted trailing slash
-    if (pch != buf)
-    {
-        --pch;
-    }
-
-    // zero-terminate the string
-    *pch++ = '\0';
-
-    /* sanity checks & return */
-    TR_ASSERT(pch - buf == (ptrdiff_t)bufLen);
-    return buf;
-}
-
 /***
 ****  PATHS
 ***/
-
-#ifndef _WIN32
-#include <pwd.h>
-#endif
 
 #ifdef _WIN32
 
@@ -128,31 +79,34 @@ static char const* getHomeDir()
     if (home == nullptr)
     {
         home = tr_env_get_string("HOME", nullptr);
+    }
 
-        if (home == nullptr)
-        {
 #ifdef _WIN32
 
-            home = win32_get_known_folder(FOLDERID_Profile);
+    if (home == nullptr)
+    {
+        home = win32_get_known_folder(FOLDERID_Profile);
+    }
 
 #else
 
-            struct passwd pwent;
-            struct passwd* pw = nullptr;
-            char buf[4096];
-            getpwuid_r(getuid(), &pwent, buf, sizeof buf, &pw);
-            if (pw != nullptr)
-            {
-                home = tr_strdup(pw->pw_dir);
-            }
+    if (home == nullptr)
+    {
+        struct passwd pwent;
+        struct passwd* pw = nullptr;
+        char buf[4096];
+        getpwuid_r(getuid(), &pwent, buf, sizeof buf, &pw);
+        if (pw != nullptr)
+        {
+            home = tr_strdup(pw->pw_dir);
+        }
+    }
 
 #endif
-        }
 
-        if (home == nullptr)
-        {
-            home = tr_strdup("");
-        }
+    if (home == nullptr)
+    {
+        home = tr_strdup("");
     }
 
     return home;
@@ -202,19 +156,19 @@ char const* tr_getDefaultConfigDir(char const* appname)
         {
 #ifdef __APPLE__
 
-            s = tr_buildPath(getHomeDir(), "Library", "Application Support", appname, nullptr);
+            s = tr_strvDup(tr_strvPath(getHomeDir(), "Library", "Application Support", appname));
 
 #elif defined(_WIN32)
 
             char* appdata = win32_get_known_folder(FOLDERID_LocalAppData);
-            s = tr_buildPath(appdata, appname, nullptr);
+            s = tr_strvDup(tr_strvPath(appdata, appname));
             tr_free(appdata);
 
 #elif defined(__HAIKU__)
 
             char buf[PATH_MAX];
             find_directory(B_USER_SETTINGS_DIRECTORY, -1, true, buf, sizeof(buf));
-            s = tr_buildPath(buf, appname, nullptr);
+            s = tr_strvDup(tr_strvPath(buf, appname));
 
 #else
 
@@ -222,12 +176,12 @@ char const* tr_getDefaultConfigDir(char const* appname)
 
             if (xdg_config_home != nullptr)
             {
-                s = tr_buildPath(xdg_config_home, appname, nullptr);
+                s = tr_strvDup(tr_strvPath(xdg_config_home, appname));
                 tr_free(xdg_config_home);
             }
             else
             {
-                s = tr_buildPath(getHomeDir(), ".config", appname, nullptr);
+                s = tr_strvDup(tr_strvPath(getHomeDir(), ".config", appname));
             }
 
 #endif
@@ -256,7 +210,7 @@ static std::string getXdgEntryFromUserDirs(std::string_view key)
     }
 
     // search for key="val" and extract val
-    auto const search = tr_strvJoin(key, R"(=")");
+    auto const search = fmt::format(FMT_STRING("{:s}=\""), key);
     auto begin = std::search(std::begin(content), std::end(content), std::begin(search), std::end(search));
     if (begin == std::end(content))
     {
@@ -301,9 +255,9 @@ char const* tr_getDefaultDownloadDir()
         if (user_dir == nullptr)
         {
 #ifdef __HAIKU__
-            user_dir = tr_buildPath(getHomeDir(), "Desktop", nullptr);
+            user_dir = tr_strvDup(tr_strvPath(getHomeDir(), "Desktop"));
 #else
-            user_dir = tr_buildPath(getHomeDir(), "Downloads", nullptr);
+            user_dir = tr_strvDup(tr_strvPath(getHomeDir(), "Downloads"));
 #endif
         }
     }
@@ -317,10 +271,10 @@ char const* tr_getDefaultDownloadDir()
 
 static bool isWebClientDir(std::string_view path)
 {
-    auto tmp = tr_strvPath(path, "index.html");
-    bool const ret = tr_sys_path_exists(tmp.c_str());
-    tr_logAddTrace(fmt::format("Searching for web interface file '{}'", tmp));
-    return ret;
+    auto const filename = tr_pathbuf{ path, '/', "index.html"sv };
+    bool const found = tr_sys_path_exists(filename);
+    tr_logAddTrace(fmt::format(FMT_STRING("Searching for web interface file '{:s}'"), filename));
+    return found;
 }
 
 char const* tr_getWebClientDir([[maybe_unused]] tr_session const* session)
@@ -330,144 +284,135 @@ char const* tr_getWebClientDir([[maybe_unused]] tr_session const* session)
     if (s == nullptr)
     {
         s = tr_env_get_string("CLUTCH_HOME", nullptr);
+    }
 
-        if (s == nullptr)
+    if (s == nullptr)
+    {
+        s = tr_env_get_string("TRANSMISSION_WEB_HOME", nullptr);
+    }
+
+#ifdef BUILD_MAC_CLIENT
+
+    // look in the Application Support folder
+    if (s == nullptr)
+    {
+        if (auto path = tr_pathbuf{ session->config_dir, "/public_html"sv }; isWebClientDir(path))
         {
-            s = tr_env_get_string("TRANSMISSION_WEB_HOME", nullptr);
+            s = tr_strvDup(path);
         }
+    }
 
-        if (s == nullptr)
+    // look in the resource bundle
+    if (s == nullptr)
+    {
+        auto app_url = CFBundleCopyBundleURL(CFBundleGetMainBundle());
+        auto app_ref = CFURLCopyFileSystemPath(app_url, kCFURLPOSIXPathStyle);
+        auto const buflen = CFStringGetMaximumSizeOfFileSystemRepresentation(app_ref);
+        auto buf = std::vector<char>(buflen, '\0');
+        bool const success = CFStringGetFileSystemRepresentation(app_ref, std::data(buf), std::size(buf));
+        TR_ASSERT(success);
+        CFRelease(app_url);
+        CFRelease(app_ref);
+
+        if (auto const path = tr_pathbuf{ std::string_view{ std::data(buf) }, "/Contents/Resources/public_html"sv };
+            isWebClientDir(path))
         {
-#ifdef BUILD_MAC_CLIENT /* on Mac, look in the Application Support folder first, then in the app bundle. */
-
-            /* Look in the Application Support folder */
-            s = tr_buildPath(tr_sessionGetConfigDir(session), "public_html", nullptr);
-
-            if (!isWebClientDir(s))
-            {
-                tr_free(const_cast<char*>(s));
-
-                CFURLRef appURL = CFBundleCopyBundleURL(CFBundleGetMainBundle());
-                CFStringRef appRef = CFURLCopyFileSystemPath(appURL, kCFURLPOSIXPathStyle);
-                CFIndex const appStringLength = CFStringGetMaximumSizeOfFileSystemRepresentation(appRef);
-
-                char* appString = static_cast<char*>(tr_malloc(appStringLength));
-                bool const success = CFStringGetFileSystemRepresentation(appRef, appString, appStringLength);
-                TR_ASSERT(success);
-
-                CFRelease(appURL);
-                CFRelease(appRef);
-
-                /* Fallback to the app bundle */
-                s = tr_buildPath(appString, "Contents", "Resources", "public_html", nullptr);
-
-                if (!isWebClientDir(s))
-                {
-                    tr_free(const_cast<char*>(s));
-                    s = nullptr;
-                }
-
-                tr_free(appString);
-            }
+            s = tr_strvDup(path);
+        }
+    }
 
 #elif defined(_WIN32)
 
-            /* Generally, Web interface should be stored in a Web subdir of
-             * calling executable dir. */
+    if (s == nullptr)
+    {
+        /* Generally, Web interface should be stored in a Web subdir of
+         * calling executable dir. */
 
-            static KNOWNFOLDERID const* const known_folder_ids[] = {
-                &FOLDERID_LocalAppData,
-                &FOLDERID_RoamingAppData,
-                &FOLDERID_ProgramData,
-            };
+        static KNOWNFOLDERID const* const known_folder_ids[] = {
+            &FOLDERID_LocalAppData,
+            &FOLDERID_RoamingAppData,
+            &FOLDERID_ProgramData,
+        };
 
-            for (size_t i = 0; s == nullptr && i < TR_N_ELEMENTS(known_folder_ids); ++i)
+        for (size_t i = 0; s == nullptr && i < TR_N_ELEMENTS(known_folder_ids); ++i)
+        {
+            char* dir = win32_get_known_folder(*known_folder_ids[i]);
+
+            if (auto const path = tr_pathbuf{ std::string_view{ dir }, "/Transmission/Web"sv }; isWebClientDir(path))
             {
-                char* dir = win32_get_known_folder(*known_folder_ids[i]);
-                char* path = tr_buildPath(dir, "Transmission", "Web", nullptr);
-                tr_free(dir);
-
-                if (isWebClientDir(path))
-                {
-                    s = path;
-                }
-                else
-                {
-                    tr_free(path);
-                }
+                s = tr_strvDup(path);
             }
 
-            if (s == nullptr) /* check calling module place */
-            {
-                wchar_t wide_module_path[MAX_PATH];
-                GetModuleFileNameW(nullptr, wide_module_path, TR_N_ELEMENTS(wide_module_path));
-                char* module_path = tr_win32_native_to_utf8(wide_module_path, -1);
-                auto const dir = tr_sys_path_dirname(module_path);
-                tr_free(module_path);
-
-                if (!std::empty(dir))
-                {
-                    char* path = tr_buildPath(dir.c_str(), "Web", nullptr);
-
-                    if (isWebClientDir(path))
-                    {
-                        s = path;
-                    }
-                    else
-                    {
-                        tr_free(path);
-                    }
-                }
-            }
-
-#else /* everyone else, follow the XDG spec */
-
-            auto candidates = std::list<std::string>{};
-
-            /* XDG_DATA_HOME should be the first in the list of candidates */
-            char* tmp = tr_env_get_string("XDG_DATA_HOME", nullptr);
-            if (!tr_str_is_empty(tmp))
-            {
-                candidates.emplace_back(tmp);
-            }
-            else
-            {
-                candidates.emplace_back(tr_strvPath(getHomeDir(), ".local"sv, "share"sv));
-            }
-            tr_free(tmp);
-
-            /* XDG_DATA_DIRS are the backup directories */
-            {
-                char const* const pkg = PACKAGE_DATA_DIR;
-                auto* xdg = tr_env_get_string("XDG_DATA_DIRS", "");
-                auto const buf = tr_strvJoin(pkg, ":", xdg, ":/usr/local/share:/usr/share");
-                tr_free(xdg);
-
-                auto sv = std::string_view{ buf };
-                auto token = std::string_view{};
-                while (tr_strvSep(&sv, &token, ':'))
-                {
-                    token = tr_strvStrip(token);
-                    if (!std::empty(token))
-                    {
-                        candidates.emplace_back(token);
-                    }
-                }
-            }
-
-            /* walk through the candidates & look for a match */
-            for (auto const& dir : candidates)
-            {
-                auto const path = tr_strvPath(dir, "transmission"sv, "public_html"sv);
-                if (isWebClientDir(path))
-                {
-                    s = tr_strvDup(path);
-                    break;
-                }
-            }
-#endif
+            tr_free(dir);
         }
     }
+
+    if (s == nullptr) /* check calling module place */
+    {
+        wchar_t wide_module_path[MAX_PATH];
+        GetModuleFileNameW(nullptr, wide_module_path, TR_N_ELEMENTS(wide_module_path));
+        char* module_path = tr_win32_native_to_utf8(wide_module_path, -1);
+
+        if (auto const dir = tr_sys_path_dirname(module_path); !std::empty(dir))
+        {
+            if (auto const path = tr_pathbuf{ dir, "/Web"sv }; isWebClientDir(path))
+            {
+                s = tr_strvDup(path);
+            }
+        }
+
+        tr_free(module_path);
+    }
+
+#else // everyone else, follow the XDG spec
+
+    if (s == nullptr)
+    {
+        auto candidates = std::list<std::string>{};
+
+        /* XDG_DATA_HOME should be the first in the list of candidates */
+        char* tmp = tr_env_get_string("XDG_DATA_HOME", nullptr);
+        if (!tr_str_is_empty(tmp))
+        {
+            candidates.emplace_back(tmp);
+        }
+        else
+        {
+            candidates.emplace_back(tr_strvPath(getHomeDir(), ".local"sv, "share"sv));
+        }
+        tr_free(tmp);
+
+        /* XDG_DATA_DIRS are the backup directories */
+        {
+            char const* const pkg = PACKAGE_DATA_DIR;
+            auto* xdg = tr_env_get_string("XDG_DATA_DIRS", "");
+            auto const buf = fmt::format(FMT_STRING("{:s}:{:s}:/usr/local/share:/usr/share"), pkg, xdg);
+            tr_free(xdg);
+
+            auto sv = std::string_view{ buf };
+            auto token = std::string_view{};
+            while (tr_strvSep(&sv, &token, ':'))
+            {
+                token = tr_strvStrip(token);
+                if (!std::empty(token))
+                {
+                    candidates.emplace_back(token);
+                }
+            }
+        }
+
+        /* walk through the candidates & look for a match */
+        for (auto const& dir : candidates)
+        {
+            if (auto const path = tr_pathbuf{ dir, "/transmission/public_html"sv }; isWebClientDir(path))
+            {
+                s = tr_strvDup(path);
+                break;
+            }
+        }
+    }
+
+#endif
 
     return s;
 }

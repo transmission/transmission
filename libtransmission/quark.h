@@ -420,23 +420,23 @@ enum
  *
  * @return true if the specified string exists as a quark
  */
-std::optional<tr_quark> tr_quark_lookup(std::string_view key);
+[[nodiscard]] std::optional<tr_quark> tr_quark_lookup(std::string_view key);
 
 /**
  * Get the string that corresponds to the specified quark
  */
-char const* tr_quark_get_string(tr_quark quark, size_t* len = nullptr);
+[[nodiscard]] char const* tr_quark_get_string(tr_quark quark, size_t* len = nullptr);
 
 /**
  * Get the string view that corresponds to the specified quark.
  *
  * Note: this view is guaranteed to be zero-terminated at view[std::size(view)]
  */
-std::string_view tr_quark_get_string_view(tr_quark quark);
+[[nodiscard]] std::string_view tr_quark_get_string_view(tr_quark quark);
 
 /**
  * Create a new quark for the specified string. If a quark already
  * exists for that string, it is returned so that no duplicates are
  * created.
  */
-tr_quark tr_quark_new(std::string_view);
+[[nodiscard]] tr_quark tr_quark_new(std::string_view);

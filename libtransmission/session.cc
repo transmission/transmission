@@ -15,6 +15,7 @@
 #include <list>
 #include <memory>
 #include <numeric> // std::acumulate()
+#include <string>
 #include <string_view>
 #include <tuple>
 #include <unordered_set>
@@ -136,7 +137,7 @@ std::optional<std::string> tr_session::WebMediator::cookieFile() const
 
 std::optional<std::string> tr_session::WebMediator::userAgent() const
 {
-    return tr_strvJoin(TR_NAME, "/"sv, SHORT_VERSION_STRING);
+    return fmt::format(FMT_STRING("{:s}/{:s}"), TR_NAME, SHORT_VERSION_STRING);
 }
 
 std::optional<std::string> tr_session::WebMediator::publicAddress() const
@@ -299,7 +300,7 @@ tr_address const* tr_sessionGetPublicAddress(tr_session const* session, int tr_a
 
     if (is_default_value != nullptr && bindinfo != nullptr)
     {
-        *is_default_value = tr_strcmp0(default_value, tr_address_to_string(&bindinfo->addr)) == 0;
+        *is_default_value = bindinfo->addr.to_string() == default_value;
     }
 
     return bindinfo != nullptr ? &bindinfo->addr : nullptr;
@@ -521,14 +522,10 @@ void tr_sessionSaveSettings(tr_session* session, char const* config_dir, tr_vari
     tr_variantInitDict(&settings, 0);
 
     /* the existing file settings are the fallback values */
+    if (auto file_settings = tr_variant{}; tr_variantFromFile(&file_settings, TR_VARIANT_PARSE_JSON, filename))
     {
-        tr_variant fileSettings;
-
-        if (tr_variantFromFile(&fileSettings, TR_VARIANT_PARSE_JSON, filename, nullptr))
-        {
-            tr_variantMergeDicts(&settings, &fileSettings);
-            tr_variantFree(&fileSettings);
-        }
+        tr_variantMergeDicts(&settings, &file_settings);
+        tr_variantFree(&file_settings);
     }
 
     /* the client's settings override the file settings */
@@ -578,7 +575,7 @@ static void onSaveTimer(evutil_socket_t /*fd*/, short /*what*/, void* vsession)
 
     tr_statsSaveDirty(session);
 
-    tr_timerAdd(session->saveTimer, SaveIntervalSecs, 0);
+    tr_timerAdd(*session->saveTimer, SaveIntervalSecs, 0);
 }
 
 /***
@@ -696,7 +693,7 @@ static void onNowTimer(evutil_socket_t /*fd*/, short /*what*/, void* vsession)
     int constexpr Max = 999999;
     int const usec = std::clamp(int(1000000 - tv.tv_usec), Min, Max);
 
-    tr_timerAdd(session->nowTimer, 0, usec);
+    tr_timerAdd(*session->nowTimer, 0, usec);
 }
 
 static void loadBlocklists(tr_session* session);
@@ -749,7 +746,7 @@ static void tr_sessionInitImpl(init_data* data)
     TR_ASSERT(tr_isSession(session));
 
     session->saveTimer = evtimer_new(session->event_base, onSaveTimer, session);
-    tr_timerAdd(session->saveTimer, SaveIntervalSecs, 0);
+    tr_timerAdd(*session->saveTimer, SaveIntervalSecs, 0);
 
     tr_announcerInit(session);
 
@@ -1880,7 +1877,7 @@ static void sessionCloseImplStart(tr_session* session)
     /* saveTimer is not used at this point, reusing for UDP shutdown wait */
     TR_ASSERT(session->saveTimer == nullptr);
     session->saveTimer = evtimer_new(session->event_base, sessionCloseImplWaitForIdleUdp, session);
-    tr_timerAdd(session->saveTimer, 0, 0);
+    tr_timerAdd(*session->saveTimer, 0, 0);
 }
 
 static void sessionCloseImplFinish(tr_session* session);
@@ -1896,7 +1893,7 @@ static void sessionCloseImplWaitForIdleUdp(evutil_socket_t /*fd*/, short /*what*
     if (!tr_tracker_udp_is_idle(session))
     {
         tr_tracker_udp_upkeep(session);
-        tr_timerAdd(session->saveTimer, 0, 100000);
+        tr_timerAdd(*session->saveTimer, 0, 100000);
         return;
     }
 
@@ -2363,11 +2360,11 @@ static void loadBlocklists(tr_session* session)
             tr_sys_path_info path_info;
             tr_sys_path_info binname_info;
 
-            auto const binname = tr_strvJoin(dirname, TR_PATH_DELIMITER_STR, name, ".bin"sv);
+            auto const binname = tr_pathbuf{ dirname, '/', name, ".bin"sv };
 
-            if (!tr_sys_path_get_info(binname.c_str(), 0, &binname_info)) /* create it */
+            if (!tr_sys_path_get_info(binname, 0, &binname_info)) /* create it */
             {
-                tr_blocklistFile* b = tr_blocklistFileNew(binname.c_str(), isEnabled);
+                tr_blocklistFile* b = tr_blocklistFileNew(binname, isEnabled);
 
                 if (auto const n = tr_blocklistFileSetContent(b, path.c_str()); n > 0)
                 {
@@ -2380,19 +2377,19 @@ static void loadBlocklists(tr_session* session)
                 tr_sys_path_get_info(path.c_str(), 0, &path_info) &&
                 path_info.last_modified_at >= binname_info.last_modified_at) /* update it */
             {
-                auto const old = binname + ".old";
-                tr_sys_path_remove(old.c_str());
-                tr_sys_path_rename(binname.c_str(), old.c_str());
-                auto* const b = tr_blocklistFileNew(binname.c_str(), isEnabled);
+                auto const old = tr_pathbuf{ binname, ".old"sv };
+                tr_sys_path_remove(old);
+                tr_sys_path_rename(binname, old);
+                auto* const b = tr_blocklistFileNew(binname, isEnabled);
 
                 if (tr_blocklistFileSetContent(b, path.c_str()) > 0)
                 {
-                    tr_sys_path_remove(old.c_str());
+                    tr_sys_path_remove(old);
                 }
                 else
                 {
-                    tr_sys_path_remove(binname.c_str());
-                    tr_sys_path_rename(old.c_str(), binname.c_str());
+                    tr_sys_path_remove(binname);
+                    tr_sys_path_rename(old, binname);
                 }
 
                 tr_blocklistFileFree(b);
@@ -2489,8 +2486,7 @@ int tr_blocklistSetContent(tr_session* session, char const* contentFilename)
 
     if (it == std::end(src))
     {
-        auto path = tr_strvJoin(session->config_dir, "blocklists"sv, name);
-        b = tr_blocklistFileNew(path.c_str(), session->useBlocklist());
+        b = tr_blocklistFileNew(tr_pathbuf{ session->config_dir, "/blocklists/"sv, name }, session->useBlocklist());
         src.push_back(b);
     }
     else

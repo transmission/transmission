@@ -3,7 +3,15 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include <algorithm>
+#include <array>
+#include <cmath> // sqrt()
+#include <cstdlib> // setenv(), unsetenv()
+#include <iostream>
+#include <sstream>
+#include <string>
 #include <string_view>
+#include <utility>
 
 #ifdef _WIN32
 #include <windows.h>
@@ -21,38 +29,9 @@
 
 #include "test-fixtures.h"
 
-#include <algorithm>
-#include <array>
-#include <cmath> // sqrt()
-#include <cstdlib> // setenv(), unsetenv()
-#include <iostream>
-#include <sstream>
-#include <string>
-
 using ::libtransmission::test::makeString;
 using UtilsTest = ::testing::Test;
 using namespace std::literals;
-
-TEST_F(UtilsTest, trStripPositionalArgs)
-{
-    auto const* in = "Hello %1$s foo %2$.*f";
-    auto const* expected = "Hello %s foo %.*f";
-    auto const* out = tr_strip_positional_args(in);
-    EXPECT_STREQ(expected, out);
-
-    in = "Hello %1$'d foo %2$'f";
-    expected = "Hello %d foo %f";
-    out = tr_strip_positional_args(in);
-    EXPECT_STREQ(expected, out);
-}
-
-TEST_F(UtilsTest, trStrvJoin)
-{
-    EXPECT_EQ(""sv, tr_strvJoin(""sv));
-    EXPECT_EQ("test"sv, tr_strvJoin("test"sv));
-    EXPECT_EQ("foo/bar"sv, tr_strvJoin("foo"sv, "/", std::string{ "bar" }));
-    EXPECT_EQ("abcde"sv, tr_strvJoin("a", "b", "c", "d", "e"));
-}
 
 TEST_F(UtilsTest, trStrvContains)
 {
@@ -227,33 +206,6 @@ TEST_F(UtilsTest, trParseNumberRange)
     EXPECT_EQ(empty_string, tostring(numbers));
 }
 
-namespace
-{
-
-int compareInts(void const* va, void const* vb) noexcept
-{
-    auto const a = *static_cast<int const*>(va);
-    auto const b = *static_cast<int const*>(vb);
-    return a - b;
-}
-
-} // namespace
-
-TEST_F(UtilsTest, lowerbound)
-{
-    auto const a = std::array<int, 7>{ 1, 2, 3, 3, 3, 5, 8 };
-    auto const expected_pos = std::array<int, 10>{ 0, 1, 2, 5, 5, 6, 6, 6, 7, 7 };
-    auto const expected_exact = std::array<bool, 10>{ true, true, true, false, true, false, false, true, false, false };
-
-    for (int i = 1; i <= 10; i++)
-    {
-        bool exact;
-        auto const pos = tr_lowerBound(&i, a.data(), a.size(), sizeof(int), compareInts, &exact);
-        EXPECT_EQ(expected_pos[i - 1], pos);
-        EXPECT_EQ(expected_exact[i - 1], exact);
-    }
-}
-
 TEST_F(UtilsTest, trStrlower)
 {
     EXPECT_EQ(""sv, tr_strlower(""sv));
@@ -297,37 +249,20 @@ TEST_F(UtilsTest, array)
 
 TEST_F(UtilsTest, truncd)
 {
-    auto buf = std::array<char, 32>{};
-
-    tr_snprintf(buf.data(), buf.size(), "%.2f%%", 99.999);
-    EXPECT_STREQ("100.00%", buf.data());
-
-    tr_snprintf(buf.data(), buf.size(), "%.2f%%", tr_truncd(99.999, 2));
-    EXPECT_STREQ("99.99%", buf.data());
-
-    tr_snprintf(buf.data(), buf.size(), "%.4f", tr_truncd(403650.656250, 4));
-    EXPECT_STREQ("403650.6562", buf.data());
-
-    tr_snprintf(buf.data(), buf.size(), "%.2f", tr_truncd(2.15, 2));
-    EXPECT_STREQ("2.15", buf.data());
-
-    tr_snprintf(buf.data(), buf.size(), "%.2f", tr_truncd(2.05, 2));
-    EXPECT_STREQ("2.05", buf.data());
-
-    tr_snprintf(buf.data(), buf.size(), "%.2f", tr_truncd(3.3333, 2));
-    EXPECT_STREQ("3.33", buf.data());
-
-    tr_snprintf(buf.data(), buf.size(), "%.0f", tr_truncd(3.3333, 0));
-    EXPECT_STREQ("3", buf.data());
-
-    tr_snprintf(buf.data(), buf.size(), "%.0f", tr_truncd(3.9999, 0));
-    EXPECT_STREQ("3", buf.data());
+    EXPECT_EQ("100.00%"sv, fmt::format("{:.2f}%", 99.999));
+    EXPECT_EQ("99.99%"sv, fmt::format("{:.2f}%", tr_truncd(99.999, 2)));
+    EXPECT_EQ("403650.6562"sv, fmt::format("{:.4f}", tr_truncd(403650.656250, 4)));
+    EXPECT_EQ("2.15"sv, fmt::format("{:.2f}", tr_truncd(2.15, 2)));
+    EXPECT_EQ("2.05"sv, fmt::format("{:.2f}", tr_truncd(2.05, 2)));
+    EXPECT_EQ("3.33"sv, fmt::format("{:.2f}", tr_truncd(3.333333, 2)));
+    EXPECT_EQ("3"sv, fmt::format("{:.0f}", tr_truncd(3.333333, 0)));
+    EXPECT_EQ("3"sv, fmt::format("{:.0f}", tr_truncd(3.9999, 0)));
 
 #if !(defined(_MSC_VER) || (defined(__MINGW32__) && defined(__MSVCRT__)))
     /* FIXME: MSCVRT behaves differently in case of nan */
     auto const nan = sqrt(-1.0);
-    tr_snprintf(buf.data(), buf.size(), "%.2f", tr_truncd(nan, 2));
-    EXPECT_TRUE(strstr(buf.data(), "nan") != nullptr || strstr(buf.data(), "NaN") != nullptr);
+    auto const nanstr = fmt::format("{:.2f}", tr_truncd(nan, 2));
+    EXPECT_TRUE(strstr(nanstr.c_str(), "nan") != nullptr || strstr(nanstr.c_str(), "NaN") != nullptr);
 #endif
 }
 
@@ -344,7 +279,7 @@ TEST_F(UtilsTest, trStrlcpy)
         "This, very usefull string contains total of 104 characters not counting null. Almost like an easter egg!"
     };
 
-    for (auto& test : tests)
+    for (auto const& test : tests)
     {
         auto c_string = test.c_str();
         auto length = strlen(c_string);
@@ -357,7 +292,7 @@ TEST_F(UtilsTest, trStrlcpy)
         ASSERT_EQ(responce, length);
 
         // Check what was copied
-        for (auto i = 0; i < 97; i++)
+        for (unsigned i = 0U; i < 97U; ++i)
         {
             if (i <= length)
             {
@@ -458,12 +393,22 @@ TEST_F(UtilsTest, saveFile)
 TEST_F(UtilsTest, ratioToString)
 {
     // Testpairs contain ratio as a double and a string
-    std::vector<std::pair<double, std::string>> const tests{
-        { 0.0, "0.00" },        { 0.01, "0.01" },  { 0.1, "0.10" },    { 1.0, "1.00" },        { 1.015, "1.01" },
-        { 4.99, "4.99" },       { 4.996, "4.99" }, { 5.0, "5.0" },     { 5.09999, "5.0" },     { 5.1, "5.1" },
-        { 99.99, "99.9" },      { 100.0, "100" },  { 4000.4, "4000" }, { 600000.0, "600000" }, { 900000000.0, "900000000" },
-        { TR_RATIO_INF, "inf" }
-    };
+    static auto constexpr Tests = std::array<std::pair<double, std::string_view>, 16>{ { { 0.0, "0.00" },
+                                                                                         { 0.01, "0.01" },
+                                                                                         { 0.1, "0.10" },
+                                                                                         { 1.0, "1.00" },
+                                                                                         { 1.015, "1.01" },
+                                                                                         { 4.99, "4.99" },
+                                                                                         { 4.996, "4.99" },
+                                                                                         { 5.0, "5.0" },
+                                                                                         { 5.09999, "5.0" },
+                                                                                         { 5.1, "5.1" },
+                                                                                         { 99.99, "99.9" },
+                                                                                         { 100.0, "100" },
+                                                                                         { 4000.4, "4000" },
+                                                                                         { 600000.0, "600000" },
+                                                                                         { 900000000.0, "900000000" },
+                                                                                         { TR_RATIO_INF, "inf" } } };
     char const nullchar = '\0';
 
     ASSERT_EQ(tr_strratio(TR_RATIO_NA, "Ratio is NaN"), "None");
@@ -471,8 +416,8 @@ TEST_F(UtilsTest, ratioToString)
     // Inf contains only null character
     ASSERT_EQ(tr_strratio(TR_RATIO_INF, &nullchar), "");
 
-    for (auto& test : tests)
+    for (auto const& [input, expected] : Tests)
     {
-        ASSERT_EQ(tr_strratio(test.first, "inf"), test.second);
+        ASSERT_EQ(tr_strratio(input, "inf"), expected);
     }
 }

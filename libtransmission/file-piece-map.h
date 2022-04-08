@@ -9,6 +9,7 @@
 #error only libtransmission should #include this header.
 #endif
 
+#include <cstdint> // uint64_t
 #include <cstddef> // size_t
 #include <vector>
 
