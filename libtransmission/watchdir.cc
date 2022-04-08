@@ -22,6 +22,7 @@
 #include "log.h"
 #include "ptrarray.h"
 #include "tr-assert.h"
+#include "tr-strbuf.h"
 #include "utils.h"
 #include "watchdir.h"
 #include "watchdir-common.h"
@@ -32,7 +33,7 @@
 
 struct tr_watchdir
 {
-    char* path;
+    std::string path;
     tr_watchdir_cb callback;
     void* callback_user_data;
     struct event_base* event_base;
@@ -44,13 +45,13 @@ struct tr_watchdir
 ****
 ***/
 
-static bool is_regular_file(char const* dir, char const* name)
+static bool is_regular_file(std::string_view dir, std::string_view name)
 {
-    auto const path = tr_strvPath(dir, name);
+    auto const path = tr_pathbuf{ dir, '/', name };
     auto path_info = tr_sys_path_info{};
     tr_error* error = nullptr;
 
-    bool const ret = tr_sys_path_get_info(path.c_str(), 0, &path_info, &error) && (path_info.type == TR_SYS_PATH_IS_FILE);
+    bool const ret = tr_sys_path_get_info(path, 0, &path_info, &error) && (path_info.type == TR_SYS_PATH_IS_FILE);
 
     if (error != nullptr)
     {
@@ -111,7 +112,7 @@ static tr_watchdir_status tr_watchdir_process_impl(tr_watchdir_t handle, char co
 struct tr_watchdir_retry
 {
     tr_watchdir_t handle;
-    char* name;
+    std::string name;
     size_t counter;
     struct event* timer;
     struct timeval interval;
@@ -130,7 +131,7 @@ auto tr_watchdir_retry_max_interval = timeval{ 10, 0 };
 
 static int compare_retry_names(void const* a, void const* b)
 {
-    return strcmp(((tr_watchdir_retry const*)a)->name, ((tr_watchdir_retry const*)b)->name);
+    return strcmp(((tr_watchdir_retry const*)a)->name.c_str(), ((tr_watchdir_retry const*)b)->name.c_str());
 }
 
 static void tr_watchdir_retry_free(tr_watchdir_retry* retry);
@@ -142,7 +143,7 @@ static void tr_watchdir_on_retry_timer(evutil_socket_t /*fd*/, short /*type*/, v
     auto* const retry = static_cast<tr_watchdir_retry*>(context);
     auto const handle = retry->handle;
 
-    if (tr_watchdir_process_impl(handle, retry->name) == TR_WATCHDIR_RETRY)
+    if (tr_watchdir_process_impl(handle, retry->name.c_str()) == TR_WATCHDIR_RETRY)
     {
         if (++retry->counter < tr_watchdir_retry_limit)
         {
@@ -191,7 +192,6 @@ static void tr_watchdir_retry_free(tr_watchdir_retry* retry)
         event_free(retry->timer);
     }
 
-    tr_free(retry->name);
     delete retry;
 }
 
@@ -219,7 +219,7 @@ tr_watchdir_t tr_watchdir_new(
     bool force_generic)
 {
     auto* handle = new tr_watchdir{};
-    handle->path = tr_strvDup(path);
+    handle->path = path;
     handle->callback = callback;
     handle->callback_user_data = callback_user_data;
     handle->event_base = event_base;
@@ -268,7 +268,6 @@ void tr_watchdir_free(tr_watchdir_t handle)
         handle->backend->free_func(handle->backend);
     }
 
-    tr_free(handle->path);
     delete handle;
 }
 
@@ -276,7 +275,7 @@ char const* tr_watchdir_get_path(tr_watchdir_t handle)
 {
     TR_ASSERT(handle != nullptr);
 
-    return handle->path;
+    return handle->path.c_str();
 }
 
 tr_watchdir_backend* tr_watchdir_get_backend(tr_watchdir_t handle)
@@ -321,7 +320,7 @@ void tr_watchdir_scan(tr_watchdir_t handle, std::unordered_set<std::string>* dir
     auto new_dir_entries = std::unordered_set<std::string>{};
     tr_error* error = nullptr;
 
-    auto const dir = tr_sys_dir_open(handle->path, &error);
+    auto const dir = tr_sys_dir_open(handle->path.c_str(), &error);
     if (dir == TR_BAD_SYS_DIR)
     {
         tr_logAddWarn(fmt::format(
