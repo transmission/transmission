@@ -167,7 +167,7 @@ static void tr_watchdir_on_retry_timer(evutil_socket_t /*fd*/, short /*type*/, v
 
 static tr_watchdir_retry* tr_watchdir_retry_new(tr_watchdir_t handle, char const* name)
 {
-    auto* const retry = tr_new0(tr_watchdir_retry, 1);
+    auto* const retry = new tr_watchdir_retry{};
     retry->handle = handle;
     retry->name = tr_strdup(name);
     retry->timer = evtimer_new(handle->event_base, &tr_watchdir_on_retry_timer, retry);
@@ -192,7 +192,7 @@ static void tr_watchdir_retry_free(tr_watchdir_retry* retry)
     }
 
     tr_free(retry->name);
-    tr_free(retry);
+    delete retry;
 }
 
 static void tr_watchdir_retry_restart(tr_watchdir_retry* retry)
@@ -218,7 +218,7 @@ tr_watchdir_t tr_watchdir_new(
     struct event_base* event_base,
     bool force_generic)
 {
-    auto* handle = tr_new0(struct tr_watchdir, 1);
+    auto* handle = new tr_watchdir{};
     handle->path = tr_strvDup(path);
     handle->callback = callback;
     handle->callback_user_data = callback_user_data;
@@ -269,7 +269,7 @@ void tr_watchdir_free(tr_watchdir_t handle)
     }
 
     tr_free(handle->path);
-    tr_free(handle);
+    delete handle;
 }
 
 char const* tr_watchdir_get_path(tr_watchdir_t handle)
