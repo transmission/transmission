@@ -9,6 +9,8 @@
 #error only libtransmission should #include this header.
 #endif
 
+#include <cstdint> // uint8_t, uint32_t
+
 #include "transmission.h"
 
 #include "block-info.h"

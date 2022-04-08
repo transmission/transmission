@@ -5,6 +5,7 @@
 
 #include <algorithm>
 #include <array>
+#include <cinttypes> // PRIu64
 #include <cstdio>
 #include <ctime>
 #include <iterator>

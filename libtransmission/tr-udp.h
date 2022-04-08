@@ -9,7 +9,7 @@
 #endif
 
 #include <cstddef> // size_t
-#include <cstdint> // uintX_t
+#include <cstdint> // uint8_t
 
 struct tr_session;
 

@@ -16,7 +16,9 @@
 
 #include <array>
 #include <cstdlib>
+#include <map>
 #include <string>
+#include <string_view>
 
 #ifdef _WIN32
 #include <windows.h>

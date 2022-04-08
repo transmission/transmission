@@ -16,7 +16,6 @@
 #include <thread>
 
 #ifdef _WIN32
-#include <inttypes.h>
 #include <ws2tcpip.h>
 #undef gai_strerror
 #define gai_strerror gai_strerrorA

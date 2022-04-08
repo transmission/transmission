@@ -11,6 +11,8 @@
 #include <fcntl.h> /* open() */
 #include <unistd.h> /* fork(), setsid(), chdir(), dup2(), close(), pipe() */
 
+#include <string_view>
+
 #include <fmt/format.h>
 
 #include <libtransmission/transmission.h>

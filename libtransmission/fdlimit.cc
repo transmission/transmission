@@ -6,7 +6,7 @@
 #include <algorithm>
 #include <array>
 #include <cerrno>
-#include <cinttypes>
+#include <cstdint> // uint8_t, uint64_t
 #include <ctime>
 
 #include <fmt/core.h>

@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <cstdint> // uint32_t, uint64_t
 #include <ctime>
 #include <string>
 #include <string_view>

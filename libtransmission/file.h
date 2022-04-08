@@ -6,8 +6,8 @@
 #pragma once
 
 #include <cstddef> // size_t
-#include <cinttypes> // uintX_t
-#include <ctime>
+#include <cstdint> // uint64_t
+#include <ctime> // time_t
 #include <string>
 #include <string_view>
 

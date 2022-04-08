@@ -15,6 +15,7 @@
 #include <list>
 #include <memory>
 #include <numeric> // std::acumulate()
+#include <string>
 #include <string_view>
 #include <tuple>
 #include <unordered_set>

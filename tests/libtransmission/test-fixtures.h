@@ -12,6 +12,7 @@
 #include <memory>
 #include <mutex> // std::once_flag()
 #include <string>
+#include <string_view>
 #include <thread>
 
 #include "crypto-utils.h" // tr_base64_decode()

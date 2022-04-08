@@ -6,6 +6,7 @@
 
 #include <memory>
 #include <string>
+#include <vector>
 
 #include <glibmm.h>
 #include <gtkmm.h>

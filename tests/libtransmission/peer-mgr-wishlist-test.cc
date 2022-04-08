@@ -4,6 +4,7 @@
 // License text can be found in the licenses/ folder.
 
 #include <algorithm>
+#include <map>
 #include <type_traits>
 
 #define LIBTRANSMISSION_PEER_MODULE

@@ -9,9 +9,9 @@
 #error only libtransmission should #include this header.
 #endif
 
-#include <cinttypes>
-#include <cstddef>
-#include <ctime>
+#include <cstdint> // int8_t
+#include <cstddef> // size_t
+#include <ctime> // time_t
 
 #include "peer-common.h"
 

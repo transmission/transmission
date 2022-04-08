@@ -14,7 +14,6 @@
 #include <string_view>
 
 #ifdef _WIN32
-#include <inttypes.h>
 #include <ws2tcpip.h>
 #else
 #include <errno.h>
