@@ -4,7 +4,8 @@
 // License text can be found in the licenses/ folder.
 
 #include <array>
-#include <cinttypes>
+#include <cinttypes> // PRIu32
+#include <cstdint> // uint32_t
 #include <cstdio>
 #include <cstdlib>
 #include <iostream>

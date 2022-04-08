@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include <cstdint> // uint32_t, uint64_t
+
 #include "transmission.h"
 
 #include "tr-assert.h"

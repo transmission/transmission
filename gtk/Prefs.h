@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <inttypes.h>
+#include <cstdint> // int64_t
 #include <string>
 #include <string_view>
 #include <vector>

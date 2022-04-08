@@ -10,6 +10,7 @@
 #endif
 
 #include <array>
+#include <cstdint> // uint64_t
 #include <cstddef> // size_t
 #include <string>
 #include <string_view>

@@ -11,8 +11,9 @@
 
 #include <array>
 #include <cstddef> // size_t
-#include <vector>
+#include <cstdint> // uint64_t
 #include <string>
+#include <vector>
 
 #include "transmission.h"
 

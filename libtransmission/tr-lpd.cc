@@ -10,7 +10,6 @@
 #include <type_traits>
 
 #ifdef _WIN32
-#include <inttypes.h>
 #include <ws2tcpip.h>
 using in_port_t = uint16_t; /* all missing */
 #else

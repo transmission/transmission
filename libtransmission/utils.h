@@ -7,9 +7,9 @@
 
 #include <algorithm>
 #include <cctype>
-#include <cinttypes>
-#include <cstddef>
-#include <ctime>
+#include <cstdint> // uint8_t, uint32_t, uint64_t
+#include <cstddef> // size_t
+#include <ctime> // time_t
 #include <optional>
 #include <string>
 #include <string_view>

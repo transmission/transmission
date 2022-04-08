@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <cstdint> // int64_t
 #include <map>
 #include <string_view>
 #include <vector>

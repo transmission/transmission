@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <cmath> // pow()
 #include <cstring> // strstr
+#include <cinttypes>  // PRId64
 #include <functional>
 #include <iostream>
 #include <map>

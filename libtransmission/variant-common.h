@@ -9,6 +9,7 @@
 #error only libtransmission/variant-*.c should #include this header.
 #endif
 
+#include <cstdint> // int64_t
 #include <optional>
 #include <string_view>
 

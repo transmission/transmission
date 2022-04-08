@@ -6,6 +6,7 @@
 #include <array>
 #include <cassert>
 #include <cctype> /* isspace */
+#include <cinttypes> // PRId64
 #include <cerrno>
 #include <cmath>
 #include <cstdio>
