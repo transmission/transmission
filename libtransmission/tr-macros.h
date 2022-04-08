@@ -12,14 +12,6 @@
 ****
 ***/
 
-#ifndef __has_feature
-#define __has_feature(x) 0
-#endif
-
-#ifndef __has_extension
-#define __has_extension __has_feature
-#endif
-
 #ifndef __has_attribute
 #define __has_attribute(x) 0
 #endif
@@ -60,53 +52,15 @@
 #define TR_UNLIKELY(x) (x)
 #endif
 
-#define TR_DISABLE_COPY(Class) \
-    Class(Class const&) = delete; \
-    Class& operator=(Class const&) = delete;
-
-#define TR_DISABLE_MOVE(Class) \
-    Class(Class&&) = delete; \
-    Class& operator=(Class&&) = delete;
-
 #define TR_DISABLE_COPY_MOVE(Class) \
-    TR_DISABLE_COPY(Class) \
-    TR_DISABLE_MOVE(Class)
+    Class& operator=(Class const&) = delete; \
+    Class& operator=(Class&&) = delete; \
+    Class(Class const&) = delete; \
+    Class(Class&&) = delete;
 
 /***
 ****
 ***/
-
-#if __has_attribute(__deprecated__) || TR_GNUC_CHECK_VERSION(3, 1)
-#define TR_DEPRECATED __attribute__((__deprecated__))
-#elif defined(_MSC_VER)
-#define TR_DEPRECATED __declspec(deprecated)
-#else
-#define TR_DEPRECATED
-#endif
-
-#if __has_attribute(__format__) || TR_GNUC_CHECK_VERSION(2, 3)
-#define TR_GNUC_PRINTF(fmt, args) __attribute__((__format__(printf, fmt, args)))
-#else
-#define TR_GNUC_PRINTF(fmt, args)
-#endif
-
-#if __has_attribute(__nonnull__) || TR_GNUC_CHECK_VERSION(3, 3)
-#define TR_GNUC_NONNULL(...) __attribute__((__nonnull__(__VA_ARGS__)))
-#else
-#define TR_GNUC_NONNULL(...)
-#endif
-
-#if __has_attribute(__sentinel__) || TR_GNUC_CHECK_VERSION(4, 3)
-#define TR_GNUC_NULL_TERMINATED __attribute__((__sentinel__))
-#else
-#define TR_GNUC_NULL_TERMINATED
-#endif
-
-#if __has_attribute(__hot__) || TR_GNUC_CHECK_VERSION(4, 3)
-#define TR_GNUC_HOT __attribute__((__hot__))
-#else
-#define TR_GNUC_HOT
-#endif
 
 #if __has_attribute(__malloc__) || TR_GNUC_CHECK_VERSION(2, 96)
 #define TR_GNUC_MALLOC __attribute__((__malloc__))

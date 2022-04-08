@@ -2265,7 +2265,7 @@ static void deleteLocalData(tr_torrent const* tor, tr_fileFunc func)
         if (!std::empty(filename))
         {
             auto target = tr_strvPath(tmpdir, tor->fileSubpath(f));
-            tr_moveFile(filename.c_str(), target.c_str(), nullptr);
+            tr_moveFile(filename, target);
             files.emplace_back(target);
         }
     }

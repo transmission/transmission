@@ -575,7 +575,7 @@ static void onSaveTimer(evutil_socket_t /*fd*/, short /*what*/, void* vsession)
 
     tr_statsSaveDirty(session);
 
-    tr_timerAdd(session->saveTimer, SaveIntervalSecs, 0);
+    tr_timerAdd(*session->saveTimer, SaveIntervalSecs, 0);
 }
 
 /***
@@ -693,7 +693,7 @@ static void onNowTimer(evutil_socket_t /*fd*/, short /*what*/, void* vsession)
     int constexpr Max = 999999;
     int const usec = std::clamp(int(1000000 - tv.tv_usec), Min, Max);
 
-    tr_timerAdd(session->nowTimer, 0, usec);
+    tr_timerAdd(*session->nowTimer, 0, usec);
 }
 
 static void loadBlocklists(tr_session* session);
@@ -746,7 +746,7 @@ static void tr_sessionInitImpl(init_data* data)
     TR_ASSERT(tr_isSession(session));
 
     session->saveTimer = evtimer_new(session->event_base, onSaveTimer, session);
-    tr_timerAdd(session->saveTimer, SaveIntervalSecs, 0);
+    tr_timerAdd(*session->saveTimer, SaveIntervalSecs, 0);
 
     tr_announcerInit(session);
 
@@ -1877,7 +1877,7 @@ static void sessionCloseImplStart(tr_session* session)
     /* saveTimer is not used at this point, reusing for UDP shutdown wait */
     TR_ASSERT(session->saveTimer == nullptr);
     session->saveTimer = evtimer_new(session->event_base, sessionCloseImplWaitForIdleUdp, session);
-    tr_timerAdd(session->saveTimer, 0, 0);
+    tr_timerAdd(*session->saveTimer, 0, 0);
 }
 
 static void sessionCloseImplFinish(tr_session* session);
@@ -1893,7 +1893,7 @@ static void sessionCloseImplWaitForIdleUdp(evutil_socket_t /*fd*/, short /*what*
     if (!tr_tracker_udp_is_idle(session))
     {
         tr_tracker_udp_upkeep(session);
-        tr_timerAdd(session->saveTimer, 0, 100000);
+        tr_timerAdd(*session->saveTimer, 0, 100000);
         return;
     }
 

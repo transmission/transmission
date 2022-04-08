@@ -71,7 +71,7 @@ struct tr_error;
  * @brief Rich Salz's classic implementation of shell-style pattern matching for ?, \, [], and * characters.
  * @return 1 if the pattern matches, 0 if it doesn't, or -1 if an error occured
  */
-[[nodiscard]] bool tr_wildmat(char const* text, char const* pattern) TR_GNUC_NONNULL(1, 2);
+[[nodiscard]] bool tr_wildmat(std::string_view text, std::string_view pattern);
 
 /**
  * @brief Loads a file and returns its contents.
@@ -114,14 +114,14 @@ tr_disk_space tr_dirSpace(std::string_view path);
  * @param seconds       seconds to wait
  * @param microseconds  microseconds to wait
  */
-void tr_timerAdd(struct event* timer, int seconds, int microseconds) TR_GNUC_NONNULL(1);
+void tr_timerAdd(struct event& timer, int seconds, int microseconds);
 
 /**
  * @brief Convenience wrapper around timer_add() to have a timer wake up in a number of milliseconds
  * @param timer         the timer to set
  * @param milliseconds  milliseconds to wait
  */
-void tr_timerAddMsec(struct event* timer, int milliseconds) TR_GNUC_NONNULL(1);
+void tr_timerAddMsec(struct event& timer, int milliseconds);
 
 /** @brief return the current date in milliseconds */
 uint64_t tr_time_msec();
@@ -412,7 +412,7 @@ struct timeval tr_gettimeofday();
  * @brief move a file
  * @return `True` on success, `false` otherwise (with `error` set accordingly).
  */
-bool tr_moveFile(char const* oldpath, char const* newpath, struct tr_error** error) TR_GNUC_NONNULL(1, 2);
+bool tr_moveFile(std::string_view oldpath, std::string_view newpath, struct tr_error** error = nullptr);
 
 /** @brief convenience function to remove an item from an array */
 void tr_removeElementFromArray(void* array, size_t index_to_remove, size_t sizeof_element, size_t nmemb);

@@ -140,7 +140,7 @@ static void reset_timer(tr_session* ss)
         usec = tr_rand_int_weak(1000000);
     }
 
-    tr_timerAdd(ss->utp_timer, sec, usec);
+    tr_timerAdd(*ss->utp_timer, sec, usec);
 }
 
 static void timer_callback(evutil_socket_t /*s*/, short /*type*/, void* vsession)

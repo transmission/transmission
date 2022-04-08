@@ -98,13 +98,4 @@ void tr_ptrArrayRemoveSortedPointer(tr_ptrArray* t, void const* ptr, tr_voidptr_
     @return the matching pointer, or nullptr if no match was found */
 void* tr_ptrArrayFindSorted(tr_ptrArray* array, void const* key, tr_voidptr_compare_func compare);
 
-/** @brief similar to bsearch() but returns the index of the lower bound */
-int tr_lowerBound(
-    void const* key,
-    void const* base,
-    size_t nmemb,
-    size_t size,
-    tr_voidptr_compare_func compar,
-    bool* exact_match) TR_GNUC_HOT TR_GNUC_NONNULL(1, 5, 6);
-
 /* @} */
