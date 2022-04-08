@@ -4,6 +4,8 @@
 // License text can be found in the licenses/ folder.
 
 #include <cstring> /* strcmp() */
+#include <map>
+#include <memory>
 #include <string>
 #include <string_view>
 #include <unordered_set>
@@ -20,7 +22,6 @@
 #include "error-types.h"
 #include "file.h"
 #include "log.h"
-#include "ptrarray.h"
 #include "tr-assert.h"
 #include "tr-strbuf.h"
 #include "utils.h"
@@ -30,6 +31,77 @@
 /***
 ****
 ***/
+
+/* Non-static and mutable for unit tests */
+auto tr_watchdir_retry_limit = size_t{ 3 };
+auto tr_watchdir_retry_start_interval = timeval{ 1, 0 };
+auto tr_watchdir_retry_max_interval = timeval{ 10, 0 };
+
+class tr_watchdir_retry
+{
+public:
+    tr_watchdir_retry(tr_watchdir_t handle_in, struct event_base* base, std::string_view name_in)
+        : handle_{ handle_in }
+        , name_{ name_in }
+        , timer_{ evtimer_new(base, onRetryTimer, this) }
+    {
+        restart();
+    }
+
+    ~tr_watchdir_retry()
+    {
+        evtimer_del(timer_);
+        event_free(timer_);
+    }
+
+    void restart()
+    {
+        evtimer_del(timer_);
+
+        counter_ = 0U;
+        interval_ = tr_watchdir_retry_start_interval;
+
+        evtimer_add(timer_, &interval_);
+    }
+
+    bool bump()
+    {
+        evtimer_del(timer_);
+
+        if (++counter_ >= tr_watchdir_retry_limit)
+        {
+            return false;
+        }
+
+        // keep doubling the interval, but clamp at max_interval
+        evutil_timeradd(&interval_, &interval_, &interval_);
+        if (evutil_timercmp(&interval_, &tr_watchdir_retry_max_interval, >))
+        {
+            interval_ = tr_watchdir_retry_max_interval;
+        }
+
+        evtimer_add(timer_, &interval_);
+        return true;
+    }
+
+    tr_watchdir_retry(tr_watchdir_retry const&) = delete;
+    tr_watchdir_retry& operator= (tr_watchdir_retry const&) = delete;
+
+    auto const& name() const
+    {
+        return name_;
+    }
+
+private:
+    static void onRetryTimer(evutil_socket_t /*fd*/, short /*type*/, void* self);
+
+    tr_watchdir_t handle_ = nullptr;
+    std::string name_;
+    size_t counter_ = 0U;
+    struct event* const timer_;
+    struct timeval interval_ = tr_watchdir_retry_start_interval;
+
+};
 
 struct tr_watchdir
 {
@@ -48,9 +120,9 @@ struct tr_watchdir
 static bool is_regular_file(std::string_view dir, std::string_view name)
 {
     auto const path = tr_pathbuf{ dir, '/', name };
+
     auto path_info = tr_sys_path_info{};
     tr_error* error = nullptr;
-
     bool const ret = tr_sys_path_get_info(path, 0, &path_info, &error) && (path_info.type == TR_SYS_PATH_IS_FILE);
 
     if (error != nullptr)
@@ -109,20 +181,6 @@ static tr_watchdir_status tr_watchdir_process_impl(tr_watchdir_t handle, char co
 ****
 ***/
 
-struct tr_watchdir_retry
-{
-    tr_watchdir_t handle;
-    std::string name;
-    size_t counter;
-    struct event* timer;
-    struct timeval interval;
-};
-
-/* Non-static and mutable for unit tests */
-auto tr_watchdir_retry_limit = size_t{ 3 };
-auto tr_watchdir_retry_start_interval = timeval{ 1, 0 };
-auto tr_watchdir_retry_max_interval = timeval{ 10, 0 };
-
 #define tr_watchdir_retries_init(r) (void)0
 #define tr_watchdir_retries_destroy(r) tr_ptrArrayDestruct((r), (PtrArrayForeachFunc)&tr_watchdir_retry_free)
 #define tr_watchdir_retries_insert(r, v) tr_ptrArrayInsertSorted((r), (v), &compare_retry_names)
@@ -131,35 +189,27 @@ auto tr_watchdir_retry_max_interval = timeval{ 10, 0 };
 
 static int compare_retry_names(void const* a, void const* b)
 {
-    return strcmp(((tr_watchdir_retry const*)a)->name.c_str(), ((tr_watchdir_retry const*)b)->name.c_str());
+    return strcmp(((tr_watchdir_retry const*)a)->name().c_str(), ((tr_watchdir_retry const*)b)->name().c_str());
 }
 
 static void tr_watchdir_retry_free(tr_watchdir_retry* retry);
 
-static void tr_watchdir_on_retry_timer(evutil_socket_t /*fd*/, short /*type*/, void* context)
+void
+tr_watchdir_retry::onRetryTimer(evutil_socket_t /*fd*/, short /*type*/, void* vself)
 {
-    TR_ASSERT(context != nullptr);
+    TR_ASSERT(vself != nullptr);
 
-    auto* const retry = static_cast<tr_watchdir_retry*>(context);
-    auto const handle = retry->handle;
+    auto* const retry = static_cast<tr_watchdir_retry*>(vself);
+    auto const handle = retry->handle_;
 
-    if (tr_watchdir_process_impl(handle, retry->name.c_str()) == TR_WATCHDIR_RETRY)
+    if (tr_watchdir_process_impl(handle, retry->name_.c_str()) == TR_WATCHDIR_RETRY)
     {
-        if (++retry->counter < tr_watchdir_retry_limit)
+        if (retry->bump())
         {
-            evutil_timeradd(&retry->interval, &retry->interval, &retry->interval);
-
-            if (evutil_timercmp(&retry->interval, &tr_watchdir_retry_max_interval, >))
-            {
-                retry->interval = tr_watchdir_retry_max_interval;
-            }
-
-            evtimer_del(retry->timer);
-            evtimer_add(retry->timer, &retry->interval);
             return;
         }
 
-        tr_logAddWarn(fmt::format(_("Couldn't add torrent file '{path}'"), fmt::arg("path", retry->name)));
+        tr_logAddWarn(fmt::format(_("Couldn't add torrent file '{path}'"), fmt::arg("path", retry->name())));
     }
 
     tr_watchdir_retries_remove(&handle->active_retries, retry);
@@ -168,43 +218,12 @@ static void tr_watchdir_on_retry_timer(evutil_socket_t /*fd*/, short /*type*/, v
 
 static tr_watchdir_retry* tr_watchdir_retry_new(tr_watchdir_t handle, char const* name)
 {
-    auto* const retry = new tr_watchdir_retry{};
-    retry->handle = handle;
-    retry->name = tr_strdup(name);
-    retry->timer = evtimer_new(handle->event_base, &tr_watchdir_on_retry_timer, retry);
-    retry->interval = tr_watchdir_retry_start_interval;
-
-    evtimer_add(retry->timer, &retry->interval);
-
-    return retry;
+    return new tr_watchdir_retry{ handle, handle->event_base, name };
 }
 
 static void tr_watchdir_retry_free(tr_watchdir_retry* retry)
 {
-    if (retry == nullptr)
-    {
-        return;
-    }
-
-    if (retry->timer != nullptr)
-    {
-        evtimer_del(retry->timer);
-        event_free(retry->timer);
-    }
-
     delete retry;
-}
-
-static void tr_watchdir_retry_restart(tr_watchdir_retry* retry)
-{
-    TR_ASSERT(retry != nullptr);
-
-    evtimer_del(retry->timer);
-
-    retry->counter = 0;
-    retry->interval = tr_watchdir_retry_start_interval;
-
-    evtimer_add(retry->timer, &retry->interval);
 }
 
 /***
