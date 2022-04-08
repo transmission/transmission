@@ -5,8 +5,7 @@
 
 #include <cerrno>
 #include <ctime>
-#include <cinttypes>
-#include <string_view>
+#include <cstdint> // uint32_t
 
 #include <event2/util.h> /* evutil_inet_ntop() */
 

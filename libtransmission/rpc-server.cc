@@ -234,7 +234,7 @@ static void serve_file(struct evhttp_request* req, tr_rpc_server* server, std::s
 
         if (file == nullptr)
         {
-            auto const tmp = tr_strvJoin(filename, " ("sv, error->message, ")"sv);
+            auto const tmp = fmt::format(FMT_STRING("{:s} ({:s})"), filename, error->message);
             send_simple_response(req, HTTP_NOTFOUND, tmp.c_str());
             tr_error_free(error);
         }
@@ -369,7 +369,7 @@ static bool isAddressAllowed(tr_rpc_server const* server, char const* address)
     auto const& src = server->whitelist;
 
     return !server->isWhitelistEnabled ||
-        std::any_of(std::begin(src), std::end(src), [&address](auto const& s) { return tr_wildmat(address, s.c_str()); });
+        std::any_of(std::begin(src), std::end(src), [&address](auto const& s) { return tr_wildmat(address, s); });
 }
 
 static bool isIPAddressWithOptionalPort(char const* host)
@@ -507,10 +507,9 @@ static void handle_request(struct evhttp_request* req, void* arg)
                 ++server->loginattempts;
             }
 
-            auto const unauthuser = tr_strvJoin(
-                "<p>Unauthorized User. "sv,
-                std::to_string(server->loginattempts),
-                " unsuccessful login attempts.</p>"sv);
+            auto const unauthuser = fmt::format(
+                FMT_STRING("<p>Unauthorized User. {:d} unsuccessful login attempts.</p>"),
+                server->loginattempts);
             send_simple_response(req, 401, unauthuser.c_str());
             return;
         }
@@ -522,7 +521,7 @@ static void handle_request(struct evhttp_request* req, void* arg)
 
         if (std::empty(location) || location == "web"sv)
         {
-            auto const new_location = tr_strvJoin(server->url, "web/");
+            auto const new_location = fmt::format(FMT_STRING("{:s}web/"), server->url);
             evhttp_add_header(req->output_headers, "Location", new_location.c_str());
             send_simple_response(req, HTTP_MOVEPERM, nullptr);
         }
@@ -549,20 +548,19 @@ static void handle_request(struct evhttp_request* req, void* arg)
         else if (!test_session_id(server, req))
         {
             char const* sessionId = get_current_session_id(server);
-            auto const tmp = tr_strvJoin(
-                "<p>Your request had an invalid session-id header.</p>"
-                "<p>To fix this, follow these steps:"
-                "<ol><li> When reading a response, get its X-Transmission-Session-Id header and remember it"
-                "<li> Add the updated header to your outgoing requests"
-                "<li> When you get this 409 error message, resend your request with the updated header"
-                "</ol></p>"
-                "<p>This requirement has been added to help prevent "
-                "<a href=\"https://en.wikipedia.org/wiki/Cross-site_request_forgery\">CSRF</a> "
-                "attacks.</p>"
-                "<p><code>" TR_RPC_SESSION_ID_HEADER,
-                ": "sv,
-                sessionId,
-                "</code></p>");
+            auto const tmp = fmt::format(
+                FMT_STRING("<p>Your request had an invalid session-id header.</p>"
+                           "<p>To fix this, follow these steps:"
+                           "<ol><li> When reading a response, get its X-Transmission-Session-Id header and remember it"
+                           "<li> Add the updated header to your outgoing requests"
+                           "<li> When you get this 409 error message, resend your request with the updated header"
+                           "</ol></p>"
+                           "<p>This requirement has been added to help prevent "
+                           "<a href=\"https://en.wikipedia.org/wiki/Cross-site_request_forgery\">CSRF</a> "
+                           "attacks.</p>"
+                           "<p><code>{:s}: {:s}</code></p>"),
+                TR_RPC_SESSION_ID_HEADER,
+                sessionId);
             evhttp_add_header(req->output_headers, TR_RPC_SESSION_ID_HEADER, sessionId);
             evhttp_add_header(req->output_headers, "Access-Control-Expose-Headers", TR_RPC_SESSION_ID_HEADER);
             send_simple_response(req, 409, tmp.c_str());
@@ -711,7 +709,7 @@ static int rpc_server_start_retry(tr_rpc_server* server)
         server->start_retry_timer = evtimer_new(server->session->event_base, rpc_server_on_start_retry, server);
     }
 
-    tr_timerAdd(server->start_retry_timer, retry_delay, 0);
+    tr_timerAdd(*server->start_retry_timer, retry_delay, 0);
     ++server->start_retry_counter;
 
     return retry_delay;
@@ -1061,7 +1059,7 @@ tr_rpc_server::tr_rpc_server(tr_session* session_in, tr_variant* settings)
     }
     else if (std::empty(sv) || sv.back() != '/')
     {
-        this->url = tr_strvJoin(sv, "/"sv);
+        this->url = fmt::format(FMT_STRING("{:s}/"), sv);
     }
     else
     {

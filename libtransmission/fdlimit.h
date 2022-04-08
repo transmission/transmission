@@ -9,7 +9,10 @@
 #error only libtransmission should #include this header.
 #endif
 
+#include <cstdint> // uint64_t
+
 #include "transmission.h"
+
 #include "file.h"
 #include "net.h"
 

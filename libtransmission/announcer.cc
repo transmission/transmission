@@ -5,7 +5,8 @@
 
 #include <algorithm>
 #include <array>
-#include <climits> /* INT_MAX */
+#include <cinttypes> // PRIu64
+#include <climits> // INT_MAX
 #include <cstdio>
 #include <cstring>
 #include <ctime>
@@ -91,7 +92,7 @@ namespace
 
 struct StopsCompare
 {
-    static int compare(tr_announce_request const* a, tr_announce_request const* b) // <=>
+    [[nodiscard]] static int compare(tr_announce_request const* a, tr_announce_request const* b) noexcept // <=>
     {
         // primary key: volume of data transferred
         auto const ax = a->up + a->down;
@@ -128,7 +129,7 @@ struct StopsCompare
         return 0;
     }
 
-    bool operator()(tr_announce_request const* a, tr_announce_request const* b) const // less than
+    [[nodiscard]] bool operator()(tr_announce_request const* a, tr_announce_request const* b) const noexcept // less than
     {
         return compare(a, b) < 0;
     }
@@ -174,7 +175,7 @@ struct tr_announcer
 
     void scheduleNextUpdate() const
     {
-        tr_timerAddMsec(this->upkeep_timer, UpkeepIntervalMsec);
+        tr_timerAddMsec(*this->upkeep_timer, UpkeepIntervalMsec);
     }
 
     std::set<tr_announce_request*, StopsCompare> stops;
@@ -331,7 +332,7 @@ struct tr_tier
         return &trackers[*current_tracker_index_];
     }
 
-    [[nodiscard]] bool needsToAnnounce(time_t now) const
+    [[nodiscard]] constexpr bool needsToAnnounce(time_t now) const
     {
         return !isAnnouncing && !isScraping && announceAt != 0 && announceAt <= now && !std::empty(announce_events);
     }

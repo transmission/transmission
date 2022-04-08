@@ -4,7 +4,6 @@
 // License text can be found in the licenses/ folder.
 
 #include <algorithm>
-#include <string_view>
 
 #include <sys/types.h>
 
@@ -143,7 +142,7 @@ static void set_evtimer_from_status(tr_shared* s)
 
     if (s->timer != nullptr)
     {
-        tr_timerAdd(s->timer, sec, msec);
+        tr_timerAdd(*s->timer, sec, msec);
     }
 }
 

@@ -1385,7 +1385,7 @@ static char const* portTest(
     struct tr_rpc_idle_data* idle_data)
 {
     auto const port = tr_sessionGetPeerPort(session);
-    auto const url = tr_strvJoin("https://portcheck.transmissionbt.com/"sv, std::to_string(port));
+    auto const url = fmt::format(FMT_STRING("https://portcheck.transmissionbt.com/{:d}"), port);
     session->web->fetch({ url, onPortTested, idle_data });
     return nullptr;
 }

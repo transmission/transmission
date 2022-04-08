@@ -5,7 +5,6 @@
 
 #include <algorithm>
 #include <cerrno>
-#include <cstdarg>
 #include <cstring>
 #include <ctime>
 #include <memory> // std::unique_ptr
@@ -244,7 +243,7 @@ public:
         if (torrent->allowsPex())
         {
             pex_timer.reset(evtimer_new(torrent->session->event_base, pexPulse, this));
-            tr_timerAdd(pex_timer.get(), PexIntervalSecs, 0);
+            tr_timerAdd(*pex_timer, PexIntervalSecs, 0);
         }
 
         if (tr_peerIoSupportsUTP(io))
@@ -309,27 +308,27 @@ public:
         return Bps > 0;
     }
 
-    [[nodiscard]] bool is_peer_choked() const override
+    [[nodiscard]] bool is_peer_choked() const noexcept override
     {
         return peer_is_choked_;
     }
 
-    [[nodiscard]] bool is_peer_interested() const override
+    [[nodiscard]] bool is_peer_interested() const noexcept override
     {
         return peer_is_interested_;
     }
 
-    [[nodiscard]] bool is_client_choked() const override
+    [[nodiscard]] bool is_client_choked() const noexcept override
     {
         return client_is_choked_;
     }
 
-    [[nodiscard]] bool is_client_interested() const override
+    [[nodiscard]] bool is_client_interested() const noexcept override
     {
         return client_is_interested_;
     }
 
-    [[nodiscard]] bool is_utp_connection() const override
+    [[nodiscard]] bool is_utp_connection() const noexcept override
     {
         return io->socket.type == TR_PEER_SOCKET_TYPE_UTP;
     }
@@ -359,7 +358,7 @@ public:
         set_active(direction, calculate_active(direction));
     }
 
-    [[nodiscard]] bool is_connection_older_than(time_t timestamp) const override
+    [[nodiscard]] bool is_connection_older_than(time_t timestamp) const noexcept override
     {
         return io->time_created < timestamp;
     }
@@ -658,30 +657,25 @@ tr_peerMsgs* tr_peerMsgsNew(tr_torrent* torrent, peer_atom* atom, tr_peerIo* io,
 ***
 **/
 
-static void myDebug(char const* file, int line, tr_log_level level, tr_peerMsgsImpl const* msgs, char const* fmt, ...)
-{
-    if (!tr_logLevelIsActive(level))
-    {
-        return;
-    }
+#define myLogMacro(msgs, level, text) \
+    do \
+    { \
+        if (tr_logGetLevel() >= (level)) \
+        { \
+            tr_logAddMessage( \
+                __FILE__, \
+                __LINE__, \
+                (level), \
+                fmt::format(FMT_STRING("{:s} [{:s}]: {:s}"), (msgs)->io->addrStr(), (msgs)->client, text), \
+                (msgs)->torrent->name()); \
+        } \
+    } while (0)
 
-    va_list args;
-    char addrstr[TR_ADDRSTRLEN];
-
-    auto* const buf = evbuffer_new();
-    evbuffer_add_printf(buf, "%s [%s]: ", tr_peerIoGetAddrStr(msgs->io, addrstr, sizeof(addrstr)), msgs->client.c_str());
-    va_start(args, fmt);
-    evbuffer_add_vprintf(buf, fmt, args);
-    va_end(args);
-    auto const message = evbuffer_free_to_str(buf);
-    tr_logAddMessage(file, line, level, tr_torrentName(msgs->torrent), message);
-}
-
-#define logdbg(msgs, ...) myDebug(__FILE__, __LINE__, TR_LOG_DEBUG, msgs, __VA_ARGS__)
-#define logtrace(msgs, ...) myDebug(__FILE__, __LINE__, TR_LOG_TRACE, msgs, __VA_ARGS__)
+#define logdbg(msgs, text) myLogMacro(msgs, TR_LOG_DEBUG, text)
+#define logtrace(msgs, text) myLogMacro(msgs, TR_LOG_TRACE, text)
 
 /**
-***
+***j
 **/
 
 static void pokeBatchPeriod(tr_peerMsgsImpl* msgs, int interval)
@@ -689,13 +683,13 @@ static void pokeBatchPeriod(tr_peerMsgsImpl* msgs, int interval)
     if (msgs->outMessagesBatchPeriod > interval)
     {
         msgs->outMessagesBatchPeriod = interval;
-        logtrace(msgs, "lowering batch interval to %d seconds", interval);
+        logtrace(msgs, fmt::format(FMT_STRING("lowering batch interval to {:d} seconds"), interval));
     }
 }
 
 static void dbgOutMessageLen(tr_peerMsgsImpl* msgs)
 {
-    logtrace(msgs, "outMessage size is now %zu", evbuffer_get_length(msgs->outMessages));
+    logtrace(msgs, fmt::format(FMT_STRING("outMessage size is now {:d}"), evbuffer_get_length(msgs->outMessages)));
 }
 
 static void protocolSendReject(tr_peerMsgsImpl* msgs, struct peer_request const* req)
@@ -710,7 +704,7 @@ static void protocolSendReject(tr_peerMsgsImpl* msgs, struct peer_request const*
     evbuffer_add_uint32(out, req->offset);
     evbuffer_add_uint32(out, req->length);
 
-    logtrace(msgs, "rejecting %u:%u->%u...", req->index, req->offset, req->length);
+    logtrace(msgs, fmt::format(FMT_STRING("rejecting {:d}:{:d}->{:d}..."), req->index, req->offset, req->length));
     dbgOutMessageLen(msgs);
 }
 
@@ -724,7 +718,7 @@ static void protocolSendRequest(tr_peerMsgsImpl* msgs, struct peer_request const
     evbuffer_add_uint32(out, req.offset);
     evbuffer_add_uint32(out, req.length);
 
-    logtrace(msgs, "requesting %u:%u->%u...", req.index, req.offset, req.length);
+    logtrace(msgs, fmt::format(FMT_STRING("requesting {:d}:{:d}->{:d}..."), req.index, req.offset, req.length));
     dbgOutMessageLen(msgs);
     pokeBatchPeriod(msgs, ImmediatePriorityIntervalSecs);
 }
@@ -739,7 +733,7 @@ static void protocolSendCancel(tr_peerMsgsImpl* msgs, peer_request const& req)
     evbuffer_add_uint32(out, req.offset);
     evbuffer_add_uint32(out, req.length);
 
-    logtrace(msgs, "cancelling %u:%u->%u...", req.index, req.offset, req.length);
+    logtrace(msgs, fmt::format(FMT_STRING("cancelling {:d}:{:d}->{:d}..."), req.index, req.offset, req.length));
     dbgOutMessageLen(msgs);
     pokeBatchPeriod(msgs, ImmediatePriorityIntervalSecs);
 }
@@ -748,7 +742,7 @@ static void protocolSendPort(tr_peerMsgsImpl* msgs, uint16_t port)
 {
     struct evbuffer* out = msgs->outMessages;
 
-    logtrace(msgs, "sending Port %u", port);
+    logtrace(msgs, fmt::format(FMT_STRING("sending Port {:d}"), port));
     evbuffer_add_uint32(out, 3);
     evbuffer_add_uint8(out, BtPeerMsgs::Port);
     evbuffer_add_uint16(out, port);
@@ -762,7 +756,7 @@ static void protocolSendHave(tr_peerMsgsImpl* msgs, tr_piece_index_t index)
     evbuffer_add_uint8(out, BtPeerMsgs::Have);
     evbuffer_add_uint32(out, index);
 
-    logtrace(msgs, "sending Have %u", index);
+    logtrace(msgs, fmt::format(FMT_STRING("sending Have {:d}"), index));
     dbgOutMessageLen(msgs);
     pokeBatchPeriod(msgs, LowPriorityIntervalSecs);
 }
@@ -793,7 +787,7 @@ static void protocolSendChoke(tr_peerMsgsImpl* msgs, bool choke)
     evbuffer_add_uint32(out, sizeof(uint8_t));
     evbuffer_add_uint8(out, choke ? BtPeerMsgs::Choke : BtPeerMsgs::Unchoke);
 
-    logtrace(msgs, "sending %s...", choke ? "Choke" : "Unchoke");
+    logtrace(msgs, choke ? "sending choke" : "sending unchoked");
     dbgOutMessageLen(msgs);
     pokeBatchPeriod(msgs, ImmediatePriorityIntervalSecs);
 }
@@ -920,7 +914,7 @@ static void sendInterest(tr_peerMsgsImpl* msgs, bool b)
 
     struct evbuffer* out = msgs->outMessages;
 
-    logtrace(msgs, "Sending %s", b ? "Interested" : "Not Interested");
+    logtrace(msgs, b ? "Sending Interested" : "Sending Not Interested");
     evbuffer_add_uint32(out, sizeof(uint8_t));
     evbuffer_add_uint8(out, b ? BtPeerMsgs::Interested : BtPeerMsgs::NotInterested);
 
@@ -1118,11 +1112,11 @@ static void parseLtepHandshake(tr_peerMsgsImpl* msgs, uint32_t len, struct evbuf
     /* arbitrary limit, should be more than enough */
     if (len <= 4096)
     {
-        logtrace(msgs, "here is the handshake: [%*.*s]", TR_ARG_TUPLE(int(len), int(len), tmp));
+        logtrace(msgs, fmt::format(FMT_STRING("here is the handshake: [{:{}.{}s}]"), tmp, len, len));
     }
     else
     {
-        logtrace(msgs, "handshake length is too big (%" PRIu32 "), printing skipped", len);
+        logtrace(msgs, fmt::format(FMT_STRING("handshake length is too big ({:d}), printing skipped"), len));
     }
 
     /* does the peer prefer encrypted connections? */
@@ -1148,14 +1142,14 @@ static void parseLtepHandshake(tr_peerMsgsImpl* msgs, uint32_t len, struct evbuf
         {
             msgs->peerSupportsPex = i != 0;
             msgs->ut_pex_id = (uint8_t)i;
-            logtrace(msgs, "msgs->ut_pex is %d", int(msgs->ut_pex_id));
+            logtrace(msgs, fmt::format(FMT_STRING("msgs->ut_pex is {:d}"), static_cast<int>(msgs->ut_pex_id)));
         }
 
         if (tr_variantDictFindInt(sub, TR_KEY_ut_metadata, &i))
         {
             msgs->peerSupportsMetadataXfer = i != 0;
             msgs->ut_metadata_id = (uint8_t)i;
-            logtrace(msgs, "msgs->ut_metadata_id is %d", int(msgs->ut_metadata_id));
+            logtrace(msgs, fmt::format(FMT_STRING("msgs->ut_metadata_id is {:d}"), static_cast<int>(msgs->ut_metadata_id)));
         }
 
         if (tr_variantDictFindInt(sub, TR_KEY_ut_holepunch, &i))
@@ -1183,7 +1177,7 @@ static void parseLtepHandshake(tr_peerMsgsImpl* msgs, uint32_t len, struct evbuf
     {
         pex.port = htons((uint16_t)i);
         msgs->publishClientGotPort(pex.port);
-        logtrace(msgs, "peer's port is now %d", int(i));
+        logtrace(msgs, fmt::format(FMT_STRING("peer's port is now {:d}"), i));
     }
 
     uint8_t const* addr = nullptr;
@@ -1232,7 +1226,9 @@ static void parseUtMetadata(tr_peerMsgsImpl* msgs, uint32_t msglen, struct evbuf
         tr_variantFree(&dict);
     }
 
-    logtrace(msgs, "got ut_metadata msg: type %d, piece %d, total_size %d", int(msg_type), int(piece), int(total_size));
+    logtrace(
+        msgs,
+        fmt::format(FMT_STRING("got ut_metadata msg: type {:d}, piece {:d}, total_size {:d}"), msg_type, piece, total_size));
 
     if (msg_type == MetadataMsgType::Reject)
     {
@@ -1367,7 +1363,7 @@ static void parseLtep(tr_peerMsgsImpl* msgs, uint32_t msglen, struct evbuffer* i
     }
     else
     {
-        logtrace(msgs, "skipping unknown ltep message (%d)", int(ltep_msgid));
+        logtrace(msgs, fmt::format(FMT_STRING("skipping unknown ltep message ({:d})"), static_cast<int>(ltep_msgid)));
         evbuffer_drain(inbuf, msglen);
     }
 }
@@ -1406,7 +1402,9 @@ static ReadState readBtId(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, size_t 
     auto id = uint8_t{};
     tr_peerIoReadUint8(msgs->io, inbuf, &id);
     msgs->incoming.id = id;
-    logtrace(msgs, "msgs->incoming.id is now %d; msgs->incoming.length is %zu", id, (size_t)msgs->incoming.length);
+    logtrace(
+        msgs,
+        fmt::format(FMT_STRING("msgs->incoming.id is now {:d}: msgs->incoming.length is {:d}"), id, msgs->incoming.length));
 
     if (id == BtPeerMsgs::Piece)
     {
@@ -1565,7 +1563,9 @@ static ReadState readBtPiece(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, size
         tr_peerIoReadUint32(msgs->io, inbuf, &req->index);
         tr_peerIoReadUint32(msgs->io, inbuf, &req->offset);
         req->length = msgs->incoming.length - 9;
-        logtrace(msgs, "got incoming block header %u:%u->%u", req->index, req->offset, req->length);
+        logtrace(
+            msgs,
+            fmt::format(FMT_STRING("got incoming block header {:d}:{:d}->{:d}"), req->index, req->offset, req->length));
         return READ_NOW;
     }
 
@@ -1586,12 +1586,13 @@ static ReadState readBtPiece(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, size
     *setme_piece_bytes_read += n;
     logtrace(
         msgs,
-        "got %zu bytes for block %u:%u->%u ... %d remain",
-        n,
-        req->index,
-        req->offset,
-        req->length,
-        int(req->length - evbuffer_get_length(block_buffer)));
+        fmt::format(
+            FMT_STRING("got {:d} bytes for block {:d}:{:d}->{:d} ... {:d} remain"),
+            n,
+            req->index,
+            req->offset,
+            req->length,
+            req->length - evbuffer_get_length(block_buffer)));
 
     if (evbuffer_get_length(block_buffer) < req->length)
     {
@@ -1623,7 +1624,9 @@ static ReadState readBtMessage(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, si
 
     --msglen; /* id length */
 
-    logtrace(msgs, "got BT id %d, len %d, buffer size is %zu", int(id), int(msglen), inlen);
+    logtrace(
+        msgs,
+        fmt::format(FMT_STRING("got BT id {:d}, len {:d}, buffer size is {:d}"), static_cast<int>(id), msglen, inlen));
 
     if (inlen < msglen)
     {
@@ -1632,7 +1635,9 @@ static ReadState readBtMessage(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, si
 
     if (!messageLengthIsCorrect(msgs, id, msglen + 1))
     {
-        logdbg(msgs, "bad packet - BT message #%d with a length of %d", int(id), int(msglen));
+        logdbg(
+            msgs,
+            fmt::format(FMT_STRING("bad packet - BT message #{:d} with a length of {:d}"), static_cast<int>(id), msglen));
         msgs->publishError(EMSGSIZE);
         return READ_ERR;
     }
@@ -1672,7 +1677,7 @@ static ReadState readBtMessage(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, si
 
     case BtPeerMsgs::Have:
         tr_peerIoReadUint32(msgs->io, inbuf, &ui32);
-        logtrace(msgs, "got Have: %u", ui32);
+        logtrace(msgs, fmt::format(FMT_STRING("got Have: {:d}"), ui32));
 
         if (msgs->torrent->hasMetainfo() && ui32 >= msgs->torrent->pieceCount())
         {
@@ -1708,7 +1713,7 @@ static ReadState readBtMessage(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, si
             tr_peerIoReadUint32(msgs->io, inbuf, &r.index);
             tr_peerIoReadUint32(msgs->io, inbuf, &r.offset);
             tr_peerIoReadUint32(msgs->io, inbuf, &r.length);
-            logtrace(msgs, "got Request: %u:%u->%u", r.index, r.offset, r.length);
+            logtrace(msgs, fmt::format(FMT_STRING("got Request: {:d}:{:d}->{:d}"), r.index, r.offset, r.length));
             peerMadeRequest(msgs, &r);
             break;
         }
@@ -1720,7 +1725,7 @@ static ReadState readBtMessage(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, si
             tr_peerIoReadUint32(msgs->io, inbuf, &r.offset);
             tr_peerIoReadUint32(msgs->io, inbuf, &r.length);
             msgs->cancelsSentToClient.add(tr_time(), 1);
-            logtrace(msgs, "got a Cancel %u:%u->%u", r.index, r.offset, r.length);
+            logtrace(msgs, fmt::format(FMT_STRING("got a Cancel {:d}:{:d}->{:d}"), r.index, r.offset, r.length));
 
             for (int i = 0; i < msgs->pendingReqsToClient; ++i)
             {
@@ -1850,7 +1855,7 @@ static ReadState readBtMessage(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, si
         break;
 
     default:
-        logtrace(msgs, "peer sent us an UNKNOWN: %d", int(id));
+        logtrace(msgs, fmt::format(FMT_STRING("peer sent us an UNKNOWN: {:d}"), static_cast<int>(id)));
         tr_peerIoDrain(msgs->io, inbuf, msglen);
         break;
     }
@@ -1873,17 +1878,22 @@ static int clientGotBlock(tr_peerMsgsImpl* msgs, struct evbuffer* data, struct p
 
     if (!requestIsValid(msgs, req))
     {
-        logdbg(msgs, "dropping invalid block %u:%u->%u", req->index, req->offset, req->length);
+        logdbg(msgs, fmt::format(FMT_STRING("dropping invalid block {:d}:{:d}->{:d}"), req->index, req->offset, req->length));
         return EBADMSG;
     }
 
     if (req->length != msgs->torrent->blockSize(block))
     {
-        logdbg(msgs, "wrong block size -- expected %u, got %d", msgs->torrent->blockSize(block), req->length);
+        logdbg(
+            msgs,
+            fmt::format(
+                FMT_STRING("wrong block size -- expected {:d}, got {:d}"),
+                msgs->torrent->blockSize(block),
+                req->length));
         return EMSGSIZE;
     }
 
-    logtrace(msgs, "got block %u:%u->%u", req->index, req->offset, req->length);
+    logtrace(msgs, fmt::format(FMT_STRING("got block {:d}:{:d}->{:d}"), req->index, req->offset, req->length));
 
     if (!tr_peerMgrDidPeerRequest(msgs->torrent, msgs, block))
     {
@@ -1934,7 +1944,9 @@ static ReadState canRead(tr_peerIo* io, void* vmsgs, size_t* piece)
     evbuffer* const in = io->getReadBuffer();
     size_t const inlen = evbuffer_get_length(in);
 
-    logtrace(msgs, "canRead: inlen is %zu, msgs->state is %d", inlen, int(msgs->state));
+    logtrace(
+        msgs,
+        fmt::format(FMT_STRING("canRead: inlen is {:d}, msgs->state is {:d}"), inlen, static_cast<int>(msgs->state)));
 
     auto ret = ReadState{};
     if (inlen == 0)
@@ -1963,7 +1975,7 @@ static ReadState canRead(tr_peerIo* io, void* vmsgs, size_t* piece)
 
         default:
 #ifdef TR_ENABLE_ASSERTS
-            TR_ASSERT_MSG(false, fmt::format(FMT_STRING("unhandled peer messages state {:d}"), int(msgs->state)));
+            TR_ASSERT_MSG(false, fmt::format(FMT_STRING("unhandled peer messages state {:d}"), static_cast<int>(msgs->state)));
 #else
             ret = READ_ERR;
             break;
@@ -1971,7 +1983,7 @@ static ReadState canRead(tr_peerIo* io, void* vmsgs, size_t* piece)
         }
     }
 
-    logtrace(msgs, "canRead: ret is %d", int(ret));
+    logtrace(msgs, fmt::format(FMT_STRING("canRead: ret is {:d}"), static_cast<int>(ret)));
 
     return ret;
 }
@@ -2032,7 +2044,7 @@ static void updateMetadataRequests(tr_peerMsgsImpl* msgs, time_t now)
         tr_variantDictAddInt(&tmp, TR_KEY_piece, piece);
         auto* const payload = tr_variantToBuf(&tmp, TR_VARIANT_FMT_BENC);
 
-        logtrace(msgs, "requesting metadata piece #%d", piece);
+        logtrace(msgs, fmt::format(FMT_STRING("requesting metadata piece #{:d}"), piece));
 
         /* write it out as a LTEP message to our outMessages buffer */
         evbuffer_add_uint32(out, 2 * sizeof(uint8_t) + evbuffer_get_length(payload));
@@ -2094,14 +2106,16 @@ static size_t fillOutputBuffer(tr_peerMsgsImpl* msgs, time_t now)
 
     if (haveMessages && msgs->outMessagesBatchedAt == 0) /* fresh batch */
     {
-        logtrace(msgs, "started an outMessages batch (length is %zu)", evbuffer_get_length(msgs->outMessages));
+        logtrace(
+            msgs,
+            fmt::format(FMT_STRING("started an outMessages batch (length is {:d})"), evbuffer_get_length(msgs->outMessages)));
         msgs->outMessagesBatchedAt = now;
     }
     else if (haveMessages && now - msgs->outMessagesBatchedAt >= msgs->outMessagesBatchPeriod)
     {
         size_t const len = evbuffer_get_length(msgs->outMessages);
         /* flush the protocol messages */
-        logtrace(msgs, "flushing outMessages... to %p (length is %zu)", (void*)msgs->io, len);
+        logtrace(msgs, fmt::format(FMT_STRING("flushing outMessages... to {:p} (length is {:d})"), fmt::ptr(msgs->io), len));
         tr_peerIoWriteBuf(msgs->io, msgs->outMessages, false);
         msgs->clientSentAnythingAt = now;
         msgs->outMessagesBatchedAt = 0;
@@ -2224,7 +2238,7 @@ static size_t fillOutputBuffer(tr_peerMsgsImpl* msgs, time_t now)
             else
             {
                 size_t const n = evbuffer_get_length(out);
-                logtrace(msgs, "sending block %u:%u->%u", req.index, req.offset, req.length);
+                logtrace(msgs, fmt::format(FMT_STRING("sending block {:d}:{:d}->{:d}"), req.index, req.offset, req.length));
                 TR_ASSERT(n == msglen);
                 tr_peerIoWriteBuf(msgs->io, out, true);
                 bytesWritten += n;
@@ -2292,12 +2306,14 @@ static void gotError(tr_peerIo* /*io*/, short what, void* vmsgs)
 
     if ((what & BEV_EVENT_TIMEOUT) != 0)
     {
-        logdbg(msgs, "libevent got a timeout, what=%hd", what);
+        logdbg(msgs, fmt::format(FMT_STRING("libevent got a timeout, what={:d}"), what));
     }
 
     if ((what & (BEV_EVENT_EOF | BEV_EVENT_ERROR)) != 0)
     {
-        logdbg(msgs, "libevent got an error! what=%hd, errno=%d (%s)", what, errno, tr_strerror(errno));
+        logdbg(
+            msgs,
+            fmt::format(FMT_STRING("libevent got an error! what={:d}, errno={:d} ({:s})"), what, errno, tr_strerror(errno)));
     }
 
     msgs->publishError(ENOTCONN);
@@ -2313,7 +2329,7 @@ static void sendBitfield(tr_peerMsgsImpl* msgs)
     evbuffer_add_uint32(out, sizeof(uint8_t) + bytes.size());
     evbuffer_add_uint8(out, BtPeerMsgs::Bitfield);
     evbuffer_add(out, bytes.data(), std::size(bytes));
-    logtrace(msgs, "sending bitfield... outMessage size is now %zu", evbuffer_get_length(out));
+    logtrace(msgs, fmt::format(FMT_STRING("sending bitfield... outMessage size is now {:d}"), evbuffer_get_length(out)));
     pokeBatchPeriod(msgs, ImmediatePriorityIntervalSecs);
 }
 
@@ -2502,15 +2518,16 @@ static void sendPex(tr_peerMsgsImpl* msgs)
             &diffs6);
         logtrace(
             msgs,
-            "pex: old peer count %d+%d, new peer count %d+%d, added %d+%d, removed %d+%d",
-            msgs->pexCount,
-            msgs->pexCount6,
-            newCount,
-            newCount6,
-            diffs.addedCount,
-            diffs6.addedCount,
-            diffs.droppedCount,
-            diffs6.droppedCount);
+            fmt::format(
+                FMT_STRING("pex: old peer count {:d}+{:d}, new peer count {:d}+{:d}, added {:d}+{:d}, removed {:d}+{:d}"),
+                msgs->pexCount,
+                msgs->pexCount6,
+                newCount,
+                newCount6,
+                diffs.addedCount,
+                diffs6.addedCount,
+                diffs.droppedCount,
+                diffs6.droppedCount));
 
         if (diffs.addedCount == 0 && diffs.droppedCount == 0 && diffs6.addedCount == 0 && diffs6.droppedCount == 0)
         {
@@ -2640,7 +2657,9 @@ static void sendPex(tr_peerMsgsImpl* msgs)
             evbuffer_add_uint8(out, msgs->ut_pex_id);
             evbuffer_add_buffer(out, payload);
             pokeBatchPeriod(msgs, HighPriorityIntervalSecs);
-            logtrace(msgs, "sending a pex message; outMessage size is now %zu", evbuffer_get_length(out));
+            logtrace(
+                msgs,
+                fmt::format(FMT_STRING("sending a pex message; outMessage size is now {:d}"), evbuffer_get_length(out)));
             dbgOutMessageLen(msgs);
 
             evbuffer_free(payload);
@@ -2664,5 +2683,5 @@ static void pexPulse(evutil_socket_t /*fd*/, short /*what*/, void* vmsgs)
     sendPex(msgs);
 
     TR_ASSERT(msgs->pex_timer);
-    tr_timerAdd(msgs->pex_timer.get(), PexIntervalSecs, 0);
+    tr_timerAdd(*msgs->pex_timer, PexIntervalSecs, 0);
 }

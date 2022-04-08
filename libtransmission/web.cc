@@ -154,7 +154,7 @@ public:
         queued_tasks_cv.notify_one();
     }
 
-    [[nodiscard]] bool isClosed() const
+    [[nodiscard]] bool isClosed() const noexcept
     {
         return is_closed_;
     }
@@ -593,7 +593,7 @@ void tr_web::fetch(FetchOptions&& options)
     impl_->fetch(std::move(options));
 }
 
-bool tr_web::isClosed() const
+bool tr_web::isClosed() const noexcept
 {
     return impl_->isClosed();
 }

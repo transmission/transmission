@@ -83,7 +83,7 @@ public:
 
     // True when tr_web is ready to be destroyed.
     // Will never be true until after closeSoon() is called.
-    [[nodiscard]] bool isClosed() const;
+    [[nodiscard]] bool isClosed() const noexcept;
 
     // If you want to give running tasks a chance to finish, call closeSoon()
     // before destroying the tr_web object. Deleting the object will cancel

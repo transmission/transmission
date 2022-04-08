@@ -7,6 +7,7 @@
 #include <cstdio>
 #include <cstdlib> /* bsearch(), qsort() */
 #include <cstring>
+#include <string_view>
 
 #include <fmt/core.h>
 
@@ -206,91 +207,84 @@ bool tr_blocklistFileHasAddress(tr_blocklistFile* b, tr_address const* addr)
  * http://wiki.phoenixlabs.org/wiki/P2P_Format
  * http://en.wikipedia.org/wiki/PeerGuardian#P2P_plaintext_format
  */
-static bool parseLine1(char const* line, struct tr_ipv4_range* range)
+static bool parseLine1(std::string_view line, struct tr_ipv4_range* range)
 {
-    int b[4];
-    int e[4];
-    char str[64];
-    tr_address addr;
-
-    char const* walk = strrchr(line, ':');
-
-    if (walk == nullptr)
+    // remove leading "comment:"
+    auto pos = line.find(':');
+    if (pos == std::string_view::npos)
     {
         return false;
     }
+    line = line.substr(pos + 1);
 
-    ++walk; /* walk past the colon */
-
-    if (sscanf(
-            walk,
-            "%d.%d.%d.%d-%d.%d.%d.%d",
-            TR_ARG_TUPLE(&b[0], &b[1], &b[2], &b[3]),
-            TR_ARG_TUPLE(&e[0], &e[1], &e[2], &e[3])) != 8)
+    // parse the leading 'x.x.x.x'
+    pos = line.find('-');
+    if (pos == std::string_view::npos)
     {
         return false;
     }
-
-    tr_snprintf(str, sizeof(str), "%d.%d.%d.%d", TR_ARG_TUPLE(b[0], b[1], b[2], b[3]));
-
-    if (!tr_address_from_string(&addr, str))
+    if (auto addr = tr_address{}; tr_address_from_string(&addr, line.substr(0, pos)))
+    {
+        range->begin = ntohl(addr.addr.addr4.s_addr);
+    }
+    else
     {
         return false;
     }
+    line = line.substr(pos + 1);
 
-    range->begin = ntohl(addr.addr.addr4.s_addr);
-
-    tr_snprintf(str, sizeof(str), "%d.%d.%d.%d", TR_ARG_TUPLE(e[0], e[1], e[2], e[3]));
-
-    if (!tr_address_from_string(&addr, str))
+    // parse the trailing 'y.y.y.y'
+    if (auto addr = tr_address{}; tr_address_from_string(&addr, line))
+    {
+        range->end = ntohl(addr.addr.addr4.s_addr);
+    }
+    else
     {
         return false;
     }
-
-    range->end = ntohl(addr.addr.addr4.s_addr);
 
     return true;
 }
 
 /*
- * DAT format: "000.000.000.000 - 000.255.255.255 , 000 , invalid ip"
- * http://wiki.phoenixlabs.org/wiki/DAT_Format
+ * DAT / eMule format: "000.000.000.000 - 000.255.255.255 , 000 , invalid ip"a
+ * https://sourceforge.net/p/peerguardian/wiki/dev-blocklist-format-dat/
  */
-static bool parseLine2(char const* line, struct tr_ipv4_range* range)
+static bool parseLine2(std::string_view line, struct tr_ipv4_range* range)
 {
-    int unk = 0;
-    int a[4];
-    int b[4];
-    char str[32];
-    tr_address addr;
+    static auto constexpr Delim1 = std::string_view{ " - " };
+    static auto constexpr Delim2 = std::string_view{ " , " };
 
-    if (sscanf(
-            line,
-            "%3d.%3d.%3d.%3d - %3d.%3d.%3d.%3d , %3d , ",
-            TR_ARG_TUPLE(&a[0], &a[1], &a[2], &a[3]),
-            TR_ARG_TUPLE(&b[0], &b[1], &b[2], &b[3]),
-            &unk) != 9)
+    auto pos = line.find(Delim1);
+    if (pos == std::string_view::npos)
     {
         return false;
     }
 
-    tr_snprintf(str, sizeof(str), "%d.%d.%d.%d", TR_ARG_TUPLE(a[0], a[1], a[2], a[3]));
-
-    if (!tr_address_from_string(&addr, str))
+    if (auto addr = tr_address{}; tr_address_from_string(&addr, line.substr(0, pos)))
+    {
+        range->begin = ntohl(addr.addr.addr4.s_addr);
+    }
+    else
     {
         return false;
     }
 
-    range->begin = ntohl(addr.addr.addr4.s_addr);
-
-    tr_snprintf(str, sizeof(str), "%d.%d.%d.%d", TR_ARG_TUPLE(b[0], b[1], b[2], b[3]));
-
-    if (!tr_address_from_string(&addr, str))
+    line = line.substr(pos + std::size(Delim1));
+    pos = line.find(Delim2);
+    if (pos == std::string_view::npos)
     {
         return false;
     }
 
-    range->end = ntohl(addr.addr.addr4.s_addr);
+    if (auto addr = tr_address{}; tr_address_from_string(&addr, line.substr(0, pos)))
+    {
+        range->end = ntohl(addr.addr.addr4.s_addr);
+    }
+    else
+    {
+        return false;
+    }
 
     return true;
 }

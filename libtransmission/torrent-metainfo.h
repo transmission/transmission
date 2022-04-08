@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <cstdint> // uint32_t, uint64_t
 #include <ctime>
 #include <string>
 #include <string_view>
@@ -57,7 +58,7 @@ public:
     {
         return blockInfo().pieceLoc(piece, offset, length);
     }
-    [[nodiscard]] constexpr auto blockSize(tr_block_index_t block) const
+    [[nodiscard]] constexpr auto blockSize(tr_block_index_t block) const noexcept
     {
         return blockInfo().blockSize(block);
     }
@@ -73,7 +74,7 @@ public:
     {
         return blockInfo().pieceSize();
     }
-    [[nodiscard]] constexpr auto pieceSize(tr_piece_index_t piece) const
+    [[nodiscard]] constexpr auto pieceSize(tr_piece_index_t piece) const noexcept
     {
         return blockInfo().pieceSize(piece);
     }
@@ -82,55 +83,55 @@ public:
         return blockInfo().totalSize();
     }
 
-    [[nodiscard]] auto const& comment() const noexcept
+    [[nodiscard]] constexpr auto const& comment() const noexcept
     {
         return comment_;
     }
-    [[nodiscard]] auto const& creator() const noexcept
+    [[nodiscard]] constexpr auto const& creator() const noexcept
     {
         return creator_;
     }
-    [[nodiscard]] auto const& source() const noexcept
+    [[nodiscard]] constexpr auto const& source() const noexcept
     {
         return source_;
     }
 
-    [[nodiscard]] auto fileCount() const noexcept
+    [[nodiscard]] constexpr auto fileCount() const noexcept
     {
         return std::size(files_);
     }
+
+    [[nodiscard]] uint64_t fileSize(tr_file_index_t i) const;
 
     [[nodiscard]] std::string const& fileSubpath(tr_file_index_t i) const;
 
     void setFileSubpath(tr_file_index_t i, std::string_view subpath);
 
-    [[nodiscard]] uint64_t fileSize(tr_file_index_t i) const;
-
-    [[nodiscard]] auto const& isPrivate() const noexcept
+    [[nodiscard]] constexpr auto const& isPrivate() const noexcept
     {
         return is_private_;
     }
 
     [[nodiscard]] tr_sha1_digest_t const& pieceHash(tr_piece_index_t piece) const;
 
-    [[nodiscard]] auto const& dateCreated() const noexcept
+    [[nodiscard]] constexpr auto const& dateCreated() const noexcept
     {
         return date_created_;
     }
 
     [[nodiscard]] std::string benc() const;
 
-    [[nodiscard]] auto infoDictSize() const noexcept
+    [[nodiscard]] constexpr auto infoDictSize() const noexcept
     {
         return info_dict_size_;
     }
 
-    [[nodiscard]] auto infoDictOffset() const noexcept
+    [[nodiscard]] constexpr auto infoDictOffset() const noexcept
     {
         return info_dict_offset_;
     }
 
-    [[nodiscard]] auto piecesOffset() const noexcept
+    [[nodiscard]] constexpr auto piecesOffset() const noexcept
     {
         return pieces_offset_;
     }

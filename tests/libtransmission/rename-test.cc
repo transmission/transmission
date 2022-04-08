@@ -20,6 +20,7 @@
 #include <cstdio> // fopen()
 #include <cstring> // strcmp()
 #include <string>
+#include <string_view>
 
 using namespace std::literals;
 

@@ -45,7 +45,7 @@ struct tr_completion
         return blocks_;
     }
 
-    [[nodiscard]] constexpr bool hasAll() const
+    [[nodiscard]] constexpr bool hasAll() const noexcept
     {
         return hasMetainfo() && blocks_.hasAll();
     }
@@ -60,7 +60,7 @@ struct tr_completion
         return blocks_.count(span.begin, span.end) == span.end - span.begin;
     }
 
-    [[nodiscard]] constexpr bool hasNone() const
+    [[nodiscard]] constexpr bool hasNone() const noexcept
     {
         return !hasMetainfo() || blocks_.hasNone();
     }
@@ -77,7 +77,10 @@ struct tr_completion
 
     [[nodiscard]] uint64_t hasValid() const;
 
-    [[nodiscard]] uint64_t leftUntilDone() const;
+    [[nodiscard]] auto leftUntilDone() const
+    {
+        return sizeWhenDone() - hasTotal();
+    }
 
     [[nodiscard]] constexpr double percentComplete() const
     {
@@ -118,7 +121,7 @@ struct tr_completion
         }
     }
 
-    void setHasAll();
+    void setHasAll() noexcept;
 
     void setBlocks(tr_bitfield blocks);
 

@@ -2265,7 +2265,7 @@ static void deleteLocalData(tr_torrent const* tor, tr_fileFunc func)
         if (!std::empty(filename))
         {
             auto target = tr_strvPath(tmpdir, tor->fileSubpath(f));
-            tr_moveFile(filename.c_str(), target.c_str(), nullptr);
+            tr_moveFile(filename, target);
             files.emplace_back(target);
         }
     }
@@ -2881,7 +2881,7 @@ static bool renameArgsAreValid(char const* oldpath, char const* newname)
 static auto renameFindAffectedFiles(tr_torrent const* tor, std::string_view oldpath)
 {
     auto indices = std::vector<tr_file_index_t>{};
-    auto oldpath_as_dir = tr_strvJoin(oldpath, "/"sv);
+    auto const oldpath_as_dir = tr_pathbuf{ oldpath, '/' };
     auto const n_files = tor->fileCount();
 
     for (tr_file_index_t i = 0; i < n_files; ++i)
@@ -2913,11 +2913,11 @@ static int renamePath(tr_torrent* tor, char const* oldpath, char const* newname)
     {
         auto const parent = tr_sys_path_dirname(src);
         auto const tgt = tr_strvEndsWith(src, tr_torrent::PartialFileSuffix) ?
-            tr_strvJoin(parent, TR_PATH_DELIMITER_STR, newname, tr_torrent::PartialFileSuffix) :
-            tr_strvPath(parent, newname);
+            tr_pathbuf{ parent, '/', newname, tr_torrent::PartialFileSuffix } :
+            tr_pathbuf{ parent, '/', newname };
 
         auto tmp = errno;
-        bool const tgt_exists = tr_sys_path_exists(tgt.c_str());
+        bool const tgt_exists = tr_sys_path_exists(tgt);
         errno = tmp;
 
         if (!tgt_exists)
@@ -2926,7 +2926,7 @@ static int renamePath(tr_torrent* tor, char const* oldpath, char const* newname)
 
             tmp = errno;
 
-            if (!tr_sys_path_rename(src.c_str(), tgt.c_str(), &error))
+            if (!tr_sys_path_rename(src.c_str(), tgt, &error))
             {
                 err = error->code;
                 tr_error_free(error);

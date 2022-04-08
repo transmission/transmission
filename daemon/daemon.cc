@@ -8,6 +8,7 @@
 #include <cstdio> /* printf */
 #include <cstdlib> /* atoi */
 #include <iostream>
+#include <string>
 #include <string_view>
 #include <utility>
 
@@ -339,14 +340,14 @@ static void printMessage(
     std::string_view filename,
     int line)
 {
-    auto const out = std::empty(name) ? tr_strvJoin(message, " ("sv, filename, ":"sv, std::to_string(line), ")"sv) :
-                                        tr_strvJoin(name, " "sv, message, " ("sv, filename, ":"sv, std::to_string(line), ")"sv);
+    auto const out = std::empty(name) ? fmt::format(FMT_STRING("{:s} ({:s}:{:d}"), message, filename, line) :
+                                        fmt::format(FMT_STRING("{:s} {:s} ({:s}:{:d}"), name, message, filename, line);
 
     if (file != TR_BAD_SYS_FILE)
     {
         auto timestr = std::array<char, 64>{};
         tr_logGetTimeStr(std::data(timestr), std::size(timestr));
-        tr_sys_file_write_line(file, tr_strvJoin("["sv, std::data(timestr), "] "sv, levelName(level), " "sv, out));
+        tr_sys_file_write_line(file, fmt::format(FMT_STRING("[{:s}] {:s} {:s}"), std::data(timestr), levelName(level), out));
     }
 
 #ifdef HAVE_SYSLOG
@@ -980,7 +981,8 @@ int tr_main(int argc, char* argv[])
 
     if (tr_error* error = nullptr; !dtr_daemon(&cb, &data, foreground, &ret, &error))
     {
-        printMessage(logfile, TR_LOG_ERROR, MyName, tr_strvJoin("Couldn't daemonize: ", error->message), __FILE__, __LINE__);
+        auto const errmsg = fmt::format(FMT_STRING("Couldn't daemonize: {:s} ({:d})"), error->message, error->code);
+        printMessage(logfile, TR_LOG_ERROR, MyName, errmsg, __FILE__, __LINE__);
         tr_error_free(error);
     }
 

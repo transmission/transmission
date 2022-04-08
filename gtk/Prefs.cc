@@ -4,6 +4,7 @@
 
 #include <errno.h>
 #include <stdlib.h> /* strtol() */
+#include <string>
 #include <string_view>
 
 #include <glibmm.h>

@@ -13,44 +13,6 @@
 
 static auto constexpr Floor = int{ 32 };
 
-int tr_lowerBound(
-    void const* key,
-    void const* base,
-    size_t nmemb,
-    size_t size,
-    tr_voidptr_compare_func compar,
-    bool* exact_match)
-{
-    size_t first = 0;
-    auto const* cbase = static_cast<char const*>(base);
-    bool exact = false;
-
-    while (nmemb != 0)
-    {
-        size_t const half = nmemb / 2;
-        size_t const middle = first + half;
-        int const c = (*compar)(key, cbase + size * middle);
-
-        if (c <= 0)
-        {
-            if (c == 0)
-            {
-                exact = true;
-            }
-
-            nmemb = half;
-        }
-        else
-        {
-            first = middle + 1;
-            nmemb = nmemb - half - 1;
-        }
-    }
-
-    *exact_match = exact;
-    return first;
-}
-
 void tr_ptrArrayDestruct(tr_ptrArray* p, PtrArrayForeachFunc func)
 {
     TR_ASSERT(p != nullptr);

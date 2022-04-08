@@ -23,6 +23,7 @@
 
 #include "transmission.h"
 
+#include "error.h"
 #include "jsonsl.h"
 #include "log.h"
 #include "quark.h"
@@ -39,10 +40,11 @@ static auto constexpr MaxDepth = int{ 64 };
 struct json_wrapper_data
 {
     bool has_content;
+    size_t size;
     std::string_view key;
     evbuffer* keybuf;
     evbuffer* strbuf;
-    int error;
+    tr_error* error;
     std::deque<tr_variant*> stack;
     tr_variant* top;
     int parse_opts;
@@ -82,14 +84,15 @@ static void error_handler(jsonsl_t jsn, jsonsl_error_t error, jsonsl_state_st* /
 {
     auto* data = static_cast<struct json_wrapper_data*>(jsn->data);
 
-    tr_logAddError(fmt::format(
-        _("Couldn't parse JSON at position {position} '{text:16s}': {error} ({error_code})"),
-        fmt::arg("position", jsn->pos),
-        fmt::arg("text", buf),
-        fmt::arg("error", jsonsl_strerror(error)),
-        fmt::arg("error_code", error)));
-
-    data->error = EILSEQ;
+    tr_error_set(
+        &data->error,
+        EILSEQ,
+        fmt::format(
+            _("Couldn't parse JSON at position {position} '{text}': {error} ({error_code})"),
+            fmt::arg("position", jsn->pos),
+            fmt::arg("text", std::string_view{ buf, std::min(size_t{ 16U }, data->size - jsn->pos) }),
+            fmt::arg("error", jsonsl_strerror(error)),
+            fmt::arg("error_code", error)));
 }
 
 static int error_callback(jsonsl_t jsn, jsonsl_error_t error, struct jsonsl_state_st* state, jsonsl_char_t* at)
@@ -104,7 +107,7 @@ static void action_callback_PUSH(
     struct jsonsl_state_st* state,
     jsonsl_char_t const* /*buf*/)
 {
-    auto* data = static_cast<struct json_wrapper_data*>(jsn->data);
+    auto* const data = static_cast<json_wrapper_data*>(jsn->data);
 
     if ((state->type == JSONSL_T_LIST) || (state->type == JSONSL_T_OBJECT))
     {
@@ -345,7 +348,7 @@ static void action_callback_POP(
     }
 }
 
-int tr_variantParseJson(tr_variant& setme, int parse_opts, std::string_view benc, char const** setme_end)
+bool tr_variantParseJson(tr_variant& setme, int parse_opts, std::string_view benc, char const** setme_end, tr_error** error)
 {
     TR_ASSERT((parse_opts & TR_VARIANT_PARSE_JSON) != 0);
 
@@ -358,7 +361,8 @@ int tr_variantParseJson(tr_variant& setme, int parse_opts, std::string_view benc
     jsn->data = &data;
     jsonsl_enable_all_callbacks(jsn);
 
-    data.error = 0;
+    data.error = nullptr;
+    data.size = std::size(benc);
     data.has_content = false;
     data.key = ""sv;
     data.keybuf = evbuffer_new();
@@ -372,9 +376,9 @@ int tr_variantParseJson(tr_variant& setme, int parse_opts, std::string_view benc
     jsonsl_feed(jsn, static_cast<jsonsl_char_t const*>(std::data(benc)), std::size(benc));
 
     /* EINVAL if there was no content */
-    if (data.error == 0 && !data.has_content)
+    if (data.error == nullptr && !data.has_content)
     {
-        data.error = EINVAL;
+        tr_error_set(&data.error, EINVAL, "No content");
     }
 
     /* maybe set the end ptr */
@@ -384,11 +388,15 @@ int tr_variantParseJson(tr_variant& setme, int parse_opts, std::string_view benc
     }
 
     /* cleanup */
-    int const error = data.error;
+    auto const success = data.error == nullptr;
+    if (data.error != nullptr)
+    {
+        tr_error_propagate(error, &data.error);
+    }
     evbuffer_free(data.keybuf);
     evbuffer_free(data.strbuf);
     jsonsl_destroy(jsn);
-    return error;
+    return success;
 }
 
 /****

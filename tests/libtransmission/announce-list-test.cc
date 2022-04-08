@@ -421,7 +421,7 @@ TEST_F(AnnounceListTest, parseThreeTier)
     EXPECT_EQ(1U, announce_list.at(1).tier);
     EXPECT_EQ("https://www.example.com/c/announce", announce_list.at(2).announce.full);
     EXPECT_EQ(2U, announce_list.at(2).tier);
-    EXPECT_EQ(tr_strvJoin(Text, "\n"sv), announce_list.toString());
+    EXPECT_EQ(fmt::format("{:s}\n", Text), announce_list.toString());
 }
 
 TEST_F(AnnounceListTest, parseThreeTierWithTrailingLf)

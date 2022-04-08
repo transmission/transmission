@@ -11,7 +11,7 @@ Users can set environmental variables to override Transmission's default behavio
    $ export TR_DEBUG_FD=2
    $ transmission 2>runlog
    ```
- * If `TR_DHT_VERBOSE` is set, then Transmission will log all of the DHT's activities in excrutiating detail to standard error.
+ * If `TR_DHT_VERBOSE` is set, then Transmission will log all of the DHT's activities in excruciating detail to standard error.
 
 ## Standard Variables Used By Transmission
 

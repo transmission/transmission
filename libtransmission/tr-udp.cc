@@ -5,7 +5,6 @@
 #include <cstdint>
 #include <cstring> /* memcmp(), memcpy(), memset() */
 #include <cstdlib> /* malloc(), free() */
-#include <string_view>
 
 #ifdef _WIN32
 #include <io.h> /* dup2() */
