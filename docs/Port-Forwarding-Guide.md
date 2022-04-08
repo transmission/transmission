@@ -91,4 +91,3 @@ For more comprehensive instructions specific to your router, visit [portforward.
 #### Common Problems
 
 Go to the [Why is my port closed?](Why-is-my-port-closed.md) page.
-
