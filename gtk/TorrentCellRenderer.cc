@@ -7,6 +7,7 @@
 #include <cstring> // strchr()
 #include <memory>
 #include <optional>
+#include <string>
 
 #include <glibmm.h>
 #include <glibmm/i18n.h>
