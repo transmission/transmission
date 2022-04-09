@@ -52,16 +52,13 @@ Functionality of these scripts has been implemented in libtransmission and is th
 
 ## contrib/scripts
 
-Tomas Carnecky (aka wereHamster) is maintaining a set of scripts in his [http://github.com/wereHamster/transmission/tree/master/contrib/scripts/ GitHub repository].
+Tomas Carnecky (aka wereHamster) is maintaining a set of scripts in his [https://github.com/wereHamster/transmission/tree/master/contrib/scripts/ GitHub repository].
 
-Falk Husemann (aka hxgn) is maintaining scripts in his [http://falkhusemann.de/blog/category/tcp_ip/transmission-tcp_ip/ blog].
+Falk Husemann (aka hxgn) is maintaining scripts in his [https://falkhusemann.de/category/tcp_ip/transmission-tcp_ip/ blog].
 
-oguz wrote [http://oguzarduc.blogspot.com/2012/05/transmission-quit-script-in-php.html on his blog] a PHP script to stop Transmission after it finishes downloading and seeding.
+oguz wrote [https://oguzarduc.blogspot.com/2012/05/transmission-quit-script-in-php.html on his blog] a PHP script to stop Transmission after it finishes downloading and seeding.
 Scripts which have not yet been ported and may not work with the latest version:
- * http://pastie.org/338556: Python - Fetch new torrents from tvrss
- * http://pastie.org/338555: PHP - Stop finished torrents
- * http://pastie.org/443058: Perl - Network traffic graph, based on rrdtool (example: http://skitch.com/werehamster/bmjg8/bittorrent-traffic)
- * http://transmission.pastebin.com/QzVxQDtM: Bash - (cron)script to keep a maximum number of torrents running; starting and pausing torrents as necessary
+ * https://pastebin.com/QzVxQDtM: Bash - (cron)script to keep a maximum number of torrents running; starting and pausing torrents as necessary
  * https://github.com/jaboto/Transmission-script - (cron)script set network limits according to the number of clients in the network
 
 ## Security on systemd
