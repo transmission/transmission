@@ -17,6 +17,7 @@
 #define LIBTRANSMISSION_WATCHDIR_MODULE
 
 #include "transmission.h"
+
 #include "error.h"
 #include "error-types.h"
 #include "file.h"
@@ -41,6 +42,9 @@ auto tr_watchdir_retry_max_interval = timeval{ 10, 0 };
 class tr_watchdir_retry
 {
 public:
+    tr_watchdir_retry(tr_watchdir_retry const&) = delete;
+    tr_watchdir_retry& operator=(tr_watchdir_retry const&) = delete;
+
     tr_watchdir_retry(tr_watchdir_t handle_in, struct event_base* base, std::string_view name_in)
         : handle_{ handle_in }
         , name_{ name_in }
@@ -84,9 +88,6 @@ public:
         evtimer_add(timer_, &interval_);
         return true;
     }
-
-    tr_watchdir_retry(tr_watchdir_retry const&) = delete;
-    tr_watchdir_retry& operator=(tr_watchdir_retry const&) = delete;
 
     [[nodiscard]] auto const& name() const noexcept
     {
@@ -133,8 +134,6 @@ public:
         {
             backend_ = tr_watchdir_generic_new(this);
         }
-
-        TR_ASSERT(backend_->free_func != nullptr);
     }
 
     ~tr_watchdir()
