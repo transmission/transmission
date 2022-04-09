@@ -104,6 +104,8 @@ private:
     struct timeval interval_ = tr_watchdir_retry_start_interval;
 };
 
+// TODO: notify / kqueue / win32 / generic should subclass from tr_watchdir
+
 struct tr_watchdir
 {
 public:
