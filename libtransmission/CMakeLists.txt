@@ -15,6 +15,7 @@ set(PROJECT_FILES
   block-info.cc
   blocklist.cc
   cache.cc
+  cache-new.cc
   clients.cc
   completion.cc
   crypto-utils-ccrypto.cc
@@ -163,6 +164,7 @@ set(${PROJECT_NAME}_PRIVATE_HEADERS
     block-info.h
     blocklist.h
     cache.h
+    cache-new.h
     clients.h
     completion.h
     crypto-utils.h

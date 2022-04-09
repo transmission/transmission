@@ -34,7 +34,7 @@ public:
         return name_;
     }
 
-    [[nodiscard]] constexpr auto webseedCount() const noexcept
+    [[nodiscard]] auto webseedCount() const noexcept
     {
         return std::size(webseed_urls_);
     }

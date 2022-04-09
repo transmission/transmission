@@ -398,7 +398,7 @@ public:
 
     /// METAINFO - TRACKERS
 
-    [[nodiscard]] auto const& announceList() const noexcept
+    [[nodiscard]] constexpr auto const& announceList() const noexcept
     {
         return metainfo_.announceList();
     }
@@ -449,32 +449,32 @@ public:
         metainfo_.setName(name);
     }
 
-    [[nodiscard]] auto const& name() const noexcept
+    [[nodiscard]] constexpr auto const& name() const noexcept
     {
         return metainfo_.name();
     }
 
-    [[nodiscard]] auto const& infoHash() const noexcept
+    [[nodiscard]] constexpr auto const& infoHash() const noexcept
     {
         return metainfo_.infoHash();
     }
 
-    [[nodiscard]] auto isPrivate() const noexcept
+    [[nodiscard]] constexpr auto isPrivate() const noexcept
     {
         return metainfo_.isPrivate();
     }
 
-    [[nodiscard]] auto isPublic() const noexcept
+    [[nodiscard]] constexpr auto isPublic() const noexcept
     {
         return !this->isPrivate();
     }
 
-    [[nodiscard]] auto const& infoHashString() const noexcept
+    [[nodiscard]] constexpr auto const& infoHashString() const noexcept
     {
         return metainfo_.infoHashString();
     }
 
-    [[nodiscard]] auto dateCreated() const noexcept
+    [[nodiscard]] constexpr auto dateCreated() const noexcept
     {
         return metainfo_.dateCreated();
     }

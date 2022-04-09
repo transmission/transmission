@@ -5,6 +5,7 @@ add_executable(libtransmission-test
     bitfield-test.cc
     block-info-test.cc
     blocklist-test.cc
+    cache-test.cc
     clients-test.cc
     completion-test.cc
     copy-test.cc
