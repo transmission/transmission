@@ -3,6 +3,8 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include <array>
+#include <iterator>
 #include <cstdlib> /* qsort() */
 #include <ctime>
 
@@ -24,6 +26,8 @@
 *****
 ****/
 
+static auto constexpr BlockSize = tr_block_info::BlockSize;
+
 struct cache_block
 {
     tr_torrent* tor;
@@ -33,7 +37,7 @@ struct cache_block
 
     time_t time;
 
-    struct evbuffer* evbuf;
+    std::array<uint8_t, BlockSize> data;
 };
 
 struct tr_cache
@@ -153,11 +157,10 @@ static int calcRuns(tr_cache const* cache, struct run_info* runs)
 
 static int flushContiguous(tr_cache* cache, int pos, int n)
 {
-    int err = 0;
-    auto* const buf = tr_new(uint8_t, n * tr_block_info::BlockSize);
-    auto* walk = buf;
-    auto** blocks = (struct cache_block**)tr_ptrArrayBase(&cache->blocks);
+    auto buf = std::vector<uint8_t>{};
+    buf.reserve(n * BlockSize);
 
+    auto** blocks = (struct cache_block**)tr_ptrArrayBase(&cache->blocks);
     auto* b = blocks[pos];
     auto* const tor = b->tor;
     auto const loc = b->loc;
@@ -165,19 +168,16 @@ static int flushContiguous(tr_cache* cache, int pos, int n)
     for (int i = 0; i < n; ++i)
     {
         b = blocks[pos + i];
-        evbuffer_copyout(b->evbuf, walk, b->length);
-        walk += b->length;
-        evbuffer_free(b->evbuf);
+        std::copy_n(std::begin(b->data), b->length, std::back_inserter(buf));
         tr_free(b);
     }
 
     tr_ptrArrayErase(&cache->blocks, pos, pos + n);
 
-    err = tr_ioWrite(tor, loc, walk - buf, buf);
-    tr_free(buf);
+    int const err = tr_ioWrite(tor, loc, std::size(buf), std::data(buf));
 
     ++cache->disk_writes;
-    cache->disk_write_bytes += walk - buf;
+    cache->disk_write_bytes += std::size(buf);
     return err;
 }
 
@@ -234,7 +234,7 @@ static int cacheTrim(tr_cache* cache)
 
 static int getMaxBlocks(int64_t max_bytes)
 {
-    return std::lldiv(max_bytes, tr_block_info::BlockSize).quot;
+    return std::lldiv(max_bytes, BlockSize).quot;
 }
 
 int tr_cacheSetLimit(tr_cache* cache, int64_t max_bytes)
@@ -320,16 +320,14 @@ int tr_cacheWriteBlock(
         cb->tor = torrent;
         cb->loc = loc;
         cb->length = length;
-        cb->evbuf = evbuffer_new();
         tr_ptrArrayInsertSorted(&cache->blocks, cb, cache_block_compare);
     }
 
     TR_ASSERT(cb->length == length);
 
     cb->time = tr_time();
+    evbuffer_remove(writeme, std::data(cb->data), cb->length);
 
-    evbuffer_drain(cb->evbuf, evbuffer_get_length(cb->evbuf));
-    evbuffer_remove_buffer(writeme, cb->evbuf, cb->length);
 
     cache->cache_writes++;
     cache->cache_write_bytes += cb->length;
@@ -343,7 +341,7 @@ int tr_cacheReadBlock(tr_cache* cache, tr_torrent* torrent, tr_block_info::Locat
 
     if (auto* const cb = findBlock(cache, torrent, loc); cb != nullptr)
     {
-        evbuffer_copyout(cb->evbuf, setme, len);
+        std::copy_n(std::data(cb->data), len, setme);
     }
     else
     {
