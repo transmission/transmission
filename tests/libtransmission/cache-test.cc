@@ -57,10 +57,11 @@ public:
 
         for (auto block = span.begin; block < span.end; ++block)
         {
-            auto const key = makeKey(tor_id, block);
-            auto& entry = blocks_[key];
-            std::copy_n(block_data, blockSize(block), std::data(entry));
+            auto const n = blockSize(block);
+            std::copy_n(block_data, n, std::back_inserter(blocks_[makeKey(tor_id, block)]));
+            block_data += n;
         }
+
         return true;
     }
 
@@ -74,7 +75,7 @@ public:
             auto const iter = blocks_.find(key);
             if (iter != std::end(blocks_))
             {
-                std::copy_n(std::data(iter->second), blockSize(block), setme);
+                std::copy_n(std::data(iter->second), std::size(iter->second), setme);
                 return true;
             }
         }
@@ -89,7 +90,7 @@ public:
 
     using Operation = std::pair<tr_torrent_id_t, tr_block_span_t>;
 
-    std::map<key_t, std::array<uint8_t, tr_torrent_io::BlockSize>> blocks_;
+    std::map<key_t, std::vector<uint8_t>> blocks_;
     std::vector<Operation> gets_;
     std::vector<Operation> puts_;
     std::vector<Operation> prefetches_;
@@ -109,11 +110,9 @@ TEST_F(CacheTest, constructorMaxBytes)
     auto const block_info = tr_block_info{ TotalSize, PieceSize };
     auto mio = MockTorrentIo{ block_info };
 
-    auto* cache = tr_writeCacheNew(mio, MaxBytes);
+    auto cache = std::shared_ptr<tr_write_cache>(tr_writeCacheNew(mio, MaxBytes));
 
     EXPECT_EQ(MaxBytes, cache->maxBytes());
-
-    delete cache;
 }
 
 TEST_F(CacheTest, putBlockDoesCache)
@@ -121,7 +120,7 @@ TEST_F(CacheTest, putBlockDoesCache)
     auto const block_info = tr_block_info{ TotalSize, PieceSize };
     auto mio = MockTorrentIo{ block_info };
 
-    auto* cache = tr_writeCacheNew(mio, MaxBytes);
+    auto cache = std::shared_ptr<tr_write_cache>(tr_writeCacheNew(mio, MaxBytes));
 
     // put a block
     auto const tor_id = tr_torrent_id_t{ 1 };
@@ -140,8 +139,6 @@ TEST_F(CacheTest, putBlockDoesCache)
     EXPECT_TRUE(std::empty(mio.gets_));
     EXPECT_TRUE(std::empty(mio.puts_));
     EXPECT_TRUE(std::empty(mio.prefetches_));
-
-    delete cache;
 }
 
 TEST_F(CacheTest, destructorSavesOne)
@@ -154,7 +151,7 @@ TEST_F(CacheTest, destructorSavesOne)
     auto const block = tr_block_index_t{};
     auto const block_data = makeRandomBlock(block_info.blockSize(block));
 
-    auto* cache = tr_writeCacheNew(mio, MaxBytes);
+    auto cache = std::shared_ptr<tr_write_cache>(tr_writeCacheNew(mio, MaxBytes));
 
     // cache the block
     auto const span = tr_block_span_t{ block, block + 1 };
@@ -164,7 +161,7 @@ TEST_F(CacheTest, destructorSavesOne)
     EXPECT_TRUE(std::empty(mio.gets_));
     EXPECT_TRUE(std::empty(mio.prefetches_));
 
-    delete cache;
+    cache.reset();
 
     // confirm the block was saved during cache destruction
     auto expected_puts = std::vector<MockTorrentIo::Operation>{};
@@ -172,6 +169,44 @@ TEST_F(CacheTest, destructorSavesOne)
     EXPECT_EQ(expected_puts, mio.puts_);
     EXPECT_TRUE(std::empty(mio.gets_));
     EXPECT_TRUE(std::empty(mio.prefetches_));
+}
+
+TEST_F(CacheTest, blocksAreFoldedIntoSpan)
+{
+    auto const block_info = tr_block_info{ TotalSize, PieceSize };
+    auto mio = MockTorrentIo{ block_info };
+
+    // create block data
+    auto const tor_id = tr_torrent_id_t{ 1 };
+    auto const span = tr_block_span_t{ 0, 3 };
+    auto block_data = std::map<tr_block_index_t, std::vector<uint8_t>>{};
+    block_data.try_emplace(0U, makeRandomBlock(block_info.blockSize(0U)));
+    block_data.try_emplace(1U, makeRandomBlock(block_info.blockSize(1U)));
+    block_data.try_emplace(2U, makeRandomBlock(block_info.blockSize(2U)));
+
+    auto cache = std::shared_ptr<tr_write_cache>(tr_writeCacheNew(mio, MaxBytes));
+
+    // cache the span in a non-consecutive order
+    EXPECT_TRUE(cache->put(tor_id, { 1U, 1U + 1 }, std::data(block_data[1U])));
+    EXPECT_TRUE(cache->put(tor_id, { 0U, 0U + 1 }, std::data(block_data[0U])));
+    EXPECT_TRUE(cache->put(tor_id, { 2U, 2U + 1 }, std::data(block_data[2U])));
+
+    // cache should be holding it all, so mio_ should be untouched
+    EXPECT_TRUE(std::empty(mio.puts_));
+    EXPECT_TRUE(std::empty(mio.gets_));
+    EXPECT_TRUE(std::empty(mio.prefetches_));
+
+    cache.reset();
+
+    // confirm the span was put to mio in a single operation
+    auto expected_puts = std::vector<MockTorrentIo::Operation>{};
+    expected_puts.emplace_back(tor_id, span);
+    EXPECT_EQ(expected_puts, mio.puts_);
+    EXPECT_TRUE(std::empty(mio.gets_));
+    EXPECT_TRUE(std::empty(mio.prefetches_));
+    EXPECT_EQ(block_data[0U], mio.blocks_[mio.makeKey(tor_id, 0U)]);
+    EXPECT_EQ(block_data[1U], mio.blocks_[mio.makeKey(tor_id, 1U)]);
+    EXPECT_EQ(block_data[2U], mio.blocks_[mio.makeKey(tor_id, 2U)]);
 }
 
 TEST_F(CacheTest, destructorSavesSpan)
@@ -187,7 +222,7 @@ TEST_F(CacheTest, destructorSavesSpan)
     block_data.try_emplace(1U, makeRandomBlock(block_info.blockSize(1U)));
     block_data.try_emplace(2U, makeRandomBlock(block_info.blockSize(2U)));
 
-    auto* cache = tr_writeCacheNew(mio, MaxBytes);
+    auto cache = std::shared_ptr<tr_write_cache>(tr_writeCacheNew(mio, MaxBytes));
 
     // cache the span
     auto buf = std::vector<uint8_t>{};
@@ -201,7 +236,7 @@ TEST_F(CacheTest, destructorSavesSpan)
     EXPECT_TRUE(std::empty(mio.gets_));
     EXPECT_TRUE(std::empty(mio.prefetches_));
 
-    delete cache;
+    cache.reset();
 
     // confirm the span was saved during cache destruction
     auto expected_puts = std::vector<MockTorrentIo::Operation>{};
@@ -209,6 +244,9 @@ TEST_F(CacheTest, destructorSavesSpan)
     EXPECT_EQ(expected_puts, mio.puts_);
     EXPECT_TRUE(std::empty(mio.gets_));
     EXPECT_TRUE(std::empty(mio.prefetches_));
+    EXPECT_EQ(block_data[0U], mio.blocks_[mio.makeKey(tor_id, 0U)]);
+    EXPECT_EQ(block_data[1U], mio.blocks_[mio.makeKey(tor_id, 1U)]);
+    EXPECT_EQ(block_data[2U], mio.blocks_[mio.makeKey(tor_id, 2U)]);
 }
 
 TEST_F(CacheTest, uncachedGetAsksWrappedIo)
@@ -227,7 +265,7 @@ TEST_F(CacheTest, uncachedGetAsksWrappedIo)
     EXPECT_TRUE(ok);
     mio.puts_.clear();
 
-    auto* cache = tr_writeCacheNew(mio, MaxBytes);
+    auto cache = std::shared_ptr<tr_write_cache>(tr_writeCacheNew(mio, MaxBytes));
 
     // read that block from the cache
     auto cached_block_data = std::vector<uint8_t>(block_info.blockSize(block));
@@ -241,6 +279,4 @@ TEST_F(CacheTest, uncachedGetAsksWrappedIo)
     EXPECT_EQ(expected_gets, mio.gets_);
     EXPECT_TRUE(std::empty(mio.puts_));
     EXPECT_TRUE(std::empty(mio.prefetches_));
-
-    delete cache;
 }

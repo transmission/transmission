@@ -67,9 +67,11 @@ public:
         {
             std::cerr << __FILE__ << ':' << __LINE__ << " put tor_id " << tor_id << " block " << block << std::endl;
             auto& entry = blocks_[makeKey(tor_id, block)];
-            entry.length = io_.blockSize(block);
+            auto const n_bytes = io_.blockSize(block);
+            entry.length = n_bytes;
             entry.age_ = age_++;
-            std::copy_n(block_data, entry.length, std::data(entry.data));
+            std::copy_n(block_data, n_bytes, std::data(entry.data));
+            block_data += n_bytes;
         }
         trim();
         return true;
