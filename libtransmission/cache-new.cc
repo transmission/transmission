@@ -65,6 +65,7 @@ public:
     {
         for (auto block = span.begin; block < span.end; ++block)
         {
+            std::cerr << __FILE__ << ':' << __LINE__ << " put tor_id " << tor_id << " block " << block << std::endl;
             auto& entry = blocks_[makeKey(tor_id, block)];
             entry.length = io_.blockSize(block);
             entry.age_ = age_++;
@@ -167,23 +168,22 @@ public:
         }
     }
 
-    static auto findRunEnd(block_map_t::iterator iter, block_map_t::const_iterator end)
+    static auto findRunLast(block_map_t::iterator iter, block_map_t::const_iterator end)
     {
-        if (iter == end)
-        {
-            return iter;
-        }
+        TR_ASSERT(iter != end);
 
         for (;;)
         {
-            auto const [torrent_id, block] = iter->first;
+            auto const [tor_id, block] = iter->first;
+            std::cerr << __FILE__ << ':' << __LINE__ << " iter tor_id " << tor_id << " block " << block << std::endl;
             std::cerr << __FILE__ << ':' << __LINE__ << " step next" << std::endl;
+
             auto next = iter;
             ++next;
-            if (next == end || next->first != makeKey(torrent_id, block + 1))
+            if (next == end || next->first != makeKey(tor_id, block + 1))
             {
                 std::cerr << __FILE__ << ':' << __LINE__ << " next is end or not a match; returning" << std::endl;
-                return next;
+                return iter;
             }
             iter = next;
         }
@@ -191,6 +191,8 @@ public:
 
     bool trimNext()
     {
+        std::cerr << __FILE__ << ':' << __LINE__ << " blocks_.size() is " << std::size(blocks_) << std::endl;
+
         // find the oldest cached block
         auto iter = std::min_element(
             std::begin(blocks_),
@@ -200,20 +202,23 @@ public:
         {
             return false;
         }
+        std::cerr << __FILE__ << ':' << __LINE__ << " oldest is tor_id " << iter->first.first << " block " << iter->first.second << std::endl;
 
         // find the span that includes that oldest block
         auto const begin = findRunBegin(std::begin(blocks_), iter);
-        auto const end = findRunEnd(iter, std::end(blocks_));
+        std::cerr << __FILE__ << ':' << __LINE__ << " begin is tor_id " << begin->first.first << " block " << begin->first.second << std::endl;
+        auto const last = findRunLast(iter, std::end(blocks_));
 
         // build a block span for it
         auto const [torrent_id, first_block] = begin->first;
-        auto const last = end;
-        std::prev(last);
+        auto end = last;
+        ++end;
+        std::cerr << __FILE__ << ':' << __LINE__ << " last is tor_id " << last->first.first << " block " << last->first.second << std::endl;
         auto const span = tr_block_span_t{ begin->first.second, last->first.second + 1 };
+        std::cerr << __FILE__ << ':' << __LINE__ << " span is { " << span.begin << ", " << span.end << " }" << std::endl;
         auto const n_blocks = span.end - span.begin;
         TR_ASSERT(begin->first.first == last->first.first);
-        auto const distance = std::distance(begin, end);
-        TR_ASSERT(distance == span.end - span.begin);
+        TR_ASSERT(std::distance(begin, end) == span.end - span.begin);
 
         // save that span
         using buf_t = std::vector<uint8_t>;

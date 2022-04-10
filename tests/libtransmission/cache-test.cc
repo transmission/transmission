@@ -22,6 +22,79 @@ static bool operator==(tr_block_span_t lhs, tr_block_span_t rhs)
     return lhs.begin == rhs.begin && lhs.end == rhs.end;
 }
 
+static std::vector<uint8_t> makeRandomBlock(size_t block_size)
+{
+    auto buf = std::vector<uint8_t>(block_size);
+    tr_rand_buffer(std::data(buf), std::size(buf));
+    return buf;
+}
+
+class MockTorrentIo final: public tr_torrent_io
+{
+public:
+    tr_block_info const& block_info_;
+
+    explicit MockTorrentIo(tr_block_info const& block_info)
+        : block_info_{ block_info }
+    {
+    }
+
+    using key_t = std::pair<tr_torrent_id_t, tr_block_index_t>;
+
+    [[nodiscard]] static constexpr auto makeKey(tr_torrent_id_t tor_id, tr_block_index_t block_index)
+    {
+        return std::make_pair(tor_id, block_index);
+    }
+
+    [[nodiscard]] uint32_t blockSize(tr_block_index_t block) const noexcept final
+    {
+        return block_info_.blockSize(block);
+    }
+
+    bool put(tr_torrent_id_t tor_id, tr_block_span_t span, uint8_t const* block_data) final
+    {
+        puts_.emplace_back(tor_id, span);
+
+        for (auto block = span.begin; block < span.end; ++block)
+        {
+            auto const key = makeKey(tor_id, block);
+            auto& entry = blocks_[key];
+            std::copy_n(block_data, blockSize(block), std::data(entry));
+        }
+        return true;
+    }
+
+    bool get(tr_torrent_id_t tor_id, tr_block_span_t span, uint8_t* setme) final
+    {
+        gets_.emplace_back(tor_id, span);
+
+        for (auto block = span.begin; block < span.end; ++block)
+        {
+            auto const key = makeKey(tor_id, block);
+            auto const iter = blocks_.find(key);
+            if (iter != std::end(blocks_))
+            {
+                std::copy_n(std::data(iter->second), blockSize(block), setme);
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    void prefetch(tr_torrent_id_t tor_id, tr_block_span_t span) final
+    {
+        prefetches_.emplace_back(tor_id, span);
+    }
+
+    using Operation = std::pair<tr_torrent_id_t, tr_block_span_t>;
+
+    std::map<key_t, std::array<uint8_t, tr_torrent_io::BlockSize>> blocks_;
+    std::vector<Operation> gets_;
+    std::vector<Operation> puts_;
+    std::vector<Operation> prefetches_;
+};
+
 class CacheTest: public ::testing::Test
 {
 protected:
@@ -29,71 +102,6 @@ protected:
     static auto constexpr PieceSize = tr_block_info::BlockSize * 8;
     static auto constexpr MaxBytes = tr_block_info::BlockSize * 8;
 
-    class MockTorrentIo final: public tr_torrent_io
-    {
-    public:
-        tr_block_info const& block_info_;
-
-        explicit MockTorrentIo(tr_block_info const& block_info)
-            : block_info_{ block_info }
-        {
-        }
-
-        using key_t = std::pair<tr_torrent_id_t, tr_block_index_t>;
-
-        [[nodiscard]] static constexpr auto makeKey(tr_torrent_id_t tor_id, tr_block_index_t block_index)
-        {
-            return std::make_pair(tor_id, block_index);
-        }
-
-        [[nodiscard]] uint32_t blockSize(tr_block_index_t block) const noexcept final
-        {
-            return block_info_.blockSize(block);
-        }
-
-        bool put(tr_torrent_id_t tor_id, tr_block_span_t span, uint8_t const* block_data) final
-        {
-            puts_.emplace_back(tor_id, span);
-
-            for (auto block = span.begin; block < span.end; ++block)
-            {
-                auto const key = makeKey(tor_id, block);
-                auto& entry = blocks_[key];
-                std::copy_n(block_data, blockSize(block), std::data(entry));
-            }
-            return true;
-        }
-
-        bool get(tr_torrent_id_t tor_id, tr_block_span_t span, uint8_t* setme) final
-        {
-            gets_.emplace_back(tor_id, span);
-
-            for (auto block = span.begin; block < span.end; ++block)
-            {
-                auto const key = makeKey(tor_id, block);
-                auto const iter = blocks_.find(key);
-                if (iter != std::end(blocks_))
-                {
-                    std::copy_n(std::data(iter->second), blockSize(block), setme);
-                    return true;
-                }
-            }
-
-            return false;
-        }
-
-        void prefetch(tr_torrent_id_t tor_id, tr_block_span_t span) final
-        {
-            prefetches_.emplace_back(tor_id, span);
-        }
-
-        using Operation = std::pair<tr_torrent_id_t, tr_block_span_t>;
-
-        std::map<key_t, std::array<uint8_t, tr_torrent_io::BlockSize>> blocks_;
-        std::vector<Operation> gets_;
-        std::vector<Operation> puts_;
-        std::vector<Operation> prefetches_;
-    };
 };
 
 TEST_F(CacheTest, constructorMaxBytes)
@@ -118,8 +126,7 @@ TEST_F(CacheTest, putBlockDoesCache)
     // put a block
     auto const tor_id = tr_torrent_id_t{ 1 };
     auto const block_index = 0;
-    auto block_data = std::vector<uint8_t>(block_info.blockSize(block_index));
-    tr_rand_buffer(std::data(block_data), std::size(block_data));
+    auto const block_data = makeRandomBlock(block_info.blockSize(block_index));
     auto ok = cache->put(tor_id, { block_index, block_index + 1 }, std::data(block_data));
     EXPECT_TRUE(ok);
 
@@ -145,8 +152,7 @@ TEST_F(CacheTest, destructorSavesOne)
     // create block data
     auto const tor_id = tr_torrent_id_t{ 1 };
     auto const block = tr_block_index_t{};
-    auto block_data = std::vector<uint8_t>(block_info.blockSize(block));
-    tr_rand_buffer(std::data(block_data), std::size(block_data));
+    auto const block_data = makeRandomBlock(block_info.blockSize(block));
 
     auto* cache = tr_writeCacheNew(mio, MaxBytes);
 
@@ -168,6 +174,43 @@ TEST_F(CacheTest, destructorSavesOne)
     EXPECT_TRUE(std::empty(mio.prefetches_));
 }
 
+TEST_F(CacheTest, destructorSavesSpan)
+{
+    auto const block_info = tr_block_info{ TotalSize, PieceSize };
+    auto mio = MockTorrentIo{ block_info };
+
+    // create block data
+    auto const tor_id = tr_torrent_id_t{ 1 };
+    auto const span = tr_block_span_t{ 0, 3 };
+    auto block_data = std::map<tr_block_index_t, std::vector<uint8_t>>{};
+    block_data.try_emplace(0U, makeRandomBlock(block_info.blockSize(0U)));
+    block_data.try_emplace(1U, makeRandomBlock(block_info.blockSize(1U)));
+    block_data.try_emplace(2U, makeRandomBlock(block_info.blockSize(2U)));
+
+    auto* cache = tr_writeCacheNew(mio, MaxBytes);
+
+    // cache the span
+    auto buf = std::vector<uint8_t>{};
+    buf.insert(std::end(buf), std::begin(block_data[0U]), std::end(block_data[0U]));
+    buf.insert(std::end(buf), std::begin(block_data[1U]), std::end(block_data[1U]));
+    buf.insert(std::end(buf), std::begin(block_data[2U]), std::end(block_data[2U]));
+    EXPECT_TRUE(cache->put(tor_id, span, std::data(buf)));
+
+    // cache should be holding it all, so mio_ should be untouched
+    EXPECT_TRUE(std::empty(mio.puts_));
+    EXPECT_TRUE(std::empty(mio.gets_));
+    EXPECT_TRUE(std::empty(mio.prefetches_));
+
+    delete cache;
+
+    // confirm the span was saved during cache destruction
+    auto expected_puts = std::vector<MockTorrentIo::Operation>{};
+    expected_puts.emplace_back(tor_id, span);
+    EXPECT_EQ(expected_puts, mio.puts_);
+    EXPECT_TRUE(std::empty(mio.gets_));
+    EXPECT_TRUE(std::empty(mio.prefetches_));
+}
+
 TEST_F(CacheTest, uncachedGetAsksWrappedIo)
 {
     auto const block_info = tr_block_info{ TotalSize, PieceSize };
@@ -176,8 +219,7 @@ TEST_F(CacheTest, uncachedGetAsksWrappedIo)
     // create block data
     auto const tor_id = tr_torrent_id_t{ 1 };
     auto const block = tr_block_index_t{};
-    auto block_data = std::vector<uint8_t>(block_info.blockSize(block));
-    tr_rand_buffer(std::data(block_data), std::size(block_data));
+    auto const block_data = makeRandomBlock(block_info.blockSize(block));
 
     // save that block to the mio
     auto const span = tr_block_span_t{ block, block + 1 };
