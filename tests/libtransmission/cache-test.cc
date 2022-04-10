@@ -69,18 +69,22 @@ public:
     {
         gets_.emplace_back(tor_id, span);
 
+        std::cerr << __FILE__ << ':' << __LINE__ << " span { begin:" << span.begin << ", end:" << span.end << '}' << std::endl;
         for (auto block = span.begin; block < span.end; ++block)
         {
+            std::cerr << __FILE__ << ':' << __LINE__ << " looking for tor_id " << tor_id << " block " << block << std::endl;
             auto const key = makeKey(tor_id, block);
             auto const iter = blocks_.find(key);
-            if (iter != std::end(blocks_))
+            if (iter == std::end(blocks_))
             {
-                std::copy_n(std::data(iter->second), std::size(iter->second), setme);
-                return true;
+                std::cerr << __FILE__ << ':' << __LINE__ << " could not find; returning false" << std::endl;
+                return false;
             }
+
+            setme = std::copy_n(std::data(iter->second), std::size(iter->second), setme);
         }
 
-        return false;
+        return true;
     }
 
     void prefetch(tr_torrent_id_t tor_id, tr_block_span_t span) final
@@ -369,6 +373,110 @@ TEST_F(CacheTest, prefetchBiscectedSpan)
     EXPECT_TRUE(std::empty(mio.gets_));
 }
 
+TEST_F(CacheTest, getUncachedSpan)
+{
+    auto const block_info = tr_block_info{ TotalSize, PieceSize };
+    auto mio = MockTorrentIo{ block_info };
+
+    // create block data and populate mio
+    auto const tor_id = tr_torrent_id_t{ 1 };
+    auto const span = tr_block_span_t{ 0U, 3U };
+    auto blocks = std::map<tr_block_index_t, std::vector<uint8_t>>{};
+    for (tr_block_index_t block = span.begin; block != span.end; ++block)
+    {
+        blocks.try_emplace(block, std::vector<uint8_t>(block_info.blockSize(block), static_cast<char>('0' + block)));
+        mio.blocks_.try_emplace(MockTorrentIo::makeKey(tor_id, block), blocks[block]);
+    }
+
+    EXPECT_TRUE(std::empty(mio.puts_));
+    EXPECT_TRUE(std::empty(mio.gets_));
+    EXPECT_TRUE(std::empty(mio.prefetches_));
+
+    auto cache = std::shared_ptr<tr_write_cache>(tr_writeCacheNew(mio, MaxBytes));
+    auto buf = std::vector<uint8_t>(block_info.blockSize(0) * (span.end - span.begin));
+    cache->get(tor_id, span, std::data(buf));
+
+    auto expected_gets = std::vector<MockTorrentIo::Operation>{};
+    expected_gets.emplace_back(tor_id, span);
+    EXPECT_EQ(expected_gets, mio.gets_);
+    EXPECT_TRUE(std::empty(mio.puts_));
+    EXPECT_TRUE(std::empty(mio.prefetches_));
+
+    auto expected_buf = std::vector<uint8_t>{};
+    for (auto block = span.begin; block < span.end; ++block)
+    {
+        std::copy(std::begin(blocks[block]), std::end(blocks[block]), std::back_inserter(expected_buf));
+    }
+    EXPECT_EQ(expected_buf, buf);
+}
+
+#if 0
+TEST_F(CacheTest, getPartialCache)
+{
+    // This is similar to CacheTest.prefetchUncached
+    // but in this variation, `cache` has the first block
+    // so only the rest of the span should be passed to
+    // mio.prefetch()
+
+    auto const block_info = tr_block_info{ TotalSize, PieceSize };
+    auto mio = MockTorrentIo{ block_info };
+
+    auto blocks = std::map<tr_block_index_t, std::vector<uint8_t>>{};
+    blocks.try_emplace(0U, makeRandomBlock(block_info.blockSize(0U)));
+
+    // create block data
+    auto const tor_id = tr_torrent_id_t{ 1 };
+    auto const span = tr_block_span_t{ 0U, 3U };
+
+    EXPECT_TRUE(std::empty(mio.puts_));
+    EXPECT_TRUE(std::empty(mio.gets_));
+    EXPECT_TRUE(std::empty(mio.prefetches_));
+
+    auto cache = std::shared_ptr<tr_write_cache>(tr_writeCacheNew(mio, MaxBytes));
+    cache->put(tor_id, tr_block_span_t{ 0U, 1U }, std::data(blocks[0U]));
+    cache->prefetch(tor_id, span);
+
+    auto expected_prefetches = std::vector<MockTorrentIo::Operation>{};
+    expected_prefetches.emplace_back(tor_id, tr_block_span_t{ 1U, 3U });
+    EXPECT_EQ(expected_prefetches, mio.prefetches_);
+    EXPECT_TRUE(std::empty(mio.puts_));
+    EXPECT_TRUE(std::empty(mio.gets_));
+}
+
+TEST_F(CacheTest, getBiscectedSpan)
+{
+    // This is similar to CacheTest.prefetchUncached
+    // but in this variation, `cache` has the first block
+    // so only the rest of the span should be passed to
+    // mio.prefetch()
+
+    auto const block_info = tr_block_info{ TotalSize, PieceSize };
+    auto mio = MockTorrentIo{ block_info };
+
+    auto blocks = std::map<tr_block_index_t, std::vector<uint8_t>>{};
+    blocks.try_emplace(1U, makeRandomBlock(block_info.blockSize(1U)));
+
+    // create block data
+    auto const tor_id = tr_torrent_id_t{ 1 };
+    auto const span = tr_block_span_t{ 0U, 4U };
+
+    EXPECT_TRUE(std::empty(mio.puts_));
+    EXPECT_TRUE(std::empty(mio.gets_));
+    EXPECT_TRUE(std::empty(mio.prefetches_));
+
+    auto cache = std::shared_ptr<tr_write_cache>(tr_writeCacheNew(mio, MaxBytes));
+    cache->put(tor_id, tr_block_span_t{ 1U, 2U }, std::data(blocks[1U]));
+    cache->prefetch(tor_id, span);
+
+    auto expected_prefetches = std::vector<MockTorrentIo::Operation>{};
+    expected_prefetches.emplace_back(tor_id, tr_block_span_t{ 0U, 1U });
+    expected_prefetches.emplace_back(tor_id, tr_block_span_t{ 2U, 4U });
+    EXPECT_EQ(expected_prefetches, mio.prefetches_);
+    EXPECT_TRUE(std::empty(mio.puts_));
+    EXPECT_TRUE(std::empty(mio.gets_));
+}
+#endif
+
 TEST_F(CacheTest, honorsByteLimit)
 {
 }
@@ -386,5 +494,9 @@ TEST_F(CacheTest, saveSpan)
 }
 
 TEST_F(CacheTest, setMaxBytesToLowerValueReducesCacheSize)
+{
+}
+
+TEST_F(CacheTest, returnsFalseIfGetFails)
 {
 }

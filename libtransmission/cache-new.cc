@@ -79,17 +79,31 @@ public:
 
     bool get(tr_torrent_id_t tor_id, tr_block_span_t span, uint8_t* data_out) override
     {
-        for (auto block = span.begin; block < span.end; ++block)
+        for (auto begin = span.begin; begin < span.end; )
         {
-            auto const iter = blocks_.find(makeKey(tor_id, block));
+            auto const iter = blocks_.find(makeKey(tor_id, begin));
             if (iter != std::end(blocks_))
             {
                 data_out = std::copy_n(std::data(iter->second.data), iter->second.length, data_out);
+                ++begin;
             }
-            // FIXME: needs to request full spans instead of one-by-one
-            else if (!io_.get(tor_id, { block, block + 1 }, data_out))
+            else // request the uncached span from io_
             {
-                return false;
+                auto end = begin;
+                auto span_bytes = size_t{};
+                while (end != span.end && !has(tor_id, end))
+                {
+                    span_bytes += blockSize(end);
+                    ++end;
+                }
+                std::cerr << __FILE__ << ':' << __LINE__ << " about to call io_.get for { begin:" << begin << ", end:" << end << " }" << std::endl;
+                if (!io_.get(tor_id, { begin, end }, data_out))
+                {
+                    std::cerr << __FILE__ << ':' << __LINE__ << " io_.get " << begin << ", " << end << " returned false" << std::endl;
+                    return false;
+                }
+                data_out += span_bytes;
+                begin = end;
             }
         }
 
@@ -146,6 +160,18 @@ private:
     [[nodiscard]] bool has(tr_torrent_id_t tor_id, tr_block_index_t block) const
     {
         return blocks_.count(makeKey(tor_id, block)) != 0U;
+    }
+
+    [[nodiscard]] bool has(tr_torrent_id_t tor_id, tr_block_span_t span) const
+    {
+        for (auto block = span.begin; block < span.end; ++block)
+        {
+            if (!has(tor_id, block))
+            {
+                return false;
+            }
+        }
+        return true;
     }
 
     void trim()
