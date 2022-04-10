@@ -1437,6 +1437,7 @@ void tr_torrentStart(tr_torrent* tor)
 {
     if (tr_isTorrent(tor))
     {
+        tor->startAfterVerify = true;
         torrentStart(tor, {});
     }
 }
