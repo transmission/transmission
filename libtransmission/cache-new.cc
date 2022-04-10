@@ -98,13 +98,20 @@ public:
 
     void prefetch(tr_torrent_id_t tor_id, tr_block_span_t span) override
     {
-        for (auto block = span.begin; block < span.end; ++block)
+        for (auto begin = span.begin; begin < span.end; ++begin)
         {
-            // FIXME: nice-to-have in this requested in batches too
-            if (blocks_.count(makeKey(tor_id, block)) == 0)
+            auto end = begin;
+            while (end != span.end && !has(tor_id, end))
             {
-                io_.prefetch(tor_id, { block, block + 1 });
+                ++end;
             }
+
+            if (end != begin)
+            {
+                io_.prefetch(tor_id, { begin, end });
+            }
+
+            begin = end;
         }
     }
 
@@ -125,11 +132,6 @@ public:
         return max_bytes_;
     }
 
-    void saveCompletePieces() override
-    {
-        // FIXME
-    }
-
     void saveTorrent(tr_torrent_id_t /*tor_id*/) override
     {
         // FIXME
@@ -138,6 +140,12 @@ public:
     void saveSpan(tr_torrent_id_t /*tor_id*/, tr_block_span_t /*span*/) override
     {
         // FIXME
+    }
+
+private:
+    [[nodiscard]] bool has(tr_torrent_id_t tor_id, tr_block_index_t block) const
+    {
+        return blocks_.count(makeKey(tor_id, block)) != 0U;
     }
 
     void trim()
@@ -239,7 +247,6 @@ public:
         return did_save;
     }
 
-private:
     static uint64_t age_;
 
     block_map_t blocks_ = {};

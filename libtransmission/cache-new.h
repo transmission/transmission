@@ -40,7 +40,6 @@ public:
     virtual void setMaxBytes(size_t max_bytes) = 0;
     [[nodiscard]] virtual size_t maxBytes() const = 0;
 
-    virtual void saveCompletePieces() = 0;
     virtual void saveTorrent(tr_torrent_id_t tor_id) = 0;
     virtual void saveSpan(tr_torrent_id_t tor_id, tr_block_span_t blocks) = 0;
 };
