@@ -410,39 +410,51 @@ TEST_F(CacheTest, getUncachedSpan)
     EXPECT_EQ(expected_buf, buf);
 }
 
-#if 0
 TEST_F(CacheTest, getPartialCache)
 {
-    // This is similar to CacheTest.prefetchUncached
+    // This is similar to CacheTest.getUncached
     // but in this variation, `cache` has the first block
     // so only the rest of the span should be passed to
-    // mio.prefetch()
+    // mio.get()
 
     auto const block_info = tr_block_info{ TotalSize, PieceSize };
     auto mio = MockTorrentIo{ block_info };
 
-    auto blocks = std::map<tr_block_index_t, std::vector<uint8_t>>{};
-    blocks.try_emplace(0U, makeRandomBlock(block_info.blockSize(0U)));
-
-    // create block data
+    // create block data and populate mio
     auto const tor_id = tr_torrent_id_t{ 1 };
-    auto const span = tr_block_span_t{ 0U, 3U };
+    auto const span = tr_block_span_t{ 0U, 5U };
+    auto blocks = std::map<tr_block_index_t, std::vector<uint8_t>>{};
+    for (tr_block_index_t block = span.begin; block != span.end; ++block)
+    {
+        blocks.try_emplace(block, std::vector<uint8_t>(block_info.blockSize(block), static_cast<char>('0' + block)));
+        mio.blocks_.try_emplace(MockTorrentIo::makeKey(tor_id, block), blocks[block]);
+    }
 
     EXPECT_TRUE(std::empty(mio.puts_));
     EXPECT_TRUE(std::empty(mio.gets_));
     EXPECT_TRUE(std::empty(mio.prefetches_));
 
     auto cache = std::shared_ptr<tr_write_cache>(tr_writeCacheNew(mio, MaxBytes));
-    cache->put(tor_id, tr_block_span_t{ 0U, 1U }, std::data(blocks[0U]));
-    cache->prefetch(tor_id, span);
+    auto buf = std::vector<uint8_t>(block_info.blockSize(0) * (span.end - span.begin));
+    EXPECT_TRUE(cache->put(tor_id, { 2U, 3U }, std::data(blocks[2U])));
+    cache->get(tor_id, span, std::data(buf));
 
-    auto expected_prefetches = std::vector<MockTorrentIo::Operation>{};
-    expected_prefetches.emplace_back(tor_id, tr_block_span_t{ 1U, 3U });
-    EXPECT_EQ(expected_prefetches, mio.prefetches_);
+    auto expected_gets = std::vector<MockTorrentIo::Operation>{};
+    expected_gets.emplace_back(tor_id, tr_block_span_t{ 0U, 2U });
+    expected_gets.emplace_back(tor_id, tr_block_span_t{ 3U, 5U });
+    EXPECT_EQ(expected_gets, mio.gets_);
     EXPECT_TRUE(std::empty(mio.puts_));
-    EXPECT_TRUE(std::empty(mio.gets_));
+    EXPECT_TRUE(std::empty(mio.prefetches_));
+
+    auto expected_buf = std::vector<uint8_t>{};
+    for (auto block = span.begin; block < span.end; ++block)
+    {
+        std::copy(std::begin(blocks[block]), std::end(blocks[block]), std::back_inserter(expected_buf));
+    }
+    EXPECT_EQ(expected_buf, buf);
 }
 
+#if 0
 TEST_F(CacheTest, getBiscectedSpan)
 {
     // This is similar to CacheTest.prefetchUncached

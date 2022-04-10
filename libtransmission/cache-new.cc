@@ -89,6 +89,7 @@ public:
             }
             else // request the uncached span from io_
             {
+                // build a subspan of uncached blocks
                 auto end = begin;
                 auto span_bytes = size_t{};
                 while (end != span.end && !has(tor_id, end))
@@ -96,6 +97,8 @@ public:
                     span_bytes += blockSize(end);
                     ++end;
                 }
+
+                // get that subspan fro mio_
                 std::cerr << __FILE__ << ':' << __LINE__ << " about to call io_.get for { begin:" << begin << ", end:" << end << " }" << std::endl;
                 if (!io_.get(tor_id, { begin, end }, data_out))
                 {
