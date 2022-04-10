@@ -53,7 +53,7 @@ protected:
 
         bool put(tr_torrent_id_t tor_id, tr_block_span_t span, uint8_t const* block_data) final
         {
-            writes_.emplace_back(tor_id, span);
+            puts_.emplace_back(tor_id, span);
 
             for (auto block = span.begin; block < span.end; ++block)
             {
@@ -66,7 +66,7 @@ protected:
 
         bool get(tr_torrent_id_t tor_id, tr_block_span_t span, uint8_t* setme) final
         {
-            reads_.emplace_back(tor_id, span);
+            gets_.emplace_back(tor_id, span);
 
             for (auto block = span.begin; block < span.end; ++block)
             {
@@ -90,8 +90,8 @@ protected:
         using Operation = std::pair<tr_torrent_id_t, tr_block_span_t>;
 
         std::map<key_t, std::array<uint8_t, tr_torrent_io::BlockSize>> blocks_;
-        std::vector<Operation> reads_;
-        std::vector<Operation> writes_;
+        std::vector<Operation> gets_;
+        std::vector<Operation> puts_;
         std::vector<Operation> prefetches_;
     };
 };
@@ -130,11 +130,42 @@ TEST_F(CacheTest, putBlockDoesCache)
     EXPECT_EQ(block_data, cached_block_data);
 
     // confirm that cache didn't touch mio since the block was cached
-    EXPECT_TRUE(std::empty(mio.reads_));
-    EXPECT_TRUE(std::empty(mio.writes_));
+    EXPECT_TRUE(std::empty(mio.gets_));
+    EXPECT_TRUE(std::empty(mio.puts_));
     EXPECT_TRUE(std::empty(mio.prefetches_));
 
     delete cache;
+}
+
+TEST_F(CacheTest, destructorSavesOne)
+{
+    auto const block_info = tr_block_info{ TotalSize, PieceSize };
+    auto mio = MockTorrentIo{ block_info };
+
+    // create block data
+    auto const tor_id = tr_torrent_id_t{ 1 };
+    auto const block = tr_block_index_t{};
+    auto block_data = std::vector<uint8_t>(block_info.blockSize(block));
+    tr_rand_buffer(std::data(block_data), std::size(block_data));
+
+    auto* cache = tr_writeCacheNew(mio, MaxBytes);
+
+    // cache the block
+    auto const span = tr_block_span_t{ block, block + 1 };
+    EXPECT_TRUE(cache->put(tor_id, span, std::data(block_data)));
+
+    EXPECT_TRUE(std::empty(mio.puts_));
+    EXPECT_TRUE(std::empty(mio.gets_));
+    EXPECT_TRUE(std::empty(mio.prefetches_));
+
+    delete cache;
+
+    // confirm the block was saved during cache destruction
+    auto expected_puts = std::vector<MockTorrentIo::Operation>{};
+    expected_puts.emplace_back(tor_id, span);
+    EXPECT_EQ(expected_puts, mio.puts_);
+    EXPECT_TRUE(std::empty(mio.gets_));
+    EXPECT_TRUE(std::empty(mio.prefetches_));
 }
 
 TEST_F(CacheTest, uncachedGetAsksWrappedIo)
@@ -152,7 +183,7 @@ TEST_F(CacheTest, uncachedGetAsksWrappedIo)
     auto const span = tr_block_span_t{ block, block + 1 };
     auto ok = mio.put(tor_id, span, std::data(block_data));
     EXPECT_TRUE(ok);
-    mio.writes_.clear();
+    mio.puts_.clear();
 
     auto* cache = tr_writeCacheNew(mio, MaxBytes);
 
@@ -163,13 +194,11 @@ TEST_F(CacheTest, uncachedGetAsksWrappedIo)
     EXPECT_EQ(block_data, cached_block_data);
 
     // confirm that cache got it from mio
-    auto expected_reads = std::vector<MockTorrentIo::Operation>{};
-    expected_reads.emplace_back(tor_id, span);
-    EXPECT_EQ(expected_reads, mio.reads_);
-    EXPECT_TRUE(std::empty(mio.writes_));
+    auto expected_gets = std::vector<MockTorrentIo::Operation>{};
+    expected_gets.emplace_back(tor_id, span);
+    EXPECT_EQ(expected_gets, mio.gets_);
+    EXPECT_TRUE(std::empty(mio.puts_));
     EXPECT_TRUE(std::empty(mio.prefetches_));
 
     delete cache;
 }
-
-// TEST_F(CacheTest, destructorDoesSave)
