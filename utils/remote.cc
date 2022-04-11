@@ -218,7 +218,7 @@ enum
 ****
 ***/
 
-static auto constexpr Options = std::array<tr_option, 92>{
+static auto constexpr Options = std::array<tr_option, 94>{
     { { 'a', "add", "Add torrent files by filename or URL", "a", false, nullptr },
       { 970, "alt-speed", "Use the alternate Limits", "as", false, nullptr },
       { 971, "no-alt-speed", "Don't use the alternate Limits", "AS", false, nullptr },
@@ -262,6 +262,8 @@ static auto constexpr Options = std::array<tr_option, 92>{
       { 'L', "labels", "Set the current torrents' labels", "L", true, "<label[,label...]>" },
       { 960, "move", "Move current torrent's data to a new folder", nullptr, true, "<path>" },
       { 961, "find", "Tell Transmission where to find a torrent's data", nullptr, true, "<path>" },
+      { 964, "rename", "Rename torrents root folder or a file", nullptr, true, "<name>" },
+      { 965, "path", "Provide path for rename functions", nullptr, true, "<path>" },
       { 'm', "portmap", "Enable portmapping via NAT-PMP or UPnP", "m", false, nullptr },
       { 'M', "no-portmap", "Disable portmapping", "M", false, nullptr },
       { 'n', "auth", "Set username and password", "n", true, "<user:pw>" },
@@ -515,6 +517,12 @@ static int getOptMode(int val)
 
     case 960: /* move */
         return MODE_TORRENT_SET_LOCATION;
+
+    case 964: /* rename */
+        return MODE_TORRENT_SET_LOCATION | MODE_TORRENT_SET;
+
+    case 965: /* path */
+        return MODE_TORRENT_SET_LOCATION | MODE_TORRENT_SET;
 
     case 732: /* List groups */
         return MODE_GROUP_GET;
@@ -2252,6 +2260,8 @@ static tr_variant* ensure_tset(tr_variant** tset)
     return args;
 }
 
+static char rename_from[4096];
+
 static int processArgs(char const* rpcurl, int argc, char const* const* argv)
 {
     int c;
@@ -2978,6 +2988,25 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
                     tr_variantDictAddBool(args, TR_KEY_move, true);
                     addIdArg(args, id, nullptr);
                     status |= flush(rpcurl, &top);
+                    break;
+                }
+
+            case 964:
+                {
+                    auto* top = tr_new0(tr_variant, 1);
+                    tr_variantInitDict(top, 2);
+                    tr_variantDictAddStr(top, TR_KEY_method, "rename");
+                    auto* args = tr_variantDictAddDict(top, Arguments, 3);
+                    tr_variantDictAddStr(args, TR_KEY_path, rename_from);
+                    tr_variantDictAddStr(args, TR_KEY_name, optarg);
+                    addIdArg(args, id, NULL);
+                    status |= flush(rpcurl, &top);
+                    break;
+                }
+
+            case 965:
+                {
+                    strlcpy(rename_from, optarg, sizeof(rename_from));
                     break;
                 }
 
