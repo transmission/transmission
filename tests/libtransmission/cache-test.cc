@@ -65,8 +65,8 @@ static auto makeBasicTestData(
     tr_torrent_id_t tor_id = 1,
     uint64_t total_size = tr_block_info::BlockSize * 8U + 1U,
     uint64_t piece_size = tr_block_info::BlockSize * 4U,
-    size_t max_blocks = size_t{ 7 }
-) {
+    size_t max_blocks = size_t{ 7 })
+{
     auto ret = BasicTestData{};
     ret.tor_id = tor_id;
     ret.block_info = tr_block_info{ total_size, piece_size };
@@ -455,7 +455,7 @@ TEST_F(CacheTest, honorsBlockLimitWhenExceeded)
 
     // create a cache and fill it up to capacity
     auto cache = std::shared_ptr<tr_write_cache>(tr_writeCacheNew(mio, MaxBlocks));
-    for (auto block = tr_block_index_t{0U}; block < NumBlocks; ++block)
+    for (auto block = tr_block_index_t{ 0U }; block < NumBlocks; ++block)
     {
         EXPECT_TRUE(cache->put(tor_id, block, std::data(contents.at(block))));
     }
