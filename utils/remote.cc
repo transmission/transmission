@@ -3006,7 +3006,7 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
 
             case 965:
                 {
-                    strlcpy(rename_from, optarg, sizeof(rename_from));
+                    tr_strlcpy(rename_from, optarg, sizeof(rename_from));
                     break;
                 }
 
