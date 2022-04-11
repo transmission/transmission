@@ -52,12 +52,11 @@ class tr_write_cache : public tr_torrent_io
 public:
     ~tr_write_cache() = default;
 
-    virtual void setMaxBytes(size_t max_bytes) = 0;
-    [[nodiscard]] virtual size_t maxBytes() const noexcept = 0;
+    virtual void setMaxBlocks(size_t max_blocks) = 0;
     [[nodiscard]] virtual size_t maxBlocks() const noexcept = 0;
 
     virtual void saveTorrent(tr_torrent_id_t tor_id) = 0;
     virtual void saveSpan(tr_torrent_id_t tor_id, tr_block_span_t blocks) = 0;
 };
 
-tr_write_cache* tr_writeCacheNew(tr_torrent_io& io, size_t max_bytes);
+tr_write_cache* tr_writeCacheNew(tr_torrent_io& io, size_t max_blocks);

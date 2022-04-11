@@ -60,20 +60,20 @@ struct BasicTestData
     tr_torrent_id_t tor_id;
     tr_block_info block_info;
     BlockMap blocks;
-    size_t max_bytes;
+    size_t max_blocks;
 };
 
 static auto makeBasicTestData(
     tr_torrent_id_t tor_id = 1,
     uint64_t total_size = tr_block_info::BlockSize * 8 + 1,
     uint64_t piece_size = tr_block_info::BlockSize * 4,
-    size_t max_bytes = tr_block_info::BlockSize * 6 + tr_block_info::BlockSize / 2U)
-{
+    size_t max_blocks = 7
+) {
     auto ret = BasicTestData{};
     ret.tor_id = tor_id;
     ret.block_info = tr_block_info{ total_size, piece_size };
     ret.blocks = makeBlocksFromSpan(ret.block_info, { 0U, ret.block_info.blockCount() });
-    ret.max_bytes = max_bytes;
+    ret.max_blocks = max_blocks;
     return ret;
 }
 
@@ -158,26 +158,26 @@ public:
     Operations_t prefetches_;
 };
 
-TEST_F(CacheTest, constructorMaxBytes)
+TEST_F(CacheTest, constructorMaxBlocks)
 {
-    auto const [tor_id, block_info, contents, max_bytes] = makeBasicTestData();
+    auto const [tor_id, block_info, contents, max_blocks] = makeBasicTestData();
     auto mio = MockTorrentIo{ block_info };
 
-    auto cache = std::shared_ptr<tr_write_cache>(tr_writeCacheNew(mio, max_bytes));
+    auto cache = std::shared_ptr<tr_write_cache>(tr_writeCacheNew(mio, max_blocks));
 
-    EXPECT_EQ(max_bytes, cache->maxBytes());
+    EXPECT_EQ(max_blocks, cache->maxBlocks());
 }
 
 TEST_F(CacheTest, putBlockDoesCache)
 {
     auto constexpr Block = tr_block_index_t{ 0U };
-    auto const [tor_id, block_info, contents, max_bytes] = makeBasicTestData();
+    auto const [tor_id, block_info, contents, max_blocks] = makeBasicTestData();
 
     // make an unpopulated io mock
     auto mio = MockTorrentIo{ block_info };
 
     // make an unpopulated cache
-    auto cache = std::shared_ptr<tr_write_cache>(tr_writeCacheNew(mio, max_bytes));
+    auto cache = std::shared_ptr<tr_write_cache>(tr_writeCacheNew(mio, max_blocks));
 
     // cache a block
     EXPECT_TRUE(cache->put(tor_id, Block, std::data(contents.at(Block))));
@@ -198,13 +198,13 @@ TEST_F(CacheTest, putBlockDoesCache)
 TEST_F(CacheTest, destructorSavesOne)
 {
     auto constexpr Block = tr_block_index_t{ 0U };
-    auto const [tor_id, block_info, contents, max_bytes] = makeBasicTestData();
+    auto const [tor_id, block_info, contents, max_blocks] = makeBasicTestData();
 
     // make an unpopulated io mock
     auto mio = MockTorrentIo{ block_info };
 
     // make an unpopulated cache
-    auto cache = std::shared_ptr<tr_write_cache>(tr_writeCacheNew(mio, max_bytes));
+    auto cache = std::shared_ptr<tr_write_cache>(tr_writeCacheNew(mio, max_blocks));
 
     // cache the block
     EXPECT_TRUE(cache->put(tor_id, Block, std::data(contents.at(Block))));
@@ -227,13 +227,13 @@ TEST_F(CacheTest, destructorSavesOne)
 TEST_F(CacheTest, blocksAreFoldedIntoSpan)
 {
     auto constexpr const Span = tr_block_span_t{ 0U, 5U };
-    auto const [tor_id, block_info, contents, max_bytes] = makeBasicTestData();
+    auto const [tor_id, block_info, contents, max_blocks] = makeBasicTestData();
 
     // make an unpopulated io mock
     auto mio = MockTorrentIo{ block_info };
 
     // make an unpopulated cache
-    auto cache = std::shared_ptr<tr_write_cache>(tr_writeCacheNew(mio, max_bytes));
+    auto cache = std::shared_ptr<tr_write_cache>(tr_writeCacheNew(mio, max_blocks));
 
     // cache the span in a non-consecutive order
     EXPECT_TRUE(cache->put(tor_id, 1U, std::data(contents.at(1U))));
@@ -264,13 +264,13 @@ TEST_F(CacheTest, blocksAreFoldedIntoSpan)
 TEST_F(CacheTest, prefetchUncached)
 {
     auto constexpr Span = tr_block_span_t{ 0U, 5U };
-    auto const [tor_id, block_info, contents, max_bytes] = makeBasicTestData();
+    auto const [tor_id, block_info, contents, max_blocks] = makeBasicTestData();
 
     // make an unpopulated io mock
     auto mio = MockTorrentIo{ block_info };
 
     // make an unpopulated cache
-    auto cache = std::shared_ptr<tr_write_cache>(tr_writeCacheNew(mio, max_bytes));
+    auto cache = std::shared_ptr<tr_write_cache>(tr_writeCacheNew(mio, max_blocks));
 
     cache->prefetch(tor_id, Span);
 
@@ -291,13 +291,13 @@ TEST_F(CacheTest, prefetchBisectedSpan)
 
     auto constexpr Span = tr_block_span_t{ 0U, 5U };
     auto constexpr MidpointBlock = tr_block_index_t{ 2U };
-    auto const [tor_id, block_info, contents, max_bytes] = makeBasicTestData();
+    auto const [tor_id, block_info, contents, max_blocks] = makeBasicTestData();
 
     // make an unpopulated io mock
     auto mio = MockTorrentIo{ block_info };
 
     // make a cache, populated with a single block
-    auto cache = std::shared_ptr<tr_write_cache>(tr_writeCacheNew(mio, max_bytes));
+    auto cache = std::shared_ptr<tr_write_cache>(tr_writeCacheNew(mio, max_blocks));
     EXPECT_TRUE(cache->put(tor_id, MidpointBlock, std::data(contents.at(MidpointBlock))));
 
     // call prefetch
@@ -318,14 +318,14 @@ TEST_F(CacheTest, prefetchBisectedSpan)
 TEST_F(CacheTest, getUncached)
 {
     auto constexpr Span = tr_block_span_t{ 0U, 5U };
-    auto const [tor_id, block_info, contents, max_bytes] = makeBasicTestData();
+    auto const [tor_id, block_info, contents, max_blocks] = makeBasicTestData();
 
     // create and populate the io mock
     auto mio = MockTorrentIo{ block_info };
     mio.populate(tor_id, contents);
 
     // create the (unpopulated) cache
-    auto cache = std::shared_ptr<tr_write_cache>(tr_writeCacheNew(mio, max_bytes));
+    auto cache = std::shared_ptr<tr_write_cache>(tr_writeCacheNew(mio, max_blocks));
 
     // get the full span
     auto buf = std::vector<uint8_t>(block_info.blockSize(0) * (Span.end - Span.begin));
@@ -346,14 +346,14 @@ TEST_F(CacheTest, getPartialCache)
 {
     auto constexpr Span = tr_block_span_t{ 0U, 5U };
     auto constexpr MidpointBlock = Span.begin + (Span.end - Span.begin) / 2U;
-    auto const [tor_id, block_info, contents, max_bytes] = makeBasicTestData();
+    auto const [tor_id, block_info, contents, max_blocks] = makeBasicTestData();
 
     // create and populate the io mock
     auto mio = MockTorrentIo{ block_info };
     mio.populate(tor_id, contents);
 
     // create the cache, populated with some of the blocks
-    auto cache = std::shared_ptr<tr_write_cache>(tr_writeCacheNew(mio, max_bytes));
+    auto cache = std::shared_ptr<tr_write_cache>(tr_writeCacheNew(mio, max_blocks));
     auto const cached_span = tr_block_span_t{ Span.begin, MidpointBlock };
     EXPECT_TRUE(cache->put(tor_id, cached_span, std::data(getContentsOfSpan(contents, cached_span))));
 
@@ -377,14 +377,14 @@ TEST_F(CacheTest, getBisectedCache)
 {
     auto constexpr Span = tr_block_span_t{ 0U, 5U };
     auto constexpr MidpointBlock = Span.begin + (Span.end - Span.begin) / 2U;
-    auto const [tor_id, block_info, contents, max_bytes] = makeBasicTestData();
+    auto const [tor_id, block_info, contents, max_blocks] = makeBasicTestData();
 
     // create and populate the io mock
     auto mio = MockTorrentIo{ block_info };
     mio.populate(tor_id, contents);
 
     // create the cache, populated with one block in the middle
-    auto cache = std::shared_ptr<tr_write_cache>(tr_writeCacheNew(mio, max_bytes));
+    auto cache = std::shared_ptr<tr_write_cache>(tr_writeCacheNew(mio, max_blocks));
     auto const cached_span = singleBlockSpan(MidpointBlock);
     EXPECT_TRUE(cache->put(tor_id, cached_span, std::data(getContentsOfSpan(contents, cached_span))));
 
@@ -407,7 +407,7 @@ TEST_F(CacheTest, getBisectedCache)
 
 TEST_F(CacheTest, honorsByteLimitWhenExceeded)
 {
-    auto const [tor_id, block_info, contents, max_bytes] = makeBasicTestData();
+    auto const [tor_id, block_info, contents, max_blocks] = makeBasicTestData();
     auto const span = tr_block_span_t{ 0U, block_info.blockCount() };
 
     // create the unpopulated io mock
@@ -416,7 +416,7 @@ TEST_F(CacheTest, honorsByteLimitWhenExceeded)
     EXPECT_TRUE(std::empty(mio.blocks_));
 
     // Create and populate the cache with all the blocks
-    auto cache = std::shared_ptr<tr_write_cache>(tr_writeCacheNew(mio, max_bytes));
+    auto cache = std::shared_ptr<tr_write_cache>(tr_writeCacheNew(mio, max_blocks));
     for (auto block = span.begin; block < span.end; ++block)
     {
         EXPECT_TRUE(cache->put(tor_id, block, std::data(contents.at(block))));
@@ -439,11 +439,12 @@ TEST_F(CacheTest, honorsByteLimitWhenExceeded)
 TEST_F(CacheTest, flushesOldestFirst)
 {
     // create the test's block info and data
-    auto constexpr NumBlocks = 9U;
-    auto constexpr LastBlockSize = 1U;
+    auto constexpr NumBlocks = tr_block_index_t{ 9U };
+    auto constexpr LastBlockSize = uint32_t{ 1U };
+    auto constexpr MaxBlocks = size_t{ 2 };
     auto constexpr TotalSize = tr_block_info::BlockSize * (NumBlocks - 1U) + LastBlockSize;
-    auto constexpr PieceSize = tr_block_info::BlockSize * 4;
-    auto const [tor_id, block_info, contents, max_bytes] = makeBasicTestData(1, TotalSize, PieceSize);
+    auto constexpr PieceSize = tr_block_info::BlockSize * 4U;
+    auto const [tor_id, block_info, contents, max_blocks] = makeBasicTestData(1, TotalSize, PieceSize);
     EXPECT_EQ(NumBlocks, block_info.blockCount());
     EXPECT_EQ(LastBlockSize, block_info.blockSize(NumBlocks - 1));
 
@@ -451,10 +452,7 @@ TEST_F(CacheTest, flushesOldestFirst)
     auto mio = MockTorrentIo{ block_info };
 
     // create and populate it with all the blocks
-    auto constexpr BlockCapacity = size_t{ 2 };
-    auto constexpr MaxBytes = tr_block_info::BlockSize * BlockCapacity + LastBlockSize;
-    auto cache = std::shared_ptr<tr_write_cache>(tr_writeCacheNew(mio, MaxBytes));
-    EXPECT_EQ(BlockCapacity, cache->maxBlocks());
+    auto cache = std::shared_ptr<tr_write_cache>(tr_writeCacheNew(mio, MaxBlocks));
     for (auto block = tr_block_index_t{0U}; block < NumBlocks; ++block)
     {
         EXPECT_TRUE(cache->put(tor_id, block, std::data(contents.at(block))));
@@ -466,7 +464,8 @@ TEST_F(CacheTest, flushesOldestFirst)
     // empty cache. Next, [4..6) will be flushed for the same reasons.
     auto const expected_puts = MockTorrentIo::Operations_t{
         { tor_id, { 0U, 3U } },
-        { tor_id, { 4U, 6U } },
+        { tor_id, { 3U, 6U } },
+        { tor_id, { 6U, 9U } },
     };
     EXPECT_EQ(expected_puts, mio.puts_);
     EXPECT_TRUE(std::empty(mio.gets_));

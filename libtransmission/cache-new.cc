@@ -51,15 +51,15 @@ using block_map_t = std::map<cache_key_t, cache_block>;
 class tr_write_cache_impl final : public tr_write_cache
 {
 public:
-    tr_write_cache_impl(tr_torrent_io& torrent_io, size_t max_bytes)
+    tr_write_cache_impl(tr_torrent_io& torrent_io, size_t max_blocks)
         : io_{ torrent_io }
     {
-        setMaxBytes(max_bytes);
+        setMaxBlocks(max_blocks);
     }
 
     ~tr_write_cache_impl() final
     {
-        setMaxBytes(0);
+        setMaxBlocks(0);
     }
 
     bool put(tr_torrent_id_t tor_id, tr_block_span_t span, uint8_t const* block_data) override
@@ -136,21 +136,15 @@ public:
         }
     }
 
-    void setMaxBytes(size_t max_bytes) override
+    void setMaxBlocks(size_t max_blocks) override
     {
-        max_bytes_ = max_bytes;
-        max_blocks_ = max_bytes > 0U ? max_bytes_ / BlockSize : 0U;
+        max_blocks_ = max_blocks;
         trim();
     }
 
     [[nodiscard]] uint32_t blockSize(tr_block_index_t block) const override
     {
         return io_.blockSize(block);
-    }
-
-    [[nodiscard]] size_t maxBytes() const noexcept override
-    {
-        return max_bytes_;
     }
 
     [[nodiscard]] size_t maxBlocks() const noexcept override
@@ -301,7 +295,6 @@ private:
     tr_torrent_io& io_;
 
     size_t max_blocks_ = {};
-    size_t max_bytes_ = {};
 
     // size_t disk_writes = {};
     // size_t disk_write_bytes = {};
@@ -315,7 +308,7 @@ uint64_t tr_write_cache_impl::age_ = {};
 *****
 ****/
 
-tr_write_cache* tr_writeCacheNew(tr_torrent_io& torrent_io, size_t max_bytes)
+tr_write_cache* tr_writeCacheNew(tr_torrent_io& torrent_io, size_t max_blocks)
 {
-    return new tr_write_cache_impl(torrent_io, max_bytes);
+    return new tr_write_cache_impl(torrent_io, max_blocks);
 }
