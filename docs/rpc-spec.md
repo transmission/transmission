@@ -1,28 +1,23 @@
-# Transmission RPC Specification
-
+# Transmission's RPC specification
 This document describes a protocol for interacting with Transmission sessions remotely.
 
 ### 1.1 Terminology
-
 The [JSON](https://www.json.org/) terminology in [RFC 4627](https://datatracker.ietf.org/doc/html/rfc4627) is used.
 RPC requests and responses are formatted in JSON.
 
 ### 1.2 Tools
-
 If `transmission-remote` is called with a `--debug` argument, its RPC traffic to the Transmission server will be dumped to the terminal. This can be useful when you want to compare requests in your application to another for reference.
 
 If `transmission-qt` is run with an environment variable `TR_RPC_VERBOSE` set, it too will dump the RPC requests and responses to the terminal for inspection.
 
 Lastly, using devtools in the Transmission web client is always an option.
 
-## 2. Message Format
-
+## 2 Message format
 Messages are formatted as objects. There are two types: requests (described in 2.1) and responses (described in 2.2).
 
 All text **must** be UTF-8 encoded.
 
-### 2.1. Requests
-
+### 2.1 Requests
 Requests support three keys:
 
 1. A required `method` string telling the name of the method to invoke
@@ -42,8 +37,7 @@ Requests support three keys:
 ```
 
 
-### 2.2. Responses
-
+### 2.2 Responses
 Responses to a request will include:
 
 1. A required `result` string whose value MUST be `success` on success, or an error string on failure.
@@ -60,8 +54,7 @@ Responses to a request will include:
 }
 ```
 
-### 2.3. Transport Mechanism
-
+### 2.3 Transport mechanism
 HTTP POSTing a JSON-encoded request is the preferred way of communicating
 with a Transmission RPC server. The current Transmission implementation
 has the default URL as `http://host:9091/transmission/rpc`. Clients
@@ -69,8 +62,7 @@ may use this as a default, but should allow the URL to be reconfigured,
 since the port and path may be changed to allow mapping and/or multiple
 daemons to run on a single server.
 
-#### 2.3.1. CSRF Protection
-
+#### 2.3.1 CSRF protection
 Most Transmission RPC servers require a X-Transmission-Session-Id
 header to be sent with requests, to prevent CSRF attacks.
 
@@ -82,8 +74,7 @@ right `X-Transmission-Session-Id` in its own headers.
 So, the correct way to handle a 409 response is to update your
 `X-Transmission-Session-Id` and to resend the previous request.
 
-#### 2.3.2. DNS Rebinding Protection
-
+#### 2.3.2 DNS rebinding protection
 Additional check is being made on each RPC request to make sure that the
 client sending the request does so using one of the allowed hostnames by
 which RPC server is meant to be available.
@@ -97,8 +88,7 @@ addresses are always implicitly allowed.
 For more information on configuration, see settings.json documentation for
 `rpc-host-whitelist-enabled` and `rpc-host-whitelist` keys.
 
-#### 2.3.3. Authentication
-
+#### 2.3.3 Authentication
 Enabling authentication is an optional security feature that can be enabled
 on Transmission RPC servers. Authentication occurs by method of HTTP Basic
 Access Authentication.
@@ -109,10 +99,8 @@ of this HTTP header is expected to be [`Basic <b64 credentials>`](https://develo
 where <b64 credentials> is equal to a base64 encoded string of the
 username and password (respectively), separated by a colon.
 
-## 3. Torrent Requests
-
-### 3.1. Torrent Action Requests
-
+## 3 Torrent requests
+### 3.1 Torrent action requests
 | Method name          | libtransmission function
 |:--|:--
 | `torrent-start`      | tr_torrentStart
@@ -126,13 +114,12 @@ All torrents are used if the `ids` argument is omitted.
 
 `ids` should be one of the following:
 1. an integer referring to a torrent id
-2. a list of torrent id numbers, sha1 hash strings, or both
+2. a list of torrent id numbers, SHA1 hash strings, or both
 3. a string, `recently-active`, for recently-active torrents
 
 Response arguments: none
 
-### 3.2. Torrent Mutator: `torrent-set`
-
+### 3.2 Torrent mutator: `torrent-set`
 Method name: `torrent-set`
 
 Request arguments:
@@ -171,8 +158,7 @@ for `files-wanted`, `files-unwanted`, `priority-high`, `priority-low`, or
 
    Response arguments: none
 
-### 3.3. Torrent Accessor: `torrent-get`
-
+### 3.3 Torrent accessor: `torrent-get`
 Method name: `torrent-get`.
 
 Request arguments:
@@ -439,8 +425,7 @@ Response:
 }
 ```
 
-### 3.4.  Adding a Torrent
-
+### 3.4 Adding a torrent
 Method name: `torrent-add`
 
 Request arguments:
@@ -471,8 +456,7 @@ Response arguments:
 
 * When attempting to add a duplicate torrent, a `torrent-duplicate` object in the same form is returned, but the response's `result` value is still `success`.
 
-### 3.5. Removing a Torrent
-
+### 3.5 Removing a torrent
 Method name: `torrent-remove`
 
 | Key | Value Type | Description
@@ -482,8 +466,7 @@ Method name: `torrent-remove`
 
 Response arguments: none
 
-### 3.6. Moving a Torrent
-
+### 3.6 Moving a torrent
 Method name: `torrent-set-location`
 
 Request arguments:
@@ -496,8 +479,7 @@ Request arguments:
 
 Response arguments: none
 
-### 3.7. Renaming a Torrent's Path
-
+### 3.7 Renaming a torrent's path
 Method name: `torrent-rename-path`
 
 For more information on the use of this function, see the transmission.h
@@ -515,10 +497,8 @@ Request arguments:
 
 Response arguments: `path`, `name`, and `id`, holding the torrent ID integer
 
-## 4.  Session Requests
-
-### 4.1. Session Arguments
-
+## 4  Session requests
+### 4.1 Session arguments
 | Key | Value Type | Description
 |:--|:--|:--
 | `alt-speed-down` | number | max global download speed (KBps)
@@ -597,8 +577,7 @@ It is changes when a new version of Transmission changes the RPC interface
 in a way that is not backwards compatible. There are no plans for this
 to be common behavior.
 
-#### 4.1.1. Mutators
-
+#### 4.1.1 Mutators
 Method name: `session-set`
 
 Request arguments: one or more of 4.1's arguments, except: `blocklist-size`,
@@ -607,8 +586,7 @@ Request arguments: one or more of 4.1's arguments, except: `blocklist-size`,
 
 Response arguments: none
 
-#### 4.1.2. Accessors
-
+#### 4.1.2 Accessors
 Method name: `session-get`
 
 Request arguments: an optional `fields` array of keys (see 4.1)
@@ -616,8 +594,7 @@ Request arguments: an optional `fields` array of keys (see 4.1)
 Response arguments: key/value pairs matching the request's `fields`
 argument if present, or all supported fields (see 4.1) otherwise.
 
-### 4.2. Session Statistics
-
+### 4.2 Session statistics
 Method name: `session-stats`
 
 Request arguments: none
@@ -644,16 +621,14 @@ A stats object contains:
 | sessionCount     | number     | tr_session_stats
 | secondsActive    | number     | tr_session_stats
 
-### 4.3. Blocklist
-
+### 4.3 Blocklist
 Method name: `blocklist-update`
 
 Request arguments: none
 
 Response arguments: a number `blocklist-size`
 
-### 4.4. Port Checking
-
+### 4.4 Port checking
 This method tests to see if your incoming peer port is accessible
 from the outside world.
 
@@ -663,8 +638,7 @@ Request arguments: none
 
 Response arguments: a bool, `port-is-open`
 
-### 4.5. Session shutdown
-
+### 4.5 Session shutdown
 This method tells the transmission session to shut down.
 
 Method name: `session-close`
@@ -673,8 +647,7 @@ Request arguments: none
 
 Response arguments: none
 
-### 4.6. Queue Movement Requests
-
+### 4.6 Queue movement requests
 | Method name | transmission.h source
 |:--|:--
 | `queue-move-top` | tr_torrentQueueMoveTop()
@@ -690,8 +663,7 @@ Request arguments:
 
 Response arguments: none
 
-### 4.7. Free Space
-
+### 4.7 Free space
 This method tests how much free space is available in a
 client-specified folder.
 
@@ -712,9 +684,7 @@ Response arguments:
 | `total_size` | number | the total capacity, in bytes, of that directory
 
 ### 4.8 Bandwidth groups
-
-#### 4.8.1 Bandwidth group Mutator: `group-set`
-
+#### 4.8.1 Bandwidth group mutator: `group-set`
 Method name: `group-set`
 
 Request parameters:
@@ -730,8 +700,7 @@ Request parameters:
 
 Response arguments: none
 
-#### 4.8.2 Bandwidth group Accessor: `group-get`
-
+#### 4.8.2 Bandwidth group accessor: `group-get`
 Method name: `group-get`
 
 Request arguments: An optional argument `group`.
@@ -756,8 +725,7 @@ A bandwidth group description object has:
 | `speed-limit-up-enabled` | boolean | true means enabled
 | `speed-limit-up` | number | max global upload speed (KBps)
 
-## 5. Protocol Versions
-
+## 5 Protocol versions
 This section lists the changes that have been made to the RPC protocol.
 
 There are two ways to check for API compatibility. Since most developers know
