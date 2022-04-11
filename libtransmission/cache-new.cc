@@ -66,7 +66,7 @@ public:
         for (auto block = span.begin; block < span.end; ++block)
         {
             auto& entry = blocks_[makeKey(tor_id, block)];
-            auto const n_bytes = io_.blockSize(block);
+            auto const n_bytes = io_.blockSize(tor_id, block);
             entry.length = n_bytes;
             entry.age_ = age_++;
             std::copy_n(block_data, n_bytes, std::data(entry.data));
@@ -93,7 +93,7 @@ public:
                 auto span_bytes = size_t{};
                 while (end != span.end && !has(tor_id, end))
                 {
-                    span_bytes += blockSize(end);
+                    span_bytes += blockSize(tor_id, end);
                     ++end;
                 }
 
@@ -135,9 +135,9 @@ public:
         trim();
     }
 
-    [[nodiscard]] uint32_t blockSize(tr_block_index_t block) const override
+    [[nodiscard]] uint32_t blockSize(tr_torrent_id_t tor_id, tr_block_index_t block) const override
     {
-        return io_.blockSize(block);
+        return io_.blockSize(tor_id, block);
     }
 
     [[nodiscard]] size_t maxBlocks() const noexcept override

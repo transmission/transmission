@@ -44,6 +44,11 @@ struct CompareTorrentByHash
 
 tr_torrent* tr_torrents::get(int id)
 {
+    return const_cast<tr_torrent*>(const_cast<tr_torrents const*>(this)->get(id));
+}
+
+tr_torrent const* tr_torrents::get(int id) const
+{
     TR_ASSERT(0 < id);
     TR_ASSERT(static_cast<size_t>(id) < std::size(by_id_));
     if (static_cast<size_t>(id) >= std::size(by_id_))

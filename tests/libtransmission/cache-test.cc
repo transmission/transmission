@@ -551,11 +551,3 @@ TEST_F(CacheTest, saveSpan)
     EXPECT_EQ(no_ops, mio.prefetches_);
     EXPECT_EQ(getContentsOfSpan(contents, save_span), buf);
 }
-
-TEST_F(CacheTest, getReturnsFalseOnError)
-{
-}
-
-TEST_F(CacheTest, setReturnsFalseOnError)
-{
-}

@@ -33,6 +33,7 @@ public:
 
     // O(1)
     [[nodiscard]] tr_torrent* get(int id);
+    [[nodiscard]] tr_torrent const* get(int id) const;
 
     // O(log n)
     [[nodiscard]] tr_torrent const* get(tr_sha1_digest_t const& hash) const;

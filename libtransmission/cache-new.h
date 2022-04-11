@@ -18,6 +18,8 @@
 
 #include "block-info.h"
 
+class tr_torrents;
+
 /**
  * An interface for reading / writing torrent blocks
  */
@@ -47,7 +49,7 @@ public:
         return prefetch(tor_id, { block, block + 1 });
     }
 
-    virtual uint32_t blockSize(tr_block_index_t block) const = 0;
+    virtual uint32_t blockSize(tr_torrent_id_t tor_id, tr_block_index_t block) const = 0;
 };
 
 /**
@@ -78,3 +80,5 @@ public:
 };
 
 tr_write_cache* tr_writeCacheNew(tr_torrent_io& io, size_t max_blocks);
+
+tr_torrent_io* tr_sessionIoNew(tr_torrents const& torrents);
