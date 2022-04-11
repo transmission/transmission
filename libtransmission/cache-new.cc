@@ -5,8 +5,9 @@
 
 #include <algorithm> // std::copy_n
 #include <array>
-#include <map>
 #include <iterator>
+#include <map>
+#include <limits>
 #include <utility> // std::pair
 
 #include "transmission.h"
@@ -33,7 +34,7 @@ struct cache_block
 
 using cache_key_t = std::pair<tr_torrent_id_t, tr_block_index_t>;
 
-constexpr cache_key_t makeKey(tr_torrent_id_t tor_id, tr_block_index_t block_index)
+constexpr cache_key_t makeKey(tr_torrent_id_t tor_id, tr_block_index_t block_index) noexcept
 {
     return std::make_pair(tor_id, block_index);
 }
@@ -144,14 +145,17 @@ public:
         return max_blocks_;
     }
 
-    void saveTorrent(tr_torrent_id_t /*tor_id*/) override
+    bool saveTorrent(tr_torrent_id_t tor_id) override
     {
-        // FIXME
+        using block_limits = std::numeric_limits<tr_block_index_t>;
+        return flushRange(
+            blocks_.lower_bound(makeKey(tor_id, block_limits::min())),
+            blocks_.upper_bound(makeKey(tor_id, block_limits::max())));
     }
 
-    void saveSpan(tr_torrent_id_t /*tor_id*/, tr_block_span_t /*span*/) override
+    bool saveSpan(tr_torrent_id_t tor_id, tr_block_span_t span) override
     {
-        // FIXME
+        return flushRange(blocks_.lower_bound(makeKey(tor_id, span.begin)), blocks_.upper_bound(makeKey(tor_id, span.end)));
     }
 
 private:
@@ -180,7 +184,7 @@ private:
         }
     }
 
-    static auto findRunBegin(block_map_t::const_iterator begin, block_map_t::iterator iter)
+    [[nodiscard]] static auto findRunBegin(block_map_t::const_iterator begin, block_map_t::iterator iter) noexcept
     {
         for (;;)
         {
@@ -202,21 +206,73 @@ private:
         }
     }
 
-    static auto findRunLast(block_map_t::iterator iter, block_map_t::const_iterator end)
+    [[nodiscard]] static auto findRunLast(block_map_t::const_iterator iter, block_map_t::const_iterator end)
     {
         TR_ASSERT(iter != end);
 
         for (;;)
         {
             auto const [tor_id, block] = iter->first;
+
             auto next = iter;
             ++next;
-            if (next == end || next->first != makeKey(tor_id, block + 1))
+            if (next == end)
             {
                 return iter;
             }
+
+            auto const [next_tor_id, next_block] = next->first;
+            if (tor_id != next_tor_id || block + 1 != next_block)
+            {
+                return iter;
+            }
+
             iter = next;
         }
+    }
+
+    [[nodiscard]] bool flushSpan(block_map_t::const_iterator begin, block_map_t::const_iterator end)
+    {
+        auto const [tor_id, first_block] = begin->first;
+        auto block = tr_block_index_t{ first_block };
+
+        using buf_t = std::vector<uint8_t>;
+        auto buf = buf_t{};
+        buf.reserve(BlockSize * std::distance(begin, end));
+
+        for (auto walk = begin; walk != end; ++walk)
+        {
+            auto const [walk_tor_id, walk_block] = walk->first;
+            TR_ASSERT(tor_id == walk_tor_id);
+            TR_ASSERT(block == walk_block);
+            std::copy_n(std::data(walk->second.data), walk->second.length, std::back_inserter(buf));
+            ++block;
+        }
+
+        // save it + remove it
+        auto const did_save = io_.put(tor_id, { first_block, block }, std::data(buf));
+        blocks_.erase(begin, end);
+        return did_save;
+    }
+
+    [[nodiscard]] bool flushRange(block_map_t::const_iterator begin, block_map_t::const_iterator end)
+    {
+        using buf_t = std::vector<uint8_t>;
+        auto buf = buf_t{};
+
+        while (begin != end)
+        {
+            auto span_begin = begin;
+            auto span_end = ++findRunLast(span_begin, end);
+            if (!flushSpan(span_begin, span_end))
+            {
+                return false;
+            }
+
+            begin = span_end;
+        }
+
+        return true;
     }
 
     bool trimNext()
@@ -231,34 +287,10 @@ private:
             return false;
         }
 
-        // find the span that includes that oldest block
+        // find the bounds of the span which has oldest block
         auto const begin = findRunBegin(std::begin(blocks_), iter);
-        auto const last = findRunLast(iter, std::end(blocks_));
-
-        // build a block span for it
-        auto const [torrent_id, first_block] = begin->first;
-        auto end = last;
-        ++end;
-        auto const span = tr_block_span_t{ begin->first.second, last->first.second + 1 };
-        auto const n_blocks = span.end - span.begin;
-        TR_ASSERT(begin->first.first == last->first.first);
-        TR_ASSERT(std::distance(begin, end) == span.end - span.begin);
-
-        // save that span
-        using buf_t = std::vector<uint8_t>;
-        auto buf = buf_t{};
-        buf.reserve(n_blocks * static_cast<buf_t::size_type>(BlockSize));
-        for (auto walk = begin; walk != end; ++walk)
-        {
-            TR_ASSERT(walk->first.first == torrent_id);
-            std::copy_n(std::data(walk->second.data), walk->second.length, std::back_inserter(buf));
-        }
-        auto const did_save = io_.put(torrent_id, span, std::data(buf));
-
-        // remove that span from the cache
-        blocks_.erase(begin, end);
-
-        return did_save;
+        auto const end = ++findRunLast(iter, std::end(blocks_));
+        return flushRange(begin, end);
     }
 
     static uint64_t age_;
