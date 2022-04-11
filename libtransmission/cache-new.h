@@ -29,6 +29,21 @@ public:
     virtual bool get(tr_torrent_id_t tor_id, tr_block_span_t span, uint8_t* block_data) = 0;
     virtual void prefetch(tr_torrent_id_t tor_id, tr_block_span_t span) = 0;
 
+    bool put(tr_torrent_id_t tor_id, tr_block_index_t block, uint8_t const* block_data)
+    {
+        return put(tor_id, { block, block + 1 }, block_data);
+    }
+
+    bool get(tr_torrent_id_t tor_id, tr_block_index_t block, uint8_t* block_data)
+    {
+        return get(tor_id, { block, block + 1 }, block_data);
+    }
+
+    void prefetch(tr_torrent_id_t tor_id, tr_block_index_t block)
+    {
+        return prefetch(tor_id, { block, block + 1 });
+    }
+
     virtual uint32_t blockSize(tr_block_index_t block) const = 0;
 };
 
