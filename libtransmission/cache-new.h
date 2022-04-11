@@ -18,6 +18,9 @@
 
 #include "block-info.h"
 
+/**
+ * An interface for reading / writing torrent blocks
+ */
 class tr_torrent_io
 {
 public:
@@ -47,15 +50,30 @@ public:
     virtual uint32_t blockSize(tr_block_index_t block) const = 0;
 };
 
+/**
+ * A tr_torrent_io decorator that batches data passed to it via put() in
+ * memory for a short time before put()ting it along to its wrapped io.
+ *
+ * The intent is fewer disk writes: blocks that arrive from peers
+ * are often contiguous and can be folded into fewer disk writes.
+ */
 class tr_write_cache : public tr_torrent_io
 {
 public:
     ~tr_write_cache() = default;
 
+    // How many blocks can be held in the memory cache
     virtual void setMaxBlocks(size_t max_blocks) = 0;
     [[nodiscard]] virtual size_t maxBlocks() const noexcept = 0;
 
+    // Flush a torrent from the memory cache to disk.
+    // Typically used when a torrent becomes complete, e.g. so its
+    // files can be moved from an incompleteDir to a completeDir
     virtual bool saveTorrent(tr_torrent_id_t tor_id) = 0;
+
+    // Flush a torrent's span from the memory cache to disk.
+    // Typically used when a file becomes complete, e.g. so
+    // the file can be reopened in read-only mode
     virtual bool saveSpan(tr_torrent_id_t tor_id, tr_block_span_t blocks) = 0;
 };
 
