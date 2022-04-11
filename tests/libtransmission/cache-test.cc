@@ -9,6 +9,8 @@
 #include <utility>
 #include <vector>
 
+#include <iostream>
+
 #include "transmission.h"
 
 #include "cache-new.h"
@@ -147,9 +149,9 @@ public:
 class CacheTest : public ::testing::Test
 {
 protected:
-    static auto constexpr TotalSize = tr_block_info::BlockSize * 16 + 1;
-    static auto constexpr PieceSize = tr_block_info::BlockSize * 8;
-    static auto constexpr MaxBytes = tr_block_info::BlockSize * 8;
+    static auto constexpr TotalSize = tr_block_info::BlockSize * 8 + 1;
+    static auto constexpr PieceSize = tr_block_info::BlockSize * 4;
+    static auto constexpr MaxBytes = tr_block_info::BlockSize * 6;
 };
 
 TEST_F(CacheTest, constructorMaxBytes)
@@ -490,44 +492,37 @@ TEST_F(CacheTest, getPartialCache)
     EXPECT_EQ(getContentsOfSpan(blocks, Span), buf);
 }
 
-#if 0
-TEST_F(CacheTest, getBiscectedSpan)
+TEST_F(CacheTest, honorsByteLimitWhenExceeded)
 {
-    // This is similar to CacheTest.prefetchUncached
-    // but in this variation, `cache` has the first block
-    // so only the rest of the span should be passed to
-    // mio.prefetch()
-
-    auto const block_info = tr_block_info{ TotalSize, PieceSize };
-    auto mio = MockTorrentIo{ block_info };
-
-    auto blocks = std::map<tr_block_index_t, std::vector<uint8_t>>{};
-    blocks.try_emplace(1U, makeRandomBlock(block_info.blockSize(1U)));
-
-    // create block data
+    // block data
     auto constexpr TorId = tr_torrent_id_t{ 1 };
-    auto constexpr = tr_block_span_t{ 0U, 4U };
+    auto const block_info = tr_block_info{ TotalSize, PieceSize };
+    auto const span = tr_block_span_t{ 0U, block_info.blockCount() };
+    auto const blocks = makeBlocksFromSpan(block_info, span);
 
+    // create the unpopulated io mock
+    auto mio = MockTorrentIo{ block_info };
     EXPECT_TRUE(std::empty(mio.puts_));
+    EXPECT_TRUE(std::empty(mio.blocks_));
+
+    // Create and populate the cache with all the blocks
+    auto cache = std::shared_ptr<tr_write_cache>(tr_writeCacheNew(mio, MaxBytes));
+    for (auto block = span.begin; block < span.end; ++block)
+    {
+        EXPECT_TRUE(cache->put(TorId, block, std::data(blocks.at(block))));
+    }
+
+    // Figure out how many blocks were in the cache when the capacity was exceeded.
+    // The cache tries to flush the span containing the oldest cached block,
+    // so since we added the block in order, those blocks should all have been flushed.
+    auto const cache_block_capacity = cache->maxBlocks();
+    std::cerr << __FILE__ << ':' << __LINE__ << " capacity " << cache_block_capacity << std::endl;
+    auto const expected_puts = MockTorrentIo::Operations_t{
+        { TorId, { span.begin, static_cast<tr_block_index_t>(span.begin + cache_block_capacity + 1) } }
+    };
+    EXPECT_EQ(expected_puts, mio.puts_);
     EXPECT_TRUE(std::empty(mio.gets_));
     EXPECT_TRUE(std::empty(mio.prefetches_));
-
-    auto cache = std::shared_ptr<tr_write_cache>(tr_writeCacheNew(mio, MaxBytes));
-
-    cache->put(tor_id, tr_block_span_t{ 1U, 2U }, std::data(blocks[1U]));
-    cache->prefetch(tor_id, span);
-
-    auto expected_prefetches = std::vector<MockTorrentIo::Operation>{};
-    expected_prefetches.emplace_back(tor_id, tr_block_span_t{ 0U, 1U });
-    expected_prefetches.emplace_back(tor_id, tr_block_span_t{ 2U, 4U });
-    EXPECT_EQ(expected_prefetches, mio.prefetches_);
-    EXPECT_TRUE(std::empty(mio.puts_));
-    EXPECT_TRUE(std::empty(mio.gets_));
-}
-#endif
-
-TEST_F(CacheTest, honorsByteLimit)
-{
 }
 
 TEST_F(CacheTest, flushesOldestFirst)

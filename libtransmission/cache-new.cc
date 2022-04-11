@@ -147,9 +147,14 @@ public:
         return io_.blockSize(block);
     }
 
-    [[nodiscard]] size_t maxBytes() const override
+    [[nodiscard]] size_t maxBytes() const noexcept override
     {
         return max_bytes_;
+    }
+
+    [[nodiscard]] size_t maxBlocks() const noexcept override
+    {
+        return max_blocks_;
     }
 
     void saveTorrent(tr_torrent_id_t /*tor_id*/) override
