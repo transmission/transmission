@@ -9,8 +9,6 @@
 #include <iterator>
 #include <utility> // std::pair
 
-#include <iostream>
-
 #include "transmission.h"
 
 #include "block-info.h"
@@ -64,10 +62,8 @@ public:
 
     bool put(tr_torrent_id_t tor_id, tr_block_span_t span, uint8_t const* block_data) override
     {
-        std::cerr << __FILE__ << ':' << __LINE__ << " cache.put called w/span [" << span.begin << "..." << span.end << ')' << std::endl;
         for (auto block = span.begin; block < span.end; ++block)
         {
-            std::cerr << __FILE__ << ':' << __LINE__ << " put tor_id " << tor_id << " block " << block << std::endl;
             auto& entry = blocks_[makeKey(tor_id, block)];
             auto const n_bytes = io_.blockSize(block);
             entry.length = n_bytes;
@@ -101,12 +97,8 @@ public:
                 }
 
                 // get that subspan fro mio_
-                std::cerr << __FILE__ << ':' << __LINE__ << " about to call io_.get for { begin:" << begin << ", end:" << end
-                          << " }" << std::endl;
                 if (!io_.get(tor_id, { begin, end }, data_out))
                 {
-                    std::cerr << __FILE__ << ':' << __LINE__ << " io_.get " << begin << ", " << end << " returned false"
-                              << std::endl;
                     return false;
                 }
                 data_out += span_bytes;
@@ -217,14 +209,10 @@ private:
         for (;;)
         {
             auto const [tor_id, block] = iter->first;
-            std::cerr << __FILE__ << ':' << __LINE__ << " iter tor_id " << tor_id << " block " << block << std::endl;
-            std::cerr << __FILE__ << ':' << __LINE__ << " step next" << std::endl;
-
             auto next = iter;
             ++next;
             if (next == end || next->first != makeKey(tor_id, block + 1))
             {
-                std::cerr << __FILE__ << ':' << __LINE__ << " next is end or not a match; returning" << std::endl;
                 return iter;
             }
             iter = next;
@@ -233,8 +221,6 @@ private:
 
     bool trimNext()
     {
-        std::cerr << __FILE__ << ':' << __LINE__ << " blocks_.size() is " << std::size(blocks_) << std::endl;
-
         // find the oldest cached block
         auto iter = std::min_element(
             std::begin(blocks_),
@@ -244,23 +230,16 @@ private:
         {
             return false;
         }
-        std::cerr << __FILE__ << ':' << __LINE__ << " oldest is tor_id " << iter->first.first << " block " << iter->first.second
-                  << std::endl;
 
         // find the span that includes that oldest block
         auto const begin = findRunBegin(std::begin(blocks_), iter);
-        std::cerr << __FILE__ << ':' << __LINE__ << " begin is tor_id " << begin->first.first << " block "
-                  << begin->first.second << std::endl;
         auto const last = findRunLast(iter, std::end(blocks_));
 
         // build a block span for it
         auto const [torrent_id, first_block] = begin->first;
         auto end = last;
         ++end;
-        std::cerr << __FILE__ << ':' << __LINE__ << " last is tor_id " << last->first.first << " block " << last->first.second
-                  << std::endl;
         auto const span = tr_block_span_t{ begin->first.second, last->first.second + 1 };
-        std::cerr << __FILE__ << ':' << __LINE__ << " span is { " << span.begin << ", " << span.end << " }" << std::endl;
         auto const n_blocks = span.end - span.begin;
         TR_ASSERT(begin->first.first == last->first.first);
         TR_ASSERT(std::distance(begin, end) == span.end - span.begin);
@@ -278,12 +257,6 @@ private:
 
         // remove that span from the cache
         blocks_.erase(begin, end);
-
-        std::cerr << __FILE__ << ':' << __LINE__ << " after trim, here is what cache has: " << std::endl;
-        for (auto const& block : blocks_)
-        {
-            std::cerr << __FILE__ << ':' << __LINE__ << " key " << block.first.first << ' ' << block.first.second << std::endl;
-        }
 
         return did_save;
     }

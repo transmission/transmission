@@ -9,8 +9,6 @@
 #include <utility>
 #include <vector>
 
-#include <iostream>
-
 #include "transmission.h"
 
 #include "cache-new.h"
@@ -117,15 +115,12 @@ public:
     {
         gets_.emplace_back(tor_id, span);
 
-        std::cerr << __FILE__ << ':' << __LINE__ << " span { begin:" << span.begin << ", end:" << span.end << '}' << std::endl;
         for (auto block = span.begin; block < span.end; ++block)
         {
-            std::cerr << __FILE__ << ':' << __LINE__ << " looking for tor_id " << tor_id << " block " << block << std::endl;
             auto const key = makeKey(tor_id, block);
             auto const iter = blocks_.find(key);
             if (iter == std::end(blocks_))
             {
-                std::cerr << __FILE__ << ':' << __LINE__ << " could not find; returning false" << std::endl;
                 return false;
             }
 
