@@ -405,37 +405,6 @@ TEST_F(CacheTest, getBisectedCache)
     EXPECT_EQ(getContentsOfSpan(contents, Span), buf);
 }
 
-TEST_F(CacheTest, honorsBlockLimitWhenExceeded)
-{
-    auto const [tor_id, block_info, contents, max_blocks] = makeBasicTestData();
-    auto const span = tr_block_span_t{ 0U, block_info.blockCount() };
-
-    // create the unpopulated io mock
-    auto mio = MockTorrentIo{ block_info };
-    EXPECT_TRUE(std::empty(mio.puts_));
-    EXPECT_TRUE(std::empty(mio.blocks_));
-
-    // Create and populate the cache with all the blocks
-    auto cache = std::shared_ptr<tr_write_cache>(tr_writeCacheNew(mio, max_blocks));
-    for (auto block = span.begin; block < span.end; ++block)
-    {
-        EXPECT_TRUE(cache->put(tor_id, block, std::data(contents.at(block))));
-    }
-
-    // Figure out how many blocks were in the cache when the capacity
-    // was reached. The cache tries to flush the span with the oldest
-    // cached block, so since we added the block in order, those blocks
-    // should all have been flushed.
-    auto const cache_block_capacity = cache->maxBlocks();
-    std::cerr << __FILE__ << ':' << __LINE__ << " capacity " << cache_block_capacity << std::endl;
-    auto const expected_puts = MockTorrentIo::Operations_t{
-        { tor_id, { span.begin, static_cast<tr_block_index_t>(span.begin + cache_block_capacity + 1) } }
-    };
-    EXPECT_EQ(expected_puts, mio.puts_);
-    EXPECT_TRUE(std::empty(mio.gets_));
-    EXPECT_TRUE(std::empty(mio.prefetches_));
-}
-
 TEST_F(CacheTest, honorsBlockLimitWhenReduced)
 {
     auto constexpr Span1 = tr_block_span_t{ 4U, 7U };
@@ -462,9 +431,9 @@ TEST_F(CacheTest, honorsBlockLimitWhenReduced)
     expected_puts.emplace_back(tor_id, Span1);
     EXPECT_EQ(expected_puts, mio.puts_);
 
-    // Now maxBlocks is 6 and the cache has 4 blocks [0..3) and [8..9),
-    // so there won't be another pruning until we reduce maxBlocks by
-    // another three blocks.
+    // cache's maxBlocks is 6 and it has 4 blocks [0..3) and [8..9),
+    // so it won't be another call to mio.put() until we reduce maxBlocks
+    // by another three blocks.
     cache->setMaxBlocks(cache->maxBlocks() - 1);
     EXPECT_EQ(expected_puts, mio.puts_);
     cache->setMaxBlocks(cache->maxBlocks() - 1);
@@ -474,7 +443,7 @@ TEST_F(CacheTest, honorsBlockLimitWhenReduced)
     EXPECT_EQ(expected_puts, mio.puts_);
 }
 
-TEST_F(CacheTest, flushesOldestFirst)
+TEST_F(CacheTest, honorsBlockLimitWhenExceeded)
 {
     // create the test's block info and data
     auto constexpr NumBlocks = tr_block_index_t{ 9U };
@@ -489,7 +458,7 @@ TEST_F(CacheTest, flushesOldestFirst)
     // create an unpopulated io mock
     auto mio = MockTorrentIo{ block_info };
 
-    // create and populate it with all the blocks
+    // create a cache and fill it up to capacity
     auto cache = std::shared_ptr<tr_write_cache>(tr_writeCacheNew(mio, MaxBlocks));
     for (auto block = tr_block_index_t{0U}; block < NumBlocks; ++block)
     {
@@ -523,9 +492,5 @@ TEST_F(CacheTest, getReturnsFalseOnError)
 }
 
 TEST_F(CacheTest, setReturnsFalseOnError)
-{
-}
-
-TEST_F(CacheTest, savesWhenRemovedFromCache)
 {
 }
