@@ -64,6 +64,7 @@ public:
 
     bool put(tr_torrent_id_t tor_id, tr_block_span_t span, uint8_t const* block_data) override
     {
+        std::cerr << __FILE__ << ':' << __LINE__ << " cache.put called w/span [" << span.begin << "..." << span.end << ')' << std::endl;
         for (auto block = span.begin; block < span.end; ++block)
         {
             std::cerr << __FILE__ << ':' << __LINE__ << " put tor_id " << tor_id << " block " << block << std::endl;
@@ -283,6 +284,12 @@ private:
 
         // remove that span from the cache
         blocks_.erase(begin, end);
+
+        std::cerr << __FILE__ << ':' << __LINE__ << " after trim, here is what cache has: " << std::endl;
+        for (auto const& block : blocks_)
+        {
+            std::cerr << __FILE__ << ':' << __LINE__ << " key " << block.first.first << ' ' << block.first.second << std::endl;
+        }
 
         return did_save;
     }
