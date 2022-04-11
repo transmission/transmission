@@ -47,7 +47,7 @@ public:
     virtual uint32_t blockSize(tr_block_index_t block) const = 0;
 };
 
-class tr_write_cache: public tr_torrent_io
+class tr_write_cache : public tr_torrent_io
 {
 public:
     ~tr_write_cache() = default;
@@ -58,6 +58,5 @@ public:
     virtual void saveTorrent(tr_torrent_id_t tor_id) = 0;
     virtual void saveSpan(tr_torrent_id_t tor_id, tr_block_span_t blocks) = 0;
 };
-
 
 tr_write_cache* tr_writeCacheNew(tr_torrent_io& io, size_t max_bytes);

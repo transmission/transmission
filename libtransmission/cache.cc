@@ -328,7 +328,6 @@ int tr_cacheWriteBlock(
     cb->time = tr_time();
     evbuffer_remove(writeme, std::data(cb->data), cb->length);
 
-
     cache->cache_writes++;
     cache->cache_write_bytes += cb->length;
 

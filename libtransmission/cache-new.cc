@@ -42,16 +42,17 @@ constexpr cache_key_t makeKey(tr_torrent_id_t tor_id, tr_block_index_t block_ind
 
 using block_map_t = std::map<cache_key_t, cache_block>;
 
-}
+} // namespace
 
 /****
 *****
 ****/
 
-class tr_write_cache_impl final: public tr_write_cache
+class tr_write_cache_impl final : public tr_write_cache
 {
 public:
-    tr_write_cache_impl(tr_torrent_io& torrent_io, size_t max_bytes): io_{ torrent_io }
+    tr_write_cache_impl(tr_torrent_io& torrent_io, size_t max_bytes)
+        : io_{ torrent_io }
     {
         setMaxBytes(max_bytes);
     }
@@ -79,7 +80,7 @@ public:
 
     bool get(tr_torrent_id_t tor_id, tr_block_span_t span, uint8_t* data_out) override
     {
-        for (auto begin = span.begin; begin < span.end; )
+        for (auto begin = span.begin; begin < span.end;)
         {
             auto const iter = blocks_.find(makeKey(tor_id, begin));
             if (iter != std::end(blocks_))
@@ -99,10 +100,12 @@ public:
                 }
 
                 // get that subspan fro mio_
-                std::cerr << __FILE__ << ':' << __LINE__ << " about to call io_.get for { begin:" << begin << ", end:" << end << " }" << std::endl;
+                std::cerr << __FILE__ << ':' << __LINE__ << " about to call io_.get for { begin:" << begin << ", end:" << end
+                          << " }" << std::endl;
                 if (!io_.get(tor_id, { begin, end }, data_out))
                 {
-                    std::cerr << __FILE__ << ':' << __LINE__ << " io_.get " << begin << ", " << end << " returned false" << std::endl;
+                    std::cerr << __FILE__ << ':' << __LINE__ << " io_.get " << begin << ", " << end << " returned false"
+                              << std::endl;
                     return false;
                 }
                 data_out += span_bytes;
@@ -135,7 +138,7 @@ public:
     void setMaxBytes(size_t max_bytes) override
     {
         max_bytes_ = max_bytes;
-        max_blocks_ = max_bytes > 0U ? max_bytes_ / BlockSize: 0U;
+        max_blocks_ = max_bytes > 0U ? max_bytes_ / BlockSize : 0U;
         trim();
     }
 
@@ -241,18 +244,21 @@ private:
         {
             return false;
         }
-        std::cerr << __FILE__ << ':' << __LINE__ << " oldest is tor_id " << iter->first.first << " block " << iter->first.second << std::endl;
+        std::cerr << __FILE__ << ':' << __LINE__ << " oldest is tor_id " << iter->first.first << " block " << iter->first.second
+                  << std::endl;
 
         // find the span that includes that oldest block
         auto const begin = findRunBegin(std::begin(blocks_), iter);
-        std::cerr << __FILE__ << ':' << __LINE__ << " begin is tor_id " << begin->first.first << " block " << begin->first.second << std::endl;
+        std::cerr << __FILE__ << ':' << __LINE__ << " begin is tor_id " << begin->first.first << " block "
+                  << begin->first.second << std::endl;
         auto const last = findRunLast(iter, std::end(blocks_));
 
         // build a block span for it
         auto const [torrent_id, first_block] = begin->first;
         auto end = last;
         ++end;
-        std::cerr << __FILE__ << ':' << __LINE__ << " last is tor_id " << last->first.first << " block " << last->first.second << std::endl;
+        std::cerr << __FILE__ << ':' << __LINE__ << " last is tor_id " << last->first.first << " block " << last->first.second
+                  << std::endl;
         auto const span = tr_block_span_t{ begin->first.second, last->first.second + 1 };
         std::cerr << __FILE__ << ':' << __LINE__ << " span is { " << span.begin << ", " << span.end << " }" << std::endl;
         auto const n_blocks = span.end - span.begin;
