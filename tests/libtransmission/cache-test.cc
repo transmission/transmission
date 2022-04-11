@@ -489,7 +489,7 @@ TEST_F(CacheTest, saveTorrent)
     EXPECT_TRUE(cache->put(tor_id_2, Span, std::data(getContentsOfSpan(contents, Span))));
     EXPECT_TRUE(cache->put(tor_id_3, Span, std::data(getContentsOfSpan(contents, Span))));
 
-    // we haven't reached the cache's capacity yet, so mio should still be idle
+    // we haven't exceeded the cache's capacity yet, so mio should still be idle
     auto const no_ops = MockTorrentIo::Operations_t{};
     EXPECT_EQ(no_ops, mio.puts_);
     EXPECT_EQ(no_ops, mio.gets_);
@@ -516,6 +516,40 @@ TEST_F(CacheTest, saveTorrent)
 
 TEST_F(CacheTest, saveSpan)
 {
+    auto const [tor_id, block_info, contents, max_blocks] = makeBasicTestData(1);
+    auto const span = tr_block_span_t{ 0U, static_cast<tr_block_index_t>(max_blocks) };
+    auto const save_span = tr_block_span_t{ span.begin, span.end / 2U };
+
+    // make an unpopulated io mock
+    auto mio = MockTorrentIo{ block_info };
+
+    // make a fully-stocked cache
+    auto cache = std::shared_ptr<tr_write_cache>(tr_writeCacheNew(mio, max_blocks));
+    EXPECT_TRUE(cache->put(tor_id, span, std::data(getContentsOfSpan(contents, span))));
+
+    // we haven't exceeded the cache's capacity yet, so mio should still be idle
+    auto const no_ops = MockTorrentIo::Operations_t{};
+    EXPECT_EQ(no_ops, mio.puts_);
+    EXPECT_EQ(no_ops, mio.gets_);
+    EXPECT_EQ(no_ops, mio.prefetches_);
+
+    // save a span
+    cache->saveSpan(tor_id, save_span);
+
+    // cache should have written that span to mio
+    auto const expected_puts = MockTorrentIo::Operations_t{ { tor_id, save_span } };
+    EXPECT_EQ(expected_puts, mio.puts_);
+    EXPECT_EQ(no_ops, mio.gets_);
+    EXPECT_EQ(no_ops, mio.prefetches_);
+
+    // ..and since they're no longer cached, requesting from
+    // the cache should delegate to mio.get()
+    auto buf = std::vector<uint8_t>(tr_block_info::BlockSize * (save_span.end - save_span.begin));
+    EXPECT_TRUE(cache->get(tor_id, save_span, std::data(buf)));
+    EXPECT_EQ(expected_puts, mio.puts_);
+    EXPECT_EQ(expected_puts, mio.gets_);
+    EXPECT_EQ(no_ops, mio.prefetches_);
+    EXPECT_EQ(getContentsOfSpan(contents, save_span), buf);
 }
 
 TEST_F(CacheTest, getReturnsFalseOnError)

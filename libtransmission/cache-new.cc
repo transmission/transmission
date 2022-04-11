@@ -155,7 +155,7 @@ public:
 
     bool saveSpan(tr_torrent_id_t tor_id, tr_block_span_t span) override
     {
-        return flushRange(blocks_.lower_bound(makeKey(tor_id, span.begin)), blocks_.upper_bound(makeKey(tor_id, span.end)));
+        return flushRange(blocks_.lower_bound(makeKey(tor_id, span.begin)), blocks_.lower_bound(makeKey(tor_id, span.end)));
     }
 
 private:
