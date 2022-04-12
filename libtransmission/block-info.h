@@ -94,7 +94,7 @@ struct tr_block_info
 
 private:
     // Location of the last byte in `piece`.
-    [[nodiscard]] Location constexpr pieceLastLoc(tr_piece_index_t piece) const
+    [[nodiscard]] Location pieceLastLoc(tr_piece_index_t piece) const
     {
         return byteLoc(uint64_t{ piece } * pieceSize() + pieceSize(piece) - 1);
     }
