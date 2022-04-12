@@ -1,0 +1,438 @@
+name: Sanity
+on: [push, pull_request]
+env:
+  GTEST_OUTPUT: xml:./
+jobs:
+  alpine:
+    runs-on: ubuntu-latest
+    container:
+      image: alpine
+    steps:
+      - name: Prepare
+        run: |
+          set -ex
+          apk add \
+            cmake \
+            curl-dev \
+            fmt-dev \
+            g++ \
+            gettext \
+            git \
+            glibmm-dev \
+            gtkmm3-dev \
+            libevent-dev \
+            libpsl-dev \
+            miniupnpc-dev \
+            `#nodejs` \
+            `#npm` \
+            openssl-dev \
+            qt5-qtbase-dev \
+            qt5-qttools-dev \
+            samurai \
+            zlib-dev
+          `#npm install --global corepack`
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          path: src
+          submodules: recursive
+      - name: Configure
+        run: |
+          cmake \
+            -S src \
+            -B obj \
+            -G Ninja \
+            -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+            -DCMAKE_INSTALL_PREFIX=pfx \
+            -DENABLE_CLI=ON \
+            -DENABLE_GTK=ON \
+            -DENABLE_QT=ON \
+            `#-DENABLE_WEB=ON`
+      - name: Build
+        run: cmake --build obj --config RelWithDebInfo
+      - name: Test
+        run: cmake -E chdir obj ctest --build-config RelWithDebInfo --output-on-failure
+      - name: Install
+        run: cmake --build obj --config RelWithDebInfo --target install/strip
+      - uses: actions/upload-artifact@v3
+        with:
+          name: binaries-${{ github.job }}
+          path: pfx/**/*
+  debian-11:
+    runs-on: ubuntu-latest
+    container:
+      image: debian:11-slim
+    steps:
+      - name: Prepare
+        run: |
+          set -ex
+          apt-get update
+          apt-get install -y --no-install-recommends \
+            ca-certificates \
+            cmake \
+            g++ \
+            gettext \
+            git \
+            libcurl4-openssl-dev \
+            libdeflate-dev \
+            libevent-dev \
+            libfmt-dev \
+            libglibmm-2.4-dev \
+            libgtkmm-3.0-dev \
+            libminiupnpc-dev \
+            libnatpmp-dev \
+            libpsl-dev \
+            libssl-dev \
+            ninja-build \
+            `#nodejs` \
+            `#npm` \
+            qtbase5-dev \
+            qttools5-dev \
+            zlib1g-dev
+          `#npm install --global corepack`
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          path: src
+          submodules: recursive
+      - name: Configure
+        run: |
+          cmake \
+            -S src \
+            -B obj \
+            -G Ninja \
+            -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+            -DCMAKE_INSTALL_PREFIX=pfx \
+            -DENABLE_CLI=ON \
+            -DENABLE_GTK=ON \
+            -DENABLE_QT=ON \
+            `#-DENABLE_WEB=ON`
+      - name: Build
+        run: cmake --build obj --config RelWithDebInfo
+      - name: Test
+        run: cmake -E chdir obj ctest --build-config RelWithDebInfo --output-on-failure
+      - name: Install
+        run: cmake --build obj --config RelWithDebInfo --target install/strip
+      - uses: actions/upload-artifact@v3
+        with:
+          name: binaries-${{ github.job }}
+          path: pfx/**/*
+  debian-11-bundles-deps:
+    runs-on: ubuntu-latest
+    container:
+      image: debian:11-slim
+    steps:
+      - name: Prepare
+        run: |
+          set -ex
+          apt-get update
+          apt-get install -y --no-install-recommends \
+            ca-certificates \
+            cmake \
+            g++ \
+            gettext \
+            git \
+            libcurl4-openssl-dev \
+            libglibmm-2.4-dev \
+            libgtkmm-3.0-dev \
+            libssl-dev \
+            ninja-build \
+            `#nodejs` \
+            `#npm` \
+            qtbase5-dev \
+            qttools5-dev \
+            zlib1g-dev
+          `#npm install --global corepack`
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          path: src
+          submodules: recursive
+      - name: Configure
+        run: |
+          cmake \
+            -S src \
+            -B obj \
+            -G Ninja \
+            -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+            -DCMAKE_INSTALL_PREFIX=pfx \
+            -DENABLE_CLI=ON \
+            -DENABLE_GTK=ON \
+            -DENABLE_QT=ON \
+            `#-DENABLE_WEB=ON` \
+            -DUSE_SYSTEM_B64=OFF \
+            -DUSE_SYSTEM_DEFLATE=OFF \
+            -DUSE_SYSTEM_DHT=OFF \
+            -DUSE_SYSTEM_EVENT2=OFF \
+            -DUSE_SYSTEM_MINIUPNPC=OFF \
+            -DUSE_SYSTEM_NATPMP=OFF \
+            -DUSE_SYSTEM_PSL=OFF \
+            -DUSE_SYSTEM_UTP=OFF
+      - name: Build
+        run: cmake --build obj --config RelWithDebInfo
+      - name: Test
+        run: cmake -E chdir obj ctest --build-config RelWithDebInfo --output-on-failure
+      - name: Install
+        run: cmake --build obj --config RelWithDebInfo --target install/strip
+      - uses: actions/upload-artifact@v3
+        with:
+          name: binaries-${{ github.job }}
+          path: pfx/**/*
+  debian-11-s390x:
+    runs-on: ubuntu-latest
+    container:
+      image: debian:11-slim
+      options: --privileged
+    steps:
+      - name: Prepare
+        run: |
+          set -ex
+          dpkg --add-architecture s390x
+          apt-get update
+          apt-get install -y --no-install-recommends \
+            binfmt-support \
+            ca-certificates \
+            cmake \
+            g++-s390x-linux-gnu \
+            git \
+            libcurl4-openssl-dev:s390x \
+            libdeflate-dev:s390x \
+            libfmt-dev:s390x \
+            libminiupnpc-dev:s390x \
+            libnatpmp-dev:s390x \
+            libpsl-dev:s390x \
+            libssl-dev:s390x \
+            make \
+            qemu-user-static \
+            zlib1g-dev:s390x
+          update-binfmts --enable
+          echo '
+          set(CMAKE_C_COMPILER s390x-linux-gnu-gcc)
+          set(CMAKE_CXX_COMPILER s390x-linux-gnu-g++)
+          ' > /tmp/toolchain.cmake
+          # Not installing libevent-dev:s390x but building from source to workaround https://gitlab.com/qemu-project/qemu/-/issues/356
+          rm /usr/include/s390x-linux-gnu/sys/uio.h /usr/s390x-linux-gnu/include/sys/uio.h # avoid readv/writev calls in libevent
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          path: src
+          submodules: recursive
+      - name: Configure
+        run: |
+          cmake \
+            -S src \
+            -B obj \
+            -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+            -DCMAKE_INSTALL_PREFIX=pfx \
+            -DCMAKE_TOOLCHAIN_FILE=/tmp/toolchain.cmake \
+            -DHAVE_COPY_FILE_RANGE:BOOL=OFF \
+            -DHAVE_SENDFILE64:BOOL=OFF
+      - name: Build
+        run: cmake --build obj --config RelWithDebInfo --parallel $(nproc)
+      - name: Test
+        run: cmake -E chdir obj ctest --build-config RelWithDebInfo --output-on-failure
+      - name: Install
+        run: cmake --build obj --config RelWithDebInfo --target install/strip/fast
+      - uses: actions/upload-artifact@v3
+        with:
+          name: binaries-${{ github.job }}
+          path: pfx/**/*
+  debian-11-tarball:
+    runs-on: ubuntu-latest
+    container:
+      image: debian:11-slim
+    steps:
+      - name: Prepare
+        run: |
+          set -ex
+          apt-get update
+          apt-get install -y --no-install-recommends \
+            ca-certificates \
+            cmake \
+            g++ \
+            git \
+            libcurl4-openssl-dev \
+            libssl-dev \
+            ninja-build \
+            zlib1g-dev
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          path: src
+          submodules: recursive
+      - name: Configure
+        run: |
+          cmake \
+            -S src \
+            -B obj \
+            -G Ninja
+      - name: Create source tarball
+        run: cmake --build obj --target package_source
+      - uses: actions/upload-artifact@v3
+        with:
+          name: tarball-${{ github.job }}
+          path: obj/transmission*.tar.*
+  debian-11-from-tarball:
+    needs: debian-11-tarball
+    runs-on: ubuntu-latest
+    container:
+      image: debian:11-slim
+    steps:
+      - name: Prepare
+        run: |
+          set -ex
+          apt-get update
+          apt-get install -y --no-install-recommends \
+            ca-certificates \
+            cmake \
+            g++ \
+            gettext \
+            git \
+            libcurl4-openssl-dev \
+            libdeflate-dev \
+            libevent-dev \
+            libfmt-dev \
+            libglibmm-2.4-dev \
+            libgtkmm-3.0-dev \
+            libminiupnpc-dev \
+            libnatpmp-dev \
+            libpsl-dev \
+            libssl-dev \
+            ninja-build \
+            `#nodejs` \
+            `#npm` \
+            qtbase5-dev \
+            qttools5-dev \
+            xz-utils \
+            zlib1g-dev
+          `#npm install --global corepack`
+      - name: Download tarball
+        uses: actions/download-artifact@v3
+        with:
+          name: tarball-debian-11-tarball
+      - name: Extract sources from tarball
+        run: mkdir src && tar xf transmission*.tar.* -C src --strip-components 1
+      - name: Configure
+        run: |
+          cmake \
+            -S src \
+            -B obj \
+            -G Ninja \
+            -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+            -DCMAKE_INSTALL_PREFIX=pfx \
+            -DENABLE_CLI=ON \
+            -DENABLE_GTK=ON \
+            -DENABLE_QT=ON \
+            `#-DENABLE_WEB=ON`
+      - name: Build
+        run: cmake --build obj --config RelWithDebInfo
+      - name: Test
+        run: cmake -E chdir obj ctest --build-config RelWithDebInfo --output-on-failure
+      - name: Install
+        run: cmake --build obj --config RelWithDebInfo --target install/strip
+      - uses: actions/upload-artifact@v3
+        with:
+          name: binaries-${{ github.job }}
+          path: pfx/**/*
+  macos:
+    runs-on: macos-latest
+    steps:
+      - name: Prepare
+        run: |
+          set -ex
+          brew install \
+            cmake \
+            gettext \
+            gtkmm3 \
+            libdeflate \
+            libevent \
+            libnatpmp \
+            libpsl \
+            miniupnpc \
+            ninja \
+            `#node` \
+            qt@5
+          `#npm install --global corepack`
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          path: src
+          submodules: recursive
+      - name: Configure
+        run: |
+          cmake \
+            -S src \
+            -B obj \
+            -G Ninja \
+            -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+            -DCMAKE_INSTALL_PREFIX=pfx \
+            -DCMAKE_PREFIX_PATH=`brew --prefix`/opt/qt@5 \
+            -DENABLE_CLI=ON \
+            -DENABLE_GTK=ON \
+            -DENABLE_MAC=ON \
+            -DENABLE_QT=ON \
+            `#-DENABLE_WEB=ON`
+      - name: Build
+        run: cmake --build obj --config RelWithDebInfo
+      - name: Test
+        env:
+          TMPDIR: /private/tmp
+        run: cmake -E chdir obj ctest --build-config RelWithDebInfo --output-on-failure
+      - name: Install
+        run: cmake --build obj --config RelWithDebInfo --target install/strip
+      - uses: actions/upload-artifact@v3
+        with:
+          name: binaries-${{ github.job }}
+          path: pfx/**/*
+  macos-from-tarball:
+    needs: debian-11-tarball
+    runs-on: macos-latest
+    steps:
+      - name: Prepare
+        run: |
+          set -ex
+          brew install \
+            cmake \
+            gettext \
+            gtkmm3 \
+            libdeflate \
+            libevent \
+            libnatpmp \
+            libpsl \
+            miniupnpc \
+            ninja \
+            `#node` \
+            qt@5
+          `#npm install --global corepack`
+      - name: Download tarball
+        uses: actions/download-artifact@v3
+        with:
+          name: tarball-debian-11-tarball
+      - name: Extract sources from tarball
+        run: mkdir src && tar xf transmission*.tar.* -C src --strip-components 1
+      - name: Configure
+        run: |
+          cmake \
+            -S src \
+            -B obj \
+            -G Ninja \
+            -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+            -DCMAKE_INSTALL_PREFIX=pfx \
+            -DCMAKE_PREFIX_PATH=`brew --prefix`/opt/qt@5 \
+            -DENABLE_CLI=ON \
+            -DENABLE_GTK=ON \
+            -DENABLE_MAC=ON \
+            -DENABLE_QT=ON \
+            `#-DENABLE_WEB=ON`
+      - name: Build
+        run: cmake --build obj --config RelWithDebInfo
+      - name: Test
+        env:
+          TMPDIR: /private/tmp
+        run: cmake -E chdir obj ctest --build-config RelWithDebInfo --output-on-failure
+      - name: Install
+        run: cmake --build obj --config RelWithDebInfo --target install/strip
+      - uses: actions/upload-artifact@v3
+        with:
+          name: binaries-${{ github.job }}
+          path: pfx/**/*
