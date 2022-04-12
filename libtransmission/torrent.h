@@ -9,6 +9,7 @@
 #error only libtransmission should #include this header.
 #endif
 
+#include <array>
 #include <cstddef> // size_t
 #include <ctime>
 #include <optional>
@@ -368,33 +369,23 @@ public:
         metainfo_.setFileSubpath(i, subpath);
     }
 
-    struct tr_found_file_t : public tr_sys_path_info
+    [[nodiscard]] auto findFile(tr_file_index_t file_index) const
     {
-        // /home/foo/Downloads/torrent/01-file-one.txt
-        tr_pathbuf filename;
-        size_t base_len;
+        auto n_paths = size_t{ 0U };
+        auto paths = std::array<std::string_view, 2>{};
 
-        tr_found_file_t(tr_sys_path_info info, tr_pathbuf&& filename_in, size_t base_len_in)
-            : tr_sys_path_info{ info }
-            , filename{ std::move(filename_in) }
-            , base_len{ base_len_in }
+        if (auto const path = downloadDir(); !std::empty(path))
         {
+            paths[n_paths++] = path.sv();
         }
 
-        [[nodiscard]] constexpr auto base() const
+        if (auto const path = incompleteDir(); !std::empty(path))
         {
-            // /home/foo/Downloads
-            return filename.sv().substr(0, base_len);
+            paths[n_paths++] = path.sv();
         }
 
-        [[nodiscard]] constexpr auto subpath() const
-        {
-            // torrent/01-file-one.txt
-            return filename.sv().substr(base_len + 1);
-        }
-    };
-
-    std::optional<tr_found_file_t> findFile(tr_file_index_t i) const;
+        return metainfo_.files().find(std::data(paths), n_paths, file_index);
+    }
 
     /// METAINFO - TRACKERS
 

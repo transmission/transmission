@@ -31,6 +31,7 @@ set(PROJECT_FILES
   file-posix.cc
   file-win32.cc
   file.cc
+  files.cc
   handshake.cc
   inout.cc
   log.cc
@@ -170,6 +171,7 @@ set(${PROJECT_NAME}_PRIVATE_HEADERS
     fdlimit.h
     file-info.h
     file-piece-map.h
+    files.h
     handshake.h
     history.h
     inout.h
