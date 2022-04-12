@@ -645,7 +645,7 @@ static bool isNewTorrentASeed(tr_torrent* tor)
         }
 
         // it's not a new seed if a file is partial
-        if (tr_strvEndsWith(found->filename, tr_torrent::PartialFileSuffix))
+        if (tr_strvEndsWith(found->filename(), tr_torrent::PartialFileSuffix))
         {
             return false;
         }
@@ -2416,7 +2416,7 @@ static void setLocationImpl(struct LocationData* const data)
 
             if (auto found = tor->findFile(i); found)
             {
-                auto const& oldpath = found->filename;
+                auto const& oldpath = found->filename();
                 auto const newpath = tr_pathbuf{ location, '/', found->subpath() };
 
                 tr_logAddTraceTor(tor, fmt::format("Found file #{}: '{}'", i, oldpath));
@@ -2566,7 +2566,7 @@ static void tr_torrentFileCompleted(tr_torrent* tor, tr_file_index_t i)
     {
         if (auto const& file_subpath = tor->fileSubpath(i); file_subpath != found->subpath())
         {
-            auto const& oldpath = found->filename;
+            auto const& oldpath = found->filename();
             auto const newpath = tr_pathbuf{ found->base(), '/', file_subpath };
             tr_error* error = nullptr;
 
@@ -2643,54 +2643,11 @@ void tr_torrentGotBlock(tr_torrent* tor, tr_block_index_t block)
 ****
 ***/
 
-std::optional<tr_torrent::tr_found_file_t> tr_torrent::findFile(tr_file_index_t i) const
-{
-    auto filename = tr_pathbuf{};
-    auto const subpath = std::string_view{ this->fileSubpath(i) };
-    auto file_info = tr_sys_path_info{};
-
-    if (!std::empty(this->downloadDir()))
-    {
-        auto const base = this->downloadDir();
-
-        filename.assign(base, "/"sv, subpath);
-        if (tr_sys_path_get_info(filename, 0, &file_info))
-        {
-            return tr_found_file_t{ file_info, std::move(filename), std::size(base) };
-        }
-
-        filename.assign(filename, base, "/"sv, subpath, PartialFileSuffix);
-        if (tr_sys_path_get_info(filename, 0, &file_info))
-        {
-            return tr_found_file_t{ file_info, std::move(filename), std::size(base) };
-        }
-    }
-
-    if (!std::empty(this->incompleteDir()))
-    {
-        auto const base = this->incompleteDir();
-
-        filename.assign(base, "/"sv, subpath);
-        if (tr_sys_path_get_info(filename, 0, &file_info))
-        {
-            return tr_found_file_t{ file_info, std::move(filename), std::size(base) };
-        }
-
-        filename.assign(base, "/"sv, subpath, PartialFileSuffix);
-        if (tr_sys_path_get_info(filename, 0, &file_info))
-        {
-            return tr_found_file_t{ file_info, std::move(filename), std::size(base) };
-        }
-    }
-
-    return {};
-}
-
 // TODO: clients that call this should call tr_torrent::findFile() instead
 char* tr_torrentFindFile(tr_torrent const* tor, tr_file_index_t fileNum)
 {
     auto const found = tor->findFile(fileNum);
-    return found ? tr_strdup(found->filename.c_str()) : nullptr;
+    return found ? tr_strdup(found->filename()) : nullptr;
 }
 
 /* Decide whether we should be looking for files in downloadDir or incompleteDir. */

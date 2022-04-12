@@ -13,6 +13,7 @@ add_executable(libtransmission-test
     error-test.cc
     file-piece-map-test.cc
     file-test.cc
+    files-test.cc
     getopt-test.cc
     history-test.cc
     json-test.cc
