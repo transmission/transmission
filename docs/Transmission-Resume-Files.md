@@ -3,7 +3,6 @@ Transmission keeps working information on each torrent in a "resume" file. This 
 Filename: `<torrent file name>.<hash?>.resume`
 
 The file contains the following **per-torrent** properties:
-
 <table>
 <tr><th>Property</th><th>Description</th></tr>
 <tr><td><tt>activity-date</tt></td><td>Date we last uploaded/downloaded a piece of data</td></tr>
@@ -39,7 +38,6 @@ The file contains the following **per-torrent** properties:
 </table>
 
 ## Constants
-
 <table>
 <tr><td>Maximum number of remembered peers</td><td><tt>MAX_REMEMBERED_PEERS</tt></td><td>200</td></tr>
 </table>
