@@ -1,5 +1,9 @@
 cmake_minimum_required(VERSION 3.9 FATAL_ERROR)
 
+if(POLICY CMP0092)
+    cmake_policy(SET CMP0092 NEW)
+endif()
+
 # The value of this variable should be set prior to the first project() command invocation.
 # See: https://cmake.org/cmake/help/latest/variable/CMAKE_OSX_DEPLOYMENT_TARGET.html
 if(CMAKE_OSX_DEPLOYMENT_TARGET STREQUAL "")

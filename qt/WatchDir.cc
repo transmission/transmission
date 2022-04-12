@@ -30,27 +30,27 @@ WatchDir::WatchDir(TorrentModel const& model)
 ****
 ***/
 
-int WatchDir::metainfoTest(QString const& filename) const
+WatchDir::AddResult WatchDir::metainfoTest(QString const& filename) const
 {
     auto metainfo = tr_torrent_metainfo();
     if (!metainfo.parseTorrentFile(filename.toUtf8().constData()))
     {
-        return ERROR;
+        return AddResult::Error;
     }
 
     if (model_.hasTorrent(TorrentHash{ metainfo.infoHash() }))
     {
-        return DUPLICATE;
+        return AddResult::Duplicate;
     }
 
-    return OK;
+    return AddResult::Success;
 }
 
 void WatchDir::onTimeout()
 {
     auto* t = qobject_cast<QTimer*>(sender());
 
-    if (auto const filename = t->objectName(); metainfoTest(filename) == OK)
+    if (auto const filename = t->objectName(); metainfoTest(filename) == AddResult::Success)
     {
         emit torrentFileAdded(filename);
     }
@@ -98,14 +98,14 @@ void WatchDir::watcherActivated(QString const& path)
 
             switch (metainfoTest(filename))
             {
-            case OK:
+            case AddResult::Success:
                 emit torrentFileAdded(filename);
                 break;
 
-            case DUPLICATE:
+            case AddResult::Duplicate:
                 break;
 
-            case ERROR:
+            case AddResult::Error:
                 {
                     // give the torrent a few seconds to finish downloading
                     auto* t = new QTimer(this);
