@@ -126,7 +126,7 @@ int readOrWriteBytes(
             auto const prealloc = (!do_write || !tor->fileIsWanted(file_index)) ? TR_PREALLOCATE_NONE :
                                                                                   tor->session->preallocationMode;
 
-            fd = tr_fdFileCheckout(session, tor->uniqueId, file_index, found->filename, do_write, prealloc, file_size);
+            fd = tr_fdFileCheckout(session, tor->uniqueId, file_index, found->filename(), do_write, prealloc, file_size);
             if (fd == TR_BAD_SYS_FILE)
             {
                 err = errno;
@@ -134,7 +134,7 @@ int readOrWriteBytes(
                     tor,
                     fmt::format(
                         _("Couldn't get '{path}': {error} ({error_code})"),
-                        fmt::arg("path", found->filename),
+                        fmt::arg("path", found->filename()),
                         fmt::arg("error", tr_strerror(err)),
                         fmt::arg("error_code", err)));
             }
