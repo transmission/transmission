@@ -454,7 +454,7 @@ std::string_view tr_torrent_metainfo::parseImpl(tr_torrent_metainfo& setme, tr_v
 
     // do the size and piece size match up?
     setme.block_info_.initSizes(total_size, piece_size);
-    if (setme.block_info_.n_pieces != std::size(setme.pieces_))
+    if (setme.block_info_.pieceCount() != std::size(setme.pieces_))
     {
         return "piece count and file sizes do not match";
     }
