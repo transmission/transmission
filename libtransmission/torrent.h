@@ -582,8 +582,6 @@ public:
         torrent's content than any other mime-type. */
     [[nodiscard]] std::string_view primaryMimeType() const;
 
-    static constexpr std::string_view PartialFileSuffix = std::string_view{ ".part" };
-
     tr_torrent_metainfo metainfo_;
 
     // TODO(ckerr): make private once some of torrent.cc's `tr_torrentFoo()` methods are member functions
