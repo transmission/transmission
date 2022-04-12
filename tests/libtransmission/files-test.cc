@@ -78,13 +78,13 @@ TEST_F(FilesTest, find)
     auto const search_path_2 = tr_pathbuf{ "/tmp"sv };
 
     auto search_path = std::vector<std::string_view>{ search_path_1.sv(), search_path_2.sv() };
-    auto found = files.find(std::data(search_path), std::size(search_path), file_index);
+    auto found = files.find(file_index, std::data(search_path), std::size(search_path));
     EXPECT_TRUE(found);
     EXPECT_EQ(filename, found->filename());
 
     // same search, but with the search paths reversed
     search_path = std::vector<std::string_view>{ search_path_2.sv(), search_path_1.sv() };
-    found = files.find(std::data(search_path), std::size(search_path), file_index);
+    found = files.find(file_index, std::data(search_path), std::size(search_path));
     EXPECT_TRUE(found);
     EXPECT_EQ(filename, found->filename());
 
@@ -92,17 +92,17 @@ TEST_F(FilesTest, find)
     auto const partial_filename = tr_pathbuf{ filename, tr_files::PartialFileSuffix };
     EXPECT_TRUE(tr_sys_path_rename(filename, partial_filename));
     search_path = std::vector<std::string_view>{ search_path_1.sv(), search_path_2.sv() };
-    found = files.find(std::data(search_path), std::size(search_path), file_index);
+    found = files.find(file_index, std::data(search_path), std::size(search_path));
     EXPECT_TRUE(found);
     EXPECT_EQ(partial_filename, found->filename());
 
     // same search, but with the search paths reversed
     search_path = std::vector<std::string_view>{ search_path_2.sv(), search_path_1.sv() };
-    found = files.find(std::data(search_path), std::size(search_path), file_index);
+    found = files.find(file_index, std::data(search_path), std::size(search_path));
     EXPECT_TRUE(found);
     EXPECT_EQ(partial_filename, found->filename());
 
     // what about if we look for a file that does not exist
     EXPECT_TRUE(tr_sys_path_remove(partial_filename));
-    EXPECT_FALSE(files.find(std::data(search_path), std::size(search_path), file_index));
+    EXPECT_FALSE(files.find(file_index, std::data(search_path), std::size(search_path)));
 }

@@ -24,12 +24,12 @@ struct tr_files
 public:
     [[nodiscard]] bool empty() const noexcept;
     [[nodiscard]] size_t size() const noexcept;
-    [[nodiscard]] uint64_t size(tr_file_index_t i) const;
-    [[nodiscard]] std::string const& path(tr_file_index_t i) const;
+    [[nodiscard]] uint64_t size(tr_file_index_t) const;
+    [[nodiscard]] std::string const& path(tr_file_index_t) const;
 
-    void setPath(tr_file_index_t i, std::string_view path);
+    void setPath(tr_file_index_t, std::string_view path);
 
-    void reserve(size_t n);
+    void reserve(size_t);
     tr_file_index_t add(std::string_view path, uint64_t size);
     void shrinkToFit();
     void clear() noexcept;
@@ -67,7 +67,10 @@ public:
         size_t base_len_;
     };
 
-    [[nodiscard]] std::optional<FoundFile> find(std::string_view const* search_paths, size_t n_paths, tr_file_index_t i) const;
+    [[nodiscard]] std::optional<FoundFile> find(
+        tr_file_index_t file_index,
+        std::string_view const* search_paths,
+        size_t n_paths) const;
 
     static constexpr std::string_view PartialFileSuffix = ".part";
 

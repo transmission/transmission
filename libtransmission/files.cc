@@ -21,24 +21,24 @@ size_t tr_files::size() const noexcept
     return std::size(files_);
 }
 
-uint64_t tr_files::size(tr_file_index_t i) const
+uint64_t tr_files::size(tr_file_index_t file_index) const
 {
-    return files_.at(i).size_;
+    return files_.at(file_index).size_;
 }
 
-std::string const& tr_files::path(tr_file_index_t i) const
+std::string const& tr_files::path(tr_file_index_t file_index) const
 {
-    return files_.at(i).path_;
+    return files_.at(file_index).path_;
 }
 
-void tr_files::setPath(tr_file_index_t i, std::string_view path)
+void tr_files::setPath(tr_file_index_t file_index, std::string_view path)
 {
-    files_.at(i).setPath(path);
+    files_.at(file_index).setPath(path);
 }
 
-void tr_files::reserve(size_t n)
+void tr_files::reserve(size_t n_files)
 {
-    files_.reserve(n);
+    files_.reserve(n_files);
 }
 
 void tr_files::shrinkToFit()
@@ -59,9 +59,9 @@ void tr_files::clear() noexcept
 }
 
 std::optional<tr_files::FoundFile> tr_files::find(
+    tr_file_index_t file_index,
     std::string_view const* search_paths,
-    size_t n_paths,
-    tr_file_index_t file_index) const
+    size_t n_paths) const
 {
     auto filename = tr_pathbuf{};
     auto file_info = tr_sys_path_info{};

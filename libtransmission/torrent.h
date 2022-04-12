@@ -384,7 +384,7 @@ public:
             paths[n_paths++] = path.sv();
         }
 
-        return metainfo_.files().find(std::data(paths), n_paths, file_index);
+        return metainfo_.files().find(file_index, std::data(paths), n_paths);
     }
 
     /// METAINFO - TRACKERS
