@@ -9,7 +9,6 @@
 #error only libtransmission should #include this header.
 #endif
 
-#include <array>
 #include <cstddef> // size_t
 #include <ctime>
 #include <optional>
@@ -369,23 +368,9 @@ public:
         metainfo_.setFileSubpath(i, subpath);
     }
 
-    [[nodiscard]] auto findFile(tr_file_index_t file_index) const
-    {
-        auto n_paths = size_t{ 0U };
-        auto paths = std::array<std::string_view, 2>{};
+    [[nodiscard]] std::optional<tr_files::FoundFile> findFile(tr_file_index_t file_index) const;
 
-        if (auto const path = downloadDir(); !std::empty(path))
-        {
-            paths[n_paths++] = path.sv();
-        }
-
-        if (auto const path = incompleteDir(); !std::empty(path))
-        {
-            paths[n_paths++] = path.sv();
-        }
-
-        return metainfo_.files().find(file_index, std::data(paths), n_paths);
-    }
+    [[nodiscard]] bool hasAnyLocalData() const;
 
     /// METAINFO - TRACKERS
 

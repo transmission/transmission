@@ -86,3 +86,16 @@ std::optional<tr_files::FoundFile> tr_files::find(
 
     return {};
 }
+
+bool tr_files::hasAnyLocalData(std::string_view const* search_paths, size_t n_paths) const
+{
+    for (tr_file_index_t i = 0, n = size(); i < n; ++i)
+    {
+        if (find(i, search_paths, n_paths))
+        {
+            return true;
+        }
+    }
+
+    return false;
+}

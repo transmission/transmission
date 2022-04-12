@@ -106,3 +106,22 @@ TEST_F(FilesTest, find)
     EXPECT_TRUE(tr_sys_path_remove(partial_filename));
     EXPECT_FALSE(files.find(file_index, std::data(search_path), std::size(search_path)));
 }
+
+TEST_F(FilesTest, hasAnyLocalData)
+{
+    static auto constexpr Contents = "hello"sv;
+    auto const filename = tr_pathbuf{ sandboxDir(), "/first_dir/hello.txt"sv };
+    createFileWithContents(std::string{ filename }, std::data(Contents), std::size(Contents));
+
+    auto files = tr_files{};
+    files.add("first_dir/hello.txt", 1024);
+
+    auto const search_path_1 = tr_pathbuf{ sandboxDir() };
+    auto const search_path_2 = tr_pathbuf{ "/tmp"sv };
+
+    auto search_path = std::vector<std::string_view>{ search_path_1.sv(), search_path_2.sv() };
+    EXPECT_TRUE(files.hasAnyLocalData(std::data(search_path), 2U));
+    EXPECT_TRUE(files.hasAnyLocalData(std::data(search_path), 1U));
+    EXPECT_FALSE(files.hasAnyLocalData(std::data(search_path) + 1, 1U));
+    EXPECT_FALSE(files.hasAnyLocalData(std::data(search_path), 0U));
+}
