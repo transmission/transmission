@@ -11,8 +11,17 @@
 
 struct tr_block_info
 {
+private:
+    uint64_t total_size_ = 0;
+    uint64_t piece_size_ = 0;
+    uint64_t n_pieces_ = 0;
+
+    tr_block_index_t n_blocks_ = 0;
+    uint32_t final_block_size_ = 0;
+    uint32_t final_piece_size_ = 0;
     static auto constexpr BlockSize = uint32_t{ 1024 * 16 };
 
+public:
     tr_block_info() noexcept = default;
 
     tr_block_info(uint64_t total_size_in, uint64_t piece_size_in) noexcept
@@ -103,12 +112,4 @@ private:
     {
         return piece_size_ != 0;
     }
-
-    uint64_t total_size_ = 0;
-    uint64_t piece_size_ = 0;
-    uint64_t n_pieces_ = 0;
-
-    tr_block_index_t n_blocks_ = 0;
-    uint32_t final_block_size_ = 0;
-    uint32_t final_piece_size_ = 0;
 };
