@@ -242,7 +242,7 @@ std::string_view tr_torrent_metainfo::parseFiles(tr_torrent_metainfo& setme, tr_
     if (tr_variantDictFindInt(info_dict, TR_KEY_length, &len))
     {
         total_size = len;
-        setme.files_.emplace_back(root_name, len);
+        setme.files_.add(root_name, len);
     }
 
     // "For the purposes of the other keys, the multi-file case is treated as
@@ -285,7 +285,7 @@ std::string_view tr_torrent_metainfo::parseFiles(tr_torrent_metainfo& setme, tr_
                 return "path";
             }
 
-            setme.files_.emplace_back(buf, len);
+            setme.files_.add(buf, len);
             total_size += len;
         }
     }
@@ -558,25 +558,4 @@ void tr_torrent_metainfo::removeFile(
 {
     tr_sys_path_remove(makeFilename(dirname, name, info_hash_string, BasenameFormat::NameAndPartialHash, suffix));
     tr_sys_path_remove(makeFilename(dirname, name, info_hash_string, BasenameFormat::Hash, suffix));
-}
-
-std::string const& tr_torrent_metainfo::fileSubpath(tr_file_index_t i) const
-{
-    TR_ASSERT(i < fileCount());
-
-    return files_.at(i).path();
-}
-
-void tr_torrent_metainfo::setFileSubpath(tr_file_index_t i, std::string_view subpath)
-{
-    TR_ASSERT(i < fileCount());
-
-    files_.at(i).setSubpath(subpath);
-}
-
-uint64_t tr_torrent_metainfo::fileSize(tr_file_index_t i) const
-{
-    TR_ASSERT(i < fileCount());
-
-    return files_.at(i).size();
 }

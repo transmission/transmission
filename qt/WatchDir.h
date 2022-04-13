@@ -36,14 +36,14 @@ private slots:
     void rescanAllWatchedDirectories();
 
 private:
-    enum
+    enum class AddResult
     {
-        OK,
-        DUPLICATE,
-        ERROR
+        Success,
+        Duplicate,
+        Error
     };
 
-    int metainfoTest(QString const& filename) const;
+    AddResult metainfoTest(QString const& filename) const;
 
     TorrentModel const& model_;
 
