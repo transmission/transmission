@@ -96,7 +96,7 @@ private:
     // Location of the last byte in `piece`.
     [[nodiscard]] Location pieceLastLoc(tr_piece_index_t piece) const
     {
-        return byteLoc(uint64_t{ piece } * pieceSize() + pieceSize(piece) - 1);
+        return byteLoc(static_cast<uint64_t>(piece) * pieceSize() + pieceSize(piece) - 1);
     }
 
     [[nodiscard]] bool constexpr isInitialized() const noexcept
