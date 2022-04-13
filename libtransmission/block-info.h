@@ -52,7 +52,7 @@ struct tr_block_info
         return total_size_;
     }
 
-    [[nodiscard]] constexpr tr_block_span_t blockSpanForPiece(tr_piece_index_t piece) const noexcept
+    [[nodiscard]] tr_block_span_t blockSpanForPiece(tr_piece_index_t piece) const noexcept
     {
         if (!isInitialized())
         {
