@@ -24,32 +24,32 @@ struct tr_block_info
 
     [[nodiscard]] constexpr auto blockCount() const noexcept
     {
-        return n_blocks;
+        return n_blocks_;
     }
 
     [[nodiscard]] constexpr auto blockSize(tr_block_index_t block) const noexcept
     {
-        return block + 1 == n_blocks ? final_block_size : BlockSize;
+        return block + 1 == n_blocks_ ? final_block_size_ : BlockSize;
     }
 
     [[nodiscard]] constexpr auto pieceCount() const noexcept
     {
-        return n_pieces;
+        return n_pieces_;
     }
 
     [[nodiscard]] constexpr auto pieceSize() const noexcept
     {
-        return piece_size;
+        return piece_size_;
     }
 
     [[nodiscard]] constexpr auto pieceSize(tr_piece_index_t piece) const noexcept
     {
-        return piece + 1 == n_pieces ? final_piece_size : pieceSize();
+        return piece + 1 == n_pieces_ ? final_piece_size_ : pieceSize();
     }
 
     [[nodiscard]] constexpr auto totalSize() const noexcept
     {
-        return total_size;
+        return total_size_;
     }
 
     [[nodiscard]] constexpr tr_block_span_t blockSpanForPiece(tr_piece_index_t piece) const noexcept
@@ -101,14 +101,14 @@ private:
 
     [[nodiscard]] bool constexpr isInitialized() const noexcept
     {
-        return piece_size != 0;
+        return piece_size_ != 0;
     }
 
-    uint64_t total_size = 0;
-    uint64_t piece_size = 0;
-    uint64_t n_pieces = 0;
+    uint64_t total_size_ = 0;
+    uint64_t piece_size_ = 0;
+    uint64_t n_pieces_ = 0;
 
-    tr_block_index_t n_blocks = 0;
-    uint32_t final_block_size = 0;
-    uint32_t final_piece_size = 0;
+    tr_block_index_t n_blocks_ = 0;
+    uint32_t final_block_size_ = 0;
+    uint32_t final_piece_size_ = 0;
 };

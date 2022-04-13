@@ -3,8 +3,6 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <event2/util.h>
-
 #include "transmission.h"
 
 #include "block-info.h"
@@ -12,43 +10,28 @@
 
 void tr_block_info::initSizes(uint64_t total_size_in, uint64_t piece_size_in) noexcept
 {
-    total_size = total_size_in;
-    piece_size = piece_size_in;
-
-    TR_ASSERT(piece_size == 0 || piece_size >= BlockSize);
-
-    if (piece_size == 0)
+    TR_ASSERT(piece_size_in == 0 || piece_size_in >= BlockSize);
+    if (piece_size_in == 0)
     {
         *this = {};
         return;
     }
 
-    n_pieces = (total_size + piece_size - 1) / piece_size;
+    total_size_ = total_size_in;
+    piece_size_ = piece_size_in;
+    n_pieces_ = (total_size_ + piece_size_ - 1) / piece_size_;
+    n_blocks_ = (total_size_ + BlockSize - 1) / BlockSize;
 
-    auto remainder = total_size % piece_size;
-    final_piece_size = remainder != 0U ? remainder : piece_size;
+    auto remainder = total_size_ % piece_size_;
+    final_piece_size_ = remainder != 0U ? remainder : piece_size_;
 
-    remainder = total_size % BlockSize;
-    final_block_size = remainder != 0U ? remainder : BlockSize;
-
-    n_blocks = (total_size + BlockSize - 1) / BlockSize;
-
-#ifdef TR_ENABLE_ASSERTS
-    uint64_t t = n_pieces - 1;
-    t *= piece_size;
-    t += final_piece_size;
-    TR_ASSERT(t == total_size);
-
-    t = n_blocks - 1;
-    t *= BlockSize;
-    t += final_block_size;
-    TR_ASSERT(t == total_size);
-#endif
+    remainder = total_size_ % BlockSize;
+    final_block_size_ = remainder != 0U ? remainder : BlockSize;
 }
 
 tr_block_info::Location tr_block_info::byteLoc(uint64_t byte_idx) const noexcept
 {
-    TR_ASSERT(byte_idx <= total_size);
+    TR_ASSERT(byte_idx <= totalSize());
 
     if (!isInitialized())
     {
@@ -78,14 +61,14 @@ tr_block_info::Location tr_block_info::byteLoc(uint64_t byte_idx) const noexcept
 
 tr_block_info::Location tr_block_info::blockLoc(tr_block_index_t block) const noexcept
 {
-    TR_ASSERT(block < n_blocks);
+    TR_ASSERT(block < blockCount());
 
     return byteLoc(uint64_t{ block } * BlockSize);
 }
 
 tr_block_info::Location tr_block_info::pieceLoc(tr_piece_index_t piece, uint32_t offset, uint32_t length) const noexcept
 {
-    TR_ASSERT(piece < n_pieces);
+    TR_ASSERT(piece < pieceCount());
 
     return byteLoc(uint64_t{ piece } * pieceSize() + offset + length);
 }
