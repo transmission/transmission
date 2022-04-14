@@ -58,7 +58,7 @@ TEST_P(IncompleteDirTest, incompleteDir)
     auto* const tor = zeroTorrentInit(ZeroTorrentState::Partial);
     auto path = tr_pathbuf{};
 
-    path.assign(incomplete_dir, '/', tr_torrentFile(tor, 0).name, ".part"sv);
+    path.assign(incomplete_dir, '/', tr_torrentFile(tor, 0).name, tr_torrent_files::PartialFileSuffix);
     EXPECT_EQ(path, makeString(tr_torrentFindFile(tor, 0)));
     path.assign(incomplete_dir, '/', tr_torrentFile(tor, 1).name);
     EXPECT_EQ(path, makeString(tr_torrentFindFile(tor, 1)));

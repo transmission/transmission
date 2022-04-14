@@ -116,7 +116,7 @@ int readOrWriteBytes(
             // We didn't find the file that we want to write to.
             // Let's figure out where it goes so that we can create it.
             auto const base = tor->currentDir();
-            auto const suffix = tor->session->isIncompleteFileNamingEnabled ? tr_files::PartialFileSuffix : ""sv;
+            auto const suffix = tor->session->isIncompleteFileNamingEnabled ? tr_torrent_files::PartialFileSuffix : ""sv;
             found = { {}, tr_pathbuf{ base, "/"sv, tor->fileSubpath(file_index), suffix }, std::size(base) };
         }
 

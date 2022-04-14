@@ -559,6 +559,16 @@ public:
         this->error_string = errmsg;
     }
 
+    void setDownloadDir(std::string_view path)
+    {
+        download_dir = path;
+        markEdited();
+        setDirty();
+        refreshCurrentDir();
+    }
+
+    void refreshCurrentDir();
+
     void setVerifyState(tr_verify_state state);
 
     void setDateActive(time_t t);

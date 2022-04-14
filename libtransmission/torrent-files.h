@@ -16,23 +16,74 @@
 #include "file.h"
 #include "tr-strbuf.h"
 
+struct tr_error;
+
 /**
- * A simple ordered collection of files.
+ * A simple collection of files & utils for finding them, moving them, etc.
  */
 struct tr_torrent_files
 {
 public:
-    [[nodiscard]] bool empty() const noexcept;
-    [[nodiscard]] size_t size() const noexcept;
-    [[nodiscard]] uint64_t size(tr_file_index_t) const;
-    [[nodiscard]] std::string const& path(tr_file_index_t) const;
+    [[nodiscard]] bool empty() const noexcept
+    {
+        return std::empty(files_);
+    }
 
-    void setPath(tr_file_index_t, std::string_view path);
+    [[nodiscard]] size_t fileCount() const noexcept
+    {
+        return std::size(files_);
+    }
 
-    void reserve(size_t);
-    void shrinkToFit();
-    void clear() noexcept;
-    tr_file_index_t add(std::string_view path, uint64_t size);
+    [[nodiscard]] uint64_t fileSize(tr_file_index_t file_index) const
+    {
+        return files_.at(file_index).size_;
+    }
+
+    [[nodiscard]] constexpr auto totalSize() const noexcept
+    {
+        return total_size_;
+    }
+
+    [[nodiscard]] std::string const& path(tr_file_index_t file_index) const
+    {
+        return files_.at(file_index).path_;
+    }
+
+    void setPath(tr_file_index_t file_index, std::string_view path)
+    {
+        files_.at(file_index).setPath(path);
+    }
+
+    void reserve(size_t n_files)
+    {
+        files_.reserve(n_files);
+    }
+
+    void shrinkToFit()
+    {
+        files_.shrink_to_fit();
+    }
+
+    void clear() noexcept
+    {
+        files_.clear();
+        total_size_ = uint64_t{};
+    }
+
+    tr_file_index_t add(std::string_view path, uint64_t file_size)
+    {
+        auto const ret = static_cast<tr_file_index_t>(std::size(files_));
+        files_.emplace_back(path, file_size);
+        total_size_ += file_size;
+        return ret;
+    }
+
+    bool move(
+        std::string_view old_top_in,
+        std::string_view top_in,
+        double volatile* setme_progress,
+        std::string_view log_name = "",
+        tr_error** error = nullptr) const;
 
     struct FoundFile : public tr_sys_path_info
     {
@@ -92,4 +143,5 @@ private:
     };
 
     std::vector<file_t> files_;
+    uint64_t total_size_;
 };
