@@ -645,7 +645,7 @@ static bool isNewTorrentASeed(tr_torrent* tor)
         }
 
         // it's not a new seed if a file is partial
-        if (tr_strvEndsWith(found->filename(), tr_torrent::PartialFileSuffix))
+        if (tr_strvEndsWith(found->filename(), tr_files::PartialFileSuffix))
         {
             return false;
         }
@@ -2253,7 +2253,7 @@ static void deleteLocalData(tr_torrent const* tor, tr_fileFunc func)
 
         if (!tr_sys_path_exists(filename.c_str()))
         {
-            filename += tr_torrent::PartialFileSuffix;
+            filename += tr_files::PartialFileSuffix;
 
             if (!tr_sys_path_exists(filename.c_str()))
             {
@@ -2863,14 +2863,14 @@ static int renamePath(tr_torrent* tor, char const* oldpath, char const* newname)
 
     if (!tr_sys_path_exists(src.c_str())) /* check for it as a partial */
     {
-        src += tr_torrent::PartialFileSuffix;
+        src += tr_files::PartialFileSuffix;
     }
 
     if (tr_sys_path_exists(src.c_str()))
     {
         auto const parent = tr_sys_path_dirname(src);
-        auto const tgt = tr_strvEndsWith(src, tr_torrent::PartialFileSuffix) ?
-            tr_pathbuf{ parent, '/', newname, tr_torrent::PartialFileSuffix } :
+        auto const tgt = tr_strvEndsWith(src, tr_files::PartialFileSuffix) ?
+            tr_pathbuf{ parent, '/', newname, tr_files::PartialFileSuffix } :
             tr_pathbuf{ parent, '/', newname };
 
         auto tmp = errno;

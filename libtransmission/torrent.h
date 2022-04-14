@@ -165,7 +165,7 @@ public:
     {
         return metainfo_.blockSize(block);
     }
-    [[nodiscard]] constexpr auto blockSpanForPiece(tr_piece_index_t piece) const
+    [[nodiscard]] auto blockSpanForPiece(tr_piece_index_t piece) const
     {
         return metainfo_.blockSpanForPiece(piece);
     }
@@ -581,8 +581,6 @@ public:
     /** Return the mime-type (e.g. "audio/x-flac") that matches more of the
         torrent's content than any other mime-type. */
     [[nodiscard]] std::string_view primaryMimeType() const;
-
-    static constexpr std::string_view PartialFileSuffix = std::string_view{ ".part" };
 
     tr_torrent_metainfo metainfo_;
 

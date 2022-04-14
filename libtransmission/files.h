@@ -30,9 +30,9 @@ public:
     void setPath(tr_file_index_t, std::string_view path);
 
     void reserve(size_t);
-    tr_file_index_t add(std::string_view path, uint64_t size);
     void shrinkToFit();
     void clear() noexcept;
+    tr_file_index_t add(std::string_view path, uint64_t size);
 
     struct FoundFile : public tr_sys_path_info
     {
