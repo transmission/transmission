@@ -368,7 +368,7 @@ public:
         metainfo_.setFileSubpath(i, subpath);
     }
 
-    [[nodiscard]] std::optional<tr_files::FoundFile> findFile(tr_file_index_t file_index) const;
+    [[nodiscard]] std::optional<tr_torrent_files::FoundFile> findFile(tr_file_index_t file_index) const;
 
     [[nodiscard]] bool hasAnyLocalData() const;
 

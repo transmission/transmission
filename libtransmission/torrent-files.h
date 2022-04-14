@@ -19,7 +19,7 @@
 /**
  * A simple ordered collection of files.
  */
-struct tr_files
+struct tr_torrent_files
 {
 public:
     [[nodiscard]] bool empty() const noexcept;

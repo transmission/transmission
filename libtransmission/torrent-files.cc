@@ -9,56 +9,56 @@
 
 #include "transmission.h"
 
-#include "files.h"
+#include "torrent-files.h"
 
-bool tr_files::empty() const noexcept
+bool tr_torrent_files::empty() const noexcept
 {
     return std::empty(files_);
 }
 
-size_t tr_files::size() const noexcept
+size_t tr_torrent_files::size() const noexcept
 {
     return std::size(files_);
 }
 
-uint64_t tr_files::size(tr_file_index_t file_index) const
+uint64_t tr_torrent_files::size(tr_file_index_t file_index) const
 {
     return files_.at(file_index).size_;
 }
 
-std::string const& tr_files::path(tr_file_index_t file_index) const
+std::string const& tr_torrent_files::path(tr_file_index_t file_index) const
 {
     return files_.at(file_index).path_;
 }
 
-void tr_files::setPath(tr_file_index_t file_index, std::string_view path)
+void tr_torrent_files::setPath(tr_file_index_t file_index, std::string_view path)
 {
     files_.at(file_index).setPath(path);
 }
 
-void tr_files::reserve(size_t n_files)
+void tr_torrent_files::reserve(size_t n_files)
 {
     files_.reserve(n_files);
 }
 
-void tr_files::shrinkToFit()
+void tr_torrent_files::shrinkToFit()
 {
     files_.shrink_to_fit();
 }
 
-tr_file_index_t tr_files::add(std::string_view path, uint64_t size)
+tr_file_index_t tr_torrent_files::add(std::string_view path, uint64_t size)
 {
     auto const file_index = static_cast<tr_file_index_t>(std::size(files_));
     files_.emplace_back(path, size);
     return file_index;
 }
 
-void tr_files::clear() noexcept
+void tr_torrent_files::clear() noexcept
 {
     files_.clear();
 }
 
-std::optional<tr_files::FoundFile> tr_files::find(
+std::optional<tr_torrent_files::FoundFile> tr_torrent_files::find(
     tr_file_index_t file_index,
     std::string_view const* search_paths,
     size_t n_paths) const
@@ -87,7 +87,7 @@ std::optional<tr_files::FoundFile> tr_files::find(
     return {};
 }
 
-bool tr_files::hasAnyLocalData(std::string_view const* search_paths, size_t n_paths) const
+bool tr_torrent_files::hasAnyLocalData(std::string_view const* search_paths, size_t n_paths) const
 {
     for (tr_file_index_t i = 0, n = size(); i < n; ++i)
     {
