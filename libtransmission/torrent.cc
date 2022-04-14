@@ -594,24 +594,42 @@ void tr_torrent::setMetainfo(tr_torrent_metainfo const& tm)
     this->setDirty();
 }
 
-static bool hasAnyLocalData(tr_torrent const* tor)
+static size_t buildSearchPathArray(tr_torrent const* tor, std::string_view* paths)
 {
-    for (tr_file_index_t i = 0, n = tor->fileCount(); i < n; ++i)
+    auto* walk = paths;
+
+    if (auto const& path = tor->downloadDir(); !std::empty(path))
     {
-        if (tor->findFile(i))
-        {
-            return true;
-        }
+        *walk++ = path.sv();
     }
 
-    return false;
+    if (auto const& path = tor->incompleteDir(); !std::empty(path))
+    {
+        *walk++ = path.sv();
+    }
+
+    return walk - paths;
+}
+
+std::optional<tr_files::FoundFile> tr_torrent::findFile(tr_file_index_t file_index) const
+{
+    auto paths = std::array<std::string_view, 4>{};
+    auto const n_paths = buildSearchPathArray(this, std::data(paths));
+    return metainfo_.files().find(file_index, std::data(paths), n_paths);
+}
+
+bool tr_torrent::hasAnyLocalData() const
+{
+    auto paths = std::array<std::string_view, 4>{};
+    auto const n_paths = buildSearchPathArray(this, std::data(paths));
+    return metainfo_.files().hasAnyLocalData(std::data(paths), n_paths);
 }
 
 static bool setLocalErrorIfFilesDisappeared(tr_torrent* tor, std::optional<bool> has_local_data = {})
 {
     if (!has_local_data)
     {
-        has_local_data = hasAnyLocalData(tor);
+        has_local_data = tor->hasAnyLocalData();
     }
 
     bool const files_disappeared = tor->hasTotal() > 0 && !*has_local_data;

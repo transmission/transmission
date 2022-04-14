@@ -67,10 +67,8 @@ public:
         size_t base_len_;
     };
 
-    [[nodiscard]] std::optional<FoundFile> find(
-        tr_file_index_t file_index,
-        std::string_view const* search_paths,
-        size_t n_paths) const;
+    [[nodiscard]] std::optional<FoundFile> find(tr_file_index_t, std::string_view const* search_paths, size_t n_paths) const;
+    [[nodiscard]] bool hasAnyLocalData(std::string_view const* search_paths, size_t n_paths) const;
 
     static constexpr std::string_view PartialFileSuffix = ".part";
 
