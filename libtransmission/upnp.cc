@@ -277,7 +277,7 @@ tr_port_forwarding tr_upnpPulse(tr_upnp* handle, tr_port port, bool isEnabled, b
             UPNP_IGD_VALID_CONNECTED)
         {
             tr_logAddInfo(fmt::format(_("Found Internet Gateway Device '{url}'"), fmt::arg("url", handle->urls.controlURL)));
-            tr_logAddInfo(fmt::format(_("Local Address is '{address}')"), fmt::arg("address", handle->lanaddr)));
+            tr_logAddInfo(fmt::format(_("Local Address is '{address}'"), fmt::arg("address", handle->lanaddr)));
             handle->state = UpnpState::IDLE;
             handle->hasDiscovered = true;
         }
@@ -341,7 +341,7 @@ tr_port_forwarding tr_upnpPulse(tr_upnp* handle, tr_port port, bool isEnabled, b
             handle->isMapped = err_tcp == 0 || err_udp == 0;
         }
 
-        tr_logAddInfo(fmt::format(
+        tr_logAddDebug(fmt::format(
             _("Port forwarding through '{url}', service '{type}'. (local address: {address}:{port})"),
             fmt::arg("url", handle->urls.controlURL),
             fmt::arg("type", handle->data.first.servicetype),
@@ -350,7 +350,7 @@ tr_port_forwarding tr_upnpPulse(tr_upnp* handle, tr_port port, bool isEnabled, b
 
         if (handle->isMapped)
         {
-            tr_logAddInfo(_("Port forwarding successful!"));
+            tr_logAddInfo(fmt::format(_("Port {port} is forwarded"), fmt::arg("port", port)));
             handle->port = port;
             handle->state = UpnpState::IDLE;
         }
