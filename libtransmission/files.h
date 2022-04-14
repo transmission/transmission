@@ -30,9 +30,9 @@ public:
     void setPath(tr_file_index_t, std::string_view path);
 
     void reserve(size_t);
-    tr_file_index_t add(std::string_view path, uint64_t size);
     void shrinkToFit();
     void clear() noexcept;
+    tr_file_index_t add(std::string_view path, uint64_t size);
 
     struct FoundFile : public tr_sys_path_info
     {
@@ -67,10 +67,8 @@ public:
         size_t base_len_;
     };
 
-    [[nodiscard]] std::optional<FoundFile> find(
-        tr_file_index_t file_index,
-        std::string_view const* search_paths,
-        size_t n_paths) const;
+    [[nodiscard]] std::optional<FoundFile> find(tr_file_index_t, std::string_view const* search_paths, size_t n_paths) const;
+    [[nodiscard]] bool hasAnyLocalData(std::string_view const* search_paths, size_t n_paths) const;
 
     static constexpr std::string_view PartialFileSuffix = ".part";
 
