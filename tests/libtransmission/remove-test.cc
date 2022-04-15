@@ -194,7 +194,7 @@ protected:
     {
         auto filenames = std::set<std::string>{};
 
-        auto file_func = [&filenames](const char* filename)
+        auto file_func = [&filenames](char const* filename)
         {
             filenames.emplace(filename);
         };

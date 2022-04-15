@@ -103,7 +103,6 @@ bool isJunkFile(std::string_view filename)
 
 } // unnamed namespace
 
-
 ///
 
 std::optional<tr_torrent_files::FoundFile> tr_torrent_files::find(
