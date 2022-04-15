@@ -18,9 +18,6 @@
 #include <unordered_map>
 #include <vector>
 
-#warning nocommit
-#include <iostream>
-
 #ifndef _WIN32
 #include <sys/wait.h> /* wait() */
 #include <unistd.h> /* fork(), execvp(), _exit() */
@@ -1653,8 +1650,10 @@ static void removeTorrentInEventThread(tr_torrent* tor, bool delete_flag, tr_fil
             delete_func = tr_sys_path_remove;
         }
 
-        std::cerr << __FILE__ << ':' << __LINE__ << " current dir [" << tor->currentDir().sv() << ']' << std::endl;
-        auto const delete_func_wrapper = [&delete_func](char const* filename){ delete_func(filename, nullptr); };
+        auto const delete_func_wrapper = [&delete_func](char const* filename)
+        {
+            delete_func(filename, nullptr);
+        };
         tor->metainfo_.files().remove(tor->currentDir(), tor->name(), delete_func_wrapper);
     }
 

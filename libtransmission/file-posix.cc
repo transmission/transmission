@@ -18,8 +18,6 @@
 #include <string>
 #include <vector>
 
-#include <iostream>
-
 #include <dirent.h>
 #include <fcntl.h> /* O_LARGEFILE, posix_fadvise(), [posix_]fallocate(), fcntl() */
 #include <libgen.h> /* basename(), dirname() */
@@ -551,17 +549,14 @@ bool tr_sys_path_remove(char const* path, tr_error** error)
 {
     TR_ASSERT(path != nullptr);
 
-    auto const ret = remove(path);
-    auto const ok = ret == 0;
-    std::cerr << __FILE__ << ':' << __LINE__ << " remove [" << path << "] ret " << ret << std::endl;
+    bool const ret = remove(path) != -1;
 
-    if (!ok)
+    if (!ret)
     {
-        std::cerr << __FILE__ << ':' << __LINE__ << ' ' << tr_strerror(errno) << ' ' << errno << std::endl;
         set_system_error(error, errno);
     }
 
-    return ok;
+    return ret;
 }
 
 char* tr_sys_path_native_separators(char* path)

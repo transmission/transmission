@@ -20,10 +20,9 @@
 using namespace std::literals;
 using SubpathAndSize = std::pair<std::string_view, uint64_t>;
 
-class RemoveTest: public libtransmission::test::SandboxedTest
+class RemoveTest : public libtransmission::test::SandboxedTest
 {
 protected:
-
     static constexpr std::string_view Content = "Hello, World!"sv;
 
     static void sysPathRemove(char const* filename)
@@ -33,7 +32,7 @@ protected:
 
     static auto aliceFiles()
     {
-        static constexpr std::array<SubpathAndSize, 106> AliceFiles = {{
+        static constexpr std::array<SubpathAndSize, 106> AliceFiles = { {
             { "alice_in_wonderland_librivox/AliceInWonderland_librivox.m4b", 87525736ULL },
             { "alice_in_wonderland_librivox/Alice_in_Wonderland.jpg", 81464ULL },
             { "alice_in_wonderland_librivox/Alice_in_Wonderland.pdf", 185367ULL },
@@ -140,7 +139,7 @@ protected:
             { "alice_in_wonderland_librivox/wonderland_ch_12_esslow.json.gz", 30975ULL },
             { "alice_in_wonderland_librivox/wonderland_ch_12_spectrogram.png", 235568ULL },
             { "alice_in_wonderland_librivox/history/files/alice_in_wonderland_librivox.storj-store.trigger.~1~", 0ULL },
-        }};
+        } };
 
         auto files = tr_torrent_files{};
 
@@ -155,9 +154,8 @@ protected:
 
     static auto ubuntuFiles()
     {
-        static auto constexpr Files = std::array<SubpathAndSize, 1>{{
-            { "ubuntu-20.04.4-desktop-amd64.iso"sv, 3379068928ULL }
-        }};
+        static auto constexpr Files = std::array<SubpathAndSize, 1>{ { { "ubuntu-20.04.4-desktop-amd64.iso"sv,
+                                                                         3379068928ULL } } };
 
         auto files = tr_torrent_files{};
 

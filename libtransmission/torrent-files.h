@@ -5,15 +5,12 @@
 
 #pragma once
 
-#include <cstdint>
+#include <cstdint> // uint64_t
 #include <functional>
 #include <optional>
 #include <string>
 #include <string_view>
 #include <vector>
-
-#warning nocommit
-#include <fmt/format.h>
 
 #include "transmission.h"
 
@@ -76,7 +73,6 @@ public:
 
     tr_file_index_t add(std::string_view path, uint64_t file_size)
     {
-        fmt::print("{:s}:{:d} add '{:s}'\n", __FILE__, __LINE__, path);
         auto const ret = static_cast<tr_file_index_t>(std::size(files_));
         files_.emplace_back(path, file_size);
         total_size_ += file_size;
@@ -91,7 +87,6 @@ public:
         tr_error** error = nullptr) const;
 
     using FileFunc = std::function<void(char const* filename)>;
-
     void remove(std::string_view top_in, std::string_view tmpdir_prefix, FileFunc const& func) const;
 
     struct FoundFile : public tr_sys_path_info
