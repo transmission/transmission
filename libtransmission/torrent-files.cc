@@ -298,15 +298,11 @@ void tr_torrent_files::remove(std::string_view parent_in, std::string_view tmpdi
     // OK we've removed the local data.
     // What's left are empty folders, junk, and user-generated files.
     // Remove the first two categories and leave the third alone.
-    auto const remove_junk = [&func](char const* filename)
+    auto const remove_junk = [](char const* filename)
     {
-        if (isEmptyDirectory(filename))
+        if (isEmptyDirectory(filename) || isJunkFile(filename))
         {
             tr_sys_path_remove(filename);
-        }
-        else if (isDirectory(filename) || isJunkFile(filename))
-        {
-            func(filename);
         }
     };
     for (auto const& filename : top_files)
