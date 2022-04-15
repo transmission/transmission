@@ -425,11 +425,11 @@ std::string_view tr_torrent_metainfo::parseImpl(tr_torrent_metainfo& setme, tr_v
     }
 
     // piece length
-    if (!tr_variantDictFindInt(info_dict, TR_KEY_piece_length, &i) && (i <= 0))
+    if (!tr_variantDictFindInt(info_dict, TR_KEY_piece_length, &i) || (i <= 0) || (i > UINT32_MAX))
     {
         return "'info' dict 'piece length' is missing or has an invalid value";
     }
-    auto const piece_size = i;
+    auto const piece_size = (uint32_t)i;
 
     // pieces
     if (!tr_variantDictFindStrView(info_dict, TR_KEY_pieces, &sv) || (std::size(sv) % sizeof(tr_sha1_digest_t) != 0))
