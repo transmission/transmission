@@ -208,7 +208,6 @@ protected:
 TEST_F(RemoveTest, RemovesSingleFile)
 {
     auto const parent = sandboxDir();
-
     auto expected_tree = std::set<std::string>{ parent };
     EXPECT_EQ(expected_tree, getSubtreeContents(parent));
 
@@ -224,7 +223,6 @@ TEST_F(RemoveTest, RemovesSingleFile)
 TEST_F(RemoveTest, RemovesSubtree)
 {
     auto const parent = sandboxDir();
-
     auto expected_tree = std::set<std::string>{ parent };
     EXPECT_EQ(expected_tree, getSubtreeContents(parent));
 
@@ -240,7 +238,6 @@ TEST_F(RemoveTest, RemovesSubtree)
 TEST_F(RemoveTest, RemovesLeftoverJunk)
 {
     auto const parent = sandboxDir();
-
     auto expected_tree = std::set<std::string>{ parent };
     EXPECT_EQ(expected_tree, getSubtreeContents(parent));
 
@@ -248,7 +245,7 @@ TEST_F(RemoveTest, RemovesLeftoverJunk)
     expected_tree = createFiles(files, parent.c_str());
     EXPECT_EQ(expected_tree, getSubtreeContents(parent));
 
-    // add in a junk file
+    // add a junk file.
     auto const junk_file = tr_pathbuf{ parent, "/alice_in_wonderland_librivox/.DS_Store"sv };
     createFileWithContents(junk_file, std::data(Content), std::size(Content));
     expected_tree.emplace(junk_file);
@@ -262,51 +259,38 @@ TEST_F(RemoveTest, RemovesLeftoverJunk)
 TEST_F(RemoveTest, RemovesSubtreeIfPossible)
 {
     auto const parent = sandboxDir();
-    auto const files = aliceFiles();
+    auto expected_tree = std::set<std::string>{ parent };
+    EXPECT_EQ(expected_tree, getSubtreeContents(parent));
 
-    auto expected_directory_tree = createFiles(files, parent.c_str());
-    EXPECT_EQ(expected_directory_tree, getSubtreeContents(parent));
-
+    // add a recycle bin
     auto const recycle_bin = tr_pathbuf{ parent, "/Trash"sv };
     tr_sys_dir_create(recycle_bin, TR_SYS_DIR_CREATE_PARENTS, 0777);
+    expected_tree.emplace(recycle_bin);
+    EXPECT_EQ(expected_tree, getSubtreeContents(parent));
+
+    auto const files = aliceFiles();
+    expected_tree = createFiles(files, parent.c_str());
+    expected_tree.emplace(recycle_bin);
+    EXPECT_EQ(expected_tree, getSubtreeContents(parent));
 
     auto const recycle_func = [&recycle_bin](char const* filename)
     {
-        auto const newpath = tr_pathbuf{ recycle_bin, '/', tr_sys_path_basename(filename) };
-        auto const ret = rename(filename, newpath);
-        fmt::print(FMT_STRING("{:s}:{:d} mv '{:s}' '{:s} returned {:d}'\n"), __FILE__, __LINE__, filename, newpath, ret);
-        if (ret != 0)
-        {
-            fmt::print(FMT_STRING("{:s}:{:d} {:s} ({:d})'\n"), __FILE__, __LINE__, tr_strerror(errno), errno);
-        }
+        tr_sys_path_rename(filename, tr_pathbuf{ recycle_bin, '/', tr_sys_path_basename(filename) });
     };
-
     files.remove(parent, "tmpdir_prefix"sv, recycle_func);
 
     // after remove, the subtree should be:
-    expected_directory_tree.clear();
+    expected_tree.clear();
     for (tr_file_index_t i = 0, n = files.fileCount(); i < n; ++i)
     {
-        expected_directory_tree.emplace(tr_pathbuf{ recycle_bin, '/', files.path(i) });
+        expected_tree.emplace(tr_pathbuf{ recycle_bin, '/', files.path(i) });
     }
-    expected_directory_tree.emplace(parent);
-    expected_directory_tree.emplace(recycle_bin);
-    expected_directory_tree.emplace(tr_pathbuf{ recycle_bin, "/alice_in_wonderland_librivox"sv });
-    expected_directory_tree.emplace(tr_pathbuf{ recycle_bin, "/alice_in_wonderland_librivox/history"sv });
-    expected_directory_tree.emplace(tr_pathbuf{ recycle_bin, "/alice_in_wonderland_librivox/history/files"sv });
-    EXPECT_EQ(expected_directory_tree, getSubtreeContents(parent));
-
-    std::cerr << "actual" << std::endl;
-    for (auto const& file : getSubtreeContents(parent))
-    {
-        std::cerr << file << std::endl;
-    }
-
-    std::cerr << std::endl << std::endl << "expected" << std::endl;
-    for (auto const& file : expected_directory_tree)
-    {
-        std::cerr << file << std::endl;
-    }
+    expected_tree.emplace(parent);
+    expected_tree.emplace(recycle_bin);
+    expected_tree.emplace(tr_pathbuf{ recycle_bin, "/alice_in_wonderland_librivox"sv });
+    expected_tree.emplace(tr_pathbuf{ recycle_bin, "/alice_in_wonderland_librivox/history"sv });
+    expected_tree.emplace(tr_pathbuf{ recycle_bin, "/alice_in_wonderland_librivox/history/files"sv });
+    EXPECT_EQ(expected_tree, getSubtreeContents(parent));
 }
 
 TEST_F(RemoveTest, CleansUpTmpdirWhenDone)
