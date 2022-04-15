@@ -148,7 +148,9 @@ using file_func_t = std::function<void(char const* filename)>;
 bool isDirectory(char const* path)
 {
     auto info = tr_sys_path_info{};
-    return tr_sys_path_get_info(path, 0, &info) && (info.type == TR_SYS_PATH_IS_DIRECTORY);
+    auto const ok = tr_sys_path_get_info(path, 0, &info) && (info.type == TR_SYS_PATH_IS_DIRECTORY);
+    fmt::print(FMT_STRING("{:s}:{:d} isDir '{:s}': {:d}\n"), __FILE__, __LINE__, path, (int)ok);
+    return ok;
 }
 
 void depthFirstWalk(char const* path, file_func_t const& func, std::optional<int> max_depth = {})
@@ -243,12 +245,12 @@ void tr_torrent_files::remove(std::string_view parent_in, std::string_view tmpdi
     auto top_files = std::set<std::string>{};
     depthFirstWalk(
         tmpdir,
-        [&tmpdir, &top_files](char const* filename)
+        [&parent, &tmpdir, &top_files](char const* filename)
         {
             if (tmpdir != filename)
             {
                 fmt::print("{:s}:{:d} top-level file found: '{:s}'\n", __FILE__, __LINE__, filename);
-                top_files.emplace(filename);
+                top_files.emplace(tr_pathbuf{ parent, '/', tr_sys_path_basename(filename) });
             }
         },
         1);
@@ -286,6 +288,7 @@ void tr_torrent_files::remove(std::string_view parent_in, std::string_view tmpdi
     };
     for (auto const& filename : top_files)
     {
+        fmt::print(FMT_STRING("{:s}:{:d} calling depthFirstWalk + removeJunk on '{:s}'\n"), __FILE__, __LINE__, filename);
         depthFirstWalk(filename.c_str(), remove_junk);
     }
 }
