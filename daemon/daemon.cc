@@ -340,8 +340,8 @@ static void printMessage(
     std::string_view filename,
     int line)
 {
-    auto const out = std::empty(name) ? fmt::format(FMT_STRING("{:s} ({:s}:{:d}"), message, filename, line) :
-                                        fmt::format(FMT_STRING("{:s} {:s} ({:s}:{:d}"), name, message, filename, line);
+    auto const out = std::empty(name) ? fmt::format(FMT_STRING("{:s} ({:s}:{:d})"), message, filename, line) :
+                                        fmt::format(FMT_STRING("{:s} {:s} ({:s}:{:d})"), name, message, filename, line);
 
     if (file != TR_BAD_SYS_FILE)
     {

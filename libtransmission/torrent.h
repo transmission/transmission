@@ -164,7 +164,7 @@ public:
     {
         return metainfo_.blockSize(block);
     }
-    [[nodiscard]] constexpr auto blockSpanForPiece(tr_piece_index_t piece) const
+    [[nodiscard]] auto blockSpanForPiece(tr_piece_index_t piece) const
     {
         return metainfo_.blockSpanForPiece(piece);
     }
@@ -368,33 +368,9 @@ public:
         metainfo_.setFileSubpath(i, subpath);
     }
 
-    struct tr_found_file_t : public tr_sys_path_info
-    {
-        // /home/foo/Downloads/torrent/01-file-one.txt
-        tr_pathbuf filename;
-        size_t base_len;
+    [[nodiscard]] std::optional<tr_files::FoundFile> findFile(tr_file_index_t file_index) const;
 
-        tr_found_file_t(tr_sys_path_info info, tr_pathbuf&& filename_in, size_t base_len_in)
-            : tr_sys_path_info{ info }
-            , filename{ std::move(filename_in) }
-            , base_len{ base_len_in }
-        {
-        }
-
-        [[nodiscard]] constexpr auto base() const
-        {
-            // /home/foo/Downloads
-            return filename.sv().substr(0, base_len);
-        }
-
-        [[nodiscard]] constexpr auto subpath() const
-        {
-            // torrent/01-file-one.txt
-            return filename.sv().substr(base_len + 1);
-        }
-    };
-
-    std::optional<tr_found_file_t> findFile(tr_file_index_t i) const;
+    [[nodiscard]] bool hasAnyLocalData() const;
 
     /// METAINFO - TRACKERS
 
@@ -590,8 +566,6 @@ public:
     /** Return the mime-type (e.g. "audio/x-flac") that matches more of the
         torrent's content than any other mime-type. */
     [[nodiscard]] std::string_view primaryMimeType() const;
-
-    static constexpr std::string_view PartialFileSuffix = std::string_view{ ".part" };
 
     tr_torrent_metainfo metainfo_;
 
