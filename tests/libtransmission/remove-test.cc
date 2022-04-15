@@ -24,6 +24,8 @@ class RemoveTest : public libtransmission::test::SandboxedTest
 {
 protected:
     static constexpr std::string_view Content = "Hello, World!"sv;
+    static constexpr std::string_view JunkBasename = ".DS_Store"sv;
+    static constexpr std::string_view NonJunkBasename = "passwords.txt"sv;
 
     static void sysPathRemove(char const* filename)
     {
@@ -243,14 +245,42 @@ TEST_F(RemoveTest, RemovesLeftoverJunk)
     expected_tree = createFiles(files, parent.c_str());
     EXPECT_EQ(expected_tree, getSubtreeContents(parent));
 
-    // add a junk file.
-    auto const junk_file = tr_pathbuf{ parent, "/alice_in_wonderland_librivox/.DS_Store"sv };
+    // add a junk file *inside of* the torrent's top directory.
+    auto const junk_file = tr_pathbuf{ parent, "/alice_in_wonderland_librivox/", JunkBasename };
     createFileWithContents(junk_file, std::data(Content), std::size(Content));
     expected_tree.emplace(junk_file);
     EXPECT_EQ(expected_tree, getSubtreeContents(parent));
 
     files.remove(parent, "tmpdir_prefix"sv, sysPathRemove);
     expected_tree = { parent };
+    EXPECT_EQ(expected_tree, getSubtreeContents(parent));
+}
+
+TEST_F(RemoveTest, LeavesSiblingsAlone)
+{
+    auto const parent = sandboxDir();
+    auto expected_tree = std::set<std::string>{ parent };
+    EXPECT_EQ(expected_tree, getSubtreeContents(parent));
+
+    auto const files = aliceFiles();
+    expected_tree = createFiles(files, parent.c_str());
+    EXPECT_GT(std::size(expected_tree), 100U);
+    EXPECT_EQ(expected_tree, getSubtreeContents(parent));
+
+    // add a junk file *as a sibling of* the torrent's top directory.
+    auto const junk_file = tr_pathbuf{ parent, '/', JunkBasename };
+    createFileWithContents(junk_file, std::data(Content), std::size(Content));
+    expected_tree.emplace(junk_file);
+    EXPECT_EQ(expected_tree, getSubtreeContents(parent));
+
+    // add a non-junk file *as a sibling of* the torrent's top directory.
+    auto const non_junk_file = tr_pathbuf{ parent, '/', NonJunkBasename };
+    createFileWithContents(non_junk_file, std::data(Content), std::size(Content));
+    expected_tree.emplace(non_junk_file);
+    EXPECT_EQ(expected_tree, getSubtreeContents(parent));
+
+    files.remove(parent, "tmpdir_prefix"sv, sysPathRemove);
+    expected_tree = { parent, junk_file.c_str(), non_junk_file.c_str() };
     EXPECT_EQ(expected_tree, getSubtreeContents(parent));
 }
 
@@ -265,7 +295,7 @@ TEST_F(RemoveTest, LeavesNonJunkAlone)
     EXPECT_EQ(expected_tree, getSubtreeContents(parent));
 
     // add a non-junk file.
-    auto const nonjunk_file = tr_pathbuf{ parent, "/alice_in_wonderland_librivox/passwords.txt"sv };
+    auto const nonjunk_file = tr_pathbuf{ parent, "/alice_in_wonderland_librivox/", NonJunkBasename };
     createFileWithContents(nonjunk_file, std::data(Content), std::size(Content));
     expected_tree.emplace(nonjunk_file);
     EXPECT_EQ(expected_tree, getSubtreeContents(parent));
@@ -275,7 +305,7 @@ TEST_F(RemoveTest, LeavesNonJunkAlone)
     EXPECT_EQ(expected_tree, getSubtreeContents(parent));
 }
 
-TEST_F(RemoveTest, RemovesSubtreeIfPossible)
+TEST_F(RemoveTest, PreservesDirectoryHierarchyIfPossible)
 {
     auto const parent = sandboxDir();
     auto expected_tree = std::set<std::string>{ parent };
