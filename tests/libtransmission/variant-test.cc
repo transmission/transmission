@@ -541,7 +541,6 @@ TEST_F(VariantTest, dictFindType)
 TEST_F(VariantTest, variantFromBufFuzz)
 {
     auto buf = std::vector<char>{};
-    auto top = tr_variant{};
 
     for (size_t i = 0; i < 100000; ++i)
     {
@@ -550,7 +549,16 @@ TEST_F(VariantTest, variantFromBufFuzz)
         auto const sv = std::string_view{ std::data(buf), std::size(buf) };
         // std::cerr << '[' << tr_base64_encode({ std::data(buf), std::size(buf) }) << ']' << std::endl;
 
-        tr_variantFromBuf(&top, TR_VARIANT_PARSE_JSON | TR_VARIANT_PARSE_INPLACE, sv, nullptr, nullptr);
-        tr_variantFromBuf(&top, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, sv, nullptr, nullptr);
+        if (auto top = tr_variant{};
+            tr_variantFromBuf(&top, TR_VARIANT_PARSE_JSON | TR_VARIANT_PARSE_INPLACE, sv, nullptr, nullptr))
+        {
+            tr_variantFree(&top);
+        }
+
+        if (auto top = tr_variant{};
+            tr_variantFromBuf(&top, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, sv, nullptr, nullptr))
+        {
+            tr_variantFree(&top);
+        }
     }
 }

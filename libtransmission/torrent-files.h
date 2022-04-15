@@ -11,6 +11,9 @@
 #include <string_view>
 #include <vector>
 
+#warning nocommit
+#include <fmt/format.h>
+
 #include "transmission.h"
 
 #include "file.h"
@@ -72,6 +75,7 @@ public:
 
     tr_file_index_t add(std::string_view path, uint64_t file_size)
     {
+        fmt::print("{:s}:{:d} add '{:s}'\n", __FILE__, __LINE__, path);
         auto const ret = static_cast<tr_file_index_t>(std::size(files_));
         files_.emplace_back(path, file_size);
         total_size_ += file_size;
@@ -84,6 +88,8 @@ public:
         double volatile* setme_progress,
         std::string_view log_name = "",
         tr_error** error = nullptr) const;
+
+    void remove(std::string_view top_in, std::string_view tmpdir_prefix, tr_fileFunc func) const;
 
     struct FoundFile : public tr_sys_path_info
     {

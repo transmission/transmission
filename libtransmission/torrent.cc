@@ -18,6 +18,9 @@
 #include <unordered_map>
 #include <vector>
 
+#warning nocommit
+#include <iostream>
+
 #ifndef _WIN32
 #include <sys/wait.h> /* wait() */
 #include <unistd.h> /* fork(), execvp(), _exit() */
@@ -1634,40 +1637,37 @@ void tr_torrentFree(tr_torrent* tor)
     }
 }
 
-struct remove_data
+static void removeTorrentInEventThread(tr_torrent* tor, bool delete_flag, tr_fileFunc delete_func)
 {
-    tr_torrent* tor;
-    bool deleteFlag;
-    tr_fileFunc deleteFunc;
-};
+    auto const lock = tor->unique_lock();
 
-static void tr_torrentDeleteLocalData(tr_torrent* /*tor*/, tr_fileFunc /*func*/);
-
-static void removeTorrent(struct remove_data* const data)
-{
-    auto const lock = data->tor->unique_lock();
-
-    if (data->deleteFlag)
+    if (delete_flag && tor->hasMetainfo())
     {
-        tr_torrentDeleteLocalData(data->tor, data->deleteFunc);
+        // ensure the files are all closed and idle before moving
+        tr_cacheFlushTorrent(tor->session->cache, tor);
+        tr_fdTorrentClose(tor->session, tor->uniqueId);
+        tr_verifyRemove(tor);
+
+        if (delete_func == nullptr)
+        {
+            delete_func = tr_sys_path_remove;
+        }
+
+        std::cerr << __FILE__ << ':' << __LINE__ << " current dir [" << tor->currentDir().sv() << ']' << std::endl;
+        tor->metainfo_.files().remove(tor->currentDir(), tor->name(), delete_func);
     }
 
-    tr_torrentClearCompletenessCallback(data->tor);
-    closeTorrent(data->tor);
-    tr_free(data);
+    tr_torrentClearCompletenessCallback(tor);
+    closeTorrent(tor);
 }
 
-void tr_torrentRemove(tr_torrent* tor, bool deleteFlag, tr_fileFunc deleteFunc)
+void tr_torrentRemove(tr_torrent* tor, bool delete_flag, tr_fileFunc delete_func)
 {
     TR_ASSERT(tr_isTorrent(tor));
 
     tor->isDeleting = true;
 
-    auto* const data = tr_new0(struct remove_data, 1);
-    data->tor = tor;
-    data->deleteFlag = deleteFlag;
-    data->deleteFunc = deleteFunc;
-    tr_runInEventThread(tor->session, removeTorrent, data);
+    tr_runInEventThread(tor->session, removeTorrentInEventThread, tor, delete_flag, delete_func);
 }
 
 /**
@@ -2170,220 +2170,7 @@ uint64_t tr_torrentGetBytesLeftToAllocate(tr_torrent const* tor)
     return bytes_left;
 }
 
-/****
-*****  Removing the torrent's local data
-****/
-
-static bool isJunkFile(std::string_view base)
-{
-#ifdef __APPLE__
-    // check for resource forks. <http://support.apple.com/kb/TA20578>
-    if (tr_strvStartsWith(base, "._"sv))
-    {
-        return true;
-    }
-#endif
-
-    auto constexpr Files = std::array<std::string_view, 3>{
-        ".DS_Store"sv,
-        "Thumbs.db"sv,
-        "desktop.ini"sv,
-    };
-
-    return std::find(std::begin(Files), std::end(Files), base) != std::end(Files);
-}
-
-static void removeEmptyFoldersAndJunkFiles(char const* folder)
-{
-    auto const odir = tr_sys_dir_open(folder);
-    if (odir == TR_BAD_SYS_DIR)
-    {
-        return;
-    }
-
-    char const* name = nullptr;
-    while ((name = tr_sys_dir_read_name(odir)) != nullptr)
-    {
-        if (strcmp(name, ".") != 0 && strcmp(name, "..") != 0)
-        {
-            auto const filename = tr_strvPath(folder, name);
-
-            auto info = tr_sys_path_info{};
-            if (tr_sys_path_get_info(filename.c_str(), TR_SYS_PATH_NO_FOLLOW, &info) && info.type == TR_SYS_PATH_IS_DIRECTORY)
-            {
-                removeEmptyFoldersAndJunkFiles(filename.c_str());
-            }
-            else if (isJunkFile(name))
-            {
-                tr_sys_path_remove(filename.c_str());
-            }
-        }
-    }
-
-    tr_sys_path_remove(folder);
-    tr_sys_dir_close(odir);
-}
-
-/**
- * This convoluted code does something (seemingly) simple:
- * remove the torrent's local files.
- *
- * Fun complications:
- * 1. Try to preserve the directory hierarchy in the recycle bin.
- * 2. If there are nontorrent files, don't delete them...
- * 3. ...unless the other files are "junk", such as .DS_Store
- */
-static void deleteLocalData(tr_torrent const* tor, tr_fileFunc func)
-{
-    auto files = std::vector<std::string>{};
-    auto folders = std::set<std::string>{};
-    auto const top = std::string{ tor->currentDir() };
-
-    /* don't try to delete local data if the directory's gone missing */
-    if (!tr_sys_path_exists(top.c_str()))
-    {
-        return;
-    }
-
-    /* if it's a magnet link, there's nothing to move... */
-    if (!tor->hasMetainfo())
-    {
-        return;
-    }
-
-    /***
-    ****  Move the local data to a new tmpdir
-    ***/
-
-    auto tmpdir = tr_strvPath(top, tr_torrentName(tor) + "__XXXXXX"s);
-    tr_sys_dir_create_temp(std::data(tmpdir));
-
-    for (tr_file_index_t f = 0, n = tor->fileCount(); f < n; ++f)
-    {
-        /* try to find the file, looking in the partial and download dirs */
-        auto filename = tr_strvPath(top, tor->fileSubpath(f));
-
-        if (!tr_sys_path_exists(filename.c_str()))
-        {
-            filename += tr_torrent_files::PartialFileSuffix;
-
-            if (!tr_sys_path_exists(filename.c_str()))
-            {
-                filename.clear();
-            }
-        }
-
-        /* if we found the file, move it */
-        if (!std::empty(filename))
-        {
-            auto target = tr_strvPath(tmpdir, tor->fileSubpath(f));
-            tr_moveFile(filename, target);
-            files.emplace_back(target);
-        }
-    }
-
-    /***
-    ****  Remove tmpdir.
-    ****
-    ****  Try deleting the top-level files & folders to preserve
-    ****  the directory hierarchy in the recycle bin.
-    ****  If case that fails -- for example, rmdir () doesn't
-    ****  delete nonempty folders -- go from the bottom up too.
-    ***/
-
-    /* try deleting the local data's top-level files & folders */
-    if (auto const odir = tr_sys_dir_open(tmpdir.c_str()); odir != TR_BAD_SYS_DIR)
-    {
-        char const* name = nullptr;
-        while ((name = tr_sys_dir_read_name(odir)) != nullptr)
-        {
-            if (strcmp(name, ".") != 0 && strcmp(name, "..") != 0)
-            {
-                auto const file = tr_strvPath(tmpdir, name);
-                (*func)(file.c_str(), nullptr);
-            }
-        }
-
-        tr_sys_dir_close(odir);
-    }
-
-    /* go from the bottom up */
-    for (auto const& file : files)
-    {
-        auto walk = file;
-
-        while (tr_sys_path_exists(walk.c_str()) && !tr_sys_path_is_same(tmpdir.c_str(), walk.c_str()))
-        {
-            (*func)(walk.c_str(), nullptr);
-
-            walk = tr_sys_path_dirname(walk);
-        }
-    }
-
-    /***
-    ****  The local data has been removed.
-    ****  What's left in top are empty folders, junk, and user-generated files.
-    ****  Remove the first two categories and leave the third.
-    ***/
-
-    /* build a list of 'top's child directories that belong to this torrent */
-    for (tr_file_index_t f = 0, n = tor->fileCount(); f < n; ++f)
-    {
-        /* get the directory that this file goes in... */
-        auto const filename = tr_strvPath(top, tor->fileSubpath(f));
-        auto dir = tr_sys_path_dirname(filename);
-        if (std::empty(dir))
-        {
-            continue;
-        }
-
-        /* walk up the directory tree until we reach 'top' */
-        if (!tr_sys_path_is_same(top.c_str(), dir.c_str()) && dir == top)
-        {
-            for (;;)
-            {
-                auto const parent = tr_sys_path_dirname(dir);
-
-                if (tr_sys_path_is_same(top.c_str(), parent.c_str()) || parent == top)
-                {
-                    folders.emplace(dir);
-                    break;
-                }
-
-                /* walk upwards to parent */
-                dir = parent;
-            }
-        }
-    }
-
-    for (auto const& folder : folders)
-    {
-        removeEmptyFoldersAndJunkFiles(folder.c_str());
-    }
-
-    /* cleanup */
-    tr_sys_path_remove(tmpdir.c_str());
-}
-
-static void tr_torrentDeleteLocalData(tr_torrent* tor, tr_fileFunc func)
-{
-    TR_ASSERT(tr_isTorrent(tor));
-
-    if (func == nullptr)
-    {
-        func = tr_sys_path_remove;
-    }
-
-    /* close all the files because we're about to delete them */
-    tr_cacheFlushTorrent(tor->session->cache, tor);
-    tr_fdTorrentClose(tor->session, tor->uniqueId);
-
-    deleteLocalData(tor, func);
-}
-
-/***
-****
-***/
+///
 
 static void setLocationInEventThread(
     tr_torrent* tor,
@@ -2473,6 +2260,8 @@ void tr_torrentSetLocation(
 
     tor->setLocation(path, move_from_old_path, setme_progress, setme_state);
 }
+
+///
 
 std::string_view tr_torrent::primaryMimeType() const
 {
