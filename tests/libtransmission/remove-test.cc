@@ -256,6 +256,27 @@ TEST_F(RemoveTest, RemovesLeftoverJunk)
     EXPECT_EQ(expected_tree, getSubtreeContents(parent));
 }
 
+TEST_F(RemoveTest, LeavesNonJunkAlone)
+{
+    auto const parent = sandboxDir();
+    auto expected_tree = std::set<std::string>{ parent };
+    EXPECT_EQ(expected_tree, getSubtreeContents(parent));
+
+    auto const files = aliceFiles();
+    expected_tree = createFiles(files, parent.c_str());
+    EXPECT_EQ(expected_tree, getSubtreeContents(parent));
+
+    // add a non-junk file.
+    auto const nonjunk_file = tr_pathbuf{ parent, "/alice_in_wonderland_librivox/passwords.txt"sv };
+    createFileWithContents(nonjunk_file, std::data(Content), std::size(Content));
+    expected_tree.emplace(nonjunk_file);
+    EXPECT_EQ(expected_tree, getSubtreeContents(parent));
+
+    files.remove(parent, "tmpdir_prefix"sv, sysPathRemove);
+    expected_tree = { parent, tr_sys_path_dirname(nonjunk_file), nonjunk_file.c_str() };
+    EXPECT_EQ(expected_tree, getSubtreeContents(parent));
+}
+
 TEST_F(RemoveTest, RemovesSubtreeIfPossible)
 {
     auto const parent = sandboxDir();
@@ -280,27 +301,13 @@ TEST_F(RemoveTest, RemovesSubtreeIfPossible)
     files.remove(parent, "tmpdir_prefix"sv, recycle_func);
 
     // after remove, the subtree should be:
-    expected_tree.clear();
+    expected_tree = { parent, recycle_bin.c_str() };
     for (tr_file_index_t i = 0, n = files.fileCount(); i < n; ++i)
     {
         expected_tree.emplace(tr_pathbuf{ recycle_bin, '/', files.path(i) });
     }
-    expected_tree.emplace(parent);
-    expected_tree.emplace(recycle_bin);
     expected_tree.emplace(tr_pathbuf{ recycle_bin, "/alice_in_wonderland_librivox"sv });
     expected_tree.emplace(tr_pathbuf{ recycle_bin, "/alice_in_wonderland_librivox/history"sv });
     expected_tree.emplace(tr_pathbuf{ recycle_bin, "/alice_in_wonderland_librivox/history/files"sv });
     EXPECT_EQ(expected_tree, getSubtreeContents(parent));
-}
-
-TEST_F(RemoveTest, CleansUpTmpdirWhenDone)
-{
-}
-
-TEST_F(RemoveTest, DoesNotRemoveOtherFilesInSubtree)
-{
-}
-
-TEST_F(RemoveTest, DoesNotRemoveSiblingFiles)
-{
 }
