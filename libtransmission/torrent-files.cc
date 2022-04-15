@@ -153,6 +153,35 @@ bool isDirectory(char const* path)
     return ok;
 }
 
+bool isEmptyDirectory(char const* path)
+{
+    fmt::print(FMT_STRING("{:s}:{:d} isEmptyDir '{:s}'\n"), __FILE__, __LINE__, path);
+    if (!isDirectory(path))
+    {
+        fmt::print(FMT_STRING("{:s}:{:d} returning false, not a directory\n"), __FILE__, __LINE__);
+        return false;
+    }
+
+    if (auto const odir = tr_sys_dir_open(path); odir != TR_BAD_SYS_DIR)
+    {
+        char const* name_cstr = nullptr;
+        while ((name_cstr = tr_sys_dir_read_name(odir)) != nullptr)
+        {
+            auto const name = std::string_view{ name_cstr };
+            if (name != "." && name != "..")
+            {
+                fmt::print(FMT_STRING("{:s}:{:d} returning false, has file '{:s}'\n"), __FILE__, __LINE__, name);
+                tr_sys_dir_close(odir);
+                return false;
+            }
+        }
+        tr_sys_dir_close(odir);
+    }
+
+    fmt::print(FMT_STRING("{:s}:{:d} returning true\n"), __FILE__, __LINE__);
+    return true;
+}
+
 void depthFirstWalk(char const* path, file_func_t const& func, std::optional<int> max_depth = {})
 {
     // fmt::print("{:s}:{:d} in depth-first walk '{:s}' max_depth '{}'\n", __FILE__, __LINE__, path, max_depth ? *max_depth : -1);
@@ -212,7 +241,7 @@ bool isJunkFile(std::string_view filename)
  * 2. If there are nontorrent files, don't delete them...
  * 3. ...unless the other files are "junk", such as .DS_Store
  */
-void tr_torrent_files::remove(std::string_view parent_in, std::string_view tmpdir_prefix, tr_fileFunc func) const
+void tr_torrent_files::remove(std::string_view parent_in, std::string_view tmpdir_prefix, FileFunc const& func) const
 {
     auto const parent = tr_pathbuf{ parent_in };
     fmt::print("{:s}:{:d} remove torrent files from '{:s}'\n", __FILE__, __LINE__, parent);
@@ -260,7 +289,7 @@ void tr_torrent_files::remove(std::string_view parent_in, std::string_view tmpdi
         if (tmpdir != filename)
         {
             fmt::print("{:s}:{:d} calling the remove func on '{:s}'\n", __FILE__, __LINE__, filename);
-            func(filename, nullptr);
+            func(filename);
         }
     };
 
@@ -280,10 +309,15 @@ void tr_torrent_files::remove(std::string_view parent_in, std::string_view tmpdi
     auto const remove_junk = [&func](char const* filename)
     {
         fmt::print("{:s}:{:d} removeJunk '{:s}'\n", __FILE__, __LINE__, filename);
-        if (isDirectory(filename) || isJunkFile(filename))
+        if (isEmptyDirectory(filename))
+        {
+            fmt::print("{:s}:{:d} removing empty directory '{:s}'\n", __FILE__, __LINE__, filename);
+            tr_sys_path_remove(filename);
+        }
+        else if (isDirectory(filename) || isJunkFile(filename))
         {
             fmt::print("{:s}:{:d} calling the remove func on '{:s}'\n", __FILE__, __LINE__, filename);
-            func(filename, nullptr);
+            func(filename);
         }
     };
     for (auto const& filename : top_files)

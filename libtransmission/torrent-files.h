@@ -6,6 +6,7 @@
 #pragma once
 
 #include <cstdint>
+#include <functional>
 #include <optional>
 #include <string>
 #include <string_view>
@@ -89,7 +90,9 @@ public:
         std::string_view log_name = "",
         tr_error** error = nullptr) const;
 
-    void remove(std::string_view top_in, std::string_view tmpdir_prefix, tr_fileFunc func) const;
+    using FileFunc = std::function<void(char const* filename)>;
+
+    void remove(std::string_view top_in, std::string_view tmpdir_prefix, FileFunc const& func) const;
 
     struct FoundFile : public tr_sys_path_info
     {

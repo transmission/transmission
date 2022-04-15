@@ -1654,7 +1654,8 @@ static void removeTorrentInEventThread(tr_torrent* tor, bool delete_flag, tr_fil
         }
 
         std::cerr << __FILE__ << ':' << __LINE__ << " current dir [" << tor->currentDir().sv() << ']' << std::endl;
-        tor->metainfo_.files().remove(tor->currentDir(), tor->name(), delete_func);
+        auto const delete_func_wrapper = [&delete_func](char const* filename){ delete_func(filename, nullptr); };
+        tor->metainfo_.files().remove(tor->currentDir(), tor->name(), delete_func_wrapper);
     }
 
     tr_torrentClearCompletenessCallback(tor);
