@@ -1142,6 +1142,9 @@
 		C81E411127F5BABD00652F56 /* CocoaCompatibility.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CocoaCompatibility.h; sourceTree = "<group>"; };
 		C88771A92803EE42005C7523 /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
 		C88771AB2803EE53005C7523 /* libiconv.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libiconv.tbd; path = usr/lib/libiconv.tbd; sourceTree = SDKROOT; };
+		C887BEC02807FCE900867D3C /* create.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = create.cc; sourceTree = "<group>"; };
+		C887BEC22807FCE900867D3C /* edit.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = edit.cc; sourceTree = "<group>"; };
+		C887BEC32807FCE900867D3C /* show.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = show.cc; sourceTree = "<group>"; };
 		CAB35C62252F6F5E00552A55 /* mime-types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "mime-types.h"; sourceTree = "<group>"; };
 		E138A9750C04D88F00C5426C /* ProgressGradients.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ProgressGradients.h; sourceTree = "<group>"; };
 		E138A9760C04D88F00C5426C /* ProgressGradients.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ProgressGradients.mm; sourceTree = "<group>"; };
@@ -1881,7 +1884,10 @@
 		C15E58AC219A37C600AB292F /* utils */ = {
 			isa = PBXGroup;
 			children = (
+				C887BEC02807FCE900867D3C /* create.cc */,
+				C887BEC22807FCE900867D3C /* edit.cc */,
 				BEFC1C140C07756200B0BB3C /* remote.cc */,
+				C887BEC32807FCE900867D3C /* show.cc */,
 			);
 			path = utils;
 			sourceTree = "<group>";

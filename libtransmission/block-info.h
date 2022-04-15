@@ -13,11 +13,13 @@ struct tr_block_info
 {
 private:
     uint64_t total_size_ = 0;
-    uint64_t piece_size_ = 0;
-    uint64_t n_pieces_ = 0;
+    uint32_t piece_size_ = 0;
+    tr_piece_index_t n_pieces_ = 0;
 
     tr_block_index_t n_blocks_ = 0;
+    // should be same type as BlockSize
     uint32_t final_block_size_ = 0;
+    // should be same type as piece_size
     uint32_t final_piece_size_ = 0;
 
 public:
@@ -25,12 +27,12 @@ public:
 
     tr_block_info() noexcept = default;
 
-    tr_block_info(uint64_t total_size_in, uint64_t piece_size_in) noexcept
+    tr_block_info(uint64_t total_size_in, uint32_t piece_size_in) noexcept
     {
         initSizes(total_size_in, piece_size_in);
     }
 
-    void initSizes(uint64_t total_size_in, uint64_t piece_size_in) noexcept;
+    void initSizes(uint64_t total_size_in, uint32_t piece_size_in) noexcept;
 
     [[nodiscard]] constexpr auto blockCount() const noexcept
     {
