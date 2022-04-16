@@ -211,7 +211,7 @@ void showInfo(app_opts const& opts, tr_torrent_metainfo const& metainfo)
             printf("  Source: %s\n", metainfo.source().c_str());
         }
 
-        printf("  Piece Count: %" PRIu64 "\n", metainfo.pieceCount());
+        printf("  Piece Count: %" PRIu32 "\n", metainfo.pieceCount());
         printf("  Piece Size: %s\n", tr_formatter_mem_B(metainfo.pieceSize()).c_str());
         printf("  Total Size: %s\n", tr_formatter_size_B(metainfo.totalSize()).c_str());
         printf("  Privacy: %s\n", metainfo.isPrivate() ? "Private torrent" : "Public torrent");

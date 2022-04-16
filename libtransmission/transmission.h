@@ -29,8 +29,8 @@
 
 using tr_file_index_t = uint32_t;
 using tr_piece_index_t = uint32_t;
-/* assuming a 16 KiB block, a 32-bit block index gives us a maximum torrent size of 63 TiB.
- * if we ever need to grow past that, change this to uint64_t ;) */
+/* Assuming a 16 KiB block (tr_block_info::BlockSize), a 32-bit block index gives us a maximum torrent size of 64 TiB.
+ * When we ever need to grow past that, change tr_block_index_t and  tr_piece_index_t to uint64_t. */
 using tr_block_index_t = uint32_t;
 using tr_port = uint16_t;
 using tr_tracker_tier_t = uint32_t;

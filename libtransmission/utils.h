@@ -306,7 +306,7 @@ template<typename... T, typename std::enable_if_t<(std::is_convertible_v<T, std:
 }
 
 template<typename T>
-[[nodiscard]] constexpr bool tr_strvContains(std::string_view sv, T key) // c++23
+[[nodiscard]] constexpr bool tr_strvContains(std::string_view sv, T key) noexcept // c++23
 {
     return sv.find(key) != sv.npos;
 }

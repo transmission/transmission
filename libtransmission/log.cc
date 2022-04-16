@@ -243,7 +243,7 @@ char* tr_logGetTimeStr(char* buf, size_t buflen)
     auto const [out, len] = fmt::format_to_n(
         buf,
         buflen - 1,
-        "{0:%F %H:%M:}{1:%S}\n",
+        "{0:%F %H:%M:}{1:%S}",
         a,
         std::chrono::duration_cast<std::chrono::milliseconds>(a.time_since_epoch()));
     *out = '\0';

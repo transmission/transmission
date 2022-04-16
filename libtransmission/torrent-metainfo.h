@@ -14,8 +14,8 @@
 #include "transmission.h"
 
 #include "block-info.h"
-#include "files.h"
 #include "magnet-metainfo.h"
+#include "torrent-files.h"
 #include "tr-strbuf.h"
 
 struct tr_error;
@@ -44,11 +44,11 @@ public:
     }
     [[nodiscard]] auto fileCount() const noexcept
     {
-        return std::size(files());
+        return files().fileCount();
     }
     [[nodiscard]] auto fileSize(tr_file_index_t i) const
     {
-        return files().size(i);
+        return files().fileSize(i);
     }
     [[nodiscard]] auto const& fileSubpath(tr_file_index_t i) const
     {
@@ -86,7 +86,7 @@ public:
     {
         return blockInfo().blockSize(block);
     }
-    [[nodiscard]] constexpr auto blockSpanForPiece(tr_piece_index_t piece) const
+    [[nodiscard]] auto blockSpanForPiece(tr_piece_index_t piece) const
     {
         return blockInfo().blockSpanForPiece(piece);
     }
@@ -208,7 +208,7 @@ private:
 
     tr_block_info block_info_ = tr_block_info{ 0, 0 };
 
-    tr_files files_;
+    tr_torrent_files files_;
 
     std::vector<tr_sha1_digest_t> pieces_;
 
