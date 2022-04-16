@@ -5,8 +5,8 @@
 
 #pragma once
 
-#include <cinttypes> // int64_t
 #include <cstddef> // size_t
+#include <cstdint> // int64_t
 #include <string>
 #include <string_view>
 

@@ -6,7 +6,7 @@
 #ifndef TR_CRYPTO_UTILS_H
 #define TR_CRYPTO_UTILS_H
 
-#include <cinttypes> // intX_t
+#include <cstdint> // uint8_t
 #include <cstddef> // size_t
 #include <optional>
 #include <string>

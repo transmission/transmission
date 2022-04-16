@@ -6,6 +6,7 @@
 #include <array>
 #include <cassert>
 #include <cctype> /* isspace */
+#include <cinttypes> // PRId64
 #include <cerrno>
 #include <cmath>
 #include <cstdio>
@@ -19,7 +20,7 @@
 #include <event2/buffer.h>
 #include <event2/util.h>
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/crypto-utils.h>
@@ -554,11 +555,14 @@ static void addIdArg(tr_variant* args, char const* id_str, char const* fallback)
         }
     }
 
-    if (tr_strcmp0(id_str, "active") == 0)
+    static auto constexpr IdActive = "active"sv;
+    static auto constexpr IdAll = "all"sv;
+
+    if (IdActive == id_str)
     {
         tr_variantDictAddStrView(args, TR_KEY_ids, "recently-active"sv);
     }
-    else if (strcmp(id_str, "all") != 0)
+    else if (IdAll != id_str)
     {
         bool isList = strchr(id_str, ',') != nullptr || strchr(id_str, '-') != nullptr;
         bool isNum = true;
@@ -2087,7 +2091,7 @@ static int processResponse(char const* rpcurl, std::string_view response)
 static CURL* tr_curl_easy_init(struct evbuffer* writebuf)
 {
     CURL* curl = curl_easy_init();
-    curl_easy_setopt(curl, CURLOPT_USERAGENT, tr_strvJoin(MyName, "/", LONG_VERSION_STRING).c_str());
+    curl_easy_setopt(curl, CURLOPT_USERAGENT, fmt::format(FMT_STRING("{:s}/{:s}"), MyName, LONG_VERSION_STRING).c_str());
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeFunc);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, writebuf);
     curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, parseResponseHeader);
@@ -2115,7 +2119,7 @@ static CURL* tr_curl_easy_init(struct evbuffer* writebuf)
 
     if (!tr_str_is_empty(session_id))
     {
-        auto const h = tr_strvJoin(TR_RPC_SESSION_ID_HEADER, ": "sv, session_id);
+        auto const h = fmt::format(FMT_STRING("{:s}: {:s}"), TR_RPC_SESSION_ID_HEADER, session_id);
         auto* const custom_headers = curl_slist_append(nullptr, h.c_str());
 
         curl_easy_setopt(curl, CURLOPT_HTTPHEADER, custom_headers);
@@ -2142,7 +2146,7 @@ static int flush(char const* rpcurl, tr_variant** benc)
 {
     int status = EXIT_SUCCESS;
     auto const json = tr_variantToStr(*benc, TR_VARIANT_FMT_JSON_LEAN);
-    auto const rpcurl_http = tr_strvJoin(UseSSL ? "https://" : "http://", rpcurl);
+    auto const rpcurl_http = fmt::format(FMT_STRING("{:s}://{:s}"), UseSSL ? "https" : "http", rpcurl);
 
     auto* const buf = evbuffer_new();
     auto* curl = tr_curl_easy_init(buf);
@@ -3044,12 +3048,12 @@ static void getHostAndPortAndRpcUrl(int* argc, char** argv, std::string* host, i
 
     if (strncmp(s, "http://", 7) == 0) /* user passed in http rpc url */
     {
-        *rpcurl = tr_strvJoin(s + 7, "/rpc/"sv);
+        *rpcurl = fmt::format(FMT_STRING("{:s}/rpc/"), s + 7);
     }
     else if (strncmp(s, "https://", 8) == 0) /* user passed in https rpc url */
     {
         UseSSL = true;
-        *rpcurl = tr_strvJoin(s + 8, "/rpc/"sv);
+        *rpcurl = fmt::format(FMT_STRING("{:s}/rpc/"), s + 8);
     }
     else if (parsePortString(s, port))
     {
@@ -3077,7 +3081,7 @@ static void getHostAndPortAndRpcUrl(int* argc, char** argv, std::string* host, i
         bool const is_unbracketed_ipv6 = (*s != '[') && (memchr(s, ':', hend - s) != nullptr);
 
         auto const sv = std::string_view{ s, size_t(hend - s) };
-        *host = is_unbracketed_ipv6 ? tr_strvJoin("[", sv, "]") : sv;
+        *host = is_unbracketed_ipv6 ? fmt::format(FMT_STRING("[{:s}]"), sv) : sv;
     }
 
     *argc -= 1;
@@ -3113,7 +3117,7 @@ int tr_main(int argc, char* argv[])
 
     if (std::empty(rpcurl))
     {
-        rpcurl = tr_strvJoin(host, ":", std::to_string(port), DefaultUrl);
+        rpcurl = fmt::format(FMT_STRING("{:s}:{:d}{:s}"), host, port, DefaultUrl);
     }
 
     return processArgs(rpcurl.c_str(), argc, (char const* const*)argv);

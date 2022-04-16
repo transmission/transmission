@@ -818,48 +818,52 @@ void DetailsDialog::Impl::refreshInfo(std::vector<tr_torrent*> const& torrents)
 
     /* size_lb */
     {
-        uint64_t size = 0;
-        int pieces = 0;
-        int32_t pieceSize = 0;
+        auto const piece_count = std::accumulate(
+            std::begin(infos),
+            std::end(infos),
+            uint64_t{},
+            [](auto sum, auto const& info) { return sum + info.n_pieces; });
 
-        for (auto const& info : infos)
-        {
-            size += info.total_size;
-            pieces += info.n_pieces;
-
-            if (pieceSize == 0)
-            {
-                pieceSize = info.piece_size;
-            }
-            else if (pieceSize != (int)info.piece_size)
-            {
-                pieceSize = -1;
-            }
-        }
-
-        auto const sizebuf = tr_strlsize(size);
-
-        if (size == 0)
+        if (piece_count == 0)
         {
             str.clear();
         }
-        else if (pieceSize >= 0)
-        {
-            str = fmt::format(
-                ngettext(
-                    "{file_size} ({piece_count} piece @ {piece_size})",
-                    "{file_size} ({piece_count} pieces @ {piece_size})",
-                    pieces),
-                fmt::arg("file_size", sizebuf),
-                fmt::arg("piece_count", pieces),
-                fmt::arg("piece_size", tr_formatter_mem_B(pieceSize)));
-        }
         else
         {
+            auto const total_size = std::accumulate(
+                std::begin(infos),
+                std::end(infos),
+                uint64_t{},
+                [](auto sum, auto const& info) { return sum + info.total_size; });
+
+            auto const file_count = std::accumulate(
+                std::begin(torrents),
+                std::end(torrents),
+                std::size_t{},
+                [](auto sum, auto const* tor) { return sum + tr_torrentFileCount(tor); });
+
             str = fmt::format(
-                ngettext("{file_size} ({piece_count} piece)", "{file_size} ({piece_count} pieces)", pieces),
-                fmt::arg("file_size", sizebuf),
-                fmt::arg("piece_count", pieces));
+                ngettext("{total_size} in {file_count:L} file", "{total_size} in {file_count:L} files", file_count),
+                fmt::arg("total_size", tr_strlsize(total_size)),
+                fmt::arg("file_count", file_count));
+
+            auto const piece_size = std::empty(infos) ? uint32_t{} : infos.front().piece_size;
+            auto const piece_size_is_uniform = std::all_of(
+                std::begin(infos),
+                std::end(infos),
+                [piece_size](auto const& info) { return info.piece_size == piece_size; });
+
+            if (piece_size_is_uniform)
+            {
+                str += ' ';
+                str += fmt::format(
+                    ngettext(
+                        "({piece_count} BitTorrent piece @ {piece_size})",
+                        "({piece_count} BitTorrent pieces @ {piece_size})",
+                        piece_count),
+                    fmt::arg("piece_count", piece_count),
+                    fmt::arg("piece_size", tr_formatter_mem_B(piece_size)));
+            }
         }
 
         size_lb_->set_text(str);
@@ -905,7 +909,7 @@ void DetailsDialog::Impl::refreshInfo(std::vector<tr_torrent*> const& torrents)
             else if (haveUnchecked == 0)
             {
                 str = fmt::format(
-                    _("{current_size} ({percent_done}% of {percent_available}% available"),
+                    _("{current_size} ({percent_done}% of {percent_available}% available)"),
                     fmt::arg("current_size", total),
                     fmt::arg("percent_done", buf2),
                     fmt::arg("percent_available", avail));
@@ -2669,8 +2673,8 @@ void DetailsDialog::Impl::set_torrents(std::vector<int> const& ids)
     else
     {
         title = fmt::format(
-            ngettext("Properties - {count} Torrent", "Properties - {count} Torrents", len),
-            fmt::arg("count", len));
+            ngettext("Properties - {torrent_count:L} Torrent", "Properties - {torrent_count:L} Torrents", len),
+            fmt::arg("torrent_count", len));
 
         file_list_->clear();
         file_list_->hide();

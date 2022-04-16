@@ -86,13 +86,10 @@ struct tr_rpc_idle_data
     void* callback_user_data;
 };
 
-static void tr_idle_function_done(struct tr_rpc_idle_data* data, char const* result)
-{
-    if (result == nullptr)
-    {
-        result = "success";
-    }
+static auto constexpr SuccessResult = "success"sv;
 
+static void tr_idle_function_done(struct tr_rpc_idle_data* data, std::string_view result)
+{
     tr_variantDictAddStr(data->response, TR_KEY_result, result);
 
     (*data->callback)(data->session, data->response, data->callback_user_data);
@@ -1326,8 +1323,7 @@ static void torrentRenamePathDone(tr_torrent* tor, char const* oldpath, char con
     tr_variantDictAddStr(data->args_out, TR_KEY_path, oldpath);
     tr_variantDictAddStr(data->args_out, TR_KEY_name, newname);
 
-    char const* const result = error == 0 ? nullptr : tr_strerror(error);
-    tr_idle_function_done(data, result);
+    tr_idle_function_done(data, error != 0 ? tr_strerror(error) : SuccessResult);
 }
 
 static char const* torrentRenamePath(
@@ -1363,21 +1359,23 @@ static char const* torrentRenamePath(
 static void onPortTested(tr_web::FetchResponse const& web_response)
 {
     auto const& [status, body, did_connect, did_tmieout, user_data] = web_response;
-    char result[1024];
     auto* data = static_cast<struct tr_rpc_idle_data*>(user_data);
 
     if (status != 200)
     {
-        tr_snprintf(result, sizeof(result), "portTested: http error %ld: %s", status, tr_webGetResponseStr(status));
+        tr_idle_function_done(
+            data,
+            fmt::format(
+                _("Couldn't test port: {error} ({error_code})"),
+                fmt::arg("error", tr_webGetResponseStr(status)),
+                fmt::arg("error_code", status)));
     }
     else /* success */
     {
         bool const isOpen = tr_strvStartsWith(body, '1');
         tr_variantDictAddBool(data->args_out, TR_KEY_port_is_open, isOpen);
-        tr_snprintf(result, sizeof(result), "success");
+        tr_idle_function_done(data, SuccessResult);
     }
-
-    tr_idle_function_done(data, result);
 }
 
 static char const* portTest(
@@ -1387,7 +1385,7 @@ static char const* portTest(
     struct tr_rpc_idle_data* idle_data)
 {
     auto const port = tr_sessionGetPeerPort(session);
-    auto const url = tr_strvJoin("https://portcheck.transmissionbt.com/"sv, std::to_string(port));
+    auto const url = fmt::format(FMT_STRING("https://portcheck.transmissionbt.com/{:d}"), port);
     session->web->fetch({ url, onPortTested, idle_data });
     return nullptr;
 }
@@ -1402,13 +1400,15 @@ static void onBlocklistFetched(tr_web::FetchResponse const& web_response)
     auto* data = static_cast<struct tr_rpc_idle_data*>(user_data);
     auto* const session = data->session;
 
-    char result[1024] = {};
-
     if (status != 200)
     {
         // we failed to download the blocklist...
-        tr_snprintf(result, sizeof(result), "gotNewBlocklist: http error %ld: %s", status, tr_webGetResponseStr(status));
-        tr_idle_function_done(data, result);
+        tr_idle_function_done(
+            data,
+            fmt::format(
+                _("Couldn't fetch blocklist: {error} ({error_code})"),
+                fmt::arg("error", tr_webGetResponseStr(status)),
+                fmt::arg("error_code", status)));
         return;
     }
 
@@ -1446,15 +1446,14 @@ static void onBlocklistFetched(tr_web::FetchResponse const& web_response)
     auto const filename = tr_pathbuf{ session->config_dir, "/blocklist.tmp"sv };
     if (tr_error* error = nullptr; !tr_saveFile(filename, content, &error))
     {
-        fmt::format_to_n(
-            result,
-            sizeof(result),
-            _("Couldn't save '{path}': {error} ({error_code})"),
-            fmt::arg("path", filename),
-            fmt::arg("error", error->message),
-            fmt::arg("error_code", error->code));
+        tr_idle_function_done(
+            data,
+            fmt::format(
+                _("Couldn't save '{path}': {error} ({error_code})"),
+                fmt::arg("path", filename),
+                fmt::arg("error", error->message),
+                fmt::arg("error_code", error->code)));
         tr_error_clear(&error);
-        tr_idle_function_done(data, result);
         return;
     }
 
@@ -1462,7 +1461,7 @@ static void onBlocklistFetched(tr_web::FetchResponse const& web_response)
     int const rule_count = tr_blocklistSetContent(session, filename);
     tr_variantDictAddInt(data->args_out, TR_KEY_blocklist_size, rule_count);
     tr_sys_path_remove(filename);
-    tr_idle_function_done(data, "success");
+    tr_idle_function_done(data, SuccessResult);
 }
 
 static char const* blocklistUpdate(
@@ -1485,39 +1484,33 @@ static void addTorrentImpl(struct tr_rpc_idle_data* data, tr_ctor* ctor)
     tr_torrent* tor = tr_torrentNew(ctor, &duplicate_of);
     tr_ctorFree(ctor);
 
-    auto key = tr_quark{};
-    char const* result = "invalid or corrupt torrent file";
-    if (tor != nullptr)
+    if (tor == nullptr && duplicate_of == nullptr)
     {
-        key = TR_KEY_torrent_added;
-        result = nullptr;
-    }
-    else if (duplicate_of != nullptr)
-    {
-        tor = duplicate_of;
-        key = TR_KEY_torrent_duplicate;
-        result = "duplicate torrent";
+        tr_idle_function_done(data, "invalid or corrupt torrent file"sv);
+        return;
     }
 
-    if (tor != nullptr && key != 0)
+    static auto constexpr Fields = std::array<tr_quark, 3>{ TR_KEY_id, TR_KEY_name, TR_KEY_hashString };
+    if (duplicate_of != nullptr)
     {
-        tr_quark const fields[] = {
-            TR_KEY_id,
-            TR_KEY_name,
-            TR_KEY_hashString,
-        };
-
-        addTorrentInfo(tor, TrFormat::Object, tr_variantDictAdd(data->args_out, key), fields, TR_N_ELEMENTS(fields));
-
-        if (result == nullptr)
-        {
-            notify(data->session, TR_RPC_TORRENT_ADDED, tor);
-        }
-
-        result = nullptr;
+        addTorrentInfo(
+            duplicate_of,
+            TrFormat::Object,
+            tr_variantDictAdd(data->args_out, TR_KEY_torrent_duplicate),
+            std::data(Fields),
+            std::size(Fields));
+        tr_idle_function_done(data, "duplicate torrent"sv);
+        return;
     }
 
-    tr_idle_function_done(data, result);
+    notify(data->session, TR_RPC_TORRENT_ADDED, tor);
+    addTorrentInfo(
+        tor,
+        TrFormat::Object,
+        tr_variantDictAdd(data->args_out, TR_KEY_torrent_added),
+        std::data(Fields),
+        std::size(Fields));
+    tr_idle_function_done(data, SuccessResult);
 }
 
 struct add_torrent_idle_data
@@ -1544,9 +1537,12 @@ static void onMetadataFetched(tr_web::FetchResponse const& web_response)
     }
     else
     {
-        char result[1024];
-        tr_snprintf(result, sizeof(result), "onMetadataFetched: http error %ld: %s", status, tr_webGetResponseStr(status));
-        tr_idle_function_done(data->data, result);
+        tr_idle_function_done(
+            data->data,
+            fmt::format(
+                _("Couldn't fetch torrent: {error} ({error_code})"),
+                fmt::arg("error", tr_webGetResponseStr(status)),
+                fmt::arg("error_code", status)));
     }
 
     tr_free(data);

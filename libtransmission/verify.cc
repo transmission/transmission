@@ -62,7 +62,7 @@ static bool verifyTorrent(tr_torrent* tor, bool const* stopFlag)
         if (file_pos == 0 && fd == TR_BAD_SYS_FILE && file_index != prev_file_index)
         {
             auto const found = tor->findFile(file_index);
-            fd = !found ? TR_BAD_SYS_FILE : tr_sys_file_open(found->filename, TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0);
+            fd = !found ? TR_BAD_SYS_FILE : tr_sys_file_open(found->filename(), TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0);
             prev_file_index = file_index;
         }
 

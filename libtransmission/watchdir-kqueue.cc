@@ -5,7 +5,6 @@
 
 #include <cerrno> /* errno */
 #include <string>
-#include <string_view>
 #include <unordered_set>
 
 #include <fcntl.h> /* open() */

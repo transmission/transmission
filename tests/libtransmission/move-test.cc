@@ -5,6 +5,7 @@
 
 #include <iostream>
 #include <string>
+#include <string_view>
 #include <utility>
 
 #include <event2/buffer.h>
@@ -17,6 +18,8 @@
 #include "variant.h"
 
 #include "test-fixtures.h"
+
+using namespace std::literals;
 
 namespace libtransmission
 {
@@ -53,8 +56,12 @@ TEST_P(IncompleteDirTest, incompleteDir)
     // init an incomplete torrent.
     // the test zero_torrent will be missing its first piece.
     auto* const tor = zeroTorrentInit(ZeroTorrentState::Partial);
-    EXPECT_EQ(tr_strvJoin(incomplete_dir, "/", tr_torrentFile(tor, 0).name, ".part"), makeString(tr_torrentFindFile(tor, 0)));
-    EXPECT_EQ(tr_strvPath(incomplete_dir, tr_torrentFile(tor, 1).name), makeString(tr_torrentFindFile(tor, 1)));
+    auto path = tr_pathbuf{};
+
+    path.assign(incomplete_dir, '/', tr_torrentFile(tor, 0).name, tr_torrent_files::PartialFileSuffix);
+    EXPECT_EQ(path, makeString(tr_torrentFindFile(tor, 0)));
+    path.assign(incomplete_dir, '/', tr_torrentFile(tor, 1).name);
+    EXPECT_EQ(path, makeString(tr_torrentFindFile(tor, 1)));
     EXPECT_EQ(tor->pieceSize(), tr_torrentStat(tor)->leftUntilDone);
 
     // auto constexpr completeness_unset = tr_completeness { -1 };

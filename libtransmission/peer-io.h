@@ -18,6 +18,7 @@
 #include <ctime>
 #include <memory>
 #include <optional>
+#include <string>
 
 #include <event2/buffer.h>
 

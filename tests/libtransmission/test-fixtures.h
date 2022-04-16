@@ -12,6 +12,7 @@
 #include <memory>
 #include <mutex> // std::once_flag()
 #include <string>
+#include <string_view>
 #include <thread>
 
 #include "crypto-utils.h" // tr_base64_decode()
@@ -37,6 +38,32 @@ namespace libtransmission
 
 namespace test
 {
+
+using file_func_t = std::function<void(char const* filename)>;
+
+static void depthFirstWalk(char const* path, file_func_t func)
+{
+    auto info = tr_sys_path_info{};
+    if (tr_sys_path_get_info(path, 0, &info) && (info.type == TR_SYS_PATH_IS_DIRECTORY))
+    {
+        if (auto const odir = tr_sys_dir_open(path); odir != TR_BAD_SYS_DIR)
+        {
+            char const* name;
+            while ((name = tr_sys_dir_read_name(odir)) != nullptr)
+            {
+                if (strcmp(name, ".") != 0 && strcmp(name, "..") != 0)
+                {
+                    auto const filename = tr_strvPath(path, name);
+                    depthFirstWalk(tr_strvPath(path, name).c_str(), func);
+                }
+            }
+
+            tr_sys_dir_close(odir);
+        }
+    }
+
+    func(path);
+}
 
 inline std::string makeString(char*&& s)
 {
@@ -115,32 +142,6 @@ protected:
         return path;
     }
 
-    using file_func_t = std::function<void(char const* filename)>;
-
-    static void depthFirstWalk(char const* path, file_func_t func)
-    {
-        auto info = tr_sys_path_info{};
-        if (tr_sys_path_get_info(path, 0, &info) && (info.type == TR_SYS_PATH_IS_DIRECTORY))
-        {
-            if (auto const odir = tr_sys_dir_open(path); odir != TR_BAD_SYS_DIR)
-            {
-                char const* name;
-                while ((name = tr_sys_dir_read_name(odir)) != nullptr)
-                {
-                    if (strcmp(name, ".") != 0 && strcmp(name, "..") != 0)
-                    {
-                        auto const filename = tr_strvPath(path, name);
-                        depthFirstWalk(tr_strvPath(path, name).c_str(), func);
-                    }
-                }
-
-                tr_sys_dir_close(odir);
-            }
-        }
-
-        func(path);
-    }
-
     static void rimraf(std::string const& path, bool verbose = false)
     {
         auto remove = [verbose](char const* filename)
@@ -178,7 +179,7 @@ protected:
         return child;
     }
 
-    void buildParentDir(std::string const& path) const
+    void buildParentDir(std::string_view path) const
     {
         auto const tmperr = errno;
 
@@ -211,14 +212,14 @@ protected:
         }
     }
 
-    void createTmpfileWithContents(std::string& tmpl, void const* payload, size_t n) const
+    void createTmpfileWithContents(char* tmpl, void const* payload, size_t n) const
     {
         auto const tmperr = errno;
 
         buildParentDir(tmpl);
 
         // NOLINTNEXTLINE(clang-analyzer-cplusplus.InnerPointer)
-        auto const fd = tr_sys_file_open_temp(&tmpl.front());
+        auto const fd = tr_sys_file_open_temp(tmpl);
         blockingFileWrite(fd, payload, n);
         tr_sys_file_close(fd);
         sync();
@@ -226,14 +227,14 @@ protected:
         errno = tmperr;
     }
 
-    void createFileWithContents(std::string const& path, void const* payload, size_t n) const
+    void createFileWithContents(std::string_view path, void const* payload, size_t n) const
     {
         auto const tmperr = errno;
 
         buildParentDir(path);
 
         auto const fd = tr_sys_file_open(
-            path.c_str(),
+            tr_pathbuf{ path },
             TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_TRUNCATE,
             0600,
             nullptr);

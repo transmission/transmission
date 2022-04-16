@@ -129,9 +129,9 @@ static wchar_t** to_wide_env(std::map<std::string_view, std::string_view> const&
     wchar_t** const wide_env = tr_new(wchar_t*, part_count + 1);
 
     int i = 0;
-    for (auto const& [key_sv, val_sv] : env)
+    for (auto const& [key, val] : env)
     {
-        auto const line = tr_strvJoin(key_sv, "="sv, val_sv);
+        auto const line = fmt::format(FMT_STRING("{:s}={:s}"), key, val);
         wide_env[i++] = tr_win32_utf8_to_native(std::data(line), std::size(line));
     }
     wide_env[i] = nullptr;

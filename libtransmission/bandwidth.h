@@ -11,8 +11,8 @@
 
 #include <array>
 #include <cstddef> // size_t
+#include <cstdint> // uint64_t
 #include <vector>
-#include <string>
 
 #include "transmission.h"
 
@@ -113,12 +113,12 @@ public:
 
     void setParent(Bandwidth* newParent);
 
-    [[nodiscard]] constexpr tr_priority_t getPriority() const
+    [[nodiscard]] constexpr tr_priority_t getPriority() const noexcept
     {
         return this->priority_;
     }
 
-    constexpr void setPriority(tr_priority_t prio)
+    constexpr void setPriority(tr_priority_t prio) noexcept
     {
         this->priority_ = prio;
     }
@@ -126,7 +126,7 @@ public:
     /**
      * @brief clamps byte_count down to a number that this bandwidth will allow to be consumed
      */
-    [[nodiscard]] unsigned int clamp(tr_direction dir, unsigned int byte_count) const
+    [[nodiscard]] unsigned int clamp(tr_direction dir, unsigned int byte_count) const noexcept
     {
         return this->clamp(0, dir, byte_count);
     }

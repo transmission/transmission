@@ -85,7 +85,7 @@ bool tr_announce_list::add(std::string_view announce_url_sv, tr_tracker_tier_t t
     tracker.announce = *tr_urlParseTracker(tracker.announce_str.sv());
     tracker.tier = getTier(tier, *announce);
     tracker.id = nextUniqueId();
-    tracker.host = tr_strvJoin(tracker.announce.host, ":"sv, tracker.announce.portstr);
+    tracker.host = fmt::format(FMT_STRING("{:s}:{:d}"), tracker.announce.host, tracker.announce.port);
 
     if (auto const scrape_str = announceToScrape(announce_url_sv); scrape_str)
     {
@@ -134,7 +134,7 @@ std::optional<std::string> tr_announce_list::announceToScrape(std::string_view a
     {
         auto const prefix = announce.substr(0, pos);
         auto const suffix = announce.substr(pos + std::size(oldval));
-        return tr_strvJoin(prefix, std::string_view{ "/scrape" }, suffix);
+        return fmt::format(FMT_STRING("{:s}/scrape{:s}"), prefix, suffix);
     }
 
     // some torrents with UDP announce URLs don't have /announce
