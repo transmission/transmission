@@ -81,7 +81,7 @@ bool tr_announce_list::add(std::string_view announce_url_sv, tr_tracker_tier_t t
     }
 
     auto tracker = tracker_info{};
-    tracker.announce_str = announce_url_sv;
+    tracker.announce = announce_url_sv;
     tracker.tier = getTier(tier, *announce);
     tracker.id = nextUniqueId();
     tracker.host = fmt::format(FMT_STRING("{:s}:{:d}"), announce->host, announce->port);
@@ -89,7 +89,7 @@ bool tr_announce_list::add(std::string_view announce_url_sv, tr_tracker_tier_t t
 
     if (auto const scrape_str = announceToScrape(announce_url_sv); scrape_str)
     {
-        tracker.scrape_str = *scrape_str;
+        tracker.scrape = *scrape_str;
     }
 
     auto const it = std::lower_bound(std::begin(trackers_), std::end(trackers_), tracker);
@@ -117,7 +117,7 @@ void tr_announce_list::add(tr_announce_list const& src)
             ++tgt_tier;
         }
 
-        tgt.add(tracker.announce_str.sv(), tgt_tier);
+        tgt.add(tracker.announce.sv(), tgt_tier);
     }
 }
 
@@ -191,7 +191,7 @@ tr_announce_list::trackers_t::iterator tr_announce_list::find(std::string_view a
 {
     auto const test = [&announce](auto const& tracker)
     {
-        return announce == tracker.announce_str.sv();
+        return announce == tracker.announce.sv();
     };
     return std::find_if(std::begin(trackers_), std::end(trackers_), test);
 }
@@ -203,7 +203,7 @@ tr_tracker_tier_t tr_announce_list::getTier(tr_tracker_tier_t tier, tr_url_parse
 {
     auto const is_sibling = [&announce](auto const& tracker)
     {
-        auto const tracker_announce = tracker.announce_str.sv();
+        auto const tracker_announce = tracker.announce.sv();
 
         // fast test to avoid tr_urlParse()ing most trackers
         if (!tr_strvContains(tracker_announce, announce.host))
@@ -226,7 +226,7 @@ bool tr_announce_list::canAdd(tr_url_parsed_t const& announce)
     // "http://tracker/announce" + "http://tracker:80/announce"
     auto const is_same = [&announce](auto const& tracker)
     {
-        auto const tracker_announce = tracker.announce_str.sv();
+        auto const tracker_announce = tracker.announce.sv();
 
         // fast test to avoid tr_urlParse()ing most trackers
         if (!tr_strvContains(tracker_announce, announce.host))
@@ -257,7 +257,7 @@ bool tr_announce_list::save(std::string_view torrent_file, tr_error** error) con
     // add the new fields
     if (this->size() == 1)
     {
-        tr_variantDictAddQuark(&metainfo, TR_KEY_announce, at(0).announce_str.quark());
+        tr_variantDictAddQuark(&metainfo, TR_KEY_announce, at(0).announce.quark());
     }
     else if (this->size() > 1)
     {
@@ -274,7 +274,7 @@ bool tr_announce_list::save(std::string_view torrent_file, tr_error** error) con
                 current_tier = tracker.tier;
             }
 
-            tr_variantListAddQuark(tracker_list, tracker.announce_str.quark());
+            tr_variantListAddQuark(tracker_list, tracker.announce.quark());
         }
     }
 
@@ -340,7 +340,7 @@ std::string tr_announce_list::toString() const
             text += '\n';
         }
 
-        text += tracker.announce_str.sv();
+        text += tracker.announce.sv();
         text += '\n';
 
         current_tier = tracker.tier;

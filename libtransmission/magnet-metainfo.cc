@@ -169,7 +169,7 @@ tr_urlbuf tr_magnet_metainfo::magnet() const
     for (auto const& tracker : this->announceList())
     {
         s += "&tr="sv;
-        tr_http_escape(std::back_inserter(s), tracker.announce_str.sv(), true);
+        tr_http_escape(std::back_inserter(s), tracker.announce.sv(), true);
     }
 
     for (auto const& webseed : webseed_urls_)

@@ -231,9 +231,9 @@ struct tr_tracker
 {
     explicit tr_tracker(tr_announcer* announcer, tr_announce_list::tracker_info const& info)
         : host{ info.host }
-        , announce_url{ info.announce_str }
+        , announce_url{ info.announce }
         , sitename{ info.sitename }
-        , scrape_info{ std::empty(info.scrape_str) ? nullptr : tr_announcerGetScrapeInfo(announcer, info.scrape_str) }
+        , scrape_info{ std::empty(info.scrape) ? nullptr : tr_announcerGetScrapeInfo(announcer, info.scrape) }
         , id{ info.id }
     {
     }
