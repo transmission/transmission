@@ -285,9 +285,12 @@ struct tr_tracker
 // format: `${host}:${port}`
 tr_interned_string tr_announcerGetKey(tr_url_parsed_t const& parsed)
 {
-    std::string buf;
-    tr_buildBuf(buf, parsed.host, ":"sv, parsed.portstr);
-    return tr_interned_string{ buf };
+    auto buf = std::array<char, 1024>{};
+    auto* const begin = std::data(buf);
+    auto const* const end = fmt::format_to_n(begin, std::size(buf), "{:s}:{:d}", parsed.host, parsed.port).out;
+    auto const sv = std::string_view{ begin, static_cast<size_t>(end - begin) };
+
+    return tr_interned_string{ sv };
 }
 
 /***
@@ -1298,9 +1301,9 @@ static void checkMultiscrapeMax(tr_announcer* announcer, tr_scrape_response cons
         // don't log the full URL, since that might have a personal announce id
         // (note: we know 'parsed' will be successful since this url has a scrape_info)
         auto const parsed = *tr_urlParse(url);
-        auto clean_url = std::string{};
-        tr_buildBuf(clean_url, parsed.scheme, "://"sv, parsed.host, ":"sv, parsed.portstr);
-        tr_logAddDebug(fmt::format("Reducing multiscrape max to {}", n), clean_url);
+        tr_logAddDebug(
+            fmt::format(FMT_STRING("Reducing multiscrape max to {:d}"), n),
+            fmt::format(FMT_STRING("{:s}://{:s}:{:d}"), parsed.scheme, parsed.host, parsed.port));
         multiscrape_max = n;
     }
 }
