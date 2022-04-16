@@ -26,14 +26,13 @@ public:
     struct tracker_info
     {
         tr_url_parsed_t announce;
-        tr_url_parsed_t scrape;
         tr_interned_string announce_str;
         tr_interned_string scrape_str;
         tr_interned_string host;
         tr_tracker_tier_t tier = 0;
         tr_tracker_id_t id = 0;
 
-        [[nodiscard]] int compare(tracker_info const& that) const // <=>
+        [[nodiscard]] constexpr int compare(tracker_info const& that) const noexcept // <=>
         {
             if (this->tier != that.tier)
             {
@@ -48,12 +47,12 @@ public:
             return 0;
         }
 
-        [[nodiscard]] bool operator<(tracker_info const& that) const
+        [[nodiscard]] constexpr bool operator<(tracker_info const& that) const noexcept
         {
             return compare(that) < 0;
         }
 
-        [[nodiscard]] bool operator==(tracker_info const& that) const
+        [[nodiscard]] constexpr bool operator==(tracker_info const& that) const noexcept
         {
             return compare(that) == 0;
         }

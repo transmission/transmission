@@ -90,11 +90,11 @@ bool tr_announce_list::add(std::string_view announce_url_sv, tr_tracker_tier_t t
     if (auto const scrape_str = announceToScrape(announce_url_sv); scrape_str)
     {
         tracker.scrape_str = *scrape_str;
-        tracker.scrape = *tr_urlParseTracker(tracker.scrape_str.sv());
     }
 
     auto const it = std::lower_bound(std::begin(trackers_), std::end(trackers_), tracker);
     trackers_.insert(it, tracker);
+
     return true;
 }
 

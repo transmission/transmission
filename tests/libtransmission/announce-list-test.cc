@@ -34,7 +34,7 @@ TEST_F(AnnounceListTest, canAdd)
     EXPECT_EQ(1, announce_list.add(Announce, Tier));
     auto const tracker = announce_list.at(0);
     EXPECT_EQ(Announce, tracker.announce.full);
-    EXPECT_EQ("https://example.org/scrape"sv, tracker.scrape.full);
+    EXPECT_EQ("https://example.org/scrape"sv, tracker.scrape_str.sv());
     EXPECT_EQ(Tier, tracker.tier);
     EXPECT_EQ("example.org:443"sv, tracker.host.sv());
 }
@@ -87,7 +87,7 @@ TEST_F(AnnounceListTest, canAddUdp)
     EXPECT_TRUE(announce_list.add(Announce, Tier));
     auto const tracker = announce_list.at(0);
     EXPECT_EQ(Announce, tracker.announce.full);
-    EXPECT_EQ("udp://example.org/"sv, tracker.scrape.full);
+    EXPECT_EQ("udp://example.org/"sv, tracker.scrape_str.sv());
     EXPECT_EQ(Tier, tracker.tier);
 }
 

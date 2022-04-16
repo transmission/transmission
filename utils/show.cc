@@ -339,7 +339,7 @@ void doScrape(tr_torrent_metainfo const& metainfo)
         // build the full scrape URL
         auto escaped = std::array<char, TR_SHA1_DIGEST_LEN * 3 + 1>{};
         tr_http_escape_sha1(std::data(escaped), metainfo.infoHash());
-        auto const scrape = tracker.scrape.full;
+        auto const scrape = tracker.scrape_str.sv();
         auto const url = tr_urlbuf{ scrape,
                                     tr_strvContains(scrape, '?') ? '&' : '?',
                                     "info_hash="sv,
