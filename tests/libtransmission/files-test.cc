@@ -5,7 +5,7 @@
 
 #include "transmission.h"
 
-#include "files.h"
+#include "torrent-files.h"
 
 #include "test-fixtures.h"
 
@@ -20,14 +20,14 @@ TEST_F(FilesTest, add)
     auto constexpr Path = "/hello/world"sv;
     auto constexpr Size = size_t{ 1024 };
 
-    auto files = tr_files{};
-    EXPECT_EQ(size_t{ 0U }, std::size(files));
+    auto files = tr_torrent_files{};
+    EXPECT_EQ(size_t{ 0U }, files.fileCount());
     EXPECT_TRUE(std::empty(files));
 
     auto const file_index = files.add(Path, Size);
     EXPECT_EQ(tr_file_index_t{ 0U }, file_index);
-    EXPECT_EQ(size_t{ 1U }, std::size(files));
-    EXPECT_EQ(Size, files.size(file_index));
+    EXPECT_EQ(size_t{ 1U }, files.fileCount());
+    EXPECT_EQ(Size, files.fileSize(file_index));
     EXPECT_EQ(Path, files.path(file_index));
     EXPECT_FALSE(std::empty(files));
 }
@@ -38,14 +38,14 @@ TEST_F(FilesTest, setPath)
     auto constexpr Path2 = "/hello/there"sv;
     auto constexpr Size = size_t{ 2048 };
 
-    auto files = tr_files{};
+    auto files = tr_torrent_files{};
     auto const file_index = files.add(Path1, Size);
     EXPECT_EQ(Path1, files.path(file_index));
-    EXPECT_EQ(Size, files.size(file_index));
+    EXPECT_EQ(Size, files.fileSize(file_index));
 
     files.setPath(file_index, Path2);
     EXPECT_EQ(Path2, files.path(file_index));
-    EXPECT_EQ(Size, files.size(file_index));
+    EXPECT_EQ(Size, files.fileSize(file_index));
 }
 
 TEST_F(FilesTest, clear)
@@ -54,15 +54,15 @@ TEST_F(FilesTest, clear)
     auto constexpr Path2 = "/hello/there"sv;
     auto constexpr Size = size_t{ 2048 };
 
-    auto files = tr_files{};
+    auto files = tr_torrent_files{};
     files.add(Path1, Size);
-    EXPECT_EQ(size_t{ 1U }, std::size(files));
+    EXPECT_EQ(size_t{ 1U }, files.fileCount());
     files.add(Path2, Size);
-    EXPECT_EQ(size_t{ 2U }, std::size(files));
+    EXPECT_EQ(size_t{ 2U }, files.fileCount());
 
     files.clear();
     EXPECT_TRUE(std::empty(files));
-    EXPECT_EQ(size_t{ 0U }, std::size(files));
+    EXPECT_EQ(size_t{ 0U }, files.fileCount());
 }
 
 TEST_F(FilesTest, find)
@@ -71,7 +71,7 @@ TEST_F(FilesTest, find)
     auto const filename = tr_pathbuf{ sandboxDir(), "/first_dir/hello.txt"sv };
     createFileWithContents(std::string{ filename }, std::data(Contents), std::size(Contents));
 
-    auto files = tr_files{};
+    auto files = tr_torrent_files{};
     auto const file_index = files.add("first_dir/hello.txt", 1024);
 
     auto const search_path_1 = tr_pathbuf{ sandboxDir() };
@@ -89,7 +89,7 @@ TEST_F(FilesTest, find)
     EXPECT_EQ(filename, found->filename());
 
     // now make it an incomplete file
-    auto const partial_filename = tr_pathbuf{ filename, tr_files::PartialFileSuffix };
+    auto const partial_filename = tr_pathbuf{ filename, tr_torrent_files::PartialFileSuffix };
     EXPECT_TRUE(tr_sys_path_rename(filename, partial_filename));
     search_path = std::vector<std::string_view>{ search_path_1.sv(), search_path_2.sv() };
     found = files.find(file_index, std::data(search_path), std::size(search_path));
@@ -113,7 +113,7 @@ TEST_F(FilesTest, hasAnyLocalData)
     auto const filename = tr_pathbuf{ sandboxDir(), "/first_dir/hello.txt"sv };
     createFileWithContents(std::string{ filename }, std::data(Contents), std::size(Contents));
 
-    auto files = tr_files{};
+    auto files = tr_torrent_files{};
     files.add("first_dir/hello.txt", 1024);
 
     auto const search_path_1 = tr_pathbuf{ sandboxDir() };

@@ -368,7 +368,7 @@ public:
         metainfo_.setFileSubpath(i, subpath);
     }
 
-    [[nodiscard]] std::optional<tr_files::FoundFile> findFile(tr_file_index_t file_index) const;
+    [[nodiscard]] std::optional<tr_torrent_files::FoundFile> findFile(tr_file_index_t file_index) const;
 
     [[nodiscard]] bool hasAnyLocalData() const;
 
@@ -558,6 +558,16 @@ public:
         this->error_announce_url = TR_KEY_NONE;
         this->error_string = errmsg;
     }
+
+    void setDownloadDir(std::string_view path)
+    {
+        download_dir = path;
+        markEdited();
+        setDirty();
+        refreshCurrentDir();
+    }
+
+    void refreshCurrentDir();
 
     void setVerifyState(tr_verify_state state);
 
