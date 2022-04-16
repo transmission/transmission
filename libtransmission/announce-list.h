@@ -25,10 +25,10 @@ class tr_announce_list
 public:
     struct tracker_info
     {
-        tr_url_parsed_t announce;
-        tr_interned_string announce_str;
-        tr_interned_string scrape_str;
-        tr_interned_string host;
+        tr_interned_string announce;
+        tr_interned_string scrape;
+        tr_interned_string host; // 'example.org:80'
+        tr_interned_string sitename; // 'example'
         tr_tracker_tier_t tier = 0;
         tr_tracker_id_t id = 0;
 
@@ -39,9 +39,9 @@ public:
                 return this->tier < that.tier ? -1 : 1;
             }
 
-            if (this->announce.full != that.announce.full)
+            if (int const i{ this->announce.compare(that.announce) }; i != 0)
             {
-                return this->announce.full < that.announce.full ? -1 : 1;
+                return i;
             }
 
             return 0;
