@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <cstdint> // uint16_t
 #include <optional>
 #include <string>
 #include <string_view>
@@ -33,12 +34,11 @@ struct tr_url_parsed_t
     std::string_view authority; // "example.com:80"
     std::string_view host; // "example.com"
     std::string_view sitename; // "example"
-    std::string_view portstr; // "80"
     std::string_view path; // /"over/there"
     std::string_view query; // "name=ferret"
     std::string_view fragment; // "nose"
     std::string_view full; // "http://example.com:80/over/there?name=ferret#nose"
-    int port = -1; // 80
+    uint16_t port = 0;
 };
 
 std::optional<tr_url_parsed_t> tr_urlParse(std::string_view url);
