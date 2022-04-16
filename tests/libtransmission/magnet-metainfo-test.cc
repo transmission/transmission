@@ -69,11 +69,11 @@ TEST(MagnetMetainfo, magnetParse)
         EXPECT_EQ(2U, std::size(mm.announceList()));
         auto it = std::begin(mm.announceList());
         EXPECT_EQ(0U, it->tier);
-        EXPECT_EQ("http://tracker.openbittorrent.com/announce"sv, it->announce.full);
+        EXPECT_EQ("http://tracker.openbittorrent.com/announce"sv, it->announce_str.sv());
         EXPECT_EQ("http://tracker.openbittorrent.com/scrape"sv, it->scrape_str.sv());
         ++it;
         EXPECT_EQ(1U, it->tier);
-        EXPECT_EQ("http://tracker.opentracker.org/announce", it->announce.full);
+        EXPECT_EQ("http://tracker.opentracker.org/announce", it->announce_str.sv());
         EXPECT_EQ("http://tracker.opentracker.org/scrape", it->scrape_str.sv());
         EXPECT_EQ(1U, mm.webseedCount());
         EXPECT_EQ("http://server.webseed.org/path/to/file"sv, mm.webseed(0));

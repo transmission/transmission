@@ -235,7 +235,7 @@ void showInfo(app_opts const& opts, tr_torrent_metainfo const& metainfo)
                 ++print_tier;
             }
 
-            printf("  %" TR_PRIsv "\n", TR_PRIsv_ARG(tracker.announce.full));
+            printf("  %" TR_PRIsv "\n", TR_PRIsv_ARG(tracker.announce_str.sv()));
         }
 
         /**
