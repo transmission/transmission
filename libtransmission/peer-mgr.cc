@@ -495,7 +495,7 @@ static int countActiveWebseeds(tr_swarm* s)
     return std::count_if(
         std::begin(s->webseeds),
         std::end(s->webseeds),
-        [&now](auto const& webseed){ return webseed->is_transferring_pieces(now, TR_DOWN, nullptr); });
+        [&now](auto const& webseed) { return webseed->is_transferring_pieces(now, TR_DOWN, nullptr); });
 }
 
 // TODO: if we keep this, add equivalent API to ActiveRequest
