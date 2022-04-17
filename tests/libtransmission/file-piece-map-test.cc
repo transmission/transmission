@@ -50,7 +50,7 @@ protected:
                 FileSizes[14] + FileSizes[15] + FileSizes[16] ==
             TotalSize);
 
-        EXPECT_EQ(11, block_info_.pieceCount());
+        EXPECT_EQ(11U, block_info_.pieceCount());
         EXPECT_EQ(PieceSize, block_info_.pieceSize());
         EXPECT_EQ(TotalSize, block_info_.totalSize());
         EXPECT_EQ(TotalSize, std::accumulate(std::begin(FileSizes), std::end(FileSizes), uint64_t{ 0 }));
