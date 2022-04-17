@@ -22,6 +22,8 @@ namespace
 
 [[nodiscard]] constexpr size_t getBytesNeeded(size_t bit_count) noexcept
 {
+    /* NB: If can gurantee bit_count <= SIZE_MAX - 8 then faster logic
+       is ((bit_count + 7) >> 3). */
     return (bit_count >> 3) + ((bit_count & 7) != 0 ? 1 : 0);
 }
 
@@ -33,7 +35,7 @@ void setAllTrue(uint8_t* array, size_t bit_count)
     if (n > 0)
     {
         std::fill_n(array, n, Val);
-        array[n - 1] = Val << (n * 8 - bit_count);
+        array[n - 1] = Val << ((-bit_count) & 7U);
     }
 }
 
@@ -47,13 +49,19 @@ auto constexpr TrueBitCount = std::array<size_t, 256>{
     6, 7, 3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7, 4, 5, 5, 6, 5, 6, 6, 7, 5, 6, 6, 7, 6, 7, 7, 8
 };
 
+/* Switch to std::popcount if project upgrades to c++20 or newer */
+[[nodiscard]] constexpr int doPopcount(uint8_t flags) noexcept
+{
+    return TrueBitCount[flags];
+}
+
 [[nodiscard]] constexpr size_t rawCountFlags(uint8_t const* flags, size_t n) noexcept
 {
     auto ret = size_t{};
 
     for (auto const* const end = flags + n; flags != end; ++flags)
     {
-        ret += TrueBitCount[*flags];
+        ret += doPopcount(*flags);
     }
 
     return ret;
@@ -72,7 +80,7 @@ size_t tr_bitfield::countFlags() const noexcept
 
 size_t tr_bitfield::countFlags(size_t begin, size_t end) const noexcept
 {
-    size_t ret = 0;
+    auto ret = size_t{};
     size_t const first_byte = begin >> 3U;
     size_t const last_byte = (end - 1) >> 3U;
 
@@ -93,40 +101,47 @@ size_t tr_bitfield::countFlags(size_t begin, size_t end) const noexcept
     {
         uint8_t val = flags_[first_byte];
 
-        auto i = begin - (first_byte * 8);
+        auto i = begin & 7U;
         val <<= i;
+        i = (begin - end) & 7U;
         val >>= i;
-        i = (last_byte + 1) * 8 - end;
-        val >>= i;
-        val <<= i;
-
-        ret += TrueBitCount[val];
+        ret = doPopcount(val);
     }
     else
     {
         size_t const walk_end = std::min(std::size(flags_), last_byte);
 
         /* first byte */
-        size_t const first_shift = begin - (first_byte * 8);
+        size_t const first_shift = begin & 7U;
         uint8_t val = flags_[first_byte];
         val <<= first_shift;
-        val >>= first_shift;
-        ret += TrueBitCount[val];
+        /* No need to shift back val for correct popcount. */
+        ret = doPopcount(val);
 
         /* middle bytes */
-        for (size_t i = first_byte + 1; i < walk_end; ++i)
+
+        /* Use second accumulator because loads generally have high
+           latency but fast throughput. */
+        size_t tmp_accum = 0;
+        for (size_t i = first_byte + 1; i < walk_end;)
         {
-            ret += TrueBitCount[flags_[i]];
+            tmp_accum += doPopcount(flags_[i]);
+            if ((i += 2) > walk_end)
+            {
+                break;
+            }
+            ret += doPopcount(flags_[i - 1]);
         }
+        ret += tmp_accum;
 
         /* last byte */
         if (last_byte < std::size(flags_))
         {
-            size_t const last_shift = (last_byte + 1) * 8 - end;
+            size_t const last_shift = (-end) & 7U;
             val = flags_[last_byte];
             val >>= last_shift;
-            val <<= last_shift;
-            ret += TrueBitCount[val];
+            /* No need to shift back val for correct popcount. */
+            ret += doPopcount(val);
         }
     }
 
@@ -329,14 +344,17 @@ void tr_bitfield::set(size_t nth, bool value)
         return;
     }
 
+    /* Already tested that val != nth bit so just swap */
+    flags_[nth >> 3U] ^= 0x80 >> (nth & 7U);
+
+    /* Branch is needed for the assertions. Otherwise incrementing
+       (val ? 1 : -1) is better */
     if (value)
     {
-        flags_[nth >> 3U] |= 0x80 >> (nth & 7U);
         incrementTrueCount(1);
     }
     else
     {
-        flags_[nth >> 3U] &= 0xff7f >> (nth & 7U);
         decrementTrueCount(1);
     }
 }
@@ -351,9 +369,11 @@ void tr_bitfield::setSpan(size_t begin, size_t end, bool value)
         return;
     }
 
-    // did anything change?
+    // NB: count(begin, end) can be quite expensive. Might be worth it
+    // to fuse the count and set loop
     size_t const old_count = count(begin, end);
     size_t const new_count = value ? (end - begin) : 0;
+    // did anything change?
     if (old_count == new_count)
     {
         return;
@@ -368,11 +388,10 @@ void tr_bitfield::setSpan(size_t begin, size_t end, bool value)
     auto walk = begin >> 3;
     auto const last_byte = end >> 3;
 
+    unsigned char first_mask = 0xff >> (begin & 7U);
     if (value)
     {
-        unsigned char const first_mask = ~(0xff << (8 - (begin & 7)));
-        unsigned char const last_mask = 0xff << (7 - (end & 7));
-
+        unsigned char last_mask = 0xff << ((~end) & 7U);
         if (walk == last_byte)
         {
             flags_[walk] |= first_mask & last_mask;
@@ -380,8 +399,9 @@ void tr_bitfield::setSpan(size_t begin, size_t end, bool value)
         else
         {
             flags_[walk] |= first_mask;
+            /* last_byte is expected to be hot in cache due to earlier
+               count(begin, end) */
             flags_[last_byte] |= last_mask;
-
             if (++walk < last_byte)
             {
                 std::fill_n(std::data(flags_) + walk, last_byte - walk, 0xff);
@@ -392,9 +412,8 @@ void tr_bitfield::setSpan(size_t begin, size_t end, bool value)
     }
     else
     {
-        unsigned char const first_mask = 0xff << (8 - (begin & 7));
-        unsigned char const last_mask = ~(0xff << (7 - (end & 7)));
-
+        first_mask = ~first_mask;
+        unsigned char last_mask = 0xff >> ((end & 7U) + 1);
         if (walk == last_byte)
         {
             flags_[walk] &= first_mask | last_mask;
@@ -402,8 +421,9 @@ void tr_bitfield::setSpan(size_t begin, size_t end, bool value)
         else
         {
             flags_[walk] &= first_mask;
+            /* last_byte is expected to be hot in cache due to earlier
+               count(begin, end) */
             flags_[last_byte] &= last_mask;
-
             if (++walk < last_byte)
             {
                 std::fill_n(std::data(flags_) + walk, last_byte - walk, 0);
