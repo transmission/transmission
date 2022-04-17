@@ -2118,7 +2118,7 @@ bool tr_torrent::setTrackerList(std::string_view text)
         if (std::any_of(
                 std::begin(this->announceList()),
                 std::end(this->announceList()),
-                [error_url](auto const& tracker) { return tracker.announce_str == error_url; }))
+                [error_url](auto const& tracker) { return tracker.announce == error_url; }))
         {
             tr_torrentClearError(this);
         }
