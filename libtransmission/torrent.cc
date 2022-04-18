@@ -717,7 +717,8 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
     tor->error = TR_STAT_OK;
     tor->finishedSeedingByIdle = false;
 
-    tor->labels = tr_ctorGetLabels(ctor);
+    auto const& labels = tr_ctorGetLabels(ctor);
+    tor->setLabels(std::data(labels), std::size(labels));
 
     tor->uniqueId = session->torrents().add(tor);
 
@@ -1454,6 +1455,7 @@ void tr_torrentStart(tr_torrent* tor)
 {
     if (tr_isTorrent(tor))
     {
+        tor->startAfterVerify = true;
         torrentStart(tor, {});
     }
 }
@@ -1602,8 +1604,6 @@ static void closeTorrent(tr_torrent* const tor)
 {
     TR_ASSERT(tr_isTorrent(tor));
     TR_ASSERT(tr_amInEventThread(tor->session));
-
-    tor->session->removed_torrents.emplace_back(tor->uniqueId, tr_time());
 
     if (!tor->session->isClosing())
     {
@@ -1926,13 +1926,13 @@ void tr_torrentSetFileDLs(tr_torrent* tor, tr_file_index_t const* files, tr_file
 ****
 ***/
 
-void tr_torrentSetLabels(tr_torrent* tor, tr_labels_t&& labels)
+void tr_torrent::setLabels(tr_quark const* new_labels, size_t n_labels)
 {
-    TR_ASSERT(tr_isTorrent(tor));
-    auto const lock = tor->unique_lock();
-
-    tor->labels = std::move(labels);
-    tor->setDirty();
+    auto const lock = unique_lock();
+    auto const sorted_unique = std::set<tr_quark>{ new_labels, new_labels + n_labels };
+    this->labels = { std::begin(sorted_unique), std::end(sorted_unique) };
+    this->labels.shrink_to_fit();
+    this->setDirty();
 }
 
 /***
