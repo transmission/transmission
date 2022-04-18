@@ -11,6 +11,7 @@
 # Mike Gelfand <mikedld@mikedld.com>, 2020
 # Fedor Katilov <fedor@katilov.ru>, 2020
 # hlm hlmfn, 2021
+# ViktorOn, 2022
 #
 #, fuzzy
 msgid ""
@@ -72,7 +73,7 @@ msgid_plural "Couldn't add corrupt torrents"
 msgstr[0] "Невозможно добавить поврежденный торрент"
 msgstr[1] "Невозможно добавить поврежденные торренты"
 msgstr[2] "Невозможно добавить поврежденные торренты"
-msgstr[3] "Couldn't add corrupt torrents"
+msgstr[3] "Невозможно добавить поврежденные торренты"
 
 #: ../gtk/Application.cc:962
 msgid "Couldn't add duplicate torrent"
@@ -80,7 +81,7 @@ msgid_plural "Couldn't add duplicate torrents"
 msgstr[0] "Невозможно добавить дублирующийся торрент"
 msgstr[1] "Невозможно добавить дублирующиеся торренты"
 msgstr[2] "Невозможно добавить дублирующиеся торренты"
-msgstr[3] "Couldn't add duplicate torrents"
+msgstr[3] "Невозможно добавить дублирующиеся торренты"
 
 #: ../gtk/Application.cc:1280
 msgid "A fast and easy BitTorrent client"
@@ -145,7 +146,7 @@ msgstr "Раздавать независимо от активности"
 
 #: ../gtk/DetailsDialog.cc:518
 msgid "Stop seeding if idle for N minutes:"
-msgstr "Прекратить раздачу при простое n-минут:"
+msgstr "Прекратить раздачу при простое N минут:"
 
 #: ../gtk/DetailsDialog.cc:531
 msgid "_Idle:"
@@ -268,7 +269,7 @@ msgstr "%1$s (доступно %2$s%% из %3$s%%); не подтвержден�
 #: ../gtk/DetailsDialog.cc:929
 #, c-format
 msgid "%1$s (+%2$s discarded after failed checksum)"
-msgstr ""
+msgstr "%1$s (+%2$s отклоняется при несовпадении контрольной суммы)"
 
 #: ../gtk/DetailsDialog.cc:955
 #, c-format
@@ -614,7 +615,7 @@ msgstr "Свойства %s"
 #: ../gtk/DetailsDialog.cc:2623
 #, c-format
 msgid "%'d Torrent Properties"
-msgstr "%'d Свойства торрента"
+msgstr "Свойства торрента %'d"
 
 #: ../gtk/Dialogs.cc:54
 #, c-format
@@ -851,7 +852,7 @@ msgstr "Отменено"
 #: ../gtk/MakeDialog.cc:124
 #, c-format
 msgid "Error: invalid announce URL \"%s\""
-msgstr "Ошибка: неверный URL объявлений «%s»"
+msgstr "Ошибка: неверный URL объявления «%s»"
 
 #: ../gtk/MakeDialog.cc:128
 #, c-format
@@ -888,7 +889,7 @@ msgid_plural "%1$s; %2$'d Files"
 msgstr[0] "%1$s; %2$'d файл"
 msgstr[1] "%1$s; %2$'d файла"
 msgstr[2] "%1$s; %2$'d файлов"
-msgstr[3] "%1$s; %2$'d Files"
+msgstr[3] "%1$s; %2$'d файлов"
 
 #: ../gtk/MakeDialog.cc:344
 #, c-format
@@ -909,7 +910,7 @@ msgstr "Со_хранить в:"
 
 #: ../gtk/MakeDialog.cc:453
 msgid "Source F_older:"
-msgstr "Исходный к_аталог:"
+msgstr "Исходная п_апка:"
 
 #: ../gtk/MakeDialog.cc:462
 msgid "Source _File:"
@@ -941,7 +942,7 @@ msgstr "При_мечание:"
 
 #: ../gtk/MakeDialog.cc:505
 msgid "_Source:"
-msgstr ""
+msgstr "_Источник:"
 
 #: ../gtk/MakeDialog.cc:512
 msgid "_Private torrent"
@@ -974,7 +975,7 @@ msgstr "Журнал сообщений"
 
 #: ../gtk/MessageLogWindow.cc:462
 msgid "Save _As"
-msgstr "Сохранить _Как"
+msgstr "Сохранить _как"
 
 #: ../gtk/MessageLogWindow.cc:473
 msgid "Clear"
@@ -1002,7 +1003,7 @@ msgstr "Торрент завершён"
 
 #: ../gtk/Notify.cc:238
 msgid "Start Now"
-msgstr ""
+msgstr "Начать сейчас"
 
 #: ../gtk/Notify.cc:250
 msgid "Torrent Added"
@@ -1030,7 +1031,7 @@ msgstr "_Переместить файл .torrent в корзину"
 
 #: ../gtk/OptionsDialog.cc:296
 msgid "_Start when added"
-msgstr "Н_ачать загрузку после добавления"
+msgstr "_Начать загрузку после добавления"
 
 #. "torrent file" row
 #: ../gtk/OptionsDialog.cc:309
@@ -1100,7 +1101,7 @@ msgstr "Максимальное количество одновременных
 
 #: ../gtk/PrefsDialog.cc:284
 msgid "Downloads sharing data in the last _N minutes are active:"
-msgstr "Загружать данные о раздаче за последние n-минут _активности:"
+msgstr "Загружать данные о раздаче за последние N минут _активности:"
 
 #: ../gtk/PrefsDialog.cc:288 ../libtransmission/torrent.cc:1648
 msgid "Incomplete"
@@ -1128,7 +1129,7 @@ msgstr "Прекратить раздачу при _рейтинге:"
 
 #: ../gtk/PrefsDialog.cc:333
 msgid "Stop seeding if idle for _N minutes:"
-msgstr "Прекратить разда_чу при простое n-минут:"
+msgstr "Прекратить разда_чу при простое N минут:"
 
 #: ../gtk/PrefsDialog.cc:341
 msgid "Call scrip_t when done seeding:"
@@ -1167,7 +1168,7 @@ msgstr "Воспроизводить _звуковое уведомление п
 msgid "Blocklist contains %'d rule"
 msgid_plural "Blocklist contains %'d rules"
 msgstr[0] "Черный список содержит %'d правило"
-msgstr[1] "Черный список содержит %'d правил"
+msgstr[1] "Черный список содержит %'d правила"
 msgstr[2] "Черный список содержит %'d правил"
 msgstr[3] "Чёрный список содержит %'d правил"
 
@@ -1183,9 +1184,9 @@ msgstr "<b>Обновление успешно завершено!</b>"
 #, c-format
 msgid "Blocklist has %'d rule."
 msgid_plural "Blocklist has %'d rules."
-msgstr[0] "Черный список содержит %'d правило."
-msgstr[1] "Черный список содержит %'d правил."
-msgstr[2] "Черный список содержит %'d правил."
+msgstr[0] "В чёрном списке %'d правило."
+msgstr[1] "В чёрном списке %'d правила."
+msgstr[2] "В чёрном списке %'d правил."
 msgstr[3] "В чёрном списке %'d правил."
 
 #: ../gtk/PrefsDialog.cc:451
@@ -1517,7 +1518,7 @@ msgstr "_Не перемещать, данные уже есть в указан
 #: ../gtk/Session.cc:1110
 #, c-format
 msgid "Couldn't read \"%s\""
-msgstr ""
+msgstr "Не удалось прочитать «%s»"
 
 #: ../gtk/Session.cc:1123
 #, c-format
@@ -1659,7 +1660,7 @@ msgstr "Оставшееся время неизвестно"
 #: ../gtk/TorrentCellRenderer.cc:133
 #, c-format
 msgid "%s remaining"
-msgstr "осталось %s"
+msgstr "Осталось %s"
 
 #: ../gtk/TorrentCellRenderer.cc:152
 #, c-format
@@ -1796,7 +1797,7 @@ msgid_plural "%'d days"
 msgstr[0] "%'d день"
 msgstr[1] "%'d дня"
 msgstr[2] "%'d дней"
-msgstr[3] "%'d days"
+msgstr[3] "%'d дней"
 
 #: ../gtk/Utils.cc:106
 #, c-format
@@ -1805,7 +1806,7 @@ msgid_plural "%'d hours"
 msgstr[0] "%'d час"
 msgstr[1] "%'d часа"
 msgstr[2] "%'d часов"
-msgstr[3] "%'d hours"
+msgstr[3] "%'d часов"
 
 #: ../gtk/Utils.cc:107
 #, c-format
@@ -1814,7 +1815,7 @@ msgid_plural "%'d minutes"
 msgstr[0] "%'d минута"
 msgstr[1] "%'d минуты"
 msgstr[2] "%'d минут"
-msgstr[3] "%'d minutes"
+msgstr[3] "%'d минут"
 
 #: ../gtk/Utils.cc:108
 #, c-format
@@ -1823,12 +1824,12 @@ msgid_plural "%'d seconds"
 msgstr[0] "%'d секунда"
 msgstr[1] "%'d секунды"
 msgstr[2] "%'d секунд"
-msgstr[3] "%'d seconds"
+msgstr[3] "%'d секунд"
 
 #: ../gtk/Utils.cc:156
 #, c-format
 msgid "The torrent file \"%s\" is already in use by \"%s.\""
-msgstr "Torrent-файл «%s» уже используется «%s»."
+msgstr "Торрент-файл «%s» уже используется «%s»."
 
 #: ../gtk/Utils.cc:162
 #, c-format
@@ -1851,7 +1852,7 @@ msgstr "Transmission не знает, как использовать «%s»"
 
 #: ../gtk/Utils.cc:464
 msgid "This magnet link appears to be intended for something other than BitTorrent."
-msgstr ""
+msgstr "Похоже, что эта магнитная ссылка предназначена не для BitTorrent."
 
 #: ../gtk/main.cc:49 ../gtk/transmission-gtk.desktop.in:3
 msgid "Transmission"
@@ -1864,7 +1865,7 @@ msgstr "Расположение файлов конфигурации"
 
 #: ../gtk/main.cc:59
 msgid "Start with all torrents paused"
-msgstr "Начать с приостановленными торрентами"
+msgstr "Запускать с приостановленными торрентами"
 
 #: ../gtk/main.cc:60
 msgid "Start minimized in notification area"
@@ -2198,7 +2199,7 @@ msgstr "Не является обычным файлом"
 #: ../libtransmission/utils.cc:365
 #, c-format
 msgid "Saved \"%s\""
-msgstr "Сохранение «%s»"
+msgstr "Сохранено «%s»"
 
 #. did caller give us an uninitialized val?
 #: ../libtransmission/variant.cc:971
@@ -2223,13 +2224,13 @@ msgstr "Проверка торрента"
 
 #, c-format
 #~ msgid "%s is not an IPv4 or IPv6 address. RPC listeners must be IPv4 or IPv6"
-#~ msgstr "%sне является адресом IPv4 или IPv6. Слушатели RPC должны быть IPv4 или IPv6"
+#~ msgstr "%s не является адресом IPv4 или IPv6. Слушатели RPC должны быть IPv4 или IPv6"
 
 #~ msgid "Ask Tracker for _More Peers"
 #~ msgstr "Зап_росить у трекера больше участников"
 
 #~ msgid "BitTorrent is a peer-to-peer file-sharing protocol that is commonly used to distribute large amounts of data between multiple users."
-#~ msgstr "BitTorrent - протокол обмена файлами пиринговой сети, который обычно используется для распространения больших объемов данных между несколькими пользователями."
+#~ msgstr "BitTorrent — протокол обмена файлами пиринговой сети, который обычно используется для распространения больших объемов данных между несколькими пользователями."
 
 #~ msgid "Call scrip_t when torrent is completed:"
 #~ msgstr "Выполнять с_ценарий после окончания загрузки:"
@@ -2398,7 +2399,7 @@ msgstr "Проверка торрента"
 #~ msgstr "Трекер разрешит запросы через %s"
 
 #~ msgid "Transmission is a BitTorrent client with an easy-to-use frontend on top a cross-platform backend. Native frontends are available for OS X and Windows, as well as command line and web frontends."
-#~ msgstr "Transmission - BitTorrent клиент с простым в использовании интерфейсом поверх кросс-платформенного бэкэнда. Родные интерфейсы доступны для OS X и Windows так же как командная строка и веб-интерфейс."
+#~ msgstr "Transmission — BitTorrent-клиент с простым в использовании интерфейсом поверх кроссплатформенного бэкенда. Родные интерфейсы доступны для OS X и Windows, так же как командная строка и веб-интерфейс."
 
 #~ msgid "Unable to parse file content"
 #~ msgstr "Невозможно разобрать содержимое файла"
