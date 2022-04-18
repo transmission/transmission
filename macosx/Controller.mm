@@ -1545,6 +1545,7 @@ static void removeKeRangerRansomware()
             if (returnCode == 1)
             {
                 NSString* urlString = [self.fUrlSheetController urlString];
+                urlString = [urlString stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet];
                 dispatch_async(dispatch_get_main_queue(), ^{
                     [self openURL:urlString];
                 });

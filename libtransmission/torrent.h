@@ -14,7 +14,6 @@
 #include <optional>
 #include <string>
 #include <string_view>
-#include <unordered_set>
 #include <vector>
 
 #include "transmission.h"
@@ -41,8 +40,6 @@ struct tr_session;
 struct tr_torrent;
 struct tr_torrent_announcer;
 
-using tr_labels_t = std::unordered_set<std::string>;
-
 /**
 ***  Package-visible ctor API
 **/
@@ -59,13 +56,9 @@ tr_session* tr_ctorGetSession(tr_ctor const* ctor);
 
 bool tr_ctorGetIncompleteDir(tr_ctor const* ctor, char const** setmeIncompleteDir);
 
-tr_labels_t tr_ctorGetLabels(tr_ctor const* ctor);
-
 /**
 ***
 **/
-
-void tr_torrentSetLabels(tr_torrent* tor, tr_labels_t&& labels);
 
 void tr_torrentChangeMyPort(tr_torrent* session);
 
@@ -368,7 +361,7 @@ public:
         metainfo_.setFileSubpath(i, subpath);
     }
 
-    [[nodiscard]] std::optional<tr_files::FoundFile> findFile(tr_file_index_t file_index) const;
+    [[nodiscard]] std::optional<tr_torrent_files::FoundFile> findFile(tr_file_index_t file_index) const;
 
     [[nodiscard]] bool hasAnyLocalData() const;
 
@@ -559,9 +552,21 @@ public:
         this->error_string = errmsg;
     }
 
+    void setDownloadDir(std::string_view path)
+    {
+        download_dir = path;
+        markEdited();
+        setDirty();
+        refreshCurrentDir();
+    }
+
+    void refreshCurrentDir();
+
     void setVerifyState(tr_verify_state state);
 
     void setDateActive(time_t t);
+
+    void setLabels(tr_quark const* labels, size_t n_labels);
 
     /** Return the mime-type (e.g. "audio/x-flac") that matches more of the
         torrent's content than any other mime-type. */
@@ -579,9 +584,6 @@ public:
     Bandwidth bandwidth_;
 
     tr_swarm* swarm = nullptr;
-
-    // TODO: is this actually still needed?
-    int const magicNumber = MagicNumber;
 
     std::optional<double> verify_progress;
 
@@ -700,13 +702,12 @@ public:
     tr_idlelimit idleLimitMode = TR_IDLELIMIT_GLOBAL;
     bool finishedSeedingByIdle = false;
 
-    tr_labels_t labels;
+    using labels_t = std::vector<tr_quark>;
+    labels_t labels;
 
     std::string group;
     /* Set the bandwidth group the torrent belongs to */
     void setGroup(std::string_view groupName);
-
-    static auto constexpr MagicNumber = int{ 95549 };
 
     tr_file_piece_map fpm_ = tr_file_piece_map{ metainfo_ };
     tr_file_priorities file_priorities_{ &fpm_ };
@@ -742,7 +743,7 @@ private:
 
 constexpr bool tr_isTorrent(tr_torrent const* tor)
 {
-    return tor != nullptr && tor->magicNumber == tr_torrent::MagicNumber && tr_isSession(tor->session);
+    return tor != nullptr && tr_isSession(tor->session);
 }
 
 /**
@@ -756,7 +757,8 @@ tr_torrent_metainfo tr_ctorStealMetainfo(tr_ctor* ctor);
 
 bool tr_ctorSetMetainfoFromFile(tr_ctor* ctor, std::string const& filename, tr_error** error);
 bool tr_ctorSetMetainfoFromMagnetLink(tr_ctor* ctor, std::string const& filename, tr_error** error);
-void tr_ctorSetLabels(tr_ctor* ctor, tr_labels_t&& labels);
+void tr_ctorSetLabels(tr_ctor* ctor, tr_quark const* labels, size_t n_labels);
+tr_torrent::labels_t const& tr_ctorGetLabels(tr_ctor const* ctor);
 
 #define tr_logAddCriticalTor(tor, msg) tr_logAddCritical(msg, (tor)->name())
 #define tr_logAddErrorTor(tor, msg) tr_logAddError(msg, (tor)->name())

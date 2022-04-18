@@ -1097,27 +1097,23 @@ static void sendLtepHandshake(tr_peerMsgsImpl* msgs)
 
 static void parseLtepHandshake(tr_peerMsgsImpl* msgs, uint32_t len, struct evbuffer* inbuf)
 {
-    auto* const tmp = tr_new(char, len);
-    tr_peerIoReadBytes(msgs->io, inbuf, tmp, len);
     msgs->peerSentLtepHandshake = true;
 
+    // LTEP messages are usually just a couple hundred bytes,
+    // so try using a strbuf to handle it on the stack
+    auto tmp = tr_strbuf<char, 512>{};
+    tmp.resize(len);
+    tr_peerIoReadBytes(msgs->io, inbuf, std::data(tmp), std::size(tmp));
+    auto const handshake_sv = tmp.sv();
+
     auto val = tr_variant{};
-    if (!tr_variantFromBuf(&val, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, { tmp, len }) || !tr_variantIsDict(&val))
+    if (!tr_variantFromBuf(&val, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, handshake_sv) || !tr_variantIsDict(&val))
     {
         logtrace(msgs, "GET  extended-handshake, couldn't get dictionary");
-        tr_free(tmp);
         return;
     }
 
-    /* arbitrary limit, should be more than enough */
-    if (len <= 4096)
-    {
-        logtrace(msgs, fmt::format(FMT_STRING("here is the handshake: [{:{}.{}s}]"), tmp, len, len));
-    }
-    else
-    {
-        logtrace(msgs, fmt::format(FMT_STRING("handshake length is too big ({:d}), printing skipped"), len));
-    }
+    logtrace(msgs, fmt::format(FMT_STRING("here is the base64-encoded handshake: [{:s}]"), tr_base64_encode(handshake_sv)));
 
     /* does the peer prefer encrypted connections? */
     auto i = int64_t{};
@@ -1203,7 +1199,6 @@ static void parseLtepHandshake(tr_peerMsgsImpl* msgs, uint32_t len, struct evbuf
     }
 
     tr_variantFree(&val);
-    tr_free(tmp);
 }
 
 static void parseUtMetadata(tr_peerMsgsImpl* msgs, uint32_t msglen, struct evbuffer* inbuf)

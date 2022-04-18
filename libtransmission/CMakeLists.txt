@@ -31,7 +31,6 @@ set(PROJECT_FILES
   file-posix.cc
   file-win32.cc
   file.cc
-  files.cc
   handshake.cc
   inout.cc
   log.cc
@@ -58,6 +57,7 @@ set(PROJECT_FILES
   subprocess-posix.cc
   subprocess-win32.cc
   torrent-ctor.cc
+  torrent-files.cc
   torrent-magnet.cc
   torrent-metainfo.cc
   torrent.cc
@@ -171,7 +171,6 @@ set(${PROJECT_NAME}_PRIVATE_HEADERS
     fdlimit.h
     file-info.h
     file-piece-map.h
-    files.h
     handshake.h
     history.h
     inout.h
@@ -195,6 +194,7 @@ set(${PROJECT_NAME}_PRIVATE_HEADERS
     session.h
     stats.h
     subprocess.h
+    torrent-files.h
     torrent-magnet.h
     torrent-metainfo.h
     torrent.h

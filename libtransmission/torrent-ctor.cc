@@ -41,7 +41,7 @@ struct tr_ctor
 
     tr_priority_t priority = TR_PRI_NORMAL;
 
-    tr_labels_t labels = {};
+    tr_torrent::labels_t labels = {};
 
     struct optional_args optional_args[2];
 
@@ -329,12 +329,12 @@ tr_priority_t tr_ctorGetBandwidthPriority(tr_ctor const* ctor)
 ****
 ***/
 
-void tr_ctorSetLabels(tr_ctor* ctor, tr_labels_t&& labels)
+void tr_ctorSetLabels(tr_ctor* ctor, tr_quark const* labels, size_t n_labels)
 {
-    ctor->labels = std::move(labels);
+    ctor->labels = { labels, labels + n_labels };
 }
 
-tr_labels_t tr_ctorGetLabels(tr_ctor const* ctor)
+tr_torrent::labels_t const& tr_ctorGetLabels(tr_ctor const* ctor)
 {
     return ctor->labels;
 }

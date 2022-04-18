@@ -148,7 +148,7 @@ std::string tr_torrent_metainfo::fixWebseedUrl(tr_torrent_metainfo const& tm, st
 {
     url = tr_strvStrip(url);
 
-    if (std::size(tm.files_) > 1 && !std::empty(url) && url.back() != '/')
+    if (tm.fileCount() > 1U && !std::empty(url) && url.back() != '/')
     {
         return std::string{ url } + '/';
     }

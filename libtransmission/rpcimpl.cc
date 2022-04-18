@@ -363,7 +363,7 @@ static void addLabels(tr_torrent const* tor, tr_variant* list)
     tr_variantInitList(list, std::size(tor->labels));
     for (auto const& label : tor->labels)
     {
-        tr_variantListAddStr(list, label);
+        tr_variantListAddQuark(list, label);
     }
 }
 
@@ -404,10 +404,10 @@ static void addTrackers(tr_torrent const* tor, tr_variant* trackers)
     for (auto const& tracker : tor->announceList())
     {
         auto* const d = tr_variantListAddDict(trackers, 5);
-        tr_variantDictAddQuark(d, TR_KEY_announce, tracker.announce_str.quark());
+        tr_variantDictAddQuark(d, TR_KEY_announce, tracker.announce.quark());
         tr_variantDictAddInt(d, TR_KEY_id, tracker.id);
-        tr_variantDictAddQuark(d, TR_KEY_scrape, tracker.scrape_str.quark());
-        tr_variantDictAddStrView(d, TR_KEY_sitename, tracker.announce.sitename);
+        tr_variantDictAddQuark(d, TR_KEY_scrape, tracker.scrape.quark());
+        tr_variantDictAddStrView(d, TR_KEY_sitename, tracker.sitename);
         tr_variantDictAddInt(d, TR_KEY_tier, tracker.tier);
     }
 }
@@ -941,10 +941,12 @@ static char const* torrentGet(tr_session* session, tr_variant* args_in, tr_varia
 ****
 ***/
 
-static std::pair<tr_labels_t, char const* /*errmsg*/> makeLabels(tr_variant* list)
+static std::pair<std::vector<tr_quark>, char const* /*errmsg*/> makeLabels(tr_variant* list)
 {
-    auto labels = tr_labels_t{};
+    auto labels = std::vector<tr_quark>{};
     size_t const n = tr_variantListSize(list);
+    labels.reserve(n);
+
     for (size_t i = 0; i < n; ++i)
     {
         auto label = std::string_view{};
@@ -964,7 +966,7 @@ static std::pair<tr_labels_t, char const* /*errmsg*/> makeLabels(tr_variant* lis
             return { {}, "labels cannot contain comma (,) character" };
         }
 
-        labels.emplace(label);
+        labels.emplace_back(tr_quark_new(label));
     }
 
     return { labels, nullptr };
@@ -979,7 +981,7 @@ static char const* setLabels(tr_torrent* tor, tr_variant* list)
         return errmsg;
     }
 
-    tr_torrentSetLabels(tor, std::move(labels));
+    tor->setLabels(std::data(labels), std::size(labels));
     return nullptr;
 }
 
@@ -1666,7 +1668,7 @@ static char const* torrentAdd(tr_session* session, tr_variant* args_in, tr_varia
             return errmsg;
         }
 
-        tr_ctorSetLabels(ctor, std::move(labels));
+        tr_ctorSetLabels(ctor, std::data(labels), std::size(labels));
     }
 
     tr_logAddTrace(fmt::format("torrentAdd: filename is '{}'", filename));
