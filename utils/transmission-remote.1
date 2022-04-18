@@ -28,6 +28,8 @@ and
 .Op Fl F Ar filter
 .Op Fl g Ar files
 .Op Fl G Ar files
+.Op Fl gisl Ar number
+.Op Fl GISL Ar number
 .Op Fl gsr Ar ratio
 .Op Fl GSR
 .Op Fl h
@@ -36,6 +38,9 @@ and
 .Op Fl ids
 .Op Fl if
 .Op Fl ip
+.Op Fl isl Ar number
+.Op Fl ISL Ar number
+.Op Fl isld
 .Op Fl it
 .Op Fl j
 .Op Fl l
@@ -176,6 +181,17 @@ All torrents, unless overridden by a per-torrent setting, should seed until a sp
 .Ar ratio
 .It Fl GSR Fl -no-global-seedratio
 All torrents, unless overridden by a per-torrent setting, should seed regardless of ratio
+.It Fl isl Fl -idle-seeding-limit Ar minutes
+Let the selected torrent(s) seed until a specific amount of idle time
+.It Fl isld Fl -default-idle-seeding-limit
+Use the default idle-seeding-limit for the selected torrent
+.It Fl ISL Fl -no-idle-seeding-limit
+Let the selected torrent(s) seed regardless of idle time
+.It Fl gisl Fl -global-idle-seeding-limit Ar minutes
+All torrents, unless overridden by a per-torrent, should stop seeding after spending the specified time idling
+.It Fl GISL Fl -no-global-idle-seeding-limit
+All torrents, unless overridden by a per-torrent, should seed regardless of the time spent idle
+Let the selected torrent(s) seed regardless of idle time
 .It Fl h Fl -help
 Print command-line option descriptions.
 .It Fl i Fl -info
