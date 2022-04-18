@@ -270,6 +270,7 @@ include_directories(
     ${DHT_INCLUDE_DIRS}
     ${UTP_INCLUDE_DIRS}
     ${B64_INCLUDE_DIRS}
+    ${THIRD_PARTY_DIR}/libpopcnt
 )
 
 if(ICONV_FOUND)
