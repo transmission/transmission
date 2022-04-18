@@ -104,7 +104,7 @@ static void saveLabels(tr_variant* dict, tr_torrent const* tor)
     tr_variant* list = tr_variantDictAddList(dict, TR_KEY_labels, std::size(labels));
     for (auto const& label : labels)
     {
-        tr_variantListAddStr(list, label);
+        tr_variantListAddQuark(list, label);
     }
 }
 
@@ -116,16 +116,19 @@ static auto loadLabels(tr_variant* dict, tr_torrent* tor)
         return tr_resume::fields_t{};
     }
 
-    int const n = tr_variantListSize(list);
-    for (int i = 0; i < n; ++i)
+    auto const n = tr_variantListSize(list);
+    auto labels = std::vector<tr_quark>{};
+    labels.reserve(n);
+    for (size_t i = 0; i < n; ++i)
     {
         auto sv = std::string_view{};
         if (tr_variantGetStrView(tr_variantListChild(list, i), &sv) && !std::empty(sv))
         {
-            tor->labels.emplace(sv);
+            labels.emplace_back(tr_quark_new(sv));
         }
     }
 
+    tor->setLabels(std::data(labels), std::size(labels));
     return tr_resume::Labels;
 }
 

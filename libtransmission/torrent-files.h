@@ -147,5 +147,5 @@ private:
     };
 
     std::vector<file_t> files_;
-    uint64_t total_size_;
+    uint64_t total_size_ = 0;
 };
