@@ -335,8 +335,7 @@ std::optional<tr_url_parsed_t> tr_urlParse(std::string_view url)
         auto remain = parsed.authority;
         parsed.host = tr_strvSep(&remain, ':');
         parsed.sitename = getSiteName(parsed.host);
-        parsed.portstr = !std::empty(remain) ? remain : getPortForScheme(parsed.scheme);
-        parsed.port = parsePort(parsed.portstr);
+        parsed.port = parsePort(!std::empty(remain) ? remain : getPortForScheme(parsed.scheme));
     }
 
     //  The path is terminated by the first question mark ("?") or

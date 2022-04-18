@@ -164,7 +164,7 @@ public:
     {
         return metainfo_.blockSize(block);
     }
-    [[nodiscard]] constexpr auto blockSpanForPiece(tr_piece_index_t piece) const
+    [[nodiscard]] auto blockSpanForPiece(tr_piece_index_t piece) const
     {
         return metainfo_.blockSpanForPiece(piece);
     }
@@ -368,33 +368,9 @@ public:
         metainfo_.setFileSubpath(i, subpath);
     }
 
-    struct tr_found_file_t : public tr_sys_path_info
-    {
-        // /home/foo/Downloads/torrent/01-file-one.txt
-        tr_pathbuf filename;
-        size_t base_len;
+    [[nodiscard]] std::optional<tr_torrent_files::FoundFile> findFile(tr_file_index_t file_index) const;
 
-        tr_found_file_t(tr_sys_path_info info, tr_pathbuf&& filename_in, size_t base_len_in)
-            : tr_sys_path_info{ info }
-            , filename{ std::move(filename_in) }
-            , base_len{ base_len_in }
-        {
-        }
-
-        [[nodiscard]] constexpr auto base() const
-        {
-            // /home/foo/Downloads
-            return filename.sv().substr(0, base_len);
-        }
-
-        [[nodiscard]] constexpr auto subpath() const
-        {
-            // torrent/01-file-one.txt
-            return filename.sv().substr(base_len + 1);
-        }
-    };
-
-    std::optional<tr_found_file_t> findFile(tr_file_index_t i) const;
+    [[nodiscard]] bool hasAnyLocalData() const;
 
     /// METAINFO - TRACKERS
 
@@ -583,6 +559,16 @@ public:
         this->error_string = errmsg;
     }
 
+    void setDownloadDir(std::string_view path)
+    {
+        download_dir = path;
+        markEdited();
+        setDirty();
+        refreshCurrentDir();
+    }
+
+    void refreshCurrentDir();
+
     void setVerifyState(tr_verify_state state);
 
     void setDateActive(time_t t);
@@ -590,8 +576,6 @@ public:
     /** Return the mime-type (e.g. "audio/x-flac") that matches more of the
         torrent's content than any other mime-type. */
     [[nodiscard]] std::string_view primaryMimeType() const;
-
-    static constexpr std::string_view PartialFileSuffix = std::string_view{ ".part" };
 
     tr_torrent_metainfo metainfo_;
 
@@ -605,9 +589,6 @@ public:
     Bandwidth bandwidth_;
 
     tr_swarm* swarm = nullptr;
-
-    // TODO: is this actually still needed?
-    int const magicNumber = MagicNumber;
 
     std::optional<double> verify_progress;
 
@@ -732,8 +713,6 @@ public:
     /* Set the bandwidth group the torrent belongs to */
     void setGroup(std::string_view groupName);
 
-    static auto constexpr MagicNumber = int{ 95549 };
-
     tr_file_piece_map fpm_ = tr_file_piece_map{ metainfo_ };
     tr_file_priorities file_priorities_{ &fpm_ };
     tr_files_wanted files_wanted_{ &fpm_ };
@@ -768,7 +747,7 @@ private:
 
 constexpr bool tr_isTorrent(tr_torrent const* tor)
 {
-    return tor != nullptr && tor->magicNumber == tr_torrent::MagicNumber && tr_isSession(tor->session);
+    return tor != nullptr && tr_isSession(tor->session);
 }
 
 /**

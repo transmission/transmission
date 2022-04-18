@@ -89,19 +89,6 @@ constexpr auto tr_saveFile(std::string_view filename, ContiguousRange const& x, 
     return tr_saveFile(filename, std::string_view{ std::data(x), std::size(x) }, error);
 }
 
-template<typename... T, typename std::enable_if_t<(std::is_convertible_v<T, std::string_view> && ...), bool> = true>
-std::string& tr_buildBuf(std::string& setme, T... args)
-{
-    setme.clear();
-    auto const n = (std::size(std::string_view{ args }) + ...);
-    if (setme.capacity() < n)
-    {
-        setme.reserve(n);
-    }
-    ((setme += args), ...);
-    return setme;
-}
-
 /**
  * @brief Get disk capacity and free disk space (in bytes) for the specified folder.
  * @return struct with free and total as zero or positive integer on success, -1 in case of error.
@@ -306,7 +293,7 @@ template<typename... T, typename std::enable_if_t<(std::is_convertible_v<T, std:
 }
 
 template<typename T>
-[[nodiscard]] constexpr bool tr_strvContains(std::string_view sv, T key) // c++23
+[[nodiscard]] constexpr bool tr_strvContains(std::string_view sv, T key) noexcept // c++23
 {
     return sv.find(key) != sv.npos;
 }

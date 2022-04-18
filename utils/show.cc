@@ -211,7 +211,7 @@ void showInfo(app_opts const& opts, tr_torrent_metainfo const& metainfo)
             printf("  Source: %s\n", metainfo.source().c_str());
         }
 
-        printf("  Piece Count: %" PRIu64 "\n", metainfo.pieceCount());
+        printf("  Piece Count: %" PRIu32 "\n", metainfo.pieceCount());
         printf("  Piece Size: %s\n", tr_formatter_mem_B(metainfo.pieceSize()).c_str());
         printf("  Total Size: %s\n", tr_formatter_size_B(metainfo.totalSize()).c_str());
         printf("  Privacy: %s\n", metainfo.isPrivate() ? "Private torrent" : "Public torrent");
@@ -235,7 +235,7 @@ void showInfo(app_opts const& opts, tr_torrent_metainfo const& metainfo)
                 ++print_tier;
             }
 
-            printf("  %" TR_PRIsv "\n", TR_PRIsv_ARG(tracker.announce.full));
+            printf("  %" TR_PRIsv "\n", TR_PRIsv_ARG(tracker.announce.sv()));
         }
 
         /**
@@ -331,7 +331,7 @@ void doScrape(tr_torrent_metainfo const& metainfo)
 
     for (auto const& tracker : metainfo.announceList())
     {
-        if (std::empty(tracker.scrape_str))
+        if (std::empty(tracker.scrape))
         {
             continue;
         }
@@ -339,7 +339,7 @@ void doScrape(tr_torrent_metainfo const& metainfo)
         // build the full scrape URL
         auto escaped = std::array<char, TR_SHA1_DIGEST_LEN * 3 + 1>{};
         tr_http_escape_sha1(std::data(escaped), metainfo.infoHash());
-        auto const scrape = tracker.scrape.full;
+        auto const scrape = tracker.scrape.sv();
         auto const url = tr_urlbuf{ scrape,
                                     tr_strvContains(scrape, '?') ? '&' : '?',
                                     "info_hash="sv,
