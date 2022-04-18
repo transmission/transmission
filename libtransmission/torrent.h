@@ -590,9 +590,6 @@ public:
 
     tr_swarm* swarm = nullptr;
 
-    // TODO: is this actually still needed?
-    int const magicNumber = MagicNumber;
-
     std::optional<double> verify_progress;
 
     tr_stat_errtype error = TR_STAT_OK;
@@ -716,8 +713,6 @@ public:
     /* Set the bandwidth group the torrent belongs to */
     void setGroup(std::string_view groupName);
 
-    static auto constexpr MagicNumber = int{ 95549 };
-
     tr_file_piece_map fpm_ = tr_file_piece_map{ metainfo_ };
     tr_file_priorities file_priorities_{ &fpm_ };
     tr_files_wanted files_wanted_{ &fpm_ };
@@ -752,7 +747,7 @@ private:
 
 constexpr bool tr_isTorrent(tr_torrent const* tor)
 {
-    return tor != nullptr && tor->magicNumber == tr_torrent::MagicNumber && tr_isSession(tor->session);
+    return tor != nullptr && tr_isSession(tor->session);
 }
 
 /**

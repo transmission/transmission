@@ -207,7 +207,7 @@ static void tr_buildMetainfoExceptInfoDict(tr_torrent_metainfo const& tm, tr_var
         auto const n = std::size(announce_list);
         if (n == 1)
         {
-            tr_variantDictAddStr(top, TR_KEY_announce, announce_list.at(0).announce_str.sv());
+            tr_variantDictAddStr(top, TR_KEY_announce, announce_list.at(0).announce.sv());
         }
         else
         {
@@ -221,7 +221,7 @@ static void tr_buildMetainfoExceptInfoDict(tr_torrent_metainfo const& tm, tr_var
                     tier_variant = tr_variantListAddList(announce_list_variant, n);
                 }
 
-                tr_variantListAddStr(tier_variant, tracker.announce_str.sv());
+                tr_variantListAddStr(tier_variant, tracker.announce.sv());
             }
         }
     }

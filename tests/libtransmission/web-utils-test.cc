@@ -33,7 +33,6 @@ TEST_F(WebUtilsTest, urlParse)
     EXPECT_EQ("1"sv, parsed->host);
     EXPECT_EQ("1"sv, parsed->sitename);
     EXPECT_EQ(""sv, parsed->path);
-    EXPECT_EQ("80"sv, parsed->portstr);
     EXPECT_EQ(""sv, parsed->query);
     EXPECT_EQ(""sv, parsed->fragment);
     EXPECT_EQ(80, parsed->port);
@@ -47,7 +46,6 @@ TEST_F(WebUtilsTest, urlParse)
     EXPECT_EQ("/some/path"sv, parsed->path);
     EXPECT_EQ(""sv, parsed->query);
     EXPECT_EQ(""sv, parsed->fragment);
-    EXPECT_EQ("80"sv, parsed->portstr);
     EXPECT_EQ(80, parsed->port);
 
     url = "http://www.some-tracker.org:8080/some/path"sv;
@@ -59,7 +57,6 @@ TEST_F(WebUtilsTest, urlParse)
     EXPECT_EQ("/some/path"sv, parsed->path);
     EXPECT_EQ(""sv, parsed->query);
     EXPECT_EQ(""sv, parsed->fragment);
-    EXPECT_EQ("8080"sv, parsed->portstr);
     EXPECT_EQ(8080, parsed->port);
 
     url = "http://www.some-tracker.org:8080/some/path?key=val&foo=bar#fragment"sv;
@@ -71,7 +68,6 @@ TEST_F(WebUtilsTest, urlParse)
     EXPECT_EQ("/some/path"sv, parsed->path);
     EXPECT_EQ("key=val&foo=bar"sv, parsed->query);
     EXPECT_EQ("fragment"sv, parsed->fragment);
-    EXPECT_EQ("8080"sv, parsed->portstr);
     EXPECT_EQ(8080, parsed->port);
 
     url =
@@ -94,7 +90,6 @@ TEST_F(WebUtilsTest, urlParse)
         "&tr=udp%3A%2F%2Ftracker.publicbt.com%3A80"
         "&ws=http%3A%2F%2Ftransmissionbt.com"sv,
         parsed->query);
-    EXPECT_EQ(""sv, parsed->portstr);
 
     // test a host whose public suffix contains >1 dot
     url = "https://www.example.co.uk:8080/some/path"sv;
@@ -104,7 +99,6 @@ TEST_F(WebUtilsTest, urlParse)
     EXPECT_EQ("example"sv, parsed->sitename);
     EXPECT_EQ("www.example.co.uk"sv, parsed->host);
     EXPECT_EQ("/some/path"sv, parsed->path);
-    EXPECT_EQ("8080"sv, parsed->portstr);
     EXPECT_EQ(8080, parsed->port);
 
     // test a host that lacks a subdomain
@@ -115,7 +109,6 @@ TEST_F(WebUtilsTest, urlParse)
     EXPECT_EQ("some-tracker"sv, parsed->sitename);
     EXPECT_EQ("some-tracker.co.uk"sv, parsed->host);
     EXPECT_EQ("/some/other/path"sv, parsed->path);
-    EXPECT_EQ("80"sv, parsed->portstr);
     EXPECT_EQ(80, parsed->port);
 
     // test a host with an IP address
@@ -126,7 +119,6 @@ TEST_F(WebUtilsTest, urlParse)
     EXPECT_EQ("127.0.0.1"sv, parsed->sitename);
     EXPECT_EQ("127.0.0.1"sv, parsed->host);
     EXPECT_EQ("/some/path"sv, parsed->path);
-    EXPECT_EQ("8080"sv, parsed->portstr);
     EXPECT_EQ(8080, parsed->port);
 }
 
