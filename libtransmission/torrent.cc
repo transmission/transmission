@@ -730,18 +730,23 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
     tor->addedDate = now; // this is a default that will be overwritten by the resume file
     tor->anyDate = now;
 
-    // tr_resume::load() calls a lot of tr_torrentSetFoo() methods
-    // that set things as dirty, but... these settings being loaded are
-    // the same ones that would be saved back again, so don't let them
-    // affect the 'is dirty' flag.
-    auto const was_dirty = tor->isDirty;
-    bool resume_file_was_migrated = false;
-    auto const loaded = tr_resume::load(tor, tr_resume::All, ctor, &resume_file_was_migrated);
-    tor->isDirty = was_dirty;
-
-    if (resume_file_was_migrated)
+    tr_resume::fields_t loaded = {};
+    if (tor->hasMetainfo())
     {
-        tr_torrent_metainfo::migrateFile(session->torrent_dir, tor->name(), tor->infoHashString(), ".torrent"sv);
+        // tr_resume::load() calls a lot of tr_torrentSetFoo() methods
+        // that set things as dirty, but... these settings being loaded are
+        // the same ones that would be saved back again, so don't let them
+        // affect the 'is dirty' flag.
+        auto const was_dirty = tor->isDirty;
+
+        bool resume_file_was_migrated = false;
+        loaded = tr_resume::load(tor, tr_resume::All, ctor, &resume_file_was_migrated);
+        tor->isDirty = was_dirty;
+
+        if (resume_file_was_migrated)
+        {
+            tr_torrent_metainfo::migrateFile(session->torrent_dir, tor->name(), tor->infoHashString(), ".torrent"sv);
+        }
     }
 
     tor->completeness = tor->completion.status();
