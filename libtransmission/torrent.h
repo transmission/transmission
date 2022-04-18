@@ -14,7 +14,6 @@
 #include <optional>
 #include <string>
 #include <string_view>
-#include <unordered_set>
 #include <vector>
 
 #include "transmission.h"
@@ -41,8 +40,6 @@ struct tr_session;
 struct tr_torrent;
 struct tr_torrent_announcer;
 
-using tr_labels_t = std::unordered_set<std::string>;
-
 /**
 ***  Package-visible ctor API
 **/
@@ -59,13 +56,9 @@ tr_session* tr_ctorGetSession(tr_ctor const* ctor);
 
 bool tr_ctorGetIncompleteDir(tr_ctor const* ctor, char const** setmeIncompleteDir);
 
-tr_labels_t tr_ctorGetLabels(tr_ctor const* ctor);
-
 /**
 ***
 **/
-
-void tr_torrentSetLabels(tr_torrent* tor, tr_labels_t&& labels);
 
 void tr_torrentChangeMyPort(tr_torrent* session);
 
@@ -573,6 +566,8 @@ public:
 
     void setDateActive(time_t t);
 
+    void setLabels(tr_quark const* labels, size_t n_labels);
+
     /** Return the mime-type (e.g. "audio/x-flac") that matches more of the
         torrent's content than any other mime-type. */
     [[nodiscard]] std::string_view primaryMimeType() const;
@@ -707,7 +702,8 @@ public:
     tr_idlelimit idleLimitMode = TR_IDLELIMIT_GLOBAL;
     bool finishedSeedingByIdle = false;
 
-    tr_labels_t labels;
+    using labels_t = std::vector<tr_quark>;
+    labels_t labels;
 
     std::string group;
     /* Set the bandwidth group the torrent belongs to */
@@ -761,7 +757,8 @@ tr_torrent_metainfo tr_ctorStealMetainfo(tr_ctor* ctor);
 
 bool tr_ctorSetMetainfoFromFile(tr_ctor* ctor, std::string const& filename, tr_error** error);
 bool tr_ctorSetMetainfoFromMagnetLink(tr_ctor* ctor, std::string const& filename, tr_error** error);
-void tr_ctorSetLabels(tr_ctor* ctor, tr_labels_t&& labels);
+void tr_ctorSetLabels(tr_ctor* ctor, tr_quark const* labels, size_t n_labels);
+tr_torrent::labels_t const& tr_ctorGetLabels(tr_ctor const* ctor);
 
 #define tr_logAddCriticalTor(tor, msg) tr_logAddCritical(msg, (tor)->name())
 #define tr_logAddErrorTor(tor, msg) tr_logAddError(msg, (tor)->name())

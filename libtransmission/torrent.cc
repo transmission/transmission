@@ -717,7 +717,8 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
     tor->error = TR_STAT_OK;
     tor->finishedSeedingByIdle = false;
 
-    tor->labels = tr_ctorGetLabels(ctor);
+    auto const& labels = tr_ctorGetLabels(ctor);
+    tor->setLabels(std::data(labels), std::size(labels));
 
     tor->uniqueId = session->torrents().add(tor);
 
@@ -730,18 +731,23 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
     tor->addedDate = now; // this is a default that will be overwritten by the resume file
     tor->anyDate = now;
 
-    // tr_resume::load() calls a lot of tr_torrentSetFoo() methods
-    // that set things as dirty, but... these settings being loaded are
-    // the same ones that would be saved back again, so don't let them
-    // affect the 'is dirty' flag.
-    auto const was_dirty = tor->isDirty;
-    bool resume_file_was_migrated = false;
-    auto const loaded = tr_resume::load(tor, tr_resume::All, ctor, &resume_file_was_migrated);
-    tor->isDirty = was_dirty;
-
-    if (resume_file_was_migrated)
+    tr_resume::fields_t loaded = {};
+    if (tor->hasMetainfo())
     {
-        tr_torrent_metainfo::migrateFile(session->torrent_dir, tor->name(), tor->infoHashString(), ".torrent"sv);
+        // tr_resume::load() calls a lot of tr_torrentSetFoo() methods
+        // that set things as dirty, but... these settings being loaded are
+        // the same ones that would be saved back again, so don't let them
+        // affect the 'is dirty' flag.
+        auto const was_dirty = tor->isDirty;
+
+        bool resume_file_was_migrated = false;
+        loaded = tr_resume::load(tor, tr_resume::All, ctor, &resume_file_was_migrated);
+        tor->isDirty = was_dirty;
+
+        if (resume_file_was_migrated)
+        {
+            tr_torrent_metainfo::migrateFile(session->torrent_dir, tor->name(), tor->infoHashString(), ".torrent"sv);
+        }
     }
 
     tor->completeness = tor->completion.status();
@@ -1449,6 +1455,7 @@ void tr_torrentStart(tr_torrent* tor)
 {
     if (tr_isTorrent(tor))
     {
+        tor->startAfterVerify = true;
         torrentStart(tor, {});
     }
 }
@@ -1921,13 +1928,13 @@ void tr_torrentSetFileDLs(tr_torrent* tor, tr_file_index_t const* files, tr_file
 ****
 ***/
 
-void tr_torrentSetLabels(tr_torrent* tor, tr_labels_t&& labels)
+void tr_torrent::setLabels(tr_quark const* new_labels, size_t n_labels)
 {
-    TR_ASSERT(tr_isTorrent(tor));
-    auto const lock = tor->unique_lock();
-
-    tor->labels = std::move(labels);
-    tor->setDirty();
+    auto const lock = unique_lock();
+    auto const sorted_unique = std::set<tr_quark>{ new_labels, new_labels + n_labels };
+    this->labels = { std::begin(sorted_unique), std::end(sorted_unique) };
+    this->labels.shrink_to_fit();
+    this->setDirty();
 }
 
 /***
