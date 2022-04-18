@@ -874,17 +874,12 @@ static char const* torrentGet(tr_session* session, tr_variant* args_in, tr_varia
 
     if (tr_variantDictFindStrView(args_in, TR_KEY_ids, &sv) && sv == "recently-active"sv)
     {
-        time_t const now = tr_time();
-        auto const interval = RecentlyActiveSeconds;
-
-        auto const& removed = session->removed_torrents;
-        tr_variant* removed_out = tr_variantDictAddList(args_out, TR_KEY_removed, std::size(removed));
-        for (auto const& [id, time_removed] : removed)
+        auto const cutoff = tr_time() - RecentlyActiveSeconds;
+        auto const ids = session->torrents().removedSince(cutoff);
+        auto* const out = tr_variantDictAddList(args_out, TR_KEY_removed, std::size(ids));
+        for (auto const& id : ids)
         {
-            if (time_removed >= now - interval)
-            {
-                tr_variantListAddInt(removed_out, id);
-            }
+            tr_variantListAddInt(out, id);
         }
     }
 

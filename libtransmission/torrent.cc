@@ -1605,8 +1605,6 @@ static void closeTorrent(tr_torrent* const tor)
     TR_ASSERT(tr_isTorrent(tor));
     TR_ASSERT(tr_amInEventThread(tor->session));
 
-    tor->session->removed_torrents.emplace_back(tor->uniqueId, tr_time());
-
     if (!tor->session->isClosing())
     {
         tr_logAddInfoTor(tor, _("Removing torrent"));

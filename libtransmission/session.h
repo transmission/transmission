@@ -287,9 +287,6 @@ public:
 
     uint8_t peer_id_ttl_hours;
 
-    // torrent id, time removed
-    std::vector<std::pair<int, time_t>> removed_torrents;
-
     bool stalledEnabled;
     bool queueEnabled[2];
     int queueSize[2];
