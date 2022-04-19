@@ -116,5 +116,5 @@ private:
     // may be testing for >0 as a validity check.
     std::vector<tr_torrent*> by_id_{ nullptr };
 
-    std::map<int, time_t> removed_;
+    std::vector<std::pair<int, time_t>> removed_;
 };
