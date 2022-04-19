@@ -14,8 +14,6 @@
 		1BB44E07B1B52E28291B4E32 /* file-piece-map.cc in Sources */ = {isa = PBXBuildFile; fileRef = 1BB44E07B1B52E28291B4E30 /* file-piece-map.cc */; };
 		1BB44E07B1B52E28291B4E33 /* file-piece-map.h in Headers */ = {isa = PBXBuildFile; fileRef = 1BB44E07B1B52E28291B4E31 /* file-piece-map.h */; };
 		2856E0656A49F2665D69E760 /* benc.h in Headers */ = {isa = PBXBuildFile; fileRef = 2856E0656A49F2665D69E761 /* benc.h */; };
-		A47A7C87B8B57BE50DF0D410 /* torrent-files.cc in Sources */ = {isa = PBXBuildFile; fileRef = A47A7C87B8B57BE50DF0D411 /* torrent-files.cc */; };
-		A47A7C87B8B57BE50DF0D412 /* torrent-files.h in Headers */ = {isa = PBXBuildFile; fileRef = A47A7C87B8B57BE50DF0D413 /* torrent-files.h */; };
 		2B9BA6C508B488FE586A0AB0 /* torrents.cc in Sources */ = {isa = PBXBuildFile; fileRef = 2B9BA6C508B488FE586A0AB1 /* torrents.cc */; };
 		2B9BA6C508B488FE586A0AB2 /* torrents.h in Headers */ = {isa = PBXBuildFile; fileRef = 2B9BA6C508B488FE586A0AB3 /* torrents.h */; };
 		35F373030C2DA89000DAA8F2 /* FilePriorityCell.mm in Sources */ = {isa = PBXBuildFile; fileRef = 35F373010C2DA88F00DAA8F2 /* FilePriorityCell.mm */; };
@@ -53,6 +51,7 @@
 		4DE5CCCB0981D9BE00BE280E /* Defaults.plist in Resources */ = {isa = PBXBuildFile; fileRef = 4DE5CCCA0981D9BE00BE280E /* Defaults.plist */; };
 		4DF0C5AB0899190500DD8943 /* Controller.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4DF0C5A90899190500DD8943 /* Controller.mm */; };
 		4DFBC2DF09C0970D00D5C571 /* Torrent.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4DFBC2DE09C0970D00D5C571 /* Torrent.mm */; };
+		4E0411DB280EF0D200E0A9C7 /* libpopcnt.h in Headers */ = {isa = PBXBuildFile; fileRef = 4E0411A5280EEE6800E0A9C7 /* libpopcnt.h */; };
 		55869926257074EC00F77A43 /* libcurl.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 55869925257074EC00F77A43 /* libcurl.tbd */; };
 		55869932257074FE00F77A43 /* libcurl.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 55869925257074EC00F77A43 /* libcurl.tbd */; };
 		558699542570759E00F77A43 /* libcurl.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 55869925257074EC00F77A43 /* libcurl.tbd */; };
@@ -272,6 +271,8 @@
 		A2F8CD430F3D0F4A00DB356A /* miniupnpcstrings.h in Headers */ = {isa = PBXBuildFile; fileRef = A2F8CD420F3D0F4A00DB356A /* miniupnpcstrings.h */; };
 		A2FB057F0BFEB6800095564D /* DragOverlayView.mm in Sources */ = {isa = PBXBuildFile; fileRef = A2FB057D0BFEB6800095564D /* DragOverlayView.mm */; };
 		A2FB701C0D95CAEA0001F331 /* GroupsController.mm in Sources */ = {isa = PBXBuildFile; fileRef = A2FB701B0D95CAEA0001F331 /* GroupsController.mm */; };
+		A47A7C87B8B57BE50DF0D410 /* torrent-files.cc in Sources */ = {isa = PBXBuildFile; fileRef = A47A7C87B8B57BE50DF0D411 /* torrent-files.cc */; };
+		A47A7C87B8B57BE50DF0D412 /* torrent-files.h in Headers */ = {isa = PBXBuildFile; fileRef = A47A7C87B8B57BE50DF0D413 /* torrent-files.h */; };
 		ACBE7A956ED89682EC4460E0 /* file-info.cc in Sources */ = {isa = PBXBuildFile; fileRef = ACBE7A956ED89682EC4460E1 /* file-info.cc */; };
 		ACBE7A956ED89682EC4460E2 /* file-info.h in Headers */ = {isa = PBXBuildFile; fileRef = ACBE7A956ED89682EC4460E3 /* file-info.h */; settings = {ATTRIBUTES = (Project, ); }; };
 		BE1183580CE160C50002D0F3 /* miniupnpc_declspec.h in Headers */ = {isa = PBXBuildFile; fileRef = BE11834E0CE160C50002D0F3 /* miniupnpc_declspec.h */; };
@@ -571,8 +572,6 @@
 		29B97325FDCFA39411CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		2B9BA6C508B488FE586A0AB1 /* torrents.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = torrents.cc; sourceTree = "<group>"; };
 		2B9BA6C508B488FE586A0AB3 /* torrents.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = torrents.h; sourceTree = "<group>"; };
-		A47A7C87B8B57BE50DF0D411 /* torrent-files.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = torrent-files.cc; sourceTree = "<group>"; };
-		A47A7C87B8B57BE50DF0D413 /* torrent-files.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = torrent-files.h; sourceTree = "<group>"; };
 		32CA4F630368D1EE00C91783 /* Transmission_Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Transmission_Prefix.pch; sourceTree = "<group>"; };
 		35F373000C2DA88F00DAA8F2 /* FilePriorityCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FilePriorityCell.h; sourceTree = "<group>"; };
 		35F373010C2DA88F00DAA8F2 /* FilePriorityCell.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = FilePriorityCell.mm; sourceTree = "<group>"; };
@@ -617,6 +616,8 @@
 		4DF0C5AA0899190500DD8943 /* Controller.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Controller.h; sourceTree = "<group>"; };
 		4DFBC2DD09C0970D00D5C571 /* Torrent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Torrent.h; sourceTree = "<group>"; };
 		4DFBC2DE09C0970D00D5C571 /* Torrent.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = Torrent.mm; sourceTree = "<group>"; };
+		4E0411A5280EEE6800E0A9C7 /* libpopcnt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = libpopcnt.h; sourceTree = "<group>"; };
+		4E0411D6280EF0BB00E0A9C7 /* liblibpopcnt.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = liblibpopcnt.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		55869925257074EC00F77A43 /* libcurl.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libcurl.tbd; path = usr/lib/libcurl.tbd; sourceTree = SDKROOT; };
 		66F977825E65AD498C028BB1 /* announce-list.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "announce-list.cc"; sourceTree = "<group>"; };
 		66F977825E65AD498C028BB3 /* announce-list.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "announce-list.h"; sourceTree = "<group>"; };
@@ -1006,6 +1007,8 @@
 		A2FB07F115F8208300933543 /* nl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = nl; path = nl.lproj/Localizable.strings; sourceTree = "<group>"; };
 		A2FB701A0D95CAEA0001F331 /* GroupsController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GroupsController.h; sourceTree = "<group>"; };
 		A2FB701B0D95CAEA0001F331 /* GroupsController.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = GroupsController.mm; sourceTree = "<group>"; };
+		A47A7C87B8B57BE50DF0D411 /* torrent-files.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "torrent-files.cc"; sourceTree = "<group>"; };
+		A47A7C87B8B57BE50DF0D413 /* torrent-files.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "torrent-files.h"; sourceTree = "<group>"; };
 		A54D44C6A7AAF131D9AE29F5 /* block-info.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "block-info.cc"; sourceTree = "<group>"; };
 		ACBE7A956ED89682EC4460E1 /* file-info.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "file-info.cc"; sourceTree = "<group>"; };
 		ACBE7A956ED89682EC4460E3 /* file-info.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "file-info.h"; sourceTree = "<group>"; };
@@ -1174,6 +1177,13 @@
 				558699542570759E00F77A43 /* libcurl.tbd in Frameworks */,
 				C88771B22803EE87005C7523 /* libiconv.tbd in Frameworks */,
 				A2B3FB4C0E59023000FF78FB /* Cocoa.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4E0411D4280EF0BB00E0A9C7 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1417,6 +1427,7 @@
 				C1A7516426ED03140038B90A /* libarc4.a */,
 				C3CEBBA927949CA000683BE0 /* libdeflate.a */,
 				C3D9062127B7E3C900EF2386 /* libpsl.a */,
+				4E0411D6280EF0BB00E0A9C7 /* liblibpopcnt.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1432,6 +1443,7 @@
 				BEFC1C0B0C07754700B0BB3C /* daemon */,
 				C15E58AC219A37C600AB292F /* utils */,
 				C1A7518626ED04EC0038B90A /* arc4 */,
+				4E0411A4280EEE6800E0A9C7 /* libpopcnt */,
 				A22CFCB50FC24F630009BD3E /* dht */,
 				C3CEBB9E27949A3900683BE0 /* libdeflate */,
 				A2E384BF130DFA49001F501B /* libutp */,
@@ -1695,6 +1707,15 @@
 			);
 			name = CLI;
 			path = cli;
+			sourceTree = "<group>";
+		};
+		4E0411A4280EEE6800E0A9C7 /* libpopcnt */ = {
+			isa = PBXGroup;
+			children = (
+				4E0411A5280EEE6800E0A9C7 /* libpopcnt.h */,
+			);
+			name = libpopcnt;
+			path = "third-party/libpopcnt";
 			sourceTree = "<group>";
 		};
 		A22CFCB50FC24F630009BD3E /* dht */ = {
@@ -2149,6 +2170,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		4E0411D2280EF0BB00E0A9C7 /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				4E0411DB280EF0D200E0A9C7 /* libpopcnt.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		A22CFCB60FC24F710009BD3E /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
@@ -2325,6 +2354,23 @@
 			productName = transmissioncli;
 			productReference = 4DDBB71909E16BAE00284745 /* transmissioncli */;
 			productType = "com.apple.product-type.tool";
+		};
+		4E0411D5280EF0BB00E0A9C7 /* libpopcnt */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 4E0411D7280EF0BB00E0A9C7 /* Build configuration list for PBXNativeTarget "libpopcnt" */;
+			buildPhases = (
+				4E0411D2280EF0BB00E0A9C7 /* Headers */,
+				4E0411D3280EF0BB00E0A9C7 /* Sources */,
+				4E0411D4280EF0BB00E0A9C7 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = libpopcnt;
+			productName = libpopcnt;
+			productReference = 4E0411D6280EF0BB00E0A9C7 /* liblibpopcnt.a */;
+			productType = "com.apple.product-type.library.static";
 		};
 		8D1107260486CEB800E47090 /* Transmission */ = {
 			isa = PBXNativeTarget;
@@ -2551,6 +2597,10 @@
 				LastUpgradeCheck = 0920;
 				ORGANIZATIONNAME = "The Transmission Project";
 				TargetAttributes = {
+					4E0411D5280EF0BB00E0A9C7 = {
+						CreatedOnToolsVersion = 13.3.1;
+						ProvisioningStyle = Automatic;
+					};
 					8D1107260486CEB800E47090 = {
 						SystemCapabilities = {
 							com.apple.HardenedRuntime = {
@@ -2602,6 +2652,7 @@
 				C1A7516326ED03140038B90A /* arc4 */,
 				C3CEBB9F27949CA000683BE0 /* deflate */,
 				C3D9062027B7E3C900EF2386 /* psl */,
+				4E0411D5280EF0BB00E0A9C7 /* libpopcnt */,
 			);
 		};
 /* End PBXProject section */
@@ -2786,7 +2837,7 @@
 				BEFC1E2F0C07861A00B0BB3C /* session.cc in Sources */,
 				BEFC1E320C07861A00B0BB3C /* torrent.cc in Sources */,
 				2B9BA6C508B488FE586A0AB0 /* torrents.cc in Sources */,
-				A47A7C87B8B57BE50DF0D410 /* torrent-files.cc */,
+				A47A7C87B8B57BE50DF0D410 /* torrent-files.cc in Sources */,
 				BEFC1E360C07861A00B0BB3C /* port-forwarding.cc in Sources */,
 				BEFC1E3C0C07861A00B0BB3C /* platform.cc in Sources */,
 				BEFC1E460C07861A00B0BB3C /* net.cc in Sources */,
@@ -2859,6 +2910,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				A2B3FB460E5901E700FF78FB /* cli.cc in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4E0411D3280EF0BB00E0A9C7 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3745,6 +3803,97 @@
 			};
 			name = Release;
 		};
+		4E0411D8280EF0BB00E0A9C7 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_STYLE = Automatic;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				EXECUTABLE_PREFIX = lib;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				MACOSX_DEPLOYMENT_TARGET = 12.3;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = Debug;
+		};
+		4E0411D9280EF0BB00E0A9C7 /* Release - Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				ENABLE_NS_ASSERTIONS = NO;
+				EXECUTABLE_PREFIX = lib;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				MACOSX_DEPLOYMENT_TARGET = 12.3;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = "Release - Debug";
+		};
+		4E0411DA280EF0BB00E0A9C7 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_STYLE = Automatic;
+				COPY_PHASE_STRIP = NO;
+				ENABLE_NS_ASSERTIONS = NO;
+				EXECUTABLE_PREFIX = lib;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				MACOSX_DEPLOYMENT_TARGET = 12.3;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = Release;
+		};
 		A22CFCBB0FC24F720009BD3E /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -4286,6 +4435,16 @@
 				0053D3DA0C86774200545606 /* Debug */,
 				A250CFEB0CDA19680068B4B6 /* Release - Debug */,
 				4DF0C59D089918A300DD8943 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		4E0411D7280EF0BB00E0A9C7 /* Build configuration list for PBXNativeTarget "libpopcnt" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				4E0411D8280EF0BB00E0A9C7 /* Debug */,
+				4E0411D9280EF0BB00E0A9C7 /* Release - Debug */,
+				4E0411DA280EF0BB00E0A9C7 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
