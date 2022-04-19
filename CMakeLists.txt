@@ -41,6 +41,7 @@ tr_auto_option(RUN_CLANG_TIDY       "Run clang-tidy on the code" AUTO)
 tr_auto_option(USE_SYSTEM_EVENT2    "Use system event2 library" AUTO)
 tr_auto_option(USE_SYSTEM_DEFLATE   "Use system deflate library" AUTO)
 tr_auto_option(USE_SYSTEM_DHT       "Use system dht library" AUTO)
+tr_auto_option(USE_SYSTEM_LIBPOPCNT       "Use system libpopcnt library" AUTO)
 tr_auto_option(USE_SYSTEM_MINIUPNPC "Use system miniupnpc library" AUTO)
 tr_auto_option(USE_SYSTEM_NATPMP    "Use system natpmp library" AUTO)
 tr_auto_option(USE_SYSTEM_UTP       "Use system utp library" AUTO)
@@ -365,6 +366,8 @@ endif()
 tr_add_external_auto_library(DHT dht dht)
 
 tr_add_external_auto_library(PSL libpsl psl)
+
+add_subdirectory(third-party/libpopcnt)
 
 if(ENABLE_UTP)
     tr_add_external_auto_library(UTP libutp utp)
