@@ -54,24 +54,14 @@ void setAllTrue(uint8_t* array, size_t bit_count)
     }
 }
 
-/* Switch to std::popcount if project upgrades to c++20 or newer */
-[[nodiscard]] uint32_t doPopcount(uint8_t flags) noexcept
+[[nodiscard]] auto rawCountFlags(uint8_t const* flags, size_t n)
 {
-    /* If flags are ever expanded to use machine words instead of
-       uint8_t popcnt64 is also available */
-    return popcnt32(flags);
+    return static_cast<size_t>(popcnt(flags, n));
 }
 
-[[nodiscard]] size_t rawCountFlags(uint8_t const* flags, size_t n) noexcept
+[[nodiscard]] auto tr_popcnt8(uint8_t flags)
 {
-    auto ret = size_t{};
-
-    for (auto const* const end = flags + n; flags != end; ++flags)
-    {
-        ret += doPopcount(*flags);
-    }
-
-    return ret;
+    return rawCountFlags(&flags, 1);
 }
 
 } // namespace
@@ -112,7 +102,7 @@ size_t tr_bitfield::countFlags(size_t begin, size_t end) const noexcept
         val <<= i;
         i = (begin - end) & 7U;
         val >>= i;
-        ret = doPopcount(val);
+        ret = tr_popcnt8(val);
     }
     else
     {
@@ -122,24 +112,15 @@ size_t tr_bitfield::countFlags(size_t begin, size_t end) const noexcept
         size_t const first_shift = begin & 7U;
         uint8_t val = flags_[first_byte];
         val <<= first_shift;
-        /* No need to shift back val for correct popcount. */
-        ret = doPopcount(val);
+        ret = tr_popcnt8(val);
 
         /* middle bytes */
 
         /* Use 2x accumulators to help alleviate high latency of
            popcnt instruction on many architectures. */
-        size_t tmp_accum = 0;
-        for (size_t i = first_byte + 1; i < walk_end;)
-        {
-            tmp_accum += doPopcount(flags_[i]);
-            if ((i += 2) > walk_end)
-            {
-                break;
-            }
-            ret += doPopcount(flags_[i - 1]);
-        }
-        ret += tmp_accum;
+        auto const middle_begin = first_byte + 1;
+        auto const middle_end = walk_end;
+        ret += rawCountFlags(&flags_[middle_begin], middle_end - middle_begin);
 
         /* last byte */
         if (last_byte < std::size(flags_))
@@ -151,8 +132,7 @@ size_t tr_bitfield::countFlags(size_t begin, size_t end) const noexcept
             uint32_t const last_shift = (~end + 1) & 7U;
             val = flags_[last_byte];
             val >>= last_shift;
-            /* No need to shift back val for correct popcount. */
-            ret += doPopcount(val);
+            ret += tr_popcnt8(val);
         }
     }
 
