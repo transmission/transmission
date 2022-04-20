@@ -32,7 +32,6 @@ using tr_piece_index_t = uint32_t;
 /* Assuming a 16 KiB block (tr_block_info::BlockSize), a 32-bit block index gives us a maximum torrent size of 64 TiB.
  * When we ever need to grow past that, change tr_block_index_t and  tr_piece_index_t to uint64_t. */
 using tr_block_index_t = uint32_t;
-using tr_port = uint16_t;
 using tr_tracker_tier_t = uint32_t;
 using tr_tracker_id_t = uint32_t;
 using tr_byte_index_t = uint64_t;
@@ -329,12 +328,12 @@ bool tr_sessionIsRPCEnabled(tr_session const* session);
 /** @brief Specify which port to listen for RPC requests on.
     @see tr_sessionInit()
     @see tr_sessionGetRPCPort */
-void tr_sessionSetRPCPort(tr_session* session, tr_port port);
+void tr_sessionSetRPCPort(tr_session* session, uint16_t port);
 
 /** @brief Get which port to listen for RPC requests on.
     @see tr_sessionInit()
     @see tr_sessionSetRPCPort */
-tr_port tr_sessionGetRPCPort(tr_session const* session);
+uint16_t tr_sessionGetRPCPort(tr_session const* session);
 
 /**
  * @brief Specify which base URL to use.
@@ -491,11 +490,11 @@ void tr_sessionSetPortForwardingEnabled(tr_session* session, bool enabled);
 
 bool tr_sessionIsPortForwardingEnabled(tr_session const* session);
 
-void tr_sessionSetPeerPort(tr_session* session, tr_port port);
+void tr_sessionSetPeerPort(tr_session* session, uint16_t port);
 
-tr_port tr_sessionGetPeerPort(tr_session const* session);
+uint16_t tr_sessionGetPeerPort(tr_session const* session);
 
-tr_port tr_sessionSetPeerPortRandom(tr_session* session);
+uint16_t tr_sessionSetPeerPortRandom(tr_session* session);
 
 void tr_sessionSetPeerPortRandomOnStart(tr_session* session, bool random);
 
@@ -1262,7 +1261,7 @@ struct tr_peer_stat
     bool isIncoming;
 
     uint8_t from;
-    tr_port port;
+    uint16_t port;
 
     char addr[TR_INET6_ADDRSTRLEN];
     char flagStr[32];

@@ -10,6 +10,7 @@
 #include <cstring> /* memcpy(), memset(), memchr(), strlen() */
 #include <ctime>
 #include <fstream>
+#include <limits>
 #include <sstream>
 #include <string>
 #include <string_view>
@@ -106,7 +107,7 @@ static void bootstrap_from_name(char const* name, tr_port port, int af)
     hints.ai_family = af;
 
     auto port_str = std::array<char, 16>{};
-    *fmt::format_to(std::data(port_str), FMT_STRING("{:d}"), port) = '\0';
+    *fmt::format_to(std::data(port_str), FMT_STRING("{:d}"), port.host()) = '\0';
 
     addrinfo* info = nullptr;
     if (int const rc = getaddrinfo(name, std::data(port_str), &hints, &info); rc != 0)
@@ -114,7 +115,7 @@ static void bootstrap_from_name(char const* name, tr_port port, int af)
         tr_logAddWarn(fmt::format(
             _("Couldn't look up '{addresss}:{port}': {error} ({error_code})"),
             fmt::arg("address", name),
-            fmt::arg("port", port),
+            fmt::arg("port", port.host()),
             fmt::arg("error", gai_strerror(rc)),
             fmt::arg("error_code", rc)));
         return;
@@ -160,16 +161,17 @@ static void dht_boostrap_from_file(tr_session* session)
     {
         auto line_stream = std::istringstream{ line };
         auto addrstr = std::string{};
-        auto port = tr_port{};
-        line_stream >> addrstr >> port;
+        auto hport = uint16_t{};
+        line_stream >> addrstr >> hport;
 
-        if (line_stream.bad() || std::empty(addrstr) || port <= 0)
+        using PortLimits = std::numeric_limits<uint16_t>;
+        if (line_stream.bad() || std::empty(addrstr) || hport < PortLimits::min() || hport > PortLimits::max())
         {
             tr_logAddWarn(fmt::format(_("Couldn't parse line: '{line}'"), fmt::arg("line", line)));
         }
         else
         {
-            bootstrap_from_name(addrstr.c_str(), port, bootstrap_af(session_));
+            bootstrap_from_name(addrstr.c_str(), tr_port::fromHost(hport), bootstrap_af(session_));
         }
     }
 }
@@ -199,27 +201,21 @@ static void dht_bootstrap(void* closure)
     {
         if (i < num && !bootstrap_done(cl->session, AF_INET))
         {
-            auto port = tr_port{};
             auto addr = tr_address{};
-
             memset(&addr, 0, sizeof(addr));
             addr.type = TR_AF_INET;
             memcpy(&addr.addr.addr4, &cl->nodes[i * 6], 4);
-            memcpy(&port, &cl->nodes[i * 6 + 4], 2);
-            port = ntohs(port);
+            auto const [port, out] = tr_port::fromCompact(&cl->nodes[i * 6 + 4]);
             tr_dhtAddNode(cl->session, &addr, port, true);
         }
 
         if (i < num6 && !bootstrap_done(cl->session, AF_INET6))
         {
-            auto port = tr_port{};
             auto addr = tr_address{};
-
             memset(&addr, 0, sizeof(addr));
             addr.type = TR_AF_INET6;
             memcpy(&addr.addr.addr6, &cl->nodes6[i * 18], 16);
-            memcpy(&port, &cl->nodes6[i * 18 + 16], 2);
-            port = ntohs(port);
+            auto const [port, out] = tr_port::fromCompact(&cl->nodes6[i * 18 + 16]);
             tr_dhtAddNode(cl->session, &addr, port, true);
         }
 
@@ -266,7 +262,7 @@ static void dht_bootstrap(void* closure)
                 tr_logAddDebug("Attempting bootstrap from dht.transmissionbt.com");
             }
 
-            bootstrap_from_name("dht.transmissionbt.com", 6881, bootstrap_af(session_));
+            bootstrap_from_name("dht.transmissionbt.com", tr_port::fromHost(6881), bootstrap_af(session_));
         }
     }
 
@@ -532,7 +528,7 @@ int tr_dhtStatus(tr_session* session, int af, int* nodes_return)
 
 tr_port tr_dhtPort(tr_session* ss)
 {
-    return tr_dhtEnabled(ss) ? ss->udp_port : 0;
+    return tr_dhtEnabled(ss) ? ss->udp_port : tr_port{};
 }
 
 bool tr_dhtAddNode(tr_session* ss, tr_address const* address, tr_port port, bool bootstrap)
@@ -558,7 +554,7 @@ bool tr_dhtAddNode(tr_session* ss, tr_address const* address, tr_port port, bool
         memset(&sin, 0, sizeof(sin));
         sin.sin_family = AF_INET;
         memcpy(&sin.sin_addr, &address->addr.addr4, 4);
-        sin.sin_port = htons(port);
+        sin.sin_port = port.network();
         dht_ping_node((struct sockaddr*)&sin, sizeof(sin));
         return true;
     }
@@ -569,7 +565,7 @@ bool tr_dhtAddNode(tr_session* ss, tr_address const* address, tr_port port, bool
         memset(&sin6, 0, sizeof(sin6));
         sin6.sin6_family = AF_INET6;
         memcpy(&sin6.sin6_addr, &address->addr.addr6, 16);
-        sin6.sin6_port = htons(port);
+        sin6.sin6_port = port.network();
         dht_ping_node((struct sockaddr*)&sin6, sizeof(sin6));
         return true;
     }
@@ -673,7 +669,8 @@ static AnnounceResult tr_dhtAnnounce(tr_torrent* tor, int af, bool announce)
     }
 
     auto const* dht_hash = reinterpret_cast<unsigned char const*>(std::data(tor->infoHash()));
-    int const rc = dht_search(dht_hash, announce ? tr_sessionGetPeerPort(session_) : 0, af, callback, nullptr);
+    auto const hport = announce ? session_->peerPort().host() : 0;
+    int const rc = dht_search(dht_hash, hport, af, callback, nullptr);
     if (rc < 0)
     {
         auto const error_code = errno;

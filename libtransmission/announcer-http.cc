@@ -71,7 +71,7 @@ static tr_urlbuf announce_url_new(tr_session const* session, tr_announce_request
         fmt::arg("sep", tr_strvContains(req->announce_url.sv(), '?') ? '&' : '?'),
         fmt::arg("info_hash", std::data(escaped_info_hash)),
         fmt::arg("peer_id", std::string_view{ std::data(req->peer_id), std::size(req->peer_id) }),
-        fmt::arg("port", req->port),
+        fmt::arg("port", req->port.host()),
         fmt::arg("uploaded", req->up),
         fmt::arg("downloaded", req->down),
         fmt::arg("left", req->leftUntilComplete),
@@ -211,7 +211,7 @@ void tr_announcerParseHttpAnnounceResponse(tr_announce_response& response, std::
             }
             else if (key == "port"sv)
             {
-                pex_.port = htons(uint16_t(value));
+                pex_.port.setHost(static_cast<uint16_t>(value));
             }
             else
             {

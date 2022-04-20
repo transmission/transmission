@@ -65,7 +65,7 @@ char const* tr_address_and_port_to_string(char* buf, size_t buflen, tr_address c
 {
     char addr_buf[INET6_ADDRSTRLEN];
     tr_address_to_string_with_buf(addr, addr_buf, sizeof(addr_buf));
-    *fmt::format_to_n(buf, buflen - 1, FMT_STRING("[{:s}]:{:d}"), addr_buf, ntohs(port)).out = '\0';
+    *fmt::format_to_n(buf, buflen - 1, FMT_STRING("[{:s}]:{:d}"), addr_buf, port.host()).out = '\0';
     return buf;
 }
 
@@ -145,7 +145,7 @@ std::string tr_address::to_string(tr_port port) const
 {
     auto addrbuf = std::array<char, TR_ADDRSTRLEN>{};
     tr_address_to_string_with_buf(this, std::data(addrbuf), std::size(addrbuf));
-    return fmt::format("[{}]:{}", std::data(addrbuf), ntohs(port));
+    return fmt::format(FMT_STRING("[{:s}]:{:d}"), std::data(addrbuf), port.host());
 }
 
 tr_address tr_address::from_4byte_ipv4(std::string_view in)
@@ -290,7 +290,7 @@ bool tr_address_from_sockaddr_storage(tr_address* setme_addr, tr_port* setme_por
         auto const* const sin = (struct sockaddr_in const*)from;
         setme_addr->type = TR_AF_INET;
         setme_addr->addr.addr4.s_addr = sin->sin_addr.s_addr;
-        *setme_port = sin->sin_port;
+        *setme_port = tr_port::fromNetwork(sin->sin_port);
         return true;
     }
 
@@ -299,7 +299,7 @@ bool tr_address_from_sockaddr_storage(tr_address* setme_addr, tr_port* setme_por
         auto const* const sin6 = (struct sockaddr_in6 const*)from;
         setme_addr->type = TR_AF_INET6;
         setme_addr->addr.addr6 = sin6->sin6_addr;
-        *setme_port = sin6->sin6_port;
+        *setme_port = tr_port::fromNetwork(sin6->sin6_port);
         return true;
     }
 
@@ -315,14 +315,14 @@ static socklen_t setup_sockaddr(tr_address const* addr, tr_port port, struct soc
         sockaddr_in sock4 = {};
         sock4.sin_family = AF_INET;
         sock4.sin_addr.s_addr = addr->addr.addr4.s_addr;
-        sock4.sin_port = port;
+        sock4.sin_port = port.network();
         memcpy(sockaddr, &sock4, sizeof(sock4));
         return sizeof(struct sockaddr_in);
     }
 
     sockaddr_in6 sock6 = {};
     sock6.sin6_family = AF_INET6;
-    sock6.sin6_port = port;
+    sock6.sin6_port = port.network();
     sock6.sin6_flowinfo = 0;
     sock6.sin6_addr = addr->addr.addr6;
     memcpy(sockaddr, &sock6, sizeof(sock6));
@@ -372,7 +372,7 @@ struct tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const
     /* set source address */
     tr_address const* const source_addr = tr_sessionGetPublicAddress(session, addr->type, nullptr);
     TR_ASSERT(source_addr != nullptr);
-    socklen_t const sourcelen = setup_sockaddr(source_addr, 0, &source_sock);
+    socklen_t const sourcelen = setup_sockaddr(source_addr, {}, &source_sock);
 
     if (bind(s, (struct sockaddr*)&source_sock, sourcelen) == -1)
     {
@@ -400,7 +400,7 @@ struct tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const
                 _("Couldn't connect socket {socket} to {address}:{port}: {error} ({error_code})"),
                 fmt::arg("socket", s),
                 fmt::arg("address", addr->to_string()),
-                fmt::arg("port", ntohs(port)),
+                fmt::arg("port", port.host()),
                 fmt::arg("error", tr_net_strerror(tmperrno)),
                 fmt::arg("error_code", tmperrno)));
         }
@@ -498,7 +498,7 @@ static tr_socket_t tr_netBindTCPImpl(tr_address const* addr, tr_port port, bool 
 
 #endif
 
-    int const addrlen = setup_sockaddr(addr, htons(port), &sock);
+    int const addrlen = setup_sockaddr(addr, port, &sock);
 
     if (bind(fd, (struct sockaddr*)&sock, addrlen) == -1)
     {
@@ -511,7 +511,7 @@ static tr_socket_t tr_netBindTCPImpl(tr_address const* addr, tr_port port, bool 
                     _("Couldn't bind port {port} on {address}: {error} ({error_code}) -- Is another copy of Transmission already running?") :
                     _("Couldn't bind port {port} on {address}: {error} ({error_code})"),
                 fmt::arg("address", addr->to_string()),
-                fmt::arg("port", port),
+                fmt::arg("port", port.host()),
                 fmt::arg("error", tr_net_strerror(err)),
                 fmt::arg("error_code", err)));
         }
@@ -523,7 +523,7 @@ static tr_socket_t tr_netBindTCPImpl(tr_address const* addr, tr_port port, bool 
 
     if (!suppressMsgs)
     {
-        tr_logAddDebug(fmt::format("Bound socket {} to port {} on {}", fd, port, addr->to_string()));
+        tr_logAddDebug(fmt::format(FMT_STRING("Bound socket {:d} to port {:d} on {:s}"), fd, port.host(), addr->to_string()));
     }
 
 #ifdef TCP_FASTOPEN
@@ -823,7 +823,7 @@ static bool isMartianAddr(struct tr_address const* a)
 
 bool tr_address_is_valid_for_peers(tr_address const* addr, tr_port port)
 {
-    return port != 0 && tr_address_is_valid(addr) && !isIPv6LinkLocalAddress(addr) && !isIPv4MappedAddress(addr) &&
+    return !std::empty(port) && tr_address_is_valid(addr) && !isIPv6LinkLocalAddress(addr) && !isIPv4MappedAddress(addr) &&
         !isMartianAddr(addr);
 }
 
@@ -841,4 +841,17 @@ struct tr_peer_socket tr_peer_socket_utp_create(struct UTPSocket* const handle)
     auto ret = tr_peer_socket{ TR_PEER_SOCKET_TYPE_UTP, {} };
     ret.handle.utp = handle;
     return ret;
+}
+
+/// tr_port
+
+static auto constexpr PortLen = size_t{ 2 };
+
+std::pair<tr_port, uint8_t const*> tr_port::fromCompact(uint8_t const* compact) noexcept
+{
+    static_assert(PortLen == sizeof(uint16_t));
+    auto nport = uint16_t{};
+    std::copy_n(compact, PortLen, reinterpret_cast<uint8_t*>(&nport));
+    compact += PortLen;
+    return std::make_pair(tr_port::fromNetwork(nport), compact);
 }

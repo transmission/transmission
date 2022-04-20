@@ -1381,8 +1381,8 @@ static char const* portTest(
     tr_variant* /*args_out*/,
     struct tr_rpc_idle_data* idle_data)
 {
-    auto const port = tr_sessionGetPeerPort(session);
-    auto const url = fmt::format(FMT_STRING("https://portcheck.transmissionbt.com/{:d}"), port);
+    auto const port = session->peerPort();
+    auto const url = fmt::format(FMT_STRING("https://portcheck.transmissionbt.com/{:d}"), port.host());
     session->web->fetch({ url, onPortTested, idle_data });
     return nullptr;
 }
@@ -1943,7 +1943,7 @@ static char const* sessionSet(
 
     if (tr_variantDictFindInt(args_in, TR_KEY_peer_port, &i))
     {
-        tr_sessionSetPeerPort(session, i);
+        session->setPeerPort(tr_port::fromHost(i));
     }
 
     if (tr_variantDictFindBool(args_in, TR_KEY_port_forwarding_enabled, &boolVal))
@@ -2222,7 +2222,7 @@ static void addSessionField(tr_session* s, tr_variant* d, tr_quark key)
         break;
 
     case TR_KEY_peer_port:
-        tr_variantDictAddInt(d, key, tr_sessionGetPeerPort(s));
+        tr_variantDictAddInt(d, key, s->peerPort().host());
         break;
 
     case TR_KEY_peer_port_random_on_start:

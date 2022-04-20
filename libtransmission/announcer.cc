@@ -877,7 +877,7 @@ static tr_announce_request* announce_request_new(
     TR_ASSERT(current_tracker != nullptr);
 
     auto* const req = new tr_announce_request();
-    req->port = tr_sessionGetPublicPeerPort(announcer->session);
+    req->port = announcer->session->peerPort();
     req->announce_url = current_tracker->announce_url;
     req->tracker_id = current_tracker->tracker_id;
     req->info_hash = tor->infoHash();
