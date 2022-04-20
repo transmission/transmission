@@ -151,19 +151,12 @@ private:
 
 struct tr_address
 {
-    static tr_address from_4byte_ipv4(std::string_view in);
+    [[nodiscard]] static std::optional<tr_address> from_string(std::string_view str);
+    [[nodiscard]] static std::pair<tr_address, uint8_t const*> fromCompact4(uint8_t const* compact) noexcept;
+    [[nodiscard]] static std::pair<tr_address, uint8_t const*> fromCompact6(uint8_t const* compact) noexcept;
 
-    static std::optional<tr_address> from_string(std::string_view str);
-
-    std::string to_string() const;
-    std::string to_string(tr_port port) const;
-
-    tr_address_type type;
-    union
-    {
-        struct in6_addr addr6;
-        struct in_addr addr4;
-    } addr;
+    [[nodiscard]] std::string to_string() const;
+    [[nodiscard]] std::string to_string(tr_port port) const;
 
     [[nodiscard]] int compare(tr_address const& that) const noexcept
     {
@@ -184,6 +177,13 @@ struct tr_address
     {
         return compare(that) > 0;
     }
+
+    tr_address_type type;
+    union
+    {
+        struct in6_addr addr6;
+        struct in_addr addr4;
+    } addr;
 };
 
 extern tr_address const tr_inaddr_any;

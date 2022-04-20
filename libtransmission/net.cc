@@ -148,16 +148,6 @@ std::string tr_address::to_string(tr_port port) const
     return fmt::format(FMT_STRING("[{:s}]:{:d}"), std::data(addrbuf), port.host());
 }
 
-tr_address tr_address::from_4byte_ipv4(std::string_view in)
-{
-    TR_ASSERT(std::size(in) == 4);
-
-    auto addr = tr_address{};
-    addr.type = TR_AF_INET;
-    std::copy_n(std::begin(in), 4, reinterpret_cast<char*>(&addr.addr));
-    return addr;
-}
-
 /*
  * Compare two tr_address structures.
  * Returns:
@@ -845,13 +835,41 @@ struct tr_peer_socket tr_peer_socket_utp_create(struct UTPSocket* const handle)
 
 /// tr_port
 
-static auto constexpr PortLen = size_t{ 2 };
-
 std::pair<tr_port, uint8_t const*> tr_port::fromCompact(uint8_t const* compact) noexcept
 {
+    static auto constexpr PortLen = size_t{ 2 };
+
     static_assert(PortLen == sizeof(uint16_t));
     auto nport = uint16_t{};
     std::copy_n(compact, PortLen, reinterpret_cast<uint8_t*>(&nport));
     compact += PortLen;
+
     return std::make_pair(tr_port::fromNetwork(nport), compact);
+}
+
+/// tr_address
+
+std::pair<tr_address, uint8_t const*> tr_address::fromCompact4(uint8_t const* compact) noexcept
+{
+    static auto constexpr Addr4Len = size_t{ 4 };
+
+    auto address = tr_address{};
+    static_assert(sizeof(address.addr.addr4) == Addr4Len);
+    address.type = TR_AF_INET;
+    std::copy_n(compact, Addr4Len, reinterpret_cast<uint8_t*>(&address.addr));
+    compact += Addr4Len;
+
+    return std::make_pair(address, compact);
+}
+
+std::pair<tr_address, uint8_t const*> tr_address::fromCompact6(uint8_t const* compact) noexcept
+{
+    static auto constexpr Addr6Len = size_t{ 16 };
+
+    auto address = tr_address{};
+    address.type = TR_AF_INET6;
+    std::copy_n(compact, Addr6Len, reinterpret_cast<uint8_t*>(&address.addr.addr6.s6_addr));
+    compact += Addr6Len;
+
+    return std::make_pair(address, compact);
 }
