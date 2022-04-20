@@ -44,5 +44,5 @@
 	url = https://github.com/transmission/fmt.git
 [submodule "third-party/libpopcnt"]
 	path = third-party/libpopcnt
-	url = git@github.com:transmission/libpopcnt.git
-    branch = popcnt32
+	url = https://github.com/transmission/libpopcnt.git
+	branch = post-v2.5-transmission
