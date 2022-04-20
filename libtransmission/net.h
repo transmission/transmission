@@ -9,9 +9,11 @@
 #endif
 
 #include <cstddef> // size_t
+#include <cstdint> // uint8_t
 #include <optional>
 #include <string>
 #include <string_view>
+#include <utility> // std::pair
 
 #ifdef _WIN32
 #include <ws2tcpip.h>
@@ -78,18 +80,10 @@ struct tr_address;
  */
 class tr_port
 {
-private:
-    uint16_t hport_ = 0;
-
-    tr_port(uint16_t hport)
-        : hport_{ hport }
-    {
-    }
-
 public:
     tr_port() noexcept = default;
 
-    [[nodiscard]] static tr_port fromHost(uint16_t hport) noexcept
+    [[nodiscard]] constexpr static tr_port fromHost(uint16_t hport) noexcept
     {
         return tr_port{ hport };
     }
@@ -145,6 +139,14 @@ public:
     {
         hport_ = 0;
     }
+
+private:
+    constexpr tr_port(uint16_t hport) noexcept
+        : hport_{ hport }
+    {
+    }
+
+    uint16_t hport_ = 0;
 };
 
 struct tr_address
