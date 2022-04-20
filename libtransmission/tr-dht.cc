@@ -164,8 +164,7 @@ static void dht_boostrap_from_file(tr_session* session)
         auto hport = uint16_t{};
         line_stream >> addrstr >> hport;
 
-        using PortLimits = std::numeric_limits<uint16_t>;
-        if (line_stream.bad() || std::empty(addrstr) || hport < PortLimits::min() || hport > PortLimits::max())
+        if (line_stream.bad() || std::empty(addrstr))
         {
             tr_logAddWarn(fmt::format(_("Couldn't parse line: '{line}'"), fmt::arg("line", line)));
         }
