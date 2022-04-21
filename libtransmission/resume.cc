@@ -794,14 +794,22 @@ static auto loadFromFile(tr_torrent* tor, tr_resume::fields_t fieldsToLoad, bool
         fields_loaded |= loadPeers(&top, tor);
     }
 
+    // Note: loadFilenames() must come before loadProgress()
+    // so that loadProgress() -> tor->initCheckedPieces() -> tor->findFile()
+    // will know where to look
+    if ((fieldsToLoad & tr_resume::Filenames) != 0)
+    {
+        fields_loaded |= loadFilenames(&top, tor);
+    }
+
+    // Note: loadProgress should come before loadFilePriorities()
+    // so that we can skip loading priorities iff the torrent is a
+    // seed or a partial seed.
     if ((fieldsToLoad & tr_resume::Progress) != 0)
     {
         fields_loaded |= loadProgress(&top, tor);
     }
 
-    // Only load file priorities if we are actually downloading.
-    // If we're a seed or partial seed, loading it is a waste of time.
-    // NB: this is why loadProgress() comes before loadFilePriorities()
     if (!tor->isDone() && (fieldsToLoad & tr_resume::FilePriorities) != 0)
     {
         fields_loaded |= loadFilePriorities(&top, tor);
@@ -825,11 +833,6 @@ static auto loadFromFile(tr_torrent* tor, tr_resume::fields_t fieldsToLoad, bool
     if ((fieldsToLoad & tr_resume::Idlelimit) != 0)
     {
         fields_loaded |= loadIdleLimits(&top, tor);
-    }
-
-    if ((fieldsToLoad & tr_resume::Filenames) != 0)
-    {
-        fields_loaded |= loadFilenames(&top, tor);
     }
 
     if ((fieldsToLoad & tr_resume::Name) != 0)
