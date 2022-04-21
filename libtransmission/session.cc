@@ -151,7 +151,7 @@ std::optional<std::string> tr_session::WebMediator::publicAddress() const
         tr_address const* addr = tr_sessionGetPublicAddress(session_, type, &is_default_value);
         if (addr != nullptr && !is_default_value)
         {
-            return tr_address_to_string(addr);
+            return addr->readable();
         }
     }
 
@@ -303,7 +303,7 @@ tr_address const* tr_sessionGetPublicAddress(tr_session const* session, int tr_a
 
     if (is_default_value != nullptr && bindinfo != nullptr)
     {
-        *is_default_value = bindinfo->addr.to_string() == default_value;
+        *is_default_value = bindinfo->addr.readable() == default_value;
     }
 
     return bindinfo != nullptr ? &bindinfo->addr : nullptr;

@@ -58,17 +58,17 @@ struct tr_pex
 {
     tr_address addr;
     tr_port port; /* this field is in network byte order */
-    uint8_t flags;
+    uint8_t flags = 0;
 
-    std::string_view to_string(char* buf, size_t buflen) const
+    template<typename OutputIt>
+    [[nodiscard]] OutputIt readable(OutputIt out) const
     {
-        tr_address_and_port_to_string(buf, buflen, &addr, port);
-        return buf;
+        return addr.readable(out, port);
     }
 
-    [[nodiscard]] std::string to_string() const
+    [[nodiscard]] std::string readable() const
     {
-        return addr.to_string(port);
+        return addr.readable(port);
     }
 };
 

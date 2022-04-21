@@ -151,31 +151,38 @@ private:
 
 struct tr_address
 {
-    [[nodiscard]] static std::optional<tr_address> from_string(std::string_view str);
+    [[nodiscard]] static std::optional<tr_address> fromString(std::string_view str);
     [[nodiscard]] static std::pair<tr_address, uint8_t const*> fromCompact4(uint8_t const* compact) noexcept;
     [[nodiscard]] static std::pair<tr_address, uint8_t const*> fromCompact6(uint8_t const* compact) noexcept;
 
-    [[nodiscard]] std::string to_string() const;
-    [[nodiscard]] std::string to_string(tr_port port) const;
+    // human-readable formatting
 
-    [[nodiscard]] int compare(tr_address const& that) const noexcept
-    {
-        return tr_address_compare(this, &that);
-    }
+    template<typename OutputIt>
+    OutputIt readable(OutputIt out) const;
+
+    template<typename OutputIt>
+    OutputIt readable(OutputIt out, tr_port) const;
+
+    [[nodiscard]] std::string readable() const;
+    [[nodiscard]] std::string readable(tr_port) const;
+
+    // comparisons
+
+    [[nodiscard]] int compare(tr_address const& that) const noexcept;
 
     [[nodiscard]] bool operator==(tr_address const& that) const noexcept
     {
-        return compare(that) == 0;
+        return this->compare(that) == 0;
     }
 
     [[nodiscard]] bool operator<(tr_address const& that) const noexcept
     {
-        return compare(that) < 0;
+        return this->compare(that) < 0;
     }
 
     [[nodiscard]] bool operator>(tr_address const& that) const noexcept
     {
-        return compare(that) > 0;
+        return this->compare(that) > 0;
     }
 
     tr_address_type type;

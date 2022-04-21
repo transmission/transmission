@@ -525,7 +525,7 @@ static int tr_lpdConsiderAnnounce(tr_pex* peer, char const* const msg)
             tr_peerMgrAddPex(tor, TR_PEER_FROM_LPD, peer, 1);
             tr_logAddDebugTor(
                 tor,
-                fmt::format(FMT_STRING("Found a local peer from LPD ({:s})"), peer->addr.to_string(peer->port)));
+                fmt::format(FMT_STRING("Found a local peer from LPD ({:s})"), peer->addr.readable(peer->port)));
 
             /* periodic reconnectPulse() deals with the rest... */
 
