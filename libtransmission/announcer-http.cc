@@ -253,7 +253,8 @@ void tr_announcerParseHttpAnnounceResponse(tr_announce_response& response, std::
             }
             else if (key == "external ip"sv && std::size(value) == 4)
             {
-                response_.external_ip = tr_address::from_4byte_ipv4(value);
+                auto const [addr, out] = tr_address::fromCompact4(reinterpret_cast<uint8_t const*>(std::data(value)));
+                response_.external_ip = addr;
             }
             else
             {

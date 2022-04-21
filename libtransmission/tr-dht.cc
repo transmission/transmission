@@ -10,7 +10,6 @@
 #include <cstring> /* memcpy(), memset(), memchr(), strlen() */
 #include <ctime>
 #include <fstream>
-#include <limits>
 #include <sstream>
 #include <string>
 #include <string_view>

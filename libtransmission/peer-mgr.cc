@@ -1128,9 +1128,7 @@ std::vector<tr_pex> tr_peerMgrCompactToPex(void const* compact, size_t compactLe
 
     for (size_t i = 0; i < n; ++i)
     {
-        pex[i].addr.type = TR_AF_INET;
-        std::copy_n(walk, 4, reinterpret_cast<uint8_t*>(&pex[i].addr.addr));
-        walk += 4;
+        std::tie(pex[i].addr, walk) = tr_address::fromCompact4(walk);
         std::tie(pex[i].port, walk) = tr_port::fromCompact(walk);
 
         if (added_f != nullptr && n == added_f_len)
@@ -1150,9 +1148,7 @@ std::vector<tr_pex> tr_peerMgrCompact6ToPex(void const* compact, size_t compactL
 
     for (size_t i = 0; i < n; ++i)
     {
-        pex[i].addr.type = TR_AF_INET6;
-        std::copy_n(walk, 16, reinterpret_cast<uint8_t*>(&pex[i].addr.addr.addr6.s6_addr));
-        walk += 16;
+        std::tie(pex[i].addr, walk) = tr_address::fromCompact6(walk);
         std::tie(pex[i].port, walk) = tr_port::fromCompact(walk);
 
         if (added_f != nullptr && n == added_f_len)
