@@ -458,7 +458,7 @@ static bool isAuthorized(tr_rpc_server const* server, char const* auth_header)
     auto decoded = std::string_view{ decoded_str };
     auto const username = tr_strvSep(&decoded, ':');
     auto const password = decoded;
-    return server->username == username && tr_ssha1_matches(server->salted_password_, password);
+    return server->username() == username && tr_ssha1_matches(server->salted_password_, password);
 }
 
 static void handle_request(struct evhttp_request* req, void* arg)
@@ -919,15 +919,10 @@ static void tr_rpcSetRPCSocketMode(tr_rpc_server* server, int socket_mode)
 *****  PASSWORD
 ****/
 
-void tr_rpcSetUsername(tr_rpc_server* server, std::string_view username)
+void tr_rpc_server::setUsername(std::string_view username) noexcept
 {
-    server->username = username;
-    tr_logAddDebug(fmt::format("setting our username to '{}'", server->username));
-}
-
-std::string const& tr_rpcGetUsername(tr_rpc_server const* server)
-{
-    return server->username;
+    username_ = username;
+    tr_logAddDebug(fmt::format(FMT_STRING("setting our username to '{:s}'"), username_));
 }
 
 static bool isSalted(std::string_view password)
@@ -1082,7 +1077,7 @@ tr_rpc_server::tr_rpc_server(tr_session* session_in, tr_variant* settings)
     }
     else
     {
-        tr_rpcSetUsername(this, sv);
+        this->setUsername(sv);
     }
 
     key = TR_KEY_rpc_password;
