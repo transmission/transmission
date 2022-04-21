@@ -2579,14 +2579,14 @@ void tr_sessionSetRPCUrl(tr_session* session, char const* url)
 {
     TR_ASSERT(tr_isSession(session));
 
-    tr_rpcSetUrl(session->rpc_server_.get(), url != nullptr ? url : "");
+    session->rpc_server_->setUrl(url != nullptr ? url : "");
 }
 
 char const* tr_sessionGetRPCUrl(tr_session const* session)
 {
     TR_ASSERT(tr_isSession(session));
 
-    return tr_rpcGetUrl(session->rpc_server_.get()).c_str();
+    return session->rpc_server_->url().c_str();
 }
 
 void tr_sessionSetRPCCallback(tr_session* session, tr_rpc_func func, void* user_data)

@@ -64,21 +64,21 @@ public:
         return whitelist_str_;
     }
 
-    void setWhitelist(std::string_view whitelist) noexcept;
+    void setWhitelist(std::string_view whitelist);
 
     [[nodiscard]] constexpr auto const& username() const noexcept
     {
         return username_;
     }
 
-    void setUsername(std::string_view username) noexcept;
+    void setUsername(std::string_view username);
 
     [[nodiscard]] constexpr auto isPasswordEnabled() const noexcept
     {
         return is_password_enabled_;
     }
 
-    void setPasswordEnabled(bool enabled) noexcept;
+    void setPasswordEnabled(bool enabled);
 
     [[nodiscard]] constexpr auto const& getSaltedPassword()
     {
@@ -106,6 +106,13 @@ public:
 
     std::shared_ptr<libdeflate_compressor> compressor;
 
+    [[nodiscard]] constexpr auto const& url() const noexcept
+    {
+        return url_;
+    }
+
+    void setUrl(std::string_view url);
+
     [[nodiscard]] std::string getBindAddress() const;
 
     std::vector<std::string> hostWhitelist;
@@ -113,7 +120,7 @@ public:
     std::string salted_password_;
     std::string username_;
     std::string whitelist_str_;
-    std::string url;
+    std::string url_;
 
     std::unique_ptr<struct tr_rpc_address> bindAddress;
 
@@ -135,9 +142,5 @@ public:
     bool is_password_enabled_ = false;
     bool is_whitelist_enabled_ = false;
 };
-
-void tr_rpcSetUrl(tr_rpc_server* server, std::string_view url);
-
-std::string const& tr_rpcGetUrl(tr_rpc_server const* server);
 
 int tr_rpcGetRPCSocketMode(tr_rpc_server const* server);

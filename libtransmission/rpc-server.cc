@@ -279,7 +279,7 @@ static void handle_web_client(struct evhttp_request* req, tr_rpc_server* server)
     else
     {
         // TODO: string_view
-        char* const subpath = tr_strdup(req->uri + std::size(server->url) + 4);
+        char* const subpath = tr_strdup(req->uri + std::size(server->url()) + 4);
         if (char* pch = strchr(subpath, '?'); pch != nullptr)
         {
             *pch = '\0';
@@ -520,11 +520,11 @@ static void handle_request(struct evhttp_request* req, void* arg)
         server->login_attempts_ = 0;
 
         auto uri = std::string_view{ req->uri };
-        auto const location = tr_strvStartsWith(uri, server->url) ? uri.substr(std::size(server->url)) : ""sv;
+        auto const location = tr_strvStartsWith(uri, server->url()) ? uri.substr(std::size(server->url())) : ""sv;
 
         if (std::empty(location) || location == "web"sv)
         {
-            auto const new_location = fmt::format(FMT_STRING("{:s}web/"), server->url);
+            auto const new_location = fmt::format(FMT_STRING("{:s}web/"), server->url());
             evhttp_add_header(req->output_headers, "Location", new_location.c_str());
             send_simple_response(req, HTTP_MOVEPERM, nullptr);
         }
@@ -851,15 +851,10 @@ void tr_rpc_server::setPort(tr_port port) noexcept
     }
 }
 
-void tr_rpcSetUrl(tr_rpc_server* server, std::string_view url)
+void tr_rpc_server::setUrl(std::string_view url)
 {
-    server->url = url;
-    tr_logAddDebug(fmt::format("setting our URL to '{}'", server->url));
-}
-
-std::string const& tr_rpcGetUrl(tr_rpc_server const* server)
-{
-    return server->url;
+    url_ = url;
+    tr_logAddDebug(fmt::format(FMT_STRING("setting our URL to '{:s}'"), url_));
 }
 
 static auto parseWhitelist(std::string_view whitelist)
@@ -893,7 +888,7 @@ static void tr_rpcSetHostWhitelist(tr_rpc_server* server, std::string_view white
     server->hostWhitelist = parseWhitelist(whitelist);
 }
 
-void tr_rpc_server::setWhitelist(std::string_view sv) noexcept
+void tr_rpc_server::setWhitelist(std::string_view sv)
 {
     this->whitelist_str_ = sv;
     this->whitelist_ = parseWhitelist(sv);
@@ -918,7 +913,7 @@ static void tr_rpcSetRPCSocketMode(tr_rpc_server* server, int socket_mode)
 *****  PASSWORD
 ****/
 
-void tr_rpc_server::setUsername(std::string_view username) noexcept
+void tr_rpc_server::setUsername(std::string_view username)
 {
     username_ = username;
     tr_logAddDebug(fmt::format(FMT_STRING("setting our username to '{:s}'"), username_));
@@ -936,7 +931,7 @@ void tr_rpc_server::setPassword(std::string_view password) noexcept
     tr_logAddDebug(fmt::format(FMT_STRING("setting our salted password to '{:s}'"), salted_password_));
 }
 
-void tr_rpc_server::setPasswordEnabled(bool enabled) noexcept
+void tr_rpc_server::setPasswordEnabled(bool enabled)
 {
     is_password_enabled_ = enabled;
     tr_logAddDebug(fmt::format("setting password-enabled to '{}'", enabled));
@@ -1006,11 +1001,11 @@ tr_rpc_server::tr_rpc_server(tr_session* session_in, tr_variant* settings)
     }
     else if (std::empty(sv) || sv.back() != '/')
     {
-        this->url = fmt::format(FMT_STRING("{:s}/"), sv);
+        this->url_ = fmt::format(FMT_STRING("{:s}/"), sv);
     }
     else
     {
-        this->url = sv;
+        this->url_ = sv;
     }
 
     key = TR_KEY_rpc_whitelist_enabled;
@@ -1147,7 +1142,7 @@ tr_rpc_server::tr_rpc_server(tr_session* session_in, tr_variant* settings)
 
     if (this->isEnabled())
     {
-        auto const rpc_uri = tr_rpc_address_with_port(this) + this->url;
+        auto const rpc_uri = tr_rpc_address_with_port(this) + this->url_;
         tr_logAddInfo(fmt::format(_("Serving RPC and Web requests on {address}"), fmt::arg("address", rpc_uri)));
         tr_runInEventThread(session, startServer, this);
 
