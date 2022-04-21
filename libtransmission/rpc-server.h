@@ -115,6 +115,11 @@ public:
 
     [[nodiscard]] std::string getBindAddress() const;
 
+    [[nodiscard]] constexpr auto socketMode() const noexcept
+    {
+        return socket_mode_;
+    }
+
     std::vector<std::string> hostWhitelist;
     std::vector<std::string> whitelist_;
     std::string salted_password_;
@@ -132,7 +137,7 @@ public:
     int login_attempts_ = 0;
     int start_retry_counter = 0;
     static int constexpr DefaultRpcSocketMode = 0750;
-    int rpc_socket_mode = DefaultRpcSocketMode;
+    int socket_mode_ = DefaultRpcSocketMode;
 
     tr_port port_;
 
@@ -142,5 +147,3 @@ public:
     bool is_password_enabled_ = false;
     bool is_whitelist_enabled_ = false;
 };
-
-int tr_rpcGetRPCSocketMode(tr_rpc_server const* server);

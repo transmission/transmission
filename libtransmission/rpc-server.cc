@@ -744,7 +744,7 @@ static void startServer(tr_rpc_server* server)
     auto const port = server->port();
 
     bool const success = server->bindAddress->type == TR_RPC_AF_UNIX ?
-        bindUnixSocket(base, httpd, address.c_str(), server->rpc_socket_mode) :
+        bindUnixSocket(base, httpd, address.c_str(), server->socket_mode_) :
         (evhttp_bind_socket(httpd, address.c_str(), port.host()) != -1);
 
     auto const addr_port_str = tr_rpc_address_with_port(server);
@@ -883,30 +883,10 @@ static auto parseWhitelist(std::string_view whitelist)
     return list;
 }
 
-static void tr_rpcSetHostWhitelist(tr_rpc_server* server, std::string_view whitelist)
-{
-    server->hostWhitelist = parseWhitelist(whitelist);
-}
-
 void tr_rpc_server::setWhitelist(std::string_view sv)
 {
     this->whitelist_str_ = sv;
     this->whitelist_ = parseWhitelist(sv);
-}
-
-static void tr_rpcSetHostWhitelistEnabled(tr_rpc_server* server, bool isEnabled)
-{
-    server->isHostWhitelistEnabled = isEnabled;
-}
-
-int tr_rpcGetRPCSocketMode(tr_rpc_server const* server)
-{
-    return server->rpc_socket_mode;
-}
-
-static void tr_rpcSetRPCSocketMode(tr_rpc_server* server, int socket_mode)
-{
-    server->rpc_socket_mode = socket_mode;
 }
 
 /****
@@ -1027,18 +1007,18 @@ tr_rpc_server::tr_rpc_server(tr_session* session_in, tr_variant* settings)
     }
     else
     {
-        tr_rpcSetHostWhitelistEnabled(this, boolVal);
+        this->isHostWhitelistEnabled = boolVal;
     }
 
     key = TR_KEY_rpc_host_whitelist;
 
-    if (!tr_variantDictFindStrView(settings, key, &sv) && !std::empty(sv))
+    if (!tr_variantDictFindStrView(settings, key, &sv))
     {
         missing_settings_key(key);
     }
-    else
+    else if (!std::empty(sv))
     {
-        tr_rpcSetHostWhitelist(this, sv);
+        this->hostWhitelist = parseWhitelist(sv);
     }
 
     key = TR_KEY_rpc_authentication_required;
@@ -1054,11 +1034,11 @@ tr_rpc_server::tr_rpc_server(tr_session* session_in, tr_variant* settings)
 
     key = TR_KEY_rpc_whitelist;
 
-    if (!tr_variantDictFindStrView(settings, key, &sv) && !std::empty(sv))
+    if (!tr_variantDictFindStrView(settings, key, &sv))
     {
         missing_settings_key(key);
     }
-    else
+    else if (!std::empty(sv))
     {
         this->setWhitelist(sv);
     }
@@ -1115,7 +1095,7 @@ tr_rpc_server::tr_rpc_server(tr_session* session_in, tr_variant* settings)
     }
     else
     {
-        tr_rpcSetRPCSocketMode(this, i);
+        this->socket_mode_ = i;
     }
 
     key = TR_KEY_rpc_bind_address;
