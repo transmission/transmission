@@ -918,7 +918,7 @@ tr_address const* tr_peerIoGetAddress(tr_peerIo const* io, tr_port* port)
 
 std::string tr_peerIo::addrStr() const
 {
-    return tr_isPeerIo(this) ? this->addr.to_string(this->port) : "error";
+    return tr_isPeerIo(this) ? this->addr.readable(this->port) : "error";
 }
 
 char const* tr_peerIoGetAddrStr(tr_peerIo const* io, char* buf, size_t buflen)

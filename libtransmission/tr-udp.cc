@@ -309,7 +309,7 @@ void tr_udpInit(tr_session* ss)
             auto const error_code = errno;
             tr_logAddWarn(fmt::format(
                 _("Couldn't bind IPv4 socket {address}: {error} ({error_code})"),
-                fmt::arg("address", public_addr != nullptr ? public_addr->to_string(ss->udp_port) : "?"),
+                fmt::arg("address", public_addr != nullptr ? public_addr->readable(ss->udp_port) : "?"),
                 fmt::arg("error", tr_strerror(error_code)),
                 fmt::arg("error_code", error_code)));
             tr_netCloseSocket(ss->udp_socket);

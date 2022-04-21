@@ -122,32 +122,6 @@ bool tr_address_from_string(tr_address* dst, std::string_view src)
     return tr_address_from_string(dst, std::data(buf));
 }
 
-std::optional<tr_address> tr_address::from_string(std::string_view address_str)
-{
-    auto addr = tr_address{};
-
-    if (!tr_address_from_string(&addr, address_str))
-    {
-        return {};
-    }
-
-    return addr;
-}
-
-std::string tr_address::to_string() const
-{
-    auto addrbuf = std::array<char, TR_ADDRSTRLEN>{};
-    tr_address_to_string_with_buf(this, std::data(addrbuf), std::size(addrbuf));
-    return std::data(addrbuf);
-}
-
-std::string tr_address::to_string(tr_port port) const
-{
-    auto addrbuf = std::array<char, TR_ADDRSTRLEN>{};
-    tr_address_to_string_with_buf(this, std::data(addrbuf), std::size(addrbuf));
-    return fmt::format(FMT_STRING("[{:s}]:{:d}"), std::data(addrbuf), port.host());
-}
-
 /*
  * Compare two tr_address structures.
  * Returns:
@@ -368,7 +342,7 @@ struct tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const
     {
         tr_logAddWarn(fmt::format(
             _("Couldn't set source address {address} on {socket}: {error} ({error_code})"),
-            fmt::arg("address", source_addr->to_string()),
+            fmt::arg("address", source_addr->readable()),
             fmt::arg("socket", s),
             fmt::arg("error", tr_net_strerror(sockerrno)),
             fmt::arg("error_code", sockerrno)));
@@ -389,7 +363,7 @@ struct tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const
             tr_logAddWarn(fmt::format(
                 _("Couldn't connect socket {socket} to {address}:{port}: {error} ({error_code})"),
                 fmt::arg("socket", s),
-                fmt::arg("address", addr->to_string()),
+                fmt::arg("address", addr->readable()),
                 fmt::arg("port", port.host()),
                 fmt::arg("error", tr_net_strerror(tmperrno)),
                 fmt::arg("error_code", tmperrno)));
@@ -500,7 +474,7 @@ static tr_socket_t tr_netBindTCPImpl(tr_address const* addr, tr_port port, bool 
                 err == EADDRINUSE ?
                     _("Couldn't bind port {port} on {address}: {error} ({error_code}) -- Is another copy of Transmission already running?") :
                     _("Couldn't bind port {port} on {address}: {error} ({error_code})"),
-                fmt::arg("address", addr->to_string()),
+                fmt::arg("address", addr->readable()),
                 fmt::arg("port", port.host()),
                 fmt::arg("error", tr_net_strerror(err)),
                 fmt::arg("error_code", err)));
@@ -513,7 +487,7 @@ static tr_socket_t tr_netBindTCPImpl(tr_address const* addr, tr_port port, bool 
 
     if (!suppressMsgs)
     {
-        tr_logAddDebug(fmt::format(FMT_STRING("Bound socket {:d} to port {:d} on {:s}"), fd, port.host(), addr->to_string()));
+        tr_logAddDebug(fmt::format(FMT_STRING("Bound socket {:d} to port {:d} on {:s}"), fd, port.host(), addr->readable()));
     }
 
 #ifdef TCP_FASTOPEN
@@ -849,6 +823,54 @@ std::pair<tr_port, uint8_t const*> tr_port::fromCompact(uint8_t const* compact) 
 
 /// tr_address
 
+std::optional<tr_address> tr_address::fromString(std::string_view address_str)
+{
+    auto addr = tr_address{};
+
+    if (!tr_address_from_string(&addr, address_str))
+    {
+        return {};
+    }
+
+    return addr;
+}
+
+template<typename OutputIt>
+OutputIt tr_address::readable(OutputIt out) const
+{
+    auto buf = std::array<char, INET6_ADDRSTRLEN>{};
+    tr_address_to_string_with_buf(this, std::data(buf), std::size(buf));
+    return fmt::format_to(out, FMT_STRING("{:s}"), std::data(buf));
+}
+
+template char* tr_address::readable<char*>(char*) const;
+
+std::string tr_address::readable() const
+{
+    auto buf = std::string{};
+    buf.reserve(INET6_ADDRSTRLEN);
+    this->readable(std::back_inserter(buf));
+    return buf;
+}
+
+template<typename OutputIt>
+OutputIt tr_address::readable(OutputIt out, tr_port port) const
+{
+    auto buf = std::array<char, INET6_ADDRSTRLEN>{};
+    tr_address_to_string_with_buf(this, std::data(buf), std::size(buf));
+    return fmt::format_to(out, FMT_STRING("[{:s}]:{:d}"), std::data(buf), port.host());
+}
+
+template char* tr_address::readable<char*>(char*, tr_port) const;
+
+std::string tr_address::readable(tr_port port) const
+{
+    auto buf = std::string{};
+    buf.reserve(INET6_ADDRSTRLEN + 9);
+    this->readable(std::back_inserter(buf), port);
+    return buf;
+}
+
 std::pair<tr_address, uint8_t const*> tr_address::fromCompact4(uint8_t const* compact) noexcept
 {
     static auto constexpr Addr4Len = size_t{ 4 };
@@ -872,4 +894,9 @@ std::pair<tr_address, uint8_t const*> tr_address::fromCompact6(uint8_t const* co
     compact += Addr6Len;
 
     return std::make_pair(address, compact);
+}
+
+int tr_address::compare(tr_address const& that) const noexcept // <=>
+{
+    return tr_address_compare(this, &that);
 }
