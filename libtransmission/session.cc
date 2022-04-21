@@ -2286,16 +2286,17 @@ void tr_sessionSetDefaultTrackers(tr_session* session, char const* trackers)
 Bandwidth& tr_session::getBandwidthGroup(std::string_view name)
 {
     auto& groups = this->bandwidth_groups_;
-    auto const key = tr_interned_string{ name };
 
-    auto it = groups.find(key);
-
-    if (it == std::end(groups))
+    for (auto const& [group_name, group] : groups)
     {
-        it = groups.try_emplace(key, std::make_unique<Bandwidth>(new Bandwidth(&top_bandwidth_))).first;
+        if (group_name == name)
+        {
+            return *group;
+        }
     }
 
-    return *it->second;
+    auto& [group_name, group] = groups.emplace_back(name, std::make_unique<Bandwidth>(new Bandwidth(&top_bandwidth_)));
+    return *group;
 }
 
 /***

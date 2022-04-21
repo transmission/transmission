@@ -9,10 +9,10 @@
 #error only libtransmission should #include this header.
 #endif
 
-#include <list>
 #include <memory>
 #include <string>
 #include <string_view>
+#include <vector>
 
 #include "transmission.h"
 
@@ -44,8 +44,8 @@ public:
 
     std::shared_ptr<libdeflate_compressor> compressor;
 
-    std::list<std::string> hostWhitelist;
-    std::list<std::string> whitelist;
+    std::vector<std::string> hostWhitelist;
+    std::vector<std::string> whitelist;
     std::string salted_password;
     std::string username;
     std::string whitelistStr;
