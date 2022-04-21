@@ -366,10 +366,13 @@ static void handle_rpc(struct evhttp_request* req, tr_rpc_server* server)
 
 static bool isAddressAllowed(tr_rpc_server const* server, char const* address)
 {
-    auto const& src = server->whitelist;
+    if (!server->isWhitelistEnabled())
+    {
+        return true;
+    }
 
-    return !server->isWhitelistEnabled() ||
-        std::any_of(std::begin(src), std::end(src), [&address](auto const& s) { return tr_wildmat(address, s); });
+    auto const& src = server->whitelist_;
+    return std::any_of(std::begin(src), std::end(src), [&address](auto const& s) { return tr_wildmat(address, s); });
 }
 
 static bool isIPAddressWithOptionalPort(char const* host)
@@ -891,15 +894,10 @@ static void tr_rpcSetHostWhitelist(tr_rpc_server* server, std::string_view white
     server->hostWhitelist = parseWhitelist(whitelist);
 }
 
-void tr_rpcSetWhitelist(tr_rpc_server* server, std::string_view whitelist)
+void tr_rpc_server::setWhitelist(std::string_view sv) noexcept
 {
-    server->whitelistStr = whitelist;
-    server->whitelist = parseWhitelist(whitelist);
-}
-
-std::string const& tr_rpcGetWhitelist(tr_rpc_server const* server)
-{
-    return server->whitelistStr;
+    this->whitelist_str_ = sv;
+    this->whitelist_ = parseWhitelist(sv);
 }
 
 static void tr_rpcSetHostWhitelistEnabled(tr_rpc_server* server, bool isEnabled)
@@ -1097,7 +1095,7 @@ tr_rpc_server::tr_rpc_server(tr_session* session_in, tr_variant* settings)
     }
     else
     {
-        tr_rpcSetWhitelist(this, sv);
+        this->setWhitelist(sv);
     }
 
     key = TR_KEY_rpc_username;

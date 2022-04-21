@@ -2531,12 +2531,7 @@ char const* tr_blocklistGetURL(tr_session const* session)
 
 void tr_session::setRpcWhitelist(std::string_view whitelist) const
 {
-    tr_rpcSetWhitelist(this->rpc_server_.get(), whitelist);
-}
-
-std::string const& tr_session::rpcWhitelist() const
-{
-    return tr_rpcGetWhitelist(this->rpc_server_.get());
+    this->rpc_server_->setWhitelist(whitelist);
 }
 
 void tr_session::useRpcWhitelist(bool enabled) const
@@ -2613,7 +2608,7 @@ char const* tr_sessionGetRPCWhitelist(tr_session const* session)
 {
     TR_ASSERT(tr_isSession(session));
 
-    return session->rpcWhitelist().c_str();
+    return session->rpc_server_->whitelist().c_str();
 }
 
 void tr_sessionSetRPCWhitelistEnabled(tr_session* session, bool enabled)

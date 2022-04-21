@@ -59,13 +59,20 @@ public:
         is_whitelist_enabled_ = is_whitelist_enabled;
     }
 
+    [[nodiscard]] constexpr auto const& whitelist() const noexcept
+    {
+        return whitelist_str_;
+    }
+
+    void setWhitelist(std::string_view whitelist) noexcept;
+
     std::shared_ptr<libdeflate_compressor> compressor;
 
     std::vector<std::string> hostWhitelist;
     std::vector<std::string> whitelist;
     std::string salted_password;
     std::string username;
-    std::string whitelistStr;
+    std::string whitelist_str_;
     std::string url;
 
     std::unique_ptr<struct tr_rpc_address> bindAddress;
@@ -95,11 +102,7 @@ std::string const& tr_rpcGetUrl(tr_rpc_server const* server);
 
 int tr_rpcSetTest(tr_rpc_server const* server, char const* whitelist, char** allocme_errmsg);
 
-void tr_rpcSetWhitelist(tr_rpc_server* server, std::string_view whitelist);
-
 int tr_rpcGetRPCSocketMode(tr_rpc_server const* server);
-
-std::string const& tr_rpcGetWhitelist(tr_rpc_server const* server);
 
 void tr_rpcSetPassword(tr_rpc_server* server, std::string_view password);
 
