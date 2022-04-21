@@ -2629,14 +2629,14 @@ void tr_sessionSetRPCPassword(tr_session* session, char const* password)
 {
     TR_ASSERT(tr_isSession(session));
 
-    tr_rpcSetPassword(session->rpc_server_.get(), password != nullptr ? password : "");
+    session->rpc_server_->setPassword(password != nullptr ? password : "");
 }
 
 char const* tr_sessionGetRPCPassword(tr_session const* session)
 {
     TR_ASSERT(tr_isSession(session));
 
-    return tr_rpcGetPassword(session->rpc_server_.get()).c_str();
+    return session->rpc_server_->getSaltedPassword().c_str();
 }
 
 void tr_sessionSetRPCUsername(tr_session* session, char const* username)

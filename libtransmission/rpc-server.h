@@ -73,11 +73,19 @@ public:
 
     void setPasswordEnabled(bool enabled) noexcept;
 
+    [[nodiscard]] constexpr auto const& getSaltedPassword()
+    {
+        return salted_password_;
+    }
+
+    void setPassword(std::string_view salted) noexcept;
+
     std::shared_ptr<libdeflate_compressor> compressor;
 
     std::vector<std::string> hostWhitelist;
     std::vector<std::string> whitelist;
     std::string salted_password;
+    std::string salted_password_;
     std::string username;
     std::string whitelist_str_;
     std::string url;
@@ -110,10 +118,6 @@ std::string const& tr_rpcGetUrl(tr_rpc_server const* server);
 int tr_rpcSetTest(tr_rpc_server const* server, char const* whitelist, char** allocme_errmsg);
 
 int tr_rpcGetRPCSocketMode(tr_rpc_server const* server);
-
-void tr_rpcSetPassword(tr_rpc_server* server, std::string_view password);
-
-std::string const& tr_rpcGetPassword(tr_rpc_server const* server);
 
 void tr_rpcSetUsername(tr_rpc_server* server, std::string_view username);
 
