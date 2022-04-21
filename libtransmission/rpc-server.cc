@@ -740,13 +740,12 @@ static void startServer(tr_rpc_server* server)
 
     evhttp_set_allowed_methods(httpd, EVHTTP_REQ_GET | EVHTTP_REQ_POST | EVHTTP_REQ_OPTIONS);
 
-    char const* address = tr_rpcGetBindAddress(server);
-
+    auto const address = server->getBindAddress();
     auto const port = server->port();
 
     bool const success = server->bindAddress->type == TR_RPC_AF_UNIX ?
-        bindUnixSocket(base, httpd, address, server->rpc_socket_mode) :
-        (evhttp_bind_socket(httpd, address, port.host()) != -1);
+        bindUnixSocket(base, httpd, address.c_str(), server->rpc_socket_mode) :
+        (evhttp_bind_socket(httpd, address.c_str(), port.host()) != -1);
 
     auto const addr_port_str = tr_rpc_address_with_port(server);
 
@@ -794,14 +793,14 @@ static void stopServer(tr_rpc_server* server)
         return;
     }
 
-    char const* address = tr_rpcGetBindAddress(server);
+    auto const address = server->getBindAddress();
 
     server->httpd = nullptr;
     evhttp_free(httpd);
 
     if (server->bindAddress->type == TR_RPC_AF_UNIX)
     {
-        unlink(address + std::size(TrUnixSocketPrefix));
+        unlink(address.c_str() + std::size(TrUnixSocketPrefix));
     }
 
     tr_logAddInfo(fmt::format(
@@ -943,10 +942,10 @@ void tr_rpc_server::setPasswordEnabled(bool enabled) noexcept
     tr_logAddDebug(fmt::format("setting password-enabled to '{}'", enabled));
 }
 
-char const* tr_rpcGetBindAddress(tr_rpc_server const* server)
+std::string tr_rpc_server::getBindAddress() const
 {
-    static char addr_buf[TrUnixAddrStrLen];
-    return tr_rpc_address_to_string(*server->bindAddress, addr_buf, sizeof(addr_buf));
+    auto buf = std::array<char, TrUnixAddrStrLen>{};
+    return tr_rpc_address_to_string(*this->bindAddress, std::data(buf), std::size(buf));
 }
 
 void tr_rpc_server::setAntiBruteForceEnabled(bool enabled) noexcept

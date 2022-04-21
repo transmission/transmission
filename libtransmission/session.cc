@@ -441,7 +441,7 @@ void tr_sessionGetSettings(tr_session const* s, tr_variant* d)
     tr_variantDictAddBool(d, TR_KEY_ratio_limit_enabled, s->isRatioLimited);
     tr_variantDictAddBool(d, TR_KEY_rename_partial_files, tr_sessionIsIncompleteFileNamingEnabled(s));
     tr_variantDictAddBool(d, TR_KEY_rpc_authentication_required, tr_sessionIsRPCPasswordEnabled(s));
-    tr_variantDictAddStr(d, TR_KEY_rpc_bind_address, tr_sessionGetRPCBindAddress(s));
+    tr_variantDictAddStr(d, TR_KEY_rpc_bind_address, s->rpc_server_->getBindAddress());
     tr_variantDictAddBool(d, TR_KEY_rpc_enabled, tr_sessionIsRPCEnabled(s));
     tr_variantDictAddStr(d, TR_KEY_rpc_password, tr_sessionGetRPCPassword(s));
     tr_variantDictAddInt(d, TR_KEY_rpc_port, tr_sessionGetRPCPort(s));
@@ -2665,13 +2665,6 @@ bool tr_sessionIsRPCPasswordEnabled(tr_session const* session)
     TR_ASSERT(tr_isSession(session));
 
     return session->rpc_server_->isPasswordEnabled();
-}
-
-char const* tr_sessionGetRPCBindAddress(tr_session const* session)
-{
-    TR_ASSERT(tr_isSession(session));
-
-    return tr_rpcGetBindAddress(session->rpc_server_.get());
 }
 
 /****

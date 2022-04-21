@@ -106,9 +106,10 @@ public:
 
     std::shared_ptr<libdeflate_compressor> compressor;
 
+    [[nodiscard]] std::string getBindAddress() const;
+
     std::vector<std::string> hostWhitelist;
-    std::vector<std::string> whitelist;
-    std::string salted_password;
+    std::vector<std::string> whitelist_;
     std::string salted_password_;
     std::string username_;
     std::string whitelist_str_;
@@ -139,8 +140,4 @@ void tr_rpcSetUrl(tr_rpc_server* server, std::string_view url);
 
 std::string const& tr_rpcGetUrl(tr_rpc_server const* server);
 
-int tr_rpcSetTest(tr_rpc_server const* server, char const* whitelist, char** allocme_errmsg);
-
 int tr_rpcGetRPCSocketMode(tr_rpc_server const* server);
-
-char const* tr_rpcGetBindAddress(tr_rpc_server const* server);
