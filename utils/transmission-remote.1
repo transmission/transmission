@@ -25,6 +25,7 @@ and
 .Op Fl er | ep | et
 .Op Fl -exit
 .Op Fl f
+.Op Fl F Ar filter
 .Op Fl g Ar files
 .Op Fl G Ar files
 .Op Fl gsr Ar ratio
@@ -32,6 +33,7 @@ and
 .Op Fl h
 .Op Fl i
 .Op Fl ic
+.Op Fl ids
 .Op Fl if
 .Op Fl ip
 .Op Fl it
@@ -153,6 +155,18 @@ adds a single file to the download list, and
 .Ar files
 adds multiple files to the download list,
 such as "\-g1,3-5" to add files #1, #3, #4, and #5 to the download list.
+.It Fl F Fl -filter Ar filter
+Filter selected torrents. Further commands will use only torrents that satisfy
+the filter condition.
+.D1 i - currently idle
+.D1 u - currently uploading
+.D1 d - currently downloading
+.D1 n:str - torrent name includes str
+.D1 l:label - has label
+.D1 r:ratio - Minimum upload ratio
+Prefixing the filter by "~" negates the filter.
+-F may be specified more than once, and may be preceded by -t. Only torrents
+that satisfy all the conditions are selected.
 .It Fl G Fl -no-get Ar all | file-index | files
 Mark file(s) for not downloading.
 .It Fl gsr Fl -global-seedratio Ar ratio
@@ -178,6 +192,9 @@ List session information from the server
 List statistical information from the server
 .It Fl l Fl -list
 List all torrents
+.It Fl ids Fl -print-ids
+Print a list of the specified torrent's ids in a format suitable as a parameter for
+.Ar -t
 .It Fl L Fl -labels Ar label1[,label2[,...]]
 Set the specified torrent's labels
 .It Fl m Fl -portmap
@@ -331,6 +348,14 @@ $ transmission-remote \-l
 List all active torrents:
 .Bd -literal -offset indent
 $ transmission-remote \-tactive \-l
+.Ed
+List all torrents with label "abc":
+.Bd -literal -offset indent
+$ transmission-remote \-F l:abc \-l
+.Ed
+List all torrents with name containing "def" or with label "abc":
+.Bd -literal -offset indent
+$ transmission-remote -t $(\ transmission-remote \-F n:def \-ids )$(\ transmission-remote \-F l:abc \-ids ) \-l
 .Ed
 Set download and upload limits to 400 kB/sec and 60 kB/sec:
 .Bd -literal -offset indent
