@@ -17,7 +17,7 @@ typedef NS_ENUM(unsigned int, blocklistDownloadState) { //
 @property(nonatomic) BlocklistDownloaderViewController* viewController;
 @property(nonatomic, class, readonly) BOOL isRunning;
 
-+ (BlocklistDownloader*)downloader; //starts download if not already occuring
++ (BlocklistDownloader*)downloader; //starts download if not already occurring
 
 - (void)cancelDownload;
 

@@ -1516,7 +1516,7 @@ msgstr[1] "Démarré %d fois"
 
 #: ../gtk/StatsDialog.cc:99
 msgid "Reset your statistics?"
-msgstr "Réinitaliser vos statistiques à zéro?"
+msgstr "Réinitialiser vos statistiques à zéro?"
 
 #: ../gtk/StatsDialog.cc:101 ../gtk/StatsDialog.cc:138
 msgid "_Reset"

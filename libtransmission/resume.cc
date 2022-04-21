@@ -505,7 +505,7 @@ static void saveProgress(tr_variant* dict, tr_torrent const* tor)
 }
 
 /*
- * Transmisison has iterated through a few strategies here, so the
+ * Transmission has iterated through a few strategies here, so the
  * code has some added complexity to support older approaches.
  *
  * Current approach: 'progress' is a dict with two entries:
@@ -888,7 +888,7 @@ static auto setFromCtor(tr_torrent* tor, tr_resume::fields_t fields, tr_ctor con
     return ret;
 }
 
-static auto useManditoryFields(tr_torrent* tor, tr_resume::fields_t fields, tr_ctor const* ctor)
+static auto useMandatoryFields(tr_torrent* tor, tr_resume::fields_t fields, tr_ctor const* ctor)
 {
     return setFromCtor(tor, fields, ctor, TR_FORCE);
 }
@@ -907,7 +907,7 @@ fields_t load(tr_torrent* tor, fields_t fields_to_load, tr_ctor const* ctor, boo
 
     auto ret = fields_t{};
 
-    ret |= useManditoryFields(tor, fields_to_load, ctor);
+    ret |= useMandatoryFields(tor, fields_to_load, ctor);
     fields_to_load &= ~ret;
     ret |= loadFromFile(tor, fields_to_load, did_rename_to_hash_only_name);
     fields_to_load &= ~ret;

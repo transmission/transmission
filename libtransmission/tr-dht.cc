@@ -112,7 +112,7 @@ static void bootstrap_from_name(char const* name, tr_port port, int af)
     if (int const rc = getaddrinfo(name, std::data(port_str), &hints, &info); rc != 0)
     {
         tr_logAddWarn(fmt::format(
-            _("Couldn't look up '{addresss}:{port}': {error} ({error_code})"),
+            _("Couldn't look up '{address}:{port}': {error} ({error_code})"),
             fmt::arg("address", name),
             fmt::arg("port", port),
             fmt::arg("error", gai_strerror(rc)),

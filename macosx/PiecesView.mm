@@ -106,8 +106,8 @@ enum
     int8_t* pieces = NULL;
     float* piecesPercent = NULL;
 
-    BOOL const showAvailablity = [NSUserDefaults.standardUserDefaults boolForKey:@"PiecesViewShowAvailability"];
-    if (showAvailablity)
+    BOOL const showAvailability = [NSUserDefaults.standardUserDefaults boolForKey:@"PiecesViewShowAvailability"];
+    if (showAvailability)
     {
         pieces = (int8_t*)tr_malloc(self.fNumPieces * sizeof(int8_t));
         [self.torrent getAvailability:pieces size:self.fNumPieces];
@@ -129,7 +129,7 @@ enum
     {
         NSColor* pieceColor = nil;
 
-        if (showAvailablity ? pieces[index] == -1 : piecesPercent[index] == 1.0)
+        if (showAvailability ? pieces[index] == -1 : piecesPercent[index] == 1.0)
         {
             if (first || self.fPieces[index] != PIECE_FINISHED)
             {
@@ -145,7 +145,7 @@ enum
                 }
             }
         }
-        else if (showAvailablity ? pieces[index] == 0 : piecesPercent[index] == 0.0)
+        else if (showAvailability ? pieces[index] == 0 : piecesPercent[index] == 0.0)
         {
             if (first || self.fPieces[index] != PIECE_NONE)
             {
@@ -153,7 +153,7 @@ enum
                 self.fPieces[index] = PIECE_NONE;
             }
         }
-        else if (showAvailablity && pieces[index] >= HIGH_PEERS)
+        else if (showAvailability && pieces[index] >= HIGH_PEERS)
         {
             if (first || self.fPieces[index] != PIECE_HIGH_PEERS)
             {
@@ -164,8 +164,8 @@ enum
         else
         {
             //always redraw "mixed"
-            CGFloat percent = showAvailablity ? (CGFloat)pieces[index] / HIGH_PEERS : piecesPercent[index];
-            NSColor* fullColor = showAvailablity ? self.fGreenAvailabilityColor : self.fBluePieceColor;
+            CGFloat percent = showAvailability ? (CGFloat)pieces[index] / HIGH_PEERS : piecesPercent[index];
+            NSColor* fullColor = showAvailability ? self.fGreenAvailabilityColor : self.fBluePieceColor;
             pieceColor = [NSColor.whiteColor blendedColorWithFraction:percent ofColor:fullColor];
             self.fPieces[index] = PIECE_SOME;
         }

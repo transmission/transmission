@@ -253,7 +253,7 @@ std::string_view tr_torrent_metainfo::parseFiles(tr_torrent_metainfo& setme, tr_
     // path - A list of UTF-8 encoded strings corresponding to subdirectory
     // names, the last of which is the actual file name (a zero length list
     // is an error case).
-    // In the multifile case, the name key is the name of a directory.
+    // In the multifile case, the name key is the name of a directory."
     else if (tr_variantDictFindList(info_dict, TR_KEY_files, &files_entry))
     {
         auto buf = std::string{};

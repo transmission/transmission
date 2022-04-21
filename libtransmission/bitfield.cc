@@ -22,7 +22,7 @@ namespace
 
 [[nodiscard]] constexpr size_t getBytesNeeded(size_t bit_count) noexcept
 {
-    /* NB: If can gurantee bit_count <= SIZE_MAX - 8 then faster logic
+    /* NB: If can guarantee bit_count <= SIZE_MAX - 8 then faster logic
        is ((bit_count + 7) >> 3). */
     return (bit_count >> 3) + ((bit_count & 7) != 0 ? 1 : 0);
 }

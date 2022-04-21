@@ -177,7 +177,7 @@
 
 - (CGFloat)tableView:(NSTableView*)tableView heightOfRow:(NSInteger)row
 {
-    //check for NSDictionay instead of TrackerNode because of display issue when adding a row
+    //check for NSDictionary instead of TrackerNode because of display issue when adding a row
     if ([self.fTrackers[row] isKindOfClass:[NSDictionary class]])
     {
         return TRACKER_GROUP_SEPARATOR_HEIGHT;

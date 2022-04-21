@@ -14,7 +14,7 @@
  * memory only if its string gets too big. Its main use case is building
  * temporary strings in stack memory.
  *
- * It is a convenience wrapper arouund `fmt::basic_memory_buffer`.
+ * It is a convenience wrapper around `fmt::basic_memory_buffer`.
  */
 template<typename Char, size_t N>
 class tr_strbuf

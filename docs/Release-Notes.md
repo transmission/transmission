@@ -604,7 +604,7 @@
 ### Transmission 2.21 (2011/02/08) ###
 [http://trac.transmissionbt.com/query?milestone#2.21&group#component&order#severity All tickets closed by this release]
 #### All Platforms ####
-  * Fix compile error in the the 2.20 tarball
+  * Fix compile error in the 2.20 tarball
 #### GTK+ ####
   * Several updated translations
 #### Qt ####

@@ -172,7 +172,7 @@ typedef NS_ENUM(unsigned int, addType) { //
 - (void)setWindowMinMaxToCurrent;
 @property(nonatomic, readonly) CGFloat minWindowContentSizeAllowed;
 
-- (void)updateForExpandCollape;
+- (void)updateForExpandCollapse;
 
 - (void)showMainWindow:(id)sender;
 

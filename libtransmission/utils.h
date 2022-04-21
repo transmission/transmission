@@ -69,7 +69,7 @@ struct tr_error;
 
 /**
  * @brief Rich Salz's classic implementation of shell-style pattern matching for ?, \, [], and * characters.
- * @return 1 if the pattern matches, 0 if it doesn't, or -1 if an error occured
+ * @return 1 if the pattern matches, 0 if it doesn't, or -1 if an error occurred
  */
 [[nodiscard]] bool tr_wildmat(std::string_view text, std::string_view pattern);
 
@@ -382,7 +382,7 @@ std::string& tr_strvUtf8Clean(std::string_view cleanme, std::string& setme);
 
 /**
  * @param ratio    the ratio to convert to a string
- * @param infinity the string represntation of "infinity"
+ * @param infinity the string representation of "infinity"
  */
 [[nodiscard]] std::string tr_strratio(double ratio, char const* infinity);
 

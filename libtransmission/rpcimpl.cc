@@ -1355,7 +1355,7 @@ static char const* torrentRenamePath(
 
 static void onPortTested(tr_web::FetchResponse const& web_response)
 {
-    auto const& [status, body, did_connect, did_tmieout, user_data] = web_response;
+    auto const& [status, body, did_connect, did_timeout, user_data] = web_response;
     auto* data = static_cast<struct tr_rpc_idle_data*>(user_data);
 
     if (status != 200)

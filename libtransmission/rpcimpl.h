@@ -18,7 +18,7 @@ struct tr_variant;
 
 using tr_rpc_response_func = void (*)(tr_session* session, tr_variant* response, void* user_data);
 
-/* http://www.json.org/ */
+/* https://www.json.org/ */
 void tr_rpc_request_exec_json(
     tr_session* session,
     tr_variant const* request,
