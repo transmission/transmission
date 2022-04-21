@@ -66,6 +66,13 @@ public:
 
     void setWhitelist(std::string_view whitelist) noexcept;
 
+    [[nodiscard]] constexpr auto isPasswordEnabled() const noexcept
+    {
+        return is_password_enabled_;
+    }
+
+    void setPasswordEnabled(bool enabled) noexcept;
+
     std::shared_ptr<libdeflate_compressor> compressor;
 
     std::vector<std::string> hostWhitelist;
@@ -92,7 +99,7 @@ public:
     bool isAntiBruteForceEnabled = false;
     bool is_enabled_ = false;
     bool isHostWhitelistEnabled = false;
-    bool isPasswordEnabled = false;
+    bool is_password_enabled_ = false;
     bool is_whitelist_enabled_ = false;
 };
 
@@ -111,10 +118,6 @@ std::string const& tr_rpcGetPassword(tr_rpc_server const* server);
 void tr_rpcSetUsername(tr_rpc_server* server, std::string_view username);
 
 std::string const& tr_rpcGetUsername(tr_rpc_server const* server);
-
-void tr_rpcSetPasswordEnabled(tr_rpc_server* server, bool isEnabled);
-
-bool tr_rpcIsPasswordEnabled(tr_rpc_server const* session);
 
 bool tr_rpcGetAntiBruteForceEnabled(tr_rpc_server const* server);
 

@@ -2653,18 +2653,18 @@ char const* tr_sessionGetRPCUsername(tr_session const* session)
     return tr_rpcGetUsername(session->rpc_server_.get()).c_str();
 }
 
-void tr_sessionSetRPCPasswordEnabled(tr_session* session, bool isEnabled)
+void tr_sessionSetRPCPasswordEnabled(tr_session* session, bool enabled)
 {
     TR_ASSERT(tr_isSession(session));
 
-    tr_rpcSetPasswordEnabled(session->rpc_server_.get(), isEnabled);
+    session->rpc_server_->setPasswordEnabled(enabled);
 }
 
 bool tr_sessionIsRPCPasswordEnabled(tr_session const* session)
 {
     TR_ASSERT(tr_isSession(session));
 
-    return tr_rpcIsPasswordEnabled(session->rpc_server_.get());
+    return session->rpc_server_->isPasswordEnabled();
 }
 
 char const* tr_sessionGetRPCBindAddress(tr_session const* session)

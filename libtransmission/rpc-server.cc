@@ -387,7 +387,7 @@ static bool isIPAddressWithOptionalPort(char const* host)
 static bool isHostnameAllowed(tr_rpc_server const* server, struct evhttp_request* req)
 {
     /* If password auth is enabled, any hostname is permitted. */
-    if (server->isPasswordEnabled)
+    if (server->isPasswordEnabled())
     {
         return true;
     }
@@ -438,7 +438,7 @@ static bool test_session_id(tr_rpc_server* server, evhttp_request const* req)
 
 static bool isAuthorized(tr_rpc_server const* server, char const* auth_header)
 {
-    if (!server->isPasswordEnabled)
+    if (!server->isPasswordEnabled())
     {
         return true;
     }
@@ -947,15 +947,10 @@ std::string const& tr_rpcGetPassword(tr_rpc_server const* server)
     return server->salted_password;
 }
 
-void tr_rpcSetPasswordEnabled(tr_rpc_server* server, bool isEnabled)
+void tr_rpc_server::setPasswordEnabled(bool enabled) noexcept
 {
-    server->isPasswordEnabled = isEnabled;
-    tr_logAddDebug(fmt::format("setting password-enabled to '{}'", isEnabled));
-}
-
-bool tr_rpcIsPasswordEnabled(tr_rpc_server const* server)
-{
-    return server->isPasswordEnabled;
+    is_password_enabled_ = enabled;
+    tr_logAddDebug(fmt::format("setting password-enabled to '{}'", enabled));
 }
 
 char const* tr_rpcGetBindAddress(tr_rpc_server const* server)
@@ -1084,7 +1079,7 @@ tr_rpc_server::tr_rpc_server(tr_session* session_in, tr_variant* settings)
     }
     else
     {
-        tr_rpcSetPasswordEnabled(this, boolVal);
+        this->setPasswordEnabled(boolVal);
     }
 
     key = TR_KEY_rpc_whitelist;
@@ -1186,7 +1181,7 @@ tr_rpc_server::tr_rpc_server(tr_session* session_in, tr_variant* settings)
             tr_logAddInfo(_("Whitelist enabled"));
         }
 
-        if (this->isPasswordEnabled)
+        if (this->isPasswordEnabled())
         {
             tr_logAddInfo(_("Password required"));
         }
