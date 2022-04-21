@@ -2541,12 +2541,12 @@ std::string const& tr_session::rpcWhitelist() const
 
 void tr_session::useRpcWhitelist(bool enabled) const
 {
-    tr_rpcSetWhitelistEnabled(this->rpc_server_.get(), enabled);
+    this->rpc_server_->setWhitelistEnabled(enabled);
 }
 
 bool tr_session::useRpcWhitelist() const
 {
-    return tr_rpcGetWhitelistEnabled(this->rpc_server_.get());
+    return this->rpc_server_->isWhitelistEnabled();
 }
 
 void tr_sessionSetRPCEnabled(tr_session* session, bool is_enabled)

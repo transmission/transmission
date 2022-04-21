@@ -42,12 +42,22 @@ public:
 
     void setPort(tr_port) noexcept;
 
-    [[nodiscard]] constexpr bool isEnabled() const noexcept
+    [[nodiscard]] constexpr auto isEnabled() const noexcept
     {
         return is_enabled_;
     }
 
     void setEnabled(bool is_enabled);
+
+    [[nodiscard]] constexpr auto isWhitelistEnabled() const noexcept
+    {
+        return is_whitelist_enabled_;
+    }
+
+    constexpr void setWhitelistEnabled(bool is_whitelist_enabled) noexcept
+    {
+        is_whitelist_enabled_ = is_whitelist_enabled;
+    }
 
     std::shared_ptr<libdeflate_compressor> compressor;
 
@@ -76,7 +86,7 @@ public:
     bool is_enabled_ = false;
     bool isHostWhitelistEnabled = false;
     bool isPasswordEnabled = false;
-    bool isWhitelistEnabled = false;
+    bool is_whitelist_enabled_ = false;
 };
 
 void tr_rpcSetUrl(tr_rpc_server* server, std::string_view url);
@@ -84,10 +94,6 @@ void tr_rpcSetUrl(tr_rpc_server* server, std::string_view url);
 std::string const& tr_rpcGetUrl(tr_rpc_server const* server);
 
 int tr_rpcSetTest(tr_rpc_server const* server, char const* whitelist, char** allocme_errmsg);
-
-void tr_rpcSetWhitelistEnabled(tr_rpc_server* server, bool isEnabled);
-
-bool tr_rpcGetWhitelistEnabled(tr_rpc_server const* server);
 
 void tr_rpcSetWhitelist(tr_rpc_server* server, std::string_view whitelist);
 

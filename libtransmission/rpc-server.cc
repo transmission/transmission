@@ -368,7 +368,7 @@ static bool isAddressAllowed(tr_rpc_server const* server, char const* address)
 {
     auto const& src = server->whitelist;
 
-    return !server->isWhitelistEnabled ||
+    return !server->isWhitelistEnabled() ||
         std::any_of(std::begin(src), std::end(src), [&address](auto const& s) { return tr_wildmat(address, s); });
 }
 
@@ -902,16 +902,6 @@ std::string const& tr_rpcGetWhitelist(tr_rpc_server const* server)
     return server->whitelistStr;
 }
 
-void tr_rpcSetWhitelistEnabled(tr_rpc_server* server, bool isEnabled)
-{
-    server->isWhitelistEnabled = isEnabled;
-}
-
-bool tr_rpcGetWhitelistEnabled(tr_rpc_server const* server)
-{
-    return server->isWhitelistEnabled;
-}
-
 static void tr_rpcSetHostWhitelistEnabled(tr_rpc_server* server, bool isEnabled)
 {
     server->isHostWhitelistEnabled = isEnabled;
@@ -1063,7 +1053,7 @@ tr_rpc_server::tr_rpc_server(tr_session* session_in, tr_variant* settings)
     }
     else
     {
-        tr_rpcSetWhitelistEnabled(this, boolVal);
+        this->setWhitelistEnabled(boolVal);
     }
 
     key = TR_KEY_rpc_host_whitelist_enabled;
@@ -1183,7 +1173,7 @@ tr_rpc_server::tr_rpc_server(tr_session* session_in, tr_variant* settings)
 
     if (bindAddress->type == TR_RPC_AF_UNIX)
     {
-        this->isWhitelistEnabled = false;
+        this->setWhitelistEnabled(false);
         this->isHostWhitelistEnabled = false;
     }
 
@@ -1193,7 +1183,7 @@ tr_rpc_server::tr_rpc_server(tr_session* session_in, tr_variant* settings)
         tr_logAddInfo(fmt::format(_("Serving RPC and Web requests on {address}"), fmt::arg("address", rpc_uri)));
         tr_runInEventThread(session, startServer, this);
 
-        if (this->isWhitelistEnabled)
+        if (this->isWhitelistEnabled())
         {
             tr_logAddInfo(_("Whitelist enabled"));
         }
