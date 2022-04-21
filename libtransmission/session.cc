@@ -2549,18 +2549,18 @@ bool tr_session::useRpcWhitelist() const
     return tr_rpcGetWhitelistEnabled(this->rpc_server_.get());
 }
 
-void tr_sessionSetRPCEnabled(tr_session* session, bool isEnabled)
+void tr_sessionSetRPCEnabled(tr_session* session, bool is_enabled)
 {
     TR_ASSERT(tr_isSession(session));
 
-    tr_rpcSetEnabled(session->rpc_server_.get(), isEnabled);
+    session->rpc_server_->setEnabled(is_enabled);
 }
 
 bool tr_sessionIsRPCEnabled(tr_session const* session)
 {
     TR_ASSERT(tr_isSession(session));
 
-    return tr_rpcIsEnabled(session->rpc_server_.get());
+    return session->rpc_server_->isEnabled();
 }
 
 void tr_sessionSetRPCPort(tr_session* session, uint16_t hport)

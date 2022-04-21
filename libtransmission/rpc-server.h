@@ -42,6 +42,13 @@ public:
 
     void setPort(tr_port) noexcept;
 
+    [[nodiscard]] constexpr bool isEnabled() const noexcept
+    {
+        return is_enabled_;
+    }
+
+    void setEnabled(bool is_enabled);
+
     std::shared_ptr<libdeflate_compressor> compressor;
 
     std::vector<std::string> hostWhitelist;
@@ -66,15 +73,11 @@ public:
     tr_port port_;
 
     bool isAntiBruteForceEnabled = false;
-    bool isEnabled = false;
+    bool is_enabled_ = false;
     bool isHostWhitelistEnabled = false;
     bool isPasswordEnabled = false;
     bool isWhitelistEnabled = false;
 };
-
-void tr_rpcSetEnabled(tr_rpc_server* server, bool isEnabled);
-
-bool tr_rpcIsEnabled(tr_rpc_server const* server);
 
 void tr_rpcSetUrl(tr_rpc_server* server, std::string_view url);
 

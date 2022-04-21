@@ -806,33 +806,28 @@ static void stopServer(tr_rpc_server* server)
         fmt::arg("address", tr_rpc_address_with_port(server))));
 }
 
-static void onEnabledChanged(tr_rpc_server* const server)
+void tr_rpc_server::setEnabled(bool is_enabled)
 {
-    if (!server->isEnabled)
-    {
-        stopServer(server);
-    }
-    else
-    {
-        startServer(server);
-    }
-}
+    is_enabled_ = is_enabled;
 
-void tr_rpcSetEnabled(tr_rpc_server* server, bool isEnabled)
-{
-    server->isEnabled = isEnabled;
-
-    tr_runInEventThread(server->session, onEnabledChanged, server);
-}
-
-bool tr_rpcIsEnabled(tr_rpc_server const* server)
-{
-    return server->isEnabled;
+    tr_runInEventThread(
+        this->session,
+        [this]()
+        {
+            if (!is_enabled_)
+            {
+                stopServer(this);
+            }
+            else
+            {
+                startServer(this);
+            }
+        });
 }
 
 static void restartServer(tr_rpc_server* const server)
 {
-    if (server->isEnabled)
+    if (server->isEnabled())
     {
         stopServer(server);
         startServer(server);
@@ -848,7 +843,7 @@ void tr_rpc_server::setPort(tr_port port) noexcept
 
     port_ = port;
 
-    if (isEnabled)
+    if (isEnabled())
     {
         tr_runInEventThread(session, restartServer, this);
     }
@@ -1031,7 +1026,7 @@ tr_rpc_server::tr_rpc_server(tr_session* session_in, tr_variant* settings)
     }
     else
     {
-        this->isEnabled = boolVal;
+        this->is_enabled_ = boolVal;
     }
 
     key = TR_KEY_rpc_port;
@@ -1192,7 +1187,7 @@ tr_rpc_server::tr_rpc_server(tr_session* session_in, tr_variant* settings)
         this->isHostWhitelistEnabled = false;
     }
 
-    if (this->isEnabled)
+    if (this->isEnabled())
     {
         auto const rpc_uri = tr_rpc_address_with_port(this) + this->url;
         tr_logAddInfo(fmt::format(_("Serving RPC and Web requests on {address}"), fmt::arg("address", rpc_uri)));
