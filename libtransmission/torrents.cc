@@ -96,17 +96,17 @@ void tr_torrents::remove(tr_torrent const* tor, time_t timestamp)
     removed_.emplace_back(tor->uniqueId, timestamp);
 }
 
-std::set<int> tr_torrents::removedSince(time_t timestamp) const
+std::vector<int> tr_torrents::removedSince(time_t timestamp) const
 {
-    auto ret = std::set<int>{};
+    auto ids = std::set<int>{};
 
     for (auto const& [id, removed_at] : removed_)
     {
         if (removed_at >= timestamp)
         {
-            ret.insert(id);
+            ids.insert(id);
         }
     }
 
-    return ret;
+    return { std::begin(ids), std::end(ids) };
 }

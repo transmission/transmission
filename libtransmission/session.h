@@ -15,13 +15,12 @@
 #include <cstddef> // size_t
 #include <cstdint> // uintX_t
 #include <ctime>
-#include <list>
-#include <map>
 #include <memory>
 #include <mutex>
 #include <string>
 #include <string_view>
 #include <tuple>
+#include <utility> // std::pair
 #include <vector>
 
 #include "transmission.h"
@@ -354,7 +353,7 @@ public:
     std::string resume_dir;
     std::string torrent_dir;
 
-    std::list<tr_blocklistFile*> blocklists;
+    std::vector<tr_blocklistFile*> blocklists;
     struct tr_peerMgr* peerMgr;
     struct tr_shared* shared;
 
@@ -400,7 +399,7 @@ public:
     // monitors the "global pool" speeds
     Bandwidth top_bandwidth_;
 
-    std::map<tr_interned_string, std::unique_ptr<Bandwidth>> bandwidth_groups_;
+    std::vector<std::pair<tr_interned_string, std::unique_ptr<Bandwidth>>> bandwidth_groups_;
 
     float desiredRatio;
 
