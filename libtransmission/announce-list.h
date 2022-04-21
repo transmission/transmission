@@ -87,8 +87,6 @@ public:
         return trackers_.at(i);
     }
 
-    [[nodiscard]] std::set<tr_tracker_tier_t> tiers() const;
-
     [[nodiscard]] tr_tracker_tier_t nextTier() const;
 
     [[nodiscard]] bool operator==(tr_announce_list const& that) const
