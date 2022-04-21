@@ -2786,14 +2786,14 @@ void tr_sessionSetAntiBruteForceEnabled(tr_session* session, bool is_enabled)
 {
     TR_ASSERT(tr_isSession(session));
 
-    tr_rpcSetAntiBruteForceEnabled(session->rpc_server_.get(), is_enabled);
+    session->rpc_server_->setAntiBruteForceEnabled(is_enabled);
 }
 
 bool tr_sessionGetAntiBruteForceEnabled(tr_session const* session)
 {
     TR_ASSERT(tr_isSession(session));
 
-    return tr_rpcGetAntiBruteForceEnabled(session->rpc_server_.get());
+    return session->rpc_server_->isAntiBruteForceEnabled();
 }
 
 int tr_sessionGetAntiBruteForceThreshold(tr_session const* session)

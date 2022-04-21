@@ -469,7 +469,7 @@ static void handle_request(struct evhttp_request* req, void* arg)
     {
         evhttp_add_header(req->output_headers, "Server", MY_REALM);
 
-        if (server->isAntiBruteForceEnabled && server->loginattempts >= server->antiBruteForceThreshold)
+        if (server->isAntiBruteForceEnabled() && server->login_attempts_ >= server->antiBruteForceThreshold)
         {
             send_simple_response(req, 403, "<p>Too many unsuccessful login attempts. Please restart transmission-daemon.</p>");
             return;
@@ -505,19 +505,19 @@ static void handle_request(struct evhttp_request* req, void* arg)
         if (!isAuthorized(server, evhttp_find_header(req->input_headers, "Authorization")))
         {
             evhttp_add_header(req->output_headers, "WWW-Authenticate", "Basic realm=\"" MY_REALM "\"");
-            if (server->isAntiBruteForceEnabled)
+            if (server->isAntiBruteForceEnabled())
             {
-                ++server->loginattempts;
+                ++server->login_attempts_;
             }
 
             auto const unauthuser = fmt::format(
                 FMT_STRING("<p>Unauthorized User. {:d} unsuccessful login attempts.</p>"),
-                server->loginattempts);
+                server->login_attempts_);
             send_simple_response(req, 401, unauthuser.c_str());
             return;
         }
 
-        server->loginattempts = 0;
+        server->login_attempts_ = 0;
 
         auto uri = std::string_view{ req->uri };
         auto const location = tr_strvStartsWith(uri, server->url) ? uri.substr(std::size(server->url)) : ""sv;
@@ -954,17 +954,13 @@ char const* tr_rpcGetBindAddress(tr_rpc_server const* server)
     return tr_rpc_address_to_string(*server->bindAddress, addr_buf, sizeof(addr_buf));
 }
 
-bool tr_rpcGetAntiBruteForceEnabled(tr_rpc_server const* server)
+void tr_rpc_server::setAntiBruteForceEnabled(bool enabled) noexcept
 {
-    return server->isAntiBruteForceEnabled;
-}
+    is_anti_brute_force_enabled_ = enabled;
 
-void tr_rpcSetAntiBruteForceEnabled(tr_rpc_server* server, bool isEnabled)
-{
-    server->isAntiBruteForceEnabled = isEnabled;
-    if (!isEnabled)
+    if (!enabled)
     {
-        server->loginattempts = 0;
+        login_attempts_ = 0;
     }
 }
 
@@ -1118,7 +1114,7 @@ tr_rpc_server::tr_rpc_server(tr_session* session_in, tr_variant* settings)
     }
     else
     {
-        tr_rpcSetAntiBruteForceEnabled(this, boolVal);
+        this->setAntiBruteForceEnabled(boolVal);
     }
 
     key = TR_KEY_anti_brute_force_threshold;

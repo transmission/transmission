@@ -80,6 +80,13 @@ public:
 
     void setPassword(std::string_view salted) noexcept;
 
+    [[nodiscard]] constexpr auto isAntiBruteForceEnabled() const noexcept
+    {
+        return is_anti_brute_force_enabled_;
+    }
+
+    void setAntiBruteForceEnabled(bool enabled) noexcept;
+
     std::shared_ptr<libdeflate_compressor> compressor;
 
     std::vector<std::string> hostWhitelist;
@@ -97,14 +104,14 @@ public:
     tr_session* const session;
 
     int antiBruteForceThreshold = 0;
-    int loginattempts = 0;
+    int login_attempts_ = 0;
     int start_retry_counter = 0;
     static int constexpr DefaultRpcSocketMode = 0750;
     int rpc_socket_mode = DefaultRpcSocketMode;
 
     tr_port port_;
 
-    bool isAntiBruteForceEnabled = false;
+    bool is_anti_brute_force_enabled_ = false;
     bool is_enabled_ = false;
     bool isHostWhitelistEnabled = false;
     bool is_password_enabled_ = false;
@@ -122,10 +129,6 @@ int tr_rpcGetRPCSocketMode(tr_rpc_server const* server);
 void tr_rpcSetUsername(tr_rpc_server* server, std::string_view username);
 
 std::string const& tr_rpcGetUsername(tr_rpc_server const* server);
-
-bool tr_rpcGetAntiBruteForceEnabled(tr_rpc_server const* server);
-
-void tr_rpcSetAntiBruteForceEnabled(tr_rpc_server* server, bool is_enabled);
 
 int tr_rpcGetAntiBruteForceThreshold(tr_rpc_server const* server);
 
