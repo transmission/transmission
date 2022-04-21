@@ -161,7 +161,7 @@ static void rebind_ipv6(tr_session* ss, bool force)
         memcpy(&sin6.sin6_addr, ipv6, 16);
     }
 
-    sin6.sin6_port = htons(ss->udp_port);
+    sin6.sin6_port = ss->udp_port.network();
 
     rc = bind(s, (struct sockaddr*)&sin6, sizeof(sin6));
 
@@ -277,9 +277,8 @@ void tr_udpInit(tr_session* ss)
     TR_ASSERT(ss->udp_socket == TR_BAD_SOCKET);
     TR_ASSERT(ss->udp6_socket == TR_BAD_SOCKET);
 
-    ss->udp_port = tr_sessionGetPeerPort(ss);
-
-    if (ss->udp_port <= 0)
+    ss->udp_port = ss->peerPort();
+    if (std::empty(ss->udp_port))
     {
         return;
     }
@@ -302,7 +301,7 @@ void tr_udpInit(tr_session* ss)
             memcpy(&sin.sin_addr, &public_addr->addr.addr4, sizeof(struct in_addr));
         }
 
-        sin.sin_port = htons(ss->udp_port);
+        sin.sin_port = ss->udp_port.network();
         int const rc = bind(ss->udp_socket, (struct sockaddr*)&sin, sizeof(sin));
 
         if (rc == -1)

@@ -337,6 +337,16 @@ public:
      */
     tr_port public_peer_port;
 
+    [[nodiscard]] constexpr auto peerPort() const noexcept
+    {
+        return public_peer_port;
+    }
+
+    constexpr auto setPeerPort(tr_port port) noexcept
+    {
+        public_peer_port = port;
+    }
+
     tr_port randomPortLow;
     tr_port randomPortHigh;
 
@@ -425,11 +435,6 @@ private:
     bool blocklist_enabled_ = false;
     bool incomplete_dir_enabled_ = false;
 };
-
-constexpr tr_port tr_sessionGetPublicPeerPort(tr_session const* session)
-{
-    return session->public_peer_port;
-}
 
 bool tr_sessionAllowsDHT(tr_session const* session);
 

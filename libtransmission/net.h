@@ -9,9 +9,11 @@
 #endif
 
 #include <cstddef> // size_t
+#include <cstdint> // uint8_t
 #include <optional>
 #include <string>
 #include <string_view>
+#include <utility> // std::pair
 
 #ifdef _WIN32
 #include <ws2tcpip.h>
@@ -70,6 +72,82 @@ enum tr_address_type
 struct tr_address;
 
 [[nodiscard]] int tr_address_compare(tr_address const* a, tr_address const* b) noexcept;
+
+/**
+ * Literally just a port number.
+ *
+ * Exists so that you never have to wonder what byte order a port variable is in.
+ */
+class tr_port
+{
+public:
+    tr_port() noexcept = default;
+
+    [[nodiscard]] constexpr static tr_port fromHost(uint16_t hport) noexcept
+    {
+        return tr_port{ hport };
+    }
+
+    [[nodiscard]] static tr_port fromNetwork(uint16_t nport) noexcept
+    {
+        return tr_port{ ntohs(nport) };
+    }
+
+    [[nodiscard]] constexpr uint16_t host() const noexcept
+    {
+        return hport_;
+    }
+
+    [[nodiscard]] uint16_t network() const noexcept
+    {
+        return htons(hport_);
+    }
+
+    constexpr void setHost(uint16_t hport) noexcept
+    {
+        hport_ = hport;
+    }
+
+    void setNetwork(uint16_t nport) noexcept
+    {
+        hport_ = ntohs(nport);
+    }
+
+    [[nodiscard]] static std::pair<tr_port, uint8_t const*> fromCompact(uint8_t const* compact) noexcept;
+
+    [[nodiscard]] constexpr auto operator<(tr_port const& that) const noexcept
+    {
+        return hport_ < that.hport_;
+    }
+
+    [[nodiscard]] constexpr auto operator==(tr_port const& that) const noexcept
+    {
+        return hport_ == that.hport_;
+    }
+
+    [[nodiscard]] constexpr auto operator!=(tr_port const& that) const noexcept
+    {
+        return hport_ != that.hport_;
+    }
+
+    [[nodiscard]] constexpr auto empty() const noexcept
+    {
+        return hport_ == 0;
+    }
+
+    constexpr void clear() noexcept
+    {
+        hport_ = 0;
+    }
+
+private:
+    constexpr tr_port(uint16_t hport) noexcept
+        : hport_{ hport }
+    {
+    }
+
+    uint16_t hport_ = 0;
+};
 
 struct tr_address
 {

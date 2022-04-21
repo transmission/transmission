@@ -10,6 +10,7 @@
 #include <cstdint>
 #include <cstdlib> /* qsort */
 #include <ctime> // time_t
+#include <tuple> // std::tie
 #include <iterator> // std::back_inserter
 #include <map>
 #include <vector>
@@ -1122,16 +1123,15 @@ size_t tr_peerMgrAddPex(tr_torrent* tor, uint8_t from, tr_pex const* pex, size_t
 std::vector<tr_pex> tr_peerMgrCompactToPex(void const* compact, size_t compactLen, uint8_t const* added_f, size_t added_f_len)
 {
     size_t n = compactLen / 6;
-    auto const* walk = static_cast<std::byte const*>(compact);
+    auto const* walk = static_cast<uint8_t const*>(compact);
     auto pex = std::vector<tr_pex>(n);
 
     for (size_t i = 0; i < n; ++i)
     {
         pex[i].addr.type = TR_AF_INET;
-        std::copy_n(walk, 4, reinterpret_cast<std::byte*>(&pex[i].addr.addr));
+        std::copy_n(walk, 4, reinterpret_cast<uint8_t*>(&pex[i].addr.addr));
         walk += 4;
-        std::copy_n(walk, 2, reinterpret_cast<std::byte*>(&pex[i].port));
-        walk += 2;
+        std::tie(pex[i].port, walk) = tr_port::fromCompact(walk);
 
         if (added_f != nullptr && n == added_f_len)
         {
@@ -1145,16 +1145,15 @@ std::vector<tr_pex> tr_peerMgrCompactToPex(void const* compact, size_t compactLe
 std::vector<tr_pex> tr_peerMgrCompact6ToPex(void const* compact, size_t compactLen, uint8_t const* added_f, size_t added_f_len)
 {
     size_t n = compactLen / 18;
-    auto const* walk = static_cast<std::byte const*>(compact);
+    auto const* walk = static_cast<uint8_t const*>(compact);
     auto pex = std::vector<tr_pex>(n);
 
     for (size_t i = 0; i < n; ++i)
     {
         pex[i].addr.type = TR_AF_INET6;
-        std::copy_n(walk, 16, reinterpret_cast<std::byte*>(&pex[i].addr.addr.addr6.s6_addr));
+        std::copy_n(walk, 16, reinterpret_cast<uint8_t*>(&pex[i].addr.addr.addr6.s6_addr));
         walk += 16;
-        std::copy_n(walk, 2, reinterpret_cast<std::byte*>(&pex[i].port));
-        walk += 2;
+        std::tie(pex[i].port, walk) = tr_port::fromCompact(walk);
 
         if (added_f != nullptr && n == added_f_len)
         {
@@ -1311,7 +1310,10 @@ int tr_peerMgrGetPeers(tr_torrent const* tor, tr_pex** setme_pex, uint8_t af, ui
         }
     }
 
-    qsort(atoms, atomCount, sizeof(struct peer_atom*), compareAtomsByUsefulness);
+    if (atoms != nullptr)
+    {
+        qsort(atoms, atomCount, sizeof(struct peer_atom*), compareAtomsByUsefulness);
+    }
 
     /**
     ***  add the first N of them into our return list
@@ -1338,7 +1340,10 @@ int tr_peerMgrGetPeers(tr_torrent const* tor, tr_pex** setme_pex, uint8_t af, ui
         }
     }
 
-    qsort(pex, count, sizeof(tr_pex), tr_pexCompare);
+    if (pex != nullptr)
+    {
+        qsort(pex, count, sizeof(tr_pex), tr_pexCompare);
+    }
 
     TR_ASSERT(walk - pex == count);
     *setme_pex = pex;
@@ -1647,7 +1652,7 @@ static auto getPeerStats(tr_peerMsgs const* peer, time_t now, uint64_t now_msec)
 
     tr_address_to_string_with_buf(&atom->addr, stats.addr, sizeof(stats.addr));
     stats.client = peer->client.c_str();
-    stats.port = ntohs(peer->atom->port);
+    stats.port = peer->atom->port.host();
     stats.from = atom->fromFirst;
     stats.progress = peer->progress;
     stats.isUTP = peer->is_utp_connection();

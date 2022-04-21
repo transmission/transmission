@@ -16,6 +16,7 @@
 #include "bitfield.h"
 #include "history.h"
 #include "interned-string.h"
+#include "net.h" // tr_port
 
 /**
  * @addtogroup peers Peers
