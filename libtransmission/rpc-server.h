@@ -80,7 +80,7 @@ public:
 
     void setPasswordEnabled(bool enabled);
 
-    [[nodiscard]] constexpr auto const& getSaltedPassword()
+    [[nodiscard]] constexpr auto const& getSaltedPassword() const noexcept
     {
         return salted_password_;
     }
