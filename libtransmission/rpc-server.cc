@@ -469,7 +469,7 @@ static void handle_request(struct evhttp_request* req, void* arg)
     {
         evhttp_add_header(req->output_headers, "Server", MY_REALM);
 
-        if (server->isAntiBruteForceEnabled() && server->login_attempts_ >= server->antiBruteForceThreshold)
+        if (server->isAntiBruteForceEnabled() && server->login_attempts_ >= server->anti_brute_force_limit_)
         {
             send_simple_response(req, 403, "<p>Too many unsuccessful login attempts. Please restart transmission-daemon.</p>");
             return;
@@ -964,16 +964,6 @@ void tr_rpc_server::setAntiBruteForceEnabled(bool enabled) noexcept
     }
 }
 
-int tr_rpcGetAntiBruteForceThreshold(tr_rpc_server const* server)
-{
-    return server->antiBruteForceThreshold;
-}
-
-void tr_rpcSetAntiBruteForceThreshold(tr_rpc_server* server, int badRequests)
-{
-    server->antiBruteForceThreshold = badRequests;
-}
-
 /****
 *****  LIFE CYCLE
 ****/
@@ -1125,7 +1115,7 @@ tr_rpc_server::tr_rpc_server(tr_session* session_in, tr_variant* settings)
     }
     else
     {
-        tr_rpcSetAntiBruteForceThreshold(this, i);
+        this->setAntiBruteForceLimit(i);
     }
 
     key = TR_KEY_rpc_socket_mode;

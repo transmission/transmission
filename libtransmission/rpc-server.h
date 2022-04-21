@@ -87,6 +87,16 @@ public:
 
     void setAntiBruteForceEnabled(bool enabled) noexcept;
 
+    [[nodiscard]] constexpr auto getAntiBruteForceLimit() const noexcept
+    {
+        return anti_brute_force_limit_;
+    }
+
+    constexpr void setAntiBruteForceLimit(int limit) noexcept
+    {
+        anti_brute_force_limit_ = limit;
+    }
+
     std::shared_ptr<libdeflate_compressor> compressor;
 
     std::vector<std::string> hostWhitelist;
@@ -103,7 +113,7 @@ public:
     struct evhttp* httpd = nullptr;
     tr_session* const session;
 
-    int antiBruteForceThreshold = 0;
+    int anti_brute_force_limit_ = 0;
     int login_attempts_ = 0;
     int start_retry_counter = 0;
     static int constexpr DefaultRpcSocketMode = 0750;
@@ -129,9 +139,5 @@ int tr_rpcGetRPCSocketMode(tr_rpc_server const* server);
 void tr_rpcSetUsername(tr_rpc_server* server, std::string_view username);
 
 std::string const& tr_rpcGetUsername(tr_rpc_server const* server);
-
-int tr_rpcGetAntiBruteForceThreshold(tr_rpc_server const* server);
-
-void tr_rpcSetAntiBruteForceThreshold(tr_rpc_server* server, int badRequests);
 
 char const* tr_rpcGetBindAddress(tr_rpc_server const* server);

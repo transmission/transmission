@@ -2775,11 +2775,19 @@ int tr_sessionGetQueueStalledMinutes(tr_session const* session)
     return session->queueStalledMinutes;
 }
 
-void tr_sessionSetAntiBruteForceThreshold(tr_session* session, int bad_requests)
+void tr_sessionSetAntiBruteForceThreshold(tr_session* session, int limit)
 {
     TR_ASSERT(tr_isSession(session));
-    TR_ASSERT(bad_requests > 0);
-    tr_rpcSetAntiBruteForceThreshold(session->rpc_server_.get(), bad_requests);
+    TR_ASSERT(limit > 0);
+
+    session->rpc_server_->setAntiBruteForceLimit(limit);
+}
+
+int tr_sessionGetAntiBruteForceThreshold(tr_session const* session)
+{
+    TR_ASSERT(tr_isSession(session));
+
+    return session->rpc_server_->getAntiBruteForceLimit();
 }
 
 void tr_sessionSetAntiBruteForceEnabled(tr_session* session, bool is_enabled)
@@ -2794,13 +2802,6 @@ bool tr_sessionGetAntiBruteForceEnabled(tr_session const* session)
     TR_ASSERT(tr_isSession(session));
 
     return session->rpc_server_->isAntiBruteForceEnabled();
-}
-
-int tr_sessionGetAntiBruteForceThreshold(tr_session const* session)
-{
-    TR_ASSERT(tr_isSession(session));
-
-    return tr_rpcGetAntiBruteForceThreshold(session->rpc_server_.get());
 }
 
 std::vector<tr_torrent*> tr_sessionGetNextQueuedTorrents(tr_session* session, tr_direction direction, size_t num_wanted)
