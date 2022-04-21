@@ -14,7 +14,7 @@
 #include <iterator> // std::back_inserter
 #include <list>
 #include <memory>
-#include <numeric> // std::acumulate()
+#include <numeric> // std::accumulate()
 #include <string>
 #include <string_view>
 #include <tuple>

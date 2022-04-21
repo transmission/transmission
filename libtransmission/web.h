@@ -57,7 +57,7 @@ public:
         // Tag used by tr_web::Mediator to limit some transfers' bandwidth
         std::optional<int> speed_limit_tag;
 
-        // Optionaly set the underlying sockets' send/receive buffers' size.
+        // Optionally set the underlying sockets' send/receive buffers' size.
         // Can be used to conserve resources for scrapes and announces, where
         // the payload is known to be small.
         std::optional<int> sndbuf;
@@ -76,7 +76,7 @@ public:
 
     void fetch(FetchOptions&& options);
 
-    // Notify tr_web that it's going to be destroyed sooon.
+    // Notify tr_web that it's going to be destroyed soon.
     // New fetch() tasks will be rejected, but already-running tasks
     // are left alone so that they can finish.
     void closeSoon();

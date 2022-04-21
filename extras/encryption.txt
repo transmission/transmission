@@ -90,7 +90,7 @@ Protocols w/o unique stream properties may use a constant.
 
 
 IA = initial payload data from A
-may be 0-sized if you want to wait for the encryption negotation.
+may be 0-sized if you want to wait for the encryption negotiation.
 
 Peer A may buffer up to 65535 bytes before or during the DH handshake to append
 it to the 3rd step. IA is considered as atomic and thus an implementation may
@@ -116,7 +116,7 @@ ENCRYPT() is RC4, that uses one of the following keys to send data:
 The first 1024 bytes of the RC4 output are discarded.
 consecutive calls to ENCRYPT() by one side continue the encryption
 stream (no reinitialization, no keychange). They are only used to distinguish
-semantically seperate content.
+semantically separate content.
 
 
 ENCRYPT2() is the negotiated crypto method.
@@ -148,7 +148,7 @@ A will be able to resynchronize on ENCRYPT(VC)
 ##### Optional early termination conditions
 (should verified before the indicated step is started).
 
-If a fail-fast behavior is prefered the following conditions can be used to
+If a fail-fast behavior is preferred, the following conditions can be used to
 disconnect the peer immediately. If less recognizable patterns are preferred
 a peer may wait and disconnect at a later point. If any of these conditions
 are met the handshake can be considered as invalid.

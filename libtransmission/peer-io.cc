@@ -1236,7 +1236,7 @@ static int tr_peerIoTryRead(tr_peerIo* io, size_t howmuch)
     switch (io->socket.type)
     {
     case TR_PEER_SOCKET_TYPE_UTP:
-        /* UTP_RBDrained notifies libutp that your read buffer is emtpy.
+        /* UTP_RBDrained notifies libutp that your read buffer is empty.
          * It opens up the congestion window by sending an ACK (soonish)
          * if one was not going to be sent. */
         if (evbuffer_get_length(io->inbuf.get()) == 0)

@@ -793,7 +793,7 @@ static ReadState readCryptoProvide(tr_handshake* handshake, struct evbuffer* inb
     evbuffer_drain(inbuf, SHA_DIGEST_LENGTH);
 
     /* This next piece is HASH('req2', SKEY) xor HASH('req3', S) ...
-     * we can get the first half of that (the obufscatedTorrentHash)
+     * we can get the first half of that (the obfuscatedTorrentHash)
      * by building the latter and xor'ing it with what the peer sent us */
     tr_logAddTraceHand(handshake, "reading obfuscated torrent hash...");
     auto req2 = tr_sha1_digest_t{};

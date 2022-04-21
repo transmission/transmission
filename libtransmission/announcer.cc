@@ -1158,7 +1158,7 @@ static void on_announce_done(tr_announce_response const* response, void* vdata)
 
             if (!isStopped && std::empty(tier->announce_events))
             {
-                /* the queue is empty, so enqueue a perodic update */
+                /* the queue is empty, so enqueue a periodic update */
                 int const i = tier->announceIntervalSec;
                 tr_logAddTraceTier(tier, fmt::format("Sending periodic reannounce in {} seconds", i));
                 tier_announce_event_push(tier, TR_ANNOUNCE_EVENT_NONE, now + i);

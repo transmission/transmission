@@ -187,7 +187,7 @@ TEST(Crypto, sha1FromString)
     EXPECT_FALSE(tr_sha1_from_string("a94a8fe5ccb19ba61c4cz873d391e987982fbbd3"sv));
     EXPECT_FALSE(tr_sha1_from_string("a94a8fe5ccb19  61c4c0873d391e987982fbbd3"sv));
 
-    // lowecase hex
+    // lowercase hex
     auto const baseline = "a94a8fe5ccb19ba61c4c0873d391e987982fbbd3"sv;
     auto const lc = tr_sha1_from_string(baseline);
     EXPECT_TRUE(lc);

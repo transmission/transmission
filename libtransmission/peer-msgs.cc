@@ -2352,7 +2352,7 @@ static void tellPeerWhatWeHave(tr_peerMsgsImpl* msgs)
 
 /* some peers give us error messages if we send
    more than this many peers in a single pex message
-   http://wiki.theory.org/BitTorrentPeerExchangeConventions */
+   https://wiki.theory.org/BitTorrentPeerExchangeConventions */
 static auto constexpr MaxPexAdded = int{ 50 };
 static auto constexpr MaxPexDropped = int{ 50 };
 
