@@ -1361,8 +1361,8 @@
     BOOL const useIncomplete = tr_sessionIsIncompleteDirEnabled(self.fHandle);
     [self.fDefaults setBool:useIncomplete forKey:@"UseIncompleteDownloadFolder"];
 
-    BOOL const usePartialFileRanaming = tr_sessionIsIncompleteFileNamingEnabled(self.fHandle);
-    [self.fDefaults setBool:usePartialFileRanaming forKey:@"RenamePartialFiles"];
+    BOOL const usePartialFileRenaming = tr_sessionIsIncompleteFileNamingEnabled(self.fHandle);
+    [self.fDefaults setBool:usePartialFileRenaming forKey:@"RenamePartialFiles"];
 
     //utp
     BOOL const utp = tr_sessionIsUTPEnabled(self.fHandle);

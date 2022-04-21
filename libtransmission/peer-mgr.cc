@@ -1493,7 +1493,7 @@ void tr_peerMgrOnTorrentGotMetainfo(tr_torrent* tor)
         tr_peerUpdateProgress(tor, peers[i]);
     }
 
-    /* update the bittorrent peers' willingnes... */
+    /* update the bittorrent peers' willingness... */
     for (int i = 0; i < peerCount; ++i)
     {
         auto* msgs = static_cast<tr_peerMsgs*>(peers[i]);

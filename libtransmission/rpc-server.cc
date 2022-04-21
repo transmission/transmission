@@ -55,8 +55,8 @@ using namespace std::literals;
 
 /* session-id is used to make cross-site request forgery attacks difficult.
  * Don't disable this feature unless you really know what you're doing!
- * http://en.wikipedia.org/wiki/Cross-site_request_forgery
- * http://shiflett.org/articles/cross-site-request-forgeries
+ * https://en.wikipedia.org/wiki/Cross-site_request_forgery
+ * https://shiflett.org/articles/cross-site-request-forgeries
  * http://www.webappsec.org/lists/websecurity/archive/2008-04/msg00037.html */
 #define REQUIRE_SESSION_ID
 

@@ -464,7 +464,7 @@ bool tr_lpdSendAnnounce(tr_torrent const* t)
 * @brief Process incoming unsolicited messages and add the peer to the announced
 * torrent if all checks are passed.
 *
-* @param[in,out] peer Adress information of the peer to add
+* @param[in,out] peer Address information of the peer to add
 * @param[in] msg The announcement message to consider
 * @return Returns 0 if any input parameter or the announce was invalid, 1 if the peer
 * was successfully added, -1 if not; a non-null return value indicates a side-effect to

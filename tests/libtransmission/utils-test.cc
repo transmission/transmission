@@ -286,10 +286,10 @@ TEST_F(UtilsTest, trStrlcpy)
 
         destination.fill(initial_char);
 
-        auto responce = tr_strlcpy(&destination, c_string, 98);
+        auto response = tr_strlcpy(&destination, c_string, 98);
 
         // Check response length
-        ASSERT_EQ(responce, length);
+        ASSERT_EQ(response, length);
 
         // Check what was copied
         for (unsigned i = 0U; i < 97U; ++i)

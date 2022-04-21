@@ -965,10 +965,10 @@ enum
 };
 
 /**
- * @brief Tell transmsision where to find this torrent's local data.
+ * @brief Tell transmission where to find this torrent's local data.
  *
  * if move_from_previous_location is `true', the torrent's incompleteDir
- * will be clobberred s.t. additional files being added will be saved
+ * will be clobbered s.t. additional files being added will be saved
  * to the torrent's downloadDir.
  */
 void tr_torrentSetLocation(
@@ -1308,7 +1308,7 @@ enum tr_tracker_state
      * waiting for enough time to pass to satisfy the tracker's interval */
     TR_TRACKER_WAITING = 1,
     /* it's time to (announce,scrape) this torrent, and we're waiting on a
-     * a free slot to open up in the announce manager */
+     * free slot to open up in the announce manager */
     TR_TRACKER_QUEUED = 2,
     /* we're (announcing,scraping) this torrent right now */
     TR_TRACKER_ACTIVE = 3
@@ -1488,9 +1488,9 @@ enum tr_stat_errtype
 {
     /* everything's fine */
     TR_STAT_OK = 0,
-    /* when we anounced to the tracker, we got a warning in the response */
+    /* when we announced to the tracker, we got a warning in the response */
     TR_STAT_TRACKER_WARNING = 1,
-    /* when we anounced to the tracker, we got an error in the response */
+    /* when we announced to the tracker, we got an error in the response */
     TR_STAT_TRACKER_ERROR = 2,
     /* local trouble, such as disk full or permissions error */
     TR_STAT_LOCAL_ERROR = 3
