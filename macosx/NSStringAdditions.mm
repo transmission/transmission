@@ -137,8 +137,7 @@
     NSUInteger const fullLength = self.length;
     do
     {
-        NSUInteger const start = [self rangeOfCharacterFromSet:includedCharSet options:0
-                                                         range:NSMakeRange(index, fullLength - index)]
+        NSUInteger const start = [self rangeOfCharacterFromSet:includedCharSet options:0 range:NSMakeRange(index, fullLength - index)]
                                      .location;
         if (start == NSNotFound)
         {
