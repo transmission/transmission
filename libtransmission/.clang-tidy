@@ -7,7 +7,6 @@ Checks: >
   -bugprone-implicit-widening-of-multiplication-result,
   -bugprone-narrowing-conversions,
   cert-*,
-  -cert-err33-c,
   -cert-err34-c,
   -cert-err58-cpp,
   clang-analyzer-core.*,

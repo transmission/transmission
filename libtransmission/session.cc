@@ -28,6 +28,7 @@
 
 #include <event2/event.h>
 
+#include <fmt/chrono.h>
 #include <fmt/core.h>
 #include <fmt/format.h> // fmt::ptr
 
@@ -724,7 +725,7 @@ static void tr_sessionInitImpl(init_data* data)
 
 #ifndef _WIN32
     /* Don't exit when writing on a broken socket */
-    signal(SIGPIPE, SIG_IGN);
+    (void)signal(SIGPIPE, SIG_IGN);
 #endif
 
     tr_logSetQueueEnabled(data->messageQueuingEnabled);
@@ -1466,9 +1467,8 @@ static void useAltSpeed(tr_session* s, struct tr_turtle_info* t, bool enabled, b
  */
 static bool getInTurtleTime(struct tr_turtle_info const* t)
 {
-    time_t const now = tr_time();
-    struct tm tm;
-    tr_localtime_r(&now, &tm);
+    auto const now = tr_time();
+    struct tm const tm = fmt::localtime(now);
 
     size_t minute_of_the_week = tm.tm_wday * MinutesPerDay + tm.tm_hour * MinutesPerHour + tm.tm_min;
 
