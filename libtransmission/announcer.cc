@@ -734,15 +734,15 @@ static void tr_logAddTrace_tier_announce_queue(tr_tier const* tier)
         return;
     }
 
-    auto* const buf = evbuffer_new();
-    for (size_t i = 0, n = std::size(tier->announce_events); i < n; ++i)
+    auto buf = std::string{};
+    auto const& events = tier->announce_events;
+    buf.reserve(std::size(events) * 20);
+    for (size_t i = 0, n = std::size(events); i < n; ++i)
     {
-        tr_announce_event const e = tier->announce_events[i];
-        char const* str = tr_announce_event_get_string(e);
-        evbuffer_add_printf(buf, "[%zu:%s]", i, str);
+        fmt::format_to(std::back_inserter(buf), FMT_STRING("[{:d}:{:s}]"), i, tr_announce_event_get_string(events[i]));
     }
 
-    tr_logAddTraceTier(tier, evbuffer_free_to_str(buf));
+    tr_logAddTraceTier(tier, buf);
 }
 
 // higher priorities go to the front of the announce queue
