@@ -42,14 +42,90 @@ public:
 
     void setPort(tr_port) noexcept;
 
+    [[nodiscard]] constexpr auto isEnabled() const noexcept
+    {
+        return is_enabled_;
+    }
+
+    void setEnabled(bool is_enabled);
+
+    [[nodiscard]] constexpr auto isWhitelistEnabled() const noexcept
+    {
+        return is_whitelist_enabled_;
+    }
+
+    constexpr void setWhitelistEnabled(bool is_whitelist_enabled) noexcept
+    {
+        is_whitelist_enabled_ = is_whitelist_enabled;
+    }
+
+    [[nodiscard]] constexpr auto const& whitelist() const noexcept
+    {
+        return whitelist_str_;
+    }
+
+    void setWhitelist(std::string_view whitelist);
+
+    [[nodiscard]] constexpr auto const& username() const noexcept
+    {
+        return username_;
+    }
+
+    void setUsername(std::string_view username);
+
+    [[nodiscard]] constexpr auto isPasswordEnabled() const noexcept
+    {
+        return is_password_enabled_;
+    }
+
+    void setPasswordEnabled(bool enabled);
+
+    [[nodiscard]] constexpr auto const& getSaltedPassword() const noexcept
+    {
+        return salted_password_;
+    }
+
+    void setPassword(std::string_view salted) noexcept;
+
+    [[nodiscard]] constexpr auto isAntiBruteForceEnabled() const noexcept
+    {
+        return is_anti_brute_force_enabled_;
+    }
+
+    void setAntiBruteForceEnabled(bool enabled) noexcept;
+
+    [[nodiscard]] constexpr auto getAntiBruteForceLimit() const noexcept
+    {
+        return anti_brute_force_limit_;
+    }
+
+    constexpr void setAntiBruteForceLimit(int limit) noexcept
+    {
+        anti_brute_force_limit_ = limit;
+    }
+
     std::shared_ptr<libdeflate_compressor> compressor;
 
+    [[nodiscard]] constexpr auto const& url() const noexcept
+    {
+        return url_;
+    }
+
+    void setUrl(std::string_view url);
+
+    [[nodiscard]] std::string getBindAddress() const;
+
+    [[nodiscard]] constexpr auto socketMode() const noexcept
+    {
+        return socket_mode_;
+    }
+
     std::vector<std::string> hostWhitelist;
-    std::vector<std::string> whitelist;
-    std::string salted_password;
-    std::string username;
-    std::string whitelistStr;
-    std::string url;
+    std::vector<std::string> whitelist_;
+    std::string salted_password_;
+    std::string username_;
+    std::string whitelist_str_;
+    std::string url_;
 
     std::unique_ptr<struct tr_rpc_address> bindAddress;
 
@@ -57,59 +133,17 @@ public:
     struct evhttp* httpd = nullptr;
     tr_session* const session;
 
-    int antiBruteForceThreshold = 0;
-    int loginattempts = 0;
+    int anti_brute_force_limit_ = 0;
+    int login_attempts_ = 0;
     int start_retry_counter = 0;
     static int constexpr DefaultRpcSocketMode = 0750;
-    int rpc_socket_mode = DefaultRpcSocketMode;
+    int socket_mode_ = DefaultRpcSocketMode;
 
     tr_port port_;
 
-    bool isAntiBruteForceEnabled = false;
-    bool isEnabled = false;
+    bool is_anti_brute_force_enabled_ = false;
+    bool is_enabled_ = false;
     bool isHostWhitelistEnabled = false;
-    bool isPasswordEnabled = false;
-    bool isWhitelistEnabled = false;
+    bool is_password_enabled_ = false;
+    bool is_whitelist_enabled_ = false;
 };
-
-void tr_rpcSetEnabled(tr_rpc_server* server, bool isEnabled);
-
-bool tr_rpcIsEnabled(tr_rpc_server const* server);
-
-void tr_rpcSetUrl(tr_rpc_server* server, std::string_view url);
-
-std::string const& tr_rpcGetUrl(tr_rpc_server const* server);
-
-int tr_rpcSetTest(tr_rpc_server const* server, char const* whitelist, char** allocme_errmsg);
-
-void tr_rpcSetWhitelistEnabled(tr_rpc_server* server, bool isEnabled);
-
-bool tr_rpcGetWhitelistEnabled(tr_rpc_server const* server);
-
-void tr_rpcSetWhitelist(tr_rpc_server* server, std::string_view whitelist);
-
-int tr_rpcGetRPCSocketMode(tr_rpc_server const* server);
-
-std::string const& tr_rpcGetWhitelist(tr_rpc_server const* server);
-
-void tr_rpcSetPassword(tr_rpc_server* server, std::string_view password);
-
-std::string const& tr_rpcGetPassword(tr_rpc_server const* server);
-
-void tr_rpcSetUsername(tr_rpc_server* server, std::string_view username);
-
-std::string const& tr_rpcGetUsername(tr_rpc_server const* server);
-
-void tr_rpcSetPasswordEnabled(tr_rpc_server* server, bool isEnabled);
-
-bool tr_rpcIsPasswordEnabled(tr_rpc_server const* session);
-
-bool tr_rpcGetAntiBruteForceEnabled(tr_rpc_server const* server);
-
-void tr_rpcSetAntiBruteForceEnabled(tr_rpc_server* server, bool is_enabled);
-
-int tr_rpcGetAntiBruteForceThreshold(tr_rpc_server const* server);
-
-void tr_rpcSetAntiBruteForceThreshold(tr_rpc_server* server, int badRequests);
-
-char const* tr_rpcGetBindAddress(tr_rpc_server const* server);

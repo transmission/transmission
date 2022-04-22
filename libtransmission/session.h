@@ -223,8 +223,6 @@ public:
 
     void setRpcWhitelist(std::string_view whitelist) const;
 
-    std::string const& rpcWhitelist() const;
-
     void useRpcWhitelist(bool enabled) const;
 
     [[nodiscard]] bool useRpcWhitelist() const;
