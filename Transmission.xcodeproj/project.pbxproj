@@ -314,8 +314,8 @@
 		BEFC1E4D0C07861A00B0BB3C /* session.h in Headers */ = {isa = PBXBuildFile; fileRef = BEFC1E140C07861A00B0BB3C /* session.h */; };
 		BEFC1E4E0C07861A00B0BB3C /* inout.h in Headers */ = {isa = PBXBuildFile; fileRef = BEFC1E150C07861A00B0BB3C /* inout.h */; };
 		BEFC1E4F0C07861A00B0BB3C /* inout.cc in Sources */ = {isa = PBXBuildFile; fileRef = BEFC1E160C07861A00B0BB3C /* inout.cc */; };
-		BEFC1E520C07861A00B0BB3C /* fdlimit.h in Headers */ = {isa = PBXBuildFile; fileRef = BEFC1E190C07861A00B0BB3C /* fdlimit.h */; };
-		BEFC1E530C07861A00B0BB3C /* fdlimit.cc in Sources */ = {isa = PBXBuildFile; fileRef = BEFC1E1A0C07861A00B0BB3C /* fdlimit.cc */; };
+		BEFC1E520C07861A00B0BB3C /* open-files.h in Headers */ = {isa = PBXBuildFile; fileRef = BEFC1E190C07861A00B0BB3C /* open-files.h */; };
+		BEFC1E530C07861A00B0BB3C /* open-files.cc in Sources */ = {isa = PBXBuildFile; fileRef = BEFC1E1A0C07861A00B0BB3C /* open-files.cc */; };
 		BEFC1E550C07861A00B0BB3C /* completion.h in Headers */ = {isa = PBXBuildFile; fileRef = BEFC1E1C0C07861A00B0BB3C /* completion.h */; };
 		BEFC1E560C07861A00B0BB3C /* completion.cc in Sources */ = {isa = PBXBuildFile; fileRef = BEFC1E1D0C07861A00B0BB3C /* completion.cc */; };
 		BEFC1E570C07861A00B0BB3C /* clients.h in Headers */ = {isa = PBXBuildFile; fileRef = BEFC1E1E0C07861A00B0BB3C /* clients.h */; };
@@ -1050,8 +1050,8 @@
 		BEFC1E140C07861A00B0BB3C /* session.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = session.h; sourceTree = "<group>"; };
 		BEFC1E150C07861A00B0BB3C /* inout.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = inout.h; sourceTree = "<group>"; };
 		BEFC1E160C07861A00B0BB3C /* inout.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = inout.cc; sourceTree = "<group>"; };
-		BEFC1E190C07861A00B0BB3C /* fdlimit.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = fdlimit.h; sourceTree = "<group>"; };
-		BEFC1E1A0C07861A00B0BB3C /* fdlimit.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = fdlimit.cc; sourceTree = "<group>"; };
+		BEFC1E190C07861A00B0BB3C /* open-files.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = open-files.h; sourceTree = "<group>"; };
+		BEFC1E1A0C07861A00B0BB3C /* open-files.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = open-files.cc; sourceTree = "<group>"; };
 		BEFC1E1C0C07861A00B0BB3C /* completion.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = completion.h; sourceTree = "<group>"; };
 		BEFC1E1D0C07861A00B0BB3C /* completion.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = completion.cc; sourceTree = "<group>"; };
 		BEFC1E1E0C07861A00B0BB3C /* clients.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = clients.h; sourceTree = "<group>"; };
@@ -1633,8 +1633,8 @@
 				BEFC1E0F0C07861A00B0BB3C /* natpmp.cc */,
 				BEFC1E150C07861A00B0BB3C /* inout.h */,
 				BEFC1E160C07861A00B0BB3C /* inout.cc */,
-				BEFC1E190C07861A00B0BB3C /* fdlimit.h */,
-				BEFC1E1A0C07861A00B0BB3C /* fdlimit.cc */,
+				BEFC1E190C07861A00B0BB3C /* open-files.h */,
+				BEFC1E1A0C07861A00B0BB3C /* open-files.cc */,
 				BEFC1E1C0C07861A00B0BB3C /* completion.h */,
 				BEFC1E1D0C07861A00B0BB3C /* completion.cc */,
 				BEFC1E1E0C07861A00B0BB3C /* clients.h */,
@@ -2089,7 +2089,7 @@
 				BEFC1E4D0C07861A00B0BB3C /* session.h in Headers */,
 				C1FEE5771C3223CC00D62832 /* watchdir-common.h in Headers */,
 				BEFC1E4E0C07861A00B0BB3C /* inout.h in Headers */,
-				BEFC1E520C07861A00B0BB3C /* fdlimit.h in Headers */,
+				BEFC1E520C07861A00B0BB3C /* open-files.h in Headers */,
 				ED8A163F2735A8AA000D61F9 /* peer-mgr-active-requests.h in Headers */,
 				BEFC1E550C07861A00B0BB3C /* completion.h in Headers */,
 				BEFC1E570C07861A00B0BB3C /* clients.h in Headers */,
@@ -2794,7 +2794,7 @@
 				BEFC1E480C07861A00B0BB3C /* natpmp.cc in Sources */,
 				C1077A4E183EB29600634C22 /* error.cc in Sources */,
 				BEFC1E4F0C07861A00B0BB3C /* inout.cc in Sources */,
-				BEFC1E530C07861A00B0BB3C /* fdlimit.cc in Sources */,
+				BEFC1E530C07861A00B0BB3C /* open-files.cc in Sources */,
 				C1FEE5781C3223CC00D62832 /* watchdir-generic.cc in Sources */,
 				BEFC1E560C07861A00B0BB3C /* completion.cc in Sources */,
 				BEFC1E580C07861A00B0BB3C /* clients.cc in Sources */,

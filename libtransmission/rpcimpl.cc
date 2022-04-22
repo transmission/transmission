@@ -22,7 +22,6 @@
 #include "completion.h"
 #include "crypto-utils.h"
 #include "error.h"
-#include "fdlimit.h"
 #include "file.h"
 #include "log.h"
 #include "platform-quota.h" /* tr_device_info_get_disk_space() */
