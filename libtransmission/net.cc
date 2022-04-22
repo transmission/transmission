@@ -6,6 +6,7 @@
 #include <array>
 #include <cerrno>
 #include <climits>
+#include <cstdint>
 #include <cstring>
 #include <ctime>
 #include <string_view>
@@ -23,19 +24,18 @@
 
 #include <fmt/core.h>
 
-#include <cstdint>
 #include <libutp/utp.h>
 
 #include "transmission.h"
 
 #include "log.h"
 #include "net.h"
-#include "peer-socket.h" /* for struct tr_peer_socket */
-#include "session.h" /* tr_sessionGetPublicAddress() */
+#include "peer-socket.h"
+#include "session.h"
 #include "tr-assert.h"
 #include "tr-macros.h"
-#include "tr-utp.h" /* tr_utpSendTo() */
-#include "utils.h" /* tr_time() */
+#include "tr-utp.h"
+#include "utils.h"
 
 #ifndef IN_MULTICAST
 #define IN_MULTICAST(a) (((a)&0xf0000000) == 0xe0000000)
