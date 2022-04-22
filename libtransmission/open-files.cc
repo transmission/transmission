@@ -302,5 +302,8 @@ void tr_open_files::Entry::close()
         tr_sys_file_close(fd_);
     }
 
-    *this = {};
+    key_ = {};
+    fd_ = TR_BAD_SYS_FILE;
+    writable_ = false;
+    sequence_ = 0;
 }
