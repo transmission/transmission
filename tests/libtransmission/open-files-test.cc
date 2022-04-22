@@ -88,6 +88,18 @@ TEST_F(OpenFilesTest, getCachedFailsIfWrongPermissions)
 
 TEST_F(OpenFilesTest, opensInReadOnlyUnlessWritableIsRequested)
 {
+    static auto constexpr Contents = "Hello, World!\n"sv;
+    auto filename = tr_pathbuf{ sandboxDir(), "/test-file.txt" };
+    createFileWithContents(filename, Contents);
+
+    // cache a file read-only mode
+    tr_error* error = nullptr;
+    auto fd = session_->openFiles().get(0, 0, false, filename, TR_PREALLOCATE_FULL, std::size(Contents));
+
+    // confirm that writing to it fails
+    EXPECT_FALSE(tr_sys_file_write(*fd, std::data(Contents), std::size(Contents), nullptr, &error));
+    EXPECT_NE(0, error->code);
+    tr_error_clear(&error);
 }
 
 TEST_F(OpenFilesTest, createsMissingFileIfWriteRequested)
