@@ -386,9 +386,6 @@ std::string& tr_strvUtf8Clean(std::string_view cleanme, std::string& setme);
  */
 [[nodiscard]] std::string tr_strratio(double ratio, char const* infinity);
 
-/** @brief Portability wrapper for localtime_r() that uses the system implementation if available */
-struct tm* tr_localtime_r(time_t const* _clock, struct tm* _result);
-
 /** @brief Portability wrapper for gmtime_r() that uses the system implementation if available */
 struct tm* tr_gmtime_r(time_t const* _clock, struct tm* _result);
 

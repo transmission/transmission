@@ -579,8 +579,6 @@ set(NEEDED_FUNCTIONS
     gmtime_r
     gmtime_s
     htonll
-    localtime_r
-    localtime_s
     mkdtemp
     ngettext
     ntohll
