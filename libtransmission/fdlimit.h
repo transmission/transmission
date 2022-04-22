@@ -9,68 +9,108 @@
 #error only libtransmission should #include this header.
 #endif
 
+#include <array>
 #include <cstdint> // uint64_t
+#include <optional>
+#include <ctime>
+#include <utility>
 
 #include "transmission.h"
 
 #include "file.h"
 #include "net.h"
+#include "utils.h"
 
-/**
- * @addtogroup file_io File IO
- * @{
- */
+struct tr_session;
 
-/***
-****
-***/
+class tr_open_files
+{
+    using Key = std::pair<tr_torrent_id_t, tr_file_index_t>;
 
-/**
- * Returns an fd to the specified filename.
- *
- * A small pool of open files is kept to avoid the overhead of
- * continually opening and closing the same files when downloading
- * piece data.
- *
- * - if do_write is true, subfolders in torrentFile are created if necessary.
- * - if do_write is true, the target file is created if necessary.
- *
- * on success, a file descriptor >= 0 is returned.
- * on failure, a TR_BAD_SYS_FILE is returned and errno is set.
- *
- * @see tr_fdFileClose
- */
-tr_sys_file_t tr_fdFileCheckout(
-    tr_session* session,
-    int torrent_id,
-    tr_file_index_t file_num,
-    char const* filename,
-    bool do_write,
-    tr_preallocation_mode preallocation_mode,
-    uint64_t preallocation_file_size);
+    [[nodiscard]] static Key makeKey(tr_torrent_id_t tor_id, tr_file_index_t file_num)
+    {
+        return std::make_pair(tor_id, file_num);
+    }
 
-tr_sys_file_t tr_fdFileGetCached(tr_session* session, int torrent_id, tr_file_index_t file_num, bool doWrite);
+public:
+    tr_open_files(tr_session* session) noexcept
+        : session_{ session }
+    {
+    }
 
-/**
- * Closes a file that's being held by our file repository.
- *
- * If the file isn't checked out, it's fsync()ed and close()d immediately.
- * If the file is currently checked out, it will be closed upon its return.
- *
- * @see tr_fdFileCheckout
- */
-void tr_fdFileClose(tr_session* session, tr_torrent const* tor, tr_file_index_t file_num);
+    [[nodiscard]] std::optional<tr_sys_file_t> get(tr_torrent_id_t torrent_id, tr_file_index_t file_num, bool writable)
+        const noexcept
+    {
+        auto const key = makeKey(torrent_id, file_num);
 
-/**
- * Closes all the files associated with a given torrent id
- */
-void tr_fdTorrentClose(tr_session* session, int torrentId);
+        for (auto const& file : files_)
+        {
+            if (file.key != key)
+            {
+                continue;
+            }
 
-/***********************************************************************
- * tr_fdClose
- ***********************************************************************
- * Frees resources allocated by tr_fdInit.
- **********************************************************************/
-void tr_fdClose(tr_session* session);
+            if (writable && !file.writable)
+            {
+                return {};
+            }
 
-/* @} */
+            file.last_used_at = tr_time();
+            return file.fd;
+        }
+
+        return {};
+    }
+
+    [[nodiscard]] std::optional<tr_sys_file_t> get(
+        tr_torrent_id_t torrent_id,
+        tr_file_index_t file_num,
+        bool writable,
+        std::string_view filename,
+        tr_preallocation_mode preallocation_mode,
+        uint64_t preallocation_file_size);
+
+    void close(tr_torrent_id_t torrent_id, tr_file_index_t file_num);
+
+    void close(tr_torrent_id_t torrent_id)
+    {
+        for (auto& file : files_)
+        {
+            if (file.key.first == torrent_id)
+            {
+                file.close();
+            }
+        }
+    }
+
+private:
+    tr_session* const session_;
+
+    struct Entry
+    {
+        Key key;
+        tr_sys_file_t fd = TR_BAD_SYS_FILE;
+        bool writable = false;
+        mutable time_t last_used_at = 0;
+
+        ~Entry()
+        {
+            close();
+        }
+
+        void close()
+        {
+            if (fd != TR_BAD_SYS_FILE)
+            {
+                tr_sys_file_close(fd);
+            }
+
+            *this = {};
+        }
+    };
+
+    void getFreeSlot();
+
+    static auto constexpr MaxOpenFiles = 32;
+    std::array<Entry, MaxOpenFiles> files_;
+};

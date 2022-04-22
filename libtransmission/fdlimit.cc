@@ -19,8 +19,8 @@
 #include "file.h"
 #include "log.h"
 #include "session.h"
-#include "torrent.h" /* tr_isTorrent() */
 #include "tr-assert.h"
+#include "tr-strbuf.h"
 #include "utils.h" // tr_time()
 
 /***
@@ -499,4 +499,122 @@ tr_sys_file_t tr_fdFileCheckout(
     o->file_index = i;
     o->used_at = tr_time();
     return o->fd;
+}
+
+std::optional<tr_sys_file_t> tr_open_files::get(
+    tr_torrent_id_t torrent_id,
+    tr_file_index_t file_num,
+    bool writable,
+    std::string_view filename_in,
+    tr_preallocation_mode allocation,
+    uint64_t file_size)
+{
+    // is it already open
+    if (auto ret = get(torrent_id, file_num, writable); ret)
+    {
+        return ret;
+    }
+
+    // create subfolders, if any
+    auto const filename = tr_pathbuf{ filename_in };
+    tr_error* error = nullptr;
+    if (writable)
+    {
+        auto const dir = tr_sys_path_dirname(filename, &error);
+
+        if (std::empty(dir))
+        {
+            tr_logAddError(fmt::format(
+                _("Couldn't create '{path}': {error} ({error_code})"),
+                fmt::arg("path", filename),
+                fmt::arg("error", error->message),
+                fmt::arg("error_code", error->code)));
+            tr_error_free(error);
+            return {};
+        }
+
+        if (!tr_sys_dir_create(dir.c_str(), TR_SYS_DIR_CREATE_PARENTS, 0777, &error))
+        {
+            tr_logAddError(fmt::format(
+                _("Couldn't create '{path}': {error} ({error_code})"),
+                fmt::arg("path", dir),
+                fmt::arg("error", error->message),
+                fmt::arg("error_code", error->code)));
+            tr_error_free(error);
+            return {};
+        }
+    }
+
+    auto info = tr_sys_path_info{};
+    bool const already_existed = tr_sys_path_get_info(filename, 0, &info) && info.type == TR_SYS_PATH_IS_FILE;
+
+    // we need write permissions to resize the file
+    bool const resize_needed = already_existed && (file_size < info.size);
+    writable |= resize_needed;
+
+    // open the file
+    int flags = writable ? (TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE) : 0;
+    flags |= TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL;
+    auto const fd = tr_sys_file_open(filename, flags, 0666, &error);
+    if (fd == TR_BAD_SYS_FILE)
+    {
+        tr_logAddError(fmt::format(
+            _("Couldn't open '{path}': {error} ({error_code})"),
+            fmt::arg("path", filename),
+            fmt::arg("error", error->message),
+            fmt::arg("error_code", error->code)));
+        tr_error_free(error);
+        return {};
+    }
+
+    if (writable && !already_existed && allocation != TR_PREALLOCATE_NONE)
+    {
+        bool success = false;
+        char const* type = nullptr;
+
+        if (allocation == TR_PREALLOCATE_FULL)
+        {
+            success = preallocate_file_full(fd, file_size, &error);
+            type = "full";
+        }
+        else if (allocation == TR_PREALLOCATE_SPARSE)
+        {
+            success = preallocate_file_sparse(fd, file_size, &error);
+            type = "sparse";
+        }
+
+        TR_ASSERT(type != nullptr);
+
+        if (!success)
+        {
+            tr_logAddError(fmt::format(
+                _("Couldn't preallocate '{path}': {error} ({error_code})"),
+                fmt::arg("path", filename),
+                fmt::arg("error", error->message),
+                fmt::arg("error_code", error->code)));
+            goto FAIL;
+        }
+
+        tr_logAddDebug(fmt::format("Preallocated file '{}' ({}, size: {})", filename, type, file_size));
+    }
+
+    /* If the file already exists and it's too large, truncate it.
+     * This is a fringe case that happens if a torrent's been updated
+     * and one of the updated torrent's files is smaller.
+     * https://trac.transmissionbt.com/ticket/2228
+     * https://bugs.launchpad.net/ubuntu/+source/transmission/+bug/318249
+     */
+    if (resize_needed && !tr_sys_file_truncate(fd, file_size, &error))
+    {
+        tr_logAddWarn(fmt::format(
+            _("Couldn't truncate '{path}': {error} ({error_code})"),
+            fmt::arg("path", filename),
+            fmt::arg("error", error->message),
+            fmt::arg("error_code", error->code)));
+        tr_error_free(error);
+        return {};
+    }
+
+    o->fd = fd;
+    return err;
 }
