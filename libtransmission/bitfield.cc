@@ -13,7 +13,6 @@
 
 #include "bitfield.h"
 #include "tr-assert.h"
-#include "utils.h" /* tr_new0() */
 
 /****
 *****

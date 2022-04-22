@@ -867,7 +867,7 @@ std::string const& tr_rpcGetUrl(tr_rpc_server const* server)
 
 static auto parseWhitelist(std::string_view whitelist)
 {
-    auto list = std::list<std::string>{};
+    auto list = std::vector<std::string>{};
 
     while (!std::empty(whitelist))
     {
