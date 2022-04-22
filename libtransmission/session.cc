@@ -724,7 +724,7 @@ static void tr_sessionInitImpl(init_data* data)
 
 #ifndef _WIN32
     /* Don't exit when writing on a broken socket */
-    signal(SIGPIPE, SIG_IGN);
+    (void)signal(SIGPIPE, SIG_IGN);
 #endif
 
     tr_logSetQueueEnabled(data->messageQueuingEnabled);
