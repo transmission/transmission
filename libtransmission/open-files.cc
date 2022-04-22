@@ -119,7 +119,8 @@ uint64_t next_sequence_ = 1;
 std::optional<tr_sys_file_t> tr_open_files::get(tr_torrent_id_t tor_id, tr_file_index_t file_num, bool writable)
 {
     std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
-    if (auto const it = find(makeKey(tor_id, file_num)); (it != std::end(files_)) && isOpen(it->fd_) && (!writable || it->writable_))
+    if (auto const it = find(makeKey(tor_id, file_num));
+        (it != std::end(files_)) && isOpen(it->fd_) && (!writable || it->writable_))
     {
         std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
         return it->fd_;
@@ -193,7 +194,7 @@ std::optional<tr_sys_file_t> tr_open_files::get(
     flags |= TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL;
     std::cerr << __FILE__ << ':' << __LINE__ << " filename [" << filename << ']' << std::endl;
     auto const fd = tr_sys_file_open(filename, flags, 0666, &error);
-    std::cerr << __FILE__ << ':' << __LINE__ << " fd "<< fd << std::endl;
+    std::cerr << __FILE__ << ':' << __LINE__ << " fd " << fd << std::endl;
     if (!isOpen(fd))
     {
         tr_logAddError(fmt::format(
