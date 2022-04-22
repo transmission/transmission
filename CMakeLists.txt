@@ -576,8 +576,6 @@ set(NEEDED_FUNCTIONS
     flock
     getmntent
     gettext
-    gmtime_r
-    gmtime_s
     htonll
     mkdtemp
     ngettext
