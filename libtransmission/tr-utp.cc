@@ -85,7 +85,7 @@ static void incoming(void* vsession, struct UTPSocket* s)
     auto* const from = (struct sockaddr*)&from_storage;
     socklen_t fromlen = sizeof(from_storage);
     tr_address addr;
-    tr_port port = 0;
+    tr_port port;
 
     if (!tr_sessionIsUTPEnabled(session))
     {

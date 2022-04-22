@@ -69,7 +69,7 @@ struct tr_error;
 
 /**
  * @brief Rich Salz's classic implementation of shell-style pattern matching for ?, \, [], and * characters.
- * @return 1 if the pattern matches, 0 if it doesn't, or -1 if an error occured
+ * @return 1 if the pattern matches, 0 if it doesn't, or -1 if an error occurred
  */
 [[nodiscard]] bool tr_wildmat(std::string_view text, std::string_view pattern);
 
@@ -239,8 +239,6 @@ constexpr bool tr_str_is_empty(char const* value)
     return value == nullptr || *value == '\0';
 }
 
-std::string evbuffer_free_to_str(evbuffer* buf);
-
 /** @brief Portability wrapper for strlcpy() that uses the system implementation if available */
 size_t tr_strlcpy(void* dst, void const* src, size_t siz);
 
@@ -382,15 +380,9 @@ std::string& tr_strvUtf8Clean(std::string_view cleanme, std::string& setme);
 
 /**
  * @param ratio    the ratio to convert to a string
- * @param infinity the string represntation of "infinity"
+ * @param infinity the string representation of "infinity"
  */
 [[nodiscard]] std::string tr_strratio(double ratio, char const* infinity);
-
-/** @brief Portability wrapper for localtime_r() that uses the system implementation if available */
-struct tm* tr_localtime_r(time_t const* _clock, struct tm* _result);
-
-/** @brief Portability wrapper for gmtime_r() that uses the system implementation if available */
-struct tm* tr_gmtime_r(time_t const* _clock, struct tm* _result);
 
 /** @brief Portability wrapper for gettimeofday(), with tz argument dropped */
 struct timeval tr_gettimeofday();

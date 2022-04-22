@@ -1165,7 +1165,7 @@ void jsonsl_jpr_match_state_cleanup(jsonsl_t jsn)
 /**
  * This function should be called exactly once on each element...
  * This should also be called in recursive order, since we rely
- * on the parent having been initalized for a match.
+ * on the parent having been initialized for a match.
  *
  * Since the parent is checked for a match as well, we maintain a 'serial' counter.
  * Whenever we traverse an element, we expect the serial to be the same as a global

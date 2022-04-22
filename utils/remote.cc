@@ -20,6 +20,7 @@
 #include <event2/buffer.h>
 #include <event2/util.h>
 
+#include <fmt/chrono.h>
 #include <fmt/format.h>
 
 #include <libtransmission/transmission.h>
@@ -886,9 +887,7 @@ static char const* bandwidthPriorityNames[] = {
 
 static char* format_date(char* buf, size_t buflen, time_t now)
 {
-    struct tm tm;
-    tr_localtime_r(&now, &tm);
-    strftime(buf, buflen, "%a %b %d %T %Y%n", &tm); /* ctime equiv */
+    *fmt::format_to_n(buf, buflen - 1, "{:%a %b %d %T %Y}", fmt::localtime(now)).out = '\0';
     return buf;
 }
 
@@ -1079,22 +1078,22 @@ static void printDetails(tr_variant* top)
 
             if (tr_variantDictFindInt(t, TR_KEY_addedDate, &i) && i != 0)
             {
-                printf("  Date added:       %s", format_date(buf, sizeof(buf), i));
+                printf("  Date added:       %s\n", format_date(buf, sizeof(buf), i));
             }
 
             if (tr_variantDictFindInt(t, TR_KEY_doneDate, &i) && i != 0)
             {
-                printf("  Date finished:    %s", format_date(buf, sizeof(buf), i));
+                printf("  Date finished:    %s\n", format_date(buf, sizeof(buf), i));
             }
 
             if (tr_variantDictFindInt(t, TR_KEY_startDate, &i) && i != 0)
             {
-                printf("  Date started:     %s", format_date(buf, sizeof(buf), i));
+                printf("  Date started:     %s\n", format_date(buf, sizeof(buf), i));
             }
 
             if (tr_variantDictFindInt(t, TR_KEY_activityDate, &i) && i != 0)
             {
-                printf("  Latest activity:  %s", format_date(buf, sizeof(buf), i));
+                printf("  Latest activity:  %s\n", format_date(buf, sizeof(buf), i));
             }
 
             if (tr_variantDictFindInt(t, TR_KEY_secondsDownloading, &i) && i > 0)
@@ -1113,7 +1112,7 @@ static void printDetails(tr_variant* top)
 
             if (tr_variantDictFindInt(t, TR_KEY_dateCreated, &i) && i != 0)
             {
-                printf("  Date created: %s", format_date(buf, sizeof(buf), i));
+                printf("  Date created: %s\n", format_date(buf, sizeof(buf), i));
             }
 
             if (tr_variantDictFindBool(t, TR_KEY_isPrivate, &boolVal))

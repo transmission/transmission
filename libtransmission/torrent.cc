@@ -27,6 +27,7 @@
 
 #include <event2/util.h> /* evutil_vsnprintf() */
 
+#include <fmt/chrono.h>
 #include <fmt/core.h>
 
 #include "transmission.h"
@@ -687,12 +688,12 @@ static bool isNewTorrentASeed(tr_torrent* tor)
 
 static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
 {
-    auto const lock = tor->unique_lock();
-
     tr_session* session = tr_ctorGetSession(ctor);
     TR_ASSERT(session != nullptr);
-
     tor->session = session;
+
+    auto const lock = tor->unique_lock();
+
     tor->queuePosition = tr_sessionCountTorrents(session);
 
     torrentInitFromInfoDict(tor);
@@ -1605,8 +1606,6 @@ static void closeTorrent(tr_torrent* const tor)
     TR_ASSERT(tr_isTorrent(tor));
     TR_ASSERT(tr_amInEventThread(tor->session));
 
-    tor->session->removed_torrents.emplace_back(tor->uniqueId, tr_time());
-
     if (!tor->session->isClosing())
     {
         tr_logAddInfoTor(tor, _("Removing torrent"));
@@ -1781,12 +1780,6 @@ static void torrentCallScript(tr_torrent const* tor, char const* script)
         return;
     }
 
-    time_t const now = tr_time();
-    struct tm tm;
-    char ctime_str[32];
-    tr_localtime_r(&now, &tm);
-    strftime(ctime_str, sizeof(ctime_str), "%a %b %d %T %Y%n", &tm); /* ctime equiv */
-
     auto torrent_dir = std::string{ tor->currentDir() };
     tr_sys_path_native_separators(std::data(torrent_dir));
 
@@ -1799,7 +1792,7 @@ static void torrentCallScript(tr_torrent const* tor, char const* script)
 
     auto const env = std::map<std::string_view, std::string_view>{
         { "TR_APP_VERSION"sv, SHORT_VERSION_STRING },
-        { "TR_TIME_LOCALTIME"sv, ctime_str },
+        { "TR_TIME_LOCALTIME"sv, fmt::format("{:%a %b %d %T %Y%n}", fmt::localtime(tr_time())) },
         { "TR_TORRENT_BYTES_DOWNLOADED"sv, bytes_downloaded_str },
         { "TR_TORRENT_DIR"sv, torrent_dir.c_str() },
         { "TR_TORRENT_HASH"sv, tor->infoHashString() },

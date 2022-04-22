@@ -156,17 +156,6 @@ tr_quark tr_announce_list::announceToScrape(tr_quark announce)
     return TR_KEY_NONE;
 }
 
-std::set<tr_tracker_tier_t> tr_announce_list::tiers() const
-{
-    auto tiers = std::set<tr_tracker_tier_t>{};
-    for (auto const& tracker : trackers_)
-    {
-        tiers.insert(tracker.tier);
-    }
-
-    return tiers;
-}
-
 tr_tracker_tier_t tr_announce_list::nextTier() const
 {
     return std::empty(trackers_) ? 0 : trackers_.back().tier + 1;

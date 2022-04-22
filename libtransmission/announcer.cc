@@ -734,15 +734,15 @@ static void tr_logAddTrace_tier_announce_queue(tr_tier const* tier)
         return;
     }
 
-    auto* const buf = evbuffer_new();
-    for (size_t i = 0, n = std::size(tier->announce_events); i < n; ++i)
+    auto buf = std::string{};
+    auto const& events = tier->announce_events;
+    buf.reserve(std::size(events) * 20);
+    for (size_t i = 0, n = std::size(events); i < n; ++i)
     {
-        tr_announce_event const e = tier->announce_events[i];
-        char const* str = tr_announce_event_get_string(e);
-        evbuffer_add_printf(buf, "[%zu:%s]", i, str);
+        fmt::format_to(std::back_inserter(buf), FMT_STRING("[{:d}:{:s}]"), i, tr_announce_event_get_string(events[i]));
     }
 
-    tr_logAddTraceTier(tier, evbuffer_free_to_str(buf));
+    tr_logAddTraceTier(tier, buf);
 }
 
 // higher priorities go to the front of the announce queue
@@ -877,7 +877,7 @@ static tr_announce_request* announce_request_new(
     TR_ASSERT(current_tracker != nullptr);
 
     auto* const req = new tr_announce_request();
-    req->port = tr_sessionGetPublicPeerPort(announcer->session);
+    req->port = announcer->session->peerPort();
     req->announce_url = current_tracker->announce_url;
     req->tracker_id = current_tracker->tracker_id;
     req->info_hash = tor->infoHash();
@@ -1158,7 +1158,7 @@ static void on_announce_done(tr_announce_response const* response, void* vdata)
 
             if (!isStopped && std::empty(tier->announce_events))
             {
-                /* the queue is empty, so enqueue a perodic update */
+                /* the queue is empty, so enqueue a periodic update */
                 int const i = tier->announceIntervalSec;
                 tr_logAddTraceTier(tier, fmt::format("Sending periodic reannounce in {} seconds", i));
                 tier_announce_event_push(tier, TR_ANNOUNCE_EVENT_NONE, now + i);

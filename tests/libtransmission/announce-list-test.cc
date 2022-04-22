@@ -135,9 +135,6 @@ TEST_F(AnnounceListTest, canSet)
     EXPECT_EQ(Urls[0], announce_list.at(0).announce.sv());
     EXPECT_EQ(Urls[1], announce_list.at(1).announce.sv());
     EXPECT_EQ(Urls[2], announce_list.at(2).announce.sv());
-    auto const expected_tiers = std::set<tr_tracker_tier_t>(std::begin(Tiers), std::end(Tiers));
-    auto const tiers = announce_list.tiers();
-    EXPECT_EQ(expected_tiers, tiers);
 }
 
 TEST_F(AnnounceListTest, canSetUnsortedWithBackupsInTiers)

@@ -10,8 +10,6 @@
 #endif
 
 #include <ctime>
-#include <map>
-#include <set>
 #include <string_view>
 #include <vector>
 
@@ -59,7 +57,7 @@ public:
         return get(key) != nullptr;
     }
 
-    [[nodiscard]] std::set<int> removedSince(time_t) const;
+    [[nodiscard]] std::vector<int> removedSince(time_t) const;
 
     [[nodiscard]] auto cbegin() const noexcept
     {
@@ -116,5 +114,5 @@ private:
     // may be testing for >0 as a validity check.
     std::vector<tr_torrent*> by_id_{ nullptr };
 
-    std::map<int, time_t> removed_;
+    std::vector<std::pair<int, time_t>> removed_;
 };

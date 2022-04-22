@@ -874,17 +874,12 @@ static char const* torrentGet(tr_session* session, tr_variant* args_in, tr_varia
 
     if (tr_variantDictFindStrView(args_in, TR_KEY_ids, &sv) && sv == "recently-active"sv)
     {
-        time_t const now = tr_time();
-        auto const interval = RecentlyActiveSeconds;
-
-        auto const& removed = session->removed_torrents;
-        tr_variant* removed_out = tr_variantDictAddList(args_out, TR_KEY_removed, std::size(removed));
-        for (auto const& [id, time_removed] : removed)
+        auto const cutoff = tr_time() - RecentlyActiveSeconds;
+        auto const ids = session->torrents().removedSince(cutoff);
+        auto* const out = tr_variantDictAddList(args_out, TR_KEY_removed, std::size(ids));
+        for (auto const& id : ids)
         {
-            if (time_removed >= now - interval)
-            {
-                tr_variantListAddInt(removed_out, id);
-            }
+            tr_variantListAddInt(out, id);
         }
     }
 
@@ -1360,7 +1355,7 @@ static char const* torrentRenamePath(
 
 static void onPortTested(tr_web::FetchResponse const& web_response)
 {
-    auto const& [status, body, did_connect, did_tmieout, user_data] = web_response;
+    auto const& [status, body, did_connect, did_timeout, user_data] = web_response;
     auto* data = static_cast<struct tr_rpc_idle_data*>(user_data);
 
     if (status != 200)
@@ -1386,8 +1381,8 @@ static char const* portTest(
     tr_variant* /*args_out*/,
     struct tr_rpc_idle_data* idle_data)
 {
-    auto const port = tr_sessionGetPeerPort(session);
-    auto const url = fmt::format(FMT_STRING("https://portcheck.transmissionbt.com/{:d}"), port);
+    auto const port = session->peerPort();
+    auto const url = fmt::format(FMT_STRING("https://portcheck.transmissionbt.com/{:d}"), port.host());
     session->web->fetch({ url, onPortTested, idle_data });
     return nullptr;
 }
@@ -1948,7 +1943,7 @@ static char const* sessionSet(
 
     if (tr_variantDictFindInt(args_in, TR_KEY_peer_port, &i))
     {
-        tr_sessionSetPeerPort(session, i);
+        session->setPeerPort(tr_port::fromHost(i));
     }
 
     if (tr_variantDictFindBool(args_in, TR_KEY_port_forwarding_enabled, &boolVal))
@@ -2227,7 +2222,7 @@ static void addSessionField(tr_session* s, tr_variant* d, tr_quark key)
         break;
 
     case TR_KEY_peer_port:
-        tr_variantDictAddInt(d, key, tr_sessionGetPeerPort(s));
+        tr_variantDictAddInt(d, key, s->peerPort().host());
         break;
 
     case TR_KEY_peer_port_random_on_start:

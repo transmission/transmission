@@ -161,7 +161,7 @@ static void rebind_ipv6(tr_session* ss, bool force)
         memcpy(&sin6.sin6_addr, ipv6, 16);
     }
 
-    sin6.sin6_port = htons(ss->udp_port);
+    sin6.sin6_port = ss->udp_port.network();
 
     rc = bind(s, (struct sockaddr*)&sin6, sizeof(sin6));
 
@@ -277,9 +277,8 @@ void tr_udpInit(tr_session* ss)
     TR_ASSERT(ss->udp_socket == TR_BAD_SOCKET);
     TR_ASSERT(ss->udp6_socket == TR_BAD_SOCKET);
 
-    ss->udp_port = tr_sessionGetPeerPort(ss);
-
-    if (ss->udp_port <= 0)
+    ss->udp_port = ss->peerPort();
+    if (std::empty(ss->udp_port))
     {
         return;
     }
@@ -302,7 +301,7 @@ void tr_udpInit(tr_session* ss)
             memcpy(&sin.sin_addr, &public_addr->addr.addr4, sizeof(struct in_addr));
         }
 
-        sin.sin_port = htons(ss->udp_port);
+        sin.sin_port = ss->udp_port.network();
         int const rc = bind(ss->udp_socket, (struct sockaddr*)&sin, sizeof(sin));
 
         if (rc == -1)
@@ -310,7 +309,7 @@ void tr_udpInit(tr_session* ss)
             auto const error_code = errno;
             tr_logAddWarn(fmt::format(
                 _("Couldn't bind IPv4 socket {address}: {error} ({error_code})"),
-                fmt::arg("address", public_addr != nullptr ? public_addr->to_string(ss->udp_port) : "?"),
+                fmt::arg("address", public_addr != nullptr ? public_addr->readable(ss->udp_port) : "?"),
                 fmt::arg("error", tr_strerror(error_code)),
                 fmt::arg("error_code", error_code)));
             tr_netCloseSocket(ss->udp_socket);
