@@ -104,6 +104,18 @@ TEST_F(OpenFilesTest, opensInReadOnlyUnlessWritableIsRequested)
 
 TEST_F(OpenFilesTest, createsMissingFileIfWriteRequested)
 {
+    static auto constexpr Contents = "Hello, World!\n"sv;
+    auto filename = tr_pathbuf{ sandboxDir(), "/test-file.txt" };
+    EXPECT_FALSE(tr_sys_path_exists(filename));
+
+    auto fd = session_->openFiles().get(0, 0, false);
+    EXPECT_FALSE(fd);
+    EXPECT_FALSE(tr_sys_path_exists(filename));
+
+    fd = session_->openFiles().get(0, 0, true, filename, TR_PREALLOCATE_FULL, std::size(Contents));
+    EXPECT_TRUE(fd);
+    EXPECT_NE(TR_BAD_SYS_FILE, *fd);
+    EXPECT_TRUE(tr_sys_path_exists(filename));
 }
 
 TEST_F(OpenFilesTest, closesLeastRecentlyUsedFile)
