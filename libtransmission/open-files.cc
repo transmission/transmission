@@ -164,8 +164,8 @@ std::optional<tr_sys_file_t> tr_open_files::get(
                 fmt::arg("path", filename),
                 fmt::arg("error", error->message),
                 fmt::arg("error_code", error->code)));
-            tr_error_free(error);
             std::cerr << __FILE__ << ':' << __LINE__ << ' ' << error->message << std::endl;
+            tr_error_free(error);
             return {};
         }
 
@@ -176,8 +176,8 @@ std::optional<tr_sys_file_t> tr_open_files::get(
                 fmt::arg("path", dir),
                 fmt::arg("error", error->message),
                 fmt::arg("error_code", error->code)));
-            tr_error_free(error);
             std::cerr << __FILE__ << ':' << __LINE__ << ' ' << error->message << std::endl;
+            tr_error_free(error);
             return {};
         }
     }
@@ -202,8 +202,8 @@ std::optional<tr_sys_file_t> tr_open_files::get(
             fmt::arg("path", filename),
             fmt::arg("error", error->message),
             fmt::arg("error_code", error->code)));
-        tr_error_free(error);
         std::cerr << __FILE__ << ':' << __LINE__ << ' ' << error->message << std::endl;
+        tr_error_free(error);
         return {};
     }
 
@@ -232,9 +232,9 @@ std::optional<tr_sys_file_t> tr_open_files::get(
                 fmt::arg("path", filename),
                 fmt::arg("error", error->message),
                 fmt::arg("error_code", error->code)));
-            tr_error_free(error);
             tr_sys_file_close(fd);
             std::cerr << __FILE__ << ':' << __LINE__ << ' ' << error->message << std::endl;
+            tr_error_free(error);
             return {};
         }
 
@@ -253,9 +253,9 @@ std::optional<tr_sys_file_t> tr_open_files::get(
             fmt::arg("path", filename),
             fmt::arg("error", error->message),
             fmt::arg("error_code", error->code)));
-        tr_error_free(error);
         tr_sys_file_close(fd);
         std::cerr << __FILE__ << ':' << __LINE__ << ' ' << error->message << std::endl;
+        tr_error_free(error);
         return {};
     }
 

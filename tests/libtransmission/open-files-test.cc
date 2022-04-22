@@ -138,27 +138,55 @@ TEST_F(OpenFilesTest, closeFileClosesTheFile)
 TEST_F(OpenFilesTest, closeTorrentClosesTheTorrentFiles)
 {
     static auto constexpr Contents = "Hello, World!\n"sv;
-    static auto tor_id = tr_torrent_id_t{ 0 };
+    static auto constexpr TorId = tr_torrent_id_t{ 0 };
 
     auto filename = tr_pathbuf{ sandboxDir(), "/a.txt" };
     createFileWithContents(filename, Contents);
-    EXPECT_TRUE(session_->openFiles().get(tor_id, 1, false, filename, TR_PREALLOCATE_FULL, std::size(Contents)));
+    EXPECT_TRUE(session_->openFiles().get(TorId, 1, false, filename, TR_PREALLOCATE_FULL, std::size(Contents)));
 
     filename.assign(sandboxDir(), "/b.txt");
     createFileWithContents(filename, Contents);
-    EXPECT_TRUE(session_->openFiles().get(tor_id, 3, false, filename, TR_PREALLOCATE_FULL, std::size(Contents)));
+    EXPECT_TRUE(session_->openFiles().get(TorId, 3, false, filename, TR_PREALLOCATE_FULL, std::size(Contents)));
 
     // confirm that closing a different torrent does not affect these files
-    session_->openFiles().closeTorrent(tor_id + 1);
-    EXPECT_TRUE(session_->openFiles().get(tor_id, 1, false));
-    EXPECT_TRUE(session_->openFiles().get(tor_id, 3, false));
+    session_->openFiles().closeTorrent(TorId + 1);
+    EXPECT_TRUE(session_->openFiles().get(TorId, 1, false));
+    EXPECT_TRUE(session_->openFiles().get(TorId, 3, false));
 
     // confirm that closing this torrent closes and uncaches the files
-    session_->openFiles().closeTorrent(tor_id);
-    EXPECT_FALSE(session_->openFiles().get(tor_id, 1, false));
-    EXPECT_FALSE(session_->openFiles().get(tor_id, 3, false));
+    session_->openFiles().closeTorrent(TorId);
+    EXPECT_FALSE(session_->openFiles().get(TorId, 1, false));
+    EXPECT_FALSE(session_->openFiles().get(TorId, 3, false));
 }
 
 TEST_F(OpenFilesTest, closesLeastRecentlyUsedFile)
 {
+    static auto constexpr Contents = "Hello, World!\n"sv;
+    static auto constexpr TorId = tr_torrent_id_t{ 0 };
+    static auto constexpr LargerThanCacheLimit = 100;
+
+    // Walk through a number of files. Confirm that they all succeed
+    // even when the number exhausts the cache size, and newer files
+    // supplant older ones.
+    for (int i = 0; i < LargerThanCacheLimit; ++i)
+    {
+        auto filename = tr_pathbuf{ sandboxDir(), fmt::format("/file-{:d}.txt", i) };
+        EXPECT_TRUE(session_->openFiles().get(TorId, i, true, filename, TR_PREALLOCATE_FULL, std::size(Contents)));
+    }
+
+    // Do a lookup-only for the files again *in the same order*. By following the
+    // order, the first files we check will be the oldest from the last pass and
+    // should have aged out. So we should have a nonzero number of failures; but
+    // once we get a success, all the remaining should also succeed.
+    auto results = std::array<bool, LargerThanCacheLimit>{};
+    auto sorted = std::array<bool, LargerThanCacheLimit>{};
+    for (int i = 0; i < LargerThanCacheLimit; ++i)
+    {
+        auto filename = tr_pathbuf{ sandboxDir(), fmt::format("/file-{:d}.txt", i) };
+        results[i] = !!session_->openFiles().get(TorId, i, false);
+    }
+    sorted = results;
+    std::sort(std::begin(sorted), std::end(sorted));
+    EXPECT_EQ(sorted, results);
+    EXPECT_GT(std::count(std::begin(results), std::end(results), true), 0);
 }
