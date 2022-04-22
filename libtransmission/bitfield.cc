@@ -7,6 +7,8 @@
 #include <array>
 #include <vector>
 
+#include "tr-popcount.h"
+
 #include "transmission.h"
 
 #include "bitfield.h"
@@ -27,35 +29,40 @@ namespace
     return (bit_count >> 3) + ((bit_count & 7) != 0 ? 1 : 0);
 }
 
+/* Used only in cases where it can be guranteed bit_count <= SIZE_MAX - 8 */
+[[nodiscard]] constexpr size_t getBytesNeededSafe(size_t bit_count) noexcept
+{
+    return ((bit_count + 7) >> 3);
+}
+
 void setAllTrue(uint8_t* array, size_t bit_count)
 {
     uint8_t constexpr Val = 0xFF;
-    size_t const n = getBytesNeeded(bit_count);
+    /* Only ever called internally with in-use bit counts. Impossible
+       for bitcount > SIZE_MAX - 8. */
+    size_t const n = getBytesNeededSafe(bit_count);
 
     if (n > 0)
     {
         std::fill_n(array, n, Val);
-        array[n - 1] = Val << ((-bit_count) & 7U);
+        /* -bit_count & 7U. Since bitcount is unsigned do ~bitcount +
+           1 to replace -bitcount as linters warn about negating
+           unsigned types. Any compiler will optimize ~x + 1 to -x in
+           the backend. */
+        uint32_t shift = ((~bit_count) + 1) & 7U;
+        array[n - 1] = Val << shift;
     }
 }
 
-auto constexpr TrueBitCount = std::array<size_t, 256>{
-    0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4, 1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5, 1, 2, 2, 3, 2,
-    3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5, 2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6, 1, 2, 2, 3, 2, 3, 3, 4, 2, 3,
-    3, 4, 3, 4, 4, 5, 2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6, 2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5,
-    6, 3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7, 1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5, 2, 3, 3, 4,
-    3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6, 2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6, 3, 4, 4, 5, 4, 5, 5, 6, 4,
-    5, 5, 6, 5, 6, 6, 7, 2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6, 3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6,
-    6, 7, 3, 4, 4, 5, 4, 5, 5, 6, 4, 5, 5, 6, 5, 6, 6, 7, 4, 5, 5, 6, 5, 6, 6, 7, 5, 6, 6, 7, 6, 7, 7, 8
-};
-
 /* Switch to std::popcount if project upgrades to c++20 or newer */
-[[nodiscard]] constexpr int doPopcount(uint8_t flags) noexcept
+[[nodiscard]] uint32_t doPopcount(uint8_t flags) noexcept
 {
-    return TrueBitCount[flags];
+    /* If flags are ever expanded to use machine words instead of
+       uint8_t popcnt64 is also available */
+    return tr_popcnt<uint8_t>::count(flags);
 }
 
-[[nodiscard]] constexpr size_t rawCountFlags(uint8_t const* flags, size_t n) noexcept
+[[nodiscard]] size_t rawCountFlags(uint8_t const* flags, size_t n) noexcept
 {
     auto ret = size_t{};
 
@@ -120,8 +127,8 @@ size_t tr_bitfield::countFlags(size_t begin, size_t end) const noexcept
 
         /* middle bytes */
 
-        /* Use second accumulator because loads generally have high
-           latency but fast throughput. */
+        /* Use 2x accumulators to help alleviate high latency of
+           popcnt instruction on many architectures. */
         size_t tmp_accum = 0;
         for (size_t i = first_byte + 1; i < walk_end;)
         {
@@ -137,7 +144,11 @@ size_t tr_bitfield::countFlags(size_t begin, size_t end) const noexcept
         /* last byte */
         if (last_byte < std::size(flags_))
         {
-            size_t const last_shift = (-end) & 7U;
+            /* -end & 7U. Since bitcount is unsigned do ~end + 1 to
+               replace -end as linters warn about negating unsigned
+               types. Any compiler will optimize ~x + 1 to -x in the
+               backend. */
+            uint32_t const last_shift = (~end + 1) & 7U;
             val = flags_[last_byte];
             val >>= last_shift;
             /* No need to shift back val for correct popcount. */
@@ -175,7 +186,8 @@ bool tr_bitfield::isValid() const
 
 std::vector<uint8_t> tr_bitfield::raw() const
 {
-    auto const n = getBytesNeeded(bit_count_);
+    /* Impossible for bit_count_ to exceed SIZE_MAX - 8 */
+    auto const n = getBytesNeededSafe(bit_count_);
 
     if (!std::empty(flags_))
     {
@@ -196,12 +208,12 @@ void tr_bitfield::ensureBitsAlloced(size_t n)
 {
     bool const has_all = hasAll();
 
+    /* Cant use getBytesNeededSafe as n can be > SIZE_MAX - 8. */
     size_t const bytes_needed = has_all ? getBytesNeeded(std::max(n, true_count_)) : getBytesNeeded(n);
 
     if (std::size(flags_) < bytes_needed)
     {
         flags_.resize(bytes_needed);
-
         if (has_all)
         {
             setAllTrue(std::data(flags_), true_count_);
@@ -298,7 +310,7 @@ void tr_bitfield::setRaw(uint8_t const* raw, size_t byte_count)
     flags_.assign(raw, raw + byte_count);
 
     // ensure any excess bits at the end of the array are set to '0'.
-    if (byte_count == getBytesNeeded(bit_count_))
+    if (byte_count == getBytesNeededSafe(bit_count_))
     {
         auto const excess_bit_count = byte_count * 8 - bit_count_;
 
@@ -389,9 +401,10 @@ void tr_bitfield::setSpan(size_t begin, size_t end, bool value)
     auto const last_byte = end >> 3;
 
     unsigned char first_mask = 0xff >> (begin & 7U);
+    unsigned char last_mask = 0xff << ((~end) & 7U);
     if (value)
     {
-        unsigned char last_mask = 0xff << ((~end) & 7U);
+
         if (walk == last_byte)
         {
             flags_[walk] |= first_mask & last_mask;
@@ -413,7 +426,7 @@ void tr_bitfield::setSpan(size_t begin, size_t end, bool value)
     else
     {
         first_mask = ~first_mask;
-        unsigned char last_mask = 0xff >> ((end & 7U) + 1);
+        last_mask = ~last_mask;
         if (walk == last_byte)
         {
             flags_[walk] &= first_mask | last_mask;
