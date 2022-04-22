@@ -254,6 +254,25 @@ public:
         tr_netSetTOS(sock, peer_socket_tos_, type);
     }
 
+    [[nodiscard]] constexpr bool incPeerCount() noexcept
+    {
+        if (this->peerCount >= this->peerLimit)
+        {
+            return false;
+        }
+
+        ++this->peerCount;
+        return true;
+    }
+
+    constexpr void decPeerCount() noexcept
+    {
+        if (this->peerCount > 0)
+        {
+            --this->peerCount;
+        }
+    }
+
     // bandwidth
 
     [[nodiscard]] Bandwidth& getBandwidthGroup(std::string_view name);
@@ -308,8 +327,9 @@ public:
     struct evdns_base* evdns_base;
     struct tr_event_handle* events;
 
-    uint16_t peerLimit;
-    uint16_t peerLimitPerTorrent;
+    uint16_t peerCount = 0;
+    uint16_t peerLimit = 200;
+    uint16_t peerLimitPerTorrent = 50;
 
     int uploadSlotsPerTorrent;
 
