@@ -599,16 +599,9 @@ void gtr_text_buffer_set_text(Glib::RefPtr<Gtk::TextBuffer> const& b, Glib::ustr
     }
 }
 
-std::string get_date_string(time_t t)
+[[nodiscard]] std::string get_date_string(time_t t)
 {
-    if (t == 0)
-    {
-        return _("N/A");
-    }
-
-    struct tm tm;
-    tr_localtime_r(&t, &tm);
-    return fmt::format(FMT_STRING("{:%x}"), tm);
+    return t == 0 ? _("N/A") : fmt::format(FMT_STRING("{:%x}"), fmt::localtime(t));
 }
 
 } // namespace
