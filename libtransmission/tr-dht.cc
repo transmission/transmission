@@ -146,8 +146,7 @@ static void dht_boostrap_from_file(tr_session* session)
     }
 
     // check for a manual bootstrap file.
-    auto const bootstrap_file = tr_strvPath(session->config_dir, "dht.bootstrap");
-    auto in = std::ifstream{ bootstrap_file };
+    auto in = std::ifstream{ tr_pathbuf{ session->config_dir, "/dht.bootstrap"sv } };
     if (!in.is_open())
     {
         return;

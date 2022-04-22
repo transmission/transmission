@@ -10,6 +10,7 @@
 #include "resume.h"
 #include "torrent.h" // tr_isTorrent()
 #include "tr-assert.h"
+#include "tr-strbuf.h"
 #include "utils.h"
 #include "variant.h"
 
@@ -47,22 +48,22 @@ protected:
 
     void createSingleFileTorrentContents(std::string_view top)
     {
-        auto const path = tr_strvPath(top, "hello-world.txt");
+        auto const path = tr_pathbuf{ top, "/hello-world.txt" };
         createFileWithContents(path, "hello, world!\n");
     }
 
     void createMultifileTorrentContents(std::string_view top)
     {
-        auto path = tr_strvPath(top, "Felidae", "Felinae", "Acinonyx", "Cheetah", "Chester");
+        auto path = tr_pathbuf{ top, "/Felidae/Felinae/Acinonyx/Cheetah/Chester"sv };
         createFileWithContents(path, "It ain't easy bein' cheesy.\n");
 
-        path = tr_strvPath(top, "Felidae", "Pantherinae", "Panthera", "Tiger", "Tony");
+        path.assign(top, "/Felidae/Pantherinae/Panthera/Tiger/Tony"sv);
         createFileWithContents(path, "They’re Grrrrreat!\n");
 
-        path = tr_strvPath(top, "Felidae", "Felinae", "Felis", "catus", "Kyphi");
+        path.assign(top, "/Felidae/Felinae/Felis/catus/Kyphi"sv);
         createFileWithContents(path, "Inquisitive\n");
 
-        path = tr_strvPath(top, "Felidae", "Felinae", "Felis", "catus", "Saffron");
+        path.assign(top, "/Felidae/Felinae/Felis/catus/Saffron"sv);
         createFileWithContents(path, "Tough\n");
 
         sync();
@@ -192,18 +193,18 @@ TEST_F(RenameTest, singleFilenameTorrent)
     ****  Now try a rename that should succeed
     ***/
 
-    auto tmpstr = tr_strvPath(tor->currentDir().sv(), "hello-world.txt");
-    EXPECT_TRUE(tr_sys_path_exists(tmpstr.c_str()));
+    auto tmpstr = tr_pathbuf{ tor->currentDir(), "/hello-world.txt" };
+    EXPECT_TRUE(tr_sys_path_exists(tmpstr));
     EXPECT_STREQ("hello-world.txt", tr_torrentName(tor));
     EXPECT_EQ(0, torrentRenameAndWait(tor, tr_torrentName(tor), "foobar"));
-    EXPECT_FALSE(tr_sys_path_exists(tmpstr.c_str())); // confirm the old filename can't be found
+    EXPECT_FALSE(tr_sys_path_exists(tmpstr)); // confirm the old filename can't be found
     EXPECT_STREQ("foobar", tr_torrentName(tor)); // confirm the torrent's name is now 'foobar'
     EXPECT_STREQ("foobar", tr_torrentFile(tor, 0).name); // confirm the file's name is now 'foobar'
     char* const torrent_filename = tr_torrentFilename(tor);
     EXPECT_STREQ(nullptr, strstr(torrent_filename, "foobar")); // confirm torrent file hasn't changed
     tr_free(torrent_filename);
-    tmpstr = tr_strvPath(tor->currentDir().sv(), "foobar");
-    EXPECT_TRUE(tr_sys_path_exists(tmpstr.c_str())); // confirm the file's name is now 'foobar' on the disk
+    tmpstr.assign(tor->currentDir(), "/foobar");
+    EXPECT_TRUE(tr_sys_path_exists(tmpstr)); // confirm the file's name is now 'foobar' on the disk
     EXPECT_TRUE(testFileExistsAndConsistsOfThisString(tor, 0, "hello, world!\n")); // confirm the contents are right
 
     // (while it's renamed: confirm that the .resume file remembers the changes)
@@ -217,10 +218,10 @@ TEST_F(RenameTest, singleFilenameTorrent)
     ****  ...and rename it back again
     ***/
 
-    tmpstr = tr_strvPath(tor->currentDir().sv(), "foobar");
-    EXPECT_TRUE(tr_sys_path_exists(tmpstr.c_str()));
+    tmpstr.assign(tor->currentDir(), "/foobar");
+    EXPECT_TRUE(tr_sys_path_exists(tmpstr));
     EXPECT_EQ(0, torrentRenameAndWait(tor, "foobar", "hello-world.txt"));
-    EXPECT_FALSE(tr_sys_path_exists(tmpstr.c_str()));
+    EXPECT_FALSE(tr_sys_path_exists(tmpstr));
     EXPECT_STREQ("hello-world.txt", tr_torrentName(tor));
     EXPECT_STREQ("hello-world.txt", tr_torrentFile(tor, 0).name);
     EXPECT_TRUE(testFileExistsAndConsistsOfThisString(tor, 0, "hello, world!\n"));
@@ -494,7 +495,7 @@ TEST_F(RenameTest, partialFile)
 
     for (tr_file_index_t i = 0; i < 3; ++i)
     {
-        auto const expected = tr_strvPath(tor->currentDir().sv(), strings[i]);
+        auto const expected = tr_pathbuf{ tor->currentDir(), '/', strings[i] };
         char* path = tr_torrentFindFile(tor, i);
         EXPECT_EQ(expected, path);
         tr_free(path);
