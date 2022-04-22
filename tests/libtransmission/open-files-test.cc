@@ -46,6 +46,31 @@ TEST_F(OpenFilesTest, getOpensIfNotCached)
     EXPECT_EQ(Contents, std::data(buf));
 }
 
+TEST_F(OpenFilesTest, getCacheSucceedsIfCached)
+{
+    static auto constexpr Contents = "Hello, World!\n"sv;
+    auto filename = tr_pathbuf{ sandboxDir(), "/test-file.txt" };
+    createFileWithContents(filename, Contents);
+
+    EXPECT_FALSE(session_->openFiles().get(0, 0, false));
+    EXPECT_TRUE(session_->openFiles().get(0, 0, false, filename, TR_PREALLOCATE_FULL, std::size(Contents)));
+    EXPECT_TRUE(session_->openFiles().get(0, 0, false));
+}
+
+TEST_F(OpenFilesTest, getCachedReturnsTheSameFd)
+{
+    static auto constexpr Contents = "Hello, World!\n"sv;
+    auto filename = tr_pathbuf{ sandboxDir(), "/test-file.txt" };
+    createFileWithContents(filename, Contents);
+
+    EXPECT_FALSE(session_->openFiles().get(0, 0, false));
+    auto const fd1 = session_->openFiles().get(0, 0, false, filename, TR_PREALLOCATE_FULL, std::size(Contents));
+    auto const fd2 = session_->openFiles().get(0, 0, false);
+    EXPECT_TRUE(fd1);
+    EXPECT_TRUE(fd2);
+    EXPECT_EQ(*fd1, *fd2);
+}
+
 TEST_F(OpenFilesTest, getCachedFailsIfWrongPermissions)
 {
     static auto constexpr Contents = "Hello, World!\n"sv;
@@ -59,14 +84,6 @@ TEST_F(OpenFilesTest, getCachedFailsIfWrongPermissions)
     // now try to get it in r/w mode
     EXPECT_TRUE(session_->openFiles().get(0, 0, false));
     EXPECT_FALSE(session_->openFiles().get(0, 0, true));
-}
-
-TEST_F(OpenFilesTest, getCacheSucceedsIfCached)
-{
-}
-
-TEST_F(OpenFilesTest, getCachedReturnsTheSameFd)
-{
 }
 
 TEST_F(OpenFilesTest, opensInReadOnlyUnlessWritableIsRequested)
