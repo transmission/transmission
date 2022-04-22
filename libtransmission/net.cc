@@ -28,7 +28,6 @@
 
 #include "transmission.h"
 
-#include "fdlimit.h" /* tr_fdSocketClose() */
 #include "log.h"
 #include "net.h"
 #include "peer-socket.h" /* for struct tr_peer_socket */
@@ -293,6 +292,55 @@ static socklen_t setup_sockaddr(tr_address const* addr, tr_port port, struct soc
     return sizeof(struct sockaddr_in6);
 }
 
+static tr_socket_t tr_fdSocketCreate(tr_session* session, int domain, int type)
+{
+    TR_ASSERT(tr_isSession(session));
+
+    auto sockfd = socket(domain, type, 0);
+
+    if ((sockfd == TR_BAD_SOCKET) && (sockerrno != EAFNOSUPPORT))
+    {
+        tr_logAddWarn(fmt::format(
+            _("Couldn't create socket: {error} ({error_code})"),
+            fmt::arg("error", tr_net_strerror(sockerrno)),
+            fmt::arg("error_code", sockerrno)));
+    }
+
+    if (sockfd == TR_BAD_SOCKET)
+    {
+        return TR_BAD_SOCKET;
+    }
+
+    if (!session->incPeerCount())
+    {
+        tr_netCloseSocket(sockfd);
+        return TR_BAD_SOCKET;
+    }
+
+    if (static bool buf_logged = false; !buf_logged)
+    {
+        int i = 0;
+        socklen_t size = sizeof(i);
+
+        if (getsockopt(sockfd, SOL_SOCKET, SO_SNDBUF, reinterpret_cast<char*>(&i), &size) != -1)
+        {
+            tr_logAddTrace(fmt::format("SO_SNDBUF size is {}", i));
+        }
+
+        i = 0;
+        size = sizeof(i);
+
+        if (getsockopt(sockfd, SOL_SOCKET, SO_RCVBUF, reinterpret_cast<char*>(&i), &size) != -1)
+        {
+            tr_logAddTrace(fmt::format("SO_RCVBUF size is {}", i));
+        }
+
+        buf_logged = true;
+    }
+
+    return sockfd;
+}
+
 struct tr_peer_socket tr_netOpenPeerSocket(tr_session* session, tr_address const* addr, tr_port port, bool clientIsSeed)
 {
     TR_ASSERT(tr_address_is_valid(addr));
@@ -548,6 +596,29 @@ bool tr_net_hasIPv6(tr_port port)
     return result;
 }
 
+static tr_socket_t tr_fdSocketAccept(tr_session* session, tr_socket_t listening_sockfd, tr_address* addr, tr_port* port)
+{
+    TR_ASSERT(tr_isSession(session));
+    TR_ASSERT(addr != nullptr);
+    TR_ASSERT(port != nullptr);
+
+    struct sockaddr_storage sock;
+    socklen_t len = sizeof(struct sockaddr_storage);
+    auto sockfd = accept(listening_sockfd, (struct sockaddr*)&sock, &len);
+    if (sockfd == TR_BAD_SOCKET)
+    {
+        return TR_BAD_SOCKET;
+    }
+
+    if (!tr_address_from_sockaddr_storage(addr, port, &sock) || !session->incPeerCount())
+    {
+        tr_netCloseSocket(sockfd);
+        return TR_BAD_SOCKET;
+    }
+
+    return sockfd;
+}
+
 tr_socket_t tr_netAccept(tr_session* session, tr_socket_t b, tr_address* addr, tr_port* port)
 {
     tr_socket_t fd = tr_fdSocketAccept(session, b, addr, port);
@@ -561,14 +632,15 @@ tr_socket_t tr_netAccept(tr_session* session, tr_socket_t b, tr_address* addr, t
     return fd;
 }
 
-void tr_netCloseSocket(tr_socket_t fd)
+void tr_netCloseSocket(tr_socket_t sockfd)
 {
-    evutil_closesocket(fd);
+    evutil_closesocket(sockfd);
 }
 
-void tr_netClose(tr_session* session, tr_socket_t s)
+void tr_netClose(tr_session* session, tr_socket_t sockfd)
 {
-    tr_fdSocketClose(session, s);
+    tr_netCloseSocket(sockfd);
+    session->decPeerCount();
 }
 
 /*
