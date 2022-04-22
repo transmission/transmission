@@ -126,7 +126,7 @@ std::string getShortTransferString(
     if (bool const have_down = have_meta && (st->peersSendingToUs > 0 || st->webseedsSendingToUs > 0); have_down)
     {
         return fmt::format(
-            _("{upload_speed} ▲ {download_speed} ▼"),
+            _("{download_speed} ▼  {upload_speed} ▲"),
             fmt::arg("upload_speed", tr_formatter_speed_KBps(uploadSpeed_KBps)),
             fmt::arg("download_speed", tr_formatter_speed_KBps(downloadSpeed_KBps)));
     }
