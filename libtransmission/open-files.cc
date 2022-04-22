@@ -8,6 +8,8 @@
 #include <cerrno>
 #include <cstdint> // uint8_t, uint64_t
 
+#include <iostream>
+
 #include <fmt/core.h>
 
 #include "transmission.h"
@@ -23,6 +25,11 @@
 
 namespace
 {
+
+bool isOpen(tr_sys_file_t fd)
+{
+    return fd != TR_BAD_SYS_FILE;
+}
 
 bool preallocate_file_sparse(tr_sys_file_t fd, uint64_t length, tr_error** error)
 {
@@ -111,11 +118,14 @@ uint64_t next_sequence_ = 1;
 
 std::optional<tr_sys_file_t> tr_open_files::get(tr_torrent_id_t tor_id, tr_file_index_t file_num, bool writable)
 {
-    if (auto const it = find(makeKey(tor_id, file_num)); (it != std::end(files_)) && (!writable || it->writable_))
+    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
+    if (auto const it = find(makeKey(tor_id, file_num)); (it != std::end(files_)) && isOpen(it->fd_) && (!writable || it->writable_))
     {
+        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
         return it->fd_;
     }
 
+    std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
     return {};
 }
 
@@ -129,7 +139,7 @@ std::optional<tr_sys_file_t> tr_open_files::get(
 {
     // is there already an entry
     auto const key = makeKey(tor_id, file_num);
-    if (auto it = find(key); it != std::end(files_))
+    if (auto it = find(key); it != std::end(files_) && isOpen(it->fd_))
     {
         if (!writable || it->writable_)
         {
@@ -154,6 +164,7 @@ std::optional<tr_sys_file_t> tr_open_files::get(
                 fmt::arg("error", error->message),
                 fmt::arg("error_code", error->code)));
             tr_error_free(error);
+            std::cerr << __FILE__ << ':' << __LINE__ << ' ' << error->message << std::endl;
             return {};
         }
 
@@ -165,6 +176,7 @@ std::optional<tr_sys_file_t> tr_open_files::get(
                 fmt::arg("error", error->message),
                 fmt::arg("error_code", error->code)));
             tr_error_free(error);
+            std::cerr << __FILE__ << ':' << __LINE__ << ' ' << error->message << std::endl;
             return {};
         }
     }
@@ -179,8 +191,10 @@ std::optional<tr_sys_file_t> tr_open_files::get(
     // open the file
     int flags = writable ? (TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE) : 0;
     flags |= TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL;
+    std::cerr << __FILE__ << ':' << __LINE__ << " filename [" << filename << ']' << std::endl;
     auto const fd = tr_sys_file_open(filename, flags, 0666, &error);
-    if (fd == TR_BAD_SYS_FILE)
+    std::cerr << __FILE__ << ':' << __LINE__ << " fd "<< fd << std::endl;
+    if (!isOpen(fd))
     {
         tr_logAddError(fmt::format(
             _("Couldn't open '{path}': {error} ({error_code})"),
@@ -188,6 +202,7 @@ std::optional<tr_sys_file_t> tr_open_files::get(
             fmt::arg("error", error->message),
             fmt::arg("error_code", error->code)));
         tr_error_free(error);
+        std::cerr << __FILE__ << ':' << __LINE__ << ' ' << error->message << std::endl;
         return {};
     }
 
@@ -218,6 +233,7 @@ std::optional<tr_sys_file_t> tr_open_files::get(
                 fmt::arg("error_code", error->code)));
             tr_error_free(error);
             tr_sys_file_close(fd);
+            std::cerr << __FILE__ << ':' << __LINE__ << ' ' << error->message << std::endl;
             return {};
         }
 
@@ -238,6 +254,7 @@ std::optional<tr_sys_file_t> tr_open_files::get(
             fmt::arg("error_code", error->code)));
         tr_error_free(error);
         tr_sys_file_close(fd);
+        std::cerr << __FILE__ << ':' << __LINE__ << ' ' << error->message << std::endl;
         return {};
     }
 
@@ -248,6 +265,7 @@ std::optional<tr_sys_file_t> tr_open_files::get(
     entry.writable_ = writable;
     entry.sequence_ = next_sequence_++;
 
+    std::cerr << __FILE__ << ':' << __LINE__ << ' ' << fd << std::endl;
     return fd;
 }
 
@@ -297,7 +315,7 @@ tr_open_files::Entry::~Entry()
 
 void tr_open_files::Entry::close()
 {
-    if (fd_ != TR_BAD_SYS_FILE)
+    if (isOpen(fd_))
     {
         tr_sys_file_close(fd_);
     }
