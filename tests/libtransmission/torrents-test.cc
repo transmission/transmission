@@ -113,7 +113,7 @@ TEST_F(TorrentsTest, removedSince)
         EXPECT_EQ(nullptr, torrents.get(tor->uniqueId));
     }
 
-    auto remove = std::set<int>{};
+    auto remove = std::vector<int>{};
     remove = { torrents_v[3]->uniqueId };
     EXPECT_EQ(remove, torrents.removedSince(300));
     EXPECT_EQ(remove, torrents.removedSince(201));
