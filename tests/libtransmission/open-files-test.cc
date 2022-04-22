@@ -118,7 +118,7 @@ TEST_F(OpenFilesTest, createsMissingFileIfWriteRequested)
     EXPECT_TRUE(tr_sys_path_exists(filename));
 }
 
-TEST_F(OpenFilesTest, closeFile)
+TEST_F(OpenFilesTest, closeFileClosesTheFile)
 {
     static auto constexpr Contents = "Hello, World!\n"sv;
     auto filename = tr_pathbuf{ sandboxDir(), "/test-file.txt" };
@@ -135,10 +135,30 @@ TEST_F(OpenFilesTest, closeFile)
     EXPECT_FALSE(session_->openFiles().get(0, 0, false));
 }
 
-TEST_F(OpenFilesTest, closesLeastRecentlyUsedFile)
+TEST_F(OpenFilesTest, closeTorrentClosesTheTorrentFiles)
 {
+    static auto constexpr Contents = "Hello, World!\n"sv;
+    static auto tor_id = tr_torrent_id_t{ 0 };
+
+    auto filename = tr_pathbuf{ sandboxDir(), "/a.txt" };
+    createFileWithContents(filename, Contents);
+    EXPECT_TRUE(session_->openFiles().get(tor_id, 1, false, filename, TR_PREALLOCATE_FULL, std::size(Contents)));
+
+    filename.assign(sandboxDir(), "/b.txt");
+    createFileWithContents(filename, Contents);
+    EXPECT_TRUE(session_->openFiles().get(tor_id, 3, false, filename, TR_PREALLOCATE_FULL, std::size(Contents)));
+
+    // confirm that closing a different torrent does not affect these files
+    session_->openFiles().closeTorrent(tor_id + 1);
+    EXPECT_TRUE(session_->openFiles().get(tor_id, 1, false));
+    EXPECT_TRUE(session_->openFiles().get(tor_id, 3, false));
+
+    // confirm that closing this torrent closes and uncaches the files
+    session_->openFiles().closeTorrent(tor_id);
+    EXPECT_FALSE(session_->openFiles().get(tor_id, 1, false));
+    EXPECT_FALSE(session_->openFiles().get(tor_id, 3, false));
 }
 
-TEST_F(OpenFilesTest, closeTorrent)
+TEST_F(OpenFilesTest, closesLeastRecentlyUsedFile)
 {
 }
