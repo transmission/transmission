@@ -25,7 +25,6 @@
 #include "announcer.h"
 #include "bandwidth.h"
 #include "blocklist.h"
-#include "cache.h"
 #include "clients.h"
 #include "completion.h"
 #include "crypto-utils.h"
