@@ -118,11 +118,24 @@ TEST_F(OpenFilesTest, createsMissingFileIfWriteRequested)
     EXPECT_TRUE(tr_sys_path_exists(filename));
 }
 
-TEST_F(OpenFilesTest, closesLeastRecentlyUsedFile)
+TEST_F(OpenFilesTest, closeFile)
 {
+    static auto constexpr Contents = "Hello, World!\n"sv;
+    auto filename = tr_pathbuf{ sandboxDir(), "/test-file.txt" };
+    createFileWithContents(filename, Contents);
+
+    // cache a file read-only mode
+    EXPECT_TRUE(session_->openFiles().get(0, 0, false, filename, TR_PREALLOCATE_FULL, std::size(Contents)));
+    EXPECT_TRUE(session_->openFiles().get(0, 0, false));
+
+    // close the file
+    session_->openFiles().closeFile(0, 0);
+
+    // confirm that its fd is no longer cached
+    EXPECT_FALSE(session_->openFiles().get(0, 0, false));
 }
 
-TEST_F(OpenFilesTest, closeFile)
+TEST_F(OpenFilesTest, closesLeastRecentlyUsedFile)
 {
 }
 
