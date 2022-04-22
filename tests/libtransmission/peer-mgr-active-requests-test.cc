@@ -101,7 +101,7 @@ TEST_F(PeerMgrActiveRequestsTest, peersAreRemoved)
     EXPECT_EQ(0U, requests.count(peer));
     EXPECT_EQ(0U, requests.size());
 
-    // try removing requests for that block agian (should remove nothing)
+    // try removing requests for that block again (should remove nothing)
     EXPECT_EQ(std::vector<tr_peer*>{}, requests.remove(block));
 }
 

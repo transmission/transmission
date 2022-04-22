@@ -57,7 +57,7 @@ public:
 
     // "raw" here is in BEP0003 format: "The first byte of the bitfield
     // corresponds to indices 0 - 7 from high bit to low bit, respectively.
-    // The next one 8-15, etc. Spare bits at the end are set to zero.
+    // The next one 8-15, etc. Spare bits at the end are set to zero."
     void setRaw(uint8_t const* bits, size_t byte_count);
     [[nodiscard]] std::vector<uint8_t> raw() const;
 

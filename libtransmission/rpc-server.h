@@ -35,6 +35,13 @@ public:
     tr_rpc_server& operator=(tr_rpc_server&) = delete;
     tr_rpc_server& operator=(tr_rpc_server&&) = delete;
 
+    [[nodiscard]] constexpr tr_port port() const noexcept
+    {
+        return port_;
+    }
+
+    void setPort(tr_port) noexcept;
+
     std::shared_ptr<libdeflate_compressor> compressor;
 
     std::list<std::string> hostWhitelist;
@@ -56,7 +63,7 @@ public:
     static int constexpr DefaultRpcSocketMode = 0750;
     int rpc_socket_mode = DefaultRpcSocketMode;
 
-    tr_port port = 0;
+    tr_port port_;
 
     bool isAntiBruteForceEnabled = false;
     bool isEnabled = false;
@@ -68,10 +75,6 @@ public:
 void tr_rpcSetEnabled(tr_rpc_server* server, bool isEnabled);
 
 bool tr_rpcIsEnabled(tr_rpc_server const* server);
-
-void tr_rpcSetPort(tr_rpc_server* server, tr_port port);
-
-tr_port tr_rpcGetPort(tr_rpc_server const* server);
 
 void tr_rpcSetUrl(tr_rpc_server* server, std::string_view url);
 

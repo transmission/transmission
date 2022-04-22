@@ -1406,7 +1406,7 @@
  * Fix 1.40 "lazy bitfield" error
  * Fix 1.40 "jumpy upload speed" bug
  * Fix handshake peer_id error
- * Corrrectly handle Windows-style newlines in Bluetack blocklists
+ * Correctly handle Windows-style newlines in Bluetack blocklists
  * More accurate bandwidth measurement
  * File selection & priority was reset when editing a torrent's tracker list
  * Fix autoconf/automake build warnings

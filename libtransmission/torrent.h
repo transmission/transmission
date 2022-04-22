@@ -387,11 +387,6 @@ public:
         return this->announceList().at(i);
     }
 
-    [[nodiscard]] auto tiers() const
-    {
-        return this->announceList().tiers();
-    }
-
     [[nodiscard]] auto trackerList() const
     {
         return this->announceList().toString();

@@ -85,7 +85,7 @@ bool isJunkFile(std::string_view filename)
     auto const base = tr_sys_path_basename(filename);
 
 #ifdef __APPLE__
-    // check for resource forks. <http://support.apple.com/kb/TA20578>
+    // check for resource forks. <http://web.archive.org/web/20101010051608/http://support.apple.com/kb/TA20578>
     if (tr_strvStartsWith(base, "._"sv))
     {
         return true;

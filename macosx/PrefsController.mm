@@ -450,7 +450,7 @@
 
 - (void)setPort:(id)sender
 {
-    tr_port const port = [sender intValue];
+    uint16_t const port = [sender intValue];
     [self.fDefaults setInteger:port forKey:@"BindPort"];
     tr_sessionSetPeerPort(self.fHandle, port);
 
@@ -460,7 +460,7 @@
 
 - (void)randomPort:(id)sender
 {
-    tr_port const port = tr_sessionSetPeerPortRandom(self.fHandle);
+    auto const port = tr_sessionSetPeerPortRandom(self.fHandle);
     [self.fDefaults setInteger:port forKey:@"BindPort"];
     self.fPortField.intValue = port;
 
@@ -1361,8 +1361,8 @@
     BOOL const useIncomplete = tr_sessionIsIncompleteDirEnabled(self.fHandle);
     [self.fDefaults setBool:useIncomplete forKey:@"UseIncompleteDownloadFolder"];
 
-    BOOL const usePartialFileRanaming = tr_sessionIsIncompleteFileNamingEnabled(self.fHandle);
-    [self.fDefaults setBool:usePartialFileRanaming forKey:@"RenamePartialFiles"];
+    BOOL const usePartialFileRenaming = tr_sessionIsIncompleteFileNamingEnabled(self.fHandle);
+    [self.fDefaults setBool:usePartialFileRenaming forKey:@"RenamePartialFiles"];
 
     //utp
     BOOL const utp = tr_sessionIsUTPEnabled(self.fHandle);
@@ -1392,7 +1392,7 @@
     [self.fDefaults setBool:autoStart forKey:@"AutoStartDownload"];
 
     //port
-    tr_port const port = tr_sessionGetPeerPort(self.fHandle);
+    auto const port = tr_sessionGetPeerPort(self.fHandle);
     [self.fDefaults setInteger:port forKey:@"BindPort"];
 
     BOOL const nat = tr_sessionIsPortForwardingEnabled(self.fHandle);

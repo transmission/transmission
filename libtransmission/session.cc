@@ -14,7 +14,7 @@
 #include <iterator> // std::back_inserter
 #include <list>
 #include <memory>
-#include <numeric> // std::acumulate()
+#include <numeric> // std::accumulate()
 #include <string>
 #include <string_view>
 #include <tuple>
@@ -86,7 +86,10 @@ static auto constexpr BandwidthGroupsFilename = "bandwidth-groups.json"sv;
 
 static tr_port getRandomPort(tr_session const* s)
 {
-    return tr_port(tr_rand_int_weak(s->randomPortHigh - s->randomPortLow + 1) + s->randomPortLow);
+    auto const lower = std::min(s->randomPortLow.host(), s->randomPortHigh.host());
+    auto const upper = std::max(s->randomPortLow.host(), s->randomPortHigh.host());
+    auto const range = upper - lower;
+    return tr_port::fromHost(lower + tr_rand_int_weak(range + 1));
 }
 
 /* Generate a peer id : "-TRxyzb-" + 12 random alphanumeric
@@ -148,7 +151,7 @@ std::optional<std::string> tr_session::WebMediator::publicAddress() const
         tr_address const* addr = tr_sessionGetPublicAddress(session_, type, &is_default_value);
         if (addr != nullptr && !is_default_value)
         {
-            return tr_address_to_string(addr);
+            return addr->readable();
         }
     }
 
@@ -300,7 +303,7 @@ tr_address const* tr_sessionGetPublicAddress(tr_session const* session, int tr_a
 
     if (is_default_value != nullptr && bindinfo != nullptr)
     {
-        *is_default_value = bindinfo->addr.to_string() == default_value;
+        *is_default_value = bindinfo->addr.readable() == default_value;
     }
 
     return bindinfo != nullptr ? &bindinfo->addr : nullptr;
@@ -421,10 +424,10 @@ void tr_sessionGetSettings(tr_session const* s, tr_variant* d)
     tr_variantDictAddInt(d, TR_KEY_message_level, tr_logGetLevel());
     tr_variantDictAddInt(d, TR_KEY_peer_limit_global, s->peerLimit);
     tr_variantDictAddInt(d, TR_KEY_peer_limit_per_torrent, s->peerLimitPerTorrent);
-    tr_variantDictAddInt(d, TR_KEY_peer_port, tr_sessionGetPeerPort(s));
+    tr_variantDictAddInt(d, TR_KEY_peer_port, s->peerPort().host());
     tr_variantDictAddBool(d, TR_KEY_peer_port_random_on_start, s->isPortRandom);
-    tr_variantDictAddInt(d, TR_KEY_peer_port_random_low, s->randomPortLow);
-    tr_variantDictAddInt(d, TR_KEY_peer_port_random_high, s->randomPortHigh);
+    tr_variantDictAddInt(d, TR_KEY_peer_port_random_low, s->randomPortLow.host());
+    tr_variantDictAddInt(d, TR_KEY_peer_port_random_high, s->randomPortHigh.host());
     tr_variantDictAddStr(d, TR_KEY_peer_socket_tos, tr_netTosToName(s->peer_socket_tos_));
     tr_variantDictAddStr(d, TR_KEY_peer_congestion_algorithm, s->peerCongestionAlgorithm());
     tr_variantDictAddBool(d, TR_KEY_pex_enabled, s->isPexEnabled);
@@ -975,12 +978,12 @@ static void sessionSetImpl(struct init_data* const data)
     /* incoming peer port */
     if (tr_variantDictFindInt(settings, TR_KEY_peer_port_random_low, &i))
     {
-        session->randomPortLow = i;
+        session->randomPortLow.setHost(i);
     }
 
     if (tr_variantDictFindInt(settings, TR_KEY_peer_port_random_high, &i))
     {
-        session->randomPortHigh = i;
+        session->randomPortHigh.setHost(i);
     }
 
     if (tr_variantDictFindBool(settings, TR_KEY_peer_port_random_on_start, &boolVal))
@@ -988,12 +991,16 @@ static void sessionSetImpl(struct init_data* const data)
         tr_sessionSetPeerPortRandomOnStart(session, boolVal);
     }
 
-    if (!tr_variantDictFindInt(settings, TR_KEY_peer_port, &i))
     {
-        i = session->private_peer_port;
-    }
+        auto peer_port = session->private_peer_port;
 
-    setPeerPort(session, boolVal ? getRandomPort(session) : i);
+        if (auto port = int64_t{}; tr_variantDictFindInt(settings, TR_KEY_peer_port, &port))
+        {
+            peer_port.setHost(static_cast<uint16_t>(port));
+        }
+
+        setPeerPort(session, boolVal ? getRandomPort(session) : peer_port);
+    }
 
     if (tr_variantDictFindBool(settings, TR_KEY_port_forwarding_enabled, &boolVal))
     {
@@ -1244,25 +1251,25 @@ static void setPeerPort(tr_session* session, tr_port port)
     tr_runInEventThread(session, peerPortChanged, session);
 }
 
-void tr_sessionSetPeerPort(tr_session* session, tr_port port)
+void tr_sessionSetPeerPort(tr_session* session, uint16_t hport)
 {
-    if (tr_isSession(session) && session->private_peer_port != port)
+    if (auto const port = tr_port::fromHost(hport); tr_isSession(session) && session->private_peer_port != port)
     {
         setPeerPort(session, port);
     }
 }
 
-tr_port tr_sessionGetPeerPort(tr_session const* session)
+uint16_t tr_sessionGetPeerPort(tr_session const* session)
 {
-    return tr_isSession(session) ? session->public_peer_port : 0;
+    return tr_isSession(session) ? session->public_peer_port.host() : 0U;
 }
 
-tr_port tr_sessionSetPeerPortRandom(tr_session* session)
+uint16_t tr_sessionSetPeerPortRandom(tr_session* session)
 {
     TR_ASSERT(tr_isSession(session));
 
-    tr_sessionSetPeerPort(session, getRandomPort(session));
-    return session->private_peer_port;
+    session->setPeerPort(getRandomPort(session));
+    return session->private_peer_port.host();
 }
 
 void tr_sessionSetPeerPortRandomOnStart(tr_session* session, bool random)
@@ -2555,18 +2562,21 @@ bool tr_sessionIsRPCEnabled(tr_session const* session)
     return tr_rpcIsEnabled(session->rpc_server_.get());
 }
 
-void tr_sessionSetRPCPort(tr_session* session, tr_port port)
+void tr_sessionSetRPCPort(tr_session* session, uint16_t hport)
 {
     TR_ASSERT(tr_isSession(session));
 
-    tr_rpcSetPort(session->rpc_server_.get(), port);
+    if (session->rpc_server_)
+    {
+        session->rpc_server_->setPort(tr_port::fromHost(hport));
+    }
 }
 
-tr_port tr_sessionGetRPCPort(tr_session const* session)
+uint16_t tr_sessionGetRPCPort(tr_session const* session)
 {
     TR_ASSERT(tr_isSession(session));
 
-    return tr_rpcGetPort(session->rpc_server_.get());
+    return session->rpc_server_ ? session->rpc_server_->port().host() : uint16_t{};
 }
 
 void tr_sessionSetRPCUrl(tr_session* session, char const* url)

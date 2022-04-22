@@ -15,7 +15,7 @@ If this does not happen, you can add Transmission to Leopard's firewall manually
  1. Make sure the pull down menu is set to "Allow incoming connections".
 
 ### On Mac OS X 10.4 and older
- 1. Open Transmission, go to Preferences >> Network and and note down the number for the port. Then quit Transmission.
+ 1. Open Transmission, go to Preferences >> Network and note down the number for the port. Then quit Transmission.
  1. Open System Prefs >> Sharing >> Firewall. Click "New." In the "Port Name" pop-up menu, select Other, and fill in the settings as follows:
   * TCP Port Number(s): the port you chose in step 1 - (default is 51413).
   * Description: Transmission

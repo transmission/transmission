@@ -244,7 +244,7 @@ void Session::updatePref(int key)
         case Prefs::RPC_PORT:
             if (session_ != nullptr)
             {
-                tr_sessionSetRPCPort(session_, static_cast<tr_port>(prefs_.getInt(key)));
+                tr_sessionSetRPCPort(session_, static_cast<uint16_t>(prefs_.getInt(key)));
             }
 
             break;

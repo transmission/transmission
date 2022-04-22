@@ -203,7 +203,8 @@ auto parsePort(std::string_view port_sv)
 {
     auto const port = tr_parseNum<int>(port_sv);
 
-    return port && *port >= std::numeric_limits<tr_port>::min() && *port <= std::numeric_limits<tr_port>::max() ? *port : -1;
+    using PortLimits = std::numeric_limits<uint16_t>;
+    return port && PortLimits::min() <= *port && *port <= PortLimits::max() ? *port : -1;
 }
 
 constexpr std::string_view getPortForScheme(std::string_view scheme)

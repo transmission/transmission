@@ -55,8 +55,8 @@ using namespace std::literals;
 
 /* session-id is used to make cross-site request forgery attacks difficult.
  * Don't disable this feature unless you really know what you're doing!
- * http://en.wikipedia.org/wiki/Cross-site_request_forgery
- * http://shiflett.org/articles/cross-site-request-forgeries
+ * https://en.wikipedia.org/wiki/Cross-site_request_forgery
+ * https://shiflett.org/articles/cross-site-request-forgeries
  * http://www.webappsec.org/lists/websecurity/archive/2008-04/msg00037.html */
 #define REQUIRE_SESSION_ID
 
@@ -605,14 +605,13 @@ static char const* tr_rpc_address_to_string(tr_rpc_address const& addr, char* bu
 
 static std::string tr_rpc_address_with_port(tr_rpc_server const* server)
 {
-
     char addr_buf[TrUnixAddrStrLen];
     tr_rpc_address_to_string(*server->bindAddress, addr_buf, sizeof(addr_buf));
 
     std::string addr_port_str{ addr_buf };
     if (server->bindAddress->type != TR_RPC_AF_UNIX)
     {
-        addr_port_str.append(":" + std::to_string(tr_rpcGetPort(server)));
+        addr_port_str.append(":" + std::to_string(server->port().host()));
     }
     return addr_port_str;
 }
@@ -740,11 +739,11 @@ static void startServer(tr_rpc_server* server)
 
     char const* address = tr_rpcGetBindAddress(server);
 
-    tr_port const port = server->port;
+    auto const port = server->port();
 
     bool const success = server->bindAddress->type == TR_RPC_AF_UNIX ?
         bindUnixSocket(base, httpd, address, server->rpc_socket_mode) :
-        (evhttp_bind_socket(httpd, address, port) != -1);
+        (evhttp_bind_socket(httpd, address, port.host()) != -1);
 
     auto const addr_port_str = tr_rpc_address_with_port(server);
 
@@ -840,24 +839,19 @@ static void restartServer(tr_rpc_server* const server)
     }
 }
 
-void tr_rpcSetPort(tr_rpc_server* server, tr_port port)
+void tr_rpc_server::setPort(tr_port port) noexcept
 {
-    TR_ASSERT(server != nullptr);
-
-    if (server->port != port)
+    if (port_ == port)
     {
-        server->port = port;
-
-        if (server->isEnabled)
-        {
-            tr_runInEventThread(server->session, restartServer, server);
-        }
+        return;
     }
-}
 
-tr_port tr_rpcGetPort(tr_rpc_server const* server)
-{
-    return server->port;
+    port_ = port;
+
+    if (isEnabled)
+    {
+        tr_runInEventThread(session, restartServer, this);
+    }
 }
 
 void tr_rpcSetUrl(tr_rpc_server* server, std::string_view url)
@@ -1048,7 +1042,7 @@ tr_rpc_server::tr_rpc_server(tr_session* session_in, tr_variant* settings)
     }
     else
     {
-        this->port = (tr_port)i;
+        this->port_.setHost(i);
     }
 
     key = TR_KEY_rpc_url;

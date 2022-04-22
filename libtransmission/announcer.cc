@@ -877,7 +877,7 @@ static tr_announce_request* announce_request_new(
     TR_ASSERT(current_tracker != nullptr);
 
     auto* const req = new tr_announce_request();
-    req->port = tr_sessionGetPublicPeerPort(announcer->session);
+    req->port = announcer->session->peerPort();
     req->announce_url = current_tracker->announce_url;
     req->tracker_id = current_tracker->tracker_id;
     req->info_hash = tor->infoHash();
@@ -1158,7 +1158,7 @@ static void on_announce_done(tr_announce_response const* response, void* vdata)
 
             if (!isStopped && std::empty(tier->announce_events))
             {
-                /* the queue is empty, so enqueue a perodic update */
+                /* the queue is empty, so enqueue a periodic update */
                 int const i = tier->announceIntervalSec;
                 tr_logAddTraceTier(tier, fmt::format("Sending periodic reannounce in {} seconds", i));
                 tier_announce_event_push(tier, TR_ANNOUNCE_EVENT_NONE, now + i);

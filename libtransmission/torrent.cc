@@ -687,12 +687,12 @@ static bool isNewTorrentASeed(tr_torrent* tor)
 
 static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
 {
-    auto const lock = tor->unique_lock();
-
     tr_session* session = tr_ctorGetSession(ctor);
     TR_ASSERT(session != nullptr);
-
     tor->session = session;
+
+    auto const lock = tor->unique_lock();
+
     tor->queuePosition = tr_sessionCountTorrents(session);
 
     torrentInitFromInfoDict(tor);

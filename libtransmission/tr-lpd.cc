@@ -23,7 +23,7 @@ using in_port_t = uint16_t; /* all missing */
 #include <event2/event.h>
 #include <event2/util.h>
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include "transmission.h"
 
@@ -263,9 +263,8 @@ int tr_lpdInit(tr_session* ss, tr_address* /*tr_addr*/)
     TR_ASSERT(lpd_announceInterval > 0);
     TR_ASSERT(lpd_announceScope > 0);
 
-    lpd_port = tr_sessionGetPeerPort(ss);
-
-    if (lpd_port <= 0)
+    lpd_port = ss->peerPort();
+    if (std::empty(lpd_port))
     {
         return -1;
     }
@@ -438,7 +437,7 @@ bool tr_lpdSendAnnounce(tr_torrent const* t)
         1,
         lpd_mcastGroup,
         lpd_mcastPort,
-        lpd_port,
+        lpd_port.host(),
         tr_strupper(t->infoHashString()));
 
     // send the query out using [lpd_socket2]
@@ -465,7 +464,7 @@ bool tr_lpdSendAnnounce(tr_torrent const* t)
 * @brief Process incoming unsolicited messages and add the peer to the announced
 * torrent if all checks are passed.
 *
-* @param[in,out] peer Adress information of the peer to add
+* @param[in,out] peer Address information of the peer to add
 * @param[in] msg The announcement message to consider
 * @return Returns 0 if any input parameter or the announce was invalid, 1 if the peer
 * was successfully added, -1 if not; a non-null return value indicates a side-effect to
@@ -484,7 +483,6 @@ static int tr_lpdConsiderAnnounce(tr_pex* peer, char const* const msg)
     char value[MaxValueLen] = { 0 };
     char hashString[MaxHashLen] = { 0 };
     int res = 0;
-    int peerPort = 0;
 
     if (peer != nullptr && msg != nullptr)
     {
@@ -505,12 +503,13 @@ static int tr_lpdConsiderAnnounce(tr_pex* peer, char const* const msg)
         }
 
         /* determine announced peer port, refuse if value too large */
-        if (sscanf(value, "%d", &peerPort) != 1 || peerPort > (in_port_t)-1)
+        int peer_port = 0;
+        if (sscanf(value, "%d", &peer_port) != 1 || peer_port > (in_port_t)-1)
         {
             return 0;
         }
 
-        peer->port = htons(peerPort);
+        peer->port.setHost(peer_port);
         res = -1; /* signal caller side-effect to peer->port via return != 0 */
 
         if (!lpd_extractParam(params, "Infohash", MaxHashLen, hashString))
@@ -524,14 +523,16 @@ static int tr_lpdConsiderAnnounce(tr_pex* peer, char const* const msg)
         {
             /* we found a suitable peer, add it to the torrent */
             tr_peerMgrAddPex(tor, TR_PEER_FROM_LPD, peer, 1);
-            tr_logAddDebugTor(tor, fmt::format("Found a local peer from LPD ({})", peer->addr.to_string(peerPort)));
+            tr_logAddDebugTor(
+                tor,
+                fmt::format(FMT_STRING("Found a local peer from LPD ({:s})"), peer->addr.readable(peer->port)));
 
             /* periodic reconnectPulse() deals with the rest... */
 
             return 1;
         }
 
-        tr_logAddDebug(fmt::format("Cannot serve torrent #{}", hashString));
+        tr_logAddDebug(fmt::format(FMT_STRING("Cannot serve torrent #{:s}"), hashString));
     }
 
     return res;
