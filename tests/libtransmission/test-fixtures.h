@@ -53,7 +53,6 @@ static void depthFirstWalk(char const* path, file_func_t func)
             {
                 if (strcmp(name, ".") != 0 && strcmp(name, "..") != 0)
                 {
-                    auto const filename = tr_strvPath(path, name);
                     depthFirstWalk(tr_strvPath(path, name).c_str(), func);
                 }
             }
@@ -245,7 +244,7 @@ protected:
         errno = tmperr;
     }
 
-    void createFileWithContents(std::string const& path, void const* payload) const
+    void createFileWithContents(std::string_view path, void const* payload) const
     {
         createFileWithContents(path, payload, strlen(static_cast<char const*>(payload)));
     }
@@ -319,8 +318,7 @@ private:
         tr_variantDictAddStr(settings, q, incomplete_dir.c_str());
 
         // blocklists
-        auto const blocklist_dir = tr_strvPath(sandboxDir(), "blocklists");
-        tr_sys_dir_create(blocklist_dir.data(), TR_SYS_DIR_CREATE_PARENTS, 0700);
+        tr_sys_dir_create(tr_pathbuf{ sandboxDir(), "/blocklists" }, TR_SYS_DIR_CREATE_PARENTS, 0700);
 
         // fill in any missing settings
 

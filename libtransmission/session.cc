@@ -739,11 +739,8 @@ static void tr_sessionInitImpl(init_data* data)
     ***  Blocklist
     **/
 
-    {
-        auto const filename = tr_strvPath(session->config_dir, "blocklists"sv);
-        tr_sys_dir_create(filename.c_str(), TR_SYS_DIR_CREATE_PARENTS, 0777);
-        loadBlocklists(session);
-    }
+    tr_sys_dir_create(tr_pathbuf{ session->config_dir, "/blocklists"sv }, TR_SYS_DIR_CREATE_PARENTS, 0777);
+    loadBlocklists(session);
 
     TR_ASSERT(tr_isSession(session));
 
@@ -2340,8 +2337,8 @@ static void loadBlocklists(tr_session* session)
     auto const isEnabled = session->useBlocklist();
 
     /* walk the blocklist directory... */
-    auto const dirname = tr_strvPath(session->config_dir, "blocklists"sv);
-    auto const odir = tr_sys_dir_open(dirname.c_str());
+    auto const dirname = tr_pathbuf{ session->config_dir, "/blocklists"sv };
+    auto const odir = tr_sys_dir_open(dirname);
 
     if (odir == TR_BAD_SYS_DIR)
     {
@@ -2358,7 +2355,7 @@ static void loadBlocklists(tr_session* session)
             continue;
         }
 
-        if (auto const path = tr_strvPath(dirname, name); tr_strvEndsWith(path, ".bin"sv))
+        if (auto const path = tr_pathbuf{ dirname, '/', name }; tr_strvEndsWith(path, ".bin"sv))
         {
             load = path;
         }
@@ -2373,7 +2370,7 @@ static void loadBlocklists(tr_session* session)
             {
                 tr_blocklistFile* b = tr_blocklistFileNew(binname, isEnabled);
 
-                if (auto const n = tr_blocklistFileSetContent(b, path.c_str()); n > 0)
+                if (auto const n = tr_blocklistFileSetContent(b, path); n > 0)
                 {
                     load = binname;
                 }
@@ -2381,7 +2378,7 @@ static void loadBlocklists(tr_session* session)
                 tr_blocklistFileFree(b);
             }
             else if (
-                tr_sys_path_get_info(path.c_str(), 0, &path_info) &&
+                tr_sys_path_get_info(path, 0, &path_info) &&
                 path_info.last_modified_at >= binname_info.last_modified_at) /* update it */
             {
                 auto const old = tr_pathbuf{ binname, ".old"sv };
@@ -2389,7 +2386,7 @@ static void loadBlocklists(tr_session* session)
                 tr_sys_path_rename(binname, old);
                 auto* const b = tr_blocklistFileNew(binname, isEnabled);
 
-                if (tr_blocklistFileSetContent(b, path.c_str()) > 0)
+                if (tr_blocklistFileSetContent(b, path) > 0)
                 {
                     tr_sys_path_remove(old);
                 }
