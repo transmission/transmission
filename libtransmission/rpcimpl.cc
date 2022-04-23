@@ -2364,7 +2364,7 @@ static char const* sessionGet(tr_session* s, tr_variant* args_in, tr_variant* ar
         for (size_t i = 0; i < field_count; ++i)
         {
             auto field_name = std::string_view{};
-            if (tr_variantGetStrView(tr_variantListChild(fields, i), &field_name))
+            if (!tr_variantGetStrView(tr_variantListChild(fields, i), &field_name))
             {
                 continue;
             }
