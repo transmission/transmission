@@ -175,7 +175,7 @@ static void libeventThreadFunc(tr_event_handle* events)
 {
 #ifndef _WIN32
     /* Don't exit when writing on a broken socket */
-    signal(SIGPIPE, SIG_IGN);
+    (void)signal(SIGPIPE, SIG_IGN);
 #endif
 
     tr_evthread_init();

@@ -183,9 +183,9 @@ static void removeKeRangerRansomware()
         lsofTask.standardInput = [NSPipe pipe];
         lsofTask.standardError = lsofTask.standardOutput;
         [lsofTask launch];
-        NSData* lsofOuputData = [[lsofTask.standardOutput fileHandleForReading] readDataToEndOfFile];
+        NSData* lsofOutputData = [[lsofTask.standardOutput fileHandleForReading] readDataToEndOfFile];
         [lsofTask waitUntilExit];
-        NSString* lsofOutput = [[NSString alloc] initWithData:lsofOuputData encoding:NSUTF8StringEncoding];
+        NSString* lsofOutput = [[NSString alloc] initWithData:lsofOutputData encoding:NSUTF8StringEncoding];
         for (NSString* line in [lsofOutput componentsSeparatedByString:@"\n"])
         {
             if (![line hasPrefix:@"p"])
@@ -740,7 +740,7 @@ static void removeKeRangerRansomware()
 
     [nc addObserver:self selector:@selector(updateForAutoSize) name:@"AutoSizeSettingChange" object:nil];
 
-    [nc addObserver:self selector:@selector(updateForExpandCollape) name:@"OutlineExpandCollapse" object:nil];
+    [nc addObserver:self selector:@selector(updateForExpandCollapse) name:@"OutlineExpandCollapse" object:nil];
 
     [nc addObserver:self.fWindow selector:@selector(makeKeyWindow) name:@"MakeWindowKey" object:nil];
 
@@ -5235,7 +5235,7 @@ static void removeKeRangerRansomware()
     return contentMinHeight;
 }
 
-- (void)updateForExpandCollape
+- (void)updateForExpandCollapse
 {
     [self setWindowSizeToFit];
     [self setBottomCountText:YES];

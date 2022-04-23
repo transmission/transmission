@@ -205,7 +205,7 @@ bool tr_blocklistFileHasAddress(tr_blocklistFile* b, tr_address const* addr)
 /*
  * P2P plaintext format: "comment:x.x.x.x-y.y.y.y"
  * http://wiki.phoenixlabs.org/wiki/P2P_Format
- * http://en.wikipedia.org/wiki/PeerGuardian#P2P_plaintext_format
+ * https://en.wikipedia.org/wiki/PeerGuardian#P2P_plaintext_format
  */
 static bool parseLine1(std::string_view line, struct tr_ipv4_range* range)
 {

@@ -31,7 +31,7 @@ will not be present.  Exchanges messages should be sent approximately
 once every minute when peers have been added or dropped.
 
 If peers have not been added or dropped, uTorrent does not send
-the periodic PEX message.  If uTorrent 1.8.1 recieves an "empty"
+the periodic PEX message.  If uTorrent 1.8.1 receives an "empty"
 pex message from Transmission 1.40, it appears to interpret this
 as an invalid message and disconnect from Transmission.
 

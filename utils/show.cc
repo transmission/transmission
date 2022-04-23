@@ -16,6 +16,9 @@
 
 #include <event2/buffer.h>
 
+#include <fmt/chrono.h>
+#include <fmt/format.h>
+
 #include <libtransmission/transmission.h>
 
 #include <libtransmission/error.h>
@@ -158,18 +161,9 @@ int parseCommandLine(app_opts& opts, int argc, char const* const* argv)
     return 0;
 }
 
-auto toString(time_t timestamp)
+[[nodiscard]] auto toString(time_t now)
 {
-    if (timestamp == 0)
-    {
-        return std::string{ "Unknown" };
-    }
-
-    struct tm tm;
-    tr_localtime_r(&timestamp, &tm);
-    auto buf = std::array<char, 64>{};
-    strftime(std::data(buf), std::size(buf), "%a %b %d %T %Y%n", &tm); /* ctime equiv */
-    return std::string{ std::data(buf) };
+    return now == 0 ? "Unknown" : fmt::format("{:%a %b %d %T %Y}", fmt::localtime(now));
 }
 
 bool compare_2nd_field(std::string_view const& l, std::string_view const& r)
@@ -199,7 +193,7 @@ void showInfo(app_opts const& opts, tr_torrent_metainfo const& metainfo)
         printf("  Name: %s\n", metainfo.name().c_str());
         printf("  Hash: %" TR_PRIsv "\n", TR_PRIsv_ARG(metainfo.infoHashString()));
         printf("  Created by: %s\n", std::empty(metainfo.creator()) ? "Unknown" : metainfo.creator().c_str());
-        printf("  Created on: %s\n", toString(metainfo.dateCreated()).c_str());
+        printf("  Created on: %s\n\n", toString(metainfo.dateCreated()).c_str());
 
         if (!std::empty(metainfo.comment()))
         {

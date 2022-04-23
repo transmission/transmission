@@ -14,7 +14,7 @@
 #include <iterator> // std::back_inserter
 #include <list>
 #include <memory>
-#include <numeric> // std::acumulate()
+#include <numeric> // std::accumulate()
 #include <string>
 #include <string_view>
 #include <tuple>
@@ -28,6 +28,7 @@
 
 #include <event2/event.h>
 
+#include <fmt/chrono.h>
 #include <fmt/core.h>
 #include <fmt/format.h> // fmt::ptr
 
@@ -86,7 +87,10 @@ static auto constexpr BandwidthGroupsFilename = "bandwidth-groups.json"sv;
 
 static tr_port getRandomPort(tr_session const* s)
 {
-    return tr_port(tr_rand_int_weak(s->randomPortHigh - s->randomPortLow + 1) + s->randomPortLow);
+    auto const lower = std::min(s->randomPortLow.host(), s->randomPortHigh.host());
+    auto const upper = std::max(s->randomPortLow.host(), s->randomPortHigh.host());
+    auto const range = upper - lower;
+    return tr_port::fromHost(lower + tr_rand_int_weak(range + 1));
 }
 
 /* Generate a peer id : "-TRxyzb-" + 12 random alphanumeric
@@ -148,7 +152,7 @@ std::optional<std::string> tr_session::WebMediator::publicAddress() const
         tr_address const* addr = tr_sessionGetPublicAddress(session_, type, &is_default_value);
         if (addr != nullptr && !is_default_value)
         {
-            return tr_address_to_string(addr);
+            return addr->readable();
         }
     }
 
@@ -300,7 +304,7 @@ tr_address const* tr_sessionGetPublicAddress(tr_session const* session, int tr_a
 
     if (is_default_value != nullptr && bindinfo != nullptr)
     {
-        *is_default_value = bindinfo->addr.to_string() == default_value;
+        *is_default_value = bindinfo->addr.readable() == default_value;
     }
 
     return bindinfo != nullptr ? &bindinfo->addr : nullptr;
@@ -421,10 +425,10 @@ void tr_sessionGetSettings(tr_session const* s, tr_variant* d)
     tr_variantDictAddInt(d, TR_KEY_message_level, tr_logGetLevel());
     tr_variantDictAddInt(d, TR_KEY_peer_limit_global, s->peerLimit);
     tr_variantDictAddInt(d, TR_KEY_peer_limit_per_torrent, s->peerLimitPerTorrent);
-    tr_variantDictAddInt(d, TR_KEY_peer_port, tr_sessionGetPeerPort(s));
+    tr_variantDictAddInt(d, TR_KEY_peer_port, s->peerPort().host());
     tr_variantDictAddBool(d, TR_KEY_peer_port_random_on_start, s->isPortRandom);
-    tr_variantDictAddInt(d, TR_KEY_peer_port_random_low, s->randomPortLow);
-    tr_variantDictAddInt(d, TR_KEY_peer_port_random_high, s->randomPortHigh);
+    tr_variantDictAddInt(d, TR_KEY_peer_port_random_low, s->randomPortLow.host());
+    tr_variantDictAddInt(d, TR_KEY_peer_port_random_high, s->randomPortHigh.host());
     tr_variantDictAddStr(d, TR_KEY_peer_socket_tos, tr_netTosToName(s->peer_socket_tos_));
     tr_variantDictAddStr(d, TR_KEY_peer_congestion_algorithm, s->peerCongestionAlgorithm());
     tr_variantDictAddBool(d, TR_KEY_pex_enabled, s->isPexEnabled);
@@ -438,11 +442,11 @@ void tr_sessionGetSettings(tr_session const* s, tr_variant* d)
     tr_variantDictAddBool(d, TR_KEY_ratio_limit_enabled, s->isRatioLimited);
     tr_variantDictAddBool(d, TR_KEY_rename_partial_files, tr_sessionIsIncompleteFileNamingEnabled(s));
     tr_variantDictAddBool(d, TR_KEY_rpc_authentication_required, tr_sessionIsRPCPasswordEnabled(s));
-    tr_variantDictAddStr(d, TR_KEY_rpc_bind_address, tr_sessionGetRPCBindAddress(s));
+    tr_variantDictAddStr(d, TR_KEY_rpc_bind_address, s->rpc_server_->getBindAddress());
     tr_variantDictAddBool(d, TR_KEY_rpc_enabled, tr_sessionIsRPCEnabled(s));
     tr_variantDictAddStr(d, TR_KEY_rpc_password, tr_sessionGetRPCPassword(s));
     tr_variantDictAddInt(d, TR_KEY_rpc_port, tr_sessionGetRPCPort(s));
-    tr_variantDictAddInt(d, TR_KEY_rpc_socket_mode, tr_rpcGetRPCSocketMode(s->rpc_server_.get()));
+    tr_variantDictAddInt(d, TR_KEY_rpc_socket_mode, s->rpc_server_->socketMode());
     tr_variantDictAddStr(d, TR_KEY_rpc_url, tr_sessionGetRPCUrl(s));
     tr_variantDictAddStr(d, TR_KEY_rpc_username, tr_sessionGetRPCUsername(s));
     tr_variantDictAddStr(d, TR_KEY_rpc_whitelist, tr_sessionGetRPCWhitelist(s));
@@ -721,7 +725,7 @@ static void tr_sessionInitImpl(init_data* data)
 
 #ifndef _WIN32
     /* Don't exit when writing on a broken socket */
-    signal(SIGPIPE, SIG_IGN);
+    (void)signal(SIGPIPE, SIG_IGN);
 #endif
 
     tr_logSetQueueEnabled(data->messageQueuingEnabled);
@@ -736,11 +740,8 @@ static void tr_sessionInitImpl(init_data* data)
     ***  Blocklist
     **/
 
-    {
-        auto const filename = tr_strvPath(session->config_dir, "blocklists"sv);
-        tr_sys_dir_create(filename.c_str(), TR_SYS_DIR_CREATE_PARENTS, 0777);
-        loadBlocklists(session);
-    }
+    tr_sys_dir_create(tr_pathbuf{ session->config_dir, "/blocklists"sv }, TR_SYS_DIR_CREATE_PARENTS, 0777);
+    loadBlocklists(session);
 
     TR_ASSERT(tr_isSession(session));
 
@@ -975,12 +976,12 @@ static void sessionSetImpl(struct init_data* const data)
     /* incoming peer port */
     if (tr_variantDictFindInt(settings, TR_KEY_peer_port_random_low, &i))
     {
-        session->randomPortLow = i;
+        session->randomPortLow.setHost(i);
     }
 
     if (tr_variantDictFindInt(settings, TR_KEY_peer_port_random_high, &i))
     {
-        session->randomPortHigh = i;
+        session->randomPortHigh.setHost(i);
     }
 
     if (tr_variantDictFindBool(settings, TR_KEY_peer_port_random_on_start, &boolVal))
@@ -988,12 +989,16 @@ static void sessionSetImpl(struct init_data* const data)
         tr_sessionSetPeerPortRandomOnStart(session, boolVal);
     }
 
-    if (!tr_variantDictFindInt(settings, TR_KEY_peer_port, &i))
     {
-        i = session->private_peer_port;
-    }
+        auto peer_port = session->private_peer_port;
 
-    setPeerPort(session, boolVal ? getRandomPort(session) : i);
+        if (auto port = int64_t{}; tr_variantDictFindInt(settings, TR_KEY_peer_port, &port))
+        {
+            peer_port.setHost(static_cast<uint16_t>(port));
+        }
+
+        setPeerPort(session, boolVal ? getRandomPort(session) : peer_port);
+    }
 
     if (tr_variantDictFindBool(settings, TR_KEY_port_forwarding_enabled, &boolVal))
     {
@@ -1244,25 +1249,25 @@ static void setPeerPort(tr_session* session, tr_port port)
     tr_runInEventThread(session, peerPortChanged, session);
 }
 
-void tr_sessionSetPeerPort(tr_session* session, tr_port port)
+void tr_sessionSetPeerPort(tr_session* session, uint16_t hport)
 {
-    if (tr_isSession(session) && session->private_peer_port != port)
+    if (auto const port = tr_port::fromHost(hport); tr_isSession(session) && session->private_peer_port != port)
     {
         setPeerPort(session, port);
     }
 }
 
-tr_port tr_sessionGetPeerPort(tr_session const* session)
+uint16_t tr_sessionGetPeerPort(tr_session const* session)
 {
-    return tr_isSession(session) ? session->public_peer_port : 0;
+    return tr_isSession(session) ? session->public_peer_port.host() : 0U;
 }
 
-tr_port tr_sessionSetPeerPortRandom(tr_session* session)
+uint16_t tr_sessionSetPeerPortRandom(tr_session* session)
 {
     TR_ASSERT(tr_isSession(session));
 
-    tr_sessionSetPeerPort(session, getRandomPort(session));
-    return session->private_peer_port;
+    session->setPeerPort(getRandomPort(session));
+    return session->private_peer_port.host();
 }
 
 void tr_sessionSetPeerPortRandomOnStart(tr_session* session, bool random)
@@ -1462,9 +1467,8 @@ static void useAltSpeed(tr_session* s, struct tr_turtle_info* t, bool enabled, b
  */
 static bool getInTurtleTime(struct tr_turtle_info const* t)
 {
-    time_t const now = tr_time();
-    struct tm tm;
-    tr_localtime_r(&now, &tm);
+    auto const now = tr_time();
+    struct tm const tm = fmt::localtime(now);
 
     size_t minute_of_the_week = tm.tm_wday * MinutesPerDay + tm.tm_hour * MinutesPerHour + tm.tm_min;
 
@@ -2279,16 +2283,17 @@ void tr_sessionSetDefaultTrackers(tr_session* session, char const* trackers)
 Bandwidth& tr_session::getBandwidthGroup(std::string_view name)
 {
     auto& groups = this->bandwidth_groups_;
-    auto const key = tr_interned_string{ name };
 
-    auto it = groups.find(key);
-
-    if (it == std::end(groups))
+    for (auto const& [group_name, group] : groups)
     {
-        it = groups.try_emplace(key, std::make_unique<Bandwidth>(new Bandwidth(&top_bandwidth_))).first;
+        if (group_name == name)
+        {
+            return *group;
+        }
     }
 
-    return *it->second;
+    auto& [group_name, group] = groups.emplace_back(name, std::make_unique<Bandwidth>(new Bandwidth(&top_bandwidth_)));
+    return *group;
 }
 
 /***
@@ -2332,8 +2337,8 @@ static void loadBlocklists(tr_session* session)
     auto const isEnabled = session->useBlocklist();
 
     /* walk the blocklist directory... */
-    auto const dirname = tr_strvPath(session->config_dir, "blocklists"sv);
-    auto const odir = tr_sys_dir_open(dirname.c_str());
+    auto const dirname = tr_pathbuf{ session->config_dir, "/blocklists"sv };
+    auto const odir = tr_sys_dir_open(dirname);
 
     if (odir == TR_BAD_SYS_DIR)
     {
@@ -2350,7 +2355,7 @@ static void loadBlocklists(tr_session* session)
             continue;
         }
 
-        if (auto const path = tr_strvPath(dirname, name); tr_strvEndsWith(path, ".bin"sv))
+        if (auto const path = tr_pathbuf{ dirname, '/', name }; tr_strvEndsWith(path, ".bin"sv))
         {
             load = path;
         }
@@ -2365,7 +2370,7 @@ static void loadBlocklists(tr_session* session)
             {
                 tr_blocklistFile* b = tr_blocklistFileNew(binname, isEnabled);
 
-                if (auto const n = tr_blocklistFileSetContent(b, path.c_str()); n > 0)
+                if (auto const n = tr_blocklistFileSetContent(b, path); n > 0)
                 {
                     load = binname;
                 }
@@ -2373,7 +2378,7 @@ static void loadBlocklists(tr_session* session)
                 tr_blocklistFileFree(b);
             }
             else if (
-                tr_sys_path_get_info(path.c_str(), 0, &path_info) &&
+                tr_sys_path_get_info(path, 0, &path_info) &&
                 path_info.last_modified_at >= binname_info.last_modified_at) /* update it */
             {
                 auto const old = tr_pathbuf{ binname, ".old"sv };
@@ -2381,7 +2386,7 @@ static void loadBlocklists(tr_session* session)
                 tr_sys_path_rename(binname, old);
                 auto* const b = tr_blocklistFileNew(binname, isEnabled);
 
-                if (tr_blocklistFileSetContent(b, path.c_str()) > 0)
+                if (tr_blocklistFileSetContent(b, path) > 0)
                 {
                     tr_sys_path_remove(old);
                 }
@@ -2523,64 +2528,62 @@ char const* tr_blocklistGetURL(tr_session const* session)
 
 void tr_session::setRpcWhitelist(std::string_view whitelist) const
 {
-    tr_rpcSetWhitelist(this->rpc_server_.get(), whitelist);
-}
-
-std::string const& tr_session::rpcWhitelist() const
-{
-    return tr_rpcGetWhitelist(this->rpc_server_.get());
+    this->rpc_server_->setWhitelist(whitelist);
 }
 
 void tr_session::useRpcWhitelist(bool enabled) const
 {
-    tr_rpcSetWhitelistEnabled(this->rpc_server_.get(), enabled);
+    this->rpc_server_->setWhitelistEnabled(enabled);
 }
 
 bool tr_session::useRpcWhitelist() const
 {
-    return tr_rpcGetWhitelistEnabled(this->rpc_server_.get());
+    return this->rpc_server_->isWhitelistEnabled();
 }
 
-void tr_sessionSetRPCEnabled(tr_session* session, bool isEnabled)
+void tr_sessionSetRPCEnabled(tr_session* session, bool is_enabled)
 {
     TR_ASSERT(tr_isSession(session));
 
-    tr_rpcSetEnabled(session->rpc_server_.get(), isEnabled);
+    session->rpc_server_->setEnabled(is_enabled);
 }
 
 bool tr_sessionIsRPCEnabled(tr_session const* session)
 {
     TR_ASSERT(tr_isSession(session));
 
-    return tr_rpcIsEnabled(session->rpc_server_.get());
+    return session->rpc_server_->isEnabled();
 }
 
-void tr_sessionSetRPCPort(tr_session* session, tr_port port)
+void tr_sessionSetRPCPort(tr_session* session, uint16_t hport)
 {
     TR_ASSERT(tr_isSession(session));
 
-    tr_rpcSetPort(session->rpc_server_.get(), port);
+    if (session->rpc_server_)
+    {
+        session->rpc_server_->setPort(tr_port::fromHost(hport));
+    }
 }
 
-tr_port tr_sessionGetRPCPort(tr_session const* session)
+uint16_t tr_sessionGetRPCPort(tr_session const* session)
 {
     TR_ASSERT(tr_isSession(session));
 
-    return tr_rpcGetPort(session->rpc_server_.get());
+    return session->rpc_server_ ? session->rpc_server_->port().host() : uint16_t{};
 }
 
 void tr_sessionSetRPCUrl(tr_session* session, char const* url)
 {
     TR_ASSERT(tr_isSession(session));
 
-    tr_rpcSetUrl(session->rpc_server_.get(), url != nullptr ? url : "");
+    session->rpc_server_->setUrl(url != nullptr ? url : "");
 }
 
 char const* tr_sessionGetRPCUrl(tr_session const* session)
 {
     TR_ASSERT(tr_isSession(session));
 
-    return tr_rpcGetUrl(session->rpc_server_.get()).c_str();
+    return session->rpc_server_->url().c_str();
 }
 
 void tr_sessionSetRPCCallback(tr_session* session, tr_rpc_func func, void* user_data)
@@ -2602,7 +2605,7 @@ char const* tr_sessionGetRPCWhitelist(tr_session const* session)
 {
     TR_ASSERT(tr_isSession(session));
 
-    return session->rpcWhitelist().c_str();
+    return session->rpc_server_->whitelist().c_str();
 }
 
 void tr_sessionSetRPCWhitelistEnabled(tr_session* session, bool enabled)
@@ -2623,49 +2626,42 @@ void tr_sessionSetRPCPassword(tr_session* session, char const* password)
 {
     TR_ASSERT(tr_isSession(session));
 
-    tr_rpcSetPassword(session->rpc_server_.get(), password != nullptr ? password : "");
+    session->rpc_server_->setPassword(password != nullptr ? password : "");
 }
 
 char const* tr_sessionGetRPCPassword(tr_session const* session)
 {
     TR_ASSERT(tr_isSession(session));
 
-    return tr_rpcGetPassword(session->rpc_server_.get()).c_str();
+    return session->rpc_server_->getSaltedPassword().c_str();
 }
 
 void tr_sessionSetRPCUsername(tr_session* session, char const* username)
 {
     TR_ASSERT(tr_isSession(session));
 
-    tr_rpcSetUsername(session->rpc_server_.get(), username != nullptr ? username : "");
+    session->rpc_server_->setUsername(username != nullptr ? username : "");
 }
 
 char const* tr_sessionGetRPCUsername(tr_session const* session)
 {
     TR_ASSERT(tr_isSession(session));
 
-    return tr_rpcGetUsername(session->rpc_server_.get()).c_str();
+    return session->rpc_server_->username().c_str();
 }
 
-void tr_sessionSetRPCPasswordEnabled(tr_session* session, bool isEnabled)
+void tr_sessionSetRPCPasswordEnabled(tr_session* session, bool enabled)
 {
     TR_ASSERT(tr_isSession(session));
 
-    tr_rpcSetPasswordEnabled(session->rpc_server_.get(), isEnabled);
+    session->rpc_server_->setPasswordEnabled(enabled);
 }
 
 bool tr_sessionIsRPCPasswordEnabled(tr_session const* session)
 {
     TR_ASSERT(tr_isSession(session));
 
-    return tr_rpcIsPasswordEnabled(session->rpc_server_.get());
-}
-
-char const* tr_sessionGetRPCBindAddress(tr_session const* session)
-{
-    TR_ASSERT(tr_isSession(session));
-
-    return tr_rpcGetBindAddress(session->rpc_server_.get());
+    return session->rpc_server_->isPasswordEnabled();
 }
 
 /****
@@ -2769,32 +2765,33 @@ int tr_sessionGetQueueStalledMinutes(tr_session const* session)
     return session->queueStalledMinutes;
 }
 
-void tr_sessionSetAntiBruteForceThreshold(tr_session* session, int bad_requests)
+void tr_sessionSetAntiBruteForceThreshold(tr_session* session, int limit)
 {
     TR_ASSERT(tr_isSession(session));
-    TR_ASSERT(bad_requests > 0);
-    tr_rpcSetAntiBruteForceThreshold(session->rpc_server_.get(), bad_requests);
-}
+    TR_ASSERT(limit > 0);
 
-void tr_sessionSetAntiBruteForceEnabled(tr_session* session, bool is_enabled)
-{
-    TR_ASSERT(tr_isSession(session));
-
-    tr_rpcSetAntiBruteForceEnabled(session->rpc_server_.get(), is_enabled);
-}
-
-bool tr_sessionGetAntiBruteForceEnabled(tr_session const* session)
-{
-    TR_ASSERT(tr_isSession(session));
-
-    return tr_rpcGetAntiBruteForceEnabled(session->rpc_server_.get());
+    session->rpc_server_->setAntiBruteForceLimit(limit);
 }
 
 int tr_sessionGetAntiBruteForceThreshold(tr_session const* session)
 {
     TR_ASSERT(tr_isSession(session));
 
-    return tr_rpcGetAntiBruteForceThreshold(session->rpc_server_.get());
+    return session->rpc_server_->getAntiBruteForceLimit();
+}
+
+void tr_sessionSetAntiBruteForceEnabled(tr_session* session, bool is_enabled)
+{
+    TR_ASSERT(tr_isSession(session));
+
+    session->rpc_server_->setAntiBruteForceEnabled(is_enabled);
+}
+
+bool tr_sessionGetAntiBruteForceEnabled(tr_session const* session)
+{
+    TR_ASSERT(tr_isSession(session));
+
+    return session->rpc_server_->isAntiBruteForceEnabled();
 }
 
 std::vector<tr_torrent*> tr_sessionGetNextQueuedTorrents(tr_session* session, tr_direction direction, size_t num_wanted)

@@ -166,7 +166,7 @@ bool dtr_daemon(dtr_callbacks const* cb, void* cb_arg, bool foreground, int* exi
 #else
 
         /* this is loosely based off of glibc's daemon() implementation
-         * http://sourceware.org/git/?p=glibc.git;a=blob_plain;f=misc/daemon.c */
+         * https://sourceware.org/git/?p=glibc.git;a=blob_plain;f=misc/daemon.c */
 
         switch (fork())
         {

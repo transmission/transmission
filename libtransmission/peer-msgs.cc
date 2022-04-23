@@ -59,6 +59,8 @@ auto constexpr Bitfield = uint8_t{ 5 };
 auto constexpr Request = uint8_t{ 6 };
 auto constexpr Piece = uint8_t{ 7 };
 auto constexpr Cancel = uint8_t{ 8 };
+
+// http://bittorrent.org/beps/bep_0005.html
 auto constexpr Port = uint8_t{ 9 };
 
 // https://www.bittorrent.org/beps/bep_0006.html
@@ -197,7 +199,7 @@ static void pexPulse(evutil_socket_t fd, short what, void* vmsgs);
 static void protocolSendCancel(tr_peerMsgsImpl* msgs, struct peer_request const& req);
 static void protocolSendChoke(tr_peerMsgsImpl* msgs, bool choke);
 static void protocolSendHave(tr_peerMsgsImpl* msgs, tr_piece_index_t index);
-static void protocolSendPort(tr_peerMsgsImpl* msgs, uint16_t port);
+static void protocolSendPort(tr_peerMsgsImpl* msgs, tr_port port);
 static void sendInterest(tr_peerMsgsImpl* msgs, bool b);
 static void sendLtepHandshake(tr_peerMsgsImpl* msgs);
 static void tellPeerWhatWeHave(tr_peerMsgsImpl* msgs);
@@ -600,7 +602,7 @@ public:
     uint16_t pexCount = 0;
     uint16_t pexCount6 = 0;
 
-    tr_port dht_port = 0;
+    tr_port dht_port;
 
     EncryptionPreference encryption_preference = EncryptionPreference::Unknown;
 
@@ -738,14 +740,14 @@ static void protocolSendCancel(tr_peerMsgsImpl* msgs, peer_request const& req)
     pokeBatchPeriod(msgs, ImmediatePriorityIntervalSecs);
 }
 
-static void protocolSendPort(tr_peerMsgsImpl* msgs, uint16_t port)
+static void protocolSendPort(tr_peerMsgsImpl* msgs, tr_port port)
 {
     struct evbuffer* out = msgs->outMessages;
 
-    logtrace(msgs, fmt::format(FMT_STRING("sending Port {:d}"), port));
+    logtrace(msgs, fmt::format(FMT_STRING("sending Port {:d}"), port.host()));
     evbuffer_add_uint32(out, 3);
     evbuffer_add_uint8(out, BtPeerMsgs::Port);
-    evbuffer_add_uint16(out, port);
+    evbuffer_add_uint16(out, port.network());
 }
 
 static void protocolSendHave(tr_peerMsgsImpl* msgs, tr_piece_index_t index)
@@ -1045,7 +1047,7 @@ static void sendLtepHandshake(tr_peerMsgsImpl* msgs)
     // port number of the other side. Note that there is no need for the
     // receiving side of the connection to send this extension message,
     // since its port number is already known.
-    tr_variantDictAddInt(&val, TR_KEY_p, tr_sessionGetPublicPeerPort(msgs->session));
+    tr_variantDictAddInt(&val, TR_KEY_p, msgs->session->peerPort().host());
 
     // http://bittorrent.org/beps/bep_0010.html
     // An integer, the number of outstanding request messages this
@@ -1171,7 +1173,7 @@ static void parseLtepHandshake(tr_peerMsgsImpl* msgs, uint32_t len, struct evbuf
     /* get peer's listening port */
     if (tr_variantDictFindInt(&val, TR_KEY_p, &i))
     {
-        pex.port = htons((uint16_t)i);
+        pex.port.setHost(i);
         msgs->publishClientGotPort(pex.port);
         logtrace(msgs, fmt::format(FMT_STRING("peer's port is now {:d}"), i));
     }
@@ -1747,14 +1749,23 @@ static ReadState readBtMessage(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, si
         break;
 
     case BtPeerMsgs::Port:
-        logtrace(msgs, "Got a BtPeerMsgs::Port");
-        tr_peerIoReadUint16(msgs->io, inbuf, &msgs->dht_port);
-
-        if (msgs->dht_port > 0)
+        // http://bittorrent.org/beps/bep_0005.html
+        // Peers supporting the DHT set the last bit of the 8-byte reserved flags
+        // exchanged in the BitTorrent protocol handshake. Peer receiving a handshake
+        // indicating the remote peer supports the DHT should send a PORT message.
+        // It begins with byte 0x09 and has a two byte payload containing the UDP
+        // port of the DHT node in network byte order.
         {
-            tr_dhtAddNode(msgs->session, tr_peerAddress(msgs), msgs->dht_port, false);
-        }
+            logtrace(msgs, "Got a BtPeerMsgs::Port");
 
+            auto nport = uint16_t{};
+            tr_peerIoReadUint16(msgs->io, inbuf, &nport);
+            if (auto const dht_port = tr_port::fromNetwork(nport); !std::empty(dht_port))
+            {
+                msgs->dht_port = dht_port;
+                tr_dhtAddNode(msgs->session, tr_peerAddress(msgs), msgs->dht_port, false);
+            }
+        }
         break;
 
     case BtPeerMsgs::FextSuggest:
@@ -2352,7 +2363,7 @@ static void tellPeerWhatWeHave(tr_peerMsgsImpl* msgs)
 
 /* some peers give us error messages if we send
    more than this many peers in a single pex message
-   http://wiki.theory.org/BitTorrentPeerExchangeConventions */
+   https://wiki.theory.org/BitTorrentPeerExchangeConventions */
 static auto constexpr MaxPexAdded = int{ 50 };
 static auto constexpr MaxPexDropped = int{ 50 };
 

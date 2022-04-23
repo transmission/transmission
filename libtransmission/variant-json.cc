@@ -543,7 +543,7 @@ static void jsonStringFunc(tr_variant const* val, void* vdata)
     auto sv = std::string_view{};
     (void)!tr_variantGetStrView(val, &sv);
 
-    evbuffer_reserve_space(data->out, std::size(sv) * 4, vec, 1);
+    evbuffer_reserve_space(data->out, std::size(sv) * 6 + 2, vec, 1);
     auto* out = static_cast<char*>(vec[0].iov_base);
     char const* const outend = out + vec[0].iov_len;
 

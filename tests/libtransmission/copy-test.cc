@@ -27,7 +27,7 @@ class CopyTest : public SandboxedTest
 protected:
     void testImpl(char const* filename1, char const* filename2, size_t const file_length)
     {
-        auto const path1 = tr_strvPath(sandboxDir(), filename1);
+        auto const path1 = tr_pathbuf{ sandboxDir(), '/', filename1 };
 
         /* Create a file. */
         auto* file_content = static_cast<char*>(tr_malloc(file_length));
@@ -35,19 +35,19 @@ protected:
         createFileWithContents(path1, file_content, file_length);
         tr_free(file_content);
 
-        auto const path2 = tr_strvPath(sandboxDir(), filename2);
+        auto const path2 = tr_pathbuf{ sandboxDir(), '/', filename2 };
 
         tr_error* err = nullptr;
         /* Copy it. */
-        EXPECT_TRUE(tr_sys_path_copy(path1.c_str(), path2.c_str(), &err));
+        EXPECT_TRUE(tr_sys_path_copy(path1, path2, &err));
         EXPECT_EQ(nullptr, err) << ' ' << *err;
         tr_error_clear(&err);
 
-        EXPECT_TRUE(filesAreIdentical(path1.c_str(), path2.c_str()));
+        EXPECT_TRUE(filesAreIdentical(path1, path2));
 
         /* Dispose of those files that we created. */
-        tr_sys_path_remove(path1.c_str());
-        tr_sys_path_remove(path2.c_str());
+        tr_sys_path_remove(path1);
+        tr_sys_path_remove(path2);
     }
 
 private:
