@@ -588,7 +588,7 @@ void MainWindow::Impl::updateStats()
     if (auto const pch = gtr_pref_string_get(TR_KEY_statusbar_stats); pch == "session-ratio")
     {
         tr_sessionGetStats(session, &stats);
-        buf = fmt::format(_("Ratio: {ratio}"), tr_strlratio(stats.ratio));
+        buf = fmt::format(_("Ratio: {ratio}"), fmt::arg("ratio", tr_strlratio(stats.ratio)));
     }
     else if (pch == "session-transfer")
     {

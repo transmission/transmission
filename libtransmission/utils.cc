@@ -59,54 +59,6 @@ time_t __tr_current_time = 0;
 ****
 ***/
 
-struct tm* tr_gmtime_r(time_t const* timep, struct tm* result)
-{
-#if defined(HAVE_GMTIME_R)
-
-    return gmtime_r(timep, result);
-
-#elif defined(HAVE_GMTIME_S)
-
-    return gmtime_s(result, timep) == 0 ? result : nullptr;
-
-#else
-
-    struct tm* p = gmtime(timep);
-    if (p != nullptr)
-    {
-        *result = *p;
-        return result;
-    }
-
-    return nullptr;
-
-#endif
-}
-
-struct tm* tr_localtime_r(time_t const* timep, struct tm* result)
-{
-#if defined(HAVE_LOCALTIME_R)
-
-    return localtime_r(timep, result);
-
-#elif defined(HAVE_LOCALTIME_S)
-
-    return localtime_s(result, timep) == 0 ? result : nullptr;
-
-#else
-
-    struct tm* p = localtime(timep);
-    if (p != nullptr)
-    {
-        *result = *p;
-        return result;
-    }
-
-    return nullptr;
-
-#endif
-}
-
 struct timeval tr_gettimeofday()
 {
     auto const d = std::chrono::system_clock::now().time_since_epoch();

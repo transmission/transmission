@@ -26,6 +26,7 @@
 #include <event2/listener.h>
 
 #include <fmt/core.h>
+#include <fmt/chrono.h>
 
 #include <libdeflate.h>
 
@@ -202,15 +203,10 @@ static void add_response(struct evhttp_request* req, tr_rpc_server* server, stru
     }
 }
 
-static void add_time_header(struct evkeyvalq* headers, char const* key, time_t value)
+static void add_time_header(struct evkeyvalq* headers, char const* key, time_t now)
 {
-    char buf[128];
-    struct tm tm;
-    /* According to RFC 2616 this must follow RFC 1123's date format,
-       so use gmtime instead of localtime... */
-    tr_gmtime_r(&value, &tm);
-    strftime(buf, sizeof(buf), "%a, %d %b %Y %H:%M:%S GMT", &tm);
-    evhttp_add_header(headers, key, buf);
+    // RFC 2616 says this must follow RFC 1123's date format, so use gmtime instead of localtime
+    evhttp_add_header(headers, key, fmt::format("{:%a %b %d %T %Y%n}", fmt::gmtime(now)).c_str());
 }
 
 static void evbuffer_ref_cleanup_tr_free(void const* /*data*/, size_t /*datalen*/, void* extra)
