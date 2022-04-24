@@ -19,6 +19,8 @@
 
 #import "VDKQueue.h"
 
+#import "CocoaCompatibility.h"
+
 #import "Controller.h"
 #import "Torrent.h"
 #import "TorrentGroup.h"

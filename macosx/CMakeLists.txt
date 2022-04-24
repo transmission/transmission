@@ -407,7 +407,6 @@ include_directories(
 add_definitions(
     -Wno-unused-parameter
     "-Wno-#warnings"
-    "-include macosx/Transmission_Prefix.pch"
 )
 
 add_library(vdkqueue STATIC
