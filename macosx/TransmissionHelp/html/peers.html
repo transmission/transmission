@@ -1,54 +1,51 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<META http-equiv="Content-Type" content="text/html; charset=utf-8" />
-		<link media="all" rel="stylesheet" href="../styles/TransBody.css" />
-		<title>Peers</title>
-	</head>
-	<body>
-		<div id="mainbox">
-		<div id="banner">
-				<div id="machelp"><a class="bread" href="../index.html">Transmission Help</a>
-				</div>
-				<div id="index">
-				<a class="leftborder" href="../html/Index2.html">Index</a></div>
-				</div>
-			</div>
+<head>
+    <META http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link media="all" rel="stylesheet" href="../styles/TransBody.css"/>
+    <title>Peers</title>
+</head>
+<body>
+<div id="mainbox">
+    <div id="banner">
+        <div id="machelp"><a class="bread" href="../index.html">Transmission Help</a></div>
+        <div id="index"><a class="leftborder" href="../html/Index2.html">Index</a></div>
+    </div>
 
-			<div class="pagetitle">
-				<h1>What is 'peer exchange'? </h1>
-			</div>
-				<p><a href="https://en.wikipedia.org/wiki/Peer_exchange">Peer Exchange (PEX)</a> is a method of discovering new peers via other peers, rather than the tracker. It allows Transmission to attach to the swarm much quicker. PEX is automatically disabled for privately tracked torrents. The feature is compatible with both Vuze and µTorrent peers.</p>
-			<div class="pagetitle">
-				<h1>What is the 'distributed hash table'? </h1>
-			</div>
-				<p>The <a href="https://en.wikipedia.org/wiki/Distributed_hash_table">Distributed Hash Table (DHT)</a> allows peers to be obtained without connecting to the tracker. This allows transfers to continue even if trackers are unreachable. It is another way that Transmission can attach to the swarm quicker. DHT is automatically disabled for privately tracked torrents.</p>
-			<div class="pagetitle">
-				<h1>What is encryption? </h1>
-			</div>
-				<p>Transmission encrypts the connections it makes with other peers when necessary, using the RC4 cipher. The implementation is compatible with other clients such as Vuze and µTorrent. It is always enabled, however you can set Transmission (Preferences &rarr; Peers) to prefer encrypted peers or to ignore unencrypted peers completely.</p>
-				<p>Note that the latter option may make Transmission unconnectable in some swarms. The encryption feature does not mean your session is secure or anonymous, it is merely a way to avoid the traffic shaping measures some ISPs have implemented.</p>
-				<p>
-			<div class="pagetitle">
-				<h1>What are 'connections'?</h1>
-			</div>
-			<p><em>Global maximum connections</em> (Preferences &rarr; Peers) is the total number of peers that Transmission will connect to across all of your transfers. Connections per torrent can also be adjusted here, as well as in the Inspector.</p>
-			<p>It is recommended that these values are left at their default setting, as allowing too many connections will severely hinder web browsing and other online activities, as well as possibly crashing your router. Increase this value at your own risk!</p>
+    <div class="pagetitle">
+        <h1>What is 'peer exchange'?</h1>
+    </div>
+    <p><a href="https://en.wikipedia.org/wiki/Peer_exchange">Peer Exchange (PEX)</a> is a method of discovering new peers via other peers, rather than the tracker. It allows Transmission to attach to the swarm much quicker. PEX is automatically disabled for privately tracked torrents. The feature is compatible with both Vuze and µTorrent peers.</p>
+    <div class="pagetitle">
+        <h1>What is the 'distributed hash table'?</h1>
+    </div>
+    <p>The <a href="https://en.wikipedia.org/wiki/Distributed_hash_table">Distributed Hash Table (DHT)</a> allows peers to be obtained without connecting to the tracker. This allows transfers to continue even if trackers are unreachable. It is another way that Transmission can attach to the swarm quicker. DHT is automatically disabled for privately tracked torrents.</p>
+    <div class="pagetitle">
+        <h1>What is encryption?</h1>
+    </div>
+    <p>Transmission encrypts the connections it makes with other peers when necessary, using the RC4 cipher. The implementation is compatible with other clients such as Vuze and µTorrent. It is always enabled, however you can set Transmission (Preferences &rarr; Peers) to prefer encrypted peers or to ignore unencrypted peers completely.</p>
+    <p>Note that the latter option may make Transmission unconnectable in some swarms. The encryption feature does not mean your session is secure or anonymous, it is merely a way to avoid the traffic shaping measures some ISPs have implemented.</p>
+    <p>
+    <div class="pagetitle">
+        <h1>What are 'connections'?</h1>
+    </div>
+    <p><em>Global maximum connections</em> (Preferences &rarr; Peers) is the total number of peers that Transmission will connect to across all of your transfers. Connections per torrent can also be adjusted here, as well as in the Inspector.</p>
+    <p>It is recommended that these values are left at their default setting, as allowing too many connections will severely hinder web browsing and other online activities, as well as possibly crashing your router. Increase this value at your own risk!</p>
 
-			<div class="taskbox">
-				<p>Recommended settings:
-				<ul>
-					<li><strong>Global maximum connections</strong>: 200 </li>
-					<li><strong>Maximum connections for new transfers</strong>: 60 </li>
-				</ul>
-			</div>
+    <div class="taskbox">
+        <p>Recommended settings:
+        <ul>
+            <li><strong>Global maximum connections</strong>: 200</li>
+            <li><strong>Maximum connections for new transfers</strong>: 60</li>
+        </ul>
+    </div>
 
-			<div class="pagetitle">
-				<h1>What is a blocklist? </h1>
-			</div>
-			<p>Transmission can block specific peers by utilizing a blocklist. An internet address for a blocklist file containing a list of IP addresses can be entered (Preferences &rarr; Peers) and configured to auto-update weekly. Blocklists can also be manually added into ~/Library/Application Support/Transmission.</p>
-			<p>The internet address may be to a text file or compressed file. Most standard compression formats are supported, including ZIP.</p>
-		</div>
-	</body>
+    <div class="pagetitle">
+        <h1>What is a blocklist?</h1>
+    </div>
+    <p>Transmission can block specific peers by utilizing a blocklist. An internet address for a blocklist file containing a list of IP addresses can be entered (Preferences &rarr; Peers) and configured to auto-update weekly. Blocklists can also be manually added into ~/Library/Application Support/Transmission.</p>
+    <p>The internet address may be to a text file or compressed file. Most standard compression formats are supported, including ZIP.</p>
+</div>
+</body>
 
 </html>
