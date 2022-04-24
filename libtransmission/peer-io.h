@@ -32,7 +32,6 @@
 
 class tr_peerIo;
 struct Bandwidth;
-struct evbuffer;
 struct tr_datatype;
 
 /**

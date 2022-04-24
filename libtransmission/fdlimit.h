@@ -14,7 +14,6 @@
 #include "transmission.h"
 
 #include "file.h"
-#include "net.h"
 
 /**
  * @addtogroup file_io File IO
