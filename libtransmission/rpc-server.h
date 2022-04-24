@@ -21,7 +21,7 @@
 struct event;
 struct evhttp;
 struct tr_variant;
-struct tr_rpc_address;
+class tr_rpc_address;
 struct libdeflate_compressor;
 
 class tr_rpc_server
@@ -114,6 +114,7 @@ public:
     void setUrl(std::string_view url);
 
     [[nodiscard]] std::string getBindAddress() const;
+    [[nodiscard]] std::string getBindAddressWithPort() const;
 
     [[nodiscard]] constexpr auto socketMode() const noexcept
     {
@@ -127,7 +128,7 @@ public:
     std::string whitelist_str_;
     std::string url_;
 
-    std::unique_ptr<struct tr_rpc_address> bindAddress;
+    std::unique_ptr<class tr_rpc_address> bindAddress;
 
     struct event* start_retry_timer = nullptr;
     struct evhttp* httpd = nullptr;
