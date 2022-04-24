@@ -201,8 +201,6 @@ NSString * VDKQueueAccessRevocationNotification = @"VDKQueueAccessWasRevokedNoti
         
         return pathEntry;
     }
-    
-    return nil;
 }
 
 

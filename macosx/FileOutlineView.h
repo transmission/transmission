@@ -2,12 +2,12 @@
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
-#import <Cocoa/Cocoa.h>
+#import <AppKit/AppKit.h>
 
 @interface FileOutlineView : NSOutlineView
 
 @property(nonatomic, readonly) NSInteger hoveredRow;
 
-- (NSRect)iconRectForRow:(int)row;
+- (NSRect)iconRectForRow:(NSInteger)row;
 
 @end

@@ -2,7 +2,7 @@
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
-#import <Cocoa/Cocoa.h>
+#import <AppKit/AppKit.h>
 
 #include <libtransmission/transmission.h>
 
@@ -25,7 +25,7 @@
 
 - (void)selectValues:(NSArray*)values;
 @property(nonatomic, readonly) NSArray* selectedValues;
-@property(nonatomic, readonly) NSArray* selectedTorrents;
+@property(nonatomic, readonly) NSArray<Torrent*>* selectedTorrents;
 
 - (NSRect)iconRectForRow:(NSInteger)row;
 

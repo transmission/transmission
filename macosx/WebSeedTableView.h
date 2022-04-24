@@ -2,11 +2,11 @@
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
-#import <Cocoa/Cocoa.h>
+#import <AppKit/AppKit.h>
 
 @interface WebSeedTableView : NSTableView
 
-@property(nonatomic, weak) NSArray* webSeeds;
+@property(nonatomic, weak) NSArray<NSDictionary*>* webSeeds;
 
 - (void)copy:(id)sender;
 

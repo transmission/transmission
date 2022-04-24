@@ -548,7 +548,7 @@
     return values;
 }
 
-- (NSArray*)selectedTorrents
+- (NSArray<Torrent*>*)selectedTorrents
 {
     NSIndexSet* selectedIndexes = self.selectedRowIndexes;
     NSMutableArray* torrents = [NSMutableArray arrayWithCapacity:selectedIndexes.count]; //take a shot at guessing capacity

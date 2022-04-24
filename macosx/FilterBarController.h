@@ -2,7 +2,7 @@
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
-#import <Cocoa/Cocoa.h>
+#import <AppKit/AppKit.h>
 
 #define FILTER_NONE @"None"
 #define FILTER_ACTIVE @"Active"
@@ -18,7 +18,7 @@
 
 @interface FilterBarController : NSViewController
 
-@property(nonatomic, readonly) NSArray* searchStrings;
+@property(nonatomic, readonly) NSArray<NSString*>* searchStrings;
 
 - (instancetype)init;
 
