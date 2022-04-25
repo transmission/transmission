@@ -3,7 +3,7 @@
 // License text can be found in the licenses/ folder.
 // Created by Mitchell Livingston on 1/20/13.
 
-#import <AppKit/AppKit.h>
+#import <Cocoa/Cocoa.h>
 
 @class FileListNode;
 @class Torrent;
