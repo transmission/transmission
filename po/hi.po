@@ -2354,7 +2354,7 @@ msgstr "टोरेंट प्रमाणीकरण जारी"
 #~ msgid "Tracker will allow requests in %s"
 #~ msgstr "ट्रैकर द्वारा %s में अनुरोध स्वीकार्य"
 
-#~ msgid "Transmission is a BitTorrent client with an easy-to-use frontend on top a cross-platform backend. Native frontends are available for macOS and Windows, as well as command line and web frontends."
+#~ msgid "Transmission is a BitTorrent client with an easy-to-use frontend on top a cross-platform backend. Native frontends are available for OS X and Windows, as well as command line and web frontends."
 #~ msgstr "ट्रांसमिशन - एकाधिक मंच समर्थित बैक-एंड पर कार्यरत सरल फ्रंट-एंड युक्त बिट टोरेंट साधन है। मैक ओएस व विंडोज हेतु मूल फ्रंट-एंड के साथ ही कमांड लाइन एवं वेब फ्रंट-एंड भी उपलब्ध हैं।"
 
 #~ msgid "Unable to parse file content"

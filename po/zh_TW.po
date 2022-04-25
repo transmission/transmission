@@ -2346,8 +2346,8 @@ msgstr "正在驗證 Torrent"
 #~ msgid "Tracker will allow requests in %s"
 #~ msgstr "追蹤器會允許 %s 內的要求"
 
-#~ msgid "Transmission is a BitTorrent client with an easy-to-use frontend on top a cross-platform backend. Native frontends are available for macOS and Windows, as well as command line and web frontends."
-#~ msgstr "Transmission 是一個 BitTorrent 的客戶端，在跨平台後端的基礎上提供了更易於使用的前端。本機前端提供 macOS 與 Windows 版本，亦提供命令列與網頁前端版本。"
+#~ msgid "Transmission is a BitTorrent client with an easy-to-use frontend on top a cross-platform backend. Native frontends are available for OS X and Windows, as well as command line and web frontends."
+#~ msgstr "Transmission 是一個 BitTorrent 的客戶端，在跨平台後端的基礎上提供了更易於使用的前端。本機前端提供 OS X 與 Windows 版本，亦提供命令列與網頁前端版本。"
 
 #~ msgid "Unable to parse file content"
 #~ msgstr "無法解析檔案內容"

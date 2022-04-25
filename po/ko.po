@@ -2341,8 +2341,8 @@ msgstr "토렌트 확인 중"
 #~ msgid "Tracker will allow requests in %s"
 #~ msgstr "트래커가 %s 안에 요청을 수락할 것입니다"
 
-#~ msgid "Transmission is a BitTorrent client with an easy-to-use frontend on top a cross-platform backend. Native frontends are available for macOS and Windows, as well as command line and web frontends."
-#~ msgstr "트랜스미션은 크로스 플랫폼 백엔드 위에서 동작하는 쉽게 사용가능한 프론트엔드인 비트토렌트 클라이언트입니다. 네이티브 프론트엔드는 macOS와 Windows, 커멘드라인 및 웹 프론트엔드가 존재합니다."
+#~ msgid "Transmission is a BitTorrent client with an easy-to-use frontend on top a cross-platform backend. Native frontends are available for OS X and Windows, as well as command line and web frontends."
+#~ msgstr "트랜스미션은 크로스 플랫폼 백엔드 위에서 동작하는 쉽게 사용가능한 프론트엔드인 비트토렌트 클라이언트입니다. 네이티브 프론트엔드는 OS X와 Windows, 커멘드라인 및 웹 프론트엔드가 존재합니다."
 
 #~ msgid "Unable to parse file content"
 #~ msgstr "파일 내용을 해석할 수 없습니다"

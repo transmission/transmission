@@ -2354,7 +2354,7 @@ msgstr "Vérification du torrent"
 #~ msgid "Tracker will allow requests in %s"
 #~ msgstr "Le traceur autorisera les requêtes dans %s"
 
-#~ msgid "Transmission is a BitTorrent client with an easy-to-use frontend on top a cross-platform backend. Native frontends are available for macOS and Windows, as well as command line and web frontends."
+#~ msgid "Transmission is a BitTorrent client with an easy-to-use frontend on top a cross-platform backend. Native frontends are available for OS X and Windows, as well as command line and web frontends."
 #~ msgstr "Transmission est un client BitTorrent muni d’une interface frontale conviviale sur une dorsale multiplate-forme. Des interfaces frontales natives sont proposées pour macOS et Windows, ainsi que des interfaces frontales en ligne de commande et Web."
 
 #~ msgid "Unable to parse file content"

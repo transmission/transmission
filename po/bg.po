@@ -2370,8 +2370,8 @@ msgstr "Проверка на торента"
 #~ msgid "Tracker will allow requests in %s"
 #~ msgstr "Тракерът ще разреши запитвания след %s"
 
-#~ msgid "Transmission is a BitTorrent client with an easy-to-use frontend on top a cross-platform backend. Native frontends are available for macOS and Windows, as well as command line and web frontends."
-#~ msgstr "Transmission е BitTorrent клиент с лесен за ползване, мултиплатформен графичен интерфейс. Достъпни са графични интерфейси за macOS и Windows, а, също конзолни и уеб интерфейси."
+#~ msgid "Transmission is a BitTorrent client with an easy-to-use frontend on top a cross-platform backend. Native frontends are available for OS X and Windows, as well as command line and web frontends."
+#~ msgstr "Transmission е BitTorrent клиент с лесен за ползване, мултиплатформен графичен интерфейс. Достъпни са графични интерфейси за OS X и Windows, а, също конзолни и уеб интерфейси."
 
 #~ msgid "Unable to parse file content"
 #~ msgstr "Не може да се анализира съдържанието на файла"
