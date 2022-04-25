@@ -23,7 +23,6 @@
 ****
 ***/
 
-struct evbuffer;
 struct event;
 struct timeval;
 struct tr_error;

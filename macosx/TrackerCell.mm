@@ -5,6 +5,8 @@
 #include <libtransmission/transmission.h>
 #include <libtransmission/web-utils.h> //tr_addressIsIP()
 
+#import "CocoaCompatibility.h"
+
 #import "TrackerCell.h"
 #import "TrackerNode.h"
 

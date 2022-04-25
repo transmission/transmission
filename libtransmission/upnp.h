@@ -14,6 +14,10 @@
  * @{
  */
 
+#include "transmission.h"
+
+#include "net.h" // tr_port
+
 struct tr_upnp;
 
 tr_upnp* tr_upnpInit(void);
