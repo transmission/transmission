@@ -2379,8 +2379,8 @@ msgstr "Provjera torrenta"
 #~ msgid "Tracker will allow requests in %s"
 #~ msgstr "Pratitelj će dopustiti zahtjeve za %s"
 
-#~ msgid "Transmission is a BitTorrent client with an easy-to-use frontend on top a cross-platform backend. Native frontends are available for OS X and Windows, as well as command line and web frontends."
-#~ msgstr "Transmission je BitTorrent klijent s jednostavnim korisničkim sučeljem povrh višeplatformske pozadine. Izvorna korisnička sučelja su dostupna za OS X i Windowse, kao i naredbeni redak i web sučelja."
+#~ msgid "Transmission is a BitTorrent client with an easy-to-use frontend on top a cross-platform backend. Native frontends are available for macOS and Windows, as well as command line and web frontends."
+#~ msgstr "Transmission je BitTorrent klijent s jednostavnim korisničkim sučeljem povrh višeplatformske pozadine. Izvorna korisnička sučelja su dostupna za macOS i Windowse, kao i naredbeni redak i web sučelja."
 
 #~ msgid "Unable to parse file content"
 #~ msgstr "Neuspjela obrada sadržaja datoteke"

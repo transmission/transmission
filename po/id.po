@@ -2340,8 +2340,8 @@ msgstr "Verifikasi torrent"
 #~ msgid "Tracker will allow requests in %s"
 #~ msgstr "Pelacak akan mengijinkan permintaan dalam %s"
 
-#~ msgid "Transmission is a BitTorrent client with an easy-to-use frontend on top a cross-platform backend. Native frontends are available for OS X and Windows, as well as command line and web frontends."
-#~ msgstr "Transmission adalah klien BitTorrent dengan frontend yang mudah digunakan di atas backend lintas platform. Frontend asli tersedia untuk OS X dan Windows, maupun frontend baris perintah dan web."
+#~ msgid "Transmission is a BitTorrent client with an easy-to-use frontend on top a cross-platform backend. Native frontends are available for macOS and Windows, as well as command line and web frontends."
+#~ msgstr "Transmission adalah klien BitTorrent dengan frontend yang mudah digunakan di atas backend lintas platform. Frontend asli tersedia untuk macOS dan Windows, maupun frontend baris perintah dan web."
 
 #~ msgid "Unable to parse file content"
 #~ msgstr "Tidak dapat menguraikan konten berkas"

@@ -2416,7 +2416,7 @@ msgstr "אימות טורנט"
 #~ msgid "Tracker will allow requests in %s"
 #~ msgstr "הגשש יאפשר בקשות בעוד %s"
 
-#~ msgid "Transmission is a BitTorrent client with an easy-to-use frontend on top a cross-platform backend. Native frontends are available for OS X and Windows, as well as command line and web frontends."
+#~ msgid "Transmission is a BitTorrent client with an easy-to-use frontend on top a cross-platform backend. Native frontends are available for macOS and Windows, as well as command line and web frontends."
 #~ msgstr "‏Transmission היא לקוח ביטורנט בעלת ממשק משתמש קל לשימוש מבוסס מנגנון חוצה ריבוי-מסדת. ממשקי משתמש זמינים ל־macOS ול־Windows, לרבות אפשרות הפעלה משורת פקודה וממשקי דפדפן מקוונים."
 
 #~ msgid "Unable to parse file content"

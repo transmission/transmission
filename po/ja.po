@@ -2355,8 +2355,8 @@ msgstr "トレントの検証中"
 #~ msgid "Tracker will allow requests in %s"
 #~ msgstr "トラッカーは %s の要求を許可"
 
-#~ msgid "Transmission is a BitTorrent client with an easy-to-use frontend on top a cross-platform backend. Native frontends are available for OS X and Windows, as well as command line and web frontends."
-#~ msgstr "Transmission は、クロスプラットフォームのバックエンド層上にお手軽なフロントエンドを備えた BitTorrent クライアントです。用意されたフロントエンドは、OS X と Windows のほか、コマンドラインやウェブでも利用できます。"
+#~ msgid "Transmission is a BitTorrent client with an easy-to-use frontend on top a cross-platform backend. Native frontends are available for macOS and Windows, as well as command line and web frontends."
+#~ msgstr "Transmission は、クロスプラットフォームのバックエンド層上にお手軽なフロントエンドを備えた BitTorrent クライアントです。用意されたフロントエンドは、macOS と Windows のほか、コマンドラインやウェブでも利用できます。"
 
 #~ msgid "Unable to parse file content"
 #~ msgstr "ファイルの内容を解析できません"
