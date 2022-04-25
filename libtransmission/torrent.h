@@ -559,6 +559,26 @@ public:
 
     void setVerifyState(tr_verify_state state);
 
+    [[nodiscard]] constexpr auto verifyState() const noexcept
+    {
+        return verify_state_;
+    }
+
+    constexpr void setVerifyProgress(float f) noexcept
+    {
+        verify_progress_ = f;
+    }
+
+    [[nodiscard]] constexpr std::optional<float> verifyProgress() const noexcept
+    {
+        if (verify_state_ == TR_VERIFY_NOW)
+        {
+            return verify_progress_;
+        }
+
+        return {};
+    }
+
     void setDateActive(time_t t);
 
     void setLabels(tr_quark const* labels, size_t n_labels);
@@ -579,8 +599,6 @@ public:
     Bandwidth bandwidth_;
 
     tr_swarm* swarm = nullptr;
-
-    std::optional<double> verify_progress;
 
     tr_stat_errtype error = TR_STAT_OK;
     tr_interned_string error_announce_url;
@@ -683,8 +701,6 @@ public:
 
     uint16_t maxConnectedPeers = TR_DEFAULT_PEER_LIMIT_TORRENT;
 
-    tr_verify_state verifyState = TR_VERIFY_NONE;
-
     time_t lastStatTime = 0;
     tr_stat stats = {};
 
@@ -717,6 +733,9 @@ public:
     tr_bitfield checked_pieces_ = tr_bitfield{ 0 };
 
 private:
+    tr_verify_state verify_state_ = TR_VERIFY_NONE;
+    float verify_progress_ = -1;
+
     void setFilesWanted(tr_file_index_t const* files, size_t n_files, bool wanted, bool is_bootstrapping)
     {
         auto const lock = unique_lock();
