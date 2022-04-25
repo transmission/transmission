@@ -371,7 +371,7 @@ void tr_sessionGetDefaultSettings(tr_variant* d)
     tr_variantDictAddBool(d, TR_KEY_rpc_host_whitelist_enabled, true);
     tr_variantDictAddInt(d, TR_KEY_rpc_port, TR_DEFAULT_RPC_PORT);
     tr_variantDictAddStrView(d, TR_KEY_rpc_url, TR_DEFAULT_RPC_URL_STR);
-    tr_variantDictAddInt(d, TR_KEY_rpc_socket_mode, tr_rpc_server::DefaultRpcSocketMode);
+    tr_variantDictAddStr(d, TR_KEY_rpc_socket_mode, fmt::format("{:#o}", tr_rpc_server::DefaultRpcSocketMode));
     tr_variantDictAddBool(d, TR_KEY_scrape_paused_torrents_enabled, true);
     tr_variantDictAddStrView(d, TR_KEY_script_torrent_added_filename, "");
     tr_variantDictAddBool(d, TR_KEY_script_torrent_added_enabled, false);
@@ -446,7 +446,7 @@ void tr_sessionGetSettings(tr_session const* s, tr_variant* d)
     tr_variantDictAddBool(d, TR_KEY_rpc_enabled, tr_sessionIsRPCEnabled(s));
     tr_variantDictAddStr(d, TR_KEY_rpc_password, tr_sessionGetRPCPassword(s));
     tr_variantDictAddInt(d, TR_KEY_rpc_port, tr_sessionGetRPCPort(s));
-    tr_variantDictAddInt(d, TR_KEY_rpc_socket_mode, s->rpc_server_->socketMode());
+    tr_variantDictAddStr(d, TR_KEY_rpc_socket_mode, fmt::format("{:#o}", s->rpc_server_.get()->socket_mode_));
     tr_variantDictAddStr(d, TR_KEY_rpc_url, tr_sessionGetRPCUrl(s));
     tr_variantDictAddStr(d, TR_KEY_rpc_username, tr_sessionGetRPCUsername(s));
     tr_variantDictAddStr(d, TR_KEY_rpc_whitelist, tr_sessionGetRPCWhitelist(s));
