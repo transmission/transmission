@@ -14,6 +14,8 @@
  * @{
  */
 
+#include <ctime> // time_t
+
 #include "natpmp.h"
 #include "net.h" // tr_port
 

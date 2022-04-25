@@ -2,6 +2,8 @@
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
+#import "CocoaCompatibility.h"
+
 #import "TorrentTableView.h"
 #import "Controller.h"
 #import "FileListNode.h"

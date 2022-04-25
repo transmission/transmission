@@ -355,6 +355,7 @@ void useFetchedBlocks(tr_webseed_task* task)
 
         task->loc = tor->byteLoc(task->loc.byte + block_size);
 
+        TR_ASSERT(task->loc.byte <= task->end_byte);
         TR_ASSERT(task->loc.byte == task->end_byte || task->loc.block_offset == 0);
     }
 }
@@ -452,7 +453,8 @@ void onPartialDataFetched(tr_web::FetchResponse const& web_response)
         return;
     }
 
-    TR_ASSERT(evbuffer_get_length(task->content()) < tr_block_info::BlockSize);
+    TR_ASSERT(evbuffer_get_length(task->content()) == 0);
+    TR_ASSERT(task->loc.byte == task->end_byte);
     webseed->tasks.erase(task);
     delete task;
 
@@ -481,11 +483,13 @@ void task_request_next_chunk(tr_webseed_task* task)
         return;
     }
 
-    auto const [file_index, file_offset] = tor->fileOffset(task->loc);
+    auto const loc = tor->byteLoc(task->loc.byte + evbuffer_get_length(task->content()));
 
+    auto const [file_index, file_offset] = tor->fileOffset(loc);
     auto const left_in_file = tor->fileSize(file_index) - file_offset;
-    auto const left_in_task = task->end_byte - task->loc.byte;
+    auto const left_in_task = task->end_byte - loc.byte;
     auto const this_chunk = std::min(left_in_file, left_in_task);
+    TR_ASSERT(this_chunk > 0U);
 
     webseed->connection_limiter.taskStarted();
 

@@ -9,8 +9,6 @@
 #error only libtransmission should #include this header.
 #endif
 
-#include <cstddef> // size_t
-
 #include "transmission.h"
 
 #include "tr-macros.h"

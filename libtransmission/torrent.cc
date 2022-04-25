@@ -970,7 +970,8 @@ void tr_torrent::setVerifyState(tr_verify_state state)
 {
     TR_ASSERT(state == TR_VERIFY_NONE || state == TR_VERIFY_WAIT || state == TR_VERIFY_NOW);
 
-    this->verifyState = state;
+    this->verify_state_ = state;
+    this->verify_progress_ = {};
     this->markChanged();
 }
 
@@ -980,11 +981,11 @@ tr_torrent_activity tr_torrentGetActivity(tr_torrent const* tor)
 
     bool const is_seed = tor->isDone();
 
-    if (tor->verifyState == TR_VERIFY_NOW)
+    if (tor->verifyState() == TR_VERIFY_NOW)
     {
         ret = TR_STATUS_CHECK;
     }
-    else if (tor->verifyState == TR_VERIFY_WAIT)
+    else if (tor->verifyState() == TR_VERIFY_WAIT)
     {
         ret = TR_STATUS_CHECK_WAIT;
     }
@@ -1017,11 +1018,6 @@ static int torrentGetIdleSecs(tr_torrent const* tor, tr_torrent_activity activit
 static inline bool tr_torrentIsStalled(tr_torrent const* tor, int idle_secs)
 {
     return tr_sessionGetQueueStalledEnabled(tor->session) && idle_secs > tr_sessionGetQueueStalledMinutes(tor->session) * 60;
-}
-
-static double getVerifyProgress(tr_torrent const* tor)
-{
-    return tor->verify_progress ? *tor->verify_progress : 0.0;
 }
 
 tr_stat const* tr_torrentStat(tr_torrent* tor)
@@ -1072,7 +1068,9 @@ tr_stat const* tr_torrentStat(tr_torrent* tor)
     s->percentDone = tor->completion.percentDone();
     s->leftUntilDone = tor->completion.leftUntilDone();
     s->sizeWhenDone = tor->completion.sizeWhenDone();
-    s->recheckProgress = s->activity == TR_STATUS_CHECK ? getVerifyProgress(tor) : 0;
+
+    auto const verify_progress = tor->verifyProgress();
+    s->recheckProgress = verify_progress ? *verify_progress : 0.0F;
     s->activityDate = tor->activityDate;
     s->addedDate = tor->addedDate;
     s->doneDate = tor->doneDate;

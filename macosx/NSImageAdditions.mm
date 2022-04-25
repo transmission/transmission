@@ -2,6 +2,8 @@
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
+#import "CocoaCompatibility.h"
+
 #import "NSImageAdditions.h"
 
 @implementation NSImage (NSImageAdditions)
@@ -28,6 +30,19 @@
     {
         return [NSImage imageWithSystemSymbolName:symbolName accessibilityDescription:nil];
     }
+
+    return [NSImage imageNamed:fallbackName];
+}
+
++ (NSImage*)largeSystemSymbol:(NSString*)symbolName withFallback:(NSString*)fallbackName
+{
+#ifdef __MAC_11_0
+    if (@available(macOS 11.0, *))
+    {
+        return [[NSImage imageWithSystemSymbolName:symbolName accessibilityDescription:nil]
+            imageWithSymbolConfiguration:[NSImageSymbolConfiguration configurationWithScale:NSImageSymbolScaleLarge]];
+    }
+#endif
 
     return [NSImage imageNamed:fallbackName];
 }

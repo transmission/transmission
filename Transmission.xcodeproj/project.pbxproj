@@ -1178,6 +1178,7 @@
 		C3D9061827B7E1DE00EF2386 /* psl.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = psl.c; path = src/psl.c; sourceTree = "<group>"; };
 		C3D9061B27B7E31100EF2386 /* libpsl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = libpsl.h; path = include/libpsl.h; sourceTree = "<group>"; };
 		C3D9062127B7E3C900EF2386 /* libpsl.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libpsl.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		C81E411127F5BABD00652F56 /* CocoaCompatibility.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CocoaCompatibility.h; sourceTree = "<group>"; };
 		C88771A92803EE42005C7523 /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
 		C88771AB2803EE53005C7523 /* libiconv.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libiconv.tbd; path = usr/lib/libiconv.tbd; sourceTree = SDKROOT; };
 		C887BEC02807FCE900867D3C /* create.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = create.cc; sourceTree = "<group>"; };
@@ -1431,6 +1432,7 @@
 				A2F7CF5E13035FFD0016FF10 /* URLSheetWindowController.mm */,
 				A2966E8513DAF74C007B52DF /* GlobalOptionsPopoverViewController.h */,
 				A2966E8613DAF74C007B52DF /* GlobalOptionsPopoverViewController.mm */,
+				C81E411027F5BA8300652F56 /* Compatibility */,
 				A234D0D40C79FB6000A82373 /* Additions */,
 				E1B6FBF80C0D719B0015FE4D /* Info Window */,
 				A26AF2220D2DA42800FF7140 /* File Outline View */,
@@ -2074,6 +2076,14 @@
 			);
 			name = libpsl;
 			path = "third-party/libpsl";
+			sourceTree = "<group>";
+		};
+		C81E411027F5BA8300652F56 /* Compatibility */ = {
+			isa = PBXGroup;
+			children = (
+				C81E411127F5BABD00652F56 /* CocoaCompatibility.h */,
+			);
+			name = Compatibility;
 			sourceTree = "<group>";
 		};
 		E1B6FBF80C0D719B0015FE4D /* Info Window */ = {

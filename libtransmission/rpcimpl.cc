@@ -9,6 +9,7 @@
 #include <ctime>
 #include <iterator>
 #include <numeric>
+#include <set>
 #include <string_view>
 #include <utility>
 #include <vector>
@@ -287,7 +288,7 @@ static char const* torrentStop(
 {
     for (auto* tor : getTorrents(session, args_in))
     {
-        if (tor->isRunning || tor->isQueued() || tor->verifyState != TR_VERIFY_NONE)
+        if (tor->isRunning || tor->isQueued() || tor->verifyState() != TR_VERIFY_NONE)
         {
             tor->isStopping = true;
             notify(session, TR_RPC_TORRENT_STOPPED, tor);
@@ -2364,7 +2365,7 @@ static char const* sessionGet(tr_session* s, tr_variant* args_in, tr_variant* ar
         for (size_t i = 0; i < field_count; ++i)
         {
             auto field_name = std::string_view{};
-            if (tr_variantGetStrView(tr_variantListChild(fields, i), &field_name))
+            if (!tr_variantGetStrView(tr_variantListChild(fields, i), &field_name))
             {
                 continue;
             }
