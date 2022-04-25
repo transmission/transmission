@@ -180,10 +180,11 @@ protected:
             createFileWithContents(filename, std::data(Content), std::size(Content));
             paths.emplace(filename);
 
-            while (!tr_sys_path_is_same(parent, filename))
+            auto walk = std::string_view{ filename };
+            while (!tr_sys_path_is_same(parent, std::string{ walk }.c_str()))
             {
-                filename = tr_sys_path_dirname(filename);
-                paths.emplace(filename);
+                walk = tr_sys_path_dirname(walk);
+                paths.emplace(walk);
             }
         }
 

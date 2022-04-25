@@ -184,7 +184,7 @@ protected:
 
         auto const dir = tr_sys_path_dirname(path);
         tr_error* error = nullptr;
-        tr_sys_dir_create(dir.data(), TR_SYS_DIR_CREATE_PARENTS, 0700, &error);
+        tr_sys_dir_create(std::string{ dir }.c_str(), TR_SYS_DIR_CREATE_PARENTS, 0700, &error);
         EXPECT_EQ(nullptr, error) << "path[" << path << "] dir[" << dir << "] " << *error;
 
         errno = tmperr;
