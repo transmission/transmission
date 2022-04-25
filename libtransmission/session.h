@@ -14,7 +14,6 @@
 #include <array>
 #include <cstddef> // size_t
 #include <cstdint> // uintX_t
-#include <ctime>
 #include <memory>
 #include <mutex>
 #include <string>

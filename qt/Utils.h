@@ -5,8 +5,7 @@
 
 #pragma once
 
-#include <cctype> // isxdigit()
-#include <functional>
+#include <cstddef> // size_t
 
 #include <QHash>
 #include <QPointer>
