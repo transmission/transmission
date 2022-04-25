@@ -26,6 +26,8 @@ Different distributions may choose to package any or all of these tools in one o
 
 Transmission has an Xcode project file (Transmission.xcodeproj) for building in Xcode.
 
+For a more detailed description, and dependencies, visit: https://github.com/transmission/transmission/tree/main/docs
+
 ### Building a Transmission release from the command line
 
     $ tar xf transmission-3.00.tar.xz
