@@ -55,7 +55,7 @@ Here is a sample of the three basic types: respectively Boolean, Number and Stri
  * **rename-partial-files:** Boolean (default = true) Postfix partially downloaded files with ".part".
  * **start-added-torrents:** Boolean (default = true) Start torrents as soon as they are added.
  * **trash-original-torrent-files:** Boolean (default = false) Delete torrents added from the watch directory.
- * **umask:** Number (default = 18) Sets transmission's file mode creation mask. See [the umask(2) manpage](https://developer.apple.com/documentation/Darwin/Reference/ManPages/man2/umask.2.html) for more information. Users who want their saved torrents to be world-writable may want to set this value to 0. Bear in mind that the JSON markup language only accepts numbers in base 10, so the standard umask(2) octal notation "022" is written in settings.json as 18.
+ * **umask:** String (default = "022") Sets Transmission's file mode creation mask. See [the umask(2) manpage](https://developer.apple.com/documentation/Darwin/Reference/ManPages/man2/umask.2.html) for more information. Users who want their saved torrents to be world-writable may want to set this value to "0".
  * **watch-dir:** String
  * **watch-dir-enabled:** Boolean (default = false) Watch a directory for torrent files and add them to transmission.
    _Note: When **watch-dir-enabled** is true, only the transmission-daemon, transmission-gtk, and transmission-qt applications will monitor **watch-dir** for new .torrent files and automatically load them._
