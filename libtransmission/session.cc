@@ -796,8 +796,16 @@ static void sessionSetImpl(struct init_data* const data)
 
 #ifndef _WIN32
 
-    if (tr_variantDictFindInt(settings, TR_KEY_umask, &i))
+    if (tr_variantDictFindStrView(settings, TR_KEY_umask, &sv))
     {
+        /* Read a umask as a string representing an octal number. */
+        std::from_chars(sv.data(), sv.data() + sv.size(), i, 8);
+        session->umask = (mode_t)i;
+        umask(session->umask);
+    }
+    else if (tr_variantDictFindInt(settings, TR_KEY_umask, &i))
+    {
+        /* Or as a base 10 integer to remain compatible with the old settings format. */
         session->umask = (mode_t)i;
         umask(session->umask);
     }
