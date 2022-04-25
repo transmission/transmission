@@ -181,6 +181,32 @@ protected:
         }
     }
 
+    static void testPathXname(
+        XnameTestData const* data,
+        size_t data_size,
+        std::string_view (*func)(std::string_view, tr_error**))
+    {
+        for (size_t i = 0; i < data_size; ++i)
+        {
+            tr_error* err = nullptr;
+            auto const name = func(data[i].input, &err);
+            std::cerr << __FILE__ << ':' << __LINE__ << " in [" << data[i].input << "] out [" << name << ']' << std::endl;
+
+            if (data[i].output != nullptr)
+            {
+                EXPECT_NE(""sv, name);
+                EXPECT_EQ(nullptr, err) << *err;
+                EXPECT_EQ(data[i].output, name);
+            }
+            else
+            {
+                EXPECT_EQ(""sv, name);
+                EXPECT_NE(nullptr, err);
+                tr_error_clear(&err);
+            }
+        }
+    }
+
     static void testDirReadImpl(tr_pathbuf const& path, bool* have1, bool* have2)
     {
         *have1 = *have2 = false;
@@ -753,11 +779,6 @@ TEST_F(FileTest, pathBasenameDirname)
     testPathXname(basename_tests.data(), basename_tests.size(), tr_sys_path_basename);
 
     auto const dirname_tests = std::vector<XnameTestData>{
-        XnameTestData{ "/a/b/c", "/a/b" },
-        { "a/b/c", "a/b" },
-        { "a/b/c/", "a/b" },
-        { "a", "." },
-        { "a/", "." },
 #ifdef _WIN32
         { "C:\\a/b\\c", "C:\\a/b" },
         { "C:\\a/b\\c\\", "C:\\a/b" },
@@ -767,7 +788,7 @@ TEST_F(FileTest, pathBasenameDirname)
         { "C:/", "C:" },
         { "C:\\", "C:" },
         { "c:a/b", "c:a" },
-        { "c:a", "c:." },
+        // { "c:a", "c:." },
         { "c:.", "c:." },
         { "\\\\a\\b\\c", "\\\\a\\b" },
         { "\\\\a\\b\\c/", "\\\\a\\b" },
@@ -777,6 +798,72 @@ TEST_F(FileTest, pathBasenameDirname)
         { "\\\\1.2.3.4", "\\\\" },
         { "\\\\", "\\\\" },
         { "a/b\\c", "a/b" },
+        // taken from Node.js unit tests
+        // https://github.com/nodejs/node/blob/e46c680bf2b211bbd52cf959ca17ee98c7f657f5/test/parallel/test-path-dirname.js
+        { "c:\\", "c:\\" },
+        { "c:\\foo", "c:\\" },
+        { "c:\\foo\\", "c:\\" },
+        { "c:\\foo\\bar", "c:\\foo" },
+        { "c:\\foo\\bar\\", "c:\\foo" },
+        { "c:\\foo\\bar\\baz", "c:\\foo\\bar" },
+        { "c:\\foo bar\\baz", "c:\\foo bar" },
+        { "\\", "\\" },
+        { "\\foo", "\\" },
+        { "\\foo\\", "\\" },
+        { "\\foo\\bar", "\\foo" },
+        { "\\foo\\bar\\", "\\foo" },
+        { "\\foo\\bar\\baz", "\\foo\\bar" },
+        { "\\foo bar\\baz", "\\foo bar" },
+        { "c:", "c:" },
+        { "c:foo", "c:" },
+        { "c:foo\\", "c:" },
+        { "c:foo\\bar", "c:foo" },
+        { "c:foo\\bar\\", "c:foo" },
+        { "c:foo\\bar\\baz", "c:foo\\bar" },
+        { "c:foo bar\\baz", "c:foo bar" },
+        { "file:stream", "." },
+        { "dir\\file:stream", "dir" },
+        { "\\\\unc\\share", "\\\\unc\\share" },
+        { "\\\\unc\\share\\foo", "\\\\unc\\share\\" },
+        { "\\\\unc\\share\\foo\\", "\\\\unc\\share\\" },
+        { "\\\\unc\\share\\foo\\bar", "\\\\unc\\share\\foo" },
+        { "\\\\unc\\share\\foo\\bar\\", "\\\\unc\\share\\foo" },
+        { "\\\\unc\\share\\foo\\bar\\baz", "\\\\unc\\share\\foo\\bar" },
+        { "/a/b/", "/a" },
+        { "/a/b", "/a" },
+        { "/a", "/" },
+        { "", "." },
+        { "/", "/" },
+        { "////", "/" },
+        { "foo", "." },
+#else
+        // taken from Node.js unit tests
+        // https://github.com/nodejs/node/blob/e46c680bf2b211bbd52cf959ca17ee98c7f657f5/test/parallel/test-path-dirname.js
+        XnameTestData{ "/a/b/", "/a" },
+        { "/a/b", "/a" },
+        { "/a", "/" },
+        { "", "." },
+        { "/", "/" },
+        { "////", "/" },
+        { "//a", "//" },
+        { "foo", "." },
+        // taken from dirname(3) manpage
+        { "usr", "." },
+        { "/usr/lib", "/usr" },
+        { "/usr/", "/" },
+        { "/usr/", "/" },
+        {
+            "/",
+            "/",
+        },
+        {
+            ".",
+            ".",
+        },
+        {
+            "..",
+            ".",
+        },
 #endif
     };
 

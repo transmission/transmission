@@ -238,7 +238,7 @@ std::string tr_sys_path_basename(std::string_view path, struct tr_error** error 
  *         when no longer needed), `nullptr` otherwise (with `error` set
  *         accordingly).
  */
-std::string tr_sys_path_dirname(std::string_view path, struct tr_error** error = nullptr);
+std::string_view tr_sys_path_dirname(std::string_view path, struct tr_error** error = nullptr);
 
 /**
  * @brief Portability wrapper for `rename()`.

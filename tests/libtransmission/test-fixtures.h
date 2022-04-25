@@ -406,7 +406,7 @@ protected:
                 auto const filename = tr_pathbuf{ base, '/', subpath, suffix };
 
                 auto const dirname = tr_sys_path_dirname(filename);
-                tr_sys_dir_create(dirname.c_str(), TR_SYS_DIR_CREATE_PARENTS, 0700);
+                tr_sys_dir_create(std::string{ dirname }.c_str(), TR_SYS_DIR_CREATE_PARENTS, 0700);
 
                 auto fd = tr_sys_file_open(filename, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_TRUNCATE, 0600);
                 auto const file_size = metainfo->fileSize(i);

@@ -59,6 +59,7 @@
 #include "file.h"
 #include "log.h"
 #include "tr-assert.h"
+#include "tr-strbuf.h"
 #include "utils.h"
 
 #ifndef O_LARGEFILE
@@ -398,13 +399,13 @@ std::string tr_sys_path_basename(std::string_view path, tr_error** error)
     return {};
 }
 
-std::string tr_sys_path_dirname(std::string_view path, tr_error** error)
+std::string_view tr_sys_path_dirname(std::string_view path, tr_error** error)
 {
-    auto tmp = std::string{ path };
+    auto tmp = tr_pathbuf{ path };
 
-    if (char const* ret = dirname(std::data(tmp)); ret != nullptr)
+    if (auto const* dir = dirname(std::data(tmp)); dir != nullptr)
     {
-        return ret;
+        return tr_strvStartsWith(path, dir) ? path.substr(0, strlen(dir)) : "."sv;
     }
 
     set_system_error(error, errno);

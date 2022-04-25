@@ -301,7 +301,7 @@ TEST_F(RemoveTest, LeavesNonJunkAlone)
     EXPECT_EQ(expected_tree, getSubtreeContents(parent));
 
     files.remove(parent, "tmpdir_prefix"sv, sysPathRemove);
-    expected_tree = { parent, tr_sys_path_dirname(nonjunk_file), nonjunk_file.c_str() };
+    expected_tree = { parent, std::string{ tr_sys_path_dirname(nonjunk_file) }, nonjunk_file.c_str() };
     EXPECT_EQ(expected_tree, getSubtreeContents(parent));
 }
 
