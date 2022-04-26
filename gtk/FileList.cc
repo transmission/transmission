@@ -414,6 +414,7 @@ struct row_struct
 {
     uint64_t length = 0;
     Glib::ustring name;
+    std::string collate_key;
     int index = 0;
 };
 
@@ -451,11 +452,13 @@ void buildTree(FileRowNode& node, build_data& build)
 
 FileRowNode* find_child(FileRowNode* parent, Glib::ustring const& name)
 {
+    auto const collate_key = name.collate_key();
+
     for (auto* child = parent->first_child(); child != nullptr; child = child->next_sibling())
     {
         auto const& child_data = child->data();
 
-        if (child_data.name == name)
+        if (child_data.collate_key == collate_key)
         {
             return child;
         }
@@ -489,6 +492,7 @@ void FileList::Impl::set_torrent(int torrentId)
             FileRowNode root;
             auto& root_data = root.data();
             root_data.name = tr_torrentName(tor);
+            root_data.collate_key = root_data.name.collate_key();
             root_data.index = -1;
             root_data.length = 0;
 
@@ -509,6 +513,7 @@ void FileList::Impl::set_torrent(int torrentId)
                         node = new FileRowNode();
                         auto& row = node->data();
                         row.name = std::move(name);
+                        row.collate_key = row.name.collate_key();
                         row.index = isLeaf ? (int)i : -1;
                         row.length = isLeaf ? file.length : 0;
                         parent->append(*node);
