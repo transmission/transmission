@@ -23,7 +23,6 @@ struct BlocklistFile
 public:
     BlocklistFile(char const* filename, bool isEnabled)
         : is_enabled_(isEnabled)
-        , fd_{ TR_BAD_SYS_FILE }
         , filename_(filename)
     {
     }
@@ -92,7 +91,7 @@ private:
 #endif
 
     bool is_enabled_;
-    tr_sys_file_t fd_;
+    tr_sys_file_t fd_{ TR_BAD_SYS_FILE };
     size_t rule_count_ = 0;
     uint64_t byte_count_ = 0;
     std::string const filename_;

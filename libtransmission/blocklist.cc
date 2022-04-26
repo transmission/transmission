@@ -315,7 +315,11 @@ size_t BlocklistFile::setContent(char const* filename)
 
     close();
 
-    auto const out = tr_sys_file_open(getFilename(), TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_TRUNCATE, 0666, &error);
+    auto const out = tr_sys_file_open(
+        getFilename(),
+        TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_TRUNCATE,
+        0666,
+        &error);
     if (out == TR_BAD_SYS_FILE)
     {
         tr_logAddWarn(fmt::format(

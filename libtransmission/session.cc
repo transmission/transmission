@@ -2447,10 +2447,7 @@ void tr_session::useBlocklist(bool enabled)
 {
     this->blocklist_enabled_ = enabled;
 
-    std::for_each(
-        std::begin(blocklists),
-        std::end(blocklists),
-        [enabled](auto* blocklist) { blocklist->setEnabled(enabled); });
+    std::for_each(std::begin(blocklists), std::end(blocklists), [enabled](auto* blocklist) { blocklist->setEnabled(enabled); });
 }
 
 void tr_blocklistSetEnabled(tr_session* session, bool enabled)
@@ -2499,10 +2496,7 @@ int tr_blocklistSetContent(tr_session* session, char const* contentFilename)
 bool tr_sessionIsAddressBlocked(tr_session const* session, tr_address const* addr)
 {
     auto const& src = session->blocklists;
-    return std::any_of(
-        std::begin(src),
-        std::end(src),
-        [&addr](auto* blocklist) { return blocklist->hasAddress(*addr); });
+    return std::any_of(std::begin(src), std::end(src), [&addr](auto* blocklist) { return blocklist->hasAddress(*addr); });
 }
 
 void tr_blocklistSetURL(tr_session* session, char const* url)
