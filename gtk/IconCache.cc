@@ -6,8 +6,10 @@
  */
 
 #include <array>
+#include <map>
 #include <memory>
-#include <unordered_map>
+#include <string>
+#include <string_view>
 
 #include <glibmm.h>
 #include <giomm.h>
@@ -17,8 +19,8 @@
 
 using namespace std::literals;
 
-Glib::ustring const DirectoryMimeType = "folder"s;
-Glib::ustring const UnknownMimeType = "unknown"s;
+std::string_view const DirectoryMimeType = "folder"sv;
+std::string_view const UnknownMimeType = "unknown"sv;
 
 namespace
 {
@@ -29,7 +31,7 @@ struct IconCache
 {
     Glib::RefPtr<Gtk::IconTheme> icon_theme;
     int icon_size;
-    std::unordered_map<std::string, Glib::RefPtr<Gdk::Pixbuf>> cache;
+    std::map<std::string, Glib::RefPtr<Gdk::Pixbuf>, std::less<>> cache;
 };
 
 std::array<std::unique_ptr<IconCache>, 7> icon_cache;
@@ -56,28 +58,6 @@ std::unique_ptr<IconCache> icon_cache_new(Gtk::Widget& for_widget, Gtk::IconSize
     icons->icon_size = get_size_in_pixels(icon_size);
     icons->cache.try_emplace(VoidPixbufKey, create_void_pixbuf(icons->icon_size, icons->icon_size));
     return icons;
-}
-
-std::string _icon_cache_get_icon_key(Glib::RefPtr<Gio::Icon> const& icon)
-{
-    std::string key;
-
-    if (auto const* const ticon = dynamic_cast<Gio::ThemedIcon*>(gtr_get_ptr(icon)); ticon != nullptr)
-    {
-        std::ostringstream names;
-        for (auto const& name : ticon->get_names())
-        {
-            names << name << ',';
-        }
-
-        key = names.str();
-    }
-    else if (auto* const ficon = dynamic_cast<Gio::FileIcon*>(gtr_get_ptr(icon)); ficon != nullptr)
-    {
-        key = ficon->get_file()->get_path();
-    }
-
-    return key;
 }
 
 Glib::RefPtr<Gdk::Pixbuf> get_themed_icon_pixbuf(Gio::ThemedIcon& icon, int size, Gtk::IconTheme& icon_theme)
@@ -134,25 +114,21 @@ Glib::RefPtr<Gdk::Pixbuf> _get_icon_pixbuf(Glib::RefPtr<Gio::Icon> const& icon, 
     return {};
 }
 
-Glib::RefPtr<Gdk::Pixbuf> icon_cache_get_mime_type_icon(IconCache& icons, Glib::ustring const& mime_type)
+Glib::RefPtr<Gdk::Pixbuf> icon_cache_get_mime_type_icon(IconCache& icons, std::string_view mime_type)
 {
-    auto icon = Gio::content_type_get_icon(mime_type);
-    auto key = _icon_cache_get_icon_key(icon);
-    if (key.empty())
+    auto& cache = icons.cache;
+
+    if (auto mime_it = cache.find(mime_type); mime_it != std::end(cache))
     {
-        key = VoidPixbufKey;
+        return mime_it->second;
     }
 
-    if (auto pixbuf_it = icons.cache.find(key); pixbuf_it != icons.cache.end())
-    {
-        return pixbuf_it->second;
-    }
-
-    auto const pixbuf = _get_icon_pixbuf(icon, icons.icon_size, *gtr_get_ptr(icons.icon_theme));
-
+    auto mime_type_str = std::string{ mime_type };
+    auto icon = Gio::content_type_get_icon(mime_type_str);
+    auto pixbuf = _get_icon_pixbuf(icon, icons.icon_size, *gtr_get_ptr(icons.icon_theme));
     if (pixbuf != nullptr)
     {
-        icons.cache.try_emplace(key, pixbuf);
+        cache.try_emplace(std::move(mime_type_str), pixbuf);
     }
 
     return pixbuf;
@@ -160,10 +136,7 @@ Glib::RefPtr<Gdk::Pixbuf> icon_cache_get_mime_type_icon(IconCache& icons, Glib::
 
 } // namespace
 
-Glib::RefPtr<Gdk::Pixbuf> gtr_get_mime_type_icon(
-    Glib::ustring const& mime_type,
-    Gtk::IconSize icon_size,
-    Gtk::Widget& for_widget)
+Glib::RefPtr<Gdk::Pixbuf> gtr_get_mime_type_icon(std::string_view mime_type, Gtk::IconSize icon_size, Gtk::Widget& for_widget)
 {
     int n;
 
@@ -204,10 +177,4 @@ Glib::RefPtr<Gdk::Pixbuf> gtr_get_mime_type_icon(
     }
 
     return icon_cache_get_mime_type_icon(*icon_cache[n], mime_type);
-}
-
-Glib::ustring gtr_get_mime_type_from_filename(std::string const& file)
-{
-    bool result_uncertain;
-    return Gio::content_type_guess(file, {}, result_uncertain);
 }
