@@ -17,7 +17,7 @@ If you are having trouble with Transmission then the things you should do in ord
  * State the version of Transmission you are using (e.g. Linux/GTK+ 1.80).
    If you are using a GUI version of Transmission, you can find its version in the `About` dialog in the Help menu.
    **Do not** say _the latest version_ it's ambiguous.
- * State what operating system and version (e.g. Mac OS X 10.5.8, Ubuntu 8.04, ...)
+ * State what operating system and version (e.g. macOS 12.3.1, Ubuntu 22.04, ...)
  * Describe the symptoms in a short yet precise manner.
  * If the problem is reproducible and you explain how to reproduce it, then it stands a high chance of being addressed.
    If the problem is intermittent then we still want to know, but if you can not tell us how to reproduce it we cannot easily work on it.
@@ -47,7 +47,7 @@ If you are experiencing slow speeds and you have been through the documentation,
 If you have problems on the Mac version then please do these extra steps:
   * Make sure your system is updated to the latest version of your operating system. Note as of version 1.60, Transmission requires Mac OS X 10.5 or later.
   * If you are running a nightly build, set the language to English. The localization will sometimes crash the nightly builds until they are updated (right before an official release).
-  * OS X collects two pieces of crash information that can help us fix the crash:
+  * macOS collects two pieces of crash information that can help us fix the crash:
      1. In Console.app, look under LOG FILES > ~/Library/Logs/ > CrashReporter > for Transmission. If you find one, include it in your forum post.
      2. In Console.app, select LOG DATABASE QUERIES > Console Messages, and search for Transmission. If you find a message that mentions an assertion failure, include it in your forum post.
 
