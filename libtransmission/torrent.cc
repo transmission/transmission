@@ -1045,14 +1045,14 @@ tr_stat const* tr_torrentStat(tr_torrent* tor)
     s->errorString = tor->error_string.c_str();
 
     s->manualAnnounceTime = tr_announcerNextManualAnnounce(tor);
-    s->peersConnected = swarm_stats.peerCount;
-    s->peersSendingToUs = swarm_stats.activePeerCount[TR_DOWN];
-    s->peersGettingFromUs = swarm_stats.activePeerCount[TR_UP];
-    s->webseedsSendingToUs = swarm_stats.activeWebseedCount;
+    s->peersConnected = swarm_stats.peer_count;
+    s->peersSendingToUs = swarm_stats.active_peer_count[TR_DOWN];
+    s->peersGettingFromUs = swarm_stats.active_peer_count[TR_UP];
+    s->webseedsSendingToUs = swarm_stats.active_webseed_count;
 
     for (int i = 0; i < TR_PEER_FROM__MAX; i++)
     {
-        s->peersFrom[i] = swarm_stats.peerFromCount[i];
+        s->peersFrom[i] = swarm_stats.peer_from_count[i];
     }
 
     s->rawUploadSpeed_KBps = tr_toSpeedKBps(tor->bandwidth_.getRawSpeedBytesPerSecond(now, TR_UP));
@@ -1980,13 +1980,13 @@ void tr_torrentSetPriority(tr_torrent* tor, tr_priority_t priority)
 ****
 ***/
 
-void tr_torrentSetPeerLimit(tr_torrent* tor, uint16_t maxConnectedPeers)
+void tr_torrentSetPeerLimit(tr_torrent* tor, uint16_t max_connected_peers)
 {
     TR_ASSERT(tr_isTorrent(tor));
 
-    if (tor->maxConnectedPeers != maxConnectedPeers)
+    if (tor->max_connected_peers != max_connected_peers)
     {
-        tor->maxConnectedPeers = maxConnectedPeers;
+        tor->max_connected_peers = max_connected_peers;
 
         tor->setDirty();
     }
@@ -1996,7 +1996,7 @@ uint16_t tr_torrentGetPeerLimit(tr_torrent const* tor)
 {
     TR_ASSERT(tr_isTorrent(tor));
 
-    return tor->maxConnectedPeers;
+    return tor->max_connected_peers;
 }
 
 /***

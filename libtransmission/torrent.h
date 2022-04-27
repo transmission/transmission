@@ -73,7 +73,7 @@ void tr_torrentCheckSeedLimit(tr_torrent* tor);
 /** save a torrent's .resume file if it's changed since the last time it was saved */
 void tr_torrentSave(tr_torrent* tor);
 
-enum tr_verify_state
+enum tr_verify_state : uint8_t
 {
     TR_VERIFY_NONE,
     TR_VERIFY_WAIT,
@@ -699,7 +699,7 @@ public:
     void markEdited();
     void markChanged();
 
-    uint16_t maxConnectedPeers = TR_DEFAULT_PEER_LIMIT_TORRENT;
+    uint16_t max_connected_peers = TR_DEFAULT_PEER_LIMIT_TORRENT;
 
     time_t lastStatTime = 0;
     tr_stat stats = {};

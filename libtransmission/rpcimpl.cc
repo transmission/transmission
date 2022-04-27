@@ -654,7 +654,7 @@ static void initField(tr_torrent const* const tor, tr_stat const* const st, tr_v
     case TR_KEY_peersFrom:
         {
             tr_variantInitDict(initme, 7);
-            int const* f = st->peersFrom;
+            auto const* f = st->peersFrom;
             tr_variantDictAddInt(initme, TR_KEY_fromCache, f[TR_PEER_FROM_RESUME]);
             tr_variantDictAddInt(initme, TR_KEY_fromDht, f[TR_PEER_FROM_DHT]);
             tr_variantDictAddInt(initme, TR_KEY_fromIncoming, f[TR_PEER_FROM_INCOMING]);
