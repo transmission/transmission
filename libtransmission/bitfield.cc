@@ -356,18 +356,23 @@ void tr_bitfield::set(size_t nth, bool value)
     }
 
     /* Already tested that val != nth bit so just swap */
-    flags_[nth >> 3U] ^= 0x80 >> (nth & 7U);
+    auto& byte = flags_[nth >> 3U];
+    auto const old_byte_pop = doPopcount(byte);
+    byte ^= 0x80 >> (nth & 7U);
+    auto const new_byte_pop = doPopcount(byte);
 
-    /* Branch is needed for the assertions. Otherwise incrementing
-       (val ? 1 : -1) is better */
     if (value)
     {
-        incrementTrueCount(1);
+        ++true_count_;
+        TR_ASSERT(old_byte_pop + 1 == new_byte_pop);
     }
     else
     {
-        decrementTrueCount(1);
+        --true_count_;
+        TR_ASSERT(new_byte_pop + 1 == old_byte_pop);
     }
+    have_all_hint_ = true_count_ == bit_count_;
+    have_none_hint_ = true_count_ == 0;
 }
 
 /* Sets bit range [begin, end) to 1 */
