@@ -288,7 +288,7 @@ static char const* torrentStop(
 {
     for (auto* tor : getTorrents(session, args_in))
     {
-        if (tor->isRunning || tor->isQueued() || tor->verifyState != TR_VERIFY_NONE)
+        if (tor->isRunning || tor->isQueued() || tor->verifyState() != TR_VERIFY_NONE)
         {
             tor->isStopping = true;
             notify(session, TR_RPC_TORRENT_STOPPED, tor);

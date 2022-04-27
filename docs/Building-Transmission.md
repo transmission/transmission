@@ -1,11 +1,10 @@
 ## Getting the Source ##
 The source code for both official and nightly releases can be found on our [download page](https://transmissionbt.com/download/).
 
-## On Mac OS X ##
+## On macOS ##
 Transmission has an Xcode project file (Transmission.xcodeproj) for building in Xcode. Make sure you have this software:
- * OS X 10.10 or newer
- * OS X 10.10 SDK
- * Xcode 4.4 or newer
+ * macOS 10.14.4 or newer
+ * Xcode 11.3.1 or newer
 
 Building the project on Mac requires the source to be retrieved from GitHub. Pre-packaged source code will not compile.
 
