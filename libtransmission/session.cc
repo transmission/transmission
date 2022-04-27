@@ -79,6 +79,7 @@ static auto constexpr DefaultPrefetchEnabled = bool{ false };
 static auto constexpr DefaultCacheSizeMB = int{ 4 };
 static auto constexpr DefaultPrefetchEnabled = bool{ true };
 #endif
+static auto constexpr DefaultUmask = int{ 022 };
 static auto constexpr SaveIntervalSecs = int{ 360 };
 
 static void bandwidthGroupRead(tr_session* session, std::string_view config_dir);
@@ -390,7 +391,7 @@ void tr_sessionGetDefaultSettings(tr_variant* d)
     tr_variantDictAddInt(d, TR_KEY_alt_speed_time_day, TR_SCHED_ALL);
     tr_variantDictAddInt(d, TR_KEY_speed_limit_up, 100);
     tr_variantDictAddBool(d, TR_KEY_speed_limit_up_enabled, false);
-    tr_variantDictAddStr(d, TR_KEY_umask, fmt::format("{:#o}", 022));
+    tr_variantDictAddStr(d, TR_KEY_umask, fmt::format("{:#o}", DefaultUmask));
     tr_variantDictAddInt(d, TR_KEY_upload_slots_per_torrent, 14);
     tr_variantDictAddStrView(d, TR_KEY_bind_address_ipv4, TR_DEFAULT_BIND_ADDRESS_IPV4);
     tr_variantDictAddStrView(d, TR_KEY_bind_address_ipv6, TR_DEFAULT_BIND_ADDRESS_IPV6);
@@ -799,7 +800,7 @@ static void sessionSetImpl(struct init_data* const data)
     if (tr_variantDictFindStrView(settings, TR_KEY_umask, &sv))
     {
         /* Read a umask as a string representing an octal number. */
-        session->umask = tr_parseNum<mode_t>(sv, 8).value_or(022);
+        session->umask = tr_parseNum<mode_t>(sv, 8).value_or(DefaultUmask);
         umask(session->umask);
     }
     else if (tr_variantDictFindInt(settings, TR_KEY_umask, &i))
