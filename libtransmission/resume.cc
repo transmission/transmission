@@ -138,14 +138,14 @@ static auto loadLabels(tr_variant* dict, tr_torrent* tor)
 
 static void saveGroup(tr_variant* dict, tr_torrent const* tor)
 {
-    tr_variantDictAddStrView(dict, TR_KEY_group, tor->group);
+    tr_variantDictAddStrView(dict, TR_KEY_group, tor->bandwidthGroup());
 }
 
 static auto loadGroup(tr_variant* dict, tr_torrent* tor)
 {
-    if (std::string_view groupName; tr_variantDictFindStrView(dict, TR_KEY_group, &groupName) && !groupName.empty())
+    if (std::string_view group_name; tr_variantDictFindStrView(dict, TR_KEY_group, &group_name) && !std::empty(group_name))
     {
-        tor->setGroup(groupName);
+        tor->setBandwidthGroup(group_name);
         return tr_resume::Group;
     }
 

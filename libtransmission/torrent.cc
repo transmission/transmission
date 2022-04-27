@@ -1932,21 +1932,21 @@ void tr_torrent::setLabels(tr_quark const* new_labels, size_t n_labels)
 ****
 ***/
 
-void tr_torrent::setGroup(std::string_view group_name)
+void tr_torrent::setBandwidthGroup(std::string_view bandwidth_group) noexcept
 {
-    group_name = tr_strvStrip(group_name);
+    bandwidth_group = tr_strvStrip(bandwidth_group);
 
     auto const lock = this->unique_lock();
 
-    if (std::empty(group_name))
+    if (std::empty(bandwidth_group))
     {
-        this->group = ""sv;
+        this->bandwidth_group_ = tr_interned_string{};
         this->bandwidth_.setParent(&this->session->top_bandwidth_);
     }
     else
     {
-        this->group = group_name;
-        this->bandwidth_.setParent(&this->session->getBandwidthGroup(group_name));
+        this->bandwidth_group_ = bandwidth_group;
+        this->bandwidth_.setParent(&this->session->getBandwidthGroup(bandwidth_group));
     }
 
     this->setDirty();

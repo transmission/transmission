@@ -562,7 +562,7 @@ static void initField(tr_torrent const* const tor, tr_stat const* const st, tr_v
         break;
 
     case TR_KEY_group:
-        tr_variantInitStrView(initme, tor->group);
+        tr_variantInitStrView(initme, tor->bandwidthGroup().sv());
         break;
 
     case TR_KEY_hashString:
@@ -1162,7 +1162,7 @@ static char const* torrentSet(
 
         if (std::string_view group; tr_variantDictFindStrView(args_in, TR_KEY_group, &group))
         {
-            tor->setGroup(group);
+            tor->setBandwidthGroup(group);
         }
 
         if (errmsg == nullptr && tr_variantDictFindList(args_in, TR_KEY_labels, &tmp_variant))
