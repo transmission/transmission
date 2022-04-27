@@ -9,7 +9,6 @@
 
 #include <CoreFoundation/CoreFoundation.h>
 #include <CoreFoundation/CFPlugInCOM.h>
-#include <CoreServices/CoreServices.h>
 #include <QuickLook/QuickLook.h>
 
 // -----------------------------------------------------------------------------
@@ -31,23 +30,23 @@
 // -----------------------------------------------------------------------------
 
 // The thumbnail generation function to be implemented in GenerateThumbnailForURL.c
-OSStatus GenerateThumbnailForURL(
+extern "C" OSStatus GenerateThumbnailForURL(
     void* thisInterface,
     QLThumbnailRequestRef thumbnail,
     CFURLRef url,
     CFStringRef contentTypeUTI,
     CFDictionaryRef options,
     CGSize maxSize);
-void CancelThumbnailGeneration(void* thisInterface, QLThumbnailRequestRef thumbnail);
+extern "C" void CancelThumbnailGeneration(void* thisInterface, QLThumbnailRequestRef thumbnail);
 
 // The preview generation function to be implemented in GeneratePreviewForURL.c
-OSStatus GeneratePreviewForURL(
+extern "C" OSStatus GeneratePreviewForURL(
     void* thisInterface,
     QLPreviewRequestRef preview,
     CFURLRef url,
     CFStringRef contentTypeUTI,
     CFDictionaryRef options);
-void CancelPreviewGeneration(void* thisInterface, QLPreviewRequestRef preview);
+extern "C" void CancelPreviewGeneration(void* thisInterface, QLPreviewRequestRef preview);
 
 // The layout for an instance of QuickLookGeneratorPlugIn
 typedef struct __QuickLookGeneratorPluginType
@@ -63,12 +62,12 @@ typedef struct __QuickLookGeneratorPluginType
 //	Forward declaration for the IUnknown implementation.
 //
 
-QuickLookGeneratorPluginType* AllocQuickLookGeneratorPluginType(CFUUIDRef inFactoryID);
-void DeallocQuickLookGeneratorPluginType(QuickLookGeneratorPluginType* thisInstance);
-HRESULT QuickLookGeneratorQueryInterface(void* thisInstance, REFIID iid, LPVOID* ppv);
-void* QuickLookGeneratorPluginFactory(CFAllocatorRef allocator, CFUUIDRef typeID);
-ULONG QuickLookGeneratorPluginAddRef(void* thisInstance);
-ULONG QuickLookGeneratorPluginRelease(void* thisInstance);
+extern "C" QuickLookGeneratorPluginType* AllocQuickLookGeneratorPluginType(CFUUIDRef inFactoryID);
+extern "C" void DeallocQuickLookGeneratorPluginType(QuickLookGeneratorPluginType* thisInstance);
+extern "C" HRESULT QuickLookGeneratorQueryInterface(void* thisInstance, REFIID iid, LPVOID* ppv);
+extern "C" void* QuickLookGeneratorPluginFactory(CFAllocatorRef allocator, CFUUIDRef typeID);
+extern "C" ULONG QuickLookGeneratorPluginAddRef(void* thisInstance);
+extern "C" ULONG QuickLookGeneratorPluginRelease(void* thisInstance);
 
 // -----------------------------------------------------------------------------
 //	myInterfaceFtbl	definition

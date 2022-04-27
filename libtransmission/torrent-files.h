@@ -72,6 +72,11 @@ public:
         total_size_ = uint64_t{};
     }
 
+    void sortByPath()
+    {
+        std::sort(files_.begin(), files_.end(), [](const auto& lhs, const auto& rhs) { return lhs.path_ < rhs.path_; });
+    }
+
     tr_file_index_t add(std::string_view path, uint64_t file_size)
     {
         auto const ret = static_cast<tr_file_index_t>(std::size(files_));
