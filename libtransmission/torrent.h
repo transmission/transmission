@@ -716,7 +716,13 @@ public:
     using labels_t = std::vector<tr_quark>;
     labels_t labels;
 
-    std::string group;
+    void setBandwidthGroup(std::string_view group_name) noexcept;
+
+    [[nodiscard]] constexpr tr_interned_string const& bandwidthGroup() const noexcept
+    {
+        return bandwidth_group_;
+    }
+
     /* Set the bandwidth group the torrent belongs to */
     void setGroup(std::string_view groupName);
 
@@ -733,6 +739,7 @@ public:
     tr_bitfield checked_pieces_ = tr_bitfield{ 0 };
 
 private:
+    tr_interned_string bandwidth_group_;
     tr_verify_state verify_state_ = TR_VERIFY_NONE;
     float verify_progress_ = -1;
 
