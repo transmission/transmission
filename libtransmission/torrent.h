@@ -666,21 +666,6 @@ public:
 
     int queuePosition = 0;
 
-    tr_torrent_metadata_func metadata_func = nullptr;
-    void* metadata_func_user_data = nullptr;
-
-    tr_torrent_completeness_func completeness_func = nullptr;
-    void* completeness_func_user_data = nullptr;
-
-    tr_torrent_ratio_limit_hit_func ratio_limit_hit_func = nullptr;
-    void* ratio_limit_hit_func_user_data = nullptr;
-
-    tr_torrent_idle_limit_hit_func idle_limit_hit_func = nullptr;
-    void* idle_limit_hit_func_user_data = nullptr;
-
-    void* queue_started_user_data = nullptr;
-    void (*queue_started_callback)(tr_torrent*, void* queue_started_user_data) = nullptr;
-
     bool isDeleting = false;
     bool isDirty = false;
     bool is_queued = false;
