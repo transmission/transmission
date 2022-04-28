@@ -121,10 +121,10 @@ bool tr_peerIsSeed(tr_peer const* peer);
 
 struct tr_swarm_stats
 {
-    int activePeerCount[2];
-    int activeWebseedCount;
-    int peerCount;
-    int peerFromCount[TR_PEER_FROM__MAX];
+    uint16_t active_peer_count[2];
+    uint16_t active_webseed_count;
+    uint16_t peer_count;
+    uint16_t peer_from_count[TR_PEER_FROM__MAX];
 };
 
 void tr_swarmGetStats(tr_swarm const* swarm, tr_swarm_stats* setme);

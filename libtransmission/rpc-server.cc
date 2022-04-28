@@ -1084,8 +1084,20 @@ tr_rpc_server::tr_rpc_server(tr_session* session_in, tr_variant* settings)
     }
 
     key = TR_KEY_rpc_socket_mode;
+    bool is_missing_rpc_socket_mode_key = true;
 
-    if (!tr_variantDictFindInt(settings, key, &i))
+    if (tr_variantDictFindStrView(settings, key, &sv))
+    {
+        /* Read the socket permission as a string representing an octal number. */
+        is_missing_rpc_socket_mode_key = false;
+        i = tr_parseNum<int>(sv, 8).value_or(tr_rpc_server::DefaultRpcSocketMode);
+    }
+    else if (tr_variantDictFindInt(settings, key, &i))
+    {
+        /* Or as a base 10 integer to remain compatible with the old settings format. */
+        is_missing_rpc_socket_mode_key = false;
+    }
+    if (is_missing_rpc_socket_mode_key)
     {
         missing_settings_key(key);
     }

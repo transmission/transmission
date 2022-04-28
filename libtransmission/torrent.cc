@@ -144,27 +144,27 @@ bool tr_torrent::isPieceTransferAllowed(tr_direction direction) const
 static void tr_torrentUnsetPeerId(tr_torrent* tor)
 {
     // triggers a rebuild next time tr_torrentGetPeerId() is called
-    tor->peer_id.reset();
+    tor->peer_id_ = {};
 }
 
 static int peerIdTTL(tr_torrent const* tor)
 {
-    auto const ctime = tor->peer_id_creation_time;
+    auto const ctime = tor->peer_id_creation_time_;
     return ctime == 0 ? 0 : (int)difftime(ctime + tor->session->peer_id_ttl_hours * 3600, tr_time());
 }
 
 tr_peer_id_t const& tr_torrentGetPeerId(tr_torrent* tor)
 {
-    bool const needs_new_peer_id = !tor->peer_id || // doesn't have one
+    bool const needs_new_peer_id = tor->peer_id_[0] == '\0' || // doesn't have one
         (tor->isPublic() && (peerIdTTL(tor) <= 0)); // has one but it's expired
 
     if (needs_new_peer_id)
     {
-        tor->peer_id = tr_peerIdInit();
-        tor->peer_id_creation_time = tr_time();
+        tor->peer_id_ = tr_peerIdInit();
+        tor->peer_id_creation_time_ = tr_time();
     }
 
-    return *tor->peer_id;
+    return tor->peer_id_;
 }
 
 /***
@@ -1045,14 +1045,14 @@ tr_stat const* tr_torrentStat(tr_torrent* tor)
     s->errorString = tor->error_string.c_str();
 
     s->manualAnnounceTime = tr_announcerNextManualAnnounce(tor);
-    s->peersConnected = swarm_stats.peerCount;
-    s->peersSendingToUs = swarm_stats.activePeerCount[TR_DOWN];
-    s->peersGettingFromUs = swarm_stats.activePeerCount[TR_UP];
-    s->webseedsSendingToUs = swarm_stats.activeWebseedCount;
+    s->peersConnected = swarm_stats.peer_count;
+    s->peersSendingToUs = swarm_stats.active_peer_count[TR_DOWN];
+    s->peersGettingFromUs = swarm_stats.active_peer_count[TR_UP];
+    s->webseedsSendingToUs = swarm_stats.active_webseed_count;
 
     for (int i = 0; i < TR_PEER_FROM__MAX; i++)
     {
-        s->peersFrom[i] = swarm_stats.peerFromCount[i];
+        s->peersFrom[i] = swarm_stats.peer_from_count[i];
     }
 
     s->rawUploadSpeed_KBps = tr_toSpeedKBps(tor->bandwidth_.getRawSpeedBytesPerSecond(now, TR_UP));
@@ -1932,21 +1932,21 @@ void tr_torrent::setLabels(tr_quark const* new_labels, size_t n_labels)
 ****
 ***/
 
-void tr_torrent::setGroup(std::string_view group_name)
+void tr_torrent::setBandwidthGroup(std::string_view bandwidth_group) noexcept
 {
-    group_name = tr_strvStrip(group_name);
+    bandwidth_group = tr_strvStrip(bandwidth_group);
 
     auto const lock = this->unique_lock();
 
-    if (std::empty(group_name))
+    if (std::empty(bandwidth_group))
     {
-        this->group = ""sv;
+        this->bandwidth_group_ = tr_interned_string{};
         this->bandwidth_.setParent(&this->session->top_bandwidth_);
     }
     else
     {
-        this->group = group_name;
-        this->bandwidth_.setParent(&this->session->getBandwidthGroup(group_name));
+        this->bandwidth_group_ = bandwidth_group;
+        this->bandwidth_.setParent(&this->session->getBandwidthGroup(bandwidth_group));
     }
 
     this->setDirty();
@@ -1980,13 +1980,13 @@ void tr_torrentSetPriority(tr_torrent* tor, tr_priority_t priority)
 ****
 ***/
 
-void tr_torrentSetPeerLimit(tr_torrent* tor, uint16_t maxConnectedPeers)
+void tr_torrentSetPeerLimit(tr_torrent* tor, uint16_t max_connected_peers)
 {
     TR_ASSERT(tr_isTorrent(tor));
 
-    if (tor->maxConnectedPeers != maxConnectedPeers)
+    if (tor->max_connected_peers != max_connected_peers)
     {
-        tor->maxConnectedPeers = maxConnectedPeers;
+        tor->max_connected_peers = max_connected_peers;
 
         tor->setDirty();
     }
@@ -1996,7 +1996,7 @@ uint16_t tr_torrentGetPeerLimit(tr_torrent const* tor)
 {
     TR_ASSERT(tr_isTorrent(tor));
 
-    return tor->maxConnectedPeers;
+    return tor->max_connected_peers;
 }
 
 /***
