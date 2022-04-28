@@ -742,7 +742,7 @@ static auto loadFromFile(tr_torrent* tor, tr_resume::fields_t fieldsToLoad, bool
 
     if ((fieldsToLoad & tr_resume::MaxPeers) != 0 && tr_variantDictFindInt(&top, TR_KEY_max_peers, &i))
     {
-        tor->maxConnectedPeers = i;
+        tor->max_connected_peers = static_cast<uint16_t>(i);
         fields_loaded |= tr_resume::MaxPeers;
     }
 
@@ -873,7 +873,7 @@ static auto setFromCtor(tr_torrent* tor, tr_resume::fields_t fields, tr_ctor con
         }
     }
 
-    if (((fields & tr_resume::MaxPeers) != 0) && tr_ctorGetPeerLimit(ctor, mode, &tor->maxConnectedPeers))
+    if (((fields & tr_resume::MaxPeers) != 0) && tr_ctorGetPeerLimit(ctor, mode, &tor->max_connected_peers))
     {
         ret |= tr_resume::MaxPeers;
     }
@@ -943,7 +943,7 @@ void save(tr_torrent* tor)
 
     tr_variantDictAddInt(&top, TR_KEY_downloaded, tor->downloadedPrev + tor->downloadedCur);
     tr_variantDictAddInt(&top, TR_KEY_uploaded, tor->uploadedPrev + tor->uploadedCur);
-    tr_variantDictAddInt(&top, TR_KEY_max_peers, tor->maxConnectedPeers);
+    tr_variantDictAddInt(&top, TR_KEY_max_peers, tor->max_connected_peers);
     tr_variantDictAddInt(&top, TR_KEY_bandwidth_priority, tr_torrentGetPriority(tor));
     tr_variantDictAddBool(&top, TR_KEY_paused, !tor->isRunning && !tor->isQueued());
     savePeers(&top, tor);
