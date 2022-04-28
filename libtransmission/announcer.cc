@@ -143,13 +143,13 @@ struct StopsCompare
 
 struct tr_scrape_info
 {
-    tr_interned_string scrape_url;
-
     int multiscrape_max;
 
+    tr_interned_string scrape_url;
+
     tr_scrape_info(tr_interned_string scrape_url_in, int const multiscrape_max_in)
-        : scrape_url{ scrape_url_in }
-        , multiscrape_max{ multiscrape_max_in }
+        : multiscrape_max{ multiscrape_max_in }
+        , scrape_url{ scrape_url_in }
     {
     }
 };
@@ -183,8 +183,10 @@ struct tr_announcer
 
     tr_session* const session;
     event* const upkeep_timer;
-    int const key = tr_rand_int(INT_MAX);
+
     time_t tau_upkeep_at = 0;
+
+    int const key = tr_rand_int(INT_MAX);
 };
 
 static tr_scrape_info* tr_announcerGetScrapeInfo(tr_announcer* announcer, tr_interned_string url)
@@ -430,32 +432,33 @@ struct tr_tier
         this->scrapeAt = getNextScrapeTime(tor->session, this, interval);
     }
 
-    tr_torrent* const tor;
+    std::deque<tr_announce_event> announce_events;
+
+    std::string last_announce_str;
+    std::string last_scrape_str;
 
     /* number of up/down/corrupt bytes since the last time we sent an
      * "event=stopped" message that was acknowledged by the tracker */
     std::array<uint64_t, 3> byteCounts = {};
 
     std::vector<tr_tracker> trackers;
+
     std::optional<size_t> current_tracker_index_;
+
+    tr_torrent* const tor;
 
     time_t scrapeAt = 0;
     time_t lastScrapeStartTime = 0;
     time_t lastScrapeTime = 0;
-    bool lastScrapeSucceeded = false;
-    bool lastScrapeTimedOut = false;
 
     time_t announceAt = 0;
     time_t manualAnnounceAllowedAt = 0;
     time_t lastAnnounceStartTime = 0;
     time_t lastAnnounceTime = 0;
-    bool lastAnnounceSucceeded = false;
-    bool lastAnnounceTimedOut = false;
-
-    std::deque<tr_announce_event> announce_events;
-    int announce_event_priority = 0;
 
     int const id;
+
+    int announce_event_priority = 0;
 
     int scrapeIntervalSec = DefaultScrapeIntervalSec;
     int announceIntervalSec = DefaultAnnounceIntervalSec;
@@ -463,12 +466,15 @@ struct tr_tier
 
     int lastAnnouncePeerCount = 0;
 
+    bool lastScrapeSucceeded = false;
+    bool lastScrapeTimedOut = false;
+
+    bool lastAnnounceSucceeded = false;
+    bool lastAnnounceTimedOut = false;
+
     bool isRunning = false;
     bool isAnnouncing = false;
     bool isScraping = false;
-
-    std::string last_announce_str;
-    std::string last_scrape_str;
 
 private:
     [[nodiscard]] static time_t getNextScrapeTime(tr_session const* session, tr_tier const* tier, int interval)
