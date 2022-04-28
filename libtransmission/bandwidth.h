@@ -211,17 +211,13 @@ public:
 
     static constexpr size_t HistoryMSec = 2000U;
     static constexpr size_t IntervalMSec = HistoryMSec;
-    static constexpr size_t GranularityMSec = 200;
+    static constexpr size_t GranularityMSec = 250;
     static constexpr size_t HistorySize = (IntervalMSec / GranularityMSec);
 
     struct RateControl
     {
-        struct Transfer
-        {
-            uint64_t date_;
-            uint64_t size_;
-        };
-        std::array<Transfer, HistorySize> transfers_;
+        std::array<uint64_t, HistorySize> date_;
+        std::array<uint32_t, HistorySize> size_;
         uint64_t cache_time_;
         unsigned int cache_val_;
         int newest_;

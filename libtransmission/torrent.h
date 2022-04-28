@@ -85,7 +85,7 @@ tr_torrent_activity tr_torrentGetActivity(tr_torrent const* tor);
 struct tr_incomplete_metadata;
 
 /** @brief Torrent object */
-struct tr_torrent : public tr_completion::torrent_view
+struct tr_torrent final : public tr_completion::torrent_view
 {
 public:
     explicit tr_torrent(tr_torrent_metainfo&& tm)
@@ -587,29 +587,48 @@ public:
         torrent's content than any other mime-type. */
     [[nodiscard]] std::string_view primaryMimeType() const;
 
+    void setDirty()
+    {
+        this->isDirty = true;
+    }
+
+    void markEdited();
+    void markChanged();
+
+    void setBandwidthGroup(std::string_view group_name) noexcept;
+
+    [[nodiscard]] constexpr tr_interned_string const& bandwidthGroup() const noexcept
+    {
+        return bandwidth_group_;
+    }
+
     tr_torrent_metainfo metainfo_;
+
+    Bandwidth bandwidth_;
+
+    tr_stat stats = {};
 
     // TODO(ckerr): make private once some of torrent.cc's `tr_torrentFoo()` methods are member functions
     tr_completion completion;
 
-    tr_session* session = nullptr;
+    tr_file_piece_map fpm_ = tr_file_piece_map{ metainfo_ };
+    tr_file_priorities file_priorities_{ &fpm_ };
+    tr_files_wanted files_wanted_{ &fpm_ };
 
-    tr_torrent_announcer* torrent_announcer = nullptr;
-
-    Bandwidth bandwidth_;
-
-    tr_swarm* swarm = nullptr;
-
-    tr_stat_errtype error = TR_STAT_OK;
-    tr_interned_string error_announce_url;
     std::string error_string;
 
-    tr_sha1_digest_t obfuscated_hash = {};
+    using labels_t = std::vector<tr_quark>;
+    labels_t labels;
 
-    /* Used when the torrent has been created with a magnet link
-     * and we're in the process of downloading the metainfo from
-     * other peers */
-    struct tr_incomplete_metadata* incompleteMetadata = nullptr;
+    // when Transmission thinks the torrent's files were last changed
+    std::vector<time_t> file_mtimes_;
+
+    // true iff the piece was verified more recently than any of the piece's
+    // files' mtimes (file_mtimes_). If checked_pieces_.test(piece) is false,
+    // it means that piece needs to be checked before its data is used.
+    tr_bitfield checked_pieces_ = tr_bitfield{ 0 };
+
+    tr_sha1_digest_t obfuscated_hash = {};
 
     /* If the initiator of the connection receives a handshake in which the
      * peer_id does not match the expected peerid, then the initiator is
@@ -618,53 +637,18 @@ public:
      * peer_id that was registered by the peer. The peer_id from the tracker
      * and in the handshake are expected to match.
      */
-    std::optional<tr_peer_id_t> peer_id;
+    tr_peer_id_t peer_id_;
 
-    time_t peer_id_creation_time = 0;
+    tr_session* session = nullptr;
 
-    // Where the files are when the torrent is complete.
-    tr_interned_string download_dir;
+    tr_torrent_announcer* torrent_announcer = nullptr;
 
-    // Where the files are when the torrent is incomplete.
-    // a value of TR_KEY_NONE indicates the 'incomplete_dir' feature is unused
-    tr_interned_string incomplete_dir;
+    tr_swarm* swarm = nullptr;
 
-    // Where the files are now.
-    // Will equal either download_dir or incomplete_dir
-    tr_interned_string current_dir;
-
-    tr_completeness completeness = TR_LEECH;
-
-    time_t dhtAnnounceAt = 0;
-    time_t dhtAnnounce6At = 0;
-    bool dhtAnnounceInProgress = false;
-    bool dhtAnnounce6InProgress = false;
-
-    time_t lpdAnnounceAt = 0;
-
-    uint64_t downloadedCur = 0;
-    uint64_t downloadedPrev = 0;
-    uint64_t uploadedCur = 0;
-    uint64_t uploadedPrev = 0;
-    uint64_t corruptCur = 0;
-    uint64_t corruptPrev = 0;
-
-    uint64_t etaDLSpeedCalculatedAt = 0;
-    uint64_t etaULSpeedCalculatedAt = 0;
-    unsigned int etaDLSpeed_Bps = 0;
-    unsigned int etaULSpeed_Bps = 0;
-
-    time_t activityDate = 0;
-    time_t addedDate = 0;
-    time_t anyDate = 0;
-    time_t doneDate = 0;
-    time_t editDate = 0;
-    time_t startDate = 0;
-
-    int secondsDownloading = 0;
-    int secondsSeeding = 0;
-
-    int queuePosition = 0;
+    /* Used when the torrent has been created with a magnet link
+     * and we're in the process of downloading the metainfo from
+     * other peers */
+    struct tr_incomplete_metadata* incompleteMetadata = nullptr;
 
     tr_torrent_metadata_func metadata_func = nullptr;
     void* metadata_func_user_data = nullptr;
@@ -681,6 +665,73 @@ public:
     void* queue_started_user_data = nullptr;
     void (*queue_started_callback)(tr_torrent*, void* queue_started_user_data) = nullptr;
 
+    time_t peer_id_creation_time_ = 0;
+
+    time_t dhtAnnounceAt = 0;
+    time_t dhtAnnounce6At = 0;
+
+    time_t lpdAnnounceAt = 0;
+
+    time_t activityDate = 0;
+    time_t addedDate = 0;
+    time_t anyDate = 0;
+    time_t doneDate = 0;
+    time_t editDate = 0;
+    time_t startDate = 0;
+
+    time_t lastStatTime = 0;
+
+    uint64_t downloadedCur = 0;
+    uint64_t downloadedPrev = 0;
+    uint64_t uploadedCur = 0;
+    uint64_t uploadedPrev = 0;
+    uint64_t corruptCur = 0;
+    uint64_t corruptPrev = 0;
+
+    uint64_t etaDLSpeedCalculatedAt = 0;
+    uint64_t etaULSpeedCalculatedAt = 0;
+
+    tr_interned_string error_announce_url;
+
+    // Where the files are when the torrent is complete.
+    tr_interned_string download_dir;
+
+    // Where the files are when the torrent is incomplete.
+    // a value of TR_KEY_NONE indicates the 'incomplete_dir' feature is unused
+    tr_interned_string incomplete_dir;
+
+    // Where the files are now.
+    // Will equal either download_dir or incomplete_dir
+    tr_interned_string current_dir;
+
+    tr_stat_errtype error = TR_STAT_OK;
+
+    unsigned int etaDLSpeed_Bps = 0;
+    unsigned int etaULSpeed_Bps = 0;
+
+    int secondsDownloading = 0;
+    int secondsSeeding = 0;
+
+    int queuePosition = 0;
+
+    int uniqueId = 0;
+
+    tr_completeness completeness = TR_LEECH;
+
+    float desiredRatio = 0.0F;
+    tr_ratiolimit ratioLimitMode = TR_RATIOLIMIT_GLOBAL;
+
+    tr_idlelimit idleLimitMode = TR_IDLELIMIT_GLOBAL;
+
+    uint16_t max_connected_peers = TR_DEFAULT_PEER_LIMIT_TORRENT;
+
+    uint16_t idleLimitMinutes = 0;
+
+    bool dhtAnnounceInProgress = false;
+    bool dhtAnnounce6InProgress = false;
+
+    bool finishedSeedingByIdle = false;
+
     bool isDeleting = false;
     bool isDirty = false;
     bool is_queued = false;
@@ -691,57 +742,10 @@ public:
     bool prefetchMagnetMetadata = false;
     bool magnetVerify = false;
 
-    void setDirty()
-    {
-        this->isDirty = true;
-    }
-
-    void markEdited();
-    void markChanged();
-
-    uint16_t max_connected_peers = TR_DEFAULT_PEER_LIMIT_TORRENT;
-
-    time_t lastStatTime = 0;
-    tr_stat stats = {};
-
-    int uniqueId = 0;
-
-    float desiredRatio = 0.0F;
-    tr_ratiolimit ratioLimitMode = TR_RATIOLIMIT_GLOBAL;
-
-    uint16_t idleLimitMinutes = 0;
-    tr_idlelimit idleLimitMode = TR_IDLELIMIT_GLOBAL;
-    bool finishedSeedingByIdle = false;
-
-    using labels_t = std::vector<tr_quark>;
-    labels_t labels;
-
-    void setBandwidthGroup(std::string_view group_name) noexcept;
-
-    [[nodiscard]] constexpr tr_interned_string const& bandwidthGroup() const noexcept
-    {
-        return bandwidth_group_;
-    }
-
-    /* Set the bandwidth group the torrent belongs to */
-    void setGroup(std::string_view groupName);
-
-    tr_file_piece_map fpm_ = tr_file_piece_map{ metainfo_ };
-    tr_file_priorities file_priorities_{ &fpm_ };
-    tr_files_wanted files_wanted_{ &fpm_ };
-
-    // when Transmission thinks the torrent's files were last changed
-    std::vector<time_t> file_mtimes_;
-
-    // true iff the piece was verified more recently than any of the piece's
-    // files' mtimes (file_mtimes_). If checked_pieces_.test(piece) is false,
-    // it means that piece needs to be checked before its data is used.
-    tr_bitfield checked_pieces_ = tr_bitfield{ 0 };
-
 private:
-    tr_interned_string bandwidth_group_;
     tr_verify_state verify_state_ = TR_VERIFY_NONE;
     float verify_progress_ = -1;
+    tr_interned_string bandwidth_group_;
 
     void setFilesWanted(tr_file_index_t const* files, size_t n_files, bool wanted, bool is_bootstrapping)
     {
