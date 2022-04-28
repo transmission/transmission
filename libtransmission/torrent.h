@@ -688,8 +688,7 @@ public:
     uint64_t corruptCur = 0;
     uint64_t corruptPrev = 0;
 
-    uint64_t etaDLSpeedCalculatedAt = 0;
-    uint64_t etaULSpeedCalculatedAt = 0;
+    uint64_t etaSpeedCalculatedAt = 0;
 
     tr_interned_string error_announce_url;
 
@@ -706,8 +705,7 @@ public:
 
     tr_stat_errtype error = TR_STAT_OK;
 
-    unsigned int etaDLSpeed_Bps = 0;
-    unsigned int etaULSpeed_Bps = 0;
+    unsigned int etaSpeed_Bps = 0;
 
     int secondsDownloading = 0;
     int secondsSeeding = 0;

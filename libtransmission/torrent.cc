@@ -1092,30 +1092,30 @@ tr_stat const* tr_torrentStat(tr_torrent* tor)
 
     switch (s->activity)
     {
-    /* etaXLSpeed exists because if we use the piece speed directly,
+    /* etaSpeed exists because if we use the piece speed directly,
      * brief fluctuations cause the ETA to jump all over the place.
      * so, etaXLSpeed is a smoothed-out version of the piece speed
      * to dampen the effect of fluctuations */
     case TR_STATUS_DOWNLOAD:
-        if (tor->etaDLSpeedCalculatedAt + 800 < now)
+        if (tor->etaSpeedCalculatedAt + 800 < now)
         {
-            tor->etaDLSpeed_Bps = tor->etaDLSpeedCalculatedAt + 4000 < now ?
+            tor->etaSpeed_Bps = tor->etaSpeedCalculatedAt + 4000 < now ?
                 pieceDownloadSpeed_Bps : /* if no recent previous speed, no need to smooth */
-                (tor->etaDLSpeed_Bps * 4.0 + pieceDownloadSpeed_Bps) / 5.0; /* smooth across 5 readings */
-            tor->etaDLSpeedCalculatedAt = now;
+                (tor->etaSpeed_Bps * 4.0 + pieceDownloadSpeed_Bps) / 5.0; /* smooth across 5 readings */
+            tor->etaSpeedCalculatedAt = now;
         }
 
         if (s->leftUntilDone > s->desiredAvailable && tor->webseedCount() < 1)
         {
             s->eta = TR_ETA_NOT_AVAIL;
         }
-        else if (tor->etaDLSpeed_Bps == 0)
+        else if (tor->etaSpeed_Bps == 0)
         {
             s->eta = TR_ETA_UNKNOWN;
         }
         else
         {
-            s->eta = s->leftUntilDone / tor->etaDLSpeed_Bps;
+            s->eta = s->leftUntilDone / tor->etaSpeed_Bps;
         }
 
         s->etaIdle = TR_ETA_NOT_AVAIL;
@@ -1128,27 +1128,27 @@ tr_stat const* tr_torrentStat(tr_torrent* tor)
         }
         else
         {
-            if (tor->etaULSpeedCalculatedAt + 800 < now)
+            if (tor->etaSpeedCalculatedAt + 800 < now)
             {
-                tor->etaULSpeed_Bps = tor->etaULSpeedCalculatedAt + 4000 < now ?
+                tor->etaSpeed_Bps = tor->etaSpeedCalculatedAt + 4000 < now ?
                     pieceUploadSpeed_Bps : /* if no recent previous speed, no need to smooth */
-                    (tor->etaULSpeed_Bps * 4.0 + pieceUploadSpeed_Bps) / 5.0; /* smooth across 5 readings */
-                tor->etaULSpeedCalculatedAt = now;
+                    (tor->etaSpeed_Bps * 4.0 + pieceUploadSpeed_Bps) / 5.0; /* smooth across 5 readings */
+                tor->etaSpeedCalculatedAt = now;
             }
 
-            if (tor->etaULSpeed_Bps == 0)
+            if (tor->etaSpeed_Bps == 0)
             {
                 s->eta = TR_ETA_UNKNOWN;
             }
             else
             {
-                s->eta = seedRatioBytesLeft / tor->etaULSpeed_Bps;
+                s->eta = seedRatioBytesLeft / tor->etaSpeed_Bps;
             }
         }
 
         {
             auto seedIdleMinutes = uint16_t{};
-            s->etaIdle = tor->etaULSpeed_Bps < 1 && tr_torrentGetSeedIdle(tor, &seedIdleMinutes) ?
+            s->etaIdle = tor->etaSpeed_Bps < 1 && tr_torrentGetSeedIdle(tor, &seedIdleMinutes) ?
                 seedIdleMinutes * 60 - s->idleSecs :
                 TR_ETA_NOT_AVAIL;
         }
