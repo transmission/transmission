@@ -12,7 +12,6 @@
 #include <climits> /* PATH_MAX */
 #include <cstdint> /* SIZE_MAX */
 #include <cstdio>
-#include <cstdlib>
 #include <cstring>
 #include <string_view>
 #include <string>

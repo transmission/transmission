@@ -9,7 +9,6 @@
 #include <cerrno>
 #include <cstddef> // size_t
 #include <cstdint> // int64_t
-#include <cstdlib>
 #include <optional>
 #include <string_view>
 #include <utility> // make_pair
