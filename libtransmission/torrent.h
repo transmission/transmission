@@ -728,7 +728,6 @@ public:
     uint16_t idleLimitMinutes = 0;
 
     bool dhtAnnounceInProgress = false;
-    bool dhtAnnounce6InProgress = false;
 
     bool finishedSeedingByIdle = false;
 
