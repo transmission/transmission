@@ -85,7 +85,7 @@ tr_torrent_activity tr_torrentGetActivity(tr_torrent const* tor);
 struct tr_incomplete_metadata;
 
 /** @brief Torrent object */
-struct tr_torrent : public tr_completion::torrent_view
+struct tr_torrent final : public tr_completion::torrent_view
 {
 public:
     explicit tr_torrent(tr_torrent_metainfo&& tm)
@@ -637,7 +637,7 @@ public:
      * peer_id that was registered by the peer. The peer_id from the tracker
      * and in the handshake are expected to match.
      */
-    std::optional<tr_peer_id_t> peer_id;
+    tr_peer_id_t peer_id_;
 
     tr_session* session = nullptr;
 
@@ -665,7 +665,7 @@ public:
     void* queue_started_user_data = nullptr;
     void (*queue_started_callback)(tr_torrent*, void* queue_started_user_data) = nullptr;
 
-    time_t peer_id_creation_time = 0;
+    time_t peer_id_creation_time_ = 0;
 
     time_t dhtAnnounceAt = 0;
     time_t dhtAnnounce6At = 0;
@@ -743,9 +743,9 @@ public:
     bool magnetVerify = false;
 
 private:
-    tr_interned_string bandwidth_group_;
-    float verify_progress_ = -1;
     tr_verify_state verify_state_ = TR_VERIFY_NONE;
+    float verify_progress_ = -1;
+    tr_interned_string bandwidth_group_;
 
     void setFilesWanted(tr_file_index_t const* files, size_t n_files, bool wanted, bool is_bootstrapping)
     {
