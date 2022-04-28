@@ -1924,7 +1924,7 @@ static void sessionCloseImplFinish(tr_session* session)
 
     closeBlocklists(session);
 
-    tr_fdClose(session);
+    session->openFiles().closeAll();
 
     session->isClosed = true;
 }
@@ -2945,4 +2945,18 @@ static int bandwidthGroupWrite(tr_session const* session, std::string_view confi
     auto const ret = tr_variantToFile(&groups_dict, TR_VARIANT_FMT_JSON, filename);
     tr_variantFree(&groups_dict);
     return ret;
+}
+
+///
+
+void tr_session::closeTorrentFiles(tr_torrent* tor) noexcept
+{
+    tr_cacheFlushTorrent(this->cache, tor);
+    openFiles().closeTorrent(tor->uniqueId);
+}
+
+void tr_session::closeTorrentFile(tr_torrent* tor, tr_file_index_t file_num) noexcept
+{
+    tr_cacheFlushFile(this->cache, tor, file_num);
+    openFiles().closeFile(tor->uniqueId, file_num);
 }
