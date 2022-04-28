@@ -79,6 +79,7 @@ static auto constexpr DefaultPrefetchEnabled = bool{ false };
 static auto constexpr DefaultCacheSizeMB = int{ 4 };
 static auto constexpr DefaultPrefetchEnabled = bool{ true };
 #endif
+static auto constexpr DefaultUmask = int{ 022 };
 static auto constexpr SaveIntervalSecs = int{ 360 };
 
 static void bandwidthGroupRead(tr_session* session, std::string_view config_dir);
@@ -371,7 +372,7 @@ void tr_sessionGetDefaultSettings(tr_variant* d)
     tr_variantDictAddBool(d, TR_KEY_rpc_host_whitelist_enabled, true);
     tr_variantDictAddInt(d, TR_KEY_rpc_port, TR_DEFAULT_RPC_PORT);
     tr_variantDictAddStrView(d, TR_KEY_rpc_url, TR_DEFAULT_RPC_URL_STR);
-    tr_variantDictAddInt(d, TR_KEY_rpc_socket_mode, tr_rpc_server::DefaultRpcSocketMode);
+    tr_variantDictAddStr(d, TR_KEY_rpc_socket_mode, fmt::format("{:#o}", tr_rpc_server::DefaultRpcSocketMode));
     tr_variantDictAddBool(d, TR_KEY_scrape_paused_torrents_enabled, true);
     tr_variantDictAddStrView(d, TR_KEY_script_torrent_added_filename, "");
     tr_variantDictAddBool(d, TR_KEY_script_torrent_added_enabled, false);
@@ -390,7 +391,7 @@ void tr_sessionGetDefaultSettings(tr_variant* d)
     tr_variantDictAddInt(d, TR_KEY_alt_speed_time_day, TR_SCHED_ALL);
     tr_variantDictAddInt(d, TR_KEY_speed_limit_up, 100);
     tr_variantDictAddBool(d, TR_KEY_speed_limit_up_enabled, false);
-    tr_variantDictAddInt(d, TR_KEY_umask, 022);
+    tr_variantDictAddStr(d, TR_KEY_umask, fmt::format("{:#o}", DefaultUmask));
     tr_variantDictAddInt(d, TR_KEY_upload_slots_per_torrent, 14);
     tr_variantDictAddStrView(d, TR_KEY_bind_address_ipv4, TR_DEFAULT_BIND_ADDRESS_IPV4);
     tr_variantDictAddStrView(d, TR_KEY_bind_address_ipv6, TR_DEFAULT_BIND_ADDRESS_IPV6);
@@ -446,7 +447,7 @@ void tr_sessionGetSettings(tr_session const* s, tr_variant* d)
     tr_variantDictAddBool(d, TR_KEY_rpc_enabled, tr_sessionIsRPCEnabled(s));
     tr_variantDictAddStr(d, TR_KEY_rpc_password, tr_sessionGetRPCPassword(s));
     tr_variantDictAddInt(d, TR_KEY_rpc_port, tr_sessionGetRPCPort(s));
-    tr_variantDictAddInt(d, TR_KEY_rpc_socket_mode, s->rpc_server_->socketMode());
+    tr_variantDictAddStr(d, TR_KEY_rpc_socket_mode, fmt::format("{:#o}", s->rpc_server_->socket_mode_));
     tr_variantDictAddStr(d, TR_KEY_rpc_url, tr_sessionGetRPCUrl(s));
     tr_variantDictAddStr(d, TR_KEY_rpc_username, tr_sessionGetRPCUsername(s));
     tr_variantDictAddStr(d, TR_KEY_rpc_whitelist, tr_sessionGetRPCWhitelist(s));
@@ -463,7 +464,7 @@ void tr_sessionGetSettings(tr_session const* s, tr_variant* d)
     tr_variantDictAddInt(d, TR_KEY_alt_speed_time_day, tr_sessionGetAltSpeedDay(s));
     tr_variantDictAddInt(d, TR_KEY_speed_limit_up, tr_sessionGetSpeedLimit_KBps(s, TR_UP));
     tr_variantDictAddBool(d, TR_KEY_speed_limit_up_enabled, tr_sessionIsSpeedLimited(s, TR_UP));
-    tr_variantDictAddInt(d, TR_KEY_umask, s->umask);
+    tr_variantDictAddStr(d, TR_KEY_umask, fmt::format("{:#o}", s->umask));
     tr_variantDictAddInt(d, TR_KEY_upload_slots_per_torrent, s->uploadSlotsPerTorrent);
     tr_variantDictAddStr(d, TR_KEY_bind_address_ipv4, tr_address_to_string(&s->bind_ipv4->addr));
     tr_variantDictAddStr(d, TR_KEY_bind_address_ipv6, tr_address_to_string(&s->bind_ipv6->addr));
@@ -796,8 +797,15 @@ static void sessionSetImpl(struct init_data* const data)
 
 #ifndef _WIN32
 
-    if (tr_variantDictFindInt(settings, TR_KEY_umask, &i))
+    if (tr_variantDictFindStrView(settings, TR_KEY_umask, &sv))
     {
+        /* Read a umask as a string representing an octal number. */
+        session->umask = tr_parseNum<mode_t>(sv, 8).value_or(DefaultUmask);
+        umask(session->umask);
+    }
+    else if (tr_variantDictFindInt(settings, TR_KEY_umask, &i))
+    {
+        /* Or as a base 10 integer to remain compatible with the old settings format. */
         session->umask = (mode_t)i;
         umask(session->umask);
     }
