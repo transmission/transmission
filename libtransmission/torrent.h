@@ -739,7 +739,6 @@ public:
     bool isStopping = false;
     bool startAfterVerify = false;
 
-    bool prefetchMagnetMetadata = false;
     bool magnetVerify = false;
 
 private:

@@ -837,8 +837,6 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
 
         if (!tor->hasMetainfo() && !doStart)
         {
-            tor->prefetchMagnetMetadata = true;
-
             auto opts = torrent_start_opts{};
             opts.bypass_queue = true;
             opts.has_local_data = has_local_data;
@@ -1594,7 +1592,6 @@ void tr_torrentStop(tr_torrent* tor)
 
     tor->isRunning = false;
     tor->isStopping = false;
-    tor->prefetchMagnetMetadata = false;
     tor->setDirty();
     tr_runInEventThread(tor->session, stopTorrent, tor);
 }
