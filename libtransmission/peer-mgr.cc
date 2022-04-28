@@ -10,8 +10,9 @@
 #include <cstdint>
 #include <cstdlib> /* qsort */
 #include <ctime> // time_t
-#include <tuple> // std::tie
 #include <iterator> // std::back_inserter
+#include <numeric> // std::accumulate
+#include <tuple> // std::tie
 #include <utility>
 #include <vector>
 
@@ -1921,7 +1922,6 @@ static void rechokeDownloads(tr_swarm* s)
         {
             auto const* const peer = static_cast<tr_peer const*>(tr_ptrArrayNth(&s->peers, i));
             auto const b = peer->blocksSentToClient.count(now, CancelHistorySec);
-            auto const c = peer->cancelsSentToPeer.count(now, CancelHistorySec);
 
             if (b == 0) /* ignore unresponsive peers, as described above */
             {
@@ -1929,7 +1929,7 @@ static void rechokeDownloads(tr_swarm* s)
             }
 
             blocks += b;
-            cancels += c;
+            cancels += peer->cancelsSentToPeer.count(now, CancelHistorySec);
         }
 
         if (cancels > 0)

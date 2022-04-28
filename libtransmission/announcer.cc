@@ -12,6 +12,7 @@
 #include <ctime>
 #include <deque>
 #include <map>
+#include <numeric>
 #include <set>
 #include <string>
 #include <string_view>
