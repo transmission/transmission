@@ -29,7 +29,7 @@ BUILDING ON WINDOWS
    rb07 has a writeup of this on the Transmission wiki:
    https://trac.transmissionbt.com/wiki/BuildingTransmissionQtWindows
 
-BUILDING ON OS X
+BUILDING ON MACOS
 
    nnc has a writeup of this on the Transmission wiki:
    https://trac.transmissionbt.com/wiki/BuildingTransmissionQtMac

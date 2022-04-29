@@ -9,10 +9,10 @@
 
 @interface InfoFileViewController : NSViewController<InfoViewController>
 
-@property(nonatomic, readonly) NSArray* quickLookURLs;
+@property(nonatomic, readonly) NSArray<NSURL*>* quickLookURLs;
 @property(nonatomic, readonly) BOOL canQuickLook;
 
-- (void)setInfoForTorrents:(NSArray*)torrents;
+- (void)setInfoForTorrents:(NSArray<Torrent*>*)torrents;
 - (void)updateInfo;
 
 - (void)saveViewSize;

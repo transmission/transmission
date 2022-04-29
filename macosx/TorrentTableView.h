@@ -25,7 +25,7 @@
 
 - (void)selectValues:(NSArray*)values;
 @property(nonatomic, readonly) NSArray* selectedValues;
-@property(nonatomic, readonly) NSArray* selectedTorrents;
+@property(nonatomic, readonly) NSArray<Torrent*>* selectedTorrents;
 
 - (NSRect)iconRectForRow:(NSInteger)row;
 

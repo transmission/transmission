@@ -128,7 +128,7 @@
     return [self compare:string options:comparisonOptions range:NSMakeRange(0, self.length) locale:NSLocale.currentLocale];
 }
 
-- (NSArray*)betterComponentsSeparatedByCharactersInSet:(NSCharacterSet*)separators
+- (NSArray<NSString*>*)betterComponentsSeparatedByCharactersInSet:(NSCharacterSet*)separators
 {
     NSMutableArray* components = [NSMutableArray array];
 

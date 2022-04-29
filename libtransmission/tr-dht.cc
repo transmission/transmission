@@ -620,12 +620,10 @@ static void callback(void* /*ignore*/, int event, unsigned char const* info_hash
             if (event == DHT_EVENT_SEARCH_DONE)
             {
                 tr_logAddTraceTor(tor, "IPv4 DHT announce done");
-                tor->dhtAnnounceInProgress = false;
             }
             else
             {
                 tr_logAddTraceTor(tor, "IPv6 DHT announce done");
-                tor->dhtAnnounce6InProgress = false;
             }
         }
     }
@@ -689,15 +687,6 @@ static AnnounceResult tr_dhtAnnounce(tr_torrent* tor, int af, bool announce)
             af == AF_INET6 ? "IPv6" : "IPv4",
             tr_dhtPrintableStatus(status),
             numnodes));
-
-    if (af == AF_INET)
-    {
-        tor->dhtAnnounceInProgress = true;
-    }
-    else
-    {
-        tor->dhtAnnounce6InProgress = true;
-    }
 
     return AnnounceResult::OK;
 }
