@@ -97,7 +97,7 @@
 @property(nonatomic) IBOutlet NSTextField* fRPCPortField;
 @property(nonatomic) IBOutlet NSTextField* fRPCPasswordField;
 @property(nonatomic) IBOutlet NSTableView* fRPCWhitelistTable;
-@property(nonatomic, readonly) NSMutableArray* fRPCWhitelistArray;
+@property(nonatomic, readonly) NSMutableArray<NSString*>* fRPCWhitelistArray;
 @property(nonatomic) IBOutlet NSSegmentedControl* fRPCAddRemoveControl;
 @property(nonatomic, copy) NSString* fRPCPassword;
 
@@ -482,7 +482,7 @@
     self.fPortChecker = nil;
 }
 
-- (NSArray*)sounds
+- (NSArray<NSString*>*)sounds
 {
     NSMutableArray* sounds = [NSMutableArray array];
 
@@ -843,7 +843,7 @@
 
 - (void)setQueueNumber:(id)sender
 {
-    NSInteger const number = [sender intValue];
+    int const number = [sender intValue];
     BOOL const seed = sender == self.fQueueSeedField;
 
     [self.fDefaults setInteger:number forKey:seed ? @"QueueSeedNumber" : @"QueueDownloadNumber"];
@@ -861,7 +861,7 @@
 
 - (void)setStalledMinutes:(id)sender
 {
-    NSInteger const min = [sender intValue];
+    int const min = [sender intValue];
     [self.fDefaults setInteger:min forKey:@"StalledMinutes"];
     tr_sessionSetQueueStalledMinutes(self.fHandle, min);
 
@@ -1183,7 +1183,7 @@
         [self.fRPCWhitelistArray addObject:@""];
         [self.fRPCWhitelistTable reloadData];
 
-        int const row = self.fRPCWhitelistArray.count - 1;
+        NSUInteger const row = self.fRPCWhitelistArray.count - 1;
         [self.fRPCWhitelistTable selectRowIndexes:[NSIndexSet indexSetWithIndex:row] byExtendingSelection:NO];
         [self.fRPCWhitelistTable editColumn:0 row:row withEvent:nil select:YES];
     }

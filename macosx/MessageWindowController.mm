@@ -28,10 +28,10 @@
 @property(nonatomic) IBOutlet NSButton* fClearButton;
 @property(nonatomic) IBOutlet NSSearchField* fFilterField;
 
-@property(nonatomic) NSMutableArray* fMessages;
-@property(nonatomic) NSMutableArray* fDisplayedMessages;
+@property(nonatomic) NSMutableArray<NSDictionary*>* fMessages;
+@property(nonatomic) NSMutableArray<NSDictionary*>* fDisplayedMessages;
 
-@property(nonatomic, copy) NSDictionary* fAttributes;
+@property(nonatomic, copy) NSDictionary<NSAttributedStringKey, id>* fAttributes;
 
 @property(nonatomic) NSTimer* fTimer;
 
@@ -487,11 +487,10 @@
     NSInteger const level = [NSUserDefaults.standardUserDefaults integerForKey:@"MessageLevel"];
     NSString* filterString = self.fFilterField.stringValue;
 
-    NSIndexSet* indexes = [self.fMessages indexesOfObjectsWithOptions:NSEnumerationConcurrent
-                                                          passingTest:^BOOL(id message, NSUInteger idx, BOOL* stop) {
-                                                              return [((NSDictionary*)message)[@"Level"] integerValue] <= level &&
-                                                                  [self shouldIncludeMessageForFilter:filterString message:message];
-                                                          }];
+    NSIndexSet* indexes = [self.fMessages
+        indexesOfObjectsWithOptions:NSEnumerationConcurrent passingTest:^BOOL(NSDictionary* message, NSUInteger idx, BOOL* stop) {
+            return [message[@"Level"] integerValue] <= level && [self shouldIncludeMessageForFilter:filterString message:message];
+        }];
 
     NSArray* tempMessages = [[self.fMessages objectsAtIndexes:indexes] sortedArrayUsingDescriptors:self.fMessageTable.sortDescriptors];
 

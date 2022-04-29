@@ -10,7 +10,7 @@
 
 @interface GroupsController ()
 
-@property(nonatomic, readonly) NSMutableArray* fGroups;
+@property(nonatomic, readonly) NSMutableArray<NSMutableDictionary*>* fGroups;
 
 - (void)saveGroups;
 
