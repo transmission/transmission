@@ -83,9 +83,6 @@ public:
     /* number of bad pieces they've contributed to */
     uint8_t strikes = 0;
 
-    /* how many requests the peer has made that we haven't responded to yet */
-    int pendingReqsToClient = 0;
-
     tr_session* const session;
 
     /* Hook to private peer-mgr information */

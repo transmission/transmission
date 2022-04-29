@@ -35,6 +35,9 @@ public:
 
     virtual ~tr_peerMsgs() override = default;
 
+    /* how many requests the peer has made that we haven't responded to yet */
+    [[nodiscard]] virtual size_t pendingReqsToClient() const noexcept = 0;
+
     [[nodiscard]] virtual bool is_peer_choked() const noexcept = 0;
     [[nodiscard]] virtual bool is_peer_interested() const noexcept = 0;
     [[nodiscard]] virtual bool is_client_choked() const noexcept = 0;
