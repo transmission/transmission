@@ -1,49 +1,40 @@
-It's not always possible to set all configurations from the GUI, especially on the Daemon or the Web Interface. This guide will try to give an overview of how and what you can change. For the location of these files, look at the [Configuration Files](Configuration-Files.md) page.
+It is not always possible to set all configurations from the GUI, especially for the daemon or the web interface. This guide will try to give an overview of how and what you can change. For the location of these files, look at the [Configuration Files](Configuration-Files.md) page.
 
-Note: The client _should_ be closed before making changes, otherwise settings will be reverted to it's previous state.
+Note: The client _should_ be closed before making changes, otherwise settings will be reverted to their previous state.
 
 Some of Transmission's behavior can also be customized via environment variables.
 
 # GTK / Daemon / CLI
-
 ### Overview
-
-GTK, CLI and Daemon (both on a Mac and Linux) use a [JSON](http://www.json.org/) formatted file, mainly because of its human readability.
-(Consult the [JSON](http://www.json.org/) for detailed information)
+GTK, CLI and daemon (both on a Mac and Linux) use a [JSON](https://www.json.org/) formatted file, mainly because of its human readability.
+(Consult the [JSON website](https://www.json.org/) for detailed information)
 
 ### Reload Settings
-
 You can make the daemon reload the settings file by sending it the `SIGHUP` signal.
-Or, simply run either of the following commands:
-
+Or simply run either of the following commands:
 ```console
-$ killall -HUP transmission-da
+$ killall -HUP transmission-daemon
 ```
-
 Or:
-
 ```console
-$ pkill -HUP transmission-da
+$ pkill -HUP transmission-daemon
 ```
 
 ### Formatting
-
-Here is a sample of the three basic types, respectively Boolean, Number and String:
+Here is a sample of the three basic types: respectively Boolean, Number and String:
 
 ```json
 {
     "rpc-enabled": true,
-    "peer-port" : 51413,
+    "peer-port": 51413,
     "rpc-whitelist": "127.0.0.1,192.168.*.*"
 }
 ```
 
 ### Options
-
 #### Bandwidth
-
  * **alt-speed-enabled:** Boolean (default = false, aka 'Turtle Mode')
-   _Note: Clicking the "Turtle" in the gui when the [scheduler](#Scheduling) is enabled, will only temporarily remove the scheduled limit until the next cycle._
+   _Note: Clicking the "Turtle" in the GUI when the [scheduler](#Scheduling) is enabled, will only temporarily remove the scheduled limit until the next cycle._
  * **alt-speed-up:** Number (KB/s, default = 50)
  * **alt-speed-down:** Number (KB/s, default = 50)
  * **speed-limit-down:** Number (KB/s, default = 100)
@@ -53,12 +44,10 @@ Here is a sample of the three basic types, respectively Boolean, Number and Stri
  * **upload-slots-per-torrent:** Number (default = 14)
 
 #### [Blocklists](./Blocklists.md)
-
- * **blocklist-url:** String (default = http://www.example.com/blocklist)
+ * **blocklist-url:** String (default = https://www.example.com/blocklist)
  * **blocklist-enabled:** Boolean (default = false)
 
 #### [Files and Locations](./ConfigFiles.md)
-
  * **download-dir:** String (default = [default locations](Configuration-Files.md#Locations))
  * **incomplete-dir:** String (default = [default locations](Configuration-Files.md#Locations)) Directory to keep files in until torrent is complete.
  * **incomplete-dir-enabled:** Boolean (default = false) When enabled, new torrents will download the files to **incomplete-dir**. When complete, the files will be moved to **download-dir**.
@@ -66,21 +55,20 @@ Here is a sample of the three basic types, respectively Boolean, Number and Stri
  * **rename-partial-files:** Boolean (default = true) Postfix partially downloaded files with ".part".
  * **start-added-torrents:** Boolean (default = true) Start torrents as soon as they are added.
  * **trash-original-torrent-files:** Boolean (default = false) Delete torrents added from the watch directory.
- * **umask:** Number (default = 18) Sets transmission's file mode creation mask.  See [the umask(2) manpage](http://developer.apple.com/documentation/Darwin/Reference/ManPages/man2/umask.2.html) for more information.  Users who want their saved torrents to be world-writable may want to set this value to 0.  Bear in mind that the json markup language only accepts numbers in base 10, so the standard umask(2) octal notation "022" is written in settings.json as 18.
+ * **umask:** String (default = "022") Sets Transmission's file mode creation mask. See [the umask(2) manpage](https://developer.apple.com/documentation/Darwin/Reference/ManPages/man2/umask.2.html) for more information. Users who want their saved torrents to be world-writable may want to set this value to "0".
  * **watch-dir:** String
  * **watch-dir-enabled:** Boolean (default = false) Watch a directory for torrent files and add them to transmission.
    _Note: When **watch-dir-enabled** is true, only the transmission-daemon, transmission-gtk, and transmission-qt applications will monitor **watch-dir** for new .torrent files and automatically load them._
 
 #### Misc
-
  * **cache-size-mb:** Size (default = 4), in megabytes, to allocate for Transmission's memory cache. The cache is used to help batch disk IO together, so increasing the cache size can be used to reduce the number of disk reads and writes. Default is 2 if configured with --enable-lightweight.
- * **dht-enabled:** Boolean (default = true) Enable [Distributed Hash Table (DHT)](http://wiki.theory.org/BitTorrentSpecification#Distributed_Hash_Table).
- * **encryption:** Number (0 = Prefer unencrypted connections, 1 = Prefer encrypted connections, 2 = Require encrypted connections; default = 1) [Encryption](http://wiki.vuze.com/w/Message_Stream_Encryption) preference. Encryption may help get around some ISP filtering, but at the cost of slightly higher CPU use.
- * **lazy-bitfield-enabled:** Boolean (default = true) May help get around some ISP filtering. [Vuze specification](http://wiki.vuze.com/w/Commandline_options#Network_Options).
- * **lpd-enabled:** Boolean (default = false) Enable [Local Peer Discovery (LPD)](http://en.wikipedia.org/wiki/Local_Peer_Discovery).
+ * **dht-enabled:** Boolean (default = true) Enable [Distributed Hash Table (DHT)](https://wiki.theory.org/BitTorrentSpecification#Distributed_Hash_Table).
+ * **encryption:** Number (0 = Prefer unencrypted connections, 1 = Prefer encrypted connections, 2 = Require encrypted connections; default = 1) [Encryption](https://wiki.vuze.com/w/Message_Stream_Encryption) preference. Encryption may help get around some ISP filtering, but at the cost of slightly higher CPU use.
+ * **lazy-bitfield-enabled:** Boolean (default = true) May help get around some ISP filtering. [Vuze specification](https://wiki.vuze.com/w/Commandline_options#Network_Options).
+ * **lpd-enabled:** Boolean (default = false) Enable [Local Peer Discovery (LPD)](https://en.wikipedia.org/wiki/Local_Peer_Discovery).
  * **message-level:** Number (0 = None, 1 = Error, 2 = Info, 3 = Debug, default = 2) Set verbosity of transmission messages.
- * **pex-enabled:** Boolean (default =  true) Enable [http://en.wikipedia.org/wiki/Peer_exchange Peer Exchange (PEX)].
- * **prefetch-enabled:** Boolean (default = true). When enabled, Transmission will hint to the OS which piece data it's about to read from disk in order to satisfy requests from peers. On Linux, this is done by passing `POSIX_FADV_WILLNEED` to [posix_fadvise()](http://www.kernel.org/doc/man-pages/online/pages/man2/posix_fadvise.2.html). On OS X, this is done by passing `F_RDADVISE` to [fcntl()](http://developer.apple.com/library/IOS/#documentation/System/Conceptual/ManPages_iPhoneOS/man2/fcntl.2.html). This defaults to false if configured with --enable-lightweight.
+ * **pex-enabled:** Boolean (default =  true) Enable [https://en.wikipedia.org/wiki/Peer_exchange Peer Exchange (PEX)].
+ * **prefetch-enabled:** Boolean (default = true). When enabled, Transmission will hint to the OS which piece data it's about to read from disk in order to satisfy requests from peers. On Linux, this is done by passing `POSIX_FADV_WILLNEED` to [posix_fadvise()](https://www.kernel.org/doc/man-pages/online/pages/man2/posix_fadvise.2.html). On macOS, this is done by passing `F_RDADVISE` to [fcntl()](https://developer.apple.com/library/archive/documentation/System/Conceptual/ManPages_iPhoneOS/man2/fcntl.2.html). This defaults to false if configured with --enable-lightweight.
  * **scrape-paused-torrents-enabled:** Boolean (default = true)
  * **script-torrent-added-enabled:** Boolean (default = false) Run a script when a torrent is added to Transmission. Environmental variables are passed in as detailed on the [Scripts](./Scripts.md) page
  * **script-torrent-added-filename:** String (default = "") Path to script.
@@ -88,28 +76,25 @@ Here is a sample of the three basic types, respectively Boolean, Number and Stri
  * **script-torrent-done-filename:** String (default = "") Path to script.
  * **script-torrent-done-seeding-enabled:** Boolean (default = false) Run a script when a torrent is done seeding. Environmental variables are passed in as detailed on the [Scripts](./Scripts.md) page
  * **script-torrent-done-seeding-filename:** String (default = "") Path to script.
- * **utp-enabled:** Boolean (default = true) Enable [Micro Transport Protocol (µTP)](http://en.wikipedia.org/wiki/Micro_Transport_Protocol)
+ * **utp-enabled:** Boolean (default = true) Enable [Micro Transport Protocol (µTP)](https://en.wikipedia.org/wiki/Micro_Transport_Protocol)
 
 #### Peers
-
  * **bind-address-ipv4:** String (default = "0.0.0.0") Where to listen for peer connections.
  * **bind-address-ipv6:** String (default = "::") Where to listen for peer connections.
- * **peer-congestion-algorithm:** String. This is documented on http://www.pps.jussieu.fr/~jch/software/bittorrent/tcp-congestion-control.html.
+ * **peer-congestion-algorithm:** String. This is documented on https://www.pps.jussieu.fr/~jch/software/bittorrent/tcp-congestion-control.html.
  * **peer-id-ttl-hours:** Number (default = 6) Recycle the peer id used for public torrents after N hours of use.
  * **peer-limit-global:** Number (default = 240)
  * **peer-limit-per-torrent:** Number (default =  60)
- * **peer-socket-tos:** String (default = "default") Set the [Type-Of-Service (TOS)](http://en.wikipedia.org/wiki/Type_of_Service) parameter for outgoing TCP packets.  Possible values are "default", "lowcost", "throughput", "lowdelay" and "reliability".  The value "lowcost" is recommended if you're using a smart router, and shouldn't harm in any case.
+ * **peer-socket-tos:** String (default = "default") Set the [Type-Of-Service (TOS)](https://en.wikipedia.org/wiki/Type_of_Service) parameter for outgoing TCP packets. Possible values are "default", "lowcost", "throughput", "lowdelay" and "reliability". The value "lowcost" is recommended if you're using a smart router, and shouldn't harm in any case.
 
 #### Peer Port
-
  * **peer-port:** Number (default = 51413)
  * **peer-port-random-high:** Number (default = 65535)
  * **peer-port-random-low:** Number (default = 1024)
  * **peer-port-random-on-start:** Boolean (default = false)
- * **port-forwarding-enabled:** Boolean (default = true) Enable [UPnP](http://en.wikipedia.org/wiki/Universal_Plug_and_Play) or [NAT-PMP](http://en.wikipedia.org/wiki/NAT_Port_Mapping_Protocol).
+ * **port-forwarding-enabled:** Boolean (default = true) Enable [UPnP](https://en.wikipedia.org/wiki/Universal_Plug_and_Play) or [NAT-PMP](https://en.wikipedia.org/wiki/NAT_Port_Mapping_Protocol).
 
 #### Queuing
-
  * **download-queue-enabled:** Boolean (default = true) When true, Transmission will only download `download-queue-size` non-stalled torrents at once.
  * **download-queue-size:** Number (default = 5) See download-queue-enabled.
  * **queue-stalled-enabled:** Boolean (default = true) When true, torrents that have not shared data for `queue-stalled-minutes` are treated as 'stalled' and are not counted against the `download-queue-size` and `seed-queue-size` limits.
@@ -118,7 +103,6 @@ Here is a sample of the three basic types, respectively Boolean, Number and Stri
  * **seed-queue-size:** Number (default = 10) See seed-queue-enabled.
 
 #### [RPC](rpc-spec.md)
-
  * **rpc-authentication-required:** Boolean (default = false)
  * **rpc-bind-address:** String (default = "0.0.0.0") Where to listen for RPC connections
  * **rpc-enabled:** Boolean (default = true)
@@ -132,7 +116,6 @@ Here is a sample of the three basic types, respectively Boolean, Number and Stri
  * **rpc-whitelist-enabled:** Boolean (default = true)
 
 #### Scheduling
-
  * **alt-speed-time-enabled:** Boolean (default = false)
    _Note: When enabled, this will toggle the **alt-speed-enabled** setting._
  * **alt-speed-time-begin:** Number (default = 540, in minutes from midnight, 9am)
@@ -156,30 +139,23 @@ Here is a sample of the three basic types, respectively Boolean, Number and Stri
  * **ratio-limit-enabled:**  Boolean (default = false)
 
 ### Legacy Options
-
-Only keys that differ from above are listed here.  These options have been replaced in newer versions of Transmission.
+Only keys that differ from above are listed here. These options have been replaced in newer versions of Transmission.
 
 #### 2.31 (and older)
-
  * **open-file-limit:** Number (default = 32)
 
 #### 1.5x (and older)
-
 ##### Bandwidth
-
  * **download-limit:** Number (KB/s, default = 100)
  * **download-limit-enabled:** Boolean (default = false)
  * **upload-limit:** Number (KB/s, default = 100)
  * **upload-limit-enabled:** Boolean (default = false)
 
 ##### Peer Port
-
  * **peer-port-random-enabled:** Boolean (default = false)
 
 #### 1.4x (and older)
-
 ##### Proxy
-
  * **proxy-authentication** String
  * **proxy-authentication-required:** Boolean (default = 0)
  * **proxy-port:** Number (default = 80)
@@ -189,28 +165,22 @@ Only keys that differ from above are listed here.  These options have been repla
  * **proxy-username:** String
 
 ##### Peers
-
  * **max-peers-global:** Number (default = 240)
  * **max-peers-per-torrent:** Number (default =  60)
 
 #### 1.3x (and older)
-
 ##### [RPC](rpc-spec.md)
-
  * **rpc-access-control-list:** String (Comma-delimited list of IP addresses prefixed with "+" or "-". Wildcards allowed using '\*'. Example: "+127.0.0.\*,-192.168.\*.\*", Default:  "+127.0.0.1")
 
-## Mac OS X
-
+## macOS
 ### Overview
-
-Mac OS X has a standardized way of saving user preferences files using [XML](http://en.wikipedia.org/wiki/XML) format. These files are called [plist](http://en.wikipedia.org/wiki/Plist) (short for property list) files. Usually there is no need to modify these files directly, since Apple provided a [command-line tool](http://developer.apple.com/DOCUMENTATION/Darwin/Reference/ManPages/man1/defaults.1.html) to reliably change settings. You do need to restart Transmission before these have effect.
+macOS has a standardized way of saving user preferences files using [XML](https://en.wikipedia.org/wiki/XML) format. These files are called [plist](https://en.wikipedia.org/wiki/Plist) (short for property list) files. Usually there is no need to modify these files directly, since Apple provided a [command-line tool](https://developer.apple.com/DOCUMENTATION/Darwin/Reference/ManPages/man1/defaults.1.html) to reliably change settings. You do need to restart Transmission before these have effect.
 
 In short:
  * To set a key: `defaults write org.m0k.transmission <key> <value>`
  * To reset a key: `defaults delete org.m0k.transmission <key>`
 
 ### Options
-
  * **PeerSocketTOS:** Number (Default = 0)
  * **RPCHostWhitelist:** String, see "rpc-host-whitelist" above.
  * **RPCUseHostWhitelist:** Boolean, see "rpc-host-whitelist-enabled" above.

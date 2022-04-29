@@ -23,7 +23,6 @@
 ****
 ***/
 
-struct evbuffer;
 struct event;
 struct timeval;
 struct tr_error;
@@ -69,7 +68,7 @@ struct tr_error;
 
 /**
  * @brief Rich Salz's classic implementation of shell-style pattern matching for ?, \, [], and * characters.
- * @return 1 if the pattern matches, 0 if it doesn't, or -1 if an error occured
+ * @return 1 if the pattern matches, 0 if it doesn't, or -1 if an error occurred
  */
 [[nodiscard]] bool tr_wildmat(std::string_view text, std::string_view pattern);
 
@@ -87,19 +86,6 @@ template<typename ContiguousRange>
 constexpr auto tr_saveFile(std::string_view filename, ContiguousRange const& x, tr_error** error = nullptr)
 {
     return tr_saveFile(filename, std::string_view{ std::data(x), std::size(x) }, error);
-}
-
-template<typename... T, typename std::enable_if_t<(std::is_convertible_v<T, std::string_view> && ...), bool> = true>
-std::string& tr_buildBuf(std::string& setme, T... args)
-{
-    setme.clear();
-    auto const n = (std::size(std::string_view{ args }) + ...);
-    if (setme.capacity() < n)
-    {
-        setme.reserve(n);
-    }
-    ((setme += args), ...);
-    return setme;
 }
 
 /**
@@ -131,16 +117,21 @@ void tr_wait_msec(long int delay_milliseconds);
 
 #if defined(__GNUC__) && !__has_include(<charconv>)
 
+#include <iomanip> // std::setbase
 #include <sstream>
 
 template<typename T>
-[[nodiscard]] std::optional<T> tr_parseNum(std::string_view& sv)
+[[nodiscard]] std::optional<T> tr_parseNum(std::string_view& sv, int base = 10)
 {
     auto val = T{};
     auto const str = std::string(std::data(sv), std::min(std::size(sv), size_t{ 64 }));
     auto sstream = std::stringstream{ str };
     auto const oldpos = sstream.tellg();
-    sstream >> val;
+    /* The base parameter only works for bases 8, 10 and 16.
+       All other bases will be converted to 0 which activates the
+       prefix based parsing and therefore decimal in our usual cases.
+       This differs from the from_chars solution below. */
+    sstream >> std::setbase(base) >> val;
     auto const newpos = sstream.tellg();
     if ((newpos == oldpos) || (sstream.fail() && !sstream.eof()))
     {
@@ -155,12 +146,15 @@ template<typename T>
 #include <charconv> // std::from_chars()
 
 template<typename T>
-[[nodiscard]] std::optional<T> tr_parseNum(std::string_view& sv)
+[[nodiscard]] std::optional<T> tr_parseNum(std::string_view& sv, int base = 10)
 {
     auto val = T{};
     auto const* const begin_ch = std::data(sv);
     auto const* const end_ch = begin_ch + std::size(sv);
-    auto const result = std::from_chars(begin_ch, end_ch, val);
+    /* The base parameter works for any base from 2 to 36 (inclusive).
+       This is different from the behaviour of the stringstream
+       based solution above. */
+    auto const result = std::from_chars(begin_ch, end_ch, val, base);
     if (result.ec != std::errc{})
     {
         return std::nullopt;
@@ -252,8 +246,6 @@ constexpr bool tr_str_is_empty(char const* value)
     return value == nullptr || *value == '\0';
 }
 
-std::string evbuffer_free_to_str(evbuffer* buf);
-
 /** @brief Portability wrapper for strlcpy() that uses the system implementation if available */
 size_t tr_strlcpy(void* dst, void const* src, size_t siz);
 
@@ -306,7 +298,7 @@ template<typename... T, typename std::enable_if_t<(std::is_convertible_v<T, std:
 }
 
 template<typename T>
-[[nodiscard]] constexpr bool tr_strvContains(std::string_view sv, T key) // c++23
+[[nodiscard]] constexpr bool tr_strvContains(std::string_view sv, T key) noexcept // c++23
 {
     return sv.find(key) != sv.npos;
 }
@@ -395,15 +387,9 @@ std::string& tr_strvUtf8Clean(std::string_view cleanme, std::string& setme);
 
 /**
  * @param ratio    the ratio to convert to a string
- * @param infinity the string represntation of "infinity"
+ * @param infinity the string representation of "infinity"
  */
 [[nodiscard]] std::string tr_strratio(double ratio, char const* infinity);
-
-/** @brief Portability wrapper for localtime_r() that uses the system implementation if available */
-struct tm* tr_localtime_r(time_t const* _clock, struct tm* _result);
-
-/** @brief Portability wrapper for gmtime_r() that uses the system implementation if available */
-struct tm* tr_gmtime_r(time_t const* _clock, struct tm* _result);
 
 /** @brief Portability wrapper for gettimeofday(), with tz argument dropped */
 struct timeval tr_gettimeofday();

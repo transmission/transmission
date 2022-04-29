@@ -12,7 +12,6 @@
 #include <optional>
 
 #include "transmission.h"
-#include "net.h"
 
 /** @addtogroup peers Peers
     @{ */

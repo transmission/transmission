@@ -16,6 +16,9 @@
 
 #include <event2/buffer.h>
 
+#include <fmt/chrono.h>
+#include <fmt/format.h>
+
 #include <libtransmission/transmission.h>
 
 #include <libtransmission/error.h>
@@ -158,18 +161,9 @@ int parseCommandLine(app_opts& opts, int argc, char const* const* argv)
     return 0;
 }
 
-auto toString(time_t timestamp)
+[[nodiscard]] auto toString(time_t now)
 {
-    if (timestamp == 0)
-    {
-        return std::string{ "Unknown" };
-    }
-
-    struct tm tm;
-    tr_localtime_r(&timestamp, &tm);
-    auto buf = std::array<char, 64>{};
-    strftime(std::data(buf), std::size(buf), "%a %b %d %T %Y%n", &tm); /* ctime equiv */
-    return std::string{ std::data(buf) };
+    return now == 0 ? "Unknown" : fmt::format("{:%a %b %d %T %Y}", fmt::localtime(now));
 }
 
 bool compare_2nd_field(std::string_view const& l, std::string_view const& r)
@@ -199,7 +193,7 @@ void showInfo(app_opts const& opts, tr_torrent_metainfo const& metainfo)
         printf("  Name: %s\n", metainfo.name().c_str());
         printf("  Hash: %" TR_PRIsv "\n", TR_PRIsv_ARG(metainfo.infoHashString()));
         printf("  Created by: %s\n", std::empty(metainfo.creator()) ? "Unknown" : metainfo.creator().c_str());
-        printf("  Created on: %s\n", toString(metainfo.dateCreated()).c_str());
+        printf("  Created on: %s\n\n", toString(metainfo.dateCreated()).c_str());
 
         if (!std::empty(metainfo.comment()))
         {
@@ -211,7 +205,7 @@ void showInfo(app_opts const& opts, tr_torrent_metainfo const& metainfo)
             printf("  Source: %s\n", metainfo.source().c_str());
         }
 
-        printf("  Piece Count: %" PRIu64 "\n", metainfo.pieceCount());
+        printf("  Piece Count: %" PRIu32 "\n", metainfo.pieceCount());
         printf("  Piece Size: %s\n", tr_formatter_mem_B(metainfo.pieceSize()).c_str());
         printf("  Total Size: %s\n", tr_formatter_size_B(metainfo.totalSize()).c_str());
         printf("  Privacy: %s\n", metainfo.isPrivate() ? "Private torrent" : "Public torrent");
@@ -235,7 +229,7 @@ void showInfo(app_opts const& opts, tr_torrent_metainfo const& metainfo)
                 ++print_tier;
             }
 
-            printf("  %" TR_PRIsv "\n", TR_PRIsv_ARG(tracker.announce.full));
+            printf("  %" TR_PRIsv "\n", TR_PRIsv_ARG(tracker.announce.sv()));
         }
 
         /**
@@ -331,7 +325,7 @@ void doScrape(tr_torrent_metainfo const& metainfo)
 
     for (auto const& tracker : metainfo.announceList())
     {
-        if (std::empty(tracker.scrape_str))
+        if (std::empty(tracker.scrape))
         {
             continue;
         }
@@ -339,7 +333,7 @@ void doScrape(tr_torrent_metainfo const& metainfo)
         // build the full scrape URL
         auto escaped = std::array<char, TR_SHA1_DIGEST_LEN * 3 + 1>{};
         tr_http_escape_sha1(std::data(escaped), metainfo.infoHash());
-        auto const scrape = tracker.scrape.full;
+        auto const scrape = tracker.scrape.sv();
         auto const url = tr_urlbuf{ scrape,
                                     tr_strvContains(scrape, '?') ? '&' : '?',
                                     "info_hash="sv,

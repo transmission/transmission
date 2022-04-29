@@ -14,6 +14,7 @@
 
 #include "cache.h" // tr_cacheWriteBlock()
 #include "file.h" // tr_sys_path_*()
+#include "tr-strbuf.h"
 #include "utils.h"
 #include "variant.h"
 
@@ -58,7 +59,7 @@ TEST_P(IncompleteDirTest, incompleteDir)
     auto* const tor = zeroTorrentInit(ZeroTorrentState::Partial);
     auto path = tr_pathbuf{};
 
-    path.assign(incomplete_dir, '/', tr_torrentFile(tor, 0).name, ".part"sv);
+    path.assign(incomplete_dir, '/', tr_torrentFile(tor, 0).name, tr_torrent_files::PartialFileSuffix);
     EXPECT_EQ(path, makeString(tr_torrentFindFile(tor, 0)));
     path.assign(incomplete_dir, '/', tr_torrentFile(tor, 1).name);
     EXPECT_EQ(path, makeString(tr_torrentFindFile(tor, 1)));
@@ -141,7 +142,8 @@ TEST_P(IncompleteDirTest, incompleteDir)
     auto const n = tr_torrentFileCount(tor);
     for (tr_file_index_t i = 0; i < n; ++i)
     {
-        EXPECT_EQ(tr_strvPath(download_dir, tr_torrentFile(tor, i).name), makeString(tr_torrentFindFile(tor, i)));
+        auto const expected = tr_pathbuf{ download_dir, '/', tr_torrentFile(tor, i).name };
+        EXPECT_EQ(expected, makeString(tr_torrentFindFile(tor, i)));
     }
 
     // cleanup
@@ -167,7 +169,7 @@ using MoveTest = SessionTest;
 
 TEST_F(MoveTest, setLocation)
 {
-    auto const target_dir = tr_strvPath(tr_sessionGetConfigDir(session_), "target");
+    auto const target_dir = tr_pathbuf{ tr_sessionGetConfigDir(session_), "/target"sv };
     tr_sys_dir_create(target_dir.data(), TR_SYS_DIR_CREATE_PARENTS, 0777, nullptr);
 
     // init a torrent.
@@ -177,7 +179,7 @@ TEST_F(MoveTest, setLocation)
 
     // now move it
     auto state = int{ -1 };
-    tr_torrentSetLocation(tor, target_dir.data(), true, nullptr, &state);
+    tr_torrentSetLocation(tor, target_dir, true, nullptr, &state);
     auto test = [&state]()
     {
         return state == TR_LOC_DONE;
@@ -194,7 +196,8 @@ TEST_F(MoveTest, setLocation)
     auto const n = tr_torrentFileCount(tor);
     for (tr_file_index_t i = 0; i < n; ++i)
     {
-        EXPECT_EQ(tr_strvPath(target_dir.data(), tr_torrentFile(tor, i).name), makeString(tr_torrentFindFile(tor, i)));
+        auto const expected = tr_pathbuf{ target_dir, '/', tr_torrentFile(tor, i).name };
+        EXPECT_EQ(expected, makeString(tr_torrentFindFile(tor, i)));
     }
 
     // cleanup

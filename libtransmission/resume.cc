@@ -104,7 +104,7 @@ static void saveLabels(tr_variant* dict, tr_torrent const* tor)
     tr_variant* list = tr_variantDictAddList(dict, TR_KEY_labels, std::size(labels));
     for (auto const& label : labels)
     {
-        tr_variantListAddStr(list, label);
+        tr_variantListAddQuark(list, label);
     }
 }
 
@@ -116,16 +116,19 @@ static auto loadLabels(tr_variant* dict, tr_torrent* tor)
         return tr_resume::fields_t{};
     }
 
-    int const n = tr_variantListSize(list);
-    for (int i = 0; i < n; ++i)
+    auto const n = tr_variantListSize(list);
+    auto labels = std::vector<tr_quark>{};
+    labels.reserve(n);
+    for (size_t i = 0; i < n; ++i)
     {
         auto sv = std::string_view{};
         if (tr_variantGetStrView(tr_variantListChild(list, i), &sv) && !std::empty(sv))
         {
-            tor->labels.emplace(sv);
+            labels.emplace_back(tr_quark_new(sv));
         }
     }
 
+    tor->setLabels(std::data(labels), std::size(labels));
     return tr_resume::Labels;
 }
 
@@ -135,14 +138,14 @@ static auto loadLabels(tr_variant* dict, tr_torrent* tor)
 
 static void saveGroup(tr_variant* dict, tr_torrent const* tor)
 {
-    tr_variantDictAddStrView(dict, TR_KEY_group, tor->group);
+    tr_variantDictAddStrView(dict, TR_KEY_group, tor->bandwidthGroup());
 }
 
 static auto loadGroup(tr_variant* dict, tr_torrent* tor)
 {
-    if (std::string_view groupName; tr_variantDictFindStrView(dict, TR_KEY_group, &groupName) && !groupName.empty())
+    if (std::string_view group_name; tr_variantDictFindStrView(dict, TR_KEY_group, &group_name) && !std::empty(group_name))
     {
-        tor->setGroup(groupName);
+        tor->setBandwidthGroup(group_name);
         return tr_resume::Group;
     }
 
@@ -502,7 +505,7 @@ static void saveProgress(tr_variant* dict, tr_torrent const* tor)
 }
 
 /*
- * Transmisison has iterated through a few strategies here, so the
+ * Transmission has iterated through a few strategies here, so the
  * code has some added complexity to support older approaches.
  *
  * Current approach: 'progress' is a dict with two entries:
@@ -739,7 +742,7 @@ static auto loadFromFile(tr_torrent* tor, tr_resume::fields_t fieldsToLoad, bool
 
     if ((fieldsToLoad & tr_resume::MaxPeers) != 0 && tr_variantDictFindInt(&top, TR_KEY_max_peers, &i))
     {
-        tor->maxConnectedPeers = i;
+        tor->max_connected_peers = static_cast<uint16_t>(i);
         fields_loaded |= tr_resume::MaxPeers;
     }
 
@@ -791,14 +794,22 @@ static auto loadFromFile(tr_torrent* tor, tr_resume::fields_t fieldsToLoad, bool
         fields_loaded |= loadPeers(&top, tor);
     }
 
+    // Note: loadFilenames() must come before loadProgress()
+    // so that loadProgress() -> tor->initCheckedPieces() -> tor->findFile()
+    // will know where to look
+    if ((fieldsToLoad & tr_resume::Filenames) != 0)
+    {
+        fields_loaded |= loadFilenames(&top, tor);
+    }
+
+    // Note: loadProgress should come before loadFilePriorities()
+    // so that we can skip loading priorities iff the torrent is a
+    // seed or a partial seed.
     if ((fieldsToLoad & tr_resume::Progress) != 0)
     {
         fields_loaded |= loadProgress(&top, tor);
     }
 
-    // Only load file priorities if we are actually downloading.
-    // If we're a seed or partial seed, loading it is a waste of time.
-    // NB: this is why loadProgress() comes before loadFilePriorities()
     if (!tor->isDone() && (fieldsToLoad & tr_resume::FilePriorities) != 0)
     {
         fields_loaded |= loadFilePriorities(&top, tor);
@@ -822,11 +833,6 @@ static auto loadFromFile(tr_torrent* tor, tr_resume::fields_t fieldsToLoad, bool
     if ((fieldsToLoad & tr_resume::Idlelimit) != 0)
     {
         fields_loaded |= loadIdleLimits(&top, tor);
-    }
-
-    if ((fieldsToLoad & tr_resume::Filenames) != 0)
-    {
-        fields_loaded |= loadFilenames(&top, tor);
     }
 
     if ((fieldsToLoad & tr_resume::Name) != 0)
@@ -867,7 +873,7 @@ static auto setFromCtor(tr_torrent* tor, tr_resume::fields_t fields, tr_ctor con
         }
     }
 
-    if (((fields & tr_resume::MaxPeers) != 0) && tr_ctorGetPeerLimit(ctor, mode, &tor->maxConnectedPeers))
+    if (((fields & tr_resume::MaxPeers) != 0) && tr_ctorGetPeerLimit(ctor, mode, &tor->max_connected_peers))
     {
         ret |= tr_resume::MaxPeers;
     }
@@ -885,7 +891,7 @@ static auto setFromCtor(tr_torrent* tor, tr_resume::fields_t fields, tr_ctor con
     return ret;
 }
 
-static auto useManditoryFields(tr_torrent* tor, tr_resume::fields_t fields, tr_ctor const* ctor)
+static auto useMandatoryFields(tr_torrent* tor, tr_resume::fields_t fields, tr_ctor const* ctor)
 {
     return setFromCtor(tor, fields, ctor, TR_FORCE);
 }
@@ -904,7 +910,7 @@ fields_t load(tr_torrent* tor, fields_t fields_to_load, tr_ctor const* ctor, boo
 
     auto ret = fields_t{};
 
-    ret |= useManditoryFields(tor, fields_to_load, ctor);
+    ret |= useMandatoryFields(tor, fields_to_load, ctor);
     fields_to_load &= ~ret;
     ret |= loadFromFile(tor, fields_to_load, did_rename_to_hash_only_name);
     fields_to_load &= ~ret;
@@ -937,7 +943,7 @@ void save(tr_torrent* tor)
 
     tr_variantDictAddInt(&top, TR_KEY_downloaded, tor->downloadedPrev + tor->downloadedCur);
     tr_variantDictAddInt(&top, TR_KEY_uploaded, tor->uploadedPrev + tor->uploadedCur);
-    tr_variantDictAddInt(&top, TR_KEY_max_peers, tor->maxConnectedPeers);
+    tr_variantDictAddInt(&top, TR_KEY_max_peers, tor->max_connected_peers);
     tr_variantDictAddInt(&top, TR_KEY_bandwidth_priority, tr_torrentGetPriority(tor));
     tr_variantDictAddBool(&top, TR_KEY_paused, !tor->isRunning && !tor->isQueued());
     savePeers(&top, tor);

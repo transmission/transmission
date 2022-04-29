@@ -59,6 +59,8 @@ auto constexpr Bitfield = uint8_t{ 5 };
 auto constexpr Request = uint8_t{ 6 };
 auto constexpr Piece = uint8_t{ 7 };
 auto constexpr Cancel = uint8_t{ 8 };
+
+// http://bittorrent.org/beps/bep_0005.html
 auto constexpr Port = uint8_t{ 9 };
 
 // https://www.bittorrent.org/beps/bep_0006.html
@@ -126,7 +128,7 @@ static auto constexpr HighPriorityIntervalSecs = int{ 2 };
 static auto constexpr LowPriorityIntervalSecs = int{ 10 };
 
 // how many blocks to keep prefetched per peer
-static auto constexpr PrefetchSize = int{ 18 };
+static auto constexpr PrefetchMax = size_t{ 18 };
 
 // when we're making requests from another peer,
 // batch them together to send enough requests to
@@ -161,9 +163,14 @@ enum class EncryptionPreference
 
 struct peer_request
 {
-    uint32_t index;
-    uint32_t offset;
-    uint32_t length;
+    uint32_t index = 0;
+    uint32_t offset = 0;
+    uint32_t length = 0;
+
+    [[nodiscard]] auto constexpr operator==(peer_request const& that) const noexcept
+    {
+        return this->index == that.index && this->offset == that.offset && this->length == that.length;
+    }
 };
 
 static peer_request blockToReq(tr_torrent const* tor, tr_block_index_t block)
@@ -197,7 +204,7 @@ static void pexPulse(evutil_socket_t fd, short what, void* vmsgs);
 static void protocolSendCancel(tr_peerMsgsImpl* msgs, struct peer_request const& req);
 static void protocolSendChoke(tr_peerMsgsImpl* msgs, bool choke);
 static void protocolSendHave(tr_peerMsgsImpl* msgs, tr_piece_index_t index);
-static void protocolSendPort(tr_peerMsgsImpl* msgs, uint16_t port);
+static void protocolSendPort(tr_peerMsgsImpl* msgs, tr_port port);
 static void sendInterest(tr_peerMsgsImpl* msgs, bool b);
 static void sendLtepHandshake(tr_peerMsgsImpl* msgs);
 static void tellPeerWhatWeHave(tr_peerMsgsImpl* msgs);
@@ -228,7 +235,7 @@ using UniqueTimer = std::unique_ptr<struct event, EventDeleter>;
  * @see struct peer_atom
  * @see tr_peer
  */
-class tr_peerMsgsImpl : public tr_peerMsgs
+class tr_peerMsgsImpl final : public tr_peerMsgs
 {
 public:
     tr_peerMsgsImpl(tr_torrent* torrent_in, peer_atom* atom_in, tr_peerIo* io_in, tr_peer_callback callback, void* callbackData)
@@ -306,6 +313,11 @@ public:
         }
 
         return Bps > 0;
+    }
+
+    [[nodiscard]] size_t pendingReqsToClient() const noexcept override
+    {
+        return std::size(peer_requested_);
     }
 
     [[nodiscard]] bool is_peer_choked() const noexcept override
@@ -587,8 +599,6 @@ public:
 
     size_t desired_request_count = 0;
 
-    int prefetchCount = 0;
-
     /* how long the outMessages batch should be allowed to grow before
      * it's flushed -- some messages (like requests >:) should be sent
      * very quickly; others aren't as urgent. */
@@ -600,7 +610,7 @@ public:
     uint16_t pexCount = 0;
     uint16_t pexCount6 = 0;
 
-    tr_port dht_port = 0;
+    tr_port dht_port;
 
     EncryptionPreference encryption_preference = EncryptionPreference::Unknown;
 
@@ -616,7 +626,17 @@ public:
 
     evbuffer* const outMessages; /* all the non-piece messages */
 
-    struct peer_request peerAskedFor[ReqQ] = {};
+    struct QueuedPeerRequest : public peer_request
+    {
+        explicit QueuedPeerRequest(peer_request in) noexcept
+            : peer_request{ in }
+        {
+        }
+
+        bool prefetched = false;
+    };
+
+    std::vector<QueuedPeerRequest> peer_requested_;
 
     int peerAskedForMetadata[MetadataReqQ] = {};
     int peerAskedForMetadataCount = 0;
@@ -738,14 +758,14 @@ static void protocolSendCancel(tr_peerMsgsImpl* msgs, peer_request const& req)
     pokeBatchPeriod(msgs, ImmediatePriorityIntervalSecs);
 }
 
-static void protocolSendPort(tr_peerMsgsImpl* msgs, uint16_t port)
+static void protocolSendPort(tr_peerMsgsImpl* msgs, tr_port port)
 {
     struct evbuffer* out = msgs->outMessages;
 
-    logtrace(msgs, fmt::format(FMT_STRING("sending Port {:d}"), port));
+    logtrace(msgs, fmt::format(FMT_STRING("sending Port {:d}"), port.host()));
     evbuffer_add_uint32(out, 3);
     evbuffer_add_uint8(out, BtPeerMsgs::Port);
-    evbuffer_add_uint16(out, port);
+    evbuffer_add_uint16(out, port.network());
 }
 
 static void protocolSendHave(tr_peerMsgsImpl* msgs, tr_piece_index_t index)
@@ -937,33 +957,17 @@ static bool popNextMetadataRequest(tr_peerMsgsImpl* msgs, int* piece)
     return true;
 }
 
-static bool popNextRequest(tr_peerMsgsImpl* msgs, struct peer_request* setme)
-{
-    if (msgs->pendingReqsToClient == 0)
-    {
-        return false;
-    }
-
-    *setme = msgs->peerAskedFor[0];
-
-    tr_removeElementFromArray(msgs->peerAskedFor, 0, sizeof(struct peer_request), msgs->pendingReqsToClient);
-    --msgs->pendingReqsToClient;
-
-    return true;
-}
-
 static void cancelAllRequestsToClient(tr_peerMsgsImpl* msgs)
 {
-    struct peer_request req;
-    bool const mustSendCancel = tr_peerIoSupportsFEXT(msgs->io);
-
-    while (popNextRequest(msgs, &req))
+    if (auto const must_send_rej = tr_peerIoSupportsFEXT(msgs->io); must_send_rej)
     {
-        if (mustSendCancel)
+        for (auto& req : msgs->peer_requested_)
         {
             protocolSendReject(msgs, &req);
         }
     }
+
+    msgs->peer_requested_.clear();
 }
 
 /**
@@ -1045,7 +1049,7 @@ static void sendLtepHandshake(tr_peerMsgsImpl* msgs)
     // port number of the other side. Note that there is no need for the
     // receiving side of the connection to send this extension message,
     // since its port number is already known.
-    tr_variantDictAddInt(&val, TR_KEY_p, tr_sessionGetPublicPeerPort(msgs->session));
+    tr_variantDictAddInt(&val, TR_KEY_p, msgs->session->peerPort().host());
 
     // http://bittorrent.org/beps/bep_0010.html
     // An integer, the number of outstanding request messages this
@@ -1097,27 +1101,23 @@ static void sendLtepHandshake(tr_peerMsgsImpl* msgs)
 
 static void parseLtepHandshake(tr_peerMsgsImpl* msgs, uint32_t len, struct evbuffer* inbuf)
 {
-    auto* const tmp = tr_new(char, len);
-    tr_peerIoReadBytes(msgs->io, inbuf, tmp, len);
     msgs->peerSentLtepHandshake = true;
 
+    // LTEP messages are usually just a couple hundred bytes,
+    // so try using a strbuf to handle it on the stack
+    auto tmp = tr_strbuf<char, 512>{};
+    tmp.resize(len);
+    tr_peerIoReadBytes(msgs->io, inbuf, std::data(tmp), std::size(tmp));
+    auto const handshake_sv = tmp.sv();
+
     auto val = tr_variant{};
-    if (!tr_variantFromBuf(&val, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, { tmp, len }) || !tr_variantIsDict(&val))
+    if (!tr_variantFromBuf(&val, TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE, handshake_sv) || !tr_variantIsDict(&val))
     {
         logtrace(msgs, "GET  extended-handshake, couldn't get dictionary");
-        tr_free(tmp);
         return;
     }
 
-    /* arbitrary limit, should be more than enough */
-    if (len <= 4096)
-    {
-        logtrace(msgs, fmt::format(FMT_STRING("here is the handshake: [{:{}.{}s}]"), tmp, len, len));
-    }
-    else
-    {
-        logtrace(msgs, fmt::format(FMT_STRING("handshake length is too big ({:d}), printing skipped"), len));
-    }
+    logtrace(msgs, fmt::format(FMT_STRING("here is the base64-encoded handshake: [{:s}]"), tr_base64_encode(handshake_sv)));
 
     /* does the peer prefer encrypted connections? */
     auto i = int64_t{};
@@ -1175,7 +1175,7 @@ static void parseLtepHandshake(tr_peerMsgsImpl* msgs, uint32_t len, struct evbuf
     /* get peer's listening port */
     if (tr_variantDictFindInt(&val, TR_KEY_p, &i))
     {
-        pex.port = htons((uint16_t)i);
+        pex.port.setHost(i);
         msgs->publishClientGotPort(pex.port);
         logtrace(msgs, fmt::format(FMT_STRING("peer's port is now {:d}"), i));
     }
@@ -1203,7 +1203,6 @@ static void parseLtepHandshake(tr_peerMsgsImpl* msgs, uint32_t len, struct evbuf
     }
 
     tr_variantFree(&val);
-    tr_free(tmp);
 }
 
 static void parseUtMetadata(tr_peerMsgsImpl* msgs, uint32_t msglen, struct evbuffer* inbuf)
@@ -1435,58 +1434,59 @@ static void prefetchPieces(tr_peerMsgsImpl* msgs)
         return;
     }
 
-    for (int i = msgs->prefetchCount; i < msgs->pendingReqsToClient && i < PrefetchSize; ++i)
+    // ensure that the first `PrefetchMax` items in `msgs->peer_requested_` are prefetched.
+    auto& requests = msgs->peer_requested_;
+    for (size_t i = 0, n = std::min(PrefetchMax, std::size(requests)); i < n; ++i)
     {
-        struct peer_request const* req = msgs->peerAskedFor + i;
-
-        if (requestIsValid(msgs, req))
+        if (auto& req = requests[i]; !req.prefetched)
         {
             tr_cachePrefetchBlock(
                 msgs->session->cache,
                 msgs->torrent,
-                msgs->torrent->pieceLoc(req->index, req->offset),
-                req->length);
-            ++msgs->prefetchCount;
+                msgs->torrent->pieceLoc(req.index, req.offset),
+                req.length);
+            req.prefetched = true;
         }
     }
 }
 
-static void peerMadeRequest(tr_peerMsgsImpl* msgs, struct peer_request const* req)
+[[nodiscard]] static bool canAddRequestFromPeer(tr_peerMsgsImpl const* const msgs, struct peer_request const& req)
 {
-    bool const fext = tr_peerIoSupportsFEXT(msgs->io);
-    bool const reqIsValid = requestIsValid(msgs, req);
-    bool const clientHasPiece = reqIsValid && msgs->torrent->hasPiece(req->index);
-    bool const peerIsChoked = msgs->peer_is_choked_;
-
-    bool allow = false;
-
-    if (!reqIsValid)
-    {
-        logtrace(msgs, "rejecting an invalid request.");
-    }
-    else if (!clientHasPiece)
-    {
-        logtrace(msgs, "rejecting request for a piece we don't have.");
-    }
-    else if (peerIsChoked)
+    if (msgs->peer_is_choked_)
     {
         logtrace(msgs, "rejecting request from choked peer");
-    }
-    else if (msgs->pendingReqsToClient + 1 >= ReqQ)
-    {
-        logtrace(msgs, "rejecting request ... reqq is full");
-    }
-    else
-    {
-        allow = true;
+        return false;
     }
 
-    if (allow)
+    if (std::size(msgs->peer_requested_) >= ReqQ)
     {
-        msgs->peerAskedFor[msgs->pendingReqsToClient++] = *req;
+        logtrace(msgs, "rejecting request ... reqq is full");
+        return false;
+    }
+
+    if (!tr_torrentReqIsValid(msgs->torrent, req.index, req.offset, req.length))
+    {
+        logtrace(msgs, "rejecting an invalid request.");
+        return false;
+    }
+
+    if (!msgs->torrent->hasPiece(req.index))
+    {
+        logtrace(msgs, "rejecting request for a piece we don't have.");
+        return false;
+    }
+
+    return true;
+}
+
+static void peerMadeRequest(tr_peerMsgsImpl* msgs, struct peer_request const* req)
+{
+    if (canAddRequestFromPeer(msgs, *req))
+    {
+        msgs->peer_requested_.emplace_back(*req);
         prefetchPieces(msgs);
     }
-    else if (fext)
+    else if (tr_peerIoSupportsFEXT(msgs->io))
     {
         protocolSendReject(msgs, req);
     }
@@ -1727,23 +1727,19 @@ static ReadState readBtMessage(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, si
             msgs->cancelsSentToClient.add(tr_time(), 1);
             logtrace(msgs, fmt::format(FMT_STRING("got a Cancel {:d}:{:d}->{:d}"), r.index, r.offset, r.length));
 
-            for (int i = 0; i < msgs->pendingReqsToClient; ++i)
+            auto& requests = msgs->peer_requested_;
+            if (auto iter = std::find(std::begin(requests), std::end(requests), r); iter != std::end(requests))
             {
-                struct peer_request const* req = msgs->peerAskedFor + i;
+                requests.erase(iter);
 
-                if (req->index == r.index && req->offset == r.offset && req->length == r.length)
+                // bep6: "Even when a request is cancelled, the peer
+                // receiving the cancel should respond with either the
+                // corresponding reject or the corresponding piece"
+                if (fext)
                 {
-                    tr_removeElementFromArray(msgs->peerAskedFor, i, sizeof(struct peer_request), msgs->pendingReqsToClient);
-                    --msgs->pendingReqsToClient;
-                    if (fext)
-                    {
-                        protocolSendReject(msgs, &r);
-                    }
-
-                    break;
+                    protocolSendReject(msgs, &r);
                 }
             }
-
             break;
         }
 
@@ -1752,14 +1748,23 @@ static ReadState readBtMessage(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, si
         break;
 
     case BtPeerMsgs::Port:
-        logtrace(msgs, "Got a BtPeerMsgs::Port");
-        tr_peerIoReadUint16(msgs->io, inbuf, &msgs->dht_port);
-
-        if (msgs->dht_port > 0)
+        // http://bittorrent.org/beps/bep_0005.html
+        // Peers supporting the DHT set the last bit of the 8-byte reserved flags
+        // exchanged in the BitTorrent protocol handshake. Peer receiving a handshake
+        // indicating the remote peer supports the DHT should send a PORT message.
+        // It begins with byte 0x09 and has a two byte payload containing the UDP
+        // port of the DHT node in network byte order.
         {
-            tr_dhtAddNode(msgs->session, tr_peerAddress(msgs), msgs->dht_port, false);
-        }
+            logtrace(msgs, "Got a BtPeerMsgs::Port");
 
+            auto nport = uint16_t{};
+            tr_peerIoReadUint16(msgs->io, inbuf, &nport);
+            if (auto const dht_port = tr_port::fromNetwork(nport); !std::empty(dht_port))
+            {
+                msgs->dht_port = dht_port;
+                tr_dhtAddNode(msgs->session, tr_peerAddress(msgs), msgs->dht_port, false);
+            }
+        }
         break;
 
     case BtPeerMsgs::FextSuggest:
@@ -2190,9 +2195,10 @@ static size_t fillOutputBuffer(tr_peerMsgsImpl* msgs, time_t now)
     ***  Data Blocks
     **/
 
-    if (tr_peerIoGetWriteBufferSpace(msgs->io, now) >= tr_block_info::BlockSize && popNextRequest(msgs, &req))
+    if (tr_peerIoGetWriteBufferSpace(msgs->io, now) >= tr_block_info::BlockSize && !std::empty(msgs->peer_requested_))
     {
-        --msgs->prefetchCount;
+        req = msgs->peer_requested_.front();
+        msgs->peer_requested_.erase(std::begin(msgs->peer_requested_));
 
         if (requestIsValid(msgs, &req) && msgs->torrent->hasPiece(req.index))
         {
@@ -2357,7 +2363,7 @@ static void tellPeerWhatWeHave(tr_peerMsgsImpl* msgs)
 
 /* some peers give us error messages if we send
    more than this many peers in a single pex message
-   http://wiki.theory.org/BitTorrentPeerExchangeConventions */
+   https://wiki.theory.org/BitTorrentPeerExchangeConventions */
 static auto constexpr MaxPexAdded = int{ 50 };
 static auto constexpr MaxPexDropped = int{ 50 };
 

@@ -47,7 +47,7 @@
 
     NSString* fullString = [fileSizeFormatter stringFromByteCount:fullSize];
 
-    //figure out the magniture of the two, since we can't rely on comparing the units because of localization and pluralization issues (for example, "1 byte of 2 bytes")
+    //figure out the magnitude of the two, since we can't rely on comparing the units because of localization and pluralization issues (for example, "1 byte of 2 bytes")
     BOOL partialUnitsSame;
     if (partialSize == 0)
     {
@@ -128,17 +128,16 @@
     return [self compare:string options:comparisonOptions range:NSMakeRange(0, self.length) locale:NSLocale.currentLocale];
 }
 
-- (NSArray*)betterComponentsSeparatedByCharactersInSet:(NSCharacterSet*)separators
+- (NSArray<NSString*>*)betterComponentsSeparatedByCharactersInSet:(NSCharacterSet*)separators
 {
     NSMutableArray* components = [NSMutableArray array];
 
-    NSCharacterSet* includededCharSet = separators.invertedSet;
+    NSCharacterSet* includedCharSet = separators.invertedSet;
     NSUInteger index = 0;
     NSUInteger const fullLength = self.length;
     do
     {
-        NSUInteger const start = [self rangeOfCharacterFromSet:includededCharSet options:0
-                                                         range:NSMakeRange(index, fullLength - index)]
+        NSUInteger const start = [self rangeOfCharacterFromSet:includedCharSet options:0 range:NSMakeRange(index, fullLength - index)]
                                      .location;
         if (start == NSNotFound)
         {

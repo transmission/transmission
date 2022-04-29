@@ -7,7 +7,6 @@
 
 #include <cstddef>
 #include <optional>
-#include <set>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -25,35 +24,34 @@ class tr_announce_list
 public:
     struct tracker_info
     {
-        tr_url_parsed_t announce;
-        tr_url_parsed_t scrape;
-        tr_interned_string announce_str;
-        tr_interned_string scrape_str;
-        tr_interned_string host;
+        tr_interned_string announce;
+        tr_interned_string scrape;
+        tr_interned_string host; // 'example.org:80'
+        tr_interned_string sitename; // 'example'
         tr_tracker_tier_t tier = 0;
         tr_tracker_id_t id = 0;
 
-        [[nodiscard]] int compare(tracker_info const& that) const // <=>
+        [[nodiscard]] constexpr int compare(tracker_info const& that) const noexcept // <=>
         {
             if (this->tier != that.tier)
             {
                 return this->tier < that.tier ? -1 : 1;
             }
 
-            if (this->announce.full != that.announce.full)
+            if (int const i{ this->announce.compare(that.announce) }; i != 0)
             {
-                return this->announce.full < that.announce.full ? -1 : 1;
+                return i;
             }
 
             return 0;
         }
 
-        [[nodiscard]] bool operator<(tracker_info const& that) const
+        [[nodiscard]] constexpr bool operator<(tracker_info const& that) const noexcept
         {
             return compare(that) < 0;
         }
 
-        [[nodiscard]] bool operator==(tracker_info const& that) const
+        [[nodiscard]] constexpr bool operator==(tracker_info const& that) const noexcept
         {
             return compare(that) == 0;
         }
@@ -87,8 +85,6 @@ public:
     {
         return trackers_.at(i);
     }
-
-    [[nodiscard]] std::set<tr_tracker_tier_t> tiers() const;
 
     [[nodiscard]] tr_tracker_tier_t nextTier() const;
 

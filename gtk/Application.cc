@@ -600,7 +600,7 @@ void Application::Impl::on_activate()
 
     /* GApplication emits an 'activate' signal when bootstrapping the primary.
      * Ordinarily we handle that by presenting the main window, but if the user
-     * user started Transmission minimized, ignore that initial signal... */
+     * started Transmission minimized, ignore that initial signal... */
     if (is_iconified_ && activation_count_ == 1)
     {
         return;

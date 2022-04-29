@@ -56,7 +56,7 @@
     return self.menu;
 }
 
-- (NSRect)iconRectForRow:(int)row
+- (NSRect)iconRectForRow:(NSInteger)row
 {
     FileNameCell* cell = (FileNameCell*)[self preparedCellAtColumn:[self columnWithIdentifier:@"Name"] row:row];
     NSRect iconRect = [cell imageRectForBounds:[self rectOfRow:row]];

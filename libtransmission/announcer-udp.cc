@@ -47,11 +47,11 @@ static void tau_sockaddr_setport(struct sockaddr* sa, tr_port port)
 {
     if (sa->sa_family == AF_INET)
     {
-        TR_DISCARD_ALIGN(sa, struct sockaddr_in*)->sin_port = htons(port);
+        TR_DISCARD_ALIGN(sa, struct sockaddr_in*)->sin_port = port.network();
     }
     else if (sa->sa_family == AF_INET6)
     {
-        TR_DISCARD_ALIGN(sa, struct sockaddr_in6*)->sin6_port = htons(port);
+        TR_DISCARD_ALIGN(sa, struct sockaddr_in6*)->sin6_port = port.network();
     }
 }
 
@@ -370,7 +370,7 @@ static tau_announce_request make_tau_announce_request(
     evbuffer_add_hton_32(buf, 0);
     evbuffer_add_hton_32(buf, in->key);
     evbuffer_add_hton_32(buf, in->numwant);
-    evbuffer_add_hton_16(buf, in->port);
+    evbuffer_add_hton_16(buf, in->port.host());
     auto const* const payload_begin = evbuffer_pullup(buf, -1);
     auto const* const payload_end = payload_begin + evbuffer_get_length(buf);
 
@@ -423,7 +423,7 @@ struct tau_tracker
 
     tr_interned_string const key;
     tr_interned_string const host;
-    int const port;
+    tr_port const port;
 
     evdns_getaddrinfo_request* dns_request = nullptr;
     std::shared_ptr<evutil_addrinfo> addr;
@@ -439,7 +439,7 @@ struct tau_tracker
     std::list<tau_announce_request> announces;
     std::list<tau_scrape_request> scrapes;
 
-    tau_tracker(tr_session* session_in, tr_interned_string key_in, tr_interned_string host_in, int port_in)
+    tau_tracker(tr_session* session_in, tr_interned_string key_in, tr_interned_string host_in, tr_port port_in)
         : session{ session_in }
         , key{ key_in }
         , host{ host_in }
@@ -744,7 +744,7 @@ static tau_tracker* tau_session_get_tracker(tr_announcer_udp* tau, tr_interned_s
     }
 
     // we don't have it -- build a new one
-    tau->trackers.emplace_back(tau->session, key, tr_interned_string(parsed->host), parsed->port);
+    tau->trackers.emplace_back(tau->session, key, tr_interned_string(parsed->host), tr_port::fromHost(parsed->port));
     auto* const tracker = &tau->trackers.back();
     logtrace(tracker->key, "New tau_tracker created");
     return tracker;

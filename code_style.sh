@@ -43,9 +43,27 @@ find_cfiles() {
   find . \( $(get_find_path_args "${cfile_includes[@]}") \) ! \( $(get_find_path_args "${cfile_excludes[@]}") \) "$@"
 }
 
+# We're targeting clang-format version 12 and other versions give slightly
+# different results, so prefer `clang-format-12` if it's installed.
+clang_format_exe_names=(
+  'clang-format-12'
+  'clang-format'
+)
+for name in ${clang_format_exe_names[@]}; do
+  clang_format_exe=$(command -v "${name}")
+  if [ "$?" -eq 0 ]; then
+    clang_format_exe="${name}"
+    break
+  fi
+done
+if [ -z "${clang_format_exe}" ]; then
+  echo "error: clang-format not found";
+  exit 1;
+fi
+
 # format C/C++
 clang_format_args="$([ -n "$fix" ] && echo '-i' || echo '--dry-run --Werror')"
-if ! find_cfiles -exec clang-format $clang_format_args '{}' '+'; then
+if ! find_cfiles -exec "${clang_format_exe}" $clang_format_args '{}' '+'; then
   [ -n "$fix" ] || echo 'C/C++ code needs formatting'
   exitcode=1
 fi

@@ -5,11 +5,13 @@
 #include <libtransmission/transmission.h>
 #include <libtransmission/web-utils.h> //tr_addressIsIP()
 
+#import "CocoaCompatibility.h"
+
 #import "TrackerCell.h"
 #import "TrackerNode.h"
 
-#define PADDING_HORIZONAL 3.0
-#define PADDING_STATUS_HORIZONAL 3.0
+#define PADDING_HORIZONTAL 3.0
+#define PADDING_STATUS_HORIZONTAL 3.0
 #define ICON_SIZE 16.0
 #define PADDING_BETWEEN_ICON_AND_NAME 4.0
 #define PADDING_ABOVE_ICON 1.0
@@ -261,17 +263,17 @@ NSMutableSet* fTrackerIconLoading;
 
 - (NSRect)imageRectForBounds:(NSRect)bounds
 {
-    return NSMakeRect(NSMinX(bounds) + PADDING_HORIZONAL, NSMinY(bounds) + PADDING_ABOVE_ICON, ICON_SIZE, ICON_SIZE);
+    return NSMakeRect(NSMinX(bounds) + PADDING_HORIZONTAL, NSMinY(bounds) + PADDING_ABOVE_ICON, ICON_SIZE, ICON_SIZE);
 }
 
 - (NSRect)rectForNameWithString:(NSAttributedString*)string inBounds:(NSRect)bounds
 {
     NSRect result;
-    result.origin.x = NSMinX(bounds) + PADDING_HORIZONAL + ICON_SIZE + PADDING_BETWEEN_ICON_AND_NAME;
+    result.origin.x = NSMinX(bounds) + PADDING_HORIZONTAL + ICON_SIZE + PADDING_BETWEEN_ICON_AND_NAME;
     result.origin.y = NSMinY(bounds) + PADDING_ABOVE_NAME;
 
     result.size.height = [string size].height;
-    result.size.width = NSMaxX(bounds) - NSMinX(result) - PADDING_HORIZONAL;
+    result.size.width = NSMaxX(bounds) - NSMinX(result) - PADDING_HORIZONTAL;
 
     return result;
 }
@@ -279,7 +281,7 @@ NSMutableSet* fTrackerIconLoading;
 - (NSRect)rectForCountWithString:(NSAttributedString*)string withAboveRect:(NSRect)aboveRect inBounds:(NSRect)bounds
 {
     return NSMakeRect(
-        NSMaxX(bounds) - PADDING_HORIZONAL - COUNT_WIDTH,
+        NSMaxX(bounds) - PADDING_HORIZONTAL - COUNT_WIDTH,
         NSMaxY(aboveRect) + PADDING_BETWEEN_LINES,
         COUNT_WIDTH,
         [string size].height);
@@ -300,7 +302,7 @@ NSMutableSet* fTrackerIconLoading;
                          inBounds:(NSRect)bounds
 {
     NSRect result;
-    result.origin.x = NSMinX(bounds) + PADDING_STATUS_HORIZONAL;
+    result.origin.x = NSMinX(bounds) + PADDING_STATUS_HORIZONTAL;
     result.origin.y = NSMaxY(aboveRect) + PADDING_BETWEEN_LINES;
 
     result.size.height = [string size].height;

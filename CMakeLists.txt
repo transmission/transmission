@@ -1,5 +1,9 @@
 cmake_minimum_required(VERSION 3.9 FATAL_ERROR)
 
+if(POLICY CMP0092)
+    cmake_policy(SET CMP0092 NEW)
+endif()
+
 # The value of this variable should be set prior to the first project() command invocation.
 # See: https://cmake.org/cmake/help/latest/variable/CMAKE_OSX_DEPLOYMENT_TARGET.html
 if(CMAKE_OSX_DEPLOYMENT_TARGET STREQUAL "")
@@ -113,7 +117,7 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set(PSL_MINIMUM             0.21.1)
 set(CURL_MINIMUM            7.28.0)
 set(CYASSL_MINIMUM          3.0)
-set(DEFLATE_MINIMUM         1.9)
+set(DEFLATE_MINIMUM         1.10)
 set(EVENT2_MINIMUM          2.1.0)
 set(GIO_MINIMUM             2.26.0)
 set(GLIB_MINIMUM            2.50.1)
@@ -329,7 +333,7 @@ set(THIRD_PARTY_DIR ${CMAKE_SOURCE_DIR}/third-party)
 
 tr_add_external_auto_library(DEFLATE libdeflate deflate)
 if(NOT USE_SYSTEM_DEFLATE)
-    set(DEFLATE_VERSION 1.9)
+    set(DEFLATE_VERSION 1.10)
 endif()
 
 tr_add_external_auto_library(EVENT2 libevent event
@@ -572,11 +576,7 @@ set(NEEDED_FUNCTIONS
     flock
     getmntent
     gettext
-    gmtime_r
-    gmtime_s
     htonll
-    localtime_r
-    localtime_s
     mkdtemp
     ngettext
     ntohll

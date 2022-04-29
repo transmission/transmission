@@ -7,11 +7,13 @@
 // #include <unistd.h> // sync()
 
 #include "transmission.h"
+
 #include "blocklist.h"
 #include "file.h"
-#include "peer-socket.h"
 #include "net.h"
+#include "peer-socket.h"
 #include "session.h" // tr_sessionIsAddressBlocked()
+#include "tr-strbuf.h"
 #include "utils.h"
 
 #include "test-fixtures.h"
@@ -67,7 +69,7 @@ TEST_F(BlocklistTest, parsing)
     EXPECT_EQ(0, tr_blocklistGetRuleCount(session_));
 
     // init the blocklist
-    auto const path = tr_strvPath(tr_sessionGetConfigDir(session_), "blocklists", "level1");
+    auto const path = tr_pathbuf{ tr_sessionGetConfigDir(session_), "/blocklists/level1" };
     createFileWithContents(path, Contents1);
     tr_sessionReloadBlocklists(session_);
     EXPECT_TRUE(tr_blocklistExists(session_));
@@ -103,7 +105,7 @@ TEST_F(BlocklistTest, parsing)
 TEST_F(BlocklistTest, updating)
 {
     // init the session
-    auto const path = tr_strvPath(tr_sessionGetConfigDir(session_), "blocklists", "level1");
+    auto const path = tr_pathbuf{ tr_sessionGetConfigDir(session_), "/blocklists/level1" };
 
     // no blocklist to start with...
     EXPECT_EQ(0, tr_blocklistGetRuleCount(session_));

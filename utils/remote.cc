@@ -20,6 +20,7 @@
 #include <event2/buffer.h>
 #include <event2/util.h>
 
+#include <fmt/chrono.h>
 #include <fmt/format.h>
 
 #include <libtransmission/transmission.h>
@@ -218,7 +219,7 @@ enum
 ****
 ***/
 
-static auto constexpr Options = std::array<tr_option, 92>{
+static auto constexpr Options = std::array<tr_option, 94>{
     { { 'a', "add", "Add torrent files by filename or URL", "a", false, nullptr },
       { 970, "alt-speed", "Use the alternate Limits", "as", false, nullptr },
       { 971, "no-alt-speed", "Don't use the alternate Limits", "AS", false, nullptr },
@@ -262,6 +263,8 @@ static auto constexpr Options = std::array<tr_option, 92>{
       { 'L', "labels", "Set the current torrents' labels", "L", true, "<label[,label...]>" },
       { 960, "move", "Move current torrent's data to a new folder", nullptr, true, "<path>" },
       { 961, "find", "Tell Transmission where to find a torrent's data", nullptr, true, "<path>" },
+      { 964, "rename", "Rename torrents root folder or a file", nullptr, true, "<name>" },
+      { 965, "path", "Provide path for rename functions", nullptr, true, "<path>" },
       { 'm', "portmap", "Enable portmapping via NAT-PMP or UPnP", "m", false, nullptr },
       { 'M', "no-portmap", "Disable portmapping", "M", false, nullptr },
       { 'n', "auth", "Set username and password", "n", true, "<user:pw>" },
@@ -515,6 +518,12 @@ static int getOptMode(int val)
 
     case 960: /* move */
         return MODE_TORRENT_SET_LOCATION;
+
+    case 964: /* rename */
+        return MODE_TORRENT_SET_LOCATION | MODE_TORRENT_SET;
+
+    case 965: /* path */
+        return MODE_TORRENT_SET_LOCATION | MODE_TORRENT_SET;
 
     case 732: /* List groups */
         return MODE_GROUP_GET;
@@ -878,9 +887,7 @@ static char const* bandwidthPriorityNames[] = {
 
 static char* format_date(char* buf, size_t buflen, time_t now)
 {
-    struct tm tm;
-    tr_localtime_r(&now, &tm);
-    strftime(buf, buflen, "%a %b %d %T %Y%n", &tm); /* ctime equiv */
+    *fmt::format_to_n(buf, buflen - 1, "{:%a %b %d %T %Y}", fmt::localtime(now)).out = '\0';
     return buf;
 }
 
@@ -1071,22 +1078,22 @@ static void printDetails(tr_variant* top)
 
             if (tr_variantDictFindInt(t, TR_KEY_addedDate, &i) && i != 0)
             {
-                printf("  Date added:       %s", format_date(buf, sizeof(buf), i));
+                printf("  Date added:       %s\n", format_date(buf, sizeof(buf), i));
             }
 
             if (tr_variantDictFindInt(t, TR_KEY_doneDate, &i) && i != 0)
             {
-                printf("  Date finished:    %s", format_date(buf, sizeof(buf), i));
+                printf("  Date finished:    %s\n", format_date(buf, sizeof(buf), i));
             }
 
             if (tr_variantDictFindInt(t, TR_KEY_startDate, &i) && i != 0)
             {
-                printf("  Date started:     %s", format_date(buf, sizeof(buf), i));
+                printf("  Date started:     %s\n", format_date(buf, sizeof(buf), i));
             }
 
             if (tr_variantDictFindInt(t, TR_KEY_activityDate, &i) && i != 0)
             {
-                printf("  Latest activity:  %s", format_date(buf, sizeof(buf), i));
+                printf("  Latest activity:  %s\n", format_date(buf, sizeof(buf), i));
             }
 
             if (tr_variantDictFindInt(t, TR_KEY_secondsDownloading, &i) && i > 0)
@@ -1105,7 +1112,7 @@ static void printDetails(tr_variant* top)
 
             if (tr_variantDictFindInt(t, TR_KEY_dateCreated, &i) && i != 0)
             {
-                printf("  Date created: %s", format_date(buf, sizeof(buf), i));
+                printf("  Date created: %s\n", format_date(buf, sizeof(buf), i));
             }
 
             if (tr_variantDictFindBool(t, TR_KEY_isPrivate, &boolVal))
@@ -2252,6 +2259,8 @@ static tr_variant* ensure_tset(tr_variant** tset)
     return args;
 }
 
+static char rename_from[4096];
+
 static int processArgs(char const* rpcurl, int argc, char const* const* argv)
 {
     int c;
@@ -2978,6 +2987,25 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
                     tr_variantDictAddBool(args, TR_KEY_move, true);
                     addIdArg(args, id, nullptr);
                     status |= flush(rpcurl, &top);
+                    break;
+                }
+
+            case 964:
+                {
+                    auto* top = tr_new0(tr_variant, 1);
+                    tr_variantInitDict(top, 2);
+                    tr_variantDictAddStr(top, TR_KEY_method, "rename");
+                    auto* args = tr_variantDictAddDict(top, Arguments, 3);
+                    tr_variantDictAddStr(args, TR_KEY_path, rename_from);
+                    tr_variantDictAddStr(args, TR_KEY_name, optarg);
+                    addIdArg(args, id, NULL);
+                    status |= flush(rpcurl, &top);
+                    break;
+                }
+
+            case 965:
+                {
+                    tr_strlcpy(rename_from, optarg, sizeof(rename_from));
                     break;
                 }
 

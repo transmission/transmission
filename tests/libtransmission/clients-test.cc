@@ -75,7 +75,7 @@ TEST(Client, clientForId)
     }
 }
 
-TEST(Client, fuzzRegressions)
+TEST(Client, clientForIdFuzzRegressions)
 {
     auto constexpr Tests = std::array<std::string_view, 5>{
         "LVJTp3u+Aptl01HjzTHXVC5b9g4="sv, "LWJrHb2OpoNsJdODHA7iyXjnHxc="sv, "LU1PjpTjmvUth+f15YTOOggXl3k="sv,
@@ -92,7 +92,7 @@ TEST(Client, fuzzRegressions)
     }
 }
 
-TEST(Client, fuzz)
+TEST(Client, clientForIdFuzz)
 {
     for (size_t i = 0; i < 10000; ++i)
     {

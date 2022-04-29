@@ -1,3 +1,4 @@
+#import <AppKit/AppKit.h>
 #import <QuickLook/QuickLook.h>
 
 #include <string>
@@ -172,7 +173,7 @@ OSStatus GeneratePreviewForURL(void* thisInterface, QLPreviewRequestRef preview,
 #warning handle tiers?
         for (auto const& tracker : announce_list)
         {
-            [listSection appendFormat:@"<tr><td>%s<td></tr>", tracker.announce_str.c_str()];
+            [listSection appendFormat:@"<tr><td>%s<td></tr>", tracker.announce.c_str()];
         }
 
         [listSection appendString:@"</table>"];

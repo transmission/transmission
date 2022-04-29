@@ -39,6 +39,31 @@ namespace libtransmission
 namespace test
 {
 
+using file_func_t = std::function<void(char const* filename)>;
+
+static void depthFirstWalk(char const* path, file_func_t func)
+{
+    auto info = tr_sys_path_info{};
+    if (tr_sys_path_get_info(path, 0, &info) && (info.type == TR_SYS_PATH_IS_DIRECTORY))
+    {
+        if (auto const odir = tr_sys_dir_open(path); odir != TR_BAD_SYS_DIR)
+        {
+            char const* name;
+            while ((name = tr_sys_dir_read_name(odir)) != nullptr)
+            {
+                if (strcmp(name, ".") != 0 && strcmp(name, "..") != 0)
+                {
+                    depthFirstWalk(tr_strvPath(path, name).c_str(), func);
+                }
+            }
+
+            tr_sys_dir_close(odir);
+        }
+    }
+
+    func(path);
+}
+
 inline std::string makeString(char*&& s)
 {
     auto const ret = std::string(s != nullptr ? s : "");
@@ -114,32 +139,6 @@ protected:
         tr_sys_dir_create_temp(std::data(path));
         tr_sys_path_native_separators(std::data(path));
         return path;
-    }
-
-    using file_func_t = std::function<void(char const* filename)>;
-
-    static void depthFirstWalk(char const* path, file_func_t func)
-    {
-        auto info = tr_sys_path_info{};
-        if (tr_sys_path_get_info(path, 0, &info) && (info.type == TR_SYS_PATH_IS_DIRECTORY))
-        {
-            if (auto const odir = tr_sys_dir_open(path); odir != TR_BAD_SYS_DIR)
-            {
-                char const* name;
-                while ((name = tr_sys_dir_read_name(odir)) != nullptr)
-                {
-                    if (strcmp(name, ".") != 0 && strcmp(name, "..") != 0)
-                    {
-                        auto const filename = tr_strvPath(path, name);
-                        depthFirstWalk(tr_strvPath(path, name).c_str(), func);
-                    }
-                }
-
-                tr_sys_dir_close(odir);
-            }
-        }
-
-        func(path);
     }
 
     static void rimraf(std::string const& path, bool verbose = false)
@@ -227,14 +226,14 @@ protected:
         errno = tmperr;
     }
 
-    void createFileWithContents(std::string const& path, void const* payload, size_t n) const
+    void createFileWithContents(std::string_view path, void const* payload, size_t n) const
     {
         auto const tmperr = errno;
 
         buildParentDir(path);
 
         auto const fd = tr_sys_file_open(
-            path.c_str(),
+            tr_pathbuf{ path },
             TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_TRUNCATE,
             0600,
             nullptr);
@@ -245,7 +244,12 @@ protected:
         errno = tmperr;
     }
 
-    void createFileWithContents(std::string const& path, void const* payload) const
+    void createFileWithContents(std::string_view path, std::string_view payload) const
+    {
+        createFileWithContents(path, std::data(payload), std::size(payload));
+    }
+
+    void createFileWithContents(std::string_view path, void const* payload) const
     {
         createFileWithContents(path, payload, strlen(static_cast<char const*>(payload)));
     }
@@ -319,8 +323,7 @@ private:
         tr_variantDictAddStr(settings, q, incomplete_dir.c_str());
 
         // blocklists
-        auto const blocklist_dir = tr_strvPath(sandboxDir(), "blocklists");
-        tr_sys_dir_create(blocklist_dir.data(), TR_SYS_DIR_CREATE_PARENTS, 0700);
+        tr_sys_dir_create(tr_pathbuf{ sandboxDir(), "/blocklists" }, TR_SYS_DIR_CREATE_PARENTS, 0700);
 
         // fill in any missing settings
 

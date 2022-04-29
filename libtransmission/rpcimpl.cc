@@ -9,6 +9,7 @@
 #include <ctime>
 #include <iterator>
 #include <numeric>
+#include <set>
 #include <string_view>
 #include <utility>
 #include <vector>
@@ -287,7 +288,7 @@ static char const* torrentStop(
 {
     for (auto* tor : getTorrents(session, args_in))
     {
-        if (tor->isRunning || tor->isQueued() || tor->verifyState != TR_VERIFY_NONE)
+        if (tor->isRunning || tor->isQueued() || tor->verifyState() != TR_VERIFY_NONE)
         {
             tor->isStopping = true;
             notify(session, TR_RPC_TORRENT_STOPPED, tor);
@@ -363,7 +364,7 @@ static void addLabels(tr_torrent const* tor, tr_variant* list)
     tr_variantInitList(list, std::size(tor->labels));
     for (auto const& label : tor->labels)
     {
-        tr_variantListAddStr(list, label);
+        tr_variantListAddQuark(list, label);
     }
 }
 
@@ -404,10 +405,10 @@ static void addTrackers(tr_torrent const* tor, tr_variant* trackers)
     for (auto const& tracker : tor->announceList())
     {
         auto* const d = tr_variantListAddDict(trackers, 5);
-        tr_variantDictAddQuark(d, TR_KEY_announce, tracker.announce_str.quark());
+        tr_variantDictAddQuark(d, TR_KEY_announce, tracker.announce.quark());
         tr_variantDictAddInt(d, TR_KEY_id, tracker.id);
-        tr_variantDictAddQuark(d, TR_KEY_scrape, tracker.scrape_str.quark());
-        tr_variantDictAddStrView(d, TR_KEY_sitename, tracker.announce.sitename);
+        tr_variantDictAddQuark(d, TR_KEY_scrape, tracker.scrape.quark());
+        tr_variantDictAddStrView(d, TR_KEY_sitename, tracker.sitename);
         tr_variantDictAddInt(d, TR_KEY_tier, tracker.tier);
     }
 }
@@ -561,7 +562,7 @@ static void initField(tr_torrent const* const tor, tr_stat const* const st, tr_v
         break;
 
     case TR_KEY_group:
-        tr_variantInitStrView(initme, tor->group);
+        tr_variantInitStrView(initme, tor->bandwidthGroup().sv());
         break;
 
     case TR_KEY_hashString:
@@ -653,7 +654,7 @@ static void initField(tr_torrent const* const tor, tr_stat const* const st, tr_v
     case TR_KEY_peersFrom:
         {
             tr_variantInitDict(initme, 7);
-            int const* f = st->peersFrom;
+            auto const* f = st->peersFrom;
             tr_variantDictAddInt(initme, TR_KEY_fromCache, f[TR_PEER_FROM_RESUME]);
             tr_variantDictAddInt(initme, TR_KEY_fromDht, f[TR_PEER_FROM_DHT]);
             tr_variantDictAddInt(initme, TR_KEY_fromIncoming, f[TR_PEER_FROM_INCOMING]);
@@ -874,17 +875,12 @@ static char const* torrentGet(tr_session* session, tr_variant* args_in, tr_varia
 
     if (tr_variantDictFindStrView(args_in, TR_KEY_ids, &sv) && sv == "recently-active"sv)
     {
-        time_t const now = tr_time();
-        auto const interval = RecentlyActiveSeconds;
-
-        auto const& removed = session->removed_torrents;
-        tr_variant* removed_out = tr_variantDictAddList(args_out, TR_KEY_removed, std::size(removed));
-        for (auto const& [id, time_removed] : removed)
+        auto const cutoff = tr_time() - RecentlyActiveSeconds;
+        auto const ids = session->torrents().removedSince(cutoff);
+        auto* const out = tr_variantDictAddList(args_out, TR_KEY_removed, std::size(ids));
+        for (auto const& id : ids)
         {
-            if (time_removed >= now - interval)
-            {
-                tr_variantListAddInt(removed_out, id);
-            }
+            tr_variantListAddInt(out, id);
         }
     }
 
@@ -941,10 +937,12 @@ static char const* torrentGet(tr_session* session, tr_variant* args_in, tr_varia
 ****
 ***/
 
-static std::pair<tr_labels_t, char const* /*errmsg*/> makeLabels(tr_variant* list)
+static std::pair<std::vector<tr_quark>, char const* /*errmsg*/> makeLabels(tr_variant* list)
 {
-    auto labels = tr_labels_t{};
+    auto labels = std::vector<tr_quark>{};
     size_t const n = tr_variantListSize(list);
+    labels.reserve(n);
+
     for (size_t i = 0; i < n; ++i)
     {
         auto label = std::string_view{};
@@ -964,7 +962,7 @@ static std::pair<tr_labels_t, char const* /*errmsg*/> makeLabels(tr_variant* lis
             return { {}, "labels cannot contain comma (,) character" };
         }
 
-        labels.emplace(label);
+        labels.emplace_back(tr_quark_new(label));
     }
 
     return { labels, nullptr };
@@ -979,7 +977,7 @@ static char const* setLabels(tr_torrent* tor, tr_variant* list)
         return errmsg;
     }
 
-    tr_torrentSetLabels(tor, std::move(labels));
+    tor->setLabels(std::data(labels), std::size(labels));
     return nullptr;
 }
 
@@ -1164,7 +1162,7 @@ static char const* torrentSet(
 
         if (std::string_view group; tr_variantDictFindStrView(args_in, TR_KEY_group, &group))
         {
-            tor->setGroup(group);
+            tor->setBandwidthGroup(group);
         }
 
         if (errmsg == nullptr && tr_variantDictFindList(args_in, TR_KEY_labels, &tmp_variant))
@@ -1358,7 +1356,7 @@ static char const* torrentRenamePath(
 
 static void onPortTested(tr_web::FetchResponse const& web_response)
 {
-    auto const& [status, body, did_connect, did_tmieout, user_data] = web_response;
+    auto const& [status, body, did_connect, did_timeout, user_data] = web_response;
     auto* data = static_cast<struct tr_rpc_idle_data*>(user_data);
 
     if (status != 200)
@@ -1384,8 +1382,8 @@ static char const* portTest(
     tr_variant* /*args_out*/,
     struct tr_rpc_idle_data* idle_data)
 {
-    auto const port = tr_sessionGetPeerPort(session);
-    auto const url = fmt::format(FMT_STRING("https://portcheck.transmissionbt.com/{:d}"), port);
+    auto const port = session->peerPort();
+    auto const url = fmt::format(FMT_STRING("https://portcheck.transmissionbt.com/{:d}"), port.host());
     session->web->fetch({ url, onPortTested, idle_data });
     return nullptr;
 }
@@ -1666,7 +1664,7 @@ static char const* torrentAdd(tr_session* session, tr_variant* args_in, tr_varia
             return errmsg;
         }
 
-        tr_ctorSetLabels(ctor, std::move(labels));
+        tr_ctorSetLabels(ctor, std::data(labels), std::size(labels));
     }
 
     tr_logAddTrace(fmt::format("torrentAdd: filename is '{}'", filename));
@@ -1946,7 +1944,7 @@ static char const* sessionSet(
 
     if (tr_variantDictFindInt(args_in, TR_KEY_peer_port, &i))
     {
-        tr_sessionSetPeerPort(session, i);
+        session->setPeerPort(tr_port::fromHost(i));
     }
 
     if (tr_variantDictFindBool(args_in, TR_KEY_port_forwarding_enabled, &boolVal))
@@ -2225,7 +2223,7 @@ static void addSessionField(tr_session* s, tr_variant* d, tr_quark key)
         break;
 
     case TR_KEY_peer_port:
-        tr_variantDictAddInt(d, key, tr_sessionGetPeerPort(s));
+        tr_variantDictAddInt(d, key, s->peerPort().host());
         break;
 
     case TR_KEY_peer_port_random_on_start:
@@ -2367,7 +2365,7 @@ static char const* sessionGet(tr_session* s, tr_variant* args_in, tr_variant* ar
         for (size_t i = 0; i < field_count; ++i)
         {
             auto field_name = std::string_view{};
-            if (tr_variantGetStrView(tr_variantListChild(fields, i), &field_name))
+            if (!tr_variantGetStrView(tr_variantListChild(fields, i), &field_name))
             {
                 continue;
             }

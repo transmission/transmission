@@ -16,7 +16,7 @@
 
 @interface InfoTrackersViewController ()
 
-@property(nonatomic, copy) NSArray* fTorrents;
+@property(nonatomic, copy) NSArray<Torrent*>* fTorrents;
 
 @property(nonatomic) BOOL fSet;
 
@@ -64,7 +64,7 @@
     }
 }
 
-- (void)setInfoForTorrents:(NSArray*)torrents
+- (void)setInfoForTorrents:(NSArray<Torrent*>*)torrents
 {
     //don't check if it's the same in case the metadata changed
     self.fTorrents = torrents;
@@ -91,7 +91,7 @@
 
         if (self.fTorrents.count == 1)
         {
-            self.fTrackers = ((Torrent*)self.fTorrents[0]).allTrackerStats;
+            self.fTrackers = self.fTorrents[0].allTrackerStats;
         }
         else
         {
@@ -120,7 +120,7 @@
         NSIndexSet* addedIndexes = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(self.fTrackers.count - 2, 2)];
         NSArray* tierAndTrackerBeingAdded = [self.fTrackers objectsAtIndexes:addedIndexes];
 
-        self.fTrackers = ((Torrent*)self.fTorrents[0]).allTrackerStats;
+        self.fTrackers = self.fTorrents[0].allTrackerStats;
         [self.fTrackers addObjectsFromArray:tierAndTrackerBeingAdded];
 
         self.fTrackerTable.trackers = self.fTrackers;
@@ -177,7 +177,7 @@
 
 - (CGFloat)tableView:(NSTableView*)tableView heightOfRow:(NSInteger)row
 {
-    //check for NSDictionay instead of TrackerNode because of display issue when adding a row
+    //check for NSDictionary instead of TrackerNode because of display issue when adding a row
     if ([self.fTrackers[row] isKindOfClass:[NSDictionary class]])
     {
         return TRACKER_GROUP_SEPARATOR_HEIGHT;

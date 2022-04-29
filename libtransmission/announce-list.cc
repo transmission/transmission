@@ -81,20 +81,20 @@ bool tr_announce_list::add(std::string_view announce_url_sv, tr_tracker_tier_t t
     }
 
     auto tracker = tracker_info{};
-    tracker.announce_str = announce_url_sv;
-    tracker.announce = *tr_urlParseTracker(tracker.announce_str.sv());
+    tracker.announce = announce_url_sv;
     tracker.tier = getTier(tier, *announce);
     tracker.id = nextUniqueId();
-    tracker.host = fmt::format(FMT_STRING("{:s}:{:d}"), tracker.announce.host, tracker.announce.port);
+    tracker.host = fmt::format(FMT_STRING("{:s}:{:d}"), announce->host, announce->port);
+    tracker.sitename = announce->sitename;
 
     if (auto const scrape_str = announceToScrape(announce_url_sv); scrape_str)
     {
-        tracker.scrape_str = *scrape_str;
-        tracker.scrape = *tr_urlParseTracker(tracker.scrape_str.sv());
+        tracker.scrape = *scrape_str;
     }
 
     auto const it = std::lower_bound(std::begin(trackers_), std::end(trackers_), tracker);
     trackers_.insert(it, tracker);
+
     return true;
 }
 
@@ -117,7 +117,7 @@ void tr_announce_list::add(tr_announce_list const& src)
             ++tgt_tier;
         }
 
-        tgt.add(tracker.announce.full, tgt_tier);
+        tgt.add(tracker.announce.sv(), tgt_tier);
     }
 }
 
@@ -156,17 +156,6 @@ tr_quark tr_announce_list::announceToScrape(tr_quark announce)
     return TR_KEY_NONE;
 }
 
-std::set<tr_tracker_tier_t> tr_announce_list::tiers() const
-{
-    auto tiers = std::set<tr_tracker_tier_t>{};
-    for (auto const& tracker : trackers_)
-    {
-        tiers.insert(tracker.tier);
-    }
-
-    return tiers;
-}
-
 tr_tracker_tier_t tr_announce_list::nextTier() const
 {
     return std::empty(trackers_) ? 0 : trackers_.back().tier + 1;
@@ -191,7 +180,7 @@ tr_announce_list::trackers_t::iterator tr_announce_list::find(std::string_view a
 {
     auto const test = [&announce](auto const& tracker)
     {
-        return announce == tracker.announce.full;
+        return announce == tracker.announce.sv();
     };
     return std::find_if(std::begin(trackers_), std::end(trackers_), test);
 }
@@ -201,9 +190,18 @@ tr_announce_list::trackers_t::iterator tr_announce_list::find(std::string_view a
 // function doesn't care, there's no point in removing the gaps...)
 tr_tracker_tier_t tr_announce_list::getTier(tr_tracker_tier_t tier, tr_url_parsed_t const& announce) const
 {
-    auto const is_sibling = [&announce](tracker_info const& tracker)
+    auto const is_sibling = [&announce](auto const& tracker)
     {
-        return tracker.announce.host == announce.host && tracker.announce.path == announce.path;
+        auto const tracker_announce = tracker.announce.sv();
+
+        // fast test to avoid tr_urlParse()ing most trackers
+        if (!tr_strvContains(tracker_announce, announce.host))
+        {
+            return false;
+        }
+
+        auto const candidate = tr_urlParse(tracker_announce);
+        return candidate->host == announce.host && candidate->path == announce.path;
     };
 
     auto const it = std::find_if(std::begin(trackers_), std::end(trackers_), is_sibling);
@@ -217,8 +215,17 @@ bool tr_announce_list::canAdd(tr_url_parsed_t const& announce)
     // "http://tracker/announce" + "http://tracker:80/announce"
     auto const is_same = [&announce](auto const& tracker)
     {
-        return tracker.announce.scheme == announce.scheme && tracker.announce.host == announce.host &&
-            tracker.announce.port == announce.port && tracker.announce.path == announce.path;
+        auto const tracker_announce = tracker.announce.sv();
+
+        // fast test to avoid tr_urlParse()ing most trackers
+        if (!tr_strvContains(tracker_announce, announce.host))
+        {
+            return false;
+        }
+
+        auto const tracker_parsed = tr_urlParse(tracker_announce);
+        return tracker_parsed->scheme == announce.scheme && tracker_parsed->host == announce.host &&
+            tracker_parsed->port == announce.port && tracker_parsed->path == announce.path;
     };
     return std::none_of(std::begin(trackers_), std::end(trackers_), is_same);
 }
@@ -239,7 +246,7 @@ bool tr_announce_list::save(std::string_view torrent_file, tr_error** error) con
     // add the new fields
     if (this->size() == 1)
     {
-        tr_variantDictAddQuark(&metainfo, TR_KEY_announce, at(0).announce_str.quark());
+        tr_variantDictAddQuark(&metainfo, TR_KEY_announce, at(0).announce.quark());
     }
     else if (this->size() > 1)
     {
@@ -256,7 +263,7 @@ bool tr_announce_list::save(std::string_view torrent_file, tr_error** error) con
                 current_tier = tracker.tier;
             }
 
-            tr_variantListAddQuark(tracker_list, tracker.announce_str.quark());
+            tr_variantListAddQuark(tracker_list, tracker.announce.quark());
         }
     }
 
@@ -322,7 +329,7 @@ std::string tr_announce_list::toString() const
             text += '\n';
         }
 
-        text += tracker.announce.full;
+        text += tracker.announce.sv();
         text += '\n';
 
         current_tier = tracker.tier;

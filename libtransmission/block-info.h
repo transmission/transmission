@@ -9,56 +9,62 @@
 
 #include "transmission.h"
 
-#include "tr-assert.h"
-
 struct tr_block_info
 {
+private:
+    uint64_t total_size_ = 0;
+    uint32_t piece_size_ = 0;
+    tr_piece_index_t n_pieces_ = 0;
+
+    tr_block_index_t n_blocks_ = 0;
+    // should be same type as BlockSize
+    uint32_t final_block_size_ = 0;
+    // should be same type as piece_size
+    uint32_t final_piece_size_ = 0;
+
+public:
     static auto constexpr BlockSize = uint32_t{ 1024 * 16 };
 
-    uint64_t total_size = 0;
-    uint64_t piece_size = 0;
-    uint64_t n_pieces = 0;
+    tr_block_info() noexcept = default;
 
-    tr_block_index_t n_blocks = 0;
-    uint32_t final_block_size = 0;
-    uint32_t final_piece_size = 0;
-
-    tr_block_info() = default;
-    tr_block_info(uint64_t total_size_in, uint64_t piece_size_in)
+    tr_block_info(uint64_t total_size_in, uint32_t piece_size_in) noexcept
     {
         initSizes(total_size_in, piece_size_in);
     }
 
-    void initSizes(uint64_t total_size_in, uint64_t piece_size_in);
+    void initSizes(uint64_t total_size_in, uint32_t piece_size_in) noexcept;
 
     [[nodiscard]] constexpr auto blockCount() const noexcept
     {
-        return n_blocks;
+        return n_blocks_;
     }
 
-    // return the number of bytes in `block`
-    [[nodiscard]] constexpr auto blockSize(tr_block_index_t block) const
+    [[nodiscard]] constexpr auto blockSize(tr_block_index_t block) const noexcept
     {
-        return block + 1 == n_blocks ? final_block_size : BlockSize;
+        return block + 1 == n_blocks_ ? final_block_size_ : BlockSize;
     }
 
     [[nodiscard]] constexpr auto pieceCount() const noexcept
     {
-        return n_pieces;
+        return n_pieces_;
     }
 
     [[nodiscard]] constexpr auto pieceSize() const noexcept
     {
-        return piece_size;
+        return piece_size_;
     }
 
-    // return the number of bytes in `piece`
     [[nodiscard]] constexpr auto pieceSize(tr_piece_index_t piece) const noexcept
     {
-        return piece + 1 == n_pieces ? final_piece_size : pieceSize();
+        return piece + 1 == n_pieces_ ? final_piece_size_ : pieceSize();
     }
 
-    [[nodiscard]] constexpr tr_block_span_t blockSpanForPiece(tr_piece_index_t piece) const
+    [[nodiscard]] constexpr auto totalSize() const noexcept
+    {
+        return total_size_;
+    }
+
+    [[nodiscard]] tr_block_span_t blockSpanForPiece(tr_piece_index_t piece) const noexcept
     {
         if (!isInitialized())
         {
@@ -66,11 +72,6 @@ struct tr_block_info
         }
 
         return { pieceLoc(piece).block, pieceLastLoc(piece).block + 1 };
-    }
-
-    [[nodiscard]] constexpr auto totalSize() const noexcept
-    {
-        return total_size;
     }
 
     struct Location
@@ -95,79 +96,23 @@ struct tr_block_info
     };
 
     // Location of the first byte in `block`.
-    [[nodiscard]] Location constexpr blockLoc(tr_block_index_t block) const
-    {
-        TR_ASSERT(block < n_blocks);
-
-        return byteLoc(uint64_t{ block } * BlockSize);
-    }
-
-    // Location of the last byte in `block`.
-    [[nodiscard]] Location constexpr blockLastLoc(tr_block_index_t block) const
-    {
-        if (!isInitialized())
-        {
-            return {};
-        }
-
-        return byteLoc(uint64_t{ block } * BlockSize + blockSize(block) - 1);
-    }
+    [[nodiscard]] Location blockLoc(tr_block_index_t block) const noexcept;
 
     // Location of the first byte (+ optional offset and length) in `piece`
-    [[nodiscard]] Location constexpr pieceLoc(tr_piece_index_t piece, uint32_t offset = 0, uint32_t length = 0) const
-    {
-        TR_ASSERT(piece < n_pieces);
-
-        return byteLoc(uint64_t{ piece } * pieceSize() + offset + length);
-    }
-
-    // Location of the last byte in `piece`.
-    [[nodiscard]] Location constexpr pieceLastLoc(tr_piece_index_t piece) const
-    {
-        if (!isInitialized())
-        {
-            return {};
-        }
-
-        return byteLoc(uint64_t{ piece } * pieceSize() + pieceSize(piece) - 1);
-    }
+    [[nodiscard]] Location pieceLoc(tr_piece_index_t piece, uint32_t offset = 0, uint32_t length = 0) const noexcept;
 
     // Location of the torrent's nth byte
-    [[nodiscard]] Location constexpr byteLoc(uint64_t byte_idx) const
-    {
-        TR_ASSERT(byte_idx <= total_size);
-
-        if (!isInitialized())
-        {
-            return {};
-        }
-
-        auto loc = Location{};
-
-        loc.byte = byte_idx;
-
-        if (byte_idx == totalSize()) // handle 0-byte files at the end of a torrent
-        {
-            loc.block = blockCount() - 1;
-            loc.piece = pieceCount() - 1;
-        }
-        else
-        {
-            loc.block = byte_idx / BlockSize;
-            loc.piece = byte_idx / pieceSize();
-        }
-
-        loc.block_offset = static_cast<uint32_t>(loc.byte - (uint64_t{ loc.block } * BlockSize));
-        loc.piece_offset = static_cast<uint32_t>(loc.byte - (uint64_t{ loc.piece } * pieceSize()));
-
-        return loc;
-    }
-
-    [[nodiscard]] static uint32_t bestBlockSize(uint64_t piece_size);
+    [[nodiscard]] Location byteLoc(uint64_t byte_idx) const noexcept;
 
 private:
+    // Location of the last byte in `piece`.
+    [[nodiscard]] Location pieceLastLoc(tr_piece_index_t piece) const
+    {
+        return byteLoc(static_cast<uint64_t>(piece) * pieceSize() + pieceSize(piece) - 1);
+    }
+
     [[nodiscard]] bool constexpr isInitialized() const noexcept
     {
-        return piece_size != 0;
+        return piece_size_ != 0;
     }
 };

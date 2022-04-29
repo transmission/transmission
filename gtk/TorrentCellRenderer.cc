@@ -126,7 +126,7 @@ std::string getShortTransferString(
     if (bool const have_down = have_meta && (st->peersSendingToUs > 0 || st->webseedsSendingToUs > 0); have_down)
     {
         return fmt::format(
-            _("{upload_speed} ▲ {download_speed} ▼"),
+            _("{download_speed} ▼  {upload_speed} ▲"),
             fmt::arg("upload_speed", tr_formatter_speed_KBps(uploadSpeed_KBps)),
             fmt::arg("download_speed", tr_formatter_speed_KBps(downloadSpeed_KBps)));
     }
@@ -350,7 +350,7 @@ namespace
 
 Glib::RefPtr<Gdk::Pixbuf> get_icon(tr_torrent const* tor, Gtk::IconSize icon_size, Gtk::Widget& for_widget)
 {
-    Glib::ustring mime_type;
+    auto mime_type = std::string_view{};
 
     if (auto const n_files = tr_torrentFileCount(tor); n_files == 0)
     {
@@ -364,7 +364,7 @@ Glib::RefPtr<Gdk::Pixbuf> get_icon(tr_torrent const* tor, Gtk::IconSize icon_siz
     {
         auto const* const name = tr_torrentFile(tor, 0).name;
 
-        mime_type = strchr(name, '/') != nullptr ? DirectoryMimeType : gtr_get_mime_type_from_filename(name);
+        mime_type = strchr(name, '/') != nullptr ? DirectoryMimeType : tr_get_mime_type_for_filename(name);
     }
 
     return gtr_get_mime_type_icon(mime_type, icon_size, for_widget);

@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <cstddef> // size_t
 #include <cstdint> // int64_t
 #include <ctime>
 #include <optional>

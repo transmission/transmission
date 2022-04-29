@@ -46,7 +46,6 @@ static bool verifyTorrent(tr_torrent* tor, bool const* stopFlag)
     auto sha = tr_sha1_init();
 
     tr_logAddDebugTor(tor, "verifying torrent...");
-    tor->verify_progress = 0;
 
     while (!*stopFlag && piece < tor->pieceCount())
     {
@@ -62,7 +61,7 @@ static bool verifyTorrent(tr_torrent* tor, bool const* stopFlag)
         if (file_pos == 0 && fd == TR_BAD_SYS_FILE && file_index != prev_file_index)
         {
             auto const found = tor->findFile(file_index);
-            fd = !found ? TR_BAD_SYS_FILE : tr_sys_file_open(found->filename, TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0);
+            fd = !found ? TR_BAD_SYS_FILE : tr_sys_file_open(found->filename(), TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0);
             prev_file_index = file_index;
         }
 
@@ -115,7 +114,7 @@ static bool verifyTorrent(tr_torrent* tor, bool const* stopFlag)
 
             sha = tr_sha1_init();
             ++piece;
-            tor->verify_progress = piece / double(tor->pieceCount());
+            tor->setVerifyProgress(piece / float(tor->pieceCount()));
             piece_pos = 0;
         }
 
@@ -139,7 +138,6 @@ static bool verifyTorrent(tr_torrent* tor, bool const* stopFlag)
         tr_sys_file_close(fd);
     }
 
-    tor->verify_progress.reset();
     tr_sha1_final(sha);
 
     /* stopwatch */

@@ -45,7 +45,7 @@ TEST_F(AnnouncerTest, parseHttpAnnounceResponseNoPeers)
     EXPECT_EQ(3, response.seeders);
     EXPECT_EQ(0, response.leechers);
     EXPECT_EQ(2, response.downloads);
-    EXPECT_EQ(*tr_address::from_string("1.2.3.4"), response.external_ip);
+    EXPECT_EQ(*tr_address::fromString("1.2.3.4"), response.external_ip);
     EXPECT_EQ(0U, std::size(response.pex));
     EXPECT_EQ(0U, std::size(response.pex6));
     EXPECT_EQ(""sv, response.errmsg);
@@ -81,7 +81,7 @@ TEST_F(AnnouncerTest, parseHttpAnnounceResponsePexCompact)
 
     if (std::size(response.pex) == 1)
     {
-        EXPECT_EQ("[127.0.0.1]:64551"sv, response.pex[0].to_string());
+        EXPECT_EQ("[127.0.0.1]:64551"sv, response.pex[0].readable());
     }
 }
 
@@ -120,7 +120,7 @@ TEST_F(AnnouncerTest, parseHttpAnnounceResponsePexList)
 
     if (std::size(response.pex) == 1)
     {
-        EXPECT_EQ("[8.8.4.4]:53"sv, response.pex[0].to_string());
+        EXPECT_EQ("[8.8.4.4]:53"sv, response.pex[0].readable());
     }
 }
 
