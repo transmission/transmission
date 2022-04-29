@@ -34,11 +34,9 @@
 
 #include "announcer.h"
 #include "bandwidth.h"
-#include "cache.h"
 #include "completion.h"
 #include "crypto-utils.h" /* for tr_sha1 */
 #include "error.h"
-#include "fdlimit.h" /* tr_fdTorrentClose */
 #include "file.h"
 #include "inout.h" /* tr_ioTestPiece() */
 #include "log.h"
@@ -837,8 +835,6 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
 
         if (!tor->hasMetainfo() && !doStart)
         {
-            tor->prefetchMagnetMetadata = true;
-
             auto opts = torrent_start_opts{};
             opts.bypass_queue = true;
             opts.has_local_data = has_local_data;
@@ -1094,30 +1090,30 @@ tr_stat const* tr_torrentStat(tr_torrent* tor)
 
     switch (s->activity)
     {
-    /* etaXLSpeed exists because if we use the piece speed directly,
+    /* etaSpeed exists because if we use the piece speed directly,
      * brief fluctuations cause the ETA to jump all over the place.
      * so, etaXLSpeed is a smoothed-out version of the piece speed
      * to dampen the effect of fluctuations */
     case TR_STATUS_DOWNLOAD:
-        if (tor->etaDLSpeedCalculatedAt + 800 < now)
+        if (tor->etaSpeedCalculatedAt + 800 < now)
         {
-            tor->etaDLSpeed_Bps = tor->etaDLSpeedCalculatedAt + 4000 < now ?
+            tor->etaSpeed_Bps = tor->etaSpeedCalculatedAt + 4000 < now ?
                 pieceDownloadSpeed_Bps : /* if no recent previous speed, no need to smooth */
-                (tor->etaDLSpeed_Bps * 4.0 + pieceDownloadSpeed_Bps) / 5.0; /* smooth across 5 readings */
-            tor->etaDLSpeedCalculatedAt = now;
+                (tor->etaSpeed_Bps * 4.0 + pieceDownloadSpeed_Bps) / 5.0; /* smooth across 5 readings */
+            tor->etaSpeedCalculatedAt = now;
         }
 
         if (s->leftUntilDone > s->desiredAvailable && tor->webseedCount() < 1)
         {
             s->eta = TR_ETA_NOT_AVAIL;
         }
-        else if (tor->etaDLSpeed_Bps == 0)
+        else if (tor->etaSpeed_Bps == 0)
         {
             s->eta = TR_ETA_UNKNOWN;
         }
         else
         {
-            s->eta = s->leftUntilDone / tor->etaDLSpeed_Bps;
+            s->eta = s->leftUntilDone / tor->etaSpeed_Bps;
         }
 
         s->etaIdle = TR_ETA_NOT_AVAIL;
@@ -1130,27 +1126,27 @@ tr_stat const* tr_torrentStat(tr_torrent* tor)
         }
         else
         {
-            if (tor->etaULSpeedCalculatedAt + 800 < now)
+            if (tor->etaSpeedCalculatedAt + 800 < now)
             {
-                tor->etaULSpeed_Bps = tor->etaULSpeedCalculatedAt + 4000 < now ?
+                tor->etaSpeed_Bps = tor->etaSpeedCalculatedAt + 4000 < now ?
                     pieceUploadSpeed_Bps : /* if no recent previous speed, no need to smooth */
-                    (tor->etaULSpeed_Bps * 4.0 + pieceUploadSpeed_Bps) / 5.0; /* smooth across 5 readings */
-                tor->etaULSpeedCalculatedAt = now;
+                    (tor->etaSpeed_Bps * 4.0 + pieceUploadSpeed_Bps) / 5.0; /* smooth across 5 readings */
+                tor->etaSpeedCalculatedAt = now;
             }
 
-            if (tor->etaULSpeed_Bps == 0)
+            if (tor->etaSpeed_Bps == 0)
             {
                 s->eta = TR_ETA_UNKNOWN;
             }
             else
             {
-                s->eta = seedRatioBytesLeft / tor->etaULSpeed_Bps;
+                s->eta = seedRatioBytesLeft / tor->etaSpeed_Bps;
             }
         }
 
         {
             auto seedIdleMinutes = uint16_t{};
-            s->etaIdle = tor->etaULSpeed_Bps < 1 && tr_torrentGetSeedIdle(tor, &seedIdleMinutes) ?
+            s->etaIdle = tor->etaSpeed_Bps < 1 && tr_torrentGetSeedIdle(tor, &seedIdleMinutes) ?
                 seedIdleMinutes * 60 - s->idleSecs :
                 TR_ETA_NOT_AVAIL;
         }
@@ -1561,9 +1557,8 @@ static void stopTorrent(tr_torrent* const tor)
     tr_verifyRemove(tor);
     tr_peerMgrStopTorrent(tor);
     tr_announcerTorrentStopped(tor);
-    tr_cacheFlushTorrent(tor->session->cache, tor);
 
-    tr_fdTorrentClose(tor->session, tor->uniqueId);
+    tor->session->closeTorrentFiles(tor);
 
     if (!tor->isDeleting)
     {
@@ -1594,7 +1589,6 @@ void tr_torrentStop(tr_torrent* tor)
 
     tor->isRunning = false;
     tor->isStopping = false;
-    tor->prefetchMagnetMetadata = false;
     tor->setDirty();
     tr_runInEventThread(tor->session, stopTorrent, tor);
 }
@@ -1645,8 +1639,7 @@ static void removeTorrentInEventThread(tr_torrent* tor, bool delete_flag, tr_fil
     if (delete_flag && tor->hasMetainfo())
     {
         // ensure the files are all closed and idle before moving
-        tr_cacheFlushTorrent(tor->session->cache, tor);
-        tr_fdTorrentClose(tor->session, tor->uniqueId);
+        tor->session->closeTorrentFiles(tor);
         tr_verifyRemove(tor);
 
         if (delete_func == nullptr)
@@ -1840,7 +1833,7 @@ void tr_torrent::recheckCompleteness()
         }
 
         this->completeness = new_completeness;
-        tr_fdTorrentClose(this->session, this->uniqueId);
+        this->session->closeTorrentFiles(this);
 
         if (this->isDone())
         {
@@ -2189,8 +2182,7 @@ static void setLocationInEventThread(
         }
 
         // ensure the files are all closed and idle before moving
-        tr_cacheFlushTorrent(tor->session->cache, tor);
-        tr_fdTorrentClose(tor->session, tor->uniqueId);
+        tor->session->closeTorrentFiles(tor);
         tr_verifyRemove(tor);
 
         tr_error* error = nullptr;
@@ -2296,8 +2288,7 @@ std::string_view tr_torrent::primaryMimeType() const
 static void tr_torrentFileCompleted(tr_torrent* tor, tr_file_index_t i)
 {
     /* close the file so that we can reopen in read-only mode as needed */
-    tr_cacheFlushFile(tor->session->cache, tor, i);
-    tr_fdFileClose(tor->session, tor, i);
+    tor->session->closeTorrentFile(tor, i);
 
     /* now that the file is complete and closed, we can start watching its
      * mtime timestamp for changes to know if we need to reverify pieces */

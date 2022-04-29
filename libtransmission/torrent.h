@@ -611,6 +611,11 @@ public:
     // TODO(ckerr): make private once some of torrent.cc's `tr_torrentFoo()` methods are member functions
     tr_completion completion;
 
+    // true iff the piece was verified more recently than any of the piece's
+    // files' mtimes (file_mtimes_). If checked_pieces_.test(piece) is false,
+    // it means that piece needs to be checked before its data is used.
+    tr_bitfield checked_pieces_ = tr_bitfield{ 0 };
+
     tr_file_piece_map fpm_ = tr_file_piece_map{ metainfo_ };
     tr_file_priorities file_priorities_{ &fpm_ };
     tr_files_wanted files_wanted_{ &fpm_ };
@@ -622,11 +627,6 @@ public:
 
     // when Transmission thinks the torrent's files were last changed
     std::vector<time_t> file_mtimes_;
-
-    // true iff the piece was verified more recently than any of the piece's
-    // files' mtimes (file_mtimes_). If checked_pieces_.test(piece) is false,
-    // it means that piece needs to be checked before its data is used.
-    tr_bitfield checked_pieces_ = tr_bitfield{ 0 };
 
     tr_sha1_digest_t obfuscated_hash = {};
 
@@ -688,8 +688,7 @@ public:
     uint64_t corruptCur = 0;
     uint64_t corruptPrev = 0;
 
-    uint64_t etaDLSpeedCalculatedAt = 0;
-    uint64_t etaULSpeedCalculatedAt = 0;
+    uint64_t etaSpeedCalculatedAt = 0;
 
     tr_interned_string error_announce_url;
 
@@ -706,8 +705,7 @@ public:
 
     tr_stat_errtype error = TR_STAT_OK;
 
-    unsigned int etaDLSpeed_Bps = 0;
-    unsigned int etaULSpeed_Bps = 0;
+    unsigned int etaSpeed_Bps = 0;
 
     int secondsDownloading = 0;
     int secondsSeeding = 0;
@@ -727,9 +725,6 @@ public:
 
     uint16_t idleLimitMinutes = 0;
 
-    bool dhtAnnounceInProgress = false;
-    bool dhtAnnounce6InProgress = false;
-
     bool finishedSeedingByIdle = false;
 
     bool isDeleting = false;
@@ -739,7 +734,6 @@ public:
     bool isStopping = false;
     bool startAfterVerify = false;
 
-    bool prefetchMagnetMetadata = false;
     bool magnetVerify = false;
 
 private:

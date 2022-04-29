@@ -96,7 +96,6 @@ public:
     [[nodiscard]] bool isValid() const;
 
 private:
-    std::vector<uint8_t> flags_;
     [[nodiscard]] size_t countFlags() const noexcept;
     [[nodiscard]] size_t countFlags(size_t begin, size_t end) const noexcept;
 
@@ -119,6 +118,8 @@ private:
     void rebuildTrueCount() noexcept;
     void incrementTrueCount(size_t inc) noexcept;
     void decrementTrueCount(size_t dec) noexcept;
+
+    std::vector<uint8_t> flags_;
 
     size_t bit_count_ = 0;
     size_t true_count_ = 0;

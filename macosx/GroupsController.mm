@@ -40,7 +40,21 @@ GroupsController* fGroupsInstance = nil;
         NSData* data;
         if ((data = [NSUserDefaults.standardUserDefaults dataForKey:@"GroupDicts"]))
         {
-            _fGroups = [NSKeyedUnarchiver unarchiveObjectWithData:data];
+            if (@available(macOS 10.13, *))
+            {
+                _fGroups = [NSKeyedUnarchiver unarchivedObjectOfClasses:[NSSet setWithObjects:NSMutableArray.class,
+                                                                                              NSMutableDictionary.class,
+                                                                                              NSNumber.class,
+                                                                                              NSColor.class,
+                                                                                              NSString.class,
+                                                                                              nil]
+                                                               fromData:data
+                                                                  error:nil];
+            }
+            else
+            {
+                _fGroups = [NSKeyedUnarchiver unarchiveObjectWithData:data];
+            }
         }
         else if ((data = [NSUserDefaults.standardUserDefaults dataForKey:@"Groups"])) //handle old groups
         {
@@ -48,7 +62,7 @@ GroupsController* fGroupsInstance = nil;
             [NSUserDefaults.standardUserDefaults removeObjectForKey:@"Groups"];
             [self saveGroups];
         }
-        else
+        if (_fGroups == nil)
         {
             //default groups
             NSMutableDictionary* red = [NSMutableDictionary

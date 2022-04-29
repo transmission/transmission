@@ -252,8 +252,8 @@ private:
         std::vector<tr_peerIo*>& peer_pool);
 
     mutable std::array<Band, 2> band_ = {};
-    Bandwidth* parent_ = nullptr;
     std::vector<Bandwidth*> children_;
+    Bandwidth* parent_ = nullptr;
     tr_peerIo* peer_ = nullptr;
     tr_priority_t priority_ = 0;
 };
