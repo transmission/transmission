@@ -113,8 +113,10 @@ Request arguments: `ids`, which specifies which torrents to use.
 All torrents are used if the `ids` argument is omitted.
 
 `ids` should be one of the following:
+
 1. an integer referring to a torrent id
-2. a list of torrent id numbers, SHA1 hash strings, or both
+2. a list of torrent id numbers, SHA1 hash strings (may be partial, as long as
+   each string matches a single torrent), or both
 3. a string, `recently-active`, for recently-active torrents
 
 Response arguments: none
