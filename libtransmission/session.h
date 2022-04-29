@@ -28,6 +28,7 @@
 #include "bandwidth.h"
 #include "interned-string.h"
 #include "net.h" // tr_socket_t
+#include "open-files.h"
 #include "quark.h"
 #include "torrents.h"
 #include "web.h"
@@ -335,6 +336,16 @@ public:
         }
     }
 
+    ///
+
+    [[nodiscard]] constexpr auto& openFiles() noexcept
+    {
+        return open_files_;
+    }
+
+    void closeTorrentFiles(tr_torrent* tor) noexcept;
+    void closeTorrentFile(tr_torrent* tor, tr_file_index_t file_num) noexcept;
+
 public:
     static constexpr std::array<std::tuple<tr_quark, tr_quark, TrScript>, 3> Scripts{
         { { TR_KEY_script_torrent_added_enabled, TR_KEY_script_torrent_added_filename, TR_SCRIPT_ON_TORRENT_ADDED },
@@ -372,8 +383,6 @@ public:
     bool speedLimitEnabled[2];
 
     struct tr_turtle_info turtle;
-
-    struct tr_fdInfo* fdInfo;
 
     int magicNumber;
 
@@ -525,6 +534,8 @@ private:
     std::array<bool, TR_SCRIPT_N_TYPES> scripts_enabled_;
     bool blocklist_enabled_ = false;
     bool incomplete_dir_enabled_ = false;
+
+    tr_open_files open_files_;
 };
 
 bool tr_sessionAllowsDHT(tr_session const* session);

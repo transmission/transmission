@@ -156,10 +156,10 @@ bool refreshFilesForeach(
     auto const old_progress = iter->get_value(file_cols.prog);
     auto const old_size = iter->get_value(file_cols.size);
 
-    bool new_enabled;
-    int new_priority;
-    int new_progress;
+    auto new_enabled = int{};
     auto new_have = old_have;
+    auto new_priority = int{};
+    auto new_progress = int{};
     auto new_size = old_size;
 
     if (is_file)
