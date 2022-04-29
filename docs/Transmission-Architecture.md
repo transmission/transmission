@@ -7,7 +7,7 @@ The core components and methods of control are shown below:
 ![Architecture](https://transmission.github.io/wiki-images/Transmission_Architecture.gif)
 
 From the above diagram it can be seen that a Transmission core may be controlled by the following:
- * _Local_ directly linked GUI (OS X, GTK+)
+ * _Local_ directly linked GUI (macOS, GTK+)
  * _Local_ or _remote_ Qt GUI
  * _Local_ or _remote_ command line utility
  * _Local_ or _remote_ Transmission web application running in a web browser
@@ -17,7 +17,7 @@ The multiple methods of controlling Transmission and the various native GUIs ava
 ![Products](https://transmission.github.io/wiki-images/Transmission_Products.gif)
 
 The products are:
- * Transmission desktop - OS X
+ * Transmission desktop - macOS
  * Transmission desktop - Windows, Linux/Qt
  * Transmission desktop - Linux/GTK+
  * Transmission daemon (headless)

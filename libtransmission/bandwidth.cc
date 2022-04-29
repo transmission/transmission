@@ -39,9 +39,9 @@ unsigned int Bandwidth::getSpeedBytesPerSecond(RateControl& r, unsigned int inte
         uint64_t bytes = 0;
         uint64_t const cutoff = now - interval_msec;
 
-        for (int i = r.newest_; r.transfers_[i].date_ > cutoff;)
+        for (int i = r.newest_; r.date_[i] > cutoff;)
         {
-            bytes += r.transfers_[i].size_;
+            bytes += r.size_[i];
 
             if (--i == -1)
             {
@@ -63,9 +63,9 @@ unsigned int Bandwidth::getSpeedBytesPerSecond(RateControl& r, unsigned int inte
 
 void Bandwidth::notifyBandwidthConsumedBytes(uint64_t const now, RateControl* r, size_t size)
 {
-    if (r->transfers_[r->newest_].date_ + GranularityMSec >= now)
+    if (r->date_[r->newest_] + GranularityMSec >= now)
     {
-        r->transfers_[r->newest_].size_ += size;
+        r->size_[r->newest_] += size;
     }
     else
     {
@@ -74,8 +74,8 @@ void Bandwidth::notifyBandwidthConsumedBytes(uint64_t const now, RateControl* r,
             r->newest_ = 0;
         }
 
-        r->transfers_[r->newest_].date_ = now;
-        r->transfers_[r->newest_].size_ = size;
+        r->date_[r->newest_] = now;
+        r->size_[r->newest_] = size;
     }
 
     /* invalidate cache_val*/

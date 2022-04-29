@@ -20,7 +20,7 @@ Copyright 2017 Endless Mobile, Inc.
     <p>
       Transmission is a BitTorrent client with an easy-to-use frontend on top a
       cross-platform backend.
-      Native frontends are available for OS X and Windows, as well as command line and
+      Native frontends are available for macOS and Windows, as well as command line and
       web frontends.
     </p>
     <p>

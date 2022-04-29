@@ -6,8 +6,8 @@ For this to be possible, it is required to be accessible from the Internet. Howe
 ## Open your local firewall
 To allow other peers to communicate with your Transmission instance, you have to forward a port through your firewall.
 
-### On Mac OS X
-Upon opening Transmission for the first time, a Mac OS X dialog box should appear asking if you will allow Transmission to receive incoming connections. Click Accept.
+### On macOS
+Upon opening Transmission for the first time, a macOS dialog box should appear asking if you will allow Transmission to receive incoming connections. Click Accept.
 
 If this does not happen, you can add Transmission to Leopard's firewall manually:
  1. Open System Prefs >> Security >> Firewall. Make sure "Set access for specific services and applications" is selected.
@@ -53,7 +53,7 @@ Most routers manufactured since 2001 have either the UPnP or NAT-PMP feature.
 
 ### Forward manually through a router
  1. Find out what your IP address is.
-  * *On Mac OS X*- Go to System Preferences >> Network, double-clicking on your connection (for instance, Built-in Ethernet), and clicking the TCP/IP tab. The address is probably something like 192.168.1.100, or 10.0.1.2. The IP of your router is here too.
+  * *On macOS*- Go to System Preferences >> Network, double-clicking on your connection (for instance, Built-in Ethernet), and clicking the TCP/IP tab. The address is probably something like 192.168.1.100, or 10.0.1.2. The IP of your router is here too.
   * *On Unix*- In Ubuntu, right click the Network Manager applet in the menu bar, and select 'Connection Information'. The address is probably something like 192.168.1.2, or 10.0.1.2.
    * If you don't have Network Manager, open a Terminal and type 'ifconfig'. It will list information for each of your network devices. Find the one you are using, and use the number after 'inet addr:'.
    * Using the command "ip a" will achieve the same results in a different format.
