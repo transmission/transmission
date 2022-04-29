@@ -350,7 +350,7 @@ if(NOT USE_SYSTEM_NATPMP)
     set(NATPMP_DEFINITIONS -DNATPMP_STATICLIB)
 endif()
 
-tr_add_external_auto_library(MINIUPNPC miniupnpc miniupnpc
+tr_add_external_auto_library(MINIUPNPC miniupnp/miniupnpc miniupnpc
     CMAKE_ARGS
         -DUPNPC_BUILD_STATIC=ON
         -DUPNPC_BUILD_SHARED=OFF
