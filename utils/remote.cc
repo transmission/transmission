@@ -2088,6 +2088,22 @@ static void filterIds(tr_variant* top)
                     include = !include;
                 }
                 break;
+            case 'w': // Not all torrent wanted
+                int64_t totalSize;
+                if (!tr_variantDictFindInt(d, TR_KEY_totalSize, &totalSize) || totalSize < 0)
+                {
+                    continue;
+                }
+                int64_t sizeWhenDone;
+                if (!tr_variantDictFindInt(d, TR_KEY_sizeWhenDone, &sizeWhenDone) || sizeWhenDone < 0)
+                {
+                    continue;
+                }
+                if (totalSize > sizeWhenDone)
+                {
+                    include = !include;
+                }
+                break;
             }
             if (include)
             {
