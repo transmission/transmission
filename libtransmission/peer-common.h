@@ -103,11 +103,11 @@ public:
        For BitTorrent peers, this is the app name derived from the `v' string in LTEP's handshake dictionary */
     tr_interned_string client;
 
-    tr_recentHistory blocksSentToClient;
-    tr_recentHistory blocksSentToPeer;
+    tr_recentHistory<uint16_t> blocksSentToClient;
+    tr_recentHistory<uint16_t> blocksSentToPeer;
 
-    tr_recentHistory cancelsSentToClient;
-    tr_recentHistory cancelsSentToPeer;
+    tr_recentHistory<uint16_t> cancelsSentToClient;
+    tr_recentHistory<uint16_t> cancelsSentToPeer;
 };
 
 /** Update the tr_peer.progress field based on the 'have' bitset. */
@@ -121,10 +121,10 @@ bool tr_peerIsSeed(tr_peer const* peer);
 
 struct tr_swarm_stats
 {
-    int activePeerCount[2];
-    int activeWebseedCount;
-    int peerCount;
-    int peerFromCount[TR_PEER_FROM__MAX];
+    uint16_t active_peer_count[2];
+    uint16_t active_webseed_count;
+    uint16_t peer_count;
+    uint16_t peer_from_count[TR_PEER_FROM__MAX];
 };
 
 void tr_swarmGetStats(tr_swarm const* swarm, tr_swarm_stats* setme);

@@ -1,6 +1,6 @@
 ## Locations
 
-### Mac OS X Defaults
+### macOS Defaults
 <table>
 <tr><th>What</th><th>Where</th></tr>
 <tr><td>Per-torrent settings</td><td><tt>$HOME/Library/Application Support/Transmission</tt></td></tr>

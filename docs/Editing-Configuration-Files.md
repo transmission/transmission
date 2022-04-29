@@ -55,7 +55,7 @@ Here is a sample of the three basic types: respectively Boolean, Number and Stri
  * **rename-partial-files:** Boolean (default = true) Postfix partially downloaded files with ".part".
  * **start-added-torrents:** Boolean (default = true) Start torrents as soon as they are added.
  * **trash-original-torrent-files:** Boolean (default = false) Delete torrents added from the watch directory.
- * **umask:** Number (default = 18) Sets transmission's file mode creation mask. See [the umask(2) manpage](https://developer.apple.com/documentation/Darwin/Reference/ManPages/man2/umask.2.html) for more information. Users who want their saved torrents to be world-writable may want to set this value to 0. Bear in mind that the JSON markup language only accepts numbers in base 10, so the standard umask(2) octal notation "022" is written in settings.json as 18.
+ * **umask:** String (default = "022") Sets Transmission's file mode creation mask. See [the umask(2) manpage](https://developer.apple.com/documentation/Darwin/Reference/ManPages/man2/umask.2.html) for more information. Users who want their saved torrents to be world-writable may want to set this value to "0".
  * **watch-dir:** String
  * **watch-dir-enabled:** Boolean (default = false) Watch a directory for torrent files and add them to transmission.
    _Note: When **watch-dir-enabled** is true, only the transmission-daemon, transmission-gtk, and transmission-qt applications will monitor **watch-dir** for new .torrent files and automatically load them._
@@ -68,7 +68,7 @@ Here is a sample of the three basic types: respectively Boolean, Number and Stri
  * **lpd-enabled:** Boolean (default = false) Enable [Local Peer Discovery (LPD)](https://en.wikipedia.org/wiki/Local_Peer_Discovery).
  * **message-level:** Number (0 = None, 1 = Error, 2 = Info, 3 = Debug, default = 2) Set verbosity of transmission messages.
  * **pex-enabled:** Boolean (default =  true) Enable [https://en.wikipedia.org/wiki/Peer_exchange Peer Exchange (PEX)].
- * **prefetch-enabled:** Boolean (default = true). When enabled, Transmission will hint to the OS which piece data it's about to read from disk in order to satisfy requests from peers. On Linux, this is done by passing `POSIX_FADV_WILLNEED` to [posix_fadvise()](https://www.kernel.org/doc/man-pages/online/pages/man2/posix_fadvise.2.html). On OS X, this is done by passing `F_RDADVISE` to [fcntl()](https://developer.apple.com/library/IOS/#documentation/System/Conceptual/ManPages_iPhoneOS/man2/fcntl.2.html). This defaults to false if configured with --enable-lightweight.
+ * **prefetch-enabled:** Boolean (default = true). When enabled, Transmission will hint to the OS which piece data it's about to read from disk in order to satisfy requests from peers. On Linux, this is done by passing `POSIX_FADV_WILLNEED` to [posix_fadvise()](https://www.kernel.org/doc/man-pages/online/pages/man2/posix_fadvise.2.html). On macOS, this is done by passing `F_RDADVISE` to [fcntl()](https://developer.apple.com/library/archive/documentation/System/Conceptual/ManPages_iPhoneOS/man2/fcntl.2.html). This defaults to false if configured with --enable-lightweight.
  * **scrape-paused-torrents-enabled:** Boolean (default = true)
  * **script-torrent-added-enabled:** Boolean (default = false) Run a script when a torrent is added to Transmission. Environmental variables are passed in as detailed on the [Scripts](./Scripts.md) page
  * **script-torrent-added-filename:** String (default = "") Path to script.
@@ -172,9 +172,9 @@ Only keys that differ from above are listed here. These options have been replac
 ##### [RPC](rpc-spec.md)
  * **rpc-access-control-list:** String (Comma-delimited list of IP addresses prefixed with "+" or "-". Wildcards allowed using '\*'. Example: "+127.0.0.\*,-192.168.\*.\*", Default:  "+127.0.0.1")
 
-## Mac OS X
+## macOS
 ### Overview
-Mac OS X has a standardized way of saving user preferences files using [XML](https://en.wikipedia.org/wiki/XML) format. These files are called [plist](https://en.wikipedia.org/wiki/Plist) (short for property list) files. Usually there is no need to modify these files directly, since Apple provided a [command-line tool](https://developer.apple.com/DOCUMENTATION/Darwin/Reference/ManPages/man1/defaults.1.html) to reliably change settings. You do need to restart Transmission before these have effect.
+macOS has a standardized way of saving user preferences files using [XML](https://en.wikipedia.org/wiki/XML) format. These files are called [plist](https://en.wikipedia.org/wiki/Plist) (short for property list) files. Usually there is no need to modify these files directly, since Apple provided a [command-line tool](https://developer.apple.com/DOCUMENTATION/Darwin/Reference/ManPages/man1/defaults.1.html) to reliably change settings. You do need to restart Transmission before these have effect.
 
 In short:
  * To set a key: `defaults write org.m0k.transmission <key> <value>`
