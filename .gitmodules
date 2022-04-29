@@ -18,6 +18,10 @@
 	path = third-party/libutp
 	url = https://github.com/transmission/libutp
 	branch = post-3.4-transmission
+[submodule "third-party/miniupnp"]
+	path = third-party/miniupnp
+	url = https://github.com/transmission/miniupnp.git
+	branch = post-2.3.0
 [submodule "third-party/googletest"]
 	path = third-party/googletest
 	url = https://github.com/google/googletest.git
