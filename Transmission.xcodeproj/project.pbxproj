@@ -3051,7 +3051,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "cd third-party/miniupnp/miniupnpc\ncp \"$SCRIPT_INPUT_FILE_1\" \"$SCRIPT_OUTPUT_FILE_0\"\nsh updateminiupnpcstrings.sh \"$SCRIPT_INPUT_FILE_0\" \"$SCRIPT_INPUT_FILE_1\" \"$SCRIPT_OUTPUT_FILE_0\"\n";
+			shellScript = "cd third-party/miniupnp/miniupnpc\nsh updateminiupnpcstrings.sh\nmv miniupnpcstrings.h src/miniupnpcstrings.h\n";
 		};
 		BE75C3510C729EE100DBEFE0 /* Copy libevent headers */ = {
 			isa = PBXShellScriptBuildPhase;
