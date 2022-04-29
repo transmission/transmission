@@ -9,8 +9,7 @@ NS_ASSUME_NONNULL_BEGIN
 // Compatibility declarations to build `@available(macOS 11.0, *)` code with older Xcode 11.3.1 (the last 32-bit OS compatible Xcode)
 #ifndef __MAC_11_0
 
-typedef NS_ENUM(NSInteger, NSImageSymbolScale)
-{
+typedef NS_ENUM(NSInteger, NSImageSymbolScale) {
     NSImageSymbolScaleLarge = 3,
 } API_AVAILABLE(macos(11.0));
 
@@ -19,8 +18,7 @@ typedef NS_ENUM(NSInteger, NSImageSymbolScale)
                           accessibilityDescription:(nullable NSString*)description API_AVAILABLE(macos(11.0));
 @end
 
-typedef NS_ENUM(NSInteger, NSWindowToolbarStyle)
-{
+typedef NS_ENUM(NSInteger, NSWindowToolbarStyle) {
     NSWindowToolbarStylePreference = 2,
 } API_AVAILABLE(macos(11.0));
 
@@ -28,8 +26,7 @@ typedef NS_ENUM(NSInteger, NSWindowToolbarStyle)
 @property NSWindowToolbarStyle toolbarStyle API_AVAILABLE(macos(11.0));
 @end
 
-typedef NS_ENUM(NSInteger, NSTableViewStyle)
-{
+typedef NS_ENUM(NSInteger, NSTableViewStyle) {
     NSTableViewStyleFullWidth = 1,
 } API_AVAILABLE(macos(11.0));
 

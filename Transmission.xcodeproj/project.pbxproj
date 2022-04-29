@@ -14,8 +14,6 @@
 		1BB44E07B1B52E28291B4E32 /* file-piece-map.cc in Sources */ = {isa = PBXBuildFile; fileRef = 1BB44E07B1B52E28291B4E30 /* file-piece-map.cc */; };
 		1BB44E07B1B52E28291B4E33 /* file-piece-map.h in Headers */ = {isa = PBXBuildFile; fileRef = 1BB44E07B1B52E28291B4E31 /* file-piece-map.h */; };
 		2856E0656A49F2665D69E760 /* benc.h in Headers */ = {isa = PBXBuildFile; fileRef = 2856E0656A49F2665D69E761 /* benc.h */; };
-		A47A7C87B8B57BE50DF0D410 /* torrent-files.cc in Sources */ = {isa = PBXBuildFile; fileRef = A47A7C87B8B57BE50DF0D411 /* torrent-files.cc */; };
-		A47A7C87B8B57BE50DF0D412 /* torrent-files.h in Headers */ = {isa = PBXBuildFile; fileRef = A47A7C87B8B57BE50DF0D413 /* torrent-files.h */; };
 		2B9BA6C508B488FE586A0AB0 /* torrents.cc in Sources */ = {isa = PBXBuildFile; fileRef = 2B9BA6C508B488FE586A0AB1 /* torrents.cc */; };
 		2B9BA6C508B488FE586A0AB2 /* torrents.h in Headers */ = {isa = PBXBuildFile; fileRef = 2B9BA6C508B488FE586A0AB3 /* torrents.h */; };
 		35F373030C2DA89000DAA8F2 /* FilePriorityCell.mm in Sources */ = {isa = PBXBuildFile; fileRef = 35F373010C2DA88F00DAA8F2 /* FilePriorityCell.mm */; };
@@ -272,6 +270,8 @@
 		A2F8CD430F3D0F4A00DB356A /* miniupnpcstrings.h in Headers */ = {isa = PBXBuildFile; fileRef = A2F8CD420F3D0F4A00DB356A /* miniupnpcstrings.h */; };
 		A2FB057F0BFEB6800095564D /* DragOverlayView.mm in Sources */ = {isa = PBXBuildFile; fileRef = A2FB057D0BFEB6800095564D /* DragOverlayView.mm */; };
 		A2FB701C0D95CAEA0001F331 /* GroupsController.mm in Sources */ = {isa = PBXBuildFile; fileRef = A2FB701B0D95CAEA0001F331 /* GroupsController.mm */; };
+		A47A7C87B8B57BE50DF0D410 /* torrent-files.cc in Sources */ = {isa = PBXBuildFile; fileRef = A47A7C87B8B57BE50DF0D411 /* torrent-files.cc */; };
+		A47A7C87B8B57BE50DF0D412 /* torrent-files.h in Headers */ = {isa = PBXBuildFile; fileRef = A47A7C87B8B57BE50DF0D413 /* torrent-files.h */; };
 		ACBE7A956ED89682EC4460E0 /* file-info.cc in Sources */ = {isa = PBXBuildFile; fileRef = ACBE7A956ED89682EC4460E1 /* file-info.cc */; };
 		ACBE7A956ED89682EC4460E2 /* file-info.h in Headers */ = {isa = PBXBuildFile; fileRef = ACBE7A956ED89682EC4460E3 /* file-info.h */; settings = {ATTRIBUTES = (Project, ); }; };
 		BE1183580CE160C50002D0F3 /* miniupnpc_declspec.h in Headers */ = {isa = PBXBuildFile; fileRef = BE11834E0CE160C50002D0F3 /* miniupnpc_declspec.h */; };
@@ -610,8 +610,6 @@
 		29B97325FDCFA39411CA2CEA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		2B9BA6C508B488FE586A0AB1 /* torrents.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = torrents.cc; sourceTree = "<group>"; };
 		2B9BA6C508B488FE586A0AB3 /* torrents.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = torrents.h; sourceTree = "<group>"; };
-		A47A7C87B8B57BE50DF0D411 /* torrent-files.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = torrent-files.cc; sourceTree = "<group>"; };
-		A47A7C87B8B57BE50DF0D413 /* torrent-files.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = torrent-files.h; sourceTree = "<group>"; };
 		32CA4F630368D1EE00C91783 /* Transmission_Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Transmission_Prefix.pch; sourceTree = "<group>"; };
 		35F373000C2DA88F00DAA8F2 /* FilePriorityCell.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FilePriorityCell.h; sourceTree = "<group>"; };
 		35F373010C2DA88F00DAA8F2 /* FilePriorityCell.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = FilePriorityCell.mm; sourceTree = "<group>"; };
@@ -1045,6 +1043,8 @@
 		A2FB07F115F8208300933543 /* nl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = nl; path = nl.lproj/Localizable.strings; sourceTree = "<group>"; };
 		A2FB701A0D95CAEA0001F331 /* GroupsController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GroupsController.h; sourceTree = "<group>"; };
 		A2FB701B0D95CAEA0001F331 /* GroupsController.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = GroupsController.mm; sourceTree = "<group>"; };
+		A47A7C87B8B57BE50DF0D411 /* torrent-files.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "torrent-files.cc"; sourceTree = "<group>"; };
+		A47A7C87B8B57BE50DF0D413 /* torrent-files.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "torrent-files.h"; sourceTree = "<group>"; };
 		A54D44C6A7AAF131D9AE29F5 /* block-info.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "block-info.cc"; sourceTree = "<group>"; };
 		ACBE7A956ED89682EC4460E1 /* file-info.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "file-info.cc"; sourceTree = "<group>"; };
 		ACBE7A956ED89682EC4460E3 /* file-info.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "file-info.h"; sourceTree = "<group>"; };
@@ -1089,8 +1089,8 @@
 		BEFC1E140C07861A00B0BB3C /* session.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = session.h; sourceTree = "<group>"; };
 		BEFC1E150C07861A00B0BB3C /* inout.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = inout.h; sourceTree = "<group>"; };
 		BEFC1E160C07861A00B0BB3C /* inout.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = inout.cc; sourceTree = "<group>"; };
-		BEFC1E190C07861A00B0BB3C /* open-files.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = open-files.h; sourceTree = "<group>"; };
-		BEFC1E1A0C07861A00B0BB3C /* open-files.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = open-files.cc; sourceTree = "<group>"; };
+		BEFC1E190C07861A00B0BB3C /* open-files.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "open-files.h"; sourceTree = "<group>"; };
+		BEFC1E1A0C07861A00B0BB3C /* open-files.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "open-files.cc"; sourceTree = "<group>"; };
 		BEFC1E1C0C07861A00B0BB3C /* completion.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = completion.h; sourceTree = "<group>"; };
 		BEFC1E1D0C07861A00B0BB3C /* completion.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = completion.cc; sourceTree = "<group>"; };
 		BEFC1E1E0C07861A00B0BB3C /* clients.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = clients.h; sourceTree = "<group>"; };
@@ -2931,7 +2931,7 @@
 				BEFC1E2F0C07861A00B0BB3C /* session.cc in Sources */,
 				BEFC1E320C07861A00B0BB3C /* torrent.cc in Sources */,
 				2B9BA6C508B488FE586A0AB0 /* torrents.cc in Sources */,
-				A47A7C87B8B57BE50DF0D410 /* torrent-files.cc */,
+				A47A7C87B8B57BE50DF0D410 /* torrent-files.cc in Sources */,
 				BEFC1E360C07861A00B0BB3C /* port-forwarding.cc in Sources */,
 				BEFC1E3C0C07861A00B0BB3C /* platform.cc in Sources */,
 				BEFC1E460C07861A00B0BB3C /* net.cc in Sources */,
