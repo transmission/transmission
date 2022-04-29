@@ -34,11 +34,9 @@
 
 #include "announcer.h"
 #include "bandwidth.h"
-#include "cache.h"
 #include "completion.h"
 #include "crypto-utils.h" /* for tr_sha1 */
 #include "error.h"
-#include "fdlimit.h" /* tr_fdTorrentClose */
 #include "file.h"
 #include "inout.h" /* tr_ioTestPiece() */
 #include "log.h"
@@ -1559,9 +1557,8 @@ static void stopTorrent(tr_torrent* const tor)
     tr_verifyRemove(tor);
     tr_peerMgrStopTorrent(tor);
     tr_announcerTorrentStopped(tor);
-    tr_cacheFlushTorrent(tor->session->cache, tor);
 
-    tr_fdTorrentClose(tor->session, tor->uniqueId);
+    tor->session->closeTorrentFiles(tor);
 
     if (!tor->isDeleting)
     {
@@ -1642,8 +1639,7 @@ static void removeTorrentInEventThread(tr_torrent* tor, bool delete_flag, tr_fil
     if (delete_flag && tor->hasMetainfo())
     {
         // ensure the files are all closed and idle before moving
-        tr_cacheFlushTorrent(tor->session->cache, tor);
-        tr_fdTorrentClose(tor->session, tor->uniqueId);
+        tor->session->closeTorrentFiles(tor);
         tr_verifyRemove(tor);
 
         if (delete_func == nullptr)
@@ -1837,7 +1833,7 @@ void tr_torrent::recheckCompleteness()
         }
 
         this->completeness = new_completeness;
-        tr_fdTorrentClose(this->session, this->uniqueId);
+        this->session->closeTorrentFiles(this);
 
         if (this->isDone())
         {
@@ -2186,8 +2182,7 @@ static void setLocationInEventThread(
         }
 
         // ensure the files are all closed and idle before moving
-        tr_cacheFlushTorrent(tor->session->cache, tor);
-        tr_fdTorrentClose(tor->session, tor->uniqueId);
+        tor->session->closeTorrentFiles(tor);
         tr_verifyRemove(tor);
 
         tr_error* error = nullptr;
@@ -2293,8 +2288,7 @@ std::string_view tr_torrent::primaryMimeType() const
 static void tr_torrentFileCompleted(tr_torrent* tor, tr_file_index_t i)
 {
     /* close the file so that we can reopen in read-only mode as needed */
-    tr_cacheFlushFile(tor->session->cache, tor, i);
-    tr_fdFileClose(tor->session, tor, i);
+    tor->session->closeTorrentFile(tor, i);
 
     /* now that the file is complete and closed, we can start watching its
      * mtime timestamp for changes to know if we need to reverify pieces */

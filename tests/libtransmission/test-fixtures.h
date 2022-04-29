@@ -244,6 +244,11 @@ protected:
         errno = tmperr;
     }
 
+    void createFileWithContents(std::string_view path, std::string_view payload) const
+    {
+        createFileWithContents(path, std::data(payload), std::size(payload));
+    }
+
     void createFileWithContents(std::string_view path, void const* payload) const
     {
         createFileWithContents(path, payload, strlen(static_cast<char const*>(payload)));
