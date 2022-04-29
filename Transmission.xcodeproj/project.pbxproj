@@ -434,6 +434,8 @@
 		C8B27BA328153F6300A22B5D /* create.cc in Sources */ = {isa = PBXBuildFile; fileRef = C887BEC02807FCE900867D3C /* create.cc */; };
 		C8B27BA428153F6600A22B5D /* edit.cc in Sources */ = {isa = PBXBuildFile; fileRef = C887BEC22807FCE900867D3C /* edit.cc */; };
 		C8B27BA528153F6900A22B5D /* show.cc in Sources */ = {isa = PBXBuildFile; fileRef = C887BEC32807FCE900867D3C /* show.cc */; };
+		C8ED0FB1281C10F100B44472 /* addr_is_reserved.c in Sources */ = {isa = PBXBuildFile; fileRef = C8ED0FAF281C10F100B44472 /* addr_is_reserved.c */; };
+		C8ED0FB2281C10F100B44472 /* addr_is_reserved.h in Headers */ = {isa = PBXBuildFile; fileRef = C8ED0FB0281C10F100B44472 /* addr_is_reserved.h */; };
 		CAB35C64252F6F5E00552A55 /* mime-types.h in Headers */ = {isa = PBXBuildFile; fileRef = CAB35C62252F6F5E00552A55 /* mime-types.h */; };
 		CCEBA596277340F6DF9F4480 /* session-alt-speeds.cc in Sources */ = {isa = PBXBuildFile; fileRef = CCEBA596277340F6DF9F4481 /* session-alt-speeds.cc */; };
 		CCEBA596277340F6DF9F4482 /* session-alt-speeds.h in Headers */ = {isa = PBXBuildFile; fileRef = CCEBA596277340F6DF9F4483 /* session-alt-speeds.h */; };
@@ -1347,6 +1349,8 @@
 		C8B27B7F28153F2B00A22B5D /* transmission-create */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "transmission-create"; sourceTree = BUILT_PRODUCTS_DIR; };
 		C8B27B9028153F3100A22B5D /* transmission-edit */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "transmission-edit"; sourceTree = BUILT_PRODUCTS_DIR; };
 		C8B27BA128153F3400A22B5D /* transmission-show */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "transmission-show"; sourceTree = BUILT_PRODUCTS_DIR; };
+		C8ED0FAF281C10F100B44472 /* addr_is_reserved.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = addr_is_reserved.c; sourceTree = "<group>"; };
+		C8ED0FB0281C10F100B44472 /* addr_is_reserved.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = addr_is_reserved.h; sourceTree = "<group>"; };
 		CAB35C62252F6F5E00552A55 /* mime-types.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 4; path = "mime-types.h"; sourceTree = "<group>"; };
 		CCEBA596277340F6DF9F4481 /* session-alt-speeds.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "session-alt-speeds.cc"; sourceTree = "<group>"; };
 		CCEBA596277340F6DF9F4483 /* session-alt-speeds.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; path = "session-alt-speeds.h"; sourceTree = "<group>"; };
@@ -2092,39 +2096,32 @@
 		BE1183410CE15DF00002D0F3 /* libminiupnp */ = {
 			isa = PBXGroup;
 			children = (
+				A2F8CD420F3D0F4A00DB356A /* miniupnpcstrings.h */,
+				C891A007281C02F3002E745F /* include */,
+				C8ED0FAF281C10F100B44472 /* addr_is_reserved.c */,
 				A22B00AE116A9E90003315FC /* connecthostport.c */,
 				BE1183610CE160D50002D0F3 /* igd_desc_parse.c */,
-				BE1183620CE160D50002D0F3 /* minixml.c */,
-				BE1183630CE160D50002D0F3 /* miniwget.c */,
-				BE1183640CE160D50002D0F3 /* minissdpc.c */,
 				BE1183650CE160D50002D0F3 /* minisoap.c */,
-				BE1183660CE160D50002D0F3 /* upnpreplyparse.c */,
-				BE1183670CE160D50002D0F3 /* upnpcommands.c */,
+				BE1183640CE160D50002D0F3 /* minissdpc.c */,
 				BE1183680CE160D50002D0F3 /* miniupnpc.c */,
+				BE1183630CE160D50002D0F3 /* miniwget.c */,
+				BE1183620CE160D50002D0F3 /* minixml.c */,
 				A20162CB13DE497000E15488 /* portlistingparse.c */,
 				A20162C713DE48BF00E15488 /* receivedata.c */,
+				BE1183670CE160D50002D0F3 /* upnpcommands.c */,
 				C1BF7BA71F2A3CB7008E88A7 /* upnpdev.c */,
 				C12F19771E1AE3C30005E93F /* upnperrors.c */,
-				A22B00AF116A9E90003315FC /* connecthostport.h */,
-				BE11834E0CE160C50002D0F3 /* miniupnpc_declspec.h */,
-				BE11834F0CE160C50002D0F3 /* igd_desc_parse.h */,
-				BE1183500CE160C50002D0F3 /* minixml.h */,
-				BE1183510CE160C50002D0F3 /* miniwget.h */,
-				BE1183520CE160C50002D0F3 /* minisoap.h */,
-				A2F8CD420F3D0F4A00DB356A /* miniupnpcstrings.h */,
-				A20162CF13DE49E500E15488 /* miniupnpctypes.h */,
-				BE1183530CE160C50002D0F3 /* upnpreplyparse.h */,
-				BE1183540CE160C50002D0F3 /* upnpcommands.h */,
-				BE1183550CE160C50002D0F3 /* miniupnpc.h */,
-				BE1183560CE160C50002D0F3 /* minissdpc.h */,
+				BE1183660CE160D50002D0F3 /* upnpreplyparse.c */,
+				C8ED0FB0281C10F100B44472 /* addr_is_reserved.h */,
 				A25485390EB66CBB004539DA /* codelength.h */,
-				A20162CC13DE497000E15488 /* portlistingparse.h */,
+				A22B00AF116A9E90003315FC /* connecthostport.h */,
+				BE1183520CE160C50002D0F3 /* minisoap.h */,
+				BE1183560CE160C50002D0F3 /* minissdpc.h */,
+				BE1183500CE160C50002D0F3 /* minixml.h */,
 				A20162C813DE48BF00E15488 /* receivedata.h */,
-				C1BF7BA91F2A3CCE008E88A7 /* upnpdev.h */,
-				C12F197A1E1AE4460005E93F /* upnperrors.h */,
 			);
 			name = libminiupnp;
-			path = "third-party/miniupnpc";
+			path = "third-party/miniupnp/miniupnpc/src";
 			sourceTree = "<group>";
 		};
 		BE75C3570C72A0D600DBEFE0 /* libevent */ = {
@@ -2278,6 +2275,24 @@
 			);
 			name = Compatibility;
 			sourceTree = "<group>";
+		};
+		C891A007281C02F3002E745F /* include */ = {
+			isa = PBXGroup;
+			children = (
+				BE11834F0CE160C50002D0F3 /* igd_desc_parse.h */,
+				BE11834E0CE160C50002D0F3 /* miniupnpc_declspec.h */,
+				BE1183550CE160C50002D0F3 /* miniupnpc.h */,
+				A20162CF13DE49E500E15488 /* miniupnpctypes.h */,
+				BE1183510CE160C50002D0F3 /* miniwget.h */,
+				A20162CC13DE497000E15488 /* portlistingparse.h */,
+				BE1183540CE160C50002D0F3 /* upnpcommands.h */,
+				C1BF7BA91F2A3CCE008E88A7 /* upnpdev.h */,
+				C12F197A1E1AE4460005E93F /* upnperrors.h */,
+				BE1183530CE160C50002D0F3 /* upnpreplyparse.h */,
+			);
+			name = include;
+			path = "third-party/miniupnp/miniupnpc/include";
+			sourceTree = SOURCE_ROOT;
 		};
 		E1B6FBF80C0D719B0015FE4D /* Info Window */ = {
 			isa = PBXGroup;
@@ -2470,6 +2485,7 @@
 				BE11835D0CE160C50002D0F3 /* upnpreplyparse.h in Headers */,
 				C1BF7BAA1F2A3CCE008E88A7 /* upnpdev.h in Headers */,
 				BE1183600CE160C50002D0F3 /* minissdpc.h in Headers */,
+				C8ED0FB2281C10F100B44472 /* addr_is_reserved.h in Headers */,
 				A254853C0EB66CD4004539DA /* codelength.h in Headers */,
 				A2F8CD430F3D0F4A00DB356A /* miniupnpcstrings.h in Headers */,
 				A22B00B2116A9E9F003315FC /* connecthostport.h in Headers */,
@@ -3027,15 +3043,15 @@
 			files = (
 			);
 			inputPaths = (
-				"third-party/miniupnpc/VERSION",
-				"third-party/miniupnpc/miniupnpcstrings.h.in",
+				"third-party/miniupnp/miniupnpc/VERSION",
+				"third-party/miniupnp/miniupnpc/miniupnpcstrings.h.in",
 			);
 			outputPaths = (
-				"third-party/miniupnpc/miniupnpcstrings.h",
+				"third-party/miniupnp/miniupnpc/src/miniupnpcstrings.h",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "cd third-party/miniupnpc\nsh updateminiupnpcstrings.sh \"$SCRIPT_INPUT_FILE_0\" \"$SCRIPT_INPUT_FILE_1\" \"$SCRIPT_OUTPUT_FILE_0\"\n";
+			shellScript = "cd third-party/miniupnp/miniupnpc\ncp \"$SCRIPT_INPUT_FILE_1\" \"$SCRIPT_OUTPUT_FILE_0\"\nsh updateminiupnpcstrings.sh \"$SCRIPT_INPUT_FILE_0\" \"$SCRIPT_INPUT_FILE_1\" \"$SCRIPT_OUTPUT_FILE_0\"\n";
 		};
 		BE75C3510C729EE100DBEFE0 /* Copy libevent headers */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -3067,7 +3083,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "cd third-party/miniupnpc && rm -f miniupnp && ln -s . miniupnp\n";
+			shellScript = "cd third-party/miniupnp && rm -f miniupnp && ln -s . miniupnp\n";
 		};
 		C12F197E1E1AE6D50005E93F /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -3340,6 +3356,7 @@
 				C12F19791E1AE3C30005E93F /* upnperrors.c in Sources */,
 				BE11836E0CE160D50002D0F3 /* upnpreplyparse.c in Sources */,
 				C1BF7BA81F2A3CB7008E88A7 /* upnpdev.c in Sources */,
+				C8ED0FB1281C10F100B44472 /* addr_is_reserved.c in Sources */,
 				BE11836F0CE160D50002D0F3 /* upnpcommands.c in Sources */,
 				BE1183700CE160D50002D0F3 /* miniupnpc.c in Sources */,
 				A22B00B3116A9EA4003315FC /* connecthostport.c in Sources */,
