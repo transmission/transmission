@@ -959,7 +959,7 @@ static bool popNextMetadataRequest(tr_peerMsgsImpl* msgs, int* piece)
 
 static void cancelAllRequestsToClient(tr_peerMsgsImpl* msgs)
 {
-    if (auto const must_send_cancel = tr_peerIoSupportsFEXT(msgs->io); must_send_cancel)
+    if (auto const must_send_rej = tr_peerIoSupportsFEXT(msgs->io); must_send_rej)
     {
         for (auto& req : msgs->peer_requested_)
         {
@@ -2197,7 +2197,7 @@ static size_t fillOutputBuffer(tr_peerMsgsImpl* msgs, time_t now)
 
     if (tr_peerIoGetWriteBufferSpace(msgs->io, now) >= tr_block_info::BlockSize && !std::empty(msgs->peer_requested_))
     {
-        req = msgs->peer_requested_.back();
+        req = msgs->peer_requested_.front();
         msgs->peer_requested_.erase(std::begin(msgs->peer_requested_));
 
         if (requestIsValid(msgs, &req) && msgs->torrent->hasPiece(req.index))
