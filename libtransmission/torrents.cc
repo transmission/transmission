@@ -9,6 +9,7 @@
 
 #include "transmission.h"
 
+#include "crypto-utils.h"
 #include "magnet-metainfo.h"
 #include "torrent.h"
 #include "torrents.h"
@@ -16,6 +17,21 @@
 
 namespace
 {
+struct CompareTorrentByHashLen
+{
+    bool operator()(std::string_view info_hash_prefix, tr_torrent* const tor) const
+    {
+        auto const n = std::size(info_hash_prefix);
+        auto const tor_info_hash_prefix = std::string_view{ tor->infoHashString() }.substr(0, n);
+        return info_hash_prefix < tor_info_hash_prefix;
+    }
+    bool operator()(tr_torrent* const tor, std::string_view info_hash_prefix) const
+    {
+        auto const n = std::size(info_hash_prefix);
+        auto const tor_info_hash_prefix = std::string_view{ tor->infoHashString() }.substr(0, n);
+        return tor_info_hash_prefix < info_hash_prefix;
+    }
+};
 
 struct CompareTorrentByHash
 {
@@ -59,10 +75,26 @@ tr_torrent* tr_torrents::get(int id)
     return tor;
 }
 
-tr_torrent* tr_torrents::get(std::string_view magnet_link)
+// str may be a hash string (in hex or benc encoding), or a magnet URL.
+tr_torrent* tr_torrents::get(std::string_view str)
 {
-    auto magnet = tr_magnet_metainfo{};
-    return magnet.parseMagnet(magnet_link) ? get(magnet.infoHash()) : nullptr;
+    if (auto magnet = tr_magnet_metainfo{}; magnet.parseMagnet(str))
+    {
+        return get(magnet.infoHash());
+    }
+    // Allow partial hash comparison
+    if (std::size(str) < 4 || std::size(str) >= TR_SHA1_DIGEST_STRLEN)
+    {
+        return nullptr;
+    }
+
+    if (!std::all_of(std::begin(str), std::end(str), [](unsigned char ch) { return isxdigit(ch); }))
+    {
+        return nullptr;
+    }
+
+    auto [begin, end] = std::equal_range(std::begin(by_hash_), std::end(by_hash_), str, CompareTorrentByHashLen{});
+    return begin == end ? nullptr : *begin;
 }
 
 tr_torrent* tr_torrents::get(tr_sha1_digest_t const& hash)
