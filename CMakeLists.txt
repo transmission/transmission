@@ -497,7 +497,7 @@ if(NOT USE_SYSTEM_NATPMP)
             NATPMP_STATICLIB)
 endif()
 
-tr_add_external_auto_library(MINIUPNPC miniupnpc miniupnpc
+tr_add_external_auto_library(MINIUPNPC miniupnp/miniupnpc miniupnpc
     TARGET miniupnpc::libminiupnpc
     CMAKE_ARGS
         -DUPNPC_BUILD_STATIC=ON
