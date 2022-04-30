@@ -10,8 +10,10 @@
 
 #import "NSStringAdditions.h"
 
-extern "C" OSStatus GeneratePreviewForURL(void* thisInterface, QLPreviewRequestRef preview, CFURLRef url, CFStringRef contentTypeUTI, CFDictionaryRef options);
-extern "C" void CancelPreviewGeneration(void* thisInterface, QLPreviewRequestRef preview);
+QL_EXTERN_C_BEGIN
+OSStatus GeneratePreviewForURL(void* thisInterface, QLPreviewRequestRef preview, CFURLRef url, CFStringRef contentTypeUTI, CFDictionaryRef options);
+void CancelPreviewGeneration(void* thisInterface, QLPreviewRequestRef preview);
+QL_EXTERN_C_END
 
 NSString* generateIconData(NSString* fileExtension, NSUInteger width, NSMutableDictionary* allImgProps)
 {

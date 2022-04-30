@@ -2,8 +2,10 @@
 #import <CoreFoundation/CFPlugInCOM.h>
 #import <QuickLook/QuickLook.h>
 
-extern "C" OSStatus GenerateThumbnailForURL(void* thisInterface, QLThumbnailRequestRef thumbnail, CFURLRef url, CFStringRef contentTypeUTI, CFDictionaryRef options, CGSize maxSize);
-extern "C" void CancelThumbnailGeneration(void* thisInterface, QLThumbnailRequestRef thumbnail);
+QL_EXTERN_C_BEGIN
+OSStatus GenerateThumbnailForURL(void* thisInterface, QLThumbnailRequestRef thumbnail, CFURLRef url, CFStringRef contentTypeUTI, CFDictionaryRef options, CGSize maxSize);
+void CancelThumbnailGeneration(void* thisInterface, QLThumbnailRequestRef thumbnail);
+QL_EXTERN_C_END
 
 /* -----------------------------------------------------------------------------
     Generate a thumbnail for file
