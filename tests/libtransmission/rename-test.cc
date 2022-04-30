@@ -10,6 +10,7 @@
 #include "resume.h"
 #include "torrent.h" // tr_isTorrent()
 #include "tr-assert.h"
+#include "tr-strbuf.h"
 #include "utils.h"
 #include "variant.h"
 
@@ -20,6 +21,7 @@
 #include <cstdio> // fopen()
 #include <cstring> // strcmp()
 #include <string>
+#include <string_view>
 
 using namespace std::literals;
 
@@ -46,22 +48,22 @@ protected:
 
     void createSingleFileTorrentContents(std::string_view top)
     {
-        auto const path = tr_strvPath(top, "hello-world.txt");
+        auto const path = tr_pathbuf{ top, "/hello-world.txt" };
         createFileWithContents(path, "hello, world!\n");
     }
 
     void createMultifileTorrentContents(std::string_view top)
     {
-        auto path = tr_strvPath(top, "Felidae", "Felinae", "Acinonyx", "Cheetah", "Chester");
+        auto path = tr_pathbuf{ top, "/Felidae/Felinae/Acinonyx/Cheetah/Chester"sv };
         createFileWithContents(path, "It ain't easy bein' cheesy.\n");
 
-        path = tr_strvPath(top, "Felidae", "Pantherinae", "Panthera", "Tiger", "Tony");
+        path.assign(top, "/Felidae/Pantherinae/Panthera/Tiger/Tony"sv);
         createFileWithContents(path, "They’re Grrrrreat!\n");
 
-        path = tr_strvPath(top, "Felidae", "Felinae", "Felis", "catus", "Kyphi");
+        path.assign(top, "/Felidae/Felinae/Felis/catus/Kyphi"sv);
         createFileWithContents(path, "Inquisitive\n");
 
-        path = tr_strvPath(top, "Felidae", "Felinae", "Felis", "catus", "Saffron");
+        path.assign(top, "/Felidae/Felinae/Felis/catus/Saffron"sv);
         createFileWithContents(path, "Tough\n");
 
         sync();
@@ -71,10 +73,10 @@ protected:
     {
         // create the torrent ctor
         auto const benc = tr_base64_decode(benc_base64);
-        EXPECT_LT(0, std::size(benc));
+        EXPECT_LT(0U, std::size(benc));
         tr_error* error = nullptr;
         EXPECT_TRUE(tr_ctorSetMetainfo(ctor, std::data(benc), std::size(benc), &error));
-        EXPECT_EQ(nullptr, error);
+        EXPECT_EQ(nullptr, error) << *error;
         tr_ctorSetPaused(ctor, TR_FORCE, true);
 
         // create the torrent
@@ -93,7 +95,7 @@ protected:
         auto* path = tr_torrentFindFile(tor, file_index);
         if (path != nullptr)
         {
-            EXPECT_TRUE(tr_sys_path_exists(path, nullptr));
+            EXPECT_TRUE(tr_sys_path_exists(path));
 
             size_t contents_len;
             uint8_t* contents = tr_loadFile(path, &contents_len, nullptr);
@@ -139,7 +141,6 @@ protected:
 
 TEST_F(RenameTest, singleFilenameTorrent)
 {
-    uint64_t loaded;
     static auto constexpr TotalSize = size_t{ 14 };
 
     // this is a single-file torrent whose file is hello-world.txt, holding the string "hello, world!"
@@ -192,35 +193,35 @@ TEST_F(RenameTest, singleFilenameTorrent)
     ****  Now try a rename that should succeed
     ***/
 
-    auto tmpstr = tr_strvPath(tor->currentDir().sv(), "hello-world.txt");
-    EXPECT_TRUE(tr_sys_path_exists(tmpstr.c_str(), nullptr));
+    auto tmpstr = tr_pathbuf{ tor->currentDir(), "/hello-world.txt" };
+    EXPECT_TRUE(tr_sys_path_exists(tmpstr));
     EXPECT_STREQ("hello-world.txt", tr_torrentName(tor));
     EXPECT_EQ(0, torrentRenameAndWait(tor, tr_torrentName(tor), "foobar"));
-    EXPECT_FALSE(tr_sys_path_exists(tmpstr.c_str(), nullptr)); // confirm the old filename can't be found
+    EXPECT_FALSE(tr_sys_path_exists(tmpstr)); // confirm the old filename can't be found
     EXPECT_STREQ("foobar", tr_torrentName(tor)); // confirm the torrent's name is now 'foobar'
     EXPECT_STREQ("foobar", tr_torrentFile(tor, 0).name); // confirm the file's name is now 'foobar'
     char* const torrent_filename = tr_torrentFilename(tor);
-    EXPECT_STREQ(nullptr, strstr(torrent_filename, "foobar")); // confirm .torrent file hasn't changed
+    EXPECT_STREQ(nullptr, strstr(torrent_filename, "foobar")); // confirm torrent file hasn't changed
     tr_free(torrent_filename);
-    tmpstr = tr_strvPath(tor->currentDir().sv(), "foobar");
-    EXPECT_TRUE(tr_sys_path_exists(tmpstr.c_str(), nullptr)); // confirm the file's name is now 'foobar' on the disk
+    tmpstr.assign(tor->currentDir(), "/foobar");
+    EXPECT_TRUE(tr_sys_path_exists(tmpstr)); // confirm the file's name is now 'foobar' on the disk
     EXPECT_TRUE(testFileExistsAndConsistsOfThisString(tor, 0, "hello, world!\n")); // confirm the contents are right
 
     // (while it's renamed: confirm that the .resume file remembers the changes)
-    tr_torrentSaveResume(tor);
+    tr_resume::save(tor);
     sync();
-    loaded = tr_torrentLoadResume(tor, ~0ULL, ctor, nullptr);
+    auto const loaded = tr_resume::load(tor, tr_resume::All, ctor, nullptr);
     EXPECT_STREQ("foobar", tr_torrentName(tor));
-    EXPECT_NE(decltype(loaded){ 0 }, (loaded & TR_FR_NAME));
+    EXPECT_NE(decltype(loaded){ 0 }, (loaded & tr_resume::Name));
 
     /***
     ****  ...and rename it back again
     ***/
 
-    tmpstr = tr_strvPath(tor->currentDir().sv(), "foobar");
-    EXPECT_TRUE(tr_sys_path_exists(tmpstr.c_str(), nullptr));
+    tmpstr.assign(tor->currentDir(), "/foobar");
+    EXPECT_TRUE(tr_sys_path_exists(tmpstr));
     EXPECT_EQ(0, torrentRenameAndWait(tor, "foobar", "hello-world.txt"));
-    EXPECT_FALSE(tr_sys_path_exists(tmpstr.c_str(), nullptr));
+    EXPECT_FALSE(tr_sys_path_exists(tmpstr));
     EXPECT_STREQ("hello-world.txt", tr_torrentName(tor));
     EXPECT_STREQ("hello-world.txt", tr_torrentFile(tor, 0).name);
     EXPECT_TRUE(testFileExistsAndConsistsOfThisString(tor, 0, "hello, world!\n"));
@@ -318,11 +319,11 @@ TEST_F(RenameTest, multifileTorrent)
     EXPECT_TRUE(testFileExistsAndConsistsOfThisString(tor, 2, expected_contents[2]));
 
     // (while the branch is renamed: confirm that the .resume file remembers the changes)
-    tr_torrentSaveResume(tor);
+    tr_resume::save(tor);
     // this is a bit dodgy code-wise, but let's make sure the .resume file got the name
     tor->setFileSubpath(1, "gabba gabba hey"sv);
-    auto const loaded = tr_torrentLoadResume(tor, ~0ULL, ctor, nullptr);
-    EXPECT_NE(decltype(loaded){ 0 }, (loaded & TR_FR_FILENAMES));
+    auto const loaded = tr_resume::load(tor, tr_resume::All, ctor, nullptr);
+    EXPECT_NE(decltype(loaded){ 0 }, (loaded & tr_resume::Filenames));
     EXPECT_EQ(expected_files[0], tr_torrentFile(tor, 0).name);
     EXPECT_STREQ("Felidae/Felinae/Felis/placeholder/Kyphi", tr_torrentFile(tor, 1).name);
     EXPECT_STREQ("Felidae/Felinae/Felis/placeholder/Saffron", tr_torrentFile(tor, 2).name);
@@ -344,14 +345,12 @@ TEST_F(RenameTest, multifileTorrent)
     // remove the directory Felidae/Felinae/Felis/catus
     str = tr_torrentFindFile(tor, 1);
     EXPECT_NE(nullptr, str);
-    tr_sys_path_remove(str, nullptr);
+    tr_sys_path_remove(str);
     tr_free(str);
     str = tr_torrentFindFile(tor, 2);
     EXPECT_NE(nullptr, str);
-    tr_sys_path_remove(str, nullptr);
-    auto* tmp = tr_sys_path_dirname(str, nullptr);
-    tr_sys_path_remove(tmp, nullptr);
-    tr_free(tmp);
+    tr_sys_path_remove(str);
+    tr_sys_path_remove(tr_sys_path_dirname(str).c_str());
     tr_free(str);
     sync();
     blockingTorrentVerify(tor);
@@ -461,15 +460,14 @@ TEST_F(RenameTest, partialFile)
     ****  create our test torrent with an incomplete .part file
     ***/
 
-    auto* tor = zeroTorrentInit();
+    auto* tor = zeroTorrentInit(ZeroTorrentState::Partial);
     EXPECT_EQ(TotalSize, tor->totalSize());
     EXPECT_EQ(PieceSize, tor->pieceSize());
     EXPECT_EQ(PieceCount, tor->pieceCount());
     EXPECT_EQ("files-filled-with-zeroes/1048576"sv, tor->fileSubpath(0));
     EXPECT_EQ("files-filled-with-zeroes/4096"sv, tor->fileSubpath(1));
     EXPECT_EQ("files-filled-with-zeroes/512"sv, tor->fileSubpath(2));
-
-    zeroTorrentPopulate(tor, false);
+    EXPECT_NE(0, tr_torrentFile(tor, 0).have);
     EXPECT_EQ(Length[0], tr_torrentFile(tor, 0).have + PieceSize);
     EXPECT_EQ(Length[1], tr_torrentFile(tor, 1).have);
     EXPECT_EQ(Length[2], tr_torrentFile(tor, 2).have);
@@ -497,7 +495,7 @@ TEST_F(RenameTest, partialFile)
 
     for (tr_file_index_t i = 0; i < 3; ++i)
     {
-        auto const expected = tr_strvPath(tor->currentDir().sv(), strings[i]);
+        auto const expected = tr_pathbuf{ tor->currentDir(), '/', strings[i] };
         char* path = tr_torrentFindFile(tor, i);
         EXPECT_EQ(expected, path);
         tr_free(path);

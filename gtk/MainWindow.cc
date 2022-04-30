@@ -1,7 +1,8 @@
-// This file Copyright © 2005-2021 Transmission authors and contributors.
+// This file Copyright © 2005-2022 Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
+#include <array>
 #include <string>
 
 #include <glibmm/i18n.h>
@@ -62,8 +63,8 @@ private:
 private:
     MainWindow& window_;
 
-    Gtk::RadioMenuItem* speedlimit_on_item_[2] = { nullptr, nullptr };
-    Gtk::RadioMenuItem* speedlimit_off_item_[2] = { nullptr, nullptr };
+    std::array<Gtk::RadioMenuItem*, 2> speedlimit_on_item_;
+    std::array<Gtk::RadioMenuItem*, 2> speedlimit_off_item_;
     Gtk::RadioMenuItem* ratio_on_item_ = nullptr;
     Gtk::RadioMenuItem* ratio_off_item_ = nullptr;
     Gtk::ScrolledWindow* scroll_ = nullptr;
@@ -220,17 +221,15 @@ void MainWindow::Impl::syncAltSpeedButton()
     bool const b = gtr_pref_flag_get(TR_KEY_alt_speed_enabled);
     char const* const stock = b ? "alt-speed-on" : "alt-speed-off";
 
-    auto const u = tr_formatter_speed_KBps(gtr_pref_int_get(TR_KEY_alt_speed_up));
-    auto const d = tr_formatter_speed_KBps(gtr_pref_int_get(TR_KEY_alt_speed_down));
-
-    auto const str = b ? gtr_sprintf(_("Click to disable Alternative Speed Limits\n (%1$s down, %2$s up)"), d, u) :
-                         gtr_sprintf(_("Click to enable Alternative Speed Limits\n (%1$s down, %2$s up)"), d, u);
-
     alt_speed_button_->set_active(b);
     alt_speed_image_->set_from_icon_name(stock, Gtk::BuiltinIconSize::ICON_SIZE_MENU);
     alt_speed_button_->set_halign(Gtk::ALIGN_CENTER);
     alt_speed_button_->set_valign(Gtk::ALIGN_CENTER);
-    alt_speed_button_->set_tooltip_text(str);
+    alt_speed_button_->set_tooltip_text(fmt::format(
+        b ? _("Click to disable Alternative Speed Limits\n ({download_speed} down, {upload_speed} up)") :
+            _("Click to enable Alternative Speed Limits\n ({download_speed} down, {upload_speed} up)"),
+        fmt::arg("download_speed", tr_formatter_speed_KBps(gtr_pref_int_get(TR_KEY_alt_speed_down))),
+        fmt::arg("upload_speed", tr_formatter_speed_KBps(gtr_pref_int_get(TR_KEY_alt_speed_up)))));
 }
 
 void MainWindow::Impl::alt_speed_toggled_cb()
@@ -267,8 +266,6 @@ void MainWindow::Impl::onSpeedSet(tr_direction dir, int KBps)
 
 Gtk::Menu* MainWindow::Impl::createSpeedMenu(tr_direction dir)
 {
-    static int const speeds_KBps[] = { 5, 10, 20, 30, 40, 50, 75, 100, 150, 200, 250, 500, 750 };
-
     auto* m = Gtk::make_managed<Gtk::Menu>();
     Gtk::RadioButtonGroup group;
 
@@ -283,10 +280,10 @@ Gtk::Menu* MainWindow::Impl::createSpeedMenu(tr_direction dir)
 
     m->append(*Gtk::make_managed<Gtk::SeparatorMenuItem>());
 
-    for (auto const speed : speeds_KBps)
+    for (auto const KBps : { 50, 100, 250, 500, 1000, 2500, 5000, 10000 })
     {
-        auto* w = Gtk::make_managed<Gtk::MenuItem>(tr_formatter_speed_KBps(speed));
-        w->signal_activate().connect([this, dir, speed]() { onSpeedSet(dir, speed); });
+        auto* w = Gtk::make_managed<Gtk::MenuItem>(tr_formatter_speed_KBps(KBps));
+        w->signal_activate().connect([this, dir, KBps]() { onSpeedSet(dir, KBps); });
         m->append(*w);
     }
 
@@ -383,7 +380,7 @@ void MainWindow::Impl::onOptionsClicked(Gtk::Button* button)
 
     gtr_label_set_text(
         *static_cast<Gtk::Label*>(ratio_on_item_->get_child()),
-        gtr_sprintf(_("Stop at Ratio (%s)"), tr_strlratio(gtr_pref_double_get(TR_KEY_ratio_limit))));
+        fmt::format(_("Stop at Ratio ({ratio})"), fmt::arg("ratio", tr_strlratio(gtr_pref_double_get(TR_KEY_ratio_limit)))));
 
     (gtr_pref_flag_get(TR_KEY_ratio_limit_enabled) ? ratio_on_item_ : ratio_off_item_)->set_active(true);
 
@@ -591,31 +588,28 @@ void MainWindow::Impl::updateStats()
     if (auto const pch = gtr_pref_string_get(TR_KEY_statusbar_stats); pch == "session-ratio")
     {
         tr_sessionGetStats(session, &stats);
-        buf = gtr_sprintf(_("Ratio: %s"), tr_strlratio(stats.ratio));
+        buf = fmt::format(_("Ratio: {ratio}"), fmt::arg("ratio", tr_strlratio(stats.ratio)));
     }
     else if (pch == "session-transfer")
     {
         tr_sessionGetStats(session, &stats);
-        /* Translators: "size|" is here for disambiguation. Please remove it from your translation.
-           %1$s is the size of the data we've downloaded
-           %2$s is the size of the data we've uploaded */
-        buf = gtr_sprintf(Q_("Down: %1$s, Up: %2$s"), tr_strlsize(stats.downloadedBytes), tr_strlsize(stats.uploadedBytes));
+        buf = fmt::format(
+            C_("current session totals", "Down: {downloaded_size}, Up: {uploaded_size}"),
+            fmt::arg("downloaded_size", tr_strlsize(stats.downloadedBytes)),
+            fmt::arg("uploaded_size", tr_strlsize(stats.uploadedBytes)));
     }
     else if (pch == "total-transfer")
     {
         tr_sessionGetCumulativeStats(session, &stats);
-        /* Translators: "size|" is here for disambiguation. Please remove it from your translation.
-           %1$s is the size of the data we've downloaded
-           %2$s is the size of the data we've uploaded */
-        buf = gtr_sprintf(
-            Q_("size|Down: %1$s, Up: %2$s"),
-            tr_strlsize(stats.downloadedBytes),
-            tr_strlsize(stats.uploadedBytes));
+        buf = fmt::format(
+            C_("all-time totals", "Down: {downloaded_size}, Up: {uploaded_size}"),
+            fmt::arg("downloaded_size", tr_strlsize(stats.downloadedBytes)),
+            fmt::arg("uploaded_size", tr_strlsize(stats.uploadedBytes)));
     }
     else /* default is total-ratio */
     {
         tr_sessionGetCumulativeStats(session, &stats);
-        buf = gtr_sprintf(_("Ratio: %s"), tr_strlratio(stats.ratio));
+        buf = fmt::format(_("Ratio: {ratio}"), fmt::arg("ratio", tr_strlratio(stats.ratio)));
     }
 
     stats_lb_->set_text(buf);
@@ -627,25 +621,25 @@ void MainWindow::Impl::updateSpeeds()
 
     if (session != nullptr)
     {
-        double upSpeed = 0;
-        double downSpeed = 0;
-        int upCount = 0;
-        int downCount = 0;
-        auto const model = core_->get_model();
+        auto dn_count = int{};
+        auto dn_speed = double{};
+        auto up_count = int{};
+        auto up_speed = double{};
 
+        auto const model = core_->get_model();
         for (auto const& row : model->children())
         {
-            upSpeed += row.get_value(torrent_cols.speed_up);
-            upCount += row.get_value(torrent_cols.active_peers_up);
-            downSpeed += row.get_value(torrent_cols.speed_down);
-            downCount += row.get_value(torrent_cols.active_peers_down);
+            dn_count += row.get_value(torrent_cols.active_peers_down);
+            dn_speed += row.get_value(torrent_cols.speed_down);
+            up_count += row.get_value(torrent_cols.active_peers_up);
+            up_speed += row.get_value(torrent_cols.speed_up);
         }
 
-        dl_lb_->set_text(gtr_sprintf("%s %s", tr_formatter_speed_KBps(downSpeed), gtr_get_unicode_string(GTR_UNICODE_DOWN)));
-        dl_lb_->set_visible(downCount > 0);
+        dl_lb_->set_text(fmt::format(_("{download_speed} ▼"), fmt::arg("download_speed", tr_formatter_speed_KBps(dn_speed))));
+        dl_lb_->set_visible(dn_count > 0);
 
-        ul_lb_->set_text(gtr_sprintf("%s %s", tr_formatter_speed_KBps(upSpeed), gtr_get_unicode_string(GTR_UNICODE_UP)));
-        ul_lb_->set_visible(downCount > 0 || upCount > 0);
+        ul_lb_->set_text(fmt::format(_("{upload_speed} ▲"), fmt::arg("upload_speed", tr_formatter_speed_KBps(up_speed))));
+        ul_lb_->set_visible(dn_count > 0 || up_count > 0);
     }
 }
 

@@ -1,5 +1,5 @@
 // This file Copyright © 2012-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -38,7 +38,7 @@ void FilterBarComboBoxDelegate::setSeparator(QAbstractItemModel* model, QModelIn
 {
     model->setData(index, QStringLiteral("separator"), Qt::AccessibleDescriptionRole);
 
-    if (auto* m = qobject_cast<QStandardItemModel*>(model))
+    if (auto const* const m = qobject_cast<QStandardItemModel*>(model))
     {
         if (QStandardItem* item = m->itemFromIndex(index))
         {
@@ -106,10 +106,10 @@ QSize FilterBarComboBoxDelegate::sizeHint(QStyleOptionViewItem const& option, QM
     if (isSeparator(index))
     {
         int const pm = combo_->style()->pixelMetric(QStyle::PM_DefaultFrameWidth, nullptr, combo_);
-        return QSize(pm, pm + 10);
+        return { pm, pm + 10 };
     }
 
-    QStyle* s = combo_->style();
+    QStyle const* const s = combo_->style();
     int const hmargin = getHSpacing(combo_);
 
     QSize size = QItemDelegate::sizeHint(option, index);

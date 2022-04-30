@@ -1,10 +1,10 @@
 // This file Copyright © 2013-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
 #undef _GNU_SOURCE
-#define _GNU_SOURCE
+#define _GNU_SOURCE // NOLINT
 
 #include <algorithm>
 #include <array>
@@ -12,19 +12,19 @@
 #include <climits> /* PATH_MAX */
 #include <cstdint> /* SIZE_MAX */
 #include <cstdio>
-#include <cstdlib>
 #include <cstring>
+#include <string_view>
+#include <string>
+#include <vector>
+
 #include <dirent.h>
 #include <fcntl.h> /* O_LARGEFILE, posix_fadvise(), [posix_]fallocate(), fcntl() */
 #include <libgen.h> /* basename(), dirname() */
-#include <string_view>
-#include <unistd.h> /* lseek(), write(), ftruncate(), pread(), pwrite(), pathconf(), etc */
-#include <vector>
-
 #include <sys/file.h> /* flock() */
 #include <sys/mman.h> /* mmap(), munmap() */
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <unistd.h> /* lseek(), write(), ftruncate(), pread(), pwrite(), pathconf(), etc */
 
 #ifdef HAVE_XFS_XFS_H
 #include <xfs/xfs.h>
@@ -51,11 +51,12 @@
 #define USE_COPY_FILE_RANGE
 #endif /* __linux__ */
 
+#include <fmt/format.h>
+
 #include "transmission.h"
 #include "error.h"
 #include "file.h"
 #include "log.h"
-#include "platform.h"
 #include "tr-assert.h"
 #include "utils.h"
 
@@ -176,7 +177,7 @@ static bool create_path_require_dir(char const* path, tr_error** error)
 
     if ((sb.st_mode & S_IFMT) != S_IFDIR)
     {
-        tr_error_set(error, ENOTDIR, tr_strvJoin("File is in the way: "sv, path));
+        tr_error_set(error, ENOTDIR, fmt::format(FMT_STRING("File is in the way: {:s}"), path));
         return false;
     }
 
@@ -266,7 +267,11 @@ FAILURE:
     TR_ASSERT(!ret);
     TR_ASSERT(my_error != nullptr);
 
-    tr_logAddError(_("Couldn't create \"%1$s\": %2$s"), path, my_error->message);
+    tr_logAddError(fmt::format(
+        _("Couldn't create '{path}': {error} ({error_code})"),
+        fmt::arg("path", path),
+        fmt::arg("error", my_error->message),
+        fmt::arg("error_code", my_error->code)));
     tr_error_propagate(error, &my_error);
 
 CLEANUP:
@@ -379,42 +384,30 @@ char* tr_sys_path_resolve(char const* path, tr_error** error)
     return ret;
 }
 
-char* tr_sys_path_basename(std::string_view path, tr_error** error)
+std::string tr_sys_path_basename(std::string_view path, tr_error** error)
 {
-    char* const tmp = tr_strvDup(path);
-    char* ret = basename(tmp);
+    auto tmp = std::string{ path };
 
-    if (ret != nullptr)
+    if (char const* ret = basename(std::data(tmp)); ret != nullptr)
     {
-        ret = tr_strdup(ret);
-    }
-    else
-    {
-        set_system_error(error, errno);
+        return ret;
     }
 
-    tr_free(tmp);
-
-    return ret;
+    set_system_error(error, errno);
+    return {};
 }
 
-char* tr_sys_path_dirname(std::string_view path, tr_error** error)
+std::string tr_sys_path_dirname(std::string_view path, tr_error** error)
 {
-    char* const tmp = tr_strvDup(path);
-    char* ret = dirname(tmp);
+    auto tmp = std::string{ path };
 
-    if (ret != nullptr)
+    if (char const* ret = dirname(std::data(tmp)); ret != nullptr)
     {
-        ret = tr_strdup(ret);
-    }
-    else
-    {
-        set_system_error(error, errno);
+        return ret;
     }
 
-    tr_free(tmp);
-
-    return ret;
+    set_system_error(error, errno);
+    return {};
 }
 
 bool tr_sys_path_rename(char const* src_path, char const* dst_path, tr_error** error)
@@ -463,7 +456,7 @@ bool tr_sys_path_copy(char const* src_path, char const* dst_path, tr_error** err
     if (!tr_sys_file_get_info(in, &info, error))
     {
         tr_error_prefix(error, "Unable to get information on source file: ");
-        tr_sys_file_close(in, nullptr);
+        tr_sys_file_close(in);
         return false;
     }
 
@@ -471,7 +464,7 @@ bool tr_sys_path_copy(char const* src_path, char const* dst_path, tr_error** err
     if (out == TR_BAD_SYS_FILE)
     {
         tr_error_prefix(error, "Unable to open destination file: ");
-        tr_sys_file_close(in, nullptr);
+        tr_sys_file_close(in);
         return false;
     }
 
@@ -537,8 +530,8 @@ bool tr_sys_path_copy(char const* src_path, char const* dst_path, tr_error** err
 #endif /* USE_COPY_FILE_RANGE || USE_SENDFILE64 */
 
     /* cleanup */
-    tr_sys_file_close(out, nullptr);
-    tr_sys_file_close(in, nullptr);
+    tr_sys_file_close(out);
+    tr_sys_file_close(in);
 
     if (file_size != 0)
     {
@@ -589,7 +582,7 @@ tr_sys_file_t tr_sys_file_get_std(tr_std_sys_file_t std_file, tr_error** error)
         break;
 
     default:
-        TR_ASSERT_MSG(false, "unknown standard file %d", (int)std_file);
+        TR_ASSERT_MSG(false, fmt::format(FMT_STRING("unknown standard file {:d}"), std_file));
         set_system_error(error, EINVAL);
     }
 
@@ -781,7 +774,7 @@ bool tr_sys_file_read_at(
 
     static_assert(sizeof(*bytes_read) >= sizeof(my_bytes_read));
 
-    if (my_bytes_read != -1)
+    if (my_bytes_read > 0)
     {
         if (bytes_read != nullptr)
         {
@@ -918,9 +911,7 @@ bool tr_sys_file_advise(
 
     TR_ASSERT(native_advice != POSIX_FADV_NORMAL);
 
-    int const code = posix_fadvise(handle, offset, size, native_advice);
-
-    if (code != 0)
+    if (int const code = posix_fadvise(handle, offset, size, native_advice); code != 0)
     {
         set_system_error(error, code);
         ret = false;
@@ -960,7 +951,7 @@ bool preallocate_fallocate64(tr_sys_file_t handle, uint64_t size)
 #ifdef HAVE_XFS_XFS_H
 bool full_preallocate_xfs(tr_sys_file_t handle, uint64_t size)
 {
-    if (!platform_test_xfs_fd(handle)) // true if on xfs filesystem
+    if (platform_test_xfs_fd(handle) == 0) // true if on xfs filesystem
     {
         return false;
     }
@@ -1053,8 +1044,7 @@ bool tr_sys_file_preallocate(tr_sys_file_t handle, uint64_t size, int flags, tr_
     {
         errno = 0;
 
-        auto const success = approach(handle, size);
-        if (success)
+        if (auto const success = approach(handle, size); success)
         {
             return success;
         }
@@ -1316,9 +1306,8 @@ char const* tr_sys_dir_read_name(tr_sys_dir_t handle, tr_error** error)
     char const* ret = nullptr;
 
     errno = 0;
-    struct dirent const* const entry = readdir((DIR*)handle);
 
-    if (entry != nullptr)
+    if (auto const* const entry = readdir((DIR*)handle); entry != nullptr)
     {
         ret = entry->d_name;
     }

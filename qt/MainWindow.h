@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <cstddef>
 #include <ctime>
 #include <memory>
 
@@ -52,7 +53,7 @@ class MainWindow : public QMainWindow
     TR_DISABLE_COPY_MOVE(MainWindow)
 
 public:
-    MainWindow(Session&, Prefs&, TorrentModel&, bool minized);
+    MainWindow(Session&, Prefs&, TorrentModel&, bool minimized);
 
     QSystemTrayIcon& trayIcon()
     {

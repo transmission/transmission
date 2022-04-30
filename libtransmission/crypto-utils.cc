@@ -1,5 +1,5 @@
 // This file Copyright © 2007-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -19,6 +19,8 @@ extern "C"
 #include <b64/cdecode.h>
 #include <b64/cencode.h>
 }
+
+#include <fmt/format.h>
 
 #include "transmission.h"
 #include "crypto-utils.h"
@@ -94,7 +96,7 @@ std::string tr_salt(std::string_view plaintext, std::string_view salt)
 
     // convert it to a string. string holds three parts:
     // DigestPrefix, stringified digest of plaintext + salt, and the salt.
-    return tr_strvJoin(SaltedPrefix, tr_sha1_to_string(*digest), salt);
+    return fmt::format(FMT_STRING("{:s}{:s}{:s}"), SaltedPrefix, tr_sha1_to_string(*digest), salt);
 }
 
 } // namespace
@@ -203,12 +205,6 @@ std::string tr_sha1_to_string(tr_sha1_digest_t const& digest)
     return str;
 }
 
-char* tr_sha1_to_string(tr_sha1_digest_t const& digest, char* strbuf)
-{
-    tr_binary_to_hex(std::data(digest), strbuf, std::size(digest));
-    return strbuf + (std::size(digest) * 2);
-}
-
 static void tr_hex_to_binary(char const* input, void* voutput, size_t byte_length)
 {
     static char constexpr Hex[] = "0123456789abcdef";
@@ -223,9 +219,17 @@ static void tr_hex_to_binary(char const* input, void* voutput, size_t byte_lengt
     }
 }
 
-tr_sha1_digest_t tr_sha1_from_string(std::string_view hex)
+std::optional<tr_sha1_digest_t> tr_sha1_from_string(std::string_view hex)
 {
-    TR_ASSERT(std::size(hex) == TR_SHA1_DIGEST_STRLEN);
+    if (std::size(hex) != TR_SHA1_DIGEST_STRLEN)
+    {
+        return {};
+    }
+
+    if (!std::all_of(std::begin(hex), std::end(hex), [](unsigned char ch) { return isxdigit(ch); }))
+    {
+        return {};
+    }
 
     auto digest = tr_sha1_digest_t{};
     tr_hex_to_binary(std::data(hex), std::data(digest), std::size(digest));

@@ -1,5 +1,5 @@
 // This file Copyright © 2009-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -59,12 +59,9 @@ char const* getUsage()
            "  transmission [OPTIONS...] [torrent files]";
 }
 
-enum
-{
-    STATS_REFRESH_INTERVAL_MSEC = 3000,
-    SESSION_REFRESH_INTERVAL_MSEC = 3000,
-    MODEL_REFRESH_INTERVAL_MSEC = 3000
-};
+auto constexpr StatsRefreshIntervalMsec = int{ 3000 };
+auto constexpr SessionRefreshIntervalMsec = int{ 3000 };
+auto constexpr ModelRefreshIntervalMsec = int{ 3000 };
 
 bool loadTranslation(QTranslator& translator, QString const& name, QLocale const& locale, QStringList const& search_directories)
 {
@@ -118,9 +115,9 @@ Application::Application(int& argc, char** argv)
 #endif
 
     // parse the command-line arguments
-    int c;
+    int c = 0;
     bool minimized = false;
-    char const* optarg;
+    char const* optarg = nullptr;
     QString host;
     QString port;
     QString username;
@@ -299,19 +296,19 @@ Application::Application(int& argc, char** argv)
     QTimer* timer = &model_timer_;
     connect(timer, &QTimer::timeout, this, &Application::refreshTorrents);
     timer->setSingleShot(false);
-    timer->setInterval(MODEL_REFRESH_INTERVAL_MSEC);
+    timer->setInterval(ModelRefreshIntervalMsec);
     timer->start();
 
     timer = &stats_timer_;
     connect(timer, &QTimer::timeout, session_.get(), &Session::refreshSessionStats);
     timer->setSingleShot(false);
-    timer->setInterval(STATS_REFRESH_INTERVAL_MSEC);
+    timer->setInterval(StatsRefreshIntervalMsec);
     timer->start();
 
     timer = &session_timer_;
     connect(timer, &QTimer::timeout, session_.get(), &Session::refreshSessionInfo);
     timer->setSingleShot(false);
-    timer->setInterval(SESSION_REFRESH_INTERVAL_MSEC);
+    timer->setInterval(SessionRefreshIntervalMsec);
     timer->start();
 
     maybeUpdateBlocklist();
@@ -605,9 +602,7 @@ void Application::raise() const
 bool Application::notifyApp(QString const& title, QString const& body, QStringList const& actions) const
 {
 #ifdef QT_DBUS_LIB
-    QDBusConnection bus = QDBusConnection::sessionBus();
-
-    if (bus.isConnected())
+    if (auto bus = QDBusConnection::sessionBus(); bus.isConnected())
     {
         QDBusMessage m = QDBusMessage::createMethodCall(
             fdo_notifications_service_name_,

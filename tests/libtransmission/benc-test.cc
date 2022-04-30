@@ -3,6 +3,8 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include <fmt/format.h>
+
 #include "transmission.h"
 
 #include "benc.h"
@@ -12,6 +14,26 @@
 
 using BencTest = ::testing::Test;
 using namespace std::literals;
+
+TEST_F(BencTest, MalformedBenc)
+{
+    // malformed benc seen in the wild. "119" length is incorrect.
+    auto constexpr Benc =
+        "d14:failure reason119:The tracker was unable to process your request. It may be down, overloaded, under attack or it just does not like you.12:min intervali1800e8:intervali1800e5:peers0:ee\n"sv;
+    auto constexpr MaxBencDepth = 8;
+    using TestHandler = transmission::benc::BasicHandler<MaxBencDepth>;
+
+    auto stack = transmission::benc::ParserStack<MaxBencDepth>{};
+    auto handler = TestHandler{};
+    tr_error* error = nullptr;
+    EXPECT_FALSE(transmission::benc::parse(Benc, stack, handler, nullptr, &error));
+    EXPECT_NE(nullptr, error);
+    if (error != nullptr)
+    {
+        EXPECT_NE(nullptr, error->message);
+    }
+    tr_error_clear(&error);
+}
 
 TEST_F(BencTest, ContextTokenIsCorrect)
 {
@@ -62,15 +84,13 @@ TEST_F(BencTest, ContextTokenIsCorrect)
 
         bool Int64(int64_t value, Context const& context) override
         {
-            auto const expected = tr_strvJoin("i"sv, std::to_string(value), "e"sv);
-            EXPECT_EQ(expected, context.raw());
+            EXPECT_EQ(fmt::format(FMT_STRING("i{:d}e"), value), context.raw());
             return true;
         }
 
         bool String(std::string_view value, Context const& context) override
         {
-            auto const key = tr_strvJoin(std::to_string(std::size(value)), ":"sv, value);
-            EXPECT_EQ(key, context.raw());
+            EXPECT_EQ(fmt::format(FMT_STRING("{:d}:{:s}"), std::size(value), value), context.raw());
             return true;
         }
     };

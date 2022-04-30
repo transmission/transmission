@@ -5,14 +5,19 @@
 
 #pragma once
 
+#include <cstddef>
 #include <ctime>
 #include <functional>
 #include <string>
+#include <vector>
 
 #include <sys/types.h>
 
 #include <glibmm.h>
 #include <gtkmm.h>
+
+#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/tr-macros.h>
@@ -35,18 +40,15 @@ extern char const* const speed_M_str;
 extern char const* const speed_G_str;
 extern char const* const speed_T_str;
 
-enum
+enum class GtrUnicode
 {
-    GTR_UNICODE_UP,
-    GTR_UNICODE_DOWN,
-    GTR_UNICODE_INF,
-    GTR_UNICODE_BULLET
+    Up,
+    Down,
+    Inf,
+    Bullet
 };
 
-Glib::ustring gtr_get_unicode_string(int);
-
-/* return a percent formatted string of either x.xx, xx.x or xxx */
-Glib::ustring tr_strlpercent(double x);
+Glib::ustring gtr_get_unicode_string(GtrUnicode);
 
 /* return a human-readable string for the size given in bytes. */
 Glib::ustring tr_strlsize(guint64 size);
@@ -56,17 +58,6 @@ Glib::ustring tr_strlratio(double ratio);
 
 /* return a human-readable string for the time given in seconds. */
 Glib::ustring tr_strltime(time_t secs);
-
-/***
-****
-***/
-
-/* http://www.legaltorrents.com/some/announce/url --> legaltorrents.com */
-Glib::ustring gtr_get_host_from_url(Glib::ustring const& url);
-
-bool gtr_is_magnet_link(Glib::ustring const& str);
-
-bool gtr_is_hex_hashcode(std::string const& str);
 
 /***
 ****
@@ -212,6 +203,16 @@ struct std::hash<Glib::ustring>
     std::size_t operator()(Glib::ustring const& s) const
     {
         return std::hash<std::string>()(s.raw());
+    }
+};
+
+template<>
+struct fmt::formatter<Glib::ustring> : formatter<std::string>
+{
+    template<typename FormatContext>
+    auto format(Glib::ustring const& ustr, FormatContext& ctx) const
+    {
+        return formatter<std::string>::format(ustr.raw(), ctx);
     }
 };
 

@@ -1,5 +1,5 @@
 // This file Copyright © 2021-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -151,7 +151,7 @@ std::vector<tr_block_index_t> ActiveRequests::remove(tr_peer const* peer)
     auto const key = peer_at{ const_cast<tr_peer*>(peer), 0 };
     for (auto const& [block, peers_at] : impl_->blocks_)
     {
-        if (peers_at.count(key))
+        if (peers_at.count(key) != 0U)
         {
             removed.push_back(block);
         }
@@ -182,7 +182,7 @@ std::vector<tr_peer*> ActiveRequests::remove(tr_block_index_t block)
         impl_->blocks_.erase(block);
     }
 
-    for (auto* peer : removed)
+    for (auto const* const peer : removed)
     {
         impl_->decCount(peer);
     }
@@ -194,7 +194,7 @@ std::vector<tr_peer*> ActiveRequests::remove(tr_block_index_t block)
 bool ActiveRequests::has(tr_block_index_t block, tr_peer const* peer) const
 {
     auto const it = impl_->blocks_.find(block);
-    return it != std::end(impl_->blocks_) && it->second.count(peer_at{ const_cast<tr_peer*>(peer), 0 });
+    return it != std::end(impl_->blocks_) && (it->second.count(peer_at{ const_cast<tr_peer*>(peer), 0 }) != 0U);
 }
 
 // count how many peers we're asking for `block`
@@ -221,7 +221,7 @@ std::vector<std::pair<tr_block_index_t, tr_peer*>> ActiveRequests::sentBefore(ti
     auto sent_before = std::vector<std::pair<tr_block_index_t, tr_peer*>>{};
     sent_before.reserve(std::size(impl_->blocks_));
 
-    for (auto& [block, peers_at] : impl_->blocks_)
+    for (auto const& [block, peers_at] : impl_->blocks_)
     {
         for (auto const& sent : peers_at)
         {

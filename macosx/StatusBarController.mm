@@ -21,6 +21,17 @@ typedef NS_ENUM(unsigned int, statusTag) {
 
 @interface StatusBarController ()
 
+@property(nonatomic) IBOutlet NSButton* fStatusButton;
+@property(nonatomic) IBOutlet NSTextField* fTotalDLField;
+@property(nonatomic) IBOutlet NSTextField* fTotalULField;
+@property(nonatomic) IBOutlet NSImageView* fTotalDLImageView;
+@property(nonatomic) IBOutlet NSImageView* fTotalULImageView;
+
+@property(nonatomic, readonly) tr_session* fLib;
+
+@property(nonatomic) CGFloat fPreviousDownloadRate;
+@property(nonatomic) CGFloat fPreviousUploadRate;
+
 - (void)resizeStatusButton;
 
 @end
@@ -31,10 +42,10 @@ typedef NS_ENUM(unsigned int, statusTag) {
 {
     if ((self = [super initWithNibName:@"StatusBar" bundle:nil]))
     {
-        fLib = lib;
+        _fLib = lib;
 
-        fPreviousDownloadRate = -1.0;
-        fPreviousUploadRate = -1.0;
+        _fPreviousDownloadRate = -1.0;
+        _fPreviousUploadRate = -1.0;
     }
 
     return self;
@@ -43,16 +54,16 @@ typedef NS_ENUM(unsigned int, statusTag) {
 - (void)awakeFromNib
 {
     //localize menu items
-    [fStatusButton.menu itemWithTag:STATUS_RATIO_TOTAL_TAG].title = NSLocalizedString(@"Total Ratio", "Status Bar -> status menu");
-    [fStatusButton.menu itemWithTag:STATUS_RATIO_SESSION_TAG].title = NSLocalizedString(@"Session Ratio", "Status Bar -> status menu");
-    [fStatusButton.menu itemWithTag:STATUS_TRANSFER_TOTAL_TAG].title = NSLocalizedString(@"Total Transfer", "Status Bar -> status menu");
-    [fStatusButton.menu itemWithTag:STATUS_TRANSFER_SESSION_TAG].title = NSLocalizedString(@"Session Transfer", "Status Bar -> status menu");
+    [self.fStatusButton.menu itemWithTag:STATUS_RATIO_TOTAL_TAG].title = NSLocalizedString(@"Total Ratio", "Status Bar -> status menu");
+    [self.fStatusButton.menu itemWithTag:STATUS_RATIO_SESSION_TAG].title = NSLocalizedString(@"Session Ratio", "Status Bar -> status menu");
+    [self.fStatusButton.menu itemWithTag:STATUS_TRANSFER_TOTAL_TAG].title = NSLocalizedString(@"Total Transfer", "Status Bar -> status menu");
+    [self.fStatusButton.menu itemWithTag:STATUS_TRANSFER_SESSION_TAG].title = NSLocalizedString(@"Session Transfer", "Status Bar -> status menu");
 
-    fStatusButton.cell.backgroundStyle = NSBackgroundStyleRaised;
-    fTotalDLField.cell.backgroundStyle = NSBackgroundStyleRaised;
-    fTotalULField.cell.backgroundStyle = NSBackgroundStyleRaised;
-    fTotalDLImageView.cell.backgroundStyle = NSBackgroundStyleRaised;
-    fTotalULImageView.cell.backgroundStyle = NSBackgroundStyleRaised;
+    self.fStatusButton.cell.backgroundStyle = NSBackgroundStyleRaised;
+    self.fTotalDLField.cell.backgroundStyle = NSBackgroundStyleRaised;
+    self.fTotalULField.cell.backgroundStyle = NSBackgroundStyleRaised;
+    self.fTotalDLImageView.cell.backgroundStyle = NSBackgroundStyleRaised;
+    self.fTotalULImageView.cell.backgroundStyle = NSBackgroundStyleRaised;
 
     [self updateSpeedFieldsToolTips];
 
@@ -72,16 +83,16 @@ typedef NS_ENUM(unsigned int, statusTag) {
 - (void)updateWithDownload:(CGFloat)dlRate upload:(CGFloat)ulRate
 {
     //set rates
-    if (dlRate != fPreviousDownloadRate)
+    if (dlRate != self.fPreviousDownloadRate)
     {
-        fTotalDLField.stringValue = [NSString stringForSpeed:dlRate];
-        fPreviousDownloadRate = dlRate;
+        self.fTotalDLField.stringValue = [NSString stringForSpeed:dlRate];
+        self.fPreviousDownloadRate = dlRate;
     }
 
-    if (ulRate != fPreviousUploadRate)
+    if (ulRate != self.fPreviousUploadRate)
     {
-        fTotalULField.stringValue = [NSString stringForSpeed:ulRate];
-        fPreviousUploadRate = ulRate;
+        self.fTotalULField.stringValue = [NSString stringForSpeed:ulRate];
+        self.fPreviousUploadRate = ulRate;
     }
 
     //set status button text
@@ -92,11 +103,11 @@ typedef NS_ENUM(unsigned int, statusTag) {
         tr_session_stats stats;
         if (total)
         {
-            tr_sessionGetCumulativeStats(fLib, &stats);
+            tr_sessionGetCumulativeStats(self.fLib, &stats);
         }
         else
         {
-            tr_sessionGetStats(fLib, &stats);
+            tr_sessionGetStats(self.fLib, &stats);
         }
 
         statusString = [NSLocalizedString(@"Ratio", "status bar -> status label")
@@ -109,11 +120,11 @@ typedef NS_ENUM(unsigned int, statusTag) {
         tr_session_stats stats;
         if (total)
         {
-            tr_sessionGetCumulativeStats(fLib, &stats);
+            tr_sessionGetCumulativeStats(self.fLib, &stats);
         }
         else
         {
-            tr_sessionGetStats(fLib, &stats);
+            tr_sessionGetStats(self.fLib, &stats);
         }
 
         statusString = [NSString stringWithFormat:@"%@: %@  %@: %@",
@@ -123,9 +134,9 @@ typedef NS_ENUM(unsigned int, statusTag) {
                                                   [NSString stringForFileSize:stats.uploadedBytes]];
     }
 
-    if (![fStatusButton.title isEqualToString:statusString])
+    if (![self.fStatusButton.title isEqualToString:statusString])
     {
-        fStatusButton.title = statusString;
+        self.fStatusButton.title = statusString;
         [self resizeStatusButton];
     }
 }
@@ -196,8 +207,8 @@ typedef NS_ENUM(unsigned int, statusTag) {
     uploadText = [NSLocalizedString(@"Global upload limit", "Status Bar -> speed tooltip") stringByAppendingFormat:@": %@", uploadText];
     downloadText = [NSLocalizedString(@"Global download limit", "Status Bar -> speed tooltip") stringByAppendingFormat:@": %@", downloadText];
 
-    fTotalULField.toolTip = uploadText;
-    fTotalDLField.toolTip = downloadText;
+    self.fTotalULField.toolTip = uploadText;
+    self.fTotalDLField.toolTip = downloadText;
 }
 
 - (BOOL)validateMenuItem:(NSMenuItem*)menuItem
@@ -227,30 +238,32 @@ typedef NS_ENUM(unsigned int, statusTag) {
             statusLabel = STATUS_RATIO_TOTAL;
         }
 
-        menuItem.state = [statusLabel isEqualToString:[NSUserDefaults.standardUserDefaults stringForKey:@"StatusLabel"]]
-                             ? NSControlStateValueOn
-                             : NSControlStateValueOff;
+        menuItem.state = [statusLabel isEqualToString:[NSUserDefaults.standardUserDefaults stringForKey:@"StatusLabel"]] ?
+            NSControlStateValueOn :
+            NSControlStateValueOff;
         return YES;
     }
 
     return YES;
 }
 
+#pragma mark - Private
+
 - (void)resizeStatusButton
 {
-    [fStatusButton sizeToFit];
+    [self.fStatusButton sizeToFit];
 
     //width ends up being too long
-    NSRect statusFrame = fStatusButton.frame;
+    NSRect statusFrame = self.fStatusButton.frame;
     statusFrame.size.width -= 25.0;
 
-    CGFloat const difference = NSMaxX(statusFrame) + 5.0 - NSMinX(fTotalDLImageView.frame);
+    CGFloat const difference = NSMaxX(statusFrame) + 5.0 - NSMinX(self.fTotalDLImageView.frame);
     if (difference > 0.0)
     {
         statusFrame.size.width -= difference;
     }
 
-    fStatusButton.frame = statusFrame;
+    self.fStatusButton.frame = statusFrame;
 }
 
 @end

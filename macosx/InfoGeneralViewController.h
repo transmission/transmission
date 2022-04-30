@@ -7,36 +7,8 @@
 #import "InfoViewController.h"
 
 @interface InfoGeneralViewController : NSViewController<InfoViewController>
-{
-    NSArray* fTorrents;
 
-    BOOL fSet;
-
-    IBOutlet NSTextField* fPiecesField;
-    IBOutlet NSTextField* fHashField;
-    IBOutlet NSTextField* fSecureField;
-    IBOutlet NSTextField* fDataLocationField;
-    IBOutlet NSTextField* fCreatorField;
-    IBOutlet NSTextField* fDateCreatedField;
-
-    IBOutlet NSTextView* fCommentView;
-
-    IBOutlet NSButton* fRevealDataButton;
-
-    //remove when we switch to auto layout on 10.7
-    IBOutlet NSTextField* fPiecesLabel;
-    IBOutlet NSTextField* fHashLabel;
-    IBOutlet NSTextField* fSecureLabel;
-    IBOutlet NSTextField* fCreatorLabel;
-    IBOutlet NSTextField* fDateCreatedLabel;
-    IBOutlet NSTextField* fCommentLabel;
-    IBOutlet NSTextField* fDataLocationLabel;
-    IBOutlet NSTextField* fInfoSectionLabel;
-    IBOutlet NSTextField* fWhereSectionLabel;
-    IBOutlet NSScrollView* fCommentScrollView;
-}
-
-- (void)setInfoForTorrents:(NSArray*)torrents;
+- (void)setInfoForTorrents:(NSArray<Torrent*>*)torrents;
 - (void)updateInfo;
 
 - (void)revealDataFile:(id)sender;

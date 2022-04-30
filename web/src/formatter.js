@@ -1,5 +1,5 @@
 /* @license This file Copyright (C) 2020-2022 Mnemosyne LLC.
-   It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+   It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
    or any future license endorsed by Mnemosyne LLC.
    License text can be found in the licenses/ folder. */
 
@@ -9,19 +9,45 @@ const number_format = new Intl.NumberFormat(current_locale);
 
 const kilo = 1000;
 const mem_formatters = [
-  new Intl.NumberFormat(current_locale, { style: 'unit', unit: 'byte' }),
-  new Intl.NumberFormat(current_locale, { style: 'unit', unit: 'kilobyte' }),
-  new Intl.NumberFormat(current_locale, { style: 'unit', unit: 'megabyte' }),
-  new Intl.NumberFormat(current_locale, { style: 'unit', unit: 'gigabyte' }),
-  new Intl.NumberFormat(current_locale, { style: 'unit', unit: 'terabyte' }),
-  new Intl.NumberFormat(current_locale, { style: 'unit', unit: 'petabyte' }),
+  new Intl.NumberFormat(current_locale, {
+    maximumFractionDigits: 0,
+    style: 'unit',
+    unit: 'byte',
+  }),
+  new Intl.NumberFormat(current_locale, {
+    maximumFractionDigits: 0,
+    style: 'unit',
+    unit: 'kilobyte',
+  }),
+  new Intl.NumberFormat(current_locale, {
+    maximumFractionDigits: 0,
+    style: 'unit',
+    unit: 'megabyte',
+  }),
+  new Intl.NumberFormat(current_locale, {
+    maximumFractionDigits: 2,
+    style: 'unit',
+    unit: 'gigabyte',
+  }),
+  new Intl.NumberFormat(current_locale, {
+    maximumFractionDigits: 2,
+    style: 'unit',
+    unit: 'terabyte',
+  }),
+  new Intl.NumberFormat(current_locale, {
+    maximumFractionDigits: 2,
+    style: 'unit',
+    unit: 'petabyte',
+  }),
 ];
 
 const fmt_kBps = new Intl.NumberFormat(current_locale, {
+  maximumFractionDigits: 2,
   style: 'unit',
   unit: 'kilobyte-per-second',
 });
 const fmt_MBps = new Intl.NumberFormat(current_locale, {
+  maximumFractionDigits: 2,
   style: 'unit',
   unit: 'megabyte-per-second',
 });
@@ -51,7 +77,7 @@ export const Formatter = {
     let size = bytes;
     for (const nf of mem_formatters) {
       if (size < kilo) {
-        return nf.format(Math.floor(size));
+        return nf.format(size);
       }
       size /= kilo;
     }

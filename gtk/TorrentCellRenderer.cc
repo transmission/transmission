@@ -1,14 +1,18 @@
 // This file Copyright © 2007-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
 #include <climits> /* INT_MAX */
 #include <cstring> // strchr()
 #include <memory>
+#include <optional>
+#include <string>
 
 #include <glibmm.h>
 #include <glibmm/i18n.h>
+
+#include <fmt/core.h>
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/utils.h> /* tr_truncd() */
@@ -33,7 +37,7 @@ auto const SmallScale = 0.9;
 auto const CompactIconSize = Gtk::ICON_SIZE_MENU;
 auto const FullIconSize = Gtk::ICON_SIZE_DND;
 
-Glib::ustring getProgressString(tr_torrent const* tor, uint64_t total_size, tr_stat const* st)
+auto getProgressString(tr_torrent const* tor, uint64_t total_size, tr_stat const* st)
 {
     Glib::ustring gstr;
 
@@ -43,81 +47,56 @@ Glib::ustring getProgressString(tr_torrent const* tor, uint64_t total_size, tr_s
     double seedRatio;
     bool const hasSeedRatio = tr_torrentGetSeedRatio(tor, &seedRatio);
 
-    if (!isDone) /* downloading */
+    if (!isDone) // downloading
     {
-        gstr += gtr_sprintf(
-            /* %1$s is how much we've got,
-               %2$s is how much we'll have when done,
-               %3$s%% is a percentage of the two */
-            _("%1$s of %2$s (%3$s%%)"),
-            tr_strlsize(haveTotal),
-            tr_strlsize(st->sizeWhenDone),
-            tr_strlpercent(st->percentDone * 100.0));
+        // 50 MB of 200 MB (25%)
+        gstr += fmt::format(
+            _("{current_size} of {complete_size} ({percent_done}%)"),
+            fmt::arg("current_size", tr_strlsize(haveTotal)),
+            fmt::arg("complete_size", tr_strlsize(st->sizeWhenDone)),
+            fmt::arg("percent_done", tr_strpercent(st->percentDone * 100.0)));
     }
-    else if (!isSeed) /* partial seeds */
+    else if (!isSeed && hasSeedRatio) // partial seed, seed ratio
     {
-        if (hasSeedRatio)
-        {
-            gstr += gtr_sprintf(
-                /* %1$s is how much we've got,
-                   %2$s is the torrent's total size,
-                   %3$s%% is a percentage of the two,
-                   %4$s is how much we've uploaded,
-                   %5$s is our upload-to-download ratio,
-                   %6$s is the ratio we want to reach before we stop uploading */
-                _("%1$s of %2$s (%3$s%%), uploaded %4$s (Ratio: %5$s Goal: %6$s)"),
-                tr_strlsize(haveTotal),
-                tr_strlsize(total_size),
-                tr_strlpercent(st->percentComplete * 100.0),
-                tr_strlsize(st->uploadedEver),
-                tr_strlratio(st->ratio),
-                tr_strlratio(seedRatio));
-        }
-        else
-        {
-            gstr += gtr_sprintf(
-                /* %1$s is how much we've got,
-                   %2$s is the torrent's total size,
-                   %3$s%% is a percentage of the two,
-                   %4$s is how much we've uploaded,
-                   %5$s is our upload-to-download ratio */
-                _("%1$s of %2$s (%3$s%%), uploaded %4$s (Ratio: %5$s)"),
-                tr_strlsize(haveTotal),
-                tr_strlsize(total_size),
-                tr_strlpercent(st->percentComplete * 100.0),
-                tr_strlsize(st->uploadedEver),
-                tr_strlratio(st->ratio));
-        }
+        // 50 MB of 200 MB (25%), uploaded 30 MB (Ratio: X%, Goal: Y%)
+        gstr += fmt::format(
+            _("{current_size} of {complete_size} ({percent_complete}%), uploaded {uploaded_size} (Ratio: {ratio}, Goal: {seed_ratio})"),
+            fmt::arg("current_size", tr_strlsize(haveTotal)),
+            fmt::arg("complete_size", tr_strlsize(total_size)),
+            fmt::arg("percent_complete", tr_strpercent(st->percentComplete * 100.0)),
+            fmt::arg("uploaded_size", tr_strlsize(st->uploadedEver)),
+            fmt::arg("ratio", tr_strlratio(st->ratio)),
+            fmt::arg("seed_ratio", tr_strlratio(seedRatio)));
     }
-    else /* seeding */
+    else if (!isSeed) // partial seed, no seed ratio
     {
-        if (hasSeedRatio)
-        {
-            gstr += gtr_sprintf(
-                /* %1$s is the torrent's total size,
-                   %2$s is how much we've uploaded,
-                   %3$s is our upload-to-download ratio,
-                   %4$s is the ratio we want to reach before we stop uploading */
-                _("%1$s, uploaded %2$s (Ratio: %3$s Goal: %4$s)"),
-                tr_strlsize(total_size),
-                tr_strlsize(st->uploadedEver),
-                tr_strlratio(st->ratio),
-                tr_strlratio(seedRatio));
-        }
-        else /* seeding w/o a ratio */
-        {
-            gstr += gtr_sprintf(
-                /* %1$s is the torrent's total size,
-                   %2$s is how much we've uploaded,
-                   %3$s is our upload-to-download ratio */
-                _("%1$s, uploaded %2$s (Ratio: %3$s)"),
-                tr_strlsize(total_size),
-                tr_strlsize(st->uploadedEver),
-                tr_strlratio(st->ratio));
-        }
+        gstr += fmt::format(
+            _("{current_size} of {complete_size} ({percent_complete}%), uploaded {uploaded_size} (Ratio: {ratio})"),
+            fmt::arg("current_size", tr_strlsize(haveTotal)),
+            fmt::arg("complete_size", tr_strlsize(total_size)),
+            fmt::arg("percent_complete", tr_strpercent(st->percentComplete * 100.0)),
+            fmt::arg("uploaded_size", tr_strlsize(st->uploadedEver)),
+            fmt::arg("ratio", tr_strlratio(st->ratio)));
+    }
+    else if (hasSeedRatio) // seed, seed ratio
+    {
+        gstr += fmt::format(
+            _("{complete_size}, uploaded {uploaded_size} (Ratio: {ratio}, Goal: {seed_ratio})"),
+            fmt::arg("complete_size", tr_strlsize(total_size)),
+            fmt::arg("uploaded_size", tr_strlsize(st->uploadedEver)),
+            fmt::arg("ratio", tr_strlratio(st->ratio)),
+            fmt::arg("seed_ratio", tr_strlratio(seedRatio)));
+    }
+    else // seed, no seed ratio
+    {
+        gstr += fmt::format(
+            _("{complete_size}, uploaded {uploaded_size} (Ratio: {ratio})"),
+            fmt::arg("complete_size", tr_strlsize(total_size)),
+            fmt::arg("uploaded_size", tr_strlsize(st->uploadedEver)),
+            fmt::arg("ratio", tr_strlratio(st->ratio)));
     }
 
-    /* add time when downloading */
+    // add time remaining when applicable
     if (st->activity == TR_STATUS_DOWNLOAD || (hasSeedRatio && st->activity == TR_STATUS_SEED))
     {
         int const eta = st->eta;
@@ -129,194 +108,186 @@ Glib::ustring getProgressString(tr_torrent const* tor, uint64_t total_size, tr_s
         }
         else
         {
-            /* time remaining */
-            gstr += gtr_sprintf(_("%s remaining"), tr_strltime(eta));
+            gstr += fmt::format(_("{time_span} remaining"), fmt::arg("time_span", tr_strltime(eta)));
         }
     }
 
     return gstr;
 }
 
-Glib::ustring getShortTransferString(
-    tr_torrent const* tor,
-    tr_stat const* st,
+std::string getShortTransferString(
+    tr_torrent const* const tor,
+    tr_stat const* const st,
     double uploadSpeed_KBps,
     double downloadSpeed_KBps)
 {
-    Glib::ustring buf;
+    bool const have_meta = tr_torrentHasMetadata(tor);
 
-    bool const haveMeta = tr_torrentHasMetadata(tor);
-    bool const haveUp = haveMeta && st->peersGettingFromUs > 0;
-    bool const haveDown = haveMeta && (st->peersSendingToUs > 0 || st->webseedsSendingToUs > 0);
-
-    if (haveDown)
+    if (bool const have_down = have_meta && (st->peersSendingToUs > 0 || st->webseedsSendingToUs > 0); have_down)
     {
-        /* down speed, down symbol, up speed, up symbol */
-        buf += gtr_sprintf(
-            _("%1$s %2$s  %3$s %4$s"),
-            tr_formatter_speed_KBps(downloadSpeed_KBps),
-            gtr_get_unicode_string(GTR_UNICODE_DOWN),
-            tr_formatter_speed_KBps(uploadSpeed_KBps),
-            gtr_get_unicode_string(GTR_UNICODE_UP));
-    }
-    else if (haveUp)
-    {
-        /* up speed, up symbol */
-        buf += gtr_sprintf(_("%1$s  %2$s"), tr_formatter_speed_KBps(uploadSpeed_KBps), gtr_get_unicode_string(GTR_UNICODE_UP));
-    }
-    else if (st->isStalled)
-    {
-        buf += _("Stalled");
+        return fmt::format(
+            _("{download_speed} ▼  {upload_speed} ▲"),
+            fmt::arg("upload_speed", tr_formatter_speed_KBps(uploadSpeed_KBps)),
+            fmt::arg("download_speed", tr_formatter_speed_KBps(downloadSpeed_KBps)));
     }
 
-    return buf;
+    if (bool const have_up = have_meta && st->peersGettingFromUs > 0; have_up)
+    {
+        return fmt::format(_("{upload_speed} ▲"), fmt::arg("upload_speed", tr_formatter_speed_KBps(downloadSpeed_KBps)));
+    }
+
+    if (st->isStalled)
+    {
+        return _("Stalled");
+    }
+
+    return {};
 }
 
-Glib::ustring getShortStatusString(tr_torrent const* tor, tr_stat const* st, double uploadSpeed_KBps, double downloadSpeed_KBps)
+std::string getShortStatusString(
+    tr_torrent const* const tor,
+    tr_stat const* const st,
+    double uploadSpeed_KBps,
+    double downloadSpeed_KBps)
 {
-    Glib::ustring gstr;
-
     switch (st->activity)
     {
     case TR_STATUS_STOPPED:
-        gstr += st->finished ? _("Finished") : _("Paused");
-        break;
+        return st->finished ? _("Finished") : _("Paused");
 
     case TR_STATUS_CHECK_WAIT:
-        gstr += _("Queued for verification");
-        break;
+        return _("Queued for verification");
 
     case TR_STATUS_DOWNLOAD_WAIT:
-        gstr += _("Queued for download");
-        break;
+        return _("Queued for download");
 
     case TR_STATUS_SEED_WAIT:
-        gstr += _("Queued for seeding");
-        break;
+        return _("Queued for seeding");
 
     case TR_STATUS_CHECK:
-        gstr += gtr_sprintf(_("Verifying local data (%.1f%% tested)"), tr_truncd(st->recheckProgress * 100.0, 1));
-        break;
+        return fmt::format(
+            _("Verifying local data ({percent_done}% tested)"),
+            fmt::arg("percent_done", tr_truncd(st->recheckProgress * 100.0, 1)));
 
     case TR_STATUS_DOWNLOAD:
     case TR_STATUS_SEED:
-        {
-            /* download/upload speed, ratio */
-            gstr += gtr_sprintf("%s  ", getShortTransferString(tor, st, uploadSpeed_KBps, downloadSpeed_KBps));
-            gstr += gtr_sprintf(_("Ratio: %s"), tr_strlratio(st->ratio));
-            break;
-        }
+        return fmt::format(
+            FMT_STRING("{:s} {:s}"),
+            getShortTransferString(tor, st, uploadSpeed_KBps, downloadSpeed_KBps),
+            fmt::format(_("Ratio: {ratio}"), fmt::arg("ratio", tr_strlratio(st->ratio))));
 
     default:
-        break;
+        return {};
     }
-
-    return gstr;
 }
 
-Glib::ustring getStatusString(
+std::optional<std::string> getErrorString(tr_stat const* st)
+{
+    switch (st->error)
+    {
+    case TR_STAT_TRACKER_WARNING:
+        return fmt::format(_("Tracker warning: '{warning}'"), fmt::arg("warning", st->errorString));
+
+    case TR_STAT_TRACKER_ERROR:
+        return fmt::format(_("Tracker Error: '{error}'"), fmt::arg("error", st->errorString));
+
+    case TR_STAT_LOCAL_ERROR:
+        return fmt::format(_("Local error: '{error}'"), fmt::arg("error", st->errorString));
+
+    default:
+        return std::nullopt;
+    }
+}
+
+auto getActivityString(
+    tr_torrent const* const tor,
+    tr_stat const* const st,
+    double const uploadSpeed_KBps,
+    double const downloadSpeed_KBps)
+{
+    switch (st->activity)
+    {
+    case TR_STATUS_STOPPED:
+    case TR_STATUS_CHECK_WAIT:
+    case TR_STATUS_CHECK:
+    case TR_STATUS_DOWNLOAD_WAIT:
+    case TR_STATUS_SEED_WAIT:
+        return getShortStatusString(tor, st, uploadSpeed_KBps, downloadSpeed_KBps);
+
+    case TR_STATUS_DOWNLOAD:
+        if (!tr_torrentHasMetadata(tor))
+        {
+            return fmt::format(
+                ngettext(
+                    "Downloading metadata from {active_count} connected peer ({percent_done:d}% done)",
+                    "Downloading metadata from {active_count} connected peers ({percent_done:d}% done)",
+                    st->peersConnected),
+                fmt::arg("active_count", st->peersConnected),
+                fmt::arg("percent_done", tr_strpercent(st->metadataPercentComplete * 100.0)));
+        }
+
+        if (st->peersSendingToUs != 0 && st->webseedsSendingToUs != 0)
+        {
+            return fmt::format(
+                ngettext(
+                    "Downloading from {active_count} of {connected_count} connected peer and webseed",
+                    "Downloading from {active_count} of {connected_count} connected peers and webseeds",
+                    st->peersConnected + st->webseedsSendingToUs),
+                fmt::arg("active_count", st->peersSendingToUs + st->webseedsSendingToUs),
+                fmt::arg("connected_count", st->peersConnected + st->webseedsSendingToUs));
+        }
+
+        if (st->webseedsSendingToUs != 0)
+        {
+            return fmt::format(
+                ngettext(
+                    "Downloading from {active_count} webseed",
+                    "Downloading from {active_count} webseeds",
+                    st->webseedsSendingToUs),
+                fmt::arg("active_count", st->webseedsSendingToUs));
+        }
+
+        return fmt::format(
+            ngettext(
+                "Downloading from {active_count} of {connected_count} connected peer",
+                "Downloading from {active_count} of {connected_count} connected peers",
+                st->peersConnected),
+            fmt::arg("active_count", st->peersSendingToUs),
+            fmt::arg("connected_count", st->peersConnected));
+
+    case TR_STATUS_SEED:
+        return fmt::format(
+            ngettext(
+                "Seeding to {active_count} of {connected_count} connected peer",
+                "Seeding to {active_count} of {connected_count} connected peers",
+                st->peersConnected),
+            fmt::arg("active_count", st->peersGettingFromUs),
+            fmt::arg("connected_count", st->peersConnected));
+
+    default:
+        g_assert_not_reached();
+        return std::string{};
+    }
+}
+
+std::string getStatusString(
     tr_torrent const* tor,
     tr_stat const* st,
     double const uploadSpeed_KBps,
     double const downloadSpeed_KBps)
 {
-    Glib::ustring gstr;
-
-    if (st->error != 0)
-    {
-        char const* fmt[] = {
-            nullptr,
-            N_("Tracker gave a warning: \"%s\""),
-            N_("Tracker gave an error: \"%s\""),
-            N_("Error: %s"),
-        };
-
-        gstr += gtr_sprintf(_(fmt[st->error]), st->errorString);
-    }
-    else
-    {
-        switch (st->activity)
-        {
-        case TR_STATUS_STOPPED:
-        case TR_STATUS_CHECK_WAIT:
-        case TR_STATUS_CHECK:
-        case TR_STATUS_DOWNLOAD_WAIT:
-        case TR_STATUS_SEED_WAIT:
-            {
-                gstr += getShortStatusString(tor, st, uploadSpeed_KBps, downloadSpeed_KBps);
-                break;
-            }
-
-        case TR_STATUS_DOWNLOAD:
-            {
-                if (!tr_torrentHasMetadata(tor))
-                {
-                    /* Downloading metadata from 2 peer (s)(50% done) */
-                    gstr += gtr_sprintf(
-                        _("Downloading metadata from %1$'d %2$s (%3$d%% done)"),
-                        st->peersConnected,
-                        ngettext("peer", "peers", st->peersConnected),
-                        (int)(100.0 * st->metadataPercentComplete));
-                }
-                else if (st->peersSendingToUs != 0 && st->webseedsSendingToUs != 0)
-                {
-                    /* Downloading from 2 of 3 peer (s) and 2 webseed (s) */
-                    gstr += gtr_sprintf(
-                        _("Downloading from %1$'d of %2$'d %3$s and %4$'d %5$s"),
-                        st->peersSendingToUs,
-                        st->peersConnected,
-                        ngettext("peer", "peers", st->peersConnected),
-                        st->webseedsSendingToUs,
-                        ngettext("web seed", "web seeds", st->webseedsSendingToUs));
-                }
-                else if (st->webseedsSendingToUs != 0)
-                {
-                    /* Downloading from 3 web seed (s) */
-                    gstr += gtr_sprintf(
-                        _("Downloading from %1$'d %2$s"),
-                        st->webseedsSendingToUs,
-                        ngettext("web seed", "web seeds", st->webseedsSendingToUs));
-                }
-                else
-                {
-                    /* Downloading from 2 of 3 peer (s) */
-                    gstr += gtr_sprintf(
-                        _("Downloading from %1$'d of %2$'d %3$s"),
-                        st->peersSendingToUs,
-                        st->peersConnected,
-                        ngettext("peer", "peers", st->peersConnected));
-                }
-
-                break;
-            }
-
-        case TR_STATUS_SEED:
-            gstr += gtr_sprintf(
-                ngettext(
-                    "Seeding to %1$'d of %2$'d connected peer",
-                    "Seeding to %1$'d of %2$'d connected peers",
-                    st->peersConnected),
-                st->peersGettingFromUs,
-                st->peersConnected);
-            break;
-
-        default:
-            g_assert_not_reached();
-        }
-    }
+    auto status_str = getErrorString(st).value_or(getActivityString(tor, st, uploadSpeed_KBps, downloadSpeed_KBps));
 
     if (st->activity != TR_STATUS_CHECK_WAIT && st->activity != TR_STATUS_CHECK && st->activity != TR_STATUS_DOWNLOAD_WAIT &&
         st->activity != TR_STATUS_SEED_WAIT && st->activity != TR_STATUS_STOPPED)
     {
-        auto const buf = getShortTransferString(tor, st, uploadSpeed_KBps, downloadSpeed_KBps);
-
-        if (!buf.empty())
+        if (auto const buf = getShortTransferString(tor, st, uploadSpeed_KBps, downloadSpeed_KBps); !std::empty(buf))
         {
-            gstr += gtr_sprintf(" - %s", buf);
+            status_str += fmt::format(FMT_STRING(" - {:s}"), buf);
         }
     }
 
-    return gstr;
+    return status_str;
 }
 
 } // namespace
@@ -379,7 +350,7 @@ namespace
 
 Glib::RefPtr<Gdk::Pixbuf> get_icon(tr_torrent const* tor, Gtk::IconSize icon_size, Gtk::Widget& for_widget)
 {
-    Glib::ustring mime_type;
+    auto mime_type = std::string_view{};
 
     if (auto const n_files = tr_torrentFileCount(tor); n_files == 0)
     {
@@ -393,7 +364,7 @@ Glib::RefPtr<Gdk::Pixbuf> get_icon(tr_torrent const* tor, Gtk::IconSize icon_siz
     {
         auto const* const name = tr_torrentFile(tor, 0).name;
 
-        mime_type = strchr(name, '/') != nullptr ? DirectoryMimeType : gtr_get_mime_type_from_filename(name);
+        mime_type = strchr(name, '/') != nullptr ? DirectoryMimeType : tr_get_mime_type_for_filename(name);
     }
 
     return gtr_get_mime_type_icon(mime_type, icon_size, for_widget);
@@ -641,8 +612,9 @@ void TorrentCellRenderer::Impl::render_compact(
     icon_renderer_->property_sensitive() = sensitive;
     icon_renderer_->render(cr, widget, icon_area, icon_area, flags);
 
-    progress_renderer_->property_value() = (int)(percentDone * 100.0);
-    progress_renderer_->property_text() = Glib::ustring();
+    auto const percent_done = static_cast<int>(percentDone * 100.0);
+    progress_renderer_->property_value() = percent_done;
+    progress_renderer_->property_text() = fmt::format(FMT_STRING("{:d}%"), percent_done);
     progress_renderer_->property_sensitive() = sensitive;
     progress_renderer_->render(cr, widget, prog_area, prog_area, flags);
 
@@ -778,7 +750,7 @@ void TorrentCellRenderer::Impl::render_full(
     text_renderer_->property_weight() = Pango::WEIGHT_NORMAL;
     text_renderer_->render(cr, widget, prog_area, prog_area, flags);
 
-    progress_renderer_->property_value() = (int)(percentDone * 100.0);
+    progress_renderer_->property_value() = static_cast<int>(percentDone * 100.0);
     progress_renderer_->property_text() = Glib::ustring();
     progress_renderer_->property_sensitive() = sensitive;
     progress_renderer_->render(cr, widget, prct_area, prct_area, flags);

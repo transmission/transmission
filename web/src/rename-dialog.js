@@ -1,5 +1,5 @@
 /* @license This file Copyright (C) 2020-2022 Mnemosyne LLC.
-   It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+   It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
    or any future license endorsed by Mnemosyne LLC.
    License text can be found in the licenses/ folder. */
 
@@ -26,6 +26,8 @@ export class RenameDialog extends EventTarget {
 
     this.torrents = torrents;
     this.elements = RenameDialog._create();
+    this.elements.dismiss.addEventListener('click', () => this._onDismiss());
+    this.elements.confirm.addEventListener('click', () => this._onConfirm());
     this.elements.entry.value = torrents[0].getName();
     document.body.append(this.elements.root);
 
@@ -65,8 +67,6 @@ export class RenameDialog extends EventTarget {
     elements.root.setAttribute('aria-label', 'Rename Torrent');
     elements.heading.textContent = 'Enter new name:';
     elements.confirm.textContent = 'Rename';
-    elements.dismiss.addEventListener('click', () => this._onDismiss());
-    elements.confirm.addEventListener('click', () => this._onConfirm());
 
     const label = document.createElement('label');
     label.setAttribute('for', 'torrent-rename-name');

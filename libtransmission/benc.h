@@ -5,15 +5,13 @@
 
 #pragma once
 
-#include <algorithm>
 #include <array>
-#include <cctype>
 #include <cerrno>
-#include <cstddef>
-#include <cstdint>
-#include <cstdlib>
+#include <cstddef> // size_t
+#include <cstdint> // int64_t
 #include <optional>
 #include <string_view>
+#include <utility> // make_pair
 
 #include "error.h"
 
@@ -132,13 +130,13 @@ struct BasicHandler : public Handler
     }
 
 private:
-    void push()
+    constexpr void push() noexcept
     {
         ++depth_;
         keys_[depth_] = {};
     }
 
-    void pop()
+    constexpr void pop() noexcept
     {
         --depth_;
     }
@@ -163,26 +161,32 @@ struct ParserStack
     std::array<Node, MaxDepth> stack;
     std::size_t depth = 0;
 
-    void clear()
+    constexpr void clear() noexcept
     {
         depth = 0;
     }
 
-    void tokenWalked()
+    [[nodiscard]] constexpr auto empty() const noexcept
+    {
+        return depth == 0;
+    }
+
+    constexpr void tokenWalked()
     {
         ++stack[depth].n_children_walked;
     }
 
-    Node& current()
-    {
-        return stack[depth];
-    }
-    Node& current() const
+    [[nodiscard]] constexpr Node& current()
     {
         return stack[depth];
     }
 
-    [[nodiscard]] bool expectingDictKey() const
+    [[nodiscard]] constexpr Node& current() const
+    {
+        return stack[depth];
+    }
+
+    [[nodiscard]] constexpr bool expectingDictKey() const
     {
         return depth > 0 && stack[depth].parent_type == ParentType::Dict && (stack[depth].n_children_walked % 2) == 0;
     }
@@ -239,7 +243,8 @@ bool parse(
     tr_error** error = nullptr)
 {
     stack.clear();
-    auto context = Handler::Context(std::data(benc), error);
+    auto const* const stream_begin = std::data(benc);
+    auto context = Handler::Context(stream_begin, error);
 
     int err = 0;
     for (;;)
@@ -261,6 +266,7 @@ bool parse(
             if (auto const value = impl::ParseInt(&benc); !value)
             {
                 tr_error_set(error, err, "Malformed benc? Unable to parse integer");
+                err = EILSEQ;
             }
             else
             {
@@ -377,7 +383,7 @@ bool parse(
     if (stack.stack[0].n_children_walked == 0)
     {
         err = EILSEQ;
-        tr_error_set(error, err, "no data found");
+        tr_error_set(error, err, "no bencoded data to parse");
         errno = err;
         return false;
     }

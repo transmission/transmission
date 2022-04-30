@@ -1,20 +1,25 @@
 // This file Copyright © 2012-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
 #include <array>
-#include <cinttypes>
+#include <cinttypes> // PRIu32
+#include <cstdint> // uint32_t
 #include <cstdio>
 #include <cstdlib>
+#include <iostream>
 #include <string>
+#include <string_view>
 
 #include <libtransmission/transmission.h>
 
 #include <libtransmission/error.h>
 #include <libtransmission/file.h>
+#include <libtransmission/log.h>
 #include <libtransmission/makemeta.h>
 #include <libtransmission/tr-getopt.h>
+#include <libtransmission/tr-strbuf.h>
 #include <libtransmission/utils.h>
 #include <libtransmission/version.h>
 
@@ -30,13 +35,14 @@ char constexpr Usage[] = "Usage: transmission-create [options] <file|directory>"
 
 uint32_t constexpr KiB = 1024;
 
-auto constexpr Options = std::array<tr_option, 8>{
+auto constexpr Options = std::array<tr_option, 9>{
     { { 'p', "private", "Allow this torrent to only be used with the specified tracker(s)", "p", false, nullptr },
       { 'r', "source", "Set the source for private trackers", "r", true, "<source>" },
       { 'o', "outfile", "Save the generated .torrent to this filename", "o", true, "<file>" },
       { 's', "piecesize", "Set the piece size in KiB, overriding the preferred default", "s", true, "<KiB>" },
       { 'c', "comment", "Add a comment", "c", true, "<comment>" },
       { 't', "tracker", "Add a tracker's announce URL", "t", true, "<url>" },
+      { 'w', "webseed", "Add a webseed URL", "w", true, "<url>" },
       { 'V', "version", "Show version number and exit", "V", false, nullptr },
       { 0, nullptr, nullptr, nullptr, false, nullptr } }
 };
@@ -44,6 +50,7 @@ auto constexpr Options = std::array<tr_option, 8>{
 struct app_options
 {
     std::vector<tr_tracker_info> trackers;
+    std::vector<char const*> webseeds;
     std::string outfile;
     char const* comment = nullptr;
     char const* infile = nullptr;
@@ -79,7 +86,11 @@ int parseCommandLine(app_options& options, int argc, char const* const* argv)
             break;
 
         case 't':
-            options.trackers.push_back(tr_tracker_info{ 0, const_cast<char*>(optarg), nullptr, 0 });
+            options.trackers.push_back(tr_tracker_info{ 0, const_cast<char*>(optarg) });
+            break;
+
+        case 'w':
+            options.webseeds.push_back(optarg);
             break;
 
         case 's':
@@ -163,19 +174,17 @@ int tr_main(int argc, char* argv[])
     if (std::empty(options.outfile))
     {
         tr_error* error = nullptr;
-        char* base = tr_sys_path_basename(options.infile, &error);
+        auto const base = tr_sys_path_basename(options.infile, &error);
 
-        if (base == nullptr)
+        if (std::empty(base))
         {
             fprintf(stderr, "ERROR: Cannot deduce output path from input path: %s\n", error->message);
             return EXIT_FAILURE;
         }
 
-        auto const end = tr_strvJoin(base, ".torrent"sv);
-        char* cwd = tr_getcwd();
-        options.outfile = tr_strvDup(tr_strvPath(cwd, end.c_str()));
+        char* const cwd = tr_getcwd();
+        options.outfile = tr_strvDup(tr_pathbuf{ std::string_view{ cwd }, '/', base, ".torrent"sv });
         tr_free(cwd);
-        tr_free(base);
     }
 
     if (std::empty(options.trackers))
@@ -201,6 +210,14 @@ int tr_main(int argc, char* argv[])
         return EXIT_FAILURE;
     }
 
+    for (uint32_t i = 0; i < b->fileCount; ++i)
+    {
+        if (auto const& file = b->files[i]; !file.is_portable)
+        {
+            fprintf(stderr, "WARNING: consider renaming nonportable filename \"%s\".\n", file.filename);
+        }
+    }
+
     if (options.piecesize_kib != 0)
     {
         tr_metaInfoBuilderSetPieceSize(b, options.piecesize_kib * KiB);
@@ -219,7 +236,9 @@ int tr_main(int argc, char* argv[])
         b,
         options.outfile.c_str(),
         std::data(options.trackers),
-        std::size(options.trackers),
+        static_cast<int>(std::size(options.trackers)),
+        std::data(options.webseeds),
+        static_cast<int>(std::size(options.webseeds)),
         options.comment,
         options.is_private,
         options.source);
@@ -243,23 +262,23 @@ int tr_main(int argc, char* argv[])
 
     switch (b->result)
     {
-    case TR_MAKEMETA_OK:
+    case TrMakemetaResult::OK:
         printf("done!");
         break;
 
-    case TR_MAKEMETA_URL:
+    case TrMakemetaResult::ERR_URL:
         printf("bad announce URL: \"%s\"", b->errfile);
         break;
 
-    case TR_MAKEMETA_IO_READ:
+    case TrMakemetaResult::ERR_IO_READ:
         printf("error reading \"%s\": %s", b->errfile, tr_strerror(b->my_errno));
         break;
 
-    case TR_MAKEMETA_IO_WRITE:
+    case TrMakemetaResult::ERR_IO_WRITE:
         printf("error writing \"%s\": %s", b->errfile, tr_strerror(b->my_errno));
         break;
 
-    case TR_MAKEMETA_CANCELLED:
+    case TrMakemetaResult::CANCELLED:
         printf("cancelled");
         break;
     }

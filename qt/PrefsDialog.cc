@@ -1,5 +1,5 @@
 // This file Copyright © 2009-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -25,6 +25,7 @@
 #include <QLabel>
 #include <QLineEdit>
 #include <QMessageBox>
+#include <QPlainTextEdit>
 #include <QPushButton>
 #include <QSpinBox>
 #include <QStyle>
@@ -152,7 +153,7 @@ QString qtDayName(int day)
 
     default:
         assert(false && "Invalid day of week");
-        return QString();
+        return {};
     }
 }
 
@@ -190,6 +191,10 @@ bool PrefsDialog::updateWidgetValue(QWidget* widget, int pref_key) const
     {
         pref_widget.as<FreeSpaceLabel>()->setPath(prefs_.getString(pref_key));
     }
+    else if (pref_widget.is<QPlainTextEdit>())
+    {
+        pref_widget.as<QPlainTextEdit>()->setPlainText(prefs_.getString(pref_key));
+    }
     else
     {
         return false;
@@ -206,39 +211,76 @@ void PrefsDialog::linkWidgetToPref(QWidget* widget, int pref_key)
     updateWidgetValue(widget, pref_key);
     widgets_.insert(pref_key, widget);
 
-    auto const* check_box = qobject_cast<QCheckBox*>(widget);
-    if (check_box != nullptr)
+    if (auto const* check_box = qobject_cast<QCheckBox*>(widget); check_box != nullptr)
     {
         connect(check_box, &QAbstractButton::toggled, this, &PrefsDialog::checkBoxToggled);
         return;
     }
 
-    auto const* time_edit = qobject_cast<QTimeEdit*>(widget);
-    if (time_edit != nullptr)
+    if (auto const* time_edit = qobject_cast<QTimeEdit*>(widget); time_edit != nullptr)
     {
         connect(time_edit, &QAbstractSpinBox::editingFinished, this, &PrefsDialog::timeEditingFinished);
         return;
     }
 
-    auto const* line_edit = qobject_cast<QLineEdit*>(widget);
-    if (line_edit != nullptr)
+    if (auto const* line_edit = qobject_cast<QLineEdit*>(widget); line_edit != nullptr)
     {
         connect(line_edit, &QLineEdit::editingFinished, this, &PrefsDialog::lineEditingFinished);
         return;
     }
 
-    auto const* path_button = qobject_cast<PathButton*>(widget);
-    if (path_button != nullptr)
+    if (auto const* path_button = qobject_cast<PathButton*>(widget); path_button != nullptr)
     {
         connect(path_button, &PathButton::pathChanged, this, &PrefsDialog::pathChanged);
         return;
     }
 
-    auto const* spin_box = qobject_cast<QAbstractSpinBox*>(widget);
-    if (spin_box != nullptr)
+    if (auto const* spin_box = qobject_cast<QAbstractSpinBox*>(widget); spin_box != nullptr)
     {
         connect(spin_box, &QAbstractSpinBox::editingFinished, this, &PrefsDialog::spinBoxEditingFinished);
+        return;
     }
+}
+
+static bool isDescendantOf(QObject const* descendant, QObject const* ancestor)
+{
+    if (ancestor == nullptr)
+    {
+        return false;
+    }
+    while (descendant != nullptr)
+    {
+        if (descendant == ancestor)
+        {
+            return true;
+        }
+
+        descendant = descendant->parent();
+    }
+    return false;
+}
+
+void PrefsDialog::focusChanged(QWidget* old, QWidget* cur)
+{
+    // We don't want to change the preference every time there's a keystroke
+    // in a QPlainTextEdit, so instead of connecting to the textChanged signal,
+    // only update the pref when the text changed AND focus was lost.
+    char const constexpr* const StartValue = "StartValue";
+
+    if (auto* const edit = qobject_cast<QPlainTextEdit*>(cur); isDescendantOf(edit, this))
+    {
+        edit->setProperty(StartValue, edit->toPlainText());
+    }
+
+    if (auto const* const edit = qobject_cast<QPlainTextEdit*>(old); isDescendantOf(edit, this))
+    {
+        if (auto const val = edit->toPlainText(); val != edit->property(StartValue).toString())
+        {
+            setPref(PreferenceWidget{ old }.getPrefKey(), val);
+        }
+    }
+
+    // (TODO: we probably want to do this for single-line text entries too?)
 }
 
 void PrefsDialog::checkBoxToggled(bool checked)
@@ -428,6 +470,7 @@ void PrefsDialog::initNetworkTab()
     linkWidgetToPref(ui_.enablePexCheck, Prefs::PEX_ENABLED);
     linkWidgetToPref(ui_.enableDhtCheck, Prefs::DHT_ENABLED);
     linkWidgetToPref(ui_.enableLpdCheck, Prefs::LPD_ENABLED);
+    linkWidgetToPref(ui_.defaultTrackersPlainTextEdit, Prefs::DEFAULT_TRACKERS);
 
     auto* cr = new ColumnResizer(this);
     cr->addLayout(ui_.incomingPeersSectionLayout);
@@ -523,13 +566,19 @@ void PrefsDialog::onIdleLimitChanged()
 
 void PrefsDialog::initSeedingTab()
 {
+    ui_.doneSeedingScriptButton->setTitle(tr("Select \"Torrent Done Seeding\" Script"));
+
     linkWidgetToPref(ui_.ratioLimitCheck, Prefs::RATIO_ENABLED);
     linkWidgetToPref(ui_.ratioLimitSpin, Prefs::RATIO);
     linkWidgetToPref(ui_.idleLimitCheck, Prefs::IDLE_LIMIT_ENABLED);
     linkWidgetToPref(ui_.idleLimitSpin, Prefs::IDLE_LIMIT);
+    linkWidgetToPref(ui_.doneSeedingScriptCheck, Prefs::SCRIPT_TORRENT_DONE_SEEDING_ENABLED);
+    linkWidgetToPref(ui_.doneSeedingScriptButton, Prefs::SCRIPT_TORRENT_DONE_SEEDING_FILENAME);
+    linkWidgetToPref(ui_.doneSeedingScriptEdit, Prefs::SCRIPT_TORRENT_DONE_SEEDING_FILENAME);
 
     connect(ui_.idleLimitSpin, qOverload<int>(&QSpinBox::valueChanged), this, &PrefsDialog::onIdleLimitChanged);
 
+    updateSeedingWidgetsLocality();
     onIdleLimitChanged();
 }
 
@@ -549,12 +598,13 @@ void PrefsDialog::initDownloadingTab()
     ui_.watchDirButton->setMode(PathButton::DirectoryMode);
     ui_.downloadDirButton->setMode(PathButton::DirectoryMode);
     ui_.incompleteDirButton->setMode(PathButton::DirectoryMode);
-    ui_.completionScriptButton->setMode(PathButton::FileMode);
+    ui_.doneDownloadingScriptButton->setMode(PathButton::FileMode);
+    ui_.doneSeedingScriptButton->setMode(PathButton::FileMode);
 
     ui_.watchDirButton->setTitle(tr("Select Watch Directory"));
     ui_.downloadDirButton->setTitle(tr("Select Destination"));
     ui_.incompleteDirButton->setTitle(tr("Select Incomplete Directory"));
-    ui_.completionScriptButton->setTitle(tr("Select \"Torrent Done\" Script"));
+    ui_.doneDownloadingScriptButton->setTitle(tr("Select \"Torrent Done Downloading\" Script"));
 
     ui_.watchDirStack->setMinimumWidth(200);
 
@@ -577,9 +627,9 @@ void PrefsDialog::initDownloadingTab()
     linkWidgetToPref(ui_.incompleteDirCheck, Prefs::INCOMPLETE_DIR_ENABLED);
     linkWidgetToPref(ui_.incompleteDirButton, Prefs::INCOMPLETE_DIR);
     linkWidgetToPref(ui_.incompleteDirEdit, Prefs::INCOMPLETE_DIR);
-    linkWidgetToPref(ui_.completionScriptCheck, Prefs::SCRIPT_TORRENT_DONE_ENABLED);
-    linkWidgetToPref(ui_.completionScriptButton, Prefs::SCRIPT_TORRENT_DONE_FILENAME);
-    linkWidgetToPref(ui_.completionScriptEdit, Prefs::SCRIPT_TORRENT_DONE_FILENAME);
+    linkWidgetToPref(ui_.doneDownloadingScriptCheck, Prefs::SCRIPT_TORRENT_DONE_ENABLED);
+    linkWidgetToPref(ui_.doneDownloadingScriptButton, Prefs::SCRIPT_TORRENT_DONE_FILENAME);
+    linkWidgetToPref(ui_.doneDownloadingScriptEdit, Prefs::SCRIPT_TORRENT_DONE_FILENAME);
 
     auto* cr = new ColumnResizer(this);
     cr->addLayout(ui_.addingSectionLayout);
@@ -603,15 +653,22 @@ void PrefsDialog::updateDownloadingWidgetsLocality()
     ui_.downloadDirStack->setCurrentWidget(is_local_ ? static_cast<QWidget*>(ui_.downloadDirButton) : ui_.downloadDirEdit);
     ui_.incompleteDirStack->setCurrentWidget(
         is_local_ ? static_cast<QWidget*>(ui_.incompleteDirButton) : ui_.incompleteDirEdit);
-    ui_.completionScriptStack->setCurrentWidget(
-        is_local_ ? static_cast<QWidget*>(ui_.completionScriptButton) : ui_.completionScriptEdit);
+    ui_.doneDownloadingScriptStack->setCurrentWidget(
+        is_local_ ? static_cast<QWidget*>(ui_.doneDownloadingScriptButton) : ui_.doneDownloadingScriptEdit);
 
     ui_.watchDirStack->setFixedHeight(ui_.watchDirStack->currentWidget()->sizeHint().height());
     ui_.downloadDirStack->setFixedHeight(ui_.downloadDirStack->currentWidget()->sizeHint().height());
     ui_.incompleteDirStack->setFixedHeight(ui_.incompleteDirStack->currentWidget()->sizeHint().height());
-    ui_.completionScriptStack->setFixedHeight(ui_.completionScriptStack->currentWidget()->sizeHint().height());
+    ui_.doneDownloadingScriptStack->setFixedHeight(ui_.doneDownloadingScriptStack->currentWidget()->sizeHint().height());
 
     ui_.downloadDirLabel->setBuddy(ui_.downloadDirStack->currentWidget());
+}
+
+void PrefsDialog::updateSeedingWidgetsLocality()
+{
+    ui_.doneSeedingScriptStack->setCurrentWidget(
+        is_local_ ? static_cast<QWidget*>(ui_.doneSeedingScriptButton) : ui_.doneSeedingScriptEdit);
+    ui_.doneSeedingScriptStack->setFixedHeight(ui_.doneSeedingScriptStack->currentWidget()->sizeHint().height());
 }
 
 /***
@@ -667,6 +724,8 @@ PrefsDialog::PrefsDialog(Session& session, Prefs& prefs, QWidget* parent)
     }
 
     adjustSize();
+
+    connect(qApp, &QApplication::focusChanged, this, &PrefsDialog::focusChanged);
 }
 
 void PrefsDialog::setPref(int key, QVariant const& v)
@@ -681,12 +740,11 @@ void PrefsDialog::setPref(int key, QVariant const& v)
 
 void PrefsDialog::sessionUpdated()
 {
-    bool const is_local = session_.isLocal();
-
-    if (is_local_ != is_local)
+    if (bool const is_local = session_.isLocal(); is_local_ != is_local)
     {
         is_local_ = is_local;
         updateDownloadingWidgetsLocality();
+        updateSeedingWidgetsLocality();
     }
 
     updateBlocklistLabel();
@@ -767,11 +825,15 @@ void PrefsDialog::refreshPref(int key)
     {
         QWidget* w(it.value());
 
+        w->blockSignals(true);
+
         if (!updateWidgetValue(w, key) && (key == Prefs::ENCRYPTION))
         {
             auto* combo_box = qobject_cast<QComboBox*>(w);
             int const index = combo_box->findData(prefs_.getInt(key));
             combo_box->setCurrentIndex(index);
         }
+
+        w->blockSignals(false);
     }
 }

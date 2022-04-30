@@ -8,6 +8,10 @@
 #error only libtransmission should #include this header.
 #endif
 
+#include "transmission.h"
+
+#include "net.h" // tr_port
+
 enum
 {
     TR_DHT_STOPPED = 0,

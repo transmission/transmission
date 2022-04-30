@@ -1,5 +1,5 @@
 // This file Copyright © 2021-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -12,7 +12,10 @@
 #include <CommonCrypto/CommonDigest.h>
 #include <CommonCrypto/CommonRandom.h>
 
+#include <fmt/core.h>
+
 #include "transmission.h"
+
 #include "crypto-utils.h"
 #include "log.h"
 #include "tr-assert.h"
@@ -20,7 +23,7 @@
 
 #define TR_CRYPTO_DH_SECRET_FALLBACK
 #define TR_CRYPTO_X509_FALLBACK
-#include "crypto-utils-fallback.cc"
+#include "crypto-utils-fallback.cc" // NOLINT(bugprone-suspicious-include)
 
 /***
 ****
@@ -52,8 +55,6 @@ extern "C"
 namespace
 {
 
-static char constexpr MyName[] = "tr_crypto_utils";
-
 char const* ccrypto_error_to_str(CCCryptorStatus error_code)
 {
     switch (error_code)
@@ -65,7 +66,7 @@ char const* ccrypto_error_to_str(CCCryptorStatus error_code)
         return "Illegal parameter value";
 
     case kCCBufferTooSmall:
-        return "Insufficent buffer provided for specified operation";
+        return "Insufficient buffer provided for specified operation";
 
     case kCCMemoryFailure:
         return "Memory allocation failure";
@@ -97,10 +98,11 @@ void log_ccrypto_error(CCCryptorStatus error_code, char const* file, int line)
             file,
             line,
             TR_LOG_ERROR,
-            MyName,
-            "CCrypto error (%d): %s",
-            error_code,
-            ccrypto_error_to_str(error_code));
+            fmt::format(
+                _("{crypto_library} error: {error} ({error_code})"),
+                fmt::arg("crypto_library", "CCrypto"),
+                fmt::arg("error", ccrypto_error_to_str(error_code)),
+                fmt::arg("error_code", error_code)));
     }
 }
 

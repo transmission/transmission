@@ -9,8 +9,13 @@
 
 @interface BlocklistDownloader ()
 
+@property(nonatomic) NSURLSession* fSession;
+@property(nonatomic) NSUInteger fCurrentSize;
+@property(nonatomic) long long fExpectedSize;
+@property(nonatomic) blocklistDownloadState fState;
+
 - (void)startDownload;
-- (void)decompressFrom:(NSURL*)file to:(NSURL*)destination error:(NSError**)error;
+- (BOOL)decompressFrom:(NSURL*)file to:(NSURL*)destination error:(NSError**)error;
 
 @end
 
@@ -36,19 +41,19 @@ BlocklistDownloader* fBLDownloader = nil;
 
 - (void)setViewController:(BlocklistDownloaderViewController*)viewController
 {
-    fViewController = viewController;
-    if (fViewController)
+    _viewController = viewController;
+    if (_viewController)
     {
-        switch (fState)
+        switch (self.fState)
         {
         case BLOCKLIST_DL_START:
-            [fViewController setStatusStarting];
+            [_viewController setStatusStarting];
             break;
         case BLOCKLIST_DL_DOWNLOADING:
-            [fViewController setStatusProgressForCurrentSize:fCurrentSize expectedSize:fExpectedSize];
+            [_viewController setStatusProgressForCurrentSize:self.fCurrentSize expectedSize:self.fExpectedSize];
             break;
         case BLOCKLIST_DL_PROCESSING:
-            [fViewController setStatusProcessing];
+            [_viewController setStatusProcessing];
             break;
         }
     }
@@ -56,39 +61,37 @@ BlocklistDownloader* fBLDownloader = nil;
 
 - (void)cancelDownload
 {
-    [fViewController setFinished];
+    [_viewController setFinished];
 
-    [fSession invalidateAndCancel];
+    [self.fSession invalidateAndCancel];
 
     [BlocklistScheduler.scheduler updateSchedule];
 
     fBLDownloader = nil;
 }
 
-- (void)URLSession:(NSURLSession *)session 
-      downloadTask:(NSURLSessionDownloadTask *)downloadTask 
-      didWriteData:(int64_t)bytesWritten 
- totalBytesWritten:(int64_t)totalBytesWritten 
-totalBytesExpectedToWrite:(int64_t)totalBytesExpectedToWrite
+- (void)URLSession:(NSURLSession*)session
+                 downloadTask:(NSURLSessionDownloadTask*)downloadTask
+                 didWriteData:(int64_t)bytesWritten
+            totalBytesWritten:(int64_t)totalBytesWritten
+    totalBytesExpectedToWrite:(int64_t)totalBytesExpectedToWrite
 {
     dispatch_async(dispatch_get_main_queue(), ^{
-        fState = BLOCKLIST_DL_DOWNLOADING;
+        self.fState = BLOCKLIST_DL_DOWNLOADING;
 
-        fCurrentSize = totalBytesWritten;
-        fExpectedSize = totalBytesExpectedToWrite;
+        self.fCurrentSize = totalBytesWritten;
+        self.fExpectedSize = totalBytesExpectedToWrite;
 
-        [fViewController setStatusProgressForCurrentSize:fCurrentSize expectedSize:fExpectedSize];
+        [self.viewController setStatusProgressForCurrentSize:self.fCurrentSize expectedSize:self.fExpectedSize];
     });
 }
 
-- (void)URLSession:(NSURLSession *)session 
-              task:(NSURLSessionTask *)task 
-didCompleteWithError:(NSError *)error
+- (void)URLSession:(NSURLSession*)session task:(NSURLSessionTask*)task didCompleteWithError:(NSError*)error
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         if (error)
         {
-            [fViewController setFailed:error.localizedDescription];
+            [self.viewController setFailed:error.localizedDescription];
         }
 
         [NSUserDefaults.standardUserDefaults setObject:[NSDate date] forKey:@"BlocklistNewLastUpdate"];
@@ -98,14 +101,14 @@ didCompleteWithError:(NSError *)error
     });
 }
 
-- (void)URLSession:(NSURLSession *)session 
-      downloadTask:(NSURLSessionDownloadTask *)downloadTask 
-didFinishDownloadingToURL:(NSURL *)location
+- (void)URLSession:(NSURLSession*)session
+                 downloadTask:(NSURLSessionDownloadTask*)downloadTask
+    didFinishDownloadingToURL:(NSURL*)location
 {
-    fState = BLOCKLIST_DL_PROCESSING;
+    self.fState = BLOCKLIST_DL_PROCESSING;
 
     dispatch_async(dispatch_get_main_queue(), ^{
-        [fViewController setStatusProcessing];
+        [self.viewController setStatusProcessing];
     });
 
     NSString* filename = downloadTask.response.suggestedFilename;
@@ -125,25 +128,24 @@ didFinishDownloadingToURL:(NSURL *)location
     }
     else
     {
-        [self decompressFrom:[NSURL fileURLWithPath:tempFile]
-                          to:[NSURL fileURLWithPath:blocklistFile]
-                       error:nil];
+        [self decompressFrom:[NSURL fileURLWithPath:tempFile] to:[NSURL fileURLWithPath:blocklistFile] error:nil];
         [NSFileManager.defaultManager removeItemAtPath:tempFile error:nil];
     }
 
     dispatch_async(dispatch_get_main_queue(), ^{
-        const int count = tr_blocklistSetContent(((Controller*)NSApp.delegate).sessionHandle, blocklistFile.UTF8String);
+        int const count = tr_blocklistSetContent(((Controller*)NSApp.delegate).sessionHandle, blocklistFile.UTF8String);
 
         //delete downloaded file
         [NSFileManager.defaultManager removeItemAtPath:blocklistFile error:nil];
 
         if (count > 0)
         {
-            [fViewController setFinished];
+            [self.viewController setFinished];
         }
         else
         {
-            [fViewController setFailed:NSLocalizedString(@"The specified blocklist file did not contain any valid rules.", "blocklist fail message")];
+            [self.viewController
+                setFailed:NSLocalizedString(@"The specified blocklist file did not contain any valid rules.", "blocklist fail message")];
         }
 
         //update last updated date for schedule
@@ -158,13 +160,14 @@ didFinishDownloadingToURL:(NSURL *)location
     });
 }
 
+#pragma mark - Private
+
 - (void)startDownload
 {
-    fState = BLOCKLIST_DL_START;
+    self.fState = BLOCKLIST_DL_START;
 
-    fSession = [NSURLSession sessionWithConfiguration:NSURLSessionConfiguration.ephemeralSessionConfiguration
-                                             delegate:self
-                                        delegateQueue:nil];
+    self.fSession = [NSURLSession sessionWithConfiguration:NSURLSessionConfiguration.ephemeralSessionConfiguration delegate:self
+                                             delegateQueue:nil];
 
     [BlocklistScheduler.scheduler cancelSchedule];
 
@@ -178,31 +181,31 @@ didFinishDownloadingToURL:(NSURL *)location
         urlString = [@"https://" stringByAppendingString:urlString];
     }
 
-    NSURLSessionDownloadTask* task = [fSession downloadTaskWithURL:[NSURL URLWithString:urlString]];
+    NSURLSessionDownloadTask* task = [self.fSession downloadTaskWithURL:[NSURL URLWithString:urlString]];
     [task resume];
 }
 
-- (void)decompressFrom:(NSURL*)file to:(NSURL*)destination error:(NSError**)error
+- (BOOL)decompressFrom:(NSURL*)file to:(NSURL*)destination error:(NSError**)error
 {
     if ([self untarFrom:file to:destination])
     {
-        return;
+        return YES;
     }
 
     if ([self unzipFrom:file to:destination])
     {
-        return;
+        return YES;
     }
 
     if ([self gunzipFrom:file to:destination])
     {
-        return;
+        return YES;
     }
 
     // If it doesn't look like archive just copy it to destination
     else
     {
-        [NSFileManager.defaultManager copyItemAtURL:file toURL:destination error:error];
+        return [NSFileManager.defaultManager copyItemAtURL:file toURL:destination error:error];
     }
 }
 
@@ -211,11 +214,7 @@ didFinishDownloadingToURL:(NSURL *)location
     NSTask* tarList = [[NSTask alloc] init];
 
     tarList.launchPath = @"/usr/bin/tar";
-    tarList.arguments = @[
-        @"--list",
-        @"--file",
-        file.path
-    ];
+    tarList.arguments = @[ @"--list", @"--file", file.path ];
 
     NSPipe* pipe = [[NSPipe alloc] init];
     tarList.standardOutput = pipe;
@@ -235,8 +234,7 @@ didFinishDownloadingToURL:(NSURL *)location
 
         NSData* data = [pipe.fileHandleForReading readDataToEndOfFile];
 
-        NSString* output = [[NSString alloc] initWithData:data
-                                                 encoding:NSUTF8StringEncoding];
+        NSString* output = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
 
         filename = [output componentsSeparatedByCharactersInSet:NSCharacterSet.newlineCharacterSet].firstObject;
     }
@@ -256,12 +254,7 @@ didFinishDownloadingToURL:(NSURL *)location
     NSTask* untar = [[NSTask alloc] init];
     untar.launchPath = @"/usr/bin/tar";
     untar.currentDirectoryPath = destinationDir.path;
-    untar.arguments = @[
-        @"--extract",
-        @"--file",
-        file.path,
-        filename
-    ];
+    untar.arguments = @[ @"--extract", @"--file", file.path, filename ];
 
     @try
     {
@@ -291,10 +284,7 @@ didFinishDownloadingToURL:(NSURL *)location
     NSTask* gunzip = [[NSTask alloc] init];
     gunzip.launchPath = @"/usr/bin/gunzip";
     gunzip.currentDirectoryPath = destinationDir.path;
-    gunzip.arguments = @[
-        @"--keep",
-        file.path
-    ];
+    gunzip.arguments = @[ @"--keep", file.path ];
 
     @try
     {
@@ -306,7 +296,7 @@ didFinishDownloadingToURL:(NSURL *)location
             return NO;
         }
     }
-    @catch (NSException *exception)
+    @catch (NSException* exception)
     {
         return NO;
     }
@@ -343,12 +333,11 @@ didFinishDownloadingToURL:(NSURL *)location
 
         NSData* data = [pipe.fileHandleForReading readDataToEndOfFile];
 
-        NSString* output = [[NSString alloc] initWithData:data
-                                                 encoding:NSUTF8StringEncoding];
+        NSString* output = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
 
         filename = [output componentsSeparatedByCharactersInSet:NSCharacterSet.newlineCharacterSet].firstObject;
     }
-    @catch (NSException *exception)
+    @catch (NSException* exception)
     {
         return NO;
     }
@@ -364,10 +353,7 @@ didFinishDownloadingToURL:(NSURL *)location
     NSTask* unzip = [[NSTask alloc] init];
     unzip.launchPath = @"/usr/bin/unzip";
     unzip.currentDirectoryPath = destinationDir.path;
-    unzip.arguments = @[
-        file.path,
-        filename
-    ];
+    unzip.arguments = @[ file.path, filename ];
 
     @try
     {
@@ -379,7 +365,7 @@ didFinishDownloadingToURL:(NSURL *)location
             return NO;
         }
     }
-    @catch (NSException *exception)
+    @catch (NSException* exception)
     {
         return NO;
     }

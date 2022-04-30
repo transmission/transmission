@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>601</width>
-    <height>547</height>
+    <height>657</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,7 +17,7 @@
    <item>
     <widget class="QTabWidget" name="tabs">
      <property name="currentIndex">
-      <number>1</number>
+      <number>0</number>
      </property>
      <property name="elideMode">
       <enum>Qt::ElideNone</enum>
@@ -411,7 +411,7 @@
          <item row="1" column="0">
           <widget class="QLabel" name="queueStalledMinutesLabel">
            <property name="text">
-            <string extracomment="Please keep this phrase as short as possible, it's curently the longest and influences dialog width">Download is i&amp;nactive if data sharing stopped:</string>
+            <string extracomment="Please keep this phrase as short as possible, it's currently the longest and influences dialog width">Download is i&amp;nactive if data sharing stopped:</string>
            </property>
            <property name="buddy">
             <cstring>queueStalledMinutesSpin</cstring>
@@ -497,9 +497,9 @@
           </widget>
          </item>
          <item row="2" column="0">
-          <widget class="QCheckBox" name="completionScriptCheck">
+          <widget class="QCheckBox" name="doneDownloadingScriptCheck">
            <property name="text">
-            <string>Call scrip&amp;t when torrent is completed:</string>
+            <string>Call scrip&amp;t when downloading is completed:</string>
            </property>
            <property name="checked">
             <bool>true</bool>
@@ -507,15 +507,15 @@
           </widget>
          </item>
          <item row="2" column="1">
-          <widget class="QStackedWidget" name="completionScriptStack">
+          <widget class="QStackedWidget" name="doneDownloadingScriptStack">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
-           <widget class="PathButton" name="completionScriptButton"/>
-           <widget class="QLineEdit" name="completionScriptEdit"/>
+           <widget class="PathButton" name="doneDownloadingScriptButton"/>
+           <widget class="QLineEdit" name="doneDownloadingScriptEdit"/>
           </widget>
          </item>
         </layout>
@@ -599,6 +599,28 @@
            <property name="singleStep">
             <number>5</number>
            </property>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QCheckBox" name="doneSeedingScriptCheck">
+           <property name="text">
+            <string>Call scrip&amp;t when seeding is completed:</string>
+           </property>
+           <property name="checked">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QStackedWidget" name="doneSeedingScriptStack">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <widget class="PathButton" name="doneSeedingScriptButton"/>
+           <widget class="QLineEdit" name="doneSeedingScriptEdit"/>
           </widget>
          </item>
         </layout>
@@ -958,6 +980,58 @@
            </property>
            <property name="text">
             <string>Use &amp;Local Peer Discovery to find more peers</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item>
+        <spacer name="defaultTrackersSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeType">
+          <enum>QSizePolicy::Fixed</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>1</width>
+           <height>10</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+       <item>
+        <widget class="QLabel" name="defaultTrackersLabel">
+         <property name="font">
+          <font>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
+         <property name="text">
+          <string>Default Public Trackers</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <layout class="QVBoxLayout" name="defaultTrackersLayout">
+         <property name="leftMargin">
+          <number>18</number>
+         </property>
+         <item>
+          <widget class="QPlainTextEdit" name="defaultTrackersPlainTextEdit">
+           <property name="toolTip">
+            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Trackers to use on all public torrents.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;To add a backup URL, add it on the next line after a primary URL.&lt;/p&gt;&lt;p&gt;To add a new primary URL, add it after a blank line.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           </property>
+           <property name="tabChangesFocus">
+            <bool>true</bool>
+           </property>
+           <property name="lineWrapMode">
+            <enum>QPlainTextEdit::NoWrap</enum>
+           </property>
+           <property name="plainText">
+            <string notr="true"/>
            </property>
           </widget>
          </item>
@@ -1366,9 +1440,9 @@
    </hints>
   </connection>
   <connection>
-   <sender>completionScriptCheck</sender>
+   <sender>doneDownloadingScriptCheck</sender>
    <signal>toggled(bool)</signal>
-   <receiver>completionScriptStack</receiver>
+   <receiver>doneDownloadingScriptStack</receiver>
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
@@ -1378,6 +1452,22 @@
     <hint type="destinationlabel">
      <x>395</x>
      <y>447</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>doneSeedingScriptCheck</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>doneSeedingScriptStack</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>69</x>
+     <y>69</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>69</x>
+     <y>69</y>
     </hint>
    </hints>
   </connection>

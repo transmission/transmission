@@ -6,10 +6,10 @@
 #pragma once
 
 #include <cstdint>
+#include <vector>
 
 #include <QCoreApplication>
 #include <QHash>
-#include <QList>
 #include <QSet>
 #include <QString>
 #include <QVariant>
@@ -22,12 +22,9 @@ class FileTreeItem
     TR_DISABLE_COPY_MOVE(FileTreeItem)
 
 public:
-    enum
-    {
-        LOW = (1 << 0),
-        NORMAL = (1 << 1),
-        HIGH = (1 << 2)
-    };
+    static auto constexpr Low = int{ 1 << 0 };
+    static auto constexpr Normal = int{ 1 << 1 };
+    static auto constexpr High = int{ 1 << 2 };
 
     FileTreeItem(QString const& name = QString(), int file_index = -1, uint64_t size = 0)
         : name_(name)
@@ -98,7 +95,7 @@ private:
 
     FileTreeItem* parent_ = {};
     QHash<QString, int> child_rows_;
-    QList<FileTreeItem*> children_;
+    std::vector<FileTreeItem*> children_;
     QString name_;
     uint64_t const total_size_ = {};
     uint64_t have_size_ = {};

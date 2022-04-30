@@ -1,5 +1,5 @@
 // This file Copyright © 2012-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -29,47 +29,55 @@ QString getNameFromMetainfo(QByteArray const& benc)
     return QString::fromStdString(metainfo.name());
 }
 
+QString getNameFromMagnet(QString const& magnet)
+{
+    auto tmp = tr_magnet_metainfo{};
+
+    if (!tmp.parseMagnet(magnet.toStdString()))
+    {
+        return magnet;
+    }
+
+    if (!std::empty(tmp.name()))
+    {
+        return QString::fromStdString(tmp.name());
+    }
+
+    return QString::fromStdString(tmp.infoHashString());
+}
+
 } // namespace
 
 int AddData::set(QString const& key)
 {
-    if (Utils::isMagnetLink(key))
+    if (auto const key_std = key.toStdString(); tr_urlIsValid(key_std))
     {
-        magnet = key;
-        type = MAGNET;
-    }
-    else if (Utils::isUriWithSupportedScheme(key))
-    {
-        url = key;
+        this->url = key;
         type = URL;
     }
     else if (QFile(key).exists())
     {
-        filename = QDir::fromNativeSeparators(key);
+        this->filename = QDir::fromNativeSeparators(key);
         type = FILENAME;
 
-        QFile file(key);
+        auto file = QFile{ key };
         file.open(QIODevice::ReadOnly);
-        metainfo = file.readAll();
+        this->metainfo = file.readAll();
         file.close();
     }
-    else if (Utils::isHexHashcode(key))
+    else if (tr_magnet_metainfo{}.parseMagnet(key_std))
     {
-        magnet = QStringLiteral("magnet:?xt=urn:btih:") + key;
-        type = MAGNET;
+        this->magnet = key;
+        this->type = MAGNET;
+    }
+    else if (auto const raw = QByteArray::fromBase64(key.toUtf8()); !raw.isEmpty())
+    {
+        this->metainfo.append(raw);
+        this->type = METAINFO;
     }
     else
     {
-        auto raw = QByteArray::fromBase64(key.toUtf8());
-        if (!raw.isEmpty())
-        {
-            metainfo.append(raw);
-            type = METAINFO;
-        }
-        else
-        {
-            type = NONE;
-        }
+        this->type = NONE;
     }
 
     return type;
@@ -88,7 +96,7 @@ QString AddData::readableName() const
         return filename;
 
     case MAGNET:
-        return magnet;
+        return getNameFromMagnet(magnet);
 
     case URL:
         return url.toString();

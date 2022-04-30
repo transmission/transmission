@@ -66,14 +66,14 @@ TEST_F(CompletionTest, setBlocks)
     EXPECT_FALSE(completion.hasAll());
     EXPECT_EQ(0, completion.hasTotal());
 
-    auto bitfield = tr_bitfield{ block_info.n_blocks };
+    auto bitfield = tr_bitfield{ block_info.blockCount() };
     bitfield.setHasAll();
 
     // test that the bitfield did get replaced
     completion.setBlocks(bitfield);
     EXPECT_TRUE(completion.blocks().hasAll());
     EXPECT_TRUE(completion.hasAll());
-    EXPECT_EQ(block_info.total_size, completion.hasTotal());
+    EXPECT_EQ(block_info.totalSize(), completion.hasTotal());
 }
 
 TEST_F(CompletionTest, hasBlock)
@@ -152,7 +152,7 @@ TEST_F(CompletionTest, hasPiece)
     EXPECT_EQ(0, completion.hasValid());
 
     // check that adding all the blocks in a piece means we have it
-    for (size_t i = 1; i < block_info.n_blocks_in_piece; ++i)
+    for (tr_block_index_t i = 1, n = block_info.pieceLoc(1).block; i < n; ++i)
     {
         completion.addBlock(i);
     }
@@ -217,21 +217,21 @@ TEST_F(CompletionTest, hasTotalAndValid)
     EXPECT_EQ(completion.hasValid(), completion.hasTotal());
 
     // check that adding the final piece adjusts by block_info.final_piece_size
-    completion.setHasPiece(block_info.n_pieces - 1, true);
-    EXPECT_EQ(block_info.final_piece_size, completion.hasTotal());
+    completion.setHasPiece(block_info.pieceCount() - 1, true);
+    EXPECT_EQ(block_info.pieceSize(block_info.pieceCount() - 1), completion.hasTotal());
     EXPECT_EQ(completion.hasValid(), completion.hasTotal());
 
-    // check that adding a non-final piece adjusts by block_info.piece_size
+    // check that adding a non-final piece adjusts by block_info.pieceSize()
     completion.setHasPiece(0, true);
-    EXPECT_EQ(block_info.final_piece_size + block_info.piece_size, completion.hasTotal());
+    EXPECT_EQ(block_info.pieceSize(block_info.pieceCount() - 1) + block_info.pieceSize(), completion.hasTotal());
     EXPECT_EQ(completion.hasValid(), completion.hasTotal());
 
     // check that removing the final piece adjusts by block_info.final_piece_size
-    completion.setHasPiece(block_info.n_pieces - 1, false);
-    EXPECT_EQ(block_info.piece_size, completion.hasValid());
+    completion.setHasPiece(block_info.pieceCount() - 1, false);
+    EXPECT_EQ(block_info.pieceSize(), completion.hasValid());
     EXPECT_EQ(completion.hasValid(), completion.hasTotal());
 
-    // check that removing a non-final piece adjusts by block_info.piece_size
+    // check that removing a non-final piece adjusts by block_info.pieceSize()
     completion.setHasPiece(0, false);
     EXPECT_EQ(0, completion.hasValid());
     EXPECT_EQ(completion.hasValid(), completion.hasTotal());
@@ -251,41 +251,43 @@ TEST_F(CompletionTest, leftUntilDone)
 
     // check that the initial blank-slate state has nothing
     auto completion = tr_completion(&torrent, &block_info);
-    EXPECT_EQ(block_info.total_size, completion.leftUntilDone());
+    EXPECT_EQ(block_info.totalSize(), completion.leftUntilDone());
 
     // check that adding the final piece adjusts by block_info.final_piece_size
-    completion.addPiece(block_info.n_pieces - 1);
-    EXPECT_EQ(block_info.total_size - block_info.final_piece_size, completion.leftUntilDone());
+    completion.addPiece(block_info.pieceCount() - 1);
+    EXPECT_EQ(block_info.totalSize() - block_info.pieceSize(block_info.pieceCount() - 1), completion.leftUntilDone());
 
-    // check that adding a non-final piece adjusts by block_info.piece_size
+    // check that adding a non-final piece adjusts by block_info.pieceSize()
     completion.addPiece(0);
-    EXPECT_EQ(block_info.total_size - block_info.final_piece_size - block_info.piece_size, completion.leftUntilDone());
+    EXPECT_EQ(
+        block_info.totalSize() - block_info.pieceSize(block_info.pieceCount() - 1) - block_info.pieceSize(),
+        completion.leftUntilDone());
 
     // check that removing the final piece adjusts by block_info.final_piece_size
-    completion.removePiece(block_info.n_pieces - 1);
-    EXPECT_EQ(block_info.total_size - block_info.piece_size, completion.leftUntilDone());
+    completion.removePiece(block_info.pieceCount() - 1);
+    EXPECT_EQ(block_info.totalSize() - block_info.pieceSize(), completion.leftUntilDone());
 
     // check that dnd-flagging a piece we already have affects nothing
     torrent.dnd_pieces.insert(0);
     completion.invalidateSizeWhenDone();
-    EXPECT_EQ(block_info.total_size - block_info.piece_size, completion.leftUntilDone());
+    EXPECT_EQ(block_info.totalSize() - block_info.pieceSize(), completion.leftUntilDone());
     torrent.dnd_pieces.clear();
     completion.invalidateSizeWhenDone();
 
-    // check that dnd-flagging a piece we DON'T already have adjusts by block_info.piece_size
+    // check that dnd-flagging a piece we DON'T already have adjusts by block_info.pieceSize()
     torrent.dnd_pieces.insert(1);
     completion.invalidateSizeWhenDone();
-    EXPECT_EQ(block_info.total_size - block_info.piece_size * 2, completion.leftUntilDone());
+    EXPECT_EQ(block_info.totalSize() - block_info.pieceSize() * 2, completion.leftUntilDone());
     torrent.dnd_pieces.clear();
     completion.invalidateSizeWhenDone();
 
-    // check that removing a non-final piece adjusts by block_info.piece_size
+    // check that removing a non-final piece adjusts by block_info.pieceSize()
     completion.removePiece(0);
-    EXPECT_EQ(block_info.total_size, completion.leftUntilDone());
+    EXPECT_EQ(block_info.totalSize(), completion.leftUntilDone());
 
     // check that adding a block adjusts by block_info.block_size
     completion.addBlock(0);
-    EXPECT_EQ(block_info.total_size - block_info.block_size, completion.leftUntilDone());
+    EXPECT_EQ(block_info.totalSize() - tr_block_info::BlockSize, completion.leftUntilDone());
 }
 
 TEST_F(CompletionTest, sizeWhenDone)
@@ -297,13 +299,13 @@ TEST_F(CompletionTest, sizeWhenDone)
 
     // check that adding or removing blocks or pieces does not affect sizeWhenDone
     auto completion = tr_completion(&torrent, &block_info);
-    EXPECT_EQ(block_info.total_size, completion.sizeWhenDone());
+    EXPECT_EQ(block_info.totalSize(), completion.sizeWhenDone());
     completion.addBlock(0);
-    EXPECT_EQ(block_info.total_size, completion.sizeWhenDone());
+    EXPECT_EQ(block_info.totalSize(), completion.sizeWhenDone());
     completion.addPiece(0);
-    EXPECT_EQ(block_info.total_size, completion.sizeWhenDone());
+    EXPECT_EQ(block_info.totalSize(), completion.sizeWhenDone());
     completion.removePiece(0);
-    EXPECT_EQ(block_info.total_size, completion.sizeWhenDone());
+    EXPECT_EQ(block_info.totalSize(), completion.sizeWhenDone());
 
     // check that flagging complete pieces as dnd does not affect sizeWhenDone
     for (size_t i = 0; i < 32; ++i)
@@ -312,7 +314,7 @@ TEST_F(CompletionTest, sizeWhenDone)
         torrent.dnd_pieces.insert(i);
     }
     completion.invalidateSizeWhenDone();
-    EXPECT_EQ(block_info.total_size, completion.sizeWhenDone());
+    EXPECT_EQ(block_info.totalSize(), completion.sizeWhenDone());
 
     // check that flagging missing pieces as dnd does not affect sizeWhenDone
     for (size_t i = 32; i < 48; ++i)
@@ -320,7 +322,7 @@ TEST_F(CompletionTest, sizeWhenDone)
         torrent.dnd_pieces.insert(i);
     }
     completion.invalidateSizeWhenDone();
-    EXPECT_EQ(block_info.total_size - 16 * block_info.piece_size, completion.sizeWhenDone());
+    EXPECT_EQ(block_info.totalSize() - 16 * block_info.pieceSize(), completion.sizeWhenDone());
 }
 
 TEST_F(CompletionTest, createPieceBitfield)
@@ -332,9 +334,10 @@ TEST_F(CompletionTest, createPieceBitfield)
 
     // make a completion object that has a random assortment of pieces
     auto completion = tr_completion(&torrent, &block_info);
-    auto buf = std::array<char, 64>{};
+    auto buf = std::array<char, 65>{};
+    ASSERT_EQ(std::size(buf), block_info.pieceCount());
     EXPECT_TRUE(tr_rand_buffer(std::data(buf), std::size(buf)));
-    for (uint64_t i = 0; i < block_info.n_pieces; ++i)
+    for (uint64_t i = 0; i < block_info.pieceCount(); ++i)
     {
         if ((buf[i] % 2) != 0)
         {
@@ -345,9 +348,9 @@ TEST_F(CompletionTest, createPieceBitfield)
     // serialize it to a raw bitfield, read it back into a bitfield,
     // and test that the new bitfield matches
     auto const pieces_raw_bitfield = completion.createPieceBitfield();
-    tr_bitfield pieces{ size_t(block_info.n_pieces) };
+    tr_bitfield pieces{ size_t(block_info.pieceCount()) };
     pieces.setRaw(std::data(pieces_raw_bitfield), std::size(pieces_raw_bitfield));
-    for (uint64_t i = 0; i < block_info.n_pieces; ++i)
+    for (uint64_t i = 0; i < block_info.pieceCount(); ++i)
     {
         EXPECT_EQ(completion.hasPiece(i), pieces.test(i));
     }
@@ -367,19 +370,17 @@ TEST_F(CompletionTest, countMissingBytesInPiece)
 
     EXPECT_EQ(block_info.pieceSize(0), completion.countMissingBytesInPiece(0));
     completion.addBlock(0);
-    EXPECT_EQ(block_info.pieceSize(0) - block_info.block_size, completion.countMissingBytesInPiece(0));
+    EXPECT_EQ(block_info.pieceSize(0) - tr_block_info::BlockSize, completion.countMissingBytesInPiece(0));
     completion.addPiece(0);
-    EXPECT_EQ(0, completion.countMissingBytesInPiece(0));
+    EXPECT_EQ(0U, completion.countMissingBytesInPiece(0));
 
-    auto const final_piece = block_info.n_pieces - 1;
-    auto const final_block = block_info.n_blocks - 1;
+    auto const final_piece = block_info.pieceCount() - 1;
+    auto const final_block = block_info.blockCount() - 1;
     EXPECT_EQ(block_info.pieceSize(final_piece), completion.countMissingBytesInPiece(final_piece));
     completion.addBlock(final_block);
-    EXPECT_EQ(1, block_info.final_piece_size);
-    EXPECT_EQ(1, block_info.final_block_size);
-    EXPECT_EQ(1, block_info.n_blocks_in_final_piece);
+    EXPECT_EQ(1U, block_info.pieceSize(block_info.pieceCount() - 1));
     EXPECT_TRUE(completion.hasPiece(final_piece));
-    EXPECT_EQ(0, completion.countMissingBytesInPiece(final_piece));
+    EXPECT_EQ(0U, completion.countMissingBytesInPiece(final_piece));
 }
 
 TEST_F(CompletionTest, amountDone)
@@ -393,7 +394,7 @@ TEST_F(CompletionTest, amountDone)
     // make bins s.t. each bin is a single piece
     auto bins = std::array<float, TotalSize / PieceSize>{};
 
-    for (tr_piece_index_t piece = 0; piece < block_info.n_pieces; ++piece)
+    for (tr_piece_index_t piece = 0; piece < block_info.pieceCount(); ++piece)
     {
         completion.removePiece(piece);
     }
@@ -403,7 +404,6 @@ TEST_F(CompletionTest, amountDone)
     // one block
     completion.addBlock(0);
     completion.amountDone(std::data(bins), std::size(bins));
-    EXPECT_DOUBLE_EQ(1.0 / block_info.n_blocks_in_piece, bins[0]);
     EXPECT_DOUBLE_EQ(0.0, bins[1]);
 
     // one piece
@@ -413,7 +413,7 @@ TEST_F(CompletionTest, amountDone)
     EXPECT_DOUBLE_EQ(0.0, bins[1]);
 
     // all pieces
-    for (tr_piece_index_t piece = 0; piece < block_info.n_pieces; ++piece)
+    for (tr_piece_index_t piece = 0; piece < block_info.pieceCount(); ++piece)
     {
         completion.addPiece(piece);
     }
@@ -436,7 +436,7 @@ TEST_F(CompletionTest, countHasBytesInSpan)
     auto completion = tr_completion(&torrent, &block_info);
 
     // torrent is complete
-    auto blocks = tr_bitfield{ block_info.n_blocks };
+    auto blocks = tr_bitfield{ block_info.blockCount() };
     blocks.setHasAll();
     completion.setBlocks(blocks);
 

@@ -1,5 +1,5 @@
 // This file Copyright © 2008-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -7,6 +7,8 @@
 #include <string>
 
 #include <glibmm/i18n.h>
+
+#include <fmt/core.h>
 
 #include <libtransmission/utils.h>
 
@@ -17,17 +19,16 @@
 class FreeSpaceLabel::Impl
 {
 public:
-    Impl(FreeSpaceLabel& label, Glib::RefPtr<Session> const& core, std::string const& dir);
+    Impl(FreeSpaceLabel& label, Glib::RefPtr<Session> const& core, std::string_view dir);
     ~Impl();
 
     TR_DISABLE_COPY_MOVE(Impl)
 
-    void set_dir(std::string const& dir);
+    void set_dir(std::string_view dir);
 
 private:
     bool on_freespace_timer();
 
-private:
     FreeSpaceLabel& label_;
     Glib::RefPtr<Session> const core_;
     std::string dir_;
@@ -47,14 +48,13 @@ bool FreeSpaceLabel::Impl::on_freespace_timer()
     }
 
     auto const bytes = tr_dirSpace(dir_).free;
-    auto const text = bytes < 0 ? _("Error") : gtr_sprintf(_("%s free"), tr_strlsize(bytes));
-    auto const markup = gtr_sprintf("<i>%s</i>", text);
-    label_.set_markup(markup);
+    auto const text = bytes < 0 ? _("Error") : fmt::format(_("{disk_space} free"), fmt::arg("disk_space", tr_strlsize(bytes)));
+    label_.set_markup(fmt::format(FMT_STRING("<i>{:s}</i>"), text));
 
     return true;
 }
 
-FreeSpaceLabel::FreeSpaceLabel(Glib::RefPtr<Session> const& core, std::string const& dir)
+FreeSpaceLabel::FreeSpaceLabel(Glib::RefPtr<Session> const& core, std::string_view dir)
     : Gtk::Label()
     , impl_(std::make_unique<Impl>(*this, core, dir))
 {
@@ -62,7 +62,7 @@ FreeSpaceLabel::FreeSpaceLabel(Glib::RefPtr<Session> const& core, std::string co
 
 FreeSpaceLabel::~FreeSpaceLabel() = default;
 
-FreeSpaceLabel::Impl::Impl(FreeSpaceLabel& label, Glib::RefPtr<Session> const& core, std::string const& dir)
+FreeSpaceLabel::Impl::Impl(FreeSpaceLabel& label, Glib::RefPtr<Session> const& core, std::string_view dir)
     : label_(label)
     , core_(core)
     , dir_(dir)
@@ -71,12 +71,12 @@ FreeSpaceLabel::Impl::Impl(FreeSpaceLabel& label, Glib::RefPtr<Session> const& c
     on_freespace_timer();
 }
 
-void FreeSpaceLabel::set_dir(std::string const& dir)
+void FreeSpaceLabel::set_dir(std::string_view dir)
 {
     impl_->set_dir(dir);
 }
 
-void FreeSpaceLabel::Impl::set_dir(std::string const& dir)
+void FreeSpaceLabel::Impl::set_dir(std::string_view dir)
 {
     dir_ = dir;
     on_freespace_timer();

@@ -12,6 +12,8 @@
 #endif
 
 #include "transmission.h"
+
+#include "crypto-utils.h"
 #include "platform.h"
 #include "web-utils.h"
 
@@ -29,8 +31,8 @@ TEST_F(WebUtilsTest, urlParse)
     EXPECT_TRUE(parsed);
     EXPECT_EQ("http"sv, parsed->scheme);
     EXPECT_EQ("1"sv, parsed->host);
+    EXPECT_EQ("1"sv, parsed->sitename);
     EXPECT_EQ(""sv, parsed->path);
-    EXPECT_EQ("80"sv, parsed->portstr);
     EXPECT_EQ(""sv, parsed->query);
     EXPECT_EQ(""sv, parsed->fragment);
     EXPECT_EQ(80, parsed->port);
@@ -40,10 +42,10 @@ TEST_F(WebUtilsTest, urlParse)
     EXPECT_TRUE(parsed);
     EXPECT_EQ("http"sv, parsed->scheme);
     EXPECT_EQ("www.some-tracker.org"sv, parsed->host);
+    EXPECT_EQ("some-tracker"sv, parsed->sitename);
     EXPECT_EQ("/some/path"sv, parsed->path);
     EXPECT_EQ(""sv, parsed->query);
     EXPECT_EQ(""sv, parsed->fragment);
-    EXPECT_EQ("80"sv, parsed->portstr);
     EXPECT_EQ(80, parsed->port);
 
     url = "http://www.some-tracker.org:8080/some/path"sv;
@@ -51,10 +53,10 @@ TEST_F(WebUtilsTest, urlParse)
     EXPECT_TRUE(parsed);
     EXPECT_EQ("http"sv, parsed->scheme);
     EXPECT_EQ("www.some-tracker.org"sv, parsed->host);
+    EXPECT_EQ("some-tracker"sv, parsed->sitename);
     EXPECT_EQ("/some/path"sv, parsed->path);
     EXPECT_EQ(""sv, parsed->query);
     EXPECT_EQ(""sv, parsed->fragment);
-    EXPECT_EQ("8080"sv, parsed->portstr);
     EXPECT_EQ(8080, parsed->port);
 
     url = "http://www.some-tracker.org:8080/some/path?key=val&foo=bar#fragment"sv;
@@ -62,10 +64,10 @@ TEST_F(WebUtilsTest, urlParse)
     EXPECT_TRUE(parsed);
     EXPECT_EQ("http"sv, parsed->scheme);
     EXPECT_EQ("www.some-tracker.org"sv, parsed->host);
+    EXPECT_EQ("some-tracker"sv, parsed->sitename);
     EXPECT_EQ("/some/path"sv, parsed->path);
     EXPECT_EQ("key=val&foo=bar"sv, parsed->query);
     EXPECT_EQ("fragment"sv, parsed->fragment);
-    EXPECT_EQ("8080"sv, parsed->portstr);
     EXPECT_EQ(8080, parsed->port);
 
     url =
@@ -79,6 +81,7 @@ TEST_F(WebUtilsTest, urlParse)
     EXPECT_TRUE(parsed);
     EXPECT_EQ("magnet"sv, parsed->scheme);
     EXPECT_EQ(""sv, parsed->host);
+    EXPECT_EQ(""sv, parsed->sitename);
     EXPECT_EQ(""sv, parsed->path);
     EXPECT_EQ(
         "xt=urn:btih:14ffe5dd23188fd5cb53a1d47f1289db70abf31e"
@@ -87,7 +90,48 @@ TEST_F(WebUtilsTest, urlParse)
         "&tr=udp%3A%2F%2Ftracker.publicbt.com%3A80"
         "&ws=http%3A%2F%2Ftransmissionbt.com"sv,
         parsed->query);
-    EXPECT_EQ(""sv, parsed->portstr);
+
+    // test a host whose public suffix contains >1 dot
+    url = "https://www.example.co.uk:8080/some/path"sv;
+    parsed = tr_urlParse(url);
+    EXPECT_TRUE(parsed);
+    EXPECT_EQ("https"sv, parsed->scheme);
+    EXPECT_EQ("example"sv, parsed->sitename);
+    EXPECT_EQ("www.example.co.uk"sv, parsed->host);
+    EXPECT_EQ("/some/path"sv, parsed->path);
+    EXPECT_EQ(8080, parsed->port);
+
+    // test a host that lacks a subdomain
+    url = "http://some-tracker.co.uk/some/other/path"sv;
+    parsed = tr_urlParse(url);
+    EXPECT_TRUE(parsed);
+    EXPECT_EQ("http"sv, parsed->scheme);
+    EXPECT_EQ("some-tracker"sv, parsed->sitename);
+    EXPECT_EQ("some-tracker.co.uk"sv, parsed->host);
+    EXPECT_EQ("/some/other/path"sv, parsed->path);
+    EXPECT_EQ(80, parsed->port);
+
+    // test a host with an IP address
+    url = "https://127.0.0.1:8080/some/path"sv;
+    parsed = tr_urlParse(url);
+    EXPECT_TRUE(parsed);
+    EXPECT_EQ("https"sv, parsed->scheme);
+    EXPECT_EQ("127.0.0.1"sv, parsed->sitename);
+    EXPECT_EQ("127.0.0.1"sv, parsed->host);
+    EXPECT_EQ("/some/path"sv, parsed->path);
+    EXPECT_EQ(8080, parsed->port);
+}
+
+TEST(WebUtilsTest, urlParseFuzz)
+{
+    auto buf = std::vector<char>{};
+
+    for (size_t i = 0; i < 100000; ++i)
+    {
+        buf.resize(tr_rand_int(1024));
+        tr_rand_buffer(std::data(buf), std::size(buf));
+        tr_urlParse({ std::data(buf), std::size(buf) });
+    }
 }
 
 TEST_F(WebUtilsTest, urlNextQueryPair)
@@ -170,8 +214,8 @@ TEST_F(WebUtilsTest, urlPercentDecode)
           "http://www.example.com/~user/?test=1&test1=2"sv },
     } };
 
-    for (auto const& test : Tests)
+    for (auto const& [encoded, decoded] : Tests)
     {
-        EXPECT_EQ(test.second, tr_urlPercentDecode(test.first));
+        EXPECT_EQ(decoded, tr_urlPercentDecode(encoded));
     }
 }

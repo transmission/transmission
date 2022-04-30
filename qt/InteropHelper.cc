@@ -1,5 +1,5 @@
 // This file Copyright © 2015-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -9,52 +9,44 @@
 
 bool InteropHelper::isConnected() const
 {
-    bool is_connected = false;
+#if defined(ENABLE_DBUS_INTEROP) && defined(ENABLE_COM_INTEROP)
 
-#ifdef ENABLE_DBUS_INTEROP
+    return dbus_client_.isConnected() || com_client_.isConnected();
 
-    is_connected |= dbus_client_.isConnected();
+#elif defined(ENABLE_DBUS_INTEROP)
+
+    return dbus_client_.isConnected();
+
+#elif defined(ENABLE_COM_INTEROP)
+
+    return com_client_.isConnected();
+
+#else
+
+    return false;
 
 #endif
-
-#ifdef ENABLE_COM_INTEROP
-
-    is_connected |= com_client_.isConnected();
-
-#endif
-
-    return is_connected;
 }
 
 bool InteropHelper::addMetainfo(QString const& metainfo) const
 {
-#ifdef ENABLE_DBUS_INTEROP
+#if defined(ENABLE_DBUS_INTEROP) && defined(ENABLE_COM_INTEROP)
 
-    {
-        QVariant const response = dbus_client_.addMetainfo(metainfo);
+    return dbus_client_.addMetainfo(metainfo).toBool() || com_client_.addMetainfo(metainfo).toBool();
 
-        if (response.isValid() && response.toBool())
-        {
-            return true;
-        }
-    }
+#elif defined(ENABLE_DBUS_INTEROP)
 
-#endif
+    return dbus_client_.addMetainfo(metainfo).toBool();
 
-#ifdef ENABLE_COM_INTEROP
+#elif defined(ENABLE_COM_INTEROP)
 
-    {
-        QVariant const response = com_client_.addMetainfo(metainfo);
+    return com_client_.addMetainfo(metainfo).toBool();
 
-        if (response.isValid() && response.toBool())
-        {
-            return true;
-        }
-    }
-
-#endif
+#else
 
     return false;
+
+#endif
 }
 
 void InteropHelper::initialize()

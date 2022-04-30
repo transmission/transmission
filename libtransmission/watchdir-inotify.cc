@@ -1,5 +1,5 @@
 // This file Copyright © 2015-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -13,6 +13,8 @@
 #include <event2/bufferevent.h>
 #include <event2/event.h>
 
+#include <fmt/core.h>
+
 #define LIBTRANSMISSION_WATCHDIR_MODULE
 
 #include "transmission.h"
@@ -21,14 +23,6 @@
 #include "utils.h"
 #include "watchdir.h"
 #include "watchdir-common.h"
-
-/***
-****
-***/
-
-#define log_error(...) \
-    (!tr_logLevelIsActive(TR_LOG_ERROR) ? (void)0 : \
-                                          tr_logAddMessage(__FILE__, __LINE__, TR_LOG_ERROR, "watchdir:inotify", __VA_ARGS__))
 
 /***
 ****
@@ -77,13 +71,20 @@ static void tr_watchdir_inotify_on_event(struct bufferevent* event, void* contex
     {
         if (nread == (size_t)-1)
         {
-            log_error("Failed to read inotify event: %s", tr_strerror(errno));
+            auto const error_code = errno;
+            tr_logAddError(fmt::format(
+                _("Couldn't read event: {error} ({error_code})"),
+                fmt::arg("error", tr_strerror(error_code)),
+                fmt::arg("error_code", error_code)));
             break;
         }
 
         if (nread != sizeof(ev))
         {
-            log_error("Failed to read inotify event: expected %zu, got %zu bytes.", sizeof(ev), nread);
+            tr_logAddError(fmt::format(
+                _("Couldn't read event: expected {expected_size}, got {actual_size}"),
+                fmt::arg("expected_size", sizeof(ev)),
+                fmt::arg("actual_size", nread)));
             break;
         }
 
@@ -100,13 +101,20 @@ static void tr_watchdir_inotify_on_event(struct bufferevent* event, void* contex
         /* Consume entire name into buffer */
         if ((nread = bufferevent_read(event, name, ev.len)) == (size_t)-1)
         {
-            log_error("Failed to read inotify name: %s", tr_strerror(errno));
+            auto const error_code = errno;
+            tr_logAddError(fmt::format(
+                _("Couldn't read filename: {error} ({error_code})"),
+                fmt::arg("error", tr_strerror(error_code)),
+                fmt::arg("error_code", error_code)));
             break;
         }
 
         if (nread != ev.len)
         {
-            log_error("Failed to read inotify name: expected %" PRIu32 ", got %zu bytes.", ev.len, nread);
+            tr_logAddError(fmt::format(
+                _("Couldn't read filename: expected {expected_size}, got {actual_size}"),
+                fmt::arg("expected_size", sizeof(ev)),
+                fmt::arg("actual_size", nread)));
             break;
         }
 
@@ -152,24 +160,40 @@ tr_watchdir_backend* tr_watchdir_inotify_new(tr_watchdir_t handle)
 
     auto* const backend = tr_new0(tr_watchdir_inotify, 1);
     backend->base.free_func = &tr_watchdir_inotify_free;
-    backend->infd = -1;
-    backend->inwd = -1;
 
-    if ((backend->infd = inotify_init()) == -1)
+    backend->infd = inotify_init();
+    if (backend->infd == -1)
     {
-        log_error("Unable to inotify_init: %s", tr_strerror(errno));
+        auto const error_code = errno;
+        tr_logAddError(fmt::format(
+            _("Couldn't watch '{path}': {error} ({error_code})"),
+            fmt::arg("path", path),
+            fmt::arg("error", tr_strerror(error_code)),
+            fmt::arg("error_code", error_code)));
         goto FAIL;
     }
 
-    if ((backend->inwd = inotify_add_watch(backend->infd, path, INOTIFY_WATCH_MASK | IN_ONLYDIR)) == -1)
+    backend->inwd = inotify_add_watch(backend->infd, path, INOTIFY_WATCH_MASK | IN_ONLYDIR);
+    if (backend->inwd == -1)
     {
-        log_error("Failed to setup watchdir \"%s\": %s (%d)", path, tr_strerror(errno), errno);
+        auto const error_code = errno;
+        tr_logAddError(fmt::format(
+            _("Couldn't watch '{path}': {error} ({error_code})"),
+            fmt::arg("path", path),
+            fmt::arg("error", tr_strerror(error_code)),
+            fmt::arg("error_code", error_code)));
         goto FAIL;
     }
 
-    if ((backend->event = bufferevent_socket_new(tr_watchdir_get_event_base(handle), backend->infd, 0)) == nullptr)
+    backend->event = bufferevent_socket_new(tr_watchdir_get_event_base(handle), backend->infd, 0);
+    if (backend->event == nullptr)
     {
-        log_error("Failed to create event buffer: %s", tr_strerror(errno));
+        auto const error_code = errno;
+        tr_logAddError(fmt::format(
+            _("Couldn't watch '{path}': {error} ({error_code})"),
+            fmt::arg("path", path),
+            fmt::arg("error", tr_strerror(error_code)),
+            fmt::arg("error_code", error_code)));
         goto FAIL;
     }
 
@@ -188,7 +212,12 @@ tr_watchdir_backend* tr_watchdir_inotify_new(tr_watchdir_t handle)
             handle,
             nullptr) == -1)
     {
-        log_error("Failed to perform initial scan: %s", tr_strerror(errno));
+        auto const error_code = errno;
+        tr_logAddWarn(fmt::format(
+            _("Couldn't scan '{path}': {error} ({error_code})"),
+            fmt::arg("path", path),
+            fmt::arg("error", tr_strerror(error_code)),
+            fmt::arg("error_code", error_code)));
     }
 
     return BACKEND_DOWNCAST(backend);

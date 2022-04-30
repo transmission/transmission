@@ -1,5 +1,5 @@
 // This file Copyright © 2012-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -19,7 +19,7 @@
 #include "FilterBar.h"
 #include "HigWorkarea.h" /* GUI_PAD */
 #include "Session.h" /* MC_TORRENT */
-#include "Utils.h" /* gtr_get_host_from_url() */
+#include "Utils.h"
 
 namespace
 {
@@ -62,7 +62,7 @@ private:
     Glib::RefPtr<Gtk::TreeModelFilter> filter_model_;
     int active_activity_type_ = 0;
     int active_tracker_type_ = 0;
-    Glib::ustring active_tracker_host_;
+    Glib::ustring active_tracker_sitename_;
 
     sigc::connection activity_model_row_changed_tag_;
     sigc::connection activity_model_row_inserted_tag_;
@@ -96,17 +96,17 @@ class TrackerFilterModelColumns : public Gtk::TreeModelColumnRecord
 public:
     TrackerFilterModelColumns()
     {
-        add(name);
+        add(displayname);
         add(count);
         add(type);
-        add(host);
+        add(sitename);
         add(pixbuf);
     }
 
-    Gtk::TreeModelColumn<Glib::ustring> name; /* human-readable name; ie, Legaltorrents */
+    Gtk::TreeModelColumn<Glib::ustring> displayname; /* human-readable name; ie, Legaltorrents */
     Gtk::TreeModelColumn<int> count; /* how many matches there are */
     Gtk::TreeModelColumn<int> type;
-    Gtk::TreeModelColumn<std::string> host; /* pattern-matching text; ie, legaltorrents.com */
+    Gtk::TreeModelColumn<Glib::ustring> sitename; // pattern-matching text; see tr_parsed_url.sitename
     Gtk::TreeModelColumn<Glib::RefPtr<Gdk::Pixbuf>> pixbuf;
 };
 
@@ -115,20 +115,7 @@ TrackerFilterModelColumns const tracker_filter_cols;
 /* human-readable name; ie, Legaltorrents */
 Glib::ustring get_name_from_host(std::string const& host)
 {
-    std::string name;
-
-    if (tr_addressIsIP(host.c_str()))
-    {
-        name = host;
-    }
-    else if (auto const dot = host.rfind('.'); dot != std::string::npos)
-    {
-        name = host.substr(0, dot);
-    }
-    else
-    {
-        name = host;
-    }
+    std::string name = host;
 
     if (!name.empty())
     {
@@ -164,48 +151,56 @@ bool tracker_filter_model_update(Glib::RefPtr<Gtk::TreeStore> const& tracker_mod
 {
     tracker_model->steal_data(DIRTY_KEY);
 
+    struct site_info
+    {
+        int count = 0;
+        std::string host;
+        std::string sitename;
+
+        bool operator<(site_info const& that) const
+        {
+            return sitename < that.sitename;
+        }
+    };
+
     /* Walk through all the torrents, tallying how many matches there are
      * for the various categories. Also make a sorted list of all tracker
      * hosts s.t. we can merge it with the existing list */
-    int num_torrents = 0;
-    std::vector<std::string const*> hosts;
-    std::set<std::string> strings;
-    std::unordered_map<std::string const*, int> hosts_hash;
+    auto n_torrents = int{ 0 };
+    auto site_infos = std::unordered_map<std::string /*site*/, site_info>{};
     auto* tmodel = static_cast<Gtk::TreeModel*>(tracker_model->get_data(TORRENT_MODEL_KEY));
     for (auto const& row : tmodel->children())
     {
         auto const* tor = static_cast<tr_torrent const*>(row.get_value(torrent_cols.torrent));
 
-        std::set<std::string const*> keys;
-
+        auto torrent_sites_and_hosts = std::map<std::string, std::string>{};
         for (size_t i = 0, n = tr_torrentTrackerCount(tor); i < n; ++i)
         {
-            auto const* const key = &*strings.insert(gtr_get_host_from_url(tr_torrentTracker(tor, i).announce)).first;
-
-            if (auto const count = hosts_hash.find(key); count == hosts_hash.end())
-            {
-                hosts_hash.emplace(key, 0);
-                hosts.push_back(key);
-            }
-
-            keys.insert(key);
+            auto const view = tr_torrentTracker(tor, i);
+            torrent_sites_and_hosts.try_emplace(view.sitename, view.host);
         }
 
-        for (auto const* const key : keys)
+        for (auto const& [sitename, host] : torrent_sites_and_hosts)
         {
-            ++hosts_hash.at(key);
+            auto& info = site_infos[sitename];
+            info.sitename = sitename;
+            info.host = host;
+            ++info.count;
         }
 
-        ++num_torrents;
+        ++n_torrents;
     }
 
-    std::sort(hosts.begin(), hosts.end(), [](auto const* lhs, auto const& rhs) { return *lhs < *rhs; });
+    auto const n_sites = std::size(site_infos);
+    auto sites_v = std::vector<site_info>(n_sites);
+    std::transform(std::begin(site_infos), std::end(site_infos), std::begin(sites_v), [](auto const& it) { return it.second; });
+    std::sort(std::begin(sites_v), std::end(sites_v));
 
     // update the "all" count
     auto iter = tracker_model->children().begin();
     if (iter)
     {
-        tracker_model_update_count(iter, num_torrents);
+        tracker_model_update_count(iter, n_torrents);
     }
 
     // offset past the "All" and the separator
@@ -216,9 +211,9 @@ bool tracker_filter_model_update(Glib::RefPtr<Gtk::TreeStore> const& tracker_mod
     for (;;)
     {
         // are we done yet?
-        bool const new_hosts_done = i >= hosts.size();
-        bool const old_hosts_done = !iter;
-        if (new_hosts_done && old_hosts_done)
+        bool const new_sites_done = i >= n_sites;
+        bool const old_sites_done = !iter;
+        if (new_sites_done && old_sites_done)
         {
             break;
         }
@@ -226,18 +221,18 @@ bool tracker_filter_model_update(Glib::RefPtr<Gtk::TreeStore> const& tracker_mod
         // decide what to do
         bool remove_row = false;
         bool insert_row = false;
-        if (new_hosts_done)
+        if (new_sites_done)
         {
             remove_row = true;
         }
-        else if (old_hosts_done)
+        else if (old_sites_done)
         {
             insert_row = true;
         }
         else
         {
-            auto const host = iter->get_value(tracker_filter_cols.host);
-            int const cmp = host.compare(*hosts.at(i));
+            auto const sitename = iter->get_value(tracker_filter_cols.sitename);
+            int const cmp = sitename.compare(sites_v.at(i).sitename);
 
             if (cmp < 0)
             {
@@ -257,16 +252,16 @@ bool tracker_filter_model_update(Glib::RefPtr<Gtk::TreeStore> const& tracker_mod
         else if (insert_row)
         {
             auto* session = static_cast<tr_session*>(tracker_model->get_data(SESSION_KEY));
-            auto const* host = hosts.at(i);
+            auto const& site = sites_v.at(i);
             auto const add = tracker_model->insert(iter);
-            add->set_value(tracker_filter_cols.host, *host);
-            add->set_value(tracker_filter_cols.name, get_name_from_host(*host));
-            add->set_value(tracker_filter_cols.count, hosts_hash.at(host));
+            add->set_value(tracker_filter_cols.sitename, Glib::ustring{ site.sitename });
+            add->set_value(tracker_filter_cols.displayname, get_name_from_host(site.sitename));
+            add->set_value(tracker_filter_cols.count, site.count);
             add->set_value(tracker_filter_cols.type, static_cast<int>(TRACKER_FILTER_TYPE_HOST));
             auto path = tracker_model->get_path(add);
             gtr_get_favicon(
                 session,
-                *host,
+                site.host,
                 [ref = Gtk::TreeRowReference(tracker_model, path)](auto const& pixbuf) mutable
                 { favicon_ready_cb(pixbuf, ref); });
             // ++iter;
@@ -274,9 +269,7 @@ bool tracker_filter_model_update(Glib::RefPtr<Gtk::TreeStore> const& tracker_mod
         }
         else // update row
         {
-            auto const* const host = hosts.at(i);
-            auto const count = hosts_hash.at(host);
-            tracker_model_update_count(iter, count);
+            tracker_model_update_count(iter, sites_v.at(i).count);
             ++iter;
             ++i;
         }
@@ -290,7 +283,7 @@ Glib::RefPtr<Gtk::TreeStore> tracker_filter_model_new(Glib::RefPtr<Gtk::TreeMode
     auto const store = Gtk::TreeStore::create(tracker_filter_cols);
 
     auto iter = store->append();
-    iter->set_value(tracker_filter_cols.name, Glib::ustring(_("All")));
+    iter->set_value(tracker_filter_cols.displayname, Glib::ustring(_("All")));
     iter->set_value(tracker_filter_cols.type, static_cast<int>(TRACKER_FILTER_TYPE_ALL));
 
     iter = store->append();
@@ -360,7 +353,7 @@ Gtk::ComboBox* FilterBar::Impl::tracker_combo_box_new(Glib::RefPtr<Gtk::TreeMode
     {
         auto* r = Gtk::make_managed<Gtk::CellRendererText>();
         c->pack_start(*r, false);
-        c->add_attribute(r->property_text(), tracker_filter_cols.name);
+        c->add_attribute(r->property_text(), tracker_filter_cols.displayname);
     }
 
     {
@@ -391,7 +384,7 @@ bool test_tracker(tr_torrent const* tor, int active_tracker_type, Glib::ustring 
 
     for (size_t i = 0, n = tr_torrentTrackerCount(tor); i < n; ++i)
     {
-        if (gtr_get_host_from_url(tr_torrentTracker(tor, i).announce) == host)
+        if (tr_torrentTracker(tor, i).sitename == host)
         {
             return true;
         }
@@ -653,7 +646,7 @@ bool FilterBar::Impl::is_row_visible(Gtk::TreeModel::const_iterator const& iter)
 {
     auto* tor = static_cast<tr_torrent*>(iter->get_value(torrent_cols.torrent));
 
-    return tor != nullptr && test_tracker(tor, active_tracker_type_, active_tracker_host_) &&
+    return tor != nullptr && test_tracker(tor, active_tracker_type_, active_tracker_sitename_) &&
         test_torrent_activity(tor, active_activity_type_) && testText(tor, filter_text_);
 }
 
@@ -673,12 +666,12 @@ void FilterBar::Impl::selection_changed_cb()
     if (auto const iter = tracker_->get_active(); iter)
     {
         active_tracker_type_ = iter->get_value(tracker_filter_cols.type);
-        active_tracker_host_ = iter->get_value(tracker_filter_cols.host);
+        active_tracker_sitename_ = iter->get_value(tracker_filter_cols.sitename);
     }
     else
     {
         active_tracker_type_ = TRACKER_FILTER_TYPE_ALL;
-        active_tracker_host_.clear();
+        active_tracker_sitename_.clear();
     }
 
     /* refilter */
@@ -718,7 +711,9 @@ bool FilterBar::Impl::update_count_label()
 
     /* set the text */
     show_lb_->set_markup_with_mnemonic(
-        visibleCount == std::min(activityCount, trackerCount) ? _("_Show:") : gtr_sprintf(_("_Show %'d of:"), visibleCount));
+        visibleCount == std::min(activityCount, trackerCount) ?
+            _("_Show:") :
+            fmt::format(_("_Show {count:L} of:"), fmt::arg("count", visibleCount)));
 
     show_lb_->steal_data(DIRTY_KEY);
     return false;

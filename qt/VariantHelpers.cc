@@ -1,5 +1,5 @@
 // This file Copyright © 2020-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -7,6 +7,7 @@
 
 #include <cmath>
 #include <limits>
+#include <string_view>
 
 #include <QUrl>
 
@@ -44,11 +45,11 @@ bool change(TorrentHash& setme, tr_variant const* value)
 
 bool change(Peer& setme, tr_variant const* value)
 {
-    bool changed = false;
+    auto changed = bool{ false };
 
-    size_t pos = 0;
-    tr_quark key;
-    tr_variant* child;
+    auto pos = size_t{ 0 };
+    auto key = tr_quark{};
+    tr_variant* child = nullptr;
     while (tr_variantDictChild(const_cast<tr_variant*>(value), pos++, &key, &child))
     {
         switch (key)
@@ -84,11 +85,11 @@ bool change(Peer& setme, tr_variant const* value)
 
 bool change(TorrentFile& setme, tr_variant const* value)
 {
-    bool changed = false;
+    auto changed = bool{ false };
 
-    size_t pos = 0;
-    tr_quark key;
-    tr_variant* child;
+    auto pos = size_t{ 0 };
+    auto key = tr_quark{};
+    tr_variant* child = nullptr;
     while (tr_variantDictChild(const_cast<tr_variant*>(value), pos++, &key, &child))
     {
         switch (key)
@@ -122,10 +123,11 @@ bool change(TorrentFile& setme, tr_variant const* value)
 bool change(TrackerStat& setme, tr_variant const* value)
 {
     bool changed = false;
+    bool site_changed = false;
 
-    size_t pos = 0;
-    tr_quark key;
-    tr_variant* child;
+    auto pos = size_t{ 0 };
+    auto key = tr_quark{};
+    tr_variant* child = nullptr;
     while (tr_variantDictChild(const_cast<tr_variant*>(value), pos++, &key, &child))
     {
         bool field_changed = false;
@@ -159,6 +161,7 @@ bool change(TrackerStat& setme, tr_variant const* value)
             HANDLE_KEY(nextScrapeTime, next_scrape_time)
             HANDLE_KEY(scrapeState, scrape_state)
             HANDLE_KEY(seederCount, seeder_count)
+            HANDLE_KEY(sitename, sitename)
             HANDLE_KEY(tier, tier)
 
 #undef HANDLE_KEY
@@ -168,14 +171,16 @@ bool change(TrackerStat& setme, tr_variant const* value)
 
         if (field_changed)
         {
-            if (key == TR_KEY_announce)
-            {
-                setme.announce = trApp->intern(setme.announce);
-                setme.favicon_key = trApp->faviconCache().add(setme.announce);
-            }
-
-            changed = true;
+            site_changed |= key == TR_KEY_announce || key == TR_KEY_sitename;
         }
+
+        changed = true;
+    }
+
+    if (site_changed && !setme.sitename.isEmpty() && !setme.announce.isEmpty())
+    {
+        setme.announce = trApp->intern(setme.announce);
+        trApp->faviconCache().add(setme.sitename, setme.announce);
     }
 
     return changed;
@@ -194,11 +199,6 @@ void variantInit(tr_variant* init_me, int64_t value)
 }
 
 void variantInit(tr_variant* init_me, int value)
-{
-    tr_variantInitInt(init_me, value);
-}
-
-void variantInit(tr_variant* init_me, unsigned int value)
 {
     tr_variantInitInt(init_me, value);
 }

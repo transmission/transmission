@@ -1,5 +1,5 @@
 // This file Copyright © 2012-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -51,7 +51,7 @@ FilterBarComboBox* FilterBar::createActivityCombo()
     model->appendRow(new QStandardItem); // separator
     FilterBarComboBoxDelegate::setSeparator(model, model->index(1, 0));
 
-    auto& icons = IconCache::get();
+    auto const& icons = IconCache::get();
 
     row = new QStandardItem(icons.getThemeIcon(QStringLiteral("system-run")), tr("Active"));
     row->setData(FilterMode::SHOW_ACTIVE, ACTIVITY_ROLE);
@@ -114,27 +114,26 @@ void FilterBar::refreshTrackers()
         ROW_FIRST_TRACKER
     };
 
-    auto torrents_per_tracker = std::unordered_map<FaviconCache::Key, int>{};
+    auto torrents_per_sitename = std::unordered_map<QString, int>{};
     for (auto const& tor : torrents_.torrents())
     {
-        for (auto const& key : tor->trackerKeys())
+        for (auto const& sitename : tor->sitenames())
         {
-            ++torrents_per_tracker[key];
+            ++torrents_per_sitename[sitename];
         }
     }
 
     // update the "All" row
-    auto const num_trackers = torrents_per_tracker.size();
+    auto const num_trackers = torrents_per_sitename.size();
     auto* item = tracker_model_->item(ROW_TOTALS);
     item->setData(int(num_trackers), FilterBarComboBox::CountRole);
     item->setData(getCountString(num_trackers), FilterBarComboBox::CountStringRole);
 
     auto update_tracker_item = [](QStandardItem* i, auto const& it)
     {
-        auto const& key = it->first;
-        auto const& display_name = FaviconCache::getDisplayName(key);
-        auto const& count = it->second;
-        auto const icon = trApp->faviconCache().find(key);
+        auto const& [sitename, count] = *it;
+        auto const display_name = FaviconCache::getDisplayName(sitename);
+        auto const icon = trApp->faviconCache().find(sitename);
 
         i->setData(display_name, Qt::DisplayRole);
         i->setData(display_name, TRACKER_ROLE);
@@ -145,10 +144,10 @@ void FilterBar::refreshTrackers()
         return i;
     };
 
-    auto new_trackers = std::map<FaviconCache::Key, int>(torrents_per_tracker.begin(), torrents_per_tracker.end());
-    auto old_it = tracker_counts_.cbegin();
+    auto new_trackers = std::map<QString, int>(torrents_per_sitename.begin(), torrents_per_sitename.end());
+    auto old_it = sitename_counts_.cbegin();
     auto new_it = new_trackers.cbegin();
-    auto const old_end = tracker_counts_.cend();
+    auto const old_end = sitename_counts_.cend();
     auto const new_end = new_trackers.cend();
     bool any_added = false;
     int row = ROW_FIRST_TRACKER;
@@ -181,7 +180,7 @@ void FilterBar::refreshTrackers()
         refreshPref(Prefs::FILTER_TRACKERS);
     }
 
-    tracker_counts_.swap(new_trackers);
+    sitename_counts_.swap(new_trackers);
 }
 
 FilterBarComboBox* FilterBar::createTrackerCombo(QStandardItemModel* model)
@@ -280,7 +279,7 @@ void FilterBar::refreshPref(int key)
     case Prefs::FILTER_MODE:
         {
             auto const m = prefs_.get<FilterMode>(key);
-            QAbstractItemModel* model = activity_combo_->model();
+            QAbstractItemModel const* const model = activity_combo_->model();
             QModelIndexList indices = model->match(model->index(0, 0), ACTIVITY_ROLE, m.mode());
             activity_combo_->setCurrentIndex(indices.isEmpty() ? 0 : indices.first().row());
             break;

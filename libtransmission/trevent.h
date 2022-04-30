@@ -9,12 +9,29 @@
 #error only libtransmission should #include this header.
 #endif
 
+#include <functional>
+#include <tuple>
+#include <utility>
+
 #include "tr-macros.h"
 
-void tr_eventInit(tr_session*);
+struct tr_session;
 
-void tr_eventClose(tr_session*);
+void tr_eventInit(tr_session* session);
 
-bool tr_amInEventThread(tr_session const*);
+void tr_eventClose(tr_session* session);
 
-void tr_runInEventThread(tr_session*, void (*func)(void*), void* user_data);
+bool tr_amInEventThread(tr_session const* session);
+
+void tr_runInEventThread(tr_session* session, std::function<void(void)>&& func);
+
+template<typename Func, typename... Args>
+void tr_runInEventThread(tr_session* session, Func&& func, Args&&... args)
+{
+    tr_runInEventThread(
+        session,
+        std::function<void(void)>{ [func = std::forward<Func&&>(func), args = std::make_tuple(std::forward<Args>(args)...)]()
+                                   {
+                                       std::apply(std::move(func), std::move(args));
+                                   } });
+}

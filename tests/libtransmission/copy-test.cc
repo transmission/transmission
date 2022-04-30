@@ -27,27 +27,27 @@ class CopyTest : public SandboxedTest
 protected:
     void testImpl(char const* filename1, char const* filename2, size_t const file_length)
     {
-        auto const path1 = tr_strvPath(sandboxDir(), filename1);
+        auto const path1 = tr_pathbuf{ sandboxDir(), '/', filename1 };
 
         /* Create a file. */
-        char* file_content = static_cast<char*>(tr_malloc(file_length));
+        auto* file_content = static_cast<char*>(tr_malloc(file_length));
         tr_rand_buffer(file_content, file_length);
         createFileWithContents(path1, file_content, file_length);
         tr_free(file_content);
 
-        auto const path2 = tr_strvPath(sandboxDir(), filename2);
+        auto const path2 = tr_pathbuf{ sandboxDir(), '/', filename2 };
 
         tr_error* err = nullptr;
         /* Copy it. */
-        EXPECT_TRUE(tr_sys_path_copy(path1.c_str(), path2.c_str(), &err));
-        EXPECT_EQ(nullptr, err);
+        EXPECT_TRUE(tr_sys_path_copy(path1, path2, &err));
+        EXPECT_EQ(nullptr, err) << ' ' << *err;
         tr_error_clear(&err);
 
-        EXPECT_TRUE(filesAreIdentical(path1.c_str(), path2.c_str()));
+        EXPECT_TRUE(filesAreIdentical(path1, path2));
 
         /* Dispose of those files that we created. */
-        tr_sys_path_remove(path1.c_str(), nullptr);
-        tr_sys_path_remove(path2.c_str(), nullptr);
+        tr_sys_path_remove(path1);
+        tr_sys_path_remove(path2);
     }
 
 private:
@@ -61,7 +61,7 @@ private:
             uint64_t const chunk_size = std::min(uint64_t{ buf_len - buf_pos }, bytes_remaining);
             uint64_t bytes_read = 0;
 
-            tr_sys_file_read(fd, buf + buf_pos, chunk_size, &bytes_read, nullptr);
+            tr_sys_file_read(fd, buf + buf_pos, chunk_size, &bytes_read);
 
             EXPECT_LE(buf_pos + bytes_read, buf_len);
             EXPECT_LE(bytes_read, bytes_remaining);
@@ -76,23 +76,23 @@ private:
     {
         bool identical = true;
 
-        tr_sys_file_t fd1 = tr_sys_file_open(fn1, TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0, nullptr);
-        tr_sys_file_t fd2 = tr_sys_file_open(fn2, TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0, nullptr);
+        tr_sys_file_t fd1 = tr_sys_file_open(fn1, TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0);
+        tr_sys_file_t fd2 = tr_sys_file_open(fn2, TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0);
         EXPECT_NE(fd1, TR_BAD_SYS_FILE);
         EXPECT_NE(fd2, TR_BAD_SYS_FILE);
 
         tr_sys_path_info info1;
         tr_sys_path_info info2;
-        tr_sys_file_get_info(fd1, &info1, nullptr);
-        tr_sys_file_get_info(fd2, &info2, nullptr);
+        tr_sys_file_get_info(fd1, &info1);
+        tr_sys_file_get_info(fd2, &info2);
         EXPECT_EQ(info1.size, info2.size);
 
         uint64_t bytes_left1 = info1.size;
         uint64_t bytes_left2 = info2.size;
 
         size_t const buflen = 2 * 1024 * 1024; /* 2 MiB buffer */
-        char* readbuf1 = static_cast<char*>(tr_malloc(buflen));
-        char* readbuf2 = static_cast<char*>(tr_malloc(buflen));
+        auto* readbuf1 = static_cast<char*>(tr_malloc(buflen));
+        auto* readbuf2 = static_cast<char*>(tr_malloc(buflen));
 
         while (bytes_left1 > 0 || bytes_left2 > 0)
         {
@@ -114,8 +114,8 @@ private:
 
         tr_free(readbuf1);
         tr_free(readbuf2);
-        tr_sys_file_close(fd1, nullptr);
-        tr_sys_file_close(fd2, nullptr);
+        tr_sys_file_close(fd1);
+        tr_sys_file_close(fd2);
 
         return identical;
     }

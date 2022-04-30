@@ -2,54 +2,52 @@
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
+#include <cstdint>
+
 #include <event2/event.h>
 
-#include <cstdint>
+#include <fmt/core.h>
+#include <fmt/format.h>
+
 #include <libutp/utp.h>
 
 #include "transmission.h"
+
+#include "crypto-utils.h" /* tr_rand_int_weak() */
 #include "log.h"
 #include "net.h"
-#include "session.h"
-#include "crypto-utils.h" /* tr_rand_int_weak() */
 #include "peer-mgr.h"
 #include "peer-socket.h"
+#include "session.h"
 #include "tr-utp.h"
 #include "utils.h"
 
 #ifndef WITH_UTP
 
-static char constexpr MyName[] = "UTP";
-
-#define dbgmsg(...) tr_logAddDeepNamed(MyName, __VA_ARGS__)
-
 void UTP_Close(struct UTPSocket* socket)
 {
-    tr_logAddNamedError(MyName, "UTP_Close(%p) was called.", socket);
-    dbgmsg("UTP_Close(%p) was called.", socket);
+    tr_logAddTrace(fmt::format("UTP_Close({}) was called.", fmt::ptr(socket)));
 }
 
 void UTP_RBDrained(struct UTPSocket* socket)
 {
-    tr_logAddNamedError(MyName, "UTP_RBDrained(%p) was called.", socket);
-    dbgmsg("UTP_RBDrained(%p) was called.", socket);
+    tr_logAddTrace(fmt::format("UTP_RBDrained({}) was called.", fmt::ptr(socket)));
 }
 
 bool UTP_Write(struct UTPSocket* socket, size_t count)
 {
-    tr_logAddNamedError(MyName, "UTP_RBDrained(%p, %zu) was called.", socket, count);
-    dbgmsg("UTP_RBDrained(%p, %zu) was called.", socket, count);
+    tr_logAddTrace(fmt::format("UTP_Write({}, {}) was called.", fmt::ptr(socket), count));
     return false;
 }
 
-int tr_utpPacket(
+bool tr_utpPacket(
     unsigned char const* /*buf*/,
     size_t /*buflen*/,
     sockaddr const* /*from*/,
     socklen_t /*fromlen*/,
     tr_session* /*ss*/)
 {
-    return -1;
+    return false;
 }
 
 struct UTPSocket* UTP_Create(
@@ -87,7 +85,7 @@ static void incoming(void* vsession, struct UTPSocket* s)
     auto* const from = (struct sockaddr*)&from_storage;
     socklen_t fromlen = sizeof(from_storage);
     tr_address addr;
-    tr_port port = 0;
+    tr_port port;
 
     if (!tr_sessionIsUTPEnabled(session))
     {
@@ -99,7 +97,7 @@ static void incoming(void* vsession, struct UTPSocket* s)
 
     if (!tr_address_from_sockaddr_storage(&addr, &port, &from_storage))
     {
-        tr_logAddNamedError("UTP", "Unknown socket family");
+        tr_logAddWarn(_("Unknown socket family"));
         UTP_Close(s);
         return;
     }
@@ -142,7 +140,7 @@ static void reset_timer(tr_session* ss)
         usec = tr_rand_int_weak(1000000);
     }
 
-    tr_timerAdd(ss->utp_timer, sec, usec);
+    tr_timerAdd(*ss->utp_timer, sec, usec);
 }
 
 static void timer_callback(evutil_socket_t /*s*/, short /*type*/, void* vsession)
@@ -152,7 +150,7 @@ static void timer_callback(evutil_socket_t /*s*/, short /*type*/, void* vsession
     reset_timer(session);
 }
 
-int tr_utpPacket(unsigned char const* buf, size_t buflen, struct sockaddr const* from, socklen_t fromlen, tr_session* ss)
+bool tr_utpPacket(unsigned char const* buf, size_t buflen, struct sockaddr const* from, socklen_t fromlen, tr_session* ss)
 {
     if (!ss->isClosed && ss->utp_timer == nullptr)
     {
@@ -160,7 +158,7 @@ int tr_utpPacket(unsigned char const* buf, size_t buflen, struct sockaddr const*
 
         if (ss->utp_timer == nullptr)
         {
-            return -1;
+            return false;
         }
 
         reset_timer(ss);

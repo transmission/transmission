@@ -21,7 +21,7 @@
         <window title="Torrent Inspector" allowsToolTipsWhenApplicationIsInactive="NO" restorable="NO" hidesOnDeactivate="YES" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" tabbingMode="disallowed" id="5" userLabel="InfoWindow" customClass="NSPanel">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES" utility="YES"/>
             <rect key="contentRect" x="897" y="867" width="403" height="70"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1792" height="1120"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1415"/>
             <value key="minSize" type="size" width="350" height="77"/>
             <view key="contentView" id="6">
                 <rect key="frame" x="0.0" y="0.0" width="403" height="70"/>
@@ -67,12 +67,12 @@
                         <segmentedCell key="cell" borderStyle="border" alignment="left" segmentDistribution="fill" style="rounded" trackingMode="selectOne" id="aGK-Yo-M1B">
                             <font key="font" metaFont="system"/>
                             <segments>
-                                <segment image="info.circle" catalog="system" selected="YES"/>
-                                <segment image="square.grid.3x3.fill.square" catalog="system" tag="1"/>
-                                <segment image="antenna.radiowaves.left.and.right" catalog="system" tag="2"/>
-                                <segment image="person.2" catalog="system" tag="3"/>
-                                <segment image="doc.on.doc" catalog="system" tag="4"/>
-                                <segment image="gearshape" catalog="system" tag="5"/>
+                                <segment selected="YES"/>
+                                <segment tag="1"/>
+                                <segment tag="2"/>
+                                <segment tag="3"/>
+                                <segment tag="4"/>
+                                <segment tag="5"/>
                             </segments>
                         </segmentedCell>
                     </segmentedControl>
@@ -102,11 +102,5 @@
     </objects>
     <resources>
         <image name="NSApplicationIcon" width="32" height="32"/>
-        <image name="antenna.radiowaves.left.and.right" catalog="system" width="16" height="14"/>
-        <image name="doc.on.doc" catalog="system" width="16" height="18"/>
-        <image name="gearshape" catalog="system" width="16" height="16"/>
-        <image name="info.circle" catalog="system" width="15" height="15"/>
-        <image name="person.2" catalog="system" width="21" height="14"/>
-        <image name="square.grid.3x3.fill.square" catalog="system" width="15" height="14"/>
     </resources>
 </document>

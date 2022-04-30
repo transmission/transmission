@@ -4,9 +4,8 @@
 
 #include <errno.h>
 #include <stdlib.h> /* strtol() */
+#include <string>
 #include <string_view>
-
-#include <unistd.h>
 
 #include <glibmm.h>
 #include <glibmm/i18n.h>
@@ -22,7 +21,7 @@ using namespace std::literals;
 
 std::string gl_confdir;
 
-void gtr_pref_init(std::string const& config_dir)
+void gtr_pref_init(std::string_view config_dir)
 {
     gl_confdir = config_dir;
 }
@@ -176,8 +175,7 @@ std::vector<std::string> gtr_pref_strv_get(tr_quark const key)
 {
     std::vector<std::string> ret;
 
-    tr_variant* list = nullptr;
-    if (tr_variantDictFindList(getPrefs(), key, &list))
+    if (tr_variant* list = nullptr; tr_variantDictFindList(getPrefs(), key, &list))
     {
         size_t const n = tr_variantListSize(list);
         ret.reserve(n);
@@ -202,7 +200,7 @@ std::string gtr_pref_string_get(tr_quark const key)
     return std::string{ sv };
 }
 
-void gtr_pref_string_set(tr_quark const key, std::string const& value)
+void gtr_pref_string_set(tr_quark const key, std::string_view value)
 {
     tr_variantDictAddStr(getPrefs(), key, value);
 }

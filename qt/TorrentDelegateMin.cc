@@ -1,5 +1,5 @@
 // This file Copyright © 2009-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -174,64 +174,46 @@ void TorrentDelegateMin::drawTorrent(QPainter* painter, QStyleOptionViewItem con
 
     if (is_item_selected)
     {
-        QPalette::ColorGroup cg = is_item_enabled ? QPalette::Normal : QPalette::Disabled;
+        auto color_group = is_item_enabled ? QPalette::Normal : QPalette::Disabled;
 
-        if (cg == QPalette::Normal && !is_item_active)
+        if (color_group == QPalette::Normal && !is_item_active)
         {
-            cg = QPalette::Inactive;
+            color_group = QPalette::Inactive;
         }
 
-        painter->fillRect(option.rect, option.palette.brush(cg, QPalette::Highlight));
+        painter->fillRect(option.rect, option.palette.brush(color_group, QPalette::Highlight));
     }
 
-    QIcon::Mode im;
+    auto icon_mode = QIcon::Mode{};
 
     if (is_paused || !is_item_enabled)
     {
-        im = QIcon::Disabled;
+        icon_mode = QIcon::Disabled;
     }
     else if (is_item_selected)
     {
-        im = QIcon::Selected;
+        icon_mode = QIcon::Selected;
     }
     else
     {
-        im = QIcon::Normal;
+        icon_mode = QIcon::Normal;
     }
 
-    QIcon::State qs;
+    auto const icon_state = is_paused ? QIcon::Off : QIcon::On;
 
-    if (is_paused)
-    {
-        qs = QIcon::Off;
-    }
-    else
-    {
-        qs = QIcon::On;
-    }
-
-    QPalette::ColorGroup cg = QPalette::Normal;
+    QPalette::ColorGroup color_group = QPalette::Normal;
 
     if (is_paused || !is_item_enabled)
     {
-        cg = QPalette::Disabled;
+        color_group = QPalette::Disabled;
     }
 
-    if (cg == QPalette::Normal && !is_item_active)
+    if (color_group == QPalette::Normal && !is_item_active)
     {
-        cg = QPalette::Inactive;
+        color_group = QPalette::Inactive;
     }
 
-    QPalette::ColorRole cr;
-
-    if (is_item_selected)
-    {
-        cr = QPalette::HighlightedText;
-    }
-    else
-    {
-        cr = QPalette::Text;
-    }
+    auto const color_role = is_item_selected ? QPalette::HighlightedText : QPalette::Text;
 
     QStyle::State progress_bar_state(option.state | QStyle::State_Horizontal);
 
@@ -264,14 +246,14 @@ void TorrentDelegateMin::drawTorrent(QPainter* painter, QStyleOptionViewItem con
     }
     else
     {
-        painter->setPen(option.palette.color(cg, cr));
+        painter->setPen(option.palette.color(color_group, color_role));
     }
 
-    tor.getMimeTypeIcon().paint(painter, layout.icon_rect, Qt::AlignCenter, im, qs);
+    tor.getMimeTypeIcon().paint(painter, layout.icon_rect, Qt::AlignCenter, icon_mode, icon_state);
 
     if (!emblem_icon.isNull())
     {
-        emblem_icon.paint(painter, layout.emblem_rect, Qt::AlignCenter, emblem_im, qs);
+        emblem_icon.paint(painter, layout.emblem_rect, Qt::AlignCenter, emblem_im, icon_state);
     }
 
     painter->setFont(layout.name_font);

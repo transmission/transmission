@@ -5,11 +5,13 @@
 #include <libtransmission/transmission.h>
 #include <libtransmission/web-utils.h> //tr_addressIsIP()
 
+#import "CocoaCompatibility.h"
+
 #import "TrackerCell.h"
 #import "TrackerNode.h"
 
-#define PADDING_HORIZONAL 3.0
-#define PADDING_STATUS_HORIZONAL 3.0
+#define PADDING_HORIZONTAL 3.0
+#define PADDING_STATUS_HORIZONTAL 3.0
 #define ICON_SIZE 16.0
 #define PADDING_BETWEEN_ICON_AND_NAME 4.0
 #define PADDING_ABOVE_ICON 1.0
@@ -21,6 +23,10 @@
 @interface TrackerCell ()
 
 @property(nonatomic, readonly) NSImage* favIcon;
+@property(nonatomic, readonly) NSAttributedString* attributedName;
+@property(nonatomic, readonly) NSMutableDictionary* fNameAttributes;
+@property(nonatomic, readonly) NSMutableDictionary* fStatusAttributes;
+
 - (void)loadTrackerIcon:(NSString*)baseAddress;
 
 - (NSRect)imageRectForBounds:(NSRect)bounds;
@@ -32,7 +38,6 @@
                     withRightRect:(NSRect)rightRect
                          inBounds:(NSRect)bounds;
 
-@property(nonatomic, readonly) NSAttributedString* attributedName;
 - (NSAttributedString*)attributedStatusWithString:(NSString*)statusString;
 - (NSAttributedString*)attributedCount:(NSInteger)count;
 
@@ -57,10 +62,10 @@ NSMutableSet* fTrackerIconLoading;
         NSMutableParagraphStyle* paragraphStyle = [NSParagraphStyle.defaultParagraphStyle mutableCopy];
         paragraphStyle.lineBreakMode = NSLineBreakByTruncatingTail;
 
-        fNameAttributes = [[NSMutableDictionary alloc]
+        _fNameAttributes = [[NSMutableDictionary alloc]
             initWithObjectsAndKeys:[NSFont messageFontOfSize:12.0], NSFontAttributeName, paragraphStyle, NSParagraphStyleAttributeName, nil];
 
-        fStatusAttributes = [[NSMutableDictionary alloc]
+        _fStatusAttributes = [[NSMutableDictionary alloc]
             initWithObjectsAndKeys:[NSFont messageFontOfSize:9.0], NSFontAttributeName, paragraphStyle, NSParagraphStyleAttributeName, nil];
     }
     return self;
@@ -70,8 +75,8 @@ NSMutableSet* fTrackerIconLoading;
 {
     TrackerCell* copy = [super copyWithZone:zone];
 
-    copy->fNameAttributes = fNameAttributes;
-    copy->fStatusAttributes = fStatusAttributes;
+    copy->_fNameAttributes = _fNameAttributes;
+    copy->_fStatusAttributes = _fStatusAttributes;
 
     return copy;
 }
@@ -96,8 +101,8 @@ NSMutableSet* fTrackerIconLoading;
         statusColor = NSColor.secondaryLabelColor;
     }
 
-    fNameAttributes[NSForegroundColorAttributeName] = nameColor;
-    fStatusAttributes[NSForegroundColorAttributeName] = statusColor;
+    self.fNameAttributes[NSForegroundColorAttributeName] = nameColor;
+    self.fStatusAttributes[NSForegroundColorAttributeName] = statusColor;
 
     TrackerNode* node = (TrackerNode*)self.objectValue;
 
@@ -157,6 +162,8 @@ NSMutableSet* fTrackerIconLoading;
     [lastScrapeString drawInRect:lastScrapeRect];
 }
 
+#pragma mark - Private
+
 - (NSImage*)favIcon
 {
     id icon = nil;
@@ -192,11 +199,12 @@ NSMutableSet* fTrackerIconLoading;
         return icon;
     }
 
-    if (@available(macOS 11.0, *)) {
+    if (@available(macOS 11.0, *))
+    {
         NSImage* result = [NSImage imageWithSystemSymbolName:@"globe" accessibilityDescription:nil];
         [result lockFocus];
         [NSColor.textColor set];
-        NSRect imageRect = {NSZeroPoint, [result size]};
+        NSRect imageRect = { NSZeroPoint, [result size] };
         NSRectFillUsingOperation(imageRect, NSCompositingOperationSourceIn);
         [result unlockFocus];
         return result;
@@ -255,17 +263,17 @@ NSMutableSet* fTrackerIconLoading;
 
 - (NSRect)imageRectForBounds:(NSRect)bounds
 {
-    return NSMakeRect(NSMinX(bounds) + PADDING_HORIZONAL, NSMinY(bounds) + PADDING_ABOVE_ICON, ICON_SIZE, ICON_SIZE);
+    return NSMakeRect(NSMinX(bounds) + PADDING_HORIZONTAL, NSMinY(bounds) + PADDING_ABOVE_ICON, ICON_SIZE, ICON_SIZE);
 }
 
 - (NSRect)rectForNameWithString:(NSAttributedString*)string inBounds:(NSRect)bounds
 {
     NSRect result;
-    result.origin.x = NSMinX(bounds) + PADDING_HORIZONAL + ICON_SIZE + PADDING_BETWEEN_ICON_AND_NAME;
+    result.origin.x = NSMinX(bounds) + PADDING_HORIZONTAL + ICON_SIZE + PADDING_BETWEEN_ICON_AND_NAME;
     result.origin.y = NSMinY(bounds) + PADDING_ABOVE_NAME;
 
     result.size.height = [string size].height;
-    result.size.width = NSMaxX(bounds) - NSMinX(result) - PADDING_HORIZONAL;
+    result.size.width = NSMaxX(bounds) - NSMinX(result) - PADDING_HORIZONTAL;
 
     return result;
 }
@@ -273,7 +281,7 @@ NSMutableSet* fTrackerIconLoading;
 - (NSRect)rectForCountWithString:(NSAttributedString*)string withAboveRect:(NSRect)aboveRect inBounds:(NSRect)bounds
 {
     return NSMakeRect(
-        NSMaxX(bounds) - PADDING_HORIZONAL - COUNT_WIDTH,
+        NSMaxX(bounds) - PADDING_HORIZONTAL - COUNT_WIDTH,
         NSMaxY(aboveRect) + PADDING_BETWEEN_LINES,
         COUNT_WIDTH,
         [string size].height);
@@ -294,7 +302,7 @@ NSMutableSet* fTrackerIconLoading;
                          inBounds:(NSRect)bounds
 {
     NSRect result;
-    result.origin.x = NSMinX(bounds) + PADDING_STATUS_HORIZONAL;
+    result.origin.x = NSMinX(bounds) + PADDING_STATUS_HORIZONTAL;
     result.origin.y = NSMaxY(aboveRect) + PADDING_BETWEEN_LINES;
 
     result.size.height = [string size].height;
@@ -306,18 +314,18 @@ NSMutableSet* fTrackerIconLoading;
 - (NSAttributedString*)attributedName
 {
     NSString* name = ((TrackerNode*)self.objectValue).host;
-    return [[NSAttributedString alloc] initWithString:name attributes:fNameAttributes];
+    return [[NSAttributedString alloc] initWithString:name attributes:self.fNameAttributes];
 }
 
 - (NSAttributedString*)attributedStatusWithString:(NSString*)statusString
 {
-    return [[NSAttributedString alloc] initWithString:statusString attributes:fStatusAttributes];
+    return [[NSAttributedString alloc] initWithString:statusString attributes:self.fStatusAttributes];
 }
 
 - (NSAttributedString*)attributedCount:(NSInteger)count
 {
     NSString* countString = count != -1 ? [NSString stringWithFormat:@"%ld", count] : NSLocalizedString(@"N/A", "tracker peer stat");
-    return [[NSAttributedString alloc] initWithString:countString attributes:fStatusAttributes];
+    return [[NSAttributedString alloc] initWithString:countString attributes:self.fStatusAttributes];
 }
 
 @end

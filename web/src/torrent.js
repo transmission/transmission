@@ -1,51 +1,11 @@
 /* @license This file Copyright (C) 2020-2022 Mnemosyne LLC.
-   It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+   It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
    or any future license endorsed by Mnemosyne LLC.
    License text can be found in the licenses/ folder. */
 
 import { Formatter } from './formatter.js';
 import { Prefs } from './prefs.js';
 import { deepEqual } from './utils.js';
-
-/// DOMAINS
-
-// example: "tracker.ubuntu.com" returns "ubuntu.com"
-function getDomainName(host) {
-  const dot = host.indexOf('.');
-  if (dot !== host.lastIndexOf('.')) {
-    host = host.slice(dot + 1);
-  }
-  return host;
-}
-
-// example: "ubuntu.com" returns "Ubuntu"
-function getReadableDomain(name) {
-  if (name.length > 0) {
-    name = name.charAt(0).toUpperCase() + name.slice(1);
-  }
-  const dot = name.indexOf('.');
-  if (dot !== -1) {
-    name = name.slice(0, dot);
-  }
-  return name;
-}
-
-// key: url string
-// val: { domain, readable_domain }
-const announce_to_domain_cache = {};
-
-function getAnnounceDomain(announce) {
-  if (announce_to_domain_cache[announce]) {
-    return announce_to_domain_cache[announce];
-  }
-
-  const url = new URL(announce);
-  const domain = getDomainName(url.host);
-  const name = getReadableDomain(domain);
-  const o = { domain, name, url };
-  announce_to_domain_cache[announce] = o;
-  return o;
-}
 
 ///
 
@@ -203,11 +163,17 @@ export class Torrent extends EventTarget {
   getId() {
     return this.fields.id;
   }
+  getLabels() {
+    return this.fields.labels.sort();
+  }
   getLastActivity() {
     return this.fields.activityDate;
   }
   getLeftUntilDone() {
     return this.fields.leftUntilDone;
+  }
+  getMagnetLink() {
+    return this.fields.magnetLink;
   }
   getMetadataPercentComplete() {
     return this.fields.metadataPercentComplete;
@@ -264,13 +230,7 @@ export class Torrent extends EventTarget {
     return this.fields.totalSize;
   }
   getTrackers() {
-    const trackers = this.fields.trackers || [];
-    for (const tracker of trackers) {
-      if (tracker.announce && !tracker.domain) {
-        Object.assign(tracker, getAnnounceDomain(tracker.announce));
-      }
-    }
-    return this.fields.trackers;
+    return this.fields.trackers || [];
   }
   getUploadSpeed() {
     return this.fields.rateUpload;
@@ -416,17 +376,28 @@ export class Torrent extends EventTarget {
   }
 
   /**
-   * @param filter one of Prefs.Filter*
+   * @param state one of Prefs.Filter*
+   * @param tracker tracker name
    * @param search substring to look for, or null
+   * @param labels array of labels. Empty array matches all.
    * @return true if it passes the test, false if it fails
    */
-  test(state, search, tracker) {
+  test(state, tracker, search, labels) {
     // flter by state...
     let pass = this.testState(state);
 
     // maybe filter by text...
-    if (pass && search && search.length > 0) {
+    if (pass && search) {
       pass = this.getCollatedName().includes(search.toLowerCase());
+    }
+
+    // maybe filter by labels...
+    if (pass) {
+      // pass if this torrent has any of these labels
+      const torrent_labels = this.getLabels();
+      if (torrent_labels.length > 0) {
+        pass = labels.some((label) => torrent_labels.includes(label));
+      }
     }
 
     // maybe filter by tracker...
@@ -624,6 +595,7 @@ Torrent.Fields.Stats = [
   'eta',
   'isFinished',
   'isStalled',
+  'labels',
   'leftUntilDone',
   'metadataPercentComplete',
   'peersConnected',
@@ -653,6 +625,7 @@ Torrent.Fields.InfoExtra = [
   'files',
   'hashString',
   'isPrivate',
+  'magnetLink',
   'pieceCount',
   'pieceSize',
 ];

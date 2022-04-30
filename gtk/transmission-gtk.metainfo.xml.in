@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright 2014 Richard Hughes <richard@hughsie.com>
+Copyright 2017 Endless Mobile, Inc.
+ -->
+<component type="desktop-application">
+  <id type="desktop">transmission-gtk.desktop</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>GPL-2.0 OR GPL-3.0</project_license>
+
+  <name>Transmission</name>
+  <summary>Download and share files over BitTorrent</summary>
+
+  <description>
+    <!-- Translators: these are the application description paragraphs in the MetaInfo file. -->
+    <p>
+      BitTorrent is a peer-to-peer file-sharing protocol that is commonly used to
+      distribute large amounts of data between multiple users.
+    </p>
+    <p>
+      Transmission is a BitTorrent client with an easy-to-use frontend on top a
+      cross-platform backend.
+      Native frontends are available for macOS and Windows, as well as command line and
+      web frontends.
+    </p>
+    <p>
+      Notable features of Transmission include support for Local Peer Discovery, encryption,
+      DHT, µTP, PEX and Magnet Link.
+    </p>
+  </description>
+  <url type="homepage">https://transmissionbt.com/</url>
+  <screenshots>
+    <screenshot type="default">
+      <image type="source">https://raw.githubusercontent.com/transmission/transmission/main/gtk/screenshots/a.png</image>
+    </screenshot>
+  </screenshots>
+  <update_contact>info_AT_transmissionbt.com</update_contact>
+  <content_rating type="oars-1.1">
+    <content_attribute id="social-info">mild</content_attribute>
+  </content_rating>
+</component>

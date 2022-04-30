@@ -1,5 +1,5 @@
 // This file Copyright © 2021-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -26,7 +26,7 @@ void tr_file_piece_map::reset(tr_block_info const& block_info, uint64_t const* f
     {
         auto const file_size = file_sizes[i];
         auto const begin_byte = offset;
-        auto const begin_piece = block_info.pieceOf(begin_byte);
+        auto const begin_piece = block_info.byteLoc(begin_byte).piece;
         auto end_byte = tr_byte_index_t{};
         auto end_piece = tr_piece_index_t{};
 
@@ -34,7 +34,7 @@ void tr_file_piece_map::reset(tr_block_info const& block_info, uint64_t const* f
         {
             end_byte = offset + file_size;
             auto const final_byte = end_byte - 1;
-            auto const final_piece = block_info.pieceOf(final_byte);
+            auto const final_piece = block_info.byteLoc(final_byte).piece;
             end_piece = final_piece + 1;
         }
         else
@@ -95,35 +95,52 @@ tr_file_priorities::tr_file_priorities(tr_file_piece_map const* fpm)
 void tr_file_priorities::reset(tr_file_piece_map const* fpm)
 {
     fpm_ = fpm;
-
-    auto const n = std::size(*fpm_);
-    priorities_.resize(n);
-    priorities_.shrink_to_fit();
-    std::fill_n(std::begin(priorities_), n, TR_PRI_NORMAL);
+    priorities_ = {};
 }
 
-void tr_file_priorities::set(tr_file_index_t file, tr_priority_t priority)
+void tr_file_priorities::set(tr_file_index_t file, tr_priority_t new_priority)
 {
-    priorities_[file] = priority;
+    if (std::empty(priorities_))
+    {
+        if (new_priority == TR_PRI_NORMAL)
+        {
+            return;
+        }
+
+        priorities_.assign(std::size(*fpm_), TR_PRI_NORMAL);
+        priorities_.shrink_to_fit();
+    }
+
+    priorities_[file] = new_priority;
 }
 
-void tr_file_priorities::set(tr_file_index_t const* files, size_t n, tr_priority_t priority)
+void tr_file_priorities::set(tr_file_index_t const* files, size_t n, tr_priority_t new_priority)
 {
     for (size_t i = 0; i < n; ++i)
     {
-        set(files[i], priority);
+        set(files[i], new_priority);
     }
 }
 
 tr_priority_t tr_file_priorities::filePriority(tr_file_index_t file) const
 {
-    TR_ASSERT(file < std::size(priorities_));
+    TR_ASSERT(file < std::size(*fpm_));
+
+    if (std::empty(priorities_))
+    {
+        return TR_PRI_NORMAL;
+    }
 
     return priorities_[file];
 }
 
 tr_priority_t tr_file_priorities::piecePriority(tr_piece_index_t piece) const
 {
+    if (std::empty(priorities_))
+    {
+        return TR_PRI_NORMAL;
+    }
+
     auto const [begin_idx, end_idx] = fpm_->fileSpan(piece);
     auto const begin = std::begin(priorities_) + begin_idx;
     auto const end = std::begin(priorities_) + end_idx;
@@ -166,6 +183,11 @@ bool tr_files_wanted::fileWanted(tr_file_index_t file) const
 
 bool tr_files_wanted::pieceWanted(tr_piece_index_t piece) const
 {
+    if (wanted_.hasAll())
+    {
+        return true;
+    }
+
     auto const [begin, end] = fpm_->fileSpan(piece);
     return wanted_.count(begin, end) != 0;
 }

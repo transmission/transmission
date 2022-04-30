@@ -9,9 +9,9 @@
 #error only libtransmission should #include this header.
 #endif
 
-#include <cinttypes>
-#include <cstddef>
-#include <ctime>
+#include <cstdint> // int8_t
+#include <cstddef> // size_t
+#include <ctime> // time_t
 
 #include "peer-common.h"
 
@@ -35,20 +35,22 @@ public:
 
     virtual ~tr_peerMsgs() override = default;
 
-    virtual bool is_peer_choked() const = 0;
-    virtual bool is_peer_interested() const = 0;
-    virtual bool is_client_choked() const = 0;
-    virtual bool is_client_interested() const = 0;
+    /* how many requests the peer has made that we haven't responded to yet */
+    [[nodiscard]] virtual size_t pendingReqsToClient() const noexcept = 0;
 
-    virtual bool is_utp_connection() const = 0;
-    virtual bool is_encrypted() const = 0;
-    virtual bool is_incoming_connection() const = 0;
+    [[nodiscard]] virtual bool is_peer_choked() const noexcept = 0;
+    [[nodiscard]] virtual bool is_peer_interested() const noexcept = 0;
+    [[nodiscard]] virtual bool is_client_choked() const noexcept = 0;
+    [[nodiscard]] virtual bool is_client_interested() const noexcept = 0;
 
-    virtual bool is_active(tr_direction direction) const = 0;
+    [[nodiscard]] virtual bool is_utp_connection() const noexcept = 0;
+    [[nodiscard]] virtual bool is_encrypted() const = 0;
+    [[nodiscard]] virtual bool is_incoming_connection() const = 0;
+
+    [[nodiscard]] virtual bool is_active(tr_direction direction) const = 0;
     virtual void update_active(tr_direction direction) = 0;
 
-    virtual time_t get_connection_age() const = 0;
-    virtual bool is_reading_block(tr_block_index_t block) const = 0;
+    [[nodiscard]] virtual bool is_connection_older_than(time_t time) const noexcept = 0;
 
     virtual void cancel_block_request(tr_block_index_t block) = 0;
 

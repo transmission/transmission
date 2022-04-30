@@ -1,9 +1,11 @@
 // This file Copyright © 2013-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
 #include <string_view>
+
+#include <fmt/format.h>
 
 #include "transmission.h"
 
@@ -11,11 +13,6 @@
 #include "tr-assert.h"
 #include "tr-macros.h"
 #include "utils.h"
-
-bool tr_error_is_set(tr_error const* const* error)
-{
-    return (error != nullptr) && (*error != nullptr);
-}
 
 void tr_error_free(tr_error* error)
 {
@@ -79,7 +76,7 @@ void tr_error_prefix(tr_error** error, char const* prefix)
     }
 
     auto* err = *error;
-    auto* const new_message = tr_strvDup(tr_strvJoin(prefix, err->message));
+    auto* const new_message = tr_strvDup(fmt::format(FMT_STRING("{:s}{:s}"), prefix, err->message));
     tr_free(err->message);
     err->message = new_message;
 }

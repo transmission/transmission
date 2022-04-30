@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="19162" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="19529" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19162"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19529"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -22,7 +22,7 @@
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" topStrut="YES"/>
             <rect key="contentRect" x="320" y="502" width="611" height="328"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="875"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1680" height="1050"/>
             <value key="minSize" type="size" width="550" height="200"/>
             <view key="contentView" id="6">
                 <rect key="frame" x="0.0" y="0.0" width="611" height="328"/>
@@ -47,9 +47,11 @@
                             <font key="font" metaFont="menu"/>
                             <menu key="menu" title="OtherViews" id="16">
                                 <items>
-                                    <menuItem title="Error" state="on" image="RedDotFlat" id="17"/>
-                                    <menuItem title="Info" image="YellowDotFlat" id="18"/>
-                                    <menuItem title="Debug" image="PurpleDotFlat" id="19"/>
+                                    <menuItem title="Error" state="on" image="RedDotFlat"/>
+                                    <menuItem title="Warn" image="OrangeDotFlat"/>
+                                    <menuItem title="Info" image="GreenDotFlat"/>
+                                    <menuItem title="Debug" image="BlueDotFlat"/>
+                                    <menuItem title="Trace" image="PurpleDotFlat"/>
                                 </items>
                             </menu>
                         </popUpButtonCell>
@@ -117,7 +119,7 @@
                                             <sortDescriptor key="sortDescriptorPrototype" selector="localizedStandardCompare:" sortKey="Name"/>
                                             <tableColumnResizingMask key="resizingMask" userResizable="YES"/>
                                         </tableColumn>
-                                        <tableColumn identifier="Message" editable="NO" width="384" minWidth="10" maxWidth="3.4028229999999999e+38" id="68">
+                                        <tableColumn identifier="Message" editable="NO" width="355" minWidth="10" maxWidth="3.4028229999999999e+38" id="68">
                                             <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Message">
                                                 <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>

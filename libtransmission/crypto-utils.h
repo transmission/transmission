@@ -6,7 +6,7 @@
 #ifndef TR_CRYPTO_UTILS_H
 #define TR_CRYPTO_UTILS_H
 
-#include <cinttypes> // intX_t
+#include <cstdint> // uint8_t
 #include <cstddef> // size_t
 #include <optional>
 #include <string>
@@ -182,19 +182,13 @@ std::string tr_base64_decode(std::string_view input);
 
 /**
  * @brief Generate an ascii hex string for a sha1 digest.
- * @return address pointing past the last element written.
- */
-char* tr_sha1_to_string(tr_sha1_digest_t const& digest, char* strbuf);
-
-/**
- * @brief Generate an ascii hex string for a sha1 digest.
  */
 std::string tr_sha1_to_string(tr_sha1_digest_t const&);
 
 /**
  * @brief Generate a sha1 digest from a hex string.
  */
-tr_sha1_digest_t tr_sha1_from_string(std::string_view hex);
+std::optional<tr_sha1_digest_t> tr_sha1_from_string(std::string_view hex);
 
 /** @} */
 

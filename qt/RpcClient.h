@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <cstdint> // int64_t
 #include <memory>
 #include <optional>
 #include <string_view>
@@ -19,11 +20,11 @@
 #include <QUrl>
 
 #include <libtransmission/transmission.h>
+
 #include <libtransmission/quark.h>
-#include <libtransmission/tr-macros.h>
+#include <libtransmission/utils.h>
 #include <libtransmission/variant.h>
 
-class QByteArray;
 class QNetworkAccessManager;
 
 using TrVariantPtr = std::shared_ptr<tr_variant>;
@@ -96,4 +97,5 @@ private:
     QNetworkAccessManager* nam_ = {};
     QHash<int64_t, QFutureInterface<RpcResponse>> local_requests_;
     int64_t next_tag_ = {};
+    bool const verbose_ = tr_env_key_exists("TR_RPC_VERBOSE");
 };

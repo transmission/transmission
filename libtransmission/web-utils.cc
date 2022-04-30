@@ -1,5 +1,5 @@
 // This file Copyright © 2021-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -13,7 +13,10 @@
 #include <string>
 #include <string_view>
 
-#include <event2/buffer.h>
+#include <fmt/format.h>
+
+#define PSL_STATIC
+#include <libpsl.h>
 
 #include "transmission.h"
 
@@ -168,44 +171,6 @@ char const* tr_webGetResponseStr(long code)
     }
 }
 
-void tr_http_escape(struct evbuffer* out, std::string_view str, bool escape_reserved)
-{
-    auto constexpr ReservedChars = std::string_view{ "!*'();:@&=+$,/?%#[]" };
-    auto constexpr UnescapedChars = std::string_view{ "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_.~" };
-
-    for (auto const& ch : str)
-    {
-        if (tr_strvContains(UnescapedChars, ch) || (tr_strvContains(ReservedChars, ch) && !escape_reserved))
-        {
-            evbuffer_add_printf(out, "%c", ch);
-        }
-        else
-        {
-            evbuffer_add_printf(out, "%%%02X", (unsigned)(ch & 0xFF));
-        }
-    }
-}
-
-void tr_http_escape(std::string& appendme, std::string_view str, bool escape_reserved)
-{
-    auto constexpr ReservedChars = std::string_view{ "!*'();:@&=+$,/?%#[]" };
-    auto constexpr UnescapedChars = std::string_view{ "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_.~" };
-
-    for (auto const& ch : str)
-    {
-        if (tr_strvContains(UnescapedChars, ch) || (!escape_reserved && tr_strvContains(ReservedChars, ch)))
-        {
-            appendme += ch;
-        }
-        else
-        {
-            char buf[16];
-            tr_snprintf(buf, sizeof(buf), "%%%02X", (unsigned)(ch & 0xFF));
-            appendme += buf;
-        }
-    }
-}
-
 static bool is_rfc2396_alnum(uint8_t ch)
 {
     return ('0' <= ch && ch <= '9') || ('A' <= ch && ch <= 'Z') || ('a' <= ch && ch <= 'z') || ch == '.' || ch == '-' ||
@@ -222,18 +187,11 @@ void tr_http_escape_sha1(char* out, tr_sha1_digest_t const& digest)
         }
         else
         {
-            out += tr_snprintf(out, 4, "%%%02x", (unsigned int)b);
+            out = fmt::format_to(out, FMT_STRING("%{:02x}"), unsigned(b));
         }
     }
 
     *out = '\0';
-}
-
-void tr_http_escape_sha1(char* out, uint8_t const* sha1_digest)
-{
-    auto digest = tr_sha1_digest_t{};
-    std::copy_n(reinterpret_cast<std::byte const*>(sha1_digest), std::size(digest), std::begin(digest));
-    tr_http_escape_sha1(out, digest);
 }
 
 //// URLs
@@ -245,7 +203,8 @@ auto parsePort(std::string_view port_sv)
 {
     auto const port = tr_parseNum<int>(port_sv);
 
-    return port && *port >= std::numeric_limits<tr_port>::min() && *port <= std::numeric_limits<tr_port>::max() ? *port : -1;
+    using PortLimits = std::numeric_limits<uint16_t>;
+    return port && PortLimits::min() <= *port && *port <= PortLimits::max() ? *port : -1;
 }
 
 constexpr std::string_view getPortForScheme(std::string_view scheme)
@@ -292,6 +251,46 @@ bool tr_isValidTrackerScheme(std::string_view scheme)
     return std::find(std::begin(Schemes), std::end(Schemes), scheme) != std::end(Schemes);
 }
 
+// www.example.com -> example
+// www.example.co.uk -> example
+// 127.0.0.1 -> 127.0.0.1
+std::string_view getSiteName(std::string_view host)
+{
+    // is it empty?
+    if (std::empty(host))
+    {
+        return host;
+    }
+
+    // is it an IP?
+    auto addr = tr_address{};
+    auto const szhost = std::string(host);
+    if (tr_address_from_string(&addr, szhost.c_str()))
+    {
+        return host;
+    }
+
+    // is it a registered name?
+    if (char* lower = nullptr; psl_str_to_utf8lower(szhost.c_str(), nullptr, nullptr, &lower) == PSL_SUCCESS)
+    {
+        // www.example.com -> example.com
+        if (char const* const top = psl_registrable_domain(psl_builtin(), lower); top != nullptr)
+        {
+            host.remove_prefix(top - lower);
+        }
+
+        psl_free_string(lower);
+    }
+
+    // example.com -> example
+    if (auto const dot_pos = host.find('.'); dot_pos != std::string_view::npos)
+    {
+        host = host.substr(0, dot_pos);
+    }
+
+    return host;
+}
+
 } // namespace
 
 std::optional<tr_url_parsed_t> tr_urlParse(std::string_view url)
@@ -304,8 +303,7 @@ std::optional<tr_url_parsed_t> tr_urlParse(std::string_view url)
     // So many magnet links are malformed, e.g. not escaping text
     // in the display name, that we're better off handling magnets
     // as a special case before even scanning for invalid chars.
-    auto constexpr MagnetStart = "magnet:?"sv;
-    if (tr_strvStartsWith(url, MagnetStart))
+    if (auto constexpr MagnetStart = "magnet:?"sv; tr_strvStartsWith(url, MagnetStart))
     {
         parsed.scheme = "magnet"sv;
         parsed.query = url.substr(std::size(MagnetStart));
@@ -337,8 +335,8 @@ std::optional<tr_url_parsed_t> tr_urlParse(std::string_view url)
 
         auto remain = parsed.authority;
         parsed.host = tr_strvSep(&remain, ':');
-        parsed.portstr = !std::empty(remain) ? remain : getPortForScheme(parsed.scheme);
-        parsed.port = parsePort(parsed.portstr);
+        parsed.sitename = getSiteName(parsed.host);
+        parsed.port = parsePort(!std::empty(remain) ? remain : getPortForScheme(parsed.scheme));
     }
 
     //  The path is terminated by the first question mark ("?") or
@@ -414,7 +412,7 @@ std::string tr_urlPercentDecode(std::string_view in)
         }
 
         in.remove_prefix(pos);
-        if (std::size(in) >= 3 && in[0] == '%' && std::isxdigit(in[1]) && std::isxdigit(in[2]))
+        if (std::size(in) >= 3 && in[0] == '%' && (std::isxdigit(in[1]) != 0) && (std::isxdigit(in[2]) != 0))
         {
             auto hexstr = std::array<char, 3>{ in[1], in[2], '\0' };
             auto const hex = strtoul(std::data(hexstr), nullptr, 16);

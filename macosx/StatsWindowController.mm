@@ -11,6 +11,23 @@
 
 @interface StatsWindowController ()
 
+@property(nonatomic) IBOutlet NSTextField* fUploadedField;
+@property(nonatomic) IBOutlet NSTextField* fUploadedAllField;
+@property(nonatomic) IBOutlet NSTextField* fDownloadedField;
+@property(nonatomic) IBOutlet NSTextField* fDownloadedAllField;
+@property(nonatomic) IBOutlet NSTextField* fRatioField;
+@property(nonatomic) IBOutlet NSTextField* fRatioAllField;
+@property(nonatomic) IBOutlet NSTextField* fTimeField;
+@property(nonatomic) IBOutlet NSTextField* fTimeAllField;
+@property(nonatomic) IBOutlet NSTextField* fNumOpenedField;
+@property(nonatomic) IBOutlet NSTextField* fUploadedLabelField;
+@property(nonatomic) IBOutlet NSTextField* fDownloadedLabelField;
+@property(nonatomic) IBOutlet NSTextField* fRatioLabelField;
+@property(nonatomic) IBOutlet NSTextField* fTimeLabelField;
+@property(nonatomic) IBOutlet NSTextField* fNumOpenedLabelField;
+@property(nonatomic) IBOutlet NSButton* fResetButton;
+@property(nonatomic) NSTimer* fTimer;
+
 - (void)updateStats;
 
 - (void)performResetStats;
@@ -43,26 +60,33 @@ tr_session* fLib = NULL;
 {
     [self updateStats];
 
-    fTimer = [NSTimer scheduledTimerWithTimeInterval:UPDATE_SECONDS target:self selector:@selector(updateStats) userInfo:nil
-                                             repeats:YES];
-    [NSRunLoop.currentRunLoop addTimer:fTimer forMode:NSModalPanelRunLoopMode];
-    [NSRunLoop.currentRunLoop addTimer:fTimer forMode:NSEventTrackingRunLoopMode];
+    self.fTimer = [NSTimer scheduledTimerWithTimeInterval:UPDATE_SECONDS target:self selector:@selector(updateStats)
+                                                 userInfo:nil
+                                                  repeats:YES];
+    [NSRunLoop.currentRunLoop addTimer:self.fTimer forMode:NSModalPanelRunLoopMode];
+    [NSRunLoop.currentRunLoop addTimer:self.fTimer forMode:NSEventTrackingRunLoopMode];
 
     self.window.restorationClass = [self class];
 
     self.window.title = NSLocalizedString(@"Statistics", "Stats window -> title");
 
     //set label text
-    fUploadedLabelField.stringValue = [NSLocalizedString(@"Uploaded", "Stats window -> label") stringByAppendingString:@":"];
-    fDownloadedLabelField.stringValue = [NSLocalizedString(@"Downloaded", "Stats window -> label") stringByAppendingString:@":"];
-    fRatioLabelField.stringValue = [NSLocalizedString(@"Ratio", "Stats window -> label") stringByAppendingString:@":"];
-    fTimeLabelField.stringValue = [NSLocalizedString(@"Running Time", "Stats window -> label") stringByAppendingString:@":"];
-    fNumOpenedLabelField.stringValue = [NSLocalizedString(@"Program Started", "Stats window -> label") stringByAppendingString:@":"];
+    self.fUploadedLabelField.stringValue = [NSLocalizedString(@"Uploaded", "Stats window -> label") stringByAppendingString:@":"];
+    self.fDownloadedLabelField.stringValue = [NSLocalizedString(@"Downloaded", "Stats window -> label") stringByAppendingString:@":"];
+    self.fRatioLabelField.stringValue = [NSLocalizedString(@"Ratio", "Stats window -> label") stringByAppendingString:@":"];
+    self.fTimeLabelField.stringValue = [NSLocalizedString(@"Running Time", "Stats window -> label") stringByAppendingString:@":"];
+    self.fNumOpenedLabelField.stringValue = [NSLocalizedString(@"Program Started", "Stats window -> label") stringByAppendingString:@":"];
 
     //size of all labels
-    CGFloat const oldWidth = fUploadedLabelField.frame.size.width;
+    CGFloat const oldWidth = self.fUploadedLabelField.frame.size.width;
 
-    NSArray* labels = @[ fUploadedLabelField, fDownloadedLabelField, fRatioLabelField, fTimeLabelField, fNumOpenedLabelField ];
+    NSArray* labels = @[
+        self.fUploadedLabelField,
+        self.fDownloadedLabelField,
+        self.fRatioLabelField,
+        self.fTimeLabelField,
+        self.fNumOpenedLabelField
+    ];
 
     CGFloat maxWidth = CGFLOAT_MIN;
     for (NSTextField* label in labels)
@@ -86,21 +110,21 @@ tr_session* fLib = NULL;
     [self.window setFrame:windowRect display:YES];
 
     //resize reset button
-    CGFloat const oldButtonWidth = fResetButton.frame.size.width;
+    CGFloat const oldButtonWidth = self.fResetButton.frame.size.width;
 
-    fResetButton.title = NSLocalizedString(@"Reset", "Stats window -> reset button");
-    [fResetButton sizeToFit];
+    self.fResetButton.title = NSLocalizedString(@"Reset", "Stats window -> reset button");
+    [self.fResetButton sizeToFit];
 
-    NSRect buttonFrame = fResetButton.frame;
+    NSRect buttonFrame = self.fResetButton.frame;
     buttonFrame.size.width += 10.0;
     buttonFrame.origin.x -= buttonFrame.size.width - oldButtonWidth;
-    fResetButton.frame = buttonFrame;
+    self.fResetButton.frame = buttonFrame;
 }
 
 - (void)windowWillClose:(id)sender
 {
-    [fTimer invalidate];
-    fTimer = nil;
+    [self.fTimer invalidate];
+    self.fTimer = nil;
     fStatsWindowInstance = nil;
 }
 
@@ -152,6 +176,8 @@ tr_session* fLib = NULL;
     return @"StatsWindow";
 }
 
+#pragma mark - Private
+
 - (void)updateStats
 {
     tr_session_stats statsAll, statsSession;
@@ -161,24 +187,24 @@ tr_session* fLib = NULL;
     NSByteCountFormatter* byteFormatter = [[NSByteCountFormatter alloc] init];
     byteFormatter.allowedUnits = NSByteCountFormatterUseBytes;
 
-    fUploadedField.stringValue = [NSString stringForFileSize:statsSession.uploadedBytes];
-    fUploadedField.toolTip = [byteFormatter stringFromByteCount:statsSession.uploadedBytes];
-    fUploadedAllField.stringValue = [NSString
+    self.fUploadedField.stringValue = [NSString stringForFileSize:statsSession.uploadedBytes];
+    self.fUploadedField.toolTip = [byteFormatter stringFromByteCount:statsSession.uploadedBytes];
+    self.fUploadedAllField.stringValue = [NSString
         stringWithFormat:NSLocalizedString(@"%@ total", "stats total"), [NSString stringForFileSize:statsAll.uploadedBytes]];
-    fUploadedAllField.toolTip = [byteFormatter stringFromByteCount:statsAll.uploadedBytes];
+    self.fUploadedAllField.toolTip = [byteFormatter stringFromByteCount:statsAll.uploadedBytes];
 
-    fDownloadedField.stringValue = [NSString stringForFileSize:statsSession.downloadedBytes];
-    fDownloadedField.toolTip = [byteFormatter stringFromByteCount:statsSession.downloadedBytes];
-    fDownloadedAllField.stringValue = [NSString
+    self.fDownloadedField.stringValue = [NSString stringForFileSize:statsSession.downloadedBytes];
+    self.fDownloadedField.toolTip = [byteFormatter stringFromByteCount:statsSession.downloadedBytes];
+    self.fDownloadedAllField.stringValue = [NSString
         stringWithFormat:NSLocalizedString(@"%@ total", "stats total"), [NSString stringForFileSize:statsAll.downloadedBytes]];
-    fDownloadedAllField.toolTip = [byteFormatter stringFromByteCount:statsAll.downloadedBytes];
+    self.fDownloadedAllField.toolTip = [byteFormatter stringFromByteCount:statsAll.downloadedBytes];
 
-    fRatioField.stringValue = [NSString stringForRatio:statsSession.ratio];
+    self.fRatioField.stringValue = [NSString stringForRatio:statsSession.ratio];
 
     NSString* totalRatioString = statsAll.ratio != TR_RATIO_NA ?
         [NSString stringWithFormat:NSLocalizedString(@"%@ total", "stats total"), [NSString stringForRatio:statsAll.ratio]] :
         NSLocalizedString(@"Total N/A", "stats total");
-    fRatioAllField.stringValue = totalRatioString;
+    self.fRatioAllField.stringValue = totalRatioString;
 
     static NSDateComponentsFormatter* timeFormatter;
     static dispatch_once_t onceToken;
@@ -190,18 +216,18 @@ tr_session* fLib = NULL;
             NSCalendarUnitHour | NSCalendarUnitMinute;
     });
 
-    fTimeField.stringValue = [timeFormatter stringFromTimeInterval:statsSession.secondsActive];
-    fTimeAllField.stringValue = [NSString stringWithFormat:NSLocalizedString(@"%@ total", "stats total"),
-                                                           [timeFormatter stringFromTimeInterval:statsAll.secondsActive]];
+    self.fTimeField.stringValue = [timeFormatter stringFromTimeInterval:statsSession.secondsActive];
+    self.fTimeAllField.stringValue = [NSString stringWithFormat:NSLocalizedString(@"%@ total", "stats total"),
+                                                                [timeFormatter stringFromTimeInterval:statsAll.secondsActive]];
 
     if (statsAll.sessionCount == 1)
     {
-        fNumOpenedField.stringValue = NSLocalizedString(@"1 time", "stats window -> times opened");
+        self.fNumOpenedField.stringValue = NSLocalizedString(@"1 time", "stats window -> times opened");
     }
     else
     {
-        fNumOpenedField.stringValue = [NSString stringWithFormat:NSLocalizedString(@"%@ times", "stats window -> times opened"),
-                                                                 [NSString formattedUInteger:statsAll.sessionCount]];
+        self.fNumOpenedField.stringValue = [NSString stringWithFormat:NSLocalizedString(@"%@ times", "stats window -> times opened"),
+                                                                      [NSString formattedUInteger:statsAll.sessionCount]];
     }
 }
 

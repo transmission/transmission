@@ -1,5 +1,5 @@
 // This file Copyright © 2012-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -10,6 +10,8 @@
 #include <string_view>
 
 #include <event2/buffer.h>
+
+#include <fmt/core.h>
 
 #include "transmission.h"
 
@@ -28,8 +30,6 @@
 #include "web-utils.h"
 
 using namespace std::literals;
-
-#define dbgmsg(tor, ...) tr_logAddDeepNamed(tr_torrentName(tor), __VA_ARGS__)
 
 /***
 ****
@@ -64,7 +64,7 @@ static void incompleteMetadataFree(struct tr_incomplete_metadata* m)
 
 bool tr_torrentSetMetadataSizeHint(tr_torrent* tor, int64_t size)
 {
-    if (tor->hasMetadata())
+    if (tor->hasMetainfo())
     {
         return false;
     }
@@ -76,7 +76,7 @@ bool tr_torrentSetMetadataSizeHint(tr_torrent* tor, int64_t size)
 
     int const n = (size <= 0 || size > INT_MAX) ? -1 : size / METADATA_PIECE_SIZE + (size % METADATA_PIECE_SIZE != 0 ? 1 : 0);
 
-    dbgmsg(tor, "metadata is %" PRId64 " bytes in %d pieces", size, n);
+    tr_logAddDebugTor(tor, fmt::format("metadata is {} bytes in {} pieces", size, n));
 
     if (n <= 0)
     {
@@ -118,12 +118,12 @@ void* tr_torrentGetMetadataPiece(tr_torrent const* tor, int piece, size_t* len)
     TR_ASSERT(piece >= 0);
     TR_ASSERT(len != nullptr);
 
-    if (!tor->hasMetadata())
+    if (!tor->hasMetainfo())
     {
         return nullptr;
     }
 
-    auto const fd = tr_sys_file_open(tor->torrentFile().c_str(), TR_SYS_FILE_READ, 0, nullptr);
+    auto const fd = tr_sys_file_open(tor->torrentFile(), TR_SYS_FILE_READ, 0);
     if (fd == TR_BAD_SYS_FILE)
     {
         return nullptr;
@@ -133,16 +133,15 @@ void* tr_torrentGetMetadataPiece(tr_torrent const* tor, int piece, size_t* len)
     TR_ASSERT(info_dict_size > 0);
 
     char* ret = nullptr;
-    if (size_t o = piece * METADATA_PIECE_SIZE; tr_sys_file_seek(fd, tor->infoDictOffset() + o, TR_SEEK_SET, nullptr, nullptr))
+    if (size_t o = piece * METADATA_PIECE_SIZE; tr_sys_file_seek(fd, tor->infoDictOffset() + o, TR_SEEK_SET, nullptr))
     {
         size_t const l = o + METADATA_PIECE_SIZE <= info_dict_size ? METADATA_PIECE_SIZE : info_dict_size - o;
 
         if (0 < l && l <= METADATA_PIECE_SIZE)
         {
             auto* buf = tr_new(char, l);
-            auto n = uint64_t{};
 
-            if (tr_sys_file_read(fd, buf, l, &n, nullptr) && n == l)
+            if (auto n = uint64_t{}; tr_sys_file_read(fd, buf, l, &n) && n == l)
             {
                 *len = l;
                 ret = buf;
@@ -153,7 +152,7 @@ void* tr_torrentGetMetadataPiece(tr_torrent const* tor, int piece, size_t* len)
         }
     }
 
-    tr_sys_file_close(fd, nullptr);
+    tr_sys_file_close(fd);
 
     TR_ASSERT(ret == nullptr || *len > 0);
     return ret;
@@ -208,7 +207,7 @@ static void tr_buildMetainfoExceptInfoDict(tr_torrent_metainfo const& tm, tr_var
         auto const n = std::size(announce_list);
         if (n == 1)
         {
-            tr_variantDictAddStr(top, TR_KEY_announce, announce_list.at(0).announce_str.sv());
+            tr_variantDictAddStr(top, TR_KEY_announce, announce_list.at(0).announce.sv());
         }
         else
         {
@@ -222,7 +221,7 @@ static void tr_buildMetainfoExceptInfoDict(tr_torrent_metainfo const& tm, tr_var
                     tier_variant = tr_variantListAddList(announce_list_variant, n);
                 }
 
-                tr_variantListAddStr(tier_variant, tracker.announce_str.sv());
+                tr_variantListAddStr(tier_variant, tracker.announce.sv());
             }
         }
     }
@@ -258,7 +257,7 @@ static bool useNewMetainfo(tr_torrent* tor, tr_incomplete_metadata const* m, tr_
         return false;
     }
 
-    // yay we have an info dict. Let's make a .torrent file
+    // yay we have an info dict. Let's make a torrent file
     auto top_v = tr_variant{};
     tr_buildMetainfoExceptInfoDict(tor->metainfo_, &top_v);
     tr_variantMergeDicts(tr_variantDictAddDict(&top_v, TR_KEY_info, 0), &info_dict_v);
@@ -266,7 +265,7 @@ static bool useNewMetainfo(tr_torrent* tor, tr_incomplete_metadata const* m, tr_
     tr_variantFree(&top_v);
     tr_variantFree(&info_dict_v);
 
-    // does this synthetic .torrent file parse?
+    // does this synthetic torrent file parse?
     auto metainfo = tr_torrent_metainfo{};
     if (!metainfo.parseBenc(benc))
     {
@@ -274,11 +273,13 @@ static bool useNewMetainfo(tr_torrent* tor, tr_incomplete_metadata const* m, tr_
     }
 
     // save it
-    auto const filename = tor->torrentFile();
-    if (!tr_saveFile(filename, benc, error))
+    if (!tr_saveFile(tor->torrentFile(), benc, error))
     {
         return false;
     }
+
+    // remove .magnet file
+    tr_sys_path_remove(tor->magnetFile());
 
     // tor should keep this metainfo
     tor->setMetainfo(metainfo);
@@ -295,7 +296,10 @@ static void onHaveAllMetainfo(tr_torrent* tor, tr_incomplete_metadata* m)
         tor->incompleteMetadata = nullptr;
         tor->isStopping = true;
         tor->magnetVerify = true;
-        tor->startAfterVerify = !tor->prefetchMagnetMetadata;
+        if (tr_sessionGetPaused(tor->session))
+        {
+            tor->startAfterVerify = false;
+        }
         tor->markEdited();
     }
     else /* drat. */
@@ -310,7 +314,15 @@ static void onHaveAllMetainfo(tr_torrent* tor, tr_incomplete_metadata* m)
 
         m->piecesNeededCount = n;
         char const* const msg = error != nullptr && error->message != nullptr ? error->message : "unknown error";
-        dbgmsg(tor, "metadata error: %s. (trying again; %d pieces left)", msg, n);
+        tr_logAddWarnTor(
+            tor,
+            fmt::format(
+                ngettext(
+                    "Couldn't parse magnet metainfo: '{error}'. Redownloading {piece_count} piece",
+                    "Couldn't parse magnet metainfo: '{error}'. Redownloading {piece_count} pieces",
+                    n),
+                fmt::arg("error", msg),
+                fmt::arg("piece_count", n)));
         tr_error_clear(&error);
     }
 }
@@ -321,7 +333,7 @@ void tr_torrentSetMetadataPiece(tr_torrent* tor, int piece, void const* data, in
     TR_ASSERT(data != nullptr);
     TR_ASSERT(len >= 0);
 
-    dbgmsg(tor, "got metadata piece %d of %d bytes", piece, len);
+    tr_logAddDebugTor(tor, fmt::format("got metadata piece {} of {} bytes", piece, len));
 
     // are we set up to download metadata?
     tr_incomplete_metadata* const m = tor->incompleteMetadata;
@@ -355,12 +367,12 @@ void tr_torrentSetMetadataPiece(tr_torrent* tor, int piece, void const* data, in
     tr_removeElementFromArray(m->piecesNeeded, idx, sizeof(struct metadata_node), m->piecesNeededCount);
     --m->piecesNeededCount;
 
-    dbgmsg(tor, "saving metainfo piece %d... %d remain", piece, m->piecesNeededCount);
+    tr_logAddDebugTor(tor, fmt::format("saving metainfo piece {}... {} remain", piece, m->piecesNeededCount));
 
     /* are we done? */
     if (m->piecesNeededCount == 0)
     {
-        dbgmsg(tor, "metainfo piece %d was the last one", piece);
+        tr_logAddDebugTor(tor, fmt::format("metainfo piece {} was the last one", piece));
         onHaveAllMetainfo(tor, m);
     }
 }
@@ -381,7 +393,7 @@ bool tr_torrentGetNextMetadataRequest(tr_torrent* tor, time_t now, int* setme_pi
         m->piecesNeeded[i].piece = piece;
         m->piecesNeeded[i].requestedAt = now;
 
-        dbgmsg(tor, "next piece to request: %d", piece);
+        tr_logAddDebugTor(tor, fmt::format("next piece to request: {}", piece));
         *setme_piece = piece;
         have_request = true;
     }
@@ -391,7 +403,7 @@ bool tr_torrentGetNextMetadataRequest(tr_torrent* tor, time_t now, int* setme_pi
 
 double tr_torrentGetMetadataPercent(tr_torrent const* tor)
 {
-    if (tor->hasMetadata())
+    if (tor->hasMetainfo())
     {
         return 1.0;
     }

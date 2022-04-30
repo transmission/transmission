@@ -3,16 +3,11 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include "transmission.h"
-#include "error.h"
-#include "file.h"
-#include "tr-macros.h"
-
-#include "test-fixtures.h"
-
 #include <array>
 #include <cstring>
+#include <ostream>
 #include <string>
+#include <string_view>
 
 #ifndef _WIN32
 #include <sys/types.h>
@@ -21,6 +16,14 @@
 #else
 #include <windows.h>
 #endif
+
+#include "transmission.h"
+
+#include "error.h"
+#include "file.h"
+#include "tr-macros.h"
+
+#include "test-fixtures.h"
 
 #if !defined(__OpenBSD__)
 #define HAVE_UNIFIED_BUFFER_CACHE
@@ -45,8 +48,8 @@ class FileTest : public SessionTest
 protected:
     auto createTestDir(std::string const& child_name)
     {
-        auto test_dir = tr_strvPath(tr_sessionGetConfigDir(session_), child_name);
-        tr_sys_dir_create(std::data(test_dir), 0, 0777, nullptr);
+        auto test_dir = tr_pathbuf{ tr_sessionGetConfigDir(session_), '/', child_name };
+        tr_sys_dir_create(test_dir, 0, 0777);
         return test_dir;
     }
 
@@ -123,7 +126,7 @@ protected:
 
             auto const path_part = std::string{ path, size_t(slash_pos - path + 1) };
 
-            if (!tr_sys_path_get_info(path_part.c_str(), TR_SYS_PATH_NO_FOLLOW, &info, nullptr) ||
+            if (!tr_sys_path_get_info(path_part.c_str(), TR_SYS_PATH_NO_FOLLOW, &info) ||
                 (info.type != TR_SYS_PATH_IS_FILE && info.type != TR_SYS_PATH_IS_DIRECTORY))
             {
                 return false;
@@ -156,42 +159,41 @@ protected:
         char const* output;
     };
 
-    static void testPathXname(XnameTestData const* data, size_t data_size, char* (*func)(std::string_view, tr_error**))
+    static void testPathXname(XnameTestData const* data, size_t data_size, std::string (*func)(std::string_view, tr_error**))
     {
         for (size_t i = 0; i < data_size; ++i)
         {
             tr_error* err = nullptr;
-            char* name = func(data[i].input, &err);
+            auto const name = func(data[i].input, &err);
 
             if (data[i].output != nullptr)
             {
-                EXPECT_NE(nullptr, name);
-                EXPECT_EQ(nullptr, err);
-                EXPECT_STREQ(data[i].output, name);
-                tr_free(name);
+                EXPECT_NE(""sv, name);
+                EXPECT_EQ(nullptr, err) << *err;
+                EXPECT_EQ(data[i].output, name);
             }
             else
             {
-                EXPECT_EQ(nullptr, name);
+                EXPECT_EQ(""sv, name);
                 EXPECT_NE(nullptr, err);
                 tr_error_clear(&err);
             }
         }
     }
 
-    static void testDirReadImpl(std::string const& path, bool* have1, bool* have2)
+    static void testDirReadImpl(tr_pathbuf const& path, bool* have1, bool* have2)
     {
         *have1 = *have2 = false;
 
         tr_error* err = nullptr;
-        auto dd = tr_sys_dir_open(path.c_str(), &err);
+        auto dd = tr_sys_dir_open(path, &err);
         EXPECT_NE(TR_BAD_SYS_DIR, dd);
-        EXPECT_EQ(nullptr, err);
+        EXPECT_EQ(nullptr, err) << *err;
 
         char const* name;
         while ((name = tr_sys_dir_read_name(dd, &err)) != nullptr)
         {
-            EXPECT_EQ(nullptr, err);
+            EXPECT_EQ(nullptr, err) << *err;
 
             if (strcmp(name, ".") == 0 || strcmp(name, "..") == 0)
             {
@@ -212,10 +214,10 @@ protected:
             }
         }
 
-        EXPECT_EQ(nullptr, err);
+        EXPECT_EQ(nullptr, err) << *err;
 
         EXPECT_TRUE(tr_sys_dir_close(dd, &err));
-        EXPECT_EQ(nullptr, err);
+        EXPECT_EQ(nullptr, err) << *err;
     }
 };
 
@@ -224,12 +226,12 @@ TEST_F(FileTest, getInfo)
     auto const test_dir = createTestDir(currentTestName());
     tr_sys_path_info info;
 
-    auto const path1 = tr_strvPath(test_dir, "a"sv);
-    auto const path2 = tr_strvPath(test_dir, "b"sv);
+    auto const path1 = tr_pathbuf{ test_dir, "/a"sv };
+    auto const path2 = tr_pathbuf{ test_dir, "/b"sv };
 
     // Can't get info of non-existent file/directory
     tr_error* err = nullptr;
-    EXPECT_FALSE(tr_sys_path_get_info(path1.c_str(), 0, &info, &err));
+    EXPECT_FALSE(tr_sys_path_get_info(path1, 0, &info, &err));
     EXPECT_NE(nullptr, err);
     tr_error_clear(&err);
 
@@ -238,42 +240,42 @@ TEST_F(FileTest, getInfo)
 
     // Good file info
     clearPathInfo(&info);
-    EXPECT_TRUE(tr_sys_path_get_info(path1.c_str(), 0, &info, &err));
-    EXPECT_EQ(nullptr, err);
+    EXPECT_TRUE(tr_sys_path_get_info(path1, 0, &info, &err));
+    EXPECT_EQ(nullptr, err) << *err;
     EXPECT_EQ(TR_SYS_PATH_IS_FILE, info.type);
     EXPECT_EQ(4, info.size);
-    EXPECT_GT(info.last_modified_at, t - 1);
+    EXPECT_GE(info.last_modified_at, t - 1);
     EXPECT_LE(info.last_modified_at, time(nullptr) + 1);
 
     // Good file info (by handle)
-    auto fd = tr_sys_file_open(path1.c_str(), TR_SYS_FILE_READ, 0, nullptr);
+    auto fd = tr_sys_file_open(path1, TR_SYS_FILE_READ, 0);
     clearPathInfo(&info);
     EXPECT_TRUE(tr_sys_file_get_info(fd, &info, &err));
-    EXPECT_EQ(nullptr, err);
+    EXPECT_EQ(nullptr, err) << *err;
     EXPECT_EQ(TR_SYS_PATH_IS_FILE, info.type);
     EXPECT_EQ(4, info.size);
-    EXPECT_GT(info.last_modified_at, t - 1);
+    EXPECT_GE(info.last_modified_at, t - 1);
     EXPECT_LE(info.last_modified_at, time(nullptr) + 1);
-    tr_sys_file_close(fd, nullptr);
+    tr_sys_file_close(fd);
 
-    tr_sys_path_remove(path1.c_str(), nullptr);
+    tr_sys_path_remove(path1);
 
     // Good directory info
     t = time(nullptr);
-    tr_sys_dir_create(path1.c_str(), 0, 0777, nullptr);
+    tr_sys_dir_create(path1, 0, 0777);
     clearPathInfo(&info);
-    EXPECT_TRUE(tr_sys_path_get_info(path1.c_str(), 0, &info, &err));
-    EXPECT_EQ(nullptr, err);
+    EXPECT_TRUE(tr_sys_path_get_info(path1, 0, &info, &err));
+    EXPECT_EQ(nullptr, err) << *err;
     EXPECT_EQ(TR_SYS_PATH_IS_DIRECTORY, info.type);
     EXPECT_NE(uint64_t(-1), info.size);
     EXPECT_GE(info.last_modified_at, t - 1);
     EXPECT_LE(info.last_modified_at, time(nullptr) + 1);
-    tr_sys_path_remove(path1.c_str(), nullptr);
+    tr_sys_path_remove(path1);
 
-    if (createSymlink(path1.c_str(), path2.c_str(), false))
+    if (createSymlink(path1, path2, false))
     {
         // Can't get info of non-existent file/directory
-        EXPECT_FALSE(tr_sys_path_get_info(path1.c_str(), 0, &info, &err));
+        EXPECT_FALSE(tr_sys_path_get_info(path1, 0, &info, &err));
         EXPECT_NE(nullptr, err);
         tr_error_clear(&err);
 
@@ -282,41 +284,41 @@ TEST_F(FileTest, getInfo)
 
         // Good file info
         clearPathInfo(&info);
-        EXPECT_TRUE(tr_sys_path_get_info(path1.c_str(), 0, &info, &err));
-        EXPECT_EQ(nullptr, err);
+        EXPECT_TRUE(tr_sys_path_get_info(path1, 0, &info, &err));
+        EXPECT_EQ(nullptr, err) << *err;
         EXPECT_EQ(TR_SYS_PATH_IS_FILE, info.type);
         EXPECT_EQ(4, info.size);
         EXPECT_GE(info.last_modified_at, t - 1);
         EXPECT_LE(info.last_modified_at, time(nullptr) + 1);
 
         // Good file info (by handle)
-        fd = tr_sys_file_open(path1.c_str(), TR_SYS_FILE_READ, 0, nullptr);
+        fd = tr_sys_file_open(path1, TR_SYS_FILE_READ, 0);
         clearPathInfo(&info);
         EXPECT_TRUE(tr_sys_file_get_info(fd, &info, &err));
-        EXPECT_EQ(nullptr, err);
+        EXPECT_EQ(nullptr, err) << *err;
         EXPECT_EQ(TR_SYS_PATH_IS_FILE, info.type);
         EXPECT_EQ(4, info.size);
         EXPECT_GE(info.last_modified_at, t - 1);
         EXPECT_LE(info.last_modified_at, time(nullptr) + 1);
-        tr_sys_file_close(fd, nullptr);
+        tr_sys_file_close(fd);
 
-        tr_sys_path_remove(path2.c_str(), nullptr);
-        tr_sys_path_remove(path1.c_str(), nullptr);
+        tr_sys_path_remove(path2);
+        tr_sys_path_remove(path1);
 
         // Good directory info
         t = time(nullptr);
-        tr_sys_dir_create(path2.c_str(), 0, 0777, nullptr);
-        EXPECT_TRUE(createSymlink(path1.c_str(), path2.c_str(), true)); /* Win32: directory and file symlinks differ :( */
+        tr_sys_dir_create(path2, 0, 0777);
+        EXPECT_TRUE(createSymlink(path1, path2, true)); /* Win32: directory and file symlinks differ :( */
         clearPathInfo(&info);
-        EXPECT_TRUE(tr_sys_path_get_info(path1.c_str(), 0, &info, &err));
-        EXPECT_EQ(nullptr, err);
+        EXPECT_TRUE(tr_sys_path_get_info(path1, 0, &info, &err));
+        EXPECT_EQ(nullptr, err) << *err;
         EXPECT_EQ(TR_SYS_PATH_IS_DIRECTORY, info.type);
         EXPECT_NE(uint64_t(-1), info.size);
         EXPECT_GE(info.last_modified_at, t - 1);
         EXPECT_LE(info.last_modified_at, time(nullptr) + 1);
 
-        tr_sys_path_remove(path2.c_str(), nullptr);
-        tr_sys_path_remove(path1.c_str(), nullptr);
+        tr_sys_path_remove(path2);
+        tr_sys_path_remove(path1);
     }
     else
     {
@@ -328,50 +330,50 @@ TEST_F(FileTest, pathExists)
 {
     auto const test_dir = createTestDir(currentTestName());
 
-    auto const path1 = tr_strvPath(test_dir.data(), "a"sv);
-    auto const path2 = tr_strvPath(test_dir.data(), "b"sv);
+    auto const path1 = tr_pathbuf{ test_dir, "/a"sv };
+    auto const path2 = tr_pathbuf{ test_dir, "/b"sv };
 
     // Non-existent file does not exist
     tr_error* err = nullptr;
-    EXPECT_FALSE(tr_sys_path_exists(path1.c_str(), &err));
-    EXPECT_EQ(nullptr, err);
+    EXPECT_FALSE(tr_sys_path_exists(path1, &err));
+    EXPECT_EQ(nullptr, err) << *err;
 
     // Create file and see that it exists
     createFileWithContents(path1, "test");
-    EXPECT_TRUE(tr_sys_path_exists(path1.c_str(), &err));
-    EXPECT_EQ(nullptr, err);
+    EXPECT_TRUE(tr_sys_path_exists(path1, &err));
+    EXPECT_EQ(nullptr, err) << *err;
 
-    tr_sys_path_remove(path1.c_str(), nullptr);
+    tr_sys_path_remove(path1);
 
     // Create directory and see that it exists
-    tr_sys_dir_create(path1.c_str(), 0, 0777, nullptr);
-    EXPECT_TRUE(tr_sys_path_exists(path1.c_str(), &err));
-    EXPECT_EQ(nullptr, err);
+    tr_sys_dir_create(path1, 0, 0777);
+    EXPECT_TRUE(tr_sys_path_exists(path1, &err));
+    EXPECT_EQ(nullptr, err) << *err;
 
-    tr_sys_path_remove(path1.c_str(), nullptr);
+    tr_sys_path_remove(path1);
 
-    if (createSymlink(path1.c_str(), path2.c_str(), false))
+    if (createSymlink(path1, path2, false))
     {
         // Non-existent file does not exist (via symlink)
-        EXPECT_FALSE(tr_sys_path_exists(path1.c_str(), &err));
-        EXPECT_EQ(nullptr, err);
+        EXPECT_FALSE(tr_sys_path_exists(path1, &err));
+        EXPECT_EQ(nullptr, err) << *err;
 
         // Create file and see that it exists (via symlink)
         createFileWithContents(path2, "test");
-        EXPECT_TRUE(tr_sys_path_exists(path1.c_str(), &err));
-        EXPECT_EQ(nullptr, err);
+        EXPECT_TRUE(tr_sys_path_exists(path1, &err));
+        EXPECT_EQ(nullptr, err) << *err;
 
-        tr_sys_path_remove(path2.c_str(), nullptr);
-        tr_sys_path_remove(path1.c_str(), nullptr);
+        tr_sys_path_remove(path2);
+        tr_sys_path_remove(path1);
 
         /* Create directory and see that it exists (via symlink) */
-        tr_sys_dir_create(path2.c_str(), 0, 0777, nullptr);
-        EXPECT_TRUE(createSymlink(path1.c_str(), path2.c_str(), true)); /* Win32: directory and file symlinks differ :( */
-        EXPECT_TRUE(tr_sys_path_exists(path1.c_str(), &err));
-        EXPECT_EQ(nullptr, err);
+        tr_sys_dir_create(path2, 0, 0777);
+        EXPECT_TRUE(createSymlink(path1, path2, true)); /* Win32: directory and file symlinks differ :( */
+        EXPECT_TRUE(tr_sys_path_exists(path1, &err));
+        EXPECT_EQ(nullptr, err) << *err;
 
-        tr_sys_path_remove(path2.c_str(), nullptr);
-        tr_sys_path_remove(path1.c_str(), nullptr);
+        tr_sys_path_remove(path2);
+        tr_sys_path_remove(path1);
     }
     else
     {
@@ -429,203 +431,203 @@ TEST_F(FileTest, pathIsSame)
 {
     auto const test_dir = createTestDir(currentTestName());
 
-    auto const path1 = tr_strvPath(test_dir, "a"sv);
-    auto const path2 = tr_strvPath(test_dir, "b"sv);
-    auto path3 = tr_strvPath(path2, "c"sv);
+    auto const path1 = tr_pathbuf{ test_dir, "/a"sv };
+    auto const path2 = tr_pathbuf{ test_dir, "/b"sv };
+    auto path3 = tr_pathbuf{ path2, "/c"sv };
 
     /* Two non-existent files are not the same */
     tr_error* err = nullptr;
-    EXPECT_FALSE(tr_sys_path_is_same(path1.c_str(), path1.c_str(), &err));
-    EXPECT_EQ(nullptr, err);
-    EXPECT_FALSE(tr_sys_path_is_same(path1.c_str(), path2.c_str(), &err));
-    EXPECT_EQ(nullptr, err);
+    EXPECT_FALSE(tr_sys_path_is_same(path1, path1, &err));
+    EXPECT_EQ(nullptr, err) << *err;
+    EXPECT_FALSE(tr_sys_path_is_same(path1, path2, &err));
+    EXPECT_EQ(nullptr, err) << *err;
 
     /* Two same files are the same */
     createFileWithContents(path1, "test");
-    EXPECT_TRUE(tr_sys_path_is_same(path1.c_str(), path1.c_str(), &err));
-    EXPECT_EQ(nullptr, err);
+    EXPECT_TRUE(tr_sys_path_is_same(path1, path1, &err));
+    EXPECT_EQ(nullptr, err) << *err;
 
     /* Existent and non-existent files are not the same */
-    EXPECT_FALSE(tr_sys_path_is_same(path1.c_str(), path2.c_str(), &err));
-    EXPECT_EQ(nullptr, err);
-    EXPECT_FALSE(tr_sys_path_is_same(path2.c_str(), path1.c_str(), &err));
-    EXPECT_EQ(nullptr, err);
+    EXPECT_FALSE(tr_sys_path_is_same(path1, path2, &err));
+    EXPECT_EQ(nullptr, err) << *err;
+    EXPECT_FALSE(tr_sys_path_is_same(path2, path1, &err));
+    EXPECT_EQ(nullptr, err) << *err;
 
     /* Two separate files (even with same content) are not the same */
     createFileWithContents(path2, "test");
-    EXPECT_FALSE(tr_sys_path_is_same(path1.c_str(), path2.c_str(), &err));
-    EXPECT_EQ(nullptr, err);
+    EXPECT_FALSE(tr_sys_path_is_same(path1, path2, &err));
+    EXPECT_EQ(nullptr, err) << *err;
 
-    tr_sys_path_remove(path1.c_str(), nullptr);
+    tr_sys_path_remove(path1);
 
     /* Two same directories are the same */
-    tr_sys_dir_create(path1.c_str(), 0, 0777, nullptr);
-    EXPECT_TRUE(tr_sys_path_is_same(path1.c_str(), path1.c_str(), &err));
-    EXPECT_EQ(nullptr, err);
+    tr_sys_dir_create(path1, 0, 0777);
+    EXPECT_TRUE(tr_sys_path_is_same(path1, path1, &err));
+    EXPECT_EQ(nullptr, err) << *err;
 
     /* File and directory are not the same */
-    EXPECT_FALSE(tr_sys_path_is_same(path1.c_str(), path2.c_str(), &err));
-    EXPECT_EQ(nullptr, err);
-    EXPECT_FALSE(tr_sys_path_is_same(path2.c_str(), path1.c_str(), &err));
-    EXPECT_EQ(nullptr, err);
+    EXPECT_FALSE(tr_sys_path_is_same(path1, path2, &err));
+    EXPECT_EQ(nullptr, err) << *err;
+    EXPECT_FALSE(tr_sys_path_is_same(path2, path1, &err));
+    EXPECT_EQ(nullptr, err) << *err;
 
-    tr_sys_path_remove(path2.c_str(), nullptr);
+    tr_sys_path_remove(path2);
 
     /* Two separate directories are not the same */
-    tr_sys_dir_create(path2.c_str(), 0, 0777, nullptr);
-    EXPECT_FALSE(tr_sys_path_is_same(path1.c_str(), path2.c_str(), &err));
-    EXPECT_EQ(nullptr, err);
+    tr_sys_dir_create(path2, 0, 0777);
+    EXPECT_FALSE(tr_sys_path_is_same(path1, path2, &err));
+    EXPECT_EQ(nullptr, err) << *err;
 
-    tr_sys_path_remove(path1.c_str(), nullptr);
-    tr_sys_path_remove(path2.c_str(), nullptr);
+    tr_sys_path_remove(path1);
+    tr_sys_path_remove(path2);
 
-    if (createSymlink(path1.c_str(), ".", true))
+    if (createSymlink(path1, ".", true))
     {
         /* Directory and symlink pointing to it are the same */
-        EXPECT_TRUE(tr_sys_path_is_same(path1.c_str(), test_dir.data(), &err));
-        EXPECT_EQ(nullptr, err);
-        EXPECT_TRUE(tr_sys_path_is_same(test_dir.data(), path1.c_str(), &err));
-        EXPECT_EQ(nullptr, err);
+        EXPECT_TRUE(tr_sys_path_is_same(path1, test_dir.data(), &err));
+        EXPECT_EQ(nullptr, err) << *err;
+        EXPECT_TRUE(tr_sys_path_is_same(test_dir.data(), path1, &err));
+        EXPECT_EQ(nullptr, err) << *err;
 
         /* Non-existent file and symlink are not the same */
-        EXPECT_FALSE(tr_sys_path_is_same(path1.c_str(), path2.c_str(), &err));
-        EXPECT_EQ(nullptr, err);
-        EXPECT_FALSE(tr_sys_path_is_same(path2.c_str(), path1.c_str(), &err));
-        EXPECT_EQ(nullptr, err);
+        EXPECT_FALSE(tr_sys_path_is_same(path1, path2, &err));
+        EXPECT_EQ(nullptr, err) << *err;
+        EXPECT_FALSE(tr_sys_path_is_same(path2, path1, &err));
+        EXPECT_EQ(nullptr, err) << *err;
 
         /* Symlinks pointing to different directories are not the same */
-        createSymlink(path2.c_str(), "..", true);
-        EXPECT_FALSE(tr_sys_path_is_same(path1.c_str(), path2.c_str(), &err));
-        EXPECT_EQ(nullptr, err);
-        EXPECT_FALSE(tr_sys_path_is_same(path2.c_str(), path1.c_str(), &err));
-        EXPECT_EQ(nullptr, err);
+        createSymlink(path2, "..", true);
+        EXPECT_FALSE(tr_sys_path_is_same(path1, path2, &err));
+        EXPECT_EQ(nullptr, err) << *err;
+        EXPECT_FALSE(tr_sys_path_is_same(path2, path1, &err));
+        EXPECT_EQ(nullptr, err) << *err;
 
-        tr_sys_path_remove(path2.c_str(), nullptr);
+        tr_sys_path_remove(path2);
 
         /* Symlinks pointing to same directory are the same */
-        createSymlink(path2.c_str(), ".", true);
-        EXPECT_TRUE(tr_sys_path_is_same(path1.c_str(), path2.c_str(), &err));
-        EXPECT_EQ(nullptr, err);
+        createSymlink(path2, ".", true);
+        EXPECT_TRUE(tr_sys_path_is_same(path1, path2, &err));
+        EXPECT_EQ(nullptr, err) << *err;
 
-        tr_sys_path_remove(path2.c_str(), nullptr);
+        tr_sys_path_remove(path2);
 
         /* Directory and symlink pointing to another directory are not the same */
-        tr_sys_dir_create(path2.c_str(), 0, 0777, nullptr);
-        EXPECT_FALSE(tr_sys_path_is_same(path1.c_str(), path2.c_str(), &err));
-        EXPECT_EQ(nullptr, err);
-        EXPECT_FALSE(tr_sys_path_is_same(path2.c_str(), path1.c_str(), &err));
-        EXPECT_EQ(nullptr, err);
+        tr_sys_dir_create(path2, 0, 0777);
+        EXPECT_FALSE(tr_sys_path_is_same(path1, path2, &err));
+        EXPECT_EQ(nullptr, err) << *err;
+        EXPECT_FALSE(tr_sys_path_is_same(path2, path1, &err));
+        EXPECT_EQ(nullptr, err) << *err;
 
         /* Symlinks pointing to same directory are the same */
-        createSymlink(path3.c_str(), "..", true);
-        EXPECT_TRUE(tr_sys_path_is_same(path1.c_str(), path3.c_str(), &err));
-        EXPECT_EQ(nullptr, err);
+        createSymlink(path3, "..", true);
+        EXPECT_TRUE(tr_sys_path_is_same(path1, path3, &err));
+        EXPECT_EQ(nullptr, err) << *err;
 
-        tr_sys_path_remove(path1.c_str(), nullptr);
+        tr_sys_path_remove(path1);
 
         /* File and symlink pointing to directory are not the same */
         createFileWithContents(path1, "test");
-        EXPECT_FALSE(tr_sys_path_is_same(path1.c_str(), path3.c_str(), &err));
-        EXPECT_EQ(nullptr, err);
-        EXPECT_FALSE(tr_sys_path_is_same(path3.c_str(), path1.c_str(), &err));
-        EXPECT_EQ(nullptr, err);
+        EXPECT_FALSE(tr_sys_path_is_same(path1, path3, &err));
+        EXPECT_EQ(nullptr, err) << *err;
+        EXPECT_FALSE(tr_sys_path_is_same(path3, path1, &err));
+        EXPECT_EQ(nullptr, err) << *err;
 
-        tr_sys_path_remove(path3.c_str(), nullptr);
+        tr_sys_path_remove(path3);
 
         /* File and symlink pointing to same file are the same */
-        createSymlink(path3.c_str(), path1.c_str(), false);
-        EXPECT_TRUE(tr_sys_path_is_same(path1.c_str(), path3.c_str(), &err));
-        EXPECT_EQ(nullptr, err);
-        EXPECT_TRUE(tr_sys_path_is_same(path3.c_str(), path1.c_str(), &err));
-        EXPECT_EQ(nullptr, err);
+        createSymlink(path3, path1, false);
+        EXPECT_TRUE(tr_sys_path_is_same(path1, path3, &err));
+        EXPECT_EQ(nullptr, err) << *err;
+        EXPECT_TRUE(tr_sys_path_is_same(path3, path1, &err));
+        EXPECT_EQ(nullptr, err) << *err;
 
         /* Symlinks pointing to non-existent files are not the same */
-        tr_sys_path_remove(path1.c_str(), nullptr);
-        createSymlink(path1.c_str(), "missing", false);
-        tr_sys_path_remove(path3.c_str(), nullptr);
-        createSymlink(path3.c_str(), "missing", false);
-        EXPECT_FALSE(tr_sys_path_is_same(path1.c_str(), path3.c_str(), &err));
-        EXPECT_EQ(nullptr, err);
-        EXPECT_FALSE(tr_sys_path_is_same(path3.c_str(), path1.c_str(), &err));
-        EXPECT_EQ(nullptr, err);
+        tr_sys_path_remove(path1);
+        createSymlink(path1, "missing", false);
+        tr_sys_path_remove(path3);
+        createSymlink(path3, "missing", false);
+        EXPECT_FALSE(tr_sys_path_is_same(path1, path3, &err));
+        EXPECT_EQ(nullptr, err) << *err;
+        EXPECT_FALSE(tr_sys_path_is_same(path3, path1, &err));
+        EXPECT_EQ(nullptr, err) << *err;
 
-        tr_sys_path_remove(path3.c_str(), nullptr);
+        tr_sys_path_remove(path3);
 
         /* Symlinks pointing to same non-existent file are not the same */
         createSymlink(path3.c_str(), ".." NATIVE_PATH_SEP "missing", false);
-        EXPECT_FALSE(tr_sys_path_is_same(path1.c_str(), path3.c_str(), &err));
-        EXPECT_EQ(nullptr, err);
-        EXPECT_FALSE(tr_sys_path_is_same(path3.c_str(), path1.c_str(), &err));
-        EXPECT_EQ(nullptr, err);
+        EXPECT_FALSE(tr_sys_path_is_same(path1, path3, &err));
+        EXPECT_EQ(nullptr, err) << *err;
+        EXPECT_FALSE(tr_sys_path_is_same(path3, path1, &err));
+        EXPECT_EQ(nullptr, err) << *err;
 
         /* Non-existent file and symlink pointing to non-existent file are not the same */
-        tr_sys_path_remove(path3.c_str(), nullptr);
-        EXPECT_FALSE(tr_sys_path_is_same(path1.c_str(), path3.c_str(), &err));
-        EXPECT_EQ(nullptr, err);
-        EXPECT_FALSE(tr_sys_path_is_same(path3.c_str(), path1.c_str(), &err));
-        EXPECT_EQ(nullptr, err);
+        tr_sys_path_remove(path3);
+        EXPECT_FALSE(tr_sys_path_is_same(path1, path3, &err));
+        EXPECT_EQ(nullptr, err) << *err;
+        EXPECT_FALSE(tr_sys_path_is_same(path3, path1, &err));
+        EXPECT_EQ(nullptr, err) << *err;
 
-        tr_sys_path_remove(path2.c_str(), nullptr);
-        tr_sys_path_remove(path1.c_str(), nullptr);
+        tr_sys_path_remove(path2);
+        tr_sys_path_remove(path1);
     }
     else
     {
         fprintf(stderr, "WARNING: [%s] unable to run symlink tests\n", __FUNCTION__);
     }
 
-    path3 = tr_strvPath(test_dir, "c"sv);
+    path3.assign(test_dir, "/c"sv);
 
     createFileWithContents(path1, "test");
 
-    if (createHardlink(path2.c_str(), path1.c_str()))
+    if (createHardlink(path2, path1))
     {
         /* File and hardlink to it are the same */
-        EXPECT_TRUE(tr_sys_path_is_same(path1.c_str(), path2.c_str(), &err));
-        EXPECT_EQ(nullptr, err);
+        EXPECT_TRUE(tr_sys_path_is_same(path1, path2, &err));
+        EXPECT_EQ(nullptr, err) << *err;
 
         /* Two hardlinks to the same file are the same */
-        createHardlink(path3.c_str(), path2.c_str());
-        EXPECT_TRUE(tr_sys_path_is_same(path2.c_str(), path3.c_str(), &err));
-        EXPECT_EQ(nullptr, err);
-        EXPECT_TRUE(tr_sys_path_is_same(path1.c_str(), path3.c_str(), &err));
-        EXPECT_EQ(nullptr, err);
+        createHardlink(path3, path2);
+        EXPECT_TRUE(tr_sys_path_is_same(path2, path3, &err));
+        EXPECT_EQ(nullptr, err) << *err;
+        EXPECT_TRUE(tr_sys_path_is_same(path1, path3, &err));
+        EXPECT_EQ(nullptr, err) << *err;
 
-        tr_sys_path_remove(path2.c_str(), nullptr);
+        tr_sys_path_remove(path2);
 
-        EXPECT_TRUE(tr_sys_path_is_same(path1.c_str(), path3.c_str(), &err));
-        EXPECT_EQ(nullptr, err);
+        EXPECT_TRUE(tr_sys_path_is_same(path1, path3, &err));
+        EXPECT_EQ(nullptr, err) << *err;
 
-        tr_sys_path_remove(path3.c_str(), nullptr);
+        tr_sys_path_remove(path3);
 
         /* File and hardlink to another file are not the same */
         createFileWithContents(path3, "test");
-        createHardlink(path2.c_str(), path3.c_str());
-        EXPECT_FALSE(tr_sys_path_is_same(path1.c_str(), path2.c_str(), &err));
-        EXPECT_EQ(nullptr, err);
-        EXPECT_FALSE(tr_sys_path_is_same(path2.c_str(), path1.c_str(), &err));
-        EXPECT_EQ(nullptr, err);
+        createHardlink(path2, path3);
+        EXPECT_FALSE(tr_sys_path_is_same(path1, path2, &err));
+        EXPECT_EQ(nullptr, err) << *err;
+        EXPECT_FALSE(tr_sys_path_is_same(path2, path1, &err));
+        EXPECT_EQ(nullptr, err) << *err;
 
-        tr_sys_path_remove(path3.c_str(), nullptr);
-        tr_sys_path_remove(path2.c_str(), nullptr);
+        tr_sys_path_remove(path3);
+        tr_sys_path_remove(path2);
     }
     else
     {
         fprintf(stderr, "WARNING: [%s] unable to run hardlink tests\n", __FUNCTION__);
     }
 
-    if (createSymlink(path2.c_str(), path1.c_str(), false) && createHardlink(path3.c_str(), path1.c_str()))
+    if (createSymlink(path2, path1, false) && createHardlink(path3, path1))
     {
-        EXPECT_TRUE(tr_sys_path_is_same(path2.c_str(), path3.c_str(), &err));
-        EXPECT_EQ(nullptr, err);
+        EXPECT_TRUE(tr_sys_path_is_same(path2, path3, &err));
+        EXPECT_EQ(nullptr, err) << *err;
     }
     else
     {
         fprintf(stderr, "WARNING: [%s] unable to run combined symlink and hardlink tests\n", __FUNCTION__);
     }
 
-    tr_sys_path_remove(path3.c_str(), nullptr);
-    tr_sys_path_remove(path2.c_str(), nullptr);
-    tr_sys_path_remove(path1.c_str(), nullptr);
+    tr_sys_path_remove(path3);
+    tr_sys_path_remove(path2);
+    tr_sys_path_remove(path1);
 }
 
 TEST_F(FileTest, pathResolve)
@@ -633,24 +635,24 @@ TEST_F(FileTest, pathResolve)
     auto const test_dir = createTestDir(currentTestName());
 
     tr_error* err = nullptr;
-    auto const path1 = tr_strvPath(test_dir, "a"sv);
-    auto const path2 = tr_strvPath(test_dir, "b"sv);
+    auto const path1 = tr_pathbuf{ test_dir, "/a"sv };
+    auto const path2 = tr_pathbuf{ test_dir, "/b"sv };
 
     createFileWithContents(path1, "test");
 
-    if (createSymlink(path2.c_str(), path1.c_str(), false))
+    if (createSymlink(path2, path1, false))
     {
-        auto tmp = makeString(tr_sys_path_resolve(path2.c_str(), &err));
-        EXPECT_EQ(nullptr, err);
+        auto tmp = makeString(tr_sys_path_resolve(path2, &err));
+        EXPECT_EQ(nullptr, err) << *err;
         EXPECT_TRUE(pathContainsNoSymlinks(tmp.c_str()));
 
-        tr_sys_path_remove(path2.c_str(), nullptr);
-        tr_sys_path_remove(path1.c_str(), nullptr);
+        tr_sys_path_remove(path2);
+        tr_sys_path_remove(path1);
 
-        tr_sys_dir_create(path1.c_str(), 0, 0755, nullptr);
-        EXPECT_TRUE(createSymlink(path2.c_str(), path1.c_str(), true)); /* Win32: directory and file symlinks differ :( */
-        tmp = makeString(tr_sys_path_resolve(path2.c_str(), &err));
-        EXPECT_EQ(nullptr, err);
+        tr_sys_dir_create(path1, 0, 0755);
+        EXPECT_TRUE(createSymlink(path2, path1, true)); /* Win32: directory and file symlinks differ :( */
+        tmp = makeString(tr_sys_path_resolve(path2, &err));
+        EXPECT_EQ(nullptr, err) << *err;
         EXPECT_TRUE(pathContainsNoSymlinks(tmp.c_str()));
     }
     else
@@ -658,8 +660,8 @@ TEST_F(FileTest, pathResolve)
         fprintf(stderr, "WARNING: [%s] unable to run symlink tests\n", __FUNCTION__);
     }
 
-    tr_sys_path_remove(path2.c_str(), nullptr);
-    tr_sys_path_remove(path1.c_str(), nullptr);
+    tr_sys_path_remove(path2);
+    tr_sys_path_remove(path1);
 
 #ifdef _WIN32
 
@@ -678,7 +680,7 @@ TEST_F(FileTest, pathResolve)
 
         tmp = tr_sys_path_resolve("\\\\127.0.0.1\\ADMIN$\\System32", &err);
         EXPECT_STREQ("\\\\127.0.0.1\\ADMIN$\\System32", tmp);
-        EXPECT_EQ(nullptr, err);
+        EXPECT_EQ(nullptr, err) << *err;
         tr_free(tmp);
     }
 
@@ -787,152 +789,152 @@ TEST_F(FileTest, pathRename)
 {
     auto const test_dir = createTestDir(currentTestName());
 
-    auto const path1 = tr_strvPath(test_dir, "a"sv);
-    auto const path2 = tr_strvPath(test_dir, "b"sv);
-    auto path3 = tr_strvPath(path2, "c"sv);
+    auto const path1 = tr_pathbuf{ test_dir, "/a"sv };
+    auto const path2 = tr_pathbuf{ test_dir, "/b"sv };
+    auto path3 = tr_pathbuf{ path2, "/c"sv };
 
     createFileWithContents(path1, "test");
 
     /* Preconditions */
-    EXPECT_TRUE(tr_sys_path_exists(path1.c_str(), nullptr));
-    EXPECT_FALSE(tr_sys_path_exists(path2.c_str(), nullptr));
+    EXPECT_TRUE(tr_sys_path_exists(path1));
+    EXPECT_FALSE(tr_sys_path_exists(path2));
 
     /* Forward rename works */
     tr_error* err = nullptr;
-    EXPECT_TRUE(tr_sys_path_rename(path1.c_str(), path2.c_str(), &err));
-    EXPECT_FALSE(tr_sys_path_exists(path1.c_str(), nullptr));
-    EXPECT_TRUE(tr_sys_path_exists(path2.c_str(), nullptr));
-    EXPECT_EQ(nullptr, err);
+    EXPECT_TRUE(tr_sys_path_rename(path1, path2, &err));
+    EXPECT_FALSE(tr_sys_path_exists(path1));
+    EXPECT_TRUE(tr_sys_path_exists(path2));
+    EXPECT_EQ(nullptr, err) << *err;
 
     /* Backward rename works */
-    EXPECT_TRUE(tr_sys_path_rename(path2.c_str(), path1.c_str(), &err));
-    EXPECT_TRUE(tr_sys_path_exists(path1.c_str(), nullptr));
-    EXPECT_FALSE(tr_sys_path_exists(path2.c_str(), nullptr));
-    EXPECT_EQ(nullptr, err);
+    EXPECT_TRUE(tr_sys_path_rename(path2, path1, &err));
+    EXPECT_TRUE(tr_sys_path_exists(path1));
+    EXPECT_FALSE(tr_sys_path_exists(path2));
+    EXPECT_EQ(nullptr, err) << *err;
 
     /* Another backward rename [of non-existent file] does not work */
-    EXPECT_FALSE(tr_sys_path_rename(path2.c_str(), path1.c_str(), &err));
+    EXPECT_FALSE(tr_sys_path_rename(path2, path1, &err));
     EXPECT_NE(nullptr, err);
     tr_error_clear(&err);
 
     /* Rename to file which couldn't be created does not work */
-    EXPECT_FALSE(tr_sys_path_rename(path1.c_str(), path3.c_str(), &err));
+    EXPECT_FALSE(tr_sys_path_rename(path1, path3, &err));
     EXPECT_NE(nullptr, err);
     tr_error_clear(&err);
 
     /* Rename of non-existent file does not work */
-    EXPECT_FALSE(tr_sys_path_rename(path3.c_str(), path2.c_str(), &err));
+    EXPECT_FALSE(tr_sys_path_rename(path3, path2, &err));
     EXPECT_NE(nullptr, err);
     tr_error_clear(&err);
 
     createFileWithContents(path2, "test");
 
     /* Renaming file does overwrite existing file */
-    EXPECT_TRUE(tr_sys_path_rename(path2.c_str(), path1.c_str(), &err));
-    EXPECT_EQ(nullptr, err);
+    EXPECT_TRUE(tr_sys_path_rename(path2, path1, &err));
+    EXPECT_EQ(nullptr, err) << *err;
 
-    tr_sys_dir_create(path2.c_str(), 0, 0777, nullptr);
+    tr_sys_dir_create(path2, 0, 0777);
 
     /* Renaming file does not overwrite existing directory, and vice versa */
-    EXPECT_FALSE(tr_sys_path_rename(path1.c_str(), path2.c_str(), &err));
+    EXPECT_FALSE(tr_sys_path_rename(path1, path2, &err));
     EXPECT_NE(nullptr, err);
     tr_error_clear(&err);
-    EXPECT_FALSE(tr_sys_path_rename(path2.c_str(), path1.c_str(), &err));
+    EXPECT_FALSE(tr_sys_path_rename(path2, path1, &err));
     EXPECT_NE(nullptr, err);
     tr_error_clear(&err);
 
-    tr_sys_path_remove(path2.c_str(), nullptr);
+    tr_sys_path_remove(path2);
 
-    path3 = tr_strvPath(test_dir, "c"sv);
+    path3.assign(test_dir, "/c"sv);
 
-    if (createSymlink(path2.c_str(), path1.c_str(), false))
+    if (createSymlink(path2, path1, false))
     {
         /* Preconditions */
-        EXPECT_TRUE(tr_sys_path_exists(path2.c_str(), nullptr));
-        EXPECT_FALSE(tr_sys_path_exists(path3.c_str(), nullptr));
-        EXPECT_TRUE(tr_sys_path_is_same(path1.c_str(), path2.c_str(), nullptr));
+        EXPECT_TRUE(tr_sys_path_exists(path2));
+        EXPECT_FALSE(tr_sys_path_exists(path3));
+        EXPECT_TRUE(tr_sys_path_is_same(path1, path2));
 
         /* Rename of symlink works, files stay the same */
-        EXPECT_TRUE(tr_sys_path_rename(path2.c_str(), path3.c_str(), &err));
-        EXPECT_EQ(nullptr, err);
-        EXPECT_FALSE(tr_sys_path_exists(path2.c_str(), nullptr));
-        EXPECT_TRUE(tr_sys_path_exists(path3.c_str(), nullptr));
-        EXPECT_TRUE(tr_sys_path_is_same(path1.c_str(), path3.c_str(), nullptr));
+        EXPECT_TRUE(tr_sys_path_rename(path2, path3, &err));
+        EXPECT_EQ(nullptr, err) << *err;
+        EXPECT_FALSE(tr_sys_path_exists(path2));
+        EXPECT_TRUE(tr_sys_path_exists(path3));
+        EXPECT_TRUE(tr_sys_path_is_same(path1, path3));
 
-        tr_sys_path_remove(path3.c_str(), nullptr);
+        tr_sys_path_remove(path3);
     }
     else
     {
         fprintf(stderr, "WARNING: [%s] unable to run symlink tests\n", __FUNCTION__);
     }
 
-    if (createHardlink(path2.c_str(), path1.c_str()))
+    if (createHardlink(path2, path1))
     {
         /* Preconditions */
-        EXPECT_TRUE(tr_sys_path_exists(path2.c_str(), nullptr));
-        EXPECT_FALSE(tr_sys_path_exists(path3.c_str(), nullptr));
-        EXPECT_TRUE(tr_sys_path_is_same(path1.c_str(), path2.c_str(), nullptr));
+        EXPECT_TRUE(tr_sys_path_exists(path2));
+        EXPECT_FALSE(tr_sys_path_exists(path3));
+        EXPECT_TRUE(tr_sys_path_is_same(path1, path2));
 
         /* Rename of hardlink works, files stay the same */
-        EXPECT_TRUE(tr_sys_path_rename(path2.c_str(), path3.c_str(), &err));
-        EXPECT_EQ(nullptr, err);
-        EXPECT_FALSE(tr_sys_path_exists(path2.c_str(), nullptr));
-        EXPECT_TRUE(tr_sys_path_exists(path3.c_str(), nullptr));
-        EXPECT_TRUE(tr_sys_path_is_same(path1.c_str(), path3.c_str(), nullptr));
+        EXPECT_TRUE(tr_sys_path_rename(path2, path3, &err));
+        EXPECT_EQ(nullptr, err) << *err;
+        EXPECT_FALSE(tr_sys_path_exists(path2));
+        EXPECT_TRUE(tr_sys_path_exists(path3));
+        EXPECT_TRUE(tr_sys_path_is_same(path1, path3));
 
-        tr_sys_path_remove(path3.c_str(), nullptr);
+        tr_sys_path_remove(path3);
     }
     else
     {
         fprintf(stderr, "WARNING: [%s] unable to run hardlink tests\n", __FUNCTION__);
     }
 
-    tr_sys_path_remove(path1.c_str(), nullptr);
+    tr_sys_path_remove(path1);
 }
 
 TEST_F(FileTest, pathRemove)
 {
     auto const test_dir = createTestDir(currentTestName());
 
-    auto const path1 = tr_strvPath(test_dir.data(), "a"sv);
-    auto const path2 = tr_strvPath(test_dir.data(), "b"sv);
-    auto const path3 = tr_strvPath(path2.c_str(), "c"sv);
+    auto const path1 = tr_pathbuf{ test_dir, "/a"sv };
+    auto const path2 = tr_pathbuf{ test_dir, "/b"sv };
+    auto const path3 = tr_pathbuf{ path2, "/c"sv };
 
     /* Can't remove non-existent file/directory */
-    EXPECT_FALSE(tr_sys_path_exists(path1.c_str(), nullptr));
+    EXPECT_FALSE(tr_sys_path_exists(path1));
     tr_error* err = nullptr;
-    EXPECT_FALSE(tr_sys_path_remove(path1.c_str(), &err));
+    EXPECT_FALSE(tr_sys_path_remove(path1, &err));
     EXPECT_NE(nullptr, err);
-    EXPECT_FALSE(tr_sys_path_exists(path1.c_str(), nullptr));
+    EXPECT_FALSE(tr_sys_path_exists(path1));
     tr_error_clear(&err);
 
     /* Removing file works */
     createFileWithContents(path1, "test");
-    EXPECT_TRUE(tr_sys_path_exists(path1.c_str(), nullptr));
-    EXPECT_TRUE(tr_sys_path_remove(path1.c_str(), &err));
-    EXPECT_EQ(nullptr, err);
-    EXPECT_FALSE(tr_sys_path_exists(path1.c_str(), nullptr));
+    EXPECT_TRUE(tr_sys_path_exists(path1));
+    EXPECT_TRUE(tr_sys_path_remove(path1, &err));
+    EXPECT_EQ(nullptr, err) << *err;
+    EXPECT_FALSE(tr_sys_path_exists(path1));
 
     /* Removing empty directory works */
-    tr_sys_dir_create(path1.c_str(), 0, 0777, nullptr);
-    EXPECT_TRUE(tr_sys_path_exists(path1.c_str(), nullptr));
-    EXPECT_TRUE(tr_sys_path_remove(path1.c_str(), &err));
-    EXPECT_EQ(nullptr, err);
-    EXPECT_FALSE(tr_sys_path_exists(path1.c_str(), nullptr));
+    tr_sys_dir_create(path1, 0, 0777);
+    EXPECT_TRUE(tr_sys_path_exists(path1));
+    EXPECT_TRUE(tr_sys_path_remove(path1, &err));
+    EXPECT_EQ(nullptr, err) << *err;
+    EXPECT_FALSE(tr_sys_path_exists(path1));
 
     /* Removing non-empty directory fails */
-    tr_sys_dir_create(path2.c_str(), 0, 0777, nullptr);
+    tr_sys_dir_create(path2, 0, 0777);
     createFileWithContents(path3, "test");
-    EXPECT_TRUE(tr_sys_path_exists(path2.c_str(), nullptr));
-    EXPECT_TRUE(tr_sys_path_exists(path3.c_str(), nullptr));
-    EXPECT_FALSE(tr_sys_path_remove(path2.c_str(), &err));
+    EXPECT_TRUE(tr_sys_path_exists(path2));
+    EXPECT_TRUE(tr_sys_path_exists(path3));
+    EXPECT_FALSE(tr_sys_path_remove(path2, &err));
     EXPECT_NE(nullptr, err);
-    EXPECT_TRUE(tr_sys_path_exists(path2.c_str(), nullptr));
-    EXPECT_TRUE(tr_sys_path_exists(path3.c_str(), nullptr));
+    EXPECT_TRUE(tr_sys_path_exists(path2));
+    EXPECT_TRUE(tr_sys_path_exists(path3));
     tr_error_clear(&err);
 
-    tr_sys_path_remove(path3.c_str(), nullptr);
-    tr_sys_path_remove(path2.c_str(), nullptr);
+    tr_sys_path_remove(path3);
+    tr_sys_path_remove(path2);
 }
 
 TEST_F(FileTest, pathNativeSeparators)
@@ -967,234 +969,234 @@ TEST_F(FileTest, fileOpen)
     auto const test_dir = createTestDir(currentTestName());
 
     // can't open non-existent file
-    auto const path1 = tr_strvPath(test_dir, "a"sv);
-    EXPECT_FALSE(tr_sys_path_exists(path1.c_str(), nullptr));
+    auto const path1 = tr_pathbuf{ test_dir, "/a"sv };
+    EXPECT_FALSE(tr_sys_path_exists(path1));
     tr_error* err = nullptr;
-    EXPECT_EQ(TR_BAD_SYS_FILE, tr_sys_file_open(path1.c_str(), TR_SYS_FILE_READ, 0600, &err));
+    EXPECT_EQ(TR_BAD_SYS_FILE, tr_sys_file_open(path1, TR_SYS_FILE_READ, 0600, &err));
     EXPECT_NE(nullptr, err);
-    EXPECT_FALSE(tr_sys_path_exists(path1.c_str(), nullptr));
+    EXPECT_FALSE(tr_sys_path_exists(path1));
     tr_error_clear(&err);
-    EXPECT_EQ(TR_BAD_SYS_FILE, tr_sys_file_open(path1.c_str(), TR_SYS_FILE_WRITE, 0600, &err));
+    EXPECT_EQ(TR_BAD_SYS_FILE, tr_sys_file_open(path1, TR_SYS_FILE_WRITE, 0600, &err));
     EXPECT_NE(nullptr, err);
-    EXPECT_FALSE(tr_sys_path_exists(path1.c_str(), nullptr));
+    EXPECT_FALSE(tr_sys_path_exists(path1));
     tr_error_clear(&err);
 
     // can't open directory
-    tr_sys_dir_create(path1.c_str(), 0, 0777, nullptr);
+    tr_sys_dir_create(path1, 0, 0777);
 #ifdef _WIN32
     // this works on *NIX
-    EXPECT_EQ(TR_BAD_SYS_FILE, tr_sys_file_open(path1.c_str(), TR_SYS_FILE_READ, 0600, &err));
+    EXPECT_EQ(TR_BAD_SYS_FILE, tr_sys_file_open(path1, TR_SYS_FILE_READ, 0600, &err));
     EXPECT_NE(nullptr, err);
     tr_error_clear(&err);
 #endif
-    EXPECT_EQ(TR_BAD_SYS_FILE, tr_sys_file_open(path1.c_str(), TR_SYS_FILE_WRITE, 0600, &err));
+    EXPECT_EQ(TR_BAD_SYS_FILE, tr_sys_file_open(path1, TR_SYS_FILE_WRITE, 0600, &err));
     EXPECT_NE(nullptr, err);
     tr_error_clear(&err);
 
-    tr_sys_path_remove(path1.c_str(), nullptr);
+    tr_sys_path_remove(path1);
 
     // can create non-existent file
-    auto fd = tr_sys_file_open(path1.c_str(), TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE, 0640, &err);
+    auto fd = tr_sys_file_open(path1, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE, 0640, &err);
     EXPECT_NE(TR_BAD_SYS_FILE, fd);
-    EXPECT_EQ(nullptr, err);
-    tr_sys_file_close(fd, nullptr);
-    EXPECT_TRUE(tr_sys_path_exists(path1.c_str(), nullptr));
-    EXPECT_TRUE(validatePermissions(path1.c_str(), 0640));
+    EXPECT_EQ(nullptr, err) << *err;
+    tr_sys_file_close(fd);
+    EXPECT_TRUE(tr_sys_path_exists(path1));
+    EXPECT_TRUE(validatePermissions(path1, 0640));
 
     // can open existing file
-    EXPECT_TRUE(tr_sys_path_exists(path1.c_str(), nullptr));
-    fd = tr_sys_file_open(path1.c_str(), TR_SYS_FILE_READ, 0600, &err);
+    EXPECT_TRUE(tr_sys_path_exists(path1));
+    fd = tr_sys_file_open(path1, TR_SYS_FILE_READ, 0600, &err);
     EXPECT_NE(TR_BAD_SYS_FILE, fd);
-    EXPECT_EQ(nullptr, err);
-    tr_sys_file_close(fd, nullptr);
-    fd = tr_sys_file_open(path1.c_str(), TR_SYS_FILE_WRITE, 0600, &err);
+    EXPECT_EQ(nullptr, err) << *err;
+    tr_sys_file_close(fd);
+    fd = tr_sys_file_open(path1, TR_SYS_FILE_WRITE, 0600, &err);
     EXPECT_NE(TR_BAD_SYS_FILE, fd);
-    EXPECT_EQ(nullptr, err);
-    tr_sys_file_close(fd, nullptr);
+    EXPECT_EQ(nullptr, err) << *err;
+    tr_sys_file_close(fd);
 
-    tr_sys_path_remove(path1.c_str(), nullptr);
+    tr_sys_path_remove(path1);
     createFileWithContents(path1, "test");
 
     /* Can't create new file if it already exists */
-    fd = tr_sys_file_open(path1.c_str(), TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE_NEW, 0640, &err);
+    fd = tr_sys_file_open(path1, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE_NEW, 0640, &err);
     EXPECT_EQ(TR_BAD_SYS_FILE, fd);
     EXPECT_NE(nullptr, err);
     tr_error_clear(&err);
     tr_sys_path_info info;
-    tr_sys_path_get_info(path1.c_str(), TR_SYS_PATH_NO_FOLLOW, &info, nullptr);
+    tr_sys_path_get_info(path1, TR_SYS_PATH_NO_FOLLOW, &info);
     EXPECT_EQ(4, info.size);
 
     /* Pointer is at the end of file */
-    tr_sys_path_get_info(path1.c_str(), TR_SYS_PATH_NO_FOLLOW, &info, nullptr);
+    tr_sys_path_get_info(path1, TR_SYS_PATH_NO_FOLLOW, &info);
     EXPECT_EQ(4, info.size);
-    fd = tr_sys_file_open(path1.c_str(), TR_SYS_FILE_WRITE | TR_SYS_FILE_APPEND, 0600, &err);
+    fd = tr_sys_file_open(path1, TR_SYS_FILE_WRITE | TR_SYS_FILE_APPEND, 0600, &err);
     EXPECT_NE(TR_BAD_SYS_FILE, fd);
-    EXPECT_EQ(nullptr, err);
-    tr_sys_file_write(fd, "s", 1, nullptr, nullptr); /* On *NIX, pointer is positioned on each write but not initially */
+    EXPECT_EQ(nullptr, err) << *err;
+    tr_sys_file_write(fd, "s", 1, nullptr); /* On *NIX, pointer is positioned on each write but not initially */
     auto n = uint64_t{};
-    tr_sys_file_seek(fd, 0, TR_SEEK_CUR, &n, nullptr);
+    tr_sys_file_seek(fd, 0, TR_SEEK_CUR, &n);
     EXPECT_EQ(5, n);
-    tr_sys_file_close(fd, nullptr);
+    tr_sys_file_close(fd);
 
     /* File gets truncated */
-    tr_sys_path_get_info(path1.c_str(), TR_SYS_PATH_NO_FOLLOW, &info, nullptr);
+    tr_sys_path_get_info(path1, TR_SYS_PATH_NO_FOLLOW, &info);
     EXPECT_EQ(5, info.size);
-    fd = tr_sys_file_open(path1.c_str(), TR_SYS_FILE_WRITE | TR_SYS_FILE_TRUNCATE, 0600, &err);
+    fd = tr_sys_file_open(path1, TR_SYS_FILE_WRITE | TR_SYS_FILE_TRUNCATE, 0600, &err);
     EXPECT_NE(TR_BAD_SYS_FILE, fd);
-    EXPECT_EQ(nullptr, err);
-    tr_sys_file_get_info(fd, &info, nullptr);
+    EXPECT_EQ(nullptr, err) << *err;
+    tr_sys_file_get_info(fd, &info);
     EXPECT_EQ(0, info.size);
-    tr_sys_file_close(fd, nullptr);
-    tr_sys_path_get_info(path1.c_str(), TR_SYS_PATH_NO_FOLLOW, &info, nullptr);
+    tr_sys_file_close(fd);
+    tr_sys_path_get_info(path1, TR_SYS_PATH_NO_FOLLOW, &info);
     EXPECT_EQ(0, info.size);
 
     /* TODO: symlink and hardlink tests */
 
-    tr_sys_path_remove(path1.c_str(), nullptr);
+    tr_sys_path_remove(path1);
 }
 
 TEST_F(FileTest, fileReadWriteSeek)
 {
     auto const test_dir = createTestDir(currentTestName());
 
-    auto const path1 = tr_strvPath(test_dir, "a"sv);
-    auto const fd = tr_sys_file_open(path1.c_str(), TR_SYS_FILE_READ | TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE, 0600, nullptr);
+    auto const path1 = tr_pathbuf{ test_dir, "/a"sv };
+    auto const fd = tr_sys_file_open(path1, TR_SYS_FILE_READ | TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE, 0600);
 
     uint64_t n;
     tr_error* err = nullptr;
     EXPECT_TRUE(tr_sys_file_seek(fd, 0, TR_SEEK_CUR, &n, &err));
-    EXPECT_EQ(nullptr, err);
+    EXPECT_EQ(nullptr, err) << *err;
     EXPECT_EQ(0, n);
 
     EXPECT_TRUE(tr_sys_file_write(fd, "test", 4, &n, &err));
-    EXPECT_EQ(nullptr, err);
+    EXPECT_EQ(nullptr, err) << *err;
     EXPECT_EQ(4, n);
 
     EXPECT_TRUE(tr_sys_file_seek(fd, 0, TR_SEEK_CUR, &n, &err));
-    EXPECT_EQ(nullptr, err);
+    EXPECT_EQ(nullptr, err) << *err;
     EXPECT_EQ(4, n);
 
     EXPECT_TRUE(tr_sys_file_seek(fd, 0, TR_SEEK_SET, &n, &err));
-    EXPECT_EQ(nullptr, err);
+    EXPECT_EQ(nullptr, err) << *err;
     EXPECT_EQ(0, n);
 
     auto buf = std::array<char, 100>{};
     EXPECT_TRUE(tr_sys_file_read(fd, buf.data(), buf.size(), &n, &err));
-    EXPECT_EQ(nullptr, err);
+    EXPECT_EQ(nullptr, err) << *err;
     EXPECT_EQ(4, n);
 
     EXPECT_EQ(0, memcmp("test", buf.data(), 4));
 
     EXPECT_TRUE(tr_sys_file_seek(fd, -3, TR_SEEK_CUR, &n, &err));
-    EXPECT_EQ(nullptr, err);
+    EXPECT_EQ(nullptr, err) << *err;
     EXPECT_EQ(1, n);
 
     EXPECT_TRUE(tr_sys_file_write(fd, "E", 1, &n, &err));
-    EXPECT_EQ(nullptr, err);
+    EXPECT_EQ(nullptr, err) << *err;
     EXPECT_EQ(1, n);
 
     EXPECT_TRUE(tr_sys_file_seek(fd, -2, TR_SEEK_CUR, &n, &err));
-    EXPECT_EQ(nullptr, err);
+    EXPECT_EQ(nullptr, err) << *err;
     EXPECT_EQ(0, n);
 
     EXPECT_TRUE(tr_sys_file_read(fd, buf.data(), buf.size(), &n, &err));
-    EXPECT_EQ(nullptr, err);
+    EXPECT_EQ(nullptr, err) << *err;
     EXPECT_EQ(4, n);
 
     EXPECT_EQ(0, memcmp("tEst", buf.data(), 4));
 
     EXPECT_TRUE(tr_sys_file_seek(fd, 0, TR_SEEK_END, &n, &err));
-    EXPECT_EQ(nullptr, err);
+    EXPECT_EQ(nullptr, err) << *err;
     EXPECT_EQ(4, n);
 
     EXPECT_TRUE(tr_sys_file_write(fd, " ok", 3, &n, &err));
-    EXPECT_EQ(nullptr, err);
+    EXPECT_EQ(nullptr, err) << *err;
     EXPECT_EQ(3, n);
 
     EXPECT_TRUE(tr_sys_file_seek(fd, 0, TR_SEEK_SET, &n, &err));
-    EXPECT_EQ(nullptr, err);
+    EXPECT_EQ(nullptr, err) << *err;
     EXPECT_EQ(0, n);
 
     EXPECT_TRUE(tr_sys_file_read(fd, buf.data(), buf.size(), &n, &err));
-    EXPECT_EQ(nullptr, err);
+    EXPECT_EQ(nullptr, err) << *err;
     EXPECT_EQ(7, n);
 
     EXPECT_EQ(0, memcmp("tEst ok", buf.data(), 7));
 
     EXPECT_TRUE(tr_sys_file_write_at(fd, "-", 1, 4, &n, &err));
-    EXPECT_EQ(nullptr, err);
+    EXPECT_EQ(nullptr, err) << *err;
     EXPECT_EQ(1, n);
 
     EXPECT_TRUE(tr_sys_file_read_at(fd, buf.data(), 5, 2, &n, &err));
-    EXPECT_EQ(nullptr, err);
+    EXPECT_EQ(nullptr, err) << *err;
     EXPECT_EQ(5, n);
 
     EXPECT_EQ(0, memcmp("st-ok", buf.data(), 5));
 
-    tr_sys_file_close(fd, nullptr);
+    tr_sys_file_close(fd);
 
-    tr_sys_path_remove(path1.c_str(), nullptr);
+    tr_sys_path_remove(path1);
 }
 
 TEST_F(FileTest, fileTruncate)
 {
     auto const test_dir = createTestDir(currentTestName());
 
-    auto const path1 = tr_strvPath(test_dir, "a"sv);
-    auto fd = tr_sys_file_open(path1.c_str(), TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE, 0600, nullptr);
+    auto const path1 = tr_pathbuf{ test_dir, "/a"sv };
+    auto fd = tr_sys_file_open(path1, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE, 0600);
 
     tr_error* err = nullptr;
     EXPECT_TRUE(tr_sys_file_truncate(fd, 10, &err));
-    EXPECT_EQ(nullptr, err);
+    EXPECT_EQ(nullptr, err) << *err;
     tr_sys_path_info info;
-    tr_sys_file_get_info(fd, &info, nullptr);
+    tr_sys_file_get_info(fd, &info);
     EXPECT_EQ(10, info.size);
 
     EXPECT_TRUE(tr_sys_file_truncate(fd, 20, &err));
-    EXPECT_EQ(nullptr, err);
-    tr_sys_file_get_info(fd, &info, nullptr);
+    EXPECT_EQ(nullptr, err) << *err;
+    tr_sys_file_get_info(fd, &info);
     EXPECT_EQ(20, info.size);
 
     EXPECT_TRUE(tr_sys_file_truncate(fd, 0, &err));
-    EXPECT_EQ(nullptr, err);
-    tr_sys_file_get_info(fd, &info, nullptr);
+    EXPECT_EQ(nullptr, err) << *err;
+    tr_sys_file_get_info(fd, &info);
     EXPECT_EQ(0, info.size);
 
     EXPECT_TRUE(tr_sys_file_truncate(fd, 50, &err));
-    EXPECT_EQ(nullptr, err);
+    EXPECT_EQ(nullptr, err) << *err;
 
-    tr_sys_file_close(fd, nullptr);
+    tr_sys_file_close(fd);
 
-    tr_sys_path_get_info(path1.c_str(), 0, &info, nullptr);
+    tr_sys_path_get_info(path1, 0, &info);
     EXPECT_EQ(50, info.size);
 
-    fd = tr_sys_file_open(path1.c_str(), TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE, 0600, nullptr);
+    fd = tr_sys_file_open(path1, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE, 0600);
 
     EXPECT_TRUE(tr_sys_file_truncate(fd, 25, &err));
-    EXPECT_EQ(nullptr, err);
+    EXPECT_EQ(nullptr, err) << *err;
 
-    tr_sys_file_close(fd, nullptr);
+    tr_sys_file_close(fd);
 
-    tr_sys_path_get_info(path1.c_str(), 0, &info, nullptr);
+    tr_sys_path_get_info(path1, 0, &info);
     EXPECT_EQ(25, info.size);
 
-    tr_sys_path_remove(path1.c_str(), nullptr);
+    tr_sys_path_remove(path1);
 }
 
 TEST_F(FileTest, filePreallocate)
 {
     auto const test_dir = createTestDir(currentTestName());
 
-    auto const path1 = tr_strvPath(test_dir, "a"sv);
-    auto fd = tr_sys_file_open(path1.c_str(), TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE, 0600, nullptr);
+    auto const path1 = tr_pathbuf{ test_dir, "/a"sv };
+    auto fd = tr_sys_file_open(path1, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE, 0600);
 
     tr_error* err = nullptr;
     auto prealloc_size = size_t{ 50 };
     if (tr_sys_file_preallocate(fd, prealloc_size, 0, &err))
     {
-        EXPECT_EQ(nullptr, err);
+        EXPECT_EQ(nullptr, err) << *err;
         tr_sys_path_info info;
-        tr_sys_file_get_info(fd, &info, nullptr);
+        tr_sys_file_get_info(fd, &info);
         EXPECT_EQ(prealloc_size, info.size);
     }
     else
@@ -1204,47 +1206,47 @@ TEST_F(FileTest, filePreallocate)
         tr_error_clear(&err);
     }
 
-    tr_sys_file_close(fd, nullptr);
+    tr_sys_file_close(fd);
 
-    tr_sys_path_remove(path1.c_str(), nullptr);
+    tr_sys_path_remove(path1);
 
-    fd = tr_sys_file_open(path1.c_str(), TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE, 0600, nullptr);
+    fd = tr_sys_file_open(path1, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE, 0600);
 
     prealloc_size = 500 * 1024 * 1024;
     if (tr_sys_file_preallocate(fd, prealloc_size, TR_SYS_FILE_PREALLOC_SPARSE, &err))
     {
-        EXPECT_EQ(nullptr, err);
+        EXPECT_EQ(nullptr, err) << *err;
         tr_sys_path_info info;
-        tr_sys_file_get_info(fd, &info, nullptr);
+        tr_sys_file_get_info(fd, &info);
         EXPECT_EQ(prealloc_size, info.size);
     }
     else
     {
-        EXPECT_NE(nullptr, err);
+        EXPECT_NE(nullptr, err) << *err;
         fprintf(stderr, "WARNING: [%s] unable to preallocate file (sparse): %s (%d)\n", __FUNCTION__, err->message, err->code);
         tr_error_clear(&err);
     }
 
-    tr_sys_file_close(fd, nullptr);
+    tr_sys_file_close(fd);
 
-    tr_sys_path_remove(path1.c_str(), nullptr);
+    tr_sys_path_remove(path1);
 }
 
 TEST_F(FileTest, map)
 {
     auto const test_dir = createTestDir(currentTestName());
 
-    auto const path1 = tr_strvPath(test_dir, "a"sv);
+    auto const path1 = tr_pathbuf{ test_dir, "/a"sv };
     auto const contents = std::string{ "test" };
     createFileWithContents(path1, contents.data());
 
-    auto fd = tr_sys_file_open(path1.c_str(), TR_SYS_FILE_READ | TR_SYS_FILE_WRITE, 0600, nullptr);
+    auto fd = tr_sys_file_open(path1, TR_SYS_FILE_READ | TR_SYS_FILE_WRITE, 0600);
 
     tr_error* err = nullptr;
     auto map_len = contents.size();
     auto* view = static_cast<char*>(tr_sys_file_map_for_reading(fd, 0, map_len, &err));
     EXPECT_NE(nullptr, view);
-    EXPECT_EQ(nullptr, err);
+    EXPECT_EQ(nullptr, err) << *err;
     EXPECT_EQ(contents, std::string(view, map_len));
 
 #ifdef HAVE_UNIFIED_BUFFER_CACHE
@@ -1254,167 +1256,167 @@ TEST_F(FileTest, map)
     tr_sys_file_write_at(fd, contents_2.data(), contents_2.size(), 0, &n_written, &err);
     EXPECT_EQ(map_len, contents_2.size());
     EXPECT_EQ(map_len, n_written);
-    EXPECT_EQ(nullptr, err);
+    EXPECT_EQ(nullptr, err) << *err;
     EXPECT_EQ(contents_2, std::string(view, map_len));
 
 #endif
 
     EXPECT_TRUE(tr_sys_file_unmap(view, map_len, &err));
-    EXPECT_EQ(nullptr, err);
+    EXPECT_EQ(nullptr, err) << *err;
 
-    tr_sys_file_close(fd, nullptr);
+    tr_sys_file_close(fd);
 
-    tr_sys_path_remove(path1.c_str(), nullptr);
+    tr_sys_path_remove(path1);
 }
 
 TEST_F(FileTest, fileUtilities)
 {
     auto const test_dir = createTestDir(currentTestName());
 
-    auto const path1 = tr_strvPath(test_dir, "a"sv);
+    auto const path1 = tr_pathbuf{ test_dir, "/a"sv };
     auto const contents = std::string{ "a\nbc\r\ndef\nghij\r\n\n\nklmno\r" };
     createFileWithContents(path1, contents.data());
 
-    auto fd = tr_sys_file_open(path1.c_str(), TR_SYS_FILE_READ, 0, nullptr);
+    auto fd = tr_sys_file_open(path1, TR_SYS_FILE_READ, 0);
 
     tr_error* err = nullptr;
     auto buffer = std::array<char, 16>{};
     EXPECT_TRUE(tr_sys_file_read_line(fd, buffer.data(), buffer.size(), &err));
-    EXPECT_EQ(nullptr, err);
+    EXPECT_EQ(nullptr, err) << *err;
     EXPECT_STREQ("a", buffer.data());
     EXPECT_TRUE(tr_sys_file_read_line(fd, buffer.data(), buffer.size(), &err));
-    EXPECT_EQ(nullptr, err);
+    EXPECT_EQ(nullptr, err) << *err;
     EXPECT_STREQ("bc", buffer.data());
     EXPECT_TRUE(tr_sys_file_read_line(fd, buffer.data(), buffer.size(), &err));
-    EXPECT_EQ(nullptr, err);
+    EXPECT_EQ(nullptr, err) << *err;
     EXPECT_STREQ("def", buffer.data());
     EXPECT_TRUE(tr_sys_file_read_line(fd, buffer.data(), buffer.size(), &err));
-    EXPECT_EQ(nullptr, err);
+    EXPECT_EQ(nullptr, err) << *err;
     EXPECT_STREQ("ghij", buffer.data());
     EXPECT_TRUE(tr_sys_file_read_line(fd, buffer.data(), buffer.size(), &err));
-    EXPECT_EQ(nullptr, err);
+    EXPECT_EQ(nullptr, err) << *err;
     EXPECT_STREQ("", buffer.data());
     EXPECT_TRUE(tr_sys_file_read_line(fd, buffer.data(), buffer.size(), &err));
-    EXPECT_EQ(nullptr, err);
+    EXPECT_EQ(nullptr, err) << *err;
     EXPECT_STREQ("", buffer.data());
     EXPECT_TRUE(tr_sys_file_read_line(fd, buffer.data(), 4, &err));
-    EXPECT_EQ(nullptr, err);
+    EXPECT_EQ(nullptr, err) << *err;
     EXPECT_STREQ("klmn", buffer.data());
     EXPECT_TRUE(tr_sys_file_read_line(fd, buffer.data(), buffer.size(), &err));
-    EXPECT_EQ(nullptr, err);
+    EXPECT_EQ(nullptr, err) << *err;
     EXPECT_STREQ("o", buffer.data());
     EXPECT_FALSE(tr_sys_file_read_line(fd, buffer.data(), buffer.size(), &err));
-    EXPECT_EQ(nullptr, err);
+    EXPECT_EQ(nullptr, err) << *err;
     EXPECT_STREQ("o", buffer.data()); // on EOF, buffer stays unchanged
 
-    tr_sys_file_close(fd, nullptr);
+    tr_sys_file_close(fd);
 
-    fd = tr_sys_file_open(path1.c_str(), TR_SYS_FILE_READ | TR_SYS_FILE_WRITE | TR_SYS_FILE_TRUNCATE, 0, nullptr);
+    fd = tr_sys_file_open(path1, TR_SYS_FILE_READ | TR_SYS_FILE_WRITE | TR_SYS_FILE_TRUNCATE, 0);
 
     EXPECT_TRUE(tr_sys_file_write_line(fd, "p", &err));
-    EXPECT_EQ(nullptr, err);
+    EXPECT_EQ(nullptr, err) << *err;
     EXPECT_TRUE(tr_sys_file_write_line(fd, "", &err));
-    EXPECT_EQ(nullptr, err);
+    EXPECT_EQ(nullptr, err) << *err;
     EXPECT_TRUE(tr_sys_file_write_line(fd, "qr", &err));
-    EXPECT_EQ(nullptr, err);
+    EXPECT_EQ(nullptr, err) << *err;
     EXPECT_TRUE(tr_sys_file_write_line(fd, "stu", &err));
-    EXPECT_EQ(nullptr, err);
+    EXPECT_EQ(nullptr, err) << *err;
     EXPECT_TRUE(tr_sys_file_write_line(fd, "", &err));
-    EXPECT_EQ(nullptr, err);
+    EXPECT_EQ(nullptr, err) << *err;
     EXPECT_TRUE(tr_sys_file_write_line(fd, "", &err));
-    EXPECT_EQ(nullptr, err);
+    EXPECT_EQ(nullptr, err) << *err;
     EXPECT_TRUE(tr_sys_file_write_line(fd, "vwxy2", &err));
-    EXPECT_EQ(nullptr, err);
+    EXPECT_EQ(nullptr, err) << *err;
 
-    tr_sys_file_seek(fd, 0, TR_SEEK_SET, nullptr, nullptr);
+    tr_sys_file_seek(fd, 0, TR_SEEK_SET, nullptr);
 
     EXPECT_TRUE(tr_sys_file_read_line(fd, buffer.data(), buffer.size(), &err));
-    EXPECT_EQ(nullptr, err);
+    EXPECT_EQ(nullptr, err) << *err;
     EXPECT_STREQ("p", buffer.data());
     EXPECT_TRUE(tr_sys_file_read_line(fd, buffer.data(), buffer.size(), &err));
-    EXPECT_EQ(nullptr, err);
+    EXPECT_EQ(nullptr, err) << *err;
     EXPECT_STREQ("", buffer.data());
     EXPECT_TRUE(tr_sys_file_read_line(fd, buffer.data(), buffer.size(), &err));
-    EXPECT_EQ(nullptr, err);
+    EXPECT_EQ(nullptr, err) << *err;
     EXPECT_STREQ("qr", buffer.data());
     EXPECT_TRUE(tr_sys_file_read_line(fd, buffer.data(), buffer.size(), &err));
-    EXPECT_EQ(nullptr, err);
+    EXPECT_EQ(nullptr, err) << *err;
     EXPECT_STREQ("stu", buffer.data());
     EXPECT_TRUE(tr_sys_file_read_line(fd, buffer.data(), buffer.size(), &err));
-    EXPECT_EQ(nullptr, err);
+    EXPECT_EQ(nullptr, err) << *err;
     EXPECT_STREQ("", buffer.data());
     EXPECT_TRUE(tr_sys_file_read_line(fd, buffer.data(), buffer.size(), &err));
-    EXPECT_EQ(nullptr, err);
+    EXPECT_EQ(nullptr, err) << *err;
     EXPECT_STREQ("", buffer.data());
     EXPECT_TRUE(tr_sys_file_read_line(fd, buffer.data(), buffer.size(), &err));
-    EXPECT_EQ(nullptr, err);
+    EXPECT_EQ(nullptr, err) << *err;
     EXPECT_STREQ("vwxy2", buffer.data());
     EXPECT_FALSE(tr_sys_file_read_line(fd, buffer.data(), buffer.size(), &err));
-    EXPECT_EQ(nullptr, err);
+    EXPECT_EQ(nullptr, err) << *err;
     EXPECT_STREQ("vwxy2", buffer.data()); // on EOF, buffer stays unchanged
 
-    tr_sys_file_close(fd, nullptr);
+    tr_sys_file_close(fd);
 
-    tr_sys_path_remove(path1.c_str(), nullptr);
+    tr_sys_path_remove(path1);
 }
 
 TEST_F(FileTest, dirCreate)
 {
     auto const test_dir = createTestDir(currentTestName());
 
-    auto const path1 = tr_strvPath(test_dir.data(), "a"sv);
-    auto const path2 = tr_strvPath(path1, "b"sv);
+    auto const path1 = tr_pathbuf{ test_dir, "/a"sv };
+    auto const path2 = tr_pathbuf{ path1, "/b"sv };
 
     // Can create directory which has parent
     tr_error* err = nullptr;
-    EXPECT_TRUE(tr_sys_dir_create(path1.c_str(), 0, 0700, &err));
-    EXPECT_EQ(nullptr, err);
-    EXPECT_TRUE(tr_sys_path_exists(path1.c_str(), nullptr));
-    EXPECT_TRUE(validatePermissions(path1.c_str(), 0700));
+    EXPECT_TRUE(tr_sys_dir_create(path1, 0, 0700, &err));
+    EXPECT_EQ(nullptr, err) << *err;
+    EXPECT_TRUE(tr_sys_path_exists(path1));
+    EXPECT_TRUE(validatePermissions(path1, 0700));
 
-    tr_sys_path_remove(path1.c_str(), nullptr);
+    tr_sys_path_remove(path1);
     createFileWithContents(path1, "test");
 
     // Can't create directory where file already exists
-    EXPECT_FALSE(tr_sys_dir_create(path1.c_str(), 0, 0700, &err));
+    EXPECT_FALSE(tr_sys_dir_create(path1, 0, 0700, &err));
     EXPECT_NE(nullptr, err);
     tr_error_clear(&err);
-    EXPECT_FALSE(tr_sys_dir_create(path1.c_str(), TR_SYS_DIR_CREATE_PARENTS, 0700, &err));
+    EXPECT_FALSE(tr_sys_dir_create(path1, TR_SYS_DIR_CREATE_PARENTS, 0700, &err));
     EXPECT_NE(nullptr, err);
     tr_error_clear(&err);
 
-    tr_sys_path_remove(path1.c_str(), nullptr);
+    tr_sys_path_remove(path1);
 
     // Can't create directory which has no parent
-    EXPECT_FALSE(tr_sys_dir_create(path2.c_str(), 0, 0700, &err));
+    EXPECT_FALSE(tr_sys_dir_create(path2, 0, 0700, &err));
     EXPECT_NE(nullptr, err);
-    EXPECT_FALSE(tr_sys_path_exists(path2.c_str(), nullptr));
+    EXPECT_FALSE(tr_sys_path_exists(path2));
     tr_error_clear(&err);
 
     // Can create directory with parent directories
-    EXPECT_TRUE(tr_sys_dir_create(path2.c_str(), TR_SYS_DIR_CREATE_PARENTS, 0751, &err));
-    EXPECT_EQ(nullptr, err);
-    EXPECT_TRUE(tr_sys_path_exists(path1.c_str(), nullptr));
-    EXPECT_TRUE(tr_sys_path_exists(path2.c_str(), nullptr));
-    EXPECT_TRUE(validatePermissions(path1.c_str(), 0751));
-    EXPECT_TRUE(validatePermissions(path2.c_str(), 0751));
+    EXPECT_TRUE(tr_sys_dir_create(path2, TR_SYS_DIR_CREATE_PARENTS, 0751, &err));
+    EXPECT_EQ(nullptr, err) << *err;
+    EXPECT_TRUE(tr_sys_path_exists(path1));
+    EXPECT_TRUE(tr_sys_path_exists(path2));
+    EXPECT_TRUE(validatePermissions(path1, 0751));
+    EXPECT_TRUE(validatePermissions(path2, 0751));
 
     // Can create existing directory (no-op)
-    EXPECT_TRUE(tr_sys_dir_create(path1.c_str(), 0, 0700, &err));
-    EXPECT_EQ(nullptr, err);
-    EXPECT_TRUE(tr_sys_dir_create(path1.c_str(), TR_SYS_DIR_CREATE_PARENTS, 0700, &err));
-    EXPECT_EQ(nullptr, err);
+    EXPECT_TRUE(tr_sys_dir_create(path1, 0, 0700, &err));
+    EXPECT_EQ(nullptr, err) << *err;
+    EXPECT_TRUE(tr_sys_dir_create(path1, TR_SYS_DIR_CREATE_PARENTS, 0700, &err));
+    EXPECT_EQ(nullptr, err) << *err;
 
-    tr_sys_path_remove(path2.c_str(), nullptr);
-    tr_sys_path_remove(path1.c_str(), nullptr);
+    tr_sys_path_remove(path2);
+    tr_sys_path_remove(path1);
 }
 
 TEST_F(FileTest, dirRead)
 {
     auto const test_dir = createTestDir(currentTestName());
 
-    auto const path1 = tr_strvPath(test_dir, "a"sv);
-    auto const path2 = tr_strvPath(test_dir, "b"sv);
+    auto const path1 = tr_pathbuf{ test_dir, "/a"sv };
+    auto const path2 = tr_pathbuf{ test_dir, "/b"sv };
 
     bool have1;
     bool have2;
@@ -1432,7 +1434,7 @@ TEST_F(FileTest, dirRead)
     EXPECT_TRUE(have1);
     EXPECT_TRUE(have2);
 
-    tr_sys_path_remove(path1.c_str(), nullptr);
+    tr_sys_path_remove(path1);
     testDirReadImpl(test_dir, &have1, &have2);
     EXPECT_FALSE(have1);
     EXPECT_TRUE(have2);

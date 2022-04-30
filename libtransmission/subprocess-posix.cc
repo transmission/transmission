@@ -1,5 +1,5 @@
 // This file Copyright 2010-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -12,6 +12,8 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
+
+#include <fmt/format.h>
 
 #include "transmission.h"
 #include "error.h"
@@ -42,7 +44,7 @@ static void set_system_error(tr_error** error, int code, std::string_view what)
         return;
     }
 
-    tr_error_set(error, code, tr_strvJoin(what, " failed "sv, tr_strerror(code)));
+    tr_error_set(error, code, fmt::format(FMT_STRING("{:s} failed: {:s} ({:d})"), what, tr_strerror(code), code));
 }
 
 static bool tr_spawn_async_in_child(
@@ -78,7 +80,7 @@ static bool tr_spawn_async_in_child(
     return true;
 
 FAIL:
-    (void)!write(pipe_fd, &errno, sizeof(errno));
+    (void)write(pipe_fd, &errno, sizeof(errno));
     return false;
 }
 

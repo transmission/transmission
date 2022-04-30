@@ -1,5 +1,5 @@
 // This file Copyright © 2010-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -166,12 +166,12 @@ void OptionsDialog::Impl::updateTorrent()
         tr_torrentSetDownloadDir(tor_, downloadDir_.c_str());
         file_list_->set_sensitive(tr_torrentHasMetadata(tor_));
         file_list_->set_torrent(tr_torrentId(tor_));
-        tr_torrentVerify(tor_, nullptr, nullptr);
+        tr_torrentVerify(tor_);
     }
 }
 
 /**
- * When the source .torrent file is deleted
+ * When the source torrent file is deleted
  * (such as, if it was a temp file that a web browser passed to us),
  * gtk invokes this callback and `filename' will be nullptr.
  * The `filename' tests here are to prevent us from losing the current
@@ -186,7 +186,7 @@ void OptionsDialog::Impl::sourceChanged(Gtk::FileChooserButton* b)
     {
         bool new_file = false;
 
-        if (!filename.empty() && (filename_.empty() || !tr_sys_path_is_same(filename.c_str(), filename_.c_str(), nullptr)))
+        if (!filename.empty() && (filename_.empty() || !tr_sys_path_is_same(filename.c_str(), filename_.c_str())))
         {
             filename_ = filename;
             tr_ctorSetMetainfoFromFile(ctor_.get(), filename_.c_str(), nullptr);
@@ -216,7 +216,7 @@ void OptionsDialog::Impl::downloadDirChanged(Gtk::FileChooserButton* b)
 {
     auto const fname = b->get_filename();
 
-    if (!fname.empty() && (downloadDir_.empty() || !tr_sys_path_is_same(fname.c_str(), downloadDir_.c_str(), nullptr)))
+    if (!fname.empty() && (downloadDir_.empty() || !tr_sys_path_is_same(fname.c_str(), downloadDir_.c_str())))
     {
         downloadDir_ = fname;
         updateTorrent();
@@ -292,7 +292,7 @@ OptionsDialog::Impl::Impl(
     filename_ = tr_ctorGetSourceFile(ctor_.get()) != nullptr ? tr_ctorGetSourceFile(ctor_.get()) : "";
     downloadDir_ = str;
     file_list_ = Gtk::make_managed<FileList>(core_, 0);
-    trash_check_ = Gtk::make_managed<Gtk::CheckButton>(_("Mo_ve .torrent file to the trash"), true);
+    trash_check_ = Gtk::make_managed<Gtk::CheckButton>(_("Mo_ve torrent file to the trash"), true);
     run_check_ = Gtk::make_managed<Gtk::CheckButton>(_("_Start when added"), true);
 
     priority_combo_ = gtr_priority_combo_new();
@@ -376,7 +376,7 @@ OptionsDialog::Impl::Impl(
     run_check_->set_active(!flag);
     grid->attach(*run_check_, 0, row, 2, 1);
 
-    /* "trash .torrent file" row */
+    /* "trash torrent file" row */
     row++;
 
     if (!tr_ctorGetDeleteSource(ctor_.get(), &flag))
@@ -413,7 +413,7 @@ void TorrentFileChooserDialog::onOpenDialogResponse(int response, Glib::RefPtr<S
 
     if (response == Gtk::RESPONSE_ACCEPT)
     {
-        auto* tb = static_cast<Gtk::CheckButton*>(get_extra_widget());
+        auto const* const tb = static_cast<Gtk::CheckButton*>(get_extra_widget());
         bool const do_start = gtr_pref_flag_get(TR_KEY_start_added_torrents);
         bool const do_prompt = tb->get_active();
         bool const do_notify = false;
@@ -461,31 +461,29 @@ TorrentFileChooserDialog::TorrentFileChooserDialog(Gtk::Window& parent, Glib::Re
 
 void TorrentUrlChooserDialog::onOpenURLResponse(int response, Glib::RefPtr<Session> const& core)
 {
-    bool handled = false;
 
-    if (response == Gtk::RESPONSE_ACCEPT)
-    {
-        auto* e = static_cast<Gtk::Entry*>(get_data("url-entry"));
-        auto const url = gtr_str_strip(e->get_text());
-
-        if (!url.empty())
-        {
-            handled = core->add_from_url(url);
-
-            if (!handled)
-            {
-                gtr_unrecognized_url_dialog(*this, url);
-            }
-        }
-    }
-    else if (response == Gtk::RESPONSE_CANCEL)
-    {
-        handled = true;
-    }
-
-    if (handled)
+    if (response == Gtk::RESPONSE_CANCEL)
     {
         hide();
+    }
+    else if (response == Gtk::RESPONSE_ACCEPT)
+    {
+        auto const* const e = static_cast<Gtk::Entry*>(get_data("url-entry"));
+        auto const url = gtr_str_strip(e->get_text());
+
+        if (url.empty())
+        {
+            return;
+        }
+
+        if (core->add_from_url(url))
+        {
+            hide();
+        }
+        else
+        {
+            gtr_unrecognized_url_dialog(*this, url);
+        }
     }
 }
 

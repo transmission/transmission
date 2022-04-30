@@ -1,5 +1,5 @@
 // This file Copyright © 2007-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -18,6 +18,8 @@
 #include <openssl/ssl.h>
 #include <openssl/x509.h>
 
+#include <fmt/core.h>
+
 #include "transmission.h"
 #include "crypto-utils.h"
 #include "log.h"
@@ -25,13 +27,11 @@
 #include "utils.h"
 
 #define TR_CRYPTO_DH_SECRET_FALLBACK
-#include "crypto-utils-fallback.cc"
+#include "crypto-utils-fallback.cc" // NOLINT(bugprone-suspicious-include)
 
 /***
 ****
 ***/
-
-static char constexpr MyName[] = "tr_crypto_utils";
 
 static void log_openssl_error(char const* file, int line)
 {
@@ -59,7 +59,15 @@ static void log_openssl_error(char const* file, int line)
 #endif
 
         ERR_error_string_n(error_code, buf, sizeof(buf));
-        tr_logAddMessage(file, line, TR_LOG_ERROR, MyName, "OpenSSL error: %s", buf);
+        tr_logAddMessage(
+            file,
+            line,
+            TR_LOG_ERROR,
+            fmt::format(
+                _("{crypto_library} error: {error} ({error_code})"),
+                fmt::arg("crypto_library", "OpenSSL"),
+                fmt::arg("error", buf),
+                fmt::arg("error_code", error_code)));
     }
 }
 

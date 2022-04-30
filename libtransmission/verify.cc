@@ -1,20 +1,23 @@
 // This file Copyright © 2007-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
 #include <algorithm>
 #include <ctime>
 #include <mutex>
+#include <optional>
 #include <set>
+#include <thread>
 #include <vector>
+
+#include <fmt/core.h>
 
 #include "transmission.h"
 #include "completion.h"
 #include "crypto-utils.h"
 #include "file.h"
 #include "log.h"
-#include "platform.h"
 #include "torrent.h"
 #include "tr-assert.h"
 #include "utils.h" /* tr_malloc(), tr_free() */
@@ -31,123 +34,121 @@ static bool verifyTorrent(tr_torrent* tor, bool const* stopFlag)
     auto const begin = tr_time();
 
     tr_sys_file_t fd = TR_BAD_SYS_FILE;
-    uint64_t filePos = 0;
+    uint64_t file_pos = 0;
     bool changed = false;
-    bool hadPiece = false;
-    time_t lastSleptAt = 0;
-    uint32_t piecePos = 0;
-    tr_file_index_t fileIndex = 0;
-    tr_file_index_t prevFileIndex = !fileIndex;
+    bool had_piece = false;
+    time_t last_slept_at = 0;
+    uint32_t piece_pos = 0;
+    tr_file_index_t file_index = 0;
+    tr_file_index_t prev_file_index = ~file_index;
     tr_piece_index_t piece = 0;
     auto buffer = std::vector<std::byte>(1024 * 256);
     auto sha = tr_sha1_init();
 
-    tr_logAddTorDbg(tor, "%s", "verifying torrent...");
-    tor->verify_progress = 0;
+    tr_logAddDebugTor(tor, "verifying torrent...");
 
     while (!*stopFlag && piece < tor->pieceCount())
     {
-        auto const file_length = tor->fileSize(fileIndex);
+        auto const file_length = tor->fileSize(file_index);
 
         /* if we're starting a new piece... */
-        if (piecePos == 0)
+        if (piece_pos == 0)
         {
-            hadPiece = tor->hasPiece(piece);
+            had_piece = tor->hasPiece(piece);
         }
 
         /* if we're starting a new file... */
-        if (filePos == 0 && fd == TR_BAD_SYS_FILE && fileIndex != prevFileIndex)
+        if (file_pos == 0 && fd == TR_BAD_SYS_FILE && file_index != prev_file_index)
         {
-            char* filename = tr_torrentFindFile(tor, fileIndex);
-            fd = filename == nullptr ? TR_BAD_SYS_FILE :
-                                       tr_sys_file_open(filename, TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0, nullptr);
-            tr_free(filename);
-            prevFileIndex = fileIndex;
+            auto const found = tor->findFile(file_index);
+            fd = !found ? TR_BAD_SYS_FILE : tr_sys_file_open(found->filename(), TR_SYS_FILE_READ | TR_SYS_FILE_SEQUENTIAL, 0);
+            prev_file_index = file_index;
         }
 
         /* figure out how much we can read this pass */
-        uint64_t leftInPiece = tor->pieceSize(piece) - piecePos;
-        uint64_t leftInFile = file_length - filePos;
-        uint64_t bytesThisPass = std::min(leftInFile, leftInPiece);
-        bytesThisPass = std::min(bytesThisPass, uint64_t(std::size(buffer)));
+        uint64_t left_in_piece = tor->pieceSize(piece) - piece_pos;
+        uint64_t left_in_file = file_length - file_pos;
+        uint64_t bytes_this_pass = std::min(left_in_file, left_in_piece);
+        bytes_this_pass = std::min(bytes_this_pass, uint64_t(std::size(buffer)));
 
         /* read a bit */
         if (fd != TR_BAD_SYS_FILE)
         {
-            auto numRead = uint64_t{};
-            if (tr_sys_file_read_at(fd, std::data(buffer), bytesThisPass, filePos, &numRead, nullptr) && numRead > 0)
+            auto num_read = uint64_t{};
+            if (tr_sys_file_read_at(fd, std::data(buffer), bytes_this_pass, file_pos, &num_read) && num_read > 0)
             {
-                bytesThisPass = numRead;
-                tr_sha1_update(sha, std::data(buffer), bytesThisPass);
-                tr_sys_file_advise(fd, filePos, bytesThisPass, TR_SYS_FILE_ADVICE_DONT_NEED, nullptr);
+                bytes_this_pass = num_read;
+                tr_sha1_update(sha, std::data(buffer), bytes_this_pass);
+                tr_sys_file_advise(fd, file_pos, bytes_this_pass, TR_SYS_FILE_ADVICE_DONT_NEED);
             }
         }
 
         /* move our offsets */
-        leftInPiece -= bytesThisPass;
-        leftInFile -= bytesThisPass;
-        piecePos += bytesThisPass;
-        filePos += bytesThisPass;
+        left_in_piece -= bytes_this_pass;
+        left_in_file -= bytes_this_pass;
+        piece_pos += bytes_this_pass;
+        file_pos += bytes_this_pass;
 
         /* if we're finishing a piece... */
-        if (leftInPiece == 0)
+        if (left_in_piece == 0)
         {
-            auto hash = tr_sha1_final(sha);
-            auto const hasPiece = hash && *hash == tor->pieceHash(piece);
+            auto const hash = tr_sha1_final(sha);
+            auto const has_piece = hash && *hash == tor->pieceHash(piece);
 
-            if (hasPiece || hadPiece)
+            if (has_piece || had_piece)
             {
-                tor->setHasPiece(piece, hasPiece);
-                changed |= hasPiece != hadPiece;
+                tor->setHasPiece(piece, has_piece);
+                changed |= has_piece != had_piece;
             }
 
+            tor->checked_pieces_.set(piece, true);
             tor->markChanged();
 
             /* sleeping even just a few msec per second goes a long
              * way towards reducing IO load... */
-            if (auto const now = tr_time(); lastSleptAt != now)
+            if (auto const now = tr_time(); last_slept_at != now)
             {
-                lastSleptAt = now;
+                last_slept_at = now;
                 tr_wait_msec(MsecToSleepPerSecondDuringVerify);
             }
 
             sha = tr_sha1_init();
             ++piece;
-            tor->verify_progress = piece / double(tor->pieceCount());
-            piecePos = 0;
+            tor->setVerifyProgress(piece / float(tor->pieceCount()));
+            piece_pos = 0;
         }
 
         /* if we're finishing a file... */
-        if (leftInFile == 0)
+        if (left_in_file == 0)
         {
             if (fd != TR_BAD_SYS_FILE)
             {
-                tr_sys_file_close(fd, nullptr);
+                tr_sys_file_close(fd);
                 fd = TR_BAD_SYS_FILE;
             }
 
-            fileIndex++;
-            filePos = 0;
+            ++file_index;
+            file_pos = 0;
         }
     }
 
     /* cleanup */
     if (fd != TR_BAD_SYS_FILE)
     {
-        tr_sys_file_close(fd, nullptr);
+        tr_sys_file_close(fd);
     }
 
-    tor->verify_progress.reset();
     tr_sha1_final(sha);
 
     /* stopwatch */
     time_t const end = tr_time();
-    tr_logAddTorDbg(
+    tr_logAddDebugTor(
         tor,
-        "Verification is done. It took %d seconds to verify %" PRIu64 " bytes (%" PRIu64 " bytes per second)",
-        (int)(end - begin),
-        tor->totalSize(),
-        (uint64_t)(tor->totalSize() / (1 + (end - begin))));
+        fmt::format(
+            "Verification is done. It took {} seconds to verify {} bytes ({} bytes per second)",
+            end - begin,
+            tor->totalSize(),
+            tor->totalSize() / (1 + (end - begin))));
 
     return changed;
 }
@@ -197,12 +198,12 @@ struct verify_node
 static struct verify_node currentNode;
 // TODO: refactor s.t. this doesn't leak
 static auto& verify_list{ *new std::set<verify_node>{} };
-static tr_thread* verify_thread = nullptr;
+static std::optional<std::thread::id> verify_thread_id;
 static bool stopCurrent = false;
 
 static std::mutex verify_mutex_;
 
-static void verifyThreadFunc(void* /*user_data*/)
+static void verifyThreadFunc()
 {
     for (;;)
     {
@@ -213,7 +214,7 @@ static void verifyThreadFunc(void* /*user_data*/)
             if (std::empty(verify_list))
             {
                 currentNode.torrent = nullptr;
-                verify_thread = nullptr;
+                verify_thread_id.reset();
                 return;
             }
 
@@ -223,7 +224,7 @@ static void verifyThreadFunc(void* /*user_data*/)
         }
 
         tr_torrent* tor = currentNode.torrent;
-        tr_logAddTorInfo(tor, "%s", _("Verifying torrent"));
+        tr_logAddTraceTor(tor, "Verifying torrent");
         tor->setVerifyState(TR_VERIFY_NOW);
         auto const changed = verifyTorrent(tor, &stopCurrent);
         tor->setVerifyState(TR_VERIFY_NONE);
@@ -244,7 +245,7 @@ static void verifyThreadFunc(void* /*user_data*/)
 void tr_verifyAdd(tr_torrent* tor, tr_verify_done_func callback_func, void* callback_data)
 {
     TR_ASSERT(tr_isTorrent(tor));
-    tr_logAddTorInfo(tor, "%s", _("Queued for verification"));
+    tr_logAddTraceTor(tor, "Queued for verification");
 
     auto node = verify_node{};
     node.torrent = tor;
@@ -256,9 +257,11 @@ void tr_verifyAdd(tr_torrent* tor, tr_verify_done_func callback_func, void* call
     tor->setVerifyState(TR_VERIFY_WAIT);
     verify_list.insert(node);
 
-    if (verify_thread == nullptr)
+    if (!verify_thread_id)
     {
-        verify_thread = tr_threadNew(verifyThreadFunc, nullptr);
+        auto thread = std::thread(verifyThreadFunc);
+        verify_thread_id = thread.get_id();
+        thread.detach();
     }
 }
 

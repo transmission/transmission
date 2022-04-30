@@ -10,9 +10,10 @@
 #endif
 
 #include <array>
-#include <cinttypes> // uintX_t
 #include <cstddef> // size_t
+#include <cstdint> // uint8_t, uint64_t
 #include <string>
+#include <string_view>
 #include <vector>
 
 #ifdef _WIN32
@@ -57,18 +58,17 @@ struct tr_pex
 {
     tr_address addr;
     tr_port port; /* this field is in network byte order */
-    uint8_t flags;
+    uint8_t flags = 0;
 
-    std::string_view to_string(char* buf, size_t buflen) const
+    template<typename OutputIt>
+    [[nodiscard]] OutputIt readable(OutputIt out) const
     {
-        tr_address_and_port_to_string(buf, buflen, &addr, port);
-        return buf;
+        return addr.readable(out, port);
     }
 
-    [[nodiscard]] std::string to_string() const
+    [[nodiscard]] std::string readable() const
     {
-        auto buf = std::array<char, 64>{};
-        return std::string{ to_string(std::data(buf), std::size(buf)) };
+        return addr.readable(port);
     }
 };
 
@@ -100,20 +100,6 @@ void tr_peerMgrClientSentRequests(tr_torrent* torrent, tr_peer* peer, tr_block_s
 size_t tr_peerMgrCountActiveRequestsToPeer(tr_torrent const* torrent, tr_peer const* peer);
 
 void tr_peerMgrAddIncoming(tr_peerMgr* manager, tr_address const* addr, tr_port port, struct tr_peer_socket const socket);
-
-tr_pex* tr_peerMgrCompactToPex(
-    void const* compact,
-    size_t compactLen,
-    uint8_t const* added_f,
-    size_t added_f_len,
-    size_t* setme_pex_count);
-
-tr_pex* tr_peerMgrCompact6ToPex(
-    void const* compact,
-    size_t compactLen,
-    uint8_t const* added_f,
-    size_t added_f_len,
-    size_t* pexCount);
 
 std::vector<tr_pex> tr_peerMgrCompactToPex(void const* compact, size_t compactLen, uint8_t const* added_f, size_t added_f_len);
 

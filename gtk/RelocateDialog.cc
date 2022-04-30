@@ -1,5 +1,5 @@
 // This file Copyright © 2009-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -9,6 +9,8 @@
 
 #include <glibmm.h>
 #include <glibmm/i18n.h>
+
+#include <fmt/core.h>
 
 #include <libtransmission/transmission.h>
 
@@ -72,7 +74,9 @@ void RelocateDialog::Impl::startMovingNextTorrent()
 
     torrent_ids_.pop_back();
 
-    message_dialog_->set_message(gtr_sprintf(_("Moving \"%s\""), tr_torrentName(tor)), true);
+    message_dialog_->set_message(
+        fmt::format(_("Moving '{torrent_name}'"), fmt::arg("torrent_name", tr_torrentName(tor))),
+        true);
 }
 
 /* every once in awhile, check to see if the move is done.

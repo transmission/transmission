@@ -1,5 +1,5 @@
 /* @license This file Copyright (C) 2020-2022 Mnemosyne LLC.
-   It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+   It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
    or any future license endorsed by Mnemosyne LLC.
    License text can be found in the licenses/ folder. */
 
@@ -17,6 +17,12 @@ const TorrentRendererHelper = {
       return '';
     }
     return `ETA: ${Formatter.timeInterval(eta)}`;
+  },
+  formatLabels: (t) => {
+    if (t.getLabels().length > 0) {
+      return `🏷 ${t.getLabels().join(', ')}`;
+    }
+    return '';
   },
   formatUL: (t) => {
     return `▲${Formatter.speedBps(t.getUploadSpeed())}`;
@@ -215,6 +221,10 @@ export class TorrentRendererFull {
     setTextContent(e, t.getName());
     e.classList.toggle('paused', is_stopped);
 
+    // labels
+    e = root._labels_container;
+    setTextContent(e, TorrentRendererHelper.formatLabels(t));
+
     // progressbar
     TorrentRendererHelper.renderProgressbar(controller, t, root._progressbar);
     root._progressbar.classList.add('full');
@@ -251,6 +261,9 @@ export class TorrentRendererFull {
     const name = document.createElement('div');
     name.className = 'torrent-name';
 
+    const labels = document.createElement('div');
+    labels.className = 'torrent-labels';
+
     const peers = document.createElement('div');
     peers.className = 'torrent-peer-details';
 
@@ -268,12 +281,14 @@ export class TorrentRendererFull {
 
     root.append(icon);
     root.append(name);
+    root.append(labels);
     root.append(peers);
     root.append(progress);
     root.append(details);
 
     root._icon = icon;
     root._name_container = name;
+    root._labels_container = labels;
     root._peer_details_container = peers;
     root._progress_details_container = details;
     root._progressbar = progressbar;
@@ -323,6 +338,10 @@ export class TorrentRendererCompact {
     e.classList.toggle('paused', t.isStopped());
     setTextContent(e, t.getName());
 
+    // labels
+    e = root._labels_container;
+    setTextContent(e, TorrentRendererHelper.formatLabels(t));
+
     // peer details
     const has_error = t.getError() !== Torrent._ErrNone;
     e = root._details_container;
@@ -350,17 +369,22 @@ export class TorrentRendererCompact {
     const details = document.createElement('div');
     details.className = 'torrent-peer-details compact';
 
+    const labels = document.createElement('div');
+    labels.className = 'torrent-labels compact';
+
     const name = document.createElement('div');
     name.className = 'torrent-name compact';
 
     const root = document.createElement('li');
     root.append(progressbar);
     root.append(details);
+    root.append(labels);
     root.append(name);
     root.append(icon);
     root.className = 'torrent compact';
     root._progressbar = progressbar;
     root._details_container = details;
+    root._labels_container = labels;
     root._name_container = name;
     return root;
   }

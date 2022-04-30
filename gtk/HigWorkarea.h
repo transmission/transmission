@@ -49,10 +49,7 @@ private:
     void add_control(guint row, Gtk::Widget& control);
 };
 
-enum
-{
-    GUI_PAD_SMALL = 3,
-    GUI_PAD = 6,
-    GUI_PAD_BIG = 12,
-    GUI_PAD_LARGE = 12
-};
+auto inline constexpr GUI_PAD_SMALL = int{ 3 };
+auto inline constexpr GUI_PAD = int{ 6 };
+auto inline constexpr GUI_PAD_BIG = int{ 12 };
+auto inline constexpr GUI_PAD_LARGE = int{ 12 };

@@ -1,15 +1,16 @@
 // This file Copyright © 2007-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
 #include <climits> /* USHRT_MAX, INT_MAX */
 #include <sstream>
 #include <string>
-#include <unistd.h>
 
 #include <glibmm.h>
 #include <glibmm/i18n.h>
+
+#include <fmt/core.h>
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/utils.h>
@@ -96,10 +97,9 @@ auto const IdleDataKey = Glib::Quark("idle-data");
 bool spun_cb_idle(Gtk::SpinButton* spin, tr_quark const key, Glib::RefPtr<Session> const& core, bool isDouble)
 {
     bool keep_waiting = true;
-    auto* last_change = static_cast<Glib::Timer*>(spin->get_data(IdleDataKey));
 
     /* has the user stopped making changes? */
-    if (last_change->elapsed() > 0.33)
+    if (auto const* const last_change = static_cast<Glib::Timer*>(spin->get_data(IdleDataKey)); last_change->elapsed() > 0.33)
     {
         /* update the core */
         if (isDouble)
@@ -178,6 +178,32 @@ Gtk::Entry* new_entry(tr_quark const key, Glib::RefPtr<Session> const& core)
     return w;
 }
 
+Gtk::Widget* new_text_view(tr_quark const key, Glib::RefPtr<Session> const& core)
+{
+    auto* w = Gtk::make_managed<Gtk::TextView>();
+    auto buffer = w->get_buffer();
+
+    buffer->set_text(gtr_pref_string_get(key));
+
+    /* set up the scrolled window and put the text view in it */
+    auto* scroll = Gtk::make_managed<Gtk::ScrolledWindow>();
+    scroll->set_policy(Gtk::PolicyType::POLICY_AUTOMATIC, Gtk::PolicyType::POLICY_AUTOMATIC);
+    scroll->set_shadow_type(Gtk::ShadowType::SHADOW_IN);
+    scroll->add(*w);
+    scroll->set_size_request(-1, 166);
+
+    /* signal */
+    w->add_events(Gdk::FOCUS_CHANGE_MASK);
+    w->signal_focus_out_event().connect(
+        [buffer, key, core](GdkEventFocus*)
+        {
+            core->set_pref(key, buffer->get_text());
+            return false;
+        });
+
+    return scroll;
+}
+
 void chosen_cb(Gtk::FileChooser* w, tr_quark const key, Glib::RefPtr<Session> const& core)
 {
     core->set_pref(key, w->get_filename());
@@ -228,7 +254,7 @@ Gtk::Widget* PrefsDialog::Impl::downloadingPage()
     t->add_section_title(row, C_("Gerund", "Adding"));
 
     {
-        auto* l = new_check_button(_("Automatically add .torrent files _from:"), TR_KEY_watch_dir_enabled, core_);
+        auto* l = new_check_button(_("Automatically add torrent files _from:"), TR_KEY_watch_dir_enabled, core_);
         auto* w = new_path_chooser_button(TR_KEY_watch_dir, core_);
         w->set_sensitive(gtr_pref_flag_get(TR_KEY_watch_dir_enabled));
         l->signal_toggled().connect([l, w]() { target_cb(l, w); });
@@ -241,7 +267,7 @@ Gtk::Widget* PrefsDialog::Impl::downloadingPage()
 
     t->add_wide_control(
         row,
-        *new_check_button(_("Mo_ve .torrent file to the trash"), TR_KEY_trash_original_torrent_files, core_));
+        *new_check_button(_("Mo_ve torrent file to the trash"), TR_KEY_trash_original_torrent_files, core_));
 
     t->add_row(row, _("Save to _Location:"), *new_path_chooser_button(TR_KEY_download_dir, core_));
 
@@ -276,7 +302,7 @@ Gtk::Widget* PrefsDialog::Impl::downloadingPage()
     }
 
     {
-        auto* l = new_check_button(_("Call scrip_t when torrent is completed:"), TR_KEY_script_torrent_done_enabled, core_);
+        auto* l = new_check_button(_("Call scrip_t when done downloading:"), TR_KEY_script_torrent_done_enabled, core_);
         auto* w = new_file_chooser_button(TR_KEY_script_torrent_done_filename, core_);
         w->set_sensitive(gtr_pref_flag_get(TR_KEY_script_torrent_done_enabled));
         l->signal_toggled().connect([l, w]() { target_cb(l, w); });
@@ -311,6 +337,14 @@ Gtk::Widget* PrefsDialog::Impl::seedingPage()
         w2->set_sensitive(gtr_pref_flag_get(TR_KEY_idle_seeding_limit_enabled));
         w->signal_toggled().connect([w, w2]() { target_cb(w, w2); });
         t->add_row_w(row, *w, *w2);
+    }
+
+    {
+        auto* l = new_check_button(_("Call scrip_t when done seeding:"), TR_KEY_script_torrent_done_seeding_enabled, core_);
+        auto* w = new_file_chooser_button(TR_KEY_script_torrent_done_seeding_filename, core_);
+        w->set_sensitive(gtr_pref_flag_get(TR_KEY_script_torrent_done_seeding_enabled));
+        l->signal_toggled().connect([l, w]() { target_cb(l, w); });
+        t->add_row_w(row, *l, *w);
     }
 
     return t;
@@ -378,8 +412,10 @@ struct blocklist_data
 void updateBlocklistText(Gtk::Label* w, Glib::RefPtr<Session> const& core)
 {
     int const n = tr_blocklistGetRuleCount(core->get_session());
-    w->set_markup(
-        gtr_sprintf("<i>%s</i>", gtr_sprintf(ngettext("Blocklist contains %'d rule", "Blocklist contains %'d rules", n), n)));
+    auto const msg = fmt::format(
+        ngettext("Blocklist has {count:L} entry", "Blocklist has {count:L} entries", n),
+        fmt::arg("count", n));
+    w->set_markup(fmt::format(FMT_STRING("<i>{:s}</i>"), msg));
 }
 
 /* prefs dialog is being destroyed, so stop listening to blocklist updates */
@@ -404,10 +440,14 @@ void onBlocklistUpdated(Glib::RefPtr<Session> const& core, int n, blocklist_data
 {
     bool const success = n >= 0;
     int const count = n >= 0 ? n : tr_blocklistGetRuleCount(core->get_session());
+    auto const msg = fmt::format(
+        ngettext("Blocklist has {count:L} entry", "Blocklist has {count:L} entries", count),
+        fmt::arg("count", count));
     data->updateBlocklistButton->set_sensitive(true);
-    data->updateBlocklistDialog->set_message(success ? _("<b>Update succeeded!</b>") : _("<b>Unable to update.</b>"), true);
-    data->updateBlocklistDialog->set_secondary_text(
-        gtr_sprintf(ngettext("Blocklist has %'d rule.", "Blocklist has %'d rules.", count), count));
+    data->updateBlocklistDialog->set_message(
+        fmt::format(FMT_STRING("<b>{:s}</b>"), success ? _("Blocklist updated!") : _("Couldn't update blocklist")),
+        true);
+    data->updateBlocklistDialog->set_secondary_text(msg);
     updateBlocklistText(data->label, core);
 }
 
@@ -809,19 +849,27 @@ Gtk::ComboBox* new_time_combo(Glib::RefPtr<Session> const& core, tr_quark const 
     return w;
 }
 
+auto get_weekday_string(Glib::Date::Weekday weekday)
+{
+    auto date = Glib::Date{};
+    date.set_time_current();
+    date.add_days(weekday - date.get_weekday());
+    return date.format_string("%A");
+}
+
 Gtk::ComboBox* new_week_combo(Glib::RefPtr<Session> const& core, tr_quark const key)
 {
     auto* w = gtr_combo_box_new_enum({
         { _("Every Day"), TR_SCHED_ALL },
         { _("Weekdays"), TR_SCHED_WEEKDAY },
         { _("Weekends"), TR_SCHED_WEEKEND },
-        { _("Sunday"), TR_SCHED_SUN },
-        { _("Monday"), TR_SCHED_MON },
-        { _("Tuesday"), TR_SCHED_TUES },
-        { _("Wednesday"), TR_SCHED_WED },
-        { _("Thursday"), TR_SCHED_THURS },
-        { _("Friday"), TR_SCHED_FRI },
-        { _("Saturday"), TR_SCHED_SAT },
+        { get_weekday_string(Glib::Date::MONDAY), TR_SCHED_MON },
+        { get_weekday_string(Glib::Date::TUESDAY), TR_SCHED_TUES },
+        { get_weekday_string(Glib::Date::WEDNESDAY), TR_SCHED_WED },
+        { get_weekday_string(Glib::Date::THURSDAY), TR_SCHED_THURS },
+        { get_weekday_string(Glib::Date::FRIDAY), TR_SCHED_FRI },
+        { get_weekday_string(Glib::Date::SATURDAY), TR_SCHED_SAT },
+        { get_weekday_string(Glib::Date::SUNDAY), TR_SCHED_SUN },
     });
     gtr_combo_box_set_active_enum(*w, gtr_pref_int_get(key));
     w->signal_changed().connect([w, key, core]() { onIntComboChanged(w, key, core); });
@@ -839,7 +887,11 @@ Gtk::Widget* PrefsDialog::Impl::speedPage()
     t->add_section_title(row, _("Speed Limits"));
 
     {
-        auto* w = new_check_button(gtr_sprintf(_("_Upload (%s):"), _(speed_K_str)), TR_KEY_speed_limit_up_enabled, core_);
+        auto* w = new_check_button(
+            // checkbox to limit upload speed
+            fmt::format(_("_Upload ({speed_units}):"), fmt::arg("speed_units", speed_K_str)),
+            TR_KEY_speed_limit_up_enabled,
+            core_);
         auto* w2 = new_spin_button(TR_KEY_speed_limit_up, core_, 0, INT_MAX, 5);
         w2->set_sensitive(gtr_pref_flag_get(TR_KEY_speed_limit_up_enabled));
         w->signal_toggled().connect([w, w2]() { target_cb(w, w2); });
@@ -847,7 +899,11 @@ Gtk::Widget* PrefsDialog::Impl::speedPage()
     }
 
     {
-        auto* w = new_check_button(gtr_sprintf(_("_Download (%s):"), _(speed_K_str)), TR_KEY_speed_limit_down_enabled, core_);
+        auto* w = new_check_button(
+            // checkbox to limit download speed
+            fmt::format(_("_Download ({speed_units}):"), fmt::arg("speed_units", speed_K_str)),
+            TR_KEY_speed_limit_down_enabled,
+            core_);
         auto* w2 = new_spin_button(TR_KEY_speed_limit_down, core_, 0, INT_MAX, 5);
         w2->set_sensitive(gtr_pref_flag_get(TR_KEY_speed_limit_down_enabled));
         w->signal_toggled().connect([w, w2]() { target_cb(w, w2); });
@@ -858,7 +914,7 @@ Gtk::Widget* PrefsDialog::Impl::speedPage()
 
     {
         auto* h = Gtk::make_managed<Gtk::Box>(Gtk::ORIENTATION_HORIZONTAL, GUI_PAD);
-        auto* w = Gtk::make_managed<Gtk::Label>(gtr_sprintf("<b>%s</b>", _("Alternative Speed Limits")));
+        auto* w = Gtk::make_managed<Gtk::Label>(fmt::format(FMT_STRING("<b>{:s}</b>"), _("Alternative Speed Limits")));
         w->set_halign(Gtk::ALIGN_START);
         w->set_valign(Gtk::ALIGN_CENTER);
         w->set_use_markup(true);
@@ -869,7 +925,7 @@ Gtk::Widget* PrefsDialog::Impl::speedPage()
 
     {
         auto* w = Gtk::make_managed<Gtk::Label>(
-            gtr_sprintf("<small>%s</small>", _("Override normal speed limits manually or at scheduled times")));
+            fmt::format(FMT_STRING("<small>{:s}</small>"), _("Override normal speed limits manually or at scheduled times")));
         w->set_use_markup(true);
         w->set_halign(Gtk::ALIGN_START);
         w->set_valign(Gtk::ALIGN_CENTER);
@@ -878,12 +934,14 @@ Gtk::Widget* PrefsDialog::Impl::speedPage()
 
     t->add_row(
         row,
-        gtr_sprintf(_("U_pload (%s):"), _(speed_K_str)),
+        // labels a spinbutton for alternate upload speed limits
+        fmt::format(_("U_pload ({speed_units}):"), fmt::arg("speed_units", speed_K_str)),
         *new_spin_button(TR_KEY_alt_speed_up, core_, 0, INT_MAX, 5));
 
     t->add_row(
         row,
-        gtr_sprintf(_("Do_wnload (%s):"), _(speed_K_str)),
+        // labels a spinbutton for alternate download speed limits
+        fmt::format(_("Do_wnload ({speed_units}):"), fmt::arg("speed_units", speed_K_str)),
         *new_spin_button(TR_KEY_alt_speed_down, core_, 0, INT_MAX, 5));
 
     {
@@ -891,6 +949,7 @@ Gtk::Widget* PrefsDialog::Impl::speedPage()
         auto* start_combo = new_time_combo(core_, TR_KEY_alt_speed_time_begin);
         page->sched_widgets.push_back(start_combo);
         h->pack_start(*start_combo, true, true, 0);
+        // label goes between two time selectors, e.g. "limit speeds from [time] to [time]"
         auto* to_label = Gtk::make_managed<Gtk::Label>(_(" _to "), true);
         page->sched_widgets.push_back(to_label);
         h->pack_start(*to_label, false, false, 0);
@@ -958,7 +1017,10 @@ network_page_data::~network_page_data()
 
 void onPortTested(bool isOpen, network_page_data* data)
 {
-    data->portLabel->set_markup(isOpen ? _("Port is <b>open</b>") : _("Port is <b>closed</b>"));
+    data->portLabel->set_markup(fmt::format(
+        isOpen ? _("Port is {markup_begin}open{markup_end}") : _("Port is {markup_begin}closed{markup_end}"),
+        fmt::arg("markup_begin", "<b>"),
+        fmt::arg("markup_end", "</b>")));
     data->portButton->set_sensitive(true);
     data->portSpin->set_sensitive(true);
 }
@@ -967,7 +1029,7 @@ void onPortTest(std::shared_ptr<network_page_data> const& data)
 {
     data->portButton->set_sensitive(false);
     data->portSpin->set_sensitive(false);
-    data->portLabel->set_markup(_("<i>Testing TCP port…</i>"));
+    data->portLabel->set_markup(fmt::format(FMT_STRING("<i>{:s}</i>"), _("Testing TCP port…")));
 
     if (!data->portTag.connected())
     {
@@ -1045,6 +1107,16 @@ Gtk::Widget* PrefsDialog::Impl::networkPage()
     w->set_tooltip_text(_("LPD is a tool for finding peers on your local network."));
     t->add_wide_control(row, *w);
 
+    t->add_section_divider(row);
+    t->add_section_title(row, _("Default Public Trackers"));
+
+    auto tv = new_text_view(TR_KEY_default_trackers, core_);
+    tv->set_tooltip_text(
+        _("Trackers to use on all public torrents.\n\n"
+          "To add a backup URL, add it on the next line after a primary URL.\n"
+          "To add a new primary URL, add it after a blank line."));
+    t->add_wide_control(row, *tv);
+
     return t;
 }
 
@@ -1098,8 +1170,6 @@ PrefsDialog::Impl::Impl(PrefsDialog& dialog, Glib::RefPtr<Session> const& core)
     : dialog_(dialog)
     , core_(core)
 {
-    static tr_quark const prefs_quarks[] = { TR_KEY_peer_port, TR_KEY_download_dir };
-
     core_prefs_tag_ = core_->signal_prefs_changed().connect(sigc::mem_fun(*this, &Impl::on_core_prefs_changed));
 
     dialog_.add_button(_("_Help"), Gtk::RESPONSE_HELP);
@@ -1119,7 +1189,8 @@ PrefsDialog::Impl::Impl(PrefsDialog& dialog, Glib::RefPtr<Session> const& core)
     n->append_page(*remotePage(), _("Remote"));
 
     /* init from prefs keys */
-    for (auto const key : prefs_quarks)
+    static auto constexpr PrefsQuarks = std::array<tr_quark, 2>{ TR_KEY_peer_port, TR_KEY_download_dir };
+    for (auto const key : PrefsQuarks)
     {
         on_core_prefs_changed(key);
     }

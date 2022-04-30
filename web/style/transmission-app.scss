@@ -42,6 +42,7 @@ $image-chevron-dn: 'images/chevron-down.svg';
 $image-chevron-up: 'images/chevron-up.svg';
 $image-lock-fill: 'images/lock-fill.svg';
 $image-network: 'images/router.svg';
+$image-magnet: 'images/magnet.svg';
 $image-overflow: 'images/three-dots-vertical.svg';
 $image-pause-circle-active: 'images/pause-circle-active.svg';
 $image-pause-circle-idle: 'images/pause-circle-idle.svg';
@@ -102,6 +103,7 @@ $image-upload-download: 'images/up-and-down-arrows.svg';
   --color-fg-disabled: #{$grey-400};
   --color-fg-error: #{$red-500};
   --color-fg-name: #{$grey-800};
+  --color-fg-on-popup: #{$grey-800};
   --color-fg-port-closed: #{$red-500};
   --color-fg-port-open: #{$green-500};
   @media (prefers-color-scheme: dark) {
@@ -209,6 +211,7 @@ $toolbar-height: $toolbar-height-number * 1px;
     background-position: center;
     background-repeat: no-repeat;
     border: 0;
+    border-radius: 10px;
     cursor: pointer;
     height: $toolbar-height;
     margin-right: 6px;
@@ -449,11 +452,11 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
       display: grid;
       grid-column-gap: 12px;
       grid-template-areas:
-        'icon name'
-        'icon peers'
-        'icon progressbar'
-        'icon progress-text';
-      grid-template-columns: $icon-size 1fr;
+        'icon name labels'
+        'icon peers peers'
+        'icon progressbar progressbar'
+        'icon progress-text progress-text';
+      grid-template-columns: $icon-size auto 1fr;
       padding: 2px 12px;
 
       .icon {
@@ -465,6 +468,10 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
 
       .torrent-name {
         grid-area: name;
+      }
+
+      .torrent-labels {
+        grid-area: labels;
       }
 
       .torrent-peer-details {
@@ -505,7 +512,7 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
     background-position: center center;
     background-repeat: no-repeat;
     background-size: $pauseresume-size;
-    margin-left: math.floor($pauseresume-size-number / 2) * 1px;
+    margin-left: math.floor(math.div($pauseresume-size-number, 2)) * 1px;
     width: $pauseresume-size;
 
     &[data-action='pause'] {
@@ -538,13 +545,27 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
     white-space: nowrap;
 
     &.compact {
-      flex: 1;
       font-size: 1em;
       font-weight: normal;
     }
 
     &:not(.paused) {
       color: var(--color-fg-name);
+    }
+  }
+
+  .torrent-labels {
+    font-size: x-small;
+    font-weight: normal;
+    margin-bottom: 2px;
+    margin-top: 2px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    &.compact {
+      flex: 1;
+      font-size: x-small;
     }
   }
 
@@ -741,6 +762,10 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
     grid-column: span 2;
   }
 
+  #default-trackers {
+    height: 300px;
+  }
+
   .blocklist-size-label,
   .blocklist-update-button,
   .port-status {
@@ -764,6 +789,11 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
     &[data-open='false'] {
       color: var(--color-fg-port-closed);
     }
+  }
+
+  #default-trackers,
+  .default-trackers-label {
+    grid-column: 1 / 3;
   }
 
   .alt-speed-label {
@@ -931,6 +961,20 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
     // this section is not copied
     overflow-x: hidden;
     text-overflow: ellipsis;
+  }
+}
+
+.inspector-info-magnet {
+  button {
+    background-color: transparent;
+    background-image: url($image-magnet);
+    background-position: top;
+    background-repeat: no-repeat;
+    border: 0;
+    cursor: pointer;
+    height: 1rem;
+    vertical-align: middle;
+    width: 1rem;
   }
 }
 
@@ -1144,7 +1188,7 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
 .file-priority-radiobox {
   $size-number: 20;
   $size: $size-number * 1px;
-  $halfsize: math.floor($size-number / 2) * 1px;
+  $halfsize: math.floor(math.div($size-number, 2)) * 1px;
 
   grid-area: priority;
 
@@ -1183,6 +1227,7 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
 
   background: $background-color;
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.7);
+  color: var(--color-fg-on-popup);
   position: absolute;
   z-index: $z-index-popup;
 
@@ -1222,6 +1267,7 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
   );
   border-radius: 8px;
   box-shadow: 0 3px 6px rgba(0, 0, 0, 0.7);
+  color: var(--color-fg-on-popup);
   padding: 20px;
   position: fixed;
   width: 200px;
@@ -1252,7 +1298,6 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
   a,
   button,
   label {
-    color: var(--color-fg-primary);
     font-size: 1em;
 
     &:disabled {
@@ -1372,7 +1417,7 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
 /// DIALOGS
 
 $dialog-padding-number: 20;
-$dialog-logo-padding-number: $dialog-padding-number * 2 / 3;
+$dialog-logo-padding-number: math.div($dialog-padding-number * 2, 3);
 $logo-size: 64px;
 
 @include for-phone-only {
@@ -1416,6 +1461,7 @@ $logo-size: 64px;
   }
 
   .dialog-window {
+    color: var(--color-fg-on-popup);
     display: grid;
     grid-column-gap: 12px;
     grid-template-areas:

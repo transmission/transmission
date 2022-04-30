@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include <cstddef> // size_t
+#include <cstdint> // int64_t
 #include <ctime>
 #include <optional>
 #include <string_view>
@@ -32,8 +34,8 @@ template<typename T, typename std::enable_if_t<std::is_same_v<T, bool>>* = nullp
 auto getValue(tr_variant const* variant)
 {
     std::optional<T> ret;
-    auto value = T{};
-    if (tr_variantGetBool(variant, &value))
+
+    if (auto value = T{}; tr_variantGetBool(variant, &value))
     {
         ret = value;
     }
@@ -49,8 +51,8 @@ template<
 auto getValue(tr_variant const* variant)
 {
     std::optional<T> ret;
-    auto value = int64_t{};
-    if (tr_variantGetInt(variant, &value))
+
+    if (auto value = int64_t{}; tr_variantGetInt(variant, &value))
     {
         ret = value;
     }
@@ -62,8 +64,8 @@ template<typename T, typename std::enable_if_t<std::is_same_v<T, double>>* = nul
 auto getValue(tr_variant const* variant)
 {
     std::optional<T> ret;
-    auto value = T{};
-    if (tr_variantGetReal(variant, &value))
+
+    if (auto value = T{}; tr_variantGetReal(variant, &value))
     {
         ret = value;
     }
@@ -193,7 +195,6 @@ auto dictFind(tr_variant* dict, tr_quark key)
 void variantInit(tr_variant* init_me, bool value);
 void variantInit(tr_variant* init_me, int64_t value);
 void variantInit(tr_variant* init_me, int value);
-void variantInit(tr_variant* init_me, unsigned int value);
 void variantInit(tr_variant* init_me, double value);
 void variantInit(tr_variant* init_me, QByteArray const& value);
 void variantInit(tr_variant* init_me, QString const& value);

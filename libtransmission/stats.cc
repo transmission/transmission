@@ -1,5 +1,5 @@
 // This file Copyright © 2007-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -9,11 +9,13 @@
 #include "transmission.h"
 
 #include "log.h"
-#include "platform.h" /* tr_sessionGetConfigDir() */
 #include "session.h"
 #include "stats.h"
+#include "tr-strbuf.h"
 #include "utils.h"
 #include "variant.h"
+
+using namespace std::literals;
 
 /***
 ****
@@ -28,27 +30,19 @@ struct tr_stats_handle
     bool isDirty;
 };
 
-static std::string getOldFilename(tr_session const* session)
-{
-    return tr_strvPath(tr_sessionGetConfigDir(session), "stats.benc");
-}
-
-static std::string getFilename(tr_session const* session)
-{
-    return tr_strvPath(tr_sessionGetConfigDir(session), "stats.json");
-}
-
 static void loadCumulativeStats(tr_session const* session, tr_session_stats* setme)
 {
     auto top = tr_variant{};
 
-    auto filename = getFilename(session);
-    bool loaded = tr_variantFromFile(&top, TR_VARIANT_PARSE_JSON, filename, nullptr);
+    auto filename = tr_pathbuf{ session->config_dir, "/stats.json"sv };
+    bool loaded = tr_variantFromFile(&top, TR_VARIANT_PARSE_JSON, filename.sv(), nullptr);
 
     if (!loaded)
     {
-        filename = getOldFilename(session);
-        loaded = tr_variantFromFile(&top, TR_VARIANT_PARSE_BENC, filename, nullptr);
+        // maybe the user just upgraded from an old version of Transmission
+        // that was still using stats.benc
+        filename.assign(session->config_dir, "/stats.benc");
+        loaded = tr_variantFromFile(&top, TR_VARIANT_PARSE_BENC, filename.sv(), nullptr);
     }
 
     if (loaded)
@@ -86,6 +80,7 @@ static void loadCumulativeStats(tr_session const* session, tr_session_stats* set
 
 static void saveCumulativeStats(tr_session const* session, tr_session_stats const* s)
 {
+    auto const filename = tr_pathbuf{ session->config_dir, "/stats.json"sv };
     auto top = tr_variant{};
     tr_variantInitDict(&top, 5);
     tr_variantDictAddInt(&top, TR_KEY_downloaded_bytes, s->downloadedBytes);
@@ -93,15 +88,7 @@ static void saveCumulativeStats(tr_session const* session, tr_session_stats cons
     tr_variantDictAddInt(&top, TR_KEY_seconds_active, s->secondsActive);
     tr_variantDictAddInt(&top, TR_KEY_session_count, s->sessionCount);
     tr_variantDictAddInt(&top, TR_KEY_uploaded_bytes, s->uploadedBytes);
-
-    auto const filename = getFilename(session);
-    if (tr_logGetDeepEnabled())
-    {
-        tr_logAddDeep(__FILE__, __LINE__, nullptr, "Saving stats to \"%s\"", filename.c_str());
-    }
-
-    tr_variantToFile(&top, TR_VARIANT_FMT_JSON, filename);
-
+    tr_variantToFile(&top, TR_VARIANT_FMT_JSON, filename.sv());
     tr_variantFree(&top);
 }
 

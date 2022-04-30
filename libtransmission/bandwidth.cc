@@ -1,20 +1,27 @@
 // This file Copyright © 2008-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
 #include <algorithm>
 #include <vector>
+#include <cstring>
+
+#include <fmt/core.h>
 
 #include "transmission.h"
+
 #include "bandwidth.h"
 #include "crypto-utils.h" /* tr_rand_int_weak() */
+#include "error.h"
 #include "log.h"
 #include "peer-io.h"
+#include "platform.h"
+#include "quark.h"
+#include "session.h"
 #include "tr-assert.h"
 #include "utils.h"
-
-#define dbgmsg(...) tr_logAddDeepNamed(nullptr, __VA_ARGS__)
+#include "variant.h"
 
 /***
 ****
@@ -32,9 +39,9 @@ unsigned int Bandwidth::getSpeedBytesPerSecond(RateControl& r, unsigned int inte
         uint64_t bytes = 0;
         uint64_t const cutoff = now - interval_msec;
 
-        for (int i = r.newest_; r.transfers_[i].date_ > cutoff;)
+        for (int i = r.newest_; r.date_[i] > cutoff;)
         {
-            bytes += r.transfers_[i].size_;
+            bytes += r.size_[i];
 
             if (--i == -1)
             {
@@ -56,9 +63,9 @@ unsigned int Bandwidth::getSpeedBytesPerSecond(RateControl& r, unsigned int inte
 
 void Bandwidth::notifyBandwidthConsumedBytes(uint64_t const now, RateControl* r, size_t size)
 {
-    if (r->transfers_[r->newest_].date_ + GranularityMSec >= now)
+    if (r->date_[r->newest_] + GranularityMSec >= now)
     {
-        r->transfers_[r->newest_].size_ += size;
+        r->size_[r->newest_] += size;
     }
     else
     {
@@ -67,8 +74,8 @@ void Bandwidth::notifyBandwidthConsumedBytes(uint64_t const now, RateControl* r,
             r->newest_ = 0;
         }
 
-        r->transfers_[r->newest_].date_ = now;
-        r->transfers_[r->newest_].size_ = size;
+        r->date_[r->newest_] = now;
+        r->size_[r->newest_] = size;
     }
 
     /* invalidate cache_val*/
@@ -79,11 +86,9 @@ void Bandwidth::notifyBandwidthConsumedBytes(uint64_t const now, RateControl* r,
 ****
 ***/
 
-Bandwidth::Bandwidth(Bandwidth* new_parent)
+Bandwidth::Bandwidth(Bandwidth* parent)
 {
-    this->band_[TR_UP].honor_parent_limits_ = true;
-    this->band_[TR_DOWN].honor_parent_limits_ = true;
-    this->setParent(new_parent);
+    this->setParent(parent);
 }
 
 /***
@@ -166,7 +171,7 @@ void Bandwidth::phaseOne(std::vector<tr_peerIo*>& peerArray, tr_direction dir)
      * peers from starving the others. Loop through the peers, giving each a
      * small chunk of bandwidth. Keep looping until we run out of bandwidth
      * and/or peers that can use it */
-    dbgmsg("%lu peers to go round-robin for %s", peerArray.size(), dir == TR_UP ? "upload" : "download");
+    tr_logAddTrace(fmt::format("{} peers to go round-robin for {}", peerArray.size(), dir == TR_UP ? "upload" : "download"));
 
     size_t n = peerArray.size();
     while (n > 0)
@@ -180,7 +185,7 @@ void Bandwidth::phaseOne(std::vector<tr_peerIo*>& peerArray, tr_direction dir)
 
         int const bytes_used = tr_peerIoFlush(peerArray[i], dir, increment);
 
-        dbgmsg("peer #%d of %zu used %d bytes in this pass", i, n, bytes_used);
+        tr_logAddTrace(fmt::format("peer #{} of {} used {} bytes in this pass", i, n, bytes_used));
 
         if (bytes_used != int(increment))
         {
@@ -334,4 +339,26 @@ void Bandwidth::notifyBandwidthConsumed(tr_direction dir, size_t byte_count, boo
     {
         this->parent_->notifyBandwidthConsumed(dir, byte_count, is_piece_data, now);
     }
+}
+
+/***
+****
+***/
+
+tr_bandwidth_limits Bandwidth::getLimits() const
+{
+    tr_bandwidth_limits limits;
+    limits.up_limit_KBps = tr_toSpeedKBps(this->getDesiredSpeedBytesPerSecond(TR_UP));
+    limits.down_limit_KBps = tr_toSpeedKBps(this->getDesiredSpeedBytesPerSecond(TR_DOWN));
+    limits.up_limited = this->isLimited(TR_UP);
+    limits.down_limited = this->isLimited(TR_DOWN);
+    return limits;
+}
+
+void Bandwidth::setLimits(tr_bandwidth_limits const* limits)
+{
+    this->setDesiredSpeedBytesPerSecond(TR_UP, tr_toSpeedBytes(limits->up_limit_KBps));
+    this->setDesiredSpeedBytesPerSecond(TR_DOWN, tr_toSpeedBytes(limits->down_limit_KBps));
+    this->setLimited(TR_UP, limits->up_limited);
+    this->setLimited(TR_DOWN, limits->down_limited);
 }

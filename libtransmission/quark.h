@@ -77,6 +77,7 @@ enum
     TR_KEY_current_stats,
     TR_KEY_date,
     TR_KEY_dateCreated,
+    TR_KEY_default_trackers,
     TR_KEY_delete_local_data,
     TR_KEY_desiredAvailable,
     TR_KEY_destination,
@@ -133,6 +134,7 @@ enum
     TR_KEY_fromLtep,
     TR_KEY_fromPex,
     TR_KEY_fromTracker,
+    TR_KEY_group,
     TR_KEY_hasAnnounced,
     TR_KEY_hasScraped,
     TR_KEY_hashString,
@@ -233,6 +235,7 @@ enum
     TR_KEY_peersFrom,
     TR_KEY_peersGettingFromUs,
     TR_KEY_peersSendingToUs,
+    TR_KEY_percentComplete,
     TR_KEY_percentDone,
     TR_KEY_pex_enabled,
     TR_KEY_piece,
@@ -292,6 +295,7 @@ enum
     TR_KEY_rpc_host_whitelist_enabled,
     TR_KEY_rpc_password,
     TR_KEY_rpc_port,
+    TR_KEY_rpc_socket_mode,
     TR_KEY_rpc_url,
     TR_KEY_rpc_username,
     TR_KEY_rpc_version,
@@ -306,6 +310,8 @@ enum
     TR_KEY_script_torrent_added_filename,
     TR_KEY_script_torrent_done_enabled,
     TR_KEY_script_torrent_done_filename,
+    TR_KEY_script_torrent_done_seeding_enabled,
+    TR_KEY_script_torrent_done_seeding_filename,
     TR_KEY_seconds_active,
     TR_KEY_secondsActive,
     TR_KEY_secondsDownloading,
@@ -330,6 +336,7 @@ enum
     TR_KEY_show_statusbar,
     TR_KEY_show_toolbar,
     TR_KEY_show_tracker_scrapes,
+    TR_KEY_sitename,
     TR_KEY_size_bytes,
     TR_KEY_size_units,
     TR_KEY_sizeWhenDone,
@@ -369,6 +376,7 @@ enum
     TR_KEY_totalSize,
     TR_KEY_total_size,
     TR_KEY_trackerAdd,
+    TR_KEY_trackerList,
     TR_KEY_trackerRemove,
     TR_KEY_trackerReplace,
     TR_KEY_trackerStats,
@@ -412,23 +420,23 @@ enum
  *
  * @return true if the specified string exists as a quark
  */
-std::optional<tr_quark> tr_quark_lookup(std::string_view key);
+[[nodiscard]] std::optional<tr_quark> tr_quark_lookup(std::string_view key);
 
 /**
  * Get the string that corresponds to the specified quark
  */
-char const* tr_quark_get_string(tr_quark quark, size_t* len = nullptr);
+[[nodiscard]] char const* tr_quark_get_string(tr_quark quark, size_t* len = nullptr);
 
 /**
  * Get the string view that corresponds to the specified quark.
  *
  * Note: this view is guaranteed to be zero-terminated at view[std::size(view)]
  */
-std::string_view tr_quark_get_string_view(tr_quark quark);
+[[nodiscard]] std::string_view tr_quark_get_string_view(tr_quark quark);
 
 /**
  * Create a new quark for the specified string. If a quark already
  * exists for that string, it is returned so that no duplicates are
  * created.
  */
-tr_quark tr_quark_new(std::string_view);
+[[nodiscard]] tr_quark tr_quark_new(std::string_view);

@@ -1,5 +1,5 @@
 // This file Copyright 2014-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -24,16 +24,17 @@
 #include API_HEADER_CRYPT(sha.h)
 #include API_HEADER(version.h)
 
+#include <fmt/core.h>
+
 #include "transmission.h"
 #include "crypto-utils.h"
 #include "log.h"
-#include "platform.h"
 #include "tr-assert.h"
 #include "utils.h"
 
 #define TR_CRYPTO_DH_SECRET_FALLBACK
 #define TR_CRYPTO_X509_FALLBACK
-#include "crypto-utils-fallback.cc"
+#include "crypto-utils-fallback.cc" // NOLINT(bugprone-suspicious-include)
 
 struct tr_dh_ctx
 {
@@ -46,8 +47,6 @@ struct tr_dh_ctx
 /***
 ****
 ***/
-
-static char constexpr MyName[] = "tr_crypto_utils";
 
 static void log_cyassl_error(int error_code, char const* file, int line)
 {
@@ -62,7 +61,15 @@ static void log_cyassl_error(int error_code, char const* file, int line)
         CTaoCryptErrorString(error_code, error_message);
 #endif
 
-        tr_logAddMessage(file, line, TR_LOG_ERROR, MyName, "CyaSSL error: %s", error_message);
+        tr_logAddMessage(
+            file,
+            line,
+            TR_LOG_ERROR,
+            fmt::format(
+                _("{crypto_library} error: {error} ({error_code})"),
+                fmt::arg("crypto_library", "CyaSSL/WolfSSL"),
+                fmt::arg("error", error_message),
+                fmt::arg("error_code", error_code)));
     }
 }
 

@@ -1,5 +1,5 @@
 // This file Copyright © 2015-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -10,6 +10,10 @@
 #include <stdlib.h> /* abort(), daemon(), exit() */
 #include <fcntl.h> /* open() */
 #include <unistd.h> /* fork(), setsid(), chdir(), dup2(), close(), pipe() */
+
+#include <string_view>
+
+#include <fmt/format.h>
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/error.h>
@@ -34,7 +38,7 @@ static int signal_pipe[2];
 
 static void set_system_error(tr_error** error, int code, std::string_view message)
 {
-    tr_error_set(error, code, tr_strvJoin(message, " ("sv, std::to_string(code), "): "sv, tr_strerror(code)));
+    tr_error_set(error, code, fmt::format(FMT_STRING("{:s}: {:s} ({:d}"), message, tr_strerror(code), code));
 }
 
 /***
@@ -162,7 +166,7 @@ bool dtr_daemon(dtr_callbacks const* cb, void* cb_arg, bool foreground, int* exi
 #else
 
         /* this is loosely based off of glibc's daemon() implementation
-         * http://sourceware.org/git/?p=glibc.git;a=blob_plain;f=misc/daemon.c */
+         * https://sourceware.org/git/?p=glibc.git;a=blob_plain;f=misc/daemon.c */
 
         switch (fork())
         {

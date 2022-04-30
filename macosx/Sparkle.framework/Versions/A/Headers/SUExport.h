@@ -3,7 +3,7 @@
 //  Sparkle
 //
 //  Created by Jake Petroules on 2014-08-23.
-//  Copyright © 2014 Sparkle Project. All rights reserved.
+//  Copyright (c) 2014 Sparkle Project. All rights reserved.
 //
 
 #ifndef SUEXPORT_H

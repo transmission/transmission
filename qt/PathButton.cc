@@ -1,5 +1,5 @@
 // This file Copyright © 2014-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -71,7 +71,7 @@ QString const& PathButton::path() const
 QSize PathButton::sizeHint() const
 {
     QSize const sh(QToolButton::sizeHint());
-    return QSize(qMin(sh.width(), 150), sh.height());
+    return { qMin(sh.width(), 150), sh.height() };
 }
 
 void PathButton::paintEvent(QPaintEvent* /*event*/)
@@ -112,9 +112,7 @@ void PathButton::onClicked() const
         dialog->setNameFilter(name_filter_);
     }
 
-    QFileInfo const path_info(path_);
-
-    if (!path_.isEmpty() && path_info.exists())
+    if (auto const path_info = QFileInfo(path_); !path_.isEmpty() && path_info.exists())
     {
         if (path_info.isDir())
         {

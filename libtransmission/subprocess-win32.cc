@@ -1,5 +1,5 @@
 // This file Copyright © 2011-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -10,6 +10,8 @@
 #include <cwchar>
 #include <map>
 #include <string_view>
+
+#include <fmt/format.h>
 
 #include <windows.h>
 
@@ -34,16 +36,15 @@ static void set_system_error(tr_error** error, DWORD code, std::string_view what
         return;
     }
 
-    char* message = tr_win32_format_message(code);
-
-    if (message == nullptr)
+    if (char* message = tr_win32_format_message(code); message != nullptr)
     {
-        message = tr_strdup_printf("Unknown error: 0x%08lx", code);
+        tr_error_set(error, code, fmt::format(FMT_STRING("{:s} failed: {:s}"), what, message));
+        tr_free(message);
     }
-
-    tr_error_set(error, code, tr_strvJoin(what, " failed: "sv, message));
-
-    tr_free(message);
+    else
+    {
+        tr_error_set(error, code, fmt::format(FMT_STRING("{:s} failed: Unknown error: {:#08x}"), what, code));
+    }
 }
 
 static void append_to_env_block(wchar_t** env_block, size_t* env_block_len, wchar_t const* part, size_t part_len)
@@ -128,9 +129,9 @@ static wchar_t** to_wide_env(std::map<std::string_view, std::string_view> const&
     wchar_t** const wide_env = tr_new(wchar_t*, part_count + 1);
 
     int i = 0;
-    for (auto const& [key_sv, val_sv] : env)
+    for (auto const& [key, val] : env)
     {
-        auto const line = tr_strvJoin(key_sv, "="sv, val_sv);
+        auto const line = fmt::format(FMT_STRING("{:s}={:s}"), key, val);
         wide_env[i++] = tr_win32_utf8_to_native(std::data(line), std::size(line));
     }
     wide_env[i] = nullptr;
@@ -342,7 +343,7 @@ static void append_app_launcher_arguments(enum tr_app_type app_type, char** args
         break;
 
     default:
-        TR_ASSERT_MSG(false, "unsupported application type %d", (int)app_type);
+        TR_ASSERT_MSG(false, fmt::format(FMT_STRING("unsupported application type {:d}"), app_type));
         break;
     }
 }

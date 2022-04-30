@@ -1,5 +1,5 @@
 // This file Copyright © 2009-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -41,6 +41,8 @@ struct tr_ctor
 
     tr_priority_t priority = TR_PRI_NORMAL;
 
+    tr_torrent::labels_t labels = {};
+
     struct optional_args optional_args[2];
 
     std::string incomplete_dir;
@@ -72,7 +74,7 @@ bool tr_ctorSetMetainfoFromFile(tr_ctor* ctor, std::string const& filename, tr_e
         return false;
     }
 
-    if (!tr_loadFile(ctor->contents, filename, error))
+    if (!tr_loadFile(filename, ctor->contents, error))
     {
         return false;
     }
@@ -84,7 +86,7 @@ bool tr_ctorSetMetainfoFromFile(tr_ctor* ctor, std::string const& filename, tr_e
 
 bool tr_ctorSetMetainfoFromFile(tr_ctor* ctor, char const* filename, tr_error** error)
 {
-    return tr_ctorSetMetainfoFromFile(ctor, std::string{ filename ? filename : "" }, error);
+    return tr_ctorSetMetainfoFromFile(ctor, std::string{ filename != nullptr ? filename : "" }, error);
 }
 
 bool tr_ctorSetMetainfo(tr_ctor* ctor, char const* metainfo, size_t len, tr_error** error)
@@ -98,12 +100,8 @@ bool tr_ctorSetMetainfo(tr_ctor* ctor, char const* metainfo, size_t len, tr_erro
 bool tr_ctorSetMetainfoFromMagnetLink(tr_ctor* ctor, char const* magnet_link, tr_error** error)
 {
     ctor->torrent_filename.clear();
-    return ctor->metainfo.parseMagnet(magnet_link ? magnet_link : "", error);
-}
-
-std::string_view tr_ctorGetContents(tr_ctor const* ctor)
-{
-    return std::string_view{ std::data(ctor->contents), std::size(ctor->contents) };
+    ctor->metainfo = {};
+    return ctor->metainfo.parseMagnet(magnet_link != nullptr ? magnet_link : "", error);
 }
 
 char const* tr_ctorGetSourceFile(tr_ctor const* ctor)
@@ -111,7 +109,7 @@ char const* tr_ctorGetSourceFile(tr_ctor const* ctor)
     return ctor->torrent_filename.c_str();
 }
 
-bool tr_ctorSaveContents(tr_ctor const* ctor, std::string const& filename, tr_error** error)
+bool tr_ctorSaveContents(tr_ctor const* ctor, std::string_view filename, tr_error** error)
 {
     TR_ASSERT(ctor != nullptr);
     TR_ASSERT(!std::empty(filename));
@@ -122,7 +120,7 @@ bool tr_ctorSaveContents(tr_ctor const* ctor, std::string const& filename, tr_er
         return false;
     }
 
-    return tr_saveFile(filename, { std::data(ctor->contents), std::size(ctor->contents) }, error);
+    return tr_saveFile(filename, ctor->contents, error);
 }
 
 /***
@@ -216,12 +214,12 @@ void tr_ctorSetDownloadDir(tr_ctor* ctor, tr_ctorMode mode, char const* director
     TR_ASSERT(ctor != nullptr);
     TR_ASSERT(mode == TR_FALLBACK || mode == TR_FORCE);
 
-    ctor->optional_args[mode].download_dir.assign(directory ? directory : "");
+    ctor->optional_args[mode].download_dir.assign(directory != nullptr ? directory : "");
 }
 
 void tr_ctorSetIncompleteDir(tr_ctor* ctor, char const* directory)
 {
-    ctor->incomplete_dir.assign(directory ? directory : "");
+    ctor->incomplete_dir.assign(directory != nullptr ? directory : "");
 }
 
 bool tr_ctorGetPeerLimit(tr_ctor const* ctor, tr_ctorMode mode, uint16_t* setme)
@@ -288,9 +286,11 @@ bool tr_ctorGetIncompleteDir(tr_ctor const* ctor, char const** setme)
     return true;
 }
 
-tr_torrent_metainfo&& tr_ctorStealMetainfo(tr_ctor* ctor)
+tr_torrent_metainfo tr_ctorStealMetainfo(tr_ctor* ctor)
 {
-    return std::move(ctor->metainfo);
+    auto metainfo = tr_torrent_metainfo{};
+    std::swap(ctor->metainfo, metainfo);
+    return metainfo;
 }
 
 tr_torrent_metainfo const* tr_ctorGetMetainfo(tr_ctor const* ctor)
@@ -323,6 +323,20 @@ void tr_ctorSetBandwidthPriority(tr_ctor* ctor, tr_priority_t priority)
 tr_priority_t tr_ctorGetBandwidthPriority(tr_ctor const* ctor)
 {
     return ctor->priority;
+}
+
+/***
+****
+***/
+
+void tr_ctorSetLabels(tr_ctor* ctor, tr_quark const* labels, size_t n_labels)
+{
+    ctor->labels = { labels, labels + n_labels };
+}
+
+tr_torrent::labels_t const& tr_ctorGetLabels(tr_ctor const* ctor)
+{
+    return ctor->labels;
 }
 
 /***

@@ -98,4 +98,4 @@ private:
 #endif
 };
 
-#define trApp static_cast<Application*>(Application::instance())
+#define trApp dynamic_cast<Application*>(Application::instance())

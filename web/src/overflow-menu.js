@@ -1,5 +1,5 @@
 /* @license This file Copyright (C) 2020-2022 Mnemosyne LLC.
-   It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+   It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
    or any future license endorsed by Mnemosyne LLC.
    License text can be found in the licenses/ folder. */
 
@@ -294,12 +294,22 @@ export class OverflowMenu extends EventTarget {
     select.id = 'speed-up-select';
     div.append(select);
 
-    const speeds = ['10', '100', '200', '500', '750', unlimited];
+    const speeds = [
+      '50',
+      '100',
+      '250',
+      '500',
+      '1000',
+      '2500',
+      '5000',
+      '10000',
+      unlimited,
+    ];
     for (const speed of [
       ...new Set(speeds)
         .add(`${session_properties[RPC._UpSpeedLimit]}`)
         .values(),
-    ].sort()) {
+    ].sort((a, b) => a - b)) {
       const option = document.createElement('option');
       option.value = speed;
       option.textContent =
@@ -343,10 +353,11 @@ export class OverflowMenu extends EventTarget {
       ...new Set(speeds)
         .add(`${session_properties[RPC._DownSpeedLimit]}`)
         .values(),
-    ].sort()) {
+    ].sort((a, b) => a - b)) {
       const option = document.createElement('option');
       option.value = speed;
-      option.textContent = speed;
+      option.textContent =
+        speed === unlimited ? unlimited : Formatter.speed(speed);
       select.append(option);
     }
 

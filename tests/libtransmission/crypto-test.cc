@@ -141,9 +141,12 @@ TEST(Crypto, ssha1)
         EXPECT_TRUE(tr_ssha1_matches(ssha1, plain_text));
         EXPECT_TRUE(tr_ssha1_matches_(ssha1, plain_text));
 
+        using ssha1_func = std::string (*)(std::string_view plain_text);
+        static auto constexpr Ssha1Funcs = std::array<ssha1_func, 2>{ tr_ssha1, tr_ssha1_ };
+
         for (size_t j = 0; j < HashCount; ++j)
         {
-            auto const hash = (j % 2 == 0) ? tr_ssha1(plain_text) : tr_ssha1_(plain_text);
+            auto const hash = Ssha1Funcs[j % 2](plain_text);
 
             // phrase matches each of generated hashes
             EXPECT_TRUE(tr_ssha1_matches(hash, plain_text));
@@ -174,19 +177,26 @@ TEST(Crypto, ssha1)
     EXPECT_TRUE(tr_ssha1_matches("{d209a21d3bc4f8fc4f8faf347e69f3def597eb170pySy4ai1ZPMjeU1", "test"));
 }
 
-TEST(Crypto, hex)
+TEST(Crypto, sha1FromString)
 {
-    auto constexpr Hex = std::array<std::string_view, 2>{
-        "a94a8fe5ccb19ba61c4c0873d391e987982fbbd3"sv,
-        "d209a21d3bc4f8fc4f8faf347e69f3def597eb17"sv,
-    };
+    // bad lengths
+    EXPECT_FALSE(tr_sha1_from_string(""));
+    EXPECT_FALSE(tr_sha1_from_string("a94a8fe5ccb19ba61c4c0873d391e987982fbbd"sv));
+    EXPECT_FALSE(tr_sha1_from_string("a94a8fe5ccb19ba61c4c0873d391e987982fbbd33"sv));
+    // nonhex
+    EXPECT_FALSE(tr_sha1_from_string("a94a8fe5ccb19ba61c4cz873d391e987982fbbd3"sv));
+    EXPECT_FALSE(tr_sha1_from_string("a94a8fe5ccb19  61c4c0873d391e987982fbbd3"sv));
 
-    for (auto const& hex : Hex)
-    {
-        auto const digest = tr_sha1_from_string(hex);
-        auto const str = tr_sha1_to_string(digest);
-        EXPECT_EQ(hex, str);
-    }
+    // lowercase hex
+    auto const baseline = "a94a8fe5ccb19ba61c4c0873d391e987982fbbd3"sv;
+    auto const lc = tr_sha1_from_string(baseline);
+    EXPECT_TRUE(lc);
+    EXPECT_EQ(baseline, tr_sha1_to_string(*lc));
+
+    // uppercase hex should yield the same result
+    auto const uc = tr_sha1_from_string(tr_strupper(baseline));
+    EXPECT_TRUE(uc);
+    EXPECT_EQ(*lc, *uc);
 }
 
 TEST(Crypto, random)

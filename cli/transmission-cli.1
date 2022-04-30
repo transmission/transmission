@@ -32,7 +32,7 @@
 .Op Fl h
 .Op Fl m | M
 .Op Fl p Ar port
-.Op Fl t Ar tos
+.Op Fl -tos Ar tos
 .Op Fl u Ar number | Fl U
 .Op Fl v
 .Op Fl w Ar directory
@@ -65,28 +65,52 @@ Prefer unencrypted peer connections.
 Set a script to run when the torrent finishes
 .It Fl g Fl -config-dir Ar directory
 Where to look for configuration files. This can be used to swap between using the cli, daemon, gtk, and qt clients.
-See https://github.com/transmission/transmission/wiki/Configuration-Files for more information.
+See https://github.com/transmission/transmission/blob/main/docs/Configuration-Files.md for more information.
 .It Fl h Fl -help
 Prints a short usage summary.
 .It Fl m Fl -portmap
 Enable portmapping via NAT-PMP or UPnP
 .It Fl M Fl -no-portmap
 Disable portmapping
-.It Fl n Fl -new Ar sourcefile
-Create torrent from the specified file or directory
 .It Fl p -port Ar port
 Set the port to listen for incoming peers. (Default: 51413)
-.It Fl t -tos Ar tos
-Set the peer socket TOS for local router-based traffic shaping.
-Valid values are
+.It Fl -tos Ar tos
+.nf
+Use a ToS or DSCP name to set the peer socket service type for
+local router-based traffic shaping. Valid values are a decimal
+value 0-255, or any of these DSCP strings:
+.fi
 .Pp
+.Dq af11 ,
+.Dq af12 ,
+.Dq af13 ,
+.Dq af21 ,
+.Dq af22 ,
+.Dq af23 ,
+.Dq af31 ,
+.Dq af32 ,
+.Dq af33 ,
+.Dq af41 ,
+.Dq af42 ,
+.Dq af43 ,
+.Dq cs0 ,
+.Dq cs1 ,
+.Dq cs2 ,
+.Dq cs3 ,
+.Dq cs4 ,
+.Dq cs5 ,
+.Dq cs6 ,
+.Dq cs7 ,
+.Dq ef ,
+.Dq le
+
+These ToS keys are deprecated and will be removed in the future:
 .Dq default ,
 .Dq lowcost ,
-.Dq throughput ,
+.Dq lowdelay,
 .Dq reliability ,
-.Dq lowdelay ,
+.Dq throughput
 .Pp
-a decimal value 0-255 or a hexidecimal value 0x00-0xff)
 .It Fl u -uplimit Ar number
 Set the maximum upload speed in KB/s
 .It Fl U -no-uplimit

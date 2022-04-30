@@ -1,5 +1,5 @@
 // This file Copyright 2008-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -12,44 +12,6 @@
 #include "utils.h"
 
 static auto constexpr Floor = int{ 32 };
-
-int tr_lowerBound(
-    void const* key,
-    void const* base,
-    size_t nmemb,
-    size_t size,
-    tr_voidptr_compare_func compar,
-    bool* exact_match)
-{
-    size_t first = 0;
-    auto const* cbase = static_cast<char const*>(base);
-    bool exact = false;
-
-    while (nmemb != 0)
-    {
-        size_t const half = nmemb / 2;
-        size_t const middle = first + half;
-        int const c = (*compar)(key, cbase + size * middle);
-
-        if (c <= 0)
-        {
-            if (c == 0)
-            {
-                exact = true;
-            }
-
-            nmemb = half;
-        }
-        else
-        {
-            first = middle + 1;
-            nmemb = nmemb - half - 1;
-        }
-    }
-
-    *exact_match = exact;
-    return first;
-}
 
 void tr_ptrArrayDestruct(tr_ptrArray* p, PtrArrayForeachFunc func)
 {
@@ -102,18 +64,6 @@ int tr_ptrArrayInsert(tr_ptrArray* t, void* ptr, int pos)
     t->items[pos] = ptr;
     t->n_items++;
     return pos;
-}
-
-void* tr_ptrArrayPop(tr_ptrArray* t)
-{
-    void* ret = nullptr;
-
-    if (t->n_items != 0)
-    {
-        ret = t->items[--t->n_items];
-    }
-
-    return ret;
 }
 
 void tr_ptrArrayErase(tr_ptrArray* t, int begin, int end)

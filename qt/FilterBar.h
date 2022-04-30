@@ -57,7 +57,7 @@ private:
     TorrentModel const& torrents_;
     TorrentFilter const& filter_;
 
-    std::map<FaviconCache::Key, int> tracker_counts_;
+    std::map<QString, int> sitename_counts_;
     FilterBarComboBox* activity_combo_ = {};
     FilterBarComboBox* tracker_combo_ = {};
     QLabel* count_label_ = {};

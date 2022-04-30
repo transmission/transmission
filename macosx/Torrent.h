@@ -24,7 +24,7 @@ typedef NS_ENUM(unsigned int, TorrentDeterminationType) {
                          lib:(tr_session*)lib;
 - (instancetype)initWithTorrentStruct:(tr_torrent*)torrentStruct location:(NSString*)location lib:(tr_session*)lib;
 - (instancetype)initWithMagnetAddress:(NSString*)address location:(NSString*)location lib:(tr_session*)lib;
-- (instancetype)initWithHistory:(NSDictionary*)history lib:(tr_session*)lib forcePause:(BOOL)pause;
+- (void)setResumeStatusForTorrent:(Torrent*)torrent withHistory:(NSDictionary*)history forcePause:(BOOL)pause;
 
 @property(nonatomic, readonly) NSDictionary* history;
 
@@ -93,7 +93,7 @@ typedef NS_ENUM(unsigned int, TorrentDeterminationType) {
 @property(nonatomic, readonly) uint64_t sizeLeft;
 
 @property(nonatomic, readonly) NSMutableArray* allTrackerStats;
-@property(nonatomic, readonly) NSArray* allTrackersFlat; //used by GroupRules
+@property(nonatomic, readonly) NSArray<NSString*>* allTrackersFlat; //used by GroupRules
 - (BOOL)addTrackerToNewTier:(NSString*)tracker;
 - (void)removeTrackers:(NSSet*)trackers;
 
@@ -133,10 +133,10 @@ typedef NS_ENUM(unsigned int, TorrentDeterminationType) {
 @property(nonatomic, getter=isAnyErrorOrWarning, readonly) BOOL anyErrorOrWarning;
 @property(nonatomic, readonly) NSString* errorMessage;
 
-@property(nonatomic, readonly) NSArray* peers;
+@property(nonatomic, readonly) NSArray<NSDictionary*>* peers;
 
 @property(nonatomic, readonly) NSUInteger webSeedCount;
-@property(nonatomic, readonly) NSArray* webSeeds;
+@property(nonatomic, readonly) NSArray<NSDictionary*>* webSeeds;
 
 @property(nonatomic, readonly) NSString* progressString;
 @property(nonatomic, readonly) NSString* statusString;
@@ -172,8 +172,8 @@ typedef NS_ENUM(unsigned int, TorrentDeterminationType) {
 @property(nonatomic, readonly) NSInteger groupOrderValue;
 - (void)checkGroupValueForRemoval:(NSNotification*)notification;
 
-@property(nonatomic, readonly) NSArray* fileList;
-@property(nonatomic, readonly) NSArray* flatFileList;
+@property(nonatomic, readonly) NSArray<FileListNode*>* fileList;
+@property(nonatomic, readonly) NSArray<FileListNode*>* flatFileList;
 @property(nonatomic, readonly) NSInteger fileCount;
 
 //methods require fileStats to have been updated recently to be accurate

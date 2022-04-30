@@ -13,6 +13,8 @@
 
 @interface BlocklistScheduler ()
 
+@property(nonatomic) NSTimer* fTimer;
+
 - (void)runUpdater;
 
 @end
@@ -55,25 +57,27 @@ BlocklistScheduler* fScheduler = nil;
 
     NSDate* useDate = lastUpdateDate ? [lastUpdateDate laterDate:closeDate] : closeDate;
 
-    fTimer = [[NSTimer alloc] initWithFireDate:useDate interval:0 target:self selector:@selector(runUpdater) userInfo:nil
-                                       repeats:NO];
+    self.fTimer = [[NSTimer alloc] initWithFireDate:useDate interval:0 target:self selector:@selector(runUpdater) userInfo:nil
+                                            repeats:NO];
 
     //current run loop usually means a second update won't work
     NSRunLoop* loop = NSRunLoop.mainRunLoop;
-    [loop addTimer:fTimer forMode:NSDefaultRunLoopMode];
-    [loop addTimer:fTimer forMode:NSModalPanelRunLoopMode];
-    [loop addTimer:fTimer forMode:NSEventTrackingRunLoopMode];
+    [loop addTimer:self.fTimer forMode:NSDefaultRunLoopMode];
+    [loop addTimer:self.fTimer forMode:NSModalPanelRunLoopMode];
+    [loop addTimer:self.fTimer forMode:NSEventTrackingRunLoopMode];
 }
 
 - (void)cancelSchedule
 {
-    [fTimer invalidate];
-    fTimer = nil;
+    [self.fTimer invalidate];
+    self.fTimer = nil;
 }
+
+#pragma mark - Private
 
 - (void)runUpdater
 {
-    fTimer = nil;
+    self.fTimer = nil;
     [BlocklistDownloader downloader];
 }
 

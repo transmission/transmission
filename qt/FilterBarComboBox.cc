@@ -1,5 +1,5 @@
 // This file Copyright © 2012-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -87,18 +87,16 @@ void FilterBarComboBox::paintEvent(QPaintEvent* e)
 
     if (model_index.isValid())
     {
-        QStyle* s = style();
+        QStyle const* const s = style();
         int const hmargin = getHSpacing(this);
 
         QRect rect = s->subControlRect(QStyle::CC_ComboBox, &opt, QStyle::SC_ComboBoxEditField, this);
         rect.adjust(2, 1, -2, -1);
 
         // draw the icon
-        QIcon const icon = Utils::getIconFromIndex(model_index);
-
-        if (!icon.isNull())
+        if (auto const icon = Utils::getIconFromIndex(model_index); !icon.isNull())
         {
-            QRect const icon_rect = QStyle::alignedRect(opt.direction, Qt::AlignLeft | Qt::AlignVCenter, opt.iconSize, rect);
+            auto const icon_rect = QStyle::alignedRect(opt.direction, Qt::AlignLeft | Qt::AlignVCenter, opt.iconSize, rect);
             icon.paint(&painter, icon_rect, Qt::AlignCenter, StyleHelper::getIconMode(opt.state), QIcon::Off);
             Utils::narrowRect(rect, icon_rect.width() + hmargin, 0, opt.direction);
         }

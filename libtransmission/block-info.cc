@@ -1,83 +1,74 @@
 // This file Copyright © 2007-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
-
-#include <event2/util.h>
 
 #include "transmission.h"
 
 #include "block-info.h"
 #include "tr-assert.h"
 
-// Decide on a block size. Constraints:
-// (1) most clients decline requests over 16 KiB
-// (2) pieceSize must be a multiple of block size
-uint32_t tr_block_info::bestBlockSize(uint64_t piece_size)
+void tr_block_info::initSizes(uint64_t total_size_in, uint32_t piece_size_in) noexcept
 {
-    uint32_t b = piece_size;
-
-    auto constexpr MaxBlockSize = uint32_t{ 1024 * 16 };
-    while (b > MaxBlockSize)
-    {
-        b /= 2U;
-    }
-
-    if (b == 0 || piece_size % b != 0) // not cleanly divisible
-    {
-        return 0;
-    }
-
-    return b;
-}
-
-void tr_block_info::initSizes(uint64_t total_size_in, uint64_t piece_size_in)
-{
-    total_size = total_size_in;
-    piece_size = piece_size_in;
-    block_size = bestBlockSize(piece_size);
-
-    if (piece_size == 0 || block_size == 0)
+    TR_ASSERT(piece_size_in == 0 || piece_size_in >= BlockSize);
+    if (piece_size_in == 0)
     {
         *this = {};
         return;
     }
 
-    n_pieces = (total_size + piece_size - 1) / piece_size;
+    total_size_ = total_size_in;
+    piece_size_ = piece_size_in;
+    n_pieces_ = (total_size_ + piece_size_ - 1) / piece_size_;
+    n_blocks_ = (total_size_ + BlockSize - 1) / BlockSize;
 
-    auto remainder = total_size % piece_size;
-    final_piece_size = remainder ? remainder : piece_size;
+    uint32_t remainder = total_size_ % piece_size_;
+    final_piece_size_ = remainder != 0U ? remainder : piece_size_;
 
-    remainder = total_size % block_size;
-    final_block_size = remainder ? remainder : block_size;
+    remainder = total_size_ % BlockSize;
+    final_block_size_ = remainder != 0U ? remainder : BlockSize;
+}
 
-    if (block_size != 0)
+tr_block_info::Location tr_block_info::byteLoc(uint64_t byte_idx) const noexcept
+{
+    TR_ASSERT(byte_idx <= totalSize());
+
+    if (!isInitialized())
     {
-        n_blocks = (total_size + block_size - 1) / block_size;
-        n_blocks_in_piece = piece_size / block_size;
-        n_blocks_in_final_piece = (final_piece_size + block_size - 1) / block_size;
+        return {};
     }
 
-#ifdef TR_ENABLE_ASSERTS
-    // check our work
-    if (block_size != 0)
+    auto loc = Location{};
+
+    loc.byte = byte_idx;
+
+    if (byte_idx == totalSize()) // handle 0-byte files at the end of a torrent
     {
-        TR_ASSERT(piece_size % block_size == 0);
+        loc.block = blockCount() - 1;
+        loc.piece = pieceCount() - 1;
+    }
+    else
+    {
+        loc.block = byte_idx / BlockSize;
+        loc.piece = byte_idx / pieceSize();
     }
 
-    uint64_t t = n_pieces - 1;
-    t *= piece_size;
-    t += final_piece_size;
-    TR_ASSERT(t == total_size);
+    loc.block_offset = static_cast<uint32_t>(loc.byte - (uint64_t{ loc.block } * BlockSize));
+    loc.piece_offset = static_cast<uint32_t>(loc.byte - (uint64_t{ loc.piece } * pieceSize()));
 
-    t = n_blocks - 1;
-    t *= block_size;
-    t += final_block_size;
-    TR_ASSERT(t == total_size);
+    return loc;
+}
 
-    t = n_pieces - 1;
-    t *= n_blocks_in_piece;
-    t += n_blocks_in_final_piece;
-    TR_ASSERT(t == n_blocks);
-#endif
+tr_block_info::Location tr_block_info::blockLoc(tr_block_index_t block) const noexcept
+{
+    TR_ASSERT(block < blockCount());
+
+    return byteLoc(uint64_t{ block } * BlockSize);
+}
+
+tr_block_info::Location tr_block_info::pieceLoc(tr_piece_index_t piece, uint32_t offset, uint32_t length) const noexcept
+{
+    TR_ASSERT(piece < pieceCount());
+
+    return byteLoc(uint64_t{ piece } * pieceSize() + offset + length);
 }

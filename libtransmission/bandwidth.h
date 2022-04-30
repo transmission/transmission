@@ -11,6 +11,7 @@
 
 #include <array>
 #include <cstddef> // size_t
+#include <cstdint> // uint64_t
 #include <vector>
 
 #include "transmission.h"
@@ -23,6 +24,14 @@ class tr_peerIo;
  * @addtogroup networked_io Networked IO
  * @{
  */
+
+struct tr_bandwidth_limits
+{
+    unsigned int up_limit_KBps = 0;
+    unsigned int down_limit_KBps = 0;
+    bool up_limited = false;
+    bool down_limited = false;
+};
 
 /**
  * Bandwidth is an object for measuring and constraining bandwidth speeds.
@@ -104,12 +113,12 @@ public:
 
     void setParent(Bandwidth* newParent);
 
-    [[nodiscard]] constexpr tr_priority_t getPriority() const
+    [[nodiscard]] constexpr tr_priority_t getPriority() const noexcept
     {
         return this->priority_;
     }
 
-    constexpr void setPriority(tr_priority_t prio)
+    constexpr void setPriority(tr_priority_t prio) noexcept
     {
         this->priority_ = prio;
     }
@@ -117,7 +126,7 @@ public:
     /**
      * @brief clamps byte_count down to a number that this bandwidth will allow to be consumed
      */
-    [[nodiscard]] unsigned int clamp(tr_direction dir, unsigned int byte_count) const
+    [[nodiscard]] unsigned int clamp(tr_direction dir, unsigned int byte_count) const noexcept
     {
         return this->clamp(0, dir, byte_count);
     }
@@ -202,17 +211,13 @@ public:
 
     static constexpr size_t HistoryMSec = 2000U;
     static constexpr size_t IntervalMSec = HistoryMSec;
-    static constexpr size_t GranularityMSec = 200;
+    static constexpr size_t GranularityMSec = 250;
     static constexpr size_t HistorySize = (IntervalMSec / GranularityMSec);
 
     struct RateControl
     {
-        struct Transfer
-        {
-            uint64_t date_;
-            uint64_t size_;
-        };
-        std::array<Transfer, HistorySize> transfers_;
+        std::array<uint64_t, HistorySize> date_;
+        std::array<uint32_t, HistorySize> size_;
         uint64_t cache_time_;
         unsigned int cache_val_;
         int newest_;
@@ -224,9 +229,12 @@ public:
         RateControl piece_;
         unsigned int bytes_left_;
         unsigned int desired_speed_bps_;
-        bool is_limited_;
-        bool honor_parent_limits_;
+        bool is_limited_ = false;
+        bool honor_parent_limits_ = true;
     };
+
+    tr_bandwidth_limits getLimits() const;
+    void setLimits(tr_bandwidth_limits const* limits);
 
 private:
     static unsigned int getSpeedBytesPerSecond(RateControl& r, unsigned int interval_msec, uint64_t now);
@@ -244,8 +252,8 @@ private:
         std::vector<tr_peerIo*>& peer_pool);
 
     mutable std::array<Band, 2> band_ = {};
-    Bandwidth* parent_ = nullptr;
     std::vector<Bandwidth*> children_;
+    Bandwidth* parent_ = nullptr;
     tr_peerIo* peer_ = nullptr;
     tr_priority_t priority_ = 0;
 };

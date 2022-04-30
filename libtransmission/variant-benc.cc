@@ -1,16 +1,18 @@
 // This file Copyright © 2008-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
 #include <array>
 #include <cctype> /* isdigit() */
 #include <deque>
-#include <cerrno>
 #include <string_view>
 #include <optional>
 
 #include <event2/buffer.h>
+
+#include <fmt/compile.h>
+#include <fmt/format.h>
 
 #define LIBTRANSMISSION_VARIANT_MODULE
 
@@ -19,7 +21,7 @@
 #include "benc.h"
 #include "tr-assert.h"
 #include "quark.h"
-#include "utils.h" /* tr_snprintf() */
+#include "utils.h"
 #include "variant-common.h"
 #include "variant.h"
 
@@ -59,14 +61,13 @@ std::optional<int64_t> ParseInt(std::string_view* benc)
 
     // find the ending delimiter
     walk.remove_prefix(std::size(Prefix));
-    auto const pos = walk.find(Suffix);
-    if (pos == std::string_view::npos)
+    if (auto const pos = walk.find(Suffix); pos == std::string_view::npos)
     {
         return {};
     }
 
     // leading zeroes are not allowed
-    if ((walk[0] == '0' && isdigit(walk[1])) || (walk[0] == '-' && walk[1] == '0' && isdigit(walk[2])))
+    if ((walk[0] == '0' && (isdigit(walk[1]) != 0)) || (walk[0] == '-' && walk[1] == '0' && (isdigit(walk[2]) != 0)))
     {
         return {};
     }
@@ -100,6 +101,11 @@ std::optional<std::string_view> ParseString(std::string_view* benc)
 
     // get the string length
     auto svtmp = benc->substr(0, colon_pos);
+    if (!std::all_of(std::begin(svtmp), std::end(svtmp), [](auto ch) { return isdigit(ch) != 0; }))
+    {
+        return {};
+    }
+
     auto const len = tr_parseNum<size_t>(svtmp);
     if (!len || *len >= MaxBencStrLength)
     {
@@ -142,26 +148,31 @@ struct MyHandler : public transmission::benc::Handler
 
     bool Int64(int64_t value, Context const& /*context*/) final
     {
-        if (tr_variant* variant = get_node(); variant != nullptr)
+        auto* const variant = get_node();
+        if (variant == nullptr)
         {
-            tr_variantInitInt(variant, value);
+            return false;
         }
 
+        tr_variantInitInt(variant, value);
         return true;
     }
 
     bool String(std::string_view sv, Context const& /*context*/) final
     {
-        if (tr_variant* variant = get_node(); variant != nullptr)
+        auto* const variant = get_node();
+        if (variant == nullptr)
         {
-            if ((parse_opts_ & TR_VARIANT_PARSE_INPLACE) != 0)
-            {
-                tr_variantInitStrView(variant, sv);
-            }
-            else
-            {
-                tr_variantInitStr(variant, sv);
-            }
+            return false;
+        }
+
+        if ((parse_opts_ & TR_VARIANT_PARSE_INPLACE) != 0)
+        {
+            tr_variantInitStrView(variant, sv);
+        }
+        else
+        {
+            tr_variantInitStr(variant, sv);
         }
 
         return true;
@@ -169,12 +180,14 @@ struct MyHandler : public transmission::benc::Handler
 
     bool StartDict(Context const& /*context*/) final
     {
-        if (tr_variant* variant = get_node(); variant != nullptr)
+        auto* const variant = get_node();
+        if (variant == nullptr)
         {
-            tr_variantInitDict(variant, 0);
-            stack_.push_back(variant);
+            return false;
         }
 
+        tr_variantInitDict(variant, 0);
+        stack_.push_back(variant);
         return true;
     }
 
@@ -187,26 +200,36 @@ struct MyHandler : public transmission::benc::Handler
 
     bool EndDict(Context const& /*context*/) final
     {
-        stack_.pop_back();
+        if (std::empty(stack_))
+        {
+            return false;
+        }
 
+        stack_.pop_back();
         return true;
     }
 
     bool StartArray(Context const& /*context*/) final
     {
-        if (tr_variant* variant = get_node(); variant != nullptr)
+        auto* const variant = get_node();
+        if (variant == nullptr)
         {
-            tr_variantInitList(variant, 0);
-            stack_.push_back(variant);
+            return false;
         }
 
+        tr_variantInitList(variant, 0);
+        stack_.push_back(variant);
         return true;
     }
 
     bool EndArray(Context const& /*context*/) final
     {
-        stack_.pop_back();
+        if (std::empty(stack_))
+        {
+            return false;
+        }
 
+        stack_.pop_back();
         return true;
     }
 
@@ -219,19 +242,14 @@ private:
         {
             node = top_;
         }
-        else
+        else if (auto* parent = stack_.back(); tr_variantIsList(parent))
         {
-            auto* parent = stack_.back();
-
-            if (tr_variantIsList(parent))
-            {
-                node = tr_variantListAdd(parent);
-            }
-            else if (key_ && tr_variantIsDict(parent))
-            {
-                node = tr_variantDictAdd(parent, *key_);
-                key_.reset();
-            }
+            node = tr_variantListAdd(parent);
+        }
+        else if (key_ && tr_variantIsDict(parent))
+        {
+            node = tr_variantDictAdd(parent, *key_);
+            key_.reset();
         }
 
         return node;
@@ -243,12 +261,7 @@ bool tr_variantParseBenc(tr_variant& top, int parse_opts, std::string_view benc,
     using Stack = transmission::benc::ParserStack<512>;
     auto stack = Stack{};
     auto handler = MyHandler{ &top, parse_opts };
-    bool const ok = transmission::benc::parse(benc, stack, handler, setme_end, error);
-    if (!ok)
-    {
-        tr_variantFree(&top);
-    }
-    return ok;
+    return transmission::benc::parse(benc, stack, handler, setme_end, error) && std::empty(stack);
 }
 
 /****
@@ -257,13 +270,15 @@ bool tr_variantParseBenc(tr_variant& top, int parse_opts, std::string_view benc,
 
 static void saveIntFunc(tr_variant const* val, void* vevbuf)
 {
-    auto* evbuf = static_cast<struct evbuffer*>(vevbuf);
-    evbuffer_add_printf(evbuf, "i%" PRId64 "e", val->val.i);
+    auto buf = std::array<char, 64>{};
+    auto const out = fmt::format_to(std::data(buf), FMT_COMPILE("i{:d}e"), val->val.i);
+    auto* const evbuf = static_cast<evbuffer*>(vevbuf);
+    evbuffer_add(evbuf, std::data(buf), static_cast<size_t>(out - std::data(buf)));
 }
 
 static void saveBoolFunc(tr_variant const* val, void* vevbuf)
 {
-    auto* evbuf = static_cast<struct evbuffer*>(vevbuf);
+    auto* const evbuf = static_cast<evbuffer*>(vevbuf);
     if (val->val.b)
     {
         evbuffer_add(evbuf, "i1e", 3);
@@ -274,41 +289,48 @@ static void saveBoolFunc(tr_variant const* val, void* vevbuf)
     }
 }
 
-static void saveRealFunc(tr_variant const* val, void* vevbuf)
+static void saveStringImpl(evbuffer* evbuf, std::string_view sv)
 {
-    auto buf = std::array<char, 64>{};
-    int const len = tr_snprintf(std::data(buf), std::size(buf), "%f", val->val.d);
-
-    auto* evbuf = static_cast<evbuffer*>(vevbuf);
-    evbuffer_add_printf(evbuf, "%d:", len);
-    evbuffer_add(evbuf, std::data(buf), len);
+    // `${sv.size()}:${sv}`
+    auto prefix = std::array<char, 32>{};
+    auto out = fmt::format_to(std::data(prefix), FMT_COMPILE("{:d}:"), std::size(sv));
+    evbuffer_add(evbuf, std::data(prefix), out - std::data(prefix));
+    evbuffer_add(evbuf, std::data(sv), std::size(sv));
 }
 
 static void saveStringFunc(tr_variant const* v, void* vevbuf)
 {
     auto sv = std::string_view{};
     (void)!tr_variantGetStrView(v, &sv);
+    auto* const evbuf = static_cast<evbuffer*>(vevbuf);
+    saveStringImpl(evbuf, sv);
+}
 
-    auto* evbuf = static_cast<struct evbuffer*>(vevbuf);
-    evbuffer_add_printf(evbuf, "%zu:", std::size(sv));
-    evbuffer_add(evbuf, std::data(sv), std::size(sv));
+static void saveRealFunc(tr_variant const* val, void* vevbuf)
+{
+    // the benc spec doesn't handle floats; save it as a string.
+
+    auto buf = std::array<char, 64>{};
+    auto out = fmt::format_to(std::data(buf), FMT_COMPILE("{:f}"), val->val.d);
+    auto* const evbuf = static_cast<evbuffer*>(vevbuf);
+    saveStringImpl(evbuf, { std::data(buf), static_cast<size_t>(out - std::data(buf)) });
 }
 
 static void saveDictBeginFunc(tr_variant const* /*val*/, void* vevbuf)
 {
-    auto* evbuf = static_cast<struct evbuffer*>(vevbuf);
+    auto* const evbuf = static_cast<evbuffer*>(vevbuf);
     evbuffer_add(evbuf, "d", 1);
 }
 
 static void saveListBeginFunc(tr_variant const* /*val*/, void* vevbuf)
 {
-    auto* evbuf = static_cast<struct evbuffer*>(vevbuf);
+    auto* const evbuf = static_cast<evbuffer*>(vevbuf);
     evbuffer_add(evbuf, "l", 1);
 }
 
 static void saveContainerEndFunc(tr_variant const* /*val*/, void* vevbuf)
 {
-    auto* evbuf = static_cast<struct evbuffer*>(vevbuf);
+    auto* const evbuf = static_cast<evbuffer*>(vevbuf);
     evbuffer_add(evbuf, "e", 1);
 }
 
@@ -322,7 +344,7 @@ static struct VariantWalkFuncs const walk_funcs = {
     saveContainerEndFunc, //
 };
 
-void tr_variantToBufBenc(tr_variant const* top, struct evbuffer* buf)
+void tr_variantToBufBenc(tr_variant const* top, evbuffer* buf)
 {
     tr_variantWalk(top, &walk_funcs, buf, true);
 }

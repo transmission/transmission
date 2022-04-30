@@ -1,5 +1,5 @@
 /* @license This file Copyright (C) 2020-2022 Mnemosyne LLC.
-   It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+   It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
    or any future license endorsed by Mnemosyne LLC.
    License text can be found in the licenses/ folder. */
 
@@ -115,7 +115,9 @@ export class Inspector extends EventTarget {
       ['hash', 'Hash:'],
       ['privacy', 'Privacy:'],
       ['origin', 'Origin:'],
+      ['magnetLink', 'Magnet:'],
       ['comment', 'Comment:'],
+      ['labels', 'Labels:'],
     ];
     for (const [name, text] of rows) {
       elements[name] = append_row(text);
@@ -338,7 +340,9 @@ export class Inspector extends EventTarget {
         (accumulator, t) => accumulator + t.getFailedEver(),
         0
       );
-      string = f ? `${fmt.size(d)} (${fmt.size(f)} corrupt)` : fmt.size(d);
+      string = f
+        ? `${fmt.size(d)} (+${fmt.size(f)} discarded after failed checksum)`
+        : fmt.size(d);
     }
     setTextContent(e.info.downloaded, string);
 
@@ -346,17 +350,19 @@ export class Inspector extends EventTarget {
     if (torrents.length === 0) {
       string = none;
     } else {
-      const u = torrents.reduce(
+      const uploaded = torrents.reduce(
         (accumulator, t) => accumulator + t.getUploadedEver(),
         0
       );
-      const d =
+      const denominator =
         torrents.reduce(
-          (accumulator, t) => accumulator + t.getDownloadedEver(),
+          (accumulator, t) => accumulator + t.getSizeWhenDone(),
           0
         ) ||
         torrents.reduce((accumulator, t) => accumulator + t.getHaveValid(), 0);
-      string = `${fmt.size(u)} (Ratio: ${fmt.ratioString(Utils.ratio(u, d))})`;
+      string = `${fmt.size(uploaded)} (Ratio: ${fmt.ratioString(
+        Utils.ratio(uploaded, denominator)
+      )})`;
     }
     setTextContent(e.info.uploaded, string);
 
@@ -489,6 +495,10 @@ export class Inspector extends EventTarget {
       setTextContent(e.info.comment, string);
     }
 
+    // labels
+    string = torrents.length === 0 ? none : torrents[0].getLabels().join(', ');
+    setTextContent(e.info.labels, string);
+
     // origin
     if (torrents.length === 0) {
       string = none;
@@ -528,6 +538,19 @@ export class Inspector extends EventTarget {
       string = torrents.every((t) => get(t) === first) ? first : mixed;
     }
     setTextContent(e.info.location, string);
+
+    // magnetLink
+    if (torrents.length === 0) {
+      setTextContent(e.info.magnetLink, none);
+    } else if (torrents.length > 1) {
+      setTextContent(e.info.magnetLink, mixed);
+    } else {
+      const link = torrents[0].getMagnetLink();
+      Utils.setInnerHTML(
+        e.info.magnetLink,
+        `<a class="inspector-info-magnet" href="${link}"><button></button></a>`
+      );
+    }
   }
 
   ///  PEERS PAGE
@@ -717,7 +740,7 @@ export class Inspector extends EventTarget {
         element.classList.add('tier-list-tracker');
         setTextContent(
           element,
-          `${tracker.domain || tracker.host || tracker.announce} - tier ${
+          `${tracker.sitename || tracker.host || tracker.announce} - tier ${
             tracker.tier + 1
           }`
         );

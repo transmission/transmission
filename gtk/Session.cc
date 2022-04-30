@@ -3,16 +3,21 @@
 // A copy of this license can be found in licenses/ .
 
 #include <algorithm>
-#include <cmath> /* pow() */
+#include <cmath> // pow()
 #include <cstring> // strstr
+#include <cinttypes> // PRId64
 #include <functional>
+#include <iostream>
 #include <map>
 #include <memory>
 #include <string>
+#include <string_view>
 
 #include <glibmm/i18n.h>
 
 #include <event2/buffer.h>
+
+#include <fmt/core.h>
 
 #include <libtransmission/transmission.h>
 
@@ -127,7 +132,7 @@ private:
 
     tr_torrent* create_new_torrent(tr_ctor* ctor);
 
-    void set_sort_mode(std::string const& mode, bool is_reversed);
+    void set_sort_mode(std::string_view mode, bool is_reversed);
 
     void maybe_inhibit_hibernation();
     void set_hibernation_allowed(bool allowed);
@@ -270,29 +275,25 @@ bool is_valid_eta(int t)
 
 int compare_eta(int a, int b)
 {
-    int ret;
-
     bool const a_valid = is_valid_eta(a);
     bool const b_valid = is_valid_eta(b);
 
     if (!a_valid && !b_valid)
     {
-        ret = 0;
-    }
-    else if (!a_valid)
-    {
-        ret = -1;
-    }
-    else if (!b_valid)
-    {
-        ret = 1;
-    }
-    else
-    {
-        ret = a < b ? 1 : -1;
+        return 0;
     }
 
-    return ret;
+    if (!a_valid)
+    {
+        return -1;
+    }
+
+    if (!b_valid)
+    {
+        return 1;
+    }
+
+    return a < b ? 1 : -1;
 }
 
 int compare_double(double a, double b)
@@ -537,7 +538,7 @@ int compare_by_state(Gtk::TreeModel::iterator const& a, Gtk::TreeModel::iterator
 
 } // namespace
 
-void Session::Impl::set_sort_mode(std::string const& mode, bool is_reversed)
+void Session::Impl::set_sort_mode(std::string_view mode, bool is_reversed)
 {
     auto const& col = torrent_cols.torrent;
     Gtk::TreeSortable::SlotCompare sort_func;
@@ -616,7 +617,13 @@ void rename_torrent(Glib::RefPtr<Gio::File> const& file)
         }
         catch (Glib::Error const& e)
         {
-            g_message("Unable to rename \"%s\" as \"%s\": %s", old_name.c_str(), new_name.c_str(), e.what().c_str());
+            auto const errmsg = fmt::format(
+                _("Couldn't rename '{old_path}' as '{path}': {error} ({error_code})"),
+                fmt::arg("old_path", old_name),
+                fmt::arg("path", new_name),
+                fmt::arg("error", e.what()),
+                fmt::arg("error_code", e.code()));
+            g_message("%s", errmsg.c_str());
         }
     }
 }
@@ -900,10 +907,8 @@ void Session::Impl::on_torrent_metadata_changed(tr_torrent* tor)
     Glib::signal_idle().connect(
         [this, core = get_core_ptr(), torrent_id = tr_torrentId(tor)]()
         {
-            auto const* const tor2 = tr_torrentFindFromId(session_, torrent_id);
-
             /* update the torrent's collated name */
-            if (tor2 != nullptr)
+            if (auto const* const tor2 = tr_torrentFindFromId(session_, torrent_id); tor2 != nullptr)
             {
                 if (auto const iter = find_row_from_torrent_id(raw_model_, torrent_id); iter)
                 {
@@ -1034,7 +1039,7 @@ int Session::Impl::add_ctor(tr_ctor* ctor, bool do_prompt, bool do_notify)
 
     if (tr_torrentFindFromMetainfo(get_session(), metainfo) != nullptr)
     {
-        /* don't complain about .torrent files in the watch directory
+        /* don't complain about torrent files in the watch directory
          * that have already been added... that gets annoying and we
          * don't want to be nagging users to clean up their watch dirs */
         if (tr_ctorGetSourceFile(ctor) == nullptr || !adding_from_watch_dir_)
@@ -1112,7 +1117,8 @@ void Session::Impl::add_file_async_callback(
     {
         if (!file->load_contents_finish(result, contents, length))
         {
-            g_message(_("Couldn't read \"%s\""), file->get_parse_name().c_str());
+            auto const errmsg = fmt::format(_("Couldn't read '{path}'"), fmt::arg("path", file->get_parse_name()));
+            g_message("%s", errmsg.c_str());
         }
         else if (tr_ctorSetMetainfo(ctor, contents, length, nullptr))
         {
@@ -1125,7 +1131,12 @@ void Session::Impl::add_file_async_callback(
     }
     catch (Glib::Error const& e)
     {
-        g_message(_("Couldn't read \"%s\": %s"), file->get_parse_name().c_str(), e.what().c_str());
+        auto const errmsg = fmt::format(
+            _("Couldn't read '{path}': {error} ({error_code})"),
+            fmt::arg("path", file->get_parse_name()),
+            fmt::arg("error", e.what()),
+            fmt::arg("error_code", e.code()));
+        g_message("%s", errmsg.c_str());
     }
 
     dec_busy();
@@ -1133,70 +1144,48 @@ void Session::Impl::add_file_async_callback(
 
 bool Session::Impl::add_file(Glib::RefPtr<Gio::File> const& file, bool do_start, bool do_prompt, bool do_notify)
 {
-    bool handled = false;
     auto const* const session = get_session();
-
-    if (session != nullptr)
+    if (session == nullptr)
     {
-        tr_ctor* ctor;
-        bool tried = false;
-        bool loaded = false;
+        return false;
+    }
 
-        ctor = tr_ctorNew(session);
-        core_apply_defaults(ctor);
-        tr_ctorSetPaused(ctor, TR_FORCE, !do_start);
+    bool handled = false;
+    auto* ctor = tr_ctorNew(session);
+    core_apply_defaults(ctor);
+    tr_ctorSetPaused(ctor, TR_FORCE, !do_start);
 
-        /* local files... */
-        if (!tried)
-        {
-            auto const str = file->get_path();
+    bool loaded = false;
+    if (auto const path = file->get_path(); !std::empty(path))
+    {
+        // try to treat it as a file...
+        loaded = tr_ctorSetMetainfoFromFile(ctor, path.c_str(), nullptr);
+    }
 
-            if ((tried = !str.empty() && Glib::file_test(str, Glib::FILE_TEST_EXISTS)))
-            {
-                loaded = tr_ctorSetMetainfoFromFile(ctor, str.c_str(), nullptr);
-            }
-        }
+    if (!loaded)
+    {
+        // try to treat it as a magnet link...
+        loaded = tr_ctorSetMetainfoFromMagnetLink(ctor, file->get_uri().c_str(), nullptr);
+    }
 
-        /* magnet links... */
-        if (!tried && file->has_uri_scheme("magnet"))
-        {
-            /* GFile mangles the original string with /// so we have to un-mangle */
-            auto const str = file->get_parse_name();
-            auto const magnet = gtr_sprintf("magnet:%s", str.substr(str.find('?')));
-            tried = true;
-            loaded = tr_ctorSetMetainfoFromMagnetLink(ctor, magnet.c_str(), nullptr);
-        }
-
-        /* hashcodes that we can turn into magnet links... */
-        if (!tried)
-        {
-            auto const str = file->get_basename();
-
-            if (gtr_is_hex_hashcode(str))
-            {
-                auto const magnet = gtr_sprintf("magnet:?xt=urn:btih:%s", str);
-                loaded = tr_ctorSetMetainfoFromMagnetLink(ctor, magnet.c_str(), nullptr);
-            }
-        }
-
-        /* if we were able to load the metainfo, add the torrent */
-        if (loaded)
-        {
-            handled = true;
-            add_ctor(ctor, do_prompt, do_notify);
-        }
-        else if (file->has_uri_scheme("http") || file->has_uri_scheme("https") || file->has_uri_scheme("ftp"))
-        {
-            handled = true;
-            inc_busy();
-            file->load_contents_async([this, file, ctor, do_prompt, do_notify](auto& result)
-                                      { add_file_async_callback(file, result, ctor, do_prompt, do_notify); });
-        }
-        else
-        {
-            tr_ctorFree(ctor);
-            g_message(_("Skipping unknown torrent \"%s\""), file->get_parse_name().c_str());
-        }
+    // if we could make sense of it, add it
+    if (loaded)
+    {
+        handled = true;
+        add_ctor(ctor, do_prompt, do_notify);
+    }
+    else if (tr_urlIsValid(file->get_uri()))
+    {
+        handled = true;
+        inc_busy();
+        file->load_contents_async([this, file, ctor, do_prompt, do_notify](auto& result)
+                                  { add_file_async_callback(file, result, ctor, do_prompt, do_notify); });
+    }
+    else
+    {
+        tr_ctorFree(ctor);
+        std::cerr << fmt::format(_("Couldn't add torrent file '{path}'"), fmt::arg("path", file->get_parse_name()))
+                  << std::endl;
     }
 
     return handled;
@@ -1209,15 +1198,13 @@ bool Session::add_from_url(Glib::ustring const& uri)
 
 bool Session::Impl::add_from_url(Glib::ustring const& uri)
 {
-    bool handled;
-    bool const do_start = gtr_pref_flag_get(TR_KEY_start_added_torrents);
-    bool const do_prompt = gtr_pref_flag_get(TR_KEY_show_options_window);
-    bool const do_notify = false;
-
     auto const file = Gio::File::create_for_uri(uri);
-    handled = add_file(file, do_start, do_prompt, do_notify);
-    torrents_added();
+    auto const do_start = gtr_pref_flag_get(TR_KEY_start_added_torrents);
+    auto const do_prompt = gtr_pref_flag_get(TR_KEY_show_options_window);
+    auto const do_notify = false;
 
+    auto const handled = add_file(file, do_start, do_prompt, do_notify);
+    torrents_added();
     return handled;
 }
 
@@ -1321,24 +1308,20 @@ namespace
 
 int gtr_compare_double(double const a, double const b, int decimal_places)
 {
-    int ret;
     auto const ia = int64_t(a * pow(10, decimal_places));
     auto const ib = int64_t(b * pow(10, decimal_places));
 
     if (ia < ib)
     {
-        ret = -1;
-    }
-    else if (ia > ib)
-    {
-        ret = 1;
-    }
-    else
-    {
-        ret = 0;
+        return -1;
     }
 
-    return ret;
+    if (ia > ib)
+    {
+        return 1;
+    }
+
+    return 0;
 }
 
 void update_foreach(Gtk::TreeModel::Row const& row)
@@ -1471,13 +1454,13 @@ bool gtr_inhibit_hibernation(guint32& cookie)
         cookie = Glib::VariantBase::cast_dynamic<Glib::Variant<guint32>>(response.get_child(0)).get();
 
         /* logging */
-        tr_logAddInfo("%s", _("Inhibiting desktop hibernation"));
+        tr_logAddInfo(_("Inhibiting desktop hibernation"));
 
         success = true;
     }
     catch (Glib::Error const& e)
     {
-        tr_logAddError(_("Couldn't inhibit desktop hibernation: %s"), e.what().c_str());
+        tr_logAddError(fmt::format(_("Couldn't inhibit desktop hibernation: {error}"), fmt::arg("error", e.what())));
     }
 
     return success;
@@ -1498,11 +1481,11 @@ void gtr_uninhibit_hibernation(guint inhibit_cookie)
             1000);
 
         /* logging */
-        tr_logAddInfo("%s", _("Allowing desktop hibernation"));
+        tr_logAddInfo(_("Allowing desktop hibernation"));
     }
     catch (Glib::Error const& e)
     {
-        g_warning("Couldn't uninhibit desktop hibernation: %s.", e.what().c_str());
+        tr_logAddError(fmt::format(_("Couldn't inhibit desktop hibernation: {error}"), fmt::arg("error", e.what())));
     }
 }
 

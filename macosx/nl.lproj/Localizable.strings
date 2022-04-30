@@ -18,9 +18,6 @@
 /* Torrent -> progress string */
 "%@ of torrent metadata retrieved" = "%@ van torrentmetadata gevonden";
 
-/* time remaining string */
-"%@ remaining" = "%@ resterend";
-
 /* Add torrent -> info
    Inspector -> Activity tab -> progress
    Torrent -> progress string */
@@ -90,24 +87,6 @@
 /* Torrent -> status string */
 "%d web seeds" = "%d webseeds";
 
-/* time string */
-"%u days" = "%u dagen";
-
-/* time string */
-"%u hr" = "%u uur";
-
-/* time string */
-"%u min" = "%u min";
-
-/* time string */
-"%u sec" = "%u sec";
-
-/* time string */
-"%u years" = "%u jaar";
-
-/* time string */
-"1 day" = "1 dag";
-
 /* Add torrent -> info
    Create torrent -> info
    Drag overlay -> torrents
@@ -130,9 +109,6 @@
    Status bar transfer count
    Torrent table -> group row -> tooltip */
 "1 transfer" = "1 overdracht";
-
-/* time string */
-"1 year" = "1 jaar";
 
 /* Open invalid alert -> title */
 "\"%@\" is not a valid torrent file." = "‘%@’ is geen geldig torrentbestand.";
@@ -762,9 +738,6 @@
 /* Confirm Quit panel -> button
    Legal alert -> button */
 "Quit" = "Stop";
-
-/* Dock Badger -> quit */
-"Quitting" = "Stoppen";
 
 /* Stats window -> label
    status bar -> status label

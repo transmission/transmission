@@ -3,7 +3,15 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include <algorithm>
+#include <array>
+#include <cmath> // sqrt()
+#include <cstdlib> // setenv(), unsetenv()
+#include <iostream>
+#include <sstream>
+#include <string>
 #include <string_view>
+#include <utility>
 
 #ifdef _WIN32
 #include <windows.h>
@@ -16,42 +24,14 @@
 #include "crypto-utils.h" // tr_rand_int_weak()
 #include "platform.h"
 #include "ptrarray.h"
+#include "tr-strbuf.h"
 #include "utils.h"
 
 #include "test-fixtures.h"
 
-#include <algorithm>
-#include <array>
-#include <cmath> // sqrt()
-#include <cstdlib> // setenv(), unsetenv()
-#include <iostream>
-#include <sstream>
-#include <string>
-
 using ::libtransmission::test::makeString;
 using UtilsTest = ::testing::Test;
 using namespace std::literals;
-
-TEST_F(UtilsTest, trStripPositionalArgs)
-{
-    auto const* in = "Hello %1$s foo %2$.*f";
-    auto const* expected = "Hello %s foo %.*f";
-    auto const* out = tr_strip_positional_args(in);
-    EXPECT_STREQ(expected, out);
-
-    in = "Hello %1$'d foo %2$'f";
-    expected = "Hello %d foo %f";
-    out = tr_strip_positional_args(in);
-    EXPECT_STREQ(expected, out);
-}
-
-TEST_F(UtilsTest, trStrvJoin)
-{
-    EXPECT_EQ(""sv, tr_strvJoin(""sv));
-    EXPECT_EQ("test"sv, tr_strvJoin("test"sv));
-    EXPECT_EQ("foo/bar"sv, tr_strvJoin("foo"sv, "/", std::string{ "bar" }));
-    EXPECT_EQ("abcde"sv, tr_strvJoin("a", "b", "c", "d", "e"));
-}
 
 TEST_F(UtilsTest, trStrvContains)
 {
@@ -226,33 +206,6 @@ TEST_F(UtilsTest, trParseNumberRange)
     EXPECT_EQ(empty_string, tostring(numbers));
 }
 
-namespace
-{
-
-int compareInts(void const* va, void const* vb) noexcept
-{
-    auto const a = *static_cast<int const*>(va);
-    auto const b = *static_cast<int const*>(vb);
-    return a - b;
-}
-
-} // namespace
-
-TEST_F(UtilsTest, lowerbound)
-{
-    auto const a = std::array<int, 7>{ 1, 2, 3, 3, 3, 5, 8 };
-    auto const expected_pos = std::array<int, 10>{ 0, 1, 2, 5, 5, 6, 6, 6, 7, 7 };
-    auto const expected_exact = std::array<bool, 10>{ true, true, true, false, true, false, false, true, false, false };
-
-    for (int i = 1; i <= 10; i++)
-    {
-        bool exact;
-        auto const pos = tr_lowerBound(&i, a.data(), a.size(), sizeof(int), compareInts, &exact);
-        EXPECT_EQ(expected_pos[i - 1], pos);
-        EXPECT_EQ(expected_exact[i - 1], exact);
-    }
-}
-
 TEST_F(UtilsTest, trStrlower)
 {
     EXPECT_EQ(""sv, tr_strlower(""sv));
@@ -262,16 +215,6 @@ TEST_F(UtilsTest, trStrlower)
     EXPECT_EQ("apple"sv, tr_strlower("applE"sv));
     EXPECT_EQ("hello"sv, tr_strlower("HELLO"sv));
     EXPECT_EQ("hello"sv, tr_strlower("hello"sv));
-}
-
-TEST_F(UtilsTest, trMemmem)
-{
-    auto const haystack = std::string{ "abcabcabcabc" };
-    auto const needle = std::string{ "cab" };
-
-    EXPECT_EQ(haystack, tr_memmem(haystack.data(), haystack.size(), haystack.data(), haystack.size()));
-    EXPECT_EQ(haystack.substr(2), tr_memmem(haystack.data(), haystack.size(), needle.data(), needle.size()));
-    EXPECT_EQ(nullptr, tr_memmem(needle.data(), needle.size(), haystack.data(), haystack.size()));
 }
 
 TEST_F(UtilsTest, array)
@@ -306,73 +249,75 @@ TEST_F(UtilsTest, array)
 
 TEST_F(UtilsTest, truncd)
 {
-    auto buf = std::array<char, 32>{};
-
-    tr_snprintf(buf.data(), buf.size(), "%.2f%%", 99.999);
-    EXPECT_STREQ("100.00%", buf.data());
-
-    tr_snprintf(buf.data(), buf.size(), "%.2f%%", tr_truncd(99.999, 2));
-    EXPECT_STREQ("99.99%", buf.data());
-
-    tr_snprintf(buf.data(), buf.size(), "%.4f", tr_truncd(403650.656250, 4));
-    EXPECT_STREQ("403650.6562", buf.data());
-
-    tr_snprintf(buf.data(), buf.size(), "%.2f", tr_truncd(2.15, 2));
-    EXPECT_STREQ("2.15", buf.data());
-
-    tr_snprintf(buf.data(), buf.size(), "%.2f", tr_truncd(2.05, 2));
-    EXPECT_STREQ("2.05", buf.data());
-
-    tr_snprintf(buf.data(), buf.size(), "%.2f", tr_truncd(3.3333, 2));
-    EXPECT_STREQ("3.33", buf.data());
-
-    tr_snprintf(buf.data(), buf.size(), "%.0f", tr_truncd(3.3333, 0));
-    EXPECT_STREQ("3", buf.data());
-
-    tr_snprintf(buf.data(), buf.size(), "%.0f", tr_truncd(3.9999, 0));
-    EXPECT_STREQ("3", buf.data());
+    EXPECT_EQ("100.00%"sv, fmt::format("{:.2f}%", 99.999));
+    EXPECT_EQ("99.99%"sv, fmt::format("{:.2f}%", tr_truncd(99.999, 2)));
+    EXPECT_EQ("403650.6562"sv, fmt::format("{:.4f}", tr_truncd(403650.656250, 4)));
+    EXPECT_EQ("2.15"sv, fmt::format("{:.2f}", tr_truncd(2.15, 2)));
+    EXPECT_EQ("2.05"sv, fmt::format("{:.2f}", tr_truncd(2.05, 2)));
+    EXPECT_EQ("3.33"sv, fmt::format("{:.2f}", tr_truncd(3.333333, 2)));
+    EXPECT_EQ("3"sv, fmt::format("{:.0f}", tr_truncd(3.333333, 0)));
+    EXPECT_EQ("3"sv, fmt::format("{:.0f}", tr_truncd(3.9999, 0)));
 
 #if !(defined(_MSC_VER) || (defined(__MINGW32__) && defined(__MSVCRT__)))
     /* FIXME: MSCVRT behaves differently in case of nan */
     auto const nan = sqrt(-1.0);
-    tr_snprintf(buf.data(), buf.size(), "%.2f", tr_truncd(nan, 2));
-    EXPECT_TRUE(strstr(buf.data(), "nan") != nullptr || strstr(buf.data(), "NaN") != nullptr);
+    auto const nanstr = fmt::format("{:.2f}", tr_truncd(nan, 2));
+    EXPECT_TRUE(strstr(nanstr.c_str(), "nan") != nullptr || strstr(nanstr.c_str(), "NaN") != nullptr);
 #endif
 }
 
-TEST_F(UtilsTest, trStrdupPrintfFmtS)
+TEST_F(UtilsTest, trStrlcpy)
 {
-    auto s = makeString(tr_strdup_printf("%s", "test"));
-    EXPECT_EQ("test", s);
-}
+    // destination will be initialized with this char
+    char const initial_char = '1';
+    std::array<char, 100> destination = { initial_char };
 
-TEST_F(UtilsTest, trStrdupPrintf)
-{
-    auto s = makeString(tr_strdup_printf("%d %s %c %u", -1, "0", '1', 2));
-    EXPECT_EQ("-1 0 1 2", s);
+    std::vector<std::string> tests{
+        "a",
+        "",
+        "12345678901234567890",
+        "This, very usefull string contains total of 104 characters not counting null. Almost like an easter egg!"
+    };
 
-    auto* s3 = reinterpret_cast<char*>(tr_malloc0(4098));
-    memset(s3, '-', 4097);
-    s3[2047] = 't';
-    s3[2048] = 'e';
-    s3[2049] = 's';
-    s3[2050] = 't';
+    for (auto const& test : tests)
+    {
+        auto c_string = test.c_str();
+        auto length = strlen(c_string);
 
-    auto* s2 = reinterpret_cast<char*>(tr_malloc0(4096));
-    memset(s2, '-', 4095);
-    s2[2047] = '%';
-    s2[2048] = 's';
+        destination.fill(initial_char);
 
-    // NOLINTNEXTLINE(clang-diagnostic-format-nonliteral)
-    s = makeString(tr_strdup_printf(s2, "test"));
-    EXPECT_EQ(s3, s);
+        auto response = tr_strlcpy(&destination, c_string, 98);
 
-    tr_free(s2);
+        // Check response length
+        ASSERT_EQ(response, length);
 
-    s = makeString(tr_strdup_printf("%s", s3));
-    EXPECT_EQ(s3, s);
+        // Check what was copied
+        for (unsigned i = 0U; i < 97U; ++i)
+        {
+            if (i <= length)
+            {
+                ASSERT_EQ(destination[i], c_string[i]);
+            }
+            else
+            {
+                ASSERT_EQ(destination[i], initial_char);
+            }
+        }
 
-    tr_free(s3);
+        // tr_strlcpy should only write this far if (length >= 98)
+        if (length >= 98)
+        {
+            ASSERT_EQ(destination[97], '\0');
+        }
+        else
+        {
+            ASSERT_EQ(destination[97], initial_char);
+        }
+
+        // tr_strlcpy should not write this far
+        ASSERT_EQ(destination[98], initial_char);
+        ASSERT_EQ(destination[99], initial_char);
+    }
 }
 
 TEST_F(UtilsTest, env)
@@ -417,27 +362,29 @@ TEST_F(UtilsTest, mimeTypes)
 
 TEST_F(UtilsTest, saveFile)
 {
+    auto filename = tr_pathbuf{};
+
     // save a file to GoogleTest's temp dir
-    auto filename = tr_strvJoin(::testing::TempDir(), "filename.txt");
+    filename.assign(::testing::TempDir(), "filename.txt"sv);
     auto contents = "these are the contents"sv;
     tr_error* error = nullptr;
-    EXPECT_TRUE(tr_saveFile(filename, contents, &error));
-    EXPECT_EQ(nullptr, error);
+    EXPECT_TRUE(tr_saveFile(filename.sv(), contents, &error));
+    EXPECT_EQ(nullptr, error) << *error;
 
     // now read the file back in and confirm the contents are the same
     auto buf = std::vector<char>{};
-    EXPECT_TRUE(tr_loadFile(buf, filename, &error));
-    EXPECT_EQ(nullptr, error);
+    EXPECT_TRUE(tr_loadFile(filename.sv(), buf, &error));
+    EXPECT_EQ(nullptr, error) << *error;
     auto sv = std::string_view{ std::data(buf), std::size(buf) };
     EXPECT_EQ(contents, sv);
 
     // remove the tempfile
     EXPECT_TRUE(tr_sys_path_remove(filename.c_str(), &error));
-    EXPECT_EQ(nullptr, error);
+    EXPECT_EQ(nullptr, error) << *error;
 
     // try saving a file to a path that doesn't exist
     filename = "/this/path/does/not/exist/foo.txt";
-    EXPECT_FALSE(tr_saveFile(filename, contents, &error));
+    EXPECT_FALSE(tr_saveFile(filename.sv(), contents, &error));
     ASSERT_NE(nullptr, error);
     EXPECT_NE(0, error->code);
     tr_error_clear(&error);
@@ -446,12 +393,22 @@ TEST_F(UtilsTest, saveFile)
 TEST_F(UtilsTest, ratioToString)
 {
     // Testpairs contain ratio as a double and a string
-    std::vector<std::pair<double, std::string>> const tests{
-        { 0.0, "0.00" },        { 0.01, "0.01" },  { 0.1, "0.10" },    { 1.0, "1.00" },        { 1.015, "1.01" },
-        { 4.99, "4.99" },       { 4.996, "4.99" }, { 5.0, "5.0" },     { 5.09999, "5.0" },     { 5.1, "5.1" },
-        { 99.99, "99.9" },      { 100.0, "100" },  { 4000.4, "4000" }, { 600000.0, "600000" }, { 900000000.0, "900000000" },
-        { TR_RATIO_INF, "inf" }
-    };
+    static auto constexpr Tests = std::array<std::pair<double, std::string_view>, 16>{ { { 0.0, "0.00" },
+                                                                                         { 0.01, "0.01" },
+                                                                                         { 0.1, "0.10" },
+                                                                                         { 1.0, "1.00" },
+                                                                                         { 1.015, "1.01" },
+                                                                                         { 4.99, "4.99" },
+                                                                                         { 4.996, "4.99" },
+                                                                                         { 5.0, "5.0" },
+                                                                                         { 5.09999, "5.0" },
+                                                                                         { 5.1, "5.1" },
+                                                                                         { 99.99, "99.9" },
+                                                                                         { 100.0, "100" },
+                                                                                         { 4000.4, "4000" },
+                                                                                         { 600000.0, "600000" },
+                                                                                         { 900000000.0, "900000000" },
+                                                                                         { TR_RATIO_INF, "inf" } } };
     char const nullchar = '\0';
 
     ASSERT_EQ(tr_strratio(TR_RATIO_NA, "Ratio is NaN"), "None");
@@ -459,8 +416,8 @@ TEST_F(UtilsTest, ratioToString)
     // Inf contains only null character
     ASSERT_EQ(tr_strratio(TR_RATIO_INF, &nullchar), "");
 
-    for (auto& test : tests)
+    for (auto const& [input, expected] : Tests)
     {
-        ASSERT_EQ(tr_strratio(test.first, "inf"), test.second);
+        ASSERT_EQ(tr_strratio(input, "inf"), expected);
     }
 }

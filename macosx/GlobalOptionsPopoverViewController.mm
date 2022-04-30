@@ -4,15 +4,30 @@
 
 #import "GlobalOptionsPopoverViewController.h"
 
+@interface GlobalOptionsPopoverViewController ()
+
+@property(nonatomic, readonly) tr_session* fHandle;
+@property(nonatomic, readonly) NSUserDefaults* fDefaults;
+
+@property(nonatomic) IBOutlet NSTextField* fUploadLimitField;
+@property(nonatomic) IBOutlet NSTextField* fDownloadLimitField;
+
+@property(nonatomic) IBOutlet NSTextField* fRatioStopField;
+@property(nonatomic) IBOutlet NSTextField* fIdleStopField;
+
+@property(nonatomic, copy) NSString* fInitialString;
+
+@end
+
 @implementation GlobalOptionsPopoverViewController
 
 - (instancetype)initWithHandle:(tr_session*)handle
 {
     if ((self = [super initWithNibName:@"GlobalOptionsPopover" bundle:nil]))
     {
-        fHandle = handle;
+        _fHandle = handle;
 
-        fDefaults = NSUserDefaults.standardUserDefaults;
+        _fDefaults = NSUserDefaults.standardUserDefaults;
     }
 
     return self;
@@ -20,11 +35,11 @@
 
 - (void)awakeFromNib
 {
-    fUploadLimitField.intValue = [fDefaults integerForKey:@"UploadLimit"];
-    fDownloadLimitField.intValue = [fDefaults integerForKey:@"DownloadLimit"];
+    self.fUploadLimitField.intValue = [self.fDefaults integerForKey:@"UploadLimit"];
+    self.fDownloadLimitField.intValue = [self.fDefaults integerForKey:@"DownloadLimit"];
 
-    fRatioStopField.floatValue = [fDefaults floatForKey:@"RatioLimit"];
-    fIdleStopField.integerValue = [fDefaults integerForKey:@"IdleLimitMinutes"];
+    self.fRatioStopField.floatValue = [self.fDefaults floatForKey:@"RatioLimit"];
+    self.fIdleStopField.integerValue = [self.fDefaults integerForKey:@"IdleLimitMinutes"];
 
     [self.view setFrameSize:self.view.fittingSize];
 }
@@ -36,7 +51,7 @@
 
 - (IBAction)setDownSpeedSetting:(id)sender
 {
-    tr_sessionLimitSpeed(fHandle, TR_DOWN, [fDefaults boolForKey:@"CheckDownload"]);
+    tr_sessionLimitSpeed(self.fHandle, TR_DOWN, [self.fDefaults boolForKey:@"CheckDownload"]);
 
     [NSNotificationCenter.defaultCenter postNotificationName:@"SpeedLimitUpdate" object:nil];
 }
@@ -44,8 +59,8 @@
 - (IBAction)setDownSpeedLimit:(id)sender
 {
     NSInteger const limit = [sender integerValue];
-    [fDefaults setInteger:limit forKey:@"DownloadLimit"];
-    tr_sessionSetSpeedLimit_KBps(fHandle, TR_DOWN, limit);
+    [self.fDefaults setInteger:limit forKey:@"DownloadLimit"];
+    tr_sessionSetSpeedLimit_KBps(self.fHandle, TR_DOWN, limit);
 
     [NSNotificationCenter.defaultCenter postNotificationName:@"UpdateSpeedLimitValuesOutsidePrefs" object:nil];
     [NSNotificationCenter.defaultCenter postNotificationName:@"SpeedLimitUpdate" object:nil];
@@ -53,7 +68,7 @@
 
 - (IBAction)setUpSpeedSetting:(id)sender
 {
-    tr_sessionLimitSpeed(fHandle, TR_UP, [fDefaults boolForKey:@"CheckUpload"]);
+    tr_sessionLimitSpeed(self.fHandle, TR_UP, [self.fDefaults boolForKey:@"CheckUpload"]);
 
     [NSNotificationCenter.defaultCenter postNotificationName:@"UpdateSpeedLimitValuesOutsidePrefs" object:nil];
     [NSNotificationCenter.defaultCenter postNotificationName:@"SpeedLimitUpdate" object:nil];
@@ -62,15 +77,15 @@
 - (IBAction)setUpSpeedLimit:(id)sender
 {
     NSInteger const limit = [sender integerValue];
-    [fDefaults setInteger:limit forKey:@"UploadLimit"];
-    tr_sessionSetSpeedLimit_KBps(fHandle, TR_UP, limit);
+    [self.fDefaults setInteger:limit forKey:@"UploadLimit"];
+    tr_sessionSetSpeedLimit_KBps(self.fHandle, TR_UP, limit);
 
     [NSNotificationCenter.defaultCenter postNotificationName:@"SpeedLimitUpdate" object:nil];
 }
 
 - (IBAction)setRatioStopSetting:(id)sender
 {
-    tr_sessionSetRatioLimited(fHandle, [fDefaults boolForKey:@"RatioCheck"]);
+    tr_sessionSetRatioLimited(self.fHandle, [self.fDefaults boolForKey:@"RatioCheck"]);
 
     //reload main table for seeding progress
     [NSNotificationCenter.defaultCenter postNotificationName:@"UpdateUI" object:nil];
@@ -82,8 +97,8 @@
 - (IBAction)setRatioStopLimit:(id)sender
 {
     CGFloat const value = [sender floatValue];
-    [fDefaults setFloat:value forKey:@"RatioLimit"];
-    tr_sessionSetRatioLimit(fHandle, value);
+    [self.fDefaults setFloat:value forKey:@"RatioLimit"];
+    tr_sessionSetRatioLimit(self.fHandle, value);
 
     [NSNotificationCenter.defaultCenter postNotificationName:@"UpdateRatioStopValueOutsidePrefs" object:nil];
 
@@ -96,7 +111,7 @@
 
 - (IBAction)setIdleStopSetting:(id)sender
 {
-    tr_sessionSetIdleLimited(fHandle, [fDefaults boolForKey:@"IdleLimitCheck"]);
+    tr_sessionSetIdleLimited(self.fHandle, [self.fDefaults boolForKey:@"IdleLimitCheck"]);
 
     //reload main table for remaining seeding time
     [NSNotificationCenter.defaultCenter postNotificationName:@"UpdateUI" object:nil];
@@ -108,8 +123,8 @@
 - (IBAction)setIdleStopLimit:(id)sender
 {
     NSInteger const value = [sender integerValue];
-    [fDefaults setInteger:value forKey:@"IdleLimitMinutes"];
-    tr_sessionSetIdleLimit(fHandle, value);
+    [self.fDefaults setInteger:value forKey:@"IdleLimitMinutes"];
+    tr_sessionSetIdleLimit(self.fHandle, value);
 
     [NSNotificationCenter.defaultCenter postNotificationName:@"UpdateIdleStopValueOutsidePrefs" object:nil];
 
@@ -122,7 +137,7 @@
 
 - (BOOL)control:(NSControl*)control textShouldBeginEditing:(NSText*)fieldEditor
 {
-    fInitialString = control.stringValue;
+    self.fInitialString = control.stringValue;
 
     return YES;
 }
@@ -130,10 +145,10 @@
 - (BOOL)control:(NSControl*)control didFailToFormatString:(NSString*)string errorDescription:(NSString*)error
 {
     NSBeep();
-    if (fInitialString)
+    if (self.fInitialString)
     {
-        control.stringValue = fInitialString;
-        fInitialString = nil;
+        control.stringValue = self.fInitialString;
+        self.fInitialString = nil;
     }
     return NO;
 }

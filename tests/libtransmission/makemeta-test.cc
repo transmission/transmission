@@ -9,6 +9,8 @@
 #include <string>
 #include <string_view>
 
+#include <fmt/format.h>
+
 #include "transmission.h"
 
 #include "crypto-utils.h"
@@ -34,6 +36,8 @@ protected:
         tr_torrent_metainfo& metainfo,
         tr_tracker_info const* trackers,
         int const trackerCount,
+        char const** webseeds,
+        int const webseedCount,
         void const* payload,
         size_t const payloadSize,
         char const* comment,
@@ -42,10 +46,10 @@ protected:
     {
 
         // create a single input file
-        auto input_file = tr_strvPath(sandboxDir().data(), "test.XXXXXX");
-        createTmpfileWithContents(input_file, payload, payloadSize);
+        auto input_file = tr_pathbuf{ sandboxDir(), '/', "test.XXXXXX" };
+        createTmpfileWithContents(std::data(input_file), payload, payloadSize);
         tr_sys_path_native_separators(std::data(input_file));
-        auto* builder = tr_metaInfoBuilderCreate(input_file.c_str());
+        auto* builder = tr_metaInfoBuilderCreate(input_file);
         EXPECT_EQ(tr_file_index_t{ 1 }, builder->fileCount);
         EXPECT_EQ(input_file, builder->top);
         EXPECT_EQ(input_file, builder->files[0].filename);
@@ -54,9 +58,18 @@ protected:
         EXPECT_FALSE(builder->isFolder);
         EXPECT_FALSE(builder->abortFlag);
 
-        // have tr_makeMetaInfo() build the .torrent file
-        auto const torrent_file = tr_strvJoin(input_file, ".torrent");
-        tr_makeMetaInfo(builder, torrent_file.c_str(), trackers, trackerCount, comment, isPrivate, std::string(source).c_str());
+        // have tr_makeMetaInfo() build the torrent file
+        auto const torrent_file = tr_pathbuf{ input_file, ".torrent"sv };
+        tr_makeMetaInfo(
+            builder,
+            torrent_file,
+            trackers,
+            trackerCount,
+            webseeds,
+            webseedCount,
+            comment,
+            isPrivate,
+            std::string(source).c_str());
         EXPECT_EQ(isPrivate, builder->isPrivate);
         EXPECT_EQ(torrent_file, builder->outputFile);
         EXPECT_STREQ(comment, builder->comment);
@@ -69,17 +82,18 @@ protected:
         }
         sync();
 
-        // now let's check our work: parse the  .torrent file
+        // now let's check our work: parse the  torrent file
         EXPECT_TRUE(metainfo.parseTorrentFile(torrent_file));
 
         // quick check of some of the parsed metainfo
         EXPECT_EQ(payloadSize, metainfo.totalSize());
-        EXPECT_EQ(makeString(tr_sys_path_basename(input_file.data(), nullptr)), metainfo.name());
+        EXPECT_EQ(tr_sys_path_basename(input_file), metainfo.name());
         EXPECT_EQ(comment, metainfo.comment());
         EXPECT_EQ(isPrivate, metainfo.isPrivate());
         EXPECT_EQ(size_t(trackerCount), std::size(metainfo.announceList()));
+        EXPECT_EQ(size_t(webseedCount), metainfo.webseedCount());
         EXPECT_EQ(tr_file_index_t{ 1 }, metainfo.fileCount());
-        EXPECT_EQ(makeString(tr_sys_path_basename(input_file.data(), nullptr)), metainfo.fileSubpath(0));
+        EXPECT_EQ(tr_sys_path_basename(input_file), metainfo.fileSubpath(0));
         EXPECT_EQ(payloadSize, metainfo.fileSize(0));
 
         // cleanup
@@ -89,6 +103,8 @@ protected:
     void testSingleDirectoryImpl(
         tr_tracker_info const* trackers,
         int const tracker_count,
+        char const** webseeds,
+        int const webseed_count,
         void const** payloads,
         size_t const* payload_sizes,
         size_t const payload_count,
@@ -97,9 +113,9 @@ protected:
         char const* source)
     {
         // create the top temp directory
-        auto top = tr_strvPath(sandboxDir(), "folder.XXXXXX");
+        auto top = tr_pathbuf{ sandboxDir(), '/', "folder.XXXXXX"sv };
         tr_sys_path_native_separators(std::data(top));
-        tr_sys_dir_create_temp(std::data(top), nullptr);
+        tr_sys_dir_create_temp(std::data(top));
 
         // build the payload files that go into the top temp directory
         auto files = std::vector<std::string>{};
@@ -108,10 +124,8 @@ protected:
 
         for (size_t i = 0; i < payload_count; i++)
         {
-            auto tmpl = std::array<char, 16>{};
-            tr_snprintf(tmpl.data(), tmpl.size(), "file.%04zu%s", i, "XXXXXX");
-            auto path = tr_strvPath(top, std::data(tmpl));
-            createTmpfileWithContents(path, payloads[i], payload_sizes[i]);
+            auto path = fmt::format(FMT_STRING("{:s}/file.{:04}XXXXXX"), top.sv(), i);
+            createTmpfileWithContents(std::data(path), payloads[i], payload_sizes[i]);
             tr_sys_path_native_separators(std::data(path));
             files.push_back(path);
             total_size += payload_sizes[i];
@@ -120,7 +134,7 @@ protected:
         sync();
 
         // init the builder
-        auto* builder = tr_metaInfoBuilderCreate(top.c_str());
+        auto* builder = tr_metaInfoBuilderCreate(top);
         EXPECT_FALSE(builder->abortFlag);
         EXPECT_EQ(top, builder->top);
         EXPECT_EQ(payload_count, builder->fileCount);
@@ -133,9 +147,18 @@ protected:
             EXPECT_EQ(payload_sizes[i], builder->files[i].size);
         }
 
-        // build the .torrent file
-        auto torrent_file = tr_strvJoin(top, ".torrent"sv);
-        tr_makeMetaInfo(builder, torrent_file.c_str(), trackers, tracker_count, comment, is_private, source);
+        // build the torrent file
+        auto const torrent_file = tr_pathbuf{ top, ".torrent"sv };
+        tr_makeMetaInfo(
+            builder,
+            torrent_file.c_str(),
+            trackers,
+            tracker_count,
+            webseeds,
+            webseed_count,
+            comment,
+            is_private,
+            source);
         EXPECT_EQ(is_private, builder->isPrivate);
         EXPECT_EQ(torrent_file, builder->outputFile);
         EXPECT_STREQ(comment, builder->comment);
@@ -148,15 +171,13 @@ protected:
         EXPECT_TRUE(waitFor(test, 5000));
         sync();
 
-        // now let's check our work: parse the  .torrent file
+        // now let's check our work: parse the  torrent file
         auto metainfo = tr_torrent_metainfo{};
         EXPECT_TRUE(metainfo.parseTorrentFile(torrent_file));
 
         // quick check of some of the parsed metainfo
         EXPECT_EQ(total_size, metainfo.totalSize());
-        auto* tmpstr = tr_sys_path_basename(top.c_str(), nullptr);
-        EXPECT_EQ(tmpstr, metainfo.name());
-        tr_free(tmpstr);
+        EXPECT_EQ(tr_sys_path_basename(top), metainfo.name());
         EXPECT_EQ(comment, metainfo.comment());
         EXPECT_EQ(source, metainfo.source());
         EXPECT_EQ(payload_count, metainfo.fileCount());
@@ -170,6 +191,8 @@ protected:
     void testSingleDirectoryRandomPayloadImpl(
         tr_tracker_info const* trackers,
         int const tracker_count,
+        char const** webseeds,
+        int const webseed_count,
         size_t const max_file_count,
         size_t const max_file_size,
         char const* comment,
@@ -178,8 +201,8 @@ protected:
     {
         // build random payloads
         size_t payload_count = 1 + tr_rand_int_weak(max_file_count);
-        void** payloads = tr_new0(void*, payload_count);
-        size_t* payload_sizes = tr_new0(size_t, payload_count);
+        auto** payloads = tr_new0(void*, payload_count);
+        auto* payload_sizes = tr_new0(size_t, payload_count);
 
         for (size_t i = 0; i < payload_count; i++)
         {
@@ -193,6 +216,8 @@ protected:
         testSingleDirectoryImpl(
             trackers,
             tracker_count,
+            webseeds,
+            webseed_count,
             const_cast<void const**>(payloads),
             payload_sizes,
             payload_count,
@@ -229,6 +254,32 @@ TEST_F(MakemetaTest, singleFile)
         metainfo,
         trackers.data(),
         tracker_count,
+        nullptr,
+        0,
+        payload.data(),
+        payload.size(),
+        comment,
+        is_private,
+        "TESTME"sv);
+}
+
+TEST_F(MakemetaTest, webseed)
+{
+    auto trackers = std::vector<tr_tracker_info>{};
+    auto webseeds = std::vector<char const*>{};
+
+    webseeds.emplace_back("https://www.example.com/linux.iso");
+
+    auto const payload = std::string{ "Hello, World!\n" };
+    char const* const comment = "This is the comment";
+    bool const is_private = false;
+    auto metainfo = tr_torrent_metainfo{};
+    testSingleFileImpl(
+        metainfo,
+        std::data(trackers),
+        std::size(trackers),
+        std::data(webseeds),
+        std::size(webseeds),
         payload.data(),
         payload.size(),
         comment,
@@ -255,6 +306,8 @@ TEST_F(MakemetaTest, singleFileDifferentSourceFlags)
         metainfo_foobar,
         trackers.data(),
         tracker_count,
+        nullptr,
+        0,
         payload.data(),
         payload.size(),
         comment,
@@ -266,6 +319,8 @@ TEST_F(MakemetaTest, singleFileDifferentSourceFlags)
         metainfo_testme,
         trackers.data(),
         tracker_count,
+        nullptr,
+        0,
         payload.data(),
         payload.size(),
         comment,
@@ -297,6 +352,8 @@ TEST_F(MakemetaTest, singleDirectoryRandomPayload)
         testSingleDirectoryRandomPayloadImpl(
             trackers.data(),
             tracker_count,
+            nullptr,
+            0,
             DefaultMaxFileCount,
             DefaultMaxFileSize,
             comment,

@@ -1,5 +1,5 @@
 // This file Copyright © 2007-2022 Mnemosyne LLC.
-// It may be used under GPLv2 (SPDX: GPL-2.0), GPLv3 (SPDX: GPL-3.0),
+// It may be used under GPLv2 (SPDX: GPL-2.0-only), GPLv3 (SPDX: GPL-3.0-only),
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
@@ -7,6 +7,8 @@
 #undef GTK_DISABLE_DEPRECATED
 // We're using deprecated Gtk::StatusItem ourselves as well
 #undef GTKMM_DISABLE_DEPRECATED
+
+#include <string>
 
 #include <glibmm.h>
 #include <glibmm/i18n.h>
@@ -48,6 +50,8 @@ private:
     void activated();
     void popup(guint button, guint when);
 
+    [[nodiscard]] std::string make_tooltip_text() const;
+
 private:
     Glib::RefPtr<Session> const core_;
 
@@ -87,42 +91,7 @@ void SystemTrayIcon::Impl::popup(guint /*button*/, guint /*when*/)
 
 void SystemTrayIcon::Impl::refresh()
 {
-    double KBps;
-    double limit;
-    Glib::ustring upLimit;
-    Glib::ustring downLimit;
-    char const* const idle = _("Idle");
-    auto* session = core_->get_session();
-
-    /* up */
-    KBps = tr_sessionGetRawSpeed_KBps(session, TR_UP);
-
-    auto const up = KBps < 0.001 ? idle : tr_formatter_speed_KBps(KBps);
-
-    /* up limit */
-    if (tr_sessionGetActiveSpeedLimit_KBps(session, TR_UP, &limit))
-    {
-        upLimit = gtr_sprintf(_(" (Limit: %s)"), tr_formatter_speed_KBps(limit));
-    }
-
-    /* down */
-    KBps = tr_sessionGetRawSpeed_KBps(session, TR_DOWN);
-
-    auto const down = KBps < 0.001 ? idle : tr_formatter_speed_KBps(KBps);
-
-    /* down limit */
-    if (tr_sessionGetActiveSpeedLimit_KBps(session, TR_DOWN, &limit))
-    {
-        downLimit = gtr_sprintf(_(" (Limit: %s)"), tr_formatter_speed_KBps(limit));
-    }
-
-    /* %1$s: current upload speed
-     * %2$s: current upload limit, if any
-     * %3$s: current download speed
-     * %4$s: current download limit, if any */
-    auto const tip = gtr_sprintf(_("Transmission\nUp: %1$s %2$s\nDown: %3$s %4$s"), up, upLimit, down, downLimit);
-
-    icon_->set_tooltip_text(tip);
+    icon_->set_tooltip_text(make_tooltip_text());
 }
 
 #endif
@@ -134,11 +103,9 @@ Glib::ustring getIconName()
 {
     Glib::ustring icon_name;
 
-    auto theme = Gtk::IconTheme::get_default();
-
     // if the tray's icon is a 48x48 file, use it.
     // otherwise, use the fallback builtin icon.
-    if (!theme->has_icon(TrayIconName))
+    if (auto theme = Gtk::IconTheme::get_default(); !theme->has_icon(TrayIconName))
     {
         icon_name = AppIconName;
     }
@@ -188,4 +155,13 @@ SystemTrayIcon::Impl::Impl(Gtk::Window& main_window, Glib::RefPtr<Session> const
     icon_->signal_popup_menu().connect(sigc::mem_fun(*this, &Impl::popup));
 
 #endif
+}
+
+std::string SystemTrayIcon::Impl::make_tooltip_text() const
+{
+    auto const* const session = core_->get_session();
+    return fmt::format(
+        _("{upload_speed} ▲ {download_speed} ▼"),
+        fmt::arg("upload_speed", tr_formatter_speed_KBps(tr_sessionGetRawSpeed_KBps(session, TR_UP))),
+        fmt::arg("download_speed", tr_formatter_speed_KBps(tr_sessionGetRawSpeed_KBps(session, TR_DOWN))));
 }

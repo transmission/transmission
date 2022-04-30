@@ -9,6 +9,12 @@
 #import "FilePriorityCell.h"
 #import "Torrent.h"
 
+@interface FileOutlineView ()
+
+@property(nonatomic) NSInteger hoveredRow;
+
+@end
+
 @implementation FileOutlineView
 
 - (void)awakeFromNib
@@ -22,7 +28,7 @@
     self.autoresizesOutlineColumn = NO;
     self.indentationPerLevel = 14.0;
 
-    fMouseRow = -1;
+    self.hoveredRow = -1;
 }
 
 - (void)mouseDown:(NSEvent*)event
@@ -50,7 +56,7 @@
     return self.menu;
 }
 
-- (NSRect)iconRectForRow:(int)row
+- (NSRect)iconRectForRow:(NSInteger)row
 {
     FileNameCell* cell = (FileNameCell*)[self preparedCellAtColumn:[self columnWithIdentifier:@"Name"] row:row];
     NSRect iconRect = [cell imageRectForBounds:[self rectOfRow:row]];
@@ -89,18 +95,13 @@
     }
 }
 
-- (NSInteger)hoveredRow
-{
-    return fMouseRow;
-}
-
 - (void)mouseEntered:(NSEvent*)event
 {
     NSNumber* row;
     if ((row = ((NSDictionary*)event.userData)[@"Row"]))
     {
-        fMouseRow = row.intValue;
-        [self setNeedsDisplayInRect:[self frameOfCellAtColumn:[self columnWithIdentifier:@"Priority"] row:fMouseRow]];
+        self.hoveredRow = row.intValue;
+        [self setNeedsDisplayInRect:[self frameOfCellAtColumn:[self columnWithIdentifier:@"Priority"] row:self.hoveredRow]];
     }
 }
 
@@ -110,7 +111,7 @@
     if ((row = ((NSDictionary*)event.userData)[@"Row"]))
     {
         [self setNeedsDisplayInRect:[self frameOfCellAtColumn:[self columnWithIdentifier:@"Priority"] row:row.intValue]];
-        fMouseRow = -1;
+        self.hoveredRow = -1;
     }
 }
 
