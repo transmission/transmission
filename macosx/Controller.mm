@@ -860,8 +860,31 @@ void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool 
                               if (error.code == 1)
                               {
                                   // "Notifications are not allowed for this application"
-                                  // Likely a codesign issue which resolution could require:
-                                  // `codesign -s - Transmission.app`
+                                  // Likely a codesign issue.
+                                  SecCodeRef code = NULL;
+                                  CFDictionaryRef signingInformation = nil;
+                                  if (SecCodeCopySelf(kSecCSDefaultFlags, &code) == noErr &&
+                                      SecCodeCopySigningInformation(code, kSecCSDefaultFlags, &signingInformation) == noErr)
+                                  {
+                                      NSDictionary* codeSigningInformation = CFBridgingRelease(signingInformation);
+                                      NSString* identifier = codeSigningInformation[(__bridge NSString*)kSecCodeInfoIdentifier];
+                                      NSString* bundleIdentifier = codeSigningInformation[(__bridge NSString*)kSecCodeInfoPList][@"CFBundleIdentifier"];
+                                      if (![bundleIdentifier isEqualToString:identifier])
+                                      {
+                                          dispatch_async(dispatch_get_main_queue(), ^{
+                                              NSAlert* alert = [[NSAlert alloc] init];
+                                              alert.messageText = NSLocalizedString(@"UserNotifications not configured", nil);
+                                              alert.informativeText = NSLocalizedString(
+                                                  @"Transmission needs to be code-signed with an identifier matching the bundleIdentifier. Try re-codesigning: `sudo codesign -s - -o linker-signed Transmission.app`",
+                                                  nil);
+                                              [alert runModal];
+                                          });
+                                      }
+                                  }
+                                  if (code)
+                                  {
+                                      CFRelease(code);
+                                  }
                               }
                           }];
     }
