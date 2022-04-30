@@ -37,7 +37,7 @@
 @property(nonatomic, readonly) tr_metainfo_builder* fInfo;
 @property(nonatomic, readonly) NSURL* fPath;
 @property(nonatomic) NSURL* fLocation;
-@property(nonatomic) NSMutableArray* fTrackers;
+@property(nonatomic) NSMutableArray<NSString*>* fTrackers;
 
 @property(nonatomic) NSTimer* fTimer;
 @property(nonatomic) BOOL fStarted;

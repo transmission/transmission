@@ -8,7 +8,7 @@
 
 @interface InfoActivityViewController : NSViewController<InfoViewController>
 
-- (void)setInfoForTorrents:(NSArray*)torrents;
+- (void)setInfoForTorrents:(NSArray<Torrent*>*)torrents;
 - (void)updateInfo;
 
 - (IBAction)setPiecesView:(id)sender;

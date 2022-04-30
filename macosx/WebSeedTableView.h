@@ -6,7 +6,7 @@
 
 @interface WebSeedTableView : NSTableView
 
-@property(nonatomic, weak) NSArray* webSeeds;
+@property(nonatomic, weak) NSArray<NSDictionary*>* webSeeds;
 
 - (void)copy:(id)sender;
 

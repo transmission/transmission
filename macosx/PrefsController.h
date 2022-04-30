@@ -8,7 +8,7 @@
 
 @interface PrefsController : NSWindowController<NSToolbarDelegate>
 
-@property(nonatomic, readonly) NSArray* sounds;
+@property(nonatomic, readonly) NSArray<NSString*>* sounds;
 
 + (NSInteger)dateToTimeSum:(NSDate*)date;
 
