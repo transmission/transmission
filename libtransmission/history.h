@@ -10,15 +10,16 @@
 #endif
 
 #include <array>
-#include <cstddef> // size_t
+#include <cstdint>
 #include <ctime> // time_t
-#include <numeric> // std::accumulate
 
 /**
  * A short-term memory object that remembers how many times something
- * happened over the last N seconds. tr_peer uses it to count how many
- * bytes transferred to estimate the speed over the last N seconds.
+ * happened over the last Seconds seconds. tr_peer uses it to count
+ * how many bytes transferred to estimate the speed over the last
+ * Seconds seconds.
  */
+template<typename SizeType, std::size_t Seconds = 60>
 class tr_recentHistory
 {
 public:
@@ -27,15 +28,16 @@ public:
      * @param when the current time in sec, such as from tr_time()
      * @param n how many items to add to the history's counter
      */
-    void add(time_t now, size_t n)
+    void add(time_t now, SizeType n)
     {
-        if (slices[newest].time != now)
+        if (timestamps_[newest_] != now)
         {
-            newest = (newest + 1) % TR_RECENT_HISTORY_PERIOD_SEC;
-            slices[newest].time = now;
+            newest_ = (newest_ + 1) % Seconds;
+            timestamps_[newest_] = now;
+            count_[newest_] = {};
         }
 
-        slices[newest].n += n;
+        count_[newest_] += n;
     }
 
     /**
@@ -43,27 +45,24 @@ public:
      * @param when the current time in sec, such as from tr_time()
      * @param seconds how many seconds to count back through.
      */
-    size_t count(time_t now, unsigned int age_sec) const
+    SizeType count(time_t now, unsigned int age_sec) const
     {
+        auto sum = SizeType{};
         time_t const oldest = now - age_sec;
 
-        return std::accumulate(
-            std::begin(slices),
-            std::end(slices),
-            size_t{ 0 },
-            [&oldest](size_t sum, auto const& slice) { return slice.time >= oldest ? sum + slice.n : sum; });
+        for (std::size_t i = 0; i < Seconds; ++i)
+        {
+            if (timestamps_[i] >= oldest)
+            {
+                sum += count_[i];
+            }
+        }
+
+        return sum;
     }
 
 private:
-    inline auto static constexpr TR_RECENT_HISTORY_PERIOD_SEC = size_t{ 60 };
-
-    int newest = 0;
-
-    struct slice_t
-    {
-        size_t n = 0;
-        time_t time = 0;
-    };
-
-    std::array<slice_t, TR_RECENT_HISTORY_PERIOD_SEC> slices = {};
+    std::array<time_t, Seconds> timestamps_ = {};
+    std::array<SizeType, Seconds> count_ = {};
+    uint32_t newest_ = 0;
 };

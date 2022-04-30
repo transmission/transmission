@@ -8,6 +8,10 @@ Transmission is a fast, easy, and free BitTorrent client. It comes in several fl
 
 Visit https://transmissionbt.com/ for more information.
 
+## Documentation
+
+[Transmission's documentation](docs/README.md) is currently out-of-date, but the team has recently begun a new project to update it and is looking for volunteers. If you're interested, please feel free to submit pull requests!
+
 ## Command line interface notes
 
 Transmission is fully supported in transmission-remote, the preferred cli client.
@@ -22,12 +26,12 @@ Different distributions may choose to package any or all of these tools in one o
 
 Transmission has an Xcode project file (Transmission.xcodeproj) for building in Xcode.
 
-For a more detailed description, and dependencies, visit: https://github.com/transmission/transmission/wiki
+For a more detailed description, and dependencies, visit: https://github.com/transmission/transmission/tree/main/docs
 
 ### Building a Transmission release from the command line
 
-    $ tar xf transmission-2.92.tar.xz
-    $ cd transmission-2.92
+    $ tar xf transmission-3.00.tar.xz
+    $ cd transmission-3.00
     $ mkdir build
     $ cd build
     $ # Use -DCMAKE_BUILD_TYPE=RelWithDebInfo to build optimized binary.
@@ -57,6 +61,7 @@ If you're new to building programs from source code, this is typically easier th
 
     $ cd Transmission/build
     $ make clean
+    $ git submodule foreach --recursive git clean -xfd
     $ git pull --rebase --prune
     $ git submodule update --recursive
     $ # Use -DCMAKE_BUILD_TYPE=RelWithDebInfo to build optimized binary.

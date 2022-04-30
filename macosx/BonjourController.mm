@@ -6,6 +6,12 @@
 
 #define BONJOUR_SERVICE_NAME_MAX_LENGTH 63
 
+@interface BonjourController ()
+
+@property(nonatomic) NSNetService* fService;
+
+@end
+
 @implementation BonjourController
 
 BonjourController* fDefaultController = nil;
@@ -36,16 +42,16 @@ BonjourController* fDefaultController = nil;
         [serviceName deleteCharactersInRange:NSMakeRange(BONJOUR_SERVICE_NAME_MAX_LENGTH, serviceName.length - BONJOUR_SERVICE_NAME_MAX_LENGTH)];
     }
 
-    fService = [[NSNetService alloc] initWithDomain:@"" type:@"_http._tcp." name:serviceName port:port];
-    fService.delegate = self;
+    self.fService = [[NSNetService alloc] initWithDomain:@"" type:@"_http._tcp." name:serviceName port:port];
+    self.fService.delegate = self;
 
-    [fService publish];
+    [self.fService publish];
 }
 
 - (void)stop
 {
-    [fService stop];
-    fService = nil;
+    [self.fService stop];
+    self.fService = nil;
 }
 
 - (void)netService:(NSNetService*)sender didNotPublish:(NSDictionary*)errorDict

@@ -16,7 +16,9 @@
 #include <cstddef> // size_t
 #include <cstdint> // uintX_t
 #include <ctime>
+#include <memory>
 #include <optional>
+#include <string>
 
 #include <event2/buffer.h>
 
@@ -27,11 +29,9 @@
 #include "net.h" /* tr_address */
 #include "peer-socket.h"
 #include "tr-assert.h"
-#include "utils.h" // tr_time()
 
 class tr_peerIo;
 struct Bandwidth;
-struct evbuffer;
 struct tr_datatype;
 
 /**
@@ -61,6 +61,16 @@ using tr_net_error_cb = void (*)(tr_peerIo* io, short what, void* userData);
 
 auto inline constexpr PEER_IO_MAGIC_NUMBER = 206745;
 
+struct evbuffer_deleter
+{
+    void operator()(struct evbuffer* buf) const noexcept
+    {
+        evbuffer_free(buf);
+    }
+};
+
+using tr_evbuffer_ptr = std::unique_ptr<evbuffer, evbuffer_deleter>;
+
 class tr_peerIo
 {
 public:
@@ -70,21 +80,22 @@ public:
         bool is_incoming,
         tr_address const& addr_in,
         tr_port port_in,
-        bool is_seed_in)
+        bool is_seed_in,
+        time_t current_time)
         : crypto{ torrent_hash, is_incoming }
         , addr{ addr_in }
         , session{ session_in }
-        , inbuf{ evbuffer_new() }
-        , outbuf{ evbuffer_new() }
+        , time_created{ current_time }
         , port{ port_in }
-        , isSeed{ is_seed_in }
+        , is_seed{ is_seed_in }
     {
     }
 
-    ~tr_peerIo()
+    std::string addrStr() const;
+
+    [[nodiscard]] auto getReadBuffer() noexcept
     {
-        evbuffer_free(outbuf);
-        evbuffer_free(inbuf);
+        return inbuf.get();
     }
 
     tr_crypto crypto;
@@ -99,9 +110,9 @@ public:
 
     struct tr_peer_socket socket = {};
 
-    time_t const timeCreated = tr_time();
-
     tr_session* const session;
+
+    time_t const time_created;
 
     tr_can_read_cb canRead = nullptr;
     tr_did_write_cb didWrite = nullptr;
@@ -112,8 +123,9 @@ public:
     // TODO: change tr_bandwidth* to owning pointer to the bandwidth, or remove * and own the value
     Bandwidth* bandwidth = nullptr;
 
-    evbuffer* const inbuf;
-    evbuffer* const outbuf;
+    tr_evbuffer_ptr const inbuf = tr_evbuffer_ptr{ evbuffer_new() };
+    tr_evbuffer_ptr const outbuf = tr_evbuffer_ptr{ evbuffer_new() };
+
     struct tr_datatype* outbuf_datatypes = nullptr;
 
     struct event* event_read = nullptr;
@@ -131,7 +143,7 @@ public:
 
     tr_priority_t priority = TR_PRI_NORMAL;
 
-    bool const isSeed;
+    bool const is_seed;
     bool dhtSupported = false;
     bool extendedProtocolSupported = false;
     bool fastExtensionSupported = false;
@@ -142,13 +154,15 @@ public:
 ***
 **/
 
+// TODO: 8 constructor args is too many; maybe a builder object?
 tr_peerIo* tr_peerIoNewOutgoing(
     tr_session* session,
     Bandwidth* parent,
     struct tr_address const* addr,
     tr_port port,
+    time_t current_time,
     tr_sha1_digest_t const& torrent_hash,
-    bool isSeed,
+    bool is_seed,
     bool utp);
 
 tr_peerIo* tr_peerIoNewIncoming(
@@ -156,6 +170,7 @@ tr_peerIo* tr_peerIoNewIncoming(
     Bandwidth* parent,
     struct tr_address const* addr,
     tr_port port,
+    time_t current_time,
     struct tr_peer_socket const socket);
 
 void tr_peerIoRefImpl(char const* file, int line, tr_peerIo* io);
@@ -235,12 +250,6 @@ int tr_peerIoReconnect(tr_peerIo* io);
 constexpr bool tr_peerIoIsIncoming(tr_peerIo const* io)
 {
     return io->crypto.is_incoming;
-}
-
-// TODO: remove this func; let caller get the current time instead
-static inline int tr_peerIoGetAge(tr_peerIo const* io)
-{
-    return tr_time() - io->timeCreated;
 }
 
 /**
@@ -344,14 +353,5 @@ void tr_peerIoSetEnabled(tr_peerIo* io, tr_direction dir, bool isEnabled);
 int tr_peerIoFlush(tr_peerIo* io, tr_direction dir, size_t byteLimit);
 
 int tr_peerIoFlushOutgoingProtocolMsgs(tr_peerIo* io);
-
-/**
-***
-**/
-
-constexpr struct evbuffer* tr_peerIoGetReadBuffer(tr_peerIo* io)
-{
-    return io->inbuf;
-}
 
 /* @} */

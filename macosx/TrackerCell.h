@@ -5,8 +5,5 @@
 #import <Cocoa/Cocoa.h>
 
 @interface TrackerCell : NSActionCell
-{
-    NSMutableDictionary *fNameAttributes, *fStatusAttributes;
-}
 
 @end

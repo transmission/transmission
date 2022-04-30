@@ -51,7 +51,7 @@ FilterBarComboBox* FilterBar::createActivityCombo()
     model->appendRow(new QStandardItem); // separator
     FilterBarComboBoxDelegate::setSeparator(model, model->index(1, 0));
 
-    auto& icons = IconCache::get();
+    auto const& icons = IconCache::get();
 
     row = new QStandardItem(icons.getThemeIcon(QStringLiteral("system-run")), tr("Active"));
     row->setData(FilterMode::SHOW_ACTIVE, ACTIVITY_ROLE);
@@ -279,7 +279,7 @@ void FilterBar::refreshPref(int key)
     case Prefs::FILTER_MODE:
         {
             auto const m = prefs_.get<FilterMode>(key);
-            QAbstractItemModel* model = activity_combo_->model();
+            QAbstractItemModel const* const model = activity_combo_->model();
             QModelIndexList indices = model->match(model->index(0, 0), ACTIVITY_ROLE, m.mode());
             activity_combo_->setCurrentIndex(indices.isEmpty() ? 0 : indices.first().row());
             break;

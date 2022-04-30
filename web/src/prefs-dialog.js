@@ -63,6 +63,10 @@ export class PrefsDialog extends EventTarget {
   }
 
   static _getValue(e) {
+    if (e.tagName === 'TEXTAREA') {
+      return e.value;
+    }
+
     switch (e.type) {
       case 'checkbox':
       case 'radio':
@@ -128,6 +132,7 @@ export class PrefsDialog extends EventTarget {
               }
               break;
             case 'text':
+            case 'textarea':
             case 'url':
             case 'email':
             case 'number':
@@ -150,6 +155,7 @@ export class PrefsDialog extends EventTarget {
               }
               break;
             default:
+              console.log(element.type);
               break;
           }
         }
@@ -272,6 +278,8 @@ export class PrefsDialog extends EventTarget {
 
     input = document.createElement('input');
     input.type = 'number';
+    input.min = '0.1';
+    input.step = 'any';
     input.dataset.key = 'seedRatioLimit';
     root.append(input);
     PrefsDialog._enableIfChecked(input, cal.check);
@@ -287,6 +295,8 @@ export class PrefsDialog extends EventTarget {
 
     input = document.createElement('input');
     input.type = 'number';
+    input.min = '0.1';
+    input.step = 'any';
     input.dataset.key = 'idle-seeding-limit';
     root.append(input);
     PrefsDialog._enableIfChecked(input, cal.check);
@@ -642,7 +652,32 @@ export class PrefsDialog extends EventTarget {
     root.append(cal.root);
     const utp_check = cal.check;
 
+    label = document.createElement('div');
+    label.textContent = 'Default Public Trackers';
+    label.classList.add('section-label');
+    root.append(label);
+
+    const tracker_labels = [
+      'Trackers to use on all public torrents.',
+      'To add a backup URL, add it on the next line after a primary URL.',
+      'To add a new primary URL, add it after a blank line.',
+    ];
+    for (const text of tracker_labels) {
+      label = document.createElement('label');
+      label.classList.add('default-trackers-label');
+      label.textContent = text;
+      label.setAttribute('for', 'default-trackers');
+      root.append(label);
+    }
+
+    const textarea = document.createElement('textarea');
+    textarea.dataset.key = 'default-trackers';
+    textarea.id = 'default-trackers';
+    root.append(textarea);
+    const default_trackers_textarea = textarea;
+
     return {
+      default_trackers_textarea,
       port_forwarding_check,
       port_input,
       port_status_label,
@@ -710,6 +745,8 @@ export class PrefsDialog extends EventTarget {
               console.trace(`unhandled input: ${element.type}`);
               break;
           }
+        } else if (element.tagName === 'TEXTAREA') {
+          element.addEventListener('change', on_change);
         }
       }
     };

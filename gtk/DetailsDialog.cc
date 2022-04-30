@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <array>
 #include <limits.h> /* INT_MAX */
+#include <numeric>
 #include <sstream>
 #include <stddef.h>
 #include <stdio.h> /* sscanf() */
@@ -15,6 +16,10 @@
 #include <unordered_map>
 
 #include <glibmm/i18n.h>
+
+#include <fmt/core.h>
+#include <fmt/chrono.h>
+#include <fmt/format.h>
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/utils.h> /* tr_free */
@@ -458,12 +463,12 @@ Gtk::Widget* DetailsDialog::Impl::options_page_new()
     auto* t = Gtk::make_managed<HigWorkarea>();
     t->add_section_title(row, _("Speed"));
 
-    honor_limits_check_ = t->add_wide_checkbutton(row, _("Honor global _limits"), 0);
+    honor_limits_check_ = t->add_wide_checkbutton(row, _("Honor global _limits"), false);
     honor_limits_check_tag_ = honor_limits_check_->signal_toggled().connect(
         [this]() { torrent_set_bool(TR_KEY_honorsSessionLimits, honor_limits_check_->get_active()); });
 
     down_limited_check_ = Gtk::make_managed<Gtk::CheckButton>(
-        gtr_sprintf(_("Limit _download speed (%s):"), _(speed_K_str)),
+        fmt::format(_("Limit _download speed ({speed_units}):"), fmt::arg("speed_units", speed_K_str)),
         true);
     down_limited_check_->set_active(false);
     down_limited_check_tag_ = down_limited_check_->signal_toggled().connect(
@@ -474,7 +479,9 @@ Gtk::Widget* DetailsDialog::Impl::options_page_new()
         [this]() { torrent_set_int(TR_KEY_downloadLimit, down_limit_spin_->get_value_as_int()); });
     t->add_row_w(row, *down_limited_check_, *down_limit_spin_);
 
-    up_limited_check_ = Gtk::make_managed<Gtk::CheckButton>(gtr_sprintf(_("Limit _upload speed (%s):"), _(speed_K_str)), true);
+    up_limited_check_ = Gtk::make_managed<Gtk::CheckButton>(
+        fmt::format(_("Limit _upload speed ({speed_units}):"), fmt::arg("speed_units", speed_K_str)),
+        true);
     up_limited_check_tag_ = up_limited_check_->signal_toggled().connect(
         [this]() { torrent_set_bool(TR_KEY_uploadLimited, up_limited_check_->get_active()); });
 
@@ -592,19 +599,9 @@ void gtr_text_buffer_set_text(Glib::RefPtr<Gtk::TextBuffer> const& b, Glib::ustr
     }
 }
 
-Glib::ustring get_short_date_string(time_t t)
+[[nodiscard]] std::string get_date_string(time_t t)
 {
-    char buf[64];
-    struct tm tm;
-
-    if (t == 0)
-    {
-        return _("N/A");
-    }
-
-    tr_localtime_r(&t, &tm);
-    strftime(buf, sizeof(buf), "%d %b %Y", &tm);
-    return Glib::locale_to_utf8(buf);
+    return t == 0 ? _("N/A") : fmt::format(FMT_STRING("{:%x}"), fmt::localtime(t));
 }
 
 } // namespace
@@ -659,9 +656,9 @@ void DetailsDialog::Impl::refreshInfo(std::vector<tr_torrent*> const& torrents)
     }
     else
     {
-        auto const creator = Glib::ustring(infos.front().creator != nullptr ? infos.front().creator : "");
+        auto const creator = tr_strvStrip(infos.front().creator != nullptr ? infos.front().creator : "");
         auto const date = infos.front().date_created;
-        auto const datestr = get_short_date_string(date);
+        auto const datestr = get_date_string(date);
         bool const mixed_creator = std::any_of(
             infos.begin(),
             infos.end(),
@@ -671,31 +668,28 @@ void DetailsDialog::Impl::refreshInfo(std::vector<tr_torrent*> const& torrents)
             infos.end(),
             [date](auto const& info) { return date != info.date_created; });
 
-        bool const empty_creator = creator.empty();
+        bool const empty_creator = std::empty(creator);
         bool const empty_date = date == 0;
 
-        if (mixed_date || mixed_creator)
+        if (mixed_creator || mixed_date)
         {
             str = mixed;
         }
-        else if (empty_date && empty_creator)
+        else if (!empty_creator && !empty_date)
         {
-            str = _("N/A");
+            str = fmt::format(_("Created by {creator} on {date}"), fmt::arg("creator", creator), fmt::arg("date", datestr));
+        }
+        else if (!empty_creator)
+        {
+            str = fmt::format(_("Created by {creator}"), fmt::arg("creator", creator));
+        }
+        else if (!empty_date)
+        {
+            str = fmt::format(_("Created on {date}"), fmt::arg("date", datestr));
         }
         else
         {
-            if (empty_date && !empty_creator)
-            {
-                str = gtr_sprintf(_("Created by %1$s"), creator);
-            }
-            else if (empty_creator && !empty_date)
-            {
-                str = gtr_sprintf(_("Created on %1$s"), datestr);
-            }
-            else
-            {
-                str = gtr_sprintf(_("Created by %1$s on %2$s"), creator, datestr);
-            }
+            str = _("N/A");
         }
     }
 
@@ -817,42 +811,52 @@ void DetailsDialog::Impl::refreshInfo(std::vector<tr_torrent*> const& torrents)
 
     /* size_lb */
     {
-        uint64_t size = 0;
-        int pieces = 0;
-        int32_t pieceSize = 0;
+        auto const piece_count = std::accumulate(
+            std::begin(infos),
+            std::end(infos),
+            uint64_t{},
+            [](auto sum, auto const& info) { return sum + info.n_pieces; });
 
-        for (auto const& info : infos)
-        {
-            size += info.total_size;
-            pieces += info.n_pieces;
-
-            if (pieceSize == 0)
-            {
-                pieceSize = info.piece_size;
-            }
-            else if (pieceSize != (int)info.piece_size)
-            {
-                pieceSize = -1;
-            }
-        }
-
-        auto const sizebuf = tr_strlsize(size);
-
-        if (size == 0)
+        if (piece_count == 0)
         {
             str.clear();
         }
-        else if (pieceSize >= 0)
-        {
-            str = gtr_sprintf(
-                ngettext("%1$s (%2$'d piece @ %3$s)", "%1$s (%2$'d pieces @ %3$s)", pieces),
-                sizebuf,
-                pieces,
-                tr_formatter_mem_B(pieceSize));
-        }
         else
         {
-            str = gtr_sprintf(ngettext("%1$s (%2$'d piece)", "%1$s (%2$'d pieces)", pieces), sizebuf, pieces);
+            auto const total_size = std::accumulate(
+                std::begin(infos),
+                std::end(infos),
+                uint64_t{},
+                [](auto sum, auto const& info) { return sum + info.total_size; });
+
+            auto const file_count = std::accumulate(
+                std::begin(torrents),
+                std::end(torrents),
+                std::size_t{},
+                [](auto sum, auto const* tor) { return sum + tr_torrentFileCount(tor); });
+
+            str = fmt::format(
+                ngettext("{total_size} in {file_count:L} file", "{total_size} in {file_count:L} files", file_count),
+                fmt::arg("total_size", tr_strlsize(total_size)),
+                fmt::arg("file_count", file_count));
+
+            auto const piece_size = std::empty(infos) ? uint32_t{} : infos.front().piece_size;
+            auto const piece_size_is_uniform = std::all_of(
+                std::begin(infos),
+                std::end(infos),
+                [piece_size](auto const& info) { return info.piece_size == piece_size; });
+
+            if (piece_size_is_uniform)
+            {
+                str += ' ';
+                str += fmt::format(
+                    ngettext(
+                        "({piece_count} BitTorrent piece @ {piece_size})",
+                        "({piece_count} BitTorrent pieces @ {piece_size})",
+                        piece_count),
+                    fmt::arg("piece_count", piece_count),
+                    fmt::arg("piece_size", tr_formatter_mem_B(piece_size)));
+            }
         }
 
         size_lb_->set_text(str);
@@ -883,54 +887,69 @@ void DetailsDialog::Impl::refreshInfo(std::vector<tr_torrent*> const& torrents)
             double const d = sizeWhenDone != 0 ? (100.0 * available) / sizeWhenDone : 0;
             double const ratio = 100.0 * (sizeWhenDone != 0 ? (haveValid + haveUnchecked) / (double)sizeWhenDone : 1);
 
-            auto const avail = tr_strlpercent(d);
-            auto const buf2 = tr_strlpercent(ratio);
+            auto const avail = tr_strpercent(d);
+            auto const buf2 = tr_strpercent(ratio);
             auto const total = tr_strlsize(haveUnchecked + haveValid);
             auto const unver = tr_strlsize(haveUnchecked);
 
             if (haveUnchecked == 0 && leftUntilDone == 0)
             {
-                str = gtr_sprintf(_("%1$s (%2$s%%)"), total, buf2);
+                str = fmt::format(
+                    _("{current_size} ({percent_done}%)"),
+                    fmt::arg("current_size", total),
+                    fmt::arg("percent_done", buf2));
             }
             else if (haveUnchecked == 0)
             {
-                str = gtr_sprintf(_("%1$s (%2$s%% of %3$s%% Available)"), total, buf2, avail);
+                str = fmt::format(
+                    _("{current_size} ({percent_done}% of {percent_available}% available)"),
+                    fmt::arg("current_size", total),
+                    fmt::arg("percent_done", buf2),
+                    fmt::arg("percent_available", avail));
             }
             else
             {
-                str = gtr_sprintf(_("%1$s (%2$s%% of %3$s%% Available); %4$s Unverified"), total, buf2, avail, unver);
+                str = fmt::format(
+                    _("{current_size} ({percent_done}% of {percent_available}% available; {unverified_size} unverified)"),
+                    fmt::arg("current_size", total),
+                    fmt::arg("percent_done", buf2),
+                    fmt::arg("percent_available", avail),
+                    fmt::arg("unverified_size", unver));
             }
         }
     }
 
     have_lb_->set_text(str);
 
-    /* dl_lb */
+    // dl_lb
     if (stats.empty())
     {
         str = no_torrent;
     }
     else
     {
-        uint64_t d = 0;
-        uint64_t f = 0;
+        auto const downloaded_str = tr_strlsize(std::accumulate(
+            std::begin(stats),
+            std::end(stats),
+            uint64_t{ 0 },
+            [](auto sum, auto const* st) { return sum + st->downloadedEver; }));
 
-        for (auto const* const st : stats)
+        auto const failed = std::accumulate(
+            std::begin(stats),
+            std::end(stats),
+            uint64_t{ 0 },
+            [](auto sum, auto const* st) { return sum + st->corruptEver; });
+
+        if (failed != 0)
         {
-            d += st->downloadedEver;
-            f += st->corruptEver;
-        }
-
-        auto const dbuf = tr_strlsize(d);
-        auto const fbuf = tr_strlsize(f);
-
-        if (f != 0)
-        {
-            str = gtr_sprintf(_("%1$s (+%2$s discarded after failed checksum)"), dbuf, fbuf);
+            str = fmt::format(
+                _("{downloaded_size} (+{discarded_size} discarded after failed checksum)"),
+                fmt::arg("downloaded_size", downloaded_str),
+                fmt::arg("discarded_size", tr_strlsize(failed)));
         }
         else
         {
-            str = dbuf;
+            str = downloaded_str;
         }
     }
 
@@ -943,16 +962,20 @@ void DetailsDialog::Impl::refreshInfo(std::vector<tr_torrent*> const& torrents)
     }
     else
     {
-        uint64_t up = 0;
-        uint64_t down = 0;
-
-        for (auto const* const st : stats)
-        {
-            up += st->uploadedEver;
-            down += st->downloadedEver;
-        }
-
-        str = gtr_sprintf(_("%s (Ratio: %s)"), tr_strlsize(up), tr_strlratio(tr_getRatio(up, down)));
+        auto const uploaded = std::accumulate(
+            std::begin(stats),
+            std::end(stats),
+            uint64_t{},
+            [](auto sum, auto const* st) { return sum + st->uploadedEver; });
+        auto const denominator = std::accumulate(
+            std::begin(stats),
+            std::end(stats),
+            uint64_t{},
+            [](auto sum, auto const* st) { return sum + st->sizeWhenDone; });
+        str = fmt::format(
+            _("{uploaded_size} (Ratio: {ratio})"),
+            fmt::arg("uploaded_size", tr_strlsize(uploaded)),
+            fmt::arg("ratio", tr_strlratio(tr_getRatio(uploaded, denominator))));
     }
 
     ul_lb_->set_text(str);
@@ -1023,7 +1046,8 @@ void DetailsDialog::Impl::refreshInfo(std::vector<tr_torrent*> const& torrents)
             }
             else
             {
-                str = gtr_sprintf(_("%1$s ago"), tr_strltime(period));
+                // e.g. 5 minutes ago
+                str = fmt::format(_("{time_span} ago"), fmt::arg("time_span", tr_strltime(period)));
             }
         }
     }
@@ -1224,7 +1248,7 @@ public:
 
 PeerModelColumns const peer_cols;
 
-void initPeerRow(Gtk::TreeIter const& iter, std::string const& key, std::string const& torrentName, tr_peer_stat const* peer)
+void initPeerRow(Gtk::TreeIter const& iter, std::string_view key, std::string_view torrent_name, tr_peer_stat const* peer)
 {
     g_return_if_fail(peer != nullptr);
 
@@ -1234,23 +1258,17 @@ void initPeerRow(Gtk::TreeIter const& iter, std::string const& key, std::string 
         client = "";
     }
 
-    int q[4];
-    Glib::ustring collated_name;
-    if (sscanf(peer->addr, "%d.%d.%d.%d", q, q + 1, q + 2, q + 3) != 4)
-    {
-        collated_name = peer->addr;
-    }
-    else
-    {
-        collated_name = gtr_sprintf("%03d.%03d.%03d.%03d", q[0], q[1], q[2], q[3]);
-    }
+    auto q = std::array<int, 4>{};
+    auto const collated_name = sscanf(peer->addr, "%d.%d.%d.%d", &q[0], &q[1], &q[2], &q[3]) != 4 ?
+        peer->addr :
+        fmt::format(FMT_STRING("{:03d}.{:03d}.{:03d}.{:03d}"), q[0], q[1], q[2], q[3]);
 
     (*iter)[peer_cols.address] = peer->addr;
     (*iter)[peer_cols.address_collated] = collated_name;
     (*iter)[peer_cols.client] = client;
     (*iter)[peer_cols.encryption_stock_id] = peer->isEncrypted ? "lock" : "";
-    (*iter)[peer_cols.key] = key;
-    (*iter)[peer_cols.torrent_name] = torrentName;
+    (*iter)[peer_cols.key] = Glib::ustring{ std::data(key), std::size(key) };
+    (*iter)[peer_cols.torrent_name] = Glib::ustring{ std::data(torrent_name), std::size(torrent_name) };
 }
 
 void refreshPeerRow(Gtk::TreeIter const& iter, tr_peer_stat const* peer)
@@ -1332,7 +1350,7 @@ void refreshPeerRow(Gtk::TreeIter const& iter, tr_peer_stat const* peer)
 void DetailsDialog::Impl::refreshPeerList(std::vector<tr_torrent*> const& torrents)
 {
     auto& hash = peer_hash_;
-    auto& store = peer_store_;
+    auto const& store = peer_store_;
 
     /* step 1: get all the peers */
     std::vector<tr_peer_stat*> peers;
@@ -1353,6 +1371,11 @@ void DetailsDialog::Impl::refreshPeerList(std::vector<tr_torrent*> const& torren
         row[peer_cols.was_updated] = false;
     }
 
+    auto make_key = [](tr_torrent const* tor, tr_peer_stat const* ps)
+    {
+        return fmt::format(FMT_STRING("{:d}.{:s}"), tr_torrentId(tor), ps->addr);
+    };
+
     /* step 3: add any new peers */
     for (size_t i = 0; i < torrents.size(); ++i)
     {
@@ -1361,7 +1384,7 @@ void DetailsDialog::Impl::refreshPeerList(std::vector<tr_torrent*> const& torren
         for (int j = 0; j < peerCount[i]; ++j)
         {
             auto const* s = &peers.at(i)[j];
-            auto const key = gtr_sprintf("%d.%s", tr_torrentId(tor), s->addr);
+            auto const key = make_key(tor, s);
 
             if (hash.find(key) == hash.end())
             {
@@ -1380,7 +1403,7 @@ void DetailsDialog::Impl::refreshPeerList(std::vector<tr_torrent*> const& torren
         for (int j = 0; j < peerCount[i]; ++j)
         {
             auto const* s = &peers.at(i)[j];
-            auto const key = gtr_sprintf("%d.%s", tr_torrentId(tor), s->addr);
+            auto const key = make_key(tor, s);
             refreshPeerRow(store->get_iter(hash.at(key).get_path()), s);
         }
     }
@@ -1414,7 +1437,12 @@ void DetailsDialog::Impl::refreshWebseedList(std::vector<tr_torrent*> const& tor
 {
     auto has_any_webseeds = bool{ false };
     auto& hash = webseed_hash_;
-    auto& store = webseed_store_;
+    auto const& store = webseed_store_;
+
+    auto make_key = [](tr_torrent const* tor, char const* url)
+    {
+        return fmt::format(FMT_STRING("{:d}.{:s}"), tr_torrentId(tor), url);
+    };
 
     /* step 1: mark all webseeds as not-updated */
     for (auto const& row : store->children())
@@ -1430,7 +1458,7 @@ void DetailsDialog::Impl::refreshWebseedList(std::vector<tr_torrent*> const& tor
             has_any_webseeds = true;
 
             auto const* const url = tr_torrentWebseed(tor, j).url;
-            auto const key = gtr_sprintf("%d.%s", tr_torrentId(tor), url);
+            auto const key = make_key(tor, url);
 
             if (hash.find(key) == hash.end())
             {
@@ -1448,7 +1476,7 @@ void DetailsDialog::Impl::refreshWebseedList(std::vector<tr_torrent*> const& tor
         for (size_t j = 0, n = tr_torrentWebseedCount(tor); j < n; ++j)
         {
             auto const webseed = tr_torrentWebseed(tor, j);
-            auto const key = gtr_sprintf("%d.%s", tr_torrentId(tor), webseed.url);
+            auto const key = make_key(tor, webseed.url);
             auto const iter = store->get_iter(hash.at(key).get_path());
 
             auto const KBps = double(webseed.download_bytes_per_second) / speed_K;
@@ -1647,6 +1675,7 @@ void setPeerViewColumns(Gtk::TreeView* peer_view)
         else if (*col == peer_cols.progress)
         {
             auto* r = Gtk::make_managed<Gtk::CellRendererProgress>();
+            // % is percent done
             c = Gtk::make_managed<Gtk::TreeViewColumn>(_("%"), *r);
             c->add_attribute(r->property_text(), *col);
         }
@@ -1835,12 +1864,12 @@ Gtk::Widget* DetailsDialog::Impl::peer_page_new()
 namespace
 {
 
-char const err_markup_begin[] = "<span color=\"red\">";
-char const err_markup_end[] = "</span>";
-char const timeout_markup_begin[] = "<span color=\"#246\">";
-char const timeout_markup_end[] = "</span>";
-char const success_markup_begin[] = "<span color=\"#080\">";
-char const success_markup_end[] = "</span>";
+auto constexpr ErrMarkupBegin = "<span color=\"red\">"sv;
+auto constexpr ErrMarkupEnd = "</span>"sv;
+auto constexpr TimeoutMarkupBegin = "<span color=\"#246\">"sv;
+auto constexpr TimeoutMarkupEnd = "</span>"sv;
+auto constexpr SuccessMarkupBegin = "<span color=\"#080\">"sv;
+auto constexpr SuccessMarkupEnd = "</span>"sv;
 
 std::array<std::string_view, 3> const text_dir_mark = { ""sv, "\u200E"sv, "\u200F"sv };
 
@@ -1865,29 +1894,35 @@ void appendAnnounceInfo(tr_tracker_view const& tracker, time_t const now, Gtk::T
 
         if (tracker.lastAnnounceSucceeded)
         {
-            gstr << gtr_sprintf(
-                _("Got a list of %1$s%2$'d peers%3$s %4$s ago"),
-                success_markup_begin,
-                tracker.lastAnnouncePeerCount,
-                success_markup_end,
-                timebuf);
+            gstr << fmt::format(
+                // {markup_begin} and {markup_end} should surround the peer text
+                ngettext(
+                    "Got a list of {markup_begin}{peer_count} peer{markup_end} {time_span} ago",
+                    "Got a list of {markup_begin}{peer_count} peers{markup_end} {time_span} ago",
+                    tracker.lastAnnouncePeerCount),
+                fmt::arg("markup_begin", SuccessMarkupBegin),
+                fmt::arg("peer_count", tracker.lastAnnouncePeerCount),
+                fmt::arg("markup_end", SuccessMarkupEnd),
+                fmt::arg("time_span", timebuf));
         }
         else if (tracker.lastAnnounceTimedOut)
         {
-            gstr << gtr_sprintf(
-                _("Peer list request %1$stimed out%2$s %3$s ago; will retry"),
-                timeout_markup_begin,
-                timeout_markup_end,
-                timebuf);
+            gstr << fmt::format(
+                // {markup_begin} and {markup_end} should surround the time_span
+                _("Peer list request {markup_begin}timed out {time_span} ago{markup_end}; will retry"),
+                fmt::arg("markup_begin", TimeoutMarkupBegin),
+                fmt::arg("time_span", timebuf),
+                fmt::arg("markup_end", TimeoutMarkupEnd));
         }
         else
         {
-            gstr << gtr_sprintf(
-                _("Got an error %1$s\"%2$s\"%3$s %4$s ago"),
-                err_markup_begin,
-                tracker.lastAnnounceResult,
-                err_markup_end,
-                timebuf);
+            gstr << fmt::format(
+                // {markup_begin} and {markup_end} should surround the error
+                _("Got an error '{markup_begin}{error}{markup_end}' {time_span} ago"),
+                fmt::arg("markup_begin", ErrMarkupBegin),
+                fmt::arg("error", Glib::Markup::escape_text(tracker.lastAnnounceResult)),
+                fmt::arg("markup_end", ErrMarkupEnd),
+                fmt::arg("time_span", timebuf));
         }
     }
 
@@ -1902,7 +1937,9 @@ void appendAnnounceInfo(tr_tracker_view const& tracker, time_t const now, Gtk::T
     case TR_TRACKER_WAITING:
         gstr << '\n';
         gstr << text_dir_mark[direction];
-        gstr << gtr_sprintf(_("Asking for more peers in %s"), tr_strltime_rounded(tracker.nextAnnounceTime - now));
+        gstr << fmt::format(
+            _("Asking for more peers in {time_span}"),
+            fmt::arg("time_span", tr_strltime_rounded(tracker.nextAnnounceTime - now)));
         break;
 
     case TR_TRACKER_QUEUED:
@@ -1914,9 +1951,12 @@ void appendAnnounceInfo(tr_tracker_view const& tracker, time_t const now, Gtk::T
     case TR_TRACKER_ACTIVE:
         gstr << '\n';
         gstr << text_dir_mark[direction];
-        gstr << gtr_sprintf(
-            _("Asking for more peers now… <small>%s</small>"),
-            tr_strltime_rounded(now - tracker.lastAnnounceStartTime));
+        gstr << fmt::format(
+            // {markup_begin} and {markup_end} should surround the time_span
+            _("Asking for more peers now… {markup_begin}{time_span}{markup_end}"),
+            fmt::arg("markup_begin", "<small>"),
+            fmt::arg("time_span", tr_strltime_rounded(now - tracker.lastAnnounceStartTime)),
+            fmt::arg("markup_end", "</small>"));
         break;
 
     default:
@@ -1934,22 +1974,26 @@ void appendScrapeInfo(tr_tracker_view const& tracker, time_t const now, Gtk::Tex
 
         if (tracker.lastScrapeSucceeded)
         {
-            gstr << gtr_sprintf(
-                _("Tracker had %s%'d seeders and %'d leechers%s %s ago"),
-                success_markup_begin,
-                tracker.seederCount,
-                tracker.leecherCount,
-                success_markup_end,
-                timebuf);
+            gstr << fmt::format(
+                // {markup_begin} and {markup_end} should surround the seeder/leecher text
+                _("Tracker had {markup_begin}{seeder_count} {seeder_or_seeders} and {leecher_count} {leecher_or_leechers}{markup_end} {time_span} ago"),
+                fmt::arg("seeder_count", tracker.seederCount),
+                fmt::arg("seeder_or_seeders", ngettext("seeder", "seeders", tracker.seederCount)),
+                fmt::arg("leecher_count", tracker.leecherCount),
+                fmt::arg("leecher_or_leechers", ngettext("leecher", "leechers", tracker.leecherCount)),
+                fmt::arg("time_span", timebuf),
+                fmt::arg("markup_begin", SuccessMarkupBegin),
+                fmt::arg("markup_end", SuccessMarkupEnd));
         }
         else
         {
-            gstr << gtr_sprintf(
-                _("Got a scrape error \"%s%s%s\" %s ago"),
-                err_markup_begin,
-                tracker.lastScrapeResult,
-                err_markup_end,
-                timebuf);
+            gstr << fmt::format(
+                // {markup_begin} and {markup_end} should surround the error text
+                _("Got a scrape error '{markup_begin}{error}{markup_end}' {time_span} ago"),
+                fmt::arg("error", Glib::Markup::escape_text(tracker.lastScrapeResult)),
+                fmt::arg("time_span", timebuf),
+                fmt::arg("markup_begin", ErrMarkupBegin),
+                fmt::arg("markup_end", ErrMarkupEnd));
         }
     }
 
@@ -1961,7 +2005,9 @@ void appendScrapeInfo(tr_tracker_view const& tracker, time_t const now, Gtk::Tex
     case TR_TRACKER_WAITING:
         gstr << '\n';
         gstr << text_dir_mark[direction];
-        gstr << gtr_sprintf(_("Asking for peer counts in %s"), tr_strltime_rounded(tracker.nextScrapeTime - now));
+        gstr << fmt::format(
+            _("Asking for peer counts in {time_span}"),
+            fmt::arg("time_span", tr_strltime_rounded(tracker.nextScrapeTime - now)));
         break;
 
     case TR_TRACKER_QUEUED:
@@ -1973,9 +2019,11 @@ void appendScrapeInfo(tr_tracker_view const& tracker, time_t const now, Gtk::Tex
     case TR_TRACKER_ACTIVE:
         gstr << '\n';
         gstr << text_dir_mark[direction];
-        gstr << gtr_sprintf(
-            _("Asking for peer counts now… <small>%s</small>"),
-            tr_strltime_rounded(now - tracker.lastScrapeStartTime));
+        gstr << fmt::format(
+            _("Asking for peer counts now… {markup_begin}{time_span}{markup_end}"),
+            fmt::arg("markup_begin", "<small>"),
+            fmt::arg("time_span", tr_strltime_rounded(now - tracker.lastScrapeStartTime)),
+            fmt::arg("markup_end", "</small>"));
         break;
 
     default:
@@ -1993,7 +2041,7 @@ void buildTrackerSummary(
     // hostname
     gstr << text_dir_mark[direction];
     gstr << (tracker.isBackup ? "<i>" : "<b>");
-    gstr << Glib::Markup::escape_text(!key.empty() ? gtr_sprintf("%s - %s", tracker.host, key) : tracker.host);
+    gstr << Glib::Markup::escape_text(!key.empty() ? fmt::format(FMT_STRING("{:s} - {:s}"), tracker.host, key) : tracker.host);
     gstr << (tracker.isBackup ? "</i>" : "</b>");
 
     if (!tracker.isBackup)
@@ -2101,7 +2149,7 @@ void DetailsDialog::Impl::refreshTracker(std::vector<tr_torrent*> const& torrent
 {
     std::ostringstream gstr;
     auto& hash = tracker_hash_;
-    auto& store = tracker_store_;
+    auto const& store = tracker_store_;
     auto* session = core_->get_session();
     bool const showScrape = scrape_check_->get_active();
 
@@ -2210,40 +2258,11 @@ void DetailsDialog::Impl::on_edit_trackers_response(int response, std::shared_pt
     if (response == Gtk::RESPONSE_ACCEPT)
     {
         auto const torrent_id = GPOINTER_TO_INT(dialog->get_data(TORRENT_ID_KEY));
-        auto* const text_buffer = static_cast<Gtk::TextBuffer*>(dialog->get_data(TEXT_BUFFER_KEY));
-        tr_torrent* const tor = core_->find_torrent(torrent_id);
+        auto const* const text_buffer = static_cast<Gtk::TextBuffer*>(dialog->get_data(TEXT_BUFFER_KEY));
 
-        if (tor != nullptr)
+        if (auto* const tor = core_->find_torrent(torrent_id); tor != nullptr)
         {
-            /* build the array of trackers */
-            auto const tracker_text = text_buffer->get_text(false);
-            std::istringstream tracker_strings(tracker_text);
-
-            auto announce_url_strings = std::vector<std::string>{};
-            auto announce_urls = std::vector<char const*>{};
-            auto tiers = std::vector<tr_tracker_tier_t>{};
-            auto tier = tr_tracker_tier_t{ 0 };
-
-            std::string str;
-            while (std::getline(tracker_strings, str))
-            {
-                if (str.empty())
-                {
-                    ++tier;
-                }
-                else
-                {
-                    announce_url_strings.push_back(str);
-                    tiers.push_back(tier);
-                }
-            }
-
-            std::transform(
-                std::begin(announce_url_strings),
-                std::end(announce_url_strings),
-                std::back_inserter(announce_urls),
-                [](auto const& url) { return url.c_str(); });
-            if (tr_torrentSetAnnounceList(tor, std::data(announce_urls), std::data(tiers), std::size(announce_urls)))
+            if (tr_torrentSetTrackerList(tor, text_buffer->get_text(false).c_str()))
             {
                 refresh();
             }
@@ -2270,28 +2289,9 @@ namespace
 
 std::string get_editable_tracker_list(tr_torrent const* tor)
 {
-    std::ostringstream gstr;
-    int tier = 0;
-
-    for (size_t i = 0, n = tr_torrentTrackerCount(tor); i < n; ++i)
-    {
-        auto const tracker = tr_torrentTracker(tor, i);
-
-        if (tier != tracker.tier)
-        {
-            tier = tracker.tier;
-            gstr << '\n';
-        }
-
-        gstr << tracker.announce << '\n';
-    }
-
-    auto str = gstr.str();
-    if (!str.empty())
-    {
-        str.resize(str.size() - 1);
-    }
-
+    char* cstr = tr_torrentGetTrackerList(tor);
+    auto str = std::string{ cstr != nullptr ? cstr : "" };
+    tr_free(cstr);
     return str;
 }
 
@@ -2307,7 +2307,7 @@ void DetailsDialog::Impl::on_edit_trackers()
         int const torrent_id = tr_torrentId(tor);
 
         auto d = std::make_shared<Gtk::Dialog>(
-            gtr_sprintf(_("%s - Edit Trackers"), tr_torrentName(tor)),
+            fmt::format(_("{torrent_name} - Edit Trackers"), fmt::arg("torrent_name", tr_torrentName(tor))),
             dialog_,
             Gtk::DIALOG_MODAL | Gtk::DIALOG_DESTROY_WITH_PARENT);
         d->add_button(_("_Cancel"), Gtk::RESPONSE_CANCEL);
@@ -2320,8 +2320,8 @@ void DetailsDialog::Impl::on_edit_trackers()
 
         auto* l = Gtk::make_managed<Gtk::Label>();
         l->set_markup(
-            _("To add a backup URL, add it on the line after the primary URL.\n"
-              "To add another primary URL, add it after a blank line."));
+            _("To add a backup URL, add it on the next line after a primary URL.\n"
+              "To add a new primary URL, add it after a blank line."));
         l->set_justify(Gtk::JUSTIFY_LEFT);
         l->set_halign(Gtk::ALIGN_START);
         l->set_valign(Gtk::ALIGN_CENTER);
@@ -2338,6 +2338,13 @@ void DetailsDialog::Impl::on_edit_trackers()
         fr->set_size_request(500U, 166U);
         t->add_wide_tall_control(row, *fr);
 
+        l = Gtk::make_managed<Gtk::Label>();
+        l->set_markup(_("Also see Default Public Trackers in Edit > Preferences > Network"));
+        l->set_justify(Gtk::JUSTIFY_LEFT);
+        l->set_halign(Gtk::ALIGN_START);
+        l->set_valign(Gtk::ALIGN_CENTER);
+        t->add_wide_control(row, *l);
+
         gtr_dialog_set_content(*d, *t);
 
         d->set_data(TORRENT_ID_KEY, GINT_TO_POINTER(torrent_id));
@@ -2350,7 +2357,7 @@ void DetailsDialog::Impl::on_edit_trackers()
 void DetailsDialog::Impl::on_tracker_list_selection_changed()
 {
     int const n = tracker_view_->get_selection()->count_selected_rows();
-    auto* tor = tracker_list_get_current_torrent();
+    auto const* const tor = tracker_list_get_current_torrent();
 
     remove_tracker_button_->set_sensitive(n > 0);
     add_tracker_button_->set_sensitive(tor != nullptr);
@@ -2363,7 +2370,7 @@ void DetailsDialog::Impl::on_add_tracker_response(int response, std::shared_ptr<
 
     if (response == Gtk::RESPONSE_ACCEPT)
     {
-        auto* e = static_cast<Gtk::Entry*>(dialog->get_data(URL_ENTRY_KEY));
+        auto const* const e = static_cast<Gtk::Entry*>(dialog->get_data(URL_ENTRY_KEY));
         auto const torrent_id = GPOINTER_TO_INT(dialog->get_data(TORRENT_ID_KEY));
         auto const url = gtr_str_strip(e->get_text());
 
@@ -2410,7 +2417,7 @@ void DetailsDialog::Impl::on_tracker_list_add_button_clicked()
         guint row;
 
         auto w = std::make_shared<Gtk::Dialog>(
-            gtr_sprintf(_("%s - Add Tracker"), tr_torrentName(tor)),
+            fmt::format(_("{torrent_name} - Add Tracker"), fmt::arg("torrent_name", tr_torrentName(tor))),
             dialog_,
             Gtk::DIALOG_DESTROY_WITH_PARENT);
         w->add_button(_("_Cancel"), Gtk::RESPONSE_CANCEL);
@@ -2650,7 +2657,7 @@ void DetailsDialog::Impl::set_torrents(std::vector<int> const& ids)
     {
         int const id = ids.front();
         auto const* tor = core_->find_torrent(id);
-        title = gtr_sprintf(_("%s Properties"), tr_torrentName(tor));
+        title = fmt::format(_("{torrent_name} Properties"), fmt::arg("torrent_name", tr_torrentName(tor)));
 
         file_list_->set_torrent(id);
         file_list_->show();
@@ -2658,10 +2665,13 @@ void DetailsDialog::Impl::set_torrents(std::vector<int> const& ids)
     }
     else
     {
+        title = fmt::format(
+            ngettext("Properties - {torrent_count:L} Torrent", "Properties - {torrent_count:L} Torrents", len),
+            fmt::arg("torrent_count", len));
+
         file_list_->clear();
         file_list_->hide();
         file_label_->show();
-        title = gtr_sprintf(_("%'d Torrent Properties"), len);
     }
 
     dialog_.set_title(title);

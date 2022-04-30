@@ -16,6 +16,17 @@
 
 @interface InfoTrackersViewController ()
 
+@property(nonatomic, copy) NSArray<Torrent*>* fTorrents;
+
+@property(nonatomic) BOOL fSet;
+
+@property(nonatomic) NSMutableArray* fTrackers;
+
+@property(nonatomic) IBOutlet TrackerTableView* fTrackerTable;
+@property(nonatomic, readonly) TrackerCell* fTrackerCell;
+
+@property(nonatomic) IBOutlet NSSegmentedControl* fTrackerAddRemoveControl;
+
 - (void)setupInfo;
 
 - (void)addTrackers;
@@ -31,7 +42,7 @@
     {
         self.title = NSLocalizedString(@"Trackers", "Inspector view -> title");
 
-        fTrackerCell = [[TrackerCell alloc] init];
+        _fTrackerCell = [[TrackerCell alloc] init];
     }
 
     return self;
@@ -39,10 +50,10 @@
 
 - (void)awakeFromNib
 {
-    [fTrackerAddRemoveControl.cell setToolTip:NSLocalizedString(@"Add a tracker", "Inspector view -> tracker buttons")
-                                   forSegment:TRACKER_ADD_TAG];
-    [fTrackerAddRemoveControl.cell setToolTip:NSLocalizedString(@"Remove selected trackers", "Inspector view -> tracker buttons")
-                                   forSegment:TRACKER_REMOVE_TAG];
+    [self.fTrackerAddRemoveControl.cell setToolTip:NSLocalizedString(@"Add a tracker", "Inspector view -> tracker buttons")
+                                        forSegment:TRACKER_ADD_TAG];
+    [self.fTrackerAddRemoveControl.cell setToolTip:NSLocalizedString(@"Remove selected trackers", "Inspector view -> tracker buttons")
+                                        forSegment:TRACKER_REMOVE_TAG];
 
     CGFloat const height = [NSUserDefaults.standardUserDefaults floatForKey:@"InspectorContentHeightTracker"];
     if (height != 0.0)
@@ -53,70 +64,70 @@
     }
 }
 
-- (void)setInfoForTorrents:(NSArray*)torrents
+- (void)setInfoForTorrents:(NSArray<Torrent*>*)torrents
 {
     //don't check if it's the same in case the metadata changed
-    fTorrents = torrents;
+    self.fTorrents = torrents;
 
-    fSet = NO;
+    self.fSet = NO;
 }
 
 - (void)updateInfo
 {
-    if (!fSet)
+    if (!self.fSet)
     {
         [self setupInfo];
     }
 
-    if (fTorrents.count == 0)
+    if (self.fTorrents.count == 0)
     {
         return;
     }
 
     //get updated tracker stats
-    if (fTrackerTable.editedRow == -1)
+    if (self.fTrackerTable.editedRow == -1)
     {
-        NSArray* oldTrackers = fTrackers;
+        NSArray* oldTrackers = self.fTrackers;
 
-        if (fTorrents.count == 1)
+        if (self.fTorrents.count == 1)
         {
-            fTrackers = ((Torrent*)fTorrents[0]).allTrackerStats;
+            self.fTrackers = self.fTorrents[0].allTrackerStats;
         }
         else
         {
-            fTrackers = [[NSMutableArray alloc] init];
-            for (Torrent* torrent in fTorrents)
+            self.fTrackers = [[NSMutableArray alloc] init];
+            for (Torrent* torrent in self.fTorrents)
             {
-                [fTrackers addObjectsFromArray:torrent.allTrackerStats];
+                [self.fTrackers addObjectsFromArray:torrent.allTrackerStats];
             }
         }
 
-        [fTrackerTable setTrackers:fTrackers];
+        self.fTrackerTable.trackers = self.fTrackers;
 
-        if (oldTrackers && [fTrackers isEqualToArray:oldTrackers])
+        if (oldTrackers && [self.fTrackers isEqualToArray:oldTrackers])
         {
-            fTrackerTable.needsDisplay = YES;
+            self.fTrackerTable.needsDisplay = YES;
         }
         else
         {
-            [fTrackerTable reloadData];
+            [self.fTrackerTable reloadData];
         }
     }
     else
     {
-        NSAssert1(fTorrents.count == 1, @"Attempting to add tracker with %ld transfers selected", fTorrents.count);
+        NSAssert1(self.fTorrents.count == 1, @"Attempting to add tracker with %ld transfers selected", self.fTorrents.count);
 
-        NSIndexSet* addedIndexes = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(fTrackers.count - 2, 2)];
-        NSArray* tierAndTrackerBeingAdded = [fTrackers objectsAtIndexes:addedIndexes];
+        NSIndexSet* addedIndexes = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(self.fTrackers.count - 2, 2)];
+        NSArray* tierAndTrackerBeingAdded = [self.fTrackers objectsAtIndexes:addedIndexes];
 
-        fTrackers = ((Torrent*)fTorrents[0]).allTrackerStats;
-        [fTrackers addObjectsFromArray:tierAndTrackerBeingAdded];
+        self.fTrackers = self.fTorrents[0].allTrackerStats;
+        [self.fTrackers addObjectsFromArray:tierAndTrackerBeingAdded];
 
-        [fTrackerTable setTrackers:fTrackers];
+        self.fTrackerTable.trackers = self.fTrackers;
 
-        NSIndexSet *updateIndexes = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, fTrackers.count - 2)],
-                   *columnIndexes = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, fTrackerTable.tableColumns.count)];
-        [fTrackerTable reloadDataForRowIndexes:updateIndexes columnIndexes:columnIndexes];
+        NSIndexSet *updateIndexes = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, self.fTrackers.count - 2)],
+                   *columnIndexes = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, self.fTrackerTable.tableColumns.count)];
+        [self.fTrackerTable reloadDataForRowIndexes:updateIndexes columnIndexes:columnIndexes];
     }
 }
 
@@ -127,17 +138,17 @@
 
 - (void)clearView
 {
-    fTrackers = nil;
+    self.fTrackers = nil;
 }
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView*)tableView
 {
-    return fTrackers ? fTrackers.count : 0;
+    return self.fTrackers ? self.fTrackers.count : 0;
 }
 
 - (id)tableView:(NSTableView*)tableView objectValueForTableColumn:(NSTableColumn*)column row:(NSInteger)row
 {
-    id item = fTrackers[row];
+    id item = self.fTrackers[row];
 
     if ([item isKindOfClass:[NSDictionary class]])
     {
@@ -146,7 +157,7 @@
             NSLocalizedString(@"New Tier", "Inspector -> tracker table") :
             [NSString stringWithFormat:NSLocalizedString(@"Tier %d", "Inspector -> tracker table"), tier];
 
-        if (fTorrents.count > 1)
+        if (self.fTorrents.count > 1)
         {
             tierString = [tierString stringByAppendingFormat:@" - %@", item[@"Name"]];
         }
@@ -160,14 +171,14 @@
 
 - (NSCell*)tableView:(NSTableView*)tableView dataCellForTableColumn:(NSTableColumn*)tableColumn row:(NSInteger)row
 {
-    BOOL const tracker = [fTrackers[row] isKindOfClass:[TrackerNode class]];
-    return tracker ? fTrackerCell : [tableColumn dataCellForRow:row];
+    BOOL const tracker = [self.fTrackers[row] isKindOfClass:[TrackerNode class]];
+    return tracker ? self.fTrackerCell : [tableColumn dataCellForRow:row];
 }
 
 - (CGFloat)tableView:(NSTableView*)tableView heightOfRow:(NSInteger)row
 {
-    //check for NSDictionay instead of TrackerNode because of display issue when adding a row
-    if ([fTrackers[row] isKindOfClass:[NSDictionary class]])
+    //check for NSDictionary instead of TrackerNode because of display issue when adding a row
+    if ([self.fTrackers[row] isKindOfClass:[NSDictionary class]])
     {
         return TRACKER_GROUP_SEPARATOR_HEIGHT;
     }
@@ -185,12 +196,12 @@
 
 - (void)tableViewSelectionDidChange:(NSNotification*)notification
 {
-    [fTrackerAddRemoveControl setEnabled:fTrackerTable.numberOfSelectedRows > 0 forSegment:TRACKER_REMOVE_TAG];
+    [self.fTrackerAddRemoveControl setEnabled:self.fTrackerTable.numberOfSelectedRows > 0 forSegment:TRACKER_REMOVE_TAG];
 }
 
 - (BOOL)tableView:(NSTableView*)tableView isGroupRow:(NSInteger)row
 {
-    return ![fTrackers[row] isKindOfClass:[TrackerNode class]] && tableView.editedRow != row;
+    return ![self.fTrackers[row] isKindOfClass:[TrackerNode class]] && tableView.editedRow != row;
 }
 
 - (NSString*)tableView:(NSTableView*)tableView
@@ -200,7 +211,7 @@
                    row:(NSInteger)row
          mouseLocation:(NSPoint)mouseLocation
 {
-    id node = fTrackers[row];
+    id node = self.fTrackers[row];
     if ([node isKindOfClass:[TrackerNode class]])
     {
         return ((TrackerNode*)node).fullAnnounceAddress;
@@ -216,7 +227,7 @@
     forTableColumn:(NSTableColumn*)tableColumn
                row:(NSInteger)row
 {
-    Torrent* torrent = fTorrents[0];
+    Torrent* torrent = self.fTorrents[0];
 
     BOOL added = NO;
     for (NSString* tracker in [object componentsSeparatedByString:@"\n"])
@@ -233,11 +244,11 @@
     }
 
     //reset table with either new or old value
-    fTrackers = torrent.allTrackerStats;
+    self.fTrackers = torrent.allTrackerStats;
 
-    [fTrackerTable setTrackers:fTrackers];
-    [fTrackerTable reloadData];
-    [fTrackerTable deselectAll:self];
+    self.fTrackerTable.trackers = self.fTrackers;
+    [self.fTrackerTable reloadData];
+    [self.fTrackerTable deselectAll:self];
 
     [NSNotificationCenter.defaultCenter postNotificationName:@"UpdateUI" object:nil]; //incase sort by tracker
 }
@@ -245,7 +256,7 @@
 - (void)addRemoveTracker:(id)sender
 {
     //don't allow add/remove when currently adding - it leads to weird results
-    if (fTrackerTable.editedRow != -1)
+    if (self.fTrackerTable.editedRow != -1)
     {
         return;
     }
@@ -262,35 +273,37 @@
     }
 }
 
+#pragma mark - Private
+
 - (void)setupInfo
 {
-    NSUInteger const numberSelected = fTorrents.count;
+    NSUInteger const numberSelected = self.fTorrents.count;
     if (numberSelected != 1)
     {
         if (numberSelected == 0)
         {
-            fTrackers = nil;
+            self.fTrackers = nil;
 
-            [fTrackerTable setTrackers:nil];
-            [fTrackerTable reloadData];
+            self.fTrackerTable.trackers = nil;
+            [self.fTrackerTable reloadData];
         }
 
-        [fTrackerTable setTorrent:nil];
+        self.fTrackerTable.torrent = nil;
 
-        [fTrackerAddRemoveControl setEnabled:NO forSegment:TRACKER_ADD_TAG];
-        [fTrackerAddRemoveControl setEnabled:NO forSegment:TRACKER_REMOVE_TAG];
+        [self.fTrackerAddRemoveControl setEnabled:NO forSegment:TRACKER_ADD_TAG];
+        [self.fTrackerAddRemoveControl setEnabled:NO forSegment:TRACKER_REMOVE_TAG];
     }
     else
     {
-        [fTrackerTable setTorrent:fTorrents[0]];
+        self.fTrackerTable.torrent = self.fTorrents[0];
 
-        [fTrackerAddRemoveControl setEnabled:YES forSegment:TRACKER_ADD_TAG];
-        [fTrackerAddRemoveControl setEnabled:NO forSegment:TRACKER_REMOVE_TAG];
+        [self.fTrackerAddRemoveControl setEnabled:YES forSegment:TRACKER_ADD_TAG];
+        [self.fTrackerAddRemoveControl setEnabled:NO forSegment:TRACKER_REMOVE_TAG];
     }
 
-    [fTrackerTable deselectAll:self];
+    [self.fTrackerTable deselectAll:self];
 
-    fSet = YES;
+    self.fSet = YES;
 }
 
 #warning doesn't like blank addresses
@@ -298,29 +311,31 @@
 {
     [self.view.window makeKeyWindow];
 
-    NSAssert1(fTorrents.count == 1, @"Attempting to add tracker with %ld transfers selected", fTorrents.count);
+    NSAssert1(self.fTorrents.count == 1, @"Attempting to add tracker with %ld transfers selected", self.fTorrents.count);
 
-    [fTrackers addObject:@{ @"Tier" : @-1 }];
-    [fTrackers addObject:@""];
+    [self.fTrackers addObject:@{ @"Tier" : @-1 }];
+    [self.fTrackers addObject:@""];
 
-    [fTrackerTable setTrackers:fTrackers];
-    [fTrackerTable reloadData];
-    [fTrackerTable selectRowIndexes:[NSIndexSet indexSetWithIndex:fTrackers.count - 1] byExtendingSelection:NO];
-    [fTrackerTable editColumn:[fTrackerTable columnWithIdentifier:@"Tracker"] row:fTrackers.count - 1 withEvent:nil select:YES];
+    self.fTrackerTable.trackers = self.fTrackers;
+    [self.fTrackerTable reloadData];
+    [self.fTrackerTable selectRowIndexes:[NSIndexSet indexSetWithIndex:self.fTrackers.count - 1] byExtendingSelection:NO];
+    [self.fTrackerTable editColumn:[self.fTrackerTable columnWithIdentifier:@"Tracker"] row:self.fTrackers.count - 1
+                         withEvent:nil
+                            select:YES];
 }
 
 - (void)removeTrackers
 {
-    NSMutableDictionary* removeIdentifiers = [NSMutableDictionary dictionaryWithCapacity:fTorrents.count];
+    NSMutableDictionary* removeIdentifiers = [NSMutableDictionary dictionaryWithCapacity:self.fTorrents.count];
     NSUInteger removeTrackerCount = 0;
 
-    NSIndexSet* selectedIndexes = fTrackerTable.selectedRowIndexes;
+    NSIndexSet* selectedIndexes = self.fTrackerTable.selectedRowIndexes;
     BOOL groupSelected = NO;
     NSUInteger groupRowIndex = NSNotFound;
     NSMutableIndexSet* removeIndexes = [NSMutableIndexSet indexSet];
-    for (NSUInteger i = 0; i < fTrackers.count; ++i)
+    for (NSUInteger i = 0; i < self.fTrackers.count; ++i)
     {
-        id object = fTrackers[i];
+        id object = self.fTrackers[i];
         if ([object isKindOfClass:[TrackerNode class]])
         {
             TrackerNode* node = (TrackerNode*)object;
@@ -422,7 +437,7 @@
         }
     }
 
-    [fTrackerTable beginUpdates];
+    [self.fTrackerTable beginUpdates];
 
     for (Torrent* torrent in removeIdentifiers)
     {
@@ -430,17 +445,17 @@
     }
 
     //reset table with either new or old value
-    fTrackers = [[NSMutableArray alloc] init];
-    for (Torrent* torrent in fTorrents)
+    self.fTrackers = [[NSMutableArray alloc] init];
+    for (Torrent* torrent in self.fTorrents)
     {
-        [fTrackers addObjectsFromArray:torrent.allTrackerStats];
+        [self.fTrackers addObjectsFromArray:torrent.allTrackerStats];
     }
 
-    [fTrackerTable removeRowsAtIndexes:removeIndexes withAnimation:NSTableViewAnimationSlideLeft];
+    [self.fTrackerTable removeRowsAtIndexes:removeIndexes withAnimation:NSTableViewAnimationSlideLeft];
 
-    [fTrackerTable setTrackers:fTrackers];
+    self.fTrackerTable.trackers = self.fTrackers;
 
-    [fTrackerTable endUpdates];
+    [self.fTrackerTable endUpdates];
 
     [NSNotificationCenter.defaultCenter postNotificationName:@"UpdateUI" object:nil]; //incase sort by tracker
 }

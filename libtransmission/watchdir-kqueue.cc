@@ -19,22 +19,16 @@
 
 #include <event2/event.h>
 
-#define LIBTRANSMISSION_WATCHDIR_MODULE
+#include <fmt/core.h>
 
+#define LIBTRANSMISSION_WATCHDIR_MODULE
 #include "transmission.h"
+
 #include "log.h"
 #include "tr-assert.h"
 #include "utils.h"
 #include "watchdir.h"
 #include "watchdir-common.h"
-
-/***
-****
-***/
-
-#define log_error(...) \
-    (!tr_logLevelIsActive(TR_LOG_ERROR) ? (void)0 : \
-                                          tr_logAddMessage(__FILE__, __LINE__, TR_LOG_ERROR, "watchdir:kqueue", __VA_ARGS__))
 
 /***
 ****
@@ -61,13 +55,17 @@ struct tr_watchdir_kqueue
 static void tr_watchdir_kqueue_on_event(evutil_socket_t /*fd*/, short /*type*/, void* context)
 {
     auto const handle = static_cast<tr_watchdir_t>(context);
-    tr_watchdir_kqueue* const backend = BACKEND_UPCAST(tr_watchdir_get_backend(handle));
+    auto* const backend = BACKEND_UPCAST(tr_watchdir_get_backend(handle));
+
     struct kevent ke;
     auto ts = timespec{};
-
     if (kevent(backend->kq, nullptr, 0, &ke, 1, &ts) == -1)
     {
-        log_error("Failed to fetch kevent: %s", tr_strerror(errno));
+        auto const error_code = errno;
+        tr_logAddError(fmt::format(
+            _("Couldn't read event: {error} ({error_code})"),
+            fmt::arg("error", tr_strerror(error_code)),
+            fmt::arg("error_code", error_code)));
         return;
     }
 
@@ -112,19 +110,29 @@ tr_watchdir_backend* tr_watchdir_kqueue_new(tr_watchdir_t handle)
 
     auto* backend = new tr_watchdir_kqueue{};
     backend->base.free_func = &tr_watchdir_kqueue_free;
-    backend->kq = -1;
     backend->dirfd = -1;
 
-    if ((backend->kq = kqueue()) == -1)
+    backend->kq = kqueue();
+    if (backend->kq == -1)
     {
-        log_error("Failed to start kqueue");
+        auto const error_code = errno;
+        tr_logAddError(fmt::format(
+            _("Couldn't watch '{path}': {error} ({error_code})"),
+            fmt::arg("error", tr_strerror(error_code)),
+            fmt::arg("error_code", error_code)));
         goto fail;
     }
 
     /* Open fd for watching */
-    if ((backend->dirfd = open(path, O_RDONLY | O_EVTONLY)) == -1)
+    backend->dirfd = open(path, O_RDONLY | O_EVTONLY);
+    if (backend->dirfd == -1)
     {
-        log_error("Failed to passively watch directory \"%s\": %s", path, tr_strerror(errno));
+        auto const error_code = errno;
+        tr_logAddError(fmt::format(
+            _("Couldn't watch '{path}': {error} ({error_code})"),
+            fmt::arg("path", path),
+            fmt::arg("error", tr_strerror(error_code)),
+            fmt::arg("error_code", error_code)));
         goto fail;
     }
 
@@ -133,7 +141,12 @@ tr_watchdir_backend* tr_watchdir_kqueue_new(tr_watchdir_t handle)
 
     if (kevent(backend->kq, &ke, 1, nullptr, 0, nullptr) == -1)
     {
-        log_error("Failed to set directory event filter with fd %d: %s", backend->kq, tr_strerror(errno));
+        auto const error_code = errno;
+        tr_logAddError(fmt::format(
+            _("Couldn't watch '{path}': {error} ({error_code})"),
+            fmt::arg("path", path),
+            fmt::arg("error", tr_strerror(error_code)),
+            fmt::arg("error_code", error_code)));
         goto fail;
     }
 
@@ -145,13 +158,21 @@ tr_watchdir_backend* tr_watchdir_kqueue_new(tr_watchdir_t handle)
              &tr_watchdir_kqueue_on_event,
              handle)) == nullptr)
     {
-        log_error("Failed to create event: %s", tr_strerror(errno));
+        auto const error_code = errno;
+        tr_logAddError(fmt::format(
+            _("Couldn't create event: {error} ({error_code})"),
+            fmt::arg("error", tr_strerror(error_code)),
+            fmt::arg("error_code", error_code)));
         goto fail;
     }
 
     if (event_add(backend->event, nullptr) == -1)
     {
-        log_error("Failed to add event: %s", tr_strerror(errno));
+        auto const error_code = errno;
+        tr_logAddError(fmt::format(
+            _("Couldn't add event: {error} ({error_code})"),
+            fmt::arg("error", tr_strerror(error_code)),
+            fmt::arg("error_code", error_code)));
         goto fail;
     }
 

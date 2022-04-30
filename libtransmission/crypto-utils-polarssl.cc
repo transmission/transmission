@@ -22,6 +22,8 @@
 #include API_HEADER(sha1.h)
 #include API_HEADER(version.h)
 
+#include <fmt/core.h>
+
 #include "transmission.h"
 #include "crypto-utils.h"
 #include "log.h"
@@ -35,8 +37,6 @@
 /***
 ****
 ***/
-
-static char constexpr MyName[] = "tr_crypto_utils";
 
 using api_ctr_drbg_context = API(ctr_drbg_context);
 using api_sha1_context = API(sha1_context);
@@ -56,7 +56,15 @@ static void log_polarssl_error(int error_code, char const* file, int line)
         error_strerror(error_code, error_message, sizeof(error_message));
 #endif
 
-        tr_logAddMessage(file, line, TR_LOG_ERROR, MyName, "PolarSSL error: %s", error_message);
+        tr_logAddMessage(
+            file,
+            line,
+            TR_LOG_ERROR,
+            fmt::format(
+                _("{crypto_library} error: {error} ({error_code})"),
+                fmt::arg("crypto_library", "PolarSSL/MbedTLS"),
+                fmt::arg("error", error_message),
+                fmt::arg("error_code", error_code)));
     }
 }
 

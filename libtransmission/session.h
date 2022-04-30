@@ -14,19 +14,24 @@
 #include <array>
 #include <cstddef> // size_t
 #include <cstdint> // uintX_t
-#include <ctime>
-#include <list>
-#include <map>
 #include <memory>
 #include <mutex>
 #include <string>
 #include <string_view>
-#include <unordered_set>
+#include <tuple>
+#include <utility> // std::pair
 #include <vector>
 
 #include "transmission.h"
 
+#include "announce-list.h"
+#include "bandwidth.h"
+#include "interned-string.h"
 #include "net.h" // tr_socket_t
+#include "open-files.h"
+#include "quark.h"
+#include "torrents.h"
+#include "web.h"
 
 enum tr_auto_switch_state_t
 {
@@ -42,6 +47,7 @@ struct evdns_base;
 
 class tr_bitfield;
 class tr_rpc_server;
+class tr_web;
 struct Bandwidth;
 struct tr_address;
 struct tr_announcer;
@@ -103,40 +109,29 @@ struct tr_turtle_info
 struct tr_session
 {
 public:
+    [[nodiscard]] constexpr auto& torrents()
+    {
+        return torrents_;
+    }
+
+    [[nodiscard]] constexpr auto const& torrents() const
+    {
+        return torrents_;
+    }
+
     [[nodiscard]] auto unique_lock() const
     {
         return std::unique_lock(session_mutex_);
     }
 
-    [[nodiscard]] bool isClosing() const
+    [[nodiscard]] constexpr auto isClosing() const noexcept
     {
         return is_closing_;
     }
 
-    [[nodiscard]] auto const* getTorrent(tr_sha1_digest_t const& info_dict_hash) const
-    {
-        auto& src = this->torrentsByHash;
-        auto it = src.find(info_dict_hash);
-        return it == std::end(src) ? nullptr : it->second;
-    }
-
-    [[nodiscard]] auto* getTorrent(tr_sha1_digest_t const& info_dict_hash)
-    {
-        auto& src = this->torrentsByHash;
-        auto it = src.find(info_dict_hash);
-        return it == std::end(src) ? nullptr : it->second;
-    }
-
-    [[nodiscard]] tr_torrent* getTorrent(std::string_view info_dict_hash_string);
-
-    [[nodiscard]] auto contains(tr_sha1_digest_t const& info_dict_hash) const
-    {
-        return getTorrent(info_dict_hash) != nullptr;
-    }
-
     // download dir
 
-    std::string const& downloadDir() const
+    [[nodiscard]] constexpr auto const& downloadDir() const noexcept
     {
         return download_dir_;
     }
@@ -146,9 +141,24 @@ public:
         download_dir_ = dir;
     }
 
+    // default trackers
+    // (trackers to apply automatically to public torrents)
+
+    [[nodiscard]] constexpr auto const& defaultTrackersStr() const noexcept
+    {
+        return default_trackers_str_;
+    }
+
+    [[nodiscard]] constexpr auto const& defaultTrackers() const noexcept
+    {
+        return default_trackers_;
+    }
+
+    void setDefaultTrackers(std::string_view trackers);
+
     // incomplete dir
 
-    std::string const& incompleteDir() const
+    [[nodiscard]] constexpr auto const& incompleteDir() const noexcept
     {
         return incomplete_dir_;
     }
@@ -158,24 +168,24 @@ public:
         incomplete_dir_ = dir;
     }
 
-    bool useIncompleteDir() const
+    [[nodiscard]] constexpr auto useIncompleteDir() const noexcept
     {
         return incomplete_dir_enabled_;
     }
 
-    void useIncompleteDir(bool enabled)
+    constexpr void useIncompleteDir(bool enabled) noexcept
     {
         incomplete_dir_enabled_ = enabled;
     }
 
     // scripts
 
-    void useScript(TrScript i, bool enabled)
+    constexpr void useScript(TrScript i, bool enabled)
     {
         scripts_enabled_[i] = enabled;
     }
 
-    bool useScript(TrScript i) const
+    [[nodiscard]] auto useScript(TrScript i) const
     {
         return scripts_enabled_[i];
     }
@@ -185,21 +195,21 @@ public:
         scripts_[i] = path;
     }
 
-    std::string const& script(TrScript i) const
+    [[nodiscard]] constexpr auto const& script(TrScript i) const
     {
         return scripts_[i];
     }
 
     // blocklist
 
-    bool useBlocklist() const
+    [[nodiscard]] constexpr auto useBlocklist() const noexcept
     {
         return blocklist_enabled_;
     }
 
     void useBlocklist(bool enabled);
 
-    std::string const& blocklistUrl() const
+    [[nodiscard]] constexpr auto const& blocklistUrl() const noexcept
     {
         return blocklist_url_;
     }
@@ -213,15 +223,23 @@ public:
 
     void setRpcWhitelist(std::string_view whitelist) const;
 
-    std::string const& rpcWhitelist() const;
-
     void useRpcWhitelist(bool enabled) const;
 
-    bool useRpcWhitelist() const;
+    [[nodiscard]] bool useRpcWhitelist() const;
+
+    [[nodiscard]] auto externalIP() const noexcept
+    {
+        return external_ip_;
+    }
+
+    void setExternalIP(tr_address external_ip)
+    {
+        external_ip_ = external_ip;
+    }
 
     // peer networking
 
-    std::string const& peerCongestionAlgorithm() const
+    [[nodiscard]] constexpr auto const& peerCongestionAlgorithm() const noexcept
     {
         return peer_congestion_algorithm_;
     }
@@ -231,12 +249,53 @@ public:
         peer_congestion_algorithm_ = algorithm;
     }
 
-    void setSocketTOS(tr_socket_t sock, tr_address_type type)
+    void setSocketTOS(tr_socket_t sock, tr_address_type type) const
     {
         tr_netSetTOS(sock, peer_socket_tos_, type);
     }
 
+    [[nodiscard]] constexpr bool incPeerCount() noexcept
+    {
+        if (this->peerCount >= this->peerLimit)
+        {
+            return false;
+        }
+
+        ++this->peerCount;
+        return true;
+    }
+
+    constexpr void decPeerCount() noexcept
+    {
+        if (this->peerCount > 0)
+        {
+            --this->peerCount;
+        }
+    }
+
+    // bandwidth
+
+    [[nodiscard]] Bandwidth& getBandwidthGroup(std::string_view name);
+
+    //
+
+    [[nodiscard]] constexpr auto& openFiles() noexcept
+    {
+        return open_files_;
+    }
+
+    void closeTorrentFiles(tr_torrent* tor) noexcept;
+    void closeTorrentFile(tr_torrent* tor, tr_file_index_t file_num) noexcept;
+
 public:
+    static constexpr std::array<std::tuple<tr_quark, tr_quark, TrScript>, 3> Scripts{
+        { { TR_KEY_script_torrent_added_enabled, TR_KEY_script_torrent_added_filename, TR_SCRIPT_ON_TORRENT_ADDED },
+          { TR_KEY_script_torrent_done_enabled, TR_KEY_script_torrent_done_filename, TR_SCRIPT_ON_TORRENT_DONE },
+          { TR_KEY_script_torrent_done_seeding_enabled,
+            TR_KEY_script_torrent_done_seeding_filename,
+            TR_SCRIPT_ON_TORRENT_DONE_SEEDING } }
+    };
+
     bool isPortRandom;
     bool isPexEnabled;
     bool isDHTEnabled;
@@ -254,9 +313,6 @@ public:
 
     uint8_t peer_id_ttl_hours;
 
-    // torrent id, time removed
-    std::vector<std::pair<int, time_t>> removed_torrents;
-
     bool stalledEnabled;
     bool queueEnabled[2];
     int queueSize[2];
@@ -269,8 +325,6 @@ public:
 
     struct tr_turtle_info turtle;
 
-    struct tr_fdInfo* fdInfo;
-
     int magicNumber;
 
     tr_encryption_mode encryptionMode;
@@ -281,8 +335,9 @@ public:
     struct evdns_base* evdns_base;
     struct tr_event_handle* events;
 
-    uint16_t peerLimit;
-    uint16_t peerLimitPerTorrent;
+    uint16_t peerCount = 0;
+    uint16_t peerLimit = 200;
+    uint16_t peerLimitPerTorrent = 50;
 
     int uploadSlotsPerTorrent;
 
@@ -307,24 +362,52 @@ public:
      */
     tr_port public_peer_port;
 
+    [[nodiscard]] constexpr auto peerPort() const noexcept
+    {
+        return public_peer_port;
+    }
+
+    constexpr auto setPeerPort(tr_port port) noexcept
+    {
+        public_peer_port = port;
+    }
+
     tr_port randomPortLow;
     tr_port randomPortHigh;
-
-    std::unordered_set<tr_torrent*> torrents;
-    std::map<int, tr_torrent*> torrentsById;
-    std::map<tr_sha1_digest_t, tr_torrent*> torrentsByHash;
 
     std::string config_dir;
     std::string resume_dir;
     std::string torrent_dir;
 
-    std::list<tr_blocklistFile*> blocklists;
+    std::vector<tr_blocklistFile*> blocklists;
     struct tr_peerMgr* peerMgr;
     struct tr_shared* shared;
 
     struct tr_cache* cache;
 
-    struct tr_web* web;
+    class WebMediator final : public tr_web::Mediator
+    {
+    public:
+        explicit WebMediator(tr_session* session)
+            : session_{ session }
+        {
+        }
+        ~WebMediator() override = default;
+
+        [[nodiscard]] std::optional<std::string> cookieFile() const override;
+        [[nodiscard]] std::optional<std::string> publicAddress() const override;
+        [[nodiscard]] std::optional<std::string> userAgent() const override;
+        [[nodiscard]] unsigned int clamp(int bandwidth_tag, unsigned int byte_count) const override;
+        void notifyBandwidthConsumed(int torrent_id, size_t byte_count) override;
+        // runs the tr_web::fetch response callback in the libtransmission thread
+        void run(tr_web::FetchDoneFunc&& func, tr_web::FetchResponse&& response) const override;
+
+    private:
+        tr_session* const session_;
+    };
+
+    WebMediator web_mediator{ this };
+    std::unique_ptr<tr_web> web;
 
     struct tr_session_id* session_id;
 
@@ -339,10 +422,10 @@ public:
     struct event* nowTimer;
     struct event* saveTimer;
 
-    /* monitors the "global pool" speeds */
-    // Changed to non-owning pointer temporarily till tr_session becomes C++-constructible and destructible
-    // TODO: change tr_bandwidth* to owning pointer to the bandwidth, or remove * and own the value
-    Bandwidth* bandwidth;
+    // monitors the "global pool" speeds
+    Bandwidth top_bandwidth_;
+
+    std::vector<std::pair<tr_interned_string, std::unique_ptr<Bandwidth>>> bandwidth_groups_;
 
     float desiredRatio;
 
@@ -353,6 +436,8 @@ public:
 
     std::unique_ptr<tr_rpc_server> rpc_server_;
 
+    tr_announce_list default_trackers_;
+
     // One of <netinet/ip.h>'s IPTOS_ values.
     // See tr_netTos*() in libtransmission/net.h for more info
     // Only session.cc should use this.
@@ -361,21 +446,22 @@ public:
 private:
     static std::recursive_mutex session_mutex_;
 
+    tr_torrents torrents_;
+
     std::array<std::string, TR_SCRIPT_N_TYPES> scripts_;
     std::string blocklist_url_;
     std::string download_dir_;
+    std::string default_trackers_str_;
     std::string incomplete_dir_;
     std::string peer_congestion_algorithm_;
+    std::optional<tr_address> external_ip_;
 
     std::array<bool, TR_SCRIPT_N_TYPES> scripts_enabled_;
     bool blocklist_enabled_ = false;
     bool incomplete_dir_enabled_ = false;
-};
 
-constexpr tr_port tr_sessionGetPublicPeerPort(tr_session const* session)
-{
-    return session->public_peer_port;
-}
+    tr_open_files open_files_;
+};
 
 bool tr_sessionAllowsDHT(tr_session const* session);
 
@@ -401,16 +487,6 @@ constexpr bool tr_isSession(tr_session const* session)
     return session != nullptr && session->magicNumber == SESSION_MAGIC_NUMBER;
 }
 
-constexpr bool tr_isPreallocationMode(tr_preallocation_mode m)
-{
-    return m == TR_PREALLOCATE_NONE || m == TR_PREALLOCATE_SPARSE || m == TR_PREALLOCATE_FULL;
-}
-
-constexpr bool tr_isEncryptionMode(tr_encryption_mode m)
-{
-    return m == TR_CLEAR_PREFERRED || m == TR_ENCRYPTION_PREFERRED || m == TR_ENCRYPTION_REQUIRED;
-}
-
 constexpr bool tr_isPriority(tr_priority_t p)
 {
     return p == TR_PRI_LOW || p == TR_PRI_NORMAL || p == TR_PRI_HIGH;
@@ -428,6 +504,3 @@ bool tr_sessionGetActiveSpeedLimit_Bps(tr_session const* session, tr_direction d
 std::vector<tr_torrent*> tr_sessionGetNextQueuedTorrents(tr_session* session, tr_direction dir, size_t numwanted);
 
 int tr_sessionCountQueueFreeSlots(tr_session* session, tr_direction);
-
-void tr_sessionAddTorrent(tr_session* session, tr_torrent* tor);
-void tr_sessionRemoveTorrent(tr_session* session, tr_torrent* tor);

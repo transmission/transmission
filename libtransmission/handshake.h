@@ -12,7 +12,6 @@
 #include <optional>
 
 #include "transmission.h"
-#include "net.h"
 
 /** @addtogroup peers Peers
     @{ */
@@ -42,8 +41,6 @@ tr_handshake* tr_handshakeNew(
     tr_encryption_mode encryption_mode,
     tr_handshake_done_func when_done,
     void* when_done_user_data);
-
-tr_address const* tr_handshakeGetAddr(struct tr_handshake const* handshake, tr_port* port);
 
 void tr_handshakeAbort(tr_handshake* handshake);
 

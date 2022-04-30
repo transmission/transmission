@@ -224,6 +224,7 @@ Torrent::fields_t Torrent::update(tr_quark const* keys, tr_variant const* const*
             HANDLE_KEY(startDate, start_date, START_DATE)
             HANDLE_KEY(status, status, STATUS)
             HANDLE_KEY(totalSize, total_size, TOTAL_SIZE)
+            HANDLE_KEY(trackerList, tracker_list, TRACKER_LIST)
             HANDLE_KEY(trackerStats, tracker_stats, TRACKER_STATS)
             HANDLE_KEY(trackers, tracker_stats, TRACKER_STATS)
             HANDLE_KEY(uploadLimit, upload_limit, UPLOAD_LIMIT) // KB/s
@@ -258,19 +259,15 @@ Torrent::fields_t Torrent::update(tr_quark const* keys, tr_variant const* const*
             {
             case TR_KEY_file_count:
             case TR_KEY_primary_mime_type:
-                {
-                    icon_ = {};
-                    break;
-                }
+                icon_ = {};
+                break;
 
             case TR_KEY_files:
+                for (size_t i = 0; i < files_.size(); ++i)
                 {
-                    for (size_t i = 0; i < files_.size(); ++i)
-                    {
-                        files_[i].index = i;
-                    }
-                    break;
+                    files_[i].index = i;
                 }
+                break;
 
             case TR_KEY_trackers:
                 {
@@ -291,66 +288,50 @@ Torrent::fields_t Torrent::update(tr_quark const* keys, tr_variant const* const*
 
 QString Torrent::activityString() const
 {
-    QString str;
-
     switch (getActivity())
     {
     case TR_STATUS_STOPPED:
-        str = isFinished() ? tr("Finished") : tr("Paused");
-        break;
+        return isFinished() ? tr("Finished") : tr("Paused");
 
     case TR_STATUS_CHECK_WAIT:
-        str = tr("Queued for verification");
-        break;
+        return tr("Queued for verification");
 
     case TR_STATUS_CHECK:
-        str = tr("Verifying local data");
-        break;
+        return tr("Verifying local data");
 
     case TR_STATUS_DOWNLOAD_WAIT:
-        str = tr("Queued for download");
-        break;
+        return tr("Queued for download");
 
     case TR_STATUS_DOWNLOAD:
-        str = tr("Downloading");
-        break;
+        return tr("Downloading");
 
     case TR_STATUS_SEED_WAIT:
-        str = tr("Queued for seeding");
-        break;
+        return tr("Queued for seeding");
 
     case TR_STATUS_SEED:
-        str = tr("Seeding");
-        break;
-    }
+        return tr("Seeding");
 
-    return str;
+    default:
+        return {};
+    }
 }
 
 QString Torrent::getError() const
 {
-    auto s = error_string_;
-
     switch (error_)
     {
     case TR_STAT_TRACKER_WARNING:
-        s = tr("Tracker gave a warning: %1").arg(s);
-        break;
+        return tr("Tracker gave a warning: %1").arg(error_string_);
 
     case TR_STAT_TRACKER_ERROR:
-        s = tr("Tracker gave an error: %1").arg(s);
-        break;
+        return tr("Tracker gave an error: %1").arg(error_string_);
 
     case TR_STAT_LOCAL_ERROR:
-        s = tr("Error: %1").arg(s);
-        break;
+        return tr("Error: %1").arg(error_string_);
 
     default:
-        s.clear();
-        break;
+        return {};
     }
-
-    return s;
 }
 
 QPixmap TrackerStat::getFavicon() const

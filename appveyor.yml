@@ -39,7 +39,6 @@ for:
       git submodule update --init --recursive
 
       choco install python3 --pre
-      choco install ActivePerl
       choco install nasm
       choco install jom
       choco install wixtoolset --version 3.11.2
@@ -52,7 +51,7 @@ for:
   build_script:
   - pwsh: |
       $Env:PATH = @(
-          (Join-Path $Env:SystemDrive Perl64 bin)
+          (Join-Path $Env:SystemDrive Strawberry perl bin)
           (Join-Path $Env:ProgramFiles NASM)
           (Join-Path ${Env:ProgramFiles(x86)} 'WiX Toolset v3.11' bin)
           $Env:PATH

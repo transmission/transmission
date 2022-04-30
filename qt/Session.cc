@@ -40,7 +40,6 @@
 using ::trqt::variant_helpers::dictAdd;
 using ::trqt::variant_helpers::dictFind;
 using ::trqt::variant_helpers::getValue;
-using ::trqt::variant_helpers::listAdd;
 
 /***
 ****
@@ -155,6 +154,7 @@ void Session::updatePref(int key)
         case Prefs::BLOCKLIST_DATE:
         case Prefs::BLOCKLIST_ENABLED:
         case Prefs::BLOCKLIST_URL:
+        case Prefs::DEFAULT_TRACKERS:
         case Prefs::DHT_ENABLED:
         case Prefs::DOWNLOAD_QUEUE_ENABLED:
         case Prefs::DOWNLOAD_QUEUE_SIZE:
@@ -175,6 +175,8 @@ void Session::updatePref(int key)
         case Prefs::RENAME_PARTIAL_FILES:
         case Prefs::SCRIPT_TORRENT_DONE_ENABLED:
         case Prefs::SCRIPT_TORRENT_DONE_FILENAME:
+        case Prefs::SCRIPT_TORRENT_DONE_SEEDING_ENABLED:
+        case Prefs::SCRIPT_TORRENT_DONE_SEEDING_FILENAME:
         case Prefs::START:
         case Prefs::TRASH_ORIGINAL:
         case Prefs::USPEED:
@@ -242,7 +244,7 @@ void Session::updatePref(int key)
         case Prefs::RPC_PORT:
             if (session_ != nullptr)
             {
-                tr_sessionSetRPCPort(session_, static_cast<tr_port>(prefs_.getInt(key)));
+                tr_sessionSetRPCPort(session_, static_cast<uint16_t>(prefs_.getInt(key)));
             }
 
             break;
@@ -434,6 +436,15 @@ Session::Tag Session::torrentSet(torrent_ids_t const& ids, tr_quark const key, b
     return torrentSetImpl(&args);
 }
 
+Session::Tag Session::torrentSet(torrent_ids_t const& ids, tr_quark const key, QString const& value)
+{
+    tr_variant args;
+    tr_variantInitDict(&args, 2);
+    addOptionalIds(&args, ids);
+    dictAdd(&args, key, value);
+    return torrentSetImpl(&args);
+}
+
 Session::Tag Session::torrentSet(torrent_ids_t const& ids, tr_quark const key, QStringList const& value)
 {
     tr_variant args;
@@ -449,17 +460,6 @@ Session::Tag Session::torrentSet(torrent_ids_t const& ids, tr_quark const key, Q
     tr_variantInitDict(&args, 2);
     addOptionalIds(&args, ids);
     dictAdd(&args, key, value);
-    return torrentSetImpl(&args);
-}
-
-Session::Tag Session::torrentSet(torrent_ids_t const& ids, tr_quark const key, QPair<int, QString> const& value)
-{
-    tr_variant args;
-    tr_variantInitDict(&args, 2);
-    addOptionalIds(&args, ids);
-    tr_variant* list(tr_variantDictAddList(&args, key, 2));
-    listAdd(list, value.first);
-    listAdd(list, value.second);
     return torrentSetImpl(&args);
 }
 
@@ -559,7 +559,7 @@ std::vector<std::string_view> const& Session::getKeyNames(TorrentProperties prop
         };
 
         // unchanging fields needed by the details dialog
-        static auto constexpr DetailInfoKeys = std::array<tr_quark, 8>{
+        static auto constexpr DetailInfoKeys = std::array<tr_quark, 9>{
             TR_KEY_comment, //
             TR_KEY_creator, //
             TR_KEY_dateCreated, //
@@ -567,6 +567,7 @@ std::vector<std::string_view> const& Session::getKeyNames(TorrentProperties prop
             TR_KEY_isPrivate, //
             TR_KEY_pieceCount, //
             TR_KEY_pieceSize, //
+            TR_KEY_trackerList, //
             TR_KEY_trackers, //
         };
 

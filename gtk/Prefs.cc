@@ -4,6 +4,7 @@
 
 #include <errno.h>
 #include <stdlib.h> /* strtol() */
+#include <string>
 #include <string_view>
 
 #include <glibmm.h>
@@ -20,7 +21,7 @@ using namespace std::literals;
 
 std::string gl_confdir;
 
-void gtr_pref_init(std::string const& config_dir)
+void gtr_pref_init(std::string_view config_dir)
 {
     gl_confdir = config_dir;
 }
@@ -199,7 +200,7 @@ std::string gtr_pref_string_get(tr_quark const key)
     return std::string{ sv };
 }
 
-void gtr_pref_string_set(tr_quark const key, std::string const& value)
+void gtr_pref_string_set(tr_quark const key, std::string_view value)
 {
     tr_variantDictAddStr(getPrefs(), key, value);
 }

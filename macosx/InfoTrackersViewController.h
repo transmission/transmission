@@ -6,25 +6,9 @@
 
 #import "InfoViewController.h"
 
-@class Torrent;
-@class TrackerTableView;
-@class TrackerCell;
-
 @interface InfoTrackersViewController : NSViewController<InfoViewController>
-{
-    NSArray* fTorrents;
 
-    BOOL fSet;
-
-    NSMutableArray* fTrackers;
-
-    IBOutlet TrackerTableView* fTrackerTable;
-    TrackerCell* fTrackerCell;
-
-    IBOutlet NSSegmentedControl* fTrackerAddRemoveControl;
-}
-
-- (void)setInfoForTorrents:(NSArray*)torrents;
+- (void)setInfoForTorrents:(NSArray<Torrent*>*)torrents;
 - (void)updateInfo;
 
 - (void)saveViewSize;

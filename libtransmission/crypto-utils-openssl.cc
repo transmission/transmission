@@ -18,6 +18,8 @@
 #include <openssl/ssl.h>
 #include <openssl/x509.h>
 
+#include <fmt/core.h>
+
 #include "transmission.h"
 #include "crypto-utils.h"
 #include "log.h"
@@ -30,8 +32,6 @@
 /***
 ****
 ***/
-
-static char constexpr MyName[] = "tr_crypto_utils";
 
 static void log_openssl_error(char const* file, int line)
 {
@@ -59,7 +59,15 @@ static void log_openssl_error(char const* file, int line)
 #endif
 
         ERR_error_string_n(error_code, buf, sizeof(buf));
-        tr_logAddMessage(file, line, TR_LOG_ERROR, MyName, "OpenSSL error: %s", buf);
+        tr_logAddMessage(
+            file,
+            line,
+            TR_LOG_ERROR,
+            fmt::format(
+                _("{crypto_library} error: {error} ({error_code})"),
+                fmt::arg("crypto_library", "OpenSSL"),
+                fmt::arg("error", buf),
+                fmt::arg("error_code", error_code)));
     }
 }
 

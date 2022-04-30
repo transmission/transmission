@@ -41,7 +41,7 @@ struct tr_ctor
 
     tr_priority_t priority = TR_PRI_NORMAL;
 
-    tr_labels_t labels = {};
+    tr_torrent::labels_t labels = {};
 
     struct optional_args optional_args[2];
 
@@ -74,7 +74,7 @@ bool tr_ctorSetMetainfoFromFile(tr_ctor* ctor, std::string const& filename, tr_e
         return false;
     }
 
-    if (!tr_loadFile(ctor->contents, filename, error))
+    if (!tr_loadFile(filename, ctor->contents, error))
     {
         return false;
     }
@@ -100,12 +100,8 @@ bool tr_ctorSetMetainfo(tr_ctor* ctor, char const* metainfo, size_t len, tr_erro
 bool tr_ctorSetMetainfoFromMagnetLink(tr_ctor* ctor, char const* magnet_link, tr_error** error)
 {
     ctor->torrent_filename.clear();
+    ctor->metainfo = {};
     return ctor->metainfo.parseMagnet(magnet_link != nullptr ? magnet_link : "", error);
-}
-
-std::string_view tr_ctorGetContents(tr_ctor const* ctor)
-{
-    return std::string_view{ std::data(ctor->contents), std::size(ctor->contents) };
 }
 
 char const* tr_ctorGetSourceFile(tr_ctor const* ctor)
@@ -113,7 +109,7 @@ char const* tr_ctorGetSourceFile(tr_ctor const* ctor)
     return ctor->torrent_filename.c_str();
 }
 
-bool tr_ctorSaveContents(tr_ctor const* ctor, std::string const& filename, tr_error** error)
+bool tr_ctorSaveContents(tr_ctor const* ctor, std::string_view filename, tr_error** error)
 {
     TR_ASSERT(ctor != nullptr);
     TR_ASSERT(!std::empty(filename));
@@ -124,7 +120,7 @@ bool tr_ctorSaveContents(tr_ctor const* ctor, std::string const& filename, tr_er
         return false;
     }
 
-    return tr_saveFile(filename, { std::data(ctor->contents), std::size(ctor->contents) }, error);
+    return tr_saveFile(filename, ctor->contents, error);
 }
 
 /***
@@ -290,9 +286,11 @@ bool tr_ctorGetIncompleteDir(tr_ctor const* ctor, char const** setme)
     return true;
 }
 
-tr_torrent_metainfo&& tr_ctorStealMetainfo(tr_ctor* ctor)
+tr_torrent_metainfo tr_ctorStealMetainfo(tr_ctor* ctor)
 {
-    return std::move(ctor->metainfo);
+    auto metainfo = tr_torrent_metainfo{};
+    std::swap(ctor->metainfo, metainfo);
+    return metainfo;
 }
 
 tr_torrent_metainfo const* tr_ctorGetMetainfo(tr_ctor const* ctor)
@@ -331,23 +329,12 @@ tr_priority_t tr_ctorGetBandwidthPriority(tr_ctor const* ctor)
 ****
 ***/
 
-void tr_ctorSetLabels(tr_ctor* ctor, char const** labels, size_t len)
+void tr_ctorSetLabels(tr_ctor* ctor, tr_quark const* labels, size_t n_labels)
 {
-    auto labels_set = tr_labels_t{};
-    for (size_t i = 0; i < len; i++)
-    {
-        labels_set.emplace(labels[i]);
-    }
-
-    tr_ctorSetLabels(ctor, std::move(labels_set));
+    ctor->labels = { labels, labels + n_labels };
 }
 
-void tr_ctorSetLabels(tr_ctor* ctor, tr_labels_t&& labels)
-{
-    ctor->labels = std::move(labels);
-}
-
-tr_labels_t tr_ctorGetLabels(tr_ctor const* ctor)
+tr_torrent::labels_t const& tr_ctorGetLabels(tr_ctor const* ctor)
 {
     return ctor->labels;
 }

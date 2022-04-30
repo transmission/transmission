@@ -12,12 +12,30 @@
 #import "NSStringAdditions.h"
 
 #define LEVEL_ERROR 0
-#define LEVEL_INFO 1
-#define LEVEL_DEBUG 2
+#define LEVEL_WARN 1
+#define LEVEL_INFO 2
+#define LEVEL_DEBUG 3
+#define LEVEL_TRACE 4
 
 #define UPDATE_SECONDS 0.75
 
 @interface MessageWindowController ()
+
+@property(nonatomic) IBOutlet NSTableView* fMessageTable;
+
+@property(nonatomic) IBOutlet NSPopUpButton* fLevelButton;
+@property(nonatomic) IBOutlet NSButton* fSaveButton;
+@property(nonatomic) IBOutlet NSButton* fClearButton;
+@property(nonatomic) IBOutlet NSSearchField* fFilterField;
+
+@property(nonatomic) NSMutableArray<NSDictionary*>* fMessages;
+@property(nonatomic) NSMutableArray<NSDictionary*>* fDisplayedMessages;
+
+@property(nonatomic, copy) NSDictionary<NSAttributedStringKey, id>* fAttributes;
+
+@property(nonatomic) NSTimer* fTimer;
+
+@property(nonatomic) NSLock* fLock;
 
 - (void)resizeColumn;
 - (BOOL)shouldIncludeMessageForFilter:(NSString*)filterString message:(NSDictionary*)message;
@@ -42,95 +60,105 @@
 
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(resizeColumn)
                                                name:NSTableViewColumnDidResizeNotification
-                                             object:fMessageTable];
+                                             object:self.fMessageTable];
 
-    [window setContentBorderThickness:NSMinY(fMessageTable.enclosingScrollView.frame) forEdge:NSMinYEdge];
+    [window setContentBorderThickness:NSMinY(self.fMessageTable.enclosingScrollView.frame) forEdge:NSMinYEdge];
 
     self.window.title = NSLocalizedString(@"Message Log", "Message window -> title");
 
     //set images and text for popup button items
-    [fLevelButton itemAtIndex:LEVEL_ERROR].title = NSLocalizedString(@"Error", "Message window -> level string");
-    [fLevelButton itemAtIndex:LEVEL_INFO].title = NSLocalizedString(@"Info", "Message window -> level string");
-    [fLevelButton itemAtIndex:LEVEL_DEBUG].title = NSLocalizedString(@"Debug", "Message window -> level string");
+    [self.fLevelButton itemAtIndex:LEVEL_ERROR].title = NSLocalizedString(@"Error", "Message window -> level string");
+    [self.fLevelButton itemAtIndex:LEVEL_WARN].title = NSLocalizedString(@"Warn", "Message window -> level string");
+    [self.fLevelButton itemAtIndex:LEVEL_INFO].title = NSLocalizedString(@"Info", "Message window -> level string");
+    [self.fLevelButton itemAtIndex:LEVEL_DEBUG].title = NSLocalizedString(@"Debug", "Message window -> level string");
+    [self.fLevelButton itemAtIndex:LEVEL_TRACE].title = NSLocalizedString(@"Trace", "Message window -> level string");
 
-    CGFloat const levelButtonOldWidth = NSWidth(fLevelButton.frame);
-    [fLevelButton sizeToFit];
+    CGFloat const levelButtonOldWidth = NSWidth(self.fLevelButton.frame);
+    [self.fLevelButton sizeToFit];
 
     //set table column text
-    [fMessageTable tableColumnWithIdentifier:@"Date"].headerCell.title = NSLocalizedString(@"Date", "Message window -> table column");
-    [fMessageTable tableColumnWithIdentifier:@"Name"].headerCell.title = NSLocalizedString(@"Process", "Message window -> table column");
-    [fMessageTable tableColumnWithIdentifier:@"Message"].headerCell.title = NSLocalizedString(@"Message", "Message window -> table column");
+    [self.fMessageTable tableColumnWithIdentifier:@"Date"].headerCell.title = NSLocalizedString(@"Date", "Message window -> table column");
+    [self.fMessageTable tableColumnWithIdentifier:@"Name"].headerCell.title = NSLocalizedString(@"Process", "Message window -> table column");
+    [self.fMessageTable tableColumnWithIdentifier:@"Message"].headerCell.title = NSLocalizedString(@"Message", "Message window -> table column");
 
     //set and size buttons
-    fSaveButton.title = [NSLocalizedString(@"Save", "Message window -> save button") stringByAppendingEllipsis];
-    [fSaveButton sizeToFit];
+    self.fSaveButton.title = [NSLocalizedString(@"Save", "Message window -> save button") stringByAppendingEllipsis];
+    [self.fSaveButton sizeToFit];
 
-    NSRect saveButtonFrame = fSaveButton.frame;
+    NSRect saveButtonFrame = self.fSaveButton.frame;
     saveButtonFrame.size.width += 10.0;
-    saveButtonFrame.origin.x += NSWidth(fLevelButton.frame) - levelButtonOldWidth;
-    fSaveButton.frame = saveButtonFrame;
+    saveButtonFrame.origin.x += NSWidth(self.fLevelButton.frame) - levelButtonOldWidth;
+    self.fSaveButton.frame = saveButtonFrame;
 
-    CGFloat const oldClearButtonWidth = fClearButton.frame.size.width;
+    CGFloat const oldClearButtonWidth = self.fClearButton.frame.size.width;
 
-    fClearButton.title = NSLocalizedString(@"Clear", "Message window -> save button");
-    [fClearButton sizeToFit];
+    self.fClearButton.title = NSLocalizedString(@"Clear", "Message window -> save button");
+    [self.fClearButton sizeToFit];
 
-    NSRect clearButtonFrame = fClearButton.frame;
+    NSRect clearButtonFrame = self.fClearButton.frame;
     clearButtonFrame.size.width = MAX(clearButtonFrame.size.width + 10.0, saveButtonFrame.size.width);
     clearButtonFrame.origin.x -= NSWidth(clearButtonFrame) - oldClearButtonWidth;
-    fClearButton.frame = clearButtonFrame;
+    self.fClearButton.frame = clearButtonFrame;
 
-    [fFilterField.cell setPlaceholderString:NSLocalizedString(@"Filter", "Message window -> filter field")];
-    NSRect filterButtonFrame = fFilterField.frame;
+    [self.fFilterField.cell setPlaceholderString:NSLocalizedString(@"Filter", "Message window -> filter field")];
+    NSRect filterButtonFrame = self.fFilterField.frame;
     filterButtonFrame.origin.x -= NSWidth(clearButtonFrame) - oldClearButtonWidth;
-    fFilterField.frame = filterButtonFrame;
+    self.fFilterField.frame = filterButtonFrame;
 
-    fAttributes = [[[fMessageTable tableColumnWithIdentifier:@"Message"].dataCell attributedStringValue] attributesAtIndex:0
-                                                                                                            effectiveRange:NULL];
+    self.fAttributes = [[[self.fMessageTable tableColumnWithIdentifier:@"Message"].dataCell attributedStringValue]
+        attributesAtIndex:0
+           effectiveRange:NULL];
 
     //select proper level in popup button
     switch ([NSUserDefaults.standardUserDefaults integerForKey:@"MessageLevel"])
     {
     case TR_LOG_ERROR:
-        [fLevelButton selectItemAtIndex:LEVEL_ERROR];
+        [self.fLevelButton selectItemAtIndex:LEVEL_ERROR];
+        break;
+    case TR_LOG_WARN:
+        [self.fLevelButton selectItemAtIndex:LEVEL_WARN];
         break;
     case TR_LOG_INFO:
-        [fLevelButton selectItemAtIndex:LEVEL_INFO];
+        [self.fLevelButton selectItemAtIndex:LEVEL_INFO];
         break;
     case TR_LOG_DEBUG:
-        [fLevelButton selectItemAtIndex:LEVEL_DEBUG];
+        [self.fLevelButton selectItemAtIndex:LEVEL_DEBUG];
+        break;
+    case TR_LOG_TRACE:
+        [self.fLevelButton selectItemAtIndex:LEVEL_TRACE];
         break;
     default: //safety
         [NSUserDefaults.standardUserDefaults setInteger:TR_LOG_ERROR forKey:@"MessageLevel"];
-        [fLevelButton selectItemAtIndex:LEVEL_ERROR];
+        [self.fLevelButton selectItemAtIndex:LEVEL_ERROR];
     }
 
-    fMessages = [[NSMutableArray alloc] init];
-    fDisplayedMessages = [[NSMutableArray alloc] init];
+    self.fMessages = [[NSMutableArray alloc] init];
+    self.fDisplayedMessages = [[NSMutableArray alloc] init];
 
-    fLock = [[NSLock alloc] init];
+    self.fLock = [[NSLock alloc] init];
 }
 
 - (void)dealloc
 {
     [NSNotificationCenter.defaultCenter removeObserver:self];
-    [fTimer invalidate];
+    [_fTimer invalidate];
 }
 
 - (void)windowDidBecomeKey:(NSNotification*)notification
 {
-    if (!fTimer)
+    if (!self.fTimer)
     {
-        fTimer = [NSTimer scheduledTimerWithTimeInterval:UPDATE_SECONDS target:self selector:@selector(updateLog:) userInfo:nil
-                                                 repeats:YES];
+        self.fTimer = [NSTimer scheduledTimerWithTimeInterval:UPDATE_SECONDS target:self selector:@selector(updateLog:)
+                                                     userInfo:nil
+                                                      repeats:YES];
         [self updateLog:nil];
     }
 }
 
 - (void)windowWillClose:(id)sender
 {
-    [fTimer invalidate];
-    fTimer = nil;
+    [self.fTimer invalidate];
+    self.fTimer = nil;
 }
 
 + (void)restoreWindowWithIdentifier:(NSString*)identifier
@@ -145,9 +173,9 @@
 
 - (void)window:(NSWindow*)window didDecodeRestorableState:(NSCoder*)coder
 {
-    [fTimer invalidate];
-    fTimer = [NSTimer scheduledTimerWithTimeInterval:UPDATE_SECONDS target:self selector:@selector(updateLog:) userInfo:nil
-                                             repeats:YES];
+    [self.fTimer invalidate];
+    self.fTimer = [NSTimer scheduledTimerWithTimeInterval:UPDATE_SECONDS target:self selector:@selector(updateLog:) userInfo:nil
+                                                  repeats:YES];
     [self updateLog:nil];
 }
 
@@ -159,15 +187,15 @@
         return;
     }
 
-    [fLock lock];
+    [self.fLock lock];
 
     static NSUInteger currentIndex = 0;
 
-    NSScroller* scroller = fMessageTable.enclosingScrollView.verticalScroller;
+    NSScroller* scroller = self.fMessageTable.enclosingScrollView.verticalScroller;
     BOOL const shouldScroll = currentIndex == 0 || scroller.floatValue == 1.0 || scroller.hidden || scroller.knobProportion == 1.0;
 
     NSInteger const maxLevel = [NSUserDefaults.standardUserDefaults integerForKey:@"MessageLevel"];
-    NSString* filterString = fFilterField.stringValue;
+    NSString* filterString = self.fFilterField.stringValue;
 
     BOOL changed = NO;
 
@@ -185,51 +213,51 @@
             @"Name" : name,
             @"File" : file
         };
-        [fMessages addObject:message];
+        [self.fMessages addObject:message];
 
         if (currentMessage->level <= maxLevel && [self shouldIncludeMessageForFilter:filterString message:message])
         {
-            [fDisplayedMessages addObject:message];
+            [self.fDisplayedMessages addObject:message];
             changed = YES;
         }
     }
 
-    if (fMessages.count > TR_LOG_MAX_QUEUE_LENGTH)
+    if (self.fMessages.count > TR_LOG_MAX_QUEUE_LENGTH)
     {
-        NSUInteger const oldCount = fDisplayedMessages.count;
+        NSUInteger const oldCount = self.fDisplayedMessages.count;
 
-        NSIndexSet* removeIndexes = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, fMessages.count - TR_LOG_MAX_QUEUE_LENGTH)];
-        NSArray* itemsToRemove = [fMessages objectsAtIndexes:removeIndexes];
+        NSIndexSet* removeIndexes = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, self.fMessages.count - TR_LOG_MAX_QUEUE_LENGTH)];
+        NSArray* itemsToRemove = [self.fMessages objectsAtIndexes:removeIndexes];
 
-        [fMessages removeObjectsAtIndexes:removeIndexes];
-        [fDisplayedMessages removeObjectsInArray:itemsToRemove];
+        [self.fMessages removeObjectsAtIndexes:removeIndexes];
+        [self.fDisplayedMessages removeObjectsInArray:itemsToRemove];
 
-        changed |= oldCount > fDisplayedMessages.count;
+        changed |= oldCount > self.fDisplayedMessages.count;
     }
 
     if (changed)
     {
-        [fDisplayedMessages sortUsingDescriptors:fMessageTable.sortDescriptors];
+        [self.fDisplayedMessages sortUsingDescriptors:self.fMessageTable.sortDescriptors];
 
-        [fMessageTable reloadData];
+        [self.fMessageTable reloadData];
         if (shouldScroll)
-            [fMessageTable scrollRowToVisible:fMessageTable.numberOfRows - 1];
+            [self.fMessageTable scrollRowToVisible:self.fMessageTable.numberOfRows - 1];
     }
 
-    [fLock unlock];
+    [self.fLock unlock];
 
     tr_logFreeQueue(messages);
 }
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView*)tableView
 {
-    return fDisplayedMessages.count;
+    return self.fDisplayedMessages.count;
 }
 
 - (id)tableView:(NSTableView*)tableView objectValueForTableColumn:(NSTableColumn*)column row:(NSInteger)row
 {
     NSString* ident = column.identifier;
-    NSDictionary* message = fDisplayedMessages[row];
+    NSDictionary* message = self.fDisplayedMessages[row];
 
     if ([ident isEqualToString:@"Date"])
     {
@@ -240,12 +268,22 @@
         NSInteger const level = [message[@"Level"] integerValue];
         switch (level)
         {
+        case TR_LOG_CRITICAL:
         case TR_LOG_ERROR:
             return [NSImage imageNamed:@"RedDotFlat"];
+
+        case TR_LOG_WARN:
+            return [NSImage imageNamed:@"OrangeDotFlat"];
+
         case TR_LOG_INFO:
-            return [NSImage imageNamed:@"YellowDotFlat"];
+            return [NSImage imageNamed:@"GreenDotFlat"];
+
         case TR_LOG_DEBUG:
+            return [NSImage imageNamed:@"BlueDotFlat"];
+
+        case TR_LOG_TRACE:
             return [NSImage imageNamed:@"PurpleDotFlat"];
+
         default:
             NSAssert1(NO, @"Unknown message log level: %ld", level);
             return nil;
@@ -264,18 +302,18 @@
 #warning don't cut off end
 - (CGFloat)tableView:(NSTableView*)tableView heightOfRow:(NSInteger)row
 {
-    NSString* message = fDisplayedMessages[row][@"Message"];
+    NSString* message = self.fDisplayedMessages[row][@"Message"];
 
     NSTableColumn* column = [tableView tableColumnWithIdentifier:@"Message"];
-    CGFloat const count = floorf([message sizeWithAttributes:fAttributes].width / column.width);
+    CGFloat const count = floorf([message sizeWithAttributes:self.fAttributes].width / column.width);
 
     return tableView.rowHeight * (count + 1.0);
 }
 
 - (void)tableView:(NSTableView*)tableView sortDescriptorsDidChange:(NSArray*)oldDescriptors
 {
-    [fDisplayedMessages sortUsingDescriptors:fMessageTable.sortDescriptors];
-    [fMessageTable reloadData];
+    [self.fDisplayedMessages sortUsingDescriptors:self.fMessageTable.sortDescriptors];
+    [self.fMessageTable reloadData];
 }
 
 - (NSString*)tableView:(NSTableView*)tableView
@@ -285,16 +323,16 @@
                    row:(NSInteger)row
          mouseLocation:(NSPoint)mouseLocation
 {
-    NSDictionary* message = fDisplayedMessages[row];
+    NSDictionary* message = self.fDisplayedMessages[row];
     return message[@"File"];
 }
 
 - (void)copy:(id)sender
 {
-    NSIndexSet* indexes = fMessageTable.selectedRowIndexes;
+    NSIndexSet* indexes = self.fMessageTable.selectedRowIndexes;
     NSMutableArray* messageStrings = [NSMutableArray arrayWithCapacity:indexes.count];
 
-    for (NSDictionary* message in [fDisplayedMessages objectsAtIndexes:indexes])
+    for (NSDictionary* message in [self.fDisplayedMessages objectsAtIndexes:indexes])
     {
         [messageStrings addObject:[self stringForMessage:message]];
     }
@@ -312,7 +350,7 @@
 
     if (action == @selector(copy:))
     {
-        return fMessageTable.numberOfSelectedRows > 0;
+        return self.fMessageTable.numberOfSelectedRows > 0;
     }
 
     return YES;
@@ -321,10 +359,13 @@
 - (void)changeLevel:(id)sender
 {
     NSInteger level;
-    switch (fLevelButton.indexOfSelectedItem)
+    switch (self.fLevelButton.indexOfSelectedItem)
     {
     case LEVEL_ERROR:
         level = TR_LOG_ERROR;
+        break;
+    case LEVEL_WARN:
+        level = TR_LOG_WARN;
         break;
     case LEVEL_INFO:
         level = TR_LOG_INFO;
@@ -332,8 +373,11 @@
     case LEVEL_DEBUG:
         level = TR_LOG_DEBUG;
         break;
+    case LEVEL_TRACE:
+        level = TR_LOG_TRACE;
+        break;
     default:
-        NSAssert1(NO, @"Unknown message log level: %ld", [fLevelButton indexOfSelectedItem]);
+        NSAssert1(NO, @"Unknown message log level: %ld", [self.fLevelButton indexOfSelectedItem]);
         level = TR_LOG_INFO;
     }
 
@@ -344,37 +388,37 @@
 
     [NSUserDefaults.standardUserDefaults setInteger:level forKey:@"MessageLevel"];
 
-    [fLock lock];
+    [self.fLock lock];
 
     [self updateListForFilter];
 
-    [fLock unlock];
+    [self.fLock unlock];
 }
 
 - (void)changeFilter:(id)sender
 {
-    [fLock lock];
+    [self.fLock lock];
 
     [self updateListForFilter];
 
-    [fLock unlock];
+    [self.fLock unlock];
 }
 
 - (void)clearLog:(id)sender
 {
-    [fLock lock];
+    [self.fLock lock];
 
-    [fMessages removeAllObjects];
+    [self.fMessages removeAllObjects];
 
-    [fMessageTable beginUpdates];
-    [fMessageTable removeRowsAtIndexes:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, fDisplayedMessages.count)]
-                         withAnimation:NSTableViewAnimationSlideLeft];
+    [self.fMessageTable beginUpdates];
+    [self.fMessageTable removeRowsAtIndexes:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, self.fDisplayedMessages.count)]
+                              withAnimation:NSTableViewAnimationSlideLeft];
 
-    [fDisplayedMessages removeAllObjects];
+    [self.fDisplayedMessages removeAllObjects];
 
-    [fMessageTable endUpdates];
+    [self.fMessageTable endUpdates];
 
-    [fLock unlock];
+    [self.fLock unlock];
 }
 
 - (void)writeToFile:(id)sender
@@ -391,7 +435,7 @@
             //make the array sorted by date
             NSSortDescriptor* descriptor = [NSSortDescriptor sortDescriptorWithKey:@"Index" ascending:YES];
             NSArray* descriptors = @[ descriptor ];
-            NSArray* sortedMessages = [fDisplayedMessages sortedArrayUsingDescriptors:descriptors];
+            NSArray* sortedMessages = [self.fDisplayedMessages sortedArrayUsingDescriptors:descriptors];
 
             //create the text to output
             NSMutableArray* messageStrings = [NSMutableArray arrayWithCapacity:sortedMessages.count];
@@ -418,9 +462,12 @@
     }];
 }
 
+#pragma mark - Private
+
 - (void)resizeColumn
 {
-    [fMessageTable noteHeightOfRowsWithIndexesChanged:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, fMessageTable.numberOfRows)]];
+    [self.fMessageTable
+        noteHeightOfRowsWithIndexesChanged:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, self.fMessageTable.numberOfRows)]];
 }
 
 - (BOOL)shouldIncludeMessageForFilter:(NSString*)filterString message:(NSDictionary*)message
@@ -438,17 +485,16 @@
 - (void)updateListForFilter
 {
     NSInteger const level = [NSUserDefaults.standardUserDefaults integerForKey:@"MessageLevel"];
-    NSString* filterString = fFilterField.stringValue;
+    NSString* filterString = self.fFilterField.stringValue;
 
-    NSIndexSet* indexes = [fMessages indexesOfObjectsWithOptions:NSEnumerationConcurrent
-                                                     passingTest:^BOOL(id message, NSUInteger idx, BOOL* stop) {
-                                                         return [((NSDictionary*)message)[@"Level"] integerValue] <= level &&
-                                                             [self shouldIncludeMessageForFilter:filterString message:message];
-                                                     }];
+    NSIndexSet* indexes = [self.fMessages
+        indexesOfObjectsWithOptions:NSEnumerationConcurrent passingTest:^BOOL(NSDictionary* message, NSUInteger idx, BOOL* stop) {
+            return [message[@"Level"] integerValue] <= level && [self shouldIncludeMessageForFilter:filterString message:message];
+        }];
 
-    NSArray* tempMessages = [[fMessages objectsAtIndexes:indexes] sortedArrayUsingDescriptors:fMessageTable.sortDescriptors];
+    NSArray* tempMessages = [[self.fMessages objectsAtIndexes:indexes] sortedArrayUsingDescriptors:self.fMessageTable.sortDescriptors];
 
-    [fMessageTable beginUpdates];
+    [self.fMessageTable beginUpdates];
 
     //figure out which rows were added/moved
     NSUInteger currentIndex = 0, totalCount = 0;
@@ -457,9 +503,9 @@
 
     for (NSDictionary* message in tempMessages)
     {
-        NSUInteger const previousIndex = [fDisplayedMessages
+        NSUInteger const previousIndex = [self.fDisplayedMessages
             indexOfObject:message
-                  inRange:NSMakeRange(currentIndex, fDisplayedMessages.count - currentIndex)];
+                  inRange:NSMakeRange(currentIndex, self.fDisplayedMessages.count - currentIndex)];
         if (previousIndex == NSNotFound)
         {
             [itemsToAdd addObject:message];
@@ -469,8 +515,8 @@
         {
             if (previousIndex != currentIndex)
             {
-                [fDisplayedMessages moveObjectAtIndex:previousIndex toIndex:currentIndex];
-                [fMessageTable moveRowAtIndex:previousIndex toIndex:currentIndex];
+                [self.fDisplayedMessages moveObjectAtIndex:previousIndex toIndex:currentIndex];
+                [self.fMessageTable moveRowAtIndex:previousIndex toIndex:currentIndex];
             }
             ++currentIndex;
         }
@@ -479,21 +525,21 @@
     }
 
     //remove trailing items - those are the unused
-    if (currentIndex < fDisplayedMessages.count)
+    if (currentIndex < self.fDisplayedMessages.count)
     {
-        NSRange const removeRange = NSMakeRange(currentIndex, fDisplayedMessages.count - currentIndex);
-        [fDisplayedMessages removeObjectsInRange:removeRange];
-        [fMessageTable removeRowsAtIndexes:[NSIndexSet indexSetWithIndexesInRange:removeRange]
-                             withAnimation:NSTableViewAnimationSlideDown];
+        NSRange const removeRange = NSMakeRange(currentIndex, self.fDisplayedMessages.count - currentIndex);
+        [self.fDisplayedMessages removeObjectsInRange:removeRange];
+        [self.fMessageTable removeRowsAtIndexes:[NSIndexSet indexSetWithIndexesInRange:removeRange]
+                                  withAnimation:NSTableViewAnimationSlideDown];
     }
 
     //add new items
-    [fDisplayedMessages insertObjects:itemsToAdd atIndexes:itemsToAddIndexes];
-    [fMessageTable insertRowsAtIndexes:itemsToAddIndexes withAnimation:NSTableViewAnimationSlideUp];
+    [self.fDisplayedMessages insertObjects:itemsToAdd atIndexes:itemsToAddIndexes];
+    [self.fMessageTable insertRowsAtIndexes:itemsToAddIndexes withAnimation:NSTableViewAnimationSlideUp];
 
-    [fMessageTable endUpdates];
+    [self.fMessageTable endUpdates];
 
-    NSAssert2([fDisplayedMessages isEqualToArray:tempMessages], @"Inconsistency between message arrays! %@ %@", fDisplayedMessages, tempMessages);
+    NSAssert2([self.fDisplayedMessages isEqualToArray:tempMessages], @"Inconsistency between message arrays! %@ %@", self.fDisplayedMessages, tempMessages);
 }
 
 - (NSString*)stringForMessage:(NSDictionary*)message

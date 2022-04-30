@@ -15,48 +15,38 @@
 {
     if ((self = [super init]))
     {
-        fGroup = group;
-        fTorrents = [[NSMutableArray alloc] init];
+        _groupIndex = group;
+        _torrents = [[NSMutableArray alloc] init];
     }
     return self;
 }
 
 - (NSString*)description
 {
-    return [NSString stringWithFormat:@"Torrent Group %ld: %@", fGroup, fTorrents];
-}
-
-- (NSInteger)groupIndex
-{
-    return fGroup;
+    return [NSString stringWithFormat:@"Torrent Group %ld: %@", self.groupIndex, self.torrents];
 }
 
 - (NSInteger)groupOrderValue
 {
-    return [GroupsController.groups rowValueForIndex:fGroup];
-}
-
-- (NSMutableArray*)torrents
-{
-    return fTorrents;
+    return [GroupsController.groups rowValueForIndex:self.groupIndex];
 }
 
 - (CGFloat)ratio
 {
-    uint64_t uploaded = 0, downloaded = 0;
-    for (Torrent* torrent in fTorrents)
+    uint64_t uploaded = 0, total_size = 0;
+    for (Torrent* torrent in self.torrents)
     {
         uploaded += torrent.uploadedTotal;
-        downloaded += torrent.downloadedTotal;
+        total_size += torrent.totalSizeSelected;
     }
 
-    return tr_getRatio(uploaded, downloaded);
+    return tr_getRatio(uploaded, total_size);
 }
 
 - (CGFloat)uploadRate
 {
     CGFloat rate = 0.0;
-    for (Torrent* torrent in fTorrents)
+    for (Torrent* torrent in self.torrents)
     {
         rate += torrent.uploadRate;
     }
@@ -67,7 +57,7 @@
 - (CGFloat)downloadRate
 {
     CGFloat rate = 0.0;
-    for (Torrent* torrent in fTorrents)
+    for (Torrent* torrent in self.torrents)
     {
         rate += torrent.downloadRate;
     }

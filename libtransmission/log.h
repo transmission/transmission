@@ -5,66 +5,112 @@
 
 #pragma once
 
-#include <stddef.h> /* size_t */
+#include <cstddef>
+#include <ctime>
+#include <optional>
+#include <string_view>
 
-#include "file.h" /* tr_sys_file_t */
-#include "tr-macros.h"
+///
+
+enum tr_log_level
+{
+    // No logging at all
+    TR_LOG_OFF,
+
+    // Errors that prevent Transmission from running
+    TR_LOG_CRITICAL,
+
+    // Errors that could prevent a single torrent from running, e.g. missing
+    // files or a private torrent's tracker responding "unregistered torrent"
+    TR_LOG_ERROR,
+
+    // Smaller errors that don't stop the overall system,
+    // e.g. unable to preallocate a file, or unable to connect to a tracker
+    // when other trackers are available
+    TR_LOG_WARN,
+
+    // User-visible info, e.g. "torrent completed" or "running script"
+    TR_LOG_INFO,
+
+    // Debug messages
+    TR_LOG_DEBUG,
+
+    // High-volume debug messages, e.g. tracing peer protocol messages
+    TR_LOG_TRACE
+};
+
+std::optional<tr_log_level> tr_logGetLevelFromKey(std::string_view key);
+
+std::string_view tr_logLevelToKey(tr_log_level);
+
+///
+
+struct tr_log_message
+{
+    tr_log_level level;
+
+    // location in the source code
+    char const* file;
+    int line;
+
+    // when the message was generated
+    time_t when;
+
+    // torrent name or code module name associated with the message
+    char* name;
+
+    // the message
+    char* message;
+
+    // linked list of messages
+    struct tr_log_message* next;
+};
+
+////
 
 #define TR_LOG_MAX_QUEUE_LENGTH 10000
 
-tr_log_level tr_logGetLevel(void);
+[[nodiscard]] bool tr_logGetQueueEnabled();
 
-static inline bool tr_logLevelIsActive(tr_log_level level)
-{
-    return tr_logGetLevel() >= level;
-}
+void tr_logSetQueueEnabled(bool isEnabled);
 
-void tr_logAddMessage(char const* file, int line, tr_log_level level, char const* torrent, char const* fmt, ...)
-    TR_GNUC_PRINTF(5, 6);
+[[nodiscard]] tr_log_message* tr_logGetQueue();
 
-#define tr_logAddNamed(level, name, ...) \
+void tr_logFreeQueue(tr_log_message* freeme);
+
+////
+
+void tr_logSetLevel(tr_log_level);
+
+[[nodiscard]] tr_log_level tr_logGetLevel();
+
+[[nodiscard]] bool tr_logLevelIsActive(tr_log_level level);
+
+////
+
+void tr_logAddMessage(
+    char const* source_file,
+    int source_line,
+    tr_log_level level,
+    std::string_view message,
+    std::string_view module_name = {});
+
+#define tr_logAddLevel(level, ...) \
     do \
     { \
-        if (tr_logLevelIsActive(level)) \
+        if (tr_logGetLevel() >= level) \
         { \
-            tr_logAddMessage(__FILE__, __LINE__, level, name, __VA_ARGS__); \
+            tr_logAddMessage(__FILE__, __LINE__, level, __VA_ARGS__); \
         } \
     } while (0)
 
-#define tr_logAddNamedError(name, ...) tr_logAddNamed(TR_LOG_ERROR, name, __VA_ARGS__)
-#define tr_logAddNamedInfo(name, ...) tr_logAddNamed(TR_LOG_INFO, name, __VA_ARGS__)
-#define tr_logAddNamedDbg(name, ...) tr_logAddNamed(TR_LOG_DEBUG, name, __VA_ARGS__)
+#define tr_logAddCritical(...) tr_logAddLevel(TR_LOG_CRITICAL, __VA_ARGS__)
+#define tr_logAddError(...) tr_logAddLevel(TR_LOG_ERROR, __VA_ARGS__)
+#define tr_logAddWarn(...) tr_logAddLevel(TR_LOG_WARN, __VA_ARGS__)
+#define tr_logAddInfo(...) tr_logAddLevel(TR_LOG_INFO, __VA_ARGS__)
+#define tr_logAddDebug(...) tr_logAddLevel(TR_LOG_DEBUG, __VA_ARGS__)
+#define tr_logAddTrace(...) tr_logAddLevel(TR_LOG_TRACE, __VA_ARGS__)
 
-#define tr_logAddTor(level, tor, ...) tr_logAddNamed(level, tr_torrentName(tor), __VA_ARGS__)
+////
 
-#define tr_logAddTorErr(tor, ...) tr_logAddTor(TR_LOG_ERROR, tor, __VA_ARGS__)
-#define tr_logAddTorInfo(tor, ...) tr_logAddTor(TR_LOG_INFO, tor, __VA_ARGS__)
-#define tr_logAddTorDbg(tor, ...) tr_logAddTor(TR_LOG_DEBUG, tor, __VA_ARGS__)
-
-#define tr_logAdd(level, ...) tr_logAddNamed(level, nullptr, __VA_ARGS__)
-
-#define tr_logAddError(...) tr_logAdd(TR_LOG_ERROR, __VA_ARGS__)
-#define tr_logAddInfo(...) tr_logAdd(TR_LOG_INFO, __VA_ARGS__)
-#define tr_logAddDebug(...) tr_logAdd(TR_LOG_DEBUG, __VA_ARGS__)
-
-tr_sys_file_t tr_logGetFile(void);
-
-/** @brief return true if deep logging has been enabled by the user, false otherwise */
-bool tr_logGetDeepEnabled(void);
-
-void tr_logAddDeep(char const* file, int line, char const* name, char const* fmt, ...) TR_GNUC_PRINTF(4, 5)
-    TR_GNUC_NONNULL(1, 4);
-
-#define tr_logAddDeepNamed(name, ...) \
-    do \
-    { \
-        if (tr_logGetDeepEnabled()) \
-        { \
-            tr_logAddDeep(__FILE__, __LINE__, name, __VA_ARGS__); \
-        } \
-    } while (0)
-
-/** @brief set the buffer with the current time formatted for deep logging. */
-char* tr_logGetTimeStr(char* buf, size_t buflen) TR_GNUC_NONNULL(1);
-
-/** @} */
+char* tr_logGetTimeStr(char* buf, size_t buflen);

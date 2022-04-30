@@ -1,3 +1,4 @@
+#import <AppKit/AppKit.h>
 #import <QuickLook/QuickLook.h>
 
 #include <string>
@@ -83,8 +84,9 @@ OSStatus GeneratePreviewForURL(void* thisInterface, QLPreviewRequestRef preview,
     NSString* fileSizeString = [NSString stringForFileSize:metainfo.totalSize()];
     if (is_multifile)
     {
-        NSString* fileCountString = [NSString stringWithFormat:NSLocalizedStringFromTableInBundle(@"%@ files", nil, bundle, "quicklook file count"),
-                                                         [NSString formattedUInteger:n_files]];
+        NSString* fileCountString = [NSString
+            stringWithFormat:NSLocalizedStringFromTableInBundle(@"%@ files", nil, bundle, "quicklook file count"),
+                             [NSString formattedUInteger:n_files]];
         fileSizeString = [NSString stringWithFormat:@"%@, %@", fileCountString, fileSizeString];
     }
     [htmlString appendFormat:@"<p>%@</p>", fileSizeString];
@@ -171,7 +173,7 @@ OSStatus GeneratePreviewForURL(void* thisInterface, QLPreviewRequestRef preview,
 #warning handle tiers?
         for (auto const& tracker : announce_list)
         {
-            [listSection appendFormat:@"<tr><td>%s<td></tr>", tracker.announce_str.c_str()];
+            [listSection appendFormat:@"<tr><td>%s<td></tr>", tracker.announce.c_str()];
         }
 
         [listSection appendString:@"</table>"];
@@ -184,8 +186,9 @@ OSStatus GeneratePreviewForURL(void* thisInterface, QLPreviewRequestRef preview,
         NSMutableString* listSection = [NSMutableString string];
         [listSection appendString:@"<table>"];
 
-        NSString* fileTitleString = [NSString stringWithFormat:NSLocalizedStringFromTableInBundle(@"%@ Files", nil, bundle, "quicklook file header"),
-                                       [NSString formattedUInteger:n_files]];
+        NSString* fileTitleString = [NSString
+            stringWithFormat:NSLocalizedStringFromTableInBundle(@"%@ Files", nil, bundle, "quicklook file header"),
+                             [NSString formattedUInteger:n_files]];
         [listSection appendFormat:@"<tr><th>%@</th></tr>", fileTitleString];
 
 #warning display size?

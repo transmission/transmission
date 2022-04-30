@@ -3,9 +3,11 @@
 // A copy of this license can be found in licenses/ .
 
 #include <algorithm>
-#include <cmath> /* pow() */
+#include <cmath> // pow()
 #include <cstring> // strstr
+#include <cinttypes> // PRId64
 #include <functional>
+#include <iostream>
 #include <map>
 #include <memory>
 #include <string>
@@ -14,6 +16,8 @@
 #include <glibmm/i18n.h>
 
 #include <event2/buffer.h>
+
+#include <fmt/core.h>
 
 #include <libtransmission/transmission.h>
 
@@ -128,7 +132,7 @@ private:
 
     tr_torrent* create_new_torrent(tr_ctor* ctor);
 
-    void set_sort_mode(std::string const& mode, bool is_reversed);
+    void set_sort_mode(std::string_view mode, bool is_reversed);
 
     void maybe_inhibit_hibernation();
     void set_hibernation_allowed(bool allowed);
@@ -534,7 +538,7 @@ int compare_by_state(Gtk::TreeModel::iterator const& a, Gtk::TreeModel::iterator
 
 } // namespace
 
-void Session::Impl::set_sort_mode(std::string const& mode, bool is_reversed)
+void Session::Impl::set_sort_mode(std::string_view mode, bool is_reversed)
 {
     auto const& col = torrent_cols.torrent;
     Gtk::TreeSortable::SlotCompare sort_func;
@@ -613,7 +617,13 @@ void rename_torrent(Glib::RefPtr<Gio::File> const& file)
         }
         catch (Glib::Error const& e)
         {
-            g_message("Unable to rename \"%s\" as \"%s\": %s", old_name.c_str(), new_name.c_str(), e.what().c_str());
+            auto const errmsg = fmt::format(
+                _("Couldn't rename '{old_path}' as '{path}': {error} ({error_code})"),
+                fmt::arg("old_path", old_name),
+                fmt::arg("path", new_name),
+                fmt::arg("error", e.what()),
+                fmt::arg("error_code", e.code()));
+            g_message("%s", errmsg.c_str());
         }
     }
 }
@@ -1029,7 +1039,7 @@ int Session::Impl::add_ctor(tr_ctor* ctor, bool do_prompt, bool do_notify)
 
     if (tr_torrentFindFromMetainfo(get_session(), metainfo) != nullptr)
     {
-        /* don't complain about .torrent files in the watch directory
+        /* don't complain about torrent files in the watch directory
          * that have already been added... that gets annoying and we
          * don't want to be nagging users to clean up their watch dirs */
         if (tr_ctorGetSourceFile(ctor) == nullptr || !adding_from_watch_dir_)
@@ -1107,7 +1117,8 @@ void Session::Impl::add_file_async_callback(
     {
         if (!file->load_contents_finish(result, contents, length))
         {
-            g_message(_("Couldn't read \"%s\""), file->get_parse_name().c_str());
+            auto const errmsg = fmt::format(_("Couldn't read '{path}'"), fmt::arg("path", file->get_parse_name()));
+            g_message("%s", errmsg.c_str());
         }
         else if (tr_ctorSetMetainfo(ctor, contents, length, nullptr))
         {
@@ -1120,7 +1131,12 @@ void Session::Impl::add_file_async_callback(
     }
     catch (Glib::Error const& e)
     {
-        g_message(_("Couldn't read \"%s\": %s"), file->get_parse_name().c_str(), e.what().c_str());
+        auto const errmsg = fmt::format(
+            _("Couldn't read '{path}': {error} ({error_code})"),
+            fmt::arg("path", file->get_parse_name()),
+            fmt::arg("error", e.what()),
+            fmt::arg("error_code", e.code()));
+        g_message("%s", errmsg.c_str());
     }
 
     dec_busy();
@@ -1168,7 +1184,8 @@ bool Session::Impl::add_file(Glib::RefPtr<Gio::File> const& file, bool do_start,
     else
     {
         tr_ctorFree(ctor);
-        g_message(_("Skipping unknown torrent \"%s\""), file->get_parse_name().c_str());
+        std::cerr << fmt::format(_("Couldn't add torrent file '{path}'"), fmt::arg("path", file->get_parse_name()))
+                  << std::endl;
     }
 
     return handled;
@@ -1437,13 +1454,13 @@ bool gtr_inhibit_hibernation(guint32& cookie)
         cookie = Glib::VariantBase::cast_dynamic<Glib::Variant<guint32>>(response.get_child(0)).get();
 
         /* logging */
-        tr_logAddInfo("%s", _("Inhibiting desktop hibernation"));
+        tr_logAddInfo(_("Inhibiting desktop hibernation"));
 
         success = true;
     }
     catch (Glib::Error const& e)
     {
-        tr_logAddError(_("Couldn't inhibit desktop hibernation: %s"), e.what().c_str());
+        tr_logAddError(fmt::format(_("Couldn't inhibit desktop hibernation: {error}"), fmt::arg("error", e.what())));
     }
 
     return success;
@@ -1464,11 +1481,11 @@ void gtr_uninhibit_hibernation(guint inhibit_cookie)
             1000);
 
         /* logging */
-        tr_logAddInfo("%s", _("Allowing desktop hibernation"));
+        tr_logAddInfo(_("Allowing desktop hibernation"));
     }
     catch (Glib::Error const& e)
     {
-        g_warning("Couldn't uninhibit desktop hibernation: %s.", e.what().c_str());
+        tr_logAddError(fmt::format(_("Couldn't inhibit desktop hibernation: {error}"), fmt::arg("error", e.what())));
     }
 }
 

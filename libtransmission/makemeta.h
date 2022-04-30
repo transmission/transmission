@@ -5,12 +5,15 @@
 
 #pragma once
 
+#include <cstdint> // uint32_t, uint64_t
+
 #include "transmission.h"
 
 struct tr_metainfo_builder_file
 {
     char* filename;
     uint64_t size;
+    bool is_portable;
 };
 
 enum class TrMakemetaResult
@@ -100,7 +103,7 @@ bool tr_metaInfoBuilderSetPieceSize(tr_metainfo_builder* builder, uint32_t bytes
 void tr_metaInfoBuilderFree(tr_metainfo_builder*);
 
 /**
- * @brief create a new .torrent file
+ * @brief create a new torrent file
  *
  * This is actually done in a worker thread, not the main thread!
  * Otherwise the client's interface would lock up while this runs.

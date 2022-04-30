@@ -29,6 +29,7 @@
 .Op Fl V
 .Op Fl w Ar download-dir
 .Op Fl e Ar logfile
+.Op Fl x Ar pid-file
 .Op Fl log-error | log-info | log-debug
 .Ek
 .Sh DESCRIPTION
@@ -52,14 +53,14 @@ the daemon will load them into Transmission.
 .It Fl C
 Do not watch for new .torrent files.
 .It Fl B Fl -no-blocklist
-Disble blocklists.
+Disable blocklists.
 .It Fl d
 Dump transmission-daemon's settings to stderr.
 .It Fl f Fl -foreground
 Run in the foreground and print errors to stderr.
 .It Fl g Fl -config-dir Ar directory
 Where to look for configuration files. This can be used to swap between using the cli, daemon, gtk, and qt clients.
-See https://github.com/transmission/transmission/wiki/Configuration-Files for more information.
+See https://github.com/transmission/transmission/blob/main/docs/Configuration-Files.md for more information.
 .It Fl er Fl -encryption-required
 Encrypt all peer connections.
 .It Fl ep Fl -encryption-preferred
@@ -98,7 +99,7 @@ Disable portmapping
 .It Fl o Fl -dht
 Enable distributed hash table (DHT).
 .It Fl O Fl -no-dht
-Disable distribued hash table (DHT).
+Disable distributed hash table (DHT).
 .It Fl p Fl -port Ar port
 Port to open and listen for RPC requests on. Default: 9091
 .It Fl P Fl -peerport Ar port
@@ -132,6 +133,8 @@ Show error messages
 Show error and info messages
 .It Fl -log-debug
 Show error, info, and debug messages
+.It Fl x Fl -pid-file
+Name of PID file
 .El
 .Sh ENVIRONMENT
 .Bl -tag -width Fl
@@ -148,7 +151,7 @@ The config-dir used when neither
 nor
 .Op Fl g
 is specified.
-See https://github.com/transmission/transmission/wiki/Configuration-Files for more information.
+See https://github.com/transmission/transmission/blob/main/docs/Configuration-Files.md for more information.
 .El
 .Sh AUTHORS
 .An -nosplit

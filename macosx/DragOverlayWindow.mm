@@ -11,6 +11,11 @@
 
 @interface DragOverlayWindow ()
 
+@property(nonatomic, readonly) tr_session* fLib;
+
+@property(nonatomic, readonly) NSViewAnimation* fFadeInAnimation;
+@property(nonatomic, readonly) NSViewAnimation* fFadeOutAnimation;
+
 - (void)resizeWindow;
 
 @end
@@ -19,12 +24,10 @@
 
 - (instancetype)initWithLib:(tr_session*)lib forWindow:(NSWindow*)window
 {
-    if ((self = ([super initWithContentRect:window.frame
-                                  styleMask:NSWindowStyleMaskBorderless
-                                    backing:NSBackingStoreBuffered
+    if ((self = ([super initWithContentRect:window.frame styleMask:NSWindowStyleMaskBorderless backing:NSBackingStoreBuffered
                                       defer:NO])))
     {
-        fLib = lib;
+        _fLib = lib;
 
         self.backgroundColor = [NSColor colorWithCalibratedWhite:0.0 alpha:0.5];
         self.alphaValue = 0.0;
@@ -37,17 +40,17 @@
         self.releasedWhenClosed = NO;
         self.ignoresMouseEvents = YES;
 
-        fFadeInAnimation = [[NSViewAnimation alloc] initWithViewAnimations:@[
+        _fFadeInAnimation = [[NSViewAnimation alloc] initWithViewAnimations:@[
             @{ NSViewAnimationTargetKey : self, NSViewAnimationEffectKey : NSViewAnimationFadeInEffect }
         ]];
-        fFadeInAnimation.duration = 0.15;
-        fFadeInAnimation.animationBlockingMode = NSAnimationNonblockingThreaded;
+        _fFadeInAnimation.duration = 0.15;
+        _fFadeInAnimation.animationBlockingMode = NSAnimationNonblockingThreaded;
 
-        fFadeOutAnimation = [[NSViewAnimation alloc] initWithViewAnimations:@[
+        _fFadeOutAnimation = [[NSViewAnimation alloc] initWithViewAnimations:@[
             @{ NSViewAnimationTargetKey : self, NSViewAnimationEffectKey : NSViewAnimationFadeOutEffect }
         ]];
-        fFadeOutAnimation.duration = 0.5;
-        fFadeOutAnimation.animationBlockingMode = NSAnimationNonblockingThreaded;
+        _fFadeOutAnimation.duration = 0.5;
+        _fFadeOutAnimation.animationBlockingMode = NSAnimationNonblockingThreaded;
 
         [window addChildWindow:self ordered:NSWindowAbove];
 
@@ -149,27 +152,29 @@
 - (void)fadeIn
 {
     //stop other animation and set to same progress
-    if (fFadeOutAnimation.animating)
+    if (self.fFadeOutAnimation.animating)
     {
-        [fFadeOutAnimation stopAnimation];
-        fFadeInAnimation.currentProgress = 1.0 - fFadeOutAnimation.currentProgress;
+        [self.fFadeOutAnimation stopAnimation];
+        self.fFadeInAnimation.currentProgress = 1.0 - self.fFadeOutAnimation.currentProgress;
     }
-    [fFadeInAnimation startAnimation];
+    [self.fFadeInAnimation startAnimation];
 }
 
 - (void)fadeOut
 {
     //stop other animation and set to same progress
-    if (fFadeInAnimation.animating)
+    if (self.fFadeInAnimation.animating)
     {
-        [fFadeInAnimation stopAnimation];
-        fFadeOutAnimation.currentProgress = 1.0 - fFadeInAnimation.currentProgress;
+        [self.fFadeInAnimation stopAnimation];
+        self.fFadeOutAnimation.currentProgress = 1.0 - self.fFadeInAnimation.currentProgress;
     }
     if (self.alphaValue > 0.0)
     {
-        [fFadeOutAnimation startAnimation];
+        [self.fFadeOutAnimation startAnimation];
     }
 }
+
+#pragma mark - Private
 
 - (void)resizeWindow
 {

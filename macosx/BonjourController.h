@@ -2,12 +2,9 @@
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
-#import <Cocoa/Cocoa.h>
+#import <Foundation/Foundation.h>
 
 @interface BonjourController : NSObject<NSNetServiceDelegate>
-{
-    NSNetService* fService;
-}
 
 @property(nonatomic, class, readonly) BonjourController* defaultController;
 @property(nonatomic, class, readonly) BOOL defaultControllerExists;

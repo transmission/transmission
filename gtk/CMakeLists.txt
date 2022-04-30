@@ -18,6 +18,8 @@ if(NOT GLIB_COMPILE_RESOURCES_EXECUTABLE)
     message(SEND_ERROR "Unable to find glib-compile-resources executable")
 endif()
 
+find_program(APPSTREAM appstreamcli)
+
 add_custom_command(
     OUTPUT
         ${CMAKE_CURRENT_BINARY_DIR}/transmission-resources.c
@@ -58,11 +60,11 @@ if(ENABLE_NLS)
         VERBATIM
     )
 
-    set(${PROJECT_NAME}_APPDATA_FILE "${PROJECT_BINARY_DIR}/${TR_NAME}-gtk.appdata.xml")
+    set(${PROJECT_NAME}_METAINFO_FILE "${PROJECT_BINARY_DIR}/${TR_NAME}-gtk.metainfo.xml")
     add_custom_command(
-        OUTPUT ${${PROJECT_NAME}_APPDATA_FILE}
-        COMMAND ${GETTEXT_MSGFMT_EXECUTABLE} --xml -d ${CMAKE_SOURCE_DIR}/po --template ${PROJECT_SOURCE_DIR}/transmission-gtk.appdata.xml.in -o ${${PROJECT_NAME}_APPDATA_FILE}
-        DEPENDS ${PROJECT_SOURCE_DIR}/transmission-gtk.appdata.xml.in
+        OUTPUT ${${PROJECT_NAME}_METAINFO_FILE}
+        COMMAND ${GETTEXT_MSGFMT_EXECUTABLE} --xml -d ${CMAKE_SOURCE_DIR}/po --template ${PROJECT_SOURCE_DIR}/transmission-gtk.metainfo.xml.in -o ${${PROJECT_NAME}_METAINFO_FILE}
+        DEPENDS ${PROJECT_SOURCE_DIR}/transmission-gtk.metainfo.xml.in
         VERBATIM
     )
 endif()
@@ -168,7 +170,7 @@ add_executable(${TR_NAME}-gtk WIN32
     ${${PROJECT_NAME}_SOURCES}
     ${${PROJECT_NAME}_HEADERS}
     ${${PROJECT_NAME}_DESKTOP_FILE}
-    ${${PROJECT_NAME}_APPDATA_FILE}
+    ${${PROJECT_NAME}_METAINFO_FILE}
     ${${PROJECT_NAME}_WIN32_RC_FILE}
 )
 
@@ -209,7 +211,7 @@ endif()
 
 if(ENABLE_NLS)
     install(FILES ${${PROJECT_NAME}_DESKTOP_FILE} DESTINATION ${CMAKE_INSTALL_DATADIR}/applications)
-    install(FILES ${${PROJECT_NAME}_APPDATA_FILE} DESTINATION ${CMAKE_INSTALL_DATADIR}/appdata)
+    install(FILES ${${PROJECT_NAME}_METAINFO_FILE} DESTINATION ${CMAKE_INSTALL_DATADIR}/metainfo)
 else()
     install(FILES transmission-gtk.desktop.in DESTINATION ${CMAKE_INSTALL_DATADIR}/applications RENAME ${TR_NAME}-gtk.desktop)
 endif()

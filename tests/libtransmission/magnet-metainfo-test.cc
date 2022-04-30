@@ -3,14 +3,16 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include "transmission.h"
-#include "magnet-metainfo.h"
-#include "utils.h"
+#include <array>
+#include <string_view>
 
 #include "gtest/gtest.h"
 
-#include <array>
-#include <string_view>
+#include "transmission.h"
+
+#include "crypto-utils.h"
+#include "magnet-metainfo.h"
+#include "utils.h"
 
 using namespace std::literals;
 
@@ -64,16 +66,16 @@ TEST(MagnetMetainfo, magnetParse)
         auto mm = tr_magnet_metainfo{};
 
         EXPECT_TRUE(mm.parseMagnet(uri));
-        EXPECT_EQ(2, std::size(mm.announceList()));
+        EXPECT_EQ(2U, std::size(mm.announceList()));
         auto it = std::begin(mm.announceList());
-        EXPECT_EQ(0, it->tier);
-        EXPECT_EQ("http://tracker.openbittorrent.com/announce"sv, it->announce.full);
-        EXPECT_EQ("http://tracker.openbittorrent.com/scrape"sv, it->scrape.full);
+        EXPECT_EQ(0U, it->tier);
+        EXPECT_EQ("http://tracker.openbittorrent.com/announce"sv, it->announce.sv());
+        EXPECT_EQ("http://tracker.openbittorrent.com/scrape"sv, it->scrape.sv());
         ++it;
-        EXPECT_EQ(1, it->tier);
-        EXPECT_EQ("http://tracker.opentracker.org/announce", it->announce.full);
-        EXPECT_EQ("http://tracker.opentracker.org/scrape", it->scrape.full);
-        EXPECT_EQ(1, mm.webseedCount());
+        EXPECT_EQ(1U, it->tier);
+        EXPECT_EQ("http://tracker.opentracker.org/announce", it->announce.sv());
+        EXPECT_EQ("http://tracker.opentracker.org/scrape", it->scrape.sv());
+        EXPECT_EQ(1U, mm.webseedCount());
         EXPECT_EQ("http://server.webseed.org/path/to/file"sv, mm.webseed(0));
         EXPECT_EQ("Display Name"sv, mm.name());
         EXPECT_EQ(ExpectedHash, mm.infoHash());
@@ -84,8 +86,36 @@ TEST(MagnetMetainfo, magnetParse)
         auto mm = tr_magnet_metainfo{};
 
         EXPECT_TRUE(mm.parseMagnet(uri));
-        EXPECT_EQ(0, std::size(mm.announceList()));
-        EXPECT_EQ(0, mm.webseedCount());
+        EXPECT_EQ(0U, std::size(mm.announceList()));
+        EXPECT_EQ(0U, mm.webseedCount());
         EXPECT_EQ(ExpectedHash, mm.infoHash());
+    }
+}
+
+TEST(WebUtilsTest, parseMagnetFuzzRegressions)
+{
+    auto buf = std::vector<char>{};
+
+    static auto constexpr Tests = std::array<std::string_view, 1>{
+        "UICOl7RLjChs/QZZwNH4sSQwuH890UMHuoxoWBmMkr0=",
+    };
+
+    for (auto const& test : Tests)
+    {
+        auto mm = tr_magnet_metainfo{};
+        mm.parseMagnet(tr_base64_decode(test));
+    }
+}
+
+TEST(WebUtilsTest, parseMagnetFuzz)
+{
+    auto buf = std::vector<char>{};
+
+    for (size_t i = 0; i < 100000; ++i)
+    {
+        buf.resize(tr_rand_int(1024));
+        tr_rand_buffer(std::data(buf), std::size(buf));
+        auto mm = tr_magnet_metainfo{};
+        EXPECT_FALSE(mm.parseMagnet({ std::data(buf), std::size(buf) }));
     }
 }

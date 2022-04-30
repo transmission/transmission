@@ -5,9 +5,12 @@
 
 #include <errno.h>
 #include <stdio.h>
+#include <map>
 
 #include <glibmm.h>
 #include <glibmm/i18n.h>
+
+#include <fmt/core.h>
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/log.h>
@@ -59,6 +62,7 @@ private:
 
     void scroll_to_bottom();
     void level_combo_changed_cb(Gtk::ComboBox* combo_box);
+    Gtk::ComboBox* level_combo_new() const;
 
     bool is_pinned_to_new() const;
     bool isRowVisible(Gtk::TreeModel::const_iterator const& iter) const;
@@ -71,9 +75,10 @@ private:
     Glib::RefPtr<Gtk::ListStore> store_;
     Glib::RefPtr<Gtk::TreeModelFilter> filter_;
     Glib::RefPtr<Gtk::TreeModelSort> sort_;
-    tr_log_level maxLevel_ = TR_LOG_SILENT;
+    tr_log_level maxLevel_ = TR_LOG_INFO;
     bool isPaused_ = false;
     sigc::connection refresh_tag_;
+    std::map<tr_log_level, char const*> const level_names_;
 };
 
 namespace
@@ -133,6 +138,18 @@ void MessageLogWindow::Impl::scroll_to_bottom()
 *****
 ****/
 
+Gtk::ComboBox* MessageLogWindow::Impl::level_combo_new() const
+{
+    auto items = std::vector<std::pair<Glib::ustring, int>>{};
+    for (auto const& [level, name] : level_names_)
+    {
+        items.emplace_back(name, level);
+    }
+    auto* w = gtr_combo_box_new_enum(items);
+    gtr_combo_box_set_active_enum(*w, gtr_pref_int_get(TR_KEY_message_level));
+    return w;
+}
+
 void MessageLogWindow::Impl::level_combo_changed_cb(Gtk::ComboBox* combo_box)
 {
     auto const level = static_cast<tr_log_level>(gtr_combo_box_get_active_enum(*combo_box));
@@ -166,9 +183,14 @@ void MessageLogWindow::Impl::doSave(Gtk::Window& parent, Glib::ustring const& fi
 
     if (fp == nullptr)
     {
+        auto const errcode = errno;
         auto w = std::make_shared<Gtk::MessageDialog>(
             parent,
-            gtr_sprintf(_("Couldn't save \"%s\""), filename),
+            fmt::format(
+                _("Couldn't save '{path}': {error} ({error_code})"),
+                fmt::arg("path", filename),
+                fmt::arg("error", g_strerror(errcode)),
+                fmt::arg("error_code", errcode)),
             false,
             Gtk::MESSAGE_ERROR,
             Gtk::BUTTONS_CLOSE);
@@ -180,31 +202,17 @@ void MessageLogWindow::Impl::doSave(Gtk::Window& parent, Glib::ustring const& fi
     {
         for (auto const& row : store_->children())
         {
-            char const* levelStr;
             auto const* const node = row.get_value(message_log_cols.tr_msg);
-
             auto const date = gtr_asctime(node->when);
 
-            switch (node->level)
-            {
-            case TR_LOG_DEBUG:
-                levelStr = "debug";
-                break;
-
-            case TR_LOG_ERROR:
-                levelStr = "error";
-                break;
-
-            default:
-                levelStr = "     ";
-                break;
-            }
+            auto const it = level_names_.find(node->level);
+            auto const* const level_str = it != std::end(level_names_) ? it->second : "???";
 
             fprintf(
                 fp,
                 "%s\t%s\t%s\t%s\n",
                 date.c_str(),
-                levelStr,
+                level_str,
                 node->name != nullptr ? node->name : "",
                 node->message != nullptr ? node->message : "");
         }
@@ -248,19 +256,24 @@ void MessageLogWindow::Impl::onPauseToggled(Gtk::ToggleToolButton* w)
 namespace
 {
 
-void setForegroundColor(Gtk::CellRendererText* renderer, int msgLevel)
+void setForegroundColor(Gtk::CellRendererText* renderer, tr_log_level level)
 {
-    if (msgLevel == TR_LOG_DEBUG)
+    switch (level)
     {
-        renderer->property_foreground() = "forestgreen";
-    }
-    else if (msgLevel == TR_LOG_ERROR)
-    {
+    case TR_LOG_CRITICAL:
+    case TR_LOG_ERROR:
+    case TR_LOG_WARN:
         renderer->property_foreground() = "red";
-    }
-    else
-    {
+        break;
+
+    case TR_LOG_DEBUG:
+    case TR_LOG_TRACE:
+        renderer->property_foreground() = "forestgreen";
+        break;
+
+    default:
         renderer->property_foreground_set() = false;
+        break;
     }
 }
 
@@ -403,22 +416,6 @@ bool MessageLogWindow::Impl::onRefresh()
     return true;
 }
 
-namespace
-{
-
-Gtk::ComboBox* debug_level_combo_new()
-{
-    auto* w = gtr_combo_box_new_enum({
-        { _("Error"), TR_LOG_ERROR },
-        { _("Information"), TR_LOG_INFO },
-        { _("Debug"), TR_LOG_DEBUG },
-    });
-    gtr_combo_box_set_active_enum(*w, gtr_pref_int_get(TR_KEY_message_level));
-    return w;
-}
-
-} // namespace
-
 /**
 ***  Public Functions
 **/
@@ -440,6 +437,12 @@ MessageLogWindow::~MessageLogWindow() = default;
 MessageLogWindow::Impl::Impl(MessageLogWindow& window, Glib::RefPtr<Session> const& core)
     : window_(window)
     , core_(core)
+    , level_names_{ { { TR_LOG_CRITICAL, _("Critical") },
+                      { TR_LOG_ERROR, _("Error") },
+                      { TR_LOG_WARN, _("Warning") },
+                      { TR_LOG_INFO, _("Information") },
+                      { TR_LOG_DEBUG, _("Debug") },
+                      { TR_LOG_TRACE, _("Trace") } } }
 {
     window_.set_title(_("Message Log"));
     window_.set_default_size(560, 350);
@@ -500,7 +503,7 @@ MessageLogWindow::Impl::Impl(MessageLogWindow& window, Glib::RefPtr<Session> con
     }
 
     {
-        auto* w = debug_level_combo_new();
+        auto* w = level_combo_new();
         w->signal_changed().connect([this, w]() { level_combo_changed_cb(w); });
         auto* item = Gtk::make_managed<Gtk::ToolItem>();
         item->add(*w);

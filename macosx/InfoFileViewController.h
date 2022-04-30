@@ -7,22 +7,12 @@
 
 #import "InfoViewController.h"
 
-@class FileOutlineController;
-
 @interface InfoFileViewController : NSViewController<InfoViewController>
-{
-    NSArray* fTorrents;
 
-    BOOL fSet;
+@property(nonatomic, readonly) NSArray<NSURL*>* quickLookURLs;
+@property(nonatomic, readonly) BOOL canQuickLook;
 
-    IBOutlet FileOutlineController* fFileController;
-
-    IBOutlet NSSearchField* fFileFilterField;
-    IBOutlet NSButton* fCheckAllButton;
-    IBOutlet NSButton* fUncheckAllButton;
-}
-
-- (void)setInfoForTorrents:(NSArray*)torrents;
+- (void)setInfoForTorrents:(NSArray<Torrent*>*)torrents;
 - (void)updateInfo;
 
 - (void)saveViewSize;
@@ -31,8 +21,6 @@
 - (IBAction)checkAll:(id)sender;
 - (IBAction)uncheckAll:(id)sender;
 
-@property(nonatomic, readonly) NSArray* quickLookURLs;
-@property(nonatomic, readonly) BOOL canQuickLook;
 - (NSRect)quickLookSourceFrameForPreviewItem:(id<QLPreviewItem>)item;
 
 @end

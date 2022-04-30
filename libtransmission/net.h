@@ -9,12 +9,13 @@
 #endif
 
 #include <cstddef> // size_t
+#include <cstdint> // uint8_t
 #include <optional>
 #include <string>
 #include <string_view>
+#include <utility> // std::pair
 
 #ifdef _WIN32
-#include <inttypes.h>
 #include <ws2tcpip.h>
 #else
 #include <errno.h>
@@ -68,8 +69,122 @@ enum tr_address_type
     NUM_TR_AF_INET_TYPES
 };
 
+struct tr_address;
+
+[[nodiscard]] int tr_address_compare(tr_address const* a, tr_address const* b) noexcept;
+
+/**
+ * Literally just a port number.
+ *
+ * Exists so that you never have to wonder what byte order a port variable is in.
+ */
+class tr_port
+{
+public:
+    tr_port() noexcept = default;
+
+    [[nodiscard]] constexpr static tr_port fromHost(uint16_t hport) noexcept
+    {
+        return tr_port{ hport };
+    }
+
+    [[nodiscard]] static tr_port fromNetwork(uint16_t nport) noexcept
+    {
+        return tr_port{ ntohs(nport) };
+    }
+
+    [[nodiscard]] constexpr uint16_t host() const noexcept
+    {
+        return hport_;
+    }
+
+    [[nodiscard]] uint16_t network() const noexcept
+    {
+        return htons(hport_);
+    }
+
+    constexpr void setHost(uint16_t hport) noexcept
+    {
+        hport_ = hport;
+    }
+
+    void setNetwork(uint16_t nport) noexcept
+    {
+        hport_ = ntohs(nport);
+    }
+
+    [[nodiscard]] static std::pair<tr_port, uint8_t const*> fromCompact(uint8_t const* compact) noexcept;
+
+    [[nodiscard]] constexpr auto operator<(tr_port const& that) const noexcept
+    {
+        return hport_ < that.hport_;
+    }
+
+    [[nodiscard]] constexpr auto operator==(tr_port const& that) const noexcept
+    {
+        return hport_ == that.hport_;
+    }
+
+    [[nodiscard]] constexpr auto operator!=(tr_port const& that) const noexcept
+    {
+        return hport_ != that.hport_;
+    }
+
+    [[nodiscard]] constexpr auto empty() const noexcept
+    {
+        return hport_ == 0;
+    }
+
+    constexpr void clear() noexcept
+    {
+        hport_ = 0;
+    }
+
+private:
+    constexpr tr_port(uint16_t hport) noexcept
+        : hport_{ hport }
+    {
+    }
+
+    uint16_t hport_ = 0;
+};
+
 struct tr_address
 {
+    [[nodiscard]] static std::optional<tr_address> fromString(std::string_view str);
+    [[nodiscard]] static std::pair<tr_address, uint8_t const*> fromCompact4(uint8_t const* compact) noexcept;
+    [[nodiscard]] static std::pair<tr_address, uint8_t const*> fromCompact6(uint8_t const* compact) noexcept;
+
+    // human-readable formatting
+
+    template<typename OutputIt>
+    OutputIt readable(OutputIt out) const;
+
+    template<typename OutputIt>
+    OutputIt readable(OutputIt out, tr_port) const;
+
+    [[nodiscard]] std::string readable() const;
+    [[nodiscard]] std::string readable(tr_port) const;
+
+    // comparisons
+
+    [[nodiscard]] int compare(tr_address const& that) const noexcept;
+
+    [[nodiscard]] bool operator==(tr_address const& that) const noexcept
+    {
+        return this->compare(that) == 0;
+    }
+
+    [[nodiscard]] bool operator<(tr_address const& that) const noexcept
+    {
+        return this->compare(that) < 0;
+    }
+
+    [[nodiscard]] bool operator>(tr_address const& that) const noexcept
+    {
+        return this->compare(that) > 0;
+    }
+
     tr_address_type type;
     union
     {
@@ -92,8 +207,6 @@ bool tr_address_from_string(tr_address* setme, char const* string);
 bool tr_address_from_string(tr_address* dst, std::string_view src);
 
 bool tr_address_from_sockaddr_storage(tr_address* setme, tr_port* port, struct sockaddr_storage const* src);
-
-int tr_address_compare(tr_address const* a, tr_address const* b);
 
 bool tr_address_is_valid_for_peers(tr_address const* addr, tr_port port);
 
@@ -135,6 +248,6 @@ void tr_netSetTOS(tr_socket_t sock, int tos, tr_address_type type);
  * @brief get a human-representable string representing the network error.
  * @param err an errno on Unix/Linux and an WSAError on win32)
  */
-char* tr_net_strerror(char* buf, size_t buflen, int err);
+std::string tr_net_strerror(int err);
 
 unsigned char const* tr_globalIPv6(tr_session const* session);

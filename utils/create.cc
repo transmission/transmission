@@ -4,18 +4,22 @@
 // License text can be found in the licenses/ folder.
 
 #include <array>
-#include <cinttypes>
+#include <cinttypes> // PRIu32
+#include <cstdint> // uint32_t
 #include <cstdio>
 #include <cstdlib>
 #include <iostream>
 #include <string>
+#include <string_view>
 
 #include <libtransmission/transmission.h>
 
 #include <libtransmission/error.h>
 #include <libtransmission/file.h>
+#include <libtransmission/log.h>
 #include <libtransmission/makemeta.h>
 #include <libtransmission/tr-getopt.h>
+#include <libtransmission/tr-strbuf.h>
 #include <libtransmission/utils.h>
 #include <libtransmission/version.h>
 
@@ -170,19 +174,17 @@ int tr_main(int argc, char* argv[])
     if (std::empty(options.outfile))
     {
         tr_error* error = nullptr;
-        char* base = tr_sys_path_basename(options.infile, &error);
+        auto const base = tr_sys_path_basename(options.infile, &error);
 
-        if (base == nullptr)
+        if (std::empty(base))
         {
             fprintf(stderr, "ERROR: Cannot deduce output path from input path: %s\n", error->message);
             return EXIT_FAILURE;
         }
 
-        auto const end = tr_strvJoin(base, ".torrent"sv);
-        char* cwd = tr_getcwd();
-        options.outfile = tr_strvDup(tr_strvPath(cwd, end.c_str()));
+        char* const cwd = tr_getcwd();
+        options.outfile = tr_strvDup(tr_pathbuf{ std::string_view{ cwd }, '/', base, ".torrent"sv });
         tr_free(cwd);
-        tr_free(base);
     }
 
     if (std::empty(options.trackers))
@@ -208,6 +210,14 @@ int tr_main(int argc, char* argv[])
         return EXIT_FAILURE;
     }
 
+    for (uint32_t i = 0; i < b->fileCount; ++i)
+    {
+        if (auto const& file = b->files[i]; !file.is_portable)
+        {
+            fprintf(stderr, "WARNING: consider renaming nonportable filename \"%s\".\n", file.filename);
+        }
+    }
+
     if (options.piecesize_kib != 0)
     {
         tr_metaInfoBuilderSetPieceSize(b, options.piecesize_kib * KiB);
@@ -226,9 +236,9 @@ int tr_main(int argc, char* argv[])
         b,
         options.outfile.c_str(),
         std::data(options.trackers),
-        std::size(options.trackers),
+        static_cast<int>(std::size(options.trackers)),
         std::data(options.webseeds),
-        std::size(options.webseeds),
+        static_cast<int>(std::size(options.webseeds)),
         options.comment,
         options.is_private,
         options.source);

@@ -141,9 +141,12 @@ TEST(Crypto, ssha1)
         EXPECT_TRUE(tr_ssha1_matches(ssha1, plain_text));
         EXPECT_TRUE(tr_ssha1_matches_(ssha1, plain_text));
 
+        using ssha1_func = std::string (*)(std::string_view plain_text);
+        static auto constexpr Ssha1Funcs = std::array<ssha1_func, 2>{ tr_ssha1, tr_ssha1_ };
+
         for (size_t j = 0; j < HashCount; ++j)
         {
-            auto const hash = (j % 2 == 0) ? tr_ssha1(plain_text) : tr_ssha1_(plain_text);
+            auto const hash = Ssha1Funcs[j % 2](plain_text);
 
             // phrase matches each of generated hashes
             EXPECT_TRUE(tr_ssha1_matches(hash, plain_text));
@@ -184,7 +187,7 @@ TEST(Crypto, sha1FromString)
     EXPECT_FALSE(tr_sha1_from_string("a94a8fe5ccb19ba61c4cz873d391e987982fbbd3"sv));
     EXPECT_FALSE(tr_sha1_from_string("a94a8fe5ccb19  61c4c0873d391e987982fbbd3"sv));
 
-    // lowecase hex
+    // lowercase hex
     auto const baseline = "a94a8fe5ccb19ba61c4c0873d391e987982fbbd3"sv;
     auto const lc = tr_sha1_from_string(baseline);
     EXPECT_TRUE(lc);

@@ -13,7 +13,9 @@
 #include <event2/buffer.h>
 
 #include <libtransmission/transmission.h>
+
 #include <libtransmission/error.h>
+#include <libtransmission/log.h>
 #include <libtransmission/tr-getopt.h>
 #include <libtransmission/utils.h>
 #include <libtransmission/variant.h>
@@ -24,7 +26,7 @@ static char constexpr Usage[] = "Usage: transmission-edit [options] torrent-file
 
 struct app_options
 {
-    std::vector<char const*> files;
+    std::vector<std::string_view> files;
     char const* add = nullptr;
     char const* deleteme = nullptr;
     std::array<char const*, 2> replace;
@@ -322,7 +324,7 @@ int tr_main(int argc, char* argv[])
         return EXIT_FAILURE;
     }
 
-    if (options.add == nullptr && options.deleteme == nullptr && options.replace[0] == 0)
+    if (options.add == nullptr && options.deleteme == nullptr && options.replace[0] == nullptr)
     {
         fprintf(stderr, "ERROR: Must specify -a, -d or -r\n");
         tr_getopt_usage(MyName, Usage, std::data(Options));
@@ -336,7 +338,7 @@ int tr_main(int argc, char* argv[])
         bool changed = false;
         tr_error* error = nullptr;
 
-        printf("%s\n", filename);
+        printf("%" TR_PRIsv "\n", TR_PRIsv_ARG(filename));
 
         if (!tr_variantFromFile(&top, TR_VARIANT_PARSE_BENC, filename, &error))
         {

@@ -7,6 +7,15 @@
 #define PADDING 10.0
 #define ICON_WIDTH 64.0
 
+@interface DragOverlayView ()
+
+@property(nonatomic) NSImage* fBadge;
+
+@property(nonatomic, readonly) NSDictionary* fMainLineAttributes;
+@property(nonatomic, readonly) NSDictionary* fSubLineAttributes;
+
+@end
+
 @implementation DragOverlayView
 
 - (instancetype)initWithFrame:(NSRect)frame
@@ -23,14 +32,14 @@
         NSMutableParagraphStyle* paragraphStyle = [NSParagraphStyle.defaultParagraphStyle mutableCopy];
         paragraphStyle.lineBreakMode = NSLineBreakByTruncatingMiddle;
 
-        fMainLineAttributes = @{
+        _fMainLineAttributes = @{
             NSForegroundColorAttributeName : NSColor.whiteColor,
             NSFontAttributeName : bigFont,
             NSShadowAttributeName : stringShadow,
             NSParagraphStyleAttributeName : paragraphStyle
         };
 
-        fSubLineAttributes = @{
+        _fSubLineAttributes = @{
             NSForegroundColorAttributeName : NSColor.whiteColor,
             NSFontAttributeName : smallFont,
             NSShadowAttributeName : stringShadow,
@@ -45,8 +54,8 @@
     //create badge
     NSRect const badgeRect = NSMakeRect(0.0, 0.0, 325.0, 84.0);
 
-    fBadge = [[NSImage alloc] initWithSize:badgeRect.size];
-    [fBadge lockFocus];
+    self.fBadge = [[NSImage alloc] initWithSize:badgeRect.size];
+    [self.fBadge lockFocus];
 
     NSBezierPath* bp = [NSBezierPath bezierPathWithRoundedRect:badgeRect xRadius:15.0 yRadius:15.0];
     [[NSColor colorWithCalibratedWhite:0.0 alpha:0.75] set];
@@ -58,36 +67,36 @@
             fraction:1.0];
 
     //place main text
-    NSSize const mainLineSize = [mainLine sizeWithAttributes:fMainLineAttributes];
-    NSSize const subLineSize = [subLine sizeWithAttributes:fSubLineAttributes];
+    NSSize const mainLineSize = [mainLine sizeWithAttributes:self.fMainLineAttributes];
+    NSSize const subLineSize = [subLine sizeWithAttributes:self.fSubLineAttributes];
 
     NSRect lineRect = NSMakeRect(
         PADDING + ICON_WIDTH + 5.0,
         (NSHeight(badgeRect) + (subLineSize.height + 2.0 - mainLineSize.height)) * 0.5,
         NSWidth(badgeRect) - (PADDING + ICON_WIDTH + 2.0) - PADDING,
         mainLineSize.height);
-    [mainLine drawInRect:lineRect withAttributes:fMainLineAttributes];
+    [mainLine drawInRect:lineRect withAttributes:self.fMainLineAttributes];
 
     //place sub text
     lineRect.origin.y -= subLineSize.height + 2.0;
     lineRect.size.height = subLineSize.height;
-    [subLine drawInRect:lineRect withAttributes:fSubLineAttributes];
+    [subLine drawInRect:lineRect withAttributes:self.fSubLineAttributes];
 
-    [fBadge unlockFocus];
+    [self.fBadge unlockFocus];
 
     self.needsDisplay = YES;
 }
 
 - (void)drawRect:(NSRect)rect
 {
-    if (fBadge)
+    if (self.fBadge)
     {
         NSRect const frame = self.frame;
-        NSSize const imageSize = fBadge.size;
-        [fBadge drawAtPoint:NSMakePoint((NSWidth(frame) - imageSize.width) * 0.5, (NSHeight(frame) - imageSize.height) * 0.5)
-                   fromRect:NSZeroRect
-                  operation:NSCompositingOperationSourceOver
-                   fraction:1.0];
+        NSSize const imageSize = self.fBadge.size;
+        [self.fBadge drawAtPoint:NSMakePoint((NSWidth(frame) - imageSize.width) * 0.5, (NSHeight(frame) - imageSize.height) * 0.5)
+                        fromRect:NSZeroRect
+                       operation:NSCompositingOperationSourceOver
+                        fraction:1.0];
     }
 }
 

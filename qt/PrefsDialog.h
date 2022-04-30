@@ -29,6 +29,7 @@ public:
     PrefsDialog(Session&, Prefs&, QWidget* parent = nullptr);
 
 private slots:
+    void focusChanged(QWidget* old, QWidget* now);
     void checkBoxToggled(bool checked);
     void spinBoxEditingFinished();
     void timeEditingFinished();
@@ -55,6 +56,7 @@ private:
     void linkWidgetToPref(QWidget* widget, int pref_key);
     void updateBlocklistLabel();
     void updateDownloadingWidgetsLocality();
+    void updateSeedingWidgetsLocality();
 
     void setPref(int key, QVariant const& v);
 

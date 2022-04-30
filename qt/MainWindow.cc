@@ -84,7 +84,7 @@ QIcon MainWindow::addEmblem(QIcon base_icon, QStringList const& emblem_names) co
         return base_icon;
     }
 
-    auto& icons = IconCache::get();
+    auto const& icons = IconCache::get();
     QIcon emblem_icon;
 
     for (QString const& emblem_name : emblem_names)
@@ -144,7 +144,7 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
     ui_.listView->setStyle(lvp_style_.get());
     ui_.listView->setAttribute(Qt::WA_MacShowFocusRect, false);
 
-    auto& icons = IconCache::get();
+    auto const& icons = IconCache::get();
 
     // icons
     QIcon const icon_play = icons.getThemeIcon(QStringLiteral("media-playback-start"), QStyle::SP_MediaPlay);
@@ -174,9 +174,6 @@ MainWindow::MainWindow(Session& session, Prefs& prefs, TorrentModel& model, bool
     ui_.action_QueueMoveUp->setIcon(icons.getThemeIcon(QStringLiteral("go-up"), QStyle::SP_ArrowUp));
     ui_.action_QueueMoveDown->setIcon(icons.getThemeIcon(QStringLiteral("go-down"), QStyle::SP_ArrowDown));
     ui_.action_QueueMoveBottom->setIcon(icons.getThemeIcon(QStringLiteral("go-bottom")));
-
-    ui_.optionsButton->setIcon(icons.getThemeIcon(QStringLiteral("preferences-other")));
-    ui_.statsModeButton->setIcon(icons.getThemeIcon(QStringLiteral("view-statistics")));
 
     auto make_network_pixmap = [&icons](QString name, QSize size = { 16, 16 })
     {
@@ -410,7 +407,6 @@ QMenu* MainWindow::createOptionsMenu()
 {
     auto const init_speed_sub_menu = [this](QMenu* menu, QAction*& off_action, QAction*& on_action, int pref, int enabled_pref)
     {
-        std::array<int, 13> stock_speeds = { 5, 10, 20, 30, 40, 50, 75, 100, 150, 200, 250, 500, 750 };
         int const current_value = prefs_.get<int>(pref);
 
         // NOLINTNEXTLINE(clang-analyzer-cplusplus.NewDeleteLeaks)
@@ -430,10 +426,10 @@ QMenu* MainWindow::createOptionsMenu()
 
         menu->addSeparator();
 
-        for (int const i : stock_speeds)
+        for (auto const KBps : { 50, 100, 250, 500, 1000, 2500, 5000, 10000 })
         {
-            QAction* action = menu->addAction(Formatter::get().speedToString(Speed::fromKBps(i)));
-            action->setProperty(PrefVariantsKey, QVariantList{ pref, i, enabled_pref, true });
+            auto* const action = menu->addAction(Formatter::get().speedToString(Speed::fromKBps(KBps)));
+            action->setProperty(PrefVariantsKey, QVariantList{ pref, KBps, enabled_pref, true });
             connect(action, &QAction::triggered, this, qOverload<>(&MainWindow::onSetPrefs));
         }
     };

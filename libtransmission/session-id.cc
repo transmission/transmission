@@ -10,6 +10,8 @@
 #include <sys/stat.h>
 #endif
 
+#include <fmt/format.h>
+
 #include "transmission.h"
 #include "crypto-utils.h"
 #include "error.h"
@@ -55,7 +57,7 @@ static char* generate_new_session_id_value()
 
 static std::string get_session_id_lock_file_path(std::string_view session_id)
 {
-    return tr_strvJoin(tr_getSessionIdDir(), TR_PATH_DELIMITER_STR, "tr_session_id_"sv, session_id);
+    return fmt::format(FMT_STRING("{:s}/tr_session_id_{:s}"), tr_getSessionIdDir(), session_id);
 }
 
 static tr_sys_file_t create_session_id_lock_file(char const* session_id)
@@ -84,14 +86,18 @@ static tr_sys_file_t create_session_id_lock_file(char const* session_id)
         }
         else
         {
-            tr_sys_file_close(lock_file, nullptr);
+            tr_sys_file_close(lock_file);
             lock_file = TR_BAD_SYS_FILE;
         }
     }
 
     if (error != nullptr)
     {
-        tr_logAddError("Unable to create session lock file (%d): %s", error->code, error->message);
+        tr_logAddWarn(fmt::format(
+            _("Couldn't create '{path}': {error} ({error_code})"),
+            fmt::arg("path", lock_file_path),
+            fmt::arg("error", error->message),
+            fmt::arg("error_code", error->code)));
         tr_error_free(error);
     }
 
@@ -102,13 +108,13 @@ static void destroy_session_id_lock_file(tr_sys_file_t lock_file, char const* se
 {
     if (lock_file != TR_BAD_SYS_FILE)
     {
-        tr_sys_file_close(lock_file, nullptr);
+        tr_sys_file_close(lock_file);
     }
 
     if (session_id != nullptr)
     {
         auto const lock_file_path = get_session_id_lock_file_path(session_id);
-        tr_sys_path_remove(lock_file_path.c_str(), nullptr);
+        tr_sys_path_remove(lock_file_path.c_str());
     }
 }
 
@@ -189,12 +195,16 @@ bool tr_session_id_is_local(char const* session_id)
                 tr_error_clear(&error);
             }
 
-            tr_sys_file_close(lock_file, nullptr);
+            tr_sys_file_close(lock_file);
         }
 
         if (error != nullptr)
         {
-            tr_logAddError("Unable to open session lock file (%d): %s", error->code, error->message);
+            tr_logAddWarn(fmt::format(
+                _("Couldn't open session lock file '{path}': {error} ({error_code})"),
+                fmt::arg("path", lock_file_path),
+                fmt::arg("error", error->message),
+                fmt::arg("error_code", error->code)));
             tr_error_free(error);
         }
     }

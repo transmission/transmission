@@ -24,6 +24,8 @@
 #include API_HEADER_CRYPT(sha.h)
 #include API_HEADER(version.h)
 
+#include <fmt/core.h>
+
 #include "transmission.h"
 #include "crypto-utils.h"
 #include "log.h"
@@ -46,8 +48,6 @@ struct tr_dh_ctx
 ****
 ***/
 
-static char constexpr MyName[] = "tr_crypto_utils";
-
 static void log_cyassl_error(int error_code, char const* file, int line)
 {
     if (tr_logLevelIsActive(TR_LOG_ERROR))
@@ -61,7 +61,15 @@ static void log_cyassl_error(int error_code, char const* file, int line)
         CTaoCryptErrorString(error_code, error_message);
 #endif
 
-        tr_logAddMessage(file, line, TR_LOG_ERROR, MyName, "CyaSSL error: %s", error_message);
+        tr_logAddMessage(
+            file,
+            line,
+            TR_LOG_ERROR,
+            fmt::format(
+                _("{crypto_library} error: {error} ({error_code})"),
+                fmt::arg("crypto_library", "CyaSSL/WolfSSL"),
+                fmt::arg("error", error_message),
+                fmt::arg("error_code", error_code)));
     }
 }
 

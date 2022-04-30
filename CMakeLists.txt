@@ -1,5 +1,9 @@
 cmake_minimum_required(VERSION 3.9 FATAL_ERROR)
 
+if(POLICY CMP0092)
+    cmake_policy(SET CMP0092 NEW)
+endif()
+
 # The value of this variable should be set prior to the first project() command invocation.
 # See: https://cmake.org/cmake/help/latest/variable/CMAKE_OSX_DEPLOYMENT_TARGET.html
 if(CMAKE_OSX_DEPLOYMENT_TARGET STREQUAL "")
@@ -42,7 +46,7 @@ tr_auto_option(USE_SYSTEM_NATPMP    "Use system natpmp library" AUTO)
 tr_auto_option(USE_SYSTEM_UTP       "Use system utp library" AUTO)
 tr_auto_option(USE_SYSTEM_B64       "Use system b64 library" AUTO)
 tr_auto_option(USE_SYSTEM_PSL       "Use system psl library" AUTO)
-tr_auto_option(USE_QT_VERSION       "Use specific Qt version" AUTO 5 6)
+tr_list_option(USE_QT_VERSION       "Use specific Qt version" AUTO 5 6)
 tr_list_option(WITH_CRYPTO          "Use specified crypto library" AUTO openssl cyassl polarssl ccrypto)
 tr_auto_option(WITH_INOTIFY         "Enable inotify support (on systems that support it)" AUTO)
 tr_auto_option(WITH_KQUEUE          "Enable kqueue support (on systems that support it)" AUTO)
@@ -113,7 +117,7 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set(PSL_MINIMUM             0.21.1)
 set(CURL_MINIMUM            7.28.0)
 set(CYASSL_MINIMUM          3.0)
-set(DEFLATE_MINIMUM         1.9)
+set(DEFLATE_MINIMUM         1.10)
 set(EVENT2_MINIMUM          2.1.0)
 set(GIO_MINIMUM             2.26.0)
 set(GLIB_MINIMUM            2.50.1)
@@ -145,6 +149,10 @@ if(WIN32)
         endif()
     endforeach()
 endif()
+
+find_package(Fmt)
+add_definitions(-DFMT_HEADER_ONLY -DFMT_EXCEPTIONS=0)
+include_directories(SYSTEM ${LIBFMT_INCLUDE_DIRS})
 
 find_package(UtfCpp)
 find_package(Threads)
@@ -325,7 +333,7 @@ set(THIRD_PARTY_DIR ${CMAKE_SOURCE_DIR}/third-party)
 
 tr_add_external_auto_library(DEFLATE libdeflate deflate)
 if(NOT USE_SYSTEM_DEFLATE)
-    set(DEFLATE_VERSION 1.9)
+    set(DEFLATE_VERSION 1.10)
 endif()
 
 tr_add_external_auto_library(EVENT2 libevent event
@@ -539,6 +547,14 @@ set(NEEDED_HEADERS
     xlocale.h)
 
 if(ENABLE_NLS)
+    check_library_exists(intl libintl_gettext "" HAVE_LIBINTL)
+    if(HAVE_LIBINTL)
+        set(LIBINTL_LIBRARY intl)
+        # check_function_exists() below may need this
+        # when looking for gettext() and ngettext()
+        list(APPEND CMAKE_REQUIRED_LIBRARIES intl)
+    endif()
+
     list(APPEND NEEDED_HEADERS libintl.h)
 endif()
 
@@ -559,12 +575,10 @@ set(NEEDED_FUNCTIONS
     fallocate64
     flock
     getmntent
-    gmtime_r
-    gmtime_s
+    gettext
     htonll
-    localtime_r
-    localtime_s
     mkdtemp
+    ngettext
     ntohll
     posix_fadvise
     posix_fallocate
@@ -597,13 +611,6 @@ endif()
 #         add_definitions(-D__USE_MINGW_ANSI_STDIO=1 -D__STDC_FORMAT_MACROS=1)
 #     endif()
 # endif()
-
-if(ENABLE_NLS)
-    check_library_exists(intl libintl_gettext "" HAVE_LIBINTL)
-    if(HAVE_LIBINTL)
-        set(LIBINTL_LIBRARY intl)
-    endif()
-endif()
 
 check_library_exists(m sqrt "" HAVE_LIBM)
 if(HAVE_LIBM)
@@ -678,7 +685,7 @@ if(ENABLE_DAEMON OR ENABLE_GTK OR ENABLE_QT)
 endif()
 
 if(INSTALL_DOC)
-    install(FILES AUTHORS COPYING NEWS.md README.md extras/rpc-spec.md extras/send-email-when-torrent-done.sh DESTINATION ${CMAKE_INSTALL_DOCDIR})
+    install(FILES AUTHORS COPYING NEWS.md README.md docs/rpc-spec.md extras/send-email-when-torrent-done.sh DESTINATION ${CMAKE_INSTALL_DOCDIR})
 endif()
 
 if(MSVC AND ENABLE_DAEMON AND ENABLE_QT AND ENABLE_UTILS AND WITH_CRYPTO STREQUAL "openssl")
@@ -695,7 +702,6 @@ list(APPEND CPACK_SOURCE_IGNORE_FILES
     "[.]git"
     "node_modules"
 )
-set(CPACK_INSTALL_SCRIPTS "${CMAKE_CURRENT_LIST_DIR}/cmake/CPackSourceFixDirLinks.cmake")
 
 ## Code Formatting
 

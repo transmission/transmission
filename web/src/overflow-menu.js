@@ -294,12 +294,22 @@ export class OverflowMenu extends EventTarget {
     select.id = 'speed-up-select';
     div.append(select);
 
-    const speeds = ['10', '100', '200', '500', '750', unlimited];
+    const speeds = [
+      '50',
+      '100',
+      '250',
+      '500',
+      '1000',
+      '2500',
+      '5000',
+      '10000',
+      unlimited,
+    ];
     for (const speed of [
       ...new Set(speeds)
         .add(`${session_properties[RPC._UpSpeedLimit]}`)
         .values(),
-    ].sort()) {
+    ].sort((a, b) => a - b)) {
       const option = document.createElement('option');
       option.value = speed;
       option.textContent =
@@ -343,10 +353,11 @@ export class OverflowMenu extends EventTarget {
       ...new Set(speeds)
         .add(`${session_properties[RPC._DownSpeedLimit]}`)
         .values(),
-    ].sort()) {
+    ].sort((a, b) => a - b)) {
       const option = document.createElement('option');
       option.value = speed;
-      option.textContent = speed;
+      option.textContent =
+        speed === unlimited ? unlimited : Formatter.speed(speed);
       select.append(option);
     }
 

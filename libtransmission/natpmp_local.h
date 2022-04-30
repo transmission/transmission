@@ -14,7 +14,10 @@
  * @{
  */
 
+#include <ctime> // time_t
+
 #include "natpmp.h"
+#include "net.h" // tr_port
 
 enum tr_natpmp_state
 {

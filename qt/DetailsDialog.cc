@@ -29,6 +29,7 @@
 #include <libtransmission/transmission.h>
 #include <libtransmission/utils.h> // tr_getRatio()
 
+#include "BaseDialog.h"
 #include "ColumnResizer.h"
 #include "DetailsDialog.h"
 #include "Formatter.h"
@@ -43,12 +44,51 @@
 #include "TrackerModelFilter.h"
 #include "Utils.h"
 
+#include "ui_TrackersDialog.h"
+
 class Prefs;
 class Session;
 
 /****
 *****
 ****/
+
+namespace
+{
+
+class TrackersDialog : public BaseDialog
+{
+    Q_OBJECT
+
+public:
+    explicit TrackersDialog(QString tracker_list, QWidget* parent = nullptr)
+        : BaseDialog{ parent }
+    {
+        ui_.setupUi(this);
+        ui_.trackerList->setPlainText(tracker_list);
+        connect(ui_.dialogButtons, &QDialogButtonBox::clicked, this, &TrackersDialog::onButtonBoxClicked);
+    }
+
+signals:
+    void trackerListEdited(QString trackerList);
+
+private slots:
+    void onButtonBoxClicked(QAbstractButton* button)
+    {
+        if (ui_.dialogButtons->standardButton(button) == QDialogButtonBox::Ok)
+        {
+            emit trackerListEdited(ui_.trackerList->toPlainText());
+        }
+
+        close();
+    }
+
+private:
+    Ui::TrackersDialog ui_{};
+    QTimer timer_;
+};
+
+} // namespace
 
 namespace
 {
@@ -573,16 +613,18 @@ void DetailsDialog::refreshUI()
     }
     else
     {
-        auto u = uint64_t{};
-        auto d = uint64_t{};
+        auto uploaded = uint64_t{};
+        auto denominator = uint64_t{};
 
         for (Torrent const* const t : torrents)
         {
-            u += t->uploadedEver();
-            d += t->downloadedEver();
+            uploaded += t->uploadedEver();
+            denominator += t->sizeWhenDone();
         }
 
-        string = tr("%1 (Ratio: %2)").arg(fmt.sizeToString(u)).arg(fmt.ratioToString(tr_getRatio(u, d)));
+        string = tr("%1 (Ratio: %2)")
+                     .arg(fmt.sizeToString(uploaded))
+                     .arg(fmt.ratioToString(tr_getRatio(uploaded, denominator)));
     }
 
     ui_.uploadedValueLabel->setText(string);
@@ -1014,6 +1056,7 @@ void DetailsDialog::refreshUI()
     ///
 
     tracker_model_->refresh(model_, ids_);
+    ui_.editTrackersButton->setEnabled(std::size(ids_) == 1);
 
     ///
     ///  Peers tab
@@ -1256,7 +1299,6 @@ void DetailsDialog::onBandwidthPriorityChanged(int index)
 void DetailsDialog::onTrackerSelectionChanged()
 {
     int const selection_count = ui_.trackersView->selectionModel()->selectedRows().size();
-    ui_.editTrackerButton->setEnabled(selection_count == 1);
     ui_.removeTrackerButton->setEnabled(selection_count > 0);
 }
 
@@ -1303,39 +1345,28 @@ void DetailsDialog::onAddTrackerClicked()
     }
 }
 
-void DetailsDialog::onEditTrackerClicked()
+void DetailsDialog::onTrackerListEdited(QString tracker_list)
 {
-    QItemSelectionModel* selection_model = ui_.trackersView->selectionModel();
-    QModelIndexList selected_rows = selection_model->selectedRows();
-    assert(selected_rows.size() == 1);
-    QModelIndex i = selection_model->currentIndex();
-    auto const tracker_info = ui_.trackersView->model()->data(i, TrackerModel::TrackerRole).value<TrackerInfo>();
+    torrentSet(TR_KEY_trackerList, tracker_list);
+}
 
-    bool ok = false;
-    QString const newval = QInputDialog::getText(
-        this,
-        tr("Edit URL "),
-        tr("Edit tracker announce URL:"),
-        QLineEdit::Normal,
-        tracker_info.st.announce,
-        &ok);
-
-    if (!ok)
+void DetailsDialog::onEditTrackersClicked()
+{
+    if (std::size(ids_) != 1)
     {
-        // user pressed "cancel" -- noop
+        return;
     }
-    else if (!QUrl(newval).isValid())
-    {
-        QMessageBox::warning(this, tr("Error"), tr("Invalid URL \"%1\"").arg(newval));
-    }
-    else
-    {
-        torrent_ids_t ids{ tracker_info.torrent_id };
 
-        QPair<int, QString> const id_url = qMakePair(tracker_info.st.id, newval);
-
-        torrentSet(ids, TR_KEY_trackerReplace, id_url);
+    auto const* const tor = model_.getTorrentFromId(*std::begin(ids_));
+    if (tor == nullptr)
+    {
+        return;
     }
+
+    auto* dialog = new TrackersDialog(tor->trackerList(), this);
+    dialog->setAttribute(Qt::WA_DeleteOnClose);
+    connect(dialog, &TrackersDialog::trackerListEdited, this, &DetailsDialog::onTrackerListEdited);
+    dialog->open();
 }
 
 void DetailsDialog::onRemoveTrackerClicked()
@@ -1431,16 +1462,16 @@ void DetailsDialog::initTrackerTab()
     ui_.trackersView->setModel(tracker_filter_.get());
     ui_.trackersView->setItemDelegate(tracker_delegate_.get());
 
-    auto& icons = IconCache::get();
+    auto const& icons = IconCache::get();
     ui_.addTrackerButton->setIcon(icons.getThemeIcon(QStringLiteral("list-add"), QStyle::SP_DialogOpenButton));
-    ui_.editTrackerButton->setIcon(icons.getThemeIcon(QStringLiteral("document-properties"), QStyle::SP_DesktopIcon));
+    ui_.editTrackersButton->setIcon(icons.getThemeIcon(QStringLiteral("document-properties"), QStyle::SP_DesktopIcon));
     ui_.removeTrackerButton->setIcon(icons.getThemeIcon(QStringLiteral("list-remove"), QStyle::SP_TrashIcon));
 
     ui_.showTrackerScrapesCheck->setChecked(prefs_.getBool(Prefs::SHOW_TRACKER_SCRAPES));
     ui_.showBackupTrackersCheck->setChecked(prefs_.getBool(Prefs::SHOW_BACKUP_TRACKERS));
 
     connect(ui_.addTrackerButton, &QAbstractButton::clicked, this, &DetailsDialog::onAddTrackerClicked);
-    connect(ui_.editTrackerButton, &QAbstractButton::clicked, this, &DetailsDialog::onEditTrackerClicked);
+    connect(ui_.editTrackersButton, &QAbstractButton::clicked, this, &DetailsDialog::onEditTrackersClicked);
     connect(ui_.removeTrackerButton, &QAbstractButton::clicked, this, &DetailsDialog::onRemoveTrackerClicked);
     connect(ui_.showBackupTrackersCheck, &QAbstractButton::clicked, this, &DetailsDialog::onShowBackupTrackersToggled);
     connect(ui_.showTrackerScrapesCheck, &QAbstractButton::clicked, this, &DetailsDialog::onShowTrackerScrapesToggled);
@@ -1488,15 +1519,12 @@ static constexpr tr_quark priorityKey(int priority)
     {
     case TR_PRI_LOW:
         return TR_KEY_priority_low;
-        break;
 
     case TR_PRI_HIGH:
         return TR_KEY_priority_high;
-        break;
 
     default:
         return TR_KEY_priority_normal;
-        break;
     }
 }
 
@@ -1545,3 +1573,5 @@ void DetailsDialog::onOpenRequested(QString const& path) const
         }
     }
 }
+
+#include "DetailsDialog.moc"

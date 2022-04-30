@@ -30,27 +30,27 @@ WatchDir::WatchDir(TorrentModel const& model)
 ****
 ***/
 
-int WatchDir::metainfoTest(QString const& filename) const
+WatchDir::AddResult WatchDir::metainfoTest(QString const& filename) const
 {
     auto metainfo = tr_torrent_metainfo();
     if (!metainfo.parseTorrentFile(filename.toUtf8().constData()))
     {
-        return ERROR;
+        return AddResult::Error;
     }
 
     if (model_.hasTorrent(TorrentHash{ metainfo.infoHash() }))
     {
-        return DUPLICATE;
+        return AddResult::Duplicate;
     }
 
-    return OK;
+    return AddResult::Success;
 }
 
 void WatchDir::onTimeout()
 {
     auto* t = qobject_cast<QTimer*>(sender());
 
-    if (auto const filename = t->objectName(); metainfoTest(filename) == OK)
+    if (auto const filename = t->objectName(); metainfoTest(filename) == AddResult::Success)
     {
         emit torrentFileAdded(filename);
     }
@@ -69,7 +69,7 @@ void WatchDir::setPath(QString const& path, bool is_enabled)
     {
         watcher_ = std::make_unique<QFileSystemWatcher>(QStringList{ path });
         connect(watcher_.get(), &QFileSystemWatcher::directoryChanged, this, &WatchDir::watcherActivated);
-        // trigger the watchdir for .torrent files in there already
+        // trigger the watchdir for torrent files in there already
         QTimer::singleShot(0, this, SLOT(rescanAllWatchedDirectories()));
     }
 }
@@ -86,7 +86,7 @@ void WatchDir::watcherActivated(QString const& path)
         files.insert(str);
     }
 
-    // try to add any new files which end in .torrent
+    // try to add any new files which end in torrent
     auto const new_files = files - watch_dir_files_;
     auto const torrent_suffix = QStringLiteral(".torrent");
 
@@ -98,16 +98,16 @@ void WatchDir::watcherActivated(QString const& path)
 
             switch (metainfoTest(filename))
             {
-            case OK:
+            case AddResult::Success:
                 emit torrentFileAdded(filename);
                 break;
 
-            case DUPLICATE:
+            case AddResult::Duplicate:
                 break;
 
-            case ERROR:
+            case AddResult::Error:
                 {
-                    // give the .torrent a few seconds to finish downloading
+                    // give the torrent a few seconds to finish downloading
                     auto* t = new QTimer(this);
                     t->setObjectName(dir.absoluteFilePath(name));
                     t->setSingleShot(true);

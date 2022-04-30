@@ -7,6 +7,8 @@
 
 #include <windows.h>
 
+#include <fmt/format.h>
+
 #include <libtransmission/transmission.h>
 #include <libtransmission/error.h>
 #include <libtransmission/log.h>
@@ -43,16 +45,19 @@ static HANDLE service_stop_thread = nullptr;
 static void set_system_error(tr_error** error, DWORD code, char const* message)
 {
     auto* const system_message = tr_win32_format_message(code);
-    auto* const buf = tr_strdup_printf("%s (0x%08lx): %s", message, code, system_message);
-    tr_error_set(error, code, buf);
-    tr_free(buf);
+    tr_error_set(error, code, fmt::format(FMT_STRING("{:s} ({:#08x}): {:s})"), message, code, system_message));
     tr_free(system_message);
 }
 
 static void do_log_system_error(char const* file, int line, tr_log_level level, DWORD code, char const* message)
 {
     char* const system_message = tr_win32_format_message(code);
-    tr_logAddMessage(file, line, level, "[dtr_daemon] %s (0x%08lx): %s", message, code, system_message);
+    tr_logAddMessage(
+        file,
+        line,
+        level,
+        "dtr_daemon",
+        fmt::format("[dtr_daemon] {} ({:#x}): {}", message, code, system_message));
     tr_free(system_message);
 }
 

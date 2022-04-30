@@ -5,14 +5,19 @@
 
 #pragma once
 
+#include <cstddef>
 #include <ctime>
 #include <functional>
 #include <string>
+#include <vector>
 
 #include <sys/types.h>
 
 #include <glibmm.h>
 #include <gtkmm.h>
+
+#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/tr-macros.h>
@@ -44,9 +49,6 @@ enum class GtrUnicode
 };
 
 Glib::ustring gtr_get_unicode_string(GtrUnicode);
-
-/* return a percent formatted string of either x.xx, xx.x or xxx */
-Glib::ustring tr_strlpercent(double x);
 
 /* return a human-readable string for the size given in bytes. */
 Glib::ustring tr_strlsize(guint64 size);
@@ -201,6 +203,16 @@ struct std::hash<Glib::ustring>
     std::size_t operator()(Glib::ustring const& s) const
     {
         return std::hash<std::string>()(s.raw());
+    }
+};
+
+template<>
+struct fmt::formatter<Glib::ustring> : formatter<std::string>
+{
+    template<typename FormatContext>
+    auto format(Glib::ustring const& ustr, FormatContext& ctx) const
+    {
+        return formatter<std::string>::format(ustr.raw(), ctx);
     }
 };
 

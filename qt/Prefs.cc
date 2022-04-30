@@ -109,6 +109,7 @@ std::array<Prefs::PrefItem, Prefs::PREFS_COUNT> const Prefs::Items{
     { ALT_SPEED_LIMIT_TIME_DAY, TR_KEY_alt_speed_time_day, QVariant::Int },
     { BLOCKLIST_ENABLED, TR_KEY_blocklist_enabled, QVariant::Bool },
     { BLOCKLIST_URL, TR_KEY_blocklist_url, QVariant::String },
+    { DEFAULT_TRACKERS, TR_KEY_default_trackers, QVariant::String },
     { DSPEED, TR_KEY_speed_limit_down, QVariant::Int },
     { DSPEED_ENABLED, TR_KEY_speed_limit_down_enabled, QVariant::Bool },
     { DOWNLOAD_DIR, TR_KEY_download_dir, QVariant::String },
@@ -129,6 +130,8 @@ std::array<Prefs::PrefItem, Prefs::PREFS_COUNT> const Prefs::Items{
     { QUEUE_STALLED_MINUTES, TR_KEY_queue_stalled_minutes, QVariant::Int },
     { SCRIPT_TORRENT_DONE_ENABLED, TR_KEY_script_torrent_done_enabled, QVariant::Bool },
     { SCRIPT_TORRENT_DONE_FILENAME, TR_KEY_script_torrent_done_filename, QVariant::String },
+    { SCRIPT_TORRENT_DONE_SEEDING_ENABLED, TR_KEY_script_torrent_done_seeding_enabled, QVariant::Bool },
+    { SCRIPT_TORRENT_DONE_SEEDING_FILENAME, TR_KEY_script_torrent_done_seeding_filename, QVariant::String },
     { SOCKET_TOS, TR_KEY_peer_socket_tos, QVariant::String },
     { START, TR_KEY_start_added_torrents, QVariant::Bool },
     { TRASH_ORIGINAL, TR_KEY_trash_original_torrent_files, QVariant::Bool },
@@ -234,100 +237,76 @@ Prefs::Prefs(QString config_dir)
         switch (Items[i].type)
         {
         case QVariant::Int:
+            if (auto const value = getValue<int64_t>(b); value)
             {
-                auto const value = getValue<int64_t>(b);
-                if (value)
-                {
-                    values_[i].setValue(*value);
-                }
+                values_[i].setValue(*value);
             }
             break;
 
         case CustomVariantType::SortModeType:
+            if (auto const value = getValue<std::string_view>(b); value)
             {
-                auto const value = getValue<std::string_view>(b);
-                if (value)
+                auto const test = [&value](auto const& item)
                 {
-                    auto const test = [&value](auto const& item)
-                    {
-                        return item.second == *value;
-                    };
-                    // NOLINTNEXTLINE(readability-qualified-auto)
-                    auto const it = std::find_if(std::cbegin(SortModes), std::cend(SortModes), test);
-                    auto const& pair = it == std::end(SortModes) ? SortModes.front() : *it;
-                    values_[i] = QVariant::fromValue(SortMode(pair.first));
-                }
+                    return item.second == *value;
+                };
+                // NOLINTNEXTLINE(readability-qualified-auto)
+                auto const it = std::find_if(std::cbegin(SortModes), std::cend(SortModes), test);
+                auto const& pair = it == std::end(SortModes) ? SortModes.front() : *it;
+                values_[i] = QVariant::fromValue(SortMode(pair.first));
             }
             break;
 
         case CustomVariantType::FilterModeType:
+            if (auto const value = getValue<std::string_view>(b); value)
             {
-                auto const value = getValue<std::string_view>(b);
-                if (value)
+                auto const test = [&value](auto const& item)
                 {
-                    auto const test = [&value](auto const& item)
-                    {
-                        return item.second == *value;
-                    };
-                    // NOLINTNEXTLINE(readability-qualified-auto)
-                    auto const it = std::find_if(std::cbegin(FilterModes), std::cend(FilterModes), test);
-                    auto const& pair = it == std::end(FilterModes) ? FilterModes.front() : *it;
-                    values_[i] = QVariant::fromValue(FilterMode(pair.first));
-                }
+                    return item.second == *value;
+                };
+                // NOLINTNEXTLINE(readability-qualified-auto)
+                auto const it = std::find_if(std::cbegin(FilterModes), std::cend(FilterModes), test);
+                auto const& pair = it == std::end(FilterModes) ? FilterModes.front() : *it;
+                values_[i] = QVariant::fromValue(FilterMode(pair.first));
             }
             break;
 
         case QVariant::String:
+            if (auto const value = getValue<QString>(b); value)
             {
-                auto const value = getValue<QString>(b);
-                if (value)
-                {
-                    values_[i].setValue(*value);
-                }
+                values_[i].setValue(*value);
             }
             break;
 
         case QVariant::StringList:
+            if (auto const value = getValue<QStringList>(b); value)
             {
-                auto const value = getValue<QStringList>(b);
-                if (value)
-                {
-                    values_[i].setValue(*value);
-                }
+                values_[i].setValue(*value);
             }
             break;
 
         case QVariant::Bool:
+            if (auto const value = getValue<bool>(b); value)
             {
-                auto const value = getValue<bool>(b);
-                if (value)
-                {
-                    values_[i].setValue(*value);
-                }
+                values_[i].setValue(*value);
             }
             break;
 
         case QVariant::Double:
+            if (auto const value = getValue<double>(b); value)
             {
-                auto const value = getValue<double>(b);
-                if (value)
-                {
-                    values_[i].setValue(*value);
-                }
+                values_[i].setValue(*value);
             }
             break;
 
         case QVariant::DateTime:
+            if (auto const value = getValue<time_t>(b); value)
             {
-                auto const value = getValue<time_t>(b);
-                if (value)
-                {
 #if QT_VERSION >= QT_VERSION_CHECK(5, 8, 0)
-                    values_[i].setValue(QDateTime::fromSecsSinceEpoch(*value));
+                values_[i].setValue(QDateTime::fromSecsSinceEpoch(*value));
 #else
-                    values_[i].setValue(QDateTime::fromTime_t(*value));
+                values_[i].setValue(QDateTime::fromTime_t(*value));
 #endif
-                }
             }
             break;
 
@@ -424,13 +403,13 @@ Prefs::~Prefs()
     tr_variant file_settings;
     QFile const file(QDir(config_dir_).absoluteFilePath(QStringLiteral("settings.json")));
 
-    if (!tr_variantFromFile(&file_settings, TR_VARIANT_PARSE_JSON, file.fileName().toUtf8().constData(), nullptr))
+    if (!tr_variantFromFile(&file_settings, TR_VARIANT_PARSE_JSON, file.fileName().toStdString(), nullptr))
     {
         tr_variantInitDict(&file_settings, PREFS_COUNT);
     }
 
     tr_variantMergeDicts(&file_settings, &current_settings);
-    tr_variantToFile(&file_settings, TR_VARIANT_FMT_JSON, file.fileName().toUtf8().constData());
+    tr_variantToFile(&file_settings, TR_VARIANT_FMT_JSON, file.fileName().toStdString());
     tr_variantFree(&file_settings);
 
     // cleanup

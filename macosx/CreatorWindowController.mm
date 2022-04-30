@@ -3,8 +3,10 @@
 // License text can be found in the licenses/ folder.
 
 #include <libtransmission/transmission.h>
+#include <libtransmission/makemeta.h>
 #include <libtransmission/utils.h>
 #include <libtransmission/web-utils.h> // tr_urlIsValidTracker()
+#include <cmath>
 
 #import "CreatorWindowController.h"
 #import "Controller.h"
@@ -15,6 +17,33 @@
 #define TRACKER_REMOVE_TAG 1
 
 @interface CreatorWindowController ()
+
+@property(nonatomic) IBOutlet NSImageView* fIconView;
+@property(nonatomic) IBOutlet NSTextField* fNameField;
+@property(nonatomic) IBOutlet NSTextField* fStatusField;
+@property(nonatomic) IBOutlet NSTextField* fPiecesField;
+@property(nonatomic) IBOutlet NSTextField* fLocationField;
+@property(nonatomic) IBOutlet NSTableView* fTrackerTable;
+@property(nonatomic) IBOutlet NSSegmentedControl* fTrackerAddRemoveControl;
+@property(nonatomic) IBOutlet NSTextView* fCommentView;
+@property(nonatomic) IBOutlet NSButton* fPrivateCheck;
+@property(nonatomic) IBOutlet NSButton* fOpenCheck;
+@property(nonatomic) IBOutlet NSTextField* fSource;
+@property(nonatomic) IBOutlet NSStepper* fPieceSizeStepper;
+
+@property(nonatomic) IBOutlet NSView* fProgressView;
+@property(nonatomic) IBOutlet NSProgressIndicator* fProgressIndicator;
+
+@property(nonatomic, readonly) tr_metainfo_builder* fInfo;
+@property(nonatomic, readonly) NSURL* fPath;
+@property(nonatomic) NSURL* fLocation;
+@property(nonatomic) NSMutableArray<NSString*>* fTrackers;
+
+@property(nonatomic) NSTimer* fTimer;
+@property(nonatomic) BOOL fStarted;
+@property(nonatomic) BOOL fOpenWhenCreated;
+
+@property(nonatomic, readonly) NSUserDefaults* fDefaults;
 
 + (NSURL*)chooseFile;
 
@@ -58,12 +87,12 @@ NSMutableSet* creatorWindowControllerSet = nil;
             creatorWindowControllerSet = [NSMutableSet set];
         }
 
-        fStarted = NO;
+        _fStarted = NO;
 
-        fPath = path;
-        fInfo = tr_metaInfoBuilderCreate(fPath.path.UTF8String);
+        _fPath = path;
+        _fInfo = tr_metaInfoBuilderCreate(_fPath.path.UTF8String);
 
-        if (fInfo->fileCount == 0)
+        if (_fInfo->fileCount == 0)
         {
             NSAlert* alert = [[NSAlert alloc] init];
             [alert addButtonWithTitle:NSLocalizedString(@"OK", "Create torrent -> no files -> button")];
@@ -77,7 +106,7 @@ NSMutableSet* creatorWindowControllerSet = nil;
 
             return nil;
         }
-        if (fInfo->totalSize == 0)
+        if (_fInfo->totalSize == 0)
         {
             NSAlert* alert = [[NSAlert alloc] init];
             [alert addButtonWithTitle:NSLocalizedString(@"OK", "Create torrent -> zero size -> button")];
@@ -90,32 +119,32 @@ NSMutableSet* creatorWindowControllerSet = nil;
             return nil;
         }
 
-        fDefaults = NSUserDefaults.standardUserDefaults;
+        _fDefaults = NSUserDefaults.standardUserDefaults;
 
         //get list of trackers
-        if (!(fTrackers = [[fDefaults arrayForKey:@"CreatorTrackers"] mutableCopy]))
+        if (!(_fTrackers = [[_fDefaults arrayForKey:@"CreatorTrackers"] mutableCopy]))
         {
-            fTrackers = [[NSMutableArray alloc] init];
+            _fTrackers = [[NSMutableArray alloc] init];
 
             //check for single tracker from versions before 1.3
             NSString* tracker;
-            if ((tracker = [fDefaults stringForKey:@"CreatorTracker"]))
+            if ((tracker = [_fDefaults stringForKey:@"CreatorTracker"]))
             {
-                [fDefaults removeObjectForKey:@"CreatorTracker"];
+                [_fDefaults removeObjectForKey:@"CreatorTracker"];
                 if (![tracker isEqualToString:@""])
                 {
-                    [fTrackers addObject:tracker];
-                    [fDefaults setObject:fTrackers forKey:@"CreatorTrackers"];
+                    [_fTrackers addObject:tracker];
+                    [_fDefaults setObject:_fTrackers forKey:@"CreatorTrackers"];
                 }
             }
         }
 
         //remove potentially invalid addresses
-        for (NSInteger i = fTrackers.count - 1; i >= 0; i--)
+        for (NSInteger i = _fTrackers.count - 1; i >= 0; i--)
         {
-            if (!tr_urlIsValidTracker([fTrackers[i] UTF8String]))
+            if (!tr_urlIsValidTracker([_fTrackers[i] UTF8String]))
             {
-                [fTrackers removeObjectAtIndex:i];
+                [_fTrackers removeObjectAtIndex:i];
             }
         }
 
@@ -128,25 +157,25 @@ NSMutableSet* creatorWindowControllerSet = nil;
 {
     self.window.restorationClass = [self class];
 
-    NSString* name = fPath.lastPathComponent;
+    NSString* name = self.fPath.lastPathComponent;
 
     self.window.title = name;
 
-    fNameField.stringValue = name;
-    fNameField.toolTip = fPath.path;
+    self.fNameField.stringValue = name;
+    self.fNameField.toolTip = self.fPath.path;
 
-    BOOL const multifile = fInfo->isFolder;
+    BOOL const multifile = self.fInfo->isFolder;
 
     NSImage* icon = [NSWorkspace.sharedWorkspace
-        iconForFileType:multifile ? NSFileTypeForHFSTypeCode(kGenericFolderIcon) : fPath.pathExtension];
-    icon.size = fIconView.frame.size;
-    fIconView.image = icon;
+        iconForFileType:multifile ? NSFileTypeForHFSTypeCode(kGenericFolderIcon) : self.fPath.pathExtension];
+    icon.size = self.fIconView.frame.size;
+    self.fIconView.image = icon;
 
-    NSString* statusString = [NSString stringForFileSize:fInfo->totalSize];
+    NSString* statusString = [NSString stringForFileSize:self.fInfo->totalSize];
     if (multifile)
     {
         NSString* fileString;
-        NSInteger count = fInfo->fileCount;
+        NSInteger count = self.fInfo->fileCount;
         if (count != 1)
         {
             fileString = [NSString
@@ -158,53 +187,46 @@ NSMutableSet* creatorWindowControllerSet = nil;
         }
         statusString = [NSString stringWithFormat:@"%@, %@", fileString, statusString];
     }
-    fStatusField.stringValue = statusString;
+    self.fStatusField.stringValue = statusString;
 
-    if (fInfo->pieceCount == 1)
-    {
-        fPiecesField.stringValue = [NSString stringWithFormat:NSLocalizedString(@"1 piece, %@", "Create torrent -> info"),
-                                                              [NSString stringForFileSize:fInfo->pieceSize]];
-    }
-    else
-    {
-        fPiecesField.stringValue = [NSString stringWithFormat:NSLocalizedString(@"%d pieces, %@ each", "Create torrent -> info"),
-                                                              fInfo->pieceCount,
-                                                              [NSString stringForFileSize:fInfo->pieceSize]];
-    }
+    [self updatePiecesField];
+    [self.fPieceSizeStepper setIntValue:(int)log2((double)self.fInfo->pieceSize)];
 
-    fLocation = [[fDefaults URLForKey:@"CreatorLocationURL"] URLByAppendingPathComponent:[name stringByAppendingPathExtension:@"torrent"]];
-    if (!fLocation)
+    self.fLocation = [[self.fDefaults URLForKey:@"CreatorLocationURL"]
+        URLByAppendingPathComponent:[name stringByAppendingPathExtension:@"torrent"]];
+    if (!self.fLocation)
     {
         //for 2.5 and earlier
 #warning we still store "CreatorLocation" in Defaults.plist, and not "CreatorLocationURL"
-        NSString* location = [fDefaults stringForKey:@"CreatorLocation"];
-        fLocation = [[NSURL alloc] initFileURLWithPath:[location.stringByExpandingTildeInPath
-                                                           stringByAppendingPathComponent:[name stringByAppendingPathExtension:@"torrent"]]];
+        NSString* location = [self.fDefaults stringForKey:@"CreatorLocation"];
+        self.fLocation = [[NSURL alloc]
+            initFileURLWithPath:[location.stringByExpandingTildeInPath
+                                    stringByAppendingPathComponent:[name stringByAppendingPathExtension:@"torrent"]]];
     }
     [self updateLocationField];
 
     //set previously saved values
-    if ([fDefaults objectForKey:@"CreatorPrivate"])
+    if ([self.fDefaults objectForKey:@"CreatorPrivate"])
     {
-        fPrivateCheck.state = [fDefaults boolForKey:@"CreatorPrivate"] ? NSControlStateValueOn : NSControlStateValueOff;
+        self.fPrivateCheck.state = [self.fDefaults boolForKey:@"CreatorPrivate"] ? NSControlStateValueOn : NSControlStateValueOff;
     }
 
-    if ([fDefaults objectForKey:@"CreatorSource"])
+    if ([self.fDefaults objectForKey:@"CreatorSource"])
     {
-        fSource.stringValue = [fDefaults stringForKey:@"CreatorSource"];
+        self.fSource.stringValue = [self.fDefaults stringForKey:@"CreatorSource"];
     }
 
-    fOpenCheck.state = [fDefaults boolForKey:@"CreatorOpen"] ? NSControlStateValueOn : NSControlStateValueOff;
+    self.fOpenCheck.state = [self.fDefaults boolForKey:@"CreatorOpen"] ? NSControlStateValueOn : NSControlStateValueOff;
 }
 
 - (void)dealloc
 {
-    if (fInfo)
+    if (_fInfo)
     {
-        tr_metaInfoBuilderFree(fInfo);
+        tr_metaInfoBuilderFree(_fInfo);
     }
 
-    [fTimer invalidate];
+    [_fTimer invalidate];
 }
 
 + (void)restoreWindowWithIdentifier:(NSString*)identifier
@@ -224,27 +246,27 @@ NSMutableSet* creatorWindowControllerSet = nil;
 
 - (void)window:(NSWindow*)window willEncodeRestorableState:(NSCoder*)state
 {
-    [state encodeObject:fPath forKey:@"TRCreatorPath"];
-    [state encodeObject:fLocation forKey:@"TRCreatorLocation"];
-    [state encodeObject:fTrackers forKey:@"TRCreatorTrackers"];
-    [state encodeInteger:fOpenCheck.state forKey:@"TRCreatorOpenCheck"];
-    [state encodeInteger:fPrivateCheck.state forKey:@"TRCreatorPrivateCheck"];
-    [state encodeObject:fSource.stringValue forKey:@"TRCreatorSource"];
-    [state encodeObject:fCommentView.string forKey:@"TRCreatorPrivateComment"];
+    [state encodeObject:self.fPath forKey:@"TRCreatorPath"];
+    [state encodeObject:self.fLocation forKey:@"TRCreatorLocation"];
+    [state encodeObject:self.fTrackers forKey:@"TRCreatorTrackers"];
+    [state encodeInteger:self.fOpenCheck.state forKey:@"TRCreatorOpenCheck"];
+    [state encodeInteger:self.fPrivateCheck.state forKey:@"TRCreatorPrivateCheck"];
+    [state encodeObject:self.fSource.stringValue forKey:@"TRCreatorSource"];
+    [state encodeObject:self.fCommentView.string forKey:@"TRCreatorPrivateComment"];
 }
 
 - (void)window:(NSWindow*)window didDecodeRestorableState:(NSCoder*)coder
 {
-    fLocation = [coder decodeObjectForKey:@"TRCreatorLocation"];
+    self.fLocation = [coder decodeObjectForKey:@"TRCreatorLocation"];
     [self updateLocationField];
 
-    fTrackers = [coder decodeObjectForKey:@"TRCreatorTrackers"];
-    [fTrackerTable reloadData];
+    self.fTrackers = [coder decodeObjectForKey:@"TRCreatorTrackers"];
+    [self.fTrackerTable reloadData];
 
-    fOpenCheck.state = [coder decodeIntegerForKey:@"TRCreatorOpenCheck"];
-    fPrivateCheck.state = [coder decodeIntegerForKey:@"TRCreatorPrivateCheck"];
-    fSource.stringValue = [coder decodeObjectForKey:@"TRCreatorSource"];
-    fCommentView.string = [coder decodeObjectForKey:@"TRCreatorPrivateComment"];
+    self.fOpenCheck.state = [coder decodeIntegerForKey:@"TRCreatorOpenCheck"];
+    self.fPrivateCheck.state = [coder decodeIntegerForKey:@"TRCreatorPrivateCheck"];
+    self.fSource.stringValue = [coder decodeObjectForKey:@"TRCreatorSource"];
+    self.fCommentView.string = [coder decodeObjectForKey:@"TRCreatorPrivateComment"];
 }
 
 - (IBAction)setLocation:(id)sender
@@ -257,13 +279,13 @@ NSMutableSet* creatorWindowControllerSet = nil;
     panel.allowedFileTypes = @[ @"org.bittorrent.torrent", @"torrent" ];
     panel.canSelectHiddenExtension = YES;
 
-    panel.directoryURL = fLocation.URLByDeletingLastPathComponent;
-    panel.nameFieldStringValue = fLocation.lastPathComponent;
+    panel.directoryURL = self.fLocation.URLByDeletingLastPathComponent;
+    panel.nameFieldStringValue = self.fLocation.lastPathComponent;
 
     [panel beginSheetModalForWindow:self.window completionHandler:^(NSInteger result) {
         if (result == NSModalResponseOK)
         {
-            fLocation = panel.URL;
+            self.fLocation = panel.URL;
             [self updateLocationField];
         }
     }];
@@ -272,13 +294,13 @@ NSMutableSet* creatorWindowControllerSet = nil;
 - (IBAction)create:(id)sender
 {
     //make sure the trackers are no longer being verified
-    if (fTrackerTable.editedRow != -1)
+    if (self.fTrackerTable.editedRow != -1)
     {
-        [self.window endEditingFor:fTrackerTable];
+        [self.window endEditingFor:self.fTrackerTable];
     }
 
-    BOOL const isPrivate = fPrivateCheck.state == NSControlStateValueOn;
-    if (fTrackers.count == 0 && [fDefaults boolForKey:isPrivate ? @"WarningCreatorPrivateBlankAddress" : @"WarningCreatorBlankAddress"])
+    BOOL const isPrivate = self.fPrivateCheck.state == NSControlStateValueOn;
+    if (self.fTrackers.count == 0 && [self.fDefaults boolForKey:isPrivate ? @"WarningCreatorPrivateBlankAddress" : @"WarningCreatorBlankAddress"])
     {
         NSAlert* alert = [[NSAlert alloc] init];
         alert.messageText = NSLocalizedString(@"There are no tracker addresses.", "Create torrent -> blank address -> title");
@@ -303,7 +325,7 @@ NSMutableSet* creatorWindowControllerSet = nil;
             if (alert.suppressionButton.state == NSControlStateValueOn)
             {
                 [NSUserDefaults.standardUserDefaults setBool:NO forKey:@"WarningCreatorBlankAddress"]; //set regardless of private/public
-                if (fPrivateCheck.state == NSControlStateValueOn)
+                if (self.fPrivateCheck.state == NSControlStateValueOn)
                 {
                     [NSUserDefaults.standardUserDefaults setBool:NO forKey:@"WarningCreatorPrivateBlankAddress"];
                 }
@@ -333,43 +355,52 @@ NSMutableSet* creatorWindowControllerSet = nil;
 
 - (IBAction)cancelCreateProgress:(id)sender
 {
-    fInfo->abortFlag = 1;
-    [fTimer fire];
+    self.fInfo->abortFlag = 1;
+    [self.fTimer fire];
+}
+
+- (IBAction)incrementOrDecrementPieceSize:(id)sender
+{
+    uint32_t pieceSize = (uint32_t)pow(2.0, [sender intValue]);
+    if (tr_metaInfoBuilderSetPieceSize(self.fInfo, pieceSize))
+    {
+        [self updatePiecesField];
+    }
 }
 
 - (NSInteger)numberOfRowsInTableView:(NSTableView*)tableView
 {
-    return fTrackers.count;
+    return self.fTrackers.count;
 }
 
 - (id)tableView:(NSTableView*)tableView objectValueForTableColumn:(NSTableColumn*)tableColumn row:(NSInteger)row
 {
-    return fTrackers[row];
+    return self.fTrackers[row];
 }
 
 - (IBAction)addRemoveTracker:(id)sender
 {
     //don't allow add/remove when currently adding - it leads to weird results
-    if (fTrackerTable.editedRow != -1)
+    if (self.fTrackerTable.editedRow != -1)
     {
         return;
     }
 
     if ([[sender cell] tagForSegment:[sender selectedSegment]] == TRACKER_REMOVE_TAG)
     {
-        [fTrackers removeObjectsAtIndexes:fTrackerTable.selectedRowIndexes];
+        [self.fTrackers removeObjectsAtIndexes:self.fTrackerTable.selectedRowIndexes];
 
-        [fTrackerTable deselectAll:self];
-        [fTrackerTable reloadData];
+        [self.fTrackerTable deselectAll:self];
+        [self.fTrackerTable reloadData];
     }
     else
     {
-        [fTrackers addObject:@""];
-        [fTrackerTable reloadData];
+        [self.fTrackers addObject:@""];
+        [self.fTrackerTable reloadData];
 
-        NSInteger const row = fTrackers.count - 1;
-        [fTrackerTable selectRowIndexes:[NSIndexSet indexSetWithIndex:row] byExtendingSelection:NO];
-        [fTrackerTable editColumn:0 row:row withEvent:nil select:YES];
+        NSInteger const row = self.fTrackers.count - 1;
+        [self.fTrackerTable selectRowIndexes:[NSIndexSet indexSetWithIndex:row] byExtendingSelection:NO];
+        [self.fTrackerTable editColumn:0 row:row withEvent:nil select:YES];
     }
 }
 
@@ -390,25 +421,25 @@ NSMutableSet* creatorWindowControllerSet = nil;
     if (!tr_urlIsValidTracker(tracker.UTF8String))
     {
         NSBeep();
-        [fTrackers removeObjectAtIndex:row];
+        [self.fTrackers removeObjectAtIndex:row];
     }
     else
     {
-        fTrackers[row] = tracker;
+        self.fTrackers[row] = tracker;
     }
 
-    [fTrackerTable deselectAll:self];
-    [fTrackerTable reloadData];
+    [self.fTrackerTable deselectAll:self];
+    [self.fTrackerTable reloadData];
 }
 
 - (void)tableViewSelectionDidChange:(NSNotification*)notification
 {
-    [fTrackerAddRemoveControl setEnabled:fTrackerTable.numberOfSelectedRows > 0 forSegment:TRACKER_REMOVE_TAG];
+    [self.fTrackerAddRemoveControl setEnabled:self.fTrackerTable.numberOfSelectedRows > 0 forSegment:TRACKER_REMOVE_TAG];
 }
 
 - (void)copy:(id)sender
 {
-    NSArray* addresses = [fTrackers objectsAtIndexes:fTrackerTable.selectedRowIndexes];
+    NSArray* addresses = [self.fTrackers objectsAtIndexes:self.fTrackerTable.selectedRowIndexes];
     NSString* text = [addresses componentsJoinedByString:@"\n"];
 
     NSPasteboard* pb = NSPasteboard.generalPasteboard;
@@ -422,12 +453,12 @@ NSMutableSet* creatorWindowControllerSet = nil;
 
     if (action == @selector(copy:))
     {
-        return self.window.firstResponder == fTrackerTable && fTrackerTable.numberOfSelectedRows > 0;
+        return self.window.firstResponder == self.fTrackerTable && self.fTrackerTable.numberOfSelectedRows > 0;
     }
 
     if (action == @selector(paste:))
     {
-        return self.window.firstResponder == fTrackerTable &&
+        return self.window.firstResponder == self.fTrackerTable &&
             [NSPasteboard.generalPasteboard canReadObjectForClasses:@[ [NSString class] ] options:nil];
     }
 
@@ -462,15 +493,15 @@ NSMutableSet* creatorWindowControllerSet = nil;
 
         if (tr_urlIsValidTracker(tracker.UTF8String))
         {
-            [fTrackers addObject:tracker];
+            [self.fTrackers addObject:tracker];
             added = YES;
         }
     }
 
     if (added)
     {
-        [fTrackerTable deselectAll:self];
-        [fTrackerTable reloadData];
+        [self.fTrackerTable deselectAll:self];
+        [self.fTrackerTable reloadData];
     }
     else
     {
@@ -478,11 +509,28 @@ NSMutableSet* creatorWindowControllerSet = nil;
     }
 }
 
+#pragma mark - Private
+
+- (void)updatePiecesField
+{
+    if (self.fInfo->pieceCount == 1)
+    {
+        self.fPiecesField.stringValue = [NSString stringWithFormat:NSLocalizedString(@"1 piece, %@", "Create torrent -> info"),
+                                                                   [NSString stringForFileSize:self.fInfo->pieceSize]];
+    }
+    else
+    {
+        self.fPiecesField.stringValue = [NSString stringWithFormat:NSLocalizedString(@"%d pieces, %@ each", "Create torrent -> info"),
+                                                                   self.fInfo->pieceCount,
+                                                                   [NSString stringForFileSize:self.fInfo->pieceSize]];
+    }
+}
+
 - (void)updateLocationField
 {
-    NSString* pathString = fLocation.path;
-    fLocationField.stringValue = pathString.stringByAbbreviatingWithTildeInPath;
-    fLocationField.toolTip = pathString;
+    NSString* pathString = self.fLocation.path;
+    self.fLocationField.stringValue = pathString.stringByAbbreviatingWithTildeInPath;
+    self.fLocationField.toolTip = pathString;
 }
 
 + (NSURL*)chooseFile
@@ -505,7 +553,7 @@ NSMutableSet* creatorWindowControllerSet = nil;
 - (void)createReal
 {
     //check if the location currently exists
-    if (![fLocation.URLByDeletingLastPathComponent checkResourceIsReachableAndReturnError:NULL])
+    if (![self.fLocation.URLByDeletingLastPathComponent checkResourceIsReachableAndReturnError:NULL])
     {
         NSAlert* alert = [[NSAlert alloc] init];
         [alert addButtonWithTitle:NSLocalizedString(@"OK", "Create torrent -> directory doesn't exist warning -> button")];
@@ -514,7 +562,7 @@ NSMutableSet* creatorWindowControllerSet = nil;
                                                                @"The directory \"%@\" does not currently exist. "
                                                                 "Create this directory or choose a different one to create the torrent file.",
                                                                "Create torrent -> directory doesn't exist warning -> warning"),
-                                                           fLocation.URLByDeletingLastPathComponent.path];
+                                                           self.fLocation.URLByDeletingLastPathComponent.path];
         alert.alertStyle = NSAlertStyleWarning;
 
         [alert beginSheetModalForWindow:self.window completionHandler:nil];
@@ -522,9 +570,9 @@ NSMutableSet* creatorWindowControllerSet = nil;
     }
 
     //check if a file with the same name and location already exists
-    if ([fLocation checkResourceIsReachableAndReturnError:NULL])
+    if ([self.fLocation checkResourceIsReachableAndReturnError:NULL])
     {
-        NSArray* pathComponents = fLocation.pathComponents;
+        NSArray* pathComponents = self.fLocation.pathComponents;
         NSInteger count = pathComponents.count;
 
         NSAlert* alert = [[NSAlert alloc] init];
@@ -545,54 +593,59 @@ NSMutableSet* creatorWindowControllerSet = nil;
     }
 
     //parse non-empty tracker strings
-    tr_tracker_info* trackerInfo = tr_new0(tr_tracker_info, fTrackers.count);
+    tr_tracker_info* trackerInfo = tr_new0(tr_tracker_info, self.fTrackers.count);
 
-    for (NSUInteger i = 0; i < fTrackers.count; i++)
+    for (NSUInteger i = 0; i < self.fTrackers.count; i++)
     {
-        trackerInfo[i].announce = (char*)[fTrackers[i] UTF8String];
+        trackerInfo[i].announce = (char*)[self.fTrackers[i] UTF8String];
         trackerInfo[i].tier = i;
     }
 
     //store values
-    [fDefaults setObject:fTrackers forKey:@"CreatorTrackers"];
-    [fDefaults setBool:fPrivateCheck.state == NSControlStateValueOn forKey:@"CreatorPrivate"];
-    [fDefaults setObject: [fSource stringValue] forKey: @"CreatorSource"];
-    [fDefaults setBool:fOpenCheck.state == NSControlStateValueOn forKey:@"CreatorOpen"];
-    fOpenWhenCreated = fOpenCheck.state == NSControlStateValueOn; //need this since the check box might not exist, and value in prefs might have changed from another creator window
-    [fDefaults setURL:fLocation.URLByDeletingLastPathComponent forKey:@"CreatorLocationURL"];
+    [self.fDefaults setObject:self.fTrackers forKey:@"CreatorTrackers"];
+    [self.fDefaults setBool:self.fPrivateCheck.state == NSControlStateValueOn forKey:@"CreatorPrivate"];
+    [self.fDefaults setObject:[self.fSource stringValue] forKey:@"CreatorSource"];
+    [self.fDefaults setBool:self.fOpenCheck.state == NSControlStateValueOn forKey:@"CreatorOpen"];
+    self.fOpenWhenCreated = self.fOpenCheck.state ==
+        NSControlStateValueOn; //need this since the check box might not exist, and value in prefs might have changed from another creator window
+    [self.fDefaults setURL:self.fLocation.URLByDeletingLastPathComponent forKey:@"CreatorLocationURL"];
 
     self.window.restorable = NO;
 
-    [NSNotificationCenter.defaultCenter postNotificationName:@"BeginCreateTorrentFile" object:fLocation userInfo:nil];
+    [NSNotificationCenter.defaultCenter postNotificationName:@"BeginCreateTorrentFile" object:self.fLocation userInfo:nil];
     tr_makeMetaInfo(
-        fInfo,
-        fLocation.path.UTF8String,
+        self.fInfo,
+        self.fLocation.path.UTF8String,
         trackerInfo,
-        fTrackers.count,
+        self.fTrackers.count,
         nullptr,
         0,
-        fCommentView.string.UTF8String,
-        fPrivateCheck.state == NSControlStateValueOn,
-        fSource.stringValue.UTF8String);
+        self.fCommentView.string.UTF8String,
+        self.fPrivateCheck.state == NSControlStateValueOn,
+        self.fSource.stringValue.UTF8String);
     tr_free(trackerInfo);
 
-    fTimer = [NSTimer scheduledTimerWithTimeInterval:0.1 target:self selector:@selector(checkProgress) userInfo:nil repeats:YES];
+    self.fTimer = [NSTimer scheduledTimerWithTimeInterval:0.1 target:self selector:@selector(checkProgress) userInfo:nil
+                                                  repeats:YES];
 }
 
 - (void)checkProgress
 {
-    if (fInfo->isDone)
+    if (self.fInfo->isDone)
     {
-        [fTimer invalidate];
-        fTimer = nil;
+        [self.fTimer invalidate];
+        self.fTimer = nil;
 
         NSAlert* alert;
-        switch (fInfo->result)
+        switch (self.fInfo->result)
         {
         case TrMakemetaResult::OK:
-            if (fOpenWhenCreated)
+            if (self.fOpenWhenCreated)
             {
-                NSDictionary* dict = @{ @"File" : fLocation.path, @"Path" : fPath.URLByDeletingLastPathComponent.path };
+                NSDictionary* dict = @{
+                    @"File" : self.fLocation.path,
+                    @"Path" : self.fPath.URLByDeletingLastPathComponent.path
+                };
                 [NSNotificationCenter.defaultCenter postNotificationName:@"OpenCreatedTorrentFile" object:self userInfo:dict];
             }
 
@@ -607,29 +660,29 @@ NSMutableSet* creatorWindowControllerSet = nil;
             alert = [[NSAlert alloc] init];
             [alert addButtonWithTitle:NSLocalizedString(@"OK", "Create torrent -> failed -> button")];
             alert.messageText = [NSString stringWithFormat:NSLocalizedString(@"Creation of \"%@\" failed.", "Create torrent -> failed -> title"),
-                                                           fLocation.lastPathComponent];
+                                                           self.fLocation.lastPathComponent];
             alert.alertStyle = NSAlertStyleWarning;
 
-            if (fInfo->result == TrMakemetaResult::ERR_IO_READ)
+            if (self.fInfo->result == TrMakemetaResult::ERR_IO_READ)
             {
                 alert.informativeText = [NSString
                     stringWithFormat:NSLocalizedString(@"Could not read \"%s\": %s.", "Create torrent -> failed -> warning"),
-                                     fInfo->errfile,
-                                     strerror(fInfo->my_errno)];
+                                     self.fInfo->errfile,
+                                     strerror(self.fInfo->my_errno)];
             }
-            else if (fInfo->result == TrMakemetaResult::ERR_IO_WRITE)
+            else if (self.fInfo->result == TrMakemetaResult::ERR_IO_WRITE)
             {
                 alert.informativeText = [NSString
                     stringWithFormat:NSLocalizedString(@"Could not write \"%s\": %s.", "Create torrent -> failed -> warning"),
-                                     fInfo->errfile,
-                                     strerror(fInfo->my_errno)];
+                                     self.fInfo->errfile,
+                                     strerror(self.fInfo->my_errno)];
             }
             else //invalid url should have been caught before creating
             {
                 alert.informativeText = [NSString
                     stringWithFormat:@"%@ (%d)",
                                      NSLocalizedString(@"An unknown error has occurred.", "Create torrent -> failed -> warning"),
-                                     fInfo->result];
+                                     self.fInfo->result];
             }
 
             [alert beginSheetModalForWindow:self.window completionHandler:^(NSModalResponse returnCode) {
@@ -640,19 +693,19 @@ NSMutableSet* creatorWindowControllerSet = nil;
     }
     else
     {
-        fProgressIndicator.doubleValue = (double)fInfo->pieceIndex / fInfo->pieceCount;
+        self.fProgressIndicator.doubleValue = (double)self.fInfo->pieceIndex / self.fInfo->pieceCount;
 
-        if (!fStarted)
+        if (!self.fStarted)
         {
-            fStarted = YES;
+            self.fStarted = YES;
 
-            fProgressView.hidden = YES;
+            self.fProgressView.hidden = YES;
 
             NSWindow* window = self.window;
             window.frameAutosaveName = @"";
 
             NSRect windowRect = window.frame;
-            CGFloat difference = fProgressView.frame.size.height - window.contentView.frame.size.height;
+            CGFloat difference = self.fProgressView.frame.size.height - window.contentView.frame.size.height;
             windowRect.origin.y -= difference;
             windowRect.size.height += difference;
 
@@ -661,9 +714,9 @@ NSMutableSet* creatorWindowControllerSet = nil;
             window.minSize = NSMakeSize(window.minSize.width, height);
             window.maxSize = NSMakeSize(window.maxSize.width, height);
 
-            window.contentView = fProgressView;
+            window.contentView = self.fProgressView;
             [window setFrame:windowRect display:YES animate:YES];
-            fProgressView.hidden = NO;
+            self.fProgressView.hidden = NO;
 
             [window standardWindowButton:NSWindowCloseButton].enabled = NO;
         }

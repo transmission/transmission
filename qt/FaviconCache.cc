@@ -129,8 +129,7 @@ void FaviconCache::add(QString const& sitename, QString const& url_str)
 
     // Try to download a favicon if we don't have one.
     // Add a placeholder to prevent repeat downloads.
-    auto const already_had_it = !pixmaps_.try_emplace(sitename).second;
-    if (already_had_it)
+    if (auto const already_had_it = !pixmaps_.try_emplace(sitename).second; already_had_it)
     {
         return;
     }

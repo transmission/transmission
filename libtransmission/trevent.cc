@@ -4,6 +4,7 @@
 // License text can be found in the licenses/ folder.
 
 #include <condition_variable>
+#include <functional>
 #include <list>
 #include <mutex>
 #include <shared_mutex>
@@ -31,8 +32,6 @@
 /***
 ****
 ***/
-
-#include <iostream>
 
 namespace
 {
@@ -139,29 +138,11 @@ void tr_evthread_init()
 
 struct tr_event_handle
 {
-    // would it be more expensive to use std::function here?
-    struct callback
-    {
-        callback(void (*func)(void*) = nullptr, void* user_data = nullptr)
-            : func_{ func }
-            , user_data_{ user_data }
-        {
-        }
-
-        void invoke() const
-        {
-            if (func_ != nullptr)
-            {
-                func_(user_data_);
-            }
-        }
-
-        void (*func_)(void*);
-        void* user_data_;
-    };
+    using callback = std::function<void(void)>;
 
     using work_queue_t = std::list<callback>;
     work_queue_t work_queue;
+    std::condition_variable work_queue_cv;
     std::mutex work_queue_mutex;
     event* work_queue_event = nullptr;
 
@@ -184,9 +165,9 @@ static void onWorkAvailable(evutil_socket_t /*fd*/, short /*flags*/, void* vsess
     work_queue_lock.unlock();
 
     // process the work queue
-    for (auto const& work : work_queue)
+    for (auto const& func : work_queue)
     {
-        work.invoke();
+        func();
     }
 }
 
@@ -194,31 +175,41 @@ static void libeventThreadFunc(tr_event_handle* events)
 {
 #ifndef _WIN32
     /* Don't exit when writing on a broken socket */
-    signal(SIGPIPE, SIG_IGN);
+    (void)signal(SIGPIPE, SIG_IGN);
 #endif
 
     tr_evthread_init();
 
     // create the libevent base
     auto* const base = event_base_new();
+    auto* const dns_base = evdns_base_new(base, EVDNS_BASE_INITIALIZE_NAMESERVERS);
 
     // initialize the session struct's event fields
     events->base = base;
     events->work_queue_event = event_new(base, -1, 0, onWorkAvailable, events->session);
     events->session->event_base = base;
-    events->session->evdns_base = evdns_base_new(base, EVDNS_BASE_INITIALIZE_NAMESERVERS);
+    events->session->evdns_base = dns_base;
     events->session->events = events;
+
+    // tell the thread that's waiting in tr_eventInit()
+    // that this thread is ready for business
+    events->work_queue_cv.notify_one();
 
     // loop until `tr_eventClose()` kills the loop
     event_base_loop(base, EVLOOP_NO_EXIT_ON_EMPTY);
 
     // shut down the thread
+    if (dns_base != nullptr)
+    {
+        evdns_base_free(dns_base, 0);
+    }
+    event_free(events->work_queue_event);
     event_base_free(base);
     events->session->event_base = nullptr;
     events->session->evdns_base = nullptr;
     events->session->events = nullptr;
     delete events;
-    tr_logAddDebug("Closing libevent thread");
+    tr_logAddTrace("Closing libevent thread");
 }
 
 void tr_eventInit(tr_session* session)
@@ -228,15 +219,12 @@ void tr_eventInit(tr_session* session)
     auto* const events = new tr_event_handle();
     events->session = session;
 
+    auto lock = std::unique_lock(events->work_queue_mutex);
     auto thread = std::thread(libeventThreadFunc, events);
     events->thread_id = thread.get_id();
     thread.detach();
-
     // wait until the libevent thread is running
-    while (session->events == nullptr)
-    {
-        tr_wait_msec(100);
-    }
+    events->work_queue_cv.wait(lock, [session] { return session->events != nullptr; });
 }
 
 void tr_eventClose(tr_session* session)
@@ -251,10 +239,7 @@ void tr_eventClose(tr_session* session)
 
     event_base_loopexit(events->base, nullptr);
 
-    if (tr_logGetDeepEnabled())
-    {
-        tr_logAddDeep(__FILE__, __LINE__, nullptr, "closing trevent pipe");
-    }
+    tr_logAddTrace("closing trevent pipe");
 }
 
 /**
@@ -273,7 +258,7 @@ bool tr_amInEventThread(tr_session const* session)
 ***
 **/
 
-void tr_runInEventThread(tr_session* session, void (*func)(void*), void* user_data)
+void tr_runInEventThread(tr_session* session, std::function<void(void)>&& func)
 {
     TR_ASSERT(tr_isSession(session));
     auto* events = session->events;
@@ -281,12 +266,12 @@ void tr_runInEventThread(tr_session* session, void (*func)(void*), void* user_da
 
     if (tr_amInEventThread(session))
     {
-        (*func)(user_data);
+        func();
     }
     else
     {
         auto lock = std::unique_lock(events->work_queue_mutex);
-        events->work_queue.emplace_back(func, user_data);
+        events->work_queue.emplace_back(std::move(func));
         lock.unlock();
 
         event_active(events->work_queue_event, 0, {});

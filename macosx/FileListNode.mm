@@ -6,16 +6,14 @@
 
 @interface FileListNode ()
 
+@property(nonatomic, readonly) NSMutableIndexSet* indexesInternal;
+@property(nonatomic) NSImage* iconInternal;
+
 - (instancetype)initWithFolder:(BOOL)isFolder name:(NSString*)name path:(NSString*)path torrent:(Torrent*)torrent;
 
 @end
 
 @implementation FileListNode
-{
-    NSMutableIndexSet* _indexes;
-    NSImage* _icon;
-    NSMutableArray* _children;
-}
 
 - (instancetype)initWithFolderName:(NSString*)name path:(NSString*)path torrent:(Torrent*)torrent
 {
@@ -37,7 +35,7 @@
     if ((self = [self initWithFolder:NO name:name path:path torrent:torrent]))
     {
         _size = size;
-        [_indexes addIndex:index];
+        [_indexesInternal addIndex:index];
     }
 
     return self;
@@ -54,7 +52,7 @@
 {
     NSAssert(_isFolder, @"method can only be invoked on folders");
 
-    [_indexes addIndex:index];
+    [self.indexesInternal addIndex:index];
     _size += size;
 }
 
@@ -68,33 +66,27 @@
 {
     if (!_isFolder)
     {
-        return [NSString stringWithFormat:@"%@ (%ld)", _name, _indexes.firstIndex];
+        return [NSString stringWithFormat:@"%@ (%ld)", _name, _indexesInternal.firstIndex];
     }
     else
     {
-        return [NSString stringWithFormat:@"%@ (folder: %@)", _name, _indexes];
+        return [NSString stringWithFormat:@"%@ (folder: %@)", _name, _indexesInternal];
     }
 }
 
 - (NSImage*)icon
 {
-    if (!_icon)
+    if (!_iconInternal)
     {
-        _icon = [NSWorkspace.sharedWorkspace iconForFileType:_isFolder ? NSFileTypeForHFSTypeCode(kGenericFolderIcon) : _name.pathExtension];
+        _iconInternal = [NSWorkspace.sharedWorkspace
+            iconForFileType:_isFolder ? NSFileTypeForHFSTypeCode(kGenericFolderIcon) : _name.pathExtension];
     }
-    return _icon;
-}
-
-- (NSMutableArray*)children
-{
-    NSAssert(_isFolder, @"method can only be invoked on folders");
-
-    return _children;
+    return _iconInternal;
 }
 
 - (NSIndexSet*)indexes
 {
-    return _indexes;
+    return _indexesInternal;
 }
 
 - (BOOL)updateFromOldName:(NSString*)oldName toNewName:(NSString*)newName inPath:(NSString*)path
@@ -111,7 +103,7 @@
         if ([oldName isEqualToString:self.name])
         {
             _name = [newName copy];
-            _icon = nil;
+            _iconInternal = nil;
             return YES;
         }
     }
@@ -137,6 +129,8 @@
     return NO;
 }
 
+#pragma mark - Private
+
 - (instancetype)initWithFolder:(BOOL)isFolder name:(NSString*)name path:(NSString*)path torrent:(Torrent*)torrent
 {
     if ((self = [super init]))
@@ -145,7 +139,7 @@
         _name = [name copy];
         _path = [path copy];
 
-        _indexes = [[NSMutableIndexSet alloc] init];
+        _indexesInternal = [[NSMutableIndexSet alloc] init];
 
         _torrent = torrent;
     }

@@ -40,7 +40,7 @@ TEST_F(RpcTest, list)
 
     tr_rpc_parse_list_str(&top, "6,7"sv);
     EXPECT_TRUE(tr_variantIsList(&top));
-    EXPECT_EQ(2, tr_variantListSize(&top));
+    EXPECT_EQ(2U, tr_variantListSize(&top));
     EXPECT_TRUE(tr_variantGetInt(tr_variantListChild(&top, 0), &i));
     EXPECT_EQ(6, i);
     EXPECT_TRUE(tr_variantGetInt(tr_variantListChild(&top, 1), &i));
@@ -55,7 +55,7 @@ TEST_F(RpcTest, list)
 
     tr_rpc_parse_list_str(&top, "1,3-5"sv);
     EXPECT_TRUE(tr_variantIsList(&top));
-    EXPECT_EQ(4, tr_variantListSize(&top));
+    EXPECT_EQ(4U, tr_variantListSize(&top));
     EXPECT_TRUE(tr_variantGetInt(tr_variantListChild(&top, 0), &i));
     EXPECT_EQ(1, i);
     EXPECT_TRUE(tr_variantGetInt(tr_variantListChild(&top, 1), &i));
@@ -79,7 +79,7 @@ TEST_F(RpcTest, sessionGet)
         tr_variantInitBool(response, false);
     };
 
-    auto* tor = zeroTorrentInit();
+    auto* tor = zeroTorrentInit(ZeroTorrentState::NoFiles);
     EXPECT_NE(nullptr, tor);
 
     tr_variant request;
@@ -94,7 +94,7 @@ TEST_F(RpcTest, sessionGet)
     EXPECT_TRUE(tr_variantDictFindDict(&response, TR_KEY_arguments, &args));
 
     // what we expected
-    auto const expected_keys = std::array<tr_quark, 55>{
+    auto const expected_keys = std::array<tr_quark, 58>{
         TR_KEY_alt_speed_down,
         TR_KEY_alt_speed_enabled,
         TR_KEY_alt_speed_time_begin,
@@ -109,6 +109,7 @@ TEST_F(RpcTest, sessionGet)
         TR_KEY_blocklist_url,
         TR_KEY_cache_size_mb,
         TR_KEY_config_dir,
+        TR_KEY_default_trackers,
         TR_KEY_dht_enabled,
         TR_KEY_download_dir,
         TR_KEY_download_dir_free_space,
@@ -136,6 +137,8 @@ TEST_F(RpcTest, sessionGet)
         TR_KEY_script_torrent_added_filename,
         TR_KEY_script_torrent_done_enabled,
         TR_KEY_script_torrent_done_filename,
+        TR_KEY_script_torrent_done_seeding_enabled,
+        TR_KEY_script_torrent_done_seeding_filename,
         TR_KEY_seed_queue_enabled,
         TR_KEY_seed_queue_size,
         TR_KEY_seedRatioLimit,

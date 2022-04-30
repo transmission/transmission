@@ -4,10 +4,13 @@
 // License text can be found in the licenses/ folder.
 
 #include <array>
-#include <errno.h>
-#include <stdio.h> /* printf */
-#include <stdlib.h> /* atoi */
+#include <cerrno>
+#include <cstdio> /* printf */
+#include <cstdlib> /* atoi */
+#include <iostream>
+#include <string>
 #include <string_view>
+#include <utility>
 
 #ifdef HAVE_SYSLOG
 #include <syslog.h>
@@ -21,12 +24,16 @@
 
 #include <event2/event.h>
 
+#include <fmt/core.h>
+
 #include <libtransmission/transmission.h>
+
 #include <libtransmission/error.h>
 #include <libtransmission/file.h>
+#include <libtransmission/log.h>
 #include <libtransmission/tr-getopt.h>
 #include <libtransmission/tr-macros.h>
-#include <libtransmission/log.h>
+#include <libtransmission/tr-strbuf.h>
 #include <libtransmission/utils.h>
 #include <libtransmission/variant.h>
 #include <libtransmission/version.h>
@@ -53,6 +60,10 @@ static void sd_notifyf(int /*status*/, char const* /*fmt*/, ...)
 #endif
 
 using namespace std::literals;
+
+/***
+****
+***/
 
 static char constexpr MyName[] = "transmission-daemon";
 static char constexpr Usage[] = "Transmission " LONG_VERSION_STRING
@@ -94,15 +105,16 @@ static struct event_base* ev_base = nullptr;
 ****  Config File
 ***/
 
-static auto constexpr Options = std::array<tr_option, 43>{
+static auto constexpr Options = std::array<tr_option, 45>{
     { { 'a', "allowed", "Allowed IP addresses. (Default: " TR_DEFAULT_RPC_WHITELIST ")", "a", true, "<list>" },
       { 'b', "blocklist", "Enable peer blocklists", "b", false, nullptr },
       { 'B', "no-blocklist", "Disable peer blocklists", "B", false, nullptr },
-      { 'c', "watch-dir", "Where to watch for new .torrent files", "c", true, "<directory>" },
+      { 'c', "watch-dir", "Where to watch for new torrent files", "c", true, "<directory>" },
       { 'C', "no-watch-dir", "Disable the watch-dir", "C", false, nullptr },
       { 941, "incomplete-dir", "Where to store new torrents until they're complete", nullptr, true, "<directory>" },
       { 942, "no-incomplete-dir", "Don't store incomplete torrents in a different location", nullptr, false, nullptr },
       { 'd', "dump-settings", "Dump the settings and exit", "d", false, nullptr },
+      { 943, "default-trackers", "Trackers for public torrents to use automatically", nullptr, true, "<list>" },
       { 'e', "logfile", "Dump the log messages to this filename", "e", true, "<filename>" },
       { 'f', "foreground", "Run in the foreground instead of daemonizing", "f", false, nullptr },
       { 'g', "config-dir", "Where to look for configuration files", "g", true, "<path>" },
@@ -112,9 +124,10 @@ static auto constexpr Options = std::array<tr_option, 43>{
       { 'u', "username", "Set username for authentication", "u", true, "<username>" },
       { 'v', "password", "Set password for authentication", "v", true, "<password>" },
       { 'V', "version", "Show version number and exit", "V", false, nullptr },
-      { 810, "log-error", "Show error messages", nullptr, false, nullptr },
-      { 811, "log-info", "Show error and info messages", nullptr, false, nullptr },
-      { 812, "log-debug", "Show error, info, and debug messages", nullptr, false, nullptr },
+      { 810, "log-level", "Must be 'critical', 'error', 'warn', 'info', 'debug', or 'trace'.", nullptr, true, "<level>" },
+      { 811, "log-error", "Deprecated. Use --log-level=error", nullptr, false, nullptr },
+      { 812, "log-info", "Deprecated. Use --log-level=info", nullptr, false, nullptr },
+      { 813, "log-debug", "Deprecated. Use --log-level=debug", nullptr, false, nullptr },
       { 'w', "download-dir", "Where to save downloaded data", "w", true, "<path>" },
       { 800, "paused", "Pause all torrents on startup", nullptr, false, nullptr },
       { 'o', "dht", "Enable distributed hash tables (DHT)", "o", false, nullptr },
@@ -181,7 +194,7 @@ static bool reopen_log_file(char const* filename)
 
     if (old_log_file != TR_BAD_SYS_FILE)
     {
-        tr_sys_file_close(old_log_file, nullptr);
+        tr_sys_file_close(old_log_file);
     }
 
     return true;
@@ -217,14 +230,49 @@ static auto onFileAdded(tr_watchdir_t dir, char const* name, void* vsession)
 {
     auto const* session = static_cast<tr_session const*>(vsession);
 
-    if (!tr_str_has_suffix(name, ".torrent"))
+    if (!tr_str_has_suffix(name, ".torrent") && !tr_str_has_suffix(name, ".magnet"))
     {
         return TR_WATCHDIR_IGNORE;
     }
 
-    auto filename = tr_strvPath(tr_watchdir_get_path(dir), name);
-    tr_ctor* ctor = tr_ctorNew(session);
-    if (!tr_ctorSetMetainfoFromFile(ctor, filename.c_str(), nullptr))
+    auto const filename = tr_pathbuf{ tr_watchdir_get_path(dir), '/', name };
+    tr_ctor* const ctor = tr_ctorNew(session);
+
+    bool retry = false;
+
+    if (tr_str_has_suffix(name, ".torrent"))
+    {
+        if (!tr_ctorSetMetainfoFromFile(ctor, filename, nullptr))
+        {
+            retry = true;
+        }
+    }
+    else // ".magnet" suffix
+    {
+        auto content = std::vector<char>{};
+        tr_error* error = nullptr;
+        if (!tr_loadFile(filename, content, &error))
+        {
+            tr_logAddWarn(fmt::format(
+                _("Couldn't read '{path}': {error} ({error_code})"),
+                fmt::arg("path", name),
+                fmt::arg("error", error->message),
+                fmt::arg("error_code", error->code)));
+            tr_error_free(error);
+            retry = true;
+        }
+        else
+        {
+            content.push_back('\0'); // zero-terminated string
+            auto const* data = std::data(content);
+            if (!tr_ctorSetMetainfoFromMagnetLink(ctor, data, nullptr))
+            {
+                retry = true;
+            }
+        }
+    }
+
+    if (retry)
     {
         tr_ctorFree(ctor);
         return TR_WATCHDIR_RETRY;
@@ -232,31 +280,32 @@ static auto onFileAdded(tr_watchdir_t dir, char const* name, void* vsession)
 
     if (tr_torrentNew(ctor, nullptr) == nullptr)
     {
-        tr_logAddError("Unable to add .torrent file \"%s\"", name);
+        tr_logAddError(fmt::format(_("Couldn't add torrent file '{path}'"), fmt::arg("path", name)));
     }
     else
     {
         bool trash = false;
         bool const test = tr_ctorGetDeleteSource(ctor, &trash);
 
-        tr_logAddInfo("Parsing .torrent file successful \"%s\"", name);
-
         if (test && trash)
         {
             tr_error* error = nullptr;
 
-            tr_logAddInfo("Deleting input .torrent file \"%s\"", name);
+            tr_logAddInfo(fmt::format(_("Removing torrent file '{path}'"), fmt::arg("path", name)));
 
             if (!tr_sys_path_remove(filename.c_str(), &error))
             {
-                tr_logAddError("Error deleting .torrent file: %s", error->message);
+                tr_logAddError(fmt::format(
+                    _("Couldn't remove '{path}': {error} ({error_code})"),
+                    fmt::arg("path", name),
+                    fmt::arg("error", error->message),
+                    fmt::arg("error_code", error->code)));
                 tr_error_free(error);
             }
         }
         else
         {
-            auto const new_filename = filename + ".added";
-            tr_sys_path_rename(filename.c_str(), new_filename.c_str(), nullptr);
+            tr_sys_path_rename(filename, tr_pathbuf{ filename, ".added"sv });
         }
     }
 
@@ -264,22 +313,41 @@ static auto onFileAdded(tr_watchdir_t dir, char const* name, void* vsession)
     return TR_WATCHDIR_ACCEPT;
 }
 
+static char const* levelName(tr_log_level level)
+{
+    switch (level)
+    {
+    case TR_LOG_CRITICAL:
+        return "CRT";
+    case TR_LOG_ERROR:
+        return "ERR";
+    case TR_LOG_WARN:
+        return "WRN";
+    case TR_LOG_DEBUG:
+        return "dbg";
+    case TR_LOG_TRACE:
+        return "trc";
+    default:
+        return "inf";
+    }
+}
+
 static void printMessage(
     tr_sys_file_t file,
-    [[maybe_unused]] int level,
+    tr_log_level level,
     std::string_view name,
     std::string_view message,
     std::string_view filename,
     int line)
 {
-    auto const out = std::empty(name) ? tr_strvJoin(message, " ("sv, filename, ":"sv, std::to_string(line), ")"sv) :
-                                        tr_strvJoin(name, " "sv, message, " ("sv, filename, ":"sv, std::to_string(line), ")"sv);
+    auto const out = std::empty(name) ? fmt::format(FMT_STRING("{:s} ({:s}:{:d})"), message, filename, line) :
+                                        fmt::format(FMT_STRING("{:s} {:s} ({:s}:{:d})"), name, message, filename, line);
 
     if (file != TR_BAD_SYS_FILE)
     {
         auto timestr = std::array<char, 64>{};
         tr_logGetTimeStr(std::data(timestr), std::size(timestr));
-        tr_sys_file_write_line(file, tr_strvJoin("["sv, std::data(timestr), "] "sv, out), nullptr);
+        tr_sys_file_write_line(file, fmt::format(FMT_STRING("[{:s}] {:s} {:s}"), std::data(timestr), levelName(level), out));
     }
 
 #ifdef HAVE_SYSLOG
@@ -291,16 +359,24 @@ static void printMessage(
         /* figure out the syslog priority */
         switch (level)
         {
+        case TR_LOG_CRITICAL:
+            priority = LOG_CRIT;
+            break;
+
         case TR_LOG_ERROR:
             priority = LOG_ERR;
             break;
 
-        case TR_LOG_DEBUG:
-            priority = LOG_DEBUG;
+        case TR_LOG_WARN:
+            priority = LOG_WARNING;
+            break;
+
+        case TR_LOG_INFO:
+            priority = LOG_INFO;
             break;
 
         default:
-            priority = LOG_INFO;
+            priority = LOG_DEBUG;
             break;
         }
 
@@ -322,7 +398,7 @@ static void pumpLogMessages(tr_sys_file_t file)
 
     if (file != TR_BAD_SYS_FILE)
     {
-        tr_sys_file_flush(file, nullptr);
+        tr_sys_file_flush(file);
     }
 
     tr_logFreeQueue(list);
@@ -414,6 +490,10 @@ static bool parse_args(
 
         case 942:
             tr_variantDictAddBool(settings, TR_KEY_incomplete_dir_enabled, false);
+            break;
+
+        case 943:
+            tr_variantDictAddStr(settings, TR_KEY_default_trackers, optstr);
             break;
 
         case 'd':
@@ -542,14 +622,28 @@ static bool parse_args(
             break;
 
         case 810:
-            tr_variantDictAddInt(settings, TR_KEY_message_level, TR_LOG_ERROR);
+            if (auto const level = tr_logGetLevelFromKey(optstr); level)
+            {
+                tr_variantDictAddInt(settings, TR_KEY_message_level, *level);
+            }
+            else
+            {
+                std::cerr << fmt::format(_("Couldn't parse log level '{level}'"), fmt::arg("level", optstr)) << std::endl;
+            }
             break;
 
         case 811:
-            tr_variantDictAddInt(settings, TR_KEY_message_level, TR_LOG_INFO);
+            std::cerr << "WARN: --log-error is deprecated. Use --log-level=error" << std::endl;
+            tr_variantDictAddInt(settings, TR_KEY_message_level, TR_LOG_ERROR);
             break;
 
         case 812:
+            std::cerr << "WARN: --log-info is deprecated. Use --log-level=info" << std::endl;
+            tr_variantDictAddInt(settings, TR_KEY_message_level, TR_LOG_INFO);
+            break;
+
+        case 813:
+            std::cerr << "WARN: --log-debug is deprecated. Use --log-level=debug" << std::endl;
             tr_variantDictAddInt(settings, TR_KEY_message_level, TR_LOG_DEBUG);
             break;
 
@@ -582,7 +676,7 @@ static void daemon_reconfigure(void* /*arg*/)
 {
     if (mySession == nullptr)
     {
-        tr_logAddInfo("Deferring reload until session is fully started.");
+        tr_logAddInfo(_("Deferring reload until session is fully started."));
         seenHUP = true;
     }
     else
@@ -597,7 +691,7 @@ static void daemon_reconfigure(void* /*arg*/)
         }
 
         configDir = tr_sessionGetConfigDir(mySession);
-        tr_logAddInfo("Reloading settings from \"%s\"", configDir);
+        tr_logAddInfo(fmt::format(_("Reloading settings from '{path}'"), fmt::arg("path", configDir)));
         tr_variantInitDict(&settings, 0);
         tr_variantDictAddBool(&settings, TR_KEY_rpc_enabled, true);
         tr_sessionLoadSettings(&settings, configDir, MyName);
@@ -634,9 +728,12 @@ static int daemon_start(void* varg, [[maybe_unused]] bool foreground)
 
     if (ev_base == nullptr)
     {
-        char buf[256];
-        tr_snprintf(buf, sizeof(buf), "Failed to init daemon event state: %s", tr_strerror(errno));
-        printMessage(logfile, TR_LOG_ERROR, MyName, buf, __FILE__, __LINE__);
+        auto const error_code = errno;
+        auto const errmsg = fmt::format(
+            _("Couldn't initialize daemon: {error} ({error_code})"),
+            fmt::arg("error", tr_strerror(error_code)),
+            fmt::arg("error_code", error_code));
+        printMessage(logfile, TR_LOG_ERROR, MyName, errmsg, __FILE__, __LINE__);
         return 1;
     }
 
@@ -646,7 +743,7 @@ static int daemon_start(void* varg, [[maybe_unused]] bool foreground)
     tr_formatter_speed_init(SpeedK, SpeedKStr, SpeedMStr, SpeedGStr, SpeedTStr);
     session = tr_sessionInit(configDir, true, settings);
     tr_sessionSetRPCCallback(session, on_rpc_callback, nullptr);
-    tr_logAddNamedInfo(nullptr, "Using settings from \"%s\"", configDir);
+    tr_logAddInfo(fmt::format(_("Loading settings from '{path}'"), fmt::arg("path", configDir)));
     tr_sessionSaveSettings(session, configDir, settings);
 
     auto sv = std::string_view{};
@@ -664,21 +761,25 @@ static int daemon_start(void* varg, [[maybe_unused]] bool foreground)
         if (fp != TR_BAD_SYS_FILE)
         {
             auto const out = std::to_string(getpid());
-            tr_sys_file_write(fp, std::data(out), std::size(out), nullptr, nullptr);
-            tr_sys_file_close(fp, nullptr);
-            tr_logAddInfo("Saved pidfile \"%s\"", sz_pid_filename.c_str());
+            tr_sys_file_write(fp, std::data(out), std::size(out), nullptr);
+            tr_sys_file_close(fp);
+            tr_logAddInfo(fmt::format(_("Saved pidfile '{path}'"), fmt::arg("path", sz_pid_filename)));
             pidfile_created = true;
         }
         else
         {
-            tr_logAddError("Unable to save pidfile \"%s\": %s", sz_pid_filename.c_str(), error->message);
+            tr_logAddError(fmt::format(
+                _("Couldn't save '{path}': {error} ({error_code})"),
+                fmt::arg("path", sz_pid_filename),
+                fmt::arg("error", error->message),
+                fmt::arg("error_code", error->code)));
             tr_error_free(error);
         }
     }
 
     if (tr_variantDictFindBool(settings, TR_KEY_rpc_authentication_required, &boolVal) && boolVal)
     {
-        tr_logAddNamedInfo(MyName, "requiring authentication");
+        tr_logAddInfo(_("Requiring authentication"));
     }
 
     mySession = session;
@@ -699,7 +800,7 @@ static int daemon_start(void* varg, [[maybe_unused]] bool foreground)
         (void)tr_variantDictFindStrView(settings, TR_KEY_watch_dir, &dir);
         if (!std::empty(dir))
         {
-            tr_logAddInfo("Watching \"%" TR_PRIsv "\" for new .torrent files", TR_PRIsv_ARG(dir));
+            tr_logAddInfo(fmt::format(_("Watching '{path}' for new torrent files"), fmt::arg("path", dir)));
 
             watchdir = tr_watchdir_new(dir, &onFileAdded, mySession, ev_base, force_generic);
             if (watchdir == nullptr)
@@ -740,13 +841,21 @@ static int daemon_start(void* varg, [[maybe_unused]] bool foreground)
 
         if (status_ev == nullptr)
         {
-            tr_logAddError("Failed to create status event %s", tr_strerror(errno));
+            auto const error_code = errno;
+            tr_logAddError(fmt::format(
+                _("Couldn't create event: {error} ({error_code})"),
+                fmt::arg("error", tr_strerror(error_code)),
+                fmt::arg("error_code", error_code)));
             goto CLEANUP;
         }
 
         if (event_add(status_ev, &one_sec) == -1)
         {
-            tr_logAddError("Failed to add status event %s", tr_strerror(errno));
+            auto const error_code = errno;
+            tr_logAddError(fmt::format(
+                _("Couldn't add event: {error} ({error_code})"),
+                fmt::arg("error", tr_strerror(error_code)),
+                fmt::arg("error_code", error_code)));
             goto CLEANUP;
         }
     }
@@ -756,7 +865,11 @@ static int daemon_start(void* varg, [[maybe_unused]] bool foreground)
     /* Run daemon event loop */
     if (event_base_dispatch(ev_base) == -1)
     {
-        tr_logAddError("Failed to launch daemon event loop: %s", tr_strerror(errno));
+        auto const error_code = errno;
+        tr_logAddError(fmt::format(
+            _("Couldn't launch daemon event loop: {error} ({error_code})"),
+            fmt::arg("error", tr_strerror(error_code)),
+            fmt::arg("error_code", error_code)));
         goto CLEANUP;
     }
 
@@ -793,7 +906,7 @@ CLEANUP:
     /* cleanup */
     if (pidfile_created)
     {
-        tr_sys_path_remove(sz_pid_filename.c_str(), nullptr);
+        tr_sys_path_remove(sz_pid_filename.c_str());
     }
 
     sd_notify(0, "STATUS=\n");
@@ -822,7 +935,7 @@ static bool init_daemon_data(int argc, char* argv[], struct daemon_data* data, b
 
     if (*foreground && logfile == TR_BAD_SYS_FILE)
     {
-        logfile = tr_sys_file_get_std(TR_STD_SYS_FILE_ERR, nullptr);
+        logfile = tr_sys_file_get_std(TR_STD_SYS_FILE_ERR);
     }
 
     if (!loaded)
@@ -868,7 +981,8 @@ int tr_main(int argc, char* argv[])
 
     if (tr_error* error = nullptr; !dtr_daemon(&cb, &data, foreground, &ret, &error))
     {
-        printMessage(logfile, TR_LOG_ERROR, MyName, tr_strvJoin("Failed to daemonize: ", error->message), __FILE__, __LINE__);
+        auto const errmsg = fmt::format(FMT_STRING("Couldn't daemonize: {:s} ({:d})"), error->message, error->code);
+        printMessage(logfile, TR_LOG_ERROR, MyName, errmsg, __FILE__, __LINE__);
         tr_error_free(error);
     }
 

@@ -27,7 +27,7 @@ struct tr_session;
  */
 void tr_setConfigDir(tr_session* session, std::string_view config_dir);
 
-/** @brief return the directory where .torrent files are stored */
+/** @brief return the directory where torrent files are stored */
 char const* tr_getTorrentDir(tr_session const*);
 
 /** @brief return the directory where the Web Client's web ui files are kept */

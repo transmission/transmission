@@ -1,28 +1,23 @@
-# Transmission RPC Specification
-
+# Transmission's RPC specification
 This document describes a protocol for interacting with Transmission sessions remotely.
 
 ### 1.1 Terminology
-
 The [JSON](https://www.json.org/) terminology in [RFC 4627](https://datatracker.ietf.org/doc/html/rfc4627) is used.
 RPC requests and responses are formatted in JSON.
 
 ### 1.2 Tools
-
-If `transmission-remote` is called with a `--debug` argument, its RPC traffic to the Transmission server will be dumped to the terinal. This can be useful when you want to compare requests in your application to another for reference.
+If `transmission-remote` is called with a `--debug` argument, its RPC traffic to the Transmission server will be dumped to the terminal. This can be useful when you want to compare requests in your application to another for reference.
 
 If `transmission-qt` is run with an environment variable `TR_RPC_VERBOSE` set, it too will dump the RPC requests and responses to the terminal for inspection.
 
 Lastly, using devtools in the Transmission web client is always an option.
 
-## 2. Message Format
-
+## 2 Message format
 Messages are formatted as objects. There are two types: requests (described in 2.1) and responses (described in 2.2).
 
 All text **must** be UTF-8 encoded.
 
-### 2.1. Requests
-
+### 2.1 Requests
 Requests support three keys:
 
 1. A required `method` string telling the name of the method to invoke
@@ -42,8 +37,7 @@ Requests support three keys:
 ```
 
 
-### 2.2. Responses
-
+### 2.2 Responses
 Responses to a request will include:
 
 1. A required `result` string whose value MUST be `success` on success, or an error string on failure.
@@ -60,8 +54,7 @@ Responses to a request will include:
 }
 ```
 
-### 2.3. Transport Mechanism
-
+### 2.3 Transport mechanism
 HTTP POSTing a JSON-encoded request is the preferred way of communicating
 with a Transmission RPC server. The current Transmission implementation
 has the default URL as `http://host:9091/transmission/rpc`. Clients
@@ -69,8 +62,7 @@ may use this as a default, but should allow the URL to be reconfigured,
 since the port and path may be changed to allow mapping and/or multiple
 daemons to run on a single server.
 
-#### 2.3.1. CSRF Protection
-
+#### 2.3.1 CSRF protection
 Most Transmission RPC servers require a X-Transmission-Session-Id
 header to be sent with requests, to prevent CSRF attacks.
 
@@ -82,8 +74,7 @@ right `X-Transmission-Session-Id` in its own headers.
 So, the correct way to handle a 409 response is to update your
 `X-Transmission-Session-Id` and to resend the previous request.
 
-#### 2.3.2. DNS Rebinding Protection
-
+#### 2.3.2 DNS rebinding protection
 Additional check is being made on each RPC request to make sure that the
 client sending the request does so using one of the allowed hostnames by
 which RPC server is meant to be available.
@@ -97,8 +88,7 @@ addresses are always implicitly allowed.
 For more information on configuration, see settings.json documentation for
 `rpc-host-whitelist-enabled` and `rpc-host-whitelist` keys.
 
-#### 2.3.3. Authentication
-
+#### 2.3.3 Authentication
 Enabling authentication is an optional security feature that can be enabled
 on Transmission RPC servers. Authentication occurs by method of HTTP Basic
 Access Authentication.
@@ -109,10 +99,8 @@ of this HTTP header is expected to be [`Basic <b64 credentials>`](https://develo
 where <b64 credentials> is equal to a base64 encoded string of the
 username and password (respectively), separated by a colon.
 
-## 3. Torrent Requests
-
-### 3.1. Torrent Action Requests
-
+## 3 Torrent requests
+### 3.1 Torrent action requests
 | Method name          | libtransmission function
 |:--|:--
 | `torrent-start`      | tr_torrentStart
@@ -126,13 +114,12 @@ All torrents are used if the `ids` argument is omitted.
 
 `ids` should be one of the following:
 1. an integer referring to a torrent id
-2. a list of torrent id numbers, sha1 hash strings, or both
+2. a list of torrent id numbers, SHA1 hash strings, or both
 3. a string, `recently-active`, for recently-active torrents
 
 Response arguments: none
 
-### 3.2. Torrent Mutator: `torrent-set`
-
+### 3.2 Torrent mutator: `torrent-set`
 Method name: `torrent-set`
 
 Request arguments:
@@ -142,8 +129,9 @@ Request arguments:
 | `bandwidthPriority`   | number   | this torrent's bandwidth tr_priority_t
 | `downloadLimit`       | number   | maximum download speed (KBps)
 | `downloadLimited`     | boolean  | true if `downloadLimit` is honored
-| `files-wanted`        | array    | indices of file(s) to download
 | `files-unwanted`      | array    | indices of file(s) to not download
+| `files-wanted`        | array    | indices of file(s) to download
+| `group`               | string   | The name of this torrent's bandwidth group
 | `honorsSessionLimits` | boolean  | true if session upload limits are honored
 | `ids`                 | array    | torrent list, as described in 3.1
 | `labels`              | array    | array of string labels
@@ -157,9 +145,10 @@ Request arguments:
 | `seedIdleMode`        | number   | which seeding inactivity to use. See tr_idlelimit
 | `seedRatioLimit`      | double   | torrent-level seeding ratio
 | `seedRatioMode`       | number   | which ratio to use. See tr_ratiolimit
-| `trackerAdd`          | array    | strings of announce URLs to add
-| `trackerRemove`       | array    | ids of trackers to remove
-| `trackerReplace`      | array    | pairs of <trackerId/new announce URLs>
+| `trackerAdd`          | array    | **DEPRECATED** use trackerList instead
+| `trackerList`         | string   | string of announce URLs, one per line, with a blank line between tiers
+| `trackerRemove`       | array    | **DEPRECATED** use trackerList instead
+| `trackerReplace`      | array    | **DEPRECATED** use trackerList instead
 | `uploadLimit`         | number   | maximum upload speed (KBps)
 | `uploadLimited`       | boolean  | true if `uploadLimit` is honored
 
@@ -169,8 +158,7 @@ for `files-wanted`, `files-unwanted`, `priority-high`, `priority-low`, or
 
    Response arguments: none
 
-### 3.3. Torrent Accessor: `torrent-get`
-
+### 3.3 Torrent accessor: `torrent-get`
 Method name: `torrent-get`.
 
 Request arguments:
@@ -227,6 +215,7 @@ The 'source' column here corresponds to the data structure there.
 | `file-count` | number | tr_info
 | `files`| array (see below)| n/a
 | `fileStats`| array (see below)| n/a
+| `group`| string| n/a
 | `hashString`| string| tr_torrent_view
 | `haveUnchecked`| number| tr_stat
 | `haveValid`| number| tr_stat
@@ -269,6 +258,7 @@ The 'source' column here corresponds to the data structure there.
 | `startDate`| number| tr_stat
 | `status`| number (see below)| tr_stat
 | `trackers`| array (see below)| n/a
+' `trackerList` | string | string of announce URLs, one per line, with a blank line between tiers
 | `trackerStats`| array (see below)| n/a
 | `totalSize`| number| tr_torrent_view
 | `torrentFile`| string| tr_info
@@ -435,8 +425,7 @@ Response:
 }
 ```
 
-### 3.4.  Adding a Torrent
-
+### 3.4 Adding a torrent
 Method name: `torrent-add`
 
 Request arguments:
@@ -465,10 +454,9 @@ Response arguments:
 
 * On success, a `torrent-added` object in the form of one of 3.3's torrent objects with the fields for `id`, `name`, and `hashString`.
 
-* On failure due to a duplicate torrent existing, a `torrent-duplicate` object in the same form.
+* When attempting to add a duplicate torrent, a `torrent-duplicate` object in the same form is returned, but the response's `result` value is still `success`.
 
-### 3.5. Removing a Torrent
-
+### 3.5 Removing a torrent
 Method name: `torrent-remove`
 
 | Key | Value Type | Description
@@ -478,8 +466,7 @@ Method name: `torrent-remove`
 
 Response arguments: none
 
-### 3.6. Moving a Torrent
-
+### 3.6 Moving a torrent
 Method name: `torrent-set-location`
 
 Request arguments:
@@ -492,8 +479,7 @@ Request arguments:
 
 Response arguments: none
 
-### 3.7. Renaming a Torrent's Path
-
+### 3.7 Renaming a torrent's path
 Method name: `torrent-rename-path`
 
 For more information on the use of this function, see the transmission.h
@@ -511,10 +497,8 @@ Request arguments:
 
 Response arguments: `path`, `name`, and `id`, holding the torrent ID integer
 
-## 4.  Session Requests
-
-### 4.1. Session Arguments
-
+## 4  Session requests
+### 4.1 Session arguments
 | Key | Value Type | Description
 |:--|:--|:--
 | `alt-speed-down` | number | max global download speed (KBps)
@@ -529,8 +513,10 @@ Response arguments: `path`, `name`, and `id`, holding the torrent ID integer
 | `blocklist-url` | string | location of the blocklist to use for `blocklist-update`
 | `cache-size-mb` | number | maximum size of the disk cache (MB)
 | `config-dir` | string | location of transmission's configuration directory
+| `default-trackers` | list of default trackers to use on public torrents
 | `dht-enabled` | boolean | true means allow dht in public torrents
 | `download-dir` | string | default path to download torrents
+| `download-dir-free-space` | number |  **DEPRECATED** Use the `free-space` method instead.
 | `download-queue-enabled` | boolean | if true, limit how many torrents can be downloaded at once
 | `download-queue-size` | number | max number of torrents to download at once (see download-queue-enabled)
 | `encryption` | string | `required`, `preferred`, `tolerated`
@@ -551,10 +537,12 @@ Response arguments: `path`, `name`, and `id`, holding the torrent ID integer
 | `rpc-version-minimum` | number | the minimum RPC API version supported
 | `rpc-version-semver` | number | the current RPC API version in a semver-compatible string
 | `rpc-version` | number | the current RPC API version
-| `script-torrent-added-enabled` | boolean | whether or not to call the `done` script
+| `script-torrent-added-enabled` | boolean | whether or not to call the `added` script
 | `script-torrent-added-filename` | string | filename of the script to run
 | `script-torrent-done-enabled` | boolean | whether or not to call the `done` script
 | `script-torrent-done-filename` | string | filename of the script to run
+| `script-torrent-done-seeding-enabled` | boolean | whether or not to call the `seeding-done` script
+| `script-torrent-done-seeding-filename` | string | filename of the script to run
 | `seed-queue-enabled` | boolean | if true, limit how many torrents can be uploaded at once
 | `seed-queue-size` | number | max number of torrents to uploaded at once (see seed-queue-enabled)
 | `seedRatioLimit` | double | the default seed ratio for torrents to use
@@ -589,8 +577,7 @@ It is changes when a new version of Transmission changes the RPC interface
 in a way that is not backwards compatible. There are no plans for this
 to be common behavior.
 
-#### 4.1.1. Mutators
-
+#### 4.1.1 Mutators
 Method name: `session-set`
 
 Request arguments: one or more of 4.1's arguments, except: `blocklist-size`,
@@ -599,8 +586,7 @@ Request arguments: one or more of 4.1's arguments, except: `blocklist-size`,
 
 Response arguments: none
 
-#### 4.1.2. Accessors
-
+#### 4.1.2 Accessors
 Method name: `session-get`
 
 Request arguments: an optional `fields` array of keys (see 4.1)
@@ -608,8 +594,7 @@ Request arguments: an optional `fields` array of keys (see 4.1)
 Response arguments: key/value pairs matching the request's `fields`
 argument if present, or all supported fields (see 4.1) otherwise.
 
-### 4.2. Session Statistics
-
+### 4.2 Session statistics
 Method name: `session-stats`
 
 Request arguments: none
@@ -636,16 +621,14 @@ A stats object contains:
 | sessionCount     | number     | tr_session_stats
 | secondsActive    | number     | tr_session_stats
 
-### 4.3. Blocklist
-
+### 4.3 Blocklist
 Method name: `blocklist-update`
 
 Request arguments: none
 
 Response arguments: a number `blocklist-size`
 
-### 4.4. Port Checking
-
+### 4.4 Port checking
 This method tests to see if your incoming peer port is accessible
 from the outside world.
 
@@ -655,8 +638,7 @@ Request arguments: none
 
 Response arguments: a bool, `port-is-open`
 
-### 4.5. Session shutdown
-
+### 4.5 Session shutdown
 This method tells the transmission session to shut down.
 
 Method name: `session-close`
@@ -665,8 +647,7 @@ Request arguments: none
 
 Response arguments: none
 
-### 4.6. Queue Movement Requests
-
+### 4.6 Queue movement requests
 | Method name | transmission.h source
 |:--|:--
 | `queue-move-top` | tr_torrentQueueMoveTop()
@@ -682,8 +663,7 @@ Request arguments:
 
 Response arguments: none
 
-### 4.7. Free Space
-
+### 4.7 Free space
 This method tests how much free space is available in a
 client-specified folder.
 
@@ -692,7 +672,7 @@ Method name: `free-space`
 Request arguments:
 
 | Key | Value type | Description
-|:--|:--
+|:--|:--|:--
 | `path` | string | the directory to query
 
 Response arguments:
@@ -703,9 +683,49 @@ Response arguments:
 | `size-bytes` | number | the size, in bytes, of the free space in that directory
 | `total_size` | number | the total capacity, in bytes, of that directory
 
+### 4.8 Bandwidth groups
+#### 4.8.1 Bandwidth group mutator: `group-set`
+Method name: `group-set`
 
-## 5. Protocol Versions
+Request parameters:
 
+| Key | Value type | Description
+|:--|:--|:--
+| `honorsSessionLimits` | boolean  | true if session upload limits are honored
+| `name` | string | Bandwidth group name
+| `speed-limit-down-enabled` | boolean | true means enabled
+| `speed-limit-down` | number | max global download speed (KBps)
+| `speed-limit-up-enabled` | boolean | true means enabled
+| `speed-limit-up` | number | max global upload speed (KBps)
+
+Response arguments: none
+
+#### 4.8.2 Bandwidth group accessor: `group-get`
+Method name: `group-get`
+
+Request arguments: An optional argument `group`.
+`group` is either a string naming the bandwidth group,
+or a list of such strings.
+If `group` is omitted, all bandwidth groups are used.
+
+Response arguments:
+
+| Key | Value type | Description
+|:--|:--|:--
+|`group`| array | A list of bandwidth group description objects
+
+A bandwidth group description object has:
+
+| Key | Value type | Description
+|:--|:--|:--
+| `honorsSessionLimits` | boolean  | true if session upload limits are honored
+| `name` | string | Bandwidth group name
+| `speed-limit-down-enabled` | boolean | true means enabled
+| `speed-limit-down` | number | max global download speed (KBps)
+| `speed-limit-up-enabled` | boolean | true means enabled
+| `speed-limit-up` | number | max global upload speed (KBps)
+
+## 5 Protocol versions
 This section lists the changes that have been made to the RPC protocol.
 
 There are two ways to check for API compatibility. Since most developers know
@@ -933,26 +953,27 @@ Transmission 4.0.0 (`rpc-version-semver` 5.3.0, `rpc-version`: 17)
 | Method | Description
 |:---|:---
 | `/upload` | :warning: undocumented `/upload` endpoint removed
+| `session-get` | **DEPRECATED** `download-dir-free-space`. Use `free-space` instead.
 | `free-space` | new return arg `total-capacity`
+| `session-get` | new arg `default-trackers`
 | `session-get` | new arg `rpc-version-semver`
 | `session-get` | new arg `script-torrent-added-enabled`
 | `session-get` | new arg `script-torrent-added-filename`
+| `session-get` | new arg `script-torrent-done-seeding-enabled`
+| `session-get` | new arg `script-torrent-done-seeding-filename`
 | `torrent-add` | new arg `labels`
 | `torrent-get` | new arg `file-count`
+| `torrent-get` | new arg `group`
 | `torrent-get` | new arg `percentComplete`
 | `torrent-get` | new arg `primary-mime-type`
 | `torrent-get` | new arg `tracker.sitename`
 | `torrent-get` | new arg `trackerStats.sitename`
+| `torrent-get` | new arg `trackerList`
+| `torrent-set` | new arg `group`
+| `torrent-set` | new arg `trackerList`
+| `torrent-set` | **DEPRECATED** `trackerAdd`. Use `trackerList` instead.
+| `torrent-set` | **DEPRECATED** `trackerRemove`. Use `trackerList` instead.
+| `torrent-set` | **DEPRECATED** `trackerReplace`. Use `trackerList` instead.
+| `group-set` | new method
+| `group-get` | new method
 
-
-### 5.1. Upcoming Breakage
-
-These features are deprecated:
-
-1. session-get's 'download-dir-free-space' argument will be removed.
-   Its functionality has been superceded by the 'free-space' method.
-
-2. HTTP POSTs to http://server:port/transmission/upload will fail.
-   This was an undocumented hack to allow web clients to add files without
-   client-side access to the file. This functionality is superceded by
-   using HTML5's FileReader object + the documented 'torrent-add' method.

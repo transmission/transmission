@@ -4,15 +4,10 @@
 
 #import <Cocoa/Cocoa.h>
 
-@class Torrent;
-
 @interface FileOutlineView : NSOutlineView
-{
-    NSInteger fMouseRow;
-}
-
-- (NSRect)iconRectForRow:(int)row;
 
 @property(nonatomic, readonly) NSInteger hoveredRow;
+
+- (NSRect)iconRectForRow:(NSInteger)row;
 
 @end

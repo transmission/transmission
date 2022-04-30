@@ -2,7 +2,7 @@
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
-#import <Cocoa/Cocoa.h>
+#import <Foundation/Foundation.h>
 
 typedef NS_ENUM(unsigned int, port_status_t) { //
     PORT_STATUS_CHECKING,
@@ -12,19 +12,10 @@ typedef NS_ENUM(unsigned int, port_status_t) { //
 };
 
 @interface PortChecker : NSObject
-{
-    id fDelegate;
-    port_status_t fStatus;
 
-    NSURLConnection* fConnection;
-    NSMutableData* fPortProbeData;
-
-    NSTimer* fTimer;
-}
+@property(nonatomic, readonly) port_status_t status;
 
 - (instancetype)initForPort:(NSInteger)portNumber delay:(BOOL)delay withDelegate:(id)delegate;
 - (void)cancelProbe;
-
-@property(nonatomic, readonly) port_status_t status;
 
 @end

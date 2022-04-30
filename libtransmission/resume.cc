@@ -9,6 +9,9 @@
 #include <string_view>
 #include <vector>
 
+#include <fmt/core.h>
+#include <fmt/format.h> // fmt::ptr
+
 #include "transmission.h"
 
 #include "error.h"
@@ -77,14 +80,14 @@ static auto loadPeers(tr_variant* dict, tr_torrent* tor)
     if (tr_variantDictFindRaw(dict, TR_KEY_peers2, &str, &len))
     {
         size_t const numAdded = addPeers(tor, str, len);
-        tr_logAddTorDbg(tor, "Loaded %zu IPv4 peers from resume file", numAdded);
+        tr_logAddTraceTor(tor, fmt::format("Loaded {} IPv4 peers from resume file", numAdded));
         ret = tr_resume::Peers;
     }
 
     if (tr_variantDictFindRaw(dict, TR_KEY_peers2_6, &str, &len))
     {
         size_t const numAdded = addPeers(tor, str, len);
-        tr_logAddTorDbg(tor, "Loaded %zu IPv6 peers from resume file", numAdded);
+        tr_logAddTraceTor(tor, fmt::format("Loaded {} IPv6 peers from resume file", numAdded));
         ret = tr_resume::Peers;
     }
 
@@ -101,7 +104,7 @@ static void saveLabels(tr_variant* dict, tr_torrent const* tor)
     tr_variant* list = tr_variantDictAddList(dict, TR_KEY_labels, std::size(labels));
     for (auto const& label : labels)
     {
-        tr_variantListAddStr(list, label);
+        tr_variantListAddQuark(list, label);
     }
 }
 
@@ -113,17 +116,40 @@ static auto loadLabels(tr_variant* dict, tr_torrent* tor)
         return tr_resume::fields_t{};
     }
 
-    int const n = tr_variantListSize(list);
-    for (int i = 0; i < n; ++i)
+    auto const n = tr_variantListSize(list);
+    auto labels = std::vector<tr_quark>{};
+    labels.reserve(n);
+    for (size_t i = 0; i < n; ++i)
     {
         auto sv = std::string_view{};
         if (tr_variantGetStrView(tr_variantListChild(list, i), &sv) && !std::empty(sv))
         {
-            tor->labels.emplace(sv);
+            labels.emplace_back(tr_quark_new(sv));
         }
     }
 
+    tor->setLabels(std::data(labels), std::size(labels));
     return tr_resume::Labels;
+}
+
+/***
+****
+***/
+
+static void saveGroup(tr_variant* dict, tr_torrent const* tor)
+{
+    tr_variantDictAddStrView(dict, TR_KEY_group, tor->bandwidthGroup());
+}
+
+static auto loadGroup(tr_variant* dict, tr_torrent* tor)
+{
+    if (std::string_view group_name; tr_variantDictFindStrView(dict, TR_KEY_group, &group_name) && !std::empty(group_name))
+    {
+        tor->setBandwidthGroup(group_name);
+        return tr_resume::Group;
+    }
+
+    return tr_resume::fields_t{};
 }
 
 /***
@@ -174,13 +200,13 @@ static auto loadDND(tr_variant* dict, tr_torrent* tor)
     }
     else
     {
-        tr_logAddTorDbg(
+        tr_logAddDebugTor(
             tor,
-            "Couldn't load DND flags. DND list (%p) has %zu"
-            " children; torrent has %d files",
-            (void*)list,
-            tr_variantListSize(list),
-            (int)n);
+            fmt::format(
+                "Couldn't load DND flags. DND list {} has {} children; torrent has {} files",
+                fmt::ptr(list),
+                tr_variantListSize(list),
+                n));
     }
 
     return ret;
@@ -479,7 +505,7 @@ static void saveProgress(tr_variant* dict, tr_torrent const* tor)
 }
 
 /*
- * Transmisison has iterated through a few strategies here, so the
+ * Transmission has iterated through a few strategies here, so the
  * code has some added complexity to support older approaches.
  *
  * Current approach: 'progress' is a dict with two entries:
@@ -564,7 +590,7 @@ static auto loadProgress(tr_variant* dict, tr_torrent* tor)
 
         if (std::size(mtimes) != n_files)
         {
-            tr_logAddTorErr(tor, "got %zu mtimes; expected %zu", std::size(mtimes), size_t(n_files));
+            tr_logAddDebugTor(tor, fmt::format("Couldn't load mtimes: expected {} got {}", std::size(mtimes), n_files));
             // if resizing grows the vector, we'll get 0 mtimes for the
             // new items which is exactly what we want since the pieces
             // in an unknown state should be treated as untested
@@ -613,7 +639,7 @@ static auto loadProgress(tr_variant* dict, tr_torrent* tor)
 
         if (err != nullptr)
         {
-            tr_logAddTorDbg(tor, "Torrent needs to be verified - %s", err);
+            tr_logAddDebugTor(tor, fmt::format("Torrent needs to be verified - {}", err));
         }
         else
         {
@@ -651,7 +677,7 @@ static auto loadFromFile(tr_torrent* tor, tr_resume::fields_t fieldsToLoad, bool
     auto buf = std::vector<char>{};
     tr_error* error = nullptr;
     auto top = tr_variant{};
-    if (!tr_loadFile(buf, filename, &error) ||
+    if (!tr_loadFile(filename, buf, &error) ||
         !tr_variantFromBuf(
             &top,
             TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_INPLACE,
@@ -659,12 +685,12 @@ static auto loadFromFile(tr_torrent* tor, tr_resume::fields_t fieldsToLoad, bool
             nullptr,
             &error))
     {
-        tr_logAddTorDbg(tor, "Couldn't read \"%s\": %s", filename.c_str(), error->message);
+        tr_logAddDebugTor(tor, fmt::format("Couldn't read '{}': {}", filename, error->message));
         tr_error_clear(&error);
         return fields_loaded;
     }
 
-    tr_logAddTorDbg(tor, "Read resume file \"%s\"", filename.c_str());
+    tr_logAddDebugTor(tor, fmt::format("Read resume file '{}'", filename));
 
     auto boolVal = false;
     auto i = int64_t{};
@@ -716,7 +742,7 @@ static auto loadFromFile(tr_torrent* tor, tr_resume::fields_t fieldsToLoad, bool
 
     if ((fieldsToLoad & tr_resume::MaxPeers) != 0 && tr_variantDictFindInt(&top, TR_KEY_max_peers, &i))
     {
-        tor->maxConnectedPeers = i;
+        tor->max_connected_peers = static_cast<uint16_t>(i);
         fields_loaded |= tr_resume::MaxPeers;
     }
 
@@ -768,14 +794,22 @@ static auto loadFromFile(tr_torrent* tor, tr_resume::fields_t fieldsToLoad, bool
         fields_loaded |= loadPeers(&top, tor);
     }
 
+    // Note: loadFilenames() must come before loadProgress()
+    // so that loadProgress() -> tor->initCheckedPieces() -> tor->findFile()
+    // will know where to look
+    if ((fieldsToLoad & tr_resume::Filenames) != 0)
+    {
+        fields_loaded |= loadFilenames(&top, tor);
+    }
+
+    // Note: loadProgress should come before loadFilePriorities()
+    // so that we can skip loading priorities iff the torrent is a
+    // seed or a partial seed.
     if ((fieldsToLoad & tr_resume::Progress) != 0)
     {
         fields_loaded |= loadProgress(&top, tor);
     }
 
-    // Only load file priorities if we are actually downloading.
-    // If we're a seed or partial seed, loading it is a waste of time.
-    // NB: this is why loadProgress() comes before loadFilePriorities()
     if (!tor->isDone() && (fieldsToLoad & tr_resume::FilePriorities) != 0)
     {
         fields_loaded |= loadFilePriorities(&top, tor);
@@ -801,11 +835,6 @@ static auto loadFromFile(tr_torrent* tor, tr_resume::fields_t fieldsToLoad, bool
         fields_loaded |= loadIdleLimits(&top, tor);
     }
 
-    if ((fieldsToLoad & tr_resume::Filenames) != 0)
-    {
-        fields_loaded |= loadFilenames(&top, tor);
-    }
-
     if ((fieldsToLoad & tr_resume::Name) != 0)
     {
         fields_loaded |= loadName(&top, tor);
@@ -814,6 +843,11 @@ static auto loadFromFile(tr_torrent* tor, tr_resume::fields_t fieldsToLoad, bool
     if ((fieldsToLoad & tr_resume::Labels) != 0)
     {
         fields_loaded |= loadLabels(&top, tor);
+    }
+
+    if ((fieldsToLoad & tr_resume::Group) != 0)
+    {
+        fields_loaded |= loadGroup(&top, tor);
     }
 
     /* loading the resume file triggers of a lot of changes,
@@ -839,7 +873,7 @@ static auto setFromCtor(tr_torrent* tor, tr_resume::fields_t fields, tr_ctor con
         }
     }
 
-    if (((fields & tr_resume::MaxPeers) != 0) && tr_ctorGetPeerLimit(ctor, mode, &tor->maxConnectedPeers))
+    if (((fields & tr_resume::MaxPeers) != 0) && tr_ctorGetPeerLimit(ctor, mode, &tor->max_connected_peers))
     {
         ret |= tr_resume::MaxPeers;
     }
@@ -857,7 +891,7 @@ static auto setFromCtor(tr_torrent* tor, tr_resume::fields_t fields, tr_ctor con
     return ret;
 }
 
-static auto useManditoryFields(tr_torrent* tor, tr_resume::fields_t fields, tr_ctor const* ctor)
+static auto useMandatoryFields(tr_torrent* tor, tr_resume::fields_t fields, tr_ctor const* ctor)
 {
     return setFromCtor(tor, fields, ctor, TR_FORCE);
 }
@@ -876,7 +910,7 @@ fields_t load(tr_torrent* tor, fields_t fields_to_load, tr_ctor const* ctor, boo
 
     auto ret = fields_t{};
 
-    ret |= useManditoryFields(tor, fields_to_load, ctor);
+    ret |= useMandatoryFields(tor, fields_to_load, ctor);
     fields_to_load &= ~ret;
     ret |= loadFromFile(tor, fields_to_load, did_rename_to_hash_only_name);
     fields_to_load &= ~ret;
@@ -909,12 +943,12 @@ void save(tr_torrent* tor)
 
     tr_variantDictAddInt(&top, TR_KEY_downloaded, tor->downloadedPrev + tor->downloadedCur);
     tr_variantDictAddInt(&top, TR_KEY_uploaded, tor->uploadedPrev + tor->uploadedCur);
-    tr_variantDictAddInt(&top, TR_KEY_max_peers, tor->maxConnectedPeers);
+    tr_variantDictAddInt(&top, TR_KEY_max_peers, tor->max_connected_peers);
     tr_variantDictAddInt(&top, TR_KEY_bandwidth_priority, tr_torrentGetPriority(tor));
     tr_variantDictAddBool(&top, TR_KEY_paused, !tor->isRunning && !tor->isQueued());
     savePeers(&top, tor);
 
-    if (tor->hasMetadata())
+    if (tor->hasMetainfo())
     {
         saveFilePriorities(&top, tor);
         saveDND(&top, tor);
@@ -927,10 +961,12 @@ void save(tr_torrent* tor)
     saveFilenames(&top, tor);
     saveName(&top, tor);
     saveLabels(&top, tor);
+    saveGroup(&top, tor);
 
-    if (auto const err = tr_variantToFile(&top, TR_VARIANT_FMT_BENC, tor->resumeFile()); err != 0)
+    auto const resume_file = tor->resumeFile();
+    if (auto const err = tr_variantToFile(&top, TR_VARIANT_FMT_BENC, resume_file); err != 0)
     {
-        tor->setLocalError(tr_strvJoin("Unable to save resume file: ", tr_strerror(err)));
+        tor->setLocalError(fmt::format(FMT_STRING("Unable to save resume file: {:s}"), tr_strerror(err)));
     }
 
     tr_variantFree(&top);

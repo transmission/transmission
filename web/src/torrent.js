@@ -393,16 +393,10 @@ export class Torrent extends EventTarget {
 
     // maybe filter by labels...
     if (pass) {
-      for (const l of labels) {
-        let m = false;
-        for (let j = 0; j < this.getLabels().length; j++) {
-          if (l === this.getLabels()[j]) {
-            m = true;
-            break;
-          }
-        }
-
-        pass = pass && m;
+      // pass if this torrent has any of these labels
+      const torrent_labels = this.getLabels();
+      if (torrent_labels.length > 0) {
+        pass = labels.some((label) => torrent_labels.includes(label));
       }
     }
 

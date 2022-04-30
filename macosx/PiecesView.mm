@@ -23,37 +23,51 @@ enum
     PIECE_FLASHING
 };
 
+@interface PiecesView ()
+
+@property(nonatomic) int8_t* fPieces;
+
+@property(nonatomic) NSColor* fGreenAvailabilityColor;
+@property(nonatomic) NSColor* fBluePieceColor;
+
+@property(nonatomic) NSInteger fNumPieces;
+@property(nonatomic) NSInteger fAcross;
+@property(nonatomic) NSInteger fWidth;
+@property(nonatomic) NSInteger fExtraBorder;
+
+@end
+
 @implementation PiecesView
 
 - (void)awakeFromNib
 {
     //store box colors
-    fGreenAvailabilityColor = [NSColor colorWithCalibratedRed:0.0 green:1.0 blue:0.4 alpha:1.0];
-    fBluePieceColor = [NSColor colorWithCalibratedRed:0.0 green:0.4 blue:0.8 alpha:1.0];
+    self.fGreenAvailabilityColor = [NSColor colorWithCalibratedRed:0.0 green:1.0 blue:0.4 alpha:1.0];
+    self.fBluePieceColor = [NSColor colorWithCalibratedRed:0.0 green:0.4 blue:0.8 alpha:1.0];
 
     //actually draw the box
-    [self setTorrent:nil];
+    self.torrent = nil;
 }
 
 - (void)dealloc
 {
-    tr_free(fPieces);
+    tr_free(_fPieces);
 }
 
 - (void)setTorrent:(Torrent*)torrent
 {
     [self clearView];
 
-    fTorrent = (torrent && !torrent.magnet) ? torrent : nil;
-    if (fTorrent)
+    _torrent = (torrent && !torrent.magnet) ? torrent : nil;
+    if (_torrent)
     {
         //determine relevant values
-        fNumPieces = MIN(fTorrent.pieceCount, MAX_ACROSS * MAX_ACROSS);
-        fAcross = ceil(sqrt(fNumPieces));
+        _fNumPieces = MIN(_torrent.pieceCount, MAX_ACROSS * MAX_ACROSS);
+        _fAcross = ceil(sqrt(_fNumPieces));
 
         CGFloat const width = self.bounds.size.width;
-        fWidth = (width - (fAcross + 1) * BETWEEN) / fAcross;
-        fExtraBorder = (width - ((fWidth + BETWEEN) * fAcross + BETWEEN)) / 2;
+        _fWidth = (width - (_fAcross + 1) * BETWEEN) / _fAcross;
+        _fExtraBorder = (width - ((_fWidth + BETWEEN) * _fAcross + BETWEEN)) / 2;
     }
 
     NSImage* back = [[NSImage alloc] initWithSize:self.bounds.size];
@@ -71,100 +85,100 @@ enum
 
 - (void)clearView
 {
-    tr_free(fPieces);
-    fPieces = NULL;
+    tr_free(self.fPieces);
+    self.fPieces = NULL;
 }
 
 - (void)updateView
 {
-    if (!fTorrent)
+    if (!self.torrent)
     {
         return;
     }
 
     //determine if first time
-    BOOL const first = fPieces == NULL;
+    BOOL const first = self.fPieces == NULL;
     if (first)
     {
-        fPieces = (int8_t*)tr_malloc(fNumPieces * sizeof(int8_t));
+        self.fPieces = (int8_t*)tr_malloc(self.fNumPieces * sizeof(int8_t));
     }
 
     int8_t* pieces = NULL;
     float* piecesPercent = NULL;
 
-    BOOL const showAvailablity = [NSUserDefaults.standardUserDefaults boolForKey:@"PiecesViewShowAvailability"];
-    if (showAvailablity)
+    BOOL const showAvailability = [NSUserDefaults.standardUserDefaults boolForKey:@"PiecesViewShowAvailability"];
+    if (showAvailability)
     {
-        pieces = (int8_t*)tr_malloc(fNumPieces * sizeof(int8_t));
-        [fTorrent getAvailability:pieces size:fNumPieces];
+        pieces = (int8_t*)tr_malloc(self.fNumPieces * sizeof(int8_t));
+        [self.torrent getAvailability:pieces size:self.fNumPieces];
     }
     else
     {
-        piecesPercent = (float*)tr_malloc(fNumPieces * sizeof(float));
-        [fTorrent getAmountFinished:piecesPercent size:fNumPieces];
+        piecesPercent = (float*)tr_malloc(self.fNumPieces * sizeof(float));
+        [self.torrent getAmountFinished:piecesPercent size:self.fNumPieces];
     }
 
     NSImage* image = self.image;
 
-    NSRect fillRects[fNumPieces];
-    NSColor* fillColors[fNumPieces];
+    NSRect fillRects[self.fNumPieces];
+    NSColor* fillColors[self.fNumPieces];
 
     NSInteger usedCount = 0;
 
-    for (NSInteger index = 0; index < fNumPieces; index++)
+    for (NSInteger index = 0; index < self.fNumPieces; index++)
     {
         NSColor* pieceColor = nil;
 
-        if (showAvailablity ? pieces[index] == -1 : piecesPercent[index] == 1.0)
+        if (showAvailability ? pieces[index] == -1 : piecesPercent[index] == 1.0)
         {
-            if (first || fPieces[index] != PIECE_FINISHED)
+            if (first || self.fPieces[index] != PIECE_FINISHED)
             {
-                if (!first && fPieces[index] != PIECE_FLASHING)
+                if (!first && self.fPieces[index] != PIECE_FLASHING)
                 {
                     pieceColor = NSColor.orangeColor;
-                    fPieces[index] = PIECE_FLASHING;
+                    self.fPieces[index] = PIECE_FLASHING;
                 }
                 else
                 {
-                    pieceColor = fBluePieceColor;
-                    fPieces[index] = PIECE_FINISHED;
+                    pieceColor = self.fBluePieceColor;
+                    self.fPieces[index] = PIECE_FINISHED;
                 }
             }
         }
-        else if (showAvailablity ? pieces[index] == 0 : piecesPercent[index] == 0.0)
+        else if (showAvailability ? pieces[index] == 0 : piecesPercent[index] == 0.0)
         {
-            if (first || fPieces[index] != PIECE_NONE)
+            if (first || self.fPieces[index] != PIECE_NONE)
             {
                 pieceColor = NSColor.whiteColor;
-                fPieces[index] = PIECE_NONE;
+                self.fPieces[index] = PIECE_NONE;
             }
         }
-        else if (showAvailablity && pieces[index] >= HIGH_PEERS)
+        else if (showAvailability && pieces[index] >= HIGH_PEERS)
         {
-            if (first || fPieces[index] != PIECE_HIGH_PEERS)
+            if (first || self.fPieces[index] != PIECE_HIGH_PEERS)
             {
-                pieceColor = fGreenAvailabilityColor;
-                fPieces[index] = PIECE_HIGH_PEERS;
+                pieceColor = self.fGreenAvailabilityColor;
+                self.fPieces[index] = PIECE_HIGH_PEERS;
             }
         }
         else
         {
             //always redraw "mixed"
-            CGFloat percent = showAvailablity ? (CGFloat)pieces[index] / HIGH_PEERS : piecesPercent[index];
-            NSColor* fullColor = showAvailablity ? fGreenAvailabilityColor : fBluePieceColor;
+            CGFloat percent = showAvailability ? (CGFloat)pieces[index] / HIGH_PEERS : piecesPercent[index];
+            NSColor* fullColor = showAvailability ? self.fGreenAvailabilityColor : self.fBluePieceColor;
             pieceColor = [NSColor.whiteColor blendedColorWithFraction:percent ofColor:fullColor];
-            fPieces[index] = PIECE_SOME;
+            self.fPieces[index] = PIECE_SOME;
         }
 
         if (pieceColor)
         {
-            NSInteger const across = index % fAcross;
-            NSInteger const down = index / fAcross;
+            NSInteger const across = index % self.fAcross;
+            NSInteger const down = index / self.fAcross;
             fillRects[usedCount] = NSMakeRect(
-                across * (fWidth + BETWEEN) + BETWEEN + fExtraBorder,
-                image.size.width - (down + 1) * (fWidth + BETWEEN) - fExtraBorder,
-                fWidth,
-                fWidth);
+                across * (self.fWidth + BETWEEN) + BETWEEN + self.fExtraBorder,
+                image.size.width - (down + 1) * (self.fWidth + BETWEEN) - self.fExtraBorder,
+                self.fWidth,
+                self.fWidth);
             fillColors[usedCount] = pieceColor;
 
             usedCount++;
@@ -190,7 +204,7 @@ enum
 
 - (void)mouseDown:(NSEvent*)event
 {
-    if (fTorrent)
+    if (self.torrent)
     {
         BOOL const availability = ![NSUserDefaults.standardUserDefaults boolForKey:@"PiecesViewShowAvailability"];
         [NSUserDefaults.standardUserDefaults setBool:availability forKey:@"PiecesViewShowAvailability"];

@@ -5,38 +5,14 @@
 #import <Cocoa/Cocoa.h>
 #import <Quartz/Quartz.h>
 
-@protocol InfoViewController;
-@class InfoGeneralViewController;
-@class InfoActivityViewController;
-@class InfoTrackersViewController;
-@class InfoPeersViewController;
-@class InfoFileViewController;
-@class InfoOptionsViewController;
+@class Torrent;
 
 @interface InfoWindowController : NSWindowController
-{
-    NSArray* fTorrents;
 
-    CGFloat fMinWindowWidth;
+@property(nonatomic, readonly) NSArray<NSURL*>* quickLookURLs;
+@property(nonatomic, readonly) BOOL canQuickLook;
 
-    NSViewController<InfoViewController>* fViewController;
-    NSInteger fCurrentTabTag;
-    IBOutlet NSSegmentedControl* fTabs;
-
-    InfoGeneralViewController* fGeneralViewController;
-    InfoActivityViewController* fActivityViewController;
-    InfoTrackersViewController* fTrackersViewController;
-    InfoPeersViewController* fPeersViewController;
-    InfoFileViewController* fFileViewController;
-    InfoOptionsViewController* fOptionsViewController;
-
-    IBOutlet NSImageView* fImageView;
-    IBOutlet NSTextField* fNameField;
-    IBOutlet NSTextField* fBasicInfoField;
-    IBOutlet NSTextField* fNoneSelectedField;
-}
-
-- (void)setInfoForTorrents:(NSArray*)torrents;
+- (void)setInfoForTorrents:(NSArray<Torrent*>*)torrents;
 - (void)updateInfoStats;
 - (void)updateOptions;
 
@@ -45,8 +21,6 @@
 - (void)setNextTab;
 - (void)setPreviousTab;
 
-@property(nonatomic, readonly) NSArray* quickLookURLs;
-@property(nonatomic, readonly) BOOL canQuickLook;
 - (NSRect)quickLookSourceFrameForPreviewItem:(id<QLPreviewItem>)item;
 
 @end

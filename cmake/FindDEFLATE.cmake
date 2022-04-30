@@ -9,7 +9,7 @@ endif()
 
 if(UNIX)
   find_package(PkgConfig QUIET)
-  # cmake supported added in libdeflate v1.9
+  # pkg-config support added in libdeflate v1.9
   pkg_check_modules(_DEFLATE libdeflate>=${DEFLATE_MINIMUM})
 endif()
 

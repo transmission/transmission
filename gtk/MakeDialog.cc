@@ -3,11 +3,14 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include <iostream>
 #include <memory>
 #include <string>
 
 #include <glibmm.h>
 #include <glibmm/i18n.h>
+
+#include <fmt/core.h>
 
 #include <libtransmission/transmission.h>
 #include <libtransmission/makemeta.h>
@@ -109,11 +112,11 @@ bool MakeProgressDialog::onProgressDialogRefresh()
     /* progress label */
     if (!builder_.isDone)
     {
-        str = gtr_sprintf(_("Creating \"%s\""), base);
+        str = fmt::format(_("Creating '{path}'"), fmt::arg("path", base));
     }
     else if (builder_.result == TrMakemetaResult::OK)
     {
-        str = gtr_sprintf(_("Created \"%s\"!"), base);
+        str = fmt::format(_("Created '{path}'"), fmt::arg("path", base));
     }
     else if (builder_.result == TrMakemetaResult::CANCELLED)
     {
@@ -121,15 +124,23 @@ bool MakeProgressDialog::onProgressDialogRefresh()
     }
     else if (builder_.result == TrMakemetaResult::ERR_URL)
     {
-        str = gtr_sprintf(_("Error: invalid announce URL \"%s\""), builder_.errfile);
+        str = fmt::format(_("Unsupported URL: '{url}'"), fmt::arg("url", builder_.errfile));
     }
     else if (builder_.result == TrMakemetaResult::ERR_IO_READ)
     {
-        str = gtr_sprintf(_("Error reading \"%s\": %s"), builder_.errfile, Glib::strerror(builder_.my_errno));
+        str = fmt::format(
+            _("Couldn't read '{path}': {error} ({error_code})"),
+            fmt::arg("path", builder_.errfile),
+            fmt::arg("error", Glib::strerror(builder_.my_errno)),
+            fmt::arg("error_code", builder_.my_errno));
     }
     else if (builder_.result == TrMakemetaResult::ERR_IO_WRITE)
     {
-        str = gtr_sprintf(_("Error writing \"%s\": %s"), builder_.errfile, Glib::strerror(builder_.my_errno));
+        str = fmt::format(
+            _("Couldn't save '{path}': {error} ({error_code})"),
+            fmt::arg("path", builder_.errfile),
+            fmt::arg("error", Glib::strerror(builder_.my_errno)),
+            fmt::arg("error_code", builder_.my_errno));
     }
     else
     {
@@ -146,7 +157,9 @@ bool MakeProgressDialog::onProgressDialogRefresh()
     else
     {
         /* how much data we've scanned through to generate checksums */
-        str = gtr_sprintf(_("Scanned %s"), tr_strlsize((uint64_t)builder_.pieceIndex * (uint64_t)builder_.pieceSize));
+        str = fmt::format(
+            _("Scanned {file_size}"),
+            fmt::arg("file_size", tr_strlsize((uint64_t)builder_.pieceIndex * (uint64_t)builder_.pieceSize)));
     }
 
     progress_bar_->set_fraction(fraction);
@@ -264,7 +277,7 @@ void MakeDialog::Impl::onResponse(int response)
             /* destination file */
             auto const dir = destination_chooser_->get_filename();
             auto const base = Glib::path_get_basename(builder_->top);
-            auto const target = gtr_sprintf("%s/%s.torrent", dir, base).raw();
+            auto const target = gtr_sprintf("%s/%s.torrent", dir, base);
 
             /* build the array of trackers */
             auto const tracker_text = announce_text_buffer_->get_text(false);
@@ -325,9 +338,8 @@ void onSourceToggled(Gtk::ToggleButton* tb, Gtk::Widget* widget)
 void MakeDialog::Impl::updatePiecesLabel()
 {
     char const* filename = builder_ != nullptr ? builder_->top : nullptr;
-    Glib::ustring gstr;
 
-    gstr += "<i>";
+    auto gstr = Glib::ustring{ "<i>" };
 
     if (filename == nullptr)
     {
@@ -335,15 +347,18 @@ void MakeDialog::Impl::updatePiecesLabel()
     }
     else
     {
-        gstr += gtr_sprintf(
-            ngettext("%1$s; %2$'d File", "%1$s; %2$'d Files", builder_->fileCount),
-            tr_strlsize(builder_->totalSize),
-            builder_->fileCount);
-        gstr += "; ";
-        gstr += gtr_sprintf(
-            ngettext("%1$'d Piece @ %2$s", "%1$'d Pieces @ %2$s", builder_->pieceCount),
-            builder_->pieceCount,
-            tr_formatter_mem_B(builder_->pieceSize));
+        gstr += fmt::format(
+            ngettext("{total_size} in {file_count:L} file", "{total_size} in {file_count:L} files", builder_->fileCount),
+            fmt::arg("total_size", tr_strlsize(builder_->totalSize)),
+            fmt::arg("file_count", builder_->fileCount));
+        gstr += ' ';
+        gstr += fmt::format(
+            ngettext(
+                "({piece_count} BitTorrent piece @ {piece_size})",
+                "({piece_count} BitTorrent pieces @ {piece_size})",
+                builder_->pieceCount),
+            fmt::arg("piece_count", builder_->pieceCount),
+            fmt::arg("piece_size", tr_formatter_mem_B(builder_->pieceSize)));
     }
 
     gstr += "</i>";
@@ -468,7 +483,7 @@ MakeDialog::Impl::Impl(MakeDialog& dialog, Glib::RefPtr<Session> const& core)
     t->add_row_w(row, *file_radio_, *file_chooser_);
 
     pieces_lb_ = Gtk::make_managed<Gtk::Label>();
-    pieces_lb_->set_markup(_("<i>No source selected</i>"));
+    pieces_lb_->set_markup(fmt::format(FMT_STRING("<i>{:s}</i>"), _("No source selected")));
     t->add_row(row, {}, *pieces_lb_);
 
     t->add_section_divider(row);
@@ -486,9 +501,8 @@ MakeDialog::Impl::Impl(MakeDialog& dialog, Glib::RefPtr<Session> const& core)
     fr->add(*sw);
     v->pack_start(*fr, true, true, 0);
     auto* l = Gtk::make_managed<Gtk::Label>();
-    l->set_markup(
-        _("To add a backup URL, add it on the line after the primary URL.\n"
-          "To add another primary URL, add it after a blank line."));
+    l->set_markup(_(
+        "To add a backup URL, add it on the next line after a primary URL.\nTo add a new primary URL, add it after a blank line."));
     l->set_justify(Gtk::JUSTIFY_LEFT);
     l->set_halign(Gtk::ALIGN_START);
     l->set_valign(Gtk::ALIGN_CENTER);

@@ -7,44 +7,8 @@
 #import "InfoViewController.h"
 
 @interface InfoOptionsViewController : NSViewController<InfoViewController>
-{
-    NSArray* fTorrents;
 
-    BOOL fSet;
-
-    IBOutlet NSPopUpButton* fPriorityPopUp;
-    IBOutlet NSPopUpButton* fRatioPopUp;
-    IBOutlet NSPopUpButton* fIdlePopUp;
-    IBOutlet NSButton* fUploadLimitCheck;
-    IBOutlet NSButton* fDownloadLimitCheck;
-    IBOutlet NSButton* fGlobalLimitCheck;
-    IBOutlet NSButton* fRemoveSeedingCompleteCheck;
-    IBOutlet NSTextField* fUploadLimitField;
-    IBOutlet NSTextField* fDownloadLimitField;
-    IBOutlet NSTextField* fRatioLimitField;
-    IBOutlet NSTextField* fIdleLimitField;
-    IBOutlet NSTextField* fUploadLimitLabel;
-    IBOutlet NSTextField* fDownloadLimitLabel;
-    IBOutlet NSTextField* fIdleLimitLabel;
-    IBOutlet NSTextField* fRatioLimitGlobalLabel;
-    IBOutlet NSTextField* fIdleLimitGlobalLabel;
-    IBOutlet NSTextField* fPeersConnectLabel;
-    IBOutlet NSTextField* fPeersConnectField;
-
-    //remove when we switch to auto layout on 10.7
-    IBOutlet NSTextField* fTransferBandwidthSectionLabel;
-    IBOutlet NSTextField* fPrioritySectionLabel;
-    IBOutlet NSTextField* fPriorityLabel;
-    IBOutlet NSTextField* fSeedingLimitsSectionLabel;
-    IBOutlet NSTextField* fRatioLabel;
-    IBOutlet NSTextField* fInactivityLabel;
-    IBOutlet NSTextField* fAdvancedSectionLabel;
-    IBOutlet NSTextField* fMaxConnectionsLabel;
-
-    NSString* fInitialString;
-}
-
-- (void)setInfoForTorrents:(NSArray*)torrents;
+- (void)setInfoForTorrents:(NSArray<Torrent*>*)torrents;
 - (void)updateInfo;
 - (void)updateOptions;
 
