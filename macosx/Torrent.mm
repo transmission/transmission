@@ -30,8 +30,8 @@
 
 @property(nonatomic) NSImage* fIcon;
 
-@property(nonatomic, copy) NSArray* fileList;
-@property(nonatomic, copy) NSArray* flatFileList;
+@property(nonatomic, copy) NSArray<FileListNode*>* fileList;
+@property(nonatomic, copy) NSArray<FileListNode*>* flatFileList;
 
 @property(nonatomic, copy) NSIndexSet* fPreviousFinishedIndexes;
 @property(nonatomic) NSDate* fPreviousFinishedIndexesDate;
@@ -61,8 +61,8 @@
                       forParent:(FileListNode*)parent
                        fileSize:(uint64_t)size
                           index:(NSInteger)index
-                       flatList:(NSMutableArray*)flatFileList;
-- (void)sortFileList:(NSMutableArray*)fileNodes;
+                       flatList:(NSMutableArray<FileListNode*>*)flatFileList;
+- (void)sortFileList:(NSMutableArray<FileListNode*>*)fileNodes;
 
 - (void)startQueue;
 - (void)completenessChange:(tr_completeness)status wasRunning:(BOOL)wasRunning;
@@ -70,7 +70,7 @@
 - (void)idleLimitHit;
 - (void)metadataRetrieved;
 - (void)renameFinished:(BOOL)success
-                 nodes:(NSArray*)nodes
+                 nodes:(NSArray<FileListNode*>*)nodes
      completionHandler:(void (^)(BOOL))completionHandler
                oldPath:(NSString*)oldPath
                newName:(NSString*)newName;
@@ -697,7 +697,7 @@ bool trashDataFile(char const* filename, tr_error** error)
     return trackers;
 }
 
-- (NSArray*)allTrackersFlat
+- (NSArray<NSString*>*)allTrackersFlat
 {
     auto const n = tr_torrentTrackerCount(self.fHandle);
     NSMutableArray* allTrackers = [NSMutableArray arrayWithCapacity:n];
@@ -983,7 +983,7 @@ bool trashDataFile(char const* filename, tr_error** error)
     return error;
 }
 
-- (NSArray*)peers
+- (NSArray<NSDictionary*>*)peers
 {
     int totalPeers;
     tr_peer_stat* peers = tr_torrentPeers(self.fHandle, &totalPeers);
@@ -1028,7 +1028,7 @@ bool trashDataFile(char const* filename, tr_error** error)
     return tr_torrentWebseedCount(self.fHandle);
 }
 
-- (NSArray*)webSeeds
+- (NSArray<NSDictionary*>*)webSeeds
 {
     NSUInteger n = tr_torrentWebseedCount(self.fHandle);
     NSMutableArray* webSeeds = [NSMutableArray arrayWithCapacity:n];
@@ -1875,7 +1875,7 @@ bool trashDataFile(char const* filename, tr_error** error)
                 tempNode = [[FileListNode alloc] initWithFolderName:pathComponents[0] path:@"" torrent:self];
             }
 
-            [self insertPathForComponents:pathComponents
+            [self insertPathForComponents:pathComponents //
                        withComponentIndex:1
                                 forParent:tempNode
                                  fileSize:file.length
@@ -1897,12 +1897,12 @@ bool trashDataFile(char const* filename, tr_error** error)
     }
 }
 
-- (void)insertPathForComponents:(NSArray*)components
+- (void)insertPathForComponents:(NSArray<NSString*>*)components
              withComponentIndex:(NSUInteger)componentIndex
                       forParent:(FileListNode*)parent
                        fileSize:(uint64_t)size
                           index:(NSInteger)index
-                       flatList:(NSMutableArray*)flatFileList
+                       flatList:(NSMutableArray<FileListNode*>*)flatFileList
 {
     NSParameterAssert(components.count > 0);
     NSParameterAssert(componentIndex < components.count);
@@ -1945,13 +1945,16 @@ bool trashDataFile(char const* filename, tr_error** error)
     {
         [node insertIndex:index withSize:size];
 
-        [self insertPathForComponents:components withComponentIndex:(componentIndex + 1) forParent:node fileSize:size
+        [self insertPathForComponents:components //
+                   withComponentIndex:componentIndex + 1
+                            forParent:node
+                             fileSize:size
                                 index:index
                              flatList:flatFileList];
     }
 }
 
-- (void)sortFileList:(NSMutableArray*)fileNodes
+- (void)sortFileList:(NSMutableArray<FileListNode*>*)fileNodes
 {
     NSSortDescriptor* descriptor = [NSSortDescriptor sortDescriptorWithKey:@"name" ascending:YES
                                                                   selector:@selector(localizedStandardCompare:)];
@@ -2042,7 +2045,7 @@ bool trashDataFile(char const* filename, tr_error** error)
 }
 
 - (void)renameFinished:(BOOL)success
-                 nodes:(NSArray*)nodes
+                 nodes:(NSArray<FileListNode*>*)nodes
      completionHandler:(void (^)(BOOL))completionHandler
                oldPath:(NSString*)oldPath
                newName:(NSString*)newName

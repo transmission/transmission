@@ -1699,7 +1699,7 @@ static auto getPeerStats(tr_peerMsgs const* peer, time_t now, uint64_t now_msec)
     stats.cancelsToClient = peer->cancelsSentToClient.count(now, CancelHistorySec);
 
     stats.pendingReqsToPeer = peer->swarm->active_requests.count(peer);
-    stats.pendingReqsToClient = peer->pendingReqsToClient;
+    stats.pendingReqsToClient = peer->pendingReqsToClient();
 
     char* pch = stats.flagStr;
 

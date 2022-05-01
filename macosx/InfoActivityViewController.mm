@@ -16,7 +16,7 @@
 
 @interface InfoActivityViewController ()
 
-@property(nonatomic, copy) NSArray* fTorrents;
+@property(nonatomic, copy) NSArray<Torrent*>* fTorrents;
 
 @property(nonatomic) BOOL fSet;
 
@@ -94,7 +94,7 @@
         self.fSeedTimeLabel
     ];
 
-    CGFloat oldMaxWidth = 0.0, originX, newMaxWidth = 0.0;
+    CGFloat oldMaxWidth = 0.0, originX = 0.0, newMaxWidth = 0.0;
     for (NSTextField* label in labels)
     {
         NSRect const oldFrame = label.frame;
@@ -155,7 +155,7 @@
     [NSNotificationCenter.defaultCenter removeObserver:self];
 }
 
-- (void)setInfoForTorrents:(NSArray*)torrents
+- (void)setInfoForTorrents:(NSArray<Torrent*>*)torrents
 {
     //don't check if it's the same in case the metadata changed
     self.fTorrents = torrents;

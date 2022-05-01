@@ -49,6 +49,7 @@
 #include "torrent-metainfo.h"
 #include "torrent.h"
 #include "tr-assert.h"
+#include "tr-assert.h"
 #include "trevent.h" /* tr_runInEventThread() */
 #include "utils.h"
 #include "variant.h"
@@ -1719,7 +1720,7 @@ static void torrentCallScript(tr_torrent const* tor, char const* script)
         return;
     }
 
-    auto torrent_dir = std::string{ tor->currentDir() };
+    auto torrent_dir = tr_pathbuf{ tor->currentDir() };
     tr_sys_path_native_separators(std::data(torrent_dir));
 
     auto const cmd = std::array<char const*, 2>{ script, nullptr };

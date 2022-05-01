@@ -18,7 +18,7 @@
 
 @interface FilterBarController : NSViewController
 
-@property(nonatomic, readonly) NSArray* searchStrings;
+@property(nonatomic, readonly) NSArray<NSString*>* searchStrings;
 
 - (instancetype)init;
 

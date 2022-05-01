@@ -37,7 +37,7 @@ typedef NS_ENUM(unsigned int, tabTag) {
 
 @interface InfoWindowController ()
 
-@property(nonatomic, copy) NSArray* fTorrents;
+@property(nonatomic, copy) NSArray<Torrent*>* fTorrents;
 
 @property(nonatomic) CGFloat fMinWindowWidth;
 
@@ -168,7 +168,7 @@ typedef NS_ENUM(unsigned int, tabTag) {
     }
 }
 
-- (void)setInfoForTorrents:(NSArray*)torrents
+- (void)setInfoForTorrents:(NSArray<Torrent*>*)torrents
 {
     if (self.fTorrents && [self.fTorrents isEqualToArray:torrents])
     {
@@ -403,7 +403,7 @@ typedef NS_ENUM(unsigned int, tabTag) {
     [self.fOptionsViewController updateOptions];
 }
 
-- (NSArray*)quickLookURLs
+- (NSArray<NSURL*>*)quickLookURLs
 {
     return self.fFileViewController.quickLookURLs;
 }
