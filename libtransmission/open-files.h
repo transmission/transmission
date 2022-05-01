@@ -9,9 +9,9 @@
 #error only libtransmission should #include this header.
 #endif
 
-#include <cstdint> // uint64_t
+#include <cstdint>
 #include <optional>
-#include <utility> // std::pair
+#include <utility>
 
 #include "transmission.h"
 
@@ -48,11 +48,17 @@ private:
 
     struct Val
     {
-        Val& operator=(Val const&) = delete;
-        Val& operator=(Val&&) = default;
-        Val() = default;
+        Val() noexcept = default;
         Val(Val const&) = delete;
-        Val(Val&&) = default;
+        Val& operator=(Val const&) = delete;
+        Val(Val&& that) noexcept {
+            *this = std::move(that);
+        }
+        Val& operator=(Val&& that) noexcept {
+            std::swap(this->fd_, that.fd_);
+            std::swap(this->writable_, that.writable_);
+            return *this;
+        }
         ~Val();
 
         tr_sys_file_t fd_ = TR_BAD_SYS_FILE;
