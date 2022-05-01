@@ -34,7 +34,7 @@
 	<key>CFBundleHelpBookName</key>
 	<string>Transmission Help</string>
 	<key>CFBundleIdentifier</key>
-	<string>org.m0k.transmission</string>
+	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>

@@ -255,7 +255,7 @@
 		A2E669790F5B8E5A00B4251A /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2E669780F5B8E5A00B4251A /* Security.framework */; };
 		A2EA52311686AC0D00180493 /* quark.cc in Sources */ = {isa = PBXBuildFile; fileRef = A2EA522F1686AC0D00180493 /* quark.cc */; };
 		A2EA52321686AC0D00180493 /* quark.h in Headers */ = {isa = PBXBuildFile; fileRef = A2EA52301686AC0D00180493 /* quark.h */; };
-		A2EB2E7715C8CF2C00FBD5B4 /* QuickLookPlugin.qlgenerator in CopyFiles */ = {isa = PBXBuildFile; fileRef = A2F35BB915C5A0A100EBF632 /* QuickLookPlugin.qlgenerator */; };
+		A2EB2E7715C8CF2C00FBD5B4 /* QuickLookPlugin.qlgenerator in CopyFiles */ = {isa = PBXBuildFile; fileRef = A2F35BB915C5A0A100EBF632 /* QuickLookPlugin.qlgenerator */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		A2ED7D8F0CEF431B00970975 /* FilterButton.mm in Sources */ = {isa = PBXBuildFile; fileRef = A2ED7D8E0CEF431B00970975 /* FilterButton.mm */; };
 		A2EE726F14DCCC950093C99A /* natpmp_local.h in Headers */ = {isa = PBXBuildFile; fileRef = A2EE726E14DCCC950093C99A /* natpmp_local.h */; };
 		A2F35BBC15C5A0A100EBF632 /* QuickLook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2F35BBB15C5A0A100EBF632 /* QuickLook.framework */; };
@@ -3622,6 +3622,8 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CODE_SIGN_ENTITLEMENTS = macosx/Transmission.entitlements;
+				CODE_SIGN_IDENTITY = "-";
 				ENABLE_HARDENED_RUNTIME = YES;
 				FRAMEWORK_SEARCH_PATHS = macosx;
 				GCC_PREFIX_HEADER = macosx/Transmission_Prefix.pch;
@@ -3645,6 +3647,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_OBJC_ARC = NO;
+				CODE_SIGN_IDENTITY = "-";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					.,
@@ -3663,6 +3666,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_OBJC_ARC = NO;
+				CODE_SIGN_IDENTITY = "-";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					.,
@@ -3684,6 +3688,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_OBJC_ARC = NO;
+				CODE_SIGN_IDENTITY = "-";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					.,
@@ -3757,6 +3762,7 @@
 					"-DFMT_HEADER_ONLY",
 				);
 				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
+				PRODUCT_BUNDLE_IDENTIFIER = org.m0k.transmission;
 				SDKROOT = macosx;
 				STRIP_INSTALLED_PRODUCT = NO;
 			};
@@ -3829,6 +3835,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_OBJC_ARC = NO;
+				CODE_SIGN_IDENTITY = "-";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					.,
@@ -3848,6 +3855,8 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CODE_SIGN_ENTITLEMENTS = macosx/Transmission.entitlements;
+				CODE_SIGN_IDENTITY = "-";
 				ENABLE_HARDENED_RUNTIME = YES;
 				FRAMEWORK_SEARCH_PATHS = macosx;
 				GCC_PREFIX_HEADER = macosx/Transmission_Prefix.pch;
@@ -3925,6 +3934,7 @@
 					"-DNDEBUG",
 				);
 				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
+				PRODUCT_BUNDLE_IDENTIFIER = org.m0k.transmission;
 				SDKROOT = macosx;
 			};
 			name = Release;
@@ -4020,6 +4030,7 @@
 					"-DFMT_HEADER_ONLY",
 				);
 				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
+				PRODUCT_BUNDLE_IDENTIFIER = org.m0k.transmission;
 				SDKROOT = macosx;
 				STRIP_INSTALLED_PRODUCT = NO;
 			};
@@ -4032,6 +4043,8 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CODE_SIGN_ENTITLEMENTS = macosx/Transmission.entitlements;
+				CODE_SIGN_IDENTITY = "-";
 				ENABLE_HARDENED_RUNTIME = YES;
 				FRAMEWORK_SEARCH_PATHS = macosx;
 				GCC_PREFIX_HEADER = macosx/Transmission_Prefix.pch;
@@ -4055,6 +4068,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_OBJC_ARC = NO;
+				CODE_SIGN_IDENTITY = "-";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					.,
@@ -4107,6 +4121,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_OBJC_ARC = NO;
+				CODE_SIGN_IDENTITY = "-";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					.,
@@ -4128,6 +4143,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_OBJC_ARC = NO;
+				CODE_SIGN_IDENTITY = "-";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					.,
@@ -4196,6 +4212,7 @@
 				OTHER_CFLAGS = "$(inherited)";
 				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
 				OTHER_LDFLAGS = "-lc++";
+				PRODUCT_BUNDLE_IDENTIFIER = "org.m0k.transmission.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SYSTEM_HEADER_SEARCH_PATHS = "$(inherited) third-party/fmt/include";
 				WRAPPER_EXTENSION = qlgenerator;
@@ -4218,6 +4235,7 @@
 				OTHER_CFLAGS = "$(inherited)";
 				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
 				OTHER_LDFLAGS = "-lc++";
+				PRODUCT_BUNDLE_IDENTIFIER = "org.m0k.transmission.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SYSTEM_HEADER_SEARCH_PATHS = "$(inherited) third-party/fmt/include";
 				WRAPPER_EXTENSION = qlgenerator;
@@ -4240,6 +4258,7 @@
 				OTHER_CFLAGS = "$(inherited)";
 				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
 				OTHER_LDFLAGS = "-lc++";
+				PRODUCT_BUNDLE_IDENTIFIER = "org.m0k.transmission.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SYSTEM_HEADER_SEARCH_PATHS = "$(inherited) third-party/fmt/include";
 				WRAPPER_EXTENSION = qlgenerator;
@@ -4286,6 +4305,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_OBJC_ARC = NO;
+				CODE_SIGN_IDENTITY = "-";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					.,
@@ -4307,6 +4327,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_OBJC_ARC = NO;
+				CODE_SIGN_IDENTITY = "-";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					.,
@@ -4427,6 +4448,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_OBJC_ARC = NO;
+				CODE_SIGN_IDENTITY = "-";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					.,
@@ -4445,6 +4467,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_OBJC_ARC = NO;
+				CODE_SIGN_IDENTITY = "-";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					.,
@@ -4463,6 +4486,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_OBJC_ARC = NO;
+				CODE_SIGN_IDENTITY = "-";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					.,
@@ -4481,6 +4505,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_OBJC_ARC = NO;
+				CODE_SIGN_IDENTITY = "-";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					.,
@@ -4499,6 +4524,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_OBJC_ARC = NO;
+				CODE_SIGN_IDENTITY = "-";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					.,
@@ -4517,6 +4543,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_OBJC_ARC = NO;
+				CODE_SIGN_IDENTITY = "-";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					.,
@@ -4535,6 +4562,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_OBJC_ARC = NO;
+				CODE_SIGN_IDENTITY = "-";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					.,
@@ -4553,6 +4581,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_OBJC_ARC = NO;
+				CODE_SIGN_IDENTITY = "-";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					.,
@@ -4571,6 +4600,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_OBJC_ARC = NO;
+				CODE_SIGN_IDENTITY = "-";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					.,
