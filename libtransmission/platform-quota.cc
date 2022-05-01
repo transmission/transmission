@@ -142,7 +142,7 @@ static char const* getdev(std::string_view path)
 #endif
 }
 
-static char const* getfstype(char const* device)
+static char const* getfstype(std::string_view device)
 {
 #ifdef HAVE_GETMNTENT
 
@@ -157,7 +157,7 @@ static char const* getfstype(char const* device)
     struct mnttab mnt;
     while (getmntent(fp, &mnt) != -1)
     {
-        if (tr_strcmp0(device, mnt.mnt_mountp) == 0)
+        if (device == mnt.mnt_mountp)
         {
             break;
         }
@@ -177,7 +177,7 @@ static char const* getfstype(char const* device)
     struct mntent const* mnt = nullptr;
     while ((mnt = getmntent(fp)) != nullptr)
     {
-        if (tr_strcmp0(device, mnt->mnt_fsname) == 0)
+        if (device == mnt->mnt_fsname)
         {
             break;
         }
@@ -199,7 +199,7 @@ static char const* getfstype(char const* device)
 
     for (int i = 0; i < n; i++)
     {
-        if (tr_strcmp0(device, mnt[i].f_mntfromname) == 0)
+        if (device == mnt[i].f_mntfromname)
         {
             return mnt[i].f_fstypename;
         }

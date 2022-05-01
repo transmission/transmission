@@ -5,12 +5,15 @@
 
 #pragma once
 
+#include <cstdint> // uint16_t
 #include <optional>
 #include <string>
 #include <string_view>
 #include <utility>
 
 #include "tr-macros.h" // tr_sha1_digest_t
+#include "tr-strbuf.h" // tr_urlbuf
+#include "utils.h"
 
 struct evbuffer;
 
@@ -31,12 +34,11 @@ struct tr_url_parsed_t
     std::string_view authority; // "example.com:80"
     std::string_view host; // "example.com"
     std::string_view sitename; // "example"
-    std::string_view portstr; // "80"
     std::string_view path; // /"over/there"
     std::string_view query; // "name=ferret"
     std::string_view fragment; // "nose"
     std::string_view full; // "http://example.com:80/over/there?name=ferret#nose"
-    int port = -1; // 80
+    uint16_t port = 0;
 };
 
 std::optional<tr_url_parsed_t> tr_urlParse(std::string_view url);
@@ -91,12 +93,24 @@ struct tr_url_query_view
     }
 };
 
-void tr_http_escape(std::string& appendme, std::string_view str, bool escape_reserved);
+template<typename OutputIt>
+void tr_http_escape(OutputIt out, std::string_view in, bool escape_reserved)
+{
+    auto constexpr ReservedChars = std::string_view{ "!*'();:@&=+$,/?%#[]" };
+    auto constexpr UnescapedChars = std::string_view{ "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_.~" };
 
-// TODO: remove evbuffer version
-void tr_http_escape(struct evbuffer* out, std::string_view str, bool escape_reserved);
-
-void tr_http_escape_sha1(char* out, uint8_t const* sha1_digest);
+    for (auto const& ch : in)
+    {
+        if (tr_strvContains(UnescapedChars, ch) || (tr_strvContains(ReservedChars, ch) && !escape_reserved))
+        {
+            out = ch;
+        }
+        else
+        {
+            fmt::format_to(out, "%{:02X}", unsigned(ch & 0xFF));
+        }
+    }
+}
 
 void tr_http_escape_sha1(char* out, tr_sha1_digest_t const& digest);
 

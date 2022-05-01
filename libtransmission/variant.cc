@@ -1203,16 +1203,22 @@ struct evbuffer* tr_variantToBuf(tr_variant const* v, tr_variant_fmt fmt)
 
 std::string tr_variantToStr(tr_variant const* v, tr_variant_fmt fmt)
 {
-    return evbuffer_free_to_str(tr_variantToBuf(v, fmt));
+    auto* const buf = tr_variantToBuf(v, fmt);
+    auto const n = evbuffer_get_length(buf);
+    auto str = std::string{};
+    str.resize(n);
+    evbuffer_copyout(buf, std::data(str), n);
+    evbuffer_free(buf);
+    return str;
 }
 
-int tr_variantToFile(tr_variant const* v, tr_variant_fmt fmt, std::string const& filename)
+int tr_variantToFile(tr_variant const* v, tr_variant_fmt fmt, std::string_view filename)
 {
     auto error_code = int{ 0 };
     auto const contents = tr_variantToStr(v, fmt);
 
     tr_error* error = nullptr;
-    tr_saveFile(filename, { std::data(contents), std::size(contents) }, &error);
+    tr_saveFile(filename, contents, &error);
     if (error != nullptr)
     {
         tr_logAddError(fmt::format(
@@ -1240,20 +1246,14 @@ bool tr_variantFromBuf(tr_variant* setme, int opts, std::string_view buf, char c
     auto locale_ctx = locale_context{};
     use_numeric_locale(&locale_ctx, "C");
 
-    auto success = bool{};
-    if ((opts & TR_VARIANT_PARSE_BENC) != 0)
+    *setme = {};
+
+    auto const success = ((opts & TR_VARIANT_PARSE_BENC) != 0) ? tr_variantParseBenc(*setme, opts, buf, setme_end, error) :
+                                                                 tr_variantParseJson(*setme, opts, buf, setme_end, error);
+
+    if (!success)
     {
-        success = tr_variantParseBenc(*setme, opts, buf, setme_end, error);
-    }
-    else
-    {
-        // TODO: tr_variantParseJson() should take a tr_error* same as ParseBenc
-        auto err = tr_variantParseJson(*setme, opts, buf, setme_end);
-        if (err != 0)
-        {
-            tr_error_set(error, EILSEQ, "error parsing encoded data"sv);
-        }
-        success = err == 0;
+        tr_variantFree(setme);
     }
 
     /* restore the previous locale */
@@ -1262,13 +1262,13 @@ bool tr_variantFromBuf(tr_variant* setme, int opts, std::string_view buf, char c
     return success;
 }
 
-bool tr_variantFromFile(tr_variant* setme, tr_variant_parse_opts opts, std::string const& filename, tr_error** error)
+bool tr_variantFromFile(tr_variant* setme, tr_variant_parse_opts opts, std::string_view filename, tr_error** error)
 {
     // can't do inplace when this function is allocating & freeing the memory...
     TR_ASSERT((opts & TR_VARIANT_PARSE_INPLACE) == 0);
 
     auto buf = std::vector<char>{};
-    if (!tr_loadFile(buf, filename, error))
+    if (!tr_loadFile(filename, buf, error))
     {
         return false;
     }

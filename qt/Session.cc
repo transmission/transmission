@@ -40,7 +40,6 @@
 using ::trqt::variant_helpers::dictAdd;
 using ::trqt::variant_helpers::dictFind;
 using ::trqt::variant_helpers::getValue;
-using ::trqt::variant_helpers::listAdd;
 
 /***
 ****
@@ -245,7 +244,7 @@ void Session::updatePref(int key)
         case Prefs::RPC_PORT:
             if (session_ != nullptr)
             {
-                tr_sessionSetRPCPort(session_, static_cast<tr_port>(prefs_.getInt(key)));
+                tr_sessionSetRPCPort(session_, static_cast<uint16_t>(prefs_.getInt(key)));
             }
 
             break;
@@ -461,17 +460,6 @@ Session::Tag Session::torrentSet(torrent_ids_t const& ids, tr_quark const key, Q
     tr_variantInitDict(&args, 2);
     addOptionalIds(&args, ids);
     dictAdd(&args, key, value);
-    return torrentSetImpl(&args);
-}
-
-Session::Tag Session::torrentSet(torrent_ids_t const& ids, tr_quark const key, QPair<int, QString> const& value)
-{
-    tr_variant args;
-    tr_variantInitDict(&args, 2);
-    addOptionalIds(&args, ids);
-    tr_variant* list(tr_variantDictAddList(&args, key, 2));
-    listAdd(list, value.first);
-    listAdd(list, value.second);
     return torrentSetImpl(&args);
 }
 

@@ -10,7 +10,7 @@
 
 @interface GroupsController ()
 
-@property(nonatomic, readonly) NSMutableArray* fGroups;
+@property(nonatomic, readonly) NSMutableArray<NSMutableDictionary*>* fGroups;
 
 - (void)saveGroups;
 
@@ -40,7 +40,21 @@ GroupsController* fGroupsInstance = nil;
         NSData* data;
         if ((data = [NSUserDefaults.standardUserDefaults dataForKey:@"GroupDicts"]))
         {
-            _fGroups = [NSKeyedUnarchiver unarchiveObjectWithData:data];
+            if (@available(macOS 10.13, *))
+            {
+                _fGroups = [NSKeyedUnarchiver unarchivedObjectOfClasses:[NSSet setWithObjects:NSMutableArray.class,
+                                                                                              NSMutableDictionary.class,
+                                                                                              NSNumber.class,
+                                                                                              NSColor.class,
+                                                                                              NSString.class,
+                                                                                              nil]
+                                                               fromData:data
+                                                                  error:nil];
+            }
+            else
+            {
+                _fGroups = [NSKeyedUnarchiver unarchiveObjectWithData:data];
+            }
         }
         else if ((data = [NSUserDefaults.standardUserDefaults dataForKey:@"Groups"])) //handle old groups
         {
@@ -48,7 +62,7 @@ GroupsController* fGroupsInstance = nil;
             [NSUserDefaults.standardUserDefaults removeObjectForKey:@"Groups"];
             [self saveGroups];
         }
-        else
+        if (_fGroups == nil)
         {
             //default groups
             NSMutableDictionary* red = [NSMutableDictionary
@@ -237,13 +251,14 @@ GroupsController* fGroupsInstance = nil;
     NSInteger const index = candidates.firstIndex;
 
     [self.fGroups addObject:[NSMutableDictionary dictionaryWithObjectsAndKeys:@(index),
-                                                                         @"Index",
-                                                                         [NSColor colorWithCalibratedRed:0.0 green:0.65 blue:1.0
-                                                                                                   alpha:1.0],
-                                                                         @"Color",
-                                                                         @"",
-                                                                         @"Name",
-                                                                         nil]];
+                                                                              @"Index",
+                                                                              [NSColor colorWithCalibratedRed:0.0 green:0.65
+                                                                                                         blue:1.0
+                                                                                                        alpha:1.0],
+                                                                              @"Color",
+                                                                              @"",
+                                                                              @"Name",
+                                                                              nil]];
 
     [NSNotificationCenter.defaultCenter postNotificationName:@"UpdateGroups" object:self];
     [self saveGroups];

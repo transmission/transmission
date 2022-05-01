@@ -304,7 +304,7 @@ bool Application::Impl::refresh_actions()
         sel_->selected_foreach(
             [&canUpdate](auto const& /*path*/, auto const& iter)
             {
-                auto* tor = static_cast<tr_torrent*>(iter->get_value(torrent_cols.torrent));
+                auto const* tor = static_cast<tr_torrent const*>(iter->get_value(torrent_cols.torrent));
                 canUpdate = canUpdate || tr_torrentCanManualUpdate(tor);
             });
         gtr_action_set_sensitive("torrent-reannounce", canUpdate);
@@ -351,7 +351,7 @@ void register_magnet_link_handler()
         auto const msg = fmt::format(
             _("Couldn't register Transmission as a {content_type} handler: {error} ({error_code})"),
             fmt::arg("content_type", content_type),
-            fmt::arg("error", e.what().raw()),
+            fmt::arg("error", e.what()),
             fmt::arg("error_code", e.code()));
         g_warning("%s", msg.c_str());
     }
@@ -424,7 +424,7 @@ bool Application::Impl::on_rpc_changed_idle(tr_rpc_callback_type type, int torre
             tr_variant* oldvals = gtr_pref_get_all();
             tr_quark key;
             std::vector<tr_quark> changed_keys;
-            auto* session = core_->get_session();
+            auto const* const session = core_->get_session();
             tr_variantInitDict(&tmp, 100);
             tr_sessionGetSettings(session, &tmp);
 
@@ -542,12 +542,12 @@ void Application::Impl::on_startup()
     /* ensure the directories are created */
     if (auto const str = gtr_pref_string_get(TR_KEY_download_dir); !str.empty())
     {
-        g_mkdir_with_parents(str.c_str(), 0777);
+        (void)g_mkdir_with_parents(str.c_str(), 0777);
     }
 
     if (auto const str = gtr_pref_string_get(TR_KEY_incomplete_dir); !str.empty())
     {
-        g_mkdir_with_parents(str.c_str(), 0777);
+        (void)g_mkdir_with_parents(str.c_str(), 0777);
     }
 
     /* initialize the libtransmission session */
@@ -600,7 +600,7 @@ void Application::Impl::on_activate()
 
     /* GApplication emits an 'activate' signal when bootstrapping the primary.
      * Ordinarily we handle that by presenting the main window, but if the user
-     * user started Transmission minimized, ignore that initial signal... */
+     * started Transmission minimized, ignore that initial signal... */
     if (is_iconified_ && activation_count_ == 1)
     {
         return;
@@ -720,14 +720,13 @@ void Application::Impl::app_setup()
         w.add_button(_("I _Agree"), Gtk::RESPONSE_ACCEPT);
         w.set_default_response(Gtk::RESPONSE_ACCEPT);
 
-        switch (w.run())
+        if (w.run() == Gtk::RESPONSE_ACCEPT)
         {
-        case Gtk::RESPONSE_ACCEPT:
-            /* only show it once */
+            // only show it once
             gtr_pref_flag_set(TR_KEY_user_has_given_informed_consent, true);
-            break;
-
-        default:
+        }
+        else
+        {
             exit(0);
         }
     }
@@ -898,7 +897,7 @@ void Application::Impl::on_app_exit()
     p->attach(*icon, 0, 0, 1, 2);
 
     auto* top_label = Gtk::make_managed<Gtk::Label>();
-    top_label->set_markup(fmt::format("<b>{}</b>", _("Closing Connections…")));
+    top_label->set_markup(fmt::format(FMT_STRING("<b>{:s}</b>"), _("Closing Connections…")));
     top_label->set_halign(Gtk::ALIGN_START);
     top_label->set_valign(Gtk::ALIGN_CENTER);
     p->attach(*top_label, 1, 0, 1, 1);
@@ -1320,7 +1319,7 @@ bool Application::Impl::call_rpc_for_selected_torrents(std::string const& method
     sel_->selected_foreach(
         [ids](auto const& /*path*/, auto const& iter)
         {
-            auto* tor = static_cast<tr_torrent*>(iter->get_value(torrent_cols.torrent));
+            auto const* const tor = static_cast<tr_torrent*>(iter->get_value(torrent_cols.torrent));
             tr_variantListAddInt(ids, tr_torrentId(tor));
         });
 

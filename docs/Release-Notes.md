@@ -1,4 +1,4 @@
-# Release Notes  #
+# Release Notes #
 ### Transmission 2.92 (2016/03/06) ###
 [http://trac.transmissionbt.com/query?milestone#2.92&group#component&order#severity All tickets closed by this release]
 #### Mac Client ####
@@ -53,7 +53,7 @@
 #### Mac Client ####
   * UI fixes for OS X 10.9+
   * Trim potential URIs from clipboard
-  * Allow downloading files from http servers (not https) on OS X 10.11+
+  * Allow downloading files from HTTP servers (not HTTPS) on OS X 10.11+
   * Change Sparkle Update URL to use HTTPS instead of HTTP (addresses Sparkle vulnerability)
   * Fix global options popover layout
   * Fix building with Xcode 7+
@@ -176,13 +176,13 @@
 #### Daemon ####
   * Change the systemd script to start Transmission after the network's initialized
 #### Web Client ####
-  * Slightly better compression of png files
+  * Slightly better compression of PNG files
 
 ### Transmission 2.80 (2013/06/25) ###
 [http://trac.transmissionbt.com/query?milestone#2.80&group#component&order#severity All tickets closed by this release]
 #### All Platforms ####
   * Support renaming a transfer's files and folders
-  * Remove the most frequent thread locks in libtransmission (ie, fewer beachballs)
+  * Remove the most frequent thread locks in libtransmission (i.e., fewer beachballs)
   * Show the free disk space available when adding torrent
   * Faster reading and parsing of local data files
   * Better use of the OS's filesystem cache
@@ -251,7 +251,7 @@
 #### Qt Client ####
   * Add magnet link support to transmission-qt.desktop
   * Fix notification area bug that inhibited logouts & desktop hibernation
-  * Use the "video" icon when the torrent is an mkv or mp4 file
+  * Use the "video" icon when the torrent is an MKV or mp4 file
   * Toggling the "Append '.part' to incomplete files' names" had no effect
   * Fix display of the torrent name in the Torrent Options dialog
   * Fix cursor point bug in the filterbar's entry field
@@ -335,7 +335,7 @@
   * Control speed limit from the icon tray
   * Improved behavior when clicking on torrents in the torrent list
   * Fix bug where torrent files were not deleted
-  * Fix bug with unicode characters in the default location
+  * Fix bug with Unicode characters in the default location
 #### Web Client ####
   * The file inspector tab displays files nested under directories
   * Improved scrolling on iPad
@@ -604,7 +604,7 @@
 ### Transmission 2.21 (2011/02/08) ###
 [http://trac.transmissionbt.com/query?milestone#2.21&group#component&order#severity All tickets closed by this release]
 #### All Platforms ####
-  * Fix compile error in the the 2.20 tarball
+  * Fix compile error in the 2.20 tarball
 #### GTK+ ####
   * Several updated translations
 #### Qt ####
@@ -768,7 +768,7 @@
   * Fix filename errors for torrents whose files are encoded in ISO-8859-1
   * Fix rare crash on shutdown
   * Fix the RPC server's redirect URL to allow HTTPS proxies like stunnel
-  * Replace less-portable calls with posix nanosleep()
+  * Replace less-portable calls with POSIX nanosleep()
 #### Mac ####
   * Use F_NOCACHE to keep "inactive memory" in check
 #### GTK+ ####
@@ -1054,8 +1054,8 @@ This is a huge listen-to-the-users release -- it uses 103 ideas from users, incl
   * Fix crash on exit when a torrent's Properties dialog is open
   * Fix tracker address display error in the torrent Properties dialog
   * Fix tray menu's main window status when Transmission is started minimized
-  * Fix broken SIGINT (ctrl-c) handling
-  * Fix 1.61 build failure on systems with new versions of glib but older versions of gtk
+  * Fix broken SIGINT (Ctrl-C) handling
+  * Fix 1.61 build failure on systems with new versions of glib but older versions of GTK
 #### Qt ####
   * Fix crash when removing expired torrents from the display
   * Fix client from closing, rather than closing to the system tray, when clicking X
@@ -1119,7 +1119,7 @@ This is a huge listen-to-the-users release -- it uses 103 ideas from users, incl
   * Fix bug where user-configured peer limits could be exceeded
   * Use less memory in some high-peer situations
   * Better estimation of time left to download
-  * Support supportcrypto and requirecrypto flags in http tracker announces
+  * Support supportcrypto and requirecrypto flags in HTTP tracker announces
   * Update to newer snapshots of libnatpmp and miniupnpc
   * Make DHT a compile-time option
 #### GTK+ ####
@@ -1273,7 +1273,7 @@ This is a huge listen-to-the-users release -- it uses 103 ideas from users, incl
   * Use the new blocklist URL when updating the blocklist
 #### Web Client ####
   * On the server, better filtering of bad URLs
-  * On the server, faster json serialization
+  * On the server, faster JSON serialization
   * Fix minor web client 301 redirect error
   * Better Internet Explorer support
 
@@ -1309,7 +1309,7 @@ This is a huge listen-to-the-users release -- it uses 103 ideas from users, incl
 #### Daemon ####
   * Lots of new options added to transmission-remote
   * Fix 1.42 whitelist bug
-  * Make i18n support optional for cli and daemon clients
+  * Make i18n support optional for CLI and daemon clients
 #### CLI ####
   * Support session.json settings, just as the Daemon and GTK+ clients do
 #### Web Client ####
@@ -1332,7 +1332,7 @@ This is a huge listen-to-the-users release -- it uses 103 ideas from users, incl
   * Fix 1.40 "lazy bitfield" error
   * Fix 1.40 "jumpy upload speed" bug
   * Fix handshake peer_id error
-  * Corrrectly handle Windows-style newlines in Bluetack blocklists
+  * Correctly handle Windows-style newlines in Bluetack blocklists
   * More accurate bandwidth measurement
   * File selection & priority was reset when editing a torrent's tracker list
   * Fix autoconf/automake build warnings
@@ -1491,7 +1491,7 @@ This is a huge listen-to-the-users release -- it uses 103 ideas from users, incl
 ### Transmission 1.20 (2008/05/09) ###
 [http://trac.transmissionbt.com/query?milestone#1.20&group#component&order#severity All tickets closed by this release]
 #### All Platforms ####
-  * Support https tracker connections
+  * Support HTTPS tracker connections
   * IP blocking using the Bluetack Level1 blocklist
   * Better support of multitracker torrents
   * Faster UPnP port mapping on startup
@@ -1524,7 +1524,7 @@ This is a huge listen-to-the-users release -- it uses 103 ideas from users, incl
   * Various backend bug fixes & improvements
 #### Mac ####
   * Window when adding torrents to select files and other settings
-  * Leopard: Collapsable group dividers
+  * Leopard: Collapsible group dividers
   * Use the file icon as the per-torrent action button
   * Tracker tab in the inspector
   * Message log specifies the torrent/activity the message relates to

@@ -188,7 +188,7 @@ void MessageLogWindow::Impl::doSave(Gtk::Window& parent, Glib::ustring const& fi
             parent,
             fmt::format(
                 _("Couldn't save '{path}': {error} ({error_code})"),
-                fmt::arg("path", filename.raw()),
+                fmt::arg("path", filename),
                 fmt::arg("error", g_strerror(errcode)),
                 fmt::arg("error_code", errcode)),
             false,
@@ -271,8 +271,7 @@ void setForegroundColor(Gtk::CellRendererText* renderer, tr_log_level level)
         renderer->property_foreground() = "forestgreen";
         break;
 
-    case TR_LOG_INFO:
-    case TR_LOG_OFF:
+    default:
         renderer->property_foreground_set() = false;
         break;
     }

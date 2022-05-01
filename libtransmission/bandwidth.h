@@ -11,8 +11,8 @@
 
 #include <array>
 #include <cstddef> // size_t
+#include <cstdint> // uint64_t
 #include <vector>
-#include <string>
 
 #include "transmission.h"
 
@@ -113,12 +113,12 @@ public:
 
     void setParent(Bandwidth* newParent);
 
-    [[nodiscard]] constexpr tr_priority_t getPriority() const
+    [[nodiscard]] constexpr tr_priority_t getPriority() const noexcept
     {
         return this->priority_;
     }
 
-    constexpr void setPriority(tr_priority_t prio)
+    constexpr void setPriority(tr_priority_t prio) noexcept
     {
         this->priority_ = prio;
     }
@@ -126,7 +126,7 @@ public:
     /**
      * @brief clamps byte_count down to a number that this bandwidth will allow to be consumed
      */
-    [[nodiscard]] unsigned int clamp(tr_direction dir, unsigned int byte_count) const
+    [[nodiscard]] unsigned int clamp(tr_direction dir, unsigned int byte_count) const noexcept
     {
         return this->clamp(0, dir, byte_count);
     }
@@ -211,17 +211,13 @@ public:
 
     static constexpr size_t HistoryMSec = 2000U;
     static constexpr size_t IntervalMSec = HistoryMSec;
-    static constexpr size_t GranularityMSec = 200;
+    static constexpr size_t GranularityMSec = 250;
     static constexpr size_t HistorySize = (IntervalMSec / GranularityMSec);
 
     struct RateControl
     {
-        struct Transfer
-        {
-            uint64_t date_;
-            uint64_t size_;
-        };
-        std::array<Transfer, HistorySize> transfers_;
+        std::array<uint64_t, HistorySize> date_;
+        std::array<uint32_t, HistorySize> size_;
         uint64_t cache_time_;
         unsigned int cache_val_;
         int newest_;
@@ -256,8 +252,8 @@ private:
         std::vector<tr_peerIo*>& peer_pool);
 
     mutable std::array<Band, 2> band_ = {};
-    Bandwidth* parent_ = nullptr;
     std::vector<Bandwidth*> children_;
+    Bandwidth* parent_ = nullptr;
     tr_peerIo* peer_ = nullptr;
     tr_priority_t priority_ = 0;
 };

@@ -12,9 +12,9 @@
 #include <climits> /* PATH_MAX */
 #include <cstdint> /* SIZE_MAX */
 #include <cstdio>
-#include <cstdlib>
 #include <cstring>
 #include <string_view>
+#include <string>
 #include <vector>
 
 #include <dirent.h>
@@ -51,13 +51,14 @@
 #define USE_COPY_FILE_RANGE
 #endif /* __linux__ */
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include "transmission.h"
 #include "error.h"
 #include "file.h"
 #include "log.h"
 #include "tr-assert.h"
+#include "tr-strbuf.h"
 #include "utils.h"
 
 #ifndef O_LARGEFILE
@@ -177,7 +178,7 @@ static bool create_path_require_dir(char const* path, tr_error** error)
 
     if ((sb.st_mode & S_IFMT) != S_IFDIR)
     {
-        tr_error_set(error, ENOTDIR, tr_strvJoin("File is in the way: "sv, path));
+        tr_error_set(error, ENOTDIR, fmt::format(FMT_STRING("File is in the way: {:s}"), path));
         return false;
     }
 
@@ -384,42 +385,30 @@ char* tr_sys_path_resolve(char const* path, tr_error** error)
     return ret;
 }
 
-char* tr_sys_path_basename(std::string_view path, tr_error** error)
+std::string tr_sys_path_basename(std::string_view path, tr_error** error)
 {
-    char* const tmp = tr_strvDup(path);
-    char* ret = basename(tmp);
+    auto tmp = tr_pathbuf{ path };
 
-    if (ret != nullptr)
+    if (char const* ret = basename(std::data(tmp)); ret != nullptr)
     {
-        ret = tr_strdup(ret);
-    }
-    else
-    {
-        set_system_error(error, errno);
+        return ret;
     }
 
-    tr_free(tmp);
-
-    return ret;
+    set_system_error(error, errno);
+    return {};
 }
 
-char* tr_sys_path_dirname(std::string_view path, tr_error** error)
+std::string tr_sys_path_dirname(std::string_view path, tr_error** error)
 {
-    char* const tmp = tr_strvDup(path);
-    char* ret = dirname(tmp);
+    auto tmp = tr_pathbuf{ path };
 
-    if (ret != nullptr)
+    if (char const* ret = dirname(std::data(tmp)); ret != nullptr)
     {
-        ret = tr_strdup(ret);
-    }
-    else
-    {
-        set_system_error(error, errno);
+        return ret;
     }
 
-    tr_free(tmp);
-
-    return ret;
+    set_system_error(error, errno);
+    return {};
 }
 
 bool tr_sys_path_rename(char const* src_path, char const* dst_path, tr_error** error)
@@ -468,7 +457,7 @@ bool tr_sys_path_copy(char const* src_path, char const* dst_path, tr_error** err
     if (!tr_sys_file_get_info(in, &info, error))
     {
         tr_error_prefix(error, "Unable to get information on source file: ");
-        tr_sys_file_close(in, nullptr);
+        tr_sys_file_close(in);
         return false;
     }
 
@@ -476,7 +465,7 @@ bool tr_sys_path_copy(char const* src_path, char const* dst_path, tr_error** err
     if (out == TR_BAD_SYS_FILE)
     {
         tr_error_prefix(error, "Unable to open destination file: ");
-        tr_sys_file_close(in, nullptr);
+        tr_sys_file_close(in);
         return false;
     }
 
@@ -542,8 +531,8 @@ bool tr_sys_path_copy(char const* src_path, char const* dst_path, tr_error** err
 #endif /* USE_COPY_FILE_RANGE || USE_SENDFILE64 */
 
     /* cleanup */
-    tr_sys_file_close(out, nullptr);
-    tr_sys_file_close(in, nullptr);
+    tr_sys_file_close(out);
+    tr_sys_file_close(in);
 
     if (file_size != 0)
     {
@@ -594,7 +583,7 @@ tr_sys_file_t tr_sys_file_get_std(tr_std_sys_file_t std_file, tr_error** error)
         break;
 
     default:
-        TR_ASSERT_MSG(false, "unknown standard file %d", (int)std_file);
+        TR_ASSERT_MSG(false, fmt::format(FMT_STRING("unknown standard file {:d}"), std_file));
         set_system_error(error, EINVAL);
     }
 
@@ -795,7 +784,7 @@ bool tr_sys_file_read_at(
 
         ret = true;
     }
-    else
+    else if (my_bytes_read == -1)
     {
         set_system_error(error, errno);
     }

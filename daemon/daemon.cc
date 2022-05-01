@@ -8,6 +8,7 @@
 #include <cstdio> /* printf */
 #include <cstdlib> /* atoi */
 #include <iostream>
+#include <string>
 #include <string_view>
 #include <utility>
 
@@ -32,6 +33,7 @@
 #include <libtransmission/log.h>
 #include <libtransmission/tr-getopt.h>
 #include <libtransmission/tr-macros.h>
+#include <libtransmission/tr-strbuf.h>
 #include <libtransmission/utils.h>
 #include <libtransmission/variant.h>
 #include <libtransmission/version.h>
@@ -107,7 +109,7 @@ static auto constexpr Options = std::array<tr_option, 45>{
     { { 'a', "allowed", "Allowed IP addresses. (Default: " TR_DEFAULT_RPC_WHITELIST ")", "a", true, "<list>" },
       { 'b', "blocklist", "Enable peer blocklists", "b", false, nullptr },
       { 'B', "no-blocklist", "Disable peer blocklists", "B", false, nullptr },
-      { 'c', "watch-dir", "Where to watch for new .torrent files", "c", true, "<directory>" },
+      { 'c', "watch-dir", "Where to watch for new torrent files", "c", true, "<directory>" },
       { 'C', "no-watch-dir", "Disable the watch-dir", "C", false, nullptr },
       { 941, "incomplete-dir", "Where to store new torrents until they're complete", nullptr, true, "<directory>" },
       { 942, "no-incomplete-dir", "Don't store incomplete torrents in a different location", nullptr, false, nullptr },
@@ -192,7 +194,7 @@ static bool reopen_log_file(char const* filename)
 
     if (old_log_file != TR_BAD_SYS_FILE)
     {
-        tr_sys_file_close(old_log_file, nullptr);
+        tr_sys_file_close(old_log_file);
     }
 
     return true;
@@ -228,14 +230,49 @@ static auto onFileAdded(tr_watchdir_t dir, char const* name, void* vsession)
 {
     auto const* session = static_cast<tr_session const*>(vsession);
 
-    if (!tr_str_has_suffix(name, ".torrent"))
+    if (!tr_str_has_suffix(name, ".torrent") && !tr_str_has_suffix(name, ".magnet"))
     {
         return TR_WATCHDIR_IGNORE;
     }
 
-    auto filename = tr_strvPath(tr_watchdir_get_path(dir), name);
-    tr_ctor* ctor = tr_ctorNew(session);
-    if (!tr_ctorSetMetainfoFromFile(ctor, filename.c_str(), nullptr))
+    auto const filename = tr_pathbuf{ tr_watchdir_get_path(dir), '/', name };
+    tr_ctor* const ctor = tr_ctorNew(session);
+
+    bool retry = false;
+
+    if (tr_str_has_suffix(name, ".torrent"))
+    {
+        if (!tr_ctorSetMetainfoFromFile(ctor, filename, nullptr))
+        {
+            retry = true;
+        }
+    }
+    else // ".magnet" suffix
+    {
+        auto content = std::vector<char>{};
+        tr_error* error = nullptr;
+        if (!tr_loadFile(filename, content, &error))
+        {
+            tr_logAddWarn(fmt::format(
+                _("Couldn't read '{path}': {error} ({error_code})"),
+                fmt::arg("path", name),
+                fmt::arg("error", error->message),
+                fmt::arg("error_code", error->code)));
+            tr_error_free(error);
+            retry = true;
+        }
+        else
+        {
+            content.push_back('\0'); // zero-terminated string
+            auto const* data = std::data(content);
+            if (!tr_ctorSetMetainfoFromMagnetLink(ctor, data, nullptr))
+            {
+                retry = true;
+            }
+        }
+    }
+
+    if (retry)
     {
         tr_ctorFree(ctor);
         return TR_WATCHDIR_RETRY;
@@ -243,7 +280,7 @@ static auto onFileAdded(tr_watchdir_t dir, char const* name, void* vsession)
 
     if (tr_torrentNew(ctor, nullptr) == nullptr)
     {
-        tr_logAddError(fmt::format(_("Couldn't add .torrent file '{path}'"), fmt::arg("path", name)));
+        tr_logAddError(fmt::format(_("Couldn't add torrent file '{path}'"), fmt::arg("path", name)));
     }
     else
     {
@@ -254,7 +291,7 @@ static auto onFileAdded(tr_watchdir_t dir, char const* name, void* vsession)
         {
             tr_error* error = nullptr;
 
-            tr_logAddInfo(fmt::format(_("Removing .torrent file '{path}'"), fmt::arg("path", name)));
+            tr_logAddInfo(fmt::format(_("Removing torrent file '{path}'"), fmt::arg("path", name)));
 
             if (!tr_sys_path_remove(filename.c_str(), &error))
             {
@@ -268,8 +305,7 @@ static auto onFileAdded(tr_watchdir_t dir, char const* name, void* vsession)
         }
         else
         {
-            auto const new_filename = filename + ".added";
-            tr_sys_path_rename(filename.c_str(), new_filename.c_str(), nullptr);
+            tr_sys_path_rename(filename, tr_pathbuf{ filename, ".added"sv });
         }
     }
 
@@ -304,14 +340,14 @@ static void printMessage(
     std::string_view filename,
     int line)
 {
-    auto const out = std::empty(name) ? tr_strvJoin(message, " ("sv, filename, ":"sv, std::to_string(line), ")"sv) :
-                                        tr_strvJoin(name, " "sv, message, " ("sv, filename, ":"sv, std::to_string(line), ")"sv);
+    auto const out = std::empty(name) ? fmt::format(FMT_STRING("{:s} ({:s}:{:d})"), message, filename, line) :
+                                        fmt::format(FMT_STRING("{:s} {:s} ({:s}:{:d})"), name, message, filename, line);
 
     if (file != TR_BAD_SYS_FILE)
     {
         auto timestr = std::array<char, 64>{};
         tr_logGetTimeStr(std::data(timestr), std::size(timestr));
-        tr_sys_file_write_line(file, tr_strvJoin("["sv, std::data(timestr), "] "sv, levelName(level), " "sv, out), nullptr);
+        tr_sys_file_write_line(file, fmt::format(FMT_STRING("[{:s}] {:s} {:s}"), std::data(timestr), levelName(level), out));
     }
 
 #ifdef HAVE_SYSLOG
@@ -362,7 +398,7 @@ static void pumpLogMessages(tr_sys_file_t file)
 
     if (file != TR_BAD_SYS_FILE)
     {
-        tr_sys_file_flush(file, nullptr);
+        tr_sys_file_flush(file);
     }
 
     tr_logFreeQueue(list);
@@ -692,9 +728,12 @@ static int daemon_start(void* varg, [[maybe_unused]] bool foreground)
 
     if (ev_base == nullptr)
     {
-        char buf[256];
-        tr_snprintf(buf, sizeof(buf), "Couldn't initialize daemon event state: %s", tr_strerror(errno));
-        printMessage(logfile, TR_LOG_ERROR, MyName, buf, __FILE__, __LINE__);
+        auto const error_code = errno;
+        auto const errmsg = fmt::format(
+            _("Couldn't initialize daemon: {error} ({error_code})"),
+            fmt::arg("error", tr_strerror(error_code)),
+            fmt::arg("error_code", error_code));
+        printMessage(logfile, TR_LOG_ERROR, MyName, errmsg, __FILE__, __LINE__);
         return 1;
     }
 
@@ -722,8 +761,8 @@ static int daemon_start(void* varg, [[maybe_unused]] bool foreground)
         if (fp != TR_BAD_SYS_FILE)
         {
             auto const out = std::to_string(getpid());
-            tr_sys_file_write(fp, std::data(out), std::size(out), nullptr, nullptr);
-            tr_sys_file_close(fp, nullptr);
+            tr_sys_file_write(fp, std::data(out), std::size(out), nullptr);
+            tr_sys_file_close(fp);
             tr_logAddInfo(fmt::format(_("Saved pidfile '{path}'"), fmt::arg("path", sz_pid_filename)));
             pidfile_created = true;
         }
@@ -761,7 +800,7 @@ static int daemon_start(void* varg, [[maybe_unused]] bool foreground)
         (void)tr_variantDictFindStrView(settings, TR_KEY_watch_dir, &dir);
         if (!std::empty(dir))
         {
-            tr_logAddInfo(fmt::format(_("Watching '{path}' for new .torrent files"), fmt::arg("path", dir)));
+            tr_logAddInfo(fmt::format(_("Watching '{path}' for new torrent files"), fmt::arg("path", dir)));
 
             watchdir = tr_watchdir_new(dir, &onFileAdded, mySession, ev_base, force_generic);
             if (watchdir == nullptr)
@@ -867,7 +906,7 @@ CLEANUP:
     /* cleanup */
     if (pidfile_created)
     {
-        tr_sys_path_remove(sz_pid_filename.c_str(), nullptr);
+        tr_sys_path_remove(sz_pid_filename.c_str());
     }
 
     sd_notify(0, "STATUS=\n");
@@ -896,7 +935,7 @@ static bool init_daemon_data(int argc, char* argv[], struct daemon_data* data, b
 
     if (*foreground && logfile == TR_BAD_SYS_FILE)
     {
-        logfile = tr_sys_file_get_std(TR_STD_SYS_FILE_ERR, nullptr);
+        logfile = tr_sys_file_get_std(TR_STD_SYS_FILE_ERR);
     }
 
     if (!loaded)
@@ -942,7 +981,8 @@ int tr_main(int argc, char* argv[])
 
     if (tr_error* error = nullptr; !dtr_daemon(&cb, &data, foreground, &ret, &error))
     {
-        printMessage(logfile, TR_LOG_ERROR, MyName, tr_strvJoin("Couldn't daemonize: ", error->message), __FILE__, __LINE__);
+        auto const errmsg = fmt::format(FMT_STRING("Couldn't daemonize: {:s} ({:d})"), error->message, error->code);
+        printMessage(logfile, TR_LOG_ERROR, MyName, errmsg, __FILE__, __LINE__);
         tr_error_free(error);
     }
 

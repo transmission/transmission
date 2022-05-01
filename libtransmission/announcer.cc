@@ -5,13 +5,14 @@
 
 #include <algorithm>
 #include <array>
-#include <climits> /* INT_MAX */
+#include <cinttypes> // PRIu64
+#include <climits> // INT_MAX
 #include <cstdio>
 #include <cstring>
 #include <ctime>
 #include <deque>
-#include <iterator>
 #include <map>
+#include <numeric>
 #include <set>
 #include <string>
 #include <string_view>
@@ -92,7 +93,7 @@ namespace
 
 struct StopsCompare
 {
-    static int compare(tr_announce_request const* a, tr_announce_request const* b) // <=>
+    [[nodiscard]] static int compare(tr_announce_request const* a, tr_announce_request const* b) noexcept // <=>
     {
         // primary key: volume of data transferred
         auto const ax = a->up + a->down;
@@ -129,7 +130,7 @@ struct StopsCompare
         return 0;
     }
 
-    bool operator()(tr_announce_request const* a, tr_announce_request const* b) const // less than
+    [[nodiscard]] bool operator()(tr_announce_request const* a, tr_announce_request const* b) const noexcept // less than
     {
         return compare(a, b) < 0;
     }
@@ -143,13 +144,13 @@ struct StopsCompare
 
 struct tr_scrape_info
 {
-    tr_interned_string scrape_url;
-
     int multiscrape_max;
 
+    tr_interned_string scrape_url;
+
     tr_scrape_info(tr_interned_string scrape_url_in, int const multiscrape_max_in)
-        : scrape_url{ scrape_url_in }
-        , multiscrape_max{ multiscrape_max_in }
+        : multiscrape_max{ multiscrape_max_in }
+        , scrape_url{ scrape_url_in }
     {
     }
 };
@@ -175,7 +176,7 @@ struct tr_announcer
 
     void scheduleNextUpdate() const
     {
-        tr_timerAddMsec(this->upkeep_timer, UpkeepIntervalMsec);
+        tr_timerAddMsec(*this->upkeep_timer, UpkeepIntervalMsec);
     }
 
     std::set<tr_announce_request*, StopsCompare> stops;
@@ -183,8 +184,10 @@ struct tr_announcer
 
     tr_session* const session;
     event* const upkeep_timer;
-    int const key = tr_rand_int(INT_MAX);
+
     time_t tau_upkeep_at = 0;
+
+    int const key = tr_rand_int(INT_MAX);
 };
 
 static tr_scrape_info* tr_announcerGetScrapeInfo(tr_announcer* announcer, tr_interned_string url)
@@ -195,8 +198,8 @@ static tr_scrape_info* tr_announcerGetScrapeInfo(tr_announcer* announcer, tr_int
     }
 
     auto& scrapes = announcer->scrape_info;
-    auto const it = scrapes.try_emplace(url, url, TR_MULTISCRAPE_MAX);
-    return &it.first->second;
+    auto const [it, is_new] = scrapes.try_emplace(url, url, TR_MULTISCRAPE_MAX);
+    return &it->second;
 }
 
 void tr_announcerInit(tr_session* session)
@@ -231,9 +234,9 @@ struct tr_tracker
 {
     explicit tr_tracker(tr_announcer* announcer, tr_announce_list::tracker_info const& info)
         : host{ info.host }
-        , announce_url{ info.announce_str }
-        , sitename{ info.announce.sitename }
-        , scrape_info{ std::empty(info.scrape_str) ? nullptr : tr_announcerGetScrapeInfo(announcer, info.scrape_str) }
+        , announce_url{ info.announce }
+        , sitename{ info.sitename }
+        , scrape_info{ std::empty(info.scrape) ? nullptr : tr_announcerGetScrapeInfo(announcer, info.scrape) }
         , id{ info.id }
     {
     }
@@ -285,9 +288,12 @@ struct tr_tracker
 // format: `${host}:${port}`
 tr_interned_string tr_announcerGetKey(tr_url_parsed_t const& parsed)
 {
-    std::string buf;
-    tr_buildBuf(buf, parsed.host, ":"sv, parsed.portstr);
-    return tr_interned_string{ buf };
+    auto buf = std::array<char, 1024>{};
+    auto* const begin = std::data(buf);
+    auto const* const end = fmt::format_to_n(begin, std::size(buf), "{:s}:{:d}", parsed.host, parsed.port).out;
+    auto const sv = std::string_view{ begin, static_cast<size_t>(end - begin) };
+
+    return tr_interned_string{ sv };
 }
 
 /***
@@ -332,7 +338,7 @@ struct tr_tier
         return &trackers[*current_tracker_index_];
     }
 
-    [[nodiscard]] bool needsToAnnounce(time_t now) const
+    [[nodiscard]] constexpr bool needsToAnnounce(time_t now) const
     {
         return !isAnnouncing && !isScraping && announceAt != 0 && announceAt <= now && !std::empty(announce_events);
     }
@@ -404,7 +410,7 @@ struct tr_tier
         auto const* const torrent_name = tr_torrentName(tor);
         auto const* const current_tracker = currentTracker();
         auto const host_sv = current_tracker == nullptr ? "?"sv : current_tracker->host.sv();
-        tr_snprintf(buf, buflen, "%s at %" TR_PRIsv, torrent_name, TR_PRIsv_ARG(host_sv));
+        *fmt::format_to_n(buf, buflen - 1, FMT_STRING("{:s} at {:s}"), torrent_name, host_sv).out = '\0';
     }
 
     [[nodiscard]] bool canManualAnnounce() const
@@ -427,32 +433,33 @@ struct tr_tier
         this->scrapeAt = getNextScrapeTime(tor->session, this, interval);
     }
 
-    tr_torrent* const tor;
+    std::deque<tr_announce_event> announce_events;
+
+    std::string last_announce_str;
+    std::string last_scrape_str;
 
     /* number of up/down/corrupt bytes since the last time we sent an
      * "event=stopped" message that was acknowledged by the tracker */
     std::array<uint64_t, 3> byteCounts = {};
 
     std::vector<tr_tracker> trackers;
+
     std::optional<size_t> current_tracker_index_;
+
+    tr_torrent* const tor;
 
     time_t scrapeAt = 0;
     time_t lastScrapeStartTime = 0;
     time_t lastScrapeTime = 0;
-    bool lastScrapeSucceeded = false;
-    bool lastScrapeTimedOut = false;
 
     time_t announceAt = 0;
     time_t manualAnnounceAllowedAt = 0;
     time_t lastAnnounceStartTime = 0;
     time_t lastAnnounceTime = 0;
-    bool lastAnnounceSucceeded = false;
-    bool lastAnnounceTimedOut = false;
-
-    std::deque<tr_announce_event> announce_events;
-    int announce_event_priority = 0;
 
     int const id;
+
+    int announce_event_priority = 0;
 
     int scrapeIntervalSec = DefaultScrapeIntervalSec;
     int announceIntervalSec = DefaultAnnounceIntervalSec;
@@ -460,12 +467,15 @@ struct tr_tier
 
     int lastAnnouncePeerCount = 0;
 
+    bool lastScrapeSucceeded = false;
+    bool lastScrapeTimedOut = false;
+
+    bool lastAnnounceSucceeded = false;
+    bool lastAnnounceTimedOut = false;
+
     bool isRunning = false;
     bool isAnnouncing = false;
     bool isScraping = false;
-
-    std::string last_announce_str;
-    std::string last_scrape_str;
 
 private:
     [[nodiscard]] static time_t getNextScrapeTime(tr_session const* session, tr_tier const* tier, int interval)
@@ -731,15 +741,15 @@ static void tr_logAddTrace_tier_announce_queue(tr_tier const* tier)
         return;
     }
 
-    auto* const buf = evbuffer_new();
-    for (size_t i = 0, n = std::size(tier->announce_events); i < n; ++i)
+    auto buf = std::string{};
+    auto const& events = tier->announce_events;
+    buf.reserve(std::size(events) * 20);
+    for (size_t i = 0, n = std::size(events); i < n; ++i)
     {
-        tr_announce_event const e = tier->announce_events[i];
-        char const* str = tr_announce_event_get_string(e);
-        evbuffer_add_printf(buf, "[%zu:%s]", i, str);
+        fmt::format_to(std::back_inserter(buf), FMT_STRING("[{:d}:{:s}]"), i, tr_announce_event_get_string(events[i]));
     }
 
-    tr_logAddTraceTier(tier, evbuffer_free_to_str(buf));
+    tr_logAddTraceTier(tier, buf);
 }
 
 // higher priorities go to the front of the announce queue
@@ -874,7 +884,7 @@ static tr_announce_request* announce_request_new(
     TR_ASSERT(current_tracker != nullptr);
 
     auto* const req = new tr_announce_request();
-    req->port = tr_sessionGetPublicPeerPort(announcer->session);
+    req->port = announcer->session->peerPort();
     req->announce_url = current_tracker->announce_url;
     req->tracker_id = current_tracker->tracker_id;
     req->info_hash = tor->infoHash();
@@ -882,7 +892,7 @@ static tr_announce_request* announce_request_new(
     req->up = tier->byteCounts[TR_ANN_UP];
     req->down = tier->byteCounts[TR_ANN_DOWN];
     req->corrupt = tier->byteCounts[TR_ANN_CORRUPT];
-    req->leftUntilComplete = tor->hasMetadata() ? tor->totalSize() - tor->hasTotal() : INT64_MAX;
+    req->leftUntilComplete = tor->hasMetainfo() ? tor->totalSize() - tor->hasTotal() : INT64_MAX;
     req->event = event;
     req->numwant = event == TR_ANNOUNCE_EVENT_STOPPED ? 0 : Numwant;
     req->key = announcer->key;
@@ -1155,7 +1165,7 @@ static void on_announce_done(tr_announce_response const* response, void* vdata)
 
             if (!isStopped && std::empty(tier->announce_events))
             {
-                /* the queue is empty, so enqueue a perodic update */
+                /* the queue is empty, so enqueue a periodic update */
                 int const i = tier->announceIntervalSec;
                 tr_logAddTraceTier(tier, fmt::format("Sending periodic reannounce in {} seconds", i));
                 tier_announce_event_push(tier, TR_ANNOUNCE_EVENT_NONE, now + i);
@@ -1297,10 +1307,10 @@ static void checkMultiscrapeMax(tr_announcer* announcer, tr_scrape_response cons
     {
         // don't log the full URL, since that might have a personal announce id
         // (note: we know 'parsed' will be successful since this url has a scrape_info)
-        auto const parsed = *tr_urlParse(url.sv());
-        auto clean_url = std::string{};
-        tr_buildBuf(clean_url, parsed.scheme, "://"sv, parsed.host, ":"sv, parsed.portstr);
-        tr_logAddDebug(fmt::format("Reducing multiscrape max to {}", n), clean_url);
+        auto const parsed = *tr_urlParse(url);
+        tr_logAddDebug(
+            fmt::format(FMT_STRING("Reducing multiscrape max to {:d}"), n),
+            fmt::format(FMT_STRING("{:s}://{:s}:{:d}"), parsed.scheme, parsed.host, parsed.port));
         multiscrape_max = n;
     }
 }
@@ -1325,8 +1335,6 @@ static void on_scrape_done(tr_scrape_response const* response, void* vsession)
                 continue;
             }
 
-            auto const scrape_url_sv = response->scrape_url.sv();
-
             tr_logAddTraceTier(
                 tier,
                 fmt::format(
@@ -1340,7 +1348,7 @@ static void on_scrape_done(tr_scrape_response const* response, void* vsession)
                     "downloaders:{} "
                     "min_request_interval:{} "
                     "err:{} ",
-                    scrape_url_sv,
+                    response->scrape_url.sv(),
                     response->did_connect,
                     response->did_timeout,
                     row.seeders,

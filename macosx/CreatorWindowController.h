@@ -17,7 +17,7 @@
 - (IBAction)create:(id)sender;
 - (IBAction)cancelCreateWindow:(id)sender;
 - (IBAction)cancelCreateProgress:(id)sender;
-
+- (IBAction)incrementOrDecrementPieceSize:(id)sender;
 - (IBAction)addRemoveTracker:(id)sender;
 
 - (void)copy:(id)sender;

@@ -12,6 +12,8 @@
 #include <shlobj.h> /* SHCreateDirectoryEx() */
 #include <winioctl.h> /* FSCTL_SET_SPARSE */
 
+#include <fmt/format.h>
+
 #include "transmission.h"
 #include "crypto-utils.h" /* tr_rand_int() */
 #include "error.h"
@@ -58,9 +60,7 @@ static void set_system_error(tr_error** error, DWORD code)
     }
     else
     {
-        auto buf = std::array<char, 32>{};
-        tr_snprintf(std::data(buf), std::size(buf), "Unknown error: 0x%08lx", code);
-        tr_error_set(error, code, std::data(buf));
+        tr_error_set(error, code, fmt::format(FMT_STRING("Unknown error: {:#08x}"), code));
     }
 }
 
@@ -646,17 +646,17 @@ cleanup:
     return ret;
 }
 
-char* tr_sys_path_basename(std::string_view path, tr_error** error)
+std::string tr_sys_path_basename(std::string_view path, tr_error** error)
 {
     if (std::empty(path))
     {
-        return tr_strdup(".");
+        return ".";
     }
 
     if (!is_valid_path(path))
     {
         set_system_error(error, ERROR_PATH_NOT_FOUND);
-        return nullptr;
+        return {};
     }
 
     char const* const begin = std::data(path);
@@ -669,7 +669,7 @@ char* tr_sys_path_basename(std::string_view path, tr_error** error)
 
     if (end == begin)
     {
-        return tr_strdup("/");
+        return "/";
     }
 
     char const* name = end;
@@ -681,30 +681,30 @@ char* tr_sys_path_basename(std::string_view path, tr_error** error)
 
     if (name == end)
     {
-        return tr_strdup("/");
+        return "/";
     }
 
-    return tr_strndup(name, end - name);
+    return { name, size_t(end - name) };
 }
 
-char* tr_sys_path_dirname(std::string_view path, tr_error** error)
+std::string tr_sys_path_dirname(std::string_view path, tr_error** error)
 {
     if (std::empty(path))
     {
-        return tr_strdup(".");
+        return ".";
     }
 
     if (!is_valid_path(path))
     {
         set_system_error(error, ERROR_PATH_NOT_FOUND);
-        return nullptr;
+        return {};
     }
 
     bool const is_unc = is_unc_path(path);
 
     if (is_unc && path[2] == '\0')
     {
-        return tr_strvDup(path);
+        return std::string{ path };
     }
 
     char const* const begin = std::data(path);
@@ -717,7 +717,7 @@ char* tr_sys_path_dirname(std::string_view path, tr_error** error)
 
     if (end == begin)
     {
-        return tr_strdup("/");
+        return "/";
     }
 
     char const* name = end;
@@ -734,15 +734,15 @@ char* tr_sys_path_dirname(std::string_view path, tr_error** error)
 
     if (name == begin)
     {
-        return tr_strdup(is_unc ? "\\\\" : ".");
+        return is_unc ? "\\\\" : ".";
     }
 
     if (name > begin && *(name - 1) == ':' && *name != '\0' && !is_slash(*name))
     {
-        return tr_strdup_printf("%c:.", begin[0]);
+        return fmt::format("{}:.", begin[0]);
     }
 
-    return tr_strndup(begin, name - begin);
+    return { begin, size_t(name - begin) };
 }
 
 bool tr_sys_path_rename(char const* src_path, char const* dst_path, tr_error** error)
@@ -892,7 +892,7 @@ tr_sys_file_t tr_sys_file_get_std(tr_std_sys_file_t std_file, tr_error** error)
         break;
 
     default:
-        TR_ASSERT_MSG(false, "unknown standard file %d", (int)std_file);
+        TR_ASSERT_MSG(false, fmt::format(FMT_STRING("unknown standard file {:d}"), std_file));
         set_system_error(error, ERROR_INVALID_PARAMETER);
         return TR_BAD_SYS_FILE;
     }

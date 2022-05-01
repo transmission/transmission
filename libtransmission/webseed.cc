@@ -4,12 +4,15 @@
 // License text can be found in the licenses/ folder.
 
 #include <algorithm>
+#include <iterator>
 #include <set>
 #include <string>
 #include <string_view>
 
 #include <event2/buffer.h>
 #include <event2/event.h>
+
+#include <fmt/format.h>
 
 #include "transmission.h"
 
@@ -76,7 +79,7 @@ public:
 class ConnectionLimiter
 {
 public:
-    void taskStarted()
+    constexpr void taskStarted() noexcept
     {
         ++n_tasks;
     }
@@ -92,14 +95,14 @@ public:
         --n_tasks;
     }
 
-    void gotData()
+    constexpr void gotData() noexcept
     {
         TR_ASSERT(n_tasks > 0);
         n_consecutive_failures = 0;
         paused_until = 0;
     }
 
-    [[nodiscard]] size_t slotsAvailable() const
+    [[nodiscard]] size_t slotsAvailable() const noexcept
     {
         if (isPaused())
         {
@@ -116,12 +119,12 @@ public:
     }
 
 private:
-    [[nodiscard]] bool isPaused() const
+    [[nodiscard]] bool isPaused() const noexcept
     {
         return paused_until > tr_time();
     }
 
-    [[nodiscard]] size_t maxConnections() const
+    [[nodiscard]] constexpr size_t maxConnections() const noexcept
     {
         return n_consecutive_failures > 0 ? 1 : MaxConnections;
     }
@@ -257,7 +260,7 @@ private:
 
     void startTimer()
     {
-        tr_timerAddMsec(pulse_timer.get(), IdleTimerMsec);
+        tr_timerAddMsec(*pulse_timer, IdleTimerMsec);
     }
 
     static void onTimer(evutil_socket_t /*fd*/, short /*what*/, void* vwebseed)
@@ -298,8 +301,8 @@ public:
     void write_block_func()
     {
         auto* const buf = this->content();
-        auto* const tor = tr_torrentFindFromId(this->session, this->torrent_id);
-        if (tor != nullptr)
+
+        if (auto* const tor = tr_torrentFindFromId(this->session, this->torrent_id); tor != nullptr)
         {
             auto const len = evbuffer_get_length(buf);
             TR_ASSERT(tor->blockSize(this->loc.block) == len);
@@ -352,6 +355,7 @@ void useFetchedBlocks(tr_webseed_task* task)
 
         task->loc = tor->byteLoc(task->loc.byte + block_size);
 
+        TR_ASSERT(task->loc.byte <= task->end_byte);
         TR_ASSERT(task->loc.byte == task->end_byte || task->loc.block_offset == 0);
     }
 }
@@ -369,7 +373,7 @@ void onBufferGotData(evbuffer* /*buf*/, evbuffer_cb_info const* info, void* vtas
         return;
     }
 
-    auto* const session = task->session;
+    auto const* const session = task->session;
     auto const lock = session->unique_lock();
 
     auto* const webseed = task->webseed;
@@ -427,8 +431,7 @@ void onPartialDataFetched(tr_web::FetchResponse const& web_response)
         return;
     }
 
-    auto* const tor = webseed->getTorrent();
-    if (tor == nullptr)
+    if (auto const* const tor = webseed->getTorrent(); tor == nullptr)
     {
         return;
     }
@@ -450,23 +453,25 @@ void onPartialDataFetched(tr_web::FetchResponse const& web_response)
         return;
     }
 
-    TR_ASSERT(evbuffer_get_length(task->content()) < tr_block_info::BlockSize);
+    TR_ASSERT(evbuffer_get_length(task->content()) == 0);
+    TR_ASSERT(task->loc.byte == task->end_byte);
     webseed->tasks.erase(task);
     delete task;
 
     on_idle(webseed);
 }
 
-std::string make_url(tr_webseed* w, std::string_view name)
+template<typename OutputIt>
+void makeUrl(tr_webseed* w, std::string_view name, OutputIt out)
 {
-    auto url = w->base_url;
+    auto const url = w->base_url;
+
+    out = std::copy(std::begin(url), std::end(url), out);
 
     if (tr_strvEndsWith(url, "/"sv) && !std::empty(name))
     {
-        tr_http_escape(url, name, false);
+        tr_http_escape(out, name, false);
     }
-
-    return url;
 }
 
 void task_request_next_chunk(tr_webseed_task* task)
@@ -478,17 +483,20 @@ void task_request_next_chunk(tr_webseed_task* task)
         return;
     }
 
-    auto const [file_index, file_offset] = tor->fileOffset(task->loc);
+    auto const loc = tor->byteLoc(task->loc.byte + evbuffer_get_length(task->content()));
 
+    auto const [file_index, file_offset] = tor->fileOffset(loc);
     auto const left_in_file = tor->fileSize(file_index) - file_offset;
-    auto const left_in_task = task->end_byte - task->loc.byte;
+    auto const left_in_task = task->end_byte - loc.byte;
     auto const this_chunk = std::min(left_in_file, left_in_task);
+    TR_ASSERT(this_chunk > 0U);
 
     webseed->connection_limiter.taskStarted();
 
-    auto const url = make_url(webseed, tor->fileSubpath(file_index));
-    auto options = tr_web::FetchOptions{ url, onPartialDataFetched, task };
-    options.range = tr_strvJoin(std::to_string(file_offset), "-"sv, std::to_string(file_offset + this_chunk - 1));
+    auto url = tr_urlbuf{};
+    makeUrl(webseed, tor->fileSubpath(file_index), std::back_inserter(url));
+    auto options = tr_web::FetchOptions{ url.sv(), onPartialDataFetched, task };
+    options.range = fmt::format(FMT_STRING("{:d}-{:d}"), file_offset, file_offset + this_chunk - 1);
     options.speed_limit_tag = tor->uniqueId;
     options.buffer = task->content();
     tor->session->web->fetch(std::move(options));

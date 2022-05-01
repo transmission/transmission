@@ -6,13 +6,13 @@
 #include <algorithm>
 #include <array>
 #include <cctype>
-#include <iterator>
 #include <numeric>
 #include <string>
 #include <string_view>
 #include <vector>
 
 #include <fmt/core.h>
+#include <fmt/format.h>
 
 #include "transmission.h"
 
@@ -148,7 +148,7 @@ std::string tr_torrent_metainfo::fixWebseedUrl(tr_torrent_metainfo const& tm, st
 {
     url = tr_strvStrip(url);
 
-    if (std::size(tm.files_) > 1 && !std::empty(url) && url.back() != '/')
+    if (tm.fileCount() > 1U && !std::empty(url) && url.back() != '/')
     {
         return std::string{ url } + '/';
     }
@@ -242,7 +242,7 @@ std::string_view tr_torrent_metainfo::parseFiles(tr_torrent_metainfo& setme, tr_
     if (tr_variantDictFindInt(info_dict, TR_KEY_length, &len))
     {
         total_size = len;
-        setme.files_.emplace_back(root_name, len);
+        setme.files_.add(root_name, len);
     }
 
     // "For the purposes of the other keys, the multi-file case is treated as
@@ -253,7 +253,7 @@ std::string_view tr_torrent_metainfo::parseFiles(tr_torrent_metainfo& setme, tr_
     // path - A list of UTF-8 encoded strings corresponding to subdirectory
     // names, the last of which is the actual file name (a zero length list
     // is an error case).
-    // In the multifile case, the name key is the name of a directory.
+    // In the multifile case, the name key is the name of a directory."
     else if (tr_variantDictFindList(info_dict, TR_KEY_files, &files_entry))
     {
         auto buf = std::string{};
@@ -285,7 +285,7 @@ std::string_view tr_torrent_metainfo::parseFiles(tr_torrent_metainfo& setme, tr_
                 return "path";
             }
 
-            setme.files_.emplace_back(buf, len);
+            setme.files_.add(buf, len);
             total_size += len;
         }
     }
@@ -425,11 +425,11 @@ std::string_view tr_torrent_metainfo::parseImpl(tr_torrent_metainfo& setme, tr_v
     }
 
     // piece length
-    if (!tr_variantDictFindInt(info_dict, TR_KEY_piece_length, &i) && (i <= 0))
+    if (!tr_variantDictFindInt(info_dict, TR_KEY_piece_length, &i) || (i <= 0) || (i > UINT32_MAX))
     {
         return "'info' dict 'piece length' is missing or has an invalid value";
     }
-    auto const piece_size = i;
+    auto const piece_size = (uint32_t)i;
 
     // pieces
     if (!tr_variantDictFindStrView(info_dict, TR_KEY_pieces, &sv) || (std::size(sv) % sizeof(tr_sha1_digest_t) != 0))
@@ -454,7 +454,7 @@ std::string_view tr_torrent_metainfo::parseImpl(tr_torrent_metainfo& setme, tr_v
 
     // do the size and piece size match up?
     setme.block_info_.initSizes(total_size, piece_size);
-    if (setme.block_info_.n_pieces != std::size(setme.pieces_))
+    if (setme.block_info_.pieceCount() != std::size(setme.pieces_))
     {
         return "piece count and file sizes do not match";
     }
@@ -477,7 +477,7 @@ bool tr_torrent_metainfo::parseBenc(std::string_view benc, tr_error** error)
     tr_variantFree(&top);
     if (!std::empty(errmsg))
     {
-        tr_error_set(error, TR_ERROR_EINVAL, tr_strvJoin("Error parsing metainfo: ", errmsg));
+        tr_error_set(error, TR_ERROR_EINVAL, fmt::format(FMT_STRING("Error parsing metainfo: {:s}"), errmsg));
         return false;
     }
 
@@ -493,8 +493,7 @@ bool tr_torrent_metainfo::parseTorrentFile(std::string_view filename, std::vecto
         contents = &local_contents;
     }
 
-    auto const sz_filename = std::string{ filename };
-    return tr_loadFile(*contents, sz_filename, error) && parseBenc({ std::data(*contents), std::size(*contents) }, error);
+    return tr_loadFile(filename, *contents, error) && parseBenc({ std::data(*contents), std::size(*contents) }, error);
 }
 
 tr_sha1_digest_t const& tr_torrent_metainfo::pieceHash(tr_piece_index_t piece) const
@@ -502,7 +501,7 @@ tr_sha1_digest_t const& tr_torrent_metainfo::pieceHash(tr_piece_index_t piece) c
     return this->pieces_[piece];
 }
 
-std::string tr_torrent_metainfo::makeFilename(
+tr_pathbuf tr_torrent_metainfo::makeFilename(
     std::string_view dirname,
     std::string_view name,
     std::string_view info_hash_string,
@@ -511,8 +510,8 @@ std::string tr_torrent_metainfo::makeFilename(
 {
     // `${dirname}/${name}.${info_hash}${suffix}`
     // `${dirname}/${info_hash}${suffix}`
-    return format == BasenameFormat::Hash ? tr_strvJoin(dirname, "/"sv, info_hash_string, suffix) :
-                                            tr_strvJoin(dirname, "/"sv, name, "."sv, info_hash_string.substr(0, 16), suffix);
+    return format == BasenameFormat::Hash ? tr_pathbuf{ dirname, "/"sv, info_hash_string, suffix } :
+                                            tr_pathbuf{ dirname, "/"sv, name, "."sv, info_hash_string.substr(0, 16), suffix };
 }
 
 bool tr_torrent_metainfo::migrateFile(
@@ -522,13 +521,13 @@ bool tr_torrent_metainfo::migrateFile(
     std::string_view suffix)
 {
     auto const old_filename = makeFilename(dirname, name, info_hash_string, BasenameFormat::NameAndPartialHash, suffix);
-    auto const old_filename_exists = tr_sys_path_exists(old_filename.c_str(), nullptr);
+    auto const old_filename_exists = tr_sys_path_exists(old_filename.c_str());
     auto const new_filename = makeFilename(dirname, name, info_hash_string, BasenameFormat::Hash, suffix);
-    auto const new_filename_exists = tr_sys_path_exists(new_filename.c_str(), nullptr);
+    auto const new_filename_exists = tr_sys_path_exists(new_filename.c_str());
 
     if (old_filename_exists && new_filename_exists)
     {
-        tr_sys_path_remove(old_filename.c_str(), nullptr);
+        tr_sys_path_remove(old_filename.c_str());
         return false;
     }
 
@@ -537,7 +536,7 @@ bool tr_torrent_metainfo::migrateFile(
         return false;
     }
 
-    if (old_filename_exists && tr_sys_path_rename(old_filename.c_str(), new_filename.c_str(), nullptr))
+    if (old_filename_exists && tr_sys_path_rename(old_filename.c_str(), new_filename.c_str()))
     {
         tr_logAddError(
             fmt::format(
@@ -557,30 +556,6 @@ void tr_torrent_metainfo::removeFile(
     std::string_view info_hash_string,
     std::string_view suffix)
 {
-    auto filename = makeFilename(dirname, name, info_hash_string, BasenameFormat::NameAndPartialHash, suffix);
-    tr_sys_path_remove(filename.c_str(), nullptr);
-
-    filename = makeFilename(dirname, name, info_hash_string, BasenameFormat::Hash, suffix);
-    tr_sys_path_remove(filename.c_str(), nullptr);
-}
-
-std::string const& tr_torrent_metainfo::fileSubpath(tr_file_index_t i) const
-{
-    TR_ASSERT(i < fileCount());
-
-    return files_.at(i).path();
-}
-
-void tr_torrent_metainfo::setFileSubpath(tr_file_index_t i, std::string_view subpath)
-{
-    TR_ASSERT(i < fileCount());
-
-    files_.at(i).setSubpath(subpath);
-}
-
-uint64_t tr_torrent_metainfo::fileSize(tr_file_index_t i) const
-{
-    TR_ASSERT(i < fileCount());
-
-    return files_.at(i).size();
+    tr_sys_path_remove(makeFilename(dirname, name, info_hash_string, BasenameFormat::NameAndPartialHash, suffix));
+    tr_sys_path_remove(makeFilename(dirname, name, info_hash_string, BasenameFormat::Hash, suffix));
 }

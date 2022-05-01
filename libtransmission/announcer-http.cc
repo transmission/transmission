@@ -6,15 +6,15 @@
 #include <climits> /* USHRT_MAX */
 #include <cstdio> /* fprintf() */
 #include <cstring> /* strchr(), memcmp(), memcpy() */
-#include <iostream>
 #include <iomanip>
+#include <iostream>
+#include <iterator>
 #include <optional>
 #include <string>
 #include <string_view>
 
 #include <curl/curl.h>
 
-#include <event2/buffer.h>
 #include <event2/http.h> /* for HTTP_OK */
 
 #include <fmt/core.h>
@@ -50,61 +50,59 @@ static char const* get_event_string(tr_announce_request const* req)
     return req->partial_seed && (req->event != TR_ANNOUNCE_EVENT_STOPPED) ? "paused" : tr_announce_event_get_string(req->event);
 }
 
-static std::string announce_url_new(tr_session const* session, tr_announce_request const* req)
+static tr_urlbuf announce_url_new(tr_session const* session, tr_announce_request const* req)
 {
-    auto const announce_sv = req->announce_url.sv();
+    auto url = tr_urlbuf{};
+    auto out = std::back_inserter(url);
 
     auto escaped_info_hash = std::array<char, SHA_DIGEST_LENGTH * 3 + 1>{};
     tr_http_escape_sha1(std::data(escaped_info_hash), req->info_hash);
 
-    auto* const buf = evbuffer_new();
-    evbuffer_expand(buf, 1024);
-    evbuffer_add_printf(
-        buf,
-        "%" TR_PRIsv
-        "%c"
-        "info_hash=%s"
-        "&peer_id=%" TR_PRIsv
-        "&port=%d"
-        "&uploaded=%" PRIu64 //
-        "&downloaded=%" PRIu64 //
-        "&left=%" PRIu64
-        "&numwant=%d"
-        "&key=%x"
+    fmt::format_to(
+        out,
+        "{url}"
+        "{sep}info_hash={info_hash}"
+        "&peer_id={peer_id}"
+        "&port={port}"
+        "&uploaded={uploaded}"
+        "&downloaded={downloaded}"
+        "&left={left}"
+        "&numwant={numwant}"
+        "&key={key}"
         "&compact=1"
         "&supportcrypto=1",
-        TR_PRIsv_ARG(announce_sv),
-        announce_sv.find('?') == std::string_view::npos ? '?' : '&',
-        std::data(escaped_info_hash),
-        TR_PRIsv_ARG(req->peer_id),
-        req->port,
-        req->up,
-        req->down,
-        req->leftUntilComplete,
-        req->numwant,
-        req->key);
+        fmt::arg("url", req->announce_url),
+        fmt::arg("sep", tr_strvContains(req->announce_url.sv(), '?') ? '&' : '?'),
+        fmt::arg("info_hash", std::data(escaped_info_hash)),
+        fmt::arg("peer_id", std::string_view{ std::data(req->peer_id), std::size(req->peer_id) }),
+        fmt::arg("port", req->port.host()),
+        fmt::arg("uploaded", req->up),
+        fmt::arg("downloaded", req->down),
+        fmt::arg("left", req->leftUntilComplete),
+        fmt::arg("numwant", req->numwant),
+        fmt::arg("key", req->key));
 
     if (session->encryptionMode == TR_ENCRYPTION_REQUIRED)
     {
-        evbuffer_add_printf(buf, "&requirecrypto=1");
+        fmt::format_to(out, "&requirecrypto=1");
     }
 
     if (req->corrupt != 0)
     {
-        evbuffer_add_printf(buf, "&corrupt=%" PRIu64, req->corrupt);
+        fmt::format_to(out, "&corrupt={}", req->corrupt);
     }
 
     if (char const* str = get_event_string(req); !tr_str_is_empty(str))
     {
-        evbuffer_add_printf(buf, "&event=%s", str);
+        fmt::format_to(out, "&event={}", str);
     }
 
     if (!std::empty(req->tracker_id))
     {
-        evbuffer_add_printf(buf, "&trackerid=%" TR_PRIsv, TR_PRIsv_ARG(req->tracker_id));
+        fmt::format_to(out, "&trackerid={}", req->tracker_id);
     }
 
-    return evbuffer_free_to_str(buf);
+    return url;
 }
 
 static std::string format_ipv4_url_arg(tr_address const& ipv4_address)
@@ -121,7 +119,7 @@ static std::string format_ipv6_url_arg(unsigned char const* ipv6_address)
     evutil_inet_ntop(AF_INET6, ipv6_address, readable.data(), readable.size());
 
     auto arg = "&ipv6="s;
-    tr_http_escape(arg, std::data(readable), true);
+    tr_http_escape(std::back_inserter(arg), readable.data(), true);
 
     return arg;
 }
@@ -219,7 +217,7 @@ void tr_announcerParseHttpAnnounceResponse(tr_announce_response& response, std::
             }
             else if (key == "port"sv)
             {
-                pex_.port = htons(uint16_t(value));
+                pex_.port.setHost(static_cast<uint16_t>(value));
             }
             else
             {
@@ -261,7 +259,8 @@ void tr_announcerParseHttpAnnounceResponse(tr_announce_response& response, std::
             }
             else if (key == "external ip"sv && std::size(value) == 4)
             {
-                response_.external_ip = tr_address::from_4byte_ipv4(value);
+                auto const [addr, out] = tr_address::fromCompact4(reinterpret_cast<uint8_t const*>(std::data(value)));
+                response_.external_ip = addr;
             }
             else
             {
@@ -315,7 +314,7 @@ static bool handleAnnounceResponse(tr_web::FetchResponse const& web_response, tr
     if (status != HTTP_OK)
     {
         auto const* const response_str = tr_webGetResponseStr(status);
-        response->errmsg = tr_strvJoin("Tracker HTTP response "sv, std::to_string(status), " ("sv, response_str, ")"sv);
+        response->errmsg = fmt::format(FMT_STRING("Tracker HTTP response {:d} ({:s}"), status, response_str);
 
         return false;
     }
@@ -416,15 +415,15 @@ void tr_tracker_http_announce(
      */
     auto url_base = announce_url_new(session, request);
 
-    auto options = tr_web::FetchOptions{ url_base, onAnnounceDone, d };
+    auto options = tr_web::FetchOptions{ url_base.sv(), onAnnounceDone, d };
     options.timeout_secs = 90L;
     options.sndbuf = 1024;
     options.rcvbuf = 3072;
 
-    auto do_make_request = [&](std::string_view const& protocol_name, tr_web::FetchOptions&& options)
+    auto do_make_request = [&](std::string_view const& protocol_name, tr_web::FetchOptions&& opt)
     {
-        tr_logAddTrace(fmt::format("Sending {} announce to libcurl: '{}'", protocol_name, options.url), request->log_name);
-        session->web->fetch(std::move(options));
+        tr_logAddTrace(fmt::format("Sending {} announce to libcurl: '{}'", protocol_name, opt.url), request->log_name);
+        session->web->fetch(std::move(opt));
     };
 
     auto ipv6 = tr_globalIPv6(session);
@@ -606,7 +605,7 @@ static void onScrapeDone(tr_web::FetchResponse const& web_response)
     if (status != HTTP_OK)
     {
         auto const* const response_str = tr_webGetResponseStr(status);
-        response.errmsg = tr_strvJoin("Tracker HTTP response "sv, std::to_string(status), " ("sv, response_str, ")"sv);
+        response.errmsg = fmt::format(FMT_STRING("Tracker HTTP response {:d} ({:s})"), status, response_str);
     }
     else if (!std::empty(body))
     {
@@ -621,23 +620,22 @@ static void onScrapeDone(tr_web::FetchResponse const& web_response)
     delete data;
 }
 
-static std::string scrape_url_new(tr_scrape_request const* req)
+static auto scrape_url_new(tr_scrape_request const* req)
 {
     auto const sv = req->scrape_url.sv();
+    char delimiter = tr_strvContains(sv, '?') ? '&' : '?';
 
-    auto* const buf = evbuffer_new();
-    evbuffer_add(buf, std::data(sv), std::size(sv));
+    auto scrape_url = tr_pathbuf{ sv };
 
-    char delimiter = sv.find('?') == std::string_view::npos ? '?' : '&';
     for (int i = 0; i < req->info_hash_count; ++i)
     {
         char str[SHA_DIGEST_LENGTH * 3 + 1];
         tr_http_escape_sha1(str, req->info_hash[i]);
-        evbuffer_add_printf(buf, "%cinfo_hash=%s", delimiter, str);
+        scrape_url.append(delimiter, "info_hash=", str);
         delimiter = '&';
     }
 
-    return evbuffer_free_to_str(buf);
+    return scrape_url;
 }
 
 void tr_tracker_http_scrape(

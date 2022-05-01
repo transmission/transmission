@@ -11,7 +11,7 @@
 #import "FileListNode.h"
 #import "NSStringAdditions.h"
 
-#define PADDING_HORIZONAL 2.0
+#define PADDING_HORIZONTAL 2.0
 #define IMAGE_FOLDER_SIZE 16.0
 #define IMAGE_ICON_SIZE 32.0
 #define PADDING_BETWEEN_IMAGE_AND_TITLE 4.0
@@ -73,7 +73,7 @@
 {
     NSRect result = bounds;
 
-    result.origin.x += PADDING_HORIZONAL;
+    result.origin.x += PADDING_HORIZONTAL;
 
     CGFloat const IMAGE_SIZE = ((FileListNode*)self.objectValue).isFolder ? IMAGE_FOLDER_SIZE : IMAGE_ICON_SIZE;
     result.origin.y += (result.size.height - IMAGE_SIZE) * 0.5;
@@ -85,7 +85,8 @@
 - (void)drawWithFrame:(NSRect)cellFrame inView:(NSView*)controlView
 {
     //icon
-    [self.image drawInRect:[self imageRectForBounds:cellFrame] fromRect:NSZeroRect operation:NSCompositingOperationSourceOver fraction:1.0
+    [self.image drawInRect:[self imageRectForBounds:cellFrame] fromRect:NSZeroRect operation:NSCompositingOperationSourceOver
+                  fraction:1.0
             respectFlipped:YES
                      hints:nil];
 
@@ -154,13 +155,13 @@
     NSRect result;
     if (!((FileListNode*)self.objectValue).isFolder)
     {
-        result.origin.x = NSMinX(bounds) + PADDING_HORIZONAL + IMAGE_ICON_SIZE + PADDING_BETWEEN_IMAGE_AND_TITLE;
+        result.origin.x = NSMinX(bounds) + PADDING_HORIZONTAL + IMAGE_ICON_SIZE + PADDING_BETWEEN_IMAGE_AND_TITLE;
         result.origin.y = NSMinY(bounds) + PADDING_ABOVE_TITLE_FILE;
         result.size.width = NSMaxX(bounds) - NSMinX(result);
     }
     else
     {
-        result.origin.x = NSMinX(bounds) + PADDING_HORIZONAL + IMAGE_FOLDER_SIZE + PADDING_BETWEEN_IMAGE_AND_TITLE;
+        result.origin.x = NSMinX(bounds) + PADDING_HORIZONTAL + IMAGE_FOLDER_SIZE + PADDING_BETWEEN_IMAGE_AND_TITLE;
         result.origin.y = NSMidY(bounds) - titleSize.height * 0.5;
         result.size.width = MIN(titleSize.width, NSMaxX(bounds) - NSMinX(result));
     }

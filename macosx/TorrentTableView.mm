@@ -2,6 +2,8 @@
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
+#import "CocoaCompatibility.h"
+
 #import "TorrentTableView.h"
 #import "Controller.h"
 #import "FileListNode.h"
@@ -69,12 +71,25 @@
 
         _fTorrentCell = [[TorrentCell alloc] init];
 
-        NSData* groupData = [_fDefaults dataForKey:@"CollapsedGroups"];
-        if (groupData)
+        NSData* groupData;
+        if ((groupData = [_fDefaults dataForKey:@"CollapsedGroupIndexes"]))
+        {
+            if (@available(macOS 10.13, *))
+            {
+                _fCollapsedGroups = [NSKeyedUnarchiver unarchivedObjectOfClass:NSMutableIndexSet.class fromData:groupData error:nil];
+            }
+            else
+            {
+                _fCollapsedGroups = [NSKeyedUnarchiver unarchiveObjectWithData:groupData];
+            }
+        }
+        else if ((groupData = [_fDefaults dataForKey:@"CollapsedGroups"])) //handle old groups
         {
             _fCollapsedGroups = [[NSUnarchiver unarchiveObjectWithData:groupData] mutableCopy];
+            [_fDefaults removeObjectForKey:@"CollapsedGroups"];
+            [self saveCollapsedGroups];
         }
-        else
+        if (_fCollapsedGroups == nil)
         {
             _fCollapsedGroups = [[NSMutableIndexSet alloc] init];
         }
@@ -139,7 +154,7 @@
 
 - (void)saveCollapsedGroups
 {
-    [self.fDefaults setObject:[NSArchiver archivedDataWithRootObject:self.fCollapsedGroups] forKey:@"CollapsedGroups"];
+    [self.fDefaults setObject:[NSKeyedArchiver archivedDataWithRootObject:self.fCollapsedGroups] forKey:@"CollapsedGroupIndexes"];
 }
 
 - (BOOL)outlineView:(NSOutlineView*)outlineView isGroupItem:(id)item
@@ -455,7 +470,8 @@
         return;
     }
 
-    BOOL const pushed = row != -1 && (self.actionButtonHoverRow == row || self.revealButtonHoverRow == row || self.controlButtonHoverRow == row);
+    BOOL const pushed = row != -1 &&
+        (self.actionButtonHoverRow == row || self.revealButtonHoverRow == row || self.controlButtonHoverRow == row);
 
     //if pushing a button, don't change the selected rows
     if (pushed)
@@ -545,7 +561,7 @@
     return values;
 }
 
-- (NSArray*)selectedTorrents
+- (NSArray<Torrent*>*)selectedTorrents
 {
     NSIndexSet* selectedIndexes = self.selectedRowIndexes;
     NSMutableArray* torrents = [NSMutableArray arrayWithCapacity:selectedIndexes.count]; //take a shot at guessing capacity
@@ -601,9 +617,7 @@
 {
     unichar const firstChar = [event.charactersIgnoringModifiers characterAtIndex:0];
 
-    if (firstChar == 'f' &&
-        event.modifierFlags & NSEventModifierFlagOption &&
-        event.modifierFlags & NSEventModifierFlagCommand)
+    if (firstChar == 'f' && event.modifierFlags & NSEventModifierFlagOption && event.modifierFlags & NSEventModifierFlagCommand)
     {
         [self.fController focusFilterField];
     }

@@ -14,7 +14,7 @@
 
 #include <event2/util.h> /* evutil_ascii_strcasecmp() */
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include "transmission.h"
 
@@ -44,14 +44,14 @@ struct FileList
     struct FileList* next;
 };
 
-static struct FileList* getFiles(char const* dir, char const* base, struct FileList* list)
+static struct FileList* getFiles(std::string_view dir, std::string_view base, struct FileList* list)
 {
-    if (dir == nullptr || base == nullptr)
+    if (std::empty(dir) || std::empty(base))
     {
         return nullptr;
     }
 
-    auto buf = tr_strvPath(dir, base);
+    auto buf = tr_pathbuf{ dir, '/', base };
     tr_sys_path_native_separators(std::data(buf));
 
     tr_sys_path_info info;
@@ -66,11 +66,11 @@ static struct FileList* getFiles(char const* dir, char const* base, struct FileL
         return list;
     }
 
-    if (tr_sys_dir_t odir = info.type == TR_SYS_PATH_IS_DIRECTORY ? tr_sys_dir_open(buf.c_str(), nullptr) : TR_BAD_SYS_DIR;
+    if (tr_sys_dir_t odir = info.type == TR_SYS_PATH_IS_DIRECTORY ? tr_sys_dir_open(buf.c_str()) : TR_BAD_SYS_DIR;
         odir != TR_BAD_SYS_DIR)
     {
         char const* name = nullptr;
-        while ((name = tr_sys_dir_read_name(odir, nullptr)) != nullptr)
+        while ((name = tr_sys_dir_read_name(odir)) != nullptr)
         {
             if (name[0] != '.') /* skip dotfiles */
             {
@@ -78,7 +78,7 @@ static struct FileList* getFiles(char const* dir, char const* base, struct FileL
             }
         }
 
-        tr_sys_dir_close(odir, nullptr);
+        tr_sys_dir_close(odir);
     }
     else if (info.type == TR_SYS_PATH_IS_FILE)
     {
@@ -133,7 +133,7 @@ static uint32_t bestPieceSize(uint64_t totalSize)
 
 tr_metainfo_builder* tr_metaInfoBuilderCreate(char const* topFileArg)
 {
-    char* const real_top = tr_sys_path_resolve(topFileArg, nullptr);
+    char* const real_top = tr_sys_path_resolve(topFileArg);
 
     if (real_top == nullptr)
     {
@@ -147,19 +147,12 @@ tr_metainfo_builder* tr_metaInfoBuilderCreate(char const* topFileArg)
 
     {
         tr_sys_path_info info;
-        ret->isFolder = tr_sys_path_get_info(ret->top, 0, &info, nullptr) && info.type == TR_SYS_PATH_IS_DIRECTORY;
+        ret->isFolder = tr_sys_path_get_info(ret->top, 0, &info) && info.type == TR_SYS_PATH_IS_DIRECTORY;
     }
 
     /* build a list of files containing top file and,
        if it's a directory, all of its children */
-    FileList* files = nullptr;
-    {
-        char* dir = tr_sys_path_dirname(ret->top, nullptr);
-        char* base = tr_sys_path_basename(ret->top, nullptr);
-        files = getFiles(dir, base, nullptr);
-        tr_free(base);
-        tr_free(dir);
-    }
+    auto* files = getFiles(tr_sys_path_dirname(ret->top), tr_sys_path_basename(ret->top), nullptr);
 
     for (auto* walk = files; walk != nullptr; walk = walk->next)
     {
@@ -172,7 +165,7 @@ tr_metainfo_builder* tr_metaInfoBuilderCreate(char const* topFileArg)
     auto const offset = strlen(ret->top);
     while (files != nullptr)
     {
-        struct FileList* const tmp = files;
+        auto* const tmp = files;
         files = files->next;
 
         auto* const file = &ret->files[i++];
@@ -299,7 +292,7 @@ static std::vector<std::byte> getHashInfo(tr_metainfo_builder* b)
         {
             uint64_t const n_this_pass = std::min(b->files[fileIndex].size - off, leftInPiece);
             uint64_t n_read = 0;
-            (void)tr_sys_file_read(fd, bufptr, n_this_pass, &n_read, nullptr);
+            (void)tr_sys_file_read(fd, bufptr, n_this_pass, &n_read);
             bufptr += n_read;
             off += n_read;
             leftInPiece -= n_read;
@@ -307,7 +300,7 @@ static std::vector<std::byte> getHashInfo(tr_metainfo_builder* b)
             if (off == b->files[fileIndex].size)
             {
                 off = 0;
-                tr_sys_file_close(fd, nullptr);
+                tr_sys_file_close(fd);
                 fd = TR_BAD_SYS_FILE;
 
                 if (++fileIndex < b->fileCount)
@@ -332,7 +325,7 @@ static std::vector<std::byte> getHashInfo(tr_metainfo_builder* b)
         if (!digest)
         {
             b->my_errno = EIO;
-            tr_snprintf(b->errfile, sizeof(b->errfile), "error hashing piece %" PRIu32, b->pieceIndex);
+            *fmt::format_to_n(b->errfile, sizeof(b->errfile) - 1, "error hashing piece {:d}", b->pieceIndex).out = '\0';
             b->result = TrMakemetaResult::ERR_IO_READ;
             break;
         }
@@ -354,7 +347,7 @@ static std::vector<std::byte> getHashInfo(tr_metainfo_builder* b)
 
     if (fd != TR_BAD_SYS_FILE)
     {
-        tr_sys_file_close(fd, nullptr);
+        tr_sys_file_close(fd);
     }
 
     return ret;
@@ -412,10 +405,9 @@ static void makeInfoDict(tr_variant* dict, tr_metainfo_builder* builder)
         tr_variantDictAddInt(dict, TR_KEY_length, builder->files[0].size);
     }
 
-    if (auto* const base = tr_sys_path_basename(builder->top, nullptr); base != nullptr)
+    if (auto const base = tr_sys_path_basename(builder->top); !std::empty(base))
     {
         tr_variantDictAddStr(dict, TR_KEY_name, base);
-        tr_free(base);
     }
 
     tr_variantDictAddInt(dict, TR_KEY_piece_length, builder->pieceSize);
@@ -623,14 +615,8 @@ void tr_makeMetaInfo(
     builder->isPrivate = isPrivate;
     builder->source = tr_strdup(source);
 
-    if (!tr_str_is_empty(outputFile))
-    {
-        builder->outputFile = tr_strdup(outputFile);
-    }
-    else
-    {
-        builder->outputFile = tr_strvDup(tr_strvJoin(builder->top, ".torrent"sv));
-    }
+    builder->outputFile = !tr_str_is_empty(outputFile) ? tr_strdup(outputFile) :
+                                                         tr_strvDup(fmt::format(FMT_STRING("{:s}.torrent"), builder->top));
 
     /* enqueue the builder */
     auto const lock = std::lock_guard(queue_mutex_);

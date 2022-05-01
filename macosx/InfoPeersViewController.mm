@@ -15,14 +15,14 @@
 #define ANIMATION_ID_KEY @"animationId"
 #define WEB_SEED_ANIMATION_ID @"webSeed"
 
-@interface InfoPeersViewController () <CAAnimationDelegate>
+@interface InfoPeersViewController ()<CAAnimationDelegate>
 
-@property(nonatomic, copy) NSArray* fTorrents;
+@property(nonatomic, copy) NSArray<Torrent*>* fTorrents;
 
 @property(nonatomic) BOOL fSet;
 
-@property(nonatomic) NSMutableArray* fPeers;
-@property(nonatomic) NSMutableArray* fWebSeeds;
+@property(nonatomic) NSMutableArray<NSDictionary*>* fPeers;
+@property(nonatomic) NSMutableArray<NSDictionary*>* fWebSeeds;
 
 @property(nonatomic) IBOutlet NSTableView* fPeerTable;
 @property(nonatomic) IBOutlet WebSeedTableView* fWebSeedTable;
@@ -31,7 +31,7 @@
 
 @property(nonatomic) CGFloat fViewTopMargin;
 @property(nonatomic) IBOutlet NSLayoutConstraint* fWebSeedTableTopConstraint;
-@property(nonatomic, readonly) NSArray* peerSortDescriptors;
+@property(nonatomic, readonly) NSArray<NSSortDescriptor*>* peerSortDescriptors;
 
 - (void)setupInfo;
 
@@ -71,7 +71,9 @@
     [self.fWebSeedTable tableColumnWithIdentifier:@"DL From"].headerCell.stringValue = NSLocalizedString(@"DL", "inspector -> web seed table -> header");
 
     //set table header tool tips
-    [self.fPeerTable tableColumnWithIdentifier:@"Encryption"].headerToolTip = NSLocalizedString(@"Encrypted Connection", "inspector -> peer table -> header tool tip");
+    [self.fPeerTable tableColumnWithIdentifier:@"Encryption"].headerToolTip = NSLocalizedString(
+        @"Encrypted Connection",
+        "inspector -> peer table -> header tool tip");
     [self.fPeerTable tableColumnWithIdentifier:@"Progress"].headerToolTip = NSLocalizedString(@"Available", "inspector -> peer table -> header tool tip");
     [self.fPeerTable tableColumnWithIdentifier:@"DL From"].headerToolTip = NSLocalizedString(@"Downloading From Peer", "inspector -> peer table -> header tool tip");
     [self.fPeerTable tableColumnWithIdentifier:@"UL To"].headerToolTip = NSLocalizedString(@"Uploading To Peer", "inspector -> peer table -> header tool tip");
@@ -94,7 +96,7 @@
 }
 
 #warning subclass?
-- (void)setInfoForTorrents:(NSArray*)torrents
+- (void)setInfoForTorrents:(NSArray<Torrent*>*)torrents
 {
     //don't check if it's the same in case the metadata changed
     self.fTorrents = torrents;
@@ -571,7 +573,7 @@
     (animate ? [self.fWebSeedTableTopConstraint animator] : self.fWebSeedTableTopConstraint).constant = webSeedTableTopMargin;
 }
 
-- (NSArray*)peerSortDescriptors
+- (NSArray<NSSortDescriptor*>*)peerSortDescriptors
 {
     NSMutableArray* descriptors = [NSMutableArray arrayWithCapacity:2];
 

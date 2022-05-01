@@ -62,7 +62,7 @@ static void log_polarssl_error(int error_code, char const* file, int line)
             TR_LOG_ERROR,
             fmt::format(
                 _("{crypto_library} error: {error} ({error_code})"),
-                fmt::arg("crypto_library", "PolarSSL"),
+                fmt::arg("crypto_library", "PolarSSL/MbedTLS"),
                 fmt::arg("error", error_message),
                 fmt::arg("error_code", error_code)));
     }

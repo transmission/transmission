@@ -421,7 +421,7 @@ struct jsonsl_state_st {
  */
 
 /**
- * This is called when a stack change ocurs.
+ * This is called when a stack change occurs.
  *
  * @param jsn The lexer
  * @param action The type of action, this can be PUSH or POP
@@ -707,7 +707,7 @@ void jsonsl_dump_global_metrics(void);
  *
  *
  * JPR (as we'll refer to it within the source) can be used by splitting
- * the components into mutliple sections, and incrementally 'track' each
+ * the components into multiple sections, and incrementally 'track' each
  * component. When JSONSL delivers a 'pop' callback for a string, or a 'push'
  * callback for an object, we will check to see whether the index matching
  * the component corresponding to the current level contains a match
@@ -842,7 +842,7 @@ jsonsl_jpr_match_t jsonsl_jpr_match(jsonsl_jpr_t jpr,
  * assumes that there is a clear distinction between array indices and
  * object keys. In this case, the jsonsl_path_component_st::ptype should
  * be set to @ref JSONSL_PATH_NUMERIC for an array index (the
- * jsonsl_path_comonent_st::is_arridx field will be removed in a future
+ * jsonsl_path_component_st::is_arridx field will be removed in a future
  * version).
  *
  * @param jpr The path
@@ -961,7 +961,7 @@ const char *jsonsl_strmatchtype(jsonsl_jpr_match_t match);
  * @param oflags If not null, and a \uXXXX escape expands to a non-ascii byte,
  * then this variable will have the SPECIALf_NONASCII flag on.
  *
- * @param err A pointer to an error variable. If an error ocurrs, it will be
+ * @param err A pointer to an error variable. If an error occurs, it will be
  * set in this variable
  * @param errat If not null and an error occurs, this will be set to point
  * to the position within the string at which the offending character was

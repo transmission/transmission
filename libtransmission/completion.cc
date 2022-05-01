@@ -13,18 +13,11 @@
 #include "torrent.h"
 #include "tr-assert.h"
 
-uint64_t tr_completion::leftUntilDone() const
-{
-    auto const size_when_done = sizeWhenDone();
-    auto const has_total = hasTotal();
-    return size_when_done - has_total;
-}
-
 uint64_t tr_completion::computeHasValid() const
 {
     uint64_t size = 0;
 
-    for (tr_piece_index_t piece = 0, n = block_info_->n_pieces; piece < n; ++piece)
+    for (tr_piece_index_t piece = 0, n_pieces = block_info_->pieceCount(); piece < n_pieces; ++piece)
     {
         if (hasPiece(piece))
         {
@@ -49,12 +42,12 @@ uint64_t tr_completion::computeSizeWhenDone() const
 {
     if (hasAll())
     {
-        return block_info_->total_size;
+        return block_info_->totalSize();
     }
 
     // count bytes that we want or that we already have
     auto size = uint64_t{ 0 };
-    for (tr_piece_index_t piece = 0; piece < block_info_->n_pieces; ++piece)
+    for (tr_piece_index_t piece = 0, n_pieces = block_info_->pieceCount(); piece < n_pieces; ++piece)
     {
         if (tor_->pieceIsWanted(piece))
         {
@@ -129,7 +122,7 @@ tr_completeness tr_completion::status() const
 
 std::vector<uint8_t> tr_completion::createPieceBitfield() const
 {
-    size_t const n = block_info_->n_pieces;
+    size_t const n = block_info_->pieceCount();
     auto pieces = tr_bitfield{ n };
 
     auto flags = std::make_unique<bool[]>(n);
@@ -167,7 +160,7 @@ void tr_completion::setBlocks(tr_bitfield blocks)
     has_valid_.reset();
 }
 
-void tr_completion::setHasAll()
+void tr_completion::setHasAll() noexcept
 {
     auto const total_size = block_info_->totalSize();
 
@@ -198,13 +191,17 @@ void tr_completion::removePiece(tr_piece_index_t piece)
 uint64_t tr_completion::countHasBytesInBlocks(tr_block_span_t span) const
 {
     auto const [begin, end] = span;
+    if (begin >= end)
+    {
+        return 0;
+    }
 
     uint64_t n = blocks_.count(begin, end);
     n *= tr_block_info::BlockSize;
 
-    if (end == block_info_->n_blocks && blocks_.test(end - 1))
+    if (end == block_info_->blockCount() && blocks_.test(end - 1))
     {
-        n -= tr_block_info::BlockSize - block_info_->final_block_size;
+        n -= tr_block_info::BlockSize - block_info_->blockSize(end - 1);
     }
 
     return n;
@@ -213,8 +210,8 @@ uint64_t tr_completion::countHasBytesInBlocks(tr_block_span_t span) const
 uint64_t tr_completion::countHasBytesInSpan(tr_byte_span_t span) const
 {
     // confirm the span is valid
-    span.begin = std::clamp(span.begin, uint64_t{ 0 }, block_info_->total_size);
-    span.end = std::clamp(span.end, uint64_t{ 0 }, block_info_->total_size);
+    span.begin = std::clamp(span.begin, uint64_t{ 0 }, block_info_->totalSize());
+    span.end = std::clamp(span.end, uint64_t{ 0 }, block_info_->totalSize());
     auto const [begin_byte, end_byte] = span;
     if (begin_byte >= end_byte)
     {

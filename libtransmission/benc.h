@@ -9,7 +9,6 @@
 #include <cerrno>
 #include <cstddef> // size_t
 #include <cstdint> // int64_t
-#include <cstdlib>
 #include <optional>
 #include <string_view>
 #include <utility> // make_pair
@@ -131,13 +130,13 @@ struct BasicHandler : public Handler
     }
 
 private:
-    void push()
+    constexpr void push() noexcept
     {
         ++depth_;
         keys_[depth_] = {};
     }
 
-    void pop()
+    constexpr void pop() noexcept
     {
         --depth_;
     }
@@ -162,26 +161,32 @@ struct ParserStack
     std::array<Node, MaxDepth> stack;
     std::size_t depth = 0;
 
-    void clear()
+    constexpr void clear() noexcept
     {
         depth = 0;
     }
 
-    void tokenWalked()
+    [[nodiscard]] constexpr auto empty() const noexcept
+    {
+        return depth == 0;
+    }
+
+    constexpr void tokenWalked()
     {
         ++stack[depth].n_children_walked;
     }
 
-    Node& current()
-    {
-        return stack[depth];
-    }
-    Node& current() const
+    [[nodiscard]] constexpr Node& current()
     {
         return stack[depth];
     }
 
-    [[nodiscard]] bool expectingDictKey() const
+    [[nodiscard]] constexpr Node& current() const
+    {
+        return stack[depth];
+    }
+
+    [[nodiscard]] constexpr bool expectingDictKey() const
     {
         return depth > 0 && stack[depth].parent_type == ParentType::Dict && (stack[depth].n_children_walked % 2) == 0;
     }

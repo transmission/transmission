@@ -4,7 +4,6 @@
 // License text can be found in the licenses/ folder.
 
 #include <algorithm>
-#include <string_view>
 
 #include <sys/types.h>
 
@@ -92,9 +91,9 @@ static void natPulse(tr_shared* s, bool do_check)
         session->public_peer_port = public_peer_port;
         session->private_peer_port = received_private_port;
         tr_logAddInfo(fmt::format(
-            _("Mapped private port '{private_port}' to public port '{public_port}'"),
-            fmt::arg("public_port", session->public_peer_port),
-            fmt::arg("private_port", session->private_peer_port)));
+            _("Mapped private port {private_port} to public port {public_port}"),
+            fmt::arg("public_port", session->public_peer_port.host()),
+            fmt::arg("private_port", session->private_peer_port.host())));
     }
 
     s->upnpStatus = tr_upnpPulse(
@@ -109,7 +108,7 @@ static void natPulse(tr_shared* s, bool do_check)
     if (new_status != old_status)
     {
         tr_logAddInfo(fmt::format(
-            _("State changed from '{old_state}' to '{state}"),
+            _("State changed from '{old_state}' to '{state}'"),
             fmt::arg("old_state", getNatStateStr(old_status)),
             fmt::arg("state", getNatStateStr(new_status))));
     }
@@ -143,7 +142,7 @@ static void set_evtimer_from_status(tr_shared* s)
 
     if (s->timer != nullptr)
     {
-        tr_timerAdd(s->timer, sec, msec);
+        tr_timerAdd(*s->timer, sec, msec);
     }
 }
 

@@ -18,6 +18,7 @@
 #import "PortChecker.h"
 #import "BonjourController.h"
 #import "NSApplicationAdditions.h"
+#import "NSImageAdditions.h"
 #import "NSStringAdditions.h"
 
 #define DOWNLOAD_FOLDER 0
@@ -96,7 +97,7 @@
 @property(nonatomic) IBOutlet NSTextField* fRPCPortField;
 @property(nonatomic) IBOutlet NSTextField* fRPCPasswordField;
 @property(nonatomic) IBOutlet NSTableView* fRPCWhitelistTable;
-@property(nonatomic, readonly) NSMutableArray* fRPCWhitelistArray;
+@property(nonatomic, readonly) NSMutableArray<NSString*>* fRPCWhitelistArray;
 @property(nonatomic) IBOutlet NSSegmentedControl* fRPCAddRemoveControl;
 @property(nonatomic, copy) NSString* fRPCPassword;
 
@@ -237,8 +238,9 @@
     self.fNatStatus = -1;
 
     [self updatePortStatus];
-    self.fPortStatusTimer = [NSTimer scheduledTimerWithTimeInterval:5.0 target:self selector:@selector(updatePortStatus) userInfo:nil
-                                                       repeats:YES];
+    self.fPortStatusTimer = [NSTimer scheduledTimerWithTimeInterval:5.0 target:self selector:@selector(updatePortStatus)
+                                                           userInfo:nil
+                                                            repeats:YES];
 
     //set peer connections
     self.fPeersGlobalField.intValue = [self.fDefaults integerForKey:@"PeersTotal"];
@@ -295,14 +297,7 @@
     if ([ident isEqualToString:TOOLBAR_GENERAL])
     {
         item.label = NSLocalizedString(@"General", "Preferences -> toolbar item title");
-        if (@available(macOS 11.0, *))
-        {
-            item.image = [NSImage imageWithSystemSymbolName:@"gearshape" accessibilityDescription:nil];
-        }
-        else
-        {
-            item.image = [NSImage imageNamed:NSImageNamePreferencesGeneral];
-        }
+        item.image = [NSImage systemSymbol:@"gearshape" withFallback:NSImageNamePreferencesGeneral];
         item.target = self;
         item.action = @selector(setPrefView:);
         item.autovalidates = NO;
@@ -310,14 +305,7 @@
     else if ([ident isEqualToString:TOOLBAR_TRANSFERS])
     {
         item.label = NSLocalizedString(@"Transfers", "Preferences -> toolbar item title");
-        if (@available(macOS 11.0, *))
-        {
-            item.image = [NSImage imageWithSystemSymbolName:@"arrow.up.arrow.down" accessibilityDescription:nil];
-        }
-        else
-        {
-            item.image = [NSImage imageNamed:@"Transfers"];
-        }
+        item.image = [NSImage systemSymbol:@"arrow.up.arrow.down" withFallback:@"Transfers"];
         item.target = self;
         item.action = @selector(setPrefView:);
         item.autovalidates = NO;
@@ -325,14 +313,7 @@
     else if ([ident isEqualToString:TOOLBAR_GROUPS])
     {
         item.label = NSLocalizedString(@"Groups", "Preferences -> toolbar item title");
-        if (@available(macOS 11.0, *))
-        {
-            item.image = [NSImage imageWithSystemSymbolName:@"pin" accessibilityDescription:nil];
-        }
-        else
-        {
-            item.image = [NSImage imageNamed:@"Groups"];
-        }
+        item.image = [NSImage systemSymbol:@"pin" withFallback:@"Groups"];
         item.target = self;
         item.action = @selector(setPrefView:);
         item.autovalidates = NO;
@@ -340,14 +321,7 @@
     else if ([ident isEqualToString:TOOLBAR_BANDWIDTH])
     {
         item.label = NSLocalizedString(@"Bandwidth", "Preferences -> toolbar item title");
-        if (@available(macOS 11.0, *))
-        {
-            item.image = [NSImage imageWithSystemSymbolName:@"speedometer" accessibilityDescription:nil];
-        }
-        else
-        {
-            item.image = [NSImage imageNamed:@"Bandwidth"];
-        }
+        item.image = [NSImage systemSymbol:@"speedometer" withFallback:@"Bandwidth"];
         item.target = self;
         item.action = @selector(setPrefView:);
         item.autovalidates = NO;
@@ -355,14 +329,7 @@
     else if ([ident isEqualToString:TOOLBAR_PEERS])
     {
         item.label = NSLocalizedString(@"Peers", "Preferences -> toolbar item title");
-        if (@available(macOS 11.0, *))
-        {
-            item.image = [NSImage imageWithSystemSymbolName:@"person.2" accessibilityDescription:nil];
-        }
-        else
-        {
-            item.image = [NSImage imageNamed:NSImageNameUserGroup];
-        }
+        item.image = [NSImage systemSymbol:@"person.2" withFallback:NSImageNameUserGroup];
         item.target = self;
         item.action = @selector(setPrefView:);
         item.autovalidates = NO;
@@ -370,14 +337,7 @@
     else if ([ident isEqualToString:TOOLBAR_NETWORK])
     {
         item.label = NSLocalizedString(@"Network", "Preferences -> toolbar item title");
-        if (@available(macOS 11.0, *))
-        {
-            item.image = [NSImage imageWithSystemSymbolName:@"network" accessibilityDescription:nil];
-        }
-        else
-        {
-            item.image = [NSImage imageNamed:NSImageNameNetwork];
-        }
+        item.image = [NSImage systemSymbol:@"network" withFallback:NSImageNameNetwork];
         item.target = self;
         item.action = @selector(setPrefView:);
         item.autovalidates = NO;
@@ -385,14 +345,7 @@
     else if ([ident isEqualToString:TOOLBAR_REMOTE])
     {
         item.label = NSLocalizedString(@"Remote", "Preferences -> toolbar item title");
-        if (@available(macOS 11.0, *))
-        {
-            item.image = [NSImage imageWithSystemSymbolName:@"antenna.radiowaves.left.and.right" accessibilityDescription:nil];
-        }
-        else
-        {
-            item.image = [NSImage imageNamed:@"Remote"];
-        }
+        item.image = [NSImage systemSymbol:@"antenna.radiowaves.left.and.right" withFallback:@"Remote"];
         item.target = self;
         item.action = @selector(setPrefView:);
         item.autovalidates = NO;
@@ -449,7 +402,7 @@
 
 - (void)setPort:(id)sender
 {
-    tr_port const port = [sender intValue];
+    uint16_t const port = [sender intValue];
     [self.fDefaults setInteger:port forKey:@"BindPort"];
     tr_sessionSetPeerPort(self.fHandle, port);
 
@@ -459,7 +412,7 @@
 
 - (void)randomPort:(id)sender
 {
-    tr_port const port = tr_sessionSetPeerPortRandom(self.fHandle);
+    auto const port = tr_sessionSetPeerPortRandom(self.fHandle);
     [self.fDefaults setInteger:port forKey:@"BindPort"];
     self.fPortField.intValue = port;
 
@@ -529,7 +482,7 @@
     self.fPortChecker = nil;
 }
 
-- (NSArray*)sounds
+- (NSArray<NSString*>*)sounds
 {
     NSMutableArray* sounds = [NSMutableArray array];
 
@@ -789,7 +742,7 @@
 - (void)setSpeedLimit:(id)sender
 {
     [self.fDefaults setInteger:[sender intValue]
-                   forKey:sender == self.fSpeedLimitUploadField ? @"SpeedLimitUploadLimit" : @"SpeedLimitDownloadLimit"];
+                        forKey:sender == self.fSpeedLimitUploadField ? @"SpeedLimitUploadLimit" : @"SpeedLimitDownloadLimit"];
     [self applyAltSpeedSettings];
 }
 
@@ -890,7 +843,7 @@
 
 - (void)setQueueNumber:(id)sender
 {
-    NSInteger const number = [sender intValue];
+    int const number = [sender intValue];
     BOOL const seed = sender == self.fQueueSeedField;
 
     [self.fDefaults setInteger:number forKey:seed ? @"QueueSeedNumber" : @"QueueDownloadNumber"];
@@ -908,7 +861,7 @@
 
 - (void)setStalledMinutes:(id)sender
 {
-    NSInteger const min = [sender intValue];
+    int const min = [sender intValue];
     [self.fDefaults setInteger:min forKey:@"StalledMinutes"];
     tr_sessionSetQueueStalledMinutes(self.fHandle, min);
 
@@ -1230,7 +1183,7 @@
         [self.fRPCWhitelistArray addObject:@""];
         [self.fRPCWhitelistTable reloadData];
 
-        int const row = self.fRPCWhitelistArray.count - 1;
+        NSUInteger const row = self.fRPCWhitelistArray.count - 1;
         [self.fRPCWhitelistTable selectRowIndexes:[NSIndexSet indexSetWithIndex:row] byExtendingSelection:NO];
         [self.fRPCWhitelistTable editColumn:0 row:row withEvent:nil select:YES];
     }
@@ -1360,8 +1313,8 @@
     BOOL const useIncomplete = tr_sessionIsIncompleteDirEnabled(self.fHandle);
     [self.fDefaults setBool:useIncomplete forKey:@"UseIncompleteDownloadFolder"];
 
-    BOOL const usePartialFileRanaming = tr_sessionIsIncompleteFileNamingEnabled(self.fHandle);
-    [self.fDefaults setBool:usePartialFileRanaming forKey:@"RenamePartialFiles"];
+    BOOL const usePartialFileRenaming = tr_sessionIsIncompleteFileNamingEnabled(self.fHandle);
+    [self.fDefaults setBool:usePartialFileRenaming forKey:@"RenamePartialFiles"];
 
     //utp
     BOOL const utp = tr_sessionIsUTPEnabled(self.fHandle);
@@ -1391,7 +1344,7 @@
     [self.fDefaults setBool:autoStart forKey:@"AutoStartDownload"];
 
     //port
-    tr_port const port = tr_sessionGetPeerPort(self.fHandle);
+    auto const port = tr_sessionGetPeerPort(self.fHandle);
     [self.fDefaults setInteger:port forKey:@"BindPort"];
 
     BOOL const nat = tr_sessionIsPortForwardingEnabled(self.fHandle);

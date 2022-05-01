@@ -10,7 +10,7 @@
 #endif
 
 #include <array>
-#include <cstddef> // size_t
+#include <cstdint> // uint64_t
 #include <string>
 #include <string_view>
 #include <vector>
@@ -18,6 +18,7 @@
 #include "transmission.h"
 
 #include "interned-string.h"
+#include "net.h"
 #include "peer-mgr.h" // tr_pex
 #include "web-utils.h"
 
@@ -133,7 +134,7 @@ struct tr_announce_request
     bool partial_seed = false;
 
     /* the port we listen for incoming peers on */
-    int port = 0;
+    tr_port port;
 
     /* per-session key */
     int key = 0;

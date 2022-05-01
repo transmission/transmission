@@ -6,6 +6,7 @@
 #include <libtransmission/makemeta.h>
 #include <libtransmission/utils.h>
 #include <libtransmission/web-utils.h> // tr_urlIsValidTracker()
+#include <cmath>
 
 #import "CreatorWindowController.h"
 #import "Controller.h"
@@ -28,6 +29,7 @@
 @property(nonatomic) IBOutlet NSButton* fPrivateCheck;
 @property(nonatomic) IBOutlet NSButton* fOpenCheck;
 @property(nonatomic) IBOutlet NSTextField* fSource;
+@property(nonatomic) IBOutlet NSStepper* fPieceSizeStepper;
 
 @property(nonatomic) IBOutlet NSView* fProgressView;
 @property(nonatomic) IBOutlet NSProgressIndicator* fProgressIndicator;
@@ -35,7 +37,7 @@
 @property(nonatomic, readonly) tr_metainfo_builder* fInfo;
 @property(nonatomic, readonly) NSURL* fPath;
 @property(nonatomic) NSURL* fLocation;
-@property(nonatomic) NSMutableArray* fTrackers;
+@property(nonatomic) NSMutableArray<NSString*>* fTrackers;
 
 @property(nonatomic) NSTimer* fTimer;
 @property(nonatomic) BOOL fStarted;
@@ -187,26 +189,19 @@ NSMutableSet* creatorWindowControllerSet = nil;
     }
     self.fStatusField.stringValue = statusString;
 
-    if (self.fInfo->pieceCount == 1)
-    {
-        self.fPiecesField.stringValue = [NSString stringWithFormat:NSLocalizedString(@"1 piece, %@", "Create torrent -> info"),
-                                                              [NSString stringForFileSize:self.fInfo->pieceSize]];
-    }
-    else
-    {
-        self.fPiecesField.stringValue = [NSString stringWithFormat:NSLocalizedString(@"%d pieces, %@ each", "Create torrent -> info"),
-                                                              self.fInfo->pieceCount,
-                                                              [NSString stringForFileSize:self.fInfo->pieceSize]];
-    }
+    [self updatePiecesField];
+    [self.fPieceSizeStepper setIntValue:(int)log2((double)self.fInfo->pieceSize)];
 
-    self.fLocation = [[self.fDefaults URLForKey:@"CreatorLocationURL"] URLByAppendingPathComponent:[name stringByAppendingPathExtension:@"torrent"]];
+    self.fLocation = [[self.fDefaults URLForKey:@"CreatorLocationURL"]
+        URLByAppendingPathComponent:[name stringByAppendingPathExtension:@"torrent"]];
     if (!self.fLocation)
     {
         //for 2.5 and earlier
 #warning we still store "CreatorLocation" in Defaults.plist, and not "CreatorLocationURL"
         NSString* location = [self.fDefaults stringForKey:@"CreatorLocation"];
-        self.fLocation = [[NSURL alloc] initFileURLWithPath:[location.stringByExpandingTildeInPath
-                                                           stringByAppendingPathComponent:[name stringByAppendingPathExtension:@"torrent"]]];
+        self.fLocation = [[NSURL alloc]
+            initFileURLWithPath:[location.stringByExpandingTildeInPath
+                                    stringByAppendingPathComponent:[name stringByAppendingPathExtension:@"torrent"]]];
     }
     [self updateLocationField];
 
@@ -364,6 +359,15 @@ NSMutableSet* creatorWindowControllerSet = nil;
     [self.fTimer fire];
 }
 
+- (IBAction)incrementOrDecrementPieceSize:(id)sender
+{
+    uint32_t pieceSize = (uint32_t)pow(2.0, [sender intValue]);
+    if (tr_metaInfoBuilderSetPieceSize(self.fInfo, pieceSize))
+    {
+        [self updatePiecesField];
+    }
+}
+
 - (NSInteger)numberOfRowsInTableView:(NSTableView*)tableView
 {
     return self.fTrackers.count;
@@ -507,6 +511,21 @@ NSMutableSet* creatorWindowControllerSet = nil;
 
 #pragma mark - Private
 
+- (void)updatePiecesField
+{
+    if (self.fInfo->pieceCount == 1)
+    {
+        self.fPiecesField.stringValue = [NSString stringWithFormat:NSLocalizedString(@"1 piece, %@", "Create torrent -> info"),
+                                                                   [NSString stringForFileSize:self.fInfo->pieceSize]];
+    }
+    else
+    {
+        self.fPiecesField.stringValue = [NSString stringWithFormat:NSLocalizedString(@"%d pieces, %@ each", "Create torrent -> info"),
+                                                                   self.fInfo->pieceCount,
+                                                                   [NSString stringForFileSize:self.fInfo->pieceSize]];
+    }
+}
+
 - (void)updateLocationField
 {
     NSString* pathString = self.fLocation.path;
@@ -585,9 +604,10 @@ NSMutableSet* creatorWindowControllerSet = nil;
     //store values
     [self.fDefaults setObject:self.fTrackers forKey:@"CreatorTrackers"];
     [self.fDefaults setBool:self.fPrivateCheck.state == NSControlStateValueOn forKey:@"CreatorPrivate"];
-    [self.fDefaults setObject: [self.fSource stringValue] forKey: @"CreatorSource"];
+    [self.fDefaults setObject:[self.fSource stringValue] forKey:@"CreatorSource"];
     [self.fDefaults setBool:self.fOpenCheck.state == NSControlStateValueOn forKey:@"CreatorOpen"];
-    self.fOpenWhenCreated = self.fOpenCheck.state == NSControlStateValueOn; //need this since the check box might not exist, and value in prefs might have changed from another creator window
+    self.fOpenWhenCreated = self.fOpenCheck.state ==
+        NSControlStateValueOn; //need this since the check box might not exist, and value in prefs might have changed from another creator window
     [self.fDefaults setURL:self.fLocation.URLByDeletingLastPathComponent forKey:@"CreatorLocationURL"];
 
     self.window.restorable = NO;
@@ -605,7 +625,8 @@ NSMutableSet* creatorWindowControllerSet = nil;
         self.fSource.stringValue.UTF8String);
     tr_free(trackerInfo);
 
-    self.fTimer = [NSTimer scheduledTimerWithTimeInterval:0.1 target:self selector:@selector(checkProgress) userInfo:nil repeats:YES];
+    self.fTimer = [NSTimer scheduledTimerWithTimeInterval:0.1 target:self selector:@selector(checkProgress) userInfo:nil
+                                                  repeats:YES];
 }
 
 - (void)checkProgress
@@ -621,7 +642,10 @@ NSMutableSet* creatorWindowControllerSet = nil;
         case TrMakemetaResult::OK:
             if (self.fOpenWhenCreated)
             {
-                NSDictionary* dict = @{ @"File" : self.fLocation.path, @"Path" : self.fPath.URLByDeletingLastPathComponent.path };
+                NSDictionary* dict = @{
+                    @"File" : self.fLocation.path,
+                    @"Path" : self.fPath.URLByDeletingLastPathComponent.path
+                };
                 [NSNotificationCenter.defaultCenter postNotificationName:@"OpenCreatedTorrentFile" object:self userInfo:dict];
             }
 

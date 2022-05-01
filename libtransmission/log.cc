@@ -8,12 +8,14 @@
 #include <cstdio>
 #include <map>
 #include <mutex>
+#include <string>
 #include <string_view>
 #include <utility>
 
 #include <event2/buffer.h>
 
-#include <fmt/core.h>
+#include <fmt/chrono.h>
+#include <fmt/format.h>
 
 #include "transmission.h"
 
@@ -31,17 +33,28 @@ using namespace std::literals;
 namespace
 {
 
-tr_log_level tr_message_level = TR_LOG_ERROR;
+class tr_log_state
+{
+public:
+    [[nodiscard]] auto unique_lock()
+    {
+        return std::unique_lock(message_mutex_);
+    }
 
-bool myQueueEnabled = false;
+    tr_log_level level = TR_LOG_ERROR;
 
-tr_log_message* myQueue = nullptr;
+    bool queue_enabled_ = false;
 
-tr_log_message** myQueueTail = &myQueue;
+    tr_log_message* queue_ = nullptr;
 
-int myQueueLength = 0;
+    tr_log_message** queue_tail_ = &queue_;
 
-std::recursive_mutex message_mutex_;
+    int queue_length_ = 0;
+
+    std::recursive_mutex message_mutex_;
+};
+
+auto log_state = tr_log_state{};
 
 ///
 
@@ -55,11 +68,11 @@ tr_sys_file_t tr_logGetFile()
         switch (tr_env_get_int("TR_DEBUG_FD", 0))
         {
         case 1:
-            file = tr_sys_file_get_std(TR_STD_SYS_FILE_OUT, nullptr);
+            file = tr_sys_file_get_std(TR_STD_SYS_FILE_OUT);
             break;
 
         case 2:
-            file = tr_sys_file_get_std(TR_STD_SYS_FILE_ERR, nullptr);
+            file = tr_sys_file_get_std(TR_STD_SYS_FILE_ERR);
             break;
 
         default:
@@ -76,7 +89,7 @@ tr_sys_file_t tr_logGetFile()
 void logAddImpl(
     [[maybe_unused]] char const* file,
     [[maybe_unused]] int line,
-    tr_log_level level,
+    [[maybe_unused]] tr_log_level level,
     std::string_view msg,
     [[maybe_unused]] std::string_view name)
 {
@@ -85,10 +98,10 @@ void logAddImpl(
         return;
     }
 
-    auto const lock = std::lock_guard(message_mutex_);
+    auto const lock = log_state.unique_lock();
 #ifdef _WIN32
 
-    OutputDebugStringA(tr_strvJoin(msg, "\r\n").c_str());
+    OutputDebugStringA(fmt::format(FMT_STRING("{:s}\r\n"), msg).c_str());
 
 #elif defined(__ANDROID__)
 
@@ -133,18 +146,18 @@ void logAddImpl(
         newmsg->line = line;
         newmsg->name = tr_strvDup(name);
 
-        *myQueueTail = newmsg;
-        myQueueTail = &newmsg->next;
-        ++myQueueLength;
+        *log_state.queue_tail_ = newmsg;
+        log_state.queue_tail_ = &newmsg->next;
+        ++log_state.queue_length_;
 
-        if (myQueueLength > TR_LOG_MAX_QUEUE_LENGTH)
+        if (log_state.queue_length_ > TR_LOG_MAX_QUEUE_LENGTH)
         {
-            tr_log_message* old = myQueue;
-            myQueue = old->next;
+            tr_log_message* old = log_state.queue_;
+            log_state.queue_ = old->next;
             old->next = nullptr;
             tr_logFreeQueue(old);
-            --myQueueLength;
-            TR_ASSERT(myQueueLength == TR_LOG_MAX_QUEUE_LENGTH);
+            --log_state.queue_length_;
+            TR_ASSERT(log_state.queue_length_ == TR_LOG_MAX_QUEUE_LENGTH);
         }
     }
     else
@@ -155,15 +168,16 @@ void logAddImpl(
 
         if (fp == TR_BAD_SYS_FILE)
         {
-            fp = tr_sys_file_get_std(TR_STD_SYS_FILE_ERR, nullptr);
+            fp = tr_sys_file_get_std(TR_STD_SYS_FILE_ERR);
         }
 
         tr_logGetTimeStr(timestr, sizeof(timestr));
 
-        auto const out = !std::empty(name) ? tr_strvJoin("["sv, timestr, "] "sv, name, ": "sv, msg) :
-                                             tr_strvJoin("["sv, timestr, "] "sv, msg);
-        tr_sys_file_write_line(fp, out, nullptr);
-        tr_sys_file_flush(fp, nullptr);
+        tr_sys_file_write_line(
+            fp,
+            !std::empty(name) ? fmt::format(FMT_STRING("[{:s}] {:s}: {:s}"), timestr, name, msg) :
+                                fmt::format(FMT_STRING("[{:s}] {:s}"), timestr, msg));
+        tr_sys_file_flush(fp);
     }
 #endif
 }
@@ -172,7 +186,7 @@ void logAddImpl(
 
 tr_log_level tr_logGetLevel()
 {
-    return tr_message_level;
+    return log_state.level;
 }
 
 bool tr_logLevelIsActive(tr_log_level level)
@@ -182,27 +196,27 @@ bool tr_logLevelIsActive(tr_log_level level)
 
 void tr_logSetLevel(tr_log_level level)
 {
-    tr_message_level = level;
+    log_state.level = level;
 }
 
 void tr_logSetQueueEnabled(bool isEnabled)
 {
-    myQueueEnabled = isEnabled;
+    log_state.queue_enabled_ = isEnabled;
 }
 
 bool tr_logGetQueueEnabled()
 {
-    return myQueueEnabled;
+    return log_state.queue_enabled_;
 }
 
 tr_log_message* tr_logGetQueue()
 {
-    auto const lock = std::lock_guard(message_mutex_);
+    auto const lock = log_state.unique_lock();
 
-    auto* const ret = myQueue;
-    myQueue = nullptr;
-    myQueueTail = &myQueue;
-    myQueueLength = 0;
+    auto* const ret = log_state.queue_;
+    log_state.queue_ = nullptr;
+    log_state.queue_tail_ = &log_state.queue_;
+    log_state.queue_length_ = 0;
 
     return ret;
 }
@@ -225,18 +239,14 @@ void tr_logFreeQueue(tr_log_message* list)
 
 char* tr_logGetTimeStr(char* buf, size_t buflen)
 {
-    auto const tv = tr_gettimeofday();
-    time_t const seconds = tv.tv_sec;
-    auto const milliseconds = int(tv.tv_usec / 1000);
-    char msec_str[8];
-    tr_snprintf(msec_str, sizeof msec_str, "%03d", milliseconds);
-
-    struct tm now_tm;
-    tr_localtime_r(&seconds, &now_tm);
-    char date_str[32];
-    strftime(date_str, sizeof(date_str), "%Y-%m-%d %H:%M:%S", &now_tm);
-
-    tr_snprintf(buf, buflen, "%s.%s", date_str, msec_str);
+    auto const a = std::chrono::system_clock::now();
+    auto const [out, len] = fmt::format_to_n(
+        buf,
+        buflen - 1,
+        "{0:%F %H:%M:}{1:%S}",
+        a,
+        std::chrono::duration_cast<std::chrono::milliseconds>(a.time_since_epoch()));
+    *out = '\0';
     return buf;
 }
 
@@ -247,10 +257,9 @@ void tr_logAddMessage(char const* file, int line, tr_log_level level, std::strin
     auto name_fallback = std::string{};
     if (std::empty(name))
     {
-        auto* base = tr_sys_path_basename(file, nullptr);
-        name_fallback = fmt::format("{}:{}", (base != nullptr ? base : "?"), line);
+        auto const base = tr_sys_path_basename(file);
+        name_fallback = fmt::format(FMT_STRING("{}:{}"), !std::empty(base) ? base : "?", line);
         name = name_fallback;
-        tr_free(base);
     }
 
     // message logging shouldn't affect errno
@@ -263,7 +272,7 @@ void tr_logAddMessage(char const* file, int line, tr_log_level level, std::strin
         return;
     }
 
-    auto const lock = std::lock_guard(message_mutex_);
+    auto const lock = log_state.unique_lock();
 
     // don't log the same warning ad infinitum.
     // it's not useful after some point.
@@ -310,7 +319,7 @@ bool constexpr keysAreOrdered()
 {
     for (size_t i = 0, n = std::size(LogKeys); i < n; ++i)
     {
-        if (LogKeys[i].second != i)
+        if (LogKeys[i].second != static_cast<tr_log_level>(i))
         {
             return false;
         }

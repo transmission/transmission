@@ -23,8 +23,6 @@ struct tr_error
     char* message;
 };
 
-bool tr_error_is_set(tr_error const* const* error);
-
 /**
  * @brief Free memory used by error object.
  *

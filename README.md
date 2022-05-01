@@ -26,12 +26,12 @@ Different distributions may choose to package any or all of these tools in one o
 
 Transmission has an Xcode project file (Transmission.xcodeproj) for building in Xcode.
 
-For a more detailed description, and dependencies, visit: https://github.com/transmission/transmission/wiki
+For a more detailed description, and dependencies, visit: https://github.com/transmission/transmission/tree/main/docs
 
 ### Building a Transmission release from the command line
 
-    $ tar xf transmission-2.92.tar.xz
-    $ cd transmission-2.92
+    $ tar xf transmission-3.00.tar.xz
+    $ cd transmission-3.00
     $ mkdir build
     $ cd build
     $ # Use -DCMAKE_BUILD_TYPE=RelWithDebInfo to build optimized binary.
@@ -61,6 +61,7 @@ If you're new to building programs from source code, this is typically easier th
 
     $ cd Transmission/build
     $ make clean
+    $ git submodule foreach --recursive git clean -xfd
     $ git pull --rebase --prune
     $ git submodule update --recursive
     $ # Use -DCMAKE_BUILD_TYPE=RelWithDebInfo to build optimized binary.

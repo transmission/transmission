@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <cstdint> // int64_t
 #include <map>
 #include <string_view>
 #include <vector>
@@ -89,7 +90,6 @@ public:
     Tag torrentSet(torrent_ids_t const& ids, tr_quark const key, QString const& val);
     Tag torrentSet(torrent_ids_t const& ids, tr_quark const key, QList<int> const& val);
     Tag torrentSet(torrent_ids_t const& ids, tr_quark const key, QStringList const& val);
-    Tag torrentSet(torrent_ids_t const& ids, tr_quark const key, QPair<int, QString> const& val);
 
     void torrentSetLocation(torrent_ids_t const& ids, QString const& path, bool do_move);
     void torrentRenamePath(torrent_ids_t const& ids, QString const& oldpath, QString const& newname);

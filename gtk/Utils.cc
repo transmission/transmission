@@ -7,7 +7,6 @@
 #include <ctype.h> /* isxdigit() */
 #include <errno.h>
 #include <limits.h> /* INT_MAX */
-#include <stdarg.h>
 
 #include <giomm.h> /* g_file_trash() */
 #include <glibmm/i18n.h>
@@ -82,11 +81,6 @@ Glib::ustring tr_strlratio(double ratio)
     return tr_strratio(ratio, gtr_get_unicode_string(GtrUnicode::Inf).c_str());
 }
 
-Glib::ustring tr_strlpercent(double x)
-{
-    return tr_strpercent(x);
-}
-
 Glib::ustring tr_strlsize(guint64 bytes)
 {
     return bytes == 0 ? Q_("None") : tr_formatter_size_B(bytes);
@@ -100,31 +94,29 @@ Glib::ustring tr_strltime(time_t seconds)
     }
 
     auto const days = (int)(seconds / 86400);
+    auto const d = fmt::format(ngettext("{days:L} day", "{days:L} days", days), fmt::arg("days", days));
     int const hours = (seconds % 86400) / 3600;
-    int const minutes = (seconds % 3600) / 60;
-    seconds = (seconds % 3600) % 60;
-
-    auto const d = gtr_sprintf(ngettext("%'d day", "%'d days", days), days);
-    auto const h = gtr_sprintf(ngettext("%'d hour", "%'d hours", hours), hours);
-    auto const m = gtr_sprintf(ngettext("%'d minute", "%'d minutes", minutes), minutes);
-    auto const s = gtr_sprintf(ngettext("%'d second", "%'d seconds", (int)seconds), (int)seconds);
-
+    auto const h = fmt::format(ngettext("{hours} hour", "{hours} hours", hours), fmt::arg("hours", hours));
     if (days != 0)
     {
-        return (days >= 4 || hours == 0) ? d : gtr_sprintf("%s, %s", d, h);
+        return (days >= 4 || hours == 0) ? d : fmt::format(FMT_STRING("{:s}, {:s}"), d, h);
     }
-    else if (hours != 0)
+
+    int const minutes = (seconds % 3600) / 60;
+    auto const m = fmt::format(ngettext("{minutes} minute", "{minutes} minutes", minutes), fmt::arg("minutes", minutes));
+    if (hours != 0)
     {
-        return (hours >= 4 || minutes == 0) ? h : gtr_sprintf("%s, %s", h, m);
+        return (hours >= 4 || minutes == 0) ? h : fmt::format(FMT_STRING("{:s}, {:s}"), h, m);
     }
-    else if (minutes != 0)
+
+    seconds = (seconds % 3600) % 60;
+    auto const s = fmt::format(ngettext("{seconds} second", "{seconds} seconds", seconds), fmt::arg("seconds", seconds));
+    if (minutes != 0)
     {
-        return (minutes >= 4 || seconds == 0) ? m : gtr_sprintf("%s, %s", m, s);
+        return (minutes >= 4 || seconds == 0) ? m : fmt::format(FMT_STRING("{:s}, {:s}"), m, s);
     }
-    else
-    {
-        return s;
-    }
+
+    return s;
 }
 
 namespace
@@ -154,14 +146,14 @@ void gtr_add_torrent_error_dialog(Gtk::Widget& child, tr_torrent* duplicate_torr
 
     if (duplicate_torrent != nullptr)
     {
-        secondary = gtr_sprintf(
-            _("The torrent file \"%s\" is already in use by \"%s.\""),
-            filename,
-            tr_torrentName(duplicate_torrent));
+        secondary = fmt::format(
+            _("The torrent file '{path}' is already in use by '{torrent_name}'."),
+            fmt::arg("path", filename),
+            fmt::arg("torrent_name", tr_torrentName(duplicate_torrent)));
     }
     else
     {
-        secondary = gtr_sprintf(_("Unable to add torrent file \"%s\"."), filename);
+        secondary = fmt::format(_("Couldn't add torrent file '{path}'"), fmt::arg("path", filename));
     }
 
     auto w = std::make_shared<Gtk::MessageDialog>(
@@ -187,13 +179,10 @@ bool on_tree_view_button_pressed(
         Gtk::TreeModel::Path path;
         auto const selection = view->get_selection();
 
-        if (view->get_path_at_pos((int)event->x, (int)event->y, path))
+        if (view->get_path_at_pos((int)event->x, (int)event->y, path) && !selection->is_selected(path))
         {
-            if (!selection->is_selected(path))
-            {
-                selection->unselect_all();
-                selection->select(path);
-            }
+            selection->unselect_all();
+            selection->select(path);
         }
 
         if (callback)
@@ -403,7 +392,7 @@ auto const ChildHiddenKey = Glib::Quark("gtr-child-hidden");
 void gtr_widget_set_visible(Gtk::Widget& w, bool b)
 {
     /* toggle the transient children, too */
-    if (auto* const window = dynamic_cast<Gtk::Window*>(&w); window != nullptr)
+    if (auto const* const window = dynamic_cast<Gtk::Window*>(&w); window != nullptr)
     {
         for (auto* const l : Gtk::Window::list_toplevels())
         {
@@ -452,13 +441,13 @@ void gtr_unrecognized_url_dialog(Gtk::Widget& parent, Glib::ustring const& url)
 
     auto w = std::make_shared<Gtk::MessageDialog>(
         *window,
-        fmt::format(_("Unsupported URL: '{url}'"), fmt::arg("url", url.raw())),
+        fmt::format(_("Unsupported URL: '{url}'"), fmt::arg("url", url)),
         false /*use markup*/,
         Gtk::MESSAGE_ERROR,
         Gtk::BUTTONS_CLOSE,
         true /*modal*/);
 
-    gstr += gtr_sprintf(_("Transmission doesn't know how to use \"%s\""), url);
+    gstr += fmt::format(_("Transmission doesn't know how to use '{url}'"), fmt::arg("url", url));
 
     if (tr_magnet_metainfo{}.parseMagnet(url.raw()))
     {

@@ -4,15 +4,16 @@
 // License text can be found in the licenses/ folder.
 
 #include <array>
-#include <cerrno>
 #include <cstring>
 #include <string_view>
 
 #include "transmission.h"
 
+#include "crypto-utils.h"
 #include "error.h"
 #include "torrent-metainfo.h"
 #include "torrent.h"
+#include "tr-strbuf.h"
 #include "utils.h"
 
 #include "test-fixtures.h"
@@ -39,9 +40,9 @@ TEST_F(TorrentMetainfoTest, magnetLink)
 
     auto metainfo = tr_torrent_metainfo{};
     EXPECT_TRUE(metainfo.parseMagnet(MagnetLink));
-    EXPECT_EQ(0, metainfo.fileCount()); // because it's a magnet link
-    EXPECT_EQ(2, std::size(metainfo.announceList()));
-    EXPECT_EQ(MagnetLink, metainfo.magnet());
+    EXPECT_EQ(0U, metainfo.fileCount()); // because it's a magnet link
+    EXPECT_EQ(2U, std::size(metainfo.announceList()));
+    EXPECT_EQ(MagnetLink, metainfo.magnet().sv());
 }
 
 #define BEFORE_PATH \
@@ -81,6 +82,34 @@ TEST_F(TorrentMetainfoTest, bucket)
     {
         auto metainfo = tr_torrent_metainfo{};
         EXPECT_EQ(test.expected_parse_result, metainfo.parseBenc(test.benc));
+    }
+}
+
+TEST_F(TorrentMetainfoTest, parseBencFuzzRegressions)
+{
+    static auto constexpr Tests = std::array<std::string_view, 1>{
+        "ZC/veNSVW0Ss+KGfMqH4DQqtYXzgmVi5oBi0XlxviLytlwwjf7MLanOcnS73eSB/iye83hVyvSWg27tPl5oqWdNEZ0euMbo7E8FH/xgTvUEOnBVgvPno50CyI7c5F2QTw16avUB7dvGzx5xIjzJ2qkD2BsNtOoiZI3skC6XwSifsDfJUN8NxHFiwvWxmZRLq2eQlE2wGxAW5aLj6U1MHDzPZ83+2o81pRyMr11bHmWFcNorTGLeOpHBd9veduHpNOKNwOatoXeb57jZCy1Zmu9y/wCuUx6DP3I5FGQ/t3AYh7w028Z/zgIlvWat6QjqSPp7j1nEbl6SNZNl1doGmusl9hvRsbaCq9b1XHpTDtQSJ8Owj07fph0p0ZVu5kJpQBfOGsHLh6ALVrTepptIvcnNW9+nauE+NJa2z+9Yla7780sCdBsGYZZA6HUr0J9GXES7+uRPPBwAl2YB1qWhCsOCClixTiAlwrsBl1bJ/a4FV04aU5jXDEYrpJMzdSAEoypDWMsn3Fc5umLqJ1jtqPqykKY0HjPrCkVAMmvmacauBzIj5Eg/uw0xtZp+wXdLQv8qyuXgsJs7dExZbgTgfPY4niTBpftM6YFQrCx/IxiMshYp7tMolykoed/8gZMm6yyWizzml4BlvnvY3+J2eVKRvS7QToRKxN5eFP9l/pflrK+8cHbwVnjQ1pE3hTQACmNIQHRTY2QoOGwG+HTwo48akfbJnjJ3F0iN6miy7lvv5u0p1rpbM2On5FJ3G98OYnzGIxf8BomHvVp/3eX6QJZUMZKsUTpgbRqg0AJH9FjiERQ9v6B25Va+Q0yV8z5DmiA5AgyIwkIzlSBAl0PYsNaw+rH06a93yBhAfK6EPSArYLjMI6o/1kF4UxNyfE+F79xbdCAKRAX3iJ7DH1GncFoIQ1fZd/uZaF9tXjViQ7P/sHuKdZvfLpvJq88JV5Pcdsfdlle86QAF4weB+k/k8f/xgvxRNbbcAfjLvEHhDBzfEvHkgFrW19WvLHyAqjjUovpecIu3KeCqwyOr1dHViUVelxqc5BklyGQ+Asd6GnWPSzO5Hamj4rYrapgogEup5PKm1j2CgL2HH2tySWwjgtOWbooGhsdBnCeQOsapCxwc6ALtudG4Q9RBu6A6pLUfFE3rm1RuvNGoJNHiEQ4BAFiqLpYJd4lR7V2fI6EIKug0dB3SpHpUeNCQbG67IM+kVe0I+vP3cECGOGXo="sv,
+    };
+
+    for (auto const& test : Tests)
+    {
+        auto tm = tr_torrent_metainfo{};
+        tm.parseBenc(tr_base64_decode(test));
+    }
+}
+
+TEST_F(TorrentMetainfoTest, parseBencFuzz)
+{
+    auto buf = std::vector<char>{};
+
+    for (size_t i = 0; i < 100000; ++i)
+    {
+        buf.resize(tr_rand_int(1024));
+        tr_rand_buffer(std::data(buf), std::size(buf));
+        // std::cerr << '[' << tr_base64_encode({ std::data(buf), std::size(buf) }) << ']' << std::endl;
+
+        auto tm = tr_torrent_metainfo{};
+        tm.parseBenc({ std::data(buf), std::size(buf) });
     }
 }
 
@@ -143,12 +172,12 @@ TEST_F(TorrentMetainfoTest, sanitize)
 
 TEST_F(TorrentMetainfoTest, AndroidTorrent)
 {
-    auto const filename = tr_strvJoin(LIBTRANSMISSION_TEST_ASSETS_DIR, "/Android-x86 8.1 r6 iso.torrent"sv);
+    auto const filename = tr_pathbuf{ LIBTRANSMISSION_TEST_ASSETS_DIR, "/Android-x86 8.1 r6 iso.torrent"sv };
 
     auto* ctor = tr_ctorNew(session_);
     tr_error* error = nullptr;
     EXPECT_TRUE(tr_ctorSetMetainfoFromFile(ctor, filename.c_str(), &error));
-    EXPECT_EQ(nullptr, error);
+    EXPECT_EQ(nullptr, error) << *error;
     auto const* const metainfo = tr_ctorGetMetainfo(ctor);
     EXPECT_NE(nullptr, metainfo);
     EXPECT_EQ(336, metainfo->infoDictOffset());
@@ -159,13 +188,13 @@ TEST_F(TorrentMetainfoTest, AndroidTorrent)
 
 TEST_F(TorrentMetainfoTest, ctorSaveContents)
 {
-    auto const src_filename = tr_strvJoin(LIBTRANSMISSION_TEST_ASSETS_DIR, "/Android-x86 8.1 r6 iso.torrent"sv);
-    auto const tgt_filename = tr_strvJoin(::testing::TempDir(), "save-contents-test.torrent");
+    auto const src_filename = tr_pathbuf{ LIBTRANSMISSION_TEST_ASSETS_DIR, "/Android-x86 8.1 r6 iso.torrent"sv };
+    auto const tgt_filename = tr_pathbuf{ ::testing::TempDir(), "save-contents-test.torrent" };
 
     // try saving without passing any metainfo.
     auto* ctor = tr_ctorNew(session_);
     tr_error* error = nullptr;
-    EXPECT_FALSE(tr_ctorSaveContents(ctor, tgt_filename, &error));
+    EXPECT_FALSE(tr_ctorSaveContents(ctor, tgt_filename.sv(), &error));
     EXPECT_NE(nullptr, error);
     if (error != nullptr)
     {
@@ -175,20 +204,20 @@ TEST_F(TorrentMetainfoTest, ctorSaveContents)
 
     // now try saving _with_ metainfo
     EXPECT_TRUE(tr_ctorSetMetainfoFromFile(ctor, src_filename.c_str(), &error));
-    EXPECT_EQ(nullptr, error);
-    EXPECT_TRUE(tr_ctorSaveContents(ctor, tgt_filename, &error));
-    EXPECT_EQ(nullptr, error);
+    EXPECT_EQ(nullptr, error) << *error;
+    EXPECT_TRUE(tr_ctorSaveContents(ctor, tgt_filename.sv(), &error));
+    EXPECT_EQ(nullptr, error) << *error;
 
     // the saved contents should match the source file's contents
     auto src_contents = std::vector<char>{};
-    EXPECT_TRUE(tr_loadFile(src_contents, src_filename, &error));
+    EXPECT_TRUE(tr_loadFile(src_filename.sv(), src_contents, &error));
     auto tgt_contents = std::vector<char>{};
-    EXPECT_TRUE(tr_loadFile(tgt_contents, tgt_filename, &error));
+    EXPECT_TRUE(tr_loadFile(tgt_filename.sv(), tgt_contents, &error));
     EXPECT_EQ(src_contents, tgt_contents);
 
     // cleanup
     EXPECT_TRUE(tr_sys_path_remove(tgt_filename.c_str(), &error));
-    EXPECT_EQ(nullptr, error);
+    EXPECT_EQ(nullptr, error) << *error;
     tr_error_clear(&error);
     tr_ctorFree(ctor);
 }

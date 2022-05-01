@@ -33,8 +33,6 @@
 ****
 ***/
 
-#include <iostream>
-
 namespace
 {
 namespace impl
@@ -177,7 +175,7 @@ static void libeventThreadFunc(tr_event_handle* events)
 {
 #ifndef _WIN32
     /* Don't exit when writing on a broken socket */
-    signal(SIGPIPE, SIG_IGN);
+    (void)signal(SIGPIPE, SIG_IGN);
 #endif
 
     tr_evthread_init();
@@ -226,7 +224,7 @@ void tr_eventInit(tr_session* session)
     events->thread_id = thread.get_id();
     thread.detach();
     // wait until the libevent thread is running
-    events->work_queue_cv.wait(lock);
+    events->work_queue_cv.wait(lock, [session] { return session->events != nullptr; });
 }
 
 void tr_eventClose(tr_session* session)

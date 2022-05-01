@@ -7,14 +7,14 @@
 
 #if !defined(NDEBUG) || defined(TR_FORCE_ASSERTIONS)
 
-#include <stdbool.h>
+#include <string_view>
 
 #include "tr-macros.h"
 
-[[noreturn]] bool tr_assert_report(char const* file, int line, char const* message_fmt, ...) TR_GNUC_PRINTF(3, 4);
+[[noreturn]] bool tr_assert_report(std::string_view file, int line, std::string_view message);
 
-#define TR_ASSERT(x) ((void)(TR_LIKELY(x) || tr_assert_report(__FILE__, __LINE__, "%s", #x)))
-#define TR_ASSERT_MSG(x, ...) ((void)(TR_LIKELY(x) || tr_assert_report(__FILE__, __LINE__, __VA_ARGS__)))
+#define TR_ASSERT(x) ((void)(TR_LIKELY(x) || tr_assert_report(__FILE__, __LINE__, #x)))
+#define TR_ASSERT_MSG(x, message) ((void)(TR_LIKELY(x) || tr_assert_report(__FILE__, __LINE__, message)))
 #define TR_UNREACHABLE() tr_assert_report(__FILE__, __LINE__, "Unreachable code")
 
 #define TR_ENABLE_ASSERTS

@@ -3,7 +3,6 @@
 // License text can be found in the licenses/ folder.
 
 #include <cstdint>
-#include <string_view>
 
 #include <event2/event.h>
 
@@ -86,7 +85,7 @@ static void incoming(void* vsession, struct UTPSocket* s)
     auto* const from = (struct sockaddr*)&from_storage;
     socklen_t fromlen = sizeof(from_storage);
     tr_address addr;
-    tr_port port = 0;
+    tr_port port;
 
     if (!tr_sessionIsUTPEnabled(session))
     {
@@ -141,7 +140,7 @@ static void reset_timer(tr_session* ss)
         usec = tr_rand_int_weak(1000000);
     }
 
-    tr_timerAdd(ss->utp_timer, sec, usec);
+    tr_timerAdd(*ss->utp_timer, sec, usec);
 }
 
 static void timer_callback(evutil_socket_t /*s*/, short /*type*/, void* vsession)

@@ -3,6 +3,10 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include <cstring>
+#include <set>
+#include <string_view>
+
 #include "transmission.h"
 
 #include "torrent.h"
@@ -10,9 +14,6 @@
 #include "utils.h"
 
 #include "gtest/gtest.h"
-
-#include <cstring>
-#include <set>
 
 using namespace std::literals;
 
@@ -63,18 +64,19 @@ TEST_F(TorrentsTest, rangedLoop)
 
     for (auto const& name : Filenames)
     {
-        auto const path = tr_strvJoin(LIBTRANSMISSION_TEST_ASSETS_DIR, "/"sv, name);
+        auto const path = tr_pathbuf{ LIBTRANSMISSION_TEST_ASSETS_DIR, '/', name };
         auto tm = tr_torrent_metainfo{};
         EXPECT_TRUE(tm.parseTorrentFile(path));
-        auto* const tor = new tr_torrent(std::move(tm));
+        auto* const tor = new tr_torrent{ std::move(tm) };
         tor->uniqueId = torrents.add(tor);
         EXPECT_EQ(tor, torrents.get(tor->uniqueId));
         torrents_set.insert(tor);
     }
 
-    for (auto const* tor : torrents)
+    for (auto* const tor : torrents)
     {
         EXPECT_EQ(1U, torrents_set.erase(tor));
+        delete tor;
     }
     EXPECT_EQ(0U, std::size(torrents_set));
     EXPECT_EQ(0U, std::size(torrents_set));
@@ -94,9 +96,9 @@ TEST_F(TorrentsTest, removedSince)
     // setup: add the torrents
     for (auto const& name : Filenames)
     {
-        auto const path = tr_strvJoin(LIBTRANSMISSION_TEST_ASSETS_DIR, "/"sv, name);
+        auto const path = tr_pathbuf{ LIBTRANSMISSION_TEST_ASSETS_DIR, '/', name };
         auto tm = tr_torrent_metainfo{};
-        auto* const tor = new tr_torrent(std::move(tm));
+        auto* const tor = new tr_torrent{ std::move(tm) };
         tor->uniqueId = torrents.add(tor);
         torrents_v.push_back(tor);
     }
@@ -111,7 +113,7 @@ TEST_F(TorrentsTest, removedSince)
         EXPECT_EQ(nullptr, torrents.get(tor->uniqueId));
     }
 
-    auto remove = std::set<int>{};
+    auto remove = std::vector<int>{};
     remove = { torrents_v[3]->uniqueId };
     EXPECT_EQ(remove, torrents.removedSince(300));
     EXPECT_EQ(remove, torrents.removedSince(201));
@@ -119,4 +121,6 @@ TEST_F(TorrentsTest, removedSince)
     EXPECT_EQ(remove, torrents.removedSince(200));
     remove = { torrents_v[0]->uniqueId, torrents_v[1]->uniqueId, torrents_v[2]->uniqueId, torrents_v[3]->uniqueId };
     EXPECT_EQ(remove, torrents.removedSince(50));
+
+    std::for_each(std::begin(torrents_v), std::end(torrents_v), [](auto* tor) { delete tor; });
 }

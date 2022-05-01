@@ -11,8 +11,11 @@
 #include "log.h"
 #include "session.h"
 #include "stats.h"
+#include "tr-strbuf.h"
 #include "utils.h"
 #include "variant.h"
+
+using namespace std::literals;
 
 /***
 ****
@@ -27,27 +30,19 @@ struct tr_stats_handle
     bool isDirty;
 };
 
-static std::string getOldFilename(tr_session const* session)
-{
-    return tr_strvPath(tr_sessionGetConfigDir(session), "stats.benc");
-}
-
-static std::string getFilename(tr_session const* session)
-{
-    return tr_strvPath(tr_sessionGetConfigDir(session), "stats.json");
-}
-
 static void loadCumulativeStats(tr_session const* session, tr_session_stats* setme)
 {
     auto top = tr_variant{};
 
-    auto filename = getFilename(session);
-    bool loaded = tr_variantFromFile(&top, TR_VARIANT_PARSE_JSON, filename, nullptr);
+    auto filename = tr_pathbuf{ session->config_dir, "/stats.json"sv };
+    bool loaded = tr_variantFromFile(&top, TR_VARIANT_PARSE_JSON, filename.sv(), nullptr);
 
     if (!loaded)
     {
-        filename = getOldFilename(session);
-        loaded = tr_variantFromFile(&top, TR_VARIANT_PARSE_BENC, filename, nullptr);
+        // maybe the user just upgraded from an old version of Transmission
+        // that was still using stats.benc
+        filename.assign(session->config_dir, "/stats.benc");
+        loaded = tr_variantFromFile(&top, TR_VARIANT_PARSE_BENC, filename.sv(), nullptr);
     }
 
     if (loaded)
@@ -85,6 +80,7 @@ static void loadCumulativeStats(tr_session const* session, tr_session_stats* set
 
 static void saveCumulativeStats(tr_session const* session, tr_session_stats const* s)
 {
+    auto const filename = tr_pathbuf{ session->config_dir, "/stats.json"sv };
     auto top = tr_variant{};
     tr_variantInitDict(&top, 5);
     tr_variantDictAddInt(&top, TR_KEY_downloaded_bytes, s->downloadedBytes);
@@ -92,9 +88,7 @@ static void saveCumulativeStats(tr_session const* session, tr_session_stats cons
     tr_variantDictAddInt(&top, TR_KEY_seconds_active, s->secondsActive);
     tr_variantDictAddInt(&top, TR_KEY_session_count, s->sessionCount);
     tr_variantDictAddInt(&top, TR_KEY_uploaded_bytes, s->uploadedBytes);
-
-    tr_variantToFile(&top, TR_VARIANT_FMT_JSON, getFilename(session));
-
+    tr_variantToFile(&top, TR_VARIANT_FMT_JSON, filename.sv());
     tr_variantFree(&top);
 }
 

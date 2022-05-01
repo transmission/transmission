@@ -25,7 +25,6 @@ set(PROJECT_FILES
   crypto-utils.cc
   crypto.cc
   error.cc
-  fdlimit.cc
   file-info.cc
   file-piece-map.cc
   file-posix.cc
@@ -38,6 +37,7 @@ set(PROJECT_FILES
   makemeta.cc
   natpmp.cc
   net.cc
+  open-files.cc
   peer-io.cc
   peer-mgr-active-requests.cc
   peer-mgr-wishlist.cc
@@ -57,6 +57,7 @@ set(PROJECT_FILES
   subprocess-posix.cc
   subprocess-win32.cc
   torrent-ctor.cc
+  torrent-files.cc
   torrent-magnet.cc
   torrent-metainfo.cc
   torrent.cc
@@ -144,6 +145,7 @@ set(${PROJECT_NAME}_PUBLIC_HEADERS
     tr-assert.h
     tr-getopt.h
     tr-macros.h
+    tr-strbuf.h
     transmission.h
     utils.h
     variant.h
@@ -166,16 +168,17 @@ set(${PROJECT_NAME}_PRIVATE_HEADERS
     completion.h
     crypto-utils.h
     crypto.h
-    fdlimit.h
     file-info.h
     file-piece-map.h
     handshake.h
     history.h
     inout.h
+    lru-cache.h
     magnet-metainfo.h
     mime-types.h
     natpmp_local.h
     net.h
+    open-files.h
     peer-common.h
     peer-io.h
     peer-mgr-active-requests.h
@@ -192,6 +195,7 @@ set(${PROJECT_NAME}_PRIVATE_HEADERS
     session.h
     stats.h
     subprocess.h
+    torrent-files.h
     torrent-magnet.h
     torrent-metainfo.h
     torrent.h
@@ -216,7 +220,6 @@ endif()
 add_definitions(
     -D__TRANSMISSION__
     "-DPACKAGE_DATA_DIR=\"${CMAKE_INSTALL_FULL_DATAROOTDIR}\""
-    ${LIBFMT_DEFINITIONS}
     ${NATPMP_DEFINITIONS}
     ${MINIUPNPC_DEFINITIONS}
 )
@@ -257,7 +260,6 @@ include_directories(
 
 include_directories(
     SYSTEM
-    ${LIBFMT_INCLUDE_DIRS}
     ${UTFCPP_INCLUDE_DIRS}
     ${DEFLATE_INCLUDE_DIRS}
     ${CRYPTO_INCLUDE_DIRS}

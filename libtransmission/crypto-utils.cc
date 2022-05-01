@@ -20,6 +20,8 @@ extern "C"
 #include <b64/cencode.h>
 }
 
+#include <fmt/format.h>
+
 #include "transmission.h"
 #include "crypto-utils.h"
 #include "tr-assert.h"
@@ -94,7 +96,7 @@ std::string tr_salt(std::string_view plaintext, std::string_view salt)
 
     // convert it to a string. string holds three parts:
     // DigestPrefix, stringified digest of plaintext + salt, and the salt.
-    return tr_strvJoin(SaltedPrefix, tr_sha1_to_string(*digest), salt);
+    return fmt::format(FMT_STRING("{:s}{:s}{:s}"), SaltedPrefix, tr_sha1_to_string(*digest), salt);
 }
 
 } // namespace
@@ -201,12 +203,6 @@ std::string tr_sha1_to_string(tr_sha1_digest_t const& digest)
     auto str = std::string(std::size(digest) * 2, '?');
     tr_binary_to_hex(std::data(digest), std::data(str), std::size(digest));
     return str;
-}
-
-char* tr_sha1_to_string(tr_sha1_digest_t const& digest, char* strbuf)
-{
-    tr_binary_to_hex(std::data(digest), strbuf, std::size(digest));
-    return strbuf + (std::size(digest) * 2);
 }
 
 static void tr_hex_to_binary(char const* input, void* voutput, size_t byte_length)

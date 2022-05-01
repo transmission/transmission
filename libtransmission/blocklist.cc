@@ -7,6 +7,7 @@
 #include <cstdio>
 #include <cstdlib> /* bsearch(), qsort() */
 #include <cstring>
+#include <string_view>
 
 #include <fmt/core.h>
 
@@ -44,8 +45,8 @@ static void blocklistClose(tr_blocklistFile* b)
 {
     if (b->rules != nullptr)
     {
-        tr_sys_file_unmap(b->rules, b->byteCount, nullptr);
-        tr_sys_file_close(b->fd, nullptr);
+        tr_sys_file_unmap(b->rules, b->byteCount);
+        tr_sys_file_close(b->fd);
         b->rules = nullptr;
         b->ruleCount = 0;
         b->byteCount = 0;
@@ -58,7 +59,7 @@ static void blocklistLoad(tr_blocklistFile* b)
     blocklistClose(b);
 
     auto info = tr_sys_path_info{};
-    if (!tr_sys_path_get_info(b->filename, 0, &info, nullptr))
+    if (!tr_sys_path_get_info(b->filename, 0, &info))
     {
         return;
     }
@@ -90,7 +91,7 @@ static void blocklistLoad(tr_blocklistFile* b)
             fmt::arg("path", b->filename),
             fmt::arg("error", error->message),
             fmt::arg("error_code", error->code)));
-        tr_sys_file_close(fd, nullptr);
+        tr_sys_file_close(fd);
         tr_error_free(error);
         return;
     }
@@ -99,12 +100,10 @@ static void blocklistLoad(tr_blocklistFile* b)
     b->byteCount = byteCount;
     b->ruleCount = byteCount / sizeof(struct tr_ipv4_range);
 
-    char* const base = tr_sys_path_basename(b->filename, nullptr);
     tr_logAddInfo(fmt::format(
         ngettext("Blocklist '{path}' has {count} entry", "Blocklist '{path}' has {count} entries", b->ruleCount),
-        fmt::arg("path", base),
+        fmt::arg("path", tr_sys_path_basename(b->filename)),
         fmt::arg("count", b->ruleCount)));
-    tr_free(base);
 }
 
 static void blocklistEnsureLoaded(tr_blocklistFile* b)
@@ -136,7 +135,7 @@ static int compareAddressToRange(void const* va, void const* vb)
 static void blocklistDelete(tr_blocklistFile* b)
 {
     blocklistClose(b);
-    tr_sys_path_remove(b->filename, nullptr);
+    tr_sys_path_remove(b->filename);
 }
 
 /***
@@ -165,21 +164,11 @@ void tr_blocklistFileFree(tr_blocklistFile* b)
     tr_free(b);
 }
 
-bool tr_blocklistFileExists(tr_blocklistFile const* b)
-{
-    return tr_sys_path_exists(b->filename, nullptr);
-}
-
 int tr_blocklistFileGetRuleCount(tr_blocklistFile const* b)
 {
     blocklistEnsureLoaded((tr_blocklistFile*)b);
 
     return b->ruleCount;
-}
-
-bool tr_blocklistFileIsEnabled(tr_blocklistFile* b)
-{
-    return b->isEnabled;
 }
 
 void tr_blocklistFileSetEnabled(tr_blocklistFile* b, bool isEnabled)
@@ -216,93 +205,86 @@ bool tr_blocklistFileHasAddress(tr_blocklistFile* b, tr_address const* addr)
 /*
  * P2P plaintext format: "comment:x.x.x.x-y.y.y.y"
  * http://wiki.phoenixlabs.org/wiki/P2P_Format
- * http://en.wikipedia.org/wiki/PeerGuardian#P2P_plaintext_format
+ * https://en.wikipedia.org/wiki/PeerGuardian#P2P_plaintext_format
  */
-static bool parseLine1(char const* line, struct tr_ipv4_range* range)
+static bool parseLine1(std::string_view line, struct tr_ipv4_range* range)
 {
-    int b[4];
-    int e[4];
-    char str[64];
-    tr_address addr;
-
-    char const* walk = strrchr(line, ':');
-
-    if (walk == nullptr)
+    // remove leading "comment:"
+    auto pos = line.find(':');
+    if (pos == std::string_view::npos)
     {
         return false;
     }
+    line = line.substr(pos + 1);
 
-    ++walk; /* walk past the colon */
-
-    if (sscanf(
-            walk,
-            "%d.%d.%d.%d-%d.%d.%d.%d",
-            TR_ARG_TUPLE(&b[0], &b[1], &b[2], &b[3]),
-            TR_ARG_TUPLE(&e[0], &e[1], &e[2], &e[3])) != 8)
+    // parse the leading 'x.x.x.x'
+    pos = line.find('-');
+    if (pos == std::string_view::npos)
     {
         return false;
     }
-
-    tr_snprintf(str, sizeof(str), "%d.%d.%d.%d", TR_ARG_TUPLE(b[0], b[1], b[2], b[3]));
-
-    if (!tr_address_from_string(&addr, str))
+    if (auto addr = tr_address{}; tr_address_from_string(&addr, line.substr(0, pos)))
+    {
+        range->begin = ntohl(addr.addr.addr4.s_addr);
+    }
+    else
     {
         return false;
     }
+    line = line.substr(pos + 1);
 
-    range->begin = ntohl(addr.addr.addr4.s_addr);
-
-    tr_snprintf(str, sizeof(str), "%d.%d.%d.%d", TR_ARG_TUPLE(e[0], e[1], e[2], e[3]));
-
-    if (!tr_address_from_string(&addr, str))
+    // parse the trailing 'y.y.y.y'
+    if (auto addr = tr_address{}; tr_address_from_string(&addr, line))
+    {
+        range->end = ntohl(addr.addr.addr4.s_addr);
+    }
+    else
     {
         return false;
     }
-
-    range->end = ntohl(addr.addr.addr4.s_addr);
 
     return true;
 }
 
 /*
- * DAT format: "000.000.000.000 - 000.255.255.255 , 000 , invalid ip"
- * http://wiki.phoenixlabs.org/wiki/DAT_Format
+ * DAT / eMule format: "000.000.000.000 - 000.255.255.255 , 000 , invalid ip"a
+ * https://sourceforge.net/p/peerguardian/wiki/dev-blocklist-format-dat/
  */
-static bool parseLine2(char const* line, struct tr_ipv4_range* range)
+static bool parseLine2(std::string_view line, struct tr_ipv4_range* range)
 {
-    int unk = 0;
-    int a[4];
-    int b[4];
-    char str[32];
-    tr_address addr;
+    static auto constexpr Delim1 = std::string_view{ " - " };
+    static auto constexpr Delim2 = std::string_view{ " , " };
 
-    if (sscanf(
-            line,
-            "%3d.%3d.%3d.%3d - %3d.%3d.%3d.%3d , %3d , ",
-            TR_ARG_TUPLE(&a[0], &a[1], &a[2], &a[3]),
-            TR_ARG_TUPLE(&b[0], &b[1], &b[2], &b[3]),
-            &unk) != 9)
+    auto pos = line.find(Delim1);
+    if (pos == std::string_view::npos)
     {
         return false;
     }
 
-    tr_snprintf(str, sizeof(str), "%d.%d.%d.%d", TR_ARG_TUPLE(a[0], a[1], a[2], a[3]));
-
-    if (!tr_address_from_string(&addr, str))
+    if (auto addr = tr_address{}; tr_address_from_string(&addr, line.substr(0, pos)))
+    {
+        range->begin = ntohl(addr.addr.addr4.s_addr);
+    }
+    else
     {
         return false;
     }
 
-    range->begin = ntohl(addr.addr.addr4.s_addr);
-
-    tr_snprintf(str, sizeof(str), "%d.%d.%d.%d", TR_ARG_TUPLE(b[0], b[1], b[2], b[3]));
-
-    if (!tr_address_from_string(&addr, str))
+    line = line.substr(pos + std::size(Delim1));
+    pos = line.find(Delim2);
+    if (pos == std::string_view::npos)
     {
         return false;
     }
 
-    range->end = ntohl(addr.addr.addr4.s_addr);
+    if (auto addr = tr_address{}; tr_address_from_string(&addr, line.substr(0, pos)))
+    {
+        range->end = ntohl(addr.addr.addr4.s_addr);
+    }
+    else
+    {
+        return false;
+    }
 
     return true;
 }
@@ -401,12 +383,12 @@ int tr_blocklistFileSetContent(tr_blocklistFile* b, char const* filename)
             fmt::arg("error", error->message),
             fmt::arg("error_code", error->code)));
         tr_error_free(error);
-        tr_sys_file_close(in, nullptr);
+        tr_sys_file_close(in);
         return 0;
     }
 
     /* load the rules into memory */
-    while (tr_sys_file_read_line(in, line, sizeof(line), nullptr))
+    while (tr_sys_file_read_line(in, line, sizeof(line)))
     {
         struct tr_ipv4_range range;
 
@@ -455,16 +437,14 @@ int tr_blocklistFileSetContent(tr_blocklistFile* b, char const* filename)
 #ifdef TR_ENABLE_ASSERTS
 
         /* sanity checks: make sure the rules are sorted in ascending order and don't overlap */
+        for (size_t i = 0; i < ranges_count; ++i)
         {
-            for (size_t i = 0; i < ranges_count; ++i)
-            {
-                TR_ASSERT(ranges[i].begin <= ranges[i].end);
-            }
+            TR_ASSERT(ranges[i].begin <= ranges[i].end);
+        }
 
-            for (size_t i = 1; i < ranges_count; ++i)
-            {
-                TR_ASSERT(ranges[i - 1].end < ranges[i].begin);
-            }
+        for (size_t i = 1; i < ranges_count; ++i)
+        {
+            TR_ASSERT(ranges[i - 1].end < ranges[i].begin);
         }
 
 #endif
@@ -481,17 +461,15 @@ int tr_blocklistFileSetContent(tr_blocklistFile* b, char const* filename)
     }
     else
     {
-        char* base = tr_sys_path_basename(b->filename, nullptr);
         tr_logAddInfo(fmt::format(
             ngettext("Blocklist '{path}' has {count} entry", "Blocklist '{path}' has {count} entries", b->ruleCount),
-            fmt::arg("path", base),
+            fmt::arg("path", tr_sys_path_basename(b->filename)),
             fmt::arg("count", b->ruleCount)));
-        tr_free(base);
     }
 
     tr_free(ranges);
-    tr_sys_file_close(out, nullptr);
-    tr_sys_file_close(in, nullptr);
+    tr_sys_file_close(out);
+    tr_sys_file_close(in);
 
     blocklistLoad(b);
 
