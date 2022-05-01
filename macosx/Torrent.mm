@@ -1812,11 +1812,11 @@ bool trashDataFile(char const* filename, tr_error** error)
         }
     }
 
-    tr_torrentSetQueueStartCallback(self.fHandle, startQueueCallback, (__bridge void*)(self));
-    tr_torrentSetCompletenessCallback(self.fHandle, completenessChangeCallback, (__bridge void*)(self));
-    tr_torrentSetRatioLimitHitCallback(self.fHandle, ratioLimitHitCallback, (__bridge void*)(self));
-    tr_torrentSetIdleLimitHitCallback(self.fHandle, idleLimitHitCallback, (__bridge void*)(self));
-    tr_torrentSetMetadataCallback(self.fHandle, metadataCallback, (__bridge void*)(self));
+    tr_sessionSetQueueStartCallback(lib, startQueueCallback, (__bridge void*)(self));
+    tr_sessionSetCompletenessCallback(lib, completenessChangeCallback, (__bridge void*)(self));
+    tr_sessionSetRatioLimitHitCallback(lib, ratioLimitHitCallback, (__bridge void*)(self));
+    tr_sessionSetIdleLimitHitCallback(lib, idleLimitHitCallback, (__bridge void*)(self));
+    tr_sessionSetMetadataCallback(lib, metadataCallback, (__bridge void*)(self));
 
     _fResumeOnWake = NO;
 
