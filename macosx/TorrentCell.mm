@@ -50,7 +50,10 @@
 - (void)drawPiecesBar:(NSRect)barRect;
 
 - (NSRect)rectForMinimalStatusWithString:(NSAttributedString*)string inBounds:(NSRect)bounds;
-- (NSRect)rectForTitleWithString:(NSAttributedString*)string withRightBound:(CGFloat)rightBound inBounds:(NSRect)bounds minimal:(BOOL)minimal;
+- (NSRect)rectForTitleWithString:(NSAttributedString*)string
+                  withRightBound:(CGFloat)rightBound
+                        inBounds:(NSRect)bounds
+                         minimal:(BOOL)minimal;
 - (NSRect)rectForProgressWithStringInBounds:(NSRect)bounds;
 - (NSRect)rectForStatusWithStringInBounds:(NSRect)bounds;
 - (NSRect)barRectRegForBounds:(NSRect)bounds;
@@ -726,7 +729,10 @@
     return result;
 }
 
-- (NSRect)rectForTitleWithString:(NSAttributedString*)string withRightBound:(CGFloat)rightBound inBounds:(NSRect)bounds minimal:(BOOL)minimal
+- (NSRect)rectForTitleWithString:(NSAttributedString*)string
+                  withRightBound:(CGFloat)rightBound
+                        inBounds:(NSRect)bounds
+                         minimal:(BOOL)minimal
 {
     NSRect result;
     result.origin.x = NSMinX(bounds) + PADDING_HORIZONTAL + (minimal ? IMAGE_SIZE_MIN : IMAGE_SIZE_REG) + PADDING_BETWEEN_IMAGE_AND_TITLE;
