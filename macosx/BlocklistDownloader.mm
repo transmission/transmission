@@ -15,7 +15,7 @@
 @property(nonatomic) blocklistDownloadState fState;
 
 - (void)startDownload;
-- (void)decompressFrom:(NSURL*)file to:(NSURL*)destination error:(NSError**)error;
+- (BOOL)decompressFrom:(NSURL*)file to:(NSURL*)destination error:(NSError**)error;
 
 @end
 
@@ -185,27 +185,27 @@ BlocklistDownloader* fBLDownloader = nil;
     [task resume];
 }
 
-- (void)decompressFrom:(NSURL*)file to:(NSURL*)destination error:(NSError**)error
+- (BOOL)decompressFrom:(NSURL*)file to:(NSURL*)destination error:(NSError**)error
 {
     if ([self untarFrom:file to:destination])
     {
-        return;
+        return YES;
     }
 
     if ([self unzipFrom:file to:destination])
     {
-        return;
+        return YES;
     }
 
     if ([self gunzipFrom:file to:destination])
     {
-        return;
+        return YES;
     }
 
     // If it doesn't look like archive just copy it to destination
     else
     {
-        [NSFileManager.defaultManager copyItemAtURL:file toURL:destination error:error];
+        return [NSFileManager.defaultManager copyItemAtURL:file toURL:destination error:error];
     }
 }
 

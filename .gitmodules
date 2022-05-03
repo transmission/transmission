@@ -4,7 +4,7 @@
 [submodule "third-party/dht"]
 	path = third-party/dht
 	url = https://github.com/transmission/dht
-	branch = post-0.25-transmission
+	branch = post-0.27-transmission
 [submodule "third-party/libb64"]
 	path = third-party/libb64
 	url = https://github.com/transmission/libb64

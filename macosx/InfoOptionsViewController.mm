@@ -18,7 +18,7 @@
 
 @interface InfoOptionsViewController ()
 
-@property(nonatomic, copy) NSArray* fTorrents;
+@property(nonatomic, copy) NSArray<Torrent*>* fTorrents;
 
 @property(nonatomic) BOOL fSet;
 
@@ -86,7 +86,7 @@
     [NSNotificationCenter.defaultCenter removeObserver:self];
 }
 
-- (void)setInfoForTorrents:(NSArray*)torrents
+- (void)setInfoForTorrents:(NSArray<Torrent*>*)torrents
 {
     //don't check if it's the same in case the metadata changed
     self.fTorrents = torrents;
@@ -306,7 +306,7 @@
 
     while ((torrent = [enumerator nextObject]) && priority != INVALID)
     {
-        if (priority != INVALID && priority != torrent.priority)
+        if (priority != torrent.priority)
         {
             priority = INVALID;
         }

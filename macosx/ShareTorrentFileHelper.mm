@@ -19,7 +19,7 @@
     return helper;
 }
 
-- (NSArray*)shareTorrentURLs
+- (NSArray<NSURL*>*)shareTorrentURLs
 {
     NSArray* torrents = ((Controller*)NSApp.delegate).selectedTorrents;
     NSMutableArray* fileURLs = [NSMutableArray arrayWithCapacity:torrents.count];
@@ -34,7 +34,7 @@
     return fileURLs;
 }
 
-- (NSArray*)menuItems
+- (NSArray<NSMenuItem*>*)menuItems
 {
     NSArray* services = [NSSharingService sharingServicesForItems:self.shareTorrentURLs];
     NSMutableArray* items = [NSMutableArray arrayWithCapacity:services.count];
