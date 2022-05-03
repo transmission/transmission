@@ -5,8 +5,11 @@
 
 set -o noglob
 
-# PATH support for SourceTree
-PATH="${PATH}:/usr/local/bin:/opt/homebrew/bin"
+# PATH workaround for SourceTree
+# for Intel Mac
+PATH="${PATH}:/usr/local/bin"
+# for Apple Silicon Mac
+PATH="${PATH}:/opt/homebrew/bin"
 
 if [[ "x$1" == *"check"* ]]; then
   echo "checking code format"
