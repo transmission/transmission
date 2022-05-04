@@ -131,7 +131,7 @@ static char const* getdev(std::string_view path)
 
     for (int i = 0; i < n; i++)
     {
-        if (mnt[i].f_mntonname != nullptr && path == mnt[i].f_mntonname)
+        if (path == mnt[i].f_mntonname)
         {
             return mnt[i].f_mntfromname;
         }
