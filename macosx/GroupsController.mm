@@ -47,6 +47,7 @@ GroupsController* fGroupsInstance = nil;
                                                                                               NSNumber.class,
                                                                                               NSColor.class,
                                                                                               NSString.class,
+                                                                                              NSPredicate.class,
                                                                                               nil]
                                                                fromData:data
                                                                   error:nil];
