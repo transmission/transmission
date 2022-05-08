@@ -1,9 +1,0 @@
-libtransmission/crypto-test.c
-third-party/googletest/googlemock/include/gmock/gmock-matchers.h
-third-party/googletest/googlemock/src/gmock-spec-builders.cc
-third-party/googletest/googlemock/test/gmock-matchers_test.cc
-third-party/googletest/googletest/include/gtest/internal/gtest-filepath.h
-third-party/googletest/googletest/src/gtest.cc
-third-party/googletest/googletest/test/googletest-catch-exceptions-test.py
-third-party/googletest/googletest/test/googletest-filepath-test.cc
-third-party/googletest/googletest/test/gtest_unittest.cc
