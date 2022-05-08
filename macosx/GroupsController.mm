@@ -66,28 +66,26 @@ GroupsController* fGroupsInstance = nil;
         if (_fGroups == nil)
         {
             //default groups
-            // Colors are used on an NSMenuItem of background White:231/255.
-            // Values taken from ColorSync Utility in Finder on a background White:228/255., which is close enough.
             NSMutableDictionary* red = [NSMutableDictionary
-                dictionaryWithObjectsAndKeys:[NSColor colorWithRed:248/255. green:67/255. blue:31/255. alpha:1], @"Color", NSLocalizedString(@"Red", "Groups -> Name"), @"Name", @0, @"Index", nil];
+                dictionaryWithObjectsAndKeys:NSColor.systemRedColor, @"Color", NSLocalizedString(@"Red", "Groups -> Name"), @"Name", @0, @"Index", nil];
 
             NSMutableDictionary* orange = [NSMutableDictionary
-                dictionaryWithObjectsAndKeys:[NSColor colorWithRed:231/255. green:132/255. blue:0/255. alpha:1], @"Color", NSLocalizedString(@"Orange", "Groups -> Name"), @"Name", @1, @"Index", nil];
+                dictionaryWithObjectsAndKeys:NSColor.systemOrangeColor, @"Color", NSLocalizedString(@"Orange", "Groups -> Name"), @"Name", @1, @"Index", nil];
 
             NSMutableDictionary* yellow = [NSMutableDictionary
-                dictionaryWithObjectsAndKeys:[NSColor colorWithRed:230/255. green:181/255. blue:0/255. alpha:1], @"Color", NSLocalizedString(@"Yellow", "Groups -> Name"), @"Name", @2, @"Index", nil];
+                dictionaryWithObjectsAndKeys:NSColor.systemYellowColor, @"Color", NSLocalizedString(@"Yellow", "Groups -> Name"), @"Name", @2, @"Index", nil];
 
             NSMutableDictionary* green = [NSMutableDictionary
-                dictionaryWithObjectsAndKeys:[NSColor colorWithRed:0/255. green:180/255. blue:19/255. alpha:1], @"Color", NSLocalizedString(@"Green", "Groups -> Name"), @"Name", @3, @"Index", nil];
+                dictionaryWithObjectsAndKeys:NSColor.systemGreenColor, @"Color", NSLocalizedString(@"Green", "Groups -> Name"), @"Name", @3, @"Index", nil];
 
             NSMutableDictionary* blue = [NSMutableDictionary
-                dictionaryWithObjectsAndKeys:[NSColor colorWithRed:52/255. green:139/255. blue:251/255. alpha:1], @"Color", NSLocalizedString(@"Blue", "Groups -> Name"), @"Name", @4, @"Index", nil];
+                dictionaryWithObjectsAndKeys:NSColor.systemBlueColor, @"Color", NSLocalizedString(@"Blue", "Groups -> Name"), @"Name", @4, @"Index", nil];
 
             NSMutableDictionary* purple = [NSMutableDictionary
-                dictionaryWithObjectsAndKeys:[NSColor colorWithRed:170/255. green:103/255. blue:209/255. alpha:1], @"Color", NSLocalizedString(@"Purple", "Groups -> Name"), @"Name", @5, @"Index", nil];
+                dictionaryWithObjectsAndKeys:NSColor.systemPurpleColor, @"Color", NSLocalizedString(@"Purple", "Groups -> Name"), @"Name", @5, @"Index", nil];
 
             NSMutableDictionary* gray = [NSMutableDictionary
-                dictionaryWithObjectsAndKeys:[NSColor colorWithRed:121/255. green:121/255. blue:126/255. alpha:1], @"Color", NSLocalizedString(@"Gray", "Groups -> Name"), @"Name", @6, @"Index", nil];
+                dictionaryWithObjectsAndKeys:NSColor.systemGrayColor, @"Color", NSLocalizedString(@"Gray", "Groups -> Name"), @"Name", @6, @"Index", nil];
 
             _fGroups = [[NSMutableArray alloc] initWithObjects:red, orange, yellow, green, blue, purple, gray, nil];
             [self saveGroups]; //make sure this is saved right away
@@ -388,7 +386,7 @@ GroupsController* fGroupsInstance = nil;
     [icon lockFocus];
 
     //border
-    NSBezierPath* bp = [NSBezierPath bezierPathWithRoundedRect:rect xRadius:rect.size.width/2 yRadius:rect.size.width/2];
+    NSBezierPath* bp = [NSBezierPath bezierPathWithRoundedRect:rect xRadius:rect.size.width / 2 yRadius:rect.size.width / 2];
     NSGradient* gradient = [[NSGradient alloc] initWithStartingColor:[color blendedColorWithFraction:0.45 ofColor:NSColor.whiteColor]
                                                          endingColor:color];
     [gradient drawInBezierPath:bp angle:0.0];
