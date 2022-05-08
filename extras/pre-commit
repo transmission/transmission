@@ -1,6 +1,0 @@
-#!/usr/bin/env sh
-
-[ -z "$TR_SKIP_HOOKS" ] || exit 0
-
-root="$(git rev-parse --show-toplevel)"
-exec "${root}/code_style.sh" --check
