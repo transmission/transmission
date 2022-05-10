@@ -655,7 +655,7 @@
     }
     NSPasteboard* pasteBoard = NSPasteboard.generalPasteboard;
     NSString* links = [[selectedTorrents valueForKeyPath:@"magnetLink"] componentsJoinedByString:@"\n"];
-    [pasteBoard declareTypes:@[NSStringPboardType] owner:nil];
+    [pasteBoard declareTypes:@[ NSStringPboardType ] owner:nil];
     [pasteBoard setString:links forType:NSStringPboardType];
 }
 
