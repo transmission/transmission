@@ -475,6 +475,8 @@
         self.fPortStatusField.stringValue = NSLocalizedString(@"Port check site is down", "Preferences -> Network -> port status");
         self.fPortStatusImage.image = [NSImage imageNamed:NSImageNameStatusPartiallyAvailable];
         break;
+    case PORT_STATUS_CHECKING:
+        break;
     default:
         NSAssert1(NO, @"Port checker returned invalid status: %d", self.fPortChecker.status);
         break;
