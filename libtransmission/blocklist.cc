@@ -108,33 +108,6 @@ void BlocklistFile::ensureLoaded()
 ****  PACKAGE-VISIBLE
 ***/
 
-char const* BlocklistFile::getFilename() const
-{
-    return filename_.c_str();
-}
-
-BlocklistFile::~BlocklistFile()
-{
-    close();
-}
-
-bool BlocklistFile::exists() const
-{
-    return tr_sys_path_exists(getFilename(), nullptr);
-}
-
-size_t BlocklistFile::getRuleCount()
-{
-    ensureLoaded();
-
-    return rule_count_;
-}
-
-void BlocklistFile::setEnabled(bool isEnabled)
-{
-    is_enabled_ = isEnabled;
-}
-
 bool BlocklistFile::hasAddress(tr_address const& addr)
 {
     TR_ASSERT(tr_address_is_valid(&addr));

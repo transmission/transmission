@@ -379,7 +379,7 @@ public:
     std::string resume_dir;
     std::string torrent_dir;
 
-    std::vector<BlocklistFile*> blocklists;
+    std::vector<std::unique_ptr<BlocklistFile>> blocklists;
     struct tr_peerMgr* peerMgr;
     struct tr_shared* shared;
 

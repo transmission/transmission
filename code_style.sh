@@ -24,6 +24,7 @@ cfile_includes=(
 )
 cfile_excludes=(
   'build/*'
+  'cmake-build-debug/*'
   'libtransmission/ConvertUTF.*'
   'libtransmission/jsonsl.*'
   'libtransmission/wildmat.*'

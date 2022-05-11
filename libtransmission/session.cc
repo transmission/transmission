@@ -2414,7 +2414,7 @@ static void loadBlocklists(tr_session* session)
         std::begin(loadme),
         std::end(loadme),
         std::back_inserter(session->blocklists),
-        [&isEnabled](auto const& path) { return new BlocklistFile(path.c_str(), isEnabled); });
+        [&isEnabled](auto const& path) { return std::make_unique<BlocklistFile>(path.c_str(), isEnabled); });
 
     /* cleanup */
     tr_sys_dir_close(odir);
@@ -2422,9 +2422,7 @@ static void loadBlocklists(tr_session* session)
 
 static void closeBlocklists(tr_session* session)
 {
-    auto& src = session->blocklists;
-    std::for_each(std::begin(src), std::end(src), [](auto* b) { delete b; });
-    src.clear();
+    session->blocklists.clear();
 }
 
 void tr_sessionReloadBlocklists(tr_session* session)
@@ -2440,7 +2438,7 @@ int tr_blocklistGetRuleCount(tr_session const* session)
     TR_ASSERT(tr_isSession(session));
 
     auto& src = session->blocklists;
-    return std::accumulate(std::begin(src), std::end(src), 0, [](int sum, auto* cur) { return sum + cur->getRuleCount(); });
+    return std::accumulate(std::begin(src), std::end(src), 0, [](int sum, auto& cur) { return sum + cur->getRuleCount(); });
 }
 
 bool tr_blocklistIsEnabled(tr_session const* session)
@@ -2454,7 +2452,7 @@ void tr_session::useBlocklist(bool enabled)
 {
     this->blocklist_enabled_ = enabled;
 
-    std::for_each(std::begin(blocklists), std::end(blocklists), [enabled](auto* blocklist) { blocklist->setEnabled(enabled); });
+    std::for_each(std::begin(blocklists), std::end(blocklists), [enabled](auto& blocklist) { blocklist->setEnabled(enabled); });
 }
 
 void tr_blocklistSetEnabled(tr_session* session, bool enabled)
@@ -2471,7 +2469,7 @@ bool tr_blocklistExists(tr_session const* session)
     return !std::empty(session->blocklists);
 }
 
-int tr_blocklistSetContent(tr_session* session, char const* contentFilename)
+size_t tr_blocklistSetContent(tr_session* session, char const* contentFilename)
 {
     auto const lock = session->unique_lock();
 
@@ -2481,18 +2479,18 @@ int tr_blocklistSetContent(tr_session* session, char const* contentFilename)
     auto const it = std::find_if(
         std::begin(src),
         std::end(src),
-        [&name](auto const* blocklist) { return tr_strvEndsWith(blocklist->getFilename(), name); });
+        [&name](auto const& blocklist) { return tr_strvEndsWith(blocklist->getFilename(), name); });
 
     BlocklistFile* b = nullptr;
     if (it == std::end(src))
     {
         auto path = tr_pathbuf{ session->config_dir, "/blocklists/"sv, name };
-        b = new BlocklistFile(path, session->useBlocklist());
-        src.push_back(b);
+        src.push_back(std::make_unique<BlocklistFile>(path, session->useBlocklist()));
+        b = std::rbegin(src)->get();
     }
     else
     {
-        b = *it;
+        b = it->get();
     }
 
     // set the default blocklist's content
@@ -2503,7 +2501,7 @@ int tr_blocklistSetContent(tr_session* session, char const* contentFilename)
 bool tr_sessionIsAddressBlocked(tr_session const* session, tr_address const* addr)
 {
     auto const& src = session->blocklists;
-    return std::any_of(std::begin(src), std::end(src), [&addr](auto* blocklist) { return blocklist->hasAddress(*addr); });
+    return std::any_of(std::begin(src), std::end(src), [&addr](auto& blocklist) { return blocklist->hasAddress(*addr); });
 }
 
 void tr_blocklistSetURL(tr_session* session, char const* url)

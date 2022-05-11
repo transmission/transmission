@@ -10,6 +10,7 @@
 #endif
 
 #include <string>
+#include <string_view>
 #include <vector>
 
 #include "file.h" // for tr_sys_file_t
@@ -21,29 +22,50 @@ struct tr_address;
 struct BlocklistFile
 {
 public:
+    // Prevent moving to protect the fd_ from accidental destruction
+    BlocklistFile(BlocklistFile&&) = delete;
+    BlocklistFile(BlocklistFile const&) = delete;
+    BlocklistFile& operator=(BlocklistFile const&) = delete;
+    BlocklistFile& operator=(BlocklistFile&&) = delete;
+
     BlocklistFile(char const* filename, bool isEnabled)
         : is_enabled_(isEnabled)
         , filename_(filename)
     {
     }
 
-    ~BlocklistFile();
+    ~BlocklistFile()
+    {
+        close();
+    }
 
-    void close();
+    [[nodiscard]] bool exists() const
+    {
+        return tr_sys_path_exists(getFilename(), nullptr);
+    }
 
-    [[nodiscard]] bool exists() const;
-
-    [[nodiscard]] char const* getFilename() const;
+    [[nodiscard]] char const* getFilename() const
+    {
+        return filename_.c_str();
+    }
 
     // TODO: This function should be const, but cannot be const due to it calling ensureLoaded()
-    size_t getRuleCount();
+    size_t getRuleCount()
+    {
+        ensureLoaded();
+
+        return rule_count_;
+    }
 
     [[nodiscard]] constexpr bool isEnabled() const
     {
         return is_enabled_;
     }
 
-    void setEnabled(bool isEnabled);
+    void setEnabled(bool isEnabled)
+    {
+        is_enabled_ = isEnabled;
+    }
 
     bool hasAddress(tr_address const& addr);
 
@@ -53,8 +75,8 @@ public:
 private:
     struct IPv4Range
     {
-        uint32_t begin_;
-        uint32_t end_;
+        uint32_t begin_ = 0;
+        uint32_t end_ = 0;
 
         /// @brief Used for std::bsearch of an IPv4 address
         static int compareAddressToRange(void const* va, void const* vb)
@@ -78,6 +100,8 @@ private:
 
     void ensureLoaded();
     void load();
+    void close();
+
     static bool parseLine(char const* line, IPv4Range* range);
     static bool compareAddressRangesByFirstAddress(IPv4Range const& a, IPv4Range const& b);
 
