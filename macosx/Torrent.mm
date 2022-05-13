@@ -479,7 +479,7 @@ bool trashDataFile(char const* filename, tr_error** error)
     return tr_torrentUsesSessionLimits(self.fHandle);
 }
 
-- (void)setUseGlobalSpeedLimit:(BOOL)use
+- (void)setUsesGlobalSpeedLimit:(BOOL)use
 {
     tr_torrentUseSessionLimits(self.fHandle, use);
 }
