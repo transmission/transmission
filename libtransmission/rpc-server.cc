@@ -35,7 +35,6 @@
 #include "crypto-utils.h" /* tr_rand_buffer() */
 #include "crypto.h" /* tr_ssha1_matches() */
 #include "error.h"
-#include "fdlimit.h"
 #include "log.h"
 #include "net.h"
 #include "platform.h" /* tr_getWebClientDir() */
