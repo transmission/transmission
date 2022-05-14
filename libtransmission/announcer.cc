@@ -465,7 +465,7 @@ struct tr_tier
     int announceIntervalSec = DefaultAnnounceIntervalSec;
     int announceMinIntervalSec = DefaultAnnounceMinIntervalSec;
 
-    int lastAnnouncePeerCount = 0;
+    size_t lastAnnouncePeerCount = 0;
 
     bool lastScrapeSucceeded = false;
     bool lastScrapeTimedOut = false;
