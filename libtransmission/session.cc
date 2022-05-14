@@ -2439,7 +2439,7 @@ void tr_sessionReloadBlocklists(tr_session* session)
     tr_peerMgrOnBlocklistChanged(session->peerMgr);
 }
 
-int tr_blocklistGetRuleCount(tr_session const* session)
+size_t tr_blocklistGetRuleCount(tr_session const* session)
 {
     TR_ASSERT(tr_isSession(session));
 
@@ -2448,7 +2448,7 @@ int tr_blocklistGetRuleCount(tr_session const* session)
         std::begin(src),
         std::end(src),
         0,
-        [](int sum, auto const* cur) { return sum + tr_blocklistFileGetRuleCount(cur); });
+        [](size_t sum, auto const* cur) { return sum + tr_blocklistFileGetRuleCount(cur); });
 }
 
 bool tr_blocklistIsEnabled(tr_session const* session)

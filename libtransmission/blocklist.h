@@ -16,7 +16,7 @@ tr_blocklistFile* tr_blocklistFileNew(char const* filename, bool isEnabled);
 
 char const* tr_blocklistFileGetFilename(tr_blocklistFile const* b);
 
-int tr_blocklistFileGetRuleCount(tr_blocklistFile const* b);
+size_t tr_blocklistFileGetRuleCount(tr_blocklistFile const* b);
 
 void tr_blocklistFileFree(tr_blocklistFile* b);
 

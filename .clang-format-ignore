@@ -1,0 +1,22 @@
+# Skipped files must be justified as untracked or third-party maintained
+
+# untracked files
+.*/*
+build/*
+libtransmission/version.h
+web/node_modules/*
+
+# third-party maintained projects
+third-party/*
+
+# maintained at https://github.com/sparkle-project/Sparkle
+macosx/Sparkle.framework/*
+
+# maintained at https://github.com/bdkjones/VDKQueue
+macosx/VDKQueue/*
+
+# maintained at https://github.com/mnunberg/jsonsl
+libtransmission/jsonsl.*
+
+# missing official maintainer (XConsortium: wildmat.c,v 1.2 94/04/13); TODO: clang-format it
+libtransmission/wildmat.*
