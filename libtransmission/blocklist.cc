@@ -164,7 +164,7 @@ void tr_blocklistFileFree(tr_blocklistFile* b)
     tr_free(b);
 }
 
-int tr_blocklistFileGetRuleCount(tr_blocklistFile const* b)
+size_t tr_blocklistFileGetRuleCount(tr_blocklistFile const* b)
 {
     blocklistEnsureLoaded((tr_blocklistFile*)b);
 
