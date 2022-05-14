@@ -876,7 +876,7 @@ static void removeKeRangerRansomware()
 {
     if (!self.fQuitRequested && [self.fDefaults boolForKey:@"CheckQuit"])
     {
-        NSInteger active = 0, downloading = 0;
+        NSUInteger active = 0, downloading = 0;
         for (Torrent* torrent in self.fTorrents)
         {
             if (torrent.active && !torrent.stalled)
@@ -900,7 +900,7 @@ static void removeKeRangerRansomware()
                      " The transfer will automatically resume on the next launch.",
                     "Confirm Quit panel -> message") :
                 [NSString stringWithFormat:NSLocalizedString(
-                                               @"There are %d active transfers that will be paused on quit."
+                                               @"There are %lu active transfers that will be paused on quit."
                                                 " The transfers will automatically resume on the next launch.",
                                                "Confirm Quit panel -> message"),
                                            active];
@@ -1709,29 +1709,29 @@ static void removeKeRangerRansomware()
                 if (deleteData)
                 {
                     title = [NSString stringWithFormat:NSLocalizedString(
-                                                           @"Are you sure you want to remove %@ transfers from the transfer list"
+                                                           @"Are you sure you want to remove %lu transfers from the transfer list"
                                                             " and trash the data files?",
                                                            "Removal confirm panel -> title"),
-                                                       [NSString formattedUInteger:selected]];
+                                                       selected];
                 }
                 else
                 {
                     title = [NSString stringWithFormat:NSLocalizedString(
-                                                           @"Are you sure you want to remove %@ transfers from the transfer list?",
+                                                           @"Are you sure you want to remove %lu transfers from the transfer list?",
                                                            "Removal confirm panel -> title"),
-                                                       [NSString formattedUInteger:selected]];
+                                                       selected];
                 }
 
                 if (selected == active)
                 {
-                    message = [NSString stringWithFormat:NSLocalizedString(@"There are %@ active transfers.", "Removal confirm panel -> message part 1"),
-                                                         [NSString formattedUInteger:active]];
+                    message = [NSString stringWithFormat:NSLocalizedString(@"There are %lu active transfers.", "Removal confirm panel -> message part 1"),
+                                                         active];
                 }
                 else
                 {
-                    message = [NSString stringWithFormat:NSLocalizedString(@"There are %@ transfers (%@ active).", "Removal confirm panel -> message part 1"),
-                                                         [NSString formattedUInteger:selected],
-                                                         [NSString formattedUInteger:active]];
+                    message = [NSString stringWithFormat:NSLocalizedString(@"There are %1$lu transfers (%2$lu active).", "Removal confirm panel -> message part 1"),
+                                                         selected,
+                                                         active];
                 }
                 message = [message stringByAppendingFormat:@" %@",
                                                            NSLocalizedString(
@@ -1905,9 +1905,9 @@ static void removeKeRangerRansomware()
         else
         {
             message = [NSString stringWithFormat:NSLocalizedString(
-                                                     @"Are you sure you want to remove %@ completed transfers from the transfer list?",
+                                                     @"Are you sure you want to remove %lu completed transfers from the transfer list?",
                                                      "Remove completed confirm panel -> title"),
-                                                 [NSString formattedUInteger:torrents.count]];
+                                                 torrents.count];
 
             info = NSLocalizedString(
                 @"Once removed, continuing the transfers will require the torrent files or magnet links.",
@@ -1951,7 +1951,7 @@ static void removeKeRangerRansomware()
     panel.canChooseDirectories = YES;
     panel.canCreateDirectories = YES;
 
-    NSInteger count = torrents.count;
+    NSUInteger count = torrents.count;
     if (count == 1)
     {
         panel.message = [NSString
@@ -1961,7 +1961,7 @@ static void removeKeRangerRansomware()
     else
     {
         panel.message = [NSString
-            stringWithFormat:NSLocalizedString(@"Select the new folder for %d data files.", "Move torrent -> select destination folder"), count];
+            stringWithFormat:NSLocalizedString(@"Select the new folder for %lu data files.", "Move torrent -> select destination folder"), count];
     }
 
     [panel beginSheetModalForWindow:self.fWindow completionHandler:^(NSInteger result) {
@@ -2252,8 +2252,7 @@ static void removeKeRangerRansomware()
     NSUInteger totalCount = self.fTorrents.count;
     if (totalCount != 1)
     {
-        totalTorrentsString = [NSString stringWithFormat:NSLocalizedString(@"%@ transfers", "Status bar transfer count"),
-                                                         [NSString formattedUInteger:totalCount]];
+        totalTorrentsString = [NSString stringWithFormat:NSLocalizedString(@"%lu transfers", "Status bar transfer count"), totalCount];
     }
     else
     {
@@ -5157,13 +5156,13 @@ static void removeKeRangerRansomware()
 
     if (seeding > 0)
     {
-        NSString* title = [NSString stringWithFormat:NSLocalizedString(@"%d Seeding", "Dock item - Seeding"), seeding];
+        NSString* title = [NSString stringWithFormat:NSLocalizedString(@"%lu Seeding", "Dock item - Seeding"), seeding];
         [menu addItemWithTitle:title action:nil keyEquivalent:@""];
     }
 
     if (downloading > 0)
     {
-        NSString* title = [NSString stringWithFormat:NSLocalizedString(@"%d Downloading", "Dock item - Downloading"), downloading];
+        NSString* title = [NSString stringWithFormat:NSLocalizedString(@"%lu Downloading", "Dock item - Downloading"), downloading];
         [menu addItemWithTitle:title action:nil keyEquivalent:@""];
     }
 

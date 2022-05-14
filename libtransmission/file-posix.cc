@@ -58,6 +58,7 @@
 #include "file.h"
 #include "log.h"
 #include "tr-assert.h"
+#include "tr-strbuf.h"
 #include "utils.h"
 
 #ifndef O_LARGEFILE
@@ -386,7 +387,7 @@ char* tr_sys_path_resolve(char const* path, tr_error** error)
 
 std::string tr_sys_path_basename(std::string_view path, tr_error** error)
 {
-    auto tmp = std::string{ path };
+    auto tmp = tr_pathbuf{ path };
 
     if (char const* ret = basename(std::data(tmp)); ret != nullptr)
     {
@@ -399,7 +400,7 @@ std::string tr_sys_path_basename(std::string_view path, tr_error** error)
 
 std::string tr_sys_path_dirname(std::string_view path, tr_error** error)
 {
-    auto tmp = std::string{ path };
+    auto tmp = tr_pathbuf{ path };
 
     if (char const* ret = dirname(std::data(tmp)); ret != nullptr)
     {
@@ -783,7 +784,7 @@ bool tr_sys_file_read_at(
 
         ret = true;
     }
-    else
+    else if (my_bytes_read == -1)
     {
         set_system_error(error, errno);
     }
