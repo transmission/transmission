@@ -640,6 +640,25 @@
     return [self.fTorrentCell iconRectForBounds:[self rectOfRow:row]];
 }
 
+- (BOOL)acceptsFirstResponder
+{
+    // add support to `copy:`
+    return YES;
+}
+
+- (void)copy:(id)sender
+{
+    NSArray<Torrent*>* selectedTorrents = self.selectedTorrents;
+    if (selectedTorrents.count == 0)
+    {
+        return;
+    }
+    NSPasteboard* pasteBoard = NSPasteboard.generalPasteboard;
+    NSString* links = [[selectedTorrents valueForKeyPath:@"magnetLink"] componentsJoinedByString:@"\n"];
+    [pasteBoard declareTypes:@[ NSStringPboardType ] owner:nil];
+    [pasteBoard setString:links forType:NSStringPboardType];
+}
+
 - (void)paste:(id)sender
 {
     NSURL* url;

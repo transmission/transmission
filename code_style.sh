@@ -5,6 +5,12 @@
 
 set -o noglob
 
+# PATH workaround for SourceTree
+# for Intel Mac
+PATH="${PATH}:/usr/local/bin"
+# for Apple Silicon Mac
+PATH="${PATH}:/opt/homebrew/bin"
+
 if [[ "x$1" == *"check"* ]]; then
   echo "checking code format"
 else
@@ -15,24 +21,13 @@ root="$(dirname "$0")"
 root="$(cd "${root}" && pwd)"
 cd "${root}" || exit 1
 
-cfile_includes=(
-  '*.c'
-  '*.cc'
-  '*.h'
-  '*.m'
-  '*.mm'
-)
-cfile_excludes=(
-  'build/*'
-  'libtransmission/ConvertUTF.*'
-  'libtransmission/jsonsl.*'
-  'libtransmission/wildmat.*'
-  'macosx/Sparkle.framework/*'
-  'macosx/VDKQueue/*'
-  'third-party/*'
-  'web/*'
-  '.git/*'
-)
+trim_comments() {
+  # 1. remove comments, ignoring backslash-escaped characters
+  # 2. trim spaces
+  # 3. remove empty lines
+  # note: GNU extensions like +?| aren't supported on macOS
+  sed 's/^\(\(\(\\.\)*[^\\#]*\)*\)#.*/\1/;s/^[[:blank:]]*//;s/[[:blank:]]*$//;/^$/d' "$@"
+}
 
 get_find_path_args() {
   local args=$(printf " -o -path ./%s" "$@")
@@ -40,7 +35,9 @@ get_find_path_args() {
 }
 
 find_cfiles() {
-  find . \( $(get_find_path_args "${cfile_includes[@]}") \) ! \( $(get_find_path_args "${cfile_excludes[@]}") \) "$@"
+  # We use the same files as Meson: https://mesonbuild.com/Code-formatting.html
+  find . \( $(get_find_path_args $(trim_comments .clang-format-include)) \)\
+       ! \( $(get_find_path_args $(trim_comments .clang-format-ignore)) \) "$@"
 }
 
 # We're targeting clang-format version 12 and other versions give slightly
