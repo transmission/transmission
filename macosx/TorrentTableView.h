@@ -29,6 +29,7 @@
 
 - (NSRect)iconRectForRow:(NSInteger)row;
 
+- (void)copy:(id)sender;
 - (void)paste:(id)sender;
 
 - (void)toggleControlForTorrent:(Torrent*)torrent;
