@@ -9,7 +9,7 @@
 
 @interface PortChecker ()
 
-@property(nonatomic, weak) id fDelegate;
+@property(nonatomic, weak) NSObject<PortCheckerDelegate>* fDelegate;
 @property(nonatomic) port_status_t fStatus;
 
 @property(nonatomic) NSURLConnection* fConnection;
@@ -25,7 +25,7 @@
 
 @implementation PortChecker
 
-- (instancetype)initForPort:(NSInteger)portNumber delay:(BOOL)delay withDelegate:(id)delegate
+- (instancetype)initForPort:(NSInteger)portNumber delay:(BOOL)delay withDelegate:(NSObject<PortCheckerDelegate>*)delegate
 {
     if ((self = [super init]))
     {

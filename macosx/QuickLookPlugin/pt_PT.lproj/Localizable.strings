@@ -1,14 +1,14 @@
 /* quicklook file header */
-"%@ Files" = "%@ Ficheiros";
+"%lu Files" = "%lu Ficheiros";
 
 /* quicklook file count */
-"%@ files" = "%@ ficheiros";
+"%lu files" = "%lu ficheiros";
 
 /* quicklook tracker header */
-"%@ Trackers" = "%@ Trackers";
+"%lu Trackers" = "%lu Trackers";
 
 /* quicklook web seed header */
-"%@ Web Seeds" = "%@ Seeds web";
+"%lu Web Seeds" = "%lu Seeds web";
 
 /* quicklook tracker header */
 "1 Tracker" = "1 Tracker";
