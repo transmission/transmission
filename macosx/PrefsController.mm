@@ -157,9 +157,6 @@
                                                      notifyingAbout:VDKQueueNotifyAboutWrite];
         }
 
-        //set special-handling of magnet link add window checkbox
-        [self updateShowAddMagnetWindowField];
-
         //set blocklist scheduler
         [BlocklistScheduler.scheduler updateSchedule];
 
@@ -216,6 +213,9 @@
     self.window.toolbar = toolbar;
 
     [self setPrefView:nil];
+
+    //set special-handling of magnet link add window checkbox
+    [self updateShowAddMagnetWindowField];
 
     //set download folder
     [self.fFolderPopUp selectItemAtIndex:[self.fDefaults boolForKey:@"DownloadLocationConstant"] ? DOWNLOAD_FOLDER : DOWNLOAD_TORRENT];
