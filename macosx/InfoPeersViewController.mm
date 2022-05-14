@@ -17,12 +17,12 @@
 
 @interface InfoPeersViewController ()<CAAnimationDelegate>
 
-@property(nonatomic, copy) NSArray* fTorrents;
+@property(nonatomic, copy) NSArray<Torrent*>* fTorrents;
 
 @property(nonatomic) BOOL fSet;
 
-@property(nonatomic) NSMutableArray* fPeers;
-@property(nonatomic) NSMutableArray* fWebSeeds;
+@property(nonatomic) NSMutableArray<NSDictionary*>* fPeers;
+@property(nonatomic) NSMutableArray<NSDictionary*>* fWebSeeds;
 
 @property(nonatomic) IBOutlet NSTableView* fPeerTable;
 @property(nonatomic) IBOutlet WebSeedTableView* fWebSeedTable;
@@ -31,7 +31,7 @@
 
 @property(nonatomic) CGFloat fViewTopMargin;
 @property(nonatomic) IBOutlet NSLayoutConstraint* fWebSeedTableTopConstraint;
-@property(nonatomic, readonly) NSArray* peerSortDescriptors;
+@property(nonatomic, readonly) NSArray<NSSortDescriptor*>* peerSortDescriptors;
 
 - (void)setupInfo;
 
@@ -96,7 +96,7 @@
 }
 
 #warning subclass?
-- (void)setInfoForTorrents:(NSArray*)torrents
+- (void)setInfoForTorrents:(NSArray<Torrent*>*)torrents
 {
     //don't check if it's the same in case the metadata changed
     self.fTorrents = torrents;
@@ -573,7 +573,7 @@
     (animate ? [self.fWebSeedTableTopConstraint animator] : self.fWebSeedTableTopConstraint).constant = webSeedTableTopMargin;
 }
 
-- (NSArray*)peerSortDescriptors
+- (NSArray<NSSortDescriptor*>*)peerSortDescriptors
 {
     NSMutableArray* descriptors = [NSMutableArray arrayWithCapacity:2];
 

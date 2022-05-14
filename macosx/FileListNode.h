@@ -16,7 +16,7 @@
 @property(nonatomic, readonly) uint64_t size;
 @property(nonatomic, readonly) NSImage* icon;
 @property(nonatomic, readonly) BOOL isFolder;
-@property(nonatomic, readonly) NSMutableArray* children;
+@property(nonatomic, readonly) NSMutableArray<FileListNode*>* children;
 
 @property(nonatomic, readonly) NSIndexSet* indexes;
 

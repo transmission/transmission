@@ -8,7 +8,7 @@
 
 @interface InfoTrackersViewController : NSViewController<InfoViewController>
 
-- (void)setInfoForTorrents:(NSArray*)torrents;
+- (void)setInfoForTorrents:(NSArray<Torrent*>*)torrents;
 - (void)updateInfo;
 
 - (void)saveViewSize;

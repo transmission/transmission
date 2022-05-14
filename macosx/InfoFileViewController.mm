@@ -10,7 +10,7 @@
 
 @interface InfoFileViewController ()
 
-@property(nonatomic, copy) NSArray* fTorrents;
+@property(nonatomic, copy) NSArray<Torrent*>* fTorrents;
 
 @property(nonatomic) BOOL fSet;
 
@@ -74,7 +74,7 @@
     self.fCheckAllButton.frame = checkAllFrame;
 }
 
-- (void)setInfoForTorrents:(NSArray*)torrents
+- (void)setInfoForTorrents:(NSArray<Torrent*>*)torrents
 {
     //don't check if it's the same in case the metadata changed
     self.fTorrents = torrents;
@@ -125,7 +125,7 @@
     [self.fFileController uncheckAll];
 }
 
-- (NSArray*)quickLookURLs
+- (NSArray<NSURL*>*)quickLookURLs
 {
     FileOutlineView* fileOutlineView = self.fFileController.outlineView;
     Torrent* torrent = self.fTorrents[0];

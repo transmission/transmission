@@ -8,6 +8,6 @@
 
 @property(nonatomic, readonly) NSInteger hoveredRow;
 
-- (NSRect)iconRectForRow:(int)row;
+- (NSRect)iconRectForRow:(NSInteger)row;
 
 @end
