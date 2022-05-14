@@ -294,6 +294,7 @@ static void removeKeRangerRansomware()
 
 @property(nonatomic) BOOL fGlobalPopoverShown;
 @property(nonatomic) BOOL fSoundPlaying;
+@property(nonatomic) id fNoNapActivity;
 
 @end
 
@@ -781,6 +782,9 @@ static void removeKeRangerRansomware()
 {
     NSApp.servicesProvider = self;
 
+    self.fNoNapActivity = [NSProcessInfo.processInfo beginActivityWithOptions:NSActivityUserInitiatedAllowingIdleSystemSleep
+                                                                       reason:NSLocalizedString(@"No napping on the job!", nil)];
+
     //register for dock icon drags (has to be in applicationDidFinishLaunching: to work)
     [[NSAppleEventManager sharedAppleEventManager] setEventHandler:self andSelector:@selector(handleOpenContentsEvent:replyEvent:)
                                                      forEventClass:kCoreEventClass
@@ -916,6 +920,8 @@ static void removeKeRangerRansomware()
 - (void)applicationWillTerminate:(NSNotification*)notification
 {
     self.fQuitting = YES;
+
+    [NSProcessInfo.processInfo endActivity:self.fNoNapActivity];
 
     //stop the Bonjour service
     if (BonjourController.defaultControllerExists)
