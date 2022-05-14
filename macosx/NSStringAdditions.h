@@ -24,6 +24,6 @@
 - (NSComparisonResult)compareNumeric:(NSString*)string;
 
 // like componentsSeparatedByCharactersInSet:, but excludes blank values
-- (NSArray*)betterComponentsSeparatedByCharactersInSet:(NSCharacterSet*)separators;
+- (NSArray<NSString*>*)nonEmptyComponentsSeparatedByCharactersInSet:(NSCharacterSet*)separators;
 
 @end
