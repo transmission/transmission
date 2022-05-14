@@ -175,7 +175,7 @@ typedef NS_ENUM(unsigned int, statusTag) {
     if ([NSUserDefaults.standardUserDefaults boolForKey:@"SpeedLimit"])
     {
         NSString* speedString = [NSString stringWithFormat:@"%@ (%@)",
-                                                           NSLocalizedString(@"%d KB/s", "Status Bar -> speed tooltip"),
+                                                           NSLocalizedString(@"%ld KB/s", "Status Bar -> speed tooltip"),
                                                            NSLocalizedString(@"Speed Limit", "Status Bar -> speed tooltip")];
 
         uploadText = [NSString stringWithFormat:speedString, [NSUserDefaults.standardUserDefaults integerForKey:@"SpeedLimitUploadLimit"]];
@@ -185,7 +185,7 @@ typedef NS_ENUM(unsigned int, statusTag) {
     {
         if ([NSUserDefaults.standardUserDefaults boolForKey:@"CheckUpload"])
         {
-            uploadText = [NSString stringWithFormat:NSLocalizedString(@"%d KB/s", "Status Bar -> speed tooltip"),
+            uploadText = [NSString stringWithFormat:NSLocalizedString(@"%ld KB/s", "Status Bar -> speed tooltip"),
                                                     [NSUserDefaults.standardUserDefaults integerForKey:@"UploadLimit"]];
         }
         else
@@ -195,7 +195,7 @@ typedef NS_ENUM(unsigned int, statusTag) {
 
         if ([NSUserDefaults.standardUserDefaults boolForKey:@"CheckDownload"])
         {
-            downloadText = [NSString stringWithFormat:NSLocalizedString(@"%d KB/s", "Status Bar -> speed tooltip"),
+            downloadText = [NSString stringWithFormat:NSLocalizedString(@"%ld KB/s", "Status Bar -> speed tooltip"),
                                                       [NSUserDefaults.standardUserDefaults integerForKey:@"DownloadLimit"]];
         }
         else

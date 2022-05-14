@@ -25,9 +25,8 @@
 
     _count = count;
 
-    self.toolTip = _count == 1 ? NSLocalizedString(@"1 transfer", "Filter Button -> tool tip") :
-                                 [NSString stringWithFormat:NSLocalizedString(@"%@ transfers", "Filter Bar Button -> tool tip"),
-                                                            [NSString formattedUInteger:_count]];
+    self.toolTip = count == 1 ? NSLocalizedString(@"1 transfer", "Filter Button -> tool tip") :
+                                [NSString stringWithFormat:NSLocalizedString(@"%lu transfers", "Filter Bar Button -> tool tip"), count];
 }
 
 @end
