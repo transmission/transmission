@@ -40,7 +40,6 @@
 #include "crypto-utils.h"
 #include "error-types.h"
 #include "error.h"
-#include "fdlimit.h"
 #include "file.h"
 #include "log.h"
 #include "net.h"
@@ -2947,6 +2946,30 @@ static int bandwidthGroupWrite(tr_session const* session, std::string_view confi
     return ret;
 }
 
+void tr_sessionSetQueueStartCallback(tr_session* session, tr_session::TorrentCallbackFunc callback, void* user_data)
+{
+    session->setTorrentQueueStartedCallback(callback, user_data);
+}
+
+void tr_sessionSetMetadataCallback(tr_session* session, tr_session::TorrentCallbackFunc callback, void* user_data)
+{
+    session->setTorrentMetadataCallback(callback, user_data);
+}
+
+void tr_sessionSetIdleLimitHitCallback(tr_session* session, tr_session::TorrentCallbackFunc callback, void* user_data)
+{
+    session->setTorrentIdleLimitCallback(callback, user_data);
+}
+
+void tr_sessionSetRatioLimitHitCallback(tr_session* session, tr_session::TorrentCallbackFunc callback, void* user_data)
+{
+    session->setTorrentRatioLimitCallback(callback, user_data);
+}
+
+void tr_sessionSetCompletenessCallback(tr_session* session, tr_session::CompletenessFunc func, void* user_data)
+{
+    session->setTorrentCompletenessCallback(func, user_data);
+}
 ///
 
 void tr_session::closeTorrentFiles(tr_torrent* tor) noexcept

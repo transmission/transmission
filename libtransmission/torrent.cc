@@ -466,11 +466,7 @@ void tr_torrentCheckSeedLimit(tr_torrent* tor)
 
         tor->isStopping = true;
 
-        /* maybe notify the client */
-        if (tor->ratio_limit_hit_func != nullptr)
-        {
-            (*tor->ratio_limit_hit_func)(tor, tor->ratio_limit_hit_func_user_data);
-        }
+        tor->session->torrentRatioLimitReached(tor);
     }
     /* if we're seeding and reach our inactivity limit, stop the torrent */
     else if (tr_torrentIsSeedIdleLimitDone(tor))
@@ -479,12 +475,7 @@ void tr_torrentCheckSeedLimit(tr_torrent* tor)
 
         tor->isStopping = true;
         tor->finishedSeedingByIdle = true;
-
-        /* maybe notify the client */
-        if (tor->idle_limit_hit_func != nullptr)
-        {
-            (*tor->idle_limit_hit_func)(tor, tor->idle_limit_hit_func_user_data);
-        }
+        tor->session->torrentIdleLimitReached(tor);
     }
 
     if (tor->isStopping)
@@ -561,8 +552,6 @@ struct torrent_start_opts
 
 static void torrentStart(tr_torrent* tor, torrent_start_opts opts);
 
-static void tr_torrentFireMetadataCompleted(tr_torrent* tor);
-
 static void torrentInitFromInfoDict(tr_torrent* tor)
 {
     tor->completion = tr_completion{ tor, &tor->blockInfo() };
@@ -590,7 +579,7 @@ void tr_torrent::setMetainfo(tr_torrent_metainfo const& tm)
 
     torrentInitFromInfoDict(this);
     tr_peerMgrOnTorrentGotMetainfo(this);
-    tr_torrentFireMetadataCompleted(this);
+    this->session->torrentMetadataCompleted(this);
     this->setDirty();
 }
 
@@ -1628,7 +1617,6 @@ void tr_torrentFree(tr_torrent* tor)
 
         auto const lock = tor->unique_lock();
 
-        tr_torrentClearCompletenessCallback(tor);
         tr_runInEventThread(session, closeTorrent, tor);
     }
 }
@@ -1655,7 +1643,6 @@ static void removeTorrentInEventThread(tr_torrent* tor, bool delete_flag, tr_fil
         tor->metainfo_.files().remove(tor->currentDir(), tor->name(), delete_func_wrapper);
     }
 
-    tr_torrentClearCompletenessCallback(tor);
     closeTorrent(tor);
 }
 
@@ -1690,45 +1677,6 @@ static char const* getCompletionString(int type)
     default:
         return "Incomplete";
     }
-}
-
-static void fireCompletenessChange(tr_torrent* tor, tr_completeness status, bool wasRunning)
-{
-    TR_ASSERT(status == TR_LEECH || status == TR_SEED || status == TR_PARTIAL_SEED);
-
-    if (tor->completeness_func != nullptr)
-    {
-        (*tor->completeness_func)(tor, status, wasRunning, tor->completeness_func_user_data);
-    }
-}
-
-void tr_torrentSetCompletenessCallback(tr_torrent* tor, tr_torrent_completeness_func func, void* user_data)
-{
-    TR_ASSERT(tr_isTorrent(tor));
-
-    tor->completeness_func = func;
-    tor->completeness_func_user_data = user_data;
-}
-
-void tr_torrentClearCompletenessCallback(tr_torrent* torrent)
-{
-    tr_torrentSetCompletenessCallback(torrent, nullptr, nullptr);
-}
-
-void tr_torrentSetRatioLimitHitCallback(tr_torrent* tor, tr_torrent_ratio_limit_hit_func func, void* user_data)
-{
-    TR_ASSERT(tr_isTorrent(tor));
-
-    tor->ratio_limit_hit_func = func;
-    tor->ratio_limit_hit_func_user_data = user_data;
-}
-
-void tr_torrentSetIdleLimitHitCallback(tr_torrent* tor, tr_torrent_idle_limit_hit_func func, void* user_data)
-{
-    TR_ASSERT(tr_isTorrent(tor));
-
-    tor->idle_limit_hit_func = func;
-    tor->idle_limit_hit_func_user_data = user_data;
 }
 
 static std::string buildLabelsString(tr_torrent const* tor)
@@ -1857,7 +1805,7 @@ void tr_torrent::recheckCompleteness()
             }
         }
 
-        fireCompletenessChange(this, completeness, wasRunning);
+        this->session->torrentCompletenessChanged(this, completeness, wasRunning);
 
         if (this->isDone() && wasLeeching && wasRunning)
         {
@@ -1874,28 +1822,6 @@ void tr_torrent::recheckCompleteness()
             callScriptIfEnabled(this, TR_SCRIPT_ON_TORRENT_DONE);
         }
     }
-}
-
-/***
-****
-***/
-
-static void tr_torrentFireMetadataCompleted(tr_torrent* tor)
-{
-    TR_ASSERT(tr_isTorrent(tor));
-
-    if (tor->metadata_func != nullptr)
-    {
-        (*tor->metadata_func)(tor, tor->metadata_func_user_data);
-    }
-}
-
-void tr_torrentSetMetadataCallback(tr_torrent* tor, tr_torrent_metadata_func func, void* user_data)
-{
-    TR_ASSERT(tr_isTorrent(tor));
-
-    tor->metadata_func = func;
-    tor->metadata_func_user_data = user_data;
 }
 
 /**
@@ -2552,12 +2478,6 @@ static void torrentSetQueued(tr_torrent* tor, bool queued)
         tor->markChanged();
         tor->setDirty();
     }
-}
-
-void tr_torrentSetQueueStartCallback(tr_torrent* torrent, void (*callback)(tr_torrent*, void*), void* user_data)
-{
-    torrent->queue_started_callback = callback;
-    torrent->queue_started_user_data = user_data;
 }
 
 /***
