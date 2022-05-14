@@ -691,11 +691,8 @@ void tr_sessionSetQueueStalledEnabled(tr_session*, bool);
 /** @return true if we're torrents idle for over N minutes will be flagged as 'stalled' */
 bool tr_sessionGetQueueStalledEnabled(tr_session const*);
 
-/**
-**/
-
 /** @brief Set a callback that is invoked when the queue starts a torrent */
-void tr_torrentSetQueueStartCallback(tr_torrent* torrent, void (*callback)(tr_torrent*, void*), void* user_data);
+void tr_sessionSetQueueStartCallback(tr_session* session, void (*callback)(tr_torrent*, void*), void* user_data);
 
 /***
 ****
@@ -757,7 +754,7 @@ bool tr_sessionIsScriptEnabled(tr_session const*, TrScript);
  */
 int tr_blocklistSetContent(tr_session* session, char const* filename);
 
-int tr_blocklistGetRuleCount(tr_session const* session);
+size_t tr_blocklistGetRuleCount(tr_session const* session);
 
 bool tr_blocklistExists(tr_session const* session);
 
@@ -1165,20 +1162,6 @@ enum tr_completeness
 };
 
 /**
- * @param wasRunning whether or not the torrent was running when
- *                   it changed its completeness state
- */
-using tr_torrent_completeness_func = void (*)( //
-    tr_torrent* torrent,
-    tr_completeness completeness,
-    bool wasRunning,
-    void* user_data);
-
-using tr_torrent_ratio_limit_hit_func = void (*)(tr_torrent* torrent, void* user_data);
-
-using tr_torrent_idle_limit_hit_func = void (*)(tr_torrent* torrent, void* user_data);
-
-/**
  * Register to be notified whenever a torrent's "completeness"
  * changes. This will be called, for example, when a torrent
  * finishes downloading and changes from TR_LEECH to
@@ -1191,9 +1174,10 @@ using tr_torrent_idle_limit_hit_func = void (*)(tr_torrent* torrent, void* user_
  *
  * @see tr_completeness
  */
-void tr_torrentSetCompletenessCallback(tr_torrent* torrent, tr_torrent_completeness_func func, void* user_data);
-
-void tr_torrentClearCompletenessCallback(tr_torrent* torrent);
+void tr_sessionSetCompletenessCallback(
+    tr_session*,
+    void (*callback)(tr_torrent*, tr_completeness, bool was_running, void*),
+    void* user_data);
 
 using tr_torrent_metadata_func = void (*)(tr_torrent* torrent, void* user_data);
 
@@ -1203,7 +1187,7 @@ using tr_torrent_metadata_func = void (*)(tr_torrent* torrent, void* user_data);
  * This happens when a magnet link finishes downloading
  * metadata from its peers.
  */
-void tr_torrentSetMetadataCallback(tr_torrent* tor, tr_torrent_metadata_func func, void* user_data);
+void tr_sessionSetMetadataCallback(tr_session*, void (*callback)(tr_torrent*, void*), void* user_data);
 
 /**
  * Register to be notified whenever a torrent's ratio limit
@@ -1212,7 +1196,7 @@ void tr_torrentSetMetadataCallback(tr_torrent* tor, tr_torrent_metadata_func fun
  *
  * Has the same restrictions as tr_torrentSetCompletenessCallback
  */
-void tr_torrentSetRatioLimitHitCallback(tr_torrent* torrent, tr_torrent_ratio_limit_hit_func func, void* user_data);
+void tr_sessionSetRatioLimitHitCallback(tr_session*, void (*callback)(tr_torrent*, void*), void* user_data);
 
 /**
  * Register to be notified whenever a torrent's idle limit
@@ -1221,7 +1205,7 @@ void tr_torrentSetRatioLimitHitCallback(tr_torrent* torrent, tr_torrent_ratio_li
  *
  * Has the same restrictions as tr_torrentSetCompletenessCallback
  */
-void tr_torrentSetIdleLimitHitCallback(tr_torrent* torrent, tr_torrent_idle_limit_hit_func func, void* user_data);
+void tr_sessionSetIdleLimitHitCallback(tr_session*, void (*callback)(tr_torrent*, void*), void* user_data);
 
 /**
  * MANUAL ANNOUNCE
@@ -1343,7 +1327,7 @@ struct tr_tracker_view
     int downloadCount; // number of times this torrent's been downloaded, or -1 if unknown
     int lastAnnouncePeerCount; // if hasAnnounced, the number of peers the tracker gave us
     int leecherCount; // number of leechers the tracker knows of, or -1 if unknown
-    int seederCount; // number of seeders the tracker knows of, or -1 if  unknown
+    int seederCount; // number of seeders the tracker knows of, or -1 if unknown
 
     int tier; // which tier this tracker is in
     int id; // unique transmission-generated ID for use in libtransmission API

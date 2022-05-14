@@ -50,7 +50,10 @@
 - (void)drawPiecesBar:(NSRect)barRect;
 
 - (NSRect)rectForMinimalStatusWithString:(NSAttributedString*)string inBounds:(NSRect)bounds;
-- (NSRect)rectForTitleWithString:(NSAttributedString*)string withRightBound:(CGFloat)rightBound inBounds:(NSRect)bounds;
+- (NSRect)rectForTitleWithString:(NSAttributedString*)string
+                  withRightBound:(CGFloat)rightBound
+                        inBounds:(NSRect)bounds
+                         minimal:(BOOL)minimal;
 - (NSRect)rectForProgressWithStringInBounds:(NSRect)bounds;
 - (NSRect)rectForStatusWithStringInBounds:(NSRect)bounds;
 - (NSRect)barRectRegForBounds:(NSRect)bounds;
@@ -68,7 +71,6 @@
 @property(nonatomic) BOOL fTracking;
 @property(nonatomic) BOOL fMouseDownControlButton;
 @property(nonatomic) BOOL fMouseDownRevealButton;
-@property(nonatomic) BOOL fMouseDownActionButton;
 
 @property(nonatomic, readonly) NSColor* fBarBorderColor;
 @property(nonatomic, readonly) NSColor* fBluePieceColor;
@@ -359,8 +361,8 @@
     self.fTitleAttributes[NSForegroundColorAttributeName] = titleColor;
     self.fStatusAttributes[NSForegroundColorAttributeName] = statusColor;
 
+    CGFloat titleRightBound;
     //minimal status
-    CGFloat minimalTitleRightBound;
     if (minimal)
     {
         NSAttributedString* minimalString = [self attributedStatusString:self.minimalStatusString];
@@ -371,16 +373,16 @@
             [minimalString drawInRect:minimalStatusRect];
         }
 
-        minimalTitleRightBound = NSMinX(minimalStatusRect);
+        titleRightBound = NSMinX(minimalStatusRect);
     }
-
     //progress
-    if (!minimal)
+    else
     {
         NSAttributedString* progressString = [self attributedStatusString:torrent.progressString];
         NSRect progressRect = [self rectForProgressWithStringInBounds:cellFrame];
 
         [progressString drawInRect:progressRect];
+        titleRightBound = NSMaxX(cellFrame);
     }
 
     if (!minimal || self.hover)
@@ -425,7 +427,10 @@
         [controlImage drawInRect:controlRect fromRect:NSZeroRect operation:NSCompositingOperationSourceOver fraction:1.0
                   respectFlipped:YES
                            hints:nil];
-        minimalTitleRightBound = MIN(minimalTitleRightBound, NSMinX(controlRect));
+        if (minimal)
+        {
+            titleRightBound = MIN(titleRightBound, NSMinX(controlRect));
+        }
 
         //reveal button
         NSString* revealImageString;
@@ -451,24 +456,9 @@
 
         //action button
 #warning image should use new gear
-        NSString* actionImageString;
-        if (self.fMouseDownActionButton)
+        if (!self.fTracking && self.hoverAction)
         {
-#warning we can get rid of this on 10.7
-            actionImageString = @"ActionOn";
-        }
-        else if (!self.fTracking && self.hoverAction)
-        {
-            actionImageString = @"ActionHover";
-        }
-        else
-        {
-            actionImageString = nil;
-        }
-
-        if (actionImageString)
-        {
-            NSImage* actionImage = [NSImage imageNamed:actionImageString];
+            NSImage* actionImage = [NSImage imageNamed:@"ActionHover"];
             [actionImage drawInRect:[self actionButtonRectForBounds:cellFrame] fromRect:NSZeroRect
                           operation:NSCompositingOperationSourceOver
                            fraction:1.0
@@ -479,7 +469,7 @@
 
     //title
     NSAttributedString* titleString = self.attributedTitle;
-    NSRect titleRect = [self rectForTitleWithString:titleString withRightBound:minimalTitleRightBound inBounds:cellFrame];
+    NSRect titleRect = [self rectForTitleWithString:titleString withRightBound:titleRightBound inBounds:cellFrame minimal:minimal];
     [titleString drawInRect:titleRect];
 
     //priority icon
@@ -513,23 +503,27 @@
     BOOL minimal = [self.fDefaults boolForKey:@"SmallView"];
 
     //this code needs to match the code in drawInteriorWithFrame:withView:
-    CGFloat minimalTitleRightBound;
+    CGFloat titleRightBound;
     if (minimal)
     {
         NSAttributedString* minimalString = [self attributedStatusString:self.minimalStatusString];
         NSRect minimalStatusRect = [self rectForMinimalStatusWithString:minimalString inBounds:cellFrame];
 
-        minimalTitleRightBound = NSMinX(minimalStatusRect);
-    }
+        titleRightBound = NSMinX(minimalStatusRect);
 
-    if (!minimal || self.hover)
+        if (self.hover)
+        {
+            NSRect const controlRect = [self controlButtonRectForBounds:cellFrame];
+            titleRightBound = MIN(titleRightBound, NSMinX(controlRect));
+        }
+    }
+    else
     {
-        NSRect const controlRect = [self controlButtonRectForBounds:cellFrame];
-        minimalTitleRightBound = MIN(minimalTitleRightBound, NSMinX(controlRect));
+        titleRightBound = NSMaxX(cellFrame);
     }
 
     NSAttributedString* titleString = self.attributedTitle;
-    NSRect realRect = [self rectForTitleWithString:titleString withRightBound:minimalTitleRightBound inBounds:cellFrame];
+    NSRect realRect = [self rectForTitleWithString:titleString withRightBound:titleRightBound inBounds:cellFrame minimal:minimal];
 
     NSAssert([titleString size].width >= NSWidth(realRect), @"Full rect width should not be less than the used title rect width!");
 
@@ -735,10 +729,11 @@
     return result;
 }
 
-- (NSRect)rectForTitleWithString:(NSAttributedString*)string withRightBound:(CGFloat)rightBound inBounds:(NSRect)bounds
+- (NSRect)rectForTitleWithString:(NSAttributedString*)string
+                  withRightBound:(CGFloat)rightBound
+                        inBounds:(NSRect)bounds
+                         minimal:(BOOL)minimal
 {
-    BOOL const minimal = [self.fDefaults boolForKey:@"SmallView"];
-
     NSRect result;
     result.origin.x = NSMinX(bounds) + PADDING_HORIZONTAL + (minimal ? IMAGE_SIZE_MIN : IMAGE_SIZE_REG) + PADDING_BETWEEN_IMAGE_AND_TITLE;
     result.size.height = HEIGHT_TITLE;
@@ -751,7 +746,7 @@
     else
     {
         result.origin.y = NSMinY(bounds) + PADDING_ABOVE_TITLE;
-        result.size.width = NSMaxX(bounds) - NSMinX(result) - PADDING_HORIZONTAL;
+        result.size.width = rightBound - NSMinX(result) - PADDING_HORIZONTAL;
     }
 
     if (((Torrent*)self.representedObject).priority != TR_PRI_NORMAL)

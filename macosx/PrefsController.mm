@@ -589,9 +589,9 @@
 
     if (exists)
     {
-        NSString* countString = [NSString formattedUInteger:tr_blocklistGetRuleCount(self.fHandle)];
         self.fBlocklistMessageField.stringValue = [NSString
-            stringWithFormat:NSLocalizedString(@"%@ IP address rules in list", "Prefs -> blocklist -> message"), countString];
+            stringWithFormat:NSLocalizedString(@"%lu IP address rules in list", "Prefs -> blocklist -> message"),
+                             tr_blocklistGetRuleCount(self.fHandle)];
     }
     else
     {

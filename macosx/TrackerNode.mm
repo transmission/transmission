@@ -140,8 +140,8 @@
             }
             else
             {
-                peerString = [NSString stringWithFormat:NSLocalizedString(@"got %d peers", "Tracker last announce"),
-                                                        self.fStat.lastAnnouncePeerCount];
+                peerString = [NSString stringWithFormat:NSLocalizedString(@"got %lu peers", "Tracker last announce"),
+                                                        (size_t)self.fStat.lastAnnouncePeerCount];
             }
             baseString = [baseString stringByAppendingFormat:@" (%@)", peerString];
         }

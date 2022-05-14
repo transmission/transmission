@@ -321,11 +321,10 @@
 
         //status field
         NSString* fileString;
-        NSInteger count = self.torrent.fileCount;
+        NSUInteger count = self.torrent.fileCount;
         if (count != 1)
         {
-            fileString = [NSString
-                stringWithFormat:NSLocalizedString(@"%@ files", "Add torrent -> info"), [NSString formattedUInteger:count]];
+            fileString = [NSString stringWithFormat:NSLocalizedString(@"%lu files", "Add torrent -> info"), count];
         }
         else
         {

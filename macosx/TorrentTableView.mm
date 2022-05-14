@@ -261,8 +261,7 @@
         }
         else
         {
-            return [NSString stringWithFormat:NSLocalizedString(@"%@ transfers", "Torrent table -> group row -> tooltip"),
-                                              [NSString formattedUInteger:count]];
+            return [NSString stringWithFormat:NSLocalizedString(@"%lu transfers", "Torrent table -> group row -> tooltip"), count];
         }
     }
     else
@@ -804,7 +803,7 @@
             for (NSInteger i = 0; speedLimitActionValue[i] != -1; i++)
             {
                 item = [[NSMenuItem alloc]
-                    initWithTitle:[NSString stringWithFormat:NSLocalizedString(@"%d KB/s", "Action menu -> upload/download limit"),
+                    initWithTitle:[NSString stringWithFormat:NSLocalizedString(@"%ld KB/s", "Action menu -> upload/download limit"),
                                                              speedLimitActionValue[i]]
                            action:@selector(setQuickLimit:)
                     keyEquivalent:@""];
@@ -819,7 +818,7 @@
 
         item = [menu itemWithTag:ACTION_MENU_LIMIT_TAG];
         item.state = limit ? NSControlStateValueOn : NSControlStateValueOff;
-        item.title = [NSString stringWithFormat:NSLocalizedString(@"Limit (%d KB/s)", "torrent action menu -> upload/download limit"),
+        item.title = [NSString stringWithFormat:NSLocalizedString(@"Limit (%ld KB/s)", "torrent action menu -> upload/download limit"),
                                                 [self.fMenuTorrent speedLimit:upload]];
 
         item = [menu itemWithTag:ACTION_MENU_UNLIMITED_TAG];
