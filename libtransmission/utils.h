@@ -115,55 +115,8 @@ uint64_t tr_time_msec();
 /** @brief sleep the specified number of milliseconds */
 void tr_wait_msec(long int delay_milliseconds);
 
-#if defined(__GNUC__) && !__has_include(<charconv>)
-
-#include <iomanip> // std::setbase
-#include <sstream>
-
 template<typename T>
-[[nodiscard]] std::optional<T> tr_parseNum(std::string_view& sv, int base = 10)
-{
-    auto val = T{};
-    auto const str = std::string(std::data(sv), std::min(std::size(sv), size_t{ 64 }));
-    auto sstream = std::stringstream{ str };
-    auto const oldpos = sstream.tellg();
-    /* The base parameter only works for bases 8, 10 and 16.
-       All other bases will be converted to 0 which activates the
-       prefix based parsing and therefore decimal in our usual cases.
-       This differs from the from_chars solution below. */
-    sstream >> std::setbase(base) >> val;
-    auto const newpos = sstream.tellg();
-    if ((newpos == oldpos) || (sstream.fail() && !sstream.eof()))
-    {
-        return std::nullopt;
-    }
-    sv.remove_prefix(sstream.eof() ? std::size(sv) : newpos - oldpos);
-    return val;
-}
-
-#else // #if defined(__GNUC__) && !__has_include(<charconv>)
-
-#include <charconv> // std::from_chars()
-
-template<typename T>
-[[nodiscard]] std::optional<T> tr_parseNum(std::string_view& sv, int base = 10)
-{
-    auto val = T{};
-    auto const* const begin_ch = std::data(sv);
-    auto const* const end_ch = begin_ch + std::size(sv);
-    /* The base parameter works for any base from 2 to 36 (inclusive).
-       This is different from the behaviour of the stringstream
-       based solution above. */
-    auto const result = std::from_chars(begin_ch, end_ch, val, base);
-    if (result.ec != std::errc{})
-    {
-        return std::nullopt;
-    }
-    sv.remove_prefix(result.ptr - std::data(sv));
-    return val;
-}
-
-#endif // #if defined(__GNUC__) && !__has_include(<charconv>)
+[[nodiscard]] std::optional<T> tr_parseNum(std::string_view& sv, int base = 10);
 
 bool tr_utf8_validate(std::string_view sv, char const** endptr);
 
