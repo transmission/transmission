@@ -122,7 +122,7 @@ typedef NS_ENUM(unsigned int, addType) { //
 
 - (void)applyFilter;
 
-- (void)sortTorrents:(BOOL)includeQueueOrder;
+- (void)sortTorrentsAndIncludeQueueOrder:(BOOL)includeQueueOrder;
 - (void)sortTorrentsCallUpdates:(BOOL)callUpdates includeQueueOrder:(BOOL)includeQueueOrder;
 - (void)rearrangeTorrentTableArray:(NSMutableArray*)rearrangeArray
                          forParent:(id)parent
