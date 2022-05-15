@@ -22,7 +22,7 @@
     "@babel/eslint-parser": "^7.17.0",
     "@babel/plugin-proposal-class-properties": "^7.16.7",
     "@primer/stylelint-config": "12.5.0",
-    "css-loader": "^5.2.7",
+    "css-loader": "^6.7.1",
     "css-minimizer-webpack-plugin": "^3.0.2",
     "eslint": "^8.15.0",
     "eslint-plugin-sonarjs": "^0.13.0",
