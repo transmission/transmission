@@ -154,6 +154,7 @@ find_package(Fmt)
 add_definitions(-DFMT_HEADER_ONLY -DFMT_EXCEPTIONS=0)
 include_directories(SYSTEM ${LIBFMT_INCLUDE_DIRS})
 
+find_package(FastFloat)
 find_package(UtfCpp)
 find_package(Threads)
 find_package(PkgConfig QUIET)
@@ -587,8 +588,7 @@ set(NEEDED_FUNCTIONS
     sendfile64
     statvfs
     strlcpy
-    syslog
-    uselocale)
+    syslog)
 
 foreach(F ${NEEDED_FUNCTIONS})
     tr_make_id("${F}" F_ID)
