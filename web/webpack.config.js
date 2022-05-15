@@ -27,18 +27,12 @@ const config = {
         test: /\.css$/i,
         use: [ 'style-loader', 'css-loader' ],
       },
+
       {
-        test: /\.(png|jpe?g|)$/i,
-        use: [
-          'url-loader',
-        ],
-      },
-      {
-        test: /\.svg$/i,
-        use: [
-          'url-loader',
-          'svgo-loader'
-        ],
+        exclude: /(node_modules)/,
+        include: /style\/images/,
+        test: /\.(jpe?g|png|gif|svg|webp)$/,
+        type: 'asset/inline',
       },
     ],
   },
