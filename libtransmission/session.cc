@@ -2436,12 +2436,8 @@ size_t tr_blocklistGetRuleCount(tr_session const* session)
 {
     TR_ASSERT(tr_isSession(session));
 
-    auto const& src = session->blocklists;
-    return std::accumulate(
-        std::begin(src),
-        std::end(src),
-        0,
-        [](size_t sum, auto const* cur) { return sum + tr_blocklistFileGetRuleCount(cur); });
+    auto& src = session->blocklists;
+    return std::accumulate(std::begin(src), std::end(src), 0, [](int sum, auto& cur) { return sum + cur->getRuleCount(); });
 }
 
 bool tr_blocklistIsEnabled(tr_session const* session)
