@@ -70,7 +70,6 @@ const config = {
 if (mode === 'development') {
   config.devServer = {
     compress: true,
-    contentBase: path.join(__dirname, 'public_html'),
     historyApiFallback: {
       rewrites: [
         { from: '/transmission/web', to: '/' },
@@ -80,7 +79,8 @@ if (mode === 'development') {
     port: devPort,
     proxy: {
       '/rpc': rpcUrl
-    }
+    },
+    static: './public_html'
   };
 }
 
