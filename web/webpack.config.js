@@ -30,7 +30,7 @@ const config = {
 
       {
         exclude: /(node_modules)/,
-        include: /style\/images/,
+        include: /(assets)\/(img)/,
         test: /\.(jpe?g|png|gif|svg|webp)$/,
         type: 'asset/inline',
       },

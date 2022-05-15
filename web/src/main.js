@@ -9,7 +9,7 @@ import { Prefs } from './prefs.js';
 import { Transmission } from './transmission.js';
 import { debounce } from './utils.js';
 
-import '../style/transmission-app.scss';
+import '../assets/css/transmission-app.scss';
 
 function main() {
   const action_manager = new ActionManager();
