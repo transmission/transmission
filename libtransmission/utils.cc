@@ -37,6 +37,8 @@
 
 #include <fmt/format.h>
 
+#include <fast_float/fast_float.h>
+
 #include "transmission.h"
 
 #include "error-types.h"
@@ -1363,7 +1365,7 @@ std::string_view tr_get_mime_type_for_filename(std::string_view filename)
 #include <iomanip> // std::setbase
 #include <sstream>
 
-template<typename T>
+template<typename T, std::enable_if_t<std::is_integral<T>::value, bool> = true>
 [[nodiscard]] std::optional<T> tr_parseNum(std::string_view& sv, int base)
 {
     auto val = T{};
@@ -1388,7 +1390,7 @@ template<typename T>
 
 #include <charconv> // std::from_chars()
 
-template<typename T>
+template<typename T, std::enable_if_t<std::is_integral<T>::value, bool>>
 [[nodiscard]] std::optional<T> tr_parseNum(std::string_view& sv, int base)
 {
     auto val = T{};
@@ -1412,3 +1414,20 @@ template std::optional<int64_t> tr_parseNum(std::string_view& sv, int base);
 template std::optional<int> tr_parseNum(std::string_view& sv, int base);
 template std::optional<mode_t> tr_parseNum(std::string_view& sv, int base);
 template std::optional<size_t> tr_parseNum(std::string_view& sv, int base);
+
+template<typename T, std::enable_if_t<std::is_floating_point<T>::value, bool>>
+[[nodiscard]] std::optional<T> tr_parseNum(std::string_view& sv)
+{
+    auto const* const begin_ch = std::data(sv);
+    auto const* const end_ch = begin_ch + std::size(sv);
+    auto val = T{};
+    auto const result = fast_float::from_chars(begin_ch, end_ch, val);
+    if (result.ec != std::errc{})
+    {
+        return std::nullopt;
+    }
+    sv.remove_prefix(result.ptr - std::data(sv));
+    return val;
+}
+
+template std::optional<double> tr_parseNum(std::string_view& sv);

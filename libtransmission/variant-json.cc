@@ -16,8 +16,6 @@
 
 #include <event2/buffer.h>
 
-#include <fast_float/fast_float.h>
-
 #include <fmt/compile.h>
 #include <fmt/format.h>
 
@@ -326,11 +324,9 @@ static void action_callback_POP(
     {
         if ((state->special_flags & JSONSL_SPECIALf_NUMNOINT) != 0)
         {
-            auto const* begin = jsn->base + state->pos_begin;
-            auto const len = jsn->pos - state->pos_begin;
-            auto d = double{};
-            fast_float::from_chars(begin, begin + len, d);
-            tr_variantInitReal(get_node(jsn), d);
+            auto sv = std::string_view{ jsn->base + state->pos_begin, jsn->pos - state->pos_begin };
+            auto const val = tr_parseNum<double>(sv);
+            tr_variantInitReal(get_node(jsn), val ? *val : double{});
         }
         else if ((state->special_flags & JSONSL_SPECIALf_NUMERIC) != 0)
         {

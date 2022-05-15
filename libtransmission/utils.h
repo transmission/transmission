@@ -115,8 +115,11 @@ uint64_t tr_time_msec();
 /** @brief sleep the specified number of milliseconds */
 void tr_wait_msec(long int delay_milliseconds);
 
-template<typename T>
+template<typename T, std::enable_if_t<std::is_integral<T>::value, bool> = true>
 [[nodiscard]] std::optional<T> tr_parseNum(std::string_view& sv, int base = 10);
+
+template<typename T, std::enable_if_t<std::is_floating_point<T>::value, bool> = true>
+[[nodiscard]] std::optional<T> tr_parseNum(std::string_view& sv);
 
 bool tr_utf8_validate(std::string_view sv, char const** endptr);
 

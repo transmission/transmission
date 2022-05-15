@@ -19,8 +19,6 @@
 
 #include <fmt/core.h>
 
-#include <fast_float/fast_float.h>
-
 #define LIBTRANSMISSION_VARIANT_MODULE
 
 #include "transmission.h"
@@ -316,14 +314,11 @@ bool tr_variantGetReal(tr_variant const* v, double* setme)
 
     if (!success && tr_variantIsString(v))
     {
-        auto sv = std::string_view{};
-        if (tr_variantGetStrView(v, &sv))
+        if (auto sv = std::string_view{}; tr_variantGetStrView(v, &sv))
         {
-            auto d = double{};
-            auto const [end, ec] = fast_float::from_chars(std::data(sv), std::data(sv) + std::size(sv), d);
-            if (ec == std::errc{} && end != nullptr && *end == '\0')
+            if (auto d = tr_parseNum<double>(sv); d)
             {
-                *setme = d;
+                *setme = *d;
                 success = true;
             }
         }
