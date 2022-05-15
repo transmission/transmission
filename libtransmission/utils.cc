@@ -25,6 +25,10 @@
 #include <ws2tcpip.h> /* WSAStartup() */
 #endif
 
+#ifndef _WIN32
+#include <sys/stat.h> // mode_t
+#endif
+
 #ifdef HAVE_ICONV
 #include <iconv.h>
 #endif
@@ -1412,8 +1416,11 @@ template<typename T, std::enable_if_t<std::is_integral<T>::value, bool>>
 
 template std::optional<int64_t> tr_parseNum(std::string_view& sv, int base);
 template std::optional<int> tr_parseNum(std::string_view& sv, int base);
-template std::optional<mode_t> tr_parseNum(std::string_view& sv, int base);
 template std::optional<size_t> tr_parseNum(std::string_view& sv, int base);
+
+#ifndef _WIN32
+template std::optional<mode_t> tr_parseNum(std::string_view& sv, int base);
+#endif
 
 template<typename T, std::enable_if_t<std::is_floating_point<T>::value, bool>>
 [[nodiscard]] std::optional<T> tr_parseNum(std::string_view& sv)
