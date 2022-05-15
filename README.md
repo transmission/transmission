@@ -1,14 +1,12 @@
 ## About
 
-Transmission Ocular is a fork of the free BitTorrent client. It comes in several flavors, but this is purely for MacOS users.
+Transmission Ocular is a fork of the free BitTorrent client. Transmission comes in several flavors, but Transmission Ocular is purely for MacOS users.
 
 Visit https://transmissionbt.com/ for more information about Transmission.
 
 ## Building
 
-Transmission has an Xcode project file (Transmission.xcodeproj) for building in Xcode.
-
-For a more detailed description, and dependencies, visit: https://github.com/transmission/transmission/tree/main/docs
+Transmission Ocular has an Xcode project file (Transmission.xcodeproj) for building in Xcode.
 
 ### Building Transmission Ocular from Git (first time)
 
