@@ -169,6 +169,7 @@ a {
 .even {
   background-color: var(--color-bg-even);
 }
+
 .odd {
   background-color: var(--color-bg-odd);
 }
@@ -296,9 +297,11 @@ $toolbar-height: $toolbar-height-number * 1px;
     > :not(select):not(input) {
       display: none;
     }
+
     > input {
       min-width: 50px;
     }
+
     > input,
     > select {
       height: 100%;
@@ -519,13 +522,16 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
 
     &[data-action='pause'] {
       background-image: url($image-pause-circle-idle);
+
       &:active,
       &:hover {
         background-image: url($image-pause-circle-active);
       }
     }
+
     &[data-action='resume'] {
       background-image: url($image-play-circle-idle);
+
       &:active,
       &:hover {
         background-image: url($image-play-circle-active);
@@ -588,6 +594,7 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
       flex-grow: 1;
       margin: 2px 0;
     }
+
     &.compact {
       min-width: 50px;
       width: 50px;
@@ -612,48 +619,56 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
         var(--color-progressbar-leech-paused-2)
       );
     }
+
     &.leech.queued {
       @include progressbar-background(
         var(--color-progressbar-leech-queued-1),
         var(--color-progressbar-leech-queued-2)
       );
     }
+
     &.leech {
       @include progressbar-background(
         var(--color-progressbar-leech-1),
         var(--color-progressbar-leech-2)
       );
     }
+
     &.magnet.paused {
       @include progressbar-background(
         var(--color-progressbar-magnet-paused-1),
         var(--color-progressbar-magnet-paused-2)
       );
     }
+
     &.magnet {
       @include progressbar-background(
         var(--color-progressbar-magnet-1),
         var(--color-progressbar-magnet-2)
       );
     }
+
     &.seed.paused {
       @include progressbar-background(
         var(--color-progressbar-seed-paused-1),
         var(--color-progressbar-seed-paused-2)
       );
     }
+
     &.seed.queued {
       @include progressbar-background(
         var(--color-progressbar-seed-queued-1),
         var(--color-progressbar-seed-queued-2)
       );
     }
+
     &.seed {
       @include progressbar-background(
         var(--color-progressbar-seed-1),
         var(--color-progressbar-seed-2)
       );
     }
+
     &.verify {
       @include progressbar-background(
         var(--color-progressbar-verify-1),
@@ -777,6 +792,7 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
   .blocklist-size-label {
     font-size: smaller;
   }
+
   .blocklist-size-number {
     font-weight: bolder;
   }
@@ -785,9 +801,11 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
     display: inline-block;
     font-weight: bold;
     margin-left: 5px;
+
     &[data-open='true'] {
       color: var(--color-fg-port-open);
     }
+
     &[data-open='false'] {
       color: var(--color-fg-port-closed);
     }
@@ -900,10 +918,12 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
 .file-priority-radiobox,
 .tabs-buttons {
   $radius: 8px;
+
   :first-child {
     border-bottom-left-radius: $radius;
     border-top-left-radius: $radius;
   }
+
   :last-child {
     border-bottom-right-radius: $radius;
     border-top-right-radius: $radius;
@@ -1143,6 +1163,7 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
 
   .encryption {
     width: 16px;
+
     &[data-encrypted='true'] {
       background: transparent url($image-lock-fill) center center no-repeat;
       height: 16px;
@@ -1160,10 +1181,12 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
   .percent-done {
     width: 10%;
   }
+
   .speed-down,
   .speed-up {
     width: 15%;
   }
+
   .peer-address {
     width: 25%;
   }
