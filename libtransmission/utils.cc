@@ -25,6 +25,10 @@
 #include <ws2tcpip.h> /* WSAStartup() */
 #endif
 
+#ifndef _WIN32
+#include <sys/stat.h> // mode_t
+#endif
+
 #ifdef HAVE_ICONV
 #include <iconv.h>
 #endif
@@ -36,6 +40,8 @@
 #include <event2/event.h>
 
 #include <fmt/format.h>
+
+#include <fast_float/fast_float.h>
 
 #include "transmission.h"
 
@@ -1355,3 +1361,80 @@ std::string_view tr_get_mime_type_for_filename(std::string_view filename)
     auto constexpr Fallback = "application/octet-stream"sv;
     return Fallback;
 }
+
+/// parseNum()
+
+#if defined(__GNUC__) && !__has_include(<charconv>)
+
+#include <iomanip> // std::setbase
+#include <sstream>
+
+template<typename T, std::enable_if_t<std::is_integral<T>::value, bool> = true>
+[[nodiscard]] std::optional<T> tr_parseNum(std::string_view& sv, int base)
+{
+    auto val = T{};
+    auto const str = std::string(std::data(sv), std::min(std::size(sv), size_t{ 64 }));
+    auto sstream = std::stringstream{ str };
+    auto const oldpos = sstream.tellg();
+    /* The base parameter only works for bases 8, 10 and 16.
+       All other bases will be converted to 0 which activates the
+       prefix based parsing and therefore decimal in our usual cases.
+       This differs from the from_chars solution below. */
+    sstream >> std::setbase(base) >> val;
+    auto const newpos = sstream.tellg();
+    if ((newpos == oldpos) || (sstream.fail() && !sstream.eof()))
+    {
+        return std::nullopt;
+    }
+    sv.remove_prefix(sstream.eof() ? std::size(sv) : newpos - oldpos);
+    return val;
+}
+
+#else // #if defined(__GNUC__) && !__has_include(<charconv>)
+
+#include <charconv> // std::from_chars()
+
+template<typename T, std::enable_if_t<std::is_integral<T>::value, bool>>
+[[nodiscard]] std::optional<T> tr_parseNum(std::string_view& sv, int base)
+{
+    auto val = T{};
+    auto const* const begin_ch = std::data(sv);
+    auto const* const end_ch = begin_ch + std::size(sv);
+    /* The base parameter works for any base from 2 to 36 (inclusive).
+       This is different from the behaviour of the stringstream
+       based solution above. */
+    auto const result = std::from_chars(begin_ch, end_ch, val, base);
+    if (result.ec != std::errc{})
+    {
+        return std::nullopt;
+    }
+    sv.remove_prefix(result.ptr - std::data(sv));
+    return val;
+}
+
+#endif // #if defined(__GNUC__) && !__has_include(<charconv>)
+
+template std::optional<int64_t> tr_parseNum(std::string_view& sv, int base);
+template std::optional<int> tr_parseNum(std::string_view& sv, int base);
+template std::optional<size_t> tr_parseNum(std::string_view& sv, int base);
+
+#ifndef _WIN32
+template std::optional<mode_t> tr_parseNum(std::string_view& sv, int base);
+#endif
+
+template<typename T, std::enable_if_t<std::is_floating_point<T>::value, bool>>
+[[nodiscard]] std::optional<T> tr_parseNum(std::string_view& sv)
+{
+    auto const* const begin_ch = std::data(sv);
+    auto const* const end_ch = begin_ch + std::size(sv);
+    auto val = T{};
+    auto const result = fast_float::from_chars(begin_ch, end_ch, val);
+    if (result.ec != std::errc{})
+    {
+        return std::nullopt;
+    }
+    sv.remove_prefix(result.ptr - std::data(sv));
+    return val;
+}
+
+template std::optional<double> tr_parseNum(std::string_view& sv);
