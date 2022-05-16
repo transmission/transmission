@@ -2032,24 +2032,7 @@ static void removeKeRangerRansomware()
 
 - (void)copyMagnetLinks:(id)sender
 {
-    NSArray* torrents = self.fTableView.selectedTorrents;
-
-    if (torrents.count <= 0)
-    {
-        return;
-    }
-
-    NSMutableArray* links = [NSMutableArray arrayWithCapacity:torrents.count];
-    for (Torrent* torrent in torrents)
-    {
-        [links addObject:torrent.magnetLink];
-    }
-
-    NSString* text = [links componentsJoinedByString:@"\n"];
-
-    NSPasteboard* pb = NSPasteboard.generalPasteboard;
-    [pb clearContents];
-    [pb writeObjects:@[ text ]];
+    [self.fTableView copy:sender];
 }
 
 - (void)revealFile:(id)sender
