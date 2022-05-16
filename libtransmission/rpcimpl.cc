@@ -1455,8 +1455,8 @@ static void onBlocklistFetched(tr_web::FetchResponse const& web_response)
     }
 
     // feed it to the session and give the client a response
-    int const rule_count = tr_blocklistSetContent(session, filename);
-    tr_variantDictAddInt(data->args_out, TR_KEY_blocklist_size, rule_count);
+    size_t const rule_count = tr_blocklistSetContent(session, filename);
+    tr_variantDictAddInt(data->args_out, TR_KEY_blocklist_size, static_cast<int64_t>(rule_count));
     tr_sys_path_remove(filename);
     tr_idle_function_done(data, SuccessResult);
 }

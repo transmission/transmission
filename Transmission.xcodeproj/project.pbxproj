@@ -3591,11 +3591,12 @@
 					"$(inherited)",
 					"third-party/arc4/src",
 					"third-party/dht",
+					"third-party/fast_float/include",
 					"third-party/libb64/include",
-					"third-party/libutp",
-					"third-party/utfcpp/source",
 					"third-party/libdeflate",
 					"third-party/libpsl/include",
+					"third-party/libutp",
+					"third-party/utfcpp/source",
 				);
 				OTHER_CFLAGS = (
 					"$(inherited)",
@@ -3805,11 +3806,12 @@
 					"$(inherited)",
 					"third-party/arc4/src",
 					"third-party/dht",
+					"third-party/fast_float/include",
 					"third-party/libb64/include",
-					"third-party/libutp",
-					"third-party/utfcpp/source",
 					"third-party/libdeflate",
 					"third-party/libpsl/include",
+					"third-party/libutp",
+					"third-party/utfcpp/source",
 				);
 				OTHER_CFLAGS = (
 					"$(inherited)",
@@ -4091,11 +4093,12 @@
 					"$(inherited)",
 					"third-party/arc4/src",
 					"third-party/dht",
+					"third-party/fast_float/include",
 					"third-party/libb64/include",
-					"third-party/libutp",
-					"third-party/utfcpp/source",
 					"third-party/libdeflate",
 					"third-party/libpsl/include",
+					"third-party/libutp",
+					"third-party/utfcpp/source",
 				);
 				OTHER_CFLAGS = (
 					"$(inherited)",

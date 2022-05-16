@@ -157,10 +157,10 @@ bool refreshFilesForeach(
     auto const old_size = iter->get_value(file_cols.size);
 
     auto new_enabled = int{};
-    auto new_have = old_have;
+    auto new_have = decltype(old_have){};
     auto new_priority = int{};
     auto new_progress = int{};
-    auto new_size = old_size;
+    auto new_size = decltype(old_have){};
 
     if (is_file)
     {
@@ -170,7 +170,7 @@ bool refreshFilesForeach(
         new_enabled = file.wanted;
         new_priority = file.priority;
         new_have = file.have;
-        new_progress = std::clamp(int(100 * file.progress), 0, 100);
+        new_progress = file.progress;
     }
     else
     {
@@ -183,10 +183,10 @@ bool refreshFilesForeach(
 
         for (auto const& child : iter->children())
         {
-            int64_t const child_size = child[file_cols.size];
-            int64_t const child_have = child[file_cols.have];
-            int const child_priority = child[file_cols.priority];
-            int const child_enabled = child[file_cols.enabled];
+            auto const child_size = child[file_cols.size];
+            auto const child_have = child[file_cols.have];
+            auto const child_priority = child[file_cols.priority];
+            auto const child_enabled = child[file_cols.enabled];
 
             if ((child_enabled != false) && (child_enabled != NOT_SET))
             {
@@ -213,8 +213,10 @@ bool refreshFilesForeach(
             }
         }
 
-        new_progress = new_size != 0 ? (int)(100.0 * new_have / new_size) : 1;
+        new_progress = new_size != 0 ? static_cast<int>(100.0 * new_have / new_size) : 1;
     }
+
+    new_progress = std::clamp(new_progress, 0, 100);
 
     if (new_priority != old_priority || new_enabled != old_enabled)
     {
