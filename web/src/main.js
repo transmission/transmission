@@ -9,7 +9,7 @@ import { Prefs } from './prefs.js';
 import { Transmission } from './transmission.js';
 import { debounce } from './utils.js';
 
-import '../style/transmission-app.scss';
+import '../assets/css/transmission-app.scss';
 
 function main() {
   const action_manager = new ActionManager();
@@ -21,7 +21,7 @@ function main() {
     transmission.elements.torrent_list.scrollTo(0, 1)
   );
   window.addEventListener('load', scroll_soon);
-  window.onorientationchange = scroll_soon;
+  window.addEventListener('orientationchange', scroll_soon);
 }
 
 document.addEventListener('DOMContentLoaded', main);
