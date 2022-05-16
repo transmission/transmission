@@ -33,25 +33,27 @@ $yellow-700: #dbab09;
 // $z-index-progressbar: 1;
 $z-index-popup: 2;
 
-// SVG ICONS -- see images/README.md for sources and license details
+// ICONS -- see assets/img/README.md for sources and license details
 // Are you a designer? New icon PRs welcomed!
-$image-analytics: 'images/analytics.svg';
-$image-baseline: 'images/horizontal-rule.svg';
-$image-files: 'images/files.svg';
-$image-chevron-dn: 'images/chevron-down.svg';
-$image-chevron-up: 'images/chevron-up.svg';
-$image-lock-fill: 'images/lock-fill.svg';
-$image-network: 'images/router.svg';
-$image-magnet: 'images/magnet.svg';
-$image-overflow: 'images/three-dots-vertical.svg';
-$image-pause-circle-active: 'images/pause-circle-active.svg';
-$image-pause-circle-idle: 'images/pause-circle-idle.svg';
-$image-peers: 'images/team.svg';
-$image-play-circle-active: 'images/play-circle-active.svg';
-$image-play-circle-idle: 'images/play-circle-idle.svg';
-$image-speed: 'images/checkered-flag.svg';
-$image-tiers: 'images/diagram-3-fill.svg';
-$image-upload-download: 'images/up-and-down-arrows.svg';
+$image-alt-speed-disabled: '../img/turtle.png';
+$image-alt-speed-enabled: '../img/blue-turtle.png';
+$image-analytics: '../img/analytics.svg';
+$image-baseline: '../img/horizontal-rule.svg';
+$image-chevron-dn: '../img/chevron-down.svg';
+$image-chevron-up: '../img/chevron-up.svg';
+$image-files: '../img/files.svg';
+$image-lock-fill: '../img/lock-fill.svg';
+$image-magnet: '../img/magnet.svg';
+$image-network: '../img/router.svg';
+$image-overflow: '../img/three-dots-vertical.svg';
+$image-pause-circle-active: '../img/pause-circle-active.svg';
+$image-pause-circle-idle: '../img/pause-circle-idle.svg';
+$image-peers: '../img/team.svg';
+$image-play-circle-active: '../img/play-circle-active.svg';
+$image-play-circle-idle: '../img/play-circle-idle.svg';
+$image-speed: '../img/checkered-flag.svg';
+$image-tiers: '../img/diagram-3-fill.svg';
+$image-upload-download: '../img/up-and-down-arrows.svg';
 
 @mixin for-phone-only {
   @media (max-width: 599px) {
@@ -167,6 +169,7 @@ a {
 .even {
   background-color: var(--color-bg-even);
 }
+
 .odd {
   background-color: var(--color-bg-odd);
 }
@@ -241,23 +244,23 @@ $toolbar-height: $toolbar-height-number * 1px;
 }
 
 #toolbar-open {
-  background-image: url('images/toolbar-folder.png');
+  background-image: url('../img/toolbar-folder.png');
 }
 
 #toolbar-remove {
-  background-image: url('images/toolbar-close.png');
+  background-image: url('../img/toolbar-close.png');
 }
 
 #toolbar-start {
-  background-image: url('images/toolbar-start.png');
+  background-image: url('../img/toolbar-start.png');
 }
 
 #toolbar-pause {
-  background-image: url('images/toolbar-pause.png');
+  background-image: url('../img/toolbar-pause.png');
 }
 
 #toolbar-inspector {
-  background-image: url('images/toolbar-info.png');
+  background-image: url('../img/toolbar-info.png');
 }
 
 #toolbar-overflow {
@@ -269,7 +272,7 @@ $toolbar-height: $toolbar-height-number * 1px;
   width: 36px;
 
   &.alt-speed-enabled {
-    background-image: url('images/blue-turtle.png'), url($image-overflow);
+    background-image: url($image-alt-speed-enabled), url($image-overflow);
     background-position: bottom left, center, center;
     background-size: 16px 9px, 26px, 26px;
   }
@@ -294,9 +297,11 @@ $toolbar-height: $toolbar-height-number * 1px;
     > :not(select):not(input) {
       display: none;
     }
+
     > input {
       min-width: 50px;
     }
+
     > input,
     > select {
       height: 100%;
@@ -359,15 +364,15 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
 }
 
 .torrent-list {
-  $app-image: 'images/application-x-executable.png';
-  $audio-image: 'images/audio-x-generic.png';
-  $folder-image: 'images/folder.png';
-  $font-image: 'images/font-x-generic.png';
-  $image-image: 'images/image-x-generic.png';
-  $package-image: 'images/package-x-generic.png';
-  $text-image: 'images/folder.png';
-  $text-image: 'images/text-x-generic.png';
-  $video-image: 'images/video-x-generic.png';
+  $app-image: '../img/application-x-executable.png';
+  $audio-image: '../img/audio-x-generic.png';
+  $folder-image: '../img/folder.png';
+  $font-image: '../img/font-x-generic.png';
+  $image-image: '../img/image-x-generic.png';
+  $package-image: '../img/package-x-generic.png';
+  $text-image: '../img/folder.png';
+  $text-image: '../img/text-x-generic.png';
+  $video-image: '../img/video-x-generic.png';
 
   cursor: pointer;
   list-style-type: none;
@@ -517,13 +522,16 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
 
     &[data-action='pause'] {
       background-image: url($image-pause-circle-idle);
+
       &:active,
       &:hover {
         background-image: url($image-pause-circle-active);
       }
     }
+
     &[data-action='resume'] {
       background-image: url($image-play-circle-idle);
+
       &:active,
       &:hover {
         background-image: url($image-play-circle-active);
@@ -586,6 +594,7 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
       flex-grow: 1;
       margin: 2px 0;
     }
+
     &.compact {
       min-width: 50px;
       width: 50px;
@@ -610,48 +619,56 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
         var(--color-progressbar-leech-paused-2)
       );
     }
+
     &.leech.queued {
       @include progressbar-background(
         var(--color-progressbar-leech-queued-1),
         var(--color-progressbar-leech-queued-2)
       );
     }
+
     &.leech {
       @include progressbar-background(
         var(--color-progressbar-leech-1),
         var(--color-progressbar-leech-2)
       );
     }
+
     &.magnet.paused {
       @include progressbar-background(
         var(--color-progressbar-magnet-paused-1),
         var(--color-progressbar-magnet-paused-2)
       );
     }
+
     &.magnet {
       @include progressbar-background(
         var(--color-progressbar-magnet-1),
         var(--color-progressbar-magnet-2)
       );
     }
+
     &.seed.paused {
       @include progressbar-background(
         var(--color-progressbar-seed-paused-1),
         var(--color-progressbar-seed-paused-2)
       );
     }
+
     &.seed.queued {
       @include progressbar-background(
         var(--color-progressbar-seed-queued-1),
         var(--color-progressbar-seed-queued-2)
       );
     }
+
     &.seed {
       @include progressbar-background(
         var(--color-progressbar-seed-1),
         var(--color-progressbar-seed-2)
       );
     }
+
     &.verify {
       @include progressbar-background(
         var(--color-progressbar-verify-1),
@@ -739,7 +756,7 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
   }
 
   .alt-speed-section-label {
-    background: transparent url('images/blue-turtle.png') no-repeat;
+    background: transparent url($image-alt-speed-enabled) no-repeat;
     background-position: left 4px;
     padding-left: 22px;
   }
@@ -775,6 +792,7 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
   .blocklist-size-label {
     font-size: smaller;
   }
+
   .blocklist-size-number {
     font-weight: bolder;
   }
@@ -783,9 +801,11 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
     display: inline-block;
     font-weight: bold;
     margin-left: 5px;
+
     &[data-open='true'] {
       color: var(--color-fg-port-open);
     }
+
     &[data-open='false'] {
       color: var(--color-fg-port-closed);
     }
@@ -852,7 +872,7 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
   }
 
   #alternative-speed-limits-title {
-    background: transparent url('images/blue-turtle.png') no-repeat;
+    background: transparent url($image-alt-speed-enabled) no-repeat;
     padding-left: 18px;
   }
 
@@ -898,10 +918,12 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
 .file-priority-radiobox,
 .tabs-buttons {
   $radius: 8px;
+
   :first-child {
     border-bottom-left-radius: $radius;
     border-top-left-radius: $radius;
   }
+
   :last-child {
     border-bottom-right-radius: $radius;
     border-top-right-radius: $radius;
@@ -1141,6 +1163,7 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
 
   .encryption {
     width: 16px;
+
     &[data-encrypted='true'] {
       background: transparent url($image-lock-fill) center center no-repeat;
       height: 16px;
@@ -1158,10 +1181,12 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
   .percent-done {
     width: 10%;
   }
+
   .speed-down,
   .speed-up {
     width: 15%;
   }
+
   .peer-address {
     width: 25%;
   }
@@ -1381,11 +1406,11 @@ $popup-top: 61px; // TODO: ugly that this is hardcoded
       grid-area: check;
 
       &:checked ~ #alt-speed-image {
-        background-image: url('images/blue-turtle.png');
+        background-image: url($image-alt-speed-enabled);
       }
 
       &:not(:checked) ~ #alt-speed-image {
-        background-image: url('images/turtle.png');
+        background-image: url($image-alt-speed-disabled);
       }
     }
 
@@ -1524,7 +1549,7 @@ $logo-size: 64px;
 }
 
 .dialog-logo {
-  background: transparent url('images/logo.png') top left no-repeat;
+  background: transparent url('../img/logo.png') top left no-repeat;
   height: $logo-size;
   width: $logo-size;
 }
