@@ -7,7 +7,7 @@
 #import "NSApplicationAdditions.h"
 
 #define ICON_WIDTH 16.0
-#define BORDER_WIDTH 1.0
+#define BORDER_WIDTH 1.25
 #define ICON_WIDTH_SMALL 12.0
 
 @interface GroupsController ()
