@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="19162" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="20037" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19162"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="20037"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -44,6 +44,7 @@
                 <outlet property="fRemoteView" destination="1481" id="1512"/>
                 <outlet property="fShowMagnetAddWindowCheck" destination="1947" id="2130"/>
                 <outlet property="fSpeedLimitDownloadField" destination="190" id="626"/>
+                <outlet property="fSpeedLimitImage" destination="228" id="RC4-qk-u6T"/>
                 <outlet property="fSpeedLimitUploadField" destination="192" id="625"/>
                 <outlet property="fStalledField" destination="636" id="643"/>
                 <outlet property="fSystemPreferencesButton" destination="2113" id="eRN-Qg-OMy"/>
@@ -1951,7 +1952,7 @@
                     <autoresizingMask key="autoresizingMask"/>
                     <clipView key="contentView" id="Sjl-RN-E6v">
                         <rect key="frame" x="1" y="1" width="306" height="76"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" columnReordering="NO" columnResizing="NO" autosaveColumns="NO" typeSelect="NO" id="1521">
                                 <rect key="frame" x="0.0" y="0.0" width="306" height="76"/>
