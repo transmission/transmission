@@ -77,6 +77,7 @@
 @property(nonatomic) IBOutlet NSTextField* fSpeedLimitUploadField;
 @property(nonatomic) IBOutlet NSTextField* fSpeedLimitDownloadField;
 @property(nonatomic) IBOutlet NSPopUpButton* fAutoSpeedDayTypePopUp;
+@property(nonatomic) IBOutlet NSImageView* fSpeedLimitImage;
 
 @property(nonatomic) IBOutlet NSTextField* fPeersGlobalField;
 @property(nonatomic) IBOutlet NSTextField* fPeersTorrentField;
@@ -232,6 +233,12 @@
     //set speed limit
     self.fSpeedLimitUploadField.intValue = [self.fDefaults integerForKey:@"SpeedLimitUploadLimit"];
     self.fSpeedLimitDownloadField.intValue = [self.fDefaults integerForKey:@"SpeedLimitDownloadLimit"];
+    
+    //update speedlimit image
+    if (@available(macOS 11.0, *))
+    {
+        self.fSpeedLimitImage.image = [NSImage imageWithSystemSymbolName:@"tortoise.fill" accessibilityDescription:nil];
+    }
 
     //set port
     self.fPortField.intValue = [self.fDefaults integerForKey:@"BindPort"];
