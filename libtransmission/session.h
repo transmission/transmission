@@ -383,7 +383,7 @@ public:
     struct tr_peerMgr* peerMgr;
     struct tr_shared* shared;
 
-    struct tr_cache* cache;
+    std::unique_ptr<tr_cache> cache;
 
     class WebMediator final : public tr_web::Mediator
     {

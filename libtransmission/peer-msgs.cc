@@ -1440,11 +1440,7 @@ static void prefetchPieces(tr_peerMsgsImpl* msgs)
     {
         if (auto& req = requests[i]; !req.prefetched)
         {
-            tr_cachePrefetchBlock(
-                msgs->session->cache,
-                msgs->torrent,
-                msgs->torrent->pieceLoc(req.index, req.offset),
-                req.length);
+            msgs->session->cache->prefetchBlock(msgs->torrent, msgs->torrent->pieceLoc(req.index, req.offset), req.length);
             req.prefetched = true;
         }
     }
@@ -1916,8 +1912,7 @@ static int clientGotBlock(tr_peerMsgsImpl* msgs, struct evbuffer* data, struct p
     ***  Save the block
     **/
 
-    if (int const
-            err = tr_cacheWriteBlock(msgs->session->cache, tor, tor->pieceLoc(req->index, req->offset), req->length, data);
+    if (int const err = msgs->session->cache->writeBlock(tor, tor->pieceLoc(req->index, req->offset), req->length, data);
         err != 0)
     {
         return err;
@@ -2214,8 +2209,7 @@ static size_t fillOutputBuffer(tr_peerMsgsImpl* msgs, time_t now)
             evbuffer_add_uint32(out, req.offset);
 
             evbuffer_reserve_space(out, req.length, iovec, 1);
-            bool err = tr_cacheReadBlock(
-                           msgs->session->cache,
+            bool err = msgs->session->cache->readBlock(
                            msgs->torrent,
                            msgs->torrent->pieceLoc(req.index, req.offset),
                            req.length,

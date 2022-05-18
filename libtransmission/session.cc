@@ -566,7 +566,7 @@ static void onSaveTimer(evutil_socket_t /*fd*/, short /*what*/, void* vsession)
 {
     auto* session = static_cast<tr_session*>(vsession);
 
-    if (tr_cacheFlushDone(session->cache) != 0)
+    if (session->cache->flushDone() != 0)
     {
         tr_logAddError("Error while flushing completed pieces from cache");
     }
@@ -606,7 +606,7 @@ tr_session* tr_sessionInit(char const* config_dir, bool messageQueuingEnabled, t
     auto* session = new tr_session{};
     session->udp_socket = TR_BAD_SOCKET;
     session->udp6_socket = TR_BAD_SOCKET;
-    session->cache = tr_cacheNew(1024 * 1024 * 2);
+    session->cache = std::make_unique<tr_cache>(1024 * 1024 * 2);
     session->magicNumber = SESSION_MAGIC_NUMBER;
     session->session_id = tr_session_id_new();
     bandwidthGroupRead(session, config_dir);
@@ -1880,8 +1880,7 @@ static void sessionCloseImplStart(tr_session* session)
        it won't be idle until the announce events are sent... */
     session->web->closeSoon();
 
-    tr_cacheFree(session->cache);
-    session->cache = nullptr;
+    session->cache.reset();
 
     /* saveTimer is not used at this point, reusing for UDP shutdown wait */
     TR_ASSERT(session->saveTimer == nullptr);
@@ -2241,14 +2240,14 @@ void tr_sessionSetCacheLimit_MB(tr_session* session, int max_bytes)
 {
     TR_ASSERT(tr_isSession(session));
 
-    tr_cacheSetLimit(session->cache, tr_toMemBytes(max_bytes));
+    session->cache->setLimit(tr_toMemBytes(max_bytes));
 }
 
 int tr_sessionGetCacheLimit_MB(tr_session const* session)
 {
     TR_ASSERT(tr_isSession(session));
 
-    return tr_toMemMB(tr_cacheGetLimit(session->cache));
+    return tr_toMemMB(session->cache->getLimit());
 }
 
 /***
@@ -2935,12 +2934,12 @@ static int bandwidthGroupWrite(tr_session const* session, std::string_view confi
 
 void tr_session::closeTorrentFiles(tr_torrent* tor) noexcept
 {
-    tr_cacheFlushTorrent(this->cache, tor);
+    this->cache->flushTorrent(tor);
     openFiles().closeTorrent(tor->uniqueId);
 }
 
 void tr_session::closeTorrentFile(tr_torrent* tor, tr_file_index_t file_num) noexcept
 {
-    tr_cacheFlushFile(this->cache, tor, file_num);
+    this->cache->flushFile(tor, file_num);
     openFiles().closeFile(tor->uniqueId, file_num);
 }
