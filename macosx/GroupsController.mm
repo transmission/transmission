@@ -396,6 +396,7 @@ GroupsController* fGroupsInstance = nil;
 
         return YES;
     }];
+    [icon setTemplate:YES];
 
     return icon;
 }
