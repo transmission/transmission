@@ -191,7 +191,7 @@ OSStatus GeneratePreviewForURL(void* thisInterface, QLPreviewRequestRef preview,
         [listSection appendFormat:@"<tr><th>%@</th></tr>", fileTitleString];
 
 #warning display folders?
-        for (auto const& [path, size] : metainfo.sortedByPath())
+        for (auto const& [path, size] : metainfo.files().sortedByPath())
         {
             NSString* fullFilePath = [NSString stringWithUTF8String:path.c_str()];
             NSCAssert([fullFilePath hasPrefix:[name stringByAppendingString:@"/"]], @"Expected file path %@ to begin with %@/", fullFilePath, name);
