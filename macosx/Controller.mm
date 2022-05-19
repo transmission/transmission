@@ -591,7 +591,7 @@ static void removeKeRangerRansomware()
 
     if (@available(macOS 11.0, *))
     {
-        self.fActionButton.image = [NSImage imageWithSystemSymbolName:@"gearshape.fill" accessibilityDescription:nil];
+        self.fActionButton.image = [NSImage imageWithSystemSymbolName:@"ellipsis.circle.fill" accessibilityDescription:nil];
         self.fSpeedLimitButton.image = [NSImage imageWithSystemSymbolName:@"tortoise.fill" accessibilityDescription:nil];
     }
     self.fClearCompletedButton.toolTip = NSLocalizedString(
@@ -2032,24 +2032,7 @@ static void removeKeRangerRansomware()
 
 - (void)copyMagnetLinks:(id)sender
 {
-    NSArray* torrents = self.fTableView.selectedTorrents;
-
-    if (torrents.count <= 0)
-    {
-        return;
-    }
-
-    NSMutableArray* links = [NSMutableArray arrayWithCapacity:torrents.count];
-    for (Torrent* torrent in torrents)
-    {
-        [links addObject:torrent.magnetLink];
-    }
-
-    NSString* text = [links componentsJoinedByString:@"\n"];
-
-    NSPasteboard* pb = NSPasteboard.generalPasteboard;
-    [pb clearContents];
-    [pb writeObjects:@[ text ]];
+    [self.fTableView copy:sender];
 }
 
 - (void)revealFile:(id)sender
@@ -3212,7 +3195,7 @@ static void removeKeRangerRansomware()
     [popover showRelativeToRect:senderView.frame ofView:senderView preferredEdge:NSMaxYEdge];
 }
 
-//don't show multiple popovers when clicking the gear button repeatedly
+//don't show multiple popovers when clicking the ellipsis button repeatedly
 - (void)popoverWillShow:(NSNotification*)notification
 {
     self.fGlobalPopoverShown = YES;

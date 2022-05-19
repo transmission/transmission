@@ -297,7 +297,7 @@
     if ([ident isEqualToString:TOOLBAR_GENERAL])
     {
         item.label = NSLocalizedString(@"General", "Preferences -> toolbar item title");
-        item.image = [NSImage systemSymbol:@"gearshape" withFallback:NSImageNamePreferencesGeneral];
+        item.image = [NSImage systemSymbol:@"ellipsis.circle.fill" withFallback:NSImageNamePreferencesGeneral];
         item.target = self;
         item.action = @selector(setPrefView:);
         item.autovalidates = NO;
