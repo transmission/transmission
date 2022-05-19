@@ -591,7 +591,7 @@ static void removeKeRangerRansomware()
 
     if (@available(macOS 11.0, *))
     {
-        self.fActionButton.image = [NSImage imageWithSystemSymbolName:@"ellipsis.circle.fill" accessibilityDescription:nil];
+        self.fActionButton.image = [NSImage imageWithSystemSymbolName:@"ellipsis.circle" accessibilityDescription:nil];
         self.fSpeedLimitButton.image = [NSImage imageWithSystemSymbolName:@"tortoise.fill" accessibilityDescription:nil];
     }
     self.fClearCompletedButton.toolTip = NSLocalizedString(
