@@ -183,8 +183,7 @@ OSStatus GeneratePreviewForURL(void* thisInterface, QLPreviewRequestRef preview,
 
     if (is_multifile)
     {
-        tr_torrent_files files = metainfo.files();
-        files.sortByPath();
+        auto const files = metainfo.files().sorted();
         NSMutableString* listSection = [NSMutableString string];
         [listSection appendString:@"<table>"];
 

@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <algorithm> // std::sort()
 #include <cstddef>
 #include <cstdint> // uint64_t
 #include <functional>
@@ -72,9 +73,14 @@ public:
         total_size_ = uint64_t{};
     }
 
-    void sortByPath()
+    auto sorted() const
     {
-        std::sort(files_.begin(), files_.end(), [](const auto& lhs, const auto& rhs) { return lhs.path_ < rhs.path_; });
+        auto ret = *this;
+        std::sort(
+            std::begin(ret.files_),
+            std::end(ret.files_),
+            [](auto const& lhs, auto const& rhs) { return lhs.path_ < rhs.path_; });
+        return ret;
     }
 
     tr_file_index_t add(std::string_view path, uint64_t file_size)
