@@ -183,7 +183,6 @@ OSStatus GeneratePreviewForURL(void* thisInterface, QLPreviewRequestRef preview,
 
     if (is_multifile)
     {
-        auto const files = metainfo.files().sorted();
         NSMutableString* listSection = [NSMutableString string];
         [listSection appendString:@"<table>"];
 
@@ -192,14 +191,14 @@ OSStatus GeneratePreviewForURL(void* thisInterface, QLPreviewRequestRef preview,
         [listSection appendFormat:@"<tr><th>%@</th></tr>", fileTitleString];
 
 #warning display folders?
-        for (tr_file_index_t i = 0; i < n_files; ++i)
+        for (auto const& [path, size] : metainfo.sortedByPath())
         {
-            NSString* fullFilePath = [NSString stringWithUTF8String:files.path(i).c_str()];
+            NSString* fullFilePath = [NSString stringWithUTF8String:path.c_str()];
             NSCAssert([fullFilePath hasPrefix:[name stringByAppendingString:@"/"]], @"Expected file path %@ to begin with %@/", fullFilePath, name);
 
             NSString* shortenedFilePath = [fullFilePath substringFromIndex:[name length] + 1];
             NSString* shortenedFilePathAndSize = [NSString
-                stringWithFormat:@"%@ - %@", shortenedFilePath, [NSString stringForFileSize:files.fileSize(i)]];
+                stringWithFormat:@"%@ - %@", shortenedFilePath, [NSString stringForFileSize:size]];
 
             NSUInteger const width = 16;
             [listSection appendFormat:@"<tr><td><img class=\"icon\" src=\"%@\" width=\"%ld\" height=\"%ld\" />%@<td></tr>",
