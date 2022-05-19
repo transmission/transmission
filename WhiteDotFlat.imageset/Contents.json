@@ -2,12 +2,12 @@
   "images" : [
     {
       "idiom" : "mac",
-      "filename" : “WhiteDotFlat.png",
+      "filename" : "WhiteDotFlat.png",
       "scale" : "1x"
     },
     {
       "idiom" : "mac",
-      "filename" : “WhiteDotFlat@2x.png",
+      "filename" : "WhiteDotFlat@2x.png",
       "scale" : "2x"
     }
   ],
