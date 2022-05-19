@@ -106,7 +106,7 @@ typedef NS_ENUM(unsigned int, tabTag) {
               forSegment:TAB_TRACKERS_TAG];
     [self.fTabs setImage:[NSImage systemSymbol:@"person.2" withFallback:@"InfoPeers"] forSegment:TAB_PEERS_TAG];
     [self.fTabs setImage:[NSImage systemSymbol:@"doc.on.doc" withFallback:@"InfoFiles"] forSegment:TAB_FILE_TAG];
-    [self.fTabs setImage:[NSImage systemSymbol:@"gearshape" withFallback:@"InfoOptions"] forSegment:TAB_OPTIONS_TAG];
+    [self.fTabs setImage:[NSImage systemSymbol:@"ellipsis.circle.fill" withFallback:@"InfoOptions"] forSegment:TAB_OPTIONS_TAG];
 
     //set selected tab
     self.fCurrentTabTag = INVALID;
