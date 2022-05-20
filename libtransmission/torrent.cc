@@ -49,7 +49,6 @@
 #include "torrent-metainfo.h"
 #include "torrent.h"
 #include "tr-assert.h"
-#include "tr-assert.h"
 #include "trevent.h" /* tr_runInEventThread() */
 #include "utils.h"
 #include "variant.h"
