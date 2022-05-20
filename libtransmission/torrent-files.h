@@ -5,9 +5,11 @@
 
 #pragma once
 
+#include <algorithm> // std::sort()
 #include <cstddef>
 #include <cstdint> // uint64_t
 #include <functional>
+#include <iterator>
 #include <optional>
 #include <string>
 #include <string_view>
@@ -70,6 +72,21 @@ public:
     {
         files_.clear();
         total_size_ = uint64_t{};
+    }
+
+    auto sortedByPath() const
+    {
+        auto ret = std::vector<std::pair<std::string /*path*/, uint64_t /*size*/>>{};
+        ret.reserve(std::size(files_));
+        std::transform(
+            std::begin(files_),
+            std::end(files_),
+            std::back_inserter(ret),
+            [](auto const& in) { return std::make_pair(in.path_, in.size_); });
+
+        std::sort(std::begin(ret), std::end(ret), [](auto const& lhs, auto const& rhs) { return lhs.first < rhs.first; });
+
+        return ret;
     }
 
     tr_file_index_t add(std::string_view path, uint64_t file_size)
