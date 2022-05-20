@@ -50,9 +50,9 @@ protected:
                 FileSizes[14] + FileSizes[15] + FileSizes[16] ==
             TotalSize);
 
-        EXPECT_EQ(11, block_info_.n_pieces);
-        EXPECT_EQ(PieceSize, block_info_.piece_size);
-        EXPECT_EQ(TotalSize, block_info_.total_size);
+        EXPECT_EQ(11U, block_info_.pieceCount());
+        EXPECT_EQ(PieceSize, block_info_.pieceSize());
+        EXPECT_EQ(TotalSize, block_info_.totalSize());
         EXPECT_EQ(TotalSize, std::accumulate(std::begin(FileSizes), std::end(FileSizes), uint64_t{ 0 }));
     }
 };
@@ -63,26 +63,26 @@ TEST_F(FilePieceMapTest, fileOffset)
 
     // first byte of the first file
     auto file_offset = fpm.fileOffset(0);
-    EXPECT_EQ(0, file_offset.index);
-    EXPECT_EQ(0, file_offset.offset);
+    EXPECT_EQ(0U, file_offset.index);
+    EXPECT_EQ(0U, file_offset.offset);
 
     // final byte of the first file
     file_offset = fpm.fileOffset(FileSizes[0] - 1);
-    EXPECT_EQ(0, file_offset.index);
+    EXPECT_EQ(0U, file_offset.index);
     EXPECT_EQ(FileSizes[0] - 1, file_offset.offset);
 
     // first byte of the second file
     // NB: this is an edge case, second file is 0 bytes.
     // The second nonzero file is file #5
     file_offset = fpm.fileOffset(FileSizes[0]);
-    EXPECT_EQ(5, file_offset.index);
-    EXPECT_EQ(0, file_offset.offset);
+    EXPECT_EQ(5U, file_offset.index);
+    EXPECT_EQ(0U, file_offset.offset);
 
     // the last byte of in the torrent.
     // NB: reverse of previous edge case, since
     // the final 4 files in the torrent are all 0 bytes
     file_offset = fpm.fileOffset(TotalSize - 1);
-    EXPECT_EQ(12, file_offset.index);
+    EXPECT_EQ(12U, file_offset.index);
     EXPECT_EQ(FileSizes[12] - 1, file_offset.offset);
 }
 
@@ -123,7 +123,7 @@ TEST_F(FilePieceMapTest, pieceSpan)
         offset += FileSizes[file];
     }
     EXPECT_EQ(TotalSize, offset);
-    EXPECT_EQ(block_info_.n_pieces, fpm.pieceSpan(std::size(FileSizes) - 1).end);
+    EXPECT_EQ(block_info_.pieceCount(), fpm.pieceSpan(std::size(FileSizes) - 1).end);
 }
 
 TEST_F(FilePieceMapTest, priorities)
@@ -134,14 +134,14 @@ TEST_F(FilePieceMapTest, priorities)
 
     // make a helper to compare file & piece priorities
     auto expected_file_priorities = std::vector<tr_priority_t>(n_files, TR_PRI_NORMAL);
-    auto expected_piece_priorities = std::vector<tr_priority_t>(block_info_.n_pieces, TR_PRI_NORMAL);
+    auto expected_piece_priorities = std::vector<tr_priority_t>(block_info_.pieceCount(), TR_PRI_NORMAL);
     auto const compare_to_expected = [&, this]()
     {
         for (tr_file_index_t i = 0; i < n_files; ++i)
         {
             EXPECT_EQ(int(expected_file_priorities[i]), int(file_priorities.filePriority(i)));
         }
-        for (tr_piece_index_t i = 0; i < block_info_.n_pieces; ++i)
+        for (tr_piece_index_t i = 0; i < block_info_.pieceCount(); ++i)
         {
             EXPECT_EQ(int(expected_piece_priorities[i]), int(file_priorities.piecePriority(i)));
         }
@@ -265,14 +265,14 @@ TEST_F(FilePieceMapTest, wanted)
 
     // make a helper to compare file & piece priorities
     auto expected_files_wanted = tr_bitfield(n_files);
-    auto expected_pieces_wanted = tr_bitfield(block_info_.n_pieces);
+    auto expected_pieces_wanted = tr_bitfield(block_info_.pieceCount());
     auto const compare_to_expected = [&, this]()
     {
         for (tr_file_index_t i = 0; i < n_files; ++i)
         {
             EXPECT_EQ(int(expected_files_wanted.test(i)), int(files_wanted.fileWanted(i)));
         }
-        for (tr_piece_index_t i = 0; i < block_info_.n_pieces; ++i)
+        for (tr_piece_index_t i = 0; i < block_info_.pieceCount(); ++i)
         {
             EXPECT_EQ(int(expected_pieces_wanted.test(i)), int(files_wanted.pieceWanted(i)));
         }

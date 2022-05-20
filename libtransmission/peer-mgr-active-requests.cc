@@ -182,7 +182,7 @@ std::vector<tr_peer*> ActiveRequests::remove(tr_block_index_t block)
         impl_->blocks_.erase(block);
     }
 
-    for (auto* peer : removed)
+    for (auto const* const peer : removed)
     {
         impl_->decCount(peer);
     }
@@ -221,7 +221,7 @@ std::vector<std::pair<tr_block_index_t, tr_peer*>> ActiveRequests::sentBefore(ti
     auto sent_before = std::vector<std::pair<tr_block_index_t, tr_peer*>>{};
     sent_before.reserve(std::size(impl_->blocks_));
 
-    for (auto& [block, peers_at] : impl_->blocks_)
+    for (auto const& [block, peers_at] : impl_->blocks_)
     {
         for (auto const& sent : peers_at)
         {

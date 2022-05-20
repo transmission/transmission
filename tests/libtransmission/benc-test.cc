@@ -3,6 +3,8 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include <fmt/format.h>
+
 #include "transmission.h"
 
 #include "benc.h"
@@ -82,15 +84,13 @@ TEST_F(BencTest, ContextTokenIsCorrect)
 
         bool Int64(int64_t value, Context const& context) override
         {
-            auto const expected = tr_strvJoin("i"sv, std::to_string(value), "e"sv);
-            EXPECT_EQ(expected, context.raw());
+            EXPECT_EQ(fmt::format(FMT_STRING("i{:d}e"), value), context.raw());
             return true;
         }
 
         bool String(std::string_view value, Context const& context) override
         {
-            auto const key = tr_strvJoin(std::to_string(std::size(value)), ":"sv, value);
-            EXPECT_EQ(key, context.raw());
+            EXPECT_EQ(fmt::format(FMT_STRING("{:d}:{:s}"), std::size(value), value), context.raw());
             return true;
         }
     };

@@ -13,7 +13,7 @@
 #include <string>
 #include <string_view>
 
-#include <event2/buffer.h>
+#include <fmt/format.h>
 
 #define PSL_STATIC
 #include <libpsl.h>
@@ -171,44 +171,6 @@ char const* tr_webGetResponseStr(long code)
     }
 }
 
-void tr_http_escape(struct evbuffer* out, std::string_view str, bool escape_reserved)
-{
-    auto constexpr ReservedChars = std::string_view{ "!*'();:@&=+$,/?%#[]" };
-    auto constexpr UnescapedChars = std::string_view{ "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_.~" };
-
-    for (auto const& ch : str)
-    {
-        if (tr_strvContains(UnescapedChars, ch) || (tr_strvContains(ReservedChars, ch) && !escape_reserved))
-        {
-            evbuffer_add_printf(out, "%c", ch);
-        }
-        else
-        {
-            evbuffer_add_printf(out, "%%%02X", (unsigned)(ch & 0xFF));
-        }
-    }
-}
-
-void tr_http_escape(std::string& appendme, std::string_view str, bool escape_reserved)
-{
-    auto constexpr ReservedChars = std::string_view{ "!*'();:@&=+$,/?%#[]" };
-    auto constexpr UnescapedChars = std::string_view{ "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-_.~" };
-
-    for (auto const& ch : str)
-    {
-        if (tr_strvContains(UnescapedChars, ch) || (!escape_reserved && tr_strvContains(ReservedChars, ch)))
-        {
-            appendme += ch;
-        }
-        else
-        {
-            char buf[16];
-            tr_snprintf(buf, sizeof(buf), "%%%02X", (unsigned)(ch & 0xFF));
-            appendme += buf;
-        }
-    }
-}
-
 static bool is_rfc2396_alnum(uint8_t ch)
 {
     return ('0' <= ch && ch <= '9') || ('A' <= ch && ch <= 'Z') || ('a' <= ch && ch <= 'z') || ch == '.' || ch == '-' ||
@@ -225,18 +187,11 @@ void tr_http_escape_sha1(char* out, tr_sha1_digest_t const& digest)
         }
         else
         {
-            out += tr_snprintf(out, 4, "%%%02x", (unsigned int)b);
+            out = fmt::format_to(out, FMT_STRING("%{:02x}"), unsigned(b));
         }
     }
 
     *out = '\0';
-}
-
-void tr_http_escape_sha1(char* out, uint8_t const* sha1_digest)
-{
-    auto digest = tr_sha1_digest_t{};
-    std::copy_n(reinterpret_cast<std::byte const*>(sha1_digest), std::size(digest), std::begin(digest));
-    tr_http_escape_sha1(out, digest);
 }
 
 //// URLs
@@ -248,7 +203,8 @@ auto parsePort(std::string_view port_sv)
 {
     auto const port = tr_parseNum<int>(port_sv);
 
-    return port && *port >= std::numeric_limits<tr_port>::min() && *port <= std::numeric_limits<tr_port>::max() ? *port : -1;
+    using PortLimits = std::numeric_limits<uint16_t>;
+    return port && PortLimits::min() <= *port && *port <= PortLimits::max() ? *port : -1;
 }
 
 constexpr std::string_view getPortForScheme(std::string_view scheme)
@@ -400,8 +356,7 @@ std::optional<tr_url_parsed_t> tr_urlParse(std::string_view url)
         auto remain = parsed.authority;
         parsed.host = tr_strvSep(&remain, ':');
         parsed.sitename = getSiteName(parsed.host);
-        parsed.portstr = !std::empty(remain) ? remain : getPortForScheme(parsed.scheme);
-        parsed.port = parsePort(parsed.portstr);
+        parsed.port = parsePort(!std::empty(remain) ? remain : getPortForScheme(parsed.scheme));
     }
 
     //  The path is terminated by the first question mark ("?") or

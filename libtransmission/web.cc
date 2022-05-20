@@ -116,6 +116,8 @@ public:
             tr_free(bundle);
         }
 
+        shareEverything();
+
         if (curl_ssl_verify)
         {
             auto const* bundle = std::empty(curl_ca_bundle) ? "none" : curl_ca_bundle.c_str();
@@ -152,7 +154,7 @@ public:
         queued_tasks_cv.notify_one();
     }
 
-    [[nodiscard]] bool isClosed() const
+    [[nodiscard]] bool isClosed() const noexcept
     {
         return is_closed_;
     }
@@ -535,6 +537,26 @@ private:
         return curlsh_.get();
     }
 
+    void shareEverything()
+    {
+        // Tell curl to share whatever it can.
+        // https://curl.se/libcurl/c/CURLSHOPT_SHARE.html
+        //
+        // The user's system probably has a different version of curl than
+        // we're compiling with; so instead of listing fields by name, just
+        // loop until curl says we've exhausted the list.
+
+        auto* const sh = shared();
+        for (long type = CURL_LOCK_DATA_COOKIE;; ++type)
+        {
+            if (curl_share_setopt(sh, CURLSHOPT_SHARE, type) != CURLSHE_OK)
+            {
+                tr_logAddDebug(fmt::format("CURLOPT_SHARE ended at {}", type));
+                return;
+            }
+        }
+    }
+
     static std::once_flag curl_init_flag;
 
     bool is_closed_ = false;
@@ -571,7 +593,7 @@ void tr_web::fetch(FetchOptions&& options)
     impl_->fetch(std::move(options));
 }
 
-bool tr_web::isClosed() const
+bool tr_web::isClosed() const noexcept
 {
     return impl_->isClosed();
 }

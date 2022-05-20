@@ -12,7 +12,7 @@
 #include <shlobj.h> /* SHCreateDirectoryEx() */
 #include <winioctl.h> /* FSCTL_SET_SPARSE */
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include "transmission.h"
 #include "crypto-utils.h" /* tr_rand_int() */
@@ -60,9 +60,7 @@ static void set_system_error(tr_error** error, DWORD code)
     }
     else
     {
-        auto buf = std::array<char, 32>{};
-        tr_snprintf(std::data(buf), std::size(buf), "Unknown error: 0x%08lx", code);
-        tr_error_set(error, code, std::data(buf));
+        tr_error_set(error, code, fmt::format(FMT_STRING("Unknown error: {:#08x}"), code));
     }
 }
 
@@ -894,7 +892,7 @@ tr_sys_file_t tr_sys_file_get_std(tr_std_sys_file_t std_file, tr_error** error)
         break;
 
     default:
-        TR_ASSERT_MSG(false, "unknown standard file %d", (int)std_file);
+        TR_ASSERT_MSG(false, fmt::format(FMT_STRING("unknown standard file {:d}"), std_file));
         set_system_error(error, ERROR_INVALID_PARAMETER);
         return TR_BAD_SYS_FILE;
     }

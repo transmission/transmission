@@ -9,6 +9,8 @@
 #include <string>
 #include <string_view>
 
+#include <fmt/format.h>
+
 #include "transmission.h"
 
 #include "crypto-utils.h"
@@ -44,10 +46,10 @@ protected:
     {
 
         // create a single input file
-        auto input_file = tr_strvPath(sandboxDir().data(), "test.XXXXXX");
-        createTmpfileWithContents(input_file, payload, payloadSize);
+        auto input_file = tr_pathbuf{ sandboxDir(), '/', "test.XXXXXX" };
+        createTmpfileWithContents(std::data(input_file), payload, payloadSize);
         tr_sys_path_native_separators(std::data(input_file));
-        auto* builder = tr_metaInfoBuilderCreate(input_file.c_str());
+        auto* builder = tr_metaInfoBuilderCreate(input_file);
         EXPECT_EQ(tr_file_index_t{ 1 }, builder->fileCount);
         EXPECT_EQ(input_file, builder->top);
         EXPECT_EQ(input_file, builder->files[0].filename);
@@ -57,10 +59,10 @@ protected:
         EXPECT_FALSE(builder->abortFlag);
 
         // have tr_makeMetaInfo() build the torrent file
-        auto const torrent_file = tr_strvJoin(input_file, ".torrent"sv);
+        auto const torrent_file = tr_pathbuf{ input_file, ".torrent"sv };
         tr_makeMetaInfo(
             builder,
-            torrent_file.c_str(),
+            torrent_file,
             trackers,
             trackerCount,
             webseeds,
@@ -111,9 +113,9 @@ protected:
         char const* source)
     {
         // create the top temp directory
-        auto top = tr_strvPath(sandboxDir(), "folder.XXXXXX");
+        auto top = tr_pathbuf{ sandboxDir(), '/', "folder.XXXXXX"sv };
         tr_sys_path_native_separators(std::data(top));
-        tr_sys_dir_create_temp(std::data(top), nullptr);
+        tr_sys_dir_create_temp(std::data(top));
 
         // build the payload files that go into the top temp directory
         auto files = std::vector<std::string>{};
@@ -122,10 +124,8 @@ protected:
 
         for (size_t i = 0; i < payload_count; i++)
         {
-            auto tmpl = std::array<char, 16>{};
-            tr_snprintf(tmpl.data(), tmpl.size(), "file.%04zu%s", i, "XXXXXX");
-            auto path = tr_strvPath(top, std::data(tmpl));
-            createTmpfileWithContents(path, payloads[i], payload_sizes[i]);
+            auto path = fmt::format(FMT_STRING("{:s}/file.{:04}XXXXXX"), top.sv(), i);
+            createTmpfileWithContents(std::data(path), payloads[i], payload_sizes[i]);
             tr_sys_path_native_separators(std::data(path));
             files.push_back(path);
             total_size += payload_sizes[i];
@@ -134,7 +134,7 @@ protected:
         sync();
 
         // init the builder
-        auto* builder = tr_metaInfoBuilderCreate(top.c_str());
+        auto* builder = tr_metaInfoBuilderCreate(top);
         EXPECT_FALSE(builder->abortFlag);
         EXPECT_EQ(top, builder->top);
         EXPECT_EQ(payload_count, builder->fileCount);
@@ -148,7 +148,7 @@ protected:
         }
 
         // build the torrent file
-        auto torrent_file = tr_strvJoin(top, ".torrent"sv);
+        auto const torrent_file = tr_pathbuf{ top, ".torrent"sv };
         tr_makeMetaInfo(
             builder,
             torrent_file.c_str(),
@@ -201,8 +201,8 @@ protected:
     {
         // build random payloads
         size_t payload_count = 1 + tr_rand_int_weak(max_file_count);
-        void** payloads = tr_new0(void*, payload_count);
-        size_t* payload_sizes = tr_new0(size_t, payload_count);
+        auto** payloads = tr_new0(void*, payload_count);
+        auto* payload_sizes = tr_new0(size_t, payload_count);
 
         for (size_t i = 0; i < payload_count; i++)
         {

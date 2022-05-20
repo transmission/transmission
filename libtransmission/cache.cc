@@ -234,7 +234,7 @@ static int cacheTrim(tr_cache* cache)
 
 static int getMaxBlocks(int64_t max_bytes)
 {
-    return max_bytes / static_cast<double>(tr_block_info::BlockSize);
+    return std::lldiv(max_bytes, tr_block_info::BlockSize).quot;
 }
 
 int tr_cacheSetLimit(tr_cache* cache, int64_t max_bytes)

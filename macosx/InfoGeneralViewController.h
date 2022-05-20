@@ -8,7 +8,7 @@
 
 @interface InfoGeneralViewController : NSViewController<InfoViewController>
 
-- (void)setInfoForTorrents:(NSArray*)torrents;
+- (void)setInfoForTorrents:(NSArray<Torrent*>*)torrents;
 - (void)updateInfo;
 
 - (void)revealDataFile:(id)sender;

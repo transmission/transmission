@@ -814,6 +814,11 @@ CA
                         <action selector="announceSelectedTorrents:" target="206" id="2124"/>
                     </connections>
                 </menuItem>
+                <menuItem title="Verificar dados locais" id="3221">
+                    <connections>
+                        <action selector="verifySelectedTorrents:" target="206" id="3222"/>
+                    </connections>
+                </menuItem>
                 <menuItem isSeparatorItem="YES" id="3450">
                     <modifierMask key="keyEquivalentModifierMask" command="YES"/>
                 </menuItem>

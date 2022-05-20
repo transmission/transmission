@@ -3,7 +3,6 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <map>
 #include <memory>
 #include <string>
 
@@ -95,7 +94,7 @@ protected:
         path += TR_PATH_DELIMITER;
         path += name;
 
-        tr_sys_dir_create(path.c_str(), 0, 0700, nullptr);
+        tr_sys_dir_create(path.c_str(), 0, 0700);
 
         return path;
     }
@@ -139,7 +138,7 @@ TEST_P(WatchDirTest, construct)
 
     auto wd = createWatchDir(path, &callback, nullptr);
     EXPECT_NE(nullptr, wd);
-    EXPECT_TRUE(tr_sys_path_is_same(path.c_str(), tr_watchdir_get_path(wd), nullptr));
+    EXPECT_TRUE(tr_sys_path_is_same(path.c_str(), tr_watchdir_get_path(wd)));
 
     processEvents();
 

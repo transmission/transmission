@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include <cstddef> // size_t
+#include <cstdint> // int64_t
 #include <ctime>
 #include <optional>
 #include <string_view>
@@ -193,7 +195,6 @@ auto dictFind(tr_variant* dict, tr_quark key)
 void variantInit(tr_variant* init_me, bool value);
 void variantInit(tr_variant* init_me, int64_t value);
 void variantInit(tr_variant* init_me, int value);
-void variantInit(tr_variant* init_me, unsigned int value);
 void variantInit(tr_variant* init_me, double value);
 void variantInit(tr_variant* init_me, QByteArray const& value);
 void variantInit(tr_variant* init_me, QString const& value);

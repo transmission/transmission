@@ -1,3 +1,5 @@
+#import <Cocoa/Cocoa.h>
+#import <CoreFoundation/CFPlugInCOM.h>
 #import <QuickLook/QuickLook.h>
 
 #include <string>
@@ -8,8 +10,10 @@
 
 #import "NSStringAdditions.h"
 
+QL_EXTERN_C_BEGIN
 OSStatus GeneratePreviewForURL(void* thisInterface, QLPreviewRequestRef preview, CFURLRef url, CFStringRef contentTypeUTI, CFDictionaryRef options);
 void CancelPreviewGeneration(void* thisInterface, QLPreviewRequestRef preview);
+QL_EXTERN_C_END
 
 NSString* generateIconData(NSString* fileExtension, NSUInteger width, NSMutableDictionary* allImgProps)
 {
@@ -83,8 +87,8 @@ OSStatus GeneratePreviewForURL(void* thisInterface, QLPreviewRequestRef preview,
     NSString* fileSizeString = [NSString stringForFileSize:metainfo.totalSize()];
     if (is_multifile)
     {
-        NSString* fileCountString = [NSString stringWithFormat:NSLocalizedStringFromTableInBundle(@"%@ files", nil, bundle, "quicklook file count"),
-                                                         [NSString formattedUInteger:n_files]];
+        NSString* fileCountString = [NSString
+            stringWithFormat:NSLocalizedStringFromTableInBundle(@"%lu files", nil, bundle, "quicklook file count"), n_files];
         fileSizeString = [NSString stringWithFormat:@"%@, %@", fileCountString, fileSizeString];
     }
     [htmlString appendFormat:@"<p>%@</p>", fileSizeString];
@@ -141,8 +145,7 @@ OSStatus GeneratePreviewForURL(void* thisInterface, QLPreviewRequestRef preview,
 
         NSString* headerTitleString = n_webseeds == 1 ?
             NSLocalizedStringFromTableInBundle(@"1 Web Seed", nil, bundle, "quicklook web seed header") :
-            [NSString stringWithFormat:NSLocalizedStringFromTableInBundle(@"%@ Web Seeds", nil, bundle, "quicklook web seed header"),
-                                       [NSString formattedUInteger:n_webseeds]];
+            [NSString stringWithFormat:NSLocalizedStringFromTableInBundle(@"%lu Web Seeds", nil, bundle, "quicklook web seed header"), n_webseeds];
         [listSection appendFormat:@"<tr><th>%@</th></tr>", headerTitleString];
 
         for (size_t i = 0; i < n_webseeds; ++i)
@@ -164,14 +167,13 @@ OSStatus GeneratePreviewForURL(void* thisInterface, QLPreviewRequestRef preview,
         auto const n = std::size(announce_list);
         NSString* headerTitleString = n == 1 ?
             NSLocalizedStringFromTableInBundle(@"1 Tracker", nil, bundle, "quicklook tracker header") :
-            [NSString stringWithFormat:NSLocalizedStringFromTableInBundle(@"%@ Trackers", nil, bundle, "quicklook tracker header"),
-                                       [NSString formattedUInteger:n]];
+            [NSString stringWithFormat:NSLocalizedStringFromTableInBundle(@"%lu Trackers", nil, bundle, "quicklook tracker header"), n];
         [listSection appendFormat:@"<tr><th>%@</th></tr>", headerTitleString];
 
 #warning handle tiers?
         for (auto const& tracker : announce_list)
         {
-            [listSection appendFormat:@"<tr><td>%s<td></tr>", tracker.announce_str.c_str()];
+            [listSection appendFormat:@"<tr><td>%s<td></tr>", tracker.announce.c_str()];
         }
 
         [listSection appendString:@"</table>"];
@@ -184,25 +186,26 @@ OSStatus GeneratePreviewForURL(void* thisInterface, QLPreviewRequestRef preview,
         NSMutableString* listSection = [NSMutableString string];
         [listSection appendString:@"<table>"];
 
-        NSString* fileTitleString = [NSString stringWithFormat:NSLocalizedStringFromTableInBundle(@"%@ Files", nil, bundle, "quicklook file header"),
-                                       [NSString formattedUInteger:n_files]];
+        NSString* fileTitleString = [NSString
+            stringWithFormat:NSLocalizedStringFromTableInBundle(@"%lu Files", nil, bundle, "quicklook file header"), n_files];
         [listSection appendFormat:@"<tr><th>%@</th></tr>", fileTitleString];
 
-#warning display size?
 #warning display folders?
-        for (tr_file_index_t i = 0; i < n_files; ++i)
+        for (auto const& [path, size] : metainfo.files().sortedByPath())
         {
-            NSString* fullFilePath = [NSString stringWithUTF8String:metainfo.fileSubpath(i).c_str()];
+            NSString* fullFilePath = [NSString stringWithUTF8String:path.c_str()];
             NSCAssert([fullFilePath hasPrefix:[name stringByAppendingString:@"/"]], @"Expected file path %@ to begin with %@/", fullFilePath, name);
 
             NSString* shortenedFilePath = [fullFilePath substringFromIndex:[name length] + 1];
+            NSString* shortenedFilePathAndSize = [NSString
+                stringWithFormat:@"%@ - %@", shortenedFilePath, [NSString stringForFileSize:size]];
 
             NSUInteger const width = 16;
             [listSection appendFormat:@"<tr><td><img class=\"icon\" src=\"%@\" width=\"%ld\" height=\"%ld\" />%@<td></tr>",
                                       generateIconData([shortenedFilePath pathExtension], width, allImgProps),
                                       width,
                                       width,
-                                      shortenedFilePath];
+                                      shortenedFilePathAndSize];
         }
 
         [listSection appendString:@"</table>"];

@@ -1,5 +1,9 @@
 cmake_minimum_required(VERSION 3.9 FATAL_ERROR)
 
+if(POLICY CMP0092)
+    cmake_policy(SET CMP0092 NEW)
+endif()
+
 # The value of this variable should be set prior to the first project() command invocation.
 # See: https://cmake.org/cmake/help/latest/variable/CMAKE_OSX_DEPLOYMENT_TARGET.html
 if(CMAKE_OSX_DEPLOYMENT_TARGET STREQUAL "")
@@ -42,7 +46,7 @@ tr_auto_option(USE_SYSTEM_NATPMP    "Use system natpmp library" AUTO)
 tr_auto_option(USE_SYSTEM_UTP       "Use system utp library" AUTO)
 tr_auto_option(USE_SYSTEM_B64       "Use system b64 library" AUTO)
 tr_auto_option(USE_SYSTEM_PSL       "Use system psl library" AUTO)
-tr_auto_option(USE_QT_VERSION       "Use specific Qt version" AUTO 5 6)
+tr_list_option(USE_QT_VERSION       "Use specific Qt version" AUTO 5 6)
 tr_list_option(WITH_CRYPTO          "Use specified crypto library" AUTO openssl cyassl polarssl ccrypto)
 tr_auto_option(WITH_INOTIFY         "Enable inotify support (on systems that support it)" AUTO)
 tr_auto_option(WITH_KQUEUE          "Enable kqueue support (on systems that support it)" AUTO)
@@ -113,7 +117,7 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set(PSL_MINIMUM             0.21.1)
 set(CURL_MINIMUM            7.28.0)
 set(CYASSL_MINIMUM          3.0)
-set(DEFLATE_MINIMUM         1.9)
+set(DEFLATE_MINIMUM         1.10)
 set(EVENT2_MINIMUM          2.1.0)
 set(GIO_MINIMUM             2.26.0)
 set(GLIB_MINIMUM            2.50.1)
@@ -147,6 +151,10 @@ if(WIN32)
 endif()
 
 find_package(Fmt)
+add_definitions(-DFMT_HEADER_ONLY -DFMT_EXCEPTIONS=0)
+include_directories(SYSTEM ${LIBFMT_INCLUDE_DIRS})
+
+find_package(FastFloat)
 find_package(UtfCpp)
 find_package(Threads)
 find_package(PkgConfig QUIET)
@@ -326,7 +334,7 @@ set(THIRD_PARTY_DIR ${CMAKE_SOURCE_DIR}/third-party)
 
 tr_add_external_auto_library(DEFLATE libdeflate deflate)
 if(NOT USE_SYSTEM_DEFLATE)
-    set(DEFLATE_VERSION 1.9)
+    set(DEFLATE_VERSION 1.10)
 endif()
 
 tr_add_external_auto_library(EVENT2 libevent event
@@ -342,8 +350,6 @@ tr_add_external_auto_library(NATPMP libnatpmp natpmp)
 if(NOT USE_SYSTEM_NATPMP)
     set(NATPMP_DEFINITIONS -DNATPMP_STATICLIB)
 endif()
-
-set(LIBFMT_DEFINITIONS -DFMT_HEADER_ONLY)
 
 tr_add_external_auto_library(MINIUPNPC miniupnpc miniupnpc
     CMAKE_ARGS
@@ -571,11 +577,7 @@ set(NEEDED_FUNCTIONS
     flock
     getmntent
     gettext
-    gmtime_r
-    gmtime_s
     htonll
-    localtime_r
-    localtime_s
     mkdtemp
     ngettext
     ntohll
@@ -586,8 +588,7 @@ set(NEEDED_FUNCTIONS
     sendfile64
     statvfs
     strlcpy
-    syslog
-    uselocale)
+    syslog)
 
 foreach(F ${NEEDED_FUNCTIONS})
     tr_make_id("${F}" F_ID)
@@ -701,7 +702,6 @@ list(APPEND CPACK_SOURCE_IGNORE_FILES
     "[.]git"
     "node_modules"
 )
-set(CPACK_INSTALL_SCRIPTS "${CMAKE_CURRENT_LIST_DIR}/cmake/CPackSourceFixDirLinks.cmake")
 
 ## Code Formatting
 

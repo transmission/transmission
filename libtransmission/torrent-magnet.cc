@@ -64,7 +64,7 @@ static void incompleteMetadataFree(struct tr_incomplete_metadata* m)
 
 bool tr_torrentSetMetadataSizeHint(tr_torrent* tor, int64_t size)
 {
-    if (tor->hasMetadata())
+    if (tor->hasMetainfo())
     {
         return false;
     }
@@ -118,12 +118,12 @@ void* tr_torrentGetMetadataPiece(tr_torrent const* tor, int piece, size_t* len)
     TR_ASSERT(piece >= 0);
     TR_ASSERT(len != nullptr);
 
-    if (!tor->hasMetadata())
+    if (!tor->hasMetainfo())
     {
         return nullptr;
     }
 
-    auto const fd = tr_sys_file_open(tor->torrentFile().c_str(), TR_SYS_FILE_READ, 0, nullptr);
+    auto const fd = tr_sys_file_open(tor->torrentFile(), TR_SYS_FILE_READ, 0);
     if (fd == TR_BAD_SYS_FILE)
     {
         return nullptr;
@@ -133,7 +133,7 @@ void* tr_torrentGetMetadataPiece(tr_torrent const* tor, int piece, size_t* len)
     TR_ASSERT(info_dict_size > 0);
 
     char* ret = nullptr;
-    if (size_t o = piece * METADATA_PIECE_SIZE; tr_sys_file_seek(fd, tor->infoDictOffset() + o, TR_SEEK_SET, nullptr, nullptr))
+    if (size_t o = piece * METADATA_PIECE_SIZE; tr_sys_file_seek(fd, tor->infoDictOffset() + o, TR_SEEK_SET, nullptr))
     {
         size_t const l = o + METADATA_PIECE_SIZE <= info_dict_size ? METADATA_PIECE_SIZE : info_dict_size - o;
 
@@ -141,7 +141,7 @@ void* tr_torrentGetMetadataPiece(tr_torrent const* tor, int piece, size_t* len)
         {
             auto* buf = tr_new(char, l);
 
-            if (auto n = uint64_t{}; tr_sys_file_read(fd, buf, l, &n, nullptr) && n == l)
+            if (auto n = uint64_t{}; tr_sys_file_read(fd, buf, l, &n) && n == l)
             {
                 *len = l;
                 ret = buf;
@@ -152,7 +152,7 @@ void* tr_torrentGetMetadataPiece(tr_torrent const* tor, int piece, size_t* len)
         }
     }
 
-    tr_sys_file_close(fd, nullptr);
+    tr_sys_file_close(fd);
 
     TR_ASSERT(ret == nullptr || *len > 0);
     return ret;
@@ -207,7 +207,7 @@ static void tr_buildMetainfoExceptInfoDict(tr_torrent_metainfo const& tm, tr_var
         auto const n = std::size(announce_list);
         if (n == 1)
         {
-            tr_variantDictAddStr(top, TR_KEY_announce, announce_list.at(0).announce_str.sv());
+            tr_variantDictAddStr(top, TR_KEY_announce, announce_list.at(0).announce.sv());
         }
         else
         {
@@ -221,7 +221,7 @@ static void tr_buildMetainfoExceptInfoDict(tr_torrent_metainfo const& tm, tr_var
                     tier_variant = tr_variantListAddList(announce_list_variant, n);
                 }
 
-                tr_variantListAddStr(tier_variant, tracker.announce_str.sv());
+                tr_variantListAddStr(tier_variant, tracker.announce.sv());
             }
         }
     }
@@ -273,13 +273,13 @@ static bool useNewMetainfo(tr_torrent* tor, tr_incomplete_metadata const* m, tr_
     }
 
     // save it
-    if (auto const filename = tor->torrentFile(); !tr_saveFile(filename, benc, error))
+    if (!tr_saveFile(tor->torrentFile(), benc, error))
     {
         return false;
     }
 
     // remove .magnet file
-    tr_sys_path_remove(tor->magnetFile().c_str(), nullptr);
+    tr_sys_path_remove(tor->magnetFile());
 
     // tor should keep this metainfo
     tor->setMetainfo(metainfo);
@@ -296,7 +296,10 @@ static void onHaveAllMetainfo(tr_torrent* tor, tr_incomplete_metadata* m)
         tor->incompleteMetadata = nullptr;
         tor->isStopping = true;
         tor->magnetVerify = true;
-        tor->startAfterVerify = !tr_sessionGetPaused(tor->session);
+        if (tr_sessionGetPaused(tor->session))
+        {
+            tor->startAfterVerify = false;
+        }
         tor->markEdited();
     }
     else /* drat. */
@@ -311,7 +314,15 @@ static void onHaveAllMetainfo(tr_torrent* tor, tr_incomplete_metadata* m)
 
         m->piecesNeededCount = n;
         char const* const msg = error != nullptr && error->message != nullptr ? error->message : "unknown error";
-        tr_logAddWarnTor(tor, fmt::format("metadata error: {}. (trying again; {} pieces left)", msg, n));
+        tr_logAddWarnTor(
+            tor,
+            fmt::format(
+                ngettext(
+                    "Couldn't parse magnet metainfo: '{error}'. Redownloading {piece_count} piece",
+                    "Couldn't parse magnet metainfo: '{error}'. Redownloading {piece_count} pieces",
+                    n),
+                fmt::arg("error", msg),
+                fmt::arg("piece_count", n)));
         tr_error_clear(&error);
     }
 }
@@ -392,7 +403,7 @@ bool tr_torrentGetNextMetadataRequest(tr_torrent* tor, time_t now, int* setme_pi
 
 double tr_torrentGetMetadataPercent(tr_torrent const* tor)
 {
-    if (tor->hasMetadata())
+    if (tor->hasMetainfo())
     {
         return 1.0;
     }

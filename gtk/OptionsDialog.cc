@@ -186,7 +186,7 @@ void OptionsDialog::Impl::sourceChanged(Gtk::FileChooserButton* b)
     {
         bool new_file = false;
 
-        if (!filename.empty() && (filename_.empty() || !tr_sys_path_is_same(filename.c_str(), filename_.c_str(), nullptr)))
+        if (!filename.empty() && (filename_.empty() || !tr_sys_path_is_same(filename.c_str(), filename_.c_str())))
         {
             filename_ = filename;
             tr_ctorSetMetainfoFromFile(ctor_.get(), filename_.c_str(), nullptr);
@@ -216,7 +216,7 @@ void OptionsDialog::Impl::downloadDirChanged(Gtk::FileChooserButton* b)
 {
     auto const fname = b->get_filename();
 
-    if (!fname.empty() && (downloadDir_.empty() || !tr_sys_path_is_same(fname.c_str(), downloadDir_.c_str(), nullptr)))
+    if (!fname.empty() && (downloadDir_.empty() || !tr_sys_path_is_same(fname.c_str(), downloadDir_.c_str())))
     {
         downloadDir_ = fname;
         updateTorrent();
@@ -413,7 +413,7 @@ void TorrentFileChooserDialog::onOpenDialogResponse(int response, Glib::RefPtr<S
 
     if (response == Gtk::RESPONSE_ACCEPT)
     {
-        auto* tb = static_cast<Gtk::CheckButton*>(get_extra_widget());
+        auto const* const tb = static_cast<Gtk::CheckButton*>(get_extra_widget());
         bool const do_start = gtr_pref_flag_get(TR_KEY_start_added_torrents);
         bool const do_prompt = tb->get_active();
         bool const do_notify = false;

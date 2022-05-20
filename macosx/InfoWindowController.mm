@@ -37,7 +37,7 @@ typedef NS_ENUM(unsigned int, tabTag) {
 
 @interface InfoWindowController ()
 
-@property(nonatomic, copy) NSArray* fTorrents;
+@property(nonatomic, copy) NSArray<Torrent*>* fTorrents;
 
 @property(nonatomic) CGFloat fMinWindowWidth;
 
@@ -100,24 +100,13 @@ typedef NS_ENUM(unsigned int, tabTag) {
     [self.fTabs.cell setToolTip:NSLocalizedString(@"Files", "Inspector -> tab") forSegment:TAB_FILE_TAG];
     [self.fTabs.cell setToolTip:NSLocalizedString(@"Options", "Inspector -> tab") forSegment:TAB_OPTIONS_TAG];
 
-    [self.fTabs setImage:[NSImage systemSymbol:@"info.circle"
-                             withFallback:@"InfoGeneral"]
-         forSegment:TAB_GENERAL_TAG];
-    [self.fTabs setImage:[NSImage systemSymbol:@"square.grid.3x3.fill.square"
-                             withFallback:@"InfoActivity"]
-         forSegment:TAB_ACTIVITY_TAG];
-    [self.fTabs setImage:[NSImage systemSymbol:@"antenna.radiowaves.left.and.right"
-                             withFallback:@"InfoTracker"]
-         forSegment:TAB_TRACKERS_TAG];
-    [self.fTabs setImage:[NSImage systemSymbol:@"person.2"
-                             withFallback:@"InfoPeers"]
-         forSegment:TAB_PEERS_TAG];
-    [self.fTabs setImage:[NSImage systemSymbol:@"doc.on.doc"
-                             withFallback:@"InfoFiles"]
-         forSegment:TAB_FILE_TAG];
-    [self.fTabs setImage:[NSImage systemSymbol:@"gearshape"
-                             withFallback:@"InfoOptions"]
-         forSegment:TAB_OPTIONS_TAG];
+    [self.fTabs setImage:[NSImage systemSymbol:@"info.circle" withFallback:@"InfoGeneral"] forSegment:TAB_GENERAL_TAG];
+    [self.fTabs setImage:[NSImage systemSymbol:@"square.grid.3x3.fill.square" withFallback:@"InfoActivity"] forSegment:TAB_ACTIVITY_TAG];
+    [self.fTabs setImage:[NSImage systemSymbol:@"antenna.radiowaves.left.and.right" withFallback:@"InfoTracker"]
+              forSegment:TAB_TRACKERS_TAG];
+    [self.fTabs setImage:[NSImage systemSymbol:@"person.2" withFallback:@"InfoPeers"] forSegment:TAB_PEERS_TAG];
+    [self.fTabs setImage:[NSImage systemSymbol:@"doc.on.doc" withFallback:@"InfoFiles"] forSegment:TAB_FILE_TAG];
+    [self.fTabs setImage:[NSImage systemSymbol:@"gearshape" withFallback:@"InfoOptions"] forSegment:TAB_OPTIONS_TAG];
 
     //set selected tab
     self.fCurrentTabTag = INVALID;
@@ -179,7 +168,7 @@ typedef NS_ENUM(unsigned int, tabTag) {
     }
 }
 
-- (void)setInfoForTorrents:(NSArray*)torrents
+- (void)setInfoForTorrents:(NSArray<Torrent*>*)torrents
 {
     if (self.fTorrents && [self.fTorrents isEqualToArray:torrents])
     {
@@ -209,7 +198,7 @@ typedef NS_ENUM(unsigned int, tabTag) {
 - (void)setTab:(id)sender
 {
     NSInteger const oldTabTag = self.fCurrentTabTag;
-    self.fCurrentTabTag = self.fTabs.selectedTag;
+    self.fCurrentTabTag = self.fTabs.selectedSegment;
     if (self.fCurrentTabTag == oldTabTag)
     {
         return;
@@ -414,7 +403,7 @@ typedef NS_ENUM(unsigned int, tabTag) {
     [self.fOptionsViewController updateOptions];
 }
 
-- (NSArray*)quickLookURLs
+- (NSArray<NSURL*>*)quickLookURLs
 {
     return self.fFileViewController.quickLookURLs;
 }
@@ -445,8 +434,8 @@ typedef NS_ENUM(unsigned int, tabTag) {
         {
             self.fImageView.image = [NSImage imageNamed:NSImageNameMultipleDocuments];
 
-            self.fNameField.stringValue = [NSString stringWithFormat:NSLocalizedString(@"%@ Torrents Selected", "Inspector -> selected torrents"),
-                                                                [NSString formattedUInteger:numberSelected]];
+            self.fNameField.stringValue = [NSString
+                stringWithFormat:NSLocalizedString(@"%lu Torrents Selected", "Inspector -> selected torrents"), numberSelected];
             self.fNameField.hidden = NO;
 
             uint64_t size = 0;
@@ -471,8 +460,7 @@ typedef NS_ENUM(unsigned int, tabTag) {
                 }
                 else
                 {
-                    fileString = [NSString stringWithFormat:NSLocalizedString(@"%@ files", "Inspector -> selected torrents"),
-                                                            [NSString formattedUInteger:fileCount]];
+                    fileString = [NSString stringWithFormat:NSLocalizedString(@"%lu files", "Inspector -> selected torrents"), fileCount];
                 }
                 [fileStrings addObject:fileString];
             }
@@ -485,8 +473,8 @@ typedef NS_ENUM(unsigned int, tabTag) {
                 }
                 else
                 {
-                    magnetString = [NSString stringWithFormat:NSLocalizedString(@"%@ magnetized transfers", "Inspector -> selected torrents"),
-                                                              [NSString formattedUInteger:magnetCount]];
+                    magnetString = [NSString
+                        stringWithFormat:NSLocalizedString(@"%lu magnetized transfers", "Inspector -> selected torrents"), magnetCount];
                 }
                 [fileStrings addObject:magnetString];
             }
@@ -549,8 +537,7 @@ typedef NS_ENUM(unsigned int, tabTag) {
                 }
                 else
                 {
-                    fileString = [NSString stringWithFormat:NSLocalizedString(@"%@ files", "Inspector -> selected torrents"),
-                                                            [NSString formattedUInteger:fileCount]];
+                    fileString = [NSString stringWithFormat:NSLocalizedString(@"%lu files", "Inspector -> selected torrents"), fileCount];
                 }
                 basicString = [NSString stringWithFormat:@"%@, %@", fileString, basicString];
             }

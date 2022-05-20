@@ -79,7 +79,7 @@ struct tr_upnp
     bool hasDiscovered = false;
     UPNPUrls urls = {};
     IGDdatas data = {};
-    int port = -1;
+    tr_port port;
     char lanaddr[16] = {};
     bool isMapped = false;
     UpnpState state = UpnpState::WILL_DISCOVER;
@@ -140,18 +140,17 @@ static int tr_upnpGetSpecificPortMappingEntry(tr_upnp* handle, char const* proto
 {
     char intClient[16];
     char intPort[16];
-    char portStr[16];
 
     *intClient = '\0';
     *intPort = '\0';
 
-    tr_snprintf(portStr, sizeof(portStr), "%d", handle->port);
+    auto const port_str = fmt::format(FMT_STRING("{:d}"), handle->port.host());
 
 #if (MINIUPNPC_API_VERSION >= 10) /* adds remoteHost arg */
     int const err = UPNP_GetSpecificPortMappingEntry(
         handle->urls.controlURL,
         handle->data.first.servicetype,
-        portStr,
+        port_str.c_str(),
         proto,
         nullptr /*remoteHost*/,
         intClient,
@@ -163,7 +162,7 @@ static int tr_upnpGetSpecificPortMappingEntry(tr_upnp* handle, char const* proto
     int const err = UPNP_GetSpecificPortMappingEntry(
         handle->urls.controlURL,
         handle->data.first.servicetype,
-        portStr,
+        port_str.c_str(),
         proto,
         intClient,
         intPort,
@@ -174,7 +173,7 @@ static int tr_upnpGetSpecificPortMappingEntry(tr_upnp* handle, char const* proto
     int const err = UPNP_GetSpecificPortMappingEntry(
         handle->urls.controlURL,
         handle->data.first.servicetype,
-        portStr,
+        port_str.c_str(),
         proto,
         intClient,
         intPort);
@@ -186,17 +185,16 @@ static int tr_upnpGetSpecificPortMappingEntry(tr_upnp* handle, char const* proto
 static int tr_upnpAddPortMapping(tr_upnp const* handle, char const* proto, tr_port port, char const* desc)
 {
     int const old_errno = errno;
-    char portStr[16];
     errno = 0;
 
-    tr_snprintf(portStr, sizeof(portStr), "%d", (int)port);
+    auto const port_str = fmt::format(FMT_STRING("{:d}"), port.host());
 
 #if (MINIUPNPC_API_VERSION >= 8)
     int err = UPNP_AddPortMapping(
         handle->urls.controlURL,
         handle->data.first.servicetype,
-        portStr,
-        portStr,
+        port_str.c_str(),
+        port_str.c_str(),
         handle->lanaddr,
         desc,
         proto,
@@ -206,8 +204,8 @@ static int tr_upnpAddPortMapping(tr_upnp const* handle, char const* proto, tr_po
     int err = UPNP_AddPortMapping(
         handle->urls.controlURL,
         handle->data.first.servicetype,
-        portStr,
-        portStr,
+        port_str.c_str(),
+        port_str.c_str(),
         handle->lanaddr,
         desc,
         proto,
@@ -225,11 +223,9 @@ static int tr_upnpAddPortMapping(tr_upnp const* handle, char const* proto, tr_po
 
 static void tr_upnpDeletePortMapping(tr_upnp const* handle, char const* proto, tr_port port)
 {
-    char portStr[16];
+    auto const port_str = fmt::format(FMT_STRING("{:d}"), port.host());
 
-    tr_snprintf(portStr, sizeof(portStr), "%d", (int)port);
-
-    UPNP_DeletePortMapping(handle->urls.controlURL, handle->data.first.servicetype, portStr, proto, nullptr);
+    UPNP_DeletePortMapping(handle->urls.controlURL, handle->data.first.servicetype, port_str.c_str(), proto, nullptr);
 }
 
 /**
@@ -281,7 +277,7 @@ tr_port_forwarding tr_upnpPulse(tr_upnp* handle, tr_port port, bool isEnabled, b
             UPNP_IGD_VALID_CONNECTED)
         {
             tr_logAddInfo(fmt::format(_("Found Internet Gateway Device '{url}'"), fmt::arg("url", handle->urls.controlURL)));
-            tr_logAddInfo(fmt::format(_("Local Address is '{address}')"), fmt::arg("address", handle->lanaddr)));
+            tr_logAddInfo(fmt::format(_("Local Address is '{address}'"), fmt::arg("address", handle->lanaddr)));
             handle->state = UpnpState::IDLE;
             handle->hasDiscovered = true;
         }
@@ -304,7 +300,7 @@ tr_port_forwarding tr_upnpPulse(tr_upnp* handle, tr_port port, bool isEnabled, b
         ((tr_upnpGetSpecificPortMappingEntry(handle, "TCP") != UPNPCOMMAND_SUCCESS) ||
          (tr_upnpGetSpecificPortMappingEntry(handle, "UDP") != UPNPCOMMAND_SUCCESS)))
     {
-        tr_logAddInfo(fmt::format(_("Port {port} is not forwarded"), fmt::arg("port", handle->port)));
+        tr_logAddInfo(fmt::format(_("Port {port} is not forwarded"), fmt::arg("port", handle->port.host())));
         handle->isMapped = false;
     }
 
@@ -320,7 +316,7 @@ tr_port_forwarding tr_upnpPulse(tr_upnp* handle, tr_port port, bool isEnabled, b
 
         handle->isMapped = false;
         handle->state = UpnpState::IDLE;
-        handle->port = -1;
+        handle->port = {};
     }
 
     if ((handle->state == UpnpState::IDLE) && isEnabled && !handle->isMapped)
@@ -338,32 +334,30 @@ tr_port_forwarding tr_upnpPulse(tr_upnp* handle, tr_port port, bool isEnabled, b
         }
         else
         {
-            char desc[64];
-            tr_snprintf(desc, sizeof(desc), "%s at %d", TR_NAME, port);
-
-            int const err_tcp = tr_upnpAddPortMapping(handle, "TCP", port, desc);
-            int const err_udp = tr_upnpAddPortMapping(handle, "UDP", port, desc);
+            auto const desc = fmt::format(FMT_STRING("{:s} at {:d}"), TR_NAME, port.host());
+            int const err_tcp = tr_upnpAddPortMapping(handle, "TCP", port, desc.c_str());
+            int const err_udp = tr_upnpAddPortMapping(handle, "UDP", port, desc.c_str());
 
             handle->isMapped = err_tcp == 0 || err_udp == 0;
         }
 
-        tr_logAddInfo(fmt::format(
+        tr_logAddDebug(fmt::format(
             _("Port forwarding through '{url}', service '{type}'. (local address: {address}:{port})"),
             fmt::arg("url", handle->urls.controlURL),
             fmt::arg("type", handle->data.first.servicetype),
             fmt::arg("address", handle->lanaddr),
-            fmt::arg("port", port)));
+            fmt::arg("port", port.host())));
 
         if (handle->isMapped)
         {
-            tr_logAddInfo(_("Port forwarding successful!"));
+            tr_logAddInfo(fmt::format(_("Port {port} is forwarded"), fmt::arg("port", port.host())));
             handle->port = port;
             handle->state = UpnpState::IDLE;
         }
         else
         {
             tr_logAddInfo(_("If your router supports UPnP, please make sure UPnP is enabled!"));
-            handle->port = -1;
+            handle->port = {};
             handle->state = UpnpState::FAILED;
         }
     }

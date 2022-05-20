@@ -99,7 +99,7 @@ bool spun_cb_idle(Gtk::SpinButton* spin, tr_quark const key, Glib::RefPtr<Sessio
     bool keep_waiting = true;
 
     /* has the user stopped making changes? */
-    if (auto* last_change = static_cast<Glib::Timer*>(spin->get_data(IdleDataKey)); last_change->elapsed() > 0.33)
+    if (auto const* const last_change = static_cast<Glib::Timer*>(spin->get_data(IdleDataKey)); last_change->elapsed() > 0.33)
     {
         /* update the core */
         if (isDouble)
@@ -413,9 +413,9 @@ void updateBlocklistText(Gtk::Label* w, Glib::RefPtr<Session> const& core)
 {
     int const n = tr_blocklistGetRuleCount(core->get_session());
     auto const msg = fmt::format(
-        ngettext("Blocklist has {count} entry", "Blocklist has {count} entries", n),
+        ngettext("Blocklist has {count:L} entry", "Blocklist has {count:L} entries", n),
         fmt::arg("count", n));
-    w->set_markup(fmt::format("<i>{}</i>", msg));
+    w->set_markup(fmt::format(FMT_STRING("<i>{:s}</i>"), msg));
 }
 
 /* prefs dialog is being destroyed, so stop listening to blocklist updates */
@@ -441,11 +441,11 @@ void onBlocklistUpdated(Glib::RefPtr<Session> const& core, int n, blocklist_data
     bool const success = n >= 0;
     int const count = n >= 0 ? n : tr_blocklistGetRuleCount(core->get_session());
     auto const msg = fmt::format(
-        ngettext("Blocklist has {count} entry", "Blocklist has {count} entries", count),
+        ngettext("Blocklist has {count:L} entry", "Blocklist has {count:L} entries", count),
         fmt::arg("count", count));
     data->updateBlocklistButton->set_sensitive(true);
     data->updateBlocklistDialog->set_message(
-        fmt::format("<b>{}</b>", success ? _("Blocklist updated!") : _("Couldn't update blocklist")),
+        fmt::format(FMT_STRING("<b>{:s}</b>"), success ? _("Blocklist updated!") : _("Couldn't update blocklist")),
         true);
     data->updateBlocklistDialog->set_secondary_text(msg);
     updateBlocklistText(data->label, core);
@@ -849,7 +849,7 @@ Gtk::ComboBox* new_time_combo(Glib::RefPtr<Session> const& core, tr_quark const 
     return w;
 }
 
-static auto get_weekday_string(Glib::Date::Weekday weekday)
+auto get_weekday_string(Glib::Date::Weekday weekday)
 {
     auto date = Glib::Date{};
     date.set_time_current();
@@ -914,7 +914,7 @@ Gtk::Widget* PrefsDialog::Impl::speedPage()
 
     {
         auto* h = Gtk::make_managed<Gtk::Box>(Gtk::ORIENTATION_HORIZONTAL, GUI_PAD);
-        auto* w = Gtk::make_managed<Gtk::Label>(fmt::format("<b>{}</b>", _("Alternative Speed Limits")));
+        auto* w = Gtk::make_managed<Gtk::Label>(fmt::format(FMT_STRING("<b>{:s}</b>"), _("Alternative Speed Limits")));
         w->set_halign(Gtk::ALIGN_START);
         w->set_valign(Gtk::ALIGN_CENTER);
         w->set_use_markup(true);
@@ -925,7 +925,7 @@ Gtk::Widget* PrefsDialog::Impl::speedPage()
 
     {
         auto* w = Gtk::make_managed<Gtk::Label>(
-            fmt::format("<small>{}</small>", _("Override normal speed limits manually or at scheduled times")));
+            fmt::format(FMT_STRING("<small>{:s}</small>"), _("Override normal speed limits manually or at scheduled times")));
         w->set_use_markup(true);
         w->set_halign(Gtk::ALIGN_START);
         w->set_valign(Gtk::ALIGN_CENTER);
@@ -1029,7 +1029,7 @@ void onPortTest(std::shared_ptr<network_page_data> const& data)
 {
     data->portButton->set_sensitive(false);
     data->portSpin->set_sensitive(false);
-    data->portLabel->set_markup(fmt::format("<i>{}</i>", _("Testing TCP port…")));
+    data->portLabel->set_markup(fmt::format(FMT_STRING("<i>{:s}</i>"), _("Testing TCP port…")));
 
     if (!data->portTag.connected())
     {
@@ -1170,8 +1170,6 @@ PrefsDialog::Impl::Impl(PrefsDialog& dialog, Glib::RefPtr<Session> const& core)
     : dialog_(dialog)
     , core_(core)
 {
-    static tr_quark const prefs_quarks[] = { TR_KEY_peer_port, TR_KEY_download_dir };
-
     core_prefs_tag_ = core_->signal_prefs_changed().connect(sigc::mem_fun(*this, &Impl::on_core_prefs_changed));
 
     dialog_.add_button(_("_Help"), Gtk::RESPONSE_HELP);
@@ -1191,7 +1189,8 @@ PrefsDialog::Impl::Impl(PrefsDialog& dialog, Glib::RefPtr<Session> const& core)
     n->append_page(*remotePage(), _("Remote"));
 
     /* init from prefs keys */
-    for (auto const key : prefs_quarks)
+    static auto constexpr PrefsQuarks = std::array<tr_quark, 2>{ TR_KEY_peer_port, TR_KEY_download_dir };
+    for (auto const key : PrefsQuarks)
     {
         on_core_prefs_changed(key);
     }

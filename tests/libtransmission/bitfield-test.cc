@@ -61,16 +61,16 @@ TEST(Bitfield, count)
     }
 
     auto bf = tr_bitfield{ 0 };
-    EXPECT_EQ(0, bf.count(0, 0));
-    EXPECT_EQ(0, bf.count(0, 1));
+    EXPECT_EQ(0U, bf.count(0, 0));
+    EXPECT_EQ(0U, bf.count(0, 1));
 
     bf = tr_bitfield{ 100 };
-    EXPECT_EQ(0, bf.count(0, 0));
-    EXPECT_EQ(0, bf.count(0, 100));
+    EXPECT_EQ(0U, bf.count(0, 0));
+    EXPECT_EQ(0U, bf.count(0, 100));
     bf.setHasAll();
-    EXPECT_EQ(0, bf.count(0, 0));
-    EXPECT_EQ(1, bf.count(0, 1));
-    EXPECT_EQ(100, bf.count(0, 100));
+    EXPECT_EQ(0U, bf.count(0, 0));
+    EXPECT_EQ(1U, bf.count(0, 1));
+    EXPECT_EQ(100U, bf.count(0, 100));
 }
 
 TEST(Bitfield, ctorFromFlagArray)
@@ -137,13 +137,13 @@ TEST(Bitfield, setRaw)
 
     // check that the spare bits t the end are zero
     bf = tr_bitfield{ 1 };
-    uint8_t by = ~uint8_t{};
+    uint8_t by = std::numeric_limits<uint8_t>::max();
     bf.setRaw(&by, 1);
     EXPECT_TRUE(bf.hasAll());
     EXPECT_FALSE(bf.hasNone());
-    EXPECT_EQ(1, bf.count());
+    EXPECT_EQ(1U, bf.count());
     raw = bf.raw();
-    EXPECT_EQ(1, std::size(raw));
+    EXPECT_EQ(1U, std::size(raw));
     EXPECT_EQ(1 << 7, raw[0]);
 }
 
@@ -254,7 +254,7 @@ TEST(Bitfield, bitfields)
     field.unsetSpan(0, 100);
     EXPECT_TRUE(field.hasNone());
     EXPECT_FALSE(field.hasAll());
-    EXPECT_EQ(0, field.count());
+    EXPECT_EQ(0U, field.count());
 
     /* test tr_bitfield::setSpan when it changes nothing */
     field.setHasAll();

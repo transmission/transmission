@@ -42,7 +42,7 @@ std::string favicon_get_cache_dir()
     if (dir.empty())
     {
         dir = Glib::build_filename(Glib::get_user_cache_dir(), "transmission", "favicons");
-        g_mkdir_with_parents(dir.c_str(), 0777);
+        (void)g_mkdir_with_parents(dir.c_str(), 0777);
     }
 
     return dir;

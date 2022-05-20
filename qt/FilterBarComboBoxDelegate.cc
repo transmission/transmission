@@ -38,7 +38,7 @@ void FilterBarComboBoxDelegate::setSeparator(QAbstractItemModel* model, QModelIn
 {
     model->setData(index, QStringLiteral("separator"), Qt::AccessibleDescriptionRole);
 
-    if (auto* m = qobject_cast<QStandardItemModel*>(model))
+    if (auto const* const m = qobject_cast<QStandardItemModel*>(model))
     {
         if (QStandardItem* item = m->itemFromIndex(index))
         {
@@ -109,7 +109,7 @@ QSize FilterBarComboBoxDelegate::sizeHint(QStyleOptionViewItem const& option, QM
         return { pm, pm + 10 };
     }
 
-    QStyle* s = combo_->style();
+    QStyle const* const s = combo_->style();
     int const hmargin = getHSpacing(combo_);
 
     QSize size = QItemDelegate::sizeHint(option, index);

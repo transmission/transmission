@@ -16,7 +16,7 @@
 
 @interface InfoTrackersViewController ()
 
-@property(nonatomic, copy) NSArray* fTorrents;
+@property(nonatomic, copy) NSArray<Torrent*>* fTorrents;
 
 @property(nonatomic) BOOL fSet;
 
@@ -51,9 +51,9 @@
 - (void)awakeFromNib
 {
     [self.fTrackerAddRemoveControl.cell setToolTip:NSLocalizedString(@"Add a tracker", "Inspector view -> tracker buttons")
-                                   forSegment:TRACKER_ADD_TAG];
+                                        forSegment:TRACKER_ADD_TAG];
     [self.fTrackerAddRemoveControl.cell setToolTip:NSLocalizedString(@"Remove selected trackers", "Inspector view -> tracker buttons")
-                                   forSegment:TRACKER_REMOVE_TAG];
+                                        forSegment:TRACKER_REMOVE_TAG];
 
     CGFloat const height = [NSUserDefaults.standardUserDefaults floatForKey:@"InspectorContentHeightTracker"];
     if (height != 0.0)
@@ -64,7 +64,7 @@
     }
 }
 
-- (void)setInfoForTorrents:(NSArray*)torrents
+- (void)setInfoForTorrents:(NSArray<Torrent*>*)torrents
 {
     //don't check if it's the same in case the metadata changed
     self.fTorrents = torrents;
@@ -91,7 +91,7 @@
 
         if (self.fTorrents.count == 1)
         {
-            self.fTrackers = ((Torrent*)self.fTorrents[0]).allTrackerStats;
+            self.fTrackers = self.fTorrents[0].allTrackerStats;
         }
         else
         {
@@ -120,7 +120,7 @@
         NSIndexSet* addedIndexes = [NSIndexSet indexSetWithIndexesInRange:NSMakeRange(self.fTrackers.count - 2, 2)];
         NSArray* tierAndTrackerBeingAdded = [self.fTrackers objectsAtIndexes:addedIndexes];
 
-        self.fTrackers = ((Torrent*)self.fTorrents[0]).allTrackerStats;
+        self.fTrackers = self.fTorrents[0].allTrackerStats;
         [self.fTrackers addObjectsFromArray:tierAndTrackerBeingAdded];
 
         self.fTrackerTable.trackers = self.fTrackers;
@@ -155,7 +155,7 @@
         NSInteger const tier = [item[@"Tier"] integerValue];
         NSString* tierString = tier == -1 ?
             NSLocalizedString(@"New Tier", "Inspector -> tracker table") :
-            [NSString stringWithFormat:NSLocalizedString(@"Tier %d", "Inspector -> tracker table"), tier];
+            [NSString stringWithFormat:NSLocalizedString(@"Tier %ld", "Inspector -> tracker table"), tier];
 
         if (self.fTorrents.count > 1)
         {
@@ -177,7 +177,7 @@
 
 - (CGFloat)tableView:(NSTableView*)tableView heightOfRow:(NSInteger)row
 {
-    //check for NSDictionay instead of TrackerNode because of display issue when adding a row
+    //check for NSDictionary instead of TrackerNode because of display issue when adding a row
     if ([self.fTrackers[row] isKindOfClass:[NSDictionary class]])
     {
         return TRACKER_GROUP_SEPARATOR_HEIGHT;
@@ -319,7 +319,9 @@
     self.fTrackerTable.trackers = self.fTrackers;
     [self.fTrackerTable reloadData];
     [self.fTrackerTable selectRowIndexes:[NSIndexSet indexSetWithIndex:self.fTrackers.count - 1] byExtendingSelection:NO];
-    [self.fTrackerTable editColumn:[self.fTrackerTable columnWithIdentifier:@"Tracker"] row:self.fTrackers.count - 1 withEvent:nil select:YES];
+    [self.fTrackerTable editColumn:[self.fTrackerTable columnWithIdentifier:@"Tracker"] row:self.fTrackers.count - 1
+                         withEvent:nil
+                            select:YES];
 }
 
 - (void)removeTrackers
@@ -402,7 +404,7 @@
         if (removeTrackerCount > 1)
         {
             alert.messageText = [NSString
-                stringWithFormat:NSLocalizedString(@"Are you sure you want to remove %d trackers?", "Remove trackers alert -> title"),
+                stringWithFormat:NSLocalizedString(@"Are you sure you want to remove %lu trackers?", "Remove trackers alert -> title"),
                                  removeTrackerCount];
             alert.informativeText = NSLocalizedString(
                 @"Once removed, Transmission will no longer attempt to contact them."

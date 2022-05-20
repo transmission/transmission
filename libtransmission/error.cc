@@ -5,17 +5,14 @@
 
 #include <string_view>
 
+#include <fmt/format.h>
+
 #include "transmission.h"
 
 #include "error.h"
 #include "tr-assert.h"
 #include "tr-macros.h"
 #include "utils.h"
-
-bool tr_error_is_set(tr_error const* const* error)
-{
-    return (error != nullptr) && (*error != nullptr);
-}
 
 void tr_error_free(tr_error* error)
 {
@@ -79,7 +76,7 @@ void tr_error_prefix(tr_error** error, char const* prefix)
     }
 
     auto* err = *error;
-    auto* const new_message = tr_strvDup(tr_strvJoin(prefix, err->message));
+    auto* const new_message = tr_strvDup(fmt::format(FMT_STRING("{:s}{:s}"), prefix, err->message));
     tr_free(err->message);
     err->message = new_message;
 }

@@ -1,7 +1,8 @@
-// This file Copyright © 2005-2021 Transmission authors and contributors.
+// This file Copyright © 2005-2022 Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
+#include <array>
 #include <string>
 
 #include <glibmm/i18n.h>
@@ -62,8 +63,8 @@ private:
 private:
     MainWindow& window_;
 
-    Gtk::RadioMenuItem* speedlimit_on_item_[2] = { nullptr, nullptr };
-    Gtk::RadioMenuItem* speedlimit_off_item_[2] = { nullptr, nullptr };
+    std::array<Gtk::RadioMenuItem*, 2> speedlimit_on_item_;
+    std::array<Gtk::RadioMenuItem*, 2> speedlimit_off_item_;
     Gtk::RadioMenuItem* ratio_on_item_ = nullptr;
     Gtk::RadioMenuItem* ratio_off_item_ = nullptr;
     Gtk::ScrolledWindow* scroll_ = nullptr;
@@ -587,7 +588,7 @@ void MainWindow::Impl::updateStats()
     if (auto const pch = gtr_pref_string_get(TR_KEY_statusbar_stats); pch == "session-ratio")
     {
         tr_sessionGetStats(session, &stats);
-        buf = fmt::format(_("Ratio: {ratio}"), tr_strlratio(stats.ratio));
+        buf = fmt::format(_("Ratio: {ratio}"), fmt::arg("ratio", tr_strlratio(stats.ratio)));
     }
     else if (pch == "session-transfer")
     {
@@ -634,10 +635,10 @@ void MainWindow::Impl::updateSpeeds()
             up_speed += row.get_value(torrent_cols.speed_up);
         }
 
-        dl_lb_->set_text(fmt::format(_("{download_speed} ▼"), fmt::arg("download_speed", dn_speed)));
+        dl_lb_->set_text(fmt::format(_("{download_speed} ▼"), fmt::arg("download_speed", tr_formatter_speed_KBps(dn_speed))));
         dl_lb_->set_visible(dn_count > 0);
 
-        ul_lb_->set_text(fmt::format(_("{upload_speed} ▲"), fmt::arg("upload_speed", up_speed)));
+        ul_lb_->set_text(fmt::format(_("{upload_speed} ▲"), fmt::arg("upload_speed", tr_formatter_speed_KBps(up_speed))));
         ul_lb_->set_visible(dn_count > 0 || up_count > 0);
     }
 }

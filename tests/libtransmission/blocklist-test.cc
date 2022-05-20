@@ -7,11 +7,13 @@
 // #include <unistd.h> // sync()
 
 #include "transmission.h"
+
 #include "blocklist.h"
 #include "file.h"
-#include "peer-socket.h"
 #include "net.h"
+#include "peer-socket.h"
 #include "session.h" // tr_sessionIsAddressBlocked()
+#include "tr-strbuf.h"
 #include "utils.h"
 
 #include "test-fixtures.h"
@@ -44,11 +46,11 @@ protected:
     void createFileWithContents(char const* path, char const* contents)
     {
         auto const dir = tr_sys_path_dirname(path);
-        tr_sys_dir_create(dir.c_str(), TR_SYS_DIR_CREATE_PARENTS, 0700, nullptr);
+        tr_sys_dir_create(dir.c_str(), TR_SYS_DIR_CREATE_PARENTS, 0700);
 
-        auto const fd = tr_sys_file_open(path, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_TRUNCATE, 0600, nullptr);
+        auto const fd = tr_sys_file_open(path, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_TRUNCATE, 0600);
         blockingFileWrite(fd, contents, strlen(contents));
-        tr_sys_file_close(fd, nullptr);
+        tr_sys_file_close(fd);
 
         sync();
     }
@@ -67,7 +69,7 @@ TEST_F(BlocklistTest, parsing)
     EXPECT_EQ(0, tr_blocklistGetRuleCount(session_));
 
     // init the blocklist
-    auto const path = tr_strvPath(tr_sessionGetConfigDir(session_), "blocklists", "level1");
+    auto const path = tr_pathbuf{ tr_sessionGetConfigDir(session_), "/blocklists/level1" };
     createFileWithContents(path, Contents1);
     tr_sessionReloadBlocklists(session_);
     EXPECT_TRUE(tr_blocklistExists(session_));
@@ -103,7 +105,7 @@ TEST_F(BlocklistTest, parsing)
 TEST_F(BlocklistTest, updating)
 {
     // init the session
-    auto const path = tr_strvPath(tr_sessionGetConfigDir(session_), "blocklists", "level1");
+    auto const path = tr_pathbuf{ tr_sessionGetConfigDir(session_), "/blocklists/level1" };
 
     // no blocklist to start with...
     EXPECT_EQ(0, tr_blocklistGetRuleCount(session_));

@@ -140,7 +140,8 @@
             }
             else
             {
-                peerString = [NSString stringWithFormat:NSLocalizedString(@"got %d peers", "Tracker last announce"), self.fStat.lastAnnouncePeerCount];
+                peerString = [NSString stringWithFormat:NSLocalizedString(@"got %lu peers", "Tracker last announce"),
+                                                        (size_t)self.fStat.lastAnnouncePeerCount];
             }
             baseString = [baseString stringByAppendingFormat:@" (%@)", peerString];
         }
@@ -177,7 +178,7 @@
 
     case TR_TRACKER_INACTIVE:
         return self.fStat.isBackup ? NSLocalizedString(@"Tracker will be used as a backup", "Tracker next announce") :
-                                NSLocalizedString(@"Announce not scheduled", "Tracker next announce");
+                                     NSLocalizedString(@"Announce not scheduled", "Tracker next announce");
 
     default:
         NSAssert1(NO, @"unknown announce state: %d", self.fStat.announceState);

@@ -10,7 +10,6 @@
 #include <type_traits>
 
 #ifdef _WIN32
-#include <inttypes.h>
 #include <ws2tcpip.h>
 using in_port_t = uint16_t; /* all missing */
 #else
@@ -24,7 +23,7 @@ using in_port_t = uint16_t; /* all missing */
 #include <event2/event.h>
 #include <event2/util.h>
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 
 #include "transmission.h"
 
@@ -32,10 +31,12 @@ using in_port_t = uint16_t; /* all missing */
 #include "net.h"
 #include "peer-mgr.h" /* tr_peerMgrAddPex() */
 #include "session.h"
-#include "torrent.h" /* tr_torrentFindFromHash() */
+#include "torrent.h"
 #include "tr-assert.h"
 #include "tr-lpd.h"
 #include "utils.h"
+
+using namespace std::literals;
 
 static auto constexpr SIZEOF_HASH_STRING = TR_SHA1_DIGEST_STRLEN;
 
@@ -201,27 +202,16 @@ static bool lpd_extractParam(char const* const str, char const* const name, int 
     TR_ASSERT(name != nullptr);
     TR_ASSERT(val != nullptr);
 
-    /* configure maximum length of search string here */
-    auto constexpr MaxLength = int{ 30 };
+    auto const key = tr_strbuf<char, 30>{ CRLF, name, ": "sv };
 
-    char sstr[MaxLength] = { 0 };
-
-    if (strlen(name) > MaxLength - strlen(CRLF ": "))
-    {
-        return false;
-    }
-
-    /* compose the string token to search for */
-    tr_snprintf(sstr, MaxLength, CRLF "%s: ", name);
-
-    char const* const pos = strstr(str, sstr);
+    char const* const pos = strstr(str, key);
     if (pos == nullptr)
     {
         return false; /* search was not successful */
     }
 
     {
-        char const* const beg = pos + strlen(sstr);
+        char const* const beg = pos + std::size(key);
         char const* const new_line = strstr(beg, CRLF);
 
         /* the value is delimited by the next CRLF */
@@ -273,9 +263,8 @@ int tr_lpdInit(tr_session* ss, tr_address* /*tr_addr*/)
     TR_ASSERT(lpd_announceInterval > 0);
     TR_ASSERT(lpd_announceScope > 0);
 
-    lpd_port = tr_sessionGetPeerPort(ss);
-
-    if (lpd_port <= 0)
+    lpd_port = ss->peerPort();
+    if (std::empty(lpd_port))
     {
         return -1;
     }
@@ -371,7 +360,7 @@ int tr_lpdInit(tr_session* ss, tr_address* /*tr_addr*/)
     event_add(lpd_event, nullptr);
 
     upkeep_timer = evtimer_new(ss->event_base, on_upkeep_timer, ss);
-    tr_timerAdd(upkeep_timer, UpkeepIntervalSecs, 0);
+    tr_timerAdd(*upkeep_timer, UpkeepIntervalSecs, 0);
 
     tr_logAddDebug("Local Peer Discovery initialised");
 
@@ -417,11 +406,6 @@ void tr_lpdUninit(tr_session* ss)
     session = nullptr;
 }
 
-bool tr_lpdEnabled(tr_session const* ss)
-{
-    return ss != nullptr && ss == session;
-}
-
 /**
 * @endcond */
 
@@ -442,38 +426,33 @@ bool tr_lpdEnabled(tr_session const* ss)
 */
 bool tr_lpdSendAnnounce(tr_torrent const* t)
 {
-    char constexpr fmt[] = //
-        "BT-SEARCH * HTTP/%u.%u" CRLF //
-        "Host: %s:%u" CRLF //
-        "Port: %u" CRLF //
-        "Infohash: %s" CRLF //
-        "" CRLF //
-        "" CRLF;
-
     if (t == nullptr)
     {
         return false;
     }
 
-    /* ensure the hash string is capitalized */
-    auto const hash_string = tr_strupper(t->infoHashString());
+    auto const query = fmt::format(
+        FMT_STRING("BT-SEARCH * HTTP/{:d}.{:d}" CRLF "Host: {:s}:{:d}" CRLF "Port: {:d}" CRLF "Infohash: {:s}" CRLF CRLF CRLF),
+        1,
+        1,
+        lpd_mcastGroup,
+        lpd_mcastPort,
+        lpd_port.host(),
+        tr_strupper(t->infoHashString()));
 
-    /* prepare a zero-terminated announce message */
-    char query[lpd_maxDatagramLength + 1] = { 0 };
-    tr_snprintf(query, lpd_maxDatagramLength + 1, fmt, 1, 1, lpd_mcastGroup, lpd_mcastPort, lpd_port, hash_string.c_str());
-
-    /* actually send the query out using [lpd_socket2] */
+    // send the query out using [lpd_socket2]
+    // destination address info has already been set up in tr_lpdInit(),
+    // so we refrain from preparing another sockaddr_in here
+    if (auto const res = sendto(
+            lpd_socket2,
+            std::data(query),
+            std::size(query),
+            0,
+            (struct sockaddr const*)&lpd_mcastAddr,
+            sizeof(lpd_mcastAddr));
+        res != static_cast<int>(std::size(query)))
     {
-        int const len = strlen(query);
-
-        /* destination address info has already been set up in tr_lpdInit(),
-         * so we refrain from preparing another sockaddr_in here */
-        int const res = sendto(lpd_socket2, query, len, 0, (struct sockaddr const*)&lpd_mcastAddr, sizeof(lpd_mcastAddr));
-
-        if (res != len)
-        {
-            return false;
-        }
+        return false;
     }
 
     tr_logAddTraceTor(t, "LPD announce message away");
@@ -485,7 +464,7 @@ bool tr_lpdSendAnnounce(tr_torrent const* t)
 * @brief Process incoming unsolicited messages and add the peer to the announced
 * torrent if all checks are passed.
 *
-* @param[in,out] peer Adress information of the peer to add
+* @param[in,out] peer Address information of the peer to add
 * @param[in] msg The announcement message to consider
 * @return Returns 0 if any input parameter or the announce was invalid, 1 if the peer
 * was successfully added, -1 if not; a non-null return value indicates a side-effect to
@@ -504,7 +483,6 @@ static int tr_lpdConsiderAnnounce(tr_pex* peer, char const* const msg)
     char value[MaxValueLen] = { 0 };
     char hashString[MaxHashLen] = { 0 };
     int res = 0;
-    int peerPort = 0;
 
     if (peer != nullptr && msg != nullptr)
     {
@@ -525,12 +503,13 @@ static int tr_lpdConsiderAnnounce(tr_pex* peer, char const* const msg)
         }
 
         /* determine announced peer port, refuse if value too large */
-        if (sscanf(value, "%d", &peerPort) != 1 || peerPort > (in_port_t)-1)
+        int peer_port = 0;
+        if (sscanf(value, "%d", &peer_port) != 1 || peer_port > (in_port_t)-1)
         {
             return 0;
         }
 
-        peer->port = htons(peerPort);
+        peer->port.setHost(peer_port);
         res = -1; /* signal caller side-effect to peer->port via return != 0 */
 
         if (!lpd_extractParam(params, "Infohash", MaxHashLen, hashString))
@@ -544,14 +523,16 @@ static int tr_lpdConsiderAnnounce(tr_pex* peer, char const* const msg)
         {
             /* we found a suitable peer, add it to the torrent */
             tr_peerMgrAddPex(tor, TR_PEER_FROM_LPD, peer, 1);
-            tr_logAddDebugTor(tor, fmt::format("Found a local peer from LPD ({})", peer->addr.to_string(peerPort)));
+            tr_logAddDebugTor(
+                tor,
+                fmt::format(FMT_STRING("Found a local peer from LPD ({:s})"), peer->addr.readable(peer->port)));
 
             /* periodic reconnectPulse() deals with the rest... */
 
             return 1;
         }
 
-        tr_logAddDebug(fmt::format("Cannot serve torrent #{}", hashString));
+        tr_logAddDebug(fmt::format(FMT_STRING("Cannot serve torrent #{:s}"), hashString));
     }
 
     return res;
@@ -641,7 +622,7 @@ static void on_upkeep_timer(evutil_socket_t /*s*/, short /*type*/, void* /*user_
 {
     time_t const now = tr_time();
     tr_lpdAnnounceMore(now, UpkeepIntervalSecs);
-    tr_timerAdd(upkeep_timer, UpkeepIntervalSecs, 0);
+    tr_timerAdd(*upkeep_timer, UpkeepIntervalSecs, 0);
 }
 
 /**

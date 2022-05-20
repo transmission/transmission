@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <cstdint> // uint32_t, uint64_t
 #include <ctime>
 #include <string>
 #include <string_view>
@@ -14,13 +15,15 @@
 
 #include "block-info.h"
 #include "magnet-metainfo.h"
+#include "torrent-files.h"
+#include "tr-strbuf.h"
 
 struct tr_error;
 
 struct tr_torrent_metainfo : public tr_magnet_metainfo
 {
 public:
-    [[nodiscard]] auto empty() const
+    [[nodiscard]] constexpr auto empty() const noexcept
     {
         return std::empty(files_);
     }
@@ -33,14 +36,37 @@ public:
     // load multiple files.
     bool parseTorrentFile(std::string_view benc_filename, std::vector<char>* buffer = nullptr, tr_error** error = nullptr);
 
+    // FILES
+
+    [[nodiscard]] constexpr auto const& files() const noexcept
+    {
+        return files_;
+    }
+    [[nodiscard]] auto fileCount() const noexcept
+    {
+        return files().fileCount();
+    }
+    [[nodiscard]] auto fileSize(tr_file_index_t i) const
+    {
+        return files().fileSize(i);
+    }
+    [[nodiscard]] auto const& fileSubpath(tr_file_index_t i) const
+    {
+        return files().path(i);
+    }
+    void setFileSubpath(tr_file_index_t i, std::string_view subpath)
+    {
+        files_.setPath(i, subpath);
+    }
+
     /// BLOCK INFO
 
-    [[nodiscard]] constexpr auto const& blockInfo() const
+    [[nodiscard]] constexpr auto const& blockInfo() const noexcept
     {
         return block_info_;
     }
 
-    [[nodiscard]] constexpr auto blockCount() const
+    [[nodiscard]] constexpr auto blockCount() const noexcept
     {
         return blockInfo().blockCount();
     }
@@ -56,95 +82,88 @@ public:
     {
         return blockInfo().pieceLoc(piece, offset, length);
     }
-    [[nodiscard]] constexpr auto blockSize(tr_block_index_t block) const
+    [[nodiscard]] constexpr auto blockSize(tr_block_index_t block) const noexcept
     {
         return blockInfo().blockSize(block);
     }
-    [[nodiscard]] constexpr auto blockSpanForPiece(tr_piece_index_t piece) const
+    [[nodiscard]] auto blockSpanForPiece(tr_piece_index_t piece) const
     {
         return blockInfo().blockSpanForPiece(piece);
     }
-    [[nodiscard]] constexpr auto pieceCount() const
+    [[nodiscard]] constexpr auto pieceCount() const noexcept
     {
         return blockInfo().pieceCount();
     }
-    [[nodiscard]] constexpr auto pieceSize() const
+    [[nodiscard]] constexpr auto pieceSize() const noexcept
     {
         return blockInfo().pieceSize();
     }
-    [[nodiscard]] constexpr auto pieceSize(tr_piece_index_t piece) const
+    [[nodiscard]] constexpr auto pieceSize(tr_piece_index_t piece) const noexcept
     {
         return blockInfo().pieceSize(piece);
     }
-    [[nodiscard]] constexpr auto totalSize() const
+    [[nodiscard]] constexpr auto totalSize() const noexcept
     {
         return blockInfo().totalSize();
     }
 
-    [[nodiscard]] auto const& comment() const
+    // OTHER PROPERTIES
+
+    [[nodiscard]] constexpr auto const& comment() const noexcept
     {
         return comment_;
     }
-    [[nodiscard]] auto const& creator() const
+    [[nodiscard]] constexpr auto const& creator() const noexcept
     {
         return creator_;
     }
-    [[nodiscard]] auto const& source() const
+    [[nodiscard]] constexpr auto const& source() const noexcept
     {
         return source_;
     }
 
-    [[nodiscard]] auto fileCount() const
-    {
-        return std::size(files_);
-    }
-
-    [[nodiscard]] std::string const& fileSubpath(tr_file_index_t i) const;
-
-    void setFileSubpath(tr_file_index_t i, std::string_view subpath);
-
-    [[nodiscard]] uint64_t fileSize(tr_file_index_t i) const;
-
-    [[nodiscard]] auto const& isPrivate() const
+    [[nodiscard]] constexpr auto const& isPrivate() const noexcept
     {
         return is_private_;
     }
 
     [[nodiscard]] tr_sha1_digest_t const& pieceHash(tr_piece_index_t piece) const;
 
-    [[nodiscard]] auto const& dateCreated() const
+    [[nodiscard]] constexpr auto const& dateCreated() const noexcept
     {
         return date_created_;
     }
 
     [[nodiscard]] std::string benc() const;
 
-    [[nodiscard]] auto infoDictSize() const
+    [[nodiscard]] constexpr auto infoDictSize() const noexcept
     {
         return info_dict_size_;
     }
 
-    [[nodiscard]] auto infoDictOffset() const
+    [[nodiscard]] constexpr auto infoDictOffset() const noexcept
     {
         return info_dict_offset_;
     }
 
-    [[nodiscard]] auto piecesOffset() const
+    [[nodiscard]] constexpr auto piecesOffset() const noexcept
     {
         return pieces_offset_;
     }
 
-    [[nodiscard]] std::string torrentFile(std::string_view torrent_dir) const
+    // UTILS
+
+    [[nodiscard]] auto torrentFile(std::string_view torrent_dir) const
     {
         return makeFilename(torrent_dir, name(), infoHashString(), BasenameFormat::Hash, ".torrent");
     }
 
-    [[nodiscard]] std::string magnetFile(std::string_view torrent_dir) const
+    [[nodiscard]] auto magnetFile(std::string_view torrent_dir) const
     {
         return makeFilename(torrent_dir, name(), infoHashString(), BasenameFormat::Hash, ".magnet");
     }
 
-    [[nodiscard]] std::string resumeFile(std::string_view resume_dir) const
+    [[nodiscard]] auto resumeFile(std::string_view resume_dir) const
     {
         return makeFilename(resume_dir, name(), infoHashString(), BasenameFormat::Hash, ".resume");
     }
@@ -176,55 +195,23 @@ private:
         NameAndPartialHash
     };
 
-    static std::string makeFilename(
+    [[nodiscard]] static tr_pathbuf makeFilename(
         std::string_view dirname,
         std::string_view name,
         std::string_view info_hash_string,
         BasenameFormat format,
         std::string_view suffix);
 
-    [[nodiscard]] std::string makeFilename(std::string_view dirname, BasenameFormat format, std::string_view suffix) const
+    auto makeFilename(std::string_view dirname, BasenameFormat format, std::string_view suffix) const
     {
         return makeFilename(dirname, name(), infoHashString(), format, suffix);
     }
 
-    struct file_t
-    {
-    public:
-        [[nodiscard]] std::string const& path() const
-        {
-            return path_;
-        }
-
-        void setSubpath(std::string&& subpath)
-        {
-            path_ = std::move(subpath);
-        }
-
-        void setSubpath(std::string_view subpath)
-        {
-            path_ = subpath;
-        }
-
-        [[nodiscard]] uint64_t size() const
-        {
-            return size_;
-        }
-
-        file_t(std::string_view path, uint64_t size)
-            : path_{ path }
-            , size_{ size }
-        {
-        }
-
-        std::string path_;
-        uint64_t size_ = 0;
-    };
-
     tr_block_info block_info_ = tr_block_info{ 0, 0 };
 
+    tr_torrent_files files_;
+
     std::vector<tr_sha1_digest_t> pieces_;
-    std::vector<file_t> files_;
 
     std::string comment_;
     std::string creator_;

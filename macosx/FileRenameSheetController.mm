@@ -18,7 +18,6 @@ typedef void (^CompletionBlock)(BOOL);
 
 @property(nonatomic) Torrent* torrent;
 @property(nonatomic) FileListNode* node;
-@property(nonatomic, copy) CompletionBlock completionHandler;
 
 @property(nonatomic, copy) NSString* originalName;
 
@@ -36,11 +35,8 @@ typedef void (^CompletionBlock)(BOOL);
     FileRenameSheetController* renamer = [[FileRenameSheetController alloc] initWithWindowNibName:@"FileRenameSheetController"];
 
     renamer.torrent = torrent;
-    renamer.completionHandler = completionHandler;
 
-    [NSApp beginSheet:renamer.window modalForWindow:window modalDelegate:self
-        didEndSelector:@selector(sheetDidEnd:returnCode:contextInfo:)
-           contextInfo:(__bridge_retained void*)(renamer)];
+    [self presentSheetForRenamer:renamer modalForWindow:window completionHandler:completionHandler];
 }
 
 + (void)presentSheetForFileListNode:(FileListNode*)node
@@ -54,21 +50,19 @@ typedef void (^CompletionBlock)(BOOL);
 
     renamer.torrent = node.torrent;
     renamer.node = node;
-    renamer.completionHandler = completionHandler;
 
-    [NSApp beginSheet:renamer.window modalForWindow:window modalDelegate:self
-        didEndSelector:@selector(sheetDidEnd:returnCode:contextInfo:)
-           contextInfo:(__bridge_retained void*)(renamer)];
+    [self presentSheetForRenamer:renamer modalForWindow:window completionHandler:completionHandler];
 }
 
-+ (void)sheetDidEnd:(NSWindow*)sheet returnCode:(NSInteger)returnCode contextInfo:(void*)contextInfo
++ (void)presentSheetForRenamer:(FileRenameSheetController*)renamer
+                modalForWindow:(NSWindow*)window
+             completionHandler:(void (^)(BOOL))completionHandler
 {
-    FileRenameSheetController* renamer = (__bridge_transfer FileRenameSheetController*)(contextInfo);
-    NSParameterAssert([renamer isKindOfClass:[FileRenameSheetController class]]);
+    [window beginSheet:renamer.window completionHandler:^(NSModalResponse returnCode) {
+        completionHandler(returnCode == NSModalResponseOK);
 
-    renamer.completionHandler(returnCode == NSModalResponseOK);
-
-    [sheet orderOut:self];
+        [renamer.window orderOut:self];
+    }];
 }
 
 - (void)windowDidLoad

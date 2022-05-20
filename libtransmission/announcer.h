@@ -10,6 +10,7 @@
 #endif
 
 #include <cstddef> // size_t
+#include <cstdint> // uint32_t
 #include <ctime>
 #include <string_view>
 #include <vector>
@@ -36,7 +37,7 @@ enum TrackerEventType
 
 struct tr_pex;
 
-/** @brief Notification object to tell listeners about announce or scrape occurences */
+/** @brief Notification object to tell listeners about announce or scrape occurrences */
 struct tr_tracker_event
 {
     /* what type of event this is */

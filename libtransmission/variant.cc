@@ -3,18 +3,8 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#if defined(HAVE_USELOCALE) && (!defined(_XOPEN_SOURCE) || _XOPEN_SOURCE < 700)
-#undef _XOPEN_SOURCE
-#define XOPEN_SOURCE 700 // NOLINT
-#endif
-
-#if defined(HAVE_USELOCALE) && !defined(_GNU_SOURCE)
-#define _GNU_SOURCE
-#endif
-
 #include <algorithm> // std::sort
 #include <cerrno>
-#include <cstdlib> /* strtod() */
 #include <cstring>
 #include <stack>
 #include <string>
@@ -23,12 +13,6 @@
 
 #ifdef _WIN32
 #include <share.h>
-#endif
-
-#include <clocale> /* setlocale() */
-
-#if defined(HAVE_USELOCALE) && defined(HAVE_XLOCALE_H)
-#include <xlocale.h>
 #endif
 
 #include <event2/buffer.h>
@@ -48,69 +32,7 @@
 #include "variant-common.h"
 #include "variant.h"
 
-/* don't use newlocale/uselocale on old versions of uClibc because they're buggy.
- * https://trac.transmissionbt.com/ticket/6006 */
-#if defined(__UCLIBC__) && !TR_UCLIBC_CHECK_VERSION(0, 9, 34)
-#undef HAVE_USELOCALE
-#endif
-
-/**
-***
-**/
-
 using namespace std::literals;
-
-struct locale_context
-{
-#ifdef HAVE_USELOCALE
-    locale_t new_locale;
-    locale_t old_locale;
-#else
-#if defined(HAVE__CONFIGTHREADLOCALE) && defined(_ENABLE_PER_THREAD_LOCALE)
-    int old_thread_config;
-#endif
-    int category;
-    char old_locale[128];
-#endif
-};
-
-static void use_numeric_locale(struct locale_context* context, char const* locale_name)
-{
-#ifdef HAVE_USELOCALE
-
-    context->new_locale = newlocale(LC_NUMERIC_MASK, locale_name, nullptr);
-    context->old_locale = uselocale(context->new_locale);
-
-#else
-
-#if defined(HAVE__CONFIGTHREADLOCALE) && defined(_ENABLE_PER_THREAD_LOCALE)
-    context->old_thread_config = _configthreadlocale(_ENABLE_PER_THREAD_LOCALE);
-#endif
-
-    context->category = LC_NUMERIC;
-    tr_strlcpy(context->old_locale, setlocale(context->category, nullptr), sizeof(context->old_locale));
-    setlocale(context->category, locale_name);
-
-#endif
-}
-
-static void restore_locale(struct locale_context* context)
-{
-#ifdef HAVE_USELOCALE
-
-    uselocale(context->old_locale);
-    freelocale(context->new_locale);
-
-#else
-
-    setlocale(context->category, context->old_locale);
-
-#if defined(HAVE__CONFIGTHREADLOCALE) && defined(_ENABLE_PER_THREAD_LOCALE)
-    _configthreadlocale(context->old_thread_config);
-#endif
-
-#endif
-}
 
 /***
 ****
@@ -392,17 +314,13 @@ bool tr_variantGetReal(tr_variant const* v, double* setme)
 
     if (!success && tr_variantIsString(v))
     {
-        /* the json spec requires a '.' decimal point regardless of locale */
-        struct locale_context locale_ctx;
-        use_numeric_locale(&locale_ctx, "C");
-        char* endptr = nullptr;
-        double const d = strtod(getStr(v), &endptr);
-        restore_locale(&locale_ctx);
-
-        if (getStr(v) != endptr && *endptr == '\0')
+        if (auto sv = std::string_view{}; tr_variantGetStrView(v, &sv))
         {
-            *setme = d;
-            success = true;
+            if (auto d = tr_parseNum<double>(sv); d)
+            {
+                *setme = *d;
+                success = true;
+            }
         }
     }
 
@@ -1173,11 +1091,7 @@ void tr_variantMergeDicts(tr_variant* target, tr_variant const* source)
 
 struct evbuffer* tr_variantToBuf(tr_variant const* v, tr_variant_fmt fmt)
 {
-    struct locale_context locale_ctx;
     struct evbuffer* buf = evbuffer_new();
-
-    /* parse with LC_NUMERIC="C" to ensure a "." decimal separator */
-    use_numeric_locale(&locale_ctx, "C");
 
     evbuffer_expand(buf, 4096); /* alloc a little memory to start off with */
 
@@ -1196,23 +1110,27 @@ struct evbuffer* tr_variantToBuf(tr_variant const* v, tr_variant_fmt fmt)
         break;
     }
 
-    /* restore the previous locale */
-    restore_locale(&locale_ctx);
     return buf;
 }
 
 std::string tr_variantToStr(tr_variant const* v, tr_variant_fmt fmt)
 {
-    return evbuffer_free_to_str(tr_variantToBuf(v, fmt));
+    auto* const buf = tr_variantToBuf(v, fmt);
+    auto const n = evbuffer_get_length(buf);
+    auto str = std::string{};
+    str.resize(n);
+    evbuffer_copyout(buf, std::data(str), n);
+    evbuffer_free(buf);
+    return str;
 }
 
-int tr_variantToFile(tr_variant const* v, tr_variant_fmt fmt, std::string const& filename)
+int tr_variantToFile(tr_variant const* v, tr_variant_fmt fmt, std::string_view filename)
 {
     auto error_code = int{ 0 };
     auto const contents = tr_variantToStr(v, fmt);
 
     tr_error* error = nullptr;
-    tr_saveFile(filename, { std::data(contents), std::size(contents) }, &error);
+    tr_saveFile(filename, contents, &error);
     if (error != nullptr)
     {
         tr_logAddError(fmt::format(
@@ -1236,39 +1154,26 @@ bool tr_variantFromBuf(tr_variant* setme, int opts, std::string_view buf, char c
     // supported formats: benc, json
     TR_ASSERT((opts & (TR_VARIANT_PARSE_BENC | TR_VARIANT_PARSE_JSON)) != 0);
 
-    // parse with LC_NUMERIC="C" to ensure a "." decimal separator
-    auto locale_ctx = locale_context{};
-    use_numeric_locale(&locale_ctx, "C");
+    *setme = {};
 
-    auto success = bool{};
-    if ((opts & TR_VARIANT_PARSE_BENC) != 0)
-    {
-        success = tr_variantParseBenc(*setme, opts, buf, setme_end, error);
-    }
-    else
-    {
-        // TODO: tr_variantParseJson() should take a tr_error* same as ParseBenc
-        auto err = tr_variantParseJson(*setme, opts, buf, setme_end);
-        if (err != 0)
-        {
-            tr_error_set(error, EILSEQ, "error parsing encoded data"sv);
-        }
-        success = err == 0;
-    }
+    auto const success = ((opts & TR_VARIANT_PARSE_BENC) != 0) ? tr_variantParseBenc(*setme, opts, buf, setme_end, error) :
+                                                                 tr_variantParseJson(*setme, opts, buf, setme_end, error);
 
-    /* restore the previous locale */
-    restore_locale(&locale_ctx);
+    if (!success)
+    {
+        tr_variantFree(setme);
+    }
 
     return success;
 }
 
-bool tr_variantFromFile(tr_variant* setme, tr_variant_parse_opts opts, std::string const& filename, tr_error** error)
+bool tr_variantFromFile(tr_variant* setme, tr_variant_parse_opts opts, std::string_view filename, tr_error** error)
 {
     // can't do inplace when this function is allocating & freeing the memory...
     TR_ASSERT((opts & TR_VARIANT_PARSE_INPLACE) == 0);
 
     auto buf = std::vector<char>{};
-    if (!tr_loadFile(buf, filename, error))
+    if (!tr_loadFile(filename, buf, error))
     {
         return false;
     }

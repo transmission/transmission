@@ -6,9 +6,11 @@
 #include <algorithm>
 #include <array>
 #include <cstring>
-#include <cctype> // isxdigit()
+#include <iterator> // back_inserter
 #include <string>
 #include <string_view>
+
+#include <fmt/format.h>
 
 #include "transmission.h"
 
@@ -116,7 +118,11 @@ std::optional<tr_sha1_digest_t> parseBase32Hash(std::string_view sv)
         return {};
     }
 
-    if (!std::all_of(std::begin(sv), std::end(sv), [](unsigned char ch) { return bitzi::Base32Lookup[ch] - '0' != 0xFF; }))
+    if (!std::all_of(
+            std::begin(sv),
+            std::end(sv),
+            [](unsigned char ch)
+            { return '0' <= ch && ch < '0' + std::size(bitzi::Base32Lookup) && bitzi::Base32Lookup[ch - '0'] != 0xFF; }))
     {
         return {};
     }
@@ -151,29 +157,26 @@ std::optional<tr_sha1_digest_t> parseHash(std::string_view sv)
 ****
 ***/
 
-std::string tr_magnet_metainfo::magnet() const
+tr_urlbuf tr_magnet_metainfo::magnet() const
 {
-    auto s = std::string{};
-
-    s += "magnet:?xt=urn:btih:"sv;
-    s += infoHashString();
+    auto s = tr_urlbuf{ "magnet:?xt=urn:btih:"sv, infoHashString() };
 
     if (!std::empty(name_))
     {
         s += "&dn="sv;
-        tr_http_escape(s, name_, true);
+        tr_http_escape(std::back_inserter(s), name_, true);
     }
 
     for (auto const& tracker : this->announceList())
     {
         s += "&tr="sv;
-        tr_http_escape(s, tracker.announce.full, true);
+        tr_http_escape(std::back_inserter(s), tracker.announce.sv(), true);
     }
 
     for (auto const& webseed : webseed_urls_)
     {
         s += "&ws="sv;
-        tr_http_escape(s, webseed, true);
+        tr_http_escape(std::back_inserter(s), webseed, true);
     }
 
     return s;
@@ -201,7 +204,7 @@ bool tr_magnet_metainfo::parseMagnet(std::string_view magnet_link, tr_error** er
     magnet_link = tr_strvStrip(magnet_link);
     if (auto const hash = parseHash(magnet_link); hash)
     {
-        return parseMagnet(tr_strvJoin("magnet:?xt=urn:btih:", tr_sha1_to_string(*hash)));
+        return parseMagnet(fmt::format(FMT_STRING("magnet:?xt=urn:btih:{:s}"), tr_sha1_to_string(*hash)));
     }
 
     auto const parsed = tr_urlParse(magnet_link);
@@ -232,7 +235,7 @@ bool tr_magnet_metainfo::parseMagnet(std::string_view magnet_link, tr_error** er
                 this->webseed_urls_.emplace_back(url_sv);
             }
         }
-        else if (auto constexpr ValPrefix = "urn:btih:"sv; key == "xt"sv && tr_strvStartsWith(value, ValPrefix))
+        else if (static auto constexpr ValPrefix = "urn:btih:"sv; key == "xt"sv && tr_strvStartsWith(value, ValPrefix))
         {
             if (auto const hash = parseHash(value.substr(std::size(ValPrefix))); hash)
             {

@@ -24,9 +24,7 @@
 
 - (instancetype)initWithLib:(tr_session*)lib forWindow:(NSWindow*)window
 {
-    if ((self = ([super initWithContentRect:window.frame
-                                  styleMask:NSWindowStyleMaskBorderless
-                                    backing:NSBackingStoreBuffered
+    if ((self = ([super initWithContentRect:window.frame styleMask:NSWindowStyleMaskBorderless backing:NSBackingStoreBuffered
                                       defer:NO])))
     {
         _fLib = lib;
@@ -70,10 +68,10 @@
 - (void)setTorrents:(NSArray*)files
 {
     uint64_t size = 0;
-    NSInteger count = 0;
+    NSUInteger count = 0;
 
     NSString* name;
-    NSInteger fileCount = 0;
+    NSUInteger fileCount = 0;
 
     for (NSString* file in files)
     {
@@ -113,8 +111,7 @@
         }
         else
         {
-            fileString = [NSString stringWithFormat:NSLocalizedString(@"%@ files", "Drag overlay -> torrents"),
-                                                    [NSString formattedUInteger:fileCount]];
+            fileString = [NSString stringWithFormat:NSLocalizedString(@"%lu files", "Drag overlay -> torrents"), fileCount];
         }
         secondString = [NSString stringWithFormat:@"%@, %@", fileString, secondString];
     }
@@ -126,8 +123,7 @@
     }
     else
     {
-        name = [NSString stringWithFormat:NSLocalizedString(@"%@ Torrent Files", "Drag overlay -> torrents"),
-                                          [NSString formattedUInteger:count]];
+        name = [NSString stringWithFormat:NSLocalizedString(@"%lu Torrent Files", "Drag overlay -> torrents"), count];
         secondString = [secondString stringByAppendingString:@" total"];
         icon = [NSImage imageNamed:@"TransmissionDocument.icns"];
     }

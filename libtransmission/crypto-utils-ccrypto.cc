@@ -66,7 +66,7 @@ char const* ccrypto_error_to_str(CCCryptorStatus error_code)
         return "Illegal parameter value";
 
     case kCCBufferTooSmall:
-        return "Insufficent buffer provided for specified operation";
+        return "Insufficient buffer provided for specified operation";
 
     case kCCMemoryFailure:
         return "Memory allocation failure";

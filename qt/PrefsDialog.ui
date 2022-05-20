@@ -411,7 +411,7 @@
          <item row="1" column="0">
           <widget class="QLabel" name="queueStalledMinutesLabel">
            <property name="text">
-            <string extracomment="Please keep this phrase as short as possible, it's curently the longest and influences dialog width">Download is i&amp;nactive if data sharing stopped:</string>
+            <string extracomment="Please keep this phrase as short as possible, it's currently the longest and influences dialog width">Download is i&amp;nactive if data sharing stopped:</string>
            </property>
            <property name="buddy">
             <cstring>queueStalledMinutesSpin</cstring>

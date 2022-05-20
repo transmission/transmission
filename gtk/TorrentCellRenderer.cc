@@ -7,6 +7,7 @@
 #include <cstring> // strchr()
 #include <memory>
 #include <optional>
+#include <string>
 
 #include <glibmm.h>
 #include <glibmm/i18n.h>
@@ -53,7 +54,7 @@ auto getProgressString(tr_torrent const* tor, uint64_t total_size, tr_stat const
             _("{current_size} of {complete_size} ({percent_done}%)"),
             fmt::arg("current_size", tr_strlsize(haveTotal)),
             fmt::arg("complete_size", tr_strlsize(st->sizeWhenDone)),
-            fmt::arg("percent_done", tr_strlpercent(st->percentDone * 100.0)));
+            fmt::arg("percent_done", tr_strpercent(st->percentDone * 100.0)));
     }
     else if (!isSeed && hasSeedRatio) // partial seed, seed ratio
     {
@@ -62,7 +63,7 @@ auto getProgressString(tr_torrent const* tor, uint64_t total_size, tr_stat const
             _("{current_size} of {complete_size} ({percent_complete}%), uploaded {uploaded_size} (Ratio: {ratio}, Goal: {seed_ratio})"),
             fmt::arg("current_size", tr_strlsize(haveTotal)),
             fmt::arg("complete_size", tr_strlsize(total_size)),
-            fmt::arg("percent_done", tr_strlpercent(st->percentComplete * 100.0)),
+            fmt::arg("percent_complete", tr_strpercent(st->percentComplete * 100.0)),
             fmt::arg("uploaded_size", tr_strlsize(st->uploadedEver)),
             fmt::arg("ratio", tr_strlratio(st->ratio)),
             fmt::arg("seed_ratio", tr_strlratio(seedRatio)));
@@ -73,7 +74,7 @@ auto getProgressString(tr_torrent const* tor, uint64_t total_size, tr_stat const
             _("{current_size} of {complete_size} ({percent_complete}%), uploaded {uploaded_size} (Ratio: {ratio})"),
             fmt::arg("current_size", tr_strlsize(haveTotal)),
             fmt::arg("complete_size", tr_strlsize(total_size)),
-            fmt::arg("percent_complete", tr_strlpercent(st->percentComplete * 100.0)),
+            fmt::arg("percent_complete", tr_strpercent(st->percentComplete * 100.0)),
             fmt::arg("uploaded_size", tr_strlsize(st->uploadedEver)),
             fmt::arg("ratio", tr_strlratio(st->ratio)));
     }
@@ -125,14 +126,14 @@ std::string getShortTransferString(
     if (bool const have_down = have_meta && (st->peersSendingToUs > 0 || st->webseedsSendingToUs > 0); have_down)
     {
         return fmt::format(
-            _("{upload_speed} ▲ {download_speed} ▼"),
-            tr_formatter_speed_KBps(downloadSpeed_KBps),
-            tr_formatter_speed_KBps(uploadSpeed_KBps));
+            _("{download_speed} ▼  {upload_speed} ▲"),
+            fmt::arg("upload_speed", tr_formatter_speed_KBps(uploadSpeed_KBps)),
+            fmt::arg("download_speed", tr_formatter_speed_KBps(downloadSpeed_KBps)));
     }
 
     if (bool const have_up = have_meta && st->peersGettingFromUs > 0; have_up)
     {
-        return fmt::format(_("{upload_speed} ▲"), tr_formatter_speed_KBps(downloadSpeed_KBps));
+        return fmt::format(_("{upload_speed} ▲"), fmt::arg("upload_speed", tr_formatter_speed_KBps(downloadSpeed_KBps)));
     }
 
     if (st->isStalled)
@@ -165,13 +166,13 @@ std::string getShortStatusString(
 
     case TR_STATUS_CHECK:
         return fmt::format(
-            _("Verifying local data ({percent_done:.1}% tested)"),
+            _("Verifying local data ({percent_done}% tested)"),
             fmt::arg("percent_done", tr_truncd(st->recheckProgress * 100.0, 1)));
 
     case TR_STATUS_DOWNLOAD:
     case TR_STATUS_SEED:
         return fmt::format(
-            "{} {}",
+            FMT_STRING("{:s} {:s}"),
             getShortTransferString(tor, st, uploadSpeed_KBps, downloadSpeed_KBps),
             fmt::format(_("Ratio: {ratio}"), fmt::arg("ratio", tr_strlratio(st->ratio))));
 
@@ -180,17 +181,15 @@ std::string getShortStatusString(
     }
 }
 
-static std::optional<std::string> getErrorString(tr_stat const* st)
+std::optional<std::string> getErrorString(tr_stat const* st)
 {
     switch (st->error)
     {
     case TR_STAT_TRACKER_WARNING:
         return fmt::format(_("Tracker warning: '{warning}'"), fmt::arg("warning", st->errorString));
-        break;
 
     case TR_STAT_TRACKER_ERROR:
         return fmt::format(_("Tracker Error: '{error}'"), fmt::arg("error", st->errorString));
-        break;
 
     case TR_STAT_LOCAL_ERROR:
         return fmt::format(_("Local error: '{error}'"), fmt::arg("error", st->errorString));
@@ -200,7 +199,7 @@ static std::optional<std::string> getErrorString(tr_stat const* st)
     }
 }
 
-static auto getActivityString(
+auto getActivityString(
     tr_torrent const* const tor,
     tr_stat const* const st,
     double const uploadSpeed_KBps,
@@ -224,7 +223,7 @@ static auto getActivityString(
                     "Downloading metadata from {active_count} connected peers ({percent_done:d}% done)",
                     st->peersConnected),
                 fmt::arg("active_count", st->peersConnected),
-                fmt::arg("percent_done", 100.0 * st->metadataPercentComplete));
+                fmt::arg("percent_done", tr_strpercent(st->metadataPercentComplete * 100.0)));
         }
 
         if (st->peersSendingToUs != 0 && st->webseedsSendingToUs != 0)
@@ -277,23 +276,14 @@ std::string getStatusString(
     double const uploadSpeed_KBps,
     double const downloadSpeed_KBps)
 {
-    auto status_str = std::string{};
-
-    if (auto error_string = getErrorString(st); error_string)
-    {
-        status_str = *error_string;
-    }
-    else
-    {
-        status_str = getActivityString(tor, st, uploadSpeed_KBps, downloadSpeed_KBps);
-    }
+    auto status_str = getErrorString(st).value_or(getActivityString(tor, st, uploadSpeed_KBps, downloadSpeed_KBps));
 
     if (st->activity != TR_STATUS_CHECK_WAIT && st->activity != TR_STATUS_CHECK && st->activity != TR_STATUS_DOWNLOAD_WAIT &&
         st->activity != TR_STATUS_SEED_WAIT && st->activity != TR_STATUS_STOPPED)
     {
         if (auto const buf = getShortTransferString(tor, st, uploadSpeed_KBps, downloadSpeed_KBps); !std::empty(buf))
         {
-            status_str += fmt::format(" - {}", buf);
+            status_str += fmt::format(FMT_STRING(" - {:s}"), buf);
         }
     }
 
@@ -360,7 +350,7 @@ namespace
 
 Glib::RefPtr<Gdk::Pixbuf> get_icon(tr_torrent const* tor, Gtk::IconSize icon_size, Gtk::Widget& for_widget)
 {
-    Glib::ustring mime_type;
+    auto mime_type = std::string_view{};
 
     if (auto const n_files = tr_torrentFileCount(tor); n_files == 0)
     {
@@ -374,7 +364,7 @@ Glib::RefPtr<Gdk::Pixbuf> get_icon(tr_torrent const* tor, Gtk::IconSize icon_siz
     {
         auto const* const name = tr_torrentFile(tor, 0).name;
 
-        mime_type = strchr(name, '/') != nullptr ? DirectoryMimeType : gtr_get_mime_type_from_filename(name);
+        mime_type = strchr(name, '/') != nullptr ? DirectoryMimeType : tr_get_mime_type_for_filename(name);
     }
 
     return gtr_get_mime_type_icon(mime_type, icon_size, for_widget);
@@ -622,8 +612,9 @@ void TorrentCellRenderer::Impl::render_compact(
     icon_renderer_->property_sensitive() = sensitive;
     icon_renderer_->render(cr, widget, icon_area, icon_area, flags);
 
-    progress_renderer_->property_value() = (int)(percentDone * 100.0);
-    progress_renderer_->property_text() = Glib::ustring();
+    auto const percent_done = static_cast<int>(percentDone * 100.0);
+    progress_renderer_->property_value() = percent_done;
+    progress_renderer_->property_text() = fmt::format(FMT_STRING("{:d}%"), percent_done);
     progress_renderer_->property_sensitive() = sensitive;
     progress_renderer_->render(cr, widget, prog_area, prog_area, flags);
 
@@ -759,7 +750,7 @@ void TorrentCellRenderer::Impl::render_full(
     text_renderer_->property_weight() = Pango::WEIGHT_NORMAL;
     text_renderer_->render(cr, widget, prog_area, prog_area, flags);
 
-    progress_renderer_->property_value() = (int)(percentDone * 100.0);
+    progress_renderer_->property_value() = static_cast<int>(percentDone * 100.0);
     progress_renderer_->property_text() = Glib::ustring();
     progress_renderer_->property_sensitive() = sensitive;
     progress_renderer_->render(cr, widget, prct_area, prct_area, flags);

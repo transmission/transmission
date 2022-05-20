@@ -29,13 +29,13 @@
 
 using tr_file_index_t = uint32_t;
 using tr_piece_index_t = uint32_t;
-/* assuming a 16 KiB block, a 32-bit block index gives us a maximum torrent size of 63 TiB.
- * if we ever need to grow past that, change this to uint64_t ;) */
+/* Assuming a 16 KiB block (tr_block_info::BlockSize), a 32-bit block index gives us a maximum torrent size of 64 TiB.
+ * When we ever need to grow past that, change tr_block_index_t and  tr_piece_index_t to uint64_t. */
 using tr_block_index_t = uint32_t;
-using tr_port = uint16_t;
 using tr_tracker_tier_t = uint32_t;
 using tr_tracker_id_t = uint32_t;
 using tr_byte_index_t = uint64_t;
+using tr_torrent_id_t = int;
 
 struct tr_block_span_t
 {
@@ -329,12 +329,12 @@ bool tr_sessionIsRPCEnabled(tr_session const* session);
 /** @brief Specify which port to listen for RPC requests on.
     @see tr_sessionInit()
     @see tr_sessionGetRPCPort */
-void tr_sessionSetRPCPort(tr_session* session, tr_port port);
+void tr_sessionSetRPCPort(tr_session* session, uint16_t port);
 
 /** @brief Get which port to listen for RPC requests on.
     @see tr_sessionInit()
     @see tr_sessionSetRPCPort */
-tr_port tr_sessionGetRPCPort(tr_session const* session);
+uint16_t tr_sessionGetRPCPort(tr_session const* session);
 
 /**
  * @brief Specify which base URL to use.
@@ -389,8 +389,6 @@ char const* tr_sessionGetRPCUsername(tr_session const* session);
 void tr_sessionSetRPCPasswordEnabled(tr_session* session, bool isEnabled);
 
 bool tr_sessionIsRPCPasswordEnabled(tr_session const* session);
-
-char const* tr_sessionGetRPCBindAddress(tr_session const* session);
 
 void tr_sessionSetDefaultTrackers(tr_session* session, char const* trackers);
 
@@ -491,11 +489,11 @@ void tr_sessionSetPortForwardingEnabled(tr_session* session, bool enabled);
 
 bool tr_sessionIsPortForwardingEnabled(tr_session const* session);
 
-void tr_sessionSetPeerPort(tr_session* session, tr_port port);
+void tr_sessionSetPeerPort(tr_session* session, uint16_t port);
 
-tr_port tr_sessionGetPeerPort(tr_session const* session);
+uint16_t tr_sessionGetPeerPort(tr_session const* session);
 
-tr_port tr_sessionSetPeerPortRandom(tr_session* session);
+uint16_t tr_sessionSetPeerPortRandom(tr_session* session);
 
 void tr_sessionSetPeerPortRandomOnStart(tr_session* session, bool random);
 
@@ -757,9 +755,9 @@ bool tr_sessionIsScriptEnabled(tr_session const*, TrScript);
  *
  * Passing nullptr for a filename will clear the blocklist.
  */
-int tr_blocklistSetContent(tr_session* session, char const* filename);
+size_t tr_blocklistSetContent(tr_session* session, char const* filename);
 
-int tr_blocklistGetRuleCount(tr_session const* session);
+size_t tr_blocklistGetRuleCount(tr_session const* session);
 
 bool tr_blocklistExists(tr_session const* session);
 
@@ -845,10 +843,6 @@ void tr_ctorSetFilePriorities(tr_ctor* ctor, tr_file_index_t const* files, tr_fi
 
 /** @brief Set the download flag for files in a torrent */
 void tr_ctorSetFilesWanted(tr_ctor* ctor, tr_file_index_t const* fileIndices, tr_file_index_t fileCount, bool wanted);
-
-/** @brief Set labels for this torrent, the length of the labels array
-    must be the same size as len. */
-void tr_ctorSetLabels(tr_ctor* ctor, char const** labels, size_t len);
 
 /** @brief Get this peer constructor's peer limit */
 bool tr_ctorGetPeerLimit(tr_ctor const* ctor, tr_ctorMode mode, uint16_t* setmeCount);
@@ -970,10 +964,10 @@ enum
 };
 
 /**
- * @brief Tell transmsision where to find this torrent's local data.
+ * @brief Tell transmission where to find this torrent's local data.
  *
  * if move_from_previous_location is `true', the torrent's incompleteDir
- * will be clobberred s.t. additional files being added will be saved
+ * will be clobbered s.t. additional files being added will be saved
  * to the torrent's downloadDir.
  */
 void tr_torrentSetLocation(
@@ -997,9 +991,6 @@ tr_torrent* tr_torrentFindFromId(tr_session* session, int id);
 
 tr_torrent* tr_torrentFindFromMetainfo(tr_session*, tr_torrent_metainfo const*);
 
-tr_torrent* tr_torrentFindFromHash(tr_session* session, tr_sha1_digest_t const* hash);
-
-/** @brief Convenience function similar to tr_torrentFindFromHash() */
 tr_torrent* tr_torrentFindFromMagnetLink(tr_session* session, char const* link);
 
 /**
@@ -1223,8 +1214,6 @@ void tr_torrentSetMetadataCallback(tr_torrent* tor, tr_torrent_metadata_func fun
  */
 void tr_torrentSetRatioLimitHitCallback(tr_torrent* torrent, tr_torrent_ratio_limit_hit_func func, void* user_data);
 
-void tr_torrentClearRatioLimitHitCallback(tr_torrent* torrent);
-
 /**
  * Register to be notified whenever a torrent's idle limit
  * has been hit. This will be called when the seeding torrent's
@@ -1233,8 +1222,6 @@ void tr_torrentClearRatioLimitHitCallback(tr_torrent* torrent);
  * Has the same restrictions as tr_torrentSetCompletenessCallback
  */
 void tr_torrentSetIdleLimitHitCallback(tr_torrent* torrent, tr_torrent_idle_limit_hit_func func, void* user_data);
-
-void tr_torrentClearIdleLimitHitCallback(tr_torrent* torrent);
 
 /**
  * MANUAL ANNOUNCE
@@ -1273,7 +1260,7 @@ struct tr_peer_stat
     bool isIncoming;
 
     uint8_t from;
-    tr_port port;
+    uint16_t port;
 
     char addr[TR_INET6_ADDRSTRLEN];
     char flagStr[32];
@@ -1320,7 +1307,7 @@ enum tr_tracker_state
      * waiting for enough time to pass to satisfy the tracker's interval */
     TR_TRACKER_WAITING = 1,
     /* it's time to (announce,scrape) this torrent, and we're waiting on a
-     * a free slot to open up in the announce manager */
+     * free slot to open up in the announce manager */
     TR_TRACKER_QUEUED = 2,
     /* we're (announcing,scraping) this torrent right now */
     TR_TRACKER_ACTIVE = 3
@@ -1356,7 +1343,7 @@ struct tr_tracker_view
     int downloadCount; // number of times this torrent's been downloaded, or -1 if unknown
     int lastAnnouncePeerCount; // if hasAnnounced, the number of peers the tracker gave us
     int leecherCount; // number of leechers the tracker knows of, or -1 if unknown
-    int seederCount; // number of seeders the tracker knows of, or -1 if  unknown
+    int seederCount; // number of seeders the tracker knows of, or -1 if unknown
 
     int tier; // which tier this tracker is in
     int id; // unique transmission-generated ID for use in libtransmission API
@@ -1500,9 +1487,9 @@ enum tr_stat_errtype
 {
     /* everything's fine */
     TR_STAT_OK = 0,
-    /* when we anounced to the tracker, we got a warning in the response */
+    /* when we announced to the tracker, we got a warning in the response */
     TR_STAT_TRACKER_WARNING = 1,
-    /* when we anounced to the tracker, we got an error in the response */
+    /* when we announced to the tracker, we got an error in the response */
     TR_STAT_TRACKER_ERROR = 2,
     /* local trouble, such as disk full or permissions error */
     TR_STAT_LOCAL_ERROR = 3
@@ -1511,20 +1498,68 @@ enum tr_stat_errtype
 /** @brief Used by tr_torrentStat() to tell clients about a torrent's state and statistics */
 struct tr_stat
 {
-    /** The torrent's unique Id.
-        @see tr_torrentId() */
-    int id;
-
-    /** What is this torrent doing right now? */
-    tr_torrent_activity activity;
-
-    /** Defines what kind of text is in errorString.
-        @see errorString */
-    tr_stat_errtype error;
-
     /** A warning or error message regarding the torrent.
         @see error */
     char const* errorString;
+
+    /** Byte count of all the piece data we'll have downloaded when we're done,
+        whether or not we have it yet. This may be less than tr_torrentTotalSize()
+        if only some of the torrent's files are wanted.
+        [0...tr_torrentTotalSize()] */
+    uint64_t sizeWhenDone;
+
+    /** Byte count of how much data is left to be downloaded until we've got
+        all the pieces that we want. [0...tr_stat.sizeWhenDone] */
+    uint64_t leftUntilDone;
+
+    /** Byte count of all the piece data we want and don't have yet,
+        but that a connected peer does have. [0...leftUntilDone] */
+    uint64_t desiredAvailable;
+
+    /** Byte count of all the corrupt data you've ever downloaded for
+        this torrent. If you're on a poisoned torrent, this number can
+        grow very large. */
+    uint64_t corruptEver;
+
+    /** Byte count of all data you've ever uploaded for this torrent. */
+    uint64_t uploadedEver;
+
+    /** Byte count of all the non-corrupt data you've ever downloaded
+        for this torrent. If you deleted the files and downloaded a second
+        time, this will be 2*totalSize.. */
+    uint64_t downloadedEver;
+
+    /** Byte count of all the checksum-verified data we have for this torrent.
+      */
+    uint64_t haveValid;
+
+    /** Byte count of all the partial piece data we have for this torrent.
+        As pieces become complete, this value may decrease as portions of it
+        are moved to `corrupt' or `haveValid'. */
+    uint64_t haveUnchecked;
+
+    /** time when one or more of the torrent's trackers will
+        allow you to manually ask for more peers,
+        or 0 if you can't */
+    time_t manualAnnounceTime;
+
+    /** When the torrent was first added. */
+    time_t addedDate;
+
+    /** When the torrent finished downloading. */
+    time_t doneDate;
+
+    /** When the torrent was last started. */
+    time_t startDate;
+
+    /** The last time we uploaded or downloaded piece data on this torrent. */
+    time_t activityDate;
+
+    /** The last time during this session that a rarely-changing field
+        changed -- e.g. any tr_torrent_metainfo field (trackers, filenames, name)
+        or download directory. RPC clients can monitor this to know when
+        to reload fields that rarely change. */
+    time_t editDate;
 
     /** When tr_stat.activity is TR_STATUS_CHECK or TR_STATUS_CHECK_WAIT,
         this is the percentage of how much of the files has been
@@ -1570,93 +1605,14 @@ struct tr_stat
         This ONLY counts piece data. */
     float pieceDownloadSpeed_KBps;
 
-#define TR_ETA_NOT_AVAIL (-1)
-#define TR_ETA_UNKNOWN (-2)
-    /** If downloading, estimated number of seconds left until the torrent is done.
-        If seeding, estimated number of seconds left until seed ratio is reached. */
-    int eta;
-    /** If seeding, number of seconds left until the idle time limit is reached. */
-    int etaIdle;
-
-    /** Number of peers that we're connected to */
-    int peersConnected;
-
-    /** How many peers we found out about from the tracker, or from pex,
-        or from incoming connections, or from our resume file. */
-    int peersFrom[TR_PEER_FROM__MAX];
-
-    /** Number of peers that are sending data to us. */
-    int peersSendingToUs;
-
-    /** Number of peers that we're sending data to */
-    int peersGettingFromUs;
-
-    /** Number of webseeds that are sending data to us. */
-    int webseedsSendingToUs;
-
-    /** Byte count of all the piece data we'll have downloaded when we're done,
-        whether or not we have it yet. This may be less than tr_torrentTotalSize()
-        if only some of the torrent's files are wanted.
-        [0...tr_torrentTotalSize()] */
-    uint64_t sizeWhenDone;
-
-    /** Byte count of how much data is left to be downloaded until we've got
-        all the pieces that we want. [0...tr_stat.sizeWhenDone] */
-    uint64_t leftUntilDone;
-
-    /** Byte count of all the piece data we want and don't have yet,
-        but that a connected peer does have. [0...leftUntilDone] */
-    uint64_t desiredAvailable;
-
-    /** Byte count of all the corrupt data you've ever downloaded for
-        this torrent. If you're on a poisoned torrent, this number can
-        grow very large. */
-    uint64_t corruptEver;
-
-    /** Byte count of all data you've ever uploaded for this torrent. */
-    uint64_t uploadedEver;
-
-    /** Byte count of all the non-corrupt data you've ever downloaded
-        for this torrent. If you deleted the files and downloaded a second
-        time, this will be 2*totalSize.. */
-    uint64_t downloadedEver;
-
-    /** Byte count of all the checksum-verified data we have for this torrent.
-      */
-    uint64_t haveValid;
-
-    /** Byte count of all the partial piece data we have for this torrent.
-        As pieces become complete, this value may decrease as portions of it
-        are moved to `corrupt' or `haveValid'. */
-    uint64_t haveUnchecked;
-
-    /** time when one or more of the torrent's trackers will
-        allow you to manually ask for more peers,
-        or 0 if you can't */
-    time_t manualAnnounceTime;
-
     /** Total uploaded bytes / sizeWhenDone.
         NB: In Transmission 3.00 and earlier, this was total upload / download,
         which caused edge cases when total download was less than sizeWhenDone. */
     float ratio;
 
-    /** When the torrent was first added. */
-    time_t addedDate;
-
-    /** When the torrent finished downloading. */
-    time_t doneDate;
-
-    /** When the torrent was last started. */
-    time_t startDate;
-
-    /** The last time we uploaded or downloaded piece data on this torrent. */
-    time_t activityDate;
-
-    /** The last time during this session that a rarely-changing field
-        changed -- e.g. any tr_torrent_metainfo field (trackers, filenames, name)
-        or download directory. RPC clients can monitor this to know when
-        to reload fields that rarely change. */
-    time_t editDate;
+    /** The torrent's unique Id.
+        @see tr_torrentId() */
+    int id;
 
     /** Number of seconds since the last activity (or since started).
         -1 if activity is not seeding or downloading. */
@@ -1671,6 +1627,38 @@ struct tr_stat
     /** This torrent's queue position.
         All torrents have a queue position, even if it's not queued. */
     int queuePosition;
+
+#define TR_ETA_NOT_AVAIL (-1)
+#define TR_ETA_UNKNOWN (-2)
+    /** If downloading, estimated number of seconds left until the torrent is done.
+        If seeding, estimated number of seconds left until seed ratio is reached. */
+    int eta;
+
+    /** If seeding, number of seconds left until the idle time limit is reached. */
+    int etaIdle;
+
+    /** What is this torrent doing right now? */
+    tr_torrent_activity activity;
+
+    /** Defines what kind of text is in errorString.
+        @see errorString */
+    tr_stat_errtype error;
+
+    /** Number of peers that we're connected to */
+    uint16_t peersConnected;
+
+    /** How many peers we found out about from the tracker, or from pex,
+        or from incoming connections, or from our resume file. */
+    uint16_t peersFrom[TR_PEER_FROM__MAX];
+
+    /** Number of peers that are sending data to us. */
+    uint16_t peersSendingToUs;
+
+    /** Number of peers that we're sending data to */
+    uint16_t peersGettingFromUs;
+
+    /** Number of webseeds that are sending data to us. */
+    uint16_t webseedsSendingToUs;
 
     /** A torrent is considered finished if it has met its seed ratio.
         As a result, only paused torrents can be finished. */

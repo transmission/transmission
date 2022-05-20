@@ -4,11 +4,13 @@
 // License text can be found in the licenses/ folder.
 
 #include <array>
-#include <cinttypes>
+#include <cinttypes> // PRIu32
+#include <cstdint> // uint32_t
 #include <cstdio>
 #include <cstdlib>
 #include <iostream>
 #include <string>
+#include <string_view>
 
 #include <libtransmission/transmission.h>
 
@@ -17,6 +19,7 @@
 #include <libtransmission/log.h>
 #include <libtransmission/makemeta.h>
 #include <libtransmission/tr-getopt.h>
+#include <libtransmission/tr-strbuf.h>
 #include <libtransmission/utils.h>
 #include <libtransmission/version.h>
 
@@ -179,9 +182,8 @@ int tr_main(int argc, char* argv[])
             return EXIT_FAILURE;
         }
 
-        auto const end = tr_strvJoin(base, ".torrent"sv);
-        char* cwd = tr_getcwd();
-        options.outfile = tr_strvDup(tr_strvPath(cwd, end.c_str()));
+        char* const cwd = tr_getcwd();
+        options.outfile = tr_strvDup(tr_pathbuf{ std::string_view{ cwd }, '/', base, ".torrent"sv });
         tr_free(cwd);
     }
 

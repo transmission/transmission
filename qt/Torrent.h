@@ -6,6 +6,8 @@
 #pragma once
 
 #include <bitset>
+#include <cstddef> // size_t
+#include <cstdint> // uint64_t
 #include <ctime> // time_t
 #include <optional>
 #include <vector>

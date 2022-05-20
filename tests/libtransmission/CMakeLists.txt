@@ -13,19 +13,23 @@ add_executable(libtransmission-test
     error-test.cc
     file-piece-map-test.cc
     file-test.cc
+    files-test.cc
     getopt-test.cc
     history-test.cc
     json-test.cc
     magnet-metainfo-test.cc
     makemeta-test.cc
     move-test.cc
+    open-files-test.cc
     peer-mgr-active-requests-test.cc
     peer-mgr-wishlist-test.cc
     peer-msgs-test.cc
     quark-test.cc
+    remove-test.cc
     rename-test.cc
     rpc-test.cc
     session-test.cc
+    strbuf-test.cc
     subprocess-test-script.cmd
     subprocess-test.cc
     test-fixtures.h
@@ -38,7 +42,6 @@ add_executable(libtransmission-test
 
 target_compile_definitions(libtransmission-test
     PRIVATE
-        ${LIBFMT_DEFINITIONS}
         -DLIBTRANSMISSION_TEST_ASSETS_DIR="${CMAKE_CURRENT_SOURCE_DIR}/assets"
         __TRANSMISSION__)
 

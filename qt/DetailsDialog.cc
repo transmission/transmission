@@ -1462,7 +1462,7 @@ void DetailsDialog::initTrackerTab()
     ui_.trackersView->setModel(tracker_filter_.get());
     ui_.trackersView->setItemDelegate(tracker_delegate_.get());
 
-    auto& icons = IconCache::get();
+    auto const& icons = IconCache::get();
     ui_.addTrackerButton->setIcon(icons.getThemeIcon(QStringLiteral("list-add"), QStyle::SP_DialogOpenButton));
     ui_.editTrackersButton->setIcon(icons.getThemeIcon(QStringLiteral("document-properties"), QStyle::SP_DesktopIcon));
     ui_.removeTrackerButton->setIcon(icons.getThemeIcon(QStringLiteral("list-remove"), QStyle::SP_TrashIcon));
@@ -1519,15 +1519,12 @@ static constexpr tr_quark priorityKey(int priority)
     {
     case TR_PRI_LOW:
         return TR_KEY_priority_low;
-        break;
 
     case TR_PRI_HIGH:
         return TR_KEY_priority_high;
-        break;
 
     default:
         return TR_KEY_priority_normal;
-        break;
     }
 }
 

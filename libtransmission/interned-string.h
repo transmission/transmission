@@ -7,6 +7,8 @@
 
 #include <string_view>
 
+#include <fmt/format.h>
+
 #include "quark.h"
 
 /**
@@ -44,7 +46,7 @@ public:
         return *this = std::string_view{ c_str != nullptr ? c_str : "" };
     }
 
-    [[nodiscard]] tr_quark quark() const
+    [[nodiscard]] constexpr tr_quark quark() const noexcept
     {
         return quark_;
     }
@@ -61,7 +63,7 @@ public:
     {
         return std::data(this->sv());
     }
-    [[nodiscard]] auto empty() const
+    [[nodiscard]] constexpr auto empty() const noexcept
     {
         return quark_ == TR_KEY_NONE;
     }
@@ -92,7 +94,7 @@ public:
         return std::rend(this->sv());
     }
 
-    [[nodiscard]] auto compare(tr_interned_string const& that) const // <=>
+    [[nodiscard]] constexpr auto compare(tr_interned_string const& that) const noexcept // <=>
     {
         if (this->quark() < that.quark())
         {
@@ -107,21 +109,21 @@ public:
         return 0;
     }
 
-    [[nodiscard]] bool operator<(tr_interned_string const& that) const
+    [[nodiscard]] constexpr bool operator<(tr_interned_string const& that) const noexcept
     {
         return this->compare(that) < 0;
     }
 
-    [[nodiscard]] bool operator>(tr_interned_string const& that) const
+    [[nodiscard]] constexpr bool operator>(tr_interned_string const& that) const noexcept
     {
         return this->compare(that) > 0;
     }
 
-    [[nodiscard]] bool operator==(tr_interned_string const& that) const
+    [[nodiscard]] constexpr bool operator==(tr_interned_string const& that) const noexcept
     {
         return this->compare(that) == 0;
     }
-    [[nodiscard]] bool operator!=(tr_interned_string const& that) const
+    [[nodiscard]] constexpr bool operator!=(tr_interned_string const& that) const noexcept
     {
         return this->compare(that) != 0;
     }
@@ -143,6 +145,21 @@ public:
         return *this != std::string_view{ that != nullptr ? that : "" };
     }
 
+    operator std::string_view() const
+    {
+        return sv();
+    }
+
 private:
     tr_quark quark_ = TR_KEY_NONE;
+};
+
+template<>
+struct fmt::formatter<tr_interned_string> : formatter<std::string_view>
+{
+    template<typename FormatContext>
+    constexpr auto format(tr_interned_string const& is, FormatContext& ctx) const
+    {
+        return formatter<std::string_view>::format(is.sv(), ctx);
+    }
 };

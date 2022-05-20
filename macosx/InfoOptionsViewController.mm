@@ -18,7 +18,7 @@
 
 @interface InfoOptionsViewController ()
 
-@property(nonatomic, copy) NSArray* fTorrents;
+@property(nonatomic, copy) NSArray<Torrent*>* fTorrents;
 
 @property(nonatomic) BOOL fSet;
 
@@ -86,7 +86,7 @@
     [NSNotificationCenter.defaultCenter removeObserver:self];
 }
 
-- (void)setInfoForTorrents:(NSArray*)torrents
+- (void)setInfoForTorrents:(NSArray<Torrent*>*)torrents
 {
     //don't check if it's the same in case the metadata changed
     self.fTorrents = torrents;
@@ -122,9 +122,8 @@
     NSInteger globalUseSpeedLimit = torrent.usesGlobalSpeedLimit ? NSControlStateValueOn : NSControlStateValueOff;
 
     while ((torrent = [enumerator nextObject]) &&
-           (uploadUseSpeedLimit != NSControlStateValueMixed || uploadSpeedLimit != INVALID ||
-            downloadUseSpeedLimit != NSControlStateValueMixed || downloadSpeedLimit != INVALID ||
-            globalUseSpeedLimit != NSControlStateValueMixed))
+           (uploadUseSpeedLimit != NSControlStateValueMixed || uploadSpeedLimit != INVALID || downloadUseSpeedLimit != NSControlStateValueMixed ||
+            downloadSpeedLimit != INVALID || globalUseSpeedLimit != NSControlStateValueMixed))
     {
         if (uploadUseSpeedLimit != NSControlStateValueMixed &&
             uploadUseSpeedLimit != ([torrent usesSpeedLimit:YES] ? NSControlStateValueOn : NSControlStateValueOff))
@@ -195,8 +194,7 @@
 
     NSInteger checkRatio = torrent.ratioSetting;
     NSInteger checkIdle = torrent.idleSetting;
-    NSInteger removeWhenFinishSeeding = torrent.removeWhenFinishSeeding ? NSControlStateValueOn
-                                                                        : NSControlStateValueOff;
+    NSInteger removeWhenFinishSeeding = torrent.removeWhenFinishSeeding ? NSControlStateValueOn : NSControlStateValueOff;
     CGFloat ratioLimit = torrent.ratioLimit;
     NSUInteger idleLimit = torrent.idleLimitMinutes;
 
@@ -224,8 +222,7 @@
         }
 
         if (removeWhenFinishSeeding != NSControlStateValueMixed &&
-            removeWhenFinishSeeding != (torrent.removeWhenFinishSeeding ? NSControlStateValueOn
-                                                                        : NSControlStateValueOff))
+            removeWhenFinishSeeding != (torrent.removeWhenFinishSeeding ? NSControlStateValueOn : NSControlStateValueOff))
         {
             removeWhenFinishSeeding = NSControlStateValueMixed;
         }
@@ -309,7 +306,7 @@
 
     while ((torrent = [enumerator nextObject]) && priority != INVALID)
     {
-        if (priority != INVALID && priority != torrent.priority)
+        if (priority != torrent.priority)
         {
             priority = INVALID;
         }
@@ -661,7 +658,7 @@
         NSInteger const globalMin = [NSUserDefaults.standardUserDefaults integerForKey:@"IdleLimitMinutes"];
         globalIdle = globalMin == 1 ?
             NSLocalizedString(@"1 minute", "Info options -> global setting") :
-            [NSString localizedStringWithFormat:NSLocalizedString(@"%d minutes", "Info options -> global setting"), globalMin];
+            [NSString localizedStringWithFormat:NSLocalizedString(@"%ld minutes", "Info options -> global setting"), globalMin];
     }
     else
     {

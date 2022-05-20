@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="19162" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="20037" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19162"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="20037"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -13,6 +13,7 @@
                 <outlet property="fLocationField" destination="20" id="30"/>
                 <outlet property="fNameField" destination="9" id="31"/>
                 <outlet property="fOpenCheck" destination="63" id="64"/>
+                <outlet property="fPieceSizeStepper" destination="uTm-Zf-xrb" id="do1-Ov-Bc5"/>
                 <outlet property="fPiecesField" destination="26" id="32"/>
                 <outlet property="fPrivateCheck" destination="22" id="33"/>
                 <outlet property="fProgressIndicator" destination="57" id="61"/>
@@ -29,7 +30,7 @@
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" topStrut="YES"/>
             <rect key="contentRect" x="244" y="423" width="708" height="408"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="875"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="2048" height="1255"/>
             <value key="minSize" type="size" width="440" height="350"/>
             <view key="contentView" id="6">
                 <rect key="frame" x="0.0" y="0.0" width="708" height="408"/>
@@ -180,7 +181,7 @@ Gw
                         </connections>
                     </button>
                     <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="26">
-                        <rect key="frame" x="290" y="98" width="401" height="17"/>
+                        <rect key="frame" x="290" y="98" width="380" height="17"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="piece info" id="80">
                             <font key="font" metaFont="system"/>
@@ -280,6 +281,14 @@ Gw
                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                         </textFieldCell>
                     </textField>
+                    <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="uTm-Zf-xrb">
+                        <rect key="frame" x="673" y="92" width="19" height="28"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                        <stepperCell key="cell" continuous="YES" alignment="left" maxValue="100" id="NqF-2B-m6R"/>
+                        <connections>
+                            <action selector="incrementOrDecrementPieceSize:" target="-2" id="6ZI-8D-fhl"/>
+                        </connections>
+                    </stepper>
                 </subviews>
             </view>
             <connections>

@@ -16,6 +16,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <string>
+#include <string_view>
 
 using namespace std::literals;
 
@@ -229,7 +230,7 @@ TEST_F(SessionTest, sessionId)
 
     auto const* session_id_str_1 = tr_session_id_get_current(session_id);
     EXPECT_NE(nullptr, session_id_str_1);
-    EXPECT_EQ(48, strlen(session_id_str_1));
+    EXPECT_EQ(48U, strlen(session_id_str_1));
     session_id_str_1 = tr_strdup(session_id_str_1);
 
     EXPECT_TRUE(tr_session_id_is_local(session_id_str_1));
@@ -240,7 +241,7 @@ TEST_F(SessionTest, sessionId)
 
     auto const* session_id_str_2 = tr_session_id_get_current(session_id);
     EXPECT_NE(nullptr, session_id_str_2);
-    EXPECT_EQ(48, strlen(session_id_str_2));
+    EXPECT_EQ(48U, strlen(session_id_str_2));
     EXPECT_STREQ(session_id_str_1, session_id_str_2);
 
     tr_timeUpdate(60 * 60);
@@ -249,7 +250,7 @@ TEST_F(SessionTest, sessionId)
 
     session_id_str_2 = tr_session_id_get_current(session_id);
     EXPECT_NE(nullptr, session_id_str_2);
-    EXPECT_EQ(48, strlen(session_id_str_2));
+    EXPECT_EQ(48U, strlen(session_id_str_2));
     EXPECT_STRNE(session_id_str_1, session_id_str_2);
     session_id_str_2 = tr_strdup(session_id_str_2);
 
@@ -263,7 +264,7 @@ TEST_F(SessionTest, sessionId)
 
     auto const* session_id_str_3 = tr_session_id_get_current(session_id);
     EXPECT_NE(nullptr, session_id_str_3);
-    EXPECT_EQ(48, strlen(session_id_str_3));
+    EXPECT_EQ(48U, strlen(session_id_str_3));
     EXPECT_STRNE(session_id_str_2, session_id_str_3);
     EXPECT_STRNE(session_id_str_1, session_id_str_3);
     session_id_str_3 = tr_strdup(session_id_str_3);
