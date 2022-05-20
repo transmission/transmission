@@ -30,8 +30,8 @@
 
 @property(nonatomic) NSImage* fIcon;
 
-@property(nonatomic, copy) NSArray* fileList;
-@property(nonatomic, copy) NSArray* flatFileList;
+@property(nonatomic, copy) NSArray<FileListNode*>* fileList;
+@property(nonatomic, copy) NSArray<FileListNode*>* flatFileList;
 
 @property(nonatomic, copy) NSIndexSet* fPreviousFinishedIndexes;
 @property(nonatomic) NSDate* fPreviousFinishedIndexesDate;
@@ -61,8 +61,8 @@
                       forParent:(FileListNode*)parent
                        fileSize:(uint64_t)size
                           index:(NSInteger)index
-                       flatList:(NSMutableArray*)flatFileList;
-- (void)sortFileList:(NSMutableArray*)fileNodes;
+                       flatList:(NSMutableArray<FileListNode*>*)flatFileList;
+- (void)sortFileList:(NSMutableArray<FileListNode*>*)fileNodes;
 
 - (void)startQueue;
 - (void)completenessChange:(tr_completeness)status wasRunning:(BOOL)wasRunning;
@@ -70,7 +70,7 @@
 - (void)idleLimitHit;
 - (void)metadataRetrieved;
 - (void)renameFinished:(BOOL)success
-                 nodes:(NSArray*)nodes
+                 nodes:(NSArray<FileListNode*>*)nodes
      completionHandler:(void (^)(BOOL))completionHandler
                oldPath:(NSString*)oldPath
                newName:(NSString*)newName;
@@ -464,12 +464,12 @@ bool trashDataFile(char const* filename, tr_error** error)
     tr_torrentUseSpeedLimit(self.fHandle, upload ? TR_UP : TR_DOWN, use);
 }
 
-- (NSInteger)speedLimit:(BOOL)upload
+- (NSUInteger)speedLimit:(BOOL)upload
 {
     return tr_torrentGetSpeedLimit_KBps(self.fHandle, upload ? TR_UP : TR_DOWN);
 }
 
-- (void)setSpeedLimit:(NSInteger)limit upload:(BOOL)upload
+- (void)setSpeedLimit:(NSUInteger)limit upload:(BOOL)upload
 {
     tr_torrentSetSpeedLimit_KBps(self.fHandle, upload ? TR_UP : TR_DOWN, limit);
 }
@@ -479,7 +479,7 @@ bool trashDataFile(char const* filename, tr_error** error)
     return tr_torrentUsesSessionLimits(self.fHandle);
 }
 
-- (void)setUseGlobalSpeedLimit:(BOOL)use
+- (void)setUsesGlobalSpeedLimit:(BOOL)use
 {
     tr_torrentUseSessionLimits(self.fHandle, use);
 }
@@ -697,7 +697,7 @@ bool trashDataFile(char const* filename, tr_error** error)
     return trackers;
 }
 
-- (NSArray*)allTrackersFlat
+- (NSArray<NSString*>*)allTrackersFlat
 {
     auto const n = tr_torrentTrackerCount(self.fHandle);
     NSMutableArray* allTrackers = [NSMutableArray arrayWithCapacity:n];
@@ -983,7 +983,7 @@ bool trashDataFile(char const* filename, tr_error** error)
     return error;
 }
 
-- (NSArray*)peers
+- (NSArray<NSDictionary*>*)peers
 {
     int totalPeers;
     tr_peer_stat* peers = tr_torrentPeers(self.fHandle, &totalPeers);
@@ -1028,7 +1028,7 @@ bool trashDataFile(char const* filename, tr_error** error)
     return tr_torrentWebseedCount(self.fHandle);
 }
 
-- (NSArray*)webSeeds
+- (NSArray<NSDictionary*>*)webSeeds
 {
     NSUInteger n = tr_torrentWebseedCount(self.fHandle);
     NSMutableArray* webSeeds = [NSMutableArray arrayWithCapacity:n];
@@ -1182,17 +1182,17 @@ bool trashDataFile(char const* filename, tr_error** error)
         case TR_STATUS_DOWNLOAD:
             if (self.totalPeersConnected != 1)
             {
-                string = [NSString stringWithFormat:NSLocalizedString(@"Downloading from %d of %d peers", "Torrent -> status string"),
+                string = [NSString stringWithFormat:NSLocalizedString(@"Downloading from %lu of %lu peers", "Torrent -> status string"),
                                                     self.peersSendingToUs,
                                                     self.totalPeersConnected];
             }
             else
             {
-                string = [NSString stringWithFormat:NSLocalizedString(@"Downloading from %d of 1 peer", "Torrent -> status string"),
+                string = [NSString stringWithFormat:NSLocalizedString(@"Downloading from %lu of 1 peer", "Torrent -> status string"),
                                                     self.peersSendingToUs];
             }
 
-            if (NSInteger const webSeedCount = self.fStat->webseedsSendingToUs; webSeedCount > 0)
+            if (NSUInteger const webSeedCount = self.fStat->webseedsSendingToUs; webSeedCount > 0)
             {
                 NSString* webSeedString;
                 if (webSeedCount == 1)
@@ -1201,7 +1201,7 @@ bool trashDataFile(char const* filename, tr_error** error)
                 }
                 else
                 {
-                    webSeedString = [NSString stringWithFormat:NSLocalizedString(@"%d web seeds", "Torrent -> status string"), webSeedCount];
+                    webSeedString = [NSString stringWithFormat:NSLocalizedString(@"%lu web seeds", "Torrent -> status string"), webSeedCount];
                 }
 
                 string = [string stringByAppendingFormat:@" + %@", webSeedString];
@@ -1212,14 +1212,14 @@ bool trashDataFile(char const* filename, tr_error** error)
         case TR_STATUS_SEED:
             if (self.totalPeersConnected != 1)
             {
-                string = [NSString stringWithFormat:NSLocalizedString(@"Seeding to %d of %d peers", "Torrent -> status string"),
+                string = [NSString stringWithFormat:NSLocalizedString(@"Seeding to %1$lu of %2$lu peers", "Torrent -> status string"),
                                                     self.peersGettingFromUs,
                                                     self.totalPeersConnected];
             }
             else
             {
-                string = [NSString stringWithFormat:NSLocalizedString(@"Seeding to %d of 1 peer", "Torrent -> status string"),
-                                                    self.peersGettingFromUs];
+                string = [NSString stringWithFormat:NSLocalizedString(@"Seeding to %u of 1 peer", "Torrent -> status string"),
+                                                    (unsigned int)self.peersGettingFromUs];
             }
         }
 
@@ -1358,52 +1358,52 @@ bool trashDataFile(char const* filename, tr_error** error)
     }
 }
 
-- (NSInteger)totalPeersConnected
+- (NSUInteger)totalPeersConnected
 {
     return self.fStat->peersConnected;
 }
 
-- (NSInteger)totalPeersTracker
+- (NSUInteger)totalPeersTracker
 {
     return self.fStat->peersFrom[TR_PEER_FROM_TRACKER];
 }
 
-- (NSInteger)totalPeersIncoming
+- (NSUInteger)totalPeersIncoming
 {
     return self.fStat->peersFrom[TR_PEER_FROM_INCOMING];
 }
 
-- (NSInteger)totalPeersCache
+- (NSUInteger)totalPeersCache
 {
     return self.fStat->peersFrom[TR_PEER_FROM_RESUME];
 }
 
-- (NSInteger)totalPeersPex
+- (NSUInteger)totalPeersPex
 {
     return self.fStat->peersFrom[TR_PEER_FROM_PEX];
 }
 
-- (NSInteger)totalPeersDHT
+- (NSUInteger)totalPeersDHT
 {
     return self.fStat->peersFrom[TR_PEER_FROM_DHT];
 }
 
-- (NSInteger)totalPeersLocal
+- (NSUInteger)totalPeersLocal
 {
     return self.fStat->peersFrom[TR_PEER_FROM_LPD];
 }
 
-- (NSInteger)totalPeersLTEP
+- (NSUInteger)totalPeersLTEP
 {
     return self.fStat->peersFrom[TR_PEER_FROM_LTEP];
 }
 
-- (NSInteger)peersSendingToUs
+- (NSUInteger)peersSendingToUs
 {
     return self.fStat->peersSendingToUs;
 }
 
-- (NSInteger)peersGettingFromUs
+- (NSUInteger)peersGettingFromUs
 {
     return self.fStat->peersGettingFromUs;
 }
@@ -1476,7 +1476,7 @@ bool trashDataFile(char const* filename, tr_error** error)
     }
 }
 
-- (NSInteger)fileCount
+- (NSUInteger)fileCount
 {
     return tr_torrentFileCount(self.fHandle);
 }
@@ -1506,7 +1506,7 @@ bool trashDataFile(char const* filename, tr_error** error)
 
 - (BOOL)canChangeDownloadCheckForFile:(NSUInteger)index
 {
-    NSAssert2((NSInteger)index < self.fileCount, @"Index %ld is greater than file count %ld", index, self.fileCount);
+    NSAssert2(index < self.fileCount, @"Index %lu is greater than file count %lu", index, self.fileCount);
 
     return [self canChangeDownloadCheckForFiles:[NSIndexSet indexSetWithIndex:index]];
 }
@@ -1858,12 +1858,12 @@ bool trashDataFile(char const* filename, tr_error** error)
 
     if (self.folder)
     {
-        NSInteger const count = self.fileCount;
+        NSUInteger const count = self.fileCount;
         NSMutableArray* flatFileList = [NSMutableArray arrayWithCapacity:count];
 
         FileListNode* tempNode = nil;
 
-        for (NSInteger i = 0; i < count; i++)
+        for (NSUInteger i = 0; i < count; i++)
         {
             auto const file = tr_torrentFile(self.fHandle, i);
 
@@ -1875,7 +1875,7 @@ bool trashDataFile(char const* filename, tr_error** error)
                 tempNode = [[FileListNode alloc] initWithFolderName:pathComponents[0] path:@"" torrent:self];
             }
 
-            [self insertPathForComponents:pathComponents
+            [self insertPathForComponents:pathComponents //
                        withComponentIndex:1
                                 forParent:tempNode
                                  fileSize:file.length
@@ -1897,12 +1897,12 @@ bool trashDataFile(char const* filename, tr_error** error)
     }
 }
 
-- (void)insertPathForComponents:(NSArray*)components
+- (void)insertPathForComponents:(NSArray<NSString*>*)components
              withComponentIndex:(NSUInteger)componentIndex
                       forParent:(FileListNode*)parent
                        fileSize:(uint64_t)size
                           index:(NSInteger)index
-                       flatList:(NSMutableArray*)flatFileList
+                       flatList:(NSMutableArray<FileListNode*>*)flatFileList
 {
     NSParameterAssert(components.count > 0);
     NSParameterAssert(componentIndex < components.count);
@@ -1945,13 +1945,16 @@ bool trashDataFile(char const* filename, tr_error** error)
     {
         [node insertIndex:index withSize:size];
 
-        [self insertPathForComponents:components withComponentIndex:(componentIndex + 1) forParent:node fileSize:size
+        [self insertPathForComponents:components //
+                   withComponentIndex:componentIndex + 1
+                            forParent:node
+                             fileSize:size
                                 index:index
                              flatList:flatFileList];
     }
 }
 
-- (void)sortFileList:(NSMutableArray*)fileNodes
+- (void)sortFileList:(NSMutableArray<FileListNode*>*)fileNodes
 {
     NSSortDescriptor* descriptor = [NSSortDescriptor sortDescriptorWithKey:@"name" ascending:YES
                                                                   selector:@selector(localizedStandardCompare:)];
@@ -2042,7 +2045,7 @@ bool trashDataFile(char const* filename, tr_error** error)
 }
 
 - (void)renameFinished:(BOOL)success
-                 nodes:(NSArray*)nodes
+                 nodes:(NSArray<FileListNode*>*)nodes
      completionHandler:(void (^)(BOOL))completionHandler
                oldPath:(NSString*)oldPath
                newName:(NSString*)newName

@@ -36,7 +36,8 @@
 
 - (instancetype)init
 {
-    return (self = [super initWithNibName:@"FilterBar" bundle:nil]);
+    self = [super initWithNibName:@"FilterBar" bundle:nil];
+    return self;
 }
 
 - (void)awakeFromNib
@@ -319,9 +320,9 @@
     }
 }
 
-- (NSArray*)searchStrings
+- (NSArray<NSString*>*)searchStrings
 {
-    return [self.fSearchField.stringValue betterComponentsSeparatedByCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet];
+    return [self.fSearchField.stringValue nonEmptyComponentsSeparatedByCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet];
 }
 
 - (void)setCountAll:(NSUInteger)all

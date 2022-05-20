@@ -25,7 +25,6 @@ set(PROJECT_FILES
   crypto-utils.cc
   crypto.cc
   error.cc
-  fdlimit.cc
   file-info.cc
   file-piece-map.cc
   file-posix.cc
@@ -38,6 +37,7 @@ set(PROJECT_FILES
   makemeta.cc
   natpmp.cc
   net.cc
+  open-files.cc
   peer-io.cc
   peer-mgr-active-requests.cc
   peer-mgr-wishlist.cc
@@ -168,16 +168,17 @@ set(${PROJECT_NAME}_PRIVATE_HEADERS
     completion.h
     crypto-utils.h
     crypto.h
-    fdlimit.h
     file-info.h
     file-piece-map.h
     handshake.h
     history.h
     inout.h
+    lru-cache.h
     magnet-metainfo.h
     mime-types.h
     natpmp_local.h
     net.h
+    open-files.h
     peer-common.h
     peer-io.h
     peer-mgr-active-requests.h
@@ -261,6 +262,7 @@ include_directories(
     SYSTEM
     ${UTFCPP_INCLUDE_DIRS}
     ${DEFLATE_INCLUDE_DIRS}
+    ${FAST_FLOAT_INCLUDE_DIRS}
     ${CRYPTO_INCLUDE_DIRS}
     ${CURL_INCLUDE_DIRS}
     ${EVENT2_INCLUDE_DIRS}

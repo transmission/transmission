@@ -2,7 +2,7 @@
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
-#import <Cocoa/Cocoa.h>
+#import <Foundation/Foundation.h>
 
 @interface NSString (NSStringAdditions)
 
@@ -24,6 +24,6 @@
 - (NSComparisonResult)compareNumeric:(NSString*)string;
 
 // like componentsSeparatedByCharactersInSet:, but excludes blank values
-- (NSArray*)betterComponentsSeparatedByCharactersInSet:(NSCharacterSet*)separators;
+- (NSArray<NSString*>*)nonEmptyComponentsSeparatedByCharactersInSet:(NSCharacterSet*)separators;
 
 @end

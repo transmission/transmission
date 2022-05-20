@@ -37,7 +37,7 @@ typedef NS_ENUM(unsigned int, tabTag) {
 
 @interface InfoWindowController ()
 
-@property(nonatomic, copy) NSArray* fTorrents;
+@property(nonatomic, copy) NSArray<Torrent*>* fTorrents;
 
 @property(nonatomic) CGFloat fMinWindowWidth;
 
@@ -168,7 +168,7 @@ typedef NS_ENUM(unsigned int, tabTag) {
     }
 }
 
-- (void)setInfoForTorrents:(NSArray*)torrents
+- (void)setInfoForTorrents:(NSArray<Torrent*>*)torrents
 {
     if (self.fTorrents && [self.fTorrents isEqualToArray:torrents])
     {
@@ -403,7 +403,7 @@ typedef NS_ENUM(unsigned int, tabTag) {
     [self.fOptionsViewController updateOptions];
 }
 
-- (NSArray*)quickLookURLs
+- (NSArray<NSURL*>*)quickLookURLs
 {
     return self.fFileViewController.quickLookURLs;
 }
@@ -434,8 +434,8 @@ typedef NS_ENUM(unsigned int, tabTag) {
         {
             self.fImageView.image = [NSImage imageNamed:NSImageNameMultipleDocuments];
 
-            self.fNameField.stringValue = [NSString stringWithFormat:NSLocalizedString(@"%@ Torrents Selected", "Inspector -> selected torrents"),
-                                                                     [NSString formattedUInteger:numberSelected]];
+            self.fNameField.stringValue = [NSString
+                stringWithFormat:NSLocalizedString(@"%lu Torrents Selected", "Inspector -> selected torrents"), numberSelected];
             self.fNameField.hidden = NO;
 
             uint64_t size = 0;
@@ -460,8 +460,7 @@ typedef NS_ENUM(unsigned int, tabTag) {
                 }
                 else
                 {
-                    fileString = [NSString stringWithFormat:NSLocalizedString(@"%@ files", "Inspector -> selected torrents"),
-                                                            [NSString formattedUInteger:fileCount]];
+                    fileString = [NSString stringWithFormat:NSLocalizedString(@"%lu files", "Inspector -> selected torrents"), fileCount];
                 }
                 [fileStrings addObject:fileString];
             }
@@ -474,8 +473,8 @@ typedef NS_ENUM(unsigned int, tabTag) {
                 }
                 else
                 {
-                    magnetString = [NSString stringWithFormat:NSLocalizedString(@"%@ magnetized transfers", "Inspector -> selected torrents"),
-                                                              [NSString formattedUInteger:magnetCount]];
+                    magnetString = [NSString
+                        stringWithFormat:NSLocalizedString(@"%lu magnetized transfers", "Inspector -> selected torrents"), magnetCount];
                 }
                 [fileStrings addObject:magnetString];
             }
@@ -538,8 +537,7 @@ typedef NS_ENUM(unsigned int, tabTag) {
                 }
                 else
                 {
-                    fileString = [NSString stringWithFormat:NSLocalizedString(@"%@ files", "Inspector -> selected torrents"),
-                                                            [NSString formattedUInteger:fileCount]];
+                    fileString = [NSString stringWithFormat:NSLocalizedString(@"%lu files", "Inspector -> selected torrents"), fileCount];
                 }
                 basicString = [NSString stringWithFormat:@"%@, %@", fileString, basicString];
             }

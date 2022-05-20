@@ -29,14 +29,14 @@ typedef NS_ENUM(unsigned int, filePriorityMenuTag) { //
 
 @interface FileOutlineController ()
 
-@property(nonatomic) NSMutableArray* fFileList;
+@property(nonatomic) NSMutableArray<FileListNode*>* fFileList;
 
 @property(nonatomic) IBOutlet FileOutlineView* fOutline;
 
 @property(nonatomic, readonly) NSMenu* menu;
 
 - (NSUInteger)findFileNode:(FileListNode*)node
-                    inList:(NSArray*)list
+                    inList:(NSArray<FileListNode*>*)list
                  atIndexes:(NSIndexSet*)range
              currentParent:(FileListNode*)currentParent
                finalParent:(FileListNode**)parent;
@@ -80,7 +80,7 @@ typedef NS_ENUM(unsigned int, filePriorityMenuTag) { //
 
 - (void)setFilterText:(NSString*)text
 {
-    NSArray* components = [text betterComponentsSeparatedByCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet];
+    NSArray* components = [text nonEmptyComponentsSeparatedByCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet];
     if (!components || components.count == 0)
     {
         text = nil;
@@ -106,8 +106,8 @@ typedef NS_ENUM(unsigned int, filePriorityMenuTag) { //
         __block BOOL filter = NO;
         if (components)
         {
-            [components enumerateObjectsWithOptions:NSEnumerationConcurrent usingBlock:^(id obj, NSUInteger idx, BOOL* stop) {
-                if ([item.name rangeOfString:(NSString*)obj options:(NSCaseInsensitiveSearch | NSDiacriticInsensitiveSearch)].location == NSNotFound)
+            [components enumerateObjectsWithOptions:NSEnumerationConcurrent usingBlock:^(NSString* obj, NSUInteger idx, BOOL* stop) {
+                if ([item.name rangeOfString:obj options:(NSCaseInsensitiveSearch | NSDiacriticInsensitiveSearch)].location == NSNotFound)
                 {
                     filter = YES;
                     *stop = YES;
@@ -683,7 +683,7 @@ typedef NS_ENUM(unsigned int, filePriorityMenuTag) { //
 }
 
 - (NSUInteger)findFileNode:(FileListNode*)node
-                    inList:(NSArray*)list
+                    inList:(NSArray<FileListNode*>*)list
                  atIndexes:(NSIndexSet*)indexes
              currentParent:(FileListNode*)currentParent
                finalParent:(FileListNode* __autoreleasing*)parent

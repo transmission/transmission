@@ -4,7 +4,7 @@
 [submodule "third-party/dht"]
 	path = third-party/dht
 	url = https://github.com/transmission/dht
-	branch = post-0.25-transmission
+	branch = post-0.27-transmission
 [submodule "third-party/libb64"]
 	path = third-party/libb64
 	url = https://github.com/transmission/libb64
@@ -35,6 +35,7 @@
 [submodule "third-party/libdeflate"]
 	path = third-party/libdeflate
 	url = https://github.com/transmission/libdeflate
+	branch = v1.10-plus-cmake
 [submodule "third-party/libpsl"]
 	path = third-party/libpsl
 	url = https://github.com/transmission/libpsl.git
@@ -42,3 +43,6 @@
 [submodule "third-party/fmt"]
 	path = third-party/fmt
 	url = https://github.com/transmission/fmt.git
+[submodule "third-party/fast_float"]
+	path = third-party/fast_float
+	url = https://github.com/transmission/fast_float

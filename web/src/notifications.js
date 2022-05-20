@@ -44,7 +44,7 @@ export class Notifications {
       const title = `${event.type === 'downloadComplete' ? 'Download' : 'Seeding'} complete`;
       const content = torrent.getName();
       const notification = window.webkitNotifications.createNotification(
-        'style/transmission/images/logo.png',
+        'assets/img/logo.png',
         title,
         content
       );

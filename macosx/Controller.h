@@ -62,24 +62,24 @@ typedef NS_ENUM(unsigned int, addType) { //
 
 - (void)resumeSelectedTorrentsNoWait:(id)sender;
 - (void)resumeWaitingTorrents:(id)sender;
-- (void)resumeTorrentsNoWait:(NSArray*)torrents;
+- (void)resumeTorrentsNoWait:(NSArray<Torrent*>*)torrents;
 
 - (void)stopSelectedTorrents:(id)sender;
 - (void)stopAllTorrents:(id)sender;
-- (void)stopTorrents:(NSArray*)torrents;
+- (void)stopTorrents:(NSArray<Torrent*>*)torrents;
 
-- (void)removeTorrents:(NSArray*)torrents deleteData:(BOOL)deleteData;
-- (void)confirmRemoveTorrents:(NSArray*)torrents deleteData:(BOOL)deleteData;
+- (void)removeTorrents:(NSArray<Torrent*>*)torrents deleteData:(BOOL)deleteData;
+- (void)confirmRemoveTorrents:(NSArray<Torrent*>*)torrents deleteData:(BOOL)deleteData;
 - (void)removeNoDelete:(id)sender;
 - (void)removeDeleteData:(id)sender;
 
 - (void)clearCompleted:(id)sender;
 
 - (void)moveDataFilesSelected:(id)sender;
-- (void)moveDataFiles:(NSArray*)torrents;
+- (void)moveDataFiles:(NSArray<Torrent*>*)torrents;
 
 - (void)copyTorrentFiles:(id)sender;
-- (void)copyTorrentFileForTorrents:(NSMutableArray*)torrents;
+- (void)copyTorrentFileForTorrents:(NSMutableArray<Torrent*>*)torrents;
 
 - (void)copyMagnetLinks:(id)sender;
 
@@ -92,7 +92,7 @@ typedef NS_ENUM(unsigned int, addType) { //
 - (void)verifySelectedTorrents:(id)sender;
 - (void)verifyTorrents:(NSArray*)torrents;
 
-@property(nonatomic, readonly) NSArray* selectedTorrents;
+@property(nonatomic, readonly) NSArray<Torrent*>* selectedTorrents;
 
 @property(nonatomic, readonly) PrefsController* prefsController;
 - (void)showPreferenceWindow:(id)sender;
@@ -122,7 +122,7 @@ typedef NS_ENUM(unsigned int, addType) { //
 
 - (void)applyFilter;
 
-- (void)sortTorrents:(BOOL)includeQueueOrder;
+- (void)sortTorrentsAndIncludeQueueOrder:(BOOL)includeQueueOrder;
 - (void)sortTorrentsCallUpdates:(BOOL)callUpdates includeQueueOrder:(BOOL)includeQueueOrder;
 - (void)rearrangeTorrentTableArray:(NSMutableArray*)rearrangeArray
                          forParent:(id)parent

@@ -115,47 +115,11 @@ uint64_t tr_time_msec();
 /** @brief sleep the specified number of milliseconds */
 void tr_wait_msec(long int delay_milliseconds);
 
-#if defined(__GNUC__) && !__has_include(<charconv>)
+template<typename T, std::enable_if_t<std::is_integral<T>::value, bool> = true>
+[[nodiscard]] std::optional<T> tr_parseNum(std::string_view& sv, int base = 10);
 
-#include <sstream>
-
-template<typename T>
-[[nodiscard]] std::optional<T> tr_parseNum(std::string_view& sv)
-{
-    auto val = T{};
-    auto const str = std::string(std::data(sv), std::min(std::size(sv), size_t{ 64 }));
-    auto sstream = std::stringstream{ str };
-    auto const oldpos = sstream.tellg();
-    sstream >> val;
-    auto const newpos = sstream.tellg();
-    if ((newpos == oldpos) || (sstream.fail() && !sstream.eof()))
-    {
-        return std::nullopt;
-    }
-    sv.remove_prefix(sstream.eof() ? std::size(sv) : newpos - oldpos);
-    return val;
-}
-
-#else // #if defined(__GNUC__) && !__has_include(<charconv>)
-
-#include <charconv> // std::from_chars()
-
-template<typename T>
-[[nodiscard]] std::optional<T> tr_parseNum(std::string_view& sv)
-{
-    auto val = T{};
-    auto const* const begin_ch = std::data(sv);
-    auto const* const end_ch = begin_ch + std::size(sv);
-    auto const result = std::from_chars(begin_ch, end_ch, val);
-    if (result.ec != std::errc{})
-    {
-        return std::nullopt;
-    }
-    sv.remove_prefix(result.ptr - std::data(sv));
-    return val;
-}
-
-#endif // #if defined(__GNUC__) && !__has_include(<charconv>)
+template<typename T, std::enable_if_t<std::is_floating_point<T>::value, bool> = true>
+[[nodiscard]] std::optional<T> tr_parseNum(std::string_view& sv);
 
 bool tr_utf8_validate(std::string_view sv, char const** endptr);
 

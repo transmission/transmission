@@ -10,7 +10,7 @@
 
 TEST(History, recentHistory)
 {
-    auto h = tr_recentHistory{};
+    auto h = tr_recentHistory<size_t, 60>{};
 
     h.add(10000, 1);
     EXPECT_EQ(0U, h.count(12000, 1000));

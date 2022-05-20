@@ -23,7 +23,6 @@
 #include "completion.h"
 #include "crypto-utils.h"
 #include "error.h"
-#include "fdlimit.h"
 #include "file.h"
 #include "log.h"
 #include "platform-quota.h" /* tr_device_info_get_disk_space() */
@@ -562,7 +561,7 @@ static void initField(tr_torrent const* const tor, tr_stat const* const st, tr_v
         break;
 
     case TR_KEY_group:
-        tr_variantInitStrView(initme, tor->group);
+        tr_variantInitStrView(initme, tor->bandwidthGroup().sv());
         break;
 
     case TR_KEY_hashString:
@@ -654,7 +653,7 @@ static void initField(tr_torrent const* const tor, tr_stat const* const st, tr_v
     case TR_KEY_peersFrom:
         {
             tr_variantInitDict(initme, 7);
-            int const* f = st->peersFrom;
+            auto const* f = st->peersFrom;
             tr_variantDictAddInt(initme, TR_KEY_fromCache, f[TR_PEER_FROM_RESUME]);
             tr_variantDictAddInt(initme, TR_KEY_fromDht, f[TR_PEER_FROM_DHT]);
             tr_variantDictAddInt(initme, TR_KEY_fromIncoming, f[TR_PEER_FROM_INCOMING]);
@@ -1162,7 +1161,7 @@ static char const* torrentSet(
 
         if (std::string_view group; tr_variantDictFindStrView(args_in, TR_KEY_group, &group))
         {
-            tor->setGroup(group);
+            tor->setBandwidthGroup(group);
         }
 
         if (errmsg == nullptr && tr_variantDictFindList(args_in, TR_KEY_labels, &tmp_variant))
@@ -1456,8 +1455,8 @@ static void onBlocklistFetched(tr_web::FetchResponse const& web_response)
     }
 
     // feed it to the session and give the client a response
-    int const rule_count = tr_blocklistSetContent(session, filename);
-    tr_variantDictAddInt(data->args_out, TR_KEY_blocklist_size, rule_count);
+    size_t const rule_count = tr_blocklistSetContent(session, filename);
+    tr_variantDictAddInt(data->args_out, TR_KEY_blocklist_size, static_cast<int64_t>(rule_count));
     tr_sys_path_remove(filename);
     tr_idle_function_done(data, SuccessResult);
 }

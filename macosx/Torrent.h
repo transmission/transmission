@@ -67,8 +67,8 @@ typedef NS_ENUM(unsigned int, TorrentDeterminationType) {
 
 - (BOOL)usesSpeedLimit:(BOOL)upload;
 - (void)setUseSpeedLimit:(BOOL)use upload:(BOOL)upload;
-- (NSInteger)speedLimit:(BOOL)upload;
-- (void)setSpeedLimit:(NSInteger)limit upload:(BOOL)upload;
+- (NSUInteger)speedLimit:(BOOL)upload;
+- (void)setSpeedLimit:(NSUInteger)limit upload:(BOOL)upload;
 @property(nonatomic) BOOL usesGlobalSpeedLimit;
 
 @property(nonatomic) uint16_t maxPeerConnect;
@@ -93,7 +93,7 @@ typedef NS_ENUM(unsigned int, TorrentDeterminationType) {
 @property(nonatomic, readonly) uint64_t sizeLeft;
 
 @property(nonatomic, readonly) NSMutableArray* allTrackerStats;
-@property(nonatomic, readonly) NSArray* allTrackersFlat; //used by GroupRules
+@property(nonatomic, readonly) NSArray<NSString*>* allTrackersFlat; //used by GroupRules
 - (BOOL)addTrackerToNewTier:(NSString*)tracker;
 - (void)removeTrackers:(NSSet*)trackers;
 
@@ -133,10 +133,10 @@ typedef NS_ENUM(unsigned int, TorrentDeterminationType) {
 @property(nonatomic, getter=isAnyErrorOrWarning, readonly) BOOL anyErrorOrWarning;
 @property(nonatomic, readonly) NSString* errorMessage;
 
-@property(nonatomic, readonly) NSArray* peers;
+@property(nonatomic, readonly) NSArray<NSDictionary*>* peers;
 
 @property(nonatomic, readonly) NSUInteger webSeedCount;
-@property(nonatomic, readonly) NSArray* webSeeds;
+@property(nonatomic, readonly) NSArray<NSDictionary*>* webSeeds;
 
 @property(nonatomic, readonly) NSString* progressString;
 @property(nonatomic, readonly) NSString* statusString;
@@ -144,17 +144,17 @@ typedef NS_ENUM(unsigned int, TorrentDeterminationType) {
 @property(nonatomic, readonly) NSString* remainingTimeString;
 
 @property(nonatomic, readonly) NSString* stateString;
-@property(nonatomic, readonly) NSInteger totalPeersConnected;
-@property(nonatomic, readonly) NSInteger totalPeersTracker;
-@property(nonatomic, readonly) NSInteger totalPeersIncoming;
-@property(nonatomic, readonly) NSInteger totalPeersCache;
-@property(nonatomic, readonly) NSInteger totalPeersPex;
-@property(nonatomic, readonly) NSInteger totalPeersDHT;
-@property(nonatomic, readonly) NSInteger totalPeersLocal;
-@property(nonatomic, readonly) NSInteger totalPeersLTEP;
+@property(nonatomic, readonly) NSUInteger totalPeersConnected;
+@property(nonatomic, readonly) NSUInteger totalPeersTracker;
+@property(nonatomic, readonly) NSUInteger totalPeersIncoming;
+@property(nonatomic, readonly) NSUInteger totalPeersCache;
+@property(nonatomic, readonly) NSUInteger totalPeersPex;
+@property(nonatomic, readonly) NSUInteger totalPeersDHT;
+@property(nonatomic, readonly) NSUInteger totalPeersLocal;
+@property(nonatomic, readonly) NSUInteger totalPeersLTEP;
 
-@property(nonatomic, readonly) NSInteger peersSendingToUs;
-@property(nonatomic, readonly) NSInteger peersGettingFromUs;
+@property(nonatomic, readonly) NSUInteger peersSendingToUs;
+@property(nonatomic, readonly) NSUInteger peersGettingFromUs;
 
 @property(nonatomic, readonly) CGFloat downloadRate;
 @property(nonatomic, readonly) CGFloat uploadRate;
@@ -172,9 +172,9 @@ typedef NS_ENUM(unsigned int, TorrentDeterminationType) {
 @property(nonatomic, readonly) NSInteger groupOrderValue;
 - (void)checkGroupValueForRemoval:(NSNotification*)notification;
 
-@property(nonatomic, readonly) NSArray* fileList;
-@property(nonatomic, readonly) NSArray* flatFileList;
-@property(nonatomic, readonly) NSInteger fileCount;
+@property(nonatomic, readonly) NSArray<FileListNode*>* fileList;
+@property(nonatomic, readonly) NSArray<FileListNode*>* flatFileList;
+@property(nonatomic, readonly) NSUInteger fileCount;
 
 //methods require fileStats to have been updated recently to be accurate
 - (CGFloat)fileProgress:(FileListNode*)node;

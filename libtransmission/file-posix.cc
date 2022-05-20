@@ -12,7 +12,6 @@
 #include <climits> /* PATH_MAX */
 #include <cstdint> /* SIZE_MAX */
 #include <cstdio>
-#include <cstdlib>
 #include <cstring>
 #include <string_view>
 #include <string>
@@ -388,7 +387,7 @@ char* tr_sys_path_resolve(char const* path, tr_error** error)
 
 std::string tr_sys_path_basename(std::string_view path, tr_error** error)
 {
-    auto tmp = std::string{ path };
+    auto tmp = tr_pathbuf{ path };
 
     if (char const* ret = basename(std::data(tmp)); ret != nullptr)
     {
@@ -785,7 +784,7 @@ bool tr_sys_file_read_at(
 
         ret = true;
     }
-    else
+    else if (my_bytes_read == -1)
     {
         set_system_error(error, errno);
     }

@@ -28,6 +28,7 @@
 #include "bandwidth.h"
 #include "interned-string.h"
 #include "net.h" // tr_socket_t
+#include "open-files.h"
 #include "quark.h"
 #include "torrents.h"
 #include "web.h"
@@ -52,7 +53,7 @@ struct tr_address;
 struct tr_announcer;
 struct tr_announcer_udp;
 struct tr_bindsockets;
-struct tr_blocklistFile;
+struct BlocklistFile;
 struct tr_cache;
 struct tr_fdInfo;
 
@@ -276,6 +277,16 @@ public:
 
     [[nodiscard]] Bandwidth& getBandwidthGroup(std::string_view name);
 
+    //
+
+    [[nodiscard]] constexpr auto& openFiles() noexcept
+    {
+        return open_files_;
+    }
+
+    void closeTorrentFiles(tr_torrent* tor) noexcept;
+    void closeTorrentFile(tr_torrent* tor, tr_file_index_t file_num) noexcept;
+
 public:
     static constexpr std::array<std::tuple<tr_quark, tr_quark, TrScript>, 3> Scripts{
         { { TR_KEY_script_torrent_added_enabled, TR_KEY_script_torrent_added_filename, TR_SCRIPT_ON_TORRENT_ADDED },
@@ -313,8 +324,6 @@ public:
     bool speedLimitEnabled[2];
 
     struct tr_turtle_info turtle;
-
-    struct tr_fdInfo* fdInfo;
 
     int magicNumber;
 
@@ -370,7 +379,7 @@ public:
     std::string resume_dir;
     std::string torrent_dir;
 
-    std::vector<tr_blocklistFile*> blocklists;
+    std::vector<std::unique_ptr<BlocklistFile>> blocklists;
     struct tr_peerMgr* peerMgr;
     struct tr_shared* shared;
 
@@ -450,6 +459,8 @@ private:
     std::array<bool, TR_SCRIPT_N_TYPES> scripts_enabled_;
     bool blocklist_enabled_ = false;
     bool incomplete_dir_enabled_ = false;
+
+    tr_open_files open_files_;
 };
 
 bool tr_sessionAllowsDHT(tr_session const* session);

@@ -5,7 +5,6 @@
 #include <libtransmission/transmission.h>
 #include <libtransmission/utils.h>
 
-#import "NSApplicationAdditions.h"
 #import "NSStringAdditions.h"
 
 @interface NSString (Private)
@@ -34,13 +33,15 @@
     return [NSString localizedStringWithFormat:@"%lu", value];
 }
 
-#warning should we take long long instead?
+// Maximum supported localization is 9.22 EB, which is the maximum supported filesystem size by macOS, 8 EiB.
+// https://developer.apple.com/library/archive/documentation/FileManagement/Conceptual/APFS_Guide/VolumeFormatComparison/VolumeFormatComparison.html
 + (NSString*)stringForFileSize:(uint64_t)size
 {
     return [NSByteCountFormatter stringFromByteCount:size countStyle:NSByteCountFormatterCountStyleFile];
 }
 
-#warning should we take long long instead?
+// Maximum supported localization is 9.22 EB, which is the maximum supported filesystem size by macOS, 8 EiB.
+// https://developer.apple.com/library/archive/documentation/FileManagement/Conceptual/APFS_Guide/VolumeFormatComparison/VolumeFormatComparison.html
 + (NSString*)stringForFilePartialSize:(uint64_t)partialSize fullSize:(uint64_t)fullSize
 {
     NSByteCountFormatter* fileSizeFormatter = [[NSByteCountFormatter alloc] init];
@@ -128,34 +129,16 @@
     return [self compare:string options:comparisonOptions range:NSMakeRange(0, self.length) locale:NSLocale.currentLocale];
 }
 
-- (NSArray*)betterComponentsSeparatedByCharactersInSet:(NSCharacterSet*)separators
+- (NSArray<NSString*>*)nonEmptyComponentsSeparatedByCharactersInSet:(NSCharacterSet*)separators
 {
-    NSMutableArray* components = [NSMutableArray array];
-
-    NSCharacterSet* includedCharSet = separators.invertedSet;
-    NSUInteger index = 0;
-    NSUInteger const fullLength = self.length;
-    do
+    NSMutableArray<NSString*>* components = [NSMutableArray array];
+    for (NSString* evaluatedObject in [self componentsSeparatedByCharactersInSet:separators])
     {
-        NSUInteger const start = [self rangeOfCharacterFromSet:includedCharSet options:0 range:NSMakeRange(index, fullLength - index)]
-                                     .location;
-        if (start == NSNotFound)
+        if (evaluatedObject.length > 0)
         {
-            break;
+            [components addObject:evaluatedObject];
         }
-
-        NSRange const endRange = [self rangeOfCharacterFromSet:separators options:0 range:NSMakeRange(start, fullLength - start)];
-        if (endRange.location == NSNotFound)
-        {
-            [components addObject:[self substringFromIndex:start]];
-            break;
-        }
-
-        [components addObject:[self substringWithRange:NSMakeRange(start, endRange.location - start)]];
-
-        index = NSMaxRange(endRange);
-    } while (YES);
-
+    }
     return components;
 }
 

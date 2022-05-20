@@ -37,7 +37,7 @@
 @property(nonatomic, readonly) tr_metainfo_builder* fInfo;
 @property(nonatomic, readonly) NSURL* fPath;
 @property(nonatomic) NSURL* fLocation;
-@property(nonatomic) NSMutableArray* fTrackers;
+@property(nonatomic) NSMutableArray<NSString*>* fTrackers;
 
 @property(nonatomic) NSTimer* fTimer;
 @property(nonatomic) BOOL fStarted;
@@ -175,11 +175,10 @@ NSMutableSet* creatorWindowControllerSet = nil;
     if (multifile)
     {
         NSString* fileString;
-        NSInteger count = self.fInfo->fileCount;
+        NSUInteger count = self.fInfo->fileCount;
         if (count != 1)
         {
-            fileString = [NSString
-                stringWithFormat:NSLocalizedString(@"%@ files", "Create torrent -> info"), [NSString formattedUInteger:count]];
+            fileString = [NSString stringWithFormat:NSLocalizedString(@"%lu files", "Create torrent -> info"), count];
         }
         else
         {
@@ -520,7 +519,7 @@ NSMutableSet* creatorWindowControllerSet = nil;
     }
     else
     {
-        self.fPiecesField.stringValue = [NSString stringWithFormat:NSLocalizedString(@"%d pieces, %@ each", "Create torrent -> info"),
+        self.fPiecesField.stringValue = [NSString stringWithFormat:NSLocalizedString(@"%u pieces, %@ each", "Create torrent -> info"),
                                                                    self.fInfo->pieceCount,
                                                                    [NSString stringForFileSize:self.fInfo->pieceSize]];
     }

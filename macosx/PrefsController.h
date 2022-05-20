@@ -6,9 +6,11 @@
 
 #include <libtransmission/transmission.h>
 
-@interface PrefsController : NSWindowController<NSToolbarDelegate>
+@protocol PortCheckerDelegate;
 
-@property(nonatomic, readonly) NSArray* sounds;
+@interface PrefsController : NSWindowController<NSToolbarDelegate, PortCheckerDelegate>
+
+@property(nonatomic, readonly) NSArray<NSString*>* sounds;
 
 + (NSInteger)dateToTimeSum:(NSDate*)date;
 

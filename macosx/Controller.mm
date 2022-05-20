@@ -255,9 +255,9 @@ static void removeKeRangerRansomware()
 
 @property(nonatomic, readonly) tr_session* fLib;
 
-@property(nonatomic, readonly) NSMutableArray* fTorrents;
+@property(nonatomic, readonly) NSMutableArray<Torrent*>* fTorrents;
 @property(nonatomic, readonly) NSMutableArray* fDisplayedTorrents;
-@property(nonatomic, readonly) NSMutableDictionary* fTorrentHashes;
+@property(nonatomic, readonly) NSMutableDictionary<NSString*, Torrent*>* fTorrentHashes;
 
 @property(nonatomic, readonly) InfoWindowController* fInfoController;
 @property(nonatomic) MessageWindowController* fMessageController;
@@ -282,18 +282,19 @@ static void removeKeRangerRansomware()
 
 @property(nonatomic) Badger* fBadger;
 
-@property(nonatomic) NSMutableArray* fAutoImportedNames;
+@property(nonatomic) NSMutableArray<NSString*>* fAutoImportedNames;
 @property(nonatomic) NSTimer* fAutoImportTimer;
 
-@property(nonatomic) NSMutableDictionary* fPendingTorrentDownloads;
+@property(nonatomic) NSMutableDictionary<NSURL*, id>* fPendingTorrentDownloads;
 
-@property(nonatomic) NSMutableSet* fAddingTransfers;
+@property(nonatomic) NSMutableSet<Torrent*>* fAddingTransfers;
 
-@property(nonatomic) NSMutableSet* fAddWindows;
+@property(nonatomic) NSMutableSet<NSWindowController*>* fAddWindows;
 @property(nonatomic) URLSheetWindowController* fUrlSheetController;
 
 @property(nonatomic) BOOL fGlobalPopoverShown;
 @property(nonatomic) BOOL fSoundPlaying;
+@property(nonatomic) id fNoNapActivity;
 
 @end
 
@@ -781,6 +782,9 @@ static void removeKeRangerRansomware()
 {
     NSApp.servicesProvider = self;
 
+    self.fNoNapActivity = [NSProcessInfo.processInfo beginActivityWithOptions:NSActivityUserInitiatedAllowingIdleSystemSleep
+                                                                       reason:NSLocalizedString(@"No napping on the job!", nil)];
+
     //register for dock icon drags (has to be in applicationDidFinishLaunching: to work)
     [[NSAppleEventManager sharedAppleEventManager] setEventHandler:self andSelector:@selector(handleOpenContentsEvent:replyEvent:)
                                                      forEventClass:kCoreEventClass
@@ -872,7 +876,7 @@ static void removeKeRangerRansomware()
 {
     if (!self.fQuitRequested && [self.fDefaults boolForKey:@"CheckQuit"])
     {
-        NSInteger active = 0, downloading = 0;
+        NSUInteger active = 0, downloading = 0;
         for (Torrent* torrent in self.fTorrents)
         {
             if (torrent.active && !torrent.stalled)
@@ -896,7 +900,7 @@ static void removeKeRangerRansomware()
                      " The transfer will automatically resume on the next launch.",
                     "Confirm Quit panel -> message") :
                 [NSString stringWithFormat:NSLocalizedString(
-                                               @"There are %d active transfers that will be paused on quit."
+                                               @"There are %lu active transfers that will be paused on quit."
                                                 " The transfers will automatically resume on the next launch.",
                                                "Confirm Quit panel -> message"),
                                            active];
@@ -916,6 +920,8 @@ static void removeKeRangerRansomware()
 - (void)applicationWillTerminate:(NSNotification*)notification
 {
     self.fQuitting = YES;
+
+    [NSProcessInfo.processInfo endActivity:self.fNoNapActivity];
 
     //stop the Bonjour service
     if (BonjourController.defaultControllerExists)
@@ -1612,7 +1618,7 @@ static void removeKeRangerRansomware()
     [self resumeTorrentsNoWait:torrents];
 }
 
-- (void)resumeTorrentsNoWait:(NSArray*)torrents
+- (void)resumeTorrentsNoWait:(NSArray<Torrent*>*)torrents
 {
     //iterate through instead of all at once to ensure no conflicts
     for (Torrent* torrent in torrents)
@@ -1633,7 +1639,7 @@ static void removeKeRangerRansomware()
     [self stopTorrents:self.fTorrents];
 }
 
-- (void)stopTorrents:(NSArray*)torrents
+- (void)stopTorrents:(NSArray<Torrent*>*)torrents
 {
     //don't want any of these starting then stopping
     for (Torrent* torrent in torrents)
@@ -1652,7 +1658,7 @@ static void removeKeRangerRansomware()
     [self fullUpdateUI];
 }
 
-- (void)removeTorrents:(NSArray*)torrents deleteData:(BOOL)deleteData
+- (void)removeTorrents:(NSArray<Torrent*>*)torrents deleteData:(BOOL)deleteData
 {
     if ([self.fDefaults boolForKey:@"CheckRemove"])
     {
@@ -1676,7 +1682,7 @@ static void removeKeRangerRansomware()
             NSUInteger const selected = torrents.count;
             if (selected == 1)
             {
-                NSString* torrentName = ((Torrent*)torrents[0]).name;
+                NSString* torrentName = torrents[0].name;
 
                 if (deleteData)
                 {
@@ -1703,29 +1709,29 @@ static void removeKeRangerRansomware()
                 if (deleteData)
                 {
                     title = [NSString stringWithFormat:NSLocalizedString(
-                                                           @"Are you sure you want to remove %@ transfers from the transfer list"
+                                                           @"Are you sure you want to remove %lu transfers from the transfer list"
                                                             " and trash the data files?",
                                                            "Removal confirm panel -> title"),
-                                                       [NSString formattedUInteger:selected]];
+                                                       selected];
                 }
                 else
                 {
                     title = [NSString stringWithFormat:NSLocalizedString(
-                                                           @"Are you sure you want to remove %@ transfers from the transfer list?",
+                                                           @"Are you sure you want to remove %lu transfers from the transfer list?",
                                                            "Removal confirm panel -> title"),
-                                                       [NSString formattedUInteger:selected]];
+                                                       selected];
                 }
 
                 if (selected == active)
                 {
-                    message = [NSString stringWithFormat:NSLocalizedString(@"There are %@ active transfers.", "Removal confirm panel -> message part 1"),
-                                                         [NSString formattedUInteger:active]];
+                    message = [NSString stringWithFormat:NSLocalizedString(@"There are %lu active transfers.", "Removal confirm panel -> message part 1"),
+                                                         active];
                 }
                 else
                 {
-                    message = [NSString stringWithFormat:NSLocalizedString(@"There are %@ transfers (%@ active).", "Removal confirm panel -> message part 1"),
-                                                         [NSString formattedUInteger:selected],
-                                                         [NSString formattedUInteger:active]];
+                    message = [NSString stringWithFormat:NSLocalizedString(@"There are %1$lu transfers (%2$lu active).", "Removal confirm panel -> message part 1"),
+                                                         selected,
+                                                         active];
                 }
                 message = [message stringByAppendingFormat:@" %@",
                                                            NSLocalizedString(
@@ -1753,7 +1759,7 @@ static void removeKeRangerRansomware()
     [self confirmRemoveTorrents:torrents deleteData:deleteData];
 }
 
-- (void)confirmRemoveTorrents:(NSArray*)torrents deleteData:(BOOL)deleteData
+- (void)confirmRemoveTorrents:(NSArray<Torrent*>*)torrents deleteData:(BOOL)deleteData
 {
     //miscellaneous
     for (Torrent* torrent in torrents)
@@ -1872,7 +1878,7 @@ static void removeKeRangerRansomware()
 
 - (void)clearCompleted:(id)sender
 {
-    NSMutableArray* torrents = [NSMutableArray array];
+    NSMutableArray<Torrent*>* torrents = [NSMutableArray array];
 
     for (Torrent* torrent in self.fTorrents)
     {
@@ -1887,7 +1893,7 @@ static void removeKeRangerRansomware()
         NSString *message, *info;
         if (torrents.count == 1)
         {
-            NSString* torrentName = ((Torrent*)torrents[0]).name;
+            NSString* torrentName = torrents[0].name;
             message = [NSString
                 stringWithFormat:NSLocalizedString(@"Are you sure you want to remove \"%@\" from the transfer list?", "Remove completed confirm panel -> title"),
                                  torrentName];
@@ -1899,9 +1905,9 @@ static void removeKeRangerRansomware()
         else
         {
             message = [NSString stringWithFormat:NSLocalizedString(
-                                                     @"Are you sure you want to remove %@ completed transfers from the transfer list?",
+                                                     @"Are you sure you want to remove %lu completed transfers from the transfer list?",
                                                      "Remove completed confirm panel -> title"),
-                                                 [NSString formattedUInteger:torrents.count]];
+                                                 torrents.count];
 
             info = NSLocalizedString(
                 @"Once removed, continuing the transfers will require the torrent files or magnet links.",
@@ -1936,7 +1942,7 @@ static void removeKeRangerRansomware()
     [self moveDataFiles:self.fTableView.selectedTorrents];
 }
 
-- (void)moveDataFiles:(NSArray*)torrents
+- (void)moveDataFiles:(NSArray<Torrent*>*)torrents
 {
     NSOpenPanel* panel = [NSOpenPanel openPanel];
     panel.prompt = NSLocalizedString(@"Select", "Move torrent -> prompt");
@@ -1945,17 +1951,17 @@ static void removeKeRangerRansomware()
     panel.canChooseDirectories = YES;
     panel.canCreateDirectories = YES;
 
-    NSInteger count = torrents.count;
+    NSUInteger count = torrents.count;
     if (count == 1)
     {
         panel.message = [NSString
             stringWithFormat:NSLocalizedString(@"Select the new folder for \"%@\".", "Move torrent -> select destination folder"),
-                             ((Torrent*)torrents[0]).name];
+                             torrents[0].name];
     }
     else
     {
         panel.message = [NSString
-            stringWithFormat:NSLocalizedString(@"Select the new folder for %d data files.", "Move torrent -> select destination folder"), count];
+            stringWithFormat:NSLocalizedString(@"Select the new folder for %lu data files.", "Move torrent -> select destination folder"), count];
     }
 
     [panel beginSheetModalForWindow:self.fWindow completionHandler:^(NSInteger result) {
@@ -1974,7 +1980,7 @@ static void removeKeRangerRansomware()
     [self copyTorrentFileForTorrents:[[NSMutableArray alloc] initWithArray:self.fTableView.selectedTorrents]];
 }
 
-- (void)copyTorrentFileForTorrents:(NSMutableArray*)torrents
+- (void)copyTorrentFileForTorrents:(NSMutableArray<Torrent*>*)torrents
 {
     if (torrents.count == 0)
     {
@@ -2026,24 +2032,7 @@ static void removeKeRangerRansomware()
 
 - (void)copyMagnetLinks:(id)sender
 {
-    NSArray* torrents = self.fTableView.selectedTorrents;
-
-    if (torrents.count <= 0)
-    {
-        return;
-    }
-
-    NSMutableArray* links = [NSMutableArray arrayWithCapacity:torrents.count];
-    for (Torrent* torrent in torrents)
-    {
-        [links addObject:torrent.magnetLink];
-    }
-
-    NSString* text = [links componentsJoinedByString:@"\n"];
-
-    NSPasteboard* pb = NSPasteboard.generalPasteboard;
-    [pb clearContents];
-    [pb writeObjects:@[ text ]];
+    [self.fTableView copy:sender];
 }
 
 - (void)revealFile:(id)sender
@@ -2100,7 +2089,7 @@ static void removeKeRangerRansomware()
     [self verifyTorrents:self.fTableView.selectedTorrents];
 }
 
-- (void)verifyTorrents:(NSArray*)torrents
+- (void)verifyTorrents:(NSArray<Torrent*>*)torrents
 {
     for (Torrent* torrent in torrents)
     {
@@ -2110,7 +2099,7 @@ static void removeKeRangerRansomware()
     [self applyFilter];
 }
 
-- (NSArray*)selectedTorrents
+- (NSArray<Torrent*>*)selectedTorrents
 {
     return self.fTableView.selectedTorrents;
 }
@@ -2213,7 +2202,7 @@ static void removeKeRangerRansomware()
     {
         if (self.fWindow.visible)
         {
-            [self sortTorrents:NO];
+            [self sortTorrentsAndIncludeQueueOrder:NO];
 
             [self.fStatusBar updateWithDownload:dlRate upload:ulRate];
 
@@ -2246,8 +2235,7 @@ static void removeKeRangerRansomware()
     NSUInteger totalCount = self.fTorrents.count;
     if (totalCount != 1)
     {
-        totalTorrentsString = [NSString stringWithFormat:NSLocalizedString(@"%@ transfers", "Status bar transfer count"),
-                                                         [NSString formattedUInteger:totalCount]];
+        totalTorrentsString = [NSString stringWithFormat:NSLocalizedString(@"%lu transfers", "Status bar transfer count"), totalCount];
     }
     else
     {
@@ -2298,13 +2286,42 @@ static void removeKeRangerRansomware()
     else if (notification.activationType == NSUserNotificationActivationTypeContentsClicked)
     {
         Torrent* torrent = [self torrentForHash:notification.userInfo[@"Hash"]];
-        if (torrent)
+        if (!torrent)
         {
-            //select in the table - first see if it's already shown
-            NSInteger row = [self.fTableView rowForItem:torrent];
+            return;
+        }
+        //select in the table - first see if it's already shown
+        NSInteger row = [self.fTableView rowForItem:torrent];
+        if (row == -1)
+        {
+            //if it's not shown, see if it's in a collapsed row
+            if ([self.fDefaults boolForKey:@"SortByGroup"])
+            {
+                __block TorrentGroup* parent = nil;
+                [self.fDisplayedTorrents enumerateObjectsWithOptions:NSEnumerationConcurrent
+                                                          usingBlock:^(TorrentGroup* group, NSUInteger idx, BOOL* stop) {
+                                                              if ([group.torrents containsObject:torrent])
+                                                              {
+                                                                  parent = group;
+                                                                  *stop = YES;
+                                                              }
+                                                          }];
+                if (parent)
+                {
+                    [[self.fTableView animator] expandItem:parent];
+                    row = [self.fTableView rowForItem:torrent];
+                }
+            }
+
             if (row == -1)
             {
-                //if it's not shown, see if it's in a collapsed row
+                //not found - must be filtering
+                NSAssert([self.fDefaults boolForKey:@"FilterBar"], @"expected the filter to be enabled");
+                [self.fFilterBar reset:YES];
+
+                row = [self.fTableView rowForItem:torrent];
+
+                //if it's not shown, it has to be in a collapsed row...again
                 if ([self.fDefaults boolForKey:@"SortByGroup"])
                 {
                     __block TorrentGroup* parent = nil;
@@ -2322,41 +2339,13 @@ static void removeKeRangerRansomware()
                         row = [self.fTableView rowForItem:torrent];
                     }
                 }
-
-                if (row == -1)
-                {
-                    //not found - must be filtering
-                    NSAssert([self.fDefaults boolForKey:@"FilterBar"], @"expected the filter to be enabled");
-                    [self.fFilterBar reset:YES];
-
-                    row = [self.fTableView rowForItem:torrent];
-
-                    //if it's not shown, it has to be in a collapsed row...again
-                    if ([self.fDefaults boolForKey:@"SortByGroup"])
-                    {
-                        __block TorrentGroup* parent = nil;
-                        [self.fDisplayedTorrents enumerateObjectsWithOptions:NSEnumerationConcurrent
-                                                                  usingBlock:^(TorrentGroup* group, NSUInteger idx, BOOL* stop) {
-                                                                      if ([group.torrents containsObject:torrent])
-                                                                      {
-                                                                          parent = group;
-                                                                          *stop = YES;
-                                                                      }
-                                                                  }];
-                        if (parent)
-                        {
-                            [[self.fTableView animator] expandItem:parent];
-                            row = [self.fTableView rowForItem:torrent];
-                        }
-                    }
-                }
             }
-
-            NSAssert1(row != -1, @"expected a row to be found for torrent %@", torrent);
-
-            [self showMainWindow:nil];
-            [self.fTableView selectAndScrollToRow:row];
         }
+
+        NSAssert1(row != -1, @"expected a row to be found for torrent %@", torrent);
+
+        [self showMainWindow:nil];
+        [self.fTableView selectAndScrollToRow:row];
     }
 }
 
@@ -2365,8 +2354,8 @@ static void removeKeRangerRansomware()
     NSParameterAssert(hash != nil);
 
     __block Torrent* torrent = nil;
-    [self.fTorrents enumerateObjectsWithOptions:NSEnumerationConcurrent usingBlock:^(id obj, NSUInteger idx, BOOL* stop) {
-        if ([((Torrent*)obj).hashString isEqualToString:hash])
+    [self.fTorrents enumerateObjectsWithOptions:NSEnumerationConcurrent usingBlock:^(Torrent* obj, NSUInteger idx, BOOL* stop) {
+        if ([obj.hashString isEqualToString:hash])
         {
             torrent = obj;
             *stop = YES;
@@ -2537,7 +2526,7 @@ static void removeKeRangerRansomware()
 
     [self.fDefaults setObject:sortType forKey:@"Sort"];
 
-    [self sortTorrents:YES];
+    [self sortTorrentsAndIncludeQueueOrder:YES];
 }
 
 - (void)setSortByGroup:(id)sender
@@ -2554,11 +2543,11 @@ static void removeKeRangerRansomware()
     if (setReverse != [self.fDefaults boolForKey:@"SortReverse"])
     {
         [self.fDefaults setBool:setReverse forKey:@"SortReverse"];
-        [self sortTorrents:NO];
+        [self sortTorrentsAndIncludeQueueOrder:NO];
     }
 }
 
-- (void)sortTorrents:(BOOL)includeQueueOrder
+- (void)sortTorrentsAndIncludeQueueOrder:(BOOL)includeQueueOrder
 {
     //actually sort
     [self sortTorrentsCallUpdates:YES includeQueueOrder:includeQueueOrder];
@@ -2813,14 +2802,16 @@ static void removeKeRangerRansomware()
                     //to count, we need each string in at least 1 tracker
                     [searchStrings enumerateObjectsWithOptions:NSEnumerationConcurrent usingBlock:^(id searchString, NSUInteger idx, BOOL* stop) {
                         __block BOOL found = NO;
-                        [trackers enumerateObjectsWithOptions:NSEnumerationConcurrent usingBlock:^(id tracker, NSUInteger idx, BOOL* stopTracker) {
-                            if ([tracker rangeOfString:searchString options:(NSCaseInsensitiveSearch | NSDiacriticInsensitiveSearch)]
-                                    .location != NSNotFound)
-                            {
-                                found = YES;
-                                *stopTracker = YES;
-                            }
-                        }];
+                        [trackers enumerateObjectsWithOptions:NSEnumerationConcurrent
+                                                   usingBlock:^(NSString* tracker, NSUInteger idx, BOOL* stopTracker) {
+                                                       if ([tracker rangeOfString:searchString
+                                                                          options:(NSCaseInsensitiveSearch | NSDiacriticInsensitiveSearch)]
+                                                               .location != NSNotFound)
+                                                       {
+                                                           found = YES;
+                                                           *stopTracker = YES;
+                                                       }
+                                                   }];
                         if (!found)
                         {
                             removeTextField = YES;
@@ -2849,7 +2840,7 @@ static void removeKeRangerRansomware()
             return YES;
         }];
 
-    NSArray* allTorrents = [self.fTorrents objectsAtIndexes:indexesOfNonFilteredTorrents];
+    NSArray<Torrent*>* allTorrents = [self.fTorrents objectsAtIndexes:indexesOfNonFilteredTorrents];
 
     //set button tooltips
     if (self.fFilterBar)
@@ -2944,7 +2935,7 @@ static void removeKeRangerRansomware()
                 if (self.fAddingTransfers)
                 {
                     NSIndexSet* newAddIndexes = [allTorrents indexesOfObjectsAtIndexes:addIndexes options:NSEnumerationConcurrent
-                                                                           passingTest:^BOOL(id obj, NSUInteger idx, BOOL* stop) {
+                                                                           passingTest:^BOOL(Torrent* obj, NSUInteger idx, BOOL* stop) {
                                                                                return [self.fAddingTransfers containsObject:obj];
                                                                            }];
 
@@ -3341,7 +3332,7 @@ static void removeKeRangerRansomware()
 
     path = path.stringByExpandingTildeInPath;
 
-    NSArray* importedNames;
+    NSArray<NSString*>* importedNames;
     if (!(importedNames = [NSFileManager.defaultManager contentsOfDirectoryAtPath:path error:NULL]))
     {
         return;
@@ -3566,7 +3557,16 @@ static void removeKeRangerRansomware()
     NSPasteboard* pasteboard = info.draggingPasteboard;
     if ([pasteboard.types containsObject:TORRENT_TABLE_VIEW_DATA_TYPE])
     {
-        NSIndexSet* indexes = [NSKeyedUnarchiver unarchiveObjectWithData:[pasteboard dataForType:TORRENT_TABLE_VIEW_DATA_TYPE]];
+        NSIndexSet* indexes;
+        if (@available(macOS 10.13, *))
+        {
+            indexes = [NSKeyedUnarchiver unarchivedObjectOfClass:NSIndexSet.class fromData:[pasteboard dataForType:TORRENT_TABLE_VIEW_DATA_TYPE]
+                                                           error:nil];
+        }
+        else
+        {
+            indexes = [NSKeyedUnarchiver unarchiveObjectWithData:[pasteboard dataForType:TORRENT_TABLE_VIEW_DATA_TYPE]];
+        }
 
         //get the torrents to move
         NSMutableArray* movingTorrents = [NSMutableArray arrayWithCapacity:indexes.count];
@@ -5140,13 +5140,13 @@ static void removeKeRangerRansomware()
 
     if (seeding > 0)
     {
-        NSString* title = [NSString stringWithFormat:NSLocalizedString(@"%d Seeding", "Dock item - Seeding"), seeding];
+        NSString* title = [NSString stringWithFormat:NSLocalizedString(@"%lu Seeding", "Dock item - Seeding"), seeding];
         [menu addItemWithTitle:title action:nil keyEquivalent:@""];
     }
 
     if (downloading > 0)
     {
-        NSString* title = [NSString stringWithFormat:NSLocalizedString(@"%d Downloading", "Dock item - Downloading"), downloading];
+        NSString* title = [NSString stringWithFormat:NSLocalizedString(@"%lu Downloading", "Dock item - Downloading"), downloading];
         [menu addItemWithTitle:title action:nil keyEquivalent:@""];
     }
 
@@ -5444,7 +5444,7 @@ static void removeKeRangerRansomware()
     NSArray* descriptors = @[ descriptor ];
     [self.fTorrents sortUsingDescriptors:descriptors];
 
-    [self sortTorrents:YES];
+    [self sortTorrentsAndIncludeQueueOrder:YES];
 }
 
 @end
