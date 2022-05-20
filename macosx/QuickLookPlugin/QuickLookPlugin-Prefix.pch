@@ -1,4 +1,5 @@
 #ifdef __OBJC__
 #import <Cocoa/Cocoa.h>
+#import <CoreFoundation/CFPlugInCOM.h>
 #import <QuickLook/QuickLook.h>
 #endif

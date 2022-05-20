@@ -237,7 +237,6 @@
 		A2D77451154CC25700A62B93 /* WebSeedTableView.h in Headers */ = {isa = PBXBuildFile; fileRef = A2D7744F154CC25700A62B93 /* WebSeedTableView.h */; };
 		A2D77452154CC25700A62B93 /* WebSeedTableView.mm in Sources */ = {isa = PBXBuildFile; fileRef = A2D77450154CC25700A62B93 /* WebSeedTableView.mm */; };
 		A2D77453154CC72B00A62B93 /* WebSeedTableView.mm in Sources */ = {isa = PBXBuildFile; fileRef = A2D77450154CC25700A62B93 /* WebSeedTableView.mm */; };
-		A2D8CFBA15F82DFA0056E93D /* NSApplicationAdditions.mm in Sources */ = {isa = PBXBuildFile; fileRef = A29D84031049C25600D1987A /* NSApplicationAdditions.mm */; };
 		A2D8CFBB15F82E030056E93D /* NSStringAdditions.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4DE5CC9C0980656F00BE280E /* NSStringAdditions.mm */; };
 		A2DF37070C220D03006523C1 /* CreatorWindowController.mm in Sources */ = {isa = PBXBuildFile; fileRef = A2DF37050C220D03006523C1 /* CreatorWindowController.mm */; };
 		A2E384DA130DFB3A001F501B /* templates.h in Headers */ = {isa = PBXBuildFile; fileRef = A2E384D2130DFB3A001F501B /* templates.h */; };
@@ -1257,10 +1256,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				A2F35BBC15C5A0A100EBF632 /* QuickLook.framework in Frameworks */,
-				C88771AD2803EE7B005C7523 /* libz.tbd in Frameworks */,
 				A2F35BE115C5A7ED00EBF632 /* Cocoa.framework in Frameworks */,
 				A2F35BE315C5A7F900EBF632 /* Foundation.framework in Frameworks */,
 				A2F35BD415C5A19A00EBF632 /* libtransmission.a in Frameworks */,
+				C88771AD2803EE7B005C7523 /* libz.tbd in Frameworks */,
 				C88771B12803EE86005C7523 /* libiconv.tbd in Frameworks */,
 				55869932257074FE00F77A43 /* libcurl.tbd in Frameworks */,
 			);
@@ -3103,9 +3102,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A2D8CFBB15F82E030056E93D /* NSStringAdditions.mm in Sources */,
-				A2D8CFBA15F82DFA0056E93D /* NSApplicationAdditions.mm in Sources */,
 				A29304EE15D7497C00B1F726 /* main.cc in Sources */,
+				A2D8CFBB15F82E030056E93D /* NSStringAdditions.mm in Sources */,
 				A2F35BCA15C5A0A100EBF632 /* GenerateThumbnailForURL.mm in Sources */,
 				A2F35BCC15C5A0A100EBF632 /* GeneratePreviewForURL.mm in Sources */,
 			);
