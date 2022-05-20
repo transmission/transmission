@@ -1,4 +1,5 @@
-#import <AppKit/AppKit.h>
+#import <Cocoa/Cocoa.h>
+#import <CoreFoundation/CFPlugInCOM.h>
 #import <QuickLook/QuickLook.h>
 
 #include <string>
@@ -9,8 +10,10 @@
 
 #import "NSStringAdditions.h"
 
+QL_EXTERN_C_BEGIN
 OSStatus GeneratePreviewForURL(void* thisInterface, QLPreviewRequestRef preview, CFURLRef url, CFStringRef contentTypeUTI, CFDictionaryRef options);
 void CancelPreviewGeneration(void* thisInterface, QLPreviewRequestRef preview);
+QL_EXTERN_C_END
 
 NSString* generateIconData(NSString* fileExtension, NSUInteger width, NSMutableDictionary* allImgProps)
 {
@@ -187,21 +190,22 @@ OSStatus GeneratePreviewForURL(void* thisInterface, QLPreviewRequestRef preview,
             stringWithFormat:NSLocalizedStringFromTableInBundle(@"%lu Files", nil, bundle, "quicklook file header"), n_files];
         [listSection appendFormat:@"<tr><th>%@</th></tr>", fileTitleString];
 
-#warning display size?
 #warning display folders?
-        for (tr_file_index_t i = 0; i < n_files; ++i)
+        for (auto const& [path, size] : metainfo.files().sortedByPath())
         {
-            NSString* fullFilePath = [NSString stringWithUTF8String:metainfo.fileSubpath(i).c_str()];
+            NSString* fullFilePath = [NSString stringWithUTF8String:path.c_str()];
             NSCAssert([fullFilePath hasPrefix:[name stringByAppendingString:@"/"]], @"Expected file path %@ to begin with %@/", fullFilePath, name);
 
             NSString* shortenedFilePath = [fullFilePath substringFromIndex:[name length] + 1];
+            NSString* shortenedFilePathAndSize = [NSString
+                stringWithFormat:@"%@ - %@", shortenedFilePath, [NSString stringForFileSize:size]];
 
             NSUInteger const width = 16;
             [listSection appendFormat:@"<tr><td><img class=\"icon\" src=\"%@\" width=\"%ld\" height=\"%ld\" />%@<td></tr>",
                                       generateIconData([shortenedFilePath pathExtension], width, allImgProps),
                                       width,
                                       width,
-                                      shortenedFilePath];
+                                      shortenedFilePathAndSize];
         }
 
         [listSection appendString:@"</table>"];
