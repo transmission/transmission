@@ -714,7 +714,7 @@ TEST_F(FileTest, pathResolve)
 #endif
 }
 
-TEST_F(FileTest, pathBasenameDirname)
+TEST_F(FileTest, pathBasename)
 {
     auto const common_xname_tests = std::vector<XnameTestData>{
         XnameTestData{ "/", "/" },
@@ -778,26 +778,23 @@ TEST_F(FileTest, pathBasenameDirname)
     };
 
     testPathXname(basename_tests.data(), basename_tests.size(), tr_sys_path_basename);
+}
 
+TEST_F(FileTest, pathDirname)
+{
 #ifdef _WIN32
-    static auto constexpr DirnameTests = std::array<std::pair<std::string_view, std::string_view>, 53>{ {
+    static auto constexpr DirnameTests = std::array<std::pair<std::string_view, std::string_view>, 48>{ {
         { "C:\\a/b\\c"sv, "C:\\a/b"sv },
         { "C:\\a/b\\c\\"sv, "C:\\a/b"sv },
         { "C:\\a/b"sv, "C:\\a"sv },
-        { "C:/a"sv, "C:"sv },
+        { "C:/a"sv, "C:/"sv },
         { "C:"sv, "C:"sv },
-        { "C:/"sv, "C:"sv },
-        { "C:\\"sv, "C:"sv },
+        { "C:/"sv, "C:/"sv },
         { "c:a/b"sv, "c:a"sv },
-        // { "c:a"sv, "c:."sv },
-        { "c:."sv, "c:."sv },
-        { "\\\\a\\b\\c"sv, "\\\\a\\b"sv },
-        { "\\\\a\\b\\c/"sv, "\\\\a\\b"sv },
-        { "//a/b"sv, "//a"sv },
-        { "//1.2.3.4/b"sv, "//1.2.3.4"sv },
-        { "\\\\a"sv, "\\\\"sv },
-        { "\\\\1.2.3.4"sv, "\\\\"sv },
-        { "\\\\"sv, "\\\\"sv },
+        { "c:a"sv, "c:"sv },
+        { "\\\\a"sv, "\\"sv },
+        { "\\\\1.2.3.4"sv, "\\"sv },
+        { "\\\\"sv, "\\"sv },
         { "a/b\\c"sv, "a/b"sv },
         // taken from Node.js unit tests
         // https://github.com/nodejs/node/blob/e46c680bf2b211bbd52cf959ca17ee98c7f657f5/test/parallel/test-path-dirname.js
@@ -839,7 +836,7 @@ TEST_F(FileTest, pathBasenameDirname)
         { "foo"sv, "."sv },
     } };
 #else
-    static auto constexpr DirnameTests = std::array<std::pair<std::string_view, std::string_view>, 14>{ {
+    static auto constexpr DirnameTests = std::array<std::pair<std::string_view, std::string_view>, 15>{ {
         // taken from Node.js unit tests
         // https://github.com/nodejs/node/blob/e46c680bf2b211bbd52cf959ca17ee98c7f657f5/test/parallel/test-path-dirname.js
         { "/a/b/"sv, "/a"sv },
@@ -848,7 +845,7 @@ TEST_F(FileTest, pathBasenameDirname)
         { ""sv, "."sv },
         { "/"sv, "/"sv },
         { "////"sv, "/"sv },
-        // { "//a"sv, "//"sv },
+        { "//a"sv, "//"sv },
         { "foo"sv, "."sv },
         // taken from dirname(3) manpage
         { "usr"sv, "."sv },
