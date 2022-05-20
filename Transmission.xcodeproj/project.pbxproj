@@ -17,6 +17,7 @@
 		2B9BA6C508B488FE586A0AB0 /* torrents.cc in Sources */ = {isa = PBXBuildFile; fileRef = 2B9BA6C508B488FE586A0AB1 /* torrents.cc */; };
 		2B9BA6C508B488FE586A0AB2 /* torrents.h in Headers */ = {isa = PBXBuildFile; fileRef = 2B9BA6C508B488FE586A0AB3 /* torrents.h */; };
 		35F373030C2DA89000DAA8F2 /* FilePriorityCell.mm in Sources */ = {isa = PBXBuildFile; fileRef = 35F373010C2DA88F00DAA8F2 /* FilePriorityCell.mm */; };
+		39F7438291842BA006D63270 /* proxylist.h in Headers */ = {isa = PBXBuildFile; fileRef = D5004DB5B188D0EAB2C06950 /* proxylist.h */; };
 		3C7A11970D0B2EE300B5701F /* getgateway.c in Sources */ = {isa = PBXBuildFile; fileRef = 3C7A11910D0B2EE300B5701F /* getgateway.c */; };
 		3C7A11980D0B2EE300B5701F /* getgateway.h in Headers */ = {isa = PBXBuildFile; fileRef = 3C7A11920D0B2EE300B5701F /* getgateway.h */; };
 		3C7A11990D0B2EE300B5701F /* natpmp.c in Sources */ = {isa = PBXBuildFile; fileRef = 3C7A11930D0B2EE300B5701F /* natpmp.c */; };
@@ -57,6 +58,7 @@
 		558699602570759F00F77A43 /* libcurl.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 55869925257074EC00F77A43 /* libcurl.tbd */; };
 		5586996C2570759F00F77A43 /* libcurl.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 55869925257074EC00F77A43 /* libcurl.tbd */; };
 		62F644738FE3D8788EBF73A9 /* block-info.cc in Sources */ = {isa = PBXBuildFile; fileRef = A54D44C6A7AAF131D9AE29F5 /* block-info.cc */; };
+		62F84CEA9149E7C193F56757 /* proxylist.cc in Sources */ = {isa = PBXBuildFile; fileRef = 88F44B0086C0E8E7B7EF79DE /* proxylist.cc */; };
 		66F977825E65AD498C028BB0 /* announce-list.cc in Sources */ = {isa = PBXBuildFile; fileRef = 66F977825E65AD498C028BB1 /* announce-list.cc */; };
 		66F977825E65AD498C028BB2 /* announce-list.h in Headers */ = {isa = PBXBuildFile; fileRef = 66F977825E65AD498C028BB3 /* announce-list.h */; };
 		888A256631B3DE536FEB8B00 /* tr-strbuf.h in Headers */ = {isa = PBXBuildFile; fileRef = 888A256631B3DE536FEB8B01 /* tr-strbuf.h */; };
@@ -659,6 +661,7 @@
 		66F977825E65AD498C028BB3 /* announce-list.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "announce-list.h"; sourceTree = "<group>"; };
 		6A044CBD8C049AFCBD4DB411 /* block-info.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "block-info.h"; sourceTree = "<group>"; };
 		888A256631B3DE536FEB8B01 /* tr-strbuf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "tr-strbuf.h"; sourceTree = "<group>"; };
+		88F44B0086C0E8E7B7EF79DE /* proxylist.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "proxylist.cc"; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		8D1107320486CEB800E47090 /* Transmission.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Transmission.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A200B8390A2263BA007BBB1E /* InfoWindowController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = InfoWindowController.h; sourceTree = "<group>"; };
@@ -1188,6 +1191,7 @@
 		C8B27B9028153F3100A22B5D /* transmission-edit */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "transmission-edit"; sourceTree = BUILT_PRODUCTS_DIR; };
 		C8B27BA128153F3400A22B5D /* transmission-show */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "transmission-show"; sourceTree = BUILT_PRODUCTS_DIR; };
 		CAB35C62252F6F5E00552A55 /* mime-types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "mime-types.h"; sourceTree = "<group>"; };
+		D5004DB5B188D0EAB2C06950 /* proxylist.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "proxylist.h"; sourceTree = "<group>"; };
 		E138A9750C04D88F00C5426C /* ProgressGradients.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ProgressGradients.h; sourceTree = "<group>"; };
 		E138A9760C04D88F00C5426C /* ProgressGradients.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ProgressGradients.mm; sourceTree = "<group>"; };
 		E23B55A5FC3B557F7746D511 /* interned-string.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "interned-string.h"; sourceTree = "<group>"; };
@@ -1749,6 +1753,8 @@
 				C1FEE5731C3223CC00D62832 /* watchdir-generic.cc */,
 				C1FEE5741C3223CC00D62832 /* watchdir-kqueue.cc */,
 				C1FEE5721C3223CC00D62832 /* watchdir-common.h */,
+				88F44B0086C0E8E7B7EF79DE /* proxylist.cc */,
+				D5004DB5B188D0EAB2C06950 /* proxylist.h */,
 			);
 			path = libtransmission;
 			sourceTree = "<group>";
@@ -2237,6 +2243,7 @@
 				F11545ACA7C4D7A464F703AB /* block-info.h in Headers */,
 				ACBE7A956ED89682EC4460E2 /* file-info.h in Headers */,
 				E23B55A5FC3B557F7746D510 /* interned-string.h in Headers */,
+				39F7438291842BA006D63270 /* proxylist.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2996,6 +3003,7 @@
 				A23FAE54178BC2950053DC5B /* platform-quota.cc in Sources */,
 				62F644738FE3D8788EBF73A9 /* block-info.cc in Sources */,
 				ACBE7A956ED89682EC4460E0 /* file-info.cc in Sources */,
+				62F84CEA9149E7C193F56757 /* proxylist.cc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
