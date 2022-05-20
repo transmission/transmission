@@ -21,8 +21,9 @@
 #include "transmission.h"
 
 #include "net.h"
-#include "web-utils.h"
+#include "tr-strbuf.h"
 #include "utils.h"
+#include "web-utils.h"
 
 using namespace std::literals;
 
@@ -271,10 +272,7 @@ std::string_view getSiteName(std::string_view host)
     }
 
     // psl needs a zero-terminated hostname
-    auto szhost = std::array<char, 256>{};
-    auto const n = std::min(std::size(szhost) - 1, std::size(host));
-    std::copy_n(std::data(host), n, std::data(szhost));
-    szhost[n] = '\0';
+    auto const szhost = tr_urlbuf{ host };
 
     // is it an IP?
     auto addr = tr_address{};
