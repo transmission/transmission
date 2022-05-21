@@ -10,6 +10,7 @@
 #include <ctime> // time_t
 #include <string>
 #include <string_view>
+#include <type_traits>
 
 #ifdef _WIN32
 #include <windows.h>
@@ -159,6 +160,12 @@ bool tr_sys_path_copy(char const* src_path, char const* dst_path, struct tr_erro
  * @return `True` on success, `false` otherwise (with `error` set accordingly).
  */
 bool tr_sys_path_get_info(char const* path, int flags, tr_sys_path_info* info, struct tr_error** error = nullptr);
+
+template<typename T, typename = std::enable_if<std::is_member_function_pointer<decltype(&T::c_str)>::value>>
+bool tr_sys_path_get_info(T const& path, int flags, tr_sys_path_info* info, struct tr_error** error = nullptr)
+{
+    return tr_sys_path_get_info(path.c_str(), flags, info, error);
+}
 
 /**
  * @brief Portability wrapper for `access()`.
@@ -616,12 +623,8 @@ char* tr_sys_dir_get_current(struct tr_error** error = nullptr);
  */
 bool tr_sys_dir_create(char const* path, int flags, int permissions, struct tr_error** error = nullptr);
 
-static inline bool tr_sys_dir_create(std::string_view path, int flags, int permissions, struct tr_error** error = nullptr)
-{
-    return tr_sys_dir_create(tr_pathbuf{ path }.c_str(), flags, permissions, error);
-}
-
-static inline bool tr_sys_dir_create(tr_pathbuf const& path, int flags, int permissions, struct tr_error** error = nullptr)
+template<typename T, typename = std::enable_if<std::is_member_function_pointer<decltype(&T::c_str)>::value>>
+bool tr_sys_dir_create(T const& path, int flags, int permissions, struct tr_error** error = nullptr)
 {
     return tr_sys_dir_create(path.c_str(), flags, permissions, error);
 }

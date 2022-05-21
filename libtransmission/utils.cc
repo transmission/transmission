@@ -149,7 +149,7 @@ uint8_t* tr_loadFile(std::string_view path_in, size_t* size, tr_error** error)
     /* try to stat the file */
     auto info = tr_sys_path_info{};
     tr_error* my_error = nullptr;
-    if (!tr_sys_path_get_info(path.c_str(), 0, &info, &my_error))
+    if (!tr_sys_path_get_info(path, 0, &info, &my_error))
     {
         tr_logAddError(fmt::format(
             _("Couldn't read '{path}': {error} ({error_code})"),
@@ -213,7 +213,7 @@ bool tr_loadFile(std::string_view path_in, std::vector<char>& setme, tr_error** 
     /* try to stat the file */
     auto info = tr_sys_path_info{};
     tr_error* my_error = nullptr;
-    if (!tr_sys_path_get_info(path.c_str(), 0, &info, &my_error))
+    if (!tr_sys_path_get_info(path, 0, &info, &my_error))
     {
         tr_logAddError(fmt::format(
             _("Couldn't read '{path}': {error} ({error_code})"),
@@ -968,8 +968,9 @@ bool tr_moveFile(std::string_view oldpath_in, std::string_view newpath_in, tr_er
     }
 
     // ensure the target directory exists
-    if (auto const newdir = tr_sys_path_dirname(newpath);
-        std::empty(newdir) || !tr_sys_dir_create(newdir, TR_SYS_DIR_CREATE_PARENTS, 0777, error))
+    auto newdir = tr_pathbuf{ newpath.sv() };
+    newdir.popdir();
+    if (!tr_sys_dir_create(newdir, TR_SYS_DIR_CREATE_PARENTS, 0777, error))
     {
         tr_error_prefix(error, "Unable to create directory for new file: ");
         return false;

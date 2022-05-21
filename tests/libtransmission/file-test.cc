@@ -23,6 +23,7 @@
 #include "error.h"
 #include "file.h"
 #include "tr-macros.h"
+#include "tr-strbuf.h"
 
 #include "test-fixtures.h"
 
@@ -126,8 +127,7 @@ protected:
             }
 
             auto const path_part = std::string{ path, size_t(slash_pos - path + 1) };
-
-            if (!tr_sys_path_get_info(path_part.c_str(), TR_SYS_PATH_NO_FOLLOW, &info) ||
+            if (!tr_sys_path_get_info(path_part, TR_SYS_PATH_NO_FOLLOW, &info) ||
                 (info.type != TR_SYS_PATH_IS_FILE && info.type != TR_SYS_PATH_IS_DIRECTORY))
             {
                 return false;
@@ -862,6 +862,11 @@ TEST_F(FileTest, pathDirname)
     {
         EXPECT_EQ(expected, tr_sys_path_dirname(input)) << "input[" << input << "] expected [" << expected << "] actual ["
                                                         << tr_sys_path_dirname(input) << ']' << std::endl;
+
+        auto path = tr_pathbuf{ input };
+        path.popdir();
+        EXPECT_EQ(expected, path) << "input[" << input << "] expected [" << expected << "] actual [" << path << ']'
+                                  << std::endl;
     }
 
     /* TODO: is_same(dirname(x) + '/' + basename(x), x) */
