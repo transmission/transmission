@@ -230,15 +230,13 @@ std::string tr_sys_path_basename(std::string_view path, struct tr_error** error 
  * @brief Portability wrapper for `dirname()`.
  *
  * @param[in]  path  Path to file or directory.
- * @param[out] error Pointer to error object. Optional, pass `nullptr` if you
- *                   are not interested in error details.
  *
  * @return Pointer to newly allocated buffer containing directory (parent path;
  *         last path component removed) on success (use @ref tr_free to free it
  *         when no longer needed), `nullptr` otherwise (with `error` set
  *         accordingly).
  */
-std::string tr_sys_path_dirname(std::string_view path, struct tr_error** error = nullptr);
+std::string_view tr_sys_path_dirname(std::string_view path);
 
 /**
  * @brief Portability wrapper for `rename()`.
