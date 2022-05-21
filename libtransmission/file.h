@@ -212,6 +212,16 @@ bool tr_sys_path_is_relative(std::string_view path);
  */
 bool tr_sys_path_is_same(char const* path1, char const* path2, struct tr_error** error = nullptr);
 
+template<
+    typename T,
+    typename U,
+    typename = std::enable_if<std::is_member_function_pointer<decltype(&T::c_str)>::value>,
+    typename = std::enable_if<std::is_member_function_pointer<decltype(&U::c_str)>::value>>
+bool tr_sys_path_is_same(T const& path1, T const& path2, struct tr_error** error = nullptr)
+{
+    return tr_sys_path_is_same(path1.c_str(), path2.c_str(), error);
+}
+
 /**
  * @brief Portability wrapper for `realpath()`.
  *
@@ -278,6 +288,12 @@ bool tr_sys_path_rename(char const* src_path, char const* dst_path, struct tr_er
  *         files and directories).
  */
 bool tr_sys_path_remove(char const* path, struct tr_error** error = nullptr);
+
+template<typename T, typename = std::enable_if<std::is_member_function_pointer<decltype(&T::c_str)>::value>>
+bool tr_sys_path_remove(T const& path, struct tr_error** error = nullptr)
+{
+    return tr_sys_path_remove(path.c_str(), error);
+}
 
 /**
  * @brief Transform path separators to native ones, in-place.

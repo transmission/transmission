@@ -527,7 +527,7 @@ bool tr_torrent_metainfo::migrateFile(
 
     if (old_filename_exists && new_filename_exists)
     {
-        tr_sys_path_remove(old_filename.c_str());
+        tr_sys_path_remove(old_filename);
         return false;
     }
 
