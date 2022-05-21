@@ -242,10 +242,9 @@ int tr_main(int argc, char* argv[])
 
     if (auto sv = std::string_view{}; tr_variantDictFindStrView(&settings, TR_KEY_download_dir, &sv))
     {
-        // tr_sys_path_exists needs a zero-terminated str
         auto const sz_download_dir = std::string{ sv };
 
-        if (!tr_sys_path_exists(sz_download_dir.c_str()))
+        if (!tr_sys_path_exists(sz_download_dir))
         {
             tr_error* error = nullptr;
 

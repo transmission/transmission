@@ -180,6 +180,12 @@ bool tr_sys_path_get_info(T const& path, int flags, tr_sys_path_info* info, stru
  */
 bool tr_sys_path_exists(char const* path, struct tr_error** error = nullptr);
 
+template<typename T, typename = std::enable_if<std::is_member_function_pointer<decltype(&T::c_str)>::value>>
+bool tr_sys_path_exists(T const& path, struct tr_error** error = nullptr)
+{
+    return tr_sys_path_exists(path.c_str(), error);
+}
+
 /**
  * @brief Check whether path is relative.
  *
