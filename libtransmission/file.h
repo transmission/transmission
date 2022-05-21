@@ -16,6 +16,7 @@
 #endif
 
 #include "tr-macros.h"
+#include "tr-strbuf.h"
 
 struct tr_error;
 
@@ -614,6 +615,16 @@ char* tr_sys_dir_get_current(struct tr_error** error = nullptr);
  * @return `True` on success, `false` otherwise (with `error` set accordingly).
  */
 bool tr_sys_dir_create(char const* path, int flags, int permissions, struct tr_error** error = nullptr);
+
+static inline bool tr_sys_dir_create(std::string_view path, int flags, int permissions, struct tr_error** error = nullptr)
+{
+    return tr_sys_dir_create(tr_pathbuf{ path }.c_str(), flags, permissions, error);
+}
+
+static inline bool tr_sys_dir_create(tr_pathbuf const& path, int flags, int permissions, struct tr_error** error = nullptr)
+{
+    return tr_sys_dir_create(path.c_str(), flags, permissions, error);
+}
 
 /**
  * @brief Portability wrapper for `mkdtemp()`.
