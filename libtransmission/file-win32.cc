@@ -700,7 +700,7 @@ std::string tr_sys_path_basename(std::string_view path, tr_error** error)
 // This function is adapted from Node.js's path.win32.dirname() function,
 // which is copyrighted by Joyent, Inc. and other Node contributors
 // and is distributed under MIT (SPDX:MIT) license.
-std::string_view tr_sys_path_dirname_win32(std::string_view path, tr_error** /*error*/)
+std::string_view tr_sys_path_dirname_win32(std::string_view path)
 {
     auto const len = std::size(path);
 

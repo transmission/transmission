@@ -968,7 +968,7 @@ bool tr_moveFile(std::string_view oldpath_in, std::string_view newpath_in, tr_er
     }
 
     // ensure the target directory exists
-    if (auto const newdir = tr_sys_path_dirname(newpath, error);
+    if (auto const newdir = tr_sys_path_dirname(newpath);
         std::empty(newdir) || !tr_sys_dir_create(std::string{ newdir }.c_str(), TR_SYS_DIR_CREATE_PARENTS, 0777, error))
     {
         tr_error_prefix(error, "Unable to create directory for new file: ");

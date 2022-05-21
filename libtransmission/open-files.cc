@@ -152,16 +152,11 @@ std::optional<tr_sys_file_t> tr_open_files::get(
     tr_error* error = nullptr;
     if (writable)
     {
-        auto const dir = tr_sys_path_dirname(filename, &error);
+        auto const dir = tr_sys_path_dirname(filename);
 
         if (std::empty(dir))
         {
-            tr_logAddError(fmt::format(
-                _("Couldn't create '{path}': {error} ({error_code})"),
-                fmt::arg("path", filename),
-                fmt::arg("error", error->message),
-                fmt::arg("error_code", error->code)));
-            tr_error_free(error);
+            tr_logAddError(fmt::format(_("Couldn't create '{path}'"), fmt::arg("path", filename)));
             return {};
         }
 

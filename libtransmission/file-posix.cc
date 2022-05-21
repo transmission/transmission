@@ -398,17 +398,50 @@ std::string tr_sys_path_basename(std::string_view path, tr_error** error)
     return {};
 }
 
-std::string_view tr_sys_path_dirname(std::string_view path, tr_error** error)
+// This function is adapted from Node.js's path.posix.dirname() function,
+// which is copyrighted by Joyent, Inc. and other Node contributors
+// and is distributed under MIT (SPDX:MIT) license.
+std::string_view tr_sys_path_dirname(std::string_view path)
 {
-    auto tmp = tr_pathbuf{ path };
+    auto const len = std::size(path);
 
-    if (auto const* dir = dirname(std::data(tmp)); dir != nullptr)
+    if (len == 0U)
     {
-        return tr_strvStartsWith(path, dir) ? path.substr(0, strlen(dir)) : "."sv;
+        return "."sv;
     }
 
-    set_system_error(error, errno);
-    return {};
+    auto const has_root = path[0] == '/';
+    auto end = std::string_view::npos;
+    auto matched_slash = bool{ true };
+
+    for (auto i = len - 1; i >= 1U; --i)
+    {
+        if (path[i] == '/')
+        {
+            if (!matched_slash)
+            {
+                end = i;
+                break;
+            }
+        }
+        else
+        {
+            // We saw the first non-path separator
+            matched_slash = false;
+        }
+    }
+
+    if (end == std::string_view::npos)
+    {
+        return has_root ? "/"sv : "."sv;
+    }
+
+    if (has_root && end == 1)
+    {
+        return "//"sv;
+    }
+
+    return path.substr(0, end);
 }
 
 bool tr_sys_path_rename(char const* src_path, char const* dst_path, tr_error** error)
