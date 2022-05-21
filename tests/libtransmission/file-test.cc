@@ -456,6 +456,8 @@ TEST_F(FileTest, pathIsRelative)
 
 TEST_F(FileTest, pathIsSame)
 {
+    // NOLINTBEGIN(readability-suspicious-call-argument)
+
     auto const test_dir = createTestDir(currentTestName());
 
     auto const path1 = tr_pathbuf{ test_dir, "/a"sv };
@@ -655,6 +657,8 @@ TEST_F(FileTest, pathIsSame)
     tr_sys_path_remove(path3);
     tr_sys_path_remove(path2);
     tr_sys_path_remove(path1);
+
+    // NOLINTEND(readability-suspicious-call-argument)
 }
 
 TEST_F(FileTest, pathResolve)

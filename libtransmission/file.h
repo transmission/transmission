@@ -217,7 +217,7 @@ template<
     typename U,
     typename = std::enable_if<std::is_member_function_pointer<decltype(&T::c_str)>::value>,
     typename = std::enable_if<std::is_member_function_pointer<decltype(&U::c_str)>::value>>
-bool tr_sys_path_is_same(T const& path1, T const& path2, struct tr_error** error = nullptr)
+bool tr_sys_path_is_same(T const& path1, U const& path2, struct tr_error** error = nullptr)
 {
     return tr_sys_path_is_same(path1.c_str(), path2.c_str(), error);
 }
@@ -281,7 +281,7 @@ template<
     typename U,
     typename = std::enable_if<std::is_member_function_pointer<decltype(&T::c_str)>::value>,
     typename = std::enable_if<std::is_member_function_pointer<decltype(&U::c_str)>::value>>
-bool tr_sys_path_rename(T const& src_path, T const& dst_path, struct tr_error** error = nullptr)
+bool tr_sys_path_rename(T const& src_path, U const& dst_path, struct tr_error** error = nullptr)
 {
     return tr_sys_path_rename(src_path.c_str(), dst_path.c_str(), error);
 }
