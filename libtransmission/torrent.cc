@@ -2595,7 +2595,7 @@ static int renamePath(tr_torrent* tor, char const* oldpath, char const* newname)
 
     auto const base = tor->isDone() || std::empty(tor->incompleteDir()) ? tor->downloadDir() : tor->incompleteDir();
 
-    auto src = tr_strvPath(base, oldpath);
+    auto src = tr_pathbuf{ base, '/', oldpath };
 
     if (!tr_sys_path_exists(src)) /* check for it as a partial */
     {
@@ -2619,7 +2619,7 @@ static int renamePath(tr_torrent* tor, char const* oldpath, char const* newname)
 
             tmp = errno;
 
-            if (!tr_sys_path_rename(src.c_str(), tgt, &error))
+            if (!tr_sys_path_rename(src, tgt, &error))
             {
                 err = error->code;
                 tr_error_free(error);
