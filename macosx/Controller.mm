@@ -584,7 +584,7 @@ static void removeKeRangerRansomware()
     //set up status bar
     [self showStatusBar:[self.fDefaults boolForKey:@"StatusBar"] animate:NO];
 
-    self.fActionButton.toolTip = NSLocalizedString(@"Shortcuts for changing global settings.", "Main window -> 1st bottom left button (action) tooltip");
+    self.fActionButton.toolTip = NSLocalizedString(@"Shortcut for changing bandwidth and transfer settings.", "Main window -> 1st bottom left button (action) tooltip");
     self.fSpeedLimitButton.toolTip = NSLocalizedString(
         @"Speed Limit overrides the total bandwidth limits with its own limits.",
         "Main window -> 2nd bottom left button (turtle) tooltip");
