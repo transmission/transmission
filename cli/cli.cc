@@ -242,14 +242,13 @@ int tr_main(int argc, char* argv[])
 
     if (auto sv = std::string_view{}; tr_variantDictFindStrView(&settings, TR_KEY_download_dir, &sv))
     {
-        // tr_sys_path_exists and tr_sys_dir_create need zero-terminated strs
         auto const sz_download_dir = std::string{ sv };
 
-        if (!tr_sys_path_exists(sz_download_dir.c_str()))
+        if (!tr_sys_path_exists(sz_download_dir))
         {
             tr_error* error = nullptr;
 
-            if (!tr_sys_dir_create(sz_download_dir.c_str(), TR_SYS_DIR_CREATE_PARENTS, 0700, &error))
+            if (!tr_sys_dir_create(sz_download_dir, TR_SYS_DIR_CREATE_PARENTS, 0700, &error))
             {
                 fprintf(stderr, "Unable to create download directory \"%s\": %s\n", sz_download_dir.c_str(), error->message);
                 tr_error_free(error);

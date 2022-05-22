@@ -379,7 +379,7 @@ TEST_F(UtilsTest, saveFile)
     EXPECT_EQ(contents, sv);
 
     // remove the tempfile
-    EXPECT_TRUE(tr_sys_path_remove(filename.c_str(), &error));
+    EXPECT_TRUE(tr_sys_path_remove(filename, &error));
     EXPECT_EQ(nullptr, error) << *error;
 
     // try saving a file to a path that doesn't exist
