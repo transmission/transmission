@@ -114,7 +114,7 @@ static void destroy_session_id_lock_file(tr_sys_file_t lock_file, char const* se
     if (session_id != nullptr)
     {
         auto const lock_file_path = get_session_id_lock_file_path(session_id);
-        tr_sys_path_remove(lock_file_path.c_str());
+        tr_sys_path_remove(lock_file_path);
     }
 }
 

@@ -795,7 +795,7 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
 
     // if we don't have a local .torrent or .magnet file already,
     // assume the torrent is new
-    bool const is_new_torrent = !tr_sys_path_exists(filename.c_str());
+    bool const is_new_torrent = !tr_sys_path_exists(filename);
 
     if (is_new_torrent)
     {
@@ -2595,14 +2595,14 @@ static int renamePath(tr_torrent* tor, char const* oldpath, char const* newname)
 
     auto const base = tor->isDone() || std::empty(tor->incompleteDir()) ? tor->downloadDir() : tor->incompleteDir();
 
-    auto src = tr_strvPath(base, oldpath);
+    auto src = tr_pathbuf{ base, '/', oldpath };
 
-    if (!tr_sys_path_exists(src.c_str())) /* check for it as a partial */
+    if (!tr_sys_path_exists(src)) /* check for it as a partial */
     {
         src += tr_torrent_files::PartialFileSuffix;
     }
 
-    if (tr_sys_path_exists(src.c_str()))
+    if (tr_sys_path_exists(src))
     {
         auto const parent = tr_sys_path_dirname(src);
         auto const tgt = tr_strvEndsWith(src, tr_torrent_files::PartialFileSuffix) ?
@@ -2619,7 +2619,7 @@ static int renamePath(tr_torrent* tor, char const* oldpath, char const* newname)
 
             tmp = errno;
 
-            if (!tr_sys_path_rename(src.c_str(), tgt, &error))
+            if (!tr_sys_path_rename(src, tgt, &error))
             {
                 err = error->code;
                 tr_error_free(error);
