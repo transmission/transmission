@@ -167,6 +167,23 @@ int parseCommandLine(app_opts& opts, int argc, char const* const* argv)
     return now == 0 ? "Unknown" : fmt::format("{:%a %b %d %T %Y}", fmt::localtime(now));
 }
 
+bool compareSecondField(std::string_view l, std::string_view r)
+{
+    auto const lpos = l.find(' ');
+    if (lpos == std::string_view::npos)
+    {
+        return false;
+    }
+
+    auto const rpos = r.find(' ');
+    if (rpos == std::string_view::npos)
+    {
+        return true;
+    }
+
+    return l.substr(lpos) <= r.substr(rpos);
+}
+
 void showInfo(app_opts const& opts, tr_torrent_metainfo const& metainfo)
 {
     /**
@@ -268,7 +285,7 @@ void showInfo(app_opts const& opts, tr_torrent_metainfo const& metainfo)
         {
             if (opts.show_bytesize)
             {
-                std::sort(std::begin(filenames), std::end(filenames), compare_2nd_field);
+                std::sort(std::begin(filenames), std::end(filenames), compareSecondField);
             }
             else
             {
