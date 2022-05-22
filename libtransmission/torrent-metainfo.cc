@@ -291,9 +291,7 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
 
     bool StartArray(Context const& context) override
     {
-        BasicHandler::StartArray(context);
-
-        if (state_ == State::Info && key(depth() - 1) == FilesKey)
+        if (pathIs(InfoKey, FilesKey))
         {
             if (!std::empty(tm_.files_))
             {
@@ -306,7 +304,8 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
                 file_length_ = 0;
             }
         }
-        return true;
+
+        return BasicHandler::StartArray(context);
     }
 
     bool EndArray(Context const& context) override
