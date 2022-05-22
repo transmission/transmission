@@ -165,25 +165,6 @@ int parseCommandLine(app_opts& opts, int argc, char const* const* argv)
 [[nodiscard]] auto toString(time_t now)
 {
     return now == 0 ? "Unknown" : fmt::format("{:%a %b %d %T %Y}", fmt::localtime(now));
-<<<<<<< HEAD
-=======
-}
-
-bool compare_2nd_field(std::string_view const& l, std::string_view const& r)
-{
-    auto l_ = l.find(" ");
-    auto r_ = r.find(" ");
-
-    if (l_ == std::string_view::npos)
-    {
-        return false;
-    }
-    if (r_ == std::string_view::npos)
-    {
-        return true;
-    }
-    return l.substr(l_) <= r.substr(r_);
->>>>>>> main
 }
 
 void showInfo(app_opts const& opts, tr_torrent_metainfo const& metainfo)
