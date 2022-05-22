@@ -66,7 +66,7 @@ protected:
 
 TEST_F(BlocklistTest, parsing)
 {
-    EXPECT_EQ(0, tr_blocklistGetRuleCount(session_));
+    EXPECT_EQ(0U, tr_blocklistGetRuleCount(session_));
 
     // init the blocklist
     auto const path = tr_pathbuf{ tr_sessionGetConfigDir(session_), "/blocklists/level1" };
