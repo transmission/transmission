@@ -186,7 +186,7 @@ void OptionsDialog::Impl::sourceChanged(Gtk::FileChooserButton* b)
     {
         bool new_file = false;
 
-        if (!filename.empty() && (filename_.empty() || !tr_sys_path_is_same(filename.c_str(), filename_.c_str())))
+        if (!filename.empty() && (filename_.empty() || !tr_sys_path_is_same(filename, filename_)))
         {
             filename_ = filename;
             tr_ctorSetMetainfoFromFile(ctor_.get(), filename_.c_str(), nullptr);
@@ -216,7 +216,7 @@ void OptionsDialog::Impl::downloadDirChanged(Gtk::FileChooserButton* b)
 {
     auto const fname = b->get_filename();
 
-    if (!fname.empty() && (downloadDir_.empty() || !tr_sys_path_is_same(fname.c_str(), downloadDir_.c_str())))
+    if (!fname.empty() && (downloadDir_.empty() || !tr_sys_path_is_same(fname, downloadDir_)))
     {
         downloadDir_ = fname;
         updateTorrent();
