@@ -11,6 +11,9 @@
 #include <string_view>
 #include <vector>
 
+#warning nocommit
+#include <iostream>
+
 #include <fmt/core.h>
 #include <fmt/format.h>
 
@@ -180,14 +183,13 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
 
     enum class State
     {
-        Top,
-        Info,
+        UsePath,
         FileTree,
         Files,
         FilesIgnored,
         PieceLayers,
     };
-    State state_ = State::Top;
+    State state_ = State::UsePath;
 
     explicit MetainfoHandler(tr_torrent_metainfo& tm)
         : tm_{ tm }
@@ -213,7 +215,6 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
         {
             info_dict_begin_ = context.raw();
             tm_.info_dict_offset_ = context.tokenSpan().first;
-            state_ = State::Info;
         }
         else if (pathIs(InfoKey, FileTreeKey))
         {
@@ -226,29 +227,49 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
             state_ = State::PieceLayers;
         }
 
-        return BasicHandler::StartDict(context);
+        std::cerr << __FILE__ << ':' << __LINE__ << " StartDict before push, depth is " << depth() << ' ';
+        for (size_t i = 1; i <= depth(); ++i)
+            std::cerr << '[' << key(i) << ']';
+        std::cerr << std::endl;
+
+        std::cerr << __FILE__ << ':' << __LINE__ << " before push, depth " << depth() << std::endl;
+        BasicHandler::StartDict(context);
+        std::cerr << __FILE__ << ':' << __LINE__ << " after push, depth " << depth() << std::endl;
+
+        std::cerr << __FILE__ << ':' << __LINE__ << " StartDict after push, depth is " << depth() << ' ';
+        for (size_t i = 1; i <= depth(); ++i)
+            std::cerr << '[' << key(i) << ']';
+        std::cerr << std::endl;
+
+        return true;
     }
 
     bool EndDict(Context const& context) override
     {
+        std::cerr << __FILE__ << ':' << __LINE__ << " EndDict before pop, depth is " << depth() << ' ';
+        for (size_t i = 1; i <= depth(); ++i)
+            std::cerr << '[' << key(i) << ']';
+        std::cerr << std::endl;
+
+        std::cerr << __FILE__ << ':' << __LINE__ << " before pop, depth " << depth() << std::endl;
         BasicHandler::EndDict(context);
-        auto const current_key = currentKey();
+        std::cerr << __FILE__ << ':' << __LINE__ << " after pop, depth " << depth() << std::endl;
 
-        if (depth() == 0) // top
-        {
-            return finish(context);
-        }
+        std::cerr << __FILE__ << ':' << __LINE__ << " EndDict after pop, depth is " << depth() << ' ';
+        for (size_t i = 1; i <= depth(); ++i)
+            std::cerr << '[' << key(i) << ']';
+        std::cerr << std::endl;
 
-        if (state_ == State::Info && current_key == InfoKey)
+        if (pathIs(InfoKey))
         {
-            state_ = State::Top;
+            std::cerr << __FILE__ << ':' << __LINE__ << " state reset to top" << std::endl;
             return finishInfoDict(context);
         }
 
-        if (state_ == State::PieceLayers && current_key == PieceLayersKey)
+        if (depth() == 0) // top
         {
-            state_ = State::Top;
-            return true;
+            std::cerr << __FILE__ << ':' << __LINE__ << " finish" << std::endl;
+            return finish(context);
         }
 
         if (state_ == State::FileTree) // bittorrent v2 format
@@ -259,16 +280,17 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
             }
 
             file_subpath_.popdir();
-
-            if (current_key == FileTreeKey)
+            if (file_subpath_ == "."sv)
             {
-                state_ = State::Info;
+                file_subpath_.clear();
             }
 
-            return true;
+            if (pathIs(InfoKey, FileTreeKey))
+            {
+                state_ = State::UsePath;
+            }
         }
-
-        if (state_ == State::Files) // bittorrent v1 format
+        else if (state_ == State::Files) // bittorrent v1 format
         {
             if (!addFile(context))
             {
@@ -276,7 +298,6 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
             }
 
             file_subpath_.clear();
-            return true;
         }
 
         return depth() > 0;
@@ -286,28 +307,26 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
     {
         if (pathIs(InfoKey, FilesKey))
         {
-            if (!std::empty(tm_.files_))
-            {
-                state_ = State::FilesIgnored;
-            }
-            else
-            {
-                state_ = State::Files;
-                file_subpath_.clear();
-                file_length_ = 0;
-            }
+            state_ = std::empty(tm_.files_) ? State::Files : State::FilesIgnored;
+            file_subpath_.clear();
+            file_length_ = 0;
         }
 
-        return BasicHandler::StartArray(context);
+        std::cerr << __FILE__ << ':' << __LINE__ << " before push, depth " << depth() << std::endl;
+        BasicHandler::StartArray(context);
+        std::cerr << __FILE__ << ':' << __LINE__ << " after push, depth " << depth() << std::endl;
+        return true;
     }
 
     bool EndArray(Context const& context) override
     {
+        std::cerr << __FILE__ << ':' << __LINE__ << " before pop, depth " << depth() << std::endl;
         BasicHandler::EndArray(context);
+        std::cerr << __FILE__ << ':' << __LINE__ << " after pop, depth " << depth() << std::endl;
 
         if ((state_ == State::Files || state_ == State::FilesIgnored) && key(depth()) == FilesKey) // bittorrent v1 format
         {
-            state_ = State::Info;
+            state_ = State::UsePath;
             return true;
         }
 
@@ -321,8 +340,6 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
 
     bool Int64(int64_t value, Context const& /*context*/) override
     {
-        auto const curdepth = depth();
-        auto const current_key = currentKey();
         auto unhandled = bool{ false };
 
         if (state_ == State::FilesIgnored)
@@ -331,7 +348,7 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
         }
         else if (state_ == State::FileTree || state_ == State::Files)
         {
-            if (current_key == LengthKey)
+            if (currentKey() == LengthKey)
             {
                 file_length_ = value;
             }
@@ -368,7 +385,7 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
 
         if (unhandled)
         {
-            tr_logAddWarn(fmt::format("unexpected: key '{}', int '{}'", current_key, value));
+            tr_logAddWarn(fmt::format("unexpected: key '{}', int '{}'", currentKey(), value));
         }
 
         return true;
@@ -444,6 +461,13 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
         {
             tr_strvUtf8Clean(value, tm_.name_);
         }
+        else if (pathIs(InfoKey, PiecesKey))
+        {
+            auto const n = std::size(value) / sizeof(tr_sha1_digest_t);
+            tm_.pieces_.resize(n);
+            std::copy_n(std::data(value), std::size(value), reinterpret_cast<char*>(std::data(tm_.pieces_)));
+            tm_.pieces_offset_ = context.tokenSpan().first;
+        }
         else
         {
             switch (curdepth)
@@ -452,13 +476,6 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
                 if (key(1) == HttpSeedsKey || key(1) == UrlListKey)
                 {
                     tm_.addWebseed(value);
-                }
-                else if (key(1) == InfoKey && current_key == PiecesKey)
-                {
-                    auto const n = std::size(value) / sizeof(tr_sha1_digest_t);
-                    tm_.pieces_.resize(n);
-                    std::copy_n(std::data(value), std::size(value), reinterpret_cast<char*>(std::data(tm_.pieces_)));
-                    tm_.pieces_offset_ = context.tokenSpan().first;
                 }
                 else if (key(1) == PieceLayersKey)
                 {
@@ -498,17 +515,12 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
 
 private:
     template<typename... Args>
-    [[nodiscard]] bool pathStartsWith(Args... args) const noexcept
-    {
-        auto i = 1U;
-        return (depth() >= sizeof...(args)) && ((key(i++) == args) && ...);
-    }
-
-    template<typename... Args>
     [[nodiscard]] bool pathIs(Args... args) const noexcept
     {
-        return (depth() == sizeof...(args)) && pathStartsWith((args)...);
+        auto i = 1U;
+        return (depth() == sizeof...(args)) && ((key(i++) == args) && ...);
     }
+
     [[nodiscard]] bool addFile(Context const& context)
     {
         bool ok = true;
@@ -539,6 +551,8 @@ private:
 
     bool finishInfoDict(Context const& context)
     {
+        std::cerr << __FILE__ << ':' << __LINE__ << " finishInfoDict" << std::endl;
+
         if (std::empty(info_dict_begin_))
         {
             tr_error_set(context.error, EINVAL, "no info_dict found");
