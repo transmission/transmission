@@ -336,49 +336,6 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
         {
             // no-op
         }
-        else if (curdepth == 1)
-        {
-            if (current_key == CreationDateKey)
-            {
-                tm_.date_created_ = value;
-            }
-            else if (current_key == PrivateKey)
-            {
-                tm_.is_private_ = value != 0;
-            }
-            else if (current_key == PieceLengthKey)
-            {
-                piece_size_ = value;
-            }
-            else
-            {
-                unhandled = true;
-            }
-        }
-        else if (curdepth == 2 && key(1) == InfoKey)
-        {
-            if (current_key == PieceLengthKey)
-            {
-                piece_size_ = value;
-            }
-            else if (current_key == PrivateKey)
-            {
-                tm_.is_private_ = value != 0;
-            }
-            else if (current_key == LengthKey)
-            {
-                length_ = value;
-            }
-            else if (current_key == MetaVersionKey)
-            {
-                // currently unused. TODO support for bittorrent v2
-                // TODO https://github.com/transmission/transmission/issues/458
-            }
-            else
-            {
-                unhandled = true;
-            }
-        }
         else if (state_ == State::FileTree || state_ == State::Files)
         {
             if (current_key == LengthKey)
@@ -389,6 +346,27 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
             {
                 unhandled = true;
             }
+        }
+        else if (pathIs(CreationDateKey))
+        {
+            tm_.date_created_ = value;
+        }
+        else if (pathIs(PrivateKey) || pathIs(InfoKey, PrivateKey))
+        {
+            tm_.is_private_ = value != 0;
+        }
+        else if (pathIs(PieceLengthKey) || pathIs(InfoKey, PieceLengthKey))
+        {
+            piece_size_ = value;
+        }
+        else if (pathIs(InfoKey, LengthKey))
+        {
+            length_ = value;
+        }
+        else if (pathIs(InfoKey, MetaVersionKey))
+        {
+            // currently unused. TODO support for bittorrent v2
+            // TODO https://github.com/transmission/transmission/issues/458
         }
         else
         {
