@@ -11,9 +11,6 @@
 #include <string_view>
 #include <vector>
 
-#warning nocommit
-#include <iostream>
-
 #include <fmt/core.h>
 #include <fmt/format.h>
 
@@ -227,48 +224,20 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
             state_ = State::PieceLayers;
         }
 
-        std::cerr << __FILE__ << ':' << __LINE__ << " StartDict before push, depth is " << depth() << ' ';
-        for (size_t i = 1; i <= depth(); ++i)
-            std::cerr << '[' << key(i) << ']';
-        std::cerr << std::endl;
-
-        std::cerr << __FILE__ << ':' << __LINE__ << " before push, depth " << depth() << std::endl;
-        BasicHandler::StartDict(context);
-        std::cerr << __FILE__ << ':' << __LINE__ << " after push, depth " << depth() << std::endl;
-
-        std::cerr << __FILE__ << ':' << __LINE__ << " StartDict after push, depth is " << depth() << ' ';
-        for (size_t i = 1; i <= depth(); ++i)
-            std::cerr << '[' << key(i) << ']';
-        std::cerr << std::endl;
-
-        return true;
+        return BasicHandler::StartDict(context);
     }
 
     bool EndDict(Context const& context) override
     {
-        std::cerr << __FILE__ << ':' << __LINE__ << " EndDict before pop, depth is " << depth() << ' ';
-        for (size_t i = 1; i <= depth(); ++i)
-            std::cerr << '[' << key(i) << ']';
-        std::cerr << std::endl;
-
-        std::cerr << __FILE__ << ':' << __LINE__ << " before pop, depth " << depth() << std::endl;
         BasicHandler::EndDict(context);
-        std::cerr << __FILE__ << ':' << __LINE__ << " after pop, depth " << depth() << std::endl;
-
-        std::cerr << __FILE__ << ':' << __LINE__ << " EndDict after pop, depth is " << depth() << ' ';
-        for (size_t i = 1; i <= depth(); ++i)
-            std::cerr << '[' << key(i) << ']';
-        std::cerr << std::endl;
 
         if (pathIs(InfoKey))
         {
-            std::cerr << __FILE__ << ':' << __LINE__ << " state reset to top" << std::endl;
             return finishInfoDict(context);
         }
 
         if (depth() == 0) // top
         {
-            std::cerr << __FILE__ << ':' << __LINE__ << " finish" << std::endl;
             return finish(context);
         }
 
@@ -312,17 +281,12 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
             file_length_ = 0;
         }
 
-        std::cerr << __FILE__ << ':' << __LINE__ << " before push, depth " << depth() << std::endl;
-        BasicHandler::StartArray(context);
-        std::cerr << __FILE__ << ':' << __LINE__ << " after push, depth " << depth() << std::endl;
-        return true;
+        return BasicHandler::StartArray(context);
     }
 
     bool EndArray(Context const& context) override
     {
-        std::cerr << __FILE__ << ':' << __LINE__ << " before pop, depth " << depth() << std::endl;
         BasicHandler::EndArray(context);
-        std::cerr << __FILE__ << ':' << __LINE__ << " after pop, depth " << depth() << std::endl;
 
         if ((state_ == State::Files || state_ == State::FilesIgnored) && currentKey() == FilesKey) // bittorrent v1 format
         {
@@ -468,10 +432,6 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
             std::copy_n(std::data(value), std::size(value), reinterpret_cast<char*>(std::data(tm_.pieces_)));
             tm_.pieces_offset_ = context.tokenSpan().first;
         }
-        else if (curdepth == 2 && (pathStartsWith(HttpSeedsKey) || pathStartsWith(UrlListKey)))
-        {
-            tm_.addWebseed(value);
-        }
         else if (pathStartsWith(PieceLayersKey))
         {
             // currently unused. TODO support for bittorrent v2
@@ -480,6 +440,10 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
         else if (pathStartsWith(AnnounceListKey))
         {
             tm_.announceList().add(value, tier_);
+        }
+        else if (curdepth == 2 && (pathStartsWith(HttpSeedsKey) || pathStartsWith(UrlListKey)))
+        {
+            tm_.addWebseed(value);
         }
         else
         {
@@ -539,8 +503,6 @@ private:
 
     bool finishInfoDict(Context const& context)
     {
-        std::cerr << __FILE__ << ':' << __LINE__ << " finishInfoDict" << std::endl;
-
         if (std::empty(info_dict_begin_))
         {
             tr_error_set(context.error, EINVAL, "no info_dict found");
