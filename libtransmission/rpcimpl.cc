@@ -1383,7 +1383,7 @@ static char const* portTest(
 {
     auto const port = session->peerPort();
     auto const url = fmt::format(FMT_STRING("https://portcheck.transmissionbt.com/{:d}"), port.host());
-    session->web->fetch({ url, onPortTested, idle_data });
+    tr_sessionFetch(session, { url, onPortTested, idle_data });
     return nullptr;
 }
 
@@ -1467,7 +1467,7 @@ static char const* blocklistUpdate(
     tr_variant* /*args_out*/,
     struct tr_rpc_idle_data* idle_data)
 {
-    session->web->fetch({ session->blocklistUrl(), onBlocklistFetched, idle_data });
+    tr_sessionFetch(session, { session->blocklistUrl(), onBlocklistFetched, idle_data });
     return nullptr;
 }
 
@@ -1676,7 +1676,7 @@ static char const* torrentAdd(tr_session* session, tr_variant* args_in, tr_varia
 
         auto options = tr_web::FetchOptions{ filename, onMetadataFetched, d };
         options.cookies = cookies;
-        session->web->fetch(std::move(options));
+        tr_sessionFetch(session, std::move(options));
     }
     else
     {
@@ -2055,6 +2055,11 @@ static char const* sessionSet(
         tr_sessionSetAntiBruteForceEnabled(session, boolVal);
     }
 
+    if (tr_variant* vlist = nullptr; tr_variantDictFindList(args_in, TR_KEY_proxy_list, &vlist))
+    {
+        tr_sessionSetProxyList(session, vlist);
+    }
+
     notify(session, TR_RPC_SESSION_CHANGED, nullptr);
 
     return nullptr;
@@ -2351,6 +2356,10 @@ static void addSessionField(tr_session* s, tr_variant* d, tr_quark key)
 
     case TR_KEY_session_id:
         tr_variantDictAddStr(d, key, tr_session_id_get_current(s->session_id));
+        break;
+
+    case TR_KEY_proxy_list:
+        tr_sessionCopyProxyList(tr_variantDictAddOrReplaceList(d, key, 0), s);
         break;
     }
 }

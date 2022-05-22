@@ -109,6 +109,7 @@ public:
     void set_pref(tr_quark key, bool val);
     void set_pref(tr_quark key, int val);
     void set_pref(tr_quark key, double val);
+    void set_pref(tr_quark key, std::vector<std::string> const& val);
 
     /**
     ***

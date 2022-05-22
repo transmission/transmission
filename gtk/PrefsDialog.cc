@@ -6,6 +6,7 @@
 #include <climits> /* USHRT_MAX, INT_MAX */
 #include <sstream>
 #include <string>
+#include <iomanip> // std::setw, std::left
 
 #include <glibmm.h>
 #include <glibmm/i18n.h>
@@ -42,6 +43,7 @@ private:
     Gtk::Widget* seedingPage();
     Gtk::Widget* privacyPage();
     Gtk::Widget* networkPage();
+    Gtk::Widget* proxyPage();
     Gtk::Widget* desktopPage();
     Gtk::Widget* remotePage();
 
@@ -1121,6 +1123,139 @@ Gtk::Widget* PrefsDialog::Impl::networkPage()
 }
 
 /****
+*****  Proxy Tab
+****/
+
+namespace
+{
+
+std::vector<std::string> proxyTextToList(Glib::ustring const& text)
+{
+    std::vector<std::string> result;
+    Glib::ustring const spaces(" \t\n\r");
+
+    for (size_t url_end = 0;;)
+    {
+        size_t mask_i = text.find_first_not_of(spaces, url_end); // Begin of first word
+
+        if (mask_i == Glib::ustring::npos)
+        {
+            break;
+        }
+
+        size_t mask_end = text.find_first_of(spaces, mask_i + 1); // End of first word
+
+        if (mask_end == Glib::ustring::npos || text[mask_end] == '\n' || text[mask_end] == '\r')
+        {
+            break;
+        }
+
+        size_t url_i = text.find_first_not_of(spaces, mask_end + 1); // Beign of second word
+
+        if (url_i == Glib::ustring::npos)
+        {
+            break;
+        }
+
+        url_end = text.find_first_of(spaces, url_i + 1); // End of second word
+
+        if (url_end == Glib::ustring::npos)
+        {
+            url_end = text.length();
+        }
+
+        if (url_end <= url_i)
+        {
+            break;
+        }
+
+        result.emplace_back(text.substr(mask_i, mask_end - mask_i).raw());
+        result.emplace_back(text.substr(url_i, url_end - url_i).raw());
+    }
+
+    return result;
+}
+
+Glib::ustring proxyListToText(std::vector<std::string> const& list)
+{
+    Glib::ustring result;
+    size_t align = 0;
+
+    for (size_t i = 0; i < list.size(); i += 2)
+    {
+        if (align < list[i].length())
+        {
+            align = list[i].length();
+        }
+    }
+
+    for (size_t i = 1; i < list.size(); i += 2)
+    {
+        result.append(Glib::ustring::format(std::setw(align + 1), std::left, list[i - 1]));
+        result.append(list[i]);
+        result.append(1, '\n');
+    }
+
+    return result;
+}
+
+struct proxy_page_data
+{
+    Glib::RefPtr<Session> core;
+    Glib::RefPtr<Gtk::TextBuffer> w;
+};
+
+void proxy_changed_cb(tr_quark const key, proxy_page_data* data)
+{
+    auto text = data->w->get_text();
+    auto list = proxyTextToList(text);
+    data->core->set_pref(key, list);
+}
+
+} // namespace
+
+Gtk::Widget* PrefsDialog::Impl::proxyPage()
+{
+    guint row = 0;
+
+    /* build the page */
+    auto* t = Gtk::make_managed<HigWorkarea>();
+
+    t->add_section_title(row, _("Proxy list"));
+
+    auto* l = Gtk::make_managed<Gtk::Label>(
+        _("Each line in the list must consist of two ''words''.\n"
+          "First ''word'' is a tracker domain mask with wildcards ('*' and '?').\n"
+          "Second ''word'' is a CURL-style proxy URL ([protocol://]host[:port]).\n"
+          "The protocol may be one of: socks4://, socks4a://, socks5://, socks5h://, http://, https://\n"
+          "Examples:\n"
+          "<tt>*.onion/*         socks5h://127.0.0.1:9050\n"
+          "*my.tracker.com/* http://my.proxy.com\n"
+          "*                 https://all.proxy.com</tt>"));
+    l->set_use_markup(true);
+    t->add_wide_control(row, *l);
+
+    auto* v = Gtk::make_managed<Gtk::TextView>();
+    auto css = Gtk::CssProvider::create();
+    css->load_from_data("* {font-family: monospace;}");
+    v->get_style_context()->add_provider(css, GTK_STYLE_PROVIDER_PRIORITY_USER);
+    auto* vv = Gtk::make_managed<Gtk::ScrolledWindow>();
+    vv->add(*v);
+    t->add_wide_tall_control(row, *vv);
+
+    auto list = gtr_pref_strv_get(TR_KEY_proxy_list);
+    auto s = proxyListToText(list);
+    v->get_buffer()->set_text(s);
+
+    auto const data = std::make_shared<proxy_page_data>();
+    data->core = core_;
+    data->w = v->get_buffer();
+    v->get_buffer()->signal_changed().connect([data]() { proxy_changed_cb(TR_KEY_proxy_list, data.get()); });
+
+    return t;
+}
+
+/****
 *****
 ****/
 
@@ -1185,6 +1320,7 @@ PrefsDialog::Impl::Impl(PrefsDialog& dialog, Glib::RefPtr<Session> const& core)
     n->append_page(*seedingPage(), C_("Gerund", "Seeding"));
     n->append_page(*privacyPage(), _("Privacy"));
     n->append_page(*networkPage(), _("Network"));
+    n->append_page(*proxyPage(), _("Proxy"));
     n->append_page(*desktopPage(), _("Desktop"));
     n->append_page(*remotePage(), _("Remote"));
 

@@ -730,6 +730,14 @@ void tr_sessionSetScriptEnabled(tr_session*, TrScript, bool enabled);
 
 bool tr_sessionIsScriptEnabled(tr_session const*, TrScript);
 
+/***
+****
+***/
+
+void tr_sessionSetProxyList(tr_session* session, struct tr_variant const* vlist);
+
+void tr_sessionCopyProxyList(struct tr_variant* vlist, tr_session const* session);
+
 /** @} */
 
 /**

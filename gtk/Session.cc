@@ -1569,6 +1569,15 @@ void Session::set_pref(tr_quark const key, double newval)
     }
 }
 
+void Session::set_pref(tr_quark key, std::vector<std::string> const& val)
+{
+    if (!gtr_pref_strv_equal(key, val))
+    {
+        gtr_pref_strv_set(key, val);
+        impl_->commit_prefs_change(key);
+    }
+}
+
 /***
 ****
 ****  RPC Interface

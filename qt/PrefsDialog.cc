@@ -34,6 +34,9 @@
 #include <QTimeEdit>
 #include <QTimer>
 #include <QVBoxLayout>
+#include <QStringList>
+#include <QPlainTextEdit>
+#include <QRegularExpression>
 
 #include "ColumnResizer.h"
 #include "Formatter.h"
@@ -276,7 +279,14 @@ void PrefsDialog::focusChanged(QWidget* old, QWidget* cur)
     {
         if (auto const val = edit->toPlainText(); val != edit->property(StartValue).toString())
         {
-            setPref(PreferenceWidget{ old }.getPrefKey(), val);
+            if (auto key = PreferenceWidget{ old }.getPrefKey(); key == Prefs::PROXY_LIST)
+            {
+                setPref(key, parseProxyText(val));
+            }
+            else
+            {
+                setPref(key, val);
+            }
         }
     }
 
@@ -479,6 +489,63 @@ void PrefsDialog::initNetworkTab()
 
     connect(ui_.testPeerPortButton, &QAbstractButton::clicked, this, &PrefsDialog::onPortTest);
     connect(&session_, &Session::portTested, this, &PrefsDialog::onPortTested);
+}
+
+/***
+****
+***/
+
+void PrefsDialog::updateProxyValue(QWidget* widget, int pref_key)
+{
+    auto* te = qobject_cast<QPlainTextEdit*>(widget);
+
+    if (te == nullptr)
+    {
+        return;
+    }
+
+    QStringList const qslist = prefs_.getStringList(pref_key);
+    QString text;
+    int align = 0;
+
+    for (int i = 0; i < qslist.size(); i += 2)
+    {
+        if (align < qslist[i].length())
+        {
+            align = qslist[i].length();
+        }
+    }
+
+    for (int i = 1; i < qslist.size(); i += 2)
+    {
+        text += qslist[i - 1].leftJustified(align + 1);
+        text += qslist[i];
+        text += QLatin1Char('\n');
+    }
+
+    te->setPlainText(text);
+}
+
+QStringList PrefsDialog::parseProxyText(QString const& text)
+{
+    QStringList result;
+    QRegularExpression const re(QLatin1String(R"(^\s*(\S+)\s+(\S+)\s*$)"), QRegularExpression::MultilineOption);
+
+    for (auto it = re.globalMatch(text); it.hasNext();)
+    {
+        auto match = it.next();
+        result += match.captured(1);
+        result += match.captured(2);
+    }
+
+    return result;
+}
+
+void PrefsDialog::initProxyTab()
+{
+    PreferenceWidget pref_widget(ui_.proxyTextEdit);
+    pref_widget.setPrefKey(Prefs::PROXY_LIST);
+    updateProxyValue(ui_.proxyTextEdit, Prefs::PROXY_LIST);
 }
 
 /***
@@ -689,6 +756,7 @@ PrefsDialog::PrefsDialog(Session& session, Prefs& prefs, QWidget* parent)
     initSeedingTab();
     initPrivacyTab();
     initNetworkTab();
+    initProxyTab();
     initDesktopTab();
     initRemoteTab();
 
@@ -813,6 +881,10 @@ void PrefsDialog::refreshPref(int key)
     case Prefs::PEER_PORT:
         ui_.peerPortStatusLabel->setText(tr("Status unknown"));
         ui_.testPeerPortButton->setEnabled(true);
+        break;
+
+    case Prefs::PROXY_LIST:
+        updateProxyValue(ui_.proxyTextEdit, Prefs::PROXY_LIST);
         break;
 
     default:

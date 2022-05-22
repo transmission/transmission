@@ -183,6 +183,11 @@ void tr_session::WebMediator::run(tr_web::FetchDoneFunc&& func, tr_web::FetchRes
 
 void tr_sessionFetch(tr_session* session, tr_web::FetchOptions&& options)
 {
+    if (auto proxy = session->proxy_list_.getProxyUrl(options.url); proxy)
+    {
+        options.proxy_url = *proxy;
+    }
+
     session->web->fetch(std::move(options));
 }
 
@@ -323,7 +328,7 @@ void tr_sessionGetDefaultSettings(tr_variant* d)
 {
     TR_ASSERT(tr_variantIsDict(d));
 
-    tr_variantDictReserve(d, 71);
+    tr_variantDictReserve(d, 74);
     tr_variantDictAddBool(d, TR_KEY_blocklist_enabled, false);
     tr_variantDictAddStrView(d, TR_KEY_blocklist_url, "http://www.example.com/blocklist"sv);
     tr_variantDictAddInt(d, TR_KEY_cache_size_mb, DefaultCacheSizeMB);
@@ -397,6 +402,7 @@ void tr_sessionGetDefaultSettings(tr_variant* d)
     tr_variantDictAddBool(d, TR_KEY_trash_original_torrent_files, false);
     tr_variantDictAddInt(d, TR_KEY_anti_brute_force_threshold, 100);
     tr_variantDictAddBool(d, TR_KEY_anti_brute_force_enabled, true);
+    tr_variantDictAddOrReplaceList(d, TR_KEY_proxy_list, 0);
 }
 
 void tr_sessionGetSettings(tr_session const* s, tr_variant* d)
@@ -475,6 +481,7 @@ void tr_sessionGetSettings(tr_session const* s, tr_variant* d)
         tr_variantDictAddBool(d, enabled_key, tr_sessionIsScriptEnabled(s, script));
         tr_variantDictAddStr(d, script_key, tr_sessionGetScript(s, script));
     }
+    tr_sessionCopyProxyList(tr_variantDictAddOrReplaceList(d, TR_KEY_proxy_list, 0), s);
 }
 
 bool tr_sessionLoadSettings(tr_variant* dict, char const* config_dir, char const* appName)
@@ -787,6 +794,7 @@ static void sessionSetImpl(struct init_data* const data)
     auto i = int64_t{};
     auto sv = std::string_view{};
     tr_turtle_info* const turtle = &session->turtle;
+    tr_variant* vlist = nullptr;
 
     if (tr_variantDictFindInt(settings, TR_KEY_message_level, &i))
     {
@@ -1136,6 +1144,11 @@ static void sessionSetImpl(struct init_data* const data)
     if (tr_variantDictFindBool(settings, TR_KEY_anti_brute_force_enabled, &boolVal))
     {
         tr_sessionSetAntiBruteForceEnabled(session, boolVal);
+    }
+
+    if (tr_variantDictFindList(settings, TR_KEY_proxy_list, &vlist))
+    {
+        tr_sessionSetProxyList(session, vlist);
     }
 
     data->done_cv.notify_one();
@@ -2943,4 +2956,21 @@ void tr_session::closeTorrentFile(tr_torrent* tor, tr_file_index_t file_num) noe
 {
     tr_cacheFlushFile(this->cache, tor, file_num);
     openFiles().closeFile(tor->uniqueId, file_num);
+}
+
+/***
+****
+***/
+
+void tr_sessionSetProxyList(tr_session* session, tr_variant const* vlist)
+{
+    TR_ASSERT(tr_isSession(session));
+    session->proxy_list_ = vlist;
+}
+
+void tr_sessionCopyProxyList(tr_variant* vlist, tr_session const* session)
+{
+    TR_ASSERT(tr_variantIsList(vlist));
+    TR_ASSERT(tr_isSession(session));
+    session->proxy_list_.toVariant(vlist);
 }

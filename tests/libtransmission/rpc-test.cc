@@ -94,7 +94,7 @@ TEST_F(RpcTest, sessionGet)
     EXPECT_TRUE(tr_variantDictFindDict(&response, TR_KEY_arguments, &args));
 
     // what we expected
-    auto const expected_keys = std::array<tr_quark, 58>{
+    auto const expected_keys = std::array<tr_quark, 59>{
         TR_KEY_alt_speed_down,
         TR_KEY_alt_speed_enabled,
         TR_KEY_alt_speed_time_begin,
@@ -127,6 +127,7 @@ TEST_F(RpcTest, sessionGet)
         TR_KEY_peer_port_random_on_start,
         TR_KEY_pex_enabled,
         TR_KEY_port_forwarding_enabled,
+        TR_KEY_proxy_list,
         TR_KEY_queue_stalled_enabled,
         TR_KEY_queue_stalled_minutes,
         TR_KEY_rename_partial_files,

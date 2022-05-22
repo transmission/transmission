@@ -68,6 +68,10 @@ void Session::sessionSet(tr_quark const key, QVariant const& value)
         dictAdd(&args, key, value.toString());
         break;
 
+    case QVariant::StringList:
+        dictAdd(&args, key, value.toStringList());
+        break;
+
     default:
         assert(false);
     }
@@ -182,6 +186,7 @@ void Session::updatePref(int key)
         case Prefs::USPEED:
         case Prefs::USPEED_ENABLED:
         case Prefs::UTP_ENABLED:
+        case Prefs::PROXY_LIST:
             sessionSet(prefs_.getKey(key), prefs_.variant(key));
             break;
 
@@ -923,6 +928,14 @@ void Session::updateInfo(tr_variant* d)
         case CustomVariantType::SortModeType:
         case QVariant::String:
             if (auto const value = getValue<QString>(b); value)
+            {
+                prefs_.set(i, *value);
+            }
+
+            break;
+
+        case QVariant::StringList:
+            if (auto const value = getValue<QStringList>(b); value)
             {
                 prefs_.set(i, *value);
             }

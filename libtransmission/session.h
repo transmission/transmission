@@ -29,6 +29,7 @@
 #include "interned-string.h"
 #include "net.h" // tr_socket_t
 #include "open-files.h"
+#include "proxylist.h"
 #include "quark.h"
 #include "torrents.h"
 #include "web.h"
@@ -433,6 +434,8 @@ public:
 
     struct tr_bindinfo* bind_ipv4;
     struct tr_bindinfo* bind_ipv6;
+
+    tr_proxy_list proxy_list_;
 
     std::unique_ptr<tr_rpc_server> rpc_server_;
 

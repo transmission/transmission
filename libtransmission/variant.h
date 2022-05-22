@@ -210,8 +210,9 @@ tr_variant* tr_variantListAddStrView(tr_variant* list, std::string_view);
 tr_variant* tr_variantListAddQuark(tr_variant* list, tr_quark const addme);
 tr_variant* tr_variantListAddRaw(tr_variant* list, void const* addme_value, size_t addme_len);
 tr_variant* tr_variantListAddList(tr_variant* list, size_t reserve_count);
+tr_variant* tr_variantDictAddOrReplaceList(tr_variant* dict, tr_quark const key, size_t reserve_count);
 tr_variant* tr_variantListAddDict(tr_variant* list, size_t reserve_count);
-tr_variant* tr_variantListChild(tr_variant* list, size_t pos);
+tr_variant* tr_variantListChild(tr_variant const* list, size_t pos);
 
 bool tr_variantListRemove(tr_variant* list, size_t pos);
 size_t tr_variantListSize(tr_variant const* list);

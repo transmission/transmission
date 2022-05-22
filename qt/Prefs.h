@@ -114,6 +114,7 @@ public:
         UTP_ENABLED,
         LPD_ENABLED,
         PORT_FORWARDING,
+        PROXY_LIST,
         PREALLOCATION,
         RATIO,
         RATIO_ENABLED,
@@ -164,6 +165,7 @@ public:
     int getInt(int key) const;
     bool getBool(int key) const;
     QString getString(int key) const;
+    QStringList getStringList(int key) const;
     double getDouble(int key) const;
     QDateTime getDateTime(int key) const;
 

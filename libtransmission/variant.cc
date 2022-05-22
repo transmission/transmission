@@ -184,7 +184,7 @@ size_t tr_variantListSize(tr_variant const* list)
     return tr_variantIsList(list) ? list->val.l.count : 0;
 }
 
-tr_variant* tr_variantListChild(tr_variant* v, size_t i)
+tr_variant* tr_variantListChild(tr_variant const* v, size_t i)
 {
     tr_variant* ret = nullptr;
 
@@ -631,6 +631,13 @@ tr_variant* tr_variantDictAddList(tr_variant* dict, tr_quark const key, size_t r
     return child;
 }
 
+tr_variant* tr_variantDictAddOrReplaceList(tr_variant* dict, tr_quark const key, size_t reserve_count)
+{
+    tr_variant* child = dictFindOrAdd(dict, key, TR_VARIANT_TYPE_LIST);
+    tr_variantInitList(child, reserve_count);
+    return child;
+}
+
 tr_variant* tr_variantDictAddDict(tr_variant* dict, tr_quark const key, size_t reserve_count)
 {
     tr_variant* child = tr_variantDictAdd(dict, key);
@@ -1058,10 +1065,19 @@ void tr_variantMergeDicts(tr_variant* target, tr_variant const* source)
             }
             else if (tr_variantIsList(val))
             {
-                if (tr_variantDictFind(target, key) == nullptr)
+                tr_variant* target_list = tr_variantDictFind(target, key);
+
+                if (target_list == nullptr)
                 {
-                    tr_variantListCopy(tr_variantDictAddList(target, key, tr_variantListSize(val)), val);
+                    target_list = tr_variantDictAddList(target, key, tr_variantListSize(val));
                 }
+                else
+                {
+                    tr_variantFree(target_list);
+                    tr_variantInitList(target_list, tr_variantListSize(val));
+                }
+
+                tr_variantListCopy(target_list, val);
             }
             else if (tr_variantIsDict(val))
             {

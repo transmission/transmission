@@ -24,6 +24,9 @@ bool gtr_pref_flag_get(tr_quark const key);
 void gtr_pref_flag_set(tr_quark const key, bool value);
 
 std::vector<std::string> gtr_pref_strv_get(tr_quark const key);
+void gtr_pref_strv_set(tr_quark const key, std::vector<std::string> const& value);
+bool gtr_pref_strv_equal(tr_quark const key, std::vector<std::string> const& value);
+tr_variant* gtr_pref_vlist_get(tr_quark const key);
 
 std::string gtr_pref_string_get(tr_quark const key);
 void gtr_pref_string_set(tr_quark const key, std::string_view value);
