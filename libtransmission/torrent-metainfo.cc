@@ -158,7 +158,6 @@ std::string tr_torrent_metainfo::fixWebseedUrl(tr_torrent_metainfo const& tm, st
 }
 
 static auto constexpr MaxBencDepth = 32;
-using tr_membuf = fmt::basic_memory_buffer<char, 4096>;
 
 bool tr_error_is_set(tr_error const* const* error)
 {
@@ -190,6 +189,32 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
     };
     State state_ = State::Top;
 
+    static constexpr std::string_view AnnounceKey = "announce"sv;
+    static constexpr std::string_view AnnounceListKey = "announce-list"sv;
+    static constexpr std::string_view AttrKey = "attr"sv;
+    static constexpr std::string_view CommentKey = "comment"sv;
+    static constexpr std::string_view CommentUtf8Key = "comment.utf-8"sv;
+    static constexpr std::string_view CreatedByKey = "created by"sv;
+    static constexpr std::string_view CreatedByUtf8Key = "created by.utf-8"sv;
+    static constexpr std::string_view CreationDateKey = "creation date"sv;
+    static constexpr std::string_view EncodingKey = "encoding"sv;
+    static constexpr std::string_view FileTreeKey = "file tree"sv;
+    static constexpr std::string_view FilesKey = "files"sv;
+    static constexpr std::string_view HttpSeedsKey = "httpseeds"sv;
+    static constexpr std::string_view InfoKey = "info"sv;
+    static constexpr std::string_view LengthKey = "length"sv;
+    static constexpr std::string_view MetaVersionKey = "meta version"sv;
+    static constexpr std::string_view NameKey = "name"sv;
+    static constexpr std::string_view NameUtf8Key = "name.utf-8"sv;
+    static constexpr std::string_view PathKey = "path"sv;
+    static constexpr std::string_view PieceLayersKey = "piece layers"sv;
+    static constexpr std::string_view PieceLengthKey = "piece length"sv;
+    static constexpr std::string_view PiecesKey = "pieces"sv;
+    static constexpr std::string_view PiecesRootKey = "pieces root"sv;
+    static constexpr std::string_view PrivateKey = "private"sv;
+    static constexpr std::string_view SourceKey = "source"sv;
+    static constexpr std::string_view UrlListKey = "url-list"sv;
+
     explicit MetainfoHandler(tr_torrent_metainfo& tm)
         : tm_{ tm }
     {
@@ -215,18 +240,18 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
         }
         else if (state_ == State::Top && depth() == 2)
         {
-            if (key(1) == "info"sv)
+            if (key(1) == InfoKey)
             {
                 info_dict_begin_ = context.raw();
                 tm_.info_dict_offset_ = context.tokenSpan().first;
                 state_ = State::Info;
             }
-            else if (key(1) == "piece layers"sv)
+            else if (key(1) == PieceLayersKey)
             {
                 state_ = State::PieceLayers;
             }
         }
-        else if (state_ == State::Info && key(depth() - 1) == "file tree"sv)
+        else if (state_ == State::Info && key(depth() - 1) == FileTreeKey)
         {
             state_ = State::FileTree;
             file_subpath_.clear();
@@ -239,19 +264,20 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
     bool EndDict(Context const& context) override
     {
         BasicHandler::EndDict(context);
+        auto const current_key = currentKey();
 
         if (depth() == 0) // top
         {
             return finish(context);
         }
 
-        if (state_ == State::Info && key(depth()) == "info"sv)
+        if (state_ == State::Info && current_key == InfoKey)
         {
             state_ = State::Top;
             return finishInfoDict(context);
         }
 
-        if (state_ == State::PieceLayers && key(depth()) == "piece layers"sv)
+        if (state_ == State::PieceLayers && current_key == PieceLayersKey)
         {
             state_ = State::Top;
             return true;
@@ -266,7 +292,7 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
 
             file_subpath_.popdir();
 
-            if (key(depth()) == "file tree"sv)
+            if (current_key == FileTreeKey)
             {
                 state_ = State::Info;
             }
@@ -292,7 +318,7 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
     {
         BasicHandler::StartArray(context);
 
-        if (state_ == State::Info && key(depth() - 1) == "files"sv)
+        if (state_ == State::Info && key(depth() - 1) == FilesKey)
         {
             if (!std::empty(tm_.files_))
             {
@@ -312,13 +338,13 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
     {
         BasicHandler::EndArray(context);
 
-        if ((state_ == State::Files || state_ == State::FilesIgnored) && key(depth()) == "files"sv) // bittorrent v1 format
+        if ((state_ == State::Files || state_ == State::FilesIgnored) && key(depth()) == FilesKey) // bittorrent v1 format
         {
             state_ = State::Info;
             return true;
         }
 
-        if (depth() == 2 && key(1) == "announce-list")
+        if (depth() == 2 && key(1) == AnnounceListKey)
         {
             ++tier_;
         }
@@ -338,15 +364,15 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
         }
         else if (curdepth == 1)
         {
-            if (curkey == "creation date"sv)
+            if (curkey == CreationDateKey)
             {
                 tm_.date_created_ = value;
             }
-            else if (curkey == "private"sv)
+            else if (curkey == PrivateKey)
             {
                 tm_.is_private_ = value != 0;
             }
-            else if (curkey == "piece length"sv)
+            else if (curkey == PieceLengthKey)
             {
                 piece_size_ = value;
             }
@@ -355,21 +381,21 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
                 unhandled = true;
             }
         }
-        else if (curdepth == 2 && key(1) == "info"sv)
+        else if (curdepth == 2 && key(1) == InfoKey)
         {
-            if (curkey == "piece length"sv)
+            if (curkey == PieceLengthKey)
             {
                 piece_size_ = value;
             }
-            else if (curkey == "private"sv)
+            else if (curkey == PrivateKey)
             {
                 tm_.is_private_ = value != 0;
             }
-            else if (curkey == "length"sv)
+            else if (curkey == LengthKey)
             {
                 length_ = value;
             }
-            else if (curkey == "meta version")
+            else if (curkey == MetaVersionKey)
             {
                 // currently unused. TODO support for bittorrent v2
                 // TODO https://github.com/transmission/transmission/issues/458
@@ -381,7 +407,7 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
         }
         else if (state_ == State::FileTree || state_ == State::Files)
         {
-            if (curkey == "length"sv)
+            if (curkey == LengthKey)
             {
                 file_length_ = value;
             }
@@ -415,7 +441,7 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
         }
         else if (state_ == State::FileTree)
         {
-            if (curkey == "attr"sv || curkey == "pieces root"sv)
+            if (curkey == AttrKey || curkey == PiecesRootKey)
             {
                 // currently unused. TODO support for bittorrent v2
                 // TODO https://github.com/transmission/transmission/issues/458
@@ -427,7 +453,7 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
         }
         else if (state_ == State::Files)
         {
-            if (curdepth > 1 && key(curdepth - 1) == "path"sv)
+            if (curdepth > 1 && key(curdepth - 1) == PathKey)
             {
                 if (!std::empty(file_subpath_))
                 {
@@ -435,7 +461,7 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
                 }
                 tr_file_info::sanitizePath(value, file_subpath_);
             }
-            else if (curkey == "attr"sv)
+            else if (curkey == AttrKey)
             {
                 // currently unused. TODO support for bittorrent v2
                 // TODO https://github.com/transmission/transmission/issues/458
@@ -450,27 +476,27 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
             switch (curdepth)
             {
             case 1:
-                if (curkey == "comment"sv || curkey == "comment.utf-8"sv)
+                if (curkey == CommentKey || curkey == CommentUtf8Key)
                 {
                     tr_strvUtf8Clean(value, tm_.comment_);
                 }
-                else if (curkey == "created by"sv || curkey == "created by.utf-8"sv)
+                else if (curkey == CreatedByKey || curkey == CreatedByUtf8Key)
                 {
                     tr_strvUtf8Clean(value, tm_.creator_);
                 }
-                else if (curkey == "source"sv)
+                else if (curkey == SourceKey)
                 {
                     tr_strvUtf8Clean(value, tm_.source_);
                 }
-                else if (curkey == "announce"sv)
+                else if (curkey == AnnounceKey)
                 {
                     tm_.announceList().add(value, tier_);
                 }
-                else if (curkey == "encoding"sv)
+                else if (curkey == EncodingKey)
                 {
                     encoding_ = tr_strvStrip(value);
                 }
-                else if (curkey == "url-list"sv)
+                else if (curkey == UrlListKey)
                 {
                     tm_.addWebseed(value);
                 }
@@ -481,22 +507,22 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
                 break;
 
             case 2:
-                if (key(1) == "info"sv && curkey == "source"sv)
+                if (key(1) == InfoKey && curkey == SourceKey)
                 {
                     tr_strvUtf8Clean(value, tm_.source_);
                 }
-                else if (key(1) == "httpseeds"sv || key(1) == "url-list"sv)
+                else if (key(1) == HttpSeedsKey || key(1) == UrlListKey)
                 {
                     tm_.addWebseed(value);
                 }
-                else if (key(1) == "info"sv && curkey == "pieces"sv)
+                else if (key(1) == InfoKey && curkey == PiecesKey)
                 {
                     auto const n = std::size(value) / sizeof(tr_sha1_digest_t);
                     tm_.pieces_.resize(n);
                     std::copy_n(std::data(value), std::size(value), reinterpret_cast<char*>(std::data(tm_.pieces_)));
                     tm_.pieces_offset_ = context.tokenSpan().first;
                 }
-                else if (key(1) == "info"sv && (curkey == "name"sv || curkey == "name.utf-8"sv))
+                else if (key(1) == InfoKey && (curkey == NameKey || curkey == NameUtf8Key))
                 {
                     tr_strvUtf8Clean(value, tm_.name_);
 
@@ -510,7 +536,7 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
                         }
                     }
                 }
-                else if (key(1) == "piece layers"sv)
+                else if (key(1) == PieceLayersKey)
                 {
                     // currently unused. TODO support for bittorrent v2
                     // TODO https://github.com/transmission/transmission/issues/458
@@ -522,7 +548,7 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
                 break;
 
             case 3:
-                if (key(1) == "announce-list")
+                if (key(1) == AnnounceListKey)
                 {
                     tm_.announceList().add(value, tier_);
                 }
@@ -697,8 +723,8 @@ tr_pathbuf tr_torrent_metainfo::makeFilename(
 {
     // `${dirname}/${name}.${info_hash}${suffix}`
     // `${dirname}/${info_hash}${suffix}`
-    return format == BasenameFormat::Hash ? tr_pathbuf{ dirname, "/"sv, info_hash_string, suffix } :
-                                            tr_pathbuf{ dirname, "/"sv, name, "."sv, info_hash_string.substr(0, 16), suffix };
+    return format == BasenameFormat::Hash ? tr_pathbuf{ dirname, '/', info_hash_string, suffix } :
+                                            tr_pathbuf{ dirname, '/', name, '.', info_hash_string.substr(0, 16), suffix };
 }
 
 bool tr_torrent_metainfo::migrateFile(
