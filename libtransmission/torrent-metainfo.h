@@ -54,6 +54,7 @@ public:
     {
         return files().path(i);
     }
+
     void setFileSubpath(tr_file_index_t i, std::string_view subpath)
     {
         files_.setPath(i, subpath);

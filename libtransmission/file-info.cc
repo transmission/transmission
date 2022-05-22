@@ -18,6 +18,62 @@
 
 using namespace std::literals;
 
+// https://docs.microsoft.com/en-us/windows/win32/fileio/naming-a-file
+[[nodiscard]] static bool isReservedFilename(std::string_view in) noexcept
+{
+    if (std::empty(in))
+    {
+        return false;
+    }
+
+    if ("ACLNP"sv.find(in.front()) == std::string_view::npos)
+    {
+        return false;
+    }
+
+    auto in_upper = tr_pathbuf{ in };
+    std::transform(std::begin(in_upper), std::end(in_upper), std::begin(in_upper), [](auto ch) { return toupper(ch); });
+    auto const in_upper_sv = in_upper.sv();
+
+    static auto constexpr ReservedNames = std::array<std::string_view, 22>{
+        "AUX"sv,  "CON"sv,  "NUL"sv,  "PRN"sv,  "COM1"sv, "COM2"sv, "COM3"sv, "COM4"sv, "COM5"sv, "COM6"sv, "COM7"sv,
+        "COM8"sv, "COM9"sv, "LPT1"sv, "LPT2"sv, "LPT3"sv, "LPT4"sv, "LPT5"sv, "LPT6"sv, "LPT7"sv, "LPT8"sv, "LPT9"sv,
+    };
+    if (std::find(std::begin(ReservedNames), std::end(ReservedNames), in_upper_sv) != std::end(ReservedNames))
+    {
+        return true;
+    }
+
+    static auto constexpr ReservedPrefixes = std::array<std::string_view, 22>{
+        "AUX."sv, "CON."sv,  "NUL."sv,  "PRN."sv,  "COM1."sv, "COM2"sv,  "COM3."sv, "COM4."sv, "COM5."sv, "COM6."sv, "COM7."sv,
+        "COM8"sv, "COM9."sv, "LPT1."sv, "LPT2."sv, "LPT3."sv, "LPT4."sv, "LPT5."sv, "LPT6."sv, "LPT7."sv, "LPT8."sv, "LPT9."sv,
+    };
+    return std::any_of(
+        std::begin(ReservedPrefixes),
+        std::end(ReservedPrefixes),
+        [in_upper_sv](auto const& prefix) { return tr_strvStartsWith(in_upper_sv, prefix); });
+}
+
+// https://docs.microsoft.com/en-us/windows/desktop/FileIO/naming-a-file
+[[nodiscard]] static auto constexpr isBannedChar(char ch) noexcept
+{
+    switch (ch)
+    {
+    case '"':
+    case '*':
+    case '/':
+    case ':':
+    case '<':
+    case '>':
+    case '?':
+    case '\\':
+    case '|':
+        return true;
+    default:
+        return false;
+    }
+}
+
 static void appendSanitizedComponent(std::string_view in, tr_pathbuf& out)
 {
     // remove leading and trailing spaces
@@ -29,33 +85,14 @@ static void appendSanitizedComponent(std::string_view in, tr_pathbuf& out)
         in.remove_suffix(1);
     }
 
-    // if `in` begins with any of these prefixes, insert a leading character
-    // to ensure that it _doesn't_ start with that prefix
-    // https://docs.microsoft.com/en-us/windows/desktop/FileIO/naming-a-file
-    static auto constexpr ReservedNames = std::array<std::string_view, 44>{
-        "AUX"sv,   "AUX."sv,  "COM1"sv,  "COM1."sv, "COM2"sv,  "COM2."sv, "COM3"sv,  "COM3."sv, "COM4"sv,  "COM4."sv, "COM5"sv,
-        "COM5."sv, "COM6"sv,  "COM6."sv, "COM7"sv,  "COM7."sv, "COM8"sv,  "COM8."sv, "COM9"sv,  "COM9."sv, "CON"sv,   "CON."sv,
-        "LPT1"sv,  "LPT1."sv, "LPT2"sv,  "LPT2."sv, "LPT3"sv,  "LPT3."sv, "LPT4"sv,  "LPT4."sv, "LPT5"sv,  "LPT5."sv, "LPT6"sv,
-        "LPT6."sv, "LPT7"sv,  "LPT7."sv, "LPT8"sv,  "LPT8."sv, "LPT9"sv,  "LPT9."sv, "NUL"sv,   "NUL."sv,  "PRN"sv,   "PRN."sv,
-    };
-    auto in_lower = tr_pathbuf{};
-    std::transform(std::begin(in), std::end(in), std::back_inserter(in_lower), [](auto ch) { return tolower(ch); });
-    auto const in_lower_sv = std::string_view{ std::data(in_lower), std::size(in_lower) };
-    if (std::any_of(
-            std::begin(ReservedNames),
-            std::end(ReservedNames),
-            [in_lower_sv](auto const& prefix) { return tr_strvStartsWith(in_lower_sv, prefix); }))
+    if (isReservedFilename(in))
     {
-        out.append("_"sv);
+        out.append('_');
     }
 
     // munge banned characters
     // https://docs.microsoft.com/en-us/windows/desktop/FileIO/naming-a-file
-    std::transform(
-        std::begin(in),
-        std::end(in),
-        std::back_inserter(out),
-        [](auto ch) { return !tr_strvContains("<>:\"/\\|?*"sv, ch) ? ch : '_'; });
+    std::transform(std::begin(in), std::end(in), std::back_inserter(out), [](auto ch) { return isBannedChar(ch) ? '_' : ch; });
 }
 
 void tr_file_info::sanitizePath(std::string_view in, tr_pathbuf& append_me)

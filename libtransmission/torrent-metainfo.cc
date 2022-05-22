@@ -513,10 +513,7 @@ private:
         tr_file_info::sanitizePath(tm_.name_, root);
         if (!std::empty(root))
         {
-            for (size_t i = 0, n = tm_.fileCount(); i < n; ++i)
-            {
-                tm_.files_.setPath(i, tr_pathbuf{ root.sv(), '/', tm_.fileSubpath(i) });
-            }
+            tm_.files_.insertSubpathPrefix(root);
         }
 
         TR_ASSERT(info_dict_begin_[0] == 'd');

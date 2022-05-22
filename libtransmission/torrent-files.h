@@ -58,6 +58,17 @@ public:
         files_.at(file_index).setPath(path);
     }
 
+    void insertSubpathPrefix(std::string_view path)
+    {
+        auto const buf = tr_pathbuf{ path, '/' };
+
+        for (auto& file : files_)
+        {
+            file.path_.insert(0, buf.sv());
+            file.path_.shrink_to_fit();
+        }
+    }
+
     void reserve(size_t n_files)
     {
         files_.reserve(n_files);
@@ -152,6 +163,7 @@ private:
         void setPath(std::string_view subpath)
         {
             path_ = subpath;
+            path_.shrink_to_fit();
         }
 
         file_t(std::string_view path, uint64_t size)
