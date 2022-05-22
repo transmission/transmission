@@ -100,10 +100,12 @@ struct tr_rpc_address
 
 static int constexpr DeflateLevel = 6; // medium / default
 
+#ifdef TR_ENABLE_ASSERTS
 static bool constexpr tr_rpc_address_is_valid(tr_rpc_address const& a)
 {
     return a.type == TR_RPC_AF_INET || a.type == TR_RPC_AF_INET6 || a.type == TR_RPC_AF_UNIX;
 }
+#endif
 
 /***
 ****
