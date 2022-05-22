@@ -584,14 +584,16 @@ static void removeKeRangerRansomware()
     //set up status bar
     [self showStatusBar:[self.fDefaults boolForKey:@"StatusBar"] animate:NO];
 
-    self.fActionButton.toolTip = NSLocalizedString(@"Shortcut for changing bandwidth and transfer settings.", "Main window -> 1st bottom left button (action) tooltip");
+    self.fActionButton.toolTip = NSLocalizedString(
+        @"Shortcut for changing bandwidth and transfer settings.",
+        "Main window -> 1st bottom left button (action) tooltip");
     self.fSpeedLimitButton.toolTip = NSLocalizedString(
         @"Speed Limit overrides the total bandwidth limits with its own limits.",
         "Main window -> 2nd bottom left button (turtle) tooltip");
 
     if (@available(macOS 11.0, *))
     {
-        self.fActionButton.image = [NSImage imageWithSystemSymbolName:@"ellipsis.circle" accessibilityDescription:nil];
+        self.fActionButton.image = [NSImage imageWithSystemSymbolName:@"gearshape.fill" accessibilityDescription:nil];
         self.fSpeedLimitButton.image = [NSImage imageWithSystemSymbolName:@"tortoise.fill" accessibilityDescription:nil];
     }
     self.fClearCompletedButton.toolTip = NSLocalizedString(
@@ -3195,7 +3197,7 @@ static void removeKeRangerRansomware()
     [popover showRelativeToRect:senderView.frame ofView:senderView preferredEdge:NSMaxYEdge];
 }
 
-//don't show multiple popovers when clicking the ellipsis button repeatedly
+//don't show multiple popovers when clicking the gear button repeatedly
 - (void)popoverWillShow:(NSNotification*)notification
 {
     self.fGlobalPopoverShown = YES;
