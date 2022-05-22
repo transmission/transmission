@@ -371,6 +371,7 @@
            </property>
           </widget>
          </item>
+
          <item row="4" column="1">
           <widget class="SqueezeLabel" name="originValueLabel">
            <property name="sizePolicy">
@@ -442,7 +443,21 @@
            </property>
           </widget>
          </item>
-         <item row="5" column="0">
+	 <item row="5" column="0">
+          <widget class="QLabel" name="addedLabel">
+           <property name="text">
+            <string>Added:</string>
+           </property>
+          </widget>
+         </item>
+	 <item row="5" column="1">
+          <widget class="QLabel" name="addedLabelValue">
+           <property name="text">
+            <string></string>
+           </property>
+          </widget>
+         </item>
+         <item row="6" column="0">
           <widget class="QLabel" name="commentLabel">
            <property name="text">
             <string>Comment:</string>
@@ -452,7 +467,7 @@
            </property>
           </widget>
          </item>
-         <item row="5" column="1">
+         <item row="6" column="1">
           <widget class="QTextBrowser" name="commentBrowser">
            <property name="textInteractionFlags">
             <set>Qt::TextSelectableByKeyboard|Qt::TextSelectableByMouse</set>
