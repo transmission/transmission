@@ -228,6 +228,7 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
 
     bool StartDict(Context const& context) override
     {
+        auto const current_key = currentKey();
         BasicHandler::StartDict(context);
 
         if (state_ == State::FileTree)
@@ -236,22 +237,22 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
             {
                 file_subpath_ += '/';
             }
-            tr_file_info::sanitizePath(key(depth() - 1), file_subpath_);
+            tr_file_info::sanitizePath(current_key, file_subpath_);
         }
         else if (state_ == State::Top && depth() == 2)
         {
-            if (key(1) == InfoKey)
+            if (current_key == InfoKey)
             {
                 info_dict_begin_ = context.raw();
                 tm_.info_dict_offset_ = context.tokenSpan().first;
                 state_ = State::Info;
             }
-            else if (key(1) == PieceLayersKey)
+            else if (current_key == PieceLayersKey)
             {
                 state_ = State::PieceLayers;
             }
         }
-        else if (state_ == State::Info && key(depth() - 1) == FileTreeKey)
+        else if (state_ == State::Info && current_key == FileTreeKey)
         {
             state_ = State::FileTree;
             file_subpath_.clear();
