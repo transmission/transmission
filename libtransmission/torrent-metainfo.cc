@@ -196,44 +196,37 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
 
     bool Key(std::string_view key, Context const& context) override
     {
-        BasicHandler::Key(key, context);
-        return true;
+        return BasicHandler::Key(key, context);
     }
 
     bool StartDict(Context const& context) override
     {
-        auto const current_key = currentKey();
-        BasicHandler::StartDict(context);
-
         if (state_ == State::FileTree)
         {
             if (!std::empty(file_subpath_))
             {
                 file_subpath_ += '/';
             }
-            tr_file_info::sanitizePath(current_key, file_subpath_);
+            tr_file_info::sanitizePath(currentKey(), file_subpath_);
         }
-        else if (state_ == State::Top && depth() == 2)
+        else if (pathIs(InfoKey))
         {
-            if (current_key == InfoKey)
-            {
-                info_dict_begin_ = context.raw();
-                tm_.info_dict_offset_ = context.tokenSpan().first;
-                state_ = State::Info;
-            }
-            else if (current_key == PieceLayersKey)
-            {
-                state_ = State::PieceLayers;
-            }
+            info_dict_begin_ = context.raw();
+            tm_.info_dict_offset_ = context.tokenSpan().first;
+            state_ = State::Info;
         }
-        else if (state_ == State::Info && current_key == FileTreeKey)
+        else if (pathIs(InfoKey, FileTreeKey))
         {
             state_ = State::FileTree;
             file_subpath_.clear();
             file_length_ = 0;
         }
+        else if (pathIs(PieceLayersKey))
+        {
+            state_ = State::PieceLayers;
+        }
 
-        return true;
+        return BasicHandler::StartDict(context);
     }
 
     bool EndDict(Context const& context) override
