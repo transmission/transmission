@@ -94,7 +94,7 @@ protected:
         path += TR_PATH_DELIMITER;
         path += name;
 
-        tr_sys_dir_create(path.c_str(), 0, 0700);
+        tr_sys_dir_create(path, 0, 0700);
 
         return path;
     }

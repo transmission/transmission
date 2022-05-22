@@ -152,15 +152,9 @@ std::optional<tr_sys_file_t> tr_open_files::get(
     tr_error* error = nullptr;
     if (writable)
     {
-        auto const dir = tr_sys_path_dirname(filename);
-
-        if (std::empty(dir))
-        {
-            tr_logAddError(fmt::format(_("Couldn't create '{path}'"), fmt::arg("path", filename)));
-            return {};
-        }
-
-        if (!tr_sys_dir_create(std::string{ dir }.c_str(), TR_SYS_DIR_CREATE_PARENTS, 0777, &error))
+        auto dir = tr_pathbuf{ filename.sv() };
+        dir.popdir();
+        if (!tr_sys_dir_create(dir, TR_SYS_DIR_CREATE_PARENTS, 0777, &error))
         {
             tr_logAddError(fmt::format(
                 _("Couldn't create '{path}': {error} ({error_code})"),
