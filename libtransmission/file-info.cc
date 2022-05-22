@@ -18,9 +18,7 @@
 
 using namespace std::literals;
 
-using tr_membuf = fmt::basic_memory_buffer<char, 4096>;
-
-static void appendSanitizedComponent(tr_membuf& out, std::string_view in)
+static void appendSanitizedComponent(std::string_view in, tr_pathbuf& out)
 {
     // remove leading and trailing spaces
     in = tr_strvStrip(in);
@@ -40,7 +38,7 @@ static void appendSanitizedComponent(tr_membuf& out, std::string_view in)
         "LPT1"sv,  "LPT1."sv, "LPT2"sv,  "LPT2."sv, "LPT3"sv,  "LPT3."sv, "LPT4"sv,  "LPT4."sv, "LPT5"sv,  "LPT5."sv, "LPT6"sv,
         "LPT6."sv, "LPT7"sv,  "LPT7."sv, "LPT8"sv,  "LPT8."sv, "LPT9"sv,  "LPT9."sv, "NUL"sv,   "NUL."sv,  "PRN"sv,   "PRN."sv,
     };
-    auto in_lower = tr_membuf{};
+    auto in_lower = tr_pathbuf{};
     std::transform(std::begin(in), std::end(in), std::back_inserter(in_lower), [](auto ch) { return tolower(ch); });
     auto const in_lower_sv = std::string_view{ std::data(in_lower), std::size(in_lower) };
     if (std::any_of(
@@ -60,21 +58,24 @@ static void appendSanitizedComponent(tr_membuf& out, std::string_view in)
         [](auto ch) { return !tr_strvContains("<>:\"/\\|?*"sv, ch) ? ch : '_'; });
 }
 
-std::string tr_file_info::sanitizePath(std::string_view in)
+void tr_file_info::sanitizePath(std::string_view in, tr_pathbuf& append_me)
 {
-    auto out = tr_membuf{};
-
     auto segment = std::string_view{};
     while (tr_strvSep(&in, &segment, '/'))
     {
-        appendSanitizedComponent(out, segment);
-        out.append("/"sv);
+        appendSanitizedComponent(segment, append_me);
+        append_me.append("/"sv);
     }
 
-    if (auto const n = std::size(out); n > 0)
+    if (auto const n = std::size(append_me); n > 0)
     {
-        out.resize(n - 1); // remove trailing slash
+        append_me.resize(n - 1); // remove trailing slash
     }
+}
 
-    return fmt::to_string(out);
+std::string tr_file_info::sanitizePath(std::string_view in)
+{
+    auto buf = tr_pathbuf{};
+    sanitizePath(in, buf);
+    return std::string{ buf.sv() };
 }

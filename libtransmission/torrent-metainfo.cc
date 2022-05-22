@@ -175,8 +175,7 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
     std::string encoding_ = "UTF-8";
     std::string_view info_dict_begin_;
     tr_tracker_tier_t tier_ = 0;
-    // TODO: can we have a recycled std::string to avoid excess heap allocation
-    std::vector<std::string> file_tree_;
+    tr_pathbuf file_subpath_;
     std::string_view pieces_root_;
     int64_t file_length_ = 0;
 
@@ -208,10 +207,11 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
 
         if (state_ == State::FileTree)
         {
-            if (auto token = tr_file_info::sanitizePath(key(depth() - 1)); !std::empty(token))
+            if (!std::empty(file_subpath_))
             {
-                file_tree_.emplace_back(std::move(token));
+                file_subpath_ += '/';
             }
+            tr_file_info::sanitizePath(key(depth() - 1), file_subpath_);
         }
         else if (state_ == State::Top && depth() == 2)
         {
@@ -229,7 +229,7 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
         else if (state_ == State::Info && key(depth() - 1) == "file tree"sv)
         {
             state_ = State::FileTree;
-            file_tree_.clear();
+            file_subpath_.clear();
             file_length_ = 0;
         }
 
@@ -264,10 +264,7 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
                 return false;
             }
 
-            if (auto const n = std::size(file_tree_); n > 0)
-            {
-                file_tree_.resize(n - 1);
-            }
+            file_subpath_.popdir();
 
             if (key(depth()) == "file tree"sv)
             {
@@ -284,7 +281,7 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
                 return false;
             }
 
-            file_tree_.clear();
+            file_subpath_.clear();
             return true;
         }
 
@@ -304,7 +301,7 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
             else
             {
                 state_ = State::Files;
-                file_tree_.clear();
+                file_subpath_.clear();
                 file_length_ = 0;
             }
         }
@@ -432,7 +429,11 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
         {
             if (curdepth > 1 && key(curdepth - 1) == "path"sv)
             {
-                file_tree_.emplace_back(tr_file_info::sanitizePath(value));
+                if (!std::empty(file_subpath_))
+                {
+                    file_subpath_ += '/';
+                }
+                tr_file_info::sanitizePath(value, file_subpath_);
             }
             else if (curkey == "attr"sv)
             {
@@ -499,12 +500,13 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
                 {
                     tr_strvUtf8Clean(value, tm_.name_);
 
-                    auto const token = tr_file_info::sanitizePath(value);
-                    if (!std::empty(token))
+                    auto root = tr_pathbuf{};
+                    tr_file_info::sanitizePath(value, root);
+                    if (!std::empty(root))
                     {
                         for (size_t i = 0, n = tm_.fileCount(); i < n; ++i)
                         {
-                            tm_.files_.setPath(i, tr_pathbuf{ token, '/', tm_.fileSubpath(i) });
+                            tm_.files_.setPath(i, tr_pathbuf{ root.sv(), '/', tm_.fileSubpath(i) });
                         }
                     }
                 }
@@ -556,16 +558,14 @@ private:
 
         // FIXME: Check to see if we already added this file. This is a safeguard
         // for hybrid torrents with duplicate info between "file tree" and "files"
-        auto filename = tr_pathbuf{};
-        buildPath(filename);
-        if (std::empty(filename))
+        if (std::empty(file_subpath_))
         {
-            tr_error_set(context.error, EINVAL, fmt::format("invalid path [{:s}]", filename));
+            tr_error_set(context.error, EINVAL, fmt::format("invalid path [{:s}]", file_subpath_));
             ok = false;
         }
         else
         {
-            tm_.files_.add(filename, file_length_);
+            tm_.files_.add(file_subpath_, file_length_);
         }
 
         file_length_ = 0;
@@ -573,24 +573,6 @@ private:
         // NB: let caller decide how to clear file_tree_.
         // if we're in "files" mode we clear it; if in "file tree" we pop it
         return ok;
-    }
-
-    void buildPath(tr_pathbuf& path_out) const
-    {
-        for (auto const& token : file_tree_)
-        {
-            path_out.append(token);
-
-            if (!std::empty(token))
-            {
-                path_out.append('/');
-            }
-        }
-
-        if (auto const n = std::size(path_out); n > 0)
-        {
-            path_out.resize(n - 1);
-        }
     }
 
     bool finishInfoDict(Context const& context)

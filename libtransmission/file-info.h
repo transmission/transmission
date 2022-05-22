@@ -8,9 +8,13 @@
 #include <string>
 #include <string_view>
 
+#include "tr-strbuf.h"
+
 struct tr_file_info
 {
     [[nodiscard]] static std::string sanitizePath(std::string_view path);
+
+    static void sanitizePath(std::string_view path, tr_pathbuf& append_me);
 
     [[nodiscard]] static bool isPortable(std::string_view path)
     {
