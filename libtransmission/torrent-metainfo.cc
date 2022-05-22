@@ -446,47 +446,40 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
                 unhandled = true;
             }
         }
+        else if (pathIs(CommentKey) || pathIs(CommentUtf8Key))
+        {
+            tr_strvUtf8Clean(value, tm_.comment_);
+        }
+        else if (pathIs(CreatedByKey) || pathIs(CreatedByUtf8Key))
+        {
+            tr_strvUtf8Clean(value, tm_.creator_);
+        }
+        else if (pathIs(SourceKey) || pathIs(InfoKey, SourceKey))
+        {
+            tr_strvUtf8Clean(value, tm_.source_);
+        }
+        else if (pathIs(AnnounceKey))
+        {
+            tm_.announceList().add(value, tier_);
+        }
+        else if (pathIs(EncodingKey))
+        {
+            encoding_ = tr_strvStrip(value);
+        }
+        else if (pathIs(UrlListKey))
+        {
+            tm_.addWebseed(value);
+        }
+        else if (pathIs(InfoKey, NameKey) || pathIs(InfoKey, NameUtf8Key))
+        {
+            tr_strvUtf8Clean(value, tm_.name_);
+        }
         else
         {
             switch (curdepth)
             {
-            case 1:
-                if (current_key == CommentKey || current_key == CommentUtf8Key)
-                {
-                    tr_strvUtf8Clean(value, tm_.comment_);
-                }
-                else if (current_key == CreatedByKey || current_key == CreatedByUtf8Key)
-                {
-                    tr_strvUtf8Clean(value, tm_.creator_);
-                }
-                else if (current_key == SourceKey)
-                {
-                    tr_strvUtf8Clean(value, tm_.source_);
-                }
-                else if (current_key == AnnounceKey)
-                {
-                    tm_.announceList().add(value, tier_);
-                }
-                else if (current_key == EncodingKey)
-                {
-                    encoding_ = tr_strvStrip(value);
-                }
-                else if (current_key == UrlListKey)
-                {
-                    tm_.addWebseed(value);
-                }
-                else
-                {
-                    unhandled = true;
-                }
-                break;
-
             case 2:
-                if (key(1) == InfoKey && current_key == SourceKey)
-                {
-                    tr_strvUtf8Clean(value, tm_.source_);
-                }
-                else if (key(1) == HttpSeedsKey || key(1) == UrlListKey)
+                if (key(1) == HttpSeedsKey || key(1) == UrlListKey)
                 {
                     tm_.addWebseed(value);
                 }
@@ -496,20 +489,6 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
                     tm_.pieces_.resize(n);
                     std::copy_n(std::data(value), std::size(value), reinterpret_cast<char*>(std::data(tm_.pieces_)));
                     tm_.pieces_offset_ = context.tokenSpan().first;
-                }
-                else if (key(1) == InfoKey && (current_key == NameKey || current_key == NameUtf8Key))
-                {
-                    tr_strvUtf8Clean(value, tm_.name_);
-
-                    auto root = tr_pathbuf{};
-                    tr_file_info::sanitizePath(value, root);
-                    if (!std::empty(root))
-                    {
-                        for (size_t i = 0, n = tm_.fileCount(); i < n; ++i)
-                        {
-                            tm_.files_.setPath(i, tr_pathbuf{ root.sv(), '/', tm_.fileSubpath(i) });
-                        }
-                    }
                 }
                 else if (key(1) == PieceLayersKey)
                 {
@@ -594,6 +573,16 @@ private:
         {
             tr_error_set(context.error, EINVAL, "no info_dict found");
             return false;
+        }
+
+        auto root = tr_pathbuf{};
+        tr_file_info::sanitizePath(tm_.name_, root);
+        if (!std::empty(root))
+        {
+            for (size_t i = 0, n = tm_.fileCount(); i < n; ++i)
+            {
+                tm_.files_.setPath(i, tr_pathbuf{ root.sv(), '/', tm_.fileSubpath(i) });
+            }
         }
 
         TR_ASSERT(info_dict_begin_[0] == 'd');
