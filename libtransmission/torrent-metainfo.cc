@@ -324,7 +324,7 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
         BasicHandler::EndArray(context);
         std::cerr << __FILE__ << ':' << __LINE__ << " after pop, depth " << depth() << std::endl;
 
-        if ((state_ == State::Files || state_ == State::FilesIgnored) && key(depth()) == FilesKey) // bittorrent v1 format
+        if ((state_ == State::Files || state_ == State::FilesIgnored) && currentKey() == FilesKey) // bittorrent v1 format
         {
             state_ = State::UsePath;
             return true;
@@ -468,41 +468,22 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
             std::copy_n(std::data(value), std::size(value), reinterpret_cast<char*>(std::data(tm_.pieces_)));
             tm_.pieces_offset_ = context.tokenSpan().first;
         }
+        else if (curdepth == 2 && (pathStartsWith(HttpSeedsKey) || pathStartsWith(UrlListKey)))
+        {
+            tm_.addWebseed(value);
+        }
+        else if (pathStartsWith(PieceLayersKey))
+        {
+            // currently unused. TODO support for bittorrent v2
+            // TODO https://github.com/transmission/transmission/issues/458
+        }
+        else if (pathStartsWith(AnnounceListKey))
+        {
+            tm_.announceList().add(value, tier_);
+        }
         else
         {
-            switch (curdepth)
-            {
-            case 2:
-                if (key(1) == HttpSeedsKey || key(1) == UrlListKey)
-                {
-                    tm_.addWebseed(value);
-                }
-                else if (key(1) == PieceLayersKey)
-                {
-                    // currently unused. TODO support for bittorrent v2
-                    // TODO https://github.com/transmission/transmission/issues/458
-                }
-                else
-                {
-                    unhandled = true;
-                }
-                break;
-
-            case 3:
-                if (key(1) == AnnounceListKey)
-                {
-                    tm_.announceList().add(value, tier_);
-                }
-                else
-                {
-                    unhandled = true;
-                }
-                break;
-
-            default:
-                unhandled = true;
-                break;
-            }
+            unhandled = true;
         }
 
         if (unhandled)
@@ -514,6 +495,13 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
     }
 
 private:
+    template<typename... Args>
+    [[nodiscard]] bool pathStartsWith(Args... args) const noexcept
+    {
+        auto i = 1U;
+        return (depth() >= sizeof...(args)) && ((key(i++) == args) && ...);
+    }
+
     template<typename... Args>
     [[nodiscard]] bool pathIs(Args... args) const noexcept
     {
