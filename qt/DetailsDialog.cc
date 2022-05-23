@@ -235,6 +235,7 @@ private:
 ****
 ***/
 
+// NOLINTNEXTLINE(cppcoreguidelines-avoid-non-const-global-variables)
 int DetailsDialog::prev_tab_index_ = 0;
 
 DetailsDialog::DetailsDialog(Session& session, Prefs& prefs, TorrentModel const& model, QWidget* parent)

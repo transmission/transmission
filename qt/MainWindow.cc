@@ -426,10 +426,10 @@ QMenu* MainWindow::createOptionsMenu()
 
         menu->addSeparator();
 
-        for (auto const KBps : { 50, 100, 250, 500, 1000, 2500, 5000, 10000 })
+        for (auto const kps : { 50, 100, 250, 500, 1000, 2500, 5000, 10000 })
         {
-            auto* const action = menu->addAction(Formatter::get().speedToString(Speed::fromKBps(KBps)));
-            action->setProperty(PrefVariantsKey, QVariantList{ pref, KBps, enabled_pref, true });
+            auto* const action = menu->addAction(Formatter::get().speedToString(Speed::fromKBps(kps)));
+            action->setProperty(PrefVariantsKey, QVariantList{ pref, kps, enabled_pref, true });
             connect(action, &QAction::triggered, this, qOverload<>(&MainWindow::onSetPrefs));
         }
     };
