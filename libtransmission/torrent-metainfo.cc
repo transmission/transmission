@@ -20,7 +20,6 @@
 #include "crypto-utils.h"
 #include "error-types.h"
 #include "error.h"
-#include "file-info.h"
 #include "file.h"
 #include "log.h"
 #include "quark.h"
@@ -206,7 +205,7 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
             {
                 file_subpath_ += '/';
             }
-            tr_file_info::sanitizePath(currentKey(), file_subpath_);
+            tr_torrent_files::makeSubpathPortable(currentKey(), file_subpath_);
         }
         else if (pathIs(InfoKey))
         {
@@ -397,7 +396,7 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
                 {
                     file_subpath_ += '/';
                 }
-                tr_file_info::sanitizePath(value, file_subpath_);
+                tr_torrent_files::makeSubpathPortable(value, file_subpath_);
             }
             else if (current_key == AttrKey)
             {
@@ -532,7 +531,7 @@ private:
         }
 
         auto root = tr_pathbuf{};
-        tr_file_info::sanitizePath(tm_.name_, root);
+        tr_torrent_files::makeSubpathPortable(tm_.name_, root);
         if (!std::empty(root))
         {
             tm_.files_.insertSubpathPrefix(root);
