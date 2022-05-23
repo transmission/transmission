@@ -342,7 +342,11 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
             // currently unused. TODO support for bittorrent v2
             // TODO https://github.com/transmission/transmission/issues/458
         }
-        else if (pathIs(DurationKey) || pathIs(ProfilesKey, HeightKey) || pathIs(ProfilesKey, WidthKey))
+        else if (
+            pathIs(DurationKey) || pathIs(EncodedRateKey) || pathIs(HeightKey) || pathIs(InfoKey, EntropyKey) ||
+            pathIs(InfoKey, FilesKey, ""sv, MtimeKey) || pathIs(ProfilesKey, HeightKey) || pathIs(ProfilesKey, WidthKey) ||
+            pathIs(WidthKey) || pathStartsWith(AzureusPropertiesKey) || pathStartsWith(InfoKey, FileDurationKey) ||
+            pathStartsWith(InfoKey, FileMediaKey) || pathStartsWith(InfoKey, ProfilesKey))
         {
             // unused by Transmission
         }
@@ -353,7 +357,7 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
 
         if (unhandled)
         {
-            tr_logAddWarn(fmt::format("unexpected: key '{}', int '{}'", currentKey(), value));
+            tr_logAddWarn(fmt::format("unexpected: path '{}', int '{}'", path(), value));
         }
 
         return true;
@@ -409,7 +413,7 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
         {
             tr_strvUtf8Clean(value, tm_.creator_);
         }
-        else if (pathIs(SourceKey) || pathIs(InfoKey, SourceKey) || pathIs(InfoKey, PublisherKey))
+        else if (pathIs(SourceKey) || pathIs(InfoKey, SourceKey) || pathIs(PublisherKey) || pathIs(InfoKey, PublisherKey))
         {
             // “publisher” is rare, but used by BitComet and appears
             // to have the same use as the 'source' key
@@ -440,11 +444,6 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
             std::copy_n(std::data(value), std::size(value), reinterpret_cast<char*>(std::data(tm_.pieces_)));
             tm_.pieces_offset_ = context.tokenSpan().first;
         }
-        else if (pathIs(InfoKey, PublisherUrlKey))
-        {
-            // uncommon key added used by BitComet; unused in Transmission
-            // http://wiki.bitcomet.com/inside_bitcomet
-        }
         else if (pathStartsWith(PieceLayersKey))
         {
             // currently unused. TODO support for bittorrent v2
@@ -454,7 +453,9 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
         {
             tm_.announceList().add(value, tier_);
         }
-        else if (pathIs(ProfilesKey, AcodecKey) || pathIs(ProfilesKey, VcodecKey))
+        else if (
+            pathIs(ChecksumKey) || pathIs(InfoKey, FilesKey, ""sv, MtimeKey) || pathIs(InfoKey, PublisherUrlKey) ||
+            pathIs(PublisherUrlKey) || pathStartsWith(AzureusPropertiesKey) || pathStartsWith(InfoKey, ProfilesKey))
         {
             // unused by Transmission
         }
@@ -469,7 +470,7 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
 
         if (unhandled)
         {
-            tr_logAddWarn(fmt::format("unexpected: key '{}', str '{}'", current_key, value));
+            tr_logAddWarn(fmt::format("unexpected: path '{}', str '{}'", path(), value));
         }
 
         return true;
@@ -591,20 +592,28 @@ private:
     static constexpr std::string_view AnnounceKey = "announce"sv;
     static constexpr std::string_view AnnounceListKey = "announce-list"sv;
     static constexpr std::string_view AttrKey = "attr"sv;
+    static constexpr std::string_view AzureusPropertiesKey = "azureus_properties"sv;
+    static constexpr std::string_view ChecksumKey = "checksum"sv;
     static constexpr std::string_view CommentKey = "comment"sv;
     static constexpr std::string_view CommentUtf8Key = "comment.utf-8"sv;
     static constexpr std::string_view CreatedByKey = "created by"sv;
     static constexpr std::string_view CreatedByUtf8Key = "created by.utf-8"sv;
     static constexpr std::string_view CreationDateKey = "creation date"sv;
     static constexpr std::string_view DurationKey = "duration"sv;
+    static constexpr std::string_view EncodedRateKey = "encoded rate"sv;
     static constexpr std::string_view EncodingKey = "encoding"sv;
+    static constexpr std::string_view EntropyKey = "entropy"sv;
+    static constexpr std::string_view FileDurationKey = "file-duration"sv;
+    static constexpr std::string_view FileMediaKey = "file-media"sv;
     static constexpr std::string_view FileTreeKey = "file tree"sv;
     static constexpr std::string_view FilesKey = "files"sv;
     static constexpr std::string_view HeightKey = "height"sv;
     static constexpr std::string_view HttpSeedsKey = "httpseeds"sv;
     static constexpr std::string_view InfoKey = "info"sv;
     static constexpr std::string_view LengthKey = "length"sv;
+    static constexpr std::string_view Md5sumKey = "md5sum"sv;
     static constexpr std::string_view MetaVersionKey = "meta version"sv;
+    static constexpr std::string_view MtimeKey = "mtime"sv;
     static constexpr std::string_view NameKey = "name"sv;
     static constexpr std::string_view NameUtf8Key = "name.utf-8"sv;
     static constexpr std::string_view PathKey = "path"sv;

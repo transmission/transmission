@@ -162,8 +162,11 @@ private:
     public:
         void setPath(std::string_view subpath)
         {
-            path_ = subpath;
-            path_.shrink_to_fit();
+            if (path_ != subpath)
+            {
+                path_ = subpath;
+                path_.shrink_to_fit();
+            }
         }
 
         file_t(std::string_view path, uint64_t size)

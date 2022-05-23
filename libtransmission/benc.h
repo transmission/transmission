@@ -129,6 +129,19 @@ struct BasicHandler : public Handler
         return key(depth());
     }
 
+protected:
+    [[nodiscard]] std::string path() const
+    {
+        auto ret = std::string{};
+        for (size_t i = 0; i <= depth(); ++i)
+        {
+            ret += '[';
+            ret += key(i);
+            ret += ']';
+        }
+        return ret;
+    }
+
 private:
     constexpr void push() noexcept
     {
