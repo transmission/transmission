@@ -405,8 +405,12 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
         {
             tr_strvUtf8Clean(value, tm_.creator_);
         }
-        else if (pathIs(SourceKey) || pathIs(InfoKey, SourceKey))
+        else if (pathIs(SourceKey) || pathIs(InfoKey, SourceKey) || pathIs(InfoKey, PublisherKey))
         {
+            // “publisher” is rare, but used by BitComet and appears
+            // to have the same use as the 'source' key
+            // http://wiki.bitcomet.com/inside_bitcomet
+
             tr_strvUtf8Clean(value, tm_.source_);
         }
         else if (pathIs(AnnounceKey))
@@ -431,6 +435,11 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
             tm_.pieces_.resize(n);
             std::copy_n(std::data(value), std::size(value), reinterpret_cast<char*>(std::data(tm_.pieces_)));
             tm_.pieces_offset_ = context.tokenSpan().first;
+        }
+        else if (pathIs(InfoKey, PublisherUrlKey))
+        {
+            // uncommon key added used by BitComet; unused in Transmission
+            // http://wiki.bitcomet.com/inside_bitcomet
         }
         else if (pathStartsWith(PieceLayersKey))
         {
@@ -593,6 +602,8 @@ private:
     static constexpr std::string_view PiecesKey = "pieces"sv;
     static constexpr std::string_view PiecesRootKey = "pieces root"sv;
     static constexpr std::string_view PrivateKey = "private"sv;
+    static constexpr std::string_view PublisherKey = "publisher"sv;
+    static constexpr std::string_view PublisherUrlKey = "publisher-url"sv;
     static constexpr std::string_view SourceKey = "source"sv;
     static constexpr std::string_view UrlListKey = "url-list"sv;
 };
