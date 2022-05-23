@@ -3,6 +3,10 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
+#include <array>
+#include <string_view>
+#include <utility>
+
 #include "transmission.h"
 
 #include "torrent-files.h"
@@ -124,4 +128,39 @@ TEST_F(TorrentFilesTest, hasAnyLocalData)
     EXPECT_TRUE(files.hasAnyLocalData(std::data(search_path), 1U));
     EXPECT_FALSE(files.hasAnyLocalData(std::data(search_path) + 1, 1U));
     EXPECT_FALSE(files.hasAnyLocalData(std::data(search_path), 0U));
+}
+
+TEST_F(TorrentFilesTest, isSubpathPortable)
+{
+    static auto constexpr Tests = std::array<std::pair<std::string_view, bool>, 15>{ {
+        // don't end with periods
+        { "foo.", false },
+        { "foo..", false },
+
+        // don't begin or end with whitespace
+        { " foo ", false },
+        { " foo", false },
+        { "foo ", false },
+
+        // reserved names
+        { "COM1", false },
+        { "COM1.txt", false },
+        { "Com1", false },
+        { "com1", false },
+
+        // reserved characters
+        { "hell:o.txt", false },
+
+        // everything else
+        { ".foo", true },
+        { "com99.txt", true },
+        { "foo", true },
+        { "hello.txt", true },
+        { "hello#.txt", true },
+    } };
+
+    for (auto const& [subpath, expected] : Tests)
+    {
+        EXPECT_EQ(expected, tr_torrent_files::isSubpathPortable(subpath)) << " subpath " << subpath;
+    }
 }

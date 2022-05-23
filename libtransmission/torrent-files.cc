@@ -327,7 +327,10 @@ namespace
         return false;
     }
 
-    if ("ACLNP"sv.find(in.front()) == std::string_view::npos)
+    // Shortcut to avoid extra work below.
+    // All the paths below involve filenames that begin with one of these chars
+    static auto constexpr ReservedFilesBeginWithOneOf = "ACLNP"sv;
+    if (ReservedFilesBeginWithOneOf.find(toupper(in.front())) == std::string_view::npos)
     {
         return false;
     }
