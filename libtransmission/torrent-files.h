@@ -143,6 +143,20 @@ public:
     [[nodiscard]] std::optional<FoundFile> find(tr_file_index_t, std::string_view const* search_paths, size_t n_paths) const;
     [[nodiscard]] bool hasAnyLocalData(std::string_view const* search_paths, size_t n_paths) const;
 
+    static void makeSubpathPortable(std::string_view path, tr_pathbuf& append_me);
+
+    [[nodiscard]] static auto makeSubpathPortable(std::string_view path)
+    {
+        auto tmp = tr_pathbuf{};
+        makeSubpathPortable(path, tmp);
+        return std::string{ tmp.sv() };
+    }
+
+    [[nodiscard]] static bool isSubpathPortable(std::string_view path)
+    {
+        return makeSubpathPortable(path) == path;
+    }
+
     static constexpr std::string_view PartialFileSuffix = ".part";
 
 private:

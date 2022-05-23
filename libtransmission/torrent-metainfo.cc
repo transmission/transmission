@@ -19,7 +19,6 @@
 #include "crypto-utils.h"
 #include "error-types.h"
 #include "error.h"
-#include "file-info.h"
 #include "file.h"
 #include "log.h"
 #include "quark.h"
@@ -205,7 +204,7 @@ bool tr_torrent_metainfo::parsePath(std::string_view root, tr_variant* path, std
         }
     }
 
-    auto const sanitized = tr_file_info::sanitizePath(setme);
+    auto const sanitized = tr_torrent_files::makeSubpathPortable(setme);
 
     if (std::size(sanitized) <= std::size(root))
     {
@@ -222,7 +221,7 @@ std::string_view tr_torrent_metainfo::parseFiles(tr_torrent_metainfo& setme, tr_
 
     setme.files_.clear();
 
-    auto const root_name = tr_file_info::sanitizePath(setme.name_);
+    auto const root_name = tr_torrent_files::makeSubpathPortable(setme.name_);
 
     if (std::empty(root_name))
     {
