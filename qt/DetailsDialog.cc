@@ -235,6 +235,7 @@ private:
 ****
 ***/
 
+// NOLINTNEXTLINE(cppcoreguidelines-avoid-non-const-global-variables)
 int DetailsDialog::prev_tab_index_ = 0;
 
 DetailsDialog::DetailsDialog(Session& session, Prefs& prefs, TorrentModel const& model, QWidget* parent)
@@ -933,6 +934,37 @@ void DetailsDialog::refreshUI()
     }
 
     ui_.locationValueLabel->setText(string);
+    // myAddedLabel
+    string = none;
+
+    if (!torrents.empty())
+    {
+        auto const date = torrents[0]->dateAdded();
+        bool mixed_date = false;
+
+        for (Torrent const* const t : torrents)
+        {
+            mixed_date |= (date != t->dateAdded());
+        }
+
+        bool const empty_date = date <= 0;
+
+        if (empty_date)
+        {
+            string = tr("N/A");
+        }
+        else if (mixed_date)
+        {
+            string = mixed;
+        }
+        else
+        {
+            auto const date_str = QDateTime::fromSecsSinceEpoch(date).toString();
+            string = date_str;
+        }
+    }
+
+    ui_.addedLabelValue->setText(string);
 
     ///
     ///  Options Tab
