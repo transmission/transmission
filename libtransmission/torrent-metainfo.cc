@@ -342,6 +342,10 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
             // currently unused. TODO support for bittorrent v2
             // TODO https://github.com/transmission/transmission/issues/458
         }
+        else if (pathIs(DurationKey) || pathIs(ProfilesKey, HeightKey) || pathIs(ProfilesKey, WidthKey))
+        {
+            // unused by Transmission
+        }
         else
         {
             unhandled = true;
@@ -449,6 +453,10 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
         else if (pathStartsWith(AnnounceListKey))
         {
             tm_.announceList().add(value, tier_);
+        }
+        else if (pathIs(ProfilesKey, AcodecKey) || pathIs(ProfilesKey, VcodecKey))
+        {
+            // unused by Transmission
         }
         else if (curdepth == 2 && (pathStartsWith(HttpSeedsKey) || pathStartsWith(UrlListKey)))
         {
@@ -579,6 +587,7 @@ private:
         return true;
     }
 
+    static constexpr std::string_view AcodecKey = "acodec"sv;
     static constexpr std::string_view AnnounceKey = "announce"sv;
     static constexpr std::string_view AnnounceListKey = "announce-list"sv;
     static constexpr std::string_view AttrKey = "attr"sv;
@@ -587,9 +596,11 @@ private:
     static constexpr std::string_view CreatedByKey = "created by"sv;
     static constexpr std::string_view CreatedByUtf8Key = "created by.utf-8"sv;
     static constexpr std::string_view CreationDateKey = "creation date"sv;
+    static constexpr std::string_view DurationKey = "duration"sv;
     static constexpr std::string_view EncodingKey = "encoding"sv;
     static constexpr std::string_view FileTreeKey = "file tree"sv;
     static constexpr std::string_view FilesKey = "files"sv;
+    static constexpr std::string_view HeightKey = "height"sv;
     static constexpr std::string_view HttpSeedsKey = "httpseeds"sv;
     static constexpr std::string_view InfoKey = "info"sv;
     static constexpr std::string_view LengthKey = "length"sv;
@@ -602,10 +613,13 @@ private:
     static constexpr std::string_view PiecesKey = "pieces"sv;
     static constexpr std::string_view PiecesRootKey = "pieces root"sv;
     static constexpr std::string_view PrivateKey = "private"sv;
+    static constexpr std::string_view ProfilesKey = "profiles"sv;
     static constexpr std::string_view PublisherKey = "publisher"sv;
     static constexpr std::string_view PublisherUrlKey = "publisher-url"sv;
     static constexpr std::string_view SourceKey = "source"sv;
     static constexpr std::string_view UrlListKey = "url-list"sv;
+    static constexpr std::string_view VcodecKey = "vcodec"sv;
+    static constexpr std::string_view WidthKey = "width"sv;
 };
 
 bool tr_torrent_metainfo::parseBenc(std::string_view benc, tr_error** error)
