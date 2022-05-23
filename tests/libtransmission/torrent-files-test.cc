@@ -11,11 +11,11 @@
 
 using namespace std::literals;
 
-class FilesTest : public ::libtransmission::test::SandboxedTest
+class TorrentFilesTest : public ::libtransmission::test::SandboxedTest
 {
 };
 
-TEST_F(FilesTest, add)
+TEST_F(TorrentFilesTest, add)
 {
     auto constexpr Path = "/hello/world"sv;
     auto constexpr Size = size_t{ 1024 };
@@ -32,7 +32,7 @@ TEST_F(FilesTest, add)
     EXPECT_FALSE(std::empty(files));
 }
 
-TEST_F(FilesTest, setPath)
+TEST_F(TorrentFilesTest, setPath)
 {
     auto constexpr Path1 = "/hello/world"sv;
     auto constexpr Path2 = "/hello/there"sv;
@@ -48,7 +48,7 @@ TEST_F(FilesTest, setPath)
     EXPECT_EQ(Size, files.fileSize(file_index));
 }
 
-TEST_F(FilesTest, clear)
+TEST_F(TorrentFilesTest, clear)
 {
     auto constexpr Path1 = "/hello/world"sv;
     auto constexpr Path2 = "/hello/there"sv;
@@ -65,7 +65,7 @@ TEST_F(FilesTest, clear)
     EXPECT_EQ(size_t{ 0U }, files.fileCount());
 }
 
-TEST_F(FilesTest, find)
+TEST_F(TorrentFilesTest, find)
 {
     static auto constexpr Contents = "hello"sv;
     auto const filename = tr_pathbuf{ sandboxDir(), "/first_dir/hello.txt"sv };
@@ -107,7 +107,7 @@ TEST_F(FilesTest, find)
     EXPECT_FALSE(files.find(file_index, std::data(search_path), std::size(search_path)));
 }
 
-TEST_F(FilesTest, hasAnyLocalData)
+TEST_F(TorrentFilesTest, hasAnyLocalData)
 {
     static auto constexpr Contents = "hello"sv;
     auto const filename = tr_pathbuf{ sandboxDir(), "/first_dir/hello.txt"sv };
