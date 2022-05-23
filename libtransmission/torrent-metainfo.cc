@@ -316,6 +316,10 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
             {
                 file_length_ = value;
             }
+            else if (pathIs(InfoKey, FilesKey, ""sv, MtimeKey))
+            {
+                // unused by Transmission
+            }
             else
             {
                 unhandled = true;
@@ -344,8 +348,8 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
         }
         else if (
             pathIs(DurationKey) || pathIs(EncodedRateKey) || pathIs(HeightKey) || pathIs(InfoKey, EntropyKey) ||
-            pathIs(InfoKey, FilesKey, ""sv, MtimeKey) || pathIs(ProfilesKey, HeightKey) || pathIs(ProfilesKey, WidthKey) ||
-            pathIs(WidthKey) || pathStartsWith(AzureusPropertiesKey) || pathStartsWith(InfoKey, FileDurationKey) ||
+            pathIs(ProfilesKey, HeightKey) || pathIs(ProfilesKey, WidthKey) || pathIs(WidthKey) ||
+            pathStartsWith(AzureusPropertiesKey) || pathStartsWith(InfoKey, FileDurationKey) ||
             pathStartsWith(InfoKey, FileMediaKey) || pathStartsWith(InfoKey, ProfilesKey))
         {
             // unused by Transmission
