@@ -349,6 +349,7 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
             pathIs(DurationKey) || //
             pathIs(EncodedRateKey) || //
             pathIs(HeightKey) || //
+            pathIs(InfoKey, EntropyKey) || //
             pathIs(InfoKey, UniqueKey) || //
             pathIs(ProfilesKey, HeightKey) || //
             pathIs(ProfilesKey, WidthKey) || //
