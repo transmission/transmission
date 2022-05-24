@@ -216,7 +216,7 @@ TEST_F(TorrentMetainfoTest, ctorSaveContents)
     EXPECT_EQ(src_contents, tgt_contents);
 
     // cleanup
-    EXPECT_TRUE(tr_sys_path_remove(tgt_filename.c_str(), &error));
+    EXPECT_TRUE(tr_sys_path_remove(tgt_filename, &error));
     EXPECT_EQ(nullptr, error) << *error;
     tr_error_clear(&error);
     tr_ctorFree(ctor);

@@ -10,12 +10,14 @@
 #include <ctime> // time_t
 #include <string>
 #include <string_view>
+#include <type_traits>
 
 #ifdef _WIN32
 #include <windows.h>
 #endif
 
 #include "tr-macros.h"
+#include "tr-strbuf.h"
 
 struct tr_error;
 
@@ -159,6 +161,12 @@ bool tr_sys_path_copy(char const* src_path, char const* dst_path, struct tr_erro
  */
 bool tr_sys_path_get_info(char const* path, int flags, tr_sys_path_info* info, struct tr_error** error = nullptr);
 
+template<typename T, typename = std::enable_if<std::is_member_function_pointer<decltype(&T::c_str)>::value>>
+bool tr_sys_path_get_info(T const& path, int flags, tr_sys_path_info* info, struct tr_error** error = nullptr)
+{
+    return tr_sys_path_get_info(path.c_str(), flags, info, error);
+}
+
 /**
  * @brief Portability wrapper for `access()`.
  *
@@ -171,6 +179,12 @@ bool tr_sys_path_get_info(char const* path, int flags, tr_sys_path_info* info, s
  *         check if `error` is `nullptr` afterwards.
  */
 bool tr_sys_path_exists(char const* path, struct tr_error** error = nullptr);
+
+template<typename T, typename = std::enable_if<std::is_member_function_pointer<decltype(&T::c_str)>::value>>
+bool tr_sys_path_exists(T const& path, struct tr_error** error = nullptr)
+{
+    return tr_sys_path_exists(path.c_str(), error);
+}
 
 /**
  * @brief Check whether path is relative.
@@ -197,6 +211,16 @@ bool tr_sys_path_is_relative(std::string_view path);
  *         afterwards.
  */
 bool tr_sys_path_is_same(char const* path1, char const* path2, struct tr_error** error = nullptr);
+
+template<
+    typename T,
+    typename U,
+    typename = std::enable_if<std::is_member_function_pointer<decltype(&T::c_str)>::value>,
+    typename = std::enable_if<std::is_member_function_pointer<decltype(&U::c_str)>::value>>
+bool tr_sys_path_is_same(T const& path1, U const& path2, struct tr_error** error = nullptr)
+{
+    return tr_sys_path_is_same(path1.c_str(), path2.c_str(), error);
+}
 
 /**
  * @brief Portability wrapper for `realpath()`.
@@ -230,15 +254,13 @@ std::string tr_sys_path_basename(std::string_view path, struct tr_error** error 
  * @brief Portability wrapper for `dirname()`.
  *
  * @param[in]  path  Path to file or directory.
- * @param[out] error Pointer to error object. Optional, pass `nullptr` if you
- *                   are not interested in error details.
  *
  * @return Pointer to newly allocated buffer containing directory (parent path;
  *         last path component removed) on success (use @ref tr_free to free it
  *         when no longer needed), `nullptr` otherwise (with `error` set
  *         accordingly).
  */
-std::string tr_sys_path_dirname(std::string_view path, struct tr_error** error = nullptr);
+std::string_view tr_sys_path_dirname(std::string_view path);
 
 /**
  * @brief Portability wrapper for `rename()`.
@@ -254,6 +276,16 @@ std::string tr_sys_path_dirname(std::string_view path, struct tr_error** error =
  */
 bool tr_sys_path_rename(char const* src_path, char const* dst_path, struct tr_error** error = nullptr);
 
+template<
+    typename T,
+    typename U,
+    typename = std::enable_if<std::is_member_function_pointer<decltype(&T::c_str)>::value>,
+    typename = std::enable_if<std::is_member_function_pointer<decltype(&U::c_str)>::value>>
+bool tr_sys_path_rename(T const& src_path, U const& dst_path, struct tr_error** error = nullptr)
+{
+    return tr_sys_path_rename(src_path.c_str(), dst_path.c_str(), error);
+}
+
 /**
  * @brief Portability wrapper for `remove()`.
  *
@@ -266,6 +298,12 @@ bool tr_sys_path_rename(char const* src_path, char const* dst_path, struct tr_er
  *         files and directories).
  */
 bool tr_sys_path_remove(char const* path, struct tr_error** error = nullptr);
+
+template<typename T, typename = std::enable_if<std::is_member_function_pointer<decltype(&T::c_str)>::value>>
+bool tr_sys_path_remove(T const& path, struct tr_error** error = nullptr)
+{
+    return tr_sys_path_remove(path.c_str(), error);
+}
 
 /**
  * @brief Transform path separators to native ones, in-place.
@@ -616,6 +654,12 @@ char* tr_sys_dir_get_current(struct tr_error** error = nullptr);
  * @return `True` on success, `false` otherwise (with `error` set accordingly).
  */
 bool tr_sys_dir_create(char const* path, int flags, int permissions, struct tr_error** error = nullptr);
+
+template<typename T, typename = std::enable_if<std::is_member_function_pointer<decltype(&T::c_str)>::value>>
+bool tr_sys_dir_create(T const& path, int flags, int permissions, struct tr_error** error = nullptr)
+{
+    return tr_sys_dir_create(path.c_str(), flags, permissions, error);
+}
 
 /**
  * @brief Portability wrapper for `mkdtemp()`.

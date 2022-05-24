@@ -8,6 +8,7 @@
 #include <ostream>
 #include <string>
 #include <string_view>
+#include <utility>
 
 #ifndef _WIN32
 #include <sys/types.h>
@@ -22,6 +23,7 @@
 #include "error.h"
 #include "file.h"
 #include "tr-macros.h"
+#include "tr-strbuf.h"
 
 #include "test-fixtures.h"
 
@@ -125,8 +127,7 @@ protected:
             }
 
             auto const path_part = std::string{ path, size_t(slash_pos - path + 1) };
-
-            if (!tr_sys_path_get_info(path_part.c_str(), TR_SYS_PATH_NO_FOLLOW, &info) ||
+            if (!tr_sys_path_get_info(path_part, TR_SYS_PATH_NO_FOLLOW, &info) ||
                 (info.type != TR_SYS_PATH_IS_FILE && info.type != TR_SYS_PATH_IS_DIRECTORY))
             {
                 return false;
@@ -171,6 +172,32 @@ protected:
                 EXPECT_NE(""sv, name);
                 EXPECT_EQ(nullptr, err) << *err;
                 EXPECT_EQ(data[i].output, name);
+            }
+            else
+            {
+                EXPECT_EQ(""sv, name);
+                EXPECT_NE(nullptr, err);
+                tr_error_clear(&err);
+            }
+        }
+    }
+
+    static void testPathXname(
+        XnameTestData const* data,
+        size_t data_size,
+        std::string_view (*func)(std::string_view, tr_error**))
+    {
+        for (size_t i = 0; i < data_size; ++i)
+        {
+            tr_error* err = nullptr;
+            auto const name = func(data[i].input, &err);
+            std::cerr << __FILE__ << ':' << __LINE__ << " in [" << data[i].input << "] out [" << name << ']' << std::endl;
+
+            if (data[i].output != nullptr)
+            {
+                EXPECT_NE(""sv, name);
+                EXPECT_EQ(nullptr, err) << *err;
+                EXPECT_EQ(std::string{ data[i].output }, name);
             }
             else
             {
@@ -429,6 +456,8 @@ TEST_F(FileTest, pathIsRelative)
 
 TEST_F(FileTest, pathIsSame)
 {
+    // NOLINTBEGIN(readability-suspicious-call-argument)
+
     auto const test_dir = createTestDir(currentTestName());
 
     auto const path1 = tr_pathbuf{ test_dir, "/a"sv };
@@ -628,6 +657,8 @@ TEST_F(FileTest, pathIsSame)
     tr_sys_path_remove(path3);
     tr_sys_path_remove(path2);
     tr_sys_path_remove(path1);
+
+    // NOLINTEND(readability-suspicious-call-argument)
 }
 
 TEST_F(FileTest, pathResolve)
@@ -687,7 +718,7 @@ TEST_F(FileTest, pathResolve)
 #endif
 }
 
-TEST_F(FileTest, pathBasenameDirname)
+TEST_F(FileTest, pathBasename)
 {
     auto const common_xname_tests = std::vector<XnameTestData>{
         XnameTestData{ "/", "/" },
@@ -725,7 +756,7 @@ TEST_F(FileTest, pathBasenameDirname)
     };
 
     testPathXname(common_xname_tests.data(), common_xname_tests.size(), tr_sys_path_basename);
-    testPathXname(common_xname_tests.data(), common_xname_tests.size(), tr_sys_path_dirname);
+    // testPathXname(common_xname_tests.data(), common_xname_tests.size(), tr_sys_path_dirname);
 
     auto const basename_tests = std::vector<XnameTestData>{
         XnameTestData{ "a", "a" },
@@ -751,36 +782,96 @@ TEST_F(FileTest, pathBasenameDirname)
     };
 
     testPathXname(basename_tests.data(), basename_tests.size(), tr_sys_path_basename);
+}
 
-    auto const dirname_tests = std::vector<XnameTestData>{
-        XnameTestData{ "/a/b/c", "/a/b" },
-        { "a/b/c", "a/b" },
-        { "a/b/c/", "a/b" },
-        { "a", "." },
-        { "a/", "." },
+TEST_F(FileTest, pathDirname)
+{
 #ifdef _WIN32
-        { "C:\\a/b\\c", "C:\\a/b" },
-        { "C:\\a/b\\c\\", "C:\\a/b" },
-        { "C:\\a/b", "C:\\a" },
-        { "C:/a", "C:" },
-        { "C:", "C:" },
-        { "C:/", "C:" },
-        { "C:\\", "C:" },
-        { "c:a/b", "c:a" },
-        { "c:a", "c:." },
-        { "c:.", "c:." },
-        { "\\\\a\\b\\c", "\\\\a\\b" },
-        { "\\\\a\\b\\c/", "\\\\a\\b" },
-        { "//a/b", "//a" },
-        { "//1.2.3.4/b", "//1.2.3.4" },
-        { "\\\\a", "\\\\" },
-        { "\\\\1.2.3.4", "\\\\" },
-        { "\\\\", "\\\\" },
-        { "a/b\\c", "a/b" },
+    static auto constexpr DirnameTests = std::array<std::pair<std::string_view, std::string_view>, 48>{ {
+        { "C:\\a/b\\c"sv, "C:\\a/b"sv },
+        { "C:\\a/b\\c\\"sv, "C:\\a/b"sv },
+        { "C:\\a/b"sv, "C:\\a"sv },
+        { "C:/a"sv, "C:/"sv },
+        { "C:"sv, "C:"sv },
+        { "C:/"sv, "C:/"sv },
+        { "c:a/b"sv, "c:a"sv },
+        { "c:a"sv, "c:"sv },
+        { "\\\\a"sv, "\\"sv },
+        { "\\\\1.2.3.4"sv, "\\"sv },
+        { "\\\\"sv, "\\"sv },
+        { "a/b\\c"sv, "a/b"sv },
+        // taken from Node.js unit tests
+        // https://github.com/nodejs/node/blob/e46c680bf2b211bbd52cf959ca17ee98c7f657f5/test/parallel/test-path-dirname.js
+        { "c:\\"sv, "c:\\"sv },
+        { "c:\\foo"sv, "c:\\"sv },
+        { "c:\\foo\\"sv, "c:\\"sv },
+        { "c:\\foo\\bar"sv, "c:\\foo"sv },
+        { "c:\\foo\\bar\\"sv, "c:\\foo"sv },
+        { "c:\\foo\\bar\\baz"sv, "c:\\foo\\bar"sv },
+        { "c:\\foo bar\\baz"sv, "c:\\foo bar"sv },
+        { "\\"sv, "\\"sv },
+        { "\\foo"sv, "\\"sv },
+        { "\\foo\\"sv, "\\"sv },
+        { "\\foo\\bar"sv, "\\foo"sv },
+        { "\\foo\\bar\\"sv, "\\foo"sv },
+        { "\\foo\\bar\\baz"sv, "\\foo\\bar"sv },
+        { "\\foo bar\\baz"sv, "\\foo bar"sv },
+        { "c:"sv, "c:"sv },
+        { "c:foo"sv, "c:"sv },
+        { "c:foo\\"sv, "c:"sv },
+        { "c:foo\\bar"sv, "c:foo"sv },
+        { "c:foo\\bar\\"sv, "c:foo"sv },
+        { "c:foo\\bar\\baz"sv, "c:foo\\bar"sv },
+        { "c:foo bar\\baz"sv, "c:foo bar"sv },
+        { "file:stream"sv, "."sv },
+        { "dir\\file:stream"sv, "dir"sv },
+        { "\\\\unc\\share"sv, "\\\\unc\\share"sv },
+        { "\\\\unc\\share\\foo"sv, "\\\\unc\\share\\"sv },
+        { "\\\\unc\\share\\foo\\"sv, "\\\\unc\\share\\"sv },
+        { "\\\\unc\\share\\foo\\bar"sv, "\\\\unc\\share\\foo"sv },
+        { "\\\\unc\\share\\foo\\bar\\"sv, "\\\\unc\\share\\foo"sv },
+        { "\\\\unc\\share\\foo\\bar\\baz"sv, "\\\\unc\\share\\foo\\bar"sv },
+        { "/a/b/"sv, "/a"sv },
+        { "/a/b"sv, "/a"sv },
+        { "/a"sv, "/"sv },
+        { ""sv, "."sv },
+        { "/"sv, "/"sv },
+        { "////"sv, "/"sv },
+        { "foo"sv, "."sv },
+    } };
+#else
+    static auto constexpr DirnameTests = std::array<std::pair<std::string_view, std::string_view>, 15>{ {
+        // taken from Node.js unit tests
+        // https://github.com/nodejs/node/blob/e46c680bf2b211bbd52cf959ca17ee98c7f657f5/test/parallel/test-path-dirname.js
+        { "/a/b/"sv, "/a"sv },
+        { "/a/b"sv, "/a"sv },
+        { "/a"sv, "/"sv },
+        { ""sv, "."sv },
+        { "/"sv, "/"sv },
+        { "////"sv, "/"sv },
+        { "//a"sv, "//"sv },
+        { "foo"sv, "."sv },
+        // taken from dirname(3) manpage
+        { "usr"sv, "."sv },
+        { "/usr/lib", "/usr"sv },
+        { "/usr/"sv, "/"sv },
+        { "/usr/"sv, "/"sv },
+        { "/"sv, "/"sv },
+        { "."sv, "."sv },
+        { ".."sv, "."sv },
+    } };
 #endif
-    };
 
-    testPathXname(dirname_tests.data(), dirname_tests.size(), tr_sys_path_dirname);
+    for (auto const& [input, expected] : DirnameTests)
+    {
+        EXPECT_EQ(expected, tr_sys_path_dirname(input)) << "input[" << input << "] expected [" << expected << "] actual ["
+                                                        << tr_sys_path_dirname(input) << ']' << std::endl;
+
+        auto path = tr_pathbuf{ input };
+        path.popdir();
+        EXPECT_EQ(expected, path) << "input[" << input << "] expected [" << expected << "] actual [" << path << ']'
+                                  << std::endl;
+    }
 
     /* TODO: is_same(dirname(x) + '/' + basename(x), x) */
 }
