@@ -23,7 +23,6 @@
 #include "completion.h"
 #include "crypto-utils.h"
 #include "error.h"
-#include "fdlimit.h"
 #include "file.h"
 #include "log.h"
 #include "platform-quota.h" /* tr_device_info_get_disk_space() */
@@ -1456,8 +1455,8 @@ static void onBlocklistFetched(tr_web::FetchResponse const& web_response)
     }
 
     // feed it to the session and give the client a response
-    int const rule_count = tr_blocklistSetContent(session, filename);
-    tr_variantDictAddInt(data->args_out, TR_KEY_blocklist_size, rule_count);
+    size_t const rule_count = tr_blocklistSetContent(session, filename);
+    tr_variantDictAddInt(data->args_out, TR_KEY_blocklist_size, static_cast<int64_t>(rule_count));
     tr_sys_path_remove(filename);
     tr_idle_function_done(data, SuccessResult);
 }

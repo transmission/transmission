@@ -332,8 +332,6 @@ export class Transmission extends EventTarget {
         break;
       }
 
-      case Prefs.AltSpeedEnabled:
-      case Prefs.NotificationsEnabled:
       default:
         /*noop*/
         break;

@@ -184,7 +184,15 @@
 
     if (anyActive)
     {
-        NSString* connectedText = [NSString stringWithFormat:NSLocalizedString(@"%d Connected", "Inspector -> Peers tab -> peers"), connected];
+        NSString* connectedText;
+        if (connected == 1)
+        {
+            connectedText = NSLocalizedString(@"1 Connected", "Inspector -> Peers tab -> peers");
+        }
+        else
+        {
+            connectedText = [NSString stringWithFormat:NSLocalizedString(@"%lu Connected", "Inspector -> Peers tab -> peers"), connected];
+        }
 
         if (connected > 0)
         {
@@ -192,12 +200,12 @@
             if (toUs > 0)
             {
                 [upDownComponents
-                    addObject:[NSString stringWithFormat:NSLocalizedString(@"DL from %d", "Inspector -> Peers tab -> peers"), toUs]];
+                    addObject:[NSString stringWithFormat:NSLocalizedString(@"DL from %lu", "Inspector -> Peers tab -> peers"), toUs]];
             }
             if (fromUs > 0)
             {
                 [upDownComponents
-                    addObject:[NSString stringWithFormat:NSLocalizedString(@"UL to %d", "Inspector -> Peers tab -> peers"), fromUs]];
+                    addObject:[NSString stringWithFormat:NSLocalizedString(@"UL to %lu", "Inspector -> Peers tab -> peers"), fromUs]];
             }
             if (upDownComponents.count > 0)
             {
@@ -208,35 +216,37 @@
             if (tracker > 0)
             {
                 [fromComponents
-                    addObject:[NSString stringWithFormat:NSLocalizedString(@"%d tracker", "Inspector -> Peers tab -> peers"), tracker]];
+                    addObject:[NSString stringWithFormat:NSLocalizedString(@"%lu tracker", "Inspector -> Peers tab -> peers"), tracker]];
             }
             if (incoming > 0)
             {
                 [fromComponents
-                    addObject:[NSString stringWithFormat:NSLocalizedString(@"%d incoming", "Inspector -> Peers tab -> peers"), incoming]];
+                    addObject:[NSString stringWithFormat:NSLocalizedString(@"%lu incoming", "Inspector -> Peers tab -> peers"), incoming]];
             }
             if (cache > 0)
             {
                 [fromComponents
-                    addObject:[NSString stringWithFormat:NSLocalizedString(@"%d cache", "Inspector -> Peers tab -> peers"), cache]];
+                    addObject:[NSString stringWithFormat:NSLocalizedString(@"%lu cache", "Inspector -> Peers tab -> peers"), cache]];
             }
             if (lpd > 0)
             {
                 [fromComponents
-                    addObject:[NSString stringWithFormat:NSLocalizedString(@"%d local discovery", "Inspector -> Peers tab -> peers"), lpd]];
+                    addObject:[NSString stringWithFormat:NSLocalizedString(@"%lu local discovery", "Inspector -> Peers tab -> peers"), lpd]];
             }
             if (pex > 0)
             {
-                [fromComponents addObject:[NSString stringWithFormat:NSLocalizedString(@"%d PEX", "Inspector -> Peers tab -> peers"), pex]];
+                [fromComponents
+                    addObject:[NSString stringWithFormat:NSLocalizedString(@"%lu PEX", "Inspector -> Peers tab -> peers"), pex]];
             }
             if (dht > 0)
             {
-                [fromComponents addObject:[NSString stringWithFormat:NSLocalizedString(@"%d DHT", "Inspector -> Peers tab -> peers"), dht]];
+                [fromComponents
+                    addObject:[NSString stringWithFormat:NSLocalizedString(@"%lu DHT", "Inspector -> Peers tab -> peers"), dht]];
             }
             if (ltep > 0)
             {
                 [fromComponents
-                    addObject:[NSString stringWithFormat:NSLocalizedString(@"%d LTEP", "Inspector -> Peers tab -> peers"), ltep]];
+                    addObject:[NSString stringWithFormat:NSLocalizedString(@"%lu LTEP", "Inspector -> Peers tab -> peers"), ltep]];
             }
 
             connectedText = [connectedText stringByAppendingFormat:@"\n%@", [fromComponents componentsJoinedByString:@", "]];

@@ -94,7 +94,7 @@
         self.fSeedTimeLabel
     ];
 
-    CGFloat oldMaxWidth = 0.0, originX, newMaxWidth = 0.0;
+    CGFloat oldMaxWidth = 0.0, originX = 0.0, newMaxWidth = 0.0;
     for (NSTextField* label in labels)
     {
         NSRect const oldFrame = label.frame;

@@ -35,7 +35,6 @@
 #include "crypto-utils.h" /* tr_rand_buffer() */
 #include "crypto.h" /* tr_ssha1_matches() */
 #include "error.h"
-#include "fdlimit.h"
 #include "log.h"
 #include "net.h"
 #include "platform.h" /* tr_getWebClientDir() */
@@ -101,10 +100,12 @@ struct tr_rpc_address
 
 static int constexpr DeflateLevel = 6; // medium / default
 
+#ifdef TR_ENABLE_ASSERTS
 static bool constexpr tr_rpc_address_is_valid(tr_rpc_address const& a)
 {
     return a.type == TR_RPC_AF_INET || a.type == TR_RPC_AF_INET6 || a.type == TR_RPC_AF_UNIX;
 }
+#endif
 
 /***
 ****

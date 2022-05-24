@@ -158,7 +158,7 @@ int readOrWriteBytes(
     switch (io_mode)
     {
     case IoMode::Read:
-        if (!readEntireBuf(*fd, file_offset, buf, buflen, &error))
+        if (!readEntireBuf(*fd, file_offset, buf, buflen, &error) && error != nullptr)
         {
             err = error->code;
             tr_logAddErrorTor(
@@ -173,7 +173,7 @@ int readOrWriteBytes(
         break;
 
     case IoMode::Write:
-        if (!writeEntireBuf(*fd, file_offset, buf, buflen, &error))
+        if (!writeEntireBuf(*fd, file_offset, buf, buflen, &error) && error != nullptr)
         {
             err = error->code;
             tr_logAddErrorTor(

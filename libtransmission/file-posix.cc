@@ -58,6 +58,7 @@
 #include "file.h"
 #include "log.h"
 #include "tr-assert.h"
+#include "tr-strbuf.h"
 #include "utils.h"
 
 #ifndef O_LARGEFILE
@@ -386,7 +387,7 @@ char* tr_sys_path_resolve(char const* path, tr_error** error)
 
 std::string tr_sys_path_basename(std::string_view path, tr_error** error)
 {
-    auto tmp = std::string{ path };
+    auto tmp = tr_pathbuf{ path };
 
     if (char const* ret = basename(std::data(tmp)); ret != nullptr)
     {
@@ -397,17 +398,50 @@ std::string tr_sys_path_basename(std::string_view path, tr_error** error)
     return {};
 }
 
-std::string tr_sys_path_dirname(std::string_view path, tr_error** error)
+// This function is adapted from Node.js's path.posix.dirname() function,
+// which is copyrighted by Joyent, Inc. and other Node contributors
+// and is distributed under MIT (SPDX:MIT) license.
+std::string_view tr_sys_path_dirname(std::string_view path)
 {
-    auto tmp = std::string{ path };
+    auto const len = std::size(path);
 
-    if (char const* ret = dirname(std::data(tmp)); ret != nullptr)
+    if (len == 0U)
     {
-        return ret;
+        return "."sv;
     }
 
-    set_system_error(error, errno);
-    return {};
+    auto const has_root = path[0] == '/';
+    auto end = std::string_view::npos;
+    auto matched_slash = bool{ true };
+
+    for (auto i = len - 1; i >= 1U; --i)
+    {
+        if (path[i] == '/')
+        {
+            if (!matched_slash)
+            {
+                end = i;
+                break;
+            }
+        }
+        else
+        {
+            // We saw the first non-path separator
+            matched_slash = false;
+        }
+    }
+
+    if (end == std::string_view::npos)
+    {
+        return has_root ? "/"sv : "."sv;
+    }
+
+    if (has_root && end == 1)
+    {
+        return "//"sv;
+    }
+
+    return path.substr(0, end);
 }
 
 bool tr_sys_path_rename(char const* src_path, char const* dst_path, tr_error** error)
@@ -783,7 +817,7 @@ bool tr_sys_file_read_at(
 
         ret = true;
     }
-    else
+    else if (my_bytes_read == -1)
     {
         set_system_error(error, errno);
     }

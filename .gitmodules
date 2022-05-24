@@ -43,3 +43,6 @@
 [submodule "third-party/fmt"]
 	path = third-party/fmt
 	url = https://github.com/transmission/fmt.git
+[submodule "third-party/fast_float"]
+	path = third-party/fast_float
+	url = https://github.com/transmission/fast_float

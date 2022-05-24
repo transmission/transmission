@@ -520,7 +520,7 @@ CA
                                     <action selector="removeNoDelete:" target="206" id="1546"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="Remove Data File" tag="4" id="1514">
+                            <menuItem title="Remove and Trash Data File" tag="4" id="1514">
                                 <string key="keyEquivalent" base64-UTF8="YES">
 CA
 </string>
@@ -745,7 +745,7 @@ CA
                         <action selector="removeNoDelete:" target="206" id="1554"/>
                     </connections>
                 </menuItem>
-                <menuItem title="Remove Data File" tag="4" id="1551">
+                <menuItem title="Remove and Trash Data File" tag="4" id="1551">
                     <modifierMask key="keyEquivalentModifierMask" option="YES" command="YES"/>
                     <connections>
                         <action selector="removeDeleteData:" target="206" id="1555"/>
@@ -812,6 +812,11 @@ CA
                 <menuItem title="Update Tracker" id="2122">
                     <connections>
                         <action selector="announceSelectedTorrents:" target="206" id="2124"/>
+                    </connections>
+                </menuItem>
+                <menuItem title="Verify Local Data" id="3221">
+                    <connections>
+                        <action selector="verifySelectedTorrents:" target="206" id="3222"/>
                     </connections>
                 </menuItem>
                 <menuItem isSeparatorItem="YES" id="3450">
