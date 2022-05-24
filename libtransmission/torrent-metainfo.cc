@@ -620,8 +620,8 @@ private:
     static constexpr std::string_view AnnounceKey = "announce"sv;
     static constexpr std::string_view AnnounceListKey = "announce-list"sv;
     static constexpr std::string_view AttrKey = "attr"sv;
-    static constexpr std::string_view AzureusPropertiesKey = "azureus_properties"sv;
     static constexpr std::string_view AzureusPrivatePropertiesKey = "azureus_private_properties"sv;
+    static constexpr std::string_view AzureusPropertiesKey = "azureus_properties"sv;
     static constexpr std::string_view ChecksumKey = "checksum"sv;
     static constexpr std::string_view CommentKey = "comment"sv;
     static constexpr std::string_view CommentUtf8Key = "comment.utf-8"sv;
@@ -632,8 +632,7 @@ private:
     static constexpr std::string_view EncodedRateKey = "encoded rate"sv;
     static constexpr std::string_view EncodingKey = "encoding"sv;
     static constexpr std::string_view EntropyKey = "entropy"sv;
-    static constexpr std::string_view ErrCallbackKey = "err-callback"sv;
-    static constexpr std::string_view LogCallbackKey = "log-callback"sv;
+    static constexpr std::string_view ErrCallbackKey = "err_callback"sv;
     static constexpr std::string_view FileDurationKey = "file-duration"sv;
     static constexpr std::string_view FileMediaKey = "file-media"sv;
     static constexpr std::string_view FileTreeKey = "file tree"sv;
@@ -643,6 +642,7 @@ private:
     static constexpr std::string_view InfoKey = "info"sv;
     static constexpr std::string_view LengthKey = "length"sv;
     static constexpr std::string_view LibtorrentResumeKey = "libtorrent_resume"sv;
+    static constexpr std::string_view LogCallbackKey = "log_callback"sv;
     static constexpr std::string_view MagnetInfoKey = "magnet-info"sv;
     static constexpr std::string_view Md5sumKey = "md5sum"sv;
     static constexpr std::string_view MetaVersionKey = "meta version"sv;
