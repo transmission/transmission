@@ -412,8 +412,11 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
                 // TODO https://github.com/transmission/transmission/issues/458
             }
             else if (
+                pathIs(InfoKey, FilesKey, ""sv, Crc32Key) || //
                 pathIs(InfoKey, FilesKey, ""sv, Ed2kKey) || //
+                pathIs(InfoKey, FilesKey, ""sv, Md5Key) || //
                 pathIs(InfoKey, FilesKey, ""sv, Md5sumKey) || //
+                pathIs(InfoKey, FilesKey, ""sv, MtimeKey) || // (why a string?)
                 pathIs(InfoKey, FilesKey, ""sv, Sha1Key) || //
                 pathStartsWith(InfoKey, FilesKey, ""sv, PathUtf8Key))
             {
@@ -479,9 +482,11 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
         else if (
             pathIs(ChecksumKey) || //
             pathIs(ErrCallbackKey) || //
+            pathIs(InfoKey, Ed2kKey) || //
             pathIs(InfoKey, EntropyKey) || //
             pathIs(InfoKey, Md5sumKey) || //
             pathIs(InfoKey, PublisherUrlKey) || //
+            pathIs(InfoKey, Sha1Key) || //
             pathIs(InfoKey, UniqueKey) || //
             pathIs(InfoKey, XCrossSeedKey) || //
             pathIs(LogCallbackKey) || //
@@ -629,6 +634,7 @@ private:
     static constexpr std::string_view ChecksumKey = "checksum"sv;
     static constexpr std::string_view CommentKey = "comment"sv;
     static constexpr std::string_view CommentUtf8Key = "comment.utf-8"sv;
+    static constexpr std::string_view Crc32Key = "crc"sv;
     static constexpr std::string_view CreatedByKey = "created by"sv;
     static constexpr std::string_view CreatedByUtf8Key = "created by.utf-8"sv;
     static constexpr std::string_view CreationDateKey = "creation date"sv;
@@ -649,6 +655,7 @@ private:
     static constexpr std::string_view LibtorrentResumeKey = "libtorrent_resume"sv;
     static constexpr std::string_view LogCallbackKey = "log_callback"sv;
     static constexpr std::string_view MagnetInfoKey = "magnet-info"sv;
+    static constexpr std::string_view Md5Key = "md5"sv;
     static constexpr std::string_view Md5sumKey = "md5sum"sv;
     static constexpr std::string_view MetaVersionKey = "meta version"sv;
     static constexpr std::string_view MtimeKey = "mtime"sv;
