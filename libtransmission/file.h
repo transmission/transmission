@@ -161,12 +161,6 @@ bool tr_sys_path_copy(char const* src_path, char const* dst_path, struct tr_erro
  */
 bool tr_sys_path_get_info(char const* path, int flags, tr_sys_path_info* info, struct tr_error** error = nullptr);
 
-template<typename T, typename = std::enable_if<std::is_member_function_pointer<decltype(&T::c_str)>::value>>
-bool tr_sys_path_get_info(T const& path, int flags, tr_sys_path_info* info, struct tr_error** error = nullptr)
-{
-    return tr_sys_path_get_info(path.c_str(), flags, info, error);
-}
-
 /**
  * @brief Portability wrapper for `access()`.
  *

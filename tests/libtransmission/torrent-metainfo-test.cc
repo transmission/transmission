@@ -222,5 +222,38 @@ TEST_F(TorrentMetainfoTest, ctorSaveContents)
     tr_ctorFree(ctor);
 }
 
+TEST_F(TorrentMetainfoTest, HoffmanStyleWebseeds)
+{
+    auto const src_filename = tr_pathbuf{ LIBTRANSMISSION_TEST_ASSETS_DIR, "/debian-11.2.0-amd64-DVD-1.iso.torrent"sv };
+    auto tm = tr_torrent_metainfo{};
+    EXPECT_TRUE(tm.parseTorrentFile(src_filename));
+    EXPECT_EQ(2, tm.webseedCount());
+    EXPECT_EQ(
+        "https://cdimage.debian.org/cdimage/release/11.2.0//srv/cdbuilder.debian.org/dst/deb-cd/weekly-builds/amd64/iso-dvd/debian-11.2.0-amd64-DVD-1.iso"sv,
+        tm.webseed(0));
+    EXPECT_EQ(
+        "https://cdimage.debian.org/cdimage/archive/11.2.0//srv/cdbuilder.debian.org/dst/deb-cd/weekly-builds/amd64/iso-dvd/debian-11.2.0-amd64-DVD-1.iso"sv,
+        tm.webseed(1));
+}
+
+TEST_F(TorrentMetainfoTest, GetRightStyleWebseedList)
+{
+    auto const src_filename = tr_pathbuf{ LIBTRANSMISSION_TEST_ASSETS_DIR, "/webseed-getright-list.torrent"sv };
+    auto tm = tr_torrent_metainfo{};
+    EXPECT_TRUE(tm.parseTorrentFile(src_filename));
+    EXPECT_EQ(2, tm.webseedCount());
+    EXPECT_EQ("http://www.webseed-one.com/"sv, tm.webseed(0));
+    EXPECT_EQ("http://webseed-two.com/"sv, tm.webseed(1));
+}
+
+TEST_F(TorrentMetainfoTest, GetRightStyleWebseedString)
+{
+    auto const src_filename = tr_pathbuf{ LIBTRANSMISSION_TEST_ASSETS_DIR, "/webseed-getright-string.torrent"sv };
+    auto tm = tr_torrent_metainfo{};
+    EXPECT_TRUE(tm.parseTorrentFile(src_filename));
+    EXPECT_EQ(1, tm.webseedCount());
+    EXPECT_EQ("http://www.webseed-one.com/"sv, tm.webseed(0));
+}
+
 } // namespace test
 } // namespace libtransmission

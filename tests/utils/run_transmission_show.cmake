@@ -39,7 +39,7 @@ else()
       find_program(DIFF_EXEC diff)
       if (DIFF_EXEC)
          message("DIFF:")
-         execute_process(COMMAND ${DIFF_EXEC} ${output_file} ${reference_file})
+         execute_process(COMMAND ${DIFF_EXEC} -u ${output_file} ${reference_file})
       endif()
 
       file(REMOVE ${output_file})

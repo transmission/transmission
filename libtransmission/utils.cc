@@ -149,7 +149,7 @@ uint8_t* tr_loadFile(std::string_view path_in, size_t* size, tr_error** error)
     /* try to stat the file */
     auto info = tr_sys_path_info{};
     tr_error* my_error = nullptr;
-    if (!tr_sys_path_get_info(path, 0, &info, &my_error))
+    if (!tr_sys_path_get_info(path.c_str(), 0, &info, &my_error))
     {
         tr_logAddError(fmt::format(
             _("Couldn't read '{path}': {error} ({error_code})"),
