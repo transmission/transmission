@@ -475,6 +475,7 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
             pathIs(InfoKey, FilesKey, ""sv, MtimeKey) || //
             pathIs(InfoKey, PublisherUrlKey) || //
             pathIs(InfoKey, UniqueKey) || //
+            pathIs(InfoKey, XCrossSeedKey) || //
             pathIs(LogCallbackKey) || //
             pathIs(PublisherUrlKey) || //
             pathStartsWith(AzureusPrivatePropertiesKey) || //
@@ -663,6 +664,7 @@ private:
     static constexpr std::string_view UrlListKey = "url-list"sv;
     static constexpr std::string_view VcodecKey = "vcodec"sv;
     static constexpr std::string_view WidthKey = "width"sv;
+    static constexpr std::string_view XCrossSeedKey = "x_cross_seed"sv;
 };
 
 bool tr_torrent_metainfo::parseBenc(std::string_view benc, tr_error** error)
