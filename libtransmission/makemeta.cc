@@ -20,7 +20,6 @@
 
 #include "crypto-utils.h"
 #include "error.h"
-#include "file-info.h"
 #include "file.h"
 #include "log.h"
 #include "makemeta.h"
@@ -171,7 +170,7 @@ tr_metainfo_builder* tr_metaInfoBuilderCreate(char const* topFileArg)
         auto* const file = &ret->files[i++];
         file->filename = tmp->filename;
         file->size = tmp->size;
-        file->is_portable = tr_file_info::isPortable(file->filename + offset);
+        file->is_portable = tr_torrent_files::isSubpathPortable(file->filename + offset);
 
         ret->totalSize += tmp->size;
 
