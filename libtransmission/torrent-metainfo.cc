@@ -349,7 +349,6 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
             pathIs(DurationKey) || //
             pathIs(EncodedRateKey) || //
             pathIs(HeightKey) || //
-            pathIs(InfoKey, EntropyKey) || //
             pathIs(InfoKey, UniqueKey) || //
             pathIs(ProfilesKey, HeightKey) || //
             pathIs(ProfilesKey, WidthKey) || //
@@ -472,7 +471,8 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
         else if (
             pathIs(ChecksumKey) || //
             pathIs(ErrCallbackKey) || //
-            pathIs(InfoKey, FilesKey, ""sv, MtimeKey) || //
+            pathIs(InfoKey, EntropyKey) || //
+            pathIs(InfoKey, Md5sumKey) || //
             pathIs(InfoKey, PublisherUrlKey) || //
             pathIs(InfoKey, UniqueKey) || //
             pathIs(InfoKey, XCrossSeedKey) || //
