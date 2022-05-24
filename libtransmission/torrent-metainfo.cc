@@ -324,7 +324,7 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
                 unhandled = true;
             }
         }
-        else if (pathIs(CreationDateKey))
+        else if (pathIs(CreationDateKey) || pathIs(InfoKey, CreationDateKey))
         {
             tm_.date_created_ = value;
         }
@@ -347,7 +347,7 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
         }
         else if (
             pathIs(DurationKey) || pathIs(EncodedRateKey) || pathIs(HeightKey) || pathIs(InfoKey, EntropyKey) ||
-            pathIs(ProfilesKey, HeightKey) || pathIs(ProfilesKey, WidthKey) || pathIs(WidthKey) ||
+            pathIs(InfoKey, UniqueKey) || pathIs(ProfilesKey, HeightKey) || pathIs(ProfilesKey, WidthKey) || pathIs(WidthKey) ||
             pathStartsWith(AzureusPropertiesKey) || pathStartsWith(InfoKey, FileDurationKey) ||
             pathStartsWith(InfoKey, FileMediaKey) || pathStartsWith(InfoKey, ProfilesKey))
         {
@@ -402,6 +402,10 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
             {
                 // currently unused. TODO support for bittorrent v2
                 // TODO https://github.com/transmission/transmission/issues/458
+            }
+            else if (pathIs(InfoKey, FilesKey, ""sv, Md5sumKey) || pathStartsWith(InfoKey, FilesKey, ""sv, PathUtf8Key))
+            {
+                // unused by Transmission
             }
             else
             {
@@ -458,7 +462,8 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
         }
         else if (
             pathIs(ChecksumKey) || pathIs(InfoKey, FilesKey, ""sv, MtimeKey) || pathIs(InfoKey, PublisherUrlKey) ||
-            pathIs(PublisherUrlKey) || pathStartsWith(AzureusPropertiesKey) || pathStartsWith(InfoKey, ProfilesKey))
+            pathIs(PublisherUrlKey) || pathStartsWith(AzureusPropertiesKey) || pathStartsWith(InfoKey, ProfilesKey) ||
+            pathStartsWith(LibtorrentResumeKey))
         {
             // unused by Transmission
         }
@@ -614,12 +619,14 @@ private:
     static constexpr std::string_view HttpSeedsKey = "httpseeds"sv;
     static constexpr std::string_view InfoKey = "info"sv;
     static constexpr std::string_view LengthKey = "length"sv;
+    static constexpr std::string_view LibtorrentResumeKey = "libtorrent_resume"sv;
     static constexpr std::string_view Md5sumKey = "md5sum"sv;
     static constexpr std::string_view MetaVersionKey = "meta version"sv;
     static constexpr std::string_view MtimeKey = "mtime"sv;
     static constexpr std::string_view NameKey = "name"sv;
     static constexpr std::string_view NameUtf8Key = "name.utf-8"sv;
     static constexpr std::string_view PathKey = "path"sv;
+    static constexpr std::string_view PathUtf8Key = "path.utf-8"sv;
     static constexpr std::string_view PieceLayersKey = "piece layers"sv;
     static constexpr std::string_view PieceLengthKey = "piece length"sv;
     static constexpr std::string_view PiecesKey = "pieces"sv;
@@ -629,6 +636,7 @@ private:
     static constexpr std::string_view PublisherKey = "publisher"sv;
     static constexpr std::string_view PublisherUrlKey = "publisher-url"sv;
     static constexpr std::string_view SourceKey = "source"sv;
+    static constexpr std::string_view UniqueKey = "unique"sv;
     static constexpr std::string_view UrlListKey = "url-list"sv;
     static constexpr std::string_view VcodecKey = "vcodec"sv;
     static constexpr std::string_view WidthKey = "width"sv;
