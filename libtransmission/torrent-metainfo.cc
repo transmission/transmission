@@ -634,7 +634,7 @@ private:
     static constexpr std::string_view ChecksumKey = "checksum"sv;
     static constexpr std::string_view CommentKey = "comment"sv;
     static constexpr std::string_view CommentUtf8Key = "comment.utf-8"sv;
-    static constexpr std::string_view Crc32Key = "crc"sv;
+    static constexpr std::string_view Crc32Key = "crc32"sv;
     static constexpr std::string_view CreatedByKey = "created by"sv;
     static constexpr std::string_view CreatedByUtf8Key = "created by.utf-8"sv;
     static constexpr std::string_view CreationDateKey = "creation date"sv;
