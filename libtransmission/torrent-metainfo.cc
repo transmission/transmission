@@ -489,8 +489,10 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
             pathIs(InfoKey, Sha1Key) || //
             pathIs(InfoKey, UniqueKey) || //
             pathIs(InfoKey, XCrossSeedKey) || //
+            pathIs(LocaleKey) || //
             pathIs(LogCallbackKey) || //
             pathIs(PublisherUrlKey) || //
+            pathIs(TitleKey) || //
             pathStartsWith(AzureusPrivatePropertiesKey) || //
             pathStartsWith(AzureusPropertiesKey) || //
             pathStartsWith(InfoKey, FileDurationKey) || //
@@ -653,6 +655,7 @@ private:
     static constexpr std::string_view InfoKey = "info"sv;
     static constexpr std::string_view LengthKey = "length"sv;
     static constexpr std::string_view LibtorrentResumeKey = "libtorrent_resume"sv;
+    static constexpr std::string_view LocaleKey = "locale"sv;
     static constexpr std::string_view LogCallbackKey = "log_callback"sv;
     static constexpr std::string_view MagnetInfoKey = "magnet-info"sv;
     static constexpr std::string_view Md5Key = "md5"sv;
@@ -673,6 +676,7 @@ private:
     static constexpr std::string_view PublisherUrlKey = "publisher-url"sv;
     static constexpr std::string_view Sha1Key = "sha1"sv;
     static constexpr std::string_view SourceKey = "source"sv;
+    static constexpr std::string_view TitleKey = "title"sv;
     static constexpr std::string_view UniqueKey = "unique"sv;
     static constexpr std::string_view UrlListKey = "url-list"sv;
     static constexpr std::string_view VcodecKey = "vcodec"sv;
