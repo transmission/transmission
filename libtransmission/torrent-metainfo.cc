@@ -346,10 +346,19 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
             // TODO https://github.com/transmission/transmission/issues/458
         }
         else if (
-            pathIs(DurationKey) || pathIs(EncodedRateKey) || pathIs(HeightKey) || pathIs(InfoKey, EntropyKey) ||
-            pathIs(InfoKey, UniqueKey) || pathIs(ProfilesKey, HeightKey) || pathIs(ProfilesKey, WidthKey) || pathIs(WidthKey) ||
-            pathStartsWith(AzureusPropertiesKey) || pathStartsWith(InfoKey, FileDurationKey) ||
-            pathStartsWith(InfoKey, FileMediaKey) || pathStartsWith(InfoKey, ProfilesKey))
+            pathIs(DurationKey) || //
+            pathIs(EncodedRateKey) || //
+            pathIs(HeightKey) || //
+            pathIs(InfoKey, EntropyKey) || //
+            pathIs(InfoKey, UniqueKey) || //
+            pathIs(ProfilesKey, HeightKey) || //
+            pathIs(ProfilesKey, WidthKey) || //
+            pathIs(WidthKey) || //
+            pathStartsWith(AzureusPropertiesKey) || //
+            pathStartsWith(InfoKey, FileDurationKey) || //
+            pathStartsWith(InfoKey, FileMediaKey) || //
+            pathStartsWith(InfoKey, ProfilesKey) || //
+            pathStartsWith(LibtorrentResumeKey))
         {
             // unused by Transmission
         }
@@ -461,9 +470,19 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
             tm_.announceList().add(value, tier_);
         }
         else if (
-            pathIs(ChecksumKey) || pathIs(InfoKey, FilesKey, ""sv, MtimeKey) || pathIs(InfoKey, PublisherUrlKey) ||
-            pathIs(PublisherUrlKey) || pathStartsWith(AzureusPropertiesKey) || pathStartsWith(InfoKey, ProfilesKey) ||
-            pathStartsWith(LibtorrentResumeKey))
+            pathIs(ChecksumKey) || //
+            pathIs(ErrCallbackKey) || //
+            pathIs(InfoKey, FilesKey, ""sv, MtimeKey) || //
+            pathIs(InfoKey, PublisherUrlKey) || //
+            pathIs(InfoKey, UniqueKey) || //
+            pathIs(LogCallbackKey) || //
+            pathIs(PublisherUrlKey) || //
+            pathStartsWith(AzureusPrivatePropertiesKey) || //
+            pathStartsWith(AzureusPropertiesKey) || //
+            pathStartsWith(InfoKey, FileDurationKey) || //
+            pathStartsWith(InfoKey, ProfilesKey) || //
+            pathStartsWith(LibtorrentResumeKey) || //
+            pathStartsWith(MagnetInfoKey))
         {
             // unused by Transmission
         }
@@ -601,6 +620,7 @@ private:
     static constexpr std::string_view AnnounceListKey = "announce-list"sv;
     static constexpr std::string_view AttrKey = "attr"sv;
     static constexpr std::string_view AzureusPropertiesKey = "azureus_properties"sv;
+    static constexpr std::string_view AzureusPrivatePropertiesKey = "azureus_private_properties"sv;
     static constexpr std::string_view ChecksumKey = "checksum"sv;
     static constexpr std::string_view CommentKey = "comment"sv;
     static constexpr std::string_view CommentUtf8Key = "comment.utf-8"sv;
@@ -611,6 +631,8 @@ private:
     static constexpr std::string_view EncodedRateKey = "encoded rate"sv;
     static constexpr std::string_view EncodingKey = "encoding"sv;
     static constexpr std::string_view EntropyKey = "entropy"sv;
+    static constexpr std::string_view ErrCallbackKey = "err-callback"sv;
+    static constexpr std::string_view LogCallbackKey = "log-callback"sv;
     static constexpr std::string_view FileDurationKey = "file-duration"sv;
     static constexpr std::string_view FileMediaKey = "file-media"sv;
     static constexpr std::string_view FileTreeKey = "file tree"sv;
@@ -620,6 +642,7 @@ private:
     static constexpr std::string_view InfoKey = "info"sv;
     static constexpr std::string_view LengthKey = "length"sv;
     static constexpr std::string_view LibtorrentResumeKey = "libtorrent_resume"sv;
+    static constexpr std::string_view MagnetInfoKey = "magnet-info"sv;
     static constexpr std::string_view Md5sumKey = "md5sum"sv;
     static constexpr std::string_view MetaVersionKey = "meta version"sv;
     static constexpr std::string_view MtimeKey = "mtime"sv;
