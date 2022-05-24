@@ -292,7 +292,7 @@ set(${PROJECT_NAME}_HIDPI_IMAGES
     ToolbarResumeAllTemplate
     ToolbarResumeSelectedTemplate
     Transfers
-    TurtleTemplate
+    TortoiseTemplate
     UpArrowGroupTemplate
     UpArrowTemplate
     YellowDotFlat
