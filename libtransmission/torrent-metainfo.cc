@@ -482,7 +482,6 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
         else if (
             pathIs(ChecksumKey) || //
             pathIs(ErrCallbackKey) || //
-            pathIs(InfoKey, CollectionsKey) || //
             pathIs(InfoKey, Ed2kKey) || //
             pathIs(InfoKey, EntropyKey) || //
             pathIs(InfoKey, Md5sumKey) || //
@@ -496,6 +495,7 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
             pathIs(TitleKey) || //
             pathStartsWith(AzureusPrivatePropertiesKey) || //
             pathStartsWith(AzureusPropertiesKey) || //
+            pathStartsWith(InfoKey, CollectionsKey) || //
             pathStartsWith(InfoKey, FileDurationKey) || //
             pathStartsWith(InfoKey, ProfilesKey) || //
             pathStartsWith(LibtorrentResumeKey) || //
