@@ -157,10 +157,10 @@ bool refreshFilesForeach(
     auto const old_size = iter->get_value(file_cols.size);
 
     auto new_enabled = int{};
-    auto new_have = decltype(old_have){old_have};
+    auto new_have = decltype(old_have){};
     auto new_priority = int{};
     auto new_progress = int{};
-    auto new_size = decltype(old_size){old_size};
+    auto new_size = decltype(old_size){};
 
     if (is_file)
     {
@@ -170,11 +170,11 @@ bool refreshFilesForeach(
         new_enabled = file.wanted;
         new_priority = file.priority;
         new_have = file.have;
+        new_size = file.length;
         new_progress = static_cast<int>(100 * file.progress);
     }
     else
     {
-        new_size = 0;
         new_enabled = NOT_SET;
         new_priority = NOT_SET;
 
