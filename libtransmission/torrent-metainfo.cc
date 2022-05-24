@@ -411,7 +411,11 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
                 // currently unused. TODO support for bittorrent v2
                 // TODO https://github.com/transmission/transmission/issues/458
             }
-            else if (pathIs(InfoKey, FilesKey, ""sv, Md5sumKey) || pathStartsWith(InfoKey, FilesKey, ""sv, PathUtf8Key))
+            else if (
+                pathIs(InfoKey, FilesKey, ""sv, Ed2kKey) || //
+                pathIs(InfoKey, FilesKey, ""sv, Md5sumKey) || //
+                pathIs(InfoKey, FilesKey, ""sv, Sha1Key) || //
+                pathStartsWith(InfoKey, FilesKey, ""sv, PathUtf8Key))
             {
                 // unused by Transmission
             }
@@ -468,6 +472,10 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
         {
             tm_.announceList().add(value, tier_);
         }
+        else if (curdepth == 2 && (pathStartsWith(HttpSeedsKey) || pathStartsWith(UrlListKey)))
+        {
+            tm_.addWebseed(value);
+        }
         else if (
             pathIs(ChecksumKey) || //
             pathIs(ErrCallbackKey) || //
@@ -486,10 +494,6 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
             pathStartsWith(MagnetInfoKey))
         {
             // unused by Transmission
-        }
-        else if (curdepth == 2 && (pathStartsWith(HttpSeedsKey) || pathStartsWith(UrlListKey)))
-        {
-            tm_.addWebseed(value);
         }
         else
         {
@@ -629,6 +633,7 @@ private:
     static constexpr std::string_view CreatedByUtf8Key = "created by.utf-8"sv;
     static constexpr std::string_view CreationDateKey = "creation date"sv;
     static constexpr std::string_view DurationKey = "duration"sv;
+    static constexpr std::string_view Ed2kKey = "ed2k"sv;
     static constexpr std::string_view EncodedRateKey = "encoded rate"sv;
     static constexpr std::string_view EncodingKey = "encoding"sv;
     static constexpr std::string_view EntropyKey = "entropy"sv;
@@ -659,6 +664,7 @@ private:
     static constexpr std::string_view ProfilesKey = "profiles"sv;
     static constexpr std::string_view PublisherKey = "publisher"sv;
     static constexpr std::string_view PublisherUrlKey = "publisher-url"sv;
+    static constexpr std::string_view Sha1Key = "sha1"sv;
     static constexpr std::string_view SourceKey = "source"sv;
     static constexpr std::string_view UniqueKey = "unique"sv;
     static constexpr std::string_view UrlListKey = "url-list"sv;
