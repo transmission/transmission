@@ -482,6 +482,7 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
         else if (
             pathIs(ChecksumKey) || //
             pathIs(ErrCallbackKey) || //
+            pathIs(InfoKey, CollectionsKey) || //
             pathIs(InfoKey, Ed2kKey) || //
             pathIs(InfoKey, EntropyKey) || //
             pathIs(InfoKey, Md5sumKey) || //
@@ -634,6 +635,7 @@ private:
     static constexpr std::string_view AzureusPrivatePropertiesKey = "azureus_private_properties"sv;
     static constexpr std::string_view AzureusPropertiesKey = "azureus_properties"sv;
     static constexpr std::string_view ChecksumKey = "checksum"sv;
+    static constexpr std::string_view CollectionsKey = "collections"sv;
     static constexpr std::string_view CommentKey = "comment"sv;
     static constexpr std::string_view CommentUtf8Key = "comment.utf-8"sv;
     static constexpr std::string_view Crc32Key = "crc32"sv;
