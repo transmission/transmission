@@ -310,3 +310,116 @@ void tr_torrent_files::remove(std::string_view parent_in, std::string_view tmpdi
         depthFirstWalk(filename.c_str(), remove_junk);
     }
 }
+
+namespace
+{
+
+// https://docs.microsoft.com/en-us/windows/win32/fileio/naming-a-file
+// Do not use the following reserved names for the name of a file:
+// CON, PRN, AUX, NUL, COM1, COM2, COM3, COM4, COM5, COM6, COM7, COM8,
+// COM9, LPT1, LPT2, LPT3, LPT4, LPT5, LPT6, LPT7, LPT8, and LPT9.
+// Also avoid these names followed immediately by an extension;
+// for example, NUL.txt is not recommended.
+[[nodiscard]] bool isReservedFile(std::string_view in) noexcept
+{
+    if (std::empty(in))
+    {
+        return false;
+    }
+
+    // Shortcut to avoid extra work below.
+    // All the paths below involve filenames that begin with one of these chars
+    static auto constexpr ReservedFilesBeginWithOneOf = "ACLNP"sv;
+    if (ReservedFilesBeginWithOneOf.find(toupper(in.front())) == std::string_view::npos)
+    {
+        return false;
+    }
+
+    auto in_upper = tr_pathbuf{ in };
+    std::transform(std::begin(in_upper), std::end(in_upper), std::begin(in_upper), [](auto ch) { return toupper(ch); });
+    auto const in_upper_sv = in_upper.sv();
+
+    static auto constexpr ReservedNames = std::array<std::string_view, 22>{
+        "AUX"sv,  "CON"sv,  "NUL"sv,  "PRN"sv, //
+        "COM1"sv, "COM2"sv, "COM3"sv, "COM4"sv, "COM5"sv, "COM6"sv, "COM7"sv, "COM8"sv, "COM9"sv, //
+        "LPT1"sv, "LPT2"sv, "LPT3"sv, "LPT4"sv, "LPT5"sv, "LPT6"sv, "LPT7"sv, "LPT8"sv, "LPT9"sv, //
+    };
+    if (std::find(std::begin(ReservedNames), std::end(ReservedNames), in_upper_sv) != std::end(ReservedNames))
+    {
+        return true;
+    }
+
+    static auto constexpr ReservedPrefixes = std::array<std::string_view, 22>{
+        "AUX."sv,  "CON."sv,  "NUL."sv,  "PRN."sv, //
+        "COM1."sv, "COM2"sv,  "COM3."sv, "COM4."sv, "COM5."sv, "COM6."sv, "COM7."sv, "COM8."sv, "COM9."sv, //
+        "LPT1."sv, "LPT2."sv, "LPT3."sv, "LPT4."sv, "LPT5."sv, "LPT6."sv, "LPT7."sv, "LPT8."sv, "LPT9."sv, //
+    };
+    return std::any_of(
+        std::begin(ReservedPrefixes),
+        std::end(ReservedPrefixes),
+        [in_upper_sv](auto const& prefix) { return tr_strvStartsWith(in_upper_sv, prefix); });
+}
+
+// https://docs.microsoft.com/en-us/windows/desktop/FileIO/naming-a-file
+// Use any character in the current code page for a name, including Unicode
+// characters and characters in the extended character set (128–255),
+// except for the following:
+[[nodiscard]] auto constexpr isReservedChar(char ch) noexcept
+{
+    switch (ch)
+    {
+    case '"':
+    case '*':
+    case '/':
+    case ':':
+    case '<':
+    case '>':
+    case '?':
+    case '\\':
+    case '|':
+        return true;
+    default:
+        return false;
+    }
+}
+
+void appendSanitizedComponent(std::string_view in, tr_pathbuf& out)
+{
+    // remove leading and trailing spaces
+    in = tr_strvStrip(in);
+
+    // remove trailing periods
+    while (tr_strvEndsWith(in, '.'))
+    {
+        in.remove_suffix(1);
+    }
+
+    if (isReservedFile(in))
+    {
+        out.append('_');
+    }
+
+    // replace reserved characters with an underscore
+    static auto constexpr add_char = [](auto ch)
+    {
+        return isReservedChar(ch) ? '_' : ch;
+    };
+    std::transform(std::begin(in), std::end(in), std::back_inserter(out), add_char);
+}
+
+} // namespace
+
+void tr_torrent_files::makeSubpathPortable(std::string_view path, tr_pathbuf& append_me)
+{
+    auto segment = std::string_view{};
+    while (tr_strvSep(&path, &segment, '/'))
+    {
+        appendSanitizedComponent(segment, append_me);
+        append_me.append('/');
+    }
+
+    if (auto const n = std::size(append_me); n > 0)
+    {
+        append_me.resize(n - 1); // remove trailing slash
+    }
+}
