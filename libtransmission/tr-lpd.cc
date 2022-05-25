@@ -14,7 +14,6 @@
 using in_port_t = uint16_t; /* all missing */
 #else
 #include <ctime>
-#include <unistd.h> /* close() */
 #include <sys/types.h>
 #include <sys/socket.h> /* socket(), bind() */
 #include <netinet/in.h> /* sockaddr_in */
