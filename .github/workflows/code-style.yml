@@ -1,13 +1,16 @@
 name: Code Style
-on: [push, pull_request]
+on:
+  pull_request:
+  push:
+    branches:
+      - main
 jobs:
   formatting-check:
     name: Formatting Check
     runs-on: ubuntu-latest
     steps:
-      - name: Prepare
+      - name: Install Dependencies
         run: |
-          set -ex
           sudo apt-get install clang-format-12 npm yarn
       - name: Checkout
         uses: actions/checkout@v3
@@ -16,5 +19,4 @@ jobs:
       - name: Check
         working-directory: .
         run: |
-          set -ex
           ./code_style.sh --check
