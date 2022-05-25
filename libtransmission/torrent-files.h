@@ -58,6 +58,17 @@ public:
         files_.at(file_index).setPath(path);
     }
 
+    void insertSubpathPrefix(std::string_view path)
+    {
+        auto const buf = tr_pathbuf{ path, '/' };
+
+        for (auto& file : files_)
+        {
+            file.path_.insert(0, buf.sv());
+            file.path_.shrink_to_fit();
+        }
+    }
+
     void reserve(size_t n_files)
     {
         files_.reserve(n_files);
@@ -143,6 +154,20 @@ public:
     [[nodiscard]] std::optional<FoundFile> find(tr_file_index_t, std::string_view const* search_paths, size_t n_paths) const;
     [[nodiscard]] bool hasAnyLocalData(std::string_view const* search_paths, size_t n_paths) const;
 
+    static void makeSubpathPortable(std::string_view path, tr_pathbuf& append_me);
+
+    [[nodiscard]] static auto makeSubpathPortable(std::string_view path)
+    {
+        auto tmp = tr_pathbuf{};
+        makeSubpathPortable(path, tmp);
+        return std::string{ tmp.sv() };
+    }
+
+    [[nodiscard]] static bool isSubpathPortable(std::string_view path)
+    {
+        return makeSubpathPortable(path) == path;
+    }
+
     static constexpr std::string_view PartialFileSuffix = ".part";
 
 private:
@@ -151,7 +176,11 @@ private:
     public:
         void setPath(std::string_view subpath)
         {
-            path_ = subpath;
+            if (path_ != subpath)
+            {
+                path_ = subpath;
+                path_.shrink_to_fit();
+            }
         }
 
         file_t(std::string_view path, uint64_t size)

@@ -127,7 +127,8 @@ protected:
             }
 
             auto const path_part = std::string{ path, size_t(slash_pos - path + 1) };
-            if (!tr_sys_path_get_info(path_part, TR_SYS_PATH_NO_FOLLOW, &info) ||
+
+            if (!tr_sys_path_get_info(path_part.c_str(), TR_SYS_PATH_NO_FOLLOW, &info) ||
                 (info.type != TR_SYS_PATH_IS_FILE && info.type != TR_SYS_PATH_IS_DIRECTORY))
             {
                 return false;
@@ -172,32 +173,6 @@ protected:
                 EXPECT_NE(""sv, name);
                 EXPECT_EQ(nullptr, err) << *err;
                 EXPECT_EQ(data[i].output, name);
-            }
-            else
-            {
-                EXPECT_EQ(""sv, name);
-                EXPECT_NE(nullptr, err);
-                tr_error_clear(&err);
-            }
-        }
-    }
-
-    static void testPathXname(
-        XnameTestData const* data,
-        size_t data_size,
-        std::string_view (*func)(std::string_view, tr_error**))
-    {
-        for (size_t i = 0; i < data_size; ++i)
-        {
-            tr_error* err = nullptr;
-            auto const name = func(data[i].input, &err);
-            std::cerr << __FILE__ << ':' << __LINE__ << " in [" << data[i].input << "] out [" << name << ']' << std::endl;
-
-            if (data[i].output != nullptr)
-            {
-                EXPECT_NE(""sv, name);
-                EXPECT_EQ(nullptr, err) << *err;
-                EXPECT_EQ(std::string{ data[i].output }, name);
             }
             else
             {
