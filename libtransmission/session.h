@@ -59,7 +59,7 @@ struct tr_fdInfo;
 
 struct tr_bindinfo
 {
-    int socket = TR_BAD_SOCKET;
+    tr_socket_t socket = TR_BAD_SOCKET;
     tr_address addr = {};
     struct event* ev = nullptr;
 };
