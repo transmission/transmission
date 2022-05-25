@@ -1,0 +1,20 @@
+name: Code Style
+on: [push, pull_request]
+jobs:
+  formatting-check:
+    name: Formatting Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Prepare
+        run: |
+          set -ex
+          sudo apt-get install clang-format-12 npm yarn
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+      - name: Check
+        working-directory: .
+        run: |
+          set -ex
+          ./code_style.sh --check

@@ -75,12 +75,7 @@ If you're new to building programs from source code, this is typically easier th
 
 You would want to setup your editor to make use of the .clang-format file located in the root of this repository and the eslint/prettier rules in web/package.json.
 
-If for some reason you are unwilling or unable to do so, there is a shell script which you could run either directly or via docker-compose:
-
-    $ ./code_style.sh
-    or
-    $ docker-compose build --pull
-    $ docker-compose run --rm code_style
+If for some reason you are unwilling or unable to do so, there is a shell script which you can use: `./code_style.sh`
 
 ## Sponsors
 
