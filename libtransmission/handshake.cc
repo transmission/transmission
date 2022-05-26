@@ -267,9 +267,9 @@ static handshake_parse_err_t parseHandshake(tr_handshake* handshake, struct evbu
     *** Extensions
     **/
 
-    tr_peerIoEnableDHT(handshake->io, HANDSHAKE_HAS_DHT(reserved));
-    tr_peerIoEnableLTEP(handshake->io, HANDSHAKE_HAS_LTEP(reserved));
-    tr_peerIoEnableFEXT(handshake->io, HANDSHAKE_HAS_FASTEXT(reserved));
+    handshake->io->enableDHT(HANDSHAKE_HAS_DHT(reserved));
+    handshake->io->enableLTEP(HANDSHAKE_HAS_LTEP(reserved));
+    handshake->io->enableFEXT(HANDSHAKE_HAS_FASTEXT(reserved));
 
     return HANDSHAKE_OK;
 }
@@ -637,9 +637,9 @@ static ReadState readHandshake(tr_handshake* handshake, struct evbuffer* inbuf)
     *** Extensions
     **/
 
-    tr_peerIoEnableDHT(handshake->io, HANDSHAKE_HAS_DHT(reserved));
-    tr_peerIoEnableLTEP(handshake->io, HANDSHAKE_HAS_LTEP(reserved));
-    tr_peerIoEnableFEXT(handshake->io, HANDSHAKE_HAS_FASTEXT(reserved));
+    handshake->io->enableDHT(HANDSHAKE_HAS_DHT(reserved));
+    handshake->io->enableLTEP(HANDSHAKE_HAS_LTEP(reserved));
+    handshake->io->enableFEXT(HANDSHAKE_HAS_FASTEXT(reserved));
 
     /* torrent hash */
     auto hash = tr_sha1_digest_t{};

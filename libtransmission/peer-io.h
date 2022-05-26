@@ -124,6 +124,41 @@ public:
         return bandwidth->getPieceSpeedBytesPerSecond(now, dir);
     }
 
+    constexpr void enableFEXT(bool flag) noexcept
+    {
+        this->fastExtensionSupported = flag;
+    }
+
+    constexpr auto supportsFEXT() const noexcept
+    {
+        return this->fastExtensionSupported;
+    }
+
+    constexpr void enableLTEP(bool flag) noexcept
+    {
+        this->extendedProtocolSupported = flag;
+    }
+
+    constexpr auto supportsLTEP() const noexcept
+    {
+        return this->extendedProtocolSupported;
+    }
+
+    constexpr void enableDHT(bool flag) noexcept
+    {
+        this->dhtSupported = flag;
+    }
+
+    constexpr auto supportsDHT() const noexcept
+    {
+        return this->dhtSupported;
+    }
+
+    constexpr auto supportsUTP() const noexcept
+    {
+        return this->utpSupported;
+    }
+
     tr_crypto crypto;
 
     // TODO(ckerr): yikes, unlike other class' magic_numbers it looks
@@ -166,14 +201,16 @@ public:
     tr_priority_t priority = TR_PRI_NORMAL;
 
     bool const is_seed;
-    bool dhtSupported = false;
-    bool extendedProtocolSupported = false;
-    bool fastExtensionSupported = false;
+
     bool utpSupported = false;
 
 private:
     tr_address const addr;
     tr_port const port;
+
+    bool dhtSupported = false;
+    bool extendedProtocolSupported = false;
+    bool fastExtensionSupported = false;
 };
 
 /**
@@ -211,45 +248,6 @@ constexpr bool tr_isPeerIo(tr_peerIo const* io)
 {
     return io != nullptr && io->magic_number == PEER_IO_MAGIC_NUMBER && io->refCount >= 0 &&
         tr_address_is_valid(&io->address());
-}
-
-/**
-***
-**/
-
-constexpr void tr_peerIoEnableFEXT(tr_peerIo* io, bool flag)
-{
-    io->fastExtensionSupported = flag;
-}
-
-constexpr bool tr_peerIoSupportsFEXT(tr_peerIo const* io)
-{
-    return io->fastExtensionSupported;
-}
-
-constexpr void tr_peerIoEnableLTEP(tr_peerIo* io, bool flag)
-{
-    io->extendedProtocolSupported = flag;
-}
-
-constexpr bool tr_peerIoSupportsLTEP(tr_peerIo const* io)
-{
-    return io->extendedProtocolSupported;
-}
-
-constexpr void tr_peerIoEnableDHT(tr_peerIo* io, bool flag)
-{
-    io->dhtSupported = flag;
-}
-
-constexpr bool tr_peerIoSupportsDHT(tr_peerIo const* io)
-{
-    return io->dhtSupported;
-}
-
-constexpr bool tr_peerIoSupportsUTP(tr_peerIo const* io)
-{
-    return io->utpSupported;
 }
 
 /**

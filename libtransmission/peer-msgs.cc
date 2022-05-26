@@ -253,20 +253,20 @@ public:
             tr_timerAdd(*pex_timer, PexIntervalSecs, 0);
         }
 
-        if (tr_peerIoSupportsUTP(io))
+        if (io->supportsUTP())
         {
             tr_peerMgrSetUtpSupported(torrent, io->address());
             tr_peerMgrSetUtpFailed(torrent, io->address(), false);
         }
 
-        if (tr_peerIoSupportsLTEP(io))
+        if (io->supportsLTEP())
         {
             sendLtepHandshake(this);
         }
 
         tellPeerWhatWeHave(this);
 
-        if (tr_dhtEnabled(torrent->session) && tr_peerIoSupportsDHT(io))
+        if (tr_dhtEnabled(torrent->session) && io->supportsDHT())
         {
             /* Only send PORT over IPv6 when the IPv6 DHT is running (BEP-32). */
             if (io->address().type == TR_AF_INET || tr_globalIPv6(nullptr) != nullptr)
@@ -711,7 +711,7 @@ static void dbgOutMessageLen(tr_peerMsgsImpl* msgs)
 
 static void protocolSendReject(tr_peerMsgsImpl* msgs, struct peer_request const* req)
 {
-    TR_ASSERT(tr_peerIoSupportsFEXT(msgs->io));
+    TR_ASSERT(msgs->io->supportsFEXT());
 
     struct evbuffer* out = msgs->outMessages;
 
@@ -782,7 +782,7 @@ static void protocolSendHave(tr_peerMsgsImpl* msgs, tr_piece_index_t index)
 
 static void protocolSendAllowedFast(tr_peerMsgs* msgs, uint32_t pieceIndex)
 {
-    TR_ASSERT(tr_peerIoSupportsFEXT(msgs->io));
+    TR_ASSERT(msgs->io->supportsFEXT());
 
     tr_peerIo* io = msgs->io;
     struct evbuffer* out = msgs->outMessages;
@@ -811,7 +811,7 @@ static void protocolSendChoke(tr_peerMsgsImpl* msgs, bool choke)
 
 static void protocolSendHaveAll(tr_peerMsgsImpl* msgs)
 {
-    TR_ASSERT(tr_peerIoSupportsFEXT(msgs->io));
+    TR_ASSERT(msgs->io->supportsFEXT());
 
     struct evbuffer* out = msgs->outMessages;
 
@@ -825,7 +825,7 @@ static void protocolSendHaveAll(tr_peerMsgsImpl* msgs)
 
 static void protocolSendHaveNone(tr_peerMsgsImpl* msgs)
 {
-    TR_ASSERT(tr_peerIoSupportsFEXT(msgs->io));
+    TR_ASSERT(msgs->io->supportsFEXT());
 
     struct evbuffer* out = msgs->outMessages;
 
@@ -899,7 +899,7 @@ size_t tr_generateAllowedSet(tr_piece_index_t* setmePieces, size_t desiredSetSiz
 
 static void updateFastSet(tr_peerMsgs*)
 {
-    bool const fext = tr_peerIoSupportsFEXT(msgs->io);
+    bool const fext = msgs->io->supportsFEXT();
     bool const peerIsNeedy = msgs->peer->progress < 0.10;
 
     if (fext && peerIsNeedy && !msgs->haveFastSet)
@@ -955,7 +955,7 @@ static bool popNextMetadataRequest(tr_peerMsgsImpl* msgs, int* piece)
 
 static void cancelAllRequestsToClient(tr_peerMsgsImpl* msgs)
 {
-    if (auto const must_send_rej = tr_peerIoSupportsFEXT(msgs->io); must_send_rej)
+    if (auto const must_send_rej = msgs->io->supportsFEXT(); must_send_rej)
     {
         for (auto& req : msgs->peer_requested_)
         {
@@ -1338,7 +1338,7 @@ static void parseLtep(tr_peerMsgsImpl* msgs, uint32_t msglen, struct evbuffer* i
         logtrace(msgs, "got ltep handshake");
         parseLtepHandshake(msgs, msglen, inbuf);
 
-        if (tr_peerIoSupportsLTEP(msgs->io))
+        if (msgs->io->supportsLTEP())
         {
             sendLtepHandshake(msgs);
             sendPex(msgs);
@@ -1482,7 +1482,7 @@ static void peerMadeRequest(tr_peerMsgsImpl* msgs, struct peer_request const* re
         msgs->peer_requested_.emplace_back(*req);
         prefetchPieces(msgs);
     }
-    else if (tr_peerIoSupportsFEXT(msgs->io))
+    else if (msgs->io->supportsFEXT())
     {
         protocolSendReject(msgs, req);
     }
@@ -1611,7 +1611,7 @@ static ReadState readBtMessage(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, si
 #ifdef TR_ENABLE_ASSERTS
     size_t const startBufLen = evbuffer_get_length(inbuf);
 #endif
-    bool const fext = tr_peerIoSupportsFEXT(msgs->io);
+    bool const fext = msgs->io->supportsFEXT();
 
     auto ui32 = uint32_t{};
     auto msglen = uint32_t{ msgs->incoming.length };
@@ -2099,7 +2099,7 @@ static size_t fillOutputBuffer(tr_peerMsgsImpl* msgs, time_t now)
     size_t bytesWritten = 0;
     struct peer_request req;
     bool const haveMessages = evbuffer_get_length(msgs->outMessages) != 0;
-    bool const fext = tr_peerIoSupportsFEXT(msgs->io);
+    bool const fext = msgs->io->supportsFEXT();
 
     /**
     ***  Protocol messages
@@ -2337,7 +2337,7 @@ static void sendBitfield(tr_peerMsgsImpl* msgs)
 
 static void tellPeerWhatWeHave(tr_peerMsgsImpl* msgs)
 {
-    bool const fext = tr_peerIoSupportsFEXT(msgs->io);
+    bool const fext = msgs->io->supportsFEXT();
 
     if (fext && msgs->torrent->hasAll())
     {
