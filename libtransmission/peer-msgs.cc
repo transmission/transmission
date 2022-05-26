@@ -302,7 +302,7 @@ public:
 
     bool is_transferring_pieces(uint64_t now, tr_direction direction, unsigned int* setme_Bps) const override
     {
-        auto const Bps = tr_peerIoGetPieceSpeed_Bps(io, now, direction);
+        auto const Bps = io->getPieceSpeed_Bps(now, direction);
 
         if (setme_Bps != nullptr)
         {

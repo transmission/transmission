@@ -119,6 +119,11 @@ public:
         return bandwidth->clamp(dir, 1024) > 0;
     }
 
+    [[nodiscard]] auto getPieceSpeed_Bps(uint64_t now, tr_direction dir) noexcept
+    {
+        return bandwidth->getPieceSpeedBytesPerSecond(now, dir);
+    }
+
     tr_crypto crypto;
 
     // TODO(ckerr): yikes, unlike other class' magic_numbers it looks
@@ -346,11 +351,6 @@ static inline void tr_peerIoSetParent(tr_peerIo* io, Bandwidth* parent)
 }
 
 void tr_peerIoBandwidthUsed(tr_peerIo* io, tr_direction direction, size_t byteCount, int isPieceData);
-
-static inline unsigned int tr_peerIoGetPieceSpeed_Bps(tr_peerIo const* io, uint64_t now, tr_direction dir)
-{
-    return io->bandwidth->getPieceSpeedBytesPerSecond(now, dir);
-}
 
 /**
 ***
