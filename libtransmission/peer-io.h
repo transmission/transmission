@@ -19,6 +19,7 @@
 #include <memory>
 #include <optional>
 #include <string>
+#include <utility> // std::make_pair
 
 #include <event2/buffer.h>
 
@@ -26,7 +27,7 @@
 
 #include "bandwidth.h"
 #include "crypto.h"
-#include "net.h" /* tr_address */
+#include "net.h" // tr_address
 #include "peer-socket.h"
 #include "tr-assert.h"
 
@@ -89,6 +90,16 @@ public:
         , port{ port_in }
         , is_seed{ is_seed_in }
     {
+    }
+
+    [[nodiscard]] constexpr tr_address const& address() const noexcept
+    {
+        return addr;
+    }
+
+    [[nodiscard]] constexpr std::pair<tr_address, tr_port> socketAddress() const noexcept
+    {
+        return std::make_pair(addr, port);
     }
 
     std::string addrStr() const;
@@ -236,10 +247,6 @@ constexpr tr_session* tr_peerIoGetSession(tr_peerIo* io)
 
     return io->session;
 }
-
-char const* tr_peerIoGetAddrStr(tr_peerIo const* io, char* buf, size_t buflen);
-
-struct tr_address const* tr_peerIoGetAddress(tr_peerIo const* io, tr_port* port);
 
 std::optional<tr_sha1_digest_t> tr_peerIoGetTorrentHash(tr_peerIo const* io);
 

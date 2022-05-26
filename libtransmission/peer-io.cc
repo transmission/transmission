@@ -904,35 +904,9 @@ void tr_peerIoUnrefImpl(char const* file, int line, tr_peerIo* io)
     }
 }
 
-tr_address const* tr_peerIoGetAddress(tr_peerIo const* io, tr_port* port)
-{
-    TR_ASSERT(tr_isPeerIo(io));
-
-    if (port != nullptr)
-    {
-        *port = io->port;
-    }
-
-    return &io->addr;
-}
-
 std::string tr_peerIo::addrStr() const
 {
     return tr_isPeerIo(this) ? this->addr.readable(this->port) : "error";
-}
-
-char const* tr_peerIoGetAddrStr(tr_peerIo const* io, char* buf, size_t buflen)
-{
-    if (tr_isPeerIo(io))
-    {
-        tr_address_and_port_to_string(buf, buflen, &io->addr, io->port);
-    }
-    else
-    {
-        tr_strlcpy(buf, "error", buflen);
-    }
-
-    return buf;
 }
 
 void tr_peerIoSetIOFuncs(tr_peerIo* io, tr_can_read_cb readcb, tr_did_write_cb writecb, tr_net_error_cb errcb, void* userData)

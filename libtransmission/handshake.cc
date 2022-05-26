@@ -815,7 +815,7 @@ static ReadState readCryptoProvide(tr_handshake* handshake, struct evbuffer* inb
     if (auto const* const tor = tr_torrentFindFromObfuscatedHash(handshake->session, obfuscated_hash); tor != nullptr)
     {
         bool const clientIsSeed = tor->isDone();
-        bool const peerIsSeed = tr_peerMgrPeerIsSeed(tor, tr_peerIoGetAddress(handshake->io, nullptr));
+        bool const peerIsSeed = tr_peerMgrPeerIsSeed(tor, handshake->io->address());
         tr_logAddTraceHand(
             handshake,
             fmt::format("got INCOMING connection's encrypted handshake for torrent [{}]", tor->name()));
@@ -1140,7 +1140,7 @@ static void gotError(tr_peerIo* io, short what, void* vhandshake)
         /* Don't mark a peer as non-uTP unless it's really a connect failure. */
         if ((errcode == ETIMEDOUT || errcode == ECONNREFUSED) && tr_isTorrent(tor))
         {
-            tr_peerMgrSetUtpFailed(tor, tr_peerIoGetAddress(io, nullptr), true);
+            tr_peerMgrSetUtpFailed(tor, io->address(), true);
         }
 
         if (tr_peerIoReconnect(handshake->io) == 0)

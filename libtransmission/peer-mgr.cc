@@ -349,10 +349,10 @@ static tr_swarm* getExistingSwarm(tr_peerMgr* manager, tr_sha1_digest_t const& h
     return tor == nullptr ? nullptr : tor->swarm;
 }
 
-static struct peer_atom* getExistingAtom(tr_swarm const* cswarm, tr_address const* addr)
+static struct peer_atom* getExistingAtom(tr_swarm const* cswarm, tr_address const& addr)
 {
     auto* swarm = const_cast<tr_swarm*>(cswarm);
-    return static_cast<struct peer_atom*>(tr_ptrArrayFindSorted(&swarm->pool, addr, comparePeerAtomToAddress));
+    return static_cast<struct peer_atom*>(tr_ptrArrayFindSorted(&swarm->pool, &addr, comparePeerAtomToAddress));
 }
 
 static bool peerIsInUse(tr_swarm const* cs, struct peer_atom const* atom)
@@ -488,33 +488,27 @@ static void atomSetSeed(tr_swarm* s, struct peer_atom* atom)
     s->pool_is_all_seeds_dirty = true;
 }
 
-bool tr_peerMgrPeerIsSeed(tr_torrent const* tor, tr_address const* addr)
+bool tr_peerMgrPeerIsSeed(tr_torrent const* tor, tr_address const& addr)
 {
-    bool isSeed = false;
-
     if (auto const* atom = getExistingAtom(tor->swarm, addr); atom != nullptr)
     {
-        isSeed = atomIsSeed(atom);
+        return atomIsSeed(atom);
     }
 
-    return isSeed;
+    return false;
 }
 
-void tr_peerMgrSetUtpSupported(tr_torrent* tor, tr_address const* addr)
+void tr_peerMgrSetUtpSupported(tr_torrent* tor, tr_address const& addr)
 {
-    struct peer_atom* atom = getExistingAtom(tor->swarm, addr);
-
-    if (atom != nullptr)
+    if (auto* const atom = getExistingAtom(tor->swarm, addr); atom != nullptr)
     {
         atom->flags |= ADDED_F_UTP_FLAGS;
     }
 }
 
-void tr_peerMgrSetUtpFailed(tr_torrent* tor, tr_address const* addr, bool failed)
+void tr_peerMgrSetUtpFailed(tr_torrent* tor, tr_address const& addr, bool failed)
 {
-    struct peer_atom* atom = getExistingAtom(tor->swarm, addr);
-
-    if (atom != nullptr)
+    if (auto* const atom = getExistingAtom(tor->swarm, addr); atom != nullptr)
     {
         atom->utp_failed = failed;
     }
@@ -929,12 +923,12 @@ static int getDefaultShelfLife(uint8_t from)
 
 static struct peer_atom* ensureAtomExists(
     tr_swarm* s,
-    tr_address const* addr,
+    tr_address const& addr,
     tr_port const port,
     uint8_t const flags,
     uint8_t const from)
 {
-    TR_ASSERT(tr_address_is_valid(addr));
+    TR_ASSERT(tr_address_is_valid(&addr));
     TR_ASSERT(from < TR_PEER_FROM__MAX);
 
     struct peer_atom* a = getExistingAtom(s, addr);
@@ -943,7 +937,7 @@ static struct peer_atom* ensureAtomExists(
     {
         int const jitter = tr_rand_int_weak(60 * 10);
         a = tr_new0(struct peer_atom, 1);
-        a->addr = *addr;
+        a->addr = addr;
         a->port = port;
         a->flags = flags;
         a->fromFirst = from;
@@ -1012,16 +1006,15 @@ static bool on_handshake_done(tr_handshake_result const& result)
     auto const hash = tr_peerIoGetTorrentHash(result.io);
     tr_swarm* const s = hash ? getExistingSwarm(manager, *hash) : nullptr;
 
-    auto port = tr_port{};
-    auto const* const addr = tr_peerIoGetAddress(result.io, &port);
+    auto const [addr, port] = result.io->socketAddress();
 
     if (tr_peerIoIsIncoming(result.io))
     {
-        manager->incoming_handshakes.erase(*addr);
+        manager->incoming_handshakes.erase(addr);
     }
     else if (s != nullptr)
     {
-        s->outgoing_handshakes.erase(*addr);
+        s->outgoing_handshakes.erase(addr);
     }
 
     auto const lock = manager->unique_lock();
@@ -1164,7 +1157,7 @@ size_t tr_peerMgrAddPex(tr_torrent* tor, uint8_t from, tr_pex const* pex, size_t
             !tr_sessionIsAddressBlocked(s->manager->session, &pex->addr) &&
             tr_address_is_valid_for_peers(&pex->addr, pex->port))
         {
-            ensureAtomExists(s, &pex->addr, pex->port, pex->flags, from);
+            ensureAtomExists(s, pex->addr, pex->port, pex->flags, from);
             ++n_used;
         }
     }

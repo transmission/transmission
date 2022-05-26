@@ -255,9 +255,8 @@ public:
 
         if (tr_peerIoSupportsUTP(io))
         {
-            tr_address const* addr = tr_peerIoGetAddress(io, nullptr);
-            tr_peerMgrSetUtpSupported(torrent, addr);
-            tr_peerMgrSetUtpFailed(torrent, addr, false);
+            tr_peerMgrSetUtpSupported(torrent, io->address());
+            tr_peerMgrSetUtpFailed(torrent, io->address(), false);
         }
 
         if (tr_peerIoSupportsLTEP(io))
@@ -270,9 +269,7 @@ public:
         if (tr_dhtEnabled(torrent->session) && tr_peerIoSupportsDHT(io))
         {
             /* Only send PORT over IPv6 when the IPv6 DHT is running (BEP-32). */
-            struct tr_address const* addr = tr_peerIoGetAddress(io, nullptr);
-
-            if (addr->type == TR_AF_INET || tr_globalIPv6(nullptr) != nullptr)
+            if (io->address().type == TR_AF_INET || tr_globalIPv6(nullptr) != nullptr)
             {
                 protocolSendPort(this, tr_dhtPort(torrent->session));
             }
@@ -907,12 +904,11 @@ static void updateFastSet(tr_peerMsgs*)
 
     if (fext && peerIsNeedy && !msgs->haveFastSet)
     {
-        struct tr_address const* addr = tr_peerIoGetAddress(msgs->io, nullptr);
         tr_info const* inf = &msgs->torrent->info;
         size_t const numwant = std::min(MAX_FAST_SET_SIZE, inf->pieceCount);
 
         /* build the fast set */
-        msgs->fastsetSize = tr_generateAllowedSet(msgs->fastset, numwant, inf->pieceCount, inf->hash, addr);
+        msgs->fastsetSize = tr_generateAllowedSet(msgs->fastset, numwant, inf->pieceCount, inf->hash, msgs->io->address());
         msgs->haveFastSet = true;
 
         /* send it to the peer */
@@ -1156,7 +1152,7 @@ static void parseLtepHandshake(tr_peerMsgsImpl* msgs, uint32_t len, struct evbuf
         {
             /* Mysterious µTorrent extension that we don't grok.  However,
                it implies support for µTP, so use it to indicate that. */
-            tr_peerMgrSetUtpFailed(msgs->torrent, tr_peerIoGetAddress(msgs->io, nullptr), false);
+            tr_peerMgrSetUtpFailed(msgs->torrent, msgs->io->address(), false);
         }
     }
 
