@@ -129,7 +129,7 @@ public:
         this->fastExtensionSupported = flag;
     }
 
-    constexpr auto supportsFEXT() const noexcept
+    [[nodiscard]] constexpr auto supportsFEXT() const noexcept
     {
         return this->fastExtensionSupported;
     }
@@ -139,7 +139,7 @@ public:
         this->extendedProtocolSupported = flag;
     }
 
-    constexpr auto supportsLTEP() const noexcept
+    [[nodiscard]] constexpr auto supportsLTEP() const noexcept
     {
         return this->extendedProtocolSupported;
     }
@@ -149,12 +149,12 @@ public:
         this->dhtSupported = flag;
     }
 
-    constexpr auto supportsDHT() const noexcept
+    [[nodiscard]] constexpr auto supportsDHT() const noexcept
     {
         return this->dhtSupported;
     }
 
-    constexpr auto supportsUTP() const noexcept
+    [[nodiscard]] constexpr auto supportsUTP() const noexcept
     {
         return this->utpSupported;
     }
