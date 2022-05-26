@@ -487,7 +487,7 @@ static void utp_on_state_change(void* vio, int state)
     if (state == UTP_STATE_CONNECT)
     {
         tr_logAddTraceIo(io, "utp_on_state_change -- changed to connected");
-        io->utpSupported = true;
+        io->utp_supported_ = true;
     }
     else if (state == UTP_STATE_WRITABLE)
     {
@@ -906,7 +906,7 @@ void tr_peerIoUnrefImpl(char const* file, int line, tr_peerIo* io)
 
 std::string tr_peerIo::addrStr() const
 {
-    return tr_isPeerIo(this) ? this->addr.readable(this->port) : "error";
+    return tr_isPeerIo(this) ? this->addr_.readable(this->port_) : "error";
 }
 
 void tr_peerIoSetIOFuncs(tr_peerIo* io, tr_can_read_cb readcb, tr_did_write_cb writecb, tr_net_error_cb errcb, void* userData)

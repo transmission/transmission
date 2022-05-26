@@ -87,19 +87,19 @@ public:
         , session{ session_in }
         , time_created{ current_time }
         , is_seed{ is_seed_in }
-        , addr{ addr_in }
-        , port{ port_in }
+        , addr_{ addr_in }
+        , port_{ port_in }
     {
     }
 
     [[nodiscard]] constexpr tr_address const& address() const noexcept
     {
-        return addr;
+        return addr_;
     }
 
     [[nodiscard]] constexpr std::pair<tr_address, tr_port> socketAddress() const noexcept
     {
-        return std::make_pair(addr, port);
+        return std::make_pair(addr_, port_);
     }
 
     std::string addrStr() const;
@@ -126,37 +126,37 @@ public:
 
     constexpr void enableFEXT(bool flag) noexcept
     {
-        this->fastExtensionSupported = flag;
+        fast_extension_supported_ = flag;
     }
 
     [[nodiscard]] constexpr auto supportsFEXT() const noexcept
     {
-        return this->fastExtensionSupported;
+        return fast_extension_supported_;
     }
 
     constexpr void enableLTEP(bool flag) noexcept
     {
-        this->extendedProtocolSupported = flag;
+        extended_protocol_supported_ = flag;
     }
 
     [[nodiscard]] constexpr auto supportsLTEP() const noexcept
     {
-        return this->extendedProtocolSupported;
+        return extended_protocol_supported_;
     }
 
     constexpr void enableDHT(bool flag) noexcept
     {
-        this->dhtSupported = flag;
+        dht_supported_ = flag;
     }
 
     [[nodiscard]] constexpr auto supportsDHT() const noexcept
     {
-        return this->dhtSupported;
+        return dht_supported_;
     }
 
     [[nodiscard]] constexpr auto supportsUTP() const noexcept
     {
-        return this->utpSupported;
+        return utp_supported_;
     }
 
     tr_crypto crypto;
@@ -202,15 +202,15 @@ public:
 
     bool const is_seed;
 
-    bool utpSupported = false;
+    bool utp_supported_ = false;
 
 private:
-    tr_address const addr;
-    tr_port const port;
+    tr_address const addr_;
+    tr_port const port_;
 
-    bool dhtSupported = false;
-    bool extendedProtocolSupported = false;
-    bool fastExtensionSupported = false;
+    bool dht_supported_ = false;
+    bool extended_protocol_supported_ = false;
+    bool fast_extension_supported_ = false;
 };
 
 /**
