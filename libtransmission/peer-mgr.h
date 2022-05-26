@@ -56,9 +56,14 @@ enum
 
 struct tr_pex
 {
-    tr_address addr;
-    tr_port port; /* this field is in network byte order */
-    uint8_t flags = 0;
+    tr_pex() = default;
+
+    tr_pex(tr_address addr_in, tr_port port_in, uint8_t flags_in = 0)
+        : addr{ std::move(addr_in) }
+        , port{ port_in }
+        , flags{ flags_in }
+    {
+    }
 
     template<typename OutputIt>
     [[nodiscard]] OutputIt readable(OutputIt out) const
@@ -70,6 +75,30 @@ struct tr_pex
     {
         return addr.readable(port);
     }
+
+    [[nodiscard]] int compare(tr_pex const& that) const noexcept // <=>
+    {
+        if (auto const i = addr.compare(that.addr); i != 0)
+        {
+            return i;
+        }
+
+        if (port != that.port)
+        {
+            return port < that.port ? -1 : 1;
+        }
+
+        return 0;
+    }
+
+    [[nodiscard]] bool operator<(tr_pex const& that) const noexcept
+    {
+        return compare(that) < 0;
+    }
+
+    tr_address addr = {};
+    tr_port port = {}; /* this field is in network byte order */
+    uint8_t flags = 0;
 };
 
 constexpr bool tr_isPex(tr_pex const* pex)
@@ -78,8 +107,6 @@ constexpr bool tr_isPex(tr_pex const* pex)
 }
 
 tr_address const* tr_peerAddress(tr_peer const*);
-
-int tr_pexCompare(void const* a, void const* b);
 
 tr_peerMgr* tr_peerMgrNew(tr_session* session);
 
@@ -115,12 +142,11 @@ enum
     TR_PEERS_INTERESTING
 };
 
-int tr_peerMgrGetPeers(
+std::vector<tr_pex> tr_peerMgrGetPeers(
     tr_torrent const* tor,
-    tr_pex** setme_pex,
     uint8_t address_type,
     uint8_t peer_list_mode,
-    int max_peer_count);
+    size_t max_peer_count);
 
 void tr_peerMgrStartTorrent(tr_torrent* tor);
 

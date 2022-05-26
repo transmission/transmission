@@ -296,8 +296,6 @@ public:
         }
 
         evbuffer_free(this->outMessages);
-        tr_free(this->pex6);
-        tr_free(this->pex);
     }
 
     bool is_transferring_pieces(uint64_t now, tr_direction direction, unsigned int* setme_Bps) const override
@@ -604,8 +602,6 @@ public:
     AwaitingBt state = AwaitingBt::Length;
     uint8_t ut_pex_id = 0;
     uint8_t ut_metadata_id = 0;
-    uint16_t pexCount = 0;
-    uint16_t pexCount6 = 0;
 
     tr_port dht_port;
 
@@ -638,8 +634,8 @@ public:
     int peerAskedForMetadata[MetadataReqQ] = {};
     int peerAskedForMetadataCount = 0;
 
-    tr_pex* pex = nullptr;
-    tr_pex* pex6 = nullptr;
+    std::vector<tr_pex> pex;
+    std::vector<tr_pex> pex6;
 
     time_t clientSentAnythingAt = 0;
 
@@ -2353,329 +2349,186 @@ static void tellPeerWhatWeHave(tr_peerMsgsImpl* msgs)
     }
 }
 
-/**
-***
-**/
-
-/* some peers give us error messages if we send
-   more than this many peers in a single pex message
-   https://wiki.theory.org/BitTorrentPeerExchangeConventions */
-static auto constexpr MaxPexAdded = int{ 50 };
-static auto constexpr MaxPexDropped = int{ 50 };
-
-struct PexDiffs
-{
-    tr_pex* added;
-    tr_pex* dropped;
-    tr_pex* elements;
-    int addedCount;
-    int droppedCount;
-    int elementCount;
-};
-
-static void pexAddedCb(void const* vpex, void* userData)
-{
-    auto* diffs = static_cast<PexDiffs*>(userData);
-    auto const* pex = static_cast<tr_pex const*>(vpex);
-
-    if (diffs->addedCount < MaxPexAdded)
-    {
-        diffs->added[diffs->addedCount++] = *pex;
-        diffs->elements[diffs->elementCount++] = *pex;
-    }
-}
-
-static constexpr void pexDroppedCb(void const* vpex, void* userData)
-{
-    auto* diffs = static_cast<PexDiffs*>(userData);
-    auto const* pex = static_cast<tr_pex const*>(vpex);
-
-    if (diffs->droppedCount < MaxPexDropped)
-    {
-        diffs->dropped[diffs->droppedCount++] = *pex;
-    }
-}
-
-static constexpr void pexElementCb(void const* vpex, void* userData)
-{
-    auto* diffs = static_cast<PexDiffs*>(userData);
-    auto const* pex = static_cast<tr_pex const*>(vpex);
-
-    diffs->elements[diffs->elementCount++] = *pex;
-}
-
-using tr_set_func = void (*)(void const* element, void* userData);
-
-/**
- * @brief find the differences and commonalities in two sorted sets
- * @param a the first set
- * @param aCount the number of elements in the set 'a'
- * @param b the second set
- * @param bCount the number of elements in the set 'b'
- * @param compare the sorting method for both sets
- * @param elementSize the sizeof the element in the two sorted sets
- * @param in_a called for items in set 'a' but not set 'b'
- * @param in_b called for items in set 'b' but not set 'a'
- * @param in_both called for items that are in both sets
- * @param userData user data passed along to in_a, in_b, and in_both
- */
-static void tr_set_compare(
-    void const* va,
-    size_t aCount,
-    void const* vb,
-    size_t bCount,
-    tr_voidptr_compare_func compare,
-    size_t elementSize,
-    tr_set_func in_a_cb,
-    tr_set_func in_b_cb,
-    tr_set_func in_both_cb,
-    void* userData)
-{
-    auto const* a = static_cast<uint8_t const*>(va);
-    auto const* b = static_cast<uint8_t const*>(vb);
-    uint8_t const* aend = a + elementSize * aCount;
-    uint8_t const* bend = b + elementSize * bCount;
-
-    while (a != aend || b != bend)
-    {
-        if (a == aend)
-        {
-            (*in_b_cb)(b, userData);
-            b += elementSize;
-        }
-        else if (b == bend)
-        {
-            (*in_a_cb)(a, userData);
-            a += elementSize;
-        }
-        else
-        {
-            int const val = (*compare)(a, b);
-
-            if (val == 0)
-            {
-                (*in_both_cb)(a, userData);
-                a += elementSize;
-                b += elementSize;
-            }
-            else if (val < 0)
-            {
-                (*in_a_cb)(a, userData);
-                a += elementSize;
-            }
-            else if (val > 0)
-            {
-                (*in_b_cb)(b, userData);
-                b += elementSize;
-            }
-        }
-    }
-}
-
 static void sendPex(tr_peerMsgsImpl* msgs)
 {
-    if (msgs->peerSupportsPex && msgs->torrent->allowsPex())
+    if (!msgs->peerSupportsPex || !msgs->torrent->allowsPex())
     {
-        PexDiffs diffs;
-        PexDiffs diffs6;
-        tr_pex* newPex = nullptr;
-        tr_pex* newPex6 = nullptr;
-        int const newCount = tr_peerMgrGetPeers(msgs->torrent, &newPex, TR_AF_INET, TR_PEERS_CONNECTED, MaxPexPeerCount);
-        int const newCount6 = tr_peerMgrGetPeers(msgs->torrent, &newPex6, TR_AF_INET6, TR_PEERS_CONNECTED, MaxPexPeerCount);
-
-        /* build the diffs */
-        diffs.added = tr_new(tr_pex, newCount);
-        diffs.addedCount = 0;
-        diffs.dropped = tr_new(tr_pex, msgs->pexCount);
-        diffs.droppedCount = 0;
-        diffs.elements = tr_new(tr_pex, newCount + msgs->pexCount);
-        diffs.elementCount = 0;
-        tr_set_compare(
-            msgs->pex,
-            msgs->pexCount,
-            newPex,
-            newCount,
-            tr_pexCompare,
-            sizeof(tr_pex),
-            pexDroppedCb,
-            pexAddedCb,
-            pexElementCb,
-            &diffs);
-        diffs6.added = tr_new(tr_pex, newCount6);
-        diffs6.addedCount = 0;
-        diffs6.dropped = tr_new(tr_pex, msgs->pexCount6);
-        diffs6.droppedCount = 0;
-        diffs6.elements = tr_new(tr_pex, newCount6 + msgs->pexCount6);
-        diffs6.elementCount = 0;
-        tr_set_compare(
-            msgs->pex6,
-            msgs->pexCount6,
-            newPex6,
-            newCount6,
-            tr_pexCompare,
-            sizeof(tr_pex),
-            pexDroppedCb,
-            pexAddedCb,
-            pexElementCb,
-            &diffs6);
-        logtrace(
-            msgs,
-            fmt::format(
-                FMT_STRING("pex: old peer count {:d}+{:d}, new peer count {:d}+{:d}, added {:d}+{:d}, removed {:d}+{:d}"),
-                msgs->pexCount,
-                msgs->pexCount6,
-                newCount,
-                newCount6,
-                diffs.addedCount,
-                diffs6.addedCount,
-                diffs.droppedCount,
-                diffs6.droppedCount));
-
-        if (diffs.addedCount == 0 && diffs.droppedCount == 0 && diffs6.addedCount == 0 && diffs6.droppedCount == 0)
-        {
-            tr_free(diffs.elements);
-            tr_free(diffs6.elements);
-        }
-        else
-        {
-            uint8_t* tmp = nullptr;
-            uint8_t* walk = nullptr;
-            evbuffer* const out = msgs->outMessages;
-
-            /* update peer */
-            tr_free(msgs->pex);
-            msgs->pex = diffs.elements;
-            msgs->pexCount = diffs.elementCount;
-            tr_free(msgs->pex6);
-            msgs->pex6 = diffs6.elements;
-            msgs->pexCount6 = diffs6.elementCount;
-
-            /* build the pex payload */
-            auto val = tr_variant{};
-            tr_variantInitDict(&val, 3); /* ipv6 support: left as 3: speed vs. likelihood? */
-
-            if (diffs.addedCount > 0)
-            {
-                /* "added" */
-                tmp = walk = tr_new(uint8_t, diffs.addedCount * 6);
-
-                for (int i = 0; i < diffs.addedCount; ++i)
-                {
-                    memcpy(walk, &diffs.added[i].addr.addr, 4);
-                    walk += 4;
-                    memcpy(walk, &diffs.added[i].port, 2);
-                    walk += 2;
-                }
-
-                TR_ASSERT(walk - tmp == diffs.addedCount * 6);
-                tr_variantDictAddRaw(&val, TR_KEY_added, tmp, walk - tmp);
-                tr_free(tmp);
-
-                /* "added.f"
-                 * unset each holepunch flag because we don't support it. */
-                tmp = walk = tr_new(uint8_t, diffs.addedCount);
-
-                for (int i = 0; i < diffs.addedCount; ++i)
-                {
-                    *walk++ = diffs.added[i].flags & ~ADDED_F_HOLEPUNCH;
-                }
-
-                TR_ASSERT(walk - tmp == diffs.addedCount);
-                tr_variantDictAddRaw(&val, TR_KEY_added_f, tmp, walk - tmp);
-                tr_free(tmp);
-            }
-
-            if (diffs.droppedCount > 0)
-            {
-                /* "dropped" */
-                tmp = walk = tr_new(uint8_t, diffs.droppedCount * 6);
-
-                for (int i = 0; i < diffs.droppedCount; ++i)
-                {
-                    memcpy(walk, &diffs.dropped[i].addr.addr, 4);
-                    walk += 4;
-                    memcpy(walk, &diffs.dropped[i].port, 2);
-                    walk += 2;
-                }
-
-                TR_ASSERT(walk - tmp == diffs.droppedCount * 6);
-                tr_variantDictAddRaw(&val, TR_KEY_dropped, tmp, walk - tmp);
-                tr_free(tmp);
-            }
-
-            if (diffs6.addedCount > 0)
-            {
-                /* "added6" */
-                tmp = walk = tr_new(uint8_t, diffs6.addedCount * 18);
-
-                for (int i = 0; i < diffs6.addedCount; ++i)
-                {
-                    memcpy(walk, &diffs6.added[i].addr.addr.addr6.s6_addr, 16);
-                    walk += 16;
-                    memcpy(walk, &diffs6.added[i].port, 2);
-                    walk += 2;
-                }
-
-                TR_ASSERT(walk - tmp == diffs6.addedCount * 18);
-                tr_variantDictAddRaw(&val, TR_KEY_added6, tmp, walk - tmp);
-                tr_free(tmp);
-
-                /* "added6.f"
-                 * unset each holepunch flag because we don't support it. */
-                tmp = walk = tr_new(uint8_t, diffs6.addedCount);
-
-                for (int i = 0; i < diffs6.addedCount; ++i)
-                {
-                    *walk++ = diffs6.added[i].flags & ~ADDED_F_HOLEPUNCH;
-                }
-
-                TR_ASSERT(walk - tmp == diffs6.addedCount);
-                tr_variantDictAddRaw(&val, TR_KEY_added6_f, tmp, walk - tmp);
-                tr_free(tmp);
-            }
-
-            if (diffs6.droppedCount > 0)
-            {
-                /* "dropped6" */
-                tmp = walk = tr_new(uint8_t, diffs6.droppedCount * 18);
-
-                for (int i = 0; i < diffs6.droppedCount; ++i)
-                {
-                    memcpy(walk, &diffs6.dropped[i].addr.addr.addr6.s6_addr, 16);
-                    walk += 16;
-                    memcpy(walk, &diffs6.dropped[i].port, 2);
-                    walk += 2;
-                }
-
-                TR_ASSERT(walk - tmp == diffs6.droppedCount * 18);
-                tr_variantDictAddRaw(&val, TR_KEY_dropped6, tmp, walk - tmp);
-                tr_free(tmp);
-            }
-
-            /* write the pex message */
-            auto* const payload = tr_variantToBuf(&val, TR_VARIANT_FMT_BENC);
-            evbuffer_add_uint32(out, 2 * sizeof(uint8_t) + evbuffer_get_length(payload));
-            evbuffer_add_uint8(out, BtPeerMsgs::Ltep);
-            evbuffer_add_uint8(out, msgs->ut_pex_id);
-            evbuffer_add_buffer(out, payload);
-            pokeBatchPeriod(msgs, HighPriorityIntervalSecs);
-            logtrace(
-                msgs,
-                fmt::format(FMT_STRING("sending a pex message; outMessage size is now {:d}"), evbuffer_get_length(out)));
-            dbgOutMessageLen(msgs);
-
-            evbuffer_free(payload);
-            tr_variantFree(&val);
-        }
-
-        /* cleanup */
-        tr_free(diffs.added);
-        tr_free(diffs.dropped);
-        tr_free(newPex);
-        tr_free(diffs6.added);
-        tr_free(diffs6.dropped);
-        tr_free(newPex6);
+        return;
     }
+
+    auto pex = tr_peerMgrGetPeers(msgs->torrent, TR_AF_INET, TR_PEERS_CONNECTED, MaxPexPeerCount);
+    std::sort(std::begin(pex), std::end(pex));
+    auto added = std::vector<tr_pex>{};
+    std::set_difference(std::begin(pex), std::end(pex), std::begin(msgs->pex), std::end(msgs->pex), std::back_inserter(added));
+    auto dropped = std::vector<tr_pex>{};
+    std::set_difference(
+        std::begin(msgs->pex),
+        std::end(msgs->pex),
+        std::begin(pex),
+        std::end(pex),
+        std::back_inserter(dropped));
+
+    auto pex6 = tr_peerMgrGetPeers(msgs->torrent, TR_AF_INET6, TR_PEERS_CONNECTED, MaxPexPeerCount);
+    std::sort(std::begin(pex6), std::end(pex6));
+    auto added6 = std::vector<tr_pex>{};
+    std::set_difference(
+        std::begin(pex6),
+        std::end(pex6),
+        std::begin(msgs->pex6),
+        std::end(msgs->pex6),
+        std::back_inserter(added6));
+    auto dropped6 = std::vector<tr_pex>{};
+    std::set_difference(
+        std::begin(msgs->pex6),
+        std::end(msgs->pex6),
+        std::begin(pex6),
+        std::end(pex6),
+        std::back_inserter(dropped6));
+
+    // Some peers give us error messages if we send
+    // more than this many peers in a single pex message.
+    // https://wiki.theory.org/BitTorrentPeerExchangeConventions
+    static auto constexpr MaxPexAdded = size_t{ 50 };
+    added.resize(std::min(std::size(added), MaxPexAdded));
+    added6.resize(std::min(std::size(added6), MaxPexAdded));
+    static auto constexpr MaxPexDropped = size_t{ 50 };
+    dropped.resize(std::min(std::size(dropped), MaxPexDropped));
+    dropped6.resize(std::min(std::size(dropped6), MaxPexDropped));
+
+    logtrace(
+        msgs,
+        fmt::format(
+            FMT_STRING("pex: old peer count {:d}+{:d}, new peer count {:d}+{:d}, added {:d}+{:d}, dropped {:d}+{:d}"),
+            std::size(msgs->pex),
+            std::size(msgs->pex6),
+            std::size(pex),
+            std::size(pex6),
+            std::size(added),
+            std::size(added6),
+            std::size(dropped),
+            std::size(dropped6)));
+
+    if (std::empty(added) && std::empty(dropped) && std::empty(added6) && std::empty(dropped6))
+    {
+        return;
+    }
+
+    uint8_t* tmp = nullptr;
+    uint8_t* walk = nullptr;
+    evbuffer* const out = msgs->outMessages;
+
+    // update msgs
+    std::swap(msgs->pex, pex);
+    std::swap(msgs->pex6, pex6);
+
+    // build the pex payload
+    auto val = tr_variant{};
+    tr_variantInitDict(&val, 3); /* ipv6 support: left as 3: speed vs. likelihood? */
+
+    if (!std::empty(added))
+    {
+        // "added"
+        tmp = walk = tr_new(uint8_t, std::size(added) * 6U);
+        for (auto const& p : added)
+        {
+            memcpy(walk, &p.addr.addr, 4U);
+            walk += 4U;
+            memcpy(walk, &p.port, 2U);
+            walk += 2U;
+        }
+
+        TR_ASSERT(static_cast<size_t>(walk - tmp) == std::size(added) * 6U);
+        tr_variantDictAddRaw(&val, TR_KEY_added, tmp, walk - tmp);
+        tr_free(tmp);
+
+        // "added.f"
+        // unset each holepunch flag because we don't support it.
+        tmp = walk = tr_new(uint8_t, std::size(added));
+        for (auto const& p : added)
+        {
+            *walk++ = p.flags & ~ADDED_F_HOLEPUNCH;
+        }
+
+        TR_ASSERT(static_cast<size_t>(walk - tmp) == std::size(added));
+        tr_variantDictAddRaw(&val, TR_KEY_added_f, tmp, walk - tmp);
+        tr_free(tmp);
+    }
+
+    if (!std::empty(dropped))
+    {
+        // "dropped"
+        tmp = walk = tr_new(uint8_t, std::size(dropped) * 6U);
+        for (auto const& p : dropped)
+        {
+            memcpy(walk, &p.addr.addr, 4U);
+            walk += 4U;
+            memcpy(walk, &p.port, 2U);
+            walk += 2U;
+        }
+
+        TR_ASSERT(static_cast<size_t>(walk - tmp) == std::size(dropped) * 6U);
+        tr_variantDictAddRaw(&val, TR_KEY_dropped, tmp, walk - tmp);
+        tr_free(tmp);
+    }
+
+    if (!std::empty(added6))
+    {
+        // "added6"
+        tmp = walk = tr_new(uint8_t, std::size(added6) * 18U);
+        for (auto const& p : added6)
+        {
+            memcpy(walk, &p.addr.addr.addr6.s6_addr, 16U);
+            walk += 16U;
+            memcpy(walk, &p.port, 2U);
+            walk += 2U;
+        }
+
+        TR_ASSERT(static_cast<size_t>(walk - tmp) == std::size(added6) * 18U);
+        tr_variantDictAddRaw(&val, TR_KEY_added6, tmp, walk - tmp);
+        tr_free(tmp);
+
+        // "added6.f"
+        // unset each holepunch flag because we don't support it.
+        tmp = walk = tr_new(uint8_t, std::size(added6));
+        for (auto const& p : added6)
+        {
+            *walk++ = p.flags & ~ADDED_F_HOLEPUNCH;
+        }
+
+        TR_ASSERT(static_cast<size_t>(walk - tmp) == std::size(added6));
+        tr_variantDictAddRaw(&val, TR_KEY_added6_f, tmp, walk - tmp);
+        tr_free(tmp);
+    }
+
+    if (!std::empty(dropped6))
+    {
+        // "dropped6"
+        tmp = walk = tr_new(uint8_t, std::size(dropped6) * 18U);
+        for (auto const& p : dropped6)
+        {
+            memcpy(walk, &p.addr.addr.addr6.s6_addr, 16U);
+            walk += 16U;
+            memcpy(walk, &p.port, 2U);
+            walk += 2U;
+        }
+
+        TR_ASSERT(static_cast<size_t>(walk - tmp) == std::size(dropped6) * 18U);
+        tr_variantDictAddRaw(&val, TR_KEY_dropped6, tmp, walk - tmp);
+        tr_free(tmp);
+    }
+
+    /* write the pex message */
+    auto* const payload = tr_variantToBuf(&val, TR_VARIANT_FMT_BENC);
+    evbuffer_add_uint32(out, 2 * sizeof(uint8_t) + evbuffer_get_length(payload));
+    evbuffer_add_uint8(out, BtPeerMsgs::Ltep);
+    evbuffer_add_uint8(out, msgs->ut_pex_id);
+    evbuffer_add_buffer(out, payload);
+    pokeBatchPeriod(msgs, HighPriorityIntervalSecs);
+    logtrace(msgs, fmt::format(FMT_STRING("sending a pex message; outMessage size is now {:d}"), evbuffer_get_length(out)));
+    dbgOutMessageLen(msgs);
+
+    evbuffer_free(payload);
+    tr_variantFree(&val);
 }
 
 static void pexPulse(evutil_socket_t /*fd*/, short /*what*/, void* vmsgs)
