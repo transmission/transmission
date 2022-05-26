@@ -104,6 +104,11 @@ public:
 
     std::string addrStr() const;
 
+    [[nodiscard]] constexpr bool isIncoming() noexcept
+    {
+        return crypto.is_incoming;
+    }
+
     [[nodiscard]] auto getReadBuffer() noexcept
     {
         return inbuf.get();
@@ -254,11 +259,6 @@ std::optional<tr_sha1_digest_t> tr_peerIoGetTorrentHash(tr_peerIo const* io);
 void tr_peerIoSetTorrentHash(tr_peerIo* io, tr_sha1_digest_t const& info_hash);
 
 int tr_peerIoReconnect(tr_peerIo* io);
-
-constexpr bool tr_peerIoIsIncoming(tr_peerIo const* io)
-{
-    return io->crypto.is_incoming;
-}
 
 /**
 ***

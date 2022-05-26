@@ -1008,7 +1008,7 @@ static bool on_handshake_done(tr_handshake_result const& result)
 
     auto const [addr, port] = result.io->socketAddress();
 
-    if (tr_peerIoIsIncoming(result.io))
+    if (result.io->isIncoming())
     {
         manager->incoming_handshakes.erase(addr);
     }
@@ -1050,7 +1050,7 @@ static bool on_handshake_done(tr_handshake_result const& result)
         atom->piece_data_time = 0;
         atom->lastConnectionAt = tr_time();
 
-        if (!tr_peerIoIsIncoming(result.io))
+        if (!result.io->isIncoming())
         {
             atom->flags |= ADDED_F_CONNECTABLE;
             atom->flags2 &= ~MyflagUnreachable;
@@ -1067,7 +1067,7 @@ static bool on_handshake_done(tr_handshake_result const& result)
         {
             tr_logAddTraceSwarm(s, fmt::format("banned peer {} tried to reconnect", tr_atomAddrStr(atom)));
         }
-        else if (tr_peerIoIsIncoming(result.io) && s->peerCount() >= getMaxPeerCount(s->tor))
+        else if (result.io->isIncoming() && s->peerCount() >= getMaxPeerCount(s->tor))
         {
             /* too many peers already */
         }

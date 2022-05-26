@@ -927,7 +927,7 @@ void tr_peerIoClear(tr_peerIo* io)
 int tr_peerIoReconnect(tr_peerIo* io)
 {
     TR_ASSERT(tr_isPeerIo(io));
-    TR_ASSERT(!tr_peerIoIsIncoming(io));
+    TR_ASSERT(!io->isIncoming());
 
     tr_session* session = tr_peerIoGetSession(io);
 

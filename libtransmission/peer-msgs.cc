@@ -349,7 +349,7 @@ public:
 
     [[nodiscard]] bool is_incoming_connection() const override
     {
-        return tr_peerIoIsIncoming(io);
+        return io->isIncoming();
     }
 
     [[nodiscard]] bool is_active(tr_direction direction) const override
@@ -1178,14 +1178,14 @@ static void parseLtepHandshake(tr_peerMsgsImpl* msgs, uint32_t len, struct evbuf
 
     uint8_t const* addr = nullptr;
     auto addr_len = size_t{};
-    if (tr_peerIoIsIncoming(msgs->io) && tr_variantDictFindRaw(&val, TR_KEY_ipv4, &addr, &addr_len) && addr_len == 4)
+    if (msgs->io->isIncoming() && tr_variantDictFindRaw(&val, TR_KEY_ipv4, &addr, &addr_len) && addr_len == 4)
     {
         pex.addr.type = TR_AF_INET;
         memcpy(&pex.addr.addr.addr4, addr, 4);
         tr_peerMgrAddPex(msgs->torrent, TR_PEER_FROM_LTEP, &pex, 1);
     }
 
-    if (tr_peerIoIsIncoming(msgs->io) && tr_variantDictFindRaw(&val, TR_KEY_ipv6, &addr, &addr_len) && addr_len == 16)
+    if (msgs->io->isIncoming() && tr_variantDictFindRaw(&val, TR_KEY_ipv6, &addr, &addr_len) && addr_len == 16)
     {
         pex.addr.type = TR_AF_INET6;
         memcpy(&pex.addr.addr.addr6, addr, 16);

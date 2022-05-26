@@ -108,6 +108,11 @@ enum handshake_state_t
 
 struct tr_handshake
 {
+    [[nodiscard]] auto constexpr isIncoming() const noexcept
+    {
+        return io->isIncoming();
+    }
+
     bool haveReadAnythingFromPeer;
     bool haveSentBitTorrentHandshake;
     tr_peerIo* io;
@@ -595,7 +600,7 @@ static ReadState readHandshake(tr_handshake* handshake, struct evbuffer* inbuf)
     {
         tr_peerIoSetEncryption(handshake->io, PEER_ENCRYPTION_RC4);
 
-        if (tr_peerIoIsIncoming(handshake->io))
+        if (handshake->isIncoming())
         {
             tr_logAddTraceHand(handshake, "I think peer is sending us an encrypted handshake...");
             setState(handshake, AWAITING_YA);
@@ -640,7 +645,7 @@ static ReadState readHandshake(tr_handshake* handshake, struct evbuffer* inbuf)
     auto hash = tr_sha1_digest_t{};
     tr_peerIoReadBytes(handshake->io, inbuf, std::data(hash), std::size(hash));
 
-    if (tr_peerIoIsIncoming(handshake->io))
+    if (handshake->isIncoming())
     {
         if (!handshake->session->torrents().contains(hash))
         {
@@ -694,9 +699,7 @@ static ReadState readPeerId(tr_handshake* handshake, struct evbuffer* inbuf)
 
     char client[128] = {};
     tr_clientForId(client, sizeof(client), peer_id);
-    tr_logAddTraceHand(
-        handshake,
-        fmt::format("peer-id is '{}' ... isIncoming is {}", client, tr_peerIoIsIncoming(handshake->io)));
+    tr_logAddTraceHand(handshake, fmt::format("peer-id is '{}' ... isIncoming is {}", client, handshake->isIncoming()));
 
     // if we've somehow connected to ourselves, don't keep the connection
     auto const hash = tr_peerIoGetTorrentHash(handshake->io);
@@ -1130,7 +1133,7 @@ static void gotError(tr_peerIo* io, short what, void* vhandshake)
     int errcode = errno;
     auto* handshake = static_cast<tr_handshake*>(vhandshake);
 
-    if (io->socket.type == TR_PEER_SOCKET_TYPE_UTP && !tr_peerIoIsIncoming(io) && handshake->state == AWAITING_YB)
+    if (io->socket.type == TR_PEER_SOCKET_TYPE_UTP && !io->isIncoming() && handshake->state == AWAITING_YB)
     {
         /* This peer probably doesn't speak uTP. */
 
@@ -1207,7 +1210,7 @@ tr_handshake* tr_handshakeNew(
     tr_peerIoSetIOFuncs(handshake->io, canRead, nullptr, gotError, handshake);
     tr_peerIoSetEncryption(io, PEER_ENCRYPTION_NONE);
 
-    if (tr_peerIoIsIncoming(handshake->io))
+    if (handshake->isIncoming())
     {
         setReadState(handshake, AWAITING_HANDSHAKE);
     }
