@@ -7,6 +7,7 @@
 #include <cerrno>
 #include <cstring>
 #include <ctime>
+#include <iterator>
 #include <memory> // std::unique_ptr
 #include <optional>
 
@@ -2358,32 +2359,19 @@ static void sendPex(tr_peerMsgsImpl* msgs)
 
     auto pex = tr_peerMgrGetPeers(msgs->torrent, TR_AF_INET, TR_PEERS_CONNECTED, MaxPexPeerCount);
     std::sort(std::begin(pex), std::end(pex));
+    auto& old = msgs->pex;
     auto added = std::vector<tr_pex>{};
-    std::set_difference(std::begin(pex), std::end(pex), std::begin(msgs->pex), std::end(msgs->pex), std::back_inserter(added));
+    std::set_difference(std::begin(pex), std::end(pex), std::begin(old), std::end(old), std::back_inserter(added));
     auto dropped = std::vector<tr_pex>{};
-    std::set_difference(
-        std::begin(msgs->pex),
-        std::end(msgs->pex),
-        std::begin(pex),
-        std::end(pex),
-        std::back_inserter(dropped));
+    std::set_difference(std::begin(old), std::end(old), std::begin(pex), std::end(pex), std::back_inserter(dropped));
 
     auto pex6 = tr_peerMgrGetPeers(msgs->torrent, TR_AF_INET6, TR_PEERS_CONNECTED, MaxPexPeerCount);
     std::sort(std::begin(pex6), std::end(pex6));
+    auto& old6 = msgs->pex6;
     auto added6 = std::vector<tr_pex>{};
-    std::set_difference(
-        std::begin(pex6),
-        std::end(pex6),
-        std::begin(msgs->pex6),
-        std::end(msgs->pex6),
-        std::back_inserter(added6));
+    std::set_difference(std::begin(pex6), std::end(pex6), std::begin(old6), std::end(old6), std::back_inserter(added6));
     auto dropped6 = std::vector<tr_pex>{};
-    std::set_difference(
-        std::begin(msgs->pex6),
-        std::end(msgs->pex6),
-        std::begin(pex6),
-        std::end(pex6),
-        std::back_inserter(dropped6));
+    std::set_difference(std::begin(old6), std::end(old6), std::begin(pex6), std::end(pex6), std::back_inserter(dropped6));
 
     // Some peers give us error messages if we send
     // more than this many peers in a single pex message.
@@ -2418,8 +2406,8 @@ static void sendPex(tr_peerMsgsImpl* msgs)
     evbuffer* const out = msgs->outMessages;
 
     // update msgs
-    std::swap(msgs->pex, pex);
-    std::swap(msgs->pex6, pex6);
+    std::swap(old, pex);
+    std::swap(old6, pex6);
 
     // build the pex payload
     auto val = tr_variant{};

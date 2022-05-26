@@ -9,6 +9,7 @@
 #include <cstdint>
 #include <cstring>
 #include <ctime>
+#include <iterator> // std::back_inserter
 #include <string_view>
 #include <utility> // std::pair
 
