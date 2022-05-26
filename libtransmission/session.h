@@ -59,9 +59,9 @@ struct tr_fdInfo;
 
 struct tr_bindinfo
 {
-    int socket;
-    tr_address addr;
-    struct event* ev;
+    tr_socket_t socket = TR_BAD_SOCKET;
+    tr_address addr = {};
+    struct event* ev = nullptr;
 };
 
 struct tr_turtle_info
@@ -343,8 +343,8 @@ public:
 
     /* The UDP sockets used for the DHT and uTP. */
     tr_port udp_port;
-    tr_socket_t udp_socket;
-    tr_socket_t udp6_socket;
+    tr_socket_t udp_socket = TR_BAD_SOCKET;
+    tr_socket_t udp6_socket = TR_BAD_SOCKET;
     unsigned char* udp6_bound;
     struct event* udp_event;
     struct event* udp6_event;
