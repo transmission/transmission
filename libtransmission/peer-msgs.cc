@@ -10,6 +10,7 @@
 #include <iterator>
 #include <memory> // std::unique_ptr
 #include <optional>
+#include <vector>
 
 #include <event2/buffer.h>
 #include <event2/bufferevent.h>
@@ -632,11 +633,11 @@ public:
 
     std::vector<QueuedPeerRequest> peer_requested_;
 
-    int peerAskedForMetadata[MetadataReqQ] = {};
-    int peerAskedForMetadataCount = 0;
-
     std::vector<tr_pex> pex;
     std::vector<tr_pex> pex6;
+
+    int peerAskedForMetadata[MetadataReqQ] = {};
+    int peerAskedForMetadataCount = 0;
 
     time_t clientSentAnythingAt = 0;
 
