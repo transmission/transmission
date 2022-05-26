@@ -2365,7 +2365,7 @@ static void sendPex(tr_peerMsgsImpl* msgs)
     added.reserve(std::size(pex));
     std::set_difference(std::begin(pex), std::end(pex), std::begin(old), std::end(old), std::back_inserter(added));
     auto dropped = std::vector<tr_pex>{};
-    added.reserve(std::size(old));
+    dropped.reserve(std::size(old));
     std::set_difference(std::begin(old), std::end(old), std::begin(pex), std::end(pex), std::back_inserter(dropped));
 
     auto& old6 = msgs->pex6;
