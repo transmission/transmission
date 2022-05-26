@@ -937,7 +937,7 @@ int tr_peerIoReconnect(tr_peerIo* io)
     io_close_socket(io);
 
     auto const [addr, port] = io->socketAddress();
-    io->socket = tr_netOpenPeerSocket(session, &addr, port, io->is_seed);
+    io->socket = tr_netOpenPeerSocket(session, &addr, port, io->isSeed());
 
     if (io->socket.type != TR_PEER_SOCKET_TYPE_TCP)
     {

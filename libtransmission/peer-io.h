@@ -79,16 +79,16 @@ public:
         tr_session* session_in,
         tr_sha1_digest_t const* torrent_hash,
         bool is_incoming,
-        tr_address const& addr_in,
-        tr_port port_in,
-        bool is_seed_in,
+        tr_address const& addr,
+        tr_port port,
+        bool is_seed,
         time_t current_time)
         : crypto{ torrent_hash, is_incoming }
         , session{ session_in }
         , time_created{ current_time }
-        , is_seed{ is_seed_in }
-        , addr_{ addr_in }
-        , port_{ port_in }
+        , addr_{ addr }
+        , port_{ port }
+        , is_seed_{ is_seed }
     {
     }
 
@@ -159,6 +159,11 @@ public:
         return utp_supported_;
     }
 
+    [[nodiscard]] constexpr auto isSeed() const noexcept
+    {
+        return is_seed_;
+    }
+
     tr_crypto crypto;
 
     // TODO(ckerr): yikes, unlike other class' magic_numbers it looks
@@ -200,13 +205,13 @@ public:
 
     tr_priority_t priority = TR_PRI_NORMAL;
 
-    bool const is_seed;
-
     bool utp_supported_ = false;
 
 private:
     tr_address const addr_;
     tr_port const port_;
+
+    bool const is_seed_;
 
     bool dht_supported_ = false;
     bool extended_protocol_supported_ = false;
