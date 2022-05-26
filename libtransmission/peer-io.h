@@ -84,11 +84,11 @@ public:
         bool is_seed_in,
         time_t current_time)
         : crypto{ torrent_hash, is_incoming }
-        , addr{ addr_in }
         , session{ session_in }
         , time_created{ current_time }
-        , port{ port_in }
         , is_seed{ is_seed_in }
+        , addr{ addr_in }
+        , port{ port_in }
     {
     }
 
@@ -110,8 +110,6 @@ public:
     }
 
     tr_crypto crypto;
-
-    tr_address const addr;
 
     // TODO(ckerr): yikes, unlike other class' magic_numbers it looks
     // like this one isn't being used just for assertions, but also in
@@ -150,8 +148,6 @@ public:
 
     short int pendingEvents = 0;
 
-    tr_port const port;
-
     tr_priority_t priority = TR_PRI_NORMAL;
 
     bool const is_seed;
@@ -159,6 +155,10 @@ public:
     bool extendedProtocolSupported = false;
     bool fastExtensionSupported = false;
     bool utpSupported = false;
+
+private:
+    tr_address const addr;
+    tr_port const port;
 };
 
 /**
@@ -194,7 +194,8 @@ void tr_peerIoUnrefImpl(char const* file, int line, tr_peerIo* io);
 
 constexpr bool tr_isPeerIo(tr_peerIo const* io)
 {
-    return io != nullptr && io->magic_number == PEER_IO_MAGIC_NUMBER && io->refCount >= 0 && tr_address_is_valid(&io->addr);
+    return io != nullptr && io->magic_number == PEER_IO_MAGIC_NUMBER && io->refCount >= 0 &&
+        tr_address_is_valid(&io->address());
 }
 
 /**
