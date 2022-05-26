@@ -1,0 +1,22 @@
+name: Code Style
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+jobs:
+  formatting-check:
+    name: Formatting Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install Dependencies
+        run: |
+          sudo apt-get install clang-format-12 npm yarn
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+      - name: Check
+        working-directory: .
+        run: |
+          ./code_style.sh --check

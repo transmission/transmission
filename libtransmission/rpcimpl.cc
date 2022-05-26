@@ -891,10 +891,10 @@ static char const* torrentGet(tr_session* session, tr_variant* args_in, tr_varia
     }
     else
     {
-        /* make an array of property name quarks */
-        size_t keyCount = 0;
-        size_t const n = tr_variantListSize(fields);
-        auto* const keys = tr_new(tr_quark, n);
+        auto const n = tr_variantListSize(fields);
+        auto keys = std::vector<tr_quark>{};
+        keys.reserve(n);
+
         for (size_t i = 0; i < n; ++i)
         {
             if (!tr_variantGetStrView(tr_variantListChild(fields, i), &sv))
@@ -902,31 +902,26 @@ static char const* torrentGet(tr_session* session, tr_variant* args_in, tr_varia
                 continue;
             }
 
-            auto const key = tr_quark_lookup(sv);
-            if (!key)
+            if (auto const key = tr_quark_lookup(sv); key)
             {
-                continue;
+                keys.emplace_back(*key);
             }
-
-            keys[keyCount++] = *key;
         }
 
         if (format == TrFormat::Table)
         {
             /* first entry is an array of property names */
-            tr_variant* names = tr_variantListAddList(list, keyCount);
-            for (size_t i = 0; i < keyCount; ++i)
+            tr_variant* names = tr_variantListAddList(list, std::size(keys));
+            for (auto const& key : keys)
             {
-                tr_variantListAddQuark(names, keys[i]);
+                tr_variantListAddQuark(names, key);
             }
         }
 
         for (auto* tor : torrents)
         {
-            addTorrentInfo(tor, format, tr_variantListAdd(list), keys, keyCount);
+            addTorrentInfo(tor, format, tr_variantListAdd(list), std::data(keys), std::size(keys));
         }
-
-        tr_free(keys);
     }
 
     return errmsg;
