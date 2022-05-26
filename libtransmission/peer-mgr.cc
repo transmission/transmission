@@ -1330,10 +1330,7 @@ std::vector<tr_pex> tr_peerMgrGetPeers(tr_torrent const* tor, uint8_t af, uint8_
         }
     }
 
-    if (!std::empty(atoms))
-    {
-        std::sort(std::begin(atoms), std::end(atoms), CompareAtomsByUsefulness{});
-    }
+    std::sort(std::begin(atoms), std::end(atoms), CompareAtomsByUsefulness{});
 
     /**
     ***  add the first N of them into our return list
@@ -1354,11 +1351,7 @@ std::vector<tr_pex> tr_peerMgrGetPeers(tr_torrent const* tor, uint8_t af, uint8_
         }
     }
 
-    if (!std::empty(pex))
-    {
-        std::sort(std::begin(pex), std::end(pex));
-    }
-
+    std::sort(std::begin(pex), std::end(pex));
     return pex;
 }
 

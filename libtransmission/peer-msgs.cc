@@ -2353,25 +2353,28 @@ static void tellPeerWhatWeHave(tr_peerMsgsImpl* msgs)
 
 static void sendPex(tr_peerMsgsImpl* msgs)
 {
+    // only send pex if both the torrent and peer support it
     if (!msgs->peerSupportsPex || !msgs->torrent->allowsPex())
     {
         return;
     }
 
-    auto pex = tr_peerMgrGetPeers(msgs->torrent, TR_AF_INET, TR_PEERS_CONNECTED, MaxPexPeerCount);
-    std::sort(std::begin(pex), std::end(pex));
     auto& old = msgs->pex;
+    auto pex = tr_peerMgrGetPeers(msgs->torrent, TR_AF_INET, TR_PEERS_CONNECTED, MaxPexPeerCount);
     auto added = std::vector<tr_pex>{};
+    added.reserve(std::size(pex));
     std::set_difference(std::begin(pex), std::end(pex), std::begin(old), std::end(old), std::back_inserter(added));
     auto dropped = std::vector<tr_pex>{};
+    added.reserve(std::size(old));
     std::set_difference(std::begin(old), std::end(old), std::begin(pex), std::end(pex), std::back_inserter(dropped));
 
-    auto pex6 = tr_peerMgrGetPeers(msgs->torrent, TR_AF_INET6, TR_PEERS_CONNECTED, MaxPexPeerCount);
-    std::sort(std::begin(pex6), std::end(pex6));
     auto& old6 = msgs->pex6;
+    auto pex6 = tr_peerMgrGetPeers(msgs->torrent, TR_AF_INET6, TR_PEERS_CONNECTED, MaxPexPeerCount);
     auto added6 = std::vector<tr_pex>{};
+    added6.reserve(std::size(pex6));
     std::set_difference(std::begin(pex6), std::end(pex6), std::begin(old6), std::end(old6), std::back_inserter(added6));
     auto dropped6 = std::vector<tr_pex>{};
+    dropped6.reserve(std::size(old6));
     std::set_difference(std::begin(old6), std::end(old6), std::begin(pex6), std::end(pex6), std::back_inserter(dropped6));
 
     // Some peers give us error messages if we send
@@ -2388,8 +2391,8 @@ static void sendPex(tr_peerMsgsImpl* msgs)
         msgs,
         fmt::format(
             FMT_STRING("pex: old peer count {:d}+{:d}, new peer count {:d}+{:d}, added {:d}+{:d}, dropped {:d}+{:d}"),
-            std::size(msgs->pex),
-            std::size(msgs->pex6),
+            std::size(old),
+            std::size(old6),
             std::size(pex),
             std::size(pex6),
             std::size(added),
@@ -2397,6 +2400,7 @@ static void sendPex(tr_peerMsgsImpl* msgs)
             std::size(dropped),
             std::size(dropped6)));
 
+    // if there's nothing to send, then we're done
     if (std::empty(added) && std::empty(dropped) && std::empty(added6) && std::empty(dropped6))
     {
         return;
