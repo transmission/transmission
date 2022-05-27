@@ -110,6 +110,11 @@ static auto constexpr CancelHistorySec = int{ 60 };
  */
 struct peer_atom
 {
+    [[nodiscard]] constexpr auto isSeed() const noexcept
+    {
+        return (flags & ADDED_F_SEED_FLAG) != 0;
+    }
+
     [[nodiscard]] auto readable() const
     {
         return addr.readable(port);
@@ -486,11 +491,6 @@ void tr_peerMgrOnBlocklistChanged(tr_peerMgr* mgr)
 ****
 ***/
 
-static constexpr bool atomIsSeed(struct peer_atom const* atom)
-{
-    return (atom != nullptr) && ((atom->flags & ADDED_F_SEED_FLAG) != 0);
-}
-
 static void atomSetSeed(tr_swarm* s, struct peer_atom* atom)
 {
     tr_logAddTraceSwarm(s, fmt::format("marking peer {} as a seed", atom->readable()));
@@ -502,7 +502,7 @@ bool tr_peerMgrPeerIsSeed(tr_torrent const* tor, tr_address const& addr)
 {
     if (auto const* atom = getExistingAtom(tor->swarm, addr); atom != nullptr)
     {
-        return atomIsSeed(atom);
+        return atom->isSeed();
     }
 
     return false;
@@ -1274,7 +1274,7 @@ struct CompareAtomsByUsefulness
 
 static bool isAtomInteresting(tr_torrent const* tor, struct peer_atom* atom)
 {
-    if (tor->isDone() && atomIsSeed(atom))
+    if (tor->isDone() && atom->isSeed())
     {
         return false;
     }
@@ -1563,7 +1563,7 @@ void tr_swarmIncrementActivePeers(tr_swarm* swarm, tr_direction direction, bool 
 
 bool tr_peerIsSeed(tr_peer const* peer)
 {
-    return (peer != nullptr) && ((peer->progress >= 1.0) || atomIsSeed(peer->atom));
+    return (peer != nullptr) && ((peer->progress >= 1.0) || peer->atom->isSeed());
 }
 
 /* count how many bytes we want that connected peers have */
@@ -1592,7 +1592,7 @@ uint64_t tr_peerMgrGetDesiredAvailable(tr_torrent const* tor)
 
     for (auto const* const peer : s->peers)
     {
-        if (peer->atom != nullptr && atomIsSeed(peer->atom))
+        if (peer->atom != nullptr && peer->atom->isSeed())
         {
             return tor->leftUntilDone();
         }
@@ -2746,7 +2746,7 @@ static void atomPulse(evutil_socket_t /*fd*/, short /*what*/, void* vmgr)
 static bool isPeerCandidate(tr_torrent const* tor, struct peer_atom* atom, time_t const now)
 {
     /* not if we're both seeds */
-    if (tor->isDone() && atomIsSeed(atom))
+    if (tor->isDone() && atom->isSeed())
     {
         return false;
     }
@@ -2863,7 +2863,7 @@ static bool calculateAllSeeds(tr_swarm* swarm)
 
     for (int i = 0; i < nAtoms; ++i)
     {
-        if (!atomIsSeed(atoms[i]))
+        if (!atoms[i]->isSeed())
         {
             return false;
         }
