@@ -110,6 +110,16 @@ static auto constexpr CancelHistorySec = int{ 60 };
  */
 struct peer_atom
 {
+    peer_atom(tr_address addr_in, tr_port port_in, uint8_t flags_in, uint8_t from)
+        : addr{ addr_in }
+        , port{ port_in }
+        , fromFirst{ from }
+        , fromBest{ from }
+        , flags{ flags_in }
+        , shelf_date_{ tr_time() + getDefaultShelfLife(from) + tr_rand_int_weak(60 * 10) }
+    {
+    }
+
 #ifdef TR_ENABLE_ASSERTS
     [[nodiscard]] bool isValid() const noexcept
     {
@@ -137,38 +147,75 @@ struct peer_atom
         return *blocklisted_;
     }
 
+    [[nodiscard]] constexpr auto shelfDate() const noexcept
+    {
+        return shelf_date_;
+    }
+
     void setBlocklistedDirty()
     {
         blocklisted_.reset();
     }
 
-    tr_address addr;
+    tr_address const addr;
 
-    tr_port port;
+    tr_port port = {};
 
-    uint16_t num_fails;
+    uint16_t num_fails = {};
 
-    time_t time; /* when the peer's connection status last changed */
-    time_t piece_data_time;
+    time_t time = {}; /* when the peer's connection status last changed */
+    time_t piece_data_time = {};
 
-    time_t lastConnectionAttemptAt;
-    time_t lastConnectionAt;
-
-    /* similar to a TTL field, but less rigid --
-     * if the swarm is small, the atom will be kept past this date. */
-    time_t shelf_date;
+    time_t lastConnectionAttemptAt = {};
+    time_t lastConnectionAt = {};
 
     tr_peer* peer; /* will be nullptr if not connected */
 
-    uint8_t fromFirst; /* where the peer was first found */
-    uint8_t fromBest; /* the "best" value of where the peer has been found */
-    uint8_t flags; /* these match the added_f flags */
-    uint8_t flags2; /* flags that aren't defined in added_f */
+    uint8_t fromFirst = {}; /* where the peer was first found */
+    uint8_t fromBest = {}; /* the "best" value of where the peer has been found */
+    uint8_t flags = {}; /* these match the added_f flags */
+    uint8_t flags2 = {}; /* flags that aren't defined in added_f */
 
-    bool utp_failed; /* We recently failed to connect over uTP */
+    bool utp_failed = false; /* We recently failed to connect over uTP */
 
 private:
+    /* similar to a TTL field, but less rigid --
+     * if the swarm is small, the atom will be kept past this date. */
+    time_t const shelf_date_;
+
     mutable std::optional<bool> blocklisted_;
+
+    static int getDefaultShelfLife(uint8_t from)
+    {
+        /* in general, peers obtained from firsthand contact
+         * are better than those from secondhand, etc etc */
+        switch (from)
+        {
+        case TR_PEER_FROM_INCOMING:
+            return 60 * 60 * 6;
+
+        case TR_PEER_FROM_LTEP:
+            return 60 * 60 * 6;
+
+        case TR_PEER_FROM_TRACKER:
+            return 60 * 60 * 3;
+
+        case TR_PEER_FROM_DHT:
+            return 60 * 60 * 3;
+
+        case TR_PEER_FROM_PEX:
+            return 60 * 60 * 2;
+
+        case TR_PEER_FROM_RESUME:
+            return 60 * 60;
+
+        case TR_PEER_FROM_LPD:
+            return 10 * 60;
+
+        default:
+            return 60 * 60;
+        }
+    }
 };
 
 // a container for keeping track of tr_handshakes
@@ -892,38 +939,6 @@ static void peerCallbackFunc(tr_peer* peer, tr_peer_event const* e, void* vs)
     }
 }
 
-static int getDefaultShelfLife(uint8_t from)
-{
-    /* in general, peers obtained from firsthand contact
-     * are better than those from secondhand, etc etc */
-    switch (from)
-    {
-    case TR_PEER_FROM_INCOMING:
-        return 60 * 60 * 6;
-
-    case TR_PEER_FROM_LTEP:
-        return 60 * 60 * 6;
-
-    case TR_PEER_FROM_TRACKER:
-        return 60 * 60 * 3;
-
-    case TR_PEER_FROM_DHT:
-        return 60 * 60 * 3;
-
-    case TR_PEER_FROM_PEX:
-        return 60 * 60 * 2;
-
-    case TR_PEER_FROM_RESUME:
-        return 60 * 60;
-
-    case TR_PEER_FROM_LPD:
-        return 10 * 60;
-
-    default:
-        return 60 * 60;
-    }
-}
-
 static struct peer_atom* ensureAtomExists(
     tr_swarm* s,
     tr_address const& addr,
@@ -938,16 +953,8 @@ static struct peer_atom* ensureAtomExists(
 
     if (a == nullptr)
     {
-        int const jitter = tr_rand_int_weak(60 * 10);
-        a = new peer_atom();
-        a->addr = addr;
-        a->port = port;
-        a->flags = flags;
-        a->fromFirst = from;
-        a->fromBest = from;
-        a->shelf_date = tr_time() + getDefaultShelfLife(from) + jitter;
+        a = new peer_atom{ addr, port, flags, from };
         tr_ptrArrayInsertSorted(&s->pool, a, compareAtomsByAddress);
-
         tr_logAddTraceSwarm(s, fmt::format("got a new atom: {}", a->readable()));
     }
     else
@@ -2637,9 +2644,9 @@ static int compareAtomPtrsByShelfDate(void const* va, void const* vb)
     }
 
     /* secondary key: shelf date. */
-    if (a->shelf_date != b->shelf_date)
+    if (a->shelfDate() != b->shelfDate())
     {
-        return a->shelf_date > b->shelf_date ? -1 : 1;
+        return a->shelfDate() > b->shelfDate() ? -1 : 1;
     }
 
     return 0;
