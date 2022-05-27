@@ -13,11 +13,6 @@
 
 static auto constexpr Floor = int{ 32 };
 
-static inline void tr_ptrArrayRemove(tr_ptrArray* t, int pos)
-{
-    tr_ptrArrayErase(t, pos, pos + 1);
-}
-
 static void tr_ptrArrayForeach(tr_ptrArray* t, PtrArrayForeachFunc func)
 {
     TR_ASSERT(t != nullptr);
