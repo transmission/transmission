@@ -11,6 +11,7 @@
 #include <optional>
 #include <string_view>
 #include <thread>
+#include <vector>
 
 #include <event2/util.h> /* evutil_ascii_strcasecmp() */
 
