@@ -2568,17 +2568,6 @@ static void bandwidthPulse(evutil_socket_t /*fd*/, short /*what*/, void* vmgr)
 ****
 ***/
 
-static int compareAtomPtrsByAddress(void const* va, void const* vb)
-{
-    struct peer_atom const* a = *(struct peer_atom const* const*)va;
-    struct peer_atom const* b = *(struct peer_atom const* const*)vb;
-
-    TR_ASSERT(a->isValid());
-    TR_ASSERT(b->isValid());
-
-    return tr_address_compare(&a->addr, &b->addr);
-}
-
 static auto getMaxAtomCount(tr_torrent const* tor)
 {
     static auto constexpr Limit = uint16_t{ 50 };
@@ -2589,7 +2578,7 @@ static auto getMaxAtomCount(tr_torrent const* tor)
 
 struct CompareByShelfDate
 {
-    [[nodiscard]] int compare(peer_atom const& a, peer_atom const& b) const noexcept
+    [[nodiscard]] static int compare(peer_atom const& a, peer_atom const& b) noexcept
     {
         auto constexpr data_time_cutoff_secs = int{ 60 * 60 };
         auto const tr_now = tr_time();
@@ -2623,7 +2612,7 @@ struct CompareByShelfDate
         return 0;
     }
 
-    [[nodiscard]] int compare(std::unique_ptr<peer_atom> const& a, std::unique_ptr<peer_atom> const& b) const noexcept
+    [[nodiscard]] static int compare(std::unique_ptr<peer_atom> const& a, std::unique_ptr<peer_atom> const& b) noexcept
     {
         return compare(*a, *b);
     }
