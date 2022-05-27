@@ -11,6 +11,7 @@
 #include <cstdlib> /* qsort */
 #include <ctime> // time_t
 #include <iterator> // std::back_inserter
+#include <memory>
 #include <numeric> // std::accumulate
 #include <tuple> // std::tie
 #include <utility>
@@ -38,7 +39,6 @@
 #include "peer-mgr-wishlist.h"
 #include "peer-mgr.h"
 #include "peer-msgs.h"
-#include "ptrarray.h"
 #include "session.h"
 #include "stats.h" /* tr_statsAddUploaded, tr_statsAddDownloaded */
 #include "torrent.h"
@@ -365,8 +365,7 @@ public:
 
     std::vector<std::unique_ptr<tr_peer>> webseeds;
     std::vector<tr_peerMsgs*> peers;
-
-    tr_ptrArray pool = {}; /* struct peer_atom */
+    std::vector<std::unique_ptr<peer_atom>> pool;
 
     tr_torrent* const tor;
 
@@ -437,27 +436,6 @@ tr_peer::~tr_peer()
 ***
 **/
 
-static int comparePeerAtomToAddress(void const* va, void const* vb)
-{
-    auto const* const a = static_cast<struct peer_atom const*>(va);
-    auto const* const b = static_cast<tr_address const*>(vb);
-
-    return tr_address_compare(&a->addr, b);
-}
-
-static int compareAtomsByAddress(void const* va, void const* vb)
-{
-    auto const* const b = static_cast<struct peer_atom const*>(vb);
-
-    TR_ASSERT(b->isValid());
-
-    return comparePeerAtomToAddress(va, &b->addr);
-}
-
-/**
-***
-**/
-
 tr_address const* tr_peerAddress(tr_peer const* peer)
 {
     return &peer->atom->addr;
@@ -473,7 +451,12 @@ static tr_swarm* getExistingSwarm(tr_peerMgr* manager, tr_sha1_digest_t const& h
 static struct peer_atom* getExistingAtom(tr_swarm const* cswarm, tr_address const& addr)
 {
     auto* swarm = const_cast<tr_swarm*>(cswarm);
-    return static_cast<struct peer_atom*>(tr_ptrArrayFindSorted(&swarm->pool, &addr, comparePeerAtomToAddress));
+    auto const test = [&addr](auto const& atom)
+    {
+        return atom->addr == addr;
+    };
+    auto const it = std::find_if(std::begin(swarm->pool), std::end(swarm->pool), test);
+    return it != std::end(swarm->pool) ? it->get() : nullptr;
 }
 
 static bool peerIsInUse(tr_swarm const* cs, struct peer_atom const* atom)
@@ -494,11 +477,6 @@ static void swarmFree(tr_swarm* s)
     TR_ASSERT(std::empty(s->outgoing_handshakes));
     TR_ASSERT(s->peerCount() == 0);
 
-    static auto constexpr deleter = [](void* atom)
-    {
-        delete static_cast<peer_atom*>(atom);
-    };
-    tr_ptrArrayDestruct(&s->pool, (PtrArrayForeachFunc)deleter);
     s->stats = {};
 
     delete s;
@@ -577,11 +555,8 @@ void tr_peerMgrOnBlocklistChanged(tr_peerMgr* mgr)
        since the blocklist has changed, erase that cached value */
     for (auto* const tor : mgr->session->torrents())
     {
-        tr_swarm* s = tor->swarm;
-
-        for (int i = 0, n = tr_ptrArraySize(&s->pool); i < n; ++i)
+        for (auto& atom : tor->swarm->pool)
         {
-            auto* const atom = static_cast<struct peer_atom*>(tr_ptrArrayNth(&s->pool, i));
             atom->setBlocklistedDirty();
         }
     }
@@ -591,10 +566,10 @@ void tr_peerMgrOnBlocklistChanged(tr_peerMgr* mgr)
 ****
 ***/
 
-static void atomSetSeed(tr_swarm* s, struct peer_atom* atom)
+static void atomSetSeed(tr_swarm* s, peer_atom& atom)
 {
-    tr_logAddTraceSwarm(s, fmt::format("marking peer {} as a seed", atom->readable()));
-    atom->flags |= ADDED_F_SEED_FLAG;
+    tr_logAddTraceSwarm(s, fmt::format("marking peer {} as a seed", atom.readable()));
+    atom.flags |= ADDED_F_SEED_FLAG;
     s->pool_is_all_seeds_dirty = true;
 }
 
@@ -1013,9 +988,10 @@ static struct peer_atom* ensureAtomExists(
 
     if (a == nullptr)
     {
-        a = new peer_atom{ addr, port, flags, from };
-        tr_ptrArrayInsertSorted(&s->pool, a, compareAtomsByAddress);
-        tr_logAddTraceSwarm(s, fmt::format("got a new atom: {}", a->readable()));
+        auto atom = std::make_unique<peer_atom>(addr, port, flags, from);
+        a = atom.get();
+        auto const it = std::lower_bound(std::begin(s->pool), std::end(s->pool), atom);
+        s->pool.insert(it, std::move(atom));
     }
     else
     {
@@ -1196,11 +1172,10 @@ void tr_peerMgrSetSwarmIsAllSeeds(tr_torrent* tor)
     auto const lock = tor->unique_lock();
 
     auto* const swarm = tor->swarm;
-    auto atomCount = int{};
-    auto** atoms = (struct peer_atom**)tr_ptrArrayPeek(&swarm->pool, &atomCount);
-    for (int i = 0; i < atomCount; ++i)
+
+    for (auto& atom : swarm->pool)
     {
-        atomSetSeed(swarm, atoms[i]);
+        atomSetSeed(swarm, *atom);
     }
 
     swarm->pool_is_all_seeds = true;
@@ -1328,24 +1303,24 @@ struct CompareAtomsByUsefulness
     }
 };
 
-static bool isAtomInteresting(tr_torrent const* tor, struct peer_atom* atom)
+static bool isAtomInteresting(tr_torrent const* tor, peer_atom const& atom)
 {
-    if (tor->isDone() && atom->isSeed())
+    if (tor->isDone() && atom.isSeed())
     {
         return false;
     }
 
-    if (peerIsInUse(tor->swarm, atom))
+    if (peerIsInUse(tor->swarm, &atom))
     {
         return true;
     }
 
-    if (atom->isBlocklisted(tor->session))
+    if (atom.isBlocklisted(tor->session))
     {
         return false;
     }
 
-    if ((atom->flags2 & MyflagBanned) != 0)
+    if ((atom.flags2 & MyflagBanned) != 0)
     {
         return false;
     }
@@ -1380,14 +1355,11 @@ std::vector<tr_pex> tr_peerMgrGetPeers(tr_torrent const* tor, uint8_t af, uint8_
     }
     else /* TR_PEERS_INTERESTING */
     {
-        auto** atomBase = (struct peer_atom**)tr_ptrArrayBase(&s->pool);
-        size_t const n = tr_ptrArraySize(&s->pool);
-        atoms.reserve(n);
-        for (size_t i = 0; i < n; ++i)
+        for (auto const& atom : s->pool)
         {
-            if (isAtomInteresting(tor, atomBase[i]))
+            if (isAtomInteresting(tor, *atom))
             {
-                atoms.push_back(atomBase[i]);
+                atoms.push_back(atom.get());
             }
         }
     }
@@ -1533,7 +1505,7 @@ void tr_peerUpdateProgress(tr_torrent* tor, tr_peer* peer)
 
     if (peer->atom != nullptr && peer->progress >= 1.0F)
     {
-        atomSetSeed(tor->swarm, peer->atom);
+        atomSetSeed(tor->swarm, *peer->atom);
     }
 }
 
@@ -2596,58 +2568,6 @@ static void bandwidthPulse(evutil_socket_t /*fd*/, short /*what*/, void* vmgr)
 ****
 ***/
 
-static int compareAtomPtrsByAddress(void const* va, void const* vb)
-{
-    struct peer_atom const* a = *(struct peer_atom const* const*)va;
-    struct peer_atom const* b = *(struct peer_atom const* const*)vb;
-
-    TR_ASSERT(a->isValid());
-    TR_ASSERT(b->isValid());
-
-    return tr_address_compare(&a->addr, &b->addr);
-}
-
-/* best come first, worst go last */
-static int compareAtomPtrsByShelfDate(void const* va, void const* vb)
-{
-    struct peer_atom const* a = *(struct peer_atom const* const*)va;
-    struct peer_atom const* b = *(struct peer_atom const* const*)vb;
-
-    TR_ASSERT(a->isValid());
-    TR_ASSERT(b->isValid());
-
-    int const data_time_cutoff_secs = 60 * 60;
-    time_t const tr_now = tr_time();
-
-    /* primary key: the last piece data time *if* it was within the last hour */
-    time_t atime = a->piece_data_time;
-
-    if (atime + data_time_cutoff_secs < tr_now)
-    {
-        atime = 0;
-    }
-
-    time_t btime = b->piece_data_time;
-
-    if (btime + data_time_cutoff_secs < tr_now)
-    {
-        btime = 0;
-    }
-
-    if (atime != btime)
-    {
-        return atime > btime ? -1 : 1;
-    }
-
-    /* secondary key: shelf date. */
-    if (a->shelfDate() != b->shelfDate())
-    {
-        return a->shelfDate() > b->shelfDate() ? -1 : 1;
-    }
-
-    return 0;
-}
-
 static auto getMaxAtomCount(tr_torrent const* tor)
 {
     static auto constexpr Limit = uint16_t{ 50 };
@@ -2655,6 +2575,53 @@ static auto getMaxAtomCount(tr_torrent const* tor)
 
     return std::min(Limit, static_cast<uint16_t>(tor->max_connected_peers * Multiplier));
 }
+
+struct CompareByShelfDate
+{
+    [[nodiscard]] static int compare(peer_atom const& a, peer_atom const& b) noexcept
+    {
+        auto constexpr data_time_cutoff_secs = int{ 60 * 60 };
+        auto const tr_now = tr_time();
+
+        // primary key: the last piece data time *if* it was within the last hour */
+        time_t atime = a.piece_data_time;
+
+        if (atime + data_time_cutoff_secs < tr_now)
+        {
+            atime = 0;
+        }
+
+        time_t btime = b.piece_data_time;
+
+        if (btime + data_time_cutoff_secs < tr_now)
+        {
+            btime = 0;
+        }
+
+        if (atime != btime)
+        {
+            return atime > btime ? -1 : 1;
+        }
+
+        // secondary key: shelf date
+        if (a.shelfDate() != b.shelfDate())
+        {
+            return a.shelfDate() > b.shelfDate() ? -1 : 1;
+        }
+
+        return 0;
+    }
+
+    [[nodiscard]] static int compare(std::unique_ptr<peer_atom> const& a, std::unique_ptr<peer_atom> const& b) noexcept
+    {
+        return compare(*a, *b);
+    }
+
+    [[nodiscard]] bool operator()(std::unique_ptr<peer_atom> const& a, std::unique_ptr<peer_atom> const& b) const noexcept
+    {
+        return compare(*a, *b) < 0;
+    }
+};
 
 static void atomPulse(evutil_socket_t /*fd*/, short /*what*/, void* vmgr)
 {
@@ -2664,69 +2631,45 @@ static void atomPulse(evutil_socket_t /*fd*/, short /*what*/, void* vmgr)
     for (auto* const tor : mgr->session->torrents())
     {
         tr_swarm* s = tor->swarm;
-        int const maxAtomCount = getMaxAtomCount(tor);
-        auto atomCount = int{};
-        auto** const atoms = (peer_atom**)tr_ptrArrayPeek(&s->pool, &atomCount);
+        auto const maxAtomCount = getMaxAtomCount(tor);
+        auto const atomCount = std::size(s->pool);
 
-        if (atomCount > maxAtomCount) /* we've got too many atoms... time to prune */
+        if (atomCount <= maxAtomCount)
         {
-            int keepCount = 0;
-            int testCount = 0;
-            auto** keep = tr_new(struct peer_atom*, atomCount);
-            auto** test = tr_new(struct peer_atom*, atomCount);
-
-            /* keep the ones that are in use */
-            for (int i = 0; i < atomCount; ++i)
-            {
-                struct peer_atom* atom = atoms[i];
-
-                if (peerIsInUse(s, atom))
-                {
-                    keep[keepCount++] = atom;
-                }
-                else
-                {
-                    test[testCount++] = atom;
-                }
-            }
-
-            /* if there's room, keep the best of what's left */
-            int i = 0;
-
-            if (keepCount < maxAtomCount)
-            {
-                qsort(test, testCount, sizeof(struct peer_atom*), compareAtomPtrsByShelfDate);
-
-                while (i < testCount && keepCount < maxAtomCount)
-                {
-                    keep[keepCount++] = test[i++];
-                }
-            }
-
-            /* free the culled atoms */
-            while (i < testCount)
-            {
-                tr_free(test[i++]);
-            }
-
-            /* rebuild Torrent.pool with what's left */
-            tr_ptrArrayDestruct(&s->pool, nullptr);
-            s->pool = {};
-            qsort(keep, keepCount, sizeof(struct peer_atom*), compareAtomPtrsByAddress);
-
-            for (i = 0; i < keepCount; ++i)
-            {
-                tr_ptrArrayAppend(&s->pool, keep[i]);
-            }
-
-            tr_logAddTraceSwarm(
-                s,
-                fmt::format("max atom count is {}... pruned from {} to {}", maxAtomCount, atomCount, keepCount));
-
-            /* cleanup */
-            tr_free(test);
-            tr_free(keep);
+            continue;
         }
+
+        // we've got too many atoms... time to prune
+
+        // keep the ones that are in use
+        auto keep = decltype(s->pool){};
+        auto test = decltype(s->pool){};
+        for (auto& atom : s->pool)
+        {
+            if (peerIsInUse(s, atom.get()))
+            {
+                keep.emplace_back(std::move(atom));
+            }
+            else
+            {
+                test.emplace_back(std::move(atom));
+            }
+        }
+
+        // if there's room, keep the best of what's left
+        if (std::size(keep) < maxAtomCount)
+        {
+            auto const n_left = maxAtomCount - std::size(keep);
+            auto const n_keep = std::min(std::size(test), n_left);
+            std::partial_sort(std::begin(test), std::begin(test) + n_keep, std::end(test));
+            std::move(std::begin(test), std::end(test) + n_keep, std::back_inserter(keep));
+        }
+
+        std::sort(std::begin(keep), std::end(keep));
+        std::swap(s->pool, keep);
+        tr_logAddTraceSwarm(
+            s,
+            fmt::format("max atom count is {}... pruned from {} to {}", maxAtomCount, atomCount, std::size(s->pool)));
     }
 
     tr_timerAddMsec(*mgr->atomTimer, AtomPeriodMsec);
@@ -2854,18 +2797,11 @@ static uint64_t getPeerCandidateScore(tr_torrent const* tor, struct peer_atom co
 
 static bool calculateAllSeeds(tr_swarm* swarm)
 {
-    int nAtoms = 0;
-    auto** atoms = (struct peer_atom**)tr_ptrArrayPeek(&swarm->pool, &nAtoms);
-
-    for (int i = 0; i < nAtoms; ++i)
+    static auto constexpr test = [](auto const& atom)
     {
-        if (!atoms[i]->isSeed())
-        {
-            return false;
-        }
-    }
-
-    return true;
+        return atom->isSeed();
+    };
+    return std::all_of(std::begin(swarm->pool), std::end(swarm->pool), test);
 }
 
 static bool swarmIsAllSeeds(tr_swarm* swarm)
@@ -2882,28 +2818,29 @@ static bool swarmIsAllSeeds(tr_swarm* swarm)
 /** @return an array of all the atoms we might want to connect to */
 static std::vector<peer_candidate> getPeerCandidates(tr_session* session, size_t max)
 {
-    time_t const now = tr_time();
-    uint64_t const now_msec = tr_time_msec();
-    /* leave 5% of connection slots for incoming connections -- ticket #2609 */
-    size_t const maxCandidates = tr_sessionGetPeerLimit(session) * 0.95;
+    auto const now = tr_time();
+    auto const now_msec = tr_time_msec();
+
+    // leave 5% of connection slots for incoming connections -- ticket #2609
+    auto const max_candidates = static_cast<size_t>(tr_sessionGetPeerLimit(session) * 0.95);
 
     /* count how many peers and atoms we've got */
-    int atomCount = 0;
-    size_t peerCount = 0;
+    auto atom_count = size_t{};
+    auto peer_count = size_t{};
     for (auto const* tor : session->torrents())
     {
-        atomCount += tr_ptrArraySize(&tor->swarm->pool);
-        peerCount += tor->swarm->peerCount();
+        atom_count += std::size(tor->swarm->pool);
+        peer_count += tor->swarm->peerCount();
     }
 
     /* don't start any new handshakes if we're full up */
-    if (maxCandidates <= peerCount)
+    if (max_candidates <= peer_count)
     {
         return {};
     }
 
     auto candidates = std::vector<peer_candidate>{};
-    candidates.reserve(atomCount);
+    candidates.reserve(atom_count);
 
     /* populate the candidate array */
     for (auto* tor : session->torrents())
@@ -2933,12 +2870,9 @@ static std::vector<peer_candidate> getPeerCandidates(tr_session* session, size_t
             continue;
         }
 
-        auto nAtoms = int{};
-        auto** atoms = (peer_atom**)tr_ptrArrayPeek(&tor->swarm->pool, &nAtoms);
-
-        for (int i = 0; i < nAtoms; ++i)
+        for (auto& atom_unique_ptr : tor->swarm->pool)
         {
-            struct peer_atom* atom = atoms[i];
+            auto* atom = atom_unique_ptr.get();
 
             if (isPeerCandidate(tor, atom, now))
             {
