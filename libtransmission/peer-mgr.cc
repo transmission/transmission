@@ -110,6 +110,21 @@ static auto constexpr CancelHistorySec = int{ 60 };
  */
 struct peer_atom
 {
+    [[nodiscard]] bool isBlocklisted(tr_session const* session) const
+    {
+        if (!blocklisted_)
+        {
+            blocklisted_ = tr_sessionIsAddressBlocked(session, &addr);
+        }
+
+        return *blocklisted_;
+    }
+
+    void setBlocklistedDirty()
+    {
+        blocklisted_.reset();
+    }
+
     tr_address addr;
 
     tr_port port;
@@ -132,9 +147,11 @@ struct peer_atom
     uint8_t fromBest; /* the "best" value of where the peer has been found */
     uint8_t flags; /* these match the added_f flags */
     uint8_t flags2; /* flags that aren't defined in added_f */
-    int8_t blocklisted; /* -1 for unknown, true for blocklisted, false for not blocklisted */
 
     bool utp_failed; /* We recently failed to connect over uTP */
+
+private:
+    mutable std::optional<bool> blocklisted_;
 };
 
 #ifndef TR_ENABLE_ASSERTS
@@ -373,7 +390,11 @@ static void swarmFree(tr_swarm* s)
     TR_ASSERT(std::empty(s->outgoing_handshakes));
     TR_ASSERT(s->peerCount() == 0);
 
-    tr_ptrArrayDestruct(&s->pool, (PtrArrayForeachFunc)tr_free);
+    static auto constexpr deleter = [](void* atom)
+    {
+        delete static_cast<peer_atom*>(atom);
+    };
+    tr_ptrArrayDestruct(&s->pool, (PtrArrayForeachFunc)deleter);
     s->stats = {};
 
     delete s;
@@ -457,19 +478,9 @@ void tr_peerMgrOnBlocklistChanged(tr_peerMgr* mgr)
         for (int i = 0, n = tr_ptrArraySize(&s->pool); i < n; ++i)
         {
             auto* const atom = static_cast<struct peer_atom*>(tr_ptrArrayNth(&s->pool, i));
-            atom->blocklisted = -1;
+            atom->setBlocklistedDirty();
         }
     }
-}
-
-static bool isAtomBlocklisted(tr_session const* session, struct peer_atom* atom)
-{
-    if (atom->blocklisted < 0)
-    {
-        atom->blocklisted = (int8_t)tr_sessionIsAddressBlocked(session, &atom->addr);
-    }
-
-    return atom->blocklisted != 0;
 }
 
 /***
@@ -936,14 +947,13 @@ static struct peer_atom* ensureAtomExists(
     if (a == nullptr)
     {
         int const jitter = tr_rand_int_weak(60 * 10);
-        a = tr_new0(struct peer_atom, 1);
+        a = new peer_atom();
         a->addr = addr;
         a->port = port;
         a->flags = flags;
         a->fromFirst = from;
         a->fromBest = from;
         a->shelf_date = tr_time() + getDefaultShelfLife(from) + jitter;
-        a->blocklisted = -1;
         tr_ptrArrayInsertSorted(&s->pool, a, compareAtomsByAddress);
 
         tr_logAddTraceSwarm(s, fmt::format("got a new atom: {}", tr_atomAddrStr(a)));
@@ -1278,7 +1288,7 @@ static bool isAtomInteresting(tr_torrent const* tor, struct peer_atom* atom)
         return true;
     }
 
-    if (isAtomBlocklisted(tor->session, atom))
+    if (atom->isBlocklisted(tor->session))
     {
         return false;
     }
@@ -2761,7 +2771,7 @@ static bool isPeerCandidate(tr_torrent const* tor, struct peer_atom* atom, time_
     }
 
     /* not if they're blocklisted */
-    if (isAtomBlocklisted(tor->session, atom))
+    if (atom->isBlocklisted(tor->session))
     {
         return false;
     }
