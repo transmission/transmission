@@ -110,6 +110,11 @@ static auto constexpr CancelHistorySec = int{ 60 };
  */
 struct peer_atom
 {
+    [[nodiscard]] auto readable() const
+    {
+        return addr.readable(port);
+    }
+
     [[nodiscard]] bool isBlocklisted(tr_session const* session) const
     {
         if (!blocklisted_)
@@ -167,12 +172,6 @@ static bool tr_isAtom(struct peer_atom const* atom)
 }
 
 #endif
-
-static char const* tr_atomAddrStr(struct peer_atom const* atom)
-{
-    static char addrstr[TR_ADDRSTRLEN];
-    return atom != nullptr ? tr_address_and_port_to_string(addrstr, sizeof(addrstr), &atom->addr, atom->port) : "[no atom]";
-}
 
 // a container for keeping track of tr_handshakes
 class Handshakes
@@ -494,7 +493,7 @@ static constexpr bool atomIsSeed(struct peer_atom const* atom)
 
 static void atomSetSeed(tr_swarm* s, struct peer_atom* atom)
 {
-    tr_logAddTraceSwarm(s, fmt::format("marking peer {} as a seed", tr_atomAddrStr(atom)));
+    tr_logAddTraceSwarm(s, fmt::format("marking peer {} as a seed", atom->readable()));
     atom->flags |= ADDED_F_SEED_FLAG;
     s->pool_is_all_seeds_dirty = true;
 }
@@ -701,14 +700,14 @@ static void refillUpkeep(evutil_socket_t /*fd*/, short /*what*/, void* vmgr)
 
 static void addStrike(tr_swarm* s, tr_peer* peer)
 {
-    tr_logAddTraceSwarm(s, fmt::format("increasing peer {} strike count to {}", tr_atomAddrStr(peer->atom), peer->strikes + 1));
+    tr_logAddTraceSwarm(s, fmt::format("increasing peer {} strike count to {}", peer->atom->readable(), peer->strikes + 1));
 
     if (++peer->strikes >= MaxBadPiecesPerPeer)
     {
         struct peer_atom* atom = peer->atom;
         atom->flags2 |= MyflagBanned;
         peer->doPurge = true;
-        tr_logAddTraceSwarm(s, fmt::format("banning peer {}", tr_atomAddrStr(atom)));
+        tr_logAddTraceSwarm(s, fmt::format("banning peer {}", atom->readable()));
     }
 }
 
@@ -886,7 +885,7 @@ static void peerCallbackFunc(tr_peer* peer, tr_peer_event const* e, void* vs)
                 s,
                 fmt::format(
                     "setting {} doPurge flag because we got an ERANGE, EMSGSIZE, or ENOTCONN error",
-                    tr_atomAddrStr(peer->atom)));
+                    peer->atom->readable()));
         }
         else
         {
@@ -956,7 +955,7 @@ static struct peer_atom* ensureAtomExists(
         a->shelf_date = tr_time() + getDefaultShelfLife(from) + jitter;
         tr_ptrArrayInsertSorted(&s->pool, a, compareAtomsByAddress);
 
-        tr_logAddTraceSwarm(s, fmt::format("got a new atom: {}", tr_atomAddrStr(a)));
+        tr_logAddTraceSwarm(s, fmt::format("got a new atom: {}", a->readable()));
     }
     else
     {
@@ -1043,10 +1042,7 @@ static bool on_handshake_done(tr_handshake_result const& result)
                 {
                     tr_logAddTraceSwarm(
                         s,
-                        fmt::format(
-                            "marking peer {} as unreachable... num_fails is {}",
-                            tr_atomAddrStr(atom),
-                            atom->num_fails));
+                        fmt::format("marking peer {} as unreachable... num_fails is {}", atom->readable(), atom->num_fails));
                     atom->flags2 |= MyflagUnreachable;
                 }
             }
@@ -1075,7 +1071,7 @@ static bool on_handshake_done(tr_handshake_result const& result)
 
         if ((atom->flags2 & MyflagBanned) != 0)
         {
-            tr_logAddTraceSwarm(s, fmt::format("banned peer {} tried to reconnect", tr_atomAddrStr(atom)));
+            tr_logAddTraceSwarm(s, fmt::format("banned peer {} tried to reconnect", atom->readable()));
         }
         else if (result.io->isIncoming() && s->peerCount() >= getMaxPeerCount(s->tor))
         {
@@ -1232,7 +1228,7 @@ void tr_peerMgrGotBadPiece(tr_torrent* tor, tr_piece_index_t pieceIndex)
                 s,
                 fmt::format(
                     "peer {} contributed to corrupt piece ({}); now has {} strikes",
-                    tr_atomAddrStr(peer->atom),
+                    peer->atom->readable(),
                     pieceIndex,
                     peer->strikes + 1));
             addStrike(s, peer);
@@ -2230,7 +2226,7 @@ static bool shouldPeerBeClosed(tr_swarm const* s, tr_peer const* peer, int peerC
     /* if it's marked for purging, close it */
     if (peer->doPurge)
     {
-        tr_logAddTraceSwarm(s, fmt::format("purging peer {} because its doPurge flag is set", tr_atomAddrStr(atom)));
+        tr_logAddTraceSwarm(s, fmt::format("purging peer {} because its doPurge flag is set", atom->readable()));
         return true;
     }
 
@@ -2257,10 +2253,7 @@ static bool shouldPeerBeClosed(tr_swarm const* s, tr_peer const* peer, int peerC
         {
             tr_logAddTraceSwarm(
                 s,
-                fmt::format(
-                    "purging peer {} because it's been {} secs since we shared anything",
-                    tr_atomAddrStr(atom),
-                    idleTime));
+                fmt::format("purging peer {} because it's been {} secs since we shared anything", atom->readable(), idleTime));
             return true;
         }
     }
@@ -2324,7 +2317,7 @@ static int getReconnectIntervalSecs(struct peer_atom const* atom, time_t const n
         }
     }
 
-    tr_logAddTrace(fmt::format("reconnect interval for {} is {} seconds", tr_atomAddrStr(atom), sec));
+    tr_logAddTrace(fmt::format("reconnect interval for {} is {} seconds", atom->readable(), sec));
     return sec;
 }
 
@@ -2362,16 +2355,16 @@ static void closePeer(tr_peer* peer)
        to them fruitlessly, so mark it as another fail */
     if (auto* const atom = peer->atom; atom->piece_data_time != 0)
     {
-        tr_logAddTraceSwarm(s, fmt::format("resetting atom {} num_fails to 0", tr_atomAddrStr(atom)));
+        tr_logAddTraceSwarm(s, fmt::format("resetting atom {} num_fails to 0", atom->readable()));
         atom->num_fails = 0;
     }
     else
     {
         ++atom->num_fails;
-        tr_logAddTraceSwarm(s, fmt::format("incremented atom {} num_fails to {}", tr_atomAddrStr(atom), atom->num_fails));
+        tr_logAddTraceSwarm(s, fmt::format("incremented atom {} num_fails to {}", atom->readable(), atom->num_fails));
     }
 
-    tr_logAddTraceSwarm(s, fmt::format("removing bad peer {}", tr_atomAddrStr(peer->atom)));
+    tr_logAddTraceSwarm(s, fmt::format("removing bad peer {}", peer->atom->readable()));
     removePeer(peer);
 }
 
@@ -2986,9 +2979,7 @@ static void initiateConnection(tr_peerMgr* mgr, tr_swarm* s, struct peer_atom* a
         utp = utp && (atom->flags & ADDED_F_UTP_FLAGS) != 0;
     }
 
-    tr_logAddTraceSwarm(
-        s,
-        fmt::format("Starting an OUTGOING {} connection with {}", utp ? " µTP" : "TCP", tr_atomAddrStr(atom)));
+    tr_logAddTraceSwarm(s, fmt::format("Starting an OUTGOING {} connection with {}", utp ? " µTP" : "TCP", atom->readable()));
 
     tr_peerIo* const io = tr_peerIoNewOutgoing(
         mgr->session,
@@ -3002,7 +2993,7 @@ static void initiateConnection(tr_peerMgr* mgr, tr_swarm* s, struct peer_atom* a
 
     if (io == nullptr)
     {
-        tr_logAddTraceSwarm(s, fmt::format("peerIo not created; marking peer {} as unreachable", tr_atomAddrStr(atom)));
+        tr_logAddTraceSwarm(s, fmt::format("peerIo not created; marking peer {} as unreachable", atom->readable()));
         atom->flags2 |= MyflagUnreachable;
         ++atom->num_fails;
     }
@@ -3025,7 +3016,7 @@ static void initiateCandidateConnection(tr_peerMgr* mgr, peer_candidate& c)
 {
 #if 0
 
-    fprintf(stderr, "Starting an OUTGOING connection with %s - [%s] %s, %s\n", tr_atomAddrStr(c->atom),
+    fprintf(stderr, "Starting an OUTGOING connection with %s - [%s] %s, %s\n", c->atom->readable(),
         tr_torrentName(c->tor), c->tor->isPrivate() ? "private" : "public",
         c->tor->isDone() ? "seed" : "downloader");
 
