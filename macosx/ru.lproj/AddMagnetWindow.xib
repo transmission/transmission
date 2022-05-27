@@ -109,7 +109,7 @@ Gw
                                         <font key="font" metaFont="menu"/>
                                         <menu key="menu" title="OtherViews" id="35">
                                             <items>
-                                                <menuItem title="None" state="on" image="GroupsNoneTemplate" id="2zq-5y-smI">
+                                                <menuItem title="None" state="on" image="circle.dashed" catalog="system" id="2zq-5y-smI">
                                                     <modifierMask key="keyEquivalentModifierMask"/>
                                                 </menuItem>
                                             </items>
