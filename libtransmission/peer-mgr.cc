@@ -152,6 +152,66 @@ struct peer_atom
         return shelf_date_;
     }
 
+    [[nodiscard]] int getReconnectIntervalSecs(time_t const now) const noexcept
+    {
+        auto sec = int{};
+        bool const unreachable = (this->flags2 & MyflagUnreachable) != 0;
+
+        /* if we were recently connected to this peer and transferring piece
+         * data, try to reconnect to them sooner rather that later -- we don't
+         * want network troubles to get in the way of a good peer. */
+        if (!unreachable && now - this->piece_data_time <= MinimumReconnectIntervalSecs * 2)
+        {
+            sec = MinimumReconnectIntervalSecs;
+        }
+        /* otherwise, the interval depends on how many times we've tried
+         * and failed to connect to the peer */
+        else
+        {
+            auto step = this->num_fails;
+
+            /* penalize peers that were unreachable the last time we tried */
+            if (unreachable)
+            {
+                step += 2;
+            }
+
+            switch (step)
+            {
+            case 0:
+                sec = 0;
+                break;
+
+            case 1:
+                sec = 10;
+                break;
+
+            case 2:
+                sec = 60 * 2;
+                break;
+
+            case 3:
+                sec = 60 * 15;
+                break;
+
+            case 4:
+                sec = 60 * 30;
+                break;
+
+            case 5:
+                sec = 60 * 60;
+                break;
+
+            default:
+                sec = 60 * 120;
+                break;
+            }
+        }
+
+        tr_logAddTrace(fmt::format("reconnect interval for {} is {} seconds", this->readable(), sec));
+        return sec;
+    }
+
     void setBlocklistedDirty()
     {
         blocklisted_.reset();
@@ -959,11 +1019,7 @@ static struct peer_atom* ensureAtomExists(
     }
     else
     {
-        if (from < a->fromBest)
-        {
-            a->fromBest = from;
-        }
-
+        a->fromBest = std::min(a->fromBest, from);
         a->flags |= flags;
     }
 
@@ -2261,66 +2317,6 @@ static bool shouldPeerBeClosed(tr_swarm const* s, tr_peer const* peer, int peerC
     return false;
 }
 
-static int getReconnectIntervalSecs(struct peer_atom const* atom, time_t const now)
-{
-    auto sec = int{};
-    bool const unreachable = (atom->flags2 & MyflagUnreachable) != 0;
-
-    /* if we were recently connected to this peer and transferring piece
-     * data, try to reconnect to them sooner rather that later -- we don't
-     * want network troubles to get in the way of a good peer. */
-    if (!unreachable && now - atom->piece_data_time <= MinimumReconnectIntervalSecs * 2)
-    {
-        sec = MinimumReconnectIntervalSecs;
-    }
-    /* otherwise, the interval depends on how many times we've tried
-     * and failed to connect to the peer */
-    else
-    {
-        auto step = atom->num_fails;
-
-        /* penalize peers that were unreachable the last time we tried */
-        if (unreachable)
-        {
-            step += 2;
-        }
-
-        switch (step)
-        {
-        case 0:
-            sec = 0;
-            break;
-
-        case 1:
-            sec = 10;
-            break;
-
-        case 2:
-            sec = 60 * 2;
-            break;
-
-        case 3:
-            sec = 60 * 15;
-            break;
-
-        case 4:
-            sec = 60 * 30;
-            break;
-
-        case 5:
-            sec = 60 * 60;
-            break;
-
-        default:
-            sec = 60 * 120;
-            break;
-        }
-    }
-
-    tr_logAddTrace(fmt::format("reconnect interval for {} is {} seconds", atom->readable(), sec));
-    return sec;
-}
-
 static void removePeer(tr_peer* peer)
 {
     auto* const s = peer->swarm;
@@ -2758,7 +2754,7 @@ static bool isPeerCandidate(tr_torrent const* tor, struct peer_atom* atom, time_
     }
 
     /* not if we just tried them already */
-    if (now - atom->time < getReconnectIntervalSecs(atom, now))
+    if (now - atom->time < atom->getReconnectIntervalSecs(now))
     {
         return false;
     }
