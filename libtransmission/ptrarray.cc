@@ -194,3 +194,12 @@ void* tr_ptrArrayFindSorted(tr_ptrArray* t, void const* ptr, tr_voidptr_compare_
     int const pos = tr_ptrArrayLowerBound(t, ptr, compare, &match);
     return match ? t->items[pos] : nullptr;
 }
+
+void* tr_ptrArrayNth(tr_ptrArray* array, int i)
+{
+    TR_ASSERT(array != nullptr);
+    TR_ASSERT(i >= 0);
+    TR_ASSERT(i < array->n_items);
+
+    return array->items[i];
+}
