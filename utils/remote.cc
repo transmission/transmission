@@ -2016,17 +2016,8 @@ static void filterIds(tr_variant* top)
             {
                 continue;
             }
-            /*
-            if (tr_variantDictFindInt(d, TR_KEY_eta, &eta) && 
-                tr_variantDictFindInt(d, TR_KEY_leftUntilDone, &leftUntilDone) &&
-                tr_variantDictFindStrView(d, TR_KEY_name, &name) && tr_variantDictFindInt(d, TR_KEY_rateDownload, &down) &&
-                tr_variantDictFindInt(d, TR_KEY_rateUpload, &up) &&
-                tr_variantDictFindInt(d, TR_KEY_sizeWhenDone, &sizeWhenDone) &&
-                && tr_variantDictFindReal(d, TR_KEY_uploadRatio, &ratio))
-                */
             bool include = negate;
-            std::string status = getStatusString(d);
-            std::string_view name;
+            auto const status = getStatusString(d);
             switch (filter[pos])
             {
             case 'i': // Status = Idle
@@ -2048,8 +2039,7 @@ static void filterIds(tr_variant* top)
                 }
                 break;
             case 'l': // label
-                tr_variant* l;
-                if (tr_variantDictFindList(d, TR_KEY_labels, &l))
+                if (tr_variant * l; tr_variantDictFindList(d, TR_KEY_labels, &l))
                 {
                     size_t child_pos = 0;
                     tr_variant const* child;
@@ -2068,38 +2058,36 @@ static void filterIds(tr_variant* top)
                 }
                 break;
             case 'n': // Torrent name substring
-                if (!tr_variantDictFindStrView(d, TR_KEY_name, &name))
+                if (std::string_view name; !tr_variantDictFindStrView(d, TR_KEY_name, &name))
                 {
                     continue;
                 }
-                if (name.find(arg) != std::string::npos)
+                else if (name.find(arg) != std::string::npos)
                 {
                     include = !include;
                 }
                 break;
             case 'r': // Minimal ratio
-                double ratio;
-                if (!tr_variantDictFindReal(d, TR_KEY_uploadRatio, &ratio))
+                if (double ratio; !tr_variantDictFindReal(d, TR_KEY_uploadRatio, &ratio))
                 {
                     continue;
                 }
-                if (ratio >= std::stof(std::string(arg)))
+                else if (ratio >= std::stof(std::string(arg)))
                 {
                     include = !include;
                 }
                 break;
             case 'w': // Not all torrent wanted
-                int64_t totalSize;
-                if (!tr_variantDictFindInt(d, TR_KEY_totalSize, &totalSize) || totalSize < 0)
+                if (int64_t totalSize; !tr_variantDictFindInt(d, TR_KEY_totalSize, &totalSize) || totalSize < 0)
                 {
                     continue;
                 }
-                int64_t sizeWhenDone;
-                if (!tr_variantDictFindInt(d, TR_KEY_sizeWhenDone, &sizeWhenDone) || sizeWhenDone < 0)
+                else if (int64_t sizeWhenDone;
+                         !tr_variantDictFindInt(d, TR_KEY_sizeWhenDone, &sizeWhenDone) || sizeWhenDone < 0)
                 {
                     continue;
                 }
-                if (totalSize > sizeWhenDone)
+                else if (totalSize > sizeWhenDone)
                 {
                     include = !include;
                 }
