@@ -487,7 +487,7 @@ static void utp_on_state_change(void* vio, int state)
     if (state == UTP_STATE_CONNECT)
     {
         tr_logAddTraceIo(io, "utp_on_state_change -- changed to connected");
-        io->utpSupported = true;
+        io->utp_supported_ = true;
     }
     else if (state == UTP_STATE_WRITABLE)
     {
@@ -904,35 +904,9 @@ void tr_peerIoUnrefImpl(char const* file, int line, tr_peerIo* io)
     }
 }
 
-tr_address const* tr_peerIoGetAddress(tr_peerIo const* io, tr_port* port)
-{
-    TR_ASSERT(tr_isPeerIo(io));
-
-    if (port != nullptr)
-    {
-        *port = io->port;
-    }
-
-    return &io->addr;
-}
-
 std::string tr_peerIo::addrStr() const
 {
-    return tr_isPeerIo(this) ? this->addr.readable(this->port) : "error";
-}
-
-char const* tr_peerIoGetAddrStr(tr_peerIo const* io, char* buf, size_t buflen)
-{
-    if (tr_isPeerIo(io))
-    {
-        tr_address_and_port_to_string(buf, buflen, &io->addr, io->port);
-    }
-    else
-    {
-        tr_strlcpy(buf, "error", buflen);
-    }
-
-    return buf;
+    return tr_isPeerIo(this) ? this->addr_.readable(this->port_) : "error";
 }
 
 void tr_peerIoSetIOFuncs(tr_peerIo* io, tr_can_read_cb readcb, tr_did_write_cb writecb, tr_net_error_cb errcb, void* userData)
@@ -953,7 +927,7 @@ void tr_peerIoClear(tr_peerIo* io)
 int tr_peerIoReconnect(tr_peerIo* io)
 {
     TR_ASSERT(tr_isPeerIo(io));
-    TR_ASSERT(!tr_peerIoIsIncoming(io));
+    TR_ASSERT(!io->isIncoming());
 
     tr_session* session = tr_peerIoGetSession(io);
 
@@ -962,7 +936,8 @@ int tr_peerIoReconnect(tr_peerIo* io)
 
     io_close_socket(io);
 
-    io->socket = tr_netOpenPeerSocket(session, &io->addr, io->port, io->is_seed);
+    auto const [addr, port] = io->socketAddress();
+    io->socket = tr_netOpenPeerSocket(session, &addr, port, io->isSeed());
 
     if (io->socket.type != TR_PEER_SOCKET_TYPE_TCP)
     {
@@ -973,7 +948,7 @@ int tr_peerIoReconnect(tr_peerIo* io)
     io->event_write = event_new(session->event_base, io->socket.handle.tcp, EV_WRITE, event_write_cb, io);
 
     event_enable(io, pendingEvents);
-    io->session->setSocketTOS(io->socket.handle.tcp, io->addr.type);
+    io->session->setSocketTOS(io->socket.handle.tcp, addr.type);
     maybeSetCongestionAlgorithm(io->socket.handle.tcp, session->peerCongestionAlgorithm());
 
     return 0;
