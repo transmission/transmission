@@ -4,8 +4,10 @@
 
 #import "GroupsController.h"
 #import "NSMutableArrayAdditions.h"
+#import "NSApplicationAdditions.h"
 
 #define ICON_WIDTH 16.0
+#define BORDER_WIDTH 1.25
 #define ICON_WIDTH_SMALL 12.0
 
 @interface GroupsController ()
@@ -138,7 +140,7 @@ GroupsController* fGroupsInstance = nil;
 - (NSImage*)imageForIndex:(NSInteger)index
 {
     NSInteger orderIndex = [self rowValueForIndex:index];
-    return orderIndex != -1 ? [self imageForGroup:self.fGroups[orderIndex]] : [NSImage imageNamed:@"GroupsNoneTemplate"];
+    return orderIndex != -1 ? [self imageForGroup:self.fGroups[orderIndex]] : [self imageForGroupNone];
 }
 
 - (NSColor*)colorForIndex:(NSInteger)index
@@ -299,7 +301,7 @@ GroupsController* fGroupsInstance = nil;
     item.target = target;
     item.tag = -1;
 
-    NSImage* icon = [NSImage imageNamed:@"GroupsNoneTemplate"];
+    NSImage* icon = [self imageForGroupNone];
     if (small)
     {
         icon = [icon copy];
@@ -369,33 +371,64 @@ GroupsController* fGroupsInstance = nil;
     [NSUserDefaults.standardUserDefaults setObject:[NSKeyedArchiver archivedDataWithRootObject:groups] forKey:@"GroupDicts"];
 }
 
+- (NSImage*)imageForGroupNone
+{
+    static NSImage* icon;
+    if (icon)
+    {
+        return icon;
+    }
+
+    icon = [NSImage imageWithSize:NSMakeSize(ICON_WIDTH, ICON_WIDTH) flipped:NO drawingHandler:^BOOL(NSRect rect) {
+        //shape
+        rect = NSInsetRect(rect, BORDER_WIDTH / 2, BORDER_WIDTH / 2);
+        NSBezierPath* bp = [NSBezierPath bezierPathWithOvalInRect:rect];
+        bp.lineWidth = BORDER_WIDTH;
+
+        //border
+        // code reference for dashed style
+        //CGFloat dashAndGapLength = M_PI * rect.size.width / 8;
+        //CGFloat pattern[2] = { dashAndGapLength * .5, dashAndGapLength * .5 };
+        //[bp setLineDash:pattern count:2 phase:0];
+
+        [NSColor.controlTextColor setStroke];
+        [bp stroke];
+
+        return YES;
+    }];
+    [icon setTemplate:YES];
+
+    return icon;
+}
+
 - (NSImage*)imageForGroup:(NSMutableDictionary*)dict
 {
-    NSImage* image;
-    if ((image = dict[@"Icon"]))
+    NSImage* icon;
+    if ((icon = dict[@"Icon"]))
     {
-        return image;
+        return icon;
     }
 
     NSColor* color = dict[@"Color"];
 
-    NSRect rect = NSMakeRect(0.0, 0.0, ICON_WIDTH, ICON_WIDTH);
+    icon = [NSImage imageWithSize:NSMakeSize(ICON_WIDTH, ICON_WIDTH) flipped:NO drawingHandler:^BOOL(NSRect rect) {
+        //shape
+        rect = NSInsetRect(rect, BORDER_WIDTH / 2, BORDER_WIDTH / 2);
+        NSBezierPath* bp = [NSBezierPath bezierPathWithOvalInRect:rect];
+        bp.lineWidth = BORDER_WIDTH;
 
-    NSImage* icon = [[NSImage alloc] initWithSize:rect.size];
+        //border
+        CGFloat fractionOfBlendedColor = [NSApp isDarkMode] ? 0.15 : 0.3;
+        NSColor* borderColor = [color blendedColorWithFraction:fractionOfBlendedColor ofColor:NSColor.controlTextColor];
+        [borderColor setStroke];
+        [bp stroke];
 
-    [icon lockFocus];
+        //inside
+        [color setFill];
+        [bp fill];
 
-    //border
-    NSBezierPath* bp = [NSBezierPath bezierPathWithRoundedRect:rect xRadius:rect.size.width / 2 yRadius:rect.size.width / 2];
-    NSGradient* gradient = [[NSGradient alloc] initWithStartingColor:[color blendedColorWithFraction:0.45 ofColor:NSColor.whiteColor]
-                                                         endingColor:color];
-    [gradient drawInBezierPath:bp angle:0.0];
-
-    //inside
-    [color setFill];
-    [bp fill];
-
-    [icon unlockFocus];
+        return YES;
+    }];
 
     dict[@"Icon"] = icon;
 

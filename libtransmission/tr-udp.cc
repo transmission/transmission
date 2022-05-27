@@ -118,7 +118,6 @@ static void rebind_ipv6(tr_session* ss, bool force)
 {
     struct sockaddr_in6 sin6;
     unsigned char const* ipv6 = tr_globalIPv6(ss);
-    tr_socket_t s = TR_BAD_SOCKET;
     int rc = -1;
     int one = 1;
 
@@ -140,7 +139,7 @@ static void rebind_ipv6(tr_session* ss, bool force)
         return;
     }
 
-    s = socket(PF_INET6, SOCK_DGRAM, 0);
+    auto const s = socket(PF_INET6, SOCK_DGRAM, 0);
 
     if (s == TR_BAD_SOCKET)
     {
