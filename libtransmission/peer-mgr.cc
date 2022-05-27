@@ -2818,28 +2818,29 @@ static bool swarmIsAllSeeds(tr_swarm* swarm)
 /** @return an array of all the atoms we might want to connect to */
 static std::vector<peer_candidate> getPeerCandidates(tr_session* session, size_t max)
 {
-    time_t const now = tr_time();
-    uint64_t const now_msec = tr_time_msec();
-    /* leave 5% of connection slots for incoming connections -- ticket #2609 */
-    size_t const maxCandidates = tr_sessionGetPeerLimit(session) * 0.95;
+    auto const now = tr_time();
+    auto const now_msec = tr_time_msec();
+
+    // leave 5% of connection slots for incoming connections -- ticket #2609
+    auto const max_candidates = static_cast<size_t>(tr_sessionGetPeerLimit(session) * 0.95);
 
     /* count how many peers and atoms we've got */
-    size_t atomCount = 0U;
-    size_t peerCount = 0U;
+    auto atom_count = size_t{};
+    auto peer_count = size_t{};
     for (auto const* tor : session->torrents())
     {
-        atomCount += std::size(tor->swarm->pool);
-        peerCount += tor->swarm->peerCount();
+        atom_count += std::size(tor->swarm->pool);
+        peer_count += tor->swarm->peerCount();
     }
 
     /* don't start any new handshakes if we're full up */
-    if (maxCandidates <= peerCount)
+    if (max_candidates <= peer_count)
     {
         return {};
     }
 
     auto candidates = std::vector<peer_candidate>{};
-    candidates.reserve(atomCount);
+    candidates.reserve(atom_count);
 
     /* populate the candidate array */
     for (auto* tor : session->torrents())
