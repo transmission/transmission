@@ -231,8 +231,8 @@ struct peer_atom
 
     tr_peer* peer; /* will be nullptr if not connected */
 
-    uint8_t fromFirst = {}; /* where the peer was first found */
-    uint8_t fromBest = {}; /* the "best" value of where the peer has been found */
+    uint8_t const fromFirst; /* where the peer was first found */
+    uint8_t fromBest; /* the "best" value of where the peer has been found */
     uint8_t flags = {}; /* these match the added_f flags */
     uint8_t flags2 = {}; /* flags that aren't defined in added_f */
 
