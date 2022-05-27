@@ -110,7 +110,7 @@ Gw
                                         <font key="font" metaFont="menu"/>
                                         <menu key="menu" title="OtherViews" id="35">
                                             <items>
-                                                <menuItem title="Geen" state="on" image="GroupsNoneTemplate" id="2zq-5y-smI">
+                                                <menuItem title="Geen" state="on" image="circle.dashed" catalog="system" id="2zq-5y-smI">
                                                     <modifierMask key="keyEquivalentModifierMask"/>
                                                 </menuItem>
                                             </items>

@@ -349,10 +349,10 @@ static tr_swarm* getExistingSwarm(tr_peerMgr* manager, tr_sha1_digest_t const& h
     return tor == nullptr ? nullptr : tor->swarm;
 }
 
-static struct peer_atom* getExistingAtom(tr_swarm const* cswarm, tr_address const* addr)
+static struct peer_atom* getExistingAtom(tr_swarm const* cswarm, tr_address const& addr)
 {
     auto* swarm = const_cast<tr_swarm*>(cswarm);
-    return static_cast<struct peer_atom*>(tr_ptrArrayFindSorted(&swarm->pool, addr, comparePeerAtomToAddress));
+    return static_cast<struct peer_atom*>(tr_ptrArrayFindSorted(&swarm->pool, &addr, comparePeerAtomToAddress));
 }
 
 static bool peerIsInUse(tr_swarm const* cs, struct peer_atom const* atom)
@@ -488,33 +488,27 @@ static void atomSetSeed(tr_swarm* s, struct peer_atom* atom)
     s->pool_is_all_seeds_dirty = true;
 }
 
-bool tr_peerMgrPeerIsSeed(tr_torrent const* tor, tr_address const* addr)
+bool tr_peerMgrPeerIsSeed(tr_torrent const* tor, tr_address const& addr)
 {
-    bool isSeed = false;
-
     if (auto const* atom = getExistingAtom(tor->swarm, addr); atom != nullptr)
     {
-        isSeed = atomIsSeed(atom);
+        return atomIsSeed(atom);
     }
 
-    return isSeed;
+    return false;
 }
 
-void tr_peerMgrSetUtpSupported(tr_torrent* tor, tr_address const* addr)
+void tr_peerMgrSetUtpSupported(tr_torrent* tor, tr_address const& addr)
 {
-    struct peer_atom* atom = getExistingAtom(tor->swarm, addr);
-
-    if (atom != nullptr)
+    if (auto* const atom = getExistingAtom(tor->swarm, addr); atom != nullptr)
     {
         atom->flags |= ADDED_F_UTP_FLAGS;
     }
 }
 
-void tr_peerMgrSetUtpFailed(tr_torrent* tor, tr_address const* addr, bool failed)
+void tr_peerMgrSetUtpFailed(tr_torrent* tor, tr_address const& addr, bool failed)
 {
-    struct peer_atom* atom = getExistingAtom(tor->swarm, addr);
-
-    if (atom != nullptr)
+    if (auto* const atom = getExistingAtom(tor->swarm, addr); atom != nullptr)
     {
         atom->utp_failed = failed;
     }
@@ -929,12 +923,12 @@ static int getDefaultShelfLife(uint8_t from)
 
 static struct peer_atom* ensureAtomExists(
     tr_swarm* s,
-    tr_address const* addr,
+    tr_address const& addr,
     tr_port const port,
     uint8_t const flags,
     uint8_t const from)
 {
-    TR_ASSERT(tr_address_is_valid(addr));
+    TR_ASSERT(tr_address_is_valid(&addr));
     TR_ASSERT(from < TR_PEER_FROM__MAX);
 
     struct peer_atom* a = getExistingAtom(s, addr);
@@ -943,7 +937,7 @@ static struct peer_atom* ensureAtomExists(
     {
         int const jitter = tr_rand_int_weak(60 * 10);
         a = tr_new0(struct peer_atom, 1);
-        a->addr = *addr;
+        a->addr = addr;
         a->port = port;
         a->flags = flags;
         a->fromFirst = from;
@@ -1012,16 +1006,15 @@ static bool on_handshake_done(tr_handshake_result const& result)
     auto const hash = tr_peerIoGetTorrentHash(result.io);
     tr_swarm* const s = hash ? getExistingSwarm(manager, *hash) : nullptr;
 
-    auto port = tr_port{};
-    auto const* const addr = tr_peerIoGetAddress(result.io, &port);
+    auto const [addr, port] = result.io->socketAddress();
 
-    if (tr_peerIoIsIncoming(result.io))
+    if (result.io->isIncoming())
     {
-        manager->incoming_handshakes.erase(*addr);
+        manager->incoming_handshakes.erase(addr);
     }
     else if (s != nullptr)
     {
-        s->outgoing_handshakes.erase(*addr);
+        s->outgoing_handshakes.erase(addr);
     }
 
     auto const lock = manager->unique_lock();
@@ -1057,7 +1050,7 @@ static bool on_handshake_done(tr_handshake_result const& result)
         atom->piece_data_time = 0;
         atom->lastConnectionAt = tr_time();
 
-        if (!tr_peerIoIsIncoming(result.io))
+        if (!result.io->isIncoming())
         {
             atom->flags |= ADDED_F_CONNECTABLE;
             atom->flags2 &= ~MyflagUnreachable;
@@ -1074,7 +1067,7 @@ static bool on_handshake_done(tr_handshake_result const& result)
         {
             tr_logAddTraceSwarm(s, fmt::format("banned peer {} tried to reconnect", tr_atomAddrStr(atom)));
         }
-        else if (tr_peerIoIsIncoming(result.io) && s->peerCount() >= getMaxPeerCount(s->tor))
+        else if (result.io->isIncoming() && s->peerCount() >= getMaxPeerCount(s->tor))
         {
             /* too many peers already */
         }
@@ -1164,7 +1157,7 @@ size_t tr_peerMgrAddPex(tr_torrent* tor, uint8_t from, tr_pex const* pex, size_t
             !tr_sessionIsAddressBlocked(s->manager->session, &pex->addr) &&
             tr_address_is_valid_for_peers(&pex->addr, pex->port))
         {
-            ensureAtomExists(s, &pex->addr, pex->port, pex->flags, from);
+            ensureAtomExists(s, pex->addr, pex->port, pex->flags, from);
             ++n_used;
         }
     }
@@ -1239,53 +1232,39 @@ void tr_peerMgrGotBadPiece(tr_torrent* tor, tr_piece_index_t pieceIndex)
     tr_announcerAddBytes(tor, TR_ANN_CORRUPT, byteCount);
 }
 
-int tr_pexCompare(void const* va, void const* vb)
-{
-    auto const* const a = static_cast<tr_pex const*>(va);
-    auto const* const b = static_cast<tr_pex const*>(vb);
-
-    TR_ASSERT(tr_isPex(a));
-    TR_ASSERT(tr_isPex(b));
-
-    if (auto const i = tr_address_compare(&a->addr, &b->addr); i != 0)
-    {
-        return i;
-    }
-
-    if (a->port != b->port)
-    {
-        return a->port < b->port ? -1 : 1;
-    }
-
-    return 0;
-}
-
 /* better goes first */
-static int compareAtomsByUsefulness(void const* va, void const* vb)
+struct CompareAtomsByUsefulness
 {
-    struct peer_atom const* a = *(struct peer_atom const* const*)va;
-    struct peer_atom const* b = *(struct peer_atom const* const*)vb;
-
-    TR_ASSERT(tr_isAtom(a));
-    TR_ASSERT(tr_isAtom(b));
-
-    if (a->piece_data_time != b->piece_data_time)
+    [[nodiscard]] static int compare(peer_atom const& a, peer_atom const& b) noexcept // <=>
     {
-        return a->piece_data_time > b->piece_data_time ? -1 : 1;
+        if (a.piece_data_time != b.piece_data_time)
+        {
+            return a.piece_data_time > b.piece_data_time ? -1 : 1;
+        }
+
+        if (a.fromBest != b.fromBest)
+        {
+            return a.fromBest < b.fromBest ? -1 : 1;
+        }
+
+        if (a.num_fails != b.num_fails)
+        {
+            return a.num_fails < b.num_fails ? -1 : 1;
+        }
+
+        return 0;
     }
 
-    if (a->fromBest != b->fromBest)
+    [[nodiscard]] bool operator()(peer_atom const& a, peer_atom const& b) const noexcept
     {
-        return a->fromBest < b->fromBest ? -1 : 1;
+        return compare(a, b) < 0;
     }
 
-    if (a->num_fails != b->num_fails)
+    [[nodiscard]] bool operator()(peer_atom const* a, peer_atom const* b) const noexcept
     {
-        return a->num_fails < b->num_fails ? -1 : 1;
+        return compare(*a, *b) < 0;
     }
-
-    return 0;
-}
+};
 
 static bool isAtomInteresting(tr_torrent const* tor, struct peer_atom* atom)
 {
@@ -1313,12 +1292,11 @@ static bool isAtomInteresting(tr_torrent const* tor, struct peer_atom* atom)
 }
 
 // TODO: return a std::vector
-int tr_peerMgrGetPeers(tr_torrent const* tor, tr_pex** setme_pex, uint8_t af, uint8_t list_mode, int maxCount)
+std::vector<tr_pex> tr_peerMgrGetPeers(tr_torrent const* tor, uint8_t af, uint8_t list_mode, size_t max_count)
 {
     TR_ASSERT(tr_isTorrent(tor));
     auto const lock = tor->unique_lock();
 
-    TR_ASSERT(setme_pex != nullptr);
     TR_ASSERT(af == TR_AF_INET || af == TR_AF_INET6);
     TR_ASSERT(list_mode == TR_PEERS_CONNECTED || list_mode == TR_PEERS_INTERESTING);
 
@@ -1328,70 +1306,53 @@ int tr_peerMgrGetPeers(tr_torrent const* tor, tr_pex** setme_pex, uint8_t af, ui
     ***  build a list of atoms
     **/
 
-    auto atomCount = int{};
-    struct peer_atom** atoms = nullptr;
+    auto atoms = std::vector<peer_atom const*>{};
     if (list_mode == TR_PEERS_CONNECTED) /* connected peers only */
     {
-        atomCount = s->peerCount();
-        atoms = tr_new(struct peer_atom*, atomCount);
-        std::transform(std::begin(s->peers), std::end(s->peers), atoms, [](auto const* peer) { return peer->atom; });
+        atoms.reserve(s->peerCount());
+        std::transform(
+            std::begin(s->peers),
+            std::end(s->peers),
+            std::back_inserter(atoms),
+            [](auto const* peer) { return peer->atom; });
     }
     else /* TR_PEERS_INTERESTING */
     {
         auto** atomBase = (struct peer_atom**)tr_ptrArrayBase(&s->pool);
-        int const n = tr_ptrArraySize(&s->pool);
-        atoms = tr_new(struct peer_atom*, n);
-
-        for (int i = 0; i < n; ++i)
+        size_t const n = tr_ptrArraySize(&s->pool);
+        atoms.reserve(n);
+        for (size_t i = 0; i < n; ++i)
         {
             if (isAtomInteresting(tor, atomBase[i]))
             {
-                atoms[atomCount++] = atomBase[i];
+                atoms.push_back(atomBase[i]);
             }
         }
     }
 
-    if (atoms != nullptr)
-    {
-        qsort(atoms, atomCount, sizeof(struct peer_atom*), compareAtomsByUsefulness);
-    }
+    std::sort(std::begin(atoms), std::end(atoms), CompareAtomsByUsefulness{});
 
     /**
     ***  add the first N of them into our return list
     **/
 
-    int const n = std::min(atomCount, maxCount);
-    auto* const pex = tr_new0(tr_pex, n);
-    tr_pex* walk = pex;
+    auto const n = std::min(std::size(atoms), max_count);
+    auto pex = std::vector<tr_pex>{};
+    pex.reserve(n);
 
-    auto count = int{};
-    for (int i = 0; i < atomCount && count < n; ++i)
+    for (size_t i = 0; i < std::size(atoms) && std::size(pex) < n; ++i)
     {
         auto const* const atom = atoms[i];
 
         if (atom->addr.type == af)
         {
             TR_ASSERT(tr_address_is_valid(&atom->addr));
-
-            walk->addr = atom->addr;
-            walk->port = atom->port;
-            walk->flags = atom->flags;
-            ++count;
-            ++walk;
+            pex.emplace_back(atom->addr, atom->port, atom->flags);
         }
     }
 
-    if (pex != nullptr)
-    {
-        qsort(pex, count, sizeof(tr_pex), tr_pexCompare);
-    }
-
-    TR_ASSERT(walk - pex == count);
-    *setme_pex = pex;
-
-    /* cleanup */
-    tr_free(atoms);
-    return count;
+    std::sort(std::begin(pex), std::end(pex));
+    return pex;
 }
 
 static void atomPulse(evutil_socket_t, short /*unused*/, void* /*vmgr*/);
