@@ -245,6 +245,7 @@ set(${PROJECT_NAME}_HIDPI_IMAGES
     CreateLarge
     DownArrowGroupTemplate
     DownArrowTemplate
+	EllipsisTemplate
     FavIcon
     Globe
     GreenDotFlat
@@ -292,6 +293,7 @@ set(${PROJECT_NAME}_HIDPI_IMAGES
     ToolbarResumeSelectedTemplate
     Transfers
     TortoiseTemplate
+	Unlock
     UpArrowGroupTemplate
     UpArrowTemplate
     YellowDotFlat
