@@ -49,7 +49,7 @@
                     <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="3435">
                         <rect key="frame" x="0.0" y="3" width="36" height="18"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                        <buttonCell key="cell" type="squareTextured" bezelStyle="texturedSquare" image="GearshapeTemplate" imagePosition="only" alignment="center" state="on" imageScaling="proportionallyDown" inset="2" id="3436">
+                        <buttonCell key="cell" type="squareTextured" bezelStyle="texturedSquare" image="EllipsisCircle" imagePosition="only" alignment="center" state="on" imageScaling="proportionallyDown" inset="2" id="3436">
                             <behavior key="behavior" lightByContents="YES"/>
                             <font key="font" metaFont="system"/>
                         </buttonCell>
@@ -977,7 +977,7 @@ CA
     </objects>
     <resources>
         <image name="CleanupTemplate" width="18" height="18"/>
-        <image name="GearshapeTemplate" width="18" height="18"/>
+        <image name="EllipsisCircle" width="18" height="18"/>
         <image name="PriorityHighTemplate" width="12" height="12"/>
         <image name="PriorityLowTemplate" width="12" height="12"/>
         <image name="PriorityNormalTemplate" width="12" height="12"/>
