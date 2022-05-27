@@ -110,6 +110,13 @@ static auto constexpr CancelHistorySec = int{ 60 };
  */
 struct peer_atom
 {
+#ifdef TR_ENABLE_ASSERTS
+    [[nodiscard]] bool isValid() const noexcept
+    {
+        return fromFirst < TR_PEER_FROM__MAX && fromBest < TR_PEER_FROM__MAX && tr_address_is_valid(&addr);
+    }
+#endif
+
     [[nodiscard]] constexpr auto isSeed() const noexcept
     {
         return (flags & ADDED_F_SEED_FLAG) != 0;
@@ -163,20 +170,6 @@ struct peer_atom
 private:
     mutable std::optional<bool> blocklisted_;
 };
-
-#ifndef TR_ENABLE_ASSERTS
-
-#define tr_isAtom(a) (true)
-
-#else
-
-static bool tr_isAtom(struct peer_atom const* atom)
-{
-    return atom != nullptr && atom->fromFirst < TR_PEER_FROM__MAX && atom->fromBest < TR_PEER_FROM__MAX &&
-        tr_address_is_valid(&atom->addr);
-}
-
-#endif
 
 // a container for keeping track of tr_handshakes
 class Handshakes
@@ -349,7 +342,7 @@ static int compareAtomsByAddress(void const* va, void const* vb)
 {
     auto const* const b = static_cast<struct peer_atom const*>(vb);
 
-    TR_ASSERT(tr_isAtom(b));
+    TR_ASSERT(b->isValid());
 
     return comparePeerAtomToAddress(va, &b->addr);
 }
@@ -2605,8 +2598,8 @@ static int compareAtomPtrsByAddress(void const* va, void const* vb)
     struct peer_atom const* a = *(struct peer_atom const* const*)va;
     struct peer_atom const* b = *(struct peer_atom const* const*)vb;
 
-    TR_ASSERT(tr_isAtom(a));
-    TR_ASSERT(tr_isAtom(b));
+    TR_ASSERT(a->isValid());
+    TR_ASSERT(b->isValid());
 
     return tr_address_compare(&a->addr, &b->addr);
 }
@@ -2617,8 +2610,8 @@ static int compareAtomPtrsByShelfDate(void const* va, void const* vb)
     struct peer_atom const* a = *(struct peer_atom const* const*)va;
     struct peer_atom const* b = *(struct peer_atom const* const*)vb;
 
-    TR_ASSERT(tr_isAtom(a));
-    TR_ASSERT(tr_isAtom(b));
+    TR_ASSERT(a->isValid());
+    TR_ASSERT(b->isValid());
 
     int const data_time_cutoff_secs = 60 * 60;
     time_t const tr_now = tr_time();
