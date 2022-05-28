@@ -265,7 +265,7 @@ void tr_torrent_files::remove(std::string_view parent_in, std::string_view tmpdi
     // Make a list of the top-level torrent files & folders
     // because we'll need it below in the 'remove junk' phase
     auto const path = tr_pathbuf{ parent, '/', tmpdir_prefix };
-    auto top_files = std::set<std::string>{std::string{path}};
+    auto top_files = std::set<std::string>{ std::string{ path } };
     depthFirstWalk(
         tmpdir,
         [&parent, &tmpdir, &top_files](char const* filename)
