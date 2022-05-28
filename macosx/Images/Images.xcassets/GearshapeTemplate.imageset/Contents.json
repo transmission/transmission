@@ -1,12 +1,12 @@
 {
   "images" : [
     {
-      "filename" : "CleanupTemplate.png",
+      "filename" : "GearshapeTemplate.png",
       "idiom" : "mac",
       "scale" : "1x"
     },
     {
-      "filename" : "CleanupTemplate@2x.png",
+      "filename" : "GearshapeTemplate@2x.png",
       "idiom" : "mac",
       "scale" : "2x"
     }
