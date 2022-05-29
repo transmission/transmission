@@ -8,7 +8,7 @@
 
 @implementation PriorityPopUpButtonCell
 
-- (void)drawTitleWithFrame:(NSRect)cellFrame inView:(NSView *)controlView
+- (void)drawTitleWithFrame:(NSRect)cellFrame inView:(NSView*)controlView
 {
     NSRect textFrame = cellFrame;
     textFrame.origin.x += 2 * FRAME_INSET;

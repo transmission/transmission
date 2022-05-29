@@ -8,7 +8,7 @@
 
 @implementation GroupPopUpButtonCell
 
-- (void)drawImageWithFrame:(NSRect)cellFrame inView:(NSView *)controlView
+- (void)drawImageWithFrame:(NSRect)cellFrame inView:(NSView*)controlView
 {
     NSRect imageFrame = cellFrame;
     imageFrame.origin.x -= FRAME_INSET;
@@ -16,7 +16,7 @@
     [super drawImageWithFrame:imageFrame inView:controlView];
 }
 
-- (void)drawTitleWithFrame:(NSRect)cellFrame inView:(NSView *)controlView
+- (void)drawTitleWithFrame:(NSRect)cellFrame inView:(NSView*)controlView
 {
     NSRect textFrame = cellFrame;
     textFrame.origin.y += FRAME_INSET / 2;
