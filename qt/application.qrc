@@ -13,8 +13,8 @@
       <file alias="transmission-256.png">icons/hicolor/256x256/transmission-qt.png</file>
       <file alias="transmission-qt.svg">icons/hicolor/scalable/transmission-qt.svg</file>
       <file alias="ratio.png">icons/ratio.png</file>
-      <file alias="alt-limit-off.png">icons/turtle-grey.png</file>
-      <file alias="alt-limit-on.png">icons/turtle-blue.png</file>
+      <file alias="alt-limit-off.png">icons/tortoise.png</file>
+      <file alias="alt-limit-on.png">icons/tortoise-orange.png</file>
       <file alias="encrypted.png">icons/lock.png</file>
       <file alias="utilities.png">icons/utilities.png</file>
   </qresource>
