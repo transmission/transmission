@@ -218,7 +218,10 @@ bool tr_torrent_files::move(
     {
         auto const remove_empty_directories = [](char const* filename)
         {
-            tr_sys_path_remove(filename, nullptr);
+            if (isEmptyDirectory(filename))
+            {
+                tr_sys_path_remove(filename, nullptr);
+            }
         };
 
         remove(old_parent, parent_name, remove_empty_directories);
