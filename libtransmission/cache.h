@@ -10,35 +10,26 @@
 #endif
 
 #include <cstdint> // intX_t, uintX_t
+#include <vector>
 
 #include "transmission.h"
 
 #include "block-info.h"
-#include "ptrarray.h"
 
 struct evbuffer;
 struct tr_torrent;
 
-class tr_cache
+class Cache
 {
-public: // TODO: private more of these
-    tr_ptrArray blocks; // TODO: std::vector
-    int max_blocks = 0;
-    size_t max_bytes = 0;
-
-    size_t disk_writes = 0;
-    size_t disk_write_bytes = 0;
-    size_t cache_writes = 0;
-    size_t cache_write_bytes = 0;
-
-    explicit tr_cache(int64_t max_bytes);
-    ~tr_cache();
+public:
+    explicit Cache(int64_t max_bytes);
+    ~Cache() = default;
 
     int setLimit(int64_t new_limit);
 
     [[nodiscard]] size_t getLimit() const
     {
-        return max_bytes;
+        return max_bytes_;
     }
 
     int writeBlock(tr_torrent* torrent, tr_block_info::Location loc, uint32_t length, struct evbuffer* writeme);
@@ -49,8 +40,11 @@ public: // TODO: private more of these
     int flushFile(tr_torrent* torrent, tr_file_index_t file);
 
 private:
-    struct cache_block
+    struct CacheBlock
     {
+        CacheBlock() = default;
+        CacheBlock(tr_torrent* _tor, tr_block_info::Location _loc, uint32_t _length);
+
         tr_torrent* tor = nullptr;
 
         tr_block_info::Location loc;
@@ -61,14 +55,14 @@ private:
         struct evbuffer* evbuf = nullptr;
     };
 
-    struct run_info
+    struct RunInfo
     {
-        int pos = 0;
-        int rank = 0;
+        size_t pos = 0;
+        size_t rank = 0;
         time_t last_block_time = 0;
         bool is_multi_piece = false;
         bool is_piece_done = false;
-        unsigned int len = 0;
+        size_t len = 0;
     };
 
     enum
@@ -78,15 +72,40 @@ private:
         SESSIONFLAG = 0x4000,
     };
 
-    // TODO: size_t return
-    int getBlockRun(int pos, run_info* info) const;
-    static int compareRuns(void const* va, void const* vb);
-    int calcRuns(run_info* runs) const;
-    int flushContiguous(int pos, int n);
-    int flushRuns(struct run_info* runs, int n);
+    std::vector<CacheBlock> blocks_;
+    size_t max_blocks_ = 0;
+    size_t max_bytes_ = 0;
+
+    size_t disk_writes_ = 0;
+    size_t disk_write_bytes_ = 0;
+    size_t cache_writes_ = 0;
+    size_t cache_write_bytes_ = 0;
+
+    size_t getBlockRun(size_t pos, RunInfo* info) const;
+
+    // Descending sort: Higher rank comes before lower rank
+    static bool compareRuns(RunInfo& a, RunInfo& b)
+    {
+        // The value returned by the comparer function indicates whether the element passed as
+        // first argument is considered to go before the second
+        return b.rank > a.rank;
+    }
+
+    size_t calcRuns(std::vector<RunInfo>& runs) const;
+
+    // Returns: result of tr_ioWrite
+    int flushContiguous(size_t pos, size_t n);
+
+    // Returns: result of last tr_ioWrite call returned from flushContiguous()
+    int flushRuns(std::vector<RunInfo>& runs, size_t n);
+
+    // Returns: result of last tr_ioWrite call returned from flushRuns()
     int cacheTrim();
-    static int getMaxBlocks(int64_t max_bytes);
-    static int cache_block_compare(void const* va, void const* vb);
-    cache_block* findBlock(tr_torrent* torrent, tr_block_info::Location loc);
-    int findBlockPos(tr_torrent* torrent, tr_block_info::Location loc) const;
+
+    static size_t getMaxBlocks(int64_t max_bytes);
+    static bool cacheBlockCompare(CacheBlock const& a, CacheBlock const& b);
+    // Non-const variant returns a mutable iterator
+    std::vector<Cache::CacheBlock>::iterator findBlock(tr_torrent* torrent, tr_block_info::Location loc);
+    // Returns max value for size_t (0xFFFF...) if not found
+    size_t findBlockPos(tr_torrent* torrent, tr_block_info::Location loc) const;
 };
