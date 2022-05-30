@@ -12,7 +12,7 @@
 {
     NSRect textFrame = cellFrame;
     textFrame.origin.x += 2 * FRAME_INSET;
-    
+
     [super drawTitleWithFrame:textFrame inView:controlView];
 }
 

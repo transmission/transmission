@@ -12,7 +12,7 @@
 {
     NSRect imageFrame = cellFrame;
     imageFrame.origin.x -= FRAME_INSET;
-    
+
     [super drawImageWithFrame:imageFrame inView:controlView];
 }
 
@@ -20,7 +20,7 @@
 {
     NSRect textFrame = cellFrame;
     textFrame.origin.y += FRAME_INSET / 2;
-    
+
     [super drawTitleWithFrame:textFrame inView:controlView];
 }
 
