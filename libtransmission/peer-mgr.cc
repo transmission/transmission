@@ -229,7 +229,7 @@ struct peer_atom
     time_t lastConnectionAttemptAt = {};
     time_t lastConnectionAt = {};
 
-    tr_peer* peer; /* will be nullptr if not connected */
+    tr_peer* peer = nullptr; // will be nullptr if not connected
 
     uint8_t const fromFirst; /* where the peer was first found */
     uint8_t fromBest; /* the "best" value of where the peer has been found */
