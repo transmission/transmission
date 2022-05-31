@@ -704,7 +704,7 @@ static ReadState readPeerId(tr_handshake* handshake, struct evbuffer* inbuf)
     // if we've somehow connected to ourselves, don't keep the connection
     auto const hash = tr_peerIoGetTorrentHash(handshake->io);
     auto* const tor = hash ? handshake->session->torrents().get(*hash) : nullptr;
-    bool const connected_to_self = peer_id == tr_torrentGetPeerId(tor);
+    bool const connected_to_self = tor != nullptr && peer_id == tr_torrentGetPeerId(tor);
 
     return tr_handshakeDone(handshake, !connected_to_self);
 }
