@@ -115,7 +115,7 @@ public:
         }
 
         // Return the preferred user aagent, or nullopt to not use one
-        [[nodiscard]] virtual std::optional<std::string> userAgent() const
+        [[nodiscard]] virtual std::optional<std::string_view> userAgent() const
         {
             return std::nullopt;
         }
