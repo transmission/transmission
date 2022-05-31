@@ -2308,7 +2308,6 @@ static void removePeer(tr_peer* peer)
     --s->stats.peer_from_count[atom->fromFirst];
 
     TR_ASSERT(s->stats.peer_count == s->peerCount());
-    TR_ASSERT(s->stats.peer_from_count[atom->fromFirst] >= 0);
 
     delete peer;
 }
