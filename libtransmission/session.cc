@@ -138,9 +138,9 @@ std::optional<std::string> tr_session::WebMediator::cookieFile() const
     return std::string{ path };
 }
 
-std::optional<std::string> tr_session::WebMediator::userAgent() const
+std::optional<std::string_view> tr_session::WebMediator::userAgent() const
 {
-    return fmt::format(FMT_STRING("{:s}/{:s}"), TR_NAME, SHORT_VERSION_STRING);
+    return TR_NAME "/" SHORT_VERSION_STRING;
 }
 
 std::optional<std::string> tr_session::WebMediator::publicAddress() const
