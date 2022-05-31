@@ -2576,14 +2576,27 @@ static auto getMaxAtomCount(tr_torrent const* tor)
     return std::min(Limit, static_cast<uint16_t>(tor->max_connected_peers * Multiplier));
 }
 
-struct CompareByShelfDate
+struct CompareAtomsByActivity
 {
-    [[nodiscard]] static int compare(peer_atom const& a, peer_atom const& b) noexcept
+    CompareAtomsByActivity(tr_swarm const& swarm)
+        : swarm_{ swarm }
     {
+    }
+
+    [[nodiscard]] int compare(peer_atom const& a, peer_atom const& b) const
+    {
+        // primary key: peers in use go first
+        auto const a_use = peerIsInUse(&swarm_, &a);
+        auto const b_use = peerIsInUse(&swarm_, &b);
+        if (a_use != b_use)
+        {
+            return a_use ? -1 : 1;
+        }
+
         auto constexpr data_time_cutoff_secs = int{ 60 * 60 };
         auto const tr_now = tr_time();
 
-        // primary key: the last piece data time *if* it was within the last hour */
+        // secondary key: the last piece data time *if* it was within the last hour
         time_t atime = a.piece_data_time;
 
         if (atime + data_time_cutoff_secs < tr_now)
@@ -2603,7 +2616,7 @@ struct CompareByShelfDate
             return atime > btime ? -1 : 1;
         }
 
-        // secondary key: shelf date
+        // tertiary key: shelf date
         if (a.shelfDate() != b.shelfDate())
         {
             return a.shelfDate() > b.shelfDate() ? -1 : 1;
@@ -2612,7 +2625,7 @@ struct CompareByShelfDate
         return 0;
     }
 
-    [[nodiscard]] static int compare(std::unique_ptr<peer_atom> const& a, std::unique_ptr<peer_atom> const& b) noexcept
+    [[nodiscard]] int compare(std::unique_ptr<peer_atom> const& a, std::unique_ptr<peer_atom> const& b) const noexcept
     {
         return compare(*a, *b);
     }
@@ -2621,6 +2634,9 @@ struct CompareByShelfDate
     {
         return compare(*a, *b) < 0;
     }
+
+private:
+    tr_swarm const& swarm_;
 };
 
 static void atomPulse(evutil_socket_t /*fd*/, short /*what*/, void* vmgr)
@@ -2630,46 +2646,25 @@ static void atomPulse(evutil_socket_t /*fd*/, short /*what*/, void* vmgr)
 
     for (auto* const tor : mgr->session->torrents())
     {
-        tr_swarm* s = tor->swarm;
-        auto const maxAtomCount = getMaxAtomCount(tor);
-        auto const atomCount = std::size(s->pool);
-
-        if (atomCount <= maxAtomCount)
+        // do we have too many atoms?
+        auto& atoms = tor->swarm->pool;
+        auto const max_atom_count = getMaxAtomCount(tor);
+        auto const atom_count = std::size(atoms);
+        if (atom_count <= max_atom_count)
         {
             continue;
         }
 
-        // we've got too many atoms... time to prune
-
-        // keep the ones that are in use
-        auto keep = decltype(s->pool){};
-        auto test = decltype(s->pool){};
-        for (auto& atom : s->pool)
-        {
-            if (peerIsInUse(s, atom.get()))
-            {
-                keep.emplace_back(std::move(atom));
-            }
-            else
-            {
-                test.emplace_back(std::move(atom));
-            }
-        }
-
-        // if there's room, keep the best of what's left
-        if (std::size(keep) < maxAtomCount)
-        {
-            auto const n_left = maxAtomCount - std::size(keep);
-            auto const n_keep = std::min(std::size(test), n_left);
-            std::partial_sort(std::begin(test), std::begin(test) + n_keep, std::end(test));
-            std::move(std::begin(test), std::end(test) + n_keep, std::back_inserter(keep));
-        }
-
-        std::sort(std::begin(keep), std::end(keep));
-        std::swap(s->pool, keep);
+        // we've got too many... prune the oldest / least active
+        std::partial_sort(
+            std::begin(atoms),
+            std::begin(atoms) + max_atom_count,
+            std::end(atoms),
+            CompareAtomsByActivity{ *tor->swarm });
+        atoms.resize(max_atom_count);
         tr_logAddTraceSwarm(
-            s,
-            fmt::format("max atom count is {}... pruned from {} to {}", maxAtomCount, atomCount, std::size(s->pool)));
+            tor->swarm,
+            fmt::format("max atom count is {}... pruned from {} to {}", max_atom_count, atom_count, std::size(atoms)));
     }
 
     tr_timerAddMsec(*mgr->atomTimer, AtomPeriodMsec);
