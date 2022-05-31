@@ -32,7 +32,7 @@ size_t tr_announce_list::set(char const* const* announce_urls, tr_tracker_tier_t
 
 bool tr_announce_list::remove(std::string_view announce_url)
 {
-    auto it = find(announce_url);
+    auto const it = find(announce_url);
     if (it == std::end(trackers_))
     {
         return false;
@@ -129,16 +129,15 @@ std::optional<std::string> tr_announce_list::announceToScrape(std::string_view a
     // it will be taken as a sign that that tracker doesn't support
     // the scrape convention. If it does, substitute 'scrape' for
     // 'announce' to find the scrape page.
-    auto constexpr oldval = std::string_view{ "/announce" };
-    if (auto pos = announce.rfind(oldval.front()); pos != std::string_view::npos && announce.find(oldval, pos) == pos)
+    auto constexpr Oldval = "/announce"sv;
+    auto constexpr Newval = "/scrape"sv;
+    if (auto pos = announce.rfind(Oldval.front()); pos != std::string_view::npos && announce.find(Oldval, pos) == pos)
     {
-        auto const prefix = announce.substr(0, pos);
-        auto const suffix = announce.substr(pos + std::size(oldval));
-        return fmt::format(FMT_STRING("{:s}/scrape{:s}"), prefix, suffix);
+        return std::string{ announce }.replace(pos, std::size(Oldval), Newval);
     }
 
     // some torrents with UDP announce URLs don't have /announce
-    if (tr_strvStartsWith(announce, std::string_view{ "udp:" }))
+    if (tr_strvStartsWith(announce, "udp:"sv))
     {
         return std::string{ announce };
     }
