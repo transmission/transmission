@@ -229,7 +229,7 @@ struct peer_atom
     time_t lastConnectionAttemptAt = {};
     time_t lastConnectionAt = {};
 
-    tr_peer* peer; /* will be nullptr if not connected */
+    tr_peer* peer = nullptr; // will be nullptr if not connected
 
     uint8_t const fromFirst; /* where the peer was first found */
     uint8_t fromBest; /* the "best" value of where the peer has been found */
@@ -2308,7 +2308,6 @@ static void removePeer(tr_peer* peer)
     --s->stats.peer_from_count[atom->fromFirst];
 
     TR_ASSERT(s->stats.peer_count == s->peerCount());
-    TR_ASSERT(s->stats.peer_from_count[atom->fromFirst] >= 0);
 
     delete peer;
 }
