@@ -139,12 +139,14 @@ struct peer_atom
 
     [[nodiscard]] bool isBlocklisted(tr_session const* session) const
     {
-        if (!blocklisted_)
+        if (blocklisted_)
         {
-            blocklisted_ = tr_sessionIsAddressBlocked(session, &addr);
+            return *blocklisted_;
         }
 
-        return *blocklisted_;
+        auto const value = tr_sessionIsAddressBlocked(session, &addr);
+        blocklisted_ = value;
+        return value;
     }
 
     [[nodiscard]] constexpr auto shelfDate() const noexcept

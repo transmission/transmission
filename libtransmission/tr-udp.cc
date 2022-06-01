@@ -29,9 +29,9 @@
 /* Since we use a single UDP socket in order to implement multiple
    uTP sockets, try to set up huge buffers. */
 
-#define RECV_BUFFER_SIZE (4 * 1024 * 1024)
-#define SEND_BUFFER_SIZE (1 * 1024 * 1024)
-#define SMALL_BUFFER_SIZE (32 * 1024)
+static auto constexpr RecvBufferSize = 4 * 1024 * 1024;
+static auto constexpr SendBufferSize = 1 * 1024 * 1024;
+static auto constexpr SmallBufferSize = 32 * 1024;
 
 static void set_socket_buffers(tr_socket_t fd, bool large)
 {
@@ -40,7 +40,7 @@ static void set_socket_buffers(tr_socket_t fd, bool large)
     socklen_t rbuf_len = sizeof(rbuf);
     socklen_t sbuf_len = sizeof(sbuf);
 
-    int size = large ? RECV_BUFFER_SIZE : SMALL_BUFFER_SIZE;
+    int size = large ? RecvBufferSize : SmallBufferSize;
     int rc = setsockopt(fd, SOL_SOCKET, SO_RCVBUF, reinterpret_cast<char const*>(&size), sizeof(size));
 
     if (rc < 0)
@@ -48,7 +48,7 @@ static void set_socket_buffers(tr_socket_t fd, bool large)
         tr_logAddDebug(fmt::format("Couldn't set receive buffer: {}", tr_net_strerror(sockerrno)));
     }
 
-    size = large ? SEND_BUFFER_SIZE : SMALL_BUFFER_SIZE;
+    size = large ? SendBufferSize : SmallBufferSize;
     rc = setsockopt(fd, SOL_SOCKET, SO_SNDBUF, reinterpret_cast<char const*>(&size), sizeof(size));
 
     if (rc < 0)
@@ -72,19 +72,19 @@ static void set_socket_buffers(tr_socket_t fd, bool large)
             sbuf = 0;
         }
 
-        if (rbuf < RECV_BUFFER_SIZE)
+        if (rbuf < RecvBufferSize)
         {
-            tr_logAddDebug(fmt::format("Couldn't set receive buffer: requested {}, got {}", RECV_BUFFER_SIZE, rbuf));
+            tr_logAddDebug(fmt::format("Couldn't set receive buffer: requested {}, got {}", RecvBufferSize, rbuf));
 #ifdef __linux__
-            tr_logAddDebug(fmt::format("Please add the line 'net.core.rmem_max = {}' to /etc/sysctl.conf", RECV_BUFFER_SIZE));
+            tr_logAddDebug(fmt::format("Please add the line 'net.core.rmem_max = {}' to /etc/sysctl.conf", RecvBufferSize));
 #endif
         }
 
-        if (sbuf < SEND_BUFFER_SIZE)
+        if (sbuf < SendBufferSize)
         {
-            tr_logAddDebug(fmt::format("Couldn't set send buffer: requested {}, got {}", SEND_BUFFER_SIZE, sbuf));
+            tr_logAddDebug(fmt::format("Couldn't set send buffer: requested {}, got {}", SendBufferSize, sbuf));
 #ifdef __linux__
-            tr_logAddDebug(fmt::format("Please add the line 'net.core.wmem_max = {}' to /etc/sysctl.conf", SEND_BUFFER_SIZE));
+            tr_logAddDebug(fmt::format("Please add the line 'net.core.wmem_max = {}' to /etc/sysctl.conf", SendBufferSize));
 #endif
         }
     }
