@@ -415,6 +415,7 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
             else if (
                 pathIs(InfoKey, FilesKey, ""sv, Crc32Key) || //
                 pathIs(InfoKey, FilesKey, ""sv, Ed2kKey) || //
+                pathIs(InfoKey, FilesKey, ""sv, FilehashKey) || //
                 pathIs(InfoKey, FilesKey, ""sv, Md5Key) || //
                 pathIs(InfoKey, FilesKey, ""sv, Md5sumKey) || //
                 pathIs(InfoKey, FilesKey, ""sv, MtimeKey) || // (why a string?)
@@ -653,6 +654,7 @@ private:
     static constexpr std::string_view FileDurationKey = "file-duration"sv;
     static constexpr std::string_view FileMediaKey = "file-media"sv;
     static constexpr std::string_view FileTreeKey = "file tree"sv;
+    static constexpr std::string_view FilehashKey = "filehash"sv;
     static constexpr std::string_view FilesKey = "files"sv;
     static constexpr std::string_view HeightKey = "height"sv;
     static constexpr std::string_view HttpSeedsKey = "httpseeds"sv;
