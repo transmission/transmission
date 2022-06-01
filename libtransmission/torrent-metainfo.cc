@@ -584,11 +584,12 @@ private:
         if (!hash)
         {
             tr_error_set(context.error, EINVAL, "bad info_dict checksum");
+            return false;
         }
+
         tm_.info_hash_ = *hash;
         tm_.info_hash_str_ = tr_sha1_to_string(tm_.info_hash_);
         tm_.info_dict_size_ = std::size(info_dict_benc);
-
         return true;
     }
 
