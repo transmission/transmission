@@ -25,7 +25,6 @@ Checks: >
   -misc-non-private-member-variables-in-classes,
   modernize-*,
   -modernize-avoid-c-arrays,
-  -modernize-macro-to-enum,
   -modernize-use-trailing-return-type,
   performance-*,
   readability-*,
