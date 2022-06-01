@@ -6,7 +6,6 @@ Checks: >
   -bugprone-easily-swappable-parameters,
   -bugprone-implicit-widening-of-multiplication-result,
   -bugprone-narrowing-conversions,
-  -bugprone-unchecked-optional-access,
   cert-*,
   -cert-err34-c,
   -cert-err58-cpp,

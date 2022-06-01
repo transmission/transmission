@@ -420,7 +420,14 @@ static ReadState readYb(tr_handshake* handshake, struct evbuffer* inbuf)
 
     /* HASH('req2', SKEY) xor HASH('req3', S) */
     {
-        auto const req2 = tr_sha1("req2"sv, *tr_cryptoGetTorrentHash(handshake->crypto));
+        auto const hash = tr_cryptoGetTorrentHash(handshake->crypto);
+        if (!hash)
+        {
+            tr_logAddTraceHand(handshake, "error while computing req2/req3 hash after Yb");
+            return tr_handshakeDone(handshake, false);
+        }
+
+        auto const req2 = tr_sha1("req2"sv, *hash);
         auto const req3 = computeRequestHash(handshake, "req3"sv);
         if (!req2 || !req3)
         {
