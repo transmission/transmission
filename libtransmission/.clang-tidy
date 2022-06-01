@@ -34,4 +34,3 @@ Checks: >
   -readability-magic-numbers,
   -readability-qualified-auto,
   -readability-redundant-access-specifiers,
-  -readability-simplify-boolean-expr,
