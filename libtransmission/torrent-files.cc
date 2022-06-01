@@ -154,7 +154,7 @@ bool tr_torrent_files::move(
     std::string_view old_parent_in,
     std::string_view parent_in,
     double volatile* setme_progress,
-    std::string_view log_name,
+    std::string_view parent_name,
     tr_error** error) const
 {
     if (setme_progress != nullptr)
@@ -164,7 +164,7 @@ bool tr_torrent_files::move(
 
     auto const old_parent = tr_pathbuf{ old_parent_in };
     auto const parent = tr_pathbuf{ parent_in };
-    tr_logAddTrace(fmt::format(FMT_STRING("Moving files from '{:s}' to '{:s}'"), old_parent, parent), log_name);
+    tr_logAddTrace(fmt::format(FMT_STRING("Moving files from '{:s}' to '{:s}'"), old_parent, parent), parent_name);
 
     if (tr_sys_path_is_same(old_parent, parent))
     {
@@ -192,14 +192,14 @@ bool tr_torrent_files::move(
 
         auto const& old_path = found->filename();
         auto const path = tr_pathbuf{ parent, '/', found->subpath() };
-        tr_logAddTrace(fmt::format(FMT_STRING("Found file #{:d} '{:s}'"), i, old_path), log_name);
+        tr_logAddTrace(fmt::format(FMT_STRING("Found file #{:d} '{:s}'"), i, old_path), parent_name);
 
         if (tr_sys_path_is_same(old_path, path))
         {
             continue;
         }
 
-        tr_logAddTrace(fmt::format(FMT_STRING("Moving file #{:d} to '{:s}'"), i, old_path, path), log_name);
+        tr_logAddTrace(fmt::format(FMT_STRING("Moving file #{:d} to '{:s}'"), i, old_path, path), parent_name);
         if (!tr_moveFile(old_path, path, error))
         {
             err = true;
@@ -224,7 +224,7 @@ bool tr_torrent_files::move(
             }
         };
 
-        remove(old_parent, "transmission-removed", remove_empty_directories);
+        remove(old_parent, parent_name, remove_empty_directories);
     }
 
     return !err;
@@ -267,7 +267,8 @@ void tr_torrent_files::remove(std::string_view parent_in, std::string_view tmpdi
 
     // Make a list of the top-level torrent files & folders
     // because we'll need it below in the 'remove junk' phase
-    auto top_files = std::set<std::string>{};
+    auto const path = tr_pathbuf{ parent, '/', tmpdir_prefix };
+    auto top_files = std::set<std::string>{ std::string{ path } };
     depthFirstWalk(
         tmpdir,
         [&parent, &tmpdir, &top_files](char const* filename)

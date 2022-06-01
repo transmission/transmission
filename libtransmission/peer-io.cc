@@ -41,7 +41,7 @@
 
 /* The amount of read bufferring that we allow for uTP sockets. */
 
-#define UTP_READ_BUFFER_SIZE (256 * 1024)
+static auto constexpr UtpReadBufferSize = 256 * 1024;
 
 #define tr_logAddErrorIo(io, msg) tr_logAddError(msg, (io)->addrStr())
 #define tr_logAddWarnIo(io, msg) tr_logAddWarn(msg, (io)->addrStr())
@@ -462,10 +462,10 @@ static size_t utp_get_rb_size(void* vio)
 
     TR_ASSERT(tr_isPeerIo(io));
 
-    size_t bytes = io->bandwidth->clamp(TR_DOWN, UTP_READ_BUFFER_SIZE);
+    size_t bytes = io->bandwidth->clamp(TR_DOWN, UtpReadBufferSize);
 
     tr_logAddTraceIo(io, fmt::format("utp_get_rb_size is saying it's ready to read {} bytes", bytes));
-    return UTP_READ_BUFFER_SIZE - bytes;
+    return UtpReadBufferSize - bytes;
 }
 
 static int tr_peerIoTryWrite(tr_peerIo* io, size_t howmuch);
@@ -632,7 +632,7 @@ static tr_peerIo* tr_peerIoNew(
 
     case TR_PEER_SOCKET_TYPE_UTP:
         tr_logAddTraceIo(io, fmt::format("socket (utp) is {}", fmt::ptr(socket.handle.utp)));
-        UTP_SetSockopt(socket.handle.utp, SO_RCVBUF, UTP_READ_BUFFER_SIZE);
+        UTP_SetSockopt(socket.handle.utp, SO_RCVBUF, UtpReadBufferSize);
         tr_logAddTraceIo(io, "calling UTP_SetCallbacks &utp_function_table");
         UTP_SetCallbacks(socket.handle.utp, &utp_function_table, io);
 

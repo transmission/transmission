@@ -420,7 +420,14 @@ static ReadState readYb(tr_handshake* handshake, struct evbuffer* inbuf)
 
     /* HASH('req2', SKEY) xor HASH('req3', S) */
     {
-        auto const req2 = tr_sha1("req2"sv, *tr_cryptoGetTorrentHash(handshake->crypto));
+        auto const hash = tr_cryptoGetTorrentHash(handshake->crypto);
+        if (!hash)
+        {
+            tr_logAddTraceHand(handshake, "error while computing req2/req3 hash after Yb");
+            return tr_handshakeDone(handshake, false);
+        }
+
+        auto const req2 = tr_sha1("req2"sv, *hash);
         auto const req3 = computeRequestHash(handshake, "req3"sv);
         if (!req2 || !req3)
         {
@@ -704,7 +711,7 @@ static ReadState readPeerId(tr_handshake* handshake, struct evbuffer* inbuf)
     // if we've somehow connected to ourselves, don't keep the connection
     auto const hash = tr_peerIoGetTorrentHash(handshake->io);
     auto* const tor = hash ? handshake->session->torrents().get(*hash) : nullptr;
-    bool const connected_to_self = peer_id == tr_torrentGetPeerId(tor);
+    bool const connected_to_self = tor != nullptr && peer_id == tr_torrentGetPeerId(tor);
 
     return tr_handshakeDone(handshake, !connected_to_self);
 }
