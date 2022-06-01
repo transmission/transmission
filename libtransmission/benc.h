@@ -10,6 +10,7 @@
 #include <cstddef> // size_t
 #include <cstdint> // int64_t
 #include <optional>
+#include <string>
 #include <string_view>
 #include <utility> // make_pair
 
@@ -127,6 +128,19 @@ struct BasicHandler : public Handler
     auto currentKey() const
     {
         return key(depth());
+    }
+
+protected:
+    [[nodiscard]] std::string path() const
+    {
+        auto ret = std::string{};
+        for (size_t i = 0; i <= depth(); ++i)
+        {
+            ret += '[';
+            ret += key(i);
+            ret += ']';
+        }
+        return ret;
     }
 
 private:

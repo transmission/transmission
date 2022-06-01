@@ -249,7 +249,6 @@ set(${PROJECT_NAME}_HIDPI_IMAGES
     Globe
     GreenDotFlat
     Groups
-    GroupsNoneTemplate
     InfoActivity
     InfoFiles
     InfoGeneral
@@ -292,7 +291,7 @@ set(${PROJECT_NAME}_HIDPI_IMAGES
     ToolbarResumeAllTemplate
     ToolbarResumeSelectedTemplate
     Transfers
-    TurtleTemplate
+    TortoiseTemplate
     UpArrowGroupTemplate
     UpArrowTemplate
     YellowDotFlat

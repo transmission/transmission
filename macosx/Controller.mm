@@ -589,11 +589,6 @@ static void removeKeRangerRansomware()
         @"Speed Limit overrides the total bandwidth limits with its own limits.",
         "Main window -> 2nd bottom left button (turtle) tooltip");
 
-    if (@available(macOS 11.0, *))
-    {
-        self.fActionButton.image = [NSImage imageWithSystemSymbolName:@"gearshape.fill" accessibilityDescription:nil];
-        self.fSpeedLimitButton.image = [NSImage imageWithSystemSymbolName:@"tortoise.fill" accessibilityDescription:nil];
-    }
     self.fClearCompletedButton.toolTip = NSLocalizedString(
         @"Remove all transfers that have completed seeding.",
         "Main window -> 3rd bottom left button (remove all) tooltip");
@@ -2032,24 +2027,7 @@ static void removeKeRangerRansomware()
 
 - (void)copyMagnetLinks:(id)sender
 {
-    NSArray* torrents = self.fTableView.selectedTorrents;
-
-    if (torrents.count <= 0)
-    {
-        return;
-    }
-
-    NSMutableArray* links = [NSMutableArray arrayWithCapacity:torrents.count];
-    for (Torrent* torrent in torrents)
-    {
-        [links addObject:torrent.magnetLink];
-    }
-
-    NSString* text = [links componentsJoinedByString:@"\n"];
-
-    NSPasteboard* pb = NSPasteboard.generalPasteboard;
-    [pb clearContents];
-    [pb writeObjects:@[ text ]];
+    [self.fTableView copy:sender];
 }
 
 - (void)revealFile:(id)sender
@@ -2219,7 +2197,7 @@ static void removeKeRangerRansomware()
     {
         if (self.fWindow.visible)
         {
-            [self sortTorrents:NO];
+            [self sortTorrentsAndIncludeQueueOrder:NO];
 
             [self.fStatusBar updateWithDownload:dlRate upload:ulRate];
 
@@ -2303,13 +2281,42 @@ static void removeKeRangerRansomware()
     else if (notification.activationType == NSUserNotificationActivationTypeContentsClicked)
     {
         Torrent* torrent = [self torrentForHash:notification.userInfo[@"Hash"]];
-        if (torrent)
+        if (!torrent)
         {
-            //select in the table - first see if it's already shown
-            NSInteger row = [self.fTableView rowForItem:torrent];
+            return;
+        }
+        //select in the table - first see if it's already shown
+        NSInteger row = [self.fTableView rowForItem:torrent];
+        if (row == -1)
+        {
+            //if it's not shown, see if it's in a collapsed row
+            if ([self.fDefaults boolForKey:@"SortByGroup"])
+            {
+                __block TorrentGroup* parent = nil;
+                [self.fDisplayedTorrents enumerateObjectsWithOptions:NSEnumerationConcurrent
+                                                          usingBlock:^(TorrentGroup* group, NSUInteger idx, BOOL* stop) {
+                                                              if ([group.torrents containsObject:torrent])
+                                                              {
+                                                                  parent = group;
+                                                                  *stop = YES;
+                                                              }
+                                                          }];
+                if (parent)
+                {
+                    [[self.fTableView animator] expandItem:parent];
+                    row = [self.fTableView rowForItem:torrent];
+                }
+            }
+
             if (row == -1)
             {
-                //if it's not shown, see if it's in a collapsed row
+                //not found - must be filtering
+                NSAssert([self.fDefaults boolForKey:@"FilterBar"], @"expected the filter to be enabled");
+                [self.fFilterBar reset:YES];
+
+                row = [self.fTableView rowForItem:torrent];
+
+                //if it's not shown, it has to be in a collapsed row...again
                 if ([self.fDefaults boolForKey:@"SortByGroup"])
                 {
                     __block TorrentGroup* parent = nil;
@@ -2327,41 +2334,13 @@ static void removeKeRangerRansomware()
                         row = [self.fTableView rowForItem:torrent];
                     }
                 }
-
-                if (row == -1)
-                {
-                    //not found - must be filtering
-                    NSAssert([self.fDefaults boolForKey:@"FilterBar"], @"expected the filter to be enabled");
-                    [self.fFilterBar reset:YES];
-
-                    row = [self.fTableView rowForItem:torrent];
-
-                    //if it's not shown, it has to be in a collapsed row...again
-                    if ([self.fDefaults boolForKey:@"SortByGroup"])
-                    {
-                        __block TorrentGroup* parent = nil;
-                        [self.fDisplayedTorrents enumerateObjectsWithOptions:NSEnumerationConcurrent
-                                                                  usingBlock:^(TorrentGroup* group, NSUInteger idx, BOOL* stop) {
-                                                                      if ([group.torrents containsObject:torrent])
-                                                                      {
-                                                                          parent = group;
-                                                                          *stop = YES;
-                                                                      }
-                                                                  }];
-                        if (parent)
-                        {
-                            [[self.fTableView animator] expandItem:parent];
-                            row = [self.fTableView rowForItem:torrent];
-                        }
-                    }
-                }
             }
-
-            NSAssert1(row != -1, @"expected a row to be found for torrent %@", torrent);
-
-            [self showMainWindow:nil];
-            [self.fTableView selectAndScrollToRow:row];
         }
+
+        NSAssert1(row != -1, @"expected a row to be found for torrent %@", torrent);
+
+        [self showMainWindow:nil];
+        [self.fTableView selectAndScrollToRow:row];
     }
 }
 
@@ -2542,7 +2521,7 @@ static void removeKeRangerRansomware()
 
     [self.fDefaults setObject:sortType forKey:@"Sort"];
 
-    [self sortTorrents:YES];
+    [self sortTorrentsAndIncludeQueueOrder:YES];
 }
 
 - (void)setSortByGroup:(id)sender
@@ -2559,11 +2538,11 @@ static void removeKeRangerRansomware()
     if (setReverse != [self.fDefaults boolForKey:@"SortReverse"])
     {
         [self.fDefaults setBool:setReverse forKey:@"SortReverse"];
-        [self sortTorrents:NO];
+        [self sortTorrentsAndIncludeQueueOrder:NO];
     }
 }
 
-- (void)sortTorrents:(BOOL)includeQueueOrder
+- (void)sortTorrentsAndIncludeQueueOrder:(BOOL)includeQueueOrder
 {
     //actually sort
     [self sortTorrentsCallUpdates:YES includeQueueOrder:includeQueueOrder];
@@ -5460,7 +5439,7 @@ static void removeKeRangerRansomware()
     NSArray* descriptors = @[ descriptor ];
     [self.fTorrents sortUsingDescriptors:descriptors];
 
-    [self sortTorrents:YES];
+    [self sortTorrentsAndIncludeQueueOrder:YES];
 }
 
 @end

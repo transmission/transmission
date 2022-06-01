@@ -53,15 +53,15 @@ struct tr_address;
 struct tr_announcer;
 struct tr_announcer_udp;
 struct tr_bindsockets;
-struct tr_blocklistFile;
+struct BlocklistFile;
 struct tr_cache;
 struct tr_fdInfo;
 
 struct tr_bindinfo
 {
-    int socket;
-    tr_address addr;
-    struct event* ev;
+    tr_socket_t socket = TR_BAD_SOCKET;
+    tr_address addr = {};
+    struct event* ev = nullptr;
 };
 
 struct tr_turtle_info
@@ -343,8 +343,8 @@ public:
 
     /* The UDP sockets used for the DHT and uTP. */
     tr_port udp_port;
-    tr_socket_t udp_socket;
-    tr_socket_t udp6_socket;
+    tr_socket_t udp_socket = TR_BAD_SOCKET;
+    tr_socket_t udp6_socket = TR_BAD_SOCKET;
     unsigned char* udp6_bound;
     struct event* udp_event;
     struct event* udp6_event;
@@ -379,7 +379,7 @@ public:
     std::string resume_dir;
     std::string torrent_dir;
 
-    std::vector<tr_blocklistFile*> blocklists;
+    std::vector<std::unique_ptr<BlocklistFile>> blocklists;
     struct tr_peerMgr* peerMgr;
     struct tr_shared* shared;
 
@@ -396,7 +396,7 @@ public:
 
         [[nodiscard]] std::optional<std::string> cookieFile() const override;
         [[nodiscard]] std::optional<std::string> publicAddress() const override;
-        [[nodiscard]] std::optional<std::string> userAgent() const override;
+        [[nodiscard]] std::optional<std::string_view> userAgent() const override;
         [[nodiscard]] unsigned int clamp(int bandwidth_tag, unsigned int byte_count) const override;
         void notifyBandwidthConsumed(int torrent_id, size_t byte_count) override;
         // runs the tr_web::fetch response callback in the libtransmission thread

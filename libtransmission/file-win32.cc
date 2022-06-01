@@ -687,62 +687,128 @@ std::string tr_sys_path_basename(std::string_view path, tr_error** error)
     return { name, size_t(end - name) };
 }
 
-std::string tr_sys_path_dirname(std::string_view path, tr_error** error)
+[[nodiscard]] static bool isWindowsDeviceRoot(char ch) noexcept
 {
-    if (std::empty(path))
+    return isalpha(static_cast<int>(ch)) != 0;
+}
+
+[[nodiscard]] static constexpr bool isPathSeparator(char ch) noexcept
+{
+    return ch == '/' || ch == '\\';
+}
+
+// This function is adapted from Node.js's path.win32.dirname() function,
+// which is copyrighted by Joyent, Inc. and other Node contributors
+// and is distributed under MIT (SPDX:MIT) license.
+std::string_view tr_sys_path_dirname(std::string_view path)
+{
+    auto const len = std::size(path);
+
+    if (len == 0)
     {
-        return ".";
+        return "."sv;
     }
 
-    if (!is_valid_path(path))
+    if (len == 1)
     {
-        set_system_error(error, ERROR_PATH_NOT_FOUND);
-        return {};
+        return isPathSeparator(path[0]) ? path : "."sv;
     }
 
-    bool const is_unc = is_unc_path(path);
+    auto root_end = std::string_view::npos;
+    auto offset = std::string_view::size_type{ 0 };
 
-    if (is_unc && path[2] == '\0')
+    // Try to match a root
+    if (isPathSeparator(path[0]))
     {
-        return std::string{ path };
+        // Possible UNC root
+
+        root_end = offset = 1;
+
+        if (isPathSeparator(path[1]))
+        {
+            // Matched double path separator at beginning
+            std::string_view::size_type j = 2;
+            std::string_view::size_type last = j;
+            // Match 1 or more non-path separators
+            while (j < len && !isPathSeparator(path[j]))
+            {
+                j++;
+            }
+            if (j < len && j != last)
+            {
+                // Matched!
+                last = j;
+                // Match 1 or more path separators
+                while (j < len && isPathSeparator(path[j]))
+                {
+                    j++;
+                }
+                if (j < len && j != last)
+                {
+                    // Matched!
+                    last = j;
+                    // Match 1 or more non-path separators
+                    while (j < len && !isPathSeparator(path[j]))
+                    {
+                        j++;
+                    }
+                    if (j == len)
+                    {
+                        // We matched a UNC root only
+                        return path;
+                    }
+                    if (j != last)
+                    {
+                        // We matched a UNC root with leftovers
+
+                        // Offset by 1 to include the separator after the UNC root to
+                        // treat it as a "normal root" on top of a (UNC) root
+                        root_end = offset = j + 1;
+                    }
+                }
+            }
+        }
+        // Possible device root
+    }
+    else if (isWindowsDeviceRoot(path[0]) && path[1] == ':')
+    {
+        root_end = len > 2 && isPathSeparator(path[2]) ? 3 : 2;
+        offset = root_end;
     }
 
-    char const* const begin = std::data(path);
-    char const* end = begin + std::size(path);
-
-    while (end > begin && is_slash(*(end - 1)))
+    auto end = std::string_view::npos;
+    auto matched_slash = bool{ true };
+    for (std::string_view::size_type i = len - 1; i >= offset; --i)
     {
-        --end;
+        if (isPathSeparator(path[i]))
+        {
+            if (!matched_slash)
+            {
+                end = i;
+                break;
+            }
+        }
+        else
+        {
+            // We saw the first non-path separator
+            matched_slash = false;
+        }
+        if (i <= offset)
+        {
+            break;
+        }
     }
 
-    if (end == begin)
+    if (end == std::string_view::npos)
     {
-        return "/";
+        if (root_end == std::string_view::npos)
+        {
+            return "."sv;
+        }
+
+        end = root_end;
     }
-
-    char const* name = end;
-
-    while (name > begin && *(name - 1) != ':' && !is_slash(*(name - 1)))
-    {
-        --name;
-    }
-
-    while (name > begin && is_slash(*(name - 1)))
-    {
-        --name;
-    }
-
-    if (name == begin)
-    {
-        return is_unc ? "\\\\" : ".";
-    }
-
-    if (name > begin && *(name - 1) == ':' && *name != '\0' && !is_slash(*name))
-    {
-        return fmt::format("{}:.", begin[0]);
-    }
-
-    return { begin, size_t(name - begin) };
+    return path.substr(0, end);
 }
 
 bool tr_sys_path_rename(char const* src_path, char const* dst_path, tr_error** error)

@@ -108,6 +108,11 @@ enum handshake_state_t
 
 struct tr_handshake
 {
+    [[nodiscard]] auto constexpr isIncoming() const noexcept
+    {
+        return io->isIncoming();
+    }
+
     bool haveReadAnythingFromPeer;
     bool haveSentBitTorrentHandshake;
     tr_peerIo* io;
@@ -262,9 +267,9 @@ static handshake_parse_err_t parseHandshake(tr_handshake* handshake, struct evbu
     *** Extensions
     **/
 
-    tr_peerIoEnableDHT(handshake->io, HANDSHAKE_HAS_DHT(reserved));
-    tr_peerIoEnableLTEP(handshake->io, HANDSHAKE_HAS_LTEP(reserved));
-    tr_peerIoEnableFEXT(handshake->io, HANDSHAKE_HAS_FASTEXT(reserved));
+    handshake->io->enableDHT(HANDSHAKE_HAS_DHT(reserved));
+    handshake->io->enableLTEP(HANDSHAKE_HAS_LTEP(reserved));
+    handshake->io->enableFEXT(HANDSHAKE_HAS_FASTEXT(reserved));
 
     return HANDSHAKE_OK;
 }
@@ -595,7 +600,7 @@ static ReadState readHandshake(tr_handshake* handshake, struct evbuffer* inbuf)
     {
         tr_peerIoSetEncryption(handshake->io, PEER_ENCRYPTION_RC4);
 
-        if (tr_peerIoIsIncoming(handshake->io))
+        if (handshake->isIncoming())
         {
             tr_logAddTraceHand(handshake, "I think peer is sending us an encrypted handshake...");
             setState(handshake, AWAITING_YA);
@@ -632,15 +637,15 @@ static ReadState readHandshake(tr_handshake* handshake, struct evbuffer* inbuf)
     *** Extensions
     **/
 
-    tr_peerIoEnableDHT(handshake->io, HANDSHAKE_HAS_DHT(reserved));
-    tr_peerIoEnableLTEP(handshake->io, HANDSHAKE_HAS_LTEP(reserved));
-    tr_peerIoEnableFEXT(handshake->io, HANDSHAKE_HAS_FASTEXT(reserved));
+    handshake->io->enableDHT(HANDSHAKE_HAS_DHT(reserved));
+    handshake->io->enableLTEP(HANDSHAKE_HAS_LTEP(reserved));
+    handshake->io->enableFEXT(HANDSHAKE_HAS_FASTEXT(reserved));
 
     /* torrent hash */
     auto hash = tr_sha1_digest_t{};
     tr_peerIoReadBytes(handshake->io, inbuf, std::data(hash), std::size(hash));
 
-    if (tr_peerIoIsIncoming(handshake->io))
+    if (handshake->isIncoming())
     {
         if (!handshake->session->torrents().contains(hash))
         {
@@ -694,14 +699,12 @@ static ReadState readPeerId(tr_handshake* handshake, struct evbuffer* inbuf)
 
     char client[128] = {};
     tr_clientForId(client, sizeof(client), peer_id);
-    tr_logAddTraceHand(
-        handshake,
-        fmt::format("peer-id is '{}' ... isIncoming is {}", client, tr_peerIoIsIncoming(handshake->io)));
+    tr_logAddTraceHand(handshake, fmt::format("peer-id is '{}' ... isIncoming is {}", client, handshake->isIncoming()));
 
     // if we've somehow connected to ourselves, don't keep the connection
     auto const hash = tr_peerIoGetTorrentHash(handshake->io);
     auto* const tor = hash ? handshake->session->torrents().get(*hash) : nullptr;
-    bool const connected_to_self = peer_id == tr_torrentGetPeerId(tor);
+    bool const connected_to_self = tor != nullptr && peer_id == tr_torrentGetPeerId(tor);
 
     return tr_handshakeDone(handshake, !connected_to_self);
 }
@@ -815,7 +818,7 @@ static ReadState readCryptoProvide(tr_handshake* handshake, struct evbuffer* inb
     if (auto const* const tor = tr_torrentFindFromObfuscatedHash(handshake->session, obfuscated_hash); tor != nullptr)
     {
         bool const clientIsSeed = tor->isDone();
-        bool const peerIsSeed = tr_peerMgrPeerIsSeed(tor, tr_peerIoGetAddress(handshake->io, nullptr));
+        bool const peerIsSeed = tr_peerMgrPeerIsSeed(tor, handshake->io->address());
         tr_logAddTraceHand(
             handshake,
             fmt::format("got INCOMING connection's encrypted handshake for torrent [{}]", tor->name()));
@@ -1130,7 +1133,7 @@ static void gotError(tr_peerIo* io, short what, void* vhandshake)
     int errcode = errno;
     auto* handshake = static_cast<tr_handshake*>(vhandshake);
 
-    if (io->socket.type == TR_PEER_SOCKET_TYPE_UTP && !tr_peerIoIsIncoming(io) && handshake->state == AWAITING_YB)
+    if (io->socket.type == TR_PEER_SOCKET_TYPE_UTP && !io->isIncoming() && handshake->state == AWAITING_YB)
     {
         /* This peer probably doesn't speak uTP. */
 
@@ -1140,7 +1143,7 @@ static void gotError(tr_peerIo* io, short what, void* vhandshake)
         /* Don't mark a peer as non-uTP unless it's really a connect failure. */
         if ((errcode == ETIMEDOUT || errcode == ECONNREFUSED) && tr_isTorrent(tor))
         {
-            tr_peerMgrSetUtpFailed(tor, tr_peerIoGetAddress(io, nullptr), true);
+            tr_peerMgrSetUtpFailed(tor, io->address(), true);
         }
 
         if (tr_peerIoReconnect(handshake->io) == 0)
@@ -1207,7 +1210,7 @@ tr_handshake* tr_handshakeNew(
     tr_peerIoSetIOFuncs(handshake->io, canRead, nullptr, gotError, handshake);
     tr_peerIoSetEncryption(io, PEER_ENCRYPTION_NONE);
 
-    if (tr_peerIoIsIncoming(handshake->io))
+    if (handshake->isIncoming())
     {
         setReadState(handshake, AWAITING_HANDSHAKE);
     }
