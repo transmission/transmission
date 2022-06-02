@@ -284,7 +284,7 @@
     [controlView addTrackingArea:area];
 
     //action button
-    NSRect actionButtonRect = [self actionRectForBounds:cellFrame]; //use the whole icon
+    NSRect actionButtonRect = [self actionRectForBounds:cellFrame];
     NSTrackingAreaOptions actionOptions = options;
     if (NSMouseInRect(mouseLocation, actionButtonRect, controlView.flipped))
     {
@@ -324,7 +324,7 @@
             groupRect.origin.y -= GROUP_INSET_REG * 2;
             groupRect.origin.x += GROUP_INSET_REG;
         }
-        CGFloat const radius = 2.0;
+        CGFloat const radius = GROUP_INSET_REG / 2;
 
         CGFloat fractionOfBlendedColor = 0.05;
         NSColor *groupColor = [GroupsController.groups colorForIndex:groupValue],
