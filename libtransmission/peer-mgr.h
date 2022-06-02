@@ -106,8 +106,6 @@ constexpr bool tr_isPex(tr_pex const* pex)
     return pex && tr_address_is_valid(&pex->addr);
 }
 
-tr_address const* tr_peerAddress(tr_peer const*);
-
 tr_peerMgr* tr_peerMgrNew(tr_session* session);
 
 void tr_peerMgrFree(tr_peerMgr* manager);
