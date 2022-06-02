@@ -198,6 +198,16 @@ public:
         return is_active;
     }
 
+    [[nodiscard]] std::string readable() const override
+    {
+        if (auto const parsed = tr_urlParse(base_url); parsed)
+        {
+            return fmt::format(FMT_STRING("{:s}:{:d}"), parsed->host, parsed->port);
+        }
+
+        return base_url;
+    }
+
     void gotPieceData(uint32_t n_bytes)
     {
         bandwidth.notifyBandwidthConsumed(TR_DOWN, n_bytes, true, tr_time_msec());
