@@ -16,6 +16,7 @@
 #define IMAGE_SIZE_MIN 16.0
 #define ERROR_IMAGE_SIZE 20.0
 
+#define GROUP_IMAGE_WIDTH 4.0
 #define GROUP_INSET_REG 4.0
 #define GROUP_PADDING_REG 22.0
 
@@ -134,7 +135,7 @@
     BOOL const minimal = [self.fDefaults boolForKey:@"SmallView"];
 
     NSRect iconRect = [self iconRectForBounds:bounds];
-    iconRect.origin.x += minimal ? 0.0 : GROUP_INSET_REG * 3;
+    iconRect.origin.x += minimal ? 0.0 : GROUP_INSET_REG * 2 + GROUP_IMAGE_WIDTH;
 
     return iconRect;
 }
