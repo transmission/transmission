@@ -11,7 +11,7 @@
     <message>
         <location line="+39"/>
         <source>Copyright © The Transmission Project</source>
-        <translation type="unfinished"></translation>
+        <translation>Авторское право © The Transmission Project</translation>
     </message>
     <message>
         <location line="-10"/>
@@ -21,12 +21,12 @@
     <message>
         <location filename="../AboutDialog.cc" line="+37"/>
         <source>Client</source>
-        <translation type="unfinished">Клиент</translation>
+        <translation>Клиент</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Server</source>
-        <translation type="unfinished"></translation>
+        <translation>Сервер</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -64,7 +64,7 @@
     <message>
         <location line="+132"/>
         <source>Torrent Added</source>
-        <translation type="unfinished"></translation>
+        <translation>Торрент добавлен</translation>
     </message>
     <message numerus="yes">
         <location line="-29"/>
@@ -107,7 +107,7 @@
     <message>
         <location line="+109"/>
         <source>%1 (+%2 discarded after failed checksum)</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 (+%2 отклонено после неудачной проверки контрольной суммы)</translation>
     </message>
     <message>
         <location line="+135"/>
@@ -231,12 +231,12 @@
     <message>
         <location line="+35"/>
         <source>Add URL(s) </source>
-        <translation type="unfinished"></translation>
+        <translation>Добавить URL-адрес(а)</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Add tracker announce URLs, one per line:</source>
-        <translation type="unfinished"></translation>
+        <translation>Добавить адреса анонсов трекера, один на строку:</translation>
     </message>
     <message>
         <location line="+27"/>
@@ -246,7 +246,7 @@
     <message>
         <location line="+0"/>
         <source>No new URLs found.</source>
-        <translation type="unfinished"></translation>
+        <translation>Новые адреса не найдены.</translation>
     </message>
     <message>
         <location line="-832"/>
@@ -431,7 +431,7 @@
     <message>
         <location line="+124"/>
         <source>Edit Trackers</source>
-        <translation type="unfinished"></translation>
+        <translation>Изменить трекеры</translation>
     </message>
     <message>
         <location line="-190"/>
@@ -915,12 +915,12 @@
     <message>
         <location line="-132"/>
         <source>Options</source>
-        <translation type="unfinished">Параметры</translation>
+        <translation>Параметры</translation>
     </message>
     <message>
         <location line="+83"/>
         <source>Statistics</source>
-        <translation type="unfinished">Статистика</translation>
+        <translation>Статистика</translation>
     </message>
     <message>
         <location line="+171"/>
@@ -1207,7 +1207,7 @@
     <message>
         <location line="+5"/>
         <source>Start &amp;Now</source>
-        <translation>Запустить сейчас</translation>
+        <translation>Запустить &amp;сейчас</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -1527,7 +1527,7 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="+14"/>
         <source>&amp;Source:</source>
-        <translation type="unfinished">Источник:</translation>
+        <translation>&amp;Источник:</translation>
     </message>
     <message>
         <location line="+14"/>
@@ -1555,7 +1555,7 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="+8"/>
         <source>Error: invalid announce URL &quot;%1&quot;</source>
-        <translation>Ошибка: неверный URL-адрес объявлений «%1»</translation>
+        <translation>Ошибка: неверный URL-адрес объявления «%1»</translation>
     </message>
     <message>
         <location line="-4"/>
@@ -1593,7 +1593,7 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location filename="../OptionsDialog.ui" line="+17"/>
         <source>&amp;Source:</source>
-        <translation>Источник:</translation>
+        <translation>&amp;Источник:</translation>
     </message>
     <message>
         <location line="+22"/>
@@ -1770,7 +1770,7 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="+159"/>
         <source>Select &quot;Torrent Done Downloading&quot; Script</source>
-        <translation type="unfinished"></translation>
+        <translation>Выбор сценария «Торрент завершил загрузку»</translation>
     </message>
     <message>
         <location filename="../PrefsDialog.ui" line="+545"/>
@@ -1821,7 +1821,7 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="+10"/>
         <source>Select &quot;Torrent Done Seeding&quot; Script</source>
-        <translation type="unfinished"></translation>
+        <translation>Выбор сценария «Торрент завершил раздачу»</translation>
     </message>
     <message numerus="yes">
         <location line="+19"/>
@@ -1911,9 +1911,9 @@ To add another primary URL, add it after a blank line.</source>
         <location filename="../PrefsDialog.cc" line="-253"/>
         <source>&lt;b&gt;Update succeeded!&lt;/b&gt;&lt;p&gt;Blocklist now has %Ln rule(s).</source>
         <translation>
-            <numerusform>&lt;b&gt;Обновление успешно завершено!&lt;/b&gt;&lt;p&gt;В чёрном списке %Ln правило.</numerusform>
-            <numerusform>&lt;b&gt;Обновление успешно завершено!&lt;/b&gt;&lt;p&gt;В чёрном списке %Ln правила.</numerusform>
-            <numerusform>&lt;b&gt;Обновление успешно завершено!&lt;/b&gt;&lt;p&gt;В чёрном списке %Ln правил.</numerusform>
+            <numerusform>&lt;b&gt;Обновление завершено!&lt;/b&gt;&lt;p&gt;В чёрном списке %Ln правило.</numerusform>
+            <numerusform>&lt;b&gt;Обновление завершено!&lt;/b&gt;&lt;p&gt;В чёрном списке %Ln правила.</numerusform>
+            <numerusform>&lt;b&gt;Обновление завершено!&lt;/b&gt;&lt;p&gt;В чёрном списке %Ln правил.</numerusform>
         </translation>
     </message>
     <message>
@@ -2035,32 +2035,32 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="+186"/>
         <source>Reads user clipboard content for torrents</source>
-        <translation type="unfinished"></translation>
+        <translation>Считывает содержимое пользовательского буфера обмена на наличие торрентов</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Detect new torrents from clipboard</source>
-        <translation type="unfinished"></translation>
+        <translation>Обнаруживать новые торренты в буфере обмена</translation>
     </message>
     <message>
         <location line="+148"/>
         <source>Call scrip&amp;t when downloading is completed:</source>
-        <translation type="unfinished"></translation>
+        <translation>Выполнить скрип&amp;т по завершении загрузки:</translation>
     </message>
     <message>
         <location line="+105"/>
         <source>Call scrip&amp;t when seeding is completed:</source>
-        <translation type="unfinished"></translation>
+        <translation>Выполнить скрип&amp;т по завершении раздачи:</translation>
     </message>
     <message>
         <location line="+406"/>
         <source>Default Public Trackers</source>
-        <translation type="unfinished"></translation>
+        <translation>Стандартные публичные трекеры</translation>
     </message>
     <message>
         <location line="+12"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Trackers to use on all public torrents.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;To add a backup URL, add it on the next line after a primary URL.&lt;/p&gt;&lt;p&gt;To add a new primary URL, add it after a blank line.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Трекеры для использования на всех общедоступных торрентах.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt; Чтобы добавить резервный адрес, добавьте его в следующую строку после основного адреса.&lt;/p&gt;&lt;p&gt; Чтобы добавить новый основной адрес, добавьте его после пустой строки.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location line="+60"/>
@@ -2219,7 +2219,7 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="+305"/>
         <source>Start Now</source>
-        <translation type="unfinished"></translation>
+        <translation>Запустить сейчас</translation>
     </message>
 </context>
 <context>
@@ -2265,7 +2265,7 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="+1"/>
         <source>&lt;p&gt;&lt;b&gt;Unable to rename &quot;%1&quot; as &quot;%2&quot;: %3.&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Please correct the errors and try again.&lt;/p&gt;</source>
-        <translation>&lt;p&gt;&lt;b&gt;Невозможно переименовать «%1» в «%2»: %3.&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Пожалуйста, исправьте ошибки и попробуйте ещё раз.&lt;/p&gt;</translation>
+        <translation>&lt;p&gt;&lt;b&gt;Невозможно переименовать «%1» в «%2»: %3.&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Пожалуйста, исправьте ошибки и попробуйте снова.&lt;/p&gt;</translation>
     </message>
     <message>
         <location line="+531"/>
@@ -2281,9 +2281,9 @@ To add another primary URL, add it after a blank line.</source>
         <location line="+6"/>
         <source>Duplicate Torrent(s)</source>
         <translation>
-            <numerusform>Дубликат торрент</numerusform>
-            <numerusform>Дубликат торрентов</numerusform>
-            <numerusform>Дубликат торрентов</numerusform>
+            <numerusform>Дубликат торрента</numerusform>
+            <numerusform>Дубликаты торрентов</numerusform>
+            <numerusform>Дубликаты торрентов</numerusform>
         </translation>
     </message>
     <message numerus="yes">
@@ -2291,7 +2291,7 @@ To add another primary URL, add it after a blank line.</source>
         <source>Unable to add %n duplicate torrent(s)</source>
         <translation>
             <numerusform>Невозможно добавить %n дубликат торрента</numerusform>
-            <numerusform>Невозможно добавить %n дубликатов торрентов</numerusform>
+            <numerusform>Невозможно добавить %n дубликата торрентов</numerusform>
             <numerusform>Невозможно добавить %n дубликатов торрентов</numerusform>
         </translation>
     </message>
@@ -2677,27 +2677,27 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location filename="../TrackersDialog.ui" line="+17"/>
         <source>Edit Trackers</source>
-        <translation type="unfinished"></translation>
+        <translation>Изменить трекеры</translation>
     </message>
     <message>
         <location line="+9"/>
         <source>Tracker Announce URLs</source>
-        <translation type="unfinished"></translation>
+        <translation>Адреса анонсов трекеров</translation>
     </message>
     <message>
         <location line="+12"/>
         <source>To add a new primary URL, add it after a blank line.</source>
-        <translation type="unfinished"></translation>
+        <translation>Чтобы добавить новый основной адрес, укажите его после пустой строки.</translation>
     </message>
     <message>
         <location line="+14"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;To add a backup URL, add it on the next line after a primary URL.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Чтобы добавить резервный адрес, укажите его на следующей строке после основного адреса.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Also see Default Public Trackers in Edit &gt; Preferences &gt; Network</source>
-        <translation type="unfinished"></translation>
+        <translation>Также смотрите Общедоступные трекеры по умолчанию в меню Правка &gt; Настройки &gt; Сеть</translation>
     </message>
 </context>
 </TS>

@@ -4,17 +4,17 @@
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 # Translators:
-# Mike Gelfand <mikedld@mikedld.com>, 2017
 # Źmicier Turok <nashtlumach@gmail.com>, 2020
+# Mike Gelfand <mikedld@mikedld.com>, 2022
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-06-02 23:47+0100\n"
+"POT-Creation-Date: 2022-06-03 00:09+0100\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Źmicier Turok <nashtlumach@gmail.com>, 2020\n"
+"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2022\n"
 "Language-Team: Belarusian (https://www.transifex.com/transmissionbt/teams/33778/be/)\n"
 "Language: be\n"
 "MIME-Version: 1.0\n"
@@ -2393,10 +2393,6 @@ msgstr[3] ""
 #~ msgstr "%1$s (%2$s%%)"
 
 #, c-format
-#~ msgid "%1$s (+%2$s corrupt)"
-#~ msgstr "%1$s (+%2$s пашкоджаны)"
-
-#, c-format
 #~ msgid "%1$s ago"
 #~ msgstr "%1$s назад"
 
@@ -2453,14 +2449,6 @@ msgstr[3] ""
 #~ msgstr "%s вольна"
 
 #, c-format
-#~ msgid "%s is not a valid address"
-#~ msgstr "%s - непрыдатны адрас"
-
-#, c-format
-#~ msgid "%s is not an IPv4 or IPv6 address. RPC listeners must be IPv4 or IPv6"
-#~ msgstr "%s не з’яўляецца адрасам IPv4 альбо IPv6. Апрацоўшчыкі RPC мусяць быць IPv4 альбо IPv6"
-
-#, c-format
 #~ msgid "%s remaining"
 #~ msgstr "засталося %s"
 
@@ -2483,9 +2471,6 @@ msgstr[3] ""
 #~ msgid "<i>Testing TCP port…</i>"
 #~ msgstr "<i>Праверка TCP парта...</i>"
 
-#~ msgid "Ask Tracker for _More Peers"
-#~ msgstr "За_пытаць у трэкера болей вузлоў"
-
 #, c-format
 #~ msgid "Asking for more peers in %s"
 #~ msgstr "Запыт дадатковых вузлоў праз %s"
@@ -2504,9 +2489,6 @@ msgstr[3] ""
 
 #~ msgid "Automatically add .torrent files _from:"
 #~ msgstr "Аўтаматычна дадаваць файлы .torrent _з:"
-
-#~ msgid "BitTorrent is a peer-to-peer file-sharing protocol that is commonly used to distribute large amounts of data between multiple users."
-#~ msgstr "BitTorrent - пратакол абмену файламі peer-to-peer, які звычайна выкарыстоўваецца для распаўсюджавання вялікага аб’ему даных паміж некалькімі карыстальнікамі."
 
 #, c-format
 #~ msgid "Blocklist \"%s\" contains %zu entries"
@@ -2532,9 +2514,6 @@ msgstr[3] ""
 #~ msgstr[2] "Чорны спіс змяшчае %'d правіл."
 #~ msgstr[3] "Чорны спіс змяшчае %'d правіл."
 
-#~ msgid "Call scrip_t when torrent is completed:"
-#~ msgstr "Запускаць _скрыпт, калі торэнт завершаны:"
-
 #, c-format
 #~ msgid ""
 #~ "Click to disable Alternative Speed Limits\n"
@@ -2553,12 +2532,6 @@ msgstr[3] ""
 
 #~ msgid "Complete"
 #~ msgstr "Скончана"
-
-#~ msgid "Copy _Magnet Link to Clipboard"
-#~ msgstr "Скапіяваць magnet-_спасылку ў буфер абмену"
-
-#~ msgid "Copyright (c) The Transmission Project"
-#~ msgstr "Аўтарскія правы (c) The Transmission Project"
 
 #, c-format
 #~ msgid "Couldn't bind port %d on %s: %s"
@@ -2617,19 +2590,12 @@ msgstr[3] ""
 #~ msgstr "Немагчыма захаваць файл \"%1$s\": %2$s"
 
 #, c-format
-#~ msgid "Couldn't save temporary file \"%1$s\": %2$s"
-#~ msgstr "Немагчыма захаваць часовы файл \"%1$s\": %2$s"
-
-#, c-format
 #~ msgid "Couldn't set source address %s on %<PRIdMAX>: %s"
 #~ msgstr "Не атрымалася вызначыць адрас крыніцы %s на %<PRIdMAX>: %s"
 
 #, c-format
 #~ msgid "Couldn't truncate \"%1$s\": %2$s"
 #~ msgstr "Немагчыма абрэзаць \"%1$s\": %2$s"
-
-#~ msgid "Create a torrent"
-#~ msgstr "Стварыць торэнт"
 
 #, c-format
 #~ msgid "Created \"%s\"!"
@@ -2650,13 +2616,6 @@ msgstr[3] ""
 #, c-format
 #~ msgid "Creating \"%s\""
 #~ msgstr "Стварэнне \"%s\""
-
-#, c-format
-#~ msgid "DNS Lookup failed: %s"
-#~ msgstr "Пошук DNS схібіў: %s"
-
-#~ msgid "Dese_lect All"
-#~ msgstr "_Адкінуць выбар"
 
 #, c-format
 #~ msgid "Do_wnload (%s):"
@@ -2685,9 +2644,6 @@ msgstr[3] ""
 #~ msgid "Downloading metadata from %1$'d %2$s (%3$d%% done)"
 #~ msgstr "Спампоўванне метаданых з %1$'d %2$s (%3$d%% завершана)"
 
-#~ msgid "Enable Alternative Speed _Limits"
-#~ msgstr "Уключыць альтэрнатыўныя ліміты _хуткасці"
-
 #~ msgid "Error opening torrent"
 #~ msgstr "Не атрымалася адкрыць торэнт"
 
@@ -2698,10 +2654,6 @@ msgstr[3] ""
 #, c-format
 #~ msgid "Error registering Transmission as a %s handler: %s"
 #~ msgstr "Не атрымалася зарэгістраваць Transmission як апрацоўшчык %s: %s"
-
-#, c-format
-#~ msgid "Error uncompressing blocklist: %s (%d)"
-#~ msgstr "Не атрымалася распакаваць чорны спіс: %s (%d)"
 
 #, c-format
 #~ msgid "Error writing \"%s\": %s"
@@ -2718,10 +2670,6 @@ msgstr[3] ""
 #, c-format
 #~ msgid "Failed to set piece size to %s, leaving it at %s"
 #~ msgstr "Не атрымалася вызначыць памер часткі на %s, пакінута значэнне %s"
-
-#, c-format
-#~ msgid "File \"%s\" is in the way"
-#~ msgstr "Файл \"%s\" знаходзіцца ў шляху"
 
 #, c-format
 #~ msgid "Found Internet Gateway Device \"%s\""
@@ -2749,10 +2697,6 @@ msgstr[3] ""
 #~ msgid "Idle"
 #~ msgstr "Бяздзейнасць"
 
-#, c-format
-#~ msgid "Invalid metadata entry \"%s\""
-#~ msgstr "Хібныя метаданыя запісу \"%s\""
-
 #~ msgid "Is another copy of Transmission already running?"
 #~ msgstr "Ці выконваецца іншая копія Transmission?"
 
@@ -2772,29 +2716,11 @@ msgstr[3] ""
 #~ msgid "Local Address is \"%s\""
 #~ msgstr "Лакальны адрас \"%s\""
 
-#~ msgid "Magnet torrent's metadata is not usable"
-#~ msgstr "Метаданыя з магнэт-спасылкі непрыдатныя"
-
-#~ msgid "Message _Log"
-#~ msgstr "Журнал _паведамленняў"
-
 #~ msgid "Mo_ve .torrent file to the trash"
 #~ msgstr "Пера_мясціць файл .torrent у сметніцу"
 
 #~ msgid "Monday"
 #~ msgstr "Панядзелак"
-
-#~ msgid "Move _Down"
-#~ msgstr "Перамясціць _ніжэй"
-
-#~ msgid "Move _Up"
-#~ msgstr "Перамясціць _вышэй"
-
-#~ msgid "Move to _Bottom"
-#~ msgstr "Перамясціць у _канец спіса"
-
-#~ msgid "Move to _Top"
-#~ msgstr "Перамясціць у _пачатак спіса"
 
 #, c-format
 #~ msgid "Moving \"%s\""
@@ -2803,27 +2729,6 @@ msgstr[3] ""
 #~ msgid "Not a regular file"
 #~ msgstr "Не з’яўляецца звычайным файлам"
 
-#~ msgid "Notable features of Transmission include support for Local Peer Discovery, encryption, DHT, µTP, PEX and Magnet Link."
-#~ msgstr "Адметнымі магчымасцямі Transmission з’яўляюцца: лакальнае выяўленне вузлоў, шыфраванне, падтрымка DHT, µTP, PEX магнэт-спасылак."
-
-#~ msgid "Open Fold_er"
-#~ msgstr "Адкрыць _каталог"
-
-#~ msgid "Open URL…"
-#~ msgstr "Адкрыць URL..."
-
-#~ msgid "Open _URL…"
-#~ msgstr "Адкрыць _URL..."
-
-#~ msgid "Open a torrent"
-#~ msgstr "Адкрыць торэнт"
-
-#~ msgid "Pause all torrents"
-#~ msgstr "Прыпыніць усе торэнты"
-
-#~ msgid "Pause torrent"
-#~ msgstr "Прыпыніць торэнт"
-
 #, c-format
 #~ msgid "Peer list request %1$stimed out%2$s %3$s ago; will retry"
 #~ msgstr "Час адказу на запыт спіса вузлоў %1$s скончаны %2$s %3$s таму; паўтор спробы"
@@ -2831,10 +2736,6 @@ msgstr[3] ""
 #, c-format
 #~ msgid "Piece %<PRIu32>, which was just downloaded, failed its checksum test"
 #~ msgstr "Спампаваная частка %<PRIu32> не прайшла праверку кантрольнай сумы"
-
-#, c-format
-#~ msgid "Please Verify Local Data! Piece #%zu is corrupt."
-#~ msgstr "Калі ласка, праверце лакальныя дадзеныя! Частка #%zu пашкоджана."
 
 #, c-format
 #~ msgid "Port %d forwarded successfully"
@@ -2870,18 +2771,9 @@ msgstr[3] ""
 #~ msgid "Preallocated file \"%1$s\" (%2$s, size: %3$<PRIu64>)"
 #~ msgstr "Адведзеная прастора для файла \"%1$s\" (%2$s, памер: %3$<PRIu64>)"
 
-#~ msgid "Present Main Window"
-#~ msgstr "Паказаць асноўнае акно"
-
 #, c-format
 #~ msgid "Ratio: %s"
 #~ msgstr "Рэйтынг: %s"
-
-#~ msgid "Re_verse Sort Order"
-#~ msgstr "_Адваротнае парадкаванне"
-
-#~ msgid "Remove torrent"
-#~ msgstr "В_ыдаліць торэнт"
 
 #~ msgid "Saturday"
 #~ msgstr "Субота"
@@ -2906,9 +2798,6 @@ msgstr[3] ""
 #~ msgstr[2] "Раздача %1$'d з %2$'d падлучаных вузлоў"
 #~ msgstr[3] "Раздача %1$'d з %2$'d падлучаных вузлоў"
 
-#~ msgid "Select _All"
-#~ msgstr "Абраць _усе"
-
 #, c-format
 #~ msgid "Serving RPC and Web requests from directory '%s'"
 #~ msgstr "Адпраўленне RPC і сеціўных запытаў з каталога \"%s\""
@@ -2917,51 +2806,9 @@ msgstr[3] ""
 #~ msgid "Serving RPC and Web requests on %s:%d%s"
 #~ msgstr "Абслугоўванне RPC і сеціўных запытаў на %s:%d%s"
 
-#~ msgid "Set _Location…"
-#~ msgstr "Вызначыць размяшчэнне..."
-
 #, c-format
 #~ msgid "Skipping unknown torrent \"%s\""
 #~ msgstr "Мінанне невядомага торэнта \"%s\""
-
-#~ msgid "Sort by A_ge"
-#~ msgstr "Парадкаваць паводле _ўзросту"
-
-#~ msgid "Sort by Rati_o"
-#~ msgstr "Парадкаваць паводле _рэйтынгу"
-
-#~ msgid "Sort by Si_ze"
-#~ msgstr "Парадкаваць паводле па_меру"
-
-#~ msgid "Sort by Stat_e"
-#~ msgstr "Парадкаваць паводле _стану"
-
-#~ msgid "Sort by Time _Left"
-#~ msgstr "Парадкаваць паводле _часу чакання"
-
-#~ msgid "Sort by _Activity"
-#~ msgstr "Парадкаваць паводле _актыўнасці"
-
-#~ msgid "Sort by _Name"
-#~ msgstr "Парадкаваць паводле _назвы"
-
-#~ msgid "Sort by _Progress"
-#~ msgstr "Парадкаваць паводле _ходу спампоўвання"
-
-#~ msgid "Sort by _Queue"
-#~ msgstr "Парадкаваць паводле чар_гі"
-
-#~ msgid "Start _Now"
-#~ msgstr "Запусціць зараз"
-
-#~ msgid "Start all torrents"
-#~ msgstr "Запусціць усе торэнты"
-
-#~ msgid "Start torrent"
-#~ msgstr "Запусціць торэнт"
-
-#~ msgid "Start torrent now"
-#~ msgstr "Запусціць торэнт зараз"
 
 #, c-format
 #~ msgid "Started %'d time"
@@ -2990,20 +2837,8 @@ msgstr[3] ""
 #~ msgstr "Нядзеля"
 
 #, c-format
-#~ msgid "The torrent file \"%s\" contains invalid data."
-#~ msgstr "Торэнт-файл \"% s\" змяшчае памылковыя дадзеныя."
-
-#, c-format
-#~ msgid "The torrent file \"%s\" encountered an unknown error."
-#~ msgstr "Торэнт-файл \"%s\" паўстала невядомая памылка."
-
-#, c-format
 #~ msgid "The torrent file \"%s\" is already in use by \"%s.\""
 #~ msgstr "Файл торэнта \"%s\" ужо выкарыстоўваецца \"%s.\""
-
-#, c-format
-#~ msgid "This magnet link appears to be intended for something other than BitTorrent. BitTorrent magnet links have a section containing \"%s\"."
-#~ msgstr "Гэтая магнітная спасылка, здаецца, не прызначаны для BitTorrent. Магнітныя спасылкі BitTorrent маюць падзел, які змяшчае \"%s\"."
 
 #~ msgid "Thursday"
 #~ msgstr "Чацвер"
@@ -3019,17 +2854,6 @@ msgstr[3] ""
 #~ msgid "Torrent Creator is skipping file \"%s\": %s"
 #~ msgstr "Стваральнік торэнта прамінуў файл \"%s\": %s"
 
-#~ msgid "Torrent properties"
-#~ msgstr "Уласцівасці торэнта"
-
-#, c-format
-#~ msgid "Tracker error: \"%s\""
-#~ msgstr "Памылка трэкера: \"%s\""
-
-#, c-format
-#~ msgid "Tracker gave HTTP response code %1$ld (%2$s)"
-#~ msgstr "Трэкер адправіў код адказу HTTP %1$ld (%2$s)"
-
 #, c-format
 #~ msgid "Tracker gave a warning: \"%s\""
 #~ msgstr "Трэкер адправіў папярэджанне: \"%s\""
@@ -3041,14 +2865,6 @@ msgstr[3] ""
 #, c-format
 #~ msgid "Tracker had %s%'d seeders and %'d leechers%s %s ago"
 #~ msgstr "На трэкеры было %s%'d тых, хто раздае і %'d тых, хто прымае %s %s таму"
-
-#, c-format
-#~ msgid "Tracker warning: \"%s\""
-#~ msgstr "Папярэджанне трэкера: \"%s\""
-
-#, c-format
-#~ msgid "Tracker will allow requests in %s"
-#~ msgstr "Трэкер дазволіць запыты праз %s"
 
 #, c-format
 #~ msgid ""
@@ -3064,18 +2880,12 @@ msgstr[3] ""
 #~ msgid "Transmission doesn't know how to use \"%s\""
 #~ msgstr "Transmission не ведае, як выкарыстоўваць \"%s\""
 
-#~ msgid "Transmission is a BitTorrent client with an easy-to-use frontend on top a cross-platform backend. Native frontends are available for OS X and Windows, as well as command line and web frontends."
-#~ msgstr "Transmission - кліент для пратаколу BitTorrent з простым і зручным інтэрфейсам паверх кросплатформагава рухавіка. Ёсць інтэрфейс для OS X і Windows, сеціўны інтэрфейс, інтэрфейс для загаднага радка."
-
 #~ msgid "Tuesday"
 #~ msgstr "Аўторак"
 
 #, c-format
 #~ msgid "U_pload (%s):"
 #~ msgstr "Ра_здача (%s):"
-
-#~ msgid "Unable to parse file content"
-#~ msgstr "Немагчыма разабраць змесціва файла"
 
 #, c-format
 #~ msgid "Unable to rename file as \"%s\": %s"
@@ -3094,89 +2904,17 @@ msgstr[3] ""
 #~ msgid "Wednesday"
 #~ msgstr "Серада"
 
-#~ msgid "_About"
-#~ msgstr "_Звесткі"
-
-#~ msgid "_Compact View"
-#~ msgstr "_Кампактны выгляд"
-
-#~ msgid "_Contents"
-#~ msgstr "_Змесціва"
-
-#~ msgid "_Delete Files and Remove"
-#~ msgstr "Выдаліць _файлы і торэнт"
-
-#~ msgid "_Donate"
-#~ msgstr "_Ахвяраваць"
-
 #, c-format
 #~ msgid "_Download (%s):"
 #~ msgstr "Спампоўванне (%s):"
-
-#~ msgid "_File"
-#~ msgstr "_Файл"
-
-#~ msgid "_Filterbar"
-#~ msgstr "Панэль _фільтраў"
-
-#~ msgid "_New…"
-#~ msgstr "_Новы..."
-
-#~ msgid "_Pause"
-#~ msgstr "_Прыпыніць"
-
-#~ msgid "_Pause All"
-#~ msgstr "_Прыпыніць усе"
-
-#~ msgid "_Preferences"
-#~ msgstr "_Налады"
-
-#~ msgid "_Properties"
-#~ msgstr "_Уласцівасці"
-
-#~ msgid "_Queue"
-#~ msgstr "_Чарга"
-
-#~ msgid "_Quit"
-#~ msgstr "_Выйсці"
 
 #, c-format
 #~ msgid "_Show %'d of:"
 #~ msgstr "_Паказаць %'d з:"
 
-#~ msgid "_Show Transmission"
-#~ msgstr "_Паказаць Transmission"
-
-#~ msgid "_Sort Torrents By"
-#~ msgstr "_Парадкаваць торэнты паводле"
-
-#~ msgid "_Start"
-#~ msgstr "_Запусціць"
-
-#~ msgid "_Start All"
-#~ msgstr "_Запусціць усе"
-
-#~ msgid "_Statistics"
-#~ msgstr "_Статыстыка"
-
-#~ msgid "_Statusbar"
-#~ msgstr "Панэль с_татусу"
-
-#~ msgid "_Toolbar"
-#~ msgstr "Панэль _інструментаў"
-
-#~ msgid "_Torrent"
-#~ msgstr "_Торэнт"
-
 #, c-format
 #~ msgid "_Upload (%s):"
 #~ msgstr "_Раздача (%s):"
-
-#~ msgid "_Verify Local Data"
-#~ msgstr "_Праверыць лакальныя даныя"
-
-#~ msgid "_View"
-#~ msgstr "_Выгляд"
 
 #, c-format
 #~ msgid "blocklist skipped invalid address at line %d"
@@ -3198,7 +2936,7 @@ msgstr[3] ""
 
 #, c-format
 #~ msgid "size|Down: %1$s, Up: %2$s"
-#~ msgstr "size|Спампоўванне: %1$s, Раздача: %2$s"
+#~ msgstr "Спампоўванне: %1$s, Раздача: %2$s"
 
 #~ msgid "sparse"
 #~ msgstr "рэдкі"

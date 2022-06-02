@@ -7,15 +7,17 @@
 # Clay Cheng <569735195@qq.com>, 2020
 # 玉堂白鹤 <yjwork@qq.com>, 2020
 # Dingzhong Chen <wsxy162@gmail.com>, 2022
+# Lin Xue <iconteral@yahoo.com>, 2022
+# Mike Gelfand <mikedld@mikedld.com>, 2022
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-06-02 23:47+0100\n"
+"POT-Creation-Date: 2022-06-03 00:09+0100\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Dingzhong Chen <wsxy162@gmail.com>, 2022\n"
+"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2022\n"
 "Language-Team: Chinese (China) (https://www.transifex.com/transmissionbt/teams/33778/zh_CN/)\n"
 "Language: zh_CN\n"
 "MIME-Version: 1.0\n"
@@ -145,7 +147,7 @@ msgstr "一个快速易用的 BitTorrent 客户端"
 
 #: ../gtk/Application.cc:1289
 msgid "Copyright © The Transmission Project"
-msgstr ""
+msgstr "Copyright © Transmission 项目"
 
 #. Translators: translate "translator-credits" as your name
 #. to have it appear in the credits in the "About"
@@ -638,10 +640,12 @@ msgid ""
 "To add a backup URL, add it on the next line after a primary URL.\n"
 "To add a new primary URL, add it after a blank line."
 msgstr ""
+"要添加一个备用 URL，请在主 URL 之后一行添加。\n"
+"要添加另一个主 URL，请空一行之后添加。"
 
 #: ../gtk/DetailsDialog.cc:2378
 msgid "Also see Default Public Trackers in Edit > Preferences > Network"
-msgstr ""
+msgstr "参见“默认公共Trackers”于 编辑 > 首选项 > 网络"
 
 #: ../gtk/DetailsDialog.cc:2456
 msgid "{torrent_name} - Add Tracker"
@@ -1034,7 +1038,7 @@ msgstr "种子已完成"
 
 #: ../gtk/Notify.cc:238
 msgid "Start Now"
-msgstr ""
+msgstr "立即开始"
 
 #: ../gtk/Notify.cc:250
 msgid "Torrent Added"
@@ -1433,7 +1437,7 @@ msgstr "LPD 是用于在本地网络寻找对等网络用户的工具。"
 
 #: ../gtk/PrefsDialog.cc:1111
 msgid "Default Public Trackers"
-msgstr ""
+msgstr "默认公共Tracker"
 
 #: ../gtk/PrefsDialog.cc:1115
 msgid ""
@@ -2295,8 +2299,8 @@ msgstr[0] ""
 #~ msgstr "%1$s（%2$s%%）"
 
 #, c-format
-#~ msgid "%1$s (+%2$s corrupt)"
-#~ msgstr "%1$s（+%2$s 损坏）"
+#~ msgid "%1$s (+%2$s discarded after failed checksum)"
+#~ msgstr "%1$s (+%2$s 由于校验失败丢弃)"
 
 #, c-format
 #~ msgid "%1$s ago"
@@ -2352,14 +2356,6 @@ msgstr[0] ""
 #~ msgstr "%s 可用"
 
 #, c-format
-#~ msgid "%s is not a valid address"
-#~ msgstr "%s 不是有效的地址"
-
-#, c-format
-#~ msgid "%s is not an IPv4 or IPv6 address. RPC listeners must be IPv4 or IPv6"
-#~ msgstr "%s 不是 IPv4 或 IPv6 地址。RPC 监听器必须是 IPv4 或 IPv6"
-
-#, c-format
 #~ msgid "%s remaining"
 #~ msgstr "剩余时间 %s"
 
@@ -2382,9 +2378,6 @@ msgstr[0] ""
 #~ msgid "<i>Testing TCP port…</i>"
 #~ msgstr "<i>正在测试 TCP 端口……</i>"
 
-#~ msgid "Ask Tracker for _More Peers"
-#~ msgstr "向 Traker 请求更多用户(_M)"
-
 #, c-format
 #~ msgid "Asking for more peers in %s"
 #~ msgstr "将于 %s后请求更多用户"
@@ -2404,9 +2397,6 @@ msgstr[0] ""
 #~ msgid "Automatically add .torrent files _from:"
 #~ msgstr "从此处自动添加种子(_F)："
 
-#~ msgid "BitTorrent is a peer-to-peer file-sharing protocol that is commonly used to distribute large amounts of data between multiple users."
-#~ msgstr "BitTorrent 是一个对等网络文件共享协议，多用于在多个用户间分发大量的数据。"
-
 #, c-format
 #~ msgid "Blocklist \"%s\" contains %zu entries"
 #~ msgstr "屏蔽列表“%s”包含 %zu 条规则"
@@ -2424,9 +2414,6 @@ msgstr[0] ""
 #~ msgid "Blocklist has %'d rule."
 #~ msgid_plural "Blocklist has %'d rules."
 #~ msgstr[0] "屏蔽列表有 %'d 条规则。"
-
-#~ msgid "Call scrip_t when torrent is completed:"
-#~ msgstr "种子完成时调用脚本(_T)："
 
 #, c-format
 #~ msgid ""
@@ -2446,12 +2433,6 @@ msgstr[0] ""
 
 #~ msgid "Complete"
 #~ msgstr "完成"
-
-#~ msgid "Copy _Magnet Link to Clipboard"
-#~ msgstr "复制磁力链接到剪贴板(_M)"
-
-#~ msgid "Copyright (c) The Transmission Project"
-#~ msgstr "Copyright (c) Transmission 项目"
 
 #, c-format
 #~ msgid "Couldn't bind port %d on %s: %s"
@@ -2510,19 +2491,12 @@ msgstr[0] ""
 #~ msgstr "无法保存文件“%1$s”：%2$s"
 
 #, c-format
-#~ msgid "Couldn't save temporary file \"%1$s\": %2$s"
-#~ msgstr "无法保存临时文件“%1$s”：%2$s"
-
-#, c-format
 #~ msgid "Couldn't set source address %s on %<PRIdMAX>: %s"
 #~ msgstr "无法在 %2$<PRIdMAX> 上设置源地址 %1$s：%3$s"
 
 #, c-format
 #~ msgid "Couldn't truncate \"%1$s\": %2$s"
 #~ msgstr "无法截断 %1$s：%2$s"
-
-#~ msgid "Create a torrent"
-#~ msgstr "创建一个种子"
 
 #, c-format
 #~ msgid "Created \"%s\"!"
@@ -2543,13 +2517,6 @@ msgstr[0] ""
 #, c-format
 #~ msgid "Creating \"%s\""
 #~ msgstr "正在创建“%s”"
-
-#, c-format
-#~ msgid "DNS Lookup failed: %s"
-#~ msgstr "DNS 查找失败：%s"
-
-#~ msgid "Dese_lect All"
-#~ msgstr "取消选择(_L)"
 
 #, c-format
 #~ msgid "Do_wnload (%s):"
@@ -2578,9 +2545,6 @@ msgstr[0] ""
 #~ msgid "Downloading metadata from %1$'d %2$s (%3$d%% done)"
 #~ msgstr "正在从 %1$'d 个%2$s中下载元数据（已完成 %3$d%%）"
 
-#~ msgid "Enable Alternative Speed _Limits"
-#~ msgstr "启用速度限制(_L)"
-
 #~ msgid "Error opening torrent"
 #~ msgstr "打开种子文件时出错"
 
@@ -2591,10 +2555,6 @@ msgstr[0] ""
 #, c-format
 #~ msgid "Error registering Transmission as a %s handler: %s"
 #~ msgstr "注册 Transmission 为 %s 处理程序时出错：%s"
-
-#, c-format
-#~ msgid "Error uncompressing blocklist: %s (%d)"
-#~ msgstr "解压缩屏蔽列表时出错：%s (%d)"
 
 #, c-format
 #~ msgid "Error writing \"%s\": %s"
@@ -2611,10 +2571,6 @@ msgstr[0] ""
 #, c-format
 #~ msgid "Failed to set piece size to %s, leaving it at %s"
 #~ msgstr "设置区块大小到 %s 失败，留在 %s"
-
-#, c-format
-#~ msgid "File \"%s\" is in the way"
-#~ msgstr "文件“%s”正常"
 
 #, c-format
 #~ msgid "Found Internet Gateway Device \"%s\""
@@ -2642,10 +2598,6 @@ msgstr[0] ""
 #~ msgid "Idle"
 #~ msgstr "空闲"
 
-#, c-format
-#~ msgid "Invalid metadata entry \"%s\""
-#~ msgstr "无效的元数据项“%s”"
-
 #~ msgid "Is another copy of Transmission already running?"
 #~ msgstr "是否有另外一个 Transmission 实例已经在运行？"
 
@@ -2665,29 +2617,11 @@ msgstr[0] ""
 #~ msgid "Local Address is \"%s\""
 #~ msgstr "本机地址是“%s\""
 
-#~ msgid "Magnet torrent's metadata is not usable"
-#~ msgstr "磁力种子的元数据不可用"
-
-#~ msgid "Message _Log"
-#~ msgstr "消息日志(_L)"
-
 #~ msgid "Mo_ve .torrent file to the trash"
 #~ msgstr "移动 .torrent 文件至回收站(_V)"
 
 #~ msgid "Monday"
 #~ msgstr "星期一"
-
-#~ msgid "Move _Down"
-#~ msgstr "向下移动(_D)"
-
-#~ msgid "Move _Up"
-#~ msgstr "向上移动(_U)"
-
-#~ msgid "Move to _Bottom"
-#~ msgstr "移至底部(_B)"
-
-#~ msgid "Move to _Top"
-#~ msgstr "移至顶部(_T)"
 
 #, c-format
 #~ msgid "Moving \"%s\""
@@ -2696,27 +2630,6 @@ msgstr[0] ""
 #~ msgid "Not a regular file"
 #~ msgstr "不是一个常规文件"
 
-#~ msgid "Notable features of Transmission include support for Local Peer Discovery, encryption, DHT, µTP, PEX and Magnet Link."
-#~ msgstr "Transmission 值得注意的功能包括支持本地用户发现（LPD）、加密、DHT、µTP、PEX 和磁力链接。"
-
-#~ msgid "Open Fold_er"
-#~ msgstr "打开文件夹(_E)"
-
-#~ msgid "Open URL…"
-#~ msgstr "打开 URL…"
-
-#~ msgid "Open _URL…"
-#~ msgstr "打开 _URL…"
-
-#~ msgid "Open a torrent"
-#~ msgstr "打开一个种子"
-
-#~ msgid "Pause all torrents"
-#~ msgstr "暂停所有任务"
-
-#~ msgid "Pause torrent"
-#~ msgstr "暂停任务"
-
 #, c-format
 #~ msgid "Peer list request %1$stimed out%2$s %3$s ago; will retry"
 #~ msgstr "在 %3$s前用户列表请求%1$s超时%2$s，将重试"
@@ -2724,10 +2637,6 @@ msgstr[0] ""
 #, c-format
 #~ msgid "Piece %<PRIu32>, which was just downloaded, failed its checksum test"
 #~ msgstr "区块 %<PRIu32>（刚刚下载的）校验测试失败了"
-
-#, c-format
-#~ msgid "Please Verify Local Data! Piece #%zu is corrupt."
-#~ msgstr "请校验本地数据！区块 #%zu 已损坏。"
 
 #, c-format
 #~ msgid "Port %d forwarded successfully"
@@ -2763,18 +2672,9 @@ msgstr[0] ""
 #~ msgid "Preallocated file \"%1$s\" (%2$s, size: %3$<PRIu64>)"
 #~ msgstr "预分配文件“%1$s”（%2$s，大小：%3$<PRIu64>）"
 
-#~ msgid "Present Main Window"
-#~ msgstr "显示主窗口"
-
 #, c-format
 #~ msgid "Ratio: %s"
 #~ msgstr "分享率：%s"
-
-#~ msgid "Re_verse Sort Order"
-#~ msgstr "倒序排列(_V)"
-
-#~ msgid "Remove torrent"
-#~ msgstr "移除种子"
 
 #~ msgid "Saturday"
 #~ msgstr "星期六"
@@ -2796,9 +2696,6 @@ msgstr[0] ""
 #~ msgid_plural "Seeding to %1$'d of %2$'d connected peers"
 #~ msgstr[0] "正在向 %1$'d / %2$'d 个连接的用户做种上传"
 
-#~ msgid "Select _All"
-#~ msgstr "全部选择(_A)"
-
 #, c-format
 #~ msgid "Serving RPC and Web requests from directory '%s'"
 #~ msgstr "正在从目录 '%s' 提供 RPC 和 Web 请求"
@@ -2807,51 +2704,9 @@ msgstr[0] ""
 #~ msgid "Serving RPC and Web requests on %s:%d%s"
 #~ msgstr "正在提供 RPC 和 Web 请求于 %s:%d%s"
 
-#~ msgid "Set _Location…"
-#~ msgstr "设定位置(_L)…"
-
 #, c-format
 #~ msgid "Skipping unknown torrent \"%s\""
 #~ msgstr "正在跳过未知种子“%s”"
-
-#~ msgid "Sort by A_ge"
-#~ msgstr "按存在时间排列(_G)"
-
-#~ msgid "Sort by Rati_o"
-#~ msgstr "按分享率排列(_O)"
-
-#~ msgid "Sort by Si_ze"
-#~ msgstr "按大小排列(_Z)"
-
-#~ msgid "Sort by Stat_e"
-#~ msgstr "按状态排列(_E)"
-
-#~ msgid "Sort by Time _Left"
-#~ msgstr "按剩余时间排列(_L)"
-
-#~ msgid "Sort by _Activity"
-#~ msgstr "按活跃度排列(_A)"
-
-#~ msgid "Sort by _Name"
-#~ msgstr "按名称排列(_N)"
-
-#~ msgid "Sort by _Progress"
-#~ msgstr "按进度排列(_P)"
-
-#~ msgid "Sort by _Queue"
-#~ msgstr "按队列排列(_Q)"
-
-#~ msgid "Start _Now"
-#~ msgstr "立即开始(_N)"
-
-#~ msgid "Start all torrents"
-#~ msgstr "开始所有任务"
-
-#~ msgid "Start torrent"
-#~ msgstr "开始任务"
-
-#~ msgid "Start torrent now"
-#~ msgstr "立即开始任务"
 
 #, c-format
 #~ msgid "Started %'d time"
@@ -2877,20 +2732,8 @@ msgstr[0] ""
 #~ msgstr "星期日"
 
 #, c-format
-#~ msgid "The torrent file \"%s\" contains invalid data."
-#~ msgstr "种子文件“%s”包含无效数据。"
-
-#, c-format
-#~ msgid "The torrent file \"%s\" encountered an unknown error."
-#~ msgstr "种子文件“%s”出现未知错误。"
-
-#, c-format
 #~ msgid "The torrent file \"%s\" is already in use by \"%s.\""
 #~ msgstr "种子文件“%s”已被“%s”使用。"
-
-#, c-format
-#~ msgid "This magnet link appears to be intended for something other than BitTorrent. BitTorrent magnet links have a section containing \"%s\"."
-#~ msgstr "这个磁力链接不是为 BitTorrent 而准备的，BitTorrent 的磁力链接应包含“%s”段。"
 
 #~ msgid "Thursday"
 #~ msgstr "星期四"
@@ -2906,17 +2749,6 @@ msgstr[0] ""
 #~ msgid "Torrent Creator is skipping file \"%s\": %s"
 #~ msgstr "种子创建器正在跳过文件“%s”：%s"
 
-#~ msgid "Torrent properties"
-#~ msgstr "种子属性"
-
-#, c-format
-#~ msgid "Tracker error: \"%s\""
-#~ msgstr "Tracker 错误：“%s”"
-
-#, c-format
-#~ msgid "Tracker gave HTTP response code %1$ld (%2$s)"
-#~ msgstr "Tracker 给出了 HTTP 响应代码 %1$ld (%2$s)"
-
 #, c-format
 #~ msgid "Tracker gave a warning: \"%s\""
 #~ msgstr "Tracker 给出一个警告：“%s”"
@@ -2928,14 +2760,6 @@ msgstr[0] ""
 #, c-format
 #~ msgid "Tracker had %s%'d seeders and %'d leechers%s %s ago"
 #~ msgstr "在 %5$s前 Tracker 有 %1$s%2$'d 个做种用户和 %3$'d 个下载用户%4$s"
-
-#, c-format
-#~ msgid "Tracker warning: \"%s\""
-#~ msgstr "Tracker 警告：“%s”"
-
-#, c-format
-#~ msgid "Tracker will allow requests in %s"
-#~ msgstr "Tracker 将允许来自 %s 的请求"
 
 #, c-format
 #~ msgid ""
@@ -2951,18 +2775,12 @@ msgstr[0] ""
 #~ msgid "Transmission doesn't know how to use \"%s\""
 #~ msgstr "Transmission 不知道如何使用“%s”"
 
-#~ msgid "Transmission is a BitTorrent client with an easy-to-use frontend on top a cross-platform backend. Native frontends are available for OS X and Windows, as well as command line and web frontends."
-#~ msgstr "Transmission 是个 BitTorrent 客户端，具有易用的前端和跨平台的后端。有适用于 OS X 和 Windows 的本地客户端，也包括命令行和 Web 前端。"
-
 #~ msgid "Tuesday"
 #~ msgstr "星期二"
 
 #, c-format
 #~ msgid "U_pload (%s):"
 #~ msgstr "上传(%s)(_P)："
-
-#~ msgid "Unable to parse file content"
-#~ msgstr "无法解析文件内容"
 
 #, c-format
 #~ msgid "Unable to rename file as \"%s\": %s"
@@ -2981,89 +2799,17 @@ msgstr[0] ""
 #~ msgid "Wednesday"
 #~ msgstr "星期三"
 
-#~ msgid "_About"
-#~ msgstr "关于(_A)"
-
-#~ msgid "_Compact View"
-#~ msgstr "紧凑视图(_C)"
-
-#~ msgid "_Contents"
-#~ msgstr "目录(_C)"
-
-#~ msgid "_Delete Files and Remove"
-#~ msgstr "移除并删除文件(_D)"
-
-#~ msgid "_Donate"
-#~ msgstr "捐助(_D)"
-
 #, c-format
 #~ msgid "_Download (%s):"
 #~ msgstr "下载(%s)(_D)："
-
-#~ msgid "_File"
-#~ msgstr "文件(_F)"
-
-#~ msgid "_Filterbar"
-#~ msgstr "筛选栏(_F)"
-
-#~ msgid "_New…"
-#~ msgstr "新建(_N)…"
-
-#~ msgid "_Pause"
-#~ msgstr "暂停(_P)"
-
-#~ msgid "_Pause All"
-#~ msgstr "全部暂停(_P)"
-
-#~ msgid "_Preferences"
-#~ msgstr "首选项(_P)"
-
-#~ msgid "_Properties"
-#~ msgstr "属性(_P)"
-
-#~ msgid "_Queue"
-#~ msgstr "队列(_Q)"
-
-#~ msgid "_Quit"
-#~ msgstr "退出(_Q)"
 
 #, c-format
 #~ msgid "_Show %'d of:"
 #~ msgstr "显示共 %'d 个(_S)："
 
-#~ msgid "_Show Transmission"
-#~ msgstr "显示 Transmission(_S)"
-
-#~ msgid "_Sort Torrents By"
-#~ msgstr "排列种子(_S)"
-
-#~ msgid "_Start"
-#~ msgstr "开始(_S)"
-
-#~ msgid "_Start All"
-#~ msgstr "全部开始(_S)"
-
-#~ msgid "_Statistics"
-#~ msgstr "统计信息(_S)"
-
-#~ msgid "_Statusbar"
-#~ msgstr "状态栏(_S)"
-
-#~ msgid "_Toolbar"
-#~ msgstr "工具栏(_T)"
-
-#~ msgid "_Torrent"
-#~ msgstr "种子(_T)"
-
 #, c-format
 #~ msgid "_Upload (%s):"
 #~ msgstr "上传(%s)(_U)："
-
-#~ msgid "_Verify Local Data"
-#~ msgstr "校验本地数据(_V)"
-
-#~ msgid "_View"
-#~ msgstr "查看(_V)"
 
 #, c-format
 #~ msgid "blocklist skipped invalid address at line %d"
@@ -3082,7 +2828,7 @@ msgstr[0] ""
 
 #, c-format
 #~ msgid "size|Down: %1$s, Up: %2$s"
-#~ msgstr "量|下载：%s，上传：%s"
+#~ msgstr "下载：%1$s，上传：%2$s"
 
 #~ msgid "sparse"
 #~ msgstr "稀疏"

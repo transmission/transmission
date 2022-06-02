@@ -17,7 +17,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-06-02 23:47+0100\n"
+"POT-Creation-Date: 2022-06-03 00:09+0100\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
 "Last-Translator: Emin Tufan Çetin <etcetin@gmail.com>, 2021\n"
 "Language-Team: Turkish (https://www.transifex.com/transmissionbt/teams/33778/tr/)\n"
@@ -2300,10 +2300,6 @@ msgstr[1] ""
 #~ msgstr "%1$s (%2$s%%)"
 
 #, c-format
-#~ msgid "%1$s (+%2$s corrupt)"
-#~ msgstr "%1$s (+%2$s bozuk)"
-
-#, c-format
 #~ msgid "%1$s ago"
 #~ msgstr "%1$s önce"
 
@@ -2358,14 +2354,6 @@ msgstr[1] ""
 #~ msgstr "%s boş"
 
 #, c-format
-#~ msgid "%s is not a valid address"
-#~ msgstr "%s geçerli adres değil"
-
-#, c-format
-#~ msgid "%s is not an IPv4 or IPv6 address. RPC listeners must be IPv4 or IPv6"
-#~ msgstr "%s bir IPv4 veya IPv6 adresi değil. RPC dinleyicileri, IPv4 veya IPv6 olmak zorundadır"
-
-#, c-format
 #~ msgid "%s remaining"
 #~ msgstr "%s kaldı"
 
@@ -2388,9 +2376,6 @@ msgstr[1] ""
 #~ msgid "<i>Testing TCP port…</i>"
 #~ msgstr "<i>TCP bağlantısı sınanıyor…</i>"
 
-#~ msgid "Ask Tracker for _More Peers"
-#~ msgstr "İzleyiciye Daha _Çok Eş Sor"
-
 #, c-format
 #~ msgid "Asking for more peers in %s"
 #~ msgstr "%s içinde daha çok eş sorulacak"
@@ -2409,9 +2394,6 @@ msgstr[1] ""
 
 #~ msgid "Automatically add .torrent files _from:"
 #~ msgstr "_Şuradan .torrent dosyalarını kendiliğinden ekle:"
-
-#~ msgid "BitTorrent is a peer-to-peer file-sharing protocol that is commonly used to distribute large amounts of data between multiple users."
-#~ msgstr "BitTorrent; çok sayıda kullanıcı arasında büyük miktarda veri dağıtmak için yaygınca kullanılan, eşten eşe dosya paylaşım iletişim kuralıdır."
 
 #, c-format
 #~ msgid "Blocklist \"%s\" contains %zu entries"
@@ -2433,9 +2415,6 @@ msgstr[1] ""
 #~ msgstr[0] "Karalistede %'d kural var."
 #~ msgstr[1] "Engel listesinde %'d kural var."
 
-#~ msgid "Call scrip_t when torrent is completed:"
-#~ msgstr "Torrent tamamlandığında _betiği çağır:"
-
 #, c-format
 #~ msgid ""
 #~ "Click to disable Alternative Speed Limits\n"
@@ -2454,12 +2433,6 @@ msgstr[1] ""
 
 #~ msgid "Complete"
 #~ msgstr "Tamamlandı"
-
-#~ msgid "Copy _Magnet Link to Clipboard"
-#~ msgstr "_Mıknatıs Bağlantısını Panoya Kopyala"
-
-#~ msgid "Copyright (c) The Transmission Project"
-#~ msgstr "Telif Hakkı (c) Transmission Projesi"
 
 #, c-format
 #~ msgid "Couldn't bind port %d on %s: %s"
@@ -2518,19 +2491,12 @@ msgstr[1] ""
 #~ msgstr "\"%1$s\" dosyası kaydedilemedi: %2$s"
 
 #, c-format
-#~ msgid "Couldn't save temporary file \"%1$s\": %2$s"
-#~ msgstr "\"%1$s\" geçici dosyası kaydedilemedi: %2$s"
-
-#, c-format
 #~ msgid "Couldn't set source address %s on %<PRIdMAX>: %s"
 #~ msgstr "%2$<PRIdMAX> üstünde %1$s kaynak adresi belirlenemedi: %3$s"
 
 #, c-format
 #~ msgid "Couldn't truncate \"%1$s\": %2$s"
 #~ msgstr "\"%1$s\" kesilemedi: %2$s"
-
-#~ msgid "Create a torrent"
-#~ msgstr "Torrent oluştur"
 
 #, c-format
 #~ msgid "Created \"%s\"!"
@@ -2551,13 +2517,6 @@ msgstr[1] ""
 #, c-format
 #~ msgid "Creating \"%s\""
 #~ msgstr "\"%s\" oluşturuluyor"
-
-#, c-format
-#~ msgid "DNS Lookup failed: %s"
-#~ msgstr "DNS Arama başarısız oldu: %s"
-
-#~ msgid "Dese_lect All"
-#~ msgstr "Tümünün Seçimini _Kaldır"
 
 #, c-format
 #~ msgid "Do_wnload (%s):"
@@ -2586,9 +2545,6 @@ msgstr[1] ""
 #~ msgid "Downloading metadata from %1$'d %2$s (%3$d%% done)"
 #~ msgstr "Üstveri %1$'d %2$s üzerinden indiriliyor (%3$d%% tamamlandı)"
 
-#~ msgid "Enable Alternative Speed _Limits"
-#~ msgstr "Ek Hız _Sınırlamalarını Etkinleştir"
-
 #~ msgid "Error opening torrent"
 #~ msgstr "Torrenti açmada hata"
 
@@ -2599,10 +2555,6 @@ msgstr[1] ""
 #, c-format
 #~ msgid "Error registering Transmission as a %s handler: %s"
 #~ msgstr "Transmission'ı %s işleyicisi olarak kaydederken hata: %s"
-
-#, c-format
-#~ msgid "Error uncompressing blocklist: %s (%d)"
-#~ msgstr "Engel listesi açılırken hata: %s (%d)"
 
 #, c-format
 #~ msgid "Error writing \"%s\": %s"
@@ -2619,10 +2571,6 @@ msgstr[1] ""
 #, c-format
 #~ msgid "Failed to set piece size to %s, leaving it at %s"
 #~ msgstr "Parça boyutu %s olarak belirlenemedi, %s konumunda terk ediliyor"
-
-#, c-format
-#~ msgid "File \"%s\" is in the way"
-#~ msgstr "\"%s\" dosyası yol üstünde bulunuyor"
 
 #, c-format
 #~ msgid "Found Internet Gateway Device \"%s\""
@@ -2650,10 +2598,6 @@ msgstr[1] ""
 #~ msgid "Idle"
 #~ msgstr "Boşta"
 
-#, c-format
-#~ msgid "Invalid metadata entry \"%s\""
-#~ msgstr "Geçersiz \"%s\" üst veri girişi"
-
 #~ msgid "Is another copy of Transmission already running?"
 #~ msgstr "Başka bir Transmission kopyası çalışıyor mu?"
 
@@ -2673,29 +2617,11 @@ msgstr[1] ""
 #~ msgid "Local Address is \"%s\""
 #~ msgstr "Yerel Adres \"%s\""
 
-#~ msgid "Magnet torrent's metadata is not usable"
-#~ msgstr "Mıknatıs torrentin üst verisi kullanılabilir değil"
-
-#~ msgid "Message _Log"
-#~ msgstr "İleti _Günlüğü"
-
 #~ msgid "Mo_ve .torrent file to the trash"
 #~ msgstr ".torrent dosyasını çöpe _taşı"
 
 #~ msgid "Monday"
 #~ msgstr "Pazartesi"
-
-#~ msgid "Move _Down"
-#~ msgstr "_Aşağı Taşı"
-
-#~ msgid "Move _Up"
-#~ msgstr "_Yukarı Taşı"
-
-#~ msgid "Move to _Bottom"
-#~ msgstr "En _Alta Taşı"
-
-#~ msgid "Move to _Top"
-#~ msgstr "En _Üste Taşı"
 
 #, c-format
 #~ msgid "Moving \"%s\""
@@ -2704,27 +2630,6 @@ msgstr[1] ""
 #~ msgid "Not a regular file"
 #~ msgstr "Düzenli dosya değil"
 
-#~ msgid "Notable features of Transmission include support for Local Peer Discovery, encryption, DHT, µTP, PEX and Magnet Link."
-#~ msgstr "Transmission'ın dikkate değer özellikleri arasında Yerel Eş Keşfi, şifreleme, DHT, µTP, PEX ve Magnet Bağlantısı desteği bulunur."
-
-#~ msgid "Open Fold_er"
-#~ msgstr "_Klasörü Aç"
-
-#~ msgid "Open URL…"
-#~ msgstr "URL Aç…"
-
-#~ msgid "Open _URL…"
-#~ msgstr "_URL Aç…"
-
-#~ msgid "Open a torrent"
-#~ msgstr "Torrent aç"
-
-#~ msgid "Pause all torrents"
-#~ msgstr "Tüm torrentleri duraklat"
-
-#~ msgid "Pause torrent"
-#~ msgstr "Torrenti duraklat"
-
 #, c-format
 #~ msgid "Peer list request %1$stimed out%2$s %3$s ago; will retry"
 #~ msgstr "%1$sEş listesi isteği%2$s %3$s önce zaman aşımına uğradı; yeniden deneyeceğiz"
@@ -2732,10 +2637,6 @@ msgstr[1] ""
 #, c-format
 #~ msgid "Piece %<PRIu32>, which was just downloaded, failed its checksum test"
 #~ msgstr "İndirilen parça %<PRIu32>, doğrulama sınamasında başarısız oldu."
-
-#, c-format
-#~ msgid "Please Verify Local Data! Piece #%zu is corrupt."
-#~ msgstr "Lütfen Yerel Veriyi Doğrulayın! #%zu parçası bozuk."
 
 #, c-format
 #~ msgid "Port %d forwarded successfully"
@@ -2771,18 +2672,9 @@ msgstr[1] ""
 #~ msgid "Preallocated file \"%1$s\" (%2$s, size: %3$<PRIu64>)"
 #~ msgstr "Ön yer ayrılması yapılan dosya \"%1$s\" (%2$s, boyut: %3$<PRIu64>)"
 
-#~ msgid "Present Main Window"
-#~ msgstr "Ana Pencereyi Sun"
-
 #, c-format
 #~ msgid "Ratio: %s"
 #~ msgstr "Oran: %s"
-
-#~ msgid "Re_verse Sort Order"
-#~ msgstr "Sıralama Düzenini _Ters Çevir"
-
-#~ msgid "Remove torrent"
-#~ msgstr "Torrenti kaldır"
 
 #~ msgid "Saturday"
 #~ msgstr "Cumartesi"
@@ -2805,9 +2697,6 @@ msgstr[1] ""
 #~ msgstr[0] "%1$'d / %2$'d bağlı eşe gönderiliyor"
 #~ msgstr[1] "%1$'d / %2$'d bağlı eşe gönderiliyor"
 
-#~ msgid "Select _All"
-#~ msgstr "_Tümünü Seç"
-
 #, c-format
 #~ msgid "Serving RPC and Web requests from directory '%s'"
 #~ msgstr "'%s' dizininden RPC ve Web istekleri sunuluyor"
@@ -2816,51 +2705,9 @@ msgstr[1] ""
 #~ msgid "Serving RPC and Web requests on %s:%d%s"
 #~ msgstr "%s:%d%s üstünde RPC ve Web istekleri sunuluyor"
 
-#~ msgid "Set _Location…"
-#~ msgstr "_Konumu Ayarla…"
-
 #, c-format
 #~ msgid "Skipping unknown torrent \"%s\""
 #~ msgstr "Bilinmeyen torrent \"%s\" atlanıyor"
-
-#~ msgid "Sort by A_ge"
-#~ msgstr "_Yaşa Göre Sırala"
-
-#~ msgid "Sort by Rati_o"
-#~ msgstr "_Orana Göre Sırala"
-
-#~ msgid "Sort by Si_ze"
-#~ msgstr "_Boyuta Göre Sırala"
-
-#~ msgid "Sort by Stat_e"
-#~ msgstr "_Duruma Göre Sırala"
-
-#~ msgid "Sort by Time _Left"
-#~ msgstr "_Kalan Süreye Göre Sırala"
-
-#~ msgid "Sort by _Activity"
-#~ msgstr "_Etkinliğe Göre Sırala"
-
-#~ msgid "Sort by _Name"
-#~ msgstr "_Ada Göre Sırala"
-
-#~ msgid "Sort by _Progress"
-#~ msgstr "_İlerlemeye Göre Sırala"
-
-#~ msgid "Sort by _Queue"
-#~ msgstr "_Kuyruğa Göre Sırala"
-
-#~ msgid "Start _Now"
-#~ msgstr "_Şimdi Başlat"
-
-#~ msgid "Start all torrents"
-#~ msgstr "Tüm torrentleri başlat"
-
-#~ msgid "Start torrent"
-#~ msgstr "Torrenti başlat"
-
-#~ msgid "Start torrent now"
-#~ msgstr "Torrenti şimdi başlat"
 
 #, c-format
 #~ msgid "Started %'d time"
@@ -2887,20 +2734,8 @@ msgstr[1] ""
 #~ msgstr "Pazar"
 
 #, c-format
-#~ msgid "The torrent file \"%s\" contains invalid data."
-#~ msgstr "\"%s\" torrent dosyası geçersiz veri içeriyor."
-
-#, c-format
-#~ msgid "The torrent file \"%s\" encountered an unknown error."
-#~ msgstr "\"%s\" torrent dosyasında bilinmeyen hata ile karşılaşıldı."
-
-#, c-format
 #~ msgid "The torrent file \"%s\" is already in use by \"%s.\""
 #~ msgstr "\"%s\" torrent dosyası \"%s\" tarafından zaten kullanılıyor."
-
-#, c-format
-#~ msgid "This magnet link appears to be intended for something other than BitTorrent. BitTorrent magnet links have a section containing \"%s\"."
-#~ msgstr "Bu mıknatıs bağlantısı, BitTorrent için tasarlanmış gibi görünmüyor. BitTorrent mıknatıs bağlantılarında \"%s\" içeren bölüm bulunur."
 
 #~ msgid "Thursday"
 #~ msgstr "Perşembe"
@@ -2916,17 +2751,6 @@ msgstr[1] ""
 #~ msgid "Torrent Creator is skipping file \"%s\": %s"
 #~ msgstr "Torrent Oluşturucunun \"%s\" dosyasını atlıyor: %s"
 
-#~ msgid "Torrent properties"
-#~ msgstr "Torrent özellikleri"
-
-#, c-format
-#~ msgid "Tracker error: \"%s\""
-#~ msgstr "İzleyici hatası: \"%s\""
-
-#, c-format
-#~ msgid "Tracker gave HTTP response code %1$ld (%2$s)"
-#~ msgstr "Tracker HTTP yanıt kodu verdi %1$ld (%2$s)"
-
 #, c-format
 #~ msgid "Tracker gave a warning: \"%s\""
 #~ msgstr "İzleyici uyarı verdi: \"%s\""
@@ -2938,14 +2762,6 @@ msgstr[1] ""
 #, c-format
 #~ msgid "Tracker had %s%'d seeders and %'d leechers%s %s ago"
 #~ msgstr "İzleyici %s%'d gönderici ve %'d alıcıya%s sahipti, %s önce"
-
-#, c-format
-#~ msgid "Tracker warning: \"%s\""
-#~ msgstr "İzleyici uyarısı: \"%s\""
-
-#, c-format
-#~ msgid "Tracker will allow requests in %s"
-#~ msgstr "İzleyici %s içinde isteklere izin verecek"
 
 #, c-format
 #~ msgid ""
@@ -2961,18 +2777,12 @@ msgstr[1] ""
 #~ msgid "Transmission doesn't know how to use \"%s\""
 #~ msgstr "Transmission şunun nasıl kullanılacağını bilmiyor: \"%s\""
 
-#~ msgid "Transmission is a BitTorrent client with an easy-to-use frontend on top a cross-platform backend. Native frontends are available for OS X and Windows, as well as command line and web frontends."
-#~ msgstr "Transmission, çapraz platformlu arkaucu temel alan, kullanımı kolay arayüzlü BitTorrent istemcisidir. OS X ve Windows için arayüzleri vardır. Ayrıca komut satırı ve web arayüzleri de vardır."
-
 #~ msgid "Tuesday"
 #~ msgstr "Salı"
 
 #, c-format
 #~ msgid "U_pload (%s):"
 #~ msgstr "_Gönderme (%s):"
-
-#~ msgid "Unable to parse file content"
-#~ msgstr "Dosya içeriği ayrıştırılamıyor"
 
 #, c-format
 #~ msgid "Unable to rename file as \"%s\": %s"
@@ -2991,89 +2801,17 @@ msgstr[1] ""
 #~ msgid "Wednesday"
 #~ msgstr "Çarşamba"
 
-#~ msgid "_About"
-#~ msgstr "_Hakkında"
-
-#~ msgid "_Compact View"
-#~ msgstr "_Sıkışık Görünüm"
-
-#~ msgid "_Contents"
-#~ msgstr "_İçindekiler"
-
-#~ msgid "_Delete Files and Remove"
-#~ msgstr "Dosyaları _Sil ve Kaldır"
-
-#~ msgid "_Donate"
-#~ msgstr "_Bağış Yap"
-
 #, c-format
 #~ msgid "_Download (%s):"
 #~ msgstr "İn_dirme (%s)"
-
-#~ msgid "_File"
-#~ msgstr "_Dosya"
-
-#~ msgid "_Filterbar"
-#~ msgstr "_Süzgeç Çubuğu"
-
-#~ msgid "_New…"
-#~ msgstr "_Yeni…"
-
-#~ msgid "_Pause"
-#~ msgstr "_Duraklat"
-
-#~ msgid "_Pause All"
-#~ msgstr "Tümünü _Duraklat"
-
-#~ msgid "_Preferences"
-#~ msgstr "_Tercihler"
-
-#~ msgid "_Properties"
-#~ msgstr "_Özellikler"
-
-#~ msgid "_Queue"
-#~ msgstr "_Kuyruk"
-
-#~ msgid "_Quit"
-#~ msgstr "_Çık"
 
 #, c-format
 #~ msgid "_Show %'d of:"
 #~ msgstr "%'d öge _göster:"
 
-#~ msgid "_Show Transmission"
-#~ msgstr "Transmission'ı _Göster"
-
-#~ msgid "_Sort Torrents By"
-#~ msgstr "Torrentleri Şuna Göre _Sırala"
-
-#~ msgid "_Start"
-#~ msgstr "_Başlat"
-
-#~ msgid "_Start All"
-#~ msgstr "Tümünü _Başlat"
-
-#~ msgid "_Statistics"
-#~ msgstr "_İstatistikler"
-
-#~ msgid "_Statusbar"
-#~ msgstr "_Durum Çubuğu"
-
-#~ msgid "_Toolbar"
-#~ msgstr "_Araç Çubuğu"
-
-#~ msgid "_Torrent"
-#~ msgstr "_Torrent"
-
 #, c-format
 #~ msgid "_Upload (%s):"
 #~ msgstr "G_önderme (%s):"
-
-#~ msgid "_Verify Local Data"
-#~ msgstr "Yerel Verileri _Doğrula"
-
-#~ msgid "_View"
-#~ msgstr "_Görünüm"
 
 #, c-format
 #~ msgid "blocklist skipped invalid address at line %d"

@@ -4,21 +4,21 @@
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 # Translators:
-# Mike Gelfand <mikedld@mikedld.com>, 2017
 # Xabier Aramendi <azpidatziak@gmail.com>, 2017
 # Sendoa Sojo <sendoasojo@gmail.com>, 2020
 # Xabier Martin <Iparra@iparra.eus>, 2020
 # Gorka Azkarate Zubiaur <gorkaazkarate@gmail.com>, 2020
 # Alexander Gabilondo <alexgabi@disroot.org>, 2021
+# Mike Gelfand <mikedld@mikedld.com>, 2022
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-06-02 23:47+0100\n"
+"POT-Creation-Date: 2022-06-03 00:09+0100\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Alexander Gabilondo <alexgabi@disroot.org>, 2021\n"
+"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2022\n"
 "Language-Team: Basque (https://www.transifex.com/transmissionbt/teams/33778/eu/)\n"
 "Language: eu\n"
 "MIME-Version: 1.0\n"
@@ -2307,10 +2307,6 @@ msgstr[1] ""
 #~ msgstr "%1$s (%%%2$s)"
 
 #, c-format
-#~ msgid "%1$s (+%2$s corrupt)"
-#~ msgstr "%1$s (+%2$s hondatuta)"
-
-#, c-format
 #~ msgid "%1$s ago"
 #~ msgstr "Duela %1$s"
 
@@ -2365,14 +2361,6 @@ msgstr[1] ""
 #~ msgstr "%s libre"
 
 #, c-format
-#~ msgid "%s is not a valid address"
-#~ msgstr "%s ez da helbide baliogarria"
-
-#, c-format
-#~ msgid "%s is not an IPv4 or IPv6 address. RPC listeners must be IPv4 or IPv6"
-#~ msgstr "%s ez da IPv4 edo IPv6 helbide bat. RPC entzuleak IPv4 edo IPv6 izan behar dute"
-
-#, c-format
 #~ msgid "%s remaining"
 #~ msgstr "%s geratzen da"
 
@@ -2395,9 +2383,6 @@ msgstr[1] ""
 #~ msgid "<i>Testing TCP port…</i>"
 #~ msgstr "<i>TCP ataka probatzen…</i>"
 
-#~ msgid "Ask Tracker for _More Peers"
-#~ msgstr "Galdetu Aztarnariari _Pare Gehiagorako"
-
 #, c-format
 #~ msgid "Asking for more peers in %s"
 #~ msgstr "Pare gehiago eskatzen %s-(e)n"
@@ -2416,9 +2401,6 @@ msgstr[1] ""
 
 #~ msgid "Automatically add .torrent files _from:"
 #~ msgstr "Automatikoki gehitu .torrent fitxategiak _hemendik:"
-
-#~ msgid "BitTorrent is a peer-to-peer file-sharing protocol that is commonly used to distribute large amounts of data between multiple users."
-#~ msgstr "BitTorrent P2P sistema bat da, fitxategiak partekatzeko protokoloa. Erabiltzaileen arteko datu kopuru handiak partekatzeko erabili ohi da."
 
 #, c-format
 #~ msgid "Blocklist \"%s\" contains %zu entries"
@@ -2440,9 +2422,6 @@ msgstr[1] ""
 #~ msgstr[0] "Blokeatze-zerrendak arau %'d du."
 #~ msgstr[1] "Blokeatze-zerrendak %'d arau ditu."
 
-#~ msgid "Call scrip_t when torrent is completed:"
-#~ msgstr "Deitu scrip_t-ari torrent-a osatua dagoenean:"
-
 #, c-format
 #~ msgid ""
 #~ "Click to disable Alternative Speed Limits\n"
@@ -2461,12 +2440,6 @@ msgstr[1] ""
 
 #~ msgid "Complete"
 #~ msgstr "Osatua"
-
-#~ msgid "Copy _Magnet Link to Clipboard"
-#~ msgstr "Kopiatu _Magnet Lotura Gakora"
-
-#~ msgid "Copyright (c) The Transmission Project"
-#~ msgstr "Copyright (c) The Transmission Project"
 
 #, c-format
 #~ msgid "Couldn't bind port %d on %s: %s"
@@ -2525,19 +2498,12 @@ msgstr[1] ""
 #~ msgstr "Ezin izan da \"%1$s\" fitxategia gorde: %2$s"
 
 #, c-format
-#~ msgid "Couldn't save temporary file \"%1$s\": %2$s"
-#~ msgstr "Ezin izan da behin-behineko \"%1$s\" fitxategia gorde: %2$s"
-
-#, c-format
 #~ msgid "Couldn't set source address %s on %<PRIdMAX>: %s"
 #~ msgstr "Ezin izan da iturburuko helbidea ezarri %s horretan %<PRIdMAX>: %s"
 
 #, c-format
 #~ msgid "Couldn't truncate \"%1$s\": %2$s"
 #~ msgstr "Ezin izan da \"%1$s\" moztu: %2$s"
-
-#~ msgid "Create a torrent"
-#~ msgstr "Sortu torrenta"
 
 #, c-format
 #~ msgid "Created \"%s\"!"
@@ -2558,13 +2524,6 @@ msgstr[1] ""
 #, c-format
 #~ msgid "Creating \"%s\""
 #~ msgstr "\"%s\" sortzen"
-
-#, c-format
-#~ msgid "DNS Lookup failed: %s"
-#~ msgstr "DNS bilaketak huts egin du: %s"
-
-#~ msgid "Dese_lect All"
-#~ msgstr "_Deshautatu Guztiak"
 
 #, c-format
 #~ msgid "Do_wnload (%s):"
@@ -2593,9 +2552,6 @@ msgstr[1] ""
 #~ msgid "Downloading metadata from %1$'d %2$s (%3$d%% done)"
 #~ msgstr "Deskargatu metadatuak hemendik %1$'d %2$s (%3$d%% egina)"
 
-#~ msgid "Enable Alternative Speed _Limits"
-#~ msgstr "Gaitu abiadura-muga a_lternatiboak"
-
 #~ msgid "Error opening torrent"
 #~ msgstr "Errorea torrent-a irekitzean"
 
@@ -2606,10 +2562,6 @@ msgstr[1] ""
 #, c-format
 #~ msgid "Error registering Transmission as a %s handler: %s"
 #~ msgstr "Errorea Transmission honen erregistroa egiterakoan %s manipulatzaile bezala: %s"
-
-#, c-format
-#~ msgid "Error uncompressing blocklist: %s (%d)"
-#~ msgstr "Errore deskonprimatzen blocklist-a: %s (%d)"
 
 #, c-format
 #~ msgid "Error writing \"%s\": %s"
@@ -2626,10 +2578,6 @@ msgstr[1] ""
 #, c-format
 #~ msgid "Failed to set piece size to %s, leaving it at %s"
 #~ msgstr "Ezin izan da  %s tamainako zatia ezarri, eta tamaina honetan utzi da: %s"
-
-#, c-format
-#~ msgid "File \"%s\" is in the way"
-#~ msgstr "\"%s\" fitxategia bidean dago"
 
 #, c-format
 #~ msgid "Found Internet Gateway Device \"%s\""
@@ -2657,10 +2605,6 @@ msgstr[1] ""
 #~ msgid "Idle"
 #~ msgstr "Inaktibo"
 
-#, c-format
-#~ msgid "Invalid metadata entry \"%s\""
-#~ msgstr "Baliogabeko metadatu-sarrera \"%s\""
-
 #~ msgid "Is another copy of Transmission already running?"
 #~ msgstr "Abian al dago Transmission-en beste kopiaren bat?"
 
@@ -2680,29 +2624,11 @@ msgstr[1] ""
 #~ msgid "Local Address is \"%s\""
 #~ msgstr "Helbide lokala \"%s\" da"
 
-#~ msgid "Magnet torrent's metadata is not usable"
-#~ msgstr "Magnet torrent-aren metadatuak ez daude erabilgarri"
-
-#~ msgid "Message _Log"
-#~ msgstr "Mezuen _egunkaria"
-
 #~ msgid "Mo_ve .torrent file to the trash"
 #~ msgstr "Mugitu .torrent fitxategia zakarrontzira"
 
 #~ msgid "Monday"
 #~ msgstr "Astelehena"
-
-#~ msgid "Move _Down"
-#~ msgstr "Mugitu _Behera"
-
-#~ msgid "Move _Up"
-#~ msgstr "Mugitu G_ora"
-
-#~ msgid "Move to _Bottom"
-#~ msgstr "Mugitu Be_heren"
-
-#~ msgid "Move to _Top"
-#~ msgstr "Mugitu _Goren"
 
 #, c-format
 #~ msgid "Moving \"%s\""
@@ -2711,27 +2637,6 @@ msgstr[1] ""
 #~ msgid "Not a regular file"
 #~ msgstr "Ez da fitxategi erregularra"
 
-#~ msgid "Notable features of Transmission include support for Local Peer Discovery, encryption, DHT, µTP, PEX and Magnet Link."
-#~ msgstr "Transmission honek, gainera, eskaintzen du euskarria Local Peer Discovery horretan lan egiteko, zifratze sistemak, DHT, µTP, PEX eta Magnet Link."
-
-#~ msgid "Open Fold_er"
-#~ msgstr "Ireki karpe_ta"
-
-#~ msgid "Open URL…"
-#~ msgstr "Ireki URL-a..."
-
-#~ msgid "Open _URL…"
-#~ msgstr "Ireki _URL-a..."
-
-#~ msgid "Open a torrent"
-#~ msgstr "Ireki torrent bat"
-
-#~ msgid "Pause all torrents"
-#~ msgstr "Pausatu torrent guztiak"
-
-#~ msgid "Pause torrent"
-#~ msgstr "Pausatu torrenta"
-
 #, c-format
 #~ msgid "Peer list request %1$stimed out%2$s %3$s ago; will retry"
 #~ msgstr "Pareen zerrendaren eskaera %1$sdenboraz kanpo%2$s duela %3$s; berriro saiatzen"
@@ -2739,10 +2644,6 @@ msgstr[1] ""
 #, c-format
 #~ msgid "Piece %<PRIu32>, which was just downloaded, failed its checksum test"
 #~ msgstr "Deskargatu berri den  %<PRIu32> zati honek huts egin du bere kontroleko baturan"
-
-#, c-format
-#~ msgid "Please Verify Local Data! Piece #%zu is corrupt."
-#~ msgstr "Egiaztatu datu lokalak! #%zu zatia hondatuta dago."
 
 #, c-format
 #~ msgid "Port %d forwarded successfully"
@@ -2778,18 +2679,9 @@ msgstr[1] ""
 #~ msgid "Preallocated file \"%1$s\" (%2$s, size: %3$<PRIu64>)"
 #~ msgstr "Banatutako  \"%1$s\" fitxategiaren (%2$s, tamaina: %3$<PRIu64>)"
 
-#~ msgid "Present Main Window"
-#~ msgstr "Erakutsi leiho nagusia"
-
 #, c-format
 #~ msgid "Ratio: %s"
 #~ msgstr "Partekatze-tasa: %s"
-
-#~ msgid "Re_verse Sort Order"
-#~ msgstr "Al_derantzikatu ordena"
-
-#~ msgid "Remove torrent"
-#~ msgstr "Kendu torrenta"
 
 #~ msgid "Saturday"
 #~ msgstr "Larunbata"
@@ -2812,9 +2704,6 @@ msgstr[1] ""
 #~ msgstr[0] "Konektatutako pare %2$'d-etik %1$'d aletzen"
 #~ msgstr[1] "Konektatutako %2$'d paretik %1$'d aletzen"
 
-#~ msgid "Select _All"
-#~ msgstr "Hautatu _Guztiak"
-
 #, c-format
 #~ msgid "Serving RPC and Web requests from directory '%s'"
 #~ msgstr "Zerbitzatzen RPC eta Web eskaerak direktorio honetatik: '%s'"
@@ -2823,51 +2712,9 @@ msgstr[1] ""
 #~ msgid "Serving RPC and Web requests on %s:%d%s"
 #~ msgstr "Zerbitzatzen RPC eta Web eskaerak hemen %s:%d%s"
 
-#~ msgid "Set _Location…"
-#~ msgstr "Ezarri _Kokalekua..."
-
 #, c-format
 #~ msgid "Skipping unknown torrent \"%s\""
 #~ msgstr "\"%s\" torrent ezezaguna saltatzen"
-
-#~ msgid "Sort by A_ge"
-#~ msgstr "Ordenatu a_dinaren arabera"
-
-#~ msgid "Sort by Rati_o"
-#~ msgstr "Ordenatu _tasaren arabera"
-
-#~ msgid "Sort by Si_ze"
-#~ msgstr "Ordenatu ta_mainaren arabera"
-
-#~ msgid "Sort by Stat_e"
-#~ msgstr "Ordenatu ego_eraren arabera"
-
-#~ msgid "Sort by Time _Left"
-#~ msgstr "Ordenatu _geratzen den denboraren arabera"
-
-#~ msgid "Sort by _Activity"
-#~ msgstr "Ordenatu _aktibitatearen arabera"
-
-#~ msgid "Sort by _Name"
-#~ msgstr "Ordenatu _izenaren arabera"
-
-#~ msgid "Sort by _Progress"
-#~ msgstr "Ordenatu aurrera_penaren arabera"
-
-#~ msgid "Sort by _Queue"
-#~ msgstr "Ordenatu i_lararen arabera"
-
-#~ msgid "Start _Now"
-#~ msgstr "Abiarazi _Orain"
-
-#~ msgid "Start all torrents"
-#~ msgstr "Abiarazi torrent guztiak"
-
-#~ msgid "Start torrent"
-#~ msgstr "Abiarazi torrenta"
-
-#~ msgid "Start torrent now"
-#~ msgstr "Abiarazi torrenta orain"
 
 #, c-format
 #~ msgid "Started %'d time"
@@ -2894,20 +2741,8 @@ msgstr[1] ""
 #~ msgstr "Igandea"
 
 #, c-format
-#~ msgid "The torrent file \"%s\" contains invalid data."
-#~ msgstr "\"%s\" torrent-fitxategiak baliogabeko datuak ditu."
-
-#, c-format
-#~ msgid "The torrent file \"%s\" encountered an unknown error."
-#~ msgstr "\"%s\" torrent-fitxategiak errore ezezaguna aurkitu du."
-
-#, c-format
 #~ msgid "The torrent file \"%s\" is already in use by \"%s.\""
 #~ msgstr "Torrent fitxategia \"%s\" dagoeneko \"%s horrek erabili du.\""
-
-#, c-format
-#~ msgid "This magnet link appears to be intended for something other than BitTorrent. BitTorrent magnet links have a section containing \"%s\"."
-#~ msgstr "Magent esteka hau BitTorrent ez den beste zerbaitetarako sortu zela dirudi. BitTorrent motako magnet estekek \"%s\" duen atal bat daukate."
 
 #~ msgid "Thursday"
 #~ msgstr "Osteguna"
@@ -2923,17 +2758,6 @@ msgstr[1] ""
 #~ msgid "Torrent Creator is skipping file \"%s\": %s"
 #~ msgstr "Torrent Creator-ek \"%s\" fitxategia saltatu egin du: %s"
 
-#~ msgid "Torrent properties"
-#~ msgstr "Torrentaren ezaugarriak"
-
-#, c-format
-#~ msgid "Tracker error: \"%s\""
-#~ msgstr "Aztarnariaren errorea: \"%s\""
-
-#, c-format
-#~ msgid "Tracker gave HTTP response code %1$ld (%2$s)"
-#~ msgstr "Aztarnariak eman dio HTTP erantzun-kodea  %1$ld (%2$s)"
-
 #, c-format
 #~ msgid "Tracker gave a warning: \"%s\""
 #~ msgstr "Aztarnariak abisu bat eman du: \"%s\""
@@ -2945,14 +2769,6 @@ msgstr[1] ""
 #, c-format
 #~ msgid "Tracker had %s%'d seeders and %'d leechers%s %s ago"
 #~ msgstr "Aztarnariak %s%'d aletzen and %'d izain ditu duela %s %s"
-
-#, c-format
-#~ msgid "Tracker warning: \"%s\""
-#~ msgstr "Aztarnariaren abisua: \"%s\""
-
-#, c-format
-#~ msgid "Tracker will allow requests in %s"
-#~ msgstr "Aztarnariak eskariak onartuko ditu %s-(e)n"
 
 #, c-format
 #~ msgid ""
@@ -2968,18 +2784,12 @@ msgstr[1] ""
 #~ msgid "Transmission doesn't know how to use \"%s\""
 #~ msgstr "Transmission-ek ez daki \"%s\" nola erabili"
 
-#~ msgid "Transmission is a BitTorrent client with an easy-to-use frontend on top a cross-platform backend. Native frontends are available for OS X and Windows, as well as command line and web frontends."
-#~ msgstr "Transmission hau BitTorrent bezeroa da, erabiltzeko errazak diren interfazeekin eta plataforma anitzetan lan egiteko aukerarekin.  Berariaz doitutako interfazeak eskaintzen dira Linux, OS X eta Windows sistema eragileetarako. Gainera badago komandoen bidez eta webgune batetik lan egiteko aukera."
-
 #~ msgid "Tuesday"
 #~ msgstr "Asteartea"
 
 #, c-format
 #~ msgid "U_pload (%s):"
 #~ msgstr "K_arga (%s):"
-
-#~ msgid "Unable to parse file content"
-#~ msgstr "Ezin da fitxategiaren edukia aztertu"
 
 #, c-format
 #~ msgid "Unable to rename file as \"%s\": %s"
@@ -2998,89 +2808,17 @@ msgstr[1] ""
 #~ msgid "Wednesday"
 #~ msgstr "Asteazkena"
 
-#~ msgid "_About"
-#~ msgstr "_Honi buruz"
-
-#~ msgid "_Compact View"
-#~ msgstr "_Bista trinkoa"
-
-#~ msgid "_Contents"
-#~ msgstr "_Edukiak"
-
-#~ msgid "_Delete Files and Remove"
-#~ msgstr "_Ezabatu fitxategiak eta kendu"
-
-#~ msgid "_Donate"
-#~ msgstr "_Dirulaguntza"
-
 #, c-format
 #~ msgid "_Download (%s):"
 #~ msgstr "_Deskarga (%s):"
-
-#~ msgid "_File"
-#~ msgstr "_Agiria"
-
-#~ msgid "_Filterbar"
-#~ msgstr "_Iragazki-barra"
-
-#~ msgid "_New…"
-#~ msgstr "_Berria..."
-
-#~ msgid "_Pause"
-#~ msgstr "_Pausatu"
-
-#~ msgid "_Pause All"
-#~ msgstr "_Pausatu Guztiak"
-
-#~ msgid "_Preferences"
-#~ msgstr "_Hobespenak"
-
-#~ msgid "_Properties"
-#~ msgstr "_Ezaugarriak"
-
-#~ msgid "_Queue"
-#~ msgstr "_Lerroa"
-
-#~ msgid "_Quit"
-#~ msgstr "_Utzi"
 
 #, c-format
 #~ msgid "_Show %'d of:"
 #~ msgstr "_Erakutsi %'d hemendik:"
 
-#~ msgid "_Show Transmission"
-#~ msgstr "_Erakutsi Transmission"
-
-#~ msgid "_Sort Torrents By"
-#~ msgstr "_Antolatu torrentak honela:"
-
-#~ msgid "_Start"
-#~ msgstr "_Abiarazi"
-
-#~ msgid "_Start All"
-#~ msgstr "_Abiarazi Guztiak"
-
-#~ msgid "_Statistics"
-#~ msgstr "_Estatistikak"
-
-#~ msgid "_Statusbar"
-#~ msgstr "_Egoera-barra"
-
-#~ msgid "_Toolbar"
-#~ msgstr "_Tresnabarra"
-
-#~ msgid "_Torrent"
-#~ msgstr "_Torrenta"
-
 #, c-format
 #~ msgid "_Upload (%s):"
 #~ msgstr "_Karga (%s):"
-
-#~ msgid "_Verify Local Data"
-#~ msgstr "_Egiaztatu tokiko datuak"
-
-#~ msgid "_View"
-#~ msgstr "_Ikusi"
 
 #, c-format
 #~ msgid "blocklist skipped invalid address at line %d"
@@ -3100,7 +2838,7 @@ msgstr[1] ""
 
 #, c-format
 #~ msgid "size|Down: %1$s, Up: %2$s"
-#~ msgstr "tamaina|Behera: %1$s, Gora: %2$s"
+#~ msgstr "Behera: %1$s, Gora: %2$s"
 
 #~ msgid "sparse"
 #~ msgstr "urria"

@@ -4,20 +4,20 @@
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 # Translators:
-# Mike Gelfand <mikedld@mikedld.com>, 2017
 # stematlin <wertalg@nym.hush.com>, 2017
 # 49b67765f7beecf7587147363d590d62, 2017
 # Savvas Adamtziloglou <savvas-gr@greeklug.gr>, 2021
 # Michalis Zisis <mixasgr@greeklug.gr>, 2021
+# Mike Gelfand <mikedld@mikedld.com>, 2022
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-06-02 23:47+0100\n"
+"POT-Creation-Date: 2022-06-03 00:09+0100\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Michalis Zisis <mixasgr@greeklug.gr>, 2021\n"
+"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2022\n"
 "Language-Team: Greek (https://www.transifex.com/transmissionbt/teams/33778/el/)\n"
 "Language: el\n"
 "MIME-Version: 1.0\n"
@@ -2329,10 +2329,6 @@ msgstr[1] ""
 #~ msgstr "%1$s (%2$s%%)"
 
 #, c-format
-#~ msgid "%1$s (+%2$s corrupt)"
-#~ msgstr "%1$s (+%2$s αλλοιωμένα)"
-
-#, c-format
 #~ msgid "%1$s ago"
 #~ msgstr "πριν από %1$s"
 
@@ -2387,14 +2383,6 @@ msgstr[1] ""
 #~ msgstr "%s ελεύθερα"
 
 #, c-format
-#~ msgid "%s is not a valid address"
-#~ msgstr "%s δεν είναι μία έγκυρη διεύθυνση"
-
-#, c-format
-#~ msgid "%s is not an IPv4 or IPv6 address. RPC listeners must be IPv4 or IPv6"
-#~ msgstr "%s δεν είναι μια διεύθυνση IPv4 ή IPv6. Οι ακροατές RPC πρέπει να είναι IPv4 ή IPv6"
-
-#, c-format
 #~ msgid "%s remaining"
 #~ msgstr "απομένουν %s"
 
@@ -2417,9 +2405,6 @@ msgstr[1] ""
 #~ msgid "<i>Testing TCP port…</i>"
 #~ msgstr "<i>Δοκιμή για θύρα TCP…</i>"
 
-#~ msgid "Ask Tracker for _More Peers"
-#~ msgstr "Αίτηση στον ιχνηλάτη για ε_πιπλέον ομότιμους χρήστες"
-
 #, c-format
 #~ msgid "Asking for more peers in %s"
 #~ msgstr "Αίτηση λίστας επιπλέον ομότιμων χρηστών σε %s"
@@ -2438,9 +2423,6 @@ msgstr[1] ""
 
 #~ msgid "Automatically add .torrent files _from:"
 #~ msgstr "Αυτόματη προσθήκη αρχείων .torrent _από:"
-
-#~ msgid "BitTorrent is a peer-to-peer file-sharing protocol that is commonly used to distribute large amounts of data between multiple users."
-#~ msgstr "Το BitTorrent είναι ένα πρωτόκολλο μεταφοράς αρχείων χρήστη-προς-χρήστη που συχνά χρησιμοποιείται για τη διανομή μεγάλων ποσοτήτων δεδομένων μεταξύ πολλών χρηστών."
 
 #, c-format
 #~ msgid "Blocklist \"%s\" contains %zu entries"
@@ -2462,9 +2444,6 @@ msgstr[1] ""
 #~ msgstr[0] "Η λίστα αποκλεισμού έχει %'d κανόνα."
 #~ msgstr[1] "Η λίστα αποκλεισμού περιέχει %'d κανόνες."
 
-#~ msgid "Call scrip_t when torrent is completed:"
-#~ msgstr "Εκ_τέλεση σεναρίου κελύφους όταν ολοκληρωθεί το torrent:"
-
 #, c-format
 #~ msgid ""
 #~ "Click to disable Alternative Speed Limits\n"
@@ -2483,12 +2462,6 @@ msgstr[1] ""
 
 #~ msgid "Complete"
 #~ msgstr "Ολοκληρωμένο"
-
-#~ msgid "Copy _Magnet Link to Clipboard"
-#~ msgstr "Αντιγραφή του δεσμού _Magnet στο πρόχειρο"
-
-#~ msgid "Copyright (c) The Transmission Project"
-#~ msgstr "Copyright (c) The Transmission Project"
 
 #, c-format
 #~ msgid "Couldn't bind port %d on %s: %s"
@@ -2547,19 +2520,12 @@ msgstr[1] ""
 #~ msgstr "Δεν ήταν δυνατή η αποθήκευση του αρχείου \"%1$s\": %2$s"
 
 #, c-format
-#~ msgid "Couldn't save temporary file \"%1$s\": %2$s"
-#~ msgstr "Δεν ήταν δυνατή η αποθήκευση του προσωρινού αρχείου \"%1$s\": %2$s"
-
-#, c-format
 #~ msgid "Couldn't set source address %s on %<PRIdMAX>: %s"
 #~ msgstr "Δεν ήταν δυνατός ο ορισμός της διεύθυνσης πηγής στο %s on %<PRIdMAX>: %s"
 
 #, c-format
 #~ msgid "Couldn't truncate \"%1$s\": %2$s"
 #~ msgstr "Δεν ήταν δυνατή η περικοπή \"%1$s\": %2$s"
-
-#~ msgid "Create a torrent"
-#~ msgstr "Δημιουργία torrent"
 
 #, c-format
 #~ msgid "Created \"%s\"!"
@@ -2580,13 +2546,6 @@ msgstr[1] ""
 #, c-format
 #~ msgid "Creating \"%s\""
 #~ msgstr "Δημιουργία \"%s\""
-
-#, c-format
-#~ msgid "DNS Lookup failed: %s"
-#~ msgstr "Η αναζήτηση DNS απέτυχε: %s"
-
-#~ msgid "Dese_lect All"
-#~ msgstr "Αποεπι_λογή όλων"
 
 #, c-format
 #~ msgid "Do_wnload (%s):"
@@ -2615,9 +2574,6 @@ msgstr[1] ""
 #~ msgid "Downloading metadata from %1$'d %2$s (%3$d%% done)"
 #~ msgstr "Λήψη μεταδεδομένων από %1$'d %2$s (έγινε %3$d%%)"
 
-#~ msgid "Enable Alternative Speed _Limits"
-#~ msgstr "Ενεργοποίηση Εναλλακτικών Ορίων _Ταχύτητας"
-
 #~ msgid "Error opening torrent"
 #~ msgstr "Σφάλμα κατά το άνοιγμα του torrent"
 
@@ -2628,10 +2584,6 @@ msgstr[1] ""
 #, c-format
 #~ msgid "Error registering Transmission as a %s handler: %s"
 #~ msgstr "Σφάλμα στην καταχώριση του Transmission ως %s χειριστή: %s"
-
-#, c-format
-#~ msgid "Error uncompressing blocklist: %s (%d)"
-#~ msgstr "Σφάλμα στην αποσυμπίεση της λίστας αποκλεισμού: %s (%d)"
 
 #, c-format
 #~ msgid "Error writing \"%s\": %s"
@@ -2648,10 +2600,6 @@ msgstr[1] ""
 #, c-format
 #~ msgid "Failed to set piece size to %s, leaving it at %s"
 #~ msgstr "Αποτυχία ορισμού μεγέθους κομματιού σε %s, διατηρήθηκε σε %s"
-
-#, c-format
-#~ msgid "File \"%s\" is in the way"
-#~ msgstr "Το αρχείο \"%s\" εμποδίζει"
 
 #, c-format
 #~ msgid "Found Internet Gateway Device \"%s\""
@@ -2679,10 +2627,6 @@ msgstr[1] ""
 #~ msgid "Idle"
 #~ msgstr "Αδρανές"
 
-#, c-format
-#~ msgid "Invalid metadata entry \"%s\""
-#~ msgstr "Μη έγκυρη καταχώρηση μεταδεδομένων \"%s\""
-
 #~ msgid "Is another copy of Transmission already running?"
 #~ msgstr "Εκτελείται ήδη κάποιο άλλο αντίγραφο του Transmission;"
 
@@ -2702,29 +2646,11 @@ msgstr[1] ""
 #~ msgid "Local Address is \"%s\""
 #~ msgstr "Η τοπική διεύθυνση είναι \"%s\""
 
-#~ msgid "Magnet torrent's metadata is not usable"
-#~ msgstr "Τα μεταδεδομένα του magnet torrent δεν μπορούν να χρησιμοποιηθούν"
-
-#~ msgid "Message _Log"
-#~ msgstr "Κ_αταγραφή μηνυμάτων"
-
 #~ msgid "Mo_ve .torrent file to the trash"
 #~ msgstr "Μετακ_ίνηση του αρχείου .torrent στα απορρίμματα"
 
 #~ msgid "Monday"
 #~ msgstr "Δευτέρα"
-
-#~ msgid "Move _Down"
-#~ msgstr "Μετακίνηση _κάτω"
-
-#~ msgid "Move _Up"
-#~ msgstr "Μετακίνηση _επάνω"
-
-#~ msgid "Move to _Bottom"
-#~ msgstr "Μετακίνηση στο _τέλος"
-
-#~ msgid "Move to _Top"
-#~ msgstr "Μετακίνηση στην _κορυφή"
 
 #, c-format
 #~ msgid "Moving \"%s\""
@@ -2733,27 +2659,6 @@ msgstr[1] ""
 #~ msgid "Not a regular file"
 #~ msgstr "Δεν είναι κανονικό αρχείο"
 
-#~ msgid "Notable features of Transmission include support for Local Peer Discovery, encryption, DHT, µTP, PEX and Magnet Link."
-#~ msgstr "Στα αξιοσημείωτα χαρακτηριστικά του Transmission εντάσσεται η υποστήριξη για Local Peer Discovery, κρυπτογράφηση, DHT, μTP, PEX και Σύνδεσμο Magnet."
-
-#~ msgid "Open Fold_er"
-#~ msgstr "Άνοιγμα Φακέ_λου"
-
-#~ msgid "Open URL…"
-#~ msgstr "Άνοιγμα URL…"
-
-#~ msgid "Open _URL…"
-#~ msgstr "Άνοιγμα _URL…"
-
-#~ msgid "Open a torrent"
-#~ msgstr "Άνοιγμα ενός torrent"
-
-#~ msgid "Pause all torrents"
-#~ msgstr "Παύση όλων των torrent"
-
-#~ msgid "Pause torrent"
-#~ msgstr "Παύση torrent"
-
 #, c-format
 #~ msgid "Peer list request %1$stimed out%2$s %3$s ago; will retry"
 #~ msgstr "%1$sΛήξη χρονικού ορίου%2$s της αίτησης λίστας ομότιμων χρηστών πριν από %3$s· θα ξαναδοκιμάσω"
@@ -2761,10 +2666,6 @@ msgstr[1] ""
 #, c-format
 #~ msgid "Piece %<PRIu32>, which was just downloaded, failed its checksum test"
 #~ msgstr "Το κομμάτι %<PRIu32>, που μόλις λήφθηκε, απέτυχε στο άθροισμα ελέγχου"
-
-#, c-format
-#~ msgid "Please Verify Local Data! Piece #%zu is corrupt."
-#~ msgstr "Παρακαλώ Επιβεβαιώστε τα Τοπικά Δεδομένα! Το Κομμάτι #%zu είναι κατεστραμμένο."
 
 #, c-format
 #~ msgid "Port %d forwarded successfully"
@@ -2800,18 +2701,9 @@ msgstr[1] ""
 #~ msgid "Preallocated file \"%1$s\" (%2$s, size: %3$<PRIu64>)"
 #~ msgstr "Προ-δέσμευση αρχείου \"%1$s\" (%2$s, μέγεθος: %3$<PRIu64>)"
 
-#~ msgid "Present Main Window"
-#~ msgstr "Εμφάνιση κεντρικού παραθύρου"
-
 #, c-format
 #~ msgid "Ratio: %s"
 #~ msgstr "Αναλογία: %s"
-
-#~ msgid "Re_verse Sort Order"
-#~ msgstr "Αν_τιστροφή σειράς ταξινόμησης"
-
-#~ msgid "Remove torrent"
-#~ msgstr "Αφαίρεση torrent"
 
 #~ msgid "Saturday"
 #~ msgstr "Σάββατο"
@@ -2834,9 +2726,6 @@ msgstr[1] ""
 #~ msgstr[0] "Γίνεται αποστολή σε %1$'d από %2$'d συνδεδεμένο ομότιμο χρήστη."
 #~ msgstr[1] "Γίνεται αποστολή σε %1$'d από %2$'d συνδεδεμένους ομότιμους χρήστες."
 
-#~ msgid "Select _All"
-#~ msgstr "Επιλογή _όλων"
-
 #, c-format
 #~ msgid "Serving RPC and Web requests from directory '%s'"
 #~ msgstr "Παροχή αιτημάτων RPC και ιστού από τον κατάλογο '%s'"
@@ -2845,51 +2734,9 @@ msgstr[1] ""
 #~ msgid "Serving RPC and Web requests on %s:%d%s"
 #~ msgstr "Παροχή αιτημάτων RPC και Web requests σε %s:%d%s"
 
-#~ msgid "Set _Location…"
-#~ msgstr "Καθορισμός _τοποθεσίας…"
-
 #, c-format
 #~ msgid "Skipping unknown torrent \"%s\""
 #~ msgstr "Παράκαμψη άγνωστου torrent \"%s\""
-
-#~ msgid "Sort by A_ge"
-#~ msgstr "Ταξινόμηση κατά Πα_λαιότητα"
-
-#~ msgid "Sort by Rati_o"
-#~ msgstr "Ταξινόμηση κατά _Αναλογία"
-
-#~ msgid "Sort by Si_ze"
-#~ msgstr "Ταξινόμηση κατά Μέ_γεθος"
-
-#~ msgid "Sort by Stat_e"
-#~ msgstr "Ταξινόμηση κατά _Κατάσταση"
-
-#~ msgid "Sort by Time _Left"
-#~ msgstr "Ταξινόμηση βάσει _Εναπομείναντος χρόνου"
-
-#~ msgid "Sort by _Activity"
-#~ msgstr "Ταξινόμηση κατά _Δραστηριότητα"
-
-#~ msgid "Sort by _Name"
-#~ msgstr "Ταξινόμηση κατά Ό_νομα"
-
-#~ msgid "Sort by _Progress"
-#~ msgstr "Ταξινόμηση κατά _Πρόοδο"
-
-#~ msgid "Sort by _Queue"
-#~ msgstr "Ταξινόμηση κατά _σειρά"
-
-#~ msgid "Start _Now"
-#~ msgstr "Εκκίνηση _τώρα"
-
-#~ msgid "Start all torrents"
-#~ msgstr "Εκκίνηση όλων των torrent"
-
-#~ msgid "Start torrent"
-#~ msgstr "Εκκίνηση torrent"
-
-#~ msgid "Start torrent now"
-#~ msgstr "Εκκίνηση torrent τώρα"
 
 #, c-format
 #~ msgid "Started %'d time"
@@ -2916,20 +2763,8 @@ msgstr[1] ""
 #~ msgstr "Κυριακή"
 
 #, c-format
-#~ msgid "The torrent file \"%s\" contains invalid data."
-#~ msgstr "Το αρχείο torrent \"%s\" περιλαμβάνει άκυρα δεδομένα."
-
-#, c-format
-#~ msgid "The torrent file \"%s\" encountered an unknown error."
-#~ msgstr "Το αρχείο torrent \"%s\" αντιμετώπισε ένα άγνωστο πρόβλημα."
-
-#, c-format
 #~ msgid "The torrent file \"%s\" is already in use by \"%s.\""
 #~ msgstr "Το αρχείο torrent \"%s\" ήδη χρησιμοποιείται από \"%s.\""
-
-#, c-format
-#~ msgid "This magnet link appears to be intended for something other than BitTorrent. BitTorrent magnet links have a section containing \"%s\"."
-#~ msgstr "Αυτός ο σύνδεσμος magnet φαίνεται πως δεν προορίζονταν για το BitTorrent αλλα για κάτι άλλο. Οι σύνδεσμοι magnet για το BitTorrent έχουν ένα τμήμα που περιέχει \"%s\"."
 
 #~ msgid "Thursday"
 #~ msgstr "Πέμπτη"
@@ -2945,17 +2780,6 @@ msgstr[1] ""
 #~ msgid "Torrent Creator is skipping file \"%s\": %s"
 #~ msgstr "Ο Δημιουργός torrent προσπερνάει το αρχείο \"%s\": %s"
 
-#~ msgid "Torrent properties"
-#~ msgstr "Ιδιότητες torrent"
-
-#, c-format
-#~ msgid "Tracker error: \"%s\""
-#~ msgstr "Σφάλμα ιχνηλάτη: \"%s\""
-
-#, c-format
-#~ msgid "Tracker gave HTTP response code %1$ld (%2$s)"
-#~ msgstr "Ο ιχνηλάτης έδωσε κωδικό απόκρισης HTTP %1$ld (%2$s)"
-
 #, c-format
 #~ msgid "Tracker gave a warning: \"%s\""
 #~ msgstr "Ο ιχνηλάτης έδωσε μια προειδοποίηση: \"%s\""
@@ -2967,14 +2791,6 @@ msgstr[1] ""
 #, c-format
 #~ msgid "Tracker had %s%'d seeders and %'d leechers%s %s ago"
 #~ msgstr "Ο ιχνηλάτης είχε %s%'d seeders και %'d leechers%s πριν από %s"
-
-#, c-format
-#~ msgid "Tracker warning: \"%s\""
-#~ msgstr "Προειδοποίηση ιχνηλάτη: \"%s\""
-
-#, c-format
-#~ msgid "Tracker will allow requests in %s"
-#~ msgstr "Ο ιχνηλάτης θα δεχτεί αιτήσεις σε %s"
 
 #, c-format
 #~ msgid ""
@@ -2990,18 +2806,12 @@ msgstr[1] ""
 #~ msgid "Transmission doesn't know how to use \"%s\""
 #~ msgstr "Το Transmission δεν ξέρει πώς να χρησιμοποιήσει το \"%s\""
 
-#~ msgid "Transmission is a BitTorrent client with an easy-to-use frontend on top a cross-platform backend. Native frontends are available for OS X and Windows, as well as command line and web frontends."
-#~ msgstr "Το Transmission είναι μια εφαρμογή πελάτη BitTorrent με ένα εύκολο στη χρήση διεπαφή που στηρίζεται σε ένα διαπλατφορμικό σύστημα υποστήριξης. Εγγενείς διεπαφές υπάρχουν διαθέσιμες για OS X και Windows, όπως επίσης ως διεπαφές γραμμής εντολών και ιστού."
-
 #~ msgid "Tuesday"
 #~ msgstr "Τρίτη"
 
 #, c-format
 #~ msgid "U_pload (%s):"
 #~ msgstr "Α_νέβασμα (%s):"
-
-#~ msgid "Unable to parse file content"
-#~ msgstr "Δεν είναι δυνατή η ανάλυση του περιεχομένου του αρχείου"
 
 #, c-format
 #~ msgid "Unable to rename file as \"%s\": %s"
@@ -3020,89 +2830,17 @@ msgstr[1] ""
 #~ msgid "Wednesday"
 #~ msgstr "Τετάρτη"
 
-#~ msgid "_About"
-#~ msgstr "_Σχετικά"
-
-#~ msgid "_Compact View"
-#~ msgstr "_Συνοπτική προβολή"
-
-#~ msgid "_Contents"
-#~ msgstr "_Περιεχόμενα"
-
-#~ msgid "_Delete Files and Remove"
-#~ msgstr "_Διαγραφή αρχείων και αφαίρεση από την λίστα"
-
-#~ msgid "_Donate"
-#~ msgstr "_Δωρεά"
-
 #, c-format
 #~ msgid "_Download (%s):"
 #~ msgstr "_Κατέβασμα (%s):"
-
-#~ msgid "_File"
-#~ msgstr "_Αρχείο"
-
-#~ msgid "_Filterbar"
-#~ msgstr "Γραμμή _φίλτρου"
-
-#~ msgid "_New…"
-#~ msgstr "_Νέο…"
-
-#~ msgid "_Pause"
-#~ msgstr "Παύ_ση"
-
-#~ msgid "_Pause All"
-#~ msgstr "_Παύση όλων"
-
-#~ msgid "_Preferences"
-#~ msgstr "_Προτιμήσεις"
-
-#~ msgid "_Properties"
-#~ msgstr "_Ιδιότητες"
-
-#~ msgid "_Queue"
-#~ msgstr "_Σειρά"
-
-#~ msgid "_Quit"
-#~ msgstr "Έ_ξοδος"
 
 #, c-format
 #~ msgid "_Show %'d of:"
 #~ msgstr "_Εμφάνιση %'d από:"
 
-#~ msgid "_Show Transmission"
-#~ msgstr "_Εμφάνιση του Transmission"
-
-#~ msgid "_Sort Torrents By"
-#~ msgstr "_Ταξινόμηση torrents κατά"
-
-#~ msgid "_Start"
-#~ msgstr "_Εκκίνηση"
-
-#~ msgid "_Start All"
-#~ msgstr "_Εκκίνηση όλων"
-
-#~ msgid "_Statistics"
-#~ msgstr "_Στατιστικά"
-
-#~ msgid "_Statusbar"
-#~ msgstr "Γραμμή _κατάστασης"
-
-#~ msgid "_Toolbar"
-#~ msgstr "_Εργαλειοθήκη"
-
-#~ msgid "_Torrent"
-#~ msgstr "_Torrent"
-
 #, c-format
 #~ msgid "_Upload (%s):"
 #~ msgstr "_Ανέβασμα (%s):"
-
-#~ msgid "_Verify Local Data"
-#~ msgstr "_Επαλήθευση τοπικών δεδομένων"
-
-#~ msgid "_View"
-#~ msgstr "_Προβολή"
 
 #, c-format
 #~ msgid "blocklist skipped invalid address at line %d"
@@ -3122,7 +2860,7 @@ msgstr[1] ""
 
 #, c-format
 #~ msgid "size|Down: %1$s, Up: %2$s"
-#~ msgstr "μέγεθος|Λήψη:%1$s, Αποστολή: %2$s"
+#~ msgstr "Λήψη:%1$s, Αποστολή: %2$s"
 
 #~ msgid "sparse"
 #~ msgstr "sparse"

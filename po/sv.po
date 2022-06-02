@@ -5,19 +5,18 @@
 #
 # Translators:
 # Josef Andersson <josef.andersson@fripost.org>, 2017
-# Anders Nilsson <anders@devode.se>, 2017
 # 553bfca145c93e26efcabc21d311cd2f, 2020
 # efef6ec5b435a041fce803c7f8af77d2_2341d43, 2021
-# Jonatan Nyberg <jonatan@autistici.org>, 2021
+# Jonatan Nyberg <jonatan@autistici.org>, 2022
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-06-02 23:47+0100\n"
+"POT-Creation-Date: 2022-06-03 00:09+0100\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Jonatan Nyberg <jonatan@autistici.org>, 2021\n"
+"Last-Translator: Jonatan Nyberg <jonatan@autistici.org>, 2022\n"
 "Language-Team: Swedish (https://www.transifex.com/transmissionbt/teams/33778/sv/)\n"
 "Language: sv\n"
 "MIME-Version: 1.0\n"
@@ -149,7 +148,7 @@ msgstr "En snabb och enkel BitTorrent-klient"
 
 #: ../gtk/Application.cc:1289
 msgid "Copyright © The Transmission Project"
-msgstr ""
+msgstr "Copyright © The Transmission Project"
 
 #. Translators: translate "translator-credits" as your name
 #. to have it appear in the credits in the "About"
@@ -288,7 +287,7 @@ msgstr "Privat för denna spårare -- DHT och PEX är inaktiverade"
 
 #: ../gtk/DetailsDialog.cc:648
 msgid "Public torrent"
-msgstr "Offentlig torrent"
+msgstr "Publik torrent"
 
 #: ../gtk/DetailsDialog.cc:711
 msgid "Created by {creator} on {date}"
@@ -484,11 +483,11 @@ msgstr "%"
 
 #: ../gtk/DetailsDialog.cc:1731
 msgid "Dn Reqs"
-msgstr "Ner-begäran"
+msgstr "Ner-förfrågningar"
 
 #: ../gtk/DetailsDialog.cc:1738
 msgid "Up Reqs"
-msgstr "Upp-begäran"
+msgstr "Upp-förfrågningar"
 
 #: ../gtk/DetailsDialog.cc:1745
 msgid "Dn Blocks"
@@ -603,7 +602,7 @@ msgstr "Listan innehåller ogiltiga webbadresser"
 
 #: ../gtk/DetailsDialog.cc:2309 ../gtk/FileList.cc:776
 msgid "Please correct the errors and try again."
-msgstr "Vänligen rätta till felen och försök igen."
+msgstr "Rätta till felen och försök igen."
 
 #: ../gtk/DetailsDialog.cc:2346
 msgid "{torrent_name} - Edit Trackers"
@@ -622,10 +621,12 @@ msgid ""
 "To add a backup URL, add it on the next line after a primary URL.\n"
 "To add a new primary URL, add it after a blank line."
 msgstr ""
+"För att lägga till en webbadress för reservspårare, lägg till den på nästa rad efter en primär webbadress.\n"
+"För att lägga till en ny primär webbadress, lägg till den efter en tom rad."
 
 #: ../gtk/DetailsDialog.cc:2378
 msgid "Also see Default Public Trackers in Edit > Preferences > Network"
-msgstr ""
+msgstr "Se även publika standardspårare i Redigera > Inställningar > Nätverk"
 
 #: ../gtk/DetailsDialog.cc:2456
 msgid "{torrent_name} - Add Tracker"
@@ -958,7 +959,7 @@ msgstr "Ko_mmentar:"
 
 #: ../gtk/MakeDialog.cc:538
 msgid "_Source:"
-msgstr ""
+msgstr "_Källa:"
 
 #: ../gtk/MakeDialog.cc:545
 msgid "_Private torrent"
@@ -1026,7 +1027,7 @@ msgstr "Torrenten är komplett"
 
 #: ../gtk/Notify.cc:238
 msgid "Start Now"
-msgstr ""
+msgstr "Starta nu"
 
 #: ../gtk/Notify.cc:250
 msgid "Torrent Added"
@@ -1140,7 +1141,7 @@ msgstr "Behåll _ofullständiga torrenter i:"
 
 #: ../gtk/PrefsDialog.cc:305
 msgid "Call scrip_t when done downloading:"
-msgstr ""
+msgstr "Anropa skrip&t när hämtningen är klar:"
 
 #: ../gtk/PrefsDialog.cc:324
 msgid "Limits"
@@ -1156,7 +1157,7 @@ msgstr "Stoppa distribution om inaktiv i _N minuter:"
 
 #: ../gtk/PrefsDialog.cc:343
 msgid "Call scrip_t when done seeding:"
-msgstr ""
+msgstr "Anropa skrip&t när distributionen är klar:"
 
 #: ../gtk/PrefsDialog.cc:362 ../gtk/PrefsDialog.cc:1188
 msgid "Desktop"
@@ -1426,7 +1427,7 @@ msgstr "LPD är ett verktyg för att hitta jämlikar på ditt lokala nätverk."
 
 #: ../gtk/PrefsDialog.cc:1111
 msgid "Default Public Trackers"
-msgstr ""
+msgstr "Publika spårare som standard"
 
 #: ../gtk/PrefsDialog.cc:1115
 msgid ""
@@ -1435,6 +1436,10 @@ msgid ""
 "To add a backup URL, add it on the next line after a primary URL.\n"
 "To add a new primary URL, add it after a blank line."
 msgstr ""
+"Spårare att använda på alla publika torrenter.\n"
+"\n"
+"För att lägga till en webbadress för reservspårare, lägg till den på nästa rad efter en primär webbadress.\n"
+"För att lägga till en ny primär webbadress, lägg till den efter en tom rad."
 
 #: ../gtk/PrefsDialog.cc:1161
 msgid "Transmission Preferences"
@@ -1725,7 +1730,7 @@ msgstr ""
 
 #: ../gtk/Utils.cc:455
 msgid "This magnet link appears to be intended for something other than BitTorrent."
-msgstr ""
+msgstr "Denna magnetlänk verkar vara avsedd för något annat än BitTorrent."
 
 #: ../gtk/main.cc:49 ../gtk/transmission-gtk.desktop.in:3
 msgid "Transmission"
@@ -1742,7 +1747,7 @@ msgstr "Starta med alla torrenter pausade"
 
 #: ../gtk/main.cc:60
 msgid "Start minimized in notification area"
-msgstr "Starta minimerad i aviseringsytan"
+msgstr "Starta minimerad i aviseringsfältet"
 
 #: ../gtk/main.cc:61
 msgid "Show version number and exit"
@@ -1814,7 +1819,7 @@ msgstr[1] ""
 
 #: ../libtransmission/announcer.cc:1044 ../libtransmission/announcer.cc:1372
 msgid "Could not connect to tracker"
-msgstr "Kunde inte ansluta till spårare"
+msgstr "Det gick inte att ansluta till spåraren"
 
 #: ../libtransmission/announcer.cc:1048 ../libtransmission/announcer.cc:1376
 msgid "Tracker did not respond"
@@ -2276,6 +2281,14 @@ msgstr[1] ""
 #~ msgstr[1] "%'d sekunder"
 
 #, c-format
+#~ msgid "%*.*s is not a valid address"
+#~ msgstr "%*.*s är inte en giltig adress"
+
+#, c-format
+#~ msgid "%*.*s is not an IPv4 or IPv6 address. RPC listeners must be IPv4 or IPv6"
+#~ msgstr "%*.*s är inte en IPv4- eller IPv6-adress. RPC-lyssnare måste vara IPv4 eller IPv6"
+
+#, c-format
 #~ msgid "%1$'d Piece @ %2$s"
 #~ msgid_plural "%1$'d Pieces @ %2$s"
 #~ msgstr[0] "%1$'d del @ %2$s"
@@ -2314,8 +2327,8 @@ msgstr[1] ""
 #~ msgstr "%1$s (%2$s%%)"
 
 #, c-format
-#~ msgid "%1$s (+%2$s corrupt)"
-#~ msgstr "%1$s (+%2$s skadat)"
+#~ msgid "%1$s (+%2$s discarded after failed checksum)"
+#~ msgstr "%1$s (+%2$s kasseras efter misslyckad kontrollsumma)"
 
 #, c-format
 #~ msgid "%1$s ago"
@@ -2372,14 +2385,6 @@ msgstr[1] ""
 #~ msgstr "%s ledigt"
 
 #, c-format
-#~ msgid "%s is not a valid address"
-#~ msgstr "%s är inte en giltig adress"
-
-#, c-format
-#~ msgid "%s is not an IPv4 or IPv6 address. RPC listeners must be IPv4 or IPv6"
-#~ msgstr "%s är inte en IPv4- eller IPv6-adress. RPC-lyssnare måste vara IPv4 eller IPv6"
-
-#, c-format
 #~ msgid "%s remaining"
 #~ msgstr "%s återstår"
 
@@ -2391,7 +2396,7 @@ msgstr[1] ""
 #~ msgstr "<b>Stänger anslutningar</b>"
 
 #~ msgid "<b>Unable to update.</b>"
-#~ msgstr "<b>Kunde inte uppdatera.</b>"
+#~ msgstr "<b>Det går inte att uppdatera.</b>"
 
 #~ msgid "<b>Update succeeded!</b>"
 #~ msgstr "<b>Uppdatering lyckades!</b>"
@@ -2401,9 +2406,6 @@ msgstr[1] ""
 
 #~ msgid "<i>Testing TCP port…</i>"
 #~ msgstr "<i>Testar TCP-port…</i>"
-
-#~ msgid "Ask Tracker for _More Peers"
-#~ msgstr "Fråga spårare efter f_ler jämlikar"
 
 #, c-format
 #~ msgid "Asking for more peers in %s"
@@ -2423,9 +2425,6 @@ msgstr[1] ""
 
 #~ msgid "Automatically add .torrent files _from:"
 #~ msgstr "Lägg automatiskt till .torrent-filer _från:"
-
-#~ msgid "BitTorrent is a peer-to-peer file-sharing protocol that is commonly used to distribute large amounts of data between multiple users."
-#~ msgstr "BitTorrent är ett jämlike-till-jämlike-protokoll för fildelning som ofta används för att distribuera stora mängder data mellan flera användare."
 
 #, c-format
 #~ msgid "Blocklist \"%s\" contains %zu entries"
@@ -2447,9 +2446,6 @@ msgstr[1] ""
 #~ msgstr[0] "Blockeringslistan innehåller %'d regel."
 #~ msgstr[1] "Blockeringslistan innehåller %'d regler."
 
-#~ msgid "Call scrip_t when torrent is completed:"
-#~ msgstr "Anropa skrip_t när torrenten är slutförd:"
-
 #, c-format
 #~ msgid ""
 #~ "Click to disable Alternative Speed Limits\n"
@@ -2468,12 +2464,6 @@ msgstr[1] ""
 
 #~ msgid "Complete"
 #~ msgstr "Slutförd"
-
-#~ msgid "Copy _Magnet Link to Clipboard"
-#~ msgstr "Kopiera _magnetlänk till urklipp"
-
-#~ msgid "Copyright (c) The Transmission Project"
-#~ msgstr "Copyright (c) The Transmission Project"
 
 #, c-format
 #~ msgid "Couldn't bind port %d on %s: %s"
@@ -2520,6 +2510,10 @@ msgstr[1] ""
 #~ msgstr "Det gick inte att läsa \"%1$s\": %2$s"
 
 #, c-format
+#~ msgid "Couldn't read \"%s\""
+#~ msgstr "Det gick inte att läsa \"%s\""
+
+#, c-format
 #~ msgid "Couldn't read \"%s\": %s"
 #~ msgstr "Det gick inte att läsa \"%s\": %s"
 
@@ -2532,19 +2526,12 @@ msgstr[1] ""
 #~ msgstr "Det gick inte att spara filen \"%1$s\": %2$s"
 
 #, c-format
-#~ msgid "Couldn't save temporary file \"%1$s\": %2$s"
-#~ msgstr "Det gick inte att spara den tillfälliga filen \"%1$s\": %2$s"
-
-#, c-format
 #~ msgid "Couldn't set source address %s on %<PRIdMAX>: %s"
 #~ msgstr "Det gick inte att ställa in källadressen %s på %<PRIdMAX>: %s"
 
 #, c-format
 #~ msgid "Couldn't truncate \"%1$s\": %2$s"
 #~ msgstr "Det gick inte att avkorta \"%1$s\": %2$s"
-
-#~ msgid "Create a torrent"
-#~ msgstr "Skapa en torrent"
 
 #, c-format
 #~ msgid "Created \"%s\"!"
@@ -2565,13 +2552,6 @@ msgstr[1] ""
 #, c-format
 #~ msgid "Creating \"%s\""
 #~ msgstr "Skapar \"%s\""
-
-#, c-format
-#~ msgid "DNS Lookup failed: %s"
-#~ msgstr "Misslyckades med DNS-uppslagning: %s"
-
-#~ msgid "Dese_lect All"
-#~ msgstr "Avma_rkera alla"
 
 #, c-format
 #~ msgid "Do_wnload (%s):"
@@ -2600,9 +2580,6 @@ msgstr[1] ""
 #~ msgid "Downloading metadata from %1$'d %2$s (%3$d%% done)"
 #~ msgstr "Hämtar metadata från %1$'d %2$s (%3$d%% klart)"
 
-#~ msgid "Enable Alternative Speed _Limits"
-#~ msgstr "Aktivera alternativa hastighets_gränser"
-
 #~ msgid "Error opening torrent"
 #~ msgstr "Fel vid öppnande av torrent"
 
@@ -2615,8 +2592,8 @@ msgstr[1] ""
 #~ msgstr "Fel vid registrering av Transmission som %s-hanterare: %s"
 
 #, c-format
-#~ msgid "Error uncompressing blocklist: %s (%d)"
-#~ msgstr "Fel vid extrahering av blockeringslista: %s (%d)"
+#~ msgid "Error saving \"%*.*s\": %s (%d)"
+#~ msgstr "Det gick inte att spara \"%*.*s\": %s (%d)"
 
 #, c-format
 #~ msgid "Error writing \"%s\": %s"
@@ -2635,16 +2612,12 @@ msgstr[1] ""
 #~ msgstr "Misslyckades med att ange storlek på del till %s, lämnar den på %s"
 
 #, c-format
-#~ msgid "File \"%s\" is in the way"
-#~ msgstr "Filen \"%s\" är i vägen"
-
-#, c-format
 #~ msgid "Found Internet Gateway Device \"%s\""
 #~ msgstr "Hittade Internet Gateway-enheten \"%s\""
 
 #, c-format
 #~ msgid "Found public address \"%s\""
-#~ msgstr "Hittade en offentlig adress \"%s\""
+#~ msgstr "Hittade en publik adress \"%s\""
 
 #~ msgid "Friday"
 #~ msgstr "Fredag"
@@ -2663,10 +2636,6 @@ msgstr[1] ""
 
 #~ msgid "Idle"
 #~ msgstr "Inaktiv"
-
-#, c-format
-#~ msgid "Invalid metadata entry \"%s\""
-#~ msgstr "Ogiltig metadatapost \"%s\""
 
 #~ msgid "Is another copy of Transmission already running?"
 #~ msgstr "Är en annan kopia av Transmission redan igång?"
@@ -2687,29 +2656,11 @@ msgstr[1] ""
 #~ msgid "Local Address is \"%s\""
 #~ msgstr "Lokal adress är \"%s\""
 
-#~ msgid "Magnet torrent's metadata is not usable"
-#~ msgstr "Magnettorrentens metadata är inte användbart"
-
-#~ msgid "Message _Log"
-#~ msgstr "Meddelande_logg"
-
 #~ msgid "Mo_ve .torrent file to the trash"
 #~ msgstr "Fl_ytta .torrent-fil till papperskorgen"
 
 #~ msgid "Monday"
 #~ msgstr "Måndag"
-
-#~ msgid "Move _Down"
-#~ msgstr "Flytta _ner"
-
-#~ msgid "Move _Up"
-#~ msgstr "Flytta _upp"
-
-#~ msgid "Move to _Bottom"
-#~ msgstr "Flytta ned_erst"
-
-#~ msgid "Move to _Top"
-#~ msgstr "Flytta ö_verst"
 
 #, c-format
 #~ msgid "Moving \"%s\""
@@ -2718,27 +2669,6 @@ msgstr[1] ""
 #~ msgid "Not a regular file"
 #~ msgstr "Inte en vanlig fil"
 
-#~ msgid "Notable features of Transmission include support for Local Peer Discovery, encryption, DHT, µTP, PEX and Magnet Link."
-#~ msgstr "Viktiga funktioner i Transmission är bland annat stöd för att upptäcka lokala jämlikar, kryptering, DHT, µTP, PEX och magnetlänkar."
-
-#~ msgid "Open Fold_er"
-#~ msgstr "Öppna ma_pp"
-
-#~ msgid "Open URL…"
-#~ msgstr "Öppna webbadress…"
-
-#~ msgid "Open _URL…"
-#~ msgstr "Öppna _webbadress…"
-
-#~ msgid "Open a torrent"
-#~ msgstr "Öppna en torrent"
-
-#~ msgid "Pause all torrents"
-#~ msgstr "Pausa alla torrenter"
-
-#~ msgid "Pause torrent"
-#~ msgstr "Pausa torrenten"
-
 #, c-format
 #~ msgid "Peer list request %1$stimed out%2$s %3$s ago; will retry"
 #~ msgstr "Begäran om jämlikelistan %1$söversteg tidsgränsen%2$s %3$s sedan; försöker igen"
@@ -2746,10 +2676,6 @@ msgstr[1] ""
 #, c-format
 #~ msgid "Piece %<PRIu32>, which was just downloaded, failed its checksum test"
 #~ msgstr "Del %<PRIu32> som nyss hämtades misslyckades med dess kontrollsummetest"
-
-#, c-format
-#~ msgid "Please Verify Local Data! Piece #%zu is corrupt."
-#~ msgstr "Vänligen verifiera lokala data! Del #%zu är skadad."
 
 #, c-format
 #~ msgid "Port %d forwarded successfully"
@@ -2785,18 +2711,9 @@ msgstr[1] ""
 #~ msgid "Preallocated file \"%1$s\" (%2$s, size: %3$<PRIu64>)"
 #~ msgstr "Förallokerad fil \"%1$s\" (%2$s, storlek: %3$<PRIu64>)"
 
-#~ msgid "Present Main Window"
-#~ msgstr "Visa huvudfönstret"
-
 #, c-format
 #~ msgid "Ratio: %s"
 #~ msgstr "Kvot: %s"
-
-#~ msgid "Re_verse Sort Order"
-#~ msgstr "O_mvänd sorteringsordning"
-
-#~ msgid "Remove torrent"
-#~ msgstr "Ta bort torrent"
 
 #~ msgid "Saturday"
 #~ msgstr "Lördag"
@@ -2819,9 +2736,6 @@ msgstr[1] ""
 #~ msgstr[0] "Distribuerar till %1$'d av %2$'d ansluten jämlike"
 #~ msgstr[1] "Distribuerar till %1$'d av %2$'d anslutna jämlikar"
 
-#~ msgid "Select _All"
-#~ msgstr "Markera _alla"
-
 #, c-format
 #~ msgid "Serving RPC and Web requests from directory '%s'"
 #~ msgstr "Betjänar RPC- och webbförfrågningar från mappen \"%s\""
@@ -2830,51 +2744,9 @@ msgstr[1] ""
 #~ msgid "Serving RPC and Web requests on %s:%d%s"
 #~ msgstr "Hanterar RPC- och webbförfrågningar på %s:%d%s"
 
-#~ msgid "Set _Location…"
-#~ msgstr "Ange p_lats…"
-
 #, c-format
 #~ msgid "Skipping unknown torrent \"%s\""
 #~ msgstr "Hoppar över den okända torrenten \"%s\""
-
-#~ msgid "Sort by A_ge"
-#~ msgstr "Sortera efter _ålder"
-
-#~ msgid "Sort by Rati_o"
-#~ msgstr "Sortera efter f_örhållande"
-
-#~ msgid "Sort by Si_ze"
-#~ msgstr "Sortera efter s_torlek"
-
-#~ msgid "Sort by Stat_e"
-#~ msgstr "Sortera efter ti_llstånd"
-
-#~ msgid "Sort by Time _Left"
-#~ msgstr "Sortera efter tid kva_r"
-
-#~ msgid "Sort by _Activity"
-#~ msgstr "Sortera efter _aktivitet"
-
-#~ msgid "Sort by _Name"
-#~ msgstr "Sortera efter _namn"
-
-#~ msgid "Sort by _Progress"
-#~ msgstr "Sortera efter _förlopp"
-
-#~ msgid "Sort by _Queue"
-#~ msgstr "Sortera efter _kö"
-
-#~ msgid "Start _Now"
-#~ msgstr "Starta _nu"
-
-#~ msgid "Start all torrents"
-#~ msgstr "Starta alla torrenter"
-
-#~ msgid "Start torrent"
-#~ msgstr "Starta torrent"
-
-#~ msgid "Start torrent now"
-#~ msgstr "Starta torrent nu"
 
 #, c-format
 #~ msgid "Started %'d time"
@@ -2901,20 +2773,8 @@ msgstr[1] ""
 #~ msgstr "Söndag"
 
 #, c-format
-#~ msgid "The torrent file \"%s\" contains invalid data."
-#~ msgstr "Torrentfilen \"%s\" innehåller ogiltiga data."
-
-#, c-format
-#~ msgid "The torrent file \"%s\" encountered an unknown error."
-#~ msgstr "Torrentfilen \"%s\" påträffade ett okänt fel."
-
-#, c-format
 #~ msgid "The torrent file \"%s\" is already in use by \"%s.\""
 #~ msgstr "Torrentfilen \"%s\" används redan av \"%s.\""
-
-#, c-format
-#~ msgid "This magnet link appears to be intended for something other than BitTorrent. BitTorrent magnet links have a section containing \"%s\"."
-#~ msgstr "Den här magnetlänken verkar vara avsedd för något annat än BitTorrent. BitTorrent-magnetlänkar har en sektion som innehåller \"%s\"."
 
 #~ msgid "Thursday"
 #~ msgstr "Torsdag"
@@ -2923,23 +2783,12 @@ msgstr[1] ""
 #~ "To add a backup URL, add it on the line after the primary URL.\n"
 #~ "To add another primary URL, add it after a blank line."
 #~ msgstr ""
-#~ "Om du vill lägga till en säkerhetskopieringswebbadress lägger du till den på raden efter den primära webbadressen.\n"
-#~ "Om du vill lägga till ytterligare en primär webbadress lägger du till den efter en tom rad."
+#~ "För att lägga till en webbadress för reservspårare lägger du till den på raden efter den primära webbadressen.\n"
+#~ "För att lägga till ytterligare en primär webbadress lägger du till den efter en tom rad."
 
 #, c-format
 #~ msgid "Torrent Creator is skipping file \"%s\": %s"
 #~ msgstr "Torrentskaparen hoppar över filen \"%s\": %s"
-
-#~ msgid "Torrent properties"
-#~ msgstr "Egenskaper för torrent"
-
-#, c-format
-#~ msgid "Tracker error: \"%s\""
-#~ msgstr "Fel i spårare: \"%s\""
-
-#, c-format
-#~ msgid "Tracker gave HTTP response code %1$ld (%2$s)"
-#~ msgstr "Spårare svarade med HTTP-svarskod %1$ld (%2$s)"
 
 #, c-format
 #~ msgid "Tracker gave a warning: \"%s\""
@@ -2954,12 +2803,8 @@ msgstr[1] ""
 #~ msgstr "Spårare hade %s%'d distributörer och %'d reciprokörer%s %s sedan"
 
 #, c-format
-#~ msgid "Tracker warning: \"%s\""
-#~ msgstr "Varning från spårare: \"%s\""
-
-#, c-format
-#~ msgid "Tracker will allow requests in %s"
-#~ msgstr "Spårare kommer att tillåta begäran om %s"
+#~ msgid "Tracker warning: \"%*.*s\""
+#~ msgstr "Spårarvarning: \"%*.*s\""
 
 #, c-format
 #~ msgid ""
@@ -2975,9 +2820,6 @@ msgstr[1] ""
 #~ msgid "Transmission doesn't know how to use \"%s\""
 #~ msgstr "Transmission vet inte hur den ska använda \"%s\""
 
-#~ msgid "Transmission is a BitTorrent client with an easy-to-use frontend on top a cross-platform backend. Native frontends are available for OS X and Windows, as well as command line and web frontends."
-#~ msgstr "Transmission är en BitTorrent-klient med ett lättanvänt gränssnitt ovanpå en backend för flera plattformar. Gränssnitt finns för OS X och Windows, samt som kommandorad och webbgränssnitt."
-
 #~ msgid "Tuesday"
 #~ msgstr "Tisdag"
 
@@ -2985,12 +2827,13 @@ msgstr[1] ""
 #~ msgid "U_pload (%s):"
 #~ msgstr "S_ändning (%s):"
 
-#~ msgid "Unable to parse file content"
-#~ msgstr "Kunde inte tolka filinnehåll"
+#, c-format
+#~ msgid "Unable to add torrent file \"%s\"."
+#~ msgstr "Det går inte att lägga till torrentfilen \"%s\"."
 
 #, c-format
 #~ msgid "Unable to rename file as \"%s\": %s"
-#~ msgstr "Kunde inte byta namn på filen till \"%s\": %s"
+#~ msgstr "Det går inte att byta namn på filen till \"%s\": %s"
 
 #~ msgid "Unrecognized URL"
 #~ msgstr "Okänd webbadress"
@@ -3005,89 +2848,17 @@ msgstr[1] ""
 #~ msgid "Wednesday"
 #~ msgstr "Onsdag"
 
-#~ msgid "_About"
-#~ msgstr "_Om"
-
-#~ msgid "_Compact View"
-#~ msgstr "_Kompakt vy"
-
-#~ msgid "_Contents"
-#~ msgstr "_Innehåll"
-
-#~ msgid "_Delete Files and Remove"
-#~ msgstr "_Ta bort filer och ta bort"
-
-#~ msgid "_Donate"
-#~ msgstr "_Donera"
-
 #, c-format
 #~ msgid "_Download (%s):"
 #~ msgstr "_Hämtning (%s):"
-
-#~ msgid "_File"
-#~ msgstr "_Arkiv"
-
-#~ msgid "_Filterbar"
-#~ msgstr "_Filterrad"
-
-#~ msgid "_New…"
-#~ msgstr "_Ny…"
-
-#~ msgid "_Pause"
-#~ msgstr "_Pausa"
-
-#~ msgid "_Pause All"
-#~ msgstr "Pausa a_lla"
-
-#~ msgid "_Preferences"
-#~ msgstr "_Inställningar"
-
-#~ msgid "_Properties"
-#~ msgstr "_Egenskaper"
-
-#~ msgid "_Queue"
-#~ msgstr "_Kö"
-
-#~ msgid "_Quit"
-#~ msgstr "A_vsluta"
 
 #, c-format
 #~ msgid "_Show %'d of:"
 #~ msgstr "_Visa %'d av:"
 
-#~ msgid "_Show Transmission"
-#~ msgstr "_Visa Transmission"
-
-#~ msgid "_Sort Torrents By"
-#~ msgstr "_Sortera torrenter efter"
-
-#~ msgid "_Start"
-#~ msgstr "Sta_rta"
-
-#~ msgid "_Start All"
-#~ msgstr "_Starta alla"
-
-#~ msgid "_Statistics"
-#~ msgstr "_Statistik"
-
-#~ msgid "_Statusbar"
-#~ msgstr "_Statusrad"
-
-#~ msgid "_Toolbar"
-#~ msgstr "_Verktygsfält"
-
-#~ msgid "_Torrent"
-#~ msgstr "_Torrent"
-
 #, c-format
 #~ msgid "_Upload (%s):"
 #~ msgstr "_Sändning (%s):"
-
-#~ msgid "_Verify Local Data"
-#~ msgstr "_Verifiera lokala data"
-
-#~ msgid "_View"
-#~ msgstr "_Visa"
 
 #, c-format
 #~ msgid "blocklist skipped invalid address at line %d"

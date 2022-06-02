@@ -13,7 +13,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-06-02 23:47+0100\n"
+"POT-Creation-Date: 2022-06-03 00:09+0100\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
 "Last-Translator: Kiril Kirilov <cybercop_montana@abv.bg>, 2020\n"
 "Language-Team: Bulgarian (https://www.transifex.com/transmissionbt/teams/33778/bg/)\n"
@@ -2317,10 +2317,6 @@ msgstr[1] ""
 #~ msgstr "%1$s (%2$s%%)"
 
 #, c-format
-#~ msgid "%1$s (+%2$s corrupt)"
-#~ msgstr "%1$s (+%2$s повредени)"
-
-#, c-format
 #~ msgid "%1$s ago"
 #~ msgstr "%1$s по-рано"
 
@@ -2375,14 +2371,6 @@ msgstr[1] ""
 #~ msgstr "%s свободно"
 
 #, c-format
-#~ msgid "%s is not a valid address"
-#~ msgstr "%s не е валиден адрес"
-
-#, c-format
-#~ msgid "%s is not an IPv4 or IPv6 address. RPC listeners must be IPv4 or IPv6"
-#~ msgstr "%s не е IPv4 или IPv6 адрес. RPC детекторите трябва да бъдат IPv4 или IPv6"
-
-#, c-format
 #~ msgid "%s remaining"
 #~ msgstr "остава %s"
 
@@ -2405,9 +2393,6 @@ msgstr[1] ""
 #~ msgid "<i>Testing TCP port…</i>"
 #~ msgstr "<i>Проверка на TCP порта…</i>"
 
-#~ msgid "Ask Tracker for _More Peers"
-#~ msgstr "Питай тракера за _повече участници"
-
 #, c-format
 #~ msgid "Asking for more peers in %s"
 #~ msgstr "Заявката за допълнителни участници е след %s"
@@ -2426,9 +2411,6 @@ msgstr[1] ""
 
 #~ msgid "Automatically add .torrent files _from:"
 #~ msgstr "Автоматично добавяне на .torrent файлове от:"
-
-#~ msgid "BitTorrent is a peer-to-peer file-sharing protocol that is commonly used to distribute large amounts of data between multiple users."
-#~ msgstr "BitTorrent е протокол за споделяне на файлове от тип \"участник до участник\", който обикновено се използва за разпространение на големи количества данни между множество потребители."
 
 #, c-format
 #~ msgid "Blocklist \"%s\" contains %zu entries"
@@ -2450,9 +2432,6 @@ msgstr[1] ""
 #~ msgstr[0] "Черният списък има %'d правило."
 #~ msgstr[1] "Черният списък има %'d правила."
 
-#~ msgid "Call scrip_t when torrent is completed:"
-#~ msgstr "Зареди ск_рипт, след свалянето на торента:"
-
 #, c-format
 #~ msgid ""
 #~ "Click to disable Alternative Speed Limits\n"
@@ -2471,12 +2450,6 @@ msgstr[1] ""
 
 #~ msgid "Complete"
 #~ msgstr "Завършен"
-
-#~ msgid "Copy _Magnet Link to Clipboard"
-#~ msgstr "Копирай _магнитния линк в клипборда"
-
-#~ msgid "Copyright (c) The Transmission Project"
-#~ msgstr "Авторски права (c) The Transmission Project"
 
 #, c-format
 #~ msgid "Couldn't bind port %d on %s: %s"
@@ -2535,19 +2508,12 @@ msgstr[1] ""
 #~ msgstr "Файла «%1$s» не може да бъде съхранен: %2$s"
 
 #, c-format
-#~ msgid "Couldn't save temporary file \"%1$s\": %2$s"
-#~ msgstr "Временния файл «%1$s» не може да бъде запазен: %2$s"
-
-#, c-format
 #~ msgid "Couldn't set source address %s on %<PRIdMAX>: %s"
 #~ msgstr "Не е зададен изходен адрес %s на %<PRIdMAX>:%s"
 
 #, c-format
 #~ msgid "Couldn't truncate \"%1$s\": %2$s"
 #~ msgstr "Не може да се спре «%1$s»: %2$s"
-
-#~ msgid "Create a torrent"
-#~ msgstr "Създай торент"
 
 #, c-format
 #~ msgid "Created \"%s\"!"
@@ -2568,13 +2534,6 @@ msgstr[1] ""
 #, c-format
 #~ msgid "Creating \"%s\""
 #~ msgstr "Създаване на «%s»"
-
-#, c-format
-#~ msgid "DNS Lookup failed: %s"
-#~ msgstr "Търсенето на DNS е неуспешно: %s"
-
-#~ msgid "Dese_lect All"
-#~ msgstr "Размаркирай всички"
 
 #, c-format
 #~ msgid "Do_wnload (%s):"
@@ -2603,9 +2562,6 @@ msgstr[1] ""
 #~ msgid "Downloading metadata from %1$'d %2$s (%3$d%% done)"
 #~ msgstr "Изтегляне на метаданни от %1$'d %2$s (%3$d%% приети)"
 
-#~ msgid "Enable Alternative Speed _Limits"
-#~ msgstr "Включи алтернативното ограничение на с_коростта"
-
 #~ msgid "Error opening torrent"
 #~ msgstr "Грешка при отваряне на торента"
 
@@ -2616,10 +2572,6 @@ msgstr[1] ""
 #, c-format
 #~ msgid "Error registering Transmission as a %s handler: %s"
 #~ msgstr "Грешка при регистрирането на Transmission, като %s манипулатор: %s"
-
-#, c-format
-#~ msgid "Error uncompressing blocklist: %s (%d)"
-#~ msgstr "Грешка при декомпресирането на блоковия списък: %s (%d)"
 
 #, c-format
 #~ msgid "Error writing \"%s\": %s"
@@ -2636,10 +2588,6 @@ msgstr[1] ""
 #, c-format
 #~ msgid "Failed to set piece size to %s, leaving it at %s"
 #~ msgstr "Неуспешно задаване на размера на парчето до %s, остава на %s"
-
-#, c-format
-#~ msgid "File \"%s\" is in the way"
-#~ msgstr "Файла «%s» е на път"
 
 #, c-format
 #~ msgid "Found Internet Gateway Device \"%s\""
@@ -2667,10 +2615,6 @@ msgstr[1] ""
 #~ msgid "Idle"
 #~ msgstr "Неактивен"
 
-#, c-format
-#~ msgid "Invalid metadata entry \"%s\""
-#~ msgstr "Некоректно записване на метаданните «%s»"
-
 #~ msgid "Is another copy of Transmission already running?"
 #~ msgstr "Да не би вече да работи друго копие на Transmission?"
 
@@ -2690,29 +2634,11 @@ msgstr[1] ""
 #~ msgid "Local Address is \"%s\""
 #~ msgstr "Локалният адрес е «%s»"
 
-#~ msgid "Magnet torrent's metadata is not usable"
-#~ msgstr "Метаданните на магнитната връзка не са използваеми"
-
-#~ msgid "Message _Log"
-#~ msgstr "Дневник със _съобщения"
-
 #~ msgid "Mo_ve .torrent file to the trash"
 #~ msgstr "Пре_мести .torrent файла в кошчето"
 
 #~ msgid "Monday"
 #~ msgstr "Понеделник"
-
-#~ msgid "Move _Down"
-#~ msgstr "Премести на_долу"
-
-#~ msgid "Move _Up"
-#~ msgstr "Премести на_горе"
-
-#~ msgid "Move to _Bottom"
-#~ msgstr "Премести най- о_тдолу"
-
-#~ msgid "Move to _Top"
-#~ msgstr "Премести най- о_тгоре"
 
 #, c-format
 #~ msgid "Moving \"%s\""
@@ -2721,27 +2647,6 @@ msgstr[1] ""
 #~ msgid "Not a regular file"
 #~ msgstr "Файла не е обикновен"
 
-#~ msgid "Notable features of Transmission include support for Local Peer Discovery, encryption, DHT, µTP, PEX and Magnet Link."
-#~ msgstr "Забележителните характеристики на Transmission, включват поддръжка на локално откриване на участник, криптиране, DHT, μTP, PEX и магнитни връзки."
-
-#~ msgid "Open Fold_er"
-#~ msgstr "Отвори папка_та"
-
-#~ msgid "Open URL…"
-#~ msgstr "Отвори линк..."
-
-#~ msgid "Open _URL…"
-#~ msgstr "Отвори _линк..."
-
-#~ msgid "Open a torrent"
-#~ msgstr "Отвори торент файла"
-
-#~ msgid "Pause all torrents"
-#~ msgstr "Паузирай всички торенти"
-
-#~ msgid "Pause torrent"
-#~ msgstr "Паузирай торента"
-
 #, c-format
 #~ msgid "Peer list request %1$stimed out%2$s %3$s ago; will retry"
 #~ msgstr "Преди %3$s %1$s изтече времето за отговор %2$s на заявката за изброяване на участниците; опитай отново"
@@ -2749,10 +2654,6 @@ msgstr[1] ""
 #, c-format
 #~ msgid "Piece %<PRIu32>, which was just downloaded, failed its checksum test"
 #~ msgstr "Парчето %<PRIu32>, което беше свалено, не беше тествано за контролна сума"
-
-#, c-format
-#~ msgid "Please Verify Local Data! Piece #%zu is corrupt."
-#~ msgstr "Моля проверете локалните данни! Частта #%zu е повредена."
 
 #, c-format
 #~ msgid "Port %d forwarded successfully"
@@ -2788,18 +2689,9 @@ msgstr[1] ""
 #~ msgid "Preallocated file \"%1$s\" (%2$s, size: %3$<PRIu64>)"
 #~ msgstr "Файлът е преразпределен \"%1$s\" (%2$s, размер: %3$<PRIu64>)"
 
-#~ msgid "Present Main Window"
-#~ msgstr "Покажи основния прозорец"
-
 #, c-format
 #~ msgid "Ratio: %s"
 #~ msgstr "Коефициент: %s"
-
-#~ msgid "Re_verse Sort Order"
-#~ msgstr "Объ_рни подредбата"
-
-#~ msgid "Remove torrent"
-#~ msgstr "Премахни торента"
 
 #~ msgid "Saturday"
 #~ msgstr "Събота"
@@ -2822,9 +2714,6 @@ msgstr[1] ""
 #~ msgstr[0] "Изпращане на %1$'d с %2$'d свързан участник"
 #~ msgstr[1] "Изпращане на %1$'d с %2$'d разпространяващи"
 
-#~ msgid "Select _All"
-#~ msgstr "Маркирай _всички"
-
 #, c-format
 #~ msgid "Serving RPC and Web requests from directory '%s'"
 #~ msgstr "Обслужване на RPC и уеб заявки от директория \"%s\""
@@ -2833,51 +2722,9 @@ msgstr[1] ""
 #~ msgid "Serving RPC and Web requests on %s:%d%s"
 #~ msgstr "Показване на RPC и уеб заявките на %s:%d%s"
 
-#~ msgid "Set _Location…"
-#~ msgstr "Задай  _местоположение..."
-
 #, c-format
 #~ msgid "Skipping unknown torrent \"%s\""
 #~ msgstr "Пропускане на непознатия торент «%s»"
-
-#~ msgid "Sort by A_ge"
-#~ msgstr "Сортирай по _дата"
-
-#~ msgid "Sort by Rati_o"
-#~ msgstr "Сортирай по коефи_циент"
-
-#~ msgid "Sort by Si_ze"
-#~ msgstr "Сортирай по раз_мер"
-
-#~ msgid "Sort by Stat_e"
-#~ msgstr "Сортирай по състояни_е"
-
-#~ msgid "Sort by Time _Left"
-#~ msgstr "Сортирай по оставащо _време"
-
-#~ msgid "Sort by _Activity"
-#~ msgstr "Сортирай по _активност"
-
-#~ msgid "Sort by _Name"
-#~ msgstr "Сортирай по _име"
-
-#~ msgid "Sort by _Progress"
-#~ msgstr "Сортирай по _напредък"
-
-#~ msgid "Sort by _Queue"
-#~ msgstr "Сортирай по _приоритет"
-
-#~ msgid "Start _Now"
-#~ msgstr "Стартирай _сега"
-
-#~ msgid "Start all torrents"
-#~ msgstr "Стартирай всички торенти"
-
-#~ msgid "Start torrent"
-#~ msgstr "Стартирай торента"
-
-#~ msgid "Start torrent now"
-#~ msgstr "Стартирай торента сега"
 
 #, c-format
 #~ msgid "Started %'d time"
@@ -2904,20 +2751,8 @@ msgstr[1] ""
 #~ msgstr "Неделя"
 
 #, c-format
-#~ msgid "The torrent file \"%s\" contains invalid data."
-#~ msgstr "Торент файла «%s» съдържа повредени данни."
-
-#, c-format
-#~ msgid "The torrent file \"%s\" encountered an unknown error."
-#~ msgstr "Торент файла «%s» съдържа неизвестна грешка."
-
-#, c-format
 #~ msgid "The torrent file \"%s\" is already in use by \"%s.\""
 #~ msgstr "Торент файла \"%s\" , вече се ползва от \"%s.\""
-
-#, c-format
-#~ msgid "This magnet link appears to be intended for something other than BitTorrent. BitTorrent magnet links have a section containing \"%s\"."
-#~ msgstr "Изглежда, че magnet линка е предназначен за нещо различно от BitTorrent. Магнет линковете за BitTorrent имат раздел, съдържащ «%s»."
 
 #~ msgid "Thursday"
 #~ msgstr "Четвъртък"
@@ -2933,17 +2768,6 @@ msgstr[1] ""
 #~ msgid "Torrent Creator is skipping file \"%s\": %s"
 #~ msgstr "При създаването на торента е пропуснат файла «%s»: %s"
 
-#~ msgid "Torrent properties"
-#~ msgstr "Свойства на торента"
-
-#, c-format
-#~ msgid "Tracker error: \"%s\""
-#~ msgstr "Грешка на тракера: «%s»"
-
-#, c-format
-#~ msgid "Tracker gave HTTP response code %1$ld (%2$s)"
-#~ msgstr "Тракерът даде HTTP отговор %1$ld (%2$s)"
-
 #, c-format
 #~ msgid "Tracker gave a warning: \"%s\""
 #~ msgstr "Предупреждение от тракера: «%s»"
@@ -2955,14 +2779,6 @@ msgstr[1] ""
 #, c-format
 #~ msgid "Tracker had %s%'d seeders and %'d leechers%s %s ago"
 #~ msgstr "В тракера имаше %s%'d разпространяващи и %'d приемащи%s, преди %s"
-
-#, c-format
-#~ msgid "Tracker warning: \"%s\""
-#~ msgstr "Предупреждение от тракера: «%s»"
-
-#, c-format
-#~ msgid "Tracker will allow requests in %s"
-#~ msgstr "Тракерът ще разреши запитвания след %s"
 
 #, c-format
 #~ msgid ""
@@ -2978,18 +2794,12 @@ msgstr[1] ""
 #~ msgid "Transmission doesn't know how to use \"%s\""
 #~ msgstr "Transmission не знае как да обработи «%s»"
 
-#~ msgid "Transmission is a BitTorrent client with an easy-to-use frontend on top a cross-platform backend. Native frontends are available for OS X and Windows, as well as command line and web frontends."
-#~ msgstr "Transmission е BitTorrent клиент с лесен за ползване, мултиплатформен графичен интерфейс. Достъпни са графични интерфейси за OS X и Windows, а, също конзолни и уеб интерфейси."
-
 #~ msgid "Tuesday"
 #~ msgstr "Вторник"
 
 #, c-format
 #~ msgid "U_pload (%s):"
 #~ msgstr "Ка_чване (%s):"
-
-#~ msgid "Unable to parse file content"
-#~ msgstr "Не може да се анализира съдържанието на файла"
 
 #, c-format
 #~ msgid "Unable to rename file as \"%s\": %s"
@@ -3008,89 +2818,17 @@ msgstr[1] ""
 #~ msgid "Wednesday"
 #~ msgstr "Сряда"
 
-#~ msgid "_About"
-#~ msgstr "_Относно"
-
-#~ msgid "_Compact View"
-#~ msgstr "_Компактен изглед"
-
-#~ msgid "_Contents"
-#~ msgstr "_Съдържание"
-
-#~ msgid "_Delete Files and Remove"
-#~ msgstr "_Изтрий и премахни файловете"
-
-#~ msgid "_Donate"
-#~ msgstr "Направете _дарение"
-
 #, c-format
 #~ msgid "_Download (%s):"
 #~ msgstr "_Сваляне (%s):"
-
-#~ msgid "_File"
-#~ msgstr "_Файл"
-
-#~ msgid "_Filterbar"
-#~ msgstr "Лента за _търсене"
-
-#~ msgid "_New…"
-#~ msgstr "_Нов…"
-
-#~ msgid "_Pause"
-#~ msgstr "_Паузирай"
-
-#~ msgid "_Pause All"
-#~ msgstr "_Паузирай всички"
-
-#~ msgid "_Preferences"
-#~ msgstr "_Предпочитания"
-
-#~ msgid "_Properties"
-#~ msgstr "_Свойства"
-
-#~ msgid "_Queue"
-#~ msgstr "_На опашката"
-
-#~ msgid "_Quit"
-#~ msgstr "_Изход"
 
 #, c-format
 #~ msgid "_Show %'d of:"
 #~ msgstr "_Покажи %'d от:"
 
-#~ msgid "_Show Transmission"
-#~ msgstr "_Покажи Transmission"
-
-#~ msgid "_Sort Torrents By"
-#~ msgstr "_Сортирай торентите по"
-
-#~ msgid "_Start"
-#~ msgstr "_Старт"
-
-#~ msgid "_Start All"
-#~ msgstr "_Стартирай всички"
-
-#~ msgid "_Statistics"
-#~ msgstr "_Статистика"
-
-#~ msgid "_Statusbar"
-#~ msgstr "Лента за _състоянието"
-
-#~ msgid "_Toolbar"
-#~ msgstr "Лента с _инструменти"
-
-#~ msgid "_Torrent"
-#~ msgstr "_Торент"
-
 #, c-format
 #~ msgid "_Upload (%s):"
 #~ msgstr "_Качване (%s):"
-
-#~ msgid "_Verify Local Data"
-#~ msgstr "Провери _локалните данни"
-
-#~ msgid "_View"
-#~ msgstr "_Изглед"
 
 #, c-format
 #~ msgid "blocklist skipped invalid address at line %d"

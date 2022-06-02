@@ -4,19 +4,19 @@
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 # Translators:
-# Mike Gelfand <mikedld@mikedld.com>, 2017
 # Dirk van Donkelaar <dirk@vdde.nl>, 2017
 # Nathan Follens, 2020
 # Dennis Holierhoek <dennis.hh@hotmail.com>, 2020
+# Mike Gelfand <mikedld@mikedld.com>, 2022
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-06-02 23:47+0100\n"
+"POT-Creation-Date: 2022-06-03 00:09+0100\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Dennis Holierhoek <dennis.hh@hotmail.com>, 2020\n"
+"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2022\n"
 "Language-Team: Dutch (https://www.transifex.com/transmissionbt/teams/33778/nl/)\n"
 "Language: nl\n"
 "MIME-Version: 1.0\n"
@@ -2328,10 +2328,6 @@ msgstr[1] ""
 #~ msgstr "%1$s (%2$s%%)"
 
 #, c-format
-#~ msgid "%1$s (+%2$s corrupt)"
-#~ msgstr "%1$s (+%2$s corrupt)"
-
-#, c-format
 #~ msgid "%1$s ago"
 #~ msgstr "%1$s geleden"
 
@@ -2386,14 +2382,6 @@ msgstr[1] ""
 #~ msgstr "%s vrij"
 
 #, c-format
-#~ msgid "%s is not a valid address"
-#~ msgstr "%s is geen geldig adres"
-
-#, c-format
-#~ msgid "%s is not an IPv4 or IPv6 address. RPC listeners must be IPv4 or IPv6"
-#~ msgstr "%s is geen IPv4- of IPv6-adres. RPC-luisteraars moeten IPv4 of IPv6 zijn"
-
-#, c-format
 #~ msgid "%s remaining"
 #~ msgstr "%s resterend"
 
@@ -2416,9 +2404,6 @@ msgstr[1] ""
 #~ msgid "<i>Testing TCP port…</i>"
 #~ msgstr "<i>TCP-poort wordt getest…</i>"
 
-#~ msgid "Ask Tracker for _More Peers"
-#~ msgstr "_Tracker om meer peers vragen"
-
 #, c-format
 #~ msgid "Asking for more peers in %s"
 #~ msgstr "Meer peers vragen over %s"
@@ -2437,9 +2422,6 @@ msgstr[1] ""
 
 #~ msgid "Automatically add .torrent files _from:"
 #~ msgstr ".torrentbestanden automatisch toevoegen _vanuit:"
-
-#~ msgid "BitTorrent is a peer-to-peer file-sharing protocol that is commonly used to distribute large amounts of data between multiple users."
-#~ msgstr "BitTorrent is een peer-to-peer protocol om bestanden te delen, welke doorgaans gebruikt wordt om grote hoeveelheden data aan verschillende gebruikers te verzenden."
 
 #, c-format
 #~ msgid "Blocklist \"%s\" contains %zu entries"
@@ -2461,9 +2443,6 @@ msgstr[1] ""
 #~ msgstr[0] "Blokkadelijst bevat %'d regel"
 #~ msgstr[1] "Blokkadelijst bevat %'d regels"
 
-#~ msgid "Call scrip_t when torrent is completed:"
-#~ msgstr "Scrip_t starten zodra een torrent voltooid is:"
-
 #, c-format
 #~ msgid ""
 #~ "Click to disable Alternative Speed Limits\n"
@@ -2482,12 +2461,6 @@ msgstr[1] ""
 
 #~ msgid "Complete"
 #~ msgstr "Voltooid"
-
-#~ msgid "Copy _Magnet Link to Clipboard"
-#~ msgstr "_Magnetkoppeling kopiëren naar klembord"
-
-#~ msgid "Copyright (c) The Transmission Project"
-#~ msgstr "Auteursrecht (c) het Transmission-project"
 
 #, c-format
 #~ msgid "Couldn't bind port %d on %s: %s"
@@ -2546,19 +2519,12 @@ msgstr[1] ""
 #~ msgstr "Kon bestand ‘%1$s’ niet opslaan: %2$s"
 
 #, c-format
-#~ msgid "Couldn't save temporary file \"%1$s\": %2$s"
-#~ msgstr "Kon tijdelijk bestand ‘%1$s’ niet opslaan: %2$s"
-
-#, c-format
 #~ msgid "Couldn't set source address %s on %<PRIdMAX>: %s"
 #~ msgstr "Kon bronadres %s op %<PRIdMAX> niet instellen: %s"
 
 #, c-format
 #~ msgid "Couldn't truncate \"%1$s\": %2$s"
 #~ msgstr "Kon ‘%1$s’ niet afkappen: %2$s"
-
-#~ msgid "Create a torrent"
-#~ msgstr "Torrent aanmaken"
 
 #, c-format
 #~ msgid "Created \"%s\"!"
@@ -2579,13 +2545,6 @@ msgstr[1] ""
 #, c-format
 #~ msgid "Creating \"%s\""
 #~ msgstr "‘%s’ aan het aanmaken"
-
-#, c-format
-#~ msgid "DNS Lookup failed: %s"
-#~ msgstr "DNS-opzoeken mislukt: %s"
-
-#~ msgid "Dese_lect All"
-#~ msgstr "_Niets selecteren"
 
 #, c-format
 #~ msgid "Do_wnload (%s):"
@@ -2614,9 +2573,6 @@ msgstr[1] ""
 #~ msgid "Downloading metadata from %1$'d %2$s (%3$d%% done)"
 #~ msgstr "Metagegevens van %1$'d %2$s downloaden (%3$d%% voltooid)"
 
-#~ msgid "Enable Alternative Speed _Limits"
-#~ msgstr "Alternatieve snelheids_limieten inschakelen"
-
 #~ msgid "Error opening torrent"
 #~ msgstr "Fout bij openen torrent"
 
@@ -2627,10 +2583,6 @@ msgstr[1] ""
 #, c-format
 #~ msgid "Error registering Transmission as a %s handler: %s"
 #~ msgstr "Foutmelding bij registreren van Transmission als verwerker van %s: %s"
-
-#, c-format
-#~ msgid "Error uncompressing blocklist: %s (%d)"
-#~ msgstr "Fout bij uitpakken van blokkadelijst: %s (%d)"
 
 #, c-format
 #~ msgid "Error writing \"%s\": %s"
@@ -2647,10 +2599,6 @@ msgstr[1] ""
 #, c-format
 #~ msgid "Failed to set piece size to %s, leaving it at %s"
 #~ msgstr "Kon bestandsgrootte niet instellen op %s, het blijft op %s"
-
-#, c-format
-#~ msgid "File \"%s\" is in the way"
-#~ msgstr "Bestand ‘%s’ staat in de weg"
 
 #, c-format
 #~ msgid "Found Internet Gateway Device \"%s\""
@@ -2678,10 +2626,6 @@ msgstr[1] ""
 #~ msgid "Idle"
 #~ msgstr "Inactief"
 
-#, c-format
-#~ msgid "Invalid metadata entry \"%s\""
-#~ msgstr "Ongeldige invoer van metagegegevens ‘%s’"
-
 #~ msgid "Is another copy of Transmission already running?"
 #~ msgstr "Is er reeds een andere sessie van Transmission actief?"
 
@@ -2701,29 +2645,11 @@ msgstr[1] ""
 #~ msgid "Local Address is \"%s\""
 #~ msgstr "Lokaal adres is ‘%s’"
 
-#~ msgid "Magnet torrent's metadata is not usable"
-#~ msgstr "Magnettorrentmetagegevens zijn niet bruikbaar"
-
-#~ msgid "Message _Log"
-#~ msgstr "_Berichtenlogboek"
-
 #~ msgid "Mo_ve .torrent file to the trash"
 #~ msgstr ".torrent-bestand in de _prullenbak gooien"
 
 #~ msgid "Monday"
 #~ msgstr "Maandag"
-
-#~ msgid "Move _Down"
-#~ msgstr "Omlaag _verplaatsen"
-
-#~ msgid "Move _Up"
-#~ msgstr "_Omhoog verplaatsen"
-
-#~ msgid "Move to _Bottom"
-#~ msgstr "Onder_aan plaatsen"
-
-#~ msgid "Move to _Top"
-#~ msgstr "_Bovenaan plaatsen"
 
 #, c-format
 #~ msgid "Moving \"%s\""
@@ -2732,27 +2658,6 @@ msgstr[1] ""
 #~ msgid "Not a regular file"
 #~ msgstr "Geen normaal bestand"
 
-#~ msgid "Notable features of Transmission include support for Local Peer Discovery, encryption, DHT, µTP, PEX and Magnet Link."
-#~ msgstr "Opvallende eigenschappen van Transmission voegen ondersteuning toe voor Local Peer Discovery, encryptie, DHT, µTP, PEX en Magnet Link."
-
-#~ msgid "Open Fold_er"
-#~ msgstr "Map open_en"
-
-#~ msgid "Open URL…"
-#~ msgstr "URL openen…"
-
-#~ msgid "Open _URL…"
-#~ msgstr "_URL openen…"
-
-#~ msgid "Open a torrent"
-#~ msgstr "Torrent openen"
-
-#~ msgid "Pause all torrents"
-#~ msgstr "Alle torrents pauzeren"
-
-#~ msgid "Pause torrent"
-#~ msgstr "Torrent pauzeren"
-
 #, c-format
 #~ msgid "Peer list request %1$stimed out%2$s %3$s ago; will retry"
 #~ msgstr "Verzoek om lijst met peers %1$sverliep%2$s %3$s geleden; opnieuw proberen"
@@ -2760,10 +2665,6 @@ msgstr[1] ""
 #, c-format
 #~ msgid "Piece %<PRIu32>, which was just downloaded, failed its checksum test"
 #~ msgstr "Deel %<PRIu32>, net gedownload, doorstond de controlesomtest niet"
-
-#, c-format
-#~ msgid "Please Verify Local Data! Piece #%zu is corrupt."
-#~ msgstr "Verifieer de lokale gegevens! Deel #%zu is corrupt."
 
 #, c-format
 #~ msgid "Port %d forwarded successfully"
@@ -2799,18 +2700,9 @@ msgstr[1] ""
 #~ msgid "Preallocated file \"%1$s\" (%2$s, size: %3$<PRIu64>)"
 #~ msgstr "Op voorhand toegewezen bestand ‘%1$s’ (%2$s, grootte: %3$<PRIu64>)"
 
-#~ msgid "Present Main Window"
-#~ msgstr "Hoofdvenster weergeven"
-
 #, c-format
 #~ msgid "Ratio: %s"
 #~ msgstr "Verhouding: %s"
-
-#~ msgid "Re_verse Sort Order"
-#~ msgstr "Omge_keerd sorteren"
-
-#~ msgid "Remove torrent"
-#~ msgstr "Torrent verwijderen"
 
 #~ msgid "Saturday"
 #~ msgstr "Zaterdag"
@@ -2833,58 +2725,13 @@ msgstr[1] ""
 #~ msgstr[0] "Bezig met seeden naar %1$'d van %2$'d verbonden peer"
 #~ msgstr[1] "Bezig met seeden naar %1$'d van %2$'d verbonden peers"
 
-#~ msgid "Select _All"
-#~ msgstr "_Alles selecteren"
-
 #, c-format
 #~ msgid "Serving RPC and Web requests on %s:%d%s"
 #~ msgstr "RPC- en Web-verzoeken worden aangeboden op %s:%d%s"
 
-#~ msgid "Set _Location…"
-#~ msgstr "Locatie instellen…"
-
 #, c-format
 #~ msgid "Skipping unknown torrent \"%s\""
 #~ msgstr "Onbekende torrent ‘%s’ overslaan"
-
-#~ msgid "Sort by A_ge"
-#~ msgstr "Sorteren op ou_derdom"
-
-#~ msgid "Sort by Rati_o"
-#~ msgstr "Sorteren op verh_ouding"
-
-#~ msgid "Sort by Si_ze"
-#~ msgstr "Sorteren op _grootte"
-
-#~ msgid "Sort by Stat_e"
-#~ msgstr "Sorteren op stat_us"
-
-#~ msgid "Sort by Time _Left"
-#~ msgstr "Sorteren op resterende _tijd"
-
-#~ msgid "Sort by _Activity"
-#~ msgstr "Sorteren op _activiteit"
-
-#~ msgid "Sort by _Name"
-#~ msgstr "Sorteren op _naam"
-
-#~ msgid "Sort by _Progress"
-#~ msgstr "Sorteren op _voortgang"
-
-#~ msgid "Sort by _Queue"
-#~ msgstr "Sorteren op _wachtrij"
-
-#~ msgid "Start _Now"
-#~ msgstr "_Nu starten"
-
-#~ msgid "Start all torrents"
-#~ msgstr "Alle torrents starten"
-
-#~ msgid "Start torrent"
-#~ msgstr "Torrent starten"
-
-#~ msgid "Start torrent now"
-#~ msgstr "Torrent nu starten"
 
 #, c-format
 #~ msgid "Started %'d time"
@@ -2911,20 +2758,8 @@ msgstr[1] ""
 #~ msgstr "Zondag"
 
 #, c-format
-#~ msgid "The torrent file \"%s\" contains invalid data."
-#~ msgstr "Het torrentbestand ‘%s’ bevat ongeldige gegevens."
-
-#, c-format
-#~ msgid "The torrent file \"%s\" encountered an unknown error."
-#~ msgstr "Het torrentbestand ‘%s’ kwam een onbekende fout tegen."
-
-#, c-format
 #~ msgid "The torrent file \"%s\" is already in use by \"%s.\""
 #~ msgstr "Het torrentbestand ‘%s’ is al in gebruik door ‘%s.’"
-
-#, c-format
-#~ msgid "This magnet link appears to be intended for something other than BitTorrent. BitTorrent magnet links have a section containing \"%s\"."
-#~ msgstr "Deze magnetlink lijkt voor iets anders bedoeld dan BitTorrent. BitTorrent-magnetlinks bevatten een sectie met ‘%s’."
 
 #~ msgid "Thursday"
 #~ msgstr "Donderdag"
@@ -2940,17 +2775,6 @@ msgstr[1] ""
 #~ msgid "Torrent Creator is skipping file \"%s\": %s"
 #~ msgstr "Torrentaanmaker slaat bestand ‘%s’ over: %s"
 
-#~ msgid "Torrent properties"
-#~ msgstr "Torrenteigenschappen"
-
-#, c-format
-#~ msgid "Tracker error: \"%s\""
-#~ msgstr "Trackerfout: ‘%s’"
-
-#, c-format
-#~ msgid "Tracker gave HTTP response code %1$ld (%2$s)"
-#~ msgstr "Tracker gaf HTTP-antwoordcode %1$ld (%2$s)"
-
 #, c-format
 #~ msgid "Tracker gave a warning: \"%s\""
 #~ msgstr "Trackerwaarschuwing: ‘%s’"
@@ -2962,14 +2786,6 @@ msgstr[1] ""
 #, c-format
 #~ msgid "Tracker had %s%'d seeders and %'d leechers%s %s ago"
 #~ msgstr "Tracker had %s%'d seeders en %'d leechers%s %s geleden"
-
-#, c-format
-#~ msgid "Tracker warning: \"%s\""
-#~ msgstr "Trackerwaarschuwing: ‘%s’"
-
-#, c-format
-#~ msgid "Tracker will allow requests in %s"
-#~ msgstr "Tracker zal verzoeken toestaan over %s"
 
 #, c-format
 #~ msgid ""
@@ -2985,18 +2801,12 @@ msgstr[1] ""
 #~ msgid "Transmission doesn't know how to use \"%s\""
 #~ msgstr "Transmission weet niet wat het met ‘%s’ moet doen"
 
-#~ msgid "Transmission is a BitTorrent client with an easy-to-use frontend on top a cross-platform backend. Native frontends are available for OS X and Windows, as well as command line and web frontends."
-#~ msgstr "Transmission is een BitTorrent programma met een eenvoudig te gebruiken frontend en een cross-platform backend. Standaard frontends zijn beschikbaar voor OS X en Windows, net als command line en web frontends."
-
 #~ msgid "Tuesday"
 #~ msgstr "Dinsdag"
 
 #, c-format
 #~ msgid "U_pload (%s):"
 #~ msgstr "U_pload (%s):"
-
-#~ msgid "Unable to parse file content"
-#~ msgstr "Kan bestandsinhoud niet verwerken"
 
 #, c-format
 #~ msgid "Unable to rename file as \"%s\": %s"
@@ -3015,89 +2825,17 @@ msgstr[1] ""
 #~ msgid "Wednesday"
 #~ msgstr "Woensdag"
 
-#~ msgid "_About"
-#~ msgstr "_Over"
-
-#~ msgid "_Compact View"
-#~ msgstr "_Compacte weergave"
-
-#~ msgid "_Contents"
-#~ msgstr "In_houd"
-
-#~ msgid "_Delete Files and Remove"
-#~ msgstr "Bestanden wissen en verwijderen"
-
-#~ msgid "_Donate"
-#~ msgstr "_Doneren"
-
 #, c-format
 #~ msgid "_Download (%s):"
 #~ msgstr "_Download (%s):"
-
-#~ msgid "_File"
-#~ msgstr "_Bestand"
-
-#~ msgid "_Filterbar"
-#~ msgstr "_Filterbalk"
-
-#~ msgid "_New…"
-#~ msgstr "_Nieuw…"
-
-#~ msgid "_Pause"
-#~ msgstr "_Pauzeren"
-
-#~ msgid "_Pause All"
-#~ msgstr "Alles _pauzeren"
-
-#~ msgid "_Preferences"
-#~ msgstr "_Voorkeuren"
-
-#~ msgid "_Properties"
-#~ msgstr "_Eigenschappen"
-
-#~ msgid "_Queue"
-#~ msgstr "_Wachtrij"
-
-#~ msgid "_Quit"
-#~ msgstr "A_fsluiten"
 
 #, c-format
 #~ msgid "_Show %'d of:"
 #~ msgstr "%'d t_onen van:"
 
-#~ msgid "_Show Transmission"
-#~ msgstr "Transmission _weergeven"
-
-#~ msgid "_Sort Torrents By"
-#~ msgstr "_Torrents sorteren op"
-
-#~ msgid "_Start"
-#~ msgstr "_Starten"
-
-#~ msgid "_Start All"
-#~ msgstr "Alles _starten"
-
-#~ msgid "_Statistics"
-#~ msgstr "_Statistieken"
-
-#~ msgid "_Statusbar"
-#~ msgstr "_Statusbalk"
-
-#~ msgid "_Toolbar"
-#~ msgstr "_Werkbalk"
-
-#~ msgid "_Torrent"
-#~ msgstr "_Torrent"
-
 #, c-format
 #~ msgid "_Upload (%s):"
 #~ msgstr "_Upload (%s):"
-
-#~ msgid "_Verify Local Data"
-#~ msgstr "Lokale gegevens verif_iëren"
-
-#~ msgid "_View"
-#~ msgstr "Beel_d"
 
 #, c-format
 #~ msgid "blocklist skipped invalid address at line %d"
@@ -3117,7 +2855,7 @@ msgstr[1] ""
 
 #, c-format
 #~ msgid "size|Down: %1$s, Up: %2$s"
-#~ msgstr "grootte|Download: %1$s, Upload: %2$s"
+#~ msgstr "Download: %1$s, Upload: %2$s"
 
 #~ msgid "sparse"
 #~ msgstr "spaarzaam"

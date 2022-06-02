@@ -11,7 +11,7 @@
     <message>
         <location line="+39"/>
         <source>Copyright © The Transmission Project</source>
-        <translation type="unfinished"></translation>
+        <translation>Copyright © The Transmission Project</translation>
     </message>
     <message>
         <location line="-10"/>
@@ -21,12 +21,12 @@
     <message>
         <location filename="../AboutDialog.cc" line="+37"/>
         <source>Client</source>
-        <translation type="unfinished">Cliente</translation>
+        <translation>Cliente</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Server</source>
-        <translation type="unfinished"></translation>
+        <translation>Servidor</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -64,7 +64,7 @@
     <message>
         <location line="+132"/>
         <source>Torrent Added</source>
-        <translation type="unfinished"></translation>
+        <translation>Torrent añadido</translation>
     </message>
     <message numerus="yes">
         <location line="-29"/>
@@ -106,7 +106,7 @@
     <message>
         <location line="+109"/>
         <source>%1 (+%2 discarded after failed checksum)</source>
-        <translation type="unfinished"></translation>
+        <translation>%1$s (+ %2$s descartado después de fallar la comprobación de huella)</translation>
     </message>
     <message>
         <location line="+135"/>
@@ -227,12 +227,12 @@
     <message>
         <location line="+35"/>
         <source>Add URL(s) </source>
-        <translation type="unfinished"></translation>
+        <translation>Añadir URL(s)</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Add tracker announce URLs, one per line:</source>
-        <translation type="unfinished"></translation>
+        <translation>Añadir URLs de anuncio del tracker, unot por linea:</translation>
     </message>
     <message>
         <location line="+27"/>
@@ -242,7 +242,7 @@
     <message>
         <location line="+0"/>
         <source>No new URLs found.</source>
-        <translation type="unfinished"></translation>
+        <translation>No se han encontrado nuevas URLs.</translation>
     </message>
     <message>
         <location line="-832"/>
@@ -427,7 +427,7 @@
     <message>
         <location line="+124"/>
         <source>Edit Trackers</source>
-        <translation type="unfinished"></translation>
+        <translation>Editar rastreadores</translation>
     </message>
     <message>
         <location line="-190"/>
@@ -907,12 +907,12 @@
     <message>
         <location line="-132"/>
         <source>Options</source>
-        <translation type="unfinished">Opciones</translation>
+        <translation>Opciones</translation>
     </message>
     <message>
         <location line="+83"/>
         <source>Statistics</source>
-        <translation type="unfinished">Estadísticas</translation>
+        <translation>Estadísticas</translation>
     </message>
     <message>
         <location line="+171"/>
@@ -1514,7 +1514,7 @@ Para añadir otra URL primaria, añádela después de una línea en blanco.</tra
     <message>
         <location line="+14"/>
         <source>&amp;Source:</source>
-        <translation type="unfinished">&amp;Fuente:</translation>
+        <translation>&amp;Fuente:</translation>
     </message>
     <message>
         <location line="+14"/>
@@ -1757,7 +1757,7 @@ Para añadir otra URL primaria, añádela después de una línea en blanco.</tra
     <message>
         <location line="+159"/>
         <source>Select &quot;Torrent Done Downloading&quot; Script</source>
-        <translation type="unfinished"></translation>
+        <translation>Seleccionar script para torrent completa la descarga</translation>
     </message>
     <message>
         <location filename="../PrefsDialog.ui" line="+545"/>
@@ -1807,7 +1807,7 @@ Para añadir otra URL primaria, añádela después de una línea en blanco.</tra
     <message>
         <location line="+10"/>
         <source>Select &quot;Torrent Done Seeding&quot; Script</source>
-        <translation type="unfinished"></translation>
+        <translation>Seleccionar script para torrent completa la siembra</translation>
     </message>
     <message numerus="yes">
         <location line="+19"/>
@@ -2018,32 +2018,32 @@ Para añadir otra URL primaria, añádela después de una línea en blanco.</tra
     <message>
         <location line="+186"/>
         <source>Reads user clipboard content for torrents</source>
-        <translation type="unfinished"></translation>
+        <translation>Lee torrents del contenido del portapapeles</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Detect new torrents from clipboard</source>
-        <translation type="unfinished"></translation>
+        <translation>Detectar nuevos torrents del portapapeles</translation>
     </message>
     <message>
         <location line="+148"/>
         <source>Call scrip&amp;t when downloading is completed:</source>
-        <translation type="unfinished"></translation>
+        <translation>Ejecutar scrip&amp;t al completar la descarga:</translation>
     </message>
     <message>
         <location line="+105"/>
         <source>Call scrip&amp;t when seeding is completed:</source>
-        <translation type="unfinished"></translation>
+        <translation>Ejecutar scrip&amp;t al completar la siembra:</translation>
     </message>
     <message>
         <location line="+406"/>
         <source>Default Public Trackers</source>
-        <translation type="unfinished"></translation>
+        <translation>Rastreadores públicos por defecto</translation>
     </message>
     <message>
         <location line="+12"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Trackers to use on all public torrents.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;To add a backup URL, add it on the next line after a primary URL.&lt;/p&gt;&lt;p&gt;To add a new primary URL, add it after a blank line.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Rastreadores a usar en todos los torrents públicos.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;Para añadir una copia de seguridad de URL, añádala en la siguiente línea después de la URL primaria.&lt;/p&gt;&lt;p&gt;To add a new primary URL, add it after a blank line.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location line="+60"/>
@@ -2202,7 +2202,7 @@ Para añadir otra URL primaria, añádela después de una línea en blanco.</tra
     <message>
         <location line="+305"/>
         <source>Start Now</source>
-        <translation type="unfinished"></translation>
+        <translation>Empezar ahora</translation>
     </message>
 </context>
 <context>
@@ -2648,27 +2648,27 @@ Para añadir otra URL primaria, añádela después de una línea en blanco.</tra
     <message>
         <location filename="../TrackersDialog.ui" line="+17"/>
         <source>Edit Trackers</source>
-        <translation type="unfinished"></translation>
+        <translation>Editar rastreadores</translation>
     </message>
     <message>
         <location line="+9"/>
         <source>Tracker Announce URLs</source>
-        <translation type="unfinished"></translation>
+        <translation>URLs de anuncio de rastreadores</translation>
     </message>
     <message>
         <location line="+12"/>
         <source>To add a new primary URL, add it after a blank line.</source>
-        <translation type="unfinished"></translation>
+        <translation>Para añadir una nueva URL primaria, añádala después de una linea en blanco</translation>
     </message>
     <message>
         <location line="+14"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;To add a backup URL, add it on the next line after a primary URL.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Para añadir una URL de copia de seguridad, añádala en la siguiente linea después de la URL primaria.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Also see Default Public Trackers in Edit &gt; Preferences &gt; Network</source>
-        <translation type="unfinished"></translation>
+        <translation>Ver también Rastreadores públicos por defecto en Editar &gt; Preferencias &gt; Red</translation>
     </message>
 </context>
 </TS>

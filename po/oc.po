@@ -12,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-06-02 23:47+0100\n"
+"POT-Creation-Date: 2022-06-03 00:09+0100\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
 "Last-Translator: Quentin PAGÈS, 2021\n"
 "Language-Team: Occitan (post 1500) (https://www.transifex.com/transmissionbt/teams/33778/oc/)\n"
@@ -2296,10 +2296,6 @@ msgstr[1] ""
 #~ msgstr "%1$s (%2$s%%)"
 
 #, c-format
-#~ msgid "%1$s (+%2$s corrupt)"
-#~ msgstr "%1$s (+%2$s corromput)"
-
-#, c-format
 #~ msgid "%1$s ago"
 #~ msgstr "fa %1$s"
 
@@ -2354,14 +2350,6 @@ msgstr[1] ""
 #~ msgstr "%s liure"
 
 #, c-format
-#~ msgid "%s is not a valid address"
-#~ msgstr "%s es pas una adreça valida"
-
-#, c-format
-#~ msgid "%s is not an IPv4 or IPv6 address. RPC listeners must be IPv4 or IPv6"
-#~ msgstr "%ses pas una adreça IPv4 nimai una adreça IPv6. Los escotadors RPCS devon èsser IPv4 o IPv6."
-
-#, c-format
 #~ msgid "%s remaining"
 #~ msgstr "%s restant"
 
@@ -2384,9 +2372,6 @@ msgstr[1] ""
 #~ msgid "<i>Testing TCP port…</i>"
 #~ msgstr "<i>Pòrt TCP en cors de tèst…</i>"
 
-#~ msgid "Ask Tracker for _More Peers"
-#~ msgstr "Demandar _mai de pars al tracador"
-
 #, c-format
 #~ msgid "Asking for more peers in %s"
 #~ msgstr "Demandar mai de pars dins %s"
@@ -2405,9 +2390,6 @@ msgstr[1] ""
 
 #~ msgid "Automatically add .torrent files _from:"
 #~ msgstr "Automaticament apondre los fichièrs .torrent de :"
-
-#~ msgid "BitTorrent is a peer-to-peer file-sharing protocol that is commonly used to distribute large amounts of data between multiple users."
-#~ msgstr "BitTorrent es un protocòl de partiment de fichièrs en mòde par a par e es sovent utilizat per distribuir de bravas quantitat de donadas entre mantun utilizaire."
 
 #, c-format
 #~ msgid "Blocklist \"%s\" contains %zu entries"
@@ -2429,9 +2411,6 @@ msgstr[1] ""
 #~ msgstr[0] "La lista de blocatge a recuperat %'d règla."
 #~ msgstr[1] "La lista de blocatge a recuperat %'d règlas."
 
-#~ msgid "Call scrip_t when torrent is completed:"
-#~ msgstr "Apelar aqueste escrip_t quand un torrent es acabat :"
-
 #, c-format
 #~ msgid ""
 #~ "Click to disable Alternative Speed Limits\n"
@@ -2450,12 +2429,6 @@ msgstr[1] ""
 
 #~ msgid "Complete"
 #~ msgstr "Acabat"
-
-#~ msgid "Copy _Magnet Link to Clipboard"
-#~ msgstr "Copiar lo ligam _Magnet dins lo quichapapièrs"
-
-#~ msgid "Copyright (c) The Transmission Project"
-#~ msgstr "Copyright (c) « The Transmission Project »"
 
 #, c-format
 #~ msgid "Couldn't bind port %d on %s: %s"
@@ -2514,19 +2487,12 @@ msgstr[1] ""
 #~ msgstr "Impossible d'enregistrar lo fichièr « %1$s » : %2$s"
 
 #, c-format
-#~ msgid "Couldn't save temporary file \"%1$s\": %2$s"
-#~ msgstr "Impossible d'enregistrar lo fichièr temporari « %1$s » : %2$s"
-
-#, c-format
 #~ msgid "Couldn't set source address %s on %<PRIdMAX>: %s"
 #~ msgstr "Definicion impossibla de l’adreça font %s sus %<PRIdMAX> : %s"
 
 #, c-format
 #~ msgid "Couldn't truncate \"%1$s\": %2$s"
 #~ msgstr "Impossible de troncar « %1$s » : %2$s"
-
-#~ msgid "Create a torrent"
-#~ msgstr "Crear un torrent"
 
 #, c-format
 #~ msgid "Created \"%s\"!"
@@ -2547,13 +2513,6 @@ msgstr[1] ""
 #, c-format
 #~ msgid "Creating \"%s\""
 #~ msgstr "Creacion de « %s »"
-
-#, c-format
-#~ msgid "DNS Lookup failed: %s"
-#~ msgstr "Resolucion DNS fracassada : %s"
-
-#~ msgid "Dese_lect All"
-#~ msgstr "Dese_leccionar tot"
 
 #, c-format
 #~ msgid "Do_wnload (%s):"
@@ -2582,9 +2541,6 @@ msgstr[1] ""
 #~ msgid "Downloading metadata from %1$'d %2$s (%3$d%% done)"
 #~ msgstr "Telecargament de las metadonadas de  %1$'d %2$s (%3$d%% efectuat)"
 
-#~ msgid "Enable Alternative Speed _Limits"
-#~ msgstr "Activar los _limits de velocitat alternatius"
-
 #~ msgid "Error opening torrent"
 #~ msgstr "Error al moment de la dobertura del torrent"
 
@@ -2595,10 +2551,6 @@ msgstr[1] ""
 #, c-format
 #~ msgid "Error registering Transmission as a %s handler: %s"
 #~ msgstr "Error en enregistrant Transmission coma un handler %s : %s"
-
-#, c-format
-#~ msgid "Error uncompressing blocklist: %s (%d)"
-#~ msgstr "Error de descompression de la lista de blocatge : %s (%d)"
 
 #, c-format
 #~ msgid "Error writing \"%s\": %s"
@@ -2615,10 +2567,6 @@ msgstr[1] ""
 #, c-format
 #~ msgid "Failed to set piece size to %s, leaving it at %s"
 #~ msgstr "Fracàs de la reduccion del tròç a %s, demòra a %s"
-
-#, c-format
-#~ msgid "File \"%s\" is in the way"
-#~ msgstr "Lo fichièr « %s » es en camin"
 
 #, c-format
 #~ msgid "Found Internet Gateway Device \"%s\""
@@ -2646,10 +2594,6 @@ msgstr[1] ""
 #~ msgid "Idle"
 #~ msgstr "Inactiu"
 
-#, c-format
-#~ msgid "Invalid metadata entry \"%s\""
-#~ msgstr "L'entrada de metadonadas « %s » es invalida"
-
 #~ msgid "Is another copy of Transmission already running?"
 #~ msgstr "Una autra instància de Transmission s'executa ?"
 
@@ -2669,29 +2613,11 @@ msgstr[1] ""
 #~ msgid "Local Address is \"%s\""
 #~ msgstr "L'adreça locala es « %s »"
 
-#~ msgid "Magnet torrent's metadata is not usable"
-#~ msgstr "Las metadonadas del magnet del torrent pòdon pas èsser utilizadas"
-
-#~ msgid "Message _Log"
-#~ msgstr "Jorna_l dels messatges"
-
 #~ msgid "Mo_ve .torrent file to the trash"
 #~ msgstr "Man_dar lo fichièr .torrent a la banasta"
 
 #~ msgid "Monday"
 #~ msgstr "Diluns"
-
-#~ msgid "Move _Down"
-#~ msgstr "Desplaçar cap a_val"
-
-#~ msgid "Move _Up"
-#~ msgstr "Desplaçar cap a_mont"
-
-#~ msgid "Move to _Bottom"
-#~ msgstr "Desplaçar cap a_val"
-
-#~ msgid "Move to _Top"
-#~ msgstr "Desplaçar amon_t de tot"
 
 #, c-format
 #~ msgid "Moving \"%s\""
@@ -2700,27 +2626,6 @@ msgstr[1] ""
 #~ msgid "Not a regular file"
 #~ msgstr "Es pas un fichièr estandard"
 
-#~ msgid "Notable features of Transmission include support for Local Peer Discovery, encryption, DHT, µTP, PEX and Magnet Link."
-#~ msgstr "Las foncionalitats notables de Transmission son la compatibilitat amb la descobèrta de pars locals, lo chiframent, DHT, EX e los ligams Magnet."
-
-#~ msgid "Open Fold_er"
-#~ msgstr "Dobrir lo dorsi_èr"
-
-#~ msgid "Open URL…"
-#~ msgstr "Dobrir l'URL…"
-
-#~ msgid "Open _URL…"
-#~ msgstr "Dobrir l'_URL…"
-
-#~ msgid "Open a torrent"
-#~ msgstr "Dobrir un fichièr torrent"
-
-#~ msgid "Pause all torrents"
-#~ msgstr "Metre en pausa totes los torrents"
-
-#~ msgid "Pause torrent"
-#~ msgstr "Metre aqueste torrent en pausa"
-
 #, c-format
 #~ msgid "Peer list request %1$stimed out%2$s %3$s ago; will retry"
 #~ msgstr "Demanda de la lista de pars %1$sexpirada fa %2$s %3$s ; novèla temptativa programada"
@@ -2728,10 +2633,6 @@ msgstr[1] ""
 #, c-format
 #~ msgid "Piece %<PRIu32>, which was just downloaded, failed its checksum test"
 #~ msgstr "Lo tròç <PRIu32>, que ven d’èsser telecargat, a pas reüssit la verificacion de la soma de contraròtla"
-
-#, c-format
-#~ msgid "Please Verify Local Data! Piece #%zu is corrupt."
-#~ msgstr "Verificar las donadas localas ! La partida #%zu es corrompuda."
 
 #, c-format
 #~ msgid "Port %d forwarded successfully"
@@ -2767,18 +2668,9 @@ msgstr[1] ""
 #~ msgid "Preallocated file \"%1$s\" (%2$s, size: %3$<PRIu64>)"
 #~ msgstr "Fichièr pre-alogat « %1$s » (%2$s, talha : %3$<PRIu64>) "
 
-#~ msgid "Present Main Window"
-#~ msgstr "Presentar la fenèstra principala"
-
 #, c-format
 #~ msgid "Ratio: %s"
 #~ msgstr "Racio : %s"
-
-#~ msgid "Re_verse Sort Order"
-#~ msgstr "In_versar l'òrdre de triada"
-
-#~ msgid "Remove torrent"
-#~ msgstr "Suprimir lo torrent"
 
 #~ msgid "Saturday"
 #~ msgstr "Dissabte"
@@ -2801,9 +2693,6 @@ msgstr[1] ""
 #~ msgstr[0] "Partiment cap a %1$'d de %2$'d par connectat"
 #~ msgstr[1] "Partiment cap a %1$'d de %2$'d pars connectats"
 
-#~ msgid "Select _All"
-#~ msgstr "Seleccionar _tot"
-
 #, c-format
 #~ msgid "Serving RPC and Web requests from directory '%s'"
 #~ msgstr "Servici RPC e requèstas Web a partir del repertòri « %s »"
@@ -2812,51 +2701,9 @@ msgstr[1] ""
 #~ msgid "Serving RPC and Web requests on %s:%d%s"
 #~ msgstr "Distribucion de las requèstas RPC e web sus %s : %d %s"
 
-#~ msgid "Set _Location…"
-#~ msgstr "Definir l'_emplaçament…"
-
 #, c-format
 #~ msgid "Skipping unknown torrent \"%s\""
 #~ msgstr "Lo torrent desconegut « %s » es ignorat"
-
-#~ msgid "Sort by A_ge"
-#~ msgstr "Triar per at_ge"
-
-#~ msgid "Sort by Rati_o"
-#~ msgstr "Triar per rati_o"
-
-#~ msgid "Sort by Si_ze"
-#~ msgstr "Triar per _talha"
-
-#~ msgid "Sort by Stat_e"
-#~ msgstr "Tri_ar per estat"
-
-#~ msgid "Sort by Time _Left"
-#~ msgstr "Triar per te_mps restant"
-
-#~ msgid "Sort by _Activity"
-#~ msgstr "Triar per _activitat"
-
-#~ msgid "Sort by _Name"
-#~ msgstr "Triar per _nom"
-
-#~ msgid "Sort by _Progress"
-#~ msgstr "Triar per _progression"
-
-#~ msgid "Sort by _Queue"
-#~ msgstr "Triar per _fila d'espèra"
-
-#~ msgid "Start _Now"
-#~ msgstr "Aviar a_ra"
-
-#~ msgid "Start all torrents"
-#~ msgstr "Aviar totes los torrents"
-
-#~ msgid "Start torrent"
-#~ msgstr "Aviar aqueste torrent"
-
-#~ msgid "Start torrent now"
-#~ msgstr "Aviar lo torrent ara"
 
 #, c-format
 #~ msgid "Started %'d time"
@@ -2883,20 +2730,8 @@ msgstr[1] ""
 #~ msgstr "Dimenge"
 
 #, c-format
-#~ msgid "The torrent file \"%s\" contains invalid data."
-#~ msgstr "Lo fichièr torrent « %s » conten de donadas invalidas."
-
-#, c-format
-#~ msgid "The torrent file \"%s\" encountered an unknown error."
-#~ msgstr "Lo fichièr torrent « %s » a rencontrat una error desconeguda."
-
-#, c-format
 #~ msgid "The torrent file \"%s\" is already in use by \"%s.\""
 #~ msgstr "Lo fichièr torrent « %s » es ja utilizat per « %s »."
-
-#, c-format
-#~ msgid "This magnet link appears to be intended for something other than BitTorrent. BitTorrent magnet links have a section containing \"%s\"."
-#~ msgstr "Aqueste ligam magnet sembla destinat a quicòm mai que non pas BitTorrent. Los ligams magnet BitTorrent an una seccion que conten « %s »."
 
 #~ msgid "Thursday"
 #~ msgstr "Dijòus"
@@ -2912,17 +2747,6 @@ msgstr[1] ""
 #~ msgid "Torrent Creator is skipping file \"%s\": %s"
 #~ msgstr "Lo creator de torrent ignòra lo fichièr « %s » : %s"
 
-#~ msgid "Torrent properties"
-#~ msgstr "Proprietats del torrent"
-
-#, c-format
-#~ msgid "Tracker error: \"%s\""
-#~ msgstr "Error del tracador : « %s »"
-
-#, c-format
-#~ msgid "Tracker gave HTTP response code %1$ld (%2$s)"
-#~ msgstr "Lo tracador a respondut amb lo còdi HTTP %1$ld (%2$s)"
-
 #, c-format
 #~ msgid "Tracker gave a warning: \"%s\""
 #~ msgstr "Lo tracador a retornat l'avertiment : « %s »"
@@ -2934,14 +2758,6 @@ msgstr[1] ""
 #, c-format
 #~ msgid "Tracker had %s%'d seeders and %'d leechers%s %s ago"
 #~ msgstr "Lo traçador aviá %s%'d provesidors e %'d telecargadors i a %s %s"
-
-#, c-format
-#~ msgid "Tracker warning: \"%s\""
-#~ msgstr "Avertiment del tracador : « %s »"
-
-#, c-format
-#~ msgid "Tracker will allow requests in %s"
-#~ msgstr "Lo tracador autorizarà las requèstas dins %s"
 
 #, c-format
 #~ msgid ""
@@ -2957,18 +2773,12 @@ msgstr[1] ""
 #~ msgid "Transmission doesn't know how to use \"%s\""
 #~ msgstr "Transmission sap pas cossí utilizar « %s »"
 
-#~ msgid "Transmission is a BitTorrent client with an easy-to-use frontend on top a cross-platform backend. Native frontends are available for OS X and Windows, as well as command line and web frontends."
-#~ msgstr "Transmission es un client BiTorrent amb una interfàcia utilizaire facila amb un backend multifplataforma. Los interfàcias frontends son disponiblas per OS X e Windows, tanben coma las linhas de comandas e los web frontends."
-
 #~ msgid "Tuesday"
 #~ msgstr "Dimars"
 
 #, c-format
 #~ msgid "U_pload (%s):"
 #~ msgstr "Ma_ndadís (%s) :"
-
-#~ msgid "Unable to parse file content"
-#~ msgstr "Impossible de percórrer lo contengut del fichièr"
 
 #, c-format
 #~ msgid "Unable to rename file as \"%s\": %s"
@@ -2987,89 +2797,17 @@ msgstr[1] ""
 #~ msgid "Wednesday"
 #~ msgstr "Dimècres"
 
-#~ msgid "_About"
-#~ msgstr "_A prepaus"
-
-#~ msgid "_Compact View"
-#~ msgstr "Vista _compacta"
-
-#~ msgid "_Contents"
-#~ msgstr "_Ensenhador"
-
-#~ msgid "_Delete Files and Remove"
-#~ msgstr "_Suprimir los fichièrs e levar"
-
-#~ msgid "_Donate"
-#~ msgstr "_Far un don"
-
 #, c-format
 #~ msgid "_Download (%s):"
 #~ msgstr "_Telecargament (%s) :"
-
-#~ msgid "_File"
-#~ msgstr "_Fichièr"
-
-#~ msgid "_Filterbar"
-#~ msgstr "Barra de _filtre"
-
-#~ msgid "_New…"
-#~ msgstr "_Novèl…"
-
-#~ msgid "_Pause"
-#~ msgstr "_Pausa"
-
-#~ msgid "_Pause All"
-#~ msgstr "Metre tot en _pausa"
-
-#~ msgid "_Preferences"
-#~ msgstr "_Preferéncias"
-
-#~ msgid "_Properties"
-#~ msgstr "_Proprietats"
-
-#~ msgid "_Queue"
-#~ msgstr "_Metre en espèra"
-
-#~ msgid "_Quit"
-#~ msgstr "_Quitar"
 
 #, c-format
 #~ msgid "_Show %'d of:"
 #~ msgstr "_Ne veire %'d de :"
 
-#~ msgid "_Show Transmission"
-#~ msgstr "_Afichar Transmission"
-
-#~ msgid "_Sort Torrents By"
-#~ msgstr "Triar los torrent_s per"
-
-#~ msgid "_Start"
-#~ msgstr "_Aviar"
-
-#~ msgid "_Start All"
-#~ msgstr "Aviar tote_s"
-
-#~ msgid "_Statistics"
-#~ msgstr "E_statisticas"
-
-#~ msgid "_Statusbar"
-#~ msgstr "Barra d'e_stat"
-
-#~ msgid "_Toolbar"
-#~ msgstr "_Barra d'aisinas"
-
-#~ msgid "_Torrent"
-#~ msgstr "_Torrent"
-
 #, c-format
 #~ msgid "_Upload (%s):"
 #~ msgstr "_Mandadís (%s) :"
-
-#~ msgid "_Verify Local Data"
-#~ msgstr "_Verificar las donadas localas"
-
-#~ msgid "_View"
-#~ msgstr "_Afichatge"
 
 #, c-format
 #~ msgid "blocklist skipped invalid address at line %d"

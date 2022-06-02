@@ -4,17 +4,17 @@
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 # Translators:
-# Mike Gelfand <mikedld@mikedld.com>, 2017
-# gogo <trebelnik2@gmail.com>, 2021
+# Mike Gelfand <mikedld@mikedld.com>, 2022
+# gogo <trebelnik2@gmail.com>, 2022
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-06-02 23:47+0100\n"
+"POT-Creation-Date: 2022-06-03 00:09+0100\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: gogo <trebelnik2@gmail.com>, 2021\n"
+"Last-Translator: gogo <trebelnik2@gmail.com>, 2022\n"
 "Language-Team: Croatian (https://www.transifex.com/transmissionbt/teams/33778/hr/)\n"
 "Language: hr\n"
 "MIME-Version: 1.0\n"
@@ -148,7 +148,7 @@ msgstr "Jednostavan i brz BitTorrent klijent"
 
 #: ../gtk/Application.cc:1289
 msgid "Copyright © The Transmission Project"
-msgstr ""
+msgstr "Autorsko pravo © Transmission projekt"
 
 #. Translators: translate "translator-credits" as your name
 #. to have it appear in the credits in the "About"
@@ -618,6 +618,8 @@ msgid ""
 "To add a backup URL, add it on the next line after a primary URL.\n"
 "To add a new primary URL, add it after a blank line."
 msgstr ""
+"Kako bi dodali pomoćni URL, dodajte ga u redak ispod glavnog URL-a.\n"
+"Kako bi dodali novi glavni URL, dodajte ga nakon praznog retka."
 
 #: ../gtk/DetailsDialog.cc:2378
 msgid "Also see Default Public Trackers in Edit > Preferences > Network"
@@ -2345,8 +2347,8 @@ msgstr[2] ""
 #~ msgstr "%1$s (%2$s%%)"
 
 #, c-format
-#~ msgid "%1$s (+%2$s corrupt)"
-#~ msgstr "%1$s (+%2$s oštećeno)"
+#~ msgid "%1$s (+%2$s discarded after failed checksum)"
+#~ msgstr "%1$s (+%2$s odbačeno nakon neuspjele provjere)"
 
 #, c-format
 #~ msgid "%1$s ago"
@@ -2404,14 +2406,6 @@ msgstr[2] ""
 #~ msgstr "%s slobodno"
 
 #, c-format
-#~ msgid "%s is not a valid address"
-#~ msgstr "%s nije valjana adresa"
-
-#, c-format
-#~ msgid "%s is not an IPv4 or IPv6 address. RPC listeners must be IPv4 or IPv6"
-#~ msgstr "%s nije IPv4 ili IPv6 adresa. RPC osluškivatelji moraju biti IPv4 ili IPv6"
-
-#, c-format
 #~ msgid "%s remaining"
 #~ msgstr "%s preostalo"
 
@@ -2434,9 +2428,6 @@ msgstr[2] ""
 #~ msgid "<i>Testing TCP port…</i>"
 #~ msgstr "<i>Testiranje TCP ulaza…</i>"
 
-#~ msgid "Ask Tracker for _More Peers"
-#~ msgstr "Pitaj pratitelja za _više točaka"
-
 #, c-format
 #~ msgid "Asking for more peers in %s"
 #~ msgstr "Traženje više točaka unutar %s"
@@ -2455,9 +2446,6 @@ msgstr[2] ""
 
 #~ msgid "Automatically add .torrent files _from:"
 #~ msgstr "Automatski dodaj .torrent datoteku &iz:"
-
-#~ msgid "BitTorrent is a peer-to-peer file-sharing protocol that is commonly used to distribute large amounts of data between multiple users."
-#~ msgstr "BitTorrent je točka-u-točka protokol dijeljenja datoteka koji se uobičajeno koristi za prijenos velike količine podataka između više korisnika."
 
 #, c-format
 #~ msgid "Blocklist \"%s\" contains %zu entries"
@@ -2481,9 +2469,6 @@ msgstr[2] ""
 #~ msgstr[1] "Popis blokiranja ima %'d pravila"
 #~ msgstr[2] "Popis blokiranja ima %'d pravila"
 
-#~ msgid "Call scrip_t when torrent is completed:"
-#~ msgstr "Pozovi skrip_tu kad se torrent preuzme:"
-
 #, c-format
 #~ msgid ""
 #~ "Click to disable Alternative Speed Limits\n"
@@ -2502,12 +2487,6 @@ msgstr[2] ""
 
 #~ msgid "Complete"
 #~ msgstr "Završeno"
-
-#~ msgid "Copy _Magnet Link to Clipboard"
-#~ msgstr "Kopiraj _magnetnu poveznicu u međuspremnik"
-
-#~ msgid "Copyright (c) The Transmission Project"
-#~ msgstr "Autorska prava (c) Transmission projekt"
 
 #, c-format
 #~ msgid "Couldn't bind port %d on %s: %s"
@@ -2566,19 +2545,12 @@ msgstr[2] ""
 #~ msgstr "Nemoguće spremiti datoteku \"%1$s\": %2$s"
 
 #, c-format
-#~ msgid "Couldn't save temporary file \"%1$s\": %2$s"
-#~ msgstr "Nemoguće spremiti privremenu datoteku \"%1$s\": %2$s"
-
-#, c-format
 #~ msgid "Couldn't set source address %s on %<PRIdMAX>: %s"
 #~ msgstr "Nemoguće postavljanje adrese %s na %<PRIdMAX>: %s"
 
 #, c-format
 #~ msgid "Couldn't truncate \"%1$s\": %2$s"
 #~ msgstr "Nije moguće isprazniti \"%1$s\": %2$s"
-
-#~ msgid "Create a torrent"
-#~ msgstr "_Stvori torrent"
 
 #, c-format
 #~ msgid "Created \"%s\"!"
@@ -2599,13 +2571,6 @@ msgstr[2] ""
 #, c-format
 #~ msgid "Creating \"%s\""
 #~ msgstr "Stvaranje \"%s\""
-
-#, c-format
-#~ msgid "DNS Lookup failed: %s"
-#~ msgstr "DNS pretraga neuspjela: %s"
-
-#~ msgid "Dese_lect All"
-#~ msgstr "Ukl_oni odabir"
 
 #, c-format
 #~ msgid "Do_wnload (%s):"
@@ -2634,9 +2599,6 @@ msgstr[2] ""
 #~ msgid "Downloading metadata from %1$'d %2$s (%3$d%% done)"
 #~ msgstr "Preuzimanje metapodataka s %1$'d %2$s (%3$d%% završeno)"
 
-#~ msgid "Enable Alternative Speed _Limits"
-#~ msgstr "Omogući a_lternativna ograničenja brzine"
-
 #~ msgid "Error opening torrent"
 #~ msgstr "Greška pri otvaranju torrenta"
 
@@ -2649,8 +2611,8 @@ msgstr[2] ""
 #~ msgstr "Greška registracije Transmissiona kao %s rukovatelja: %s"
 
 #, c-format
-#~ msgid "Error uncompressing blocklist: %s (%d)"
-#~ msgstr "Greška raspakiravanja popisa blokiranih: %s (%d)"
+#~ msgid "Error saving \"%*.*s\": %s (%d)"
+#~ msgstr "Greška spremanja \"%*.*s\": %s (%d)"
 
 #, c-format
 #~ msgid "Error writing \"%s\": %s"
@@ -2667,10 +2629,6 @@ msgstr[2] ""
 #, c-format
 #~ msgid "Failed to set piece size to %s, leaving it at %s"
 #~ msgstr "Neuspjelo postavljanje veličine djelića na %s, ostavljam na %s"
-
-#, c-format
-#~ msgid "File \"%s\" is in the way"
-#~ msgstr "Smeta datoteka \"%s\""
 
 #, c-format
 #~ msgid "Found Internet Gateway Device \"%s\""
@@ -2698,10 +2656,6 @@ msgstr[2] ""
 #~ msgid "Idle"
 #~ msgstr "Mirovanje"
 
-#, c-format
-#~ msgid "Invalid metadata entry \"%s\""
-#~ msgstr "Nevažeći unos metapodatka \"%s\""
-
 #~ msgid "Is another copy of Transmission already running?"
 #~ msgstr "Je li druga kopija Transmissiona već pokrenuta?"
 
@@ -2721,29 +2675,11 @@ msgstr[2] ""
 #~ msgid "Local Address is \"%s\""
 #~ msgstr "Lokalna adresa je \"%s\""
 
-#~ msgid "Magnet torrent's metadata is not usable"
-#~ msgstr "Meta podaci magnetnih torrenta nisu upotrebljivi"
-
-#~ msgid "Message _Log"
-#~ msgstr "_Zapisnik poruka"
-
 #~ msgid "Mo_ve .torrent file to the trash"
 #~ msgstr "Pre_mjesti .torrent datoteku u smeće"
 
 #~ msgid "Monday"
 #~ msgstr "Ponedjeljak"
-
-#~ msgid "Move _Down"
-#~ msgstr "Pomakni _dolje"
-
-#~ msgid "Move _Up"
-#~ msgstr "Pomakni _gore"
-
-#~ msgid "Move to _Bottom"
-#~ msgstr "Pomakni na  dn_o"
-
-#~ msgid "Move to _Top"
-#~ msgstr "Pomakni na _vrh"
 
 #, c-format
 #~ msgid "Moving \"%s\""
@@ -2752,27 +2688,6 @@ msgstr[2] ""
 #~ msgid "Not a regular file"
 #~ msgstr "Nije regularna datoteka"
 
-#~ msgid "Notable features of Transmission include support for Local Peer Discovery, encryption, DHT, µTP, PEX and Magnet Link."
-#~ msgstr "Bitne značajke Transmissiona uključuju podršku za lokalno otkrivanje točaka, šifriranje, DHT, µTP, PEX i Magnetne poveznice."
-
-#~ msgid "Open Fold_er"
-#~ msgstr "Otvori _mapu"
-
-#~ msgid "Open URL…"
-#~ msgstr "Otvori URL…"
-
-#~ msgid "Open _URL…"
-#~ msgstr "Otvori _URL…"
-
-#~ msgid "Open a torrent"
-#~ msgstr "Otvori torrent"
-
-#~ msgid "Pause all torrents"
-#~ msgstr "_Pauziraj sve torrente"
-
-#~ msgid "Pause torrent"
-#~ msgstr "Pauziraj torrent"
-
 #, c-format
 #~ msgid "Peer list request %1$stimed out%2$s %3$s ago; will retry"
 #~ msgstr "Zahtjev popisa točaka %1$sistekao%2$s prije %3$s; slijedi ponovni pokušaj"
@@ -2780,10 +2695,6 @@ msgstr[2] ""
 #, c-format
 #~ msgid "Piece %<PRIu32>, which was just downloaded, failed its checksum test"
 #~ msgstr "Dijelić %<PRIu32>, koji je upravo preuzet, neuspio test kontrolnog zbroja"
-
-#, c-format
-#~ msgid "Please Verify Local Data! Piece #%zu is corrupt."
-#~ msgstr "Provjerite lokalne podatke! Dio #%zu je oštećen."
 
 #, c-format
 #~ msgid "Port %d forwarded successfully"
@@ -2819,18 +2730,9 @@ msgstr[2] ""
 #~ msgid "Preallocated file \"%1$s\" (%2$s, size: %3$<PRIu64>)"
 #~ msgstr "Unaprijed zauzeta datoteka \"%1$s\" (%2$s, veličina: %3$<PRIu64>)"
 
-#~ msgid "Present Main Window"
-#~ msgstr "Predstavi glavni prozor"
-
 #, c-format
 #~ msgid "Ratio: %s"
 #~ msgstr "Omjer: %s"
-
-#~ msgid "Re_verse Sort Order"
-#~ msgstr "Ob_rnuti redoslijed razvrstavanja"
-
-#~ msgid "Remove torrent"
-#~ msgstr "Ukloni torrent"
 
 #~ msgid "Saturday"
 #~ msgstr "Subota"
@@ -2854,9 +2756,6 @@ msgstr[2] ""
 #~ msgstr[1] "Dijeljenje %1$'d od %2$'d povezane točke"
 #~ msgstr[2] "Dijeljenje %1$'d od %2$'d povezanih točaka"
 
-#~ msgid "Select _All"
-#~ msgstr "Odaberi _sve"
-
 #, c-format
 #~ msgid "Serving RPC and Web requests from directory '%s'"
 #~ msgstr "Posluživanje RPC i web zahtjeva iz direktorija '%s'"
@@ -2865,51 +2764,9 @@ msgstr[2] ""
 #~ msgid "Serving RPC and Web requests on %s:%d%s"
 #~ msgstr "Posluživanje RPC i Web zahtjeva na %s:%d%s"
 
-#~ msgid "Set _Location…"
-#~ msgstr "Postavi _lokaciju..."
-
 #, c-format
 #~ msgid "Skipping unknown torrent \"%s\""
 #~ msgstr "Preskakanje nepoznator torrenta \"%s\""
-
-#~ msgid "Sort by A_ge"
-#~ msgstr "Razvrstaj po s_tarosti"
-
-#~ msgid "Sort by Rati_o"
-#~ msgstr "Razvrstaj po omjer_u"
-
-#~ msgid "Sort by Si_ze"
-#~ msgstr "Razvrstaj po veli_čini"
-
-#~ msgid "Sort by Stat_e"
-#~ msgstr "Razvrstaj po stanj_u"
-
-#~ msgid "Sort by Time _Left"
-#~ msgstr "Razvrstaj po preostalom _vremenu"
-
-#~ msgid "Sort by _Activity"
-#~ msgstr "Razvrstaj po _aktivnosti"
-
-#~ msgid "Sort by _Name"
-#~ msgstr "Razvrstaj po _nazivu"
-
-#~ msgid "Sort by _Progress"
-#~ msgstr "Razvrstaj po _napretku"
-
-#~ msgid "Sort by _Queue"
-#~ msgstr "Razvrstaj po _redu čekanja"
-
-#~ msgid "Start _Now"
-#~ msgstr "Pokre_ni odmah"
-
-#~ msgid "Start all torrents"
-#~ msgstr "Pokreni sve torrente"
-
-#~ msgid "Start torrent"
-#~ msgstr "Pokreni torrent"
-
-#~ msgid "Start torrent now"
-#~ msgstr "Pokreni torrent odmah"
 
 #, c-format
 #~ msgid "Started %'d time"
@@ -2937,20 +2794,8 @@ msgstr[2] ""
 #~ msgstr "Nedjelja"
 
 #, c-format
-#~ msgid "The torrent file \"%s\" contains invalid data."
-#~ msgstr "Torrent datoteka \"%s\" sadrži nevažeće podatke."
-
-#, c-format
-#~ msgid "The torrent file \"%s\" encountered an unknown error."
-#~ msgstr "Torrent datoteka \"%s\" se susrela s nepoznatom greškom."
-
-#, c-format
 #~ msgid "The torrent file \"%s\" is already in use by \"%s.\""
 #~ msgstr "Torrent datoteku \"%s\" već koristi \"%s.\""
-
-#, c-format
-#~ msgid "This magnet link appears to be intended for something other than BitTorrent. BitTorrent magnet links have a section containing \"%s\"."
-#~ msgstr "Čini se da je ova magnetna poveznica namijenjena za nešto drugo, a ne za BitTorrent. BitTorrent magnetne poveznice imaju dio koji sadrži \"%s\"."
 
 #~ msgid "Thursday"
 #~ msgstr "Četvrtak"
@@ -2966,17 +2811,6 @@ msgstr[2] ""
 #~ msgid "Torrent Creator is skipping file \"%s\": %s"
 #~ msgstr "Stvaratelj torrenta preskače datoteku \"%s\": %s"
 
-#~ msgid "Torrent properties"
-#~ msgstr "Svojstva torrenta"
-
-#, c-format
-#~ msgid "Tracker error: \"%s\""
-#~ msgstr "Greška pratitelja: \"%s\""
-
-#, c-format
-#~ msgid "Tracker gave HTTP response code %1$ld (%2$s)"
-#~ msgstr "Pratitelj vraća HTTP kôd odgovora %1$ld (%2$s)"
-
 #, c-format
 #~ msgid "Tracker gave a warning: \"%s\""
 #~ msgstr "Pratitelj je dao upozorenje: \"%s\""
@@ -2988,14 +2822,6 @@ msgstr[2] ""
 #, c-format
 #~ msgid "Tracker had %s%'d seeders and %'d leechers%s %s ago"
 #~ msgstr "Pratitelj je imao %s%'d dijelitelja i %'d preuzimatelja%s prije %s"
-
-#, c-format
-#~ msgid "Tracker warning: \"%s\""
-#~ msgstr "Upozorenje pratitelja: \"%s\""
-
-#, c-format
-#~ msgid "Tracker will allow requests in %s"
-#~ msgstr "Pratitelj će dopustiti zahtjeve za %s"
 
 #, c-format
 #~ msgid ""
@@ -3011,18 +2837,12 @@ msgstr[2] ""
 #~ msgid "Transmission doesn't know how to use \"%s\""
 #~ msgstr "Transmission ne zna kako koristiti \"%s\""
 
-#~ msgid "Transmission is a BitTorrent client with an easy-to-use frontend on top a cross-platform backend. Native frontends are available for OS X and Windows, as well as command line and web frontends."
-#~ msgstr "Transmission je BitTorrent klijent s jednostavnim korisničkim sučeljem povrh višeplatformske pozadine. Izvorna korisnička sučelja su dostupna za OS X i Windowse, kao i naredbeni redak i web sučelja."
-
 #~ msgid "Tuesday"
 #~ msgstr "Utorak"
 
 #, c-format
 #~ msgid "U_pload (%s):"
 #~ msgstr "Sla_nje (%s):"
-
-#~ msgid "Unable to parse file content"
-#~ msgstr "Neuspjela obrada sadržaja datoteke"
 
 #, c-format
 #~ msgid "Unable to rename file as \"%s\": %s"
@@ -3041,89 +2861,17 @@ msgstr[2] ""
 #~ msgid "Wednesday"
 #~ msgstr "Srijeda"
 
-#~ msgid "_About"
-#~ msgstr "_O programu"
-
-#~ msgid "_Compact View"
-#~ msgstr "_Zbijen pogled"
-
-#~ msgid "_Contents"
-#~ msgstr "_Priručnik"
-
-#~ msgid "_Delete Files and Remove"
-#~ msgstr "_Obriši i ukloni datoteke"
-
-#~ msgid "_Donate"
-#~ msgstr "_Doniraj"
-
 #, c-format
 #~ msgid "_Download (%s):"
 #~ msgstr "_Preuzimanje (%s):"
-
-#~ msgid "_File"
-#~ msgstr "_Datoteka"
-
-#~ msgid "_Filterbar"
-#~ msgstr "_Filter traka"
-
-#~ msgid "_New…"
-#~ msgstr "_Novi…"
-
-#~ msgid "_Pause"
-#~ msgstr "_Pauza"
-
-#~ msgid "_Pause All"
-#~ msgstr "_Pauziraj sve"
-
-#~ msgid "_Preferences"
-#~ msgstr "_Osobitosti"
-
-#~ msgid "_Properties"
-#~ msgstr "_Svojstva"
-
-#~ msgid "_Queue"
-#~ msgstr "_Red čekanja"
-
-#~ msgid "_Quit"
-#~ msgstr "_Izlaz"
 
 #, c-format
 #~ msgid "_Show %'d of:"
 #~ msgstr "_Prikaži %'d od:"
 
-#~ msgid "_Show Transmission"
-#~ msgstr "_Prikaži Transmission"
-
-#~ msgid "_Sort Torrents By"
-#~ msgstr "_Razvrstaj torrente po"
-
-#~ msgid "_Start"
-#~ msgstr "_Pokreni"
-
-#~ msgid "_Start All"
-#~ msgstr "_Pokreni sve"
-
-#~ msgid "_Statistics"
-#~ msgstr "_Statistike"
-
-#~ msgid "_Statusbar"
-#~ msgstr "_Statusna traka"
-
-#~ msgid "_Toolbar"
-#~ msgstr "_Alatna traka"
-
-#~ msgid "_Torrent"
-#~ msgstr "_Torrent"
-
 #, c-format
 #~ msgid "_Upload (%s):"
 #~ msgstr "_Slanje (%s):"
-
-#~ msgid "_Verify Local Data"
-#~ msgstr "_Provjeri lokalne podatke"
-
-#~ msgid "_View"
-#~ msgstr "P_ogled"
 
 #, c-format
 #~ msgid "blocklist skipped invalid address at line %d"
@@ -3144,7 +2892,7 @@ msgstr[2] ""
 
 #, c-format
 #~ msgid "size|Down: %1$s, Up: %2$s"
-#~ msgstr "veličina|Preuzimanje: %1$s, Slanje: %2$s"
+#~ msgstr "Preuzimanje: %1$s, Slanje: %2$s"
 
 #~ msgid "sparse"
 #~ msgstr "djelomično"

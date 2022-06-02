@@ -4,17 +4,17 @@
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 # Translators:
-# Mike Gelfand <mikedld@mikedld.com>, 2017
-# Andika Triwidada <andika@gmail.com>, 2021
+# Andika Triwidada <andika@gmail.com>, 2022
+# Mike Gelfand <mikedld@mikedld.com>, 2022
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-06-02 23:47+0100\n"
+"POT-Creation-Date: 2022-06-03 00:09+0100\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Andika Triwidada <andika@gmail.com>, 2021\n"
+"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2022\n"
 "Language-Team: Indonesian (https://www.transifex.com/transmissionbt/teams/33778/id/)\n"
 "Language: id\n"
 "MIME-Version: 1.0\n"
@@ -144,7 +144,7 @@ msgstr "Aplikasi BitTorrent yang cepat dan mudah"
 
 #: ../gtk/Application.cc:1289
 msgid "Copyright © The Transmission Project"
-msgstr ""
+msgstr "Hak Cipta © Proyek Transmission"
 
 #. Translators: translate "translator-credits" as your name
 #. to have it appear in the credits in the "About"
@@ -939,7 +939,7 @@ msgstr "K_omentar:"
 
 #: ../gtk/MakeDialog.cc:538
 msgid "_Source:"
-msgstr ""
+msgstr "_Sumber:"
 
 #: ../gtk/MakeDialog.cc:545
 msgid "_Private torrent"
@@ -1007,7 +1007,7 @@ msgstr "Torrent Selesai"
 
 #: ../gtk/Notify.cc:238
 msgid "Start Now"
-msgstr ""
+msgstr "Mulai Sekarang"
 
 #: ../gtk/Notify.cc:250
 msgid "Torrent Added"
@@ -2268,8 +2268,8 @@ msgstr[0] ""
 #~ msgstr "%1$s (%2$s%%)"
 
 #, c-format
-#~ msgid "%1$s (+%2$s corrupt)"
-#~ msgstr "%1$s (+%2$s rusak)"
+#~ msgid "%1$s (+%2$s discarded after failed checksum)"
+#~ msgstr "%1$s (+%2$s dibuang setelah checksum gagal)"
 
 #, c-format
 #~ msgid "%1$s ago"
@@ -2325,14 +2325,6 @@ msgstr[0] ""
 #~ msgstr "%s bebas"
 
 #, c-format
-#~ msgid "%s is not a valid address"
-#~ msgstr "%s bukan alamat yang valid"
-
-#, c-format
-#~ msgid "%s is not an IPv4 or IPv6 address. RPC listeners must be IPv4 or IPv6"
-#~ msgstr "%s bukan alamat IPv4 atau IPv6. Pendengar RPC harus IPv4 atau IPv6"
-
-#, c-format
 #~ msgid "%s remaining"
 #~ msgstr "%s lagi"
 
@@ -2355,9 +2347,6 @@ msgstr[0] ""
 #~ msgid "<i>Testing TCP port…</i>"
 #~ msgstr "<i>Menguji port TCP…</i>"
 
-#~ msgid "Ask Tracker for _More Peers"
-#~ msgstr "Tanyakan Penjejak untuk _Peer yang lebih banyak"
-
 #, c-format
 #~ msgid "Asking for more peers in %s"
 #~ msgstr "Meminta lebih banyak peer dalam %s"
@@ -2377,9 +2366,6 @@ msgstr[0] ""
 #~ msgid "Automatically add .torrent files _from:"
 #~ msgstr "Secara otomatis menambahkan _berkas .torrent dari:"
 
-#~ msgid "BitTorrent is a peer-to-peer file-sharing protocol that is commonly used to distribute large amounts of data between multiple users."
-#~ msgstr "BitTorrent adalah protokol berbagi berkas peer-to-peer yang biasanya digunakan untuk mendistribusikan sejumlah besar data antara banyak pengguna."
-
 #, c-format
 #~ msgid "Blocklist \"%s\" contains %zu entries"
 #~ msgstr "Daftar blok \"%s\" memuat %zu entri"
@@ -2397,9 +2383,6 @@ msgstr[0] ""
 #~ msgid "Blocklist has %'d rule."
 #~ msgid_plural "Blocklist has %'d rules."
 #~ msgstr[0] "Daftar blok punya %'d aturan."
-
-#~ msgid "Call scrip_t when torrent is completed:"
-#~ msgstr "Panggil skrip ke_tika torrent komplit:"
 
 #, c-format
 #~ msgid ""
@@ -2419,12 +2402,6 @@ msgstr[0] ""
 
 #~ msgid "Complete"
 #~ msgstr "Komplit"
-
-#~ msgid "Copy _Magnet Link to Clipboard"
-#~ msgstr "Salin _Magnet Link ke Papan Klip"
-
-#~ msgid "Copyright (c) The Transmission Project"
-#~ msgstr "Hak Cipta (c) The Transmission Project"
 
 #, c-format
 #~ msgid "Couldn't bind port %d on %s: %s"
@@ -2483,19 +2460,12 @@ msgstr[0] ""
 #~ msgstr "Tak bisa menyimpan berkas \"%1$s\": %2$s"
 
 #, c-format
-#~ msgid "Couldn't save temporary file \"%1$s\": %2$s"
-#~ msgstr "Tak bisa menyimpan berkas temporer \"%1$s\": %2$s"
-
-#, c-format
 #~ msgid "Couldn't set source address %s on %<PRIdMAX>: %s"
 #~ msgstr "Tidak dapat menetapkan alamat sumber %s pada %<PRIdMAX>: %s"
 
 #, c-format
 #~ msgid "Couldn't truncate \"%1$s\": %2$s"
 #~ msgstr "Tak bisa memotong \"%1$s\": %2$s"
-
-#~ msgid "Create a torrent"
-#~ msgstr "Buat Torrent"
 
 #, c-format
 #~ msgid "Created \"%s\"!"
@@ -2516,13 +2486,6 @@ msgstr[0] ""
 #, c-format
 #~ msgid "Creating \"%s\""
 #~ msgstr "Membuat \"%s\""
-
-#, c-format
-#~ msgid "DNS Lookup failed: %s"
-#~ msgstr "Pencarian DNS gagal: %s"
-
-#~ msgid "Dese_lect All"
-#~ msgstr "Kosongkan semua pi_lihan"
 
 #, c-format
 #~ msgid "Do_wnload (%s):"
@@ -2551,9 +2514,6 @@ msgstr[0] ""
 #~ msgid "Downloading metadata from %1$'d %2$s (%3$d%% done)"
 #~ msgstr "Mengunduh metadata dari %1$'d %2$s(%3$d%% selesai)"
 
-#~ msgid "Enable Alternative Speed _Limits"
-#~ msgstr "Fungsikan Batas Kecepatan A_lternatif"
-
 #~ msgid "Error opening torrent"
 #~ msgstr "Gagal membuka torrent"
 
@@ -2564,10 +2524,6 @@ msgstr[0] ""
 #, c-format
 #~ msgid "Error registering Transmission as a %s handler: %s"
 #~ msgstr "Galat saat mendaftarkan Transmission sebagai suatu %s penangan: %s"
-
-#, c-format
-#~ msgid "Error uncompressing blocklist: %s (%d)"
-#~ msgstr "Galat saat membuka blokir yang terkompresi:%s (%d)"
 
 #, c-format
 #~ msgid "Error writing \"%s\": %s"
@@ -2584,10 +2540,6 @@ msgstr[0] ""
 #, c-format
 #~ msgid "Failed to set piece size to %s, leaving it at %s"
 #~ msgstr "Gagal mengatur ukuran potongan menjadi %s, membiarkannya pada %s"
-
-#, c-format
-#~ msgid "File \"%s\" is in the way"
-#~ msgstr "Berkas \"%s\" menghalangi"
 
 #, c-format
 #~ msgid "Found Internet Gateway Device \"%s\""
@@ -2615,10 +2567,6 @@ msgstr[0] ""
 #~ msgid "Idle"
 #~ msgstr "Mengganggur"
 
-#, c-format
-#~ msgid "Invalid metadata entry \"%s\""
-#~ msgstr "Entri metadata \"%s\" tak valid"
-
 #~ msgid "Is another copy of Transmission already running?"
 #~ msgstr "Apakah salinan lain Transmission sedang berjalan?"
 
@@ -2638,29 +2586,11 @@ msgstr[0] ""
 #~ msgid "Local Address is \"%s\""
 #~ msgstr "Alamat lokal adalah \"%s\""
 
-#~ msgid "Magnet torrent's metadata is not usable"
-#~ msgstr "Metadata magnet torrent tidak dapat digunakan"
-
-#~ msgid "Message _Log"
-#~ msgstr "_Log Pesan"
-
 #~ msgid "Mo_ve .torrent file to the trash"
 #~ msgstr "Pindahkan berkas .torrent ke tong _sampah"
 
 #~ msgid "Monday"
 #~ msgstr "Senin"
-
-#~ msgid "Move _Down"
-#~ msgstr "Tur_unkan"
-
-#~ msgid "Move _Up"
-#~ msgstr "Nai_kkan"
-
-#~ msgid "Move to _Bottom"
-#~ msgstr "Pindah ke _Dasar"
-
-#~ msgid "Move to _Top"
-#~ msgstr "Pindah ke _Puncak"
 
 #, c-format
 #~ msgid "Moving \"%s\""
@@ -2669,27 +2599,6 @@ msgstr[0] ""
 #~ msgid "Not a regular file"
 #~ msgstr "Bukan berkas biasa"
 
-#~ msgid "Notable features of Transmission include support for Local Peer Discovery, encryption, DHT, µTP, PEX and Magnet Link."
-#~ msgstr "Fitur-fitur penting Transmission termasuk dukungan untuk Local Peer Discovery, enkripsi, DHT, TP, PEX, dan Magnet Link."
-
-#~ msgid "Open Fold_er"
-#~ msgstr "Buka Fold_er"
-
-#~ msgid "Open URL…"
-#~ msgstr "Open URL…"
-
-#~ msgid "Open _URL…"
-#~ msgstr "Buka _URL…"
-
-#~ msgid "Open a torrent"
-#~ msgstr "Buka suatu torrent"
-
-#~ msgid "Pause all torrents"
-#~ msgstr "Istirahat Semua Torrents"
-
-#~ msgid "Pause torrent"
-#~ msgstr "_Hentikan torrent sementara"
-
 #, c-format
 #~ msgid "Peer list request %1$stimed out%2$s %3$s ago; will retry"
 #~ msgstr "Permintaan daftar peer %1$shabis waktu%2$s %3$s yang lalu; akan coba lagi"
@@ -2697,10 +2606,6 @@ msgstr[0] ""
 #, c-format
 #~ msgid "Piece %<PRIu32>, which was just downloaded, failed its checksum test"
 #~ msgstr "Sepotong %<PRIu32>, yang baru saja diunduh, gagal dalam ujian checksum"
-
-#, c-format
-#~ msgid "Please Verify Local Data! Piece #%zu is corrupt."
-#~ msgstr "Harap Verifikasi Data Lokal! Potongan #%zu rusak."
 
 #, c-format
 #~ msgid "Port %d forwarded successfully"
@@ -2736,18 +2641,9 @@ msgstr[0] ""
 #~ msgid "Preallocated file \"%1$s\" (%2$s, size: %3$<PRIu64>)"
 #~ msgstr "Berkas terpraalokasikan \"%1$s\" (%2$s, ukuran: %3$<PRIu64>)"
 
-#~ msgid "Present Main Window"
-#~ msgstr "Sajikan Jendela Utama"
-
 #, c-format
 #~ msgid "Ratio: %s"
 #~ msgstr "Rasio: %s"
-
-#~ msgid "Re_verse Sort Order"
-#~ msgstr "_Balikkan Urutan"
-
-#~ msgid "Remove torrent"
-#~ msgstr "Hapus torrent"
 
 #~ msgid "Saturday"
 #~ msgstr "Sabtu"
@@ -2769,9 +2665,6 @@ msgstr[0] ""
 #~ msgid_plural "Seeding to %1$'d of %2$'d connected peers"
 #~ msgstr[0] "Membibit ke %1$'d dari %2$'d peer terhubung"
 
-#~ msgid "Select _All"
-#~ msgstr "Pilih Semu_a"
-
 #, c-format
 #~ msgid "Serving RPC and Web requests from directory '%s'"
 #~ msgstr "Melayani permintaan RPC dan Web dari direktori '%s'"
@@ -2780,51 +2673,9 @@ msgstr[0] ""
 #~ msgid "Serving RPC and Web requests on %s:%d%s"
 #~ msgstr "Melayani permintaan RPC dan Web pada %s:%d%s"
 
-#~ msgid "Set _Location…"
-#~ msgstr "Tata _Lokasi…"
-
 #, c-format
 #~ msgid "Skipping unknown torrent \"%s\""
 #~ msgstr "Melewati torrent \"%s\" yang tak dikenal"
-
-#~ msgid "Sort by A_ge"
-#~ msgstr "Urut U_mur"
-
-#~ msgid "Sort by Rati_o"
-#~ msgstr "Urut Rasi_o"
-
-#~ msgid "Sort by Si_ze"
-#~ msgstr "Urut _Ukuran"
-
-#~ msgid "Sort by Stat_e"
-#~ msgstr "Urut K_eadaan"
-
-#~ msgid "Sort by Time _Left"
-#~ msgstr "Urut Sisa _Waktu"
-
-#~ msgid "Sort by _Activity"
-#~ msgstr "Urut _Aktivitas"
-
-#~ msgid "Sort by _Name"
-#~ msgstr "Urut _Nama"
-
-#~ msgid "Sort by _Progress"
-#~ msgstr "Urut _Kemajuan"
-
-#~ msgid "Sort by _Queue"
-#~ msgstr "Urut Ant_rian"
-
-#~ msgid "Start _Now"
-#~ msgstr "Mulai Sekara_ng"
-
-#~ msgid "Start all torrents"
-#~ msgstr "Muali Semua Torrents"
-
-#~ msgid "Start torrent"
-#~ msgstr "Mulai torrent"
-
-#~ msgid "Start torrent now"
-#~ msgstr "Mulai torrent sekarang"
 
 #, c-format
 #~ msgid "Started %'d time"
@@ -2850,20 +2701,8 @@ msgstr[0] ""
 #~ msgstr "Minggu"
 
 #, c-format
-#~ msgid "The torrent file \"%s\" contains invalid data."
-#~ msgstr "Berkas torrent \"%s\" mengandung data yang tidak valid."
-
-#, c-format
-#~ msgid "The torrent file \"%s\" encountered an unknown error."
-#~ msgstr "Berkas torrent \"%s\" menemui galat yang tak dikenal."
-
-#, c-format
 #~ msgid "The torrent file \"%s\" is already in use by \"%s.\""
 #~ msgstr "Berkas torrent \"%s\" sedang dipakai oleh \"%s\"."
-
-#, c-format
-#~ msgid "This magnet link appears to be intended for something other than BitTorrent. BitTorrent magnet links have a section containing \"%s\"."
-#~ msgstr "Magnet link ini nampaknya ditujukan bagi sesuatu selain BitTorrent. Magnet link BitTorrent memiliki seksi yang memuat \"%s\"."
 
 #~ msgid "Thursday"
 #~ msgstr "Kamis"
@@ -2879,17 +2718,6 @@ msgstr[0] ""
 #~ msgid "Torrent Creator is skipping file \"%s\": %s"
 #~ msgstr "Pembuat Torrent melewati berkas \"%s\": %s"
 
-#~ msgid "Torrent properties"
-#~ msgstr "Properti torrent"
-
-#, c-format
-#~ msgid "Tracker error: \"%s\""
-#~ msgstr "Galat pelacak: \"%s\""
-
-#, c-format
-#~ msgid "Tracker gave HTTP response code %1$ld (%2$s)"
-#~ msgstr "Pelacak memberi kode respon HTTP %1$ld (%2$s)"
-
 #, c-format
 #~ msgid "Tracker gave a warning: \"%s\""
 #~ msgstr "Pelacak memberi peringatan: \"%s\""
@@ -2901,14 +2729,6 @@ msgstr[0] ""
 #, c-format
 #~ msgid "Tracker had %s%'d seeders and %'d leechers%s %s ago"
 #~ msgstr "Pelacak punya %s%'d pembibit dan %'d penyedot%s %s yang lalu"
-
-#, c-format
-#~ msgid "Tracker warning: \"%s\""
-#~ msgstr "Peringatan pelacak: \"%s\""
-
-#, c-format
-#~ msgid "Tracker will allow requests in %s"
-#~ msgstr "Pelacak akan mengijinkan permintaan dalam %s"
 
 #, c-format
 #~ msgid ""
@@ -2924,18 +2744,12 @@ msgstr[0] ""
 #~ msgid "Transmission doesn't know how to use \"%s\""
 #~ msgstr "Transmission tak tahu bagaimana memakai \"%s\""
 
-#~ msgid "Transmission is a BitTorrent client with an easy-to-use frontend on top a cross-platform backend. Native frontends are available for OS X and Windows, as well as command line and web frontends."
-#~ msgstr "Transmission adalah klien BitTorrent dengan frontend yang mudah digunakan di atas backend lintas platform. Frontend asli tersedia untuk OS X dan Windows, maupun frontend baris perintah dan web."
-
 #~ msgid "Tuesday"
 #~ msgstr "Selasa"
 
 #, c-format
 #~ msgid "U_pload (%s):"
 #~ msgstr "U_nggah (%s):"
-
-#~ msgid "Unable to parse file content"
-#~ msgstr "Tidak dapat menguraikan konten berkas"
 
 #, c-format
 #~ msgid "Unable to rename file as \"%s\": %s"
@@ -2954,89 +2768,17 @@ msgstr[0] ""
 #~ msgid "Wednesday"
 #~ msgstr "Rabu"
 
-#~ msgid "_About"
-#~ msgstr "Perih_al"
-
-#~ msgid "_Compact View"
-#~ msgstr "Tilikan _Kompak"
-
-#~ msgid "_Contents"
-#~ msgstr "I_si"
-
-#~ msgid "_Delete Files and Remove"
-#~ msgstr "Hapus _dan Musnahkan Berkas"
-
-#~ msgid "_Donate"
-#~ msgstr "_Donasi"
-
 #, c-format
 #~ msgid "_Download (%s):"
 #~ msgstr "Un_duh (%s):"
-
-#~ msgid "_File"
-#~ msgstr "_Berkas"
-
-#~ msgid "_Filterbar"
-#~ msgstr "Bilah Pe_nyaring"
-
-#~ msgid "_New…"
-#~ msgstr "Bar_u…"
-
-#~ msgid "_Pause"
-#~ msgstr "_Stop"
-
-#~ msgid "_Pause All"
-#~ msgstr "_Istirahat Semua"
-
-#~ msgid "_Preferences"
-#~ msgstr "_Preferensi"
-
-#~ msgid "_Properties"
-#~ msgstr "_Properti"
-
-#~ msgid "_Queue"
-#~ msgstr "_Antrian"
-
-#~ msgid "_Quit"
-#~ msgstr "Keluar"
 
 #, c-format
 #~ msgid "_Show %'d of:"
 #~ msgstr "_Tampilkan %'d dari:"
 
-#~ msgid "_Show Transmission"
-#~ msgstr "Tampilkan Tran_smission"
-
-#~ msgid "_Sort Torrents By"
-#~ msgstr "Urut Torrent Berda_sar"
-
-#~ msgid "_Start"
-#~ msgstr "_Mulai"
-
-#~ msgid "_Start All"
-#~ msgstr "Mulai _Semua"
-
-#~ msgid "_Statistics"
-#~ msgstr "_Statistik"
-
-#~ msgid "_Statusbar"
-#~ msgstr "Bilah _Status"
-
-#~ msgid "_Toolbar"
-#~ msgstr "Bilat Ala_t"
-
-#~ msgid "_Torrent"
-#~ msgstr "_Torrent"
-
 #, c-format
 #~ msgid "_Upload (%s):"
 #~ msgstr "_Unggah (%s):"
-
-#~ msgid "_Verify Local Data"
-#~ msgstr "Pe_riksa Data Lokal"
-
-#~ msgid "_View"
-#~ msgstr "_Tilik"
 
 #, c-format
 #~ msgid "blocklist skipped invalid address at line %d"
@@ -3055,7 +2797,7 @@ msgstr[0] ""
 
 #, c-format
 #~ msgid "size|Down: %1$s, Up: %2$s"
-#~ msgstr "size|Unduh: %1$s, Unggah: %2$s"
+#~ msgstr "Unduh: %1$s, Unggah: %2$s"
 
 #~ msgid "sparse"
 #~ msgstr "sparse"

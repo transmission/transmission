@@ -5,24 +5,23 @@
 #
 # Translators:
 # c2ed1e40dec4c77110b8433ca0e8b4a8_488379a <85dd5f0e022835b2532b5ca0658d8435_534014>, 2017
-# Mike Gelfand <mikedld@mikedld.com>, 2020
-# Milo Casagrande <milo@ubuntu.com>, 2020
-# Joe Mauri <asbruff@gmail.com>, 2021
+# Milo Casagrande <milo@ubuntu.com>, 2022
+# Mike Gelfand <mikedld@mikedld.com>, 2022
 #
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-06-02 23:47+0100\n"
+"POT-Creation-Date: 2022-06-03 00:09+0100\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
-"Last-Translator: Joe Mauri <asbruff@gmail.com>, 2021\n"
+"Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2022\n"
 "Language-Team: Italian (https://www.transifex.com/transmissionbt/teams/33778/it/)\n"
 "Language: it\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Plural-Forms: nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;\n"
 
 #: ../cli/cli.cc:105 ../gtk/Utils.cc:86 ../libtransmission/utils.cc:935
 msgid "None"
@@ -135,12 +134,14 @@ msgid "Couldn't add corrupt torrent"
 msgid_plural "Couldn't add corrupt torrents"
 msgstr[0] "Impossibile aggiungere un torrent danneggiato"
 msgstr[1] "Impossibile aggiungere torrent danneggiati"
+msgstr[2] "Impossibile aggiungere torrent danneggiati"
 
 #: ../gtk/Application.cc:970
 msgid "Couldn't add duplicate torrent"
 msgid_plural "Couldn't add duplicate torrents"
 msgstr[0] "Impossbile aggiungere un torrent duplicato"
 msgstr[1] "Impossbile aggiungere torrent duplicati"
+msgstr[2] "Impossbile aggiungere torrent duplicati"
 
 #: ../gtk/Application.cc:1288
 msgid "A fast and easy BitTorrent client"
@@ -148,7 +149,7 @@ msgstr "Un client BitTorrent semplice e veloce"
 
 #: ../gtk/Application.cc:1289
 msgid "Copyright © The Transmission Project"
-msgstr ""
+msgstr "Copyright © Il progetto Transmission"
 
 #. Translators: translate "translator-credits" as your name
 #. to have it appear in the credits in the "About"
@@ -325,12 +326,14 @@ msgid "{total_size} in {file_count:L} file"
 msgid_plural "{total_size} in {file_count:L} files"
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
 
 #: ../gtk/DetailsDialog.cc:885 ../gtk/MakeDialog.cc:361
 msgid "({piece_count} BitTorrent piece @ {piece_size})"
 msgid_plural "({piece_count} BitTorrent pieces @ {piece_size})"
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
 
 #: ../gtk/DetailsDialog.cc:929
 msgid "{current_size} ({percent_done}%)"
@@ -549,6 +552,7 @@ msgid "Got a list of {markup_begin}{peer_count} peer{markup_end} {time_span} ago
 msgid_plural "Got a list of {markup_begin}{peer_count} peers{markup_end} {time_span} ago"
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
 
 #. {markup_begin} and {markup_end} should surround the time_span
 #: ../gtk/DetailsDialog.cc:1948
@@ -587,12 +591,14 @@ msgid "seeder"
 msgid_plural "seeders"
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
 
 #: ../gtk/DetailsDialog.cc:2019
 msgid "leecher"
 msgid_plural "leechers"
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
 
 #. {markup_begin} and {markup_end} should surround the error text
 #: ../gtk/DetailsDialog.cc:2028
@@ -636,10 +642,12 @@ msgid ""
 "To add a backup URL, add it on the next line after a primary URL.\n"
 "To add a new primary URL, add it after a blank line."
 msgstr ""
+"Per aggiungere un URL di backup, aggiungerlo sulla nuova riga successivo dopo l'URL principale.\n"
+"Per aggiungere un nuovo URL principale, aggiungerlo dopo una riga vuota."
 
 #: ../gtk/DetailsDialog.cc:2378
 msgid "Also see Default Public Trackers in Edit > Preferences > Network"
-msgstr ""
+msgstr "Vedere anche «Server traccia pubblici predefiniti» in Modifica > Preferenze > Rete"
 
 #: ../gtk/DetailsDialog.cc:2456
 msgid "{torrent_name} - Add Tracker"
@@ -707,6 +715,7 @@ msgid "Properties - {torrent_count:L} Torrent"
 msgid_plural "Properties - {torrent_count:L} Torrents"
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
 
 #: ../gtk/Dialogs.cc:54
 #, c-format
@@ -714,6 +723,7 @@ msgid "Remove torrent?"
 msgid_plural "Remove %d torrents?"
 msgstr[0] "Rimuovere il torrent?"
 msgstr[1] "Rimuovere %d torrent?"
+msgstr[2] "Rimuovere %d torrent?"
 
 #: ../gtk/Dialogs.cc:55
 #, c-format
@@ -721,36 +731,42 @@ msgid "Delete this torrent's downloaded files?"
 msgid_plural "Delete these %d torrents' downloaded files?"
 msgstr[0] "Eliminare i file scaricati da questo torrent?"
 msgstr[1] "Eliminare %d file scaricati da questo torrent?"
+msgstr[2] "Eliminare %d file scaricati da questo torrent?"
 
 #: ../gtk/Dialogs.cc:62
 msgid "Once removed, continuing the transfer will require the torrent file or magnet link."
 msgid_plural "Once removed, continuing the transfers will require the torrent files or magnet links."
 msgstr[0] "Una volta rimosso, per continuare il trasferimento sarà necessario il file torrent o il collegamento magnetico."
 msgstr[1] "Una volta rimossi, per continuare il trasferimento saranno necessari i file torrent o i collegamenti magnetici."
+msgstr[2] "Una volta rimossi, per continuare il trasferimento saranno necessari i file torrent o i collegamenti magnetici."
 
 #: ../gtk/Dialogs.cc:69
 msgid "This torrent has not finished downloading."
 msgid_plural "These torrents have not finished downloading."
 msgstr[0] "Questo torrent non è stato completamente scaricato."
 msgstr[1] "Questi torrent non sono stati completamente scaricati."
+msgstr[2] "Questi torrent non sono stati completamente scaricati."
 
 #: ../gtk/Dialogs.cc:75
 msgid "This torrent is connected to peers."
 msgid_plural "These torrents are connected to peers."
 msgstr[0] "Questo torrent è connesso ai nodi."
 msgstr[1] "Questi torrent sono connessi ai nodi."
+msgstr[2] "Questi torrent sono connessi ai nodi."
 
 #: ../gtk/Dialogs.cc:82
 msgid "One of these torrents is connected to peers."
 msgid_plural "Some of these torrents are connected to peers."
 msgstr[0] "Uno di questi torrent è connesso ai nodi."
 msgstr[1] "Alcuni di questi torrent sono connessi ai nodi."
+msgstr[2] "Alcuni di questi torrent sono connessi ai nodi."
 
 #: ../gtk/Dialogs.cc:95
 msgid "One of these torrents has not finished downloading."
 msgid_plural "Some of these torrents have not finished downloading."
 msgstr[0] "Uno di questi torrent non è stato completamente scaricato."
 msgstr[1] "Alcuni di questi torrent non sono stati completamente scaricati."
+msgstr[2] "Alcuni di questi torrent non sono stati completamente scaricati."
 
 #: ../gtk/Dialogs.cc:115
 msgid "_Delete"
@@ -972,7 +988,7 @@ msgstr "Co_mmento:"
 
 #: ../gtk/MakeDialog.cc:538
 msgid "_Source:"
-msgstr ""
+msgstr "_Sorgente:"
 
 #: ../gtk/MakeDialog.cc:545
 msgid "_Private torrent"
@@ -1040,7 +1056,7 @@ msgstr "Torrent completato"
 
 #: ../gtk/Notify.cc:238
 msgid "Start Now"
-msgstr ""
+msgstr "Avvia ora"
 
 #: ../gtk/Notify.cc:250
 msgid "Torrent Added"
@@ -1154,7 +1170,7 @@ msgstr "Mantenere i _torrent non completi in:"
 
 #: ../gtk/PrefsDialog.cc:305
 msgid "Call scrip_t when done downloading:"
-msgstr ""
+msgstr "Eseguire script_t al termine dello scaricamento:"
 
 #: ../gtk/PrefsDialog.cc:324
 msgid "Limits"
@@ -1170,7 +1186,7 @@ msgstr "Fermare la distribuzione se inattivo per N _minuti:"
 
 #: ../gtk/PrefsDialog.cc:343
 msgid "Call scrip_t when done seeding:"
-msgstr ""
+msgstr "Eseguire scrip_t al termine della distribuzione:"
 
 #: ../gtk/PrefsDialog.cc:362 ../gtk/PrefsDialog.cc:1188
 msgid "Desktop"
@@ -1205,6 +1221,7 @@ msgid "Blocklist has {count:L} entry"
 msgid_plural "Blocklist has {count:L} entries"
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
 
 #: ../gtk/PrefsDialog.cc:448
 msgid "Blocklist updated!"
@@ -1440,7 +1457,7 @@ msgstr "LPD è uno strumento per trovare nodi sulla propria rete locale."
 
 #: ../gtk/PrefsDialog.cc:1111
 msgid "Default Public Trackers"
-msgstr ""
+msgstr "Server traccia pubblici predefiniti"
 
 #: ../gtk/PrefsDialog.cc:1115
 msgid ""
@@ -1449,6 +1466,10 @@ msgid ""
 "To add a backup URL, add it on the next line after a primary URL.\n"
 "To add a new primary URL, add it after a blank line."
 msgstr ""
+"Server traccia da usare per tutti i torrent pubblici.\n"
+"\n"
+"Per aggiungere un URL di backup, aggiungerlo sulla nuova riga successivo dopo l'URL principale.\n"
+"Per aggiungere un nuovo URL principale, aggiungerlo dopo una riga vuota."
 
 #: ../gtk/PrefsDialog.cc:1161
 msgid "Transmission Preferences"
@@ -1535,6 +1556,7 @@ msgid "Started {count:L} time"
 msgid_plural "Started {count:L} times"
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
 
 #: ../gtk/StatsDialog.cc:103
 msgid "Reset your statistics?"
@@ -1627,30 +1649,35 @@ msgid "Downloading metadata from {active_count} connected peer ({percent_done:d}
 msgid_plural "Downloading metadata from {active_count} connected peers ({percent_done:d}% done)"
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
 
 #: ../gtk/TorrentCellRenderer.cc:233
 msgid "Downloading from {active_count} of {connected_count} connected peer and webseed"
 msgid_plural "Downloading from {active_count} of {connected_count} connected peers and webseeds"
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
 
 #: ../gtk/TorrentCellRenderer.cc:244
 msgid "Downloading from {active_count} webseed"
 msgid_plural "Downloading from {active_count} webseeds"
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
 
 #: ../gtk/TorrentCellRenderer.cc:252
 msgid "Downloading from {active_count} of {connected_count} connected peer"
 msgid_plural "Downloading from {active_count} of {connected_count} connected peers"
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
 
 #: ../gtk/TorrentCellRenderer.cc:261
 msgid "Seeding to {active_count} of {connected_count} connected peer"
 msgid_plural "Seeding to {active_count} of {connected_count} connected peers"
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
 
 #: ../gtk/Utils.cc:37
 msgid "KiB"
@@ -1705,24 +1732,28 @@ msgid "{days:L} day"
 msgid_plural "{days:L} days"
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
 
 #: ../gtk/Utils.cc:99
 msgid "{hours} hour"
 msgid_plural "{hours} hours"
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
 
 #: ../gtk/Utils.cc:106
 msgid "{minutes} minute"
 msgid_plural "{minutes} minutes"
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
 
 #: ../gtk/Utils.cc:113
 msgid "{seconds} second"
 msgid_plural "{seconds} seconds"
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
 
 #: ../gtk/Utils.cc:150
 msgid "The torrent file '{path}' is already in use by '{torrent_name}'."
@@ -1739,7 +1770,7 @@ msgstr ""
 
 #: ../gtk/Utils.cc:455
 msgid "This magnet link appears to be intended for something other than BitTorrent."
-msgstr ""
+msgstr "Questo collegamento magnetico sembra essere utilizzato per qualche cosa di diverso da BitTorrent."
 
 #: ../gtk/main.cc:49 ../gtk/transmission-gtk.desktop.in:3
 msgid "Transmission"
@@ -1825,6 +1856,7 @@ msgid "Announce error: {error} (Retrying in {count} second)"
 msgid_plural "Announce error: {error} (Retrying in {count} seconds)"
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
 
 #: ../libtransmission/announcer.cc:1044 ../libtransmission/announcer.cc:1372
 msgid "Could not connect to tracker"
@@ -1843,6 +1875,7 @@ msgid "Blocklist '{path}' has {count} entry"
 msgid_plural "Blocklist '{path}' has {count} entries"
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
 
 #. don't try to display the actual lines - it causes issues
 #: ../libtransmission/blocklist.cc:319 ../libtransmission/tr-dht.cc:167
@@ -1970,6 +2003,7 @@ msgid "Couldn't bind to {address} after {count} attempt, giving up"
 msgid_plural "Couldn't bind to {address} after {count} attempts, giving up"
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
 
 #: ../libtransmission/rpc-server.cc:774
 msgid "Listening for RPC and Web requests on '{address}'"
@@ -2044,12 +2078,14 @@ msgid "Loaded {count} torrent"
 msgid_plural "Loaded {count} torrents"
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
 
 #: ../libtransmission/torrent-magnet.cc:321
 msgid "Couldn't parse magnet metainfo: '{error}'. Redownloading {piece_count} piece"
 msgid_plural "Couldn't parse magnet metainfo: '{error}'. Redownloading {piece_count} pieces"
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
 
 #: ../libtransmission/torrent-metainfo.cc:782
 msgid "Migrated torrent file from '{old_path}' to '{path}'"
@@ -2238,24 +2274,28 @@ msgid "hour"
 msgid_plural "hours"
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
 
 #: ../utils/remote.cc:129
 msgid "minute"
 msgid_plural "minutes"
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
 
 #: ../utils/remote.cc:130 ../utils/remote.cc:150
 msgid "seconds"
 msgid_plural "seconds"
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
 
 #: ../utils/remote.cc:134
 msgid "day"
 msgid_plural "days"
 msgstr[0] ""
 msgstr[1] ""
+msgstr[2] ""
 
 #, c-format
 #~ msgid " (Limit: %s)"
@@ -2270,30 +2310,43 @@ msgstr[1] ""
 #~ msgid_plural "%'d days"
 #~ msgstr[0] "%'d giorno"
 #~ msgstr[1] "%'d giorni"
+#~ msgstr[2] "%'d giorni"
 
 #, c-format
 #~ msgid "%'d hour"
 #~ msgid_plural "%'d hours"
 #~ msgstr[0] "%'d ora"
 #~ msgstr[1] "%'d ore"
+#~ msgstr[2] "%'d ore"
 
 #, c-format
 #~ msgid "%'d minute"
 #~ msgid_plural "%'d minutes"
 #~ msgstr[0] "%'d minuto"
 #~ msgstr[1] "%'d minuti"
+#~ msgstr[2] "%'d minuti"
 
 #, c-format
 #~ msgid "%'d second"
 #~ msgid_plural "%'d seconds"
 #~ msgstr[0] "%'d secondo"
 #~ msgstr[1] "%'d secondi"
+#~ msgstr[2] "%'d secondi"
+
+#, c-format
+#~ msgid "%*.*s is not a valid address"
+#~ msgstr "%*.*s non è un indirizzo valido"
+
+#, c-format
+#~ msgid "%*.*s is not an IPv4 or IPv6 address. RPC listeners must be IPv4 or IPv6"
+#~ msgstr "%*.*s non è un indirizzo IPv4 o IPv6. I sistemi di ascolto RPC devono essere IPv4 o IPv6."
 
 #, c-format
 #~ msgid "%1$'d Piece @ %2$s"
 #~ msgid_plural "%1$'d Pieces @ %2$s"
 #~ msgstr[0] "%1$'d frammento da %2$s"
 #~ msgstr[1] "%1$'d frammenti da %2$s"
+#~ msgstr[2] "%1$'d frammenti da %2$s"
 
 #, c-format
 #~ msgid "%1$s  %2$s"
@@ -2308,12 +2361,14 @@ msgstr[1] ""
 #~ msgid_plural "%1$s (%2$'d pieces @ %3$s)"
 #~ msgstr[0] "%1$s (%2$'d frammento da %3$s)"
 #~ msgstr[1] "%1$s (%2$'d frammenti da %3$s)"
+#~ msgstr[2] "%1$s (%2$'d frammenti da %3$s)"
 
 #, c-format
 #~ msgid "%1$s (%2$'d piece)"
 #~ msgid_plural "%1$s (%2$'d pieces)"
 #~ msgstr[0] "%1$s (%2$'d frammento)"
 #~ msgstr[1] "%1$s (%2$'d frammenti)"
+#~ msgstr[2] "%1$s (%2$'d frammenti)"
 
 #, c-format
 #~ msgid "%1$s (%2$s%% of %3$s%% Available)"
@@ -2328,8 +2383,8 @@ msgstr[1] ""
 #~ msgstr "%1$s (%2$s%%)"
 
 #, c-format
-#~ msgid "%1$s (+%2$s corrupt)"
-#~ msgstr "%1$s (+%2$s non attendibile)"
+#~ msgid "%1$s (+%2$s discarded after failed checksum)"
+#~ msgstr "%1$s (+%2$s scartati per controllo non riuscito)"
 
 #, c-format
 #~ msgid "%1$s ago"
@@ -2360,6 +2415,7 @@ msgstr[1] ""
 #~ msgid_plural "%1$s; %2$'d Files"
 #~ msgstr[0] "%1$s; %2$'d file"
 #~ msgstr[1] "%1$s; %2$'d file"
+#~ msgstr[2] "%1$s; %2$'d file"
 
 #, c-format
 #~ msgid "%s %s started"
@@ -2386,14 +2442,6 @@ msgstr[1] ""
 #~ msgstr "%s libero"
 
 #, c-format
-#~ msgid "%s is not a valid address"
-#~ msgstr "%s non è un indirizzo valido"
-
-#, c-format
-#~ msgid "%s is not an IPv4 or IPv6 address. RPC listeners must be IPv4 or IPv6"
-#~ msgstr "%s non è un indirizzo IPv4 o IPv6. I sistemi di ascolto RPC devono essere IPv4 o IPv6."
-
-#, c-format
 #~ msgid "%s remaining"
 #~ msgstr "Ancora %s"
 
@@ -2416,9 +2464,6 @@ msgstr[1] ""
 #~ msgid "<i>Testing TCP port…</i>"
 #~ msgstr "<i>Verifica porta TCP...</i>"
 
-#~ msgid "Ask Tracker for _More Peers"
-#~ msgstr "C_hiedi più nodi al server traccia"
-
 #, c-format
 #~ msgid "Asking for more peers in %s"
 #~ msgstr "Richiesta di altri nodi tra %s"
@@ -2438,9 +2483,6 @@ msgstr[1] ""
 #~ msgid "Automatically add .torrent files _from:"
 #~ msgstr "A_ggiungere automaticamente i torrent da:"
 
-#~ msgid "BitTorrent is a peer-to-peer file-sharing protocol that is commonly used to distribute large amounts of data between multiple users."
-#~ msgstr "BitTorrent è un protocollo di condivisione nodo-a-nodo comunemente utilizzato per distribuire grandi quantità di dati tra molteplici utenti."
-
 #, c-format
 #~ msgid "Blocklist \"%s\" contains %zu entries"
 #~ msgstr "La blocklist «%s» contiene %zu voci"
@@ -2454,15 +2496,14 @@ msgstr[1] ""
 #~ msgid_plural "Blocklist contains %'d rules"
 #~ msgstr[0] "La blocklist contiene %'d regola"
 #~ msgstr[1] "La blocklist contiente %'d regole"
+#~ msgstr[2] "La blocklist contiente %'d regole"
 
 #, c-format
 #~ msgid "Blocklist has %'d rule."
 #~ msgid_plural "Blocklist has %'d rules."
 #~ msgstr[0] "La blocklist ha %'d regola"
 #~ msgstr[1] "La blocklist ha %'d regole"
-
-#~ msgid "Call scrip_t when torrent is completed:"
-#~ msgstr "_Eseguire uno script al completamento dei torrent:"
+#~ msgstr[2] "La blocklist ha %'d regole"
 
 #, c-format
 #~ msgid ""
@@ -2482,12 +2523,6 @@ msgstr[1] ""
 
 #~ msgid "Complete"
 #~ msgstr "Completo"
-
-#~ msgid "Copy _Magnet Link to Clipboard"
-#~ msgstr "Copia collegamento _magnetico negli appunti"
-
-#~ msgid "Copyright (c) The Transmission Project"
-#~ msgstr "Copyright (c) The Transmission Project"
 
 #, c-format
 #~ msgid "Couldn't bind port %d on %s: %s"
@@ -2534,6 +2569,10 @@ msgstr[1] ""
 #~ msgstr "Impossibile leggere «%1$s»: %2$s"
 
 #, c-format
+#~ msgid "Couldn't read \"%s\""
+#~ msgstr "Impossibile leggere «%s»"
+
+#, c-format
 #~ msgid "Couldn't read \"%s\": %s"
 #~ msgstr "Impossibile leggere «%s»: %s"
 
@@ -2546,19 +2585,12 @@ msgstr[1] ""
 #~ msgstr "Impossibile salvare il file «%1$s»: %2$s"
 
 #, c-format
-#~ msgid "Couldn't save temporary file \"%1$s\": %2$s"
-#~ msgstr "Impossibile salvare il file temporaneo «%1$s»: %2$s"
-
-#, c-format
 #~ msgid "Couldn't set source address %s on %<PRIdMAX>: %s"
 #~ msgstr "Impossibile impostare l'indirizzo sorgente %s su %<PRIdMAX>: %s"
 
 #, c-format
 #~ msgid "Couldn't truncate \"%1$s\": %2$s"
 #~ msgstr "Impossibile troncare «%1$s»: %2$s"
-
-#~ msgid "Create a torrent"
-#~ msgstr "Crea un torrent"
 
 #, c-format
 #~ msgid "Created \"%s\"!"
@@ -2579,13 +2611,6 @@ msgstr[1] ""
 #, c-format
 #~ msgid "Creating \"%s\""
 #~ msgstr "Creazione di «%s»"
-
-#, c-format
-#~ msgid "DNS Lookup failed: %s"
-#~ msgstr "Ricerca DNS non riuscita: %s"
-
-#~ msgid "Dese_lect All"
-#~ msgstr "_Deseleziona tutto"
 
 #, c-format
 #~ msgid "Do_wnload (%s):"
@@ -2614,9 +2639,6 @@ msgstr[1] ""
 #~ msgid "Downloading metadata from %1$'d %2$s (%3$d%% done)"
 #~ msgstr "Ricezione metadati da %1$'d %2$s (%3$d%% completato)"
 
-#~ msgid "Enable Alternative Speed _Limits"
-#~ msgstr "_Abilitare limiti di velocità alternativi"
-
 #~ msgid "Error opening torrent"
 #~ msgstr "Errore nell'aprire il torrent"
 
@@ -2629,8 +2651,8 @@ msgstr[1] ""
 #~ msgstr "Impossibile registrare Transmission come un gestore di %s: %s"
 
 #, c-format
-#~ msgid "Error uncompressing blocklist: %s (%d)"
-#~ msgstr "Errore nell'aprire la blocklist: %s (%d)"
+#~ msgid "Error saving \"%*.*s\": %s (%d)"
+#~ msgstr "Errore nel salvare «%*.*s»: %s (%d)"
 
 #, c-format
 #~ msgid "Error writing \"%s\": %s"
@@ -2647,10 +2669,6 @@ msgstr[1] ""
 #, c-format
 #~ msgid "Failed to set piece size to %s, leaving it at %s"
 #~ msgstr "Impostazione dimensione del frammento a %s non riuscita, viene lasciata a %s"
-
-#, c-format
-#~ msgid "File \"%s\" is in the way"
-#~ msgstr "Il file «%s» è in arrivo"
 
 #, c-format
 #~ msgid "Found Internet Gateway Device \"%s\""
@@ -2678,10 +2696,6 @@ msgstr[1] ""
 #~ msgid "Idle"
 #~ msgstr "Inattivo"
 
-#, c-format
-#~ msgid "Invalid metadata entry \"%s\""
-#~ msgstr "Voce metadati «%s» non valida"
-
 #~ msgid "Is another copy of Transmission already running?"
 #~ msgstr "È già in esecuzione un'altra istanza di Transmission?"
 
@@ -2701,29 +2715,11 @@ msgstr[1] ""
 #~ msgid "Local Address is \"%s\""
 #~ msgstr "L'indirizzo locale è «%s»"
 
-#~ msgid "Magnet torrent's metadata is not usable"
-#~ msgstr "Metadati file torrent magnetico non utilizzabili"
-
-#~ msgid "Message _Log"
-#~ msgstr "_Registro messaggi"
-
 #~ msgid "Mo_ve .torrent file to the trash"
 #~ msgstr "_Spostare il file .torrent nel cestino"
 
 #~ msgid "Monday"
 #~ msgstr "Lunedì"
-
-#~ msgid "Move _Down"
-#~ msgstr "Spos_ta giù"
-
-#~ msgid "Move _Up"
-#~ msgstr "Sposta _su"
-
-#~ msgid "Move to _Bottom"
-#~ msgstr "Sposta in _basso"
-
-#~ msgid "Move to _Top"
-#~ msgstr "Sposta in _alto"
 
 #, c-format
 #~ msgid "Moving \"%s\""
@@ -2732,27 +2728,6 @@ msgstr[1] ""
 #~ msgid "Not a regular file"
 #~ msgstr "Non è un file normale"
 
-#~ msgid "Notable features of Transmission include support for Local Peer Discovery, encryption, DHT, µTP, PEX and Magnet Link."
-#~ msgstr "Tra le varie funzionalità di Transmission, le più note sono: Local Peer Discovery, cifratura, DHT, µTP, PEX e collegamenti magnetici."
-
-#~ msgid "Open Fold_er"
-#~ msgstr "Apri cart_ella"
-
-#~ msgid "Open URL…"
-#~ msgstr "Apri URL…"
-
-#~ msgid "Open _URL…"
-#~ msgstr "Apri _URL…"
-
-#~ msgid "Open a torrent"
-#~ msgstr "Apre un torrent"
-
-#~ msgid "Pause all torrents"
-#~ msgstr "Mette in pausa tutti i torrent"
-
-#~ msgid "Pause torrent"
-#~ msgstr "Mette in pausa il torrent"
-
 #, c-format
 #~ msgid "Peer list request %1$stimed out%2$s %3$s ago; will retry"
 #~ msgstr "Richiesta elenco nodi %1$sscaduta%2$s %3$s fa; attendere"
@@ -2760,10 +2735,6 @@ msgstr[1] ""
 #, c-format
 #~ msgid "Piece %<PRIu32>, which was just downloaded, failed its checksum test"
 #~ msgstr "Il frammento %<PRIu32>, appena scaricato, non supera il controllo"
-
-#, c-format
-#~ msgid "Please Verify Local Data! Piece #%zu is corrupt."
-#~ msgstr "Verificare i dati locali. Il frammento n˚%zu risulta danneggiato."
 
 #, c-format
 #~ msgid "Port %d forwarded successfully"
@@ -2799,18 +2770,9 @@ msgstr[1] ""
 #~ msgid "Preallocated file \"%1$s\" (%2$s, size: %3$<PRIu64>)"
 #~ msgstr "File pre-allocato «%1$s» (%2$s, dimensione %3$<PRIu64>)"
 
-#~ msgid "Present Main Window"
-#~ msgstr "Mostra la finestra principale"
-
 #, c-format
 #~ msgid "Ratio: %s"
 #~ msgstr "Rapporto: %s"
-
-#~ msgid "Re_verse Sort Order"
-#~ msgstr "Ordine _inverso"
-
-#~ msgid "Remove torrent"
-#~ msgstr "Rimuove il torrent"
 
 #~ msgid "Saturday"
 #~ msgstr "Sabato"
@@ -2832,9 +2794,7 @@ msgstr[1] ""
 #~ msgid_plural "Seeding to %1$'d of %2$'d connected peers"
 #~ msgstr[0] "Distribuzione a %1$'d su %2$'d nodo connesso"
 #~ msgstr[1] "Distribuzione a %1$'d su %2$'d nodi connessi"
-
-#~ msgid "Select _All"
-#~ msgstr "_Seleziona tutto"
+#~ msgstr[2] "Distribuzione a %1$'d su %2$'d nodi connessi"
 
 #, c-format
 #~ msgid "Serving RPC and Web requests from directory '%s'"
@@ -2844,57 +2804,16 @@ msgstr[1] ""
 #~ msgid "Serving RPC and Web requests on %s:%d%s"
 #~ msgstr "RPC e richieste web fornite su %s: %d %s"
 
-#~ msgid "Set _Location…"
-#~ msgstr "Imposta posi_zione…"
-
 #, c-format
 #~ msgid "Skipping unknown torrent \"%s\""
 #~ msgstr "Ignorato il torrent sconosciuto «%s»"
-
-#~ msgid "Sort by A_ge"
-#~ msgstr "Ordina per _età"
-
-#~ msgid "Sort by Rati_o"
-#~ msgstr "Ordina per ra_pporto"
-
-#~ msgid "Sort by Si_ze"
-#~ msgstr "Ordina per _dimensione"
-
-#~ msgid "Sort by Stat_e"
-#~ msgstr "Ordina per stat_o"
-
-#~ msgid "Sort by Time _Left"
-#~ msgstr "Ordina per tempo _mancante"
-
-#~ msgid "Sort by _Activity"
-#~ msgstr "Ordina per _Attività"
-
-#~ msgid "Sort by _Name"
-#~ msgstr "Ordina per _Nome"
-
-#~ msgid "Sort by _Progress"
-#~ msgstr "Ordina per avan_zamento"
-
-#~ msgid "Sort by _Queue"
-#~ msgstr "O_rdina per accodamento"
-
-#~ msgid "Start _Now"
-#~ msgstr "_Avvia ora"
-
-#~ msgid "Start all torrents"
-#~ msgstr "Avvia tutti i torrent"
-
-#~ msgid "Start torrent"
-#~ msgstr "Avvia il torrent"
-
-#~ msgid "Start torrent now"
-#~ msgstr "Avvia il torrent ora"
 
 #, c-format
 #~ msgid "Started %'d time"
 #~ msgid_plural "Started %'d times"
 #~ msgstr[0] "Avviato %'d volta"
 #~ msgstr[1] "Avviato %'d volte"
+#~ msgstr[2] "Avviato %'d volte"
 
 #, c-format
 #~ msgid "State changed from \"%1$s\" to \"%2$s\""
@@ -2915,20 +2834,8 @@ msgstr[1] ""
 #~ msgstr "Domenica"
 
 #, c-format
-#~ msgid "The torrent file \"%s\" contains invalid data."
-#~ msgstr "Il file torrent  «%s» contiene dati non validi."
-
-#, c-format
-#~ msgid "The torrent file \"%s\" encountered an unknown error."
-#~ msgstr "Il file torrent «%s» ha riscontrato un errore sconosciuto."
-
-#, c-format
 #~ msgid "The torrent file \"%s\" is already in use by \"%s.\""
 #~ msgstr "Il file torrent «%s» è già in uso da «%s»."
-
-#, c-format
-#~ msgid "This magnet link appears to be intended for something other than BitTorrent. BitTorrent magnet links have a section containing \"%s\"."
-#~ msgstr "Questo collegamento magnetico sembra essere utilizzato per qualche cosa di diverso da BitTorrent. I collegamenti magnetici di BitTorrent presentano una sezione che contiene «%s»."
 
 #~ msgid "Thursday"
 #~ msgstr "Giovedì"
@@ -2944,17 +2851,6 @@ msgstr[1] ""
 #~ msgid "Torrent Creator is skipping file \"%s\": %s"
 #~ msgstr "L'autore del torrent sta omettendo il file «%s»: %s"
 
-#~ msgid "Torrent properties"
-#~ msgstr "Proprietà torrent"
-
-#, c-format
-#~ msgid "Tracker error: \"%s\""
-#~ msgstr "Errore server traccia: «%s»"
-
-#, c-format
-#~ msgid "Tracker gave HTTP response code %1$ld (%2$s)"
-#~ msgstr "Il server traccia ha restituito il codice HTTP %1$ld (%2$s)"
-
 #, c-format
 #~ msgid "Tracker gave a warning: \"%s\""
 #~ msgstr "Il server traccia ha restituito un avvertimento: «%s»"
@@ -2968,12 +2864,8 @@ msgstr[1] ""
 #~ msgstr "Il server traccia aveva %s%'d nodi in solo invio e %'d in ricezione%s %s fa"
 
 #, c-format
-#~ msgid "Tracker warning: \"%s\""
-#~ msgstr "Avviso server traccia: «%s»"
-
-#, c-format
-#~ msgid "Tracker will allow requests in %s"
-#~ msgstr "Il server traccia consentirà le richieste tra %s"
+#~ msgid "Tracker warning: \"%*.*s\""
+#~ msgstr "Avviso server traccia: «%*.*s»"
 
 #, c-format
 #~ msgid ""
@@ -2989,9 +2881,6 @@ msgstr[1] ""
 #~ msgid "Transmission doesn't know how to use \"%s\""
 #~ msgstr "Transmission non sa come usare «%s»"
 
-#~ msgid "Transmission is a BitTorrent client with an easy-to-use frontend on top a cross-platform backend. Native frontends are available for OS X and Windows, as well as command line and web frontends."
-#~ msgstr "Transmission è un programma BitTorrent con un'interfaccia utente di facile uso e un motore compatibile con più sistemi operativi. Sono disponibili interfacce native per OS X e Windows, strumenti a riga di comando e un'interfaccia web."
-
 #~ msgid "Tuesday"
 #~ msgstr "Martedì"
 
@@ -2999,8 +2888,9 @@ msgstr[1] ""
 #~ msgid "U_pload (%s):"
 #~ msgstr "I_nvio (%s):"
 
-#~ msgid "Unable to parse file content"
-#~ msgstr "Impossibile leggere il contenuto del file"
+#, c-format
+#~ msgid "Unable to add torrent file \"%s\"."
+#~ msgstr "Impossibile aggiungere il file torrent «%s»"
 
 #, c-format
 #~ msgid "Unable to rename file as \"%s\": %s"
@@ -3019,89 +2909,17 @@ msgstr[1] ""
 #~ msgid "Wednesday"
 #~ msgstr "Mercoledì"
 
-#~ msgid "_About"
-#~ msgstr "I_nformazioni"
-
-#~ msgid "_Compact View"
-#~ msgstr "Vista _compatta"
-
-#~ msgid "_Contents"
-#~ msgstr "_Sommario"
-
-#~ msgid "_Delete Files and Remove"
-#~ msgstr "Elimina _file e rimuovi"
-
-#~ msgid "_Donate"
-#~ msgstr "_Donazioni"
-
 #, c-format
 #~ msgid "_Download (%s):"
 #~ msgstr "Rice_zione (%s):"
-
-#~ msgid "_File"
-#~ msgstr "_File"
-
-#~ msgid "_Filterbar"
-#~ msgstr "Barra dei _filtri"
-
-#~ msgid "_New…"
-#~ msgstr "_Nuovo…"
-
-#~ msgid "_Pause"
-#~ msgstr "_Pausa"
-
-#~ msgid "_Pause All"
-#~ msgstr "_Pausa tutti"
-
-#~ msgid "_Preferences"
-#~ msgstr "Preferen_ze"
-
-#~ msgid "_Properties"
-#~ msgstr "P_roprietà"
-
-#~ msgid "_Queue"
-#~ msgstr "C_oda"
-
-#~ msgid "_Quit"
-#~ msgstr "_Esci"
 
 #, c-format
 #~ msgid "_Show %'d of:"
 #~ msgstr "_Mostra %'d di:"
 
-#~ msgid "_Show Transmission"
-#~ msgstr "_Mostra Transmission"
-
-#~ msgid "_Sort Torrents By"
-#~ msgstr "Ordina _torrent per"
-
-#~ msgid "_Start"
-#~ msgstr "A_vvia"
-
-#~ msgid "_Start All"
-#~ msgstr "Avvia _tutti"
-
-#~ msgid "_Statistics"
-#~ msgstr "S_tatistiche"
-
-#~ msgid "_Statusbar"
-#~ msgstr "Barra di s_tato"
-
-#~ msgid "_Toolbar"
-#~ msgstr "Barra degli _strumenti"
-
-#~ msgid "_Torrent"
-#~ msgstr "_Torrent"
-
 #, c-format
 #~ msgid "_Upload (%s):"
 #~ msgstr "In_vio (%s):"
-
-#~ msgid "_Verify Local Data"
-#~ msgstr "Verifica _dati locali"
-
-#~ msgid "_View"
-#~ msgstr "_Visualizza"
 
 #, c-format
 #~ msgid "blocklist skipped invalid address at line %d"
@@ -3118,6 +2936,7 @@ msgstr[1] ""
 #~ msgid_plural "peers"
 #~ msgstr[0] "nodo"
 #~ msgstr[1] "nodi"
+#~ msgstr[2] "nodi"
 
 #, c-format
 #~ msgid "size|Down: %1$s, Up: %2$s"
@@ -3130,3 +2949,4 @@ msgstr[1] ""
 #~ msgid_plural "web seeds"
 #~ msgstr[0] "nodo web"
 #~ msgstr[1] "nodi web"
+#~ msgstr[2] "nodi web"
