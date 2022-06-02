@@ -2548,6 +2548,7 @@ static void bandwidthPulse(evutil_socket_t /*fd*/, short /*what*/, void* vmgr)
 ****
 ***/
 
+#if 0
 static auto getMaxAtomCount(tr_torrent const* tor)
 {
     static auto constexpr Limit = uint16_t{ 50 };
@@ -2618,12 +2619,14 @@ struct CompareAtomsByActivity
 private:
     tr_swarm const& swarm_;
 };
+#endif
 
 static void atomPulse(evutil_socket_t /*fd*/, short /*what*/, void* vmgr)
 {
     auto* mgr = static_cast<tr_peerMgr*>(vmgr);
     auto const lock = mgr->unique_lock();
 
+#if 0
     for (auto* const tor : mgr->session->torrents())
     {
         // do we have too many atoms?
@@ -2646,6 +2649,7 @@ static void atomPulse(evutil_socket_t /*fd*/, short /*what*/, void* vmgr)
             tor->swarm,
             fmt::format("max atom count is {}... pruned from {} to {}", max_atom_count, atom_count, std::size(atoms)));
     }
+#endif
 
     tr_timerAddMsec(*mgr->atomTimer, AtomPeriodMsec);
 }
