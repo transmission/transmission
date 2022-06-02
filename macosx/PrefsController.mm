@@ -150,7 +150,6 @@
 
         //set auto import
         NSString* autoPath;
-        VDKQueue* x = [(Controller*)[NSApp delegate] fileWatcherQueue];
         if ([_fDefaults boolForKey:@"AutoImport"] && (autoPath = [_fDefaults stringForKey:@"AutoImportDirectory"]))
         {
             [((Controller*)NSApp.delegate).fileWatcherQueue addPath:autoPath.stringByExpandingTildeInPath
