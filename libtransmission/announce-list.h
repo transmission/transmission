@@ -124,8 +124,8 @@ public:
 
     bool save(std::string_view torrent_file, tr_error** error = nullptr) const;
 
-    static std::optional<std::string> announceToScrape(std::string_view announce);
-    static tr_quark announceToScrape(tr_quark announce);
+    [[nodiscard]] static std::optional<std::string> announceToScrape(std::string_view announce);
+    [[nodiscard]] static tr_quark announceToScrape(tr_quark announce);
 
 private:
     [[nodiscard]] tr_tracker_tier_t getTier(tr_tracker_tier_t tier, tr_url_parsed_t const& announce) const;

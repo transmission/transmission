@@ -1308,10 +1308,13 @@ static void checkMultiscrapeMax(tr_announcer* announcer, tr_scrape_response cons
     {
         // don't log the full URL, since that might have a personal announce id
         // (note: we know 'parsed' will be successful since this url has a scrape_info)
-        auto const parsed = *tr_urlParse(url);
-        tr_logAddDebug(
-            fmt::format(FMT_STRING("Reducing multiscrape max to {:d}"), n),
-            fmt::format(FMT_STRING("{:s}://{:s}:{:d}"), parsed.scheme, parsed.host, parsed.port));
+        if (auto const parsed = tr_urlParse(url); parsed)
+        {
+            tr_logAddDebug(
+                fmt::format(FMT_STRING("Reducing multiscrape max to {:d}"), n),
+                fmt::format(FMT_STRING("{:s}://{:s}:{:d}"), parsed->scheme, parsed->host, parsed->port));
+        }
+
         multiscrape_max = n;
     }
 }
