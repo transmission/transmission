@@ -758,7 +758,7 @@
         return;
     }
 
-    NSRect const rect = [self.fTorrentCell iconRectForBounds:[self rectOfRow:row]];
+    NSRect const rect = [self.fTorrentCell actionRectForBounds:[self rectOfRow:row]];
 
     if (self.fActionPopoverShown)
     {
