@@ -231,14 +231,13 @@ struct peer_atom
     time_t lastConnectionAttemptAt = {};
     time_t lastConnectionAt = {};
 
-    tr_peer* peer = nullptr; // will be nullptr if not connected
-
     uint8_t const fromFirst; /* where the peer was first found */
     uint8_t fromBest; /* the "best" value of where the peer has been found */
     uint8_t flags = {}; /* these match the added_f flags */
     uint8_t flags2 = {}; /* flags that aren't defined in added_f */
 
     bool utp_failed = false; /* We recently failed to connect over uTP */
+    bool is_connected = false;
 
 private:
     /* similar to a TTL field, but less rigid --
@@ -430,7 +429,7 @@ tr_peer::~tr_peer()
 
     if (atom != nullptr)
     {
-        atom->peer = nullptr;
+        atom->is_connected = false;
     }
 }
 
@@ -461,7 +460,7 @@ static bool peerIsInUse(tr_swarm const* cs, struct peer_atom const* atom)
     auto const* const s = const_cast<tr_swarm*>(cs);
     auto const lock = s->manager->unique_lock();
 
-    return atom->peer != nullptr || s->outgoing_handshakes.contains(atom->addr) ||
+    return atom->is_connected || s->outgoing_handshakes.contains(atom->addr) ||
         s->manager->incoming_handshakes.contains(atom->addr);
 }
 
@@ -1013,7 +1012,7 @@ static void createBitTorrentPeer(tr_torrent* tor, tr_peerIo* io, struct peer_ato
 
     auto* peer = tr_peerMsgsNew(tor, atom, io, peerCallbackFunc, swarm);
     peer->client = client;
-    atom->peer = peer;
+    atom->is_connected = true;
 
     swarm->peers.push_back(peer);
 
@@ -1103,31 +1102,26 @@ static bool on_handshake_done(tr_handshake_result const& result)
         {
             /* too many peers already */
         }
+        else if (atom->is_connected)
+        {
+            // we're already connected to this peer; do nothing
+        }
         else
         {
-            tr_peer const* const peer = atom->peer;
-
-            if (peer != nullptr)
+            auto client = tr_quark{ TR_KEY_NONE };
+            if (result.peer_id)
             {
-                /* we already have this peer */
+                char buf[128] = {};
+                tr_clientForId(buf, sizeof(buf), *result.peer_id);
+                client = tr_quark_new(buf);
             }
-            else
-            {
-                auto client = tr_quark{ TR_KEY_NONE };
-                if (result.peer_id)
-                {
-                    char buf[128] = {};
-                    tr_clientForId(buf, sizeof(buf), *result.peer_id);
-                    client = tr_quark_new(buf);
-                }
 
-                /* this steals its refcount too, which is balanced by our unref in peerDelete() */
-                tr_peerIo* stolen = tr_handshakeStealIO(result.handshake);
-                tr_peerIoSetParent(stolen, &s->tor->bandwidth_);
-                createBitTorrentPeer(s->tor, stolen, atom, client);
+            /* this steals its refcount too, which is balanced by our unref in peerDelete() */
+            tr_peerIo* stolen = tr_handshakeStealIO(result.handshake);
+            tr_peerIoSetParent(stolen, &s->tor->bandwidth_);
+            createBitTorrentPeer(s->tor, stolen, atom, client);
 
-                success = true;
-            }
+            success = true;
         }
     }
 
@@ -2055,29 +2049,22 @@ static bool isNew(tr_peerMsgs const* msgs)
 }
 
 /* get a rate for deciding which peers to choke and unchoke. */
-static int getRate(tr_torrent const* tor, struct peer_atom const* atom, uint64_t now)
+static auto getRateBps(tr_torrent const* tor, tr_peer const* peer, uint64_t now)
 {
-    auto Bps = unsigned{};
-
     if (tor->isDone())
     {
-        Bps = tr_peerGetPieceSpeed_Bps(atom->peer, now, TR_CLIENT_TO_PEER);
-    }
-    /* downloading a private torrent... take upload speed into account
-     * because there may only be a small window of opportunity to share */
-    else if (tor->isPrivate())
-    {
-        Bps = tr_peerGetPieceSpeed_Bps(atom->peer, now, TR_PEER_TO_CLIENT) +
-            tr_peerGetPieceSpeed_Bps(atom->peer, now, TR_CLIENT_TO_PEER);
-    }
-    /* downloading a public torrent */
-    else
-    {
-        Bps = tr_peerGetPieceSpeed_Bps(atom->peer, now, TR_PEER_TO_CLIENT);
+        return tr_peerGetPieceSpeed_Bps(peer, now, TR_CLIENT_TO_PEER);
     }
 
-    /* convert it to bytes per second */
-    return Bps;
+    /* downloading a private torrent... take upload speed into account
+     * because there may only be a small window of opportunity to share */
+    if (tor->isPrivate())
+    {
+        return tr_peerGetPieceSpeed_Bps(peer, now, TR_PEER_TO_CLIENT) + tr_peerGetPieceSpeed_Bps(peer, now, TR_CLIENT_TO_PEER);
+    }
+
+    /* downloading a public torrent */
+    return tr_peerGetPieceSpeed_Bps(peer, now, TR_PEER_TO_CLIENT);
 }
 
 static inline bool isBandwidthMaxedOut(Bandwidth const& b, uint64_t const now_msec, tr_direction dir)
@@ -2119,8 +2106,6 @@ static void rechokeUploads(tr_swarm* s, uint64_t const now)
     /* sort the peers by preference and rate */
     for (auto* const peer : peers)
     {
-        auto const* const atom = peer->atom;
-
         if (tr_peerIsSeed(peer))
         {
             /* choke seeds and partial seeds */
@@ -2137,7 +2122,7 @@ static void rechokeUploads(tr_swarm* s, uint64_t const now)
             n->msgs = peer;
             n->isInterested = peer->is_peer_interested();
             n->wasChoked = peer->is_peer_choked();
-            n->rate = getRate(s->tor, atom, now);
+            n->rate = getRateBps(s->tor, peer, now);
             n->salt = tr_rand_int_weak(INT_MAX);
             n->isChoked = true;
         }
