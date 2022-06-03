@@ -24,7 +24,7 @@
 "%@ selected" = "%@ ausgewählt";
 
 /* stats window -> times opened */
-"%lu times" = "%lu mal";
+"%llu times" = "%llu mal";
 
 /* Drag overlay -> torrents */
 "%lu Torrent Files" = "%lu Torrent-Dateien";
