@@ -14,6 +14,7 @@
 #include <iterator> // std::back_inserter
 #include <memory>
 #include <numeric> // std::accumulate
+#include <optional>
 #include <tuple> // std::tie
 #include <utility>
 #include <vector>
@@ -209,6 +210,21 @@ struct peer_atom
     void setBlocklistedDirty()
     {
         blocklisted_.reset();
+    }
+
+    std::optional<bool> isReachable() const
+    {
+        if ((flags2 & MyflagUnreachable) != 0)
+        {
+            return false;
+        }
+
+        if ((flags & ADDED_F_CONNECTABLE) != 0)
+        {
+            return true;
+        }
+
+        return std::nullopt;
     }
 
     tr_address const addr;
@@ -2502,31 +2518,37 @@ static void bandwidthPulse(evutil_socket_t /*fd*/, short /*what*/, void* vmgr)
 /* is this atom someone that we'd want to initiate a connection to? */
 static bool isPeerCandidate(tr_torrent const* tor, peer_atom const& atom, time_t const now)
 {
-    /* not if we're both seeds */
+    // have we already tried and failed to connect?
+    if (auto const reachable = atom.isReachable(); reachable && !*reachable)
+    {
+        return false;
+    }
+
+    // not if we're both seeds
     if (tor->isDone() && atom.isSeed())
     {
         return false;
     }
 
-    /* not if we've already got a connection to them... */
+    // not if we've already got a connection to them...
     if (peerIsInUse(tor->swarm, &atom))
     {
         return false;
     }
 
-    /* not if we just tried them already */
+    // not if we just tried them already
     if (now - atom.time < atom.getReconnectIntervalSecs(now))
     {
         return false;
     }
 
-    /* not if they're blocklisted */
+    // not if they're blocklisted
     if (atom.isBlocklisted(tor->session))
     {
         return false;
     }
 
-    /* not if they're banned... */
+    // not if they're banned...
     if ((atom.flags2 & MyflagBanned) != 0)
     {
         return false;
