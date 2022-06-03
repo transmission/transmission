@@ -116,7 +116,6 @@ struct peer_atom
         , fromFirst{ from }
         , fromBest{ from }
         , flags{ flags_in }
-        , shelf_date_{ tr_time() + getDefaultShelfLife(from) + tr_rand_int_weak(60 * 10) }
     {
     }
 
@@ -147,11 +146,6 @@ struct peer_atom
         auto const value = tr_sessionIsAddressBlocked(session, &addr);
         blocklisted_ = value;
         return value;
-    }
-
-    [[nodiscard]] constexpr auto shelfDate() const noexcept
-    {
-        return shelf_date_;
     }
 
     [[nodiscard]] int getReconnectIntervalSecs(time_t const now) const noexcept
@@ -240,43 +234,7 @@ struct peer_atom
     bool is_connected = false;
 
 private:
-    /* similar to a TTL field, but less rigid --
-     * if the swarm is small, the atom will be kept past this date. */
-    time_t const shelf_date_;
-
     mutable std::optional<bool> blocklisted_;
-
-    static int getDefaultShelfLife(uint8_t from)
-    {
-        /* in general, peers obtained from firsthand contact
-         * are better than those from secondhand, etc etc */
-        switch (from)
-        {
-        case TR_PEER_FROM_INCOMING:
-            return 60 * 60 * 6;
-
-        case TR_PEER_FROM_LTEP:
-            return 60 * 60 * 6;
-
-        case TR_PEER_FROM_TRACKER:
-            return 60 * 60 * 3;
-
-        case TR_PEER_FROM_DHT:
-            return 60 * 60 * 3;
-
-        case TR_PEER_FROM_PEX:
-            return 60 * 60 * 2;
-
-        case TR_PEER_FROM_RESUME:
-            return 60 * 60;
-
-        case TR_PEER_FROM_LPD:
-            return 10 * 60;
-
-        default:
-            return 60 * 60;
-        }
-    }
 };
 
 // a container for keeping track of tr_handshakes
@@ -2595,12 +2553,6 @@ struct CompareAtomsByActivity
         if (atime != btime)
         {
             return atime > btime ? -1 : 1;
-        }
-
-        // tertiary key: shelf date
-        if (a.shelfDate() != b.shelfDate())
-        {
-            return a.shelfDate() > b.shelfDate() ? -1 : 1;
         }
 
         return 0;
