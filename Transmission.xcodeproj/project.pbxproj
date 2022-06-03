@@ -22,6 +22,8 @@
 		3C7A11990D0B2EE300B5701F /* natpmp.c in Sources */ = {isa = PBXBuildFile; fileRef = 3C7A11930D0B2EE300B5701F /* natpmp.c */; };
 		3C7A119A0D0B2EE300B5701F /* natpmp.h in Headers */ = {isa = PBXBuildFile; fileRef = 3C7A11940D0B2EE300B5701F /* natpmp.h */; };
 		4394AC670C74FB6000F367E8 /* ptrarray.cc in Sources */ = {isa = PBXBuildFile; fileRef = 4394AC640C74FB6000F367E8 /* ptrarray.cc */; };
+		45A7D3292843B54D00F0C32A /* GroupPopUpButtonCell.mm in Sources */ = {isa = PBXBuildFile; fileRef = 45A7D3282843B54D00F0C32A /* GroupPopUpButtonCell.mm */; };
+		45A7D32C2843B55F00F0C32A /* PriorityPopUpButtonCell.mm in Sources */ = {isa = PBXBuildFile; fileRef = 45A7D32B2843B55F00F0C32A /* PriorityPopUpButtonCell.mm */; };
 		4D043A7F090AE979009FEDA8 /* TransmissionDocument.icns in Resources */ = {isa = PBXBuildFile; fileRef = 4D043A7E090AE979009FEDA8 /* TransmissionDocument.icns */; };
 		4D118E1A08CB46B20033958F /* PrefsController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4D118E1908CB46B20033958F /* PrefsController.mm */; };
 		4D1838DD09DEC0E80047D688 /* libtransmission.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D18389709DEC0030047D688 /* libtransmission.a */; };
@@ -617,6 +619,10 @@
 		3C7A11930D0B2EE300B5701F /* natpmp.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = natpmp.c; sourceTree = "<group>"; };
 		3C7A11940D0B2EE300B5701F /* natpmp.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = natpmp.h; sourceTree = "<group>"; };
 		4394AC640C74FB6000F367E8 /* ptrarray.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ptrarray.cc; sourceTree = "<group>"; };
+		45A7D3272843B54D00F0C32A /* GroupPopUpButtonCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GroupPopUpButtonCell.h; sourceTree = "<group>"; };
+		45A7D3282843B54D00F0C32A /* GroupPopUpButtonCell.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = GroupPopUpButtonCell.mm; sourceTree = "<group>"; };
+		45A7D32A2843B55F00F0C32A /* PriorityPopUpButtonCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PriorityPopUpButtonCell.h; sourceTree = "<group>"; };
+		45A7D32B2843B55F00F0C32A /* PriorityPopUpButtonCell.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = PriorityPopUpButtonCell.mm; sourceTree = "<group>"; };
 		4D043A7E090AE979009FEDA8 /* TransmissionDocument.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = TransmissionDocument.icns; path = Images/TransmissionDocument.icns; sourceTree = "<group>"; };
 		4D118E1808CB46B20033958F /* PrefsController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PrefsController.h; sourceTree = "<group>"; };
 		4D118E1908CB46B20033958F /* PrefsController.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = PrefsController.mm; sourceTree = "<group>"; };
@@ -1460,6 +1466,10 @@
 				A20BFFB60D091CC700CE5D2B /* ToolbarSegmentedCell.mm */,
 				A22180960D148A71007D09ED /* GroupsPrefsController.h */,
 				A22180970D148A71007D09ED /* GroupsPrefsController.mm */,
+				45A7D3272843B54D00F0C32A /* GroupPopUpButtonCell.h */,
+				45A7D3282843B54D00F0C32A /* GroupPopUpButtonCell.mm */,
+				45A7D32A2843B55F00F0C32A /* PriorityPopUpButtonCell.h */,
+				45A7D32B2843B55F00F0C32A /* PriorityPopUpButtonCell.mm */,
 				A2FB701A0D95CAEA0001F331 /* GroupsController.h */,
 				A2FB701B0D95CAEA0001F331 /* GroupsController.mm */,
 				A2451E6616ACE4EB00586E0E /* FileRenameSheetController.h */,
@@ -3036,6 +3046,7 @@
 				A257C1820CAD3003004E121C /* PeerTableView.mm in Sources */,
 				A2A6321B0CD9751700E3DA60 /* BadgeView.mm in Sources */,
 				A2ED7D8F0CEF431B00970975 /* FilterButton.mm in Sources */,
+				45A7D32C2843B55F00F0C32A /* PriorityPopUpButtonCell.mm in Sources */,
 				A25892640CF1F7E800CCCDDF /* StatsWindowController.mm in Sources */,
 				A2C89D600CFCBF57004CC2BC /* ButtonToolbarItem.mm in Sources */,
 				A219798B0D07B78400438EA7 /* GroupToolbarItem.mm in Sources */,
@@ -3044,6 +3055,7 @@
 				A26AF21A0D2DA35A00FF7140 /* FileOutlineController.mm in Sources */,
 				A26AF2840D2DC27C00FF7140 /* AddWindowController.mm in Sources */,
 				A2FB701C0D95CAEA0001F331 /* GroupsController.mm in Sources */,
+				45A7D3292843B54D00F0C32A /* GroupPopUpButtonCell.mm in Sources */,
 				A2D307A40D9EC6870051FD27 /* BlocklistDownloader.mm in Sources */,
 				A2725B6E0DE5C4F5003445E7 /* FileListNode.mm in Sources */,
 				A2725D5D0DE7507C003445E7 /* TrackerTableView.mm in Sources */,

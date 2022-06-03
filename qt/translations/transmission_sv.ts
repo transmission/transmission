@@ -11,7 +11,7 @@
     <message>
         <location line="+39"/>
         <source>Copyright © The Transmission Project</source>
-        <translation type="unfinished"></translation>
+        <translation>Copyright © The Transmission Project</translation>
     </message>
     <message>
         <location line="-10"/>
@@ -21,12 +21,12 @@
     <message>
         <location filename="../AboutDialog.cc" line="+37"/>
         <source>Client</source>
-        <translation type="unfinished">Klient</translation>
+        <translation>Klient</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Server</source>
-        <translation type="unfinished"></translation>
+        <translation>Server</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -64,7 +64,7 @@
     <message>
         <location line="+132"/>
         <source>Torrent Added</source>
-        <translation type="unfinished"></translation>
+        <translation>Torrent tillagd</translation>
     </message>
     <message numerus="yes">
         <location line="-29"/>
@@ -78,7 +78,7 @@
 <context>
     <name>DetailsDialog</name>
     <message>
-        <location filename="../DetailsDialog.cc" line="+427"/>
+        <location filename="../DetailsDialog.cc" line="+428"/>
         <source>None</source>
         <translation>Ingen</translation>
     </message>
@@ -89,12 +89,12 @@
     </message>
     <message>
         <location line="+1"/>
-        <location line="+265"/>
+        <location line="+267"/>
         <source>Unknown</source>
         <translation>Okänd</translation>
     </message>
     <message>
-        <location line="-208"/>
+        <location line="-210"/>
         <source>Finished</source>
         <translation>Slutförd</translation>
     </message>
@@ -106,10 +106,10 @@
     <message>
         <location line="+109"/>
         <source>%1 (+%2 discarded after failed checksum)</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 (+%2 kasseras efter misslyckad kontrollsumma)</translation>
     </message>
     <message>
-        <location line="+133"/>
+        <location line="+135"/>
         <source>Active now</source>
         <translation>Aktiv nu</translation>
     </message>
@@ -142,7 +142,7 @@
     <message>
         <location line="+0"/>
         <source>Public torrent</source>
-        <translation>Offentlig torrent</translation>
+        <translation>Publik torrent</translation>
     </message>
     <message>
         <location line="+69"/>
@@ -160,7 +160,7 @@
         <translation>Skapad av %1 den %2</translation>
     </message>
     <message>
-        <location line="+173"/>
+        <location line="+204"/>
         <location line="+47"/>
         <source>Encrypted connection</source>
         <translation>Krypterad anslutning</translation>
@@ -227,12 +227,12 @@
     <message>
         <location line="+35"/>
         <source>Add URL(s) </source>
-        <translation type="unfinished"></translation>
+        <translation>Lägg till webbadresser</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Add tracker announce URLs, one per line:</source>
-        <translation type="unfinished"></translation>
+        <translation>Lägg till webbadresser för spårningsannonser, en per rad:</translation>
     </message>
     <message>
         <location line="+27"/>
@@ -242,10 +242,10 @@
     <message>
         <location line="+0"/>
         <source>No new URLs found.</source>
-        <translation type="unfinished"></translation>
+        <translation>Inga nya webbadresser hittades.</translation>
     </message>
     <message>
-        <location line="-799"/>
+        <location line="-832"/>
         <source>%1 (100%)</source>
         <extracomment>Text following the &quot;Have:&quot; label in torrent properties dialog; %1 is amount of downloaded and verified data</extracomment>
         <translation>%1 (100%)</translation>
@@ -268,12 +268,13 @@
         <translation>%1 (Kvot: %2)</translation>
     </message>
     <message>
-        <location line="+271"/>
+        <location line="+273"/>
+        <location line="+55"/>
         <source>N/A</source>
         <translation>N/A</translation>
     </message>
     <message>
-        <location line="+250"/>
+        <location line="+226"/>
         <source>Peer is connected over uTP</source>
         <translation>Jämlike är ansluten över uTP</translation>
     </message>
@@ -424,12 +425,12 @@
         <translation>Plats:</translation>
     </message>
     <message>
-        <location line="+110"/>
+        <location line="+124"/>
         <source>Edit Trackers</source>
-        <translation type="unfinished"></translation>
+        <translation>Redigera spårare</translation>
     </message>
     <message>
-        <location line="-176"/>
+        <location line="-190"/>
         <source>Hash:</source>
         <translation>Hash:</translation>
     </message>
@@ -445,6 +446,11 @@
     </message>
     <message>
         <location line="+78"/>
+        <source>Added:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+14"/>
         <source>Comment:</source>
         <translation>Kommentar:</translation>
     </message>
@@ -476,7 +482,7 @@
     <message>
         <location line="+7"/>
         <source>Show &amp;backup trackers</source>
-        <translation>Visa &amp;spårare för säkerhetskopiering</translation>
+        <translation>Visa &amp;reservspårare</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -542,7 +548,7 @@
 <context>
     <name>FileTreeItem</name>
     <message>
-        <location filename="../FileTreeItem.cc" line="+285"/>
+        <location filename="../FileTreeItem.cc" line="+296"/>
         <location filename="../FileTreeView.cc" line="+108"/>
         <location line="+257"/>
         <source>Low</source>
@@ -577,22 +583,22 @@
         <translation>Fil</translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="+3"/>
         <source>Size</source>
         <translation>Storlek</translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="+3"/>
         <source>Progress</source>
         <translation>Förlopp</translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="+3"/>
         <source>Download</source>
         <translation>Hämta</translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="+3"/>
         <source>Priority</source>
         <translation>Prioritet</translation>
     </message>
@@ -901,12 +907,12 @@
     <message>
         <location line="-132"/>
         <source>Options</source>
-        <translation type="unfinished">Alternativ</translation>
+        <translation>Alternativ</translation>
     </message>
     <message>
         <location line="+83"/>
         <source>Statistics</source>
-        <translation type="unfinished">Statistik</translation>
+        <translation>Statistik</translation>
     </message>
     <message>
         <location line="+171"/>
@@ -1203,22 +1209,22 @@
     <message>
         <location line="+11"/>
         <source>Move to &amp;Top</source>
-        <translation>Flytta &amp;överst</translation>
+        <translation>Flytta &amp;längst fram</translation>
     </message>
     <message>
         <location line="+5"/>
         <source>Move &amp;Up</source>
-        <translation>Flytta &amp;upp</translation>
+        <translation>Flytta &amp;fram</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Move &amp;Down</source>
-        <translation>Flytta &amp;ner</translation>
+        <translation>Flytta &amp;bak</translation>
     </message>
     <message>
         <location line="+8"/>
         <source>Move to &amp;Bottom</source>
-        <translation>Flytta &amp;nederst</translation>
+        <translation>Flytta &amp;längst bak</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -1226,7 +1232,7 @@
         <translation>Sortera efter &amp;kö</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cc" line="+471"/>
+        <location filename="../MainWindow.cc" line="+470"/>
         <source>Limit Download Speed</source>
         <translation>Begränsa hämtningshastighet</translation>
     </message>
@@ -1302,12 +1308,12 @@
         <translation>Öppna torrent</translation>
     </message>
     <message>
-        <location line="-986"/>
+        <location line="-985"/>
         <source>Speed Limits</source>
         <translation>Hastighetsgränser</translation>
     </message>
     <message>
-        <location line="+520"/>
+        <location line="+519"/>
         <source>Network Error</source>
         <translation>Nätverksfel</translation>
     </message>
@@ -1497,8 +1503,8 @@
         <location line="+23"/>
         <source>To add a backup URL, add it on the line after the primary URL.
 To add another primary URL, add it after a blank line.</source>
-        <translation>Om du vill lägga till en säkerhetskopieringswebbadress lägger du till den på raden efter den primära webbadressen.
-Om du vill lägga till ytterligare en primär webbadress lägger du till den efter en tom rad.</translation>
+        <translation>För att lägga till en webbadress för reservspårare lägger du till den på raden efter den primära webbadressen.
+För att lägga till ytterligare en primär webbadress lägger du till den efter en tom rad.</translation>
     </message>
     <message>
         <location line="+8"/>
@@ -1508,7 +1514,7 @@ Om du vill lägga till ytterligare en primär webbadress lägger du till den eft
     <message>
         <location line="+14"/>
         <source>&amp;Source:</source>
-        <translation type="unfinished">&amp;Källa:</translation>
+        <translation>&amp;Källa:</translation>
     </message>
     <message>
         <location line="+14"/>
@@ -1751,7 +1757,7 @@ Om du vill lägga till ytterligare en primär webbadress lägger du till den eft
     <message>
         <location line="+159"/>
         <source>Select &quot;Torrent Done Downloading&quot; Script</source>
-        <translation type="unfinished"></translation>
+        <translation>Välj skriptet &quot;Torrenthämtning klar&quot;.</translation>
     </message>
     <message>
         <location filename="../PrefsDialog.ui" line="+545"/>
@@ -1762,7 +1768,7 @@ Om du vill lägga till ytterligare en primär webbadress lägger du till den eft
         <location line="+32"/>
         <location filename="../PrefsDialog.cc" line="+207"/>
         <source>Status unknown</source>
-        <translation>Okänd status</translation>
+        <translation>Status okänd</translation>
     </message>
     <message>
         <location line="-20"/>
@@ -1801,7 +1807,7 @@ Om du vill lägga till ytterligare en primär webbadress lägger du till den eft
     <message>
         <location line="+10"/>
         <source>Select &quot;Torrent Done Seeding&quot; Script</source>
-        <translation type="unfinished"></translation>
+        <translation>Välj skriptet &quot;Torrentdistribution klar&quot;.</translation>
     </message>
     <message numerus="yes">
         <location line="+19"/>
@@ -2012,32 +2018,32 @@ Om du vill lägga till ytterligare en primär webbadress lägger du till den eft
     <message>
         <location line="+186"/>
         <source>Reads user clipboard content for torrents</source>
-        <translation type="unfinished"></translation>
+        <translation>Läser användarens urklippsinnehåll för torrenter</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Detect new torrents from clipboard</source>
-        <translation type="unfinished"></translation>
+        <translation>Upptäck nya torrenter från urklipp</translation>
     </message>
     <message>
         <location line="+148"/>
         <source>Call scrip&amp;t when downloading is completed:</source>
-        <translation type="unfinished"></translation>
+        <translation>Anropa skrip&amp;t när hämtningen är klar:</translation>
     </message>
     <message>
         <location line="+105"/>
         <source>Call scrip&amp;t when seeding is completed:</source>
-        <translation type="unfinished"></translation>
+        <translation>Anropa skrip&amp;t när distributionen är klar:</translation>
     </message>
     <message>
         <location line="+406"/>
         <source>Default Public Trackers</source>
-        <translation type="unfinished"></translation>
+        <translation>Publika spårare som standard</translation>
     </message>
     <message>
         <location line="+12"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Trackers to use on all public torrents.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;To add a backup URL, add it on the next line after a primary URL.&lt;/p&gt;&lt;p&gt;To add a new primary URL, add it after a blank line.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Spårare att använda på alla publika torrenter.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;För att lägga till en webbadress för reservspårare, lägg till den på nästa rad efter en primär webbadress.&lt;/p&gt;&lt;p&gt;För att lägga till en ny primär webbadress, lägg till den efter en tom rad.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location line="+60"/>
@@ -2132,7 +2138,7 @@ Om du vill lägga till ytterligare en primär webbadress lägger du till den eft
     <message>
         <location line="+147"/>
         <source>Download is i&amp;nactive if data sharing stopped:</source>
-        <extracomment>Please keep this phrase as short as possible, it&apos;s curently the longest and influences dialog width</extracomment>
+        <extracomment>Please keep this phrase as short as possible, it&apos;s currently the longest and influences dialog width</extracomment>
         <translation>Hämtning är &amp;inaktiv om datadelning stoppas:</translation>
     </message>
     <message>
@@ -2196,7 +2202,7 @@ Om du vill lägga till ytterligare en primär webbadress lägger du till den eft
     <message>
         <location line="+305"/>
         <source>Start Now</source>
-        <translation type="unfinished"></translation>
+        <translation>Starta nu</translation>
     </message>
 </context>
 <context>
@@ -2235,14 +2241,14 @@ Om du vill lägga till ytterligare en primär webbadress lägger du till den eft
 <context>
     <name>Session</name>
     <message>
-        <location filename="../Session.cc" line="+510"/>
+        <location filename="../Session.cc" line="+498"/>
         <source>Error Renaming Path</source>
         <translation>Fel vid namnbyte av sökväg</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>&lt;p&gt;&lt;b&gt;Unable to rename &quot;%1&quot; as &quot;%2&quot;: %3.&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Please correct the errors and try again.&lt;/p&gt;</source>
-        <translation>&lt;p&gt;&lt;b&gt;Fel när &quot;%1&quot; döptes om till &quot;%2&quot;: %3.&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Vänligen rättta felen och försök igen.&lt;/p&gt;</translation>
+        <translation>&lt;p&gt;&lt;b&gt;Fel när &quot;%1&quot; döptes om till &quot;%2&quot;: %3.&lt;/b&gt;&lt;/p&gt;&lt;p&gt;Rätta till felen och försök igen.&lt;/p&gt;</translation>
     </message>
     <message>
         <location line="+531"/>
@@ -2372,22 +2378,22 @@ Om du vill lägga till ytterligare en primär webbadress lägger du till den eft
 <context>
     <name>Torrent</name>
     <message>
-        <location filename="../Torrent.cc" line="+308"/>
+        <location filename="../Torrent.cc" line="+300"/>
         <source>Verifying local data</source>
         <translation>Verifierar lokala data</translation>
     </message>
     <message>
-        <location line="+8"/>
+        <location line="+6"/>
         <source>Downloading</source>
         <translation>Hämtar</translation>
     </message>
     <message>
-        <location line="+8"/>
+        <location line="+6"/>
         <source>Seeding</source>
         <translation>Distribuering</translation>
     </message>
     <message>
-        <location line="-24"/>
+        <location line="-18"/>
         <source>Finished</source>
         <translation>Slutförd</translation>
     </message>
@@ -2397,32 +2403,32 @@ Om du vill lägga till ytterligare en primär webbadress lägger du till den eft
         <translation>Pausad</translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="+3"/>
         <source>Queued for verification</source>
         <translation>I kö för verifiering</translation>
     </message>
     <message>
-        <location line="+8"/>
+        <location line="+6"/>
         <source>Queued for download</source>
         <translation>I kö för hämtning</translation>
     </message>
     <message>
-        <location line="+8"/>
+        <location line="+6"/>
         <source>Queued for seeding</source>
         <translation>I kö för distribuering</translation>
     </message>
     <message>
-        <location line="+18"/>
+        <location line="+15"/>
         <source>Tracker gave a warning: %1</source>
         <translation>Spårare gav en varning: %1</translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="+3"/>
         <source>Tracker gave an error: %1</source>
         <translation>Spårare gav ett fel: %1</translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="+3"/>
         <source>Error: %1</source>
         <translation>Fel: %1</translation>
     </message>
@@ -2642,27 +2648,27 @@ Om du vill lägga till ytterligare en primär webbadress lägger du till den eft
     <message>
         <location filename="../TrackersDialog.ui" line="+17"/>
         <source>Edit Trackers</source>
-        <translation type="unfinished"></translation>
+        <translation>Redigera spårare</translation>
     </message>
     <message>
         <location line="+9"/>
         <source>Tracker Announce URLs</source>
-        <translation type="unfinished"></translation>
+        <translation>Annonseringswebbadresser för spårare</translation>
     </message>
     <message>
         <location line="+12"/>
         <source>To add a new primary URL, add it after a blank line.</source>
-        <translation type="unfinished"></translation>
+        <translation>För att lägga till en ny primär webbadress, lägg till den efter en tom rad.</translation>
     </message>
     <message>
         <location line="+14"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;To add a backup URL, add it on the next line after a primary URL.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;För att lägga till en webbadress för reservspårare, lägg till den på nästa rad efter en primär webbadress.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Also see Default Public Trackers in Edit &gt; Preferences &gt; Network</source>
-        <translation type="unfinished"></translation>
+        <translation>Se även publika standardspårare i Redigera &gt; Inställningar &gt; Nätverk</translation>
     </message>
 </context>
 </TS>

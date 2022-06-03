@@ -626,12 +626,9 @@ bool tr_torrent::hasAnyLocalData() const
 
 static bool setLocalErrorIfFilesDisappeared(tr_torrent* tor, std::optional<bool> has_local_data = {})
 {
-    if (!has_local_data)
-    {
-        has_local_data = tor->hasAnyLocalData();
-    }
+    auto const has = has_local_data ? *has_local_data : tor->hasAnyLocalData();
+    bool const files_disappeared = tor->hasTotal() > 0 && !has;
 
-    bool const files_disappeared = tor->hasTotal() > 0 && !*has_local_data;
     if (files_disappeared)
     {
         tr_logAddTraceTor(tor, "[LAZY] uh oh, the files disappeared");
