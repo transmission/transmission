@@ -1,15 +1,3 @@
-/* Add torrent -> info
-   Create torrent -> info
-   Drag overlay -> torrents
-   Inspector -> selected torrents */
-"%lu files" = "%lu файлов";
-
-/* Prefs -> blocklist -> message */
-"%lu IP address rules in list" = "%lu IP-адресов в списке";
-
-/* Inspector -> selected torrents */
-"%lu magnetized transfers" = "%lu maget-разд.";
-
 /* file size string
    Inspector -> Files tab -> file status string
    Status bar transfer count */
@@ -23,26 +11,22 @@
    Torrent -> progress string */
 "%@ selected" = "%@ выбрано";
 
-/* stats window -> times opened */
-"%lu times" = "%lu раз";
-
-/* Drag overlay -> torrents */
-"%lu Torrent Files" = "%lu торрент-файлов";
-
-/* Inspector -> selected torrents */
-"%lu Torrents Selected" = "%lu разд.";
-
 /* Inspector -> selected torrents
    stats total */
 "%@ total" = "%@ всего";
 
-/* Filter Bar Button -> tool tip
-   Status bar transfer count
-   Torrent table -> group row -> tooltip */
-"%lu transfers" = "%lu разд.";
-
 /* Inspector -> Activity tab -> have */
 "%@ verified" = "%@ проверено";
+
+/* Action menu -> upload/download limit
+   Status Bar -> speed tooltip */
+"%ld KB/s" = "%ld КБ/s";
+
+/* Info options -> global setting */
+"%ld minutes" = "%ld мин";
+
+/* stats window -> times opened */
+"%llu times" = "";
 
 /* Inspector -> Peers tab -> peers */
 "%lu cache" = "%lu в кеше";
@@ -56,12 +40,17 @@
 /* Dock item - Downloading */
 "%lu Downloading" = "%lu скачивается";
 
+/* Add torrent -> info
+   Create torrent -> info
+   Drag overlay -> torrents
+   Inspector -> selected torrents */
+"%lu files" = "%lu файлов";
+
 /* Inspector -> Peers tab -> peers */
 "%lu incoming" = "%lu входящих";
 
-/* Action menu -> upload/download limit
-   Status Bar -> speed tooltip */
-"%ld KB/s" = "%ld КБ/s";
+/* Prefs -> blocklist -> message */
+"%lu IP address rules in list" = "%lu IP-адресов в списке";
 
 /* Inspector -> Peers tab -> peers */
 "%lu local discovery" = "%lu местных польз.";
@@ -69,23 +58,34 @@
 /* Inspector -> Peers tab -> peers */
 "%lu LTEP" = "%lu LTEP";
 
-/* Info options -> global setting */
-"%ld minutes" = "%ld мин";
+/* Inspector -> selected torrents */
+"%lu magnetized transfers" = "%lu maget-разд.";
 
 /* Inspector -> Peers tab -> peers */
 "%lu PEX" = "%lu PEX";
 
-/* Create torrent -> info */
-"%u pieces, %@ each" = "%1$u частей, %2$@ каждая";
-
 /* Dock item - Seeding */
 "%lu Seeding" = "%lu раздается";
+
+/* Drag overlay -> torrents */
+"%lu Torrent Files" = "%lu торрент-файлов";
+
+/* Inspector -> selected torrents */
+"%lu Torrents Selected" = "%lu разд.";
 
 /* Inspector -> Peers tab -> peers */
 "%lu tracker" = "%lu от трекера";
 
+/* Filter Bar Button -> tool tip
+   Status bar transfer count
+   Torrent table -> group row -> tooltip */
+"%lu transfers" = "%lu разд.";
+
 /* Torrent -> status string */
 "%lu web seeds" = "%lu сайтов раздачи";
+
+/* Create torrent -> info */
+"%u pieces, %@ each" = "%1$u частей, %2$@ каждая";
 
 /* Inspector -> Peers tab -> peers */
 "1 Connected" = "1 подключен";
@@ -192,14 +192,14 @@
 /* Remove completed confirm panel -> title */
 "Are you sure you want to remove %lu completed transfers from the transfer list?" = "Вы действительно хотите удалить %lu завершенных раздач из списка?";
 
+/* Remove trackers alert -> title */
+"Are you sure you want to remove %lu trackers?" = "Выделено трекеров: %lu. Вы действительно хотите удалить трекеры?";
+
 /* Removal confirm panel -> title */
 "Are you sure you want to remove %lu transfers from the transfer list and trash the data files?" = "Вы действительно хотите удалить %lu раздач из списка и переместить их данные в Корзину?";
 
 /* Removal confirm panel -> title */
 "Are you sure you want to remove %lu transfers from the transfer list?" = "Вы действительно хотите удалить %lu раздач из списка?";
-
-/* Remove trackers alert -> title */
-"Are you sure you want to remove %lu trackers?" = "Выделено трекеров: %lu. Вы действительно хотите удалить трекеры?";
 
 /* Removal confirm panel -> title */
 "Are you sure you want to remove \"%@\" from the transfer list and trash the data file?" = "Вы действительно хотите удалить «%@» из списка раздач и переместить данные в Корзину?";
@@ -373,7 +373,8 @@
 /* inspector -> peer table -> header tool tip */
 "Encrypted Connection" = "Зашифрованное соединение";
 
-/* Message window -> level
+/* Filter Bar -> filter button
+   Message window -> level
    Message window -> level string
    Torrent -> status string */
 "Error" = "Ошибка";
@@ -565,6 +566,9 @@
 
 /* Group table row */
 "No Group" = "✕";
+
+/* No comment provided by engineer. */
+"No napping on the job!" = "";
 
 /* Inspector -> selected torrents */
 "No Torrents Selected" = "Ни один торрент не выбран";
@@ -969,13 +973,13 @@
 "The transfer will not contact trackers for peers, and will have to rely solely on non-tracker peer discovery methods such as PEX and DHT to download and seed." = "Раздача не будет обмениваться информацией о пользователях с трекером, получая информацию скачивания и раздачи через DHT и PEX.";
 
 /* Removal confirm panel -> message part 1 */
-"There are %lu active transfers." = "%lu активных раздач.";
-
-/* Removal confirm panel -> message part 1 */
 "There are %1$lu transfers (%2$lu active)." = "%1$lu раздач (%2$lu из них активны).";
 
 /* Confirm Quit panel -> message */
 "There are %lu active transfers that will be paused on quit. The transfers will automatically resume on the next launch." = "%lu активных раздач будут приостановлены. При следующем запуске они будут автоматически возобновлены.";
+
+/* Removal confirm panel -> message part 1 */
+"There are %lu active transfers." = "%lu активных раздач.";
 
 /* Create torrent -> blank address -> title */
 "There are no tracker addresses." = "Нет адреса трекеров.";
@@ -1043,6 +1047,9 @@
 
 /* Status Bar -> status menu */
 "Total Transfer" = "Роздано за все время";
+
+/* Message window -> level string */
+"Trace" = "";
 
 /* Filter Bar -> filter menu */
 "Tracker" = "Трекер";
@@ -1118,6 +1125,9 @@
 
 /* Torrent -> status string */
 "Waiting to seed" = "Ожидаю раздачи";
+
+/* Message window -> level string */
+"Warn" = "";
 
 /* Drag overlay -> url */
 "Web Address" = "URL";
