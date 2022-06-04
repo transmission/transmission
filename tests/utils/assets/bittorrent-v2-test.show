@@ -1,0 +1,31 @@
+Name: bittorrent-v2-test
+File: assets/bittorrent-v2-test.torrent
+
+GENERAL
+
+  Name: bittorrent-v2-test
+  Hash: f987ab6bb50f831a861c3754ecd1b47dc2cf2e30
+  Created by: libtorrent
+  Created on: Thu May 21 21:40:57 2020
+
+  Piece Count: 366
+  Piece Size: 4.00 MiB
+  Total Size: 1.53 GB
+  Privacy: Public torrent
+
+TRACKERS
+
+FILES
+
+  bittorrent-v2-test/13.Popsy Team - ViP 2.vob.mp4 (27.55 MB)
+  bittorrent-v2-test/Chameleon by ASD (female voice).mov (91.86 MB)
+  bittorrent-v2-test/Darkroom (Stellar, 1994, Amiga ECS) HQ.mp4 (6.54 MB)
+  bittorrent-v2-test/Struct by Outracks (FullHD 1080p HQ demoscene).mov (141.1 MB)
+  bittorrent-v2-test/asd-rupture.mp4 (263.7 MB)
+  bittorrent-v2-test/cncd_fairlight-ceasefire_(all_falls_down)-1080p.mp4 (342.2 MB)
+  bittorrent-v2-test/crionics & silents - hardwired (1991, hpad, divx5).avi (135.0 MB)
+  bittorrent-v2-test/elevated_4000.avi (113.3 MB)
+  bittorrent-v2-test/luma - mercury _ 64k _ Final.mp4 (183.8 MB)
+  bittorrent-v2-test/readme.txt (0.06 kB)
+  bittorrent-v2-test/tbl-starstruck-2006.avi (229.1 MB)
+

@@ -755,9 +755,9 @@ bool tr_sessionIsScriptEnabled(tr_session const*, TrScript);
  *
  * Passing nullptr for a filename will clear the blocklist.
  */
-int tr_blocklistSetContent(tr_session* session, char const* filename);
+size_t tr_blocklistSetContent(tr_session* session, char const* filename);
 
-int tr_blocklistGetRuleCount(tr_session const* session);
+size_t tr_blocklistGetRuleCount(tr_session const* session);
 
 bool tr_blocklistExists(tr_session const* session);
 
@@ -1343,7 +1343,7 @@ struct tr_tracker_view
     int downloadCount; // number of times this torrent's been downloaded, or -1 if unknown
     int lastAnnouncePeerCount; // if hasAnnounced, the number of peers the tracker gave us
     int leecherCount; // number of leechers the tracker knows of, or -1 if unknown
-    int seederCount; // number of seeders the tracker knows of, or -1 if  unknown
+    int seederCount; // number of seeders the tracker knows of, or -1 if unknown
 
     int tier; // which tier this tracker is in
     int id; // unique transmission-generated ID for use in libtransmission API

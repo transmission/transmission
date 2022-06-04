@@ -51,10 +51,12 @@ private:
         Val() noexcept = default;
         Val(Val const&) = delete;
         Val& operator=(Val const&) = delete;
-        Val(Val&& that) noexcept {
+        Val(Val&& that) noexcept
+        {
             *this = std::move(that);
         }
-        Val& operator=(Val&& that) noexcept {
+        Val& operator=(Val&& that) noexcept
+        {
             std::swap(this->fd_, that.fd_);
             std::swap(this->writable_, that.writable_);
             return *this;

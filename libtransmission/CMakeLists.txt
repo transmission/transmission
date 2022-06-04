@@ -25,7 +25,6 @@ set(PROJECT_FILES
   crypto-utils.cc
   crypto.cc
   error.cc
-  file-info.cc
   file-piece-map.cc
   file-posix.cc
   file-win32.cc
@@ -168,7 +167,6 @@ set(${PROJECT_NAME}_PRIVATE_HEADERS
     completion.h
     crypto-utils.h
     crypto.h
-    file-info.h
     file-piece-map.h
     handshake.h
     history.h
@@ -262,6 +260,7 @@ include_directories(
     SYSTEM
     ${UTFCPP_INCLUDE_DIRS}
     ${DEFLATE_INCLUDE_DIRS}
+    ${FAST_FLOAT_INCLUDE_DIRS}
     ${CRYPTO_INCLUDE_DIRS}
     ${CURL_INCLUDE_DIRS}
     ${EVENT2_INCLUDE_DIRS}

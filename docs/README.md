@@ -3,8 +3,8 @@ New to Transmission?
   * Try the help in Transmission's "Help" menu.
   * simplehelp.net has an introduction for [Transmission on Macs](https://www.simplehelp.net/2008/07/17/how-to-use-transmission-as-your-bittorrent-client-os-x/).
   * Jun Azua has an introduction for [Transmission GUI on Linux](https://www.junauza.com/2009/01/how-to-use-bittorrent-in-linux.html).
-  * Running Transmission [without a GUI](HeadlessUsage)
-  * Using Transmission [from a web browser](Web Interface)
+  * Running Transmission [without a GUI](./Headless-Usage.md)
+  * Using Transmission [from a web browser](./Web-Interface.md)
 
 Want to learn more?
   * Visit our [forums](https://forum.transmissionbt.com)

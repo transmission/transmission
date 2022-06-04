@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="19162" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="20037" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19162"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="20037"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -26,7 +26,7 @@
                     <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2690">
                         <rect key="frame" x="36" y="3" width="36" height="18"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                        <buttonCell key="cell" type="squareTextured" bezelStyle="texturedSquare" image="TurtleTemplate" imagePosition="only" alignment="center" state="on" imageScaling="proportionallyDown" inset="2" id="3048">
+                        <buttonCell key="cell" type="squareTextured" bezelStyle="texturedSquare" image="TortoiseTemplate" imagePosition="only" alignment="center" state="on" imageScaling="proportionallyDown" inset="2" id="3048">
                             <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
                             <font key="font" metaFont="system"/>
                         </buttonCell>
@@ -49,7 +49,7 @@
                     <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="3435">
                         <rect key="frame" x="0.0" y="3" width="36" height="18"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                        <buttonCell key="cell" type="squareTextured" bezelStyle="texturedSquare" image="NSActionTemplate" imagePosition="only" alignment="center" state="on" imageScaling="proportionallyDown" inset="2" id="3436">
+                        <buttonCell key="cell" type="squareTextured" bezelStyle="texturedSquare" image="GearshapeTemplate" imagePosition="only" alignment="center" state="on" imageScaling="proportionallyDown" inset="2" id="3436">
                             <behavior key="behavior" lightByContents="YES"/>
                             <font key="font" metaFont="system"/>
                         </buttonCell>
@@ -813,6 +813,11 @@ CA
                         <action selector="announceSelectedTorrents:" target="206" id="2124"/>
                     </connections>
                 </menuItem>
+                <menuItem title="Verifieer data" id="3221">
+                    <connections>
+                        <action selector="verifySelectedTorrents:" target="206" id="3222"/>
+                    </connections>
+                </menuItem>
                 <menuItem isSeparatorItem="YES" id="3450">
                     <modifierMask key="keyEquivalentModifierMask" command="YES"/>
                 </menuItem>
@@ -972,11 +977,11 @@ CA
     </objects>
     <resources>
         <image name="CleanupTemplate" width="18" height="18"/>
-        <image name="NSActionTemplate" width="15" height="15"/>
+        <image name="GearshapeTemplate" width="18" height="18"/>
         <image name="PriorityHighTemplate" width="12" height="12"/>
         <image name="PriorityLowTemplate" width="12" height="12"/>
         <image name="PriorityNormalTemplate" width="12" height="12"/>
-        <image name="TurtleTemplate" width="18" height="18"/>
+        <image name="TortoiseTemplate" width="18" height="18"/>
         <image name="imageCell:3146:image" width="62" height="62">
             <mutableData key="keyedArchiveRepresentation">
 YnBsaXN0MDDUAQIDBAUGBwpYJHZlcnNpb25ZJGFyY2hpdmVyVCR0b3BYJG9iamVjdHMSAAGGoF8QD05T

@@ -23,8 +23,11 @@
 
 @property(nonatomic, readonly) NSUInteger identifier;
 
+/// -1 if unknown
 @property(nonatomic, readonly) NSInteger totalSeeders;
+/// -1 if unknown
 @property(nonatomic, readonly) NSInteger totalLeechers;
+/// -1 if unknown
 @property(nonatomic, readonly) NSInteger totalDownloaded;
 
 @property(nonatomic, readonly) NSString* lastAnnounceStatusString;

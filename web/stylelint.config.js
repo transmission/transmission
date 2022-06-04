@@ -5,8 +5,8 @@ module.exports = {
     "stylelint-config-prettier"
   ],
   "plugins":  [
-    "stylelint-config-primer/plugins/no-undefined-vars",
-    "stylelint-config-primer/plugins/no-unused-vars"
+    "@primer/stylelint-config/plugins/no-undefined-vars",
+    "@primer/stylelint-config/plugins/no-unused-vars"
   ],
   "rules": {
     "block-no-empty": true,
@@ -15,7 +15,6 @@ module.exports = {
     "declaration-block-no-duplicate-properties": true,
     "declaration-block-no-shorthand-property-overrides": true,
     "font-family-no-duplicate-names": true,
-    "function-calc-no-invalid": true,
     "function-calc-no-unspaced-operator": true,
     "function-linear-gradient-no-nonstandard-direction": true,
     "max-nesting-depth": null,

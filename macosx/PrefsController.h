@@ -6,7 +6,9 @@
 
 #include <libtransmission/transmission.h>
 
-@interface PrefsController : NSWindowController<NSToolbarDelegate>
+@protocol PortCheckerDelegate;
+
+@interface PrefsController : NSWindowController<NSToolbarDelegate, PortCheckerDelegate>
 
 @property(nonatomic, readonly) NSArray<NSString*>* sounds;
 

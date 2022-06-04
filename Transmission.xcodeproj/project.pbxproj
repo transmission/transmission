@@ -22,6 +22,8 @@
 		3C7A11990D0B2EE300B5701F /* natpmp.c in Sources */ = {isa = PBXBuildFile; fileRef = 3C7A11930D0B2EE300B5701F /* natpmp.c */; };
 		3C7A119A0D0B2EE300B5701F /* natpmp.h in Headers */ = {isa = PBXBuildFile; fileRef = 3C7A11940D0B2EE300B5701F /* natpmp.h */; };
 		4394AC670C74FB6000F367E8 /* ptrarray.cc in Sources */ = {isa = PBXBuildFile; fileRef = 4394AC640C74FB6000F367E8 /* ptrarray.cc */; };
+		45A7D3292843B54D00F0C32A /* GroupPopUpButtonCell.mm in Sources */ = {isa = PBXBuildFile; fileRef = 45A7D3282843B54D00F0C32A /* GroupPopUpButtonCell.mm */; };
+		45A7D32C2843B55F00F0C32A /* PriorityPopUpButtonCell.mm in Sources */ = {isa = PBXBuildFile; fileRef = 45A7D32B2843B55F00F0C32A /* PriorityPopUpButtonCell.mm */; };
 		4D043A7F090AE979009FEDA8 /* TransmissionDocument.icns in Resources */ = {isa = PBXBuildFile; fileRef = 4D043A7E090AE979009FEDA8 /* TransmissionDocument.icns */; };
 		4D118E1A08CB46B20033958F /* PrefsController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4D118E1908CB46B20033958F /* PrefsController.mm */; };
 		4D1838DD09DEC0E80047D688 /* libtransmission.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D18389709DEC0030047D688 /* libtransmission.a */; };
@@ -155,7 +157,7 @@
 		A24621410C769D0900088E81 /* trevent.h in Headers */ = {isa = PBXBuildFile; fileRef = A24621350C769CF400088E81 /* trevent.h */; };
 		A24621420C769D0900088E81 /* trevent.cc in Sources */ = {isa = PBXBuildFile; fileRef = A24621360C769CF400088E81 /* trevent.cc */; };
 		A247A443114C701800547DFC /* InfoViewController.h in Headers */ = {isa = PBXBuildFile; fileRef = A247A442114C701800547DFC /* InfoViewController.h */; };
-		A24F19080A3A790800C9C145 /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A24F19070A3A790800C9C145 /* Sparkle.framework */; };
+		A24F19080A3A790800C9C145 /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A24F19070A3A790800C9C145 /* Sparkle.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		A24F19210A3A796800C9C145 /* Sparkle.framework in Copy Files */ = {isa = PBXBuildFile; fileRef = A24F19070A3A790800C9C145 /* Sparkle.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		A250EEB60E2ED87B00A688E6 /* web in Resources */ = {isa = PBXBuildFile; fileRef = A250EE800E2ED87B00A688E6 /* web */; };
 		A254853C0EB66CD4004539DA /* codelength.h in Headers */ = {isa = PBXBuildFile; fileRef = A25485390EB66CBB004539DA /* codelength.h */; };
@@ -237,7 +239,6 @@
 		A2D77451154CC25700A62B93 /* WebSeedTableView.h in Headers */ = {isa = PBXBuildFile; fileRef = A2D7744F154CC25700A62B93 /* WebSeedTableView.h */; };
 		A2D77452154CC25700A62B93 /* WebSeedTableView.mm in Sources */ = {isa = PBXBuildFile; fileRef = A2D77450154CC25700A62B93 /* WebSeedTableView.mm */; };
 		A2D77453154CC72B00A62B93 /* WebSeedTableView.mm in Sources */ = {isa = PBXBuildFile; fileRef = A2D77450154CC25700A62B93 /* WebSeedTableView.mm */; };
-		A2D8CFBA15F82DFA0056E93D /* NSApplicationAdditions.mm in Sources */ = {isa = PBXBuildFile; fileRef = A29D84031049C25600D1987A /* NSApplicationAdditions.mm */; };
 		A2D8CFBB15F82E030056E93D /* NSStringAdditions.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4DE5CC9C0980656F00BE280E /* NSStringAdditions.mm */; };
 		A2DF37070C220D03006523C1 /* CreatorWindowController.mm in Sources */ = {isa = PBXBuildFile; fileRef = A2DF37050C220D03006523C1 /* CreatorWindowController.mm */; };
 		A2E384DA130DFB3A001F501B /* templates.h in Headers */ = {isa = PBXBuildFile; fileRef = A2E384D2130DFB3A001F501B /* templates.h */; };
@@ -255,7 +256,7 @@
 		A2E669790F5B8E5A00B4251A /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2E669780F5B8E5A00B4251A /* Security.framework */; };
 		A2EA52311686AC0D00180493 /* quark.cc in Sources */ = {isa = PBXBuildFile; fileRef = A2EA522F1686AC0D00180493 /* quark.cc */; };
 		A2EA52321686AC0D00180493 /* quark.h in Headers */ = {isa = PBXBuildFile; fileRef = A2EA52301686AC0D00180493 /* quark.h */; };
-		A2EB2E7715C8CF2C00FBD5B4 /* QuickLookPlugin.qlgenerator in CopyFiles */ = {isa = PBXBuildFile; fileRef = A2F35BB915C5A0A100EBF632 /* QuickLookPlugin.qlgenerator */; };
+		A2EB2E7715C8CF2C00FBD5B4 /* QuickLookPlugin.qlgenerator in CopyFiles */ = {isa = PBXBuildFile; fileRef = A2F35BB915C5A0A100EBF632 /* QuickLookPlugin.qlgenerator */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		A2ED7D8F0CEF431B00970975 /* FilterButton.mm in Sources */ = {isa = PBXBuildFile; fileRef = A2ED7D8E0CEF431B00970975 /* FilterButton.mm */; };
 		A2EE726F14DCCC950093C99A /* natpmp_local.h in Headers */ = {isa = PBXBuildFile; fileRef = A2EE726E14DCCC950093C99A /* natpmp_local.h */; };
 		A2F35BBC15C5A0A100EBF632 /* QuickLook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A2F35BBB15C5A0A100EBF632 /* QuickLook.framework */; };
@@ -272,8 +273,6 @@
 		A2FB701C0D95CAEA0001F331 /* GroupsController.mm in Sources */ = {isa = PBXBuildFile; fileRef = A2FB701B0D95CAEA0001F331 /* GroupsController.mm */; };
 		A47A7C87B8B57BE50DF0D410 /* torrent-files.cc in Sources */ = {isa = PBXBuildFile; fileRef = A47A7C87B8B57BE50DF0D411 /* torrent-files.cc */; };
 		A47A7C87B8B57BE50DF0D412 /* torrent-files.h in Headers */ = {isa = PBXBuildFile; fileRef = A47A7C87B8B57BE50DF0D413 /* torrent-files.h */; };
-		ACBE7A956ED89682EC4460E0 /* file-info.cc in Sources */ = {isa = PBXBuildFile; fileRef = ACBE7A956ED89682EC4460E1 /* file-info.cc */; };
-		ACBE7A956ED89682EC4460E2 /* file-info.h in Headers */ = {isa = PBXBuildFile; fileRef = ACBE7A956ED89682EC4460E3 /* file-info.h */; settings = {ATTRIBUTES = (Project, ); }; };
 		BE1183580CE160C50002D0F3 /* miniupnpc_declspec.h in Headers */ = {isa = PBXBuildFile; fileRef = BE11834E0CE160C50002D0F3 /* miniupnpc_declspec.h */; };
 		BE1183590CE160C50002D0F3 /* igd_desc_parse.h in Headers */ = {isa = PBXBuildFile; fileRef = BE11834F0CE160C50002D0F3 /* igd_desc_parse.h */; };
 		BE11835A0CE160C50002D0F3 /* minixml.h in Headers */ = {isa = PBXBuildFile; fileRef = BE1183500CE160C50002D0F3 /* minixml.h */; };
@@ -401,6 +400,7 @@
 		C3D9062727B7E3E800EF2386 /* psl.c in Sources */ = {isa = PBXBuildFile; fileRef = C3D9061827B7E1DE00EF2386 /* psl.c */; };
 		C3D9062A27B7EAC600EF2386 /* libpsl.h in Headers */ = {isa = PBXBuildFile; fileRef = C3D9061B27B7E31100EF2386 /* libpsl.h */; };
 		C3D9062F27B7F7E200EF2386 /* libpsl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C3D9062127B7E3C900EF2386 /* libpsl.a */; };
+		C86BCD9928228A9600F45599 /* SparkleProxy.mm in Sources */ = {isa = PBXBuildFile; fileRef = C86BCD9828228A9600F45599 /* SparkleProxy.mm */; };
 		C88771AD2803EE7B005C7523 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = C88771A92803EE42005C7523 /* libz.tbd */; };
 		C88771AE2803EE7C005C7523 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = C88771A92803EE42005C7523 /* libz.tbd */; };
 		C88771AF2803EE7D005C7523 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = C88771A92803EE42005C7523 /* libz.tbd */; };
@@ -619,6 +619,10 @@
 		3C7A11930D0B2EE300B5701F /* natpmp.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = natpmp.c; sourceTree = "<group>"; };
 		3C7A11940D0B2EE300B5701F /* natpmp.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = natpmp.h; sourceTree = "<group>"; };
 		4394AC640C74FB6000F367E8 /* ptrarray.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ptrarray.cc; sourceTree = "<group>"; };
+		45A7D3272843B54D00F0C32A /* GroupPopUpButtonCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GroupPopUpButtonCell.h; sourceTree = "<group>"; };
+		45A7D3282843B54D00F0C32A /* GroupPopUpButtonCell.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = GroupPopUpButtonCell.mm; sourceTree = "<group>"; };
+		45A7D32A2843B55F00F0C32A /* PriorityPopUpButtonCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PriorityPopUpButtonCell.h; sourceTree = "<group>"; };
+		45A7D32B2843B55F00F0C32A /* PriorityPopUpButtonCell.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = PriorityPopUpButtonCell.mm; sourceTree = "<group>"; };
 		4D043A7E090AE979009FEDA8 /* TransmissionDocument.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = TransmissionDocument.icns; path = Images/TransmissionDocument.icns; sourceTree = "<group>"; };
 		4D118E1808CB46B20033958F /* PrefsController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PrefsController.h; sourceTree = "<group>"; };
 		4D118E1908CB46B20033958F /* PrefsController.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = PrefsController.mm; sourceTree = "<group>"; };
@@ -1046,8 +1050,6 @@
 		A47A7C87B8B57BE50DF0D411 /* torrent-files.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "torrent-files.cc"; sourceTree = "<group>"; };
 		A47A7C87B8B57BE50DF0D413 /* torrent-files.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "torrent-files.h"; sourceTree = "<group>"; };
 		A54D44C6A7AAF131D9AE29F5 /* block-info.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "block-info.cc"; sourceTree = "<group>"; };
-		ACBE7A956ED89682EC4460E1 /* file-info.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "file-info.cc"; sourceTree = "<group>"; };
-		ACBE7A956ED89682EC4460E3 /* file-info.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "file-info.h"; sourceTree = "<group>"; };
 		BE1183480CE160960002D0F3 /* libminiupnp.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libminiupnp.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		BE11834E0CE160C50002D0F3 /* miniupnpc_declspec.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = miniupnpc_declspec.h; sourceTree = "<group>"; };
 		BE11834F0CE160C50002D0F3 /* igd_desc_parse.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = igd_desc_parse.h; sourceTree = "<group>"; };
@@ -1179,6 +1181,7 @@
 		C3D9061B27B7E31100EF2386 /* libpsl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = libpsl.h; path = include/libpsl.h; sourceTree = "<group>"; };
 		C3D9062127B7E3C900EF2386 /* libpsl.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libpsl.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		C81E411127F5BABD00652F56 /* CocoaCompatibility.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CocoaCompatibility.h; sourceTree = "<group>"; };
+		C86BCD9828228A9600F45599 /* SparkleProxy.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = SparkleProxy.mm; sourceTree = "<group>"; };
 		C88771A92803EE42005C7523 /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
 		C88771AB2803EE53005C7523 /* libiconv.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libiconv.tbd; path = usr/lib/libiconv.tbd; sourceTree = SDKROOT; };
 		C887BEC02807FCE900867D3C /* create.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = create.cc; sourceTree = "<group>"; };
@@ -1257,10 +1260,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				A2F35BBC15C5A0A100EBF632 /* QuickLook.framework in Frameworks */,
-				C88771AD2803EE7B005C7523 /* libz.tbd in Frameworks */,
 				A2F35BE115C5A7ED00EBF632 /* Cocoa.framework in Frameworks */,
 				A2F35BE315C5A7F900EBF632 /* Foundation.framework in Frameworks */,
 				A2F35BD415C5A19A00EBF632 /* libtransmission.a in Frameworks */,
+				C88771AD2803EE7B005C7523 /* libz.tbd in Frameworks */,
 				C88771B12803EE86005C7523 /* libiconv.tbd in Frameworks */,
 				55869932257074FE00F77A43 /* libcurl.tbd in Frameworks */,
 			);
@@ -1392,6 +1395,7 @@
 			children = (
 				32CA4F630368D1EE00C91783 /* Transmission_Prefix.pch */,
 				29B97316FDCFA39411CA2CEA /* main.mm */,
+				C86BCD9828228A9600F45599 /* SparkleProxy.mm */,
 				4DF0C5AA0899190500DD8943 /* Controller.h */,
 				4DF0C5A90899190500DD8943 /* Controller.mm */,
 				4DFBC2DD09C0970D00D5C571 /* Torrent.h */,
@@ -1462,6 +1466,10 @@
 				A20BFFB60D091CC700CE5D2B /* ToolbarSegmentedCell.mm */,
 				A22180960D148A71007D09ED /* GroupsPrefsController.h */,
 				A22180970D148A71007D09ED /* GroupsPrefsController.mm */,
+				45A7D3272843B54D00F0C32A /* GroupPopUpButtonCell.h */,
+				45A7D3282843B54D00F0C32A /* GroupPopUpButtonCell.mm */,
+				45A7D32A2843B55F00F0C32A /* PriorityPopUpButtonCell.h */,
+				45A7D32B2843B55F00F0C32A /* PriorityPopUpButtonCell.mm */,
 				A2FB701A0D95CAEA0001F331 /* GroupsController.h */,
 				A2FB701B0D95CAEA0001F331 /* GroupsController.mm */,
 				A2451E6616ACE4EB00586E0E /* FileRenameSheetController.h */,
@@ -1604,8 +1612,6 @@
 			children = (
 				A54D44C6A7AAF131D9AE29F5 /* block-info.cc */,
 				6A044CBD8C049AFCBD4DB411 /* block-info.h */,
-				ACBE7A956ED89682EC4460E1 /* file-info.cc */,
-				ACBE7A956ED89682EC4460E3 /* file-info.h */,
 				E23B55A5FC3B557F7746D511 /* interned-string.h */,
 				C17740D3273A002C00E455D2 /* web-utils.cc */,
 				C17740D4273A002C00E455D2 /* web-utils.h */,
@@ -2235,7 +2241,6 @@
 				A2AF23C916B44FA0003BC59E /* log.h in Headers */,
 				A23FAE55178BC2950053DC5B /* platform-quota.h in Headers */,
 				F11545ACA7C4D7A464F703AB /* block-info.h in Headers */,
-				ACBE7A956ED89682EC4460E2 /* file-info.h in Headers */,
 				E23B55A5FC3B557F7746D510 /* interned-string.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2995,7 +3000,6 @@
 				A2AF23C816B44FA0003BC59E /* log.cc in Sources */,
 				A23FAE54178BC2950053DC5B /* platform-quota.cc in Sources */,
 				62F644738FE3D8788EBF73A9 /* block-info.cc in Sources */,
-				ACBE7A956ED89682EC4460E0 /* file-info.cc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3011,6 +3015,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C86BCD9928228A9600F45599 /* SparkleProxy.mm in Sources */,
 				A225A4C0187E369C00CDE823 /* ShareToolbarItem.mm in Sources */,
 				A2D77453154CC72B00A62B93 /* WebSeedTableView.mm in Sources */,
 				8D11072D0486CEB800E47090 /* main.mm in Sources */,
@@ -3041,6 +3046,7 @@
 				A257C1820CAD3003004E121C /* PeerTableView.mm in Sources */,
 				A2A6321B0CD9751700E3DA60 /* BadgeView.mm in Sources */,
 				A2ED7D8F0CEF431B00970975 /* FilterButton.mm in Sources */,
+				45A7D32C2843B55F00F0C32A /* PriorityPopUpButtonCell.mm in Sources */,
 				A25892640CF1F7E800CCCDDF /* StatsWindowController.mm in Sources */,
 				A2C89D600CFCBF57004CC2BC /* ButtonToolbarItem.mm in Sources */,
 				A219798B0D07B78400438EA7 /* GroupToolbarItem.mm in Sources */,
@@ -3049,6 +3055,7 @@
 				A26AF21A0D2DA35A00FF7140 /* FileOutlineController.mm in Sources */,
 				A26AF2840D2DC27C00FF7140 /* AddWindowController.mm in Sources */,
 				A2FB701C0D95CAEA0001F331 /* GroupsController.mm in Sources */,
+				45A7D3292843B54D00F0C32A /* GroupPopUpButtonCell.mm in Sources */,
 				A2D307A40D9EC6870051FD27 /* BlocklistDownloader.mm in Sources */,
 				A2725B6E0DE5C4F5003445E7 /* FileListNode.mm in Sources */,
 				A2725D5D0DE7507C003445E7 /* TrackerTableView.mm in Sources */,
@@ -3103,9 +3110,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A2D8CFBB15F82E030056E93D /* NSStringAdditions.mm in Sources */,
-				A2D8CFBA15F82DFA0056E93D /* NSApplicationAdditions.mm in Sources */,
 				A29304EE15D7497C00B1F726 /* main.cc in Sources */,
+				A2D8CFBB15F82E030056E93D /* NSStringAdditions.mm in Sources */,
 				A2F35BCA15C5A0A100EBF632 /* GenerateThumbnailForURL.mm in Sources */,
 				A2F35BCC15C5A0A100EBF632 /* GeneratePreviewForURL.mm in Sources */,
 			);
@@ -3591,11 +3597,12 @@
 					"$(inherited)",
 					"third-party/arc4/src",
 					"third-party/dht",
+					"third-party/fast_float/include",
 					"third-party/libb64/include",
-					"third-party/libutp",
-					"third-party/utfcpp/source",
 					"third-party/libdeflate",
 					"third-party/libpsl/include",
+					"third-party/libutp",
+					"third-party/utfcpp/source",
 				);
 				OTHER_CFLAGS = (
 					"$(inherited)",
@@ -3622,6 +3629,8 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CODE_SIGN_ENTITLEMENTS = macosx/Transmission.entitlements;
+				CODE_SIGN_IDENTITY = "-";
 				ENABLE_HARDENED_RUNTIME = YES;
 				FRAMEWORK_SEARCH_PATHS = macosx;
 				GCC_PREFIX_HEADER = macosx/Transmission_Prefix.pch;
@@ -3645,6 +3654,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_OBJC_ARC = NO;
+				CODE_SIGN_IDENTITY = "-";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					.,
@@ -3663,6 +3673,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_OBJC_ARC = NO;
+				CODE_SIGN_IDENTITY = "-";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					.,
@@ -3684,6 +3695,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_OBJC_ARC = NO;
+				CODE_SIGN_IDENTITY = "-";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					.,
@@ -3757,6 +3769,7 @@
 					"-DFMT_HEADER_ONLY",
 				);
 				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
+				PRODUCT_BUNDLE_IDENTIFIER = org.m0k.transmission;
 				SDKROOT = macosx;
 				STRIP_INSTALLED_PRODUCT = NO;
 			};
@@ -3799,11 +3812,12 @@
 					"$(inherited)",
 					"third-party/arc4/src",
 					"third-party/dht",
+					"third-party/fast_float/include",
 					"third-party/libb64/include",
-					"third-party/libutp",
-					"third-party/utfcpp/source",
 					"third-party/libdeflate",
 					"third-party/libpsl/include",
+					"third-party/libutp",
+					"third-party/utfcpp/source",
 				);
 				OTHER_CFLAGS = (
 					"$(inherited)",
@@ -3829,6 +3843,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_OBJC_ARC = NO;
+				CODE_SIGN_IDENTITY = "-";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					.,
@@ -3848,6 +3863,8 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CODE_SIGN_ENTITLEMENTS = macosx/Transmission.entitlements;
+				CODE_SIGN_IDENTITY = "-";
 				ENABLE_HARDENED_RUNTIME = YES;
 				FRAMEWORK_SEARCH_PATHS = macosx;
 				GCC_PREFIX_HEADER = macosx/Transmission_Prefix.pch;
@@ -3925,6 +3942,7 @@
 					"-DNDEBUG",
 				);
 				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
+				PRODUCT_BUNDLE_IDENTIFIER = org.m0k.transmission;
 				SDKROOT = macosx;
 			};
 			name = Release;
@@ -4020,6 +4038,7 @@
 					"-DFMT_HEADER_ONLY",
 				);
 				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
+				PRODUCT_BUNDLE_IDENTIFIER = org.m0k.transmission;
 				SDKROOT = macosx;
 				STRIP_INSTALLED_PRODUCT = NO;
 			};
@@ -4032,6 +4051,8 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CODE_SIGN_ENTITLEMENTS = macosx/Transmission.entitlements;
+				CODE_SIGN_IDENTITY = "-";
 				ENABLE_HARDENED_RUNTIME = YES;
 				FRAMEWORK_SEARCH_PATHS = macosx;
 				GCC_PREFIX_HEADER = macosx/Transmission_Prefix.pch;
@@ -4055,6 +4076,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_OBJC_ARC = NO;
+				CODE_SIGN_IDENTITY = "-";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					.,
@@ -4077,11 +4099,12 @@
 					"$(inherited)",
 					"third-party/arc4/src",
 					"third-party/dht",
+					"third-party/fast_float/include",
 					"third-party/libb64/include",
-					"third-party/libutp",
-					"third-party/utfcpp/source",
 					"third-party/libdeflate",
 					"third-party/libpsl/include",
+					"third-party/libutp",
+					"third-party/utfcpp/source",
 				);
 				OTHER_CFLAGS = (
 					"$(inherited)",
@@ -4107,6 +4130,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_OBJC_ARC = NO;
+				CODE_SIGN_IDENTITY = "-";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					.,
@@ -4128,6 +4152,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_OBJC_ARC = NO;
+				CODE_SIGN_IDENTITY = "-";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					.,
@@ -4196,6 +4221,7 @@
 				OTHER_CFLAGS = "$(inherited)";
 				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
 				OTHER_LDFLAGS = "-lc++";
+				PRODUCT_BUNDLE_IDENTIFIER = "org.m0k.transmission.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SYSTEM_HEADER_SEARCH_PATHS = "$(inherited) third-party/fmt/include";
 				WRAPPER_EXTENSION = qlgenerator;
@@ -4218,6 +4244,7 @@
 				OTHER_CFLAGS = "$(inherited)";
 				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
 				OTHER_LDFLAGS = "-lc++";
+				PRODUCT_BUNDLE_IDENTIFIER = "org.m0k.transmission.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SYSTEM_HEADER_SEARCH_PATHS = "$(inherited) third-party/fmt/include";
 				WRAPPER_EXTENSION = qlgenerator;
@@ -4240,6 +4267,7 @@
 				OTHER_CFLAGS = "$(inherited)";
 				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
 				OTHER_LDFLAGS = "-lc++";
+				PRODUCT_BUNDLE_IDENTIFIER = "org.m0k.transmission.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SYSTEM_HEADER_SEARCH_PATHS = "$(inherited) third-party/fmt/include";
 				WRAPPER_EXTENSION = qlgenerator;
@@ -4286,6 +4314,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_OBJC_ARC = NO;
+				CODE_SIGN_IDENTITY = "-";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					.,
@@ -4307,6 +4336,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_OBJC_ARC = NO;
+				CODE_SIGN_IDENTITY = "-";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					.,
@@ -4427,6 +4457,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_OBJC_ARC = NO;
+				CODE_SIGN_IDENTITY = "-";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					.,
@@ -4445,6 +4476,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_OBJC_ARC = NO;
+				CODE_SIGN_IDENTITY = "-";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					.,
@@ -4463,6 +4495,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_OBJC_ARC = NO;
+				CODE_SIGN_IDENTITY = "-";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					.,
@@ -4481,6 +4514,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_OBJC_ARC = NO;
+				CODE_SIGN_IDENTITY = "-";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					.,
@@ -4499,6 +4533,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_OBJC_ARC = NO;
+				CODE_SIGN_IDENTITY = "-";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					.,
@@ -4517,6 +4552,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_OBJC_ARC = NO;
+				CODE_SIGN_IDENTITY = "-";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					.,
@@ -4535,6 +4571,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_OBJC_ARC = NO;
+				CODE_SIGN_IDENTITY = "-";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					.,
@@ -4553,6 +4590,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_OBJC_ARC = NO;
+				CODE_SIGN_IDENTITY = "-";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					.,
@@ -4571,6 +4609,7 @@
 				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_OBJC_ARC = NO;
+				CODE_SIGN_IDENTITY = "-";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					.,

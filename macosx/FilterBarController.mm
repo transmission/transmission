@@ -322,7 +322,7 @@
 
 - (NSArray<NSString*>*)searchStrings
 {
-    return [self.fSearchField.stringValue betterComponentsSeparatedByCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet];
+    return [self.fSearchField.stringValue nonEmptyComponentsSeparatedByCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet];
 }
 
 - (void)setCountAll:(NSUInteger)all

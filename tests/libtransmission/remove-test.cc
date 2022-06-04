@@ -176,14 +176,14 @@ protected:
 
         for (tr_file_index_t i = 0, n = files.fileCount(); i < n; ++i)
         {
-            auto filename = tr_pathbuf{ parent, '/', files.path(i) };
-            createFileWithContents(filename, std::data(Content), std::size(Content));
-            paths.emplace(filename);
+            auto walk = tr_pathbuf{ parent, '/', files.path(i) };
+            createFileWithContents(walk, std::data(Content), std::size(Content));
+            paths.emplace(walk);
 
-            while (!tr_sys_path_is_same(parent, filename))
+            while (!tr_sys_path_is_same(parent, walk))
             {
-                filename = tr_sys_path_dirname(filename);
-                paths.emplace(filename);
+                walk.popdir();
+                paths.emplace(walk);
             }
         }
 
@@ -301,7 +301,7 @@ TEST_F(RemoveTest, LeavesNonJunkAlone)
     EXPECT_EQ(expected_tree, getSubtreeContents(parent));
 
     files.remove(parent, "tmpdir_prefix"sv, sysPathRemove);
-    expected_tree = { parent, tr_sys_path_dirname(nonjunk_file), nonjunk_file.c_str() };
+    expected_tree = { parent, std::string{ tr_sys_path_dirname(nonjunk_file) }, nonjunk_file.c_str() };
     EXPECT_EQ(expected_tree, getSubtreeContents(parent));
 }
 

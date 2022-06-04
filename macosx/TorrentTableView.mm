@@ -261,8 +261,7 @@
         }
         else
         {
-            return [NSString stringWithFormat:NSLocalizedString(@"%@ transfers", "Torrent table -> group row -> tooltip"),
-                                              [NSString formattedUInteger:count]];
+            return [NSString stringWithFormat:NSLocalizedString(@"%lu transfers", "Torrent table -> group row -> tooltip"), count];
         }
     }
     else
@@ -640,6 +639,25 @@
     return [self.fTorrentCell iconRectForBounds:[self rectOfRow:row]];
 }
 
+- (BOOL)acceptsFirstResponder
+{
+    // add support to `copy:`
+    return YES;
+}
+
+- (void)copy:(id)sender
+{
+    NSArray<Torrent*>* selectedTorrents = self.selectedTorrents;
+    if (selectedTorrents.count == 0)
+    {
+        return;
+    }
+    NSPasteboard* pasteBoard = NSPasteboard.generalPasteboard;
+    NSString* links = [[selectedTorrents valueForKeyPath:@"magnetLink"] componentsJoinedByString:@"\n"];
+    [pasteBoard declareTypes:@[ NSStringPboardType ] owner:nil];
+    [pasteBoard setString:links forType:NSStringPboardType];
+}
+
 - (void)paste:(id)sender
 {
     NSURL* url;
@@ -649,11 +667,16 @@
     }
     else
     {
-        NSArray* items = [NSPasteboard.generalPasteboard readObjectsForClasses:@[ [NSString class] ] options:nil];
-        if (items)
+        NSArray<NSString*>* items = [NSPasteboard.generalPasteboard readObjectsForClasses:@[ [NSString class] ] options:nil];
+        if (!items)
         {
-            NSDataDetector* detector = [NSDataDetector dataDetectorWithTypes:NSTextCheckingTypeLink error:nil];
-            for (__strong NSString* pbItem in items)
+            return;
+        }
+        NSDataDetector* detector = [NSDataDetector dataDetectorWithTypes:NSTextCheckingTypeLink error:nil];
+        for (NSString* itemString in items)
+        {
+            NSArray<NSString*>* itemLines = [itemString componentsSeparatedByCharactersInSet:NSCharacterSet.newlineCharacterSet];
+            for (__strong NSString* pbItem in itemLines)
             {
                 pbItem = [pbItem stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet];
                 if ([pbItem rangeOfString:@"magnet:" options:(NSAnchoredSearch | NSCaseInsensitiveSearch)].location != NSNotFound)
@@ -785,7 +808,7 @@
             for (NSInteger i = 0; speedLimitActionValue[i] != -1; i++)
             {
                 item = [[NSMenuItem alloc]
-                    initWithTitle:[NSString stringWithFormat:NSLocalizedString(@"%d KB/s", "Action menu -> upload/download limit"),
+                    initWithTitle:[NSString stringWithFormat:NSLocalizedString(@"%ld KB/s", "Action menu -> upload/download limit"),
                                                              speedLimitActionValue[i]]
                            action:@selector(setQuickLimit:)
                     keyEquivalent:@""];
@@ -800,7 +823,7 @@
 
         item = [menu itemWithTag:ACTION_MENU_LIMIT_TAG];
         item.state = limit ? NSControlStateValueOn : NSControlStateValueOff;
-        item.title = [NSString stringWithFormat:NSLocalizedString(@"Limit (%d KB/s)", "torrent action menu -> upload/download limit"),
+        item.title = [NSString stringWithFormat:NSLocalizedString(@"Limit (%ld KB/s)", "torrent action menu -> upload/download limit"),
                                                 [self.fMenuTorrent speedLimit:upload]];
 
         item = [menu itemWithTag:ACTION_MENU_UNLIMITED_TAG];

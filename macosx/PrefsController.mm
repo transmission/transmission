@@ -150,15 +150,11 @@
 
         //set auto import
         NSString* autoPath;
-        VDKQueue* x = [(Controller*)[NSApp delegate] fileWatcherQueue];
         if ([_fDefaults boolForKey:@"AutoImport"] && (autoPath = [_fDefaults stringForKey:@"AutoImportDirectory"]))
         {
             [((Controller*)NSApp.delegate).fileWatcherQueue addPath:autoPath.stringByExpandingTildeInPath
                                                      notifyingAbout:VDKQueueNotifyAboutWrite];
         }
-
-        //set special-handling of magnet link add window checkbox
-        [self updateShowAddMagnetWindowField];
 
         //set blocklist scheduler
         [BlocklistScheduler.scheduler updateSchedule];
@@ -216,6 +212,9 @@
     self.window.toolbar = toolbar;
 
     [self setPrefView:nil];
+
+    //set special-handling of magnet link add window checkbox
+    [self updateShowAddMagnetWindowField];
 
     //set download folder
     [self.fFolderPopUp selectItemAtIndex:[self.fDefaults boolForKey:@"DownloadLocationConstant"] ? DOWNLOAD_FOLDER : DOWNLOAD_TORRENT];
@@ -475,6 +474,8 @@
         self.fPortStatusField.stringValue = NSLocalizedString(@"Port check site is down", "Preferences -> Network -> port status");
         self.fPortStatusImage.image = [NSImage imageNamed:NSImageNameStatusPartiallyAvailable];
         break;
+    case PORT_STATUS_CHECKING:
+        break;
     default:
         NSAssert1(NO, @"Port checker returned invalid status: %d", self.fPortChecker.status);
         break;
@@ -587,9 +588,9 @@
 
     if (exists)
     {
-        NSString* countString = [NSString formattedUInteger:tr_blocklistGetRuleCount(self.fHandle)];
         self.fBlocklistMessageField.stringValue = [NSString
-            stringWithFormat:NSLocalizedString(@"%@ IP address rules in list", "Prefs -> blocklist -> message"), countString];
+            stringWithFormat:NSLocalizedString(@"%lu IP address rules in list", "Prefs -> blocklist -> message"),
+                             tr_blocklistGetRuleCount(self.fHandle)];
     }
     else
     {

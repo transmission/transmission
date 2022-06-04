@@ -12,6 +12,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring> /* strcmp */
+#include <set>
 #include <string>
 #include <string_view>
 
@@ -75,6 +76,8 @@ static auto constexpr SpeedKStr = SPEED_K_STR;
 static char constexpr SpeedMStr[] = "MB/s";
 static char constexpr SpeedGStr[] = "GB/s";
 static char constexpr SpeedTStr[] = "TB/s";
+
+static char id[4096];
 
 /***
 ****
@@ -204,13 +207,14 @@ enum
     TAG_STATS,
     TAG_DETAILS,
     TAG_FILES,
+    TAG_FILTER,
+    TAG_GROUPS,
     TAG_LIST,
     TAG_PEERS,
     TAG_PIECES,
     TAG_PORTTEST,
     TAG_TORRENT_ADD,
-    TAG_TRACKERS,
-    TAG_GROUPS
+    TAG_TRACKERS
 };
 
 /***
@@ -219,7 +223,7 @@ enum
 ****
 ***/
 
-static auto constexpr Options = std::array<tr_option, 94>{
+static auto constexpr Options = std::array<tr_option, 96>{
     { { 'a', "add", "Add torrent files by filename or URL", "a", false, nullptr },
       { 970, "alt-speed", "Use the alternate Limits", "as", false, nullptr },
       { 971, "no-alt-speed", "Don't use the alternate Limits", "AS", false, nullptr },
@@ -250,9 +254,11 @@ static auto constexpr Options = std::array<tr_option, 94>{
       { 912, "encryption-tolerated", "Prefer unencrypted peer connections", "et", false, nullptr },
       { 850, "exit", "Tell the transmission session to shut down", nullptr, false, nullptr },
       { 940, "files", "List the current torrent(s)' files", "f", false, nullptr },
+      { 'F', "filter", "Filter the current torrent(s)", "F", true, "criterion" },
       { 'g', "get", "Mark files for download", "g", true, "<files>" },
       { 'G', "no-get", "Mark files for not downloading", "G", true, "<files>" },
       { 'i', "info", "Show the current torrent(s)' details", "i", false, nullptr },
+      { 944, "print-ids", "Print the current torrent(s)' ids", "ids", false, nullptr },
       { 940, "info-files", "List the current torrent(s)' files", "if", false, nullptr },
       { 941, "info-peers", "List the current torrent(s)' peers", "ip", false, nullptr },
       { 942, "info-pieces", "List the current torrent(s)' pieces", "ic", false, nullptr },
@@ -401,6 +407,7 @@ static int getOptMode(int val)
     case 820: /* UseSSL */
     case 't': /* set current torrent */
     case 'V': /* show version number */
+    case 944: /* print selected torrents' ids */
         return 0;
 
     case 'c': /* incomplete-dir */
@@ -476,6 +483,7 @@ static int getOptMode(int val)
     case 941: /* info-peer */
     case 942: /* info-pieces */
     case 943: /* info-tracker */
+    case 'F': /* filter torrents */
         return MODE_TORRENT_GET;
 
     case 'd': /* download speed limit */
@@ -537,6 +545,7 @@ static int getOptMode(int val)
 
 static bool debug = false;
 static char* auth = nullptr;
+static char* filter = nullptr;
 static char* netrc = nullptr;
 static char* session_id = nullptr;
 static bool UseSSL = false;
@@ -749,6 +758,7 @@ static tr_quark const details_keys[] = {
     TR_KEY_uploadedEver,
     TR_KEY_uploadLimit,
     TR_KEY_uploadLimited,
+    TR_KEY_uploadRatio,
     TR_KEY_webseeds,
     TR_KEY_webseedsSendingToUs,
 };
@@ -1974,8 +1984,132 @@ static void printGroups(tr_variant* top)
         }
     }
 }
-static char id[4096];
 
+static void filterIds(tr_variant* top)
+{
+    tr_variant* args;
+    tr_variant* list;
+
+    std::set<int> ids;
+
+    if (tr_variantDictFindDict(top, TR_KEY_arguments, &args) && tr_variantDictFindList(args, TR_KEY_torrents, &list))
+    {
+        size_t pos = 0;
+        bool negate = false;
+        std::string_view arg;
+
+        if (filter[pos] == '~')
+        {
+            ++pos;
+            negate = true;
+        }
+        if (strlen(filter) > pos + 1 && filter[pos + 1] == ':')
+        {
+            arg = filter + pos + 2;
+        }
+
+        for (int i = 0, n = tr_variantListSize(list); i < n; ++i)
+        {
+            tr_variant* d = tr_variantListChild(list, i);
+            int64_t torId;
+            if (!tr_variantDictFindInt(d, TR_KEY_id, &torId) || torId < 0)
+            {
+                continue;
+            }
+            bool include = negate;
+            auto const status = getStatusString(d);
+            switch (filter[pos])
+            {
+            case 'i': // Status = Idle
+                if (status == "Idle")
+                {
+                    include = !include;
+                }
+                break;
+            case 'd': // Downloading (Status is Downloading or Up&Down)
+                if (status.find("Down") != std::string::npos)
+                {
+                    include = !include;
+                }
+                break;
+            case 'u': // Uploading (Status is Uploading, Up&Down or Seeding
+                if ((status.find("Up") != std::string::npos) || (status == "Seeding"))
+                {
+                    include = !include;
+                }
+                break;
+            case 'l': // label
+                if (tr_variant * l; tr_variantDictFindList(d, TR_KEY_labels, &l))
+                {
+                    size_t child_pos = 0;
+                    tr_variant const* child;
+                    std::string_view sv;
+                    while ((child = tr_variantListChild(l, child_pos++)))
+                    {
+                        if (tr_variantGetStrView(child, &sv))
+                        {
+                            if (arg == sv)
+                            {
+                                include = !include;
+                                break;
+                            }
+                        }
+                    }
+                }
+                break;
+            case 'n': // Torrent name substring
+                if (std::string_view name; !tr_variantDictFindStrView(d, TR_KEY_name, &name))
+                {
+                    continue;
+                }
+                else if (name.find(arg) != std::string::npos)
+                {
+                    include = !include;
+                }
+                break;
+            case 'r': // Minimal ratio
+                if (double ratio; !tr_variantDictFindReal(d, TR_KEY_uploadRatio, &ratio))
+                {
+                    continue;
+                }
+                else if (ratio >= std::stof(std::string(arg)))
+                {
+                    include = !include;
+                }
+                break;
+            case 'w': // Not all torrent wanted
+                if (int64_t totalSize; !tr_variantDictFindInt(d, TR_KEY_totalSize, &totalSize) || totalSize < 0)
+                {
+                    continue;
+                }
+                else if (int64_t sizeWhenDone;
+                         !tr_variantDictFindInt(d, TR_KEY_sizeWhenDone, &sizeWhenDone) || sizeWhenDone < 0)
+                {
+                    continue;
+                }
+                else if (totalSize > sizeWhenDone)
+                {
+                    include = !include;
+                }
+                break;
+            }
+            if (include)
+            {
+                ids.insert(torId);
+            }
+        }
+        std::string res;
+        for (auto const& i : ids)
+        {
+            res += std::to_string(i) + ",";
+        }
+        if (res.empty())
+        {
+            res = ","; // no selected torrents
+        }
+        tr_strlcpy(id, res.data(), 4096);
+    }
+}
 static int processResponse(char const* rpcurl, std::string_view response)
 {
     tr_variant top;
@@ -2051,6 +2185,10 @@ static int processResponse(char const* rpcurl, std::string_view response)
 
                 case TAG_GROUPS:
                     printGroups(&top);
+                    break;
+
+                case TAG_FILTER:
+                    filterIds(&top);
                     break;
 
                 case TAG_TORRENT_ADD:
@@ -2350,6 +2488,10 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
                 fprintf(stderr, "%s %s\n", MyName, LONG_VERSION_STRING);
                 exit(0);
 
+            case 944:
+                printf("%s\n", tr_str_is_empty(id) ? "all" : id);
+                break;
+
             case TR_OPT_ERR:
                 fprintf(stderr, "invalid option\n");
                 showUsage();
@@ -2398,6 +2540,17 @@ static int processArgs(char const* rpcurl, int argc, char const* const* argv)
 
             switch (c)
             {
+            case 'F':
+                filter = tr_strdup(optarg); /* Unnecessary dup? we will use it before optarg will be changed */
+                tr_variantDictAddInt(top, TR_KEY_tag, TAG_FILTER);
+
+                for (size_t i = 0; i < TR_N_ELEMENTS(details_keys); ++i)
+                {
+                    tr_variantListAddQuark(fields, details_keys[i]);
+                }
+
+                addIdArg(args, id, "all");
+                break;
             case 'i':
                 tr_variantDictAddInt(top, TR_KEY_tag, TAG_DETAILS);
 

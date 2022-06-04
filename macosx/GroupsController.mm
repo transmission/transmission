@@ -4,8 +4,10 @@
 
 #import "GroupsController.h"
 #import "NSMutableArrayAdditions.h"
+#import "NSApplicationAdditions.h"
 
 #define ICON_WIDTH 16.0
+#define BORDER_WIDTH 1.25
 #define ICON_WIDTH_SMALL 12.0
 
 @interface GroupsController ()
@@ -47,6 +49,7 @@ GroupsController* fGroupsInstance = nil;
                                                                                               NSNumber.class,
                                                                                               NSColor.class,
                                                                                               NSString.class,
+                                                                                              NSPredicate.class,
                                                                                               nil]
                                                                fromData:data
                                                                   error:nil];
@@ -66,25 +69,25 @@ GroupsController* fGroupsInstance = nil;
         {
             //default groups
             NSMutableDictionary* red = [NSMutableDictionary
-                dictionaryWithObjectsAndKeys:NSColor.redColor, @"Color", NSLocalizedString(@"Red", "Groups -> Name"), @"Name", @0, @"Index", nil];
+                dictionaryWithObjectsAndKeys:NSColor.systemRedColor, @"Color", NSLocalizedString(@"Red", "Groups -> Name"), @"Name", @0, @"Index", nil];
 
             NSMutableDictionary* orange = [NSMutableDictionary
-                dictionaryWithObjectsAndKeys:NSColor.orangeColor, @"Color", NSLocalizedString(@"Orange", "Groups -> Name"), @"Name", @1, @"Index", nil];
+                dictionaryWithObjectsAndKeys:NSColor.systemOrangeColor, @"Color", NSLocalizedString(@"Orange", "Groups -> Name"), @"Name", @1, @"Index", nil];
 
             NSMutableDictionary* yellow = [NSMutableDictionary
-                dictionaryWithObjectsAndKeys:NSColor.yellowColor, @"Color", NSLocalizedString(@"Yellow", "Groups -> Name"), @"Name", @2, @"Index", nil];
+                dictionaryWithObjectsAndKeys:NSColor.systemYellowColor, @"Color", NSLocalizedString(@"Yellow", "Groups -> Name"), @"Name", @2, @"Index", nil];
 
             NSMutableDictionary* green = [NSMutableDictionary
-                dictionaryWithObjectsAndKeys:NSColor.greenColor, @"Color", NSLocalizedString(@"Green", "Groups -> Name"), @"Name", @3, @"Index", nil];
+                dictionaryWithObjectsAndKeys:NSColor.systemGreenColor, @"Color", NSLocalizedString(@"Green", "Groups -> Name"), @"Name", @3, @"Index", nil];
 
             NSMutableDictionary* blue = [NSMutableDictionary
-                dictionaryWithObjectsAndKeys:NSColor.blueColor, @"Color", NSLocalizedString(@"Blue", "Groups -> Name"), @"Name", @4, @"Index", nil];
+                dictionaryWithObjectsAndKeys:NSColor.systemBlueColor, @"Color", NSLocalizedString(@"Blue", "Groups -> Name"), @"Name", @4, @"Index", nil];
 
             NSMutableDictionary* purple = [NSMutableDictionary
-                dictionaryWithObjectsAndKeys:NSColor.purpleColor, @"Color", NSLocalizedString(@"Purple", "Groups -> Name"), @"Name", @5, @"Index", nil];
+                dictionaryWithObjectsAndKeys:NSColor.systemPurpleColor, @"Color", NSLocalizedString(@"Purple", "Groups -> Name"), @"Name", @5, @"Index", nil];
 
             NSMutableDictionary* gray = [NSMutableDictionary
-                dictionaryWithObjectsAndKeys:NSColor.grayColor, @"Color", NSLocalizedString(@"Gray", "Groups -> Name"), @"Name", @6, @"Index", nil];
+                dictionaryWithObjectsAndKeys:NSColor.systemGrayColor, @"Color", NSLocalizedString(@"Gray", "Groups -> Name"), @"Name", @6, @"Index", nil];
 
             _fGroups = [[NSMutableArray alloc] initWithObjects:red, orange, yellow, green, blue, purple, gray, nil];
             [self saveGroups]; //make sure this is saved right away
@@ -137,7 +140,7 @@ GroupsController* fGroupsInstance = nil;
 - (NSImage*)imageForIndex:(NSInteger)index
 {
     NSInteger orderIndex = [self rowValueForIndex:index];
-    return orderIndex != -1 ? [self imageForGroup:self.fGroups[orderIndex]] : [NSImage imageNamed:@"GroupsNoneTemplate"];
+    return orderIndex != -1 ? [self imageForGroup:self.fGroups[orderIndex]] : [self imageForGroupNone];
 }
 
 - (NSColor*)colorForIndex:(NSInteger)index
@@ -298,7 +301,7 @@ GroupsController* fGroupsInstance = nil;
     item.target = target;
     item.tag = -1;
 
-    NSImage* icon = [NSImage imageNamed:@"GroupsNoneTemplate"];
+    NSImage* icon = [self imageForGroupNone];
     if (small)
     {
         icon = [icon copy];
@@ -368,35 +371,64 @@ GroupsController* fGroupsInstance = nil;
     [NSUserDefaults.standardUserDefaults setObject:[NSKeyedArchiver archivedDataWithRootObject:groups] forKey:@"GroupDicts"];
 }
 
-- (NSImage*)imageForGroup:(NSMutableDictionary*)dict
+- (NSImage*)imageForGroupNone
 {
-    NSImage* image;
-    if ((image = dict[@"Icon"]))
+    static NSImage* icon;
+    if (icon)
     {
-        return image;
+        return icon;
     }
 
-    NSRect rect = NSMakeRect(0.0, 0.0, ICON_WIDTH, ICON_WIDTH);
+    icon = [NSImage imageWithSize:NSMakeSize(ICON_WIDTH, ICON_WIDTH) flipped:NO drawingHandler:^BOOL(NSRect rect) {
+        //shape
+        rect = NSInsetRect(rect, BORDER_WIDTH / 2, BORDER_WIDTH / 2);
+        NSBezierPath* bp = [NSBezierPath bezierPathWithOvalInRect:rect];
+        bp.lineWidth = BORDER_WIDTH;
 
-    NSBezierPath* bp = [NSBezierPath bezierPathWithRoundedRect:rect xRadius:3.0 yRadius:3.0];
-    NSImage* icon = [[NSImage alloc] initWithSize:rect.size];
+        //border
+        // code reference for dashed style
+        //CGFloat dashAndGapLength = M_PI * rect.size.width / 8;
+        //CGFloat pattern[2] = { dashAndGapLength * .5, dashAndGapLength * .5 };
+        //[bp setLineDash:pattern count:2 phase:0];
+
+        [NSColor.controlTextColor setStroke];
+        [bp stroke];
+
+        return YES;
+    }];
+    [icon setTemplate:YES];
+
+    return icon;
+}
+
+- (NSImage*)imageForGroup:(NSMutableDictionary*)dict
+{
+    NSImage* icon;
+    if ((icon = dict[@"Icon"]))
+    {
+        return icon;
+    }
 
     NSColor* color = dict[@"Color"];
 
-    [icon lockFocus];
+    icon = [NSImage imageWithSize:NSMakeSize(ICON_WIDTH, ICON_WIDTH) flipped:NO drawingHandler:^BOOL(NSRect rect) {
+        //shape
+        rect = NSInsetRect(rect, BORDER_WIDTH / 2, BORDER_WIDTH / 2);
+        NSBezierPath* bp = [NSBezierPath bezierPathWithOvalInRect:rect];
+        bp.lineWidth = BORDER_WIDTH;
 
-    //border
-    NSGradient* gradient = [[NSGradient alloc] initWithStartingColor:[color blendedColorWithFraction:0.45 ofColor:NSColor.whiteColor]
-                                                         endingColor:color];
-    [gradient drawInBezierPath:bp angle:270.0];
+        //border
+        CGFloat fractionOfBlendedColor = [NSApp isDarkMode] ? 0.15 : 0.3;
+        NSColor* borderColor = [color blendedColorWithFraction:fractionOfBlendedColor ofColor:NSColor.controlTextColor];
+        [borderColor setStroke];
+        [bp stroke];
 
-    //inside
-    bp = [NSBezierPath bezierPathWithRoundedRect:NSInsetRect(rect, 1.0, 1.0) xRadius:3.0 yRadius:3.0];
-    gradient = [[NSGradient alloc] initWithStartingColor:[color blendedColorWithFraction:0.75 ofColor:NSColor.whiteColor]
-                                             endingColor:[color blendedColorWithFraction:0.2 ofColor:NSColor.whiteColor]];
-    [gradient drawInBezierPath:bp angle:270.0];
+        //inside
+        [color setFill];
+        [bp fill];
 
-    [icon unlockFocus];
+        return YES;
+    }];
 
     dict[@"Icon"] = icon;
 

@@ -66,7 +66,7 @@ struct tr_ctor
 ****
 ***/
 
-bool tr_ctorSetMetainfoFromFile(tr_ctor* ctor, std::string const& filename, tr_error** error)
+bool tr_ctorSetMetainfoFromFile(tr_ctor* ctor, std::string_view filename, tr_error** error)
 {
     if (std::empty(filename))
     {
@@ -97,11 +97,16 @@ bool tr_ctorSetMetainfo(tr_ctor* ctor, char const* metainfo, size_t len, tr_erro
     return ctor->metainfo.parseBenc(contents_sv, error);
 }
 
-bool tr_ctorSetMetainfoFromMagnetLink(tr_ctor* ctor, char const* magnet_link, tr_error** error)
+bool tr_ctorSetMetainfoFromMagnetLink(tr_ctor* ctor, std::string_view magnet_link, tr_error** error)
 {
     ctor->torrent_filename.clear();
     ctor->metainfo = {};
-    return ctor->metainfo.parseMagnet(magnet_link != nullptr ? magnet_link : "", error);
+    return ctor->metainfo.parseMagnet(magnet_link, error);
+}
+
+bool tr_ctorSetMetainfoFromMagnetLink(tr_ctor* ctor, char const* magnet_link, tr_error** error)
+{
+    return tr_ctorSetMetainfoFromMagnetLink(ctor, std::string_view{ magnet_link != nullptr ? magnet_link : "" }, error);
 }
 
 char const* tr_ctorGetSourceFile(tr_ctor const* ctor)
