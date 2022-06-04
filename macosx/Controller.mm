@@ -5167,6 +5167,25 @@ static void removeKeRangerRansomware()
     return frame;
 }
 
+- (void)windowWillEnterFullScreen:(NSNotification*)notification
+{
+    // temporarily disable AutoSize
+    NSSize contentMinSize = self.fWindow.contentMinSize;
+    contentMinSize.height = self.minWindowContentSizeAllowed;
+
+    self.fWindow.contentMinSize = contentMinSize;
+
+    NSSize contentMaxSize = self.fWindow.contentMaxSize;
+    contentMaxSize.height = FLT_MAX;
+    self.fWindow.contentMaxSize = contentMaxSize;
+}
+
+- (void)windowDidExitFullScreen:(NSNotification*)notification
+{
+    // restore auotsize setting
+    [self updateForAutoSize];
+}
+
 - (void)setWindowSizeToFit
 {
     if ([self.fDefaults boolForKey:@"AutoSize"])
