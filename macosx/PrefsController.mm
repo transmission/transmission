@@ -287,6 +287,9 @@
     {
         self.fRPCPasswordField.stringValue = self.fRPCPassword;
     }
+
+    //set fRPCWhitelistTable column width to table width
+    [self.fRPCWhitelistTable sizeToFit];
 }
 
 - (NSToolbarItem*)toolbar:(NSToolbar*)toolbar itemForItemIdentifier:(NSString*)ident willBeInsertedIntoToolbar:(BOOL)flag
