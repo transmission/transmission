@@ -216,6 +216,9 @@ NSMutableSet* creatorWindowControllerSet = nil;
     }
 
     self.fOpenCheck.state = [self.fDefaults boolForKey:@"CreatorOpen"] ? NSControlStateValueOn : NSControlStateValueOff;
+
+    //set tracker table column width to table width
+    [self.fTrackerTable sizeToFit];
 }
 
 - (void)dealloc

@@ -1,15 +1,3 @@
-/* Add torrent -> info
-   Create torrent -> info
-   Drag overlay -> torrents
-   Inspector -> selected torrents */
-"%lu files" = "%lu dosya";
-
-/* Prefs -> blocklist -> message */
-"%lu IP address rules in list" = "Dizelgede %lu IP adresi kuralı";
-
-/* Inspector -> selected torrents */
-"%lu magnetized transfers" = "%lu mıknatıslı aktarım";
-
 /* file size string
    Inspector -> Files tab -> file status string
    Status bar transfer count */
@@ -23,26 +11,22 @@
    Torrent -> progress string */
 "%@ selected" = "%@ seçili";
 
-/* stats window -> times opened */
-"%lu times" = "%lu kez";
-
-/* Drag overlay -> torrents */
-"%lu Torrent Files" = "%lu Torrent Dosyası";
-
-/* Inspector -> selected torrents */
-"%lu Torrents Selected" = "%lu Torrent Seçili";
-
 /* Inspector -> selected torrents
    stats total */
 "%@ total" = "%@ toplam";
 
-/* Filter Bar Button -> tool tip
-   Status bar transfer count
-   Torrent table -> group row -> tooltip */
-"%lu transfers" = "%lu aktarım";
-
 /* Inspector -> Activity tab -> have */
 "%@ verified" = "%@ doğrulanmış";
+
+/* Action menu -> upload/download limit
+   Status Bar -> speed tooltip */
+"%ld KB/s" = "%ld KB/s";
+
+/* Info options -> global setting */
+"%ld minutes" = "%ld dakika";
+
+/* stats window -> times opened */
+"%llu times" = "";
 
 /* Inspector -> Peers tab -> peers */
 "%lu cache" = "%lu önbellek";
@@ -56,12 +40,17 @@
 /* Dock item - Downloading */
 "%lu Downloading" = "%lu İndiriliyor";
 
+/* Add torrent -> info
+   Create torrent -> info
+   Drag overlay -> torrents
+   Inspector -> selected torrents */
+"%lu files" = "%lu dosya";
+
 /* Inspector -> Peers tab -> peers */
 "%lu incoming" = "%lu gelen";
 
-/* Action menu -> upload/download limit
-   Status Bar -> speed tooltip */
-"%ld KB/s" = "%ld KB/s";
+/* Prefs -> blocklist -> message */
+"%lu IP address rules in list" = "Dizelgede %lu IP adresi kuralı";
 
 /* Inspector -> Peers tab -> peers */
 "%lu local discovery" = "%lu yerel bulum";
@@ -69,23 +58,34 @@
 /* Inspector -> Peers tab -> peers */
 "%lu LTEP" = "%lu LTEP";
 
-/* Info options -> global setting */
-"%ld minutes" = "%ld dakika";
+/* Inspector -> selected torrents */
+"%lu magnetized transfers" = "%lu mıknatıslı aktarım";
 
 /* Inspector -> Peers tab -> peers */
 "%lu PEX" = "%lu PEX";
 
-/* Create torrent -> info */
-"%u pieces, %@ each" = "%1$u parça, her biri %2$@";
-
 /* Dock item - Seeding */
 "%lu Seeding" = "%lu Besleniyor";
+
+/* Drag overlay -> torrents */
+"%lu Torrent Files" = "%lu Torrent Dosyası";
+
+/* Inspector -> selected torrents */
+"%lu Torrents Selected" = "%lu Torrent Seçili";
 
 /* Inspector -> Peers tab -> peers */
 "%lu tracker" = "%lu izleyici";
 
+/* Filter Bar Button -> tool tip
+   Status bar transfer count
+   Torrent table -> group row -> tooltip */
+"%lu transfers" = "%lu aktarım";
+
 /* Torrent -> status string */
 "%lu web seeds" = "%lu web beslemesi";
+
+/* Create torrent -> info */
+"%u pieces, %@ each" = "%1$u parça, her biri %2$@";
 
 /* Inspector -> Peers tab -> peers */
 "1 Connected" = "1 Bağlı";
@@ -192,14 +192,14 @@
 /* Remove completed confirm panel -> title */
 "Are you sure you want to remove %lu completed transfers from the transfer list?" = "%lu bitmiş aktarımı aktarımlar dizelgesinden kaldırmak istediğinize emin misiniz?";
 
+/* Remove trackers alert -> title */
+"Are you sure you want to remove %lu trackers?" = "%lu izleyiciyi kaldırmak istediğinize emin misiniz?";
+
 /* Removal confirm panel -> title */
 "Are you sure you want to remove %lu transfers from the transfer list and trash the data files?" = "%lu aktarımı aktarımlar dizelgesinden kaldırıp veri dosyalarını Çöp Sepeti'ne taşımak istediğinize emin misiniz?";
 
 /* Removal confirm panel -> title */
 "Are you sure you want to remove %lu transfers from the transfer list?" = "%lu aktarımı aktarımlar dizelgesinden çıkarmak istediğinize emin misiniz?";
-
-/* Remove trackers alert -> title */
-"Are you sure you want to remove %lu trackers?" = "%lu izleyiciyi kaldırmak istediğinize emin misiniz?";
 
 /* Removal confirm panel -> title */
 "Are you sure you want to remove \"%@\" from the transfer list and trash the data file?" = "\"%@\" aktarımını aktarım dizelgesinden kaldırıp veri dosyalarını Çöp Sepeti'ne taşımak istediğinize emin misiniz?";
@@ -373,7 +373,8 @@
 /* inspector -> peer table -> header tool tip */
 "Encrypted Connection" = "Şifrelenmiş Bağlantı";
 
-/* Message window -> level
+/* Filter Bar -> filter button
+   Message window -> level
    Message window -> level string
    Torrent -> status string */
 "Error" = "Hata";
@@ -565,6 +566,9 @@
 
 /* Group table row */
 "No Group" = "Öbek Yok";
+
+/* No comment provided by engineer. */
+"No napping on the job!" = "";
 
 /* Inspector -> selected torrents */
 "No Torrents Selected" = "Seçili Torrent Yok";
@@ -969,13 +973,13 @@
 "The transfer will not contact trackers for peers, and will have to rely solely on non-tracker peer discovery methods such as PEX and DHT to download and seed." = "Bu aktarım eş bulmak için izleyicilere bağlanmayacaktır, aksine aktarım için yalnızca PEX ve DHT gibi izleyicisiz çalışan eş bulma yöntemlerine bel bağlayacaktır.";
 
 /* Removal confirm panel -> message part 1 */
-"There are %lu active transfers." = "%lu etkin aktarım var.";
-
-/* Removal confirm panel -> message part 1 */
 "There are %1$lu transfers (%2$lu active)." = "%1$lu aktarım var (%2$lu etkin).";
 
 /* Confirm Quit panel -> message */
 "There are %lu active transfers that will be paused on quit. The transfers will automatically resume on the next launch." = "Uygulamadan çıkarken duraklatılacak %lu etkin aktarım var. Uygulamayı yeniden açtığınızda aktarımlar kendiliğinden sürecektir.";
+
+/* Removal confirm panel -> message part 1 */
+"There are %lu active transfers." = "%lu etkin aktarım var.";
 
 /* Create torrent -> blank address -> title */
 "There are no tracker addresses." = "İzleyici adresi yok.";
@@ -1043,6 +1047,9 @@
 
 /* Status Bar -> status menu */
 "Total Transfer" = "Toplam Aktarım";
+
+/* Message window -> level string */
+"Trace" = "";
 
 /* Filter Bar -> filter menu */
 "Tracker" = "İzleyici";
@@ -1118,6 +1125,9 @@
 
 /* Torrent -> status string */
 "Waiting to seed" = "Beslemek için bekleniyor";
+
+/* Message window -> level string */
+"Warn" = "";
 
 /* Drag overlay -> url */
 "Web Address" = "URL";
