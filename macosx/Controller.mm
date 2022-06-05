@@ -778,7 +778,7 @@ static void removeKeRangerRansomware()
     NSApp.servicesProvider = self;
 
     self.fNoNapActivity = [NSProcessInfo.processInfo beginActivityWithOptions:NSActivityUserInitiatedAllowingIdleSystemSleep
-                                                                       reason:NSLocalizedString(@"No napping on the job!", nil)];
+                                                                       reason:@"No napping on the job!"];
 
     //register for dock icon drags (has to be in applicationDidFinishLaunching: to work)
     [[NSAppleEventManager sharedAppleEventManager] setEventHandler:self andSelector:@selector(handleOpenContentsEvent:replyEvent:)
@@ -5165,6 +5165,25 @@ static void removeKeRangerRansomware()
 
     frame.size.width = [self.fDefaults boolForKey:@"SmallView"] ? self.fWindow.minSize.width : WINDOW_REGULAR_WIDTH;
     return frame;
+}
+
+- (void)windowWillEnterFullScreen:(NSNotification*)notification
+{
+    // temporarily disable AutoSize
+    NSSize contentMinSize = self.fWindow.contentMinSize;
+    contentMinSize.height = self.minWindowContentSizeAllowed;
+
+    self.fWindow.contentMinSize = contentMinSize;
+
+    NSSize contentMaxSize = self.fWindow.contentMaxSize;
+    contentMaxSize.height = FLT_MAX;
+    self.fWindow.contentMaxSize = contentMaxSize;
+}
+
+- (void)windowDidExitFullScreen:(NSNotification*)notification
+{
+    // restore auotsize setting
+    [self updateForAutoSize];
 }
 
 - (void)setWindowSizeToFit
