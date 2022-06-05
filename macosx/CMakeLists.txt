@@ -246,6 +246,7 @@ set(${PROJECT_NAME}_HIDPI_IMAGES
     DownArrowGroupTemplate
     DownArrowTemplate
     FavIcon
+    GearshapeTemplate
     Globe
     GreenDotFlat
     Groups
@@ -290,8 +291,8 @@ set(${PROJECT_NAME}_HIDPI_IMAGES
     ToolbarRemoveTemplate
     ToolbarResumeAllTemplate
     ToolbarResumeSelectedTemplate
-    Transfers
     TortoiseTemplate
+    Transfers
     UpArrowGroupTemplate
     UpArrowTemplate
     YellowDotFlat
