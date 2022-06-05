@@ -10,8 +10,6 @@
 
 #include <fmt/format.h>
 
-std::string_view tr_sys_path_dirname(std::string_view path);
-
 /**
  * A memory buffer which uses a builtin array of N bytes, using heap
  * memory only if its string gets too big. Its main use case is building
@@ -268,6 +266,7 @@ public:
 
     bool popdir() noexcept
     {
+        std::string_view tr_sys_path_dirname(std::string_view path);
         auto const parent = tr_sys_path_dirname(sv());
         auto const changed = parent != sv();
 
