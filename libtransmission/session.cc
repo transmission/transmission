@@ -798,7 +798,7 @@ static void sessionSetImpl(struct init_data* const data)
     if (tr_variantDictFindStrView(settings, TR_KEY_umask, &sv))
     {
         /* Read a umask as a string representing an octal number. */
-        session->umask = tr_parseNum<mode_t>(sv, 8).value_or(DefaultUmask);
+        session->umask = static_cast<mode_t>(tr_parseNum<uint32_t>(sv, 8).value_or(DefaultUmask));
         umask(session->umask);
     }
     else if (tr_variantDictFindInt(settings, TR_KEY_umask, &i))
