@@ -54,6 +54,7 @@
 #import "NSStringAdditions.h"
 #import "ExpandedPathToPathTransformer.h"
 #import "ExpandedPathToIconTransformer.h"
+#import "MainWindow.h"
 
 #define TOOLBAR_CREATE @"Toolbar Create"
 #define TOOLBAR_OPEN_FILE @"Toolbar Open"
@@ -230,7 +231,7 @@ static void removeKeRangerRansomware()
 
 @interface Controller ()
 
-@property(nonatomic) IBOutlet NSWindow* fWindow;
+@property(nonatomic) IBOutlet MainWindow* fWindow;
 @property(nonatomic) IBOutlet TorrentTableView* fTableView;
 
 @property(nonatomic) IBOutlet NSMenuItem* fOpenIgnoreDownloadFolder;
@@ -4252,7 +4253,7 @@ static void removeKeRangerRansomware()
 
     if (@available(macOS 11.0, *))
     {
-        // not needed
+        button.bordered = NO;
     }
     else
     {
@@ -4351,7 +4352,7 @@ static void removeKeRangerRansomware()
 
         if (@available(macOS 11.0, *))
         {
-            // not needed
+            segmentedCell.bezeled = NO;
         }
         else
         {
@@ -4402,7 +4403,7 @@ static void removeKeRangerRansomware()
 
         if (@available(macOS 11.0, *))
         {
-            // not needed
+            segmentedCell.bezeled = NO;
         }
         else
         {
@@ -5188,7 +5189,7 @@ static void removeKeRangerRansomware()
 
 - (void)setWindowSizeToFit
 {
-    if ([self.fDefaults boolForKey:@"AutoSize"])
+    if ([self.fDefaults boolForKey:@"AutoSize"] && self.fWindow.isFullScreen == NO)
     {
         NSScrollView* scrollView = self.fTableView.enclosingScrollView;
 
