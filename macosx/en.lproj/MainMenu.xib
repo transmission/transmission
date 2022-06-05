@@ -13,7 +13,7 @@
         </customObject>
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
-        <window title="Transmission" separatorStyle="line" allowsToolTipsWhenApplicationIsInactive="NO" restorable="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="TransmissionWindow" animationBehavior="default" tabbingMode="disallowed" id="21" userLabel="Transmission">
+        <window title="Transmission" separatorStyle="line" allowsToolTipsWhenApplicationIsInactive="NO" restorable="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" frameAutosaveName="TransmissionWindow" animationBehavior="default" tabbingMode="disallowed" id="21" userLabel="Transmission" customClass="MainWindow">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" topStrut="YES"/>
             <rect key="contentRect" x="71" y="712" width="515" height="248"/>
@@ -171,7 +171,7 @@
             <connections>
                 <outlet property="menu" destination="29" id="2687"/>
             </connections>
-            <point key="canvasLocation" x="139" y="125"/>
+            <point key="canvasLocation" x="138.5" y="125"/>
         </window>
         <menu title="MainMenu" systemMenu="main" id="29" userLabel="MainMenu">
             <items>
@@ -698,6 +698,7 @@ CA
                     </menu>
                 </menuItem>
             </items>
+            <point key="canvasLocation" x="139" y="340"/>
         </menu>
         <customObject id="206" userLabel="Controller" customClass="Controller">
             <connections>
@@ -828,6 +829,7 @@ CA
                     </connections>
                 </menuItem>
             </items>
+            <point key="canvasLocation" x="117" y="-300"/>
         </menu>
         <menu title="Menu" id="589" userLabel="ContextNoRowMenu">
             <items>
