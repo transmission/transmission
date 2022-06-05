@@ -138,9 +138,9 @@ std::optional<std::string> tr_session::WebMediator::cookieFile() const
     return std::string{ path };
 }
 
-std::optional<std::string> tr_session::WebMediator::userAgent() const
+std::optional<std::string_view> tr_session::WebMediator::userAgent() const
 {
-    return fmt::format(FMT_STRING("{:s}/{:s}"), TR_NAME, SHORT_VERSION_STRING);
+    return TR_NAME "/" SHORT_VERSION_STRING;
 }
 
 std::optional<std::string> tr_session::WebMediator::publicAddress() const
@@ -798,7 +798,7 @@ static void sessionSetImpl(struct init_data* const data)
     if (tr_variantDictFindStrView(settings, TR_KEY_umask, &sv))
     {
         /* Read a umask as a string representing an octal number. */
-        session->umask = tr_parseNum<mode_t>(sv, 8).value_or(DefaultUmask);
+        session->umask = static_cast<mode_t>(tr_parseNum<uint32_t>(sv, 8).value_or(DefaultUmask));
         umask(session->umask);
     }
     else if (tr_variantDictFindInt(settings, TR_KEY_umask, &i))
@@ -2045,14 +2045,11 @@ static void sessionLoadTorrents(struct sessionLoadTorrentsData* const data)
             auto const path = tr_pathbuf{ dirname_sv, "/"sv, name };
 
             // is a magnet link?
-            if (!tr_ctorSetMetainfoFromFile(data->ctor, std::string{ path }, nullptr))
+            if (!tr_ctorSetMetainfoFromFile(data->ctor, path.sv(), nullptr))
             {
                 if (auto buf = std::vector<char>{}; tr_loadFile(path, buf))
                 {
-                    tr_ctorSetMetainfoFromMagnetLink(
-                        data->ctor,
-                        std::string{ std::data(buf), std::size(buf) }.c_str(),
-                        nullptr);
+                    tr_ctorSetMetainfoFromMagnetLink(data->ctor, std::string_view{ std::data(buf), std::size(buf) }, nullptr);
                 }
             }
 

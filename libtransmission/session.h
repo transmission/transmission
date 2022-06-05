@@ -396,7 +396,7 @@ public:
 
         [[nodiscard]] std::optional<std::string> cookieFile() const override;
         [[nodiscard]] std::optional<std::string> publicAddress() const override;
-        [[nodiscard]] std::optional<std::string> userAgent() const override;
+        [[nodiscard]] std::optional<std::string_view> userAgent() const override;
         [[nodiscard]] unsigned int clamp(int bandwidth_tag, unsigned int byte_count) const override;
         void notifyBandwidthConsumed(int torrent_id, size_t byte_count) override;
         // runs the tr_web::fetch response callback in the libtransmission thread
