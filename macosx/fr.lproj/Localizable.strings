@@ -912,7 +912,7 @@
 "Speed Limit overrides the total bandwidth limits with its own limits." = "La limite de vitesse remplace les limites de bande passante globales par ses propres limites.";
 
 /* Torrent -> status string */
-"Stalled" = "Bloqué";
+"Stalled" = "En attente";
 
 /* Stats window -> title */
 "Statistics" = "Statistiques";
