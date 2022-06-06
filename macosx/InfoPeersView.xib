@@ -126,7 +126,7 @@
                                         <sortDescriptor key="sortDescriptorPrototype" selector="localizedStandardCompare:" sortKey="Client"/>
                                         <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                     </tableColumn>
-                                    <tableColumn identifier="Encryption" editable="NO" width="30" minWidth="14" maxWidth="100" id="15">
+                                    <tableColumn identifier="Encryption" editable="NO" width="30" minWidth="14" maxWidth=“90” id="15">
                                         <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Encryption">
                                             <font key="font" metaFont="smallSystem"/>
                                             <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
