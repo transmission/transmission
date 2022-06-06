@@ -10,7 +10,6 @@
 
 #import "CreatorWindowController.h"
 #import "Controller.h"
-#import "NSApplicationAdditions.h"
 #import "NSStringAdditions.h"
 
 #define TRACKER_ADD_TAG 0

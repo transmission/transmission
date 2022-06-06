@@ -6,6 +6,7 @@
 
 @interface NSImage (NSImageAdditions)
 
++ (NSImage*)discIconWithColor:(NSColor*)color;
 - (NSImage*)imageWithColor:(NSColor*)color;
 
 /* macOS < 11 compatibility */

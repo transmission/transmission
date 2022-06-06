@@ -6,7 +6,6 @@
 #import "GroupsController.h"
 #import "ExpandedPathToPathTransformer.h"
 #import "ExpandedPathToIconTransformer.h"
-#import "NSApplicationAdditions.h"
 
 #define GROUP_TABLE_VIEW_DATA_TYPE @"GroupTableViewDataType"
 

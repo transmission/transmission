@@ -7,7 +7,7 @@
 
 #import "MessageWindowController.h"
 #import "Controller.h"
-#import "NSApplicationAdditions.h"
+#import "NSImageAdditions.h"
 #import "NSMutableArrayAdditions.h"
 #import "NSStringAdditions.h"
 
@@ -273,19 +273,26 @@
         {
         case TR_LOG_CRITICAL:
         case TR_LOG_ERROR:
-            return [NSImage imageNamed:@"RedDotFlat"];
+            return [NSImage discIconWithColor:NSColor.systemRedColor];
 
         case TR_LOG_WARN:
-            return [NSImage imageNamed:@"OrangeDotFlat"];
+            return [NSImage discIconWithColor:NSColor.systemOrangeColor];
 
         case TR_LOG_INFO:
-            return [NSImage imageNamed:@"GreenDotFlat"];
+            return [NSImage discIconWithColor:NSColor.systemGreenColor];
 
         case TR_LOG_DEBUG:
-            return [NSImage imageNamed:@"BlueDotFlat"];
+            if (@available(macOS 10.12, *))
+            {
+                return [NSImage discIconWithColor:NSColor.systemTealColor];
+            }
+            else
+            {
+                return [NSImage discIconWithColor:NSColor.cyanColor];
+            }
 
         case TR_LOG_TRACE:
-            return [NSImage imageNamed:@"PurpleDotFlat"];
+            return [NSImage discIconWithColor:NSColor.systemPurpleColor];
 
         default:
             NSAssert1(NO, @"Unknown message log level: %ld", level);

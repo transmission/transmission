@@ -6,7 +6,6 @@
 #include <libtransmission/utils.h>
 
 #import "InfoPeersViewController.h"
-#import "NSApplicationAdditions.h"
 #import "NSStringAdditions.h"
 #import "PeerProgressIndicatorCell.h"
 #import "Torrent.h"
