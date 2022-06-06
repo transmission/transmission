@@ -535,7 +535,7 @@ Response arguments: `path`, `name`, and `id`, holding the torrent ID integer
 | `queue-stalled-minutes` | number | torrents that are idle for N minuets aren't counted toward seed-queue-size or download-queue-size
 | `rename-partial-files` | boolean | true means append `.part` to incomplete files
 | `rpc-version-minimum` | number | the minimum RPC API version supported
-| `rpc-version-semver` | number | the current RPC API version in a semver-compatible string
+| `rpc-version-semver` | string | the current RPC API version in a semver-compatible string
 | `rpc-version` | number | the current RPC API version
 | `script-torrent-added-enabled` | boolean | whether or not to call the `added` script
 | `script-torrent-added-filename` | string | filename of the script to run
@@ -580,9 +580,16 @@ to be common behavior.
 #### 4.1.1 Mutators
 Method name: `session-set`
 
-Request arguments: one or more of 4.1's arguments, except: `blocklist-size`,
-`config-dir`, `rpc-version`, `rpc-version-minimum`,
-`version`, and `session-id`
+Request arguments: the mutable properties from 4.1's arguments, i.e. all of them
+except:
+
+* `blocklist-size`
+* `config-dir`
+* `rpc-version-minimum`,
+* `rpc-version-semver`
+* `rpc-version`
+* `session-id`
+* `version`
 
 Response arguments: none
 
