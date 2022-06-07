@@ -43,11 +43,19 @@ jobs:
             -B obj \
             -G Ninja \
             -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+            -DCMAKE_CXX_FLAGS=-Wno-cpp \
+            -DCMAKE_C_FLAGS=-Wno-cpp \
             -DCMAKE_INSTALL_PREFIX=pfx \
+            -DCMAKE_OSX_ARCHITECTURES=x86_64;arm64 \
+            -DCMAKE_OSX_DEPLOYMENT_TARGET=10.10
+            -DDHT_PREFER_STATIC_LIB=ON \
+            -DENABLE_CLI=ON \
             -DENABLE_CLI=ON \
             -DENABLE_GTK=ON \
-            -DENABLE_QT=ON \
-            `#-DENABLE_WEB=ON`
+            -DENABLE_QT=ON
+            -DUSE_SYSTEM_EVENT2=OFF \
+            -DUSE_SYSTEM_MINIUPNPC=OFF \
+            -DUSE_SYSTEM_NATPMP=OFF \
       - name: Build
         run: cmake --build obj --config RelWithDebInfo
       - name: Test
