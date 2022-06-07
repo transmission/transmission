@@ -108,7 +108,7 @@
         self.fLocationImageView.image = nil;
     }
 
-#warning when 10.7-only, switch to auto layout
+    // TODO: adopt auto layout instead
     [self.fMagnetLinkLabel sizeToFit];
 
     CGFloat const downloadToLabelOldWidth = self.fDownloadToLabel.frame.size.width;

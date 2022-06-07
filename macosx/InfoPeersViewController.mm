@@ -11,6 +11,7 @@
 #import "PeerProgressIndicatorCell.h"
 #import "Torrent.h"
 #import "WebSeedTableView.h"
+#import "NSImageAdditions.h"
 
 #define ANIMATION_ID_KEY @"animationId"
 #define WEB_SEED_ANIMATION_ID @"webSeed"
@@ -317,7 +318,7 @@
 
         if ([ident isEqualToString:@"Encryption"])
         {
-            return [peer[@"Encryption"] boolValue] ? [NSImage imageNamed:@"Lock"] : nil;
+            return [peer[@"Encryption"] boolValue] ? [NSImage systemSymbol:@"lock.fill" withFallback:@"Lock"] : nil;
         }
         else if ([ident isEqualToString:@"Client"])
         {

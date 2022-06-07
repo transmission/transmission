@@ -77,6 +77,7 @@ set(${PROJECT_NAME}_SOURCES
     InfoTrackersViewController.mm
     InfoWindowController.mm
     main.mm
+    MainWindow.mm
     MessageWindowController.mm
     NSApplicationAdditions.mm
     NSImageAdditions.mm
@@ -246,6 +247,7 @@ set(${PROJECT_NAME}_HIDPI_IMAGES
     DownArrowGroupTemplate
     DownArrowTemplate
     FavIcon
+    GearshapeTemplate
     Globe
     GreenDotFlat
     Groups
@@ -290,8 +292,8 @@ set(${PROJECT_NAME}_HIDPI_IMAGES
     ToolbarRemoveTemplate
     ToolbarResumeAllTemplate
     ToolbarResumeSelectedTemplate
-    Transfers
     TortoiseTemplate
+    Transfers
     UpArrowGroupTemplate
     UpArrowTemplate
     YellowDotFlat
