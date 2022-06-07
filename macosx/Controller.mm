@@ -790,7 +790,7 @@ static void removeKeRangerRansomware()
     NSUserNotification* launchNotification = notification.userInfo[NSApplicationLaunchUserNotificationKey];
     if (launchNotification)
     {
-        [self userNotificationCenter:nil didActivateNotification:launchNotification];
+        [self userNotificationCenter:NSUserNotificationCenter.defaultUserNotificationCenter didActivateNotification:launchNotification];
     }
 
     //auto importing
