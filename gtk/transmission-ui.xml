@@ -23,6 +23,7 @@
         <item>
           <attribute name="action">win.new-torrent</attribute>
           <attribute name="icon">document-new</attribute>
+          <attribute name="accel">&lt;control&gt;N</attribute>
           <attribute name="label" translatable="yes">_New…</attribute>
         </item>
       </section>
@@ -44,6 +45,7 @@
         <item>
           <attribute name="action">win.quit</attribute>
           <attribute name="icon">application-exit</attribute>
+          <attribute name="accel">&lt;control&gt;Q</attribute>
           <attribute name="label" translatable="yes">_Quit</attribute>
         </item>
       </section>
