@@ -1,5 +1,8 @@
 name: Sanity
-on: [push, pull_request]
+on:
+  push:
+  pull_request:
+    types: [opened, reopened]
 env:
   GTEST_OUTPUT: xml:./
 jobs:
