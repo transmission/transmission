@@ -3,8 +3,8 @@
 // License text can be found in the licenses/ folder.
 
 #import "GroupsController.h"
+#import "NSImageAdditions.h"
 #import "NSMutableArrayAdditions.h"
-#import "NSApplicationAdditions.h"
 
 #define ICON_WIDTH 16.0
 #define BORDER_WIDTH 1.25
@@ -409,26 +409,7 @@ GroupsController* fGroupsInstance = nil;
         return icon;
     }
 
-    NSColor* color = dict[@"Color"];
-
-    icon = [NSImage imageWithSize:NSMakeSize(ICON_WIDTH, ICON_WIDTH) flipped:NO drawingHandler:^BOOL(NSRect rect) {
-        //shape
-        rect = NSInsetRect(rect, BORDER_WIDTH / 2, BORDER_WIDTH / 2);
-        NSBezierPath* bp = [NSBezierPath bezierPathWithOvalInRect:rect];
-        bp.lineWidth = BORDER_WIDTH;
-
-        //border
-        CGFloat fractionOfBlendedColor = [NSApp isDarkMode] ? 0.15 : 0.3;
-        NSColor* borderColor = [color blendedColorWithFraction:fractionOfBlendedColor ofColor:NSColor.controlTextColor];
-        [borderColor setStroke];
-        [bp stroke];
-
-        //inside
-        [color setFill];
-        [bp fill];
-
-        return YES;
-    }];
+    icon = [NSImage discIconWithColor:dict[@"Color"] insetFactor:0];
 
     dict[@"Icon"] = icon;
 

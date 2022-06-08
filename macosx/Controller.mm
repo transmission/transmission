@@ -48,7 +48,6 @@
 #import "BonjourController.h"
 #import "Badger.h"
 #import "DragOverlayWindow.h"
-#import "NSApplicationAdditions.h"
 #import "NSImageAdditions.h"
 #import "NSMutableArrayAdditions.h"
 #import "NSStringAdditions.h"

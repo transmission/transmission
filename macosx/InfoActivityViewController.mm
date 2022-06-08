@@ -6,7 +6,6 @@
 #include <libtransmission/utils.h> //tr_getRatio()
 
 #import "InfoActivityViewController.h"
-#import "NSApplicationAdditions.h"
 #import "NSStringAdditions.h"
 #import "PiecesView.h"
 #import "Torrent.h"
