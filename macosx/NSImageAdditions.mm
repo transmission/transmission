@@ -12,18 +12,11 @@
 #define ICON_WIDTH 16.0
 #define BORDER_WIDTH 1.25
 
-+ (NSImage*)discIconWithColor:(NSColor*)color
++ (NSImage*)discIconWithColor:(NSColor*)color insetFactor:(CGFloat)insetFactor
 {
-    static NSMutableDictionary<NSColor*, NSImage*>* icons = [NSMutableDictionary dictionary];
-    NSImage* icon;
-    if ((icon = icons[color]))
-    {
-        return icon;
-    }
-
-    icon = [NSImage imageWithSize:NSMakeSize(ICON_WIDTH, ICON_WIDTH) flipped:NO drawingHandler:^BOOL(NSRect rect) {
+    return [NSImage imageWithSize:NSMakeSize(ICON_WIDTH, ICON_WIDTH) flipped:NO drawingHandler:^BOOL(NSRect rect) {
         //shape
-        rect = NSInsetRect(rect, BORDER_WIDTH / 2, BORDER_WIDTH / 2);
+        rect = NSInsetRect(rect, BORDER_WIDTH / 2 + rect.size.width * insetFactor / 2, BORDER_WIDTH / 2 + rect.size.height * insetFactor / 2);
         NSBezierPath* bp = [NSBezierPath bezierPathWithOvalInRect:rect];
         bp.lineWidth = BORDER_WIDTH;
 
@@ -39,10 +32,6 @@
 
         return YES;
     }];
-
-    icons[color] = icon;
-
-    return icon;
 }
 
 - (NSImage*)imageWithColor:(NSColor*)color

@@ -409,7 +409,7 @@ GroupsController* fGroupsInstance = nil;
         return icon;
     }
 
-    icon = [NSImage discIconWithColor:dict[@"Color"]];
+    icon = [NSImage discIconWithColor:dict[@"Color"] insetFactor:0];
 
     dict[@"Icon"] = icon;
 

@@ -6,7 +6,7 @@
 
 @interface NSImage (NSImageAdditions)
 
-+ (NSImage*)discIconWithColor:(NSColor*)color;
++ (NSImage*)discIconWithColor:(NSColor*)color insetFactor:(CGFloat)insetFactor;
 - (NSImage*)imageWithColor:(NSColor*)color;
 
 /* macOS < 11 compatibility */
