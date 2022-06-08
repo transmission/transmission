@@ -126,14 +126,14 @@
                                         <sortDescriptor key="sortDescriptorPrototype" selector="localizedStandardCompare:" sortKey="Client"/>
                                         <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                     </tableColumn>
-                                    <tableColumn identifier="Encryption" editable="NO" width="14" minWidth="14" maxWidth="14" id="15">
+                                    <tableColumn identifier="Encryption" editable="NO" width="30" minWidth="14" maxWidth="50" id="15">
                                         <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left">
-                                            <font key="font" metaFont="smallSystem"/>
                                             <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                             <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
                                         </tableHeaderCell>
-                                        <imageCell key="dataCell" controlSize="small" refusesFirstResponder="YES" alignment="left" animates="YES" imageScaling="proportionallyDown" image="EC395120-CCB1-4E1A-B7DA-654C92A76156" id="16"/>
+                                        <imageCell key="dataCell" controlSize="small" refusesFirstResponder="YES" alignment="left" animates="YES" imageScaling="proportionallyDown" id="16"/>
                                         <sortDescriptor key="sortDescriptorPrototype" selector="compare:" sortKey="Encryption" ascending="NO"/>
+                                        <tableColumnResizingMask key="resizingMask" userResizable="YES"/>
                                     </tableColumn>
                                     <tableColumn identifier="Progress" editable="NO" width="32" minWidth="10" maxWidth="1000" id="14">
                                         <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="%">
