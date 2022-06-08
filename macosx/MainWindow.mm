@@ -29,9 +29,4 @@
     [super toggleToolbarShown:sender];
 }
 
-- (BOOL)isFullScreen
-{
-    return (self.styleMask & NSFullScreenWindowMask);
-}
-
 @end

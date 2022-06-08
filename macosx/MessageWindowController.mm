@@ -58,6 +58,9 @@
     [window setFrameUsingName:@"MessageWindowFrame"];
     window.restorationClass = [self class];
 
+    //disable fullscreen support
+    [window setCollectionBehavior:NSWindowCollectionBehaviorFullScreenNone];
+
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(resizeColumn)
                                                name:NSTableViewColumnDidResizeNotification
                                              object:self.fMessageTable];
