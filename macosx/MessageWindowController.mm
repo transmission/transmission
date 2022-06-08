@@ -232,7 +232,7 @@
     {
         return icon;
     }
-    icon = [NSImage discIconWithColor:color insetFactor:0.2];
+    icon = [NSImage discIconWithColor:color insetFactor:0.5];
     icons[color] = icon;
     return icon;
 }
