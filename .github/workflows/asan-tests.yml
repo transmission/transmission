@@ -1,0 +1,57 @@
+name: Sanitizer Tests
+on: [push, pull_request]
+  push:
+    paths:
+      - CMakeLists.txt
+      - libtransmission/**
+      - tests/**
+      - utils/**
+env:
+  GTEST_OUTPUT: xml:./
+jobs:
+  libtransmission-test-asan:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Prepare
+        run: |
+          set -ex
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            ca-certificates \
+            clang \
+            cmake \
+            gettext \
+            libcurl4-openssl-dev \
+            libdeflate-dev \
+            libevent-dev \
+            libfmt-dev \
+            libminiupnpc-dev \
+            libnatpmp-dev \
+            libpsl-dev \
+            libssl-dev \
+            ninja-build
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          path: src
+          submodules: recursive
+      - name: Configure
+        run: |
+          cmake \
+            -S src \
+            -B obj \
+            -G Ninja \
+            -DCMAKE_BUILD_TYPE=Debug \
+            -DCMAKE_CXX_COMPILER='clang++' \
+            -DCMAKE_CXX_FLAGS='-gdwarf-4 -fno-omit-frame-pointer -fsanitize=address,leak,undefined' \
+            -DCMAKE_C_COMPILER='clang' \
+            -DCMAKE_C_FLAGS='-gdwarf-4 -fno-omit-frame-pointer -fsanitize=address,leak,undefined' \
+            -DCMAKE_INSTALL_PREFIX=pfx \
+            -DENABLE_CLI=OFF \
+            -DENABLE_GTK=OFF \
+            -DENABLE_QT=OFF \
+            `#-DENABLE_WEB=ON`
+      - name: Build
+        run: cmake --build obj --config Debug --target libtransmission-test transmission-show
+      - name: Test
+        run: cmake -E chdir obj ctest --build-config Debug --output-on-failure
