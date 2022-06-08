@@ -933,6 +933,7 @@ void DetailsDialog::Impl::refreshInfo(std::vector<tr_torrent*> const& torrents)
             else if (haveUnchecked == 0)
             {
                 str = fmt::format(
+                    // xgettext:no-c-format
                     _("{current_size} ({percent_done}% of {percent_available}% available)"),
                     fmt::arg("current_size", total),
                     fmt::arg("percent_done", buf2),
@@ -941,6 +942,7 @@ void DetailsDialog::Impl::refreshInfo(std::vector<tr_torrent*> const& torrents)
             else
             {
                 str = fmt::format(
+                    // xgettext:no-c-format
                     _("{current_size} ({percent_done}% of {percent_available}% available; {unverified_size} unverified)"),
                     fmt::arg("current_size", total),
                     fmt::arg("percent_done", buf2),
