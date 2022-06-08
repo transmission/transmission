@@ -1,6 +1,13 @@
 name: Sanitizer Tests
-on: [push, pull_request]
+on: 
   push:
+    paths:
+      - CMakeLists.txt
+      - libtransmission/**
+      - tests/**
+      - utils/**
+  pull_request:
+    types: [opened, reopened]
     paths:
       - CMakeLists.txt
       - libtransmission/**
