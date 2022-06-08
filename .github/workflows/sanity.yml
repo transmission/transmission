@@ -31,8 +31,7 @@ jobs:
             openssl-dev \
             qt5-qtbase-dev \
             qt5-qttools-dev \
-            samurai \
-            zlib-dev
+            samurai
           `#npm install --global corepack`
       - name: Checkout
         uses: actions/checkout@v3
@@ -93,8 +92,7 @@ jobs:
             `#nodejs` \
             `#npm` \
             qtbase5-dev \
-            qttools5-dev \
-            zlib1g-dev
+            qttools5-dev
           `#npm install --global corepack`
       - name: Checkout
         uses: actions/checkout@v3
@@ -146,8 +144,7 @@ jobs:
             `#nodejs` \
             `#npm` \
             qtbase5-dev \
-            qttools5-dev \
-            zlib1g-dev
+            qttools5-dev
           `#npm install --global corepack`
       - name: Checkout
         uses: actions/checkout@v3
@@ -209,8 +206,7 @@ jobs:
             libpsl-dev:s390x \
             libssl-dev:s390x \
             make \
-            qemu-user-static \
-            zlib1g-dev:s390x
+            qemu-user-static
           update-binfmts --enable
           echo '
           set(CMAKE_C_COMPILER s390x-linux-gnu-gcc)
@@ -257,8 +253,7 @@ jobs:
             git \
             libcurl4-openssl-dev \
             libssl-dev \
-            ninja-build \
-            zlib1g-dev
+            ninja-build
       - name: Checkout
         uses: actions/checkout@v3
         with:
@@ -307,8 +302,7 @@ jobs:
             `#npm` \
             qtbase5-dev \
             qttools5-dev \
-            xz-utils \
-            zlib1g-dev
+            xz-utils
           `#npm install --global corepack`
       - name: Download tarball
         uses: actions/download-artifact@v3
