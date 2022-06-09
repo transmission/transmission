@@ -17,7 +17,6 @@
 #import "Controller.h"
 #import "PortChecker.h"
 #import "BonjourController.h"
-#import "NSApplicationAdditions.h"
 #import "NSImageAdditions.h"
 #import "NSStringAdditions.h"
 

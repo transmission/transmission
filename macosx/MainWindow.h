@@ -6,6 +6,4 @@
 
 @interface MainWindow : NSWindow
 
-- (BOOL)isFullScreen;
-
 @end

@@ -4,7 +4,6 @@
 
 #import "StatsWindowController.h"
 #import "Controller.h"
-#import "NSApplicationAdditions.h"
 #import "NSStringAdditions.h"
 
 #define UPDATE_SECONDS 1.0

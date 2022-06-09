@@ -3616,9 +3616,6 @@
 					"-D__TRANSMISSION__",
 					"-DHAVE_FLOCK",
 					"-DHAVE_STRLCPY",
-					"-DHAVE_ASPRINTF",
-					"-DHAVE_LIBGEN",
-					"-DHAVE_ZLIB",
 					"-DHAVE_ICONV",
 				);
 				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
@@ -3831,9 +3828,6 @@
 					"-D__TRANSMISSION__",
 					"-DHAVE_FLOCK",
 					"-DHAVE_STRLCPY",
-					"-DHAVE_ASPRINTF",
-					"-DHAVE_LIBGEN",
-					"-DHAVE_ZLIB",
 					"-DHAVE_ICONV",
 				);
 				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
@@ -4118,9 +4112,6 @@
 					"-D__TRANSMISSION__",
 					"-DHAVE_FLOCK",
 					"-DHAVE_STRLCPY",
-					"-DHAVE_ASPRINTF",
-					"-DHAVE_LIBGEN",
-					"-DHAVE_ZLIB",
 					"-DHAVE_ICONV",
 				);
 				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";

@@ -10,7 +10,6 @@
 
 #import "CreatorWindowController.h"
 #import "Controller.h"
-#import "NSApplicationAdditions.h"
 #import "NSStringAdditions.h"
 
 #define TRACKER_ADD_TAG 0
@@ -160,6 +159,9 @@ NSMutableSet* creatorWindowControllerSet = nil;
     NSString* name = self.fPath.lastPathComponent;
 
     self.window.title = name;
+
+    //disable fullscreen support
+    [self.window setCollectionBehavior:NSWindowCollectionBehaviorFullScreenNone];
 
     self.fNameField.stringValue = name;
     self.fNameField.toolTip = self.fPath.path;

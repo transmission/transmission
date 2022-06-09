@@ -240,7 +240,6 @@ set(${PROJECT_NAME}_HIDPI_IMAGES
     ActionHover
     ActionOn
     Bandwidth
-    BlueDotFlat
     CleanupTemplate
     CompleteCheck
     CreateLarge
@@ -250,7 +249,6 @@ set(${PROJECT_NAME}_HIDPI_IMAGES
     FavIcon
     GearshapeTemplate
     Globe
-    GreenDotFlat
     Groups
     InfoActivity
     InfoFiles
@@ -260,7 +258,6 @@ set(${PROJECT_NAME}_HIDPI_IMAGES
     InfoTracker
     Lock
     Magnet
-    OrangeDotFlat
     PauseHover
     PauseOff
     PauseOn
@@ -271,8 +268,6 @@ set(${PROJECT_NAME}_HIDPI_IMAGES
     PriorityHighTemplate
     PriorityLowTemplate
     PriorityNormalTemplate
-    PurpleDotFlat
-    RedDotFlat
     Remote
     ResumeHover
     ResumeNoWaitHover
@@ -297,7 +292,6 @@ set(${PROJECT_NAME}_HIDPI_IMAGES
     Transfers
     UpArrowGroupTemplate
     UpArrowTemplate
-    YellowDotFlat
     YingYangGroupTemplate
     YingYangTemplate
 )
