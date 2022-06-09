@@ -344,8 +344,8 @@ void tr_tracker_http_announce(
 
     auto options = tr_web::FetchOptions{ url.sv(), onAnnounceDone, d };
     options.timeout_secs = 90L;
-    options.sndbuf = 1024;
-    options.rcvbuf = 3072;
+    options.sndbuf = 4096;
+    options.rcvbuf = 4096;
     session->web->fetch(std::move(options));
 }
 

@@ -10,7 +10,6 @@
 #import "FileOutlineView.h"
 #import "FilePriorityCell.h"
 #import "FileRenameSheetController.h"
-#import "NSApplicationAdditions.h"
 #import "NSMutableArrayAdditions.h"
 #import "NSStringAdditions.h"
 
