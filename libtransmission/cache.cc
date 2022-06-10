@@ -4,7 +4,7 @@
 // License text can be found in the licenses/ folder.
 
 #include <cstdlib> // std::lldiv()
-#include <iterator> // std::back_inserter, std::distance(), std::next(), std::prev()
+#include <iterator> // std::distance(), std::next(), std::prev()
 #include <limits> // std::numeric_limits<size_t>::max()
 #include <numeric> // std::accumulate()
 #include <utility> // std::make_pair()
@@ -82,7 +82,7 @@ int Cache::writeContiguous(CIter const begin, CIter const end) const
     {
         TR_ASSERT(begin->key.first == iter->key.first);
         TR_ASSERT(begin->key.second + std::distance(begin, iter) == iter->key.second);
-        std::copy(std::begin(iter->buf), std::end(iter->buf), std::back_inserter(buf));
+        buf.insert(std::end(buf), std::begin(iter->buf), std::end(iter->buf));
     }
     TR_ASSERT(std::size(buf) == buflen);
 
