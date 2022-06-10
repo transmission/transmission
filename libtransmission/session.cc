@@ -566,11 +566,6 @@ static void onSaveTimer(evutil_socket_t /*fd*/, short /*what*/, void* vsession)
 {
     auto* session = static_cast<tr_session*>(vsession);
 
-    if (session->cache->flushDone() != 0)
-    {
-        tr_logAddError("Error while flushing completed pieces from cache");
-    }
-
     for (auto* const tor : session->torrents())
     {
         tr_torrentSave(tor);

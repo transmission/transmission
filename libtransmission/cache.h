@@ -10,6 +10,7 @@
 #endif
 
 #include <cstdint> // intX_t, uintX_t
+#include <utility> // std::pair
 #include <vector>
 
 #include "transmission.h"
@@ -23,12 +24,11 @@ struct tr_torrent;
 class Cache
 {
 public:
-    explicit Cache(tr_torrents& torrents, int64_t max_bytes);
-    ~Cache() = default;
+    Cache(tr_torrents& torrents, int64_t max_bytes);
 
     int setLimit(int64_t new_limit);
 
-    [[nodiscard]] size_t getLimit() const
+    [[nodiscard]] constexpr auto getLimit() const noexcept
     {
         return max_bytes_;
     }
@@ -36,79 +36,59 @@ public:
     int writeBlock(tr_torrent* torrent, tr_block_info::Location loc, uint32_t length, struct evbuffer* writeme);
     int readBlock(tr_torrent* torrent, tr_block_info::Location loc, uint32_t len, uint8_t* setme);
     int prefetchBlock(tr_torrent* torrent, tr_block_info::Location loc, uint32_t len);
-    int flushDone();
     int flushTorrent(tr_torrent* torrent);
     int flushFile(tr_torrent* torrent, tr_file_index_t file);
 
 private:
+    using Key = std::pair<tr_torrent_id_t, tr_block_index_t>;
+
     struct CacheBlock
     {
-        CacheBlock() = default;
-        CacheBlock(tr_torrent* _tor, tr_block_info::Location _loc, uint32_t _length);
-
-        tr_torrent* tor = nullptr;
-
-        tr_block_info::Location loc;
-        uint32_t length = 0;
-
-        time_t time = 0;
-
-        struct evbuffer* evbuf = nullptr;
+        Key key;
+        std::vector<uint8_t> buf;
+        time_t time_added = {};
     };
 
-    struct RunInfo
+    using Blocks = std::vector<CacheBlock>;
+    using CIter = Blocks::const_iterator;
+
+    struct CompareCacheBlockByKey
     {
-        size_t pos = 0;
-        size_t rank = 0;
-        time_t last_block_time = 0;
-        bool is_multi_piece = false;
-        bool is_piece_done = false;
-        size_t len = 0;
+        [[nodiscard]] constexpr bool operator()(Key const& key, CacheBlock const& block)
+        {
+            return key < block.key;
+        }
+        [[nodiscard]] constexpr bool operator()(CacheBlock const& block, Key const& key)
+        {
+            return block.key < key;
+        }
     };
 
-    enum
-    {
-        MULTIFLAG = 0x1000,
-        DONEFLAG = 0x2000,
-        SESSIONFLAG = 0x4000,
-    };
+    [[nodiscard]] static Key makeKey(tr_torrent const* torrent, tr_block_info::Location loc) noexcept;
+
+    [[nodiscard]] static std::pair<CIter, CIter> findContiguous(CIter const begin, CIter const end, CIter const iter) noexcept;
+
+    // @return any error code from tr_ioWrite()
+    [[nodiscard]] int writeContiguous(CIter const begin, CIter const end) const;
+
+    // @return any error code from writeContiguous()
+    [[nodiscard]] int flushSpan(CIter const begin, CIter const end);
+
+    // @return any error code from writeContiguous()
+    [[nodiscard]] int cacheTrim();
+
+    [[nodiscard]] static size_t getMaxBlocks(int64_t max_bytes) noexcept;
+
+    [[nodiscard]] CIter getBlock(tr_torrent const* torrent, tr_block_info::Location loc) noexcept;
 
     tr_torrents& torrents_;
 
-    std::vector<CacheBlock> blocks_;
+    Blocks blocks_ = {};
     size_t max_blocks_ = 0;
     size_t max_bytes_ = 0;
 
-    size_t disk_writes_ = 0;
-    size_t disk_write_bytes_ = 0;
-    size_t cache_writes_ = 0;
-    size_t cache_write_bytes_ = 0;
-
-    size_t getBlockRun(size_t pos, RunInfo* info) const;
-
-    // Descending sort: Higher rank comes before lower rank
-    static bool compareRuns(RunInfo& a, RunInfo& b)
-    {
-        // The value returned by the comparer function indicates whether the element passed as
-        // first argument is considered to go before the second
-        return b.rank > a.rank;
-    }
-
-    size_t calcRuns(std::vector<RunInfo>& runs) const;
-
-    // Returns: result of tr_ioWrite
-    int flushContiguous(size_t pos, size_t n);
-
-    // Returns: result of last tr_ioWrite call returned from flushContiguous()
-    int flushRuns(std::vector<RunInfo>& runs, size_t n);
-
-    // Returns: result of last tr_ioWrite call returned from flushRuns()
-    int cacheTrim();
-
-    static size_t getMaxBlocks(int64_t max_bytes);
-    static bool cacheBlockCompare(CacheBlock const& a, CacheBlock const& b);
-    // Non-const variant returns a mutable iterator
-    std::vector<Cache::CacheBlock>::iterator findBlock(tr_torrent* torrent, tr_block_info::Location loc);
-    // Returns max value for size_t (0xFFFF...) if not found
-    size_t findBlockPos(tr_torrent* torrent, tr_block_info::Location loc) const;
+    mutable size_t disk_writes_ = 0;
+    mutable size_t disk_write_bytes_ = 0;
+    mutable size_t cache_writes_ = 0;
+    mutable size_t cache_write_bytes_ = 0;
 };
