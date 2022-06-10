@@ -110,7 +110,7 @@ auto getProgressString(tr_torrent const* tor, uint64_t total_size, tr_stat const
         }
         else
         {
-            gstr += tr_format_time_remaining(eta);
+            gstr += tr_format_time_left(eta);
         }
     }
 
