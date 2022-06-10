@@ -16,6 +16,7 @@
 #include "inout.h"
 #include "log.h"
 #include "torrent.h"
+#include "torrents.h"
 #include "tr-assert.h"
 #include "trevent.h"
 #include "utils.h"
@@ -198,8 +199,9 @@ int Cache::setLimit(int64_t new_limit)
     return cacheTrim();
 }
 
-Cache::Cache(int64_t max_bytes)
-    : max_blocks_(getMaxBlocks(max_bytes))
+Cache::Cache(tr_torrents& torrents, int64_t max_bytes)
+    : torrents_{ torrents }
+    , max_blocks_(getMaxBlocks(max_bytes))
     , max_bytes_(max_bytes)
 {
 }

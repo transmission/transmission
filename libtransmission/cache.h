@@ -16,13 +16,14 @@
 
 #include "block-info.h"
 
+class tr_torrents;
 struct evbuffer;
 struct tr_torrent;
 
 class Cache
 {
 public:
-    explicit Cache(int64_t max_bytes);
+    explicit Cache(tr_torrents& torrents, int64_t max_bytes);
     ~Cache() = default;
 
     int setLimit(int64_t new_limit);
@@ -71,6 +72,8 @@ private:
         DONEFLAG = 0x2000,
         SESSIONFLAG = 0x4000,
     };
+
+    tr_torrents& torrents_;
 
     std::vector<CacheBlock> blocks_;
     size_t max_blocks_ = 0;

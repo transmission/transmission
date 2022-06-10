@@ -606,7 +606,7 @@ tr_session* tr_sessionInit(char const* config_dir, bool messageQueuingEnabled, t
     auto* session = new tr_session{};
     session->udp_socket = TR_BAD_SOCKET;
     session->udp6_socket = TR_BAD_SOCKET;
-    session->cache = std::make_unique<Cache>(1024 * 1024 * 2);
+    session->cache = std::make_unique<Cache>(session->torrents(), 1024 * 1024 * 2);
     session->magicNumber = SESSION_MAGIC_NUMBER;
     session->session_id = tr_session_id_new();
     bandwidthGroupRead(session, config_dir);
