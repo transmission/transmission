@@ -86,37 +86,109 @@ Glib::ustring tr_strlsize(guint64 bytes)
     return bytes == 0 ? Q_("None") : tr_formatter_size_B(bytes);
 }
 
-Glib::ustring tr_strltime(time_t seconds)
+namespace
 {
-    if (seconds < 0)
+
+std::string tr_format_future_time(time_t seconds)
+{
+    if (auto const days_from_now = seconds / 86400; days_from_now > 0)
     {
-        seconds = 0;
+        return fmt::format(
+            ngettext("{days_from_now:L} day from now", "{days_from_now:L} days from now", days_from_now),
+            fmt::arg("days_from_now", days_from_now));
     }
 
-    auto const days = (int)(seconds / 86400);
-    auto const d = fmt::format(ngettext("{days:L} day", "{days:L} days", days), fmt::arg("days", days));
-    int const hours = (seconds % 86400) / 3600;
-    auto const h = fmt::format(ngettext("{hours} hour", "{hours} hours", hours), fmt::arg("hours", hours));
-    if (days != 0)
+    if (auto const hours_from_now = (seconds % 86400) / 3600; hours_from_now > 0)
     {
-        return (days >= 4 || hours == 0) ? d : fmt::format(FMT_STRING("{:s}, {:s}"), d, h);
+        return fmt::format(
+            ngettext("{hours_from_now:L} hour from now", "{hours_from_now:L} hours from now", hours_from_now),
+            fmt::arg("hours_from_now", hours_from_now));
     }
 
-    int const minutes = (seconds % 3600) / 60;
-    auto const m = fmt::format(ngettext("{minutes} minute", "{minutes} minutes", minutes), fmt::arg("minutes", minutes));
-    if (hours != 0)
+    if (auto const minutes_from_now = (seconds % 3600) / 60; minutes_from_now > 0)
     {
-        return (hours >= 4 || minutes == 0) ? h : fmt::format(FMT_STRING("{:s}, {:s}"), h, m);
+        return fmt::format(
+            ngettext("{minutes_from_now:L} minute from now", "{minutes_from_now:L} minutes from now", minutes_from_now),
+            fmt::arg("minutes_from_now", minutes_from_now));
     }
 
-    seconds = (seconds % 3600) % 60;
-    auto const s = fmt::format(ngettext("{seconds} second", "{seconds} seconds", seconds), fmt::arg("seconds", seconds));
-    if (minutes != 0)
+    if (auto const seconds_from_now = (seconds % 3600) % 60; seconds_from_now > 0)
     {
-        return (minutes >= 4 || seconds == 0) ? m : fmt::format(FMT_STRING("{:s}, {:s}"), m, s);
+        return fmt::format(
+            ngettext("{seconds_from_now:L} second from now", "{seconds_from_now:L} seconds from now", seconds_from_now),
+            fmt::arg("seconds_from_now", seconds_from_now));
     }
 
-    return s;
+    return _("now");
+}
+
+std::string tr_format_past_time(time_t seconds)
+{
+    if (auto const days_ago = seconds / 86400; days_ago > 0)
+    {
+        return fmt::format(ngettext("{days_ago:L} day ago", "{days_ago:L} days ago", days_ago), fmt::arg("days_ago", days_ago));
+    }
+
+    if (auto const hours_ago = (seconds % 86400) / 3600; hours_ago > 0)
+    {
+        return fmt::format(
+            ngettext("{hours_ago:L} hour ago", "{hours_ago:L} hours ago", hours_ago),
+            fmt::arg("hours_ago", hours_ago));
+    }
+
+    if (auto const minutes_ago = (seconds % 3600) / 60; minutes_ago > 0)
+    {
+        return fmt::format(
+            ngettext("{minutes_ago:L} minute ago", "{minutes_ago:L} minutes ago", minutes_ago),
+            fmt::arg("minutes_ago", minutes_ago));
+    }
+
+    if (auto const seconds_ago = (seconds % 3600) % 60; seconds_ago > 0)
+    {
+        return fmt::format(
+            ngettext("{seconds_ago:L} second ago", "{seconds_ago:L} seconds ago", seconds_ago),
+            fmt::arg("seconds_ago", seconds_ago));
+    }
+
+    return _("now");
+}
+
+std::string tr_format_time_remaining(time_t seconds)
+{
+    if (auto const days_left = seconds / 86400; days_left > 0)
+    {
+        return fmt::format(
+            ngettext("{days_left:L} day remaining", "{days_left:L} days left", days_left),
+            fmt::arg("days_left", days_left));
+    }
+
+    if (auto const hours_left = (seconds % 86400) / 3600; hours_left > 0)
+    {
+        return fmt::format(
+            ngettext("{hours_left:L} hour left", "{hours_left:L} hours left", hours_left),
+            fmt::arg("hours_left", hours_left));
+    }
+
+    if (auto const minutes_left = (seconds % 3600) / 60; minutes_left > 0)
+    {
+        return fmt::format(
+            ngettext("{minutes_left:L} minute left", "{minutes_left:L} minutes left", minutes_left),
+            fmt::arg("minutes_left", minutes_left));
+    }
+
+    if (auto const seconds_left = (seconds % 3600) % 60; seconds_left > 0)
+    {
+        return fmt::format(
+            ngettext("{seconds_left:L} second left", "{seconds_left:L} seconds left", seconds_left),
+            fmt::arg("seconds_left", seconds_left));
+    }
+
+    return _("now");
+}
+
+std::string tr_format_time_relative(time_t src, time_t dst)
+{
+    return src < dst ? tr_format_future_time(dst - src) : tr_format_past_time(src - dst);
 }
 
 namespace
