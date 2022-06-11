@@ -16,45 +16,45 @@
 {
     NSView* contentView = self.fWindow.contentView;
     NSSize const windowSize = [contentView convertSize:self.fWindow.frame.size fromView:nil];
-    CGFloat originY = NSMaxY(contentView.frame);
-    
+    CGFloat originY = NSMaxY( contentView.frame );
+
     //remove all subviews
-    for (id view in contentView.subviews.copy)
+    for ( id view in contentView.subviews.copy )
     {
         [view removeFromSuperviewWithoutNeedingDisplay];
     }
-    
+
     self.fStatusBar = nil;
     self.fFilterBar = nil;
-    
-    if ([self.fDefaults boolForKey:@"StatusBar"])
+
+    if ( [self.fDefaults boolForKey:@"StatusBar"] )
     {
         self.fStatusBar = [[StatusBarController alloc] initWithLib:self.fLib];
 
         NSRect statusBarFrame = self.fStatusBar.view.frame;
         statusBarFrame.size.width = windowSize.width;
-        
+
         originY -= STATUS_BAR_HEIGHT;
         statusBarFrame.origin.y = originY;
         self.fStatusBar.view.frame = statusBarFrame;
-        
+
         [contentView addSubview:self.fStatusBar.view];
     }
-    
-    if ([self.fDefaults boolForKey:@"FilterBar"])
+
+    if ( [self.fDefaults boolForKey:@"FilterBar"] )
     {
         self.fFilterBar = [[FilterBarController alloc] init];
 
         NSRect filterBarFrame = self.fFilterBar.view.frame;
         filterBarFrame.size.width = windowSize.width;
-        
+
         originY -= FILTER_BAR_HEIGHT;
         filterBarFrame.origin.y = originY;
         self.fFilterBar.view.frame = filterBarFrame;
-        
+
         [contentView addSubview:self.fFilterBar.view];
     }
-    
+
     NSScrollView* scrollView = self.fTableView.enclosingScrollView;
     [contentView addSubview:scrollView];
 
@@ -62,7 +62,7 @@
     [contentView addSubview:self.fSpeedLimitButton];
     [contentView addSubview:self.fClearCompletedButton];
     [contentView addSubview:self.fTotalTorrentsField];
-    
+
     //window is updated and animated in fullUpdateUI --> applyFilter --> setWindowSizeToFit
     [self fullUpdateUI];
     [self updateForAutoSize];
@@ -75,10 +75,10 @@
     scrollView.hasVerticalScroller = NO;
     [self.fWindow setFrame:self.sizedWindowFrame display:YES animate:YES];
     scrollView.hasVerticalScroller = YES;
-    
-    if ([self.fDefaults boolForKey:@"AutoSize"])
+
+    if ( [self.fDefaults boolForKey:@"AutoSize"] )
     {
-        if (!self.isFullScreen)
+        if ( !self.isFullScreen )
         {
             [self setWindowMinMaxToCurrent];
         }
@@ -87,7 +87,7 @@
 
 - (void)updateForAutoSize
 {
-    if ([self.fDefaults boolForKey:@"AutoSize"] && !self.isFullScreen)
+    if ( [self.fDefaults boolForKey:@"AutoSize"] && !self.isFullScreen )
     {
         [self setWindowSizeToFit];
     }
@@ -138,95 +138,95 @@
     CGFloat const minHeight = self.minWindowContentSizeAllowed +
         (NSHeight(self.fWindow.frame) - NSHeight(self.fWindow.contentView.frame)); //contentView to window
 
-    if (windowSize.height <= minHeight)
+    if ( windowSize.height <= minHeight )
     {
         windowSize.height = minHeight;
     }
     else
     {
         NSScreen* screen = self.fWindow.screen;
-        if (screen)
+        if ( screen )
         {
             NSSize maxSize = [scrollView convertSize:screen.visibleFrame.size fromView:nil];
             maxSize.height += titleBarHeight;
             maxSize.height += BOTTOM_BAR_HEIGHT;
-            
-            if (self.fStatusBar)
+
+            if ( self.fStatusBar )
             {
                 maxSize.height += STATUS_BAR_HEIGHT;
             }
-            if (self.fFilterBar)
+            if ( self.fFilterBar )
             {
                 maxSize.height += FILTER_BAR_HEIGHT;
             }
-            if (windowSize.height > maxSize.height)
+            if ( windowSize.height > maxSize.height )
             {
                 windowSize.height = maxSize.height;
             }
         }
     }
 
-    windowFrame.origin.y -= (windowSize.height - windowFrame.size.height);
+    windowFrame.origin.y -= ( windowSize.height - windowFrame.size.height );
     windowFrame.size.height = windowSize.height;
     return windowFrame;
 }
 
-- (CGFloat) titlebarHeight
+- (CGFloat)titlebarHeight
 {
-    return self.fWindow.frame.size.height - [self.fWindow contentRectForFrameRect: self.fWindow.frame].size.height;
+    return self.fWindow.frame.size.height - [self.fWindow contentRectForFrameRect:self.fWindow.frame].size.height;
 }
 
 - (CGFloat)mainWindowComponentHeight
 {
     CGFloat height = 0;
-    if (self.fStatusBar)
+    if ( self.fStatusBar )
     {
         height += STATUS_BAR_HEIGHT;
     }
-    
-    if (self.fFilterBar)
+
+    if ( self.fFilterBar )
     {
         height += FILTER_BAR_HEIGHT;
     }
-        
+
     return height;
 }
 
 - (CGFloat)scrollViewHeight
 {
-    if (self.isFullScreen)
+    if ( self.isFullScreen )
     {
         return self.fWindow.frame.size.height - self.titlebarHeight - self.mainWindowComponentHeight - BOTTOM_BAR_HEIGHT;
     }
-    
-    if ([self.fDefaults boolForKey:@"AutoSize"])
+
+    if ( [self.fDefaults boolForKey:@"AutoSize"] )
     {
-        NSUInteger groups = (self.fDisplayedTorrents.count > 0 && ![self.fDisplayedTorrents[0] isKindOfClass:[Torrent class]]) ?
+        NSUInteger groups = ( self.fDisplayedTorrents.count > 0 && ![self.fDisplayedTorrents[0] isKindOfClass:[Torrent class]] ) ?
             self.fDisplayedTorrents.count :
             0;
 
-        CGFloat height = (GROUP_SEPARATOR_HEIGHT + self.fTableView.intercellSpacing.height) * groups +
-            (self.fTableView.rowHeight + self.fTableView.intercellSpacing.height) * (self.fTableView.numberOfRows - groups);
-        
+        CGFloat height = ( GROUP_SEPARATOR_HEIGHT + self.fTableView.intercellSpacing.height ) * groups +
+            ( self.fTableView.rowHeight + self.fTableView.intercellSpacing.height ) * ( self.fTableView.numberOfRows - groups );
+
         if (height > 0)
         {
             return height;
         }
     }
-    
+
     return NSHeight(self.fTableView.enclosingScrollView.frame);
 }
 
 - (CGFloat)minWindowContentSizeAllowed
 {
-    CGFloat contentMinHeight = NSHeight(self.fWindow.contentView.frame) - NSHeight(self.fTableView.enclosingScrollView.frame) +
+    CGFloat contentMinHeight = NSHeight( self.fWindow.contentView.frame ) - NSHeight( self.fTableView.enclosingScrollView.frame ) +
         self.fTableView.rowHeight + self.fTableView.intercellSpacing.height;
     return contentMinHeight;
 }
 
 - (BOOL)isFullScreen
 {
-    return (self.fWindow.styleMask & NSFullScreenWindowMask);
+    return ( self.fWindow.styleMask & NSFullScreenWindowMask );
 }
 
 - (void)windowWillEnterFullScreen:(NSNotification*)notification
@@ -242,12 +242,12 @@
     self.fWindow.contentMaxSize = contentMaxSize;
 }
 
-- (void)windowDidEnterFullScreen:(NSNotification *)notification
+- (void)windowDidEnterFullScreen:(NSNotification*)notification
 {
     [self drawMainWindow];
 }
 
--(void)windowWillExitFullScreen:(NSNotification *)notification
+- (void)windowWillExitFullScreen:(NSNotification*)notification
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         [self drawMainWindow];
