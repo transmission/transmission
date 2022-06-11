@@ -16,7 +16,7 @@ on:
 env:
   GTEST_OUTPUT: xml:./
 jobs:
-  test-sanitizer-g++:
+  test-sanitizer-gcc:
     uses: ./.github/workflows/sanitizer-tests.yml
     with:
       c: gcc
