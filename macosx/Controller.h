@@ -10,6 +10,8 @@
 #include <libtransmission/transmission.h>
 
 #import "VDKQueue.h"
+#import "TorrentTableView.h"
+#import "MainWindow.h"
 
 @class AddMagnetWindowController;
 @class AddWindowController;
@@ -158,19 +160,11 @@ typedef NS_ENUM(unsigned int, addType) { //
 - (void)toggleAvailabilityBar:(id)sender;
 
 - (void)toggleStatusBar:(id)sender;
-- (void)showStatusBar:(BOOL)show animate:(BOOL)animate;
 - (void)toggleFilterBar:(id)sender;
-- (void)showFilterBar:(BOOL)show animate:(BOOL)animate;
 - (void)focusFilterField;
 
 - (void)allToolbarClicked:(id)sender;
 - (void)selectedToolbarClicked:(id)sender;
-
-- (void)setWindowSizeToFit;
-@property(nonatomic, readonly) NSRect sizedWindowFrame;
-- (void)updateForAutoSize;
-- (void)setWindowMinMaxToCurrent;
-@property(nonatomic, readonly) CGFloat minWindowContentSizeAllowed;
 
 - (void)updateForExpandCollapse;
 

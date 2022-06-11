@@ -50,6 +50,7 @@ set(${PROJECT_NAME}_SOURCES
     ButtonToolbarItem.mm
     ColorTextField.mm
     Controller.mm
+    ControllerWindowMethods.mm
     CreatorWindowController.mm
     DragOverlayView.mm
     DragOverlayWindow.mm

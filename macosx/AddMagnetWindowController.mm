@@ -74,8 +74,8 @@
     self.fNameField.stringValue = name;
     self.fNameField.toolTip = name;
 
-    //disable fullscreen support
-    [self.window setCollectionBehavior:NSWindowCollectionBehaviorFullScreenNone];
+    //make window an auxillary view in fullscreen
+    [self.window setCollectionBehavior:NSWindowCollectionBehaviorFullScreenAuxiliary];
 
     [self setGroupsMenu];
     [self.fGroupPopUp selectItemWithTag:self.fGroupValue];
