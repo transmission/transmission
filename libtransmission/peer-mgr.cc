@@ -259,7 +259,7 @@ public:
     {
         TR_ASSERT(!contains(address));
 
-        handshakes_.emplace_back(std::make_pair(address, handshake));
+        handshakes_.emplace_back(address, handshake);
     }
 
     [[nodiscard]] bool contains(tr_address const& address) const noexcept

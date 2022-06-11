@@ -121,36 +121,36 @@ int readOrWriteBytes(
     ***/
 
     auto fd = session->openFiles().get(tor->uniqueId, file_index, do_write);
-    if (!fd) // it's not cached, so open/create it now
+    auto filename = tr_pathbuf{};
+    if (!fd && !getFilename(filename, tor, file_index, io_mode))
     {
-        auto filename = tr_pathbuf{};
-        if (!getFilename(filename, tor, file_index, io_mode))
-        {
-            return ENOENT;
-        }
+        return ENOENT;
+    }
 
+    if (!fd) // not in the cache, so open or create it now
+    {
         // open (and maybe create) the file
         auto const prealloc = (!do_write || !tor->fileIsWanted(file_index)) ? TR_PREALLOCATE_NONE :
                                                                               tor->session->preallocationMode;
         fd = session->openFiles().get(tor->uniqueId, file_index, do_write, filename, prealloc, file_size);
-        if (!fd)
-        {
-            int const err = errno;
-            tr_logAddErrorTor(
-                tor,
-                fmt::format(
-                    _("Couldn't get '{path}': {error} ({error_code})"),
-                    fmt::arg("path", filename),
-                    fmt::arg("error", tr_strerror(err)),
-                    fmt::arg("error_code", err)));
-            return err;
-        }
-
-        if (do_write)
+        if (fd && do_write)
         {
             // make a note that we just created a file
             tr_statsFileCreated(tor->session);
         }
+    }
+
+    if (!fd) // couldn't create/open it either
+    {
+        int const err = errno;
+        tr_logAddErrorTor(
+            tor,
+            fmt::format(
+                _("Couldn't get '{path}': {error} ({error_code})"),
+                fmt::arg("path", filename),
+                fmt::arg("error", tr_strerror(err)),
+                fmt::arg("error_code", err)));
+        return err;
     }
 
     switch (io_mode)
