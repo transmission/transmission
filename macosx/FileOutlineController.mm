@@ -10,7 +10,6 @@
 #import "FileOutlineView.h"
 #import "FilePriorityCell.h"
 #import "FileRenameSheetController.h"
-#import "NSApplicationAdditions.h"
 #import "NSMutableArrayAdditions.h"
 #import "NSStringAdditions.h"
 
@@ -425,6 +424,10 @@ typedef NS_ENUM(unsigned int, filePriorityMenuTag) { //
         break;
     case FILE_PRIORITY_LOW_TAG:
         priority = TR_PRI_LOW;
+        break;
+    default:
+        NSAssert1(NO, @"Unknown sender tag: %ld", [sender tag]);
+        return;
     }
 
     NSIndexSet* indexSet = self.fOutline.selectedRowIndexes;
@@ -569,6 +572,9 @@ typedef NS_ENUM(unsigned int, filePriorityMenuTag) { //
         case FILE_PRIORITY_LOW_TAG:
             priority = TR_PRI_LOW;
             break;
+        default:
+            NSAssert1(NO, @"Unknown menuItem tag: %ld", menuItem.tag);
+            return NO;
         }
 
         BOOL current = NO, canChange = NO;

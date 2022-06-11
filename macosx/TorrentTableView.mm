@@ -8,7 +8,6 @@
 #import "Controller.h"
 #import "FileListNode.h"
 #import "InfoOptionsViewController.h"
-#import "NSApplicationAdditions.h"
 #import "NSStringAdditions.h"
 #import "Torrent.h"
 #import "TorrentCell.h"
@@ -758,7 +757,7 @@
         return;
     }
 
-    NSRect const rect = [self.fTorrentCell iconRectForBounds:[self rectOfRow:row]];
+    NSRect const rect = [self.fTorrentCell actionRectForBounds:[self rectOfRow:row]];
 
     if (self.fActionPopoverShown)
     {

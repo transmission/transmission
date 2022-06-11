@@ -125,8 +125,8 @@ void tr_setConfigDir(tr_session* session, std::string_view config_dir)
     session->config_dir = config_dir;
     session->resume_dir = tr_strvPath(config_dir, ResumeSubdir);
     session->torrent_dir = tr_strvPath(config_dir, TorrentSubdir);
-    tr_sys_dir_create(session->resume_dir.c_str(), TR_SYS_DIR_CREATE_PARENTS, 0777);
-    tr_sys_dir_create(session->torrent_dir.c_str(), TR_SYS_DIR_CREATE_PARENTS, 0777);
+    tr_sys_dir_create(session->resume_dir, TR_SYS_DIR_CREATE_PARENTS, 0777);
+    tr_sys_dir_create(session->torrent_dir, TR_SYS_DIR_CREATE_PARENTS, 0777);
 }
 
 char const* tr_sessionGetConfigDir(tr_session const* session)
@@ -428,7 +428,7 @@ std::string tr_getSessionIdDir()
     char* program_data_dir = win32_get_known_folder_ex(FOLDERID_ProgramData, KF_FLAG_CREATE);
     auto const result = tr_strvPath(program_data_dir, "Transmission");
     tr_free(program_data_dir);
-    tr_sys_dir_create(result.c_str(), 0, 0);
+    tr_sys_dir_create(result, 0, 0);
     return result;
 
 #endif

@@ -12,6 +12,7 @@
 @property(nonatomic) BOOL hoverAction;
 
 - (NSRect)iconRectForBounds:(NSRect)bounds;
+- (NSRect)actionRectForBounds:(NSRect)bounds;
 
 - (void)addTrackingAreasForView:(NSView*)controlView
                          inRect:(NSRect)cellFrame

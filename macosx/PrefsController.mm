@@ -17,7 +17,6 @@
 #import "Controller.h"
 #import "PortChecker.h"
 #import "BonjourController.h"
-#import "NSApplicationAdditions.h"
 #import "NSImageAdditions.h"
 #import "NSStringAdditions.h"
 
@@ -150,7 +149,6 @@
 
         //set auto import
         NSString* autoPath;
-        VDKQueue* x = [(Controller*)[NSApp delegate] fileWatcherQueue];
         if ([_fDefaults boolForKey:@"AutoImport"] && (autoPath = [_fDefaults stringForKey:@"AutoImportDirectory"]))
         {
             [((Controller*)NSApp.delegate).fileWatcherQueue addPath:autoPath.stringByExpandingTildeInPath
@@ -288,6 +286,9 @@
     {
         self.fRPCPasswordField.stringValue = self.fRPCPassword;
     }
+
+    //set fRPCWhitelistTable column width to table width
+    [self.fRPCWhitelistTable sizeToFit];
 }
 
 - (NSToolbarItem*)toolbar:(NSToolbar*)toolbar itemForItemIdentifier:(NSString*)ident willBeInsertedIntoToolbar:(BOOL)flag
