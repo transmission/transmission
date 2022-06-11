@@ -1,4 +1,4 @@
-name: g++ sanitizer tests
+name: sanitizer-tests-clang
 on:
   push:
     paths:
@@ -16,7 +16,7 @@ on:
 env:
   GTEST_OUTPUT: xml:./
 jobs:
-  test-sanitizer-clang:
+  sanitizer-tests-clang:
     uses: ./.github/workflows/sanitizer-tests.yml
     with:
       c: clang

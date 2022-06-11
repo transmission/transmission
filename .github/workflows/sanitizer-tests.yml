@@ -17,7 +17,7 @@ on:
 env:
   GTEST_OUTPUT: xml:./
 jobs:
-  libtransmission-test:
+  ctest:
     runs-on: ubuntu-22.04
     steps:
       - name: Prepare
