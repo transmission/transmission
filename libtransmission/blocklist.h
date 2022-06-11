@@ -111,7 +111,7 @@ private:
 
 #ifdef TR_ENABLE_ASSERTS
     /// @brief Sanity checks: make sure the rules are sorted in ascending order and don't overlap
-    void assertValidRules(std::vector<IPv4Range>& ranges);
+    static void assertValidRules(std::vector<IPv4Range> const& ranges);
 #endif
 
     bool is_enabled_;

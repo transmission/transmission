@@ -78,7 +78,7 @@
 <context>
     <name>DetailsDialog</name>
     <message>
-        <location filename="../DetailsDialog.cc" line="+427"/>
+        <location filename="../DetailsDialog.cc" line="+428"/>
         <source>None</source>
         <translation>Nessuno</translation>
     </message>
@@ -89,12 +89,12 @@
     </message>
     <message>
         <location line="+1"/>
-        <location line="+265"/>
+        <location line="+267"/>
         <source>Unknown</source>
         <translation>Sconosciuto</translation>
     </message>
     <message>
-        <location line="-208"/>
+        <location line="-210"/>
         <source>Finished</source>
         <translation>Finito</translation>
     </message>
@@ -109,7 +109,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+133"/>
+        <location line="+135"/>
         <source>Active now</source>
         <translation>Attivo</translation>
     </message>
@@ -160,7 +160,7 @@
         <translation>Creato da %1 il %2</translation>
     </message>
     <message>
-        <location line="+173"/>
+        <location line="+204"/>
         <location line="+47"/>
         <source>Encrypted connection</source>
         <translation>Connessione crittografata</translation>
@@ -245,7 +245,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-799"/>
+        <location line="-832"/>
         <source>%1 (100%)</source>
         <extracomment>Text following the &quot;Have:&quot; label in torrent properties dialog; %1 is amount of downloaded and verified data</extracomment>
         <translation>%1 (100%)</translation>
@@ -268,12 +268,13 @@
         <translation>%1 (Rapporto: %2)</translation>
     </message>
     <message>
-        <location line="+271"/>
+        <location line="+273"/>
+        <location line="+55"/>
         <source>N/A</source>
         <translation>N/D</translation>
     </message>
     <message>
-        <location line="+250"/>
+        <location line="+226"/>
         <source>Peer is connected over uTP</source>
         <translation>Il peer è connesso attraverso uTP</translation>
     </message>
@@ -424,12 +425,12 @@
         <translation>Posizione:</translation>
     </message>
     <message>
-        <location line="+110"/>
+        <location line="+124"/>
         <source>Edit Trackers</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-176"/>
+        <location line="-190"/>
         <source>Hash:</source>
         <translation>Hash:</translation>
     </message>
@@ -445,6 +446,11 @@
     </message>
     <message>
         <location line="+78"/>
+        <source>Added:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+14"/>
         <source>Comment:</source>
         <translation>Commento:</translation>
     </message>
@@ -542,7 +548,7 @@
 <context>
     <name>FileTreeItem</name>
     <message>
-        <location filename="../FileTreeItem.cc" line="+285"/>
+        <location filename="../FileTreeItem.cc" line="+296"/>
         <location filename="../FileTreeView.cc" line="+108"/>
         <location line="+257"/>
         <source>Low</source>
@@ -577,22 +583,22 @@
         <translation>File</translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="+3"/>
         <source>Size</source>
         <translation>Dimensione</translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="+3"/>
         <source>Progress</source>
         <translation>Avanzamento</translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="+3"/>
         <source>Download</source>
         <translation>Download</translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="+3"/>
         <source>Priority</source>
         <translation>Priorità</translation>
     </message>
@@ -1226,7 +1232,7 @@
         <translation>Ordina per &amp;coda</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cc" line="+471"/>
+        <location filename="../MainWindow.cc" line="+470"/>
         <source>Limit Download Speed</source>
         <translation>Limita velocità di download</translation>
     </message>
@@ -1302,12 +1308,12 @@
         <translation>Apri torrent</translation>
     </message>
     <message>
-        <location line="-986"/>
+        <location line="-985"/>
         <source>Speed Limits</source>
         <translation>Limiti di velocità</translation>
     </message>
     <message>
-        <location line="+520"/>
+        <location line="+519"/>
         <source>Network Error</source>
         <translation>Errore di rete</translation>
     </message>
@@ -2134,7 +2140,7 @@ una riga vuota.</translation>
     <message>
         <location line="+147"/>
         <source>Download is i&amp;nactive if data sharing stopped:</source>
-        <extracomment>Please keep this phrase as short as possible, it&apos;s curently the longest and influences dialog width</extracomment>
+        <extracomment>Please keep this phrase as short as possible, it&apos;s currently the longest and influences dialog width</extracomment>
         <translation>Il download è i&amp;nattivo se la condivisione è stata fermata:</translation>
     </message>
     <message>
@@ -2237,7 +2243,7 @@ una riga vuota.</translation>
 <context>
     <name>Session</name>
     <message>
-        <location filename="../Session.cc" line="+510"/>
+        <location filename="../Session.cc" line="+498"/>
         <source>Error Renaming Path</source>
         <translation>Errore durante la rinomina del precorso</translation>
     </message>
@@ -2374,22 +2380,22 @@ una riga vuota.</translation>
 <context>
     <name>Torrent</name>
     <message>
-        <location filename="../Torrent.cc" line="+308"/>
+        <location filename="../Torrent.cc" line="+300"/>
         <source>Verifying local data</source>
         <translation>Verifica dei dati locali</translation>
     </message>
     <message>
-        <location line="+8"/>
+        <location line="+6"/>
         <source>Downloading</source>
         <translation>In download</translation>
     </message>
     <message>
-        <location line="+8"/>
+        <location line="+6"/>
         <source>Seeding</source>
         <translation>In seeding</translation>
     </message>
     <message>
-        <location line="-24"/>
+        <location line="-18"/>
         <source>Finished</source>
         <translation>Completato</translation>
     </message>
@@ -2399,32 +2405,32 @@ una riga vuota.</translation>
         <translation>In pausa</translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="+3"/>
         <source>Queued for verification</source>
         <translation>In coda per la verifica</translation>
     </message>
     <message>
-        <location line="+8"/>
+        <location line="+6"/>
         <source>Queued for download</source>
         <translation>In coda per il download</translation>
     </message>
     <message>
-        <location line="+8"/>
+        <location line="+6"/>
         <source>Queued for seeding</source>
         <translation>In coda per il seed</translation>
     </message>
     <message>
-        <location line="+18"/>
+        <location line="+15"/>
         <source>Tracker gave a warning: %1</source>
         <translation>Il tracker ha dato un avviso: %1</translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="+3"/>
         <source>Tracker gave an error: %1</source>
         <translation>Il tracker ha dato un errore: %1</translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="+3"/>
         <source>Error: %1</source>
         <translation>Errore: %1</translation>
     </message>

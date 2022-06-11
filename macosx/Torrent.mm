@@ -15,7 +15,6 @@
 #import "Torrent.h"
 #import "GroupsController.h"
 #import "FileListNode.h"
-#import "NSApplicationAdditions.h"
 #import "NSStringAdditions.h"
 #import "TrackerNode.h"
 

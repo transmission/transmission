@@ -138,9 +138,9 @@ std::optional<std::string> tr_session::WebMediator::cookieFile() const
     return std::string{ path };
 }
 
-std::optional<std::string> tr_session::WebMediator::userAgent() const
+std::optional<std::string_view> tr_session::WebMediator::userAgent() const
 {
-    return fmt::format(FMT_STRING("{:s}/{:s}"), TR_NAME, SHORT_VERSION_STRING);
+    return TR_NAME "/" SHORT_VERSION_STRING;
 }
 
 std::optional<std::string> tr_session::WebMediator::publicAddress() const
@@ -370,7 +370,7 @@ void tr_sessionGetDefaultSettings(tr_variant* d)
     tr_variantDictAddBool(d, TR_KEY_rpc_host_whitelist_enabled, true);
     tr_variantDictAddInt(d, TR_KEY_rpc_port, TR_DEFAULT_RPC_PORT);
     tr_variantDictAddStrView(d, TR_KEY_rpc_url, TR_DEFAULT_RPC_URL_STR);
-    tr_variantDictAddStr(d, TR_KEY_rpc_socket_mode, fmt::format("{:#o}", tr_rpc_server::DefaultRpcSocketMode));
+    tr_variantDictAddStr(d, TR_KEY_rpc_socket_mode, fmt::format("{:03o}", tr_rpc_server::DefaultRpcSocketMode));
     tr_variantDictAddBool(d, TR_KEY_scrape_paused_torrents_enabled, true);
     tr_variantDictAddStrView(d, TR_KEY_script_torrent_added_filename, "");
     tr_variantDictAddBool(d, TR_KEY_script_torrent_added_enabled, false);
@@ -389,7 +389,7 @@ void tr_sessionGetDefaultSettings(tr_variant* d)
     tr_variantDictAddInt(d, TR_KEY_alt_speed_time_day, TR_SCHED_ALL);
     tr_variantDictAddInt(d, TR_KEY_speed_limit_up, 100);
     tr_variantDictAddBool(d, TR_KEY_speed_limit_up_enabled, false);
-    tr_variantDictAddStr(d, TR_KEY_umask, fmt::format("{:#o}", DefaultUmask));
+    tr_variantDictAddStr(d, TR_KEY_umask, fmt::format("{:03o}", DefaultUmask));
     tr_variantDictAddInt(d, TR_KEY_upload_slots_per_torrent, 14);
     tr_variantDictAddStrView(d, TR_KEY_bind_address_ipv4, TR_DEFAULT_BIND_ADDRESS_IPV4);
     tr_variantDictAddStrView(d, TR_KEY_bind_address_ipv6, TR_DEFAULT_BIND_ADDRESS_IPV6);
@@ -793,7 +793,7 @@ static void sessionSetImpl(struct init_data* const data)
     if (tr_variantDictFindStrView(settings, TR_KEY_umask, &sv))
     {
         /* Read a umask as a string representing an octal number. */
-        session->umask = tr_parseNum<mode_t>(sv, 8).value_or(DefaultUmask);
+        session->umask = static_cast<mode_t>(tr_parseNum<uint32_t>(sv, 8).value_or(DefaultUmask));
         umask(session->umask);
     }
     else if (tr_variantDictFindInt(settings, TR_KEY_umask, &i))
@@ -2039,14 +2039,11 @@ static void sessionLoadTorrents(struct sessionLoadTorrentsData* const data)
             auto const path = tr_pathbuf{ dirname_sv, "/"sv, name };
 
             // is a magnet link?
-            if (!tr_ctorSetMetainfoFromFile(data->ctor, std::string{ path }, nullptr))
+            if (!tr_ctorSetMetainfoFromFile(data->ctor, path.sv(), nullptr))
             {
                 if (auto buf = std::vector<char>{}; tr_loadFile(path, buf))
                 {
-                    tr_ctorSetMetainfoFromMagnetLink(
-                        data->ctor,
-                        std::string{ std::data(buf), std::size(buf) }.c_str(),
-                        nullptr);
+                    tr_ctorSetMetainfoFromMagnetLink(data->ctor, std::string_view{ std::data(buf), std::size(buf) }, nullptr);
                 }
             }
 

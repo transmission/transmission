@@ -3,7 +3,6 @@
 // License text can be found in the licenses/ folder.
 
 #import "InfoTrackersViewController.h"
-#import "NSApplicationAdditions.h"
 #import "Torrent.h"
 #import "TrackerCell.h"
 #import "TrackerNode.h"

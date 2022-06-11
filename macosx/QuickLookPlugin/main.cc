@@ -9,7 +9,6 @@
 
 #include <CoreFoundation/CoreFoundation.h>
 #include <CoreFoundation/CFPlugInCOM.h>
-#include <CoreServices/CoreServices.h>
 #include <QuickLook/QuickLook.h>
 
 // -----------------------------------------------------------------------------
@@ -30,6 +29,7 @@
 //	typedefs
 // -----------------------------------------------------------------------------
 
+QL_EXTERN_C_BEGIN
 // The thumbnail generation function to be implemented in GenerateThumbnailForURL.c
 OSStatus GenerateThumbnailForURL(
     void* thisInterface,
@@ -69,6 +69,7 @@ HRESULT QuickLookGeneratorQueryInterface(void* thisInstance, REFIID iid, LPVOID*
 void* QuickLookGeneratorPluginFactory(CFAllocatorRef allocator, CFUUIDRef typeID);
 ULONG QuickLookGeneratorPluginAddRef(void* thisInstance);
 ULONG QuickLookGeneratorPluginRelease(void* thisInstance);
+QL_EXTERN_C_END
 
 // -----------------------------------------------------------------------------
 //	myInterfaceFtbl	definition

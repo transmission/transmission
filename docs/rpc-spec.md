@@ -145,10 +145,10 @@ Request arguments:
 | `seedIdleMode`        | number   | which seeding inactivity to use. See tr_idlelimit
 | `seedRatioLimit`      | double   | torrent-level seeding ratio
 | `seedRatioMode`       | number   | which ratio to use. See tr_ratiolimit
-| `trackerAdd`          | array    | **DEPRECATED** use trackerList instead
-| `trackerList`         | string   | string of announce URLs, one per line, with a blank line between tiers
-| `trackerRemove`       | array    | **DEPRECATED** use trackerList instead
-| `trackerReplace`      | array    | **DEPRECATED** use trackerList instead
+| `trackerAdd`          | array    | add a new tracker URL in its own new tier
+| `trackerList`         | string   | rebuild the torrent's tracker list with a string of announce URLs, one per line, with a blank line between tiers
+| `trackerRemove`       | array    | remove a tracker URL
+| `trackerReplace`      | array    | modify a tracker URL
 | `uploadLimit`         | number   | maximum upload speed (KBps)
 | `uploadLimited`       | boolean  | true if `uploadLimit` is honored
 
@@ -196,6 +196,7 @@ The 'source' column here corresponds to the data structure there.
 |:--|:--|:--
 | `activityDate` | number | tr_stat
 | `addedDate` | number | tr_stat
+| `availability` | array (see below)| tr_torrentAvailability()
 | `bandwidthPriority` | number | tr_priority_t
 | `comment` | string | tr_torrent_view
 | `corruptEver`| number | tr_stat
@@ -270,6 +271,7 @@ The 'source' column here corresponds to the data structure there.
 | `webseeds`| array of strings | tr_tracker_view
 | `webseedsSendingToUs`| number| tr_stat
 
+`availability`: An array of `pieceCount` numbers representing the number of connected peers that have each piece, or -1 if we already have the piece ourselves.
 
 `files`: array of objects, each containing:
 
@@ -535,7 +537,7 @@ Response arguments: `path`, `name`, and `id`, holding the torrent ID integer
 | `queue-stalled-minutes` | number | torrents that are idle for N minuets aren't counted toward seed-queue-size or download-queue-size
 | `rename-partial-files` | boolean | true means append `.part` to incomplete files
 | `rpc-version-minimum` | number | the minimum RPC API version supported
-| `rpc-version-semver` | number | the current RPC API version in a semver-compatible string
+| `rpc-version-semver` | string | the current RPC API version in a semver-compatible string
 | `rpc-version` | number | the current RPC API version
 | `script-torrent-added-enabled` | boolean | whether or not to call the `added` script
 | `script-torrent-added-filename` | string | filename of the script to run
@@ -580,9 +582,16 @@ to be common behavior.
 #### 4.1.1 Mutators
 Method name: `session-set`
 
-Request arguments: one or more of 4.1's arguments, except: `blocklist-size`,
-`config-dir`, `rpc-version`, `rpc-version-minimum`,
-`version`, and `session-id`
+Request arguments: the mutable properties from 4.1's arguments, i.e. all of them
+except:
+
+* `blocklist-size`
+* `config-dir`
+* `rpc-version-minimum`,
+* `rpc-version-semver`
+* `rpc-version`
+* `session-id`
+* `version`
 
 Response arguments: none
 
@@ -962,6 +971,7 @@ Transmission 4.0.0 (`rpc-version-semver` 5.3.0, `rpc-version`: 17)
 | `session-get` | new arg `script-torrent-done-seeding-enabled`
 | `session-get` | new arg `script-torrent-done-seeding-filename`
 | `torrent-add` | new arg `labels`
+| `torrent-get` | new arg `availability`
 | `torrent-get` | new arg `file-count`
 | `torrent-get` | new arg `group`
 | `torrent-get` | new arg `percentComplete`
@@ -971,9 +981,6 @@ Transmission 4.0.0 (`rpc-version-semver` 5.3.0, `rpc-version`: 17)
 | `torrent-get` | new arg `trackerList`
 | `torrent-set` | new arg `group`
 | `torrent-set` | new arg `trackerList`
-| `torrent-set` | **DEPRECATED** `trackerAdd`. Use `trackerList` instead.
-| `torrent-set` | **DEPRECATED** `trackerRemove`. Use `trackerList` instead.
-| `torrent-set` | **DEPRECATED** `trackerReplace`. Use `trackerList` instead.
 | `group-set` | new method
 | `group-get` | new method
 

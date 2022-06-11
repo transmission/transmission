@@ -78,7 +78,7 @@
 <context>
     <name>DetailsDialog</name>
     <message>
-        <location filename="../DetailsDialog.cc" line="+427"/>
+        <location filename="../DetailsDialog.cc" line="+428"/>
         <source>None</source>
         <translation>Ingen</translation>
     </message>
@@ -89,12 +89,12 @@
     </message>
     <message>
         <location line="+1"/>
-        <location line="+265"/>
+        <location line="+267"/>
         <source>Unknown</source>
         <translation>Ukendt</translation>
     </message>
     <message>
-        <location line="-208"/>
+        <location line="-210"/>
         <source>Finished</source>
         <translation>Færdig</translation>
     </message>
@@ -109,7 +109,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+133"/>
+        <location line="+135"/>
         <source>Active now</source>
         <translation>Aktiv nu</translation>
     </message>
@@ -160,7 +160,7 @@
         <translation>Oprettet af %1 %2</translation>
     </message>
     <message>
-        <location line="+173"/>
+        <location line="+204"/>
         <location line="+47"/>
         <source>Encrypted connection</source>
         <translation>Krypteret forbindelse</translation>
@@ -245,7 +245,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-799"/>
+        <location line="-832"/>
         <source>%1 (100%)</source>
         <extracomment>Text following the &quot;Have:&quot; label in torrent properties dialog; %1 is amount of downloaded and verified data</extracomment>
         <translation>%1 (100%)</translation>
@@ -268,12 +268,13 @@
         <translation>%1 (Forhold: %2)</translation>
     </message>
     <message>
-        <location line="+271"/>
+        <location line="+273"/>
+        <location line="+55"/>
         <source>N/A</source>
         <translation>-</translation>
     </message>
     <message>
-        <location line="+250"/>
+        <location line="+226"/>
         <source>Peer is connected over uTP</source>
         <translation>Modpart er forbundet over uTP</translation>
     </message>
@@ -424,12 +425,12 @@
         <translation>Placering:</translation>
     </message>
     <message>
-        <location line="+110"/>
+        <location line="+124"/>
         <source>Edit Trackers</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-176"/>
+        <location line="-190"/>
         <source>Hash:</source>
         <translation>Hash:</translation>
     </message>
@@ -445,6 +446,11 @@
     </message>
     <message>
         <location line="+78"/>
+        <source>Added:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location line="+14"/>
         <source>Comment:</source>
         <translation>Kommentar:</translation>
     </message>
@@ -542,7 +548,7 @@
 <context>
     <name>FileTreeItem</name>
     <message>
-        <location filename="../FileTreeItem.cc" line="+285"/>
+        <location filename="../FileTreeItem.cc" line="+296"/>
         <location filename="../FileTreeView.cc" line="+108"/>
         <location line="+257"/>
         <source>Low</source>
@@ -577,22 +583,22 @@
         <translation>Fil</translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="+3"/>
         <source>Size</source>
         <translation>Størrelse</translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="+3"/>
         <source>Progress</source>
         <translation>Fremgang</translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="+3"/>
         <source>Download</source>
         <translation>Download</translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="+3"/>
         <source>Priority</source>
         <translation>Prioritet</translation>
     </message>
@@ -1226,7 +1232,7 @@
         <translation>Sortér efter &amp;kø</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cc" line="+471"/>
+        <location filename="../MainWindow.cc" line="+470"/>
         <source>Limit Download Speed</source>
         <translation>Begræns downloadhastighed</translation>
     </message>
@@ -1302,12 +1308,12 @@
         <translation>Åbn torrent</translation>
     </message>
     <message>
-        <location line="-986"/>
+        <location line="-985"/>
         <source>Speed Limits</source>
         <translation>Hastighedsgrænser</translation>
     </message>
     <message>
-        <location line="+520"/>
+        <location line="+519"/>
         <source>Network Error</source>
         <translation>Netværksfejl</translation>
     </message>
@@ -2132,7 +2138,7 @@ For at tilføje en anden primære URL, skal du tilføje den efter en tom linje.<
     <message>
         <location line="+147"/>
         <source>Download is i&amp;nactive if data sharing stopped:</source>
-        <extracomment>Please keep this phrase as short as possible, it&apos;s curently the longest and influences dialog width</extracomment>
+        <extracomment>Please keep this phrase as short as possible, it&apos;s currently the longest and influences dialog width</extracomment>
         <translation>Download er &amp;inaktiv hvis deling af data stoppede:</translation>
     </message>
     <message>
@@ -2235,7 +2241,7 @@ For at tilføje en anden primære URL, skal du tilføje den efter en tom linje.<
 <context>
     <name>Session</name>
     <message>
-        <location filename="../Session.cc" line="+510"/>
+        <location filename="../Session.cc" line="+498"/>
         <source>Error Renaming Path</source>
         <translation>Fejl ved omdøbning af sti</translation>
     </message>
@@ -2372,22 +2378,22 @@ For at tilføje en anden primære URL, skal du tilføje den efter en tom linje.<
 <context>
     <name>Torrent</name>
     <message>
-        <location filename="../Torrent.cc" line="+308"/>
+        <location filename="../Torrent.cc" line="+300"/>
         <source>Verifying local data</source>
         <translation>Verificerer lokale data</translation>
     </message>
     <message>
-        <location line="+8"/>
+        <location line="+6"/>
         <source>Downloading</source>
         <translation>Downloader</translation>
     </message>
     <message>
-        <location line="+8"/>
+        <location line="+6"/>
         <source>Seeding</source>
         <translation>Seeder</translation>
     </message>
     <message>
-        <location line="-24"/>
+        <location line="-18"/>
         <source>Finished</source>
         <translation>Færdig</translation>
     </message>
@@ -2397,32 +2403,32 @@ For at tilføje en anden primære URL, skal du tilføje den efter en tom linje.<
         <translation>På pause</translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="+3"/>
         <source>Queued for verification</source>
         <translation>Venter på verifikation</translation>
     </message>
     <message>
-        <location line="+8"/>
+        <location line="+6"/>
         <source>Queued for download</source>
         <translation>Sat i kø til download</translation>
     </message>
     <message>
-        <location line="+8"/>
+        <location line="+6"/>
         <source>Queued for seeding</source>
         <translation>Sat i kø til seeding</translation>
     </message>
     <message>
-        <location line="+18"/>
+        <location line="+15"/>
         <source>Tracker gave a warning: %1</source>
         <translation>Trackeren gav en advarsel: %1</translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="+3"/>
         <source>Tracker gave an error: %1</source>
         <translation>Trackeren gav en fejl: %1</translation>
     </message>
     <message>
-        <location line="+4"/>
+        <location line="+3"/>
         <source>Error: %1</source>
         <translation>Fejl: %1</translation>
     </message>

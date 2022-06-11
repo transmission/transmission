@@ -10,7 +10,6 @@
 
 #import "CreatorWindowController.h"
 #import "Controller.h"
-#import "NSApplicationAdditions.h"
 #import "NSStringAdditions.h"
 
 #define TRACKER_ADD_TAG 0
@@ -161,6 +160,9 @@ NSMutableSet* creatorWindowControllerSet = nil;
 
     self.window.title = name;
 
+    //disable fullscreen support
+    [self.window setCollectionBehavior:NSWindowCollectionBehaviorFullScreenNone];
+
     self.fNameField.stringValue = name;
     self.fNameField.toolTip = self.fPath.path;
 
@@ -216,6 +218,9 @@ NSMutableSet* creatorWindowControllerSet = nil;
     }
 
     self.fOpenCheck.state = [self.fDefaults boolForKey:@"CreatorOpen"] ? NSControlStateValueOn : NSControlStateValueOff;
+
+    //set tracker table column width to table width
+    [self.fTrackerTable sizeToFit];
 }
 
 - (void)dealloc
