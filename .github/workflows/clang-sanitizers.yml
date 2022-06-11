@@ -17,9 +17,15 @@ env:
   GTEST_OUTPUT: xml:./
 jobs:
   sanitizer-tests-clang:
-    uses: ./.github/workflows/sanitizer-tests.yml
-    with:
-      c: clang
-      cxx: clang++
-      compiler_package_name: clang
-      sanitizers: address,leak,undefined
+    steps:
+      - uses: ./.github/workflows/checkout-and-configure-ubuntu.yml
+        with:
+          c: clang
+          c_flags: -gdwarf-4 -fno-omit-frame-pointer -fsanitize=address,leak,undefined
+          compiler_package_name: clang
+          cxx: clang++
+          cxx_flags: -gdwarf-4 -fno-omit-frame-pointer -fsanitize=address,leak,undefined
+      - name: Build
+        run: cmake --build obj --config Debug --target libtransmission-test transmission-show
+      - name: Test
+        run: cmake -E chdir obj ctest --build-config Debug --output-on-failure

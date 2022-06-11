@@ -17,9 +17,15 @@ env:
   GTEST_OUTPUT: xml:./
 jobs:
   sanitizer-tests-gcc:
-    uses: ./.github/workflows/sanitizer-tests.yml
-    with:
-      c: gcc
-      cxx: g++
-      compiler_package_name: g++
-      sanitizers: address,pointer-compare,pointer-subtract,leak,undefined
+    steps:
+      - uses: ./.github/workflows/checkout-and-configure-ubuntu.yml
+        with:
+          c: gcc
+          c_flags: -gdwarf-4 -fno-omit-frame-pointer -fsanitize=address,pointer-compare,pointer-subtract,leak,undefined
+          compiler_package_name: g++
+          cxx: g++
+          cxx_flags: -gdwarf-4 -fno-omit-frame-pointer -fsanitize=address,pointer-compare,pointer-subtract,leak,undefined
+      - name: Build
+        run: cmake --build obj --config Debug --target libtransmission-test transmission-show
+      - name: Test
+        run: cmake -E chdir obj ctest --build-config Debug --output-on-failure
