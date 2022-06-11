@@ -75,6 +75,9 @@ private:
     [[nodiscard]] int flushSpan(CIter const begin, CIter const end);
 
     // @return any error code from writeContiguous()
+    [[nodiscard]] int flushOldest();
+
+    // @return any error code from writeContiguous()
     [[nodiscard]] int cacheTrim();
 
     [[nodiscard]] static size_t getMaxBlocks(int64_t max_bytes) noexcept;

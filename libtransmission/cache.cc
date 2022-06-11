@@ -231,22 +231,38 @@ int Cache::flushTorrent(tr_torrent* torrent)
         std::lower_bound(std::begin(blocks_), std::end(blocks_), std::make_pair(tor_id + 1, 0), compare));
 }
 
+int Cache::flushOldest()
+{
+    auto const oldest = std::min_element(
+        std::begin(blocks_),
+        std::end(blocks_),
+        [](auto const& a, auto const& b) { return a.time_added < b.time_added; });
+
+    if (oldest == std::end(blocks_)) // nothing to flush
+    {
+        return 0;
+    }
+
+    auto const [begin, end] = findContiguous(std::begin(blocks_), std::end(blocks_), oldest);
+
+    if (auto const err = writeContiguous(begin, end); err != 0)
+    {
+        return err;
+    }
+
+    blocks_.erase(begin, end);
+    return 0;
+}
+
 int Cache::cacheTrim()
 {
     while (std::size(blocks_) > max_blocks_)
     {
-        auto const oldest_element = std::min_element(
-            std::begin(blocks_),
-            std::end(blocks_),
-            [](auto const& a, auto const& b) { return a.time_added < b.time_added; });
-
-        auto const [begin, end] = findContiguous(std::begin(blocks_), std::end(blocks_), oldest_element);
-
-        if (auto const err = flushSpan(begin, end); err != 0)
+        if (auto const err = flushOldest(); err != 0)
         {
             return err;
         }
     }
 
-    return {};
+    return 0;
 }
