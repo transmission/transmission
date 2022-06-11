@@ -1482,36 +1482,35 @@ void tr_peerMgrOnTorrentGotMetainfo(tr_torrent* tor)
     }
 }
 
-void tr_peerMgrTorrentAvailability(tr_torrent const* tor, int8_t* tab, unsigned int tabCount)
+int8_t tr_peerMgrPieceAvailability(tr_torrent const* tor, tr_piece_index_t piece)
+{
+    if (!tor->hasMetainfo())
+    {
+        return 0;
+    }
+
+    if (tor->isSeed() || tor->hasPiece(piece))
+    {
+        return -1;
+    }
+
+    auto const& peers = tor->swarm->peers;
+    return std::count_if(std::begin(peers), std::end(peers), [piece](auto const* peer) { return peer->have.test(piece); });
+}
+
+void tr_peerMgrTorrentAvailability(tr_torrent const* tor, int8_t* tab, unsigned int n_tabs)
 {
     TR_ASSERT(tr_isTorrent(tor));
     TR_ASSERT(tab != nullptr);
-    TR_ASSERT(tabCount > 0);
+    TR_ASSERT(n_tabs > 0);
 
-    std::fill_n(tab, tabCount, int8_t{});
+    std::fill_n(tab, n_tabs, int8_t{});
 
-    if (tor->hasMetainfo())
+    auto const interval = tor->pieceCount() / static_cast<float>(n_tabs);
+    for (tr_piece_index_t i = 0; i < n_tabs; ++i)
     {
-        auto const& peers = tor->swarm->peers;
-        float const interval = tor->pieceCount() / (float)tabCount;
-        auto const isSeed = tor->isSeed();
-
-        for (tr_piece_index_t i = 0; i < tabCount; ++i)
-        {
-            int const piece = i * interval;
-
-            if (isSeed || tor->hasPiece(piece))
-            {
-                tab[i] = -1;
-            }
-            else
-            {
-                tab[i] = std::count_if(
-                    std::begin(peers),
-                    std::end(peers),
-                    [piece](auto const* peer) { return peer->have.test(piece); });
-            }
-        }
+        auto const piece = static_cast<tr_piece_index_t>(i * interval);
+        tab[i] = tr_peerMgrPieceAvailability(tor, piece);
     }
 }
 
