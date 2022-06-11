@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="20037" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="19529" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="20037"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="19529"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -42,16 +42,16 @@
                     <popUpButton verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="15">
                         <rect key="frame" x="20" y="5" width="101" height="25"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                        <popUpButtonCell key="cell" type="roundTextured" bezelStyle="texturedRounded" imagePosition="left" alignment="left" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" inset="2" preferredEdge="maxY" id="60">
+                        <popUpButtonCell key="cell" type="roundTextured" title="Error" bezelStyle="texturedRounded" imagePosition="left" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" inset="2" preferredEdge="maxY" selectedItem="17" id="60">
                             <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                             <font key="font" metaFont="menu"/>
-                            <menu key="menu" id="16">
+                            <menu key="menu" title="OtherViews" id="16">
                                 <items>
-                                    <menuItem title="Error" image="NSStatusUnavailable" id="menuItemError"/>
-                                    <menuItem title="Warn" image="NSStatusPartiallyAvailable" id="menuItemWarn"/>
-                                    <menuItem title="Info" image="NSStatusAvailable" id="menuItemInfo"/>
-                                    <menuItem title="Debug" image="NSStatusNone" id="menuItemDebug"/>
-                                    <menuItem title="Trace" image="NSStatusNone" id="menuItemTracer"/>
+                                    <menuItem title="Error" state="on" image="RedDotFlat"/>
+                                    <menuItem title="Warn" image="OrangeDotFlat"/>
+                                    <menuItem title="Info" image="GreenDotFlat"/>
+                                    <menuItem title="Debug" image="BlueDotFlat"/>
+                                    <menuItem title="Trace" image="PurpleDotFlat"/>
                                 </items>
                             </menu>
                         </popUpButtonCell>
@@ -174,10 +174,9 @@
         </window>
     </objects>
     <resources>
-        <image name="NSStatusAvailable" width="16" height="16"/>
-        <image name="NSStatusNone" width="16" height="16"/>
-        <image name="NSStatusPartiallyAvailable" width="16" height="16"/>
-        <image name="NSStatusUnavailable" width="16" height="16"/>
+        <image name="PurpleDotFlat" width="16" height="16"/>
+        <image name="RedDotFlat" width="16" height="16"/>
+        <image name="YellowDotFlat" width="16" height="16"/>
         <image name="imageCell:63:image" width="14" height="14">
             <mutableData key="keyedArchiveRepresentation">
 YnBsaXN0MDDUAQIDBAUGBwpYJHZlcnNpb25ZJGFyY2hpdmVyVCR0b3BYJG9iamVjdHMSAAGGoF8QD05T

@@ -42,8 +42,8 @@ TEST_F(OpenFilesTest, getOpensIfNotCached)
     auto buf = std::array<char, std::size(Contents) + 1>{};
     auto bytes_read = uint64_t{};
     EXPECT_TRUE(tr_sys_file_read_at(*fd, std::data(buf), std::size(Contents), 0, &bytes_read));
-    auto const contents = std::string_view{ std::data(buf), static_cast<size_t>(bytes_read) };
-    EXPECT_EQ(Contents, contents);
+    buf[bytes_read] = '\0';
+    EXPECT_EQ(Contents, (char*)std::data(buf));
 }
 
 TEST_F(OpenFilesTest, getCacheSucceedsIfCached)

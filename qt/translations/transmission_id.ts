@@ -77,7 +77,7 @@
 <context>
     <name>DetailsDialog</name>
     <message>
-        <location filename="../DetailsDialog.cc" line="+428"/>
+        <location filename="../DetailsDialog.cc" line="+427"/>
         <source>None</source>
         <translation>Tidak ada</translation>
     </message>
@@ -88,12 +88,12 @@
     </message>
     <message>
         <location line="+1"/>
-        <location line="+267"/>
+        <location line="+265"/>
         <source>Unknown</source>
         <translation>Tidak diketahui</translation>
     </message>
     <message>
-        <location line="-210"/>
+        <location line="-208"/>
         <source>Finished</source>
         <translation>Selesai</translation>
     </message>
@@ -108,7 +108,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+135"/>
+        <location line="+133"/>
         <source>Active now</source>
         <translation>Aktif sekarang</translation>
     </message>
@@ -157,7 +157,7 @@
         <translation>Dibuat oleh %1 pada %2</translation>
     </message>
     <message>
-        <location line="+204"/>
+        <location line="+173"/>
         <location line="+47"/>
         <source>Encrypted connection</source>
         <translation>Sambungan terenkripsi</translation>
@@ -241,7 +241,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-832"/>
+        <location line="-799"/>
         <source>%1 (100%)</source>
         <extracomment>Text following the &quot;Have:&quot; label in torrent properties dialog; %1 is amount of downloaded and verified data</extracomment>
         <translation>%1 (100%)</translation>
@@ -264,13 +264,12 @@
         <translation>%1 (Rasio: %2)</translation>
     </message>
     <message>
-        <location line="+273"/>
-        <location line="+55"/>
+        <location line="+271"/>
         <source>N/A</source>
         <translation>N/A</translation>
     </message>
     <message>
-        <location line="+226"/>
+        <location line="+250"/>
         <source>Peer is connected over uTP</source>
         <translation>Rekan tersambung melalui uTP</translation>
     </message>
@@ -421,12 +420,12 @@
         <translation>Lokasi:</translation>
     </message>
     <message>
-        <location line="+124"/>
+        <location line="+110"/>
         <source>Edit Trackers</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-190"/>
+        <location line="-176"/>
         <source>Hash:</source>
         <translation>Hash:</translation>
     </message>
@@ -442,11 +441,6 @@
     </message>
     <message>
         <location line="+78"/>
-        <source>Added:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+14"/>
         <source>Comment:</source>
         <translation>Komentar:</translation>
     </message>
@@ -544,7 +538,7 @@
 <context>
     <name>FileTreeItem</name>
     <message>
-        <location filename="../FileTreeItem.cc" line="+296"/>
+        <location filename="../FileTreeItem.cc" line="+285"/>
         <location filename="../FileTreeView.cc" line="+108"/>
         <location line="+257"/>
         <source>Low</source>
@@ -579,22 +573,22 @@
         <translation>Berkas</translation>
     </message>
     <message>
-        <location line="+3"/>
+        <location line="+4"/>
         <source>Size</source>
         <translation>Ukuran</translation>
     </message>
     <message>
-        <location line="+3"/>
+        <location line="+4"/>
         <source>Progress</source>
         <translation>Kemajuan</translation>
     </message>
     <message>
-        <location line="+3"/>
+        <location line="+4"/>
         <source>Download</source>
         <translation>Unduh</translation>
     </message>
     <message>
-        <location line="+3"/>
+        <location line="+4"/>
         <source>Priority</source>
         <translation>Prioritas</translation>
     </message>
@@ -1224,7 +1218,7 @@
         <translation>Urutkan dengan &amp;Antrian</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cc" line="+470"/>
+        <location filename="../MainWindow.cc" line="+471"/>
         <source>Limit Download Speed</source>
         <translation>Batas Kecepatan Unduh</translation>
     </message>
@@ -1300,12 +1294,12 @@
         <translation>Buka Torrent</translation>
     </message>
     <message>
-        <location line="-985"/>
+        <location line="-986"/>
         <source>Speed Limits</source>
         <translation>Batas Kecepatan</translation>
     </message>
     <message>
-        <location line="+519"/>
+        <location line="+520"/>
         <source>Network Error</source>
         <translation>Galat Jaringan</translation>
     </message>
@@ -2121,7 +2115,7 @@ Untuk menambahkan URL utama, tambahkan setelah baris kosong.</translation>
     <message>
         <location line="+147"/>
         <source>Download is i&amp;nactive if data sharing stopped:</source>
-        <extracomment>Please keep this phrase as short as possible, it&apos;s currently the longest and influences dialog width</extracomment>
+        <extracomment>Please keep this phrase as short as possible, it&apos;s curently the longest and influences dialog width</extracomment>
         <translation>Unduh tidak &amp;aktif jika berbagi data dihentikan:</translation>
     </message>
     <message>
@@ -2224,7 +2218,7 @@ Untuk menambahkan URL utama, tambahkan setelah baris kosong.</translation>
 <context>
     <name>Session</name>
     <message>
-        <location filename="../Session.cc" line="+498"/>
+        <location filename="../Session.cc" line="+510"/>
         <source>Error Renaming Path</source>
         <translation>Galat Mengubah Nama Path</translation>
     </message>
@@ -2358,22 +2352,22 @@ Untuk menambahkan URL utama, tambahkan setelah baris kosong.</translation>
 <context>
     <name>Torrent</name>
     <message>
-        <location filename="../Torrent.cc" line="+300"/>
+        <location filename="../Torrent.cc" line="+308"/>
         <source>Verifying local data</source>
         <translation>Memeriksa data lokal</translation>
     </message>
     <message>
-        <location line="+6"/>
+        <location line="+8"/>
         <source>Downloading</source>
         <translation>Mengunduh</translation>
     </message>
     <message>
-        <location line="+6"/>
+        <location line="+8"/>
         <source>Seeding</source>
         <translation>Mengirim</translation>
     </message>
     <message>
-        <location line="-18"/>
+        <location line="-24"/>
         <source>Finished</source>
         <translation>Selesai</translation>
     </message>
@@ -2383,32 +2377,32 @@ Untuk menambahkan URL utama, tambahkan setelah baris kosong.</translation>
         <translation>Dijeda</translation>
     </message>
     <message>
-        <location line="+3"/>
+        <location line="+4"/>
         <source>Queued for verification</source>
         <translation>Antri untuk pemeriksaan</translation>
     </message>
     <message>
-        <location line="+6"/>
+        <location line="+8"/>
         <source>Queued for download</source>
         <translation>Antri untuk mengunduh</translation>
     </message>
     <message>
-        <location line="+6"/>
+        <location line="+8"/>
         <source>Queued for seeding</source>
         <translation>Antri untuk mengirim</translation>
     </message>
     <message>
-        <location line="+15"/>
+        <location line="+18"/>
         <source>Tracker gave a warning: %1</source>
         <translation>Pelacak memberi sebuah peringatan: %1</translation>
     </message>
     <message>
-        <location line="+3"/>
+        <location line="+4"/>
         <source>Tracker gave an error: %1</source>
         <translation>Pelacak memberi sebuah galat: %1</translation>
     </message>
     <message>
-        <location line="+3"/>
+        <location line="+4"/>
         <source>Error: %1</source>
         <translation>Galat: %1</translation>
     </message>

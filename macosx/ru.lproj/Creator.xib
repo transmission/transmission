@@ -30,7 +30,7 @@
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" topStrut="YES"/>
             <rect key="contentRect" x="244" y="423" width="708" height="408"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="875"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="2048" height="1255"/>
             <value key="minSize" type="size" width="440" height="350"/>
             <view key="contentView" id="6">
                 <rect key="frame" x="0.0" y="0.0" width="708" height="408"/>
@@ -60,18 +60,18 @@
                         </textFieldCell>
                     </textField>
                     <scrollView fixedFrame="YES" horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="11">
-                        <rect key="frame" x="121" y="142" width="567" height="54"/>
+                        <rect key="frame" x="121" y="121" width="567" height="75"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
                         <clipView key="contentView" drawsBackground="NO" id="ROn-85-iyq">
-                            <rect key="frame" x="1" y="1" width="565" height="52"/>
+                            <rect key="frame" x="1" y="1" width="565" height="73"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                             <subviews>
                                 <textView importsGraphics="NO" richText="NO" verticallyResizable="YES" continuousSpellChecking="YES" allowsUndo="YES" spellingCorrection="YES" smartInsertDelete="YES" id="12">
-                                    <rect key="frame" x="0.0" y="0.0" width="550" height="52"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="550" height="73"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
                                     <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                    <size key="minSize" width="565" height="52"/>
+                                    <size key="minSize" width="550" height="73"/>
                                     <size key="maxSize" width="1027" height="10000000"/>
                                     <color key="insertionPointColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                 </textView>
@@ -82,7 +82,7 @@
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
                         <scroller key="verticalScroller" wantsLayer="YES" verticalHuggingPriority="750" doubleValue="1" horizontal="NO" id="84">
-                            <rect key="frame" x="550" y="1" width="16" height="52"/>
+                            <rect key="frame" x="550" y="1" width="16" height="73"/>
                             <autoresizingMask key="autoresizingMask"/>
                         </scroller>
                     </scrollView>
@@ -181,7 +181,7 @@ Gw
                         </connections>
                     </button>
                     <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="26">
-                        <rect key="frame" x="250" y="98" width="420" height="17"/>
+                        <rect key="frame" x="169" y="98" width="501" height="17"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="информация о частях" id="80">
                             <font key="font" metaFont="system"/>
@@ -211,7 +211,7 @@ Gw
                                     <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                     <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
                                     <tableColumns>
-                                        <tableColumn width="524" minWidth="40" maxWidth="100000" id="94">
+                                        <tableColumn width="524" minWidth="40" maxWidth="1000" id="94">
                                             <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left">
                                                 <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                                 <color key="backgroundColor" white="0.33333299" alpha="1" colorSpace="calibratedWhite"/>
@@ -241,10 +241,10 @@ Gw
                         </scroller>
                     </scrollView>
                     <segmentedControl verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="103">
-                        <rect key="frame" x="120" y="203" width="71" height="20"/>
+                        <rect key="frame" x="121" y="203" width="69" height="23"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                        <segmentedCell key="cell" state="on" borderStyle="border" alignment="left" style="roundRect" trackingMode="momentary" id="104">
-                            <font key="font" metaFont="cellTitle"/>
+                        <segmentedCell key="cell" state="on" borderStyle="border" alignment="left" style="smallSquare" trackingMode="momentary" id="104">
+                            <font key="font" metaFont="system"/>
                             <segments>
                                 <segment image="NSAddTemplate" width="32"/>
                                 <segment image="NSRemoveTemplate" width="32" enabled="NO" tag="1"/>
@@ -265,7 +265,7 @@ Gw
                     </textField>
                     <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="UOP-TP-vPy">
                         <rect key="frame" x="18" y="123" width="98" height="17"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" sendsActionOnEndEditing="YES" alignment="right" title="Источник:" id="oiD-oD-AeY">
                             <font key="font" metaFont="system"/>
                             <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -274,7 +274,7 @@ Gw
                     </textField>
                     <textField verticalHuggingPriority="750" id="EIp-p6-ure">
                         <rect key="frame" x="121" y="121" width="567" height="22"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" state="on" borderStyle="bezel" drawsBackground="YES" id="WGt-HR-rDr">
                             <font key="font" metaFont="system"/>
                             <color key="textColor" name="textColor" catalog="System" colorSpace="catalog"/>
@@ -283,7 +283,7 @@ Gw
                     </textField>
                     <stepper horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Qjm-SI-ujD">
                         <rect key="frame" x="672" y="92" width="19" height="28"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
+                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                         <stepperCell key="cell" continuous="YES" alignment="left" maxValue="100" id="kqg-5C-t4O"/>
                         <connections>
                             <action selector="incrementOrDecrementPieceSize:" target="-2" id="pO0-95-66d"/>

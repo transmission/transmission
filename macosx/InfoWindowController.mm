@@ -11,6 +11,7 @@
 #import "InfoFileViewController.h"
 #import "InfoOptionsViewController.h"
 #import "NSImageAdditions.h"
+#import "NSApplicationAdditions.h"
 #import "NSStringAdditions.h"
 #import "Torrent.h"
 

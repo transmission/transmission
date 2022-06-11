@@ -3,6 +3,7 @@
 // License text can be found in the licenses/ folder.
 
 #import "StatusBarView.h"
+#import "NSApplicationAdditions.h"
 
 @interface StatusBarView ()
 

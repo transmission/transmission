@@ -244,7 +244,7 @@ void Bandwidth::allocate(tr_direction dir, unsigned int period_msec)
      * or (2) the next Bandwidth::allocate () call, when we start over again. */
     for (auto* io : tmp)
     {
-        tr_peerIoSetEnabled(io, dir, io->hasBandwidthLeft(dir));
+        tr_peerIoSetEnabled(io, dir, tr_peerIoHasBandwidthLeft(io, dir));
     }
 
     for (auto* io : tmp)

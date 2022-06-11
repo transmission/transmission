@@ -59,9 +59,9 @@ struct tr_fdInfo;
 
 struct tr_bindinfo
 {
-    tr_socket_t socket = TR_BAD_SOCKET;
-    tr_address addr = {};
-    struct event* ev = nullptr;
+    int socket;
+    tr_address addr;
+    struct event* ev;
 };
 
 struct tr_turtle_info
@@ -343,8 +343,8 @@ public:
 
     /* The UDP sockets used for the DHT and uTP. */
     tr_port udp_port;
-    tr_socket_t udp_socket = TR_BAD_SOCKET;
-    tr_socket_t udp6_socket = TR_BAD_SOCKET;
+    tr_socket_t udp_socket;
+    tr_socket_t udp6_socket;
     unsigned char* udp6_bound = nullptr;
     struct event* udp_event = nullptr;
     struct event* udp6_event = nullptr;
@@ -396,7 +396,7 @@ public:
 
         [[nodiscard]] std::optional<std::string> cookieFile() const override;
         [[nodiscard]] std::optional<std::string> publicAddress() const override;
-        [[nodiscard]] std::optional<std::string_view> userAgent() const override;
+        [[nodiscard]] std::optional<std::string> userAgent() const override;
         [[nodiscard]] unsigned int clamp(int bandwidth_tag, unsigned int byte_count) const override;
         void notifyBandwidthConsumed(int torrent_id, size_t byte_count) override;
         // runs the tr_web::fetch response callback in the libtransmission thread

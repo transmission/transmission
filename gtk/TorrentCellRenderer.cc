@@ -60,7 +60,6 @@ auto getProgressString(tr_torrent const* tor, uint64_t total_size, tr_stat const
     {
         // 50 MB of 200 MB (25%), uploaded 30 MB (Ratio: X%, Goal: Y%)
         gstr += fmt::format(
-            // xgettext:no-c-format
             _("{current_size} of {complete_size} ({percent_complete}%), uploaded {uploaded_size} (Ratio: {ratio}, Goal: {seed_ratio})"),
             fmt::arg("current_size", tr_strlsize(haveTotal)),
             fmt::arg("complete_size", tr_strlsize(total_size)),
@@ -72,7 +71,6 @@ auto getProgressString(tr_torrent const* tor, uint64_t total_size, tr_stat const
     else if (!isSeed) // partial seed, no seed ratio
     {
         gstr += fmt::format(
-            // xgettext:no-c-format
             _("{current_size} of {complete_size} ({percent_complete}%), uploaded {uploaded_size} (Ratio: {ratio})"),
             fmt::arg("current_size", tr_strlsize(haveTotal)),
             fmt::arg("complete_size", tr_strlsize(total_size)),
@@ -168,7 +166,6 @@ std::string getShortStatusString(
 
     case TR_STATUS_CHECK:
         return fmt::format(
-            // xgettext:no-c-format
             _("Verifying local data ({percent_done}% tested)"),
             fmt::arg("percent_done", tr_truncd(st->recheckProgress * 100.0, 1)));
 
@@ -222,7 +219,6 @@ auto getActivityString(
         {
             return fmt::format(
                 ngettext(
-                    // xgettext:no-c-format
                     "Downloading metadata from {active_count} connected peer ({percent_done:d}% done)",
                     "Downloading metadata from {active_count} connected peers ({percent_done:d}% done)",
                     st->peersConnected),

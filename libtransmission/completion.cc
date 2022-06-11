@@ -32,9 +32,7 @@ uint64_t tr_completion::hasValid() const
 {
     if (!has_valid_)
     {
-        auto const val = computeHasValid();
-        has_valid_ = val;
-        return val;
+        has_valid_ = computeHasValid();
     }
 
     return *has_valid_;
@@ -68,9 +66,7 @@ uint64_t tr_completion::sizeWhenDone() const
 {
     if (!size_when_done_)
     {
-        auto const value = computeSizeWhenDone();
-        size_when_done_ = value;
-        return value;
+        size_when_done_ = computeSizeWhenDone();
     }
 
     return *size_when_done_;

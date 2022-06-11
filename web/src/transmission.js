@@ -260,24 +260,9 @@ export class Transmission extends EventTarget {
     }
   }
 
-  _openTorrentFromUrl() {
-    setTimeout(() => {
-      const addTorrent = new URLSearchParams(window.location.search).get(
-        'addtorrent'
-      );
-      if (addTorrent) {
-        this.setCurrentPopup(new OpenDialog(this, this.remote, addTorrent));
-        const newUrl = new URL(window.location);
-        newUrl.search = '';
-        window.history.pushState('', '', newUrl.toString());
-      }
-    }, 0);
-  }
-
   loadDaemonPrefs() {
     this.remote.loadDaemonPrefs((data) => {
       this.session_properties = data.arguments;
-      this._openTorrentFromUrl();
     });
   }
 

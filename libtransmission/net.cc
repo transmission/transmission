@@ -9,7 +9,6 @@
 #include <cstdint>
 #include <cstring>
 #include <ctime>
-#include <iterator> // std::back_inserter
 #include <string_view>
 #include <utility> // std::pair
 
@@ -314,7 +313,7 @@ static tr_socket_t createSocket(tr_session* session, int domain, int type)
     if ((evutil_make_socket_nonblocking(sockfd) == -1) || !session->incPeerCount())
     {
         tr_netClose(session, sockfd);
-        return TR_BAD_SOCKET;
+        return {};
     }
 
     if (static bool buf_logged = false; !buf_logged)
@@ -475,7 +474,7 @@ static tr_socket_t tr_netBindTCPImpl(tr_address const* addr, tr_port port, bool 
     static int const domains[NUM_TR_AF_INET_TYPES] = { AF_INET, AF_INET6 };
     struct sockaddr_storage sock;
 
-    auto const fd = socket(domains[addr->type], SOCK_STREAM, 0);
+    tr_socket_t const fd = socket(domains[addr->type], SOCK_STREAM, 0);
     if (fd == TR_BAD_SOCKET)
     {
         *errOut = sockerrno;
@@ -574,7 +573,7 @@ bool tr_net_hasIPv6(tr_port port)
     if (!alreadyDone)
     {
         int err = 0;
-        auto const fd = tr_netBindTCPImpl(&tr_in6addr_any, port, true, &err);
+        tr_socket_t fd = tr_netBindTCPImpl(&tr_in6addr_any, port, true, &err);
 
         if (fd != TR_BAD_SOCKET || err != EAFNOSUPPORT) /* we support ipv6 */
         {
@@ -601,7 +600,7 @@ tr_socket_t tr_netAccept(tr_session* session, tr_socket_t listening_sockfd, tr_a
     // accept the incoming connection
     struct sockaddr_storage sock;
     socklen_t len = sizeof(struct sockaddr_storage);
-    auto const sockfd = accept(listening_sockfd, (struct sockaddr*)&sock, &len);
+    auto sockfd = accept(listening_sockfd, (struct sockaddr*)&sock, &len);
     if (sockfd == TR_BAD_SOCKET)
     {
         return TR_BAD_SOCKET;
@@ -656,7 +655,7 @@ static int get_source_address(struct sockaddr const* dst, socklen_t dst_len, str
         return 0;
     }
 
-    auto const save = errno;
+    int save = errno;
     evutil_closesocket(s);
     errno = save;
     return -1;

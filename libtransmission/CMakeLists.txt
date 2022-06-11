@@ -25,6 +25,7 @@ set(PROJECT_FILES
   crypto-utils.cc
   crypto.cc
   error.cc
+  file-info.cc
   file-piece-map.cc
   file-posix.cc
   file-win32.cc
@@ -167,6 +168,7 @@ set(${PROJECT_NAME}_PRIVATE_HEADERS
     completion.h
     crypto-utils.h
     crypto.h
+    file-info.h
     file-piece-map.h
     handshake.h
     history.h

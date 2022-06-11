@@ -3,9 +3,10 @@
 // License text can be found in the licenses/ folder.
 
 #import <Cocoa/Cocoa.h>
-#import "PortChecker.h"
 
 #include <libtransmission/transmission.h>
+
+@protocol PortCheckerDelegate;
 
 @interface PrefsController : NSWindowController<NSToolbarDelegate, PortCheckerDelegate>
 

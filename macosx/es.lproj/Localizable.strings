@@ -1,3 +1,15 @@
+/* Add torrent -> info
+   Create torrent -> info
+   Drag overlay -> torrents
+   Inspector -> selected torrents */
+"%lu files" = "%lu archivos";
+
+/* Prefs -> blocklist -> message */
+"%lu IP address rules in list" = "%lu direcciones IP cargadas";
+
+/* Inspector -> selected torrents */
+"%lu magnetized transfers" = "%lu tareas magnetizadas";
+
 /* file size string
    Inspector -> Files tab -> file status string
    Status bar transfer count */
@@ -11,22 +23,26 @@
    Torrent -> progress string */
 "%@ selected" = "%@ seleccionado";
 
+/* stats window -> times opened */
+"%lu times" = "%lu veces";
+
+/* Drag overlay -> torrents */
+"%lu Torrent Files" = "%lu Torrents";
+
+/* Inspector -> selected torrents */
+"%lu Torrents Selected" = "%lu Torrents seleccionados";
+
 /* Inspector -> selected torrents
    stats total */
 "%@ total" = "%@ total";
 
+/* Filter Bar Button -> tool tip
+   Status bar transfer count
+   Torrent table -> group row -> tooltip */
+"%lu transfers" = "%lu tareas";
+
 /* Inspector -> Activity tab -> have */
 "%@ verified" = "%@ verificado";
-
-/* Action menu -> upload/download limit
-   Status Bar -> speed tooltip */
-"%ld KB/s" = "%ld KB/s";
-
-/* Info options -> global setting */
-"%ld minutes" = "%ld minutos";
-
-/* stats window -> times opened */
-"%llu times" = "";
 
 /* Inspector -> Peers tab -> peers */
 "%lu cache" = "%lu caché";
@@ -40,17 +56,12 @@
 /* Dock item - Downloading */
 "%lu Downloading" = "%lu Descargando";
 
-/* Add torrent -> info
-   Create torrent -> info
-   Drag overlay -> torrents
-   Inspector -> selected torrents */
-"%lu files" = "%lu archivos";
-
 /* Inspector -> Peers tab -> peers */
 "%lu incoming" = "%lu entrante";
 
-/* Prefs -> blocklist -> message */
-"%lu IP address rules in list" = "%lu direcciones IP cargadas";
+/* Action menu -> upload/download limit
+   Status Bar -> speed tooltip */
+"%ld KB/s" = "%ld KB/s";
 
 /* Inspector -> Peers tab -> peers */
 "%lu local discovery" = "%lu descubrimientos locales";
@@ -58,34 +69,23 @@
 /* Inspector -> Peers tab -> peers */
 "%lu LTEP" = "%lu LTEP";
 
-/* Inspector -> selected torrents */
-"%lu magnetized transfers" = "%lu tareas magnetizadas";
+/* Info options -> global setting */
+"%ld minutes" = "%ld minutos";
 
 /* Inspector -> Peers tab -> peers */
 "%lu PEX" = "%lu PEX";
 
+/* Create torrent -> info */
+"%u pieces, %@ each" = "%1$u partes, %2$@ cada una";
+
 /* Dock item - Seeding */
 "%lu Seeding" = "%lu Compartiendo";
-
-/* Drag overlay -> torrents */
-"%lu Torrent Files" = "%lu Torrents";
-
-/* Inspector -> selected torrents */
-"%lu Torrents Selected" = "%lu Torrents seleccionados";
 
 /* Inspector -> Peers tab -> peers */
 "%lu tracker" = "%lu tracker";
 
-/* Filter Bar Button -> tool tip
-   Status bar transfer count
-   Torrent table -> group row -> tooltip */
-"%lu transfers" = "%lu tareas";
-
 /* Torrent -> status string */
 "%lu web seeds" = "%lu web seeds";
-
-/* Create torrent -> info */
-"%u pieces, %@ each" = "%1$u partes, %2$@ cada una";
 
 /* Inspector -> Peers tab -> peers */
 "1 Connected" = "1 conectado";
@@ -192,14 +192,14 @@
 /* Remove completed confirm panel -> title */
 "Are you sure you want to remove %lu completed transfers from the transfer list?" = "¿Está seguro de querer eliminar %lu tareas completadas de la lista?";
 
-/* Remove trackers alert -> title */
-"Are you sure you want to remove %lu trackers?" = "¿Está seguro de querer eliminar %lu trackers?";
-
 /* Removal confirm panel -> title */
 "Are you sure you want to remove %lu transfers from the transfer list and trash the data files?" = "¿Está seguro de querer eliminar %lu tareas completadas de la lista y eliminar los archivos del disco duro?";
 
 /* Removal confirm panel -> title */
 "Are you sure you want to remove %lu transfers from the transfer list?" = "¿Está seguro de querer eliminar %lu tareas de la lista?";
+
+/* Remove trackers alert -> title */
+"Are you sure you want to remove %lu trackers?" = "¿Está seguro de querer eliminar %lu trackers?";
 
 /* Removal confirm panel -> title */
 "Are you sure you want to remove \"%@\" from the transfer list and trash the data file?" = "¿Está seguro de querer eliminar \"%@\" de la lista y mover los datos a la papelera?";
@@ -373,8 +373,7 @@
 /* inspector -> peer table -> header tool tip */
 "Encrypted Connection" = "Conexión encriptada";
 
-/* Filter Bar -> filter button
-   Message window -> level
+/* Message window -> level
    Message window -> level string
    Torrent -> status string */
 "Error" = "Error";
@@ -566,9 +565,6 @@
 
 /* Group table row */
 "No Group" = "Sin grupo";
-
-/* No comment provided by engineer. */
-"No napping on the job!" = "";
 
 /* Inspector -> selected torrents */
 "No Torrents Selected" = "Ningún torrent seleccionado";
@@ -973,13 +969,13 @@
 "The transfer will not contact trackers for peers, and will have to rely solely on non-tracker peer discovery methods such as PEX and DHT to download and seed." = "La tarea no pedirá clientes al tracker, y tendrá que contar sólo con métodos de búsqueda de clientes propios como PEX y DHT para descargar y compartir.";
 
 /* Removal confirm panel -> message part 1 */
+"There are %lu active transfers." = "Hay %lu tareas activas.";
+
+/* Removal confirm panel -> message part 1 */
 "There are %1$lu transfers (%2$lu active)." = "Hay %1$lu tareas (%2$lu activas).";
 
 /* Confirm Quit panel -> message */
 "There are %lu active transfers that will be paused on quit. The transfers will automatically resume on the next launch." = "Hay %lu tareas activas que se detendrán al salir. Las tareas se reanudarán automáticamente en el próximo arranque.";
-
-/* Removal confirm panel -> message part 1 */
-"There are %lu active transfers." = "Hay %lu tareas activas.";
 
 /* Create torrent -> blank address -> title */
 "There are no tracker addresses." = "No hay direcciones de tracker.";
@@ -1047,9 +1043,6 @@
 
 /* Status Bar -> status menu */
 "Total Transfer" = "Descarga total";
-
-/* Message window -> level string */
-"Trace" = "";
 
 /* Filter Bar -> filter menu */
 "Tracker" = "Tracker";
@@ -1125,9 +1118,6 @@
 
 /* Torrent -> status string */
 "Waiting to seed" = "Esperando a compartir";
-
-/* Message window -> level string */
-"Warn" = "";
 
 /* Drag overlay -> url */
 "Web Address" = "Dirección web";

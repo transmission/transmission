@@ -48,12 +48,12 @@
 #import "BonjourController.h"
 #import "Badger.h"
 #import "DragOverlayWindow.h"
+#import "NSApplicationAdditions.h"
 #import "NSImageAdditions.h"
 #import "NSMutableArrayAdditions.h"
 #import "NSStringAdditions.h"
 #import "ExpandedPathToPathTransformer.h"
 #import "ExpandedPathToIconTransformer.h"
-#import "MainWindow.h"
 
 #define TOOLBAR_CREATE @"Toolbar Create"
 #define TOOLBAR_OPEN_FILE @"Toolbar Open"
@@ -230,7 +230,7 @@ static void removeKeRangerRansomware()
 
 @interface Controller ()
 
-@property(nonatomic) IBOutlet MainWindow* fWindow;
+@property(nonatomic) IBOutlet NSWindow* fWindow;
 @property(nonatomic) IBOutlet TorrentTableView* fTableView;
 
 @property(nonatomic) IBOutlet NSMenuItem* fOpenIgnoreDownloadFolder;
@@ -562,9 +562,6 @@ static void removeKeRangerRansomware()
 
     self.fWindow.delegate = self; //do manually to avoid placement issue
 
-    //disable fullscreen support
-    [self.fWindow setCollectionBehavior:NSWindowCollectionBehaviorFullScreenNone];
-
     [self.fWindow makeFirstResponder:self.fTableView];
     self.fWindow.excludedFromWindowsMenu = YES;
 
@@ -592,6 +589,11 @@ static void removeKeRangerRansomware()
         @"Speed Limit overrides the total bandwidth limits with its own limits.",
         "Main window -> 2nd bottom left button (turtle) tooltip");
 
+    if (@available(macOS 11.0, *))
+    {
+        self.fActionButton.image = [NSImage imageWithSystemSymbolName:@"gearshape.fill" accessibilityDescription:nil];
+        self.fSpeedLimitButton.image = [NSImage imageWithSystemSymbolName:@"tortoise.fill" accessibilityDescription:nil];
+    }
     self.fClearCompletedButton.toolTip = NSLocalizedString(
         @"Remove all transfers that have completed seeding.",
         "Main window -> 3rd bottom left button (remove all) tooltip");
@@ -781,7 +783,7 @@ static void removeKeRangerRansomware()
     NSApp.servicesProvider = self;
 
     self.fNoNapActivity = [NSProcessInfo.processInfo beginActivityWithOptions:NSActivityUserInitiatedAllowingIdleSystemSleep
-                                                                       reason:@"No napping on the job!"];
+                                                                       reason:NSLocalizedString(@"No napping on the job!", nil)];
 
     //register for dock icon drags (has to be in applicationDidFinishLaunching: to work)
     [[NSAppleEventManager sharedAppleEventManager] setEventHandler:self andSelector:@selector(handleOpenContentsEvent:replyEvent:)
@@ -792,7 +794,7 @@ static void removeKeRangerRansomware()
     NSUserNotification* launchNotification = notification.userInfo[NSApplicationLaunchUserNotificationKey];
     if (launchNotification)
     {
-        [self userNotificationCenter:NSUserNotificationCenter.defaultUserNotificationCenter didActivateNotification:launchNotification];
+        [self userNotificationCenter:nil didActivateNotification:launchNotification];
     }
 
     //auto importing
@@ -3962,7 +3964,7 @@ static void removeKeRangerRansomware()
     NSUInteger const scrollMask = scrollView.autoresizingMask;
     scrollView.autoresizingMask = NSViewNotSizable;
 
-    NSRect const frame = [self windowFrameByAddingHeight:heightChange checkLimits:NO];
+    NSRect frame = [self windowFrameByAddingHeight:heightChange checkLimits:NO];
     [self.fWindow setFrame:frame display:YES animate:animate];
 
     //re-enable autoresize
@@ -4255,7 +4257,7 @@ static void removeKeRangerRansomware()
 
     if (@available(macOS 11.0, *))
     {
-        button.bordered = NO;
+        // not needed
     }
     else
     {
@@ -4354,7 +4356,7 @@ static void removeKeRangerRansomware()
 
         if (@available(macOS 11.0, *))
         {
-            segmentedCell.bezeled = NO;
+            // not needed
         }
         else
         {
@@ -4405,7 +4407,7 @@ static void removeKeRangerRansomware()
 
         if (@available(macOS 11.0, *))
         {
-            segmentedCell.bezeled = NO;
+            // not needed
         }
         else
         {

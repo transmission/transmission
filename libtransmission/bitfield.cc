@@ -357,13 +357,9 @@ void tr_bitfield::set(size_t nth, bool value)
 
     /* Already tested that val != nth bit so just swap */
     auto& byte = flags_[nth >> 3U];
-#ifdef TR_ENABLE_ASSERTS
     auto const old_byte_pop = doPopcount(byte);
-#endif
     byte ^= 0x80 >> (nth & 7U);
-#ifdef TR_ENABLE_ASSERTS
     auto const new_byte_pop = doPopcount(byte);
-#endif
 
     if (value)
     {

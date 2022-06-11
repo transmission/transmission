@@ -115,7 +115,7 @@ static void action_callback_PUSH(
         tr_variant* node = get_node(jsn);
         data->stack.push_back(node);
 
-        size_t const depth = std::size(data->stack);
+        int const depth = std::size(data->stack);
         size_t const n = depth < MaxDepth ? data->preallocGuess[depth] : 0;
         if (state->type == JSONSL_T_LIST)
         {

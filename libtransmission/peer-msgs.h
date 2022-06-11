@@ -52,8 +52,6 @@ public:
 
     [[nodiscard]] virtual bool is_connection_older_than(time_t time) const noexcept = 0;
 
-    [[nodiscard]] virtual std::pair<tr_address, tr_port> socketAddress() const = 0;
-
     virtual void cancel_block_request(tr_block_index_t block) = 0;
 
     virtual void set_choke(bool peer_is_choked) = 0;

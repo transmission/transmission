@@ -26,7 +26,7 @@ union tr_peer_socket_handle
 
 struct tr_peer_socket
 {
-    enum tr_peer_socket_type type = TR_PEER_SOCKET_TYPE_NONE;
+    enum tr_peer_socket_type type;
     union tr_peer_socket_handle handle;
 };
 

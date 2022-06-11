@@ -264,27 +264,6 @@ public:
         return c_str();
     }
 
-    bool popdir() noexcept
-    {
-        std::string_view tr_sys_path_dirname(std::string_view path);
-        auto const parent = tr_sys_path_dirname(sv());
-        auto const changed = parent != sv();
-
-        if (changed)
-        {
-            if (std::data(parent) == std::data(*this))
-            {
-                resize(std::size(parent));
-            }
-            else
-            {
-                assign(parent);
-            }
-        }
-
-        return changed;
-    }
-
 private:
     /**
      * Ensure that the buffer's string is zero-terminated, e.g. for

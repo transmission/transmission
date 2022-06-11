@@ -54,7 +54,6 @@ public:
     {
         return files().path(i);
     }
-
     void setFileSubpath(tr_file_index_t i, std::string_view subpath)
     {
         files_.setPath(i, subpath);
@@ -182,13 +181,12 @@ public:
         std::string_view suffix);
 
 private:
-    friend struct MetainfoHandler;
-    static bool parseImpl(tr_torrent_metainfo& setme, std::string_view benc, tr_error** error);
-    // static bool parsePath(std::string_view root, tr_variant* path, std::string& setme);
+    static bool parsePath(std::string_view root, tr_variant* path, std::string& setme);
     static std::string fixWebseedUrl(tr_torrent_metainfo const& tm, std::string_view url);
-    // static std::string_view parseFiles(tr_torrent_metainfo& setme, tr_variant* info_dict, uint64_t* setme_total_size);
-    // static std::string_view parseAnnounce(tr_torrent_metainfo& setme, tr_variant* meta);
-    // static void parseWebseeds(tr_torrent_metainfo& setme, tr_variant* meta);
+    static std::string_view parseFiles(tr_torrent_metainfo& setme, tr_variant* info_dict, uint64_t* setme_total_size);
+    static std::string_view parseImpl(tr_torrent_metainfo& setme, tr_variant* meta, std::string_view benc);
+    static std::string_view parseAnnounce(tr_torrent_metainfo& setme, tr_variant* meta);
+    static void parseWebseeds(tr_torrent_metainfo& setme, tr_variant* meta);
 
     enum class BasenameFormat
     {

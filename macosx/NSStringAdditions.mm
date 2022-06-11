@@ -5,6 +5,7 @@
 #include <libtransmission/transmission.h>
 #include <libtransmission/utils.h>
 
+#import "NSApplicationAdditions.h"
 #import "NSStringAdditions.h"
 
 @interface NSString (Private)

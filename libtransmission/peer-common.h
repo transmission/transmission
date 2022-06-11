@@ -76,8 +76,6 @@ public:
 
     virtual bool is_transferring_pieces(uint64_t now, tr_direction direction, unsigned int* setme_Bps) const = 0;
 
-    [[nodiscard]] virtual std::string readable() const = 0;
-
     /* whether or not we should free this peer soon.
        NOTE: private to peer-mgr.c */
     bool doPurge = false;

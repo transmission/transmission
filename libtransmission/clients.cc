@@ -214,28 +214,24 @@ void two_major_two_minor_formatter(char* buf, size_t buflen, std::string_view na
     *fmt::format_to_n(buf, buflen - 1, FMT_STRING("{:02d}"), strint(&id[5], 2)).out = '\0';
 }
 
-// Shad0w with his experimental BitTorrent implementation and BitTornado
-// introduced peer ids that begin with a character which is``T`` in the
-// case of BitTornado followed by up to five ascii characters for version
-// number, padded with dashes if less than 5, followed by ---. The ascii
-// characters denoting version are limited to the following characters:
-// 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz.-
-// For example: 'S58B-----'... for Shadow's 5.8.11
-std::optional<size_t> get_shad0w_int(char ch)
-{
-    auto constexpr Str = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz.-"sv;
-
-    if (auto const pos = Str.find(ch); pos != std::string_view::npos)
-    {
-        return pos;
-    }
-
-    return {};
-}
-
 bool decodeShad0wClient(char* buf, size_t buflen, std::string_view in)
 {
     auto const* const buf_in = buf;
+
+    // Shad0w with his experimental BitTorrent implementation and BitTornado
+    // introduced peer ids that begin with a character which is``T`` in the
+    // case of BitTornado followed by up to five ascii characters for version
+    // number, padded with dashes if less than 5, followed by ---. The ascii
+    // characters denoting version are limited to the following characters:
+    // 0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz.-
+    // For example: 'S58B-----'... for Shadow's 5.8.11
+
+    auto constexpr get_shad0w_int = [](char ch)
+    {
+        auto constexpr str = std::string_view{ "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz.-" };
+        auto const pos = str.find(ch);
+        return pos != std::string_view::npos ? std::make_optional(pos) : std::nullopt;
+    };
 
     auto peer_id = std::string_view{ std::data(in), 9 };
 

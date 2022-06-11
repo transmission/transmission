@@ -13,18 +13,6 @@
 
 static auto constexpr Floor = int{ 32 };
 
-static void tr_ptrArrayForeach(tr_ptrArray* t, PtrArrayForeachFunc func)
-{
-    TR_ASSERT(t != nullptr);
-    TR_ASSERT(t->items != nullptr || t->n_items == 0);
-    TR_ASSERT(func != nullptr);
-
-    for (int i = 0; i < t->n_items; ++i)
-    {
-        func(t->items[i]);
-    }
-}
-
 void tr_ptrArrayDestruct(tr_ptrArray* p, PtrArrayForeachFunc func)
 {
     TR_ASSERT(p != nullptr);
@@ -36,6 +24,24 @@ void tr_ptrArrayDestruct(tr_ptrArray* p, PtrArrayForeachFunc func)
     }
 
     tr_free(p->items);
+}
+
+void tr_ptrArrayForeach(tr_ptrArray* t, PtrArrayForeachFunc func)
+{
+    TR_ASSERT(t != nullptr);
+    TR_ASSERT(t->items != nullptr || t->n_items == 0);
+    TR_ASSERT(func != nullptr);
+
+    for (int i = 0; i < t->n_items; ++i)
+    {
+        func(t->items[i]);
+    }
+}
+
+void** tr_ptrArrayPeek(tr_ptrArray* t, int* size)
+{
+    *size = t->n_items;
+    return t->items;
 }
 
 int tr_ptrArrayInsert(tr_ptrArray* t, void* ptr, int pos)
@@ -193,6 +199,35 @@ void* tr_ptrArrayFindSorted(tr_ptrArray* t, void const* ptr, tr_voidptr_compare_
     bool match = false;
     int const pos = tr_ptrArrayLowerBound(t, ptr, compare, &match);
     return match ? t->items[pos] : nullptr;
+}
+
+static void* tr_ptrArrayRemoveSortedValue(tr_ptrArray* t, void const* ptr, tr_voidptr_compare_func compare)
+{
+    void* ret = nullptr;
+
+    assertArrayIsSortedAndUnique(t, compare);
+
+    bool match = false;
+    int const pos = tr_ptrArrayLowerBound(t, ptr, compare, &match);
+
+    if (match)
+    {
+        ret = t->items[pos];
+        TR_ASSERT(compare(ret, ptr) == 0);
+        tr_ptrArrayErase(t, pos, pos + 1);
+    }
+
+    TR_ASSERT(ret == nullptr || compare(ret, ptr) == 0);
+    return ret;
+}
+
+void tr_ptrArrayRemoveSortedPointer(tr_ptrArray* t, void const* ptr, tr_voidptr_compare_func compare)
+{
+    [[maybe_unused]] void const* removed = tr_ptrArrayRemoveSortedValue(t, ptr, compare);
+
+    TR_ASSERT(removed != nullptr);
+    TR_ASSERT(removed == ptr);
+    TR_ASSERT(tr_ptrArrayFindSorted(t, ptr, compare) == nullptr);
 }
 
 void* tr_ptrArrayNth(tr_ptrArray* array, int i)

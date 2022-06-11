@@ -152,9 +152,20 @@ std::optional<tr_sys_file_t> tr_open_files::get(
     tr_error* error = nullptr;
     if (writable)
     {
-        auto dir = tr_pathbuf{ filename.sv() };
-        dir.popdir();
-        if (!tr_sys_dir_create(dir, TR_SYS_DIR_CREATE_PARENTS, 0777, &error))
+        auto const dir = tr_sys_path_dirname(filename, &error);
+
+        if (std::empty(dir))
+        {
+            tr_logAddError(fmt::format(
+                _("Couldn't create '{path}': {error} ({error_code})"),
+                fmt::arg("path", filename),
+                fmt::arg("error", error->message),
+                fmt::arg("error_code", error->code)));
+            tr_error_free(error);
+            return {};
+        }
+
+        if (!tr_sys_dir_create(dir.c_str(), TR_SYS_DIR_CREATE_PARENTS, 0777, &error))
         {
             tr_logAddError(fmt::format(
                 _("Couldn't create '{path}': {error} ({error_code})"),
@@ -253,7 +264,7 @@ void tr_open_files::closeAll()
 
 void tr_open_files::closeTorrent(tr_torrent_id_t tor_id)
 {
-    return pool_.erase_if([&tor_id](Key const& key, Val const& /*unused*/) { return key.first == tor_id; });
+    return pool_.erase_if([&tor_id](Key const& key, Val const&) { return key.first == tor_id; });
 }
 
 void tr_open_files::closeFile(tr_torrent_id_t tor_id, tr_file_index_t file_num)

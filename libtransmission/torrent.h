@@ -774,8 +774,8 @@ tr_peer_id_t const& tr_torrentGetPeerId(tr_torrent* tor);
 
 tr_torrent_metainfo tr_ctorStealMetainfo(tr_ctor* ctor);
 
-bool tr_ctorSetMetainfoFromFile(tr_ctor* ctor, std::string_view filename, tr_error** error = nullptr);
-bool tr_ctorSetMetainfoFromMagnetLink(tr_ctor* ctor, std::string_view filename, tr_error** error = nullptr);
+bool tr_ctorSetMetainfoFromFile(tr_ctor* ctor, std::string const& filename, tr_error** error);
+bool tr_ctorSetMetainfoFromMagnetLink(tr_ctor* ctor, std::string const& filename, tr_error** error);
 void tr_ctorSetLabels(tr_ctor* ctor, tr_quark const* labels, size_t n_labels);
 tr_torrent::labels_t const& tr_ctorGetLabels(tr_ctor const* ctor);
 

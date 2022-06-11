@@ -19,7 +19,6 @@
 #include <memory>
 #include <optional>
 #include <string>
-#include <utility> // std::make_pair
 
 #include <event2/buffer.h>
 
@@ -27,7 +26,7 @@
 
 #include "bandwidth.h"
 #include "crypto.h"
-#include "net.h" // tr_address
+#include "net.h" /* tr_address */
 #include "peer-socket.h"
 #include "tr-assert.h"
 
@@ -79,92 +78,29 @@ public:
         tr_session* session_in,
         tr_sha1_digest_t const* torrent_hash,
         bool is_incoming,
-        tr_address const& addr,
-        tr_port port,
-        bool is_seed,
+        tr_address const& addr_in,
+        tr_port port_in,
+        bool is_seed_in,
         time_t current_time)
         : crypto{ torrent_hash, is_incoming }
+        , addr{ addr_in }
         , session{ session_in }
         , time_created{ current_time }
-        , addr_{ addr }
-        , port_{ port }
-        , is_seed_{ is_seed }
+        , port{ port_in }
+        , is_seed{ is_seed_in }
     {
-    }
-
-    [[nodiscard]] constexpr tr_address const& address() const noexcept
-    {
-        return addr_;
-    }
-
-    [[nodiscard]] constexpr std::pair<tr_address, tr_port> socketAddress() const noexcept
-    {
-        return std::make_pair(addr_, port_);
     }
 
     std::string addrStr() const;
-
-    [[nodiscard]] constexpr bool isIncoming() noexcept
-    {
-        return crypto.is_incoming;
-    }
 
     [[nodiscard]] auto getReadBuffer() noexcept
     {
         return inbuf.get();
     }
 
-    [[nodiscard]] auto hasBandwidthLeft(tr_direction dir) noexcept
-    {
-        return bandwidth->clamp(dir, 1024) > 0;
-    }
-
-    [[nodiscard]] auto getPieceSpeed_Bps(uint64_t now, tr_direction dir) noexcept
-    {
-        return bandwidth->getPieceSpeedBytesPerSecond(now, dir);
-    }
-
-    constexpr void enableFEXT(bool flag) noexcept
-    {
-        fast_extension_supported_ = flag;
-    }
-
-    [[nodiscard]] constexpr auto supportsFEXT() const noexcept
-    {
-        return fast_extension_supported_;
-    }
-
-    constexpr void enableLTEP(bool flag) noexcept
-    {
-        extended_protocol_supported_ = flag;
-    }
-
-    [[nodiscard]] constexpr auto supportsLTEP() const noexcept
-    {
-        return extended_protocol_supported_;
-    }
-
-    constexpr void enableDHT(bool flag) noexcept
-    {
-        dht_supported_ = flag;
-    }
-
-    [[nodiscard]] constexpr auto supportsDHT() const noexcept
-    {
-        return dht_supported_;
-    }
-
-    [[nodiscard]] constexpr auto supportsUTP() const noexcept
-    {
-        return utp_supported_;
-    }
-
-    [[nodiscard]] constexpr auto isSeed() const noexcept
-    {
-        return is_seed_;
-    }
-
     tr_crypto crypto;
+
+    tr_address const addr;
 
     // TODO(ckerr): yikes, unlike other class' magic_numbers it looks
     // like this one isn't being used just for assertions, but also in
@@ -203,19 +139,15 @@ public:
 
     short int pendingEvents = 0;
 
+    tr_port const port;
+
     tr_priority_t priority = TR_PRI_NORMAL;
 
-    bool utp_supported_ = false;
-
-private:
-    tr_address const addr_;
-    tr_port const port_;
-
-    bool const is_seed_;
-
-    bool dht_supported_ = false;
-    bool extended_protocol_supported_ = false;
-    bool fast_extension_supported_ = false;
+    bool const is_seed;
+    bool dhtSupported = false;
+    bool extendedProtocolSupported = false;
+    bool fastExtensionSupported = false;
+    bool utpSupported = false;
 };
 
 /**
@@ -251,8 +183,46 @@ void tr_peerIoUnrefImpl(char const* file, int line, tr_peerIo* io);
 
 constexpr bool tr_isPeerIo(tr_peerIo const* io)
 {
-    return io != nullptr && io->magic_number == PEER_IO_MAGIC_NUMBER && io->refCount >= 0 &&
-        tr_address_is_valid(&io->address());
+    return io != nullptr && io->magic_number == PEER_IO_MAGIC_NUMBER && io->refCount >= 0 && tr_address_is_valid(&io->addr);
+}
+
+/**
+***
+**/
+
+constexpr void tr_peerIoEnableFEXT(tr_peerIo* io, bool flag)
+{
+    io->fastExtensionSupported = flag;
+}
+
+constexpr bool tr_peerIoSupportsFEXT(tr_peerIo const* io)
+{
+    return io->fastExtensionSupported;
+}
+
+constexpr void tr_peerIoEnableLTEP(tr_peerIo* io, bool flag)
+{
+    io->extendedProtocolSupported = flag;
+}
+
+constexpr bool tr_peerIoSupportsLTEP(tr_peerIo const* io)
+{
+    return io->extendedProtocolSupported;
+}
+
+constexpr void tr_peerIoEnableDHT(tr_peerIo* io, bool flag)
+{
+    io->dhtSupported = flag;
+}
+
+constexpr bool tr_peerIoSupportsDHT(tr_peerIo const* io)
+{
+    return io->dhtSupported;
+}
+
+constexpr bool tr_peerIoSupportsUTP(tr_peerIo const* io)
+{
+    return io->utpSupported;
 }
 
 /**
@@ -267,11 +237,20 @@ constexpr tr_session* tr_peerIoGetSession(tr_peerIo* io)
     return io->session;
 }
 
+char const* tr_peerIoGetAddrStr(tr_peerIo const* io, char* buf, size_t buflen);
+
+struct tr_address const* tr_peerIoGetAddress(tr_peerIo const* io, tr_port* port);
+
 std::optional<tr_sha1_digest_t> tr_peerIoGetTorrentHash(tr_peerIo const* io);
 
 void tr_peerIoSetTorrentHash(tr_peerIo* io, tr_sha1_digest_t const& info_hash);
 
 int tr_peerIoReconnect(tr_peerIo* io);
+
+constexpr bool tr_peerIoIsIncoming(tr_peerIo const* io)
+{
+    return io->crypto.is_incoming;
+}
 
 /**
 ***
@@ -354,6 +333,16 @@ static inline void tr_peerIoSetParent(tr_peerIo* io, Bandwidth* parent)
 }
 
 void tr_peerIoBandwidthUsed(tr_peerIo* io, tr_direction direction, size_t byteCount, int isPieceData);
+
+static inline bool tr_peerIoHasBandwidthLeft(tr_peerIo const* io, tr_direction dir)
+{
+    return io->bandwidth->clamp(dir, 1024) > 0;
+}
+
+static inline unsigned int tr_peerIoGetPieceSpeed_Bps(tr_peerIo const* io, uint64_t now, tr_direction dir)
+{
+    return io->bandwidth->getPieceSpeedBytesPerSecond(now, dir);
+}
 
 /**
 ***

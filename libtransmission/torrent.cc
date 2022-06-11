@@ -49,6 +49,7 @@
 #include "torrent-metainfo.h"
 #include "torrent.h"
 #include "tr-assert.h"
+#include "tr-assert.h"
 #include "trevent.h" /* tr_runInEventThread() */
 #include "utils.h"
 #include "variant.h"
@@ -626,9 +627,12 @@ bool tr_torrent::hasAnyLocalData() const
 
 static bool setLocalErrorIfFilesDisappeared(tr_torrent* tor, std::optional<bool> has_local_data = {})
 {
-    auto const has = has_local_data ? *has_local_data : tor->hasAnyLocalData();
-    bool const files_disappeared = tor->hasTotal() > 0 && !has;
+    if (!has_local_data)
+    {
+        has_local_data = tor->hasAnyLocalData();
+    }
 
+    bool const files_disappeared = tor->hasTotal() > 0 && !*has_local_data;
     if (files_disappeared)
     {
         tr_logAddTraceTor(tor, "[LAZY] uh oh, the files disappeared");
@@ -792,7 +796,7 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
 
     // if we don't have a local .torrent or .magnet file already,
     // assume the torrent is new
-    bool const is_new_torrent = !tr_sys_path_exists(filename);
+    bool const is_new_torrent = !tr_sys_path_exists(filename.c_str());
 
     if (is_new_torrent)
     {
@@ -2592,14 +2596,14 @@ static int renamePath(tr_torrent* tor, char const* oldpath, char const* newname)
 
     auto const base = tor->isDone() || std::empty(tor->incompleteDir()) ? tor->downloadDir() : tor->incompleteDir();
 
-    auto src = tr_pathbuf{ base, '/', oldpath };
+    auto src = tr_strvPath(base, oldpath);
 
-    if (!tr_sys_path_exists(src)) /* check for it as a partial */
+    if (!tr_sys_path_exists(src.c_str())) /* check for it as a partial */
     {
         src += tr_torrent_files::PartialFileSuffix;
     }
 
-    if (tr_sys_path_exists(src))
+    if (tr_sys_path_exists(src.c_str()))
     {
         auto const parent = tr_sys_path_dirname(src);
         auto const tgt = tr_strvEndsWith(src, tr_torrent_files::PartialFileSuffix) ?
@@ -2616,7 +2620,7 @@ static int renamePath(tr_torrent* tor, char const* oldpath, char const* newname)
 
             tmp = errno;
 
-            if (!tr_sys_path_rename(src, tgt, &error))
+            if (!tr_sys_path_rename(src.c_str(), tgt, &error))
             {
                 err = error->code;
                 tr_error_free(error);

@@ -3,11 +3,9 @@
 // License text can be found in the licenses/ folder.
 
 #import "GroupsController.h"
-#import "NSImageAdditions.h"
 #import "NSMutableArrayAdditions.h"
 
 #define ICON_WIDTH 16.0
-#define BORDER_WIDTH 1.25
 #define ICON_WIDTH_SMALL 12.0
 
 @interface GroupsController ()
@@ -140,7 +138,7 @@ GroupsController* fGroupsInstance = nil;
 - (NSImage*)imageForIndex:(NSInteger)index
 {
     NSInteger orderIndex = [self rowValueForIndex:index];
-    return orderIndex != -1 ? [self imageForGroup:self.fGroups[orderIndex]] : [self imageForGroupNone];
+    return orderIndex != -1 ? [self imageForGroup:self.fGroups[orderIndex]] : [NSImage imageNamed:@"GroupsNoneTemplate"];
 }
 
 - (NSColor*)colorForIndex:(NSInteger)index
@@ -301,7 +299,7 @@ GroupsController* fGroupsInstance = nil;
     item.target = target;
     item.tag = -1;
 
-    NSImage* icon = [self imageForGroupNone];
+    NSImage* icon = [NSImage imageNamed:@"GroupsNoneTemplate"];
     if (small)
     {
         icon = [icon copy];
@@ -371,45 +369,33 @@ GroupsController* fGroupsInstance = nil;
     [NSUserDefaults.standardUserDefaults setObject:[NSKeyedArchiver archivedDataWithRootObject:groups] forKey:@"GroupDicts"];
 }
 
-- (NSImage*)imageForGroupNone
-{
-    static NSImage* icon;
-    if (icon)
-    {
-        return icon;
-    }
-
-    icon = [NSImage imageWithSize:NSMakeSize(ICON_WIDTH, ICON_WIDTH) flipped:NO drawingHandler:^BOOL(NSRect rect) {
-        //shape
-        rect = NSInsetRect(rect, BORDER_WIDTH / 2, BORDER_WIDTH / 2);
-        NSBezierPath* bp = [NSBezierPath bezierPathWithOvalInRect:rect];
-        bp.lineWidth = BORDER_WIDTH;
-
-        //border
-        // code reference for dashed style
-        //CGFloat dashAndGapLength = M_PI * rect.size.width / 8;
-        //CGFloat pattern[2] = { dashAndGapLength * .5, dashAndGapLength * .5 };
-        //[bp setLineDash:pattern count:2 phase:0];
-
-        [NSColor.controlTextColor setStroke];
-        [bp stroke];
-
-        return YES;
-    }];
-    [icon setTemplate:YES];
-
-    return icon;
-}
-
 - (NSImage*)imageForGroup:(NSMutableDictionary*)dict
 {
-    NSImage* icon;
-    if ((icon = dict[@"Icon"]))
+    NSImage* image;
+    if ((image = dict[@"Icon"]))
     {
-        return icon;
+        return image;
     }
 
-    icon = [NSImage discIconWithColor:dict[@"Color"] insetFactor:0];
+    NSColor* color = dict[@"Color"];
+
+    NSRect rect = NSMakeRect(0.0, 0.0, ICON_WIDTH, ICON_WIDTH);
+
+    NSImage* icon = [[NSImage alloc] initWithSize:rect.size];
+
+    [icon lockFocus];
+
+    //border
+    NSBezierPath* bp = [NSBezierPath bezierPathWithRoundedRect:rect xRadius:rect.size.width / 2 yRadius:rect.size.width / 2];
+    NSGradient* gradient = [[NSGradient alloc] initWithStartingColor:[color blendedColorWithFraction:0.45 ofColor:NSColor.whiteColor]
+                                                         endingColor:color];
+    [gradient drawInBezierPath:bp angle:0.0];
+
+    //inside
+    [color setFill];
+    [bp fill];
+
+    [icon unlockFocus];
 
     dict[@"Icon"] = icon;
 

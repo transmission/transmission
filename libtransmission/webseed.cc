@@ -198,16 +198,6 @@ public:
         return is_active;
     }
 
-    [[nodiscard]] std::string readable() const override
-    {
-        if (auto const parsed = tr_urlParse(base_url); parsed)
-        {
-            return fmt::format(FMT_STRING("{:s}:{:d}"), parsed->host, parsed->port);
-        }
-
-        return base_url;
-    }
-
     void gotPieceData(uint32_t n_bytes)
     {
         bandwidth.notifyBandwidthConsumed(TR_DOWN, n_bytes, true, tr_time_msec());
@@ -383,8 +373,13 @@ void onBufferGotData(evbuffer* /*buf*/, evbuffer_cb_info const* info, void* vtas
         return;
     }
 
-    auto const lock = task->session->unique_lock();
-    task->webseed->gotPieceData(n_added);
+    auto const* const session = task->session;
+    auto const lock = session->unique_lock();
+
+    auto* const webseed = task->webseed;
+    webseed->gotPieceData(n_added);
+
+    useFetchedBlocks(task);
 }
 
 void task_request_next_chunk(tr_webseed_task* task);
@@ -448,8 +443,6 @@ void onPartialDataFetched(tr_web::FetchResponse const& web_response)
         delete task;
         return;
     }
-
-    useFetchedBlocks(task);
 
     if (task->loc.byte < task->end_byte)
     {

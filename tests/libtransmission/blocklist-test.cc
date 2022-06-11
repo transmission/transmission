@@ -46,7 +46,7 @@ protected:
     void createFileWithContents(char const* path, char const* contents)
     {
         auto const dir = tr_sys_path_dirname(path);
-        tr_sys_dir_create(dir, TR_SYS_DIR_CREATE_PARENTS, 0700);
+        tr_sys_dir_create(dir.c_str(), TR_SYS_DIR_CREATE_PARENTS, 0700);
 
         auto const fd = tr_sys_file_open(path, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_TRUNCATE, 0600);
         blockingFileWrite(fd, contents, strlen(contents));
@@ -66,7 +66,7 @@ protected:
 
 TEST_F(BlocklistTest, parsing)
 {
-    EXPECT_EQ(0U, tr_blocklistGetRuleCount(session_));
+    EXPECT_EQ(0, tr_blocklistGetRuleCount(session_));
 
     // init the blocklist
     auto const path = tr_pathbuf{ tr_sessionGetConfigDir(session_), "/blocklists/level1" };

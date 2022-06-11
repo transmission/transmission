@@ -21,9 +21,8 @@
 #include "transmission.h"
 
 #include "net.h"
-#include "tr-strbuf.h"
-#include "utils.h"
 #include "web-utils.h"
+#include "utils.h"
 
 using namespace std::literals;
 
@@ -252,14 +251,6 @@ bool tr_isValidTrackerScheme(std::string_view scheme)
     return std::find(std::begin(Schemes), std::end(Schemes), scheme) != std::end(Schemes);
 }
 
-bool isAsciiNonUpperCase(std::string_view host)
-{
-    return std::all_of(
-        std::begin(host),
-        std::end(host),
-        [](unsigned char ch) { return (ch < 128) && (std::isupper(ch) == 0); });
-}
-
 // www.example.com -> example
 // www.example.co.uk -> example
 // 127.0.0.1 -> 127.0.0.1
@@ -271,25 +262,16 @@ std::string_view getSiteName(std::string_view host)
         return host;
     }
 
-    // psl needs a zero-terminated hostname
-    auto const szhost = tr_urlbuf{ host };
-
     // is it an IP?
     auto addr = tr_address{};
-    if (tr_address_from_string(&addr, std::data(szhost)))
+    auto const szhost = std::string(host);
+    if (tr_address_from_string(&addr, szhost.c_str()))
     {
         return host;
     }
 
     // is it a registered name?
-    if (isAsciiNonUpperCase(host))
-    {
-        if (char const* const top = psl_registrable_domain(psl_builtin(), std::data(szhost)); top != nullptr)
-        {
-            host.remove_prefix(top - std::data(szhost));
-        }
-    }
-    else if (char* lower = nullptr; psl_str_to_utf8lower(std::data(szhost), nullptr, nullptr, &lower) == PSL_SUCCESS)
+    if (char* lower = nullptr; psl_str_to_utf8lower(szhost.c_str(), nullptr, nullptr, &lower) == PSL_SUCCESS)
     {
         // www.example.com -> example.com
         if (char const* const top = psl_registrable_domain(psl_builtin(), lower); top != nullptr)

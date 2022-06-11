@@ -82,7 +82,7 @@
 <context>
     <name>DetailsDialog</name>
     <message>
-        <location filename="../DetailsDialog.cc" line="+428"/>
+        <location filename="../DetailsDialog.cc" line="+427"/>
         <source>None</source>
         <translation>لا شيء</translation>
     </message>
@@ -93,12 +93,12 @@
     </message>
     <message>
         <location line="+1"/>
-        <location line="+267"/>
+        <location line="+265"/>
         <source>Unknown</source>
         <translation>غير معروف</translation>
     </message>
     <message>
-        <location line="-210"/>
+        <location line="-208"/>
         <source>Finished</source>
         <translation>إنتهى</translation>
     </message>
@@ -113,7 +113,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="+135"/>
+        <location line="+133"/>
         <source>Active now</source>
         <translation>نشط حاليا</translation>
     </message>
@@ -172,7 +172,7 @@
         <translation>أنشى من طرف %1 في %2</translation>
     </message>
     <message>
-        <location line="+204"/>
+        <location line="+173"/>
         <location line="+47"/>
         <source>Encrypted connection</source>
         <translation>إتصال مشفر</translation>
@@ -261,7 +261,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-832"/>
+        <location line="-799"/>
         <source>%1 (100%)</source>
         <extracomment>Text following the &quot;Have:&quot; label in torrent properties dialog; %1 is amount of downloaded and verified data</extracomment>
         <translation>%1 (100%)</translation>
@@ -284,13 +284,12 @@
         <translation>%1 (النسبة: %2)</translation>
     </message>
     <message>
-        <location line="+273"/>
-        <location line="+55"/>
+        <location line="+271"/>
         <source>N/A</source>
         <translation>غير متوفر</translation>
     </message>
     <message>
-        <location line="+226"/>
+        <location line="+250"/>
         <source>Peer is connected over uTP</source>
         <translation>الند متصل عبر uTP</translation>
     </message>
@@ -441,12 +440,12 @@
         <translation>الموقع:</translation>
     </message>
     <message>
-        <location line="+124"/>
+        <location line="+110"/>
         <source>Edit Trackers</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location line="-190"/>
+        <location line="-176"/>
         <source>Hash:</source>
         <translation>التلبيدة:</translation>
     </message>
@@ -462,11 +461,6 @@
     </message>
     <message>
         <location line="+78"/>
-        <source>Added:</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <location line="+14"/>
         <source>Comment:</source>
         <translation>تعليق:</translation>
     </message>
@@ -564,7 +558,7 @@
 <context>
     <name>FileTreeItem</name>
     <message>
-        <location filename="../FileTreeItem.cc" line="+296"/>
+        <location filename="../FileTreeItem.cc" line="+285"/>
         <location filename="../FileTreeView.cc" line="+108"/>
         <location line="+257"/>
         <source>Low</source>
@@ -599,22 +593,22 @@
         <translation>الملف</translation>
     </message>
     <message>
-        <location line="+3"/>
+        <location line="+4"/>
         <source>Size</source>
         <translation>الحجم</translation>
     </message>
     <message>
-        <location line="+3"/>
+        <location line="+4"/>
         <source>Progress</source>
         <translation>التقدم</translation>
     </message>
     <message>
-        <location line="+3"/>
+        <location line="+4"/>
         <source>Download</source>
         <translation>تحميل</translation>
     </message>
     <message>
-        <location line="+3"/>
+        <location line="+4"/>
         <source>Priority</source>
         <translation>الأولوية</translation>
     </message>
@@ -1264,7 +1258,7 @@
         <translation>فرز حسب قائمة الانتظار</translation>
     </message>
     <message>
-        <location filename="../MainWindow.cc" line="+470"/>
+        <location filename="../MainWindow.cc" line="+471"/>
         <source>Limit Download Speed</source>
         <translation>حد سرعة التنزيل</translation>
     </message>
@@ -1340,12 +1334,12 @@
         <translation>فتح تورنت</translation>
     </message>
     <message>
-        <location line="-985"/>
+        <location line="-986"/>
         <source>Speed Limits</source>
         <translation>حدود السرعة</translation>
     </message>
     <message>
-        <location line="+519"/>
+        <location line="+520"/>
         <source>Network Error</source>
         <translation>خطأ في الشبكة</translation>
     </message>
@@ -2206,7 +2200,7 @@ To add another primary URL, add it after a blank line.</source>
     <message>
         <location line="+147"/>
         <source>Download is i&amp;nactive if data sharing stopped:</source>
-        <extracomment>Please keep this phrase as short as possible, it&apos;s currently the longest and influences dialog width</extracomment>
+        <extracomment>Please keep this phrase as short as possible, it&apos;s curently the longest and influences dialog width</extracomment>
         <translation>تعين التحميل كخامل إذا توقف النقل منذ:</translation>
     </message>
     <message>
@@ -2309,7 +2303,7 @@ To add another primary URL, add it after a blank line.</source>
 <context>
     <name>Session</name>
     <message>
-        <location filename="../Session.cc" line="+498"/>
+        <location filename="../Session.cc" line="+510"/>
         <source>Error Renaming Path</source>
         <translation>تعذر إعادة تسمية المسار</translation>
     </message>
@@ -2458,22 +2452,22 @@ To add another primary URL, add it after a blank line.</source>
 <context>
     <name>Torrent</name>
     <message>
-        <location filename="../Torrent.cc" line="+300"/>
+        <location filename="../Torrent.cc" line="+308"/>
         <source>Verifying local data</source>
         <translation>تحقق من البيانات المحلية</translation>
     </message>
     <message>
-        <location line="+6"/>
+        <location line="+8"/>
         <source>Downloading</source>
         <translation>يتم التحميل</translation>
     </message>
     <message>
-        <location line="+6"/>
+        <location line="+8"/>
         <source>Seeding</source>
         <translation>يتم الرفع</translation>
     </message>
     <message>
-        <location line="-18"/>
+        <location line="-24"/>
         <source>Finished</source>
         <translation>إنتهى</translation>
     </message>
@@ -2483,32 +2477,32 @@ To add another primary URL, add it after a blank line.</source>
         <translation>مُوَقف مؤقتا</translation>
     </message>
     <message>
-        <location line="+3"/>
+        <location line="+4"/>
         <source>Queued for verification</source>
         <translation>في طابور التحقق</translation>
     </message>
     <message>
-        <location line="+6"/>
+        <location line="+8"/>
         <source>Queued for download</source>
         <translation>في طابور التنزيل</translation>
     </message>
     <message>
-        <location line="+6"/>
+        <location line="+8"/>
         <source>Queued for seeding</source>
         <translation>في طابور التوزيع</translation>
     </message>
     <message>
-        <location line="+15"/>
+        <location line="+18"/>
         <source>Tracker gave a warning: %1</source>
         <translation>تحذير من المتتبع: %1</translation>
     </message>
     <message>
-        <location line="+3"/>
+        <location line="+4"/>
         <source>Tracker gave an error: %1</source>
         <translation>خطأ من المتتبع: %1</translation>
     </message>
     <message>
-        <location line="+3"/>
+        <location line="+4"/>
         <source>Error: %1</source>
         <translation>خطأ: %1</translation>
     </message>

@@ -8,13 +8,13 @@ import { Formatter } from './formatter.js';
 import { createDialogContainer, makeUUID } from './utils.js';
 
 export class OpenDialog extends EventTarget {
-  constructor(controller, remote, url = '') {
+  constructor(controller, remote) {
     super();
 
     this.controller = controller;
     this.remote = remote;
 
-    this.elements = this._create(url);
+    this.elements = this._create();
     this.elements.dismiss.addEventListener('click', () => this._onDismiss());
     this.elements.confirm.addEventListener('click', () => this._onConfirm());
     this._updateFreeSpaceInAddDialog();
@@ -43,10 +43,8 @@ export class OpenDialog extends EventTarget {
   _updateFreeSpaceInAddDialog() {
     const path = this.elements.folder_input.value;
     this.remote.getFreeSpace(path, (dir, bytes) => {
-      if (!this.closed) {
-        const string = bytes > 0 ? `${Formatter.size(bytes)} Free` : '';
-        this.elements.freespace.textContent = string;
-      }
+      const string = bytes > 0 ? `${Formatter.size(bytes)} Free` : '';
+      this.elements.freespace.textContent = string;
     });
   }
 
@@ -116,7 +114,7 @@ export class OpenDialog extends EventTarget {
     this._onDismiss();
   }
 
-  _create(url) {
+  _create() {
     const elements = createDialogContainer();
     const { confirm, root, heading, workarea } = elements;
 
@@ -147,7 +145,6 @@ export class OpenDialog extends EventTarget {
     input = document.createElement('input');
     input.type = 'url';
     input.id = input_id;
-    input.value = url;
     workarea.append(input);
     elements.url_input = input;
     input.addEventListener('keyup', ({ key }) => {

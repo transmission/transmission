@@ -376,7 +376,7 @@ size_t BlocklistFile::setContent(char const* filename)
 }
 
 #ifdef TR_ENABLE_ASSERTS
-void BlocklistFile::assertValidRules(std::vector<IPv4Range> const& ranges)
+void BlocklistFile::assertValidRules(std::vector<IPv4Range>& ranges)
 {
     for (auto const& r : ranges)
     {

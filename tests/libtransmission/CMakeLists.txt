@@ -13,6 +13,7 @@ add_executable(libtransmission-test
     error-test.cc
     file-piece-map-test.cc
     file-test.cc
+    files-test.cc
     getopt-test.cc
     history-test.cc
     json-test.cc
@@ -32,7 +33,6 @@ add_executable(libtransmission-test
     subprocess-test-script.cmd
     subprocess-test.cc
     test-fixtures.h
-    torrent-files-test.cc
     torrent-metainfo-test.cc
     torrents-test.cc
     utils-test.cc

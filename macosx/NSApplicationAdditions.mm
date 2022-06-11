@@ -6,6 +6,11 @@
 
 @implementation NSApplication (NSApplicationAdditions)
 
+- (BOOL)isOnMojaveOrBetter
+{
+    return floor(NSAppKitVersionNumber) > NSAppKitVersionNumber10_13;
+}
+
 - (BOOL)isDarkMode
 {
     if (@available(macOS 10.14, *))

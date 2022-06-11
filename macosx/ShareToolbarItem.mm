@@ -5,6 +5,7 @@
 
 #import "ShareToolbarItem.h"
 #import "ShareTorrentFileHelper.h"
+#import "NSApplicationAdditions.h"
 
 @implementation ShareToolbarItem
 

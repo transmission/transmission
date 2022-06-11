@@ -182,10 +182,9 @@ protected:
     {
         auto const tmperr = errno;
 
-        auto dir = tr_pathbuf{ path };
-        dir.popdir();
+        auto const dir = tr_sys_path_dirname(path);
         tr_error* error = nullptr;
-        tr_sys_dir_create(dir, TR_SYS_DIR_CREATE_PARENTS, 0700, &error);
+        tr_sys_dir_create(dir.data(), TR_SYS_DIR_CREATE_PARENTS, 0700, &error);
         EXPECT_EQ(nullptr, error) << "path[" << path << "] dir[" << dir << "] " << *error;
 
         errno = tmperr;
@@ -314,7 +313,7 @@ private:
         auto q = TR_KEY_download_dir;
         auto const download_dir = tr_variantDictFindStrView(settings, q, &sv) ? tr_strvPath(sandboxDir(), sv) :
                                                                                 tr_strvPath(sandboxDir(), "Downloads");
-        tr_sys_dir_create(download_dir, TR_SYS_DIR_CREATE_PARENTS, 0700);
+        tr_sys_dir_create(download_dir.data(), TR_SYS_DIR_CREATE_PARENTS, 0700);
         tr_variantDictAddStr(settings, q, download_dir.data());
 
         // incomplete dir
@@ -411,9 +410,8 @@ protected:
                 auto const suffix = std::string_view{ partial ? ".part" : "" };
                 auto const filename = tr_pathbuf{ base, '/', subpath, suffix };
 
-                auto dirname = tr_pathbuf{ filename.sv() };
-                dirname.popdir();
-                tr_sys_dir_create(dirname, TR_SYS_DIR_CREATE_PARENTS, 0700);
+                auto const dirname = tr_sys_path_dirname(filename);
+                tr_sys_dir_create(dirname.c_str(), TR_SYS_DIR_CREATE_PARENTS, 0700);
 
                 auto fd = tr_sys_file_open(filename, TR_SYS_FILE_WRITE | TR_SYS_FILE_CREATE | TR_SYS_FILE_TRUNCATE, 0600);
                 auto const file_size = metainfo->fileSize(i);

@@ -97,10 +97,7 @@ static void init_rc4(tr_crypto const* crypto, struct arc4_context** setme, char 
         *setme = tr_new0(struct arc4_context, 1);
     }
 
-    auto const buf = crypto->torrent_hash ?
-        tr_cryptoSecretKeySha1(crypto, key, 4, std::data(*crypto->torrent_hash), std::size(*crypto->torrent_hash)) :
-        std::nullopt;
-
+    auto const buf = tr_cryptoSecretKeySha1(crypto, key, 4, std::data(*crypto->torrent_hash), std::size(*crypto->torrent_hash));
     if (buf)
     {
         arc4_init(*setme, std::data(*buf), std::size(*buf));

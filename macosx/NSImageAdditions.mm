@@ -5,34 +5,8 @@
 #import "CocoaCompatibility.h"
 
 #import "NSImageAdditions.h"
-#import "NSApplicationAdditions.h"
 
 @implementation NSImage (NSImageAdditions)
-
-#define ICON_WIDTH 16.0
-#define BORDER_WIDTH 1.25
-
-+ (NSImage*)discIconWithColor:(NSColor*)color insetFactor:(CGFloat)insetFactor
-{
-    return [NSImage imageWithSize:NSMakeSize(ICON_WIDTH, ICON_WIDTH) flipped:NO drawingHandler:^BOOL(NSRect rect) {
-        //shape
-        rect = NSInsetRect(rect, BORDER_WIDTH / 2 + rect.size.width * insetFactor / 2, BORDER_WIDTH / 2 + rect.size.height * insetFactor / 2);
-        NSBezierPath* bp = [NSBezierPath bezierPathWithOvalInRect:rect];
-        bp.lineWidth = BORDER_WIDTH;
-
-        //border
-        CGFloat fractionOfBlendedColor = [NSApp isDarkMode] ? 0.15 : 0.3;
-        NSColor* borderColor = [color blendedColorWithFraction:fractionOfBlendedColor ofColor:NSColor.controlTextColor];
-        [borderColor setStroke];
-        [bp stroke];
-
-        //inside
-        [color setFill];
-        [bp fill];
-
-        return YES;
-    }];
-}
 
 - (NSImage*)imageWithColor:(NSColor*)color
 {

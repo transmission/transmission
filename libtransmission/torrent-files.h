@@ -5,11 +5,9 @@
 
 #pragma once
 
-#include <algorithm> // std::sort()
 #include <cstddef>
 #include <cstdint> // uint64_t
 #include <functional>
-#include <iterator>
 #include <optional>
 #include <string>
 #include <string_view>
@@ -58,17 +56,6 @@ public:
         files_.at(file_index).setPath(path);
     }
 
-    void insertSubpathPrefix(std::string_view path)
-    {
-        auto const buf = tr_pathbuf{ path, '/' };
-
-        for (auto& file : files_)
-        {
-            file.path_.insert(0, buf.sv());
-            file.path_.shrink_to_fit();
-        }
-    }
-
     void reserve(size_t n_files)
     {
         files_.reserve(n_files);
@@ -83,21 +70,6 @@ public:
     {
         files_.clear();
         total_size_ = uint64_t{};
-    }
-
-    auto sortedByPath() const
-    {
-        auto ret = std::vector<std::pair<std::string /*path*/, uint64_t /*size*/>>{};
-        ret.reserve(std::size(files_));
-        std::transform(
-            std::begin(files_),
-            std::end(files_),
-            std::back_inserter(ret),
-            [](auto const& in) { return std::make_pair(in.path_, in.size_); });
-
-        std::sort(std::begin(ret), std::end(ret), [](auto const& lhs, auto const& rhs) { return lhs.first < rhs.first; });
-
-        return ret;
     }
 
     tr_file_index_t add(std::string_view path, uint64_t file_size)
@@ -154,20 +126,6 @@ public:
     [[nodiscard]] std::optional<FoundFile> find(tr_file_index_t, std::string_view const* search_paths, size_t n_paths) const;
     [[nodiscard]] bool hasAnyLocalData(std::string_view const* search_paths, size_t n_paths) const;
 
-    static void makeSubpathPortable(std::string_view path, tr_pathbuf& append_me);
-
-    [[nodiscard]] static auto makeSubpathPortable(std::string_view path)
-    {
-        auto tmp = tr_pathbuf{};
-        makeSubpathPortable(path, tmp);
-        return std::string{ tmp.sv() };
-    }
-
-    [[nodiscard]] static bool isSubpathPortable(std::string_view path)
-    {
-        return makeSubpathPortable(path) == path;
-    }
-
     static constexpr std::string_view PartialFileSuffix = ".part";
 
 private:
@@ -176,11 +134,7 @@ private:
     public:
         void setPath(std::string_view subpath)
         {
-            if (path_ != subpath)
-            {
-                path_ = subpath;
-                path_.shrink_to_fit();
-            }
+            path_ = subpath;
         }
 
         file_t(std::string_view path, uint64_t size)

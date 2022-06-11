@@ -17,7 +17,6 @@
 #include <event2/buffer.h>
 
 #include <fmt/chrono.h>
-#include <fmt/core.h>
 #include <fmt/format.h>
 
 #include <libtransmission/transmission.h>
@@ -167,21 +166,20 @@ int parseCommandLine(app_opts& opts, int argc, char const* const* argv)
     return now == 0 ? "Unknown" : fmt::format("{:%a %b %d %T %Y}", fmt::localtime(now));
 }
 
-bool compareSecondField(std::string_view l, std::string_view r)
+bool compare_2nd_field(std::string_view const& l, std::string_view const& r)
 {
-    auto const lpos = l.find(' ');
-    if (lpos == std::string_view::npos)
+    auto l_ = l.find(" ");
+    auto r_ = r.find(" ");
+
+    if (l_ == std::string_view::npos)
     {
         return false;
     }
-
-    auto const rpos = r.find(' ');
-    if (rpos == std::string_view::npos)
+    if (r_ == std::string_view::npos)
     {
         return true;
     }
-
-    return l.substr(lpos) <= r.substr(rpos);
+    return l.substr(l_) <= r.substr(r_);
 }
 
 void showInfo(app_opts const& opts, tr_torrent_metainfo const& metainfo)
@@ -285,7 +283,7 @@ void showInfo(app_opts const& opts, tr_torrent_metainfo const& metainfo)
         {
             if (opts.show_bytesize)
             {
-                std::sort(std::begin(filenames), std::end(filenames), compareSecondField);
+                std::sort(std::begin(filenames), std::end(filenames), compare_2nd_field);
             }
             else
             {

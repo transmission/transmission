@@ -59,9 +59,6 @@
     case 2:
         priority = TR_PRI_HIGH;
         break;
-    default:
-        NSAssert1(NO, @"Unknown segment: %ld", segment);
-        return;
     }
 
     FileListNode* node = self.representedObject;

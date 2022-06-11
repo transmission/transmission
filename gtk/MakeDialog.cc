@@ -82,8 +82,6 @@ private:
     void setFilename(std::string const& filename);
 
     void makeProgressDialog(std::string const& target);
-    void configurePieceSizeScale();
-    void onPieceSizeUpdated();
 
 private:
     MakeDialog& dialog_;
@@ -94,7 +92,6 @@ private:
     Gtk::RadioButton* folder_radio_ = nullptr;
     Gtk::FileChooserButton* folder_chooser_ = nullptr;
     Gtk::Label* pieces_lb_ = nullptr;
-    Gtk::Scale* piece_size_scale_ = nullptr;
     Gtk::FileChooserButton* destination_chooser_ = nullptr;
     Gtk::CheckButton* comment_check_ = nullptr;
     Gtk::Entry* comment_entry_ = nullptr;
@@ -347,7 +344,6 @@ void MakeDialog::Impl::updatePiecesLabel()
     if (filename == nullptr)
     {
         gstr += _("No source selected");
-        piece_size_scale_->set_visible(false);
     }
     else
     {
@@ -369,14 +365,6 @@ void MakeDialog::Impl::updatePiecesLabel()
     pieces_lb_->set_markup(gstr);
 }
 
-void MakeDialog::Impl::configurePieceSizeScale()
-{
-    // the below lower & upper bounds would allow piece size selection between approx 1KiB - 16MiB
-    auto adjustment = Gtk::Adjustment::create(log2(builder_->pieceSize), 10, 24, 1.0, 1.0);
-    piece_size_scale_->set_adjustment(adjustment);
-    piece_size_scale_->set_visible(true);
-}
-
 void MakeDialog::Impl::setFilename(std::string const& filename)
 {
     builder_.reset();
@@ -384,7 +372,6 @@ void MakeDialog::Impl::setFilename(std::string const& filename)
     if (!filename.empty())
     {
         builder_ = { tr_metaInfoBuilderCreate(filename.c_str()), &tr_metaInfoBuilderFree };
-        configurePieceSizeScale();
     }
 
     updatePiecesLabel();
@@ -499,12 +486,6 @@ MakeDialog::Impl::Impl(MakeDialog& dialog, Glib::RefPtr<Session> const& core)
     pieces_lb_->set_markup(fmt::format(FMT_STRING("<i>{:s}</i>"), _("No source selected")));
     t->add_row(row, {}, *pieces_lb_);
 
-    piece_size_scale_ = Gtk::make_managed<Gtk::Scale>();
-    piece_size_scale_->set_draw_value(false);
-    piece_size_scale_->set_visible(false);
-    piece_size_scale_->signal_value_changed().connect([this]() { onPieceSizeUpdated(); });
-    t->add_row(row, _("Piece size:"), *piece_size_scale_);
-
     t->add_section_divider(row);
     t->add_section_title(row, _("Properties"));
 
@@ -549,14 +530,4 @@ MakeDialog::Impl::Impl(MakeDialog& dialog, Glib::RefPtr<Session> const& core)
     dialog_.drag_dest_set(Gtk::DEST_DEFAULT_ALL, Gdk::ACTION_COPY);
     dialog_.drag_dest_add_uri_targets();
     dialog_.signal_drag_data_received().connect(sigc::mem_fun(*this, &Impl::on_drag_data_received));
-}
-
-void MakeDialog::Impl::onPieceSizeUpdated()
-{
-    if (builder_ != nullptr)
-    {
-        auto new_size = static_cast<int>(pow(2, piece_size_scale_->get_value()));
-        tr_metaInfoBuilderSetPieceSize(builder_.get(), new_size);
-        updatePiecesLabel();
-    }
 }

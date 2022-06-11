@@ -196,53 +196,6 @@ export class PrefsDialog extends EventTarget {
     callback();
   }
 
-  static _getProtocolHandlerRegistered() {
-    return localStorage.getItem('protocol-handler-registered') === 'true';
-  }
-
-  static _updateProtocolHandlerButton(button) {
-    button.removeAttribute('disabled');
-    button.removeAttribute('title');
-
-    if (PrefsDialog._getProtocolHandlerRegistered()) {
-      button.textContent = 'Remove Browser Handler';
-      if (!('unregisterProtocolHandler' in navigator)) {
-        button.setAttribute(
-          'title',
-          'Your browser does not support removing protocol handlers. This button only allows you to re-register a handler.'
-        );
-      }
-    } else {
-      button.textContent = 'Add Browser Handler';
-      button.removeAttribute('title');
-      if (!('registerProtocolHandler' in navigator)) {
-        button.setAttribute('disabled', true);
-        button.setAttribute(
-          'title',
-          'Your browser does not support protocol handlers'
-        );
-      }
-    }
-  }
-
-  static _toggleProtocolHandler(button) {
-    const handlerUrl = new URL(window.location.href);
-    handlerUrl.search = 'addtorrent=%s';
-    if (this._getProtocolHandlerRegistered()) {
-      navigator.unregisterProtocolHandler?.('magnet', handlerUrl.toString());
-      localStorage.removeItem('protocol-handler-registered');
-      PrefsDialog._updateProtocolHandlerButton(button);
-    } else {
-      navigator.registerProtocolHandler(
-        'magnet',
-        handlerUrl.toString(),
-        'Transmission Web'
-      );
-      localStorage.setItem('protocol-handler-registered', 'true');
-      PrefsDialog._updateProtocolHandlerButton(button);
-    }
-  }
-
   static _createTorrentsPage() {
     const root = document.createElement('div');
     root.classList.add('prefs-torrents-page');
@@ -349,17 +302,6 @@ export class PrefsDialog extends EventTarget {
     PrefsDialog._enableIfChecked(input, cal.check);
     const stop_idle_input = input;
 
-    label = document.createElement('div');
-    label.textContent = 'Magnet Protocol Handler';
-    label.classList.add('section-label');
-    root.append(label);
-
-    const button = document.createElement('button');
-    button.classList.add('register-handler-button');
-    PrefsDialog._updateProtocolHandlerButton(button);
-    root.append(button);
-    const register_handler_button = button;
-
     return {
       autostart_check,
       download_dir,
@@ -367,7 +309,6 @@ export class PrefsDialog extends EventTarget {
       download_queue_input,
       incomplete_dir_check,
       incomplete_dir_input,
-      register_handler_button,
       root,
       stop_idle_check,
       stop_idle_input,
@@ -780,12 +721,6 @@ export class PrefsDialog extends EventTarget {
         setTextContent(event_.target, 'Updating blocklist...');
         this.remote.updateBlocklist();
         this._setBlocklistButtonEnabled(false);
-      }
-    );
-    this.elements.torrents.register_handler_button.addEventListener(
-      'click',
-      (event_) => {
-        PrefsDialog._toggleProtocolHandler(event_.currentTarget);
       }
     );
     this.outside = new OutsideClickListener(this.elements.root);
