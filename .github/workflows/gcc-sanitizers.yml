@@ -17,6 +17,7 @@ env:
   GTEST_OUTPUT: xml:./
 jobs:
   sanitizer-tests-gcc:
+    runs-on: ubuntu-22.04
     steps:
       - uses: ./.github/workflows/checkout-and-configure-ubuntu.yml
         with:
