@@ -45,6 +45,7 @@ set(PROJECT_FILES
   platform-quota.cc
   platform.cc
   port-forwarding.cc
+  ptrarray.cc
   quark.cc
   resume.cc
   rpc-server.cc
@@ -186,6 +187,7 @@ set(${PROJECT_NAME}_PRIVATE_HEADERS
     platform-quota.h
     platform.h
     port-forwarding.h
+    ptrarray.h
     resume.h
     rpc-server.h
     session.h
