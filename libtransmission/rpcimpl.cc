@@ -1690,12 +1690,13 @@ static char const* torrentAdd(tr_session* session, tr_variant* args_in, tr_varia
         }
         else
         {
-            // these two tr_ctorSet*() functions require zero-terminated strings
-            auto const filename_sz = std::string{ filename };
-
-            if (!tr_ctorSetMetainfoFromFile(ctor, filename_sz.c_str(), nullptr))
+            if (tr_sys_path_exists(tr_pathbuf{ filename }))
             {
-                tr_ctorSetMetainfoFromMagnetLink(ctor, filename_sz.c_str(), nullptr);
+                tr_ctorSetMetainfoFromFile(ctor, filename);
+            }
+            else
+            {
+                tr_ctorSetMetainfoFromMagnetLink(ctor, filename);
             }
         }
 
