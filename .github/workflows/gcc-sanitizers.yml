@@ -1,0 +1,25 @@
+name: g++ sanitizer tests
+on:
+  push:
+    paths:
+      - CMakeLists.txt
+      - libtransmission/**
+      - tests/**
+      - utils/**
+  pull_request:
+    types: [opened, reopened]
+    paths:
+      - CMakeLists.txt
+      - libtransmission/**
+      - tests/**
+      - utils/**
+env:
+  GTEST_OUTPUT: xml:./
+jobs:
+  test-sanitizer-g++:
+    uses: ./.github/workflows/sanitizer-tests.yml
+    with:
+      c: gcc
+      cxx: g++
+      compiler_package_name: g++
+      sanitizers: address,pointer-compare,pointer-subtract,leak,undefined
