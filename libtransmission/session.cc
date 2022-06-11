@@ -370,7 +370,7 @@ void tr_sessionGetDefaultSettings(tr_variant* d)
     tr_variantDictAddBool(d, TR_KEY_rpc_host_whitelist_enabled, true);
     tr_variantDictAddInt(d, TR_KEY_rpc_port, TR_DEFAULT_RPC_PORT);
     tr_variantDictAddStrView(d, TR_KEY_rpc_url, TR_DEFAULT_RPC_URL_STR);
-    tr_variantDictAddStr(d, TR_KEY_rpc_socket_mode, fmt::format("{:#o}", tr_rpc_server::DefaultRpcSocketMode));
+    tr_variantDictAddStr(d, TR_KEY_rpc_socket_mode, fmt::format("{:03o}", tr_rpc_server::DefaultRpcSocketMode));
     tr_variantDictAddBool(d, TR_KEY_scrape_paused_torrents_enabled, true);
     tr_variantDictAddStrView(d, TR_KEY_script_torrent_added_filename, "");
     tr_variantDictAddBool(d, TR_KEY_script_torrent_added_enabled, false);
@@ -389,7 +389,7 @@ void tr_sessionGetDefaultSettings(tr_variant* d)
     tr_variantDictAddInt(d, TR_KEY_alt_speed_time_day, TR_SCHED_ALL);
     tr_variantDictAddInt(d, TR_KEY_speed_limit_up, 100);
     tr_variantDictAddBool(d, TR_KEY_speed_limit_up_enabled, false);
-    tr_variantDictAddStr(d, TR_KEY_umask, fmt::format("{:#o}", DefaultUmask));
+    tr_variantDictAddStr(d, TR_KEY_umask, fmt::format("{:03o}", DefaultUmask));
     tr_variantDictAddInt(d, TR_KEY_upload_slots_per_torrent, 14);
     tr_variantDictAddStrView(d, TR_KEY_bind_address_ipv4, TR_DEFAULT_BIND_ADDRESS_IPV4);
     tr_variantDictAddStrView(d, TR_KEY_bind_address_ipv6, TR_DEFAULT_BIND_ADDRESS_IPV6);
