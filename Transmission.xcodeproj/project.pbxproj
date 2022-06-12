@@ -3579,6 +3579,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_ARC = NO;
+				CLANG_WARN_UNREACHABLE_CODE = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
+				GCC_WARN_UNUSED_FUNCTION = NO;
 				HEADER_SEARCH_PATHS = "third-party/libevent/include";
 				OTHER_CFLAGS = "-DHAVE_CONFIG_H";
 				PRODUCT_NAME = event;
@@ -3774,6 +3777,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_ARC = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
 				OTHER_CFLAGS = "-DENABLE_STRNATPMPERR";
 				PRODUCT_NAME = natpmp;
 			};
@@ -3783,6 +3787,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_ARC = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
 				OTHER_CFLAGS = "-DENABLE_STRNATPMPERR";
 				PRODUCT_NAME = natpmp;
 			};
@@ -3792,6 +3797,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_ARC = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
 				OTHER_CFLAGS = "-DENABLE_STRNATPMPERR";
 				PRODUCT_NAME = natpmp;
 			};
@@ -3943,6 +3949,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_ARC = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
 				OTHER_CFLAGS = "$(inherited)";
 				OTHER_CPLUSPLUSFLAGS = "$(inherited)";
 				PRODUCT_NAME = dht;
@@ -3953,6 +3960,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_ARC = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
 				OTHER_CFLAGS = "$(inherited)";
 				OTHER_CPLUSPLUSFLAGS = "$(inherited)";
 				PRODUCT_NAME = dht;
@@ -3963,6 +3971,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_ARC = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
 				OTHER_CFLAGS = "$(inherited)";
 				OTHER_CPLUSPLUSFLAGS = "$(inherited)";
 				PRODUCT_NAME = dht;
@@ -4158,6 +4167,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_ARC = NO;
+				CLANG_WARN_UNREACHABLE_CODE = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
+				GCC_WARN_UNUSED_FUNCTION = NO;
 				HEADER_SEARCH_PATHS = "third-party/libevent/include";
 				OTHER_CFLAGS = "-DHAVE_CONFIG_H";
 				PRODUCT_NAME = event;
@@ -4169,6 +4181,7 @@
 			buildSettings = {
 				CLANG_ENABLE_OBJC_ARC = NO;
 				GCC_PREPROCESSOR_DEFINITIONS = POSIX;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
 				PRODUCT_NAME = utp;
 			};
 			name = Debug;
@@ -4178,6 +4191,7 @@
 			buildSettings = {
 				CLANG_ENABLE_OBJC_ARC = NO;
 				GCC_PREPROCESSOR_DEFINITIONS = POSIX;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
 				PRODUCT_NAME = utp;
 			};
 			name = "Release - Debug";
@@ -4190,6 +4204,7 @@
 					POSIX,
 					NS_BLOCK_ASSERTIONS,
 				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
 				PRODUCT_NAME = utp;
 			};
 			name = Release;
@@ -4267,6 +4282,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_ARC = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
 				PRODUCT_NAME = miniupnp;
 			};
 			name = Release;
@@ -4275,6 +4291,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_ARC = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
 				PRODUCT_NAME = miniupnp;
 			};
 			name = "Release - Debug";
@@ -4283,6 +4300,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_ARC = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
 				PRODUCT_NAME = miniupnp;
 			};
 			name = Debug;
@@ -4291,6 +4309,9 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_ARC = NO;
+				CLANG_WARN_UNREACHABLE_CODE = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
+				GCC_WARN_UNUSED_FUNCTION = NO;
 				HEADER_SEARCH_PATHS = "third-party/libevent/include";
 				OTHER_CFLAGS = "-DHAVE_CONFIG_H";
 				PRODUCT_NAME = event;
@@ -4342,6 +4363,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_ARC = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
@@ -4350,6 +4372,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_ARC = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = "Release - Debug";
@@ -4358,6 +4381,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_ARC = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
@@ -4390,6 +4414,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_ARC = NO;
+				CLANG_WARN_UNREACHABLE_CODE = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
 				HEADER_SEARCH_PATHS = "third-party/libdeflate";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -4399,6 +4425,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_ARC = NO;
+				CLANG_WARN_UNREACHABLE_CODE = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
 				HEADER_SEARCH_PATHS = "third-party/libdeflate";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -4408,6 +4436,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_ENABLE_OBJC_ARC = NO;
+				CLANG_WARN_UNREACHABLE_CODE = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = NO;
 				HEADER_SEARCH_PATHS = "third-party/libdeflate";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -4416,6 +4446,7 @@
 		C3D9062327B7E3C900EF2386 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_WARN_COMMA = NO;
 				GCC_PREPROCESSOR_DEFINITIONS_NOT_USED_IN_PRECOMPS = "PACKAGE_VERSION=\"\\\"0\\\"\"";
 				HEADER_SEARCH_PATHS = "third-party/libpsl/include";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -4425,6 +4456,7 @@
 		C3D9062427B7E3C900EF2386 /* Release - Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_WARN_COMMA = NO;
 				GCC_PREPROCESSOR_DEFINITIONS_NOT_USED_IN_PRECOMPS = "PACKAGE_VERSION=\"\\\"0\\\"\"";
 				HEADER_SEARCH_PATHS = "third-party/libpsl/include";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -4434,6 +4466,7 @@
 		C3D9062527B7E3C900EF2386 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_WARN_COMMA = NO;
 				GCC_PREPROCESSOR_DEFINITIONS_NOT_USED_IN_PRECOMPS = "PACKAGE_VERSION=\"\\\"0\\\"\"";
 				HEADER_SEARCH_PATHS = "third-party/libpsl/include";
 				PRODUCT_NAME = "$(TARGET_NAME)";
