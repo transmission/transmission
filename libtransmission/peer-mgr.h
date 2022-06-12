@@ -154,6 +154,9 @@ void tr_peerMgrAddTorrent(tr_peerMgr* manager, struct tr_torrent* tor);
 
 void tr_peerMgrRemoveTorrent(tr_torrent* tor);
 
+// return the number of connected peers that have `piece`, or -1 if we already have it
+int8_t tr_peerMgrPieceAvailability(tr_torrent const* tor, tr_piece_index_t piece);
+
 void tr_peerMgrTorrentAvailability(tr_torrent const* tor, int8_t* tab, unsigned int tabCount);
 
 uint64_t tr_peerMgrGetDesiredAvailable(tr_torrent const* tor);

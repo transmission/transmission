@@ -196,7 +196,7 @@ void tr_magnet_metainfo::addWebseed(std::string_view webseed)
         return;
     }
 
-    urls.emplace_back(std::string{ webseed });
+    urls.emplace_back(webseed);
 }
 
 bool tr_magnet_metainfo::parseMagnet(std::string_view magnet_link, tr_error** error)
