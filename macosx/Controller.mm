@@ -3100,7 +3100,26 @@ static void removeKeRangerRansomware()
     popover.delegate = self;
 
     NSView* senderView = sender;
-    [popover showRelativeToRect:senderView.frame ofView:senderView preferredEdge:NSMaxYEdge];
+    NSRectEdge edge;
+    // Show popover on the right if window is almost touching left edge.
+    if (NSMinX(self.fWindow.frame) < NSWidth(senderView.frame))
+    {
+        edge = NSMaxXEdge;
+    }
+    else
+    {
+        edge = NSMaxYEdge;
+    }
+    NSRect rect = senderView.frame;
+    CGFloat width = NSWidth(rect);
+    CGFloat height = NSHeight(rect);
+    CGFloat diff = abs(width - height);
+    // Make popover target rect a centered square inside view
+    rect.origin.x = diff / 2;
+    rect.origin.y = 0;
+    rect.size.width = height;
+
+    [popover showRelativeToRect:rect ofView:senderView preferredEdge:edge];
 }
 
 //don't show multiple popovers when clicking the gear button repeatedly
