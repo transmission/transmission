@@ -1912,10 +1912,10 @@ void tr_torrentSetFileDLs(tr_torrent* tor, tr_file_index_t const* files, tr_file
 void tr_torrent::setLabels(std::vector<tr_quark> const& new_labels)
 {
     auto const lock = unique_lock();
-    this->labels = std::vector<tr_quark>{};
+    this->labels.clear();
 
     for (auto l : new_labels) {
-            if (std::find(this->labels.begin(), this->labels.end(), l) == this->labels.end()) {
+            if (std::find(std::begin(this->labels), std::end(this->labels), l) == std::end(this->labels)) {
                     this->labels.push_back(l);
             }
     }
