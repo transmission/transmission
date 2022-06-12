@@ -26,6 +26,7 @@
 
 #include "announce-list.h"
 #include "bandwidth.h"
+#include "cache.h"
 #include "interned-string.h"
 #include "net.h" // tr_socket_t
 #include "open-files.h"
@@ -54,7 +55,6 @@ struct tr_announcer;
 struct tr_announcer_udp;
 struct tr_bindsockets;
 struct BlocklistFile;
-struct tr_cache;
 struct tr_fdInfo;
 
 struct tr_bindinfo
@@ -296,60 +296,60 @@ public:
             TR_SCRIPT_ON_TORRENT_DONE_SEEDING } }
     };
 
-    bool isPortRandom;
-    bool isPexEnabled;
-    bool isDHTEnabled;
-    bool isUTPEnabled;
-    bool isLPDEnabled;
-    bool isPrefetchEnabled;
+    bool isPortRandom = false;
+    bool isPexEnabled = false;
+    bool isDHTEnabled = false;
+    bool isUTPEnabled = false;
+    bool isLPDEnabled = false;
+    bool isPrefetchEnabled = false;
     bool is_closing_ = false;
-    bool isClosed;
-    bool isRatioLimited;
-    bool isIdleLimited;
-    bool isIncompleteFileNamingEnabled;
-    bool pauseAddedTorrent;
-    bool deleteSourceTorrent;
-    bool scrapePausedTorrents;
+    bool isClosed = false;
+    bool isRatioLimited = false;
+    bool isIdleLimited = false;
+    bool isIncompleteFileNamingEnabled = false;
+    bool pauseAddedTorrent = false;
+    bool deleteSourceTorrent = false;
+    bool scrapePausedTorrents = false;
 
-    uint8_t peer_id_ttl_hours;
+    uint8_t peer_id_ttl_hours = 0;
 
-    bool stalledEnabled;
-    bool queueEnabled[2];
-    int queueSize[2];
-    int queueStalledMinutes;
+    bool stalledEnabled = false;
+    bool queueEnabled[2] = { false, false };
+    int queueSize[2] = { 0, 0 };
+    int queueStalledMinutes = 0;
 
-    int umask;
+    int umask = 0;
 
-    unsigned int speedLimit_Bps[2];
-    bool speedLimitEnabled[2];
+    unsigned int speedLimit_Bps[2] = { 0, 0 };
+    bool speedLimitEnabled[2] = { false, false };
 
     struct tr_turtle_info turtle;
 
-    int magicNumber;
+    int magicNumber = 0;
 
     tr_encryption_mode encryptionMode;
 
     tr_preallocation_mode preallocationMode;
 
-    struct event_base* event_base;
-    struct evdns_base* evdns_base;
-    struct tr_event_handle* events;
+    struct event_base* event_base = nullptr;
+    struct evdns_base* evdns_base = nullptr;
+    struct tr_event_handle* events = nullptr;
 
     uint16_t peerCount = 0;
     uint16_t peerLimit = 200;
     uint16_t peerLimitPerTorrent = 50;
 
-    int uploadSlotsPerTorrent;
+    int uploadSlotsPerTorrent = 0;
 
     /* The UDP sockets used for the DHT and uTP. */
     tr_port udp_port;
     tr_socket_t udp_socket = TR_BAD_SOCKET;
     tr_socket_t udp6_socket = TR_BAD_SOCKET;
-    unsigned char* udp6_bound;
-    struct event* udp_event;
-    struct event* udp6_event;
+    unsigned char* udp6_bound = nullptr;
+    struct event* udp_event = nullptr;
+    struct event* udp6_event = nullptr;
 
-    struct event* utp_timer;
+    struct event* utp_timer = nullptr;
 
     /* The open port on the local machine for incoming peer requests */
     tr_port private_peer_port;
@@ -380,10 +380,10 @@ public:
     std::string torrent_dir;
 
     std::vector<std::unique_ptr<BlocklistFile>> blocklists;
-    struct tr_peerMgr* peerMgr;
-    struct tr_shared* shared;
+    struct tr_peerMgr* peerMgr = nullptr;
+    struct tr_shared* shared = nullptr;
 
-    struct tr_cache* cache;
+    std::unique_ptr<Cache> cache;
 
     class WebMediator final : public tr_web::Mediator
     {
