@@ -23,7 +23,6 @@
 
 #include "crypto-utils.h" // tr_rand_int_weak()
 #include "platform.h"
-#include "ptrarray.h"
 #include "tr-strbuf.h"
 #include "utils.h"
 
