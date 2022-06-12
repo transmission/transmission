@@ -1,5 +1,5 @@
 name: sanitizer-test-clang
-on: 
+on:
   push:
     paths:
       - CMakeLists.txt
@@ -16,7 +16,7 @@ on:
 env:
   GTEST_OUTPUT: xml:./
 jobs:
-  sanitizer-test-clang
+  sanitizer-test-clang:
     runs-on: ubuntu-22.04
     steps:
       - name: Prepare
