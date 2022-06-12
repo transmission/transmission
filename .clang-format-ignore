@@ -3,6 +3,7 @@
 # untracked files
 .*/*
 build/*
+cmake-build-*/*
 libtransmission/version.h
 web/node_modules/*
 
