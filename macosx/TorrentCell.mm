@@ -16,10 +16,10 @@
 #define IMAGE_SIZE_MIN 16.0
 #define ERROR_IMAGE_SIZE 20.0
 
-#define GROUP_IMAGE_SIZE_REG 16.0
-#define GROUP_IMAGE_SIZE_MIN 10.0
-#define GROUP_PADDING_REG 32.0
-#define GROUP_PADDING_MIN 16.0
+#define GROUP_IMAGE_SIZE_REG 10.0
+#define GROUP_IMAGE_SIZE_MIN 6.0
+#define GROUP_PADDING_REG 22.0
+#define GROUP_PADDING_MIN 14.0
 
 #define NORMAL_BUTTON_WIDTH 14.0
 #define ACTION_BUTTON_WIDTH 16.0
@@ -319,7 +319,7 @@
     {
         NSRect groupRect = [self groupIconRectForBounds:iconRect];
         NSColor* groupColor = [GroupsController.groups colorForIndex:groupValue];
-        NSImage* icon = [NSImage discIconWithColor:groupColor insetFactor:0.4];
+        NSImage* icon = [NSImage discIconWithColor:groupColor insetFactor:0];
         [icon drawInRect:groupRect fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:1.0f];
     }
 
@@ -855,9 +855,9 @@
 {
     BOOL const minimal = [self.fDefaults boolForKey:@"SmallView"];
     CGFloat const imageSize = minimal ? GROUP_IMAGE_SIZE_MIN : GROUP_IMAGE_SIZE_REG;
-    CGFloat const padding = minimal ? GROUP_PADDING_MIN + 2.5 : GROUP_PADDING_REG + 1.0;
+    CGFloat const padding = minimal ? GROUP_PADDING_MIN + 2 : GROUP_PADDING_REG + 1.5;
 
-    return NSMakeRect(NSMidX(bounds) - padding, NSMidY(bounds) - imageSize * 0.5, imageSize, imageSize);
+    return NSMakeRect(NSMinX(bounds) - padding * 0.5, NSMidY(bounds) - imageSize * 0.5, imageSize, imageSize);
 }
 
 - (NSAttributedString*)attributedTitle
