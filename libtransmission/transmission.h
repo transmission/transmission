@@ -696,7 +696,7 @@ void tr_sessionSetQueueStalledEnabled(tr_session*, bool);
 bool tr_sessionGetQueueStalledEnabled(tr_session const*);
 
 /** @brief Set a callback that is invoked when the queue starts a torrent */
-void tr_sessionSetQueueStartCallback(tr_torrent* torrent, void (*callback)(tr_session*, tr_torrent*, void*), void* user_data);
+void tr_sessionSetQueueStartCallback(tr_session*, void (*callback)(tr_session*, tr_torrent*, void*), void* user_data);
 
 /***
 ****
@@ -1218,7 +1218,7 @@ void tr_sessionSetMetadataCallback(tr_session* session, tr_session_metadata_func
  *
  * Has the same restrictions as tr_sessionSetCompletenessCallback
  */
-void tr_sessionSetRatioLimitHitCallback(tr_torrent* torrent, tr_session_ratio_limit_hit_func func, void* user_data);
+void tr_sessionSetRatioLimitHitCallback(tr_session* torrent, tr_session_ratio_limit_hit_func func, void* user_data);
 
 /**
  * Register to be notified whenever a torrent's idle limit
@@ -1227,7 +1227,7 @@ void tr_sessionSetRatioLimitHitCallback(tr_torrent* torrent, tr_session_ratio_li
  *
  * Has the same restrictions as tr_sessionSetCompletenessCallback
  */
-void tr_sessionSetIdleLimitHitCallback(tr_torrent* torrent, tr_session_idle_limit_hit_func func, void* user_data);
+void tr_sessionSetIdleLimitHitCallback(tr_session* torrent, tr_session_idle_limit_hit_func func, void* user_data);
 
 /**
  * MANUAL ANNOUNCE

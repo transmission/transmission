@@ -399,11 +399,11 @@ void onMetadataCompleted(tr_session* session, tr_torrent* tor, void* vself)
     auto* torrent = [controller torrentForHash:hashstr];
 
     dispatch_async(dispatch_get_main_queue(), ^{
-        [torrent mmm];
+        [torrent metadataRetrieved];
     });
 }
 
-void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool wasRunning, void* user_data)
+void onTorrentCompletenessChanged(tr_torrent* tor, tr_completeness status, bool wasRunning, void* vself)
 {
     auto* controller = (__bridge Controller*)(vself);
     auto const hashstr = @(tr_torrentView(tor).hash_string);
