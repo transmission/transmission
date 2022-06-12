@@ -196,6 +196,7 @@ The 'source' column here corresponds to the data structure there.
 |:--|:--|:--
 | `activityDate` | number | tr_stat
 | `addedDate` | number | tr_stat
+| `availability` | array (see below)| tr_torrentAvailability()
 | `bandwidthPriority` | number | tr_priority_t
 | `comment` | string | tr_torrent_view
 | `corruptEver`| number | tr_stat
@@ -270,6 +271,7 @@ The 'source' column here corresponds to the data structure there.
 | `webseeds`| array of strings | tr_tracker_view
 | `webseedsSendingToUs`| number| tr_stat
 
+`availability`: An array of `pieceCount` numbers representing the number of connected peers that have each piece, or -1 if we already have the piece ourselves.
 
 `files`: array of objects, each containing:
 
@@ -969,6 +971,7 @@ Transmission 4.0.0 (`rpc-version-semver` 5.3.0, `rpc-version`: 17)
 | `session-get` | new arg `script-torrent-done-seeding-enabled`
 | `session-get` | new arg `script-torrent-done-seeding-filename`
 | `torrent-add` | new arg `labels`
+| `torrent-get` | new arg `availability`
 | `torrent-get` | new arg `file-count`
 | `torrent-get` | new arg `group`
 | `torrent-get` | new arg `percentComplete`
