@@ -316,7 +316,7 @@ public:
         {
             auto const len = evbuffer_get_length(buf);
             TR_ASSERT(tor->blockSize(this->loc.block) == len);
-            tr_cacheWriteBlock(tor->session->cache, tor, this->loc, len, buf);
+            tor->session->cache->writeBlock(tor, this->loc, len, buf);
             webseed->publishGotBlock(tor, this->loc);
             TR_ASSERT(evbuffer_get_length(buf) == 0);
         }
