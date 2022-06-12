@@ -246,6 +246,7 @@ set(${PROJECT_NAME}_HIDPI_IMAGES
     CreateLarge
     DownArrowGroupTemplate
     DownArrowTemplate
+    EllipsisTemplate
     FavIcon
     GearshapeTemplate
     Globe

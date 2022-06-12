@@ -21,7 +21,6 @@
 		3C7A11980D0B2EE300B5701F /* getgateway.h in Headers */ = {isa = PBXBuildFile; fileRef = 3C7A11920D0B2EE300B5701F /* getgateway.h */; };
 		3C7A11990D0B2EE300B5701F /* natpmp.c in Sources */ = {isa = PBXBuildFile; fileRef = 3C7A11930D0B2EE300B5701F /* natpmp.c */; };
 		3C7A119A0D0B2EE300B5701F /* natpmp.h in Headers */ = {isa = PBXBuildFile; fileRef = 3C7A11940D0B2EE300B5701F /* natpmp.h */; };
-		4394AC670C74FB6000F367E8 /* ptrarray.cc in Sources */ = {isa = PBXBuildFile; fileRef = 4394AC640C74FB6000F367E8 /* ptrarray.cc */; };
 		456B90D02855332F000D4D80 /* ControllerWindowMethods.mm in Sources */ = {isa = PBXBuildFile; fileRef = 456B90CE2855332F000D4D80 /* ControllerWindowMethods.mm */; };
 		45A6DE80284D1F2A0088D134 /* MainWindow.mm in Sources */ = {isa = PBXBuildFile; fileRef = 45A6DE7F284D1F2A0088D134 /* MainWindow.mm */; };
 		45A7D3292843B54D00F0C32A /* GroupPopUpButtonCell.mm in Sources */ = {isa = PBXBuildFile; fileRef = 45A7D3282843B54D00F0C32A /* GroupPopUpButtonCell.mm */; };
@@ -40,7 +39,6 @@
 		4D36BA780CA2F00800A63CA5 /* peer-mgr.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D36BA690CA2F00800A63CA5 /* peer-mgr.h */; };
 		4D36BA790CA2F00800A63CA5 /* peer-msgs.cc in Sources */ = {isa = PBXBuildFile; fileRef = 4D36BA6A0CA2F00800A63CA5 /* peer-msgs.cc */; };
 		4D36BA7A0CA2F00800A63CA5 /* peer-msgs.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D36BA6B0CA2F00800A63CA5 /* peer-msgs.h */; };
-		4D36BA7B0CA2F00800A63CA5 /* ptrarray.h in Headers */ = {isa = PBXBuildFile; fileRef = 4D36BA6C0CA2F00800A63CA5 /* ptrarray.h */; };
 		4D3EA0AA08AE13C600EA10C2 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4D3EA0A908AE13C600EA10C2 /* IOKit.framework */; };
 		4D4ADFC70DA1631500A68297 /* blocklist.cc in Sources */ = {isa = PBXBuildFile; fileRef = A2D3078E0D9EC45F0051FD27 /* blocklist.cc */; };
 		4D8017EA10BBC073008A4AF2 /* torrent-magnet.cc in Sources */ = {isa = PBXBuildFile; fileRef = 4D8017E810BBC073008A4AF2 /* torrent-magnet.cc */; };
@@ -620,7 +618,6 @@
 		3C7A11920D0B2EE300B5701F /* getgateway.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = getgateway.h; sourceTree = "<group>"; };
 		3C7A11930D0B2EE300B5701F /* natpmp.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = natpmp.c; sourceTree = "<group>"; };
 		3C7A11940D0B2EE300B5701F /* natpmp.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = natpmp.h; sourceTree = "<group>"; };
-		4394AC640C74FB6000F367E8 /* ptrarray.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ptrarray.cc; sourceTree = "<group>"; };
 		456B90CE2855332F000D4D80 /* ControllerWindowMethods.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ControllerWindowMethods.mm; sourceTree = "<group>"; };
 		456B90CF2855332F000D4D80 /* ControllerWindowMethods.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ControllerWindowMethods.h; sourceTree = "<group>"; };
 		45A6DE7E284D1F2A0088D134 /* MainWindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MainWindow.h; sourceTree = "<group>"; };
@@ -645,7 +642,6 @@
 		4D36BA690CA2F00800A63CA5 /* peer-mgr.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "peer-mgr.h"; sourceTree = "<group>"; };
 		4D36BA6A0CA2F00800A63CA5 /* peer-msgs.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "peer-msgs.cc"; sourceTree = "<group>"; };
 		4D36BA6B0CA2F00800A63CA5 /* peer-msgs.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "peer-msgs.h"; sourceTree = "<group>"; };
-		4D36BA6C0CA2F00800A63CA5 /* ptrarray.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ptrarray.h; sourceTree = "<group>"; };
 		4D3EA0A908AE13C600EA10C2 /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = System/Library/Frameworks/IOKit.framework; sourceTree = SDKROOT; };
 		4D8017E810BBC073008A4AF2 /* torrent-magnet.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "torrent-magnet.cc"; sourceTree = "<group>"; };
 		4D8017E910BBC073008A4AF2 /* torrent-magnet.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "torrent-magnet.h"; sourceTree = "<group>"; };
@@ -1688,10 +1684,8 @@
 				A292A6E40DFB45E5004B9C0A /* peer-common.h */,
 				A292A6E50DFB45EC004B9C0A /* webseed.cc */,
 				A292A6E60DFB45EC004B9C0A /* webseed.h */,
-				4D36BA6C0CA2F00800A63CA5 /* ptrarray.h */,
 				A24621350C769CF400088E81 /* trevent.h */,
 				A24621360C769CF400088E81 /* trevent.cc */,
-				4394AC640C74FB6000F367E8 /* ptrarray.cc */,
 				A2BE9C4E0C1E4ADA002D16E6 /* makemeta.cc */,
 				A2BE9C4F0C1E4ADA002D16E6 /* makemeta.h */,
 				BEFC1DF00C07861A00B0BB3C /* version.h */,
@@ -2208,7 +2202,6 @@
 				4D36BA750CA2F00800A63CA5 /* peer-io.h in Headers */,
 				4D36BA780CA2F00800A63CA5 /* peer-mgr.h in Headers */,
 				4D36BA7A0CA2F00800A63CA5 /* peer-msgs.h in Headers */,
-				4D36BA7B0CA2F00800A63CA5 /* ptrarray.h in Headers */,
 				C11DEA171FCD31C0009E22B9 /* subprocess.h in Headers */,
 				A25D2CBE0CF4C73E0096A262 /* stats.h in Headers */,
 				C1033E0A1A3279B800EF44D8 /* crypto-utils.h in Headers */,
@@ -2959,7 +2952,6 @@
 				BEFC1E560C07861A00B0BB3C /* completion.cc in Sources */,
 				BEFC1E580C07861A00B0BB3C /* clients.cc in Sources */,
 				A2BE9C520C1E4AF5002D16E6 /* makemeta.cc in Sources */,
-				4394AC670C74FB6000F367E8 /* ptrarray.cc in Sources */,
 				A24621420C769D0900088E81 /* trevent.cc in Sources */,
 				C11DEA161FCD31C0009E22B9 /* subprocess-posix.cc in Sources */,
 				4D36BA6F0CA2F00800A63CA5 /* crypto.cc in Sources */,
