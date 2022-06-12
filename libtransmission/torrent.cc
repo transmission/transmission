@@ -714,7 +714,7 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
     tor->finishedSeedingByIdle = false;
 
     auto const& labels = tr_ctorGetLabels(ctor);
-    tor->setLabels(std::data(labels), std::size(labels));
+    tor->setLabels(labels);
 
     tor->uniqueId = session->torrents().add(tor);
 
@@ -1909,13 +1909,14 @@ void tr_torrentSetFileDLs(tr_torrent* tor, tr_file_index_t const* files, tr_file
 ****
 ***/
 
-void tr_torrent::setLabels(tr_quark const* new_labels, size_t n_labels)
+void tr_torrent::setLabels(std::vector<tr_quark> const& new_labels)
 {
     auto const lock = unique_lock();
     this->labels = std::vector<tr_quark>{};
-    for (size_t i = 0; i < n_labels; i++) {
-            if (std::find(this->labels.begin(), this->labels.end(), new_labels[i]) == this->labels.end()) {
-                    this->labels.push_back(new_labels[i]);
+
+    for (auto l : new_labels) {
+            if (std::find(this->labels.begin(), this->labels.end(), l) == this->labels.end()) {
+                    this->labels.push_back(l);
             }
     }
     this->labels.shrink_to_fit();
