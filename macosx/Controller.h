@@ -185,4 +185,70 @@ typedef NS_ENUM(unsigned int, addType) { //
 - (void)rpcMovedTorrent:(Torrent*)torrent;
 - (void)rpcUpdateQueue;
 
+@property(nonatomic) IBOutlet MainWindow* fWindow;
+@property(nonatomic) IBOutlet TorrentTableView* fTableView;
+
+@property(nonatomic) IBOutlet NSMenuItem* fOpenIgnoreDownloadFolder;
+@property(nonatomic) IBOutlet NSButton* fActionButton;
+@property(nonatomic) IBOutlet NSButton* fSpeedLimitButton;
+@property(nonatomic) IBOutlet NSButton* fClearCompletedButton;
+@property(nonatomic) IBOutlet NSTextField* fTotalTorrentsField;
+@property(nonatomic) IBOutlet NSMenuItem* fNextFilterItem;
+
+@property(nonatomic) IBOutlet NSMenuItem* fNextInfoTabItem;
+@property(nonatomic) IBOutlet NSMenuItem* fPrevInfoTabItem;
+
+@property(nonatomic) IBOutlet NSMenu* fSortMenu;
+
+@property(nonatomic) IBOutlet NSMenu* fGroupsSetMenu;
+@property(nonatomic) IBOutlet NSMenu* fGroupsSetContextMenu;
+
+@property(nonatomic) IBOutlet NSMenu* fShareMenu;
+@property(nonatomic) IBOutlet NSMenu* fShareContextMenu;
+@property(nonatomic) IBOutlet NSMenuItem* fShareMenuItem; // remove when dropping 10.6
+@property(nonatomic) IBOutlet NSMenuItem* fShareContextMenuItem; // remove when dropping 10.6
+
+@property(nonatomic, readonly) tr_session* fLib;
+
+@property(nonatomic, readonly) NSMutableArray<Torrent*>* fTorrents;
+@property(nonatomic, readonly) NSMutableArray* fDisplayedTorrents;
+@property(nonatomic, readonly) NSMutableDictionary<NSString*, Torrent*>* fTorrentHashes;
+
+@property(nonatomic, readonly) InfoWindowController* fInfoController;
+@property(nonatomic) MessageWindowController* fMessageController;
+
+@property(nonatomic, readonly) NSUserDefaults* fDefaults;
+
+@property(nonatomic, readonly) NSString* fConfigDirectory;
+
+@property(nonatomic) DragOverlayWindow* fOverlayWindow;
+
+@property(nonatomic) io_connect_t fRootPort;
+@property(nonatomic) NSTimer* fTimer;
+
+@property(nonatomic) StatusBarController* fStatusBar;
+
+@property(nonatomic) FilterBarController* fFilterBar;
+
+@property(nonatomic) QLPreviewPanel* fPreviewPanel;
+@property(nonatomic) BOOL fQuitting;
+@property(nonatomic) BOOL fQuitRequested;
+@property(nonatomic, readonly) BOOL fPauseOnLaunch;
+
+@property(nonatomic) Badger* fBadger;
+
+@property(nonatomic) NSMutableArray<NSString*>* fAutoImportedNames;
+@property(nonatomic) NSTimer* fAutoImportTimer;
+
+@property(nonatomic) NSMutableDictionary<NSURL*, id>* fPendingTorrentDownloads;
+
+@property(nonatomic) NSMutableSet<Torrent*>* fAddingTransfers;
+
+@property(nonatomic) NSMutableSet<NSWindowController*>* fAddWindows;
+@property(nonatomic) URLSheetWindowController* fUrlSheetController;
+
+@property(nonatomic) BOOL fGlobalPopoverShown;
+@property(nonatomic) BOOL fSoundPlaying;
+@property(nonatomic) id fNoNapActivity;
+
 @end

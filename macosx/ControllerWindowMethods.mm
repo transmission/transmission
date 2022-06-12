@@ -208,10 +208,7 @@
         CGFloat height = (GROUP_SEPARATOR_HEIGHT + self.fTableView.intercellSpacing.height) * groups +
             (self.fTableView.rowHeight + self.fTableView.intercellSpacing.height) * (self.fTableView.numberOfRows - groups);
 
-        if (height > 0)
-        {
-            return height;
-        }
+        return height;
     }
 
     return NSHeight(self.fTableView.enclosingScrollView.frame);
@@ -219,8 +216,8 @@
 
 - (CGFloat)minWindowContentSizeAllowed
 {
-    CGFloat contentMinHeight = NSHeight(self.fWindow.contentView.frame) - NSHeight(self.fTableView.enclosingScrollView.frame) +
-        self.fTableView.rowHeight + self.fTableView.intercellSpacing.height;
+    CGFloat contentMinHeight = self.fTableView.rowHeight + self.fTableView.intercellSpacing.height +
+        self.mainWindowComponentHeight + BOTTOM_BAR_HEIGHT;
     return contentMinHeight;
 }
 
