@@ -136,27 +136,27 @@ public:
     explicit Prefs(QString config_dir);
     ~Prefs() override;
 
-    bool isCore(int key) const
+    [[nodiscard]] constexpr auto isCore(int key) const noexcept
     {
         return FIRST_CORE_PREF <= key && key <= LAST_CORE_PREF;
     }
 
-    bool isClient(int key) const
+    [[nodiscard]] constexpr auto isClient(int key) const noexcept
     {
         return !isCore(key);
     }
 
-    tr_quark getKey(int i) const
+    [[nodiscard]] constexpr auto getKey(int i) const noexcept
     {
         return Items[i].key;
     }
 
-    int type(int i) const
+    [[nodiscard]] constexpr auto type(int i) const noexcept
     {
         return Items[i].type;
     }
 
-    QVariant const& variant(int i) const
+    [[nodiscard]] constexpr auto const& variant(int i) const noexcept
     {
         return values_[i];
     }

@@ -50,7 +50,7 @@ public:
 
     using Tag = uint64_t;
 
-    Tag tag() const
+    [[nodiscard]] constexpr auto tag() const noexcept
     {
         return tag_;
     }
