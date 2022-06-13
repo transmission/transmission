@@ -58,9 +58,6 @@
     [window setFrameUsingName:@"MessageWindowFrame"];
     window.restorationClass = [self class];
 
-    //disable fullscreen support
-    [window setCollectionBehavior:NSWindowCollectionBehaviorFullScreenNone];
-
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(resizeColumn)
                                                name:NSTableViewColumnDidResizeNotification
                                              object:self.fMessageTable];
@@ -68,6 +65,9 @@
     [window setContentBorderThickness:NSMinY(self.fMessageTable.enclosingScrollView.frame) forEdge:NSMinYEdge];
 
     self.window.title = NSLocalizedString(@"Message Log", "Message window -> title");
+
+    //make window an auxillary view in fullscreen
+    [window setCollectionBehavior:NSWindowCollectionBehaviorFullScreenAuxiliary];
 
     //set images and text for popup button items
     [self.fLevelButton itemAtIndex:LEVEL_ERROR].title = NSLocalizedString(@"Error", "Message window -> level string");

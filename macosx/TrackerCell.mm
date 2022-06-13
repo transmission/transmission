@@ -172,25 +172,20 @@ NSMutableSet* fTrackerIconLoading;
     if ((host = address.host))
     {
         //don't try to parse ip address
-        BOOL const separable = !tr_addressIsIP(host.UTF8String);
+        BOOL const isIP = tr_addressIsIP(host.UTF8String);
+        NSArray* hostComponents = !isIP ? [host componentsSeparatedByString:@"."] : nil;
 
-        NSArray* hostComponents = separable ? [host componentsSeparatedByString:@"."] : nil;
+        if (!isIP && hostComponents.count >= 2)
+        {
+            NSString* domain = hostComponents[hostComponents.count - 2];
+            NSString* tld = hostComponents[hostComponents.count - 1];
+            NSString* baseAddress = [NSString stringWithFormat:@"%@.%@", domain, tld];
 
-        //let's try getting the tracker address without using any subdomains
-        NSString* baseAddress;
-        if (separable && hostComponents.count > 1)
-        {
-            baseAddress = [NSString stringWithFormat:@"http://%@.%@", hostComponents[hostComponents.count - 2], hostComponents.lastObject];
-        }
-        else
-        {
-            baseAddress = [NSString stringWithFormat:@"http://%@", host];
-        }
-
-        icon = [fTrackerIconCache objectForKey:baseAddress];
-        if (!icon)
-        {
-            [self loadTrackerIcon:baseAddress];
+            icon = [fTrackerIconCache objectForKey:baseAddress];
+            if (!icon)
+            {
+                [self loadTrackerIcon:baseAddress];
+            }
         }
     }
 
@@ -213,7 +208,6 @@ NSMutableSet* fTrackerIconLoading;
     return [NSImage imageNamed:@"FavIcon"];
 }
 
-#warning better favicon detection
 - (void)loadTrackerIcon:(NSString*)baseAddress
 {
     if ([fTrackerIconLoading containsObject:baseAddress])
@@ -222,43 +216,36 @@ NSMutableSet* fTrackerIconLoading;
     }
     [fTrackerIconLoading addObject:baseAddress];
 
-    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
-        NSImage* icon = nil;
+    NSString* favIconUrl = [NSString stringWithFormat:@"https://icons.duckduckgo.com/ip3/%@.ico", baseAddress];
 
-        NSArray<NSString*>* filenamesToTry = @[ @"favicon.png", @"favicon.ico" ];
-        for (NSString* filename in filenamesToTry)
-        {
-            NSURL* favIconUrl = [NSURL URLWithString:[baseAddress stringByAppendingPathComponent:filename]];
+    NSURLRequest* request = [NSURLRequest requestWithURL:[NSURL URLWithString:favIconUrl] cachePolicy:NSURLRequestUseProtocolCachePolicy
+                                         timeoutInterval:30.0];
 
-            NSURLRequest* request = [NSURLRequest requestWithURL:favIconUrl cachePolicy:NSURLRequestUseProtocolCachePolicy
-                                                 timeoutInterval:30.0];
-
-            NSData* iconData = [NSURLConnection sendSynchronousRequest:request returningResponse:NULL error:NULL];
-            if (iconData)
+    NSURLSessionDataTask* task = [NSURLSession.sharedSession
+        dataTaskWithRequest:request completionHandler:^(NSData* iconData, NSURLResponse* response, NSError* error) {
+            BOOL ok = ((NSHTTPURLResponse*)response).statusCode == 200 ? YES : NO;
+            if (!ok)
             {
-                icon = [[NSImage alloc] initWithData:iconData];
+                return;
+            }
+
+            dispatch_async(dispatch_get_main_queue(), ^{
+                NSImage* icon = [[NSImage alloc] initWithData:iconData];
                 if (icon)
                 {
-                    break;
+                    [fTrackerIconCache setObject:icon forKey:baseAddress];
+
+                    [[self controlView] setNeedsDisplay:YES];
                 }
-            }
-        }
+                else
+                {
+                    [fTrackerIconCache setObject:[NSNull null] forKey:baseAddress];
+                }
 
-        dispatch_async(dispatch_get_main_queue(), ^{
-            if (icon)
-            {
-                [fTrackerIconCache setObject:icon forKey:baseAddress];
-
-                [[self controlView] setNeedsDisplay:YES];
-            }
-            else
-            {
-                [fTrackerIconCache setObject:[NSNull null] forKey:baseAddress];
-            }
-
-            [fTrackerIconLoading removeObject:baseAddress];
-        });
-    });
+                [fTrackerIconLoading removeObject:baseAddress];
+            });
+        }];
+    [task resume];
 }
 
 - (NSRect)imageRectForBounds:(NSRect)bounds
