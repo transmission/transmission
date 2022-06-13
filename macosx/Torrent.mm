@@ -2175,4 +2175,10 @@ bool trashDataFile(char const* filename, tr_error** error)
     }
 }
 
+// For backward comatibility for previously saved Group Predicates.
+- (NSArray<FileListNode*>*)fFlatFileList
+{
+    return self.flatFileList;
+}
+
 @end
