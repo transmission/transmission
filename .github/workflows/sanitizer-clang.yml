@@ -1,15 +1,34 @@
 name: sanitizer-test-clang
 on:
   push:
+    branches:
+      - 'main'
   pull_request:
-    types: [opened, reopened]
+    branches:
+      - 'main'
 env:
   GTEST_OUTPUT: xml:./
 jobs:
   sanitizer-test-clang:
     runs-on: ubuntu-22.04
     steps:
-      - name: Prepare
+      - name: Get Source
+        id: get-source
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          path: src
+          submodules: recursive
+      - name: Check for diffs that affect tests
+        id: do-diffs-affect-tests
+        run: |
+          set +e
+          git -C "${GITHUB_WORKSPACE}/src" diff --exit-code origin/main -- CMakeLists.txt libtransmission tests third-party utils
+          echo "::set-output name=changed::$?"
+          set -e
+      - name: Get Deps
+        id: get-deps
+        if: (steps.do-diffs-affect-tests.outputs.changed == '1') || (github.event_name == 'push' && github.ref_name == 'main')
         run: |
           set -ex
           sudo apt-get update
@@ -27,12 +46,9 @@ jobs:
             libpsl-dev \
             libssl-dev \
             ninja-build
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          path: src
-          submodules: recursive
       - name: Configure
+        id: configure
+        if: (steps.do-diffs-affect-tests.outputs.changed == '1') || (github.event_name == 'push' && github.ref_name == 'main')
         run: |
           cmake \
             -S src \
@@ -48,7 +64,11 @@ jobs:
             -DENABLE_GTK=OFF \
             -DENABLE_QT=OFF \
             `#-DENABLE_WEB=ON`
-      - name: Build
+      - name: Make
+        id: make
+        if: (steps.do-diffs-affect-tests.outputs.changed == '1') || (github.event_name == 'push' && github.ref_name == 'main')
         run: cmake --build obj --config Debug --target libtransmission-test transmission-show
-      - name: Test
+      - name: Test with sanitizers
+        id: test
+        if: (steps.do-diffs-affect-tests.outputs.changed == '1') || (github.event_name == 'push' && github.ref_name == 'main')
         run: cmake -E chdir obj ctest --build-config Debug --output-on-failure

@@ -9,14 +9,30 @@ jobs:
     name: Formatting Check
     runs-on: ubuntu-latest
     steps:
-      - name: Install Dependencies
-        run: |
-          sudo apt-get install clang-format-12 npm yarn
-      - name: Checkout
+      - name: Get Source
         uses: actions/checkout@v3
         with:
           submodules: recursive
-      - name: Check
+      - name: Get Deps
+        run: |
+          sudo apt-get install clang-format-12 npm yarn
+      - name: Check for style diffs
+        id: check-for-diffs
         working-directory: .
         run: |
-          ./code_style.sh --check
+          ./code_style.sh
+          set +e
+          git diff --exit-code > style.diff
+          echo "::set-output name=differs::$?"
+          cat style.diff
+          set -e
+      - name: Upload Diffs
+        uses: actions/upload-artifact@v2
+        if: steps.check-for-diffs.outputs.differs== '1'
+        with:
+          name: code-style.diff
+          path: 'style.diff'
+      - name: Fail if diffs exist
+        if: steps.check-for-diffs.outputs.differs == '1'
+        run: |
+          exit 1
