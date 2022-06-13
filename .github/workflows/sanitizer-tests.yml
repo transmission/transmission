@@ -1,0 +1,98 @@
+name: sanitizer-test-clang
+on:
+  push:
+    branches:
+      - 'main'
+  pull_request:
+    branches:
+      - 'main'
+env:
+  GTEST_OUTPUT: xml:./
+jobs:
+  get-deps-and-source:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Install Dependencies
+        run: |
+          set -ex
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            ca-certificates \
+            clang \
+            cmake \
+            gettext \
+            libcurl4-openssl-dev \
+            libdeflate-dev \
+            libevent-dev \
+            libfmt-dev \
+            libminiupnpc-dev \
+            libnatpmp-dev \
+            libpsl-dev \
+            libssl-dev \
+            ninja-build
+      - name: Checkout Source
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 2
+          path: src
+          submodules: recursive
+  check-for-test-changes:
+    outputs:
+      changed: ${{ steps.test-for-diffs-from-main.outputs.changed }}
+    runs-on: ubuntu-22.04
+    needs: get-deps-and-source
+    steps:
+      - id: test-for-diffs-from-main
+        run: |
+          git diff --quiet main -- CMakeLists.txt libtransmission tests third-party utils
+          echo "::set-output name=changed::$?"
+  sanitizer-test-clang:
+    runs-on: ubuntu-22.04
+    needs: check-for-test-changes
+    if: needs.check-for-test-changes.outputs.changed == '1'
+    steps:
+      - name: Configure
+        run: |
+          cmake \
+            -S src \
+            -B build-clang \
+            -G Ninja \
+            -DCMAKE_BUILD_TYPE=Debug \
+            -DCMAKE_CXX_COMPILER='clang++' \
+            -DCMAKE_CXX_FLAGS='-gdwarf-4 -fno-omit-frame-pointer -fsanitize=address,leak,undefined' \
+            -DCMAKE_C_COMPILER='clang' \
+            -DCMAKE_C_FLAGS='-gdwarf-4 -fno-omit-frame-pointer -fsanitize=address,leak,undefined' \
+            -DCMAKE_INSTALL_PREFIX=pfx \
+            -DENABLE_CLI=OFF \
+            -DENABLE_GTK=OFF \
+            -DENABLE_QT=OFF \
+            `#-DENABLE_WEB=ON`
+      - name: Build
+        run: cmake --build build-clang --config Debug --target libtransmission-test transmission-show
+      - name: Test
+        run: cmake -E chdir build-clang ctest --build-config Debug --output-on-failure
+  sanitizer-test-gcc:
+    runs-on: ubuntu-22.04
+    needs: check-for-test-changes
+    if: needs.check-for-test-changes.outputs.changed == '1'
+    steps:
+      - name: Configure
+        run: |
+          cmake \
+            -S src \
+            -B build-gnu \
+            -G Ninja \
+            -DCMAKE_BUILD_TYPE=Debug \
+            -DCMAKE_CXX_COMPILER='g++' \
+            -DCMAKE_CXX_FLAGS='-gdwarf-4 -fno-omit-frame-pointer -fsanitize=address,pointer-compare,pointer-subtract,leak,undefined' \
+            -DCMAKE_C_COMPILER='gcc' \
+            -DCMAKE_C_FLAGS='-gdwarf-4 -fno-omit-frame-pointer -fsanitize=address,pointer-compare,pointer-subtract,leak,undefined' \
+            -DCMAKE_INSTALL_PREFIX=pfx \
+            -DENABLE_CLI=OFF \
+            -DENABLE_GTK=OFF \
+            -DENABLE_QT=OFF \
+            `#-DENABLE_WEB=ON`
+      - name: Build
+        run: cmake --build build-gnu --config Debug --target libtransmission-test transmission-show
+      - name: Test
+        run: cmake -E chdir build-gnu ctest --build-config Debug --output-on-failure
