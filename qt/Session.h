@@ -49,22 +49,22 @@ public:
         return rpc_.url();
     }
 
-    tr_session_stats const& getStats() const
+    [[nodiscard]] constexpr auto const& getStats() const noexcept
     {
         return stats_;
     }
 
-    tr_session_stats const& getCumulativeStats() const
+    [[nodiscard]] constexpr auto const& getCumulativeStats() const noexcept
     {
         return cumulative_stats_;
     }
 
-    QString const& sessionVersion() const
+    [[nodiscard]] constexpr auto const& sessionVersion() const noexcept
     {
         return session_version_;
     }
 
-    int64_t blocklistSize() const
+    [[nodiscard]] constexpr auto blocklistSize() const noexcept
     {
         return blocklist_size_;
     }

@@ -12,56 +12,56 @@ public:
 
     double getKBps() const;
 
-    [[nodiscard]] int getBps() const
+    [[nodiscard]] auto constexpr getBps() const noexcept
     {
         return bytes_per_second_;
     }
 
-    [[nodiscard]] bool isZero() const
+    [[nodiscard]] auto constexpr isZero() const noexcept
     {
         return bytes_per_second_ == 0;
     }
 
     static Speed fromKBps(double KBps);
 
-    static Speed fromBps(int Bps)
+    [[nodiscard]] static constexpr Speed fromBps(int Bps) noexcept
     {
         return Speed{ Bps };
     }
 
-    void setBps(int Bps)
+    void constexpr setBps(int Bps) noexcept
     {
         bytes_per_second_ = Bps;
     }
 
-    Speed& operator+=(Speed const& that)
+    constexpr Speed& operator+=(Speed const& that) noexcept
     {
         bytes_per_second_ += that.bytes_per_second_;
         return *this;
     }
 
-    [[nodiscard]] Speed operator+(Speed const& that) const
+    [[nodiscard]] auto constexpr operator+(Speed const& that) const noexcept
     {
         return Speed{ getBps() + that.getBps() };
     }
 
-    [[nodiscard]] bool operator<(Speed const& that) const
+    [[nodiscard]] auto constexpr operator<(Speed const& that) const noexcept
     {
         return getBps() < that.getBps();
     }
 
-    [[nodiscard]] bool operator==(Speed const& that) const
+    [[nodiscard]] auto constexpr operator==(Speed const& that) const noexcept
     {
         return getBps() == that.getBps();
     }
 
-    [[nodiscard]] bool operator!=(Speed const& that) const
+    [[nodiscard]] auto constexpr operator!=(Speed const& that) const noexcept
     {
         return getBps() != that.getBps();
     }
 
 private:
-    explicit Speed(int bytes_per_second)
+    explicit constexpr Speed(int bytes_per_second) noexcept
         : bytes_per_second_{ bytes_per_second }
     {
     }

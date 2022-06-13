@@ -75,12 +75,12 @@ public:
         NUM_MODES
     };
 
-    explicit SortMode(int mode = SORT_BY_ID)
-        : mode_(mode)
+    explicit SortMode(int mode = SORT_BY_ID) noexcept
+        : mode_{ mode }
     {
     }
 
-    int mode() const
+    [[nodiscard]] constexpr auto mode() const noexcept
     {
         return mode_;
     }
