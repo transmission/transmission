@@ -1115,7 +1115,7 @@ static void removeKeRangerRansomware()
         }
     }
 
-    [self fullUpdateUI];
+    [self drawMainWindow];
 }
 
 - (void)askOpenConfirmed:(AddWindowController*)addController add:(BOOL)add
@@ -1135,7 +1135,7 @@ static void removeKeRangerRansomware()
         }
         [self.fAddingTransfers addObject:torrent];
 
-        [self fullUpdateUI];
+        [self drawMainWindow];
     }
     else
     {
@@ -1209,7 +1209,7 @@ static void removeKeRangerRansomware()
         [self.fAddingTransfers addObject:torrent];
     }
 
-    [self fullUpdateUI];
+    [self drawMainWindow];
 }
 
 - (void)askOpenMagnetConfirmed:(AddMagnetWindowController*)addController add:(BOOL)add
@@ -1229,7 +1229,7 @@ static void removeKeRangerRansomware()
         }
         [self.fAddingTransfers addObject:torrent];
 
-        [self fullUpdateUI];
+        [self drawMainWindow];
     }
     else
     {
@@ -1726,6 +1726,8 @@ static void removeKeRangerRansomware()
                     {
                         [torrent closeRemoveTorrent:deleteData];
                     }
+
+                    [self drawMainWindow];
                 };
 
                 [self.fTableView beginUpdates];
@@ -1767,9 +1769,9 @@ static void removeKeRangerRansomware()
         {
             [torrent closeRemoveTorrent:deleteData];
         }
-    }
 
-    [self fullUpdateUI];
+        [self drawMainWindow];
+    }
 }
 
 - (void)removeNoDelete:(id)sender
@@ -4991,7 +4993,7 @@ static void removeKeRangerRansomware()
     }
     [self.fAddingTransfers addObject:torrent];
 
-    [self fullUpdateUI];
+    [self drawMainWindow];
 }
 
 - (void)rpcRemoveTorrent:(Torrent*)torrent deleteData:(BOOL)deleteData

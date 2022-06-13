@@ -14,58 +14,60 @@
 
 - (void)drawMainWindow
 {
-    NSView* contentView = self.fWindow.contentView;
-    NSSize const windowSize = [contentView convertSize:self.fWindow.frame.size fromView:nil];
-    CGFloat originY = NSMaxY(contentView.frame);
+    dispatch_async(dispatch_get_main_queue(), ^{
+        NSView* contentView = self.fWindow.contentView;
+        NSSize const windowSize = [contentView convertSize:self.fWindow.frame.size fromView:nil];
+        CGFloat originY = NSMaxY(contentView.frame);
 
-    //remove all subviews
-    for (id view in contentView.subviews.copy)
-    {
-        [view removeFromSuperviewWithoutNeedingDisplay];
-    }
+        //remove all subviews
+        for (id view in contentView.subviews.copy)
+        {
+            [view removeFromSuperviewWithoutNeedingDisplay];
+        }
 
-    self.fStatusBar = nil;
-    self.fFilterBar = nil;
+        self.fStatusBar = nil;
+        self.fFilterBar = nil;
 
-    if ([self.fDefaults boolForKey:@"StatusBar"])
-    {
-        self.fStatusBar = [[StatusBarController alloc] initWithLib:self.fLib];
+        if ([self.fDefaults boolForKey:@"StatusBar"])
+        {
+            self.fStatusBar = [[StatusBarController alloc] initWithLib:self.fLib];
 
-        NSRect statusBarFrame = self.fStatusBar.view.frame;
-        statusBarFrame.size.width = windowSize.width;
+            NSRect statusBarFrame = self.fStatusBar.view.frame;
+            statusBarFrame.size.width = windowSize.width;
 
-        originY -= STATUS_BAR_HEIGHT;
-        statusBarFrame.origin.y = originY;
-        self.fStatusBar.view.frame = statusBarFrame;
+            originY -= STATUS_BAR_HEIGHT;
+            statusBarFrame.origin.y = originY;
+            self.fStatusBar.view.frame = statusBarFrame;
 
-        [contentView addSubview:self.fStatusBar.view];
-    }
+            [contentView addSubview:self.fStatusBar.view];
+        }
 
-    if ([self.fDefaults boolForKey:@"FilterBar"])
-    {
-        self.fFilterBar = [[FilterBarController alloc] init];
+        if ([self.fDefaults boolForKey:@"FilterBar"])
+        {
+            self.fFilterBar = [[FilterBarController alloc] init];
 
-        NSRect filterBarFrame = self.fFilterBar.view.frame;
-        filterBarFrame.size.width = windowSize.width;
+            NSRect filterBarFrame = self.fFilterBar.view.frame;
+            filterBarFrame.size.width = windowSize.width;
 
-        originY -= FILTER_BAR_HEIGHT;
-        filterBarFrame.origin.y = originY;
-        self.fFilterBar.view.frame = filterBarFrame;
+            originY -= FILTER_BAR_HEIGHT;
+            filterBarFrame.origin.y = originY;
+            self.fFilterBar.view.frame = filterBarFrame;
 
-        [contentView addSubview:self.fFilterBar.view];
-    }
+            [contentView addSubview:self.fFilterBar.view];
+        }
 
-    NSScrollView* scrollView = self.fTableView.enclosingScrollView;
-    [contentView addSubview:scrollView];
+        NSScrollView* scrollView = self.fTableView.enclosingScrollView;
+        [contentView addSubview:scrollView];
 
-    [contentView addSubview:self.fActionButton];
-    [contentView addSubview:self.fSpeedLimitButton];
-    [contentView addSubview:self.fClearCompletedButton];
-    [contentView addSubview:self.fTotalTorrentsField];
+        [contentView addSubview:self.fActionButton];
+        [contentView addSubview:self.fSpeedLimitButton];
+        [contentView addSubview:self.fClearCompletedButton];
+        [contentView addSubview:self.fTotalTorrentsField];
 
-    //window is updated and animated in fullUpdateUI --> applyFilter --> setWindowSizeToFit
-    [self fullUpdateUI];
-    [self updateForAutoSize];
+        //window is updated and animated in fullUpdateUI --> applyFilter --> setWindowSizeToFit
+        [self fullUpdateUI];
+        [self updateForAutoSize];
+    });
 }
 
 - (void)setWindowSizeToFit
@@ -143,7 +145,7 @@
     else
     {
         NSScreen* screen = self.fWindow.screen;
-        if (screen)
+        if (screen && !self.isFullScreen)
         {
             NSSize maxSize = screen.frame.size;
             maxSize.height -= titleBarHeight;
