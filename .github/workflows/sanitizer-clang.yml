@@ -1,4 +1,4 @@
-name: sanitizer-test-clang
+name: Sanitizer Tests
 on:
   push:
     branches:
@@ -9,7 +9,7 @@ on:
 env:
   GTEST_OUTPUT: xml:./
 jobs:
-  sanitizer-test-clang:
+  asan-lsan-usan:
     runs-on: ubuntu-22.04
     steps:
       - name: Get Source
