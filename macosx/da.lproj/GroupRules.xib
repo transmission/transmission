@@ -135,7 +135,7 @@ Gw
                                         <predicateEditorRowTemplate rowType="simple" id="147" customClass="PredicateEditorRowTemplateAny">
                                             <array key="leftExpressionObject">
                                                 <expression type="keyPath">
-                                                    <string key="keyPath">fFlatFileList.name</string>
+                                                    <string key="keyPath">flatFileList.name</string>
                                                 </expression>
                                                 <expression type="keyPath">
                                                     <string key="keyPath">allTrackersFlat</string>
@@ -148,7 +148,7 @@ Gw
                                                     <items>
                                                         <menuItem title="Enhver fil" state="on" id="161">
                                                             <expression key="representedObject" type="keyPath">
-                                                                <string key="keyPath">fFlatFileList.name</string>
+                                                                <string key="keyPath">flatFileList.name</string>
                                                             </expression>
                                                         </menuItem>
                                                         <menuItem title="Enhver tracker" id="162">
