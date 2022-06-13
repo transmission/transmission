@@ -69,6 +69,9 @@ tr_session* fLib = NULL;
 
     self.window.title = NSLocalizedString(@"Statistics", "Stats window -> title");
 
+    //make window an auxillary view in fullscreen
+    [self.window setCollectionBehavior:NSWindowCollectionBehaviorFullScreenAuxiliary];
+
     //set label text
     self.fUploadedLabelField.stringValue = [NSLocalizedString(@"Uploaded", "Stats window -> label") stringByAppendingString:@":"];
     self.fDownloadedLabelField.stringValue = [NSLocalizedString(@"Downloaded", "Stats window -> label") stringByAppendingString:@":"];

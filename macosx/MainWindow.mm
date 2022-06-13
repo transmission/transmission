@@ -4,7 +4,7 @@
 
 #import "MainWindow.h"
 
-#define BIG_SUR_TOOLBARHEIGHT 28.0
+#define TOOL_BAR_HEIGHT 28.0
 
 @implementation MainWindow
 
@@ -12,20 +12,19 @@
 {
     NSRect frame = self.frame;
 
-    //fix window sizing when toggling toolbar
-    if (@available(macOS 10.11, *))
+    //fix window size and origin when toggling toolbar
+    if (self.toolbar.isVisible == YES)
     {
-        if (self.toolbar.isVisible == YES)
-        {
-            frame.size.height += BIG_SUR_TOOLBARHEIGHT;
-        }
-        else
-        {
-            frame.size.height -= BIG_SUR_TOOLBARHEIGHT;
-        }
+        frame.size.height += TOOL_BAR_HEIGHT;
+        frame.origin.y -= TOOL_BAR_HEIGHT;
     }
-    [self setFrame:frame display:YES animate:NO];
+    else
+    {
+        frame.size.height -= TOOL_BAR_HEIGHT;
+        frame.origin.y += TOOL_BAR_HEIGHT;
+    }
 
+    [self setFrame:frame display:YES animate:NO];
     [super toggleToolbarShown:sender];
 }
 
