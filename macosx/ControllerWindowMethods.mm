@@ -131,8 +131,6 @@
     //update scrollview
     NSRect scrollViewFrame = scrollView.frame;
     scrollViewFrame.size.height = scrollViewHeight;
-    scrollViewFrame.origin.y = BOTTOM_BAR_HEIGHT;
-    [scrollView setFrame:scrollViewFrame];
 
     //we can't call minSize, since it might be set to the current size (auto size)
     CGFloat const minHeight = self.minWindowContentSizeAllowed +
@@ -147,24 +145,31 @@
         NSScreen* screen = self.fWindow.screen;
         if (screen)
         {
-            NSSize maxSize = [scrollView convertSize:screen.visibleFrame.size fromView:nil];
-            maxSize.height += titleBarHeight;
-            maxSize.height += BOTTOM_BAR_HEIGHT;
+            NSSize maxSize = screen.frame.size;
+            maxSize.height -= titleBarHeight;
+            maxSize.height -= BOTTOM_BAR_HEIGHT;
 
             if (self.fStatusBar)
             {
-                maxSize.height += STATUS_BAR_HEIGHT;
+                maxSize.height -= STATUS_BAR_HEIGHT;
             }
             if (self.fFilterBar)
             {
-                maxSize.height += FILTER_BAR_HEIGHT;
+                maxSize.height -= FILTER_BAR_HEIGHT;
             }
             if (windowSize.height > maxSize.height)
             {
                 windowSize.height = maxSize.height;
+
+                //recalculate scrollview height
+                scrollViewFrame.size.height = self.fullScreenScrollViewHeight;
             }
         }
     }
+    
+    //commit scrollview changes
+    scrollViewFrame.origin.y = BOTTOM_BAR_HEIGHT;
+    [scrollView setFrame:scrollViewFrame];
 
     windowFrame.origin.y -= (windowSize.height - windowFrame.size.height);
     windowFrame.size.height = windowSize.height;
@@ -196,7 +201,7 @@
 {
     if (self.isFullScreen)
     {
-        return self.fWindow.frame.size.height - self.titlebarHeight - self.mainWindowComponentHeight - BOTTOM_BAR_HEIGHT;
+        return self.fullScreenScrollViewHeight;
     }
 
     if ([self.fDefaults boolForKey:@"AutoSize"])
@@ -212,6 +217,11 @@
     }
 
     return NSHeight(self.fTableView.enclosingScrollView.frame);
+}
+
+- (CGFloat)fullScreenScrollViewHeight
+{
+    return self.fWindow.frame.size.height - self.titlebarHeight - self.mainWindowComponentHeight - BOTTOM_BAR_HEIGHT;
 }
 
 - (CGFloat)minWindowContentSizeAllowed
