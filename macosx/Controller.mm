@@ -3100,7 +3100,21 @@ static void removeKeRangerRansomware()
     popover.delegate = self;
 
     NSView* senderView = sender;
-    [popover showRelativeToRect:senderView.frame ofView:senderView preferredEdge:NSMaxYEdge];
+    CGFloat width = NSWidth(senderView.frame);
+
+    if (NSMinX(self.fWindow.frame) < width || NSMaxX(self.fWindow.screen.frame) - NSMinX(self.fWindow.frame) < width * 2)
+    {
+        // Ugly hack to hide NSPopover arrow.
+        self.fPositioningView = [[NSView alloc] initWithFrame:senderView.bounds];
+        self.fPositioningView.identifier = @"positioningView";
+        [senderView addSubview:self.fPositioningView];
+        [popover showRelativeToRect:self.fPositioningView.bounds ofView:self.fPositioningView preferredEdge:NSMaxYEdge];
+        self.fPositioningView.bounds = NSOffsetRect(self.fPositioningView.bounds, 0, NSHeight(self.fPositioningView.bounds));
+    }
+    else
+    {
+        [popover showRelativeToRect:senderView.frame ofView:senderView preferredEdge:NSMaxYEdge];
+    }
 }
 
 //don't show multiple popovers when clicking the gear button repeatedly
@@ -3109,8 +3123,9 @@ static void removeKeRangerRansomware()
     self.fGlobalPopoverShown = YES;
 }
 
-- (void)popoverWillClose:(NSNotification*)notification
+- (void)popoverDidClose:(NSNotification*)notification
 {
+    [self.fPositioningView removeFromSuperview];
     self.fGlobalPopoverShown = NO;
 }
 

@@ -248,6 +248,7 @@ typedef NS_ENUM(unsigned int, addType) { //
 @property(nonatomic) URLSheetWindowController* fUrlSheetController;
 
 @property(nonatomic) BOOL fGlobalPopoverShown;
+@property(nonatomic) NSView* fPositioningView;
 @property(nonatomic) BOOL fSoundPlaying;
 @property(nonatomic) id fNoNapActivity;
 
