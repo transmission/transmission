@@ -43,24 +43,24 @@ public:
         return children_.at(row);
     }
 
-    int childCount() const
+    [[nodiscard]] int childCount() const noexcept
     {
-        return children_.size();
+        return std::size(children_);
     }
 
-    FileTreeItem* parent()
+    [[nodiscard]] auto* parent() noexcept
     {
         return parent_;
     }
 
-    FileTreeItem const* parent() const
+    [[nodiscard]] auto const* parent() const noexcept
     {
         return parent_;
     }
 
     int row() const;
 
-    QString const& name() const
+    [[nodiscard]] constexpr auto const& name() const noexcept
     {
         return name_;
     }
@@ -70,12 +70,12 @@ public:
     void setSubtreeWanted(bool, QSet<int>& file_ids);
     void setSubtreePriority(int priority, QSet<int>& file_ids);
 
-    int fileIndex() const
+    [[nodiscard]] constexpr auto fileIndex() const noexcept
     {
         return file_index_;
     }
 
-    uint64_t totalSize() const
+    [[nodiscard]] constexpr auto totalSize() const noexcept
     {
         return total_size_;
     }

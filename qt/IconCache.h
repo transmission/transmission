@@ -30,12 +30,12 @@ class IconCache
 public:
     static IconCache& get();
 
-    QIcon folderIcon() const
+    [[nodiscard]] constexpr auto const& folderIcon() const noexcept
     {
         return folder_icon_;
     }
 
-    QIcon fileIcon() const
+    [[nodiscard]] constexpr auto const& fileIcon() const noexcept
     {
         return file_icon_;
     }
