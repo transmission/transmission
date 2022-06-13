@@ -137,17 +137,17 @@ public:
         }
     }
 
-    [[nodiscard]] constexpr auto operator==(TorrentHash const& that) const noexcept
+    [[nodiscard]] auto operator==(TorrentHash const& that) const
     {
         return data_ == that.data_;
     }
 
-    [[nodiscard]] constexpr auto operator!=(TorrentHash const& that) const noexcept
+    [[nodiscard]] auto operator!=(TorrentHash const& that) const
     {
         return data_ != that.data_;
     }
 
-    [[nodiscard]] constexpr auto operator<(TorrentHash const& that) const noexcept
+    [[nodiscard]] auto operator<(TorrentHash const& that) const
     {
         return data_ < that.data_;
     }

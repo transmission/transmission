@@ -61,7 +61,7 @@ public:
     }
 
 private:
-    [[nodiscard]] explicit constexpr Speed(int bytes_per_second) noexcept
+    explicit constexpr Speed(int bytes_per_second) noexcept
         : bytes_per_second_{ bytes_per_second }
     {
     }
