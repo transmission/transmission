@@ -166,7 +166,7 @@
             }
         }
     }
-    
+
     //commit scrollview changes
     scrollViewFrame.origin.y = BOTTOM_BAR_HEIGHT;
     [scrollView setFrame:scrollViewFrame];
