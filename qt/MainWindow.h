@@ -55,7 +55,7 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(Session&, Prefs&, TorrentModel&, bool minimized);
 
-    QSystemTrayIcon& trayIcon()
+    [[nodiscard]] constexpr QSystemTrayIcon& trayIcon() noexcept
     {
         return tray_icon_;
     }

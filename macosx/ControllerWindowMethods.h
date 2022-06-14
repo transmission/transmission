@@ -19,6 +19,7 @@
 @property(nonatomic, readonly) CGFloat titlebarHeight;
 @property(nonatomic, readonly) CGFloat mainWindowComponentHeight;
 @property(nonatomic, readonly) CGFloat scrollViewHeight;
+@property(nonatomic, readonly) CGFloat fullScreenScrollViewHeight;
 @property(nonatomic, readonly) CGFloat minWindowContentSizeAllowed;
 @property(nonatomic, readonly) BOOL isFullScreen;
 

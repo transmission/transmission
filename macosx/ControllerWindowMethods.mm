@@ -14,58 +14,60 @@
 
 - (void)drawMainWindow
 {
-    NSView* contentView = self.fWindow.contentView;
-    NSSize const windowSize = [contentView convertSize:self.fWindow.frame.size fromView:nil];
-    CGFloat originY = NSMaxY(contentView.frame);
+    dispatch_async(dispatch_get_main_queue(), ^{
+        NSView* contentView = self.fWindow.contentView;
+        NSSize const windowSize = [contentView convertSize:self.fWindow.frame.size fromView:nil];
+        CGFloat originY = NSMaxY(contentView.frame);
 
-    //remove all subviews
-    for (id view in contentView.subviews.copy)
-    {
-        [view removeFromSuperviewWithoutNeedingDisplay];
-    }
+        //remove all subviews
+        for (id view in contentView.subviews.copy)
+        {
+            [view removeFromSuperviewWithoutNeedingDisplay];
+        }
 
-    self.fStatusBar = nil;
-    self.fFilterBar = nil;
+        self.fStatusBar = nil;
+        self.fFilterBar = nil;
 
-    if ([self.fDefaults boolForKey:@"StatusBar"])
-    {
-        self.fStatusBar = [[StatusBarController alloc] initWithLib:self.fLib];
+        if ([self.fDefaults boolForKey:@"StatusBar"])
+        {
+            self.fStatusBar = [[StatusBarController alloc] initWithLib:self.fLib];
 
-        NSRect statusBarFrame = self.fStatusBar.view.frame;
-        statusBarFrame.size.width = windowSize.width;
+            NSRect statusBarFrame = self.fStatusBar.view.frame;
+            statusBarFrame.size.width = windowSize.width;
 
-        originY -= STATUS_BAR_HEIGHT;
-        statusBarFrame.origin.y = originY;
-        self.fStatusBar.view.frame = statusBarFrame;
+            originY -= STATUS_BAR_HEIGHT;
+            statusBarFrame.origin.y = originY;
+            self.fStatusBar.view.frame = statusBarFrame;
 
-        [contentView addSubview:self.fStatusBar.view];
-    }
+            [contentView addSubview:self.fStatusBar.view];
+        }
 
-    if ([self.fDefaults boolForKey:@"FilterBar"])
-    {
-        self.fFilterBar = [[FilterBarController alloc] init];
+        if ([self.fDefaults boolForKey:@"FilterBar"])
+        {
+            self.fFilterBar = [[FilterBarController alloc] init];
 
-        NSRect filterBarFrame = self.fFilterBar.view.frame;
-        filterBarFrame.size.width = windowSize.width;
+            NSRect filterBarFrame = self.fFilterBar.view.frame;
+            filterBarFrame.size.width = windowSize.width;
 
-        originY -= FILTER_BAR_HEIGHT;
-        filterBarFrame.origin.y = originY;
-        self.fFilterBar.view.frame = filterBarFrame;
+            originY -= FILTER_BAR_HEIGHT;
+            filterBarFrame.origin.y = originY;
+            self.fFilterBar.view.frame = filterBarFrame;
 
-        [contentView addSubview:self.fFilterBar.view];
-    }
+            [contentView addSubview:self.fFilterBar.view];
+        }
 
-    NSScrollView* scrollView = self.fTableView.enclosingScrollView;
-    [contentView addSubview:scrollView];
+        NSScrollView* scrollView = self.fTableView.enclosingScrollView;
+        [contentView addSubview:scrollView];
 
-    [contentView addSubview:self.fActionButton];
-    [contentView addSubview:self.fSpeedLimitButton];
-    [contentView addSubview:self.fClearCompletedButton];
-    [contentView addSubview:self.fTotalTorrentsField];
+        [contentView addSubview:self.fActionButton];
+        [contentView addSubview:self.fSpeedLimitButton];
+        [contentView addSubview:self.fClearCompletedButton];
+        [contentView addSubview:self.fTotalTorrentsField];
 
-    //window is updated and animated in fullUpdateUI --> applyFilter --> setWindowSizeToFit
-    [self fullUpdateUI];
-    [self updateForAutoSize];
+        //window is updated and animated in fullUpdateUI --> applyFilter --> setWindowSizeToFit
+        [self fullUpdateUI];
+        [self updateForAutoSize];
+    });
 }
 
 - (void)setWindowSizeToFit
@@ -131,8 +133,6 @@
     //update scrollview
     NSRect scrollViewFrame = scrollView.frame;
     scrollViewFrame.size.height = scrollViewHeight;
-    scrollViewFrame.origin.y = BOTTOM_BAR_HEIGHT;
-    [scrollView setFrame:scrollViewFrame];
 
     //we can't call minSize, since it might be set to the current size (auto size)
     CGFloat const minHeight = self.minWindowContentSizeAllowed +
@@ -145,26 +145,33 @@
     else
     {
         NSScreen* screen = self.fWindow.screen;
-        if (screen)
+        if (screen && !self.isFullScreen)
         {
-            NSSize maxSize = [scrollView convertSize:screen.visibleFrame.size fromView:nil];
-            maxSize.height += titleBarHeight;
-            maxSize.height += BOTTOM_BAR_HEIGHT;
+            NSSize maxSize = screen.frame.size;
+            maxSize.height -= titleBarHeight;
+            maxSize.height -= BOTTOM_BAR_HEIGHT;
 
             if (self.fStatusBar)
             {
-                maxSize.height += STATUS_BAR_HEIGHT;
+                maxSize.height -= STATUS_BAR_HEIGHT;
             }
             if (self.fFilterBar)
             {
-                maxSize.height += FILTER_BAR_HEIGHT;
+                maxSize.height -= FILTER_BAR_HEIGHT;
             }
             if (windowSize.height > maxSize.height)
             {
                 windowSize.height = maxSize.height;
+
+                //recalculate scrollview height
+                scrollViewFrame.size.height = self.fullScreenScrollViewHeight;
             }
         }
     }
+
+    //commit scrollview changes
+    scrollViewFrame.origin.y = BOTTOM_BAR_HEIGHT;
+    [scrollView setFrame:scrollViewFrame];
 
     windowFrame.origin.y -= (windowSize.height - windowFrame.size.height);
     windowFrame.size.height = windowSize.height;
@@ -196,7 +203,7 @@
 {
     if (self.isFullScreen)
     {
-        return self.fWindow.frame.size.height - self.titlebarHeight - self.mainWindowComponentHeight - BOTTOM_BAR_HEIGHT;
+        return self.fullScreenScrollViewHeight;
     }
 
     if ([self.fDefaults boolForKey:@"AutoSize"])
@@ -212,6 +219,11 @@
     }
 
     return NSHeight(self.fTableView.enclosingScrollView.frame);
+}
+
+- (CGFloat)fullScreenScrollViewHeight
+{
+    return self.fWindow.frame.size.height - self.titlebarHeight - self.mainWindowComponentHeight - BOTTOM_BAR_HEIGHT;
 }
 
 - (CGFloat)minWindowContentSizeAllowed
