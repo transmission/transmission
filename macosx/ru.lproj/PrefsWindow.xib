@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="20037" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="21179.7" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="20037"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21179.7"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -57,10 +57,10 @@
         <window title="Настройки" allowsToolTipsWhenApplicationIsInactive="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" tabbingMode="disallowed" id="23" userLabel="Preferences" customClass="PrefsWindow">
             <windowStyleMask key="styleMask" titled="YES" closable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
-            <rect key="contentRect" x="108" y="632" width="565" height="107"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="875"/>
+            <rect key="contentRect" x="108" y="632" width="600" height="107"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="2048" height="1255"/>
             <view key="contentView" id="24">
-                <rect key="frame" x="0.0" y="0.0" width="565" height="107"/>
+                <rect key="frame" x="0.0" y="0.0" width="600" height="107"/>
                 <autoresizingMask key="autoresizingMask"/>
             </view>
             <connections>
@@ -1103,7 +1103,7 @@
                     <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" heightSizable="YES"/>
                     <clipView key="contentView" id="Dpq-ph-lQx">
                         <rect key="frame" x="1" y="1" width="141" height="169"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <tableView focusRingType="none" verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" columnReordering="NO" columnResizing="NO" multipleSelection="NO" emptySelection="NO" autosaveColumns="NO" rowHeight="18" id="1774">
                                 <rect key="frame" x="0.0" y="0.0" width="141" height="169"/>
@@ -1968,17 +1968,17 @@
                     <rect key="frame" x="103" y="94" width="308" height="78"/>
                     <autoresizingMask key="autoresizingMask"/>
                     <clipView key="contentView" id="cNg-WR-Fyn">
-                        <rect key="frame" x="1" y="1" width="306" height="76"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <rect key="frame" x="1" y="1" width="291" height="76"/>
+                        <autoresizingMask key="autoresizingMask"/>
                         <subviews>
                             <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" alternatingRowBackgroundColors="YES" columnReordering="NO" columnResizing="NO" autosaveColumns="NO" typeSelect="NO" id="1521">
-                                <rect key="frame" x="0.0" y="0.0" width="306" height="76"/>
+                                <rect key="frame" x="0.0" y="0.0" width="291" height="76"/>
                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                 <size key="intercellSpacing" width="3" height="2"/>
                                 <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                 <color key="gridColor" name="gridColor" catalog="System" colorSpace="catalog"/>
                                 <tableColumns>
-                                    <tableColumn identifier="IP" width="265" minWidth="40" maxWidth="1000" id="1523">
+                                    <tableColumn identifier="IP" width="279" minWidth="40" maxWidth="1000" id="1523">
                                         <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="IP-адрес">
                                             <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
                                             <color key="backgroundColor" white="0.33333299" alpha="1" colorSpace="calibratedWhite"/>
@@ -2012,7 +2012,7 @@
                         <autoresizingMask key="autoresizingMask"/>
                     </scroller>
                     <scroller key="verticalScroller" wantsLayer="YES" verticalHuggingPriority="750" horizontal="NO" id="1519">
-                        <rect key="frame" x="291" y="1" width="16" height="76"/>
+                        <rect key="frame" x="292" y="1" width="15" height="76"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </scroller>
                 </scrollView>

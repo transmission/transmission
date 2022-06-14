@@ -588,11 +588,17 @@
     case TR_LOG_ERROR:
         levelString = NSLocalizedString(@"Error", "Message window -> level");
         break;
+    case TR_LOG_WARN:
+        levelString = NSLocalizedString(@"Warn", "Message window -> level");
+        break;
     case TR_LOG_INFO:
         levelString = NSLocalizedString(@"Info", "Message window -> level");
         break;
     case TR_LOG_DEBUG:
         levelString = NSLocalizedString(@"Debug", "Message window -> level");
+        break;
+    case TR_LOG_TRACE:
+        levelString = NSLocalizedString(@"Trace", "Message window -> level");
         break;
     default:
         NSAssert1(NO, @"Unknown message log level: %ld", level);
