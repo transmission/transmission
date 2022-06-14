@@ -51,7 +51,6 @@
 #import "NSStringAdditions.h"
 #import "ExpandedPathToPathTransformer.h"
 #import "ExpandedPathToIconTransformer.h"
-#import "MainWindow.h"
 
 #define TOOLBAR_CREATE @"Toolbar Create"
 #define TOOLBAR_OPEN_FILE @"Toolbar Open"
@@ -548,6 +547,10 @@ static void removeKeRangerRansomware()
         [self.fSortMenu insertItem:item atIndex:sortMenuIndex++];
     }
 
+    //you would think this would be called later in this method from updateUI, but it's not reached in awakeFromNib
+    //this must be called after showStatusBar:
+    [self.fStatusBar updateWithDownload:0.0 upload:0.0];
+
     //register for sleep notifications
     IONotificationPortRef notify;
     io_object_t iterator;
@@ -659,7 +662,7 @@ static void removeKeRangerRansomware()
 #warning rename
     [nc addObserver:self selector:@selector(fullUpdateUI) name:@"UpdateQueue" object:nil];
 
-    [nc addObserver:self selector:@selector(drawMainWindow) name:@"ApplyFilter" object:nil];
+    [nc addObserver:self selector:@selector(applyFilter) name:@"ApplyFilter" object:nil];
 
     //open newly created torrent file
     [nc addObserver:self selector:@selector(beginCreateFile:) name:@"BeginCreateTorrentFile" object:nil];
@@ -669,7 +672,7 @@ static void removeKeRangerRansomware()
 
     [nc addObserver:self selector:@selector(applyFilter) name:@"UpdateGroups" object:nil];
 
-    [self drawMainWindow];
+    [self updateMainWindow];
 
     //timer to update the interface every second
     [self updateUI];
@@ -685,6 +688,9 @@ static void removeKeRangerRansomware()
     {
         [self showInfo:nil];
     }
+
+    //redraw filterbar to avoid clipping
+    [NSNotificationCenter.defaultCenter postNotificationName:@"ResizeBar" object:nil];
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification*)notification
@@ -1115,7 +1121,7 @@ static void removeKeRangerRansomware()
         }
     }
 
-    [self drawMainWindow];
+    [self fullUpdateUI];
 }
 
 - (void)askOpenConfirmed:(AddWindowController*)addController add:(BOOL)add
@@ -1135,7 +1141,7 @@ static void removeKeRangerRansomware()
         }
         [self.fAddingTransfers addObject:torrent];
 
-        [self drawMainWindow];
+        [self fullUpdateUI];
     }
     else
     {
@@ -1209,7 +1215,7 @@ static void removeKeRangerRansomware()
         [self.fAddingTransfers addObject:torrent];
     }
 
-    [self drawMainWindow];
+    [self fullUpdateUI];
 }
 
 - (void)askOpenMagnetConfirmed:(AddMagnetWindowController*)addController add:(BOOL)add
@@ -1229,7 +1235,7 @@ static void removeKeRangerRansomware()
         }
         [self.fAddingTransfers addObject:torrent];
 
-        [self drawMainWindow];
+        [self fullUpdateUI];
     }
     else
     {
@@ -1727,7 +1733,7 @@ static void removeKeRangerRansomware()
                         [torrent closeRemoveTorrent:deleteData];
                     }
 
-                    [self drawMainWindow];
+                    [self fullUpdateUI];
                 };
 
                 [self.fTableView beginUpdates];
@@ -1769,8 +1775,6 @@ static void removeKeRangerRansomware()
         {
             [torrent closeRemoveTorrent:deleteData];
         }
-
-        [self drawMainWindow];
     }
 }
 
@@ -3065,9 +3069,10 @@ static void removeKeRangerRansomware()
     {
         [self.fTableView endUpdates];
     }
-    self.fTableView.needsDisplay = YES;
-
     [NSAnimationContext endGrouping];
+
+    //reloaddata, otherwise the tableview has a bunch of empty cells
+    [self.fTableView reloadData];
 
     [self resetInfo]; //if group is already selected, but the torrents in it change
 
@@ -3728,32 +3733,9 @@ static void removeKeRangerRansomware()
         noteHeightOfRowsWithIndexesChanged:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, self.fTableView.numberOfRows)]];
     [self.fTableView endUpdates];
 
-    //resize for larger min height if not set to auto size
-    if (![self.fDefaults boolForKey:@"AutoSize"] || self.isFullScreen)
-    {
-        NSSize const contentSize = self.fWindow.contentView.frame.size;
-
-        NSSize contentMinSize = self.fWindow.contentMinSize;
-        contentMinSize.height = self.minWindowContentSizeAllowed;
-        self.fWindow.contentMinSize = contentMinSize;
-
-        //make sure the window already isn't too small
-        if (!makeSmall && contentSize.height < contentMinSize.height)
-        {
-            NSRect frame = self.fWindow.frame;
-            CGFloat heightChange = contentMinSize.height - contentSize.height;
-            frame.size.height += heightChange;
-            frame.origin.y -= heightChange;
-
-            [self.fWindow setFrame:frame display:YES];
-        }
-    }
-    else
-    {
-        [self setWindowSizeToFit];
-    }
-
-    [self drawMainWindow];
+    //reloaddata, otherwise the tableview has a bunch of empty cells
+    [self.fTableView reloadData];
+    [self updateForAutoSize];
 }
 
 - (void)togglePiecesBar:(id)sender
@@ -3772,26 +3754,21 @@ static void removeKeRangerRansomware()
 {
     BOOL const show = self.fStatusBar == nil;
     [self.fDefaults setBool:show forKey:@"StatusBar"];
-    [self drawMainWindow];
+    [self updateMainWindow];
 }
 
 - (void)toggleFilterBar:(id)sender
 {
     BOOL const show = self.fFilterBar == nil;
 
-    //disable filtering when hiding (have to do before drawMainWindow:)
+    //disable filtering when hiding (have to do before updateMainWindow:)
     if (!show)
     {
         [self.fFilterBar reset:NO];
     }
 
     [self.fDefaults setBool:show forKey:@"FilterBar"];
-    [self drawMainWindow];
-
-    if (show)
-    {
-        [self focusFilterField];
-    }
+    [self updateMainWindow];
 }
 
 - (void)focusFilterField
@@ -5008,7 +4985,7 @@ static void removeKeRangerRansomware()
     }
     [self.fAddingTransfers addObject:torrent];
 
-    [self drawMainWindow];
+    [self fullUpdateUI];
 }
 
 - (void)rpcRemoveTorrent:(Torrent*)torrent deleteData:(BOOL)deleteData

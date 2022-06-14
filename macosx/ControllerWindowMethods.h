@@ -9,18 +9,20 @@
 
 @interface Controller (ControllerWindowMethods)
 
-- (void)drawMainWindow;
+- (void)updateMainWindow;
 
 - (void)setWindowSizeToFit;
 - (void)updateForAutoSize;
 - (void)setWindowMinMaxToCurrent;
+- (void)removeWindowMinMax;
+- (void)setMinWindowContentSizeAllowed;
+- (void)setMaxWindowContentSizeAllowed;
+- (void)removeStackViewHeightConstraints;
 
-@property(nonatomic, readonly) NSRect sizedWindowFrame;
-@property(nonatomic, readonly) CGFloat titlebarHeight;
+@property(nonatomic, readonly) CGFloat minWindowContentHeightAllowed;
+@property(nonatomic, readonly) CGFloat toolbarHeight;
 @property(nonatomic, readonly) CGFloat mainWindowComponentHeight;
 @property(nonatomic, readonly) CGFloat scrollViewHeight;
-@property(nonatomic, readonly) CGFloat fullScreenScrollViewHeight;
-@property(nonatomic, readonly) CGFloat minWindowContentSizeAllowed;
 @property(nonatomic, readonly) BOOL isFullScreen;
 
 @end

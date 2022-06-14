@@ -130,6 +130,8 @@
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(resizeBar) name:NSWindowDidResizeNotification
                                              object:self.view.window];
 
+    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(resizeBar) name:@"ResizeBar" object:nil];
+
     //update when groups change
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(updateGroups:) name:@"UpdateGroups" object:nil];
 }

@@ -11,7 +11,6 @@
 
 #import "VDKQueue.h"
 #import "TorrentTableView.h"
-#import "MainWindow.h"
 
 @class AddMagnetWindowController;
 @class AddWindowController;
@@ -185,7 +184,9 @@ typedef NS_ENUM(unsigned int, addType) { //
 - (void)rpcMovedTorrent:(Torrent*)torrent;
 - (void)rpcUpdateQueue;
 
-@property(nonatomic) IBOutlet MainWindow* fWindow;
+@property(nonatomic) IBOutlet NSWindow* fWindow;
+@property(nonatomic) IBOutlet NSStackView* fStackView;
+@property(nonatomic) NSArray* fStackViewHeightConstraints;
 @property(nonatomic) IBOutlet TorrentTableView* fTableView;
 
 @property(nonatomic) IBOutlet NSMenuItem* fOpenIgnoreDownloadFolder;
