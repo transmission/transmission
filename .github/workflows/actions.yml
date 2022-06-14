@@ -218,6 +218,84 @@ jobs:
           name: binaries-${{ github.job }}
           path: pfx/**/*
 
+  alpine-musl:
+    runs-on: ubuntu-22.04
+    container:
+      image: radupopescu/musl-builder
+    runs-on: macos-11
+    needs: [ what-to-build ]
+    if: ${{ needs.what-to-build.outputs.build-cli == 'true' || needs.what-to-build.outputs.build-daemon == 'true' || needs.what-to-build.outputs.build-gtk == 'true' || needs.what-to-build.outputs.build-mac == 'true' || needs.what-to-build.outputs.build-qt == 'true' || needs.what-to-build.outputs.build-tests == 'true' || needs.what-to-build.outputs.build-utils == 'true' }}
+    steps:
+      - name: Show Configuration
+        run: |
+          echo '${{ toJSON(needs) }}'
+          echo '${{ toJSON(runner) }}'
+          cat /etc/os-release
+      - name: Get Dependencies
+        run: |
+          set -ex
+          apk update
+          apk add --upgrade \
+            ca-certificates \
+            cmake \
+            g++ \
+            gettext \
+            libcurl4-openssl-dev \
+            libdeflate-dev \
+            libevent-dev \
+            libfmt-dev \
+            libminiupnpc-dev \
+            libnatpmp-dev \
+            libpsl-dev \
+            libssl-dev \
+            ninja-build \
+            pkg-config \
+            xz-utils
+      - name: Get Dependencies (GTK)
+        if: ${{ needs.what-to-build.outputs.build-gtk == 'true' }}
+        run: apk add --upgrade glibmm-dev gtkmm3-dev
+      - name: Get Dependencies (Qt)
+        if: ${{ needs.what-to-build.outputs.build-qt == 'true' }}
+        run: apk add --upgrade qt5-qtbase-dev qt5-qttools-dev
+      - name: Get Source
+        uses: actions/checkout@v3
+        with:
+          path: src
+          submodules: recursive
+      - name: Configure
+        run: |
+          cmake \
+            -S src \
+            -B obj \
+            -G Ninja \
+            -DCMAKE_BUILD_TYPE=RelWithDebInfo \
+            -DCMAKE_INSTALL_PREFIX=pfx \
+            -DCMAKE_OSX_ARCHITECTURES='x86_64' \
+            -DCMAKE_OSX_DEPLOYMENT_TARGET='10.10' \
+            -DCMAKE_PREFIX_PATH=`brew --prefix`/opt/qt@5 \
+            -DENABLE_CLI=${{ (needs.what-to-build.outputs.build-cli == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_DAEMON=${{ (needs.what-to-build.outputs.build-daemon == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_GTK=${{ (needs.what-to-build.outputs.build-gtk == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_MAC=${{ (needs.what-to-build.outputs.build-mac == 'true') && 'ON' || 'OFF' }}  \
+            -DENABLE_QT=${{ (needs.what-to-build.outputs.build-qt == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_TESTS=OFF \
+            -DENABLE_UTILS=${{ (needs.what-to-build.outputs.build-utils == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_WEB=OFF \
+            -DRUN_CLANG_TIDY=OFF
+      - name: Make
+        run: cmake --build obj --config RelWithDebInfo
+      - name: Test
+        if: ${{ needs.what-to-build.outputs.build-tests == 'true' }}
+        env:
+          TMPDIR: /private/tmp
+        run: cmake -E chdir obj ctest --build-config RelWithDebInfo --output-on-failure
+      - name: Install
+        run: cmake --build obj --config RelWithDebInfo --target install/strip
+      - uses: actions/upload-artifact@v3
+        with:
+          name: binaries-${{ github.job }}
+          path: pfx/**/*
+
   make-source-tarball:
     runs-on: ubuntu-22.04
     needs: [ what-to-build ]
