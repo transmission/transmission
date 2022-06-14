@@ -1048,7 +1048,8 @@
 /* Status Bar -> status menu */
 "Total Transfer" = "Total Transfer";
 
-/* Message window -> level string */
+/* Message window -> level
+   Message window -> level string */
 "Trace" = "Trace";
 
 /* Filter Bar -> filter menu */
@@ -1126,7 +1127,8 @@
 /* Torrent -> status string */
 "Waiting to seed" = "Waiting to seed";
 
-/* Message window -> level string */
+/* Message window -> level
+   Message window -> level string */
 "Warn" = "Warn";
 
 /* Drag overlay -> url */
