@@ -66,8 +66,8 @@
 
     self.window.title = NSLocalizedString(@"Message Log", "Message window -> title");
 
-    //disable fullscreen support
-    [window setCollectionBehavior:NSWindowCollectionBehaviorFullScreenNone];
+    //make window an auxillary view in fullscreen
+    [window setCollectionBehavior:NSWindowCollectionBehaviorFullScreenAuxiliary];
 
     //set images and text for popup button items
     [self.fLevelButton itemAtIndex:LEVEL_ERROR].title = NSLocalizedString(@"Error", "Message window -> level string");

@@ -23,150 +23,184 @@
                 <rect key="frame" x="0.0" y="0.0" width="515" height="248"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2690">
-                        <rect key="frame" x="36" y="3" width="36" height="18"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                        <buttonCell key="cell" type="squareTextured" bezelStyle="texturedSquare" image="TortoiseTemplate" imagePosition="only" alignment="center" state="on" imageScaling="proportionallyDown" inset="2" id="3048">
-                            <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
-                            <font key="font" metaFont="system"/>
-                        </buttonCell>
-                        <connections>
-                            <action selector="speedLimitChanged:" target="206" id="3180"/>
-                            <binding destination="1815" name="value" keyPath="values.SpeedLimit" id="3179"/>
-                        </connections>
-                    </button>
-                    <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="3420">
-                        <rect key="frame" x="72" y="3" width="36" height="18"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                        <buttonCell key="cell" type="squareTextured" bezelStyle="texturedSquare" image="CleanupTemplate" imagePosition="only" alignment="center" state="on" imageScaling="proportionallyDown" inset="2" id="3421">
-                            <behavior key="behavior" lightByContents="YES"/>
-                            <font key="font" metaFont="system"/>
-                        </buttonCell>
-                        <connections>
-                            <action selector="clearCompleted:" target="206" id="3424"/>
-                        </connections>
-                    </button>
-                    <button fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="3435">
-                        <rect key="frame" x="0.0" y="3" width="36" height="18"/>
-                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                        <buttonCell key="cell" type="squareTextured" bezelStyle="texturedSquare" image="EllipsisTemplate" imagePosition="only" alignment="center" state="on" imageScaling="proportionallyDown" inset="2" id="3436">
-                            <behavior key="behavior" lightByContents="YES"/>
-                            <font key="font" metaFont="system"/>
-                        </buttonCell>
-                        <connections>
-                            <action selector="showGlobalPopover:" target="206" id="3439"/>
-                        </connections>
-                    </button>
-                    <textField verticalHuggingPriority="750" fixedFrame="YES" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2700">
-                        <rect key="frame" x="118" y="5" width="279" height="14"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES"/>
-                        <textFieldCell key="cell" controlSize="small" lineBreakMode="truncatingTail" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="center" title="999 из 999 раздач" usesSingleLineMode="YES" id="3049">
-                            <font key="font" metaFont="smallSystem"/>
-                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                        </textFieldCell>
-                    </textField>
-                    <scrollView fixedFrame="YES" borderType="none" autohidesScrollers="YES" horizontalLineScroll="65" horizontalPageScroll="0.0" verticalLineScroll="65" verticalPageScroll="0.0" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="3088">
-                        <rect key="frame" x="0.0" y="24" width="515" height="224"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <clipView key="contentView" copiesOnScroll="NO" id="cxH-Xd-aWF">
-                            <rect key="frame" x="0.0" y="0.0" width="515" height="224"/>
-                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                            <subviews>
-                                <outlineView verticalHuggingPriority="750" allowsExpansionToolTips="YES" alternatingRowBackgroundColors="YES" columnReordering="NO" columnResizing="NO" autosaveColumns="NO" rowHeight="62" indentationPerLevel="16" indentationMarkerFollowsCell="NO" outlineTableColumn="3093" id="3091" customClass="TorrentTableView">
+                    <stackView distribution="fill" orientation="vertical" alignment="leading" spacing="0.0" horizontalStackHuggingPriority="249.99998474121094" verticalStackHuggingPriority="249.99998474121094" detachesHiddenViews="YES" translatesAutoresizingMaskIntoConstraints="NO" id="gSc-ID-Ehp">
+                        <rect key="frame" x="0.0" y="0.0" width="515" height="248"/>
+                        <subviews>
+                            <scrollView borderType="none" autohidesScrollers="YES" horizontalLineScroll="65" horizontalPageScroll="0.0" verticalLineScroll="65" verticalPageScroll="0.0" hasHorizontalScroller="NO" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="3088">
+                                <rect key="frame" x="0.0" y="24" width="515" height="224"/>
+                                <clipView key="contentView" copiesOnScroll="NO" id="cxH-Xd-aWF">
                                     <rect key="frame" x="0.0" y="0.0" width="515" height="224"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                    <size key="intercellSpacing" width="2" height="3"/>
-                                    <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                    <color key="gridColor" white="0.80241936000000003" alpha="1" colorSpace="calibratedWhite"/>
-                                    <tableColumns>
-                                        <tableColumn identifier="Color" editable="NO" width="29" minWidth="16" maxWidth="3000" id="3093">
-                                            <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Цвет">
-                                                <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
-                                                <color key="backgroundColor" white="0.33333299" alpha="1" colorSpace="calibratedWhite"/>
-                                            </tableHeaderCell>
-                                            <imageCell key="dataCell" controlSize="small" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="imageCell:3146:image" id="3146">
-                                                <font key="font" metaFont="system"/>
-                                            </imageCell>
-                                        </tableColumn>
-                                        <tableColumn identifier="Group" editable="NO" width="296" minWidth="48" maxWidth="3.4028229999999999e+38" id="3140">
-                                            <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Группа">
-                                                <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
-                                                <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
-                                            </tableHeaderCell>
-                                            <textFieldCell key="dataCell" lineBreakMode="truncatingTail" selectable="YES" sendsActionOnEndEditing="YES" alignment="left" title="Text Cell" id="3145">
-                                                <font key="font" metaFont="system"/>
-                                                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                            </textFieldCell>
-                                            <tableColumnResizingMask key="resizingMask" resizeWithTable="YES"/>
-                                        </tableColumn>
-                                        <tableColumn identifier="DL Image" editable="NO" width="10" minWidth="10" maxWidth="10" id="3124">
-                                            <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left">
-                                                <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
-                                                <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
-                                            </tableHeaderCell>
-                                            <imageCell key="dataCell" controlSize="small" refusesFirstResponder="YES" alignment="left" imageAlignment="right" imageScaling="proportionallyDown" image="imageCell:3146:image" id="3138">
-                                                <font key="font" metaFont="system"/>
-                                            </imageCell>
-                                        </tableColumn>
-                                        <tableColumn identifier="DL" editable="NO" width="64" minWidth="64" maxWidth="64" id="3126">
-                                            <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Скорость скачивания">
-                                                <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
-                                                <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
-                                            </tableHeaderCell>
-                                            <textFieldCell key="dataCell" lineBreakMode="truncatingTail" selectable="YES" alignment="left" title="Text Cell" id="3127">
-                                                <font key="font" metaFont="system"/>
-                                                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                                <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                            </textFieldCell>
-                                        </tableColumn>
-                                        <tableColumn identifier="UL Image" editable="NO" width="10" minWidth="10" maxWidth="10" id="3133">
-                                            <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left">
-                                                <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
-                                                <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
-                                            </tableHeaderCell>
-                                            <imageCell key="dataCell" controlSize="small" refusesFirstResponder="YES" alignment="left" imageAlignment="right" imageScaling="proportionallyDown" image="imageCell:3146:image" id="3139">
-                                                <font key="font" metaFont="system"/>
-                                            </imageCell>
-                                        </tableColumn>
-                                        <tableColumn identifier="UL" editable="NO" width="64" minWidth="64" maxWidth="64" id="3135">
-                                            <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Скорость раздачи">
-                                                <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
-                                                <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
-                                            </tableHeaderCell>
-                                            <textFieldCell key="dataCell" lineBreakMode="truncatingTail" selectable="YES" alignment="left" title="Text Cell" id="3136">
-                                                <font key="font" metaFont="system"/>
-                                                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                                <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                            </textFieldCell>
-                                        </tableColumn>
-                                    </tableColumns>
-                                    <connections>
-                                        <outlet property="dataSource" destination="206" id="3097"/>
-                                        <outlet property="fActionMenu" destination="1936" id="3098"/>
-                                        <outlet property="fContextNoRow" destination="589" id="3101"/>
-                                        <outlet property="fContextRow" destination="456" id="3100"/>
-                                        <outlet property="fController" destination="206" id="3102"/>
-                                        <outlet property="fDownloadMenu" destination="1945" id="3103"/>
-                                        <outlet property="fGlobalLimitItem" destination="3190" id="3193"/>
-                                        <outlet property="fPriorityMenu" destination="3197" id="3201"/>
-                                        <outlet property="fRatioMenu" destination="2018" id="3105"/>
-                                        <outlet property="fUploadMenu" destination="1951" id="3104"/>
-                                    </connections>
-                                </outlineView>
-                            </subviews>
-                        </clipView>
-                        <scroller key="horizontalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="3090">
-                            <rect key="frame" x="-100" y="-100" width="451" height="15"/>
-                            <autoresizingMask key="autoresizingMask"/>
-                        </scroller>
-                        <scroller key="verticalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="NO" id="3089">
-                            <rect key="frame" x="453" y="0.0" width="15" height="173"/>
-                            <autoresizingMask key="autoresizingMask"/>
-                        </scroller>
-                    </scrollView>
+                                    <subviews>
+                                        <outlineView verticalHuggingPriority="750" allowsExpansionToolTips="YES" alternatingRowBackgroundColors="YES" columnReordering="NO" columnResizing="NO" autosaveColumns="NO" rowHeight="62" indentationPerLevel="16" indentationMarkerFollowsCell="NO" outlineTableColumn="3093" id="3091" customClass="TorrentTableView">
+                                            <rect key="frame" x="0.0" y="0.0" width="515" height="224"/>
+                                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                            <size key="intercellSpacing" width="2" height="3"/>
+                                            <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                            <color key="gridColor" white="0.80241936000000003" alpha="1" colorSpace="calibratedWhite"/>
+                                            <tableColumns>
+                                                <tableColumn identifier="Color" editable="NO" width="29" minWidth="16" maxWidth="3000" id="3093">
+                                                    <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Цвет">
+                                                        <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
+                                                        <color key="backgroundColor" white="0.33333299" alpha="1" colorSpace="calibratedWhite"/>
+                                                    </tableHeaderCell>
+                                                    <imageCell key="dataCell" controlSize="small" refusesFirstResponder="YES" alignment="left" imageScaling="proportionallyDown" image="imageCell:3146:image" id="3146">
+                                                        <font key="font" metaFont="system"/>
+                                                    </imageCell>
+                                                </tableColumn>
+                                                <tableColumn identifier="Group" editable="NO" width="296" minWidth="48" maxWidth="3.4028229999999999e+38" id="3140">
+                                                    <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Группа">
+                                                        <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
+                                                        <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
+                                                    </tableHeaderCell>
+                                                    <textFieldCell key="dataCell" lineBreakMode="truncatingTail" selectable="YES" sendsActionOnEndEditing="YES" alignment="left" title="Text Cell" id="3145">
+                                                        <font key="font" metaFont="system"/>
+                                                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                                    </textFieldCell>
+                                                    <tableColumnResizingMask key="resizingMask" resizeWithTable="YES"/>
+                                                </tableColumn>
+                                                <tableColumn identifier="DL Image" editable="NO" width="10" minWidth="10" maxWidth="10" id="3124">
+                                                    <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left">
+                                                        <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
+                                                        <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
+                                                    </tableHeaderCell>
+                                                    <imageCell key="dataCell" controlSize="small" refusesFirstResponder="YES" alignment="left" imageAlignment="right" imageScaling="proportionallyDown" image="imageCell:3146:image" id="3138">
+                                                        <font key="font" metaFont="system"/>
+                                                    </imageCell>
+                                                </tableColumn>
+                                                <tableColumn identifier="DL" editable="NO" width="64" minWidth="64" maxWidth="64" id="3126">
+                                                    <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Скорость скачивания">
+                                                        <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
+                                                        <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
+                                                    </tableHeaderCell>
+                                                    <textFieldCell key="dataCell" lineBreakMode="truncatingTail" selectable="YES" alignment="left" title="Text Cell" id="3127">
+                                                        <font key="font" metaFont="system"/>
+                                                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                        <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                    </textFieldCell>
+                                                </tableColumn>
+                                                <tableColumn identifier="UL Image" editable="NO" width="10" minWidth="10" maxWidth="10" id="3133">
+                                                    <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left">
+                                                        <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
+                                                        <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
+                                                    </tableHeaderCell>
+                                                    <imageCell key="dataCell" controlSize="small" refusesFirstResponder="YES" alignment="left" imageAlignment="right" imageScaling="proportionallyDown" image="imageCell:3146:image" id="3139">
+                                                        <font key="font" metaFont="system"/>
+                                                    </imageCell>
+                                                </tableColumn>
+                                                <tableColumn identifier="UL" editable="NO" width="64" minWidth="64" maxWidth="64" id="3135">
+                                                    <tableHeaderCell key="headerCell" lineBreakMode="truncatingTail" borderStyle="border" alignment="left" title="Скорость раздачи">
+                                                        <color key="textColor" name="headerTextColor" catalog="System" colorSpace="catalog"/>
+                                                        <color key="backgroundColor" name="headerColor" catalog="System" colorSpace="catalog"/>
+                                                    </tableHeaderCell>
+                                                    <textFieldCell key="dataCell" lineBreakMode="truncatingTail" selectable="YES" alignment="left" title="Text Cell" id="3136">
+                                                        <font key="font" metaFont="system"/>
+                                                        <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                                        <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                    </textFieldCell>
+                                                </tableColumn>
+                                            </tableColumns>
+                                            <connections>
+                                                <outlet property="dataSource" destination="206" id="3097"/>
+                                                <outlet property="fActionMenu" destination="1936" id="3098"/>
+                                                <outlet property="fContextNoRow" destination="589" id="3101"/>
+                                                <outlet property="fContextRow" destination="456" id="3100"/>
+                                                <outlet property="fController" destination="206" id="3102"/>
+                                                <outlet property="fDownloadMenu" destination="1945" id="3103"/>
+                                                <outlet property="fGlobalLimitItem" destination="3190" id="3193"/>
+                                                <outlet property="fPriorityMenu" destination="3197" id="3201"/>
+                                                <outlet property="fRatioMenu" destination="2018" id="3105"/>
+                                                <outlet property="fUploadMenu" destination="1951" id="3104"/>
+                                            </connections>
+                                        </outlineView>
+                                    </subviews>
+                                </clipView>
+                                <scroller key="horizontalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="YES" id="3090">
+                                    <rect key="frame" x="-100" y="-100" width="451" height="15"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                </scroller>
+                                <scroller key="verticalScroller" hidden="YES" wantsLayer="YES" verticalHuggingPriority="750" horizontal="NO" id="3089">
+                                    <rect key="frame" x="453" y="0.0" width="15" height="173"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                </scroller>
+                            </scrollView>
+                            <customView translatesAutoresizingMaskIntoConstraints="NO" id="gME-WF-axg">
+                                <rect key="frame" x="0.0" y="0.0" width="515" height="24"/>
+                                <subviews>
+                                    <button translatesAutoresizingMaskIntoConstraints="NO" id="2690">
+                                        <rect key="frame" x="34" y="3" width="18" height="18"/>
+                                        <buttonCell key="cell" type="squareTextured" bezelStyle="texturedSquare" image="TortoiseTemplate" imagePosition="only" alignment="center" state="on" imageScaling="proportionallyDown" inset="2" id="3048">
+                                            <behavior key="behavior" pushIn="YES" changeContents="YES" lightByContents="YES"/>
+                                            <font key="font" metaFont="system"/>
+                                        </buttonCell>
+                                        <connections>
+                                            <action selector="speedLimitChanged:" target="206" id="3180"/>
+                                            <binding destination="1815" name="value" keyPath="values.SpeedLimit" id="3179"/>
+                                        </connections>
+                                    </button>
+                                    <button translatesAutoresizingMaskIntoConstraints="NO" id="3420">
+                                        <rect key="frame" x="60" y="3" width="18" height="18"/>
+                                        <buttonCell key="cell" type="squareTextured" bezelStyle="texturedSquare" image="CleanupTemplate" imagePosition="only" alignment="center" state="on" imageScaling="proportionallyDown" inset="2" id="3421">
+                                            <behavior key="behavior" lightByContents="YES"/>
+                                            <font key="font" metaFont="system"/>
+                                        </buttonCell>
+                                        <connections>
+                                            <action selector="clearCompleted:" target="206" id="3424"/>
+                                        </connections>
+                                    </button>
+                                    <button translatesAutoresizingMaskIntoConstraints="NO" id="3435">
+                                        <rect key="frame" x="8" y="3" width="18" height="18"/>
+                                        <buttonCell key="cell" type="squareTextured" bezelStyle="texturedSquare" image="EllipsisTemplate" imagePosition="only" alignment="center" state="on" imageScaling="proportionallyDown" inset="2" id="3436">
+                                            <behavior key="behavior" lightByContents="YES"/>
+                                            <font key="font" metaFont="system"/>
+                                        </buttonCell>
+                                        <connections>
+                                            <action selector="showGlobalPopover:" target="206" id="3439"/>
+                                        </connections>
+                                    </button>
+                                    <textField verticalHuggingPriority="750" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="2700">
+                                        <rect key="frame" x="202" y="5" width="111" height="14"/>
+                                        <textFieldCell key="cell" controlSize="small" lineBreakMode="truncatingTail" allowsUndo="NO" sendsActionOnEndEditing="YES" alignment="center" title="999 из 999 раздач" usesSingleLineMode="YES" id="3049">
+                                            <font key="font" metaFont="smallSystem"/>
+                                            <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                        </textFieldCell>
+                                    </textField>
+                                </subviews>
+                                <constraints>
+                                    <constraint firstItem="2700" firstAttribute="centerY" secondItem="gME-WF-axg" secondAttribute="centerY" id="HZ2-aB-E0E"/>
+                                    <constraint firstItem="3435" firstAttribute="leading" secondItem="gME-WF-axg" secondAttribute="leading" constant="8" id="PKR-UU-O3d"/>
+                                    <constraint firstAttribute="height" constant="24" id="PVO-Fs-zff"/>
+                                    <constraint firstItem="2690" firstAttribute="leading" secondItem="3435" secondAttribute="trailing" constant="8" symbolic="YES" id="a5h-m0-7Du"/>
+                                    <constraint firstItem="3435" firstAttribute="centerY" secondItem="gME-WF-axg" secondAttribute="centerY" id="dKj-zY-5vS"/>
+                                    <constraint firstItem="2690" firstAttribute="centerY" secondItem="gME-WF-axg" secondAttribute="centerY" id="dwJ-gK-HaH"/>
+                                    <constraint firstItem="3420" firstAttribute="centerY" secondItem="gME-WF-axg" secondAttribute="centerY" id="klg-Gq-c6X"/>
+                                    <constraint firstItem="2700" firstAttribute="centerX" secondItem="gME-WF-axg" secondAttribute="centerX" id="o8f-Cb-7Ia"/>
+                                    <constraint firstItem="3420" firstAttribute="leading" secondItem="2690" secondAttribute="trailing" constant="8" symbolic="YES" id="qkq-v2-L93"/>
+                                </constraints>
+                            </customView>
+                        </subviews>
+                        <constraints>
+                            <constraint firstItem="gME-WF-axg" firstAttribute="leading" secondItem="gSc-ID-Ehp" secondAttribute="leading" id="28s-xC-DCF"/>
+                            <constraint firstAttribute="trailing" secondItem="gME-WF-axg" secondAttribute="trailing" id="HxF-jc-DA0"/>
+                        </constraints>
+                        <visibilityPriorities>
+                            <integer value="1000"/>
+                            <integer value="1000"/>
+                        </visibilityPriorities>
+                        <customSpacing>
+                            <real value="3.4028234663852886e+38"/>
+                            <real value="3.4028234663852886e+38"/>
+                        </customSpacing>
+                    </stackView>
                 </subviews>
+                <constraints>
+                    <constraint firstAttribute="bottom" secondItem="gSc-ID-Ehp" secondAttribute="bottom" id="6p2-AM-WkM"/>
+                    <constraint firstItem="gSc-ID-Ehp" firstAttribute="leading" secondItem="2" secondAttribute="leading" id="cpx-6d-drj"/>
+                    <constraint firstAttribute="trailing" secondItem="gSc-ID-Ehp" secondAttribute="trailing" id="mDd-Il-BCK"/>
+                    <constraint firstItem="gSc-ID-Ehp" firstAttribute="top" secondItem="2" secondAttribute="top" id="onD-X7-qHe"/>
+                </constraints>
             </view>
             <connections>
                 <outlet property="menu" destination="29" id="2687"/>
@@ -715,6 +749,7 @@ CA
                 <outlet property="fShareMenuItem" destination="s5v-VO-G2y" id="NnB-Cl-bNp"/>
                 <outlet property="fSortMenu" destination="1895" id="3440"/>
                 <outlet property="fSpeedLimitButton" destination="2690" id="2703"/>
+                <outlet property="fStackView" destination="gSc-ID-Ehp" id="xrq-6L-EeT"/>
                 <outlet property="fTableView" destination="3091" id="3118"/>
                 <outlet property="fTotalTorrentsField" destination="2700" id="2702"/>
                 <outlet property="fWindow" destination="21" id="246"/>
