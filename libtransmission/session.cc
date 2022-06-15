@@ -190,7 +190,7 @@ void tr_sessionFetch(tr_session* session, tr_web::FetchOptions&& options)
 ****
 ***/
 
-tr_encryption_mode tr_sessionGetEncryption(tr_session* session)
+tr_encryption_mode tr_sessionGetEncryption(tr_session const* session)
 {
     TR_ASSERT(session != nullptr);
 
@@ -472,8 +472,8 @@ void tr_sessionGetSettings(tr_session const* s, tr_variant* d)
     tr_variantDictAddBool(d, TR_KEY_anti_brute_force_enabled, tr_sessionGetAntiBruteForceEnabled(s));
     for (auto const& [enabled_key, script_key, script] : tr_session::Scripts)
     {
-        tr_variantDictAddBool(d, enabled_key, tr_sessionIsScriptEnabled(s, script));
-        tr_variantDictAddStr(d, script_key, tr_sessionGetScript(s, script));
+        tr_variantDictAddBool(d, enabled_key, s->useScript(script));
+        tr_variantDictAddStr(d, script_key, s->script(script));
     }
 }
 
@@ -1278,7 +1278,7 @@ void tr_sessionSetPeerPortRandomOnStart(tr_session* session, bool random)
     session->isPortRandom = random;
 }
 
-bool tr_sessionGetPeerPortRandomOnStart(tr_session* session)
+bool tr_sessionGetPeerPortRandomOnStart(tr_session const* session)
 {
     TR_ASSERT(tr_isSession(session));
 
