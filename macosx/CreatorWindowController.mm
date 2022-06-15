@@ -160,8 +160,8 @@ NSMutableSet* creatorWindowControllerSet = nil;
 
     self.window.title = name;
 
-    //make window an auxillary view in fullscreen
-    [self.window setCollectionBehavior:NSWindowCollectionBehaviorFullScreenAuxiliary];
+    //disable fullscreen support
+    [self.window setCollectionBehavior:NSWindowCollectionBehaviorFullScreenNone];
 
     self.fNameField.stringValue = name;
     self.fNameField.toolTip = self.fPath.path;

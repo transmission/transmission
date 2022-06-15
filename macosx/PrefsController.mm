@@ -202,8 +202,8 @@
 
     self.window.restorationClass = [self class];
 
-    //make window an auxillary view in fullscreen
-    [self.window setCollectionBehavior:NSWindowCollectionBehaviorFullScreenAuxiliary];
+    //disable fullscreen support
+    [self.window setCollectionBehavior:NSWindowCollectionBehaviorFullScreenNone];
 
     NSToolbar* toolbar = [[NSToolbar alloc] initWithIdentifier:@"Preferences Toolbar"];
     toolbar.delegate = self;
