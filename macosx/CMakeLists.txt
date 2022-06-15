@@ -247,7 +247,6 @@ set(${PROJECT_NAME}_HIDPI_IMAGES
     DownArrowTemplate
     EllipsisTemplate
     FavIcon
-    GearshapeTemplate
     Globe
     Groups
     InfoActivity
