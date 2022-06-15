@@ -367,16 +367,13 @@
 		C3CEBBCB27949F8400683BE0 /* matchfinder_common.h in Headers */ = {isa = PBXBuildFile; fileRef = C3CEBBB327949F8400683BE0 /* matchfinder_common.h */; };
 		C3CEBBCC27949F8400683BE0 /* bt_matchfinder.h in Headers */ = {isa = PBXBuildFile; fileRef = C3CEBBB427949F8400683BE0 /* bt_matchfinder.h */; };
 		C3CEBBCD27949F8400683BE0 /* crc32.c in Sources */ = {isa = PBXBuildFile; fileRef = C3CEBBB527949F8400683BE0 /* crc32.c */; };
-		C3CEBBCE27949F8400683BE0 /* crc32_table.h in Headers */ = {isa = PBXBuildFile; fileRef = C3CEBBB627949F8400683BE0 /* crc32_table.h */; };
 		C3CEBBCF27949F8400683BE0 /* deflate_constants.h in Headers */ = {isa = PBXBuildFile; fileRef = C3CEBBB727949F8400683BE0 /* deflate_constants.h */; };
-		C3CEBBD027949F8400683BE0 /* unaligned.h in Headers */ = {isa = PBXBuildFile; fileRef = C3CEBBB827949F8400683BE0 /* unaligned.h */; };
 		C3CEBBD127949F8400683BE0 /* utils.c in Sources */ = {isa = PBXBuildFile; fileRef = C3CEBBB927949F8400683BE0 /* utils.c */; };
 		C3CEBBD227949F8400683BE0 /* zlib_compress.c in Sources */ = {isa = PBXBuildFile; fileRef = C3CEBBBA27949F8400683BE0 /* zlib_compress.c */; };
 		C3CEBBD327949F8400683BE0 /* zlib_decompress.c in Sources */ = {isa = PBXBuildFile; fileRef = C3CEBBBB27949F8400683BE0 /* zlib_decompress.c */; };
 		C3CEBBD427949F8400683BE0 /* deflate_compress.c in Sources */ = {isa = PBXBuildFile; fileRef = C3CEBBBC27949F8400683BE0 /* deflate_compress.c */; };
 		C3CEBBD527949F8400683BE0 /* cpu_features_common.h in Headers */ = {isa = PBXBuildFile; fileRef = C3CEBBBD27949F8400683BE0 /* cpu_features_common.h */; };
 		C3CEBBD627949F8400683BE0 /* adler32_vec_template.h in Headers */ = {isa = PBXBuildFile; fileRef = C3CEBBBE27949F8400683BE0 /* adler32_vec_template.h */; };
-		C3CEBBD727949F8400683BE0 /* crc32_vec_template.h in Headers */ = {isa = PBXBuildFile; fileRef = C3CEBBBF27949F8400683BE0 /* crc32_vec_template.h */; };
 		C3CEBBD827949F8400683BE0 /* zlib_constants.h in Headers */ = {isa = PBXBuildFile; fileRef = C3CEBBC027949F8400683BE0 /* zlib_constants.h */; };
 		C3CEBBD927949F8400683BE0 /* deflate_compress.h in Headers */ = {isa = PBXBuildFile; fileRef = C3CEBBC127949F8400683BE0 /* deflate_compress.h */; };
 		C3CEBBDA27949F8400683BE0 /* decompress_template.h in Headers */ = {isa = PBXBuildFile; fileRef = C3CEBBC227949F8400683BE0 /* decompress_template.h */; };
@@ -392,9 +389,6 @@
 		C3CEBBF22794A07900683BE0 /* cpu_features.h in Headers */ = {isa = PBXBuildFile; fileRef = C3CEBBEB2794A07900683BE0 /* cpu_features.h */; };
 		C3CEBBF32794A07900683BE0 /* matchfinder_impl.h in Headers */ = {isa = PBXBuildFile; fileRef = C3CEBBEC2794A07900683BE0 /* matchfinder_impl.h */; };
 		C3CEBBF42794A07900683BE0 /* adler32_impl.h in Headers */ = {isa = PBXBuildFile; fileRef = C3CEBBED2794A07900683BE0 /* adler32_impl.h */; };
-		C3CEBBF92794A0D200683BE0 /* common_defs.h in Headers */ = {isa = PBXBuildFile; fileRef = C3CEBBF62794A0D200683BE0 /* common_defs.h */; };
-		C3CEBBFA2794A0D200683BE0 /* compiler_gcc.h in Headers */ = {isa = PBXBuildFile; fileRef = C3CEBBF72794A0D200683BE0 /* compiler_gcc.h */; };
-		C3CEBBFB2794A0D200683BE0 /* compiler_msc.h in Headers */ = {isa = PBXBuildFile; fileRef = C3CEBBF82794A0D200683BE0 /* compiler_msc.h */; };
 		C3CEBBFC2794A12200683BE0 /* libdeflate.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C3CEBBA927949CA000683BE0 /* libdeflate.a */; };
 		C3D9062627B7E3E200EF2386 /* lookup_string_in_fixed_set.c in Sources */ = {isa = PBXBuildFile; fileRef = C3D9061727B7E1DE00EF2386 /* lookup_string_in_fixed_set.c */; };
 		C3D9062727B7E3E800EF2386 /* psl.c in Sources */ = {isa = PBXBuildFile; fileRef = C3D9061827B7E1DE00EF2386 /* psl.c */; };
@@ -433,6 +427,9 @@
 		E138A9780C04D88F00C5426C /* ProgressGradients.mm in Sources */ = {isa = PBXBuildFile; fileRef = E138A9760C04D88F00C5426C /* ProgressGradients.mm */; };
 		E23B55A5FC3B557F7746D510 /* interned-string.h in Headers */ = {isa = PBXBuildFile; fileRef = E23B55A5FC3B557F7746D511 /* interned-string.h */; settings = {ATTRIBUTES = (Project, ); }; };
 		E71A5565279C2DD600EBFA1E /* tr-assert.mm in Sources */ = {isa = PBXBuildFile; fileRef = E71A5564279C2DD600EBFA1E /* tr-assert.mm */; };
+		ED20B87C28589274005FA6BE /* common_defs.h in Headers */ = {isa = PBXBuildFile; fileRef = ED20B87B28589274005FA6BE /* common_defs.h */; };
+		ED20B87F285892C5005FA6BE /* crc32_multipliers.h in Headers */ = {isa = PBXBuildFile; fileRef = ED20B87D285892C5005FA6BE /* crc32_multipliers.h */; };
+		ED20B880285892C5005FA6BE /* crc32_tables.h in Headers */ = {isa = PBXBuildFile; fileRef = ED20B87E285892C5005FA6BE /* crc32_tables.h */; };
 		ED8A163F2735A8AA000D61F9 /* peer-mgr-active-requests.h in Headers */ = {isa = PBXBuildFile; fileRef = ED8A163B2735A8AA000D61F9 /* peer-mgr-active-requests.h */; };
 		ED8A16402735A8AA000D61F9 /* peer-mgr-active-requests.cc in Sources */ = {isa = PBXBuildFile; fileRef = ED8A163C2735A8AA000D61F9 /* peer-mgr-active-requests.cc */; };
 		ED8A16412735A8AA000D61F9 /* peer-mgr-wishlist.h in Headers */ = {isa = PBXBuildFile; fileRef = ED8A163D2735A8AA000D61F9 /* peer-mgr-wishlist.h */; };
@@ -1150,16 +1147,13 @@
 		C3CEBBB327949F8400683BE0 /* matchfinder_common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = matchfinder_common.h; path = lib/matchfinder_common.h; sourceTree = "<group>"; };
 		C3CEBBB427949F8400683BE0 /* bt_matchfinder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = bt_matchfinder.h; path = lib/bt_matchfinder.h; sourceTree = "<group>"; };
 		C3CEBBB527949F8400683BE0 /* crc32.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = crc32.c; path = lib/crc32.c; sourceTree = "<group>"; };
-		C3CEBBB627949F8400683BE0 /* crc32_table.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = crc32_table.h; path = lib/crc32_table.h; sourceTree = "<group>"; };
 		C3CEBBB727949F8400683BE0 /* deflate_constants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = deflate_constants.h; path = lib/deflate_constants.h; sourceTree = "<group>"; };
-		C3CEBBB827949F8400683BE0 /* unaligned.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = unaligned.h; path = lib/unaligned.h; sourceTree = "<group>"; };
 		C3CEBBB927949F8400683BE0 /* utils.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = utils.c; path = lib/utils.c; sourceTree = "<group>"; };
 		C3CEBBBA27949F8400683BE0 /* zlib_compress.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = zlib_compress.c; path = lib/zlib_compress.c; sourceTree = "<group>"; };
 		C3CEBBBB27949F8400683BE0 /* zlib_decompress.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = zlib_decompress.c; path = lib/zlib_decompress.c; sourceTree = "<group>"; };
 		C3CEBBBC27949F8400683BE0 /* deflate_compress.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = deflate_compress.c; path = lib/deflate_compress.c; sourceTree = "<group>"; };
 		C3CEBBBD27949F8400683BE0 /* cpu_features_common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = cpu_features_common.h; path = lib/cpu_features_common.h; sourceTree = "<group>"; };
 		C3CEBBBE27949F8400683BE0 /* adler32_vec_template.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = adler32_vec_template.h; path = lib/adler32_vec_template.h; sourceTree = "<group>"; };
-		C3CEBBBF27949F8400683BE0 /* crc32_vec_template.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = crc32_vec_template.h; path = lib/crc32_vec_template.h; sourceTree = "<group>"; };
 		C3CEBBC027949F8400683BE0 /* zlib_constants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = zlib_constants.h; path = lib/zlib_constants.h; sourceTree = "<group>"; };
 		C3CEBBC127949F8400683BE0 /* deflate_compress.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = deflate_compress.h; path = lib/deflate_compress.h; sourceTree = "<group>"; };
 		C3CEBBC227949F8400683BE0 /* decompress_template.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = decompress_template.h; path = lib/decompress_template.h; sourceTree = "<group>"; };
@@ -1175,9 +1169,6 @@
 		C3CEBBEB2794A07900683BE0 /* cpu_features.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = cpu_features.h; path = lib/x86/cpu_features.h; sourceTree = "<group>"; };
 		C3CEBBEC2794A07900683BE0 /* matchfinder_impl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = matchfinder_impl.h; path = lib/x86/matchfinder_impl.h; sourceTree = "<group>"; };
 		C3CEBBED2794A07900683BE0 /* adler32_impl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = adler32_impl.h; path = lib/x86/adler32_impl.h; sourceTree = "<group>"; };
-		C3CEBBF62794A0D200683BE0 /* common_defs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = common_defs.h; path = common/common_defs.h; sourceTree = "<group>"; };
-		C3CEBBF72794A0D200683BE0 /* compiler_gcc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = compiler_gcc.h; path = common/compiler_gcc.h; sourceTree = "<group>"; };
-		C3CEBBF82794A0D200683BE0 /* compiler_msc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = compiler_msc.h; path = common/compiler_msc.h; sourceTree = "<group>"; };
 		C3D9061727B7E1DE00EF2386 /* lookup_string_in_fixed_set.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = lookup_string_in_fixed_set.c; path = src/lookup_string_in_fixed_set.c; sourceTree = "<group>"; };
 		C3D9061827B7E1DE00EF2386 /* psl.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = psl.c; path = src/psl.c; sourceTree = "<group>"; };
 		C3D9061B27B7E31100EF2386 /* libpsl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = libpsl.h; path = include/libpsl.h; sourceTree = "<group>"; };
@@ -1197,6 +1188,9 @@
 		E138A9760C04D88F00C5426C /* ProgressGradients.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = ProgressGradients.mm; sourceTree = "<group>"; };
 		E23B55A5FC3B557F7746D511 /* interned-string.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "interned-string.h"; sourceTree = "<group>"; };
 		E71A5564279C2DD600EBFA1E /* tr-assert.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = "tr-assert.mm"; sourceTree = "<group>"; };
+		ED20B87B28589274005FA6BE /* common_defs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = common_defs.h; sourceTree = "<group>"; };
+		ED20B87D285892C5005FA6BE /* crc32_multipliers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = crc32_multipliers.h; path = lib/crc32_multipliers.h; sourceTree = "<group>"; };
+		ED20B87E285892C5005FA6BE /* crc32_tables.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = crc32_tables.h; path = lib/crc32_tables.h; sourceTree = "<group>"; };
 		ED8A163B2735A8AA000D61F9 /* peer-mgr-active-requests.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "peer-mgr-active-requests.h"; sourceTree = "<group>"; };
 		ED8A163C2735A8AA000D61F9 /* peer-mgr-active-requests.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = "peer-mgr-active-requests.cc"; sourceTree = "<group>"; };
 		ED8A163D2735A8AA000D61F9 /* peer-mgr-wishlist.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "peer-mgr-wishlist.h"; sourceTree = "<group>"; };
@@ -2009,16 +2003,16 @@
 			isa = PBXGroup;
 			children = (
 				C31DB6D62794A4430050ABC9 /* libdeflate.h */,
-				C3CEBBF52794A09500683BE0 /* common */,
+				ED20B87B28589274005FA6BE /* common_defs.h */,
 				C3CEBBDB27949FA400683BE0 /* arm */,
 				C3CEBBDC27949FB400683BE0 /* x86 */,
 				C3CEBBBE27949F8400683BE0 /* adler32_vec_template.h */,
 				C3CEBBAD27949F8300683BE0 /* adler32.c */,
 				C3CEBBB427949F8400683BE0 /* bt_matchfinder.h */,
 				C3CEBBBD27949F8400683BE0 /* cpu_features_common.h */,
-				C3CEBBB627949F8400683BE0 /* crc32_table.h */,
-				C3CEBBBF27949F8400683BE0 /* crc32_vec_template.h */,
 				C3CEBBB527949F8400683BE0 /* crc32.c */,
+				ED20B87D285892C5005FA6BE /* crc32_multipliers.h */,
+				ED20B87E285892C5005FA6BE /* crc32_tables.h */,
 				C3CEBBC227949F8400683BE0 /* decompress_template.h */,
 				C3CEBBBC27949F8400683BE0 /* deflate_compress.c */,
 				C3CEBBC127949F8400683BE0 /* deflate_compress.h */,
@@ -2031,7 +2025,6 @@
 				C3CEBBB127949F8300683BE0 /* ht_matchfinder.h */,
 				C3CEBBB027949F8300683BE0 /* lib_common.h */,
 				C3CEBBB327949F8400683BE0 /* matchfinder_common.h */,
-				C3CEBBB827949F8400683BE0 /* unaligned.h */,
 				C3CEBBB927949F8400683BE0 /* utils.c */,
 				C3CEBBBA27949F8400683BE0 /* zlib_compress.c */,
 				C3CEBBC027949F8400683BE0 /* zlib_constants.h */,
@@ -2065,16 +2058,6 @@
 				C3CEBBEC2794A07900683BE0 /* matchfinder_impl.h */,
 			);
 			name = x86;
-			sourceTree = "<group>";
-		};
-		C3CEBBF52794A09500683BE0 /* common */ = {
-			isa = PBXGroup;
-			children = (
-				C3CEBBF62794A0D200683BE0 /* common_defs.h */,
-				C3CEBBF72794A0D200683BE0 /* compiler_gcc.h */,
-				C3CEBBF82794A0D200683BE0 /* compiler_msc.h */,
-			);
-			name = common;
 			sourceTree = "<group>";
 		};
 		C3D9061627B7E12F00EF2386 /* libpsl */ = {
@@ -2322,6 +2305,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				C3CEBBEF2794A07900683BE0 /* decompress_impl.h in Headers */,
+				ED20B880285892C5005FA6BE /* crc32_tables.h in Headers */,
 				C3CEBBF22794A07900683BE0 /* cpu_features.h in Headers */,
 				C3CEBBE42794A03700683BE0 /* matchfinder_impl.h in Headers */,
 				C3CEBBE52794A03700683BE0 /* cpu_features.h in Headers */,
@@ -2331,25 +2315,21 @@
 				C3CEBBE22794A03700683BE0 /* adler32_impl.h in Headers */,
 				C3CEBBCA27949F8400683BE0 /* gzip_constants.h in Headers */,
 				C3CEBBF32794A07900683BE0 /* matchfinder_impl.h in Headers */,
-				C3CEBBFB2794A0D200683BE0 /* compiler_msc.h in Headers */,
+				ED20B87C28589274005FA6BE /* common_defs.h in Headers */,
 				C3CEBBF12794A07900683BE0 /* crc32_impl.h in Headers */,
 				C3CEBBF42794A07900683BE0 /* adler32_impl.h in Headers */,
 				C3CEBBC827949F8400683BE0 /* lib_common.h in Headers */,
-				C3CEBBD027949F8400683BE0 /* unaligned.h in Headers */,
-				C3CEBBD727949F8400683BE0 /* crc32_vec_template.h in Headers */,
 				C3CEBBCF27949F8400683BE0 /* deflate_constants.h in Headers */,
 				C31DB6D72794A4430050ABC9 /* libdeflate.h in Headers */,
-				C3CEBBF92794A0D200683BE0 /* common_defs.h in Headers */,
 				C3CEBBD927949F8400683BE0 /* deflate_compress.h in Headers */,
 				C3CEBBCC27949F8400683BE0 /* bt_matchfinder.h in Headers */,
 				C3CEBBF02794A07900683BE0 /* crc32_pclmul_template.h in Headers */,
+				ED20B87F285892C5005FA6BE /* crc32_multipliers.h in Headers */,
 				C3CEBBD827949F8400683BE0 /* zlib_constants.h in Headers */,
 				C3CEBBDA27949F8400683BE0 /* decompress_template.h in Headers */,
 				C3CEBBC927949F8400683BE0 /* ht_matchfinder.h in Headers */,
 				C3CEBBD627949F8400683BE0 /* adler32_vec_template.h in Headers */,
 				C3CEBBC727949F8400683BE0 /* hc_matchfinder.h in Headers */,
-				C3CEBBCE27949F8400683BE0 /* crc32_table.h in Headers */,
-				C3CEBBFA2794A0D200683BE0 /* compiler_gcc.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
