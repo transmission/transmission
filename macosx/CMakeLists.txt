@@ -50,7 +50,6 @@ set(${PROJECT_NAME}_SOURCES
     ButtonToolbarItem.mm
     ColorTextField.mm
     Controller.mm
-    ControllerWindowMethods.mm
     CreatorWindowController.mm
     DragOverlayView.mm
     DragOverlayWindow.mm
@@ -78,7 +77,6 @@ set(${PROJECT_NAME}_SOURCES
     InfoTrackersViewController.mm
     InfoWindowController.mm
     main.mm
-    MainWindow.mm
     MessageWindowController.mm
     NSApplicationAdditions.mm
     NSImageAdditions.mm
