@@ -56,8 +56,9 @@ Glib::ustring tr_strlsize(guint64 size);
 /* return a human-readable string for the given ratio. */
 Glib::ustring tr_strlratio(double ratio);
 
-/* return a human-readable string for the time given in seconds. */
-Glib::ustring tr_strltime(time_t secs);
+std::string tr_format_time_relative(time_t src, time_t tgt);
+std::string tr_format_time_left(time_t seconds);
+std::string tr_format_time(time_t seconds);
 
 /***
 ****

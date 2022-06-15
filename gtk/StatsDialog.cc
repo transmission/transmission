@@ -79,13 +79,13 @@ bool StatsDialog::Impl::updateStats()
 
     setLabel(one_up_lb_, tr_strlsize(one.uploadedBytes));
     setLabel(one_down_lb_, tr_strlsize(one.downloadedBytes));
-    setLabel(one_time_lb_, tr_strltime(one.secondsActive));
+    setLabel(one_time_lb_, tr_format_time(one.secondsActive));
     setLabelFromRatio(one_ratio_lb_, one.ratio);
 
     setLabel(all_sessions_lb_, startedTimesText(all.sessionCount));
     setLabel(all_up_lb_, tr_strlsize(all.uploadedBytes));
     setLabel(all_down_lb_, tr_strlsize(all.downloadedBytes));
-    setLabel(all_time_lb_, tr_strltime(all.secondsActive));
+    setLabel(all_time_lb_, tr_format_time(all.secondsActive));
     setLabelFromRatio(all_ratio_lb_, all.ratio);
 
     return true;
