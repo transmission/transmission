@@ -53,7 +53,6 @@
 #import "NSStringAdditions.h"
 #import "ExpandedPathToPathTransformer.h"
 #import "ExpandedPathToIconTransformer.h"
-#import "MainWindow.h"
 
 #define TOOLBAR_CREATE @"Toolbar Create"
 #define TOOLBAR_OPEN_FILE @"Toolbar Open"
@@ -230,7 +229,7 @@ static void removeKeRangerRansomware()
 
 @interface Controller ()
 
-@property(nonatomic) IBOutlet MainWindow* fWindow;
+@property(nonatomic) IBOutlet NSWindow* fWindow;
 @property(nonatomic) IBOutlet TorrentTableView* fTableView;
 
 @property(nonatomic) IBOutlet NSMenuItem* fOpenIgnoreDownloadFolder;
