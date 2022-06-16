@@ -74,14 +74,7 @@
         NSData* groupData;
         if ((groupData = [_fDefaults dataForKey:@"CollapsedGroupIndexes"]))
         {
-            if (@available(macOS 10.13, *))
-            {
-                _fCollapsedGroups = [NSKeyedUnarchiver unarchivedObjectOfClass:NSMutableIndexSet.class fromData:groupData error:nil];
-            }
-            else
-            {
-                _fCollapsedGroups = [NSKeyedUnarchiver unarchiveObjectWithData:groupData];
-            }
+            _fCollapsedGroups = [NSKeyedUnarchiver unarchivedObjectOfClass:NSMutableIndexSet.class fromData:groupData error:nil];
         }
         else if ((groupData = [_fDefaults dataForKey:@"CollapsedGroups"])) //handle old groups
         {
@@ -105,10 +98,7 @@
 
         _piecesBarPercent = [_fDefaults boolForKey:@"PiecesBar"] ? 1.0 : 0.0;
 
-        if (@available(macOS 11.0, *))
-        {
-            self.style = NSTableViewStyleFullWidth;
-        }
+        self.style = NSTableViewStyleFullWidth;
     }
 
     return self;

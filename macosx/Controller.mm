@@ -3480,16 +3480,8 @@ static void removeKeRangerRansomware()
     NSPasteboard* pasteboard = info.draggingPasteboard;
     if ([pasteboard.types containsObject:TORRENT_TABLE_VIEW_DATA_TYPE])
     {
-        NSIndexSet* indexes;
-        if (@available(macOS 10.13, *))
-        {
-            indexes = [NSKeyedUnarchiver unarchivedObjectOfClass:NSIndexSet.class fromData:[pasteboard dataForType:TORRENT_TABLE_VIEW_DATA_TYPE]
-                                                           error:nil];
-        }
-        else
-        {
-            indexes = [NSKeyedUnarchiver unarchiveObjectWithData:[pasteboard dataForType:TORRENT_TABLE_VIEW_DATA_TYPE]];
-        }
+        NSIndexSet* indexes = [NSKeyedUnarchiver unarchivedObjectOfClass:NSIndexSet.class fromData:[pasteboard dataForType:TORRENT_TABLE_VIEW_DATA_TYPE]
+                                                                   error:nil];
 
         //get the torrents to move
         NSMutableArray* movingTorrents = [NSMutableArray arrayWithCapacity:indexes.count];
@@ -3940,19 +3932,9 @@ static void removeKeRangerRansomware()
     NSButton* button = [[NSButton alloc] init];
     button.bezelStyle = NSBezelStyleTexturedRounded;
     button.stringValue = @"";
+    button.bordered = NO;
 
     item.view = button;
-
-    if (@available(macOS 11.0, *))
-    {
-        button.bordered = NO;
-    }
-    else
-    {
-        NSSize const buttonSize = NSMakeSize(36.0, 25.0);
-        item.minSize = buttonSize;
-        item.maxSize = buttonSize;
-    }
 
     return item;
 }
@@ -4041,17 +4023,7 @@ static void removeKeRangerRansomware()
 
         segmentedControl.segmentCount = 2;
         segmentedCell.trackingMode = NSSegmentSwitchTrackingMomentary;
-
-        if (@available(macOS 11.0, *))
-        {
-            segmentedCell.bezeled = NO;
-        }
-        else
-        {
-            NSSize const groupSize = NSMakeSize(72.0, 25.0);
-            groupItem.minSize = groupSize;
-            groupItem.maxSize = groupSize;
-        }
+        segmentedCell.bezeled = NO;
 
         groupItem.label = NSLocalizedString(@"Apply All", "All toolbar item -> label");
         groupItem.paletteLabel = NSLocalizedString(@"Pause / Resume All", "All toolbar item -> palette label");
@@ -4092,17 +4064,7 @@ static void removeKeRangerRansomware()
 
         segmentedControl.segmentCount = 2;
         segmentedCell.trackingMode = NSSegmentSwitchTrackingMomentary;
-
-        if (@available(macOS 11.0, *))
-        {
-            segmentedCell.bezeled = NO;
-        }
-        else
-        {
-            NSSize const groupSize = NSMakeSize(72.0, 25.0);
-            groupItem.minSize = groupSize;
-            groupItem.maxSize = groupSize;
-        }
+        segmentedCell.bezeled = NO;
 
         groupItem.label = NSLocalizedString(@"Apply Selected", "Selected toolbar item -> label");
         groupItem.paletteLabel = NSLocalizedString(@"Pause / Resume Selected", "Selected toolbar item -> palette label");

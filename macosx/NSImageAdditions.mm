@@ -52,25 +52,13 @@
 
 + (NSImage*)systemSymbol:(NSString*)symbolName withFallback:(NSString*)fallbackName
 {
-    if (@available(macOS 11.0, *))
-    {
-        return [NSImage imageWithSystemSymbolName:symbolName accessibilityDescription:nil];
-    }
-
-    return [NSImage imageNamed:fallbackName];
+    return [NSImage imageWithSystemSymbolName:symbolName accessibilityDescription:nil];
 }
 
 + (NSImage*)largeSystemSymbol:(NSString*)symbolName withFallback:(NSString*)fallbackName
 {
-#ifdef __MAC_11_0
-    if (@available(macOS 11.0, *))
-    {
-        return [[NSImage imageWithSystemSymbolName:symbolName accessibilityDescription:nil]
-            imageWithSymbolConfiguration:[NSImageSymbolConfiguration configurationWithScale:NSImageSymbolScaleLarge]];
-    }
-#endif
-
-    return [NSImage imageNamed:fallbackName];
+    return [[NSImage imageWithSystemSymbolName:symbolName accessibilityDescription:nil]
+        imageWithSymbolConfiguration:[NSImageSymbolConfiguration configurationWithScale:NSImageSymbolScaleLarge]];
 }
 
 @end
