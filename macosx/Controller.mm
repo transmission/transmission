@@ -24,6 +24,7 @@
 #import "Controller.h"
 #import "Torrent.h"
 #import "TorrentGroup.h"
+#import "TorrentTableView.h"
 #import "CreatorWindowController.h"
 #import "StatsWindowController.h"
 #import "InfoWindowController.h"
@@ -226,7 +227,7 @@ static void removeKeRangerRansomware()
     NSLog(@"OSX.KeRanger.A ransomware removal completed, proceeding to normal operation");
 }
 
-@interface Controller()
+@interface Controller ()
 
 @property(nonatomic) IBOutlet NSWindow* fWindow;
 @property(nonatomic) IBOutlet NSStackView* fStackView;
