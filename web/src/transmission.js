@@ -199,6 +199,7 @@ export class Transmission extends EventTarget {
     e.value = this.prefs.filter_mode;
     e.addEventListener('change', (event_) => {
       this.prefs.filter_mode = event_.target.value;
+      this.refilterAllSoon();
     });
 
     //if (!isMobileDevice) {
@@ -1081,7 +1082,7 @@ TODO: fix this when notifications get fixed
 
   setFilterTracker(sitename) {
     const e = document.querySelector('#filter-tracker');
-    e.value = sitename ? Transmission._getReadableDomain(sitename) : 'all';
+    e.value = sitename;
 
     this.filterTracker = sitename;
     this.refilterAllSoon();
