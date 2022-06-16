@@ -53,6 +53,7 @@
 @property(nonatomic) NSAnimation* fPiecesBarAnimation;
 
 @property(nonatomic) BOOL fActionPopoverShown;
+@property(nonatomic) NSView* fPositioningView;
 
 - (BOOL)pointInGroupStatusRect:(NSPoint)point;
 
@@ -775,6 +776,22 @@
     [popover showRelativeToRect:rect ofView:self preferredEdge:NSMaxYEdge];
     [infoViewController setInfoForTorrents:@[ torrent ]];
     [infoViewController updateInfo];
+
+    CGFloat width = NSWidth(rect);
+
+    if (NSMinX(self.window.frame) < width || NSMaxX(self.window.screen.frame) - NSMinX(self.window.frame) < 72)
+    {
+        // Ugly hack to hide NSPopover arrow.
+        self.fPositioningView = [[NSView alloc] initWithFrame:rect];
+        self.fPositioningView.identifier = @"positioningView";
+        [self addSubview:self.fPositioningView];
+        [popover showRelativeToRect:self.fPositioningView.bounds ofView:self.fPositioningView preferredEdge:NSMaxYEdge];
+        self.fPositioningView.bounds = NSOffsetRect(self.fPositioningView.bounds, 0, NSHeight(self.fPositioningView.bounds));
+    }
+    else
+    {
+        [popover showRelativeToRect:rect ofView:self preferredEdge:NSMaxYEdge];
+    }
 }
 
 //don't show multiple popovers when clicking the gear button repeatedly
@@ -783,8 +800,10 @@
     self.fActionPopoverShown = YES;
 }
 
-- (void)popoverWillClose:(NSNotification*)notification
+- (void)popoverDidClose:(NSNotification*)notification
 {
+    [self.fPositioningView removeFromSuperview];
+    self.fPositioningView = nil;
     self.fActionPopoverShown = NO;
 }
 
