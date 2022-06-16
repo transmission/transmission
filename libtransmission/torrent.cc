@@ -11,7 +11,6 @@
 #include <csignal> /* signal() */
 #include <ctime>
 #include <map>
-#include <set>
 #include <sstream>
 #include <string>
 #include <string_view>
@@ -1914,11 +1913,11 @@ void tr_torrent::setLabels(std::vector<tr_quark> const& new_labels)
     auto const lock = unique_lock();
     this->labels.clear();
 
-    for (auto l : new_labels)
+    for (auto label : new_labels)
     {
-            if (std::find(std::begin(this->labels), std::end(this->labels), l) == std::end(this->labels))
+            if (std::find(std::begin(this->labels), std::end(this->labels), label) == std::end(this->labels))
             {
-                    this->labels.push_back(l);
+                    this->labels.push_back(label);
             }
     }
     this->labels.shrink_to_fit();
