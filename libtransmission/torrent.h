@@ -581,7 +581,7 @@ public:
 
     void setDateActive(time_t t);
 
-    void setLabels(tr_quark const* labels, size_t n_labels);
+    void setLabels(std::vector<tr_quark> const& new_labels);
 
     /** Return the mime-type (e.g. "audio/x-flac") that matches more of the
         torrent's content than any other mime-type. */
@@ -774,8 +774,8 @@ tr_peer_id_t const& tr_torrentGetPeerId(tr_torrent* tor);
 
 tr_torrent_metainfo tr_ctorStealMetainfo(tr_ctor* ctor);
 
-bool tr_ctorSetMetainfoFromFile(tr_ctor* ctor, std::string_view filename, tr_error** error);
-bool tr_ctorSetMetainfoFromMagnetLink(tr_ctor* ctor, std::string_view filename, tr_error** error);
+bool tr_ctorSetMetainfoFromFile(tr_ctor* ctor, std::string_view filename, tr_error** error = nullptr);
+bool tr_ctorSetMetainfoFromMagnetLink(tr_ctor* ctor, std::string_view filename, tr_error** error = nullptr);
 void tr_ctorSetLabels(tr_ctor* ctor, tr_quark const* labels, size_t n_labels);
 tr_torrent::labels_t const& tr_ctorGetLabels(tr_ctor const* ctor);
 

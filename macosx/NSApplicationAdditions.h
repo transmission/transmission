@@ -6,7 +6,6 @@
 
 @interface NSApplication (NSApplicationAdditions)
 
-@property(nonatomic, getter=isOnMojaveOrBetter, readonly) BOOL onMojaveOrBetter;
 @property(nonatomic, getter=isDarkMode, readonly) BOOL darkMode;
 
 @end

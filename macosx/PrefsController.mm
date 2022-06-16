@@ -17,7 +17,6 @@
 #import "Controller.h"
 #import "PortChecker.h"
 #import "BonjourController.h"
-#import "NSApplicationAdditions.h"
 #import "NSImageAdditions.h"
 #import "NSStringAdditions.h"
 
@@ -203,6 +202,9 @@
 
     self.window.restorationClass = [self class];
 
+    //disable fullscreen support
+    [self.window setCollectionBehavior:NSWindowCollectionBehaviorFullScreenNone];
+
     NSToolbar* toolbar = [[NSToolbar alloc] initWithIdentifier:@"Preferences Toolbar"];
     toolbar.delegate = self;
     toolbar.allowsUserCustomization = NO;
@@ -287,6 +289,9 @@
     {
         self.fRPCPasswordField.stringValue = self.fRPCPassword;
     }
+
+    //set fRPCWhitelistTable column width to table width
+    [self.fRPCWhitelistTable sizeToFit];
 }
 
 - (NSToolbarItem*)toolbar:(NSToolbar*)toolbar itemForItemIdentifier:(NSString*)ident willBeInsertedIntoToolbar:(BOOL)flag

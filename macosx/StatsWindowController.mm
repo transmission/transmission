@@ -4,7 +4,6 @@
 
 #import "StatsWindowController.h"
 #import "Controller.h"
-#import "NSApplicationAdditions.h"
 #import "NSStringAdditions.h"
 
 #define UPDATE_SECONDS 1.0
@@ -69,6 +68,9 @@ tr_session* fLib = NULL;
     self.window.restorationClass = [self class];
 
     self.window.title = NSLocalizedString(@"Statistics", "Stats window -> title");
+
+    //disable fullscreen support
+    [self.window setCollectionBehavior:NSWindowCollectionBehaviorFullScreenNone];
 
     //set label text
     self.fUploadedLabelField.stringValue = [NSLocalizedString(@"Uploaded", "Stats window -> label") stringByAppendingString:@":"];

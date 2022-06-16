@@ -417,8 +417,8 @@ void tr_tracker_http_announce(
 
     auto options = tr_web::FetchOptions{ url_base.sv(), onAnnounceDone, d };
     options.timeout_secs = 90L;
-    options.sndbuf = 1024;
-    options.rcvbuf = 3072;
+    options.sndbuf = 4096;
+    options.rcvbuf = 4096;
 
     auto do_make_request = [&](std::string_view const& protocol_name, tr_web::FetchOptions&& opt)
     {

@@ -15,7 +15,6 @@
 #import "Torrent.h"
 #import "GroupsController.h"
 #import "FileListNode.h"
-#import "NSApplicationAdditions.h"
 #import "NSStringAdditions.h"
 #import "TrackerNode.h"
 
@@ -2174,6 +2173,12 @@ bool trashDataFile(char const* filename, tr_error** error)
         CSBackupSetItemExcluded((__bridge CFURLRef)[NSURL fileURLWithPath:path], exclude, false);
         self.fTimeMachineExcludeInitialized = YES;
     }
+}
+
+// For backward comatibility for previously saved Group Predicates.
+- (NSArray<FileListNode*>*)fFlatFileList
+{
+    return self.flatFileList;
 }
 
 @end

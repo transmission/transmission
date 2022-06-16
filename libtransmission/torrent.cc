@@ -11,7 +11,6 @@
 #include <csignal> /* signal() */
 #include <ctime>
 #include <map>
-#include <set>
 #include <sstream>
 #include <string>
 #include <string_view>
@@ -714,7 +713,7 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
     tor->finishedSeedingByIdle = false;
 
     auto const& labels = tr_ctorGetLabels(ctor);
-    tor->setLabels(std::data(labels), std::size(labels));
+    tor->setLabels(labels);
 
     tor->uniqueId = session->torrents().add(tor);
 
@@ -1909,11 +1908,18 @@ void tr_torrentSetFileDLs(tr_torrent* tor, tr_file_index_t const* files, tr_file
 ****
 ***/
 
-void tr_torrent::setLabels(tr_quark const* new_labels, size_t n_labels)
+void tr_torrent::setLabels(std::vector<tr_quark> const& new_labels)
 {
     auto const lock = unique_lock();
-    auto const sorted_unique = std::set<tr_quark>{ new_labels, new_labels + n_labels };
-    this->labels = { std::begin(sorted_unique), std::end(sorted_unique) };
+    this->labels.clear();
+
+    for (auto label : new_labels)
+    {
+            if (std::find(std::begin(this->labels), std::end(this->labels), label) == std::end(this->labels))
+            {
+                    this->labels.push_back(label);
+            }
+    }
     this->labels.shrink_to_fit();
     this->setDirty();
 }

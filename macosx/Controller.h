@@ -166,11 +166,15 @@ typedef NS_ENUM(unsigned int, addType) { //
 - (void)allToolbarClicked:(id)sender;
 - (void)selectedToolbarClicked:(id)sender;
 
+- (void)updateMainWindow;
+
 - (void)setWindowSizeToFit;
-@property(nonatomic, readonly) NSRect sizedWindowFrame;
 - (void)updateForAutoSize;
 - (void)setWindowMinMaxToCurrent;
-@property(nonatomic, readonly) CGFloat minWindowContentSizeAllowed;
+- (void)removeWindowMinMax;
+- (void)setMinWindowContentSizeAllowed;
+- (void)setMaxWindowContentSizeAllowed;
+- (void)removeStackViewHeightConstraints;
 
 - (void)updateForExpandCollapse;
 
