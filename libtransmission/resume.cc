@@ -119,7 +119,7 @@ static auto loadLabels(tr_variant* dict, tr_torrent* tor)
         }
     }
 
-    tor->setLabels(std::data(labels), std::size(labels));
+    tor->setLabels(labels);
     return tr_resume::Labels;
 }
 

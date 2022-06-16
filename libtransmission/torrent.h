@@ -581,7 +581,7 @@ public:
 
     void setDateActive(time_t t);
 
-    void setLabels(tr_quark const* labels, size_t n_labels);
+    void setLabels(std::vector<tr_quark> const& new_labels);
 
     /** Return the mime-type (e.g. "audio/x-flac") that matches more of the
         torrent's content than any other mime-type. */
