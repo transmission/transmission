@@ -122,15 +122,8 @@
     if ([pasteboard.types containsObject:GROUP_TABLE_VIEW_DATA_TYPE])
     {
         NSIndexSet* indexes;
-        if (@available(macOS 10.13, *))
-        {
-            indexes = [NSKeyedUnarchiver unarchivedObjectOfClass:NSIndexSet.class fromData:[pasteboard dataForType:GROUP_TABLE_VIEW_DATA_TYPE]
-                                                           error:nil];
-        }
-        else
-        {
-            indexes = [NSKeyedUnarchiver unarchiveObjectWithData:[pasteboard dataForType:GROUP_TABLE_VIEW_DATA_TYPE]];
-        }
+        indexes = [NSKeyedUnarchiver unarchivedObjectOfClass:NSIndexSet.class fromData:[pasteboard dataForType:GROUP_TABLE_VIEW_DATA_TYPE]
+                                                       error:nil];
         NSInteger oldRow = indexes.firstIndex;
 
         if (oldRow < newRow)
