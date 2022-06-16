@@ -2121,7 +2121,7 @@ static constexpr std::string_view getEncryptionModeString(tr_encryption_mode mod
     }
 }
 
-static void addSessionField(tr_session* s, tr_variant* d, tr_quark key)
+static void addSessionField(tr_session const* s, tr_variant* d, tr_quark key)
 {
     switch (key)
     {
@@ -2302,27 +2302,27 @@ static void addSessionField(tr_session* s, tr_variant* d, tr_quark key)
         break;
 
     case TR_KEY_script_torrent_added_filename:
-        tr_variantDictAddStr(d, key, tr_sessionGetScript(s, TR_SCRIPT_ON_TORRENT_ADDED));
+        tr_variantDictAddStr(d, key, s->script(TR_SCRIPT_ON_TORRENT_ADDED));
         break;
 
     case TR_KEY_script_torrent_added_enabled:
-        tr_variantDictAddBool(d, key, tr_sessionIsScriptEnabled(s, TR_SCRIPT_ON_TORRENT_ADDED));
+        tr_variantDictAddBool(d, key, s->useScript(TR_SCRIPT_ON_TORRENT_ADDED));
         break;
 
     case TR_KEY_script_torrent_done_filename:
-        tr_variantDictAddStr(d, key, tr_sessionGetScript(s, TR_SCRIPT_ON_TORRENT_DONE));
+        tr_variantDictAddStr(d, key, s->script(TR_SCRIPT_ON_TORRENT_DONE));
         break;
 
     case TR_KEY_script_torrent_done_enabled:
-        tr_variantDictAddBool(d, key, tr_sessionIsScriptEnabled(s, TR_SCRIPT_ON_TORRENT_DONE));
+        tr_variantDictAddBool(d, key, s->useScript(TR_SCRIPT_ON_TORRENT_DONE));
         break;
 
     case TR_KEY_script_torrent_done_seeding_filename:
-        tr_variantDictAddStr(d, key, tr_sessionGetScript(s, TR_SCRIPT_ON_TORRENT_DONE_SEEDING));
+        tr_variantDictAddStr(d, key, s->script(TR_SCRIPT_ON_TORRENT_DONE_SEEDING));
         break;
 
     case TR_KEY_script_torrent_done_seeding_enabled:
-        tr_variantDictAddBool(d, key, tr_sessionIsScriptEnabled(s, TR_SCRIPT_ON_TORRENT_DONE_SEEDING));
+        tr_variantDictAddBool(d, key, s->useScript(TR_SCRIPT_ON_TORRENT_DONE_SEEDING));
         break;
 
     case TR_KEY_queue_stalled_enabled:
