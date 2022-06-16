@@ -22,7 +22,6 @@
 		3C7A11990D0B2EE300B5701F /* natpmp.c in Sources */ = {isa = PBXBuildFile; fileRef = 3C7A11930D0B2EE300B5701F /* natpmp.c */; };
 		3C7A119A0D0B2EE300B5701F /* natpmp.h in Headers */ = {isa = PBXBuildFile; fileRef = 3C7A11940D0B2EE300B5701F /* natpmp.h */; };
 		456B90D02855332F000D4D80 /* ControllerWindowMethods.mm in Sources */ = {isa = PBXBuildFile; fileRef = 456B90CE2855332F000D4D80 /* ControllerWindowMethods.mm */; };
-		45A6DE80284D1F2A0088D134 /* MainWindow.mm in Sources */ = {isa = PBXBuildFile; fileRef = 45A6DE7F284D1F2A0088D134 /* MainWindow.mm */; };
 		45A7D3292843B54D00F0C32A /* GroupPopUpButtonCell.mm in Sources */ = {isa = PBXBuildFile; fileRef = 45A7D3282843B54D00F0C32A /* GroupPopUpButtonCell.mm */; };
 		45A7D32C2843B55F00F0C32A /* PriorityPopUpButtonCell.mm in Sources */ = {isa = PBXBuildFile; fileRef = 45A7D32B2843B55F00F0C32A /* PriorityPopUpButtonCell.mm */; };
 		4D043A7F090AE979009FEDA8 /* TransmissionDocument.icns in Resources */ = {isa = PBXBuildFile; fileRef = 4D043A7E090AE979009FEDA8 /* TransmissionDocument.icns */; };
@@ -617,8 +616,6 @@
 		3C7A11940D0B2EE300B5701F /* natpmp.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = natpmp.h; sourceTree = "<group>"; };
 		456B90CE2855332F000D4D80 /* ControllerWindowMethods.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ControllerWindowMethods.mm; sourceTree = "<group>"; };
 		456B90CF2855332F000D4D80 /* ControllerWindowMethods.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ControllerWindowMethods.h; sourceTree = "<group>"; };
-		45A6DE7E284D1F2A0088D134 /* MainWindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MainWindow.h; sourceTree = "<group>"; };
-		45A6DE7F284D1F2A0088D134 /* MainWindow.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MainWindow.mm; sourceTree = "<group>"; };
 		45A7D3272843B54D00F0C32A /* GroupPopUpButtonCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GroupPopUpButtonCell.h; sourceTree = "<group>"; };
 		45A7D3282843B54D00F0C32A /* GroupPopUpButtonCell.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = GroupPopUpButtonCell.mm; sourceTree = "<group>"; };
 		45A7D32A2843B55F00F0C32A /* PriorityPopUpButtonCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PriorityPopUpButtonCell.h; sourceTree = "<group>"; };
@@ -1396,8 +1393,6 @@
 				4DF0C5A90899190500DD8943 /* Controller.mm */,
 				456B90CF2855332F000D4D80 /* ControllerWindowMethods.h */,
 				456B90CE2855332F000D4D80 /* ControllerWindowMethods.mm */,
-				45A6DE7E284D1F2A0088D134 /* MainWindow.h */,
-				45A6DE7F284D1F2A0088D134 /* MainWindow.mm */,
 				4DFBC2DD09C0970D00D5C571 /* Torrent.h */,
 				4DFBC2DE09C0970D00D5C571 /* Torrent.mm */,
 				A27F0F310E19AD9800B2DB97 /* TorrentGroup.h */,
@@ -3040,7 +3035,6 @@
 				45A7D32C2843B55F00F0C32A /* PriorityPopUpButtonCell.mm in Sources */,
 				A25892640CF1F7E800CCCDDF /* StatsWindowController.mm in Sources */,
 				A2C89D600CFCBF57004CC2BC /* ButtonToolbarItem.mm in Sources */,
-				45A6DE80284D1F2A0088D134 /* MainWindow.mm in Sources */,
 				A219798B0D07B78400438EA7 /* GroupToolbarItem.mm in Sources */,
 				A20BFFB70D091CC700CE5D2B /* ToolbarSegmentedCell.mm in Sources */,
 				A22180980D148A71007D09ED /* GroupsPrefsController.mm in Sources */,
