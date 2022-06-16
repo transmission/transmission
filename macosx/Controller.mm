@@ -103,10 +103,10 @@ typedef NS_ENUM(unsigned int, sortOrderTag) { //
 
 #define ROW_HEIGHT_REGULAR 62.0
 #define ROW_HEIGHT_SMALL 22.0
-#define WINDOW_REGULAR_WIDTH 468.0
 
 #define STATUS_BAR_HEIGHT 21.0
 #define FILTER_BAR_HEIGHT 23.0
+#define BOTTOM_BAR_HEIGHT 24.0
 
 #define UPDATE_UI_SECONDS 1.0
 
@@ -230,6 +230,8 @@ static void removeKeRangerRansomware()
 @interface Controller ()
 
 @property(nonatomic) IBOutlet NSWindow* fWindow;
+@property(nonatomic) IBOutlet NSStackView* fStackView;
+@property(nonatomic) NSArray* fStackViewHeightConstraints;
 @property(nonatomic) IBOutlet TorrentTableView* fTableView;
 
 @property(nonatomic) IBOutlet NSMenuItem* fOpenIgnoreDownloadFolder;
@@ -562,11 +564,11 @@ static void removeKeRangerRansomware()
 
     self.fWindow.delegate = self; //do manually to avoid placement issue
 
-    //disable fullscreen support
-    [self.fWindow setCollectionBehavior:NSWindowCollectionBehaviorFullScreenNone];
-
     [self.fWindow makeFirstResponder:self.fTableView];
     self.fWindow.excludedFromWindowsMenu = YES;
+
+    //make window primary view in fullscreen
+    [self.fWindow setCollectionBehavior:NSWindowCollectionBehaviorFullScreenPrimary];
 
     //set table size
     BOOL const small = [self.fDefaults boolForKey:@"SmallView"];
@@ -580,12 +582,6 @@ static void removeKeRangerRansomware()
     self.fWindow.movableByWindowBackground = YES;
 
     self.fTotalTorrentsField.cell.backgroundStyle = NSBackgroundStyleRaised;
-
-    //set up filter bar
-    [self showFilterBar:[self.fDefaults boolForKey:@"FilterBar"] animate:NO];
-
-    //set up status bar
-    [self showStatusBar:[self.fDefaults boolForKey:@"StatusBar"] animate:NO];
 
     self.fActionButton.toolTip = NSLocalizedString(@"Shortcuts for changing global settings.", "Main window -> 1st bottom left button (action) tooltip");
     self.fSpeedLimitButton.toolTip = NSLocalizedString(
@@ -633,9 +629,6 @@ static void removeKeRangerRansomware()
     //you would think this would be called later in this method from updateUI, but it's not reached in awakeFromNib
     //this must be called after showStatusBar:
     [self.fStatusBar updateWithDownload:0.0 upload:0.0];
-
-    //this should also be after the rest of the setup
-    [self updateForAutoSize];
 
     //register for sleep notifications
     IONotificationPortRef notify;
@@ -758,6 +751,8 @@ static void removeKeRangerRansomware()
 
     [nc addObserver:self selector:@selector(applyFilter) name:@"UpdateGroups" object:nil];
 
+    [self updateMainWindow];
+
     //timer to update the interface every second
     [self updateUI];
     self.fTimer = [NSTimer scheduledTimerWithTimeInterval:UPDATE_UI_SECONDS target:self selector:@selector(updateUI)
@@ -766,14 +761,15 @@ static void removeKeRangerRansomware()
     [NSRunLoop.currentRunLoop addTimer:self.fTimer forMode:NSModalPanelRunLoopMode];
     [NSRunLoop.currentRunLoop addTimer:self.fTimer forMode:NSEventTrackingRunLoopMode];
 
-    [self applyFilter];
-
     [self.fWindow makeKeyAndOrderFront:nil];
 
     if ([self.fDefaults boolForKey:@"InfoVisible"])
     {
         [self showInfo:nil];
     }
+
+    //redraw filterbar to avoid clipping
+    [NSNotificationCenter.defaultCenter postNotificationName:@"ResizeBar" object:nil];
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification*)notification
@@ -968,9 +964,6 @@ static void removeKeRangerRansomware()
     {
         [window close];
     }
-
-    [self showStatusBar:NO animate:NO];
-    [self showFilterBar:NO animate:NO];
 
     //save history
     [self updateTorrentHistory];
@@ -1818,6 +1811,8 @@ static void removeKeRangerRansomware()
                     {
                         [torrent closeRemoveTorrent:deleteData];
                     }
+
+                    [self fullUpdateUI];
                 };
 
                 [self.fTableView beginUpdates];
@@ -1860,8 +1855,6 @@ static void removeKeRangerRansomware()
             [torrent closeRemoveTorrent:deleteData];
         }
     }
-
-    [self fullUpdateUI];
 }
 
 - (void)removeNoDelete:(id)sender
@@ -3155,9 +3148,10 @@ static void removeKeRangerRansomware()
     {
         [self.fTableView endUpdates];
     }
-    self.fTableView.needsDisplay = YES;
-
     [NSAnimationContext endGrouping];
+
+    //reloaddata, otherwise the tableview has a bunch of empty cells
+    [self.fTableView reloadData];
 
     [self resetInfo]; //if group is already selected, but the torrents in it change
 
@@ -3818,30 +3812,9 @@ static void removeKeRangerRansomware()
         noteHeightOfRowsWithIndexesChanged:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, self.fTableView.numberOfRows)]];
     [self.fTableView endUpdates];
 
-    //resize for larger min height if not set to auto size
-    if (![self.fDefaults boolForKey:@"AutoSize"])
-    {
-        NSSize const contentSize = self.fWindow.contentView.frame.size;
-
-        NSSize contentMinSize = self.fWindow.contentMinSize;
-        contentMinSize.height = self.minWindowContentSizeAllowed;
-        self.fWindow.contentMinSize = contentMinSize;
-
-        //make sure the window already isn't too small
-        if (!makeSmall && contentSize.height < contentMinSize.height)
-        {
-            NSRect frame = self.fWindow.frame;
-            CGFloat heightChange = contentMinSize.height - contentSize.height;
-            frame.size.height += heightChange;
-            frame.origin.y -= heightChange;
-
-            [self.fWindow setFrame:frame display:YES];
-        }
-    }
-    else
-    {
-        [self setWindowSizeToFit];
-    }
+    //reloaddata, otherwise the tableview has a bunch of empty cells
+    [self.fTableView reloadData];
+    [self updateForAutoSize];
 }
 
 - (void)togglePiecesBar:(id)sender
@@ -3856,267 +3829,25 @@ static void removeKeRangerRansomware()
     [self.fTableView display];
 }
 
-- (NSRect)windowFrameByAddingHeight:(CGFloat)height checkLimits:(BOOL)check
-{
-    NSScrollView* scrollView = self.fTableView.enclosingScrollView;
-
-    //convert pixels to points
-    NSRect windowFrame = self.fWindow.frame;
-    NSSize windowSize = [scrollView convertSize:windowFrame.size fromView:nil];
-    windowSize.height += height;
-
-    if (check)
-    {
-        //we can't call minSize, since it might be set to the current size (auto size)
-        CGFloat const minHeight = self.minWindowContentSizeAllowed +
-            (NSHeight(self.fWindow.frame) - NSHeight(self.fWindow.contentView.frame)); //contentView to window
-
-        if (windowSize.height <= minHeight)
-        {
-            windowSize.height = minHeight;
-        }
-        else
-        {
-            NSScreen* screen = self.fWindow.screen;
-            if (screen)
-            {
-                NSSize maxSize = [scrollView convertSize:screen.visibleFrame.size fromView:nil];
-                if (!self.fStatusBar)
-                {
-                    maxSize.height -= STATUS_BAR_HEIGHT;
-                }
-                if (!self.fFilterBar)
-                {
-                    maxSize.height -= FILTER_BAR_HEIGHT;
-                }
-                if (windowSize.height > maxSize.height)
-                {
-                    windowSize.height = maxSize.height;
-                }
-            }
-        }
-    }
-
-    //convert points to pixels
-    windowSize = [scrollView convertSize:windowSize toView:nil];
-
-    windowFrame.origin.y -= (windowSize.height - windowFrame.size.height);
-    windowFrame.size.height = windowSize.height;
-    return windowFrame;
-}
-
 - (void)toggleStatusBar:(id)sender
 {
     BOOL const show = self.fStatusBar == nil;
-    [self showStatusBar:show animate:YES];
     [self.fDefaults setBool:show forKey:@"StatusBar"];
-}
-
-//doesn't save shown state
-- (void)showStatusBar:(BOOL)show animate:(BOOL)animate
-{
-    BOOL const prevShown = self.fStatusBar != nil;
-    if (show == prevShown)
-    {
-        return;
-    }
-
-    if (show)
-    {
-        self.fStatusBar = [[StatusBarController alloc] initWithLib:self.fLib];
-
-        NSView* contentView = self.fWindow.contentView;
-        NSSize const windowSize = [contentView convertSize:self.fWindow.frame.size fromView:nil];
-
-        NSRect statusBarFrame = self.fStatusBar.view.frame;
-        statusBarFrame.size.width = windowSize.width;
-        self.fStatusBar.view.frame = statusBarFrame;
-
-        [contentView addSubview:self.fStatusBar.view];
-        [self.fStatusBar.view setFrameOrigin:NSMakePoint(0.0, NSMaxY(contentView.frame))];
-    }
-
-    CGFloat heightChange = self.fStatusBar.view.frame.size.height;
-    if (!show)
-    {
-        heightChange *= -1;
-    }
-
-    //allow bar to show even if not enough room
-    if (show && ![self.fDefaults boolForKey:@"AutoSize"])
-    {
-        NSRect frame = [self windowFrameByAddingHeight:heightChange checkLimits:NO];
-
-        NSScreen* screen = self.fWindow.screen;
-        if (screen)
-        {
-            CGFloat change = screen.visibleFrame.size.height - frame.size.height;
-            if (change < 0.0)
-            {
-                frame = self.fWindow.frame;
-                frame.size.height += change;
-                frame.origin.y -= change;
-                [self.fWindow setFrame:frame display:NO animate:NO];
-            }
-        }
-    }
-
-    [self updateUI];
-
-    NSScrollView* scrollView = self.fTableView.enclosingScrollView;
-
-    //set views to not autoresize
-    NSUInteger const statsMask = self.fStatusBar.view.autoresizingMask;
-    self.fStatusBar.view.autoresizingMask = NSViewNotSizable;
-    NSUInteger filterMask;
-    if (self.fFilterBar)
-    {
-        filterMask = self.fFilterBar.view.autoresizingMask;
-        self.fFilterBar.view.autoresizingMask = NSViewNotSizable;
-    }
-    NSUInteger const scrollMask = scrollView.autoresizingMask;
-    scrollView.autoresizingMask = NSViewNotSizable;
-
-    NSRect const frame = [self windowFrameByAddingHeight:heightChange checkLimits:NO];
-    [self.fWindow setFrame:frame display:YES animate:animate];
-
-    //re-enable autoresize
-    self.fStatusBar.view.autoresizingMask = statsMask;
-    if (self.fFilterBar)
-    {
-        self.fFilterBar.view.autoresizingMask = filterMask;
-    }
-    scrollView.autoresizingMask = scrollMask;
-
-    if (!show)
-    {
-        [self.fStatusBar.view removeFromSuperviewWithoutNeedingDisplay];
-        self.fStatusBar = nil;
-    }
-
-    if ([self.fDefaults boolForKey:@"AutoSize"])
-    {
-        [self setWindowMinMaxToCurrent];
-    }
-    else
-    {
-        //change min size
-        NSSize minSize = self.fWindow.contentMinSize;
-        minSize.height += heightChange;
-        self.fWindow.contentMinSize = minSize;
-    }
+    [self updateMainWindow];
 }
 
 - (void)toggleFilterBar:(id)sender
 {
     BOOL const show = self.fFilterBar == nil;
 
-    //disable filtering when hiding (have to do before showFilterBar:animate:)
+    //disable filtering when hiding (have to do before updateMainWindow:)
     if (!show)
     {
         [self.fFilterBar reset:NO];
     }
 
-    [self showFilterBar:show animate:YES];
     [self.fDefaults setBool:show forKey:@"FilterBar"];
-    [self.fWindow.toolbar validateVisibleItems];
-
-    [self applyFilter]; //do even if showing to ensure tooltips are updated
-}
-
-//doesn't save shown state
-- (void)showFilterBar:(BOOL)show animate:(BOOL)animate
-{
-    BOOL const prevShown = self.fFilterBar != nil;
-    if (show == prevShown)
-    {
-        return;
-    }
-
-    if (show)
-    {
-        self.fFilterBar = [[FilterBarController alloc] init];
-
-        NSView* contentView = self.fWindow.contentView;
-        NSSize const windowSize = [contentView convertSize:self.fWindow.frame.size fromView:nil];
-
-        NSRect filterBarFrame = self.fFilterBar.view.frame;
-        filterBarFrame.size.width = windowSize.width;
-        self.fFilterBar.view.frame = filterBarFrame;
-
-        if (self.fStatusBar)
-        {
-            [contentView addSubview:self.fFilterBar.view positioned:NSWindowBelow relativeTo:self.fStatusBar.view];
-        }
-        else
-        {
-            [contentView addSubview:self.fFilterBar.view];
-        }
-        CGFloat const originY = self.fStatusBar ? NSMinY(self.fStatusBar.view.frame) : NSMaxY(contentView.frame);
-        [self.fFilterBar.view setFrameOrigin:NSMakePoint(0.0, originY)];
-    }
-    else
-    {
-        [self.fWindow makeFirstResponder:self.fTableView];
-    }
-
-    CGFloat heightChange = NSHeight(self.fFilterBar.view.frame);
-    if (!show)
-    {
-        heightChange *= -1;
-    }
-
-    //allow bar to show even if not enough room
-    if (show && ![self.fDefaults boolForKey:@"AutoSize"])
-    {
-        NSRect frame = [self windowFrameByAddingHeight:heightChange checkLimits:NO];
-
-        NSScreen* screen = self.fWindow.screen;
-        if (screen)
-        {
-            CGFloat change = screen.visibleFrame.size.height - frame.size.height;
-            if (change < 0.0)
-            {
-                frame = self.fWindow.frame;
-                frame.size.height += change;
-                frame.origin.y -= change;
-                [self.fWindow setFrame:frame display:NO animate:NO];
-            }
-        }
-    }
-
-    NSScrollView* scrollView = self.fTableView.enclosingScrollView;
-
-    //set views to not autoresize
-    NSUInteger const filterMask = self.fFilterBar.view.autoresizingMask;
-    NSUInteger const scrollMask = scrollView.autoresizingMask;
-    self.fFilterBar.view.autoresizingMask = NSViewNotSizable;
-    scrollView.autoresizingMask = NSViewNotSizable;
-
-    NSRect const frame = [self windowFrameByAddingHeight:heightChange checkLimits:NO];
-    [self.fWindow setFrame:frame display:YES animate:animate];
-
-    //re-enable autoresize
-    self.fFilterBar.view.autoresizingMask = filterMask;
-    scrollView.autoresizingMask = scrollMask;
-
-    if (!show)
-    {
-        [self.fFilterBar.view removeFromSuperviewWithoutNeedingDisplay];
-        self.fFilterBar = nil;
-    }
-
-    if ([self.fDefaults boolForKey:@"AutoSize"])
-    {
-        [self setWindowMinMaxToCurrent];
-    }
-    else
-    {
-        //change min size
-        NSSize minSize = self.fWindow.contentMinSize;
-        minSize.height += heightChange;
-        self.fWindow.contentMinSize = minSize;
-    }
+    [self updateMainWindow];
 }
 
 - (void)focusFilterField
@@ -5176,58 +4907,114 @@ static void removeKeRangerRansomware()
     return menu;
 }
 
-- (NSRect)windowWillUseStandardFrame:(NSWindow*)window defaultFrame:(NSRect)defaultFrame
+- (void)updateMainWindow
 {
-    //if auto size is enabled, the current frame shouldn't need to change
-    NSRect frame = [self.fDefaults boolForKey:@"AutoSize"] ? window.frame : self.sizedWindowFrame;
+    NSArray* subViews = self.fStackView.arrangedSubviews;
+    NSUInteger idx = 0;
 
-    frame.size.width = [self.fDefaults boolForKey:@"SmallView"] ? self.fWindow.minSize.width : WINDOW_REGULAR_WIDTH;
-    return frame;
+    //update layout
+    if ([self.fDefaults boolForKey:@"StatusBar"])
+    {
+        if (self.fStatusBar == nil)
+        {
+            self.fStatusBar = [[StatusBarController alloc] initWithLib:self.fLib];
+        }
+
+        [self.fStackView insertArrangedSubview:self.fStatusBar.view atIndex:idx];
+
+        NSDictionary* views = @{ @"fStatusBar" : self.fStatusBar.view };
+        [self.fStackView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[fStatusBar(==21)]" options:0
+                                                                                metrics:nil
+                                                                                  views:views]];
+        idx = 1;
+    }
+    else
+    {
+        if ([subViews containsObject:self.fStatusBar.view])
+        {
+            [self.fStackView removeView:self.fStatusBar.view];
+            self.fStatusBar = nil;
+        }
+    }
+
+    if ([self.fDefaults boolForKey:@"FilterBar"])
+    {
+        if (self.fFilterBar == nil)
+        {
+            self.fFilterBar = [[FilterBarController alloc] init];
+        }
+
+        [self.fStackView insertArrangedSubview:self.fFilterBar.view atIndex:idx];
+
+        NSDictionary* views = @{ @"fFilterBar" : self.fFilterBar.view };
+        [self.fStackView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[fFilterBar(==21)]" options:0
+                                                                                metrics:nil
+                                                                                  views:views]];
+
+        [self focusFilterField];
+    }
+    else
+    {
+        if ([subViews containsObject:self.fFilterBar.view])
+        {
+            [self.fStackView removeView:self.fFilterBar.view];
+            self.fFilterBar = nil;
+
+            [self.fWindow makeFirstResponder:self.fTableView];
+        }
+    }
+
+    [self fullUpdateUI];
+    [self updateForAutoSize];
 }
 
 - (void)setWindowSizeToFit
 {
-    if ([self.fDefaults boolForKey:@"AutoSize"])
+    if (!self.isFullScreen)
     {
-        NSScrollView* scrollView = self.fTableView.enclosingScrollView;
+        if (![self.fDefaults boolForKey:@"AutoSize"])
+        {
+            [self removeWindowMinMax];
+        }
+        else
+        {
+            NSScrollView* scrollView = self.fTableView.enclosingScrollView;
 
-        scrollView.hasVerticalScroller = NO;
-        [self.fWindow setFrame:self.sizedWindowFrame display:YES animate:YES];
-        scrollView.hasVerticalScroller = YES;
+            scrollView.hasVerticalScroller = NO;
 
-        [self setWindowMinMaxToCurrent];
+            [self removeStackViewHeightConstraints];
+
+            //update height constraints
+            NSDictionary* views = @{ @"scrollView" : scrollView };
+            CGFloat height = self.scrollViewHeight;
+            NSString* constraintsString = [NSString stringWithFormat:@"V:[scrollView(==%f)]", height];
+
+            //add height constraint
+            self.fStackViewHeightConstraints = [NSLayoutConstraint constraintsWithVisualFormat:constraintsString options:0
+                                                                                       metrics:nil
+                                                                                         views:views];
+            [self.fStackView addConstraints:self.fStackViewHeightConstraints];
+
+            scrollView.hasVerticalScroller = YES;
+
+            [self setWindowMinMaxToCurrent];
+        }
     }
-}
-
-- (NSRect)sizedWindowFrame
-{
-    NSUInteger groups = (self.fDisplayedTorrents.count > 0 && ![self.fDisplayedTorrents[0] isKindOfClass:[Torrent class]]) ?
-        self.fDisplayedTorrents.count :
-        0;
-
-    CGFloat heightChange = (GROUP_SEPARATOR_HEIGHT + self.fTableView.intercellSpacing.height) * groups +
-        (self.fTableView.rowHeight + self.fTableView.intercellSpacing.height) * (self.fTableView.numberOfRows - groups) -
-        NSHeight(self.fTableView.enclosingScrollView.frame);
-
-    return [self windowFrameByAddingHeight:heightChange checkLimits:YES];
+    else
+    {
+        [self removeStackViewHeightConstraints];
+    }
 }
 
 - (void)updateForAutoSize
 {
-    if ([self.fDefaults boolForKey:@"AutoSize"])
+    if ([self.fDefaults boolForKey:@"AutoSize"] && !self.isFullScreen)
     {
         [self setWindowSizeToFit];
     }
     else
     {
-        NSSize contentMinSize = self.fWindow.contentMinSize;
-        contentMinSize.height = self.minWindowContentSizeAllowed;
-
-        self.fWindow.contentMinSize = contentMinSize;
-
-        NSSize contentMaxSize = self.fWindow.contentMaxSize;
-        contentMaxSize.height = FLT_MAX;
-        self.fWindow.contentMaxSize = contentMaxSize;
+        [self removeWindowMinMax];
     }
 }
 
@@ -5243,11 +5030,121 @@ static void removeKeRangerRansomware()
     self.fWindow.contentMaxSize = maxSize;
 }
 
-- (CGFloat)minWindowContentSizeAllowed
+- (void)removeWindowMinMax
 {
-    CGFloat contentMinHeight = NSHeight(self.fWindow.contentView.frame) - NSHeight(self.fTableView.enclosingScrollView.frame) +
-        self.fTableView.rowHeight + self.fTableView.intercellSpacing.height;
+    [self setMinWindowContentSizeAllowed];
+    [self setMaxWindowContentSizeAllowed];
+    [self removeStackViewHeightConstraints];
+}
+
+- (void)setMinWindowContentSizeAllowed
+{
+    NSSize contentMinSize = self.fWindow.contentMinSize;
+    contentMinSize.height = self.minWindowContentHeightAllowed;
+
+    self.fWindow.contentMinSize = contentMinSize;
+}
+
+- (void)setMaxWindowContentSizeAllowed
+{
+    NSSize contentMaxSize = self.fWindow.contentMaxSize;
+    contentMaxSize.height = FLT_MAX;
+    self.fWindow.contentMaxSize = contentMaxSize;
+}
+
+- (void)removeStackViewHeightConstraints
+{
+    if (self.fStackViewHeightConstraints)
+    {
+        [self.fStackView removeConstraints:self.fStackViewHeightConstraints];
+    }
+}
+
+- (CGFloat)minWindowContentHeightAllowed
+{
+    CGFloat contentMinHeight = self.fTableView.rowHeight + self.fTableView.intercellSpacing.height + self.mainWindowComponentHeight;
     return contentMinHeight;
+}
+
+- (CGFloat)toolbarHeight
+{
+    return self.fWindow.frame.size.height - [self.fWindow contentRectForFrameRect:self.fWindow.frame].size.height;
+}
+
+- (CGFloat)mainWindowComponentHeight
+{
+    CGFloat height = BOTTOM_BAR_HEIGHT;
+    if (self.fStatusBar)
+    {
+        height += STATUS_BAR_HEIGHT;
+    }
+
+    if (self.fFilterBar)
+    {
+        height += FILTER_BAR_HEIGHT;
+    }
+
+    return height;
+}
+
+- (CGFloat)scrollViewHeight
+{
+    CGFloat height;
+    CGFloat minHeight = self.fTableView.rowHeight + self.fTableView.intercellSpacing.height;
+
+    if ([self.fDefaults boolForKey:@"AutoSize"])
+    {
+        NSUInteger groups = (self.fDisplayedTorrents.count > 0 && ![self.fDisplayedTorrents[0] isKindOfClass:[Torrent class]]) ?
+            self.fDisplayedTorrents.count :
+            0;
+
+        height = (GROUP_SEPARATOR_HEIGHT + self.fTableView.intercellSpacing.height) * groups +
+            (self.fTableView.rowHeight + self.fTableView.intercellSpacing.height) * (self.fTableView.numberOfRows - groups);
+    }
+    else
+    {
+        height = NSHeight(self.fTableView.enclosingScrollView.frame);
+    }
+
+    //make sure we dont go bigger that the screen height
+    NSScreen* screen = self.fWindow.screen;
+    if (screen)
+    {
+        NSSize maxSize = screen.frame.size;
+        maxSize.height -= self.toolbarHeight;
+        maxSize.height -= self.mainWindowComponentHeight;
+
+        //add a small buffer
+        maxSize.height -= 50;
+
+        if (height > maxSize.height)
+        {
+            height = maxSize.height;
+        }
+    }
+
+    //make sure we dont have zero height
+    if (height < minHeight)
+    {
+        height = minHeight;
+    }
+
+    return height;
+}
+
+- (BOOL)isFullScreen
+{
+    return (self.fWindow.styleMask & NSFullScreenWindowMask);
+}
+
+- (void)windowWillEnterFullScreen:(NSNotification*)notification
+{
+    [self removeWindowMinMax];
+}
+
+- (void)windowDidExitFullScreen:(NSNotification*)notification
+{
+    [self updateForAutoSize];
 }
 
 - (void)updateForExpandCollapse
