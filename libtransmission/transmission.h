@@ -478,7 +478,7 @@ void tr_sessionSetLPDEnabled(tr_session* session, bool enabled);
 void tr_sessionSetCacheLimit_MB(tr_session* session, int mb);
 int tr_sessionGetCacheLimit_MB(tr_session const* session);
 
-tr_encryption_mode tr_sessionGetEncryption(tr_session* session);
+tr_encryption_mode tr_sessionGetEncryption(tr_session const* session);
 void tr_sessionSetEncryption(tr_session* session, tr_encryption_mode mode);
 
 /***********************************************************************
@@ -497,7 +497,7 @@ uint16_t tr_sessionSetPeerPortRandom(tr_session* session);
 
 void tr_sessionSetPeerPortRandomOnStart(tr_session* session, bool random);
 
-bool tr_sessionGetPeerPortRandomOnStart(tr_session* session);
+bool tr_sessionGetPeerPortRandomOnStart(tr_session const* session);
 
 enum tr_port_forwarding
 {
