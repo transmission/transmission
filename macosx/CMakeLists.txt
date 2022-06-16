@@ -240,7 +240,6 @@ set_source_files_properties(${${PROJECT_NAME}_RESOURCES} PROPERTIES
 set(${PROJECT_NAME}_HIDPI_IMAGES
     ActionHover
     ActionOn
-    Bandwidth
     CleanupTemplate
     CompleteCheck
     CreateLarge
@@ -249,14 +248,6 @@ set(${PROJECT_NAME}_HIDPI_IMAGES
     EllipsisTemplate
     FavIcon
     Globe
-    Groups
-    InfoActivity
-    InfoFiles
-    InfoGeneral
-    InfoOptions
-    InfoPeers
-    InfoTracker
-    Lock
     Magnet
     PauseHover
     PauseOff
@@ -268,7 +259,6 @@ set(${PROJECT_NAME}_HIDPI_IMAGES
     PriorityHighTemplate
     PriorityLowTemplate
     PriorityNormalTemplate
-    Remote
     ResumeHover
     ResumeNoWaitHover
     ResumeNoWaitOff
@@ -278,18 +268,7 @@ set(${PROJECT_NAME}_HIDPI_IMAGES
     RevealHover
     RevealOff
     RevealOn
-    ToolbarCreateTemplate
-    ToolbarFilterTemplate
-    ToolbarInfoTemplate
-    ToolbarOpenTemplate
-    ToolbarOpenWebTemplate
-    ToolbarPauseAllTemplate
-    ToolbarPauseSelectedTemplate
-    ToolbarRemoveTemplate
-    ToolbarResumeAllTemplate
-    ToolbarResumeSelectedTemplate
     TortoiseTemplate
-    Transfers
     UpArrowGroupTemplate
     UpArrowTemplate
     YingYangGroupTemplate
