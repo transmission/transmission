@@ -3948,7 +3948,7 @@ static void removeKeRangerRansomware()
         item.label = NSLocalizedString(@"Create", "Create toolbar item -> label");
         item.paletteLabel = NSLocalizedString(@"Create Torrent File", "Create toolbar item -> palette label");
         item.toolTip = NSLocalizedString(@"Create torrent file", "Create toolbar item -> tooltip");
-        item.image = [NSImage systemSymbol:@"doc.badge.plus" withFallback:@"ToolbarCreateTemplate"];
+        item.image = [NSImage systemSymbol:@"doc.badge.plus"];
         item.target = self;
         item.action = @selector(createFile:);
         item.autovalidates = NO;
@@ -3962,7 +3962,7 @@ static void removeKeRangerRansomware()
         item.label = NSLocalizedString(@"Open", "Open toolbar item -> label");
         item.paletteLabel = NSLocalizedString(@"Open Torrent Files", "Open toolbar item -> palette label");
         item.toolTip = NSLocalizedString(@"Open torrent files", "Open toolbar item -> tooltip");
-        item.image = [NSImage systemSymbol:@"folder" withFallback:@"ToolbarOpenTemplate"];
+        item.image = [NSImage systemSymbol:@"folder"];
         item.target = self;
         item.action = @selector(openShowSheet:);
         item.autovalidates = NO;
@@ -3976,7 +3976,7 @@ static void removeKeRangerRansomware()
         item.label = NSLocalizedString(@"Open Address", "Open address toolbar item -> label");
         item.paletteLabel = NSLocalizedString(@"Open Torrent Address", "Open address toolbar item -> palette label");
         item.toolTip = NSLocalizedString(@"Open torrent web address", "Open address toolbar item -> tooltip");
-        item.image = [NSImage systemSymbol:@"globe" withFallback:@"ToolbarOpenWebTemplate"];
+        item.image = [NSImage systemSymbol:@"globe"];
         item.target = self;
         item.action = @selector(openURLShowSheet:);
         item.autovalidates = NO;
@@ -3990,7 +3990,7 @@ static void removeKeRangerRansomware()
         item.label = NSLocalizedString(@"Remove", "Remove toolbar item -> label");
         item.paletteLabel = NSLocalizedString(@"Remove Selected", "Remove toolbar item -> palette label");
         item.toolTip = NSLocalizedString(@"Remove selected transfers", "Remove toolbar item -> tooltip");
-        item.image = [NSImage systemSymbol:@"nosign" withFallback:@"ToolbarRemoveTemplate"];
+        item.image = [NSImage systemSymbol:@"nosign"];
         item.target = self;
         item.action = @selector(removeNoDelete:);
         item.visibilityPriority = NSToolbarItemVisibilityPriorityHigh;
@@ -4005,7 +4005,7 @@ static void removeKeRangerRansomware()
         item.label = NSLocalizedString(@"Inspector", "Inspector toolbar item -> label");
         item.paletteLabel = NSLocalizedString(@"Toggle Inspector", "Inspector toolbar item -> palette label");
         item.toolTip = NSLocalizedString(@"Toggle the torrent inspector", "Inspector toolbar item -> tooltip");
-        item.image = [NSImage systemSymbol:@"info.circle" withFallback:@"ToolbarInfoTemplate"];
+        item.image = [NSImage systemSymbol:@"info.circle"];
         item.target = self;
         item.action = @selector(showInfo:);
 
@@ -4033,13 +4033,13 @@ static void removeKeRangerRansomware()
         groupItem.identifiers = @[ TOOLBAR_PAUSE_ALL, TOOLBAR_RESUME_ALL ];
 
         [segmentedCell setTag:TOOLBAR_PAUSE_TAG forSegment:TOOLBAR_PAUSE_TAG];
-        [segmentedControl setImage:[NSImage largeSystemSymbol:@"pause.circle.fill" withFallback:@"ToolbarPauseAllTemplate"]
+        [segmentedControl setImage:[NSImage largeSystemSymbol:@"pause.circle.fill"]
                         forSegment:TOOLBAR_PAUSE_TAG];
         [segmentedCell setToolTip:NSLocalizedString(@"Pause all transfers", "All toolbar item -> tooltip") forSegment:TOOLBAR_PAUSE_TAG];
 
         [segmentedCell setTag:TOOLBAR_RESUME_TAG forSegment:TOOLBAR_RESUME_TAG];
         [segmentedControl setImage:[NSImage imageNamed:@"ToolbarResumeAllTemplate"] forSegment:TOOLBAR_RESUME_TAG];
-        [segmentedControl setImage:[NSImage largeSystemSymbol:@"arrow.clockwise.circle.fill" withFallback:@"ToolbarResumeAllTemplate"]
+        [segmentedControl setImage:[NSImage largeSystemSymbol:@"arrow.clockwise.circle.fill"]
                         forSegment:TOOLBAR_RESUME_TAG];
         [segmentedCell setToolTip:NSLocalizedString(@"Resume all transfers", "All toolbar item -> tooltip")
                        forSegment:TOOLBAR_RESUME_TAG];
@@ -4074,13 +4074,13 @@ static void removeKeRangerRansomware()
         groupItem.identifiers = @[ TOOLBAR_PAUSE_SELECTED, TOOLBAR_RESUME_SELECTED ];
 
         [segmentedCell setTag:TOOLBAR_PAUSE_TAG forSegment:TOOLBAR_PAUSE_TAG];
-        [segmentedControl setImage:[NSImage largeSystemSymbol:@"pause" withFallback:@"ToolbarPauseSelectedTemplate"]
+        [segmentedControl setImage:[NSImage largeSystemSymbol:@"pause"]
                         forSegment:TOOLBAR_PAUSE_TAG];
         [segmentedCell setToolTip:NSLocalizedString(@"Pause selected transfers", "Selected toolbar item -> tooltip")
                        forSegment:TOOLBAR_PAUSE_TAG];
 
         [segmentedCell setTag:TOOLBAR_RESUME_TAG forSegment:TOOLBAR_RESUME_TAG];
-        [segmentedControl setImage:[NSImage systemSymbol:@"arrow.clockwise" withFallback:@"ToolbarResumeSelectedTemplate"]
+        [segmentedControl setImage:[NSImage systemSymbol:@"arrow.clockwise"]
                         forSegment:TOOLBAR_RESUME_TAG];
         [segmentedCell setToolTip:NSLocalizedString(@"Resume selected transfers", "Selected toolbar item -> tooltip")
                        forSegment:TOOLBAR_RESUME_TAG];
@@ -4102,7 +4102,7 @@ static void removeKeRangerRansomware()
         item.label = NSLocalizedString(@"Filter", "Filter toolbar item -> label");
         item.paletteLabel = NSLocalizedString(@"Toggle Filter", "Filter toolbar item -> palette label");
         item.toolTip = NSLocalizedString(@"Toggle the filter bar", "Filter toolbar item -> tooltip");
-        item.image = [NSImage systemSymbol:@"magnifyingglass" withFallback:@"ToolbarFilterTemplate"];
+        item.image = [NSImage systemSymbol:@"magnifyingglass"];
         item.target = self;
         item.action = @selector(toggleFilterBar:);
 

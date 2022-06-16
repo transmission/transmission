@@ -99,13 +99,13 @@ typedef NS_ENUM(unsigned int, tabTag) {
     [self.fTabs.cell setToolTip:NSLocalizedString(@"Files", "Inspector -> tab") forSegment:TAB_FILE_TAG];
     [self.fTabs.cell setToolTip:NSLocalizedString(@"Options", "Inspector -> tab") forSegment:TAB_OPTIONS_TAG];
 
-    [self.fTabs setImage:[NSImage systemSymbol:@"info.circle" withFallback:@"InfoGeneral"] forSegment:TAB_GENERAL_TAG];
-    [self.fTabs setImage:[NSImage systemSymbol:@"square.grid.3x3.fill.square" withFallback:@"InfoActivity"] forSegment:TAB_ACTIVITY_TAG];
-    [self.fTabs setImage:[NSImage systemSymbol:@"antenna.radiowaves.left.and.right" withFallback:@"InfoTracker"]
+    [self.fTabs setImage:[NSImage systemSymbol:@"info.circle"] forSegment:TAB_GENERAL_TAG];
+    [self.fTabs setImage:[NSImage systemSymbol:@"square.grid.3x3.fill.square"] forSegment:TAB_ACTIVITY_TAG];
+    [self.fTabs setImage:[NSImage systemSymbol:@"antenna.radiowaves.left.and.right"]
               forSegment:TAB_TRACKERS_TAG];
-    [self.fTabs setImage:[NSImage systemSymbol:@"person.2" withFallback:@"InfoPeers"] forSegment:TAB_PEERS_TAG];
-    [self.fTabs setImage:[NSImage systemSymbol:@"doc.on.doc" withFallback:@"InfoFiles"] forSegment:TAB_FILE_TAG];
-    [self.fTabs setImage:[NSImage systemSymbol:@"gearshape" withFallback:@"InfoOptions"] forSegment:TAB_OPTIONS_TAG];
+    [self.fTabs setImage:[NSImage systemSymbol:@"person.2"] forSegment:TAB_PEERS_TAG];
+    [self.fTabs setImage:[NSImage systemSymbol:@"doc.on.doc"] forSegment:TAB_FILE_TAG];
+    [self.fTabs setImage:[NSImage systemSymbol:@"gearshape"] forSegment:TAB_OPTIONS_TAG];
 
     //set selected tab
     self.fCurrentTabTag = INVALID;

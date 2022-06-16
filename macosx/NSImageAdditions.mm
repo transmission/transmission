@@ -50,12 +50,12 @@
     return coloredImage;
 }
 
-+ (NSImage*)systemSymbol:(NSString*)symbolName withFallback:(NSString*)fallbackName
++ (NSImage*)systemSymbol:(NSString*)symbolName
 {
     return [NSImage imageWithSystemSymbolName:symbolName accessibilityDescription:nil];
 }
 
-+ (NSImage*)largeSystemSymbol:(NSString*)symbolName withFallback:(NSString*)fallbackName
++ (NSImage*)largeSystemSymbol:(NSString*)symbolName
 {
     return [[NSImage imageWithSystemSymbolName:symbolName accessibilityDescription:nil]
         imageWithSymbolConfiguration:[NSImageSymbolConfiguration configurationWithScale:NSImageSymbolScaleLarge]];

@@ -317,7 +317,7 @@
 
         if ([ident isEqualToString:@"Encryption"])
         {
-            return [peer[@"Encryption"] boolValue] ? [NSImage systemSymbol:@"lock.fill" withFallback:@"Lock"] : nil;
+            return [peer[@"Encryption"] boolValue] ? [NSImage systemSymbol:@"lock.fill"] : nil;
         }
         else if ([ident isEqualToString:@"Client"])
         {

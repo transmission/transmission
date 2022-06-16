@@ -301,7 +301,7 @@
     if ([ident isEqualToString:TOOLBAR_GENERAL])
     {
         item.label = NSLocalizedString(@"General", "Preferences -> toolbar item title");
-        item.image = [NSImage systemSymbol:@"gearshape" withFallback:NSImageNamePreferencesGeneral];
+        item.image = [NSImage systemSymbol:@"gearshape"];
         item.target = self;
         item.action = @selector(setPrefView:);
         item.autovalidates = NO;
@@ -309,7 +309,7 @@
     else if ([ident isEqualToString:TOOLBAR_TRANSFERS])
     {
         item.label = NSLocalizedString(@"Transfers", "Preferences -> toolbar item title");
-        item.image = [NSImage systemSymbol:@"arrow.up.arrow.down" withFallback:@"Transfers"];
+        item.image = [NSImage systemSymbol:@"arrow.up.arrow.down"];
         item.target = self;
         item.action = @selector(setPrefView:);
         item.autovalidates = NO;
@@ -317,7 +317,7 @@
     else if ([ident isEqualToString:TOOLBAR_GROUPS])
     {
         item.label = NSLocalizedString(@"Groups", "Preferences -> toolbar item title");
-        item.image = [NSImage systemSymbol:@"pin" withFallback:@"Groups"];
+        item.image = [NSImage systemSymbol:@"pin"];
         item.target = self;
         item.action = @selector(setPrefView:);
         item.autovalidates = NO;
@@ -325,7 +325,7 @@
     else if ([ident isEqualToString:TOOLBAR_BANDWIDTH])
     {
         item.label = NSLocalizedString(@"Bandwidth", "Preferences -> toolbar item title");
-        item.image = [NSImage systemSymbol:@"speedometer" withFallback:@"Bandwidth"];
+        item.image = [NSImage systemSymbol:@"speedometer"];
         item.target = self;
         item.action = @selector(setPrefView:);
         item.autovalidates = NO;
@@ -333,7 +333,7 @@
     else if ([ident isEqualToString:TOOLBAR_PEERS])
     {
         item.label = NSLocalizedString(@"Peers", "Preferences -> toolbar item title");
-        item.image = [NSImage systemSymbol:@"person.2" withFallback:NSImageNameUserGroup];
+        item.image = [NSImage systemSymbol:@"person.2"];
         item.target = self;
         item.action = @selector(setPrefView:);
         item.autovalidates = NO;
@@ -341,7 +341,7 @@
     else if ([ident isEqualToString:TOOLBAR_NETWORK])
     {
         item.label = NSLocalizedString(@"Network", "Preferences -> toolbar item title");
-        item.image = [NSImage systemSymbol:@"network" withFallback:NSImageNameNetwork];
+        item.image = [NSImage systemSymbol:@"network"];
         item.target = self;
         item.action = @selector(setPrefView:);
         item.autovalidates = NO;
@@ -349,7 +349,7 @@
     else if ([ident isEqualToString:TOOLBAR_REMOTE])
     {
         item.label = NSLocalizedString(@"Remote", "Preferences -> toolbar item title");
-        item.image = [NSImage systemSymbol:@"antenna.radiowaves.left.and.right" withFallback:@"Remote"];
+        item.image = [NSImage systemSymbol:@"antenna.radiowaves.left.and.right"];
         item.target = self;
         item.action = @selector(setPrefView:);
         item.autovalidates = NO;

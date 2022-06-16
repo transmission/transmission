@@ -10,7 +10,7 @@
 - (NSImage*)imageWithColor:(NSColor*)color;
 
 /* macOS < 11 compatibility */
-+ (NSImage*)systemSymbol:(NSString*)symbolName withFallback:(NSString*)fallbackName;
-+ (NSImage*)largeSystemSymbol:(NSString*)symbolName withFallback:(NSString*)fallbackName;
++ (NSImage*)systemSymbol:(NSString*)symbolName;
++ (NSImage*)largeSystemSymbol:(NSString*)symbolName;
 
 @end
