@@ -1082,7 +1082,7 @@ TODO: fix this when notifications get fixed
 
   setFilterTracker(sitename) {
     const e = document.querySelector('#filter-tracker');
-    e.value = sitename ? Transmission._getReadableDomain(sitename) : 'all';
+    e.value = sitename;
 
     this.filterTracker = sitename;
     this.refilterAllSoon();
