@@ -109,7 +109,7 @@ private:
         guint info,
         guint time_);
 
-    bool on_rpc_changed_idle(tr_rpc_callback_type type, int torrent_id);
+    bool on_rpc_changed_idle(tr_rpc_callback_type type, tr_torrent_id_t torrent_id);
 
     void placeWindowFromPrefs();
     void presentMainWindow();
@@ -137,7 +137,7 @@ private:
     void on_add_torrent(tr_ctor* ctor);
     void on_prefs_changed(tr_quark key);
 
-    std::vector<int> get_selected_torrent_ids() const;
+    std::vector<tr_torrent_id_t> get_selected_torrent_ids() const;
     tr_torrent* get_first_selected_torrent() const;
     counts_data get_selected_torrent_counts() const;
 
@@ -193,7 +193,7 @@ void gtr_window_present(T const& window)
 ****
 ***/
 
-std::string get_details_dialog_key(std::vector<int> const& id_list)
+std::string get_details_dialog_key(std::vector<tr_torrent_id_t> const& id_list)
 {
     auto tmp = id_list;
     std::sort(tmp.begin(), tmp.end());
@@ -210,9 +210,9 @@ std::string get_details_dialog_key(std::vector<int> const& id_list)
 
 } // namespace
 
-std::vector<int> Application::Impl::get_selected_torrent_ids() const
+std::vector<tr_torrent_id_t> Application::Impl::get_selected_torrent_ids() const
 {
-    std::vector<int> ids;
+    std::vector<tr_torrent_id_t> ids;
     sel_->selected_foreach([&ids](auto const& /*path*/, auto const& iter)
                            { ids.push_back(iter->get_value(torrent_cols.torrent_id)); });
     return ids;
@@ -393,7 +393,7 @@ void Application::Impl::on_main_window_size_allocated(Gtk::Allocation& /*alloc*/
 **** listen to changes that come from RPC
 ***/
 
-bool Application::Impl::on_rpc_changed_idle(tr_rpc_callback_type type, int torrent_id)
+bool Application::Impl::on_rpc_changed_idle(tr_rpc_callback_type type, tr_torrent_id_t torrent_id)
 {
     switch (type)
     {
@@ -1335,7 +1335,7 @@ bool Application::Impl::call_rpc_for_selected_torrents(std::string const& method
 
 void Application::Impl::remove_selected(bool delete_files)
 {
-    std::vector<int> l;
+    auto l = std::vector<tr_torrent_id_t>{};
 
     sel_->selected_foreach([&l](auto const& /*path*/, auto const& iter)
                            { l.push_back(iter->get_value(torrent_cols.torrent_id)); });

@@ -30,7 +30,7 @@ auto const NotificationsDbusCoreInterface = Glib::ustring("org.freedesktop.Notif
 struct TrNotification
 {
     Glib::RefPtr<Session> core;
-    int torrent_id = 0;
+    tr_torrent_id_t torrent_id = {};
 };
 
 Glib::RefPtr<Gio::DBus::Proxy> proxy;
@@ -162,7 +162,7 @@ void notify_callback(Glib::RefPtr<Gio::AsyncResult>& res, TrNotification const& 
 
 } // namespace
 
-void gtr_notify_torrent_completed(Glib::RefPtr<Session> const& core, int torrent_id)
+void gtr_notify_torrent_completed(Glib::RefPtr<Session> const& core, tr_torrent_id_t tor_id)
 {
     if (gtr_pref_flag_get(TR_KEY_torrent_complete_sound_enabled))
     {
@@ -184,9 +184,9 @@ void gtr_notify_torrent_completed(Glib::RefPtr<Session> const& core, int torrent
 
     g_return_if_fail(proxy != nullptr);
 
-    auto const* const tor = core->find_torrent(torrent_id);
+    auto const* const tor = core->find_torrent(tor_id);
 
-    auto const n = TrNotification{ core, torrent_id };
+    auto const n = TrNotification{ core, tor_id };
 
     std::vector<Glib::ustring> actions;
     if (server_supports_actions)
@@ -220,7 +220,7 @@ void gtr_notify_torrent_completed(Glib::RefPtr<Session> const& core, int torrent
             -1));
 }
 
-void gtr_notify_torrent_added(Glib::RefPtr<Session> const& core, int torrent_id)
+void gtr_notify_torrent_added(Glib::RefPtr<Session> const& core, tr_torrent_id_t tor_id)
 {
     g_return_if_fail(proxy != nullptr);
 
@@ -229,7 +229,7 @@ void gtr_notify_torrent_added(Glib::RefPtr<Session> const& core, int torrent_id)
         return;
     }
 
-    auto const* const tor = core->find_torrent(torrent_id);
+    auto const* const tor = core->find_torrent(tor_id);
 
     std::vector<Glib::ustring> actions;
     if (server_supports_actions)
@@ -238,7 +238,7 @@ void gtr_notify_torrent_added(Glib::RefPtr<Session> const& core, int torrent_id)
         actions.emplace_back(_("Start Now"));
     }
 
-    auto const n = TrNotification{ core, torrent_id };
+    auto const n = TrNotification{ core, tor_id };
 
     proxy->call(
         "Notify",
