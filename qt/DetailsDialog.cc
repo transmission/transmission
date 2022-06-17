@@ -334,9 +334,9 @@ void DetailsDialog::refreshModel()
 void DetailsDialog::onTorrentsEdited(torrent_ids_t const& ids)
 {
     // std::set_intersection requires sorted inputs
-    auto a = std::vector<int>{ ids.begin(), ids.end() };
+    auto a = std::vector<tr_torrent_id_t>{ ids.begin(), ids.end() };
     std::sort(std::begin(a), std::end(a));
-    auto b = std::vector<int>{ ids_.begin(), ids_.end() };
+    auto b = std::vector<tr_torrent_id_t>{ ids_.begin(), ids_.end() };
     std::sort(std::begin(b), std::end(b));
 
     // are any of the edited torrents on display here?
