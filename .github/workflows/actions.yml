@@ -43,19 +43,19 @@ jobs:
         id: check-diffs
         run: |
           set +e
-          git -C "${GITHUB_WORKSPACE}/src" diff --quiet origin/main -- CMakeLists.txt third-party libtransmission cli
+          git -C "${GITHUB_WORKSPACE}/src" diff --quiet origin/main -- CMakeLists.txt Transmission.xcodeproj third-party libtransmission cli
           echo "::set-output name=cli-changed::$?"
-          git -C "${GITHUB_WORKSPACE}/src" diff --quiet origin/main -- CMakeLists.txt third-party libtransmission cli daemon gtk macos qt utils tests web
+          git -C "${GITHUB_WORKSPACE}/src" diff --quiet origin/main -- CMakeLists.txt Transmission.xcodeproj libtransmission cli daemon gtk macos qt utils tests web third-party
           echo "::set-output name=any-code-changed::$?"
-          git -C "${GITHUB_WORKSPACE}/src" diff --quiet origin/main -- CMakeLists.txt libtransmission cli daemon gtk macos qt utils tests web
+          git -C "${GITHUB_WORKSPACE}/src" diff --quiet origin/main -- CMakeLists.txt Transmission.xcodeproj libtransmission cli daemon gtk macos qt utils tests web
           echo "::set-output name=our-code-changed::$?"
-          git -C "${GITHUB_WORKSPACE}/src" diff --quiet origin/main -- CMakeLists.txt third-party libtransmission daemon
+          git -C "${GITHUB_WORKSPACE}/src" diff --quiet origin/main -- CMakeLists.txt Transmission.xcodeproj third-party libtransmission daemon
           echo "::set-output name=daemon-changed::$?"
           git -C "${GITHUB_WORKSPACE}/src" diff --quiet origin/main -- docs
           echo "::set-output name=docs-changed::$?"
           git -C "${GITHUB_WORKSPACE}/src" diff --quiet origin/main -- CMakeLists.txt third-party libtransmission gtk
           echo "::set-output name=gtk-changed::$?"
-          git -C "${GITHUB_WORKSPACE}/src" diff --quiet origin/main -- CMakeLists.txt third-party libtransmission macosx Transmission.xcodeproj
+          git -C "${GITHUB_WORKSPACE}/src" diff --quiet origin/main -- CMakeLists.txt Transmission.xcodeproj third-party libtransmission macosx Transmission.xcodeproj
           echo "::set-output name=mac-changed::$?"
           git -C "${GITHUB_WORKSPACE}/src" diff --quiet origin/main -- CMakeLists.txt third-party libtransmission qt
           echo "::set-output name=qt-changed::$?"
