@@ -979,7 +979,7 @@ static char const* setLabels(tr_torrent* tor, tr_variant* list)
         return errmsg;
     }
 
-    tor->setLabels(std::data(labels), std::size(labels));
+    tor->setLabels(labels);
     return nullptr;
 }
 

@@ -22,9 +22,9 @@
 #import "CocoaCompatibility.h"
 
 #import "Controller.h"
-#import "ControllerWindowMethods.h"
 #import "Torrent.h"
 #import "TorrentGroup.h"
+#import "TorrentTableView.h"
 #import "CreatorWindowController.h"
 #import "StatsWindowController.h"
 #import "InfoWindowController.h"
@@ -42,6 +42,8 @@
 #import "ShareTorrentFileHelper.h"
 #import "ToolbarSegmentedCell.h"
 #import "BlocklistDownloader.h"
+#import "StatusBarController.h"
+#import "FilterBarController.h"
 #import "FileRenameSheetController.h"
 #import "BonjourController.h"
 #import "Badger.h"
@@ -51,7 +53,6 @@
 #import "NSStringAdditions.h"
 #import "ExpandedPathToPathTransformer.h"
 #import "ExpandedPathToIconTransformer.h"
-#import "MainWindow.h"
 
 #define TOOLBAR_CREATE @"Toolbar Create"
 #define TOOLBAR_OPEN_FILE @"Toolbar Open"
@@ -102,6 +103,10 @@ typedef NS_ENUM(unsigned int, sortOrderTag) { //
 
 #define ROW_HEIGHT_REGULAR 62.0
 #define ROW_HEIGHT_SMALL 22.0
+
+#define STATUS_BAR_HEIGHT 21.0
+#define FILTER_BAR_HEIGHT 23.0
+#define BOTTOM_BAR_HEIGHT 24.0
 
 #define UPDATE_UI_SECONDS 1.0
 
@@ -221,6 +226,79 @@ static void removeKeRangerRansomware()
 
     NSLog(@"OSX.KeRanger.A ransomware removal completed, proceeding to normal operation");
 }
+
+@interface Controller ()
+
+@property(nonatomic) IBOutlet NSWindow* fWindow;
+@property(nonatomic) IBOutlet NSStackView* fStackView;
+@property(nonatomic) NSArray* fStackViewHeightConstraints;
+@property(nonatomic) IBOutlet TorrentTableView* fTableView;
+
+@property(nonatomic) IBOutlet NSMenuItem* fOpenIgnoreDownloadFolder;
+@property(nonatomic) IBOutlet NSButton* fActionButton;
+@property(nonatomic) IBOutlet NSButton* fSpeedLimitButton;
+@property(nonatomic) IBOutlet NSButton* fClearCompletedButton;
+@property(nonatomic) IBOutlet NSTextField* fTotalTorrentsField;
+@property(nonatomic) IBOutlet NSMenuItem* fNextFilterItem;
+
+@property(nonatomic) IBOutlet NSMenuItem* fNextInfoTabItem;
+@property(nonatomic) IBOutlet NSMenuItem* fPrevInfoTabItem;
+
+@property(nonatomic) IBOutlet NSMenu* fSortMenu;
+
+@property(nonatomic) IBOutlet NSMenu* fGroupsSetMenu;
+@property(nonatomic) IBOutlet NSMenu* fGroupsSetContextMenu;
+
+@property(nonatomic) IBOutlet NSMenu* fShareMenu;
+@property(nonatomic) IBOutlet NSMenu* fShareContextMenu;
+@property(nonatomic) IBOutlet NSMenuItem* fShareMenuItem; // remove when dropping 10.6
+@property(nonatomic) IBOutlet NSMenuItem* fShareContextMenuItem; // remove when dropping 10.6
+
+@property(nonatomic, readonly) tr_session* fLib;
+
+@property(nonatomic, readonly) NSMutableArray<Torrent*>* fTorrents;
+@property(nonatomic, readonly) NSMutableArray* fDisplayedTorrents;
+@property(nonatomic, readonly) NSMutableDictionary<NSString*, Torrent*>* fTorrentHashes;
+
+@property(nonatomic, readonly) InfoWindowController* fInfoController;
+@property(nonatomic) MessageWindowController* fMessageController;
+
+@property(nonatomic, readonly) NSUserDefaults* fDefaults;
+
+@property(nonatomic, readonly) NSString* fConfigDirectory;
+
+@property(nonatomic) DragOverlayWindow* fOverlayWindow;
+
+@property(nonatomic) io_connect_t fRootPort;
+@property(nonatomic) NSTimer* fTimer;
+
+@property(nonatomic) StatusBarController* fStatusBar;
+
+@property(nonatomic) FilterBarController* fFilterBar;
+
+@property(nonatomic) QLPreviewPanel* fPreviewPanel;
+@property(nonatomic) BOOL fQuitting;
+@property(nonatomic) BOOL fQuitRequested;
+@property(nonatomic, readonly) BOOL fPauseOnLaunch;
+
+@property(nonatomic) Badger* fBadger;
+
+@property(nonatomic) NSMutableArray<NSString*>* fAutoImportedNames;
+@property(nonatomic) NSTimer* fAutoImportTimer;
+
+@property(nonatomic) NSMutableDictionary<NSURL*, id>* fPendingTorrentDownloads;
+
+@property(nonatomic) NSMutableSet<Torrent*>* fAddingTransfers;
+
+@property(nonatomic) NSMutableSet<NSWindowController*>* fAddWindows;
+@property(nonatomic) URLSheetWindowController* fUrlSheetController;
+
+@property(nonatomic) BOOL fGlobalPopoverShown;
+@property(nonatomic) NSView* fPositioningView;
+@property(nonatomic) BOOL fSoundPlaying;
+@property(nonatomic) id fNoNapActivity;
+
+@end
 
 @implementation Controller
 
@@ -548,6 +626,10 @@ static void removeKeRangerRansomware()
         [self.fSortMenu insertItem:item atIndex:sortMenuIndex++];
     }
 
+    //you would think this would be called later in this method from updateUI, but it's not reached in awakeFromNib
+    //this must be called after showStatusBar:
+    [self.fStatusBar updateWithDownload:0.0 upload:0.0];
+
     //register for sleep notifications
     IONotificationPortRef notify;
     io_object_t iterator;
@@ -659,7 +741,7 @@ static void removeKeRangerRansomware()
 #warning rename
     [nc addObserver:self selector:@selector(fullUpdateUI) name:@"UpdateQueue" object:nil];
 
-    [nc addObserver:self selector:@selector(drawMainWindow) name:@"ApplyFilter" object:nil];
+    [nc addObserver:self selector:@selector(applyFilter) name:@"ApplyFilter" object:nil];
 
     //open newly created torrent file
     [nc addObserver:self selector:@selector(beginCreateFile:) name:@"BeginCreateTorrentFile" object:nil];
@@ -669,7 +751,7 @@ static void removeKeRangerRansomware()
 
     [nc addObserver:self selector:@selector(applyFilter) name:@"UpdateGroups" object:nil];
 
-    [self drawMainWindow];
+    [self updateMainWindow];
 
     //timer to update the interface every second
     [self updateUI];
@@ -685,6 +767,9 @@ static void removeKeRangerRansomware()
     {
         [self showInfo:nil];
     }
+
+    //redraw filterbar to avoid clipping
+    [NSNotificationCenter.defaultCenter postNotificationName:@"ResizeBar" object:nil];
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification*)notification
@@ -1115,7 +1200,7 @@ static void removeKeRangerRansomware()
         }
     }
 
-    [self drawMainWindow];
+    [self fullUpdateUI];
 }
 
 - (void)askOpenConfirmed:(AddWindowController*)addController add:(BOOL)add
@@ -1135,7 +1220,7 @@ static void removeKeRangerRansomware()
         }
         [self.fAddingTransfers addObject:torrent];
 
-        [self drawMainWindow];
+        [self fullUpdateUI];
     }
     else
     {
@@ -1209,7 +1294,7 @@ static void removeKeRangerRansomware()
         [self.fAddingTransfers addObject:torrent];
     }
 
-    [self drawMainWindow];
+    [self fullUpdateUI];
 }
 
 - (void)askOpenMagnetConfirmed:(AddMagnetWindowController*)addController add:(BOOL)add
@@ -1229,7 +1314,7 @@ static void removeKeRangerRansomware()
         }
         [self.fAddingTransfers addObject:torrent];
 
-        [self drawMainWindow];
+        [self fullUpdateUI];
     }
     else
     {
@@ -1727,7 +1812,7 @@ static void removeKeRangerRansomware()
                         [torrent closeRemoveTorrent:deleteData];
                     }
 
-                    [self drawMainWindow];
+                    [self fullUpdateUI];
                 };
 
                 [self.fTableView beginUpdates];
@@ -1769,8 +1854,6 @@ static void removeKeRangerRansomware()
         {
             [torrent closeRemoveTorrent:deleteData];
         }
-
-        [self drawMainWindow];
     }
 }
 
@@ -3065,9 +3148,10 @@ static void removeKeRangerRansomware()
     {
         [self.fTableView endUpdates];
     }
-    self.fTableView.needsDisplay = YES;
-
     [NSAnimationContext endGrouping];
+
+    //reloaddata, otherwise the tableview has a bunch of empty cells
+    [self.fTableView reloadData];
 
     [self resetInfo]; //if group is already selected, but the torrents in it change
 
@@ -3728,32 +3812,9 @@ static void removeKeRangerRansomware()
         noteHeightOfRowsWithIndexesChanged:[NSIndexSet indexSetWithIndexesInRange:NSMakeRange(0, self.fTableView.numberOfRows)]];
     [self.fTableView endUpdates];
 
-    //resize for larger min height if not set to auto size
-    if (![self.fDefaults boolForKey:@"AutoSize"] || self.isFullScreen)
-    {
-        NSSize const contentSize = self.fWindow.contentView.frame.size;
-
-        NSSize contentMinSize = self.fWindow.contentMinSize;
-        contentMinSize.height = self.minWindowContentSizeAllowed;
-        self.fWindow.contentMinSize = contentMinSize;
-
-        //make sure the window already isn't too small
-        if (!makeSmall && contentSize.height < contentMinSize.height)
-        {
-            NSRect frame = self.fWindow.frame;
-            CGFloat heightChange = contentMinSize.height - contentSize.height;
-            frame.size.height += heightChange;
-            frame.origin.y -= heightChange;
-
-            [self.fWindow setFrame:frame display:YES];
-        }
-    }
-    else
-    {
-        [self setWindowSizeToFit];
-    }
-
-    [self drawMainWindow];
+    //reloaddata, otherwise the tableview has a bunch of empty cells
+    [self.fTableView reloadData];
+    [self updateForAutoSize];
 }
 
 - (void)togglePiecesBar:(id)sender
@@ -3772,26 +3833,21 @@ static void removeKeRangerRansomware()
 {
     BOOL const show = self.fStatusBar == nil;
     [self.fDefaults setBool:show forKey:@"StatusBar"];
-    [self drawMainWindow];
+    [self updateMainWindow];
 }
 
 - (void)toggleFilterBar:(id)sender
 {
     BOOL const show = self.fFilterBar == nil;
 
-    //disable filtering when hiding (have to do before drawMainWindow:)
+    //disable filtering when hiding (have to do before updateMainWindow:)
     if (!show)
     {
         [self.fFilterBar reset:NO];
     }
 
     [self.fDefaults setBool:show forKey:@"FilterBar"];
-    [self drawMainWindow];
-
-    if (show)
-    {
-        [self focusFilterField];
-    }
+    [self updateMainWindow];
 }
 
 - (void)focusFilterField
@@ -4851,6 +4907,246 @@ static void removeKeRangerRansomware()
     return menu;
 }
 
+- (void)updateMainWindow
+{
+    NSArray* subViews = self.fStackView.arrangedSubviews;
+    NSUInteger idx = 0;
+
+    //update layout
+    if ([self.fDefaults boolForKey:@"StatusBar"])
+    {
+        if (self.fStatusBar == nil)
+        {
+            self.fStatusBar = [[StatusBarController alloc] initWithLib:self.fLib];
+        }
+
+        [self.fStackView insertArrangedSubview:self.fStatusBar.view atIndex:idx];
+
+        NSDictionary* views = @{ @"fStatusBar" : self.fStatusBar.view };
+        [self.fStackView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[fStatusBar(==21)]" options:0
+                                                                                metrics:nil
+                                                                                  views:views]];
+        idx = 1;
+    }
+    else
+    {
+        if ([subViews containsObject:self.fStatusBar.view])
+        {
+            [self.fStackView removeView:self.fStatusBar.view];
+            self.fStatusBar = nil;
+        }
+    }
+
+    if ([self.fDefaults boolForKey:@"FilterBar"])
+    {
+        if (self.fFilterBar == nil)
+        {
+            self.fFilterBar = [[FilterBarController alloc] init];
+        }
+
+        [self.fStackView insertArrangedSubview:self.fFilterBar.view atIndex:idx];
+
+        NSDictionary* views = @{ @"fFilterBar" : self.fFilterBar.view };
+        [self.fStackView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[fFilterBar(==21)]" options:0
+                                                                                metrics:nil
+                                                                                  views:views]];
+
+        [self focusFilterField];
+    }
+    else
+    {
+        if ([subViews containsObject:self.fFilterBar.view])
+        {
+            [self.fStackView removeView:self.fFilterBar.view];
+            self.fFilterBar = nil;
+
+            [self.fWindow makeFirstResponder:self.fTableView];
+        }
+    }
+
+    [self fullUpdateUI];
+    [self updateForAutoSize];
+}
+
+- (void)setWindowSizeToFit
+{
+    if (!self.isFullScreen)
+    {
+        if (![self.fDefaults boolForKey:@"AutoSize"])
+        {
+            [self removeWindowMinMax];
+        }
+        else
+        {
+            NSScrollView* scrollView = self.fTableView.enclosingScrollView;
+
+            scrollView.hasVerticalScroller = NO;
+
+            [self removeStackViewHeightConstraints];
+
+            //update height constraints
+            NSDictionary* views = @{ @"scrollView" : scrollView };
+            CGFloat height = self.scrollViewHeight;
+            NSString* constraintsString = [NSString stringWithFormat:@"V:[scrollView(==%f)]", height];
+
+            //add height constraint
+            self.fStackViewHeightConstraints = [NSLayoutConstraint constraintsWithVisualFormat:constraintsString options:0
+                                                                                       metrics:nil
+                                                                                         views:views];
+            [self.fStackView addConstraints:self.fStackViewHeightConstraints];
+
+            scrollView.hasVerticalScroller = YES;
+
+            [self setWindowMinMaxToCurrent];
+        }
+    }
+    else
+    {
+        [self removeStackViewHeightConstraints];
+    }
+}
+
+- (void)updateForAutoSize
+{
+    if ([self.fDefaults boolForKey:@"AutoSize"] && !self.isFullScreen)
+    {
+        [self setWindowSizeToFit];
+    }
+    else
+    {
+        [self removeWindowMinMax];
+    }
+}
+
+- (void)setWindowMinMaxToCurrent
+{
+    CGFloat const height = NSHeight(self.fWindow.contentView.frame);
+
+    NSSize minSize = self.fWindow.contentMinSize, maxSize = self.fWindow.contentMaxSize;
+    minSize.height = height;
+    maxSize.height = height;
+
+    self.fWindow.contentMinSize = minSize;
+    self.fWindow.contentMaxSize = maxSize;
+}
+
+- (void)removeWindowMinMax
+{
+    [self setMinWindowContentSizeAllowed];
+    [self setMaxWindowContentSizeAllowed];
+    [self removeStackViewHeightConstraints];
+}
+
+- (void)setMinWindowContentSizeAllowed
+{
+    NSSize contentMinSize = self.fWindow.contentMinSize;
+    contentMinSize.height = self.minWindowContentHeightAllowed;
+
+    self.fWindow.contentMinSize = contentMinSize;
+}
+
+- (void)setMaxWindowContentSizeAllowed
+{
+    NSSize contentMaxSize = self.fWindow.contentMaxSize;
+    contentMaxSize.height = FLT_MAX;
+    self.fWindow.contentMaxSize = contentMaxSize;
+}
+
+- (void)removeStackViewHeightConstraints
+{
+    if (self.fStackViewHeightConstraints)
+    {
+        [self.fStackView removeConstraints:self.fStackViewHeightConstraints];
+    }
+}
+
+- (CGFloat)minWindowContentHeightAllowed
+{
+    CGFloat contentMinHeight = self.fTableView.rowHeight + self.fTableView.intercellSpacing.height + self.mainWindowComponentHeight;
+    return contentMinHeight;
+}
+
+- (CGFloat)toolbarHeight
+{
+    return self.fWindow.frame.size.height - [self.fWindow contentRectForFrameRect:self.fWindow.frame].size.height;
+}
+
+- (CGFloat)mainWindowComponentHeight
+{
+    CGFloat height = BOTTOM_BAR_HEIGHT;
+    if (self.fStatusBar)
+    {
+        height += STATUS_BAR_HEIGHT;
+    }
+
+    if (self.fFilterBar)
+    {
+        height += FILTER_BAR_HEIGHT;
+    }
+
+    return height;
+}
+
+- (CGFloat)scrollViewHeight
+{
+    CGFloat height;
+    CGFloat minHeight = self.fTableView.rowHeight + self.fTableView.intercellSpacing.height;
+
+    if ([self.fDefaults boolForKey:@"AutoSize"])
+    {
+        NSUInteger groups = (self.fDisplayedTorrents.count > 0 && ![self.fDisplayedTorrents[0] isKindOfClass:[Torrent class]]) ?
+            self.fDisplayedTorrents.count :
+            0;
+
+        height = (GROUP_SEPARATOR_HEIGHT + self.fTableView.intercellSpacing.height) * groups +
+            (self.fTableView.rowHeight + self.fTableView.intercellSpacing.height) * (self.fTableView.numberOfRows - groups);
+    }
+    else
+    {
+        height = NSHeight(self.fTableView.enclosingScrollView.frame);
+    }
+
+    //make sure we dont go bigger that the screen height
+    NSScreen* screen = self.fWindow.screen;
+    if (screen)
+    {
+        NSSize maxSize = screen.frame.size;
+        maxSize.height -= self.toolbarHeight;
+        maxSize.height -= self.mainWindowComponentHeight;
+
+        //add a small buffer
+        maxSize.height -= 50;
+
+        if (height > maxSize.height)
+        {
+            height = maxSize.height;
+        }
+    }
+
+    //make sure we dont have zero height
+    if (height < minHeight)
+    {
+        height = minHeight;
+    }
+
+    return height;
+}
+
+- (BOOL)isFullScreen
+{
+    return (self.fWindow.styleMask & NSFullScreenWindowMask);
+}
+
+- (void)windowWillEnterFullScreen:(NSNotification*)notification
+{
+    [self removeWindowMinMax];
+}
+
+- (void)windowDidExitFullScreen:(NSNotification*)notification
+{
+    [self updateForAutoSize];
+}
+
 - (void)updateForExpandCollapse
 {
     [self setWindowSizeToFit];
@@ -5008,7 +5304,7 @@ static void removeKeRangerRansomware()
     }
     [self.fAddingTransfers addObject:torrent];
 
-    [self drawMainWindow];
+    [self fullUpdateUI];
 }
 
 - (void)rpcRemoveTorrent:(Torrent*)torrent deleteData:(BOOL)deleteData
