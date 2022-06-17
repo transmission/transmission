@@ -985,7 +985,7 @@ uint64_t tr_torrentGetBytesLeftToAllocate(tr_torrent const* torrent);
  * IDs are fast lookup keys, but are not persistent between sessions.
  * If you need that, use tr_torrentView().hash_string.
  */
-int tr_torrentId(tr_torrent const* torrent);
+tr_torrent_id_t tr_torrentId(tr_torrent const* torrent);
 
 tr_torrent* tr_torrentFindFromId(tr_session* session, int id);
 
@@ -1346,7 +1346,7 @@ struct tr_tracker_view
     int seederCount; // number of seeders the tracker knows of, or -1 if unknown
 
     int tier; // which tier this tracker is in
-    int id; // unique transmission-generated ID for use in libtransmission API
+    tr_torrent_id_t id; // unique transmission-generated ID for use in libtransmission API
 
     tr_tracker_state announceState; // whether we're announcing, waiting to announce, etc.
     tr_tracker_state scrapeState; // whether we're scraping, waiting to scrape, etc.
@@ -1612,7 +1612,7 @@ struct tr_stat
 
     /** The torrent's unique Id.
         @see tr_torrentId() */
-    int id;
+    tr_torrent_id_t id;
 
     /** Number of seconds since the last activity (or since started).
         -1 if activity is not seeding or downloading. */

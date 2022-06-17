@@ -627,7 +627,7 @@ public:
     fields_t update(tr_quark const* keys, tr_variant const* const* values, size_t n);
 
 private:
-    int const id_;
+    tr_torrent_id_t const id_;
 
     bool download_limited_ = {};
     bool honors_session_limits_ = {};
