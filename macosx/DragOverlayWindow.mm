@@ -16,8 +16,6 @@
 @property(nonatomic, readonly) NSViewAnimation* fFadeInAnimation;
 @property(nonatomic, readonly) NSViewAnimation* fFadeOutAnimation;
 
-- (void)resizeWindow;
-
 @end
 
 @implementation DragOverlayWindow
@@ -53,9 +51,6 @@
         _fFadeOutAnimation.animationBlockingMode = NSAnimationNonblockingThreaded;
 
         [window addChildWindow:self ordered:NSWindowAbove];
-
-        [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(resizeWindow) name:NSWindowDidResizeNotification
-                                                 object:window];
     }
     return self;
 }
@@ -170,13 +165,6 @@
     {
         [self.fFadeOutAnimation startAnimation];
     }
-}
-
-#pragma mark - Private
-
-- (void)resizeWindow
-{
-    [self setFrame:self.parentWindow.frame display:NO];
 }
 
 @end
