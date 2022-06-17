@@ -24,10 +24,10 @@ public:
     static std::unique_ptr<RelocateDialog> create(
         Gtk::Window& parent,
         Glib::RefPtr<Session> const& core,
-        std::vector<int> const& torrent_ids);
+        std::vector<tr_torrent_id_t> const& torrent_ids);
 
 protected:
-    RelocateDialog(Gtk::Window& parent, Glib::RefPtr<Session> const& core, std::vector<int> const& torrent_ids);
+    RelocateDialog(Gtk::Window& parent, Glib::RefPtr<Session> const& core, std::vector<tr_torrent_id_t> const& torrent_ids);
 
 private:
     class Impl;

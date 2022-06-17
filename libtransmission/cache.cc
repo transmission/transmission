@@ -24,7 +24,7 @@
 
 Cache::Key Cache::makeKey(tr_torrent const* torrent, tr_block_info::Location loc) noexcept
 {
-    return std::make_pair(torrent->uniqueId, loc.block);
+    return std::make_pair(torrent->id(), loc.block);
 }
 
 std::pair<Cache::CIter, Cache::CIter> Cache::findContiguous(CIter const begin, CIter const end, CIter const iter) noexcept
@@ -213,7 +213,7 @@ int Cache::flushSpan(CIter const begin, CIter const end)
 int Cache::flushFile(tr_torrent* torrent, tr_file_index_t i)
 {
     auto const compare = CompareCacheBlockByKey{};
-    auto const tor_id = torrent->uniqueId;
+    auto const tor_id = torrent->id();
     auto const [block_begin, block_end] = tr_torGetFileBlockSpan(torrent, i);
 
     return flushSpan(
@@ -224,7 +224,7 @@ int Cache::flushFile(tr_torrent* torrent, tr_file_index_t i)
 int Cache::flushTorrent(tr_torrent* torrent)
 {
     auto const compare = CompareCacheBlockByKey{};
-    auto const tor_id = torrent->uniqueId;
+    auto const tor_id = torrent->id();
 
     return flushSpan(
         std::lower_bound(std::begin(blocks_), std::end(blocks_), std::make_pair(tor_id, 0), compare),

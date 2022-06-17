@@ -80,12 +80,12 @@ FileModelColumns const file_cols;
 class FileList::Impl
 {
 public:
-    Impl(FileList& widget, Glib::RefPtr<Session> const& core, int torrent_id);
+    Impl(FileList& widget, Glib::RefPtr<Session> const& core, tr_torrent_id_t tor_id);
     ~Impl();
 
     TR_DISABLE_COPY_MOVE(Impl)
 
-    void set_torrent(int torrent_id);
+    void set_torrent(tr_torrent_id_t tor_id);
 
 private:
     void clearData();
@@ -110,7 +110,7 @@ private:
     // GtkWidget* top_ = nullptr; // == widget_
     Gtk::TreeView* view_ = nullptr;
     Glib::RefPtr<Gtk::TreeStore> store_;
-    int torrent_id_ = 0;
+    tr_torrent_id_t torrent_id_ = {};
     sigc::connection timeout_tag_;
 };
 
@@ -470,9 +470,9 @@ void buildTree(FileRowNode& node, build_data& build)
 
 } // namespace
 
-void FileList::set_torrent(int torrent_id)
+void FileList::set_torrent(tr_torrent_id_t tor_id)
 {
-    impl_->set_torrent(torrent_id);
+    impl_->set_torrent(tor_id);
 }
 
 struct PairHash
@@ -484,14 +484,14 @@ struct PairHash
     }
 };
 
-void FileList::Impl::set_torrent(int torrentId)
+void FileList::Impl::set_torrent(tr_torrent_id_t tor_id)
 {
     /* unset the old fields */
     clearData();
 
     /* instantiate the model */
     store_ = Gtk::TreeStore::create(file_cols);
-    torrent_id_ = torrentId;
+    torrent_id_ = tor_id;
 
     /* populate the model */
     if (torrent_id_ > 0)
@@ -831,13 +831,13 @@ void FileList::Impl::cell_edited_callback(Glib::ustring const& path_string, Glib
         rename_data.release());
 }
 
-FileList::FileList(Glib::RefPtr<Session> const& core, int torrent_id)
+FileList::FileList(Glib::RefPtr<Session> const& core, tr_torrent_id_t tor_id)
     : Gtk::ScrolledWindow()
-    , impl_(std::make_unique<Impl>(*this, core, torrent_id))
+    , impl_(std::make_unique<Impl>(*this, core, tor_id))
 {
 }
 
-FileList::Impl::Impl(FileList& widget, Glib::RefPtr<Session> const& core, int torrent_id)
+FileList::Impl::Impl(FileList& widget, Glib::RefPtr<Session> const& core, tr_torrent_id_t tor_id)
     : widget_(widget)
     , core_(core)
 {
@@ -956,7 +956,7 @@ FileList::Impl::Impl(FileList& widget, Glib::RefPtr<Session> const& core, int to
     widget_.add(*view_);
     widget_.set_size_request(-1, 200);
 
-    set_torrent(torrent_id);
+    set_torrent(tor_id);
 }
 
 FileList::~FileList() = default;

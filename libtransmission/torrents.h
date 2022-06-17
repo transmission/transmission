@@ -25,12 +25,12 @@ class tr_torrents
 {
 public:
     // returns a fast lookup id for `tor`
-    [[nodiscard]] int add(tr_torrent* tor);
+    [[nodiscard]] tr_torrent_id_t add(tr_torrent* tor);
 
     void remove(tr_torrent const* tor, time_t current_time);
 
     // O(1)
-    [[nodiscard]] tr_torrent* get(int id);
+    [[nodiscard]] tr_torrent* get(tr_torrent_id_t id);
 
     // O(log n)
     [[nodiscard]] tr_torrent const* get(tr_sha1_digest_t const& hash) const;
@@ -57,7 +57,7 @@ public:
         return get(key) != nullptr;
     }
 
-    [[nodiscard]] std::vector<int> removedSince(time_t) const;
+    [[nodiscard]] std::vector<tr_torrent_id_t> removedSince(time_t) const;
 
     [[nodiscard]] auto cbegin() const noexcept
     {
@@ -100,7 +100,7 @@ public:
 private:
     std::vector<tr_torrent*> by_hash_;
 
-    // This is a lookup table where by_id_[id]->uniqueId == id.
+    // This is a lookup table where by_id_[id]->id() == id.
     // There is a small tradeoff here -- lookup is O(1) at the cost
     // of a wasted slot in the lookup table whenever a torrent is
     // removed. This improves speed for all use cases at the cost of
@@ -114,5 +114,5 @@ private:
     // may be testing for >0 as a validity check.
     std::vector<tr_torrent*> by_id_{ nullptr };
 
-    std::vector<std::pair<int, time_t>> removed_;
+    std::vector<std::pair<tr_torrent_id_t, time_t>> removed_;
 };

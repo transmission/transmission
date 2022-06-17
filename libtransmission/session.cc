@@ -2927,11 +2927,11 @@ static int bandwidthGroupWrite(tr_session const* session, std::string_view confi
 void tr_session::closeTorrentFiles(tr_torrent* tor) noexcept
 {
     this->cache->flushTorrent(tor);
-    openFiles().closeTorrent(tor->uniqueId);
+    openFiles().closeTorrent(tor->id());
 }
 
 void tr_session::closeTorrentFile(tr_torrent* tor, tr_file_index_t file_num) noexcept
 {
     this->cache->flushFile(tor, file_num);
-    openFiles().closeFile(tor->uniqueId, file_num);
+    openFiles().closeFile(tor->id(), file_num);
 }

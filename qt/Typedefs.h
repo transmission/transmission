@@ -2,4 +2,6 @@
 
 #include <unordered_set>
 
-using torrent_ids_t = std::unordered_set<int>;
+#include <libtransmission/transmission.h>
+
+using torrent_ids_t = std::unordered_set<tr_torrent_id_t>;

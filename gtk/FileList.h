@@ -16,13 +16,13 @@ class Session;
 class FileList : public Gtk::ScrolledWindow
 {
 public:
-    FileList(Glib::RefPtr<Session> const& core, int torrent_id);
+    FileList(Glib::RefPtr<Session> const& core, tr_torrent_id_t torrent_id);
     ~FileList() override;
 
     TR_DISABLE_COPY_MOVE(FileList)
 
     void clear();
-    void set_torrent(int torrent_id);
+    void set_torrent(tr_torrent_id_t torrent_id);
 
 private:
     class Impl;

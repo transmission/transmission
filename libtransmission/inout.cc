@@ -120,7 +120,7 @@ int readOrWriteBytes(
     ****  Find the fd
     ***/
 
-    auto fd = session->openFiles().get(tor->uniqueId, file_index, do_write);
+    auto fd = session->openFiles().get(tor->id(), file_index, do_write);
     auto filename = tr_pathbuf{};
     if (!fd && !getFilename(filename, tor, file_index, io_mode))
     {
@@ -132,7 +132,7 @@ int readOrWriteBytes(
         // open (and maybe create) the file
         auto const prealloc = (!do_write || !tor->fileIsWanted(file_index)) ? TR_PREALLOCATE_NONE :
                                                                               tor->session->preallocationMode;
-        fd = session->openFiles().get(tor->uniqueId, file_index, do_write, filename, prealloc, file_size);
+        fd = session->openFiles().get(tor->id(), file_index, do_write, filename, prealloc, file_size);
         if (fd && do_write)
         {
             // make a note that we just created a file

@@ -33,7 +33,7 @@ TEST_F(TorrentsTest, simpleTests)
 
     auto const id = torrents.add(tor);
     EXPECT_GT(id, 0);
-    tor->uniqueId = id;
+    tor->unique_id_ = id;
 
     EXPECT_TRUE(std::empty(torrents.removedSince(0)));
     EXPECT_FALSE(std::empty(torrents));
@@ -68,8 +68,8 @@ TEST_F(TorrentsTest, rangedLoop)
         auto tm = tr_torrent_metainfo{};
         EXPECT_TRUE(tm.parseTorrentFile(path));
         auto* const tor = new tr_torrent{ std::move(tm) };
-        tor->uniqueId = torrents.add(tor);
-        EXPECT_EQ(tor, torrents.get(tor->uniqueId));
+        tor->unique_id_ = torrents.add(tor);
+        EXPECT_EQ(tor, torrents.get(tor->id()));
         torrents_set.insert(tor);
     }
 
@@ -99,7 +99,7 @@ TEST_F(TorrentsTest, removedSince)
         auto const path = tr_pathbuf{ LIBTRANSMISSION_TEST_ASSETS_DIR, '/', name };
         auto tm = tr_torrent_metainfo{};
         auto* const tor = new tr_torrent{ std::move(tm) };
-        tor->uniqueId = torrents.add(tor);
+        tor->unique_id_ = torrents.add(tor);
         torrents_v.push_back(tor);
     }
 
@@ -108,18 +108,18 @@ TEST_F(TorrentsTest, removedSince)
     for (size_t i = 0; i < 4; ++i)
     {
         auto* const tor = torrents_v[i];
-        EXPECT_EQ(tor, torrents.get(tor->uniqueId));
+        EXPECT_EQ(tor, torrents.get(tor->id()));
         torrents.remove(torrents_v[i], TimeRemoved[i]);
-        EXPECT_EQ(nullptr, torrents.get(tor->uniqueId));
+        EXPECT_EQ(nullptr, torrents.get(tor->id()));
     }
 
-    auto remove = std::vector<int>{};
-    remove = { torrents_v[3]->uniqueId };
+    auto remove = std::vector<tr_torrent_id_t>{};
+    remove = { torrents_v[3]->id() };
     EXPECT_EQ(remove, torrents.removedSince(300));
     EXPECT_EQ(remove, torrents.removedSince(201));
-    remove = { torrents_v[1]->uniqueId, torrents_v[2]->uniqueId, torrents_v[3]->uniqueId };
+    remove = { torrents_v[1]->id(), torrents_v[2]->id(), torrents_v[3]->id() };
     EXPECT_EQ(remove, torrents.removedSince(200));
-    remove = { torrents_v[0]->uniqueId, torrents_v[1]->uniqueId, torrents_v[2]->uniqueId, torrents_v[3]->uniqueId };
+    remove = { torrents_v[0]->id(), torrents_v[1]->id(), torrents_v[2]->id(), torrents_v[3]->id() };
     EXPECT_EQ(remove, torrents.removedSince(50));
 
     std::for_each(std::begin(torrents_v), std::end(torrents_v), [](auto* tor) { delete tor; });
