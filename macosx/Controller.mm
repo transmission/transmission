@@ -4970,12 +4970,11 @@ static void removeKeRangerRansomware()
 
         [self removeStackViewHeightConstraints];
 
-        //update height constraints
         NSDictionary* views = @{ @"scrollView" : scrollView };
 
         if (![self.fDefaults boolForKey:@"AutoSize"])
         {
-            //update height constraints
+            //only set a minimum height constraint
             CGFloat height = self.minScrollViewHeightAllowed;
             NSString* constraintsString = [NSString stringWithFormat:@"V:[scrollView(>=%f)]", height];
             self.fStackViewHeightConstraints = [NSLayoutConstraint constraintsWithVisualFormat:constraintsString options:0
@@ -4984,7 +4983,7 @@ static void removeKeRangerRansomware()
         }
         else
         {
-            //update height constraints
+            //set a fixed height constraint
             CGFloat height = self.scrollViewHeight;
             NSString* constraintsString = [NSString stringWithFormat:@"V:[scrollView(==%f)]", height];
             self.fStackViewHeightConstraints = [NSLayoutConstraint constraintsWithVisualFormat:constraintsString options:0
@@ -4992,7 +4991,7 @@ static void removeKeRangerRansomware()
                                                                                          views:views];
         }
 
-        //add height constraint
+        //add height constraint to fStackView
         [self.fStackView addConstraints:self.fStackViewHeightConstraints];
 
         scrollView.hasVerticalScroller = YES;
@@ -5108,6 +5107,20 @@ static void removeKeRangerRansomware()
 - (void)windowDidExitFullScreen:(NSNotification*)notification
 {
     [self updateForAutoSize];
+}
+
+- (void)windowDidEndLiveResize:(NSNotification*)notification
+{
+    //Hacky way of fixing am issue with showing the Toolbar
+    CGFloat height = self.fWindow.contentView.frame.size.height;
+    CGFloat calculatedHeight = self.scrollViewHeight + self.mainWindowComponentHeight - 2.0;
+    if (height > calculatedHeight && !self.isFullScreen)
+    {
+        [self removeStackViewHeightConstraints];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self updateForAutoSize];
+        });
+    }
 }
 
 - (void)updateForExpandCollapse
