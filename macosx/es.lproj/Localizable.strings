@@ -26,7 +26,7 @@
 "%ld minutes" = "%ld minutos";
 
 /* stats window -> times opened */
-"%llu times" = "";
+"%llu times" = "%llu veces";
 
 /* Inspector -> Peers tab -> peers */
 "%lu cache" = "%lu caché";
@@ -1047,7 +1047,7 @@
 
 /* Message window -> level
    Message window -> level string */
-"Trace" = "";
+"Trace" = "Traza";
 
 /* Filter Bar -> filter menu */
 "Tracker" = "Tracker";
@@ -1126,7 +1126,7 @@
 
 /* Message window -> level
    Message window -> level string */
-"Warn" = "";
+"Warn" = "Advertencia";
 
 /* Drag overlay -> url */
 "Web Address" = "Dirección web";

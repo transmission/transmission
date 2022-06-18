@@ -26,7 +26,7 @@
 "%ld minutes" = "%ld dakika";
 
 /* stats window -> times opened */
-"%llu times" = "";
+"%llu times" = "%llu kez";
 
 /* Inspector -> Peers tab -> peers */
 "%lu cache" = "%lu önbellek";
@@ -65,7 +65,7 @@
 "%lu PEX" = "%lu PEX";
 
 /* Dock item - Seeding */
-"%lu Seeding" = "%lu Besleniyor";
+"%lu Seeding" = "%lu Gönderiliyor";
 
 /* Drag overlay -> torrents */
 "%lu Torrent Files" = "%lu Torrent Dosyası";
@@ -1047,7 +1047,7 @@
 
 /* Message window -> level
    Message window -> level string */
-"Trace" = "";
+"Trace" = "İz";
 
 /* Filter Bar -> filter menu */
 "Tracker" = "İzleyici";
@@ -1126,7 +1126,7 @@
 
 /* Message window -> level
    Message window -> level string */
-"Warn" = "";
+"Warn" = "Uyar";
 
 /* Drag overlay -> url */
 "Web Address" = "URL";
