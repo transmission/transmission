@@ -428,47 +428,54 @@ void tr_tracker_http_announce(
 
     auto ipv6 = tr_globalIPv6(session);
 
-#if LIBCURL_VERSION_NUM < CURL_VERSION_BITS(7, 77, 0)
     /*
      * Before Curl 7.77.0, if we explicitly choose the IP version we want
      * to use, it is still possible that the wrong one is used. The workaround
      * is expensive (disabling DNS cache), so instead we have to make do with
      * a request that we don't know if will go through IPv6 or IPv4.
      */
-    if (ipv6 != nullptr)
+    static bool const use_curl_workaround = curl_version_info(CURLVERSION_NOW)->version_num < CURL_VERSION_BITS(7, 77, 0);
+    if (use_curl_workaround)
     {
-        if (auto public_ipv4 = session->externalIP(); public_ipv4.has_value())
+        if (ipv6 != nullptr)
         {
-            options.url += format_ipv4_url_arg(*public_ipv4);
+            if (auto public_ipv4 = session->externalIP(); public_ipv4.has_value())
+            {
+                options.url += format_ipv4_url_arg(*public_ipv4);
+            }
+            options.url += format_ipv6_url_arg(ipv6);
         }
-        options.url += format_ipv6_url_arg(ipv6);
-    }
-#else
-    if (ipv6 != nullptr)
-    {
-        d->requests_sent_count = 2;
 
-        // First try to send the announce via IPv4:
-        auto ipv4_options = options;
-        // Set the "&ipv6=" argument
-        ipv4_options.url += format_ipv6_url_arg(ipv6);
-        // Set protocol to IPv4
-        ipv4_options.ip_proto = tr_web::FetchOptions::IPProtocol::V4;
-        do_make_request("IPv4"sv, std::move(ipv4_options));
-
-        // Then maybe set the "&ipv4=..." part and try to send via IPv6:
-        if (auto public_ipv4 = session->externalIP(); public_ipv4.has_value())
-        {
-            options.url += format_ipv4_url_arg(*public_ipv4);
-        }
-        options.ip_proto = tr_web::FetchOptions::IPProtocol::V6;
-        do_make_request("IPv6"sv, std::move(options));
-    }
-    else
-#endif
-    {
         d->requests_sent_count = 1;
         do_make_request(""sv, std::move(options));
+    }
+    else
+    {
+        if (ipv6 != nullptr)
+        {
+            d->requests_sent_count = 2;
+
+            // First try to send the announce via IPv4:
+            auto ipv4_options = options;
+            // Set the "&ipv6=" argument
+            ipv4_options.url += format_ipv6_url_arg(ipv6);
+            // Set protocol to IPv4
+            ipv4_options.ip_proto = tr_web::FetchOptions::IPProtocol::V4;
+            do_make_request("IPv4"sv, std::move(ipv4_options));
+
+            // Then maybe set the "&ipv4=..." part and try to send via IPv6:
+            if (auto public_ipv4 = session->externalIP(); public_ipv4.has_value())
+            {
+                options.url += format_ipv4_url_arg(*public_ipv4);
+            }
+            options.ip_proto = tr_web::FetchOptions::IPProtocol::V6;
+            do_make_request("IPv6"sv, std::move(options));
+        }
+        else
+        {
+            d->requests_sent_count = 1;
+            do_make_request(""sv, std::move(options));
+        }
     }
 }
 
