@@ -73,9 +73,9 @@ uint64_t tr_torrentTotalSize(tr_torrent const* tor)
     return tor->totalSize();
 }
 
-int tr_torrentId(tr_torrent const* tor)
+tr_torrent_id_t tr_torrentId(tr_torrent const* tor)
 {
-    return tor != nullptr ? tor->uniqueId : -1;
+    return tor != nullptr ? tor->id() : -1;
 }
 
 tr_torrent* tr_torrentFindFromId(tr_session* session, int id)
@@ -715,7 +715,7 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
     auto const& labels = tr_ctorGetLabels(ctor);
     tor->setLabels(labels);
 
-    tor->uniqueId = session->torrents().add(tor);
+    tor->unique_id_ = session->torrents().add(tor);
 
     tr_peerMgrAddTorrent(session->peerMgr, tor);
 
@@ -1028,7 +1028,7 @@ tr_stat const* tr_torrentStat(tr_torrent* tor)
     }
 
     tr_stat* const s = &tor->stats;
-    s->id = tor->uniqueId;
+    s->id = tor->id();
     s->activity = tr_torrentGetActivity(tor);
     s->error = tor->error;
     s->queuePosition = tor->queuePosition;
@@ -1915,10 +1915,10 @@ void tr_torrent::setLabels(std::vector<tr_quark> const& new_labels)
 
     for (auto label : new_labels)
     {
-            if (std::find(std::begin(this->labels), std::end(this->labels), label) == std::end(this->labels))
-            {
-                    this->labels.push_back(label);
-            }
+        if (std::find(std::begin(this->labels), std::end(this->labels), label) == std::end(this->labels))
+        {
+            this->labels.push_back(label);
+        }
     }
     this->labels.shrink_to_fit();
     this->setDirty();

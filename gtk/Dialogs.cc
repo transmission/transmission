@@ -21,7 +21,7 @@
 void gtr_confirm_remove(
     Gtk::Window& parent,
     Glib::RefPtr<Session> const& core,
-    std::vector<int> const& torrent_ids,
+    std::vector<tr_torrent_id_t> const& torrent_ids,
     bool delete_files)
 {
     int connected = 0;

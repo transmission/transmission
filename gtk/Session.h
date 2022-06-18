@@ -47,7 +47,7 @@ public:
 
     size_t get_torrent_count() const;
 
-    tr_torrent* find_torrent(int id) const;
+    tr_torrent* find_torrent(tr_torrent_id_t id) const;
 
     /******
     *******
@@ -84,14 +84,14 @@ public:
      */
     void torrents_added();
 
-    void torrent_changed(int id);
+    void torrent_changed(tr_torrent_id_t id);
 
     /******
     *******
     ******/
 
     /* remove a torrent */
-    void remove_torrent(int id, bool delete_files);
+    void remove_torrent(tr_torrent_id_t id, bool delete_files);
 
     /* update the model with current torrent status */
     void update();
@@ -99,7 +99,7 @@ public:
     /**
      * Attempts to start a torrent immediately.
      */
-    void start_now(int id);
+    void start_now(tr_torrent_id_t id);
 
     /**
     ***  Set a preference value, save the prefs file, and emit the "prefs-changed" signal
@@ -120,7 +120,7 @@ public:
 
     void exec(tr_variant const* benc);
 
-    void open_folder(int torrent_id);
+    void open_folder(tr_torrent_id_t torrent_id);
 
     sigc::signal<void(ErrorCode, Glib::ustring const&)>& signal_add_error();
     sigc::signal<void(tr_ctor*)>& signal_add_prompt();
@@ -148,7 +148,7 @@ public:
 
     Gtk::TreeModelColumn<Glib::ustring> name_collated;
     Gtk::TreeModelColumn<gpointer> torrent;
-    Gtk::TreeModelColumn<int> torrent_id;
+    Gtk::TreeModelColumn<tr_torrent_id_t> torrent_id;
     Gtk::TreeModelColumn<double> speed_up;
     Gtk::TreeModelColumn<double> speed_down;
     Gtk::TreeModelColumn<int> active_peers_up;

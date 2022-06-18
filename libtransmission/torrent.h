@@ -579,6 +579,11 @@ public:
         return {};
     }
 
+    [[nodiscard]] constexpr auto id() const noexcept
+    {
+        return unique_id_;
+    }
+
     void setDateActive(time_t t);
 
     void setLabels(std::vector<tr_quark> const& new_labels);
@@ -712,7 +717,7 @@ public:
 
     int queuePosition = 0;
 
-    int uniqueId = 0;
+    tr_torrent_id_t unique_id_ = 0;
 
     tr_completeness completeness = TR_LEECH;
 
