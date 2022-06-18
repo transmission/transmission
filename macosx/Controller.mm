@@ -5111,15 +5111,19 @@ static void removeKeRangerRansomware()
 
 - (void)windowDidEndLiveResize:(NSNotification*)notification
 {
-    //Hacky way of fixing am issue with showing the Toolbar
-    CGFloat height = self.fWindow.contentView.frame.size.height;
-    CGFloat calculatedHeight = self.scrollViewHeight + self.mainWindowComponentHeight - 2.0;
-    if (height > calculatedHeight && !self.isFullScreen)
+    if (!self.isFullScreen && [self.fDefaults boolForKey:@"AutoSize"])
     {
-        [self removeStackViewHeightConstraints];
-        dispatch_async(dispatch_get_main_queue(), ^{
-            [self updateForAutoSize];
-        });
+        //Hacky way of fixing am issue with showing the Toolbar
+        CGFloat height = self.fWindow.contentView.frame.size.height;
+        CGFloat calculatedHeight = self.scrollViewHeight + self.mainWindowComponentHeight - 2.0;
+
+        if (height > calculatedHeight)
+        {
+            [self removeStackViewHeightConstraints];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self updateForAutoSize];
+            });
+        }
     }
 }
 
