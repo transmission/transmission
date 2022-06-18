@@ -679,7 +679,8 @@ if(ENABLE_DAEMON OR ENABLE_GTK OR ENABLE_QT)
 endif()
 
 if(INSTALL_DOC)
-    install(FILES AUTHORS COPYING NEWS.md README.md docs/rpc-spec.md extras/send-email-when-torrent-done.sh DESTINATION ${CMAKE_INSTALL_DOCDIR})
+    install(FILES AUTHORS COPYING README.md extras/send-email-when-torrent-done.sh DESTINATION ${CMAKE_INSTALL_DOCDIR})
+    install(DIRECTORY news docs DESTINATION ${CMAKE_INSTALL_DOCDIR})
 endif()
 
 if(MSVC AND ENABLE_DAEMON AND ENABLE_QT AND ENABLE_UTILS AND WITH_CRYPTO STREQUAL "openssl")
