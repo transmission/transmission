@@ -4992,8 +4992,12 @@ static void removeKeRangerRansomware()
                                                                                          views:views];
         }
 
-        //add height constraint
+        //add height constraint and animate
         [self.fStackView addConstraints:self.fStackViewHeightConstraints];
+        [NSAnimationContext runAnimationGroup:^(NSAnimationContext* context) {
+            context.allowsImplicitAnimation = YES;
+            [self.fWindow layoutIfNeeded];
+        } completionHandler:nil];
 
         scrollView.hasVerticalScroller = YES;
     }
