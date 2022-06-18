@@ -231,7 +231,7 @@
     <message>
         <location line="+35"/>
         <source>Add URL(s) </source>
-        <translation>Dodaj adresy URL </translation>
+        <translation>Dodaj adresy URL</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -451,7 +451,7 @@
     <message>
         <location line="+78"/>
         <source>Added:</source>
-        <translation type="unfinished"></translation>
+        <translation>Dodano:</translation>
     </message>
     <message>
         <location line="+14"/>

@@ -443,7 +443,7 @@
     <message>
         <location line="+78"/>
         <source>Added:</source>
-        <translation type="unfinished"></translation>
+        <translation>Hozzáadva:</translation>
     </message>
     <message>
         <location line="+14"/>

@@ -26,7 +26,7 @@
 "%ld minutes" = "%ld minutes";
 
 /* stats window -> times opened */
-"%llu times" = "";
+"%llu times" = "%llu fois";
 
 /* Inspector -> Peers tab -> peers */
 "%lu cache" = "%lu en cache";
@@ -47,7 +47,7 @@
 "%lu files" = "%lu fichiers";
 
 /* Inspector -> Peers tab -> peers */
-"%lu incoming" = "%lu entrant";
+"%lu incoming" = "%lu entrants";
 
 /* Prefs -> blocklist -> message */
 "%lu IP address rules in list" = "%lu règles d’adresses IP dans la liste";
@@ -65,7 +65,7 @@
 "%lu PEX" = "%lu PEX";
 
 /* Dock item - Seeding */
-"%lu Seeding" = "%lu propagation";
+"%lu Seeding" = "%lu en propagation";
 
 /* Drag overlay -> torrents */
 "%lu Torrent Files" = "%lu fichiers torrent";
@@ -88,7 +88,7 @@
 "%u pieces, %@ each" = "%1$u morceaux, %2$@ chacun";
 
 /* Inspector -> Peers tab -> peers */
-"1 Connected" = "1 connecté";
+"1 Connected" = "1 Connectés";
 
 /* Add torrent -> info
    Create torrent -> info
@@ -187,32 +187,32 @@
 "Apply Selected" = "Appliquer à la sélection";
 
 /* Confirm Quit panel -> title */
-"Are you sure you want to quit?" = "Voulez-vous vraiment fermer Transmission ?";
+"Are you sure you want to quit?" = "Voulez-vous vraiment fermer Transmission ?";
 
 /* Remove completed confirm panel -> title */
-"Are you sure you want to remove %lu completed transfers from the transfer list?" = "Voulez-vous vraiment supprimer %lu transferts terminés de la liste de transferts ?";
+"Are you sure you want to remove %lu completed transfers from the transfer list?" = "Voulez-vous vraiment supprimer %lu transferts terminés de la liste de transferts ?";
 
 /* Remove trackers alert -> title */
-"Are you sure you want to remove %lu trackers?" = "Voulez-vous vraiment supprimer %lu traceurs ?";
+"Are you sure you want to remove %lu trackers?" = "Voulez-vous vraiment supprimer %lu traceurs ?";
 
 /* Removal confirm panel -> title */
-"Are you sure you want to remove %lu transfers from the transfer list and trash the data files?" = "Voulez-vous vraiment retirer %lu transferts de la liste des transferts et supprimer les fichiers de données ?";
+"Are you sure you want to remove %lu transfers from the transfer list and trash the data files?" = "Voulez-vous vraiment retirer %lu transferts de la liste des transferts et supprimer les fichiers de données ?";
 
 /* Removal confirm panel -> title */
-"Are you sure you want to remove %lu transfers from the transfer list?" = "Voulez-vous vraiment supprimer %lu transferts de la liste de transferts ?";
+"Are you sure you want to remove %lu transfers from the transfer list?" = "Voulez-vous vraiment supprimer %lu transferts de la liste de transferts ?";
 
 /* Removal confirm panel -> title */
-"Are you sure you want to remove \"%@\" from the transfer list and trash the data file?" = "Voulez-vous vraiment retirer « %@ » de la liste des transferts et supprimer les fichiers de données ?";
+"Are you sure you want to remove \"%@\" from the transfer list and trash the data file?" = "Voulez-vous vraiment retirer « %@ » de la liste des transferts et supprimer les fichiers de données ?";
 
 /* Removal confirm panel -> title
    Remove completed confirm panel -> title */
-"Are you sure you want to remove \"%@\" from the transfer list?" = "Voulez-vous vraiment retirer « %@ » de la liste ?";
+"Are you sure you want to remove \"%@\" from the transfer list?" = "Voulez-vous vraiment retirer « %@ » de la liste ?";
 
 /* Remove trackers alert -> title */
-"Are you sure you want to remove this tracker?" = "Voulez-vous vraiment supprimer ce traceur ?";
+"Are you sure you want to remove this tracker?" = "Voulez-vous vraiment supprimer ce traceur ?";
 
 /* Stats reset -> title */
-"Are you sure you want to reset usage statistics?" = "Voulez-vous vraiment réinitialiser les statistiques d’utilisation ?";
+"Are you sure you want to reset usage statistics?" = "Voulez-vous vraiment réinitialiser les statistiques d’utilisation ?";
 
 /* inspector -> peer table -> header tool tip */
 "Available" = "Disponible";
@@ -356,10 +356,10 @@
 "Downloading blocklist" = "Téléchargement de la liste de blocage";
 
 /* Torrent -> status string */
-"Downloading from %lu of %lu peers" = "Téléchargement à partir de %1$lu sur %2$lu pairs";
+"Downloading from %lu of %lu peers" = "Téléchargement de %1$lu sur %2$lu pairs";
 
 /* Torrent -> status string */
-"Downloading from %lu of 1 peer" = "Téléchargement à partir de %lu de 1 pair";
+"Downloading from %lu of 1 peer" = "Téléchargement de %lu sur 1 pair";
 
 /* inspector -> peer table -> header tool tip */
 "Downloading From Peer" = "Téléchargement à partir d’un pair";
@@ -559,16 +559,13 @@
 "Never" = "Jamais";
 
 /* Inspector -> tracker table */
-"New Tier" = "Nouveau tier";
+"New Tier" = "Nouveau palier";
 
 /* Tracker next announce */
 "Next announce in %@" = "Prochaine annonce dans %@";
 
 /* Group table row */
 "No Group" = "Aucun groupe";
-
-/* No comment provided by engineer. */
-"No napping on the job!" = "";
 
 /* Inspector -> selected torrents */
 "No Torrents Selected" = "Aucun torrent n’est sélectionné";
@@ -713,7 +710,7 @@
 "Priority Not Available" = "La priorité n’est pas proposée";
 
 /* Inspector -> private torrent */
-"Private Torrent, non-tracker peer discovery disabled" = "Torrent privé, utilisation des pairs du traceur uniquement\n";
+"Private Torrent, non-tracker peer discovery disabled" = "Torrent privé, utilisation des pairs du traceur uniquement";
 
 /* Message window -> table column */
 "Process" = "Traitement";
@@ -1012,7 +1009,7 @@
 "This will clear the global statistics displayed by Transmission. Individual transfer statistics will not be affected." = "Les statistiques globales affichées par Transmission seront effacées. Les statistiques individuelles de transfert ne seront pas affectées.";
 
 /* Inspector -> tracker table */
-"Tier %ld" = "%ld tier";
+"Tier %ld" = "Palier %ld";
 
 /* Filter toolbar item -> palette label */
 "Toggle Filter" = "Activer/désactiver le filtre";
@@ -1048,8 +1045,9 @@
 /* Status Bar -> status menu */
 "Total Transfer" = "Total des transferts";
 
-/* Message window -> level string */
-"Trace" = "";
+/* Message window -> level
+   Message window -> level string */
+"Trace" = "Trace";
 
 /* Filter Bar -> filter menu */
 "Tracker" = "Traceur";
@@ -1126,8 +1124,9 @@
 /* Torrent -> status string */
 "Waiting to seed" = "En attente de propagation";
 
-/* Message window -> level string */
-"Warn" = "";
+/* Message window -> level
+   Message window -> level string */
+"Warn" = "Avertir";
 
 /* Drag overlay -> url */
 "Web Address" = "Adresse Web";

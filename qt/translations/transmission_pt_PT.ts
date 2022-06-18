@@ -11,7 +11,7 @@
     <message>
         <location line="+39"/>
         <source>Copyright © The Transmission Project</source>
-        <translation type="unfinished"></translation>
+        <translation>Direitos de autor ©  O projeto Transmission</translation>
     </message>
     <message>
         <location line="-10"/>
@@ -21,12 +21,12 @@
     <message>
         <location filename="../AboutDialog.cc" line="+37"/>
         <source>Client</source>
-        <translation type="unfinished">Cliente</translation>
+        <translation>Cliente</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Server</source>
-        <translation type="unfinished"></translation>
+        <translation>Servidor</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -64,7 +64,7 @@
     <message>
         <location line="+132"/>
         <source>Torrent Added</source>
-        <translation type="unfinished"></translation>
+        <translation>Torrent adicionado</translation>
     </message>
     <message numerus="yes">
         <location line="-29"/>
@@ -447,7 +447,7 @@
     <message>
         <location line="+78"/>
         <source>Added:</source>
-        <translation type="unfinished"></translation>
+        <translation>Adicionado:</translation>
     </message>
     <message>
         <location line="+14"/>
@@ -907,12 +907,12 @@
     <message>
         <location line="-132"/>
         <source>Options</source>
-        <translation type="unfinished">Opções</translation>
+        <translation>Opções</translation>
     </message>
     <message>
         <location line="+83"/>
         <source>Statistics</source>
-        <translation type="unfinished">Estatísticas</translation>
+        <translation>Estatísticas</translation>
     </message>
     <message>
         <location line="+171"/>
@@ -1514,7 +1514,7 @@ Para adicionar outra hiperligação primária, adicione-a após a linha em branc
     <message>
         <location line="+14"/>
         <source>&amp;Source:</source>
-        <translation type="unfinished">&amp;Fonte:</translation>
+        <translation>&amp;Fonte:</translation>
     </message>
     <message>
         <location line="+14"/>
@@ -2202,7 +2202,7 @@ Para adicionar outra hiperligação primária, adicione-a após a linha em branc
     <message>
         <location line="+305"/>
         <source>Start Now</source>
-        <translation type="unfinished"></translation>
+        <translation>Iniciar agora</translation>
     </message>
 </context>
 <context>

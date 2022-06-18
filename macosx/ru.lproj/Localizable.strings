@@ -26,7 +26,7 @@
 "%ld minutes" = "%ld мин";
 
 /* stats window -> times opened */
-"%llu times" = "";
+"%llu times" = "%llu раз";
 
 /* Inspector -> Peers tab -> peers */
 "%lu cache" = "%lu в кеше";
@@ -567,9 +567,6 @@
 /* Group table row */
 "No Group" = "✕";
 
-/* No comment provided by engineer. */
-"No napping on the job!" = "";
-
 /* Inspector -> selected torrents */
 "No Torrents Selected" = "Ни один торрент не выбран";
 
@@ -786,7 +783,7 @@
 "Rename File" = "Переименовать файл";
 
 /* rename sheet label */
-"Rename the file \"%@\":" = "Переименовать файл «%@»";
+"Rename the file \"%@\":" = "Переименовать файл «%@»:";
 
 /* Stats reset -> button
    Stats window -> reset button */
@@ -1048,7 +1045,8 @@
 /* Status Bar -> status menu */
 "Total Transfer" = "Роздано за все время";
 
-/* Message window -> level string */
+/* Message window -> level
+   Message window -> level string */
 "Trace" = "";
 
 /* Filter Bar -> filter menu */
@@ -1115,7 +1113,7 @@
 "uploaded %@ (Ratio: %@)" = "роздано %1$@ (рейтинг: %2$@)";
 
 /* inspector -> peer table -> header tool tip */
-"Uploading To Peer" = "Раздаю к пользователю";
+"Uploading To Peer" = "Раздаю пользователю";
 
 /* Torrent -> status string */
 "Waiting to check existing data" = "Ожидаю проверки существующих данных";
@@ -1126,8 +1124,9 @@
 /* Torrent -> status string */
 "Waiting to seed" = "Ожидаю раздачи";
 
-/* Message window -> level string */
-"Warn" = "";
+/* Message window -> level
+   Message window -> level string */
+"Warn" = "Предупреждение";
 
 /* Drag overlay -> url */
 "Web Address" = "URL";
