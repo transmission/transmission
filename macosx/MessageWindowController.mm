@@ -206,14 +206,7 @@
         break;
 
     case TR_LOG_DEBUG:
-        if (@available(macOS 10.12, *))
-        {
-            color = NSColor.systemTealColor;
-        }
-        else
-        {
-            color = NSColor.cyanColor;
-        }
+        color = NSColor.systemTealColor;
         break;
 
     case TR_LOG_TRACE:
