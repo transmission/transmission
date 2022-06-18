@@ -232,6 +232,19 @@ private:
             return options.timeout_secs;
         }
 
+        [[nodiscard]] auto ipProtocol() const
+        {
+            switch (options.ip_proto)
+            {
+            case FetchOptions::IPProtocol::V4:
+                return CURL_IPRESOLVE_V4;
+            case FetchOptions::IPProtocol::V6:
+                return CURL_IPRESOLVE_V6;
+            default:
+                return CURL_IPRESOLVE_WHATEVER;
+            }
+        }
+
         void done()
         {
             if (options.done_func == nullptr)
@@ -334,6 +347,7 @@ private:
         (void)curl_easy_setopt(e, CURLOPT_MAXREDIRS, -1L);
         (void)curl_easy_setopt(e, CURLOPT_NOSIGNAL, 1L);
         (void)curl_easy_setopt(e, CURLOPT_PRIVATE, task);
+        (void)curl_easy_setopt(e, CURLOPT_IPRESOLVE, task->ipProtocol());
 
 #ifdef USE_LIBCURL_SOCKOPT
         (void)curl_easy_setopt(e, CURLOPT_SOCKOPTFUNCTION, onSocketCreated);

@@ -42,7 +42,7 @@ struct CompareTorrentByHash
 
 } // namespace
 
-tr_torrent* tr_torrents::get(int id)
+tr_torrent* tr_torrents::get(tr_torrent_id_t id)
 {
     TR_ASSERT(0 < id);
     TR_ASSERT(static_cast<size_t>(id) < std::size(by_id_));
@@ -52,7 +52,7 @@ tr_torrent* tr_torrents::get(int id)
     }
 
     auto* const tor = by_id_.at(id);
-    TR_ASSERT(tor == nullptr || tor->uniqueId == id);
+    TR_ASSERT(tor == nullptr || tor->id() == id);
     TR_ASSERT(
         std::count_if(std::begin(removed_), std::end(removed_), [&id](auto const& removed) { return id == removed.first; }) ==
         (tor == nullptr ? 1 : 0));
@@ -77,9 +77,9 @@ tr_torrent const* tr_torrents::get(tr_sha1_digest_t const& hash) const
     return begin == end ? nullptr : *begin;
 }
 
-int tr_torrents::add(tr_torrent* tor)
+tr_torrent_id_t tr_torrents::add(tr_torrent* tor)
 {
-    auto const id = static_cast<int>(std::size(by_id_));
+    auto const id = static_cast<tr_torrent_id_t>(std::size(by_id_));
     by_id_.push_back(tor);
     by_hash_.insert(std::lower_bound(std::begin(by_hash_), std::end(by_hash_), tor, CompareTorrentByHash{}), tor);
     return id;
@@ -88,17 +88,17 @@ int tr_torrents::add(tr_torrent* tor)
 void tr_torrents::remove(tr_torrent const* tor, time_t timestamp)
 {
     TR_ASSERT(tor != nullptr);
-    TR_ASSERT(get(tor->uniqueId) == tor);
+    TR_ASSERT(get(tor->id()) == tor);
 
-    by_id_[tor->uniqueId] = nullptr;
+    by_id_[tor->id()] = nullptr;
     auto const [begin, end] = std::equal_range(std::begin(by_hash_), std::end(by_hash_), tor, CompareTorrentByHash{});
     by_hash_.erase(begin, end);
-    removed_.emplace_back(tor->uniqueId, timestamp);
+    removed_.emplace_back(tor->id(), timestamp);
 }
 
-std::vector<int> tr_torrents::removedSince(time_t timestamp) const
+std::vector<tr_torrent_id_t> tr_torrents::removedSince(time_t timestamp) const
 {
-    auto ids = std::set<int>{};
+    auto ids = std::set<tr_torrent_id_t>{};
 
     for (auto const& [id, removed_at] : removed_)
     {

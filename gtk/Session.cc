@@ -882,10 +882,10 @@ Glib::ustring get_collated_name(tr_torrent const* tor)
 struct metadata_callback_data
 {
     Session* core;
-    int torrent_id;
+    tr_torrent_id_t torrent_id;
 };
 
-Gtk::TreeModel::iterator find_row_from_torrent_id(Glib::RefPtr<Gtk::TreeModel> const& model, int id)
+Gtk::TreeModel::iterator find_row_from_torrent_id(Glib::RefPtr<Gtk::TreeModel> const& model, tr_torrent_id_t id)
 {
     for (auto const& row : model->children())
     {
@@ -1234,7 +1234,7 @@ void Session::Impl::torrents_added()
     signal_add_error.emit(ERR_NO_MORE_TORRENTS, {});
 }
 
-void Session::torrent_changed(int id)
+void Session::torrent_changed(tr_torrent_id_t id)
 {
     auto const model = impl_->get_raw_model();
 
@@ -1244,7 +1244,7 @@ void Session::torrent_changed(int id)
     }
 }
 
-void Session::remove_torrent(int id, bool delete_local_data)
+void Session::remove_torrent(tr_torrent_id_t id, bool delete_local_data)
 {
     auto* tor = find_torrent(id);
 
@@ -1390,7 +1390,7 @@ void Session::update()
     impl_->update();
 }
 
-void Session::start_now(int id)
+void Session::start_now(tr_torrent_id_t id)
 {
     tr_variant top;
     tr_variantInitDict(&top, 2);
@@ -1752,7 +1752,7 @@ size_t Session::Impl::get_active_torrent_count() const
     return activeCount;
 }
 
-tr_torrent* Session::find_torrent(int id) const
+tr_torrent* Session::find_torrent(tr_torrent_id_t id) const
 {
     tr_torrent* tor = nullptr;
 
@@ -1764,7 +1764,7 @@ tr_torrent* Session::find_torrent(int id) const
     return tor;
 }
 
-void Session::open_folder(int torrent_id)
+void Session::open_folder(tr_torrent_id_t torrent_id)
 {
     auto const* tor = find_torrent(torrent_id);
 

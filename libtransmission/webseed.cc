@@ -242,7 +242,7 @@ public:
         publish(&e);
     }
 
-    int const torrent_id;
+    tr_torrent_id_t const torrent_id;
     std::string const base_url;
     tr_peer_callback const callback;
     void* const callback_data;
@@ -294,7 +294,11 @@ private:
     std::shared_ptr<evbuffer> const content_{ evbuffer_new(), evbuffer_free };
 
 public:
-    write_block_data(tr_session* session_in, int torrent_id_in, tr_webseed* webseed_in, tr_block_info::Location loc_in)
+    write_block_data(
+        tr_session* session_in,
+        tr_torrent_id_t torrent_id_in,
+        tr_webseed* webseed_in,
+        tr_block_info::Location loc_in)
         : session{ session_in }
         , torrent_id{ torrent_id_in }
         , webseed{ webseed_in }
@@ -326,7 +330,7 @@ public:
 
 private:
     tr_session* const session;
-    int const torrent_id;
+    tr_torrent_id_t const torrent_id;
     tr_webseed* const webseed;
     tr_block_info::Location const loc;
 };
@@ -358,7 +362,7 @@ void useFetchedBlocks(tr_webseed_task* task)
         }
         else
         {
-            auto* const data = new write_block_data{ session, tor->uniqueId, webseed, task->loc };
+            auto* const data = new write_block_data{ session, tor->id(), webseed, task->loc };
             evbuffer_remove_buffer(task->content(), data->content(), block_size);
             tr_runInEventThread(session, &write_block_data::write_block_func, data);
         }
@@ -504,7 +508,7 @@ void task_request_next_chunk(tr_webseed_task* task)
     makeUrl(webseed, tor->fileSubpath(file_index), std::back_inserter(url));
     auto options = tr_web::FetchOptions{ url.sv(), onPartialDataFetched, task };
     options.range = fmt::format(FMT_STRING("{:d}-{:d}"), file_offset, file_offset + this_chunk - 1);
-    options.speed_limit_tag = tor->uniqueId;
+    options.speed_limit_tag = tor->id();
     options.buffer = task->content();
     tor->session->web->fetch(std::move(options));
 }
