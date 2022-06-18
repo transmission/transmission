@@ -158,9 +158,7 @@ typedef NS_ENUM(unsigned int, addType) { //
 - (void)toggleAvailabilityBar:(id)sender;
 
 - (void)toggleStatusBar:(id)sender;
-- (void)showStatusBar:(BOOL)show animate:(BOOL)animate;
 - (void)toggleFilterBar:(id)sender;
-- (void)showFilterBar:(BOOL)show animate:(BOOL)animate;
 - (void)focusFilterField;
 
 - (void)allToolbarClicked:(id)sender;
@@ -170,11 +168,12 @@ typedef NS_ENUM(unsigned int, addType) { //
 
 - (void)setWindowSizeToFit;
 - (void)updateForAutoSize;
-- (void)setWindowMinMaxToCurrent;
-- (void)removeWindowMinMax;
-- (void)setMinWindowContentSizeAllowed;
-- (void)setMaxWindowContentSizeAllowed;
 - (void)removeStackViewHeightConstraints;
+@property(nonatomic, readonly) CGFloat minScrollViewHeightAllowed;
+@property(nonatomic, readonly) CGFloat toolbarHeight;
+@property(nonatomic, readonly) CGFloat mainWindowComponentHeight;
+@property(nonatomic, readonly) CGFloat scrollViewHeight;
+- (BOOL)isFullScreen;
 
 - (void)updateForExpandCollapse;
 

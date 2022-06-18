@@ -4964,33 +4964,37 @@ static void removeKeRangerRansomware()
 {
     if (!self.isFullScreen)
     {
+        NSScrollView* scrollView = self.fTableView.enclosingScrollView;
+
+        scrollView.hasVerticalScroller = NO;
+
+        [self removeStackViewHeightConstraints];
+
+        NSDictionary* views = @{ @"scrollView" : scrollView };
+
         if (![self.fDefaults boolForKey:@"AutoSize"])
         {
-            [self removeWindowMinMax];
-        }
-        else
-        {
-            NSScrollView* scrollView = self.fTableView.enclosingScrollView;
-
-            scrollView.hasVerticalScroller = NO;
-
-            [self removeStackViewHeightConstraints];
-
-            //update height constraints
-            NSDictionary* views = @{ @"scrollView" : scrollView };
-            CGFloat height = self.scrollViewHeight;
-            NSString* constraintsString = [NSString stringWithFormat:@"V:[scrollView(==%f)]", height];
-
-            //add height constraint
+            //only set a minimum height constraint
+            CGFloat height = self.minScrollViewHeightAllowed;
+            NSString* constraintsString = [NSString stringWithFormat:@"V:[scrollView(>=%f)]", height];
             self.fStackViewHeightConstraints = [NSLayoutConstraint constraintsWithVisualFormat:constraintsString options:0
                                                                                        metrics:nil
                                                                                          views:views];
-            [self.fStackView addConstraints:self.fStackViewHeightConstraints];
-
-            scrollView.hasVerticalScroller = YES;
-
-            [self setWindowMinMaxToCurrent];
         }
+        else
+        {
+            //set a fixed height constraint
+            CGFloat height = self.scrollViewHeight;
+            NSString* constraintsString = [NSString stringWithFormat:@"V:[scrollView(==%f)]", height];
+            self.fStackViewHeightConstraints = [NSLayoutConstraint constraintsWithVisualFormat:constraintsString options:0
+                                                                                       metrics:nil
+                                                                                         views:views];
+        }
+
+        //add height constraint to fStackView
+        [self.fStackView addConstraints:self.fStackViewHeightConstraints];
+
+        scrollView.hasVerticalScroller = YES;
     }
     else
     {
@@ -5000,48 +5004,14 @@ static void removeKeRangerRansomware()
 
 - (void)updateForAutoSize
 {
-    if ([self.fDefaults boolForKey:@"AutoSize"] && !self.isFullScreen)
+    if (!self.isFullScreen)
     {
         [self setWindowSizeToFit];
     }
     else
     {
-        [self removeWindowMinMax];
+        [self removeStackViewHeightConstraints];
     }
-}
-
-- (void)setWindowMinMaxToCurrent
-{
-    CGFloat const height = NSHeight(self.fWindow.contentView.frame);
-
-    NSSize minSize = self.fWindow.contentMinSize, maxSize = self.fWindow.contentMaxSize;
-    minSize.height = height;
-    maxSize.height = height;
-
-    self.fWindow.contentMinSize = minSize;
-    self.fWindow.contentMaxSize = maxSize;
-}
-
-- (void)removeWindowMinMax
-{
-    [self setMinWindowContentSizeAllowed];
-    [self setMaxWindowContentSizeAllowed];
-    [self removeStackViewHeightConstraints];
-}
-
-- (void)setMinWindowContentSizeAllowed
-{
-    NSSize contentMinSize = self.fWindow.contentMinSize;
-    contentMinSize.height = self.minWindowContentHeightAllowed;
-
-    self.fWindow.contentMinSize = contentMinSize;
-}
-
-- (void)setMaxWindowContentSizeAllowed
-{
-    NSSize contentMaxSize = self.fWindow.contentMaxSize;
-    contentMaxSize.height = FLT_MAX;
-    self.fWindow.contentMaxSize = contentMaxSize;
 }
 
 - (void)removeStackViewHeightConstraints
@@ -5052,9 +5022,9 @@ static void removeKeRangerRansomware()
     }
 }
 
-- (CGFloat)minWindowContentHeightAllowed
+- (CGFloat)minScrollViewHeightAllowed
 {
-    CGFloat contentMinHeight = self.fTableView.rowHeight + self.fTableView.intercellSpacing.height + self.mainWindowComponentHeight;
+    CGFloat contentMinHeight = self.fTableView.rowHeight + self.fTableView.intercellSpacing.height;
     return contentMinHeight;
 }
 
@@ -5082,7 +5052,7 @@ static void removeKeRangerRansomware()
 - (CGFloat)scrollViewHeight
 {
     CGFloat height;
-    CGFloat minHeight = self.fTableView.rowHeight + self.fTableView.intercellSpacing.height;
+    CGFloat minHeight = self.minScrollViewHeightAllowed;
 
     if ([self.fDefaults boolForKey:@"AutoSize"])
     {
@@ -5126,17 +5096,35 @@ static void removeKeRangerRansomware()
 
 - (BOOL)isFullScreen
 {
-    return (self.fWindow.styleMask & NSFullScreenWindowMask);
+    return (self.fWindow.styleMask & NSWindowStyleMaskFullScreen) == NSWindowStyleMaskFullScreen;
 }
 
 - (void)windowWillEnterFullScreen:(NSNotification*)notification
 {
-    [self removeWindowMinMax];
+    [self removeStackViewHeightConstraints];
 }
 
 - (void)windowDidExitFullScreen:(NSNotification*)notification
 {
     [self updateForAutoSize];
+}
+
+- (void)windowDidEndLiveResize:(NSNotification*)notification
+{
+    if (!self.isFullScreen && [self.fDefaults boolForKey:@"AutoSize"])
+    {
+        //Hacky way of fixing am issue with showing the Toolbar
+        CGFloat height = self.fWindow.contentView.frame.size.height;
+        CGFloat calculatedHeight = self.scrollViewHeight + self.mainWindowComponentHeight - 2.0;
+
+        if (height > calculatedHeight)
+        {
+            [self removeStackViewHeightConstraints];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self updateForAutoSize];
+            });
+        }
+    }
 }
 
 - (void)updateForExpandCollapse
