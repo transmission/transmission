@@ -320,7 +320,7 @@
         NSRect groupRect = [self groupIconRectForBounds:iconRect];
         NSColor* groupColor = [GroupsController.groups colorForIndex:groupValue];
         NSImage* icon = [NSImage discIconWithColor:groupColor insetFactor:0];
-        [icon drawInRect:groupRect fromRect:NSZeroRect operation:NSCompositeSourceOver fraction:1.0f];
+        [icon drawInRect:groupRect fromRect:NSZeroRect operation:NSCompositingOperationSourceOver fraction:1.0f];
     }
 
     BOOL const error = torrent.anyErrorOrWarning;

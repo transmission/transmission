@@ -42,22 +42,15 @@ GroupsController* fGroupsInstance = nil;
         NSData* data;
         if ((data = [NSUserDefaults.standardUserDefaults dataForKey:@"GroupDicts"]))
         {
-            if (@available(macOS 10.13, *))
-            {
-                _fGroups = [NSKeyedUnarchiver unarchivedObjectOfClasses:[NSSet setWithObjects:NSMutableArray.class,
-                                                                                              NSMutableDictionary.class,
-                                                                                              NSNumber.class,
-                                                                                              NSColor.class,
-                                                                                              NSString.class,
-                                                                                              NSPredicate.class,
-                                                                                              nil]
-                                                               fromData:data
-                                                                  error:nil];
-            }
-            else
-            {
-                _fGroups = [NSKeyedUnarchiver unarchiveObjectWithData:data];
-            }
+            _fGroups = [NSKeyedUnarchiver unarchivedObjectOfClasses:[NSSet setWithObjects:NSMutableArray.class,
+                                                                                          NSMutableDictionary.class,
+                                                                                          NSNumber.class,
+                                                                                          NSColor.class,
+                                                                                          NSString.class,
+                                                                                          NSPredicate.class,
+                                                                                          nil]
+                                                           fromData:data
+                                                              error:nil];
         }
         else if ((data = [NSUserDefaults.standardUserDefaults dataForKey:@"Groups"])) //handle old groups
         {
