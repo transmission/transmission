@@ -121,7 +121,8 @@
     NSPasteboard* pasteboard = info.draggingPasteboard;
     if ([pasteboard.types containsObject:GROUP_TABLE_VIEW_DATA_TYPE])
     {
-        NSIndexSet* indexes = [NSKeyedUnarchiver unarchivedObjectOfClass:NSIndexSet.class fromData:[pasteboard dataForType:GROUP_TABLE_VIEW_DATA_TYPE] error:nil];
+        NSIndexSet* indexes = [NSKeyedUnarchiver unarchivedObjectOfClass:NSIndexSet.class fromData:[pasteboard dataForType:GROUP_TABLE_VIEW_DATA_TYPE]
+                                                                   error:nil];
         NSInteger oldRow = indexes.firstIndex;
 
         if (oldRow < newRow)
