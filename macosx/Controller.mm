@@ -767,9 +767,6 @@ static void removeKeRangerRansomware()
     {
         [self showInfo:nil];
     }
-
-    //redraw filterbar to avoid clipping
-    [NSNotificationCenter.defaultCenter postNotificationName:@"ResizeBar" object:nil];
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification*)notification
