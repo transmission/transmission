@@ -1123,49 +1123,6 @@ void evbuffer_add_uint64(struct evbuffer* outbuf, uint64_t addme_hll)
 ****
 ***/
 
-static inline void maybeDecryptBuffer(tr_peerIo* io, struct evbuffer* buf, size_t offset, size_t size)
-{
-    if (io->encryption_type == PEER_ENCRYPTION_RC4)
-    {
-        processBuffer(&io->crypto, buf, offset, size, &tr_cryptoDecrypt);
-    }
-}
-
-void tr_peerIoReadBytesToBuf(tr_peerIo* io, evbuffer* inbuf, std::vector<uint8_t>& outbuf, size_t n_bytes)
-{
-    TR_ASSERT(tr_isPeerIo(io));
-    TR_ASSERT(evbuffer_get_length(inbuf) >= n_bytes);
-
-    auto const old_length = std::size(outbuf);
-
-    // append it to outbuf
-    outbuf.resize(old_length + n_bytes);
-    auto* const insert_point = &outbuf[old_length];
-    evbuffer_remove(inbuf, insert_point, n_bytes);
-
-    // decrypt it if needed
-    if (io->encryption_type == PEER_ENCRYPTION_RC4)
-    {
-        tr_cryptoDecrypt(&io->crypto, n_bytes, insert_point, insert_point);
-    }
-}
-
-void tr_peerIoReadBytesToBuf(tr_peerIo* io, struct evbuffer* inbuf, struct evbuffer* outbuf, size_t byteCount)
-{
-    TR_ASSERT(tr_isPeerIo(io));
-    TR_ASSERT(evbuffer_get_length(inbuf) >= byteCount);
-
-    size_t const old_length = evbuffer_get_length(outbuf);
-
-    /* append it to outbuf */
-    struct evbuffer* tmp = evbuffer_new();
-    evbuffer_remove_buffer(inbuf, tmp, byteCount);
-    evbuffer_add_buffer(outbuf, tmp);
-    evbuffer_free(tmp);
-
-    maybeDecryptBuffer(io, outbuf, old_length, byteCount);
-}
-
 void tr_peerIoReadBytes(tr_peerIo* io, struct evbuffer* inbuf, void* bytes, size_t byteCount)
 {
     TR_ASSERT(tr_isPeerIo(io));
