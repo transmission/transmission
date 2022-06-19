@@ -279,6 +279,11 @@ public:
         return fpm_.fileOffset(loc.byte);
     }
 
+    [[nodiscard]] auto byteSpan(tr_file_index_t file) const
+    {
+        return fpm_.byteSpan(file);
+    }
+
     /// WANTED
 
     [[nodiscard]] bool pieceIsWanted(tr_piece_index_t piece) const final

@@ -325,6 +325,7 @@ static inline void evbuffer_add_hton_64(struct evbuffer* buf, uint64_t val)
     evbuffer_add_uint64(buf, val);
 }
 
+void tr_peerIoReadBytesToBuf(tr_peerIo* io, struct evbuffer* inbuf, std::vector<uint8_t>& outbuf, size_t byteCount);
 void tr_peerIoReadBytesToBuf(tr_peerIo* io, struct evbuffer* inbuf, struct evbuffer* outbuf, size_t byteCount);
 
 void tr_peerIoReadBytes(tr_peerIo* io, struct evbuffer* inbuf, void* bytes, size_t byteCount);
