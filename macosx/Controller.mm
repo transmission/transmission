@@ -4945,7 +4945,7 @@ static void removeKeRangerRansomware()
         [self.fStackView insertArrangedSubview:self.fFilterBar.view atIndex:idx];
 
         NSDictionary* views = @{ @"fFilterBar" : self.fFilterBar.view };
-        [self.fStackView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[fFilterBar(==21)]" options:0
+        [self.fStackView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[fFilterBar(==23)]" options:0
                                                                                 metrics:nil
                                                                                   views:views]];
 
