@@ -1,10 +1,7 @@
-#import <Cocoa/Cocoa.h>
-#import <CoreFoundation/CFPlugInCOM.h>
-#import <QuickLook/QuickLook.h>
+@import CoreFoundation;
+@import QuickLook;
 
 #include <string>
-
-#include <libtransmission/transmission.h>
 
 #include <libtransmission/torrent-metainfo.h>
 
