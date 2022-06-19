@@ -19,8 +19,6 @@
 #include <utility>
 #include <vector>
 
-#include <iostream>
-
 #include <event2/event.h>
 
 #include <fmt/format.h>
@@ -664,13 +662,7 @@ std::vector<tr_block_span_t> tr_peerMgrGetNextRequests(tr_torrent* torrent, tr_p
 
         [[nodiscard]] tr_block_span_t blockSpan(tr_piece_index_t piece) const override
         {
-            std::cerr << __FILE__ << ':' << __LINE__ << " piece size " << torrent_->pieceSize() << " piece " << piece << " loc "
-                      << torrent_->pieceLoc(piece).byte << " total size " << torrent_->totalSize() << std::endl;
-            auto ret = torrent_->blockSpanForPiece(piece);
-            std::cerr << __FILE__ << ':' << __LINE__ << " begin block " << ret.begin << " loc "
-                      << torrent_->blockLoc(ret.begin).byte << std::endl;
-            std::cerr << __FILE__ << ':' << __LINE__ << "   end block " << ret.end << std::endl;
-            return ret;
+            return torrent_->blockSpanForPiece(piece);
         }
 
         [[nodiscard]] tr_piece_index_t countAllPieces() const override

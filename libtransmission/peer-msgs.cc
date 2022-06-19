@@ -13,8 +13,6 @@
 #include <optional>
 #include <vector>
 
-#include <iostream>
-
 #include <event2/buffer.h>
 #include <event2/bufferevent.h>
 #include <event2/event.h>
@@ -251,8 +249,6 @@ public:
         , callback_{ callback }
         , callbackData_{ callbackData }
     {
-        std::cerr << __FILE__ << ':' << __LINE__ << " new msgs " << this << std::endl;
-
         if (torrent->allowsPex())
         {
             pex_timer.reset(evtimer_new(torrent->session->event_base, pexPulse, this));
@@ -741,8 +737,6 @@ static void protocolSendReject(tr_peerMsgsImpl* msgs, struct peer_request const*
 
 static void protocolSendRequest(tr_peerMsgsImpl* msgs, struct peer_request const& req)
 {
-    std::cerr << __FILE__ << ':' << __LINE__ << " to msgs " << msgs << " sending req index " << req.index << " offset "
-              << req.offset << " length " << req.length << " piece size " << msgs->torrent->pieceSize() << std::endl;
     TR_ASSERT(msgs->isValidRequest(req));
 
     auto* const out = msgs->outMessages;
@@ -1381,7 +1375,6 @@ static ReadState readBtLength(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, siz
     }
     else
     {
-        std::cerr << __FILE__ << ':' << __LINE__ << " msgs " << msgs << " readBtLength length is " << len << std::endl;
         msgs->incoming.length = len;
         msgs->state = AwaitingBt::Id;
     }
@@ -1543,7 +1536,6 @@ static int clientGotBlock(tr_peerMsgsImpl* msgs, std::unique_ptr<std::vector<uin
 
 static ReadState readBtPiece(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, size_t inlen, size_t* setme_piece_bytes_read)
 {
-    std::cerr << __FILE__ << ':' << __LINE__ << " readBtPiece got block from peer " << msgs << std::endl;
     TR_ASSERT(evbuffer_get_length(inbuf) >= inlen);
 
     logtrace(msgs, "In readBtPiece");
@@ -1553,7 +1545,6 @@ static ReadState readBtPiece(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, size
     {
         if (inlen < 8)
         {
-            std::cerr << __FILE__ << ':' << __LINE__ << " readBtPiece not enough data for header" << std::endl;
             return READ_LATER;
         }
 
@@ -1562,26 +1553,17 @@ static ReadState readBtPiece(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, size
         tr_peerIoReadUint32(msgs->io, inbuf, &req.offset);
         req.length = msgs->incoming.length - 9;
         logtrace(msgs, fmt::format(FMT_STRING("got incoming block header {:d}:{:d}->{:d}"), req.index, req.offset, req.length));
-        std::cerr << __FILE__ << ':' << __LINE__ << " msgs " << msgs << " new piece header "
-                  << fmt::format(FMT_STRING("got incoming block header {:d}:{:d}->{:d}"), req.index, req.offset, req.length)
-                  << std::endl;
-        std::cerr << __FILE__ << ':' << __LINE__ << " readBtPiece returning READ_NOW" << std::endl;
         msgs->incoming.block_req = req;
         return READ_NOW;
     }
 
     auto& req = msgs->incoming.block_req;
-    std::cerr << __FILE__ << ':' << __LINE__ << " msgs " << msgs << " req index " << req->index << " offset " << req->offset
-              << " length " << req->length << std::endl;
     auto const loc = msgs->torrent->pieceLoc(req->index, req->offset);
     auto const block = loc.block;
     auto const block_size = msgs->torrent->blockSize(block);
-    std::cerr << __FILE__ << ':' << __LINE__ << " we have partial data for " << std::size(msgs->incoming.block_buf) << " blocks"
-              << std::endl;
     auto& block_buf = msgs->incoming.block_buf[block];
     if (!block_buf)
     {
-        std::cerr << __FILE__ << ':' << __LINE__ << " readBtPiece allocated incoming.block" << std::endl;
         block_buf = std::make_unique<std::vector<uint8_t>>();
         block_buf->reserve(block_size);
     }
@@ -1590,9 +1572,6 @@ static ReadState readBtPiece(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, size
     auto const n_left_in_block = block_size - std::size(*block_buf);
     auto const n_left_in_req = size_t{ req->length };
     auto const n_to_read = std::min({ n_left_in_block, n_left_in_req, inlen });
-    std::cerr << __FILE__ << ':' << __LINE__ << " n_left_in_block " << n_left_in_block << " n_left_in_req " << n_left_in_req
-              << " inlen " << inlen << std::endl;
-    std::cerr << __FILE__ << ':' << __LINE__ << " reading " << n_to_read << " bytes into buffer" << std::endl;
     auto const old_length = std::size(*block_buf);
     block_buf->resize(old_length + n_to_read);
     tr_peerIoReadBytes(msgs->io, inbuf, &((*block_buf)[old_length]), n_to_read);
@@ -1614,14 +1593,10 @@ static ReadState readBtPiece(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, size
     // update the table and wait for more
     if (n_to_read < n_left_in_req)
     {
-        std::cerr << __FILE__ << ':' << __LINE__ << " msgs " << msgs << " old req index " << req->index << " offset "
-                  << req->offset << " length " << req->length << std::endl;
         auto new_loc = msgs->torrent->byteLoc(loc.byte + n_to_read);
         req->index = new_loc.piece;
         req->offset = new_loc.piece_offset;
         req->length -= n_to_read;
-        std::cerr << __FILE__ << ':' << __LINE__ << " msgs " << msgs << " new req index " << req->index << " offset "
-                  << req->offset << " length " << req->length << std::endl;
         return READ_LATER;
     }
 
@@ -1633,12 +1608,10 @@ static ReadState readBtPiece(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, size
     // update the table and wait for more
     if (std::size(*block_buf) < block_size)
     {
-        std::cerr << __FILE__ << ':' << __LINE__ << " msgs " << msgs << " returning READ_LATER" << std::endl;
         return READ_LATER;
     }
 
     // pass the block along...
-    std::cerr << __FILE__ << ':' << __LINE__ << " msgs " << msgs << " calling clientGotBlock" << std::endl;
     int const err = clientGotBlock(msgs, block_buf, block);
     msgs->incoming.block_buf.erase(block);
 
@@ -1694,7 +1667,6 @@ static ReadState readBtMessage(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, si
         break;
 
     case BtPeerMsgs::Unchoke:
-        std::cerr << __FILE__ << ':' << __LINE__ << " got unchoke from " << msgs << std::endl;
         logtrace(msgs, "got Unchoke");
         msgs->client_is_choked_ = false;
         msgs->update_active(TR_PEER_TO_CLIENT);
@@ -1878,8 +1850,6 @@ static ReadState readBtMessage(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, si
             tr_peerIoReadUint32(msgs->io, inbuf, &r.index);
             tr_peerIoReadUint32(msgs->io, inbuf, &r.offset);
             tr_peerIoReadUint32(msgs->io, inbuf, &r.length);
-            std::cerr << __FILE__ << ':' << __LINE__ << " from msgs " << msgs << " got reject index " << r.index << " offset "
-                      << r.offset << " length " << r.length << std::endl;
 
             if (fext)
             {
@@ -1918,14 +1888,12 @@ static int clientGotBlock(
     std::unique_ptr<std::vector<uint8_t>>& block_data,
     tr_block_index_t const block)
 {
-    std::cerr << __FILE__ << ':' << __LINE__ << " got block " << block << std::endl;
     TR_ASSERT(msgs != nullptr);
 
     tr_torrent* const tor = msgs->torrent;
 
     if (!block_data || std::size(*block_data) != msgs->torrent->blockSize(block))
     {
-        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
         logdbg(
             msgs,
             fmt::format(
@@ -1940,7 +1908,6 @@ static int clientGotBlock(
 
     if (!tr_peerMgrDidPeerRequest(msgs->torrent, msgs, block))
     {
-        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
         logdbg(msgs, "we didn't ask for this message...");
         block_data->clear();
         return 0;
@@ -1949,14 +1916,12 @@ static int clientGotBlock(
     auto const loc = msgs->torrent->blockLoc(block);
     if (msgs->torrent->hasPiece(loc.piece))
     {
-        std::cerr << __FILE__ << ':' << __LINE__ << std::endl;
         logtrace(msgs, "we did ask for this message, but the piece is already complete...");
         block_data->clear();
         return 0;
     }
 
     msgs->session->cache->writeBlock(tor->id(), block, block_data);
-    std::cerr << __FILE__ << ':' << __LINE__ << " got block" << std::endl;
     msgs->blame.set(loc.piece);
     msgs->publishGotBlock(block);
     return 0;
