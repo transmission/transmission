@@ -236,6 +236,28 @@ static void tr_buildMetainfoExceptInfoDict(tr_torrent_metainfo const& tm, tr_var
     }
 }
 
+void tr_torrentUseMetainfo(tr_torrent* tor, tr_torrent_metainfo const* metainfo)
+{
+    // remove .magnet file
+    tr_sys_path_remove(tor->magnetFile());
+
+    // tor should keep this metainfo
+    tor->setMetainfo(*metainfo);
+
+    if (tor->incompleteMetadata)
+    {
+        incompleteMetadataFree(tor->incompleteMetadata);
+        tor->incompleteMetadata = nullptr;
+    }
+    tor->isStopping = true;
+    tor->magnetVerify = true;
+    if (tr_sessionGetPaused(tor->session))
+    {
+        tor->startAfterVerify = false;
+    }
+    tor->markEdited();
+}
+
 static bool useNewMetainfo(tr_torrent* tor, tr_incomplete_metadata const* m, tr_error** error)
 {
     // test the info_dict checksum

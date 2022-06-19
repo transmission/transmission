@@ -16,6 +16,7 @@
 #include "transmission.h"
 
 struct tr_torrent;
+struct tr_torrent_metainfo;
 
 // defined by BEP #9
 inline constexpr int METADATA_PIECE_SIZE = 1024 * 16;
@@ -29,3 +30,5 @@ bool tr_torrentGetNextMetadataRequest(tr_torrent* tor, time_t now, int* setme);
 bool tr_torrentSetMetadataSizeHint(tr_torrent* tor, int64_t metadata_size);
 
 double tr_torrentGetMetadataPercent(tr_torrent const* tor);
+
+void tr_torrentUseMetainfo(tr_torrent* tor, tr_torrent_metainfo const* metainfo);
