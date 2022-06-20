@@ -40,6 +40,7 @@
 #import "GroupToolbarItem.h"
 #import "ShareToolbarItem.h"
 #import "ShareTorrentFileHelper.h"
+#import "Toolbar.h"
 #import "ToolbarSegmentedCell.h"
 #import "BlocklistDownloader.h"
 #import "StatusBarController.h"
@@ -555,7 +556,7 @@ static void removeKeRangerRansomware()
 
 - (void)awakeFromNib
 {
-    NSToolbar* toolbar = [[NSToolbar alloc] initWithIdentifier:@"TRMainToolbar"];
+    Toolbar* toolbar = [[Toolbar alloc] initWithIdentifier:@"TRMainToolbar"];
     toolbar.delegate = self;
     toolbar.allowsUserCustomization = YES;
     toolbar.autosavesConfiguration = YES;
@@ -750,6 +751,8 @@ static void removeKeRangerRansomware()
     [nc addObserver:self selector:@selector(openCreatedFile:) name:@"OpenCreatedTorrentFile" object:nil];
 
     [nc addObserver:self selector:@selector(applyFilter) name:@"UpdateGroups" object:nil];
+
+    [nc addObserver:self selector:@selector(updateWindowAfterToolbarChange) name:@"ToolbarDidChange" object:nil];
 
     [self updateMainWindow];
 
@@ -5020,6 +5023,31 @@ static void removeKeRangerRansomware()
     }
 }
 
+- (void)updateWindowAfterToolbarChange
+{
+    //Hacky way of fixing an issue with showing the Toolbar
+    if (!self.isFullScreen && [self.fDefaults boolForKey:@"AutoSize"])
+    {
+        //macOS Big Sur shows the unified toolbar by default
+        //and we only need to "fix" the laout when showing the toolbar
+        if (@available(macOS 11.0, *))
+        {
+            if (!self.fWindow.toolbar.isVisible)
+            {
+                [self removeStackViewHeightConstraints];
+            }
+        }
+        else
+        {
+            [self removeStackViewHeightConstraints];
+        }
+
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self setWindowSizeToFit];
+        });
+    }
+}
+
 - (void)removeStackViewHeightConstraints
 {
     if (self.fStackViewHeightConstraints)
@@ -5113,24 +5141,6 @@ static void removeKeRangerRansomware()
 - (void)windowDidExitFullScreen:(NSNotification*)notification
 {
     [self updateForAutoSize];
-}
-
-- (void)windowDidEndLiveResize:(NSNotification*)notification
-{
-    if (!self.isFullScreen && [self.fDefaults boolForKey:@"AutoSize"])
-    {
-        //Hacky way of fixing am issue with showing the Toolbar
-        CGFloat height = self.fWindow.contentView.frame.size.height;
-        CGFloat calculatedHeight = self.scrollViewHeight + self.mainWindowComponentHeight - 2.0;
-
-        if (height > calculatedHeight)
-        {
-            [self removeStackViewHeightConstraints];
-            dispatch_async(dispatch_get_main_queue(), ^{
-                [self updateForAutoSize];
-            });
-        }
-    }
 }
 
 - (void)updateForExpandCollapse
