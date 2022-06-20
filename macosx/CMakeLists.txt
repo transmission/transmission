@@ -95,6 +95,7 @@ set(${PROJECT_NAME}_SOURCES
     StatsWindowController.mm
     StatusBarController.mm
     StatusBarView.mm
+    Toolbar.mm
     ToolbarSegmentedCell.mm
     Torrent.mm
     TorrentCell.mm
