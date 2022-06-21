@@ -5029,7 +5029,7 @@ static void removeKeRangerRansomware()
     if (!self.isFullScreen && [self.fDefaults boolForKey:@"AutoSize"])
     {
         //macOS Big Sur shows the unified toolbar by default
-        //and we only need to "fix" the laout when showing the toolbar
+        //and we only need to "fix" the layout when showing the toolbar
         if (@available(macOS 11.0, *))
         {
             if (!self.fWindow.toolbar.isVisible)
