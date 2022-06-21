@@ -104,8 +104,8 @@ jobs:
         if: ${{ steps.check-for-diffs.outputs.differs == '1' }}
         run: |
           echo "code style does not match expected."
-          echo "When CI is done, a fix 'code-style.diff' will be uploaded to the Artifacts section of https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}/ ."
           cat style.diff
+          echo "When CI is done, the above patch will be uploaded as 'code-style.diff' to https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}/ ."
           exit 1
 
   sanitizer-tests:
