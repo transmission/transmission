@@ -13,15 +13,9 @@
 
 @class AddMagnetWindowController;
 @class AddWindowController;
-@class Badger;
-@class DragOverlayWindow;
-@class FilterBarController;
-@class InfoWindowController;
 @class MessageWindowController;
 @class PrefsController;
-@class StatusBarController;
 @class Torrent;
-@class URLSheetWindowController;
 
 typedef NS_ENUM(unsigned int, addType) { //
     ADD_MANUAL,
