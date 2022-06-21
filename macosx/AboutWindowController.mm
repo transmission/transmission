@@ -38,10 +38,11 @@ AboutWindowController* fAboutBoxInstance = nil;
     self.fCopyrightField.stringValue = [NSBundle.mainBundle localizedStringForKey:@"NSHumanReadableCopyright" value:nil
                                                                             table:@"InfoPlist"];
 
-    NSAttributedString *credits = [[NSAttributedString alloc] initWithURL:[NSBundle.mainBundle URLForResource:@"Credits" withExtension:@"rtf"]
-                                                                  options:@{NSDocumentTypeDocumentAttribute: NSRTFTextDocumentType}
-                                                       documentAttributes:nil
-                                                                    error:nil];
+    NSAttributedString* credits = [[NSAttributedString alloc]
+               initWithURL:[NSBundle.mainBundle URLForResource:@"Credits" withExtension:@"rtf"]
+                   options:@{ NSDocumentTypeDocumentAttribute : NSRTFTextDocumentType }
+        documentAttributes:nil
+                     error:nil];
     [self.fTextView.textStorage setAttributedString:credits];
 
     //size license button

@@ -43,27 +43,27 @@ jobs:
         id: check-diffs
         run: |
           set +e
-          git -C "${GITHUB_WORKSPACE}/src" diff --quiet origin/main -- CMakeLists.txt Transmission.xcodeproj third-party libtransmission cli
+          git -C "${GITHUB_WORKSPACE}/src" diff --exit-code origin/main -- CMakeLists.txt Transmission.xcodeproj third-party libtransmission cli
           echo "::set-output name=cli-changed::$?"
-          git -C "${GITHUB_WORKSPACE}/src" diff --quiet origin/main -- CMakeLists.txt Transmission.xcodeproj libtransmission cli daemon gtk macos qt utils tests web third-party
+          git -C "${GITHUB_WORKSPACE}/src" diff --exit-code origin/main -- CMakeLists.txt Transmission.xcodeproj libtransmission cli daemon gtk macosx qt utils tests web third-party
           echo "::set-output name=any-code-changed::$?"
-          git -C "${GITHUB_WORKSPACE}/src" diff --quiet origin/main -- CMakeLists.txt Transmission.xcodeproj libtransmission cli daemon gtk macos qt utils tests web
+          git -C "${GITHUB_WORKSPACE}/src" diff --exit-code origin/main -- CMakeLists.txt Transmission.xcodeproj libtransmission cli daemon gtk macosx qt utils tests web
           echo "::set-output name=our-code-changed::$?"
-          git -C "${GITHUB_WORKSPACE}/src" diff --quiet origin/main -- CMakeLists.txt Transmission.xcodeproj third-party libtransmission daemon
+          git -C "${GITHUB_WORKSPACE}/src" diff --exit-code origin/main -- CMakeLists.txt Transmission.xcodeproj third-party libtransmission daemon
           echo "::set-output name=daemon-changed::$?"
-          git -C "${GITHUB_WORKSPACE}/src" diff --quiet origin/main -- docs
+          git -C "${GITHUB_WORKSPACE}/src" diff --exit-code origin/main -- docs
           echo "::set-output name=docs-changed::$?"
-          git -C "${GITHUB_WORKSPACE}/src" diff --quiet origin/main -- CMakeLists.txt third-party libtransmission gtk
+          git -C "${GITHUB_WORKSPACE}/src" diff --exit-code origin/main -- CMakeLists.txt third-party libtransmission gtk
           echo "::set-output name=gtk-changed::$?"
-          git -C "${GITHUB_WORKSPACE}/src" diff --quiet origin/main -- CMakeLists.txt Transmission.xcodeproj third-party libtransmission macosx Transmission.xcodeproj
+          git -C "${GITHUB_WORKSPACE}/src" diff --exit-code origin/main -- CMakeLists.txt Transmission.xcodeproj third-party libtransmission macosx Transmission.xcodeproj
           echo "::set-output name=mac-changed::$?"
-          git -C "${GITHUB_WORKSPACE}/src" diff --quiet origin/main -- CMakeLists.txt third-party libtransmission qt
+          git -C "${GITHUB_WORKSPACE}/src" diff --exit-code origin/main -- CMakeLists.txt third-party libtransmission qt
           echo "::set-output name=qt-changed::$?"
-          git -C "${GITHUB_WORKSPACE}/src" diff --quiet origin/main -- CMakeLists.txt third-party libtransmission utils tests
+          git -C "${GITHUB_WORKSPACE}/src" diff --exit-code origin/main -- CMakeLists.txt third-party libtransmission utils tests
           echo "::set-output name=tests-changed::$?"
-          git -C "${GITHUB_WORKSPACE}/src" diff --quiet origin/main -- CMakeLists.txt third-party libtransmission utils
+          git -C "${GITHUB_WORKSPACE}/src" diff --exit-code origin/main -- CMakeLists.txt third-party libtransmission utils
           echo "::set-output name=utils-changed::$?"
-          git -C "${GITHUB_WORKSPACE}/src" diff --quiet origin/main -- CMakeLists.txt third-party libtransmission web
+          git -C "${GITHUB_WORKSPACE}/src" diff --exit-code origin/main -- CMakeLists.txt third-party libtransmission web
           echo "::set-output name=web-changed::$?"
           set -e
 
@@ -103,6 +103,9 @@ jobs:
       - name: Fail if diffs exist
         if: ${{ steps.check-for-diffs.outputs.differs == '1' }}
         run: |
+          echo "code style does not match expected."
+          cat style.diff
+          echo "When CI is done, the above patch will be uploaded as 'code-style.diff' to https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}/ ."
           exit 1
 
   sanitizer-tests:
