@@ -45,9 +45,9 @@ jobs:
           set +e
           git -C "${GITHUB_WORKSPACE}/src" diff --exit-code origin/main -- CMakeLists.txt Transmission.xcodeproj third-party libtransmission cli
           echo "::set-output name=cli-changed::$?"
-          git -C "${GITHUB_WORKSPACE}/src" diff --exit-code origin/main -- CMakeLists.txt Transmission.xcodeproj libtransmission cli daemon gtk macos qt utils tests web third-party
+          git -C "${GITHUB_WORKSPACE}/src" diff --exit-code origin/main -- CMakeLists.txt Transmission.xcodeproj libtransmission cli daemon gtk macosx qt utils tests web third-party
           echo "::set-output name=any-code-changed::$?"
-          git -C "${GITHUB_WORKSPACE}/src" diff --exit-code origin/main -- CMakeLists.txt Transmission.xcodeproj libtransmission cli daemon gtk macos qt utils tests web
+          git -C "${GITHUB_WORKSPACE}/src" diff --exit-code origin/main -- CMakeLists.txt Transmission.xcodeproj libtransmission cli daemon gtk macosx qt utils tests web
           echo "::set-output name=our-code-changed::$?"
           git -C "${GITHUB_WORKSPACE}/src" diff --exit-code origin/main -- CMakeLists.txt Transmission.xcodeproj third-party libtransmission daemon
           echo "::set-output name=daemon-changed::$?"
