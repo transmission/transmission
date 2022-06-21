@@ -239,13 +239,11 @@ static void tr_buildMetainfoExceptInfoDict(tr_torrent_metainfo const& tm, tr_var
 bool tr_torrentUseMetainfoFromFile(
     tr_torrent* tor,
     tr_torrent_metainfo const* metainfo,
-    std::string_view filename_in,
+    char const* filename_in,
     tr_error** error)
 {
     // add .torrent file
-    auto const oldpath = tr_pathbuf{ filename_in };
-    auto const newpath = tr_pathbuf{ tor->torrentFile() };
-    if (!tr_sys_path_copy(oldpath, newpath, error))
+    if (!tr_sys_path_copy(filename_in, tor->torrentFile(), error))
     {
         return false;
     }

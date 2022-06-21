@@ -34,5 +34,5 @@ double tr_torrentGetMetadataPercent(tr_torrent const* tor);
 bool tr_torrentUseMetainfoFromFile(
     tr_torrent* tor,
     tr_torrent_metainfo const* metainfo,
-    std::string_view filename,
+    char const* filename,
     tr_error** error);

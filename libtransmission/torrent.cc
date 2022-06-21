@@ -111,25 +111,26 @@ tr_torrent* tr_torrentFindFromObfuscatedHash(tr_session* session, tr_sha1_digest
     return nullptr;
 }
 
-bool tr_torrentSetMetainfoFromFileIfMagnet(tr_torrent* tor, tr_torrent_metainfo* metainfo, char const* filename)
+bool tr_torrentSetMetainfoFromFile(tr_torrent* tor, tr_torrent_metainfo* metainfo, char const* filename)
 {
     if (tr_torrentHasMetadata(tor))
     {
         return false;
     }
-    tr_error* error = nullptr;
 
+    tr_error* error = nullptr;
     tr_torrentUseMetainfoFromFile(tor, metainfo, filename, &error);
 
     if (error != nullptr)
     {
         tor->setLocalError(fmt::format(
-            _("Couldn't copy '{path_in}' to '{path_out}': {error} ({error_code})"),
-            fmt::arg("path_in", filename),
-            fmt::arg("path_out", tor->torrentFile()),
+            _("Couldn't use metaInfo from '{path}' for '{magnet}': {error} ({error_code})"),
+            fmt::arg("path", filename),
+            fmt::arg("magnet", tor->magnet()),
             fmt::arg("error", error->message),
             fmt::arg("error_code", error->code)));
         tr_error_clear(&error);
+        return false;
     }
 
     return true;
