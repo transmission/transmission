@@ -998,7 +998,7 @@ tr_torrent* tr_torrentFindFromMagnetLink(tr_session* session, char const* link);
  * @return True if torrent was a magnet and metainfo was set.
  *
  */
-bool tr_torrentSetMetainfoIfMagnet(tr_torrent* torrent, tr_torrent_metainfo const* metainfo);
+bool tr_torrentSetMetainfoFromFileIfMagnet(tr_torrent* torrent, tr_torrent_metainfo* metainfo, char const* filename);
 
 /**
  * @return this torrent's name.

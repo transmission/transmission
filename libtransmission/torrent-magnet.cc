@@ -236,8 +236,20 @@ static void tr_buildMetainfoExceptInfoDict(tr_torrent_metainfo const& tm, tr_var
     }
 }
 
-void tr_torrentUseMetainfo(tr_torrent* tor, tr_torrent_metainfo const* metainfo)
+bool tr_torrentUseMetainfoFromFile(
+    tr_torrent* tor,
+    tr_torrent_metainfo const* metainfo,
+    std::string_view filename_in,
+    tr_error** error)
 {
+    // add .torrent file
+    auto const oldpath = tr_pathbuf{ filename_in };
+    auto const newpath = tr_pathbuf{ tor->torrentFile() };
+    if (!tr_sys_path_copy(oldpath, newpath, error))
+    {
+        return false;
+    }
+
     // remove .magnet file
     tr_sys_path_remove(tor->magnetFile());
 
@@ -256,6 +268,8 @@ void tr_torrentUseMetainfo(tr_torrent* tor, tr_torrent_metainfo const* metainfo)
         tor->startAfterVerify = false;
     }
     tor->markEdited();
+
+    return true;
 }
 
 static bool useNewMetainfo(tr_torrent* tor, tr_incomplete_metadata const* m, tr_error** error)

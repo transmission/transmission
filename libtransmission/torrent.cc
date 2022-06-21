@@ -111,14 +111,28 @@ tr_torrent* tr_torrentFindFromObfuscatedHash(tr_session* session, tr_sha1_digest
     return nullptr;
 }
 
-bool tr_torrentSetMetainfoIfMagnet(tr_torrent* torrent, tr_torrent_metainfo const* metainfo)
+bool tr_torrentSetMetainfoFromFileIfMagnet(tr_torrent* tor, tr_torrent_metainfo* metainfo, char const* filename)
 {
-    if (!tr_torrentHasMetadata(torrent))
+    if (tr_torrentHasMetadata(tor))
     {
-        tr_torrentUseMetainfo(torrent, metainfo);
-        return true;
+        return false;
     }
-    return false;
+    tr_error* error = nullptr;
+
+    tr_torrentUseMetainfoFromFile(tor, metainfo, filename, &error);
+
+    if (error != nullptr)
+    {
+        tor->setLocalError(fmt::format(
+            _("Couldn't copy '{path_in}' to '{path_out}': {error} ({error_code})"),
+            fmt::arg("path_in", filename),
+            fmt::arg("path_out", tor->torrentFile()),
+            fmt::arg("error", error->message),
+            fmt::arg("error_code", error->code)));
+        tr_error_clear(&error);
+    }
+
+    return true;
 }
 
 bool tr_torrent::isPieceTransferAllowed(tr_direction direction) const
@@ -826,8 +840,6 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
                 fmt::arg("error_code", error->code)));
             tr_error_clear(&error);
         }
-
-        tr_error_clear(&error);
     }
 
     tor->torrent_announcer = tr_announcerAddTorrent(tor, onTrackerResponse, nullptr);

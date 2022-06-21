@@ -1115,7 +1115,7 @@ static void removeKeRangerRansomware()
         if (foundTorrent != nullptr) // dupe torrent
         {
             // if foundTorrent is a magnet, fill it with file's metainfo
-            if (!tr_torrentSetMetainfoIfMagnet(foundTorrent, &metainfo))
+            if (!tr_torrentSetMetainfoFromFileIfMagnet(foundTorrent, &metainfo, torrentPath.UTF8String))
             {
                 [self duplicateOpenAlert:@(metainfo.name().c_str())];
             }
