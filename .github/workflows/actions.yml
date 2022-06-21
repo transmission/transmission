@@ -103,6 +103,9 @@ jobs:
       - name: Fail if diffs exist
         if: ${{ steps.check-for-diffs.outputs.differs == '1' }}
         run: |
+          echo "code style does not match expected."
+          echo "When CI is done, a fix 'code-style.diff' will be uploaded to the Artifacts section of https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}/ ."
+          cat style.diff
           exit 1
 
   sanitizer-tests:

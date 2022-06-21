@@ -36,8 +36,7 @@ class tr_webseed;
 
 void on_idle(tr_webseed* w);
 
-class tr_webseed_task
-{
+class tr_webseed_task {
 private:
     std::shared_ptr<evbuffer> const content_{ evbuffer_new(), evbuffer_free };
 
