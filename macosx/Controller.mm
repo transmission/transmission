@@ -767,9 +767,6 @@ static void removeKeRangerRansomware()
     {
         [self showInfo:nil];
     }
-
-    //redraw filterbar to avoid clipping
-    [NSNotificationCenter.defaultCenter postNotificationName:@"ResizeBar" object:nil];
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification*)notification
@@ -4948,7 +4945,7 @@ static void removeKeRangerRansomware()
         [self.fStackView insertArrangedSubview:self.fFilterBar.view atIndex:idx];
 
         NSDictionary* views = @{ @"fFilterBar" : self.fFilterBar.view };
-        [self.fStackView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[fFilterBar(==21)]" options:0
+        [self.fStackView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[fFilterBar(==23)]" options:0
                                                                                 metrics:nil
                                                                                   views:views]];
 

@@ -32,8 +32,6 @@ typedef NS_ENUM(unsigned int, statusTag) {
 @property(nonatomic) CGFloat fPreviousDownloadRate;
 @property(nonatomic) CGFloat fPreviousUploadRate;
 
-- (void)resizeStatusButton;
-
 @end
 
 @implementation StatusBarController
@@ -70,9 +68,6 @@ typedef NS_ENUM(unsigned int, statusTag) {
     //update when speed limits are changed
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(updateSpeedFieldsToolTips) name:@"SpeedLimitUpdate"
                                              object:nil];
-    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(resizeStatusButton)
-                                               name:NSWindowDidResizeNotification
-                                             object:self.view.window];
 }
 
 - (void)dealloc
@@ -137,7 +132,6 @@ typedef NS_ENUM(unsigned int, statusTag) {
     if (![self.fStatusButton.title isEqualToString:statusString])
     {
         self.fStatusButton.title = statusString;
-        [self resizeStatusButton];
     }
 }
 
@@ -245,25 +239,6 @@ typedef NS_ENUM(unsigned int, statusTag) {
     }
 
     return YES;
-}
-
-#pragma mark - Private
-
-- (void)resizeStatusButton
-{
-    [self.fStatusButton sizeToFit];
-
-    //width ends up being too long
-    NSRect statusFrame = self.fStatusButton.frame;
-    statusFrame.size.width -= 25.0;
-
-    CGFloat const difference = NSMaxX(statusFrame) + 5.0 - NSMinX(self.fTotalDLImageView.frame);
-    if (difference > 0.0)
-    {
-        statusFrame.size.width -= difference;
-    }
-
-    self.fStatusButton.frame = statusFrame;
 }
 
 @end
