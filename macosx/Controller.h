@@ -162,6 +162,7 @@ typedef NS_ENUM(unsigned int, addType) { //
 
 - (void)setWindowSizeToFit;
 - (void)updateForAutoSize;
+- (void)updateWindowAfterToolbarChange;
 - (void)removeStackViewHeightConstraints;
 @property(nonatomic, readonly) CGFloat minScrollViewHeightAllowed;
 @property(nonatomic, readonly) CGFloat toolbarHeight;

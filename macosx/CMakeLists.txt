@@ -95,6 +95,7 @@ set(${PROJECT_NAME}_SOURCES
     StatsWindowController.mm
     StatusBarController.mm
     StatusBarView.mm
+    Toolbar.mm
     ToolbarSegmentedCell.mm
     Torrent.mm
     TorrentCell.mm
@@ -165,6 +166,7 @@ set(${PROJECT_NAME}_HEADERS
     StatsWindowController.h
     StatusBarController.h
     StatusBarView.h
+    Toolbar.h
     ToolbarSegmentedCell.h
     Torrent.h
     TorrentCell.h
