@@ -77,7 +77,6 @@ enum
         _fExtraBorder = (width - ((_fWidth + BETWEEN) * _fAcross + BETWEEN)) / 2;
     }
 
-    
     NSImage* back = [[NSImage alloc] initWithSize:self.bounds.size];
     self.image = back;
 
