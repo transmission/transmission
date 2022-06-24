@@ -3875,6 +3875,7 @@ static void removeKeRangerRansomware()
 - (void)endPreviewPanelControl:(QLPreviewPanel*)panel
 {
     self.fPreviewPanel = nil;
+    [self.fWindow.toolbar validateVisibleItems];
 }
 
 - (NSArray*)quickLookableTorrents
@@ -4365,8 +4366,8 @@ static void removeKeRangerRansomware()
     //set quick look item
     if ([ident isEqualToString:TOOLBAR_QUICKLOOK])
     {
-        ((NSButton*)toolbarItem.view).state = [QLPreviewPanel sharedPreviewPanelExists] && [QLPreviewPanel sharedPreviewPanel].visible;
-        return YES;
+        ((NSButton*)toolbarItem.view).state = self.fPreviewPanel != nil;
+        return self.fTableView.numberOfSelectedRows > 0;
     }
 
     //enable share item
@@ -4780,7 +4781,7 @@ static void removeKeRangerRansomware()
                                      NSLocalizedString(@"Close Quick Look", "View menu -> Quick Look");
         menuItem.title = title;
 
-        return YES;
+        return self.fTableView.numberOfSelectedRows > 0;
     }
 
     return YES;
