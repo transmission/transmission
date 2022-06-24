@@ -28,9 +28,6 @@ enum
 
 @property(nonatomic) int8_t* fPieces;
 
-@property(nonatomic) NSColor* fGreenAvailabilityColor;
-@property(nonatomic) NSColor* fBluePieceColor;
-
 @property(nonatomic) NSInteger fNumPieces;
 @property(nonatomic) NSInteger fAcross;
 @property(nonatomic) NSInteger fWidth;
@@ -49,11 +46,6 @@ enum
 
 - (void)awakeFromNib
 {
-    //store box colors
-    self.fGreenAvailabilityColor = NSColor.systemGreenColor;
-    self.fBluePieceColor = NSColor.systemBlueColor;
-
-    //actually draw the box
     self.torrent = nil;
 }
 
@@ -149,7 +141,7 @@ enum
                 }
                 else
                 {
-                    pieceColor = self.fBluePieceColor;
+                    pieceColor = NSColor.systemBlueColor;
                     self.fPieces[index] = PIECE_FINISHED;
                 }
             }
@@ -166,7 +158,7 @@ enum
         {
             if (first || self.fPieces[index] != PIECE_HIGH_PEERS)
             {
-                pieceColor = self.fGreenAvailabilityColor;
+                pieceColor = NSColor.systemGreenColor;
                 self.fPieces[index] = PIECE_HIGH_PEERS;
             }
         }
@@ -174,7 +166,7 @@ enum
         {
             //always redraw "mixed"
             CGFloat percent = showAvailability ? (CGFloat)pieces[index] / HIGH_PEERS : piecesPercent[index];
-            NSColor* fullColor = showAvailability ? self.fGreenAvailabilityColor : self.fBluePieceColor;
+            NSColor* fullColor = showAvailability ? NSColor.systemGreenColor : NSColor.systemBlueColor;
             pieceColor = [defaultColor blendedColorWithFraction:percent ofColor:fullColor];
             self.fPieces[index] = PIECE_SOME;
         }
