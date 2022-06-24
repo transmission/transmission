@@ -39,6 +39,13 @@ enum
 
 @implementation PiecesView
 
+- (void)drawRect:(NSRect)dirtyRect
+{
+    [[NSColor.controlTextColor colorWithAlphaComponent:0.2] setFill];
+    NSRectFill(dirtyRect);
+    [super drawRect:dirtyRect];
+}
+
 - (void)awakeFromNib
 {
     //store box colors
@@ -70,14 +77,8 @@ enum
         _fExtraBorder = (width - ((_fWidth + BETWEEN) * _fAcross + BETWEEN)) / 2;
     }
 
+    
     NSImage* back = [[NSImage alloc] initWithSize:self.bounds.size];
-    [back lockFocus];
-
-    NSGradient* gradient = [[NSGradient alloc] initWithStartingColor:[NSColor colorWithCalibratedWhite:0.0 alpha:0.4]
-                                                         endingColor:[NSColor colorWithCalibratedWhite:0.2 alpha:0.4]];
-    [gradient drawInRect:self.bounds angle:90.0];
-    [back unlockFocus];
-
     self.image = back;
 
     [self setNeedsDisplay];
