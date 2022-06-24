@@ -42,6 +42,7 @@ add_custom_command(
         icons/hicolor_apps_scalable_transmission.svg
         icons/lock.png
         icons/ratio.png
+        icons/transmission-tray-icon.png
         icons/turtle-blue.png
         icons/turtle-grey.png
         icons/utilities.png
