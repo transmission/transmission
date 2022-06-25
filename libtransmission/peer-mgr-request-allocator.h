@@ -29,11 +29,11 @@ public:
     class Mediator
     {
     public:
-        // Get keys to the peers that we want to download from
+        // Get keys to the all peers that we want to download from
         [[nodiscard]] virtual std::vector<PeerKey> peers() const = 0;
 
-        // How many pending block requests we have awaiting a response from the peer
-        [[nodiscard]] virtual size_t pendingReqCount(PeerKey peer) const = 0;
+        // How many block requests we've sent and are awaiting a response
+        [[nodiscard]] virtual size_t activeReqCount(PeerKey peer) const = 0;
 
         // Get keys to the speed-limited bandwidth pools that constrain a peer.
         // There will always be at least one.
@@ -62,7 +62,7 @@ public:
             std::begin(peers),
             std::end(peers),
             size_t{},
-            [&](auto sum, auto const& peer) { return sum + mediator.pendingReqCount(peer); });
+            [&](auto sum, auto const& peer) { return sum + mediator.activeReqCount(peer); });
 
         if (target_blocks_per_period > n_active)
         {
@@ -206,7 +206,7 @@ private:
 
             for (auto& peer : peers)
             {
-                auto const n_pending = mediator.pendingReqCount(peer);
+                auto const n_pending = mediator.activeReqCount(peer);
 
                 for (auto& pool : mediator.pools(peer))
                 {
@@ -237,7 +237,7 @@ private:
             std::end(peers),
             std::begin(candidates),
             [&mediator](auto& peer) {
-                return Candidate{ peer, mediator.pendingReqCount(peer), {}, mediator.pools(peer) };
+                return Candidate{ peer, mediator.activeReqCount(peer), {}, mediator.pools(peer) };
             });
 
         return candidates;

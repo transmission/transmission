@@ -557,7 +557,7 @@ struct tr_peerMgr final : public BlockRequestAllocator<tr_peer*, Bandwidth*>::Me
         return peers;
     }
 
-    [[nodiscard]] size_t pendingReqCount(PeerKey peer) const override
+    [[nodiscard]] size_t activeReqCount(PeerKey peer) const override
     {
         return peer->swarm->active_requests.count(peer);
     }

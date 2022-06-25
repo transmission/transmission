@@ -50,7 +50,7 @@ public:
         return peer_keys;
     }
 
-    [[nodiscard]] size_t pendingReqCount(PeerKey peer) const override
+    [[nodiscard]] size_t activeReqCount(PeerKey peer) const override
     {
         return pending_reqs_.at(peer);
     }
