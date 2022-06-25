@@ -179,6 +179,7 @@ set(${PROJECT_NAME}_PRIVATE_HEADERS
     peer-common.h
     peer-io.h
     peer-mgr-active-requests.h
+    peer-mgr-request-allocator.h
     peer-mgr-wishlist.h
     peer-mgr.h
     peer-msgs.h

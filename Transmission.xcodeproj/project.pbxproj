@@ -335,6 +335,7 @@
 		C1305EBE186A13B100F03351 /* file.cc in Sources */ = {isa = PBXBuildFile; fileRef = C1305EB8186A134000F03351 /* file.cc */; };
 		C1425B361EE9C605001DB85F /* tr-assert.h in Headers */ = {isa = PBXBuildFile; fileRef = C1425B331EE9C5EA001DB85F /* tr-assert.h */; };
 		C1425B371EE9C705001DB85F /* tr-macros.h in Headers */ = {isa = PBXBuildFile; fileRef = C1425B341EE9C5EA001DB85F /* tr-macros.h */; };
+		C1425B371EE9C705001DDDD0 /* peer-mgr-request-allocator.h in Headers */ = {isa = PBXBuildFile; fileRef = C1425B371EE9C705001DDDD1 /* peer-mgr-request-allocator.h*/; };
 		C1425B381EE9C805001DB85F /* peer-socket.h in Headers */ = {isa = PBXBuildFile; fileRef = C1425B351EE9C5EA001DB85F /* peer-socket.h */; };
 		C1639A741A55F4E000E42033 /* libb64.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C1639A6F1A55F4D600E42033 /* libb64.a */; };
 		C1639A781A55F56600E42033 /* cdecode.c in Sources */ = {isa = PBXBuildFile; fileRef = C1639A761A55F56600E42033 /* cdecode.c */; };
@@ -1110,6 +1111,7 @@
 		C1425B321EE9C5EA001DB85F /* tr-assert.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = "tr-assert.cc"; sourceTree = "<group>"; };
 		C1425B331EE9C5EA001DB85F /* tr-assert.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "tr-assert.h"; sourceTree = "<group>"; };
 		C1425B341EE9C5EA001DB85F /* tr-macros.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "tr-macros.h"; sourceTree = "<group>"; };
+		C1425B371EE9C705001DDDD1 /* peer-mgr-request-allocator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "peer-mgr-request-allocator.h"; sourceTree = "<group>"; };
 		C1425B351EE9C5EA001DB85F /* peer-socket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "peer-socket.h"; sourceTree = "<group>"; };
 		C1639A6F1A55F4D600E42033 /* libb64.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libb64.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		C1639A761A55F56600E42033 /* cdecode.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = cdecode.c; path = src/cdecode.c; sourceTree = "<group>"; };
@@ -1633,6 +1635,7 @@
 				A22CFCA60FC24ED80009BD3E /* tr-dht.cc */,
 				A22CFCA70FC24ED80009BD3E /* tr-dht.h */,
 				C1425B341EE9C5EA001DB85F /* tr-macros.h */,
+				C1425B371EE9C705001DDDD1 /* peer-mgr-request-allocator.h */,
 				888A256631B3DE536FEB8B01 /* tr-strbuf.h */,
 				C1425B351EE9C5EA001DB85F /* peer-socket.h */,
 				A284214212DA663E00FBDDBB /* tr-udp.cc */,
@@ -2160,6 +2163,7 @@
 				BEFC1E3B0C07861A00B0BB3C /* platform.h in Headers */,
 				C1425B361EE9C605001DB85F /* tr-assert.h in Headers */,
 				C1425B371EE9C705001DB85F /* tr-macros.h in Headers */,
+				C1425B371EE9C705001DDDD0 /* peer-mgr-request-allocator.h in Headers */,
 				888A256631B3DE536FEB8B00 /* tr-strbuf.h in Headers */,
 				C1425B381EE9C805001DB85F /* peer-socket.h in Headers */,
 				BEFC1E450C07861A00B0BB3C /* net.h in Headers */,
