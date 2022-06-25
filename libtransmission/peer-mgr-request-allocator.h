@@ -9,13 +9,11 @@
 #error only the libtransmission peer module should #include this header.
 #endif
 
-#include <algorithm>
-#include <cstddef>
-#include <limits>
-#include <numeric>
+#include <algorithm> // std::sort
+#include <cstddef> // size_t
+#include <limits> // std::numeric_limits
 #include <map>
-#include <optional>
-#include <utility>
+#include <utility> // std::pair
 #include <vector>
 
 template<typename PeerKey, typename PoolKey>
@@ -44,7 +42,12 @@ public:
         // how many more blocks each pool will allow
         auto pool_left = PoolLimits(mediator);
 
-        auto candidates = getCandidatesSortedByFewestPending(mediator);
+        // get candidates sorted from fewest pending reqs to most pending reqs
+        auto candidates = getCandidates(mediator);
+        std::sort(
+            std::begin(candidates),
+            std::end(candidates),
+            [](auto const& a, auto const& b) { return a.n_pending < b.n_pending; });
 
         // We want to distribute the unallocated block requests among the
         // peers in a way that minimizes the number of pending requests.
@@ -187,7 +190,7 @@ private:
         std::vector<PoolKey> pools;
     };
 
-    [[nodiscard]] static auto getCandidatesSortedByFewestPending(Mediator const& mediator)
+    [[nodiscard]] static auto getCandidates(Mediator const& mediator)
     {
         auto const peers = mediator.peers();
         auto candidates = std::vector<Candidate>{};
@@ -200,11 +203,6 @@ private:
                 return Candidate{ peer, mediator.pendingReqCount(peer), {}, mediator.pools(peer) };
             });
 
-        // sort them from fewest pending to most pending
-        std::sort(
-            std::begin(candidates),
-            std::end(candidates),
-            [](auto const& a, auto const& b) { return a.n_pending < b.n_pending; });
         return candidates;
     }
 
