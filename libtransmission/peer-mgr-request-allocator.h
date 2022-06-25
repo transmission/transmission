@@ -11,10 +11,16 @@
 
 #include <algorithm> // std::sort
 #include <cstddef> // size_t
+#include <cstdint> // uint32_t
 #include <limits> // std::numeric_limits
 #include <map>
+#include <numeric>
 #include <utility> // std::pair
 #include <vector>
+
+#include "transmission.h"
+
+#include "block-info.h"
 
 template<typename PeerKey, typename PoolKey>
 class BlockRequestAllocator
@@ -35,9 +41,37 @@ public:
 
         // Get the maximum number of blocks per second that a bandwidth pool allows
         [[nodiscard]] virtual size_t poolBlockLimit(PoolKey pool) const = 0;
+
+        // The maximum observed download speed, in bytes per second
+        [[nodiscard]] virtual uint32_t maxObservedDownloadSpeed() const = 0;
     };
 
-    static std::vector<std::pair<PeerKey, size_t>> allocateBlockReqs(Mediator const& mediator, size_t n_reqs_to_distribute)
+    // How many blocks should we request now to keep our
+    // download bandwidth saturated over the next PeriodSecs?
+    [[nodiscard]] static size_t decideHowManyNewReqsToSend(Mediator const& mediator)
+    {
+        static auto constexpr PeriodSecs = size_t{ 10 }; // TODO: should this be configurable
+
+        auto const target_blocks_per_period = (guessMaxPhysicalDlSpeed(mediator) * PeriodSecs) / tr_block_info::BlockSize;
+
+        auto const peers = mediator.peers();
+        auto const n_active = std::accumulate(
+            std::begin(peers),
+            std::end(peers),
+            size_t{},
+            [&](auto sum, auto const& peer) { return sum + mediator.pendingReqCount(peer); });
+
+        if (target_blocks_per_period > n_active)
+        {
+            return target_blocks_per_period - n_active;
+        }
+
+        return {};
+    }
+
+    [[nodiscard]] static std::vector<std::pair<PeerKey, size_t>> allocateBlockReqs(
+        Mediator const& mediator,
+        size_t n_reqs_to_distribute)
     {
         // how many more blocks each pool will allow
         auto pool_left = PoolLimits(mediator);
@@ -204,6 +238,21 @@ private:
             });
 
         return candidates;
+    }
+
+    static uint32_t guessMaxPhysicalDlSpeed(Mediator const& mediator)
+    {
+        // Our guess is probably wrong, so apply a multiplier > 1 to push us faster
+        // to self-correct past bad guesses. The multiplier will have a cumulative
+        // effect, so even a small bump will have a big effect.
+        static auto constexpr Multiplier = 1.05;
+
+        // If we have no other info, use a default of 100 Mbit/s based on
+        // https://en.wikipedia.org/wiki/List_of_countries_by_Internet_connection_speeds .
+        // This number will be wrong for most users, but we've got to start somewhere.
+        static auto constexpr BaselineBps = uint32_t{ 12500000U };
+
+        return std::max(BaselineBps, mediator.maxObservedDownloadSpeed()) * Multiplier;
     }
 
 }; // class BlockRequestAllocator

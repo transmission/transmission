@@ -65,6 +65,11 @@ public:
         return pool_limit_.at(pool);
     }
 
+    [[nodiscard]] uint32_t maxObservedDownloadSpeed() const override
+    {
+        return max_observed_dl_speed_Bps_;
+    }
+
     template<typename... PoolKeys>
     void addPeer(PeerKey peer_key, size_t pending_reqs, PoolKeys... pool_keys)
     {
@@ -77,10 +82,16 @@ public:
         pool_limit_.try_emplace(key, n);
     }
 
+    void setMaxObservedDownloadSpeed(uint32_t bytes_per_second)
+    {
+        max_observed_dl_speed_Bps_ = bytes_per_second;
+    }
+
 private:
     std::map<PeerKey, std::vector<PoolKey>> peer_to_pools_;
     std::map<PeerKey, size_t> pending_reqs_;
     std::map<PoolKey, size_t> pool_limit_;
+    uint32_t max_observed_dl_speed_Bps_ = 0;
 };
 
 TEST_F(RequestAllocatorTest, distributesEvenlyWhenAllElseIsEqual)
@@ -205,4 +216,21 @@ TEST_F(RequestAllocatorTest, allocatesEvenly2)
                                                                    std::make_pair(Torrent2PeerA, 55),
                                                                    std::make_pair(Torrent2PeerB, 60) };
     EXPECT_EQ(expected, allocation);
+}
+
+TEST_F(RequestAllocatorTest, activeReqsReduceNewReqCount)
+{
+    static auto constexpr ActiveReqs = size_t{ 10U };
+
+    // count how many reqs we could make if there are no active reqs
+    auto mediator = MockMediator();
+    auto const baseline = RequestAllocator::decideHowManyNewReqsToSend(mediator);
+    EXPECT_GT(baseline, 0U);
+
+    // now add some active reqs and recount
+    mediator.addPeer(Torrent1PeerA, ActiveReqs, SessionPool);
+    auto const actual = RequestAllocator::decideHowManyNewReqsToSend(mediator);
+
+    // we should be able to send `ActiveReqs` fewer requests
+    EXPECT_EQ(actual + ActiveReqs, baseline);
 }
