@@ -19,6 +19,7 @@
 
 class tr_peer;
 class tr_peerIo;
+struct Bandwidth;
 struct tr_address;
 
 /**
@@ -48,6 +49,8 @@ public:
 
     [[nodiscard]] virtual bool is_active(tr_direction direction) const = 0;
     virtual void update_active(tr_direction direction) = 0;
+
+    [[nodiscard]] virtual Bandwidth* bandwidth() noexcept = 0;
 
     [[nodiscard]] virtual bool is_connection_older_than(time_t time) const noexcept = 0;
 

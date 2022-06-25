@@ -38,6 +38,7 @@
 #include "net.h"
 #include "peer-io.h"
 #include "peer-mgr-active-requests.h"
+#include "peer-mgr-request-allocator.h"
 #include "peer-mgr-wishlist.h"
 #include "peer-mgr.h"
 #include "peer-msgs.h"
@@ -492,7 +493,7 @@ struct EventDeleter
 
 using UniqueTimer = std::unique_ptr<struct event, EventDeleter>;
 
-struct tr_peerMgr
+struct tr_peerMgr final : public BlockRequestAllocator<tr_peerMsgs*, Bandwidth*>::Mediator
 {
     explicit tr_peerMgr(tr_session* session_in)
         : session{ session_in }
@@ -510,7 +511,7 @@ struct tr_peerMgr
         return session->unique_lock();
     }
 
-    ~tr_peerMgr()
+    virtual ~tr_peerMgr()
     {
         auto const lock = unique_lock();
         incoming_handshakes.abortAll();
@@ -526,6 +527,71 @@ struct tr_peerMgr
     void reconnectPulse();
     void refillUpkeep() const;
     void makeNewPeerConnections(size_t max);
+
+    /// BlockRequestAllocator::Mediator
+
+    using PeerKey = tr_peerMsgs*;
+    using PoolKey = Bandwidth*;
+
+    [[nodiscard]] std::vector<PeerKey> peers() const override
+    {
+        auto peers = std::vector<PeerKey>{};
+        peers.reserve(session->peerLimit);
+
+        for (auto& torrent : session->torrents())
+        {
+            for (auto* peer : torrent->swarm->peers)
+            {
+                if (peer->is_active(TR_PEER_TO_CLIENT))
+                {
+                    peers.push_back(peer);
+                }
+            }
+        }
+
+        return peers;
+    }
+
+    [[nodiscard]] size_t pendingReqCount(PeerKey peer) const override
+    {
+        return peer->swarm->active_requests.count(peer);
+    }
+
+    [[nodiscard]] std::vector<PoolKey> pools(PeerKey peer) const override
+    {
+        static auto constexpr Dir = TR_PEER_TO_CLIENT;
+        auto pools = std::vector<PoolKey>{};
+
+        for (auto* bandwidth = peer->bandwidth(); bandwidth != nullptr && bandwidth->areParentLimitsHonored(Dir);
+             bandwidth = bandwidth->parent())
+        {
+            if (bandwidth->isLimited(Dir))
+            {
+                pools.push_back(bandwidth);
+            }
+        }
+
+        return pools;
+    }
+
+    [[nodiscard]] size_t poolBlockLimit(PoolKey pool) const override
+    {
+        static auto constexpr Dir = TR_PEER_TO_CLIENT;
+        TR_ASSERT(pool->isLimited(Dir));
+        return static_cast<size_t>((pool->getDesiredSpeedBytesPerSecond(Dir) * downloadReqPeriod()) / tr_block_info::BlockSize);
+    }
+
+    [[nodiscard]] uint32_t maxObservedDlSpeedBps() const override
+    {
+        return session->maxObservedDlSpeedBps();
+    }
+
+    [[nodiscard]] size_t downloadReqPeriod() const override
+    {
+        return 10U; // 10 seconds. TODO: make this configurable
+    }
+
+    ///
 
     tr_session* const session;
     Handshakes incoming_handshakes;
