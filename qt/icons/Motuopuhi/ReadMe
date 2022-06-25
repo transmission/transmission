@@ -1,0 +1,7 @@
+Motuopuhi is designed and developed by Gary Elshaw <godard@hotmail.com using macOS SF Symbols.
+
+It's a simple macOS mostly-monochrome styled theme for Transmission on QT, but could be adapted for GTK.
+
+In Māori culture or Te Ao Māori (The Māori World), a part of our identity is based on the land and water that surround us. Motuopuhi [Mo-to-o-poo-he] is a small island seen from home.
+
+To use this theme in QT the Application.cc file will need to be edited on line 93 to include the theme's name.
