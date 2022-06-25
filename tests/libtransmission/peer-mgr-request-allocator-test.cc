@@ -65,7 +65,7 @@ public:
         return pool_limit_.at(pool);
     }
 
-    [[nodiscard]] uint32_t maxObservedDownloadSpeed() const override
+    [[nodiscard]] uint32_t maxObservedDlSpeedBps() const override
     {
         return max_observed_dl_speed_Bps_;
     }
@@ -87,7 +87,7 @@ public:
         pool_limit_.try_emplace(key, n);
     }
 
-    void setMaxObservedDownloadSpeed(uint32_t bytes_per_second)
+    void setMaxObservedDlSpeedBps(uint32_t bytes_per_second)
     {
         max_observed_dl_speed_Bps_ = bytes_per_second;
     }

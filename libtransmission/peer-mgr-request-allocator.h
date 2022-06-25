@@ -43,7 +43,7 @@ public:
         [[nodiscard]] virtual size_t poolBlockLimit(PoolKey pool) const = 0;
 
         // The maximum observed download speed, in bytes per second
-        [[nodiscard]] virtual uint32_t maxObservedDownloadSpeed() const = 0;
+        [[nodiscard]] virtual uint32_t maxObservedDlSpeedBps() const = 0;
 
         // The period over which we are trying to fill our download bandwidth
         [[nodiscard]] virtual size_t downloadReqPeriod() const = 0;
@@ -255,7 +255,7 @@ private:
         // This number will be wrong for most users, but we've got to start somewhere.
         static auto constexpr BaselineBps = uint32_t{ 12500000U };
 
-        return std::max(BaselineBps, mediator.maxObservedDownloadSpeed()) * Multiplier;
+        return std::max(BaselineBps, mediator.maxObservedDlSpeedBps()) * Multiplier;
     }
 
 }; // class BlockRequestAllocator
