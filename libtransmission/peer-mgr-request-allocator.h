@@ -44,15 +44,18 @@ public:
 
         // The maximum observed download speed, in bytes per second
         [[nodiscard]] virtual uint32_t maxObservedDownloadSpeed() const = 0;
+
+        // The period over which we are trying to fill our download bandwidth
+        [[nodiscard]] virtual size_t downloadReqPeriod() const = 0;
     };
 
     // How many blocks should we request now to keep our
     // download bandwidth saturated over the next PeriodSecs?
     [[nodiscard]] static size_t decideHowManyNewReqsToSend(Mediator const& mediator)
     {
-        static auto constexpr PeriodSecs = size_t{ 10 }; // TODO: should this be configurable
+        auto const period_secs = mediator.downloadReqPeriod();
 
-        auto const target_blocks_per_period = (guessMaxPhysicalDlSpeed(mediator) * PeriodSecs) / tr_block_info::BlockSize;
+        auto const target_blocks_per_period = (guessMaxPhysicalDlSpeed(mediator) * period_secs) / tr_block_info::BlockSize;
 
         auto const peers = mediator.peers();
         auto const n_active = std::accumulate(

@@ -70,6 +70,11 @@ public:
         return max_observed_dl_speed_Bps_;
     }
 
+    [[nodiscard]] size_t downloadReqPeriod() const override
+    {
+        return download_req_period_;
+    }
+
     template<typename... PoolKeys>
     void addPeer(PeerKey peer_key, size_t pending_reqs, PoolKeys... pool_keys)
     {
@@ -87,11 +92,17 @@ public:
         max_observed_dl_speed_Bps_ = bytes_per_second;
     }
 
+    void setDownloadReqPeriod(size_t secs)
+    {
+        download_req_period_ = secs;
+    }
+
 private:
     std::map<PeerKey, std::vector<PoolKey>> peer_to_pools_;
     std::map<PeerKey, size_t> pending_reqs_;
     std::map<PoolKey, size_t> pool_limit_;
     uint32_t max_observed_dl_speed_Bps_ = 0;
+    size_t download_req_period_ = 10U;
 };
 
 TEST_F(RequestAllocatorTest, distributesEvenlyWhenAllElseIsEqual)
@@ -233,4 +244,19 @@ TEST_F(RequestAllocatorTest, activeReqsReduceNewReqCount)
 
     // we should be able to send `ActiveReqs` fewer requests
     EXPECT_EQ(actual + ActiveReqs, baseline);
+}
+
+TEST_F(RequestAllocatorTest, periodReqPeriodAffectsReqCount)
+{
+    // count how many reqs we could make if there are no active reqs
+    auto mediator = MockMediator();
+    auto period_secs = size_t{ 10U };
+    mediator.setDownloadReqPeriod(period_secs);
+    auto const baseline = RequestAllocator::decideHowManyNewReqsToSend(mediator);
+    EXPECT_GT(baseline, 0U);
+
+    // now double the period and recount
+    mediator.setDownloadReqPeriod(period_secs * 2U);
+    auto const actual = RequestAllocator::decideHowManyNewReqsToSend(mediator);
+    EXPECT_NEAR(baseline * 2U, actual, 1);
 }
