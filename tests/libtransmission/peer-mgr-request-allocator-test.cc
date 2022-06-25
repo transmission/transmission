@@ -20,22 +20,17 @@
 
 using namespace std::literals;
 
-class RequestAllocatorTest : public ::testing::Test
-{
-protected:
-    template<typename T>
-    std::string quarkGetString(T i)
-    {
-        size_t len;
-        char const* const str = tr_quark_get_string(tr_quark(i), &len);
-        EXPECT_EQ(strlen(str), len);
-        return std::string(str, len);
-    }
-};
-
+using RequestAllocatorTest = ::testing::Test;
 using PeerKey = std::string_view;
 using PoolKey = std::string_view;
 using RequestAllocator = BlockRequestAllocator<PeerKey, PoolKey>;
+
+static PoolKey constexpr SessionPool = "session-pool"sv;
+static PoolKey constexpr Torrent1Pool = "torrent-1-pool"sv;
+
+static PeerKey constexpr Torrent1PeerA = "torrent-1-peer-a"sv;
+static PeerKey constexpr Torrent1PeerB = "torrent-1-peer-b"sv;
+static PeerKey constexpr Torrent2PeerA = "torrent-2-peer-a"sv;
 
 class MockMediator final : public RequestAllocator::Mediator
 {
@@ -68,6 +63,19 @@ public:
         return pool_limit_.at(pool);
     }
 
+    template<typename... PoolKeys>
+    void addPeer(PeerKey peer_key, size_t pending_reqs, PoolKeys... pool_keys)
+    {
+        (peer_to_pools_[peer_key].push_back(pool_keys), ...);
+        pending_reqs_.try_emplace(peer_key, pending_reqs);
+    }
+
+    void setPoolLimit(PoolKey key, size_t n)
+    {
+        pool_limit_.try_emplace(key, n);
+    }
+
+private:
     std::map<PeerKey, std::vector<PoolKey>> peer_to_pools_;
     std::map<PeerKey, size_t> pending_reqs_;
     std::map<PoolKey, size_t> pool_limit_;
@@ -75,90 +83,69 @@ public:
 
 TEST_F(RequestAllocatorTest, distributesEvenlyWhenAllElseIsEqual)
 {
-    static auto constexpr Peers = std::array<std::string_view, 3> { "peer-a"sv, "peer-b"sv, "peer-c"sv };
-    static auto constexpr SessionPool = "session"sv;
-
     auto mediator = MockMediator();
-    for (auto& peer : Peers)
-    {
-        mediator.peer_to_pools_.try_emplace(peer, std::vector<std::string_view>{ SessionPool });
-        mediator.pending_reqs_.try_emplace(peer, size_t{});
-    }
-    mediator.pool_limit_.emplace(SessionPool, std::numeric_limits<size_t>::max());
+    mediator.addPeer(Torrent1PeerA, 0, SessionPool);
+    mediator.addPeer(Torrent1PeerB, 0, SessionPool);
+    mediator.addPeer(Torrent2PeerA, 0, SessionPool);
+    mediator.setPoolLimit(SessionPool, std::numeric_limits<size_t>::max());
 
     static auto constexpr AllocCount = 12;
+    static auto constexpr EvenSplit = AllocCount / 3;
     auto allocation = RequestAllocator::allocateBlockReqs(mediator, AllocCount);
     std::sort(std::begin(allocation), std::end(allocation));
-    auto const expected = std::vector<std::pair<PeerKey, size_t>>{
-        std::make_pair(Peers[0], AllocCount / std::size(Peers)),
-        std::make_pair(Peers[1], AllocCount / std::size(Peers)),
-        std::make_pair(Peers[2], AllocCount / std::size(Peers))
-    };
+    auto const expected = std::vector<std::pair<PeerKey, size_t>>{ std::make_pair(Torrent1PeerA, EvenSplit),
+                                                                   std::make_pair(Torrent1PeerB, EvenSplit),
+                                                                   std::make_pair(Torrent2PeerA, EvenSplit) };
     EXPECT_EQ(expected, allocation);
 }
 
 TEST_F(RequestAllocatorTest, honorsSpeedLimits)
 {
     auto mediator = MockMediator();
-    mediator.peer_to_pools_.try_emplace("torrent-1-peer-a"sv, std::vector<std::string_view>{ "torrent-1-pool"sv, "session-pool"sv });
-    mediator.peer_to_pools_.try_emplace("torrent-1-peer-b"sv, std::vector<std::string_view>{ "torrent-1-pool"sv, "session-pool"sv });
-    mediator.peer_to_pools_.try_emplace("torrent-2-peer-a"sv, std::vector<std::string_view>{ "session-pool"sv }); // no speed limit for torrent 2
-    mediator.pending_reqs_.try_emplace("torrent-1-peer-a", size_t{});
-    mediator.pending_reqs_.try_emplace("torrent-1-peer-b", size_t{});
-    mediator.pending_reqs_.try_emplace("torrent-2-peer-a", size_t{});
-    mediator.pool_limit_.try_emplace("torrent-1-pool"sv, 50);
-    mediator.pool_limit_.try_emplace("session-pool"sv, 100);
+    mediator.addPeer(Torrent1PeerA, 0, Torrent1Pool, SessionPool);
+    mediator.addPeer(Torrent1PeerB, 0, Torrent1Pool, SessionPool);
+    mediator.addPeer(Torrent2PeerA, 0, SessionPool); // no speed limit for torrent 2
+    mediator.setPoolLimit(Torrent1Pool, 50);
+    mediator.setPoolLimit(SessionPool, 100);
 
     auto allocation = RequestAllocator::allocateBlockReqs(mediator, 1000);
     std::sort(std::begin(allocation), std::end(allocation));
-    auto const expected = std::vector<std::pair<PeerKey, size_t>>{
-        std::make_pair("torrent-1-peer-a"sv, 25),
-        std::make_pair("torrent-1-peer-b"sv, 25),
-        std::make_pair("torrent-2-peer-a"sv, 50)
-    };
+    auto const expected = std::vector<std::pair<PeerKey, size_t>>{ std::make_pair(Torrent1PeerA, 25),
+                                                                   std::make_pair(Torrent1PeerB, 25),
+                                                                   std::make_pair(Torrent2PeerA, 50) };
     EXPECT_EQ(expected, allocation);
 }
 
 TEST_F(RequestAllocatorTest, considersBacklog)
 {
     auto mediator = MockMediator();
-    mediator.peer_to_pools_.try_emplace("torrent-1-peer-a"sv, std::vector<std::string_view>{ "torrent-1-pool"sv, "session-pool"sv });
-    mediator.peer_to_pools_.try_emplace("torrent-1-peer-b"sv, std::vector<std::string_view>{ "torrent-1-pool"sv, "session-pool"sv });
-    mediator.peer_to_pools_.try_emplace("torrent-2-peer-a"sv, std::vector<std::string_view>{ "session-pool"sv }); // no speed limit for torrent 2
-    mediator.pending_reqs_.try_emplace("torrent-1-peer-a", 10);
-    mediator.pending_reqs_.try_emplace("torrent-1-peer-b", size_t{});
-    mediator.pending_reqs_.try_emplace("torrent-2-peer-a", size_t{});
-    mediator.pool_limit_.try_emplace("torrent-1-pool"sv, 50);
-    mediator.pool_limit_.try_emplace("session-pool"sv, 100);
+    mediator.addPeer(Torrent1PeerA, 10, Torrent1Pool, SessionPool);
+    mediator.addPeer(Torrent1PeerB, 0, Torrent1Pool, SessionPool);
+    mediator.addPeer(Torrent2PeerA, 0, SessionPool);
+    mediator.setPoolLimit(Torrent1Pool, 50);
+    mediator.setPoolLimit(SessionPool, 100);
 
     auto allocation = RequestAllocator::allocateBlockReqs(mediator, 1000);
     std::sort(std::begin(allocation), std::end(allocation));
-    auto const expected = std::vector<std::pair<PeerKey, size_t>>{
-        std::make_pair("torrent-1-peer-a"sv, 15),
-        std::make_pair("torrent-1-peer-b"sv, 25),
-        std::make_pair("torrent-2-peer-a"sv, 50)
-    };
+    auto const expected = std::vector<std::pair<PeerKey, size_t>>{ std::make_pair(Torrent1PeerA, 15),
+                                                                   std::make_pair(Torrent1PeerB, 25),
+                                                                   std::make_pair(Torrent2PeerA, 50) };
     EXPECT_EQ(expected, allocation);
 }
 
 TEST_F(RequestAllocatorTest, stopsWhenOutOfReqs)
 {
     auto mediator = MockMediator();
-    mediator.peer_to_pools_.try_emplace("torrent-1-peer-a"sv, std::vector<std::string_view>{ "torrent-1-pool"sv, "session-pool"sv });
-    mediator.peer_to_pools_.try_emplace("torrent-1-peer-b"sv, std::vector<std::string_view>{ "torrent-1-pool"sv, "session-pool"sv });
-    mediator.peer_to_pools_.try_emplace("torrent-2-peer-a"sv, std::vector<std::string_view>{ "session-pool"sv }); // no speed limit for torrent 2
-    mediator.pending_reqs_.try_emplace("torrent-1-peer-a", 10);
-    mediator.pending_reqs_.try_emplace("torrent-1-peer-b", size_t{});
-    mediator.pending_reqs_.try_emplace("torrent-2-peer-a", size_t{});
-    mediator.pool_limit_.try_emplace("torrent-1-pool"sv, 50);
-    mediator.pool_limit_.try_emplace("session-pool"sv, 100);
+    mediator.addPeer(Torrent1PeerA, 10, Torrent1Pool, SessionPool);
+    mediator.addPeer(Torrent1PeerB, 0, Torrent1Pool, SessionPool);
+    mediator.addPeer(Torrent2PeerA, 0, SessionPool);
+    mediator.setPoolLimit(Torrent1Pool, 50);
+    mediator.setPoolLimit(SessionPool, 100);
 
     auto allocation = RequestAllocator::allocateBlockReqs(mediator, 23);
     std::sort(std::begin(allocation), std::end(allocation));
-    auto const expected = std::vector<std::pair<PeerKey, size_t>>{
-        std::make_pair("torrent-1-peer-a"sv, 1),
-        std::make_pair("torrent-1-peer-b"sv, 11),
-        std::make_pair("torrent-2-peer-a"sv, 11)
-    };
+    auto const expected = std::vector<std::pair<PeerKey, size_t>>{ std::make_pair(Torrent1PeerA, 1),
+                                                                   std::make_pair(Torrent1PeerB, 11),
+                                                                   std::make_pair(Torrent2PeerA, 11) };
     EXPECT_EQ(expected, allocation);
 }
