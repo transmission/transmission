@@ -7,6 +7,7 @@
 #include <cstddef>
 #include <iterator>
 #include <numeric>
+#include <set>
 #include <utility>
 #include <vector>
 
@@ -136,9 +137,6 @@ std::vector<tr_block_span_t> Wishlist::next(Wishlist::Mediator const& mediator, 
         return {};
     }
 
-    size_t n_blocks = 0;
-    auto spans = std::vector<tr_block_span_t>{};
-
     // We usually won't need all the candidates until endgame, so don't
     // waste cycles sorting all of them here. partial sort is enough.
     auto candidates = getCandidates(mediator);
@@ -146,19 +144,18 @@ std::vector<tr_block_span_t> Wishlist::next(Wishlist::Mediator const& mediator, 
     auto const middle = std::min(std::size(candidates), MaxSortedPieces);
     std::partial_sort(std::begin(candidates), std::begin(candidates) + middle, std::end(candidates));
 
+    auto blocks = std::set<tr_block_index_t>{};
     for (auto const& candidate : candidates)
     {
         // do we have enough?
-        if (n_blocks >= n_wanted_blocks)
+        if (std::size(blocks) >= n_wanted_blocks)
         {
             break;
         }
 
         // walk the blocks in this piece
         auto const [begin, end] = mediator.blockSpan(candidate.piece);
-        auto blocks = std::vector<tr_block_index_t>{};
-        blocks.reserve(end - begin);
-        for (tr_block_index_t block = begin; block < end && n_blocks + std::size(blocks) < n_wanted_blocks; ++block)
+        for (tr_block_index_t block = begin; block < end && std::size(blocks) < n_wanted_blocks; ++block)
         {
             // don't request blocks we've already got
             if (!mediator.clientCanRequestBlock(block))
@@ -173,27 +170,10 @@ std::vector<tr_block_span_t> Wishlist::next(Wishlist::Mediator const& mediator, 
                 continue;
             }
 
-            blocks.push_back(block);
-        }
-
-        if (std::empty(blocks))
-        {
-            continue;
-        }
-
-        // copy the spans into `spans`
-        auto const tmp = makeSpans(std::data(blocks), std::size(blocks));
-        std::copy(std::begin(tmp), std::end(tmp), std::back_inserter(spans));
-        n_blocks += std::accumulate(
-            std::begin(tmp),
-            std::end(tmp),
-            size_t{},
-            [](size_t sum, auto span) { return sum + span.end - span.begin; });
-        if (n_blocks >= n_wanted_blocks)
-        {
-            break;
+            blocks.insert(block);
         }
     }
 
-    return spans;
+    auto const blocks_v = std::vector<tr_block_index_t>{ std::begin(blocks), std::end(blocks) };
+    return makeSpans(std::data(blocks_v), std::size(blocks_v));
 }

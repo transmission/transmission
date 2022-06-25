@@ -11,7 +11,7 @@
     <message>
         <location line="+39"/>
         <source>Copyright © The Transmission Project</source>
-        <translation type="unfinished"></translation>
+        <translation>Telif Hakkı © Transmission Projesi</translation>
     </message>
     <message>
         <location line="-10"/>
@@ -21,12 +21,12 @@
     <message>
         <location filename="../AboutDialog.cc" line="+37"/>
         <source>Client</source>
-        <translation type="unfinished">İstemci</translation>
+        <translation>İstemci</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Server</source>
-        <translation type="unfinished"></translation>
+        <translation>Sunucu</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -64,7 +64,7 @@
     <message>
         <location line="+132"/>
         <source>Torrent Added</source>
-        <translation type="unfinished"></translation>
+        <translation>Torrent Eklendi</translation>
     </message>
     <message numerus="yes">
         <location line="-29"/>
@@ -105,7 +105,7 @@
     <message>
         <location line="+109"/>
         <source>%1 (+%2 discarded after failed checksum)</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 (+%2 başarısız sağlama sonrası çıkarıldı)</translation>
     </message>
     <message>
         <location line="+135"/>
@@ -134,12 +134,12 @@
     <message>
         <location line="+28"/>
         <source>Private to this tracker -- DHT and PEX disabled</source>
-        <translation>Bu izleyiciye özel -- DHT ve PEX devredışı</translation>
+        <translation>Bu izleyiciye özel -- DHT ve PEX devre dışı</translation>
     </message>
     <message>
         <location line="+0"/>
         <source>Public torrent</source>
-        <translation>Kamusal torrent</translation>
+        <translation>Genel torrent</translation>
     </message>
     <message>
         <location line="+69"/>
@@ -223,12 +223,12 @@
     <message>
         <location line="+35"/>
         <source>Add URL(s) </source>
-        <translation type="unfinished"></translation>
+        <translation>URL Ekle</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Add tracker announce URLs, one per line:</source>
-        <translation type="unfinished"></translation>
+        <translation>İzleyici duyuru URL&apos;si ekle:</translation>
     </message>
     <message>
         <location line="+27"/>
@@ -238,7 +238,7 @@
     <message>
         <location line="+0"/>
         <source>No new URLs found.</source>
-        <translation type="unfinished"></translation>
+        <translation>Yeni URL bulunamadı.</translation>
     </message>
     <message>
         <location line="-832"/>
@@ -423,7 +423,7 @@
     <message>
         <location line="+124"/>
         <source>Edit Trackers</source>
-        <translation type="unfinished"></translation>
+        <translation>İzleyicileri Düzenle</translation>
     </message>
     <message>
         <location line="-190"/>
@@ -443,7 +443,7 @@
     <message>
         <location line="+78"/>
         <source>Added:</source>
-        <translation type="unfinished"></translation>
+        <translation>Eklendi:</translation>
     </message>
     <message>
         <location line="+14"/>
@@ -604,17 +604,17 @@
     <message>
         <location filename="../FileTreeView.cc" line="+247"/>
         <source>Check Selected</source>
-        <translation>Seçiliyi İmle</translation>
+        <translation>Seçileni Denetle</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Uncheck Selected</source>
-        <translation>Seçilinin İmini Kaldır</translation>
+        <translation>Seçileni Denetleme</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Only Check Selected</source>
-        <translation>Yalnızca Seçiliyi İmle</translation>
+        <translation>Sadece Seçileni Denetle</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -629,7 +629,7 @@
     <message>
         <location line="+1"/>
         <source>Rename...</source>
-        <translation>Yeniden Adlandır</translation>
+        <translation>Adlandır...</translation>
     </message>
 </context>
 <context>
@@ -899,12 +899,12 @@
     <message>
         <location line="-132"/>
         <source>Options</source>
-        <translation type="unfinished">Seçenekler</translation>
+        <translation>Seçenekler</translation>
     </message>
     <message>
         <location line="+83"/>
         <source>Statistics</source>
-        <translation type="unfinished">İstatistikler</translation>
+        <translation>İstatistikler</translation>
     </message>
     <message>
         <location line="+171"/>
@@ -1501,7 +1501,7 @@ Başka ana URL eklemek için, onu boş bir satırdan sonra ekleyin.</translation
     <message>
         <location line="+14"/>
         <source>&amp;Source:</source>
-        <translation type="unfinished">&amp;Kaynak:</translation>
+        <translation>&amp;Kaynak:</translation>
     </message>
     <message>
         <location line="+14"/>
@@ -1744,7 +1744,7 @@ Başka ana URL eklemek için, onu boş bir satırdan sonra ekleyin.</translation
     <message>
         <location line="+159"/>
         <source>Select &quot;Torrent Done Downloading&quot; Script</source>
-        <translation type="unfinished"></translation>
+        <translation>&quot;Torrent İndirildi&quot; Betiğini Seç</translation>
     </message>
     <message>
         <location filename="../PrefsDialog.ui" line="+545"/>
@@ -1793,7 +1793,7 @@ Başka ana URL eklemek için, onu boş bir satırdan sonra ekleyin.</translation
     <message>
         <location line="+10"/>
         <source>Select &quot;Torrent Done Seeding&quot; Script</source>
-        <translation type="unfinished"></translation>
+        <translation>&quot;Torrent Gönderildi&quot; Betiğini Seç</translation>
     </message>
     <message numerus="yes">
         <location line="+19"/>
@@ -2001,32 +2001,32 @@ Başka ana URL eklemek için, onu boş bir satırdan sonra ekleyin.</translation
     <message>
         <location line="+186"/>
         <source>Reads user clipboard content for torrents</source>
-        <translation type="unfinished"></translation>
+        <translation>Torrent için kullanıcı panosu içeriğini oku</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Detect new torrents from clipboard</source>
-        <translation type="unfinished"></translation>
+        <translation>Panodan yeni torrent algıla</translation>
     </message>
     <message>
         <location line="+148"/>
         <source>Call scrip&amp;t when downloading is completed:</source>
-        <translation type="unfinished"></translation>
+        <translation>İndirme tamamlandığında &amp;betik dosyasını çağırın:</translation>
     </message>
     <message>
         <location line="+105"/>
         <source>Call scrip&amp;t when seeding is completed:</source>
-        <translation type="unfinished"></translation>
+        <translation>Gönderim tamamlandığında &amp;betik dosyasını çağırın:</translation>
     </message>
     <message>
         <location line="+406"/>
         <source>Default Public Trackers</source>
-        <translation type="unfinished"></translation>
+        <translation>Varsayılan Genel İzleyiciler</translation>
     </message>
     <message>
         <location line="+12"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Trackers to use on all public torrents.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;To add a backup URL, add it on the next line after a primary URL.&lt;/p&gt;&lt;p&gt;To add a new primary URL, add it after a blank line.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Tüm genel torrentlerde kullanılacak izleyiciler.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;Yedek URL eklemek için bunu birincil URL sonrasındaki satıra ekleyin.&lt;/p&gt;&lt;p&gt;Yeni birincil URL eklemek için boş bir satırdan sonra ekleyin.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location line="+60"/>
@@ -2185,7 +2185,7 @@ Başka ana URL eklemek için, onu boş bir satırdan sonra ekleyin.</translation
     <message>
         <location line="+305"/>
         <source>Start Now</source>
-        <translation type="unfinished"></translation>
+        <translation>Şimdi Başlat</translation>
     </message>
 </context>
 <context>
@@ -2288,7 +2288,7 @@ Başka ana URL eklemek için, onu boş bir satırdan sonra ekleyin.</translation
     <message>
         <location line="+13"/>
         <source>&amp;Port:</source>
-        <translation>&amp;Bağlantı noktası:</translation>
+        <translation>&amp;Port:</translation>
     </message>
     <message>
         <location line="+20"/>
@@ -2298,12 +2298,12 @@ Başka ana URL eklemek için, onu boş bir satırdan sonra ekleyin.</translation
     <message>
         <location line="+7"/>
         <source>&amp;Username:</source>
-        <translation>&amp;Kullanıcı adı</translation>
+        <translation>&amp;Kullanıcı Adı:</translation>
     </message>
     <message>
         <location line="+13"/>
         <source>Pass&amp;word:</source>
-        <translation>Parola</translation>
+        <translation>&amp;Parola:</translation>
     </message>
 </context>
 <context>
@@ -2316,7 +2316,7 @@ Başka ana URL eklemek için, onu boş bir satırdan sonra ekleyin.</translation
     <message>
         <location line="+12"/>
         <source>Current Session</source>
-        <translation>Geçerli Oturum</translation>
+        <translation>Mevcut Oturum</translation>
     </message>
     <message>
         <location line="+12"/>
@@ -2619,27 +2619,27 @@ Başka ana URL eklemek için, onu boş bir satırdan sonra ekleyin.</translation
     <message>
         <location filename="../TrackersDialog.ui" line="+17"/>
         <source>Edit Trackers</source>
-        <translation type="unfinished"></translation>
+        <translation>İzleyicileri Düzenle</translation>
     </message>
     <message>
         <location line="+9"/>
         <source>Tracker Announce URLs</source>
-        <translation type="unfinished"></translation>
+        <translation>İzleyici Duyuru URL</translation>
     </message>
     <message>
         <location line="+12"/>
         <source>To add a new primary URL, add it after a blank line.</source>
-        <translation type="unfinished"></translation>
+        <translation>Yeni birincil URL eklemek için boş bir satırdan sonra ekleyin.</translation>
     </message>
     <message>
         <location line="+14"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;To add a backup URL, add it on the next line after a primary URL.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Yedek URL eklemek için bunu birincil URL sonrasındaki satıra ekleyin.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Also see Default Public Trackers in Edit &gt; Preferences &gt; Network</source>
-        <translation type="unfinished"></translation>
+        <translation>Ayrıca bkz. Varsayılan Genel İzleyiciler Düzenle &gt; Tercihler &gt; Ağ</translation>
     </message>
 </context>
 </TS>

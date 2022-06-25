@@ -10,9 +10,6 @@
 #define FILTER_TYPE_TAG_NAME 401
 #define FILTER_TYPE_TAG_TRACKER 402
 
-#define SEARCH_MIN_WIDTH 48.0
-#define SEARCH_MAX_WIDTH 95.0
-
 @interface FilterBarController ()
 
 @property(nonatomic) IBOutlet FilterButton* fNoFilterButton;
@@ -26,7 +23,6 @@
 
 @property(nonatomic) IBOutlet NSPopUpButton* fGroupsButton;
 
-- (void)resizeBar;
 - (void)updateGroupsButton;
 - (void)updateGroups:(NSNotification*)notification;
 
@@ -61,8 +57,6 @@
     [self.fSearchField.searchMenuTemplate itemWithTag:FILTER_TYPE_TAG_TRACKER].title = NSLocalizedString(@"Tracker", "Filter Bar -> filter menu");
 
     [self.fGroupsButton.menu itemWithTag:GROUP_FILTER_ALL_TAG].title = NSLocalizedString(@"All Groups", "Filter Bar -> group filter menu");
-
-    [self resizeBar];
 
     //set current filter
     NSString* filterType = [NSUserDefaults.standardUserDefaults stringForKey:@"Filter"];
@@ -126,9 +120,6 @@
     }
 
     [self updateGroupsButton];
-
-    [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(resizeBar) name:NSWindowDidResizeNotification
-                                             object:self.view.window];
 
     //update when groups change
     [NSNotificationCenter.defaultCenter addObserver:self selector:@selector(updateGroups:) name:@"UpdateGroups" object:nil];
@@ -395,70 +386,6 @@
 }
 
 #pragma mark - Private
-
-- (void)resizeBar
-{
-    //replace all buttons
-    [self.fNoFilterButton sizeToFit];
-    [self.fActiveFilterButton sizeToFit];
-    [self.fDownloadFilterButton sizeToFit];
-    [self.fSeedFilterButton sizeToFit];
-    [self.fPauseFilterButton sizeToFit];
-    [self.fErrorFilterButton sizeToFit];
-
-    NSRect allRect = self.fNoFilterButton.frame;
-    NSRect activeRect = self.fActiveFilterButton.frame;
-    NSRect downloadRect = self.fDownloadFilterButton.frame;
-    NSRect seedRect = self.fSeedFilterButton.frame;
-    NSRect pauseRect = self.fPauseFilterButton.frame;
-    NSRect errorRect = self.fErrorFilterButton.frame;
-
-    //size search filter to not overlap buttons
-    NSRect searchFrame = self.fSearchField.frame;
-    searchFrame.origin.x = NSMaxX(errorRect) + 5.0;
-    searchFrame.size.width = NSWidth(self.view.frame) - searchFrame.origin.x - 5.0;
-
-    //make sure it is not too long
-    if (NSWidth(searchFrame) > SEARCH_MAX_WIDTH)
-    {
-        searchFrame.origin.x += NSWidth(searchFrame) - SEARCH_MAX_WIDTH;
-        searchFrame.size.width = SEARCH_MAX_WIDTH;
-    }
-    else if (NSWidth(searchFrame) < SEARCH_MIN_WIDTH)
-    {
-        searchFrame.origin.x += NSWidth(searchFrame) - SEARCH_MIN_WIDTH;
-        searchFrame.size.width = SEARCH_MIN_WIDTH;
-
-        //calculate width the buttons can take up
-        CGFloat const allowedWidth = (searchFrame.origin.x - 5.0) - allRect.origin.x;
-        CGFloat const currentWidth = NSWidth(allRect) + NSWidth(activeRect) + NSWidth(downloadRect) + NSWidth(seedRect) +
-            NSWidth(pauseRect) + NSWidth(errorRect) + 4.0; //add 4 for space between buttons
-        CGFloat const ratio = allowedWidth / currentWidth;
-
-        //decrease button widths proportionally
-        allRect.size.width = NSWidth(allRect) * ratio;
-        activeRect.size.width = NSWidth(activeRect) * ratio;
-        downloadRect.size.width = NSWidth(downloadRect) * ratio;
-        seedRect.size.width = NSWidth(seedRect) * ratio;
-        pauseRect.size.width = NSWidth(pauseRect) * ratio;
-        errorRect.size.width = NSWidth(errorRect) * ratio;
-    }
-
-    activeRect.origin.x = NSMaxX(allRect) + 1.0;
-    downloadRect.origin.x = NSMaxX(activeRect) + 1.0;
-    seedRect.origin.x = NSMaxX(downloadRect) + 1.0;
-    pauseRect.origin.x = NSMaxX(seedRect) + 1.0;
-    errorRect.origin.x = NSMaxX(pauseRect) + 1.0;
-
-    self.fNoFilterButton.frame = allRect;
-    self.fActiveFilterButton.frame = activeRect;
-    self.fDownloadFilterButton.frame = downloadRect;
-    self.fSeedFilterButton.frame = seedRect;
-    self.fPauseFilterButton.frame = pauseRect;
-    self.fErrorFilterButton.frame = errorRect;
-
-    self.fSearchField.frame = searchFrame;
-}
 
 - (void)updateGroupsButton
 {

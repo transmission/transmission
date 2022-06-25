@@ -478,7 +478,7 @@ void tr_sessionSetLPDEnabled(tr_session* session, bool enabled);
 void tr_sessionSetCacheLimit_MB(tr_session* session, int mb);
 int tr_sessionGetCacheLimit_MB(tr_session const* session);
 
-tr_encryption_mode tr_sessionGetEncryption(tr_session* session);
+tr_encryption_mode tr_sessionGetEncryption(tr_session const* session);
 void tr_sessionSetEncryption(tr_session* session, tr_encryption_mode mode);
 
 /***********************************************************************
@@ -497,7 +497,7 @@ uint16_t tr_sessionSetPeerPortRandom(tr_session* session);
 
 void tr_sessionSetPeerPortRandomOnStart(tr_session* session, bool random);
 
-bool tr_sessionGetPeerPortRandomOnStart(tr_session* session);
+bool tr_sessionGetPeerPortRandomOnStart(tr_session const* session);
 
 enum tr_port_forwarding
 {
@@ -985,13 +985,20 @@ uint64_t tr_torrentGetBytesLeftToAllocate(tr_torrent const* torrent);
  * IDs are fast lookup keys, but are not persistent between sessions.
  * If you need that, use tr_torrentView().hash_string.
  */
-int tr_torrentId(tr_torrent const* torrent);
+tr_torrent_id_t tr_torrentId(tr_torrent const* torrent);
 
 tr_torrent* tr_torrentFindFromId(tr_session* session, int id);
 
 tr_torrent* tr_torrentFindFromMetainfo(tr_session*, tr_torrent_metainfo const*);
 
 tr_torrent* tr_torrentFindFromMagnetLink(tr_session* session, char const* link);
+
+/**
+ * @brief Set metainfo if possible.
+ * @return True if given metainfo was set.
+ *
+ */
+bool tr_torrentSetMetainfoFromFile(tr_torrent* torrent, tr_torrent_metainfo* metainfo, char const* filename);
 
 /**
  * @return this torrent's name.
@@ -1346,7 +1353,7 @@ struct tr_tracker_view
     int seederCount; // number of seeders the tracker knows of, or -1 if unknown
 
     int tier; // which tier this tracker is in
-    int id; // unique transmission-generated ID for use in libtransmission API
+    tr_torrent_id_t id; // unique transmission-generated ID for use in libtransmission API
 
     tr_tracker_state announceState; // whether we're announcing, waiting to announce, etc.
     tr_tracker_state scrapeState; // whether we're scraping, waiting to scrape, etc.
@@ -1612,7 +1619,7 @@ struct tr_stat
 
     /** The torrent's unique Id.
         @see tr_torrentId() */
-    int id;
+    tr_torrent_id_t id;
 
     /** Number of seconds since the last activity (or since started).
         -1 if activity is not seeding or downloading. */

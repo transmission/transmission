@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="11762" systemVersion="16D32" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="20037" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="11762"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="20037"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -22,9 +22,8 @@
             <rect key="frame" x="0.0" y="0.0" width="400" height="21"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMinY="YES"/>
             <subviews>
-                <popUpButton verticalHuggingPriority="750" id="3">
-                    <rect key="frame" x="5" y="2" width="103" height="17"/>
-                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
+                <popUpButton verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="3">
+                    <rect key="frame" x="5" y="2" width="89" height="17"/>
                     <popUpButtonCell key="cell" type="recessed" title="status menu" bezelStyle="recessed" imagePosition="left" alignment="left" controlSize="small" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" tag="-1" inset="2" pullsDown="YES" arrowPosition="noArrow" selectedItem="33" id="12">
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES" changeBackground="YES" changeGray="YES"/>
                         <font key="font" metaFont="smallSystem"/>
@@ -55,28 +54,24 @@
                         </menu>
                     </popUpButtonCell>
                 </popUpButton>
-                <imageView id="4">
-                    <rect key="frame" x="247" y="5" width="8" height="12"/>
-                    <autoresizingMask key="autoresizingMask" flexibleMinX="YES"/>
+                <imageView translatesAutoresizingMaskIntoConstraints="NO" id="4">
+                    <rect key="frame" x="218" y="5" width="8" height="12"/>
                     <imageCell key="cell" refusesFirstResponder="YES" alignment="left" animates="YES" image="DownArrowTemplate" id="11"/>
                 </imageView>
-                <imageView id="5">
-                    <rect key="frame" x="325" y="5" width="8" height="12"/>
-                    <autoresizingMask key="autoresizingMask" flexibleMinX="YES"/>
+                <imageView translatesAutoresizingMaskIntoConstraints="NO" id="5">
+                    <rect key="frame" x="309" y="5" width="8" height="12"/>
                     <imageCell key="cell" refusesFirstResponder="YES" alignment="left" image="UpArrowTemplate" id="10"/>
                 </imageView>
-                <textField verticalHuggingPriority="750" id="6">
-                    <rect key="frame" x="336" y="4" width="64" height="14"/>
-                    <autoresizingMask key="autoresizingMask" flexibleMinX="YES"/>
+                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="6">
+                    <rect key="frame" x="320" y="4" width="62" height="14"/>
                     <textFieldCell key="cell" controlSize="small" sendsActionOnEndEditing="YES" alignment="left" title="999.9 KB/s" id="9">
                         <font key="font" metaFont="smallSystem"/>
                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                         <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                     </textFieldCell>
                 </textField>
-                <textField verticalHuggingPriority="750" id="7">
-                    <rect key="frame" x="258" y="4" width="64" height="14"/>
-                    <autoresizingMask key="autoresizingMask" flexibleMinX="YES"/>
+                <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" allowsCharacterPickerTouchBarItem="YES" translatesAutoresizingMaskIntoConstraints="NO" id="7">
+                    <rect key="frame" x="229" y="4" width="62" height="14"/>
                     <textFieldCell key="cell" controlSize="small" sendsActionOnEndEditing="YES" alignment="left" title="999.9 KB/s" id="8">
                         <font key="font" metaFont="smallSystem"/>
                         <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -84,6 +79,20 @@
                     </textFieldCell>
                 </textField>
             </subviews>
+            <constraints>
+                <constraint firstItem="4" firstAttribute="centerY" secondItem="2" secondAttribute="centerY" id="5X1-ao-0Th"/>
+                <constraint firstItem="6" firstAttribute="leading" secondItem="5" secondAttribute="trailing" constant="5" id="6EO-VX-DLE"/>
+                <constraint firstItem="4" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="3" secondAttribute="trailing" constant="5" id="6tW-KD-to5"/>
+                <constraint firstItem="6" firstAttribute="centerY" secondItem="2" secondAttribute="centerY" id="PhY-Kl-8UO"/>
+                <constraint firstItem="7" firstAttribute="centerY" secondItem="2" secondAttribute="centerY" id="RUV-jV-Cu3"/>
+                <constraint firstAttribute="trailing" secondItem="6" secondAttribute="trailing" constant="20" id="TYC-7o-i81"/>
+                <constraint firstItem="3" firstAttribute="leading" secondItem="2" secondAttribute="leading" constant="5" id="aSH-P9-sbq"/>
+                <constraint firstItem="5" firstAttribute="centerY" secondItem="2" secondAttribute="centerY" id="s5N-sn-GIz"/>
+                <constraint firstItem="7" firstAttribute="leading" secondItem="4" secondAttribute="trailing" constant="5" id="ucx-2O-Qeb"/>
+                <constraint firstItem="5" firstAttribute="leading" secondItem="7" secondAttribute="trailing" constant="20" id="w5L-Hb-0Ly"/>
+                <constraint firstItem="3" firstAttribute="centerY" secondItem="2" secondAttribute="centerY" id="xna-mB-gNK"/>
+            </constraints>
+            <point key="canvasLocation" x="139" y="136"/>
         </customView>
     </objects>
     <resources>

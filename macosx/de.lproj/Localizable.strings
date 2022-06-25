@@ -567,9 +567,6 @@
 /* Group table row */
 "No Group" = "Ohne Gruppe";
 
-/* No comment provided by engineer. */
-"No napping on the job!" = "";
-
 /* Inspector -> selected torrents */
 "No Torrents Selected" = "Keine Übertragung ausgewählt";
 
@@ -1048,7 +1045,8 @@
 /* Status Bar -> status menu */
 "Total Transfer" = "Übertragen";
 
-/* Message window -> level string */
+/* Message window -> level
+   Message window -> level string */
 "Trace" = "";
 
 /* Filter Bar -> filter menu */
@@ -1126,7 +1124,8 @@
 /* Torrent -> status string */
 "Waiting to seed" = "Warten auf Verteilen";
 
-/* Message window -> level string */
+/* Message window -> level
+   Message window -> level string */
 "Warn" = "";
 
 /* Drag overlay -> url */

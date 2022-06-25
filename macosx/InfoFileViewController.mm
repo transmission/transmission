@@ -125,6 +125,32 @@
     [self.fFileController uncheckAll];
 }
 
+- (void)keyDown:(NSEvent*)event
+{
+    unichar const firstChar = [event.charactersIgnoringModifiers characterAtIndex:0];
+
+    if (firstChar == ' ')
+    {
+        [self toggleQuickLook:nil];
+    }
+    else
+    {
+        [super keyDown:event];
+    }
+}
+
+- (void)toggleQuickLook:(id)sender
+{
+    if ([QLPreviewPanel sharedPreviewPanel].visible)
+    {
+        [[QLPreviewPanel sharedPreviewPanel] orderOut:nil];
+    }
+    else
+    {
+        [[QLPreviewPanel sharedPreviewPanel] makeKeyAndOrderFront:nil];
+    }
+}
+
 - (NSArray<NSURL*>*)quickLookURLs
 {
     FileOutlineView* fileOutlineView = self.fFileController.outlineView;

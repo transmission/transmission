@@ -4,6 +4,7 @@
 // License text can be found in the licenses/ folder.
 
 #include <iostream>
+#include <memory>
 #include <string>
 #include <string_view>
 #include <utility>
@@ -81,41 +82,30 @@ TEST_P(IncompleteDirTest, incompleteDir)
         tr_torrent* tor = {};
         tr_block_index_t block = {};
         tr_piece_index_t pieceIndex = {};
-        uint32_t offset = {};
-        struct evbuffer* buf = {};
+        std::unique_ptr<std::vector<uint8_t>> buf = {};
         bool done = {};
     };
 
-    auto const test_incomplete_dir_threadfunc = [](void* vdata) noexcept
+    auto const test_incomplete_dir_threadfunc = [](TestIncompleteDirData* data) noexcept
     {
-        auto* data = static_cast<TestIncompleteDirData*>(vdata);
-        tr_cacheWriteBlock(
-            data->session->cache,
-            data->tor,
-            data->tor->pieceLoc(0, data->offset),
-            tr_block_info::BlockSize,
-            data->buf);
+        data->session->cache->writeBlock(data->tor->id(), data->block, data->buf);
         tr_torrentGotBlock(data->tor, data->block);
         data->done = true;
     };
 
     // now finish writing it
     {
-        auto* const zero_block = tr_new0(char, tr_block_info::BlockSize);
-
-        struct TestIncompleteDirData data = {};
+        auto data = TestIncompleteDirData{};
         data.session = session_;
         data.tor = tor;
-        data.buf = evbuffer_new();
 
         auto const [begin, end] = tor->blockSpanForPiece(data.pieceIndex);
 
         for (tr_block_index_t block_index = begin; block_index < end; ++block_index)
         {
-            evbuffer_add(data.buf, zero_block, tr_block_info::BlockSize);
+            data.buf = std::make_unique<std::vector<uint8_t>>(tr_block_info::BlockSize, '\0');
             data.block = block_index;
             data.done = false;
-            data.offset = data.block * tr_block_info::BlockSize;
             tr_runInEventThread(session_, test_incomplete_dir_threadfunc, &data);
 
             auto const test = [&data]()
@@ -124,9 +114,6 @@ TEST_P(IncompleteDirTest, incompleteDir)
             };
             EXPECT_TRUE(waitFor(test, MaxWaitMsec));
         }
-
-        evbuffer_free(data.buf);
-        tr_free(zero_block);
     }
 
     blockingTorrentVerify(tor);

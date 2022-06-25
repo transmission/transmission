@@ -34,6 +34,13 @@ public:
     class FetchOptions
     {
     public:
+        enum class IPProtocol
+        {
+            ANY,
+            V4,
+            V6,
+        };
+
         FetchOptions(std::string_view url_in, FetchDoneFunc&& done_func_in, void* done_func_user_data_in)
             : url{ url_in }
             , done_func{ std::move(done_func_in) }
@@ -71,6 +78,9 @@ public:
         // Provided for webseeds, which need to set low-level callbacks on
         // the buffer itself.
         evbuffer* buffer = nullptr;
+
+        // IP protocol to use when making the request
+        IPProtocol ip_proto = IPProtocol::ANY;
 
         static constexpr int DefaultTimeoutSecs = 120;
     };

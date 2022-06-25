@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-06-02 23:47+0100\n"
+"POT-Creation-Date: 2022-06-18 18:42+0100\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
 "Last-Translator: Mike Gelfand <mikedld@mikedld.com>, 2017\n"
 "Language-Team: Kurdish (https://www.transifex.com/transmissionbt/teams/33778/ku/)\n"
@@ -33,7 +33,7 @@ msgstr ""
 msgid "Couldn't read '{path}': {error} ({error_code})"
 msgstr ""
 
-#: ../daemon/daemon.cc:283 ../gtk/Session.cc:1187 ../gtk/Utils.cc:156 ../libtransmission/watchdir.cc:332
+#: ../daemon/daemon.cc:283 ../gtk/Session.cc:1187 ../gtk/Utils.cc:255 ../libtransmission/watchdir.cc:332
 msgid "Couldn't add torrent file '{path}'"
 msgstr ""
 
@@ -69,7 +69,7 @@ msgstr ""
 msgid "Saved pidfile '{path}'"
 msgstr ""
 
-#: ../daemon/daemon.cc:772 ../gtk/MakeDialog.cc:143 ../gtk/MessageLogWindow.cc:190 ../libtransmission/blocklist.cc:356 ../libtransmission/inout.cc:181 ../libtransmission/rpcimpl.cc:1444 ../libtransmission/torrent.cc:814 ../libtransmission/torrent.cc:2091 ../libtransmission/variant.cc:1137
+#: ../daemon/daemon.cc:772 ../gtk/MakeDialog.cc:143 ../gtk/MessageLogWindow.cc:190 ../libtransmission/blocklist.cc:356 ../libtransmission/inout.cc:181 ../libtransmission/rpcimpl.cc:1452 ../libtransmission/torrent.cc:813 ../libtransmission/torrent.cc:2097 ../libtransmission/variant.cc:1137
 msgid "Couldn't save '{path}': {error} ({error_code})"
 msgstr ""
 
@@ -107,7 +107,7 @@ msgid "Transmission is a file sharing program. When you run a torrent, its data 
 msgstr ""
 
 #. make the dialog
-#: ../gtk/Application.cc:719 ../gtk/DetailsDialog.cc:2349 ../gtk/DetailsDialog.cc:2459 ../gtk/Dialogs.cc:114 ../gtk/MakeDialog.cc:224 ../gtk/MessageLogWindow.cc:237 ../gtk/OptionsDialog.cc:280 ../gtk/OptionsDialog.cc:440 ../gtk/OptionsDialog.cc:500 ../gtk/RelocateDialog.cc:164 ../gtk/StatsDialog.cc:104
+#: ../gtk/Application.cc:719 ../gtk/DetailsDialog.cc:2328 ../gtk/DetailsDialog.cc:2438 ../gtk/Dialogs.cc:114 ../gtk/MakeDialog.cc:224 ../gtk/MessageLogWindow.cc:237 ../gtk/OptionsDialog.cc:280 ../gtk/OptionsDialog.cc:440 ../gtk/OptionsDialog.cc:500 ../gtk/RelocateDialog.cc:170 ../gtk/StatsDialog.cc:104
 msgid "_Cancel"
 msgstr ""
 
@@ -218,7 +218,7 @@ msgstr ""
 msgid "_Maximum peers:"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:566 ../gtk/TorrentCellRenderer.cc:159
+#: ../gtk/DetailsDialog.cc:566 ../gtk/TorrentCellRenderer.cc:161
 msgid "Queued for verification"
 msgstr ""
 
@@ -226,7 +226,7 @@ msgstr ""
 msgid "Verifying local data"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:572 ../gtk/TorrentCellRenderer.cc:162
+#: ../gtk/DetailsDialog.cc:572 ../gtk/TorrentCellRenderer.cc:164
 msgid "Queued for download"
 msgstr ""
 
@@ -235,7 +235,7 @@ msgctxt "Verb"
 msgid "Downloading"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:578 ../gtk/TorrentCellRenderer.cc:165
+#: ../gtk/DetailsDialog.cc:578 ../gtk/TorrentCellRenderer.cc:167
 msgid "Queued for seeding"
 msgstr ""
 
@@ -244,433 +244,428 @@ msgctxt "Verb"
 msgid "Seeding"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:584 ../gtk/FilterBar.cc:520 ../gtk/TorrentCellRenderer.cc:156
+#: ../gtk/DetailsDialog.cc:584 ../gtk/FilterBar.cc:520 ../gtk/TorrentCellRenderer.cc:158
 msgid "Finished"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:584 ../gtk/FilterBar.cc:519 ../gtk/TorrentCellRenderer.cc:156
+#: ../gtk/DetailsDialog.cc:584 ../gtk/FilterBar.cc:519 ../gtk/TorrentCellRenderer.cc:158
 msgid "Paused"
 msgstr "Rawestiyayî"
 
-#: ../gtk/DetailsDialog.cc:605 ../gtk/DetailsDialog.cc:610 ../gtk/DetailsDialog.cc:723
+#: ../gtk/DetailsDialog.cc:605 ../gtk/DetailsDialog.cc:610 ../gtk/DetailsDialog.cc:724
 msgid "N/A"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:618 ../gtk/FileList.cc:592
+#: ../gtk/DetailsDialog.cc:619 ../gtk/FileList.cc:592
 msgid "Mixed"
 msgstr "Tevlihev"
 
-#: ../gtk/DetailsDialog.cc:619
+#: ../gtk/DetailsDialog.cc:620
 msgid "No Torrents Selected"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:648
+#: ../gtk/DetailsDialog.cc:649
 msgid "Private to this tracker -- DHT and PEX disabled"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:648
+#: ../gtk/DetailsDialog.cc:649
 msgid "Public torrent"
 msgstr "Torrenta Gelemperî"
 
-#: ../gtk/DetailsDialog.cc:711
+#: ../gtk/DetailsDialog.cc:712
 msgid "Created by {creator} on {date}"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:715
+#: ../gtk/DetailsDialog.cc:716
 msgid "Created by {creator}"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:719
+#: ../gtk/DetailsDialog.cc:720
 msgid "Created on {date}"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:833
+#: ../gtk/DetailsDialog.cc:834
 msgid "Unknown"
 msgstr "Nenas"
 
-#: ../gtk/DetailsDialog.cc:870 ../gtk/MakeDialog.cc:355
+#: ../gtk/DetailsDialog.cc:871 ../gtk/MakeDialog.cc:355
 msgid "{total_size} in {file_count:L} file"
 msgid_plural "{total_size} in {file_count:L} files"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../gtk/DetailsDialog.cc:885 ../gtk/MakeDialog.cc:361
+#: ../gtk/DetailsDialog.cc:886 ../gtk/MakeDialog.cc:361
 msgid "({piece_count} BitTorrent piece @ {piece_size})"
 msgid_plural "({piece_count} BitTorrent pieces @ {piece_size})"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../gtk/DetailsDialog.cc:929
+#: ../gtk/DetailsDialog.cc:930
 msgid "{current_size} ({percent_done}%)"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:936
-#, c-format
+#: ../gtk/DetailsDialog.cc:938
+#, no-c-format
 msgid "{current_size} ({percent_done}% of {percent_available}% available)"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:944
-#, c-format
+#: ../gtk/DetailsDialog.cc:947
+#, no-c-format
 msgid "{current_size} ({percent_done}% of {percent_available}% available; {unverified_size} unverified)"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:977
+#: ../gtk/DetailsDialog.cc:980
 msgid "{downloaded_size} (+{discarded_size} discarded after failed checksum)"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:1007
+#: ../gtk/DetailsDialog.cc:1010
 msgid "{uploaded_size} (Ratio: {ratio})"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:1048
+#: ../gtk/DetailsDialog.cc:1051
 msgid "No errors"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:1068
+#: ../gtk/DetailsDialog.cc:1071
 msgid "Never"
 msgstr "Tu car"
 
-#: ../gtk/DetailsDialog.cc:1076
+#: ../gtk/DetailsDialog.cc:1075
 msgid "Active now"
 msgstr ""
 
-#. e.g. 5 minutes ago
-#: ../gtk/DetailsDialog.cc:1081
-msgid "{time_span} ago"
-msgstr ""
-
-#: ../gtk/DetailsDialog.cc:1094
+#: ../gtk/DetailsDialog.cc:1091
 msgid "Activity"
 msgstr "Çalakî"
 
-#: ../gtk/DetailsDialog.cc:1099
+#: ../gtk/DetailsDialog.cc:1096
 msgid "Torrent size:"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:1104
+#: ../gtk/DetailsDialog.cc:1101
 msgid "Have:"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:1109 ../gtk/StatsDialog.cc:151 ../gtk/StatsDialog.cc:172
+#: ../gtk/DetailsDialog.cc:1106 ../gtk/StatsDialog.cc:151 ../gtk/StatsDialog.cc:172
 msgid "Uploaded:"
 msgstr "Barkirî:"
 
-#: ../gtk/DetailsDialog.cc:1114 ../gtk/StatsDialog.cc:154 ../gtk/StatsDialog.cc:175
+#: ../gtk/DetailsDialog.cc:1111 ../gtk/StatsDialog.cc:154 ../gtk/StatsDialog.cc:175
 msgid "Downloaded:"
 msgstr "Daxistî:"
 
-#: ../gtk/DetailsDialog.cc:1119
+#: ../gtk/DetailsDialog.cc:1116
 msgid "State:"
 msgstr "Rewş:"
 
-#: ../gtk/DetailsDialog.cc:1124
+#: ../gtk/DetailsDialog.cc:1121
 msgid "Running time:"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:1129
+#: ../gtk/DetailsDialog.cc:1126
 msgid "Remaining time:"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:1134
+#: ../gtk/DetailsDialog.cc:1131
 msgid "Last activity:"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:1142
+#: ../gtk/DetailsDialog.cc:1139
 msgid "Error:"
 msgstr "Çewtî:"
 
-#: ../gtk/DetailsDialog.cc:1146
+#: ../gtk/DetailsDialog.cc:1143
 msgid "Details"
 msgstr "Berfirehî"
 
-#: ../gtk/DetailsDialog.cc:1152
+#: ../gtk/DetailsDialog.cc:1149
 msgid "Location:"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:1158
+#: ../gtk/DetailsDialog.cc:1155
 msgid "Hash:"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:1163
+#: ../gtk/DetailsDialog.cc:1160
 msgid "Privacy:"
 msgstr "Nepenî:"
 
-#: ../gtk/DetailsDialog.cc:1169
+#: ../gtk/DetailsDialog.cc:1166
 msgid "Origin:"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:1174
+#: ../gtk/DetailsDialog.cc:1171
 msgid "Added:"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:1188
+#: ../gtk/DetailsDialog.cc:1185
 msgid "Comment:"
 msgstr "Şîrove:"
 
-#: ../gtk/DetailsDialog.cc:1577
+#: ../gtk/DetailsDialog.cc:1574
 msgid "Optimistic unchoke"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:1581
+#: ../gtk/DetailsDialog.cc:1578
 msgid "Downloading from this peer"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:1585
+#: ../gtk/DetailsDialog.cc:1582
 msgid "We would download from this peer if they would let us"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:1589
+#: ../gtk/DetailsDialog.cc:1586
 msgid "Uploading to peer"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:1593
+#: ../gtk/DetailsDialog.cc:1590
 msgid "We would upload to this peer if they asked"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:1597
+#: ../gtk/DetailsDialog.cc:1594
 msgid "Peer has unchoked us, but we're not interested"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:1601
+#: ../gtk/DetailsDialog.cc:1598
 msgid "We unchoked this peer, but they're not interested"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:1605
+#: ../gtk/DetailsDialog.cc:1602
 msgid "Encrypted connection"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:1609
+#: ../gtk/DetailsDialog.cc:1606
 msgid "Peer was found through Peer Exchange (PEX)"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:1613
+#: ../gtk/DetailsDialog.cc:1610
 msgid "Peer was found through DHT"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:1617
+#: ../gtk/DetailsDialog.cc:1614
 msgid "Peer is an incoming connection"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:1621
+#: ../gtk/DetailsDialog.cc:1618
 msgid "Peer is connected over µTP"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:1707
+#: ../gtk/DetailsDialog.cc:1704
 msgid "Address"
 msgstr "Navnîşan"
 
 #. % is percent done
-#: ../gtk/DetailsDialog.cc:1715
+#: ../gtk/DetailsDialog.cc:1712
 msgid "%"
 msgstr "%"
 
-#: ../gtk/DetailsDialog.cc:1731
+#: ../gtk/DetailsDialog.cc:1728
 msgid "Dn Reqs"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:1738
+#: ../gtk/DetailsDialog.cc:1735
 msgid "Up Reqs"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:1745
+#: ../gtk/DetailsDialog.cc:1742
 msgid "Dn Blocks"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:1752
+#: ../gtk/DetailsDialog.cc:1749
 msgid "Up Blocks"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:1759
+#: ../gtk/DetailsDialog.cc:1756
 msgid "We Cancelled"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:1766
+#: ../gtk/DetailsDialog.cc:1763
 msgid "They Cancelled"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:1774 ../gtk/DetailsDialog.cc:1848
+#: ../gtk/DetailsDialog.cc:1771 ../gtk/DetailsDialog.cc:1845
 msgid "Down"
 msgstr "Daxistin"
 
-#: ../gtk/DetailsDialog.cc:1782
+#: ../gtk/DetailsDialog.cc:1779
 msgid "Up"
 msgstr "Barkirin"
 
-#: ../gtk/DetailsDialog.cc:1789
+#: ../gtk/DetailsDialog.cc:1786
 msgid "Client"
 msgstr "Daxwazker"
 
-#: ../gtk/DetailsDialog.cc:1795
+#: ../gtk/DetailsDialog.cc:1792
 msgid "Flags"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:1839
+#: ../gtk/DetailsDialog.cc:1836
 msgid "Web Seeds"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:1886 ../gtk/DetailsDialog.cc:2579
+#: ../gtk/DetailsDialog.cc:1883 ../gtk/DetailsDialog.cc:2558
 msgid "Show _more details"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:1936
-msgid "Got a list of {markup_begin}{peer_count} peer{markup_end} {time_span} ago"
-msgid_plural "Got a list of {markup_begin}{peer_count} peers{markup_end} {time_span} ago"
+#: ../gtk/DetailsDialog.cc:1922
+msgid "Got a list of {markup_begin}{peer_count} peer{markup_end} {time_span_ago}"
+msgid_plural "Got a list of {markup_begin}{peer_count} peers{markup_end} {time_span_ago}"
 msgstr[0] ""
 msgstr[1] ""
 
 #. {markup_begin} and {markup_end} should surround the time_span
-#: ../gtk/DetailsDialog.cc:1948
-msgid "Peer list request {markup_begin}timed out {time_span} ago{markup_end}; will retry"
+#: ../gtk/DetailsDialog.cc:1934
+msgid "Peer list request {markup_begin}timed out {time_span_ago}{markup_end}; will retry"
 msgstr ""
 
 #. {markup_begin} and {markup_end} should surround the error
-#: ../gtk/DetailsDialog.cc:1957
-msgid "Got an error '{markup_begin}{error}{markup_end}' {time_span} ago"
+#: ../gtk/DetailsDialog.cc:1943
+msgid "Got an error '{markup_begin}{error}{markup_end}' {time_span_ago}"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:1970
+#: ../gtk/DetailsDialog.cc:1956
 msgid "No updates scheduled"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:1977
-msgid "Asking for more peers in {time_span}"
+#: ../gtk/DetailsDialog.cc:1963
+msgid "Asking for more peers {time_span_from_now}"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:1984
+#: ../gtk/DetailsDialog.cc:1970
 msgid "Queued to ask for more peers"
 msgstr ""
 
-#. {markup_begin} and {markup_end} should surround the time_span
-#: ../gtk/DetailsDialog.cc:1992
-msgid "Asking for more peers now… {markup_begin}{time_span}{markup_end}"
+#. {markup_begin} and {markup_end} should surround time_span_ago
+#: ../gtk/DetailsDialog.cc:1978
+msgid "Asked for more peers {markup_begin}{time_span_ago}{markup_end}"
 msgstr ""
 
 #. {markup_begin} and {markup_end} should surround the seeder/leecher text
-#: ../gtk/DetailsDialog.cc:2015
-msgid "Tracker had {markup_begin}{seeder_count} {seeder_or_seeders} and {leecher_count} {leecher_or_leechers}{markup_end} {time_span} ago"
+#: ../gtk/DetailsDialog.cc:2001
+msgid "Tracker had {markup_begin}{seeder_count} {seeder_or_seeders} and {leecher_count} {leecher_or_leechers}{markup_end} {time_span_ago}"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:2017
+#: ../gtk/DetailsDialog.cc:2003
 msgid "seeder"
 msgid_plural "seeders"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../gtk/DetailsDialog.cc:2019
+#: ../gtk/DetailsDialog.cc:2005
 msgid "leecher"
 msgid_plural "leechers"
 msgstr[0] ""
 msgstr[1] ""
 
 #. {markup_begin} and {markup_end} should surround the error text
-#: ../gtk/DetailsDialog.cc:2028
-msgid "Got a scrape error '{markup_begin}{error}{markup_end}' {time_span} ago"
+#: ../gtk/DetailsDialog.cc:2014
+msgid "Got a scrape error '{markup_begin}{error}{markup_end}' {time_span_ago}"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:2045
-msgid "Asking for peer counts in {time_span}"
+#: ../gtk/DetailsDialog.cc:2031
+msgid "Asking for peer counts in {time_span_from_now}"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:2052
+#: ../gtk/DetailsDialog.cc:2038
 msgid "Queued to ask for peer counts"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:2059
-msgid "Asking for peer counts now… {markup_begin}{time_span}{markup_end}"
+#: ../gtk/DetailsDialog.cc:2045
+msgid "Asked for peer counts {markup_begin}{time_span_ago}{markup_end}"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:2308
+#: ../gtk/DetailsDialog.cc:2287
 msgid "List contains invalid URLs"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:2309 ../gtk/FileList.cc:776
+#: ../gtk/DetailsDialog.cc:2288 ../gtk/FileList.cc:776
 msgid "Please correct the errors and try again."
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:2346
+#: ../gtk/DetailsDialog.cc:2325
 msgid "{torrent_name} - Edit Trackers"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:2350 ../gtk/MessageLogWindow.cc:238
+#: ../gtk/DetailsDialog.cc:2329 ../gtk/MessageLogWindow.cc:238
 msgid "_Save"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:2355
+#: ../gtk/DetailsDialog.cc:2334
 msgid "Tracker Announce URLs"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:2359 ../gtk/MakeDialog.cc:524
+#: ../gtk/DetailsDialog.cc:2338 ../gtk/MakeDialog.cc:524
 msgid ""
 "To add a backup URL, add it on the next line after a primary URL.\n"
 "To add a new primary URL, add it after a blank line."
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:2378
+#: ../gtk/DetailsDialog.cc:2357
 msgid "Also see Default Public Trackers in Edit > Preferences > Network"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:2456
+#: ../gtk/DetailsDialog.cc:2435
 msgid "{torrent_name} - Add Tracker"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:2460 ../gtk/DetailsDialog.cc:2563 ../gtk/MakeDialog.cc:226 ../gtk/PrefsDialog.cc:771
+#: ../gtk/DetailsDialog.cc:2439 ../gtk/DetailsDialog.cc:2542 ../gtk/MakeDialog.cc:226 ../gtk/PrefsDialog.cc:771
 msgid "_Add"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:2465
+#: ../gtk/DetailsDialog.cc:2444
 msgid "Tracker"
 msgstr "Temaşeker"
 
-#: ../gtk/DetailsDialog.cc:2471
+#: ../gtk/DetailsDialog.cc:2450
 msgid "_Announce URL:"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:2530 ../gtk/DetailsDialog.cc:2659
+#: ../gtk/DetailsDialog.cc:2509 ../gtk/DetailsDialog.cc:2638
 msgid "Trackers"
 msgstr "Temaşeker"
 
-#: ../gtk/DetailsDialog.cc:2567
+#: ../gtk/DetailsDialog.cc:2546
 msgid "_Edit"
 msgstr "_Sererastkirin"
 
-#: ../gtk/DetailsDialog.cc:2571 ../gtk/Dialogs.cc:115 ../gtk/PrefsDialog.cc:767
+#: ../gtk/DetailsDialog.cc:2550 ../gtk/Dialogs.cc:115 ../gtk/PrefsDialog.cc:767
 msgid "_Remove"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:2584
+#: ../gtk/DetailsDialog.cc:2563
 msgid "Show _backup trackers"
 msgstr ""
 
 #. create the dialog
-#: ../gtk/DetailsDialog.cc:2644 ../gtk/MakeDialog.cc:225 ../gtk/MakeDialog.cc:467 ../gtk/PrefsDialog.cc:1176 ../gtk/StatsDialog.cc:143
+#: ../gtk/DetailsDialog.cc:2623 ../gtk/MakeDialog.cc:225 ../gtk/MakeDialog.cc:467 ../gtk/PrefsDialog.cc:1176 ../gtk/StatsDialog.cc:143
 msgid "_Close"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:2657 ../gtk/MessageLogWindow.cc:443
+#: ../gtk/DetailsDialog.cc:2636 ../gtk/MessageLogWindow.cc:443
 msgid "Information"
 msgstr "Agahî"
 
-#: ../gtk/DetailsDialog.cc:2658
+#: ../gtk/DetailsDialog.cc:2637
 msgid "Peers"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:2663
+#: ../gtk/DetailsDialog.cc:2642
 msgid "File listing not available for combined torrent properties"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:2667 ../gtk/MakeDialog.cc:473
+#: ../gtk/DetailsDialog.cc:2646 ../gtk/MakeDialog.cc:473
 msgid "Files"
 msgstr "Pel"
 
-#: ../gtk/DetailsDialog.cc:2669 ../gtk/MainWindow.cc:485 ../gtk/PrefsDialog.cc:1088
+#: ../gtk/DetailsDialog.cc:2648 ../gtk/MainWindow.cc:485 ../gtk/PrefsDialog.cc:1088
 msgid "Options"
 msgstr "Vebijêrk"
 
-#: ../gtk/DetailsDialog.cc:2696
+#: ../gtk/DetailsDialog.cc:2675
 msgid "{torrent_name} Properties"
 msgstr ""
 
-#: ../gtk/DetailsDialog.cc:2705
+#: ../gtk/DetailsDialog.cc:2684
 msgid "Properties - {torrent_count:L} Torrent"
 msgid_plural "Properties - {torrent_count:L} Torrents"
 msgstr[0] ""
@@ -724,15 +719,15 @@ msgstr[1] ""
 msgid "_Delete"
 msgstr ""
 
-#: ../gtk/FileList.cc:580 ../gtk/Utils.cc:380
+#: ../gtk/FileList.cc:580 ../gtk/Utils.cc:479
 msgid "High"
 msgstr "Bilind"
 
-#: ../gtk/FileList.cc:584 ../gtk/Utils.cc:381
+#: ../gtk/FileList.cc:584 ../gtk/Utils.cc:480
 msgid "Normal"
 msgstr "Asayî"
 
-#: ../gtk/FileList.cc:588 ../gtk/Utils.cc:382
+#: ../gtk/FileList.cc:588 ../gtk/Utils.cc:481
 msgid "Low"
 msgstr "Nizm"
 
@@ -852,7 +847,7 @@ msgstr ""
 msgid "Statistics"
 msgstr "Statîstîk"
 
-#: ../gtk/MainWindow.cc:591 ../gtk/MainWindow.cc:612 ../gtk/TorrentCellRenderer.cc:177
+#: ../gtk/MainWindow.cc:591 ../gtk/MainWindow.cc:612 ../gtk/TorrentCellRenderer.cc:180
 msgid "Ratio: {ratio}"
 msgstr ""
 
@@ -870,7 +865,7 @@ msgstr ""
 msgid "{download_speed} ▼"
 msgstr ""
 
-#: ../gtk/MainWindow.cc:641 ../gtk/TorrentCellRenderer.cc:136
+#: ../gtk/MainWindow.cc:641 ../gtk/TorrentCellRenderer.cc:138
 msgid "{upload_speed} ▲"
 msgstr ""
 
@@ -886,7 +881,7 @@ msgstr ""
 msgid "Cancelled"
 msgstr ""
 
-#: ../gtk/MakeDialog.cc:130 ../gtk/Utils.cc:444 ../libtransmission/announcer.cc:1209 ../libtransmission/announcer.cc:1441
+#: ../gtk/MakeDialog.cc:130 ../gtk/Utils.cc:543 ../libtransmission/announcer.cc:1209 ../libtransmission/announcer.cc:1441
 msgid "Unsupported URL: '{url}'"
 msgstr ""
 
@@ -1456,27 +1451,27 @@ msgstr ""
 msgid "This may take a moment…"
 msgstr ""
 
-#: ../gtk/RelocateDialog.cc:150 ../gtk/RelocateDialog.cc:178
+#: ../gtk/RelocateDialog.cc:153 ../gtk/RelocateDialog.cc:184
 msgid "Set Torrent Location"
 msgstr ""
 
-#: ../gtk/RelocateDialog.cc:165
+#: ../gtk/RelocateDialog.cc:171
 msgid "_Apply"
 msgstr ""
 
-#: ../gtk/RelocateDialog.cc:171
+#: ../gtk/RelocateDialog.cc:177
 msgid "Location"
 msgstr "Cih"
 
-#: ../gtk/RelocateDialog.cc:180
+#: ../gtk/RelocateDialog.cc:186
 msgid "Torrent _location:"
 msgstr ""
 
-#: ../gtk/RelocateDialog.cc:184
+#: ../gtk/RelocateDialog.cc:190
 msgid "_Move from the current folder"
 msgstr ""
 
-#: ../gtk/RelocateDialog.cc:187
+#: ../gtk/RelocateDialog.cc:193
 msgid "Local data is _already there"
 msgstr ""
 
@@ -1540,81 +1535,79 @@ msgstr ""
 msgid "{current_size} of {complete_size} ({percent_done}%)"
 msgstr ""
 
-#: ../gtk/TorrentCellRenderer.cc:63
+#: ../gtk/TorrentCellRenderer.cc:64
+#, no-c-format
 msgid "{current_size} of {complete_size} ({percent_complete}%), uploaded {uploaded_size} (Ratio: {ratio}, Goal: {seed_ratio})"
 msgstr ""
 
-#: ../gtk/TorrentCellRenderer.cc:74
+#: ../gtk/TorrentCellRenderer.cc:76
+#, no-c-format
 msgid "{current_size} of {complete_size} ({percent_complete}%), uploaded {uploaded_size} (Ratio: {ratio})"
 msgstr ""
 
-#: ../gtk/TorrentCellRenderer.cc:84
+#: ../gtk/TorrentCellRenderer.cc:86
 msgid "{complete_size}, uploaded {uploaded_size} (Ratio: {ratio}, Goal: {seed_ratio})"
 msgstr ""
 
-#: ../gtk/TorrentCellRenderer.cc:93
+#: ../gtk/TorrentCellRenderer.cc:95
 msgid "{complete_size}, uploaded {uploaded_size} (Ratio: {ratio})"
 msgstr ""
 
-#: ../gtk/TorrentCellRenderer.cc:107
+#: ../gtk/TorrentCellRenderer.cc:109
 msgid "Remaining time unknown"
 msgstr ""
 
-#: ../gtk/TorrentCellRenderer.cc:111
-msgid "{time_span} remaining"
-msgstr ""
-
-#: ../gtk/TorrentCellRenderer.cc:129
+#: ../gtk/TorrentCellRenderer.cc:131
 msgid "{download_speed} ▼  {upload_speed} ▲"
 msgstr ""
 
-#: ../gtk/TorrentCellRenderer.cc:141
+#: ../gtk/TorrentCellRenderer.cc:143
 msgid "Stalled"
 msgstr "Hate rawestandin"
 
-#: ../gtk/TorrentCellRenderer.cc:169
-#, c-format
+#: ../gtk/TorrentCellRenderer.cc:172
+#, no-c-format
 msgid "Verifying local data ({percent_done}% tested)"
 msgstr ""
 
-#: ../gtk/TorrentCellRenderer.cc:189 ../libtransmission/torrent.cc:524
+#: ../gtk/TorrentCellRenderer.cc:192 ../libtransmission/torrent.cc:523
 msgid "Tracker warning: '{warning}'"
 msgstr ""
 
-#: ../gtk/TorrentCellRenderer.cc:192
+#: ../gtk/TorrentCellRenderer.cc:195
 msgid "Tracker Error: '{error}'"
 msgstr ""
 
-#: ../gtk/TorrentCellRenderer.cc:195
+#: ../gtk/TorrentCellRenderer.cc:198
 msgid "Local error: '{error}'"
 msgstr ""
 
-#: ../gtk/TorrentCellRenderer.cc:222
-#, c-format
+#: ../gtk/TorrentCellRenderer.cc:226
+#, no-c-format
 msgid "Downloading metadata from {active_count} connected peer ({percent_done:d}% done)"
 msgid_plural "Downloading metadata from {active_count} connected peers ({percent_done:d}% done)"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../gtk/TorrentCellRenderer.cc:233
+#: ../gtk/TorrentCellRenderer.cc:237
 msgid "Downloading from {active_count} of {connected_count} connected peer and webseed"
 msgid_plural "Downloading from {active_count} of {connected_count} connected peers and webseeds"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../gtk/TorrentCellRenderer.cc:244
+#: ../gtk/TorrentCellRenderer.cc:248
 msgid "Downloading from {active_count} webseed"
 msgid_plural "Downloading from {active_count} webseeds"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../gtk/TorrentCellRenderer.cc:252
+#: ../gtk/TorrentCellRenderer.cc:256
 msgid "Downloading from {active_count} of {connected_count} connected peer"
 msgid_plural "Downloading from {active_count} of {connected_count} connected peers"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../gtk/TorrentCellRenderer.cc:261
+#: ../gtk/TorrentCellRenderer.cc:265
 msgid "Seeding to {active_count} of {connected_count} connected peer"
 msgid_plural "Seeding to {active_count} of {connected_count} connected peers"
 msgstr[0] ""
@@ -1669,43 +1662,119 @@ msgid "TB/s"
 msgstr ""
 
 #: ../gtk/Utils.cc:97
+msgid "{days_from_now:L} day from now"
+msgid_plural "{days_from_now:L} days from now"
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../gtk/Utils.cc:104
+msgid "{hours_from_now:L} hour from now"
+msgid_plural "{hours_from_now:L} hours from now"
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../gtk/Utils.cc:111
+msgid "{minutes_from_now:L} minute from now"
+msgid_plural "{minutes_from_now:L} minutes from now"
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../gtk/Utils.cc:118
+msgid "{seconds_from_now:L} second from now"
+msgid_plural "{seconds_from_now:L} seconds from now"
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../gtk/Utils.cc:122 ../gtk/Utils.cc:153 ../gtk/Utils.cc:180 ../gtk/Utils.cc:213
+msgid "now"
+msgstr ""
+
+#: ../gtk/Utils.cc:129
+msgid "{days_ago:L} day ago"
+msgid_plural "{days_ago:L} days ago"
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../gtk/Utils.cc:135
+msgid "{hours_ago:L} hour ago"
+msgid_plural "{hours_ago:L} hours ago"
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../gtk/Utils.cc:142
+msgid "{minutes_ago:L} minute ago"
+msgid_plural "{minutes_ago:L} minutes ago"
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../gtk/Utils.cc:149
+msgid "{seconds_ago:L} second ago"
+msgid_plural "{seconds_ago:L} seconds ago"
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../gtk/Utils.cc:162
 msgid "{days:L} day"
 msgid_plural "{days:L} days"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../gtk/Utils.cc:99
-msgid "{hours} hour"
-msgid_plural "{hours} hours"
+#: ../gtk/Utils.cc:167
+msgid "{hours:L} hour"
+msgid_plural "{hours:L} hours"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../gtk/Utils.cc:106
-msgid "{minutes} minute"
-msgid_plural "{minutes} minutes"
+#: ../gtk/Utils.cc:172
+msgid "{minutes:L} minute"
+msgid_plural "{minutes:L} minutes"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../gtk/Utils.cc:113
-msgid "{seconds} second"
-msgid_plural "{seconds} seconds"
+#: ../gtk/Utils.cc:177
+msgid "{seconds:L} second"
+msgid_plural "{seconds:L} seconds"
 msgstr[0] ""
 msgstr[1] ""
 
-#: ../gtk/Utils.cc:150
+#: ../gtk/Utils.cc:188
+msgid "{days_left:L} day left"
+msgid_plural "{days_left:L} days left"
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../gtk/Utils.cc:195
+msgid "{hours_left:L} hour left"
+msgid_plural "{hours_left:L} hours left"
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../gtk/Utils.cc:202
+msgid "{minutes_left:L} minute left"
+msgid_plural "{minutes_left:L} minutes left"
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../gtk/Utils.cc:209
+msgid "{seconds_left:L} second left"
+msgid_plural "{seconds_left:L} seconds left"
+msgstr[0] ""
+msgstr[1] ""
+
+#: ../gtk/Utils.cc:249
 msgid "The torrent file '{path}' is already in use by '{torrent_name}'."
 msgstr ""
 
-#: ../gtk/Utils.cc:161
+#: ../gtk/Utils.cc:260
 msgid "Couldn't open torrent"
 msgstr ""
 
 #. modal
-#: ../gtk/Utils.cc:450
+#: ../gtk/Utils.cc:549
 msgid "Transmission doesn't know how to use '{url}'"
 msgstr ""
 
-#: ../gtk/Utils.cc:455
+#: ../gtk/Utils.cc:554
 msgid "This magnet link appears to be intended for something other than BitTorrent."
 msgstr ""
 
@@ -1762,11 +1831,11 @@ msgstr ""
 msgid "Start Transmission Minimized"
 msgstr ""
 
-#: ../libtransmission/announcer-http.cc:276
+#: ../libtransmission/announcer-http.cc:282
 msgid "Couldn't parse announce response: {error} ({error_code})"
 msgstr ""
 
-#: ../libtransmission/announcer-http.cc:454
+#: ../libtransmission/announcer-http.cc:584
 msgid "Couldn't parse scrape response: {error} ({error_code})"
 msgstr ""
 
@@ -1823,7 +1892,7 @@ msgstr ""
 msgid "Couldn't create '{path}': {error} ({error_code})"
 msgstr ""
 
-#: ../libtransmission/inout.cc:142
+#: ../libtransmission/inout.cc:149
 msgid "Couldn't get '{path}': {error} ({error_code})"
 msgstr ""
 
@@ -1973,15 +2042,15 @@ msgstr ""
 msgid "Serving RPC and Web requests from '{path}'"
 msgstr ""
 
-#: ../libtransmission/rpcimpl.cc:1361
+#: ../libtransmission/rpcimpl.cc:1369
 msgid "Couldn't test port: {error} ({error_code})"
 msgstr ""
 
-#: ../libtransmission/rpcimpl.cc:1401
+#: ../libtransmission/rpcimpl.cc:1409
 msgid "Couldn't fetch blocklist: {error} ({error_code})"
 msgstr ""
 
-#: ../libtransmission/rpcimpl.cc:1535
+#: ../libtransmission/rpcimpl.cc:1543
 msgid "Couldn't fetch torrent: {error} ({error_code})"
 msgstr ""
 
@@ -1989,23 +2058,23 @@ msgstr ""
 msgid "Couldn't open session lock file '{path}': {error} ({error_code})"
 msgstr ""
 
-#: ../libtransmission/session.cc:752
+#: ../libtransmission/session.cc:747
 msgid "Transmission version {version} starting"
 msgstr ""
 
-#: ../libtransmission/session.cc:1504
+#: ../libtransmission/session.cc:1499
 msgid "Time to turn off turtle mode"
 msgstr ""
 
-#: ../libtransmission/session.cc:1504
+#: ../libtransmission/session.cc:1499
 msgid "Time to turn on turtle mode"
 msgstr ""
 
-#: ../libtransmission/session.cc:1951
+#: ../libtransmission/session.cc:1945
 msgid "Transmission version {version} shutting down"
 msgstr ""
 
-#: ../libtransmission/session.cc:2071
+#: ../libtransmission/session.cc:2065
 msgid "Loaded {count} torrent"
 msgid_plural "Loaded {count} torrents"
 msgstr[0] ""
@@ -2021,44 +2090,44 @@ msgstr[1] ""
 msgid "Migrated torrent file from '{old_path}' to '{path}'"
 msgstr ""
 
-#: ../libtransmission/torrent.cc:464
+#: ../libtransmission/torrent.cc:463
 msgid "Seed ratio reached; pausing torrent"
 msgstr ""
 
-#: ../libtransmission/torrent.cc:477
+#: ../libtransmission/torrent.cc:476
 msgid "Seeding idle limit reached; pausing torrent"
 msgstr ""
 
 #. lookups by obfuscated hash will fail for this torrent
-#: ../libtransmission/torrent.cc:575
+#: ../libtransmission/torrent.cc:574
 msgid "Couldn't compute obfuscated info hash"
 msgstr ""
 
-#: ../libtransmission/torrent.cc:636
+#: ../libtransmission/torrent.cc:635
 msgid "No data found! Ensure your drives are connected or use \"Set Location\". To re-download, remove the torrent and re-add it."
 msgstr ""
 
-#: ../libtransmission/torrent.cc:1431
+#: ../libtransmission/torrent.cc:1430
 msgid "Restarted manually -- disabling its seed ratio"
 msgstr ""
 
-#: ../libtransmission/torrent.cc:1551
+#: ../libtransmission/torrent.cc:1550
 msgid "Pausing torrent"
 msgstr ""
 
-#: ../libtransmission/torrent.cc:1600
+#: ../libtransmission/torrent.cc:1599
 msgid "Removing torrent"
 msgstr ""
 
-#: ../libtransmission/torrent.cc:1793
+#: ../libtransmission/torrent.cc:1792
 msgid "Calling script '{path}'"
 msgstr ""
 
-#: ../libtransmission/torrent.cc:1802
+#: ../libtransmission/torrent.cc:1801
 msgid "Couldn't call script '{path}': {error} ({error_code})"
 msgstr ""
 
-#: ../libtransmission/torrent.cc:2190 ../libtransmission/torrent.cc:2310
+#: ../libtransmission/torrent.cc:2196 ../libtransmission/torrent.cc:2316
 msgid "Couldn't move '{old_path}' to '{path}': {error} ({error_code})"
 msgstr ""
 

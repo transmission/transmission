@@ -13,15 +13,9 @@
 
 @class AddMagnetWindowController;
 @class AddWindowController;
-@class Badger;
-@class DragOverlayWindow;
-@class FilterBarController;
-@class InfoWindowController;
 @class MessageWindowController;
 @class PrefsController;
-@class StatusBarController;
 @class Torrent;
-@class URLSheetWindowController;
 
 typedef NS_ENUM(unsigned int, addType) { //
     ADD_MANUAL,
@@ -158,19 +152,23 @@ typedef NS_ENUM(unsigned int, addType) { //
 - (void)toggleAvailabilityBar:(id)sender;
 
 - (void)toggleStatusBar:(id)sender;
-- (void)showStatusBar:(BOOL)show animate:(BOOL)animate;
 - (void)toggleFilterBar:(id)sender;
-- (void)showFilterBar:(BOOL)show animate:(BOOL)animate;
 - (void)focusFilterField;
 
 - (void)allToolbarClicked:(id)sender;
 - (void)selectedToolbarClicked:(id)sender;
 
+- (void)updateMainWindow;
+
 - (void)setWindowSizeToFit;
-@property(nonatomic, readonly) NSRect sizedWindowFrame;
 - (void)updateForAutoSize;
-- (void)setWindowMinMaxToCurrent;
-@property(nonatomic, readonly) CGFloat minWindowContentSizeAllowed;
+- (void)updateWindowAfterToolbarChange;
+- (void)removeStackViewHeightConstraints;
+@property(nonatomic, readonly) CGFloat minScrollViewHeightAllowed;
+@property(nonatomic, readonly) CGFloat toolbarHeight;
+@property(nonatomic, readonly) CGFloat mainWindowComponentHeight;
+@property(nonatomic, readonly) CGFloat scrollViewHeight;
+- (BOOL)isFullScreen;
 
 - (void)updateForExpandCollapse;
 

@@ -7,7 +7,7 @@ endif()
 # The value of this variable should be set prior to the first project() command invocation.
 # See: https://cmake.org/cmake/help/latest/variable/CMAKE_OSX_DEPLOYMENT_TARGET.html
 if(CMAKE_OSX_DEPLOYMENT_TARGET STREQUAL "")
-    set(CMAKE_OSX_DEPLOYMENT_TARGET "10.10")
+    set(CMAKE_OSX_DEPLOYMENT_TARGET "10.13")
 endif()
 
 project(transmission)
@@ -126,7 +126,6 @@ set(LIBAPPINDICATOR_MINIMUM 0.4.90)
 set(OPENSSL_MINIMUM         0.9.7)
 set(POLARSSL_MINIMUM        1.2)
 set(QT_MINIMUM              5.6)
-set(ZLIB_MINIMUM            1.2.3)
 
 if(WIN32)
     foreach(L C CXX)
@@ -323,11 +322,6 @@ if(ENABLE_MAC)
     endif()
 
     tr_fixup_auto_option(ENABLE_MAC MAC_FOUND MAC_IS_REQUIRED)
-endif()
-
-find_package(ZLIB ${ZLIB_MINIMUM})
-if(ZLIB_FOUND)
-    add_definitions(-DHAVE_ZLIB)
 endif()
 
 set(THIRD_PARTY_DIR ${CMAKE_SOURCE_DIR}/third-party)

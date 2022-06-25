@@ -11,7 +11,7 @@
     <message>
         <location line="+39"/>
         <source>Copyright © The Transmission Project</source>
-        <translation type="unfinished"></translation>
+        <translation>Copyright © Transmission-projekti</translation>
     </message>
     <message>
         <location line="-10"/>
@@ -21,12 +21,12 @@
     <message>
         <location filename="../AboutDialog.cc" line="+37"/>
         <source>Client</source>
-        <translation type="unfinished">Asiakasohjelma</translation>
+        <translation>Asiakasohjelmisto</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Server</source>
-        <translation type="unfinished"></translation>
+        <translation>Palvelin</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -64,7 +64,7 @@
     <message>
         <location line="+132"/>
         <source>Torrent Added</source>
-        <translation type="unfinished"></translation>
+        <translation>Torrent lisätty</translation>
     </message>
     <message numerus="yes">
         <location line="-29"/>
@@ -106,7 +106,7 @@
     <message>
         <location line="+109"/>
         <source>%1 (+%2 discarded after failed checksum)</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 (+%2 hylätty väärän tarkistussumman jälkeen)</translation>
     </message>
     <message>
         <location line="+135"/>
@@ -227,12 +227,12 @@
     <message>
         <location line="+35"/>
         <source>Add URL(s) </source>
-        <translation type="unfinished"></translation>
+        <translation>Lisää yksi tai useampi URL-osoite</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Add tracker announce URLs, one per line:</source>
-        <translation type="unfinished"></translation>
+        <translation>Lisää jäljitin ilmoittamaan URL-osoitteet, yksi riviä kohti:</translation>
     </message>
     <message>
         <location line="+27"/>
@@ -242,7 +242,7 @@
     <message>
         <location line="+0"/>
         <source>No new URLs found.</source>
-        <translation type="unfinished"></translation>
+        <translation>Uusia URL-osoitteita ei löytynyt.</translation>
     </message>
     <message>
         <location line="-832"/>
@@ -427,7 +427,7 @@
     <message>
         <location line="+124"/>
         <source>Edit Trackers</source>
-        <translation type="unfinished"></translation>
+        <translation>Muokkaa seurantapalvelimia</translation>
     </message>
     <message>
         <location line="-190"/>
@@ -447,7 +447,7 @@
     <message>
         <location line="+78"/>
         <source>Added:</source>
-        <translation type="unfinished"></translation>
+        <translation>Lisätty:</translation>
     </message>
     <message>
         <location line="+14"/>
@@ -862,12 +862,12 @@
     <message>
         <location line="+11"/>
         <source>&amp;Help</source>
-        <translation>&amp;Apua</translation>
+        <translation>&amp;Ohje</translation>
     </message>
     <message>
         <location line="+11"/>
         <source>&amp;View</source>
-        <translation>&amp;Katso</translation>
+        <translation>&amp;Näytä</translation>
     </message>
     <message>
         <location line="+22"/>
@@ -907,12 +907,12 @@
     <message>
         <location line="-132"/>
         <source>Options</source>
-        <translation type="unfinished"></translation>
+        <translation>Valinnat</translation>
     </message>
     <message>
         <location line="+83"/>
         <source>Statistics</source>
-        <translation type="unfinished">Tilastotiedot</translation>
+        <translation>Tilastot</translation>
     </message>
     <message>
         <location line="+171"/>
@@ -1514,7 +1514,7 @@ Jos haluat lisätä toisen ensisijaisen verkko-osoitteen, lisää se tyhjän riv
     <message>
         <location line="+14"/>
         <source>&amp;Source:</source>
-        <translation type="unfinished">&amp;Lähde:</translation>
+        <translation>&amp;Lähde:</translation>
     </message>
     <message>
         <location line="+14"/>
@@ -1757,7 +1757,7 @@ Jos haluat lisätä toisen ensisijaisen verkko-osoitteen, lisää se tyhjän riv
     <message>
         <location line="+159"/>
         <source>Select &quot;Torrent Done Downloading&quot; Script</source>
-        <translation type="unfinished"></translation>
+        <translation>Valitse &quot;Torrentin lataus valmis&quot; -komentosarja</translation>
     </message>
     <message>
         <location filename="../PrefsDialog.ui" line="+545"/>
@@ -1807,7 +1807,7 @@ Jos haluat lisätä toisen ensisijaisen verkko-osoitteen, lisää se tyhjän riv
     <message>
         <location line="+10"/>
         <source>Select &quot;Torrent Done Seeding&quot; Script</source>
-        <translation type="unfinished"></translation>
+        <translation>Valitse &quot;Torrentin kylvö valmis&quot; -komentosarja</translation>
     </message>
     <message numerus="yes">
         <location line="+19"/>
@@ -2018,32 +2018,32 @@ Jos haluat lisätä toisen ensisijaisen verkko-osoitteen, lisää se tyhjän riv
     <message>
         <location line="+186"/>
         <source>Reads user clipboard content for torrents</source>
-        <translation type="unfinished"></translation>
+        <translation>Lukee käyttäjän leikepöydän sisältöä uusien torrentien varalta</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Detect new torrents from clipboard</source>
-        <translation type="unfinished"></translation>
+        <translation>Havaitse uudet torrentit leikepöydältä</translation>
     </message>
     <message>
         <location line="+148"/>
         <source>Call scrip&amp;t when downloading is completed:</source>
-        <translation type="unfinished"></translation>
+        <translation>Kutsu skrip&amp;tiä, kun lataus on valmis:</translation>
     </message>
     <message>
         <location line="+105"/>
         <source>Call scrip&amp;t when seeding is completed:</source>
-        <translation type="unfinished"></translation>
+        <translation>Kutsu skrip&amp;tiä, kun kylvö on valmis:</translation>
     </message>
     <message>
         <location line="+406"/>
         <source>Default Public Trackers</source>
-        <translation type="unfinished"></translation>
+        <translation>Oletusarvoiset julkiset seurantapalvelimet</translation>
     </message>
     <message>
         <location line="+12"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Trackers to use on all public torrents.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;To add a backup URL, add it on the next line after a primary URL.&lt;/p&gt;&lt;p&gt;To add a new primary URL, add it after a blank line.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Jäljittimiä kaikkiin julkisiin torrentteihin.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;Halutessasi varmuuskopion, lisää se rivillä ensisijaisen URL:n jälkeen.&lt;/p&gt;&lt;p&gt;Halutessasi uuden ensisijaisen URL:n, lisää se tyhjän rivin jälkeen.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location line="+60"/>
@@ -2202,7 +2202,7 @@ Jos haluat lisätä toisen ensisijaisen verkko-osoitteen, lisää se tyhjän riv
     <message>
         <location line="+305"/>
         <source>Start Now</source>
-        <translation type="unfinished"></translation>
+        <translation>Aloita nyt</translation>
     </message>
 </context>
 <context>
@@ -2648,27 +2648,27 @@ Jos haluat lisätä toisen ensisijaisen verkko-osoitteen, lisää se tyhjän riv
     <message>
         <location filename="../TrackersDialog.ui" line="+17"/>
         <source>Edit Trackers</source>
-        <translation type="unfinished"></translation>
+        <translation>Muokkaa seurantapalvelimia</translation>
     </message>
     <message>
         <location line="+9"/>
         <source>Tracker Announce URLs</source>
-        <translation type="unfinished"></translation>
+        <translation>Jäljitin Ilmoittaa URL-osoitteet</translation>
     </message>
     <message>
         <location line="+12"/>
         <source>To add a new primary URL, add it after a blank line.</source>
-        <translation type="unfinished"></translation>
+        <translation>Jos haluat lisätä uuden ensisijaisen URL:n, lisää se tyhjän rivin jälkeen.</translation>
     </message>
     <message>
         <location line="+14"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;To add a backup URL, add it on the next line after a primary URL.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Jos haluat varmuuskopion URL:n, lisää se seuraavalla rivillä ensisijaisen URL:n jälkeen.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Also see Default Public Trackers in Edit &gt; Preferences &gt; Network</source>
-        <translation type="unfinished"></translation>
+        <translation>Katso myös julkisten jäljittimien oletusarvot Muokkaa &gt; Asetukset &gt; Verkko</translation>
     </message>
 </context>
 </TS>

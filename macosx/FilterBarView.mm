@@ -3,7 +3,6 @@
 // License text can be found in the licenses/ folder.
 
 #import "FilterBarView.h"
-#import "NSApplicationAdditions.h"
 
 @implementation FilterBarView
 

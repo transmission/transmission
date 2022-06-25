@@ -137,7 +137,7 @@
     <message>
         <location line="+28"/>
         <source>Private to this tracker -- DHT and PEX disabled</source>
-        <translation>Privé pour ce traceur -- DHT et PEX désactivés</translation>
+        <translation>Privé pour ce traceur -- La DHT et le PEX sont désactivés</translation>
     </message>
     <message>
         <location line="+0"/>
@@ -447,7 +447,7 @@
     <message>
         <location line="+78"/>
         <source>Added:</source>
-        <translation type="unfinished"></translation>
+        <translation>Ajouté&#xa0;:</translation>
     </message>
     <message>
         <location line="+14"/>

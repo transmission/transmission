@@ -74,6 +74,9 @@
     self.fNameField.stringValue = name;
     self.fNameField.toolTip = name;
 
+    //disable fullscreen support
+    [self.window setCollectionBehavior:NSWindowCollectionBehaviorFullScreenNone];
+
     [self setGroupsMenu];
     [self.fGroupPopUp selectItemWithTag:self.fGroupValue];
 
@@ -108,7 +111,7 @@
         self.fLocationImageView.image = nil;
     }
 
-#warning when 10.7-only, switch to auto layout
+    // TODO: adopt auto layout instead
     [self.fMagnetLinkLabel sizeToFit];
 
     CGFloat const downloadToLabelOldWidth = self.fDownloadToLabel.frame.size.width;

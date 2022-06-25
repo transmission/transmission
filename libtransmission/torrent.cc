@@ -11,7 +11,6 @@
 #include <csignal> /* signal() */
 #include <ctime>
 #include <map>
-#include <set>
 #include <sstream>
 #include <string>
 #include <string_view>
@@ -74,9 +73,9 @@ uint64_t tr_torrentTotalSize(tr_torrent const* tor)
     return tor->totalSize();
 }
 
-int tr_torrentId(tr_torrent const* tor)
+tr_torrent_id_t tr_torrentId(tr_torrent const* tor)
 {
-    return tor != nullptr ? tor->uniqueId : -1;
+    return tor != nullptr ? tor->id() : -1;
 }
 
 tr_torrent* tr_torrentFindFromId(tr_session* session, int id)
@@ -110,6 +109,31 @@ tr_torrent* tr_torrentFindFromObfuscatedHash(tr_session* session, tr_sha1_digest
     }
 
     return nullptr;
+}
+
+bool tr_torrentSetMetainfoFromFile(tr_torrent* tor, tr_torrent_metainfo* metainfo, char const* filename)
+{
+    if (tr_torrentHasMetadata(tor))
+    {
+        return false;
+    }
+
+    tr_error* error = nullptr;
+    tr_torrentUseMetainfoFromFile(tor, metainfo, filename, &error);
+
+    if (error != nullptr)
+    {
+        tor->setLocalError(fmt::format(
+            _("Couldn't use metaInfo from '{path}' for '{magnet}': {error} ({error_code})"),
+            fmt::arg("path", filename),
+            fmt::arg("magnet", tor->magnet()),
+            fmt::arg("error", error->message),
+            fmt::arg("error_code", error->code)));
+        tr_error_clear(&error);
+        return false;
+    }
+
+    return true;
 }
 
 bool tr_torrent::isPieceTransferAllowed(tr_direction direction) const
@@ -714,9 +738,9 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
     tor->finishedSeedingByIdle = false;
 
     auto const& labels = tr_ctorGetLabels(ctor);
-    tor->setLabels(std::data(labels), std::size(labels));
+    tor->setLabels(labels);
 
-    tor->uniqueId = session->torrents().add(tor);
+    tor->unique_id_ = session->torrents().add(tor);
 
     tr_peerMgrAddTorrent(session->peerMgr, tor);
 
@@ -817,8 +841,6 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
                 fmt::arg("error_code", error->code)));
             tr_error_clear(&error);
         }
-
-        tr_error_clear(&error);
     }
 
     tor->torrent_announcer = tr_announcerAddTorrent(tor, onTrackerResponse, nullptr);
@@ -1029,7 +1051,7 @@ tr_stat const* tr_torrentStat(tr_torrent* tor)
     }
 
     tr_stat* const s = &tor->stats;
-    s->id = tor->uniqueId;
+    s->id = tor->id();
     s->activity = tr_torrentGetActivity(tor);
     s->error = tor->error;
     s->queuePosition = tor->queuePosition;
@@ -1909,11 +1931,18 @@ void tr_torrentSetFileDLs(tr_torrent* tor, tr_file_index_t const* files, tr_file
 ****
 ***/
 
-void tr_torrent::setLabels(tr_quark const* new_labels, size_t n_labels)
+void tr_torrent::setLabels(std::vector<tr_quark> const& new_labels)
 {
     auto const lock = unique_lock();
-    auto const sorted_unique = std::set<tr_quark>{ new_labels, new_labels + n_labels };
-    this->labels = { std::begin(sorted_unique), std::end(sorted_unique) };
+    this->labels.clear();
+
+    for (auto label : new_labels)
+    {
+        if (std::find(std::begin(this->labels), std::end(this->labels), label) == std::end(this->labels))
+        {
+            this->labels.push_back(label);
+        }
+    }
     this->labels.shrink_to_fit();
     this->setDirty();
 }

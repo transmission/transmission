@@ -3,8 +3,11 @@
 // or any future license endorsed by Mnemosyne LLC.
 // License text can be found in the licenses/ folder.
 
-#include <cstdlib> /* qsort() */
-#include <ctime>
+#include <cstdlib> // std::lldiv()
+#include <iterator> // std::distance(), std::next(), std::prev()
+#include <limits> // std::numeric_limits<size_t>::max()
+#include <numeric> // std::accumulate()
+#include <utility> // std::make_pair()
 
 #include <event2/buffer.h>
 
@@ -14,438 +17,246 @@
 #include "cache.h"
 #include "inout.h"
 #include "log.h"
-#include "ptrarray.h"
 #include "torrent.h"
+#include "torrents.h"
 #include "tr-assert.h"
 #include "trevent.h"
-#include "utils.h"
 
-/****
-*****
-****/
-
-struct cache_block
+Cache::Key Cache::makeKey(tr_torrent const* torrent, tr_block_info::Location loc) noexcept
 {
-    tr_torrent* tor;
+    return std::make_pair(torrent->id(), loc.block);
+}
 
-    tr_block_info::Location loc;
-    uint32_t length;
-
-    time_t time;
-
-    struct evbuffer* evbuf;
-};
-
-struct tr_cache
+std::pair<Cache::CIter, Cache::CIter> Cache::findContiguous(CIter const begin, CIter const end, CIter const iter) noexcept
 {
-    tr_ptrArray blocks;
-    int max_blocks;
-    size_t max_bytes;
-
-    size_t disk_writes;
-    size_t disk_write_bytes;
-    size_t cache_writes;
-    size_t cache_write_bytes;
-};
-
-/****
-*****
-****/
-
-struct run_info
-{
-    int pos;
-    int rank;
-    time_t last_block_time;
-    bool is_multi_piece;
-    bool is_piece_done;
-    unsigned int len;
-};
-
-/* return a count of how many contiguous blocks there are starting at this pos */
-static int getBlockRun(tr_cache const* cache, int pos, struct run_info* info)
-{
-    int const n = tr_ptrArraySize(&cache->blocks);
-    auto const* const* blocks = (struct cache_block const* const*)tr_ptrArrayBase(&cache->blocks);
-    struct cache_block const* ref = blocks[pos];
-    auto block = ref->loc.block;
-    int len = 0;
-
-    for (int i = pos; i < n; ++i)
+    if (iter == end)
     {
-        struct cache_block const* b = blocks[i];
+        return std::make_pair(end, end);
+    }
 
-        if (b->loc.block != block)
+    auto span_begin = iter;
+    for (auto key = iter->key;;)
+    {
+        if (span_begin == begin)
         {
             break;
         }
 
-        if (b->tor != ref->tor)
+        --key.second;
+        auto const prev = std::prev(span_begin);
+        if (prev->key != key)
+        {
+            break;
+        }
+    }
+
+    auto span_end = std::next(iter);
+    for (auto key = iter->key;;)
+    {
+        if (span_end == end)
         {
             break;
         }
 
-        ++block;
-        ++len;
-    }
-
-    if (info != nullptr)
-    {
-        struct cache_block const* b = blocks[pos + len - 1];
-        info->last_block_time = b->time;
-        info->is_piece_done = b->tor->hasPiece(b->loc.piece);
-        info->is_multi_piece = b->loc.piece != blocks[pos]->loc.piece;
-        info->len = len;
-        info->pos = pos;
-    }
-
-    return len;
-}
-
-/* higher rank comes before lower rank */
-static int compareRuns(void const* va, void const* vb)
-{
-    auto const* const a = static_cast<struct run_info const*>(va);
-    auto const* const b = static_cast<struct run_info const*>(vb);
-    return b->rank - a->rank;
-}
-
-enum
-{
-    MULTIFLAG = 0x1000,
-    DONEFLAG = 0x2000,
-    SESSIONFLAG = 0x4000
-};
-
-/* Calculte runs
- *   - Stale runs, runs sitting in cache for a long time or runs not growing, get priority.
- *     Returns number of runs.
- */
-// TODO: return std::vector
-static int calcRuns(tr_cache const* cache, struct run_info* runs)
-{
-    int const n = tr_ptrArraySize(&cache->blocks);
-    int i = 0;
-    time_t const now = tr_time();
-
-    for (int pos = 0; pos < n; pos += runs[i++].len)
-    {
-        int rank = getBlockRun(cache, pos, &runs[i]);
-
-        /* This adds ~2 to the relative length of a run for every minute it has
-         * languished in the cache. */
-        rank += (now - runs[i].last_block_time) / 32;
-
-        /* Flushing stale blocks should be a top priority as the probability of them
-         * growing is very small, for blocks on piece boundaries, and nonexistant for
-         * blocks inside pieces. */
-        rank |= runs[i].is_piece_done ? DONEFLAG : 0;
-
-        /* Move the multi piece runs higher */
-        rank |= runs[i].is_multi_piece ? MULTIFLAG : 0;
-
-        runs[i].rank = rank;
-    }
-
-    qsort(runs, i, sizeof(struct run_info), compareRuns);
-    return i;
-}
-
-static int flushContiguous(tr_cache* cache, int pos, int n)
-{
-    int err = 0;
-    auto* const buf = tr_new(uint8_t, n * tr_block_info::BlockSize);
-    auto* walk = buf;
-    auto** blocks = (struct cache_block**)tr_ptrArrayBase(&cache->blocks);
-
-    auto* b = blocks[pos];
-    auto* const tor = b->tor;
-    auto const loc = b->loc;
-
-    for (int i = 0; i < n; ++i)
-    {
-        b = blocks[pos + i];
-        evbuffer_copyout(b->evbuf, walk, b->length);
-        walk += b->length;
-        evbuffer_free(b->evbuf);
-        tr_free(b);
-    }
-
-    tr_ptrArrayErase(&cache->blocks, pos, pos + n);
-
-    err = tr_ioWrite(tor, loc, walk - buf, buf);
-    tr_free(buf);
-
-    ++cache->disk_writes;
-    cache->disk_write_bytes += walk - buf;
-    return err;
-}
-
-static int flushRuns(tr_cache* cache, struct run_info* runs, int n)
-{
-    int err = 0;
-
-    for (int i = 0; err == 0 && i < n; i++)
-    {
-        err = flushContiguous(cache, runs[i].pos, runs[i].len);
-
-        for (int j = i + 1; j < n; j++)
+        ++key.second;
+        if (span_end->key != key)
         {
-            if (runs[j].pos > runs[i].pos)
-            {
-                runs[j].pos -= runs[i].len;
-            }
+            break;
         }
     }
 
-    return err;
+    return std::make_pair(span_begin, span_end);
 }
 
-static int cacheTrim(tr_cache* cache)
+int Cache::writeContiguous(CIter const begin, CIter const end) const
 {
-    int err = 0;
-
-    if (tr_ptrArraySize(&cache->blocks) > cache->max_blocks)
+    // join the blocks together into contiguous memory `buf`
+    auto buf = std::vector<uint8_t>{};
+    auto const buflen = std::accumulate(
+        begin,
+        end,
+        size_t{},
+        [](size_t sum, auto const& block) { return sum + std::size(*block.buf); });
+    buf.reserve(buflen);
+    for (auto iter = begin; iter != end; ++iter)
     {
-        /* Amount of cache that should be removed by the flush. This influences how large
-         * runs can grow as well as how often flushes will happen. */
-        int const cacheCutoff = 1 + cache->max_blocks / 4;
-        auto* const runs = tr_new(struct run_info, tr_ptrArraySize(&cache->blocks));
-        int i = 0;
-        int j = 0;
+        TR_ASSERT(begin->key.first == iter->key.first);
+        TR_ASSERT(begin->key.second + std::distance(begin, iter) == iter->key.second);
+        buf.insert(std::end(buf), std::begin(*iter->buf), std::end(*iter->buf));
+    }
+    TR_ASSERT(std::size(buf) == buflen);
 
-        calcRuns(cache, runs);
+    // save it
+    auto* const tor = torrents_.get(begin->key.first);
+    auto const loc = tor->blockLoc(begin->key.second);
 
-        while (j < cacheCutoff)
-        {
-            j += runs[i++].len;
-        }
-
-        err = flushRuns(cache, runs, i);
-        tr_free(runs);
+    if (auto const err = tr_ioWrite(tor, loc, std::size(buf), std::data(buf)); err != 0)
+    {
+        return err;
     }
 
-    return err;
+    ++disk_writes_;
+    disk_write_bytes_ += std::size(buf);
+    return {};
 }
 
-/***
-****
-***/
-
-static int getMaxBlocks(int64_t max_bytes)
+size_t Cache::getMaxBlocks(int64_t max_bytes) noexcept
 {
     return std::lldiv(max_bytes, tr_block_info::BlockSize).quot;
 }
 
-int tr_cacheSetLimit(tr_cache* cache, int64_t max_bytes)
+int Cache::setLimit(int64_t new_limit)
 {
-    cache->max_bytes = max_bytes;
-    cache->max_blocks = getMaxBlocks(max_bytes);
+    max_bytes_ = new_limit;
+    max_blocks_ = getMaxBlocks(new_limit);
 
-    tr_logAddDebug(
-        fmt::format("Maximum cache size set to {} ({} blocks)", tr_formatter_mem_B(cache->max_bytes), cache->max_blocks));
+    tr_logAddDebug(fmt::format("Maximum cache size set to {} ({} blocks)", tr_formatter_mem_B(max_bytes_), max_blocks_));
 
-    return cacheTrim(cache);
+    return cacheTrim();
 }
 
-int64_t tr_cacheGetLimit(tr_cache const* cache)
+Cache::Cache(tr_torrents& torrents, int64_t max_bytes)
+    : torrents_{ torrents }
+    , max_blocks_(getMaxBlocks(max_bytes))
+    , max_bytes_(max_bytes)
 {
-    return cache->max_bytes;
-}
-
-tr_cache* tr_cacheNew(int64_t max_bytes)
-{
-    auto* const cache = tr_new0(tr_cache, 1);
-    cache->blocks = {};
-    cache->max_bytes = max_bytes;
-    cache->max_blocks = getMaxBlocks(max_bytes);
-    return cache;
-}
-
-void tr_cacheFree(tr_cache* cache)
-{
-    tr_ptrArrayDestruct(&cache->blocks, nullptr);
-    tr_free(cache);
 }
 
 /***
 ****
 ***/
 
-static int cache_block_compare(void const* va, void const* vb)
+void Cache::writeBlock(tr_torrent_id_t tor_id, tr_block_index_t block, std::unique_ptr<std::vector<uint8_t>>& data)
 {
-    auto const* a = static_cast<struct cache_block const*>(va);
-    auto const* b = static_cast<struct cache_block const*>(vb);
-
-    /* primary key: torrent id */
-    if (a->tor->uniqueId != b->tor->uniqueId)
+    auto const key = Key{ tor_id, block };
+    auto iter = std::lower_bound(std::begin(blocks_), std::end(blocks_), key, CompareCacheBlockByKey{});
+    if (iter == std::end(blocks_) || iter->key != key)
     {
-        return a->tor->uniqueId < b->tor->uniqueId ? -1 : 1;
+        iter = blocks_.emplace(iter);
+        iter->key = key;
     }
 
-    /* secondary key: block # */
-    if (a->loc.block != b->loc.block)
+    iter->time_added = tr_time();
+
+    iter->buf = std::move(data);
+
+    ++cache_writes_;
+    cache_write_bytes_ += std::size(*iter->buf);
+
+    (void)cacheTrim();
+}
+
+Cache::CIter Cache::getBlock(tr_torrent const* torrent, tr_block_info::Location loc) noexcept
+{
+    if (auto const [begin, end] = std::equal_range(
+            std::begin(blocks_),
+            std::end(blocks_),
+            makeKey(torrent, loc),
+            CompareCacheBlockByKey{});
+        begin < end)
     {
-        return a->loc.block < b->loc.block ? -1 : 1;
+        return begin;
     }
 
-    /* they're equal */
+    return std::end(blocks_);
+}
+
+int Cache::readBlock(tr_torrent* torrent, tr_block_info::Location loc, uint32_t len, uint8_t* setme)
+{
+    if (auto const iter = getBlock(torrent, loc); iter != std::end(blocks_))
+    {
+        std::copy_n(std::begin(*iter->buf), len, setme);
+        return {};
+    }
+
+    return tr_ioRead(torrent, loc, len, setme);
+}
+
+int Cache::prefetchBlock(tr_torrent* torrent, tr_block_info::Location loc, uint32_t len)
+{
+    if (auto const iter = getBlock(torrent, loc); iter != std::end(blocks_))
+    {
+        return {}; // already have it
+    }
+
+    return tr_ioPrefetch(torrent, loc, len);
+}
+
+/***
+****
+***/
+
+int Cache::flushSpan(CIter const begin, CIter const end)
+{
+    for (auto walk = begin; walk < end;)
+    {
+        auto const [contig_begin, contig_end] = findContiguous(begin, end, walk);
+
+        if (auto const err = writeContiguous(contig_begin, contig_end); err != 0)
+        {
+            return err;
+        }
+
+        walk = contig_end;
+    }
+
+    blocks_.erase(begin, end);
+    return {};
+}
+
+int Cache::flushFile(tr_torrent* torrent, tr_file_index_t i)
+{
+    auto const compare = CompareCacheBlockByKey{};
+    auto const tor_id = torrent->id();
+    auto const [block_begin, block_end] = tr_torGetFileBlockSpan(torrent, i);
+
+    return flushSpan(
+        std::lower_bound(std::begin(blocks_), std::end(blocks_), std::make_pair(tor_id, block_begin), compare),
+        std::lower_bound(std::begin(blocks_), std::end(blocks_), std::make_pair(tor_id, block_end), compare));
+}
+
+int Cache::flushTorrent(tr_torrent* torrent)
+{
+    auto const compare = CompareCacheBlockByKey{};
+    auto const tor_id = torrent->id();
+
+    return flushSpan(
+        std::lower_bound(std::begin(blocks_), std::end(blocks_), std::make_pair(tor_id, 0), compare),
+        std::lower_bound(std::begin(blocks_), std::end(blocks_), std::make_pair(tor_id + 1, 0), compare));
+}
+
+int Cache::flushOldest()
+{
+    auto const oldest = std::min_element(
+        std::begin(blocks_),
+        std::end(blocks_),
+        [](auto const& a, auto const& b) { return a.time_added < b.time_added; });
+
+    if (oldest == std::end(blocks_)) // nothing to flush
+    {
+        return 0;
+    }
+
+    auto const [begin, end] = findContiguous(std::begin(blocks_), std::end(blocks_), oldest);
+
+    if (auto const err = writeContiguous(begin, end); err != 0)
+    {
+        return err;
+    }
+
+    blocks_.erase(begin, end);
     return 0;
 }
 
-static struct cache_block* findBlock(tr_cache* cache, tr_torrent* torrent, tr_block_info::Location loc)
+int Cache::cacheTrim()
 {
-    auto key = cache_block{};
-    key.tor = torrent;
-    key.loc = loc;
-    return static_cast<struct cache_block*>(tr_ptrArrayFindSorted(&cache->blocks, &key, cache_block_compare));
-}
-
-int tr_cacheWriteBlock(
-    tr_cache* cache,
-    tr_torrent* torrent,
-    tr_block_info::Location loc,
-    uint32_t length,
-    struct evbuffer* writeme)
-{
-    TR_ASSERT(tr_amInEventThread(torrent->session));
-    TR_ASSERT(loc.block_offset == 0);
-    TR_ASSERT(torrent->blockSize(loc.block) == length);
-    TR_ASSERT(torrent->blockSize(loc.block) <= evbuffer_get_length(writeme));
-
-    auto* cb = findBlock(cache, torrent, loc);
-    if (cb == nullptr)
+    while (std::size(blocks_) > max_blocks_)
     {
-        cb = tr_new(struct cache_block, 1);
-        cb->tor = torrent;
-        cb->loc = loc;
-        cb->length = length;
-        cb->evbuf = evbuffer_new();
-        tr_ptrArrayInsertSorted(&cache->blocks, cb, cache_block_compare);
-    }
-
-    TR_ASSERT(cb->length == length);
-
-    cb->time = tr_time();
-
-    evbuffer_drain(cb->evbuf, evbuffer_get_length(cb->evbuf));
-    evbuffer_remove_buffer(writeme, cb->evbuf, cb->length);
-
-    cache->cache_writes++;
-    cache->cache_write_bytes += cb->length;
-
-    return cacheTrim(cache);
-}
-
-int tr_cacheReadBlock(tr_cache* cache, tr_torrent* torrent, tr_block_info::Location loc, uint32_t len, uint8_t* setme)
-{
-    int err = 0;
-
-    if (auto* const cb = findBlock(cache, torrent, loc); cb != nullptr)
-    {
-        evbuffer_copyout(cb->evbuf, setme, len);
-    }
-    else
-    {
-        err = tr_ioRead(torrent, loc, len, setme);
-    }
-
-    return err;
-}
-
-int tr_cachePrefetchBlock(tr_cache* cache, tr_torrent* torrent, tr_block_info::Location loc, uint32_t len)
-{
-    int err = 0;
-
-    if (auto const* const cb = findBlock(cache, torrent, loc); cb == nullptr)
-    {
-        err = tr_ioPrefetch(torrent, loc, len);
-    }
-
-    return err;
-}
-
-/***
-****
-***/
-
-static int findBlockPos(tr_cache const* cache, tr_torrent* torrent, tr_block_info::Location loc)
-{
-    struct cache_block key;
-    key.tor = torrent;
-    key.loc = loc;
-    return tr_ptrArrayLowerBound(&cache->blocks, &key, cache_block_compare, nullptr);
-}
-
-int tr_cacheFlushDone(tr_cache* cache)
-{
-    int err = 0;
-
-    if (tr_ptrArraySize(&cache->blocks) > 0)
-    {
-        auto* const runs = tr_new(struct run_info, tr_ptrArraySize(&cache->blocks));
-        int i = 0;
-        int const n = calcRuns(cache, runs);
-
-        while (i < n && (runs[i].is_piece_done || runs[i].is_multi_piece))
+        if (auto const err = flushOldest(); err != 0)
         {
-            runs[i++].rank |= SESSIONFLAG;
+            return err;
         }
-
-        err = flushRuns(cache, runs, i);
-        tr_free(runs);
     }
 
-    return err;
-}
-
-int tr_cacheFlushFile(tr_cache* cache, tr_torrent* torrent, tr_file_index_t i)
-{
-    auto const [begin, end] = tr_torGetFileBlockSpan(torrent, i);
-
-    int const pos = findBlockPos(cache, torrent, torrent->blockLoc(begin));
-
-    tr_logAddTrace(fmt::format("flushing file {} from cache to disk: blocks [{}...{})", i, begin, end));
-
-    /* flush out all the blocks in that file */
-    int err = 0;
-    while (err == 0 && pos < tr_ptrArraySize(&cache->blocks))
-    {
-        auto const* b = static_cast<struct cache_block const*>(tr_ptrArrayNth(&cache->blocks, pos));
-
-        if (b->tor != torrent)
-        {
-            break;
-        }
-
-        if (b->loc.block < begin || b->loc.block >= end)
-        {
-            break;
-        }
-
-        err = flushContiguous(cache, pos, getBlockRun(cache, pos, nullptr));
-    }
-
-    return err;
-}
-
-int tr_cacheFlushTorrent(tr_cache* cache, tr_torrent* torrent)
-{
-    int err = 0;
-    int const pos = findBlockPos(cache, torrent, {});
-
-    /* flush out all the blocks in that torrent */
-    while (err == 0 && pos < tr_ptrArraySize(&cache->blocks))
-    {
-        auto const* b = static_cast<struct cache_block const*>(tr_ptrArrayNth(&cache->blocks, pos));
-
-        if (b->tor != torrent)
-        {
-            break;
-        }
-
-        err = flushContiguous(cache, pos, getBlockRun(cache, pos, nullptr));
-    }
-
-    return err;
+    return 0;
 }

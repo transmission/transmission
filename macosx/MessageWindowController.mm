@@ -7,7 +7,7 @@
 
 #import "MessageWindowController.h"
 #import "Controller.h"
-#import "NSApplicationAdditions.h"
+#import "NSImageAdditions.h"
 #import "NSMutableArrayAdditions.h"
 #import "NSStringAdditions.h"
 
@@ -66,12 +66,20 @@
 
     self.window.title = NSLocalizedString(@"Message Log", "Message window -> title");
 
+    //disable fullscreen support
+    [window setCollectionBehavior:NSWindowCollectionBehaviorFullScreenNone];
+
     //set images and text for popup button items
     [self.fLevelButton itemAtIndex:LEVEL_ERROR].title = NSLocalizedString(@"Error", "Message window -> level string");
     [self.fLevelButton itemAtIndex:LEVEL_WARN].title = NSLocalizedString(@"Warn", "Message window -> level string");
     [self.fLevelButton itemAtIndex:LEVEL_INFO].title = NSLocalizedString(@"Info", "Message window -> level string");
     [self.fLevelButton itemAtIndex:LEVEL_DEBUG].title = NSLocalizedString(@"Debug", "Message window -> level string");
     [self.fLevelButton itemAtIndex:LEVEL_TRACE].title = NSLocalizedString(@"Trace", "Message window -> level string");
+    [self.fLevelButton itemAtIndex:LEVEL_ERROR].image = [self.class iconForLevel:TR_LOG_ERROR];
+    [self.fLevelButton itemAtIndex:LEVEL_WARN].image = [self.class iconForLevel:TR_LOG_WARN];
+    [self.fLevelButton itemAtIndex:LEVEL_INFO].image = [self.class iconForLevel:TR_LOG_INFO];
+    [self.fLevelButton itemAtIndex:LEVEL_DEBUG].image = [self.class iconForLevel:TR_LOG_DEBUG];
+    [self.fLevelButton itemAtIndex:LEVEL_TRACE].image = [self.class iconForLevel:TR_LOG_TRACE];
 
     CGFloat const levelButtonOldWidth = NSWidth(self.fLevelButton.frame);
     [self.fLevelButton sizeToFit];
@@ -179,6 +187,49 @@
     [self updateLog:nil];
 }
 
++ (NSImage*)iconForLevel:(NSInteger)level
+{
+    NSColor* color;
+    switch (level)
+    {
+    case TR_LOG_CRITICAL:
+    case TR_LOG_ERROR:
+        color = NSColor.systemRedColor;
+        break;
+
+    case TR_LOG_WARN:
+        color = NSColor.systemOrangeColor;
+        break;
+
+    case TR_LOG_INFO:
+        color = NSColor.systemGreenColor;
+        break;
+
+    case TR_LOG_DEBUG:
+        color = NSColor.systemTealColor;
+        break;
+
+    case TR_LOG_TRACE:
+        color = NSColor.systemPurpleColor;
+        break;
+
+    default:
+        NSAssert1(NO, @"Unknown message log level: %ld", level);
+        return nil;
+    }
+
+    // cache dictionary
+    static NSMutableDictionary<NSColor*, NSImage*>* icons = [NSMutableDictionary dictionary];
+    NSImage* icon;
+    if ((icon = icons[color]))
+    {
+        return icon;
+    }
+    icon = [NSImage discIconWithColor:color insetFactor:0.5];
+    icons[color] = icon;
+    return icon;
+}
+
 - (void)updateLog:(NSTimer*)timer
 {
     tr_log_message* messages;
@@ -266,28 +317,7 @@
     else if ([ident isEqualToString:@"Level"])
     {
         NSInteger const level = [message[@"Level"] integerValue];
-        switch (level)
-        {
-        case TR_LOG_CRITICAL:
-        case TR_LOG_ERROR:
-            return [NSImage imageNamed:@"RedDotFlat"];
-
-        case TR_LOG_WARN:
-            return [NSImage imageNamed:@"OrangeDotFlat"];
-
-        case TR_LOG_INFO:
-            return [NSImage imageNamed:@"GreenDotFlat"];
-
-        case TR_LOG_DEBUG:
-            return [NSImage imageNamed:@"BlueDotFlat"];
-
-        case TR_LOG_TRACE:
-            return [NSImage imageNamed:@"PurpleDotFlat"];
-
-        default:
-            NSAssert1(NO, @"Unknown message log level: %ld", level);
-            return nil;
-        }
+        return [self.class iconForLevel:level];
     }
     else if ([ident isEqualToString:@"Name"])
     {
@@ -551,11 +581,17 @@
     case TR_LOG_ERROR:
         levelString = NSLocalizedString(@"Error", "Message window -> level");
         break;
+    case TR_LOG_WARN:
+        levelString = NSLocalizedString(@"Warn", "Message window -> level");
+        break;
     case TR_LOG_INFO:
         levelString = NSLocalizedString(@"Info", "Message window -> level");
         break;
     case TR_LOG_DEBUG:
         levelString = NSLocalizedString(@"Debug", "Message window -> level");
+        break;
+    case TR_LOG_TRACE:
+        levelString = NSLocalizedString(@"Trace", "Message window -> level");
         break;
     default:
         NSAssert1(NO, @"Unknown message log level: %ld", level);

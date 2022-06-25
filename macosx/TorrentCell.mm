@@ -16,6 +16,11 @@
 #define IMAGE_SIZE_MIN 16.0
 #define ERROR_IMAGE_SIZE 20.0
 
+#define GROUP_IMAGE_SIZE_REG 10.0
+#define GROUP_IMAGE_SIZE_MIN 6.0
+#define GROUP_PADDING_REG 22.0
+#define GROUP_PADDING_MIN 14.0
+
 #define NORMAL_BUTTON_WIDTH 14.0
 #define ACTION_BUTTON_WIDTH 16.0
 
@@ -121,9 +126,19 @@
 
 - (NSRect)iconRectForBounds:(NSRect)bounds
 {
-    CGFloat const imageSize = [self.fDefaults boolForKey:@"SmallView"] ? IMAGE_SIZE_MIN : IMAGE_SIZE_REG;
+    BOOL const minimal = [self.fDefaults boolForKey:@"SmallView"];
+    CGFloat const imageSize = minimal ? IMAGE_SIZE_MIN : IMAGE_SIZE_REG;
+    CGFloat const padding = minimal ? GROUP_PADDING_MIN : GROUP_PADDING_REG;
 
-    return NSMakeRect(NSMinX(bounds) + PADDING_HORIZONTAL, ceil(NSMidY(bounds) - imageSize * 0.5), imageSize, imageSize);
+    return NSMakeRect(NSMinX(bounds) + (padding * 0.5) + PADDING_HORIZONTAL, ceil(NSMidY(bounds) - imageSize * 0.5), imageSize, imageSize);
+}
+
+- (NSRect)actionRectForBounds:(NSRect)bounds
+{
+    NSRect iconRect = [self iconRectForBounds:bounds];
+    NSRect actionRect = [self actionButtonRectForBounds:iconRect];
+
+    return actionRect;
 }
 
 - (NSCellHitResult)hitTestForEvent:(NSEvent*)event inRect:(NSRect)cellFrame ofView:(NSView*)controlView
@@ -271,7 +286,7 @@
     [controlView addTrackingArea:area];
 
     //action button
-    NSRect actionButtonRect = [self iconRectForBounds:cellFrame]; //use the whole icon
+    NSRect actionButtonRect = [self actionRectForBounds:cellFrame];
     NSTrackingAreaOptions actionOptions = options;
     if (NSMouseInRect(mouseLocation, actionButtonRect, controlView.flipped))
     {
@@ -296,34 +311,16 @@
     [self drawBar:minimal ? [self barRectMinForBounds:cellFrame] : [self barRectRegForBounds:cellFrame]];
 
     //group coloring
-    NSRect const iconRect = [self iconRectForBounds:cellFrame];
+    NSRect const parentRect = [self iconRectForBounds:cellFrame];
+    NSRect iconRect = NSMakeRect(parentRect.origin.x, parentRect.origin.y, parentRect.size.width, parentRect.size.height);
 
     NSInteger const groupValue = torrent.groupValue;
     if (groupValue != -1)
     {
-        NSRect groupRect = NSInsetRect(iconRect, -1.0, -2.0);
-        if (!minimal)
-        {
-            groupRect.size.height -= 1.0;
-            groupRect.origin.y -= 1.0;
-        }
-        CGFloat const radius = minimal ? 3.0 : 6.0;
-
-        NSColor *groupColor = [GroupsController.groups colorForIndex:groupValue],
-                *darkGroupColor = [groupColor blendedColorWithFraction:0.2 ofColor:NSColor.whiteColor];
-
-        //border
-        NSBezierPath* bp = [NSBezierPath bezierPathWithRoundedRect:groupRect xRadius:radius yRadius:radius];
-        [darkGroupColor set];
-        bp.lineWidth = 2.0;
-        [bp stroke];
-
-        //inside
-        bp = [NSBezierPath bezierPathWithRoundedRect:groupRect xRadius:radius yRadius:radius];
-        NSGradient* gradient = [[NSGradient alloc] initWithStartingColor:[groupColor blendedColorWithFraction:0.7
-                                                                                                      ofColor:NSColor.whiteColor]
-                                                             endingColor:darkGroupColor];
-        [gradient drawInBezierPath:bp angle:90.0];
+        NSRect groupRect = [self groupIconRectForBounds:iconRect];
+        NSColor* groupColor = [GroupsController.groups colorForIndex:groupValue];
+        NSImage* icon = [NSImage discIconWithColor:groupColor insetFactor:0];
+        [icon drawInRect:groupRect fromRect:NSZeroRect operation:NSCompositingOperationSourceOver fraction:1.0f];
     }
 
     BOOL const error = torrent.anyErrorOrWarning;
@@ -459,7 +456,7 @@
         if (!self.fTracking && self.hoverAction)
         {
             NSImage* actionImage = [NSImage imageNamed:@"ActionHover"];
-            [actionImage drawInRect:[self actionButtonRectForBounds:cellFrame] fromRect:NSZeroRect
+            [actionImage drawInRect:[self actionButtonRectForBounds:iconRect] fromRect:NSZeroRect
                           operation:NSCompositingOperationSourceOver
                            fraction:1.0
                      respectFlipped:YES
@@ -740,11 +737,13 @@
 
     if (minimal)
     {
+        result.origin.x += GROUP_PADDING_MIN;
         result.origin.y = ceil(NSMidY(bounds) - NSHeight(result) * 0.5);
         result.size.width = rightBound - NSMinX(result) - PADDING_BETWEEN_TITLE_AND_MIN_STATUS;
     }
     else
     {
+        result.origin.x += GROUP_PADDING_REG;
         result.origin.y = NSMinY(bounds) + PADDING_ABOVE_TITLE;
         result.size.width = rightBound - NSMinX(result) - PADDING_HORIZONTAL;
     }
@@ -762,7 +761,7 @@
 {
     NSRect result;
     result.origin.y = NSMinY(bounds) + PADDING_ABOVE_TITLE + HEIGHT_TITLE + PADDING_BETWEEN_TITLE_AND_PROGRESS;
-    result.origin.x = NSMinX(bounds) + PADDING_HORIZONTAL + IMAGE_SIZE_REG + PADDING_BETWEEN_IMAGE_AND_TITLE;
+    result.origin.x = NSMinX(bounds) + PADDING_HORIZONTAL + GROUP_PADDING_REG + IMAGE_SIZE_REG + PADDING_BETWEEN_IMAGE_AND_TITLE;
 
     result.size.height = HEIGHT_STATUS;
     result.size.width = NSMaxX(bounds) - NSMinX(result) - PADDING_HORIZONTAL;
@@ -775,7 +774,7 @@
     NSRect result;
     result.origin.y = NSMinY(bounds) + PADDING_ABOVE_TITLE + HEIGHT_TITLE + PADDING_BETWEEN_TITLE_AND_PROGRESS + HEIGHT_STATUS +
         PADDING_BETWEEN_PROGRESS_AND_BAR + BAR_HEIGHT + PADDING_BETWEEN_BAR_AND_STATUS;
-    result.origin.x = NSMinX(bounds) + PADDING_HORIZONTAL + IMAGE_SIZE_REG + PADDING_BETWEEN_IMAGE_AND_TITLE;
+    result.origin.x = NSMinX(bounds) + PADDING_HORIZONTAL + GROUP_PADDING_REG + IMAGE_SIZE_REG + PADDING_BETWEEN_IMAGE_AND_TITLE;
 
     result.size.height = HEIGHT_STATUS;
     result.size.width = NSMaxX(bounds) - NSMinX(result) - PADDING_HORIZONTAL;
@@ -787,7 +786,7 @@
 {
     NSRect result;
     result.size.height = BAR_HEIGHT;
-    result.origin.x = NSMinX(bounds) + PADDING_HORIZONTAL + IMAGE_SIZE_REG + PADDING_BETWEEN_IMAGE_AND_BAR;
+    result.origin.x = NSMinX(bounds) + PADDING_HORIZONTAL + GROUP_PADDING_REG + IMAGE_SIZE_REG + PADDING_BETWEEN_IMAGE_AND_BAR;
     result.origin.y = NSMinY(bounds) + PADDING_ABOVE_TITLE + HEIGHT_TITLE + PADDING_BETWEEN_TITLE_AND_PROGRESS + HEIGHT_STATUS +
         PADDING_BETWEEN_PROGRESS_AND_BAR;
 
@@ -799,7 +798,7 @@
 - (NSRect)barRectMinForBounds:(NSRect)bounds
 {
     NSRect result;
-    result.origin.x = NSMinX(bounds) + PADDING_HORIZONTAL + IMAGE_SIZE_MIN + PADDING_BETWEEN_IMAGE_AND_BAR;
+    result.origin.x = NSMinX(bounds) + PADDING_HORIZONTAL + IMAGE_SIZE_MIN + GROUP_PADDING_MIN + PADDING_BETWEEN_IMAGE_AND_BAR;
     result.origin.y = NSMinY(bounds) + PADDING_BETWEEN_BAR_AND_EDGE_MIN;
     result.size.height = NSHeight(bounds) - 2.0 * PADDING_BETWEEN_BAR_AND_EDGE_MIN;
     result.size.width = NSMaxX(bounds) - NSMinX(result) - PADDING_BETWEEN_BAR_AND_EDGE_MIN;
@@ -849,10 +848,16 @@
 
 - (NSRect)actionButtonRectForBounds:(NSRect)bounds
 {
-    NSRect const iconRect = [self iconRectForBounds:bounds];
+    return NSMakeRect(NSMidX(bounds) - ACTION_BUTTON_WIDTH * 0.5, NSMidY(bounds) - ACTION_BUTTON_WIDTH * 0.5, ACTION_BUTTON_WIDTH, ACTION_BUTTON_WIDTH);
+}
 
-    //in minimal view the rect will be the icon rect, but avoid the extra defaults lookup with some cheap math
-    return NSMakeRect(NSMidX(iconRect) - ACTION_BUTTON_WIDTH * 0.5, NSMidY(iconRect) - ACTION_BUTTON_WIDTH * 0.5, ACTION_BUTTON_WIDTH, ACTION_BUTTON_WIDTH);
+- (NSRect)groupIconRectForBounds:(NSRect)bounds
+{
+    BOOL const minimal = [self.fDefaults boolForKey:@"SmallView"];
+    CGFloat const imageSize = minimal ? GROUP_IMAGE_SIZE_MIN : GROUP_IMAGE_SIZE_REG;
+    CGFloat const padding = minimal ? GROUP_PADDING_MIN + 2 : GROUP_PADDING_REG + 1.5;
+
+    return NSMakeRect(NSMinX(bounds) - padding * 0.5, NSMidY(bounds) - imageSize * 0.5, imageSize, imageSize);
 }
 
 - (NSAttributedString*)attributedTitle

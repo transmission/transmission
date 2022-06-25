@@ -447,7 +447,7 @@
     <message>
         <location line="+78"/>
         <source>Added:</source>
-        <translation type="unfinished"></translation>
+        <translation>Tillagd:</translation>
     </message>
     <message>
         <location line="+14"/>

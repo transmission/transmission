@@ -25,7 +25,7 @@
 #include "error.h"
 #include "file.h"
 #include "log.h"
-#include "platform-quota.h" /* tr_device_info_get_disk_space() */
+#include "peer-mgr.h"
 #include "quark.h"
 #include "rpcimpl.h"
 #include "session-id.h"
@@ -488,6 +488,14 @@ static void initField(tr_torrent const* const tor, tr_stat const* const st, tr_v
 
     case TR_KEY_addedDate:
         tr_variantInitInt(initme, st->addedDate);
+        break;
+
+    case TR_KEY_availability:
+        tr_variantInitList(initme, tor->pieceCount());
+        for (tr_piece_index_t piece = 0, n = tor->pieceCount(); piece < n; ++piece)
+        {
+            tr_variantListAddInt(initme, tr_peerMgrPieceAvailability(tor, piece));
+        }
         break;
 
     case TR_KEY_bandwidthPriority:
@@ -971,7 +979,7 @@ static char const* setLabels(tr_torrent* tor, tr_variant* list)
         return errmsg;
     }
 
-    tor->setLabels(std::data(labels), std::size(labels));
+    tor->setLabels(labels);
     return nullptr;
 }
 
@@ -1682,12 +1690,13 @@ static char const* torrentAdd(tr_session* session, tr_variant* args_in, tr_varia
         }
         else
         {
-            // these two tr_ctorSet*() functions require zero-terminated strings
-            auto const filename_sz = std::string{ filename };
-
-            if (!tr_ctorSetMetainfoFromFile(ctor, filename_sz.c_str(), nullptr))
+            if (tr_sys_path_exists(tr_pathbuf{ filename }))
             {
-                tr_ctorSetMetainfoFromMagnetLink(ctor, filename_sz.c_str(), nullptr);
+                tr_ctorSetMetainfoFromFile(ctor, filename);
+            }
+            else
+            {
+                tr_ctorSetMetainfoFromMagnetLink(ctor, filename);
             }
         }
 
@@ -2112,7 +2121,7 @@ static constexpr std::string_view getEncryptionModeString(tr_encryption_mode mod
     }
 }
 
-static void addSessionField(tr_session* s, tr_variant* d, tr_quark key)
+static void addSessionField(tr_session const* s, tr_variant* d, tr_quark key)
 {
     switch (key)
     {
@@ -2293,27 +2302,27 @@ static void addSessionField(tr_session* s, tr_variant* d, tr_quark key)
         break;
 
     case TR_KEY_script_torrent_added_filename:
-        tr_variantDictAddStr(d, key, tr_sessionGetScript(s, TR_SCRIPT_ON_TORRENT_ADDED));
+        tr_variantDictAddStr(d, key, s->script(TR_SCRIPT_ON_TORRENT_ADDED));
         break;
 
     case TR_KEY_script_torrent_added_enabled:
-        tr_variantDictAddBool(d, key, tr_sessionIsScriptEnabled(s, TR_SCRIPT_ON_TORRENT_ADDED));
+        tr_variantDictAddBool(d, key, s->useScript(TR_SCRIPT_ON_TORRENT_ADDED));
         break;
 
     case TR_KEY_script_torrent_done_filename:
-        tr_variantDictAddStr(d, key, tr_sessionGetScript(s, TR_SCRIPT_ON_TORRENT_DONE));
+        tr_variantDictAddStr(d, key, s->script(TR_SCRIPT_ON_TORRENT_DONE));
         break;
 
     case TR_KEY_script_torrent_done_enabled:
-        tr_variantDictAddBool(d, key, tr_sessionIsScriptEnabled(s, TR_SCRIPT_ON_TORRENT_DONE));
+        tr_variantDictAddBool(d, key, s->useScript(TR_SCRIPT_ON_TORRENT_DONE));
         break;
 
     case TR_KEY_script_torrent_done_seeding_filename:
-        tr_variantDictAddStr(d, key, tr_sessionGetScript(s, TR_SCRIPT_ON_TORRENT_DONE_SEEDING));
+        tr_variantDictAddStr(d, key, s->script(TR_SCRIPT_ON_TORRENT_DONE_SEEDING));
         break;
 
     case TR_KEY_script_torrent_done_seeding_enabled:
-        tr_variantDictAddBool(d, key, tr_sessionIsScriptEnabled(s, TR_SCRIPT_ON_TORRENT_DONE_SEEDING));
+        tr_variantDictAddBool(d, key, s->useScript(TR_SCRIPT_ON_TORRENT_DONE_SEEDING));
         break;
 
     case TR_KEY_queue_stalled_enabled:

@@ -19,7 +19,7 @@ public:
 
     void setShowBackupTrackers(bool);
 
-    bool showBackupTrackers() const
+    [[nodiscard]] constexpr auto showBackupTrackers() const noexcept
     {
         return show_backups_;
     }

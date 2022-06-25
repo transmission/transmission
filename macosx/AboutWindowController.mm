@@ -38,9 +38,12 @@ AboutWindowController* fAboutBoxInstance = nil;
     self.fCopyrightField.stringValue = [NSBundle.mainBundle localizedStringForKey:@"NSHumanReadableCopyright" value:nil
                                                                             table:@"InfoPlist"];
 
-    [self.fTextView.textStorage
-        setAttributedString:[[NSAttributedString alloc] initWithPath:[NSBundle.mainBundle pathForResource:@"Credits" ofType:@"rtf"]
-                                                  documentAttributes:nil]];
+    NSAttributedString* credits = [[NSAttributedString alloc]
+               initWithURL:[NSBundle.mainBundle URLForResource:@"Credits" withExtension:@"rtf"]
+                   options:@{ NSDocumentTypeDocumentAttribute : NSRTFTextDocumentType }
+        documentAttributes:nil
+                     error:nil];
+    [self.fTextView.textStorage setAttributedString:credits];
 
     //size license button
     CGFloat const oldButtonWidth = NSWidth(self.fLicenseButton.frame);

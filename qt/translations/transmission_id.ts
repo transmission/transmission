@@ -11,7 +11,7 @@
     <message>
         <location line="+39"/>
         <source>Copyright © The Transmission Project</source>
-        <translation type="unfinished"></translation>
+        <translation>Hak Cipta © Proyek Transmission</translation>
     </message>
     <message>
         <location line="-10"/>
@@ -21,12 +21,12 @@
     <message>
         <location filename="../AboutDialog.cc" line="+37"/>
         <source>Client</source>
-        <translation type="unfinished">Klien</translation>
+        <translation>Klien</translation>
     </message>
     <message>
         <location line="+2"/>
         <source>Server</source>
-        <translation type="unfinished"></translation>
+        <translation>Server</translation>
     </message>
     <message>
         <location line="+4"/>
@@ -64,7 +64,7 @@
     <message>
         <location line="+132"/>
         <source>Torrent Added</source>
-        <translation type="unfinished"></translation>
+        <translation>Torrent Ditambahkan</translation>
     </message>
     <message numerus="yes">
         <location line="-29"/>
@@ -105,7 +105,7 @@
     <message>
         <location line="+109"/>
         <source>%1 (+%2 discarded after failed checksum)</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 (+%2 dibuang setelah checksum gagal)</translation>
     </message>
     <message>
         <location line="+135"/>
@@ -223,12 +223,12 @@
     <message>
         <location line="+35"/>
         <source>Add URL(s) </source>
-        <translation type="unfinished"></translation>
+        <translation>Tambah URL</translation>
     </message>
     <message>
         <location line="+1"/>
         <source>Add tracker announce URLs, one per line:</source>
-        <translation type="unfinished"></translation>
+        <translation>Tambah URL pengumuman pelacak, satu per baris:</translation>
     </message>
     <message>
         <location line="+27"/>
@@ -238,7 +238,7 @@
     <message>
         <location line="+0"/>
         <source>No new URLs found.</source>
-        <translation type="unfinished"></translation>
+        <translation>Tidak ditemukan URL baru.</translation>
     </message>
     <message>
         <location line="-832"/>
@@ -423,7 +423,7 @@
     <message>
         <location line="+124"/>
         <source>Edit Trackers</source>
-        <translation type="unfinished"></translation>
+        <translation>Sunting Pelacak</translation>
     </message>
     <message>
         <location line="-190"/>
@@ -443,7 +443,7 @@
     <message>
         <location line="+78"/>
         <source>Added:</source>
-        <translation type="unfinished"></translation>
+        <translation>Ditambahkan:</translation>
     </message>
     <message>
         <location line="+14"/>
@@ -899,12 +899,12 @@
     <message>
         <location line="-132"/>
         <source>Options</source>
-        <translation type="unfinished">Opsi</translation>
+        <translation>Opsi</translation>
     </message>
     <message>
         <location line="+83"/>
         <source>Statistics</source>
-        <translation type="unfinished">Statistik</translation>
+        <translation>Statistik</translation>
     </message>
     <message>
         <location line="+171"/>
@@ -1501,7 +1501,7 @@ Untuk menambahkan URL utama, tambahkan setelah baris kosong.</translation>
     <message>
         <location line="+14"/>
         <source>&amp;Source:</source>
-        <translation type="unfinished">&amp;Sumber:</translation>
+        <translation>&amp;Sumber:</translation>
     </message>
     <message>
         <location line="+14"/>
@@ -1744,7 +1744,7 @@ Untuk menambahkan URL utama, tambahkan setelah baris kosong.</translation>
     <message>
         <location line="+159"/>
         <source>Select &quot;Torrent Done Downloading&quot; Script</source>
-        <translation type="unfinished"></translation>
+        <translation>Pilih Skrip &quot;Torrent Selesai Diunduh&quot;</translation>
     </message>
     <message>
         <location filename="../PrefsDialog.ui" line="+545"/>
@@ -1793,7 +1793,7 @@ Untuk menambahkan URL utama, tambahkan setelah baris kosong.</translation>
     <message>
         <location line="+10"/>
         <source>Select &quot;Torrent Done Seeding&quot; Script</source>
-        <translation type="unfinished"></translation>
+        <translation>Pilih Skrip &quot;Torrent Selesai Dibibit&quot;</translation>
     </message>
     <message numerus="yes">
         <location line="+19"/>
@@ -2001,32 +2001,32 @@ Untuk menambahkan URL utama, tambahkan setelah baris kosong.</translation>
     <message>
         <location line="+186"/>
         <source>Reads user clipboard content for torrents</source>
-        <translation type="unfinished"></translation>
+        <translation>Membaca isi papan klip pengguna bagi torrent</translation>
     </message>
     <message>
         <location line="+3"/>
         <source>Detect new torrents from clipboard</source>
-        <translation type="unfinished"></translation>
+        <translation>Deteksi torrent baru dari papan klip</translation>
     </message>
     <message>
         <location line="+148"/>
         <source>Call scrip&amp;t when downloading is completed:</source>
-        <translation type="unfinished"></translation>
+        <translation>Panggil skrip ke&amp;tika pengunduhan selesai:</translation>
     </message>
     <message>
         <location line="+105"/>
         <source>Call scrip&amp;t when seeding is completed:</source>
-        <translation type="unfinished"></translation>
+        <translation>Panggil skrip ke&amp;tika pembibitan selesai:</translation>
     </message>
     <message>
         <location line="+406"/>
         <source>Default Public Trackers</source>
-        <translation type="unfinished"></translation>
+        <translation>Pelacak Publik Baku</translation>
     </message>
     <message>
         <location line="+12"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Trackers to use on all public torrents.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;To add a backup URL, add it on the next line after a primary URL.&lt;/p&gt;&lt;p&gt;To add a new primary URL, add it after a blank line.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Pelacak yang akan dipakai pada semua torrent publik.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;Untuk menambahkan sebuah URL backup, tambahkan itu pada baris berikutnya setelah suatu URL primer.&lt;/p&gt;&lt;p&gt;Untuk menambahkan suatu URL primer baru, tambahkan itu setelah satu baris kosong.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location line="+60"/>
@@ -2185,7 +2185,7 @@ Untuk menambahkan URL utama, tambahkan setelah baris kosong.</translation>
     <message>
         <location line="+305"/>
         <source>Start Now</source>
-        <translation type="unfinished"></translation>
+        <translation>Mulai Sekarang</translation>
     </message>
 </context>
 <context>
@@ -2241,20 +2241,20 @@ Untuk menambahkan URL utama, tambahkan setelah baris kosong.</translation>
     <message>
         <location line="+57"/>
         <source>%1 (copy of %2)</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 (salinan dari %2)</translation>
     </message>
     <message numerus="yes">
         <location line="+6"/>
         <source>Duplicate Torrent(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Torrent Duplikat</numerusform>
         </translation>
     </message>
     <message numerus="yes">
         <location line="+2"/>
         <source>Unable to add %n duplicate torrent(s)</source>
-        <translation type="unfinished">
-            <numerusform></numerusform>
+        <translation>
+            <numerusform>Tak bisa menambahkan %n torrent duplikat</numerusform>
         </translation>
     </message>
 </context>
@@ -2619,27 +2619,27 @@ Untuk menambahkan URL utama, tambahkan setelah baris kosong.</translation>
     <message>
         <location filename="../TrackersDialog.ui" line="+17"/>
         <source>Edit Trackers</source>
-        <translation type="unfinished"></translation>
+        <translation>Sunting Pelacak</translation>
     </message>
     <message>
         <location line="+9"/>
         <source>Tracker Announce URLs</source>
-        <translation type="unfinished"></translation>
+        <translation>URL Pengumuman Pelacak</translation>
     </message>
     <message>
         <location line="+12"/>
         <source>To add a new primary URL, add it after a blank line.</source>
-        <translation type="unfinished"></translation>
+        <translation>Untuk menambahkan sebuah URL primer baru, tambahkan itu setelah satu baris kosong.</translation>
     </message>
     <message>
         <location line="+14"/>
         <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;To add a backup URL, add it on the next line after a primary URL.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Untuk menambahkan suatu URL backup, tambahkan itu pada baris selanjutnya setelah URL primer.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
         <location line="+7"/>
         <source>Also see Default Public Trackers in Edit &gt; Preferences &gt; Network</source>
-        <translation type="unfinished"></translation>
+        <translation>Lihat juga Pelacak Publik Baku dalam Sunting &gt; Preferensi &gt; Jaringan</translation>
     </message>
 </context>
 </TS>

@@ -137,17 +137,17 @@ public:
         }
     }
 
-    bool operator==(TorrentHash const& that) const
+    [[nodiscard]] auto operator==(TorrentHash const& that) const
     {
         return data_ == that.data_;
     }
 
-    bool operator!=(TorrentHash const& that) const
+    [[nodiscard]] auto operator!=(TorrentHash const& that) const
     {
         return data_ != that.data_;
     }
 
-    bool operator<(TorrentHash const& that) const
+    [[nodiscard]] auto operator<(TorrentHash const& that) const
     {
         return data_ < that.data_;
     }
@@ -166,17 +166,17 @@ class Torrent : public QObject
 public:
     Torrent(Prefs const&, int id);
 
-    int getBandwidthPriority() const
+    [[nodiscard]] constexpr auto getBandwidthPriority() const noexcept
     {
         return bandwidth_priority_;
     }
 
-    int id() const
+    [[nodiscard]] constexpr auto id() const noexcept
     {
         return id_;
     }
 
-    QString const& name() const
+    [[nodiscard]] constexpr auto const& name() const noexcept
     {
         return name_;
     }
@@ -186,106 +186,121 @@ public:
         return !name_.isEmpty();
     }
 
-    QString const& creator() const
+    [[nodiscard]] constexpr auto const& creator() const noexcept
     {
         return creator_;
     }
 
-    QString const& comment() const
+    [[nodiscard]] constexpr auto const& comment() const noexcept
     {
         return comment_;
     }
 
-    QString const& getPath() const
+    [[nodiscard]] constexpr auto const& getPath() const noexcept
     {
         return download_dir_;
     }
 
     QString getError() const;
 
-    QString trackerList() const
+    [[nodiscard]] constexpr auto const& trackerList() const noexcept
     {
         return tracker_list_;
     }
 
-    TorrentHash const& hash() const
+    [[nodiscard]] constexpr auto const& hash() const noexcept
     {
         return hash_;
     }
 
-    bool hasError() const
+    [[nodiscard]] constexpr auto hasError() const noexcept
     {
         return error_ != TR_STAT_OK;
     }
 
-    bool isDone() const
+    [[nodiscard]] constexpr auto leftUntilDone() const noexcept
+    {
+        return left_until_done_;
+    }
+
+    [[nodiscard]] constexpr auto isDone() const noexcept
     {
         return leftUntilDone() == 0;
     }
 
-    bool isSeed() const
+    [[nodiscard]] constexpr auto haveVerified() const noexcept
+    {
+        return have_verified_;
+    }
+
+    [[nodiscard]] constexpr auto totalSize() const noexcept
+    {
+        return total_size_;
+    }
+
+    [[nodiscard]] constexpr auto isSeed() const noexcept
     {
         return haveVerified() >= totalSize();
     }
 
-    bool isPrivate() const
+    [[nodiscard]] constexpr auto isPrivate() const noexcept
     {
         return is_private_;
     }
 
     std::optional<double> getSeedRatioLimit() const;
 
-    uint64_t haveVerified() const
-    {
-        return have_verified_;
-    }
-
-    uint64_t haveUnverified() const
+    [[nodiscard]] constexpr auto haveUnverified() const noexcept
     {
         return have_unchecked_;
     }
 
-    uint64_t desiredAvailable() const
+    [[nodiscard]] constexpr auto desiredAvailable() const noexcept
     {
         return desired_available_;
     }
 
-    uint64_t haveTotal() const
+    [[nodiscard]] constexpr auto haveTotal() const noexcept
     {
         return haveVerified() + haveUnverified();
     }
 
-    uint64_t totalSize() const
-    {
-        return total_size_;
-    }
-
-    uint64_t sizeWhenDone() const
+    [[nodiscard]] constexpr auto sizeWhenDone() const noexcept
     {
         return size_when_done_;
     }
 
-    uint64_t leftUntilDone() const
-    {
-        return left_until_done_;
-    }
-
-    uint64_t pieceSize() const
+    [[nodiscard]] constexpr auto pieceSize() const noexcept
     {
         return piece_size_;
     }
 
-    bool hasMetadata() const
+    [[nodiscard]] constexpr auto metadataPercentDone() const noexcept
+    {
+        return metadata_percent_complete_;
+    }
+
+    [[nodiscard]] constexpr auto hasMetadata() const noexcept
     {
         return metadataPercentDone() >= 1.0;
     }
 
-    int pieceCount() const
+    [[nodiscard]] constexpr auto pieceCount() const noexcept
     {
         return piece_count_;
     }
 
-    double ratio() const
+    [[nodiscard]] constexpr auto downloadedEver() const noexcept
+    {
+        return downloaded_ever_;
+    }
+
+    [[nodiscard]] constexpr auto uploadedEver() const noexcept
+    {
+        return uploaded_ever_;
+    }
+
+    [[nodiscard]] constexpr auto ratio() const noexcept
     {
         auto const u = uploadedEver();
         auto const d = downloadedEver();
@@ -293,34 +308,19 @@ public:
         return double(u) / (d ? d : t);
     }
 
-    double percentComplete() const
+    [[nodiscard]] constexpr double percentComplete() const noexcept
     {
         return totalSize() != 0 ? haveTotal() / static_cast<double>(totalSize()) : 0;
     }
 
-    double percentDone() const
+    [[nodiscard]] constexpr double percentDone() const noexcept
     {
         auto const l = leftUntilDone();
         auto const s = sizeWhenDone();
         return s ? static_cast<double>(s - l) / static_cast<double>(s) : 0.0;
     }
 
-    double metadataPercentDone() const
-    {
-        return metadata_percent_complete_;
-    }
-
-    uint64_t downloadedEver() const
-    {
-        return downloaded_ever_;
-    }
-
-    uint64_t uploadedEver() const
-    {
-        return uploaded_ever_;
-    }
-
-    uint64_t failedEver() const
+    [[nodiscard]] constexpr auto failedEver() const noexcept
     {
         return failed_ever_;
     }
@@ -329,233 +329,233 @@ public:
     int compareRatio(Torrent const&) const;
     int compareETA(Torrent const&) const;
 
-    bool hasETA() const
-    {
-        return getETA() >= 0;
-    }
-
-    int getETA() const
+    [[nodiscard]] constexpr auto getETA() const noexcept
     {
         return eta_;
     }
 
-    time_t lastActivity() const
+    [[nodiscard]] constexpr auto hasETA() const noexcept
+    {
+        return getETA() >= 0;
+    }
+
+    [[nodiscard]] constexpr auto lastActivity() const noexcept
     {
         return activity_date_;
     }
 
-    time_t lastStarted() const
+    [[nodiscard]] constexpr auto lastStarted() const noexcept
     {
         return start_date_;
     }
 
-    time_t dateAdded() const
+    [[nodiscard]] constexpr auto dateAdded() const noexcept
     {
         return added_date_;
     }
 
-    time_t dateCreated() const
+    [[nodiscard]] constexpr auto dateCreated() const noexcept
     {
         return date_created_;
     }
 
-    time_t dateEdited() const
+    [[nodiscard]] constexpr auto dateEdited() const noexcept
     {
         return edit_date_;
     }
 
-    time_t manualAnnounceTime() const
+    [[nodiscard]] constexpr auto manualAnnounceTime() const noexcept
     {
         return manual_announce_time_;
     }
 
-    bool canManualAnnounceAt(time_t t) const
-    {
-        return isReadyToTransfer() && (manualAnnounceTime() <= t);
-    }
-
-    int peersWeAreDownloadingFrom() const
+    [[nodiscard]] constexpr auto peersWeAreDownloadingFrom() const noexcept
     {
         return peers_sending_to_us_;
     }
 
-    int webseedsWeAreDownloadingFrom() const
+    [[nodiscard]] constexpr auto webseedsWeAreDownloadingFrom() const noexcept
     {
         return webseeds_sending_to_us_;
     }
 
-    int peersWeAreUploadingTo() const
+    [[nodiscard]] constexpr auto peersWeAreUploadingTo() const noexcept
     {
         return peers_getting_from_us_;
     }
 
-    bool isUploading() const
+    [[nodiscard]] constexpr auto isUploading() const noexcept
     {
         return peersWeAreUploadingTo() > 0;
     }
 
-    int connectedPeers() const
+    [[nodiscard]] constexpr auto connectedPeers() const noexcept
     {
         return peers_connected_;
     }
 
-    int connectedPeersAndWebseeds() const
+    [[nodiscard]] constexpr auto connectedPeersAndWebseeds() const noexcept
     {
         return connectedPeers() + webseedsWeAreDownloadingFrom();
     }
 
-    Speed const& downloadSpeed() const
+    [[nodiscard]] constexpr auto const& downloadSpeed() const noexcept
     {
         return download_speed_;
     }
 
-    Speed const& uploadSpeed() const
+    [[nodiscard]] constexpr auto const& uploadSpeed() const noexcept
     {
         return upload_speed_;
     }
 
-    double getVerifyProgress() const
+    [[nodiscard]] constexpr auto getVerifyProgress() const noexcept
     {
         return recheck_progress_;
     }
 
     bool includesTracker(QString const& sitename) const;
 
-    std::vector<QString> const& sitenames() const
+    [[nodiscard]] constexpr auto const& sitenames() const noexcept
     {
         return sitenames_;
     }
 
-    Speed uploadLimit() const
+    [[nodiscard]] Speed uploadLimit() const
     {
         return Speed::fromKBps(upload_limit_);
     }
 
-    Speed downloadLimit() const
+    [[nodiscard]] Speed downloadLimit() const
     {
         return Speed::fromKBps(download_limit_);
     }
 
-    bool uploadIsLimited() const
+    [[nodiscard]] constexpr auto uploadIsLimited() const noexcept
     {
         return upload_limited_;
     }
 
-    bool downloadIsLimited() const
+    [[nodiscard]] constexpr auto downloadIsLimited() const noexcept
     {
         return download_limited_;
     }
 
-    bool honorsSessionLimits() const
+    [[nodiscard]] constexpr auto honorsSessionLimits() const noexcept
     {
         return honors_session_limits_;
     }
 
-    int peerLimit() const
+    [[nodiscard]] constexpr auto peerLimit() const noexcept
     {
         return peer_limit_;
     }
 
-    double seedRatioLimit() const
+    [[nodiscard]] constexpr auto seedRatioLimit() const noexcept
     {
         return seed_ratio_limit_;
     }
 
-    tr_ratiolimit seedRatioMode() const
+    [[nodiscard]] constexpr auto seedRatioMode() const noexcept
     {
         return static_cast<tr_ratiolimit>(seed_ratio_mode_);
     }
 
-    int seedIdleLimit() const
+    [[nodiscard]] constexpr auto seedIdleLimit() const noexcept
     {
         return seed_idle_limit_;
     }
 
-    tr_idlelimit seedIdleMode() const
+    [[nodiscard]] constexpr auto seedIdleMode() const noexcept
     {
         return static_cast<tr_idlelimit>(seed_idle_mode_);
     }
 
-    TrackerStatsList const& trackerStats() const
+    [[nodiscard]] constexpr auto const& trackerStats() const noexcept
     {
         return tracker_stats_;
     }
 
-    PeerList const& peers() const
+    [[nodiscard]] constexpr auto const& peers() const noexcept
     {
         return peers_;
     }
 
-    FileList const& files() const
+    [[nodiscard]] constexpr auto const& files() const noexcept
     {
         return files_;
     }
 
-    int queuePosition() const
+    [[nodiscard]] auto constexpr queuePosition() const noexcept
     {
         return queue_position_;
     }
 
-    bool isStalled() const
+    [[nodiscard]] auto constexpr isStalled() const noexcept
     {
         return is_stalled_;
     }
 
     QString activityString() const;
 
-    tr_torrent_activity getActivity() const
+    [[nodiscard]] auto constexpr getActivity() const noexcept
     {
         return static_cast<tr_torrent_activity>(status_);
     }
 
-    bool isFinished() const
+    [[nodiscard]] auto constexpr isFinished() const noexcept
     {
         return is_finished_;
     }
 
-    bool isPaused() const
+    [[nodiscard]] auto constexpr isPaused() const noexcept
     {
         return getActivity() == TR_STATUS_STOPPED;
     }
 
-    bool isWaitingToVerify() const
+    [[nodiscard]] auto constexpr isWaitingToVerify() const noexcept
     {
         return getActivity() == TR_STATUS_CHECK_WAIT;
     }
 
-    bool isVerifying() const
+    [[nodiscard]] auto constexpr isVerifying() const noexcept
     {
         return getActivity() == TR_STATUS_CHECK;
     }
 
-    bool isDownloading() const
+    [[nodiscard]] auto constexpr isDownloading() const noexcept
     {
         return getActivity() == TR_STATUS_DOWNLOAD;
     }
 
-    bool isWaitingToDownload() const
+    [[nodiscard]] auto constexpr isWaitingToDownload() const noexcept
     {
         return getActivity() == TR_STATUS_DOWNLOAD_WAIT;
     }
 
-    bool isSeeding() const
+    [[nodiscard]] auto constexpr isSeeding() const noexcept
     {
         return getActivity() == TR_STATUS_SEED;
     }
 
-    bool isWaitingToSeed() const
+    [[nodiscard]] auto constexpr isWaitingToSeed() const noexcept
     {
         return getActivity() == TR_STATUS_SEED_WAIT;
     }
 
-    bool isReadyToTransfer() const
+    [[nodiscard]] auto constexpr isReadyToTransfer() const noexcept
     {
         return getActivity() == TR_STATUS_DOWNLOAD || getActivity() == TR_STATUS_SEED;
     }
 
-    bool isQueued() const
+    [[nodiscard]] auto constexpr isQueued() const noexcept
     {
         return isWaitingToDownload() || isWaitingToSeed();
+    }
+
+    [[nodiscard]] auto constexpr canManualAnnounceAt(time_t t) const noexcept
+    {
+        return isReadyToTransfer() && (manualAnnounceTime() <= t);
     }
 
     QIcon getMimeTypeIcon() const;
@@ -627,7 +627,7 @@ public:
     fields_t update(tr_quark const* keys, tr_variant const* const* values, size_t n);
 
 private:
-    int const id_;
+    tr_torrent_id_t const id_;
 
     bool download_limited_ = {};
     bool honors_session_limits_ = {};

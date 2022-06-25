@@ -106,6 +106,9 @@
     self.fNameField.stringValue = name;
     self.fNameField.toolTip = name;
 
+    //disable fullscreen support
+    [self.window setCollectionBehavior:NSWindowCollectionBehaviorFullScreenNone];
+
     self.fIconView.image = self.torrent.icon;
 
     if (!self.torrent.folder)
