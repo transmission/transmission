@@ -8,6 +8,7 @@
 #import "PiecesView.h"
 #import "Torrent.h"
 #import "InfoWindowController.h"
+#import "NSApplicationAdditions.h"
 
 #define MAX_ACROSS 18
 #define BETWEEN 1.0
@@ -27,9 +28,6 @@ enum
 
 @property(nonatomic) int8_t* fPieces;
 
-@property(nonatomic) NSColor* fGreenAvailabilityColor;
-@property(nonatomic) NSColor* fBluePieceColor;
-
 @property(nonatomic) NSInteger fNumPieces;
 @property(nonatomic) NSInteger fAcross;
 @property(nonatomic) NSInteger fWidth;
@@ -39,14 +37,22 @@ enum
 
 @implementation PiecesView
 
+- (void)drawRect:(NSRect)dirtyRect
+{
+    [[NSColor.controlTextColor colorWithAlphaComponent:0.2] setFill];
+    NSRectFill(dirtyRect);
+    [super drawRect:dirtyRect];
+}
+
 - (void)awakeFromNib
 {
-    //store box colors
-    self.fGreenAvailabilityColor = [NSColor colorWithCalibratedRed:0.0 green:1.0 blue:0.4 alpha:1.0];
-    self.fBluePieceColor = [NSColor colorWithCalibratedRed:0.0 green:0.4 blue:0.8 alpha:1.0];
-
-    //actually draw the box
     self.torrent = nil;
+}
+
+- (void)viewDidChangeEffectiveAppearance
+{
+    [self setTorrent:_torrent];
+    [self updateView];
 }
 
 - (void)dealloc
@@ -71,13 +77,6 @@ enum
     }
 
     NSImage* back = [[NSImage alloc] initWithSize:self.bounds.size];
-    [back lockFocus];
-
-    NSGradient* gradient = [[NSGradient alloc] initWithStartingColor:[NSColor colorWithCalibratedWhite:0.0 alpha:0.4]
-                                                         endingColor:[NSColor colorWithCalibratedWhite:0.2 alpha:0.4]];
-    [gradient drawInRect:self.bounds angle:90.0];
-    [back unlockFocus];
-
     self.image = back;
 
     [self setNeedsDisplay];
@@ -123,6 +122,8 @@ enum
     NSRect fillRects[self.fNumPieces];
     NSColor* fillColors[self.fNumPieces];
 
+    NSColor* defaultColor = [NSApp isDarkMode] ? NSColor.blackColor : NSColor.whiteColor;
+
     NSInteger usedCount = 0;
 
     for (NSInteger index = 0; index < self.fNumPieces; index++)
@@ -135,12 +136,12 @@ enum
             {
                 if (!first && self.fPieces[index] != PIECE_FLASHING)
                 {
-                    pieceColor = NSColor.orangeColor;
+                    pieceColor = NSColor.systemOrangeColor;
                     self.fPieces[index] = PIECE_FLASHING;
                 }
                 else
                 {
-                    pieceColor = self.fBluePieceColor;
+                    pieceColor = NSColor.systemBlueColor;
                     self.fPieces[index] = PIECE_FINISHED;
                 }
             }
@@ -149,7 +150,7 @@ enum
         {
             if (first || self.fPieces[index] != PIECE_NONE)
             {
-                pieceColor = NSColor.whiteColor;
+                pieceColor = defaultColor;
                 self.fPieces[index] = PIECE_NONE;
             }
         }
@@ -157,7 +158,7 @@ enum
         {
             if (first || self.fPieces[index] != PIECE_HIGH_PEERS)
             {
-                pieceColor = self.fGreenAvailabilityColor;
+                pieceColor = NSColor.systemGreenColor;
                 self.fPieces[index] = PIECE_HIGH_PEERS;
             }
         }
@@ -165,8 +166,8 @@ enum
         {
             //always redraw "mixed"
             CGFloat percent = showAvailability ? (CGFloat)pieces[index] / HIGH_PEERS : piecesPercent[index];
-            NSColor* fullColor = showAvailability ? self.fGreenAvailabilityColor : self.fBluePieceColor;
-            pieceColor = [NSColor.whiteColor blendedColorWithFraction:percent ofColor:fullColor];
+            NSColor* fullColor = showAvailability ? NSColor.systemGreenColor : NSColor.systemBlueColor;
+            pieceColor = [defaultColor blendedColorWithFraction:percent ofColor:fullColor];
             self.fPieces[index] = PIECE_SOME;
         }
 
