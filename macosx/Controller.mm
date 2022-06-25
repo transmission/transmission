@@ -40,6 +40,7 @@
 #import "GroupToolbarItem.h"
 #import "ShareToolbarItem.h"
 #import "ShareTorrentFileHelper.h"
+#import "Toolbar.h"
 #import "ToolbarSegmentedCell.h"
 #import "BlocklistDownloader.h"
 #import "StatusBarController.h"
@@ -555,7 +556,7 @@ static void removeKeRangerRansomware()
 
 - (void)awakeFromNib
 {
-    NSToolbar* toolbar = [[NSToolbar alloc] initWithIdentifier:@"TRMainToolbar"];
+    Toolbar* toolbar = [[Toolbar alloc] initWithIdentifier:@"TRMainToolbar"];
     toolbar.delegate = self;
     toolbar.allowsUserCustomization = YES;
     toolbar.autosavesConfiguration = YES;
@@ -751,6 +752,8 @@ static void removeKeRangerRansomware()
 
     [nc addObserver:self selector:@selector(applyFilter) name:@"UpdateGroups" object:nil];
 
+    [nc addObserver:self selector:@selector(updateWindowAfterToolbarChange) name:@"ToolbarDidChange" object:nil];
+
     [self updateMainWindow];
 
     //timer to update the interface every second
@@ -767,9 +770,6 @@ static void removeKeRangerRansomware()
     {
         [self showInfo:nil];
     }
-
-    //redraw filterbar to avoid clipping
-    [NSNotificationCenter.defaultCenter postNotificationName:@"ResizeBar" object:nil];
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification*)notification
@@ -1111,9 +1111,18 @@ static void removeKeRangerRansomware()
             continue;
         }
 
-        if (tr_torrentFindFromMetainfo(self.fLib, &metainfo) != nullptr) // dupe torrent
+        auto foundTorrent = tr_torrentFindFromMetainfo(self.fLib, &metainfo);
+        if (foundTorrent != nullptr) // dupe torrent
         {
-            [self duplicateOpenAlert:@(metainfo.name().c_str())];
+            if (tr_torrentHasMetadata(foundTorrent))
+            {
+                [self duplicateOpenAlert:@(metainfo.name().c_str())];
+            }
+            // foundTorrent is a magnet, fill it with file's metainfo
+            else if (!tr_torrentSetMetainfoFromFile(foundTorrent, &metainfo, torrentPath.UTF8String))
+            {
+                [self duplicateOpenAlert:@(metainfo.name().c_str())];
+            }
             continue;
         }
 
@@ -3564,16 +3573,8 @@ static void removeKeRangerRansomware()
     NSPasteboard* pasteboard = info.draggingPasteboard;
     if ([pasteboard.types containsObject:TORRENT_TABLE_VIEW_DATA_TYPE])
     {
-        NSIndexSet* indexes;
-        if (@available(macOS 10.13, *))
-        {
-            indexes = [NSKeyedUnarchiver unarchivedObjectOfClass:NSIndexSet.class fromData:[pasteboard dataForType:TORRENT_TABLE_VIEW_DATA_TYPE]
-                                                           error:nil];
-        }
-        else
-        {
-            indexes = [NSKeyedUnarchiver unarchiveObjectWithData:[pasteboard dataForType:TORRENT_TABLE_VIEW_DATA_TYPE]];
-        }
+        NSIndexSet* indexes = [NSKeyedUnarchiver unarchivedObjectOfClass:NSIndexSet.class fromData:[pasteboard dataForType:TORRENT_TABLE_VIEW_DATA_TYPE]
+                                                                   error:nil];
 
         //get the torrents to move
         NSMutableArray* movingTorrents = [NSMutableArray arrayWithCapacity:indexes.count];
@@ -4947,7 +4948,7 @@ static void removeKeRangerRansomware()
         [self.fStackView insertArrangedSubview:self.fFilterBar.view atIndex:idx];
 
         NSDictionary* views = @{ @"fFilterBar" : self.fFilterBar.view };
-        [self.fStackView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[fFilterBar(==21)]" options:0
+        [self.fStackView addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:[fFilterBar(==23)]" options:0
                                                                                 metrics:nil
                                                                                   views:views]];
 
@@ -4972,33 +4973,37 @@ static void removeKeRangerRansomware()
 {
     if (!self.isFullScreen)
     {
+        NSScrollView* scrollView = self.fTableView.enclosingScrollView;
+
+        scrollView.hasVerticalScroller = NO;
+
+        [self removeStackViewHeightConstraints];
+
+        NSDictionary* views = @{ @"scrollView" : scrollView };
+
         if (![self.fDefaults boolForKey:@"AutoSize"])
         {
-            [self removeWindowMinMax];
-        }
-        else
-        {
-            NSScrollView* scrollView = self.fTableView.enclosingScrollView;
-
-            scrollView.hasVerticalScroller = NO;
-
-            [self removeStackViewHeightConstraints];
-
-            //update height constraints
-            NSDictionary* views = @{ @"scrollView" : scrollView };
-            CGFloat height = self.scrollViewHeight;
-            NSString* constraintsString = [NSString stringWithFormat:@"V:[scrollView(==%f)]", height];
-
-            //add height constraint
+            //only set a minimum height constraint
+            CGFloat height = self.minScrollViewHeightAllowed;
+            NSString* constraintsString = [NSString stringWithFormat:@"V:[scrollView(>=%f)]", height];
             self.fStackViewHeightConstraints = [NSLayoutConstraint constraintsWithVisualFormat:constraintsString options:0
                                                                                        metrics:nil
                                                                                          views:views];
-            [self.fStackView addConstraints:self.fStackViewHeightConstraints];
-
-            scrollView.hasVerticalScroller = YES;
-
-            [self setWindowMinMaxToCurrent];
         }
+        else
+        {
+            //set a fixed height constraint
+            CGFloat height = self.scrollViewHeight;
+            NSString* constraintsString = [NSString stringWithFormat:@"V:[scrollView(==%f)]", height];
+            self.fStackViewHeightConstraints = [NSLayoutConstraint constraintsWithVisualFormat:constraintsString options:0
+                                                                                       metrics:nil
+                                                                                         views:views];
+        }
+
+        //add height constraint to fStackView
+        [self.fStackView addConstraints:self.fStackViewHeightConstraints];
+
+        scrollView.hasVerticalScroller = YES;
     }
     else
     {
@@ -5008,48 +5013,39 @@ static void removeKeRangerRansomware()
 
 - (void)updateForAutoSize
 {
-    if ([self.fDefaults boolForKey:@"AutoSize"] && !self.isFullScreen)
+    if (!self.isFullScreen)
     {
         [self setWindowSizeToFit];
     }
     else
     {
-        [self removeWindowMinMax];
+        [self removeStackViewHeightConstraints];
     }
 }
 
-- (void)setWindowMinMaxToCurrent
+- (void)updateWindowAfterToolbarChange
 {
-    CGFloat const height = NSHeight(self.fWindow.contentView.frame);
+    //Hacky way of fixing an issue with showing the Toolbar
+    if (!self.isFullScreen && [self.fDefaults boolForKey:@"AutoSize"])
+    {
+        //macOS Big Sur shows the unified toolbar by default
+        //and we only need to "fix" the layout when showing the toolbar
+        if (@available(macOS 11.0, *))
+        {
+            if (!self.fWindow.toolbar.isVisible)
+            {
+                [self removeStackViewHeightConstraints];
+            }
+        }
+        else
+        {
+            [self removeStackViewHeightConstraints];
+        }
 
-    NSSize minSize = self.fWindow.contentMinSize, maxSize = self.fWindow.contentMaxSize;
-    minSize.height = height;
-    maxSize.height = height;
-
-    self.fWindow.contentMinSize = minSize;
-    self.fWindow.contentMaxSize = maxSize;
-}
-
-- (void)removeWindowMinMax
-{
-    [self setMinWindowContentSizeAllowed];
-    [self setMaxWindowContentSizeAllowed];
-    [self removeStackViewHeightConstraints];
-}
-
-- (void)setMinWindowContentSizeAllowed
-{
-    NSSize contentMinSize = self.fWindow.contentMinSize;
-    contentMinSize.height = self.minWindowContentHeightAllowed;
-
-    self.fWindow.contentMinSize = contentMinSize;
-}
-
-- (void)setMaxWindowContentSizeAllowed
-{
-    NSSize contentMaxSize = self.fWindow.contentMaxSize;
-    contentMaxSize.height = FLT_MAX;
-    self.fWindow.contentMaxSize = contentMaxSize;
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self setWindowSizeToFit];
+        });
+    }
 }
 
 - (void)removeStackViewHeightConstraints
@@ -5060,9 +5056,9 @@ static void removeKeRangerRansomware()
     }
 }
 
-- (CGFloat)minWindowContentHeightAllowed
+- (CGFloat)minScrollViewHeightAllowed
 {
-    CGFloat contentMinHeight = self.fTableView.rowHeight + self.fTableView.intercellSpacing.height + self.mainWindowComponentHeight;
+    CGFloat contentMinHeight = self.fTableView.rowHeight + self.fTableView.intercellSpacing.height;
     return contentMinHeight;
 }
 
@@ -5090,7 +5086,7 @@ static void removeKeRangerRansomware()
 - (CGFloat)scrollViewHeight
 {
     CGFloat height;
-    CGFloat minHeight = self.fTableView.rowHeight + self.fTableView.intercellSpacing.height;
+    CGFloat minHeight = self.minScrollViewHeightAllowed;
 
     if ([self.fDefaults boolForKey:@"AutoSize"])
     {
@@ -5134,12 +5130,12 @@ static void removeKeRangerRansomware()
 
 - (BOOL)isFullScreen
 {
-    return (self.fWindow.styleMask & NSFullScreenWindowMask);
+    return (self.fWindow.styleMask & NSWindowStyleMaskFullScreen) == NSWindowStyleMaskFullScreen;
 }
 
 - (void)windowWillEnterFullScreen:(NSNotification*)notification
 {
-    [self removeWindowMinMax];
+    [self removeStackViewHeightConstraints];
 }
 
 - (void)windowDidExitFullScreen:(NSNotification*)notification

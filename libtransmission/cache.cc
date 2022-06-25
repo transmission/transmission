@@ -24,7 +24,7 @@
 
 Cache::Key Cache::makeKey(tr_torrent const* torrent, tr_block_info::Location loc) noexcept
 {
-    return std::make_pair(torrent->uniqueId, loc.block);
+    return std::make_pair(torrent->id(), loc.block);
 }
 
 std::pair<Cache::CIter, Cache::CIter> Cache::findContiguous(CIter const begin, CIter const end, CIter const iter) noexcept
@@ -76,13 +76,13 @@ int Cache::writeContiguous(CIter const begin, CIter const end) const
         begin,
         end,
         size_t{},
-        [](size_t sum, auto const& block) { return sum + std::size(block.buf); });
+        [](size_t sum, auto const& block) { return sum + std::size(*block.buf); });
     buf.reserve(buflen);
     for (auto iter = begin; iter != end; ++iter)
     {
         TR_ASSERT(begin->key.first == iter->key.first);
         TR_ASSERT(begin->key.second + std::distance(begin, iter) == iter->key.second);
-        buf.insert(std::end(buf), std::begin(iter->buf), std::end(iter->buf));
+        buf.insert(std::end(buf), std::begin(*iter->buf), std::end(*iter->buf));
     }
     TR_ASSERT(std::size(buf) == buflen);
 
@@ -126,14 +126,9 @@ Cache::Cache(tr_torrents& torrents, int64_t max_bytes)
 ****
 ***/
 
-int Cache::writeBlock(tr_torrent* torrent, tr_block_info::Location loc, uint32_t length, struct evbuffer* writeme)
+void Cache::writeBlock(tr_torrent_id_t tor_id, tr_block_index_t block, std::unique_ptr<std::vector<uint8_t>>& data)
 {
-    TR_ASSERT(tr_amInEventThread(torrent->session));
-    TR_ASSERT(loc.block_offset == 0);
-    TR_ASSERT(torrent->blockSize(loc.block) == length);
-    TR_ASSERT(torrent->blockSize(loc.block) <= evbuffer_get_length(writeme));
-
-    auto const key = makeKey(torrent, loc);
+    auto const key = Key{ tor_id, block };
     auto iter = std::lower_bound(std::begin(blocks_), std::end(blocks_), key, CompareCacheBlockByKey{});
     if (iter == std::end(blocks_) || iter->key != key)
     {
@@ -143,13 +138,12 @@ int Cache::writeBlock(tr_torrent* torrent, tr_block_info::Location loc, uint32_t
 
     iter->time_added = tr_time();
 
-    iter->buf.resize(length);
-    evbuffer_remove(writeme, std::data(iter->buf), std::size(iter->buf));
+    iter->buf = std::move(data);
 
     ++cache_writes_;
-    cache_write_bytes_ += length;
+    cache_write_bytes_ += std::size(*iter->buf);
 
-    return cacheTrim();
+    (void)cacheTrim();
 }
 
 Cache::CIter Cache::getBlock(tr_torrent const* torrent, tr_block_info::Location loc) noexcept
@@ -171,7 +165,7 @@ int Cache::readBlock(tr_torrent* torrent, tr_block_info::Location loc, uint32_t 
 {
     if (auto const iter = getBlock(torrent, loc); iter != std::end(blocks_))
     {
-        std::copy_n(std::begin(iter->buf), len, setme);
+        std::copy_n(std::begin(*iter->buf), len, setme);
         return {};
     }
 
@@ -213,7 +207,7 @@ int Cache::flushSpan(CIter const begin, CIter const end)
 int Cache::flushFile(tr_torrent* torrent, tr_file_index_t i)
 {
     auto const compare = CompareCacheBlockByKey{};
-    auto const tor_id = torrent->uniqueId;
+    auto const tor_id = torrent->id();
     auto const [block_begin, block_end] = tr_torGetFileBlockSpan(torrent, i);
 
     return flushSpan(
@@ -224,7 +218,7 @@ int Cache::flushFile(tr_torrent* torrent, tr_file_index_t i)
 int Cache::flushTorrent(tr_torrent* torrent)
 {
     auto const compare = CompareCacheBlockByKey{};
-    auto const tor_id = torrent->uniqueId;
+    auto const tor_id = torrent->id();
 
     return flushSpan(
         std::lower_bound(std::begin(blocks_), std::end(blocks_), std::make_pair(tor_id, 0), compare),

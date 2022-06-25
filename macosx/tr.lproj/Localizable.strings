@@ -26,7 +26,7 @@
 "%ld minutes" = "%ld dakika";
 
 /* stats window -> times opened */
-"%llu times" = "";
+"%llu times" = "%llu kez";
 
 /* Inspector -> Peers tab -> peers */
 "%lu cache" = "%lu önbellek";
@@ -65,7 +65,7 @@
 "%lu PEX" = "%lu PEX";
 
 /* Dock item - Seeding */
-"%lu Seeding" = "%lu Besleniyor";
+"%lu Seeding" = "%lu Gönderiliyor";
 
 /* Drag overlay -> torrents */
 "%lu Torrent Files" = "%lu Torrent Dosyası";
@@ -567,9 +567,6 @@
 /* Group table row */
 "No Group" = "Öbek Yok";
 
-/* No comment provided by engineer. */
-"No napping on the job!" = "";
-
 /* Inspector -> selected torrents */
 "No Torrents Selected" = "Seçili Torrent Yok";
 
@@ -1048,8 +1045,9 @@
 /* Status Bar -> status menu */
 "Total Transfer" = "Toplam Aktarım";
 
-/* Message window -> level string */
-"Trace" = "";
+/* Message window -> level
+   Message window -> level string */
+"Trace" = "İz";
 
 /* Filter Bar -> filter menu */
 "Tracker" = "İzleyici";
@@ -1126,8 +1124,9 @@
 /* Torrent -> status string */
 "Waiting to seed" = "Beslemek için bekleniyor";
 
-/* Message window -> level string */
-"Warn" = "";
+/* Message window -> level
+   Message window -> level string */
+"Warn" = "Uyar";
 
 /* Drag overlay -> url */
 "Web Address" = "URL";

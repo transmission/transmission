@@ -24,7 +24,7 @@ public:
 
     static std::unique_ptr<DetailsDialog> create(Gtk::Window& parent, Glib::RefPtr<Session> const& core);
 
-    void set_torrents(std::vector<int> const& torrent_ids);
+    void set_torrents(std::vector<tr_torrent_id_t> const& torrent_ids);
 
 protected:
     DetailsDialog(Gtk::Window& parent, Glib::RefPtr<Session> const& core);

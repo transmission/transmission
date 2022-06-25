@@ -30,7 +30,7 @@ std::string previousLocation;
 class RelocateDialog::Impl
 {
 public:
-    Impl(RelocateDialog& dialog, Glib::RefPtr<Session> const& core, std::vector<int> const& torrent_ids);
+    Impl(RelocateDialog& dialog, Glib::RefPtr<Session> const& core, std::vector<tr_torrent_id_t> const& torrent_ids);
     ~Impl();
 
     TR_DISABLE_COPY_MOVE(Impl)
@@ -44,7 +44,7 @@ private:
 private:
     RelocateDialog& dialog_;
     Glib::RefPtr<Session> const core_;
-    std::vector<int> torrent_ids_;
+    std::vector<tr_torrent_id_t> torrent_ids_;
 
     int done_ = 0;
     bool do_move_ = false;
@@ -141,12 +141,15 @@ void RelocateDialog::Impl::onResponse(int response)
 std::unique_ptr<RelocateDialog> RelocateDialog::create(
     Gtk::Window& parent,
     Glib::RefPtr<Session> const& core,
-    std::vector<int> const& torrent_ids)
+    std::vector<tr_torrent_id_t> const& torrent_ids)
 {
     return std::unique_ptr<RelocateDialog>(new RelocateDialog(parent, core, torrent_ids));
 }
 
-RelocateDialog::RelocateDialog(Gtk::Window& parent, Glib::RefPtr<Session> const& core, std::vector<int> const& torrent_ids)
+RelocateDialog::RelocateDialog(
+    Gtk::Window& parent,
+    Glib::RefPtr<Session> const& core,
+    std::vector<tr_torrent_id_t> const& torrent_ids)
     : Gtk::Dialog(_("Set Torrent Location"), parent, true)
     , impl_(std::make_unique<Impl>(*this, core, torrent_ids))
 {
@@ -154,7 +157,10 @@ RelocateDialog::RelocateDialog(Gtk::Window& parent, Glib::RefPtr<Session> const&
 
 RelocateDialog::~RelocateDialog() = default;
 
-RelocateDialog::Impl::Impl(RelocateDialog& dialog, Glib::RefPtr<Session> const& core, std::vector<int> const& torrent_ids)
+RelocateDialog::Impl::Impl(
+    RelocateDialog& dialog,
+    Glib::RefPtr<Session> const& core,
+    std::vector<tr_torrent_id_t> const& torrent_ids)
     : dialog_(dialog)
     , core_(core)
     , torrent_ids_(torrent_ids)

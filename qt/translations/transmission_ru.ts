@@ -451,7 +451,7 @@
     <message>
         <location line="+78"/>
         <source>Added:</source>
-        <translation type="unfinished"></translation>
+        <translation>Добавлено:</translation>
     </message>
     <message>
         <location line="+14"/>

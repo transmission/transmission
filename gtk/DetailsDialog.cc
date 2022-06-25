@@ -45,7 +45,7 @@ public:
 
     TR_DISABLE_COPY_MOVE(Impl)
 
-    void set_torrents(std::vector<int> const& torrent_ids);
+    void set_torrents(std::vector<tr_torrent_id_t> const& torrent_ids);
 
 private:
     Gtk::Widget* info_page_new();
@@ -84,7 +84,7 @@ private:
     void refreshPeerList(std::vector<tr_torrent*> const& torrents);
     void refreshWebseedList(std::vector<tr_torrent*> const& torrents);
 
-    int tracker_list_get_current_torrent_id() const;
+    tr_torrent_id_t tracker_list_get_current_torrent_id() const;
     tr_torrent* tracker_list_get_current_torrent() const;
 
     std::vector<tr_torrent*> getTorrents() const;
@@ -155,7 +155,7 @@ private:
     FileList* file_list_ = nullptr;
     Gtk::Label* file_label_ = nullptr;
 
-    std::vector<int> ids_;
+    std::vector<tr_torrent_id_t> ids_;
     Glib::RefPtr<Session> const core_;
     sigc::connection periodic_refresh_tag_;
 
@@ -2093,7 +2093,7 @@ public:
         add(key);
     }
 
-    Gtk::TreeModelColumn<int> torrent_id;
+    Gtk::TreeModelColumn<tr_torrent_id_t> torrent_id;
     Gtk::TreeModelColumn<Glib::ustring> text;
     Gtk::TreeModelColumn<bool> is_backup;
     Gtk::TreeModelColumn<int> tracker_id;
@@ -2118,34 +2118,27 @@ bool DetailsDialog::Impl::trackerVisibleFunc(Gtk::TreeModel::const_iterator cons
     return !iter->get_value(tracker_cols.is_backup);
 }
 
-int DetailsDialog::Impl::tracker_list_get_current_torrent_id() const
+tr_torrent_id_t DetailsDialog::Impl::tracker_list_get_current_torrent_id() const
 {
-    int torrent_id = -1;
-
-    /* if there's only one torrent in the dialog, always use it */
+    // if there's only one torrent in the dialog, always use it
     if (ids_.size() == 1)
     {
-        torrent_id = ids_.front();
+        return ids_.front();
     }
 
-    /* otherwise, use the selected tracker's torrent */
-    if (torrent_id < 0)
+    // otherwise, use the selected tracker's torrent
+    auto const sel = tracker_view_->get_selection();
+    if (auto const iter = sel->get_selected(); iter)
     {
-        auto const sel = tracker_view_->get_selection();
-
-        if (auto const iter = sel->get_selected(); iter)
-        {
-            torrent_id = iter->get_value(tracker_cols.torrent_id);
-        }
+        return iter->get_value(tracker_cols.torrent_id);
     }
 
-    return torrent_id;
+    return -1;
 }
 
 tr_torrent* DetailsDialog::Impl::tracker_list_get_current_torrent() const
 {
-    int const torrent_id = tracker_list_get_current_torrent_id();
-    return core_->find_torrent(torrent_id);
+    return core_->find_torrent(tracker_list_get_current_torrent_id());
 }
 
 namespace
@@ -2254,7 +2247,7 @@ void DetailsDialog::Impl::refreshTracker(std::vector<tr_torrent*> const& torrent
         }
     }
 
-    edit_trackers_button_->set_sensitive(tracker_list_get_current_torrent_id() >= 0);
+    edit_trackers_button_->set_sensitive(tracker_list_get_current_torrent_id() > 0);
 }
 
 void DetailsDialog::Impl::onScrapeToggled()
@@ -2326,7 +2319,7 @@ void DetailsDialog::Impl::on_edit_trackers()
     if (tor != nullptr)
     {
         guint row;
-        int const torrent_id = tr_torrentId(tor);
+        auto const torrent_id = tr_torrentId(tor);
 
         auto d = std::make_shared<Gtk::Dialog>(
             fmt::format(_("{torrent_name} - Edit Trackers"), fmt::arg("torrent_name", tr_torrentName(tor))),
@@ -2663,15 +2656,15 @@ DetailsDialog::Impl::Impl(DetailsDialog& dialog, Glib::RefPtr<Session> const& co
     last_page_tag_ = n->signal_switch_page().connect([](Widget*, guint page) { DetailsDialog::Impl::last_page_ = page; });
 }
 
-void DetailsDialog::set_torrents(std::vector<int> const& ids)
+void DetailsDialog::set_torrents(std::vector<tr_torrent_id_t> const& ids)
 {
     impl_->set_torrents(ids);
 }
 
-void DetailsDialog::Impl::set_torrents(std::vector<int> const& ids)
+void DetailsDialog::Impl::set_torrents(std::vector<tr_torrent_id_t> const& ids)
 {
     Glib::ustring title;
-    int const len = ids.size();
+    auto const len = ids.size();
 
     ids_ = ids;
 

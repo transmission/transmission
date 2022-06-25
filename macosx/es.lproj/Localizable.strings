@@ -26,7 +26,7 @@
 "%ld minutes" = "%ld minutos";
 
 /* stats window -> times opened */
-"%llu times" = "";
+"%llu times" = "%llu veces";
 
 /* Inspector -> Peers tab -> peers */
 "%lu cache" = "%lu caché";
@@ -567,9 +567,6 @@
 /* Group table row */
 "No Group" = "Sin grupo";
 
-/* No comment provided by engineer. */
-"No napping on the job!" = "";
-
 /* Inspector -> selected torrents */
 "No Torrents Selected" = "Ningún torrent seleccionado";
 
@@ -1048,8 +1045,9 @@
 /* Status Bar -> status menu */
 "Total Transfer" = "Descarga total";
 
-/* Message window -> level string */
-"Trace" = "";
+/* Message window -> level
+   Message window -> level string */
+"Trace" = "Traza";
 
 /* Filter Bar -> filter menu */
 "Tracker" = "Tracker";
@@ -1126,8 +1124,9 @@
 /* Torrent -> status string */
 "Waiting to seed" = "Esperando a compartir";
 
-/* Message window -> level string */
-"Warn" = "";
+/* Message window -> level
+   Message window -> level string */
+"Warn" = "Advertencia";
 
 /* Drag overlay -> url */
 "Web Address" = "Dirección web";

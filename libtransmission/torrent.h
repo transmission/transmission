@@ -279,6 +279,11 @@ public:
         return fpm_.fileOffset(loc.byte);
     }
 
+    [[nodiscard]] auto byteSpan(tr_file_index_t file) const
+    {
+        return fpm_.byteSpan(file);
+    }
+
     /// WANTED
 
     [[nodiscard]] bool pieceIsWanted(tr_piece_index_t piece) const final
@@ -579,6 +584,11 @@ public:
         return {};
     }
 
+    [[nodiscard]] constexpr auto id() const noexcept
+    {
+        return unique_id_;
+    }
+
     void setDateActive(time_t t);
 
     void setLabels(std::vector<tr_quark> const& new_labels);
@@ -712,7 +722,7 @@ public:
 
     int queuePosition = 0;
 
-    int uniqueId = 0;
+    tr_torrent_id_t unique_id_ = 0;
 
     tr_completeness completeness = TR_LEECH;
 

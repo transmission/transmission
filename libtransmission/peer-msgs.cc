@@ -8,6 +8,7 @@
 #include <cstring>
 #include <ctime>
 #include <iterator>
+#include <map>
 #include <memory> // std::unique_ptr
 #include <optional>
 #include <vector>
@@ -188,10 +189,10 @@ static peer_request blockToReq(tr_torrent const* tor, tr_block_index_t block)
  * the current message that it's sending us. */
 struct tr_incoming
 {
-    uint8_t id = 0;
-    uint32_t length = 0; /* includes the +1 for id length */
-    struct peer_request blockReq = {}; /* metadata for incoming blocks */
-    struct evbuffer* block = nullptr; /* piece data for incoming blocks */
+    uint8_t id = 0; // the protocol message, e.g. BtPeerMsgs::Piece
+    uint32_t length = 0; // the full message payload length. Includes the +1 for id length
+    std::optional<peer_request> block_req; // metadata for incoming blocks
+    std::map<tr_block_index_t, std::unique_ptr<std::vector<uint8_t>>> block_buf; // piece data for incoming blocks
 };
 
 class tr_peerMsgsImpl;
@@ -284,11 +285,6 @@ public:
     {
         set_active(TR_UP, false);
         set_active(TR_DOWN, false);
-
-        if (this->incoming.block != nullptr)
-        {
-            evbuffer_free(this->incoming.block);
-        }
 
         if (this->io != nullptr)
         {
@@ -449,13 +445,14 @@ public:
         publish(e);
     }
 
-    void publishGotBlock(struct peer_request const* req)
+    void publishGotBlock(tr_block_index_t block)
     {
+        auto const loc = torrent->blockLoc(block);
         auto e = tr_peer_event{};
         e.eventType = TR_PEER_CLIENT_GOT_BLOCK;
-        e.pieceIndex = req->index;
-        e.offset = req->offset;
-        e.length = req->length;
+        e.pieceIndex = loc.piece;
+        e.offset = loc.piece_offset;
+        e.length = torrent->blockSize(block);
         publish(e);
     }
 
@@ -544,6 +541,11 @@ public:
         e.eventType = TR_PEER_CLIENT_GOT_HAVE;
         e.pieceIndex = index;
         publish(e);
+    }
+
+    [[nodiscard]] bool isValidRequest(peer_request const& req) const
+    {
+        return tr_torrentReqIsValid(torrent, req.index, req.offset, req.length);
     }
 
 private:
@@ -735,8 +737,9 @@ static void protocolSendReject(tr_peerMsgsImpl* msgs, struct peer_request const*
 
 static void protocolSendRequest(tr_peerMsgsImpl* msgs, struct peer_request const& req)
 {
-    struct evbuffer* out = msgs->outMessages;
+    TR_ASSERT(msgs->isValidRequest(req));
 
+    auto* const out = msgs->outMessages;
     evbuffer_add_uint32(out, sizeof(uint8_t) + 3 * sizeof(uint32_t));
     evbuffer_add_uint8(out, BtPeerMsgs::Request);
     evbuffer_add_uint32(out, req.index);
@@ -972,20 +975,6 @@ static void cancelAllRequestsToClient(tr_peerMsgsImpl* msgs)
     }
 
     msgs->peer_requested_.clear();
-}
-
-/**
-***
-**/
-
-static bool reqIsValid(tr_peerMsgsImpl const* peer, uint32_t index, uint32_t offset, uint32_t length)
-{
-    return tr_torrentReqIsValid(peer->torrent, index, offset, length);
-}
-
-static bool requestIsValid(tr_peerMsgsImpl const* msgs, struct peer_request const* req)
-{
-    return reqIsValid(msgs, req->index, req->offset, req->length);
 }
 
 /**
@@ -1543,7 +1532,7 @@ static bool messageLengthIsCorrect(tr_peerMsgsImpl const* msg, uint8_t id, uint3
     }
 }
 
-static int clientGotBlock(tr_peerMsgsImpl* msgs, struct evbuffer* block, struct peer_request const* req);
+static int clientGotBlock(tr_peerMsgsImpl* msgs, std::unique_ptr<std::vector<uint8_t>>& block_data, tr_block_index_t block);
 
 static ReadState readBtPiece(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, size_t inlen, size_t* setme_piece_bytes_read)
 {
@@ -1551,61 +1540,82 @@ static ReadState readBtPiece(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, size
 
     logtrace(msgs, "In readBtPiece");
 
-    struct peer_request* req = &msgs->incoming.blockReq;
-
-    if (req->length == 0)
+    // If this is the first we've seen of the piece data, parse out the header
+    if (!msgs->incoming.block_req)
     {
         if (inlen < 8)
         {
             return READ_LATER;
         }
 
-        tr_peerIoReadUint32(msgs->io, inbuf, &req->index);
-        tr_peerIoReadUint32(msgs->io, inbuf, &req->offset);
-        req->length = msgs->incoming.length - 9;
-        logtrace(
-            msgs,
-            fmt::format(FMT_STRING("got incoming block header {:d}:{:d}->{:d}"), req->index, req->offset, req->length));
+        auto req = peer_request{};
+        tr_peerIoReadUint32(msgs->io, inbuf, &req.index);
+        tr_peerIoReadUint32(msgs->io, inbuf, &req.offset);
+        req.length = msgs->incoming.length - 9;
+        logtrace(msgs, fmt::format(FMT_STRING("got incoming block header {:d}:{:d}->{:d}"), req.index, req.offset, req.length));
+        msgs->incoming.block_req = req;
         return READ_NOW;
     }
 
-    if (msgs->incoming.block == nullptr)
+    auto& req = msgs->incoming.block_req;
+    auto const loc = msgs->torrent->pieceLoc(req->index, req->offset);
+    auto const block = loc.block;
+    auto const block_size = msgs->torrent->blockSize(block);
+    auto& block_buf = msgs->incoming.block_buf[block];
+    if (!block_buf)
     {
-        msgs->incoming.block = evbuffer_new();
+        block_buf = std::make_unique<std::vector<uint8_t>>();
+        block_buf->reserve(block_size);
     }
 
-    struct evbuffer* const block_buffer = msgs->incoming.block;
+    // read in another chunk of data
+    auto const n_left_in_block = block_size - std::size(*block_buf);
+    auto const n_left_in_req = size_t{ req->length };
+    auto const n_to_read = std::min({ n_left_in_block, n_left_in_req, inlen });
+    auto const old_length = std::size(*block_buf);
+    block_buf->resize(old_length + n_to_read);
+    tr_peerIoReadBytes(msgs->io, inbuf, &((*block_buf)[old_length]), n_to_read);
 
-    /* read in another chunk of data */
-    size_t const nLeft = req->length - evbuffer_get_length(block_buffer);
-    size_t const n = std::min(nLeft, inlen);
-
-    tr_peerIoReadBytesToBuf(msgs->io, inbuf, block_buffer, n);
-
-    msgs->publishClientGotPieceData(n);
-    *setme_piece_bytes_read += n;
+    msgs->publishClientGotPieceData(n_to_read);
+    *setme_piece_bytes_read += n_to_read;
     logtrace(
         msgs,
         fmt::format(
-            FMT_STRING("got {:d} bytes for block {:d}:{:d}->{:d} ... {:d} remain"),
-            n,
+            FMT_STRING("got {:d} bytes for block {:d}:{:d}->{:d} ... {:d} remain in req, {:d} remain in block"),
+            n_to_read,
             req->index,
             req->offset,
             req->length,
-            req->length - evbuffer_get_length(block_buffer)));
+            req->length,
+            block_size - std::size(*block_buf)));
 
-    if (evbuffer_get_length(block_buffer) < req->length)
+    // if we didn't read enough to finish off the request,
+    // update the table and wait for more
+    if (n_to_read < n_left_in_req)
+    {
+        auto new_loc = msgs->torrent->byteLoc(loc.byte + n_to_read);
+        req->index = new_loc.piece;
+        req->offset = new_loc.piece_offset;
+        req->length -= n_to_read;
+        return READ_LATER;
+    }
+
+    // we've fully read this message
+    req.reset();
+    msgs->state = AwaitingBt::Length;
+
+    // if we didn't read enough to finish off the block,
+    // update the table and wait for more
+    if (std::size(*block_buf) < block_size)
     {
         return READ_LATER;
     }
 
-    /* pass the block along... */
-    int const err = clientGotBlock(msgs, block_buffer, req);
-    evbuffer_drain(block_buffer, evbuffer_get_length(block_buffer));
+    // pass the block along...
+    int const err = clientGotBlock(msgs, block_buf, block);
+    msgs->incoming.block_buf.erase(block);
 
-    /* cleanup */
-    req->length = 0;
-    msgs->state = AwaitingBt::Length;
+    // cleanup
     return err != 0 ? READ_ERR : READ_NOW;
 }
 
@@ -1873,57 +1883,47 @@ static ReadState readBtMessage(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, si
 }
 
 /* returns 0 on success, or an errno on failure */
-static int clientGotBlock(tr_peerMsgsImpl* msgs, struct evbuffer* data, struct peer_request const* req)
+static int clientGotBlock(
+    tr_peerMsgsImpl* msgs,
+    std::unique_ptr<std::vector<uint8_t>>& block_data,
+    tr_block_index_t const block)
 {
     TR_ASSERT(msgs != nullptr);
-    TR_ASSERT(req != nullptr);
 
     tr_torrent* const tor = msgs->torrent;
-    auto const block = tor->pieceLoc(req->index, req->offset).block;
 
-    if (!requestIsValid(msgs, req))
-    {
-        logdbg(msgs, fmt::format(FMT_STRING("dropping invalid block {:d}:{:d}->{:d}"), req->index, req->offset, req->length));
-        return EBADMSG;
-    }
-
-    if (req->length != msgs->torrent->blockSize(block))
+    if (!block_data || std::size(*block_data) != msgs->torrent->blockSize(block))
     {
         logdbg(
             msgs,
             fmt::format(
                 FMT_STRING("wrong block size -- expected {:d}, got {:d}"),
                 msgs->torrent->blockSize(block),
-                req->length));
+                block_data ? std::size(*block_data) : 0U));
+        block_data->clear();
         return EMSGSIZE;
     }
 
-    logtrace(msgs, fmt::format(FMT_STRING("got block {:d}:{:d}->{:d}"), req->index, req->offset, req->length));
+    logtrace(msgs, fmt::format(FMT_STRING("got block {:d}"), block));
 
     if (!tr_peerMgrDidPeerRequest(msgs->torrent, msgs, block))
     {
         logdbg(msgs, "we didn't ask for this message...");
+        block_data->clear();
         return 0;
     }
 
-    if (msgs->torrent->hasPiece(req->index))
+    auto const loc = msgs->torrent->blockLoc(block);
+    if (msgs->torrent->hasPiece(loc.piece))
     {
         logtrace(msgs, "we did ask for this message, but the piece is already complete...");
+        block_data->clear();
         return 0;
     }
 
-    /**
-    ***  Save the block
-    **/
-
-    if (int const err = msgs->session->cache->writeBlock(tor, tor->pieceLoc(req->index, req->offset), req->length, data);
-        err != 0)
-    {
-        return err;
-    }
-
-    msgs->blame.set(req->index);
-    msgs->publishGotBlock(req);
+    msgs->session->cache->writeBlock(tor->id(), block, block_data);
+    msgs->blame.set(loc.piece);
+    msgs->publishGotBlock(block);
     return 0;
 }
 
@@ -2066,12 +2066,14 @@ static void updateMetadataRequests(tr_peerMsgsImpl* msgs, time_t now)
 
 static void updateBlockRequests(tr_peerMsgsImpl* msgs)
 {
-    if (!msgs->torrent->clientCanDownload())
+    auto* const tor = msgs->torrent;
+
+    if (!tor->clientCanDownload())
     {
         return;
     }
 
-    auto const n_active = tr_peerMgrCountActiveRequestsToPeer(msgs->torrent, msgs);
+    auto const n_active = tr_peerMgrCountActiveRequestsToPeer(tor, msgs);
     if (n_active >= msgs->desired_request_count)
     {
         return;
@@ -2086,14 +2088,28 @@ static void updateBlockRequests(tr_peerMsgsImpl* msgs)
     TR_ASSERT(msgs->is_client_interested());
     TR_ASSERT(!msgs->is_client_choked());
 
-    for (auto const span : tr_peerMgrGetNextRequests(msgs->torrent, msgs, n_wanted))
+    for (auto const span : tr_peerMgrGetNextRequests(tor, msgs, n_wanted))
     {
         for (tr_block_index_t block = span.begin; block < span.end; ++block)
         {
-            protocolSendRequest(msgs, blockToReq(msgs->torrent, block));
+            // Note that requests can't cross over a piece boundary.
+            // So if a piece isn't evenly divisible by the block size,
+            // we need to split our block request info per-piece chunks.
+            auto const byte_begin = tor->blockLoc(block).byte;
+            auto const block_size = tor->blockSize(block);
+            auto const byte_end = byte_begin + block_size;
+            for (auto offset = byte_begin; offset < byte_end;)
+            {
+                auto const loc = tor->byteLoc(offset);
+                auto const left_in_block = block_size - loc.block_offset;
+                auto const left_in_piece = tor->pieceSize(loc.piece) - loc.piece_offset;
+                auto const req_len = std::min(left_in_block, left_in_piece);
+                protocolSendRequest(msgs, { loc.piece, loc.piece_offset, req_len });
+                offset += req_len;
+            }
         }
 
-        tr_peerMgrClientSentRequests(msgs->torrent, msgs, span);
+        tr_peerMgrClientSentRequests(tor, msgs, span);
     }
 }
 
@@ -2199,7 +2215,7 @@ static size_t fillOutputBuffer(tr_peerMsgsImpl* msgs, time_t now)
         req = msgs->peer_requested_.front();
         msgs->peer_requested_.erase(std::begin(msgs->peer_requested_));
 
-        if (requestIsValid(msgs, &req) && msgs->torrent->hasPiece(req.index))
+        if (msgs->isValidRequest(req) && msgs->torrent->hasPiece(req.index))
         {
             uint32_t const msglen = 4 + 1 + 4 + 4 + req.length;
             struct evbuffer_iovec iovec[1];

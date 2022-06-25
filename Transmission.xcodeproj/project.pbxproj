@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 48;
+	objectVersion = 51;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -21,6 +21,7 @@
 		3C7A11980D0B2EE300B5701F /* getgateway.h in Headers */ = {isa = PBXBuildFile; fileRef = 3C7A11920D0B2EE300B5701F /* getgateway.h */; };
 		3C7A11990D0B2EE300B5701F /* natpmp.c in Sources */ = {isa = PBXBuildFile; fileRef = 3C7A11930D0B2EE300B5701F /* natpmp.c */; };
 		3C7A119A0D0B2EE300B5701F /* natpmp.h in Headers */ = {isa = PBXBuildFile; fileRef = 3C7A11940D0B2EE300B5701F /* natpmp.h */; };
+		457AF8EB28604AFC00BCF74F /* Toolbar.mm in Sources */ = {isa = PBXBuildFile; fileRef = 457AF8EA28604AFC00BCF74F /* Toolbar.mm */; };
 		45A7D3292843B54D00F0C32A /* GroupPopUpButtonCell.mm in Sources */ = {isa = PBXBuildFile; fileRef = 45A7D3282843B54D00F0C32A /* GroupPopUpButtonCell.mm */; };
 		45A7D32C2843B55F00F0C32A /* PriorityPopUpButtonCell.mm in Sources */ = {isa = PBXBuildFile; fileRef = 45A7D32B2843B55F00F0C32A /* PriorityPopUpButtonCell.mm */; };
 		4D043A7F090AE979009FEDA8 /* TransmissionDocument.icns in Resources */ = {isa = PBXBuildFile; fileRef = 4D043A7E090AE979009FEDA8 /* TransmissionDocument.icns */; };
@@ -613,6 +614,8 @@
 		3C7A11920D0B2EE300B5701F /* getgateway.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = getgateway.h; sourceTree = "<group>"; };
 		3C7A11930D0B2EE300B5701F /* natpmp.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = natpmp.c; sourceTree = "<group>"; };
 		3C7A11940D0B2EE300B5701F /* natpmp.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = natpmp.h; sourceTree = "<group>"; };
+		457AF8E928604AFC00BCF74F /* Toolbar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Toolbar.h; sourceTree = "<group>"; };
+		457AF8EA28604AFC00BCF74F /* Toolbar.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = Toolbar.mm; sourceTree = "<group>"; };
 		45A7D3272843B54D00F0C32A /* GroupPopUpButtonCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GroupPopUpButtonCell.h; sourceTree = "<group>"; };
 		45A7D3282843B54D00F0C32A /* GroupPopUpButtonCell.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = GroupPopUpButtonCell.mm; sourceTree = "<group>"; };
 		45A7D32A2843B55F00F0C32A /* PriorityPopUpButtonCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PriorityPopUpButtonCell.h; sourceTree = "<group>"; };
@@ -1452,6 +1455,8 @@
 				A2B5B4E81880665E0071A66A /* ShareTorrentFileHelper.mm */,
 				A21979890D07B78400438EA7 /* GroupToolbarItem.h */,
 				A219798A0D07B78400438EA7 /* GroupToolbarItem.mm */,
+				457AF8E928604AFC00BCF74F /* Toolbar.h */,
+				457AF8EA28604AFC00BCF74F /* Toolbar.mm */,
 				A20BFFB50D091CC700CE5D2B /* ToolbarSegmentedCell.h */,
 				A20BFFB60D091CC700CE5D2B /* ToolbarSegmentedCell.mm */,
 				A22180960D148A71007D09ED /* GroupsPrefsController.h */,
@@ -2687,7 +2692,7 @@
 				};
 			};
 			buildConfigurationList = 4DF0C59A089918A300DD8943 /* Build configuration list for PBXProject "Transmission" */;
-			compatibilityVersion = "Xcode 8.0";
+			compatibilityVersion = "Xcode 10.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 1;
 			knownRegions = (
@@ -3016,6 +3021,7 @@
 				A25E74660AF5097D006F11AE /* ExpandedPathToIconTransformer.mm in Sources */,
 				A2265F420B5EF5F40093DDA5 /* FileNameCell.mm in Sources */,
 				A2A1CB7A0BF29D5500AE959F /* PeerProgressIndicatorCell.mm in Sources */,
+				457AF8EB28604AFC00BCF74F /* Toolbar.mm in Sources */,
 				A2385DD40BFE06C800B24EF6 /* DragOverlayWindow.mm in Sources */,
 				A2FB057F0BFEB6800095564D /* DragOverlayView.mm in Sources */,
 				E138A9780C04D88F00C5426C /* ProgressGradients.mm in Sources */,
@@ -3597,8 +3603,16 @@
 				);
 				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
 				PRODUCT_NAME = transmission;
-				SYSTEM_HEADER_SEARCH_PATHS = "$(inherited) third-party/fmt/include third-party/libevent/include";
-				USER_HEADER_SEARCH_PATHS = "$(inherited) third-party/libnatpmp third-party/miniupnpc";
+				SYSTEM_HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"third-party/fmt/include",
+					"third-party/libevent/include",
+				);
+				USER_HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"third-party/libnatpmp",
+					"third-party/miniupnpc",
+				);
 			};
 			name = Debug;
 		};
@@ -3623,7 +3637,10 @@
 				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
 				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_NAME = Transmission;
-				SYSTEM_HEADER_SEARCH_PATHS = "$(inherited) third-party/fmt/include";
+				SYSTEM_HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"third-party/fmt/include",
+				);
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -3643,7 +3660,11 @@
 				OTHER_CPLUSPLUSFLAGS = "$(inherited)";
 				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_NAME = transmissioncli;
-				SYSTEM_HEADER_SEARCH_PATHS = "$(inherited) third-party/fmt/include third-party/libevent/include";
+				SYSTEM_HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"third-party/fmt/include",
+					"third-party/libevent/include",
+				);
 			};
 			name = Debug;
 		};
@@ -3665,7 +3686,11 @@
 				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
 				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_NAME = "transmission-daemon";
-				SYSTEM_HEADER_SEARCH_PATHS = "$(inherited) third-party/fmt/include third-party/libevent/include";
+				SYSTEM_HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"third-party/fmt/include",
+					"third-party/libevent/include",
+				);
 			};
 			name = Debug;
 		};
@@ -3684,7 +3709,11 @@
 				OTHER_CPLUSPLUSFLAGS = "$(inherited)";
 				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SYSTEM_HEADER_SEARCH_PATHS = "$(inherited) third-party/fmt/include third-party/libevent/include";
+				SYSTEM_HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"third-party/fmt/include",
+					"third-party/libevent/include",
+				);
 			};
 			name = Debug;
 		};
@@ -3742,7 +3771,7 @@
 				INFOPLIST_OTHER_PREPROCESSOR_FLAGS = "-traditional";
 				INFOPLIST_PREFIX_HEADER = libtransmission/version.h;
 				INFOPLIST_PREPROCESS = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CFLAGS = (
 					"$(inherited)",
@@ -3812,8 +3841,16 @@
 				);
 				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
 				PRODUCT_NAME = transmission;
-				SYSTEM_HEADER_SEARCH_PATHS = "$(inherited) third-party/fmt/include third-party/libevent/include";
-				USER_HEADER_SEARCH_PATHS = "$(inherited) third-party/libnatpmp third-party/miniupnpc";
+				SYSTEM_HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"third-party/fmt/include",
+					"third-party/libevent/include",
+				);
+				USER_HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"third-party/libnatpmp",
+					"third-party/miniupnpc",
+				);
 			};
 			name = Release;
 		};
@@ -3832,7 +3869,11 @@
 				OTHER_CPLUSPLUSFLAGS = "$(inherited)";
 				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_NAME = transmissioncli;
-				SYSTEM_HEADER_SEARCH_PATHS = "$(inherited) third-party/fmt/include third-party/libevent/include";
+				SYSTEM_HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"third-party/fmt/include",
+					"third-party/libevent/include",
+				);
 			};
 			name = Release;
 		};
@@ -3857,7 +3898,10 @@
 				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
 				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_NAME = Transmission;
-				SYSTEM_HEADER_SEARCH_PATHS = "$(inherited) third-party/fmt/include";
+				SYSTEM_HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"third-party/fmt/include",
+				);
 				WRAPPER_EXTENSION = app;
 			};
 			name = Release;
@@ -3915,7 +3959,7 @@
 				INFOPLIST_OTHER_PREPROCESSOR_FLAGS = "-traditional";
 				INFOPLIST_PREFIX_HEADER = libtransmission/version.h;
 				INFOPLIST_PREPROCESS = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				OTHER_CFLAGS = (
 					"$(inherited)",
 					"-DFMT_HEADER_ONLY",
@@ -4014,7 +4058,7 @@
 				INFOPLIST_OTHER_PREPROCESSOR_FLAGS = "-traditional";
 				INFOPLIST_PREFIX_HEADER = libtransmission/version.h;
 				INFOPLIST_PREPROCESS = YES;
-				MACOSX_DEPLOYMENT_TARGET = 10.10;
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_CFLAGS = (
 					"$(inherited)",
@@ -4048,7 +4092,10 @@
 				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
 				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_NAME = Transmission;
-				SYSTEM_HEADER_SEARCH_PATHS = "$(inherited) third-party/fmt/include";
+				SYSTEM_HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"third-party/fmt/include",
+				);
 				WRAPPER_EXTENSION = app;
 			};
 			name = "Release - Debug";
@@ -4068,7 +4115,11 @@
 				OTHER_CPLUSPLUSFLAGS = "$(inherited)";
 				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_NAME = transmissioncli;
-				SYSTEM_HEADER_SEARCH_PATHS = "$(inherited) third-party/fmt/include third-party/libevent/include";
+				SYSTEM_HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"third-party/fmt/include",
+					"third-party/libevent/include",
+				);
 			};
 			name = "Release - Debug";
 		};
@@ -4099,8 +4150,16 @@
 				);
 				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
 				PRODUCT_NAME = transmission;
-				SYSTEM_HEADER_SEARCH_PATHS = "$(inherited) third-party/fmt/include third-party/libevent/include";
-				USER_HEADER_SEARCH_PATHS = "$(inherited) third-party/libnatpmp third-party/miniupnpc";
+				SYSTEM_HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"third-party/fmt/include",
+					"third-party/libevent/include",
+				);
+				USER_HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"third-party/libnatpmp",
+					"third-party/miniupnpc",
+				);
 			};
 			name = "Release - Debug";
 		};
@@ -4122,7 +4181,11 @@
 				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
 				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_NAME = "transmission-daemon";
-				SYSTEM_HEADER_SEARCH_PATHS = "$(inherited) third-party/fmt/include third-party/libevent/include";
+				SYSTEM_HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"third-party/fmt/include",
+					"third-party/libevent/include",
+				);
 			};
 			name = "Release - Debug";
 		};
@@ -4141,7 +4204,11 @@
 				OTHER_CPLUSPLUSFLAGS = "$(inherited)";
 				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SYSTEM_HEADER_SEARCH_PATHS = "$(inherited) third-party/fmt/include third-party/libevent/include";
+				SYSTEM_HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"third-party/fmt/include",
+					"third-party/libevent/include",
+				);
 			};
 			name = "Release - Debug";
 		};
@@ -4209,7 +4276,10 @@
 				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_BUNDLE_IDENTIFIER = "org.m0k.transmission.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SYSTEM_HEADER_SEARCH_PATHS = "$(inherited) third-party/fmt/include";
+				SYSTEM_HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"third-party/fmt/include",
+				);
 				WRAPPER_EXTENSION = qlgenerator;
 			};
 			name = Debug;
@@ -4232,7 +4302,10 @@
 				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_BUNDLE_IDENTIFIER = "org.m0k.transmission.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SYSTEM_HEADER_SEARCH_PATHS = "$(inherited) third-party/fmt/include";
+				SYSTEM_HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"third-party/fmt/include",
+				);
 				WRAPPER_EXTENSION = qlgenerator;
 			};
 			name = "Release - Debug";
@@ -4255,7 +4328,10 @@
 				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_BUNDLE_IDENTIFIER = "org.m0k.transmission.${PRODUCT_NAME:rfc1034identifier}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SYSTEM_HEADER_SEARCH_PATHS = "$(inherited) third-party/fmt/include";
+				SYSTEM_HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"third-party/fmt/include",
+				);
 				WRAPPER_EXTENSION = qlgenerator;
 			};
 			name = Release;
@@ -4318,7 +4394,11 @@
 				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
 				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_NAME = "transmission-daemon";
-				SYSTEM_HEADER_SEARCH_PATHS = "$(inherited) third-party/fmt/include third-party/libevent/include";
+				SYSTEM_HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"third-party/fmt/include",
+					"third-party/libevent/include",
+				);
 			};
 			name = Release;
 		};
@@ -4337,7 +4417,11 @@
 				OTHER_CPLUSPLUSFLAGS = "$(inherited)";
 				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SYSTEM_HEADER_SEARCH_PATHS = "$(inherited) third-party/fmt/include third-party/libevent/include";
+				SYSTEM_HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"third-party/fmt/include",
+					"third-party/libevent/include",
+				);
 			};
 			name = Release;
 		};
@@ -4470,7 +4554,11 @@
 				OTHER_CPLUSPLUSFLAGS = "$(inherited)";
 				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SYSTEM_HEADER_SEARCH_PATHS = "$(inherited) third-party/fmt/include third-party/libevent/include";
+				SYSTEM_HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"third-party/fmt/include",
+					"third-party/libevent/include",
+				);
 			};
 			name = Debug;
 		};
@@ -4489,7 +4577,11 @@
 				OTHER_CPLUSPLUSFLAGS = "$(inherited)";
 				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SYSTEM_HEADER_SEARCH_PATHS = "$(inherited) third-party/fmt/include third-party/libevent/include";
+				SYSTEM_HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"third-party/fmt/include",
+					"third-party/libevent/include",
+				);
 			};
 			name = "Release - Debug";
 		};
@@ -4508,7 +4600,11 @@
 				OTHER_CPLUSPLUSFLAGS = "$(inherited)";
 				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SYSTEM_HEADER_SEARCH_PATHS = "$(inherited) third-party/fmt/include third-party/libevent/include";
+				SYSTEM_HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"third-party/fmt/include",
+					"third-party/libevent/include",
+				);
 			};
 			name = Release;
 		};
@@ -4527,7 +4623,11 @@
 				OTHER_CPLUSPLUSFLAGS = "$(inherited)";
 				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SYSTEM_HEADER_SEARCH_PATHS = "$(inherited) third-party/fmt/include third-party/libevent/include";
+				SYSTEM_HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"third-party/fmt/include",
+					"third-party/libevent/include",
+				);
 			};
 			name = Debug;
 		};
@@ -4546,7 +4646,11 @@
 				OTHER_CPLUSPLUSFLAGS = "$(inherited)";
 				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SYSTEM_HEADER_SEARCH_PATHS = "$(inherited) third-party/fmt/include third-party/libevent/include";
+				SYSTEM_HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"third-party/fmt/include",
+					"third-party/libevent/include",
+				);
 			};
 			name = "Release - Debug";
 		};
@@ -4565,7 +4669,11 @@
 				OTHER_CPLUSPLUSFLAGS = "$(inherited)";
 				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SYSTEM_HEADER_SEARCH_PATHS = "$(inherited) third-party/fmt/include third-party/libevent/include";
+				SYSTEM_HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"third-party/fmt/include",
+					"third-party/libevent/include",
+				);
 			};
 			name = Release;
 		};
@@ -4584,7 +4692,11 @@
 				OTHER_CPLUSPLUSFLAGS = "$(inherited)";
 				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SYSTEM_HEADER_SEARCH_PATHS = "$(inherited) third-party/fmt/include third-party/libevent/include";
+				SYSTEM_HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"third-party/fmt/include",
+					"third-party/libevent/include",
+				);
 			};
 			name = Debug;
 		};
@@ -4603,7 +4715,11 @@
 				OTHER_CPLUSPLUSFLAGS = "$(inherited)";
 				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SYSTEM_HEADER_SEARCH_PATHS = "$(inherited) third-party/fmt/include third-party/libevent/include";
+				SYSTEM_HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"third-party/fmt/include",
+					"third-party/libevent/include",
+				);
 			};
 			name = "Release - Debug";
 		};
@@ -4622,7 +4738,11 @@
 				OTHER_CPLUSPLUSFLAGS = "$(inherited)";
 				OTHER_LDFLAGS = "-lc++";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SYSTEM_HEADER_SEARCH_PATHS = "$(inherited) third-party/fmt/include third-party/libevent/include";
+				SYSTEM_HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"third-party/fmt/include",
+					"third-party/libevent/include",
+				);
 			};
 			name = Release;
 		};
