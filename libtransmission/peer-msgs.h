@@ -19,7 +19,6 @@
 
 class tr_peer;
 class tr_peerIo;
-struct Bandwidth;
 struct tr_address;
 
 /**

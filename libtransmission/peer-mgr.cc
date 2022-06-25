@@ -495,6 +495,11 @@ using UniqueTimer = std::unique_ptr<struct event, EventDeleter>;
 
 struct tr_peerMgr final : public BlockRequestAllocator<tr_peer*, Bandwidth*>::Mediator
 {
+private:
+    using PeerKey = tr_peer*;
+    using PoolKey = Bandwidth*;
+
+public:
     explicit tr_peerMgr(tr_session* session_in)
         : session{ session_in }
         , bandwidth_timer_{ evtimer_new(session->event_base, bandwidthPulseMarshall, this) }
@@ -529,9 +534,6 @@ struct tr_peerMgr final : public BlockRequestAllocator<tr_peer*, Bandwidth*>::Me
     void makeNewPeerConnections(size_t max);
 
     /// BlockRequestAllocator::Mediator
-
-    using PeerKey = tr_peer*;
-    using PoolKey = Bandwidth*;
 
     [[nodiscard]] std::vector<PeerKey> peers() const override
     {
