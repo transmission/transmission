@@ -149,3 +149,17 @@ TEST_F(RequestAllocatorTest, stopsWhenOutOfReqs)
                                                                    std::make_pair(Torrent2PeerA, 11) };
     EXPECT_EQ(expected, allocation);
 }
+
+TEST_F(RequestAllocatorTest, doesNothingWhenNoReqs)
+{
+    auto mediator = MockMediator();
+    mediator.addPeer(Torrent1PeerA, 10, Torrent1Pool, SessionPool);
+    mediator.addPeer(Torrent1PeerB, 0, Torrent1Pool, SessionPool);
+    mediator.addPeer(Torrent2PeerA, 0, SessionPool);
+    mediator.setPoolLimit(Torrent1Pool, 50);
+    mediator.setPoolLimit(SessionPool, 100);
+
+    auto const allocation = RequestAllocator::allocateBlockReqs(mediator, 0);
+    auto const expected = std::vector<std::pair<PeerKey, size_t>>{};
+    EXPECT_EQ(expected, allocation);
+}
