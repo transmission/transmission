@@ -653,6 +653,9 @@ static void onNowTimer(evutil_socket_t /*fd*/, short /*what*/, void* vsession)
     ***  tr_session things to do once per second
     **/
 
+    auto& max = session->max_observed_dl_speed_Bps_;
+    max = std::max(max, tr_sessionGetPieceSpeed_Bps(session, TR_PEER_TO_CLIENT));
+
     tr_timeUpdate(now);
 
     tr_dhtUpkeep(session);

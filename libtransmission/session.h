@@ -287,6 +287,11 @@ public:
     void closeTorrentFiles(tr_torrent* tor) noexcept;
     void closeTorrentFile(tr_torrent* tor, tr_file_index_t file_num) noexcept;
 
+    [[nodiscard]] auto maxObservedDlSpeedBps() const noexcept
+    {
+        return max_observed_dl_speed_Bps_;
+    }
+
 public:
     static constexpr std::array<std::tuple<tr_quark, tr_quark, TrScript>, 3> Scripts{
         { { TR_KEY_script_torrent_added_enabled, TR_KEY_script_torrent_added_filename, TR_SCRIPT_ON_TORRENT_ADDED },
@@ -442,6 +447,8 @@ public:
     // See tr_netTos*() in libtransmission/net.h for more info
     // Only session.cc should use this.
     int peer_socket_tos_ = *tr_netTosFromName(TR_DEFAULT_PEER_SOCKET_TOS_STR);
+
+    uint32_t max_observed_dl_speed_Bps_ = 0;
 
 private:
     static std::recursive_mutex session_mutex_;
