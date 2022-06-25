@@ -105,6 +105,7 @@ TEST_F(RequestAllocatorTest, honorsSpeedLimits)
 {
     auto mediator = MockMediator();
     mediator.setPoolLimit(SessionPool, 100);
+    mediator.setPoolLimit(Torrent1Pool, 50);
     mediator.addPeer(Torrent1PeerA, 0, Torrent1Pool, SessionPool);
     mediator.addPeer(Torrent1PeerB, 0, Torrent1Pool, SessionPool);
     mediator.addPeer(Torrent2PeerA, 0, SessionPool); // no per-torrent speed limit for torrent 2
@@ -120,8 +121,8 @@ TEST_F(RequestAllocatorTest, honorsSpeedLimits)
 TEST_F(RequestAllocatorTest, considersBacklog)
 {
     auto mediator = MockMediator();
-    mediator.setPoolLimit(Torrent1Pool, 50);
     mediator.setPoolLimit(SessionPool, 100);
+    mediator.setPoolLimit(Torrent1Pool, 50);
     mediator.addPeer(Torrent1PeerA, 10, Torrent1Pool, SessionPool);
     mediator.addPeer(Torrent1PeerB, 0, Torrent1Pool, SessionPool);
     mediator.addPeer(Torrent2PeerA, 0, SessionPool); // no per-torrent speed limit for torrent 2
