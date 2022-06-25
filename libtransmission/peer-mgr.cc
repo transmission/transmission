@@ -493,7 +493,7 @@ struct EventDeleter
 
 using UniqueTimer = std::unique_ptr<struct event, EventDeleter>;
 
-struct tr_peerMgr final : public BlockRequestAllocator<tr_peerMsgs*, Bandwidth*>::Mediator
+struct tr_peerMgr final : public BlockRequestAllocator<tr_peer*, Bandwidth*>::Mediator
 {
     explicit tr_peerMgr(tr_session* session_in)
         : session{ session_in }
@@ -530,7 +530,7 @@ struct tr_peerMgr final : public BlockRequestAllocator<tr_peerMsgs*, Bandwidth*>
 
     /// BlockRequestAllocator::Mediator
 
-    using PeerKey = tr_peerMsgs*;
+    using PeerKey = tr_peer*;
     using PoolKey = Bandwidth*;
 
     [[nodiscard]] std::vector<PeerKey> peers() const override
@@ -546,6 +546,11 @@ struct tr_peerMgr final : public BlockRequestAllocator<tr_peerMsgs*, Bandwidth*>
                 {
                     peers.push_back(peer);
                 }
+            }
+
+            for (auto& peer : torrent->swarm->webseeds)
+            {
+                peers.push_back(peer.get());
             }
         }
 

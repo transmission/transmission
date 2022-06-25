@@ -234,6 +234,26 @@ public:
         return true;
     }
 
+    [[nodiscard]] Bandwidth* bandwidth() noexcept override
+    {
+        return &bandwidth_;
+    }
+
+    [[nodiscard]] size_t pendingReqCount(tr_direction dir) const noexcept override
+    {
+        if (dir == TR_CLIENT_TO_PEER) // blocks we've requested
+        {
+            return std::accumulate(
+                std::begin(tasks),
+                std::end(tasks),
+                size_t{},
+                [](size_t sum, auto const* task) { return sum + (task->blocks.end - task->blocks.begin); });
+        }
+
+        // webseed will never request blocks from us
+        return {};
+    }
+
     void gotPieceData(uint32_t n_bytes)
     {
         bandwidth_.notifyBandwidthConsumed(TR_DOWN, n_bytes, true, tr_time_msec());
@@ -315,6 +335,10 @@ public:
     tr_peer_callback const callback;
     void* const callback_data;
 
+<<<<<<< HEAD
+=======
+    Bandwidth bandwidth_;
+>>>>>>> 151c0d69d (refactor: add webseeds to peer_mgr's Mediator code)
     ConnectionLimiter connection_limiter;
     std::set<tr_webseed_task*> tasks;
 
