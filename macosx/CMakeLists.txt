@@ -95,7 +95,6 @@ set(${PROJECT_NAME}_SOURCES
     StatsWindowController.mm
     StatusBarController.mm
     StatusBarView.mm
-    Toolbar.mm
     ToolbarSegmentedCell.mm
     Torrent.mm
     TorrentCell.mm
@@ -166,7 +165,6 @@ set(${PROJECT_NAME}_HEADERS
     StatsWindowController.h
     StatusBarController.h
     StatusBarView.h
-    Toolbar.h
     ToolbarSegmentedCell.h
     Torrent.h
     TorrentCell.h
@@ -239,17 +237,18 @@ set_source_files_properties(${${PROJECT_NAME}_RESOURCES} PROPERTIES
 
 set(${PROJECT_NAME}_HIDPI_IMAGES
     ActionHover
-    ActionOn
     Bandwidth
+    BlueDotFlat
     CleanupTemplate
     CompleteCheck
     CreateLarge
     DownArrowGroupTemplate
     DownArrowTemplate
-    EllipsisTemplate
     FavIcon
     Globe
+    GreenDotFlat
     Groups
+    GroupsNoneTemplate
     InfoActivity
     InfoFiles
     InfoGeneral
@@ -258,6 +257,7 @@ set(${PROJECT_NAME}_HIDPI_IMAGES
     InfoTracker
     Lock
     Magnet
+    OrangeDotFlat
     PauseHover
     PauseOff
     PauseOn
@@ -268,6 +268,8 @@ set(${PROJECT_NAME}_HIDPI_IMAGES
     PriorityHighTemplate
     PriorityLowTemplate
     PriorityNormalTemplate
+    PurpleDotFlat
+    RedDotFlat
     Remote
     ResumeHover
     ResumeNoWaitHover
@@ -288,10 +290,11 @@ set(${PROJECT_NAME}_HIDPI_IMAGES
     ToolbarRemoveTemplate
     ToolbarResumeAllTemplate
     ToolbarResumeSelectedTemplate
-    TortoiseTemplate
     Transfers
+    TurtleTemplate
     UpArrowGroupTemplate
     UpArrowTemplate
+    YellowDotFlat
     YingYangGroupTemplate
     YingYangTemplate
 )
