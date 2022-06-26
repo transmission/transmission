@@ -309,6 +309,13 @@ public:
         return std::size(peers);
     }
 
+    void updateEndgame()
+    {
+        /* we consider ourselves to be in endgame if the number of bytes
+           we've got requested is >= the number of bytes left to download */
+        is_endgame = uint64_t(std::size(active_requests)) * tr_block_info::BlockSize >= tor->leftUntilDone();
+    }
+
     void addStrike(tr_peer* peer)
     {
         tr_logAddTraceSwarm(this, fmt::format("increasing peer {} strike count to {}", peer->readable(), peer->strikes + 1));
@@ -353,6 +360,8 @@ public:
 
     tr_peerMgr* const manager;
 
+    tr_torrent* const tor;
+
     std::vector<std::unique_ptr<tr_peer>> webseeds;
     std::vector<tr_peerMsgs*> peers;
 
@@ -360,8 +369,6 @@ public:
     // so use a deque instead of vector to prevent insertion from
     // invalidating those pointers
     std::deque<peer_atom> pool;
-
-    tr_torrent* const tor;
 
     tr_peerMsgs* optimistic = nullptr; /* the optimistic peer, or nullptr if none */
 
@@ -647,13 +654,6 @@ void tr_peerMgrClientSentRequests(tr_torrent* torrent, tr_peer* peer, tr_block_s
     }
 }
 
-static void updateEndgame(tr_swarm* s)
-{
-    /* we consider ourselves to be in endgame if the number of bytes
-       we've got requested is >= the number of bytes left to download */
-    s->is_endgame = uint64_t(std::size(s->active_requests)) * tr_block_info::BlockSize >= s->tor->leftUntilDone();
-}
-
 std::vector<tr_block_span_t> tr_peerMgrGetNextRequests(tr_torrent* torrent, tr_peer const* peer, size_t numwant)
 {
     class MediatorImpl final : public Wishlist::Mediator
@@ -714,8 +714,7 @@ std::vector<tr_block_span_t> tr_peerMgrGetNextRequests(tr_torrent* torrent, tr_p
         tr_peer const* const peer_;
     };
 
-    auto* const swarm = torrent->swarm;
-    updateEndgame(swarm);
+    torrent->swarm->updateEndgame();
     return Wishlist::next(MediatorImpl(torrent, peer), numwant);
 }
 
