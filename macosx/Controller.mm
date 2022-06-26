@@ -5021,6 +5021,7 @@ static void removeKeRangerRansomware()
             [self removeStackViewHeightConstraints];
         }
 
+        //this fixes a macOS bug where on toggling the toolbar item bezels will show
         [self hideToolBarBezels:YES];
 
         dispatch_async(dispatch_get_main_queue(), ^{
