@@ -5021,9 +5021,23 @@ static void removeKeRangerRansomware()
             [self removeStackViewHeightConstraints];
         }
 
+        [self hideToolBarBezels:YES];
+
         dispatch_async(dispatch_get_main_queue(), ^{
             [self setWindowSizeToFit];
+            [self hideToolBarBezels:NO];
         });
+    }
+}
+
+- (void)hideToolBarBezels:(BOOL)hide
+{
+    if (@available(macOS 11.0, *))
+    {
+        for (NSToolbarItem* item in self.fWindow.toolbar.items)
+        {
+            [item.view setHidden:hide];
+        }
     }
 }
 
