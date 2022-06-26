@@ -75,7 +75,7 @@
     self.fNameField.toolTip = name;
 
     //disable fullscreen support
-    [self.window setCollectionBehavior:NSWindowCollectionBehaviorFullScreenNone];
+    self.window.collectionBehavior = NSWindowCollectionBehaviorFullScreenNone;
 
     [self setGroupsMenu];
     [self.fGroupPopUp selectItemWithTag:self.fGroupValue];
