@@ -367,14 +367,15 @@ struct tr_peerMgr
         tr_timerAddMsec(*refill_upkeep_timer_, RefillUpkeepPeriodMsec);
     }
 
-    ~tr_peerMgr()
-    {
-        incoming_handshakes.abortAll();
-    }
-
     [[nodiscard]] auto unique_lock() const
     {
         return session->unique_lock();
+    }
+
+    ~tr_peerMgr()
+    {
+        auto const lock = unique_lock();
+        incoming_handshakes.abortAll();
     }
 
     void rechokeSoon() noexcept
@@ -535,10 +536,6 @@ tr_peerMgr* tr_peerMgrNew(tr_session* session)
 
 void tr_peerMgrFree(tr_peerMgr* manager)
 {
-    auto const lock = manager->unique_lock();
-
-    manager->incoming_handshakes.abortAll();
-
     delete manager;
 }
 
