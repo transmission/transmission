@@ -53,18 +53,11 @@
 // for this many calls to rechokeUploads().
 static auto constexpr OptimisticUnchokeMultiplier = uint8_t{ 4 };
 
-// how frequently to decide which peers live and die
-static auto constexpr ReconnectPeriodMsec = int{ 500 };
-
 // when many peers are available, keep idle ones this long
 static auto constexpr MinUploadIdleSecs = int{ 60 };
 
 // when few peers are available, keep idle ones this long
 static auto constexpr MaxUploadIdleSecs = int{ 60 * 5 };
-
-// max number of peers to ask for per second overall.
-// this throttle is to avoid overloading the router
-static auto constexpr MaxConnectionsPerSecond = size_t{ 12 };
 
 // number of bad pieces a peer is allowed to send before we ban them
 static auto constexpr MaxBadPiecesPerPeer = int{ 5 };
@@ -421,6 +414,13 @@ private:
     static auto constexpr BandwidthPeriodMsec = int{ 500 };
     static auto constexpr RechokePeriodMsec = int{ 10 * 1000 };
     static auto constexpr RefillUpkeepPeriodMsec = int{ 10 * 1000 };
+
+    // how frequently to decide which peers live and die
+    static auto constexpr ReconnectPeriodMsec = int{ 500 };
+
+    // max number of peers to ask for per second overall.
+    // this throttle is to avoid overloading the router
+    static auto constexpr MaxConnectionsPerSecond = size_t{ 12 };
 };
 
 #define tr_logAddDebugSwarm(swarm, msg) tr_logAddDebugTor((swarm)->tor, msg)
