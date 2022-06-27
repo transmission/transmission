@@ -2465,9 +2465,6 @@ void tr_peerMgr::bandwidthPulse()
 ****
 ***/
 
-namespace peer_candidates
-{
-
 /* is this atom someone that we'd want to initiate a connection to? */
 static bool isPeerCandidate(tr_torrent const* tor, peer_atom const& atom, time_t const now)
 {
@@ -2733,12 +2730,10 @@ static void initiateConnection(tr_peerMgr* mgr, tr_swarm* s, peer_atom& atom)
     atom.time = now;
 }
 
-} // namespace peer_candidates
-
 void tr_peerMgr::makeNewPeerConnections(size_t max)
 {
-    for (auto& candidate : peer_candidates::getPeerCandidates(session, max))
+    for (auto& candidate : getPeerCandidates(session, max))
     {
-        peer_candidates::initiateConnection(this, candidate.tor->swarm, *candidate.atom);
+        initiateConnection(this, candidate.tor->swarm, *candidate.atom);
     }
 }
