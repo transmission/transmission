@@ -78,6 +78,8 @@ public:
 
     [[nodiscard]] virtual std::string readable() const = 0;
 
+    [[nodiscard]] virtual bool hasPiece(tr_piece_index_t piece) const noexcept = 0;
+
     /* whether or not we should free this peer soon.
        NOTE: private to peer-mgr.c */
     bool doPurge = false;
@@ -92,15 +94,7 @@ public:
 
     tr_swarm* const swarm;
 
-    /** how complete the peer's copy of the torrent is. [0.0...1.0] */
-    float progress = 0.0f;
-
     tr_bitfield blame;
-    tr_bitfield have;
-
-    /* the client name.
-       For BitTorrent peers, this is the app name derived from the `v' string in LTEP's handshake dictionary */
-    tr_interned_string client;
 
     tr_recentHistory<uint16_t> blocksSentToClient;
     tr_recentHistory<uint16_t> blocksSentToPeer;
@@ -108,11 +102,6 @@ public:
     tr_recentHistory<uint16_t> cancelsSentToClient;
     tr_recentHistory<uint16_t> cancelsSentToPeer;
 };
-
-/** Update the tr_peer.progress field based on the 'have' bitset. */
-void tr_peerUpdateProgress(tr_torrent* tor, tr_peer*);
-
-bool tr_peerIsSeed(tr_peer const* peer);
 
 /***
 ****

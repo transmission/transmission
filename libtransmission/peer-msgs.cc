@@ -246,6 +246,7 @@ public:
         , torrent{ torrent_in }
         , outMessages{ evbuffer_new() }
         , io{ io_in }
+        , have_{ torrent_in->pieceCount() }
         , callback_{ callback }
         , callbackData_{ callbackData }
     {
@@ -378,6 +379,37 @@ public:
         return addr.readable(port);
     }
 
+    [[nodiscard]] bool isSeed() const noexcept override
+    {
+        return have_.hasAll();
+    }
+
+    [[nodiscard]] bool hasPiece(tr_piece_index_t piece) const noexcept override
+    {
+        return have_.test(piece);
+    }
+
+    [[nodiscard]] float percentDone() const noexcept override
+    {
+        if (!percent_done_)
+        {
+            percent_done_ = calculatePercentDone();
+        }
+
+        return *percent_done_;
+    }
+
+    void onTorrentGotMetainfo() noexcept override
+    {
+        invalidatePercentDone();
+    }
+
+    void invalidatePercentDone()
+    {
+        percent_done_.reset();
+        updateInterest();
+    }
+
     void cancel_block_request(tr_block_index_t block) override
     {
         protocolSendCancel(this, blockToReq(torrent, block));
@@ -417,7 +449,7 @@ public:
         protocolSendHave(this, piece);
 
         // since we have more pieces now, we might not be interested in this peer
-        update_interest();
+        updateInterest();
     }
 
     void set_interested(bool interested) override
@@ -430,7 +462,7 @@ public:
         }
     }
 
-    void update_interest()
+    void updateInterest()
     {
         // TODO -- might need to poke the mgr on startup
     }
@@ -549,6 +581,24 @@ public:
     }
 
 private:
+    [[nodiscard]] float calculatePercentDone() const noexcept
+    {
+        if (have_.hasAll())
+        {
+            return 1.0F;
+        }
+
+        if (have_.hasNone())
+        {
+            return 0.0F;
+        }
+
+        auto const true_count = have_.count();
+        auto const percent_done = torrent->hasMetainfo() ? true_count / static_cast<float>(torrent->pieceCount()) :
+                                                           true_count / static_cast<float>(std::size(have_) + 1);
+        return std::clamp(percent_done, 0.0F, 1.0F);
+    }
+
     [[nodiscard]] bool calculate_active(tr_direction direction) const
     {
         if (direction == TR_CLIENT_TO_PEER)
@@ -668,11 +718,15 @@ public:
 
     tr_peerIo* io = nullptr;
 
+    tr_bitfield have_;
+
 private:
     bool is_active_[2] = { false, false };
 
     tr_peer_callback const callback_;
     void* const callbackData_;
+
+    mutable std::optional<float> percent_done_;
 };
 
 tr_peerMsgs* tr_peerMsgsNew(tr_torrent* torrent, peer_atom* atom, tr_peerIo* io, tr_peer_callback callback, void* callbackData)
@@ -1413,13 +1467,6 @@ static ReadState readBtId(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, size_t 
     return readBtMessage(msgs, inbuf, inlen - 1);
 }
 
-static void updatePeerProgress(tr_peerMsgsImpl* msgs)
-{
-    tr_peerUpdateProgress(msgs->torrent, msgs);
-
-    msgs->update_interest();
-}
-
 static void prefetchPieces(tr_peerMsgsImpl* msgs)
 {
     if (!msgs->session->isPrefetchEnabled)
@@ -1696,24 +1743,24 @@ static ReadState readBtMessage(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, si
         }
 
         /* a peer can send the same HAVE message twice... */
-        if (!msgs->have.test(ui32))
+        if (!msgs->have_.test(ui32))
         {
-            msgs->have.set(ui32);
+            msgs->have_.set(ui32);
             msgs->publishClientGotHave(ui32);
         }
 
-        updatePeerProgress(msgs);
+        msgs->invalidatePercentDone();
         break;
 
     case BtPeerMsgs::Bitfield:
         {
-            auto* const tmp = tr_new(uint8_t, msglen);
             logtrace(msgs, "got a bitfield");
-            tr_peerIoReadBytes(msgs->io, inbuf, tmp, msglen);
-            msgs->have.setRaw(tmp, msglen);
-            msgs->publishClientGotBitfield(&msgs->have);
-            updatePeerProgress(msgs);
-            tr_free(tmp);
+            auto tmp = std::vector<uint8_t>(msglen);
+            tr_peerIoReadBytes(msgs->io, inbuf, std::data(tmp), std::size(tmp));
+            msgs->have_ = tr_bitfield{ msgs->torrent->hasMetainfo() ? msgs->torrent->pieceCount() : std::size(tmp) };
+            msgs->have_.setRaw(std::data(tmp), std::size(tmp));
+            msgs->publishClientGotBitfield(&msgs->have_);
+            msgs->invalidatePercentDone();
             break;
         }
 
@@ -1814,9 +1861,9 @@ static ReadState readBtMessage(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, si
 
         if (fext)
         {
-            msgs->have.setHasAll();
+            msgs->have_.setHasAll();
             msgs->publishClientGotHaveAll();
-            updatePeerProgress(msgs);
+            msgs->invalidatePercentDone();
         }
         else
         {
@@ -1831,9 +1878,9 @@ static ReadState readBtMessage(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, si
 
         if (fext)
         {
-            msgs->have.setHasNone();
+            msgs->have_.setHasNone();
             msgs->publishClientGotHaveNone();
-            updatePeerProgress(msgs);
+            msgs->invalidatePercentDone();
         }
         else
         {

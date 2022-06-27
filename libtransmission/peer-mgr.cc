@@ -391,7 +391,6 @@ tr_peer::tr_peer(tr_torrent const* tor, peer_atom* atom_in)
     , atom{ atom_in }
     , swarm{ tor->swarm }
     , blame{ tor->blockCount() }
-    , have{ tor->pieceCount() }
 {
 }
 
@@ -642,7 +641,7 @@ std::vector<tr_block_span_t> tr_peerMgrGetNextRequests(tr_torrent* torrent, tr_p
 
         [[nodiscard]] bool clientCanRequestPiece(tr_piece_index_t piece) const override
         {
-            return torrent_->pieceIsWanted(piece) && peer_->have.test(piece);
+            return torrent_->pieceIsWanted(piece) && peer_->hasPiece(piece);
         }
 
         [[nodiscard]] bool isEndgame() const override
@@ -1430,38 +1429,6 @@ void tr_peerMgrRemoveTorrent(tr_torrent* tor)
     swarmFree(tor->swarm);
 }
 
-void tr_peerUpdateProgress(tr_torrent* tor, tr_peer* peer)
-{
-    if (auto const* have = &peer->have; have->hasAll())
-    {
-        peer->progress = 1.0;
-    }
-    else if (have->hasNone())
-    {
-        peer->progress = 0.0;
-    }
-    else
-    {
-        float const true_count = have->count();
-
-        if (tor->hasMetainfo())
-        {
-            peer->progress = true_count / float(tor->pieceCount());
-        }
-        else // without pieceCount, this result is only a best guess...
-        {
-            peer->progress = true_count / float(have->size() + 1);
-        }
-    }
-
-    peer->progress = std::clamp(peer->progress, 0.0F, 1.0F);
-
-    if (peer->atom != nullptr && peer->progress >= 1.0F)
-    {
-        atomSetSeed(tor->swarm, *peer->atom);
-    }
-}
-
 void tr_peerMgrOnTorrentGotMetainfo(tr_torrent* tor)
 {
     /* the webseed list may have changed... */
@@ -1471,7 +1438,12 @@ void tr_peerMgrOnTorrentGotMetainfo(tr_torrent* tor)
        didn't have the metadata before now... so refresh them all... */
     for (auto* peer : tor->swarm->peers)
     {
-        tr_peerUpdateProgress(tor, peer);
+        peer->onTorrentGotMetainfo();
+
+        if (peer->isSeed())
+        {
+            atomSetSeed(tor->swarm, *peer->atom);
+        }
     }
 
     /* update the bittorrent peers' willingness... */
@@ -1495,7 +1467,7 @@ int8_t tr_peerMgrPieceAvailability(tr_torrent const* tor, tr_piece_index_t piece
     }
 
     auto const& peers = tor->swarm->peers;
-    return std::count_if(std::begin(peers), std::end(peers), [piece](auto const* peer) { return peer->have.test(piece); });
+    return std::count_if(std::begin(peers), std::end(peers), [piece](auto const* peer) { return peer->hasPiece(piece); });
 }
 
 void tr_peerMgrTorrentAvailability(tr_torrent const* tor, int8_t* tab, unsigned int n_tabs)
@@ -1541,11 +1513,6 @@ void tr_swarmIncrementActivePeers(tr_swarm* swarm, tr_direction direction, bool 
     swarm->stats.active_peer_count[direction] = n;
 }
 
-bool tr_peerIsSeed(tr_peer const* peer)
-{
-    return (peer != nullptr) && ((peer->progress >= 1.0) || peer->atom->isSeed());
-}
-
 /* count how many bytes we want that connected peers have */
 uint64_t tr_peerMgrGetDesiredAvailable(tr_torrent const* tor)
 {
@@ -1588,7 +1555,7 @@ uint64_t tr_peerMgrGetDesiredAvailable(tr_torrent const* tor)
     {
         for (size_t j = 0; j < n_pieces; ++j)
         {
-            if (peer->have.test(j))
+            if (peer->hasPiece(j))
             {
                 have[j] = true;
             }
@@ -1628,7 +1595,7 @@ static auto getPeerStats(tr_peerMsgs const* peer, time_t now, uint64_t now_msec)
     stats.client = peer->client.c_str();
     stats.port = port.host();
     stats.from = atom->fromFirst;
-    stats.progress = peer->progress;
+    stats.progress = peer->percentDone();
     stats.isUTP = peer->is_utp_connection();
     stats.isEncrypted = peer->is_encrypted();
     stats.rateToPeer_KBps = tr_toSpeedKBps(tr_peerGetPieceSpeed_Bps(peer, now_msec, TR_CLIENT_TO_PEER));
@@ -1640,7 +1607,7 @@ static auto getPeerStats(tr_peerMsgs const* peer, time_t now, uint64_t now_msec)
     stats.isIncoming = peer->is_incoming_connection();
     stats.isDownloadingFrom = peer->is_active(TR_PEER_TO_CLIENT);
     stats.isUploadingTo = peer->is_active(TR_CLIENT_TO_PEER);
-    stats.isSeed = tr_peerIsSeed(peer);
+    stats.isSeed = peer->isSeed();
 
     stats.blocksToPeer = peer->blocksSentToPeer.count(now, CancelHistorySec);
     stats.blocksToClient = peer->blocksSentToClient.count(now, CancelHistorySec);
@@ -1749,20 +1716,20 @@ void tr_peerMgrClearInterest(tr_torrent* tor)
 }
 
 /* does this peer have any pieces that we want? */
-static bool isPeerInteresting(tr_torrent* const tor, bool const* const piece_is_interesting, tr_peer const* const peer)
+static bool isPeerInteresting(tr_torrent* const tor, bool const* const piece_is_interesting, tr_peerMsgs const* const peer)
 {
     /* these cases should have already been handled by the calling code... */
     TR_ASSERT(!tor->isDone());
     TR_ASSERT(tor->clientCanDownload());
 
-    if (tr_peerIsSeed(peer))
+    if (peer->isSeed())
     {
         return true;
     }
 
     for (tr_piece_index_t i = 0; i < tor->pieceCount(); ++i)
     {
-        if (piece_is_interesting[i] && peer->have.test(i))
+        if (piece_is_interesting[i] && peer->hasPiece(i))
         {
             return true;
         }
@@ -2070,7 +2037,7 @@ static void rechokeUploads(tr_swarm* s, uint64_t const now)
     /* sort the peers by preference and rate */
     for (auto* const peer : peers)
     {
-        if (tr_peerIsSeed(peer))
+        if (peer->isSeed())
         {
             /* choke seeds and partial seeds */
             peer->set_choke(true);
@@ -2191,7 +2158,7 @@ static void rechokePulse(evutil_socket_t /*fd*/, short /*what*/, void* vmgr)
 ****
 ***/
 
-static bool shouldPeerBeClosed(tr_swarm const* s, tr_peer const* peer, int peerCount, time_t const now)
+static bool shouldPeerBeClosed(tr_swarm const* s, tr_peerMsgs const* peer, int peerCount, time_t const now)
 {
     /* if it's marked for purging, close it */
     if (peer->doPurge)
@@ -2204,7 +2171,7 @@ static bool shouldPeerBeClosed(tr_swarm const* s, tr_peer const* peer, int peerC
     auto const* const atom = peer->atom;
 
     /* disconnect if we're both seeds and enough time has passed for PEX */
-    if (tor->isDone() && tr_peerIsSeed(peer))
+    if (tor->isDone() && peer->isSeed())
     {
         return !tor->allowsPex() || now - atom->time >= 30;
     }

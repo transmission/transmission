@@ -161,10 +161,6 @@ public:
         , bandwidth(&tor->bandwidth_)
         , pulse_timer(evtimer_new(session->event_base, &tr_webseed::onTimer, this), event_free)
     {
-        // init parent bits
-        have.setHasAll();
-        tr_peerUpdateProgress(tor, this);
-
         startTimer();
     }
 
@@ -207,6 +203,11 @@ public:
         }
 
         return base_url;
+    }
+
+    [[nodiscard]] bool hasPiece(tr_piece_index_t /*piece*/) const noexcept override
+    {
+        return true;
     }
 
     void gotPieceData(uint32_t n_bytes)
