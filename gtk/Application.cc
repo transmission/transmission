@@ -1279,7 +1279,7 @@ void Application::Impl::show_about_dialog()
     auto const uri = Glib::ustring("https://transmissionbt.com/");
     auto const authors = std::vector<Glib::ustring>({
         "Charles Kerr (Backend; GTK+)",
-        "Mitchell Livingston (Backend; OS X)",
+        "Mitchell Livingston (Backend; macOS)",
         "Mike Gelfand",
     });
 
