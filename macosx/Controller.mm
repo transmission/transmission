@@ -908,8 +908,13 @@ static void removeKeRangerRansomware()
                                    active];
     [alert addButtonWithTitle:NSLocalizedString(@"Quit", "Confirm Quit panel -> button")];
     [alert addButtonWithTitle:NSLocalizedString(@"Cancel", "Confirm Quit panel -> button")];
+    alert.showsSuppressionButton = YES;
 
     [alert beginSheetModalForWindow:self.fWindow completionHandler:^(NSModalResponse returnCode) {
+        if (alert.suppressionButton.state == NSControlStateValueOn)
+        {
+            [self.fDefaults setBool:NO forKey:@"CheckQuit"];
+        }
         [NSApp replyToApplicationShouldTerminate:returnCode == NSAlertFirstButtonReturn];
     }];
 
