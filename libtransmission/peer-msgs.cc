@@ -296,7 +296,7 @@ public:
         evbuffer_free(this->outMessages);
     }
 
-    bool is_transferring_pieces(uint64_t now, tr_direction direction, unsigned int* setme_Bps) const override
+    bool isTransferringPieces(uint64_t now, tr_direction direction, unsigned int* setme_Bps) const override
     {
         auto const Bps = io->getPieceSpeed_Bps(now, direction);
 
@@ -1781,7 +1781,7 @@ static ReadState readBtMessage(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, si
             tr_peerIoReadUint32(msgs->io, inbuf, &r.index);
             tr_peerIoReadUint32(msgs->io, inbuf, &r.offset);
             tr_peerIoReadUint32(msgs->io, inbuf, &r.length);
-            msgs->cancelsSentToClient.add(tr_time(), 1);
+            msgs->cancels_sent_to_client.add(tr_time(), 1);
             logtrace(msgs, fmt::format(FMT_STRING("got a Cancel {:d}:{:d}->{:d}"), r.index, r.offset, r.length));
 
             auto& requests = msgs->peer_requested_;
@@ -2310,7 +2310,7 @@ static size_t fillOutputBuffer(tr_peerMsgsImpl* msgs, time_t now)
                 tr_peerIoWriteBuf(msgs->io, out, true);
                 bytesWritten += n;
                 msgs->clientSentAnythingAt = now;
-                msgs->blocksSentToPeer.add(tr_time(), 1);
+                msgs->blocks_sent_to_peer.add(tr_time(), 1);
             }
 
             evbuffer_free(out);
