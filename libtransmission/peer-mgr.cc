@@ -382,16 +382,15 @@ struct tr_peerMgr
 unsigned int tr_peerGetPieceSpeed_Bps(tr_peer const* peer, uint64_t now, tr_direction direction)
 {
     unsigned int Bps = 0;
-    peer->is_transferring_pieces(now, direction, &Bps);
+    peer->isTransferringPieces(now, direction, &Bps);
     return Bps;
 }
 
 tr_peer::tr_peer(tr_torrent const* tor, peer_atom* atom_in)
     : session{ tor->session }
-    , atom{ atom_in }
     , swarm{ tor->swarm }
+    , atom{ atom_in }
     , blame{ tor->blockCount() }
-    , have{ tor->pieceCount() }
 {
 }
 
@@ -600,7 +599,7 @@ void tr_peerMgrSetUtpFailed(tr_torrent* tor, tr_address const& addr, bool failed
     return std::count_if(
         std::begin(s->webseeds),
         std::end(s->webseeds),
-        [&now](auto const& webseed) { return webseed->is_transferring_pieces(now, TR_DOWN, nullptr); });
+        [&now](auto const& webseed) { return webseed->isTransferringPieces(now, TR_DOWN, nullptr); });
 }
 
 // TODO: if we keep this, add equivalent API to ActiveRequest
@@ -642,7 +641,7 @@ std::vector<tr_block_span_t> tr_peerMgrGetNextRequests(tr_torrent* torrent, tr_p
 
         [[nodiscard]] bool clientCanRequestPiece(tr_piece_index_t piece) const override
         {
-            return torrent_->pieceIsWanted(piece) && peer_->have.test(piece);
+            return torrent_->pieceIsWanted(piece) && peer_->hasPiece(piece);
         }
 
         [[nodiscard]] bool isEndgame() const override
@@ -707,7 +706,7 @@ static void maybeSendCancelRequest(tr_peer* peer, tr_block_index_t block, tr_pee
     auto* msgs = dynamic_cast<tr_peerMsgs*>(peer);
     if (msgs != nullptr && msgs != muted)
     {
-        peer->cancelsSentToPeer.add(tr_time(), 1);
+        peer->cancels_sent_to_peer.add(tr_time(), 1);
         msgs->cancel_block_request(block);
     }
 }
@@ -750,7 +749,7 @@ static void addStrike(tr_swarm* s, tr_peer* peer)
     if (++peer->strikes >= MaxBadPiecesPerPeer)
     {
         peer->atom->flags2 |= MyflagBanned;
-        peer->doPurge = true;
+        peer->do_purge = true;
         tr_logAddTraceSwarm(s, fmt::format("banning peer {}", peer->readable()));
     }
 }
@@ -915,7 +914,7 @@ static void peerCallbackFunc(tr_peer* peer, tr_peer_event const* e, void* vs)
             auto* const tor = s->tor;
             auto const loc = tor->pieceLoc(e->pieceIndex, e->offset);
             cancelAllRequestsForBlock(s, loc.block, peer);
-            peer->blocksSentToClient.add(tr_time(), 1);
+            peer->blocks_sent_to_client.add(tr_time(), 1);
             tr_torrentGotBlock(tor, loc.block);
             break;
         }
@@ -924,10 +923,12 @@ static void peerCallbackFunc(tr_peer* peer, tr_peer_event const* e, void* vs)
         if (e->err == ERANGE || e->err == EMSGSIZE || e->err == ENOTCONN)
         {
             /* some protocol error from the peer */
-            peer->doPurge = true;
+            peer->do_purge = true;
             tr_logAddDebugSwarm(
                 s,
-                fmt::format("setting {} doPurge flag because we got an ERANGE, EMSGSIZE, or ENOTCONN error", peer->readable()));
+                fmt::format(
+                    "setting {} do_purge flag because we got an ERANGE, EMSGSIZE, or ENOTCONN error",
+                    peer->readable()));
         }
         else
         {
@@ -1430,38 +1431,6 @@ void tr_peerMgrRemoveTorrent(tr_torrent* tor)
     swarmFree(tor->swarm);
 }
 
-void tr_peerUpdateProgress(tr_torrent* tor, tr_peer* peer)
-{
-    if (auto const* have = &peer->have; have->hasAll())
-    {
-        peer->progress = 1.0;
-    }
-    else if (have->hasNone())
-    {
-        peer->progress = 0.0;
-    }
-    else
-    {
-        float const true_count = have->count();
-
-        if (tor->hasMetainfo())
-        {
-            peer->progress = true_count / float(tor->pieceCount());
-        }
-        else // without pieceCount, this result is only a best guess...
-        {
-            peer->progress = true_count / float(have->size() + 1);
-        }
-    }
-
-    peer->progress = std::clamp(peer->progress, 0.0F, 1.0F);
-
-    if (peer->atom != nullptr && peer->progress >= 1.0F)
-    {
-        atomSetSeed(tor->swarm, *peer->atom);
-    }
-}
-
 void tr_peerMgrOnTorrentGotMetainfo(tr_torrent* tor)
 {
     /* the webseed list may have changed... */
@@ -1471,7 +1440,12 @@ void tr_peerMgrOnTorrentGotMetainfo(tr_torrent* tor)
        didn't have the metadata before now... so refresh them all... */
     for (auto* peer : tor->swarm->peers)
     {
-        tr_peerUpdateProgress(tor, peer);
+        peer->onTorrentGotMetainfo();
+
+        if (peer->isSeed())
+        {
+            atomSetSeed(tor->swarm, *peer->atom);
+        }
     }
 
     /* update the bittorrent peers' willingness... */
@@ -1495,7 +1469,7 @@ int8_t tr_peerMgrPieceAvailability(tr_torrent const* tor, tr_piece_index_t piece
     }
 
     auto const& peers = tor->swarm->peers;
-    return std::count_if(std::begin(peers), std::end(peers), [piece](auto const* peer) { return peer->have.test(piece); });
+    return std::count_if(std::begin(peers), std::end(peers), [piece](auto const* peer) { return peer->hasPiece(piece); });
 }
 
 void tr_peerMgrTorrentAvailability(tr_torrent const* tor, int8_t* tab, unsigned int n_tabs)
@@ -1541,11 +1515,6 @@ void tr_swarmIncrementActivePeers(tr_swarm* swarm, tr_direction direction, bool 
     swarm->stats.active_peer_count[direction] = n;
 }
 
-bool tr_peerIsSeed(tr_peer const* peer)
-{
-    return (peer != nullptr) && ((peer->progress >= 1.0) || peer->atom->isSeed());
-}
-
 /* count how many bytes we want that connected peers have */
 uint64_t tr_peerMgrGetDesiredAvailable(tr_torrent const* tor)
 {
@@ -1588,7 +1557,7 @@ uint64_t tr_peerMgrGetDesiredAvailable(tr_torrent const* tor)
     {
         for (size_t j = 0; j < n_pieces; ++j)
         {
-            if (peer->have.test(j))
+            if (peer->hasPiece(j))
             {
                 have[j] = true;
             }
@@ -1628,7 +1597,7 @@ static auto getPeerStats(tr_peerMsgs const* peer, time_t now, uint64_t now_msec)
     stats.client = peer->client.c_str();
     stats.port = port.host();
     stats.from = atom->fromFirst;
-    stats.progress = peer->progress;
+    stats.progress = peer->percentDone();
     stats.isUTP = peer->is_utp_connection();
     stats.isEncrypted = peer->is_encrypted();
     stats.rateToPeer_KBps = tr_toSpeedKBps(tr_peerGetPieceSpeed_Bps(peer, now_msec, TR_CLIENT_TO_PEER));
@@ -1640,12 +1609,12 @@ static auto getPeerStats(tr_peerMsgs const* peer, time_t now, uint64_t now_msec)
     stats.isIncoming = peer->is_incoming_connection();
     stats.isDownloadingFrom = peer->is_active(TR_PEER_TO_CLIENT);
     stats.isUploadingTo = peer->is_active(TR_CLIENT_TO_PEER);
-    stats.isSeed = tr_peerIsSeed(peer);
+    stats.isSeed = peer->isSeed();
 
-    stats.blocksToPeer = peer->blocksSentToPeer.count(now, CancelHistorySec);
-    stats.blocksToClient = peer->blocksSentToClient.count(now, CancelHistorySec);
-    stats.cancelsToPeer = peer->cancelsSentToPeer.count(now, CancelHistorySec);
-    stats.cancelsToClient = peer->cancelsSentToClient.count(now, CancelHistorySec);
+    stats.blocksToPeer = peer->blocks_sent_to_peer.count(now, CancelHistorySec);
+    stats.blocksToClient = peer->blocks_sent_to_client.count(now, CancelHistorySec);
+    stats.cancelsToPeer = peer->cancels_sent_to_peer.count(now, CancelHistorySec);
+    stats.cancelsToClient = peer->cancels_sent_to_client.count(now, CancelHistorySec);
 
     stats.pendingReqsToPeer = peer->swarm->active_requests.count(peer);
     stats.pendingReqsToClient = peer->pendingReqsToClient();
@@ -1749,20 +1718,20 @@ void tr_peerMgrClearInterest(tr_torrent* tor)
 }
 
 /* does this peer have any pieces that we want? */
-static bool isPeerInteresting(tr_torrent* const tor, bool const* const piece_is_interesting, tr_peer const* const peer)
+static bool isPeerInteresting(tr_torrent* const tor, bool const* const piece_is_interesting, tr_peerMsgs const* const peer)
 {
     /* these cases should have already been handled by the calling code... */
     TR_ASSERT(!tor->isDone());
     TR_ASSERT(tor->clientCanDownload());
 
-    if (tr_peerIsSeed(peer))
+    if (peer->isSeed())
     {
         return true;
     }
 
     for (tr_piece_index_t i = 0; i < tor->pieceCount(); ++i)
     {
-        if (piece_is_interesting[i] && peer->have.test(i))
+        if (piece_is_interesting[i] && peer->hasPiece(i))
         {
             return true;
         }
@@ -1838,7 +1807,7 @@ static void rechokeDownloads(tr_swarm* s)
          */
         for (auto const* const peer : peers)
         {
-            auto const b = peer->blocksSentToClient.count(now, CancelHistorySec);
+            auto const b = peer->blocks_sent_to_client.count(now, CancelHistorySec);
 
             if (b == 0) /* ignore unresponsive peers, as described above */
             {
@@ -1846,7 +1815,7 @@ static void rechokeDownloads(tr_swarm* s)
             }
 
             blocks += b;
-            cancels += peer->cancelsSentToPeer.count(now, CancelHistorySec);
+            cancels += peer->cancels_sent_to_peer.count(now, CancelHistorySec);
         }
 
         if (cancels > 0)
@@ -1911,8 +1880,8 @@ static void rechokeDownloads(tr_swarm* s)
             else
             {
                 auto rechoke_state = tr_rechoke_state{};
-                auto const blocks = peer->blocksSentToClient.count(now, CancelHistorySec);
-                auto const cancels = peer->cancelsSentToPeer.count(now, CancelHistorySec);
+                auto const blocks = peer->blocks_sent_to_client.count(now, CancelHistorySec);
+                auto const cancels = peer->cancels_sent_to_peer.count(now, CancelHistorySec);
 
                 if (blocks == 0 && cancels == 0)
                 {
@@ -2070,7 +2039,7 @@ static void rechokeUploads(tr_swarm* s, uint64_t const now)
     /* sort the peers by preference and rate */
     for (auto* const peer : peers)
     {
-        if (tr_peerIsSeed(peer))
+        if (peer->isSeed())
         {
             /* choke seeds and partial seeds */
             peer->set_choke(true);
@@ -2191,12 +2160,12 @@ static void rechokePulse(evutil_socket_t /*fd*/, short /*what*/, void* vmgr)
 ****
 ***/
 
-static bool shouldPeerBeClosed(tr_swarm const* s, tr_peer const* peer, int peerCount, time_t const now)
+static bool shouldPeerBeClosed(tr_swarm const* s, tr_peerMsgs const* peer, int peerCount, time_t const now)
 {
     /* if it's marked for purging, close it */
-    if (peer->doPurge)
+    if (peer->do_purge)
     {
-        tr_logAddTraceSwarm(s, fmt::format("purging peer {} because its doPurge flag is set", peer->readable()));
+        tr_logAddTraceSwarm(s, fmt::format("purging peer {} because its do_purge flag is set", peer->readable()));
         return true;
     }
 
@@ -2204,7 +2173,7 @@ static bool shouldPeerBeClosed(tr_swarm const* s, tr_peer const* peer, int peerC
     auto const* const atom = peer->atom;
 
     /* disconnect if we're both seeds and enough time has passed for PEX */
-    if (tor->isDone() && tr_peerIsSeed(peer))
+    if (tor->isDone() && peer->isSeed())
     {
         return !tor->allowsPex() || now - atom->time >= 30;
     }
@@ -2318,9 +2287,9 @@ struct ComparePeerByActivity
 {
     static int compare(tr_peer const* a, tr_peer const* b) // <=>
     {
-        if (a->doPurge != b->doPurge)
+        if (a->do_purge != b->do_purge)
         {
-            return a->doPurge ? 1 : -1;
+            return a->do_purge ? 1 : -1;
         }
 
         /* the one to give us data more recently goes first */

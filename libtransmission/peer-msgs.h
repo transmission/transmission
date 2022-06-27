@@ -13,12 +13,13 @@
 #include <cstddef> // size_t
 #include <ctime> // time_t
 
+#include "bitfield.h"
 #include "peer-common.h"
+#include "torrent.h"
 
 class tr_peer;
 class tr_peerIo;
 struct tr_address;
-struct tr_torrent;
 
 /**
  * @addtogroup peers Peers
@@ -28,8 +29,9 @@ struct tr_torrent;
 class tr_peerMsgs : public tr_peer
 {
 public:
-    tr_peerMsgs(tr_torrent* torrent, peer_atom* atom_in)
-        : tr_peer{ torrent, atom_in }
+    tr_peerMsgs(tr_torrent* tor, peer_atom* atom_in)
+        : tr_peer{ tor, atom_in }
+        , have_{ tor->pieceCount() }
     {
     }
 
@@ -61,7 +63,17 @@ public:
 
     virtual void pulse() = 0;
 
+    [[nodiscard]] virtual float percentDone() const noexcept = 0;
+    [[nodiscard]] virtual bool isSeed() const noexcept = 0;
+    virtual void onTorrentGotMetainfo() = 0;
+
     virtual void on_piece_completed(tr_piece_index_t) = 0;
+
+    // The client name. This is the app name derived from the `v' string in LTEP's handshake dictionary
+    tr_interned_string client;
+
+protected:
+    tr_bitfield have_;
 };
 
 tr_peerMsgs* tr_peerMsgsNew(
