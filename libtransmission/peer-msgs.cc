@@ -1757,7 +1757,7 @@ static ReadState readBtMessage(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, si
             logtrace(msgs, "got a bitfield");
             auto tmp = std::vector<uint8_t>(msglen);
             tr_peerIoReadBytes(msgs->io, inbuf, std::data(tmp), std::size(tmp));
-            msgs->have_ = tr_bitfield{ msgs->torrent->hasMetainfo() ? msgs->torrent->pieceCount() : std::size(tmp) };
+            msgs->have_ = tr_bitfield{ msgs->torrent->hasMetainfo() ? msgs->torrent->pieceCount() : std::size(tmp) * 8 };
             msgs->have_.setRaw(std::data(tmp), std::size(tmp));
             msgs->publishClientGotBitfield(&msgs->have_);
             msgs->invalidatePercentDone();
