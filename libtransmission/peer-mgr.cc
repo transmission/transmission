@@ -59,9 +59,6 @@ static auto constexpr MinUploadIdleSecs = int{ 60 };
 // when few peers are available, keep idle ones this long
 static auto constexpr MaxUploadIdleSecs = int{ 60 * 5 };
 
-// number of bad pieces a peer is allowed to send before we ban them
-static auto constexpr MaxBadPiecesPerPeer = int{ 5 };
-
 // use for bitwise operations w/peer_atom.flags2
 static auto constexpr MyflagBanned = int{ 1 };
 
@@ -69,9 +66,6 @@ static auto constexpr MyflagBanned = int{ 1 };
 // unreachable for now... but not banned.
 // if they try to connect to us it's okay
 static auto constexpr MyflagUnreachable = int{ 2 };
-
-// the minimum we'll wait before attempting to reconnect to a peer
-static auto constexpr MinimumReconnectIntervalSecs = int{ 5 };
 
 // how long we'll let requests we've made linger before we cancel them
 static auto constexpr RequestTtlSecs = int{ 90 };
@@ -233,6 +227,9 @@ struct peer_atom
 
 private:
     mutable std::optional<bool> blocklisted_;
+
+    // the minimum we'll wait before attempting to reconnect to a peer
+    static auto constexpr MinimumReconnectIntervalSecs = int{ 5 };
 };
 
 // a container for keeping track of tr_handshakes
@@ -375,6 +372,9 @@ public:
     time_t lastCancel = 0;
 
     ActiveRequests active_requests;
+
+    // number of bad pieces a peer is allowed to send before we ban them
+    static auto constexpr MaxBadPiecesPerPeer = int{ 5 };
 };
 
 struct EventDeleter
