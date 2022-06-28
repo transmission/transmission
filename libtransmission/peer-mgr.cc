@@ -562,11 +562,6 @@ static void swarmFree(tr_swarm* s)
     delete s;
 }
 
-static tr_swarm* swarmNew(tr_peerMgr* manager, tr_torrent* tor)
-{
-    return new tr_swarm{ manager, tor };
-}
-
 tr_peerMgr* tr_peerMgrNew(tr_session* session)
 {
     return new tr_peerMgr{ session };
@@ -1428,7 +1423,7 @@ void tr_peerMgrAddTorrent(tr_peerMgr* manager, tr_torrent* tor)
     auto const lock = tor->unique_lock();
     TR_ASSERT(tor->swarm == nullptr);
 
-    tor->swarm = swarmNew(manager, tor);
+    tor->swarm = new tr_swarm{ manager, tor };
 }
 
 void tr_peerMgrRemoveTorrent(tr_torrent* tor)
