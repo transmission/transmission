@@ -241,7 +241,6 @@ set_source_files_properties(${${PROJECT_NAME}_RESOURCES} PROPERTIES
 
 set(${PROJECT_NAME}_HIDPI_IMAGES
     ActionHover
-    ActionOn
     Bandwidth
     CleanupTemplate
     CompleteCheck
@@ -316,7 +315,6 @@ endforeach()
 
 set(${PROJECT_NAME}_LODPI_IMAGES
     DownloadBadge
-    QuitBadge
     UploadBadge
 )
 

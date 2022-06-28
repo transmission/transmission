@@ -9,6 +9,7 @@
 #error only libtransmission should #include this header.
 #endif
 
+#include <array>
 #include <cstdint> // uint8_t, uint32_t, uint64_t
 
 #include "transmission.h"
@@ -74,45 +75,41 @@ public:
     tr_peer(tr_torrent const* tor, peer_atom* atom = nullptr);
     virtual ~tr_peer();
 
-    virtual bool is_transferring_pieces(uint64_t now, tr_direction direction, unsigned int* setme_Bps) const = 0;
+    virtual bool isTransferringPieces(uint64_t now, tr_direction direction, unsigned int* setme_Bps) const = 0;
 
     [[nodiscard]] virtual std::string readable() const = 0;
 
-    /* whether or not we should free this peer soon.
-       NOTE: private to peer-mgr.c */
-    bool doPurge = false;
-
-    /* number of bad pieces they've contributed to */
-    uint8_t strikes = 0;
+    [[nodiscard]] virtual bool hasPiece(tr_piece_index_t piece) const noexcept = 0;
 
     tr_session* const session;
 
-    /* Hook to private peer-mgr information */
-    peer_atom* const atom;
-
     tr_swarm* const swarm;
 
-    /** how complete the peer's copy of the torrent is. [0.0...1.0] */
-    float progress = 0.0f;
+    tr_recentHistory<uint16_t> blocks_sent_to_peer;
 
+    tr_recentHistory<uint16_t> cancels_sent_to_client;
+
+    /// The following fields are only to be used in peer-mgr.cc.
+    /// TODO(ckerr): refactor them out of tr_peer
+
+    // hook to private peer-mgr information
+    peer_atom* const atom;
+
+    // whether or not this peer sent us any given block
     tr_bitfield blame;
-    tr_bitfield have;
 
-    /* the client name.
-       For BitTorrent peers, this is the app name derived from the `v' string in LTEP's handshake dictionary */
-    tr_interned_string client;
+    // whether or not we should free this peer soon.
+    bool do_purge = false;
 
-    tr_recentHistory<uint16_t> blocksSentToClient;
-    tr_recentHistory<uint16_t> blocksSentToPeer;
+    // how many bad pieces this piece has contributed to
+    uint8_t strikes = 0;
 
-    tr_recentHistory<uint16_t> cancelsSentToClient;
-    tr_recentHistory<uint16_t> cancelsSentToPeer;
+    // how many blocks this peer has sent us
+    tr_recentHistory<uint16_t> blocks_sent_to_client;
+
+    // how many requests we made to this peer and then canceled
+    tr_recentHistory<uint16_t> cancels_sent_to_peer;
 };
-
-/** Update the tr_peer.progress field based on the 'have' bitset. */
-void tr_peerUpdateProgress(tr_torrent* tor, tr_peer*);
-
-bool tr_peerIsSeed(tr_peer const* peer);
 
 /***
 ****
@@ -120,13 +117,13 @@ bool tr_peerIsSeed(tr_peer const* peer);
 
 struct tr_swarm_stats
 {
-    uint16_t active_peer_count[2];
+    std::array<uint16_t, 2> active_peer_count;
     uint16_t active_webseed_count;
     uint16_t peer_count;
-    uint16_t peer_from_count[TR_PEER_FROM__MAX];
+    std::array<uint16_t, TR_PEER_FROM__MAX> peer_from_count;
 };
 
-void tr_swarmGetStats(tr_swarm const* swarm, tr_swarm_stats* setme);
+tr_swarm_stats tr_swarmGetStats(tr_swarm const* swarm);
 
 void tr_swarmIncrementActivePeers(tr_swarm* swarm, tr_direction direction, bool is_active);
 
