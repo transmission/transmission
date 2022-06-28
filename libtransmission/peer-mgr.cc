@@ -310,7 +310,12 @@ public:
     {
         /* we consider ourselves to be in endgame if the number of bytes
            we've got requested is >= the number of bytes left to download */
-        is_endgame = uint64_t(std::size(active_requests)) * tr_block_info::BlockSize >= tor->leftUntilDone();
+        is_endgame_ = uint64_t(std::size(active_requests)) * tr_block_info::BlockSize >= tor->leftUntilDone();
+    }
+
+    [[nodiscard]] auto constexpr isEndgame() const noexcept
+    {
+        return is_endgame_;
     }
 
     void addStrike(tr_peer* peer)
@@ -353,7 +358,6 @@ public:
     bool pool_is_all_seeds_dirty = true; /* true if pool_is_all_seeds needs to be recomputed */
     bool is_running = false;
     bool needs_completeness_check = true;
-    bool is_endgame = false;
 
     tr_peerMgr* const manager;
 
@@ -375,6 +379,8 @@ public:
 
     // number of bad pieces a peer is allowed to send before we ban them
     static auto constexpr MaxBadPiecesPerPeer = int{ 5 };
+
+    bool is_endgame_ = false;
 };
 
 struct EventDeleter
@@ -680,7 +686,7 @@ std::vector<tr_block_span_t> tr_peerMgrGetNextRequests(tr_torrent* torrent, tr_p
 
         [[nodiscard]] bool isEndgame() const override
         {
-            return swarm_->is_endgame;
+            return swarm_->isEndgame();
         }
 
         [[nodiscard]] size_t countActiveRequests(tr_block_index_t block) const override

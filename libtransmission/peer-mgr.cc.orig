@@ -59,9 +59,6 @@ static auto constexpr MinUploadIdleSecs = int{ 60 };
 // when few peers are available, keep idle ones this long
 static auto constexpr MaxUploadIdleSecs = int{ 60 * 5 };
 
-// number of bad pieces a peer is allowed to send before we ban them
-static auto constexpr MaxBadPiecesPerPeer = int{ 5 };
-
 // use for bitwise operations w/peer_atom.flags2
 static auto constexpr MyflagBanned = int{ 1 };
 
@@ -69,9 +66,6 @@ static auto constexpr MyflagBanned = int{ 1 };
 // unreachable for now... but not banned.
 // if they try to connect to us it's okay
 static auto constexpr MyflagUnreachable = int{ 2 };
-
-// the minimum we'll wait before attempting to reconnect to a peer
-static auto constexpr MinimumReconnectIntervalSecs = int{ 5 };
 
 // how long we'll let requests we've made linger before we cancel them
 static auto constexpr RequestTtlSecs = int{ 90 };
@@ -233,6 +227,9 @@ struct peer_atom
 
 private:
     mutable std::optional<bool> blocklisted_;
+
+    // the minimum we'll wait before attempting to reconnect to a peer
+    static auto constexpr MinimumReconnectIntervalSecs = int{ 5 };
 };
 
 // a container for keeping track of tr_handshakes
@@ -288,6 +285,11 @@ private:
     std::vector<std::pair<tr_address, tr_handshake*>> handshakes_;
 };
 
+#define tr_logAddDebugSwarm(swarm, msg) tr_logAddDebugTor((swarm)->tor, msg)
+#define tr_logAddTraceSwarm(swarm, msg) tr_logAddTraceTor((swarm)->tor, msg)
+
+static void peerCallbackFunc(tr_peer* /*peer*/, tr_peer_event const* /*e*/, void* /*vs*/);
+
 /** @brief Opaque, per-torrent data structure for peer connection information */
 class tr_swarm
 {
@@ -296,11 +298,46 @@ public:
         : manager{ manager_in }
         , tor{ tor_in }
     {
+        rebuildWebseeds();
     }
 
     [[nodiscard]] auto peerCount() const noexcept
     {
         return std::size(peers);
+    }
+
+    void updateEndgame()
+    {
+        /* we consider ourselves to be in endgame if the number of bytes
+           we've got requested is >= the number of bytes left to download */
+        is_endgame = uint64_t(std::size(active_requests)) * tr_block_info::BlockSize >= tor->leftUntilDone();
+    }
+
+    void addStrike(tr_peer* peer)
+    {
+        tr_logAddTraceSwarm(this, fmt::format("increasing peer {} strike count to {}", peer->readable(), peer->strikes + 1));
+
+        if (++peer->strikes >= MaxBadPiecesPerPeer)
+        {
+            peer->atom->flags2 |= MyflagBanned;
+            peer->do_purge = true;
+            tr_logAddTraceSwarm(this, fmt::format("banning peer {}", peer->readable()));
+        }
+    }
+
+    void rebuildWebseeds()
+    {
+        auto const n = tor->webseedCount();
+
+        webseeds.clear();
+        webseeds.reserve(n);
+        for (size_t i = 0; i < n; ++i)
+        {
+            webseeds.emplace_back(tr_webseedNew(tor, tor->webseed(i), peerCallbackFunc, this));
+        }
+        webseeds.shrink_to_fit();
+
+        stats.active_webseed_count = 0;
     }
 
     Handshakes outgoing_handshakes;
@@ -320,6 +357,8 @@ public:
 
     tr_peerMgr* const manager;
 
+    tr_torrent* const tor;
+
     std::vector<std::unique_ptr<tr_peer>> webseeds;
     std::vector<tr_peerMsgs*> peers;
 
@@ -328,13 +367,14 @@ public:
     // invalidating those pointers
     std::deque<peer_atom> pool;
 
-    tr_torrent* const tor;
-
     tr_peerMsgs* optimistic = nullptr; /* the optimistic peer, or nullptr if none */
 
     time_t lastCancel = 0;
 
     ActiveRequests active_requests;
+
+    // number of bad pieces a peer is allowed to send before we ban them
+    static auto constexpr MaxBadPiecesPerPeer = int{ 5 };
 };
 
 struct EventDeleter
@@ -423,9 +463,6 @@ private:
     static auto constexpr MaxConnectionsPerSecond = size_t{ 12 };
 };
 
-#define tr_logAddDebugSwarm(swarm, msg) tr_logAddDebugTor((swarm)->tor, msg)
-#define tr_logAddTraceSwarm(swarm, msg) tr_logAddTraceTor((swarm)->tor, msg)
-
 /**
 *** tr_peer virtual functions
 **/
@@ -503,30 +540,9 @@ static void swarmFree(tr_swarm* s)
     delete s;
 }
 
-static void peerCallbackFunc(tr_peer* /*peer*/, tr_peer_event const* /*e*/, void* /*vs*/);
-
-static void rebuildWebseedArray(tr_swarm* s, tr_torrent* tor)
-{
-    size_t const n = tor->webseedCount();
-
-    s->webseeds.clear();
-    s->webseeds.reserve(n);
-    for (size_t i = 0; i < n; ++i)
-    {
-        s->webseeds.emplace_back(tr_webseedNew(tor, tor->webseed(i), peerCallbackFunc, s));
-    }
-    s->webseeds.shrink_to_fit();
-
-    s->stats.active_webseed_count = 0;
-}
-
 static tr_swarm* swarmNew(tr_peerMgr* manager, tr_torrent* tor)
 {
-    auto* swarm = new tr_swarm{ manager, tor };
-
-    rebuildWebseedArray(swarm, tor);
-
-    return swarm;
+    return new tr_swarm{ manager, tor };
 }
 
 tr_peerMgr* tr_peerMgrNew(tr_session* session)
@@ -638,13 +654,6 @@ void tr_peerMgrClientSentRequests(tr_torrent* torrent, tr_peer* peer, tr_block_s
     }
 }
 
-static void updateEndgame(tr_swarm* s)
-{
-    /* we consider ourselves to be in endgame if the number of bytes
-       we've got requested is >= the number of bytes left to download */
-    s->is_endgame = uint64_t(std::size(s->active_requests)) * tr_block_info::BlockSize >= s->tor->leftUntilDone();
-}
-
 std::vector<tr_block_span_t> tr_peerMgrGetNextRequests(tr_torrent* torrent, tr_peer const* peer, size_t numwant)
 {
     class MediatorImpl final : public Wishlist::Mediator
@@ -705,8 +714,7 @@ std::vector<tr_block_span_t> tr_peerMgrGetNextRequests(tr_torrent* torrent, tr_p
         tr_peer const* const peer_;
     };
 
-    auto* const swarm = torrent->swarm;
-    updateEndgame(swarm);
+    torrent->swarm->updateEndgame();
     return Wishlist::next(MediatorImpl(torrent, peer), numwant);
 }
 
@@ -763,18 +771,6 @@ void tr_peerMgr::refillUpkeep() const
     for (auto* const tor : session->torrents())
     {
         tr_swarmCancelOldRequests(tor->swarm);
-    }
-}
-
-static void addStrike(tr_swarm* s, tr_peer* peer)
-{
-    tr_logAddTraceSwarm(s, fmt::format("increasing peer {} strike count to {}", peer->readable(), peer->strikes + 1));
-
-    if (++peer->strikes >= MaxBadPiecesPerPeer)
-    {
-        peer->atom->flags2 |= MyflagBanned;
-        peer->do_purge = true;
-        tr_logAddTraceSwarm(s, fmt::format("banning peer {}", peer->readable()));
     }
 }
 
@@ -1232,21 +1228,21 @@ std::vector<tr_pex> tr_peerMgrCompact6ToPex(void const* compact, size_t compactL
 
 void tr_peerMgrGotBadPiece(tr_torrent* tor, tr_piece_index_t pieceIndex)
 {
-    tr_swarm* s = tor->swarm;
-    uint32_t const byteCount = tor->pieceSize(pieceIndex);
+    auto* const swarm = tor->swarm;
+    auto const byteCount = tor->pieceSize(pieceIndex);
 
-    for (auto* peer : s->peers)
+    for (auto* const peer : swarm->peers)
     {
         if (peer->blame.test(pieceIndex))
         {
             tr_logAddTraceSwarm(
-                s,
+                swarm,
                 fmt::format(
                     "peer {} contributed to corrupt piece ({}); now has {} strikes",
                     peer->readable(),
                     pieceIndex,
                     peer->strikes + 1));
-            addStrike(s, peer);
+            swarm->addStrike(peer);
         }
     }
 
@@ -1426,7 +1422,7 @@ void tr_peerMgrRemoveTorrent(tr_torrent* tor)
 void tr_peerMgrOnTorrentGotMetainfo(tr_torrent* tor)
 {
     /* the webseed list may have changed... */
-    rebuildWebseedArray(tor->swarm, tor);
+    tor->swarm->rebuildWebseeds();
 
     /* some peer_msgs' progress fields may not be accurate if we
        didn't have the metadata before now... so refresh them all... */
