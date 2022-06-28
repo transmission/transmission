@@ -5037,7 +5037,7 @@ static void removeKeRangerRansomware()
     {
         for (NSToolbarItem* item in self.fWindow.toolbar.items)
         {
-            [item.view setHidden:hide];
+            item.view.hidden = hide;
         }
     }
 }
