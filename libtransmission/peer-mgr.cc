@@ -49,31 +49,15 @@
 #include "utils.h"
 #include "webseed.h"
 
-// how frequently to change which peers are choked
-static auto constexpr RechokePeriodMsec = int{ 10 * 1000 };
-
 // an optimistically unchoked peer is immune from rechoking
 // for this many calls to rechokeUploads().
 static auto constexpr OptimisticUnchokeMultiplier = uint8_t{ 4 };
-
-// how frequently to reallocate bandwidth
-static auto constexpr BandwidthPeriodMsec = int{ 500 };
-
-// how frequently to age out old piece request lists
-static auto constexpr RefillUpkeepPeriodMsec = int{ 10 * 1000 };
-
-// how frequently to decide which peers live and die
-static auto constexpr ReconnectPeriodMsec = int{ 500 };
 
 // when many peers are available, keep idle ones this long
 static auto constexpr MinUploadIdleSecs = int{ 60 };
 
 // when few peers are available, keep idle ones this long
 static auto constexpr MaxUploadIdleSecs = int{ 60 * 5 };
-
-// max number of peers to ask for per second overall.
-// this throttle is to avoid overloading the router
-static auto constexpr MaxConnectionsPerSecond = size_t{ 12 };
 
 // number of bad pieces a peer is allowed to send before we ban them
 static auto constexpr MaxBadPiecesPerPeer = int{ 5 };
@@ -353,11 +337,27 @@ public:
     ActiveRequests active_requests;
 };
 
+struct EventDeleter
+{
+    void operator()(struct event* ev) const
+    {
+        event_free(ev);
+    }
+};
+
+using UniqueTimer = std::unique_ptr<struct event, EventDeleter>;
+
 struct tr_peerMgr
 {
     explicit tr_peerMgr(tr_session* session_in)
         : session{ session_in }
+        , bandwidth_timer_{ evtimer_new(session->event_base, bandwidthPulseMarshall, this) }
+        , rechoke_timer_{ evtimer_new(session->event_base, rechokePulseMarshall, this) }
+        , refill_upkeep_timer_{ evtimer_new(session->event_base, refillUpkeepMarshall, this) }
     {
+        tr_timerAddMsec(*bandwidth_timer_, BandwidthPeriodMsec);
+        tr_timerAddMsec(*rechoke_timer_, RechokePeriodMsec);
+        tr_timerAddMsec(*refill_upkeep_timer_, RefillUpkeepPeriodMsec);
     }
 
     [[nodiscard]] auto unique_lock() const
@@ -365,11 +365,62 @@ struct tr_peerMgr
         return session->unique_lock();
     }
 
+    ~tr_peerMgr()
+    {
+        auto const lock = unique_lock();
+        incoming_handshakes.abortAll();
+    }
+
+    void rechokeSoon() noexcept
+    {
+        tr_timerAddMsec(*rechoke_timer_, 100);
+    }
+
+    void bandwidthPulse();
+    void rechokePulse() const;
+    void reconnectPulse();
+    void refillUpkeep() const;
+    void makeNewPeerConnections(size_t max);
+
     tr_session* const session;
     Handshakes incoming_handshakes;
-    event* bandwidthTimer = nullptr;
-    event* rechokeTimer = nullptr;
-    event* refillUpkeepTimer = nullptr;
+
+private:
+    static void bandwidthPulseMarshall(evutil_socket_t, short /*reason*/, void* vmgr)
+    {
+        auto* const self = static_cast<tr_peerMgr*>(vmgr);
+        self->bandwidthPulse();
+        tr_timerAddMsec(*self->bandwidth_timer_, BandwidthPeriodMsec);
+    }
+
+    static void rechokePulseMarshall(evutil_socket_t, short /*reason*/, void* vmgr)
+    {
+        auto* const self = static_cast<tr_peerMgr*>(vmgr);
+        self->rechokePulse();
+        tr_timerAddMsec(*self->rechoke_timer_, RechokePeriodMsec);
+    }
+
+    static void refillUpkeepMarshall(evutil_socket_t, short /*reason*/, void* vmgr)
+    {
+        auto* const self = static_cast<tr_peerMgr*>(vmgr);
+        self->refillUpkeep();
+        tr_timerAddMsec(*self->refill_upkeep_timer_, RefillUpkeepPeriodMsec);
+    }
+
+    UniqueTimer const bandwidth_timer_;
+    UniqueTimer const rechoke_timer_;
+    UniqueTimer const refill_upkeep_timer_;
+
+    static auto constexpr BandwidthPeriodMsec = int{ 500 };
+    static auto constexpr RechokePeriodMsec = int{ 10 * 1000 };
+    static auto constexpr RefillUpkeepPeriodMsec = int{ 10 * 1000 };
+
+    // how frequently to decide which peers live and die
+    static auto constexpr ReconnectPeriodMsec = int{ 500 };
+
+    // max number of peers to ask for per second overall.
+    // this throttle is to avoid overloading the router
+    static auto constexpr MaxConnectionsPerSecond = size_t{ 12 };
 };
 
 #define tr_logAddDebugSwarm(swarm, msg) tr_logAddDebugTor((swarm)->tor, msg)
@@ -478,39 +529,13 @@ static tr_swarm* swarmNew(tr_peerMgr* manager, tr_torrent* tor)
     return swarm;
 }
 
-static void ensureMgrTimersExist(struct tr_peerMgr* m);
-
 tr_peerMgr* tr_peerMgrNew(tr_session* session)
 {
-    auto* const m = new tr_peerMgr{ session };
-    ensureMgrTimersExist(m);
-    return m;
-}
-
-static void deleteTimer(struct event** t)
-{
-    if (*t != nullptr)
-    {
-        event_free(*t);
-        *t = nullptr;
-    }
-}
-
-static void deleteTimers(struct tr_peerMgr* m)
-{
-    deleteTimer(&m->bandwidthTimer);
-    deleteTimer(&m->rechokeTimer);
-    deleteTimer(&m->refillUpkeepTimer);
+    return new tr_peerMgr{ session };
 }
 
 void tr_peerMgrFree(tr_peerMgr* manager)
 {
-    auto const lock = manager->unique_lock();
-
-    deleteTimers(manager);
-
-    manager->incoming_handshakes.abortAll();
-
     delete manager;
 }
 
@@ -594,7 +619,7 @@ void tr_peerMgrSetUtpFailed(tr_torrent* tor, tr_address const& addr, bool failed
         return 0;
     }
 
-    uint64_t const now = tr_time_msec();
+    auto const now = tr_time_msec();
 
     return std::count_if(
         std::begin(s->webseeds),
@@ -731,15 +756,14 @@ static void tr_swarmCancelOldRequests(tr_swarm* swarm)
     }
 }
 
-static void refillUpkeep(evutil_socket_t /*fd*/, short /*what*/, void* vmgr)
+void tr_peerMgr::refillUpkeep() const
 {
-    auto* mgr = static_cast<tr_peerMgr*>(vmgr);
-    auto const lock = mgr->unique_lock();
+    auto const lock = unique_lock();
 
-    auto& torrents = mgr->session->torrents();
-    std::for_each(std::begin(torrents), std::end(torrents), [](auto* tor) { tr_swarmCancelOldRequests(tor->swarm); });
-
-    tr_timerAddMsec(*mgr->refillUpkeepTimer, RefillUpkeepPeriodMsec);
+    for (auto* const tor : session->torrents())
+    {
+        tr_swarmCancelOldRequests(tor->swarm);
+    }
 }
 
 static void addStrike(tr_swarm* s, tr_peer* peer)
@@ -1349,49 +1373,17 @@ std::vector<tr_pex> tr_peerMgrGetPeers(tr_torrent const* tor, uint8_t af, uint8_
     return pex;
 }
 
-static void bandwidthPulse(evutil_socket_t, short /*unused*/, void* /*vmgr*/);
-static void rechokePulse(evutil_socket_t, short /*unused*/, void* /*vmgr*/);
-static void reconnectPulse(evutil_socket_t, short /*unused*/, void* /*vmgr*/);
-
-static struct event* createTimer(tr_session* session, int msec, event_callback_fn callback, void* cbdata)
-{
-    struct event* timer = evtimer_new(session->event_base, callback, cbdata);
-    tr_timerAddMsec(*timer, msec);
-    return timer;
-}
-
-static void ensureMgrTimersExist(struct tr_peerMgr* m)
-{
-    if (m->bandwidthTimer == nullptr)
-    {
-        m->bandwidthTimer = createTimer(m->session, BandwidthPeriodMsec, bandwidthPulse, m);
-    }
-
-    if (m->rechokeTimer == nullptr)
-    {
-        m->rechokeTimer = createTimer(m->session, RechokePeriodMsec, rechokePulse, m);
-    }
-
-    if (m->refillUpkeepTimer == nullptr)
-    {
-        m->refillUpkeepTimer = createTimer(m->session, RefillUpkeepPeriodMsec, refillUpkeep, m);
-    }
-}
-
 void tr_peerMgrStartTorrent(tr_torrent* tor)
 {
     TR_ASSERT(tr_isTorrent(tor));
     auto const lock = tor->unique_lock();
 
-    tr_swarm* s = tor->swarm;
+    tr_swarm* const swarm = tor->swarm;
 
-    ensureMgrTimersExist(s->manager);
+    swarm->is_running = true;
+    swarm->max_peers = getMaxPeerCount(tor);
 
-    s->is_running = true;
-    s->max_peers = getMaxPeerCount(tor);
-
-    // rechoke soon
-    tr_timerAddMsec(*s->manager->rechokeTimer, 100);
+    swarm->manager->rechokeSoon();
 }
 
 static void removeAllPeers(tr_swarm* /*swarm*/);
@@ -1691,8 +1683,8 @@ struct tr_peer_stat* tr_peerMgrPeerStats(tr_torrent const* tor, int* setme_count
     auto const n = tor->swarm->peerCount();
     auto* const ret = tr_new0(tr_peer_stat, n);
 
-    time_t const now = tr_time();
-    uint64_t const now_msec = tr_time_msec();
+    auto const now = tr_time();
+    auto const now_msec = tr_time_msec();
     std::transform(
         std::begin(tor->swarm->peers),
         std::end(tor->swarm->peers),
@@ -2131,27 +2123,24 @@ static void rechokeUploads(tr_swarm* s, uint64_t const now)
     tr_free(choke);
 }
 
-static void rechokePulse(evutil_socket_t /*fd*/, short /*what*/, void* vmgr)
+void tr_peerMgr::rechokePulse() const
 {
-    auto* mgr = static_cast<tr_peerMgr*>(vmgr);
-    auto const lock = mgr->unique_lock();
-    uint64_t const now = tr_time_msec();
+    auto const lock = unique_lock();
+    auto const now = tr_time_msec();
 
-    for (auto* const tor : mgr->session->torrents())
+    for (auto* const tor : session->torrents())
     {
-        if (tor->isRunning)
+        if (!tor->isRunning)
         {
-            tr_swarm* s = tor->swarm;
+            continue;
+        }
 
-            if (s->stats.peer_count > 0)
-            {
-                rechokeUploads(s, now);
-                rechokeDownloads(s);
-            }
+        if (auto* const swarm = tor->swarm; swarm->stats.peer_count > 0)
+        {
+            rechokeUploads(swarm, now);
+            rechokeDownloads(swarm);
         }
     }
-
-    tr_timerAddMsec(*mgr->rechokeTimer, RechokePeriodMsec);
 }
 
 /***
@@ -2357,15 +2346,12 @@ static void enforceSessionPeerLimit(tr_session* session)
     std::for_each(std::begin(peers) + max, std::end(peers), closePeer);
 }
 
-static void makeNewPeerConnections(tr_peerMgr* mgr, size_t max);
-
-static void reconnectPulse(evutil_socket_t /*fd*/, short /*what*/, void* vmgr)
+void tr_peerMgr::reconnectPulse()
 {
-    auto* mgr = static_cast<tr_peerMgr*>(vmgr);
     time_t const now_sec = tr_time();
 
     // remove crappy peers
-    for (auto* const tor : mgr->session->torrents())
+    for (auto* const tor : session->torrents())
     {
         if (!tor->swarm->is_running)
         {
@@ -2378,7 +2364,7 @@ static void reconnectPulse(evutil_socket_t /*fd*/, short /*what*/, void* vmgr)
     }
 
     // if we're over the per-torrent peer limits, cull some peers
-    for (auto* const tor : mgr->session->torrents())
+    for (auto* const tor : session->torrents())
     {
         if (tor->isRunning)
         {
@@ -2387,11 +2373,11 @@ static void reconnectPulse(evutil_socket_t /*fd*/, short /*what*/, void* vmgr)
     }
 
     // if we're over the per-session peer limits, cull some peers
-    enforceSessionPeerLimit(mgr->session);
+    enforceSessionPeerLimit(session);
 
     // try to make new peer connections
     auto const max_connections_per_pulse = int(MaxConnectionsPerSecond * (ReconnectPeriodMsec / 1000.0));
-    makeNewPeerConnections(mgr, max_connections_per_pulse);
+    makeNewPeerConnections(max_connections_per_pulse);
 }
 
 /****
@@ -2432,13 +2418,11 @@ static void queuePulse(tr_session* session, tr_direction dir)
     }
 }
 
-static void bandwidthPulse(evutil_socket_t /*fd*/, short /*what*/, void* vmgr)
+void tr_peerMgr::bandwidthPulse()
 {
-    auto* mgr = static_cast<tr_peerMgr*>(vmgr);
-    auto const lock = mgr->unique_lock();
-    tr_session* session = mgr->session;
+    auto const lock = unique_lock();
 
-    pumpAllPeers(mgr);
+    pumpAllPeers(this);
 
     /* allocate bandwidth to the peers */
     session->top_bandwidth_.allocate(TR_UP, BandwidthPeriodMsec);
@@ -2472,9 +2456,7 @@ static void bandwidthPulse(evutil_socket_t /*fd*/, short /*what*/, void* vmgr)
     queuePulse(session, TR_UP);
     queuePulse(session, TR_DOWN);
 
-    reconnectPulse(0, 0, mgr);
-
-    tr_timerAddMsec(*mgr->bandwidthTimer, BandwidthPeriodMsec);
+    reconnectPulse();
 }
 
 /***
@@ -2748,23 +2730,10 @@ static void initiateConnection(tr_peerMgr* mgr, tr_swarm* s, peer_atom& atom)
     atom.time = now;
 }
 
-static void initiateCandidateConnection(tr_peerMgr* mgr, peer_candidate& c)
+void tr_peerMgr::makeNewPeerConnections(size_t max)
 {
-#if 0
-
-    fprintf(stderr, "Starting an OUTGOING connection with %s - [%s] %s, %s\n", c->atom->readable(),
-        tr_torrentName(c->tor), c->tor->isPrivate() ? "private" : "public",
-        c->tor->isDone() ? "seed" : "downloader");
-
-#endif
-
-    initiateConnection(mgr, c.tor->swarm, *c.atom);
-}
-
-static void makeNewPeerConnections(struct tr_peerMgr* mgr, size_t max)
-{
-    for (auto& candidate : getPeerCandidates(mgr->session, max))
+    for (auto& candidate : getPeerCandidates(session, max))
     {
-        initiateCandidateConnection(mgr, candidate);
+        initiateConnection(this, candidate.tor->swarm, *candidate.atom);
     }
 }
