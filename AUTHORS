@@ -3,11 +3,11 @@ https://transmissionbt.com/
 
 Lead Developers <dev@transmissionbt.com>
   Charles Kerr, Mnemosyne LLC <charles@charleskerr.com> (Daemon, Backend, GTK+, QT clients)
-  Mitchell Livingston, Digital Ignition LLC <livings124@transmissionbt.com> (Mac OS X client)
+  Mitchell Livingston, Digital Ignition LLC <livings124@transmissionbt.com> (macOS client)
   Mike Gelfand <mike@transmissionbt.com>
 
 Project Contributors
-  John Clay <john@transmissionbt.com> (Website maintenance and troubleshooting, Mac OS X help documentation)
+  John Clay <john@transmissionbt.com> (Website maintenance and troubleshooting, macOS help documentation)
   Hugo van Heuven, madebysofa (Main icon design)
   Andreas Nilsson (GNOME adaptation of main icon)
   Rodger Werner ("Big Sur" adaptation of main icon)
@@ -19,10 +19,10 @@ Project Contributors
   Kendall Hopkins <SoftwareElves@gmail.com> (Web client)
   Malcolm Jarvis <mjarvis@transmissionbt.com> (Web client)
   Kevin Glowacz <kjg@transmissionbt.com> (Web client)
-  Rashid Eissing (Mac OS X Transfers preferences icon)
+  Rashid Eissing (macOS Transfers preferences icon)
   Dean Ostetto
-  Rick Patrick (Mac OS X images)
-  Jonas Rask (Mac OS X Globe icon)
+  Rick Patrick (macOS images)
+  Jonas Rask (macOS Globe icon)
   Erick Turnquist (IPv6 code, support)
   Maarten Van Coile (Wiki Wrangler, troubleshooting, support)
   James "Kibo" Parry (Updated Mac Retina images)
@@ -33,7 +33,7 @@ Previous Developers
   Josh Elsasser <josh@elsasser.org> (Daemon, Backend, GTK+ client)
   Bryan Varner <bryan@varnernet.com> (BeOS client)
 
-Mac OS X Translators, current release:
+macOS Translators, current release:
   Jorge Carrasco (Spanish)
   Etienne Samson (French)
   Marco Cavazzuti (Italian)
