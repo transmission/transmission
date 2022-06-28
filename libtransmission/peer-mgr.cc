@@ -1480,12 +1480,11 @@ void tr_peerMgrTorrentAvailability(tr_torrent const* tor, int8_t* tab, unsigned 
     }
 }
 
-void tr_swarmGetStats(tr_swarm const* swarm, tr_swarm_stats* setme)
+tr_swarm_stats tr_swarmGetStats(tr_swarm const* swarm)
 {
     TR_ASSERT(swarm != nullptr);
-    TR_ASSERT(setme != nullptr);
 
-    *setme = swarm->stats;
+    return swarm->stats;
 }
 
 void tr_swarmIncrementActivePeers(tr_swarm* swarm, tr_direction direction, bool is_active)
