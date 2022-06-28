@@ -4000,16 +4000,9 @@ static void removeKeRangerRansomware()
 
     item.view = button;
 
-    if (@available(macOS 11.0, *))
-    {
-        button.bordered = NO;
-    }
-    else
-    {
-        NSSize const buttonSize = NSMakeSize(36.0, 25.0);
-        item.minSize = buttonSize;
-        item.maxSize = buttonSize;
-    }
+    NSSize const buttonSize = NSMakeSize(36.0, 25.0);
+    item.minSize = buttonSize;
+    item.maxSize = buttonSize;
 
     return item;
 }
@@ -4099,16 +4092,9 @@ static void removeKeRangerRansomware()
         segmentedControl.segmentCount = 2;
         segmentedCell.trackingMode = NSSegmentSwitchTrackingMomentary;
 
-        if (@available(macOS 11.0, *))
-        {
-            segmentedCell.bezeled = NO;
-        }
-        else
-        {
-            NSSize const groupSize = NSMakeSize(72.0, 25.0);
-            groupItem.minSize = groupSize;
-            groupItem.maxSize = groupSize;
-        }
+        NSSize const groupSize = NSMakeSize(72.0, 25.0);
+        groupItem.minSize = groupSize;
+        groupItem.maxSize = groupSize;
 
         groupItem.label = NSLocalizedString(@"Apply All", "All toolbar item -> label");
         groupItem.paletteLabel = NSLocalizedString(@"Pause / Resume All", "All toolbar item -> palette label");
@@ -4150,16 +4136,9 @@ static void removeKeRangerRansomware()
         segmentedControl.segmentCount = 2;
         segmentedCell.trackingMode = NSSegmentSwitchTrackingMomentary;
 
-        if (@available(macOS 11.0, *))
-        {
-            segmentedCell.bezeled = NO;
-        }
-        else
-        {
-            NSSize const groupSize = NSMakeSize(72.0, 25.0);
-            groupItem.minSize = groupSize;
-            groupItem.maxSize = groupSize;
-        }
+        NSSize const groupSize = NSMakeSize(72.0, 25.0);
+        groupItem.minSize = groupSize;
+        groupItem.maxSize = groupSize;
 
         groupItem.label = NSLocalizedString(@"Apply Selected", "Selected toolbar item -> label");
         groupItem.paletteLabel = NSLocalizedString(@"Pause / Resume Selected", "Selected toolbar item -> palette label");
@@ -5042,9 +5021,24 @@ static void removeKeRangerRansomware()
             [self removeStackViewHeightConstraints];
         }
 
+        //this fixes a macOS bug where on toggling the toolbar item bezels will show
+        [self hideToolBarBezels:YES];
+
         dispatch_async(dispatch_get_main_queue(), ^{
             [self setWindowSizeToFit];
+            [self hideToolBarBezels:NO];
         });
+    }
+}
+
+- (void)hideToolBarBezels:(BOOL)hide
+{
+    if (@available(macOS 11.0, *))
+    {
+        for (NSToolbarItem* item in self.fWindow.toolbar.items)
+        {
+            item.view.hidden = hide;
+        }
     }
 }
 
