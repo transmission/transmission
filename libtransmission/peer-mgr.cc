@@ -345,6 +345,21 @@ public:
         stats.active_webseed_count = 0;
     }
 
+    [[nodiscard]] auto isAllSeeds() const noexcept
+    {
+        if (!pool_is_all_seeds_)
+        {
+            pool_is_all_seeds_ = std::all_of(std::begin(pool), std::end(pool), [](auto const& atom) { return atom.isSeed(); });
+        }
+
+        return *pool_is_all_seeds_;
+    }
+
+    void markAllSeedsFlagDirty() noexcept
+    {
+        pool_is_all_seeds_.reset();
+    }
+
     Handshakes outgoing_handshakes;
 
     uint16_t interested_count = 0;
@@ -354,8 +369,6 @@ public:
 
     uint8_t optimistic_unchoke_time_scaler = 0;
 
-    bool pool_is_all_seeds = false;
-    bool pool_is_all_seeds_dirty = true; /* true if pool_is_all_seeds needs to be recomputed */
     bool is_running = false;
     bool needs_completeness_check = true;
 
@@ -377,8 +390,11 @@ public:
 
     ActiveRequests active_requests;
 
+private:
     // number of bad pieces a peer is allowed to send before we ban them
     static auto constexpr MaxBadPiecesPerPeer = int{ 5 };
+
+    mutable std::optional<bool> pool_is_all_seeds_;
 
     bool is_endgame_ = false;
 };
@@ -582,11 +598,11 @@ void tr_peerMgrOnBlocklistChanged(tr_peerMgr* mgr)
 ****
 ***/
 
-static void atomSetSeed(tr_swarm* s, peer_atom& atom)
+static void atomSetSeed(tr_swarm* swarm, peer_atom& atom)
 {
-    tr_logAddTraceSwarm(s, fmt::format("marking peer {} as a seed", atom.readable()));
+    tr_logAddTraceSwarm(swarm, fmt::format("marking peer {} as a seed", atom.readable()));
     atom.flags |= ADDED_F_SEED_FLAG;
-    s->pool_is_all_seeds_dirty = true;
+    swarm->markAllSeedsFlagDirty();
 }
 
 bool tr_peerMgrPeerIsSeed(tr_torrent const* tor, tr_address const& addr)
@@ -990,7 +1006,7 @@ static struct peer_atom* ensureAtomExists(
         a->flags |= flags;
     }
 
-    s->pool_is_all_seeds_dirty = true;
+    s->markAllSeedsFlagDirty();
 
     return a;
 }
@@ -1164,8 +1180,7 @@ void tr_peerMgrSetSwarmIsAllSeeds(tr_torrent* tor)
         atomSetSeed(swarm, atom);
     }
 
-    swarm->pool_is_all_seeds = true;
-    swarm->pool_is_all_seeds_dirty = false;
+    swarm->markAllSeedsFlagDirty();
 }
 
 size_t tr_peerMgrAddPex(tr_torrent* tor, uint8_t from, tr_pex const* pex, size_t n_pex)
@@ -2586,26 +2601,6 @@ static uint64_t getPeerCandidateScore(tr_torrent const* tor, peer_atom const& at
     return score;
 }
 
-static bool calculateAllSeeds(tr_swarm* swarm)
-{
-    static auto constexpr test = [](auto const& atom)
-    {
-        return atom.isSeed();
-    };
-    return std::all_of(std::begin(swarm->pool), std::end(swarm->pool), test);
-}
-
-static bool swarmIsAllSeeds(tr_swarm* swarm)
-{
-    if (swarm->pool_is_all_seeds_dirty)
-    {
-        swarm->pool_is_all_seeds = calculateAllSeeds(swarm);
-        swarm->pool_is_all_seeds_dirty = false;
-    }
-
-    return swarm->pool_is_all_seeds;
-}
-
 /** @return an array of all the atoms we might want to connect to */
 static std::vector<peer_candidate> getPeerCandidates(tr_session* session, size_t max)
 {
@@ -2644,7 +2639,7 @@ static std::vector<peer_candidate> getPeerCandidates(tr_session* session, size_t
         /* if everyone in the swarm is seeds and pex is disabled because
          * the torrent is private, then don't initiate connections */
         bool const seeding = tor->isDone();
-        if (seeding && swarmIsAllSeeds(tor->swarm) && tor->isPrivate())
+        if (seeding && tor->swarm->isAllSeeds() && tor->isPrivate())
         {
             continue;
         }
