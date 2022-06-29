@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <iterator>
 #include <memory>
+#include <numeric> // std::accumulate()
 #include <set>
 #include <string>
 #include <string_view>
@@ -158,7 +159,7 @@ public:
         , base_url{ url }
         , callback{ callback_in }
         , callback_data{ callback_data_in }
-        , bandwidth(&tor->bandwidth_)
+        , bandwidth_(&tor->bandwidth_)
         , pulse_timer(evtimer_new(session->event_base, &tr_webseed::onTimer, this), event_free)
     {
         startTimer();
@@ -184,7 +185,7 @@ public:
         if (direction == TR_DOWN)
         {
             is_active = !std::empty(tasks);
-            Bps = bandwidth.getPieceSpeedBytesPerSecond(now, direction);
+            Bps = bandwidth_.getPieceSpeedBytesPerSecond(now, direction);
         }
 
         if (setme_Bps != nullptr)
@@ -193,6 +194,26 @@ public:
         }
 
         return is_active;
+    }
+
+    [[nodiscard]] Bandwidth* bandwidth() noexcept override
+    {
+        return &bandwidth_;
+    }
+
+    [[nodiscard]] size_t activeReqCount(tr_direction dir) const noexcept override
+    {
+        if (dir == TR_CLIENT_TO_PEER) // blocks we've requested
+        {
+            return std::accumulate(
+                std::begin(tasks),
+                std::end(tasks),
+                size_t{},
+                [](size_t sum, auto const* task) { return sum + (task->blocks.end - task->blocks.begin); });
+        }
+
+        // webseed will never request blocks from us
+        return {};
     }
 
     [[nodiscard]] std::string readable() const override
@@ -212,7 +233,7 @@ public:
 
     void gotPieceData(uint32_t n_bytes)
     {
-        bandwidth.notifyBandwidthConsumed(TR_DOWN, n_bytes, true, tr_time_msec());
+        bandwidth_.notifyBandwidthConsumed(TR_DOWN, n_bytes, true, tr_time_msec());
         publishClientGotPieceData(n_bytes);
         connection_limiter.gotData();
     }
@@ -249,7 +270,6 @@ public:
     tr_peer_callback const callback;
     void* const callback_data;
 
-    Bandwidth bandwidth;
     ConnectionLimiter connection_limiter;
     std::set<tr_webseed_task*> tasks;
 
@@ -282,6 +302,7 @@ private:
         webseed->startTimer();
     }
 
+    Bandwidth bandwidth_;
     std::shared_ptr<event> const pulse_timer;
     static int constexpr IdleTimerMsec = 2000;
 };

@@ -1291,10 +1291,10 @@ struct tr_peer_stat
     uint32_t cancelsToClient;
 
     /* how many requests the peer has made that we haven't responded to yet */
-    int pendingReqsToClient;
+    int activeReqsToClient;
 
     /* how many requests we've made and are currently awaiting a response for */
-    int pendingReqsToPeer;
+    int activeReqsToPeer;
 };
 
 tr_peer_stat* tr_torrentPeers(tr_torrent const* torrent, int* peerCount);

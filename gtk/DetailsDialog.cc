@@ -1327,14 +1327,14 @@ void refreshPeerRow(Gtk::TreeIter const& iter, tr_peer_stat const* peer)
         down_speed = tr_formatter_speed_KBps(peer->rateToClient_KBps);
     }
 
-    if (peer->pendingReqsToPeer > 0)
+    if (peer->activeReqsToPeer > 0)
     {
-        down_count = std::to_string(peer->pendingReqsToPeer);
+        down_count = std::to_string(peer->activeReqsToPeer);
     }
 
-    if (peer->pendingReqsToClient > 0)
+    if (peer->activeReqsToClient > 0)
     {
-        up_count = std::to_string(peer->pendingReqsToClient);
+        up_count = std::to_string(peer->activeReqsToClient);
     }
 
     if (peer->blocksToPeer > 0)
@@ -1358,9 +1358,9 @@ void refreshPeerRow(Gtk::TreeIter const& iter, tr_peer_stat const* peer)
     }
 
     (*iter)[peer_cols.progress] = (int)(100.0 * peer->progress);
-    (*iter)[peer_cols.upload_request_count_int] = peer->pendingReqsToClient;
+    (*iter)[peer_cols.upload_request_count_int] = peer->activeReqsToClient;
     (*iter)[peer_cols.upload_request_count_string] = up_count;
-    (*iter)[peer_cols.download_request_count_int] = peer->pendingReqsToPeer;
+    (*iter)[peer_cols.download_request_count_int] = peer->activeReqsToPeer;
     (*iter)[peer_cols.download_request_count_string] = down_count;
     (*iter)[peer_cols.download_rate_double] = peer->rateToClient_KBps;
     (*iter)[peer_cols.download_rate_string] = down_speed;

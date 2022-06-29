@@ -308,9 +308,20 @@ public:
         return Bps > 0;
     }
 
-    [[nodiscard]] size_t pendingReqsToClient() const noexcept override
+    [[nodiscard]] size_t activeReqCount(tr_direction dir) const noexcept override
     {
-        return std::size(peer_requested_);
+        switch (dir)
+        {
+        case TR_CLIENT_TO_PEER: // requests we sent
+            return tr_peerMgrCountActiveRequestsToPeer(torrent, this);
+
+        case TR_PEER_TO_CLIENT: // requests they sent
+            return std::size(peer_requested_);
+
+        default:
+            TR_ASSERT(0);
+            return {};
+        }
     }
 
     [[nodiscard]] bool is_peer_choked() const noexcept override
@@ -346,6 +357,11 @@ public:
     [[nodiscard]] bool is_incoming_connection() const override
     {
         return io->isIncoming();
+    }
+
+    [[nodiscard]] Bandwidth* bandwidth() noexcept override
+    {
+        return io->bandwidth;
     }
 
     [[nodiscard]] bool is_active(tr_direction direction) const override
@@ -683,6 +699,8 @@ public:
 
     evbuffer* const outMessages; /* all the non-piece messages */
 
+    tr_peerIo* const io;
+
     struct QueuedPeerRequest : public peer_request
     {
         explicit QueuedPeerRequest(peer_request in) noexcept
@@ -715,8 +733,6 @@ public:
     std::optional<size_t> reqq;
 
     UniqueTimer pex_timer;
-
-    tr_peerIo* io = nullptr;
 
     tr_bitfield have_;
 
@@ -1757,7 +1773,7 @@ static ReadState readBtMessage(tr_peerMsgsImpl* msgs, struct evbuffer* inbuf, si
             logtrace(msgs, "got a bitfield");
             auto tmp = std::vector<uint8_t>(msglen);
             tr_peerIoReadBytes(msgs->io, inbuf, std::data(tmp), std::size(tmp));
-            msgs->have_ = tr_bitfield{ msgs->torrent->hasMetainfo() ? msgs->torrent->pieceCount() : std::size(tmp) };
+            msgs->have_ = tr_bitfield{ msgs->torrent->hasMetainfo() ? msgs->torrent->pieceCount() : std::size(tmp) * 8 };
             msgs->have_.setRaw(std::data(tmp), std::size(tmp));
             msgs->publishClientGotBitfield(&msgs->have_);
             msgs->invalidatePercentDone();

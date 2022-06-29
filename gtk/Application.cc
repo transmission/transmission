@@ -1,4 +1,4 @@
-// This file Copyright © 2005-2021 Transmission authors and contributors.
+// This file Copyright © 2005-2022 Transmission authors and contributors.
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
@@ -54,7 +54,7 @@ namespace
 auto const AppIconName = Glib::ustring("transmission"s);
 
 char const* const LICENSE =
-    "Copyright 2005-2020. All code is copyrighted by the respective authors.\n"
+    "Copyright 2005-2022. All code is copyrighted by the respective authors.\n"
     "\n"
     "Transmission can be redistributed and/or modified under the terms of the "
     "\n"

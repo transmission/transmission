@@ -1047,7 +1047,7 @@ tr_stat const* tr_torrentStat(tr_torrent* tor)
 
     if (tor->swarm != nullptr)
     {
-        tr_swarmGetStats(tor->swarm, &swarm_stats);
+        swarm_stats = tr_swarmGetStats(tor->swarm);
     }
 
     tr_stat* const s = &tor->stats;
