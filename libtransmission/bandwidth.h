@@ -236,6 +236,11 @@ public:
     tr_bandwidth_limits getLimits() const;
     void setLimits(tr_bandwidth_limits const* limits);
 
+    [[nodiscard]] constexpr auto* parent() noexcept
+    {
+        return parent_;
+    }
+
 private:
     static unsigned int getSpeedBytesPerSecond(RateControl& r, unsigned int interval_msec, uint64_t now);
 
