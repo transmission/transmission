@@ -20,6 +20,7 @@
 #include API_HEADER(dhm.h)
 #include API_HEADER(error.h)
 #include API_HEADER(sha1.h)
+#include API_HEADER(sha256.h)
 #include API_HEADER(version.h)
 
 #include <fmt/core.h>

@@ -22,6 +22,7 @@
 #include API_HEADER_CRYPT(error-crypt.h)
 #include API_HEADER_CRYPT(random.h)
 #include API_HEADER_CRYPT(sha.h)
+#include API_HEADER_CRYPT(sha256.h)
 #include API_HEADER(version.h)
 
 #include <fmt/core.h>
