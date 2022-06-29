@@ -26,8 +26,8 @@
 
 class tr_peer;
 class tr_swarm;
-struct Bandwidth;
 struct peer_atom;
+struct tr_bandwidth;
 
 /**
 ***  Peer Publish / Subscribe
@@ -82,7 +82,7 @@ public:
 
     [[nodiscard]] virtual bool hasPiece(tr_piece_index_t piece) const noexcept = 0;
 
-    [[nodiscard]] virtual Bandwidth* bandwidth() noexcept = 0;
+    [[nodiscard]] virtual tr_bandwidth& bandwidth() noexcept = 0;
 
     // requests that have been made but haven't been fulfilled yet
     [[nodiscard]] virtual size_t activeReqCount(tr_direction) const noexcept = 0;

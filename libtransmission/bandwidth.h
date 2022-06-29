@@ -34,9 +34,9 @@ struct tr_bandwidth_limits
 };
 
 /**
- * Bandwidth is an object for measuring and constraining bandwidth speeds.
+ * tr_bandwidth is an object for measuring and constraining bandwidth speeds.
  *
- * Bandwidth objects can be "stacked" so that a peer can be made to obey
+ * tr_bandwidth objects can be "stacked" so that a peer can be made to obey
  * multiple constraints (for example, obeying the global speed limit and a
  * per-torrent speed limit).
  *
@@ -60,42 +60,48 @@ struct tr_bandwidth_limits
  *
  * CONSTRAINING
  *
- *   Call Bandwidth::allocate() periodically. tr_bandwidth knows its current
+ *   Call tr_bandwidth::allocate() periodically. tr_bandwidth knows its current
  *   speed and will decide how many bytes to make available over the
  *   user-specified period to reach the user-specified desired speed.
  *   If appropriate, it notifies its peer-ios that new bandwidth is available.
  *
- *   Bandwidth::allocate() operates on the tr_bandwidth subtree, so usually
+ *   tr_bandwidth::allocate() operates on the tr_bandwidth subtree, so usually
  *   you'll only need to invoke it for the top-level tr_session bandwidth.
  *
  *   The peer-ios all have a pointer to their associated tr_bandwidth object,
- *   and call Bandwidth::clamp() before performing I/O to see how much
+ *   and call tr_bandwidth::clamp() before performing I/O to see how much
  *   bandwidth they can safely use.
  */
-struct Bandwidth
+struct tr_bandwidth
 {
-public:
-    explicit Bandwidth(Bandwidth* newParent);
+private:
+    static constexpr size_t HistoryMSec = 2000U;
+    static constexpr size_t IntervalMSec = HistoryMSec;
+    static constexpr size_t GranularityMSec = 250;
+    static constexpr size_t HistorySize = (IntervalMSec / GranularityMSec);
 
-    Bandwidth()
-        : Bandwidth(nullptr)
+public:
+    explicit tr_bandwidth(tr_bandwidth* newParent);
+
+    tr_bandwidth()
+        : tr_bandwidth(nullptr)
     {
     }
 
-    ~Bandwidth()
+    ~tr_bandwidth()
     {
         this->setParent(nullptr);
     }
 
-    Bandwidth& operator=(Bandwidth&&) = delete;
-    Bandwidth& operator=(Bandwidth) = delete;
-    Bandwidth(Bandwidth&&) = delete;
-    Bandwidth(Bandwidth&) = delete;
+    tr_bandwidth& operator=(tr_bandwidth&&) = delete;
+    tr_bandwidth& operator=(tr_bandwidth) = delete;
+    tr_bandwidth(tr_bandwidth&&) = delete;
+    tr_bandwidth(tr_bandwidth&) = delete;
 
     /**
      * @brief Sets new peer, nullptr is allowed.
      */
-    constexpr void setPeer(tr_peerIo* peer)
+    constexpr void setPeer(tr_peerIo* peer) noexcept
     {
         this->peer_ = peer;
     }
@@ -111,7 +117,7 @@ public:
      */
     void allocate(tr_direction dir, unsigned int period_msec);
 
-    void setParent(Bandwidth* newParent);
+    void setParent(tr_bandwidth* newParent);
 
     [[nodiscard]] constexpr tr_priority_t getPriority() const noexcept
     {
@@ -149,8 +155,8 @@ public:
 
     /**
      * @brief Set the desired speed for this bandwidth subtree.
-     * @see Bandwidth::allocate
-     * @see Bandwidth::getDesiredSpeed
+     * @see tr_bandwidth::allocate
+     * @see tr_bandwidth::getDesiredSpeed
      */
     constexpr bool setDesiredSpeedBytesPerSecond(tr_direction dir, unsigned int desired_speed)
     {
@@ -162,7 +168,7 @@ public:
 
     /**
      * @brief Get the desired speed for the bandwidth subtree.
-     * @see Bandwidth::setDesiredSpeed
+     * @see tr_bandwidth::setDesiredSpeed
      */
     [[nodiscard]] constexpr double getDesiredSpeedBytesPerSecond(tr_direction dir) const
     {
@@ -209,11 +215,6 @@ public:
         return this->band_[direction].honor_parent_limits_;
     }
 
-    static constexpr size_t HistoryMSec = 2000U;
-    static constexpr size_t IntervalMSec = HistoryMSec;
-    static constexpr size_t GranularityMSec = 250;
-    static constexpr size_t HistorySize = (IntervalMSec / GranularityMSec);
-
     struct RateControl
     {
         std::array<uint64_t, HistorySize> date_;
@@ -233,7 +234,8 @@ public:
         bool honor_parent_limits_ = true;
     };
 
-    tr_bandwidth_limits getLimits() const;
+    [[nodiscard]] tr_bandwidth_limits getLimits() const;
+
     void setLimits(tr_bandwidth_limits const* limits);
 
     [[nodiscard]] constexpr auto* parent() noexcept
@@ -257,8 +259,8 @@ private:
         std::vector<tr_peerIo*>& peer_pool);
 
     mutable std::array<Band, 2> band_ = {};
-    std::vector<Bandwidth*> children_;
-    Bandwidth* parent_ = nullptr;
+    std::vector<tr_bandwidth*> children_;
+    tr_bandwidth* parent_ = nullptr;
     tr_peerIo* peer_ = nullptr;
     tr_priority_t priority_ = 0;
 };
