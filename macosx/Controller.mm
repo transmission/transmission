@@ -2,11 +2,11 @@
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
-#import <IOKit/IOMessage.h>
-#import <IOKit/pwr_mgt/IOPMLib.h>
-#import <Carbon/Carbon.h>
+@import IOKit;
+@import IOKit.pwr_mgt;
+@import Carbon;
 
-#import <Sparkle/Sparkle.h>
+@import Sparkle;
 
 #include <atomic> /* atomic, atomic_fetch_add_explicit, memory_order_relaxed */
 
@@ -122,7 +122,7 @@ typedef NS_ENUM(unsigned int, sortOrderTag) { //
 
 static void altSpeedToggledCallback([[maybe_unused]] tr_session* handle, bool active, bool byUser, void* controller)
 {
-    NSDictionary* dict = [[NSDictionary alloc] initWithObjects:@[ @(active), @(byUser) ] forKeys:@[ @"Active", @"ByUser" ]];
+    NSDictionary* dict = @{@"Active" : @(active), @"ByUser" : @(byUser)};
     [(__bridge Controller*)controller performSelectorOnMainThread:@selector(altSpeedToggledCallbackIsLimited:) withObject:dict
                                                     waitUntilDone:NO];
 }
@@ -512,7 +512,7 @@ static void removeKeRangerRansomware()
         _fLib = tr_sessionInit(configDir, YES, &settings);
         tr_variantFree(&settings);
 
-        _fConfigDirectory = [[NSString alloc] initWithUTF8String:configDir];
+        _fConfigDirectory = @(configDir);
 
         NSApp.delegate = self;
 
@@ -569,7 +569,7 @@ static void removeKeRangerRansomware()
     self.fWindow.excludedFromWindowsMenu = YES;
 
     //make window primary view in fullscreen
-    [self.fWindow setCollectionBehavior:NSWindowCollectionBehaviorFullScreenPrimary];
+    self.fWindow.collectionBehavior = NSWindowCollectionBehaviorFullScreenPrimary;
 
     //set table size
     BOOL const small = [self.fDefaults boolForKey:@"SmallView"];
@@ -1021,7 +1021,7 @@ static void removeKeRangerRansomware()
         NSString* message = [NSString
             stringWithFormat:NSLocalizedString(@"It appears that the file \"%@\" from %@ is not a torrent file.", "Download not a torrent -> message"),
                              suggestedName,
-                             [download.request.URL.absoluteString stringByRemovingPercentEncoding]];
+                             download.request.URL.absoluteString.stringByRemovingPercentEncoding];
 
         NSAlert* alert = [[NSAlert alloc] init];
         [alert addButtonWithTitle:NSLocalizedString(@"OK", "Download not a torrent -> button")];
@@ -1046,7 +1046,7 @@ static void removeKeRangerRansomware()
 {
     NSString* message = [NSString
         stringWithFormat:NSLocalizedString(@"The torrent could not be downloaded from %@: %@.", "Torrent download failed -> message"),
-                         [download.request.URL.absoluteString stringByRemovingPercentEncoding],
+                         download.request.URL.absoluteString.stringByRemovingPercentEncoding,
                          error.localizedDescription];
 
     NSAlert* alert = [[NSAlert alloc] init];
@@ -1351,7 +1351,7 @@ static void removeKeRangerRansomware()
 //called on by applescript
 - (void)open:(NSArray*)files
 {
-    NSDictionary* dict = [[NSDictionary alloc] initWithObjects:@[ files, @(ADD_MANUAL) ] forKeys:@[ @"Filenames", @"AddType" ]];
+    NSDictionary* dict = @{ @"Filenames" : files, @"AddType" : @(ADD_MANUAL) };
     [self performSelectorOnMainThread:@selector(openFilesWithDict:) withObject:dict waitUntilDone:NO];
 }
 
@@ -1374,9 +1374,10 @@ static void removeKeRangerRansomware()
                 [filenames addObject:url.path];
             }
 
-            NSDictionary* dictionary = [[NSDictionary alloc]
-                initWithObjects:@[ filenames, sender == self.fOpenIgnoreDownloadFolder ? @(ADD_SHOW_OPTIONS) : @(ADD_MANUAL) ]
-                        forKeys:@[ @"Filenames", @"AddType" ]];
+            NSDictionary* dictionary = @{
+                @"Filenames" : filenames,
+                @"AddType" : sender == self.fOpenIgnoreDownloadFolder ? @(ADD_SHOW_OPTIONS) : @(ADD_MANUAL)
+            };
             [self performSelectorOnMainThread:@selector(openFilesWithDict:) withObject:dictionary waitUntilDone:NO];
         }
     }];
@@ -1552,7 +1553,7 @@ static void removeKeRangerRansomware()
         [self.fWindow beginSheet:self.fUrlSheetController.window completionHandler:^(NSModalResponse returnCode) {
             if (returnCode == 1)
             {
-                NSString* urlString = [self.fUrlSheetController urlString];
+                NSString* urlString = self.fUrlSheetController.urlString;
                 urlString = [urlString stringByTrimmingCharactersInSet:NSCharacterSet.whitespaceAndNewlineCharacterSet];
                 dispatch_async(dispatch_get_main_queue(), ^{
                     [self openURL:urlString];
@@ -3875,6 +3876,7 @@ static void removeKeRangerRansomware()
 - (void)endPreviewPanelControl:(QLPreviewPanel*)panel
 {
     self.fPreviewPanel = nil;
+    [self.fWindow.toolbar validateVisibleItems];
 }
 
 - (NSArray*)quickLookableTorrents
@@ -4000,16 +4002,9 @@ static void removeKeRangerRansomware()
 
     item.view = button;
 
-    if (@available(macOS 11.0, *))
-    {
-        button.bordered = NO;
-    }
-    else
-    {
-        NSSize const buttonSize = NSMakeSize(36.0, 25.0);
-        item.minSize = buttonSize;
-        item.maxSize = buttonSize;
-    }
+    NSSize const buttonSize = NSMakeSize(36.0, 25.0);
+    item.minSize = buttonSize;
+    item.maxSize = buttonSize;
 
     return item;
 }
@@ -4099,16 +4094,9 @@ static void removeKeRangerRansomware()
         segmentedControl.segmentCount = 2;
         segmentedCell.trackingMode = NSSegmentSwitchTrackingMomentary;
 
-        if (@available(macOS 11.0, *))
-        {
-            segmentedCell.bezeled = NO;
-        }
-        else
-        {
-            NSSize const groupSize = NSMakeSize(72.0, 25.0);
-            groupItem.minSize = groupSize;
-            groupItem.maxSize = groupSize;
-        }
+        NSSize const groupSize = NSMakeSize(72.0, 25.0);
+        groupItem.minSize = groupSize;
+        groupItem.maxSize = groupSize;
 
         groupItem.label = NSLocalizedString(@"Apply All", "All toolbar item -> label");
         groupItem.paletteLabel = NSLocalizedString(@"Pause / Resume All", "All toolbar item -> palette label");
@@ -4150,16 +4138,9 @@ static void removeKeRangerRansomware()
         segmentedControl.segmentCount = 2;
         segmentedCell.trackingMode = NSSegmentSwitchTrackingMomentary;
 
-        if (@available(macOS 11.0, *))
-        {
-            segmentedCell.bezeled = NO;
-        }
-        else
-        {
-            NSSize const groupSize = NSMakeSize(72.0, 25.0);
-            groupItem.minSize = groupSize;
-            groupItem.maxSize = groupSize;
-        }
+        NSSize const groupSize = NSMakeSize(72.0, 25.0);
+        groupItem.minSize = groupSize;
+        groupItem.maxSize = groupSize;
 
         groupItem.label = NSLocalizedString(@"Apply Selected", "Selected toolbar item -> label");
         groupItem.paletteLabel = NSLocalizedString(@"Pause / Resume Selected", "Selected toolbar item -> palette label");
@@ -4386,8 +4367,8 @@ static void removeKeRangerRansomware()
     //set quick look item
     if ([ident isEqualToString:TOOLBAR_QUICKLOOK])
     {
-        ((NSButton*)toolbarItem.view).state = [QLPreviewPanel sharedPreviewPanelExists] && [QLPreviewPanel sharedPreviewPanel].visible;
-        return YES;
+        ((NSButton*)toolbarItem.view).state = self.fPreviewPanel != nil;
+        return self.fTableView.numberOfSelectedRows > 0;
     }
 
     //enable share item
@@ -4801,7 +4782,7 @@ static void removeKeRangerRansomware()
                                      NSLocalizedString(@"Close Quick Look", "View menu -> Quick Look");
         menuItem.title = title;
 
-        return YES;
+        return self.fTableView.numberOfSelectedRows > 0;
     }
 
     return YES;
@@ -5042,9 +5023,24 @@ static void removeKeRangerRansomware()
             [self removeStackViewHeightConstraints];
         }
 
+        //this fixes a macOS bug where on toggling the toolbar item bezels will show
+        [self hideToolBarBezels:YES];
+
         dispatch_async(dispatch_get_main_queue(), ^{
             [self setWindowSizeToFit];
+            [self hideToolBarBezels:NO];
         });
+    }
+}
+
+- (void)hideToolBarBezels:(BOOL)hide
+{
+    if (@available(macOS 11.0, *))
+    {
+        for (NSToolbarItem* item in self.fWindow.toolbar.items)
+        {
+            item.view.hidden = hide;
+        }
     }
 }
 

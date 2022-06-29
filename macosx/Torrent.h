@@ -2,7 +2,7 @@
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
-#import <Cocoa/Cocoa.h>
+#import <Foundation/Foundation.h>
 #import <Quartz/Quartz.h>
 
 #include <libtransmission/transmission.h>
@@ -83,7 +83,7 @@ typedef NS_ENUM(unsigned int, TorrentDeterminationType) {
 - (void)moveTorrentDataFileTo:(NSString*)folder;
 - (void)copyTorrentFileTo:(NSString*)path;
 
-- (BOOL)alertForRemainingDiskSpace;
+@property(nonatomic, readonly) BOOL alertForRemainingDiskSpace;
 
 @property(nonatomic, readonly) NSImage* icon;
 

@@ -2,11 +2,7 @@
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
-#import <Foundation/Foundation.h>
-
 #import <Sparkle/Sparkle.h>
-
-#include <libtransmission/transmission.h>
 #include <libtransmission/utils.h>
 
 #import "VDKQueue.h"
@@ -203,7 +199,7 @@
     self.window.restorationClass = [self class];
 
     //disable fullscreen support
-    [self.window setCollectionBehavior:NSWindowCollectionBehaviorFullScreenNone];
+    self.window.collectionBehavior = NSWindowCollectionBehaviorFullScreenNone;
 
     NSToolbar* toolbar = [[NSToolbar alloc] initWithIdentifier:@"Preferences Toolbar"];
     toolbar.delegate = self;
@@ -1123,7 +1119,7 @@
 
         tr_sessionSetRPCPassword(self.fHandle, fullPassword);
 
-        self.fRPCPassword = [[NSString alloc] initWithUTF8String:fullPassword];
+        self.fRPCPassword = @(fullPassword);
         self.fRPCPasswordField.stringValue = self.fRPCPassword;
     }
     else

@@ -107,7 +107,7 @@
     self.fNameField.toolTip = name;
 
     //disable fullscreen support
-    [self.window setCollectionBehavior:NSWindowCollectionBehaviorFullScreenNone];
+    self.window.collectionBehavior = NSWindowCollectionBehaviorFullScreenNone;
 
     self.fIconView.image = self.torrent.icon;
 
@@ -233,7 +233,7 @@
         [alert addButtonWithTitle:NSLocalizedString(@"Add", "Add torrent -> same name -> button")];
         alert.showsSuppressionButton = YES;
 
-        [alert beginSheetModalForWindow:[self window] completionHandler:^(NSModalResponse returnCode) {
+        [alert beginSheetModalForWindow:self.window completionHandler:^(NSModalResponse returnCode) {
             if (alert.suppressionButton.state == NSControlStateValueOn)
             {
                 [NSUserDefaults.standardUserDefaults setBool:NO forKey:@"WarningFolderDataSameName"];

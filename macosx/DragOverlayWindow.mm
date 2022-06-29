@@ -6,7 +6,6 @@
 #import "DragOverlayView.h"
 #import "NSStringAdditions.h"
 
-#include <libtransmission/transmission.h>
 #include <libtransmission/torrent-metainfo.h>
 
 @interface DragOverlayWindow ()

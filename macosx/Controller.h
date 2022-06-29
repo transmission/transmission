@@ -2,7 +2,7 @@
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
-#import <Cocoa/Cocoa.h>
+#import <AppKit/AppKit.h>
 #import <Quartz/Quartz.h>
 
 #import <Sparkle/SUUpdaterDelegate.h>
@@ -168,7 +168,7 @@ typedef NS_ENUM(unsigned int, addType) { //
 @property(nonatomic, readonly) CGFloat toolbarHeight;
 @property(nonatomic, readonly) CGFloat mainWindowComponentHeight;
 @property(nonatomic, readonly) CGFloat scrollViewHeight;
-- (BOOL)isFullScreen;
+@property(nonatomic, getter=isFullScreen, readonly) BOOL fullScreen;
 
 - (void)updateForExpandCollapse;
 

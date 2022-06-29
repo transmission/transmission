@@ -43,9 +43,9 @@ If you are experiencing slow speeds and you have been through the documentation,
  * Is your incoming peer port open or closed?
    The "Peers" and "Tracker" tabs are in the dialog named "Inspector" on the Mac GUI and "Torrent Properties" on the GTK+ GUI.
 
-### Crash on the Mac ###
-If you have problems on the Mac version then please do these extra steps:
-  * Make sure your system is updated to the latest version of your operating system. Note as of version 1.60, Transmission requires Mac OS X 10.5 or later.
+### Crash on macOS ###
+If you have problems on the macOS version then please do these extra steps:
+  * Make sure your system is updated to the latest version of your operating system.
   * If you are running a nightly build, set the language to English. The localization will sometimes crash the nightly builds until they are updated (right before an official release).
   * macOS collects two pieces of crash information that can help us fix the crash:
      1. In Console.app, look under LOG FILES > ~/Library/Logs/ > CrashReporter > for Transmission. If you find one, include it in your forum post.

@@ -2,8 +2,8 @@
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
-#import <objc/runtime.h>
-#import <AppKit/AppKit.h>
+@import ObjectiveC;
+@import AppKit;
 
 void SUUpdater_checkForUpdates(id self, SEL _cmd, ...)
 {

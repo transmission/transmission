@@ -9,7 +9,7 @@
 
 + (NSGradient*)progressWhiteGradient
 {
-    if ([NSApp isDarkMode])
+    if (NSApp.darkMode)
     {
         return [[self class] progressGradientForRed:0.1 green:0.1 blue:0.1];
     }
@@ -21,7 +21,7 @@
 
 + (NSGradient*)progressGrayGradient
 {
-    if ([NSApp isDarkMode])
+    if (NSApp.darkMode)
     {
         return [[self class] progressGradientForRed:0.35 green:0.35 blue:0.35];
     }
@@ -33,7 +33,7 @@
 
 + (NSGradient*)progressLightGrayGradient
 {
-    if ([NSApp isDarkMode])
+    if (NSApp.darkMode)
     {
         return [[self class] progressGradientForRed:0.2 green:0.2 blue:0.2];
     }
@@ -45,7 +45,7 @@
 
 + (NSGradient*)progressBlueGradient
 {
-    if ([NSApp isDarkMode])
+    if (NSApp.darkMode)
     {
         return [[self class] progressGradientForRed:0.35 * 2.0 / 3.0 green:0.67 * 2.0 / 3.0 blue:0.98 * 2.0 / 3.0];
     }
@@ -57,7 +57,7 @@
 
 + (NSGradient*)progressDarkBlueGradient
 {
-    if ([NSApp isDarkMode])
+    if (NSApp.darkMode)
     {
         return [[self class] progressGradientForRed:0.616 * 2.0 / 3.0 green:0.722 * 2.0 / 3.0 blue:0.776 * 2.0 / 3.0];
     }
@@ -69,7 +69,7 @@
 
 + (NSGradient*)progressGreenGradient
 {
-    if ([NSApp isDarkMode])
+    if (NSApp.darkMode)
     {
         return [[self class] progressGradientForRed:0.44 * 2.0 / 3.0 green:0.89 * 2.0 / 3.0 blue:0.40 * 2.0 / 3.0];
     }
@@ -81,7 +81,7 @@
 
 + (NSGradient*)progressLightGreenGradient
 {
-    if ([NSApp isDarkMode])
+    if (NSApp.darkMode)
     {
         return [[self class] progressGradientForRed:0.62 * 3.0 / 4.0 green:0.99 * 3.0 / 4.0 blue:0.58 * 3.0 / 4.0];
     }
@@ -93,7 +93,7 @@
 
 + (NSGradient*)progressDarkGreenGradient
 {
-    if ([NSApp isDarkMode])
+    if (NSApp.darkMode)
     {
         return [[self class] progressGradientForRed:0.627 * 2.0 / 3.0 green:0.714 * 2.0 / 3.0 blue:0.639 * 2.0 / 3.0];
     }
@@ -105,7 +105,7 @@
 
 + (NSGradient*)progressRedGradient
 {
-    if ([NSApp isDarkMode])
+    if (NSApp.darkMode)
     {
         return [[self class] progressGradientForRed:0.902 * 2.0 / 3.0 green:0.439 * 2.0 / 3.0 blue:0.451 * 2.0 / 3.0];
     }
@@ -117,7 +117,7 @@
 
 + (NSGradient*)progressYellowGradient
 {
-    if ([NSApp isDarkMode])
+    if (NSApp.darkMode)
     {
         return [[self class] progressGradientForRed:0.933 * 0.8 green:0.890 * 0.8 blue:0.243 * 0.8];
     }
