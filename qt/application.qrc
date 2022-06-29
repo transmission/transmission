@@ -12,10 +12,11 @@
       <file alias="transmission-192.png">icons/hicolor/192x192/transmission-qt.png</file>
       <file alias="transmission-256.png">icons/hicolor/256x256/transmission-qt.png</file>
       <file alias="transmission-qt.svg">icons/hicolor/scalable/transmission-qt.svg</file>
-      <file alias="ratio.png">icons/ratio.png</file>
-      <file alias="alt-limit-off.png">icons/turtle-grey.png</file>
-      <file alias="alt-limit-on.png">icons/turtle-blue.png</file>
-      <file alias="encrypted.png">icons/lock.png</file>
-      <file alias="utilities.png">icons/utilities.png</file>
+      <file alias="ratio.png">icons/ratio.svg</file>
+      <file alias="alt-limit-off.png">icons/turtle-grey.svg</file>
+      <file alias="alt-limit-on.png">icons/turtle-blue.svg</file>
+      <file alias="encrypted.png">icons/lock.svg</file>
+      <file alias="turtle.png">icons/turtle-grey.png</file>
+      <file alias="utilities.png">icons/utilities.svg</file>
   </qresource>
 </RCC>
