@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>601</width>
-    <height>657</height>
+    <width>618</width>
+    <height>632</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -120,8 +120,14 @@
          </item>
          <item>
           <widget class="QLabel" name="altSpeedLimitsSectionIconLabel">
+           <property name="maximumSize">
+            <size>
+             <width>20</width>
+             <height>20</height>
+            </size>
+           </property>
            <property name="pixmap">
-            <pixmap resource="application.qrc">:/icons/alt-limit-off.png</pixmap>
+            <pixmap resource="application.qrc">:/icons/turtle.png</pixmap>
            </property>
           </widget>
          </item>
