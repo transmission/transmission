@@ -11,7 +11,6 @@
 #include <optional>
 #include <string>
 #include <string_view>
-#include <utility> // stds::move()
 
 struct evbuffer;
 

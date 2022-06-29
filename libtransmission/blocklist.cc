@@ -6,6 +6,7 @@
 #include <algorithm>
 #include <cerrno>
 #include <cstdio>
+#include <cstring>
 #include <string_view>
 
 #include <fmt/core.h>

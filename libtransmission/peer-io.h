@@ -115,7 +115,7 @@ public:
         return inbuf.get();
     }
 
-    [[nodiscard]] auto hastr_bandwidthLeft(tr_direction dir) noexcept
+    [[nodiscard]] auto hasBandwidthLeft(tr_direction dir) noexcept
     {
         return bandwidth_.clamp(dir, 1024) > 0;
     }
@@ -358,7 +358,7 @@ void tr_peerIoDrain(tr_peerIo* io, struct evbuffer* inbuf, size_t byteCount);
 
 size_t tr_peerIoGetWriteBufferSpace(tr_peerIo const* io, uint64_t now);
 
-void tr_peerIotr_bandwidthUsed(tr_peerIo* io, tr_direction direction, size_t byteCount, int isPieceData);
+void tr_peerIoBandwidthUsed(tr_peerIo* io, tr_direction direction, size_t byteCount, int isPieceData);
 
 /**
 ***

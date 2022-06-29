@@ -14,7 +14,6 @@
 #include <cstdint> // uint8_t, uint64_t
 #include <string>
 #include <string_view>
-#include <utility> // std::move()
 #include <vector>
 
 #ifdef _WIN32

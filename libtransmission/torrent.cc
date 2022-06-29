@@ -8,15 +8,13 @@
 #include <cerrno> // EINVAL
 #include <climits> /* INT_MAX */
 #include <cmath>
-#include <csignal> // signal()
-#include <cstring>
+#include <csignal> /* signal() */
 #include <ctime>
 #include <map>
 #include <sstream>
 #include <string>
 #include <string_view>
 #include <unordered_map>
-#include <utility> // std::move()
 #include <vector>
 
 #ifndef _WIN32
@@ -735,7 +733,7 @@ static void torrentInit(tr_torrent* tor, tr_ctor const* ctor)
         tor->incomplete_dir = dir;
     }
     tor->bandwidth_.setParent(&session->top_bandwidth_);
-    tor->bandwidth_.setPriority(tr_ctorGettr_bandwidthPriority(ctor));
+    tor->bandwidth_.setPriority(tr_ctorGetBandwidthPriority(ctor));
     tor->error = TR_STAT_OK;
     tor->finishedSeedingByIdle = false;
 
@@ -1953,7 +1951,7 @@ void tr_torrent::setLabels(std::vector<tr_quark> const& new_labels)
 ****
 ***/
 
-void tr_torrent::settr_bandwidthGroup(std::string_view bandwidth_group) noexcept
+void tr_torrent::setBandwidthGroup(std::string_view bandwidth_group) noexcept
 {
     bandwidth_group = tr_strvStrip(bandwidth_group);
 
@@ -1967,7 +1965,7 @@ void tr_torrent::settr_bandwidthGroup(std::string_view bandwidth_group) noexcept
     else
     {
         this->bandwidth_group_ = bandwidth_group;
-        this->bandwidth_.setParent(&this->session->gettr_bandwidthGroup(bandwidth_group));
+        this->bandwidth_.setParent(&this->session->getBandwidthGroup(bandwidth_group));
     }
 
     this->setDirty();

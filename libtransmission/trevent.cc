@@ -9,7 +9,6 @@
 #include <mutex>
 #include <shared_mutex>
 #include <thread>
-#include <utility> // std::move(), std::swap()
 
 #include <csignal>
 

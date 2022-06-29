@@ -19,11 +19,10 @@
 #include <tuple>
 #include <unordered_set>
 #include <vector>
-#include <utility> // std::move()
 
 #ifndef _WIN32
-#include <sys/types.h> // umask()
-#include <sys/stat.h> // umask()
+#include <sys/types.h> /* umask() */
+#include <sys/stat.h> /* umask() */
 #endif
 
 #include <event2/event.h>
@@ -83,7 +82,7 @@ static auto constexpr SaveIntervalSecs = int{ 360 };
 
 static void bandwidthGroupRead(tr_session* session, std::string_view config_dir);
 static int bandwidthGroupWrite(tr_session const* session, std::string_view config_dir);
-static auto constexpr tr_bandwidthGroupsFilename = "bandwidth-groups.json"sv;
+static auto constexpr BandwidthGroupsFilename = "bandwidth-groups.json"sv;
 
 static tr_port getRandomPort(tr_session const* s)
 {
@@ -1398,7 +1397,7 @@ bool tr_sessionGetActiveSpeedLimit_KBps(tr_session const* session, tr_direction 
     return is_active;
 }
 
-static void updatetr_bandwidth(tr_session* session, tr_direction dir)
+static void updateBandwidth(tr_session* session, tr_direction dir)
 {
     unsigned int limit_Bps = 0;
     bool const isLimited = tr_sessionGetActiveSpeedLimit_Bps(session, dir, &limit_Bps);
@@ -1440,8 +1439,8 @@ static void altSpeedToggled(tr_session* const session)
 {
     TR_ASSERT(tr_isSession(session));
 
-    updatetr_bandwidth(session, TR_UP);
-    updatetr_bandwidth(session, TR_DOWN);
+    updateBandwidth(session, TR_UP);
+    updateBandwidth(session, TR_DOWN);
 
     struct tr_turtle_info* t = &session->turtle;
 
@@ -1535,7 +1534,7 @@ static void tr_sessionSetSpeedLimit_Bps(tr_session* s, tr_direction d, unsigned 
 
     s->speedLimit_Bps[d] = Bps;
 
-    updatetr_bandwidth(s, d);
+    updateBandwidth(s, d);
 }
 
 void tr_sessionSetSpeedLimit_KBps(tr_session* s, tr_direction d, unsigned int KBps)
@@ -1563,7 +1562,7 @@ void tr_sessionLimitSpeed(tr_session* s, tr_direction d, bool b)
 
     s->speedLimitEnabled[d] = b;
 
-    updatetr_bandwidth(s, d);
+    updateBandwidth(s, d);
 }
 
 bool tr_sessionIsSpeedLimited(tr_session const* s, tr_direction d)
@@ -1585,7 +1584,7 @@ static void tr_sessionSetAltSpeed_Bps(tr_session* s, tr_direction d, unsigned in
 
     s->turtle.speedLimit_Bps[d] = Bps;
 
-    updatetr_bandwidth(s, d);
+    updateBandwidth(s, d);
 }
 
 void tr_sessionSetAltSpeed_KBps(tr_session* s, tr_direction d, unsigned int KBps)
@@ -2278,7 +2277,7 @@ void tr_sessionSetDefaultTrackers(tr_session* session, char const* trackers)
 ****
 ***/
 
-tr_bandwidth& tr_session::gettr_bandwidthGroup(std::string_view name)
+tr_bandwidth& tr_session::getBandwidthGroup(std::string_view name)
 {
     auto& groups = this->bandwidth_groups_;
 
@@ -2855,7 +2854,7 @@ int tr_sessionCountQueueFreeSlots(tr_session* session, tr_direction dir)
 
 static void bandwidthGroupRead(tr_session* session, std::string_view config_dir)
 {
-    auto const filename = tr_pathbuf{ config_dir, "/"sv, tr_bandwidthGroupsFilename };
+    auto const filename = tr_pathbuf{ config_dir, "/"sv, BandwidthGroupsFilename };
     auto groups_dict = tr_variant{};
     if (!tr_variantFromFile(&groups_dict, TR_VARIANT_PARSE_JSON, filename, nullptr) || !tr_variantIsDict(&groups_dict))
     {
@@ -2870,7 +2869,7 @@ static void bandwidthGroupRead(tr_session* session, std::string_view config_dir)
         ++idx;
 
         auto name = tr_interned_string(key);
-        auto& group = session->gettr_bandwidthGroup(name);
+        auto& group = session->getBandwidthGroup(name);
 
         auto limits = tr_bandwidth_limits{};
         tr_variantDictFindBool(dict, TR_KEY_uploadLimited, &limits.up_limited);
@@ -2917,7 +2916,7 @@ static int bandwidthGroupWrite(tr_session const* session, std::string_view confi
         tr_variantDictAddBool(dict, TR_KEY_honorsSessionLimits, group->areParentLimitsHonored(TR_UP));
     }
 
-    auto const filename = tr_pathbuf{ config_dir, "/"sv, tr_bandwidthGroupsFilename };
+    auto const filename = tr_pathbuf{ config_dir, "/"sv, BandwidthGroupsFilename };
     auto const ret = tr_variantToFile(&groups_dict, TR_VARIANT_FMT_JSON, filename);
     tr_variantFree(&groups_dict);
     return ret;

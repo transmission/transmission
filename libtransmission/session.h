@@ -275,7 +275,7 @@ public:
 
     // bandwidth
 
-    [[nodiscard]] tr_bandwidth& gettr_bandwidthGroup(std::string_view name);
+    [[nodiscard]] tr_bandwidth& getBandwidthGroup(std::string_view name);
 
     //
 

@@ -12,7 +12,6 @@
 #include <cstdint> // int8_t
 #include <cstddef> // size_t
 #include <ctime> // time_t
-#include <utility> // std::pair
 
 #include "bitfield.h"
 #include "peer-common.h"

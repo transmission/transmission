@@ -500,7 +500,7 @@ struct tr_peerMgr
         , rechoke_timer_{ evtimer_new(session->event_base, rechokePulseMarshall, this) }
         , refill_upkeep_timer_{ evtimer_new(session->event_base, refillUpkeepMarshall, this) }
     {
-        tr_timerAddMsec(*bandwidth_timer_, tr_bandwidthPeriodMsec);
+        tr_timerAddMsec(*bandwidth_timer_, BandwidthPeriodMsec);
         tr_timerAddMsec(*rechoke_timer_, RechokePeriodMsec);
         tr_timerAddMsec(*refill_upkeep_timer_, RefillUpkeepPeriodMsec);
     }
@@ -535,7 +535,7 @@ private:
     {
         auto* const self = static_cast<tr_peerMgr*>(vmgr);
         self->bandwidthPulse();
-        tr_timerAddMsec(*self->bandwidth_timer_, tr_bandwidthPeriodMsec);
+        tr_timerAddMsec(*self->bandwidth_timer_, BandwidthPeriodMsec);
     }
 
     static void rechokePulseMarshall(evutil_socket_t, short /*reason*/, void* vmgr)
@@ -556,7 +556,7 @@ private:
     UniqueTimer const rechoke_timer_;
     UniqueTimer const refill_upkeep_timer_;
 
-    static auto constexpr tr_bandwidthPeriodMsec = int{ 500 };
+    static auto constexpr BandwidthPeriodMsec = int{ 500 };
     static auto constexpr RechokePeriodMsec = int{ 10 * 1000 };
     static auto constexpr RefillUpkeepPeriodMsec = int{ 10 * 1000 };
 
@@ -1990,7 +1990,7 @@ void rechokeDownloads(tr_swarm* s)
 ***
 **/
 
-[[nodiscard]] static inline bool istr_bandwidthMaxedOut(tr_bandwidth const& b, uint64_t const now_msec, tr_direction dir)
+[[nodiscard]] static inline bool isBandwidthMaxedOut(tr_bandwidth const& b, uint64_t const now_msec, tr_direction dir)
 {
     if (!b.isLimited(dir))
     {
@@ -2081,7 +2081,7 @@ void rechokeUploads(tr_swarm* s, uint64_t const now)
     auto* const choke = tr_new0(struct ChokeData, peerCount);
     auto const* const session = s->manager->session;
     bool const chokeAll = !s->tor->clientCanUpload();
-    bool const isMaxedOut = istr_bandwidthMaxedOut(s->tor->bandwidth_, now, TR_UP);
+    bool const isMaxedOut = isBandwidthMaxedOut(s->tor->bandwidth_, now, TR_UP);
 
     /* an optimistic unchoke peer's "optimistic"
      * state lasts for N calls to rechokeUploads(). */
@@ -2490,8 +2490,8 @@ void tr_peerMgr::bandwidthPulse()
     pumpAllPeers(this);
 
     /* allocate bandwidth to the peers */
-    session->top_bandwidth_.allocate(TR_UP, tr_bandwidthPeriodMsec);
-    session->top_bandwidth_.allocate(TR_DOWN, tr_bandwidthPeriodMsec);
+    session->top_bandwidth_.allocate(TR_UP, BandwidthPeriodMsec);
+    session->top_bandwidth_.allocate(TR_DOWN, BandwidthPeriodMsec);
 
     /* torrent upkeep */
     for (auto* const tor : session->torrents())
@@ -2707,7 +2707,7 @@ struct peer_candidate
         }
 
         /* if we've already got enough speed in this torrent... */
-        if (seeding && istr_bandwidthMaxedOut(tor->bandwidth_, now_msec, TR_UP))
+        if (seeding && isBandwidthMaxedOut(tor->bandwidth_, now_msec, TR_UP))
         {
             continue;
         }

@@ -12,7 +12,6 @@
 #include <string>
 #include <string_view>
 #include <thread>
-#include <utility> // stds::move
 
 #ifdef _WIN32
 #include <windows.h>
@@ -261,7 +260,7 @@ private:
         tr_web::FetchResponse response;
     };
 
-    static auto constexpr tr_bandwidthPauseMsec = long{ 500 };
+    static auto constexpr BandwidthPauseMsec = long{ 500 };
     static auto constexpr DnsCacheTimeoutSecs = long{ 60 * 60 };
     static auto constexpr MaxRedirects = long{ 10 };
 
@@ -428,7 +427,7 @@ private:
 
         for (auto it = std::begin(paused); it != std::end(paused);)
         {
-            if (it->first + tr_bandwidthPauseMsec < now)
+            if (it->first + BandwidthPauseMsec < now)
             {
                 curl_easy_pause(it->second, CURLPAUSE_CONT);
                 it = paused.erase(it);

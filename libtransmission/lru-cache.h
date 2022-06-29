@@ -10,7 +10,6 @@
 #include <cstddef>
 #include <cstdint>
 #include <functional>
-#include <utility> // std::move()
 
 // A fixed-size cache that erases least-recently-used items to make room for new ones.
 template<typename Key, typename Val, std::size_t N>

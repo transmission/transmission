@@ -11,7 +11,6 @@
 #include <map>
 #include <memory> // std::unique_ptr
 #include <optional>
-#include <utility> // std::pair
 #include <vector>
 
 #include <event2/buffer.h>

@@ -12,7 +12,6 @@
 #include <optional>
 #include <string>
 #include <string_view>
-#include <utility> // std::pair
 
 #include <fmt/format.h>
 

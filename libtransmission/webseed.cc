@@ -10,7 +10,6 @@
 #include <set>
 #include <string>
 #include <string_view>
-#include <utility> // std::move()
 
 #include <event2/buffer.h>
 #include <event2/event.h>

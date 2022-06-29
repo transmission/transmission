@@ -8,6 +8,7 @@
 #include <cinttypes> // PRIu64
 #include <climits> // INT_MAX
 #include <cstdio>
+#include <cstring>
 #include <ctime>
 #include <deque>
 #include <iterator>

@@ -8,7 +8,6 @@
 #include <mutex>
 #include <string_view>
 #include <thread>
-#include <utility> // std::move()
 
 #include <fmt/core.h>
 

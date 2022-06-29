@@ -136,7 +136,7 @@ static auto loadGroup(tr_variant* dict, tr_torrent* tor)
 {
     if (std::string_view group_name; tr_variantDictFindStrView(dict, TR_KEY_group, &group_name) && !std::empty(group_name))
     {
-        tor->settr_bandwidthGroup(group_name);
+        tor->setBandwidthGroup(group_name);
         return tr_resume::Group;
     }
 
@@ -773,11 +773,11 @@ static auto loadFromFile(tr_torrent* tor, tr_resume::fields_t fieldsToLoad, bool
         fields_loaded |= tr_resume::TimeDownloading;
     }
 
-    if ((fieldsToLoad & tr_resume::tr_bandwidthPriority) != 0 && tr_variantDictFindInt(&top, TR_KEY_bandwidth_priority, &i) &&
+    if ((fieldsToLoad & tr_resume::BandwidthPriority) != 0 && tr_variantDictFindInt(&top, TR_KEY_bandwidth_priority, &i) &&
         tr_isPriority(i))
     {
         tr_torrentSetPriority(tor, i);
-        fields_loaded |= tr_resume::tr_bandwidthPriority;
+        fields_loaded |= tr_resume::BandwidthPriority;
     }
 
     if ((fieldsToLoad & tr_resume::Peers) != 0)

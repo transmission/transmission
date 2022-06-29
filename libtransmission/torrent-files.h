@@ -13,7 +13,6 @@
 #include <optional>
 #include <string>
 #include <string_view>
-#include <utility> // std::move()
 #include <vector>
 
 #include "transmission.h"
