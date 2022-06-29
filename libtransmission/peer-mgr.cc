@@ -493,11 +493,11 @@ struct EventDeleter
 
 using UniqueTimer = std::unique_ptr<struct event, EventDeleter>;
 
-struct tr_peerMgr final : public BlockRequestAllocator<tr_peer*, Bandwidth*>::Mediator
+struct tr_peerMgr final : public BlockRequestAllocator<tr_peer*, tr_bandwidth*>::Mediator
 {
 private:
     using PeerKey = tr_peer*;
-    using PoolKey = Bandwidth*;
+    using PoolKey = tr_bandwidth*;
 
 public:
     explicit tr_peerMgr(tr_session* session_in)
@@ -569,7 +569,7 @@ public:
         static auto constexpr Dir = TR_PEER_TO_CLIENT;
         auto pools = std::vector<PoolKey>{};
 
-        for (auto* bandwidth = peer->bandwidth(); bandwidth != nullptr && bandwidth->areParentLimitsHonored(Dir);
+        for (auto* bandwidth = &peer->bandwidth(); bandwidth != nullptr && bandwidth->areParentLimitsHonored(Dir);
              bandwidth = bandwidth->parent())
         {
             if (bandwidth->isLimited(Dir))

@@ -21,18 +21,22 @@
 using namespace std::literals;
 
 using RequestAllocatorTest = ::testing::Test;
+
+namespace
+{
+
 using PeerKey = std::string_view;
 using PoolKey = std::string_view;
 using RequestAllocator = BlockRequestAllocator<PeerKey, PoolKey>;
 
-static PoolKey constexpr SessionPool = "session-pool"sv;
-static PoolKey constexpr Torrent1Pool = "torrent-1-pool"sv;
-static PoolKey constexpr Torrent2Pool = "torrent-2-pool"sv;
+PoolKey constexpr SessionPool = "session-pool"sv;
+PoolKey constexpr Torrent1Pool = "torrent-1-pool"sv;
+PoolKey constexpr Torrent2Pool = "torrent-2-pool"sv;
 
-static PeerKey constexpr Torrent1PeerA = "torrent-1-peer-a"sv;
-static PeerKey constexpr Torrent1PeerB = "torrent-1-peer-b"sv;
-static PeerKey constexpr Torrent2PeerA = "torrent-2-peer-a"sv;
-static PeerKey constexpr Torrent2PeerB = "torrent-2-peer-b"sv;
+PeerKey constexpr Torrent1PeerA = "torrent-1-peer-a"sv;
+PeerKey constexpr Torrent1PeerB = "torrent-1-peer-b"sv;
+PeerKey constexpr Torrent2PeerA = "torrent-2-peer-a"sv;
+PeerKey constexpr Torrent2PeerB = "torrent-2-peer-b"sv;
 
 class MockMediator final : public RequestAllocator::Mediator
 {
@@ -104,6 +108,8 @@ private:
     uint32_t max_observed_dl_speed_Bps_ = 0;
     size_t download_req_period_ = 10U;
 };
+
+} // namespace
 
 TEST_F(RequestAllocatorTest, distributesEvenlyWhenAllElseIsEqual)
 {
