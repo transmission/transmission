@@ -229,7 +229,7 @@ jobs:
     runs-on: ubuntu-22.04
     container:
       image: radupopescu/musl-builder
-    if: ${{ needs.what-to-make.outputs.build-cli == 'true' || needs.what-to-make.outputs.build-daemon == 'true' || needs.what-to-make.outputs.build-gtk == 'true' || needs.what-to-make.outputs.build-qt == 'true' || needs.what-to-make.outputs.build-tests == 'true' || needs.what-to-make.outputs.build-utils == 'true' }}
+    if: ${{ needs.what-to-make.outputs.make-cli == 'true' || needs.what-to-make.outputs.make-daemon == 'true' || needs.what-to-make.outputs.make-gtk == 'true' || needs.what-to-make.outputs.make-qt == 'true' || needs.what-to-make.outputs.make-tests == 'true' || needs.what-to-make.outputs.make-utils == 'true' }}
     steps:
       - name: Show Configuration
         run: |
@@ -255,10 +255,10 @@ jobs:
             pkgconfig \
             xz
       - name: Get Dependencies (GTK)
-        if: ${{ needs.what-to-make.outputs.build-gtk == 'true' }}
+        if: ${{ needs.what-to-make.outputs.make-gtk == 'true' }}
         run: apk add --upgrade glibmm-dev gtkmm3-dev
       - name: Get Dependencies (Qt)
-        if: ${{ needs.what-to-make.outputs.build-qt == 'true' }}
+        if: ${{ needs.what-to-make.outputs.make-qt == 'true' }}
         run: apk add --upgrade qt5-qtbase-dev qt5-qttools-dev
       - name: Get Source
         uses: actions/checkout@v3
@@ -274,19 +274,19 @@ jobs:
             -DCMAKE_BUILD_TYPE=RelWithDebInfo \
             -DCMAKE_INSTALL_PREFIX=pfx \
             -DCMAKE_PREFIX_PATH=`brew --prefix`/opt/qt@5 \
-            -DENABLE_CLI=${{ (needs.what-to-make.outputs.build-cli == 'true') && 'ON' || 'OFF' }} \
-            -DENABLE_DAEMON=${{ (needs.what-to-make.outputs.build-daemon == 'true') && 'ON' || 'OFF' }} \
-            -DENABLE_GTK=${{ (needs.what-to-make.outputs.build-gtk == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_CLI=${{ (needs.what-to-make.outputs.make-cli == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_DAEMON=${{ (needs.what-to-make.outputs.make-daemon == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_GTK=${{ (needs.what-to-make.outputs.make-gtk == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_MAC=OFF \
-            -DENABLE_QT=${{ (needs.what-to-make.outputs.build-qt == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_QT=${{ (needs.what-to-make.outputs.make-qt == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_TESTS=OFF \
-            -DENABLE_UTILS=${{ (needs.what-to-make.outputs.build-utils == 'true') && 'ON' || 'OFF' }} \
+            -DENABLE_UTILS=${{ (needs.what-to-make.outputs.make-utils == 'true') && 'ON' || 'OFF' }} \
             -DENABLE_WEB=OFF \
             -DRUN_CLANG_TIDY=OFF
       - name: Make
         run: cmake --build obj --config RelWithDebInfo
       - name: Test
-        if: ${{ needs.what-to-make.outputs.build-tests == 'true' }}
+        if: ${{ needs.what-to-make.outputs.make-tests == 'true' }}
         env:
           TMPDIR: /private/tmp
         run: cmake -E chdir obj ctest --build-config RelWithDebInfo --output-on-failure
