@@ -614,7 +614,7 @@ public:
 
     tr_torrent_metainfo metainfo_;
 
-    Bandwidth bandwidth_;
+    tr_bandwidth bandwidth_;
 
     tr_stat stats = {};
 

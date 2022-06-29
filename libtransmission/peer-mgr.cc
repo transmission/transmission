@@ -1165,7 +1165,7 @@ static bool on_handshake_done(tr_handshake_result const& result)
 
             /* this steals its refcount too, which is balanced by our unref in peerDelete() */
             tr_peerIo* stolen = tr_handshakeStealIO(result.handshake);
-            tr_peerIoSetParent(stolen, &s->tor->bandwidth_);
+            stolen->setParent(&s->tor->bandwidth_);
             createBitTorrentPeer(s->tor, stolen, atom, client);
 
             success = true;
@@ -1990,7 +1990,7 @@ void rechokeDownloads(tr_swarm* s)
 ***
 **/
 
-[[nodiscard]] static inline bool isBandwidthMaxedOut(Bandwidth const& b, uint64_t const now_msec, tr_direction dir)
+[[nodiscard]] static inline bool isBandwidthMaxedOut(tr_bandwidth const& b, uint64_t const now_msec, tr_direction dir)
 {
     if (!b.isLimited(dir))
     {
