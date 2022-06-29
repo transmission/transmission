@@ -168,7 +168,7 @@ typedef NS_ENUM(unsigned int, addType) { //
 @property(nonatomic, readonly) CGFloat toolbarHeight;
 @property(nonatomic, readonly) CGFloat mainWindowComponentHeight;
 @property(nonatomic, readonly) CGFloat scrollViewHeight;
-- (BOOL)isFullScreen;
+@property(nonatomic, getter=isFullScreen, readonly) BOOL fullScreen;
 
 - (void)updateForExpandCollapse;
 

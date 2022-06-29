@@ -51,7 +51,7 @@ enum
 
 - (void)viewDidChangeEffectiveAppearance
 {
-    [self setTorrent:_torrent];
+    self.torrent = _torrent;
     [self updateView];
 }
 
@@ -122,7 +122,7 @@ enum
     NSRect fillRects[self.fNumPieces];
     NSColor* fillColors[self.fNumPieces];
 
-    NSColor* defaultColor = [NSApp isDarkMode] ? NSColor.blackColor : NSColor.whiteColor;
+    NSColor* defaultColor = NSApp.darkMode ? NSColor.blackColor : NSColor.whiteColor;
 
     NSInteger usedCount = 0;
 

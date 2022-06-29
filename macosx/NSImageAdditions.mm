@@ -21,7 +21,7 @@
         bp.lineWidth = BORDER_WIDTH;
 
         //border
-        CGFloat fractionOfBlendedColor = [NSApp isDarkMode] ? 0.15 : 0.3;
+        CGFloat fractionOfBlendedColor = NSApp.darkMode ? 0.15 : 0.3;
         NSColor* borderColor = [color blendedColorWithFraction:fractionOfBlendedColor ofColor:NSColor.controlTextColor];
         [borderColor setStroke];
         [bp stroke];
