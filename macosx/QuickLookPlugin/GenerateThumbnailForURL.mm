@@ -1,6 +1,5 @@
-#import <CoreFoundation/CoreFoundation.h>
-#import <CoreFoundation/CFPlugInCOM.h>
-#import <QuickLook/QuickLook.h>
+@import CoreFoundation;
+@import QuickLook;
 
 QL_EXTERN_C_BEGIN
 OSStatus GenerateThumbnailForURL(void* thisInterface, QLThumbnailRequestRef thumbnail, CFURLRef url, CFStringRef contentTypeUTI, CFDictionaryRef options, CGSize maxSize);

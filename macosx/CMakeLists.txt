@@ -8,6 +8,8 @@ else()
     add_definitions(-fobjc-arc)
 endif()
 
+add_compile_options(-fmodules -fcxx-modules)
+
 find_program(IBTOOL_EXECUTABLE ibtool REQUIRED)
 find_program(ICONUTIL_EXECUTABLE iconutil REQUIRED)
 find_program(TIFFUTIL_EXECUTABLE tiffutil REQUIRED)
