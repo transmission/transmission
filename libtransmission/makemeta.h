@@ -6,7 +6,6 @@
 #pragma once
 
 #include <cstdint> // uint32_t, uint64_t
-#include <optional>
 
 #include "transmission.h"
 

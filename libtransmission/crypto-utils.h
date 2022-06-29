@@ -73,17 +73,17 @@ std::optional<tr_sha1_digest_t> tr_sha1(T... args)
 }
 
 /**
- * @brief Allocate and initialize new SHA1 hasher context.
+ * @brief Allocate and initialize new SHA256 hasher context.
  */
 tr_sha256_ctx_t tr_sha256_init(void);
 
 /**
- * @brief Update SHA1 hash.
+ * @brief Update SHA256 hash.
  */
 bool tr_sha256_update(tr_sha256_ctx_t handle, void const* data, size_t data_length);
 
 /**
- * @brief Finalize and export SHA1 hash, free hasher context.
+ * @brief Finalize and export SHA256 hash, free hasher context.
  */
 std::optional<tr_sha256_digest_t> tr_sha256_final(tr_sha256_ctx_t handle);
 
