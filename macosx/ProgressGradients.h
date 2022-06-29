@@ -2,7 +2,6 @@
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
-#import <Foundation/Foundation.h>
 #import <AppKit/AppKit.h>
 
 @interface ProgressGradients : NSObject

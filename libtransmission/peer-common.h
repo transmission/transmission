@@ -9,6 +9,7 @@
 #error only libtransmission should #include this header.
 #endif
 
+#include <array>
 #include <cstdint> // uint8_t, uint32_t, uint64_t
 
 #include "transmission.h"
@@ -25,6 +26,7 @@
 
 class tr_peer;
 class tr_swarm;
+struct Bandwidth;
 struct peer_atom;
 
 /**
@@ -80,6 +82,11 @@ public:
 
     [[nodiscard]] virtual bool hasPiece(tr_piece_index_t piece) const noexcept = 0;
 
+    [[nodiscard]] virtual Bandwidth* bandwidth() noexcept = 0;
+
+    // requests that have been made but haven't been fulfilled yet
+    [[nodiscard]] virtual size_t activeReqCount(tr_direction) const noexcept = 0;
+
     tr_session* const session;
 
     tr_swarm* const swarm;
@@ -116,13 +123,13 @@ public:
 
 struct tr_swarm_stats
 {
-    uint16_t active_peer_count[2];
+    std::array<uint16_t, 2> active_peer_count;
     uint16_t active_webseed_count;
     uint16_t peer_count;
-    uint16_t peer_from_count[TR_PEER_FROM__MAX];
+    std::array<uint16_t, TR_PEER_FROM__MAX> peer_from_count;
 };
 
-void tr_swarmGetStats(tr_swarm const* swarm, tr_swarm_stats* setme);
+tr_swarm_stats tr_swarmGetStats(tr_swarm const* swarm);
 
 void tr_swarmIncrementActivePeers(tr_swarm* swarm, tr_direction direction, bool is_active);
 

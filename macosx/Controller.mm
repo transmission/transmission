@@ -2,11 +2,11 @@
 // It may be used under the MIT (SPDX: MIT) license.
 // License text can be found in the licenses/ folder.
 
-#import <IOKit/IOMessage.h>
-#import <IOKit/pwr_mgt/IOPMLib.h>
-#import <Carbon/Carbon.h>
+@import IOKit;
+@import IOKit.pwr_mgt;
+@import Carbon;
 
-#import <Sparkle/Sparkle.h>
+@import Sparkle;
 
 #include <atomic> /* atomic, atomic_fetch_add_explicit, memory_order_relaxed */
 
@@ -3875,6 +3875,7 @@ static void removeKeRangerRansomware()
 - (void)endPreviewPanelControl:(QLPreviewPanel*)panel
 {
     self.fPreviewPanel = nil;
+    [self.fWindow.toolbar validateVisibleItems];
 }
 
 - (NSArray*)quickLookableTorrents
@@ -4000,16 +4001,9 @@ static void removeKeRangerRansomware()
 
     item.view = button;
 
-    if (@available(macOS 11.0, *))
-    {
-        button.bordered = NO;
-    }
-    else
-    {
-        NSSize const buttonSize = NSMakeSize(36.0, 25.0);
-        item.minSize = buttonSize;
-        item.maxSize = buttonSize;
-    }
+    NSSize const buttonSize = NSMakeSize(36.0, 25.0);
+    item.minSize = buttonSize;
+    item.maxSize = buttonSize;
 
     return item;
 }
@@ -4099,16 +4093,9 @@ static void removeKeRangerRansomware()
         segmentedControl.segmentCount = 2;
         segmentedCell.trackingMode = NSSegmentSwitchTrackingMomentary;
 
-        if (@available(macOS 11.0, *))
-        {
-            segmentedCell.bezeled = NO;
-        }
-        else
-        {
-            NSSize const groupSize = NSMakeSize(72.0, 25.0);
-            groupItem.minSize = groupSize;
-            groupItem.maxSize = groupSize;
-        }
+        NSSize const groupSize = NSMakeSize(72.0, 25.0);
+        groupItem.minSize = groupSize;
+        groupItem.maxSize = groupSize;
 
         groupItem.label = NSLocalizedString(@"Apply All", "All toolbar item -> label");
         groupItem.paletteLabel = NSLocalizedString(@"Pause / Resume All", "All toolbar item -> palette label");
@@ -4150,16 +4137,9 @@ static void removeKeRangerRansomware()
         segmentedControl.segmentCount = 2;
         segmentedCell.trackingMode = NSSegmentSwitchTrackingMomentary;
 
-        if (@available(macOS 11.0, *))
-        {
-            segmentedCell.bezeled = NO;
-        }
-        else
-        {
-            NSSize const groupSize = NSMakeSize(72.0, 25.0);
-            groupItem.minSize = groupSize;
-            groupItem.maxSize = groupSize;
-        }
+        NSSize const groupSize = NSMakeSize(72.0, 25.0);
+        groupItem.minSize = groupSize;
+        groupItem.maxSize = groupSize;
 
         groupItem.label = NSLocalizedString(@"Apply Selected", "Selected toolbar item -> label");
         groupItem.paletteLabel = NSLocalizedString(@"Pause / Resume Selected", "Selected toolbar item -> palette label");
@@ -4386,8 +4366,8 @@ static void removeKeRangerRansomware()
     //set quick look item
     if ([ident isEqualToString:TOOLBAR_QUICKLOOK])
     {
-        ((NSButton*)toolbarItem.view).state = [QLPreviewPanel sharedPreviewPanelExists] && [QLPreviewPanel sharedPreviewPanel].visible;
-        return YES;
+        ((NSButton*)toolbarItem.view).state = self.fPreviewPanel != nil;
+        return self.fTableView.numberOfSelectedRows > 0;
     }
 
     //enable share item
@@ -4801,7 +4781,7 @@ static void removeKeRangerRansomware()
                                      NSLocalizedString(@"Close Quick Look", "View menu -> Quick Look");
         menuItem.title = title;
 
-        return YES;
+        return self.fTableView.numberOfSelectedRows > 0;
     }
 
     return YES;
@@ -5042,9 +5022,24 @@ static void removeKeRangerRansomware()
             [self removeStackViewHeightConstraints];
         }
 
+        //this fixes a macOS bug where on toggling the toolbar item bezels will show
+        [self hideToolBarBezels:YES];
+
         dispatch_async(dispatch_get_main_queue(), ^{
             [self setWindowSizeToFit];
+            [self hideToolBarBezels:NO];
         });
+    }
+}
+
+- (void)hideToolBarBezels:(BOOL)hide
+{
+    if (@available(macOS 11.0, *))
+    {
+        for (NSToolbarItem* item in self.fWindow.toolbar.items)
+        {
+            item.view.hidden = hide;
+        }
     }
 }
 

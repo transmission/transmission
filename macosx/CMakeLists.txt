@@ -8,6 +8,8 @@ else()
     add_definitions(-fobjc-arc)
 endif()
 
+add_compile_options(-fmodules -fcxx-modules)
+
 find_program(IBTOOL_EXECUTABLE ibtool REQUIRED)
 find_program(ICONUTIL_EXECUTABLE iconutil REQUIRED)
 find_program(TIFFUTIL_EXECUTABLE tiffutil REQUIRED)
@@ -239,7 +241,6 @@ set_source_files_properties(${${PROJECT_NAME}_RESOURCES} PROPERTIES
 
 set(${PROJECT_NAME}_HIDPI_IMAGES
     ActionHover
-    ActionOn
     Bandwidth
     CleanupTemplate
     CompleteCheck
@@ -314,7 +315,6 @@ endforeach()
 
 set(${PROJECT_NAME}_LODPI_IMAGES
     DownloadBadge
-    QuitBadge
     UploadBadge
 )
 
