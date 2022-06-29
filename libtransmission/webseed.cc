@@ -10,6 +10,7 @@
 #include <set>
 #include <string>
 #include <string_view>
+#include <utility> // std::move()
 
 #include <event2/buffer.h>
 #include <event2/event.h>
@@ -196,9 +197,9 @@ public:
         return is_active;
     }
 
-    [[nodiscard]] Bandwidth* bandwidth() noexcept override
+    [[nodiscard]] tr_bandwidth& bandwidth() noexcept override
     {
-        return &bandwidth_;
+        return bandwidth_;
     }
 
     [[nodiscard]] size_t activeReqCount(tr_direction dir) const noexcept override
@@ -302,7 +303,7 @@ private:
         webseed->startTimer();
     }
 
-    Bandwidth bandwidth_;
+    tr_bandwidth bandwidth_;
     std::shared_ptr<event> const pulse_timer;
     static int constexpr IdleTimerMsec = 2000;
 };

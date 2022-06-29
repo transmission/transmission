@@ -5,6 +5,7 @@
 
 #include <algorithm>
 #include <memory>
+#include <utility> // std::move()
 #include <vector>
 
 #include "transmission.h"

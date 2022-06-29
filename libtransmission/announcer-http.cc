@@ -5,13 +5,13 @@
 
 #include <climits> /* USHRT_MAX */
 #include <cstdio> /* fprintf() */
-#include <cstring> /* strchr(), memcmp(), memcpy() */
 #include <iomanip>
 #include <iostream>
 #include <iterator>
 #include <optional>
 #include <string>
 #include <string_view>
+#include <utility> // std::move()
 
 #include <curl/curl.h>
 

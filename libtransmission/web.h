@@ -11,6 +11,7 @@
 #include <optional>
 #include <string>
 #include <string_view>
+#include <utility> // stds::move()
 
 struct evbuffer;
 
@@ -135,7 +136,7 @@ public:
         {
         }
 
-        // Return the number of bytes that should be allowed. See Bandwidth::clamp()
+        // Return the number of bytes that should be allowed. See tr_bandwidth::clamp()
         [[nodiscard]] virtual unsigned int clamp([[maybe_unused]] int bandwidth_tag, unsigned int byte_count) const
         {
             return byte_count;

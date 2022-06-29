@@ -6,11 +6,11 @@
 #include <algorithm>
 #include <array>
 #include <cerrno>
-#include <cstring> /* memcpy */
+#include <cstring>
 #include <ctime>
-#include <list>
 #include <string>
 #include <string_view>
+#include <utility> // std::pair
 #include <vector>
 
 #ifndef _WIN32

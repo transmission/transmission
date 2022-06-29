@@ -14,6 +14,7 @@
 #include <optional>
 #include <string>
 #include <string_view>
+#include <utility>
 #include <vector>
 
 #include "transmission.h"
@@ -605,7 +606,7 @@ public:
     void markEdited();
     void markChanged();
 
-    void setBandwidthGroup(std::string_view group_name) noexcept;
+    void settr_bandwidthGroup(std::string_view group_name) noexcept;
 
     [[nodiscard]] constexpr tr_interned_string const& bandwidthGroup() const noexcept
     {
@@ -614,7 +615,7 @@ public:
 
     tr_torrent_metainfo metainfo_;
 
-    Bandwidth bandwidth_;
+    tr_bandwidth bandwidth_;
 
     tr_stat stats = {};
 

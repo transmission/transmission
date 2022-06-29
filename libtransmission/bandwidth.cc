@@ -4,30 +4,25 @@
 // License text can be found in the licenses/ folder.
 
 #include <algorithm>
+#include <utility> // std::swap()
 #include <vector>
-#include <cstring>
 
 #include <fmt/core.h>
 
 #include "transmission.h"
 
 #include "bandwidth.h"
-#include "crypto-utils.h" /* tr_rand_int_weak() */
-#include "error.h"
+#include "crypto-utils.h" // tr_rand_int_weak()
 #include "log.h"
 #include "peer-io.h"
-#include "platform.h"
-#include "quark.h"
-#include "session.h"
 #include "tr-assert.h"
-#include "utils.h"
-#include "variant.h"
+#include "utils.h" // tr_time_msec()
 
 /***
 ****
 ***/
 
-unsigned int Bandwidth::getSpeedBytesPerSecond(RateControl& r, unsigned int interval_msec, uint64_t now)
+unsigned int tr_bandwidth::getSpeedBytesPerSecond(RateControl& r, unsigned int interval_msec, uint64_t now)
 {
     if (now == 0)
     {
@@ -61,7 +56,7 @@ unsigned int Bandwidth::getSpeedBytesPerSecond(RateControl& r, unsigned int inte
     return r.cache_val_;
 }
 
-void Bandwidth::notifyBandwidthConsumedBytes(uint64_t const now, RateControl* r, size_t size)
+void tr_bandwidth::notifyBandwidthConsumedBytes(uint64_t const now, RateControl* r, size_t size)
 {
     if (r->date_[r->newest_] + GranularityMSec >= now)
     {
@@ -86,7 +81,7 @@ void Bandwidth::notifyBandwidthConsumedBytes(uint64_t const now, RateControl* r,
 ****
 ***/
 
-Bandwidth::Bandwidth(Bandwidth* parent)
+tr_bandwidth::tr_bandwidth(tr_bandwidth* parent)
 {
     this->setParent(parent);
 }
@@ -95,7 +90,7 @@ Bandwidth::Bandwidth(Bandwidth* parent)
 ****
 ***/
 
-static void remove_child(std::vector<Bandwidth*>& v, Bandwidth* remove_me)
+static void remove_child(std::vector<tr_bandwidth*>& v, tr_bandwidth* remove_me)
 {
     auto it = std::find(std::begin(v), std::end(v), remove_me);
     if (it == std::end(v))
@@ -109,7 +104,7 @@ static void remove_child(std::vector<Bandwidth*>& v, Bandwidth* remove_me)
     v.resize(v.size() - 1);
 }
 
-void Bandwidth::setParent(Bandwidth* new_parent)
+void tr_bandwidth::setParent(tr_bandwidth* new_parent)
 {
     TR_ASSERT(this != new_parent);
 
@@ -136,7 +131,7 @@ void Bandwidth::setParent(Bandwidth* new_parent)
 ****
 ***/
 
-void Bandwidth::allocateBandwidth(
+void tr_bandwidth::allocateBandwidth(
     tr_priority_t parent_priority,
     tr_direction dir,
     unsigned int period_msec,
@@ -165,7 +160,7 @@ void Bandwidth::allocateBandwidth(
     }
 }
 
-void Bandwidth::phaseOne(std::vector<tr_peerIo*>& peerArray, tr_direction dir)
+void tr_bandwidth::phaseOne(std::vector<tr_peerIo*>& peerArray, tr_direction dir)
 {
     /* First phase of IO. Tries to distribute bandwidth fairly to keep faster
      * peers from starving the others. Loop through the peers, giving each a
@@ -196,7 +191,7 @@ void Bandwidth::phaseOne(std::vector<tr_peerIo*>& peerArray, tr_direction dir)
     }
 }
 
-void Bandwidth::allocate(tr_direction dir, unsigned int period_msec)
+void tr_bandwidth::allocate(tr_direction dir, unsigned int period_msec)
 {
     TR_ASSERT(tr_isDirection(dir));
 
@@ -241,10 +236,10 @@ void Bandwidth::allocate(tr_direction dir, unsigned int period_msec)
     /* Second phase of IO. To help us scale in high bandwidth situations,
      * enable on-demand IO for peers with bandwidth left to burn.
      * This on-demand IO is enabled until (1) the peer runs out of bandwidth,
-     * or (2) the next Bandwidth::allocate () call, when we start over again. */
+     * or (2) the next tr_bandwidth::allocate () call, when we start over again. */
     for (auto* io : tmp)
     {
-        tr_peerIoSetEnabled(io, dir, io->hasBandwidthLeft(dir));
+        tr_peerIoSetEnabled(io, dir, io->hastr_bandwidthLeft(dir));
     }
 
     for (auto* io : tmp)
@@ -257,7 +252,7 @@ void Bandwidth::allocate(tr_direction dir, unsigned int period_msec)
 ****
 ***/
 
-unsigned int Bandwidth::clamp(uint64_t now, tr_direction dir, unsigned int byte_count) const
+unsigned int tr_bandwidth::clamp(uint64_t now, tr_direction dir, unsigned int byte_count) const
 {
     TR_ASSERT(tr_isDirection(dir));
 
@@ -301,7 +296,7 @@ unsigned int Bandwidth::clamp(uint64_t now, tr_direction dir, unsigned int byte_
     return byte_count;
 }
 
-void Bandwidth::notifyBandwidthConsumed(tr_direction dir, size_t byte_count, bool is_piece_data, uint64_t now)
+void tr_bandwidth::notifyBandwidthConsumed(tr_direction dir, size_t byte_count, bool is_piece_data, uint64_t now)
 {
     TR_ASSERT(tr_isDirection(dir));
 
@@ -345,7 +340,7 @@ void Bandwidth::notifyBandwidthConsumed(tr_direction dir, size_t byte_count, boo
 ****
 ***/
 
-tr_bandwidth_limits Bandwidth::getLimits() const
+tr_bandwidth_limits tr_bandwidth::getLimits() const
 {
     tr_bandwidth_limits limits;
     limits.up_limit_KBps = tr_toSpeedKBps(this->getDesiredSpeedBytesPerSecond(TR_UP));
@@ -355,7 +350,7 @@ tr_bandwidth_limits Bandwidth::getLimits() const
     return limits;
 }
 
-void Bandwidth::setLimits(tr_bandwidth_limits const* limits)
+void tr_bandwidth::setLimits(tr_bandwidth_limits const* limits)
 {
     this->setDesiredSpeedBytesPerSecond(TR_UP, tr_toSpeedBytes(limits->up_limit_KBps));
     this->setDesiredSpeedBytesPerSecond(TR_DOWN, tr_toSpeedBytes(limits->down_limit_KBps));

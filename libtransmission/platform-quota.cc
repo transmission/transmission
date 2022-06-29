@@ -4,7 +4,6 @@
 // License text can be found in the licenses/ folder.
 
 #include <cerrno>
-#include <cstring>
 #include <string>
 #include <string_view>
 

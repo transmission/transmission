@@ -1164,7 +1164,7 @@ static char const* torrentSet(
 
         if (std::string_view group; tr_variantDictFindStrView(args_in, TR_KEY_group, &group))
         {
-            tor->setBandwidthGroup(group);
+            tor->settr_bandwidthGroup(group);
         }
 
         if (errmsg == nullptr && tr_variantDictFindList(args_in, TR_KEY_labels, &tmp_variant))
@@ -1623,7 +1623,7 @@ static char const* torrentAdd(tr_session* session, tr_variant* args_in, tr_varia
 
     if (tr_variantDictFindInt(args_in, TR_KEY_bandwidthPriority, &i))
     {
-        tr_ctorSetBandwidthPriority(ctor, (tr_priority_t)i);
+        tr_ctorSettr_bandwidthPriority(ctor, (tr_priority_t)i);
     }
 
     if (tr_variantDictFindList(args_in, TR_KEY_files_unwanted, &l))
@@ -1765,7 +1765,7 @@ static char const* groupSet(
         return "No group name given";
     }
 
-    auto& group = session->getBandwidthGroup(name);
+    auto& group = session->gettr_bandwidthGroup(name);
     auto limits = group.getLimits();
 
     (void)tr_variantDictFindBool(args_in, TR_KEY_speed_limit_down_enabled, &limits.down_limited);

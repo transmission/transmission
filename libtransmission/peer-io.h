@@ -32,7 +32,6 @@
 #include "tr-assert.h"
 
 class tr_peerIo;
-struct Bandwidth;
 struct tr_datatype;
 
 /**
@@ -82,10 +81,12 @@ public:
         tr_address const& addr,
         tr_port port,
         bool is_seed,
-        time_t current_time)
+        time_t current_time,
+        tr_bandwidth* parent_bandwidth)
         : crypto{ torrent_hash, is_incoming }
         , session{ session_in }
         , time_created{ current_time }
+        , bandwidth_{ parent_bandwidth }
         , addr_{ addr }
         , port_{ port }
         , is_seed_{ is_seed }
@@ -114,14 +115,14 @@ public:
         return inbuf.get();
     }
 
-    [[nodiscard]] auto hasBandwidthLeft(tr_direction dir) noexcept
+    [[nodiscard]] auto hastr_bandwidthLeft(tr_direction dir) noexcept
     {
-        return bandwidth->clamp(dir, 1024) > 0;
+        return bandwidth_.clamp(dir, 1024) > 0;
     }
 
     [[nodiscard]] auto getPieceSpeed_Bps(uint64_t now, tr_direction dir) noexcept
     {
-        return bandwidth->getPieceSpeedBytesPerSecond(now, dir);
+        return bandwidth_.getPieceSpeedBytesPerSecond(now, dir);
     }
 
     constexpr void enableFEXT(bool flag) noexcept
@@ -164,6 +165,21 @@ public:
         return is_seed_;
     }
 
+    [[nodiscard]] constexpr auto const& bandwidth() const noexcept
+    {
+        return bandwidth_;
+    }
+
+    [[nodiscard]] constexpr auto& bandwidth() noexcept
+    {
+        return bandwidth_;
+    }
+
+    void setParent(tr_bandwidth* parent)
+    {
+        bandwidth_.setParent(parent);
+    }
+
     tr_crypto crypto;
 
     // TODO(ckerr): yikes, unlike other class' magic_numbers it looks
@@ -182,10 +198,6 @@ public:
     tr_did_write_cb didWrite = nullptr;
     tr_net_error_cb gotError = nullptr;
     void* userData = nullptr;
-
-    // Changed to non-owning pointer temporarily till tr_peerIo becomes C++-constructible and destructible
-    // TODO: change tr_bandwidth* to owning pointer to the bandwidth, or remove * and own the value
-    Bandwidth* bandwidth = nullptr;
 
     tr_evbuffer_ptr const inbuf = tr_evbuffer_ptr{ evbuffer_new() };
     tr_evbuffer_ptr const outbuf = tr_evbuffer_ptr{ evbuffer_new() };
@@ -208,6 +220,8 @@ public:
     bool utp_supported_ = false;
 
 private:
+    tr_bandwidth bandwidth_;
+
     tr_address const addr_;
     tr_port const port_;
 
@@ -225,7 +239,7 @@ private:
 // TODO: 8 constructor args is too many; maybe a builder object?
 tr_peerIo* tr_peerIoNewOutgoing(
     tr_session* session,
-    Bandwidth* parent,
+    tr_bandwidth* parent,
     struct tr_address const* addr,
     tr_port port,
     time_t current_time,
@@ -235,7 +249,7 @@ tr_peerIo* tr_peerIoNewOutgoing(
 
 tr_peerIo* tr_peerIoNewIncoming(
     tr_session* session,
-    Bandwidth* parent,
+    tr_bandwidth* parent,
     struct tr_address const* addr,
     tr_port port,
     time_t current_time,
@@ -344,14 +358,7 @@ void tr_peerIoDrain(tr_peerIo* io, struct evbuffer* inbuf, size_t byteCount);
 
 size_t tr_peerIoGetWriteBufferSpace(tr_peerIo const* io, uint64_t now);
 
-static inline void tr_peerIoSetParent(tr_peerIo* io, Bandwidth* parent)
-{
-    TR_ASSERT(tr_isPeerIo(io));
-
-    io->bandwidth->setParent(parent);
-}
-
-void tr_peerIoBandwidthUsed(tr_peerIo* io, tr_direction direction, size_t byteCount, int isPieceData);
+void tr_peerIotr_bandwidthUsed(tr_peerIo* io, tr_direction direction, size_t byteCount, int isPieceData);
 
 /**
 ***

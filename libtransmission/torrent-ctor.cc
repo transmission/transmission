@@ -7,6 +7,7 @@
 #include <optional>
 #include <string>
 #include <string_view>
+#include <utility> // std::swap()
 #include <vector>
 
 #include "transmission.h"
@@ -317,7 +318,7 @@ static bool isPriority(int i)
     return i == TR_PRI_LOW || i == TR_PRI_NORMAL || i == TR_PRI_HIGH;
 }
 
-void tr_ctorSetBandwidthPriority(tr_ctor* ctor, tr_priority_t priority)
+void tr_ctorSettr_bandwidthPriority(tr_ctor* ctor, tr_priority_t priority)
 {
     if (isPriority(priority))
     {
@@ -325,7 +326,7 @@ void tr_ctorSetBandwidthPriority(tr_ctor* ctor, tr_priority_t priority)
     }
 }
 
-tr_priority_t tr_ctorGetBandwidthPriority(tr_ctor const* ctor)
+tr_priority_t tr_ctorGettr_bandwidthPriority(tr_ctor const* ctor)
 {
     return ctor->priority;
 }

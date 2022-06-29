@@ -49,7 +49,7 @@ struct evdns_base;
 class tr_bitfield;
 class tr_rpc_server;
 class tr_web;
-struct Bandwidth;
+struct tr_bandwidth;
 struct tr_address;
 struct tr_announcer;
 struct tr_announcer_udp;
@@ -275,7 +275,7 @@ public:
 
     // bandwidth
 
-    [[nodiscard]] Bandwidth& getBandwidthGroup(std::string_view name);
+    [[nodiscard]] tr_bandwidth& gettr_bandwidthGroup(std::string_view name);
 
     //
 
@@ -423,9 +423,9 @@ public:
     struct event* saveTimer;
 
     // monitors the "global pool" speeds
-    Bandwidth top_bandwidth_;
+    tr_bandwidth top_bandwidth_;
 
-    std::vector<std::pair<tr_interned_string, std::unique_ptr<Bandwidth>>> bandwidth_groups_;
+    std::vector<std::pair<tr_interned_string, std::unique_ptr<tr_bandwidth>>> bandwidth_groups_;
 
     float desiredRatio;
 
