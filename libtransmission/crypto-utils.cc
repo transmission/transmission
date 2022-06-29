@@ -205,6 +205,13 @@ std::string tr_sha1_to_string(tr_sha1_digest_t const& digest)
     return str;
 }
 
+std::string tr_sha256_to_string(tr_sha256_digest_t const& digest)
+{
+    auto str = std::string(std::size(digest) * 2, '?');
+    tr_binary_to_hex(std::data(digest), std::data(str), std::size(digest));
+    return str;
+}
+
 static void tr_hex_to_binary(char const* input, void* voutput, size_t byte_length)
 {
     static char constexpr Hex[] = "0123456789abcdef";
@@ -232,6 +239,23 @@ std::optional<tr_sha1_digest_t> tr_sha1_from_string(std::string_view hex)
     }
 
     auto digest = tr_sha1_digest_t{};
+    tr_hex_to_binary(std::data(hex), std::data(digest), std::size(digest));
+    return digest;
+}
+
+std::optional<tr_sha256_digest_t> tr_sha256_from_string(std::string_view hex)
+{
+    if (std::size(hex) != TR_SHA256_DIGEST_STRLEN)
+    {
+        return {};
+    }
+
+    if (!std::all_of(std::begin(hex), std::end(hex), [](unsigned char ch) { return isxdigit(ch); }))
+    {
+        return {};
+    }
+
+    auto digest = tr_sha256_digest_t{};
     tr_hex_to_binary(std::data(hex), std::data(digest), std::size(digest));
     return digest;
 }
