@@ -268,7 +268,7 @@ public:
         publish(&e);
     }
 
-    void sendBlockRequests(tr_block_span_t const* block_spans, size_t n_spans)
+    void requestBlocks(tr_block_span_t const* block_spans, size_t n_spans) override
     {
         auto* const tor = getTorrent();
         TR_ASSERT(tor != nullptr);
@@ -456,7 +456,7 @@ void on_idle(tr_webseed* webseed)
     {
         spans.resize(slots_available);
     }
-    webseed->sendBlockRequests(std::data(spans), std::size(spans));
+    webseed->requestBlocks(std::data(spans), std::size(spans));
 }
 
 void onPartialDataFetched(tr_web::FetchResponse const& web_response)

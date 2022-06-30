@@ -627,7 +627,7 @@ public:
         return tr_torrentReqIsValid(torrent, req.index, req.offset, req.length);
     }
 
-    void sendBlockRequests(tr_block_span_t const* block_spans, size_t n_spans)
+    void requestBlocks(tr_block_span_t const* block_spans, size_t n_spans) override
     {
         TR_ASSERT(torrent->clientCanDownload());
         TR_ASSERT(is_client_interested());
@@ -2180,7 +2180,7 @@ static void updateBlockRequests(tr_peerMsgsImpl* msgs)
 
     if (auto const requests = tr_peerMgrGetNextRequests(tor, msgs, n_wanted); !std::empty(requests))
     {
-        msgs->sendBlockRequests(std::data(requests), std::size(requests));
+        msgs->requestBlocks(std::data(requests), std::size(requests));
     }
 }
 
