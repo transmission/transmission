@@ -63,6 +63,7 @@
 #define tr_sha256_final tr_sha256_final_
 #define tr_sha256_from_string tr_sha256_from_string_
 #define tr_sha256_init tr_sha256_init_
+#define tr_sha256_to_string tr_sha256_to_string_
 #define tr_sha256_update tr_sha256_update_
 
 #undef TR_ENCRYPTION_H
@@ -127,6 +128,7 @@
 #undef tr_sha256_final
 #undef tr_sha256_from_string
 #undef tr_sha256_init
+#undef tr_sha256_to_string
 #undef tr_sha256_update
 
 #else /* CRYPTO_REFERENCE_CHECK */
@@ -184,6 +186,7 @@
 #define tr_sha256_final_ tr_sha256_final
 #define tr_sha256_from_string_ tr_sha256_from_string
 #define tr_sha256_init_ tr_sha256_init
+#define tr_sha256_to_string_ tr_sha256_to_string
 #define tr_sha256_update_ tr_sha256_update
 
 #endif /* CRYPTO_REFERENCE_CHECK */
