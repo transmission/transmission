@@ -150,6 +150,9 @@ private:
     time_t paused_until = 0;
 };
 
+void task_request_next_chunk(tr_webseed_task* task);
+void onBufferGotData(evbuffer* /*buf*/, evbuffer_cb_info const* info, void* vtask);
+
 class tr_webseed : public tr_peer
 {
 public:
@@ -263,6 +266,28 @@ public:
         e.offset = loc.piece_offset;
         e.length = tor->blockSize(loc.block);
         publish(&e);
+    }
+
+    void sendBlockRequests(tr_block_span_t const* block_spans, size_t n_spans)
+    {
+        auto* const tor = getTorrent();
+        TR_ASSERT(tor != nullptr);
+        TR_ASSERT(tor->isRunning);
+        TR_ASSERT(!tor->isDone());
+        if (tor == nullptr || !tor->isRunning || tor->isDone())
+        {
+            return;
+        }
+
+        for (auto const *span = block_spans, *end = span + n_spans; span != end; ++span)
+        {
+            auto* const task = new tr_webseed_task{ tor, this, *span };
+            evbuffer_add_cb(task->content(), onBufferGotData, task);
+            tasks.insert(task);
+            task_request_next_chunk(task);
+
+            tr_peerMgrClientSentRequests(tor, this, *span);
+        }
     }
 
     tr_torrent_id_t const torrent_id;
@@ -408,18 +433,16 @@ void onBufferGotData(evbuffer* /*buf*/, evbuffer_cb_info const* info, void* vtas
     task->webseed->gotPieceData(n_added);
 }
 
-void task_request_next_chunk(tr_webseed_task* task);
-
-void on_idle(tr_webseed* w)
+void on_idle(tr_webseed* webseed)
 {
-    auto* const tor = w->getTorrent();
-    if (tor == nullptr || !tor->isRunning || tor->isDone())
+    auto const slots_available = webseed->connection_limiter.slotsAvailable();
+    if (slots_available == 0)
     {
         return;
     }
 
-    auto const slots_available = w->connection_limiter.slotsAvailable();
-    if (slots_available == 0)
+    auto* const tor = webseed->getTorrent();
+    if (tor == nullptr || !tor->isRunning || tor->isDone())
     {
         return;
     }
@@ -428,17 +451,12 @@ void on_idle(tr_webseed* w)
     // The actual value of '64' is arbitrary here; we could probably
     // be smarter about this.
     auto constexpr PreferredBlocksPerTask = size_t{ 64 };
-    auto const spans = tr_peerMgrGetNextRequests(tor, w, slots_available * PreferredBlocksPerTask);
-    for (size_t i = 0; i < slots_available && i < std::size(spans); ++i)
+    auto spans = tr_peerMgrGetNextRequests(tor, webseed, slots_available * PreferredBlocksPerTask);
+    if (std::size(spans) > slots_available)
     {
-        auto const& span = spans[i];
-        auto* const task = new tr_webseed_task{ tor, w, span };
-        evbuffer_add_cb(task->content(), onBufferGotData, task);
-        w->tasks.insert(task);
-        task_request_next_chunk(task);
-
-        tr_peerMgrClientSentRequests(tor, w, span);
+        spans.resize(slots_available);
     }
+    webseed->sendBlockRequests(std::data(spans), std::size(spans));
 }
 
 void onPartialDataFetched(tr_web::FetchResponse const& web_response)
