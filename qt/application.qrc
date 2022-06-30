@@ -16,7 +16,6 @@
       <file alias="alt-limit-off.png">icons/turtle.svg</file>
       <file alias="alt-limit-on.png">icons/turtle-blue.svg</file>
       <file alias="encrypted.png">icons/lock.svg</file>
-      <file alias="turtle.png">icons/turtle-grey.png</file>
       <file alias="utilities.png">icons/utilities.svg</file>
   </qresource>
 </RCC>
