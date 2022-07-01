@@ -79,6 +79,10 @@ public:
     {
         return tracker_model_;
     }
+    QAbstractItemModel* pathModel() const
+    {
+        return path_proxy_;
+    }
 
 public slots:
     void updateTorrents(tr_variant* torrent_list, bool is_complete_list);
@@ -133,6 +137,7 @@ private:
     QStandardItemModel* activity_model_ = {};
     QStandardItemModel* path_model_ = {};
     QStandardItemModel* tracker_model_ = {};
+    QAbstractItemModel* path_proxy_ = {};
     torrent_ids_t already_added_;
     torrents_t torrents_;
     Pending pending_ = {};

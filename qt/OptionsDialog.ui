@@ -52,7 +52,11 @@
       </sizepolicy>
      </property>
      <widget class="PathButton" name="destinationButton"/>
-     <widget class="QLineEdit" name="destinationEdit"/>
+     <widget class="QComboBox" name="destinationBox">
+      <property name="editable">
+       <bool>true</bool>
+      </property>
+     </widget>
     </widget>
    </item>
    <item row="2" column="1">

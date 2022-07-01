@@ -583,7 +583,7 @@ void Application::addTorrent(AddData const& addme) const
     }
     else
     {
-        auto* o = new OptionsDialog(*session_, *prefs_, addme, window_.get());
+        auto* o = new OptionsDialog(*session_, *prefs_, *model_, addme, window_.get());
         o->show();
     }
 

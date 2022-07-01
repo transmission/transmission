@@ -28,6 +28,7 @@
 
 class Prefs;
 class Session;
+class TorrentModel;
 
 extern "C"
 {
@@ -40,7 +41,7 @@ class OptionsDialog : public BaseDialog
     TR_DISABLE_COPY_MOVE(OptionsDialog)
 
 public:
-    OptionsDialog(Session& session, Prefs const& prefs, AddData addme, QWidget* parent = nullptr);
+    OptionsDialog(Session& session, Prefs const& prefs, TorrentModel const& torrents, AddData addme, QWidget* parent = nullptr);
     ~OptionsDialog() override;
 
 private slots:

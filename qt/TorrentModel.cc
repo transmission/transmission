@@ -11,6 +11,7 @@
 #include <libtransmission/transmission.h>
 #include <libtransmission/variant.h>
 
+#include <QSortFilterProxyModel>
 #include <QStandardItemModel>
 
 #include "Application.h"
@@ -32,6 +33,26 @@ using ::trqt::variant_helpers::getValue;
 
 namespace
 {
+
+class PathProxy : public QSortFilterProxyModel
+{
+public:
+    using QSortFilterProxyModel::QSortFilterProxyModel;
+
+    static QAbstractItemModel* create(QObject* parent, QAbstractItemModel* sourceModel)
+    {
+        auto* proxy = new PathProxy(parent);
+        proxy->setSourceModel(sourceModel);
+        return proxy;
+    }
+
+protected:
+    bool filterAcceptsRow(int source_row, QModelIndex const& source_parent) const override
+    {
+        Q_UNUSED(source_parent);
+        return source_row > 0; // skip "All" item
+    }
+};
 
 struct TorrentIdLessThan
 {
@@ -90,6 +111,7 @@ TorrentModel::TorrentModel(Prefs const& prefs)
     , activity_model_(createActivityModel())
     , path_model_(createFilterModel(PathRole, 0))
     , tracker_model_(createFilterModel(TrackerRole, 0))
+    , path_proxy_(PathProxy::create(this, path_model_))
 {
     connect(this, &TorrentModel::modelReset, this, &TorrentModel::recountAllSoon);
     connect(this, &TorrentModel::rowsInserted, this, &TorrentModel::recountAllSoon);
