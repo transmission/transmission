@@ -62,6 +62,11 @@ public:
         return info_hash_str_;
     }
 
+    [[nodiscard]] constexpr std::string const& infoHash2String() const noexcept
+    {
+        return info_hash2_str_;
+    }
+
     void setName(std::string_view name)
     {
         name_ = name;
@@ -73,6 +78,8 @@ protected:
     tr_announce_list announce_list_;
     std::vector<std::string> webseed_urls_;
     tr_sha1_digest_t info_hash_ = {};
+    tr_sha256_digest_t info_hash2_ = {};
     std::string info_hash_str_;
+    std::string info_hash2_str_;
     std::string name_;
 };

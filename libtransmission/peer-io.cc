@@ -153,11 +153,11 @@ static void didWriteWrapper(tr_peerIo* io, unsigned int bytes_transferred)
         unsigned int const overhead = io->socket.type == TR_PEER_SOCKET_TYPE_TCP ? guessPacketOverhead(payload) : 0;
         uint64_t const now = tr_time_msec();
 
-        io->bandwidth->notifyBandwidthConsumed(TR_UP, payload, next->isPieceData, now);
+        io->bandwidth().notifyBandwidthConsumed(TR_UP, payload, next->isPieceData, now);
 
         if (overhead > 0)
         {
-            io->bandwidth->notifyBandwidthConsumed(TR_UP, overhead, false, now);
+            io->bandwidth().notifyBandwidthConsumed(TR_UP, overhead, false, now);
         }
 
         if (io->didWrite != nullptr)
@@ -207,18 +207,18 @@ static void canReadWrapper(tr_peerIo* io)
             {
                 if (piece != 0)
                 {
-                    io->bandwidth->notifyBandwidthConsumed(TR_DOWN, piece, true, now);
+                    io->bandwidth().notifyBandwidthConsumed(TR_DOWN, piece, true, now);
                 }
 
                 if (used != piece)
                 {
-                    io->bandwidth->notifyBandwidthConsumed(TR_DOWN, used - piece, false, now);
+                    io->bandwidth().notifyBandwidthConsumed(TR_DOWN, used - piece, false, now);
                 }
             }
 
             if (overhead > 0)
             {
-                io->bandwidth->notifyBandwidthConsumed(TR_UP, overhead, false, now);
+                io->bandwidth().notifyBandwidthConsumed(TR_UP, overhead, false, now);
             }
 
             switch (ret)
@@ -263,7 +263,7 @@ static void event_read_cb(evutil_socket_t fd, short /*event*/, void* vio)
 
     unsigned int const curlen = evbuffer_get_length(io->inbuf.get());
     unsigned int howmuch = curlen >= max ? 0 : max - curlen;
-    howmuch = io->bandwidth->clamp(TR_DOWN, howmuch);
+    howmuch = io->bandwidth().clamp(TR_DOWN, howmuch);
 
     tr_logAddTraceIo(io, "libevent says this peer is ready to read");
 
@@ -342,7 +342,7 @@ static void event_write_cb(evutil_socket_t fd, short /*event*/, void* vio)
 
     /* Write as much as possible, since the socket is non-blocking, write() will
      * return if it can't write any more data without blocking */
-    size_t const howmuch = io->bandwidth->clamp(dir, evbuffer_get_length(io->outbuf.get()));
+    size_t const howmuch = io->bandwidth().clamp(dir, evbuffer_get_length(io->outbuf.get()));
 
     /* if we don't have any bandwidth left, stop writing */
     if (howmuch < 1)
@@ -462,7 +462,7 @@ static size_t utp_get_rb_size(void* vio)
 
     TR_ASSERT(tr_isPeerIo(io));
 
-    size_t bytes = io->bandwidth->clamp(TR_DOWN, UtpReadBufferSize);
+    size_t bytes = io->bandwidth().clamp(TR_DOWN, UtpReadBufferSize);
 
     tr_logAddTraceIo(io, fmt::format("utp_get_rb_size is saying it's ready to read {} bytes", bytes));
     return UtpReadBufferSize - bytes;
@@ -539,7 +539,7 @@ static void utp_on_overhead(void* vio, bool send, size_t count, int /*type*/)
 
     tr_logAddTraceIo(io, fmt::format("utp_on_overhead -- count is {}", count));
 
-    io->bandwidth->notifyBandwidthConsumed(send ? TR_UP : TR_DOWN, count, false, tr_time_msec());
+    io->bandwidth().notifyBandwidthConsumed(send ? TR_UP : TR_DOWN, count, false, tr_time_msec());
 }
 
 static auto utp_function_table = UTPFunctionTable{
@@ -589,7 +589,7 @@ static auto dummy_utp_function_table = UTPFunctionTable{
 
 static tr_peerIo* tr_peerIoNew(
     tr_session* session,
-    Bandwidth* parent,
+    tr_bandwidth* parent,
     tr_address const* addr,
     tr_port port,
     time_t current_time,
@@ -614,11 +614,10 @@ static tr_peerIo* tr_peerIoNew(
         maybeSetCongestionAlgorithm(socket.handle.tcp, session->peerCongestionAlgorithm());
     }
 
-    auto* io = new tr_peerIo{ session, torrent_hash, is_incoming, *addr, port, is_seed, current_time };
+    auto* io = new tr_peerIo{ session, torrent_hash, is_incoming, *addr, port, is_seed, current_time, parent };
     io->socket = socket;
-    io->bandwidth = new Bandwidth(parent);
-    io->bandwidth->setPeer(io);
-    tr_logAddTraceIo(io, fmt::format("bandwidth is {}; its parent is {}", fmt::ptr(&io->bandwidth), fmt::ptr(parent)));
+    io->bandwidth().setPeer(io);
+    tr_logAddTraceIo(io, fmt::format("bandwidth is {}; its parent is {}", fmt::ptr(&io->bandwidth()), fmt::ptr(parent)));
 
     switch (socket.type)
     {
@@ -655,7 +654,7 @@ static tr_peerIo* tr_peerIoNew(
 
 tr_peerIo* tr_peerIoNewIncoming(
     tr_session* session,
-    Bandwidth* parent,
+    tr_bandwidth* parent,
     tr_address const* addr,
     tr_port port,
     time_t current_time,
@@ -669,7 +668,7 @@ tr_peerIo* tr_peerIoNewIncoming(
 
 tr_peerIo* tr_peerIoNewOutgoing(
     tr_session* session,
-    Bandwidth* parent,
+    tr_bandwidth* parent,
     tr_address const* addr,
     tr_port port,
     time_t current_time,
@@ -855,7 +854,6 @@ static void io_dtor(tr_peerIo* const io)
 
     tr_logAddTraceIo(io, "in tr_peerIo destructor");
     event_disable(io, EV_READ | EV_WRITE);
-    delete io->bandwidth;
     io_close_socket(io);
 
     while (io->outbuf_datatypes != nullptr)
@@ -982,7 +980,7 @@ static unsigned int getDesiredOutputBufferSize(tr_peerIo const* io, uint64_t now
      * being large enough to hold the next 20 seconds' worth of input,
      * or a few blocks, whichever is bigger.
      * It's okay to tweak this as needed */
-    unsigned int const currentSpeed_Bps = io->bandwidth->getPieceSpeedBytesPerSecond(now, TR_UP);
+    unsigned int const currentSpeed_Bps = io->bandwidth().getPieceSpeedBytesPerSecond(now, TR_UP);
     unsigned int const period = 15U; /* arbitrary */
     /* the 3 is arbitrary; the .5 is to leave room for messages */
     static auto const ceiling = (unsigned int)(tr_block_info::BlockSize * 3.5);
@@ -1177,7 +1175,7 @@ void tr_peerIoDrain(tr_peerIo* io, struct evbuffer* inbuf, size_t byteCount)
 
 static int tr_peerIoTryRead(tr_peerIo* io, size_t howmuch)
 {
-    howmuch = io->bandwidth->clamp(TR_DOWN, howmuch);
+    howmuch = io->bandwidth().clamp(TR_DOWN, howmuch);
     if (howmuch == 0)
     {
         return 0;
@@ -1242,7 +1240,7 @@ static int tr_peerIoTryWrite(tr_peerIo* io, size_t howmuch)
 
     tr_logAddTraceIo(io, fmt::format("in tr_peerIoTryWrite {}", howmuch));
     howmuch = std::min(howmuch, old_len);
-    howmuch = io->bandwidth->clamp(TR_UP, howmuch);
+    howmuch = io->bandwidth().clamp(TR_UP, howmuch);
     if (howmuch == 0)
     {
         return 0;

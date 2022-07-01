@@ -199,6 +199,30 @@ TEST(Crypto, sha1FromString)
     EXPECT_EQ(*lc, *uc);
 }
 
+TEST(Crypto, sha256FromString)
+{
+    // bad lengths
+    EXPECT_FALSE(tr_sha256_from_string(""));
+    EXPECT_FALSE(tr_sha256_from_string("a94a8fe5ccb19ba61c4c0873d391e987982fbbd"sv));
+    EXPECT_FALSE(tr_sha256_from_string("a94a8fe5ccb19ba61c4c0873d391e987982fbbd33"sv));
+    EXPECT_FALSE(tr_sha256_from_string("05d58dfd14ed21d33add137eb7a2c5d4ef5aaa4a945e654363d32b7c4bf5c92"sv));
+    EXPECT_FALSE(tr_sha256_from_string("05d58dfd14ed21d33add137eb7a2c5d4ef5aaa4a945e654363d32b7c4bf5c9299"sv));
+    // nonhex
+    EXPECT_FALSE(tr_sha256_from_string("a94a8fe5ccb19ba61c4cz873d391e987982fbbd3aaaaaaaaaaaaaaaaaaaaaaa"sv));
+    EXPECT_FALSE(tr_sha256_from_string("05  8dfd14ed21d33add137eb7a2c5d4ef5aaa4a945e654363d32b7c4bf5c92"sv));
+
+    // lowercase hex
+    auto const baseline = "05d58dfd14ed21d33add137eb7a2c5d4ef5aaa4a945e654363d32b7c4bf5c929"sv;
+    auto const lc = tr_sha256_from_string(baseline);
+    EXPECT_TRUE(lc);
+    EXPECT_EQ(baseline, tr_sha256_to_string(*lc));
+
+    // uppercase hex should yield the same result
+    auto const uc = tr_sha256_from_string(tr_strupper(baseline));
+    EXPECT_TRUE(uc);
+    EXPECT_EQ(*lc, *uc);
+}
+
 TEST(Crypto, random)
 {
     /* test that tr_rand_int() stays in-bounds */

@@ -54,7 +54,11 @@
 #define EVENT__HAVE_ARC4RANDOM_BUF 1
 
 /* Define to 1 if you have the `arc4random_addrandom' function. */
-#define EVENT__HAVE_ARC4RANDOM_ADDRANDOM 1
+/* NOTE(nevack): this defines `evutil_secure_rng_add_bytes` function which
+   uses deprecated on macOS arc4random_addrandom(2).
+   Transmission on macOS never calls `evutil_secure_rng_add_bytes`, that's
+   why we remove this define to get rid of compiler warning. */
+/* #undef EVENT__HAVE_ARC4RANDOM_ADDRANDOM */
 
 /* Define if clock_gettime is available in libc */
 /* #undef EVENT__DNS_USE_CPU_CLOCK_FOR_ID */

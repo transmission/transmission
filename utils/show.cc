@@ -193,7 +193,14 @@ void showInfo(app_opts const& opts, tr_torrent_metainfo const& metainfo)
     {
         printf("GENERAL\n\n");
         printf("  Name: %s\n", metainfo.name().c_str());
-        printf("  Hash: %" TR_PRIsv "\n", TR_PRIsv_ARG(metainfo.infoHashString()));
+        if (metainfo.hasV1Metadata())
+        {
+            printf("  Hash v1: %" TR_PRIsv "\n", TR_PRIsv_ARG(metainfo.infoHashString()));
+        }
+        if (metainfo.hasV2Metadata())
+        {
+            printf("  Hash v2: %" TR_PRIsv "\n", TR_PRIsv_ARG(metainfo.infoHash2String()));
+        }
         printf("  Created by: %s\n", std::empty(metainfo.creator()) ? "Unknown" : metainfo.creator().c_str());
         printf("  Created on: %s\n\n", toString(metainfo.dateCreated()).c_str());
 

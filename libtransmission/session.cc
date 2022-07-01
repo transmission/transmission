@@ -2277,7 +2277,7 @@ void tr_sessionSetDefaultTrackers(tr_session* session, char const* trackers)
 ****
 ***/
 
-Bandwidth& tr_session::getBandwidthGroup(std::string_view name)
+tr_bandwidth& tr_session::getBandwidthGroup(std::string_view name)
 {
     auto& groups = this->bandwidth_groups_;
 
@@ -2289,7 +2289,7 @@ Bandwidth& tr_session::getBandwidthGroup(std::string_view name)
         }
     }
 
-    auto& [group_name, group] = groups.emplace_back(name, std::make_unique<Bandwidth>(new Bandwidth(&top_bandwidth_)));
+    auto& [group_name, group] = groups.emplace_back(name, std::make_unique<tr_bandwidth>(new tr_bandwidth(&top_bandwidth_)));
     return *group;
 }
 
