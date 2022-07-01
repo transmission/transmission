@@ -263,21 +263,3 @@ bool TorrentFilter::filterAcceptsRow(int source_row, QModelIndex const& source_p
 
     return accepts;
 }
-
-std::array<int, FilterMode::NUM_MODES> TorrentFilter::countTorrentsPerMode() const
-{
-    std::array<int, FilterMode::NUM_MODES> torrent_counts = {};
-
-    for (auto const& tor : dynamic_cast<TorrentModel*>(sourceModel())->torrents())
-    {
-        for (int mode = 0; mode < FilterMode::NUM_MODES; ++mode)
-        {
-            if (FilterMode::test(*tor, mode))
-            {
-                ++torrent_counts[mode];
-            }
-        }
-    }
-
-    return torrent_counts;
-}

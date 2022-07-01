@@ -5,18 +5,26 @@
 
 #pragma once
 
+#include <array>
+#include <bitset>
+#include <map>
 #include <optional>
 #include <vector>
+#include <unordered_map>
 
 #include <QAbstractListModel>
+#include <QTimer>
 
 #include <libtransmission/tr-macros.h>
 
+#include "Filters.h"
 #include "Torrent.h"
 #include "Typedefs.h"
 
 class Prefs;
 class Speed;
+class QStandardItem;
+class QStandardItemModel;
 
 extern "C"
 {
@@ -59,6 +67,19 @@ public:
     int rowCount(QModelIndex const& parent = QModelIndex()) const override;
     QVariant data(QModelIndex const& index, int role = Qt::DisplayRole) const override;
 
+    QStandardItemModel* activityFilterModel() const
+    {
+        return activity_model_;
+    }
+    QStandardItemModel* pathFilterModel() const
+    {
+        return path_model_;
+    }
+    QStandardItemModel* trackerFilterModel() const
+    {
+        return tracker_model_;
+    }
+
 public slots:
     void updateTorrents(tr_variant* torrent_list, bool is_complete_list);
     void removeTorrents(tr_variant* torrent_list);
@@ -69,6 +90,24 @@ signals:
     void torrentsCompleted(torrent_ids_t const&);
     void torrentsEdited(torrent_ids_t const&);
     void torrentsNeedInfo(torrent_ids_t const&);
+    void filterChanged(int);
+
+private:
+    using Map = std::map<QString, int>;
+    using MapIter = Map::const_iterator;
+    using Counts = std::unordered_map<QString, int>;
+    using MapUpdate = QStandardItem* (*)(QStandardItem* i, MapIter const& it);
+
+    enum
+    {
+        ACTIVITY,
+        PATHS,
+        TRACKERS,
+
+        NUM_FLAGS
+    };
+
+    using Pending = std::bitset<NUM_FLAGS>;
 
 private:
     void rowsAdd(torrents_t const& torrents);
@@ -79,7 +118,48 @@ private:
     using span_t = std::pair<int, int>;
     std::vector<span_t> getSpans(torrent_ids_t const& ids) const;
 
+    QStandardItemModel* createActivityModel();
+    QStandardItemModel* createFilterModel(int role, int count);
+
+    [[nodiscard]] std::array<int, FilterMode::NUM_MODES> countTorrentsPerMode() const;
+    void refreshFilter(Map& map, QStandardItemModel* model, Counts& counts, MapUpdate update, int key);
+    void refreshActivity();
+    void refreshPaths();
+    void refreshTrackers();
+
+    Map path_counts_;
+    Map sitename_counts_;
     Prefs const& prefs_;
+    QStandardItemModel* activity_model_ = {};
+    QStandardItemModel* path_model_ = {};
+    QStandardItemModel* tracker_model_ = {};
     torrent_ids_t already_added_;
     torrents_t torrents_;
+    Pending pending_ = {};
+    QTimer recount_timer_;
+
+private slots:
+    void onTorrentsChanged(torrent_ids_t const&, Torrent::fields_t const& fields);
+    void recount();
+    void recountSoon(Pending const& fields);
+
+    void recountActivitySoon()
+    {
+        recountSoon(Pending().set(ACTIVITY));
+    }
+
+    void recountPathsSoon()
+    {
+        recountSoon(Pending().set(PATHS));
+    }
+
+    void recountTrackersSoon()
+    {
+        recountSoon(Pending().set(TRACKERS));
+    }
+
+    void recountAllSoon()
+    {
+        recountSoon(Pending().set(ACTIVITY).set(PATHS).set(TRACKERS));
+    }
 };

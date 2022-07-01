@@ -11,6 +11,13 @@
 #include <libtransmission/transmission.h>
 #include <libtransmission/variant.h>
 
+#include <QStandardItemModel>
+
+#include "Application.h"
+#include "FaviconCache.h"
+#include "Filters.h"
+#include "IconCache.h"
+#include "Prefs.h"
 #include "Speed.h"
 #include "Torrent.h"
 #include "TorrentDelegate.h"
@@ -57,6 +64,21 @@ auto getIds(Iter it, Iter end)
     return ids;
 }
 
+QString getCountString(size_t n)
+{
+    return QStringLiteral("%L1").arg(n);
+}
+
+auto constexpr ActivityFields = FilterMode::TorrentFields;
+
+Torrent::fields_t constexpr PathFields = {
+    uint64_t(1) << Torrent::DOWNLOAD_DIR,
+};
+
+Torrent::fields_t constexpr TrackerFields = {
+    uint64_t(1) << Torrent::TRACKER_STATS,
+};
+
 } // namespace
 
 /***
@@ -65,7 +87,18 @@ auto getIds(Iter it, Iter end)
 
 TorrentModel::TorrentModel(Prefs const& prefs)
     : prefs_(prefs)
+    , activity_model_(createActivityModel())
+    , path_model_(createFilterModel(PathRole, 0))
+    , tracker_model_(createFilterModel(TrackerRole, 0))
 {
+    connect(this, &TorrentModel::modelReset, this, &TorrentModel::recountAllSoon);
+    connect(this, &TorrentModel::rowsInserted, this, &TorrentModel::recountAllSoon);
+    connect(this, &TorrentModel::rowsRemoved, this, &TorrentModel::recountAllSoon);
+    connect(this, &TorrentModel::torrentsChanged, this, &TorrentModel::onTorrentsChanged);
+    connect(&trApp->faviconCache(), &FaviconCache::pixmapReady, this, &TorrentModel::recountTrackersSoon);
+    connect(&recount_timer_, &QTimer::timeout, this, &TorrentModel::recount);
+
+    recountAllSoon();
 }
 
 TorrentModel::~TorrentModel()
@@ -478,4 +511,261 @@ bool TorrentModel::hasTorrent(TorrentHash const& hash) const
         return tor->hash() == hash;
     };
     return std::any_of(torrents_.cbegin(), torrents_.cend(), test);
+}
+
+/***
+****
+***/
+
+void TorrentModel::recountSoon(Pending const& pending)
+{
+    pending_ |= pending;
+
+    if (!recount_timer_.isActive())
+    {
+        recount_timer_.setSingleShot(true);
+        recount_timer_.start(800);
+    }
+}
+
+std::array<int, FilterMode::NUM_MODES> TorrentModel::countTorrentsPerMode() const
+{
+    std::array<int, FilterMode::NUM_MODES> torrent_counts = {};
+
+    for (auto const& tor : torrents_)
+    {
+        for (int mode = 0; mode < FilterMode::NUM_MODES; ++mode)
+        {
+            if (FilterMode::test(*tor, mode))
+            {
+                ++torrent_counts[mode];
+            }
+        }
+    }
+
+    return torrent_counts;
+}
+
+void TorrentModel::recount()
+{
+    decltype(pending_) pending = {};
+    std::swap(pending_, pending);
+
+    if (pending[ACTIVITY])
+    {
+        refreshActivity();
+    }
+
+    if (pending[PATHS])
+    {
+        refreshPaths();
+    }
+
+    if (pending[TRACKERS])
+    {
+        refreshTrackers();
+    }
+}
+
+void TorrentModel::onTorrentsChanged(torrent_ids_t const& ids, Torrent::fields_t const& changed_fields)
+{
+    Q_UNUSED(ids)
+
+    if ((changed_fields & TrackerFields).any())
+    {
+        recountTrackersSoon();
+    }
+
+    if ((changed_fields & PathFields).any())
+    {
+        recountPathsSoon();
+    }
+
+    if ((changed_fields & ActivityFields).any())
+    {
+        recountActivitySoon();
+    }
+}
+
+/***
+****
+***/
+
+void TorrentModel::refreshFilter(Map& map, QStandardItemModel* model, Counts& counts, MapUpdate update, int key)
+{
+    enum
+    {
+        ROW_TOTALS = 0,
+        ROW_SEPARATOR,
+        ROW_FIRST_TRACKER
+    };
+
+    // update the "All" row
+    auto const num = counts.size();
+    auto* item = model->item(ROW_TOTALS);
+    item->setData(int(num), TorrentModel::CountRole);
+    item->setData(getCountString(num), TorrentModel::CountStringRole);
+
+    auto new_map = Map(counts.begin(), counts.end());
+    auto old_it = map.cbegin();
+    auto new_it = new_map.cbegin();
+    auto const old_end = map.cend();
+    auto const new_end = new_map.cend();
+    bool any_added = false;
+    int row = ROW_FIRST_TRACKER;
+
+    while ((old_it != old_end) || (new_it != new_end))
+    {
+        if ((old_it == old_end) || ((new_it != new_end) && (old_it->first > new_it->first)))
+        {
+            model->insertRow(row, update(new QStandardItem(1), new_it));
+            any_added = true;
+            ++new_it;
+            ++row;
+        }
+        else if ((new_it == new_end) || ((old_it != old_end) && (old_it->first < new_it->first)))
+        {
+            model->removeRow(row);
+            ++old_it;
+        }
+        else // update
+        {
+            update(model->item(row), new_it);
+            ++old_it;
+            ++new_it;
+            ++row;
+        }
+    }
+
+    if (any_added) // the one added might match our filter...
+    {
+        emit filterChanged(key);
+    }
+
+    map.swap(new_map);
+}
+
+void TorrentModel::refreshTrackers()
+{
+    auto torrents_per_sitename = Counts{};
+    for (auto const& tor : torrents_)
+    {
+        for (auto const& sitename : tor->sitenames())
+        {
+            ++torrents_per_sitename[sitename];
+        }
+    }
+
+    auto update_tracker_item = [](QStandardItem* i, auto const& it)
+    {
+        auto const& [sitename, count] = *it;
+        auto const display_name = FaviconCache::getDisplayName(sitename);
+        auto const icon = trApp->faviconCache().find(sitename);
+
+        i->setData(display_name, Qt::DisplayRole);
+        i->setData(display_name, TrackerRole);
+        i->setData(getCountString(static_cast<size_t>(count)), TorrentModel::CountStringRole);
+        i->setData(icon, Qt::DecorationRole);
+        i->setData(int(count), TorrentModel::CountRole);
+
+        return i;
+    };
+
+    refreshFilter(sitename_counts_, tracker_model_, torrents_per_sitename, update_tracker_item, Prefs::FILTER_TRACKERS);
+}
+
+void TorrentModel::refreshPaths()
+{
+    auto torrents_per_path = Counts{};
+    for (auto const& tor : torrents_)
+    {
+        ++torrents_per_path[tor->getPath()];
+    }
+
+    auto update_path_item = [](QStandardItem* i, auto const& it)
+    {
+        auto const& displayName = it->first;
+        auto const& count = it->second;
+        auto const icon = IconCache::get().folderIcon();
+        i->setData(displayName, Qt::DisplayRole);
+        i->setData(displayName, PathRole);
+        i->setData(getCountString(count), TorrentModel::CountStringRole);
+        i->setData(icon, Qt::DecorationRole);
+        i->setData(int(count), TorrentModel::CountRole);
+        return i;
+    };
+
+    refreshFilter(path_counts_, path_model_, torrents_per_path, update_path_item, Prefs::FILTER_PATH);
+}
+
+void TorrentModel::refreshActivity()
+{
+    auto const torrents_per_mode = countTorrentsPerMode();
+    auto* model = activity_model_;
+
+    for (int row = 0, n = model->rowCount(); row < n; ++row)
+    {
+        auto const index = model->index(row, 0);
+        auto const mode = index.data(ActivityRole).toInt();
+        auto const count = torrents_per_mode[mode];
+        model->setData(index, count, TorrentModel::CountRole);
+        model->setData(index, getCountString(static_cast<size_t>(count)), TorrentModel::CountStringRole);
+    }
+}
+
+QStandardItemModel* TorrentModel::createActivityModel()
+{
+    auto* model = new QStandardItemModel(this);
+
+    auto* row = new QStandardItem(tr("All"));
+    row->setData(FilterMode::SHOW_ALL, ActivityRole);
+    model->appendRow(row);
+
+    model->appendRow(new QStandardItem); // separator
+
+    auto const& icons = IconCache::get();
+
+    row = new QStandardItem(icons.getThemeIcon(QStringLiteral("system-run")), tr("Active"));
+    row->setData(FilterMode::SHOW_ACTIVE, ActivityRole);
+    model->appendRow(row);
+
+    row = new QStandardItem(icons.getThemeIcon(QStringLiteral("go-down")), tr("Downloading"));
+    row->setData(FilterMode::SHOW_DOWNLOADING, ActivityRole);
+    model->appendRow(row);
+
+    row = new QStandardItem(icons.getThemeIcon(QStringLiteral("go-up")), tr("Seeding"));
+    row->setData(FilterMode::SHOW_SEEDING, ActivityRole);
+    model->appendRow(row);
+
+    row = new QStandardItem(icons.getThemeIcon(QStringLiteral("media-playback-pause")), tr("Paused"));
+    row->setData(FilterMode::SHOW_PAUSED, ActivityRole);
+    model->appendRow(row);
+
+    row = new QStandardItem(icons.getThemeIcon(QStringLiteral("dialog-ok")), tr("Finished"));
+    row->setData(FilterMode::SHOW_FINISHED, ActivityRole);
+    model->appendRow(row);
+
+    row = new QStandardItem(icons.getThemeIcon(QStringLiteral("view-refresh")), tr("Verifying"));
+    row->setData(FilterMode::SHOW_VERIFYING, ActivityRole);
+    model->appendRow(row);
+
+    row = new QStandardItem(icons.getThemeIcon(QStringLiteral("process-stop")), tr("Error"));
+    row->setData(FilterMode::SHOW_ERROR, ActivityRole);
+    model->appendRow(row);
+
+    return model;
+}
+
+QStandardItemModel* TorrentModel::createFilterModel(int role, int count)
+{
+    auto* model = new QStandardItemModel(this);
+
+    auto* row = new QStandardItem(tr("All"));
+    row->setData(QString(), role);
+    row->setData(count, TorrentModel::CountRole);
+    row->setData(getCountString(static_cast<size_t>(count)), TorrentModel::CountStringRole);
+    model->appendRow(row);
+
+    model->appendRow(new QStandardItem); // separator
+    return model;
 }
