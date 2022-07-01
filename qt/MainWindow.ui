@@ -72,8 +72,8 @@
          </property>
          <property name="iconSize">
           <size>
-						<width>16</width>
-						<height>16</height>
+           <width>16</width>
+           <height>16</height>
           </size>
          </property>
          <property name="popupMode">
