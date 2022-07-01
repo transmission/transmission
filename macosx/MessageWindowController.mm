@@ -71,7 +71,7 @@
 
     //set images and text for popup button items
     [self.fLevelButton itemAtIndex:LEVEL_ERROR].title = NSLocalizedString(@"Error", "Message window -> level string");
-    [self.fLevelButton itemAtIndex:LEVEL_WARN].title = NSLocalizedString(@"Warn", "Message window -> level string");
+    [self.fLevelButton itemAtIndex:LEVEL_WARN].title = NSLocalizedString(@"Warning", "Message window -> level string");
     [self.fLevelButton itemAtIndex:LEVEL_INFO].title = NSLocalizedString(@"Info", "Message window -> level string");
     [self.fLevelButton itemAtIndex:LEVEL_DEBUG].title = NSLocalizedString(@"Debug", "Message window -> level string");
     [self.fLevelButton itemAtIndex:LEVEL_TRACE].title = NSLocalizedString(@"Trace", "Message window -> level string");
@@ -582,7 +582,7 @@
         levelString = NSLocalizedString(@"Error", "Message window -> level");
         break;
     case TR_LOG_WARN:
-        levelString = NSLocalizedString(@"Warn", "Message window -> level");
+        levelString = NSLocalizedString(@"Warning", "Message window -> level");
         break;
     case TR_LOG_INFO:
         levelString = NSLocalizedString(@"Info", "Message window -> level");
