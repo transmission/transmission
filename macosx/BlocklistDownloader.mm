@@ -249,7 +249,7 @@ BlocklistDownloader* fBLDownloader = nil;
         return NO;
     }
 
-    NSURL* destinationDir = [destination URLByDeletingLastPathComponent];
+    NSURL* destinationDir = destination.URLByDeletingLastPathComponent;
 
     NSTask* untar = [[NSTask alloc] init];
     untar.launchPath = @"/usr/bin/tar";
@@ -279,7 +279,7 @@ BlocklistDownloader* fBLDownloader = nil;
 
 - (BOOL)gunzipFrom:(NSURL*)file to:(NSURL*)destination
 {
-    NSURL* destinationDir = [destination URLByDeletingLastPathComponent];
+    NSURL* destinationDir = destination.URLByDeletingLastPathComponent;
 
     NSTask* gunzip = [[NSTask alloc] init];
     gunzip.launchPath = @"/usr/bin/gunzip";
@@ -301,7 +301,7 @@ BlocklistDownloader* fBLDownloader = nil;
         return NO;
     }
 
-    NSURL* result = [file URLByDeletingPathExtension];
+    NSURL* result = file.URLByDeletingPathExtension;
 
     [NSFileManager.defaultManager moveItemAtURL:result toURL:destination error:nil];
     return YES;
@@ -348,7 +348,7 @@ BlocklistDownloader* fBLDownloader = nil;
         return NO;
     }
 
-    NSURL* destinationDir = [destination URLByDeletingLastPathComponent];
+    NSURL* destinationDir = destination.URLByDeletingLastPathComponent;
 
     NSTask* unzip = [[NSTask alloc] init];
     unzip.launchPath = @"/usr/bin/unzip";

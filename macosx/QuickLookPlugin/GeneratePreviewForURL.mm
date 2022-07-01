@@ -19,7 +19,7 @@ NSString* generateIconData(NSString* fileExtension, NSUInteger width, NSMutableD
     // we need to do this once per file extension, per size
     NSString* iconFileName = [NSString stringWithFormat:@"%ldx%@.tiff", width, rawFilename];
 
-    if (![allImgProps objectForKey:iconFileName])
+    if (!allImgProps[iconFileName])
     {
         NSImage* icon = [[NSWorkspace sharedWorkspace] iconForFileType:fileExtension];
 
@@ -29,13 +29,13 @@ NSString* generateIconData(NSString* fileExtension, NSUInteger width, NSMutableD
         [icon drawInRect:iconFrame fromRect:NSZeroRect operation:NSCompositingOperationCopy fraction:1.0];
         [renderedIcon unlockFocus];
 
-        NSData* iconData = [renderedIcon TIFFRepresentation];
+        NSData* iconData = renderedIcon.TIFFRepresentation;
 
         NSDictionary* imgProps = @{
             (NSString*)kQLPreviewPropertyMIMETypeKey : @"image/png",
             (NSString*)kQLPreviewPropertyAttachmentDataKey : iconData
         };
-        [allImgProps setObject:imgProps forKey:iconFileName];
+        allImgProps[iconFileName] = imgProps;
     }
 
     return [@"cid:" stringByAppendingString:iconFileName];
@@ -54,7 +54,7 @@ OSStatus GeneratePreviewForURL(void* thisInterface, QLPreviewRequestRef preview,
 
     //try to parse the torrent file
     auto metainfo = tr_torrent_metainfo{};
-    if (!metainfo.parseTorrentFile([[(__bridge NSURL*)url path] UTF8String]))
+    if (!metainfo.parseTorrentFile(((__bridge NSURL*)url).path.UTF8String))
     {
         return noErr;
     }
@@ -69,11 +69,11 @@ OSStatus GeneratePreviewForURL(void* thisInterface, QLPreviewRequestRef preview,
 
     NSMutableDictionary* allImgProps = [NSMutableDictionary dictionary];
 
-    NSString* name = [NSString stringWithUTF8String:metainfo.name().c_str()];
+    NSString* name = @(metainfo.name().c_str());
 
     auto const n_files = metainfo.fileCount();
     auto const is_multifile = n_files > 1;
-    NSString* fileTypeString = is_multifile ? NSFileTypeForHFSTypeCode(kGenericFolderIcon) : [name pathExtension];
+    NSString* fileTypeString = is_multifile ? NSFileTypeForHFSTypeCode(kGenericFolderIcon) : name.pathExtension;
 
     NSUInteger const width = 32;
     [htmlString appendFormat:@"<h2><img class=\"icon\" src=\"%@\" width=\"%ld\" height=\"%ld\" />%@</h2>",
@@ -97,7 +97,7 @@ OSStatus GeneratePreviewForURL(void* thisInterface, QLPreviewRequestRef preview,
                                        timeStyle:NSDateFormatterShortStyle] :
         nil;
     auto const& creator = metainfo.creator();
-    NSString* creatorString = !std::empty(creator) ? [NSString stringWithUTF8String:creator.c_str()] : nil;
+    NSString* creatorString = !std::empty(creator) ? @(creator.c_str()) : nil;
     if ([creatorString isEqualToString:@""])
     {
         creatorString = nil;
@@ -128,7 +128,7 @@ OSStatus GeneratePreviewForURL(void* thisInterface, QLPreviewRequestRef preview,
     auto const& commentStr = metainfo.comment();
     if (!std::empty(commentStr))
     {
-        NSString* comment = [NSString stringWithUTF8String:commentStr.c_str()];
+        NSString* comment = @(commentStr.c_str());
         if (![comment isEqualToString:@""])
             [htmlString appendFormat:@"<p>%@</p>", comment];
     }
@@ -191,16 +191,16 @@ OSStatus GeneratePreviewForURL(void* thisInterface, QLPreviewRequestRef preview,
 #warning display folders?
         for (auto const& [path, size] : metainfo.files().sortedByPath())
         {
-            NSString* fullFilePath = [NSString stringWithUTF8String:path.c_str()];
+            NSString* fullFilePath = @(path.c_str());
             NSCAssert([fullFilePath hasPrefix:[name stringByAppendingString:@"/"]], @"Expected file path %@ to begin with %@/", fullFilePath, name);
 
-            NSString* shortenedFilePath = [fullFilePath substringFromIndex:[name length] + 1];
+            NSString* shortenedFilePath = [fullFilePath substringFromIndex:name.length + 1];
             NSString* shortenedFilePathAndSize = [NSString
                 stringWithFormat:@"%@ - %@", shortenedFilePath, [NSString stringForFileSize:size]];
 
             NSUInteger const width = 16;
             [listSection appendFormat:@"<tr><td><img class=\"icon\" src=\"%@\" width=\"%ld\" height=\"%ld\" />%@<td></tr>",
-                                      generateIconData([shortenedFilePath pathExtension], width, allImgProps),
+                                      generateIconData(shortenedFilePath.pathExtension, width, allImgProps),
                                       width,
                                       width,
                                       shortenedFilePathAndSize];
@@ -211,7 +211,7 @@ OSStatus GeneratePreviewForURL(void* thisInterface, QLPreviewRequestRef preview,
         [lists addObject:listSection];
     }
 
-    if ([lists count] > 0)
+    if (lists.count > 0)
     {
         [htmlString appendFormat:@"<hr/><br>%@", [lists componentsJoinedByString:@"<br>"]];
     }

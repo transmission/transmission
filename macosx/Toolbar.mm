@@ -12,7 +12,7 @@
     //otherwise we get strange drawing issues, leading to a potential crash
     [NSNotificationCenter.defaultCenter postNotificationName:@"ToolbarDidChange" object:nil];
 
-    [super setVisible:visible];
+    super.visible = visible;
 }
 
 @end

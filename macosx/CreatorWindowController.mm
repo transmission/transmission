@@ -141,7 +141,7 @@ NSMutableSet* creatorWindowControllerSet = nil;
         //remove potentially invalid addresses
         for (NSInteger i = _fTrackers.count - 1; i >= 0; i--)
         {
-            if (!tr_urlIsValidTracker([_fTrackers[i] UTF8String]))
+            if (!tr_urlIsValidTracker(_fTrackers[i].UTF8String))
             {
                 [_fTrackers removeObjectAtIndex:i];
             }
@@ -161,7 +161,7 @@ NSMutableSet* creatorWindowControllerSet = nil;
     self.window.title = name;
 
     //disable fullscreen support
-    [self.window setCollectionBehavior:NSWindowCollectionBehaviorFullScreenNone];
+    self.window.collectionBehavior = NSWindowCollectionBehaviorFullScreenNone;
 
     self.fNameField.stringValue = name;
     self.fNameField.toolTip = self.fPath.path;
@@ -191,7 +191,7 @@ NSMutableSet* creatorWindowControllerSet = nil;
     self.fStatusField.stringValue = statusString;
 
     [self updatePiecesField];
-    [self.fPieceSizeStepper setIntValue:(int)log2((double)self.fInfo->pieceSize)];
+    self.fPieceSizeStepper.intValue = (int)log2((double)self.fInfo->pieceSize);
 
     self.fLocation = [[self.fDefaults URLForKey:@"CreatorLocationURL"]
         URLByAppendingPathComponent:[name stringByAppendingPathExtension:@"torrent"]];
@@ -601,14 +601,14 @@ NSMutableSet* creatorWindowControllerSet = nil;
 
     for (NSUInteger i = 0; i < self.fTrackers.count; i++)
     {
-        trackerInfo[i].announce = (char*)[self.fTrackers[i] UTF8String];
+        trackerInfo[i].announce = (char*)(self.fTrackers[i]).UTF8String;
         trackerInfo[i].tier = i;
     }
 
     //store values
     [self.fDefaults setObject:self.fTrackers forKey:@"CreatorTrackers"];
     [self.fDefaults setBool:self.fPrivateCheck.state == NSControlStateValueOn forKey:@"CreatorPrivate"];
-    [self.fDefaults setObject:[self.fSource stringValue] forKey:@"CreatorSource"];
+    [self.fDefaults setObject:self.fSource.stringValue forKey:@"CreatorSource"];
     [self.fDefaults setBool:self.fOpenCheck.state == NSControlStateValueOn forKey:@"CreatorOpen"];
     self.fOpenWhenCreated = self.fOpenCheck.state ==
         NSControlStateValueOn; //need this since the check box might not exist, and value in prefs might have changed from another creator window

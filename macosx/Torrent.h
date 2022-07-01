@@ -83,7 +83,7 @@ typedef NS_ENUM(unsigned int, TorrentDeterminationType) {
 - (void)moveTorrentDataFileTo:(NSString*)folder;
 - (void)copyTorrentFileTo:(NSString*)path;
 
-- (BOOL)alertForRemainingDiskSpace;
+@property(nonatomic, readonly) BOOL alertForRemainingDiskSpace;
 
 @property(nonatomic, readonly) NSImage* icon;
 
