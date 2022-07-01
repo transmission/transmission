@@ -10,7 +10,7 @@ function(AddShowTest name file_basename)
    )
 endfunction()
 
-AddShowTest(transmission-show-bittorrent-v2 bittorrent-v2-test)
+# disabled AddShowTest(transmission-show-bittorrent-v2 bittorrent-v2-test)
 AddShowTest(transmission-show-bittorrent-v2-hybrid-test bittorrent-v2-hybrid-test)
 AddShowTest(transmission-show-inner-sanctum Inner_Sanctum_movie_archive)
 AddShowTest(transmission-show-thor Thor_and_the_Amazon_Women.avi)
