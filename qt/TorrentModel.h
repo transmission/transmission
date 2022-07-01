@@ -31,7 +31,12 @@ class TorrentModel : public QAbstractListModel
 public:
     enum Role
     {
-        TorrentRole = Qt::UserRole
+        TorrentRole = Qt::UserRole,
+        CountRole,
+        CountStringRole,
+        ActivityRole,
+        PathRole,
+        TrackerRole,
     };
 
     explicit TorrentModel(Prefs const& prefs);
