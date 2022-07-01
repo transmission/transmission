@@ -344,6 +344,7 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
         {
             // currently unused. TODO support for bittorrent v2
             // TODO https://github.com/transmission/transmission/issues/458
+            tm_.is_v2_ = value == 2;
         }
         else if (
             pathIs(DurationKey) || //
@@ -582,6 +583,7 @@ private:
         char const* const end = &context.raw().back() + 1;
         auto const info_dict_benc = std::string_view{ begin, size_t(end - begin) };
         auto const hash = tr_sha1(info_dict_benc);
+        auto const hash2 = tr_sha256(info_dict_benc);
         if (!hash)
         {
             tr_error_set(context.error, EINVAL, "bad info_dict checksum");
@@ -590,6 +592,8 @@ private:
 
         tm_.info_hash_ = *hash;
         tm_.info_hash_str_ = tr_sha1_to_string(tm_.info_hash_);
+        tm_.info_hash2_ = *hash2;
+        tm_.info_hash2_str_ = tr_sha256_to_string(tm_.info_hash2_);
         tm_.info_dict_size_ = std::size(info_dict_benc);
         return true;
     }
