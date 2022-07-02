@@ -9,15 +9,23 @@ GENERAL
   Created by: libtorrent
   Created on: Wed Jun 03 08:45:06 2020
 
-  Piece Count: 1709
+  Piece Count: 1715
   Piece Size: 512.0 KiB
-  Total Size: 895.5 MB
+  Total Size: 898.6 MB
   Privacy: Public torrent
 
 TRACKERS
 
 FILES
 
+  bittorrent-v1-v2-hybrid-test/.pad/129434 (129.4 kB)
+  bittorrent-v1-v2-hybrid-test/.pad/227380 (227.4 kB)
+  bittorrent-v1-v2-hybrid-test/.pad/280339 (280.3 kB)
+  bittorrent-v1-v2-hybrid-test/.pad/442368 (442.4 kB)
+  bittorrent-v1-v2-hybrid-test/.pad/464896 (464.9 kB)
+  bittorrent-v1-v2-hybrid-test/.pad/507162 (507.2 kB)
+  bittorrent-v1-v2-hybrid-test/.pad/510995 (511.0 kB)
+  bittorrent-v1-v2-hybrid-test/.pad/524227 (524.2 kB)
   bittorrent-v1-v2-hybrid-test/Darkroom (Stellar, 1994, Amiga ECS) HQ.mp4 (6.54 MB)
   bittorrent-v1-v2-hybrid-test/Spaceballs-StateOfTheArt.avi (20.51 MB)
   bittorrent-v1-v2-hybrid-test/cncd_fairlight-ceasefire_(all_falls_down)-1080p.mp4 (342.2 MB)
