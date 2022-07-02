@@ -21,6 +21,8 @@
 
 /** @brief Opaque SHA1 context type. */
 using tr_sha1_ctx_t = void*;
+/** @brief Opaque SHA256 context type. */
+using tr_sha256_ctx_t = void*;
 /** @brief Opaque DH context type. */
 using tr_dh_ctx_t = void*;
 /** @brief Opaque DH secret key type. */
@@ -67,6 +69,44 @@ std::optional<tr_sha1_digest_t> tr_sha1(T... args)
     // one of the update() calls failed so we will return nullopt,
     // but we need to call final() first to ensure ctx is released
     tr_sha1_final(ctx);
+    return std::nullopt;
+}
+
+/**
+ * @brief Allocate and initialize new SHA256 hasher context.
+ */
+tr_sha256_ctx_t tr_sha256_init(void);
+
+/**
+ * @brief Update SHA256 hash.
+ */
+bool tr_sha256_update(tr_sha256_ctx_t handle, void const* data, size_t data_length);
+
+/**
+ * @brief Finalize and export SHA256 hash, free hasher context.
+ */
+std::optional<tr_sha256_digest_t> tr_sha256_final(tr_sha256_ctx_t handle);
+
+/**
+ * @brief generate a SHA256 hash from some memory
+ */
+template<typename... T>
+std::optional<tr_sha256_digest_t> tr_sha256(T... args)
+{
+    auto ctx = tr_sha256_init();
+    if (ctx == nullptr)
+    {
+        return std::nullopt;
+    }
+
+    if ((tr_sha256_update(ctx, std::data(args), std::size(args)) && ...))
+    {
+        return tr_sha256_final(ctx);
+    }
+
+    // one of the update() calls failed so we will return nullopt,
+    // but we need to call final() first to ensure ctx is released
+    tr_sha256_final(ctx);
     return std::nullopt;
 }
 
@@ -186,9 +226,19 @@ std::string tr_base64_decode(std::string_view input);
 std::string tr_sha1_to_string(tr_sha1_digest_t const&);
 
 /**
- * @brief Generate a sha1 digest from a hex string.
+ * @brief Generate a sha256 digest from a hex string.
  */
 std::optional<tr_sha1_digest_t> tr_sha1_from_string(std::string_view hex);
+
+/**
+ * @brief Generate an ascii hex string for a sha256 digest.
+ */
+std::string tr_sha256_to_string(tr_sha256_digest_t const&);
+
+/**
+ * @brief Generate a sha256 digest from a hex string.
+ */
+std::optional<tr_sha256_digest_t> tr_sha256_from_string(std::string_view hex);
 
 /** @} */
 

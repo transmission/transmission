@@ -179,6 +179,45 @@ std::optional<tr_sha1_digest_t> tr_sha1_final(tr_sha1_ctx_t raw_handle)
 ****
 ***/
 
+tr_sha256_ctx_t tr_sha256_init(void)
+{
+    auto* handle = new CC_SHA256_CTX();
+    CC_SHA256_Init(handle);
+    return handle;
+}
+
+bool tr_sha256_update(tr_sha256_ctx_t handle, void const* data, size_t data_length)
+{
+    TR_ASSERT(handle != nullptr);
+
+    if (data_length == 0)
+    {
+        return true;
+    }
+
+    TR_ASSERT(data != nullptr);
+
+    CC_SHA256_Update(static_cast<CC_SHA256_CTX*>(handle), data, data_length);
+    return true;
+}
+
+std::optional<tr_sha256_digest_t> tr_sha256_final(tr_sha256_ctx_t raw_handle)
+{
+    TR_ASSERT(raw_handle != nullptr);
+    auto* handle = static_cast<CC_SHA256_CTX*>(raw_handle);
+
+    auto digest = tr_sha256_digest_t{};
+    auto* const digest_as_uchar = reinterpret_cast<unsigned char*>(std::data(digest));
+    CC_SHA256_Final(digest_as_uchar, handle);
+
+    delete handle;
+    return digest;
+}
+
+/***
+****
+***/
+
 namespace
 {
 
