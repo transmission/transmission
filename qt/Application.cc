@@ -76,7 +76,7 @@ bool loadTranslation(QTranslator& translator, QString const& name, QLocale const
     return false;
 }
 
-auto makeWindowIcon()
+[[nodiscard]] auto makeWindowIcon()
 {
     // first, try to load it from the system theme
     if (auto icon = QIcon::fromTheme(QStringLiteral("transmission")); !icon.isNull())
