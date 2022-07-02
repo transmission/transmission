@@ -17,7 +17,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-06-18 18:42+0100\n"
+"POT-Creation-Date: 2022-07-02 03:57+0100\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
 "Last-Translator: Виктор Б, 2022\n"
 "Language-Team: Russian (https://www.transifex.com/transmissionbt/teams/33778/ru/)\n"
@@ -75,7 +75,7 @@ msgstr ""
 msgid "Saved pidfile '{path}'"
 msgstr ""
 
-#: ../daemon/daemon.cc:772 ../gtk/MakeDialog.cc:143 ../gtk/MessageLogWindow.cc:190 ../libtransmission/blocklist.cc:356 ../libtransmission/inout.cc:181 ../libtransmission/rpcimpl.cc:1452 ../libtransmission/torrent.cc:813 ../libtransmission/torrent.cc:2097 ../libtransmission/variant.cc:1137
+#: ../daemon/daemon.cc:772 ../gtk/MakeDialog.cc:143 ../gtk/MessageLogWindow.cc:190 ../libtransmission/blocklist.cc:356 ../libtransmission/inout.cc:181 ../libtransmission/rpcimpl.cc:1452 ../libtransmission/torrent.cc:838 ../libtransmission/torrent.cc:2120 ../libtransmission/variant.cc:1137
 msgid "Couldn't save '{path}': {error} ({error_code})"
 msgstr ""
 
@@ -1612,7 +1612,7 @@ msgstr "Простаивает"
 msgid "Verifying local data ({percent_done}% tested)"
 msgstr ""
 
-#: ../gtk/TorrentCellRenderer.cc:192 ../libtransmission/torrent.cc:523
+#: ../gtk/TorrentCellRenderer.cc:192 ../libtransmission/torrent.cc:548
 msgid "Tracker warning: '{warning}'"
 msgstr ""
 
@@ -1974,7 +1974,7 @@ msgstr[3] ""
 msgid "Couldn't parse line: '{line}'"
 msgstr ""
 
-#: ../libtransmission/crypto-utils-ccrypto.cc:102 ../libtransmission/crypto-utils-cyassl.cc:69 ../libtransmission/crypto-utils-openssl.cc:67 ../libtransmission/crypto-utils-polarssl.cc:64
+#: ../libtransmission/crypto-utils-ccrypto.cc:102 ../libtransmission/crypto-utils-cyassl.cc:70 ../libtransmission/crypto-utils-openssl.cc:67 ../libtransmission/crypto-utils-polarssl.cc:66
 msgid "{crypto_library} error: {error} ({error_code})"
 msgstr ""
 
@@ -2174,7 +2174,7 @@ msgstr[1] ""
 msgstr[2] ""
 msgstr[3] ""
 
-#: ../libtransmission/torrent-magnet.cc:321
+#: ../libtransmission/torrent-magnet.cc:355
 msgid "Couldn't parse magnet metainfo: '{error}'. Redownloading {piece_count} piece"
 msgid_plural "Couldn't parse magnet metainfo: '{error}'. Redownloading {piece_count} pieces"
 msgstr[0] ""
@@ -2182,48 +2182,52 @@ msgstr[1] ""
 msgstr[2] ""
 msgstr[3] ""
 
-#: ../libtransmission/torrent-metainfo.cc:782
+#: ../libtransmission/torrent-metainfo.cc:786
 msgid "Migrated torrent file from '{old_path}' to '{path}'"
 msgstr ""
 
-#: ../libtransmission/torrent.cc:463
+#: ../libtransmission/torrent.cc:127
+msgid "Couldn't use metaInfo from '{path}' for '{magnet}': {error} ({error_code})"
+msgstr ""
+
+#: ../libtransmission/torrent.cc:488
 msgid "Seed ratio reached; pausing torrent"
 msgstr ""
 
-#: ../libtransmission/torrent.cc:476
+#: ../libtransmission/torrent.cc:501
 msgid "Seeding idle limit reached; pausing torrent"
 msgstr ""
 
 #. lookups by obfuscated hash will fail for this torrent
-#: ../libtransmission/torrent.cc:574
+#: ../libtransmission/torrent.cc:599
 msgid "Couldn't compute obfuscated info hash"
 msgstr ""
 
-#: ../libtransmission/torrent.cc:635
+#: ../libtransmission/torrent.cc:660
 msgid "No data found! Ensure your drives are connected or use \"Set Location\". To re-download, remove the torrent and re-add it."
 msgstr "Данные не обнаружены! Убедитесь, что диски подключены, или используйте пункт меню «Указать расположение». Для повторной загрузки, удалите торрент, а затем добавьте его снова."
 
-#: ../libtransmission/torrent.cc:1430
+#: ../libtransmission/torrent.cc:1453
 msgid "Restarted manually -- disabling its seed ratio"
 msgstr "Перезагружено вручную — отключение рейтинга раздачи"
 
-#: ../libtransmission/torrent.cc:1550
+#: ../libtransmission/torrent.cc:1573
 msgid "Pausing torrent"
 msgstr ""
 
-#: ../libtransmission/torrent.cc:1599
+#: ../libtransmission/torrent.cc:1622
 msgid "Removing torrent"
 msgstr "Удаление торрента"
 
-#: ../libtransmission/torrent.cc:1792
+#: ../libtransmission/torrent.cc:1815
 msgid "Calling script '{path}'"
 msgstr ""
 
-#: ../libtransmission/torrent.cc:1801
+#: ../libtransmission/torrent.cc:1824
 msgid "Couldn't call script '{path}': {error} ({error_code})"
 msgstr ""
 
-#: ../libtransmission/torrent.cc:2196 ../libtransmission/torrent.cc:2316
+#: ../libtransmission/torrent.cc:2219 ../libtransmission/torrent.cc:2339
 msgid "Couldn't move '{old_path}' to '{path}': {error} ({error_code})"
 msgstr ""
 
