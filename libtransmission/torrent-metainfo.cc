@@ -242,21 +242,8 @@ struct MetainfoHandler final : public transmission::benc::BasicHandler<MaxBencDe
 
         if (state_ == State::FileTree) // bittorrent v2 format
         {
-            if (!addFile(context))
-            {
-                return false;
-            }
-
-            file_subpath_.popdir();
-            if (file_subpath_ == "."sv)
-            {
-                file_subpath_.clear();
-            }
-
-            if (pathIs(InfoKey, FileTreeKey))
-            {
-                state_ = State::UsePath;
-            }
+            // v2, ignore for today
+            tr_logAddInfo("'file tree' is ignored");
         }
         else if (state_ == State::Files) // bittorrent v1 format
         {
