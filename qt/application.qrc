@@ -4,7 +4,7 @@
       <file alias="alt-limit-on.svg">icons/turtle.svg</file>
       <file alias="encrypted.svg">icons/lock.svg</file>
       <file alias="hamburger-menu.svg">icons/hamburger-menu.svg</file>
-      <file alias="ratio.svg">icons/yin-yang.svg</file>
+      <file alias="ratio.svg">icons/ratio.svg</file>
       <file alias="transmission.svg">icons/transmission.svg</file>
   </qresource>
 </RCC>
