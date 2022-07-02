@@ -16,7 +16,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-07-02 03:57+0100\n"
+"POT-Creation-Date: 2022-07-02 03:58+0100\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
 "Last-Translator: Balázs Meskó <meskobalazs@mailbox.org>, 2022\n"
 "Language-Team: Hungarian (https://www.transifex.com/transmissionbt/teams/33778/hu/)\n"
@@ -2341,33 +2341,3 @@ msgid "day"
 msgid_plural "days"
 msgstr[0] "nap"
 msgstr[1] "nap"
-
-#~ msgid "Asking for more peers in {time_span}"
-#~ msgstr "További partnerek kérése {time_span} múlva"
-
-#~ msgid "Asking for more peers now… {markup_begin}{time_span}{markup_end}"
-#~ msgstr "További partnerek kérése most… {markup_begin}{time_span}{markup_end}"
-
-#~ msgid "Asking for peer counts in {time_span}"
-#~ msgstr "Partnerek számának lekérése {time_span} múlva"
-
-#~ msgid "Asking for peer counts now… {markup_begin}{time_span}{markup_end}"
-#~ msgstr "Partnerek számának lekérése most… {markup_begin}{time_span}{markup_end}"
-
-#~ msgid "{hours} hour"
-#~ msgid_plural "{hours} hours"
-#~ msgstr[0] "{hours} óra"
-#~ msgstr[1] "{hours} óra"
-
-#~ msgid "{minutes} minute"
-#~ msgid_plural "{minutes} minutes"
-#~ msgstr[0] "{minutes} perc"
-#~ msgstr[1] "{minutes} perc"
-
-#~ msgid "{seconds} second"
-#~ msgid_plural "{seconds} seconds"
-#~ msgstr[0] "{seconds} másodperc"
-#~ msgstr[1] "{seconds} másodperc"
-
-#~ msgid "{time_span} remaining"
-#~ msgstr "{time_span} van hátra"

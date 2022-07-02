@@ -14,7 +14,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-07-02 03:57+0100\n"
+"POT-Creation-Date: 2022-07-02 03:58+0100\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
 "Last-Translator: Dingzhong Chen <wsxy162@gmail.com>, 2022\n"
 "Language-Team: Chinese (China) (https://www.transifex.com/transmissionbt/teams/33778/zh_CN/)\n"
@@ -2302,49 +2302,3 @@ msgstr[0] "秒"
 msgid "day"
 msgid_plural "days"
 msgstr[0] "天"
-
-#~ msgid "Asking for more peers in {time_span}"
-#~ msgstr "将于 {time_span}后请求更多用户"
-
-#~ msgid "Asking for more peers now… {markup_begin}{time_span}{markup_end}"
-#~ msgstr "正在请求更多的用户……{markup_begin}{time_span}{markup_end}"
-
-#~ msgid "Asking for peer counts in {time_span}"
-#~ msgstr "将于 {time_span}后询问用户数量"
-
-#~ msgid "Asking for peer counts now… {markup_begin}{time_span}{markup_end}"
-#~ msgstr "正在询问用户数量……{markup_begin}{time_span}{markup_end}"
-
-#~ msgid "Got a list of {markup_begin}{peer_count} peer{markup_end} {time_span} ago"
-#~ msgid_plural "Got a list of {markup_begin}{peer_count} peers{markup_end} {time_span} ago"
-#~ msgstr[0] "在 {time_span}前获得了载有 {markup_begin}{peer_count} 个用户{markup_end}的列表"
-
-#~ msgid "Got a scrape error '{markup_begin}{error}{markup_end}' {time_span} ago"
-#~ msgstr "在 {time_span}前遇到抓取错误“{markup_begin}{error}{markup_end}”"
-
-#~ msgid "Got an error '{markup_begin}{error}{markup_end}' {time_span} ago"
-#~ msgstr "在 {time_span}前遇到错误“{markup_begin}{error}{markup_end}”"
-
-#~ msgid "Peer list request {markup_begin}timed out {time_span} ago{markup_end}; will retry"
-#~ msgstr "在 {time_span}前用户列表请求markup_begin}超时{time_span}，将重试"
-
-#~ msgid "Tracker had {markup_begin}{seeder_count} {seeder_or_seeders} and {leecher_count} {leecher_or_leechers}{markup_end} {time_span} ago"
-#~ msgstr "在 {time_span}前 Tracker 有 {markup_begin}{seeder_count} 个 {seeder_or_seeders}和 {leecher_count} 个{leecher_or_leechers}{markup_end}"
-
-#~ msgid "{hours} hour"
-#~ msgid_plural "{hours} hours"
-#~ msgstr[0] "{hours} 小时"
-
-#~ msgid "{minutes} minute"
-#~ msgid_plural "{minutes} minutes"
-#~ msgstr[0] "{minutes} 分钟"
-
-#~ msgid "{seconds} second"
-#~ msgid_plural "{seconds} seconds"
-#~ msgstr[0] "{seconds} 秒"
-
-#~ msgid "{time_span} ago"
-#~ msgstr "{time_span} 前"
-
-#~ msgid "{time_span} remaining"
-#~ msgstr "剩余 {time_span}"

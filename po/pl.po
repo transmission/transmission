@@ -12,7 +12,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-07-02 03:57+0100\n"
+"POT-Creation-Date: 2022-07-02 03:58+0100\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
 "Last-Translator: Piotr Drąg <piotrdrag@gmail.com>, 2022\n"
 "Language-Team: Polish (https://www.transifex.com/transmissionbt/teams/33778/pl/)\n"
@@ -558,20 +558,20 @@ msgstr "_Więcej informacji"
 #: ../gtk/DetailsDialog.cc:1922
 msgid "Got a list of {markup_begin}{peer_count} peer{markup_end} {time_span_ago}"
 msgid_plural "Got a list of {markup_begin}{peer_count} peers{markup_end} {time_span_ago}"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "Otrzymano listę {markup_begin}{peer_count} partnera{markup_end} {time_span_ago}"
+msgstr[1] "Otrzymano listę {markup_begin}{peer_count} partnerów{markup_end} {time_span_ago}"
+msgstr[2] "Otrzymano listę {markup_begin}{peer_count} partnerów{markup_end} {time_span_ago}"
+msgstr[3] "Otrzymano listę {markup_begin}{peer_count} partnerów{markup_end} {time_span_ago}"
 
 #. {markup_begin} and {markup_end} should surround the time_span
 #: ../gtk/DetailsDialog.cc:1934
 msgid "Peer list request {markup_begin}timed out {time_span_ago}{markup_end}; will retry"
-msgstr ""
+msgstr "Żądanie listy partnerów {markup_begin}przekroczyło czas oczekiwania {time_span_ago}{markup_end}, zostanie ponowione"
 
 #. {markup_begin} and {markup_end} should surround the error
 #: ../gtk/DetailsDialog.cc:1943
 msgid "Got an error '{markup_begin}{error}{markup_end}' {time_span_ago}"
-msgstr ""
+msgstr "Otrzymano błąd „{markup_begin}{error}{markup_end}” {time_span_ago}"
 
 #: ../gtk/DetailsDialog.cc:1956
 msgid "No updates scheduled"
@@ -579,7 +579,7 @@ msgstr "Brak zaplanowanych aktualizacji"
 
 #: ../gtk/DetailsDialog.cc:1963
 msgid "Asking for more peers {time_span_from_now}"
-msgstr ""
+msgstr "Wysyłanie zapytania o więcej partnerów {time_span_from_now}"
 
 #: ../gtk/DetailsDialog.cc:1970
 msgid "Queued to ask for more peers"
@@ -588,12 +588,12 @@ msgstr "W kolejce do wysłania zapytania o więcej partnerów"
 #. {markup_begin} and {markup_end} should surround time_span_ago
 #: ../gtk/DetailsDialog.cc:1978
 msgid "Asked for more peers {markup_begin}{time_span_ago}{markup_end}"
-msgstr ""
+msgstr "Wysłano zapytanie o więcej partnerów {markup_begin}{time_span_ago}{markup_end}"
 
 #. {markup_begin} and {markup_end} should surround the seeder/leecher text
 #: ../gtk/DetailsDialog.cc:2001
 msgid "Tracker had {markup_begin}{seeder_count} {seeder_or_seeders} and {leecher_count} {leecher_or_leechers}{markup_end} {time_span_ago}"
-msgstr ""
+msgstr "Serwer śledzący miał {markup_begin}{seeder_count} {seeder_or_seeders} i {leecher_count} {leecher_or_leechers}{markup_end} {time_span_ago}"
 
 #: ../gtk/DetailsDialog.cc:2003
 msgid "seeder"
@@ -614,11 +614,11 @@ msgstr[3] "niewysyłających"
 #. {markup_begin} and {markup_end} should surround the error text
 #: ../gtk/DetailsDialog.cc:2014
 msgid "Got a scrape error '{markup_begin}{error}{markup_end}' {time_span_ago}"
-msgstr ""
+msgstr "Otrzymano błąd „scrape” „{markup_begin}{error}{markup_end}” {time_span_ago}"
 
 #: ../gtk/DetailsDialog.cc:2031
 msgid "Asking for peer counts in {time_span_from_now}"
-msgstr ""
+msgstr "Wysyłanie zapytania o liczbę partnerów za {time_span_from_now}"
 
 #: ../gtk/DetailsDialog.cc:2038
 msgid "Queued to ask for peer counts"
@@ -626,7 +626,7 @@ msgstr "W kolejce do wysłania zapytania o liczbę partnerów"
 
 #: ../gtk/DetailsDialog.cc:2045
 msgid "Asked for peer counts {markup_begin}{time_span_ago}{markup_end}"
-msgstr ""
+msgstr "Wysłano zapytanie o liczbę partnerów {markup_begin}{time_span_ago}{markup_end}"
 
 #: ../gtk/DetailsDialog.cc:2287
 msgid "List contains invalid URLs"
@@ -1758,70 +1758,70 @@ msgstr "TB/s"
 #: ../gtk/Utils.cc:97
 msgid "{days_from_now:L} day from now"
 msgid_plural "{days_from_now:L} days from now"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "{days_from_now:L} dzień od teraz"
+msgstr[1] "{days_from_now:L} dni od teraz"
+msgstr[2] "{days_from_now:L} dni od teraz"
+msgstr[3] "{days_from_now:L} dni od teraz"
 
 #: ../gtk/Utils.cc:104
 msgid "{hours_from_now:L} hour from now"
 msgid_plural "{hours_from_now:L} hours from now"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "{hours_from_now:L} godzina od teraz"
+msgstr[1] "{hours_from_now:L} godziny od teraz"
+msgstr[2] "{hours_from_now:L} godzin od teraz"
+msgstr[3] "{hours_from_now:L} godzin od teraz"
 
 #: ../gtk/Utils.cc:111
 msgid "{minutes_from_now:L} minute from now"
 msgid_plural "{minutes_from_now:L} minutes from now"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "{minutes_from_now:L} minuta od teraz"
+msgstr[1] "{minutes_from_now:L} minuty od teraz"
+msgstr[2] "{minutes_from_now:L} minut od teraz"
+msgstr[3] "{minutes_from_now:L} minut od teraz"
 
 #: ../gtk/Utils.cc:118
 msgid "{seconds_from_now:L} second from now"
 msgid_plural "{seconds_from_now:L} seconds from now"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "{seconds_from_now:L} sekunda od teraz"
+msgstr[1] "{seconds_from_now:L} sekundy od teraz"
+msgstr[2] "{seconds_from_now:L} sekund od teraz"
+msgstr[3] "{seconds_from_now:L} sekund od teraz"
 
 #: ../gtk/Utils.cc:122 ../gtk/Utils.cc:153 ../gtk/Utils.cc:180 ../gtk/Utils.cc:213
 msgid "now"
-msgstr ""
+msgstr "teraz"
 
 #: ../gtk/Utils.cc:129
 msgid "{days_ago:L} day ago"
 msgid_plural "{days_ago:L} days ago"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "{days_ago:L} dzień temu"
+msgstr[1] "{days_ago:L} dni temu"
+msgstr[2] "{days_ago:L} dni temu"
+msgstr[3] "{days_ago:L} dni temu"
 
 #: ../gtk/Utils.cc:135
 msgid "{hours_ago:L} hour ago"
 msgid_plural "{hours_ago:L} hours ago"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "{hours_ago:L} godzina temu"
+msgstr[1] "{hours_ago:L} godziny temu"
+msgstr[2] "{hours_ago:L} godzin temu"
+msgstr[3] "{hours_ago:L} godzin temu"
 
 #: ../gtk/Utils.cc:142
 msgid "{minutes_ago:L} minute ago"
 msgid_plural "{minutes_ago:L} minutes ago"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "{minutes_ago:L} minuta temu"
+msgstr[1] "{minutes_ago:L} minuty temu"
+msgstr[2] "{minutes_ago:L} minut temu"
+msgstr[3] "{minutes_ago:L} minut temu"
 
 #: ../gtk/Utils.cc:149
 msgid "{seconds_ago:L} second ago"
 msgid_plural "{seconds_ago:L} seconds ago"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "{seconds_ago:L} sekunda temu"
+msgstr[1] "{seconds_ago:L} sekundy temu"
+msgstr[2] "{seconds_ago:L} sekund temu"
+msgstr[3] "{seconds_ago:L} sekund temu"
 
 #: ../gtk/Utils.cc:162
 msgid "{days:L} day"
@@ -1834,58 +1834,58 @@ msgstr[3] "{days:L} dni"
 #: ../gtk/Utils.cc:167
 msgid "{hours:L} hour"
 msgid_plural "{hours:L} hours"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "{hours:L} godzina"
+msgstr[1] "{hours:L} godziny"
+msgstr[2] "{hours:L} godzin"
+msgstr[3] "{hours:L} godzin"
 
 #: ../gtk/Utils.cc:172
 msgid "{minutes:L} minute"
 msgid_plural "{minutes:L} minutes"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "{minutes:L} minuta"
+msgstr[1] "{minutes:L} minuty"
+msgstr[2] "{minutes:L} minut"
+msgstr[3] "{minutes:L} minut"
 
 #: ../gtk/Utils.cc:177
 msgid "{seconds:L} second"
 msgid_plural "{seconds:L} seconds"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "{seconds:L} sekunda"
+msgstr[1] "{seconds:L} sekundy"
+msgstr[2] "{seconds:L} sekund"
+msgstr[3] "{seconds:L} sekund"
 
 #: ../gtk/Utils.cc:188
 msgid "{days_left:L} day left"
 msgid_plural "{days_left:L} days left"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "{days_left:L} dzień pozostał"
+msgstr[1] "{days_left:L} dni pozostały"
+msgstr[2] "{days_left:L} dni pozostało"
+msgstr[3] "{days_left:L} dni pozostało"
 
 #: ../gtk/Utils.cc:195
 msgid "{hours_left:L} hour left"
 msgid_plural "{hours_left:L} hours left"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "{hours_left:L} godzina pozostała"
+msgstr[1] "{hours_left:L} godziny pozostały"
+msgstr[2] "{hours_left:L} godzin pozostało"
+msgstr[3] "{hours_left:L} godzin pozostało"
 
 #: ../gtk/Utils.cc:202
 msgid "{minutes_left:L} minute left"
 msgid_plural "{minutes_left:L} minutes left"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "{minutes_left:L} minuta pozostała"
+msgstr[1] "{minutes_left:L} minuty pozostały"
+msgstr[2] "{minutes_left:L} minut pozostało"
+msgstr[3] "{minutes_left:L} minut pozostało"
 
 #: ../gtk/Utils.cc:209
 msgid "{seconds_left:L} second left"
 msgid_plural "{seconds_left:L} seconds left"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
-msgstr[3] ""
+msgstr[0] "{seconds_left:L} sekunda pozostała"
+msgstr[1] "{seconds_left:L} sekundy pozostały"
+msgstr[2] "{seconds_left:L} sekund pozostało"
+msgstr[3] "{seconds_left:L} sekund pozostało"
 
 #: ../gtk/Utils.cc:249
 msgid "The torrent file '{path}' is already in use by '{torrent_name}'."
@@ -2441,61 +2441,3 @@ msgstr[0] "dzień"
 msgstr[1] "dni"
 msgstr[2] "dni"
 msgstr[3] "dni"
-
-#~ msgid "Asking for more peers in {time_span}"
-#~ msgstr "Wysyłanie zapytania o więcej partnerów za {time_span}"
-
-#~ msgid "Asking for more peers now… {markup_begin}{time_span}{markup_end}"
-#~ msgstr "Wysyłanie zapytania o więcej partnerów… {markup_begin}{time_span}{markup_end}"
-
-#~ msgid "Asking for peer counts in {time_span}"
-#~ msgstr "Wysyłanie zapytania o liczbę partnerów za {time_span}"
-
-#~ msgid "Asking for peer counts now… {markup_begin}{time_span}{markup_end}"
-#~ msgstr "Wysyłanie zapytania o liczbę partnerów… {markup_begin}{time_span}{markup_end}"
-
-#~ msgid "Got a list of {markup_begin}{peer_count} peer{markup_end} {time_span} ago"
-#~ msgid_plural "Got a list of {markup_begin}{peer_count} peers{markup_end} {time_span} ago"
-#~ msgstr[0] "Otrzymano listę {markup_begin}{peer_count} partnera{markup_end} {time_span} temu"
-#~ msgstr[1] "Otrzymano listę {markup_begin}{peer_count} partnerów{markup_end} {time_span} temu"
-#~ msgstr[2] "Otrzymano listę {markup_begin}{peer_count} partnerów{markup_end} {time_span} temu"
-#~ msgstr[3] "Otrzymano listę {markup_begin}{peer_count} partnerów{markup_end} {time_span} temu"
-
-#~ msgid "Got a scrape error '{markup_begin}{error}{markup_end}' {time_span} ago"
-#~ msgstr "Otrzymano błąd „scrape” „{markup_begin}{error}{markup_end}” {time_span} temu"
-
-#~ msgid "Got an error '{markup_begin}{error}{markup_end}' {time_span} ago"
-#~ msgstr "Otrzymano błąd „{markup_begin}{error}{markup_end}” {time_span} temu"
-
-#~ msgid "Peer list request {markup_begin}timed out {time_span} ago{markup_end}; will retry"
-#~ msgstr "Żądanie listy partnerów {markup_begin}przekroczyło czas oczekiwania {time_span} temu{markup_end}, zostanie ponowione"
-
-#~ msgid "Tracker had {markup_begin}{seeder_count} {seeder_or_seeders} and {leecher_count} {leecher_or_leechers}{markup_end} {time_span} ago"
-#~ msgstr "Serwer śledzący miał {markup_begin}{seeder_count} {seeder_or_seeders} i {leecher_count} {leecher_or_leechers}{markup_end} {time_span} temu"
-
-#~ msgid "{hours} hour"
-#~ msgid_plural "{hours} hours"
-#~ msgstr[0] "{hours} godzina"
-#~ msgstr[1] "{hours} godziny"
-#~ msgstr[2] "{hours} godzin"
-#~ msgstr[3] "{hours} godzin"
-
-#~ msgid "{minutes} minute"
-#~ msgid_plural "{minutes} minutes"
-#~ msgstr[0] "{minutes} minuta"
-#~ msgstr[1] "{minutes} minuty"
-#~ msgstr[2] "{minutes} minut"
-#~ msgstr[3] "{minutes} minut"
-
-#~ msgid "{seconds} second"
-#~ msgid_plural "{seconds} seconds"
-#~ msgstr[0] "{seconds} sekunda"
-#~ msgstr[1] "{seconds} sekundy"
-#~ msgstr[2] "{seconds} sekund"
-#~ msgstr[3] "{seconds} sekund"
-
-#~ msgid "{time_span} ago"
-#~ msgstr "{time_span} temu"
-
-#~ msgid "{time_span} remaining"
-#~ msgstr "pozostało: {time_span}"

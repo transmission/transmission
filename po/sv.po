@@ -14,7 +14,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-07-02 03:57+0100\n"
+"POT-Creation-Date: 2022-07-02 03:58+0100\n"
 "PO-Revision-Date: 2017-01-26 19:47+0000\n"
 "Last-Translator: Jonatan Nyberg <jonatan@autistici.org>, 2022\n"
 "Language-Team: Swedish (https://www.transifex.com/transmissionbt/teams/33778/sv/)\n"
@@ -527,18 +527,18 @@ msgstr "Visa _mer detaljer"
 #: ../gtk/DetailsDialog.cc:1922
 msgid "Got a list of {markup_begin}{peer_count} peer{markup_end} {time_span_ago}"
 msgid_plural "Got a list of {markup_begin}{peer_count} peers{markup_end} {time_span_ago}"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Fick en lista över {markup_begin}{peer_count} jämlike{markup_end} {time_span_ago}"
+msgstr[1] "Fick en lista över {markup_begin}{peer_count} jämlikar{markup_end} {time_span_ago}"
 
 #. {markup_begin} and {markup_end} should surround the time_span
 #: ../gtk/DetailsDialog.cc:1934
 msgid "Peer list request {markup_begin}timed out {time_span_ago}{markup_end}; will retry"
-msgstr ""
+msgstr "Förfrågan efter lista över jämlikar {markup_begin}tog för lång tid {time_span_ago}{markup_end}; kommer att försöka igen"
 
 #. {markup_begin} and {markup_end} should surround the error
 #: ../gtk/DetailsDialog.cc:1943
 msgid "Got an error '{markup_begin}{error}{markup_end}' {time_span_ago}"
-msgstr ""
+msgstr "Fick ett fel '{markup_begin}{error}{markup_end}' {time_span_ago}"
 
 #: ../gtk/DetailsDialog.cc:1956
 msgid "No updates scheduled"
@@ -546,7 +546,7 @@ msgstr "Inga uppdateringar schemalagda"
 
 #: ../gtk/DetailsDialog.cc:1963
 msgid "Asking for more peers {time_span_from_now}"
-msgstr ""
+msgstr "Frågar efter fler jämlikar {time_span_from_now}"
 
 #: ../gtk/DetailsDialog.cc:1970
 msgid "Queued to ask for more peers"
@@ -555,12 +555,12 @@ msgstr "I kö för att fråga efter fler jämlikar"
 #. {markup_begin} and {markup_end} should surround time_span_ago
 #: ../gtk/DetailsDialog.cc:1978
 msgid "Asked for more peers {markup_begin}{time_span_ago}{markup_end}"
-msgstr ""
+msgstr "Frågade efter fler jämlikar {markup_begin}{time_span_ago}{markup_end}"
 
 #. {markup_begin} and {markup_end} should surround the seeder/leecher text
 #: ../gtk/DetailsDialog.cc:2001
 msgid "Tracker had {markup_begin}{seeder_count} {seeder_or_seeders} and {leecher_count} {leecher_or_leechers}{markup_end} {time_span_ago}"
-msgstr ""
+msgstr "Spåraren hade {markup_begin}{seeder_count} {seeder_or_seeders} och {leecher_count} {leecher_or_leechers}{markup_end} {time_span_ago}"
 
 #: ../gtk/DetailsDialog.cc:2003
 msgid "seeder"
@@ -577,11 +577,11 @@ msgstr[1] "reciprokörer"
 #. {markup_begin} and {markup_end} should surround the error text
 #: ../gtk/DetailsDialog.cc:2014
 msgid "Got a scrape error '{markup_begin}{error}{markup_end}' {time_span_ago}"
-msgstr ""
+msgstr "Fick ett skrapfel '{markup_begin}{error}{markup_end}' {time_span_ago}"
 
 #: ../gtk/DetailsDialog.cc:2031
 msgid "Asking for peer counts in {time_span_from_now}"
-msgstr ""
+msgstr "Frågar efter antal jämlikar om {time_span_from_now}"
 
 #: ../gtk/DetailsDialog.cc:2038
 msgid "Queued to ask for peer counts"
@@ -589,7 +589,7 @@ msgstr "I kö för att fråga efter antal jämlikar"
 
 #: ../gtk/DetailsDialog.cc:2045
 msgid "Asked for peer counts {markup_begin}{time_span_ago}{markup_end}"
-msgstr ""
+msgstr "Frågade efter antal jämlikar {markup_begin}{time_span_ago}{markup_end}"
 
 #: ../gtk/DetailsDialog.cc:2287
 msgid "List contains invalid URLs"
@@ -1358,7 +1358,7 @@ msgstr "Porten är {markup_begin}öppen{markup_end}"
 
 #: ../gtk/PrefsDialog.cc:1032
 msgid "Testing TCP port…"
-msgstr "Testar TCP-port..."
+msgstr "Testar TCP-port…"
 
 #: ../gtk/PrefsDialog.cc:1054
 msgid "Listening Port"
@@ -1691,54 +1691,54 @@ msgstr "TB/s"
 #: ../gtk/Utils.cc:97
 msgid "{days_from_now:L} day from now"
 msgid_plural "{days_from_now:L} days from now"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{days_from_now:L} dag från nu"
+msgstr[1] "{days_from_now:L} dagar från nu"
 
 #: ../gtk/Utils.cc:104
 msgid "{hours_from_now:L} hour from now"
 msgid_plural "{hours_from_now:L} hours from now"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{hours_from_now:L} timme från nu"
+msgstr[1] "{hours_from_now:L} timmar från nu"
 
 #: ../gtk/Utils.cc:111
 msgid "{minutes_from_now:L} minute from now"
 msgid_plural "{minutes_from_now:L} minutes from now"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{minutes_from_now:L} minut från nu"
+msgstr[1] "{minutes_from_now:L} minuter från nu"
 
 #: ../gtk/Utils.cc:118
 msgid "{seconds_from_now:L} second from now"
 msgid_plural "{seconds_from_now:L} seconds from now"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{seconds_from_now:L} sekund från nu"
+msgstr[1] "{seconds_from_now:L} sekunder från nu"
 
 #: ../gtk/Utils.cc:122 ../gtk/Utils.cc:153 ../gtk/Utils.cc:180 ../gtk/Utils.cc:213
 msgid "now"
-msgstr ""
+msgstr "nu"
 
 #: ../gtk/Utils.cc:129
 msgid "{days_ago:L} day ago"
 msgid_plural "{days_ago:L} days ago"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{days_ago:L} dag sedan"
+msgstr[1] "{days_ago:L} dagar sedan"
 
 #: ../gtk/Utils.cc:135
 msgid "{hours_ago:L} hour ago"
 msgid_plural "{hours_ago:L} hours ago"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{hours_ago:L} timme sedan"
+msgstr[1] "{hours_ago:L} timmar sedan"
 
 #: ../gtk/Utils.cc:142
 msgid "{minutes_ago:L} minute ago"
 msgid_plural "{minutes_ago:L} minutes ago"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{minutes_ago:L} minut sedan"
+msgstr[1] "{minutes_ago:L} minuter sedan"
 
 #: ../gtk/Utils.cc:149
 msgid "{seconds_ago:L} second ago"
 msgid_plural "{seconds_ago:L} seconds ago"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{seconds_ago:L} sekund sedan"
+msgstr[1] "{seconds_ago:L} sekunder sedan"
 
 #: ../gtk/Utils.cc:162
 msgid "{days:L} day"
@@ -1749,44 +1749,44 @@ msgstr[1] "{days:L} dagar"
 #: ../gtk/Utils.cc:167
 msgid "{hours:L} hour"
 msgid_plural "{hours:L} hours"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{hours:L} timme"
+msgstr[1] "{hours:L} timmar"
 
 #: ../gtk/Utils.cc:172
 msgid "{minutes:L} minute"
 msgid_plural "{minutes:L} minutes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{minutes:L} minut"
+msgstr[1] "{minutes:L} minuter"
 
 #: ../gtk/Utils.cc:177
 msgid "{seconds:L} second"
 msgid_plural "{seconds:L} seconds"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{seconds:L} sekund"
+msgstr[1] "{seconds:L} sekunder"
 
 #: ../gtk/Utils.cc:188
 msgid "{days_left:L} day left"
 msgid_plural "{days_left:L} days left"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{days_left:L} dag kvar"
+msgstr[1] "{days_left:L} dagar kvar"
 
 #: ../gtk/Utils.cc:195
 msgid "{hours_left:L} hour left"
 msgid_plural "{hours_left:L} hours left"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{hours_left:L} timme kvar"
+msgstr[1] "{hours_left:L} timmar kvar"
 
 #: ../gtk/Utils.cc:202
 msgid "{minutes_left:L} minute left"
 msgid_plural "{minutes_left:L} minutes left"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{minutes_left:L} minut kvar"
+msgstr[1] "{minutes_left:L} minuter kvar"
 
 #: ../gtk/Utils.cc:209
 msgid "{seconds_left:L} second left"
 msgid_plural "{seconds_left:L} seconds left"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "{seconds_left:L} sekund kvar"
+msgstr[1] "{seconds_left:L} sekunder kvar"
 
 #: ../gtk/Utils.cc:249
 msgid "The torrent file '{path}' is already in use by '{torrent_name}'."
@@ -2324,53 +2324,3 @@ msgid "day"
 msgid_plural "days"
 msgstr[0] "dag"
 msgstr[1] "dagar"
-
-#~ msgid "Asking for more peers in {time_span}"
-#~ msgstr "Frågar efter fler jämlikar om {time_span}"
-
-#~ msgid "Asking for more peers now… {markup_begin}{time_span}{markup_end}"
-#~ msgstr "Frågar efter fler jämlikar nu… {markup_begin}{time_span}{markup_end}"
-
-#~ msgid "Asking for peer counts in {time_span}"
-#~ msgstr "Frågar efter antal jämlikar om {time_span}"
-
-#~ msgid "Asking for peer counts now… {markup_begin}{time_span}{markup_end}"
-#~ msgstr "Frågar efter fler jämlikar nu… {markup_begin}{time_span}{markup_end}"
-
-#~ msgid "Got a list of {markup_begin}{peer_count} peer{markup_end} {time_span} ago"
-#~ msgid_plural "Got a list of {markup_begin}{peer_count} peers{markup_end} {time_span} ago"
-#~ msgstr[0] "Fick en lista över {markup_begin}{peer_count} jämlikar{markup_end} {time_span} sedan"
-#~ msgstr[1] "Fick en lista över {markup_begin}{peer_count} jämlikar{markup_end} {time_span} sedan"
-
-#~ msgid "Got a scrape error '{markup_begin}{error}{markup_end}' {time_span} ago"
-#~ msgstr "Fick ett skrapfel '{markup_begin}{error}{markup_end}' {time_span} sedan"
-
-#~ msgid "Got an error '{markup_begin}{error}{markup_end}' {time_span} ago"
-#~ msgstr "Fick ett fel '{markup_begin}{error}{markup_end}' {time_span} sedan"
-
-#~ msgid "Peer list request {markup_begin}timed out {time_span} ago{markup_end}; will retry"
-#~ msgstr "Tiden för begäran om jämlikelista {markup_begin}löpte ut för {time_span} sedan{markup_end}; kommer att försöka igen"
-
-#~ msgid "Tracker had {markup_begin}{seeder_count} {seeder_or_seeders} and {leecher_count} {leecher_or_leechers}{markup_end} {time_span} ago"
-#~ msgstr "Spåraren hade {markup_begin}{seeder_count} {seeder_or_seeders} och {leecher_count} {leecher_or_leechers}{markup_end} {time_span} sedan"
-
-#~ msgid "{hours} hour"
-#~ msgid_plural "{hours} hours"
-#~ msgstr[0] "{hours} timme"
-#~ msgstr[1] "{hours} timmar"
-
-#~ msgid "{minutes} minute"
-#~ msgid_plural "{minutes} minutes"
-#~ msgstr[0] "{minutes} minut"
-#~ msgstr[1] "{minutes} minuter"
-
-#~ msgid "{seconds} second"
-#~ msgid_plural "{seconds} seconds"
-#~ msgstr[0] "{seconds} sekund"
-#~ msgstr[1] "{seconds} sekunder"
-
-#~ msgid "{time_span} ago"
-#~ msgstr "{time_span} sedan"
-
-#~ msgid "{time_span} remaining"
-#~ msgstr "{time_span} återstår"
