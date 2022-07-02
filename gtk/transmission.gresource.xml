@@ -2,6 +2,7 @@
 <gresources>
   <gresource prefix="/com/transmissionbt/transmission">
     <file alias="icons/scalable/apps/transmission.svg" compressed="true" preprocess="xml-stripblanks">icons/hicolor_apps_scalable_transmission.svg</file>
+    <file alias="icons/scalable/apps/transmission-tray-icon.svg" compressed="true" preprocess="xml-stripblanks">icons/hicolor_apps_scalable_transmission-tray-icon.svg</file>
     <file alias="icons/16x16/actions/lock.png">icons/lock.png</file>
     <file alias="icons/16x16/actions/view-statistics.png">icons/ratio.png</file>
     <file alias="icons/16x16/status/alt-speed-on.png">icons/turtle-blue.png</file>
