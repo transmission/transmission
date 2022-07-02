@@ -87,6 +87,8 @@ public:
     // requests that have been made but haven't been fulfilled yet
     [[nodiscard]] virtual size_t activeReqCount(tr_direction) const noexcept = 0;
 
+    virtual void requestBlocks(tr_block_span_t const* block_spans, size_t n_spans) = 0;
+
     tr_session* const session;
 
     tr_swarm* const swarm;
