@@ -1,0 +1,38 @@
+Name: bittorrent-v1-v2-hybrid-test
+File: assets/bittorrent-v2-hybrid-test.torrent
+
+GENERAL
+
+  Name: bittorrent-v1-v2-hybrid-test
+  Hash v1: 631a31dd0a46257d5078c0dee4e66e26f73e42ac
+  Hash v2: d8dd32ac93357c368556af3ac1d95c9d76bd0dff6fa9833ecdac3d53134efabb
+  Created by: libtorrent
+  Created on: Wed Jun 03 08:45:06 2020
+
+  Piece Count: 1715
+  Piece Size: 512.0 KiB
+  Total Size: 898.6 MB
+  Privacy: Public torrent
+
+TRACKERS
+
+FILES
+
+  bittorrent-v1-v2-hybrid-test/.pad/129434 (129.4 kB)
+  bittorrent-v1-v2-hybrid-test/.pad/227380 (227.4 kB)
+  bittorrent-v1-v2-hybrid-test/.pad/280339 (280.3 kB)
+  bittorrent-v1-v2-hybrid-test/.pad/442368 (442.4 kB)
+  bittorrent-v1-v2-hybrid-test/.pad/464896 (464.9 kB)
+  bittorrent-v1-v2-hybrid-test/.pad/507162 (507.2 kB)
+  bittorrent-v1-v2-hybrid-test/.pad/510995 (511.0 kB)
+  bittorrent-v1-v2-hybrid-test/.pad/524227 (524.2 kB)
+  bittorrent-v1-v2-hybrid-test/Darkroom (Stellar, 1994, Amiga ECS) HQ.mp4 (6.54 MB)
+  bittorrent-v1-v2-hybrid-test/Spaceballs-StateOfTheArt.avi (20.51 MB)
+  bittorrent-v1-v2-hybrid-test/cncd_fairlight-ceasefire_(all_falls_down)-1080p.mp4 (342.2 MB)
+  bittorrent-v1-v2-hybrid-test/eld-dust.mkv (61.64 MB)
+  bittorrent-v1-v2-hybrid-test/fairlight_cncd-agenda_circling_forth-1080p30lq.mp4 (277.9 MB)
+  bittorrent-v1-v2-hybrid-test/meet the deadline - Still _ Evoke 2014.mp4 (44.58 MB)
+  bittorrent-v1-v2-hybrid-test/readme.txt (0.06 kB)
+  bittorrent-v1-v2-hybrid-test/tbl-goa.avi (26.30 MB)
+  bittorrent-v1-v2-hybrid-test/tbl-tint.mpg (115.9 MB)
+

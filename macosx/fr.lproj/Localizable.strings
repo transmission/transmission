@@ -20,7 +20,7 @@
 
 /* Action menu -> upload/download limit
    Status Bar -> speed tooltip */
-"%ld KB/s" = "%ld Ko/s";
+"%ld KB/s" = "%ld ko/s";
 
 /* Info options -> global setting */
 "%ld minutes" = "%ld minutes";
@@ -88,7 +88,7 @@
 "%u pieces, %@ each" = "%1$u morceaux, %2$@ chacun";
 
 /* Inspector -> Peers tab -> peers */
-"1 Connected" = "1 Connectés";
+"1 Connected" = "1 connecté";
 
 /* Add torrent -> info
    Create torrent -> info
@@ -487,10 +487,10 @@
 "It appears that the file \"%@\" from %@ is not a torrent file." = "Il semble que le ficher « %1$@ » de %2$@ n’est pas un fichier torrent.";
 
 /* File size - kilobytes */
-"KB" = "Ko";
+"KB" = "ko";
 
 /* Transfer speed (kilobytes per second) */
-"KB/s" = "Ko/s";
+"KB/s" = "ko/s";
 
 /* Tracker last announce */
 "Last Announce" = "Dernière annonce";
@@ -508,7 +508,7 @@
 "License" = "Licence";
 
 /* torrent action menu -> upload/download limit */
-"Limit (%ld KB/s)" = "Limiter (%ld Ko/s)";
+"Limit (%ld KB/s)" = "Limiter (%ld ko/s)";
 
 /* Save log alert panel -> title */
 "Log Could Not Be Saved" = "Les messages n’ont pu être enregistrés";
@@ -1126,7 +1126,7 @@
 
 /* Message window -> level
    Message window -> level string */
-"Warn" = "Avertir";
+"Warning" = "";
 
 /* Drag overlay -> url */
 "Web Address" = "Adresse Web";

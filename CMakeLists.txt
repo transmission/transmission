@@ -124,7 +124,7 @@ set(GLIB_MINIMUM            2.50.1)
 set(GTK_MINIMUM             3.24.0)
 set(LIBAPPINDICATOR_MINIMUM 0.4.90)
 set(OPENSSL_MINIMUM         0.9.7)
-set(POLARSSL_MINIMUM        1.2)
+set(POLARSSL_MINIMUM        1.3)
 set(QT_MINIMUM              5.6)
 
 if(WIN32)
@@ -679,7 +679,8 @@ if(ENABLE_DAEMON OR ENABLE_GTK OR ENABLE_QT)
 endif()
 
 if(INSTALL_DOC)
-    install(FILES AUTHORS COPYING NEWS.md README.md docs/rpc-spec.md extras/send-email-when-torrent-done.sh DESTINATION ${CMAKE_INSTALL_DOCDIR})
+    install(FILES AUTHORS COPYING README.md docs/rpc-spec.md extras/send-email-when-torrent-done.sh DESTINATION ${CMAKE_INSTALL_DOCDIR})
+    install(DIRECTORY news DESTINATION ${CMAKE_INSTALL_DOCDIR})
 endif()
 
 if(MSVC AND ENABLE_DAEMON AND ENABLE_QT AND ENABLE_UTILS AND WITH_CRYPTO STREQUAL "openssl")

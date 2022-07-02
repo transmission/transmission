@@ -130,6 +130,18 @@ public:
 
     [[nodiscard]] tr_sha1_digest_t const& pieceHash(tr_piece_index_t piece) const;
 
+    [[nodiscard]] bool hasV1Metadata() const
+    {
+        // need 'pieces' field and 'files' or 'length'
+        // TODO check for 'files' or 'length'
+        return pieces_.size() > 0;
+    }
+
+    [[nodiscard]] bool hasV2Metadata() const
+    {
+        return is_v2_;
+    }
+
     [[nodiscard]] constexpr auto const& dateCreated() const noexcept
     {
         return date_created_;
@@ -231,4 +243,5 @@ private:
     uint64_t pieces_offset_ = 0;
 
     bool is_private_ = false;
+    bool is_v2_ = false;
 };

@@ -151,6 +151,19 @@ std::optional<tr_sha1_digest_t> parseHash(std::string_view sv)
     return {};
 }
 
+std::optional<tr_sha256_digest_t> parseHash2(std::string_view sv)
+{
+    // http://bittorrent.org/beps/bep_0009.html
+    // Is the info-hash v2 hex encoded and tag removed, for a total of 64 characters.
+
+    if (auto const hash = tr_sha256_from_string(sv); hash)
+    {
+        return hash;
+    }
+
+    return {};
+}
+
 } // namespace
 
 /***
@@ -237,10 +250,20 @@ bool tr_magnet_metainfo::parseMagnet(std::string_view magnet_link, tr_error** er
         }
         else if (static auto constexpr ValPrefix = "urn:btih:"sv; key == "xt"sv && tr_strvStartsWith(value, ValPrefix))
         {
+            // v1 info-hash
             if (auto const hash = parseHash(value.substr(std::size(ValPrefix))); hash)
             {
                 this->info_hash_ = *hash;
                 got_hash = true;
+            }
+        }
+        else if (static auto constexpr ValPrefix2 = "urn:btmh:1220"sv; key == "xt"sv && tr_strvStartsWith(value, ValPrefix2))
+        {
+            // v2 info-hash
+            // The 1220 tag identifies the hash as sha256, removing tag before sending to parseHash2
+            if (auto const hash = parseHash2(value.substr(std::size(ValPrefix2))); hash)
+            {
+                this->info_hash2_ = *hash;
             }
         }
     }

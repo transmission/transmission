@@ -154,6 +154,54 @@ std::optional<tr_sha1_digest_t> tr_sha1_final(tr_sha1_ctx_t raw_handle)
 ****
 ***/
 
+tr_sha256_ctx_t tr_sha256_init()
+{
+    EVP_MD_CTX* handle = EVP_MD_CTX_create();
+
+    if (check_result(EVP_DigestInit_ex(handle, EVP_sha256(), nullptr)))
+    {
+        return handle;
+    }
+
+    EVP_MD_CTX_destroy(handle);
+    return nullptr;
+}
+
+bool tr_sha256_update(tr_sha256_ctx_t raw_handle, void const* data, size_t data_length)
+{
+    auto* const handle = static_cast<EVP_MD_CTX*>(raw_handle);
+
+    TR_ASSERT(handle != nullptr);
+
+    if (data_length == 0)
+    {
+        return true;
+    }
+
+    TR_ASSERT(data != nullptr);
+
+    return check_result(EVP_DigestUpdate(handle, data, data_length));
+}
+
+std::optional<tr_sha256_digest_t> tr_sha256_final(tr_sha1_ctx_t raw_handle)
+{
+    auto* handle = static_cast<EVP_MD_CTX*>(raw_handle);
+    TR_ASSERT(handle != nullptr);
+
+    unsigned int hash_length = 0;
+    auto digest = tr_sha256_digest_t{};
+    auto* const digest_as_uchar = reinterpret_cast<unsigned char*>(std::data(digest));
+    bool const ok = check_result(EVP_DigestFinal_ex(handle, digest_as_uchar, &hash_length));
+    TR_ASSERT(!ok || hash_length == std::size(digest));
+
+    EVP_MD_CTX_destroy(handle);
+    return ok ? std::make_optional(digest) : std::nullopt;
+}
+
+/***
+****
+***/
+
 #if OPENSSL_VERSION_NUMBER < 0x0090802fL
 
 static EVP_CIPHER_CTX* openssl_evp_cipher_context_new(void)

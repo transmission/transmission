@@ -868,47 +868,57 @@ static void removeKeRangerRansomware()
 
 - (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication*)sender
 {
-    if (!self.fQuitRequested && [self.fDefaults boolForKey:@"CheckQuit"])
+    if (self.fQuitRequested || ![self.fDefaults boolForKey:@"CheckQuit"])
     {
-        NSUInteger active = 0, downloading = 0;
-        for (Torrent* torrent in self.fTorrents)
+        return NSTerminateNow;
+    }
+
+    NSUInteger active = 0, downloading = 0;
+    for (Torrent* torrent in self.fTorrents)
+    {
+        if (torrent.active && !torrent.stalled)
         {
-            if (torrent.active && !torrent.stalled)
+            active++;
+            if (!torrent.allDownloaded)
             {
-                active++;
-                if (!torrent.allDownloaded)
-                {
-                    downloading++;
-                }
+                downloading++;
             }
-        }
-
-        if ([self.fDefaults boolForKey:@"CheckQuitDownloading"] ? downloading > 0 : active > 0)
-        {
-            NSAlert* alert = [[NSAlert alloc] init];
-            alert.alertStyle = NSAlertStyleInformational;
-            alert.messageText = NSLocalizedString(@"Are you sure you want to quit?", "Confirm Quit panel -> title");
-            alert.informativeText = active == 1 ?
-                NSLocalizedString(
-                    @"There is an active transfer that will be paused on quit."
-                     " The transfer will automatically resume on the next launch.",
-                    "Confirm Quit panel -> message") :
-                [NSString stringWithFormat:NSLocalizedString(
-                                               @"There are %lu active transfers that will be paused on quit."
-                                                " The transfers will automatically resume on the next launch.",
-                                               "Confirm Quit panel -> message"),
-                                           active];
-            [alert addButtonWithTitle:NSLocalizedString(@"Quit", "Confirm Quit panel -> button")];
-            [alert addButtonWithTitle:NSLocalizedString(@"Cancel", "Confirm Quit panel -> button")];
-
-            [alert beginSheetModalForWindow:self.fWindow completionHandler:^(NSModalResponse returnCode) {
-                [NSApp replyToApplicationShouldTerminate:returnCode == NSAlertFirstButtonReturn];
-            }];
-            return NSTerminateLater;
         }
     }
 
-    return NSTerminateNow;
+    BOOL preventedByTransfer = [self.fDefaults boolForKey:@"CheckQuitDownloading"] ? downloading > 0 : active > 0;
+
+    if (!preventedByTransfer)
+    {
+        return NSTerminateNow;
+    }
+
+    NSAlert* alert = [[NSAlert alloc] init];
+    alert.alertStyle = NSAlertStyleInformational;
+    alert.messageText = NSLocalizedString(@"Are you sure you want to quit?", "Confirm Quit panel -> title");
+    alert.informativeText = active == 1 ?
+        NSLocalizedString(
+            @"There is an active transfer that will be paused on quit."
+             " The transfer will automatically resume on the next launch.",
+            "Confirm Quit panel -> message") :
+        [NSString stringWithFormat:NSLocalizedString(
+                                       @"There are %lu active transfers that will be paused on quit."
+                                        " The transfers will automatically resume on the next launch.",
+                                       "Confirm Quit panel -> message"),
+                                   active];
+    [alert addButtonWithTitle:NSLocalizedString(@"Quit", "Confirm Quit panel -> button")];
+    [alert addButtonWithTitle:NSLocalizedString(@"Cancel", "Confirm Quit panel -> button")];
+    alert.showsSuppressionButton = YES;
+
+    [alert beginSheetModalForWindow:self.fWindow completionHandler:^(NSModalResponse returnCode) {
+        if (alert.suppressionButton.state == NSControlStateValueOn)
+        {
+            [self.fDefaults setBool:NO forKey:@"CheckQuit"];
+        }
+        [NSApp replyToApplicationShouldTerminate:returnCode == NSAlertFirstButtonReturn];
+    }];
+
+    return NSTerminateLater;
 }
 
 - (void)applicationWillTerminate:(NSNotification*)notification

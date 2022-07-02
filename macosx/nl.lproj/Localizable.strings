@@ -1126,7 +1126,7 @@
 
 /* Message window -> level
    Message window -> level string */
-"Warn" = "";
+"Warning" = "";
 
 /* Drag overlay -> url */
 "Web Address" = "Webadres";
