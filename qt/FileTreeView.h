@@ -32,6 +32,11 @@ public:
 
     void setEditable(bool editable);
 
+    QSortFilterProxyModel* filter() const
+    {
+        return proxy_;
+    }
+
 signals:
     void priorityChanged(QSet<int> const& file_indices, int priority);
     void wantedChanged(QSet<int> const& file_indices, bool wanted);

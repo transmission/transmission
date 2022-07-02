@@ -619,6 +619,13 @@
          </property>
         </widget>
        </item>
+       <item>
+        <widget class="QLineEdit" name="filterEdit">
+         <property name="placeholderText">
+          <string>Search...</string>
+         </property>
+        </widget>
+       </item>
       </layout>
      </widget>
      <widget class="QWidget" name="optionsTab">
