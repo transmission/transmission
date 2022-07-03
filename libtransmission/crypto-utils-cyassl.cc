@@ -258,8 +258,8 @@ bool tr_dh_make_key(tr_dh_ctx_t raw_handle, size_t /*private_key_length*/, uint8
 
     auto const lock = std::lock_guard(rng_mutex_);
 
-    auto my_private_key_length = word32{};
-    auto my_public_key_length = word32{};
+    auto my_private_key_length = handle->key_length;
+    auto my_public_key_length = static_cast<word32>(*public_key_length);
     if (!check_result(API(DhGenerateKeyPair)(
             &handle->dh,
             get_rng(),
