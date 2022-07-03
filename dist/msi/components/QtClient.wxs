@@ -8,8 +8,8 @@
 
       <Component Id="exe.transmission.qt">
         <File DiskId="1" Id="exe.transmission.qt" KeyPath="yes" Name="transmission-qt.exe">
-          <Shortcut Id="exe.transmission.qt.startMenu" Directory="ProgramMenuFolder" Name="Transmission Qt Client" WorkingDirectory="INSTALLDIR" Icon="Tr.svg" Advertise="yes" />
-          <Shortcut Id="exe.transmission.qt.desktop" Directory="DesktopFolder" Name="Transmission Qt Client" WorkingDirectory="INSTALLDIR" Icon="Tr.svg" Advertise="yes" />
+          <Shortcut Id="exe.transmission.qt.startMenu" Directory="ProgramMenuFolder" Name="Transmission Qt Client" WorkingDirectory="INSTALLDIR" Icon="Tr.ico" Advertise="yes" />
+          <Shortcut Id="exe.transmission.qt.desktop" Directory="DesktopFolder" Name="Transmission Qt Client" WorkingDirectory="INSTALLDIR" Icon="Tr.ico" Advertise="yes" />
 
           <TypeLib Id="{1E405FC2-1A3A-468B-8BD6-BFBB58770390}" Description="Transmission Qt Client Type Library" HelpDirectory="INSTALLDIR" Language="0" MajorVersion="1" MinorVersion="0">
             <AppId Id="{792D1AAC-53CC-4DC9-BC29-E5295FDB93A9}" Description="Transmission Qt Client">
