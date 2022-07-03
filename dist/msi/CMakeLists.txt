@@ -40,18 +40,7 @@ else()
 endif()
 
 set(ICONS_DIR "${CMAKE_SOURCE_DIR}/qt/icons/hicolor")
-png2ico(Transmission.ico
-    "${ICONS_DIR}/16x16/transmission-qt.png"
-    "${ICONS_DIR}/22x22/transmission-qt.png"
-    "${ICONS_DIR}/24x24/transmission-qt.png"
-    "${ICONS_DIR}/32x32/transmission-qt.png"
-    "${ICONS_DIR}/48x48/transmission-qt.png"
-    "${ICONS_DIR}/64x64/transmission-qt.png"
-    "${ICONS_DIR}/72x72/transmission-qt.png"
-    "${ICONS_DIR}/96x96/transmission-qt.png"
-    "${ICONS_DIR}/128x128/transmission-qt.png"
-    "${ICONS_DIR}/192x192/transmission-qt.png"
-    "${ICONS_DIR}/256x256/transmission-qt.png")
+file(COPY "${CMAKE_SOURCE_DIR}/qt/icons/transmission.svg" DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
 set(WEBSRCDIR "${CMAKE_INSTALL_PREFIX}/share/transmission/public_html")
 set(TRQMSRCDIR "${CMAKE_INSTALL_PREFIX}/share/transmission/translations")
@@ -103,7 +92,7 @@ wix_light(${PROJECT_NAME}_OUTPUT
         WixUtilExtension
     EXTRA_DEPENDS
         "${CMAKE_CURRENT_SOURCE_DIR}/GPLv2.rtf"
-        "${CMAKE_CURRENT_BINARY_DIR}/Transmission.ico")
+        "${CMAKE_CURRENT_BINARY_DIR}/transmission.svg")
 
 add_custom_target(pack-msi
     SOURCES
