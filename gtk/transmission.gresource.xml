@@ -6,7 +6,6 @@
     <file alias="icons/16x16/actions/view-statistics.png">icons/ratio.png</file>
     <file alias="icons/16x16/status/alt-speed-on.png">icons/turtle-blue.png</file>
     <file alias="icons/16x16/status/alt-speed-off.png">icons/turtle-grey.png</file>
-    <file alias="icons/16x16/actions/preferences-other.png">icons/utilities.png</file>
     <file compressed="true" preprocess="xml-stripblanks">transmission-ui.xml</file>
   </gresource>
 </gresources>

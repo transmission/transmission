@@ -44,7 +44,6 @@ add_custom_command(
         icons/ratio.png
         icons/turtle-blue.png
         icons/turtle-grey.png
-        icons/utilities.png
         transmission.gresource.xml
         transmission-ui.xml
     WORKING_DIRECTORY
