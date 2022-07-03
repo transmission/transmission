@@ -3,9 +3,9 @@
   <gresource prefix="/com/transmissionbt/transmission">
     <file alias="icons/scalable/apps/transmission.svg" compressed="true" preprocess="xml-stripblanks">icons/hicolor_apps_scalable_transmission.svg</file>
     <file alias="icons/16x16/actions/lock.png">icons/lock.png</file>
-    <file alias="icons/16x16/actions/view-statistics.png">icons/ratio.png</file>
-    <file alias="icons/16x16/status/alt-speed-on.png">icons/turtle-blue.png</file>
-    <file alias="icons/16x16/status/alt-speed-off.png">icons/turtle-grey.png</file>
+    <file alias="icons/scalable/actions/ratio.svg">icons/ratio.svg</file>
+    <file alias="icons/scalable/status/alt-speed-on.svg">icons/turtle.svg</file>
+    <file alias="icons/scalable/status/alt-speed-off.svg">icons/turtle-silhouette.svg</file>
     <file compressed="true" preprocess="xml-stripblanks">transmission-ui.xml</file>
   </gresource>
 </gresources>

@@ -41,9 +41,9 @@ add_custom_command(
     DEPENDS
         icons/hicolor_apps_scalable_transmission.svg
         icons/lock.png
-        icons/ratio.png
-        icons/turtle-blue.png
-        icons/turtle-grey.png
+        icons/ratio.svg
+        icons/turtle-silhouette.svg
+        icons/turtle.svg
         transmission.gresource.xml
         transmission-ui.xml
     WORKING_DIRECTORY
