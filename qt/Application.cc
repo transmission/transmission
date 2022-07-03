@@ -76,6 +76,18 @@ bool loadTranslation(QTranslator& translator, QString const& name, QLocale const
     return false;
 }
 
+[[nodiscard]] auto makeWindowIcon()
+{
+    // first, try to load it from the system theme
+    if (auto icon = QIcon::fromTheme(QStringLiteral("transmission")); !icon.isNull())
+    {
+        return icon;
+    }
+
+    // if that fails, use our own as the fallback
+    return QIcon{ QStringLiteral(":/icons/transmission.svg") };
+}
+
 } // namespace
 
 Application::Application(int& argc, char** argv)
@@ -96,19 +108,7 @@ Application::Application(int& argc, char** argv)
 
 #endif
 
-    // set the default icon
-    QIcon icon = QIcon::fromTheme(QStringLiteral("transmission"));
-
-    if (icon.isNull())
-    {
-        static std::array<int, 11> constexpr Sizes = { 16, 22, 24, 32, 48, 64, 72, 96, 128, 192, 256 };
-        for (auto const size : Sizes)
-        {
-            icon.addPixmap(QPixmap(QStringLiteral(":/icons/transmission-%1.png").arg(size)));
-        }
-    }
-
-    setWindowIcon(icon);
+    setWindowIcon(makeWindowIcon());
 
 #ifdef __APPLE__
     setAttribute(Qt::AA_DontShowIconsInMenus);

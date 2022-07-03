@@ -68,7 +68,7 @@
          </property>
          <property name="icon">
           <iconset resource="application.qrc">
-           <normaloff>:/icons/utilities.png</normaloff>:/icons/utilities.png</iconset>
+           <normaloff>:/icons/hamburger-menu.svg</normaloff>:/icons/hamburger-menu.svg</iconset>
          </property>
          <property name="iconSize">
           <size>
@@ -91,8 +91,8 @@
         <widget class="IconToolButton" name="altSpeedButton">
          <property name="icon">
           <iconset resource="application.qrc">
-           <normaloff>:/icons/alt-limit-off.png</normaloff>
-           <normalon>:/icons/alt-limit-on.png</normalon>:/icons/alt-limit-off.png</iconset>
+           <normaloff>:/icons/alt-limit-off.svg</normaloff>
+           <normalon>:/icons/alt-limit-on.svg</normalon>:/icons/alt-limit-off.svg</iconset>
          </property>
          <property name="iconSize">
           <size>
@@ -151,7 +151,7 @@
          </property>
          <property name="icon">
           <iconset resource="application.qrc">
-           <normaloff>:/icons/ratio.png</normaloff>:/icons/ratio.png</iconset>
+           <normaloff>:/icons/ratio.svg</normaloff>:/icons/ratio.svg</iconset>
          </property>
          <property name="iconSize">
           <size>

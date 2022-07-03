@@ -23,7 +23,7 @@ QSize IconToolButton::sizeHint() const
     option.toolButtonStyle = Qt::ToolButtonIconOnly;
     QSize const size = style()->sizeFromContents(QStyle::CT_ToolButton, &option, iconSize(), this);
 
-    return size.expandedTo(iconSize() + QSize(8, 8));
+    return size.expandedTo(iconSize() + QSize(4, 4));
 }
 
 void IconToolButton::paintEvent(QPaintEvent* /*event*/)
