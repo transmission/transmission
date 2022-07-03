@@ -78,7 +78,7 @@
 
     <WixVariable Id="WixUILicenseRtf" Value="$(var.LicenseFile)" />
 
-    <Icon Id="Tr.ico" SourceFile="Transmission.ico" />
+    <Icon Id="Tr.ico" SourceFile="transmission.ico" />
     <Property Id="ARPPRODUCTICON" Value="Tr.ico" />
 
     <Property Id="ARPURLINFOABOUT" Value="https://transmissionbt.com/" />

@@ -521,7 +521,7 @@ MainWindow::Impl::Impl(MainWindow& window, Glib::RefPtr<Gio::ActionGroup> const&
     /* ratio selector */
     auto* ratio_button = Gtk::make_managed<Gtk::Button>();
     ratio_button->set_tooltip_text(_("Statistics"));
-    ratio_button->add(*Gtk::make_managed<Gtk::Image>("view-statistics", Gtk::ICON_SIZE_MENU));
+    ratio_button->add(*Gtk::make_managed<Gtk::Image>("ratio", Gtk::ICON_SIZE_MENU));
     ratio_button->set_relief(Gtk::RELIEF_NONE);
     ratio_button->signal_clicked().connect([this, ratio_button]() { onYinYangClicked(ratio_button); });
     status_->add(*ratio_button);
