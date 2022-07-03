@@ -121,7 +121,7 @@
          <item>
           <widget class="QLabel" name="altSpeedLimitsSectionIconLabel">
            <property name="pixmap">
-            <pixmap resource="application.qrc">:/icons/alt-limit-off.png</pixmap>
+            <pixmap resource="application.qrc">:/icons/alt-limit-off.svg</pixmap>
            </property>
           </widget>
          </item>
