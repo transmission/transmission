@@ -40,7 +40,7 @@ add_custom_command(
         transmission.gresource.xml
     DEPENDS
         icons/hicolor_apps_scalable_transmission.svg
-        icons/lock.png
+        icons/lock.svg
         icons/ratio.svg
         icons/turtle-silhouette.svg
         icons/turtle.svg
