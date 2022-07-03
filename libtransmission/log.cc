@@ -99,11 +99,8 @@ void logAddImpl(
     }
 
     auto const lock = log_state.unique_lock();
-#ifdef _WIN32
 
-    OutputDebugStringA(fmt::format(FMT_STRING("{:s}\r\n"), msg).c_str());
-
-#elif defined(__ANDROID__)
+#if defined(__ANDROID__)
 
     int prio;
 
