@@ -700,7 +700,7 @@
     <message>
         <location line="+0"/>
         <source>kB/s</source>
-        <translation>Ko/s</translation>
+        <translation>ko/s</translation>
     </message>
     <message>
         <location line="+0"/>
@@ -726,7 +726,7 @@
     <message>
         <location line="-1"/>
         <source>kB</source>
-        <translation>Ko</translation>
+        <translation>ko</translation>
     </message>
     <message>
         <location line="+0"/>

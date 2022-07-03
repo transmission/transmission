@@ -2073,7 +2073,7 @@ För att lägga till ytterligare en primär webbadress lägger du till den efter
     <message>
         <location filename="../PrefsDialog.cc" line="-78"/>
         <source>Testing TCP Port...</source>
-        <translation>Testar TCP-port...</translation>
+        <translation>Testar TCP-port…</translation>
     </message>
     <message>
         <location filename="../PrefsDialog.ui" line="-281"/>
