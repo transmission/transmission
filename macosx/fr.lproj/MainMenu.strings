@@ -1,0 +1,441 @@
+
+/* Class = "NSWindow"; title = "Transmission"; ObjectID = "21"; */
+"21.title" = "Transmission";
+
+/* Class = "NSMenu"; title = "MainMenu"; ObjectID = "29"; */
+"29.title" = "MainMenu";
+
+/* Class = "NSMenuItem"; title = "Transmission"; ObjectID = "56"; */
+"56.title" = "Transmission";
+
+/* Class = "NSMenu"; title = "Transmission"; ObjectID = "57"; */
+"57.title" = "Transmission";
+
+/* Class = "NSMenuItem"; title = "À propos de Transmission"; ObjectID = "58"; */
+"58.title" = "À propos de Transmission";
+
+/* Class = "NSMenuItem"; title = "Ouvrir un fichier torrent..."; ObjectID = "72"; */
+"72.title" = "Ouvrir un fichier torrent...";
+
+/* Class = "NSMenuItem"; title = "Fermer la fenêtre"; ObjectID = "73"; */
+"73.title" = "Fermer la fenêtre";
+
+/* Class = "NSMenu"; title = "Fichier"; ObjectID = "81"; */
+"81.title" = "Fichier";
+
+/* Class = "NSMenuItem"; title = "Fichier"; ObjectID = "83"; */
+"83.title" = "Fichier";
+
+/* Class = "NSMenuItem"; title = "Aide"; ObjectID = "103"; */
+"103.title" = "Aide";
+
+/* Class = "NSMenu"; title = "Aide"; ObjectID = "106"; */
+"106.title" = "Aide";
+
+/* Class = "NSMenuItem"; title = "Préférences..."; ObjectID = "129"; */
+"129.title" = "Préférences...";
+
+/* Class = "NSMenu"; title = "Services"; ObjectID = "130"; */
+"130.title" = "Services";
+
+/* Class = "NSMenuItem"; title = "Services"; ObjectID = "131"; */
+"131.title" = "Services";
+
+/* Class = "NSMenuItem"; title = "Masquer Transmission"; ObjectID = "134"; */
+"134.title" = "Masquer Transmission";
+
+/* Class = "NSMenuItem"; title = "Quitter Transmission"; ObjectID = "136"; */
+"136.title" = "Quitter Transmission";
+
+/* Class = "NSMenuItem"; title = "Masquer les autres"; ObjectID = "145"; */
+"145.title" = "Masquer les autres";
+
+/* Class = "NSMenuItem"; title = "Tout afficher"; ObjectID = "150"; */
+"150.title" = "Tout afficher";
+
+/* Class = "NSMenuItem"; title = "Copier"; ObjectID = "157"; */
+"157.title" = "Copier";
+
+/* Class = "NSMenuItem"; title = "Couper"; ObjectID = "160"; */
+"160.title" = "Couper";
+
+/* Class = "NSMenuItem"; title = "Édition"; ObjectID = "163"; */
+"163.title" = "Édition";
+
+/* Class = "NSMenu"; title = "Édition"; ObjectID = "169"; */
+"169.title" = "Édition";
+
+/* Class = "NSMenuItem"; title = "Coller"; ObjectID = "171"; */
+"171.title" = "Coller";
+
+/* Class = "NSMenuItem"; title = "Tout sélectionner"; ObjectID = "172"; */
+"172.title" = "Tout sélectionner";
+
+/* Class = "NSMenuItem"; title = "Présentation"; ObjectID = "301"; */
+"301.title" = "Présentation";
+
+/* Class = "NSMenu"; title = "Présentation"; ObjectID = "302"; */
+"302.title" = "Présentation";
+
+/* Class = "NSMenuItem"; title = "Forums"; ObjectID = "418"; */
+"418.title" = "Forums";
+
+/* Class = "NSMenu"; title = "Menu"; ObjectID = "456"; */
+"456.title" = "Menu";
+
+/* Class = "NSMenuItem"; title = "Arrêter la sélection"; ObjectID = "457"; */
+"457.title" = "Arrêter la sélection";
+
+/* Class = "NSMenuItem"; title = "Montrer l'inspecteur"; ObjectID = "459"; */
+"459.title" = "Montrer l'inspecteur";
+
+/* Class = "NSMenuItem"; title = "Révéler les données dans le Finder"; ObjectID = "516"; */
+"516.title" = "Révéler les données dans le Finder";
+
+/* Class = "NSMenuItem"; title = "Personnaliser la barre d'outils"; ObjectID = "545"; */
+"545.title" = "Personnaliser la barre d'outils";
+
+/* Class = "NSMenuItem"; title = "Masquer la barre de status"; ObjectID = "547"; */
+"547.title" = "Masquer la barre de status";
+
+/* Class = "NSMenu"; title = "Menu"; ObjectID = "589"; */
+"589.title" = "Menu";
+
+/* Class = "NSMenuItem"; title = "Montrer l'inspecteur"; ObjectID = "598"; */
+"598.title" = "Montrer l'inspecteur";
+
+/* Class = "NSMenuItem"; title = "Ouvrir un fichier torrent..."; ObjectID = "611"; */
+"611.title" = "Ouvrir un fichier torrent...";
+
+/* Class = "NSMenuItem"; title = "Vérifier les mises à jour..."; ObjectID = "975"; */
+"975.title" = "Vérifier les mises à jour...";
+
+/* Class = "NSMenuItem"; title = "Reprendre la sélection"; ObjectID = "1028"; */
+"1028.title" = "Reprendre la sélection";
+
+/* Class = "NSMenuItem"; title = "Masquer la barre d'outils"; ObjectID = "1222"; */
+"1222.title" = "Masquer la barre d'outils";
+
+/* Class = "NSMenuItem"; title = "Transferts"; ObjectID = "1399"; */
+"1399.title" = "Transferts";
+
+/* Class = "NSMenu"; title = "Transferts"; ObjectID = "1400"; */
+"1400.title" = "Transferts";
+
+/* Class = "NSMenuItem"; title = "Arrêter la sélection"; ObjectID = "1403"; */
+"1403.title" = "Arrêter la sélection";
+
+/* Class = "NSMenuItem"; title = "Reprendre la sélection"; ObjectID = "1404"; */
+"1404.title" = "Reprendre la sélection";
+
+/* Class = "NSMenuItem"; title = "Arrêter tous"; ObjectID = "1413"; */
+"1413.title" = "Arrêter tous";
+
+/* Class = "NSMenuItem"; title = "Reprendre tous"; ObjectID = "1414"; */
+"1414.title" = "Reprendre tous";
+
+/* Class = "NSMenuItem"; title = "Enlever et placer dans la corbeille"; ObjectID = "1514"; */
+"1514.title" = "Enlever et placer dans la corbeille";
+
+/* Class = "NSMenuItem"; title = "Enlever de la liste"; ObjectID = "1516"; */
+"1516.title" = "Enlever de la liste";
+
+/* Class = "NSMenuItem"; title = "Enregistrer le fichier torrent sous…"; ObjectID = "1533"; */
+"1533.title" = "Enregistrer le fichier torrent sous…";
+
+/* Class = "NSMenuItem"; title = "Montrer l'inspecteur"; ObjectID = "1536"; */
+"1536.title" = "Montrer l'inspecteur";
+
+/* Class = "NSMenuItem"; title = "Révéler les données dans le Finder"; ObjectID = "1539"; */
+"1539.title" = "Révéler les données dans le Finder";
+
+/* Class = "NSMenuItem"; title = "Enlever de la liste"; ObjectID = "1550"; */
+"1550.title" = "Enlever de la liste";
+
+/* Class = "NSMenuItem"; title = "Enlever et placer dans la corbeille"; ObjectID = "1551"; */
+"1551.title" = "Enlever et placer dans la corbeille";
+
+/* Class = "NSMenuItem"; title = "Site Web de Transmission"; ObjectID = "1558"; */
+"1558.title" = "Site Web de Transmission";
+
+/* Class = "NSMenuItem"; title = "Aide de Transmission"; ObjectID = "1561"; */
+"1561.title" = "Aide de Transmission";
+
+/* Class = "NSMenuItem"; title = "Vitesse limitée"; ObjectID = "1566"; */
+"1566.title" = "Vitesse limitée";
+
+/* Class = "NSMenuItem"; title = "Vue minimale"; ObjectID = "1578"; */
+"1578.title" = "Vue minimale";
+
+/* Class = "NSMenuItem"; title = "Masquer la barre de filtre"; ObjectID = "1620"; */
+"1620.title" = "Masquer la barre de filtre";
+
+/* Class = "NSMenuItem"; title = "Tout désélectionner"; ObjectID = "1675"; */
+"1675.title" = "Tout désélectionner";
+
+/* Class = "NSMenuItem"; title = "Reprendre la sélection sans attente"; ObjectID = "1678"; */
+"1678.title" = "Reprendre la sélection sans attente";
+
+/* Class = "NSMenuItem"; title = "Ouvrir avec les options..."; ObjectID = "1680"; */
+"1680.title" = "Ouvrir avec les options...";
+
+/* Class = "NSMenuItem"; title = "Fenêtre"; ObjectID = "1683"; */
+"1683.title" = "Fenêtre";
+
+/* Class = "NSMenu"; title = "Fenêtre"; ObjectID = "1684"; */
+"1684.title" = "Fenêtre";
+
+/* Class = "NSMenuItem"; title = "Placer dans le Dock"; ObjectID = "1685"; */
+"1685.title" = "Placer dans le Dock";
+
+/* Class = "NSMenuItem"; title = "Tout ramener au premier plan"; ObjectID = "1687"; */
+"1687.title" = "Tout ramener au premier plan";
+
+/* Class = "NSMenuItem"; title = "Réduire/agrandir"; ObjectID = "1688"; */
+"1688.title" = "Réduire/agrandir";
+
+/* Class = "NSMenuItem"; title = "Onglet inspecteur suivant"; ObjectID = "1693"; */
+"1693.title" = "Onglet inspecteur suivant";
+
+/* Class = "NSMenuItem"; title = "Onglet inspecteur précédent"; ObjectID = "1694"; */
+"1694.title" = "Onglet inspecteur précédent";
+
+/* Class = "NSMenuItem"; title = "Transmission"; ObjectID = "1696"; */
+"1696.title" = "Transmission";
+
+/* Class = "NSMenuItem"; title = "Effacer"; ObjectID = "1766"; */
+"1766.title" = "Effacer";
+
+/* Class = "NSMenuItem"; title = "Messages"; ObjectID = "1795"; */
+"1795.title" = "Messages";
+
+/* Class = "NSMenuItem"; title = "Filtre suivant"; ObjectID = "1797"; */
+"1797.title" = "Filtre suivant";
+
+/* Class = "NSMenuItem"; title = "Filtre précédent"; ObjectID = "1798"; */
+"1798.title" = "Filtre précédent";
+
+/* Class = "NSMenuItem"; title = "Reprendre tous"; ObjectID = "1804"; */
+"1804.title" = "Reprendre tous";
+
+/* Class = "NSMenuItem"; title = "Reprendre la sélection sans attente"; ObjectID = "1808"; */
+"1808.title" = "Reprendre la sélection sans attente";
+
+/* Class = "NSMenuItem"; title = "Ouvrir le torrent à l'adresse"; ObjectID = "1846"; */
+"1846.title" = "Ouvrir le torrent à l'adresse";
+
+/* Class = "NSMenuItem"; title = "Ouvrir le torrent à l'adresse"; ObjectID = "1858"; */
+"1858.title" = "Ouvrir le torrent à l'adresse";
+
+/* Class = "NSMenuItem"; title = "Mettre à jour depuis le trackeur"; ObjectID = "1860"; */
+"1860.title" = "Mettre à jour depuis le trackeur";
+
+/* Class = "NSMenuItem"; title = "Vérifier les données locales"; ObjectID = "1877"; */
+"1877.title" = "Vérifier les données locales";
+
+/* Class = "NSMenuItem"; title = "Déplacer les données vers…"; ObjectID = "1891"; */
+"1891.title" = "Déplacer les données vers…";
+
+/* Class = "NSMenuItem"; title = "Trier les transferts par"; ObjectID = "1894"; */
+"1894.title" = "Trier les transferts par";
+
+/* Class = "NSMenu"; title = "Trier les transferts par"; ObjectID = "1895"; */
+"1895.title" = "Trier les transferts par";
+
+/* Class = "NSMenuItem"; title = "Progression"; ObjectID = "1896"; */
+"1896.title" = "Progression";
+
+/* Class = "NSMenuItem"; title = "État"; ObjectID = "1897"; */
+"1897.title" = "État";
+
+/* Class = "NSMenuItem"; title = "Croissant"; ObjectID = "1899"; */
+"1899.title" = "Croissant";
+
+/* Class = "NSMenuItem"; title = "Date d'ajout"; ObjectID = "1900"; */
+"1900.title" = "Date d'ajout";
+
+/* Class = "NSMenuItem"; title = "File d'attente"; ObjectID = "1901"; */
+"1901.title" = "File d'attente";
+
+/* Class = "NSMenuItem"; title = "Nom"; ObjectID = "1902"; */
+"1902.title" = "Nom";
+
+/* Class = "NSMenuItem"; title = "Créer un fichier torrent..."; ObjectID = "1921"; */
+"1921.title" = "Créer un fichier torrent...";
+
+/* Class = "NSMenuItem"; title = "Créer un fichier torrent..."; ObjectID = "1923"; */
+"1923.title" = "Créer un fichier torrent...";
+
+/* Class = "NSMenuItem"; title = "Trackeur"; ObjectID = "1933"; */
+"1933.title" = "Trackeur";
+
+/* Class = "NSMenu"; title = "Menu"; ObjectID = "1936"; */
+"1936.title" = "Menu";
+
+/* Class = "NSMenuItem"; title = "Limite de téléchargement"; ObjectID = "1944"; */
+"1944.title" = "Limite de téléchargement";
+
+/* Class = "NSMenu"; title = "Limite de téléchargement"; ObjectID = "1945"; */
+"1945.title" = "Limite de téléchargement";
+
+/* Class = "NSMenuItem"; title = "Illimité"; ObjectID = "1946"; */
+"1946.title" = "Illimité";
+
+/* Class = "NSMenuItem"; title = "Limite d'envoi"; ObjectID = "1950"; */
+"1950.title" = "Limite d'envoi";
+
+/* Class = "NSMenu"; title = "Limite d'envoi"; ObjectID = "1951"; */
+"1951.title" = "Limite d'envoi";
+
+/* Class = "NSMenuItem"; title = "Limité"; ObjectID = "1960"; */
+"1960.title" = "Limité";
+
+/* Class = "NSMenuItem"; title = "Illimité"; ObjectID = "1963"; */
+"1963.title" = "Illimité";
+
+/* Class = "NSMenuItem"; title = "Limité"; ObjectID = "1964"; */
+"1964.title" = "Limité";
+
+/* Class = "NSMenuItem"; title = "Arrêter l'envoi"; ObjectID = "2017"; */
+"2017.title" = "Arrêter l'envoi";
+
+/* Class = "NSMenu"; title = "Arrêter l'envoi"; ObjectID = "2018"; */
+"2018.title" = "Arrêter l'envoi";
+
+/* Class = "NSMenuItem"; title = "Jamais"; ObjectID = "2024"; */
+"2024.title" = "Jamais";
+
+/* Class = "NSMenuItem"; title = "Arrêter au ratio"; ObjectID = "2025"; */
+"2025.title" = "Arrêter au ratio";
+
+/* Class = "NSMenuItem"; title = "Réglage global"; ObjectID = "2031"; */
+"2031.title" = "Réglage global";
+
+/* Class = "NSMenuItem"; title = "Mettre à jour depuis le trackeur"; ObjectID = "2122"; */
+"2122.title" = "Mettre à jour depuis le trackeur";
+
+/* Class = "NSMenuItem"; title = "Barre des pièces"; ObjectID = "2185"; */
+"2185.title" = "Barre des pièces";
+
+/* Class = "NSMenuItem"; title = "Disponibilité"; ObjectID = "2279"; */
+"2279.title" = "Disponibilité";
+
+/* Class = "NSMenuItem"; title = "Statistiques"; ObjectID = "2301"; */
+"2301.title" = "Statistiques";
+
+/* Class = "NSMenuItem"; title = "Activité"; ObjectID = "2324"; */
+"2324.title" = "Activité";
+
+/* Class = "NSMenuItem"; title = "Groupe"; ObjectID = "2839"; */
+"2839.title" = "Groupe";
+
+/* Class = "NSMenu"; title = "Groupe"; ObjectID = "2840"; */
+"2840.title" = "Groupe";
+
+/* Class = "NSMenuItem"; title = "Groupe"; ObjectID = "2849"; */
+"2849.title" = "Groupe";
+
+/* Class = "NSMenu"; title = "Groupe"; ObjectID = "2850"; */
+"2850.title" = "Groupe";
+
+/* Class = "NSTextFieldCell"; title = "999 of 999 transfers"; ObjectID = "3049"; */
+"3049.title" = "999 of 999 transfers";
+
+/* Class = "NSMenuItem"; title = "Utiliser les groupes"; ObjectID = "3078"; */
+"3078.title" = "Utiliser les groupes";
+
+/* Class = "NSTableColumn"; headerCell.title = "Couleur"; ObjectID = "3093"; */
+"3093.headerCell.title" = "Couleur";
+
+/* Class = "NSTableColumn"; headerCell.title = "Vitesse DL"; ObjectID = "3126"; */
+"3126.headerCell.title" = "Vitesse DL";
+
+/* Class = "NSTextFieldCell"; title = "Text Cell"; ObjectID = "3127"; */
+"3127.title" = "Text Cell";
+
+/* Class = "NSTableColumn"; headerCell.title = "Vitesse UL"; ObjectID = "3135"; */
+"3135.headerCell.title" = "Vitesse UL";
+
+/* Class = "NSTextFieldCell"; title = "Text Cell"; ObjectID = "3136"; */
+"3136.title" = "Text Cell";
+
+/* Class = "NSTableColumn"; headerCell.title = "Groupe"; ObjectID = "3140"; */
+"3140.headerCell.title" = "Groupe";
+
+/* Class = "NSTextFieldCell"; title = "Text Cell"; ObjectID = "3145"; */
+"3145.title" = "Text Cell";
+
+/* Class = "NSMenuItem"; title = "Quick Look"; ObjectID = "3166"; */
+"3166.title" = "Quick Look";
+
+/* Class = "NSMenuItem"; title = "Support & Développement"; ObjectID = "3170"; */
+"3170.title" = "Support & Développement";
+
+/* Class = "NSMenuItem"; title = "Respecter la limite globale"; ObjectID = "3190"; */
+"3190.title" = "Respecter la limite globale";
+
+/* Class = "NSMenuItem"; title = "Priorité"; ObjectID = "3196"; */
+"3196.title" = "Priorité";
+
+/* Class = "NSMenu"; title = "Priorité"; ObjectID = "3197"; */
+"3197.title" = "Priorité";
+
+/* Class = "NSMenuItem"; title = "Haute"; ObjectID = "3198"; */
+"3198.title" = "Haute";
+
+/* Class = "NSMenuItem"; title = "Normale"; ObjectID = "3199"; */
+"3199.title" = "Normale";
+
+/* Class = "NSMenuItem"; title = "Basse"; ObjectID = "3200"; */
+"3200.title" = "Basse";
+
+/* Class = "NSMenuItem"; title = "Enregistrer le fichier Torrent sous…"; ObjectID = "3207"; */
+"3207.title" = "Enregistrer le fichier Torrent sous…";
+
+/* Class = "NSMenuItem"; title = "Déplacer les données…"; ObjectID = "3209"; */
+"3209.title" = "Déplacer les données…";
+
+/* Class = "NSMenuItem"; title = "Faire un don…"; ObjectID = "3212"; */
+"3212.title" = "Faire un don…";
+
+/* Class = "NSMenuItem"; title = "Copier le lien-aimant dans le Presse-Papier"; ObjectID = "3216"; */
+"3216.title" = "Copier le lien-aimant dans le Presse-Papier";
+
+/* Class = "NSMenuItem"; title = "Copier le lien-aimant dans le Presse-Papier"; ObjectID = "3218"; */
+"3218.title" = "Copier le lien-aimant dans le Presse-Papier";
+
+/* Class = "NSMenuItem"; title = "Vérifier les données locales"; ObjectID = "3221"; */
+"3221.title" = "Vérifier les données locales";
+
+/* Class = "NSMenuItem"; title = "Annuler"; ObjectID = "3321"; */
+"3321.title" = "Annuler";
+
+/* Class = "NSMenuItem"; title = "Rétablir"; ObjectID = "3400"; */
+"3400.title" = "Rétablir";
+
+/* Class = "NSMenuItem"; title = "Décroissant"; ObjectID = "3405"; */
+"3405.title" = "Décroissant";
+
+/* Class = "NSMenuItem"; title = "Supprimer tous les terminés de la liste"; ObjectID = "3407"; */
+"3407.title" = "Supprimer tous les terminés de la liste";
+
+/* Class = "NSMenuItem"; title = "Taille"; ObjectID = "3430"; */
+"3430.title" = "Taille";
+
+/* Class = "NSMenuItem"; title = "Renommer le fichier..."; ObjectID = "3445"; */
+"3445.title" = "Renommer le fichier...";
+
+/* Class = "NSMenuItem"; title = "Renommer le fichier..."; ObjectID = "3448"; */
+"3448.title" = "Renommer le fichier...";
+
+/* Class = "NSMenuItem"; title = "Partager le torrent"; ObjectID = "8t6-wh-5UW"; */
+"8t6-wh-5UW.title" = "Partager le torrent";
+
+/* Class = "NSMenu"; title = "Partager le torrent"; ObjectID = "Cay-iU-bH4"; */
+"Cay-iU-bH4.title" = "Partager le torrent";
+
+/* Class = "NSMenu"; title = "Partager le torrent"; ObjectID = "lvU-Va-GzM"; */
+"lvU-Va-GzM.title" = "Partager le torrent";
+
+/* Class = "NSMenuItem"; title = "Partager le torrent"; ObjectID = "s5v-VO-G2y"; */
+"s5v-VO-G2y.title" = "Partager le torrent";
