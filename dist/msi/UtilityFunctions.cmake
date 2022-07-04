@@ -39,32 +39,6 @@ function(find_msvc_crt_msm OUTPUT_VAR)
     set(${OUTPUT_VAR} "${${OUTPUT_VAR}}" PARENT_SCOPE)
 endfunction()
 
-function(png2ico OUTPUT_FILE)
-    if(NOT IS_ABSOLUTE "${OUTPUT_FILE}")
-        set(OUTPUT_FILE "${CMAKE_CURRENT_BINARY_DIR}/${OUTPUT_FILE}")
-    endif()
-
-    find_program(MAGICK_PROGRAM magick)
-    find_program(PWSH_PROGRAM pwsh powershell)
-
-    if(MAGICK_PROGRAM)
-        add_custom_command(
-            OUTPUT "${OUTPUT_FILE}"
-            COMMAND "${MAGICK_PROGRAM}" convert ${ARGN} "${OUTPUT_FILE}"
-            DEPENDS ${ARGN})
-    elseif(PWSH_PROGRAM)
-        add_custom_command(
-            OUTPUT "${OUTPUT_FILE}"
-            COMMAND "${PWSH_PROGRAM}" -Command "${CMAKE_CURRENT_LIST_DIR}/ConvertTo-Icon.ps1" "${OUTPUT_FILE}" ${ARGN}
-            DEPENDS ${ARGN})
-    else()
-        message(FATAL_ERROR "Unable to convert PNGs to ICO (no suitable program found)")
-    endif()
-
-    list(APPEND ${OUTPUT_VAR} "${OUTPUT_FILE}")
-    set(${OUTPUT_VAR} "${${OUTPUT_VAR}}" PARENT_SCOPE)
-endfunction()
-
 function(wix_heat OUTPUT_FILE SOURCE_DIR CG_NAME DR_NAME VAR_NAME)
     cmake_parse_arguments(HEAT "" "XSL_TRANSFORM" "" ${ARGN})
 

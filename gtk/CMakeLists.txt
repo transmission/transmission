@@ -40,13 +40,13 @@ add_custom_command(
         transmission.gresource.xml
     DEPENDS
         icons/hicolor_apps_scalable_transmission.svg
-        icons/lock.png
-        icons/ratio.png
-        icons/turtle-blue.png
-        icons/turtle-grey.png
-        icons/utilities.png
-        transmission.gresource.xml
+        icons/lock.svg
+        icons/preferences-other-symbolic.svg
+        icons/ratio.svg
+        icons/turtle-silhouette.svg
+        icons/turtle.svg
         transmission-ui.xml
+        transmission.gresource.xml
     WORKING_DIRECTORY
         ${CMAKE_CURRENT_SOURCE_DIR}
 )
