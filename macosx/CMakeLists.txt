@@ -327,9 +327,9 @@ foreach(IMG ${${PROJECT_NAME}_LODPI_IMAGES})
 endforeach()
 
 set(${PROJECT_NAME}_LINGUAS
+    Base
     da
     de
-    en
     es
     fr
     it
@@ -390,7 +390,13 @@ foreach(LANG ${${PROJECT_NAME}_ENABLED_LINGUAS})
 
     set(${PROJECT_NAME}_${LANG}_STRINGS_FILES)
     foreach(F ${${PROJECT_NAME}_LANG_STRINGS_FILES})
-        list(APPEND ${PROJECT_NAME}_${LANG}_STRINGS_FILES ${LANG}.lproj/${F})
+        # Special case for Base Internationalization.
+        # 'en' is considered as Base/Development locale.
+        if(LANG STREQUAL "Base")
+            list(APPEND ${PROJECT_NAME}_${LANG}_STRINGS_FILES en.lproj/${F})
+        else()
+            list(APPEND ${PROJECT_NAME}_${LANG}_STRINGS_FILES ${LANG}.lproj/${F})
+        endif()
     endforeach()
 endforeach()
 
