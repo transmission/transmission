@@ -5,7 +5,7 @@
     <file alias="icons/scalable/actions/preferences-other.svg">icons/preferences-other-symbolic.svg</file>
     <file alias="icons/scalable/actions/ratio.svg">icons/ratio.svg</file>
     <file alias="icons/scalable/apps/transmission.svg" compressed="true" preprocess="xml-stripblanks">icons/hicolor_apps_scalable_transmission.svg</file>
-	<file alias="hicolor_apps_scalable_transmission-tray-icon.svg" compresses="true" preprocess="xml-stripblanks">icons/hicolor_apps_scalable_transmission-tray-icon.svg</file>
+	<file alias="icons/hicolor_apps_scalable_transmission-tray-icon.svg" compressed="true" preprocess="xml-stripblanks">icons/hicolor_apps_scalable_transmission-tray-icon.svg</file>
     <file alias="icons/scalable/status/alt-speed-off.svg">icons/turtle-silhouette.svg</file>
     <file alias="icons/scalable/status/alt-speed-on.svg">icons/turtle.svg</file>
     <file compressed="true" preprocess="xml-stripblanks">transmission-ui.xml</file>
