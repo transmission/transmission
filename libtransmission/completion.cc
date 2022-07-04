@@ -57,7 +57,7 @@ uint64_t tr_completion::computeSizeWhenDone() const
         }
         else
         {
-            size += countHasBytesInBlocks(block_info_->blockSpanForPiece(piece));
+            size += countHasBytesInPiece(piece);
         }
     }
 
@@ -101,7 +101,7 @@ size_t tr_completion::countMissingBlocksInPiece(tr_piece_index_t piece) const
 
 size_t tr_completion::countMissingBytesInPiece(tr_piece_index_t piece) const
 {
-    return block_info_->pieceSize(piece) - countHasBytesInBlocks(block_info_->blockSpanForPiece(piece));
+    return block_info_->pieceSize(piece) - countHasBytesInPiece(piece);
 }
 
 tr_completeness tr_completion::status() const
@@ -151,6 +151,7 @@ void tr_completion::addBlock(tr_block_index_t block)
     blocks_.set(block);
     size_now_ += block_info_->blockSize(block);
 
+    size_when_done_.reset();
     has_valid_.reset();
 }
 
@@ -159,7 +160,7 @@ void tr_completion::setBlocks(tr_bitfield blocks)
     TR_ASSERT(std::size(blocks_) == std::size(blocks));
 
     blocks_ = std::move(blocks);
-    size_now_ = countHasBytesInBlocks({ 0, tr_block_index_t(std::size(blocks_)) });
+    size_now_ = countHasBytesInSpan({ 0, block_info_->totalSize() });
     size_when_done_.reset();
     has_valid_.reset();
 }
@@ -187,28 +188,10 @@ void tr_completion::addPiece(tr_piece_index_t piece)
 void tr_completion::removePiece(tr_piece_index_t piece)
 {
     auto const [begin, end] = block_info_->blockSpanForPiece(piece);
-    size_now_ -= countHasBytesInBlocks(block_info_->blockSpanForPiece(piece));
+    size_now_ -= countHasBytesInPiece(piece);
+    size_when_done_.reset();
     has_valid_.reset();
     blocks_.unsetSpan(begin, end);
-}
-
-uint64_t tr_completion::countHasBytesInBlocks(tr_block_span_t span) const
-{
-    auto const [begin, end] = span;
-    if (begin >= end)
-    {
-        return 0;
-    }
-
-    uint64_t n = blocks_.count(begin, end);
-    n *= tr_block_info::BlockSize;
-
-    if (end == block_info_->blockCount() && blocks_.test(end - 1))
-    {
-        n -= tr_block_info::BlockSize - block_info_->blockSize(end - 1);
-    }
-
-    return n;
 }
 
 uint64_t tr_completion::countHasBytesInSpan(tr_byte_span_t span) const
