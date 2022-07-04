@@ -151,6 +151,7 @@ void tr_completion::addBlock(tr_block_index_t block)
     blocks_.set(block);
     size_now_ += block_info_->blockSize(block);
 
+    size_when_done_.reset();
     has_valid_.reset();
 }
 
@@ -188,6 +189,7 @@ void tr_completion::removePiece(tr_piece_index_t piece)
 {
     auto const [begin, end] = block_info_->blockSpanForPiece(piece);
     size_now_ -= countHasBytesInPiece(piece);
+    size_when_done_.reset();
     has_valid_.reset();
     blocks_.unsetSpan(begin, end);
 }
