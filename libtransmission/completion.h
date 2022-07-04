@@ -140,7 +140,11 @@ struct tr_completion
 private:
     [[nodiscard]] uint64_t computeHasValid() const;
     [[nodiscard]] uint64_t computeSizeWhenDone() const;
-    [[nodiscard]] uint64_t countHasBytesInBlocks(tr_block_span_t) const;
+
+    [[nodiscard]] uint64_t countHasBytesInPiece(tr_piece_index_t piece) const
+    {
+        return countHasBytesInSpan(block_info_->byteSpanForPiece(piece));
+    }
 
     torrent_view const* tor_;
     tr_block_info const* block_info_;
