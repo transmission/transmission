@@ -1415,13 +1415,15 @@ template<typename T, std::enable_if_t<std::is_integral<T>::value, bool>>
 
 #endif // #if defined(__GNUC__) && !__has_include(<charconv>)
 
-template std::optional<int64_t> tr_parseNum(std::string_view& sv, int base);
-template std::optional<int32_t> tr_parseNum(std::string_view& sv, int base);
-template std::optional<int8_t> tr_parseNum(std::string_view& sv, int base);
+template std::optional<long long> tr_parseNum(std::string_view& sv, int base);
+template std::optional<long> tr_parseNum(std::string_view& sv, int base);
+template std::optional<int> tr_parseNum(std::string_view& sv, int base);
+template std::optional<char> tr_parseNum(std::string_view& sv, int base);
 
-template std::optional<uint64_t> tr_parseNum(std::string_view& sv, int base);
-template std::optional<uint32_t> tr_parseNum(std::string_view& sv, int base);
-template std::optional<uint8_t> tr_parseNum(std::string_view& sv, int base);
+template std::optional<unsigned long long> tr_parseNum(std::string_view& sv, int base);
+template std::optional<unsigned long> tr_parseNum(std::string_view& sv, int base);
+template std::optional<unsigned int> tr_parseNum(std::string_view& sv, int base);
+template std::optional<unsigned char> tr_parseNum(std::string_view& sv, int base);
 
 template<typename T, std::enable_if_t<std::is_floating_point<T>::value, bool>>
 [[nodiscard]] std::optional<T> tr_parseNum(std::string_view& sv)
