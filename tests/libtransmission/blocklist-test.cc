@@ -73,7 +73,7 @@ TEST_F(BlocklistTest, parsing)
     createFileWithContents(path, Contents1);
     tr_sessionReloadBlocklists(session_);
     EXPECT_TRUE(tr_blocklistExists(session_));
-    EXPECT_EQ(5, tr_blocklistGetRuleCount(session_));
+    EXPECT_EQ(size_t{ 5 }, tr_blocklistGetRuleCount(session_));
 
     // enable the blocklist
     EXPECT_FALSE(tr_blocklistIsEnabled(session_));
