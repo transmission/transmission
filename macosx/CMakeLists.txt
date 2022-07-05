@@ -361,6 +361,7 @@ set(${PROJECT_NAME}_LANG_XIB_FILES
 set(${PROJECT_NAME}_LANG_STRINGS_FILES
     InfoPlist.strings
     Localizable.strings
+    MainMenu.strings
 )
 
 set(${PROJECT_NAME}_NIB_FILES)
@@ -379,13 +380,20 @@ set(${PROJECT_NAME}_LINGUAS_NIB_FILES)
 foreach(LANG ${${PROJECT_NAME}_ENABLED_LINGUAS})
     set(${PROJECT_NAME}_${LANG}_NIB_FILES)
     foreach(F ${${PROJECT_NAME}_LANG_XIB_FILES})
-        set(F_XIB "${LANG}.lproj/${F}")
-        get_filename_component(F_BASE "${F}" NAME_WE)
-        set(F_NIB "${PROJECT_BINARY_DIR}/${LANG}.lproj/${F_BASE}.nib")
-        tr_wrap_xib("${F_XIB}" "${F_NIB}")
-        list(APPEND ${PROJECT_NAME}_LINGUAS_XIB_FILES "${F_XIB}")
-        list(APPEND ${PROJECT_NAME}_LINGUAS_NIB_FILES "${F_NIB}")
-        list(APPEND ${PROJECT_NAME}_${LANG}_NIB_FILES "${F_NIB}")
+        # Check for existence of xib file, otherwise get .strings file
+        if(EXISTS "${LANG}.lproj/${F}")
+            set(F_XIB "${LANG}.lproj/${F}")
+            get_filename_component(F_BASE "${F}" NAME_WE)
+            set(F_NIB "${PROJECT_BINARY_DIR}/${LANG}.lproj/${F_BASE}.nib")
+            tr_wrap_xib("${F_XIB}" "${F_NIB}")
+            list(APPEND ${PROJECT_NAME}_LINGUAS_XIB_FILES "${F_XIB}")
+            list(APPEND ${PROJECT_NAME}_LINGUAS_NIB_FILES "${F_NIB}")
+            list(APPEND ${PROJECT_NAME}_${LANG}_NIB_FILES "${F_NIB}")
+        else()
+            if(EXISTS "${PROJECT_NAME}_${LANG}_STRINGS_FILES ${LANG}.lproj/${F}")
+                list(APPEND ${PROJECT_NAME}_${LANG}_STRINGS_FILES ${LANG}.lproj/${F})
+            endif()
+        endif()
     endforeach()
 
     set(${PROJECT_NAME}_${LANG}_STRINGS_FILES)
@@ -393,9 +401,13 @@ foreach(LANG ${${PROJECT_NAME}_ENABLED_LINGUAS})
         # Special case for Base Internationalization.
         # 'en' is considered as Base/Development locale.
         if(LANG STREQUAL "Base")
-            list(APPEND ${PROJECT_NAME}_${LANG}_STRINGS_FILES en.lproj/${F})
+            if(EXISTS "${PROJECT_NAME}_${LANG}_STRINGS_FILES en.lproj/${F}")
+                list(APPEND ${PROJECT_NAME}_${LANG}_STRINGS_FILES en.lproj/${F})
+            endif()
         else()
-            list(APPEND ${PROJECT_NAME}_${LANG}_STRINGS_FILES ${LANG}.lproj/${F})
+            if(EXISTS "${PROJECT_NAME}_${LANG}_STRINGS_FILES ${LANG}.lproj/${F}")
+                list(APPEND ${PROJECT_NAME}_${LANG}_STRINGS_FILES ${LANG}.lproj/${F})
+            endif()
         endif()
     endforeach()
 endforeach()
