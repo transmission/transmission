@@ -79,6 +79,16 @@ public:
         return download_req_period_;
     }
 
+    [[nodiscard]] std::optional<size_t> maxActiveRequests(PeerKey peer) const noexcept override
+    {
+        if (auto const iter = reqq_.find(peer); iter != std::end(reqq_))
+        {
+            return iter->second;
+        }
+
+        return std::nullopt;
+    }
+
     template<typename... PoolKeys>
     void addPeer(PeerKey peer_key, size_t pending_reqs, PoolKeys... pool_keys)
     {
@@ -101,12 +111,18 @@ public:
         download_req_period_ = secs;
     }
 
+    void setReqQ(PeerKey peer, std::optional<size_t> reqq)
+    {
+        reqq_[peer] = reqq;
+    }
+
 private:
     std::map<PeerKey, std::vector<PoolKey>> peer_to_pools_;
+    std::map<PeerKey, std::optional<size_t>> reqq_;
     std::map<PeerKey, size_t> pending_reqs_;
     std::map<PoolKey, size_t> pool_limit_;
-    uint32_t max_observed_dl_speed_Bps_ = 0;
     size_t download_req_period_ = 10U;
+    uint32_t max_observed_dl_speed_Bps_ = 0;
 };
 
 } // namespace

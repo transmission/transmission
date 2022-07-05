@@ -598,6 +598,11 @@ public:
         return 10U; // 10 seconds. TODO: make this configurable
     }
 
+    [[nodiscard]] std::optional<size_t> maxActiveRequests(PeerKey peer) const noexcept override
+    {
+        return peer->maxActiveRequests();
+    }
+
     ///
 
     tr_session* const session;

@@ -15,6 +15,7 @@
 #include <limits> // std::numeric_limits
 #include <map>
 #include <numeric>
+#include <optional>
 #include <utility> // std::pair
 #include <vector>
 
@@ -47,6 +48,11 @@ public:
 
         // The period over which we are trying to fill our download bandwidth
         [[nodiscard]] virtual size_t downloadReqPeriod() const = 0;
+
+        // The number of concurrent active requests that the peer will allow.
+        // For BitTorrent peers, this is the BitTorrent peer's ReqQ.
+        // Note this number comes from the peer and is independent of speed limits.
+        [[nodiscard]] virtual std::optional<size_t> maxActiveRequests(PeerKey peer) const noexcept = 0;
     };
 
     // How many blocks should we request now to keep our
