@@ -73,7 +73,7 @@ TEST_F(BlocklistTest, parsing)
     createFileWithContents(path, Contents1);
     tr_sessionReloadBlocklists(session_);
     EXPECT_TRUE(tr_blocklistExists(session_));
-    EXPECT_EQ(5, tr_blocklistGetRuleCount(session_));
+    EXPECT_EQ(size_t{ 5 }, tr_blocklistGetRuleCount(session_));
 
     // enable the blocklist
     EXPECT_FALSE(tr_blocklistIsEnabled(session_));
@@ -108,27 +108,27 @@ TEST_F(BlocklistTest, updating)
     auto const path = tr_pathbuf{ tr_sessionGetConfigDir(session_), "/blocklists/level1" };
 
     // no blocklist to start with...
-    EXPECT_EQ(0, tr_blocklistGetRuleCount(session_));
+    EXPECT_EQ(0U, tr_blocklistGetRuleCount(session_));
 
     // test that updated source files will get loaded
     createFileWithContents(path, Contents1);
     tr_sessionReloadBlocklists(session_);
-    EXPECT_EQ(5, tr_blocklistGetRuleCount(session_));
+    EXPECT_EQ(5U, tr_blocklistGetRuleCount(session_));
 
     // test that updated source files will get loaded
     createFileWithContents(path, Contents2);
     tr_sessionReloadBlocklists(session_);
-    EXPECT_EQ(6, tr_blocklistGetRuleCount(session_));
+    EXPECT_EQ(6U, tr_blocklistGetRuleCount(session_));
 
     // test that updated source files will get loaded
     createFileWithContents(path, Contents1);
     tr_sessionReloadBlocklists(session_);
-    EXPECT_EQ(5, tr_blocklistGetRuleCount(session_));
+    EXPECT_EQ(5U, tr_blocklistGetRuleCount(session_));
 
     // ensure that new files, if bad, get skipped
     createFileWithContents(path, "# nothing useful\n");
     tr_sessionReloadBlocklists(session_);
-    EXPECT_EQ(5, tr_blocklistGetRuleCount(session_));
+    EXPECT_EQ(5U, tr_blocklistGetRuleCount(session_));
 
     // cleanup
 }
